@@ -67,7 +67,6 @@ namespace ec2 {
 class ECConnectionNotificationManager;
 class TransactionMessageBusAdapter;
 class P2pMessageBus;
-class TimeSynchronizationManager;
 class QnAbstractTransactionTransport;
 
 struct QnPeerTimeInfo
@@ -929,8 +928,6 @@ protected:
         impl::SimpleHandlerPtr handler) = 0;
 };
 
-typedef std::shared_ptr<AbstractTimeManager> AbstractTimeManagerPtr;
-
 class AbstractMiscNotificationManager: public QObject
 {
 Q_OBJECT
@@ -1171,7 +1168,6 @@ public:
     virtual AbstractMiscManagerPtr getMiscManager(const Qn::UserAccessData& userAccessData) = 0;
     virtual AbstractDiscoveryManagerPtr getDiscoveryManager(
         const Qn::UserAccessData& userAccessData) = 0;
-    virtual AbstractTimeManagerPtr getTimeManager(const Qn::UserAccessData& userAccessData) = 0;
     virtual AbstractWebPageManagerPtr getWebPageManager(
         const Qn::UserAccessData& userAccessData) = 0;
 
@@ -1361,7 +1357,6 @@ public:
 
     virtual void setConfParams(std::map<QString, QVariant> confParams) = 0;
     virtual TransactionMessageBusAdapter* messageBus() const = 0;
-    virtual TimeSynchronizationManager* timeSyncManager() const = 0;
 
     virtual void shutdown()
     {

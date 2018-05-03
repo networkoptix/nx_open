@@ -60,7 +60,6 @@ namespace ec2
         virtual AbstractUpdatesManagerPtr getUpdatesManager(const Qn::UserAccessData &userAccessData) override;
         virtual AbstractMiscManagerPtr getMiscManager(const Qn::UserAccessData &userAccessData) override;
         virtual AbstractDiscoveryManagerPtr getDiscoveryManager(const Qn::UserAccessData &userAccessData) override;
-        virtual AbstractTimeManagerPtr getTimeManager(const Qn::UserAccessData &userAccessData) override;
 
         virtual AbstractLicenseNotificationManagerPtr getLicenseNotificationManager() override;
         virtual AbstractTimeNotificationManagerPtr getTimeNotificationManager() override;
@@ -143,8 +142,7 @@ namespace ec2
         m_storedFileNotificationManager(new QnStoredFileNotificationManager),
         m_updatesNotificationManager(new QnUpdatesNotificationManager),
         m_miscNotificationManager(new QnMiscNotificationManager),
-        m_discoveryNotificationManager(new QnDiscoveryNotificationManager(commonModule())),
-        m_timeNotificationManager(new QnTimeNotificationManager(connectionFactory->timeSyncManager()))
+        m_discoveryNotificationManager(new QnDiscoveryNotificationManager(commonModule()))
     {
         m_notificationManager.reset(
             new ECConnectionNotificationManager(
@@ -184,7 +182,6 @@ namespace ec2
         connect(m_connectionFactory->messageBus(), &AbstractTransactionMessageBus::newDirectConnectionEstablished,
             this, &BaseEc2Connection<QueryProcessorType>::newDirectConnectionEstablished, Qt::DirectConnection);
 
-        m_connectionFactory->timeSyncManager()->start(messageBus(), getMiscManager(Qn::kSystemAccess));
         messageBus()->start();
     }
 
@@ -405,23 +402,6 @@ namespace ec2
         BaseEc2Connection<QueryProcessorType>::getDiscoveryNotificationManager()
     {
         return m_discoveryNotificationManager;
-    }
-
-    template<class QueryProcessorType>
-    AbstractTimeManagerPtr BaseEc2Connection<QueryProcessorType>::getTimeManager(
-        const Qn::UserAccessData& userAccessData)
-    {
-        return std::make_shared<QnTimeManager<QueryProcessorType>>(
-            m_queryProcessor,
-            m_connectionFactory->timeSyncManager(),
-            userAccessData);
-    }
-
-    template<class QueryProcessorType>
-    AbstractTimeNotificationManagerPtr
-        BaseEc2Connection<QueryProcessorType>::getTimeNotificationManager()
-    {
-        return m_timeNotificationManager;
     }
 
     template<class QueryProcessorType>

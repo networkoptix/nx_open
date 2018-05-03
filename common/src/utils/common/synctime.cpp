@@ -127,7 +127,8 @@ qint64 QnSyncTime::currentMSecsSinceEpoch()
         ec2::AbstractECConnectionPtr appServerConnection = QnAppServerConnectionFactory::ec2Connection();
         if( appServerConnection )
         {
-            appServerConnection->getTimeManager(Qn::kSystemAccess)->getCurrentTime( this, (void(QnSyncTime::*)(int, ec2::ErrorCode, qint64))&QnSyncTime::updateTime );
+            // TODO: SYNC_TIME
+            //appServerConnection->getTimeManager(Qn::kSystemAccess)->getCurrentTime( this, (void(QnSyncTime::*)(int, ec2::ErrorCode, qint64))&QnSyncTime::updateTime );
             m_syncTimeRequestIssued = true;
         }
     }

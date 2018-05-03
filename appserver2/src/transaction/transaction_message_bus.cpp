@@ -534,12 +534,10 @@ bool QnTransactionMessageBus::processSpecialTransaction(const QnTransaction<T> &
             onGotServerAliveInfo(tran, sender, transportHeader);
             return true; // do not proxy. this call contains built in proxy
         case ApiCommand::forcePrimaryTimeServer:
-            if (m_timeSyncManager)
-                m_timeSyncManager->onGotPrimariTimeServerTran(tran);
+            // ignore deprecated transaction
             break;
         case ApiCommand::broadcastPeerSyncTime:
-            if (m_timeSyncManager)
-                m_timeSyncManager->resyncTimeWithPeer(tran.peerID);
+            // ignore deprecated transaction
             return true; // do not proxy.
         case ApiCommand::broadcastPeerSystemTime:
         case ApiCommand::getKnownPeersSystemTime:

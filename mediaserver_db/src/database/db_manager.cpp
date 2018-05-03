@@ -296,7 +296,6 @@ QnDbManager::QnDbManager(QnCommonModule* commonModule):
     m_needReparentLayouts(false),
     m_resyncFlags(),
     m_tranLog(nullptr),
-    m_timeSyncManager(nullptr),
     m_insertCameraQuery(&m_queryCachePool),
     m_insertCameraUserAttrQuery(&m_queryCachePool),
     m_insertCameraScheduleQuery(&m_queryCachePool),
@@ -4255,13 +4254,6 @@ ErrorCode QnDbManager::doQueryNoLock(const QnUuid& resourceId, ResourceParamWith
     return fetchResourceParams( filter, params );
 }
 
-// getCurrentTime
-ErrorCode QnDbManager::doQuery(const nullptr_t& /*dummy*/, ApiTimeData& currentTime)
-{
-    currentTime = m_timeSyncManager->getTimeInfo();
-    return ErrorCode::ok;
-}
-
 // dumpDatabase
 ErrorCode QnDbManager::doQuery(const nullptr_t& /*dummy*/, DatabaseDumpData& data)
 {
@@ -4998,11 +4990,6 @@ QnDbManager::QnDbTransactionExt* QnDbManager::getTransaction()
 void QnDbManager::setTransactionLog(QnTransactionLog* tranLog)
 {
     m_tranLog = tranLog;
-}
-
-void QnDbManager::setTimeSyncManager(TimeSynchronizationManager* timeSyncManager)
-{
-    m_timeSyncManager = timeSyncManager;
 }
 
 QnTransactionLog* QnDbManager::transactionLog() const

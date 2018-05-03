@@ -53,7 +53,6 @@ namespace ec2
         virtual QnUbjsonTransactionSerializer* ubjsonTranSerializer() const = 0;
 
         virtual ConnectionGuardSharedState* connectionGuardSharedState() = 0;
-        virtual void setTimeSyncManager(TimeSynchronizationManager* timeSyncManager) = 0;
 
     signals:
         void peerFound(QnUuid data, Qn::PeerType peerType);

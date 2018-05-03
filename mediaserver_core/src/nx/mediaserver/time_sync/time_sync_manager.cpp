@@ -15,20 +15,21 @@
 
 namespace nx {
 namespace mediaserver {
-namespace time_sync {
 
 static const std::chrono::seconds kProxySocetTimeout(10);
+const QString kTimeSyncUrlPath = QString::fromLatin1("ec2/timeSync");
 
-TimeSynchManager::TimeSynchManager(
-    QnMediaServerModule* serverModule,
-    nx::utils::StandaloneTimerManager* const /*timerManager*/,
+TimeSyncManager::TimeSyncManager(
+    QnCommonModule* commonModule,
+    ReverseConnectionManager* reverseConnectionManager,
     const std::shared_ptr<AbstractSystemClock>& systemClock,
     const std::shared_ptr<AbstractSteadyClock>& steadyClock)
     :
-    ServerModuleAware(serverModule),
+    QnCommonModuleAware(commonModule),
     m_systemClock(systemClock),
     m_steadyClock(steadyClock),
-    m_thread(new QThread())
+    m_thread(new QThread()),
+    m_reverseConnectionManager(reverseConnectionManager)
 {
     moveToThread(m_thread);
         
@@ -38,7 +39,7 @@ TimeSynchManager::TimeSynchManager(
         if (!m_timer)
         {
             m_timer = new QTimer();
-            connect(m_timer, &QTimer::timeout, this, &TimeSynchManager::doPeriodicTasks);
+            connect(m_timer, &QTimer::timeout, this, &TimeSyncManager::doPeriodicTasks);
         }
         m_timer->start(1000);
     });
@@ -47,17 +48,17 @@ TimeSynchManager::TimeSynchManager(
     initializeTimeFetcher();
 }
 
-TimeSynchManager::~TimeSynchManager()
+TimeSyncManager::~TimeSyncManager()
 {
     stop();
 }
 
-void TimeSynchManager::start()
+void TimeSyncManager::start()
 {
     m_thread->start();
 }
 
-void TimeSynchManager::stop()
+void TimeSyncManager::stop()
 {
     m_thread->exit();
     m_thread->wait();
@@ -69,7 +70,7 @@ void TimeSynchManager::stop()
     }
 }
 
-void TimeSynchManager::initializeTimeFetcher()
+void TimeSyncManager::initializeTimeFetcher()
 {
     auto meanTimerFetcher = std::make_unique<nx::network::MeanTimeFetcher>();
     for (const char* timeServer: RFC868_SERVERS)
@@ -82,7 +83,7 @@ void TimeSynchManager::initializeTimeFetcher()
     m_internetTimeSynchronizer = std::move(meanTimerFetcher);
 }
 
-QnMediaServerResourcePtr TimeSynchManager::getPrimaryTimeServer()
+QnMediaServerResourcePtr TimeSyncManager::getPrimaryTimeServer()
 {
     auto resourcePool = commonModule()->resourcePool();
     auto settings = commonModule()->globalSettings();
@@ -106,13 +107,12 @@ QnMediaServerResourcePtr TimeSynchManager::getPrimaryTimeServer()
     return servers.front();
 }
 
-std::unique_ptr<nx::network::AbstractStreamSocket> TimeSynchManager::connectToRemoteHost(const QnRoute& route)
+std::unique_ptr<nx::network::AbstractStreamSocket> TimeSyncManager::connectToRemoteHost(const QnRoute& route)
 {
-    if (route.reverseConnect) 
+    if (route.reverseConnect && m_reverseConnectionManager)
     {
         const auto& target = route.gatewayId.isNull() ? route.id : route.gatewayId;
-        auto manager = serverModule()->reverseConnectionManager();
-        return manager->getProxySocket(target, kProxySocetTimeout);
+        return m_reverseConnectionManager->getProxySocket(target, kProxySocetTimeout);
     }
     else
     {
@@ -127,7 +127,7 @@ std::unique_ptr<nx::network::AbstractStreamSocket> TimeSynchManager::connectToRe
     return std::unique_ptr<nx::network::AbstractStreamSocket>();
 }
 
-void TimeSynchManager::loadTimeFromServer(const QnRoute& route)
+void TimeSyncManager::loadTimeFromServer(const QnRoute& route)
 {
     auto socket = connectToRemoteHost(route);
     if (!socket)
@@ -136,7 +136,7 @@ void TimeSynchManager::loadTimeFromServer(const QnRoute& route)
     auto httpClient = std::make_unique<nx::network::http::HttpClient>();
     httpClient->setSocket(std::move(socket));
     nx::utils::Url url;
-    url.setPath("/api/getSyncTime");
+    url.setPath(kTimeSyncUrlPath);
 
     nx::utils::ElapsedTimer timer;
     timer.restart();
@@ -153,7 +153,7 @@ void TimeSynchManager::loadTimeFromServer(const QnRoute& route)
         route.id.toString()));
 }
 
-void TimeSynchManager::loadTimeFromInternet()
+void TimeSyncManager::loadTimeFromInternet()
 {
     if (m_internetSyncInProgress.exchange(true))
         return; //< Sync already in progress.
@@ -174,7 +174,7 @@ void TimeSynchManager::loadTimeFromInternet()
         });
 }
 
-void TimeSynchManager::loadTimeFromLocalClock()
+void TimeSyncManager::loadTimeFromLocalClock()
 {
     auto newValue = m_systemClock->millisSinceEpoch();
     setTime(newValue);
@@ -182,7 +182,7 @@ void TimeSynchManager::loadTimeFromLocalClock()
         arg(QDateTime::fromMSecsSinceEpoch(newValue.count()).toString(Qt::ISODate)));
 }
 
-void TimeSynchManager::setTime(std::chrono::milliseconds value)
+void TimeSyncManager::setTime(std::chrono::milliseconds value)
 {
     const auto minDeltaToSync = 
         commonModule()->globalSettings()->maxDifferenceBetweenSynchronizedAndInternetTime();
@@ -195,14 +195,14 @@ void TimeSynchManager::setTime(std::chrono::milliseconds value)
     m_synchronizedOnClock = m_steadyClock->now();
 }
 
-std::chrono::milliseconds TimeSynchManager::getTime() const
+std::chrono::milliseconds TimeSyncManager::getTime() const
 {
     QnMutexLocker lock(&m_mutex);
     auto elapsed = m_steadyClock->now() - m_synchronizedOnClock;
     return m_synchronizedTime + elapsed;
 }
 
-void TimeSynchManager::doPeriodicTasks()
+void TimeSyncManager::doPeriodicTasks()
 {
     auto server = getPrimaryTimeServer();
     if (!server)
@@ -224,6 +224,5 @@ void TimeSynchManager::doPeriodicTasks()
     }
 }
 
-} // namespace time_sync
-} // namespace vms
+} // namespace mediaserver
 } // namespace nx

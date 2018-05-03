@@ -50,6 +50,7 @@ const QString kNameSupportEmail(lit("emailSupportEmail"));
 const QString kNameUpdateNotificationsEnabled(lit("updateNotificationsEnabled"));
 const QString kNameTimeSynchronizationEnabled(lit("timeSynchronizationEnabled"));
 const QString kNameSynchronizeTimeWithInternet(lit("synchronizeTimeWithInternet"));
+const QString kNamePrimaryTimeServer(lit("primaryTimeServer"));
 const QString kMaxDifferenceBetweenSynchronizedAndInternetTime(
     lit("maxDifferenceBetweenSynchronizedAndInternetTime"));
 const QString kMaxDifferenceBetweenSynchronizedAndLocalTime(
@@ -225,7 +226,7 @@ public:
     void setSynchronizingTimeWithInternet(bool value);
 
     QnUuid primaryTimeServer() const;
-    void setPrimaryTimeServer(const QnUuid& id);
+    void setPrimaryTimeServer(const QnUuid& value);
 
     std::chrono::milliseconds maxDifferenceBetweenSynchronizedAndInternetTime() const;
     std::chrono::milliseconds maxDifferenceBetweenSynchronizedAndLocalTime() const;
@@ -374,6 +375,7 @@ private:
     QnResourcePropertyAdaptor<bool> *m_updateNotificationsEnabledAdaptor = nullptr;
     QnResourcePropertyAdaptor<bool> *m_timeSynchronizationEnabledAdaptor = nullptr;
     QnResourcePropertyAdaptor<bool> *m_synchronizeTimeWithInternetAdaptor = nullptr;
+    QnResourcePropertyAdaptor<QnUuid> *m_primaryTimeServerAdaptor = nullptr;
     QnResourcePropertyAdaptor<int> *m_maxDifferenceBetweenSynchronizedAndInternetTimeAdaptor = nullptr;
     QnResourcePropertyAdaptor<int> *m_maxDifferenceBetweenSynchronizedAndLocalTimeAdaptor = nullptr;
     QnResourcePropertyAdaptor<int> *m_osTimeChangeCheckPeriodAdaptor = nullptr;

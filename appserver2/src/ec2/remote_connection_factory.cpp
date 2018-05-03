@@ -41,12 +41,8 @@ RemoteConnectionFactory::RemoteConnectionFactory(
         m_jsonTranSerializer.get(),
         m_ubjsonTranSerializer.get()));
 
-	m_timeSynchronizationManager.reset(new TimeSynchronizationManager(
-        commonModule,
-		peerType,
-		timerManager,
-		&m_settingsInstance));
-    m_bus->setTimeSyncManager(m_timeSynchronizationManager.get());
+    // todo:: TIME_SYNC
+    //m_bus->setTimeSyncManager(m_timeSynchronizationManager.get());
 }
 
 void RemoteConnectionFactory::shutdown()
@@ -54,8 +50,6 @@ void RemoteConnectionFactory::shutdown()
     // Have to do it before m_transactionMessageBus destruction since TimeSynchronizationManager
     // uses QnTransactionMessageBus.
 	// todo: introduce server and client TimeSynchronizationManager
-	if (m_timeSynchronizationManager)
-        m_timeSynchronizationManager->pleaseStop();
     pleaseStop();
     join();
 }
@@ -481,11 +475,6 @@ int RemoteConnectionFactory::testRemoteConnection(
     m_remoteQueryProcessor->processQueryAsync<nullptr_t, QnConnectionInfo>(
         addr, ApiCommand::testConnection, nullptr_t(), func);
     return reqId;
-}
-
-TimeSynchronizationManager* RemoteConnectionFactory::timeSyncManager() const
-{
-    return m_timeSynchronizationManager.get();
 }
 
 TransactionMessageBusAdapter* RemoteConnectionFactory::messageBus() const

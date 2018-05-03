@@ -99,12 +99,7 @@ namespace ec2
         return AbstractDiscoveryManagerPtr();
     }
 
-    AbstractTimeManagerPtr OldEcConnection::getTimeManager(const Qn::UserAccessData &)
-    {
-        return AbstractTimeManagerPtr();
-    }
-
-    AbstractLicenseNotificationManagerPtr OldEcConnection::getLicenseNotificationManager()
+        AbstractLicenseNotificationManagerPtr OldEcConnection::getLicenseNotificationManager()
     {
         return AbstractLicenseNotificationManagerPtr();
     }

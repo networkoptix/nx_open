@@ -59,7 +59,6 @@ namespace ec2 {
 
 		TransactionMessageBusAdapter* messageBus() const;
 		QnDistributedMutexManager* distributedMutex() const;
-		virtual TimeSynchronizationManager* timeSyncManager() const override;
 
 		QnJsonTransactionSerializer* jsonTranSerializer() const;
 		QnUbjsonTransactionSerializer* ubjsonTranSerializer() const;
@@ -77,7 +76,6 @@ namespace ec2 {
 		std::unique_ptr<TransactionMessageBusAdapter> m_bus;
 
 		std::shared_ptr<ServerQueryProcessorAccess> m_serverQueryProcessor;
-		std::unique_ptr<TimeSynchronizationManager> m_timeSynchronizationManager;
 		std::unique_ptr<QnDistributedMutexManager> m_distributedMutexManager;
 		bool m_terminated;
 		int m_runningRequests;

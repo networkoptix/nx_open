@@ -769,6 +769,8 @@ void QnCommonMessageProcessor::resetTime()
     if (!m_connection)
         return;
 
+#if 0
+    // TODO: SYNC_TIME
     auto timeManager = m_connection->getTimeManager(Qn::kSystemAccess);
     timeManager->getCurrentTime(this, [this](int /*handle*/, ec2::ErrorCode errCode, qint64 syncTime)
     {
@@ -778,6 +780,7 @@ void QnCommonMessageProcessor::resetTime()
 
         emit syncTimeChanged(syncTime);
     });
+#endif
 }
 
 void QnCommonMessageProcessor::resetAccessRights(const ec2::ApiAccessRightsDataList& accessRights)

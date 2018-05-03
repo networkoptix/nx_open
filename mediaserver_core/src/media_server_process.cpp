@@ -240,6 +240,7 @@
 #include "proxy/proxy_connection.h"
 #include "nx/mediaserver/hls/hls_session_pool.h"
 #include "nx/mediaserver/hls/hls_server.h"
+#include <nx/mediaserver/time_sync/time_sync_manager.h>
 #include "llutil/hardware_id.h"
 #include "api/runtime_info_manager.h"
 #include "rest/handlers/old_client_connect_rest_handler.h"
@@ -288,7 +289,7 @@
 #include <nx/mediaserver/updates2/server_updates2_manager.h>
 #include <nx/vms/common/p2p/downloader/downloader.h>
 #include <nx/mediaserver/root_tool.h>
-
+#include <rest/handlers/time_sync_rest_handler.h>
 
 #if !defined(EDGE_SERVER) && !defined(__aarch64__)
     #include <nx_speech_synthesizer/text_to_wav.h>
@@ -309,6 +310,7 @@
 #include <core/resource/resource_command_processor.h>
 
 using namespace nx;
+using namespace nx::mediaserver;
 
 // This constant is used while checking for compatibility.
 // Do not change it until you know what you're doing.
@@ -1829,7 +1831,7 @@ void MediaServerProcess::registerRestHandlers(
      */
     reg("api/ping", new QnPingRestHandler());
 
-    reg(rest::helper::P2pStatistics::kUrlPath, new QnP2pStatsRestHandler());
+    reg(::rest::helper::P2pStatistics::kUrlPath, new QnP2pStatsRestHandler());
     reg("api/recStats", new QnRecordingStatsRestHandler());
 
     /**%apidoc GET /api/auditLog
@@ -2227,6 +2229,8 @@ void MediaServerProcess::registerRestHandlers(
      * %return JSON result with error code
      */
     reg("api/detachFromCloud", new QnDetachFromCloudRestHandler(cloudManagerGroup), kAdmin);
+
+    reg("api/timeSync", new QnTimeSyncRestHandler(m_serverModule->timeSyncManager()));
 
     reg("api/detachFromSystem", new QnDetachFromSystemRestHandler(
         &cloudManagerGroup->connectionManager, messageBus), kAdmin);
@@ -3500,6 +3504,7 @@ void MediaServerProcess::run()
         QnSleep::msleep(3000);
     }
     QnAppServerConnectionFactory::setEc2Connection(ec2Connection);
+    m_serverModule->timeSyncManager()->start();
 
     while (!needToStop())
     {
@@ -4070,6 +4075,7 @@ void MediaServerProcess::run()
             //ptzPool.reset();
 
             commonModule()->deleteMessageProcessor(); // stop receiving notifications
+            m_serverModule->timeSyncManager()->stop();
             ec2ConnectionFactory->shutdown();
 
             //disconnecting from EC2

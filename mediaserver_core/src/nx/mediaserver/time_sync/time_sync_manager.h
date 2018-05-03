@@ -2,13 +2,12 @@
 
 #include <QtCore/QThread>
 
-#include <common/common_module_aware.h>
 #include <nx/utils/timer_manager.h>
 #include <core/resource/resource_fwd.h>
 #include <network/router.h>
 #include <nx/network/abstract_socket.h>
-#include <nx/mediaserver/server_module_aware.h>
 #include <nx/network/time/mean_time_fetcher.h>
+#include <common/common_module_aware.h>
 
 class AbstractSystemClock
 {
@@ -31,11 +30,10 @@ public:
 
 namespace nx {
 namespace mediaserver {
-namespace time_sync {
 
-class TimeSynchManager:
-    public QObject,
-    public ServerModuleAware
+class ReverseConnectionManager;
+
+class TimeSyncManager: public QObject, public QnCommonModuleAware
 {
     Q_OBJECT
 public:
@@ -43,12 +41,12 @@ public:
     /**
      * TimeSynchronizationManager::start MUST be called before using class instance.
      */
-    TimeSynchManager(
-		QnMediaServerModule* serverModule,
-        nx::utils::StandaloneTimerManager* const timerManager,
+    TimeSyncManager(
+        QnCommonModule* commonModule,
+        ReverseConnectionManager* reverseConnectionManager,
         const std::shared_ptr<AbstractSystemClock>& systemClock = nullptr,
         const std::shared_ptr<AbstractSteadyClock>& steadyClock = nullptr);
-    virtual ~TimeSynchManager();
+    virtual ~TimeSyncManager();
 
     virtual void stop();
 
@@ -87,8 +85,8 @@ private:
 
     QThread* m_thread = nullptr;
 	QTimer* m_timer = nullptr;
+    ReverseConnectionManager* m_reverseConnectionManager = nullptr;
 };
 
-} // namespace time_sync
 } // namespace mediaserver
 } // namespace nx

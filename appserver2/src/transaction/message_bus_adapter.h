@@ -65,8 +65,6 @@ namespace ec2 {
         virtual ConnectionGuardSharedState* connectionGuardSharedState() override;
         //detail::QnDbManager* getDb() const;
 
-        virtual void setTimeSyncManager(TimeSynchronizationManager* timeSyncManager) override;
-
     public:
         template<class T>
         void sendTransaction(
@@ -108,7 +106,6 @@ namespace ec2 {
 
         QnJsonTransactionSerializer* m_jsonTranSerializer;
         QnUbjsonTransactionSerializer* m_ubjsonTranSerializer;
-        TimeSynchronizationManager* m_timeSyncManager;
     };
 
 } // namespace ec2

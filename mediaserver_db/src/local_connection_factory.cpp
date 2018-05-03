@@ -25,7 +25,6 @@
 #include "remote_ec_connection.h"
 #include <rest/handlers/ec2_base_query_http_handler.h>
 #include <rest/handlers/ec2_update_http_handler.h>
-#include <rest/handlers/time_sync_rest_handler.h>
 #include "rest/server/rest_connection_processor.h"
 #include "transaction/transaction.h"
 #include "transaction/transaction_message_bus.h"
@@ -76,12 +75,6 @@ LocalConnectionFactory::LocalConnectionFactory(
 		m_jsonTranSerializer.get(),
 		m_ubjsonTranSerializer.get()));
 
-	m_timeSynchronizationManager.reset(new TimeSynchronizationManager(
-        commonModule,
-		peerType,
-		timerManager,
-		&m_settingsInstance));
-
     if (m_p2pMode)
     {
         auto messageBus = m_bus->init<nx::p2p::ServerMessageBus>(peerType);
@@ -97,9 +90,6 @@ LocalConnectionFactory::LocalConnectionFactory(
 	m_serverQueryProcessor.reset(new ServerQueryProcessorAccess(m_dbManager.get(), m_bus.get()));
 
 	m_dbManager->setTransactionLog(m_transactionLog.get());
-	m_dbManager->setTimeSyncManager(m_timeSynchronizationManager.get());
-
-	m_bus->setTimeSyncManager(m_timeSynchronizationManager.get());
 
 	// Cannot be done in TimeSynchronizationManager constructor to keep valid object destruction
 	// order.
@@ -115,8 +105,6 @@ void LocalConnectionFactory::shutdown()
 {
 	// Have to do it before m_transactionMessageBus destruction since TimeSynchronizationManager
 	// uses QnTransactionMessageBus.
-	if (m_timeSynchronizationManager)
-		m_timeSynchronizationManager->pleaseStop();
 
 	m_serverQueryProcessor->waitForAsyncTasks();
 
@@ -1559,6 +1547,7 @@ void LocalConnectionFactory::registerRestHandlers(QnRestProcessorPool* const p)
     // AbstractECConnection
     regUpdate<DatabaseDumpData>(p, ApiCommand::restoreDatabase);
 
+#if 0
     /**%apidoc GET /ec2/getCurrentTime
      * Read current time.
      * %permissions Administrator.
@@ -1572,6 +1561,7 @@ void LocalConnectionFactory::registerRestHandlers(QnRestProcessorPool* const p)
     regUpdate<IdData>(p, ApiCommand::forcePrimaryTimeServer,
         std::bind(&TimeSynchronizationManager::primaryTimeServerChanged,
             m_timeSynchronizationManager.get(), _1));
+#endif
 
     /**%apidoc GET /ec2/getFullInfo
      * Read all data such as all servers, cameras, users, etc.
@@ -1623,7 +1613,6 @@ void LocalConnectionFactory::registerRestHandlers(QnRestProcessorPool* const p)
         });
 
     p->registerHandler("ec2/activeConnections", new QnActiveConnectionsRestHandler(m_bus.get()));
-    p->registerHandler(TimeSynchronizationManager::kTimeSyncUrlPath, new QnTimeSyncRestHandler(this));
 
 #if 0 // Using HTTP processor since HTTP REST does not support HTTP interleaving.
 	p->registerHandler(
@@ -1967,11 +1956,6 @@ TransactionMessageBusAdapter* LocalConnectionFactory::messageBus() const
 QnDistributedMutexManager* LocalConnectionFactory::distributedMutex() const
 {
 	return m_distributedMutexManager.get();
-}
-
-TimeSynchronizationManager* LocalConnectionFactory::timeSyncManager() const
-{
-	return m_timeSynchronizationManager.get();
 }
 
 } // namespace ec2

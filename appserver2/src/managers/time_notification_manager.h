@@ -8,10 +8,8 @@ namespace ec2
 class QnTimeNotificationManager : public AbstractTimeNotificationManager
 {
 public:
-    QnTimeNotificationManager(TimeSynchronizationManager* timeSyncManager);
+    QnTimeNotificationManager();
     ~QnTimeNotificationManager();
-private:
-    QPointer<TimeSynchronizationManager> m_timeSyncManager;
 };
 
 } // namespace ec2

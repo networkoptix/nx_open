@@ -28,7 +28,6 @@ public:
     virtual AbstractUpdatesManagerPtr getUpdatesManager(const Qn::UserAccessData &) override;
     virtual AbstractMiscManagerPtr getMiscManager(const Qn::UserAccessData &) override;
     virtual AbstractDiscoveryManagerPtr getDiscoveryManager(const Qn::UserAccessData &) override;
-    virtual AbstractTimeManagerPtr getTimeManager(const Qn::UserAccessData &) override;
 
     virtual AbstractLicenseNotificationManagerPtr getLicenseNotificationManager() override;
     virtual AbstractTimeNotificationManagerPtr getTimeNotificationManager() override;

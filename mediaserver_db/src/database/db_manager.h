@@ -168,9 +168,6 @@ namespace detail
             return ErrorCode::ok;
         }
 
-        //getCurrentTime
-        ErrorCode doQuery(const nullptr_t& /*dummy*/, ApiTimeData& currentTime);
-
         //dumpDatabase
         ErrorCode doQuery(const nullptr_t& /*dummy*/, nx::vms::api::DatabaseDumpData& data);
         ErrorCode doQuery(
@@ -198,7 +195,6 @@ namespace detail
         //!Reads settings (properties of user 'admin')
 
         void setTransactionLog(QnTransactionLog* tranLog);
-        void setTimeSyncManager(TimeSynchronizationManager* timeSyncManager);
         QnTransactionLog* transactionLog() const;
         virtual bool tuneDBAfterOpen(QSqlDatabase* const sqlDb) override;
         ec2::database::api::QueryCache::Pool* queryCachePool();
@@ -818,7 +814,6 @@ namespace detail
         bool m_needReparentLayouts;
         ResyncFlags m_resyncFlags;
         QnTransactionLog* m_tranLog;
-        TimeSynchronizationManager* m_timeSyncManager;
 
         ec2::database::api::QueryCache::Pool m_queryCachePool;
         ec2::database::api::QueryCache m_insertCameraQuery;

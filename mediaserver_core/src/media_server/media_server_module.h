@@ -29,6 +29,7 @@ class UnusedWallpapersWatcher;
 class LicenseWatcher;
 class RootTool;
 class ReverseConnectionManager;
+class TimeSyncManager;
 
 namespace updates2 { class ServerUpdates2Manager; }
 
@@ -91,6 +92,7 @@ public:
     nx::mediaserver::RootTool* rootTool() const;
 
     nx::mediaserver::ReverseConnectionManager* reverseConnectionManager() const;
+    nx::mediaserver::TimeSyncManager* timeSyncManager() const;
 
 private:
     void registerResourceDataProviders();
@@ -123,6 +125,7 @@ private:
     QScopedPointer<QnDataProviderFactory> m_resourceDataProviderFactory;
     QScopedPointer<QnResourceCommandProcessor> m_resourceCommandProcessor;
     QScopedPointer<nx::mediaserver::ReverseConnectionManager> m_reverseConnectionManager;
+    QScopedPointer<nx::mediaserver::TimeSyncManager> m_timeSyncManager;
 };
 
 #define qnServerModule QnMediaServerModule::instance()

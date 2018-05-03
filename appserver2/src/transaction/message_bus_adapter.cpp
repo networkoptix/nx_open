@@ -11,8 +11,7 @@ TransactionMessageBusAdapter::TransactionMessageBusAdapter(
     :
     AbstractTransactionMessageBus(commonModule),
     m_jsonTranSerializer(jsonTranSerializer),
-    m_ubjsonTranSerializer(ubjsonTranSerializer),
-    m_timeSyncManager(nullptr)
+    m_ubjsonTranSerializer(ubjsonTranSerializer)
 {
 }
 
@@ -23,7 +22,6 @@ void TransactionMessageBusAdapter::reset()
 
 void TransactionMessageBusAdapter::initInternal(Qn::PeerType peerType)
 {
-    m_bus->setTimeSyncManager(m_timeSyncManager);
     connect(m_bus.get(), &AbstractTransactionMessageBus::peerFound,
         this, &AbstractTransactionMessageBus::peerFound, Qt::DirectConnection);
     connect(m_bus.get(), &AbstractTransactionMessageBus::peerLost,
@@ -115,12 +113,5 @@ detail::QnDbManager* TransactionMessageBusAdapter::getDb() const
     return m_bus->getDb();
 }
 #endif
-
-void TransactionMessageBusAdapter::setTimeSyncManager(TimeSynchronizationManager* timeSyncManager)
-{
-    m_timeSyncManager = timeSyncManager;
-    if (m_bus)
-        m_bus->setTimeSyncManager(m_timeSyncManager);
-}
 
 } // namespace ec2

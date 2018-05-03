@@ -865,12 +865,8 @@ bool MessageBus::processSpecialTransaction(
     {
         // TODO: move it to the global setting param or emit this data via NotificationManager
     case ApiCommand::forcePrimaryTimeServer:
-        m_timeSyncManager->onGotPrimariTimeServerTran(tran);
-        if (localPeer().isServer())
-            sendTransaction(tran, transportHeader); //< Proxy
-        return true;
     case ApiCommand::broadcastPeerSyncTime:
-        m_timeSyncManager->resyncTimeWithPeer(tran.peerID);
+        // ignore deprecated transaction
         return true;
     case ApiCommand::runtimeInfoChanged:
         processRuntimeInfo(tran, connection, transportHeader);

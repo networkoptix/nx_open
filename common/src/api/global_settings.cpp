@@ -316,6 +316,12 @@ QnGlobalSettings::AdaptorList QnGlobalSettings::initTimeSynchronizationAdaptors(
         this);
     timeSynchronizationAdaptors << m_synchronizeTimeWithInternetAdaptor;
 
+    m_primaryTimeServerAdaptor = new QnLexicalResourcePropertyAdaptor<QnUuid>(
+        kNamePrimaryTimeServer,
+        QnUuid(),
+        this);
+    timeSynchronizationAdaptors << m_primaryTimeServerAdaptor;
+
     m_maxDifferenceBetweenSynchronizedAndInternetTimeAdaptor =
         new QnLexicalResourcePropertyAdaptor<int>(
             kMaxDifferenceBetweenSynchronizedAndInternetTime,
@@ -1040,6 +1046,16 @@ bool QnGlobalSettings::isSynchronizingTimeWithInternet() const
 void QnGlobalSettings::setSynchronizingTimeWithInternet(bool value)
 {
     m_synchronizeTimeWithInternetAdaptor->setValue(value);
+}
+
+QnUuid QnGlobalSettings::primaryTimeServer() const
+{
+    return m_primaryTimeServerAdaptor->value();
+}
+
+void QnGlobalSettings::setPrimaryTimeServer(const QnUuid& value)
+{
+    m_primaryTimeServerAdaptor->setValue(value);
 }
 
 std::chrono::milliseconds QnGlobalSettings::maxDifferenceBetweenSynchronizedAndInternetTime() const

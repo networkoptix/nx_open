@@ -55,7 +55,6 @@ public:
     virtual void setConfParams(std::map<QString, QVariant> confParams) override;
 
     virtual TransactionMessageBusAdapter* messageBus() const override;
-    virtual TimeSynchronizationManager* timeSyncManager() const override;
 
     virtual void shutdown() override;
 
@@ -63,7 +62,6 @@ private:
     QnMutex m_mutex;
     Settings m_settingsInstance;
     std::unique_ptr<TransactionMessageBusAdapter> m_bus;
-    std::unique_ptr<TimeSynchronizationManager> m_timeSynchronizationManager;
     std::unique_ptr<QnJsonTransactionSerializer> m_jsonTranSerializer;
     std::unique_ptr<QnUbjsonTransactionSerializer> m_ubjsonTranSerializer;
     bool m_terminated;
