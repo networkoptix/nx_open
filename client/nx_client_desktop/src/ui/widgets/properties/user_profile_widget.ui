@@ -49,13 +49,13 @@
         <number>0</number>
        </property>
        <item>
-        <widget class="QnInputField" name="loginInputField" native="true"/>
+        <widget class="nx::client::desktop::InputField" name="loginInputField" native="true"/>
        </item>
        <item>
-        <widget class="QnInputField" name="nameInputField" native="true"/>
+        <widget class="nx::client::desktop::InputField" name="nameInputField" native="true"/>
        </item>
        <item>
-        <widget class="QnInputField" name="emailInputField" native="true"/>
+        <widget class="nx::client::desktop::InputField" name="emailInputField" native="true"/>
        </item>
        <item>
         <widget class="QWidget" name="changePasswordWidget" native="true">
@@ -166,7 +166,7 @@
        <number>0</number>
       </property>
       <item>
-       <widget class="QnInputField" name="groupInputField" native="true"/>
+       <widget class="nx::client::desktop::InputField" name="groupInputField" native="true"/>
       </item>
       <item>
        <layout class="QHBoxLayout" name="permissionsLayouyt">
@@ -223,9 +223,9 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>QnInputField</class>
+   <class>nx::client::desktop::InputField</class>
    <extends>QWidget</extends>
-   <header location="global">ui/widgets/common/input_field.h</header>
+   <header location="global">nx/client/desktop/common/widgets/input_field.h</header>
    <container>1</container>
   </customwidget>
   <customwidget>

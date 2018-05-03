@@ -9,18 +9,18 @@ namespace relay {
 namespace view {
 
 class AuthenticationManager:
-    public nx_http::server::AbstractAuthenticationManager
+    public nx::network::http::server::AbstractAuthenticationManager
 {
 public:
-    AuthenticationManager(const nx_http::AuthMethodRestrictionList& authRestrictionList);
+    AuthenticationManager(const nx::network::http::AuthMethodRestrictionList& authRestrictionList);
 
     virtual void authenticate(
-        const nx_http::HttpServerConnection& connection,
-        const nx_http::Request& request,
-        nx_http::server::AuthenticationCompletionHandler completionHandler) override;
+        const nx::network::http::HttpServerConnection& connection,
+        const nx::network::http::Request& request,
+        nx::network::http::server::AuthenticationCompletionHandler completionHandler) override;
 
 private:
-    const nx_http::AuthMethodRestrictionList& m_authRestrictionList;
+    const nx::network::http::AuthMethodRestrictionList& m_authRestrictionList;
 };
 
 } // namespace view

@@ -21,10 +21,12 @@
 #include <ui/models/ldap_user_list_model.h>
 #include <ui/models/user_roles_model.h>
 #include <ui/widgets/common/snapped_scrollbar.h>
-#include <ui/widgets/views/checkboxed_header_view.h>
+#include <nx/client/desktop/common/widgets/checkable_header_view.h>
 
 #include <utils/common/ldap.h>
 #include <common/common_module.h>
+
+using namespace nx::client::desktop;
 
 namespace {
 
@@ -33,7 +35,7 @@ static const int testLdapTimeoutMSec = 30 * 1000; //ec2::RESPONSE_WAIT_TIMEOUT_M
 
 static const int kUpdateFilterDelayMs = 200;
 
-}
+} // namespace
 
 QnLdapUsersDialog::QnLdapUsersDialog(QWidget* parent):
     base_type(parent),
@@ -75,7 +77,7 @@ QnLdapUsersDialog::QnLdapUsersDialog(QWidget* parent):
     {
         QnMediaServerResourcePtr server = commonModule()->currentServer();
 
-        Q_ASSERT(server);
+        NX_ASSERT(server);
         if (!server)
         {
             stopTesting(tr("Could not load users."));
@@ -293,10 +295,10 @@ void QnLdapUsersDialog::setupUsersTable(const QnLdapUsers& filteredUsers)
     usersModel->setUsers(filteredUsers);
 
     auto sortModel = new QSortFilterProxyModel(this);
-    auto header = new QnCheckBoxedHeaderView(QnLdapUserListModel::CheckBoxColumn, this);
+    auto header = new CheckableHeaderView(QnLdapUserListModel::CheckBoxColumn, this);
     sortModel->setSourceModel(usersModel);
 
-    connect(header, &QnCheckBoxedHeaderView::checkStateChanged, this,
+    connect(header, &CheckableHeaderView::checkStateChanged, this,
         [this, usersModel](Qt::CheckState state)
         {
             QSet<QString> users;
@@ -359,7 +361,7 @@ void QnLdapUsersDialog::setupUsersTable(const QnLdapUsers& filteredUsers)
         };
 
     // TODO: #GDM model should notify about its check state changes
-    connect(header, &QnCheckBoxedHeaderView::checkStateChanged, this, updateButton);
+    connect(header, &CheckableHeaderView::checkStateChanged, this, updateButton);
     updateButton();
 
     sortModel->setDynamicSortFilter(true);
@@ -367,7 +369,7 @@ void QnLdapUsersDialog::setupUsersTable(const QnLdapUsers& filteredUsers)
     sortModel->setFilterKeyColumn(-1);
 
     ui->filterLineEdit->setTextChangedSignalFilterMs(kUpdateFilterDelayMs);
-    connect(ui->filterLineEdit, &QnSearchLineEdit::textChanged, this,
+    connect(ui->filterLineEdit, &SearchLineEdit::textChanged, this,
         [sortModel](const QString &text)
         {
             sortModel->setFilterWildcard(text);

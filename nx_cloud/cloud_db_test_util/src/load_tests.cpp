@@ -47,7 +47,7 @@ int makeApiRequests(
 {
     using namespace std::chrono;
 
-    std::vector<nx_http::AsyncHttpClientPtr> requests;
+    std::vector<nx::network::http::AsyncHttpClientPtr> requests;
     requests.resize(connectionCount);
     QUrl url(QString::fromStdString(cdbUrl));
     url.setPath("/cdb/account/get");
@@ -65,16 +65,16 @@ int makeApiRequests(
     {
         std::this_thread::sleep_for(milliseconds(1));
 
-        request = nx_http::AsyncHttpClient::create();
+        request = nx::network::http::AsyncHttpClient::create();
         request->setUserName(QString::fromStdString(login));
         request->setUserPassword(QString::fromStdString(password));
         request->doGet(
             url,
-            [&](nx_http::AsyncHttpClientPtr client)
+            [&](nx::network::http::AsyncHttpClientPtr client)
             {
                 --responsesToWait;
                 if (client->failed() ||
-                    client->response()->statusLine.statusCode != nx_http::StatusCode::ok)
+                    client->response()->statusLine.statusCode != nx::network::http::StatusCode::ok)
                 {
                     ++failedRequests;
                 }

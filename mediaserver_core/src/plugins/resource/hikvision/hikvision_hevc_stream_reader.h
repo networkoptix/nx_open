@@ -6,7 +6,7 @@
 
 #include <nx/network/http/http_client.h>
 #include <core/resource/resource_fwd.h>
-#include <plugins/resource/onvif/dataprovider/rtp_stream_provider.h>
+#include <streaming/rtp_stream_reader.h>
 #include <plugins/resource/hikvision/hikvision_utils.h>
 
 namespace nx {
@@ -17,7 +17,7 @@ class HikvisionHevcStreamReader: public QnRtpStreamReader
 {
 
 public:
-    HikvisionHevcStreamReader(const QnResourcePtr& resource);
+    HikvisionHevcStreamReader(const HikvisionResourcePtr& resource);
 
 protected:
     virtual CameraDiagnostics::Result openStreamInternal(
@@ -25,15 +25,17 @@ protected:
         const QnLiveStreamParams& params) override;
 
 private:
-    QUrl buildHikvisionStreamUrl(int rtspPortNumber) const;
-    QUrl hikvisionRequestUrlFromPath(const QString& path) const;
+    nx::utils::Url buildHikvisionStreamUrl(
+        const hikvision::ChannelProperties& properties) const;
+    nx::utils::Url hikvisionRequestUrlFromPath(const QString& path) const;
 
     QSize chooseResolution(
         const hikvision::ChannelCapabilities& channelCapabilities,
         const QSize& primaryResolution) const;
 
     QString chooseCodec(
-        const hikvision::ChannelCapabilities& channelCapabilities) const;
+        const hikvision::ChannelCapabilities& channelCapabilities,
+        AVCodecID codec) const;
 
     int chooseFps(
         const hikvision::ChannelCapabilities& channelCapabilities,
@@ -41,10 +43,6 @@ private:
 
     boost::optional<int> chooseQuality(
         Qn::StreamQuality quality,
-        const hikvision::ChannelCapabilities& channelCapabilities) const;
-
-    boost::optional<int> chooseQuality(
-        Qn::SecondStreamQuality quality,
         const hikvision::ChannelCapabilities& channelCapabilities) const;
 
     boost::optional<int> rescaleQuality(
@@ -56,20 +54,24 @@ private:
         hikvision::ChannelProperties* outChannelProperties) const;
 
     CameraDiagnostics::Result configureChannel(
+        const hikvision::ChannelProperties& channelProperties,
         QSize resolution,
         QString codec,
         int fps,
-        boost::optional<int> quality);
+        boost::optional<int> quality,
+        boost::optional<int> bitrateKbps);
 
     bool updateVideoChannelConfiguration(
         QDomDocument* outVideoChannelConfiguration,
         const QSize& resolution,
         const QString& codec,
         int fps,
-        boost::optional<int> quality) const;
+        boost::optional<int> quality,
+        boost::optional<int> bitrateKbps) const;
 
 private:
-    QnHikvisionResourcePtr m_hikvisionResource;
+    HikvisionResourcePtr m_hikvisionResource;
+    QString m_previousCodecValue;
 };
 
 } // namespace plugins

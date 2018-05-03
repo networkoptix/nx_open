@@ -86,7 +86,7 @@ std::vector<Range> Stick::ranges() const
 
 void Stick::setRanges(Ranges ranges)
 {
-    Q_ASSERT(ranges.size() == kMaxDegreesOfFreedom);
+    NX_ASSERT(ranges.size() == kMaxDegreesOfFreedom);
     QnMutexLocker lock(&m_mutex);
     m_ranges = ranges;
 }
@@ -99,7 +99,7 @@ Ranges Stick::outputRanges() const
 
 void Stick::setOutputRanges(Ranges outputRanges)
 {
-    Q_ASSERT(outputRanges.size() == kMaxDegreesOfFreedom);
+    NX_ASSERT(outputRanges.size() == kMaxDegreesOfFreedom);
     QnMutexLocker lock(&m_mutex);
     m_outputRanges = outputRanges;
 }
@@ -196,14 +196,14 @@ Range Stick::xRange() const
 
 void Stick::setStickXRange(StateElement min, StateElement max)
 {
-    Q_ASSERT(max > min);
+    NX_ASSERT(max > min);
     QnMutexLocker lock(&m_mutex);
     m_ranges[DegreeOfFreedom::x] = Range(min, max);
 }
 
 void Stick::setStickXRange(const Range& range)
 {
-    Q_ASSERT(range.max > range.min);
+    NX_ASSERT(range.max > range.min);
     QnMutexLocker lock(&m_mutex);
     m_ranges[DegreeOfFreedom::x] = range;
 }
@@ -216,14 +216,14 @@ Range Stick::yRange() const
 
 void Stick::setStickYRange(StateElement min, StateElement max)
 {
-    Q_ASSERT(max > min);
+    NX_ASSERT(max > min);
     QnMutexLocker lock(&m_mutex);
     m_ranges[DegreeOfFreedom::y] = Range(min, max);
 }
 
 void Stick::setStickYRange(const Range& range)
 {
-    Q_ASSERT(range.max > range.min);
+    NX_ASSERT(range.max > range.min);
     QnMutexLocker lock(&m_mutex);
     m_ranges[DegreeOfFreedom::y] = range;
 }
@@ -236,14 +236,14 @@ Range Stick::zRange() const
 
 void Stick::setStickZRange(StateElement min, StateElement max)
 {
-    Q_ASSERT(max > min);
+    NX_ASSERT(max > min);
     QnMutexLocker lock(&m_mutex);
     m_ranges[DegreeOfFreedom::z] = Range(min, max);
 }
 
 void Stick::setStickZRange(const Range& range)
 {
-    Q_ASSERT(range.max > range.min);
+    NX_ASSERT(range.max > range.min);
     QnMutexLocker lock(&m_mutex);
     m_ranges[DegreeOfFreedom::z] = range;
 }
@@ -256,14 +256,14 @@ Range Stick::rXRange() const
 
 void Stick::setStickRxRange(StateElement min, StateElement max)
 {
-    Q_ASSERT(max > min);
+    NX_ASSERT(max > min);
     QnMutexLocker lock(&m_mutex);
     m_ranges[DegreeOfFreedom::rX] = Range(min, max);
 }
 
 void Stick::setStickRxRange(const Range& range)
 {
-    Q_ASSERT(range.max > range.min);
+    NX_ASSERT(range.max > range.min);
     QnMutexLocker lock(&m_mutex);
     m_ranges[DegreeOfFreedom::rX] = range;
 }
@@ -276,14 +276,14 @@ Range Stick::rYRange() const
 
 void Stick::setStickRyRange(StateElement min, StateElement max)
 {
-    Q_ASSERT(max > min);
+    NX_ASSERT(max > min);
     QnMutexLocker lock(&m_mutex);
     m_ranges[DegreeOfFreedom::rY] = Range(min, max);
 }
 
 void Stick::setStickRyRange(const Range& range)
 {
-    Q_ASSERT(range.max > range.min);
+    NX_ASSERT(range.max > range.min);
     QnMutexLocker lock(&m_mutex);
     m_ranges[DegreeOfFreedom::rY] = range;
 }
@@ -296,14 +296,14 @@ Range Stick::rZRange() const
 
 void Stick::setStickRzRange(StateElement min, StateElement max)
 {
-    Q_ASSERT(max > min);
+    NX_ASSERT(max > min);
     QnMutexLocker lock(&m_mutex);
     m_ranges[DegreeOfFreedom::rZ] = Range(min, max);
 }
 
 void Stick::setStickRzRange(const Range& range)
 {
-    Q_ASSERT(range.max > range.min);
+    NX_ASSERT(range.max > range.min);
     QnMutexLocker lock(&m_mutex);
     m_ranges[DegreeOfFreedom::rZ] = range;
 }
@@ -316,14 +316,14 @@ Range Stick::outputXRange() const
 
 void Stick::setStickOutputXRange(StateElement min, StateElement max)
 {
-    Q_ASSERT(max > min);
+    NX_ASSERT(max > min);
     QnMutexLocker lock(&m_mutex);
     m_outputRanges[DegreeOfFreedom::x] = Range(min, max);
 }
 
 void Stick::setStickOutputXRange(const Range& range)
 {
-    Q_ASSERT(range.max > range.min);
+    NX_ASSERT(range.max > range.min);
     QnMutexLocker lock(&m_mutex);
     m_outputRanges[DegreeOfFreedom::x] = range;
 }
@@ -336,14 +336,14 @@ Range Stick::outputYRange() const
 
 void Stick::setStickOutputYRange(StateElement min, StateElement max)
 {
-    Q_ASSERT(max > min);
+    NX_ASSERT(max > min);
     QnMutexLocker lock(&m_mutex);
     m_outputRanges[DegreeOfFreedom::y] = Range(min, max);
 }
 
 void Stick::setStickOutputYRange(const Range& range)
 {
-    Q_ASSERT(range.max > range.min);
+    NX_ASSERT(range.max > range.min);
     QnMutexLocker lock(&m_mutex);
     m_outputRanges[DegreeOfFreedom::y] = range;
 }
@@ -356,14 +356,14 @@ Range Stick::outputZRange() const
 
 void Stick::setStickOutputZRange(StateElement min, StateElement max)
 {
-    Q_ASSERT(max > min);
+    NX_ASSERT(max > min);
     QnMutexLocker lock(&m_mutex);
     m_outputRanges[DegreeOfFreedom::z] = Range(min, max);
 }
 
 void Stick::setStickOutputZRange(const Range& range)
 {
-    Q_ASSERT(range.max > range.min);
+    NX_ASSERT(range.max > range.min);
     QnMutexLocker lock(&m_mutex);
     m_outputRanges[DegreeOfFreedom::z] = range;
 }
@@ -376,14 +376,14 @@ Range Stick::outputRxRange() const
 
 void Stick::setStickOutputRxRange(StateElement min, StateElement max)
 {
-    Q_ASSERT(max > min);
+    NX_ASSERT(max > min);
     QnMutexLocker lock(&m_mutex);
     m_outputRanges[DegreeOfFreedom::rX] = Range(min, max);
 }
 
 void Stick::setStickOutputRxRange(const Range& range)
 {
-    Q_ASSERT(range.max > range.min);
+    NX_ASSERT(range.max > range.min);
     QnMutexLocker lock(&m_mutex);
     m_outputRanges[DegreeOfFreedom::rX] = range;
 }
@@ -396,14 +396,14 @@ Range Stick::outputRyRange() const
 
 void Stick::setStickOutputRyRange(StateElement min, StateElement max)
 {
-    Q_ASSERT(max > min);
+    NX_ASSERT(max > min);
     QnMutexLocker lock(&m_mutex);
     m_outputRanges[DegreeOfFreedom::rY] = Range(min, max);
 }
 
 void Stick::setStickOutputRyRange(const Range& range)
 {
-    Q_ASSERT(range.max > range.min);
+    NX_ASSERT(range.max > range.min);
     QnMutexLocker lock(&m_mutex);
     m_outputRanges[DegreeOfFreedom::rY] = range;
 }
@@ -416,14 +416,14 @@ Range Stick::outputRzRange() const
 
 void Stick::setStickOutputRzRange(StateElement min, StateElement max)
 {
-    Q_ASSERT(max > min);
+    NX_ASSERT(max > min);
     QnMutexLocker lock(&m_mutex);
     m_outputRanges[DegreeOfFreedom::rZ] = Range(min, max);
 }
 
 void Stick::setStickOutputRzRange(const Range& range)
 {
-    Q_ASSERT(range.max > range.min);
+    NX_ASSERT(range.max > range.min);
     QnMutexLocker lock(&m_mutex);
     m_outputRanges[DegreeOfFreedom::rZ] = range;
 }
@@ -453,7 +453,7 @@ bool Stick::isEventTypeSupported(EventType eventType) const
 
 BaseControl::EventSet Stick::checkForEventsUnsafe() const 
 {
-    Q_ASSERT(m_state.size() == kMaxDegreesOfFreedom);
+    NX_ASSERT(m_state.size() == kMaxDegreesOfFreedom);
     EventSet eventsToBeFired;
 
     if (distance(m_previousPosition, m_state) > m_threshold || 
@@ -474,7 +474,7 @@ void Stick::setStateUnsafe(const State& state)
 
 State Stick::fromRawToNormalized(const State& raw) const 
 {
-    Q_ASSERT(raw.size() == kMaxDegreesOfFreedom);
+    NX_ASSERT(raw.size() == kMaxDegreesOfFreedom);
 
     QnMutexLocker lock(&m_mutex);
     State normalizedState;
@@ -497,7 +497,7 @@ State Stick::fromRawToNormalized(const State& raw) const
 
 State Stick::fromNormalizedToRaw(const State& normalized) const 
 {
-    Q_ASSERT(normalized.size() == kMaxDegreesOfFreedom);
+    NX_ASSERT(normalized.size() == kMaxDegreesOfFreedom);
     State rawState;
     for (auto i = 0; i < normalized.size(); ++i)
     {
@@ -510,7 +510,7 @@ State Stick::fromNormalizedToRaw(const State& normalized) const
 
 StateElement Stick::distance(const State& position1, const State& position2) const
 {
-    Q_ASSERT(position1.size() >= 3 && position2.size() >= 3);
+    NX_ASSERT(position1.size() >= 3 && position2.size() >= 3);
     auto xDiff = position1[DegreeOfFreedom::x] - position2[DegreeOfFreedom::x];
     auto yDiff = position1[DegreeOfFreedom::y] - position2[DegreeOfFreedom::y];
     auto zDiff = position1[DegreeOfFreedom::z] - position2[DegreeOfFreedom::z];
@@ -523,7 +523,7 @@ StateElement Stick::translatePoint(
     const Range& originalBounds,
     const Range& targetBounds) const
 {
-    Q_ASSERT(originalBounds.max > originalBounds.min && targetBounds.max > targetBounds.min);
+    NX_ASSERT(originalBounds.max > originalBounds.min && targetBounds.max > targetBounds.min);
     if (originalBounds.max == originalBounds.min)
         return targetBounds.min;
 
@@ -543,7 +543,7 @@ StateElement Stick::translatePoint(
 
 bool Stick::isZeroPosition(const State& position) const
 {
-    Q_ASSERT(position.size() == kMaxDegreesOfFreedom);
+    NX_ASSERT(position.size() == kMaxDegreesOfFreedom);
 
     return distance(position, kZeroPositionState) < m_threshold;
 }

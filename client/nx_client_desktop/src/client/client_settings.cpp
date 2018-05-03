@@ -72,7 +72,7 @@ QnConnectionData readConnectionData(QSettings *settings)
 
 void writeConnectionData(QSettings *settings, const QnConnectionData &connection)
 {
-    QUrl url = connection.url;
+    nx::utils::Url url = connection.url;
 
     QString password;
     if (!url.password().isEmpty())
@@ -141,7 +141,9 @@ QnClientSettings::QnClientSettings(bool forceLocalSettings, QObject *parent):
 QnClientSettings::~QnClientSettings() {
 }
 
-QVariant QnClientSettings::readValueFromSettings(QSettings *settings, int id, const QVariant &defaultValue) {
+QVariant QnClientSettings::readValueFromSettings(QSettings* settings, int id,
+    const QVariant& defaultValue) const
+{
     switch(id)
     {
         case LAST_USED_CONNECTION:
@@ -199,6 +201,23 @@ QVariant QnClientSettings::readValueFromSettings(QSettings *settings, int id, co
                 defaultValue.value<QnWorkbenchStateList>()));
         }
 
+        case EXPORT_MEDIA_SETTINGS:
+        case EXPORT_BOOKMARK_SETTINGS:
+        {
+            const auto asJson = base_type::readValueFromSettings(settings, id, QVariant())
+                .value<QString>().toUtf8();
+            return QVariant::fromValue(QJson::deserialized<ExportMediaSettings>(asJson,
+                defaultValue.value<ExportMediaSettings>()));
+        }
+
+        case EXPORT_LAYOUT_SETTINGS:
+        {
+            const auto asJson = base_type::readValueFromSettings(settings, id, QVariant())
+                .value<QString>().toUtf8();
+            return QVariant::fromValue(QJson::deserialized<ExportLayoutSettings>(asJson,
+                defaultValue.value<ExportLayoutSettings>()));
+        }
+
         case BACKGROUND_IMAGE:
         {
             QByteArray asJson = base_type::readValueFromSettings(settings, id, QVariant())
@@ -232,6 +251,13 @@ QVariant QnClientSettings::readValueFromSettings(QSettings *settings, int id, co
             if (!compatibleValue.isEmpty())
                 return translationPath30ToLocale(compatibleValue);
             return base_type::readValueFromSettings(settings, id, defaultValue);
+        }
+
+        case POPUP_SYSTEM_HEALTH:
+        {
+            quint64 packed = base_type::readValueFromSettings(settings, id, 0xFFFFFFFFFFFFFFFFull)
+                .toULongLong();
+            return QVariant::fromValue(QnSystemHealth::unpackVisibleInSettings(packed));
         }
 
         default:
@@ -312,6 +338,21 @@ void QnClientSettings::writeValueToSettings(QSettings *settings, int id, const Q
             break;
         }
 
+        case EXPORT_MEDIA_SETTINGS:
+        case EXPORT_BOOKMARK_SETTINGS:
+        {
+            const auto asJson = QString::fromUtf8(QJson::serialized(value.value<ExportMediaSettings>()));
+            base_type::writeValueToSettings(settings, id, asJson);
+            break;
+        }
+
+        case EXPORT_LAYOUT_SETTINGS:
+        {
+            const auto asJson = QString::fromUtf8(QJson::serialized(value.value<ExportLayoutSettings>()));
+            base_type::writeValueToSettings(settings, id, asJson);
+            break;
+        }
+
         case EXTRA_INFO_IN_TREE:
         {
             Qn::ResourceInfoLevel level = value.value<Qn::ResourceInfoLevel>();
@@ -325,6 +366,16 @@ void QnClientSettings::writeValueToSettings(QSettings *settings, int id, const Q
         {
             base_type::writeValueToSettings(settings, id, value);
             settings->setValue(k30TranslationPath, localeTo30TranslationPath(value.toString()));
+            break;
+        }
+
+        case POPUP_SYSTEM_HEALTH:
+        {
+            quint64 packed = base_type::readValueFromSettings(settings, id, 0xFFFFFFFFFFFFFFFFull)
+                .toULongLong();
+            packed = QnSystemHealth::packVisibleInSettings(packed,
+                value.value<QSet<QnSystemHealth::MessageType>>());
+            base_type::writeValueToSettings(settings, id, packed);
             break;
         }
 
@@ -359,8 +410,9 @@ void QnClientSettings::migrateKnownServerConnections()
     auto migratedKnownUrls = qnClientCoreSettings->knownServerUrls();
     const auto& knownConnections = qnClientCoreSettings->knownServerConnections();
 
-    for (const auto url: knownUrls)
+    for (const auto qUrl: knownUrls)
     {
+        const auto url = nx::utils::Url::fromQUrl(qUrl);
         if (std::any_of(
                 knownConnections.begin(), knownConnections.end(),
                 [&url](const QnClientCoreSettings::KnownServerConnection& connection)
@@ -369,7 +421,7 @@ void QnClientSettings::migrateKnownServerConnections()
                 })
             || std::any_of(
                 migratedKnownUrls.begin(), migratedKnownUrls.end(),
-                [&url](const QUrl& other)
+                [&url](const nx::utils::Url& other)
                 {
                     return nx::utils::url::addressesEqual(url, other);
                 }))
@@ -405,6 +457,7 @@ bool QnClientSettings::isWritable() const
     return m_settings->isWritable();
 }
 
-QSettings* QnClientSettings::rawSettings() {
+QSettings* QnClientSettings::rawSettings()
+{
     return m_settings;
 }

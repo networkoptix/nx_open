@@ -3,6 +3,8 @@
 
 #include <algorithm>
 
+#include <client/client_settings.h>
+
 #include "decoders/video/abstract_video_decoder.h"
 #include "utils/math/math.h"
 #include "nx/utils/thread/long_runnable.h"
@@ -14,11 +16,7 @@
 #include "buffered_frame_displayer.h"
 #include "ui/graphics/opengl/gl_functions.h"
 #include "ui/graphics/items/resource/resource_widget_renderer.h"
-#include "../client/client_settings.h"
-#include "transcoding/filters/contrast_image_filter.h"
-#include "transcoding/filters/fisheye_image_filter.h"
-#include "transcoding/filters/filter_helper.h"
-
+#include <camera/video_decoder_factory.h>
 
 static const int MAX_REVERSE_QUEUE_SIZE = 1024*1024 * 300; // at bytes
 static const double FPS_EPS = 1e-6;
@@ -52,10 +50,9 @@ QnVideoStreamDisplay::QnVideoStreamDisplay(bool canDownscale, int channelNumber)
     m_prevSrcWidth(0),
     m_prevSrcHeight(0),
     m_lastIgnoreTime(AV_NOPTS_VALUE),
-    m_isPaused(false),
-    m_overridenAspectRatio(0.0)
+    m_isPaused(false)
 {
-    for (int i = 0; i < MAX_FRAME_QUEUE_SIZE; ++i)
+    for (int i = 0; i < kMaxFrameQueueSize; ++i)
         m_frameQueue[i] = QSharedPointer<CLVideoDecoderOutput>( new CLVideoDecoderOutput() );
 }
 
@@ -95,7 +92,7 @@ int QnVideoStreamDisplay::addRenderer(QnAbstractRenderer* renderer)
 
     QnMutexLocker lock( &m_renderListMtx );
     renderer->setScreenshotInterface(this);
-    m_newList << renderer;
+    m_newList.insert(renderer);
     m_renderListModified = true;
     return m_newList.size();
 }
@@ -103,7 +100,7 @@ int QnVideoStreamDisplay::addRenderer(QnAbstractRenderer* renderer)
 int QnVideoStreamDisplay::removeRenderer(QnAbstractRenderer* renderer)
 {
     QnMutexLocker lock( &m_renderListMtx );
-    m_newList.remove(renderer);
+    m_newList.erase(renderer);
     m_renderListModified = true;
     return m_newList.size();
 }
@@ -133,7 +130,7 @@ void QnVideoStreamDisplay::freeScaleContext()
     }
 }
 
-QnFrameScaler::DownscaleFactor QnVideoStreamDisplay::determineScaleFactor(QSet<QnAbstractRenderer*> renderList,
+QnFrameScaler::DownscaleFactor QnVideoStreamDisplay::determineScaleFactor(std::set<QnAbstractRenderer*> renderList,
                                                                           int channelNumber,
                                                                           int srcWidth, int srcHeight,
                                                                           QnFrameScaler::DownscaleFactor force_factor)
@@ -382,13 +379,13 @@ void QnVideoStreamDisplay::updateRenderList()
 
 void QnVideoStreamDisplay::calcSampleAR(QSharedPointer<CLVideoDecoderOutput> outFrame, QnAbstractVideoDecoder* dec)
 {
-    if (qFuzzyIsNull(m_overridenAspectRatio))
+    if (!m_overridenAspectRatio.isValid())
     {
         outFrame->sample_aspect_ratio = dec->getSampleAspectRatio();
     }
     else {
         qreal realAR = outFrame->height > 0 ? (qreal) outFrame->width / (qreal) outFrame->height : 1.0;
-        outFrame->sample_aspect_ratio = m_overridenAspectRatio / realAR;
+        outFrame->sample_aspect_ratio = m_overridenAspectRatio.toFloat() / realAR;
     }
 }
 
@@ -439,7 +436,7 @@ QnVideoStreamDisplay::FrameDisplayStatus QnVideoStreamDisplay::display(QnCompres
         foreach(QnAbstractRenderer* render, m_renderList)
             render->waitForFrameDisplayed(data->channelNumber);
         m_frameQueueIndex = 0;
-        for (int i = 1; i < MAX_FRAME_QUEUE_SIZE; ++i)
+        for (int i = 1; i < kMaxFrameQueueSize; ++i)
         {
             if (!m_frameQueue[i]->isExternalData())
                 m_frameQueue[i]->clean();
@@ -466,7 +463,7 @@ QnVideoStreamDisplay::FrameDisplayStatus QnVideoStreamDisplay::display(QnCompres
     if (dec == 0)
     {
         // todo: all renders MUST have same GL context!!!
-        const QnAbstractRenderer* renderer = m_renderList.isEmpty() ? 0 : *m_renderList.constBegin();
+        const QnAbstractRenderer* renderer = m_renderList.empty() ? 0 : *m_renderList.begin();
         const QnResourceWidgetRenderer* widgetRenderer = dynamic_cast<const QnResourceWidgetRenderer*>(renderer);
         dec = QnVideoDecoderFactory::createDecoder(
                 data,
@@ -496,7 +493,8 @@ QnVideoStreamDisplay::FrameDisplayStatus QnVideoStreamDisplay::display(QnCompres
     dec->setOutPictureSize(getMaxScreenSize());
 
     QnFrameScaler::DownscaleFactor scaleFactor = QnFrameScaler::factor_unknown;
-    if (dec->getWidth() > 0) {
+    if (dec->getWidth() > 0)
+    {
         scaleFactor = determineScaleFactor(m_renderList, data->channelNumber, dec->getWidth(), dec->getHeight(), force_factor);
     }
 
@@ -535,6 +533,16 @@ QnVideoStreamDisplay::FrameDisplayStatus QnVideoStreamDisplay::display(QnCompres
         QnWritableCompressedVideoDataPtr emptyData(new QnWritableCompressedVideoData(1,0));
         while (dec->decode(emptyData, &m_tmpFrame))
         {
+            if (scaleFactor == QnFrameScaler::factor_unknown && dec->getWidth() > 0)
+            {
+                scaleFactor = determineScaleFactor(
+                    m_renderList,
+                    data->channelNumber,
+                    dec->getWidth(),
+                    dec->getHeight(),
+                    force_factor);
+            }
+
             QSharedPointer<CLVideoDecoderOutput> tmpOutFrame( new CLVideoDecoderOutput() );
             if (!downscaleFrame(m_tmpFrame, tmpOutFrame, scaleFactor, pixFmt))
                 continue;
@@ -587,14 +595,16 @@ QnVideoStreamDisplay::FrameDisplayStatus QnVideoStreamDisplay::display(QnCompres
     m_mtx.unlock();
     m_rawDataSize = QSize(decodeToFrame->width,decodeToFrame->height);
     if (decodeToFrame->width) {
-        if (qFuzzyIsNull(m_overridenAspectRatio)) {
+        if (!m_overridenAspectRatio.isValid())
+        {
             //qreal sampleAr = decodeToFrame->height > 0 ? (qreal)decodeToFrame->width / (qreal)decodeToFrame->height : 1.0;
             QSize imageSize(decodeToFrame->width * dec->getSampleAspectRatio(), decodeToFrame->height);
             QnMutexLocker lock( &m_imageSizeMtx );
             m_imageSize = imageSize;
         }
         else {
-            QSize imageSize(decodeToFrame->height*m_overridenAspectRatio, decodeToFrame->height);
+            QSize imageSize(decodeToFrame->height*m_overridenAspectRatio.toFloat(),
+                decodeToFrame->height);
             QnMutexLocker lock( &m_imageSizeMtx );
             m_imageSize = imageSize;
         }
@@ -621,7 +631,7 @@ QnVideoStreamDisplay::FrameDisplayStatus QnVideoStreamDisplay::display(QnCompres
         scaleFactor = determineScaleFactor(m_renderList, data->channelNumber, dec->getWidth(), dec->getHeight(), force_factor);
     }
 
-    if (!draw || m_renderList.isEmpty())
+    if (!draw || m_renderList.empty())
         return Status_Skipped;
     else if (m_lastIgnoreTime != (qint64)AV_NOPTS_VALUE && decodeToFrame->pkt_dts <= m_lastIgnoreTime)
         return Status_Skipped;
@@ -745,57 +755,62 @@ QnVideoStreamDisplay::FrameDisplayStatus QnVideoStreamDisplay::flushFrame(int ch
         return Status_Buffered;
 }
 
-bool QnVideoStreamDisplay::processDecodedFrame(QnAbstractVideoDecoder* dec, const QSharedPointer<CLVideoDecoderOutput>& outFrame, bool enableFrameQueue, bool reverseMode)
+bool QnVideoStreamDisplay::processDecodedFrame(
+    QnAbstractVideoDecoder* decoder,
+    const QSharedPointer<CLVideoDecoderOutput>& outFrame,
+    bool enableFrameQueue,
+    bool /*reverseMode*/)
 {
-    Q_UNUSED(reverseMode)
-    //if (quint64(outFrame->pkt_dts) != AV_NOPTS_VALUE)
-    //    overrideTimestampOfNextFrameToRender(outFrame->pkt_dts);
+    if (!outFrame->data[0] && !outFrame->picData)
+        return false;
 
-    //qDebug() << "got decoded frame=" << QDateTime::fromMSecsSinceEpoch(outFrame->pkt_dts/1000).toString(QLatin1String("hh:mm:ss.zzz"));
-
-    if( outFrame->data[0] || outFrame->picData.data() )
+    if (enableFrameQueue)
     {
-        if (enableFrameQueue)
+        NX_ASSERT(!outFrame->isExternalData());
+
+        if (m_bufferedFrameDisplayer)
         {
-            NX_ASSERT(!outFrame->isExternalData());
-            if (m_bufferedFrameDisplayer)
+            const bool wasWaiting = m_bufferedFrameDisplayer->addFrame(outFrame);
+            const qint64 bufferedDuration = m_bufferedFrameDisplayer->bufferedDuration();
+            if (wasWaiting)
             {
-                bool wasWaiting = m_bufferedFrameDisplayer->addFrame(outFrame);
-                qint64 bufferedDuration = m_bufferedFrameDisplayer->bufferedDuration();
-                if (wasWaiting) {
-                    dec->setLightCpuMode(QnAbstractVideoDecoder::DecodeMode_Full);
-                    m_queueWasFilled = true;
-                }
-                else {
-                    if (m_queueWasFilled && bufferedDuration <= MAX_QUEUE_TIME/4)
-                        dec->setLightCpuMode(QnAbstractVideoDecoder::DecodeMode_Fast);
+                decoder->setLightCpuMode(QnAbstractVideoDecoder::DecodeMode_Full);
+                m_queueWasFilled = true;
+            }
+            else
+            {
+                if (m_queueWasFilled && bufferedDuration <= MAX_QUEUE_TIME / 4)
+                    decoder->setLightCpuMode(QnAbstractVideoDecoder::DecodeMode_Fast);
+            }
+        }
+        else
+        {
+            if (std::abs(static_cast<double>(m_speed)) < 1.0 + FPS_EPS)
+            {
+                for (const auto render: m_renderList)
+                {
+                    // Wait for old frame.
+                    render->waitForQueueLessThan(outFrame->channel, kMaxFrameQueueSize);
                 }
             }
-            else {
-                if (qAbs(m_speed) < 1.0 + FPS_EPS) {
-                    foreach(QnAbstractRenderer* render, m_renderList)
-                        render->waitForQueueLessThan(outFrame->channel, MAX_FRAME_QUEUE_SIZE); // wait old frame
-                }
-                foreach(QnAbstractRenderer* render, m_renderList)
-                    render->draw(outFrame); // send new one
-            }
-            m_frameQueueIndex = (m_frameQueueIndex + 1) % MAX_FRAME_QUEUE_SIZE; // allow frame queue for selected video
-            m_queueUsed = true;
+            for (const auto render: m_renderList)
+                render->draw(outFrame); //< Send the new one.
         }
-        else {
-            foreach(QnAbstractRenderer* render, m_renderList)
-                render->draw(outFrame);
-            foreach(QnAbstractRenderer* render, m_renderList)
-                render->waitForFrameDisplayed(outFrame->channel);
-        }
-        m_lastDisplayedFrame = outFrame;
-        return true; //!m_bufferedFrameDisplayer;
+        // Allow frame queue for selected video.
+        m_frameQueueIndex = (m_frameQueueIndex + 1) % kMaxFrameQueueSize;
+        m_queueUsed = true;
     }
     else
     {
-//        delete outFrame;
-        return false;
+        for (const auto render: m_renderList)
+            render->draw(outFrame);
+
+        for (const auto render: m_renderList)
+            render->waitForFrameDisplayed(outFrame->channel);
     }
+    m_lastDisplayedFrame = outFrame;
+
+    return true;
 }
 
 bool QnVideoStreamDisplay::selfSyncUsed() const
@@ -803,11 +818,11 @@ bool QnVideoStreamDisplay::selfSyncUsed() const
     return m_bufferedFrameDisplayer;
 }
 
-qreal QnVideoStreamDisplay::overridenAspectRatio() const {
+QnAspectRatio QnVideoStreamDisplay::overridenAspectRatio() const {
     return m_overridenAspectRatio;
 }
 
-void QnVideoStreamDisplay::setOverridenAspectRatio(qreal aspectRatio) {
+void QnVideoStreamDisplay::setOverridenAspectRatio(QnAspectRatio aspectRatio) {
     m_overridenAspectRatio = aspectRatio;
 }
 
@@ -922,7 +937,7 @@ void QnVideoStreamDisplay::overrideTimestampOfNextFrameToRender(qint64 value)
 
 qint64 QnVideoStreamDisplay::getTimestampOfNextFrameToRender() const
 {
-    if (m_renderList.isEmpty())
+    if (m_renderList.empty())
         return AV_NOPTS_VALUE;
     foreach(QnAbstractRenderer* renderer, m_renderList)
     {
@@ -961,7 +976,7 @@ void QnVideoStreamDisplay::blockTimeValueSafe(qint64 time)
 bool QnVideoStreamDisplay::isTimeBlocked() const
 {
     QnMutexLocker lock(&m_renderListMtx);
-    if (m_renderList.isEmpty())
+    if (m_renderList.empty())
         return false;
     QnAbstractRenderer* renderer = *m_renderList.begin();
     return renderer->isTimeBlocked(m_channelNumber);
@@ -1120,6 +1135,7 @@ bool QnVideoStreamDisplay::getLastDecodedFrame( QnAbstractVideoDecoder* dec, QSh
 
 QSize QnVideoStreamDisplay::getMaxScreenSize() const
 {
+    QnMutexLocker lock(&m_renderListMtx);
     int maxW = 0, maxH = 0;
     foreach(QnAbstractRenderer* render, m_renderList)
     {

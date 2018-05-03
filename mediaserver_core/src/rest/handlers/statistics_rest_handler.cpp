@@ -29,7 +29,7 @@ int QnStatisticsRestHandler::executeGet(
             owner->resourcePool()->getResourceById(owner->commonModule()->moduleGUID()),
             Qn::ViewContentPermission))
     {
-        return nx_http::StatusCode::forbidden;
+        return nx::network::http::StatusCode::forbidden;
     }
 
     QnStatisticsReply reply;

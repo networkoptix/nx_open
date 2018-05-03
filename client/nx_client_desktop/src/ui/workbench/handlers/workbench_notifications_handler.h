@@ -49,7 +49,6 @@ private slots:
     void at_context_userChanged();
     void at_userEmailValidityChanged(const QnUserResourcePtr &user, bool isValid);
 
-    void at_eventManager_connectionClosed();
     void at_eventManager_actionReceived(const nx::vms::event::AbstractActionPtr& action);
 
     void at_settings_valueChanged(int id);
@@ -77,5 +76,5 @@ private:
 private:
     QnWorkbenchUserEmailWatcher* m_userEmailWatcher;
     QnBusinessEventsFilterResourcePropertyAdaptor* m_adaptor;
-    quint64 m_popupSystemHealthFilter;
+    QSet<QnSystemHealth::MessageType> m_popupSystemHealthFilter;
 };

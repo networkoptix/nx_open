@@ -141,13 +141,13 @@ TEST_F(TransactionVersioning, ApiUserData_relevance)
 
 TEST_F(TransactionVersioning, ApiIdData_relevance)
 {
-    testTwoWayStructureRelevance<::ec2::ApiIdData, compatibility::ApiIdData>();
+    testTwoWayStructureRelevance<nx::vms::api::IdData, compatibility::ApiIdData>();
 }
 
 TEST_F(TransactionVersioning, ApiResourceParamWithRefData_relevance)
 {
     testTwoWayStructureRelevance<
-        ::ec2::ApiResourceParamWithRefData,
+        nx::vms::api::ResourceParamWithRefData,
         compatibility::ApiResourceParamWithRefData>();
 }
 

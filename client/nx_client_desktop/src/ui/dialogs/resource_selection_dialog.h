@@ -32,7 +32,7 @@ public:
         users
     };
 
-    explicit QnResourceSelectionDialog(Filter filter, QWidget* parent = nullptr);
+    explicit QnResourceSelectionDialog(Filter filter, QWidget* parent);
     ~QnResourceSelectionDialog();
 
     QSet<QnUuid> selectedResources() const;

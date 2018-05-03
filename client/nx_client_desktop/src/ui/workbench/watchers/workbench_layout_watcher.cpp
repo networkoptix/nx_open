@@ -5,7 +5,7 @@
 #include <core/resource/layout_resource.h>
 #include <core/resource_management/resource_pool.h>
 
-#include <plugins/resource/avi/avi_resource.h>
+#include <core/resource/avi/avi_resource.h>
 
 QnWorkbenchLayoutWatcher::QnWorkbenchLayoutWatcher(QObject *parent):
     QObject(parent),

@@ -5,7 +5,7 @@
 #include "p2p_fwd.h"
 #include <nx_ec/data/api_peer_data.h>
 #include <nx/network/websocket/websocket.h>
-#include <nx/network/http/asynchttpclient.h>
+#include <nx/network/deprecated/asynchttpclient.h>
 #include <nx_ec/ec_proto_version.h>
 #include <utils/common/from_this_to_shared.h>
 #include <core/resource/shared_resource_pointer.h>
@@ -53,7 +53,7 @@ public:
     ConnectionBase(
         const QnUuid& remoteId,
         const ApiPeerDataEx& localPeer,
-        const QUrl& remotePeerUrl,
+        const nx::utils::Url& remotePeerUrl,
         const std::chrono::seconds& keepAliveTimeout,
         std::unique_ptr<QObject> opaqueObject,
         std::unique_ptr<ConnectionLockGuard> connectionLockGuard = nullptr);
@@ -73,7 +73,7 @@ public:
     virtual const ApiPeerDataEx& localPeer() const override { return m_localPeer; }
     virtual const ApiPeerDataEx& remotePeer() const override { return m_remotePeer; }
     virtual bool isIncoming() const override { return m_direction == Direction::incoming;  }
-    virtual nx_http::AuthInfoCache::AuthorizationCacheItem authData() const override;
+    virtual nx::network::http::AuthInfoCache::AuthorizationCacheItem authData() const override;
 
     State state() const;
     virtual void setState(State state);
@@ -86,7 +86,7 @@ public:
 
     QObject* opaqueObject();
 
-    virtual QUrl remoteAddr() const override;
+    virtual utils::Url remoteAddr() const override;
     const nx::network::WebSocket* webSocket() const;
     void stopWhileInAioThread();
 signals:
@@ -94,7 +94,7 @@ signals:
     void stateChanged(QWeakPointer<ConnectionBase> connection, ConnectionBase::State state);
     void allDataSent(QWeakPointer<ConnectionBase> connection);
 protected:
-    virtual void fillAuthInfo(nx_http::AsyncClient* httpClient, bool authByKey) = 0;
+    virtual void fillAuthInfo(nx::network::http::AsyncClient* httpClient, bool authByKey) = 0;
     void bindToAioThread(nx::network::aio::AbstractAioThread* aioThread);
     nx::network::WebSocket* webSocket();
 private:
@@ -118,7 +118,7 @@ private:
     std::deque<nx::Buffer> m_dataToSend;
     QByteArray m_readBuffer;
 
-    std::unique_ptr<nx_http::AsyncClient> m_httpClient;
+    std::unique_ptr<nx::network::http::AsyncClient> m_httpClient;
 
 
     CredentialsSource m_credentialsSource = CredentialsSource::serverKey;
@@ -130,7 +130,7 @@ private:
     std::atomic<State> m_state{State::Connecting};
 
     Direction m_direction;
-    QUrl m_remotePeerUrl;
+    nx::utils::Url m_remotePeerUrl;
 
     static SendCounters m_sendCounters;
 
@@ -142,7 +142,7 @@ private:
     int m_sendSequence = 0;
     int m_lastReceivedSequence = 0;
 
-    nx_http::AuthInfoCache::AuthorizationCacheItem m_httpAuthCacheItem;
+    nx::network::http::AuthInfoCache::AuthorizationCacheItem m_httpAuthCacheItem;
     mutable QnMutex m_mutex;
 };
 

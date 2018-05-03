@@ -1,23 +1,18 @@
-/**********************************************************
-* Oct 7, 2015
-* akolesnikov
-***********************************************************/
-
 #include "random_online_endpoint_selector.h"
 
 #include <nx/utils/scope_guard.h>
 
-
 namespace {
-    const unsigned int CONNECT_TIMEOUT_MS = 14384;
-}
+
+static const unsigned int CONNECT_TIMEOUT_MS = 14384;
+
+} // namespace
 
 namespace nx {
 namespace network {
 namespace cloud {
 
-RandomOnlineEndpointSelector::RandomOnlineEndpointSelector()
-:
+RandomOnlineEndpointSelector::RandomOnlineEndpointSelector():
     m_endpointResolved(false),
     m_socketsStillConnecting(0)
 {
@@ -37,7 +32,7 @@ RandomOnlineEndpointSelector::~RandomOnlineEndpointSelector()
 void RandomOnlineEndpointSelector::selectBestEndpont(
     const QString& /*moduleName*/,
     std::vector<SocketAddress> endpoints,
-    std::function<void(nx_http::StatusCode::Value, SocketAddress)> handler)
+    std::function<void(nx::network::http::StatusCode::Value, SocketAddress)> handler)
 {
     QnMutexLocker lk(&m_mutex);
 
@@ -46,7 +41,7 @@ void RandomOnlineEndpointSelector::selectBestEndpont(
 
     using namespace std::placeholders;
     //trying to establish connection to any endpoint and return first one that works
-    for (auto& endpoint: endpoints)
+    for (auto& endpoint : endpoints)
     {
         auto sock = SocketFactory::createStreamSocket(
             false, NatTraversalSupport::disabled);
@@ -68,7 +63,7 @@ void RandomOnlineEndpointSelector::selectBestEndpont(
     //failed to start at least one connection. Reporting error...
     auto localHandler = std::move(m_handler);
     lk.unlock();
-    localHandler(nx_http::StatusCode::serviceUnavailable, SocketAddress());
+    localHandler(nx::network::http::StatusCode::serviceUnavailable, SocketAddress());
 }
 
 void RandomOnlineEndpointSelector::done(
@@ -76,7 +71,7 @@ void RandomOnlineEndpointSelector::done(
     SystemError::ErrorCode osErrorCode,
     SocketAddress endpoint)
 {
-    auto scopedGuard = makeScopeGuard([sock, this](){
+    auto scopedGuard = makeScopeGuard([sock, this]() {
         QnMutexLocker lk(&m_mutex);
         m_sockets.erase(sock);
     });
@@ -97,9 +92,9 @@ void RandomOnlineEndpointSelector::done(
     lk.unlock();
 
     if (osErrorCode == SystemError::noError)
-        localHandler(nx_http::StatusCode::ok, std::move(endpoint));
+        localHandler(nx::network::http::StatusCode::ok, std::move(endpoint));
     else
-        localHandler(nx_http::StatusCode::serviceUnavailable, SocketAddress());
+        localHandler(nx::network::http::StatusCode::serviceUnavailable, SocketAddress());
 }
 
 } // namespace cloud

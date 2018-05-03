@@ -1,10 +1,4 @@
-/**********************************************************
-* Sep 8, 2015
-* akolesnikov
-***********************************************************/
-
-#ifndef NX_CC_CLOUD_MODULES_XML_SAX_HANDLER_H
-#define NX_CC_CLOUD_MODULES_XML_SAX_HANDLER_H
+#pragma once
 
 #include <list>
 #include <map>
@@ -17,13 +11,12 @@ namespace nx {
 namespace network {
 namespace cloud {
 
-class NX_NETWORK_API CloudModulesXmlHandler
-:
+class NX_NETWORK_API CloudModulesXmlHandler:
     public QXmlDefaultHandler
 {
 public:
     CloudModulesXmlHandler();
-    virtual ~CloudModulesXmlHandler();
+    virtual ~CloudModulesXmlHandler() = default;
 
     virtual bool startDocument() override;
     virtual bool endDocument() override;
@@ -61,5 +54,3 @@ private:
 } // namespace cloud
 } // namespace network
 } // namespace nx
-
-#endif  //NX_CC_CLOUD_MODULES_XML_SAX_HANDLER_H

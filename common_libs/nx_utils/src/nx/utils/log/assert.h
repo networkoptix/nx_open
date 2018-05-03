@@ -55,9 +55,9 @@ public:
     {
         TimeInfo();
         TimeInfo(const TimeInfo& info);
-        TimeInfo& operator =(const TimeInfo& info);
+        TimeInfo& operator=(const TimeInfo& info);
 
-        bool operator <(const TimeInfo& other) const;
+        bool operator<(const TimeInfo& other) const;
         void add(std::chrono::microseconds duration);
 
         size_t count() const;

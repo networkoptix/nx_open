@@ -6,3 +6,6 @@ nx_add_target(minilauncher EXECUTABLE
     PUBLIC_LIBS
         shlwapi.lib
 )
+
+string(REPLACE ".exe" "" binary_name ${minilauncher.binary.name})
+set_target_properties(minilauncher PROPERTIES OUTPUT_NAME ${binary_name})

@@ -13,7 +13,7 @@ class CLSimpleTFTPClient;
 class AVPanoramicClientPullSSTFTPStreamreader : public QnPlAVClinetPullStreamReader
 {
 public:
-    explicit AVPanoramicClientPullSSTFTPStreamreader(const QnResourcePtr& res);
+    explicit AVPanoramicClientPullSSTFTPStreamreader(const QnPlAreconVisionResourcePtr& res);
 
     ~AVPanoramicClientPullSSTFTPStreamreader();
 
@@ -34,9 +34,7 @@ protected:
     bool m_last_resolution;
 
     unsigned int m_timeout;
-    
-    bool m_panoramic;
-    bool m_dualsensor;
+
     QString m_model;
 
     CLSimpleTFTPClient* m_tftp_client;

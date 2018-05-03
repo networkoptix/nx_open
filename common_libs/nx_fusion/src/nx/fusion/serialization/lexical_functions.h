@@ -11,6 +11,7 @@
 
 #include "nx/utils/latin1_array.h"
 #include "nx/fusion/fusion/fusion_fwd.h"
+#include <nx/utils/url.h>
 
 namespace QnLexicalDetail {
     template<class T, class Temporary>
@@ -153,6 +154,6 @@ bool deserialize(const QString& value, QRect* target);
 bool serialize(const QRectF& value, QString* target);
 bool deserialize(const QString& value, QRectF* target);
 
-QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES((bool)(QnUuid)(QUrl)(QColor), (lexical))
+QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES((bool)(QnUuid)(QUrl)(nx::utils::Url)(QColor), (lexical))
 
 #endif // QN_SERIALIZATION_LEXICAL_FUNCTIONS_H

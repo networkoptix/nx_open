@@ -299,7 +299,7 @@ bool CommonPollSetTest::isEveryExpectedEventHasBeenReported(
         {
             if ((socketAndEventMask.second & eventTypeToCheck) == 0)
                 continue;
-            auto reportedEventIter = 
+            auto reportedEventIter =
                 m_eventsReported.find(std::make_pair(socketAndEventMask.first, eventTypeToCheck));
             if (reportedEventIter == m_eventsReported.end())
                 return false;

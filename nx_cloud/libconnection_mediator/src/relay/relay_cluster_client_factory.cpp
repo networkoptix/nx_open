@@ -17,7 +17,7 @@ RelayClusterClientFactory& RelayClusterClientFactory::instance()
     return staticInstance;
 }
 
-std::unique_ptr<AbstractRelayClusterClient> 
+std::unique_ptr<AbstractRelayClusterClient>
     RelayClusterClientFactory::defaultFactoryFunction(const conf::Settings& settings)
 {
     return std::make_unique<RelayClusterClient>(settings);

@@ -62,13 +62,36 @@ QString QnConnectionDiagnosticsHelper::getErrorDescription(
     const QnConnectionInfo& connectionInfo)
 {
     static const QString kRowMarker = lit(" - ");
-    QString versionDetails =
-        kRowMarker
-        + tr("Client version: %1.").arg(qnStaticCommon->engineVersion().toString())
-        + L'\n'
-        + kRowMarker
-        + tr("Server version: %1.").arg(connectionInfo.version.toString())
-        + L'\n';
+    QString versionDetails;
+
+    auto addRow = [&versionDetails](const QString& text)
+        {
+            versionDetails += kRowMarker + text + L'\n';
+        };
+
+
+    addRow(tr("Client version: %1.").arg(qnStaticCommon->engineVersion().toString()));
+
+    if (qnRuntime->isDevMode())
+    {
+        addRow(lit("Protocol: %1, Cloud: %2")
+            .arg(QnAppInfo::ec2ProtoVersion())
+            .arg(nx::network::SocketGlobals::cloud().cloudHost()));
+    }
+
+    addRow(tr("Server version: %1.").arg(connectionInfo.version.toString()));
+
+    if (qnRuntime->isDevMode())
+    {
+        addRow(lit("Brand: %1, Customization: %2")
+            .arg(connectionInfo.brand)
+            .arg(connectionInfo.customization));
+        addRow(lit("Protocol: %1, Cloud: %2")
+            .arg(connectionInfo.nxClusterProtoVersion)
+            .arg(connectionInfo.cloudHost));
+    }
+
+
 
     switch (result)
     {
@@ -280,7 +303,7 @@ QString QnConnectionDiagnosticsHelper::getDiffVersionFullExtras(
     {
         devModeText += L'\n' + lit("Client Protocol: %1").arg(QnAppInfo::ec2ProtoVersion());
         devModeText += L'\n' + lit("Server Protocol: %1").arg(serverInfo.nxClusterProtoVersion);
-        devModeText += L'\n' + lit("Client Cloud Host: %1").arg(nx::network::AppInfo::defaultCloudHost());
+        devModeText += L'\n' + lit("Client Cloud Host: %1").arg(nx::network::SocketGlobals::cloud().cloudHost());
         devModeText += L'\n' + lit("Server Cloud Host: %1").arg(serverInfo.cloudHost);
     }
 
@@ -367,7 +390,7 @@ Qn::ConnectionResult QnConnectionDiagnosticsHelper::handleCompatibilityMode(
         if (dialog.exec() == QDialogButtonBox::Cancel)
             return Qn::IncompatibleVersionConnectionResult;
 
-        QUrl serverUrl = connectionInfo.ecUrl;
+        nx::utils::Url serverUrl = connectionInfo.ecUrl;
         if (serverUrl.scheme().isEmpty())
         {
             serverUrl.setScheme(connectionInfo.allowSslConnections
@@ -429,7 +452,7 @@ QString QnConnectionDiagnosticsHelper::getErrorString(ErrorStrings id)
         case ErrorStrings::CloudIsNotReady:
             return tr("Connection to %1 is not ready yet. "
                 "Check server Internet connection or try again later.",
-                "%1 is the cloud name (like 'Nx Cloud')").arg(nx::network::AppInfo::cloudName());
+                "%1 is the cloud name (like Nx Cloud)").arg(nx::network::AppInfo::cloudName());
         default:
             NX_ASSERT(false, Q_FUNC_INFO, "Should never get here");
             break;

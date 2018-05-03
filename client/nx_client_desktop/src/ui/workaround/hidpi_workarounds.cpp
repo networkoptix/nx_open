@@ -162,7 +162,7 @@ MenuScreenCorrectorPtr installMenuMouseEventCorrector(QMenu* menu)
     return corrector;
 }
 
-QWindow* getParentWindow(QWidget* widget)
+QWindow* getParentWindow(const QWidget* widget)
 {
     if (!widget)
         return nullptr;
@@ -182,7 +182,7 @@ QWindow* getParentWindow(QWidget* widget)
     return getParentWindow(scene->views().first());
 }
 
-QPoint getPoint(QWidget* widget, const QPoint& offset, QWindow* parentWindow = nullptr)
+QPoint getPoint(const QWidget* widget, const QPoint& offset, QWindow* parentWindow = nullptr)
 {
     if (!parentWindow)
         parentWindow = getParentWindow(widget);
@@ -277,7 +277,7 @@ QAction* QnHiDpiWorkarounds::showMenu(QMenu* menu, const QPoint& globalPoint)
     return menu->exec(globalPoint);
 }
 
-QPoint QnHiDpiWorkarounds::safeMapToGlobal(QWidget* widget, const QPoint& offset)
+QPoint QnHiDpiWorkarounds::safeMapToGlobal(const QWidget* widget, const QPoint& offset)
 {
     if (isWindowsEnvironment)
         return getPoint(widget, offset);

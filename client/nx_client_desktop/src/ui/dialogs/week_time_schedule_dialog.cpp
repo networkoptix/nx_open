@@ -19,7 +19,6 @@ QnWeekTimeScheduleDialog::QnWeekTimeScheduleDialog(QWidget *parent):
     setHelpTopic(this, Qn::EventsActions_Schedule_Help);
 
     // init buttons
-    connect(ui->gridWidget, &QnScheduleGridWidget::colorsChanged, this, &QnWeekTimeScheduleDialog::updateColors);
     updateColors();
 
     connect(ui->valueOnButton, SIGNAL(toggled(bool)), this, SLOT(updateGridParams()));
@@ -63,7 +62,7 @@ QString QnWeekTimeScheduleDialog::scheduleTasks() const
                 const QPoint cell(col, row);
 
                 Qn::RecordingType recordType = ui->gridWidget->cellValue(cell).recordingType;
-                writer.putBit(recordType != Qn::RT_Never);
+                writer.putBit(recordType != Qn::RecordingType::never);
             }
         }
         writer.flushBits();
@@ -88,7 +87,7 @@ void QnWeekTimeScheduleDialog::setScheduleTasks(const QString& value)
             {
                 const QPoint cell(col, row);
                 auto params = ui->gridWidget->cellValue(cell);
-                params.recordingType = Qn::RT_Always;
+                params.recordingType = Qn::RecordingType::always;
                 ui->gridWidget->setCellValue(cell, params);
             }
         }
@@ -105,7 +104,7 @@ void QnWeekTimeScheduleDialog::setScheduleTasks(const QString& value)
                 {
                     const QPoint cell(col, row);
                     auto params = ui->gridWidget->cellValue(cell);
-                    params.recordingType = reader.getBit() ? Qn::RT_Always : Qn::RT_Never;
+                    params.recordingType = reader.getBit() ? Qn::RecordingType::always : Qn::RecordingType::never;
                     ui->gridWidget->setCellValue(cell, params);
                 }
             }
@@ -131,11 +130,11 @@ void QnWeekTimeScheduleDialog::updateGridParams(bool fromUserInput)
         return;
 
     QnScheduleGridWidget::CellParams brush;
-    brush.recordingType = Qn::RT_Never;
+    brush.recordingType = Qn::RecordingType::never;
     if (ui->valueOnButton->isChecked())
-        brush.recordingType = Qn::RT_Always;
+        brush.recordingType = Qn::RecordingType::always;
     else if (ui->valueOffButton->isChecked())
-        brush.recordingType = Qn::RT_Never;
+        brush.recordingType = Qn::RecordingType::never;
     else
         qWarning() << "QnWeekTimeScheduleDialog::No record type is selected!";
 
@@ -147,8 +146,9 @@ void QnWeekTimeScheduleDialog::updateGridParams(bool fromUserInput)
 
 void QnWeekTimeScheduleDialog::updateColors()
 {
-    ui->valueOnButton->setColor(ui->gridWidget->colors().recordAlways);
-    ui->valueOffButton->setColor(ui->gridWidget->colors().recordNever);
+    const nx::client::desktop::SchedulePaintFunctions paintFunctions;
+    ui->valueOnButton->setColor(paintFunctions.recordAlways);
+    ui->valueOffButton->setColor(paintFunctions.recordNever);
 }
 
 // -------------------------------------------------------------------------- //
@@ -163,7 +163,7 @@ void QnWeekTimeScheduleDialog::at_gridWidget_cellActivated(const QPoint &cell)
 
     switch (recordType)
     {
-        case Qn::RT_Always:
+        case Qn::RecordingType::always:
             ui->valueOnButton->setChecked(true);
             break;
         default:

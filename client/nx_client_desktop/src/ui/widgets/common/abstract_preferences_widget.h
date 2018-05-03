@@ -2,53 +2,63 @@
 
 #include <QtWidgets/QWidget>
 
-class QnAbstractPreferencesWidget: public QWidget {
-    Q_OBJECT
-    Q_PROPERTY(bool readOnly READ isReadOnly WRITE setReadOnly)
-
+class QnAbstractPreferencesInterface
+{
 public:
-    explicit QnAbstractPreferencesWidget(QWidget *parent = 0);
+    QnAbstractPreferencesInterface() = default;
+    virtual ~QnAbstractPreferencesInterface() = default;
 
     /**
-     * @brief hasChanges                        Check if there are modified values.
-     *                                          This method must be implemented in derived classes.
-     * @return                                  True if something is changed, false otherwise.
+     * Check if there are modified values.
+     * @return True if something is changed, false otherwise.
      */
     virtual bool hasChanges() const = 0;
 
     /**
-     * @brief loadDataToUi                      Read widget elements' values from model data.
-     *                                          This method must be implemented in derived classes.
+     * Read widget elements' values from model data.
      */
     virtual void loadDataToUi() = 0;
 
     /**
-     * @brief applyChanges                      Save widget elements' values to model data.
-     *                                          This method must be implemented in derived classes.
+     * Save widget elements' values to model data.
      */
     virtual void applyChanges() = 0;
 
     /**
-    * @brief discardChanges                    Discard changes if needed. Called only on force closing.
-    */
-    virtual void discardChanges();
-
-    /**
-     * @brief canApplyChanges                   Check that all values are correct so saving is possible.
-     *                                          This method is optional, usually it shouldn't be reimplemented.
-     * @return                                  False if saving should be aborted, true otherwise.
+     * Discard changes if needed. Called only on force closing.
      */
-    virtual bool canApplyChanges() const;
+    virtual void discardChanges() {}
 
     /**
-     * @brief canDiscardChanges                 Check that all values can be discarded safely.
-     *                                          This method is optional, usually it shouldn't be reimplemented.
-     * @return                                  False if discarding should be aborted, true otherwise.
+     * Check that all values are correct so saving is possible.
+     * @return False if saving should be aborted, true otherwise.
      */
-    virtual bool canDiscardChanges() const;
+    virtual bool canApplyChanges() const
+    {
+        return true;
+    }
 
     /**
-     * @brief retranslateUi                     Update ui strings (if required).
+     * Check that all values can be discarded safely.
+     * @return False if discarding should be aborted, true otherwise.
+     */
+    virtual bool canDiscardChanges() const
+    {
+        return true;
+    }
+};
+
+class QnAbstractPreferencesWidget: public QWidget, public QnAbstractPreferencesInterface
+{
+    Q_OBJECT
+    Q_PROPERTY(bool readOnly READ isReadOnly WRITE setReadOnly)
+
+    using base_type = QWidget;
+public:
+    explicit QnAbstractPreferencesWidget(QWidget* parent = nullptr);
+
+    /**
+     * Update ui strings (if required).
      */
     virtual void retranslateUi();
 
@@ -60,8 +70,8 @@ signals:
     void hasChangesChanged();
 
 protected:
-    virtual void setReadOnlyInternal(bool readOnly);
+    virtual void setReadOnlyInternal(bool readOnly) {}
 
 private:
-    bool m_readOnly;
+    bool m_readOnly = false;
 };

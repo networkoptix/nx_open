@@ -1,3 +1,105 @@
+-----------------------------------------------3.1.0.xxxx-----------------------------------------
+NEW FEATURES
+* Cloud Client - Browser based client now in the Cloud Portal.
+* Cloud Data Proxy - In cases where NAT Traversal fails .
+* Soft Triggers - Create and add overlaid buttons to trigger System Actions.
+* Showreel - Create customizable timed viewing sequences using any resource - cameras, layouts, web pages, offline files, and even server health monitoring.
+* Acknowledge and Bookmark -- Force acknowledgement and Bookmark by operators before a notification disappears in Desktop client.
+* Multicast Stream Support - multicast streams can be added to Server as a camera.
+* H265 Support - H.265 codec is now supported!
+* API Generator - create HTTP Generic Events or API calls in the For Developers tab of the Web Admin interface.
+
+NEW DEVICE SUPPORT
+* Analog Encoder license support added for: Dahua DHI-HCVR Series, Dahua DHI-XVR Series, Dahua X21A2E, Geovision GV-VS2400, Pravis HDR-1600, Samsung Techwin SPE-400, TCAM TCS-300, VIVOTEK VS8102, Unview NVR302-08E-P8
+* New Arecont Vision devices supported: 2325, 2326, 3325, 3326, 12375, 12376, 20375
+* New Axis devices supported: P3227, P3228, Q1659, Q1942
+* ACTi I96
+* Advanced PTZ support for Hikvision DS-2DF5220S-DE4/W, Samsung Techwin XNP-6370
+* Onvif PTZ presets added for Rhodium RBU-PZ-4461-EB
+* 2-way audio support for Sony SNC-CX600, Dahua IPC-K15P, Dahua IPC-K35P
+* Alarm Input support for Hikvision cameras: DS-2CD2132F-IWS, DS-2CD2655FWD-IZS, DS-2CD2742FWD-IS, DS-2CD2942F-IS, DS-2CD4A26FWD-IZS, DS-2CD63C2F-IS, DS-2DE4A220IW-DE
+* Alarm Output support for Hikvision cameras: DS-2CD2132F-IWS, DS-2CD2655FWD-IZS, DS-2CD2742FWD-IS, DS-2CD2942F-IS, DS-2CD4A26FWD-IZS, DS-2DE4A220IW-DE
+
+IMPROVEMENTS
+* LDAP general workflow improvements, secured LDAP is supported now, integration with Jumpcloud service.
+* RTSP digest authentication support added.
+* User can connect to Server with Cloud credentials even if Internet connection is temporary unavailable.
+* Active license now can be deactivated right in the Client and applied to another Server.
+* User can disable time synchronization with Internet on Time Management tab in System Administration.
+* Server can be unmerged from System keeping its database ("Detach Server from System" button in Web Admin).
+* Specific users or user roles can be selected as a target for actions in Event Rules.
+* Cloud users who has been invited but has not created account yet are marked in Client.
+* New event "System drive is full" was added.
+* "Device recording" action can be used for instant events with new option "Fixed duration".
+* Email notifications optionally can be sent in plain text format.
+* Added new Camera Detailes panel in Web Client.
+* Web Client can be open on Mobile devices now.
+* Clear storage space mechanism was optimized and improved.
+* Added video support for Web Pages in Client (Any video codec pack like "K-Lite codec pack" has to be installed on Client PC).
+* "Application Window" mode was removed from Screen Recording options.
+* Added "Disable blur" option to the "Advanced" tab of Local Client Settings
+* Local files can be renamed from Client resources tree.
+* Small interfase improvements and UI fixes.
+* Incremental expansion of Server API documentation.
+* General server stability improvements based on anonymous usage and crash statistics.
+
+BUG FIXES
+* New Hikvision cameras got blocked for 30 minutes during auto-discovery. Fixed.
+* Axis Q6000-E was not discovered using Onvif. Fixed.
+* Axis P7210 encoder could not be added through native Axis driver, only as Onvif resource, that caused different issues. Fixed.
+* Secondary stream for ISD cameras was always received with 5fps. Fixed.
+* IQEye cameras were not allowed to "Force motion detection" for any stream. Fixed.
+* Impossible to get primary stream from Arecont Vision cameras with maximum fps. Fixed.
+* Axis T8311 joystick moved several PTZ cameras at several opened client sessions simultaneously. Now can be disabled with "PTZ" icon in camera panel. Fixed.
+* Dahua cameras dropped unauthorized after discovery. Fixed.
+* Motion detection sometimes failed for Arecont Vision AV10655. Fixed.
+* H.264 codec was unavailable for Arecont Vision AV6655 and AV6656. Fixed.
+* Several cameras forwarded from the same remote IP and added to the same Server caused "Device IP conflict" alarm. Fixed.
+* A lot of authorization attempts in Audit Trail if System page was opened on Cloud Portal for a long time without any activity. Fixed.
+* There was no record with "Server updated" in Audit Trail if external storage had been removed. Fixed.
+* "Login" activity was displayed twice in Audit Trail if user logged in to Server and then disconnected using Main Menu. Fixed.
+* Japanese symbols were displayed wrong in camera names in Light Client. Fixed.
+* Lite Client crashes in fullscreen mode on cameras with low stream width > 640px. Fixed.
+* After upgrade to 3.0 servers could stop to communicate if multicast was disabled. While connected to any server you saw offline all the rest hosts. Fixed.
+* License keys were sometimes lost after upgrade from older versions. Fixed.
+* Server couldn't calculate HWID in some virtual hosts so license couldn't be activated. Fixed.
+* Backgrounds for removed layouts were stored in Server DB significantly increasing its size. Fixed.
+* System didn't allow to delete users with "Locked" layouts. Fixed.
+* In some rare situations small parts of archive (about 1 minute) could not be played in Client. Fixed.
+* Couldn't add NAS with symbols (@,#,$,etc.) in login/password pairs -- "Invalid Storage Path" message was shown in Client. Fixed.
+* Not all multicast packets were disabled if user turned off auto-discovery and failover was not used. Fixed.
+* Server migth not start properly after PC reboot if it was updated twice with new .exe installer. Fixed.
+* Server on RaspberryPi didn't see local storage on new Debian 8 Jessie. Fixed.
+* Server on Nx1 didn't completely unmount NAS if it was removed from Client. Server restart was required. Fixed.
+* Nx1 Server upgrade could fail in case of high memory usage. Fixed.
+* USB sticks could be recorgnized as storage on Linux Servers. Fixed.
+* System time offset could reach several seconds per day. Fixed.
+* Rare Server crash when camera with audio was opened in Web Client. Fixed.
+* Several simultaneous HLS exports using api methods could fail. Fixed.
+* Users unable to login after password change at LDAP server. Fixed.
+* Systems with very high number of custom users at one moment could start failing to sync database. Fixed.
+* API requests for streaming were not proxied between Servers if cameraId was used instead of physicalId. Fixed.
+* There was wrong error message in Setup Wizard if user set non-English letters in password. Fixed.
+* Cameras with not enabled recording played video in Web Client only for second try opening. Fixed.
+* Archived video could not be played in Web Client if camera was moved from ARM to PC Server. Fixed.
+* Timeline in Web Client always displayed local client time that might lead to wrong archive displaying. Fixed.
+* Client "Connect to Server..." dialog always kept password for the last used connection. Fixed.
+* Client didn't create Main Media Folder on first start after installation. Fixed.
+* Local files could not be saved on layout if they located not in Client Media Folder. Fixed.
+* Client multi-window mode might not work properly in case of specific monitor configuration (more than 2 displays, different scales on each display). Fixed.
+* IO module item was shown incorrectly on layout if it had only one type of ports. Fixed.
+* Custom aspect ratio for camera was not applied on thumbnails. Fixed.
+* Web Pages couldn't be drag-n-dropped from Resources Tree to Video Wall view. Fixed.
+* Client could crash if some specific Web Pages were opened on layout. Fixed.
+* 2way audio sometimes worked with significant delay after item reopening. Fixed.
+* Screen Recording couldn't save file if 2-way audio talk button was used before. Fixed.
+* Text overlay and bookmarks were not displayed on item if text contained symbol "&". Fixed.
+* Backward playback didn't work properly with enabled Smart Search -- video could be played continuously despite the motion chuncks. Fixed.
+* Video exported from Client 2.6 and less was played in 3.0 with audio out of sync. Fixed.
+* Preview Search layout cleared timeline selection on changing time marker position. Fixed.
+* Video could start playing from "Pause" after switching between layouts. Fixed.
+
+
 -----------------------------------------------3.0.0.xxxx-----------------------------------------
 NEW FEATURES
 * Nx Cloud - connect your system to Nx Cloud to login from anywhere and share access to your system. Save hours in port-forwarding setup and coordination.

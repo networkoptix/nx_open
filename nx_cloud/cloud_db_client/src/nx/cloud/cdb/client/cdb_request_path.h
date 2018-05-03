@@ -21,6 +21,7 @@ extern const char* const kSystemRenamePath;
 extern const char* const kSystemUpdatePath;
 extern const char* const kSystemRecordUserSessionStartPath;
 extern const char* const kSystemHealthHistoryPath;
+extern const char* const kSystemsMergedToASpecificSystem;
 
 extern const char* const kAuthGetNoncePath;
 extern const char* const kAuthGetAuthenticationPath;
@@ -29,9 +30,8 @@ extern const char* const kSubscribeToSystemEventsPath;
 
 extern const char* const kPingPath;
 
-extern const char* const kEstablishEc2TransactionConnectionPath;
-extern const char* const kDeprecatedEstablishEc2TransactionConnectionPath;
-extern const char* const kEstablishEc2P2pTransactionConnectionPath;
+extern const char* const kEc2TransactionConnectionPathPrefix;
+extern const char* const kDeprecatedEc2TransactionConnectionPathPrefix;
 
 // Maintenance.
 extern const char* const kMaintenanceGetVmsConnections;

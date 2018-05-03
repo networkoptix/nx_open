@@ -8,11 +8,10 @@ namespace ssl {
 
 StreamServerSocket::StreamServerSocket(
     std::unique_ptr<AbstractStreamServerSocket> delegatee,
-    EncryptionUse encryptionUse)
+    EncryptionUse /*encryptionUse*/)
     :
     base_type(delegatee.get()),
-    m_delegatee(std::move(delegatee)),
-    m_encryptionUse(encryptionUse)
+    m_delegatee(std::move(delegatee))
 {
 }
 
@@ -28,6 +27,14 @@ void StreamServerSocket::acceptAsync(AcceptCompletionHandler handler)
                 sysErrorCode,
                 std::move(streamSocket));
         });
+}
+
+AbstractStreamSocket* StreamServerSocket::accept()
+{
+    AbstractStreamSocket* accepted = base_type::accept();
+    if (accepted)
+        accepted = new StreamSocket(std::unique_ptr<AbstractStreamSocket>(accepted), true);
+    return accepted;
 }
 
 void StreamServerSocket::onAcceptCompletion(

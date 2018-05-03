@@ -53,7 +53,7 @@ std::vector<std::unique_ptr<AbstractTunnelAcceptor>>
             mediatorUdpEndpoint,
             std::move(event.udpEndpointList),
             event.params);
-        // TODO: #ak Following call is a result of some architectual problem 
+        // TODO: #ak Following call is a result of some architectual problem
         // making udp::TunnelAcceptor required for cloud connect to succeed with any method.
         if ((m_enabledConnectionMethods & hpm::api::ConnectionMethod::udpHolePunching) == 0)
             acceptor->setHolePunchingEnabled(false);

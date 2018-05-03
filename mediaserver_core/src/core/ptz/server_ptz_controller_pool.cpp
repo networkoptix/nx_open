@@ -3,6 +3,7 @@
 #include <api/app_server_connection.h>
 #include <common/common_module.h>
 #include <common/static_common_module.h>
+
 #include <core/ptz/activity_ptz_controller.h>
 #include <core/ptz/home_ptz_controller.h>
 #include <core/ptz/mapped_ptz_controller.h>
@@ -14,6 +15,8 @@
 #include <core/resource/camera_resource.h>
 #include <core/resource_management/resource_data_pool.h>
 #include <core/resource/param.h>
+
+#include <nx/mediaserver/resource/camera.h>
 
 QnServerPtzControllerPool::QnServerPtzControllerPool(QObject *parent):
     base_type(parent)
@@ -29,7 +32,8 @@ QnServerPtzControllerPool::~QnServerPtzControllerPool()
     deinitialize();
 }
 
-void QnServerPtzControllerPool::registerResource(const QnResourcePtr &resource) {
+void QnServerPtzControllerPool::registerResource(const QnResourcePtr& resource)
+{
     // TODO: #Elric we're creating controller from main thread.
     // Controller ctor may take some time (several seconds).
     // => main thread will stall.
@@ -37,24 +41,27 @@ void QnServerPtzControllerPool::registerResource(const QnResourcePtr &resource) 
     base_type::registerResource(resource);
 }
 
-void QnServerPtzControllerPool::unregisterResource(const QnResourcePtr &resource) {
+void QnServerPtzControllerPool::unregisterResource(const QnResourcePtr& resource)
+{
     base_type::unregisterResource(resource);
     disconnect(resource, NULL, this, NULL);
 }
 
-QnPtzControllerPtr QnServerPtzControllerPool::createController(const QnResourcePtr &resource) const {
+QnPtzControllerPtr QnServerPtzControllerPool::createController(const QnResourcePtr& resource) const
+{
     if(resource->flags() & Qn::foreigner)
         return QnPtzControllerPtr(); /* That's not our resource! */
 
     if(!resource->isInitialized())
         return QnPtzControllerPtr();
 
-    QnVirtualCameraResourcePtr camera = resource.dynamicCast<QnVirtualCameraResource>();
+    auto camera = resource.dynamicCast<nx::mediaserver::resource::Camera>();
     if(!camera)
         return QnPtzControllerPtr();
 
     QnPtzControllerPtr controller(camera->createPtzController());
-    if(controller) {
+    if(controller)
+    {
         if(QnMappedPtzController::extends(controller->getCapabilities()))
             if(QnPtzMapperPtr mapper = qnStaticCommon->dataPool()->data(camera).value<QnPtzMapperPtr>(lit("ptzMapper")))
                 controller.reset(new QnMappedPtzController(mapper, controller));
@@ -105,7 +112,7 @@ QnPtzControllerPtr QnServerPtzControllerPool::createController(const QnResourceP
     return controller;
 }
 
-void QnServerPtzControllerPool::at_addCameraDone(int, ec2::ErrorCode, const QnVirtualCameraResourceList &)
+void QnServerPtzControllerPool::at_addCameraDone(int, ec2::ErrorCode, const QnVirtualCameraResourceList&)
 {
 }
 
@@ -119,7 +126,8 @@ void QnServerPtzControllerPool::at_cameraPropertyChanged(
     }
 }
 
-void QnServerPtzControllerPool::at_controllerAboutToBeChanged(const QnResourcePtr &resource) {
+void QnServerPtzControllerPool::at_controllerAboutToBeChanged(const QnResourcePtr& resource)
+{
     QnPtzControllerPtr oldController = controller(resource);
     if(oldController) {
         QnPtzObject object;
@@ -130,7 +138,8 @@ void QnServerPtzControllerPool::at_controllerAboutToBeChanged(const QnResourcePt
     }
 }
 
-void QnServerPtzControllerPool::at_controllerChanged(const QnResourcePtr &resource) {
+void QnServerPtzControllerPool::at_controllerChanged(const QnResourcePtr& resource)
+{
     QnPtzControllerPtr controller = this->controller(resource);
     if(!controller)
         return;

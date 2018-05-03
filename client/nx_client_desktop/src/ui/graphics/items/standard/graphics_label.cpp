@@ -4,12 +4,14 @@
 #include <QtGui/QFontMetricsF>
 
 #include <nx/utils/math/fuzzy.h>
+#include <nx/client/core/utils/geometry.h>
 #include <utils/common/scoped_painter_rollback.h>
 
 #include <ui/common/text_pixmap_cache.h>
-#include <ui/common/geometry.h>
 #include <ui/style/skin.h>
 #include <ui/workaround/sharp_pixmap_painting.h>
+
+using nx::client::core::Geometry;
 
 // -------------------------------------------------------------------------- //
 // GraphicsLabelPrivate
@@ -181,7 +183,7 @@ void GraphicsLabel::paint(QPainter* painter, const QStyleOptionGraphicsItem* opt
     {
         d->ensurePixmaps();
         const auto dpiPixmapSize = (d->pixmap.size() / d->pixmap.devicePixelRatio());
-        const QPointF position = QnGeometry::aligned(dpiPixmapSize, rect(), d->alignment).topLeft();
+        const QPointF position = Geometry::aligned(dpiPixmapSize, rect(), d->alignment).topLeft();
         paintPixmapSharp(painter, d->pixmap, position);
     }
     else
@@ -196,7 +198,7 @@ void GraphicsLabel::paint(QPainter* painter, const QStyleOptionGraphicsItem* opt
         else
         {
             d->ensureStaticText();
-            const QPointF position = QnGeometry::aligned(d->staticText.size(), rect(), d->alignment).topLeft();
+            const QPointF position = Geometry::aligned(d->staticText.size(), rect(), d->alignment).topLeft();
             painter->drawStaticText(position, d->staticText);
         }
     }

@@ -3,7 +3,7 @@
 
 #ifdef ENABLE_DATA_PROVIDERS
 
-#include "utils/color_space/image_correction.h"
+#include <utils/color_space/image_correction.h>
 
 #include "abstract_image_filter.h"
 
@@ -11,7 +11,7 @@
 class QnContrastImageFilter: public QnAbstractImageFilter
 {
 public:
-    QnContrastImageFilter(const ImageCorrectionParams& params, bool doDeepCopy);
+    QnContrastImageFilter(const ImageCorrectionParams& params);
     CLVideoDecoderOutputPtr updateImage(const CLVideoDecoderOutputPtr& frame) override;
     virtual QSize updatedResolution(const QSize& srcSize) override { return srcSize; }
 private:

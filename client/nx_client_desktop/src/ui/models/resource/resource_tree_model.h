@@ -20,12 +20,16 @@
 class QnResourceTreeModelCustomColumnDelegate;
 class QnResourceTreeModelNodeManager;
 class QnResourceTreeModelLayoutNodeManager;
+namespace nx { namespace client { namespace desktop { struct WearableState; } } }
+namespace nx { namespace client { namespace desktop { enum class ResourceTreeNodeType; } } }
 
 class QnResourceTreeModel : public Connective<QAbstractItemModel>, public QnWorkbenchContextAware
 {
     Q_OBJECT
 
     typedef Connective<QAbstractItemModel> base_type;
+    using NodeType = nx::client::desktop::ResourceTreeNodeType;
+
 public:
     /** Narrowed scope for the minor widgets and dialogs. */
     enum Scope
@@ -35,34 +39,34 @@ public:
         UsersScope
     };
 
-    explicit QnResourceTreeModel(Scope scope = FullScope, QObject *parent = NULL);
+    explicit QnResourceTreeModel(Scope scope = FullScope, QObject* parent = NULL);
     virtual ~QnResourceTreeModel();
 
     virtual QModelIndex index(int row, int column, const QModelIndex &parent = QModelIndex()) const override;
-    virtual QModelIndex buddy(const QModelIndex &index) const override;
-    virtual QModelIndex parent(const QModelIndex &index) const override;
-    virtual bool hasChildren(const QModelIndex &parent) const override;
-    virtual int rowCount(const QModelIndex &parent = QModelIndex()) const override;
-    virtual int columnCount(const QModelIndex &parent = QModelIndex()) const override;
-    virtual Qt::ItemFlags flags(const QModelIndex &index) const override;
-    virtual QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const override;
-    virtual bool setData(const QModelIndex &index, const QVariant &value, int role) override;
+    virtual QModelIndex buddy(const QModelIndex& index) const override;
+    virtual QModelIndex parent(const QModelIndex& index) const override;
+    virtual bool hasChildren(const QModelIndex& parent) const override;
+    virtual int rowCount(const QModelIndex& parent = QModelIndex()) const override;
+    virtual int columnCount(const QModelIndex& parent = QModelIndex()) const override;
+    virtual Qt::ItemFlags flags(const QModelIndex& index) const override;
+    virtual QVariant data(const QModelIndex& index, int role = Qt::DisplayRole) const override;
+    virtual bool setData(const QModelIndex& index, const QVariant& value, int role) override;
     virtual QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const override;
     virtual QHash<int,QByteArray> roleNames() const;
 
     virtual QStringList mimeTypes() const override;
-    virtual QMimeData *mimeData(const QModelIndexList &indexes) const override;
-    virtual bool dropMimeData(const QMimeData *mimeData, Qt::DropAction action, int row, int column, const QModelIndex &parent) override;
+    virtual QMimeData *mimeData(const QModelIndexList& indexes) const override;
+    virtual bool dropMimeData(const QMimeData* mimeData, Qt::DropAction action, int row, int column, const QModelIndex& parent) override;
     virtual Qt::DropActions supportedDropActions() const override;
 
-    QnResourcePtr resource(const QModelIndex &index) const;
+    QnResourcePtr resource(const QModelIndex& index) const;
 
     QnResourceTreeModelCustomColumnDelegate* customColumnDelegate() const;
-    void setCustomColumnDelegate(QnResourceTreeModelCustomColumnDelegate *columnDelegate);
+    void setCustomColumnDelegate(QnResourceTreeModelCustomColumnDelegate* columnDelegate);
 
     Scope scope() const;
 
-    QnResourceTreeModelNodePtr rootNode(Qn::NodeType nodeType) const;
+    QnResourceTreeModelNodePtr rootNode(NodeType nodeType) const;
 
     // TODO: #vkutin Shouldn't be public
     QnResourceTreeModelNodeManager* nodeManager() const;
@@ -75,20 +79,25 @@ private:
     QList<QnResourceTreeModelNodePtr> children(const QnResourceTreeModelNodePtr& node) const;
 
     QnResourceTreeModelNodePtr ensureResourceNode(const QnResourcePtr& resource);
-    QnResourceTreeModelNodePtr ensureItemNode(const QnResourceTreeModelNodePtr& parentNode, const QnUuid& uuid, Qn::NodeType nodeType);
-    QnResourceTreeModelNodePtr ensureRecorderNode(const QnResourceTreeModelNodePtr& parentNode,
+    QnResourceTreeModelNodePtr ensureItemNode(
+        const QnResourceTreeModelNodePtr& parentNode,
+        const QnUuid& uuid,
+        NodeType nodeType);
+    QnResourceTreeModelNodePtr ensureRecorderNode(
+        const QnResourceTreeModelNodePtr& parentNode,
         const QnVirtualCameraResourcePtr& camera);
 
     QnResourceTreeModelNodePtr expectedParent(const QnResourceTreeModelNodePtr& node);
-    QnResourceTreeModelNodePtr expectedParentForResourceNode(const QnResourceTreeModelNodePtr& node);
+    QnResourceTreeModelNodePtr expectedParentForResourceNode(
+        const QnResourceTreeModelNodePtr& node);
 
     void updateNodeParent(const QnResourceTreeModelNodePtr& node);
     void updateNodeResource(const QnResourceTreeModelNodePtr& node, const QnResourcePtr& resource);
 
-    Qn::NodeType rootNodeTypeForScope() const;
+    NodeType rootNodeTypeForScope() const;
 
     /** Cleanup all node references. */
-    void removeNode(const QnResourceTreeModelNodePtr& node);
+    void removeNode(QnResourceTreeModelNodePtr node);
 
     /** Fully rebuild resources tree. */
     void rebuildTree();
@@ -100,36 +109,38 @@ private:
      * @param mimeData              Full drag-n-drop data.
      */
     void handleDrop(const QnResourceList& sourceResources, const QnResourcePtr& targetResource,
-        const QMimeData *mimeData);
+        const QMimeData* mimeData);
 
     void handlePermissionsChanged(const QnResourcePtr& resource);
 
     void updateSystemHasManyServers();
 
 private slots:
-    void at_resPool_resourceAdded(const QnResourcePtr &resource);
-    void at_resPool_resourceRemoved(const QnResourcePtr &resource);
+    void at_resPool_resourceAdded(const QnResourcePtr& resource);
+    void at_resPool_resourceRemoved(const QnResourcePtr& resource);
 
-    void at_snapshotManager_flagsChanged(const QnLayoutResourcePtr &resource);
+    void at_snapshotManager_flagsChanged(const QnLayoutResourcePtr& resource);
 
-    void at_resource_parentIdChanged(const QnResourcePtr &resource);
+    void at_resource_parentIdChanged(const QnResourcePtr& resource);
 
-    void at_videoWall_itemAdded(const QnVideoWallResourcePtr &videoWall, const QnVideoWallItem &item);
-    void at_videoWall_itemRemoved(const QnVideoWallResourcePtr &videoWall, const QnVideoWallItem &item);
+    void at_videoWall_itemAdded(const QnVideoWallResourcePtr& videoWall, const QnVideoWallItem& item);
+    void at_videoWall_itemRemoved(const QnVideoWallResourcePtr& videoWall, const QnVideoWallItem& item);
 
-    void at_videoWall_matrixAddedOrChanged(const QnVideoWallResourcePtr &videoWall, const QnVideoWallMatrix &matrix);
-    void at_videoWall_matrixRemoved(const QnVideoWallResourcePtr &videoWall, const QnVideoWallMatrix &matrix);
+    void at_videoWall_matrixAddedOrChanged(const QnVideoWallResourcePtr& videoWall, const QnVideoWallMatrix& matrix);
+    void at_videoWall_matrixRemoved(const QnVideoWallResourcePtr& videoWall, const QnVideoWallMatrix& matrix);
 
     void at_server_redundancyChanged(const QnResourcePtr &resource);
     void at_systemNameChanged();
 
     void at_autoDiscoveryEnabledChanged();
 
+    void at_wearableManager_stateChanged(const nx::client::desktop::WearableState& state);
+
 private:
     friend class QnResourceTreeModelNode;
 
-    /** Root nodes array */
-    std::array<QnResourceTreeModelNodePtr, Qn::NodeTypeCount> m_rootNodes;
+    /** Root nodes. */
+    QMap<NodeType, QnResourceTreeModelNodePtr> m_rootNodes;
 
     /** Mapping for resource nodes by resource. */
     // TODO: #vkutin #GDM Remove duplication with QnResourceTreeModelNodeManager
@@ -161,3 +172,5 @@ private:
     QnResourceTreeModelNodeManager* const m_nodeManager;
     QnResourceTreeModelLayoutNodeManager* const m_layoutNodeManager;
 };
+
+Q_DECLARE_METATYPE(QnResourceTreeModel::Scope)

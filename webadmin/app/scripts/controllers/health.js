@@ -4,7 +4,8 @@
  * If once health chart will dissapear - try going to tc-angular-chartjs and find there "chartObj.resize();" and comment to hell!
  */
 angular.module('webadminApp')
-    .controller('HealthCtrl', function ($scope, $modal, $log, mediaserver, $poll) {
+    .controller('HealthCtrl', ['$scope', '$log', 'mediaserver', '$poll',
+    function ($scope, $log, mediaserver, $poll) {
         $scope.healthLength = 100;//сколько точек сохраняем
         $scope.interval = 1000;// 1 секунда
         $scope.serverIsOnline = true;
@@ -25,13 +26,11 @@ angular.module('webadminApp')
             labels: Array.apply(null, new Array( $scope.healthLength)).map(String.prototype.valueOf,''),
             datasets: [{ // we need some data
                 label: '',
+                backgroundColor: nocolor,
+                borderColor: nocolor,
                 fillColor: nocolor,
-                strokeColor: nocolor,
-                pointColor: nocolor,
-                pointStrokeColor: nocolor,
-                pointHighlightFill: nocolor,
-                pointHighlightStroke: nocolor,
-                show:true,
+                fill:false,
+                pointRadius: 0,
                 hideLegend:true,
                 data: Array.apply(null, new Array($scope.healthLength)).map(Number.prototype.valueOf,100)
             }]
@@ -47,6 +46,9 @@ angular.module('webadminApp')
             scaleShowLabels: false ,
             scaleLabel: '<%=value%> %',
             scaleIntegersOnly:true,
+            legend:{
+                display: false
+            },
 
 
             // Sets the chart to be responsive
@@ -102,24 +104,22 @@ angular.module('webadminApp')
         function prepareDataSets(statistics){
             var datasets = [{
                 label: '',
+                backgroundColor: nocolor,
+                borderColor: nocolor,
                 fillColor: nocolor,
+                fill:false,
                 strokeColor: nocolor,
-                pointColor: nocolor,
-                pointStrokeColor: nocolor,
-                pointHighlightFill: nocolor,
-                pointHighlightStroke: nocolor,
-                show:true,
+                pointRadius: 0,
                 hideLegend:true,
                 data: Array.apply(null, new Array($scope.healthLength)).map(Number.prototype.valueOf,100)
             },{
                 label: '',
+                backgroundColor: nocolor,
+                borderColor: nocolor,
                 fillColor: nocolor,
+                fill:false,
                 strokeColor: nocolor,
-                pointColor: nocolor,
-                pointStrokeColor: nocolor,
-                pointHighlightFill: nocolor,
-                pointHighlightStroke: nocolor,
-                show:true,
+                pointRadius: 0,
                 hideLegend:true,
                 data: Array.apply(null, new Array($scope.healthLength)).map(Number.prototype.valueOf,0)
             }];
@@ -129,12 +129,12 @@ angular.module('webadminApp')
                 var color = colorSet[i % colorSet.length];
                 datasets.push({
                     label: statistics[i].description,
+                    backgroundColor: color,
+                    borderColor: color,
                     fillColor: color,
+                    fill: false,
                     strokeColor: color,
-                    pointColor: color,
-                    pointStrokeColor: color,
-                    pointHighlightFill: color,
-                    pointHighlightStroke: color,
+                    pointRadius: 0,
                     show: true,
                     hideLegend:false,
                     data: Array.apply(null, new Array($scope.healthLength)).map(Number.prototype.valueOf,0)
@@ -200,4 +200,4 @@ angular.module('webadminApp')
             }
         );
 
-    });
+    }]);

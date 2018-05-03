@@ -73,7 +73,7 @@
                            id="{{param.name}}"
                            class="form-control"
                            placeholder="YYYY-MM-DDTHH:mm:ss"
-                           datepicker-popup="{{Config.dateInternalFormat}}"
+                           uib-datepicker-popup="{{Config.dateInternalFormat}}"
                            ng-model="apiMethod.params[param.name]"
                            ng-required="param.optional=='false'"
                            is-open="openDate[param.name]"
@@ -92,13 +92,13 @@
                        ng-switch-when="camera"
                        id="{{param.name}}"
                        ng-model="apiMethod.params[param.name]"
-                       typeahead="camera.id as camera.id +': ' + camera.name for camera in cameras | filter:{searchLabel:$viewValue} | limitTo:10 "
-                       typeahead-focus-on-select="false"
-                       typeahead-min-length="0"
-                       typeahead-show-hint="true"
-                       typeahead-focus-first="false"
-                       typeahead-editable="false"
-                       typeahead-focus
+                       uib-typeahead="camera.id as camera.id +': ' + camera.name for camera in cameras | filter:{searchLabel:$viewValue} | limitTo:10 "
+                       uib-typeahead-focus-on-select="false"
+                       uib-typeahead-min-length="0"
+                       uib-typeahead-show-hint="true"
+                       uib-typeahead-focus-first="false"
+                       uib-typeahead-editable="false"
+                       uib-typeahead-focus
                        class="form-control input-sm">
                 <p class="help-block" ng-switch-when="camera">
                     <i>Selected camera: {{cameraIds[apiMethod.params[param.name]].name}}</i>
@@ -165,7 +165,7 @@
         <div class="col-sm-10">
             <textarea class="form-control" rows="10" readonly>{{getPostData()}}</textarea>
             <p class="help-block">
-                <copy-button copy-data="activeCamera.id.replace('{','').replace('}','')"></copy-button>
+                <copy-button copy-data="result.result"></copy-button>
             </p>
         </div>
     </div>
@@ -201,7 +201,7 @@
         <div class="col-sm-10">
             <textarea class="form-control" rows="10" readonly>{{result.result}}</textarea>
             <p class="help-block">
-                <copy-button copy-data="activeCamera.id.replace('{','').replace('}','')"></copy-button>
+                <copy-button copy-data="result.result"></copy-button>
             </p>
         </div>
     </div>

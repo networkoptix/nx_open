@@ -117,7 +117,7 @@ QnWorkbenchTextOverlaysHandler::~QnWorkbenchTextOverlaysHandler()
 void QnWorkbenchTextOverlaysHandler::at_eventActionReceived(
     const vms::event::AbstractActionPtr& businessAction)
 {
-    if (businessAction->actionType() != vms::event::showTextOverlayAction)
+    if (businessAction->actionType() != vms::api::ActionType::showTextOverlayAction)
         return;
 
     if (!context()->user())
@@ -127,18 +127,18 @@ void QnWorkbenchTextOverlaysHandler::at_eventActionReceived(
 
     const auto state = businessAction->getToggleState();
     const bool isProlongedAction = businessAction->isProlonged();
-    const bool couldBeInstantEvent = (state == vms::event::EventState::undefined);
+    const bool couldBeInstantEvent = (state == vms::api::EventState::undefined);
 
     /* Do not accept instant events for prolonged actions. */
     if (isProlongedAction && couldBeInstantEvent)
         return;
 
-    auto cameras = resourcePool()->getResources<QnVirtualCameraResource>(
+    auto cameras = resourcePool()->getResourcesByIds<QnVirtualCameraResource>(
         businessAction->getResources());
 
     if (actionParams.useSource)
     {
-        cameras << resourcePool()->getResources<QnVirtualCameraResource>(
+        cameras << resourcePool()->getResourcesByIds<QnVirtualCameraResource>(
             businessAction->getSourceResources());
     }
 
@@ -149,7 +149,7 @@ void QnWorkbenchTextOverlaysHandler::at_eventActionReceived(
     const int timeoutMs = isProlongedAction ? -1 : actionParams.durationMs;
 
     const auto id = businessAction->getRuleId();
-    const bool finished = isProlongedAction && (state == vms::event::EventState::inactive);
+    const bool finished = isProlongedAction && (state == vms::api::EventState::inactive);
 
     Q_D(QnWorkbenchTextOverlaysHandler);
 
@@ -197,9 +197,8 @@ void QnWorkbenchTextOverlaysHandler::at_eventActionReceived(
         }
         else
         {
-            const auto rich = mightBeHtml(text) ? text : Qt::convertFromPlainText(text);
             textHtml = elideHtml(
-                htmlFormattedParagraph(rich, kDescriptionPixelFontSize),
+                htmlFormattedParagraph(ensureHtml(text), kDescriptionPixelFontSize),
                 kDescriptionMaxLength);
         }
 

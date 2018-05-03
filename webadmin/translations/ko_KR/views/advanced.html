@@ -151,25 +151,16 @@
         </div>
     </form>
 
-    <h2>"수동 업데이트"</h2>
-    <form class="form-horizontal" enctype="multipart/form-data" target="_blank" action="/api/installUpdate" method="post">
-        <div class="form-group">
-            <label class="col-sm-4">설치 프로그램을 업로드</label>
-            <div class="col-sm-8">
-                <fileupload text="Select server update archive (zip)"></fileupload>
-                <p class="help-block">구성이 올바른지 확인 하십시오.</p>
-            </div>
-        </div>
-    </form>
-
     <h1>고급 시스템 설정</h1>
     <div class="alert alert-danger" role="alert">
         <b>경고!</b> 변경사항으로 인해 시스템 오동작 될 수있습니다.
     </div>
 
-    <form class="form row" role="form" name="systemSettings" novalidate>
+    <form class="form form-horizontal row" role="form" name="systemSettings" novalidate>
         <div class="form-group" ng-repeat="(setting, value) in systemSettings">
-            <label class="col-sm-6" for="{{setting}}">{{L.settingsConfig[setting]}}</label>
+            <label class="col-sm-6" for="{{setting}}">{{L.settingsConfig[setting] || setting}}
+                    <small ng-if="L.settingsConfig[setting]" class="text-muted">&nbsp;&nbsp;{{setting}}</small>
+            </label>
             <div class="col-sm-6">
                 <input ng-if="Config.settingsConfig[setting].type == 'checkbox' " type="checkbox"
                        style="height: 22px"

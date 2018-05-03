@@ -16,7 +16,6 @@ struct QnLogs;
 struct QnLog
 {
     static NX_UTILS_API const nx::utils::log::Tag MAIN_LOG_ID;
-    static NX_UTILS_API const nx::utils::log::Tag CUSTOM_LOG_BASE_ID;
     static NX_UTILS_API const nx::utils::log::Tag HTTP_LOG_INDEX;
     static NX_UTILS_API const nx::utils::log::Tag EC2_TRAN_LOG;
     static NX_UTILS_API const nx::utils::log::Tag HWID_LOG;
@@ -28,7 +27,9 @@ struct QnLog
 
 struct QnLogs
 {
-    static NX_UTILS_API std::shared_ptr<nx::utils::log::Logger> logger(int id);
+    static NX_UTILS_API std::vector<QString> getLoggerNames();
+    static NX_UTILS_API std::shared_ptr<nx::utils::log::Logger> getLogger(int id);
+    static NX_UTILS_API std::shared_ptr<nx::utils::log::Logger> getLogger(const QString& name);
     static NX_UTILS_API QnLog* get();
 };
 

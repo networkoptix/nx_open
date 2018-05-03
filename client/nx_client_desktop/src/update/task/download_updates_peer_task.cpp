@@ -34,23 +34,23 @@ QnDownloadUpdatesPeerTask::QnDownloadUpdatesPeerTask(QObject *parent) :
 {
 }
 
-void QnDownloadUpdatesPeerTask::setTargets(const QHash<QUrl, QString> &targets) {
+void QnDownloadUpdatesPeerTask::setTargets(const QHash<nx::utils::Url, QString> &targets) {
     m_targets = targets;
 }
 
-void QnDownloadUpdatesPeerTask::setHashes(const QHash<QUrl, QString> &hashByUrl) {
+void QnDownloadUpdatesPeerTask::setHashes(const QHash<nx::utils::Url, QString> &hashByUrl) {
     m_hashByUrl = hashByUrl;
 }
 
-void QnDownloadUpdatesPeerTask::setFileSizes(const QHash<QUrl, qint64> &fileSizeByUrl) {
+void QnDownloadUpdatesPeerTask::setFileSizes(const QHash<nx::utils::Url, qint64> &fileSizeByUrl) {
     m_fileSizeByUrl = fileSizeByUrl;
 }
 
-QHash<QUrl, QString> QnDownloadUpdatesPeerTask::resultingFiles() const {
+QHash<nx::utils::Url, QString> QnDownloadUpdatesPeerTask::resultingFiles() const {
     return m_resultingFiles;
 }
 
-void QnDownloadUpdatesPeerTask::setPeerAssociations(const QMultiHash<QUrl, QnUuid> &peersByUrl) {
+void QnDownloadUpdatesPeerTask::setPeerAssociations(const QMultiHash<nx::utils::Url, QnUuid> &peersByUrl) {
     m_peersByUrl = peersByUrl;
 }
 
@@ -82,7 +82,7 @@ void QnDownloadUpdatesPeerTask::downloadNextUpdate() {
         return;
     }
 
-    QUrl url = m_pendingDownloads.first();
+    nx::utils::Url url = m_pendingDownloads.first();
     m_currentPeers = QSet<QnUuid>::fromList(m_peersByUrl.values(url));
 
     QString fileName = updateFilePath(m_targets[url]);
@@ -98,7 +98,7 @@ void QnDownloadUpdatesPeerTask::downloadNextUpdate() {
     }
 
     m_triesCount = 0;
-    QNetworkReply *reply = m_networkAccessManager->get(QNetworkRequest(url));
+    QNetworkReply *reply = m_networkAccessManager->get(QNetworkRequest(url.toQUrl()));
     connect(reply,  &QNetworkReply::readyRead,          this,   &QnDownloadUpdatesPeerTask::at_downloadReply_readyRead);
     connect(reply,  &QNetworkReply::finished,           this,   &QnDownloadUpdatesPeerTask::at_downloadReply_finished);
     connect(reply,  &QNetworkReply::downloadProgress,   this,   &QnDownloadUpdatesPeerTask::at_downloadReply_downloadProgress);
@@ -108,12 +108,12 @@ void QnDownloadUpdatesPeerTask::continueDownload() {
     if (m_file.isNull())
         return;
 
-    QUrl url = m_pendingDownloads.first();
+    nx::utils::Url url = m_pendingDownloads.first();
     qint64 pos = m_file->pos();
 
     m_triesCount++;
 
-    QNetworkRequest request(url);
+    QNetworkRequest request(url.toQUrl());
     request.setRawHeader("Range", QString(lit("bytes=%1-")).arg(pos).toLatin1());
     NX_LOG(lit("Update: QnDownloadUpdatesPeerTask: Continue download at %1.").arg(pos), cl_logDEBUG2);
     QNetworkReply *reply = m_networkAccessManager->get(request);

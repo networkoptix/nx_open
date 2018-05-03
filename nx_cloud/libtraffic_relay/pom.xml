@@ -2,12 +2,12 @@
     <parent>
         <artifactId>nx_cloud</artifactId>
         <groupId>com.networkoptix.hdwitness</groupId>
-        <version>3.1.0-SNAPSHOT</version>
+        <version>4.0.0-SNAPSHOT</version>
         <relativePath>..</relativePath>
     </parent>
 
     <groupId>com.networkoptix.hdwitness</groupId>
-    <version>3.1.0-SNAPSHOT</version>
+    <version>4.0.0-SNAPSHOT</version>
     <modelVersion>4.0.0</modelVersion>
     <artifactId>libtraffic_relay</artifactId>
     <packaging>pom</packaging>
@@ -20,7 +20,7 @@
         <targetName>traffic_relay</targetName>
 
         <qt.libs>core network concurrent</qt.libs>
-        <global.libs>-ludt -lnx_network -lnx_cassandra -lnx_fusion -lnx_utils -lcloud_db_client</global.libs>
+        <global.libs>-ludt -lnx_network -lnx_fusion -lnx_utils -lcloud_db_client -lnx_cassandra -lrelaying</global.libs>
         <windows.oslibs>-lws2_32 -lIphlpapi DbgHelp.lib -lwinmm</windows.oslibs>
         <mac.oslibs>-lbz2 -framework IOKit -framework CoreServices</mac.oslibs>
 
@@ -53,6 +53,15 @@
             <type>pom</type>
             <scope>system</scope>
             <systemPath>${root.dir}/nx_cloud/cloud_db_client/pom.xml</systemPath>
+        </dependency>
+
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>relaying</artifactId>
+            <version>${project.version}</version>
+            <type>pom</type>
+            <scope>system</scope>
+            <systemPath>${root.dir}/nx_cloud/librelaying/pom.xml</systemPath>
         </dependency>
 
         <dependency>

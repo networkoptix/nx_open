@@ -3,6 +3,8 @@
 #include <QtCore/QDir>
 #include <QtCore/QFile>
 
+#include <utils/common/synctime.h>
+
 #include <nx/utils/test_support/test_options.h>
 #include <nx/utils/random_file.h>
 #include <nx/vms/common/p2p/downloader/private/storage.h>
@@ -63,6 +65,7 @@ protected:
     QString testFilePath;
     QByteArray testFileMd5;
     QScopedPointer<Storage> downloaderStorage;
+    QnSyncTime syncTime;
 };
 
 TEST_F(DistributedFileDownloaderStorageTest, inexistentFileRequests)

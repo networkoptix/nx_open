@@ -1,21 +1,16 @@
-/**********************************************************
-* Aug 18, 2015
-* a.kolesnikov
-***********************************************************/
-
 #include "managers_types.h"
 
 #include <nx/fusion/model_functions.h>
 
-
 namespace nx {
 namespace cdb {
 
-api::ResultCode dbResultToApiResult( nx::utils::db::DBResult dbResult )
+api::ResultCode dbResultToApiResult(nx::utils::db::DBResult dbResult)
 {
-    switch( dbResult )
+    switch (dbResult)
     {
         case nx::utils::db::DBResult::ok:
+        case nx::utils::db::DBResult::endOfData:
             return api::ResultCode::ok;
 
         case nx::utils::db::DBResult::notFound:
@@ -34,9 +29,33 @@ api::ResultCode dbResultToApiResult( nx::utils::db::DBResult dbResult )
 
         case nx::utils::db::DBResult::uniqueConstraintViolation:
             return api::ResultCode::alreadyExists;
+
+        case nx::utils::db::DBResult::logicError:
+            return api::ResultCode::unknownError;
     }
 
     return api::ResultCode::dbError;
+}
+
+api::ResultCode ec2ResultToResult(ec2::ResultCode resultCode)
+{
+    switch (resultCode)
+    {
+        case ec2::ResultCode::ok:
+            return api::ResultCode::ok;
+        case ec2::ResultCode::partialContent:
+            return api::ResultCode::partialContent;
+        case ec2::ResultCode::dbError:
+            return api::ResultCode::dbError;
+        case ec2::ResultCode::retryLater:
+            return api::ResultCode::retryLater;
+        case ec2::ResultCode::notFound:
+            return api::ResultCode::notFound;
+        case ec2::ResultCode::badRequest:
+            return api::ResultCode::badRequest;
+        default:
+            return api::ResultCode::unknownError;
+    }
 }
 
 } // namespace cdb
@@ -56,5 +75,5 @@ QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(nx::cdb, DataActionType,
     (nx::cdb::DataActionType::fetch, "fetch")
     (nx::cdb::DataActionType::insert, "insert")
     (nx::cdb::DataActionType::update, "update")
-    (nx::cdb::DataActionType::_delete, "delete")
+    (nx::cdb::DataActionType::delete_, "delete")
 )

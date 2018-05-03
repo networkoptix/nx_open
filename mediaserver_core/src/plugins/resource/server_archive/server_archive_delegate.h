@@ -5,22 +5,26 @@
 #include <QtGui/QRegion>
 
 #include "core/resource/resource_fwd.h"
-#include "plugins/resource/avi/avi_archive_delegate.h"
+#include "core/resource/avi/avi_archive_delegate.h"
 #include "recorder/device_file_catalog.h"
 #include "recorder/storage_manager.h"
 #include "utils/media/sse_helper.h"
 #include "motion/motion_archive.h"
 #include "dualquality_helper.h"
 
+class QnMediaServerModule;
+
 class QnServerArchiveDelegate: public QnAbstractArchiveDelegate
 {
 public:
-    QnServerArchiveDelegate();
+    QnServerArchiveDelegate(QnMediaServerModule* mediaServerModule);
     virtual ~QnServerArchiveDelegate();
 
     //virtual void setSendMotion(bool value) override;
 
-    virtual bool open(const QnResourcePtr &resource);
+    virtual bool open(
+        const QnResourcePtr &resource,
+        AbstractArchiveIntegrityWatcher* archiveIntegrityWatcher) override;
     bool isOpened() const;
     virtual void close();
     virtual qint64 startTime() const;
@@ -31,10 +35,11 @@ public:
     virtual QnConstResourceAudioLayoutPtr getAudioLayout() override;
 
     virtual AVCodecContext* setAudioChannel(int num);
-    virtual void onReverseMode(qint64 displayTime, bool value);
+    virtual void setSpeed(qint64 displayTime, double value);
 
     virtual bool setQuality(MediaQuality quality, bool fastSwitch, const QSize &) override;
     virtual QnAbstractMotionArchiveConnectionPtr getMotionConnection(int channel) override;
+    virtual QnAbstractMotionArchiveConnectionPtr getAnalyticsConnection(int channel) override;
 
     virtual ArchiveChunkInfo getLastUsedChunkInfo() const override;
 
@@ -51,10 +56,11 @@ private:
 private:
     typedef std::map<QnServer::StoragePool, DeviceFileCatalogPtr> PoolToCatalogMap;
 
+    QnMediaServerModule* m_mediaServerModule;
     bool m_opened;
     QnResourcePtr m_resource;
     qint64 m_lastPacketTime;
-    
+
     qint64 m_skipFramesToTime;
     mutable PoolToCatalogMap m_catalogHi;
     mutable PoolToCatalogMap m_catalogLow;
@@ -93,6 +99,8 @@ private:
     QnServer::ChunksCatalog m_lastChunkQuality;
     QnServer::StoragePool m_currentChunkStoragePool;
     QnServer::StoragePool m_newQualityChunkStoragePool;
+
+    AbstractArchiveIntegrityWatcher* m_archiveIntegrityWatcher;
 };
 
 typedef QSharedPointer<QnServerArchiveDelegate> QnServerArchiveDelegatePtr;

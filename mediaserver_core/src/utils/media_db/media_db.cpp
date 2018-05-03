@@ -2,6 +2,8 @@
 #include "media_db.h"
 #include <cerrno>
 
+#include <recorder/device_file_catalog.h>
+
 namespace nx
 {
 namespace media_db
@@ -9,14 +11,14 @@ namespace media_db
 
 const size_t kMaxWriteQueueSize = 1000;
 
-namespace
-{
-
 template<typename StructToWrite>
-QDataStream &operator << (QDataStream &stream, const StructToWrite &s)
+static QDataStream &operator << (QDataStream &stream, const StructToWrite &s)
 {
     return stream << s.part1 << s.part2;
 }
+
+namespace
+{
 
 class RecordVisitor : public boost::static_visitor<>
 {
@@ -69,11 +71,192 @@ private:
 
 } // namespace <anonymous>
 
+RecordType RecordBase::getRecordType() const
+{
+    return static_cast<RecordType>(part1 & 0x3);
+}
+
+void RecordBase::setRecordType(RecordType recordType)
+{
+    part1 &= ~0x3;
+    part1 |= (quint64)recordType & 0x3;
+}
+
+
+int MediaFileOperation::getCameraId() const
+{
+    return (part1 >> 0x2) & 0xffff;
+}
+
+void MediaFileOperation::setCameraId(int cameraId)
+{
+    part1 &= ~(0xffffULL << 0x2);
+    part1 |= ((quint64)cameraId & 0xffff) << 0x2;
+}
+
+qint64 MediaFileOperation::getStartTime() const
+{   // -1 is a special value which designates that this operation
+    // should be done with entire catalog instead of one chunk.
+    qint64 ret = (part1 >> 0x12) & getBitMask(0x2a);
+    return ret == 1 ? -1 : ret;
+}
+
+void MediaFileOperation::setStartTime(qint64 startTime)
+{
+    startTime = startTime == -1 ? 1 : startTime;
+    part1 &= ~(getBitMask(0x2a) << 0x12);
+    part1 |= ((quint64)startTime & getBitMask(0x2a)) << 0x12;
+}
+
+int MediaFileOperation::getDuration() const
+{
+    quint64 p1 = (part1 >> 0x3c) & 0xf;
+    quint64 p2 = part2 & getBitMask(0x10);
+    return p2 | (p1 << 0x10);
+}
+
+void MediaFileOperation::setDuration(int duration)
+{
+    part1 &= ~(0xfULL << 0x3c);
+    part1 |= (((quint64)duration >> 0x10) & 0xf) << 0x3c;
+    part2 &= ~getBitMask(0x10);
+    part2 |= (quint64)duration & getBitMask(0x10);
+}
+
+int MediaFileOperation::getTimeZone() const
+{
+    bool isPositive = ((part2 >> 0x10) & 0x1) == 0;
+
+    int intPart = (part2 >> 0x11) & getBitMask(0x4);
+    int remainder = (part2 >> 0x15) & 0x3;
+
+    int result = intPart * 60;
+    switch (remainder)
+    {
+        case 0:
+            break;
+        case 1:
+            result += 30;
+            break;
+        case 2:
+            result += 45;
+            break;
+    }
+
+    return result * (isPositive ? 1 : -1);
+}
+
+void MediaFileOperation::setTimeZone(int timeZone)
+{
+    part2 &= ~(0x7fULL << 0x10);
+
+    if (timeZone < 0)
+        part2 |= 0x1ULL << 0x10;
+
+    timeZone = qAbs(timeZone);
+
+    int intPart = timeZone / 60;
+    part2 |= ((quint64)intPart & getBitMask(0x4)) << 0x11;
+
+    int remainderPart = timeZone - intPart * 60;
+    if (remainderPart == 30)
+        part2 |= (0x1ULL & 0x3) << 0x15;
+    else if (remainderPart == 45)
+        part2 |= (0x2ULL & 0x3) << 0x15;
+}
+
+qint64 MediaFileOperation::getFileSize() const
+{
+    return (part2 >> 0x17) & getBitMask(0x27LL);
+}
+
+void MediaFileOperation::setFileSize(qint64 fileSize)
+{
+    const quint64 kFileSizeMaskLength = 0x27ULL;
+    const quint64 kMaxFileSizeValue = getBitMask(kFileSizeMaskLength);
+
+    part2 &= ~(getBitMask(kFileSizeMaskLength) << 0x17);
+    if (fileSize > kMaxFileSizeValue)
+    {
+        NX_WARNING(
+            this,
+            lm("File size value %1 would overflow. Setting to max available value %2 instead.")
+                .arg(fileSize)
+                .arg(kMaxFileSizeValue));
+        part2 |= (getBitMask(kFileSizeMaskLength)) << 0x17;
+        return;
+    }
+
+    part2 |= ((quint64)fileSize & getBitMask(kFileSizeMaskLength)) << 0x17;
+}
+
+int MediaFileOperation::getFileTypeIndex() const
+{
+    return ((part2 >> 0x3e) & 0x1) == 0
+        ? DeviceFileCatalog::Chunk::FILE_INDEX_WITH_DURATION
+        : DeviceFileCatalog::Chunk::FILE_INDEX_NONE;
+}
+
+void MediaFileOperation::setFileTypeIndex(int fileTypeIndex)
+{
+    NX_ASSERT(
+        fileTypeIndex == DeviceFileCatalog::Chunk::FILE_INDEX_NONE
+        || fileTypeIndex == DeviceFileCatalog::Chunk::FILE_INDEX_WITH_DURATION);
+
+    quint64 value = fileTypeIndex == DeviceFileCatalog::Chunk::FILE_INDEX_WITH_DURATION ? 0x0LL : 0x1LL;
+    part2 &= ~(0x1ULL << 0x3e);
+    part2 |= ((quint64)value & 0x1) << 0x3e;
+}
+
+int MediaFileOperation::getCatalog() const
+{
+    return (part2 >> 0x3f) & 0x1;
+}
+
+void MediaFileOperation::setCatalog(int catalog)
+{
+    part2 &= ~(0x1ULL << 0x3f);
+    part2 |= ((quint64)catalog & 0x1) << 0x3f;
+}
+
+
+int CameraOperation::getCameraUniqueIdLen() const
+{
+    return (part1 >> 0x2) & getBitMask(0xE);
+}
+
+void CameraOperation::setCameraUniqueIdLen(int len)
+{
+    part1 &= ~(getBitMask(0xe) << 0x2);
+    part1 |= ((quint64)len & getBitMask(0xe)) << 0x2;
+}
+
+int CameraOperation::getCameraId() const
+{
+    return (part1 >> 0x10) & getBitMask(0x10);
+}
+
+void CameraOperation::setCameraId(int cameraId)
+{
+    part1 &= ~(getBitMask(0x10) << 0x10);
+    part1 |= ((quint64)cameraId & getBitMask(0x10)) << 0x10;
+}
+
+QByteArray CameraOperation::getCameraUniqueId() const
+{
+    return cameraUniqueId;
+}
+
+void CameraOperation::setCameraUniqueId(const QByteArray &uniqueId)
+{
+    cameraUniqueId = uniqueId;
+}
+
+
 DbHelper::DbHelper(DbHelperHandler *const handler)
 : m_device(nullptr),
   m_handler(handler),
   m_stream(m_device),
-  m_needStop(false),
   m_mode(Mode::Read)
 {
     m_stream.setByteOrder(QDataStream::LittleEndian);
@@ -82,10 +265,10 @@ DbHelper::DbHelper(DbHelperHandler *const handler)
 
 void DbHelper::run()
 {
-    while (!m_needStop)
+    while (!needToStop())
     {
         QnMutexLocker lk(&m_mutex);
-        while ((m_writeQueue.empty() || m_mode == Mode::Read) && !m_needStop)
+        while ((m_writeQueue.empty() || m_mode == Mode::Read) && !needToStop())
         {
             NX_LOG(lit("media_db: run is going to sleep. Write queue size: %1. Mode = %2. Need to stop = %3")
                     .arg(m_writeQueue.size())
@@ -94,13 +277,15 @@ void DbHelper::run()
             m_cond.wait(lk.mutex());
         }
 
-        if (m_needStop)
+        if (needToStop())
             return;
 
         auto record = m_writeQueue.front();
 
         Error error = Error::NoError;
         RecordVisitor vis(&m_stream, &error);
+
+        NX_ASSERT(m_mode == Mode::Write);
 
         lk.unlock();
         boost::apply_visitor(vis, record);
@@ -127,20 +312,14 @@ void DbHelper::run()
     }
 }
 
-void DbHelper::stop()
-{
-    {
-        QnMutexLocker lk(&m_mutex);
-        m_needStop = true;
-    }
-    m_cond.wakeAll();
-
-    wait();
-}
-
 DbHelper::~DbHelper()
 {
-    stop();
+    {
+        QnMutexLocker lock(&m_mutex);
+        m_needStop = true;
+        m_cond.wakeOne();
+    }
+    wait();
 }
 
 QIODevice *DbHelper::getDevice() const
@@ -166,6 +345,8 @@ Error DbHelper::getError() const
         return Error::ReadError;
     case QDataStream::Status::WriteFailed:
         return Error::WriteError;
+    case QDataStream::Status::Ok:
+        break;
     }
 
     if (m_stream.atEnd())

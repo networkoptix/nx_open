@@ -3,6 +3,9 @@
 
 #include <nx/network/socket_factory.h>
 
+namespace nx {
+namespace network {
+
 class PortMapping
 {
     SocketAddress external;
@@ -22,5 +25,8 @@ public:
     virtual bool mapPort(PortMapping& portMapping);
 };
 */
+
+} // namespace network
+} // namespace nx
 
 #endif // PORT_MAPPER_H

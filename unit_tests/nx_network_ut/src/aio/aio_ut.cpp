@@ -1,8 +1,3 @@
-/**********************************************************
-* Nov 12, 2015
-* a.kolesnikov
-***********************************************************/
-
 #include <functional>
 
 #include <gtest/gtest.h>
@@ -13,7 +8,6 @@
 namespace nx {
 namespace network {
 namespace aio {
-
 
 } // namespace aio
 } // namespace network

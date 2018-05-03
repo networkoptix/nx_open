@@ -2,10 +2,12 @@
 
 #include "abstract_msg_body_source.h"
 
-namespace nx_http {
+namespace nx {
+namespace network {
+namespace http {
 
 /**
- * Should be used when HTTP request handler wishes to set Content-Length 
+ * Should be used when HTTP request handler wishes to set Content-Length
  * to some specific value (or just omit it) and at the same time does not provide body at all.
  */
 class NX_NETWORK_API EmptyMessageBodySource:
@@ -33,4 +35,6 @@ private:
     boost::optional<uint64_t> m_contentLength;
 };
 
-} // namespace nx_http
+} // namespace nx
+} // namespace network
+} // namespace http

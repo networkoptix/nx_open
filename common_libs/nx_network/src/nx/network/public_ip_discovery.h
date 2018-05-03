@@ -18,7 +18,7 @@ class NX_NETWORK_API PublicIPDiscovery:
     Q_OBJECT
 
 public:
-    /** If \a primaryUrls is empty, default urls are used */
+    /** If primaryUrls is empty, default urls are used */
     PublicIPDiscovery(QStringList primaryUrls = QStringList());
     virtual ~PublicIPDiscovery() override;
 
@@ -34,7 +34,7 @@ signals:
     void found(const QHostAddress& address);
 
 private:
-    void handleReply(const nx_http::AsyncHttpClientPtr& httpClient);
+    void handleReply(const nx::network::http::AsyncHttpClientPtr& httpClient);
     void sendRequest(const QString &url);
     void nextStage();
 
@@ -53,10 +53,10 @@ private:
     QStringList m_primaryUrls;
     QStringList m_secondaryUrls;
     QnMutex m_mutex;
-    std::set<nx_http::AsyncHttpClientPtr> m_httpRequests;
+    std::set<nx::network::http::AsyncHttpClientPtr> m_httpRequests;
 
     virtual void stopWhileInAioThread() override;
-    
+
     QString toString(Stage value) const;
 };
 

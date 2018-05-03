@@ -3,7 +3,7 @@
 
 #include <helpers/cloud_url_helper.h>
 
-#include <ui/common/accessor.h>
+#include <nx/client/desktop/common/utils/accessor.h>
 #include <ui/help/help_topics.h>
 #include <ui/help/help_topic_accessor.h>
 #include <ui/style/custom_style.h>
@@ -12,6 +12,8 @@
 #include <watchers/cloud_status_watcher.h>
 
 #include <utils/common/html.h>
+
+using namespace nx::client::desktop;
 
 namespace {
 

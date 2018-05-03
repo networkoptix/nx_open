@@ -1,10 +1,17 @@
 #include "resource_display.h"
+
 #include <cassert>
+
+#include <client/client_module.h>
+
 #include <nx/streaming/abstract_media_stream_data_provider.h>
+#include <nx/streaming/abstract_archive_stream_reader.h>
+
 #include <core/resource/resource_media_layout.h>
 #include <core/resource/media_resource.h>
 #include <core/resource/media_server_resource.h>
-#include <nx/streaming/abstract_archive_stream_reader.h>
+#include <core/dataprovider/data_provider_factory.h>
+
 #include <camera/cam_display.h>
 #include <camera/client_video_camera.h>
 #include <camera/abstract_renderer.h>
@@ -12,22 +19,17 @@
 #include <nx/utils/counter.h>
 #include <utils/common/util.h>
 
+
 QnResourceDisplay::QnResourceDisplay(const QnResourcePtr &resource, QObject *parent):
     base_type(parent),
     QnResourceConsumer(resource),
-    m_dataProvider(),
-    m_mediaProvider(),
-    m_archiveReader(),
-    m_camera(),
-    m_started(false),
-    m_counter()
+    m_started(false)
 {
     NX_ASSERT(resource);
 
     m_mediaResource = resource.dynamicCast<QnMediaResource>();
 
-    m_dataProvider = resource->createDataProvider(Qn::CR_Default);
-
+    m_dataProvider = qnClientModule->dataProviderFactory()->createDataProvider(resource);
     if (m_dataProvider)
     {
         m_archiveReader = dynamic_cast<QnAbstractArchiveStreamReader *>(m_dataProvider.data());
@@ -228,4 +230,18 @@ void QnResourceDisplay::removeRenderer(QnAbstractRenderer *renderer) {
         for(int i = 0; i < channelCount; i++)
             m_camera->getCamDisplay()->removeVideoRenderer(renderer);
     }
+}
+
+void QnResourceDisplay::addMetadataConsumer(
+    const nx::media::AbstractMetadataConsumerPtr& metadataConsumer)
+{
+    if (m_camera)
+        m_camera->getCamDisplay()->addMetadataConsumer(metadataConsumer);
+}
+
+void QnResourceDisplay::removeMetadataConsumer(
+    const nx::media::AbstractMetadataConsumerPtr& metadataConsumer)
+{
+    if (m_camera)
+        m_camera->getCamDisplay()->removeMetadataConsumer(metadataConsumer);
 }

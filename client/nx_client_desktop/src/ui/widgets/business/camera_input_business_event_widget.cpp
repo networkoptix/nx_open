@@ -6,8 +6,10 @@
 
 #include <nx/vms/event/events/camera_input_event.h>
 
-#include <ui/common/aligner.h>
+#include <nx/client/desktop/common/utils/aligner.h>
 #include <utils/common/scoped_value_rollback.h>
+
+using namespace nx::client::desktop;
 
 QnCameraInputBusinessEventWidget::QnCameraInputBusinessEventWidget(QWidget *parent) :
     base_type(parent),
@@ -17,7 +19,7 @@ QnCameraInputBusinessEventWidget::QnCameraInputBusinessEventWidget(QWidget *pare
     connect(ui->relayComboBox, SIGNAL(currentIndexChanged(int)), this, SLOT(paramsChanged()));
 
     /* This aligner will be linked with parent widget event controls aligner. */
-    auto aligner = new QnAligner(this);
+    auto aligner = new Aligner(this);
     aligner->addWidget(ui->label);
 }
 
@@ -41,7 +43,7 @@ void QnCameraInputBusinessEventWidget::at_model_dataChanged(Fields fields) {
         QnIOPortDataList inputPorts;
         bool inited = false;
 
-        auto cameras = resourcePool()->getResources<QnVirtualCameraResource>(model()->eventResources());
+        auto cameras = resourcePool()->getResourcesByIds<QnVirtualCameraResource>(model()->eventResources());
         foreach (const QnVirtualCameraResourcePtr &camera, cameras) {
             QnIOPortDataList cameraInputs = camera->getInputPortList();
             if (!inited) {

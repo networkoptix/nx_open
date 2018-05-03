@@ -21,9 +21,30 @@ namespace desktop {
 
 QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(RadassMode)
 
+using ModeByIdHash = QHash<QnUuid, RadassMode>;
+
+namespace {
+
+ModeByIdHash filtered(ModeByIdHash source, QnResourcePool* resourcePool)
+{
+    QSet<QnUuid> existingItems;
+    for (const auto& layout: resourcePool->getResources<QnLayoutResource>())
+        existingItems.unite(layout->getItems().keys().toSet());
+
+    const auto storedItems = source.keys().toSet();
+
+    auto removedItems = storedItems - existingItems;
+    for (const auto& item: removedItems)
+        source.remove(item);
+
+    return source;
+}
+
+} // namespace
+
 struct RadassResourceManager::Private
 {
-    RadassMode mode(const QnLayoutItemIndex& index)
+    RadassMode mode(const QnLayoutItemIndex& index) const
     {
         return m_modes.value(index.uuid(), RadassMode::Auto);
     }
@@ -53,20 +74,7 @@ struct RadassResourceManager::Private
         data.close();
     }
 
-    void filter(QnResourcePool* resourcePool)
-    {
-        QSet<QnUuid> existingItems;
-        for (const auto& layout: resourcePool->getResources<QnLayoutResource>())
-            existingItems.unite(layout->getItems().keys().toSet());
-
-        QSet<QnUuid> storedItems = m_modes.keys().toSet();
-
-        QSet<QnUuid> removedItems = storedItems - existingItems;
-        for (const auto& item: removedItems)
-            m_modes.remove(item);
-    }
-
-    void saveToFile(const QString& filename)
+    void saveToFile(const QString& filename, QnResourcePool* resourcePool) const
     {
         QDir dir(cacheDirectory);
         dir.mkpath(cacheDirectory);
@@ -75,7 +83,7 @@ struct RadassResourceManager::Private
         if (!data.open(QIODevice::WriteOnly))
             return;
 
-        data.write(QnUbjson::serialized(m_modes));
+        data.write(QnUbjson::serialized(filtered(m_modes, resourcePool)));
         data.close();
     }
 
@@ -83,7 +91,7 @@ struct RadassResourceManager::Private
 
 private:
     // Mode by layout item uuid.
-    QHash<QnUuid, RadassMode> m_modes;
+    ModeByIdHash m_modes;
 };
 
 RadassResourceManager::RadassResourceManager(QObject* parent):
@@ -122,6 +130,16 @@ void RadassResourceManager::setMode(const QnLayoutResourcePtr& layout, RadassMod
         items << QnLayoutItemIndex(layout, item.uuid);
 
     setMode(items, value);
+}
+
+RadassMode RadassResourceManager::mode(const QnLayoutItemIndex& item) const
+{
+    return mode(QnLayoutItemIndexList() << item);
+}
+
+void RadassResourceManager::setMode(const QnLayoutItemIndex& item, RadassMode value)
+{
+    setMode(QnLayoutItemIndexList() << item, value);
 }
 
 RadassMode RadassResourceManager::mode(const QnLayoutItemIndexList& items) const
@@ -180,10 +198,10 @@ void RadassResourceManager::switchLocalSystemId(const QnUuid& localSystemId)
     d->loadFromFile(localSystemId.toString());
 }
 
-void RadassResourceManager::saveData(const QnUuid& localSystemId, QnResourcePool* resourcePool)
+void RadassResourceManager::saveData(const QnUuid& localSystemId,
+    QnResourcePool* resourcePool) const
 {
-    d->filter(resourcePool);
-    d->saveToFile(localSystemId.toString());
+    d->saveToFile(localSystemId.toString(), resourcePool);
 }
 
 } // namespace desktop

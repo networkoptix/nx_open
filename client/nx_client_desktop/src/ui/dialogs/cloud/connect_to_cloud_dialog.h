@@ -19,7 +19,7 @@ class QnConnectToCloudDialog : public QnSessionAwareButtonBoxDialog
     typedef QnSessionAwareButtonBoxDialog base_type;
 
 public:
-    explicit QnConnectToCloudDialog(QWidget* parent = nullptr);
+    explicit QnConnectToCloudDialog(QWidget* parent);
     ~QnConnectToCloudDialog();
 
     void accept() override;

@@ -3,27 +3,12 @@
 #include <core/resource/camera_resource.h>
 #include <core/resource_management/resource_pool.h>
 
-#include <nx/fusion/model_functions.h>
 #include <nx/utils/string.h>
 #include <nx/utils/datetime.h>
 
 #include <api/helpers/camera_id_helper.h>
 
-QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(QnThumbnailRequestData, RoundMethod,
-    (QnThumbnailRequestData::KeyFrameBeforeMethod, "before")
-    (QnThumbnailRequestData::PreciseMethod, "precise")
-    (QnThumbnailRequestData::PreciseMethod, "exact")
-    (QnThumbnailRequestData::KeyFrameAfterMethod, "after")
-)
-
-QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(QnThumbnailRequestData, ThumbnailFormat,
-    (QnThumbnailRequestData::JpgFormat, "jpeg")
-    (QnThumbnailRequestData::JpgFormat, "jpg")
-    (QnThumbnailRequestData::TiffFormat, "tiff")
-    (QnThumbnailRequestData::TiffFormat, "tif")
-    (QnThumbnailRequestData::PngFormat, "png")
-    (QnThumbnailRequestData::RawFormat, "raw")
-)
+#include <nx/fusion/model_functions.h>
 
 namespace {
 
@@ -37,33 +22,18 @@ static const QString kDeprecatedWidthParam = lit("widht");
 static const QString kWidthParam = lit("width");
 static const QString kImageFormatParam = lit("imageFormat");
 static const QString kRoundMethodParam = lit("method");
+static const QString kAspectRatioParam = lit("aspectRatio");
 
 static const QString kLatestTimeValue = lit("latest");
 
 } // namespace
-
-QnThumbnailRequestData::QnThumbnailRequestData():
-    QnMultiserverRequestData(),
-    camera(),
-    msecSinceEpoch(kLatestThumbnail),
-    rotation(kDefaultRotation),
-    size(),
-    imageFormat(JpgFormat),
-    roundMethod(KeyFrameAfterMethod) //< round after is better then before by default for most situations
-{
-}
-
-bool QnThumbnailRequestData::isSpecialTimeValue(qint64 value)
-{
-    return value < 0 || value == DATETIME_NOW;
-}
 
 void QnThumbnailRequestData::loadFromParams(QnResourcePool* resourcePool,
     const QnRequestParamList& params)
 {
     QnMultiserverRequestData::loadFromParams(resourcePool, params);
 
-    camera = nx::camera_id_helper::findCameraByFlexibleIds(
+    request.camera = nx::camera_id_helper::findCameraByFlexibleIds(
         resourcePool,
         /*outNotFoundCameraId*/ nullptr,
         params.toHash(),
@@ -74,21 +44,25 @@ void QnThumbnailRequestData::loadFromParams(QnResourcePool* resourcePool,
     {
         QString timeValue = params.value(kTimeParam);
         if (timeValue.toLower() == kLatestTimeValue)
-            msecSinceEpoch = kLatestThumbnail;
+            request.usecSinceEpoch = nx::api::ImageRequest::kLatestThumbnail;
         else
-            msecSinceEpoch = nx::utils::parseDateTimeMsec(timeValue);
+            request.usecSinceEpoch = nx::utils::parseDateTime(timeValue);
     }
 
-    rotation = QnLexical::deserialized<int>(params.value(kRotateParam), rotation);
-    size.setHeight(QnLexical::deserialized<int>(params.value(kHeightParam), size.height()));
+    request.rotation = QnLexical::deserialized<int>(params.value(kRotateParam), request.rotation);
+    auto& size = request.size;
+    size.setHeight(QnLexical::deserialized<int>(params.value(kHeightParam),
+        size.height()));
     if (params.contains(kWidthParam))
         size.setWidth(QnLexical::deserialized<int>(params.value(kWidthParam), size.width()));
     else
         size.setWidth(QnLexical::deserialized<int>(params.value(kDeprecatedWidthParam), size.width()));
-    imageFormat = QnLexical::deserialized<ThumbnailFormat>(
-        params.value(kImageFormatParam), imageFormat);
-    roundMethod = QnLexical::deserialized<RoundMethod>(
-        params.value(kRoundMethodParam), roundMethod);
+    request.imageFormat = QnLexical::deserialized<nx::api::ImageRequest::ThumbnailFormat>(
+        params.value(kImageFormatParam), /*defaultValue*/ request.imageFormat);
+    request.roundMethod = QnLexical::deserialized<nx::api::ImageRequest::RoundMethod>(
+        params.value(kRoundMethodParam), /*defaultValue*/ request.roundMethod);
+    request.aspectRatio = QnLexical::deserialized<nx::api::ImageRequest::AspectRatio>(
+        params.value(kAspectRatioParam), /*defaultValue*/ request.aspectRatio);
 }
 
 QnRequestParamList QnThumbnailRequestData::toParams() const
@@ -96,34 +70,41 @@ QnRequestParamList QnThumbnailRequestData::toParams() const
     QnRequestParamList result = QnMultiserverRequestData::toParams();
 
     result.insert(kCameraIdParam,
-        QnLexical::serialized(camera ? camera->getId().toString() : QString()));
+        QnLexical::serialized(request.camera ? request.camera->getId().toString() : QString()));
     result.insert(kTimeParam,
-        isSpecialTimeValue(msecSinceEpoch)
+        nx::api::CameraImageRequest::isSpecialTimeValue(request.usecSinceEpoch)
         ? kLatestTimeValue
-        : QnLexical::serialized(msecSinceEpoch));
-    result.insert(kRotateParam, QnLexical::serialized(rotation));
-    result.insert(kHeightParam, QnLexical::serialized(size.height()));
-    result.insert(kWidthParam, QnLexical::serialized(size.width()));
-    result.insert(kImageFormatParam, QnLexical::serialized(imageFormat));
-    result.insert(kRoundMethodParam, QnLexical::serialized(roundMethod));
+        : QnLexical::serialized(request.usecSinceEpoch));
+    result.insert(kRotateParam, QnLexical::serialized(request.rotation));
+    result.insert(kHeightParam, QnLexical::serialized(request.size.height()));
+    result.insert(kWidthParam, QnLexical::serialized(request.size.width()));
+    result.insert(kImageFormatParam, QnLexical::serialized(request.imageFormat));
+    result.insert(kRoundMethodParam, QnLexical::serialized(request.roundMethod));
+    result.insert(kAspectRatioParam, QnLexical::serialized(request.aspectRatio));
     return result;
 }
 
-bool QnThumbnailRequestData::isValid() const
+boost::optional<QString> QnThumbnailRequestData::getError() const
 {
-    if (!camera)
-        return false;
+    if (!request.camera)
+        return lit("No camera avaliable");
 
     // Check invalid time.
-    if (msecSinceEpoch < 0 && msecSinceEpoch != kLatestThumbnail)
-        return false;
+    if (request.usecSinceEpoch < 0
+        && request.usecSinceEpoch != nx::api::ImageRequest::kLatestThumbnail)
+    {
+        return lit("Invalid time");
+    }
 
-    if (size.height() > 0 && size.height() < kMinimumSize)
-        return false;
+    const auto& size = request.size;
+    if (size.height() > 0 && size.height() < nx::api::CameraImageRequest::kMinimumSize)
+        return lit("Invalid height");
 
-    // Width cannot be specified without specifying height.
-    if (size.width() > 0 && (size.width() < kMinimumSize || size.height() < 0))
-        return false;
+    if (size.width() > 0
+        && (size.width() < nx::api::CameraImageRequest::kMinimumSize || size.height() < 0))
+    {
+        return lit("Width cannot be specified without specifying height");
+    }
 
-    return true;
+    return boost::none;
 }

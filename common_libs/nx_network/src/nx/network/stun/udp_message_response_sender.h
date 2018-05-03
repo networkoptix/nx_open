@@ -6,6 +6,7 @@
 #include "nx/network/socket_common.h"
 
 namespace nx {
+namespace network {
 namespace stun {
 
 class UdpServer;
@@ -14,16 +15,16 @@ class UdpServer;
  * Provides ability to send response to a request message received via UDP.
  */
 class UDPMessageResponseSender:
-    public nx::stun::AbstractServerConnection
+    public nx::network::stun::AbstractServerConnection
 {
 public:
     UDPMessageResponseSender(
         UdpServer* udpServer,
         SocketAddress sourceAddress);
-    virtual ~UDPMessageResponseSender();
+    virtual ~UDPMessageResponseSender() = default;
 
     virtual void sendMessage(
-        nx::stun::Message message,
+        nx::network::stun::Message message,
         std::function<void(SystemError::ErrorCode)> handler) override;
     virtual nx::network::TransportProtocol transportProtocol() const override;
     virtual SocketAddress getSourceAddress() const override;
@@ -38,4 +39,5 @@ private:
 };
 
 } // namespace stun
+} // namespace network
 } // namespace nx

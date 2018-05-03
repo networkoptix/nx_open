@@ -59,21 +59,21 @@ QnResourceList QnPlDlinkResourceSearcher::findResources()
 {
     QnResourceList result;
 
-    std::unique_ptr<AbstractDatagramSocket> recvSocket( SocketFactory::createDatagramSocket() );
+    std::unique_ptr<nx::network::AbstractDatagramSocket> recvSocket( nx::network::SocketFactory::createDatagramSocket() );
 #ifdef Q_OS_WIN
-    if (!recvSocket->bind(SocketAddress( HostAddress::anyHost, 0 )))
+    if (!recvSocket->bind(nx::network::SocketAddress( nx::network::HostAddress::anyHost, 0 )))
 #else
-	if (!recvSocket->bind(BROADCAST_ADDRESS, 0))
+	if (!recvSocket->bind(nx::network::BROADCAST_ADDRESS, 0))
 #endif
         return QnResourceList();
 
-    for (const QnInterfaceAndAddr& iface: getAllIPv4Interfaces())
+    for (const nx::network::QnInterfaceAndAddr& iface: nx::network::getAllIPv4Interfaces())
     {
 
         if (shouldStop())
             return QnResourceList();
 
-        std::unique_ptr<AbstractDatagramSocket> sock( SocketFactory::createDatagramSocket() );
+        std::unique_ptr<nx::network::AbstractDatagramSocket> sock( nx::network::SocketFactory::createDatagramSocket() );
         sock->setReuseAddrFlag(true);
 
         if (!sock->bind(iface.address.toString(), recvSocket->getLocalAddress().port))
@@ -83,7 +83,7 @@ QnResourceList QnPlDlinkResourceSearcher::findResources()
 
         for (int r = 0; r < CL_BROAD_CAST_RETRY; ++r)
         {
-            sock->sendTo(barequest.data(), barequest.size(), BROADCAST_ADDRESS, 62976);
+            sock->sendTo(barequest.data(), barequest.size(), nx::network::BROADCAST_ADDRESS, 62976);
 
             if (r!=CL_BROAD_CAST_RETRY-1)
                 QnSleep::msleep(5);
@@ -94,9 +94,9 @@ QnResourceList QnPlDlinkResourceSearcher::findResources()
         while (recvSocket->hasData())
         {
             QByteArray datagram;
-            datagram.resize( AbstractDatagramSocket::MAX_DATAGRAM_SIZE );
+            datagram.resize( nx::network::AbstractDatagramSocket::MAX_DATAGRAM_SIZE );
 
-            SocketAddress remoteEndpoint;
+            nx::network::SocketAddress remoteEndpoint;
             int readed = recvSocket->recvFrom(datagram.data(), datagram.size(), &remoteEndpoint);
 
             if (remoteEndpoint.port != 62976 || readed < 32) // minimum response size
@@ -122,7 +122,7 @@ QnResourceList QnPlDlinkResourceSearcher::findResources()
             unsigned char mac[6];
             memcpy(mac, data + 6, 6);
 
-            QString smac = MACToString(mac);
+            QString smac = nx::network::MACToString(mac);
 
 
             bool haveToContinue = false;
@@ -154,7 +154,7 @@ QnResourceList QnPlDlinkResourceSearcher::findResources()
             resource->setTypeId(rt);
             resource->setName(name);
             resource->setModel(name);
-            resource->setMAC(QnMacAddress(smac));
+            resource->setMAC(nx::network::QnMacAddress(smac));
             resource->setHostAddress(remoteEndpoint.address.toString());
 
             result.push_back(resource);
@@ -172,7 +172,7 @@ QString QnPlDlinkResourceSearcher::manufacture() const
 }
 
 
-QList<QnResourcePtr> QnPlDlinkResourceSearcher::checkHostAddr(const QUrl& url, const QAuthenticator& auth, bool isSearchAction)
+QList<QnResourcePtr> QnPlDlinkResourceSearcher::checkHostAddr(const nx::utils::Url& url, const QAuthenticator& auth, bool isSearchAction)
 {
     if( !url.scheme().isEmpty() && isSearchAction )
         return QList<QnResourcePtr>();  //searching if only host is present, not specific protocol
@@ -230,7 +230,7 @@ QList<QnResourcePtr> QnPlDlinkResourceSearcher::checkHostAddr(const QUrl& url, c
 
     resource->setTypeId(rt);
     resource->setName(name);
-    resource->setMAC(QnMacAddress(mac));
+    resource->setMAC(nx::network::QnMacAddress(mac));
     (resource.dynamicCast<QnPlDlinkResource>())->setModel(name);
     resource->setHostAddress(host);
     resource->setDefaultAuth(auth);

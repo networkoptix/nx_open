@@ -1,6 +1,10 @@
 #pragma once
 
+#include <map>
 #include <memory>
+#include <thread>
+
+#include <nx/utils/thread/mutex.h>
 
 #include "ssl_pipeline.h"
 #include "../aio/stream_transforming_async_channel.h"
@@ -21,10 +25,15 @@ public:
     virtual int read(void* data, size_t count) override;
     virtual int write(const void* data, size_t count) override;
 
+    void setFlagsForCallsInThread(std::thread::id threadId, int flags);
+
 private:
     AbstractStreamSocket* m_streamSocket;
+    mutable QnMutex m_mutex;
+    std::map<std::thread::id, int> m_threadIdToFlags;
 
     int bytesTransferredToPipelineReturnCode(int bytesTransferred);
+    int getFlagsForCurrentThread() const;
 };
 
 //-------------------------------------------------------------------------------------------------
@@ -49,17 +58,14 @@ public:
 
     virtual void readSomeAsync(
         nx::Buffer* const buffer,
-        std::function<void(SystemError::ErrorCode, size_t)> handler) override;
+        IoCompletionHandler handler) override;
 
     virtual void sendAsync(
         const nx::Buffer& buffer,
-        std::function<void(SystemError::ErrorCode, size_t)> handler) override;
+        IoCompletionHandler handler) override;
 
-    virtual void cancelIOAsync(
-        nx::network::aio::EventType eventType,
-        nx::utils::MoveOnlyFunc<void()> handler) override;
-
-    virtual void cancelIOSync(nx::network::aio::EventType eventType) override;
+protected:
+    virtual void cancelIoInAioThread(nx::network::aio::EventType eventType) override;
 
 private:
     std::unique_ptr<aio::StreamTransformingAsyncChannel> m_asyncTransformingChannel;
@@ -72,6 +78,8 @@ private:
     void stopWhileInAioThread();
     void switchToSyncModeIfNeeded();
     void switchToAsyncModeIfNeeded();
+
+    void handleSslError(int sslPipelineResultCode);
 };
 
 } // namespace ssl

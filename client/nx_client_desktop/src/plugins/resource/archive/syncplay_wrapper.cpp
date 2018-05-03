@@ -676,13 +676,13 @@ qint64 QnArchiveSyncPlayWrapper::getCurrentTimeInternal() const
 
     qint64 expectTime = expectedTime();
     qint64 nextTime = getNextTime();
-    if (nextTime != qint64(AV_NOPTS_VALUE) && qAbs(nextTime - expectTime) > MAX_FRAME_DURATION*1000)
+    if (nextTime != qint64(AV_NOPTS_VALUE) && qAbs(nextTime - expectTime) > MAX_FRAME_DURATION_MS*1000)
     {
         QnArchiveSyncPlayWrapper* nonConstThis = const_cast<QnArchiveSyncPlayWrapper*>(this);
         if ((nextTime > expectTime && d->speed >= 0) || (nextTime < expectTime && d->speed < 0))
             nonConstThis->reinitTime(nextTime); // data hole
         else
-            nonConstThis->reinitTime(nextTime + MAX_FRAME_DURATION/2*1000ll * sign(d->speed)); // stream is playing slower than need. do not release expected time too far away
+            nonConstThis->reinitTime(nextTime + MAX_FRAME_DURATION_MS/2*1000ll * sign(d->speed)); // stream is playing slower than need. do not release expected time too far away
         expectTime = expectedTime();
     }
 
@@ -747,17 +747,12 @@ void QnArchiveSyncPlayWrapper::onConsumerBlocksReader(QnAbstractStreamDataProvid
     }
     else if (reader->isEnabled() && value)
     {
-        if (!reader->isSingleShotMode())
-        {
-            reader->setNavDelegate(0);
-            // use pause instead of pauseMedia. Prevent isMediaPaused=true value. So, pause thread physically but not change any playback logic
-            if (!reader->isPaused())
-                reader->pause();
-            if (d->enabled && isSyncReader)
-                reader->setNavDelegate(this);
-            //if (reader.buffering)
-            //    onBufferingFinished(reader.cam);
-        }
+        reader->setNavDelegate(0);
+        // use pause instead of pauseMedia. Prevent isMediaPaused=true value. So, pause thread physically but not change any playback logic
+        if (!reader->isPaused())
+            reader->pause();
+        if (d->enabled && isSyncReader)
+            reader->setNavDelegate(this);
     }
     onConsumerBlocksReaderInternal(reader, value);
     reader->setEnabled(!value);

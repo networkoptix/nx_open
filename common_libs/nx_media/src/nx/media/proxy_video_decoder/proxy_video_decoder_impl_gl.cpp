@@ -469,7 +469,7 @@ int Impl::decode(
         else
         {
 #if 0
-            allocator().execAtGlThreadAsync(
+            renderContextSynchronizer().execInRenderContextAsync(
             [yuvBuffer, &fboToRender, this]()
             {
                 renderYuvBufferToFbo(yuvBuffer.get(), &fboToRender);
@@ -480,7 +480,7 @@ int Impl::decode(
             setQVideoFrame(outDecodedFrame, textureBuffer, QVideoFrame::Format_BGR32, ptsUs);
 
             const auto decodedFrame = *outDecodedFrame;
-            allocator().execAtGlThreadAsync(
+            renderContextSynchronizer().execInRenderContextAsync(
                 [decodedFrame]()
                 {
                     decodedFrame->handle();

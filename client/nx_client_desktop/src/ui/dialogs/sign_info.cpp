@@ -15,8 +15,6 @@ QnSignInfo::QnSignInfo(QWidget* parent):
     m_signHelper(qnClientCoreModule->commonModule())
 {
     m_finished = false;
-    m_textureWidth = 1920.0;
-    m_textureHeight = 1080.0; // default aspect ratio 16:9 (exact size is not important here)
     m_progress = 0;
     connect(&m_timer, SIGNAL(timeout()), this, SLOT(update()));
     m_timer.start(16);
@@ -25,11 +23,12 @@ QnSignInfo::QnSignInfo(QWidget* parent):
 
 void QnSignInfo::at_gotSignature(QByteArray calculatedSign, QByteArray signFromFrame)
 {
-    m_finished = true;
-
-    QnMutexLocker lock(&m_mutex);
-    m_sign = calculatedSign;
-    m_signFromFrame = signFromFrame;
+    {
+        QnMutexLocker lock(&m_mutex);
+        m_finished = true;
+        m_sign = calculatedSign;
+        m_signFromFrame = signFromFrame;
+    }
     update();
 }
 
@@ -42,75 +41,75 @@ void QnSignInfo::at_gotSignatureDescription(QString version, QString hwId, QStri
 
 void QnSignInfo::at_calcSignInProgress(QByteArray sign, int progress)
 {
-    QnMutexLocker lock(&m_mutex);
-    m_sign = sign;
-    m_progress = progress;
+    {
+        QnMutexLocker lock(&m_mutex);
+        m_sign = sign;
+        m_progress = progress;
+    }
     update();
 }
 
-void QnSignInfo::resizeEvent(QResizeEvent *)
-{
-    m_videoRect = SignDialog::calcVideoRect(width(), height(), m_textureWidth, m_textureHeight);
-    update();
-}
-
-void QnSignInfo::paintEvent(QPaintEvent *)
+void QnSignInfo::paintEvent(QPaintEvent*)
 {
     static const int TEXT_FLASHING_PERIOD = 1000;
     float opacity = qAbs(sin(QDateTime::currentMSecsSinceEpoch() / qreal(TEXT_FLASHING_PERIOD * 2) * M_PI))*0.5 + 0.5;
+    bool finished = false;
+    QByteArray sign;
+    QByteArray signFromFrame;
 
+    // We gather a copy of all thread-shared data.
+    // We are completely thread-safe after that.
     {
         QnMutexLocker lock(&m_mutex);
-        m_signHelper.setSign(m_sign);
+        finished = m_finished;
+        sign = m_sign;
+        signFromFrame = m_signFromFrame;
     }
-    QPixmap pixmap(m_textureWidth, m_textureHeight);
-    QPainter p(&pixmap);
 
-    if (m_finished)
-        m_signHelper.setSignOpacity(opacity, m_sign == m_signFromFrame ? QColor(0, 128, 0) : QColor(128, 0, 0));
-    m_signHelper.draw(p, QSize(m_textureWidth, m_textureHeight), m_DrawDetailText);
-    QString text;
-    text = tr("Analyzing: %1%").arg(m_progress);
-    p.end();
+    bool signIsMatched = (sign == signFromFrame);
 
-    QPainter p2(this);
-    if (m_finished)
+    m_signHelper.setSign(sign);
+    QPainter painter(this);
+
+    if (finished)
+        m_signHelper.setSignOpacity(opacity, signIsMatched ? QColor(0, 128, 0) : QColor(128, 0, 0));
+    m_signHelper.draw(painter, QSize(width(), height()), m_DrawDetailText);
+
+    QString text = tr("Analyzing: %1%").arg(m_progress);
+    if (finished)
     {
-        if (m_signFromFrame.isEmpty())
+        if (signFromFrame.isEmpty())
         {
-            p2.setPen(QColor(128, 0, 0));
+            painter.setPen(QColor(128, 0, 0));
             text = tr("Watermark Not Found");
         }
-        else if (m_sign == m_signFromFrame)
+        else if (signIsMatched)
         {
-            p2.setPen(QColor(0, 128, 0));
+            painter.setPen(QColor(0, 128, 0));
             text = tr("Watermark Matched");
         }
         else
         {
-            p2.setPen(QColor(128, 0, 0));
+            painter.setPen(QColor(128, 0, 0));
             text = tr("Invalid watermark");
         }
     }
     else
     {
-        p2.setPen(Qt::black);
+        painter.setPen(Qt::black);
     }
 
-    p2.setRenderHints(QPainter::Antialiasing | QPainter::TextAntialiasing | QPainter::SmoothPixmapTransform);
-    p2.drawPixmap(m_videoRect, pixmap);
-    QFontMetrics metric = m_signHelper.updateFontSize(p2, QSize(width() * 2, height() * 2));
-    if (m_finished)
-        p2.setOpacity(opacity);
+    painter.setRenderHints(QPainter::Antialiasing | QPainter::TextAntialiasing | QPainter::SmoothPixmapTransform);
+    // Drawing video rect
+    QFontMetrics metric = m_signHelper.updateFontSize(painter, QSize(width() * 2, height() * 2));
+    if (finished)
+        painter.setOpacity(opacity);
     if (!m_DrawDetailText)
-        p2.drawText(m_videoRect.left() + 16, m_videoRect.top() + metric.height() + 16, text);
+        painter.drawText(16, metric.height() + 16, text);
 }
 
 void QnSignInfo::setImageSize(int textureWidth, int textureHeight)
 {
-    m_textureWidth = textureWidth;
-    m_textureHeight = textureHeight;
-    m_videoRect = SignDialog::calcVideoRect(width(), height(), m_textureWidth, m_textureHeight);
     update();
 }
 

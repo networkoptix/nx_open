@@ -8,7 +8,7 @@
 #include <utils/math/color_transformations.h>
 #include <ui/style/helper.h>
 
-#include <nx/utils/string.h>
+#include <nx/client/core/utils/human_readable.h>
 
 QnStorageSpaceSlider::QnStorageSpaceSlider(QWidget *parent):
     base_type(parent),
@@ -73,7 +73,12 @@ void QnStorageSpaceSlider::setTextFormat(const QString& textFormat)
 
 QString QnStorageSpaceSlider::formatSize(qint64 size)
 {
-    return nx::utils::formatFileSize(size, /*precision*/ 1, /*prefixThreshold*/ 10); /*< TODO: #rvasilenko what is 10? */
+    using HumanReadable = nx::client::core::HumanReadable;
+
+    return HumanReadable::digitalSizePrecise(size,
+        HumanReadable::VolumeSize,
+        HumanReadable::DigitalSizeMultiplier::Binary,
+        HumanReadable::SuffixFormat::Long);
 }
 
 void QnStorageSpaceSlider::mouseMoveEvent(QMouseEvent* event)

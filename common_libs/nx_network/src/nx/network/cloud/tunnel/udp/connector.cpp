@@ -1,13 +1,8 @@
-/**********************************************************
-* Feb 3, 2016
-* akolesnikov
-***********************************************************/
-
 #include "connector.h"
 
-#include <nx/fusion/serialization/lexical.h>
+#include <nx/network/cloud/cloud_connect_controller.h>
 #include <nx/network/cloud/data/udp_hole_punching_connection_initiation_data.h>
-#include <nx/network/socket_global.h>
+#include <nx/network/cloud/mediator_connector.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/log/log_message.h>
 #include <nx/utils/std/cpp14.h>
@@ -33,7 +28,6 @@ TunnelConnector::TunnelConnector(
     m_udpSocket(std::move(udpSocket)),
     m_remotePeerCloudConnectVersion(hpm::api::kDefaultCloudConnectVersion)
 {
-    NX_ASSERT(nx::network::SocketGlobals::mediatorConnector().udpEndpoint());
     NX_CRITICAL(m_udpSocket);
     m_localAddress = m_udpSocket->getLocalAddress();
 
@@ -80,9 +74,9 @@ void TunnelConnector::connect(
         NX_LOGX(lm("cross-nat %1. mediator reported empty UDP address list for host %2")
             .arg(m_connectSessionId).arg(m_targetHostAddress.host.toString()),
             cl_logDEBUG1);
-        return holePunchingDone(
+        return post(std::bind(&TunnelConnector::holePunchingDone, this,
             api::NatTraversalResultCode::targetPeerHasNoUdpAddress,
-            SystemError::connectionReset);
+            SystemError::connectionReset));
     }
 
     for (const SocketAddress& endpoint: response.udpEndpointList)
@@ -126,7 +120,7 @@ void TunnelConnector::messageReceived(
 
 void TunnelConnector::ioFailure(SystemError::ErrorCode /*errorCode*/)
 {
-    //if error happens when sending connect result report, 
+    //if error happens when sending connect result report,
     //  it will be reported to TunnelConnector::connectSessionReportSent too
     //  and we will handle error there
 }
@@ -171,7 +165,7 @@ void TunnelConnector::onUdtConnectionEstablished(
             errorCode);
         return;
     }
-    
+
     //success!
     NX_LOGX(lm("cross-nat %1. Udp hole punching to %2 is a success!")
         .arg(m_connectSessionId).arg(rendezvousConnector->remoteAddress().toString()),
@@ -233,7 +227,7 @@ void TunnelConnector::holePunchingDone(
     SystemError::ErrorCode sysErrorCode)
 {
     NX_LOGX(lm("cross-nat %1. Udp hole punching result: %2, system result code: %3")
-        .arg(m_connectSessionId).arg(QnLexical::serialized(resultCode))
+        .arg(m_connectSessionId).arg(api::toString(resultCode))
         .arg(SystemError::toString(sysErrorCode)),
         cl_logDEBUG2);
 
@@ -249,8 +243,8 @@ void TunnelConnector::holePunchingDone(
             std::move(m_udtConnection));
     }
 
-    auto completionHandler = std::move(m_completionHandler);
-    completionHandler(
+    nx::utils::swapAndCall(
+        m_completionHandler,
         resultCode,
         sysErrorCode,
         std::move(tunnelConnection));
@@ -265,7 +259,7 @@ std::unique_ptr<RendezvousConnectorWithVerification>
         rendezvousConnector = std::make_unique<RendezvousConnectorWithVerification>(
             m_connectSessionId,
             std::move(endpoint),
-            std::move(m_udpSocket));  //moving system socket handler from m_mediatorUdpClient to udt connection
+            std::move(m_udpSocket)); //< Moving system socket handler from m_mediatorUdpClient to udt connection.
         m_udpSocket.reset();
     }
     else

@@ -1,0 +1,34 @@
+<!doctype html>
+<!--[if lt IE 7]>      <html class="no-js lt-ie9 lt-ie8 lt-ie7"> <![endif]-->
+<!--[if IE 7]>         <html class="no-js lt-ie9 lt-ie8"> <![endif]-->
+<!--[if IE 8]>         <html class="no-js lt-ie9"> <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js"> <!--<![endif]-->
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title></title>
+    <meta name="description" content="">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+
+    <link rel="stylesheet" href="fonts/roboto/roboto_bold/stylesheet.css" />
+    <link rel="stylesheet" href="fonts/roboto/roboto_light/stylesheet.css" />
+    <link rel="stylesheet" href="fonts/roboto/roboto_regular/stylesheet.css" />
+    <link rel="stylesheet" href="fonts/roboto/roboto_medium/stylesheet.css" />
+
+    <% for (key in htmlWebpackPlugin.files.css) { %>
+    <link rel="stylesheet" href="<%= htmlWebpackPlugin.files.css[key] %>" />
+    <% } %>
+
+    <link rel="stylesheet" href="skin/styles-native.css">
+</head>
+<body class="inline-webadmin">
+
+<!-- Add your site or application content here -->
+<div class="panel master" ng-view=""></div>
+
+<% for (key in htmlWebpackPlugin.files.chunks) { %>
+<script type="text/javascript" src="<%= htmlWebpackPlugin.files.chunks[key].entry %>"></script>
+<% } %>
+<script src="customization/config.js"></script>
+</body>
+</html>

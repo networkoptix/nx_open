@@ -1,0 +1,57 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+
+    <parent>
+        <artifactId>vms_libs</artifactId>
+        <groupId>com.networkoptix.hdwitness</groupId>
+        <version>4.0.0-SNAPSHOT</version>
+        <relativePath>..</relativePath>
+    </parent>
+
+    <groupId>com.networkoptix.hdwitness</groupId>
+    <version>4.0.0-SNAPSHOT</version>
+    <modelVersion>4.0.0</modelVersion>
+    <artifactId>nx_vms_api</artifactId>
+    <packaging>pom</packaging>
+    <name>Nx VMS API Library</name>
+
+    <properties>
+        <guid>${nx_vms_api.guid}</guid>
+        <!--Global libs-->
+        <template>lib</template>
+
+        <qt.libs>core gui network xml xmlpatterns sql concurrent multimedia</qt.libs>
+        <global.libs>-lnx_fusion -lnx_utils -lnx_kit</global.libs>
+        <windows.oslibs>-lws2_32 DbgHelp.lib -lIphlpapi -lOle32  -lSecur32 -lwinmm</windows.oslibs>
+        <linux.oslibs>-lswscale</linux.oslibs>
+        <mac.oslibs>-framework IOKit -framework CoreFoundation  -lz -framework QtConcurrent</mac.oslibs>
+        <android.oslibs>-lz</android.oslibs>
+
+        <windows.defines>_USING_V110_SDK71_</windows.defines>
+        <buildLib>sharedLib</buildLib>
+        <rdep.packages>openssl</rdep.packages>
+        <rdep.windows.packages>quazip</rdep.windows.packages>
+        <rdep.linux.packages>quazip ffmpeg</rdep.linux.packages>
+        <rdep.mac.packages>quazip</rdep.mac.packages>
+    </properties>
+
+    <dependencies>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>nx_fusion</artifactId>
+            <version>${project.version}</version>
+            <type>pom</type>
+            <scope>system</scope>
+            <systemPath>${root.dir}/common_libs/nx_fusion/pom.xml</systemPath>
+        </dependency>
+
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>nx_utils</artifactId>
+            <version>${project.version}</version>
+            <type>pom</type>
+            <scope>system</scope>
+            <systemPath>${root.dir}/common_libs/nx_utils/pom.xml</systemPath>
+        </dependency>
+    </dependencies>
+
+</project>

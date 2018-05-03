@@ -11,6 +11,7 @@
 #include <test_support/appserver2_process.h>
 
 static const std::chrono::milliseconds kDiscoveryTimeouts(100);
+static const std::chrono::seconds kWaitForDiscoveryTimeout(10);
 size_t kInitialServerCount = 3;
 size_t kAdditionalServerCount = 2;
 nx::network::RetryPolicy kReconnectPolicy(
@@ -87,54 +88,64 @@ protected:
 
     void checkVisibility()
     {
-        // Wait enough time for servers to discover each other.
-        std::this_thread::sleep_for(kDiscoveryTimeouts * m_servers.size() * m_servers.size());
-
         size_t totalDiscoveryLinks = 0;
+        #if defined(Q_OS_MAC)
+            // Can join different UDT sockets to the same multicast group on OSX. So at least one
+            // should be able to see everyone else.
+            const size_t expectedDiscoveryLinks = m_servers.size() - 1;
+        #else
+            // Everyone should be able to see everyone else.
+            const size_t expectedDiscoveryLinks = m_servers.size() * (m_servers.size() - 1);
+        #endif
+
+        const auto startTime = std::chrono::steady_clock::now();
+        while (std::chrono::steady_clock::now() - startTime < kWaitForDiscoveryTimeout)
+        {
+            totalDiscoveryLinks = 0;
+            for (const auto& server: m_servers)
+            {
+                totalDiscoveryLinks += checkVisibilityFor(
+                    server.second->moduleInstance()->commonModule());
+            }
+
+            if (expectedDiscoveryLinks == totalDiscoveryLinks)
+                return;
+
+            std::this_thread::sleep_for(kDiscoveryTimeouts);
+        }
+
+        EXPECT_EQ(expectedDiscoveryLinks, totalDiscoveryLinks);
+    }
+
+    size_t checkVisibilityFor(const QnCommonModule* searcher)
+    {
+        size_t totalDiscoveryLinks = 0;
+        const auto discoveryManager = searcher->moduleDiscoveryManager();
         for (const auto& server: m_servers)
         {
-            const auto discoveryManager = server.second->moduleInstance()->commonModule()
-                ->moduleDiscoveryManager();
+            if (searcher->moduleGUID() == server.first)
+                continue;
 
-            for (const auto& otherServer: m_servers)
+            if (const auto module = discoveryManager->getModule(server.first))
             {
-                if (server.first == otherServer.first)
-                    continue;
+                ++totalDiscoveryLinks;
+                NX_ALWAYS(this, lm("Module %1 discovered %2 with endpoint %3").args(
+                    searcher->moduleGUID(), module->id, module->endpoint));
 
-                if (const auto module = discoveryManager->getModule(otherServer.first))
-                {
-                    ++totalDiscoveryLinks;
-                    NX_ALWAYS(this, lm("Module %1 discovered %2 with endpoint %3").args(
-                        server.first, module->id, module->endpoint));
-
-                    EXPECT_EQ(module->id.toString(), otherServer.first.toString());
-                    EXPECT_EQ(module->endpoint.port,
-                        otherServer.second->moduleInstance()->endpoint().port);
-                }
-                else
-                {
-                    const auto error = lm("Module %1 failed to discover %2").args(
-                        server.first, otherServer.first);
-
-                    #if defined(Q_OS_MAC)
-                        // Can join different UDT sockets to the same multicast group on OSX.
-                        NX_WARNING(this, error);
-                    #else
-                        FAIL() << error.toStdString();
-                    #endif
-                }
+                EXPECT_EQ(module->id.toString(), server.first.toString());
+                EXPECT_EQ(module->endpoint.port, server.second->moduleInstance()->endpoint().port);
+            }
+            else
+            {
+                NX_WARNING(this, lm("Module %1 failed to discover %2").args(
+                    searcher->moduleGUID(), server.first));
             }
         }
 
-        #if defined(Q_OS_MAC)
-            EXPECT_GE(totalDiscoveryLinks, m_servers.size() - 1);
-        #else
-            EXPECT_EQ(m_servers.size() * (m_servers.size() - 1), totalDiscoveryLinks);
-        #endif
+        return totalDiscoveryLinks;
     }
 
 private:
-    QnStaticCommonModule m_common;
     std::map<QnUuid, std::unique_ptr<MediaServer>> m_servers;
 };
 

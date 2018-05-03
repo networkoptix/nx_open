@@ -37,7 +37,7 @@ int QnRecordedChunksRestHandler::executeGet(
         errStr += "Parameter 'startTime' must be provided.\n";
     if (request.endTimeMs < 0)
         errStr += "Parameter 'endTime' must be provided.\n";
-    if (request.detailLevel < 0)
+    if (request.detailLevel < std::chrono::milliseconds::zero())
         errStr += "Parameter 'detail' must be provided.\n";
     if (request.format == Qn::UnsupportedFormat)
         errStr += "Parameter 'format' must be provided.\n";
@@ -56,7 +56,7 @@ int QnRecordedChunksRestHandler::executeGet(
 
     QnTimePeriodList periods = QnChunksRequestHelper::load(request);
 
-    switch(request.format)
+    switch (static_cast<ChunkFormat>(request.format))
     {
         case ChunkFormat_Binary:
             result.append("BIN");

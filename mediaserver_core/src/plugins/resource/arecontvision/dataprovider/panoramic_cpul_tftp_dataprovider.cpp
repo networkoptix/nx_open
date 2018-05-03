@@ -27,7 +27,7 @@ extern AVLastPacketSize ExtractSize(const unsigned char* arr);
 
 // =========================================================
 
-AVPanoramicClientPullSSTFTPStreamreader::AVPanoramicClientPullSSTFTPStreamreader(const QnResourcePtr& res):
+AVPanoramicClientPullSSTFTPStreamreader::AVPanoramicClientPullSSTFTPStreamreader(const QnPlAreconVisionResourcePtr& res):
     QnPlAVClinetPullStreamReader(res)
 {
 
@@ -35,14 +35,10 @@ AVPanoramicClientPullSSTFTPStreamreader::AVPanoramicClientPullSSTFTPStreamreader
     m_last_width = 1600;
     m_last_height = 1200;
 
-    const QnPlAreconVisionResource* avRes = dynamic_cast<const QnPlAreconVisionResource*>(res.data());
-
-    m_panoramic = avRes->isPanoramic();
-    m_dualsensor = avRes->isDualSensor();
-    m_model = avRes->getModel();
+    m_model = m_camera->getModel();
     m_tftp_client = 0;
     m_motionData = 0;
-    m_channelCount = avRes->getVideoLayout()->channelCount();
+    m_channelCount = m_camera->getVideoLayout()->channelCount();
 }
 
 AVPanoramicClientPullSSTFTPStreamreader::~AVPanoramicClientPullSSTFTPStreamreader()
@@ -126,12 +122,12 @@ QnAbstractMediaDataPtr AVPanoramicClientPullSSTFTPStreamreader::getNextData()
     if (m_motionData > 0)
     {
         --m_motionData;
-        QnAbstractMediaDataPtr metadata = getMetaData();
+        QnAbstractMediaDataPtr metadata = getMetadata();
         if (metadata)
             return metadata;
     }
 
-    if (needMetaData())
+    if (needMetadata())
     {
         m_motionData = m_channelCount;
     }
@@ -355,6 +351,8 @@ QnAbstractMediaDataPtr AVPanoramicClientPullSSTFTPStreamreader::getNextData()
         AVJpeg::Header::GetHeader((unsigned char*)img.data(), size.width, size.height, quality, m_model.toLatin1().data());
     }
 
+    if (!qBetween(1U, m_videoFrameBuff.size(), MAX_ALLOWED_FRAME_SIZE))
+        return QnAbstractMediaDataPtr();
     QnWritableCompressedVideoDataPtr videoData(new QnWritableCompressedVideoData(CL_MEDIA_ALIGNMENT, m_videoFrameBuff.size()));
     videoData->m_data.write(m_videoFrameBuff);
 
@@ -376,7 +374,7 @@ QnAbstractMediaDataPtr AVPanoramicClientPullSSTFTPStreamreader::getNextData()
 bool AVPanoramicClientPullSSTFTPStreamreader::needKeyData() const
 {
     QnMutexLocker mtx(&m_mutex);
-    for (int i = 0; i < CL_MAX_CHANNEL_NUMBER; ++i)
+    for (int i = 0; i < m_channelCount; ++i)
         if (m_gotKeyFrame[i] < 2)  // due to bug of AV panoramic H.264 cam. cam do not send frame with diff resolution of resolution changed. first I frame comes with old resolution
             return true;
 

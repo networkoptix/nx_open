@@ -12,24 +12,24 @@ class NX_NETWORK_API UdpHolePunchingSynRequest:
     public StunRequestData
 {
 public:
-    constexpr static const auto kMethod = stun::extension::methods::udpHolePunchingSyn;
+    constexpr static const auto kMethod = network::stun::extension::methods::udpHolePunchingSyn;
 
     UdpHolePunchingSynRequest();
-    virtual void serializeAttributes(nx::stun::Message* const message) override;
-    virtual bool parseAttributes(const nx::stun::Message& message) override;
+    virtual void serializeAttributes(nx::network::stun::Message* const message) override;
+    virtual bool parseAttributes(const nx::network::stun::Message& message) override;
 };
 
 class NX_NETWORK_API UdpHolePunchingSynResponse:
     public StunResponseData
 {
 public:
-    constexpr static const auto kMethod = stun::extension::methods::udpHolePunchingSyn;
+    constexpr static const auto kMethod = network::stun::extension::methods::udpHolePunchingSyn;
 
     nx::String connectSessionId;
 
     UdpHolePunchingSynResponse();
-    virtual void serializeAttributes(nx::stun::Message* const message) override;
-    virtual bool parseAttributes(const nx::stun::Message& message) override;
+    virtual void serializeAttributes(nx::network::stun::Message* const message) override;
+    virtual bool parseAttributes(const nx::network::stun::Message& message) override;
 };
 
 } // namespace api

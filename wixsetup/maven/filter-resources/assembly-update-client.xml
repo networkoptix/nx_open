@@ -31,6 +31,8 @@
                 <include>swresample-2.dll</include>
                 <include>swscale-4.dll</include>
                 <include>udt.dll</include>
+                <include>nx_relaying.dll</include>
+                <include>vms_gateway_core.dll</include>
             </includes>
             <excludes>
                 <exclude>libvorbisfile.dll</exclude>
@@ -43,14 +45,14 @@
             <includes>
                 <include>**</include>
             </includes>
-        </fileSet> 
+        </fileSet>
         <fileSet>
             <directory>${ClientHelpSourceDir}</directory>
             <outputDirectory>../help</outputDirectory>
             <includes>
                 <include>**</include>
             </includes>
-        </fileSet>        
+        </fileSet>
         <fileSet>
             <directory>${qt.dir}/bin</directory>
             <outputDirectory>..</outputDirectory>

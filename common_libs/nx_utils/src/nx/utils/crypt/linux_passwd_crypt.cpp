@@ -44,7 +44,7 @@ namespace
 {
     const int BITS_MASK[] = { 0, 0x1, 0x3, 0x7, 0xF, 0x1F, 0x3F, 0x7F };
 
-    //!Performs inplace bitshift of array \a data
+    //!Performs inplace bitshift of array data
     void shiftArrayRight( unsigned char* data, size_t dataSize, size_t bitsCount )
     {
         //TODO #ak moving by number of bytes and modifing bitsCount

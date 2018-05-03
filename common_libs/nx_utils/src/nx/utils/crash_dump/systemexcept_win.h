@@ -5,10 +5,10 @@
 
 //!Used to dump unhandled structured exception call stack to file ({application_name}_{pid}.except near application binary)
 /*!
-    \note This does not work if structured exception handling is not used and application is being debugged
+    NOTE: This does not work if structured exception handling is not used and application is being debugged
         (debugger handles unhandled exceptions by itself)
-    \note This handling works on per-thread basis. \a win32_exception::translate has to be called in thread to enable unhandled structured exception handling
-    \note QnLongRunnable instance calls \a win32_exception::translate after thread creation
+    NOTE: This handling works on per-thread basis. win32_exception::translate has to be called in thread to enable unhandled structured exception handling
+    NOTE: QnLongRunnable instance calls win32_exception::translate after thread creation
     \todo some refactoring is required
 */
 class NX_UTILS_API win32_exception
@@ -19,9 +19,9 @@ public:
     static void installThreadSpecificUnhandledExceptionHandler();
     //!
     /*!
-        \param isFull If \a true then in case of process crash all process memory dumped. 
-            If \a false, only call stack for each thread is dumped.
-            By default, \a false
+        \param isFull If true then in case of process crash all process memory dumped.
+            If false, only call stack for each thread is dumped.
+            By default, false
     */
     static void setCreateFullCrashDump( bool isFull );
 

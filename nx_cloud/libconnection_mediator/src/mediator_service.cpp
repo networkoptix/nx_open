@@ -14,32 +14,28 @@
 #include <nx/utils/system_error.h>
 
 #include "controller.h"
-#include "http/get_listening_peer_list_handler.h"
-#include "http/http_server.h"
 #include "libconnection_mediator_app_info.h"
 #include "settings.h"
+#include "statistics/statistics_provider.h"
 #include "statistics/stats_manager.h"
-#include "stun_server.h"
+#include "view.h"
 
 namespace nx {
 namespace hpm {
 
 MediatorProcess::MediatorProcess(int argc, char **argv):
-    base_type(argc, argv, QnLibConnectionMediatorAppInfo::applicationDisplayName()),
-    m_controller(nullptr),
-    m_stunServer(nullptr),
-    m_httpServer(nullptr)
+    base_type(argc, argv, QnLibConnectionMediatorAppInfo::applicationDisplayName())
 {
 }
 
-std::vector<SocketAddress> MediatorProcess::httpEndpoints() const
+std::vector<network::SocketAddress> MediatorProcess::httpEndpoints() const
 {
-    return m_httpServer->httpEndpoints();
+    return m_view->httpServer().endpoints();
 }
 
-std::vector<SocketAddress> MediatorProcess::stunEndpoints() const
+std::vector<network::SocketAddress> MediatorProcess::stunEndpoints() const
 {
-    return m_stunServer->endpoints();
+    return m_view->stunServer().endpoints();
 }
 
 ListeningPeerPool* MediatorProcess::listeningPeerPool() const
@@ -68,40 +64,43 @@ int MediatorProcess::serviceMain(const nx::utils::AbstractServiceSettings& abstr
 
     nx::utils::TimerManager timerManager;
 
-    auto stunServer = std::make_unique<StunServer>(settings);
-    m_stunServer = stunServer.get();
+    NX_INFO(this, lm("Initializating controller"));
 
-    // TODO: #ak Controller should be instanciated before stunServer.
-    // That requires decoupling controller and STUN request handling.
-    Controller controller(
-        settings,
-        &stunServer->dispatcher());
+    Controller controller(settings);
     m_controller = &controller;
 
-    http::Server httpServer(
-        settings,
-        controller.listeningPeerRegistrator(),
-        &controller.discoveredPeerPool());
-    m_httpServer = &httpServer;
+    NX_INFO(this, lm("Initializating view"));
 
-    // TODO: #ak Following call should be removed.
-    // Http server should be passed to stun server via constructor.
-    stunServer->initializeHttpTunnelling(&httpServer);
+    View view(settings, &controller);
+    m_view = &view;
 
-    // process privilege reduction
-    nx::utils::CurrentProcess::changeUser(settings.general().systemUserToRunUnder);
+    stats::Provider statisticsProvider(
+        view.httpServer().server(),
+        view.stunServer().server());
+    view.httpServer().registerStatisticsApiHandlers(statisticsProvider);
 
-    stunServer->listen();
-    httpServer.listen();
+    NX_INFO(this, lm("Initializating view"));
+
+    // Process privilege reduction.
+    if (!settings.general().systemUserToRunUnder.isEmpty())
+    {
+        NX_INFO(this, lm("Changing active user"));
+        nx::utils::CurrentProcess::changeUser(settings.general().systemUserToRunUnder);
+    }
+
+    NX_INFO(this, lm("Starting view"));
+
+    view.start();
+
+    NX_INFO(this, lm("Initialization completed. Running..."));
 
     const int result = runMainLoop();
 
-    stunServer->stopAcceptingNewRequests();
+    view.stop();
     controller.stop();
-    stunServer.reset();
 
-    NX_LOGX(lit("%1 is stopped")
-        .arg(QnLibConnectionMediatorAppInfo::applicationDisplayName()), cl_logALWAYS);
+    NX_ALWAYS(this, lm("%1 is stopped")
+        .arg(QnLibConnectionMediatorAppInfo::applicationDisplayName()));
 
     return result;
 }

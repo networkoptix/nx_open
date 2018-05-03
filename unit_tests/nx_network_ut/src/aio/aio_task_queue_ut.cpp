@@ -53,7 +53,7 @@ private:
 
 static constexpr std::size_t kPollableCount = 7;
 
-} // namespace 
+} // namespace
 
 class AioTaskQueue:
     public ::testing::Test
@@ -86,7 +86,7 @@ protected:
 
     void whenCancelledCallsOfARandomPollable()
     {
-        PollableContext* pollableCtx = 
+        PollableContext* pollableCtx =
             m_pollables[nx::utils::random::number<std::size_t>(0, m_pollables.size()-1)].get();
 
         pollableCtx->cancelledTasks = m_aioTaskQueue.cancelPostedCalls(

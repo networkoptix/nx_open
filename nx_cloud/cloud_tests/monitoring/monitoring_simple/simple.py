@@ -12,7 +12,7 @@ from urllib.parse import quote
 from requests.auth import HTTPDigestAuth
 
 logging.basicConfig(stream=sys.stderr, level=logging.INFO)
-logging.getLogger("requests").setLevel(logging.WARNING)
+logging.getLogger("requests").setLevel(logging.DEBUG)
 logging.getLogger("botocore").setLevel(logging.WARNING)
 logging.getLogger("boto3").setLevel(logging.WARNING)
 
@@ -185,7 +185,7 @@ class CloudSession(object):
         data = r.json()
         assert 'id' in data, 'No ID'
 
-    @testmethod(delay=10)
+    @testmethod(delay=20)
     def check_system_users(self):
         headers = {
             'referer': '{}/systems/{}'.format(self.base_url, self.system_id),
@@ -206,7 +206,7 @@ class CloudSession(object):
         self.post('/gateway/{system_id}/ec2/removeUser'.format(system_id=self.system_id),
                   request_data, auth=auth)
 
-    @testmethod()
+    @testmethod(delay=20)
     def check_vasily_is_absent(self):
         headers = {
             'referer': '{}/systems/{}'.format(self.base_url, self.system_id),
@@ -220,15 +220,25 @@ class CloudSession(object):
 
     @testmethod()
     def test_cloud_connect(self):
-        command = '--http-client --url=http://{user}:{password}@{system_id}/ec2/getUsers'.format(
+        command = '--log-level=DEBUG2 --http-client --url=http://{user}:{password}@{system_id}/ec2/getUsers'.format(
             user=quote(self.email),
             password=quote(self.password),
             system_id=self.system_id)
 
         client = docker.client.from_env()
-        output = client.containers.run(
-            '009544449203.dkr.ecr.us-east-1.amazonaws.com/cloud/cloud_connect_test_util:3.1.0.13200', command)
-        assert b'HTTP/1.1 200 OK' in output, 'Received invalid output from cloud connect'
+        container = client.containers.run(
+            '009544449203.dkr.ecr.us-east-1.amazonaws.com/cloud/cloud_connect_test_util:3.1.0.13200', command, detach=True)
+        status = container.wait()
+        log.info('Container exited with exit status {}'.format(status))
+        stdout = container.logs(stdout=True, stderr=False)
+        stderr = container.logs(stdout=False, stderr=True)
+
+        log.info('Stdout:\n{}'.format(stdout.decode('utf-8')))
+        log.info('Stderr:\n{}'.format(stderr.decode('utf-8')))
+        container.remove()
+
+        assert b'HTTP/1.1 200 OK' in stdout, 'Received invalid output from cloud connect'
+        assert status == 0, 'Cloud connect test util exited with non-zero status {}'.format(status)
 
 
 def main():

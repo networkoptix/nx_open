@@ -46,11 +46,11 @@ QList<QAction*> RadassActionFactory::newActions(const ui::action::Parameters& pa
             action->setChecked(checked);
             connect(action, &QAction::triggered, this,
                 [this, items, mode]
-            {
-                ui::action::Parameters parameters(items);
-                parameters.setArgument(Qn::ResolutionModeRole, (int)mode);
-                menu()->trigger(ui::action::RadassAction, parameters);
-            });
+                {
+                    ui::action::Parameters parameters(items);
+                    parameters.setArgument(Qn::ResolutionModeRole, (int)mode);
+                    menu()->trigger(ui::action::RadassAction, parameters);
+                });
             actionGroup->addAction(action);
         };
 

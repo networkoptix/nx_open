@@ -22,7 +22,7 @@ public:
      * @param completionHandler Can be invoked within this method.
      */
     virtual void authenticateByName(
-        const nx_http::StringType& username,
+        const nx::network::http::StringType& username,
         std::function<bool(const nx::Buffer&)> validateHa1Func,
         const nx::utils::stree::AbstractResourceReader& authSearchInputData,
         nx::utils::stree::ResourceContainer* const authProperties,

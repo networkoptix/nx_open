@@ -69,17 +69,17 @@
     </message>
     <message>
       <source>Internal %1 error. Please contact support team.</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
       <translation>Bilinmeyen Hata %1. Lütfen Destek Birimiyle İletişime Geçin.</translation>
     </message>
     <message>
       <source>Sorry, %1 Service is temporary unavailable. We are doing our best to restore it. Please try again later.</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
       <translation>Üzgünüz, %1 hizmeti geçici olarak kullanılamıyor. Geri yüklemek için elimizden geleni yapıyoruz. Lütfen daha sonra yeniden deneyin.</translation>
     </message>
     <message>
       <source>Sorry, %1 Service could not process your request. Please try again in a few moments.</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
       <translation>Üzgünüz, %1 hizmeti isteğinizi işleyemedi. Lütfen birkaç dakika sonra yeniden deneyin.</translation>
     </message>
   </context>

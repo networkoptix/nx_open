@@ -12,14 +12,14 @@ TEST(SaveCamera, invalidData)
     MediaServerLauncher launcher;
     ASSERT_TRUE(launcher.start());
 
-    ec2::ApiCameraData cameraData;
+    nx::vms::api::CameraData cameraData;
     cameraData.parentId = QnUuid::createUuid();
     auto resTypePtr = qnResTypePool->getResourceTypeByName("Camera");
     ASSERT_FALSE(resTypePtr.isNull());
     cameraData.typeId = resTypePtr->getId();
     cameraData.vendor = "test vendor";
     cameraData.physicalId = "matching physicalId";
-    cameraData.id = ec2::ApiCameraData::physicalIdToId(cameraData.physicalId);
+    cameraData.id = nx::vms::api::CameraData::physicalIdToId(cameraData.physicalId);
 
     NX_LOG("[TEST] Both id and physicalId fields correctly defined.", cl_logINFO);
     NX_TEST_API_POST(&launcher, "/ec2/saveCamera", cameraData);
@@ -28,7 +28,7 @@ TEST(SaveCamera, invalidData)
     cameraData.physicalId = "non-matching physicalId";
     NX_TEST_API_POST(&launcher, "/ec2/saveCamera", cameraData,
         keepOnlyJsonFields({"id", "physicalId", "parentId", "typeId", "vendor"}),
-        nx_http::StatusCode::forbidden);
+        nx::network::http::StatusCode::forbidden);
 
     NX_LOG("[TEST] Create another camera with auto-generated id.", cl_logINFO);
     NX_TEST_API_POST(&launcher, "/ec2/saveCamera", cameraData,
@@ -41,7 +41,7 @@ TEST(SaveCamera, invalidData)
     NX_LOG("[TEST] Error case: both id and physicalId are missing.", cl_logINFO);
     NX_TEST_API_POST(&launcher, "/ec2/saveCamera", cameraData,
         keepOnlyJsonFields({/*"id",*/ /*"physicalId",*/ "parentId", "typeId", "vendor"}),
-        nx_http::StatusCode::forbidden);
+        nx::network::http::StatusCode::forbidden);
 }
 
 } // namespace test

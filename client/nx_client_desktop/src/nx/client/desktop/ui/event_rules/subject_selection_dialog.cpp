@@ -16,8 +16,8 @@
 #include <utils/common/scoped_painter_rollback.h>
 #include <nx/utils/string.h>
 
-#include <nx/client/desktop/ui/common/item_view_utils.h>
-#include <nx/client/desktop/ui/common/natural_string_sort_proxy_model.h>
+#include <nx/client/desktop/common/utils/item_view_utils.h>
+#include <nx/client/desktop/common/models/natural_string_sort_proxy_model.h>
 
 namespace nx {
 namespace client {
@@ -79,7 +79,7 @@ SubjectSelectionDialog::SubjectSelectionDialog(QWidget* parent, Qt::WindowFlags 
     ItemViewUtils::setupDefaultAutoToggle(ui->usersTreeView, UserListModel::CheckColumn);
 
     auto setupTreeView =
-        [this](QnTreeView* treeView)
+        [this](TreeView* treeView)
         {
             const QnIndents kIndents(1, 0);
             treeView->header()->setStretchLastSection(false);
@@ -108,12 +108,12 @@ SubjectSelectionDialog::SubjectSelectionDialog(QWidget* parent, Qt::WindowFlags 
             const auto filter = ui->searchLineEdit->text().trimmed();
             m_users->setFilterFixedString(filter);
             filterRoles->setFilterFixedString(filter);
-            ui->allUsersCheckableLine->setVisible(filter.isEmpty());
+            ui->allUsersCheckableLine->setVisible(m_allUsersSelectorEnabled && filter.isEmpty());
         };
 
-    connect(ui->searchLineEdit, &QnSearchLineEdit::textChanged, this, updateFilter);
-    connect(ui->searchLineEdit, &QnSearchLineEdit::enterKeyPressed, this, updateFilter);
-    connect(ui->searchLineEdit, &QnSearchLineEdit::escKeyPressed, this,
+    connect(ui->searchLineEdit, &SearchLineEdit::textChanged, this, updateFilter);
+    connect(ui->searchLineEdit, &SearchLineEdit::enterKeyPressed, this, updateFilter);
+    connect(ui->searchLineEdit, &SearchLineEdit::escKeyPressed, this,
         [this, updateFilter]()
         {
             ui->searchLineEdit->clear();
@@ -172,7 +172,8 @@ SubjectSelectionDialog::SubjectSelectionDialog(QWidget* parent, Qt::WindowFlags 
     const auto allUsersCheckStateChanged =
         [this](Qt::CheckState checkState)
         {
-            const bool checked = checkState == Qt::Checked;
+            const bool checked = m_allUsersSelectorEnabled
+                && checkState == Qt::Checked;
             ui->rolesGroupBox->setEnabled(!checked);
             ui->usersGroupBox->setEnabled(!checked);
             ui->searchLineEdit->setEnabled(!checked);
@@ -215,14 +216,14 @@ void SubjectSelectionDialog::showAllUsersChanged(bool value)
     layout()->activate();
 }
 
-void SubjectSelectionDialog::setUserValidator(Qn::UserValidator userValidator)
+void SubjectSelectionDialog::setUserValidator(UserValidator userValidator)
 {
     m_users->setUserValidator(userValidator);
     m_roles->setUserValidator(userValidator);
     validateAllUsers();
 }
 
-void SubjectSelectionDialog::setRoleValidator(Qn::RoleValidator roleValidator)
+void SubjectSelectionDialog::setRoleValidator(RoleValidator roleValidator)
 {
     m_roles->setRoleValidator(roleValidator);
 }
@@ -286,22 +287,23 @@ QSet<QnUuid> SubjectSelectionDialog::totalCheckedUsers() const
 
 bool SubjectSelectionDialog::allUsers() const
 {
-    return allUsersSelectorEnabled() && ui->allUsersCheckableLine->checked();
+    return m_allUsersSelectorEnabled && ui->allUsersCheckableLine->checked();
 }
 
 void SubjectSelectionDialog::setAllUsers(bool value)
 {
-    if (allUsersSelectorEnabled())
+    if (m_allUsersSelectorEnabled)
         ui->allUsersCheckableLine->setChecked(value);
 }
 
 bool SubjectSelectionDialog::allUsersSelectorEnabled() const
 {
-    return !ui->allUsersCheckableLine->isHidden();
+    return m_allUsersSelectorEnabled;
 }
 
 void SubjectSelectionDialog::setAllUsersSelectorEnabled(bool value)
 {
+    m_allUsersSelectorEnabled = value;
     const bool disabled = !value;
     ui->allUsersCheckableLine->setHidden(disabled);
     if (disabled)

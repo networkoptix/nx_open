@@ -79,6 +79,7 @@ private slots:
     void at_focusAutoButton_clicked();
 
     void updateOverlayWidget();
+    void updateWidgetPtzController(QnMediaResourceWidget* widget);
     void updateOverlayWidgetInternal(QnMediaResourceWidget* widget);
     void updateCapabilities(QnMediaResourceWidget* widget);
     void updateTraits(QnMediaResourceWidget* widget);

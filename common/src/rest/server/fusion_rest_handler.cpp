@@ -16,7 +16,7 @@ int QnFusionRestHandler::executePost(
     const QByteArray& /*srcBodyContentType*/, QByteArray& /*result*/,
     QByteArray& /*resultContentType*/, const QnRestConnectionProcessor* /*processor*/)
 {
-    return nx_http::StatusCode::notImplemented;
+    return nx::network::http::StatusCode::notImplemented;
 }
 
 int QnFusionRestHandler::executePut(
@@ -24,21 +24,21 @@ int QnFusionRestHandler::executePut(
     const QByteArray& /*srcBodyContentType*/, QByteArray& /*result*/,
     QByteArray& /*resultContentType*/, const QnRestConnectionProcessor* /*processor*/)
 {
-    return nx_http::StatusCode::notImplemented;
+    return nx::network::http::StatusCode::notImplemented;
 }
 
 int QnFusionRestHandler::executeGet(
     const QString& /*path*/, const QnRequestParamList& /*params*/, QByteArray& /*result*/,
     QByteArray& /*contentType*/, const QnRestConnectionProcessor* /*processor*/)
 {
-    return nx_http::StatusCode::notImplemented;
+    return nx::network::http::StatusCode::notImplemented;
 }
 
 int QnFusionRestHandler::executeDelete(
     const QString& /*path*/, const QnRequestParamList& /*params*/, QByteArray& /*result*/,
     QByteArray& /*contentType*/, const QnRestConnectionProcessor* /*processor*/)
 {
-    return nx_http::StatusCode::notImplemented;
+    return nx::network::http::StatusCode::notImplemented;
 }
 
 int QnFusionRestHandler::makeError(

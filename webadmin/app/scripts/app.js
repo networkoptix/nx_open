@@ -9,10 +9,11 @@ angular.module('webadminApp', [
     'ui.bootstrap',
     'tc.chartjs',
     'ngStorage',
-    'typeahead-focus',
-    'ui.timepicker',
     'angular-clipboard'
-]).config(function ($routeProvider) {
+]).config(['$httpProvider', function ($httpProvider) {
+    $httpProvider.defaults.xsrfCookieName = 'nx-vms-csrf-token';
+    $httpProvider.defaults.xsrfHeaderName = 'Nx-Vms-Csrf-Token';
+}]).config(['$routeProvider', function ($routeProvider) {
 
     var universalResolves = {
         currentUser: ['mediaserver',function(mediaserver){
@@ -132,4 +133,4 @@ angular.module('webadminApp', [
         .otherwise({
             redirectTo: '/'
         });
-});
+}]);

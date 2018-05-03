@@ -11,11 +11,11 @@
 #include "acti_resource.h"
 #include "acti_stream_reader.h"
 
-QnActiStreamReader::QnActiStreamReader(const QnResourcePtr& res) :
+QnActiStreamReader::QnActiStreamReader(const QnActiResourcePtr& res):
     CLServerPushStreamReader(res),
-    m_multiCodec(res)
+    m_multiCodec(res),
+    m_actiRes(res)
 {
-    m_actiRes = res.dynamicCast<QnActiResource>();
 }
 
 QnActiStreamReader::~QnActiStreamReader()
@@ -28,18 +28,52 @@ int QnActiStreamReader::getActiChannelNum() const
     return m_role == Qn::CR_LiveVideo ? 1 : 2;
 }
 
-QString QnActiStreamReader::formatResolutionStr(const QSize& resolution) const
+int QnActiStreamReader::toJpegQuality(const QnLiveStreamParams& params)
 {
-    return QString(QLatin1String("N%1x%2")).arg(resolution.width()).arg(resolution.height());
+    auto quality = params.quality;
+    if (quality == Qn::StreamQuality::undefined)
+    {
+        int srcBitrate = params.bitrateKbps;
+        int bitrateDelta = std::numeric_limits<int>::max();
+        for (int i = (int)Qn::StreamQuality::lowest; i <= (int)Qn::StreamQuality::highest; ++i)
+        {
+            QnLiveStreamParams p(params);
+            p.quality = (Qn::StreamQuality) i;
+            int bitrate = m_actiRes->suggestBitrateForQualityKbps((Qn::StreamQuality) i, params.resolution, params.fps, getRole());
+            if (abs(bitrate - srcBitrate) < bitrateDelta)
+            {
+                quality = p.quality;
+                bitrateDelta = abs(bitrate - srcBitrate);
+            }
+        }
+    }
+    switch (quality)
+    {
+        case Qn::StreamQuality::lowest:
+            return 15;
+        case Qn::StreamQuality::low:
+            return 30;
+        case Qn::StreamQuality::normal:
+            return 50;
+        case Qn::StreamQuality::high:
+            return 70;
+        case Qn::StreamQuality::highest:
+            return 80;
+        default:
+            return 50;
+    }
 }
 
-CameraDiagnostics::Result QnActiStreamReader::openStreamInternal(bool isCameraControlRequired, const QnLiveStreamParams& params)
+CameraDiagnostics::Result QnActiStreamReader::openStreamInternal(
+    bool isCameraControlRequired,
+    const QnLiveStreamParams& streamParams)
 {
     // configure stream params
-
+    QnLiveStreamParams params = streamParams;
     QString SET_RESOLUTION(QLatin1String("CHANNEL=%1&VIDEO_RESOLUTION=%2"));
     QString SET_FPS(QLatin1String("CHANNEL=%1&VIDEO_FPS_NUM=%2"));
     QString SET_BITRATE(QLatin1String("CHANNEL=%1&VIDEO_BITRATE=%2&VIDEO_MAX_BITRATE=%2"));
+    QString SET_QUALITY(QLatin1String("CHANNEL=%1&VIDEO_MJPEG_QUALITY=%2"));
     QString SET_ENCODER(QLatin1String("CHANNEL=%1&VIDEO_ENCODER=%2"));
     QString SET_STREAMING_METHOD(QLatin1String("CHANNEL=%1&STREAMING_METHOD_CURRENT=%2"));
 
@@ -50,24 +84,17 @@ CameraDiagnostics::Result QnActiStreamReader::openStreamInternal(bool isCameraCo
     const int kStreamingMethodRtpUdpMulticast = 5;
 
     m_multiCodec.setRole(m_role);
-    int fps = m_actiRes->roundFps(params.fps, m_role);
+    params.fps = m_actiRes->roundFps(params.fps, m_role);
     int ch = getActiChannelNum();
 
-    QSize resolution = m_actiRes->getResolution(m_role);
-    QString resolutionStr = formatResolutionStr(resolution);
+    QString resolutionStr = QnActiResource::formatResolutionStr(params.resolution);
 
-    int bitrate = m_actiRes->suggestBitrateKbps(params.quality, resolution, fps);
+    int bitrate = m_actiRes->suggestBitrateKbps(params, getRole());
     bitrate = m_actiRes->roundBitrate(bitrate);
     QString bitrateStr = m_actiRes->formatBitrateString(bitrate);
 
-    auto encoders = m_actiRes->getAvailableEncoders();
-    QString encoderStr;
-
-    if (encoders.contains(lit("H264")))
-        encoderStr = lit("H264");
-    else if (encoders.contains(lit("MJPEG")))
-        encoderStr = lit("MJPEG");
-    else
+    QString encoderStr = QnActiResource::toActiEncoderString(params.codec);
+    if (encoderStr.isEmpty())
         return CameraDiagnostics::CannotConfigureMediaStreamResult(lit("encoder"));
 
     auto desiredTransport = m_actiRes->getDesiredTransport();
@@ -80,15 +107,15 @@ CameraDiagnostics::Result QnActiStreamReader::openStreamInternal(bool isCameraCo
             QByteArray result = m_actiRes->makeActiRequest(
                 QLatin1String("encoder"),
                 SET_STREAMING_METHOD
-                    .arg(ch)
-                    .arg(kStreamingMethodRtpUdp),
+                .arg(ch)
+                .arg(kStreamingMethodRtpUdp),
                 status);
 
             if (status != CL_HTTP_SUCCESS)
                 return CameraDiagnostics::CannotConfigureMediaStreamResult(QLatin1String("streaming method"));
         }
 
-        QByteArray result = m_actiRes->makeActiRequest(QLatin1String("encoder"), SET_FPS.arg(ch).arg(fps), status);
+        QByteArray result = m_actiRes->makeActiRequest(QLatin1String("encoder"), SET_FPS.arg(ch).arg(params.fps), status);
         if (status != CL_HTTP_SUCCESS)
             return CameraDiagnostics::CannotConfigureMediaStreamResult(QLatin1String("fps"));
 
@@ -96,7 +123,10 @@ CameraDiagnostics::Result QnActiStreamReader::openStreamInternal(bool isCameraCo
         if (status != CL_HTTP_SUCCESS)
             return CameraDiagnostics::CannotConfigureMediaStreamResult(QLatin1String("resolution"));
 
-        result = m_actiRes->makeActiRequest(QLatin1String("encoder"), SET_BITRATE.arg(ch).arg(bitrateStr), status);
+        if (params.codec == "MJPEG")
+            result = m_actiRes->makeActiRequest(QLatin1String("encoder"), SET_QUALITY.arg(ch).arg(toJpegQuality(params)), status);
+        else
+            result = m_actiRes->makeActiRequest(QLatin1String("encoder"), SET_BITRATE.arg(ch).arg(bitrateStr), status);
         if (status != CL_HTTP_SUCCESS)
             return CameraDiagnostics::CannotConfigureMediaStreamResult(QLatin1String("bitrate"));
 
@@ -150,8 +180,8 @@ QnAbstractMediaDataPtr QnActiStreamReader::getNextData()
     if (!isStreamOpened())
         return QnAbstractMediaDataPtr(0);
 
-    if (needMetaData())
-        return getMetaData();
+    if (needMetadata())
+        return getMetadata();
 
     QnAbstractMediaDataPtr rez;
     for (int i = 0; i < 2 && !rez; ++i)

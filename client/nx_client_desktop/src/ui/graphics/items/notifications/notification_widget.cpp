@@ -8,7 +8,6 @@
 
 #include <ui/animation/opacity_animator.h>
 #include <ui/common/palette.h>
-#include <ui/common/geometry.h>
 #include <ui/common/notification_levels.h>
 #include <ui/graphics/items/generic/proxy_label.h>
 #include <ui/graphics/items/standard/graphics_label.h>
@@ -20,7 +19,7 @@
 #include <utils/common/scoped_value_rollback.h>
 #include <utils/math/color_transformations.h>
 #include <utils/media/audio_player.h>
-#include <utils/image_provider.h>
+#include <nx/client/desktop/image_providers/image_provider.h>
 
 #include <nx/fusion/model_functions.h>
 
@@ -313,7 +312,10 @@ void QnNotificationWidget::addTextButton(
     proxy->setWidget(button);
 
     auto rowLayout = new QGraphicsLinearLayout(Qt::Horizontal);
-    rowLayout->setContentsMargins(kNotificationIconWidth, 0, kHorizontalMargin, 0);
+    rowLayout->setContentsMargins(kNotificationIconWidth + m_primaryLayout->spacing(),
+        0,
+        kHorizontalMargin,
+        0);
     rowLayout->addItem(proxy);
     rowLayout->addStretch(1);
     m_verticalLayout->addItem(rowLayout);

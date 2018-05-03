@@ -10,10 +10,12 @@
 #include "variant_animator.h"
 #include "rect_animator.h"
 
+using namespace nx::client::desktop;
+
 WidgetAnimator::WidgetAnimator(
-    QGraphicsWidget* widget, 
-    const QByteArray& geometryPropertyName, 
-    const QByteArray& rotationPropertyName, 
+    QGraphicsWidget* widget,
+    const QByteArray& geometryPropertyName,
+    const QByteArray& rotationPropertyName,
     QObject* parent)
     :
     AnimatorGroup(parent),

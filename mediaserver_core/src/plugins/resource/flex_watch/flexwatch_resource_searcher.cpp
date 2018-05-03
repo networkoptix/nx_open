@@ -25,7 +25,7 @@ QnFlexWatchResourceSearcher::~QnFlexWatchResourceSearcher()
 
 void QnFlexWatchResourceSearcher::clearSocketList()
 {
-    for(AbstractDatagramSocket* sock: m_sockList)
+    for(nx::network::AbstractDatagramSocket* sock: m_sockList)
         delete sock;
     m_sockList.clear();
 }
@@ -36,9 +36,9 @@ bool QnFlexWatchResourceSearcher::updateSocketList()
     if (curretTime - m_sockUpdateTime > SOCK_UPDATE_INTERVAL)
     {
         clearSocketList();
-        for (QnInterfaceAndAddr iface: getAllIPv4Interfaces())
+        for (nx::network::QnInterfaceAndAddr iface: nx::network::getAllIPv4Interfaces())
         {
-            auto sock = SocketFactory::createDatagramSocket();
+            auto sock = nx::network::SocketFactory::createDatagramSocket();
             //if (!bindToInterface(*sock, iface, 51001)) {
             if (!sock->bind(iface.address.toString(), 51001)) {
                 continue;
@@ -54,7 +54,7 @@ bool QnFlexWatchResourceSearcher::updateSocketList()
 void QnFlexWatchResourceSearcher::sendBroadcast()
 {
     QByteArray requestPattertn("53464a001c0000000000000000000000____f850000101000000d976");
-    for (AbstractDatagramSocket* sock: m_sockList)
+    for (nx::network::AbstractDatagramSocket* sock: m_sockList)
     {
         if (shouldStop())
             break;
@@ -65,11 +65,11 @@ void QnFlexWatchResourceSearcher::sendBroadcast()
         QByteArray pattern = requestPattertn.replace("____", rndPattern);
         QByteArray request = QByteArray::fromHex(pattern);
         // sending broadcast
-        sock->sendTo(request.data(), request.size(), BROADCAST_ADDRESS, 51000);
+        sock->sendTo(request.data(), request.size(), nx::network::BROADCAST_ADDRESS, 51000);
     }
 }
 
-QList<QnResourcePtr> QnFlexWatchResourceSearcher::checkHostAddr(const QUrl& /*url*/, const QAuthenticator& /*auth*/, bool /*doMultichannelCheck*/)
+QList<QnResourcePtr> QnFlexWatchResourceSearcher::checkHostAddr(const nx::utils::Url& /*url*/, const QAuthenticator& /*auth*/, bool /*doMultichannelCheck*/)
 {
     return QList<QnResourcePtr>(); // do not duplicate resource with ONVIF discovery!
 }
@@ -85,7 +85,7 @@ QnResourceList QnFlexWatchResourceSearcher::findResources()
 
     QSet<QString> processedMac;
 
-    for (AbstractDatagramSocket* sock: m_sockList)
+    for (nx::network::AbstractDatagramSocket* sock: m_sockList)
     {
         if (shouldStop())
             return QnResourceList();
@@ -93,9 +93,9 @@ QnResourceList QnFlexWatchResourceSearcher::findResources()
         while (sock->hasData())
         {
             QByteArray datagram;
-            datagram.resize(AbstractDatagramSocket::MAX_DATAGRAM_SIZE);
+            datagram.resize(nx::network::AbstractDatagramSocket::MAX_DATAGRAM_SIZE);
 
-            SocketAddress senderEndpoint;
+            nx::network::SocketAddress senderEndpoint;
             int readed = sock->recvFrom(datagram.data(), datagram.size(), &senderEndpoint);
 
             if (readed < 4 || !datagram.startsWith("SFJ"))
@@ -109,7 +109,7 @@ QnResourceList QnFlexWatchResourceSearcher::findResources()
             if (info.manufacturer != QLatin1String("flex encoder") && !info.manufacturer.toLower().contains(QLatin1String("system")))
                 continue;
             //info.mac = QString::fromLatin1(datagram.mid(30,6).toHex());
-            info.mac = QnMacAddress((const unsigned char*) datagram.data() + 30).toString();
+            info.mac = nx::network::QnMacAddress((const unsigned char*) datagram.data() + 30).toString();
 
             if (processedMac.contains(info.mac))
                 continue;

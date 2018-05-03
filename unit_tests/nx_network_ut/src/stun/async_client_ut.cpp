@@ -5,8 +5,6 @@
 #include <nx/network/http/http_types.h>
 #include <nx/network/stun/async_client.h>
 #include <nx/network/stun/async_client_user.h>
-#include <nx/network/stun/message_dispatcher.h>
-#include <nx/network/stun/stream_socket_server.h>
 #include <nx/network/stun/stun_types.h>
 #include <nx/network/system_socket.h>
 #include <nx/network/url/url_builder.h>
@@ -15,8 +13,10 @@
 #include <nx/utils/test_support/sync_queue.h>
 
 #include "stun_async_client_acceptance_tests.h"
+#include "stun_simple_server.h"
 
 namespace nx {
+namespace network {
 namespace stun {
 namespace test {
 
@@ -28,7 +28,7 @@ class StunClient:
 public:
     StunClient()
     {
-        m_stunClient = std::make_shared<nx::stun::AsyncClient>();
+        m_stunClient = std::make_shared<nx::network::stun::AsyncClient>();
     }
 
     ~StunClient()
@@ -46,12 +46,12 @@ public:
     }
 
 protected:
-    nx::stun::MessageDispatcher& dispatcher()
+    nx::network::stun::MessageDispatcher& dispatcher()
     {
         return m_dispatcher;
     }
 
-    std::shared_ptr<nx::stun::AsyncClient> getStunClient()
+    std::shared_ptr<nx::network::stun::AsyncClient> getStunClient()
     {
         return m_stunClient;
     }
@@ -100,18 +100,19 @@ protected:
     void givenConnectedClient()
     {
         m_stunClient->connect(
-            nx::network::url::Builder().setScheme(nx::stun::kUrlSchemeName).setEndpoint(m_serverEndpoint));
+            nx::network::url::Builder().setScheme(nx::network::stun::kUrlSchemeName).setEndpoint(m_serverEndpoint));
     }
 
     void givenTcpConnectionToTheServer()
     {
         m_tcpConnectionToTheServer = std::make_unique<nx::network::TCPSocket>(AF_INET);
-        ASSERT_TRUE(m_tcpConnectionToTheServer->connect(m_server->address()));
+        ASSERT_TRUE(m_tcpConnectionToTheServer->connect(
+            m_server->address(), nx::network::kNoTimeout));
     }
-    
+
     void givenStunClientWithPredefinedConnection()
     {
-        m_stunClient = std::make_shared<nx::stun::AsyncClient>(
+        m_stunClient = std::make_shared<nx::network::stun::AsyncClient>(
             std::move(m_tcpConnectionToTheServer));
     }
 
@@ -136,7 +137,7 @@ protected:
 
     void verifyClientProcessedConnectionCloseProperly()
     {
-        ASSERT_NE(SystemError::noError, m_connectionClosedPromise.get_future().get());
+        ASSERT_NE(SystemError::noError, m_connectionClosedPromise.pop());
     }
 
     void thenResponseIsReceived()
@@ -174,7 +175,7 @@ protected:
             m_stunClient->pleaseStopSync();
             m_stunClient.reset();
         }
-        m_stunClient = std::make_shared<nx::stun::AsyncClient>();
+        m_stunClient = std::make_shared<nx::network::stun::AsyncClient>();
 
         auto url = serverUrl();
         url.setScheme(urlScheme);
@@ -184,26 +185,26 @@ protected:
 private:
     static constexpr int kNumberOfRequestsToSend = 1024;
 
-    std::shared_ptr<nx::stun::AsyncClient> m_stunClient;
-    nx::utils::promise<SystemError::ErrorCode> m_connectionClosedPromise;
+    std::shared_ptr<nx::network::stun::AsyncClient> m_stunClient;
+    nx::utils::SyncQueue<SystemError::ErrorCode> m_connectionClosedPromise;
     nx::utils::SyncQueue<SystemError::ErrorCode> m_requestResult;
     SocketAddress m_serverEndpoint;
-    nx::stun::MessageDispatcher m_dispatcher;
+    nx::network::stun::MessageDispatcher m_dispatcher;
     std::unique_ptr<stun::SocketServer> m_server;
     std::unique_ptr<nx::network::TCPSocket> m_tcpConnectionToTheServer;
 
     void closeConnection(
         std::shared_ptr<stun::AbstractServerConnection> connection,
-        nx::stun::Message /*message*/)
+        nx::network::stun::Message /*message*/)
     {
         connection->close();
     }
 
     void sendResponse(
         std::shared_ptr<stun::AbstractServerConnection> connection,
-        nx::stun::Message request)
+        nx::network::stun::Message request)
     {
-        nx::stun::Message response(
+        nx::network::stun::Message response(
             stun::Header(
                 stun::MessageClass::successResponse,
                 request.header.method,
@@ -220,7 +221,7 @@ private:
 
     void randomlyCloseConnection(
         std::shared_ptr<stun::AbstractServerConnection> connection,
-        nx::stun::Message request)
+        nx::network::stun::Message request)
     {
         if (nx::utils::random::number<int>(0, 1) > 0)
         {
@@ -228,7 +229,7 @@ private:
             return;
         }
 
-        nx::stun::Message response(
+        nx::network::stun::Message response(
             stun::Header(
                 stun::MessageClass::successResponse,
                 request.header.method,
@@ -252,14 +253,14 @@ private:
         m_stunClient->setOnConnectionClosedHandler(
             [this](SystemError::ErrorCode closeReason)
             {
-                m_connectionClosedPromise.set_value(closeReason);
+                m_connectionClosedPromise.push(closeReason);
             });
 
         ASSERT_EQ(SystemError::noError, connectToUrl(serverUrl()));
         ASSERT_EQ(m_serverEndpoint, m_stunClient->remoteAddress());
     }
 
-    SystemError::ErrorCode connectToUrl(const QUrl& url)
+    SystemError::ErrorCode connectToUrl(const nx::utils::Url& url)
     {
         nx::utils::promise<SystemError::ErrorCode> connectedPromise;
         m_stunClient->connect(
@@ -271,9 +272,9 @@ private:
         return connectedPromise.get_future().get();
     }
 
-    QUrl serverUrl() const
+    nx::utils::Url serverUrl() const
     {
-        return nx::network::url::Builder().setScheme(nx::stun::kUrlSchemeName).setEndpoint(
+        return nx::network::url::Builder().setScheme(nx::network::stun::kUrlSchemeName).setEndpoint(
             SocketAddress(HostAddress("localhost"), m_serverEndpoint.port));
     }
 
@@ -337,9 +338,9 @@ TEST_F(StunClient, only_proper_url_scheme_is_supported)
 {
     givenRegularStunServer();
 
-    assertConnectFailsIfUrlSchemeIs(nx_http::kUrlSchemeName);
-    assertConnectSucceededIfUrlSchemeIs(nx::stun::kUrlSchemeName);
-    assertConnectSucceededIfUrlSchemeIs(nx::stun::kSecureUrlSchemeName);
+    assertConnectFailsIfUrlSchemeIs(nx::network::http::kUrlSchemeName);
+    assertConnectSucceededIfUrlSchemeIs(nx::network::stun::kUrlSchemeName);
+    assertConnectSucceededIfUrlSchemeIs(nx::network::stun::kSecureUrlSchemeName);
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -395,47 +396,10 @@ TEST_F(StunClientUser, correct_cancellation)
 
 namespace {
 
-class TestServer:
-    public stun::SocketServer
-{
-    using base_type = stun::SocketServer;
-
-public:
-    TestServer():
-        base_type(&m_dispatcher, false)
-    {
-    }
-
-    ~TestServer()
-    {
-        pleaseStopSync();
-    }
-
-    QUrl getServerUrl() const
-    {
-        return nx::network::url::Builder()
-            .setScheme(nx::stun::kUrlSchemeName).setEndpoint(address());
-    }
-
-    nx::stun::MessageDispatcher& dispatcher()
-    {
-        return m_dispatcher;
-    }
-
-    void sendIndicationThroughEveryConnection(nx::stun::Message message)
-    {
-        forEachConnection(
-            nx::network::server::MessageSender<nx::stun::ServerConnection>(std::move(message)));
-    }
-
-private:
-    nx::stun::MessageDispatcher m_dispatcher;
-};
-
 struct AsyncClientTestTypes
 {
     using ClientType = stun::AsyncClient;
-    using ServerType = TestServer;
+    using ServerType = SimpleServer;
 };
 
 } // namespace
@@ -447,4 +411,5 @@ INSTANTIATE_TYPED_TEST_CASE_P(
 
 } // namespace test
 } // namespace stun
+} // namespace network
 } // namespace nx

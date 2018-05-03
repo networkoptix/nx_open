@@ -50,7 +50,7 @@
     <name>NxSearchEdit</name>
     <message>
       <source>Search</source>
-      <translation>tìm kiếm</translation>
+      <translation>Tìm kiếm</translation>
     </message>
   </context>
   <context>

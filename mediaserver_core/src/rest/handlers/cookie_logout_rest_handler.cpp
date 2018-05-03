@@ -4,14 +4,33 @@
 #include "nx/network/http/http_types.h"
 #include <nx/network/http/custom_headers.h>
 
-int QnCookieLogoutRestHandler::executeGet(const QString &, const QnRequestParams &/*params*/, QnJsonRestResult &/*result*/, const QnRestConnectionProcessor* owner)
+static const std::map<QByteArray, QByteArray> kCookies =
 {
-    QString cookieDeletePattern(lit("%1=deleted; path=/; HttpOnly; expires=Thu, 01 Jan 1970 00:00 : 00 GMT"));
+    { Qn::URL_QUERY_AUTH_KEY_NAME, "HttpOnly" },
+    { Qn::EC2_RUNTIME_GUID_HEADER_NAME, "HttpOnly" },
+    { Qn::CSRF_TOKEN_COOKIE_NAME, "" },
+};
 
-    nx_http::insertHeader(&owner->response()->headers, 
-        nx_http::HttpHeader("Set-Cookie", cookieDeletePattern.arg("auth").toUtf8()));
-    nx_http::insertHeader(&owner->response()->headers, 
-        nx_http::HttpHeader("Set-Cookie", cookieDeletePattern.arg(QLatin1String(Qn::EC2_RUNTIME_GUID_HEADER_NAME)).toUtf8()));
+void QnCookieHelper::addLogoutHeaders(nx::network::http::HttpHeaders* outHeaders)
+{
+    // TODO: Remove UUID and CSRF tocken for verification failure in
+    // QnAuthHelper::doCookieAuthorization.
+    for (const auto& cookie: kCookies)
+    {
+        QByteArray data = cookie.first;
+        data += "=deleted; Path=/";
+        if (!cookie.second.isEmpty())
+            data += "; " + cookie.second;
 
-    return nx_http::StatusCode::ok;
+        data += "; expires=Thu, 01 Jan 1970 00:00 : 00 GMT";
+        nx::network::http::insertHeader(outHeaders, nx::network::http::HttpHeader("Set-Cookie", data));
+    }
+}
+
+int QnCookieLogoutRestHandler::executeGet(
+    const QString &, const QnRequestParams &/*params*/,
+    QnJsonRestResult &/*result*/, const QnRestConnectionProcessor* owner)
+{
+    QnCookieHelper::addLogoutHeaders(&owner->response()->headers);
+    return nx::network::http::StatusCode::ok;
 }

@@ -11,12 +11,14 @@ namespace relay {
 namespace test {
 
 class BasicComponentTest:
-    public utils::test::ModuleLauncher<RelayService>,
+    public utils::test::ModuleLauncher<relay::RelayService>,
     public utils::test::TestWithTemporaryDirectory
 {
 public:
     BasicComponentTest(QString tmpDir = QString());
     ~BasicComponentTest();
+
+    nx::utils::Url basicUrl() const;
 };
 
 } // namespace test

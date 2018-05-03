@@ -23,7 +23,6 @@ namespace detail {
     const int kCheckTimeoutMs = milliseconds(minutes(20)).count();
     const int kStartPingTimeoutMs = milliseconds(minutes(1)).count();
     const int kPingIntervalMs = milliseconds(seconds(10)).count();
-    const int kShortTimeoutMs = milliseconds(minutes(1)).count();
 
     const QnSoftwareVersion kUnauthenticatedUpdateMinVersion(3, 0);
 
@@ -264,13 +263,6 @@ void QnInstallUpdatesPeerTask::at_resourceChanged(const QnResourcePtr& resource)
 
     if (peerUpdateFinished)
         removeWaitingPeer(peerId);
-
-    if (m_restartingPeers.isEmpty())
-    {
-        /* When all peers were restarted we only have to wait for saveServer transactions.
-           It shouldn't take long time. So restart timer to a short timeout. */
-        m_checkTimer->start(kShortTimeoutMs);
-    }
 }
 
 void QnInstallUpdatesPeerTask::at_checkTimer_timeout()

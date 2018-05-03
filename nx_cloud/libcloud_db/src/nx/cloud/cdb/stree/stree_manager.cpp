@@ -1,13 +1,7 @@
-/**********************************************************
-* Sep 14, 2015
-* a.kolesnikov
-***********************************************************/
-
 #include "stree_manager.h"
 
 #include <nx/utils/log/log.h>
 #include <nx/fusion/model_functions.h>
-
 
 namespace nx {
 namespace cdb {
@@ -34,8 +28,8 @@ const nx::utils::stree::ResourceNameSet& StreeManager::resourceNameSet() const
     return m_impl.resourceNameSet();
 }
 
-}   //cdb
-}   //nx
+} // namespace cdb
+} // namespace nx
 
 QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(nx::cdb, StreeOperation,
     (nx::cdb::StreeOperation::authentication, "authentication")

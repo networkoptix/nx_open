@@ -54,6 +54,10 @@ namespace desktop {
 class MimeData;
 
 namespace ui {
+
+
+namespace experimental { class MainWindow; }
+
 namespace workbench {
 
 // TODO: #Elric split this class into several handlers, group actions by handler. E.g. screen recording should definitely be spun off.
@@ -68,23 +72,16 @@ public:
 
 protected:
     struct AddToLayoutParams {
-        bool usePosition;
+        bool usePosition = false;
         QPointF position;
         QRectF zoomWindow;
         QnUuid zoomUuid;
-        qint64 time;
+        qint64 time = -1;
         QColor frameDistinctionColor;
-        qreal rotation;
+        bool zoomWindowRectangleVisible = true;
+        qreal rotation = 0.0;
         ImageCorrectionParams contrastParams;
         QnItemDewarpingParams dewarpingParams;
-
-        AddToLayoutParams() :
-            usePosition(false),
-            position(QPointF()),
-            zoomUuid(QnUuid()),
-            time(-1),
-            rotation(0)
-        {}
     };
 
     void addToLayout(const QnLayoutResourcePtr &layout, const QnResourcePtr &resource, const AddToLayoutParams &params) const;
@@ -195,7 +192,23 @@ protected slots:
     void at_cameraListChecked(int status, const QnCameraListReply& reply, int handle);
 
     void at_convertCameraToEntropix_triggered();
+
+    void at_changeDefaultCameraPassword_triggered();
+
+    void at_openNewScene_triggered();
+
 private:
+    void showSingleCameraErrorMessage(const QString& explanation = QString());
+    void showMultipleCamerasErrorMessage(
+        int totalCameras,
+        const QnVirtualCameraResourceList& camerasWithError,
+        const QString& explanation = QString());
+
+    void changeDefaultPasswords(
+        const QString& previousPassword,
+        const QnVirtualCameraResourceList& cameras,
+        bool showSingleCamera);
+
     void notifyAboutUpdate();
 
     void openFailoverPriorityDialog();
@@ -235,6 +248,8 @@ private:
     QPointer<QnAdjustVideoDialog> m_adjustVideoDialog;
     QPointer<QnSystemAdministrationDialog> m_systemAdministrationDialog;
 
+    QPointer<experimental::MainWindow> m_mainWindow;
+
     bool m_delayedDropGuard;
     /** List of serialized resources that are to be dropped on the scene once
     * the user logs in. */
@@ -258,10 +273,10 @@ private:
     struct ServerRequest
     {
         QnMediaServerResourcePtr server;
-        QUrl url;
+        nx::utils::Url url;
     };
 
-    std::multimap<QUrl, ServerRequest> m_serverRequests;
+    std::multimap<nx::utils::Url, ServerRequest> m_serverRequests;
 };
 
 } // namespace workbench

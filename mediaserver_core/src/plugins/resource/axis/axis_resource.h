@@ -1,5 +1,4 @@
-#ifndef axis_resource_h_2215
-#define axis_resource_h_2215
+#pragma once
 
 #ifdef ENABLE_AXIS
 
@@ -7,24 +6,25 @@
 #include <set>
 #include <nx/utils/thread/mutex.h>
 
-#include "core/resource/security_cam_resource.h"
-#include "core/resource/camera_resource.h"
-#include "nx/streaming/media_data_packet.h"
-#include <nx/network/http/asynchttpclient.h>
-#include <nx/network/simple_http_client.h>
 #include <api/model/api_ioport_data.h>
-#include <nx/network/http/multipart_content_parser.h>
 #include <core/resource/camera_advanced_param.h>
+#include <nx/mediaserver/resource/camera_advanced_parameters_providers.h>
+#include <nx/mediaserver/resource/camera.h>
 #include <nx/network/aio/timer.h>
+#include <nx/network/deprecated/asynchttpclient.h>
+#include <nx/network/deprecated/simple_http_client.h>
+#include <nx/network/http/multipart_content_parser.h>
+#include <nx/streaming/media_data_packet.h>
 
 class QnAxisPtzController;
 
-class QnPlAxisResource: public QnPhysicalCameraResource
+class QnPlAxisResource:
+    public nx::mediaserver::resource::Camera
 {
     Q_OBJECT
 
 public:
-    typedef QnPhysicalCameraResource base_type;
+    typedef nx::mediaserver::resource::Camera base_type;
 
     struct AxisResolution
     {
@@ -47,8 +47,6 @@ public:
 
     virtual void setIframeDistance(int frames, int timems); // sets the distance between I frames
 
-    AxisResolution getMaxResolution() const;
-    AxisResolution getNearestResolution(const QSize& resolution, float aspectRatio) const;
     float getResolutionAspectRatio(const AxisResolution& resolution) const;
 
     QRect getMotionWindow(int num) const;
@@ -56,7 +54,6 @@ public:
     bool readMotionInfo();
 
     virtual void setMotionMaskPhysical(int channel) override;
-    virtual QnConstResourceAudioLayoutPtr getAudioLayout(const QnAbstractStreamDataProvider* dataProvider) const override;
 
     virtual int getChannel() const override;
 
@@ -67,26 +64,26 @@ public:
         bool activate,
         unsigned int autoResetTimeoutMS ) override;
 
-    virtual QnAbstractPtzController *createPtzControllerInternal() override;
+    QnCameraAdvancedParamValueMap getApiParameters(const QSet<QString>& ids);
+    QSet<QString> setApiParameters(const QnCameraAdvancedParamValueMap& values);
 
-    virtual bool getParamPhysical(const QString &id, QString &value) override;
-    virtual bool getParamsPhysical(const QSet<QString> &idList, QnCameraAdvancedParamValueList& result) override;
-    virtual bool setParamPhysical(const QString &id, const QString& value) override;
-    virtual bool setParamsPhysical(const QnCameraAdvancedParamValueList &values, QnCameraAdvancedParamValueList &result) override;
-
-    AxisResolution getResolution( int encoderIndex ) const;
     virtual QnIOStateDataList ioStates() const override;
 
+    QString resolutionToString(const QSize& resolution);
+    static QString toAxisCodecString(AVCodecID codecId);
 public slots:
-    void onMonitorResponseReceived( nx_http::AsyncHttpClientPtr httpClient );
-    void onMonitorMessageBodyAvailable( nx_http::AsyncHttpClientPtr httpClient );
-    void onMonitorConnectionClosed( nx_http::AsyncHttpClientPtr httpClient );
+    void onMonitorResponseReceived( nx::network::http::AsyncHttpClientPtr httpClient );
+    void onMonitorMessageBodyAvailable( nx::network::http::AsyncHttpClientPtr httpClient );
+    void onMonitorConnectionClosed( nx::network::http::AsyncHttpClientPtr httpClient );
 
-    void onCurrentIOStateResponseReceived( nx_http::AsyncHttpClientPtr httpClient );
+    void onCurrentIOStateResponseReceived( nx::network::http::AsyncHttpClientPtr httpClient );
 
     void at_propertyChanged(const QnResourcePtr & /*res*/, const QString & key);
+
 protected:
-    virtual CameraDiagnostics::Result initInternal() override;
+    virtual QnAbstractPtzController* createPtzControllerInternal() const override;
+    virtual nx::mediaserver::resource::StreamCapabilityMap getStreamCapabilityMapFromDrives(Qn::StreamIndex streamIndex) override;
+    virtual CameraDiagnostics::Result initializeCameraDriver() override;
     virtual QnAbstractStreamDataProvider* createLiveDataProvider();
 
     virtual void setCroppingPhysical(QRect cropping);
@@ -108,8 +105,13 @@ private:
     void restartIOMonitorWithDelay();
     void startInputPortMonitoring();
     void stopInputPortMonitoringSync();
+
+    virtual std::vector<Camera::AdvancedParametersProvider*> advancedParametersProviders() override;
+    void setSupportedCodecs(const QSet<AVCodecID>& value);
+    QSet<AVCodecID> filterSupportedCodecs(const QList<QByteArray>& values) const;
 private:
     QList<AxisResolution> m_resolutionList;
+    QSet<AVCodecID> m_supportedCodecs;
 
     QMap<int, QRect> m_motionWindows;
     QMap<int, QRect> m_motionMask;
@@ -126,24 +128,23 @@ private:
         IOMonitor(Qn::IOPortType portType): portType(portType) {}
 
         Qn::IOPortType portType;
-        nx_http::AsyncHttpClientPtr httpClient;
-        std::shared_ptr<nx_http::MultipartContentParser> contentParser;
+        nx::network::http::AsyncHttpClientPtr httpClient;
+        std::shared_ptr<nx::network::http::MultipartContentParser> contentParser;
     };
 
     IOMonitor m_inputIoMonitor;
     IOMonitor m_outputIoMonitor;
     nx::network::aio::Timer m_timer;
-    nx_http::AsyncHttpClientPtr m_inputPortStateReader;
+    nx::network::http::AsyncHttpClientPtr m_inputPortStateReader;
     QVector<QString> m_ioPortIdList;
 
 
-    nx_http::AsyncHttpClientPtr m_inputPortHttpMonitor;
-    nx_http::BufferType m_currentMonitorData;
-    AxisResolution m_resolutions[SECONDARY_ENCODER_INDEX+1];
+    nx::network::http::AsyncHttpClientPtr m_inputPortHttpMonitor;
+    nx::network::http::BufferType m_currentMonitorData;
 
     QnWaitCondition m_stopInputMonitoringWaitCondition;
 
-    QnCameraAdvancedParams m_advancedParameters;
+    nx::mediaserver::resource::ApiMultiAdvancedParametersProvider<QnPlAxisResource> m_advancedParametersProvider;
 
     //!reads axis parameter, triggering url like http://ip/axis-cgi/param.cgi?action=list&group=Input.NbrOfInputs
     CLHttpStatus readAxisParameter(
@@ -163,16 +164,16 @@ private:
 
     bool enableDuplexMode() const;
 
-    bool initialize2WayAudio(CLSimpleHTTPClient* const http);
+    bool initializeAudio(CLSimpleHTTPClient* const http);
     bool initializeIOPorts( CLSimpleHTTPClient* const http );
-    void notificationReceived( const nx_http::ConstBufferRefType& notification );
+    void notificationReceived( const nx::network::http::ConstBufferRefType& notification );
     bool readPortSettings( CLSimpleHTTPClient* const http, QnIOPortDataList& ioPorts);
     bool savePortSettings(const QnIOPortDataList& newPorts, const QnIOPortDataList& oldPorts);
     QnIOPortDataList mergeIOSettings(const QnIOPortDataList& cameraIO, const QnIOPortDataList& savedIO);
     bool ioPortErrorOccured();
     void updateIOState(const QString& portId, bool isActive, qint64 timestamp, bool overrideIfExist);
     bool startIOMonitorInternal(IOMonitor& ioMonitor);
-    IOMonitor* ioMonitorByHttpClient(nx_http::AsyncHttpClientPtr httpClient);
+    IOMonitor* ioMonitorByHttpClient(nx::network::http::AsyncHttpClientPtr httpClient);
 
     /*!
         Convert port number to ID
@@ -231,7 +232,6 @@ private:
     bool loadAdvancedParametersTemplateFromFile(QnCameraAdvancedParams& params, const QString& filename);
     QSet<QString> calculateSupportedAdvancedParameters(const QnCameraAdvancedParams& allParams);
 
-
     QString getParamCmd(const QnCameraAdvancedParameter& param) const;
     QSet<QString> buildGetParamsQueries(const QList<QnCameraAdvancedParameter>& params) const;
     QString buildSetParamsQuery(const QnCameraAdvancedParamValueList& params) const;
@@ -244,10 +244,10 @@ private:
         const QList<QnCameraAdvancedParameter>& params) const;
 
     bool isMaintenanceParam(const QnCameraAdvancedParameter& param) const;
+    CameraDiagnostics::Result getParameterValue(const QString& path, QByteArray* outResult);
 
     friend class QnAxisPtzController;
     friend class AxisIOMessageBodyParser;
 };
 
 #endif // #ifdef ENABLE_AXIS
-#endif //axis_resource_h_2215

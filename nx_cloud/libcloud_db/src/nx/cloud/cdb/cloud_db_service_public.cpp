@@ -37,5 +37,10 @@ const CloudDbService* CloudDbServicePublic::impl() const
     return m_impl;
 }
 
+CloudDbService* CloudDbServicePublic::impl()
+{
+    return m_impl;
+}
+
 } // namespace cdb
 } // namespace nx

@@ -1,11 +1,11 @@
 [Desktop Entry]
-Name=${display.product.name}
-Comment=${display.product.name} Client
-Exec=/opt/${deb.customization.company.name}/client/${release.version}.${buildNumber}/bin/client %u
-Icon=vmsclient-${customization}.png
+Name=@display.product.name@
+Comment=@display.product.name@ Client
+Exec=/opt/@deb.customization.company.name@/client/@release.version@.@buildNumber@/bin/client %u
+Icon=vmsclient-@customization@.png
 Terminal=false
 Type=Application
 StartupNotify=true
-StartupWMClass=${product.name.short}
+StartupWMClass=@product.name.short@
 NoDisplay=true
-MimeType=x-scheme-handler/${uri.protocol}
+MimeType=x-scheme-handler/@uri.protocol@

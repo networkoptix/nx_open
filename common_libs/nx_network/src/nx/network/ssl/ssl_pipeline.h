@@ -13,7 +13,7 @@ namespace network {
 namespace ssl {
 
 /**
- * @note Not thread-safe.
+ * NOTE: Not thread-safe.
  */
 class NX_NETWORK_API Pipeline:
     public utils::bstream::Converter

@@ -2,7 +2,9 @@
 
 #include "abstract_msg_body_source.h"
 
-namespace nx_http {
+namespace nx {
+namespace network {
+namespace http {
 
 class NX_NETWORK_API BufferSource:
     public AbstractMsgBodySource
@@ -24,4 +26,6 @@ private:
     BufferType m_msgBody;
 };
 
-} // namespace nx_http
+} // namespace nx
+} // namespace network
+} // namespace http

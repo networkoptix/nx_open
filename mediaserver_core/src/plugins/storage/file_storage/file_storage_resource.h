@@ -16,6 +16,8 @@
 
 class QnStorageManager;
 
+namespace nx { namespace mediaserver { class RootTool; } }
+
 const QString NX_TEMP_FOLDER_NAME = QnAppInfo::productNameShort() + "_temp_folder_";
 
 class QnFileStorageResource: public QnStorageResource
@@ -62,6 +64,8 @@ public:
     static qint64 calcSpaceLimit(QnPlatformMonitor::PartitionType ptype);
 
     qint64 calcInitialSpaceLimit();
+    void setMounted(bool value);
+
 private:
 
     QString removeProtocolPrefix(const QString& url);
@@ -89,6 +93,9 @@ private:
 
     void setLocalPathSafe(const QString &path);
     QString getLocalPathSafe() const;
+    bool isMounted() const;
+    nx::mediaserver::RootTool* rootTool() const;
+
 public:
     // Try to remove old temporary dirs if any.
     // This could happen if server crashed and ~FileStorageResource
@@ -108,6 +115,7 @@ private:
     mutable boost::optional<bool> m_writeCapCached;
     mutable QnMutex      m_writeTestMutex;
     bool m_isSystem;
+    bool m_isMounted = true;
 };
 typedef QSharedPointer<QnFileStorageResource> QnFileStorageResourcePtr;
 

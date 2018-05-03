@@ -1,14 +1,47 @@
 #include "http_server.h"
 
+#include <memory>
+
+#include <nx/network/cloud/mediator/api/mediator_api_http_paths.h>
+#include <nx/network/url/url_parse_helper.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/std/cpp14.h>
 
 #include "get_listening_peer_list_handler.h"
 #include "../controller.h"
+#include "../statistics/statistics_provider.h"
 
 namespace nx {
 namespace hpm {
 namespace http {
+
+// TODO: #ak Consider moving this class to some common location.
+template<typename ResultType>
+class GetHandler:
+    public nx::network::http::AbstractFusionRequestHandler<void, ResultType>
+{
+public:
+    using FunctorType = nx::utils::MoveOnlyFunc<ResultType()>;
+
+    GetHandler(FunctorType func):
+        m_func(std::move(func))
+    {
+    }
+
+private:
+    FunctorType m_func;
+
+    virtual void processRequest(
+        nx::network::http::HttpServerConnection* const /*connection*/,
+        const nx::network::http::Request& /*request*/,
+        nx::utils::stree::ResourceContainer /*authInfo*/) override
+    {
+        auto data = m_func();
+        this->requestCompleted(nx::network::http::FusionRequestResult(), std::move(data));
+    }
+};
+
+//-------------------------------------------------------------------------------------------------
 
 Server::Server(
     const conf::Settings& settings,
@@ -34,18 +67,38 @@ void Server::listen()
                 .arg(SystemError::toString(osErrorCode)).toStdString());
     }
 
-    NX_LOGX(lit("HTTP server is listening on %1")
-        .arg(containerString(m_settings.http().addrToListenList)), cl_logALWAYS);
+    NX_ALWAYS(this, lm("HTTP server is listening on %1")
+        .args(containerString(m_multiAddressHttpServer->endpoints())));
 }
 
-nx_http::server::rest::MessageDispatcher& Server::messageDispatcher()
+void Server::stopAcceptingNewRequests()
+{
+    m_multiAddressHttpServer->pleaseStopSync();
+}
+
+nx::network::http::server::rest::MessageDispatcher& Server::messageDispatcher()
 {
     return *m_httpMessageDispatcher;
 }
 
-std::vector<SocketAddress> Server::httpEndpoints() const
+std::vector<network::SocketAddress> Server::endpoints() const
 {
-    return m_httpEndpoints;
+    return m_endpoints;
+}
+
+const Server::MultiAddressHttpServer& Server::server() const
+{
+    return *m_multiAddressHttpServer;
+}
+
+void Server::registerStatisticsApiHandlers(const stats::Provider& provider)
+{
+    using GetAllStatisticsHandler = GetHandler<stats::Statistics>;
+
+    registerApiHandler<GetAllStatisticsHandler>(
+        network::url::joinPath(api::kMediatorApiPrefix, api::kStatisticsMetricsPath).c_str(),
+        nx::network::http::Method::get,
+        std::bind(&stats::Provider::getAllStatistics, &provider));
 }
 
 bool Server::launchHttpServerIfNeeded(
@@ -55,15 +108,15 @@ bool Server::launchHttpServerIfNeeded(
 {
     NX_LOGX("Bringing up HTTP server", cl_logINFO);
 
-    m_httpMessageDispatcher = std::make_unique<nx_http::server::rest::MessageDispatcher>();
+    m_httpMessageDispatcher = std::make_unique<nx::network::http::server::rest::MessageDispatcher>();
 
     // Registering HTTP handlers.
     m_httpMessageDispatcher->registerRequestProcessor<http::GetListeningPeerListHandler>(
-        http::GetListeningPeerListHandler::kHandlerPath,
+        network::url::joinPath(api::kMediatorApiPrefix, GetListeningPeerListHandler::kHandlerPath).c_str(),
         [&]() { return std::make_unique<http::GetListeningPeerListHandler>(peerRegistrator); });
 
     m_multiAddressHttpServer =
-        std::make_unique<nx::network::server::MultiAddressServer<nx_http::HttpStreamSocketServer>>(
+        std::make_unique<nx::network::server::MultiAddressServer<nx::network::http::HttpStreamSocketServer>>(
             nullptr, //< TODO: #ak Add authentication.
             m_httpMessageDispatcher.get(),
             /*ssl required*/ false,
@@ -77,9 +130,9 @@ bool Server::launchHttpServerIfNeeded(
         return false;
     }
 
-    m_httpEndpoints = m_multiAddressHttpServer->endpoints();
+    m_endpoints = m_multiAddressHttpServer->endpoints();
     m_multiAddressHttpServer->forEachListener(
-        [&settings](nx_http::HttpStreamSocketServer* server)
+        [&settings](nx::network::http::HttpStreamSocketServer* server)
         {
             server->setConnectionKeepAliveOptions(settings.http().keepAliveOptions);
         });
@@ -89,6 +142,21 @@ bool Server::launchHttpServerIfNeeded(
         registeredPeerPool);
 
     return true;
+}
+
+template<typename Handler, typename Arg>
+void Server::registerApiHandler(
+    const char* path,
+    const nx::network::http::StringType& method,
+    Arg arg)
+{
+    m_httpMessageDispatcher->registerRequestProcessor<Handler>(
+        path,
+        [this, arg]() -> std::unique_ptr<Handler>
+        {
+            return std::make_unique<Handler>(arg);
+        },
+        method);
 }
 
 } // namespace http

@@ -9,10 +9,11 @@ class NX_NETWORK_API AppInfo
 {
 public:
     static QString realm();
-    static QString defaultCloudHost();
-    static QString defaultCloudPortalUrl();
-    static QString defaultCloudModulesXmlUrl();
+    static QString defaultCloudHostName();
+    static QString defaultCloudPortalUrl(const QString& cloudHost);
+    static QString defaultCloudModulesXmlUrl(const QString& cloudHost);
     static QString cloudName();
+    static QString shortCloudName();
     static QStringList compatibleCloudHosts();
 };
 

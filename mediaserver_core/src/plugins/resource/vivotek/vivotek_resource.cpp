@@ -177,7 +177,7 @@ bool VivotekResource::parseStreamCodecCapabilities(
     return true;
 }
 
-void VivotekResource::tuneHttpClient(nx_http::HttpClient& httpClient) const
+void VivotekResource::tuneHttpClient(nx::network::http::HttpClient& httpClient) const
 {
     auto auth = getAuth();
     httpClient.setSendTimeoutMs(kHttpTimeout.count());
@@ -206,11 +206,11 @@ bool VivotekResource::parseResponse(
 }
 
 bool VivotekResource::doVivotekRequest(
-    const QUrl& url,
+    const nx::utils::Url& url,
     QString* outParameterName,
     QString* outParameterValue) const
 {
-    nx_http::HttpClient httpClient;
+    nx::network::http::HttpClient httpClient;
     tuneHttpClient(httpClient);
 
     if (!httpClient.doGet(url))
@@ -228,7 +228,7 @@ bool VivotekResource::doVivotekRequest(
 
 boost::optional<QString> VivotekResource::getVivotekParameter(const QString& param) const
 {
-    auto url = QUrl(getUrl());
+    auto url = nx::utils::Url(getUrl());
     auto query = QUrlQuery(param);
     url.setPath(kGetParameterPath);
     url.setQuery(query);
@@ -246,7 +246,7 @@ bool VivotekResource::setVivotekParameter(
     const QString& parameterName,
     const QString& parameterValue) const
 {
-    auto url = QUrl(getUrl());
+    auto url = nx::utils::Url(getUrl());
     auto query = QUrlQuery(parameterName + lit("=") + parameterValue);
     url.setPath(kSetParameterPath);
     url.setQuery(query);

@@ -7,8 +7,6 @@
 
 #include <nx/streaming/video_data_packet.h>
 
-#include <ui/common/geometry.h>
-
 /**
  * Value class representing a single video thumbnail.
  */
@@ -64,7 +62,7 @@ public:
     }
 
     qreal aspectRatio() const {
-        return QnGeometry::aspectRatio(m_size);
+        return m_size.height() == 0 ? 0.0 : static_cast<qreal>(m_size.width()) / m_size.height();
     }
 
     qint64 time() const {

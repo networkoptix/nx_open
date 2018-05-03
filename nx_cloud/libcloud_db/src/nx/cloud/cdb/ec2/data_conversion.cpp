@@ -1,18 +1,19 @@
 #include "data_conversion.h"
 
-#include <nx/cloud/cdb/api/system_data.h>
-
 #include <nx_ec/data/api_user_data.h>
 #include <nx/fusion/serialization/lexical.h>
 
-#include <utils/common/app_info.h>
+#include <nx_ec/data/api_fwd.h>
+#include <nx/vms/api/data/id_data.h>
 
 namespace nx {
 namespace cdb {
 namespace ec2 {
 
 namespace {
+
 static const QnUuid kUserResourceTypeGuid("{774e6ecd-ffc6-ae88-0165-8f4a6d0eafa7}");
+
 } // namespace
 
 api::SystemAccessRole permissionsToAccessRole(Qn::GlobalPermissions permissions)
@@ -77,6 +78,7 @@ void convert(const api::SystemSharing& from, ::ec2::ApiUserData* const to)
     to->realm = nx::network::AppInfo::realm();
     to->hash = "password_is_in_cloud";
     to->digest = "password_is_in_cloud";
+    to->isCloud = true;
     accessRoleToPermissions(from.accessRole, &to->permissions, &to->isAdmin);
 }
 
@@ -93,7 +95,7 @@ void convert(const ::ec2::ApiUserData& from, api::SystemSharing* const to)
     to->vmsUserId = from.id.toSimpleString().toStdString();
 }
 
-void convert(const api::SystemSharing& from, ::ec2::ApiIdData* const to)
+void convert(const api::SystemSharing& from, nx::vms::api::IdData* const to)
 {
     to->id = QnUuid(from.vmsUserId);
 }

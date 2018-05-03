@@ -45,7 +45,7 @@ protected:
         if (udtSocket)
         {
             // Connect sometimes fails for unknown reason. It is some UDT problem.
-            if (!udtSocket->connect(m_udtServerSocket.getLocalAddress()))
+            if (!udtSocket->connect(m_udtServerSocket.getLocalAddress(), nx::network::kNoTimeout))
                 return false;
             char buf[kBytesToSend / 2];
             //const auto localAddress = udtSocket->getLocalAddress();

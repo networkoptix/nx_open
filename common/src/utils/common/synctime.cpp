@@ -65,6 +65,11 @@ qint64 QnSyncTime::currentUSecsSinceEpoch()
     return currentMSecsSinceEpoch() * 1000;
 }
 
+std::chrono::microseconds QnSyncTime::currentTimePoint()
+{
+    return std::chrono::microseconds(currentUSecsSinceEpoch());
+}
+
 void QnSyncTime::reset()
 {
     m_lastWarnTime = 0;

@@ -10,7 +10,7 @@
 
 class QnBusinessEventWidgetFactory {
 public:
-    static QnAbstractBusinessParamsWidget* createWidget(nx::vms::event::EventType eventType,
+    static QnAbstractBusinessParamsWidget* createWidget(nx::vms::api::EventType eventType,
                                                         QWidget* parent = 0,
                                                         QnWorkbenchContext *context = NULL);
 };

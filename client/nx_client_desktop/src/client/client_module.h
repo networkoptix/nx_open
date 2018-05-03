@@ -14,6 +14,20 @@ class QnClientCoreModule;
 class QnNetworkProxyFactory;
 class QnStaticCommonModule;
 class QnCloudStatusWatcher;
+class QnCameraDataManager;
+class QnDataProviderFactory;
+
+namespace nx {
+namespace client {
+namespace desktop {
+
+class AnalyticsMetadataProviderFactory;
+class UploadManager;
+class WearableManager;
+
+} // namespace desktop
+} // namespace client
+} // namespace nx
 
 class QnClientModule: public QObject, public Singleton<QnClientModule>
 {
@@ -28,8 +42,15 @@ public:
 
     QnNetworkProxyFactory* networkProxyFactory() const;
     QnCloudStatusWatcher* cloudStatusWatcher() const;
+    QnCameraDataManager* cameraDataManager() const;
+    QnDataProviderFactory* dataProviderFactory() const;
 
     nx::client::desktop::RadassController* radassController() const;
+
+    QnStartupParameters startupParameters() const;
+    nx::client::desktop::UploadManager* uploadManager() const;
+    nx::client::desktop::WearableManager* wearableManager() const;
+
 private:
     void initApplication();
     void initThread();
@@ -41,13 +62,21 @@ private:
     void initSkin           (const QnStartupParameters& startupParams);
     void initLocalResources (const QnStartupParameters& startupParams);
     void initLocalInfo(const QnStartupParameters& startupParams);
+    void registerResourceDataProviders();
 
 private:
+    QnStartupParameters m_startupParameters;
     QScopedPointer<QnStaticCommonModule> m_staticCommon;
     QScopedPointer<QnClientCoreModule> m_clientCoreModule;
-    QnNetworkProxyFactory* m_networkProxyFactory;
-    QnCloudStatusWatcher* m_cloudStatusWatcher;
-    nx::client::desktop::RadassController* m_radassController;
+    QScopedPointer<nx::client::desktop::AnalyticsMetadataProviderFactory>
+        m_analyticsMetadataProviderFactory;
+    QnNetworkProxyFactory* m_networkProxyFactory = nullptr;
+    QnCloudStatusWatcher* m_cloudStatusWatcher = nullptr;
+    QnCameraDataManager* m_cameraDataManager = nullptr;
+    nx::client::desktop::RadassController* m_radassController = nullptr;
+    nx::client::desktop::UploadManager* m_uploadManager = nullptr;
+    nx::client::desktop::WearableManager* m_wearableManager = nullptr;
+    QScopedPointer<QnDataProviderFactory> m_resourceDataProviderFactory;
 };
 
 #define qnClientModule QnClientModule::instance()

@@ -27,7 +27,6 @@
 
 namespace {
 
-const bool kShowPromoBar = true;
 const int kAccountFontPixelSize = 24;
 
 } // namespace
@@ -62,19 +61,19 @@ QnCloudManagementWidget::QnCloudManagementWidget(QWidget *parent):
     // TODO: #help Set help topic
 
     ui->unlinkButton->setText(tr("Disconnect System from %1",
-        "%1 is the cloud name (like 'Nx Cloud')").arg(nx::network::AppInfo::cloudName()));
+        "%1 is the cloud name (like Nx Cloud)").arg(nx::network::AppInfo::cloudName()));
     ui->goToCloudButton->setText(tr("Open %1 Portal",
-        "%1 is the cloud name (like 'Nx Cloud')").arg(nx::network::AppInfo::cloudName()));
+        "%1 is the cloud name (like Nx Cloud)").arg(nx::network::AppInfo::cloudName()));
 
     ui->createAccountButton->setText(tr("Create %1 Account",
-        "%1 is the cloud name (like 'Nx Cloud')").arg(nx::network::AppInfo::cloudName()));
+        "%1 is the cloud name (like Nx Cloud)").arg(nx::network::AppInfo::cloudName()));
     ui->linkButton->setText(tr("Connect System to %1...",
-        "%1 is the cloud name (like 'Nx Cloud')").arg(nx::network::AppInfo::cloudName()));
+        "%1 is the cloud name (like Nx Cloud)").arg(nx::network::AppInfo::cloudName()));
 
     ui->promo1TextLabel->setText(tr("Create %1\naccount",
-        "%1 is the cloud name (like 'Nx Cloud')").arg(nx::network::AppInfo::cloudName()));
+        "%1 is the cloud name (like Nx Cloud)").arg(nx::network::AppInfo::cloudName()));
     ui->promo2TextLabel->setText(tr("Connect System\nto %1",
-        "%1 is the cloud name (like 'Nx Cloud')").arg(nx::network::AppInfo::cloudName()));
+        "%1 is the cloud name (like Nx Cloud)").arg(nx::network::AppInfo::cloudName()));
     ui->promo3TextLabel->setText(tr("Connect to your Systems\nfrom anywhere with any\ndevices"));
 
     using nx::vms::utils::SystemUri;
@@ -82,39 +81,19 @@ QnCloudManagementWidget::QnCloudManagementWidget(QWidget *parent):
         SystemUri::ReferralSource::DesktopClient,
         SystemUri::ReferralContext::SettingsDialog);
 
-    const QString kLimitationsLink = makeHref(tr("Known limitations"), urlHelper.faqUrl());
-    const QString kPromoText = tr("%1 is in Beta.", "%1 is the cloud name (like 'Nx Cloud')")
-        .arg(nx::network::AppInfo::cloudName());
-
-    /* Realign content in intro panel if promo bar is shown: */
-    if (kShowPromoBar)
-    {
-        ui->promoBar->setText(kPromoText + L' ' + kLimitationsLink);
-
-        QMargins margins = ui->introLayout->contentsMargins();
-        margins.setTop(margins.top() - style::Metrics::kHeaderSize / 2);
-        ui->introLayout->setContentsMargins(margins);
-
-        ui->introSpacer->changeSize(
-            ui->introSpacer->sizeHint().width(),
-            ui->introSpacer->sizeHint().height() - style::Metrics::kHeaderSize / 2,
-            ui->introSpacer->sizePolicy().horizontalPolicy(),
-            ui->introSpacer->sizePolicy().verticalPolicy());
-    }
-
     ui->learnMoreLabel->setText(
-        makeHref(tr("Learn more about %1", "%1 is the cloud name (like 'Nx Cloud')").arg(
+        makeHref(tr("Learn more about %1", "%1 is the cloud name (like Nx Cloud)").arg(
             nx::network::AppInfo::cloudName()), urlHelper.aboutUrl()));
 
     connect(ui->goToCloudButton, &QPushButton::clicked, this,
         [this]
         {
-            QDesktopServices::openUrl(m_cloudUrlHelper->mainUrl());
+            QDesktopServices::openUrl(m_cloudUrlHelper->mainUrl().toQUrl());
         });
     connect(ui->createAccountButton, &QPushButton::clicked, this,
         [this]
         {
-            QDesktopServices::openUrl(m_cloudUrlHelper->createAccountUrl());
+            QDesktopServices::openUrl(m_cloudUrlHelper->createAccountUrl().toQUrl());
         });
 
     connect(ui->unlinkButton, &QPushButton::clicked, this, &QnCloudManagementWidget::unlinkFromCloud);

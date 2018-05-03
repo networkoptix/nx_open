@@ -13,8 +13,8 @@
 #include <nx/cloud/cdb/managers/temporary_account_password_manager.h>
 #include <nx/cloud/cdb/stree/stree_manager.h>
 #include <nx/cloud/cdb/test_support/business_data_generator.h>
+#include <nx/cloud/cdb/test_support/base_persistent_data_test.h>
 
-#include "base_persistent_data_test.h"
 #include "temporary_account_password_manager_stub.h"
 #include "../functional_tests/test_email_manager.h"
 
@@ -38,10 +38,10 @@ public:
 
         std::string accountActivationCodeExpirationTimeoutStr =
             lm("%1s").arg(rand()).toStdString();
-        std::string passwordResetCodeExpirationTimeoutStr = 
+        std::string passwordResetCodeExpirationTimeoutStr =
             lm("%1s").arg(rand()).toStdString();
         std::array<const char*, 4> args = {
-            "-accountManager/accountActivationCodeExpirationTimeout", 
+            "-accountManager/accountActivationCodeExpirationTimeout",
             accountActivationCodeExpirationTimeoutStr.c_str(),
             "-accountManager/passwordResetCodeExpirationTimeout",
             passwordResetCodeExpirationTimeoutStr.c_str()
@@ -93,7 +93,7 @@ protected:
         api::ResultCode resultCode = api::ResultCode::ok;
         std::tie(resultCode) =
             makeSyncCall<api::ResultCode>(
-                std::bind(static_cast<F>(&cdb::AccountManager::updateAccount), 
+                std::bind(static_cast<F>(&cdb::AccountManager::updateAccount),
                     m_accountManager.get(), authzInfo, accountData, _1));
         ASSERT_EQ(api::ResultCode::ok, resultCode);
     }

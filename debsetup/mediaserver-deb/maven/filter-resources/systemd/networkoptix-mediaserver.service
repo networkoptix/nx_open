@@ -1,11 +1,11 @@
-# ${company.name} Media Server
+# @company.name@ Media Server
 
 [Unit]
-Description=${company.name} Media Server
+Description=@company.name@ Media Server
 After=network.target local-fs.target remote-fs.target
 
 [Service]
-ExecStart=/opt/${deb.customization.company.name}/mediaserver/bin/mediaserver
+ExecStart=/opt/@deb.customization.company.name@/mediaserver/bin/mediaserver
 Restart=on-failure
 TimeoutStopSec=120
 KillMode=process

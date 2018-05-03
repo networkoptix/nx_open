@@ -57,6 +57,7 @@ private:
     void setShowButtonUsed(bool used);
     void updateResizerGeometry();
     void updateControlsGeometry();
+    void updatePaneWidth(qreal desiredWidth);
 
 private:
     void at_resizerWidget_geometryChanged();

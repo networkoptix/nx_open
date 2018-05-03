@@ -4,6 +4,7 @@
 #include <QtWidgets/QProxyStyle>
 #include <QtWidgets/QStyleOptionProgressBar>
 
+#include <common/common_globals.h>
 #include <ui/graphics/items/standard/graphics_style.h>
 
 class QnNoptixStyleAnimator;

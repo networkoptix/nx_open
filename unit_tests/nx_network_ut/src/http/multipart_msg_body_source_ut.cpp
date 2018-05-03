@@ -1,8 +1,3 @@
-/**********************************************************
-* May 12, 2016
-* a.kolesnikov
-***********************************************************/
-
 #include <thread>
 
 #include <gtest/gtest.h>
@@ -11,21 +6,21 @@
 #include <nx/utils/std/cpp14.h>
 #include <nx/utils/byte_stream/buffer_output_stream.h>
 
+namespace nx {
+namespace network {
+namespace http {
+namespace test {
 
-namespace nx_http {
-
-class HttpMultipartMessageBodySourceTest
-:
+class HttpMultipartMessageBodySource:
     public ::testing::Test
 {
 public:
-    HttpMultipartMessageBodySourceTest()
-    :
+    HttpMultipartMessageBodySource():
         m_eofReported(false)
     {
     }
 
-    ~HttpMultipartMessageBodySourceTest()
+    ~HttpMultipartMessageBodySource()
     {
         if (m_msgBodySource)
             m_msgBodySource->pleaseStopSync();
@@ -33,8 +28,42 @@ public:
 
 protected:
     std::unique_ptr<MultipartMessageBodySource> m_msgBodySource;
-    BufferType m_msgBody;
+    nx::Buffer m_msgBody;
     bool m_eofReported;
+    nx::Buffer m_expectedData;
+
+    void whenWriteEpilogue()
+    {
+        if (!m_msgBodySource)
+            initializeMsgBodySource();
+
+        m_expectedData += "\r\n--boundary--"; //terminating multipart body
+
+        m_msgBodySource->serializer()->writeEpilogue();
+    }
+
+    void thenSerializedDataMatchesExpectations()
+    {
+        thenSerializedMessageBodyIsEqualTo(m_expectedData);
+    }
+
+    void thenSerializedMessageBodyIsEqualTo(BufferType expectedBody)
+    {
+        while (expectedBody.startsWith(m_msgBody))
+        {
+            if (m_msgBody == expectedBody)
+                return;
+            std::this_thread::sleep_for(std::chrono::milliseconds(1));
+        }
+
+        ASSERT_EQ(expectedBody, m_msgBody);
+    }
+
+    void thenEndOfStreamIsReported()
+    {
+        while (!m_eofReported)
+            std::this_thread::sleep_for(std::chrono::milliseconds(1));
+    }
 
     void initializeMsgBodySource()
     {
@@ -47,9 +76,10 @@ protected:
 
         m_msgBodySource = std::make_unique<MultipartMessageBodySource>("boundary");
         m_msgBodySource->readAsync(
-            std::bind(&HttpMultipartMessageBodySourceTest::onSomeBodyBytesRead, this, _1, _2));
+            std::bind(&HttpMultipartMessageBodySource::onSomeBodyBytesRead, this, _1, _2));
     }
 
+private:
     void onSomeBodyBytesRead(SystemError::ErrorCode errorCode, BufferType buffer)
     {
         ASSERT_EQ(SystemError::noError, errorCode);
@@ -64,11 +94,11 @@ protected:
 
         m_msgBody += std::move(buffer);
         m_msgBodySource->readAsync(
-            std::bind(&HttpMultipartMessageBodySourceTest::onSomeBodyBytesRead, this, _1, _2));
+            std::bind(&HttpMultipartMessageBodySource::onSomeBodyBytesRead, this, _1, _2));
     }
 };
 
-TEST_F(HttpMultipartMessageBodySourceTest, general)
+TEST_F(HttpMultipartMessageBodySource, general)
 {
     for (int i = 0; i < 2; ++i)
     {
@@ -97,39 +127,29 @@ TEST_F(HttpMultipartMessageBodySourceTest, general)
         if (closeMultipartBody)
             testData += "\r\n--boundary--"; //terminating multipart body
 
-        m_msgBodySource->serializer()->beginPart("application/json", nx_http::HttpHeaders(), BufferType());
+        m_msgBodySource->serializer()->beginPart("application/json", nx::network::http::HttpHeaders(), BufferType());
         m_msgBodySource->serializer()->writeData("1xxxxxxxxxxxxx2");
-        m_msgBodySource->serializer()->beginPart("application/text", nx_http::HttpHeaders(), "3xxxxxx!");
+        m_msgBodySource->serializer()->beginPart("application/text", nx::network::http::HttpHeaders(), "3xxxxxx!");
         m_msgBodySource->serializer()->writeData("!xxxxxxx4");
-        m_msgBodySource->serializer()->writeBodyPart("text/html", nx_http::HttpHeaders(), "5xxxxxxxxxxxx6");
+        m_msgBodySource->serializer()->writeBodyPart("text/html", nx::network::http::HttpHeaders(), "5xxxxxxxxxxxx6");
 
         if (closeMultipartBody)
             m_msgBodySource->serializer()->writeEpilogue();
 
-        std::this_thread::sleep_for(std::chrono::milliseconds(200));
-
-        ASSERT_EQ(testData, m_msgBody);
+        thenSerializedMessageBodyIsEqualTo(testData);
         if (closeMultipartBody)
-        {
-            ASSERT_TRUE(m_eofReported);
-        }
+            thenEndOfStreamIsReported();
     }
 }
 
-
-TEST_F(HttpMultipartMessageBodySourceTest, onlyEpilogue)
+TEST_F(HttpMultipartMessageBodySource, onlyEpilogue)
 {
-    initializeMsgBodySource();
-
-    nx::Buffer testData;
-    testData += "\r\n--boundary--"; //terminating multipart body
-
-    m_msgBodySource->serializer()->writeEpilogue();
-
-    std::this_thread::sleep_for(std::chrono::milliseconds(100));
-
-    ASSERT_EQ(testData, m_msgBody);
-    ASSERT_TRUE(m_eofReported);
+    whenWriteEpilogue();
+    thenSerializedDataMatchesExpectations();
+    thenEndOfStreamIsReported();
 }
 
-}   //namespace nx_http
+} // namespace test
+} // namespace nx
+} // namespace network
+} // namespace http

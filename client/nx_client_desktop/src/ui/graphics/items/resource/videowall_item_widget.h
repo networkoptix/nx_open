@@ -35,6 +35,7 @@ namespace client {
 namespace desktop {
 
 class MimeData;
+class LayoutThumbnailLoader;
 
 } // namespace desktop
 } // namespace client
@@ -78,6 +79,8 @@ private:
         const QnVideoWallItem& item);
     void at_doubleClicked(Qt::MouseButton button);
 
+    void at_updateThumbnailStatus(Qn::ThumbnailStatus status);
+
     void initInfoOverlay();
 
     void updateLayout();
@@ -85,10 +88,8 @@ private:
     void updateInfo();
     void updateHud(bool animate);
 
-    /** \returns false if item image is still loading */
-    bool paintItem(QPainter *painter, const QRectF &paintRect, const QnLayoutItemData &data);
-
     bool isDragValid() const;
+
 
 private:
     friend class QnVideowallScreenWidget;
@@ -130,4 +131,11 @@ private:
     QGraphicsLinearLayout *m_headerLayout;
     GraphicsWidget *m_headerWidget;
     GraphicsLabel *m_headerLabel;
+
+    QPixmap m_layoutThumbnail;
+
+    // Status of resource loading.
+    Qn::ResourceStatusOverlay m_resourceStatus = Qn::NoDataOverlay;
+
+    std::unique_ptr<nx::client::desktop::LayoutThumbnailLoader> m_layoutThumbnailProvider;
 };

@@ -3,19 +3,22 @@
 
 #include <QtWidgets/QPushButton>
 
-#include <ui/common/aligner.h>
+#include <nx/client/desktop/common/utils/aligner.h>
 #include <utils/update/update_utils.h>
+
+using namespace nx::client::desktop;
 
 namespace {
 
-bool checkPassword(int buildNumber, const QString& password)
+bool checkPassword(const QString& build, const QString& password)
 {
 #ifdef _DEBUG
-    Q_UNUSED(buildNumber);
+    Q_UNUSED(build);
     Q_UNUSED(password);
+    qDebug() << passwordForBuild(build);
     return true;
 #else
-    return passwordForBuild((unsigned)buildNumber) == password;
+    return passwordForBuild(build) == password;
 #endif
 }
 
@@ -30,35 +33,33 @@ QnBuildNumberDialog::QnBuildNumberDialog(QWidget* parent) :
     okButton->setText(tr("Select Build"));
 
     ui->buildNumberInputField->setTitle(tr("Build Number"));
-    ui->buildNumberInputField->setValidator(
-        Qn::defaultIntValidator(0, std::numeric_limits<int>::max(), tr("Invalid build number")));
 
     ui->passwordInputField->setTitle(tr("Password"));
     ui->passwordInputField->setValidator(
         [this](const QString& password)
         {
-            int build = buildNumber();
-            if (!build)
-                return Qn::kValidResult;
+            const auto buildOrChangeset = changeset();
+            if (buildOrChangeset.isEmpty())
+                return ValidationResult::kValid;
 
-            return checkPassword(build, password)
-                ? Qn::kValidResult
-                : Qn::ValidationResult(tr("The password is incorrect."));
+            return checkPassword(buildOrChangeset, password)
+                ? ValidationResult::kValid
+                : ValidationResult(tr("The password is incorrect."));
         });
 
-    connect(ui->buildNumberInputField, &QnInputField::textChanged, this,
+    connect(ui->buildNumberInputField, &InputField::textChanged, this,
         [this, okButton](const QString& text)
         {
             if (!ui->passwordInputField->text().isEmpty())
                 ui->passwordInputField->validate();
 
-            okButton->setEnabled(text.toInt() > 0);
+            okButton->setEnabled(!text.isEmpty());
         });
 
     okButton->setEnabled(false);
 
-    auto aligner = new QnAligner(this);
-    aligner->registerTypeAccessor<QnInputField>(QnInputField::createLabelWidthAccessor());
+    auto aligner = new Aligner(this);
+    aligner->registerTypeAccessor<InputField>(InputField::createLabelWidthAccessor());
     aligner->addWidgets({
         ui->buildNumberInputField,
         ui->passwordInputField });
@@ -73,6 +74,11 @@ QnBuildNumberDialog::~QnBuildNumberDialog()
 int QnBuildNumberDialog::buildNumber() const
 {
     return ui->buildNumberInputField->text().toInt();
+}
+
+QString QnBuildNumberDialog::changeset() const
+{
+    return ui->buildNumberInputField->text().trimmed();
 }
 
 QString QnBuildNumberDialog::password() const

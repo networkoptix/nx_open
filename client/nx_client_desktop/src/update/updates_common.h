@@ -6,6 +6,7 @@
 #include <utils/common/software_version.h>
 #include <utils/common/system_information.h>
 #include <nx/utils/uuid.h>
+#include <nx/utils/url.h>
 
 struct QnCheckForUpdateResult
 {
@@ -33,7 +34,7 @@ struct QnCheckForUpdateResult
     QSet<QnSystemInformation> systems; /**< Set of supported system, for which updates were found. */
     QnSoftwareVersion version;
     bool clientInstallerRequired = false;
-    QUrl releaseNotesUrl;
+    nx::utils::Url releaseNotesUrl;
     QString description;
     QString cloudHost;
 };
@@ -114,7 +115,7 @@ struct QnUpdateFileInformation
     QString fileName;
     qint64 fileSize = 0;
     QString baseFileName;
-    QUrl url;
+    nx::utils::Url url;
     QString md5;
 
     QnUpdateFileInformation() {}
@@ -123,7 +124,7 @@ struct QnUpdateFileInformation
         version(version), fileName(fileName)
     {}
 
-    QnUpdateFileInformation(const QnSoftwareVersion &version, const QUrl &url) :
+    QnUpdateFileInformation(const QnSoftwareVersion &version, const nx::utils::Url &url) :
         version(version), url(url)
     {}
 };

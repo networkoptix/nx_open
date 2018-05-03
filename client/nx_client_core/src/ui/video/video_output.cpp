@@ -5,6 +5,8 @@
 #include <nx/media/media_player.h>
 #include "video_output_backend.h"
 
+#include <nx/utils/log/assert.h>
+
 class QnVideoOutputPrivate: public QObject
 {
     QnVideoOutput* q_ptr;
@@ -213,7 +215,7 @@ QRectF QnVideoOutput::sourceRect() const
     // from QVideoSurfaceFormat::sizeHint(), which includes pixel aspect
     // ratio and viewport.
     const auto viewportRect = d->backend->adjustedViewport();
-    Q_ASSERT(viewportRect.size() == size);
+    NX_ASSERT(viewportRect.size() == size);
     return QRectF(viewportRect.topLeft(), size);
 }
 

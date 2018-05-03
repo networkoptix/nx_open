@@ -3,6 +3,7 @@
 #include <core/resource/resource_fwd.h>
 #include <ui/dialogs/common/message_box.h>
 #include <nx/client/desktop/license/license_helpers.h>
+#include <ui/dialogs/common/session_aware_dialog.h>
 
 namespace nx {
 namespace client {
@@ -10,10 +11,11 @@ namespace desktop {
 namespace ui {
 namespace dialogs {
 
-class LicenseDeactivationReason: public QnMessageBox
+
+class LicenseDeactivationReason: public QnSessionAwareMessageBox
 {
     Q_OBJECT
-    using base_type = QnMessageBox;
+    using base_type = QnSessionAwareMessageBox;
 
 public:
     LicenseDeactivationReason(

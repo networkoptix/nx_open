@@ -10,8 +10,6 @@ StreamTransformingAsyncChannel::StreamTransformingAsyncChannel(
     :
     m_rawDataChannel(std::move(rawDataChannel)),
     m_converter(converter),
-    m_userReadBuffer(nullptr),
-    m_bytesEncodedOnPreviousStep(0),
     m_asyncReadInProgress(false)
 {
     using namespace std::placeholders;
@@ -66,13 +64,6 @@ void StreamTransformingAsyncChannel::sendAsync(
                 std::make_unique<WriteTask>(buffer, std::move(handler)));
             tryToCompleteUserTasks();
         });
-}
-
-void StreamTransformingAsyncChannel::cancelIOSync(
-    aio::EventType eventType)
-{
-    executeInAioThreadSync(std::bind(
-        &StreamTransformingAsyncChannel::cancelIoWhileInAioThread, this, eventType));
 }
 
 void StreamTransformingAsyncChannel::stopWhileInAioThread()
@@ -331,9 +322,9 @@ void StreamTransformingAsyncChannel::removeUserTask(UserTask* taskToRemove)
     }
 }
 
-void StreamTransformingAsyncChannel::cancelIoWhileInAioThread(aio::EventType eventType)
+void StreamTransformingAsyncChannel::cancelIoInAioThread(aio::EventType eventType)
 {
-    // Removing user task and cancelling operations on underlying 
+    // Removing user task and cancelling operations on underlying
     //   raw channel that are required by the task cancelled.
 
     for (auto it = m_userTaskQueue.begin(); it != m_userTaskQueue.end();)
@@ -362,6 +353,11 @@ void StreamTransformingAsyncChannel::cancelIoWhileInAioThread(aio::EventType eve
             ++it;
         }
     }
+
+    // Needed for pleaseStop to work correctly.
+    // Should be removed when AbstractStreamSocket inherits BasicPollable.
+    if (eventType == aio::EventType::etNone)
+        m_rawDataChannel->cancelIOSync(aio::EventType::etNone);
 }
 
 } // namespace aio

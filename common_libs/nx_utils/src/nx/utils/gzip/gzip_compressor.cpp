@@ -1,10 +1,6 @@
 #include "gzip_compressor.h"
 
-#if defined(Q_OS_MACX) || defined(Q_OS_ANDROID) || defined(Q_OS_IOS)
-#include <zlib.h>
-#else
-#include <QtZlib/zlib.h>
-#endif
+#include <nx/utils/crc32.h>
 
 namespace nx {
 namespace utils {
@@ -34,7 +30,7 @@ QByteArray Compressor::compressData(const QByteArray& data)
     result.reserve(cleanData.size() + GZIP_HEADER_SIZE);
     result.append((const char*) GZIP_HEADER, GZIP_HEADER_SIZE);
     result.append(cleanData);
-    quint32 tmp = crc32(0, (const Bytef*) data.data(), data.size());
+    quint32 tmp = crc32(data.data(), static_cast<std::size_t>(data.size()));
     result.append((const char*) &tmp, sizeof(quint32));
     tmp = (quint32)data.size();
     result.append((const char*) &tmp, sizeof(quint32));

@@ -2,11 +2,10 @@
 
 #include <gtest/gtest.h>
 
+#include <nx/network/cloud/mediator/api/mediator_api_http_paths.h>
 #include <nx/network/stun/async_client_with_http_tunneling.h>
 #include <nx/network/url/url_builder.h>
 #include <nx/utils/thread/sync_queue.h>
-
-#include <http/http_api_path.h>
 
 #include "functional_tests/mediator_functional_test.h"
 
@@ -19,7 +18,7 @@ class StunOverHttpTunnelling:
 {
 public:
     StunOverHttpTunnelling():
-        m_stunClient(nx::stun::AbstractAsyncClient::Settings())
+        m_stunClient(nx::network::stun::AbstractAsyncClient::Settings())
     {
     }
 
@@ -35,14 +34,15 @@ protected:
 
         m_stunClient.connect(
             nx::network::url::Builder().setScheme("http")
-                .setEndpoint(httpEndpoint()).setPath(http::kStunOverHttpTunnelPath).toUrl(),
+                .setEndpoint(httpEndpoint()).appendPath(api::kMediatorApiPrefix)
+                .appendPath(api::kStunOverHttpTunnelPath).toUrl(),
             [](SystemError::ErrorCode) {});
     }
 
     void whenIssueStunRequestThroughHttpTunnel()
     {
         using namespace std::placeholders;
-        using namespace nx::stun;
+        using namespace nx::network::stun;
 
         Message request(Header(
             MessageClass::request,
@@ -58,17 +58,17 @@ protected:
         auto response = m_messagesReceived.pop();
         ASSERT_EQ(SystemError::noError, std::get<0>(response));
         ASSERT_EQ(
-            nx::stun::MessageClass::successResponse,
+            nx::network::stun::MessageClass::successResponse,
             std::get<1>(response).header.messageClass);
     }
 
 private:
-    nx::stun::AsyncClientWithHttpTunneling m_stunClient;
-    nx::utils::SyncQueue<std::tuple<SystemError::ErrorCode, nx::stun::Message>> m_messagesReceived;
+    nx::network::stun::AsyncClientWithHttpTunneling m_stunClient;
+    nx::utils::SyncQueue<std::tuple<SystemError::ErrorCode, nx::network::stun::Message>> m_messagesReceived;
 
     void onStunResponse(
         SystemError::ErrorCode sysErrorCode,
-        nx::stun::Message responseMessage)
+        nx::network::stun::Message responseMessage)
     {
          m_messagesReceived.push(std::make_tuple(sysErrorCode, std::move(responseMessage)));
     }

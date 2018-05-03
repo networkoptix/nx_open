@@ -40,6 +40,14 @@ void QnCameraBookmarksManager::getBookmarksAsync(const QnVirtualCameraResourceSe
     d->getBookmarksAsync(cameras, filter, internalCallback);
 }
 
+int QnCameraBookmarksManager::getBookmarksAsync(const QnVirtualCameraResourceSet &cameras
+    , const QnCameraBookmarkSearchFilter &filter
+    , BookmarksInternalCallbackType callback)
+{
+    Q_D(QnCameraBookmarksManager);
+    return d->getBookmarksAsync(cameras, filter, callback);
+}
+
 void QnCameraBookmarksManager::addCameraBookmark(const QnCameraBookmark &bookmark, OperationCallbackType callback)
 {
     NX_ASSERT(bookmark.isValid(), Q_FUNC_INFO, "Invalid bookmark");

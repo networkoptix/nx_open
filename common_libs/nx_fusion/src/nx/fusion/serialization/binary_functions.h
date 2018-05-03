@@ -19,6 +19,7 @@
 #include <nx/utils/collection.h>
 #include <nx/utils/latin1_array.h>
 #include <nx/utils/uuid.h>
+#include <nx/utils/url.h>
 
 #include "collection_fwd.h"
 #include "binary.h"
@@ -333,6 +334,20 @@ bool deserialize(QnInputBinaryStream<T> *stream, QUrl *target) {
     if(!QnBinary::deserialize(stream, &tmp))
         return false;
     *target = QUrl(tmp);
+    return true;
+}
+
+template <class Output>
+void serialize(const nx::utils::Url &value, QnOutputBinaryStream<Output> *stream) {
+    QnBinary::serialize(value.toString(), stream);
+}
+
+template <class T>
+bool deserialize(QnInputBinaryStream<T> *stream, nx::utils::Url *target) {
+    QString tmp;
+    if(!QnBinary::deserialize(stream, &tmp))
+        return false;
+    *target = nx::utils::Url(tmp);
     return true;
 }
 

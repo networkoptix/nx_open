@@ -51,7 +51,8 @@ static QString qSizeToString(const QSize& size)
 class MockVideoDecoder: public AbstractVideoDecoder
 {
 public:
-    MockVideoDecoder(const ResourceAllocatorPtr& /*allocator*/, const QSize& /*resolution*/)
+    MockVideoDecoder(
+        const RenderContextSynchronizerPtr& /*synchronizer*/, const QSize& /*resolution*/)
     {
     }
 
@@ -164,6 +165,7 @@ private:
     int m_channelCount = 1;
 };
 
+//TODO: Use <test_support/resource/camera_resource_stup.h> instead.
 class MockCamera: public QnVirtualCameraResource
 {
 public:
@@ -185,7 +187,7 @@ public:
     /** Either resolution can be empty - the corresponding stream will not be created. */
     void setStreams(QSize highResolution, QSize lowResolution)
     {
-        removeProperty(Qn::CAMERA_MEDIA_STREAM_LIST_PARAM_NAME);
+        setProperty(Qn::CAMERA_MEDIA_STREAM_LIST_PARAM_NAME, QString());
 
         // For mock camera, use a codec that will never match any reasonable transcoding codec.
         static const int kCodec = /*102400*/ AV_CODEC_ID_PROBE;
@@ -225,9 +227,9 @@ public:
     virtual QString getDriverName() const override { return lit("MockCamera"); }
     virtual void setIframeDistance(int /*frames*/, int /*timems*/) override {}
     virtual Qn::ResourceStatus getStatus() const override { return Qn::Online; }
-    virtual Qn::LicenseType licenseType() const override { return m_cameraType; }
 
 protected:
+    virtual Qn::LicenseType calculateLicenseType() const override { return m_cameraType; }
     virtual QnAbstractStreamDataProvider *createLiveDataProvider() override { return nullptr; }
 
 private:
@@ -238,13 +240,13 @@ private:
 
         for (const auto& stream: mediaStreams().streams)
         {
-            if (stream.encoderIndex == CameraMediaStreamInfo::PRIMARY_STREAM_INDEX) //< High
+            if (stream.getEncoderIndex() == Qn::StreamIndex::primary) //< High
             {
                 NX_LOG(lit("[TEST] Camera High stream: %1 x %2, AVCodecID %3")
                     .arg(stream.getResolution().width()).arg(stream.getResolution().height())
                     .arg(stream.codec), cl_logDEBUG1);
             }
-            else if (stream.encoderIndex == CameraMediaStreamInfo::SECONDARY_STREAM_INDEX) //< Low
+            else if (stream.getEncoderIndex() == Qn::StreamIndex::secondary) //< Low
             {
                 NX_LOG(lit("[TEST] Camera Low stream: %1 x %2, AVCodecID %3")
                     .arg(stream.getResolution().width()).arg(stream.getResolution().height())

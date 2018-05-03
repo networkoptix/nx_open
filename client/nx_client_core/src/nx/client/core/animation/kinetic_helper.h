@@ -108,15 +108,21 @@ public:
 
         m_moves.append(Move(targetValue, m_timer.elapsed() + fakeTimeShift));
 
-        T sum = m_moves.last().first - m_moves.first().first;
-        qreal time = m_moves.last().second - m_moves.first().second;
+        const T sum = m_moves.last().first - m_moves.first().first;
+        const qreal time = m_moves.last().second - m_moves.first().second;
 
-        m_startSpeed = qBound(m_minSpeed, sum / time, m_maxSpeed);
+        if (qFuzzyIsNull(time))
+        {
+            m_state = Stopped;
+        }
+        else
+        {
+            m_startSpeed = qBound(m_minSpeed, sum / time, m_maxSpeed);
+            m_startValue = m_value = targetValue;
 
-        m_startValue = m_value = targetValue;
-
-        m_state = qAbs(m_startSpeed) < m_epsilonSpeed ? Stopped : Moving;
-        m_timer.restart();
+            m_state = qAbs(m_startSpeed) < m_epsilonSpeed ? Stopped : Moving;
+            m_timer.restart();
+        }
     }
 
     void flick(T targetValue, qreal speed)

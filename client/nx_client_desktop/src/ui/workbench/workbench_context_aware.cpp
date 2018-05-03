@@ -3,72 +3,81 @@
 #include <QtCore/QObject>
 #include <QtWidgets/QGraphicsItem>
 #include <QtWidgets/QGraphicsScene>
+#include <QtQml/QtQml>
 
 #include <utils/common/warnings.h>
+#include <ui/widgets/main_window.h>
 
 #include "workbench_context.h"
 
 using namespace nx::client::desktop::ui;
 
-QnWorkbenchContextAware::QnWorkbenchContextAware(QObject* parent, bool lazyInitialization):
-    m_context(nullptr),
-    m_initialized(false)
+QString QnWorkbenchContextAware::kQmlContextPropertyName(lit("workbenchContext"));
+
+QnWorkbenchContextAware::QnWorkbenchContextAware(QObject* parent, InitializationMode initMode):
+    m_parent(parent),
+    m_initializationMode(initMode)
 {
-    init(parent, lazyInitialization);
+    if (m_initializationMode == InitializationMode::instant)
+        init(parent);
 }
 
-QnWorkbenchContextAware::QnWorkbenchContextAware(QnWorkbenchContext *context):
-    m_context(nullptr),
-    m_initialized(false)
+QnWorkbenchContextAware::QnWorkbenchContextAware(QnWorkbenchContext* context)
 {
     init(context);
 }
 
-QnWorkbenchContextAware::QnWorkbenchContextAware(QObject *parent,
-    QnWorkbenchContext *context)
-    :
-    m_context(nullptr),
-    m_initialized(false)
+QnWorkbenchContextAware::~QnWorkbenchContextAware()
 {
-    init(context ? context : parent);
 }
 
-void QnWorkbenchContextAware::initializeContext(QObject *parent)
+QnWorkbenchContext* QnWorkbenchContextAware::context() const
 {
-    NX_ASSERT(!m_initialized, Q_FUNC_INFO, "Double initialization");
-    init(parent);
-}
-
-void QnWorkbenchContextAware::initializeContext(QnWorkbenchContext *context)
-{
-    NX_ASSERT(!m_initialized, Q_FUNC_INFO, "Double initialization");
-    init(context);
-}
-
-void QnWorkbenchContextAware::init(QObject *parent, bool lazyInitialization)
-{
-    while (true)
+    if (!m_context && m_parent && m_initializationMode != InitializationMode::instant)
     {
-        if (!lazyInitialization)
-            NX_ASSERT(parent, Q_FUNC_INFO, "Invalid parent. Use lazy initialization if you want to make ui widgets context-aware.");
-        if (!parent && lazyInitialization)
-            return;
+        const auto mutableThis = const_cast<QnWorkbenchContextAware*>(this);
 
-        QnWorkbenchContextAware *contextAware = dynamic_cast<QnWorkbenchContextAware *>(parent);
-        if (contextAware != NULL)
+        if (m_initializationMode == InitializationMode::lazy)
+            mutableThis->init(m_parent);
+        else if (m_initializationMode == InitializationMode::qmlContext)
+            mutableThis->initFromQmlContext();
+    }
+
+    NX_ASSERT(m_context, Q_FUNC_INFO, "Initialization failed.");
+
+    return m_context;
+}
+
+bool QnWorkbenchContextAware::isContextInitialized() const
+{
+    return m_context != nullptr;
+}
+
+void QnWorkbenchContextAware::initializeContext()
+{
+    NX_ASSERT(m_initializationMode == InitializationMode::manual);
+    NX_ASSERT(!m_context, Q_FUNC_INFO, "Double initialization.");
+    NX_ASSERT(m_parent);
+    init(m_parent);
+}
+
+void QnWorkbenchContextAware::init(QObject* parent)
+{
+    while (parent)
+    {
+        if (const auto contextAware = dynamic_cast<QnWorkbenchContextAware*>(parent))
         {
-            m_context = contextAware->context();
-            NX_ASSERT(m_context, Q_FUNC_INFO, "Invalid context");
-            m_initialized = true;
-            afterContextInitialized();
+            if (contextAware->isContextInitialized())
+            {
+                m_context = contextAware->context();
+                afterContextInitialized();
+            }
             return;
         }
 
-        QnWorkbenchContext *context = dynamic_cast<QnWorkbenchContext *>(parent);
-        if (context != NULL)
+        if (const auto context = dynamic_cast<QnWorkbenchContext*>(parent))
         {
             m_context = context;
-            m_initialized = true;
             afterContextInitialized();
             return;
         }
@@ -79,80 +88,95 @@ void QnWorkbenchContextAware::init(QObject *parent, bool lazyInitialization)
         }
         else
         {
-            if (QGraphicsItem *parentItem = dynamic_cast<QGraphicsItem *>(parent))
-            {
+            if (const auto parentItem = qobject_cast<QGraphicsItem*>(parent))
                 parent = parentItem->scene();
-            }
-            else if (QWidget* parentWidget = dynamic_cast<QWidget*>(parent))
-            {
+            else if (const auto parentWidget = qobject_cast<QWidget*>(parent))
                 parent = parentWidget->parentWidget();
-            }
             else
-            {
-                parent = NULL;
-            }
+                parent = nullptr;
         }
     }
+
+    NX_ASSERT(parent, Q_FUNC_INFO,
+        "Invalid parent. Use lazy initialization if you want to make ui widgets context-aware.");
 }
 
-void QnWorkbenchContextAware::init(QnWorkbenchContext *context)
+void QnWorkbenchContextAware::init(QnWorkbenchContext* context)
 {
-    NX_ASSERT(context, Q_FUNC_INFO, "Invalid context");
-    NX_ASSERT(!m_context, Q_FUNC_INFO, "Double context initialization");
+    NX_ASSERT(context, Q_FUNC_INFO, "Invalid context.");
+    NX_ASSERT(!m_context, Q_FUNC_INFO, "Double context initialization.");
     m_context = context;
-    m_initialized = true;
     afterContextInitialized();
+}
+
+void QnWorkbenchContextAware::initFromQmlContext()
+{
+    if (m_context)
+        return;
+
+    NX_ASSERT(m_initializationMode == InitializationMode::qmlContext);
+    if (m_initializationMode != InitializationMode::qmlContext)
+        return;
+
+    NX_ASSERT(m_parent, Q_FUNC_INFO,
+        "QML context based initialization requires parent to be set.");
+
+    const auto qmlContext = ::qmlContext(m_parent);
+    if (!qmlContext)
+        return;
+
+    const auto workbenchContext =
+        qmlContext->contextProperty(kQmlContextPropertyName).value<QnWorkbenchContext*>();
+
+    if (workbenchContext)
+        init(workbenchContext);
 }
 
 void QnWorkbenchContextAware::afterContextInitialized()
 {
-    //do nothing
 }
 
-QAction *QnWorkbenchContextAware::action(const action::IDType id) const
+QAction* QnWorkbenchContextAware::action(const action::IDType id) const
 {
-    NX_ASSERT(m_initialized, Q_FUNC_INFO, "Initialization failed");
     return context()->action(id);
 }
 
 action::Manager* QnWorkbenchContextAware::menu() const
 {
-    NX_ASSERT(m_initialized, Q_FUNC_INFO, "Initialization failed");
     return context()->menu();
 }
 
-QnWorkbench *QnWorkbenchContextAware::workbench() const
+QnWorkbench* QnWorkbenchContextAware::workbench() const
 {
-    NX_ASSERT(m_initialized, Q_FUNC_INFO, "Initialization failed");
     return context()->workbench();
 }
 
-QnWorkbenchLayoutSnapshotManager *QnWorkbenchContextAware::snapshotManager() const
+QnWorkbenchLayoutSnapshotManager* QnWorkbenchContextAware::snapshotManager() const
 {
-    NX_ASSERT(m_initialized, Q_FUNC_INFO, "Initialization failed");
     return context()->snapshotManager();
 }
 
-QnWorkbenchAccessController *QnWorkbenchContextAware::accessController() const
+QnWorkbenchAccessController* QnWorkbenchContextAware::accessController() const
 {
-    NX_ASSERT(m_initialized, Q_FUNC_INFO, "Initialization failed");
     return context()->accessController();
 }
 
-QnWorkbenchDisplay *QnWorkbenchContextAware::display() const
+QnWorkbenchDisplay* QnWorkbenchContextAware::display() const
 {
-    NX_ASSERT(m_initialized, Q_FUNC_INFO, "Initialization failed");
     return context()->display();
 }
 
-QnWorkbenchNavigator *QnWorkbenchContextAware::navigator() const
+QnWorkbenchNavigator* QnWorkbenchContextAware::navigator() const
 {
-    NX_ASSERT(m_initialized, Q_FUNC_INFO, "Initialization failed");
     return context()->navigator();
 }
 
-QWidget *QnWorkbenchContextAware::mainWindow() const
+MainWindow* QnWorkbenchContextAware::mainWindow() const
 {
-    NX_ASSERT(m_initialized, Q_FUNC_INFO, "Initialization failed");
     return context()->mainWindow();
+}
+
+QWidget* QnWorkbenchContextAware::mainWindowWidget() const
+{
+    return mainWindow();
 }

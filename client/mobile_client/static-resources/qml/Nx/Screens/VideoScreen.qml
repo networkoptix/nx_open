@@ -183,7 +183,9 @@ PageBase
                         "activeQuality": player.videoQuality,
                         "customQualities": customQualities,
                         "availableVideoQualities":
-                            player.availableVideoQualities(allVideoQualities)
+                            player.availableVideoQualities(allVideoQualities),
+                        "transcodingSupportStatus":
+                            player.transcodingStatus()
                     }
                 )
 
@@ -221,6 +223,7 @@ PageBase
         id: video
 
         y: -header.height
+        x: -mainWindow.leftPadding
         width: mainWindow.width
         height: mainWindow.height
 
@@ -254,7 +257,7 @@ PageBase
     Component
     {
         id: fisheyeVideoComponent
-        FisheyeVideo 
+        FisheyeVideo
         {
             mediaPlayer: videoScreenController.mediaPlayer
             resourceHelper: videoScreenController.resourceHelper
@@ -266,10 +269,11 @@ PageBase
     Image
     {
         id: screenshot
-        width: parent.width
+        width: mainWindow.width
         height: width * sourceSize.height / sourceSize.width
         y: (mainWindow.height - height) / 3 - header.height
-        visible: status == Image.Ready
+        x: -mainWindow.leftPadding
+        visible: status == Image.Ready && !dummyLoader.visible
         opacity: d.cameraUiOpacity
     }
 
@@ -297,7 +301,14 @@ PageBase
         Loader
         {
             id: dummyLoader
-            anchors.fill: parent
+
+            readonly property bool needOffset: item && item.onlyCompactTitleIsVisible
+
+            y: needOffset ? -header.height : 0
+            x: -mainWindow.leftPadding
+            width: mainWindow.width
+            height: mainWindow.height - toolBar.statusBarHeight - (needOffset ? 0 : header.height)
+
             visible: active
             active: d.cameraWarningVisible
 
@@ -305,16 +316,26 @@ PageBase
             {
                 VideoDummy
                 {
-                    y: -header.height
-                    width: mainWindow.width
-                    height: mainWindow.height
+                    readonly property bool onlyCompactTitleIsVisible:
+                        compact && title != "" && description == "" && buttonText == ""
+
+                    rightPadding: 8 + mainWindow.rightPadding
+                    leftPadding: 8 + mainWindow.leftPadding
+                    compact: videoScreen.height < 540
                     state: videoScreenController.dummyState
+
+                    MouseArea
+                    {
+                        anchors.fill: parent
+                        onClicked: toggleUi()
+                    }
                 }
             }
         }
 
         Image
         {
+            x: -mainWindow.leftPadding
             width: mainWindow.width
             height: sourceSize.height
             anchors.bottom: parent.bottom
@@ -413,6 +434,9 @@ PageBase
         {
             id: moveOnTapOverlay
 
+            x: -mainWindow.leftPadding
+            width: mainWindow.width
+            height: mainWindow.height
             parent: videoScreen
         }
 
@@ -499,7 +523,7 @@ PageBase
         color: ColorTheme.base3
         width: mainWindow.width - parent.width
         height: video.height
-        anchors.left: parent.right
+        x: mainWindow.leftPadding ? -mainWindow.leftPadding : parent.width
         anchors.top: video.top
         opacity: Math.min(navigationLoader.opacity, d.cameraUiOpacity)
     }

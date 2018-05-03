@@ -82,14 +82,7 @@ ZoomableFlickable
 
     function fitToBounds()
     {
-        if (content.sourceSize.width <= 0 || content.sourceSize.height <= 0)
-        {
-            resizeContent(width, height, false, true)
-            return
-        }
-
-        var size = content.boundedSize(width, height)
-        resizeContent(size.width, size.height, false, true)
+        resizeContent(width, height, false, true)
     }
 
     function clear()

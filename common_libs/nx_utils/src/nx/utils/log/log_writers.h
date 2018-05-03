@@ -68,6 +68,15 @@ private:
     std::vector<QString> m_messages;
 };
 
+/**
+ * Does nothing, all messages are lost.
+ */
+class NX_UTILS_API NullDevice: public AbstractWriter
+{
+public:
+    virtual void write(Level level, const QString& message) override;
+};
+
 } // namespace log
 } // namespace utils
 } // namespace nx

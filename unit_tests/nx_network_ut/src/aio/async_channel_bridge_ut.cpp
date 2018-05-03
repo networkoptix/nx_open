@@ -66,7 +66,7 @@ protected:
         createChannel(AsyncChannel::InputDepletionPolicy::ignore);
         m_bridge->start(std::bind(&AioAsyncChannelBridge::onBridgeDone, this, std::placeholders::_1));
     }
-    
+
     void givenIdleBridge()
     {
         initializeFixedDataInput();
@@ -121,7 +121,7 @@ protected:
     {
         m_leftFile->setErrorState();
     }
-    
+
     void assertBridgeIsDoneDueToError()
     {
         ASSERT_NE(SystemError::noError, m_bridgeDone.get_future().get());
@@ -291,17 +291,18 @@ public:
 
     virtual void readSomeAsync(
         nx::Buffer* const /*buffer*/,
-        std::function<void(SystemError::ErrorCode, size_t)> /*handler*/) override
+        IoCompletionHandler /*handler*/) override
     {
     }
 
     virtual void sendAsync(
         const nx::Buffer& /*buffer*/,
-        std::function<void(SystemError::ErrorCode, size_t)> /*handler*/) override
+        IoCompletionHandler /*handler*/) override
     {
     }
 
-    virtual void cancelIOSync(EventType /*eventType*/) override
+protected:
+    virtual void cancelIoInAioThread(EventType /*eventType*/) override
     {
     }
 

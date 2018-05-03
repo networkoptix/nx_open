@@ -26,7 +26,17 @@ public:
         m_connection = std::make_shared<TestTcpConnection>();
     }
 
+    ~ListeningPeerPool()
+    {
+        m_connection->pleaseStopSync();
+    }
+
 protected:
+    void givenPoolWithConnections()
+    {
+        whenInsertPeer();
+    }
+
     void whenInsertPeer()
     {
         m_listeningPeerPool->insertAndLockPeerData(
@@ -34,11 +44,24 @@ protected:
             MediaserverData());
     }
 
+    void whenCloseAllConnections()
+    {
+        m_connection->close();
+    }
+
+    void whenDeletePool()
+    {
+        m_listeningPeerPool.reset();
+    }
+
     void thenConnectionInactivityTimeoutIsSetProperly()
     {
-        ASSERT_EQ(
-            m_settings.connectionInactivityTimeout,
-            m_connection->inactivityTimeout());
+        ASSERT_EQ(m_settings.connectionInactivityTimeout, m_connection->inactivityTimeout());
+    }
+
+    void thenProcessDoesNotCrash()
+    {
+        // TODO
     }
 
 private:
@@ -51,6 +74,18 @@ TEST_F(ListeningPeerPool, sets_connection_inactivity_timeout)
 {
     whenInsertPeer();
     thenConnectionInactivityTimeoutIsSetProperly();
+}
+
+TEST_F(
+    ListeningPeerPool,
+    connection_closed_event_issued_after_ListeningPeerPool_destruction_does_not_crash_process)
+{
+    givenPoolWithConnections();
+
+    whenDeletePool();
+    whenCloseAllConnections();
+
+    thenProcessDoesNotCrash();
 }
 
 } // namespace test

@@ -80,7 +80,7 @@ void QnClientCoreSettings::writeValueToSettings(
         }
         case KnownServerUrls:
         {
-            auto list = value.value<QList<QUrl>>();
+            auto list = value.value<QList<nx::utils::Url>>();
             processedValue = QString::fromUtf8(QJson::serialized(list));
             break;
         }
@@ -94,7 +94,7 @@ void QnClientCoreSettings::writeValueToSettings(
 QVariant QnClientCoreSettings::readValueFromSettings(
     QSettings* settings,
     int id,
-    const QVariant& defaultValue)
+    const QVariant& defaultValue) const
 {
     auto baseValue = base_type::readValueFromSettings(settings, id, defaultValue);
     switch (id)
@@ -124,7 +124,7 @@ QVariant QnClientCoreSettings::readValueFromSettings(
 
         case KnownServerUrls:
             return qVariantFromValue(
-                QJson::deserialized<QList<QUrl>>(baseValue.toByteArray()));
+                QJson::deserialized<QList<nx::utils::Url>>(baseValue.toByteArray()));
 
         default:
             break;

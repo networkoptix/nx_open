@@ -1,11 +1,11 @@
 #include "url_helper.h"
 
-QnUrlHelper::QnUrlHelper(const QUrl& url):
+QnUrlHelper::QnUrlHelper(const nx::utils::Url &url):
     m_url(url)
 {
 }
 
-QUrl QnUrlHelper::url() const
+nx::utils::Url QnUrlHelper::url() const
 {
     return m_url;
 }
@@ -52,9 +52,9 @@ QString QnUrlHelper::path() const
     return m_url.path();
 }
 
-QUrl QnUrlHelper::cleanUrl() const
+nx::utils::Url QnUrlHelper::cleanUrl() const
 {
-    QUrl url;
+    nx::utils::Url url;
     url.setScheme(m_url.scheme());
     url.setHost(m_url.host());
     url.setPort(m_url.port());

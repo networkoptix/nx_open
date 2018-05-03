@@ -13,6 +13,7 @@
 #include "abstract_server_connection.h"
 
 namespace nx {
+namespace network {
 namespace stun {
 
 class MessageDispatcher;
@@ -40,7 +41,7 @@ public:
     ~ServerConnection();
 
     virtual void sendMessage(
-        nx::stun::Message message,
+        nx::network::stun::Message message,
         std::function<void(SystemError::ErrorCode)> handler) override;
     virtual nx::network::TransportProtocol transportProtocol() const override;
     virtual SocketAddress getSourceAddress() const override;
@@ -67,4 +68,5 @@ private:
 };
 
 } // namespace stun
+} // namespace network
 } // namespace nx

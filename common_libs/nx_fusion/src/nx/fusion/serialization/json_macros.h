@@ -32,6 +32,9 @@ struct BriefChecker
     bool operator()(const std::vector<U>& value) const { return value.empty(); }
 
     template<class U>
+    bool operator()(const std::set<U>& value) const { return value.empty(); }
+
+    template<class U>
     bool operator()(const QList<U>& value) const { return value.empty(); }
 
     bool operator()(const QString& value) const { return value.isEmpty(); }
@@ -122,7 +125,6 @@ private:
     static DeprecatedFieldNames* getDeprecatedFieldNamesSfinae(const T& target,
         decltype(&T::getDeprecatedFieldNames) /*enable_if_member_exists*/)
     {
-        QN_UNUSED(target); //< Suppress inappropriate MSVC warning C4100.
         return target.getDeprecatedFieldNames();
     }
 
@@ -203,7 +205,6 @@ private:
 #endif
 QN_FUSION_REGISTER_SERIALIZATION_VISITORS(QJsonValue, QJsonDetail::SerializationVisitor, QJsonDetail::DeserializationVisitor)
 
-
 #define QN_FUSION_DEFINE_FUNCTIONS_json_lexical(TYPE, ... /* PREFIX */)         \
 __VA_ARGS__ void serialize(QnJsonContext*, const TYPE &value, QJsonValue* target) { \
     *target = QnLexical::serialized(value);                                     \
@@ -213,7 +214,6 @@ __VA_ARGS__ bool deserialize(QnJsonContext*, const QJsonValue& value, TYPE* targ
     QString string;                                                             \
     return QJson::deserialize(value, &string) && QnLexical::deserialize(string, target); \
 }
-
 
 #define QN_FUSION_DEFINE_FUNCTIONS_json(TYPE, ... /* PREFIX */)                 \
 __VA_ARGS__ void serialize(QnJsonContext* ctx, const TYPE& value, QJsonValue* target) { \

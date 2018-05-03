@@ -1,16 +1,8 @@
-/**********************************************************
-* Jul 20, 2015
-* a.kolesnikov
-***********************************************************/
-
-#ifndef FUNCTOR_PROXY_HELPER_H
-#define FUNCTOR_PROXY_HELPER_H
+#pragma once
 
 #include <functional>
 
-
-namespace nx
-{
+namespace nx {
 
     //TODO #ak refactor following code using variadic template when available
 
@@ -115,6 +107,5 @@ namespace nx
         Arg1 COMMA Arg2 COMMA Arg3 COMMA Arg4,
         COMMA Arg1 COMMA Arg2 COMMA Arg3 COMMA Arg4,
         COMMA std::placeholders::_1 COMMA std::placeholders::_2 COMMA std::placeholders::_3 COMMA std::placeholders::_4 )
-}
 
-#endif  //FUNCTOR_PROXY_HELPER_H
+} // namespace nx

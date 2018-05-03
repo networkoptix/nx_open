@@ -16,7 +16,7 @@ class QnTwoStepFileDialog : public QnButtonBoxDialog
     typedef QnButtonBoxDialog base_type;
 
 public:
-    explicit QnTwoStepFileDialog(QWidget *parent = 0, const QString &caption = QString(),
+    explicit QnTwoStepFileDialog(QWidget *parent, const QString &caption = QString(),
                                  const QString &initialFile = QString(), const QString &filter = QString());
     ~QnTwoStepFileDialog();
 

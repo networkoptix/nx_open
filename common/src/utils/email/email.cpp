@@ -44,7 +44,7 @@ static QnSmtpPresets smtpServerPresetPresets;
 static bool smtpInitialized = false;
 
 QnEmailSmtpServerPreset::QnEmailSmtpServerPreset() :
-    connectionType(QnEmail::Unsecure),
+    connectionType(QnEmail::ConnectionType::unsecure),
     port(0)
 {}
 
@@ -55,7 +55,7 @@ QnEmailSmtpServerPreset::QnEmailSmtpServerPreset(const QString &server, QnEmail:
 {}
 
 QnEmailSettings::QnEmailSettings() :
-    connectionType(QnEmail::Unsecure),
+    connectionType(QnEmail::ConnectionType::unsecure),
     port(0),
     timeout(defaultSmtpTimeout),
     simple(true)
@@ -70,8 +70,10 @@ int QnEmailSettings::defaultPort(QnEmail::ConnectionType connectionType)
 {
     switch (connectionType)
     {
-        case QnEmail::Ssl: return sslPort;
-        case QnEmail::Tls: return tlsPort;
+        case QnEmail::ConnectionType::ssl:
+            return sslPort;
+        case QnEmail::ConnectionType::tls:
+            return tlsPort;
         default:
             return unsecurePort;
     }
@@ -197,8 +199,6 @@ void QnEmailAddress::initSmtpPresets() const
         qWarning() << "Smtp Presets file could not be parsed!";
     smtpInitialized = true;
 }
-
-QN_DEFINE_METAOBJECT_ENUM_LEXICAL_FUNCTIONS(QnEmail, ConnectionType);
 
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(
     (QnEmailSmtpServerPreset)(QnEmailSettings), (json)(eq), _Fields)

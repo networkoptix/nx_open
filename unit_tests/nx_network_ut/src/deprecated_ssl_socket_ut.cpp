@@ -4,9 +4,79 @@
 #include <nx/network/ssl_socket.h>
 #include <nx/network/system_socket.h>
 #include <nx/network/test_support/simple_socket_test_helper.h>
+#include <nx/network/test_support/stream_socket_acceptance_tests.h>
 
 namespace nx {
 namespace network {
+
+#if 0
+namespace test {
+
+namespace {
+
+template<bool allowNonSecureConnect>
+class SslServerSocket:
+    public deprecated::SslServerSocket
+{
+public:
+    SslServerSocket(int ipVersion = AF_INET):
+        deprecated::SslServerSocket(
+            std::make_unique<TCPServerSocket>(ipVersion),
+            allowNonSecureConnect)
+    {
+    }
+};
+
+class SslOverTcpStreamSocket:
+    public deprecated::SslSocket
+{
+public:
+    SslOverTcpStreamSocket(int ipVersion = AF_INET):
+        deprecated::SslSocket(std::make_unique<TCPSocket>(ipVersion), false)
+    {
+    }
+};
+
+struct DeprecatedSslServerAndNonSslClientTypeSet
+{
+    using ClientSocket = TCPSocket;
+    using ServerSocket = SslServerSocket</*allowNonSecureConnect*/ true>;
+};
+
+struct DeprecatedSslSocketNonSecureConnectionsAreAllowedTypeSet
+{
+    using ClientSocket = SslOverTcpStreamSocket;
+    using ServerSocket = SslServerSocket</*allowNonSecureConnect*/ true>;
+};
+
+struct DeprecatedSslSocketNonSecureConnectionsAreForbiddenTypeSet
+{
+    using ClientSocket = SslOverTcpStreamSocket;
+    using ServerSocket = SslServerSocket</*allowNonSecureConnect*/ false>;
+};
+
+} // namespace
+
+INSTANTIATE_TYPED_TEST_CASE_P(
+    DeprecatedSslServerAndNonSslClient,
+    StreamSocketAcceptance,
+    DeprecatedSslServerAndNonSslClientTypeSet);
+
+INSTANTIATE_TYPED_TEST_CASE_P(
+    DeprecatedSslSocketNonSecureConnectionsAreAllowed,
+    StreamSocketAcceptance,
+    DeprecatedSslSocketNonSecureConnectionsAreAllowedTypeSet);
+
+INSTANTIATE_TYPED_TEST_CASE_P(
+    DeprecatedSslSocketNonSecureConnectionsAreForbidden,
+    StreamSocketAcceptance,
+    DeprecatedSslSocketNonSecureConnectionsAreForbiddenTypeSet);
+
+} // namespace test
+#endif
+
+//-------------------------------------------------------------------------------------------------
+
 namespace deprecated {
 namespace test {
 
@@ -24,6 +94,8 @@ NX_NETWORK_BOTH_SOCKET_TEST_CASE(
     TEST, DeprecatedSslEnforcedTcpSockets,
     [](){ return std::make_unique<deprecated::SslServerSocket>(std::make_unique<TCPServerSocket>(AF_INET), false); },
     [](){ return std::make_unique<deprecated::SslSocket>(std::make_unique<TCPSocket>(AF_INET), false); });
+
+//-------------------------------------------------------------------------------------------------
 
 namespace {
 
@@ -84,7 +156,7 @@ protected:
         bool val = false;
         ASSERT_FALSE(m_sslSocket->getNonBlockingMode(&val));
     }
-    
+
     void thenSetNonBlockingModeFails()
     {
         ASSERT_FALSE(m_sslSocket->setNonBlockingMode(true));
@@ -105,7 +177,7 @@ private:
 TEST_F(DeprecatedSslSocket, error_on_changing_underlying_socket_mode_is_properly_handled)
 {
     givenSslSocketWithBrokenUnderlyingSocket();
-    
+
     thenGetNonBlockingModeFails();
     thenSetNonBlockingModeFails();
     thenReadAsyncFails();

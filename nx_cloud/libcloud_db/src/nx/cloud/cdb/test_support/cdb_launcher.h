@@ -27,13 +27,12 @@ class CdbLauncher:
     public nx::utils::db::test::TestWithDbHelper
 {
 public:
-    //!Calls \a start
     CdbLauncher(QString tmpDir = QString());
     ~CdbLauncher();
 
     virtual bool waitUntilStarted() override;
 
-    SocketAddress endpoint() const;
+    network::SocketAddress endpoint() const;
 
     nx::cdb::api::ConnectionFactory* connectionFactory();
     std::unique_ptr<nx::cdb::api::Connection> connection(
@@ -219,6 +218,11 @@ public:
         const std::string& systemId,
         ::ec2::ApiTransactionDataList* const transactions);
     api::ResultCode getStatistics(api::Statistics* const statistics);
+
+    api::ResultCode mergeSystems(
+        const AccountWithPassword& account,
+        const std::string& systemToMergeTo,
+        const std::string& systemBeingMerged);
 
     bool isStartedWithExternalDb() const;
     bool placePreparedDB(const QString& dbDumpPath);

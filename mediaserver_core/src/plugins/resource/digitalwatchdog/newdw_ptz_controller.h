@@ -5,6 +5,7 @@
 
 #include <QtCore/QScopedPointer>
 #include <core/ptz/basic_ptz_controller.h>
+#include <nx/mediaserver/resource/resource_fwd.h>
 
 class QnPlWatchDogResource;
 

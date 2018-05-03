@@ -5,7 +5,7 @@
 #include <limits>
 #include <array>
 
-#include <client/client_runtime_settings.h>
+#include <ini.h>
 
 #include <QtCore/QDateTime>
 #include <QtCore/QCoreApplication>
@@ -27,7 +27,6 @@
 #include <text/time_strings.h>
 
 #include <ui/animation/opacity_animator.h>
-#include <ui/common/geometry.h>
 #include <ui/style/globals.h>
 #include <ui/style/helper.h>
 #include <ui/graphics/items/controls/bookmarks_viewer.h>
@@ -39,6 +38,7 @@
 #include <ui/processors/drag_processor.h>
 #include <ui/utils/bookmark_merge_helper.h>
 #include <nx/client/desktop/ui/workbench/workbench_animations.h>
+#include <nx/client/core/utils/geometry.h>
 
 #include <ui/help/help_topics.h>
 
@@ -49,6 +49,7 @@
 #include <utils/math/math.h>
 #include <utils/math/color_transformations.h>
 
+using nx::client::core::Geometry;
 
 namespace
 {
@@ -181,6 +182,12 @@ namespace
 
     const int kNoThumbnailsFontPixelSize = 16;
 
+    // Timeline border area width in pixels where single click will auto-scroll the timeline
+    static constexpr int kAutoShiftAreaWidth = 64;
+
+    // Auto-scroll will move the timeline such way, so cursor will be 180 pixels away from border.
+    static constexpr int kAutoShiftOffsetWidth = 180;
+
     QTime msecsToTime(qint64 msecs)
     {
         return QTime(0, 0, 0, 0).addMSecs(msecs);
@@ -236,7 +243,7 @@ namespace
     template<class Data>
     void drawCroppedData(QPainter* painter, const QRectF& target, const QRectF& cropTarget, const Data& data, const QRectF& source, QRectF* drawnTarget = nullptr)
     {
-        MarginsF targetMargins(
+        QMarginsF targetMargins(
             qMax(0.0, cropTarget.left() - target.left()),
             qMax(0.0, cropTarget.top() - target.top()),
             qMax(0.0, target.right() - cropTarget.right()),
@@ -248,7 +255,7 @@ namespace
         if (targetMargins.isNull())
             erodedTarget = target;
         else
-            erodedTarget = QnGeometry::eroded(target, targetMargins);
+            erodedTarget = Geometry::eroded(target, targetMargins);
 
         if (!erodedTarget.isValid())
         {
@@ -256,8 +263,8 @@ namespace
         }
         else
         {
-            MarginsF sourceMargins = QnGeometry::cwiseMul(QnGeometry::cwiseDiv(targetMargins, target.size()), source.size());
-            QRectF erodedSource = QnGeometry::eroded(source, sourceMargins);
+            QMarginsF sourceMargins = Geometry::cwiseMul(Geometry::cwiseDiv(targetMargins, target.size()), source.size());
+            QRectF erodedSource = Geometry::eroded(source, sourceMargins);
 
             drawData(painter, erodedTarget, data, erodedSource);
         }
@@ -274,6 +281,14 @@ namespace
     void drawCroppedImage(QPainter* painter, const QRectF& target, const QRectF& cropTarget, const QImage& image, const QRectF& source, QRectF* drawnTarget = nullptr)
     {
         drawCroppedData(painter, target, cropTarget, image, source, drawnTarget);
+    }
+
+    int qBoundWorkaround(int min, int value, int max)
+    {
+        // We can't use qBound here since it looks like an error exist in MacOs compiler
+        // which causes exception. Thus we have to use this wrokaround function to
+        // avoid crash.
+        return std::max(min, std::min(max, value));
     }
 
 } // anonymous namespace
@@ -1190,7 +1205,8 @@ void QnTimeSlider::setSelection(qint64 start, qint64 end)
         m_selectionStart = start;
         m_selectionEnd = end;
 
-        emit selectionChanged(m_selectionStart, m_selectionEnd);
+        if (isSelectionValid())
+            emit selectionChanged(QnTimePeriod::fromInterval(m_selectionStart, m_selectionEnd));
     }
 }
 
@@ -1201,10 +1217,17 @@ bool QnTimeSlider::isSelectionValid() const
 
 void QnTimeSlider::setSelectionValid(bool valid)
 {
-    m_selectionValid = valid;
-
     if (!m_selectionValid)
         m_selectionInitiated = false;
+
+    if (m_selectionValid == valid)
+        return;
+
+    m_selectionValid = valid;
+
+    emit selectionChanged(m_selectionValid
+        ? QnTimePeriod::fromInterval(m_selectionStart, m_selectionEnd)
+        : QnTimePeriod());
 }
 
 QnThumbnailsLoader* QnTimeSlider::thumbnailsLoader() const
@@ -1481,7 +1504,8 @@ QColor QnTimeSlider::tickmarkTextColor(int level) const
     if (m_colors.tickmarkText.empty())
         return QColor(255, 255, 255, 255);
 
-    return m_colors.tickmarkText[qBound(0, level, static_cast<int>(m_colors.tickmarkText.size() - 1))];
+    const int maxIndex = m_colors.tickmarkText.size() - 1;
+    return m_colors.tickmarkText[qBoundWorkaround(0, level, maxIndex)];
 }
 
 QRectF QnTimeSlider::thumbnailsRect() const
@@ -1724,10 +1748,12 @@ void QnTimeSlider::updateToolTipVisibilityInternal(bool animated)
     if (!canBeVisible)
         animated = false;
 
-    bool visible = canBeVisible && m_tooltipVisible;
+    const bool visible = canBeVisible && m_tooltipVisible;
+    if (visible == actualToolTipVisibility())
+        return;
 
     if (visible)
-        showToolTip(animated);
+        showToolTip(false); //< Always show tooltip immediately.
     else
         hideToolTip(animated);
 }
@@ -2258,6 +2284,8 @@ void QnTimeSlider::paint(QPainter* painter, const QStyleOptionGraphicsItem* , QW
 
         /* Draw lines background (that is, time periods). */
         lineTop = lineBarRect.top();
+        QnTimePeriodList extraContent;
+
         for (int line = 0; line < m_lineCount; line++)
         {
             qreal lineHeight = lineUnit * effectiveLineStretch(line);
@@ -2265,11 +2293,24 @@ void QnTimeSlider::paint(QPainter* painter, const QStyleOptionGraphicsItem* , QW
                 continue;
 
             QRectF lineRect(lineBarRect.left(), lineTop, lineBarRect.width(), lineHeight);
+            switch (m_selectedExtraContent)
+            {
+                case Qn::MotionContent:
+                    extraContent = m_lineData[line].timeStorage.aggregated(Qn::MotionContent);
+                    break;
+
+                case Qn::AnalyticsContent:
+                    extraContent = m_lineData[line].timeStorage.aggregated(Qn::AnalyticsContent);
+                    break;
+
+                default:
+                    extraContent = QnTimePeriodList();
+            }
 
             drawPeriodsBar(
                 painter,
                 m_lineData[line].timeStorage.aggregated(Qn::RecordingContent),
-                m_lineData[line].timeStorage.aggregated(Qn::MotionContent),
+                extraContent,
                 lineRect);
 
             lineTop += lineHeight;
@@ -2309,7 +2350,7 @@ void QnTimeSlider::paint(QPainter* painter, const QStyleOptionGraphicsItem* , QW
 
         const auto pixmapSize = pixmap.size() / pixmap.devicePixelRatio();
         QRectF fullRect(lineBarRect.left() + kLineLabelPaddingPixels, lineTop, pixmapSize.width(), lineHeight);
-        QRectF centeredRect = QnGeometry::aligned(pixmapSize, fullRect);
+        QRectF centeredRect = Geometry::aligned(pixmapSize, fullRect);
 
         painter->drawPixmap(centeredRect, pixmap, pixmap.rect());
 
@@ -2456,7 +2497,7 @@ void QnTimeSlider::drawMarker(QPainter* painter, qint64 pos, const QColor& color
     painter->drawLine(QPointF(x, rect().top()), QPointF(x, rect().bottom()));
 }
 
-void QnTimeSlider::drawPeriodsBar(QPainter* painter, const QnTimePeriodList& recorded, const QnTimePeriodList& motion, const QRectF& rect)
+void QnTimeSlider::drawPeriodsBar(QPainter* painter, const QnTimePeriodList& recorded, const QnTimePeriodList& extra, const QRectF& rect)
 {
     qint64 minimumValue = this->windowStart();
     qint64 maximumValue = this->windowEnd();
@@ -2467,7 +2508,7 @@ void QnTimeSlider::drawPeriodsBar(QPainter* painter, const QnTimePeriodList& rec
 
     /* Note that constness of period lists is important here as requesting
      * iterators from a non-const object will result in detach. */
-    const QnTimePeriodList periods[Qn::TimePeriodContentCount] = {recorded, motion};
+    const QnTimePeriodList periods[Qn::TimePeriodContentCount] = {recorded, extra};
 
     QnTimePeriodList::const_iterator pos[Qn::TimePeriodContentCount];
     QnTimePeriodList::const_iterator end[Qn::TimePeriodContentCount];
@@ -2703,8 +2744,8 @@ void QnTimeSlider::drawThumbnails(QPainter* painter, const QRectF& rect)
         QSizeF labelSizeBound = rect.size();
         labelSizeBound.setHeight(m_noThumbnailsPixmap.height());
 
-        QRect labelRect = QnGeometry::aligned(QnGeometry::expanded(
-            QnGeometry::aspectRatio(m_noThumbnailsPixmap.size()), labelSizeBound,
+        QRect labelRect = Geometry::aligned(Geometry::expanded(
+            Geometry::aspectRatio(m_noThumbnailsPixmap.size()), labelSizeBound,
             Qt::KeepAspectRatio), rect, Qt::AlignCenter).toRect();
 
         drawCroppedPixmap(painter, labelRect, rect, m_noThumbnailsPixmap, m_noThumbnailsPixmap.rect());
@@ -2718,7 +2759,7 @@ void QnTimeSlider::drawThumbnails(QPainter* painter, const QRectF& rect)
     if (thumbnailsLoader()->thumbnailSize().isEmpty())
         return;
 
-    qreal aspectRatio = QnGeometry::aspectRatio(thumbnailsLoader()->thumbnailSize());
+    qreal aspectRatio = Geometry::aspectRatio(thumbnailsLoader()->thumbnailSize());
     qreal thumbnailWidth = rect.height() * aspectRatio;
 
     if (!m_oldThumbnailData.isEmpty() || m_thumbnailsUpdateTimer->isActive())
@@ -2784,7 +2825,7 @@ void QnTimeSlider::drawThumbnail(QPainter* painter, const ThumbnailData& data, c
         qreal a = data.selection;
         qreal width = 1.0 + a * 2.0;
         QColor color = linearCombine(1.0 - a, QColor(255, 255, 255, 32), a, m_colors.selectionMarker); // TODO: #Elric customize
-        rect = QnGeometry::eroded(rect, width / 2.0);
+        rect = Geometry::eroded(rect, width / 2.0);
 
         painter->setPen(QPen(color, width));
         painter->setBrush(Qt::NoBrush);
@@ -3305,6 +3346,27 @@ void QnTimeSlider::mouseReleaseEvent(QGraphicsSceneMouseEvent* event)
 
     dragProcessor()->mouseReleaseEvent(this, event);
 
+    if (m_dragIsClick && event->button() == Qt::LeftButton)
+    {
+        const auto pos = valueFromPosition(event->pos());
+
+        const auto allowedOffset = m_msecsPerPixel * kAutoShiftAreaWidth;
+        const auto targetOffset = m_msecsPerPixel * kAutoShiftOffsetWidth;
+        const auto leftOffset = pos - m_windowStart;
+        const auto rightOffset = m_windowEnd - pos;
+
+        if (leftOffset <= allowedOffset)
+        {
+            // Shift window to the left (negative).
+            shiftWindow(leftOffset - targetOffset, true);
+        }
+        else if (rightOffset <= allowedOffset)
+        {
+            // Shift window to the right (positive).
+            shiftWindow(targetOffset - rightOffset, true);
+        }
+    }
+
     if (m_options.testFlag(LeftButtonSelection) && m_options.testFlag(ClearSelectionOnClick)
         && m_dragMarker == CreateSelectionMarker && !m_selectionInitiated)
     {
@@ -3424,7 +3486,7 @@ void QnTimeSlider::dragMove(DragInfo* info)
             [this]()
             {
                 const auto redragCallback = [this]() { dragProcessor()->redrag(); };
-                executeDelayedParented(redragCallback, kDefaultDelay, this);
+                executeDelayedParented(redragCallback, this);
             };
 
         if (left < 0)
@@ -3491,4 +3553,18 @@ void QnTimeSlider::finishDragProcess(DragInfo* info)
 
     setSliderDown(false);
     m_dragDelta = QPointF();
+}
+
+Qn::TimePeriodContent QnTimeSlider::selectedExtraContent() const
+{
+    return m_selectedExtraContent;
+}
+
+void QnTimeSlider::setSelectedExtraContent(Qn::TimePeriodContent value)
+{
+    if (m_selectedExtraContent == value)
+        return;
+
+    m_selectedExtraContent = value;
+    update();
 }

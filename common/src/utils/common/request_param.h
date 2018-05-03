@@ -80,6 +80,11 @@ public:
         base_type::push_back(qMakePair(key, value));
     }
 
+    void insert(const QnListMap &other) {
+        for (const auto &pair: other)
+            insert(pair.first, pair.second);
+    }
+
     QHash<Key, Value> toHash() const {
         QHash<Key, Value> result;
         for(const QPair<Key, Value> &pair: *this)
@@ -97,14 +102,14 @@ typedef QnListMap<QByteArray, QByteArray> QnReplyHeaderList;
 typedef QHash<QString, QString> QnRequestParams;
 
 /** NOTE: If identical param names exist in url, the first one is taken. */
-QnRequestParams requestParamsFromUrl(const QUrl& url);
+QnRequestParams requestParamsFromUrl(const nx::utils::Url& url);
 
 struct QnHTTPRawResponse
 {
     QnHTTPRawResponse();
     QnHTTPRawResponse(
         SystemError::ErrorCode sysErrorCode,
-        const nx_http::StatusLine& statusLine,
+        const nx::network::http::StatusLine& statusLine,
         const QByteArray& contentType,
         const QByteArray& msgBody);
 
@@ -118,7 +123,7 @@ private:
     QNetworkReply::NetworkError sysErrorCodeToNetworkError(
         SystemError::ErrorCode errorCode);
     QNetworkReply::NetworkError httpStatusCodeToNetworkError(
-        nx_http::StatusCode::Value statusCode);
+        nx::network::http::StatusCode::Value statusCode);
 };
 
 Q_DECLARE_METATYPE(QnRequestParamList); /* Also works for QnRequestHeaderList. */

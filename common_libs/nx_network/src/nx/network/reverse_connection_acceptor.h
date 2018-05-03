@@ -8,13 +8,14 @@
 #include <nx/utils/system_error.h>
 #include <nx/utils/thread/mutex.h>
 
+#include "aio/aio_service.h"
 #include "aio/basic_pollable.h"
 #include "socket_global.h"
 
 namespace nx {
 namespace network {
 
-using ReverseConnectionCompletionHandler = 
+using ReverseConnectionCompletionHandler =
     nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode)>;
 
 class AbstractAcceptableReverseConnection
@@ -31,19 +32,19 @@ public:
 /**
  * Server-side implementation of "reverse connection" technique.
  * That means: server establishes connection(s) to the client and waits for client
- *   to begin using that connection. 
- * When client begins using connection, this class provides connection to the caller 
+ *   to begin using that connection.
+ * When client begins using connection, this class provides connection to the caller
  *   by acceptAsync or getNextConnectionIfAny methods.
  *
- * Connection is ready to be accepted when it has triggered handler 
- *   passed to AbstractAcceptableReverseConnection::waitForOriginatorToStartUsingConnection 
+ * Connection is ready to be accepted when it has triggered handler
+ *   passed to AbstractAcceptableReverseConnection::waitForOriginatorToStartUsingConnection
  *   with SystemError::noError code.
  * Always keeps specified number of connections alive.
- * @param AcceptableReverseConnection MUST implement 
+ * @param AcceptableReverseConnection MUST implement
  *   AbstractAcceptableReverseConnection and aio::BasicPollable.
  * NOTE: This class follows behavior of AbstractStreamSocketAcceptor, though not implements it.
  * NOTE: Does not implement accept timeout. If you need it, consider using aio::Timer.
- * NOTE: If AbstractAcceptableReverseConnection::waitForOriginatorToStartUsingConnection reports error, 
+ * NOTE: If AbstractAcceptableReverseConnection::waitForOriginatorToStartUsingConnection reports error,
  *   that error is passed to the scheduled acceptAsync call.
  */
 template<typename AcceptableReverseConnection>
@@ -53,19 +54,19 @@ class ReverseConnectionAcceptor:
     using base_type = aio::BasicPollable;
 
 public:
-    using AcceptCompletionHandler = 
+    using AcceptCompletionHandler =
         nx::utils::MoveOnlyFunc<
-            void(SystemError::ErrorCode, 
+            void(SystemError::ErrorCode,
                 std::unique_ptr<AcceptableReverseConnection>)>;
-    
-    using ConnectionFactoryFunc = 
+
+    using ConnectionFactoryFunc =
         nx::utils::MoveOnlyFunc<std::unique_ptr<AcceptableReverseConnection>()>;
 
     constexpr static std::size_t kDefaultPreemptiveConnectionCount = 7;
     constexpr static std::size_t kDefaultMaxReadyConnectionCount = 32;
 
     /**
-     * @param connectionFactory connectionFactory() must return 
+     * @param connectionFactory connectionFactory() must return
      *   std::unique_ptr<AcceptableReverseConnection>.
      */
     ReverseConnectionAcceptor(ConnectionFactoryFunc connectionFactory):
@@ -97,7 +98,7 @@ public:
     }
 
     /**
-     * When ready-to-use connection count is greater or equal to this value, 
+     * When ready-to-use connection count is greater or equal to this value,
      * then creation of new connections is stopped until there is more room in the queue.
      */
     void setReadyConnectionQueueSize(std::size_t count)
@@ -151,8 +152,8 @@ public:
     }
 
     /**
-     * @return null if connection could not been accepted. 
-     * Use SystemError::getLastOsErrorCode() to get error code. 
+     * @return null if connection could not been accepted.
+     * Use SystemError::getLastOsErrorCode() to get error code.
      * If accepted connections queue is empty, error code is set to SystemError::wouldBlock.
      */
     std::unique_ptr<AcceptableReverseConnection> getNextConnectionIfAny()
@@ -246,7 +247,7 @@ private:
 
         connectionIter->state = ConnectionState::connected;
 
-        if (m_acceptedConnections.size() + connectionsBeingAcceptedCount() >= 
+        if (m_acceptedConnections.size() + connectionsBeingAcceptedCount() >=
             m_maxReadyConnectionCount)
         {
             // Waiting for some room in m_acceptedConnections.

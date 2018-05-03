@@ -21,8 +21,8 @@ public:
     {
     }
 
-    QSharedPointer<AbstractStreamSocket> dstSocket;
-    QUrl lastConnectedUrl;
+    QSharedPointer<nx::network::AbstractStreamSocket> dstSocket;
+    nx::utils::Url lastConnectedUrl;
     std::chrono::milliseconds connectTimeout;
     ec2::TransactionMessageBusAdapter* messageBus;
 	std::chrono::steady_clock::time_point lastIoTimePoint;

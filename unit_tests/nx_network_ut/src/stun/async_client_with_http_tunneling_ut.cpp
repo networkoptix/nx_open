@@ -10,8 +10,10 @@
 
 #include "stun_async_client_acceptance_tests.h"
 #include "stun_over_http_server_fixture.h"
+#include "stun_simple_server.h"
 
 namespace nx {
+namespace network {
 namespace stun {
 namespace test {
 
@@ -64,12 +66,12 @@ protected:
             });
         ASSERT_EQ(SystemError::noError, connected.get_future().get());
     }
-    
+
     void whenConnectToRegularStunServer()
     {
         nx::utils::promise<SystemError::ErrorCode> done;
         m_client.connect(
-            network::url::Builder().setScheme(nx::stun::kUrlSchemeName).setEndpoint(m_stunServer.address()),
+            network::url::Builder().setScheme(nx::network::stun::kUrlSchemeName).setEndpoint(m_stunServer.address()),
             [&done](SystemError::ErrorCode sysErrorCode)
             {
                 done.set_value(sysErrorCode);
@@ -87,7 +89,7 @@ protected:
         auto response = m_responses.pop();
         ASSERT_EQ(SystemError::noError, std::get<0>(response));
         ASSERT_EQ(
-            nx::stun::MessageClass::successResponse,
+            nx::network::stun::MessageClass::successResponse,
             std::get<1>(response).header.messageClass);
     }
 
@@ -98,12 +100,12 @@ protected:
 
 private:
     stun::AsyncClientWithHttpTunneling m_client;
-    nx::utils::SyncQueue<std::tuple<SystemError::ErrorCode, nx::stun::Message>> m_responses;
-    nx::stun::SocketServer m_stunServer;
+    nx::utils::SyncQueue<std::tuple<SystemError::ErrorCode, nx::network::stun::Message>> m_responses;
+    nx::network::stun::SocketServer m_stunServer;
 
     void onResponseReceived(
         SystemError::ErrorCode sysErrorCode,
-        nx::stun::Message response)
+        nx::network::stun::Message response)
     {
         m_responses.push(std::make_tuple(sysErrorCode, std::move(response)));
     }
@@ -132,19 +134,31 @@ TEST_F(AsyncClientWithHttpTunneling, regular_stun_connection)
 
 namespace {
 
-struct AsyncClientWithHttpTunnelingTestTypes
+struct StunAsyncClientWithHttpTunnelingVsHttpServerTestTypes
 {
     using ClientType = stun::AsyncClientWithHttpTunneling;
     using ServerType = StunOverHttpServer;
 };
 
+struct StunAsyncClientWithHttpTunnelingVsStunServerTestTypes
+{
+    using ClientType = stun::AsyncClientWithHttpTunneling;
+    using ServerType = SimpleServer;
+};
+
 } // namespace
 
 INSTANTIATE_TYPED_TEST_CASE_P(
-    StunAsyncClientWithHttpTunneling,
+    StunAsyncClientWithHttpTunnelingVsHttpServer,
     StunAsyncClientAcceptanceTest,
-    AsyncClientWithHttpTunnelingTestTypes);
+    StunAsyncClientWithHttpTunnelingVsHttpServerTestTypes);
+
+INSTANTIATE_TYPED_TEST_CASE_P(
+    StunAsyncClientWithHttpTunnelingVsStunServer,
+    StunAsyncClientAcceptanceTest,
+    StunAsyncClientWithHttpTunnelingVsStunServerTestTypes);
 
 } // namespace test
 } // namespace stun
+} // namespace network
 } // namespace nx

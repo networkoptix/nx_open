@@ -2,9 +2,8 @@
 
 #include <boost/optional.hpp>
 
+#include <nx/network/abstract_socket.h>
 #include <nx/utils/system_error.h>
-
-#include "nx/network/abstract_socket.h"
 
 namespace nx {
 namespace network {
@@ -16,11 +15,13 @@ class SocketAttributes
 {
 public:
     boost::optional<bool> reuseAddrFlag;
+    boost::optional<bool> reusePortFlag;
     boost::optional<bool> nonBlockingMode;
     boost::optional<unsigned int> sendBufferSize;
     boost::optional<unsigned int> recvBufferSize;
     boost::optional<unsigned int> recvTimeout;
     boost::optional<unsigned int> sendTimeout;
+    boost::optional<bool> ipv6Only;
     boost::optional<aio::AbstractAioThread*> aioThread;
 
     bool applyTo(AbstractSocket* const socket) const
@@ -30,11 +31,13 @@ public:
 
         return
             apply(socket, &AbstractSocket::setReuseAddrFlag, reuseAddrFlag) &&
+            apply(socket, &AbstractSocket::setReusePortFlag, reusePortFlag) &&
             apply(socket, &AbstractSocket::setNonBlockingMode, nonBlockingMode) &&
             apply(socket, &AbstractSocket::setSendBufferSize, sendBufferSize) &&
             apply(socket, &AbstractSocket::setRecvBufferSize, recvBufferSize) &&
             apply(socket, &AbstractSocket::setRecvTimeout, recvTimeout) &&
-            apply(socket, &AbstractSocket::setSendTimeout, sendTimeout);
+            apply(socket, &AbstractSocket::setSendTimeout, sendTimeout) &&
+            apply(socket, &AbstractSocket::setIpv6Only, ipv6Only);
     }
 
 protected:
@@ -80,6 +83,21 @@ public:
             &AbstractSocket::getReuseAddrFlag,
             decltype(m_socketAttributes.reuseAddrFlag)(false),
             val);
+    }
+    virtual bool setReusePortFlag(bool value) override
+    {
+        return setAttributeValue(
+            &m_socketAttributes.reusePortFlag,
+            &AbstractSocket::setReusePortFlag,
+            value);
+    }
+    virtual bool getReusePortFlag(bool* value) const override
+    {
+        return getAttributeValue(
+            m_socketAttributes.reusePortFlag,
+            &AbstractSocket::getReusePortFlag,
+            decltype(m_socketAttributes.reusePortFlag)(false),
+            value);
     }
     virtual bool setNonBlockingMode(bool val) override
     {
@@ -173,6 +191,13 @@ public:
             return false;
         }
         return m_delegate->getLastError(errorCode);
+    }
+    virtual bool setIpv6Only(bool val) override
+    {
+        return setAttributeValue(
+            &m_socketAttributes.ipv6Only,
+            static_cast<bool (AbstractSocket::*)(bool)>(&AbstractSocket::setIpv6Only),
+            val);
     }
     virtual AbstractSocket::SOCKET_HANDLE handle() const override
     {

@@ -1,8 +1,10 @@
-FROM python:3.5-alpine
+FROM python:3.6-alpine3.6
 
 ARG VERSION
 ARG CACHE_DATE
 
-RUN pip install --trusted-host la.hdw.mx --index http://la.hdw.mx:8006 --no-cache-dir monitoring_simple==${VERSION}
+COPY stage/monitoring_simple-$VERSION-py3-none-any.whl /tmp
+
+RUN pip install /tmp/monitoring_simple-$VERSION-py3-none-any.whl
 
 ENTRYPOINT [ "monitoring_simple" ]

@@ -4,7 +4,7 @@
 
 #include <nx/utils/test_support/module_instance_launcher.h>
 #include <test_support/appserver2_process.h>
-#include <nx_ec/data/api_camera_data.h>
+#include <nx/vms/api/data/camera_data.h>
 #include <core/resource_access/user_access_data.h>
 #include <nx_ec/ec_api.h>
 #include <transaction/message_bus_adapter.h>
@@ -49,13 +49,13 @@ static void createData(const Appserver2Ptr& server)
 
     initResourceTypes(connection);
 
-    nx_http::HttpClient httpClient;
+    nx::network::http::HttpClient httpClient;
     httpClient.setUserName("admin");
     httpClient.setUserPassword("admin");
 
     for (int i = 0; i < kCameraCount; ++i)
     {
-        ec2::ApiCameraData cameraData;
+        nx::vms::api::CameraData cameraData;
         auto resTypePtr = qnResTypePool->getResourceTypeByName("Camera");
         ASSERT_TRUE(!resTypePtr.isNull());
         cameraData.typeId = resTypePtr->getId();
@@ -63,13 +63,13 @@ static void createData(const Appserver2Ptr& server)
         cameraData.vendor = "Invalid camera";
         cameraData.physicalId = QnUuid::createUuid().toString();
         cameraData.name = server->moduleInstance()->endpoint().toString();
-        cameraData.id = ec2::ApiCameraData::physicalIdToId(cameraData.physicalId);
+        cameraData.id = nx::vms::api::CameraData::physicalIdToId(cameraData.physicalId);
 
         auto content = QJson::serialized(cameraData);
 
         auto addr = server->moduleInstance()->endpoint();
 
-        QUrl url(lit("http://%1:%2/ec2/saveCamera").arg(addr.address.toString()).arg(addr.port));
+        nx::utils::Url url(lit("http://%1:%2/ec2/saveCamera").arg(addr.address.toString()).arg(addr.port));
         if (!httpClient.doPost(url, "application/json", content))
         {
             break;
@@ -85,8 +85,6 @@ static void createData(const Appserver2Ptr& server)
 
 TEST(SympleSyncTest, main)
 {
-    QnStaticCommonModule staticCommon;
-
     static const int kInstanceCount = 2;
     static const int kMaxSyncTimeoutMs = 1000 * 5 * 1000;
 
@@ -115,7 +113,7 @@ TEST(SympleSyncTest, main)
     {
         const auto addr = servers[i]->moduleInstance()->endpoint();
         const auto id = servers[i]->moduleInstance()->commonModule()->moduleGUID();
-        QUrl url = lit("http://%1:%2/ec2/events").arg(addr.address.toString()).arg(addr.port);
+        nx::utils::Url url = lit("http://%1:%2/ec2/events").arg(addr.address.toString()).arg(addr.port);
         servers[i - 1]->moduleInstance()->ecConnection()->messageBus()->addOutgoingConnectionToPeer(id, url);
     }
 

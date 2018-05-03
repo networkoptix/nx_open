@@ -95,6 +95,9 @@ public:
     static QString defaultSoftwareTriggerName();
     static QString getSoftwareTriggerName(const QString& id);
     static QString getSoftwareTriggerName(const EventParameters& params);
+
+    QString getAnalyticsSdkEventName(const EventParameters& params,
+        const QString& locale = QString()) const;
 };
 
 } // namespace event

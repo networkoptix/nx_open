@@ -3,15 +3,16 @@
 #include <server/server_globals.h>
 
 #include <api/model/camera_diagnostics_reply.h>
-#include <core/dataprovider/spush_media_stream_provider.h>
+#include <providers/spush_media_stream_provider.h>
 #include <core/resource_management/resource_pool.h>
-#include <core/resource/security_cam_resource.h>
 #include <nx/network/http/http_types.h>
 #include <camera/camera_pool.h>
 #include <api/helpers/camera_id_helper.h>
 #include <nx/utils/log/log.h>
 #include <rest/server/rest_connection_processor.h>
 #include <common/common_module.h>
+
+#include <nx/mediaserver/resource/camera.h>
 
 namespace {
 
@@ -41,25 +42,27 @@ int QnCameraDiagnosticsRestHandler::executeGet(
     {
         result.setError(QnJsonRestResult::InvalidParameter,
             lit("Invalid value of %1 parameter").arg(kTypeParam));
-        return nx_http::StatusCode::badRequest;
+        return nx::network::http::StatusCode::badRequest;
     }
 
     QString notFoundCameraId = QString::null;
-    QnSecurityCamResourcePtr camera = nx::camera_id_helper::findCameraByFlexibleIds(
-        owner->commonModule()->resourcePool(), &notFoundCameraId, params, kCameraIdParams);
+    const auto camera = nx::camera_id_helper::findCameraByFlexibleIds(
+        owner->commonModule()->resourcePool(), &notFoundCameraId, params, kCameraIdParams)
+        .dynamicCast<nx::mediaserver::resource::Camera>();
+
     if (!camera)
     {
         if (!notFoundCameraId.isNull())
         {
             result.setError(QnJsonRestResult::InvalidParameter,
                 lit("Camera %1 not found").arg(notFoundCameraId));
-            return nx_http::StatusCode::notFound;
+            return nx::network::http::StatusCode::notFound;
         }
         else
         {
             result.setError(QnJsonRestResult::MissingParameter,
                 lit("Parameter %1 is missing or invalid").arg(kCameraIdParam));
-            return nx_http::StatusCode::badRequest;
+            return nx::network::http::StatusCode::badRequest;
         }
     }
 
@@ -68,7 +71,7 @@ int QnCameraDiagnosticsRestHandler::executeGet(
     {
         result.setError(QnJsonRestResult::CantProcessRequest,
             lit("Camera %1 is not a video camera").arg(camera->getId().toString()));
-        return nx_http::StatusCode::notFound;
+        return nx::network::http::StatusCode::notFound;
     }
 
     QnCameraDiagnosticsReply reply;
@@ -82,7 +85,7 @@ int QnCameraDiagnosticsRestHandler::executeGet(
             checkResult = checkCameraAvailability(camera);
             break;
         case CameraDiagnostics::Step::mediaStreamAvailability:
-            checkResult = tryAcquireCameraMediaStream(camera, videoCamera);
+            checkResult = tryAcquireCameraMediaStream(videoCamera);
             break;
         case CameraDiagnostics::Step::mediaStreamIntegrity:
             checkResult = checkCameraMediaStreamForErrors(camera);
@@ -91,7 +94,7 @@ int QnCameraDiagnosticsRestHandler::executeGet(
             result.setError(QnJsonRestResult::CantProcessRequest,
                 lit("Diagnostics step %1 is not implemented").arg(
                     CameraDiagnostics::Step::toString(diagnosticsType)));
-            return nx_http::StatusCode::notImplemented;
+            return nx::network::http::StatusCode::notImplemented;
     }
 
     reply.errorCode = checkResult.errorCode;
@@ -100,11 +103,11 @@ int QnCameraDiagnosticsRestHandler::executeGet(
     // Serializing reply.
     result.setReply(reply);
 
-    return nx_http::StatusCode::ok;
+    return nx::network::http::StatusCode::ok;
 }
 
 CameraDiagnostics::Result QnCameraDiagnosticsRestHandler::checkCameraAvailability(
-    const QnSecurityCamResourcePtr& cameraRes)
+    const nx::mediaserver::resource::CameraPtr& cameraRes)
 {
     if (!cameraRes->ping())
         return CameraDiagnostics::CannotEstablishConnectionResult(cameraRes->httpPort());
@@ -119,7 +122,6 @@ CameraDiagnostics::Result QnCameraDiagnosticsRestHandler::checkCameraAvailabilit
 }
 
 CameraDiagnostics::Result QnCameraDiagnosticsRestHandler::tryAcquireCameraMediaStream(
-    const QnSecurityCamResourcePtr& /*cameraRes*/,
     const QnVideoCameraPtr& videoCamera)
 {
     QnAbstractMediaStreamDataProviderPtr streamReader =
@@ -134,7 +136,7 @@ CameraDiagnostics::Result QnCameraDiagnosticsRestHandler::tryAcquireCameraMediaS
 }
 
 CameraDiagnostics::Result QnCameraDiagnosticsRestHandler::checkCameraMediaStreamForErrors(
-    const QnResourcePtr& res)
+    const nx::mediaserver::resource::CameraPtr& camera)
 {
-    return res->getLastMediaIssue();
+    return camera->getLastMediaIssue();
 }

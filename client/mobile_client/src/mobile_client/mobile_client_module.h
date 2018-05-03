@@ -18,7 +18,7 @@ public:
     QnCloudStatusWatcher* cloudStatusWatcher() const;
     ~QnMobileClientModule();
 private:
-    QnClientCoreModule* m_clientCoreModule;
+    std::unique_ptr<QnClientCoreModule> m_clientCoreModule;
     QnCloudStatusWatcher* m_cloudStatusWatcher;
 };
 

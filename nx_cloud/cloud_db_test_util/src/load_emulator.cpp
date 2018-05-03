@@ -69,7 +69,7 @@ void LoadEmulator::onSystemListReceived(
 void LoadEmulator::openConnections()
 {
     QUrl cdbUrl(QString::fromStdString(m_cdbUrl));
-    const SocketAddress cdbEndpoint = network::url::getEndpoint(cdbUrl);
+    const network::SocketAddress cdbEndpoint = network::url::getEndpoint(cdbUrl);
 
     std::size_t systemIndex = 0;
     for (int i = 0; i < m_transactionConnectionCount; ++i)

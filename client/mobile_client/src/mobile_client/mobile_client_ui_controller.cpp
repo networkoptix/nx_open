@@ -47,7 +47,7 @@ void QnMobileClientUiController::disconnectFromSystem()
     setLayoutId(QString());
 }
 
-void QnMobileClientUiController::connectToSystem(const QUrl& url)
+void QnMobileClientUiController::connectToSystem(const nx::utils::Url& url)
 {
     emit connectRequested(url);
 }

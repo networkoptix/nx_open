@@ -2,7 +2,9 @@
 #include <QtCore/QSettings>
 #include <QtCore/QCoreApplication>
 
-#include "plugins/storage/file_storage/qtfile_storage_resource.h"
+#include <nx/kit/debug.h>
+
+#include "core/storage/file_storage/qtfile_storage_resource.h"
 
 #include "common/common_module.h"
 #include <common/static_common_module.h>
@@ -54,18 +56,21 @@ void showUsage(char* exeName)
 {
     qDebug() << "usage:";
     qDebug() << "testCamera [options] <cameraSet1> <cameraSet2> ... <cameraSetN>";
-    qDebug() << "where <cameraSetN> is camera(s) param with ';' delimiter";
+    qDebug() << "where <cameraSetN> is semicolon-separated camera param(s):";
     qDebug() << "count=N";
     qDebug() << "files=\"<fileName>[,<fileName>...]\" - for primary stream";
     qDebug() << "secondary-files=\"<fileName>[,<fileName>...]\" - for low quality stream";
-    qDebug() << "[offline=0..100] (optional, default value 0 - no offline)";
+    qDebug() << "[offline=0..100] (optional, default is 0 - no offline)";
     qDebug() << "";
     qDebug() << "example:";
     QString str = QFileInfo(exeName).baseName() + QString(" files=\"c:/test.264\";count=20");
-    qDebug() << str;
+    qDebug().noquote() << str;
     qDebug() << "\n[options]: ";
     qDebug() << "-I, --local-interface=     Local interface to listen. By default, all interfaces are listened";
     qDebug() << "-S, --camera-for-file      Run separate camera for each primary file, count parameter must be empty or 0";
+    qDebug() << "--pts                      Include original PTS into the stream";
+    qDebug() << "--no-secondary             Do not stream the secondary stream";
+    qDebug() << "--fps value                Force FPS to the given positive integer value";
 }
 
 
@@ -100,6 +105,9 @@ int main(int argc, char *argv[])
 
 
     bool cameraForEachFile = false;
+    bool includePts = false;
+    bool noSecondaryStream = false;
+    int fps = -1;
     QStringList localInterfacesToListen;
     for( int i = 1; i < argc; ++i )
     {
@@ -115,15 +123,41 @@ int main(int argc, char *argv[])
             if( i >= argc )
                 continue;
             localInterfacesToListen.push_back( QString(argv[i]) );
-        }else if( param =="--camera-for-file" || param == "-S" )
+        }
+        else if( param == "--fps" )
+        {
+            //value in the next arg
+            ++i;
+            if( i >= argc )
+            {
+                qWarning() << "ERROR: Missing value after fps arg.";
+                continue;
+            }
+            fps = QString(argv[i]).toInt();
+            if (fps <= 0)
+            {
+                qWarning() << "ERROR: Invalid fps arg (assuming -1):" << argv[i];
+                fps = -1;
+            }
+        }
+        else if( param == "--camera-for-file" || param == "-S" )
         {
             cameraForEachFile = true;
+        }
+        else if( param == "--no-secondary" )
+        {
+            noSecondaryStream = true;
+        }
+        else if( param == "--pts" )
+        {
+            includePts = true;
         }
     }
 
     std::unique_ptr<QnCommonModule> commonModule(
         new QnCommonModule(/*clientMode*/ false, nx::core::access::Mode::direct));
-    QnCameraPool::initGlobalInstance(new QnCameraPool(localInterfacesToListen, commonModule.get()));
+    QnCameraPool::initGlobalInstance(new QnCameraPool(
+        localInterfacesToListen, commonModule.get(), noSecondaryStream, fps));
     QnCameraPool::instance()->start();
     for (int i = 1; i < argc; ++i)
     {
@@ -190,7 +224,8 @@ int main(int argc, char *argv[])
         if (secondaryFiles.isEmpty())
             secondaryFiles = primaryFiles;
 
-        QnCameraPool::instance()->addCameras(cameraForEachFile, count, primaryFiles, secondaryFiles, offlineFreq);
+        QnCameraPool::instance()->addCameras(
+            cameraForEachFile, includePts, count, primaryFiles, secondaryFiles, offlineFreq);
     }
 
     int appResult = app.exec();
@@ -198,6 +233,6 @@ int main(int argc, char *argv[])
     delete QnCameraPool::instance();
     QnCameraPool::initGlobalInstance( NULL );
 
-    qDebug() << "Exiting!!!!!!!!!!!!!!!!!!!!!!!!!!";
+    qDebug() << "Exiting";
     return appResult;
 }

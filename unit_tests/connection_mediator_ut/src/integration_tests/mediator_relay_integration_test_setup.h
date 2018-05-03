@@ -33,7 +33,7 @@ private:
     api::ResultCode m_lastRequestResult = api::ResultCode::ok;
     boost::optional<api::ListenResponse> m_listenResponse;
     boost::optional<api::ConnectResponse> m_connectResponse;
-    std::shared_ptr<nx::stun::AbstractAsyncClient> m_stunClient;
+    std::shared_ptr<nx::network::stun::AbstractAsyncClient> m_stunClient;
     std::unique_ptr<api::MediatorServerTcpConnection> m_serverConnection;
     std::unique_ptr<api::MediatorClientUdpConnection> m_mediatorUdpClient;
     api::SystemCredentials m_systemCredentials;

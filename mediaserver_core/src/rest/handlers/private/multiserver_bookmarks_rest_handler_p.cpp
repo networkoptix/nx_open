@@ -16,7 +16,7 @@
 #include <rest/server/rest_connection_processor.h>
 
 #include <nx/fusion/model_functions.h>
-#include <nx/network/http/asynchttpclient.h>
+#include <nx/network/deprecated/asynchttpclient.h>
 #include <nx/utils/thread/mutex.h>
 #include <nx/utils/thread/wait_condition.h>
 #include <nx/vms/event/rule.h>
@@ -36,8 +36,8 @@ namespace
         "delete",
     };
 
-    QUrl getApiUrl(const QnMediaServerResourcePtr &server, QnBookmarkOperation operation) {
-        QUrl apiUrl(server->getApiUrl());
+    nx::utils::Url getApiUrl(const QnMediaServerResourcePtr &server, QnBookmarkOperation operation) {
+        nx::utils::Url apiUrl(server->getApiUrl());
         apiUrl.setPath(L'/' + QnMultiserverBookmarksRestHandlerPrivate::urlPath + L'/' + operations[static_cast<int>(operation)]);
         return apiUrl;
     }
@@ -46,11 +46,12 @@ namespace
     void sendAsyncRequest(
         QnCommonModule* commonModule,
         const QnMediaServerResourcePtr &server,
-        QUrl url,
+        nx::utils::Url url,
         Context *ctx)
     {
-        auto requestCompletionFunc = [ctx] (SystemError::ErrorCode osErrorCode, int statusCode, nx_http::BufferType msgBody ) {
-            QN_UNUSED(osErrorCode, statusCode, msgBody);
+        auto requestCompletionFunc = [ctx] (SystemError::ErrorCode /*osErrorCode*/, int /*statusCode*/,
+            nx::network::http::BufferType /*msgBody*/, nx::network::http::HttpHeaders /*httpHeaders*/)
+        {
             ctx->executeGuarded([ctx]()
             {
                 ctx->requestProcessed();
@@ -65,11 +66,12 @@ namespace
         QnMultiServerCameraBookmarkList& outputData,
         const QnMediaServerResourcePtr &server, QnGetBookmarksRequestContext* ctx)
     {
-        auto requestCompletionFunc = [ctx, &outputData] (SystemError::ErrorCode osErrorCode, int statusCode, nx_http::BufferType msgBody )
+        auto requestCompletionFunc = [ctx, &outputData](SystemError::ErrorCode osErrorCode,
+            int statusCode, nx::network::http::BufferType msgBody, nx::network::http::HttpHeaders /*httpHeaders*/)
         {
             QnCameraBookmarkList remoteData;
             bool success = false;
-            if( osErrorCode == SystemError::noError && statusCode == nx_http::StatusCode::ok ) {
+            if( osErrorCode == SystemError::noError && statusCode == nx::network::http::StatusCode::ok ) {
                 remoteData = QnUbjson::deserialized(msgBody, remoteData, &success);
                 NX_ASSERT(success, Q_FUNC_INFO, "We should receive correct answer here");
             }
@@ -83,7 +85,7 @@ namespace
             });
         };
 
-        QUrl apiUrl(getApiUrl(server, QnBookmarkOperation::Get));
+        nx::utils::Url apiUrl(getApiUrl(server, QnBookmarkOperation::Get));
 
         QnGetBookmarksRequestData modifiedRequest = ctx->request();
         modifiedRequest.makeLocal();
@@ -111,11 +113,12 @@ namespace
         const QnMediaServerResourcePtr &server,
         QnGetBookmarkTagsRequestContext* ctx)
     {
-        auto requestCompletionFunc = [ctx, &outputData] (SystemError::ErrorCode osErrorCode, int statusCode, nx_http::BufferType msgBody )
+        auto requestCompletionFunc = [ctx, &outputData](SystemError::ErrorCode osErrorCode,
+            int statusCode, nx::network::http::BufferType msgBody, nx::network::http::HttpHeaders /*httpHeaders*/)
         {
             QnCameraBookmarkTagList remoteData;
             bool success = false;
-            if( osErrorCode == SystemError::noError && statusCode == nx_http::StatusCode::ok ) {
+            if( osErrorCode == SystemError::noError && statusCode == nx::network::http::StatusCode::ok ) {
                 remoteData = QnUbjson::deserialized(msgBody, remoteData, &success);
                 NX_ASSERT(success, Q_FUNC_INFO, "We should receive correct answer here");
             }
@@ -129,7 +132,7 @@ namespace
             });
         };
 
-        QUrl apiUrl(getApiUrl(server, QnBookmarkOperation::GetTags));
+        nx::utils::Url apiUrl(getApiUrl(server, QnBookmarkOperation::GetTags));
 
         QnGetBookmarkTagsRequestData modifiedRequest = ctx->request();
         modifiedRequest.makeLocal();
@@ -154,7 +157,7 @@ namespace
         const QnMediaServerResourcePtr &server,
         QnUpdateBookmarkRequestContext* ctx)
     {
-        QUrl apiUrl(getApiUrl(server, QnBookmarkOperation::Update));
+        nx::utils::Url apiUrl(getApiUrl(server, QnBookmarkOperation::Update));
 
         QnUpdateBookmarkRequestData modifiedRequest = ctx->request();
         modifiedRequest.makeLocal();
@@ -168,7 +171,7 @@ namespace
         const QnMediaServerResourcePtr &server,
         QnDeleteBookmarkRequestContext* ctx)
     {
-        QUrl apiUrl(getApiUrl(server, QnBookmarkOperation::Delete));
+        nx::utils::Url apiUrl(getApiUrl(server, QnBookmarkOperation::Delete));
 
         QnDeleteBookmarkRequestData modifiedRequest = ctx->request();
         modifiedRequest.makeLocal();
@@ -222,7 +225,6 @@ QnCameraBookmarkList QnMultiserverBookmarksRestHandlerPrivate::getBookmarks(
     return result;
 }
 
-
 QnCameraBookmarkTagList QnMultiserverBookmarksRestHandlerPrivate::getBookmarkTags(
     QnCommonModule* commonModule,
     QnGetBookmarkTagsRequestContext& context)
@@ -246,7 +248,6 @@ QnCameraBookmarkTagList QnMultiserverBookmarksRestHandlerPrivate::getBookmarkTag
     }
     return QnCameraBookmarkTag::mergeCameraBookmarkTags(outputData, request.limit);
 }
-
 
 bool QnMultiserverBookmarksRestHandlerPrivate::addBookmark(
     QnCommonModule* commonModule,
@@ -273,10 +274,10 @@ bool QnMultiserverBookmarksRestHandlerPrivate::addBookmark(
 
     runtimeParams.eventType = rule
         ? rule->eventType()
-        : nx::vms::event::EventType::undefinedEvent;
+        : nx::vms::api::EventType::undefinedEvent;
 
     const auto action = nx::vms::event::CommonAction::create(
-        nx::vms::event::ActionType::acknowledgeAction, runtimeParams);
+        nx::vms::api::ActionType::acknowledgeAction, runtimeParams);
 
     action->setRuleId(ruleId);
 

@@ -26,7 +26,7 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "nx_client_desktop-x86", "${
 		${nx_audio.guid} = ${nx_audio.guid}
 		${nx_client_core.guid} = ${nx_client_core.guid}
 		${nx_speech_synthesizer.guid} = ${nx_speech_synthesizer.guid}
-		${libvms_gateway.guid} = ${libvms_gateway.guid}
+		${libvms_gateway_core.guid} = ${libvms_gateway_core.guid}
 	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "nx_client_core-x86", "${root.dir}\client\nx_client_core\src\nx_client_core-x86.vcxproj", "${nx_client_core.guid}"
@@ -95,7 +95,7 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "nx_kit-x86", "${root.dir}\n
 	ProjectSection(ProjectDependencies) = postProject
 	EndProjectSection
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libvms_gateway-x86", "${root.dir}\nx_cloud\libvms_gateway\src\libvms_gateway-x86.vcxproj", "${libvms_gateway.guid}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libvms_gateway_core-x86", "${root.dir}\nx_cloud\libvms_gateway_core\src\libvms_gateway_core-x86.vcxproj", "${libvms_gateway_core.guid}"
 	ProjectSection(ProjectDependencies) = postProject
 		${cloud_db_client.guid} = ${cloud_db_client.guid}
 	EndProjectSection
@@ -172,10 +172,10 @@ Global
 		${cloud_db_client.guid}.Debug|Win32.Build.0 = Debug|Win32
 		${cloud_db_client.guid}.Release|Win32.ActiveCfg = Release|Win32
 		${cloud_db_client.guid}.Release|Win32.Build.0 = Release|Win32
-		${libvms_gateway.guid}.Debug|Win32.ActiveCfg = Debug|Win32
-		${libvms_gateway.guid}.Debug|Win32.Build.0 = Debug|Win32
-		${libvms_gateway.guid}.Release|Win32.ActiveCfg = Release|Win32
-		${libvms_gateway.guid}.Release|Win32.Build.0 = Release|Win32
+		${libvms_gateway_core.guid}.Debug|Win32.ActiveCfg = Debug|Win32
+		${libvms_gateway_core.guid}.Debug|Win32.Build.0 = Debug|Win32
+		${libvms_gateway_core.guid}.Release|Win32.ActiveCfg = Release|Win32
+		${libvms_gateway_core.guid}.Release|Win32.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -13,9 +13,6 @@
 #include "../request_processor.h"
 
 namespace nx {
-
-namespace stun { class MessageDispatcher; }
-
 namespace hpm {
 
 namespace conf { class Settings; }
@@ -34,7 +31,6 @@ public:
     HolePunchingProcessor(
         const conf::Settings& settings,
         AbstractCloudDataProvider* cloudData,
-        nx::stun::MessageDispatcher* dispatcher,
         ListeningPeerPool* listeningPeerPool,
         AbstractRelayClusterClient* relayClusterClient,
         stats::AbstractCollector* statisticsCollector);
@@ -45,17 +41,19 @@ public:
     void connect(
         const ConnectionStrongRef& connection,
         api::ConnectRequest request,
-        stun::Message requestMessage,
+        network::stun::Message requestMessage,
         std::function<void(api::ResultCode, api::ConnectResponse)> completionHandler);
+
     void onConnectionAckRequest(
         const ConnectionStrongRef& connection,
         api::ConnectionAckRequest request,
-        stun::Message requestMessage,
+        network::stun::Message requestMessage,
         std::function<void(api::ResultCode)> completionHandler);
+
     void connectionResult(
         const ConnectionStrongRef& connection,
         api::ConnectionResultRequest request,
-        stun::Message requestMessage,
+        network::stun::Message requestMessage,
         std::function<void(api::ResultCode)> completionHandler);
 
 private:

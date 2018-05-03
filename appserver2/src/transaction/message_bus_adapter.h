@@ -6,43 +6,50 @@
 #include <transaction/transaction_message_bus.h>
 #include <nx/p2p/p2p_message_bus.h>
 
-namespace ec2
-{
+namespace ec2 {
 
-    enum class MessageBusType
-    {
-        None,
-        LegacyMode,
-        P2pMode
-    };
-
-    class TransactionMessageBusAdapter: public AbstractTransactionMessageBus
+    class TransactionMessageBusAdapter:
+        public AbstractTransactionMessageBus
     {
         Q_OBJECT
+
     public:
         TransactionMessageBusAdapter(
-            detail::QnDbManager* db,
-            Qn::PeerType peerType,
             QnCommonModule* commonModule,
             QnJsonTransactionSerializer* jsonTranSerializer,
             QnUbjsonTransactionSerializer* ubjsonTranSerializer
         );
 
-        void init(MessageBusType value);
+        template <typename MessageBusType>
+		MessageBusType* init(Qn::PeerType peerType)
+		{
+			reset();
+			m_bus.reset(new MessageBusType(
+				peerType,
+				commonModule(),
+				m_jsonTranSerializer,
+				m_ubjsonTranSerializer));
+
+			initInternal(peerType);
+			return dynamic_cast<MessageBusType*> (m_bus.get());
+		}
+
+        void reset();
 
         template <typename T> T dynamicCast() { return dynamic_cast<T> (m_bus.get()); }
 
-        virtual ~TransactionMessageBusAdapter() {}
+        virtual ~TransactionMessageBusAdapter() = default;
 
         virtual void start() override;
         virtual void stop() override;
 
         virtual QSet<QnUuid> directlyConnectedClientPeers() const override;
+        virtual QSet<QnUuid> directlyConnectedServerPeers() const override;
 
         virtual QnUuid routeToPeerVia(const QnUuid& dstPeer, int* distance) const override;
         virtual int distanceToPeer(const QnUuid& dstPeer) const override;
 
-        virtual void addOutgoingConnectionToPeer(const QnUuid& id, const QUrl& url) override;
+        virtual void addOutgoingConnectionToPeer(const QnUuid& id, const nx::utils::Url& url) override;
         virtual void removeOutgoingConnectionFromPeer(const QnUuid& id) override;
 
         virtual void dropConnections() override;
@@ -56,9 +63,10 @@ namespace ec2
         virtual QnUbjsonTransactionSerializer* ubjsonTranSerializer() const override;
 
         virtual ConnectionGuardSharedState* connectionGuardSharedState() override;
-        virtual detail::QnDbManager* getDb() const override;
+        //detail::QnDbManager* getDb() const;
 
         virtual void setTimeSyncManager(TimeSynchronizationManager* timeSyncManager) override;
+
     public:
         template<class T>
         void sendTransaction(
@@ -93,13 +101,14 @@ namespace ec2
             else
                 NX_CRITICAL(false, "Not implemented");
         }
+	private:
+		void initInternal(Qn::PeerType peerType);
     private:
         std::unique_ptr<TransactionMessageBusBase> m_bus;
 
-        detail::QnDbManager* m_db;
-        Qn::PeerType m_peerType;
         QnJsonTransactionSerializer* m_jsonTranSerializer;
         QnUbjsonTransactionSerializer* m_ubjsonTranSerializer;
         TimeSynchronizationManager* m_timeSyncManager;
     };
-};
+
+} // namespace ec2

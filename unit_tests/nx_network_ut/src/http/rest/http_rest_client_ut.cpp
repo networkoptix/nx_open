@@ -2,7 +2,9 @@
 
 #include <nx/network/http/rest/http_rest_client.h>
 
-namespace nx_http {
+namespace nx {
+namespace network {
+namespace http {
 namespace rest {
 namespace test {
 
@@ -19,7 +21,7 @@ TEST(HttpRest_substituteParameters, correct)
 
 TEST(HttpRest_substituteParameters, bad_input)
 {
-    nx_http::StringType resultPath;
+    nx::network::http::StringType resultPath;
 
     ASSERT_FALSE(substituteParameters(
         "/account/dummy/systems", &resultPath, {"ak"}));
@@ -29,4 +31,6 @@ TEST(HttpRest_substituteParameters, bad_input)
 
 } // namespace test
 } // namespace rest
-} // namespace nx_http
+} // namespace nx
+} // namespace network
+} // namespace http

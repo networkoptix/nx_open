@@ -43,7 +43,9 @@ QnGlobals::~QnGlobals() {
     return;
 }
 
-QVariant QnGlobals::readValueFromSettings(QSettings *settings, int id, const QVariant &defaultValue) {
+QVariant QnGlobals::readValueFromSettings(QSettings *settings, int id,
+    const QVariant& defaultValue) const
+{
     int type = this->type(id);
     if(type == QMetaType::QColor) {
         return parseColor(settings->value(name(id)), defaultValue.value<QColor>());

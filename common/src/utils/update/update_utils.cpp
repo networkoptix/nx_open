@@ -138,8 +138,18 @@ QString makeMd5(QIODevice* device)
     return QString::fromLatin1(hash.result().toHex());
 }
 
-QString passwordForBuild(unsigned buildNumber)
+QString passwordForBuild(const QString& build)
 {
+    // Leaving only numbers from the build string, as it may be a changeset.
+    QString buildNum;
+    for (const auto c: build)
+    {
+        if (c.isDigit())
+            buildNum.append(c);
+    }
+
+    unsigned buildNumber = unsigned(buildNum.toInt());
+
     unsigned seed1 = buildNumber;
     unsigned seed2 = (buildNumber + 13) * 179;
     unsigned seed3 = buildNumber << 16;

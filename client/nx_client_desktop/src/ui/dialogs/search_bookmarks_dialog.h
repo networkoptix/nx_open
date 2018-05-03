@@ -9,7 +9,7 @@ class QnSearchBookmarksDialog: public QnSessionAwareDialog
     using base_type = QnSessionAwareDialog;
 public:
     QnSearchBookmarksDialog(const QString& filterText, qint64 utcStartTimeMs,
-        qint64 utcFinishTimeMs, QWidget* parent = nullptr);
+        qint64 utcFinishTimeMs, QWidget* parent);
 
     virtual ~QnSearchBookmarksDialog();
 

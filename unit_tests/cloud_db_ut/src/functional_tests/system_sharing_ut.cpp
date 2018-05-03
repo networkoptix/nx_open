@@ -9,8 +9,61 @@
 
 namespace nx {
 namespace cdb {
+namespace test {
 
-namespace {
+class SystemSharingNew:
+    public CdbFunctionalTest
+{
+    using base_type = CdbFunctionalTest;
+
+protected:
+    virtual void SetUp() override
+    {
+        base_type::SetUp();
+
+        ASSERT_TRUE(startAndWaitUntilStarted());
+
+        m_ownerAccount = addActivatedAccount2();
+        m_otherAccount = addActivatedAccount2();
+    }
+
+    void givenSystemSharedToMultipleAccount()
+    {
+        m_system = addRandomSystemToAccount(m_ownerAccount);
+        shareSystemEx(
+            m_ownerAccount,
+            m_system,
+            m_otherAccount.email,
+            api::SystemAccessRole::viewer);
+    }
+
+    void whenRequestUserListUsingSystemCredentials()
+    {
+        m_prevResult = getSystemSharings(m_system.id, m_system.authKey, &m_systemUsers);
+    }
+
+    void thenUserListIsReturned()
+    {
+        ASSERT_EQ(api::ResultCode::ok, m_prevResult);
+        ASSERT_EQ(2U, m_systemUsers.size());
+    }
+
+private:
+    AccountWithPassword m_ownerAccount;
+    AccountWithPassword m_otherAccount;
+    api::SystemData m_system;
+    api::ResultCode m_prevResult = api::ResultCode::ok;
+    std::vector<api::SystemSharingEx> m_systemUsers;
+};
+
+TEST_F(SystemSharingNew, system_credentials_can_be_used_to_get_user_list)
+{
+    givenSystemSharedToMultipleAccount();
+    whenRequestUserListUsingSystemCredentials();
+    thenUserListIsReturned();
+}
+
+//-------------------------------------------------------------------------------------------------
 
 class SystemSharing:
     public CdbFunctionalTest
@@ -42,8 +95,6 @@ private:
     AccountWithPassword m_ownerAccount;
     api::SystemData m_system;
 };
-
-} // namespace
 
 TEST_F(SystemSharing, system_user_list_is_available_under_system_credentials)
 {
@@ -1144,5 +1195,6 @@ TEST_F(SystemSharingDisabledUser, user_get_empty_list_if_he_is_disabled_in_the_o
     thenResponseShouldBeEmpty();
 }
 
+} // namespace test
 } // namespace cdb
 } // namespace nx

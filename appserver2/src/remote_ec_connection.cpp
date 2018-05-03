@@ -15,12 +15,14 @@
 namespace ec2
 {
     RemoteEC2Connection::RemoteEC2Connection(
+        Qn::PeerType peerType,
         const AbstractECConnectionFactory* connectionFactory,
         const QnUuid& remotePeerId,
         const FixedUrlClientQueryProcessorPtr& queryProcessor,
         const QnConnectionInfo& connectionInfo )
     :
         base_type(connectionFactory, queryProcessor.get() ),
+        m_peerType(peerType),
         m_queryProcessor( queryProcessor ),
         m_connectionInfo( connectionInfo ),
         m_remotePeerId(remotePeerId)
@@ -35,23 +37,26 @@ namespace ec2
         return m_connectionInfo;
     }
 
-    void RemoteEC2Connection::updateConnectionUrl(const QUrl& url)
+    void RemoteEC2Connection::updateConnectionUrl(const nx::utils::Url &url)
     {
         m_connectionInfo.ecUrl = url;
+        m_queryProcessor->setUrl(url);
     }
 
     void RemoteEC2Connection::startReceivingNotifications()
     {
-        m_connectionFactory->messageBus()->init(
-            m_connectionInfo.p2pMode ? MessageBusType::P2pMode : MessageBusType::LegacyMode);
+        if (m_connectionInfo.p2pMode)
+            m_connectionFactory->messageBus()->init<nx::p2p::MessageBus>(m_peerType);
+        else
+            m_connectionFactory->messageBus()->init<ec2::QnTransactionMessageBus>(m_peerType);
         m_connectionFactory->messageBus()->setHandler(notificationManager());
 
         base_type::startReceivingNotifications();
 
-        QUrl url(m_queryProcessor->getUrl());
+        nx::utils::Url url(m_queryProcessor->getUrl());
         url.setScheme( m_connectionInfo.allowSslConnections ? lit("https") : lit("http") );
         //url.setPath("ec2/events");
-        url = QUrl( url.toString( QUrl::RemovePath | QUrl::RemoveQuery ) + lit("/ec2/events") );
+        url = nx::utils::Url( url.toString( QUrl::RemovePath | QUrl::RemoveQuery ) + lit("/ec2/events") );
         QUrlQuery q;
         url.setQuery(q);
         m_connectionFactory->messageBus()->addOutgoingConnectionToPeer(m_remotePeerId, url);
@@ -64,7 +69,7 @@ namespace ec2
         {
             m_connectionFactory->messageBus()->removeOutgoingConnectionFromPeer(m_remotePeerId);
             m_connectionFactory->messageBus()->removeHandler( notificationManager() );
-            m_connectionFactory->messageBus()->init(MessageBusType::None);
+            m_connectionFactory->messageBus()->reset();
         }
 
         //TODO #ak next call can be placed here just because we always have just one connection to EC

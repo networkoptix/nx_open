@@ -11,7 +11,6 @@
 
 #include "recording/time_period.h"
 
-
 struct AVFormatContext;
 class QnCustomResourceVideoLayout;
 class QnArchiveStreamReader;
@@ -30,7 +29,9 @@ public:
     void setCamera(const QnSecurityCamResourcePtr &camera);
     void setFixedServer(const QnMediaServerResourcePtr &server);
 
-    virtual bool open(const QnResourcePtr &resource) override;
+    virtual bool open(
+        const QnResourcePtr &resource,
+        AbstractArchiveIntegrityWatcher* archiveIntegrityWatcher) override;
     virtual void close() override;
     virtual qint64 startTime() const override;
     virtual qint64 endTime() const override;
@@ -40,7 +41,7 @@ public:
     virtual QnConstResourceVideoLayoutPtr getVideoLayout() override;
     virtual QnConstResourceAudioLayoutPtr getAudioLayout() override;
 
-    virtual void onReverseMode(qint64 displayTime, bool value) override;
+    virtual void setSpeed(qint64 displayTime, double value) override;
 
     virtual bool isRealTimeSource() const override;
     virtual void beforeClose() override;
@@ -55,7 +56,7 @@ public:
     virtual bool setQuality(MediaQuality quality, bool fastSwitch, const QSize& resolution) override;
 
     virtual void beforeSeek(qint64 time) override;
-    virtual void beforeChangeReverseMode(bool reverseMode) override;
+    virtual void beforeChangeSpeed(double speed) override;
 
     void setAdditionalAttribute(const QByteArray& name, const QByteArray& value);
     virtual void setRange(qint64 startTime, qint64 endTime, qint64 frameStep) override;
@@ -68,7 +69,6 @@ public:
     virtual int getSequence() const override;
 signals:
     void dataDropped(QnArchiveStreamReader* reader);
-
 private:
     void setRtpData(QnRtspIoDevice* value);
     QnAbstractDataPacketPtr processFFmpegRtpPayload(quint8* data, int dataSize, int channelNum, qint64* parserPosition);
@@ -85,6 +85,8 @@ private:
     void checkMinTimeFromOtherServer(const QnSecurityCamResourcePtr &camera);
     void setupRtspSession(const QnSecurityCamResourcePtr &camera, const QnMediaServerResourcePtr &server, QnRtspClient* session, bool usePredefinedTracks) const;
     void parseAudioSDP(const QList<QByteArray>& audioSDP);
+    void setCustomVideoLayout(const QnCustomResourceVideoLayoutPtr& value);
+    bool isConnectionExpired() const;
 private:
     QnMutex m_mutex;
     std::unique_ptr<QnRtspClient> m_rtspSession;
@@ -93,7 +95,6 @@ private:
     bool m_tcpMode;
     QMap<quint32, quint16> m_prevTimestamp;
     qint64 m_position;
-    bool m_opened;
     QnSecurityCamResourcePtr m_camera;
     QnMediaServerResourcePtr m_server;
     QnMediaServerResourcePtr m_fixedServer;
@@ -130,8 +131,10 @@ private:
     } m_auth;
 
     std::atomic_flag m_footageUpToDate;
+    std::atomic_flag m_currentServerUpToDate;
     QElapsedTimer m_reopenTimer;
-    mutable QnMutex m_rtpDataMutex;
+    QElapsedTimer m_sessionTimeout;
+    std::chrono::milliseconds m_maxSessionDurationMs;
 };
 
 typedef QSharedPointer<QnRtspClientArchiveDelegate> QnRtspClientArchiveDelegatePtr;

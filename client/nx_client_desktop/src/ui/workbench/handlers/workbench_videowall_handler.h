@@ -1,18 +1,16 @@
-#ifndef WORKBENCH_VIDEOWALL_HANDLER_H
-#define WORKBENCH_VIDEOWALL_HANDLER_H
+#pragma once
 
 #include <QtCore/QObject>
 #include <QtCore/QHash>
 #include <nx/utils/uuid.h>
 
-#include <api/app_server_connection.h>
-
-#include <client/client_model_types.h>
-
 #include <core/resource/resource_fwd.h>
 #include <core/resource/videowall_item.h>
 #include <core/resource/videowall_control_message.h>
 #include <core/resource/videowall_pc_data.h>
+
+#include <nx_ec/ec_api_fwd.h>
+#include <nx_ec/data/api_fwd.h>
 
 #include <ui/workbench/workbench_context_aware.h>
 
@@ -101,6 +99,7 @@ private:
 
 private slots:
     void at_newVideoWallAction_triggered();
+    void at_deleteVideoWallAction_triggered();
     void at_attachToVideoWallAction_triggered();
     void at_detachFromVideoWallAction_triggered();
     void at_deleteVideoWallItemAction_triggered();
@@ -137,7 +136,8 @@ private slots:
         const QnVideoWallItem& item);
     void at_videoWall_itemRemoved_activeMode(const QnVideoWallResourcePtr &videoWall, const QnVideoWallItem &item);
 
-    void at_eventManager_controlMessageReceived(const ec2::ApiVideowallControlMessageData& message);
+    void at_eventManager_controlMessageReceived(
+        const nx::vms::api::VideowallControlMessageData& message);
 
     void at_display_widgetAdded(QnResourceWidget* widget);
     void at_display_widgetAboutToBeRemoved(QnResourceWidget* widget);
@@ -201,5 +201,3 @@ private:
     QnVideoWallLicenseUsageHelper* m_licensesHelper;
     QScopedPointer<QnUuidPool> m_uuidPool;
 };
-
-#endif // WORKBENCH_VIDEOWALL_HANDLER_H

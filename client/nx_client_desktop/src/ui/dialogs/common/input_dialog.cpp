@@ -13,6 +13,8 @@ QnInputDialog::QnInputDialog(QWidget *parent)
 
     connect(ui->valueLineEdit, &QLineEdit::textChanged, this, &QnInputDialog::validateInput);
     validateInput();
+
+    setResizeToContentsMode(Qt::Horizontal | Qt::Vertical);
 }
 
 QnInputDialog::~QnInputDialog()
@@ -49,6 +51,16 @@ void QnInputDialog::setPlaceholderText(const QString &placeholderText)
     ui->valueLineEdit->setPlaceholderText(placeholderText);
 }
 
+QLineEdit::EchoMode QnInputDialog::echoMode() const
+{
+    return ui->valueLineEdit->echoMode();
+}
+
+void QnInputDialog::setEchoMode(QLineEdit::EchoMode echoMode)
+{
+    ui->valueLineEdit->setEchoMode(echoMode);
+}
+
 QDialogButtonBox::StandardButtons QnInputDialog::buttons() const
 {
     return ui->buttonBox->standardButtons();
@@ -72,4 +84,25 @@ void QnInputDialog::validateInput()
     }
 
     ui->errorLabel->setVisible(false);
+}
+
+QString QnInputDialog::getText(QWidget* parent,
+    const QString& title, const QString& label,
+    QDialogButtonBox::StandardButtons buttons,
+    QLineEdit::EchoMode echoMode,
+    const QString& placeholder,
+    const QString& initialText)
+{
+    QnInputDialog dialog(parent);
+    dialog.setWindowTitle(title);
+    dialog.setCaption(label);
+    dialog.setButtons(buttons);
+    dialog.setPlaceholderText(placeholder);
+    dialog.setEchoMode(echoMode);
+    dialog.setValue(initialText);
+
+    if (dialog.exec() != Accepted)
+        return QString();
+
+    return dialog.value();
 }

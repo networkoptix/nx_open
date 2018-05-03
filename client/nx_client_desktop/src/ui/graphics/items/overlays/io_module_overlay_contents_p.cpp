@@ -1,9 +1,11 @@
 #include "io_module_overlay_contents_p.h"
 
-#include <ui/common/geometry.h>
+#include <nx/client/core/utils/geometry.h>
 #include <ui/common/text_pixmap_cache.h>
 #include <ui/workaround/sharp_pixmap_painting.h>
 #include <nx/utils/unused.h>
+
+using nx::client::core::Geometry;
 
 namespace {
 
@@ -21,7 +23,7 @@ static void paintPixmap(
     const Qt::Alignment alignment)
 {
     const auto pixmapSize = pixmap.size() / pixmap.devicePixelRatio();
-    const auto pixmapRect = QnGeometry::aligned(pixmapSize, rect, alignment);
+    const auto pixmapRect = Geometry::aligned(pixmapSize, rect, alignment);
     paintPixmapSharp(painter, pixmap, pixmapRect.topLeft());
 }
 
@@ -140,10 +142,9 @@ void QnIoModuleOverlayContentsPrivate::PortItem::ensureElidedLabel(qreal width) 
 
 void QnIoModuleOverlayContentsPrivate::PortItem::paint(
     QPainter* painter,
-    const QStyleOptionGraphicsItem* option,
-    QWidget* widget)
+    const QStyleOptionGraphicsItem* /*option*/,
+    QWidget* /*widget*/)
 {
-    QN_UNUSED(option, widget);
     paint(painter);
 }
 

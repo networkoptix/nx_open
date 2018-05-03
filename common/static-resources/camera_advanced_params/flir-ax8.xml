@@ -170,12 +170,14 @@
                 name="Reset"
                 description=""
                 dataType="Button"
+                confirmation="Are you sure you want to reboot the device?"
                 readCmd="reset"
                 writeCmd=""/>
             <param id="01.01-default"
                 name="Factory Default"
                 description=""
                 dataType="Button"
+                confirmation="Are you sure you want to reset all settings to default?"
                 readCmd="reset"
                 writeCmd="01"/>
         </group>

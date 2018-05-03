@@ -1,6 +1,6 @@
 #include "async_http_requests_executor.h"
 
-#include <nx/network/http/asynchttpclient.h>
+#include <nx/network/deprecated/asynchttpclient.h>
 
 namespace nx {
 namespace cdb {
@@ -12,22 +12,15 @@ AsyncRequestsExecutor::AsyncRequestsExecutor(
     m_cdbEndPointFetcher(
         std::make_unique<network::cloud::CloudModuleUrlFetcher::ScopedOperation>(
             cdbEndPointFetcher)),
-    m_requestTimeout(nx_http::AsyncHttpClient::Timeouts::kDefaultResponseReadTimeout)
+    m_requestTimeout(nx::network::http::AsyncHttpClient::Timeouts::kDefaultResponseReadTimeout)
 {
 }
 
 AsyncRequestsExecutor::~AsyncRequestsExecutor()
 {
-    QnMutexLocker lk(&m_mutex);
-    while (!m_runningRequests.empty())
-    {
-        auto request = std::move(m_runningRequests.front());
-        m_runningRequests.pop_front();
-        lk.unlock();
-        request->pleaseStopSync();
-        request.reset();
-        lk.relock();
-    }
+    m_cdbEndPointFetcher.reset();
+
+    pleaseStopSync();
 }
 
 void AsyncRequestsExecutor::setCredentials(
@@ -35,8 +28,8 @@ void AsyncRequestsExecutor::setCredentials(
     const std::string& password)
 {
     QnMutexLocker lk(&m_mutex);
-    m_auth.username = QString::fromStdString(login);
-    m_auth.password = QString::fromStdString(password);
+    m_auth.user.username = QString::fromStdString(login);
+    m_auth.user.authToken.setPassword(password.c_str());
 }
 
 void AsyncRequestsExecutor::setProxyCredentials(
@@ -44,11 +37,11 @@ void AsyncRequestsExecutor::setProxyCredentials(
     const std::string& password)
 {
     QnMutexLocker lk(&m_mutex);
-    m_auth.proxyUsername = QString::fromStdString(login);
-    m_auth.proxyPassword = QString::fromStdString(password);
+    m_auth.proxyUser.username = QString::fromStdString(login);
+    m_auth.proxyUser.authToken.setPassword(password.c_str());
 }
 
-void AsyncRequestsExecutor::setProxyVia(const SocketAddress& proxyEndpoint)
+void AsyncRequestsExecutor::setProxyVia(const nx::network::SocketAddress& proxyEndpoint)
 {
     NX_ASSERT(proxyEndpoint.port > 0);
 
@@ -65,6 +58,20 @@ void AsyncRequestsExecutor::setRequestTimeout(
 std::chrono::milliseconds AsyncRequestsExecutor::requestTimeout() const
 {
     return m_requestTimeout;
+}
+
+void AsyncRequestsExecutor::bindToAioThread(
+    network::aio::AbstractAioThread* aioThread)
+{
+    base_type::bindToAioThread(aioThread);
+
+    for (auto& request: m_runningRequests)
+        request->bindToAioThread(aioThread);
+}
+
+void AsyncRequestsExecutor::stopWhileInAioThread()
+{
+    m_runningRequests.clear();
 }
 
 } // namespace client

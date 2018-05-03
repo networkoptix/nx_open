@@ -6,6 +6,7 @@
 
 namespace nx {
 namespace cdb {
+namespace test {
 
 class CdbFunctionalTest:
     public CdbLauncher,
@@ -19,5 +20,6 @@ public:
 private:
 };
 
+} // namespace test
 } // namespace cdb
 } // namespace nx

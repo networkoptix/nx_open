@@ -5,6 +5,7 @@
 #include <memory>
 #include <mutex>
 
+#include <camera_vendors.h>
 #include <onvif/soapDeviceBindingProxy.h>
 #include <plugins/resource/onvif/onvif_resource.h>
 #include <plugins/resource/onvif/onvif_searcher_hooks.h>
@@ -35,7 +36,6 @@ using namespace nx::mediaserver_core::plugins;
 const char* OnvifResourceInformationFetcher::ONVIF_RT = "ONVIF";
 const char* ONVIF_ANALOG_RT = "ONVIF_ANALOG";
 
-
 // Add vendor and camera model to omit ONVIF search (you have to add in case insensitive here)
 static const char* ANALOG_CAMERAS[][2] =
 {
@@ -53,11 +53,15 @@ static const char* IGNORE_VENDORS[][2] =
     {"acti*", "*"},       // ACTi. Current ONVIF implementation quite unstable. Vendor name is not filled by camera!
     {"*", "KCM*"},        // ACTi
     {"*", "DWCA-*"},      // NEW ISD cameras rebranded to DW
-	{"*", "DWEA-*"},      // NEW ISD cameras rebranded to DW
+    {"*", "DWEA-*"},      // NEW ISD cameras rebranded to DW
     {"*", "DWCS-*"},       // NEW ISD cameras rebranded to DW
     {"Network Optix", "*"}, // Nx cameras
     {"Digital Watchdog", "XPM-FL72-48MP"}, //For some reasons we want to use ISD resource instead Onvif Digital Watchdog one.
-    {"Network Optix", "*"} // Nx Cameras
+    {"Network Optix", "*"}, // Nx Cameras
+    #if defined(ENABLE_HANWHA)
+        {"Hanwha Techwin*", "*" },
+        {"Samsung Techwin*", "*" },
+    #endif
 };
 
 bool OnvifResourceInformationFetcher::isAnalogOnvifResource(const QString& vendor, const QString& model)
@@ -195,7 +199,6 @@ void OnvifResourceInformationFetcher::findResources(
     //if (info.name.contains(QLatin1String("netw")) || info.manufacturer.contains(QLatin1String("netw")))
     //    int n = 0;
 
-
     if (needIgnoreCamera(QUrl(endpoint).host(), info.manufacturer, info.name))
         return;
 
@@ -249,7 +252,7 @@ void OnvifResourceInformationFetcher::findResources(
     if (model.isEmpty() || manufacturer.isEmpty() ||
         // Optional fields are to be updated only if the camera is authorized, to prevent brute force
         // attacks for unauthorized cameras (Hikvision blocks after several attempts).
-        (isAuthorized && (firmware.isEmpty() || QnMacAddress(mac).isNull())))
+        (isAuthorized && (firmware.isEmpty() || nx::network::QnMacAddress(mac).isNull())))
     {
         OnvifResExtInfo extInfo;
         QAuthenticator auth;
@@ -282,14 +285,12 @@ void OnvifResourceInformationFetcher::findResources(
         model = info.uniqId;
     }
 
-
     QnPlOnvifResourcePtr res = createResource(manufacturer, firmware, QHostAddress(sender), QHostAddress(info.discoveryIp),
                                               model, mac, info.uniqId, soapWrapper.getLogin(), soapWrapper.getPassword(), endpoint);
     if (res)
         result << res;
     else
         return;
-
 
     QnResourceData resourceData = qnStaticCommon->dataPool()->data(res->getVendor(), res->getModel());
     bool shouldAppearAsSingleChannel =
@@ -373,7 +374,7 @@ QnPlOnvifResourcePtr OnvifResourceInformationFetcher::createResource(const QStri
         resource->setName(model);
     else
         resource->setName(manufacturer + model);
-    QnMacAddress macAddr(mac);
+    nx::network::QnMacAddress macAddr(mac);
     resource->setMAC(macAddr);
     resource->setFirmware(firmware);
 
@@ -444,7 +445,7 @@ QnPlOnvifResourcePtr OnvifResourceInformationFetcher::createOnvifResourceByManuf
         resource = QnPlOnvifResourcePtr(new nx::plugins::flir::OnvifResource());
     else if (manufacture.toLower().contains(QLatin1String("vivotek")))
         resource = QnPlOnvifResourcePtr(new VivotekResource());
-	else if (manufacture.toLower().contains(QLatin1String("merit-lilin")))
+    else if (manufacture.toLower().contains(QLatin1String("merit-lilin")))
         resource = QnPlOnvifResourcePtr(new LilinResource());
     else
         resource = QnPlOnvifResourcePtr(new QnPlOnvifResource());

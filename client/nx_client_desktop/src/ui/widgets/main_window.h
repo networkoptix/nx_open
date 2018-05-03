@@ -27,25 +27,31 @@ class QnWorkbenchSynchronizer;
 class QnWorkbenchDisplay;
 class QnWorkbenchLayout;
 class QnMainWindowTitleBarWidget;
+class QnWorkbenchWelcomeScreen;
 
 namespace nx {
 namespace client {
 namespace desktop {
 namespace ui {
 
-class MainWindow: public QnEmulatedFrameWidget, public QnWorkbenchContextAware {
-    Q_OBJECT;
+class MainWindow: public QnEmulatedFrameWidget, public QnWorkbenchContextAware
+{
+    Q_OBJECT
 
-    typedef QnEmulatedFrameWidget base_type;
+    using base_type = QnEmulatedFrameWidget;
 
 public:
     enum Option {
         TitleBarDraggable = 0x1,    /**< Window can be moved by dragging the title bar. */
     };
-    Q_DECLARE_FLAGS(Options, Option);
+    Q_DECLARE_FLAGS(Options, Option)
 
-    MainWindow(QnWorkbenchContext *context, QWidget *parent = 0, Qt::WindowFlags flags = 0);
-    virtual ~MainWindow();
+    MainWindow(
+        QnWorkbenchContext *context,
+        QWidget *parent = nullptr,
+        Qt::WindowFlags flags = Qt::Window);
+
+    virtual ~MainWindow() override;
 
     bool isTitleVisible() const;
 
@@ -55,6 +61,9 @@ public:
     void setAnimationsEnabled(bool enabled = true);
 
     QWidget *viewport() const;
+
+    QnWorkbenchWelcomeScreen* welcomeScreen() const;
+    void setWelcomeScreenVisible(bool visible);
 
     void updateDecorationsState();
 
@@ -91,8 +100,6 @@ protected slots:
     void at_fileOpenSignalizer_activated(QObject *object, QEvent *event);
 
 private:
-    bool isWelcomeScreenVisible() const;
-
     void updateWidgetsVisibility();
 
     void showFullScreen();
@@ -111,6 +118,7 @@ private:
     QScopedPointer<QnGraphicsScene> m_scene;
     QScopedPointer<QnWorkbenchController> m_controller;
     QScopedPointer<QnWorkbenchUi> m_ui;
+    QnWorkbenchWelcomeScreen* m_welcomeScreen = nullptr;
 
     QStackedWidget * const m_currentPageHolder;
 
@@ -118,6 +126,7 @@ private:
     QBoxLayout *m_viewLayout;
     QBoxLayout *m_globalLayout;
 
+    bool m_welcomeScreenVisible = true;
     bool m_titleVisible;
 
     bool m_drawCustomFrame;

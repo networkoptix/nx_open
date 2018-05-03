@@ -1,26 +1,28 @@
-#ifndef __QN_ABSTRACT_MOTION_ARCHIVE_H__
-#define __QN_ABSTRACT_MOTION_ARCHIVE_H__
+#pragma once
+
+#include <memory>
 
 #include "nx/streaming/media_data_packet.h"
 
 class QnAbstractMotionArchiveConnection
 {
 public:
-    /*
-    * Return metadaTata in motion archive for specified time. If next call got same metadata or no metada is found return null.
-    */
-    virtual QnMetaDataV1Ptr getMotionData(qint64 timeUsec) = 0;
+    virtual ~QnAbstractMotionArchiveConnection() = default;
 
-    virtual ~QnAbstractMotionArchiveConnection() {}
+    /**
+     * @return metadata in motion archive for specified time.
+     * If next call got same metadata or no metada is found return null.
+     */
+    virtual QnAbstractCompressedMetadataPtr getMotionData(qint64 timeUsec) = 0;
 };
-typedef QSharedPointer<QnAbstractMotionArchiveConnection> QnAbstractMotionArchiveConnectionPtr;
+using QnAbstractMotionArchiveConnectionPtr = std::shared_ptr<QnAbstractMotionArchiveConnection>;
 
 class QnAbstractMotionConnectionFactory
 {
 public:
+    virtual ~QnAbstractMotionConnectionFactory() = default;
+
     virtual QnAbstractMotionArchiveConnectionPtr createMotionArchiveConnection() = 0;
 };
 
-typedef QSharedPointer<QnAbstractMotionConnectionFactory> QnAbstractMotionConnectionFactoryPtr;
-
-#endif // __QN_ABSTRACT_MOTION_ARCHIVE_H__
+using QnAbstractMotionConnectionFactoryPtr = QSharedPointer<QnAbstractMotionConnectionFactory>;

@@ -1,0 +1,20 @@
+{{#analyticsSdkEventType}}
+    {{analyticsSdkEventType}}{{#source}} at {{source}}{{/source}}
+{{/analyticsSdkEventType}}
+{{^analyticsSdkEventType}}
+    {{event}}{{#source}} at {{source}}{{/source}}
+{{/analyticsSdkEventType}}
+
+{{#count}}
+Trigger has been activated {{count}} times, first:
+{{/count}}
+{{^count}}
+    Trigger has been activated at:
+{{/count}}
+{{timestampDate}} {{timestampTime}}
+
+{{#urlint}}
+Play archive from the local network: {{urlint}}
+{{/urlint}} {{#urlext}}
+Play archive from the web: {{urlext}}
+{{/urlext}}

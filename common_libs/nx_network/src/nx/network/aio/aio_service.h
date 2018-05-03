@@ -33,10 +33,10 @@ class NX_NETWORK_API AIOService
 {
 public:
     /**
-     * After object instantiation one must call AIOService::isInitialized to check 
+     * After object instantiation one must call AIOService::isInitialized to check
      * whether instantiation was a success.
      */
-    AIOService(unsigned int aioThreadPollSize = 0);
+    AIOService() = default;
     virtual ~AIOService();
 
     AIOService(const AIOService&) = delete;
@@ -47,7 +47,7 @@ public:
     /**
      * @return true, if object has been successfully initialized.
      */
-    bool isInitialized() const;
+    bool initialize(unsigned int aioThreadPollSize = 0);
 
     /**
      * Monitor sock for event eventToWatch and trigger eventHandler on event.
@@ -80,15 +80,15 @@ public:
 
     /**
      * Register timeout, associated with socket sock.
-     * eventHandler->eventTriggered(sock, aio::etTimedOut) will be called every 
-     * timeoutMillis milliseconds until cancelled with 
+     * eventHandler->eventTriggered(sock, aio::etTimedOut) will be called every
+     * timeoutMillis milliseconds until cancelled with
      * aio::AIOService::stopMonitoring(sock, aio::etTimedOut ).
      */
     void registerTimer(
         Pollable* const sock,
         std::chrono::milliseconds timeoutMillis,
         AIOEventHandler* const eventHandler );
-    
+
     /**
      * @returns true, if socket is still listened for state changes.
      */
@@ -96,9 +96,9 @@ public:
 
     /**
      * Call handler from within aio thread sock is bound to.
-     * NOTE: Call will always be queued. I.e., if called from handler 
+     * NOTE: Call will always be queued. I.e., if called from handler
      *   running in aio thread, it will be called after handler has returned.
-     * WARNING: Currently, there is no way to find out whether call 
+     * WARNING: Currently, there is no way to find out whether call
      *   has been posted or being executed currently.
      */
     void post(Pollable* sock, nx::utils::MoveOnlyFunc<void()> handler);
@@ -108,7 +108,7 @@ public:
     void post(nx::utils::MoveOnlyFunc<void()> handler);
     /**
      * Call handler from within aio thread sock is bound to.
-     * NOTE: If called in aio thread, handler will be called from within this method, 
+     * NOTE: If called in aio thread, handler will be called from within this method,
      *   otherwise - queued like aio::AIOService::post does.
      */
     void dispatch(Pollable* sock, nx::utils::MoveOnlyFunc<void()> handler);

@@ -143,9 +143,9 @@ public:
             case cannotConfigureMediaStream:
             {
                 QnCameraDeviceStringSet detailsBase(
-                    tr("First, try to turn on recording (if it is off) and decrease fps in device settings.").arg(p1),
-                    tr("First, try to turn on recording (if it is off) and decrease fps in camera settings.").arg(p1),
-                    tr("First, try to turn on recording (if it is off) and decrease fps in I/O module settings.").arg(p1)
+                    tr("First, try to turn on recording (if it is off) and decrease fps in device settings (error \"%1\").").arg(p1),
+                    tr("First, try to turn on recording (if it is off) and decrease fps in camera settings (error \"%1\").").arg(p1),
+                    tr("First, try to turn on recording (if it is off) and decrease fps in I/O module settings (error \"%1\").").arg(p1)
                 );
                 QnCameraDeviceStringSet detailsAdvanced(
                     tr("If it does not help, restore factory defaults on the device web-page."),
@@ -208,6 +208,13 @@ public:
 
                 errorMessageParts
                     << QnDeviceDependentStrings::getNameFromSet(resourcePool, details, device);
+                break;
+            }
+            case cameraOldFirmwareError:
+            {
+                errorMessageParts <<
+                    tr("Please update firmware. "
+                       "Minimal supported version is %1. Current version is %2").arg(p1).arg(p2);
                 break;
             }
             case badMediaStream:
@@ -353,5 +360,17 @@ QString Result::toString(QnResourcePool* resourcePool) const
 {
     return ErrorCode::toString(errorCode, resourcePool, QnVirtualCameraResourcePtr(), errorParams);
 }
+
+Qn::MediaStreamEvent Result::toMediaStreamEvent() const
+{
+    switch (errorCode)
+    {
+        case ErrorCode::tooManyOpenedConnections:
+            return Qn::MediaStreamEvent::TooManyOpenedConnections;
+        default:
+            return Qn::MediaStreamEvent::NoEvent;
+    }
+}
+
 
 } // namespace CameraDiagnostics

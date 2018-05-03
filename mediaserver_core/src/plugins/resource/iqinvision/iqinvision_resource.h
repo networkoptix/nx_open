@@ -1,14 +1,10 @@
-#ifndef iq_resource_h_1547
-#define iq_resource_h_1547
+#pragma once
 
-#ifdef ENABLE_IQE
-
-#include "core/resource/security_cam_resource.h"
-#include "core/resource/camera_resource.h"
-#include <nx/network/simple_http_client.h>
+#include <nx/mediaserver/resource/camera.h>
+#include <nx/network/deprecated/simple_http_client.h>
 #include "nx/streaming/media_data_packet.h"
 
-class QnPlIqResource : public QnPhysicalCameraResource
+class QnPlIqResource : public nx::mediaserver::resource::Camera
 {
 public:
     static const QString MANUFACTURE;
@@ -21,7 +17,9 @@ public:
 
 
 protected:
-    virtual CameraDiagnostics::Result initInternal() override;
+    virtual nx::mediaserver::resource::StreamCapabilityMap getStreamCapabilityMapFromDrives(
+        Qn::StreamIndex streamIndex) override;
+    virtual CameraDiagnostics::Result initializeCameraDriver() override;
 
     virtual QnAbstractStreamDataProvider* createLiveDataProvider();
     virtual void setCroppingPhysical(QRect cropping);
@@ -34,6 +32,3 @@ protected:
     QSize getMaxResolution() const;
     bool isRtp() const;
 };
-
-#endif // #ifdef ENABLE_IQE
-#endif //iq_resource_h_1547

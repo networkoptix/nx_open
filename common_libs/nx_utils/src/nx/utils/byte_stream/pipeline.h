@@ -126,7 +126,7 @@ private:
 // Pipe
 
 /**
- * Data that is written to object of this class with AbstractOutput::write, 
+ * Data that is written to object of this class with AbstractOutput::write,
  * becomes available through AbstractInput::read.
  */
 class NX_UTILS_API Pipe:
@@ -241,6 +241,6 @@ std::unique_ptr<CustomInput<ReadFunc>> makeCustomInput(ReadFunc func)
     return std::make_unique<CustomInput<ReadFunc>>(std::move(func));
 }
 
-} // namespace pipeline
+} // namespace bstream
 } // namespace utils
 } // namespace nx

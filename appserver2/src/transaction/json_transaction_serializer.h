@@ -24,7 +24,6 @@ namespace ec2
         QByteArray serializedTransaction(const QnTransaction<T>& tran)
         {
             QnMutexLocker lock( &m_mutex );
-            Q_UNUSED(lock);
 
             // do not cache read-only transactions (they have sequence == 0)
             if (!tran.persistentInfo.isNull() && m_cache.contains(tran.persistentInfo))
@@ -37,7 +36,7 @@ namespace ec2
             //QJson::serialize(tran.params, &jsonParams);
 
             QJsonObject tranObject;
-            tranObject["tran"] = jsonTran;
+            tranObject[QStringLiteral("tran")] = jsonTran;
 
             QByteArray* result = new QByteArray();
             QJson::serialize(tranObject, result);
@@ -59,8 +58,8 @@ namespace ec2
             QJson::serialize(header, &jsonHeader);
 
             QJsonObject tranObject;
-            tranObject["tran"] = jsonTran;
-            tranObject["header"] = jsonHeader;
+            tranObject[QStringLiteral("tran")] = jsonTran;
+            tranObject[QStringLiteral("header")] = jsonHeader;
 
             return QJson::serialized(tranObject);
         }
@@ -86,4 +85,3 @@ namespace ec2
         QCache<QnAbstractTransaction::PersistentInfo, QByteArray> m_cache;
     };
 }
-

@@ -63,7 +63,7 @@ QnCloudSystemList getCloudSystemList(const api::SystemDataExList& systemsList, b
 
     for (const api::SystemDataEx &systemData : systemsList.systems)
     {
-        if (systemData.status != api::SystemStatus::ssActivated)
+        if (systemData.status != api::SystemStatus::activated)
             continue;
 
         const auto customization = QString::fromStdString(systemData.customization);
@@ -369,9 +369,17 @@ void QnCloudStatusWatcher::updateSystems()
                             d->setStatus(QnCloudStatusWatcher::Online,
                                 QnCloudStatusWatcher::NoError);
                             break;
+                        case api::ResultCode::badUsername:
+                            d->setStatus(QnCloudStatusWatcher::LoggedOut,
+                                QnCloudStatusWatcher::InvalidEmail);
+                            break;
                         case api::ResultCode::notAuthorized:
                             d->setStatus(QnCloudStatusWatcher::LoggedOut,
-                                QnCloudStatusWatcher::InvalidCredentials);
+                                QnCloudStatusWatcher::InvalidPassword);
+                            break;
+                        case api::ResultCode::accountNotActivated:
+                            d->setStatus(QnCloudStatusWatcher::LoggedOut,
+                                QnCloudStatusWatcher::AccountNotActivated);
                             break;
                         default:
                             d->setStatus(QnCloudStatusWatcher::Offline,
@@ -380,7 +388,7 @@ void QnCloudStatusWatcher::updateSystems()
                     }
             };
 
-            executeDelayed(handler, 0, thread());
+            executeDelayed(handler, 0, guard->thread());
         }
     );
 }
@@ -458,7 +466,9 @@ void QnCloudStatusWatcherPrivate::updateConnection(bool initial)
     {
         const auto error = (initial || credentials.isEmpty())
             ? QnCloudStatusWatcher::NoError
-            : QnCloudStatusWatcher::InvalidCredentials;
+            : credentials.user.isEmpty()
+              ? QnCloudStatusWatcher::InvalidEmail
+              : QnCloudStatusWatcher::InvalidPassword;
         setStatus(QnCloudStatusWatcher::LoggedOut, error);
         setCloudSystems(QnCloudSystemList());
         q->setEffectiveUserName(QString());

@@ -54,7 +54,6 @@ private:
     AVFormatContext* m_formatCtx;
     QString m_lastErrMessage;
 
-    AVIOContext* m_ioContext;
     QString m_container;
     qint64 m_baseTime;
     bool m_inMiddleOfStream;

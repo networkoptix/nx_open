@@ -8,7 +8,7 @@
 
 #include <nx/utils/thread/mutex.h>
 
-#include "abstract_pollset.h" 
+#include "abstract_pollset.h"
 #include "aio_event_handler.h"
 #include "pollable.h"
 #include "../detail/socket_sequence.h"
@@ -180,7 +180,7 @@ public:
 };
 
 /**
- * This class used to be AioThread private impl class, 
+ * This class used to be AioThread private impl class,
  * so it contains different and unrelated data.
  * TODO: #ak Should split this class to multiple clear classes with a single responsibility.
  */
@@ -212,15 +212,15 @@ public:
         aio::EventType eventType,
         TaskType taskType) const;
     void postAsyncCall(Pollable* const pollable, nx::utils::MoveOnlyFunc<void()> func);
-    
+
     void processPollSetModificationQueue(TaskType taskFilter);
     void removeSocketFromPollSet(Pollable* sock, aio::EventType eventType);
     void processScheduledRemoveSocketTasks();
     /**
-     * This method introduced for optimization: if we fast call startMonitoring then removeSocket 
-     * (socket has not been added to pollset yet), then removeSocket can just cancel 
+     * This method introduced for optimization: if we fast call startMonitoring then removeSocket
+     * (socket has not been added to pollset yet), then removeSocket can just cancel
      * "add socket to pollset" task. And vice versa.
-     * @return true if reverse task has been cancelled and socket 
+     * @return true if reverse task has been cancelled and socket
      *   is already in desired state, no futher processing is needed.
      */
     bool removeReverseTask(
@@ -253,7 +253,7 @@ private:
     QElapsedTimer m_monotonicClock;
     // TODO #ak: use cyclic array here to minimize allocations
     /**
-     * @note This variable can be accessed within aio thread only.
+     * NOTE: This variable can be accessed within aio thread only.
      */
     std::deque<SocketAddRemoveTask> m_postedCalls;
     std::deque<SocketAddRemoveTask> m_pollSetModificationQueue;

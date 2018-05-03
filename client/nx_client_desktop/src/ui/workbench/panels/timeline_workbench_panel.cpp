@@ -24,6 +24,7 @@
 #include <ui/graphics/items/generic/resizer_widget.h>
 #include <ui/graphics/items/generic/tool_tip_widget.h>
 #include <ui/graphics/items/generic/masked_proxy_widget.h>
+#include <ui/graphics/items/resource/resource_widget.h>
 #include <ui/processors/hover_processor.h>
 #include <ui/statistics/modules/controls_statistics_module.h>
 #include <ui/style/skin.h>
@@ -34,12 +35,12 @@
 #include <ui/workbench/workbench_pane_settings.h>
 #include <ui/workbench/panels/buttons.h>
 #include <ui/workbench/panels/calendar_workbench_panel.h>
-
 #include <nx/client/desktop/ui/workbench/workbench_animations.h>
 
 #include <utils/common/event_processors.h>
 #include <utils/common/scoped_value_rollback.h>
 
+using namespace nx::client::desktop;
 using namespace nx::client::desktop::ui;
 
 namespace {
@@ -175,7 +176,10 @@ TimelineWorkbenchPanel::TimelineWorkbenchPanel(
         [this]
         {
             /* Do not auto-hide slider if we have opened context menu. */
-            if (!isPinned() && isOpened() && !menu()->isMenuVisible())
+            const auto zoomedWidget = display()->widget(Qn::ZoomedRole);
+            const bool zoomedMotionSearch =
+                zoomedWidget && zoomedWidget->options().testFlag(QnResourceWidget::DisplayMotion);
+            if (!zoomedMotionSearch && !isPinned() && isOpened() && !menu()->isMenuVisible())
                 setOpened(false); // TODO: #GDM #high process handlers
         });
     connect(menu(), &nx::client::desktop::ui::action::Manager::menuAboutToHide, m_hidingProcessor,

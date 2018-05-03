@@ -7,8 +7,9 @@
 
 #include <utils/common/scoped_painter_rollback.h>
 
-#include <ui/common/geometry.h>
+#include <nx/client/core/utils/geometry.h>
 
+using nx::client::core::Geometry;
 
 // -------------------------------------------------------------------------- //
 // SelectionItem
@@ -92,8 +93,9 @@ void SelectionItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *opt
 // -------------------------------------------------------------------------- //
 // FixedArSelectionItem
 // -------------------------------------------------------------------------- //
-QRectF FixedArSelectionItem::boundingRect() const {
-    return QnGeometry::dilated(base_type::boundingRect(), m_elementSize / 2.0);
+QRectF FixedArSelectionItem::boundingRect() const
+{
+    return Geometry::dilated(base_type::boundingRect(), m_elementSize / 2.0);
 }
 
 void FixedArSelectionItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) {
@@ -114,8 +116,8 @@ void FixedArSelectionItem::paint(QPainter *painter, const QStyleOptionGraphicsIt
         if(m_options & DrawSideElements) {
             foreach(const QPointF &sidePoint, m_sidePoints) {
                 QPointF v = sidePoint - center;
-                qreal l = QnGeometry::length(v);
-                qreal a = -QnGeometry::atan2(v) / M_PI * 180;
+                qreal l = Geometry::length(v);
+                qreal a = -Geometry::atan2(v) / M_PI * 180;
                 qreal da = 60.0;
 
                 QPointF c = sidePoint - v / l * (elementHalfSize * 1.5);
@@ -135,11 +137,11 @@ void FixedArSelectionItem::paint(QPainter *painter, const QStyleOptionGraphicsIt
 
 void FixedArSelectionItem::setGeometry(const QPointF &origin, const QPointF &corner, const qreal aspectRatio, const QRectF &boundingRect) {
     QSizeF extraBoundingSize = QSizeF(boundingRect.height() * aspectRatio, boundingRect.width() / aspectRatio);
-    QRectF actualBoundingRect = boundingRect.intersected(QRectF(origin - QnGeometry::toPoint(extraBoundingSize), 2 * extraBoundingSize));
-    QPointF boundedCorner = QnGeometry::bounded(corner, actualBoundingRect);
+    QRectF actualBoundingRect = boundingRect.intersected(QRectF(origin - Geometry::toPoint(extraBoundingSize), 2 * extraBoundingSize));
+    QPointF boundedCorner = Geometry::bounded(corner, actualBoundingRect);
 
-    QRectF rect = QnGeometry::movedInto(
-        QnGeometry::expanded(
+    QRectF rect = Geometry::movedInto(
+        Geometry::expanded(
             aspectRatio,
             QRectF(origin, boundedCorner).normalized(),
             Qt::KeepAspectRatioByExpanding,

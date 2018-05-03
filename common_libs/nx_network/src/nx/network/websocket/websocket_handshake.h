@@ -18,11 +18,11 @@ NX_NETWORK_API nx::Buffer makeAcceptKey(const nx::Buffer& requestKey);
 
 } // namespace detail
 
-NX_NETWORK_API Error validateRequest(const nx_http::Request& request, nx_http::Response* response);
-NX_NETWORK_API void addClientHeaders(nx_http::HttpHeaders* headers, const nx::Buffer& protocolName);
-NX_NETWORK_API void addClientHeaders(nx_http::AsyncClient* request, const nx::Buffer& protocolName);
+NX_NETWORK_API Error validateRequest(const nx::network::http::Request& request, nx::network::http::Response* response);
+NX_NETWORK_API void addClientHeaders(nx::network::http::HttpHeaders* headers, const nx::Buffer& protocolName);
+NX_NETWORK_API void addClientHeaders(nx::network::http::AsyncClient* request, const nx::Buffer& protocolName);
 
-NX_NETWORK_API Error validateResponse(const nx_http::Request& request, const nx_http::Response& response);
+NX_NETWORK_API Error validateResponse(const nx::network::http::Request& request, const nx::network::http::Response& response);
 
 } // namespace websocket
 } // namespace network

@@ -37,10 +37,10 @@ void QnWorkbenchScheduleWatcher::at_resourcePool_resourceAdded(const QnResourceP
     if(!camera)
         return;
 
-    connect( camera.data(), &QnSecurityCamResource::scheduleDisabledChanged,
+    connect( camera.data(), &QnSecurityCamResource::licenseUsedChanged,
              this, [this]( const QnResourcePtr& res ) { at_resource_scheduleDisabledChanged( res.staticCast<QnSecurityCamResource>() ); } );
 
-    if(!camera->isScheduleDisabled())
+    if(camera->isLicenseUsed())
         m_scheduleEnabledCameras.insert(camera);
 
     updateScheduleEnabled();
@@ -59,10 +59,10 @@ void QnWorkbenchScheduleWatcher::at_resourcePool_resourceRemoved(const QnResourc
 }
 
 void QnWorkbenchScheduleWatcher::at_resource_scheduleDisabledChanged(const QnSecurityCamResourcePtr &resource) {
-    if(resource->isScheduleDisabled()) {
-        m_scheduleEnabledCameras.remove(resource);
-    } else {
+    if (resource->isLicenseUsed()) {
         m_scheduleEnabledCameras.insert(resource);
+    } else {
+        m_scheduleEnabledCameras.remove(resource);
     }
 
     updateScheduleEnabled();

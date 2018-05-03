@@ -58,7 +58,7 @@ QnChunksRequestData QnChunksRequestData::fromParams(QnResourcePool* resourcePool
         request.endTimeMs = nx::utils::parseDateTime(params.value(kEndTimeParam)) / kUsPerMs;
 
     if (params.contains(kDetailParam))
-        request.detailLevel = params.value(kDetailParam).toLongLong();
+        request.detailLevel = std::chrono::milliseconds(params.value(kDetailParam).toLongLong());
     if (params.contains(kKeepSmallChunksParam))
         request.keepSmallChunks = true;
 
@@ -80,6 +80,13 @@ QnChunksRequestData QnChunksRequestData::fromParams(QnResourcePool* resourcePool
     nx::camera_id_helper::findAllCamerasByFlexibleIds(resourcePool, &request.resList, params,
         {kCameraIdParam, kDeprecatedIdParam, kDeprecatedPhysicalIdParam, kDeprecatedMacParam});
 
+    if (request.periodsType == Qn::TimePeriodContent::AnalyticsContent)
+    {
+        request.analyticsStorageFilter = nx::analytics::storage::Filter();
+        if (!deserializeFromParams(params, &request.analyticsStorageFilter.get()))
+            request.analyticsStorageFilter.reset();
+    }
+
     return request;
 }
 
@@ -89,7 +96,7 @@ QnRequestParamList QnChunksRequestData::toParams() const
 
     result.insert(kStartTimeParam, QString::number(startTimeMs));
     result.insert(kEndTimeParam, QString::number(endTimeMs));
-    result.insert(kDetailParam, QString::number(detailLevel));
+    result.insert(kDetailParam, QString::number(detailLevel.count()));
     if (keepSmallChunks)
         result.insert(kKeepSmallChunksParam, QString());
     result.insert(kPeriodsTypeParam, QString::number(periodsType));

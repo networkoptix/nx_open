@@ -5,6 +5,7 @@
 
 #include <boost/optional.hpp>
 
+#include <nx/network/abstract_socket.h>
 #include <nx/network/aio/abstract_async_channel.h>
 #include <nx/utils/byte_stream/pipeline.h>
 #include <nx/utils/object_destruction_flag.h>
@@ -14,8 +15,6 @@ namespace nx {
 namespace network {
 namespace aio {
 namespace test {
-
-using IoCompletionHandler = std::function<void(SystemError::ErrorCode, size_t)>;
 
 class NX_NETWORK_API AsyncChannel:
     public AbstractAsyncChannel
@@ -43,7 +42,6 @@ public:
     virtual void sendAsync(
         const nx::Buffer& buffer,
         IoCompletionHandler handler) override;
-    virtual void cancelIOSync(EventType eventType) override;
 
     void pauseReadingData();
     void resumeReadingData();
@@ -61,6 +59,9 @@ public:
 
     bool isReadScheduled() const;
     bool isWriteScheduled() const;
+
+protected:
+    virtual void cancelIoInAioThread(EventType eventType) override;
 
 private:
     utils::bstream::AbstractInput* m_input;

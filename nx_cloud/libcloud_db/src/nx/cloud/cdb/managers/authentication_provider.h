@@ -5,7 +5,10 @@
 #include <QtCore/QByteArray>
 
 #include <nx/cloud/cdb/api/auth_provider.h>
+#include <nx/network/aio/timer.h>
+#include <nx/utils/counter.h>
 #include <nx/utils/db/async_sql_query_executor.h>
+#include <nx/utils/thread/mutex.h>
 
 #include "account_manager.h"
 #include "system_sharing_manager.h"
@@ -24,7 +27,7 @@ namespace ec2 { class AbstractVmsP2pCommandBus; }
 class AbstractTemporaryAccountPasswordManager;
 
 /**
- * Provides some temporary hashes which can be used by mediaserver 
+ * Provides some temporary hashes which can be used by mediaserver
  * to authenticate requests using cloud account credentials.
  * NOTE: These requests are allowed for system only.
  */
@@ -46,7 +49,7 @@ public:
         nx::utils::db::QueryContext* const queryContext,
         const api::SystemSharing& sharing,
         SharingType sharingType) override;
-    
+
     virtual void afterUpdatingAccountPassword(
         nx::utils::db::QueryContext* const queryContext,
         const api::AccountData& account) override;
@@ -59,7 +62,7 @@ public:
         const data::DataFilter& filter,
         std::function<void(api::ResultCode, api::NonceData)> completionHandler);
     /**
-     * @return intermediate HTTP Digest response that can be used to calculate 
+     * @return intermediate HTTP Digest response that can be used to calculate
      *   HTTP Digest response with only ha2 known.
      * Usage of intermediate HTTP Digest response is required to keep ha1 inside cdb.
      */
@@ -82,8 +85,12 @@ private:
     const AbstractTemporaryAccountPasswordManager& m_temporaryAccountCredentialsManager;
     std::unique_ptr<dao::AbstractUserAuthentication> m_authenticationDataObject;
     ec2::AbstractVmsP2pCommandBus* m_vmsP2pCommandBus;
+    nx::network::aio::Timer m_updateExpiredAuthTimer;
+    nx::utils::Counter m_ongoingOperationCounter;
+    bool m_terminated = false;
+    mutable QnMutex m_mutex;
 
-    boost::optional<AccountWithEffectivePassword> 
+    boost::optional<AccountWithEffectivePassword>
         getAccountByLogin(const std::string& login) const;
     nx::utils::db::DBResult validateNonce(
         nx::utils::db::QueryContext* queryContext,
@@ -111,12 +118,33 @@ private:
     api::AuthInfoRecord generateAuthRecord(
         const api::AccountData& account,
         const std::string& nonce);
-    void removeExpiredRecords(api::AuthInfo* userAuthenticationRecords);
     void generateUpdateUserAuthInfoTransaction(
         nx::utils::db::QueryContext* const queryContext,
         const std::string& systemId,
         const std::string& vmsUserId,
         const api::AuthInfo& userAuthenticationRecords);
+
+    //---------------------------------------------------------------------------------------------
+    // Updating expired auth records.
+
+    void checkForExpiredAuthRecordsAsync();
+
+    utils::db::DBResult checkForExpiredAuthRecords(
+        utils::db::QueryContext* queryContext);
+
+    void updateSystemAuth(
+        utils::db::QueryContext* queryContext,
+        const std::string& systemId);
+
+    void updateUserAuthInSystem(
+        nx::utils::db::QueryContext* queryContext,
+        const std::string& systemId,
+        const std::string& nonce,
+        const api::SystemSharingEx& userSharing);
+
+    void startCheckForExpiredAuthRecordsTimer(
+        nx::utils::db::QueryContext* queryContext,
+        utils::db::DBResult result);
 };
 
 } // namespace cdb

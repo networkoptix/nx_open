@@ -15,7 +15,7 @@
   </property>
   <layout class="QHBoxLayout" name="horizontalLayout">
    <item>
-    <widget class="QnTableView" name="tableView">
+    <widget class="nx::client::desktop::TableView" name="tableView">
      <property name="editTriggers">
       <set>QAbstractItemView::AllEditTriggers</set>
      </property>
@@ -107,9 +107,9 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>QnTableView</class>
+   <class>nx::client::desktop::TableView</class>
    <extends>QTableView</extends>
-   <header location="global">ui/widgets/common/table_view.h</header>
+   <header location="global">nx/client/desktop/common/widgets/table_view.h</header>
   </customwidget>
  </customwidgets>
  <tabstops>

@@ -1,2 +1,5 @@
-nx_add_target(genericrtspplugin LIBRARY
-    NO_MOC NO_PCH PUBLIC_LIBS common)
+nx_add_server_plugin(genericrtspplugin
+    NO_MOC PUBLIC_LIBS 
+        common
+        #mx_plugin_utils
+)

@@ -15,7 +15,7 @@ namespace random {
 
 /**
  * Simple implementaion of std::uniform_int_distribution.
- * @note Currenty this distribution is not uniform, because of overflow bug.
+ * NOTE: Currenty this distribution is not uniform, because of overflow bug.
  *     Do not use it without a dare need.
  */
 template<typename Type = int>

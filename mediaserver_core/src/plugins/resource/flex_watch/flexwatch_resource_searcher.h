@@ -15,13 +15,13 @@ public:
     // returns all available devices
     virtual QnResourceList findResources() override;
 protected:
-    virtual QList<QnResourcePtr> checkHostAddr(const QUrl& url, const QAuthenticator& auth, bool doMultichannelCheck) override;
+    virtual QList<QnResourcePtr> checkHostAddr(const nx::utils::Url& url, const QAuthenticator& auth, bool doMultichannelCheck) override;
 private:
     bool updateSocketList();
     void clearSocketList();
     void sendBroadcast();
 private:
-    QList<AbstractDatagramSocket*> m_sockList;
+    QList<nx::network::AbstractDatagramSocket*> m_sockList;
     qint64 m_sockUpdateTime;
 };
 

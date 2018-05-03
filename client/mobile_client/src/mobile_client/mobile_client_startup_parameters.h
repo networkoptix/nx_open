@@ -4,6 +4,7 @@
 #include <QtCore/QCoreApplication>
 
 #include <nx/utils/uuid.h>
+#include <nx/utils/url.h>
 #include <mobile_client/mobile_client_meta_types.h>
 
 class QCoreApplication;
@@ -13,10 +14,10 @@ struct QnMobileClientStartupParameters
     QnMobileClientStartupParameters();
     QnMobileClientStartupParameters(const QCoreApplication& application);
 
-    QString basePath;
+    QString qmlRoot;
     bool liteMode = false;
     QnUuid videowallInstanceGuid;
-    QUrl url;
+    nx::utils::Url url;
     bool testMode = false;
     QString initialTest;
     qint16 webSocketPort = 0;

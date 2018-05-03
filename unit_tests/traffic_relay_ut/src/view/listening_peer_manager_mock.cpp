@@ -21,7 +21,7 @@ void ListeningPeerManagerMock::beginListening(
     completionHandler(
         api::ResultCode::ok,
         api::BeginListeningResponse(),
-        nx_http::ConnectionEvents());
+        nx::network::http::ConnectionEvents());
 }
 
 } // namespace test

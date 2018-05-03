@@ -8,7 +8,7 @@
 namespace nx {
 namespace recorder {
 
-class SpaceInfo 
+class SpaceInfo
 {
     struct StorageSpaceInfo
     {
@@ -17,10 +17,12 @@ class SpaceInfo
         int64_t totalSpace;
 
         StorageSpaceInfo() : index(0), effectiveSpace(0LL), totalSpace(0LL) {}
-        StorageSpaceInfo(int index, int64_t totalSpace) : 
-            index(index), 
-            effectiveSpace(0LL),
+        StorageSpaceInfo(int index, int64_t totalSpace) :
+            index(index),
+            effectiveSpace(-1LL),
             totalSpace(totalSpace) {}
+
+        bool isEffectiveSpaceSet() const { return effectiveSpace == -1; }
     };
 
     using SpaceInfoVector = std::vector<StorageSpaceInfo>;
@@ -29,7 +31,7 @@ public:
     SpaceInfo();
     void storageAdded(int index, int64_t totalSpace);
     void storageRemoved(int index);
-    void storageRebuilded(int index, int64_t freeSpace, int64_t nxOccupiedSpace, int64_t spaceLimit);
+    void storageChanged(int index, int64_t freeSpace, int64_t nxOccupiedSpace, int64_t spaceLimit);
 
     /**
     * Returns optimal storage index or -1 if this index can't be determined

@@ -7,12 +7,14 @@ RUN apt-get update && \
     easy_install pip
 
 RUN pip install cryptography ansible && \
-    ansible-galaxy install dj-wasabi.telegraf && \    
+    ansible-galaxy install dj-wasabi.telegraf rossmcdonald.influxdb ansiblebit.grafana && \
     rm -rf /var/lib/apt/lists/*
     
-ADD ./machine.py /machine.py
-ADD ./playbooks /playbooks
-ADD ./conf/ansible.cfg /etc/ansible/ansible.cfg
-ADD ./entrypoint.sh /entrypoint.sh
+COPY docker/merge_config.py /usr/local/bin/
+COPY machine.py /machine.py
+COPY playbooks /playbooks
+COPY conf/ansible.cfg /etc/ansible/ansible.cfg
+COPY docker/entrypoint.sh /entrypoint.sh
+
 ENTRYPOINT ["/entrypoint.sh"]
 CMD ["/playbooks/bootstrap.yml"]

@@ -6,9 +6,15 @@
 #include <core/resource/camera_resource.h>
 #include <core/resource_management/resource_pool.h>
 
+#include <nx/client/desktop/common/utils/stream_quality_strings.h>
+
 #include <utils/common/scoped_value_rollback.h>
 #include <ui/common/read_only.h>
 #include <ui/workaround/widgets_signals_workaround.h>
+
+static constexpr int kMsecPerSecond = 1000;
+
+using namespace nx::client::desktop;
 
 QnRecordingBusinessActionWidget::QnRecordingBusinessActionWidget(QWidget *parent) :
     base_type(parent),
@@ -16,38 +22,38 @@ QnRecordingBusinessActionWidget::QnRecordingBusinessActionWidget(QWidget *parent
 {
     ui->setupUi(this);
 
-    for (int i = Qn::QualityLowest; i <= Qn::QualityHighest; i++) {
-        ui->qualityComboBox->addItem(Qn::toDisplayString((Qn::StreamQuality)i), i);
+    for (int i = (int)Qn::StreamQuality::lowest; i <= (int)Qn::StreamQuality::highest; i++)
+    {
+        ui->qualityComboBox->addItem(toDisplayString((Qn::StreamQuality)i), i);
     }
 
-    ui->beforeLabel->setVisible(false);
-    ui->beforeSpinBox->setVisible(false);
-    ui->durationLabel->setVisible(false);
-    ui->durationSpinBox->setVisible(false);
+    static constexpr int kMaxPreRecordingSecs = 60;
+    ui->beforeSpinBox->setMaximum(kMaxPreRecordingSecs);
 
     connect(ui->qualityComboBox, SIGNAL(currentIndexChanged(int)), this, SLOT(paramsChanged()));
     connect(ui->fpsSpinBox, SIGNAL(editingFinished()), this, SLOT(paramsChanged()));
     connect(ui->fpsSpinBox, SIGNAL(valueChanged(int)), this, SLOT(paramsChanged()));
-//    connect(ui->durationSpinBox, SIGNAL(valueChanged(int)), this, SLOT(paramsChanged()));
-//    connect(ui->beforeSpinBox, SIGNAL(valueChanged(int)), this, SLOT(paramsChanged()));
+    connect(ui->beforeSpinBox, SIGNAL(valueChanged(int)), this, SLOT(paramsChanged()));
     connect(ui->afterSpinBox, SIGNAL(valueChanged(int)), this, SLOT(paramsChanged()));
 
     connect(ui->fixedDurationCheckBox, &QCheckBox::toggled, this,
         [this](bool checked)
         {
-            ui->fixedDurationSpinBox->setEnabled(checked);
-            ui->fixedDurationSuffixLabel->setEnabled(checked);
+            ui->fixedDuration->setEnabled(checked);
+            //ui->fixedDurationSuffixLabel->setEnabled(checked);
 
             // Prolonged type of event has changed. In case of instant
             // action event state should be updated.
-            if (checked && (model()->eventType() == nx::vms::event::userDefinedEvent))
-                model()->setEventState(nx::vms::event::EventState::undefined);
+            if (checked && (model()->eventType() == nx::vms::api::EventType::userDefinedEvent))
+                model()->setEventState(nx::vms::api::EventState::undefined);
 
             emit paramsChanged();
         });
 
-    connect(ui->fixedDurationSpinBox, QnSpinboxIntValueChanged, this,
-        &QnRecordingBusinessActionWidget::paramsChanged);
+    ui->fixedDuration->addDurationSuffix(QnTimeStrings::Suffix::Minutes);
+    ui->fixedDuration->addDurationSuffix(QnTimeStrings::Suffix::Hours);
+
+    connect(ui->fixedDuration, SIGNAL(valueChanged()), this, SLOT(paramsChanged()));
 }
 
 QnRecordingBusinessActionWidget::~QnRecordingBusinessActionWidget()
@@ -58,11 +64,10 @@ void QnRecordingBusinessActionWidget::updateTabOrder(QWidget *before, QWidget *a
 {
     setTabOrder(before,                 ui->qualityComboBox);
     setTabOrder(ui->qualityComboBox,    ui->fpsSpinBox);
-    setTabOrder(ui->fpsSpinBox,         ui->afterSpinBox);
-    setTabOrder(ui->afterSpinBox, ui->fixedDurationCheckBox);
-    setTabOrder(ui->fixedDurationCheckBox, ui->fixedDurationSpinBox);
-    setTabOrder(ui->fixedDurationSpinBox, after);
-
+    setTabOrder(ui->fpsSpinBox,         ui->beforeLabel);
+    setTabOrder(ui->beforeLabel,        ui->afterSpinBox);
+    setTabOrder(ui->afterSpinBox,       ui->fixedDuration);
+    setTabOrder(ui->fixedDuration, after);
 }
 
 void QnRecordingBusinessActionWidget::at_model_dataChanged(Fields fields)
@@ -76,7 +81,7 @@ void QnRecordingBusinessActionWidget::at_model_dataChanged(Fields fields)
 
     if (fields.testFlag(Field::eventType))
     {
-        bool hasToggleState = nx::vms::event::hasToggleState(model()->eventType());
+        bool hasToggleState = nx::vms::event::hasToggleState(model()->eventType(), model()->eventParams(), commonModule());
         if (!hasToggleState)
             ui->fixedDurationCheckBox->setChecked(true);
         setReadOnly(ui->fixedDurationCheckBox, !hasToggleState);
@@ -84,7 +89,7 @@ void QnRecordingBusinessActionWidget::at_model_dataChanged(Fields fields)
 
     if (fields.testFlag(Field::actionResources))
     {
-        auto cameras = resourcePool()->getResources<QnVirtualCameraResource>(model()->actionResources());
+        auto cameras = resourcePool()->getResourcesByIds<QnVirtualCameraResource>(model()->actionResources());
         for (const auto& camera: cameras)
             maxFps = (maxFps == 0 ? camera->getMaxFps() : qMax(maxFps, camera->getMaxFps()));
 
@@ -104,13 +109,20 @@ void QnRecordingBusinessActionWidget::at_model_dataChanged(Fields fields)
 
         ui->fpsSpinBox->setValue(params.fps);
         ui->afterSpinBox->setValue(params.recordAfter);
+        ui->beforeSpinBox->setValue(params.recordBeforeMs / kMsecPerSecond);
 
         int fixedDuration = params.durationMs / 1000;
         ui->fixedDurationCheckBox->setChecked(fixedDuration > 0);
         if (fixedDuration > 0)
-        {
-            ui->fixedDurationSpinBox->setValue(fixedDuration);
-        }
+            ui->fixedDuration->setValue(fixedDuration);
+
+        const bool kFixedDuration = ui->fixedDurationCheckBox->isChecked();
+
+        bool fixedEnabled = ui->fixedDurationCheckBox->isEnabled();
+        ui->beforeSpinBox->setEnabled(!kFixedDuration);
+        ui->beforeLabel->setEnabled(!kFixedDuration);
+        ui->afterSpinBox->setEnabled(!kFixedDuration);
+        ui->afterLabel->setEnabled(!kFixedDuration);
     }
 }
 
@@ -121,13 +133,14 @@ void QnRecordingBusinessActionWidget::paramsChanged()
 
     nx::vms::event::ActionParameters params;
     params.fps = ui->fpsSpinBox->value();
+    params.recordBeforeMs = ui->beforeSpinBox->value() * kMsecPerSecond;
     params.recordAfter = ui->afterSpinBox->value();
 
     params.streamQuality = (Qn::StreamQuality)ui->qualityComboBox->itemData(
         ui->qualityComboBox->currentIndex()).toInt();
 
     params.durationMs = ui->fixedDurationCheckBox->isChecked()
-        ? ui->fixedDurationSpinBox->value() * 1000
+        ? ui->fixedDuration->value() * 1000
         : 0;
 
     model()->setActionParams(params);

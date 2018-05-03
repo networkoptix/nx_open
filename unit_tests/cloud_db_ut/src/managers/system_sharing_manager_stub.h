@@ -14,10 +14,14 @@ public:
     virtual api::SystemAccessRole getAccountRightsForSystem(
         const std::string& accountEmail,
         const std::string& systemId) const override;
-    
+
     virtual boost::optional<api::SystemSharingEx> getSystemSharingData(
         const std::string& accountEmail,
         const std::string& systemId) const override;
+
+    virtual std::vector<api::SystemSharingEx> fetchSystemUsers(
+        utils::db::QueryContext* queryContext,
+        const std::string& systemId) override;
 
     virtual void addSystemSharingExtension(AbstractSystemSharingExtension* extension) override;
     virtual void removeSystemSharingExtension(AbstractSystemSharingExtension* extension) override;

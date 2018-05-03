@@ -1,7 +1,9 @@
 #include <gtest/gtest.h>
 
+#include <nx/network/address_resolver.h>
 #include <nx/network/dns_resolver.h>
 #include <nx/network/resolve/custom_resolver.h>
+#include <nx/network/socket_global.h>
 #include <nx/utils/std/cpp14.h>
 #include <nx/utils/thread/mutex.h>
 #include <nx/utils/thread/wait_condition.h>
@@ -84,7 +86,7 @@ private:
     SystemError::ErrorCode testResolve(
         const QString& hostName,
         int /*ipVersion*/,
-        std::deque<HostAddress>* resolvedAddress)
+        std::deque<AddressEntry>* resolvedAddress)
     {
         if (hostName == hardToResolveHost)
         {
@@ -95,7 +97,7 @@ private:
         if (!m_pipelinedRequests.empty())
             startNextPipelinedTask();
 
-        resolvedAddress->push_back({HostAddress::localhost});
+        resolvedAddress->push_back({AddressType::direct, HostAddress::localhost});
         return SystemError::noError;
     }
 
@@ -168,6 +170,53 @@ TEST_F(DnsResolver, pipelining_resolve_request)
 {
     pipelineRequests();
     assertIfNotAllRequestsHaveBeenCompleted();
+}
+
+TEST_F(DnsResolver, old_and_unclear_test_to_be_refactored)
+{
+    auto& dnsResolver = SocketGlobals::addressResolver().dnsResolver();
+    {
+        std::deque<HostAddress> ips;
+        const auto resultCode = dnsResolver.resolveSync("localhost", AF_INET, &ips);
+        ASSERT_EQ(SystemError::noError, resultCode);
+        ASSERT_GE(ips.size(), 1U);
+        ASSERT_TRUE(ips.front().isIpAddress());
+        ASSERT_TRUE((bool)ips.front().ipV4());
+        ASSERT_TRUE((bool)ips.front().ipV6().first);
+        ASSERT_NE(0U, ips.front().ipV4()->s_addr);
+    }
+
+    {
+        std::deque<HostAddress> ips;
+        const auto resultCode = dnsResolver.resolveSync("hren2349jf234.ru", AF_INET, &ips);
+        ASSERT_EQ(SystemError::hostNotFound, resultCode);
+        ASSERT_EQ(0U, ips.size());
+    }
+
+    {
+        const QString kTestHost("some-test-host-543242145.com");
+        std::vector<HostAddress> kTestAddresses;
+        kTestAddresses.push_back(*HostAddress::ipV4from("12.34.56.78"));
+        kTestAddresses.push_back(*HostAddress::ipV6from("1234::abcd").first);
+
+        dnsResolver.addEtcHost(kTestHost, kTestAddresses);
+
+        std::deque<HostAddress> ip4s;
+        SystemError::ErrorCode resultCode = dnsResolver.resolveSync(kTestHost, AF_INET, &ip4s);
+        ASSERT_EQ(SystemError::noError, resultCode);
+
+        std::deque<HostAddress> ip6s;
+        resultCode = dnsResolver.resolveSync(kTestHost, AF_INET6, &ip6s);
+        ASSERT_EQ(SystemError::noError, resultCode);
+
+        dnsResolver.removeEtcHost(kTestHost);
+
+        ASSERT_EQ(1U, ip4s.size());
+        ASSERT_EQ(kTestAddresses.front(), ip4s.front());
+        ASSERT_EQ(2U, ip6s.size());
+        ASSERT_EQ(kTestAddresses.front(), ip6s.front());
+        ASSERT_EQ(kTestAddresses.back(), ip6s.back());
+    }
 }
 
 } // namespace test

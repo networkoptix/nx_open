@@ -61,7 +61,7 @@ private:
 
 Q_DECLARE_METATYPE(QnResourceTypeList)
 
-class QN_EXPORT QnResourceTypePool
+class QnResourceTypePool
 {
 public:
     typedef QMap<QnUuid, QnResourceTypePtr> QnResourceTypeMap;
@@ -78,6 +78,7 @@ public:
     static const QnUuid kStorageTypeUuid;
     static const QnUuid kLayoutTypeUuid;
     static const QnUuid kDesktopCameraTypeUuid;
+    static const QnUuid kWearableCameraTypeUuid;
 
     static QnResourceTypePool *instance();
 

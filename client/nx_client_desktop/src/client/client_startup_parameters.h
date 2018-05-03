@@ -3,6 +3,7 @@
 #include <utils/common/software_version.h>
 
 #include <nx/utils/uuid.h>
+#include <nx/utils/url.h>
 #include <nx/vms/utils/system_uri.h>
 
 struct QnStartupParameters
@@ -17,12 +18,12 @@ struct QnStartupParameters
 
     static QnStartupParameters fromCommandLineArg(int argc, char **argv);
 
-    static QString createAuthenticationString(const QUrl& url,
+    static QString createAuthenticationString(const nx::utils::Url& url,
         const QnSoftwareVersion& version = QnSoftwareVersion());
 
-    static QUrl parseAuthenticationString(QString string);
+    static nx::utils::Url parseAuthenticationString(QString string);
 
-    QUrl parseAuthenticationString() const;
+    nx::utils::Url parseAuthenticationString() const;
 
     bool isDevMode() const;
 
@@ -42,6 +43,7 @@ struct QnStartupParameters
     bool showFullInfo = false;
     bool exportedMode = false;  /*< Client was run from an exported video exe-file. */
     bool hiDpiDisabled = false;
+    bool profilerMode = false;
 
     bool selfUpdateMode = false;
     const static QString kSelfUpdateKey;
@@ -51,7 +53,9 @@ struct QnStartupParameters
     QString delayedDrop;
     QString instantDrop;
     QString logLevel;
+    QString logFile;
     QString ec2TranLogLevel;
+    QString exceptionFilters; //< TODO: remove in 4.0.
     QString lightMode;
     QnUuid videoWallGuid;
     QnUuid videoWallItemGuid;
@@ -66,4 +70,6 @@ struct QnStartupParameters
     QString enforceMediatorEndpoint;
 
     QStringList files; //< File paths passed to the client.
+
+    QString qmlRoot;
 };

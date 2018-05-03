@@ -3,7 +3,7 @@
 #include <chrono>
 
 #include <nx/network/aio/basic_pollable.h>
-#include <nx/network/cloud/address_resolver.h>
+#include <nx/network/address_resolver.h>
 #include <nx/network/socket_attributes_cache.h>
 #include <nx/utils/async_operation_guard.h>
 #include <nx/utils/move_only_func.h>

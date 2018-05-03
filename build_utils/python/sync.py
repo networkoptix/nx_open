@@ -27,6 +27,8 @@ def sync_package(rdep, package):
 
 def sync(packages, skip_failed = False):
     rdep = Rdep(rdep_configure.REPOSITORY_PATH)
+    rdep.fast_check = True
+    rdep.load_timestamps_for_fast_check()
 
     result = {}
     for package in packages:

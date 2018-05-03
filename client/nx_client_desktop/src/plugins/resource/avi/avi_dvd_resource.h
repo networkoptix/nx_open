@@ -1,7 +1,6 @@
-#ifndef QN_AVI_DVD_RESOURCE_H
-#define QN_AVI_DVD_RESOURCE_H
+#pragma once
 
-#include <plugins/resource/avi/avi_resource.h>
+#include <core/resource/avi/avi_resource.h>
 
 class QnAviDvdResource : public QnAviResource
 {
@@ -13,10 +12,8 @@ public:
 
     static bool isAcceptedUrl(const QString& url);
     static QString urlToFirstVTS(const QString& url);
-protected:
-    virtual QnAbstractStreamDataProvider* createDataProviderInternal(Qn::ConnectionRole role);
+
+    virtual QnAviArchiveDelegate* createArchiveDelegate() const override;
 };
 
 typedef QnSharedResourcePointer<QnAviDvdResource> QnAviDvdResourcePtr;
-
-#endif // QN_AVI_DVD_RESOURCE_H

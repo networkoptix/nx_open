@@ -14,10 +14,10 @@ namespace settings {
 struct LastConnectionData
 {
     QString systemName;
-    QUrl url;
+    nx::utils::Url url;
     QnEncodedCredentials credentials;
 
-    QUrl urlWithCredentials() const;
+    nx::utils::Url urlWithCredentials() const;
 };
 #define LastConnectionData_Fields (systemName)(url)(credentials)
 

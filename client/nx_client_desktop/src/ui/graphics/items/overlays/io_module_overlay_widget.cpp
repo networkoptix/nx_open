@@ -307,7 +307,7 @@ void QnIoModuleOverlayWidgetPrivate::toggleState(const QString& port)
     vms::event::CameraOutputActionPtr action(new vms::event::CameraOutputAction(eventParams));
     action->setParams(params);
     action->setResources({ module->getId() });
-    action->setToggleState(it->state.isActive ? vms::event::EventState::inactive : vms::event::EventState::active);
+    action->setToggleState(it->state.isActive ? vms::api::EventState::inactive : vms::api::EventState::active);
 
     ec2::AbstractECConnectionPtr connection = commonModule()->ec2Connection();
     // we are not interested in client->server transport error code because of real port checking by timer

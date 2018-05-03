@@ -10,7 +10,7 @@ namespace network {
 class NX_NETWORK_API TimeProtocolServer:
     public server::StreamSocketServer<TimeProtocolServer, TimeProtocolConnection>
 {
-    using base_type = 
+    using base_type =
         server::StreamSocketServer<TimeProtocolServer, TimeProtocolConnection>;
 
 public:

@@ -5,6 +5,8 @@
 #include <core/resource/resource_fwd.h>
 #include <api/server_rest_connection_fwd.h>
 #include <common/common_module_aware.h>
+#include <nx/vms/common/p2p/downloader/private/peer_selection/abstract_peer_selector.h>
+#include <nx/network/deprecated/asynchttpclient.h>
 
 class QnResourcePool;
 class QnAsyncHttpClientReply;
@@ -18,12 +20,15 @@ namespace downloader {
 class ResourcePoolPeerManager: public AbstractPeerManager, public QnCommonModuleAware
 {
 public:
-    ResourcePoolPeerManager(QnCommonModule* commonModule);
+    ResourcePoolPeerManager(
+        QnCommonModule* commonModule,
+        peer_selection::AbstractPeerSelectorPtr peerSelector);
 
     virtual QnUuid selfId() const override;
 
     virtual QString peerString(const QnUuid& peerId) const override;
     virtual QList<QnUuid> getAllPeers() const override;
+    virtual QList<QnUuid> peers() const override;
     virtual int distanceTo(const QnUuid& peerId) const override;
     virtual bool hasInternetConnection(const QnUuid& peerId) const override;
 
@@ -43,13 +48,17 @@ public:
         int chunkIndex,
         ChunkCallback callback) override;
 
-    virtual rest::Handle downloadChunkFromInternet(
-        const QnUuid& peerId,
+    virtual rest::Handle downloadChunkFromInternet(const QnUuid& peerId,
         const QString& fileName,
-        const QUrl& url,
+        const nx::utils::Url &url,
         int chunkIndex,
         int chunkSize,
         ChunkCallback callback) override;
+
+    virtual rest::Handle validateFileInformation(
+        const QnUuid& peerId,
+        const FileInformation& fileInformation,
+        ValidateCallback callback) override;
 
     virtual void cancelRequest(const QnUuid& peerId, rest::Handle handle) override;
 
@@ -58,7 +67,8 @@ private:
     rest::QnConnectionPtr getConnection(const QnUuid& peerId) const;
 
     rest::Handle m_currentSelfRequestHandle = -1;
-    QHash<rest::Handle, QnAsyncHttpClientReply*> m_replyByHandle;
+    QHash<rest::Handle, nx::network::http::AsyncHttpClientPtr> m_httpClientByHandle;
+    peer_selection::AbstractPeerSelectorPtr m_peerSelector;
 };
 
 class ResourcePoolPeerManagerFactory:
@@ -67,8 +77,10 @@ class ResourcePoolPeerManagerFactory:
 {
 public:
     ResourcePoolPeerManagerFactory(QnCommonModule* commonModule);
-    virtual AbstractPeerManager* createPeerManager() override;
+    virtual AbstractPeerManager* createPeerManager(FileInformation::PeerSelectionPolicy peerPolicy) override;
 };
+
+nx::network::http::AsyncHttpClientPtr createHttpClient();
 
 } // namespace downloader
 } // namespace p2p

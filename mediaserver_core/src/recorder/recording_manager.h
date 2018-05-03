@@ -12,10 +12,8 @@
 #include <server/server_globals.h>
 
 #include <core/resource/resource_fwd.h>
-#include <core/dataprovider/data_provider_factory.h>
 
 #include "camera/video_camera.h"
-#include "core/misc/schedule_task.h"
 #include <nx/utils/singleton.h>
 #include <common/common_module_aware.h>
 
@@ -110,7 +108,7 @@ public:
 
     WriteBufferMultiplierManager& getBufferManager() { return m_writeBufferManager; }
 signals:
-    void recordingDisabled(const QnResourcePtr &resource, qint64 timeStamp, nx::vms::event::EventReason reasonCode, const QString& reasonText);
+    void recordingDisabled(const QnResourcePtr &resource, qint64 timeStamp, nx::vms::api::EventReason reasonCode, const QString& reasonText);
 private slots:
     void onNewResource(const QnResourcePtr &resource);
     void onRemoveResource(const QnResourcePtr &resource);

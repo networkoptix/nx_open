@@ -1,6 +1,8 @@
-#pragma once 
+#pragma once
 
 #include <nx/network/abstract_socket.h>
+
+#include "../aio/basic_pollable.h"
 
 namespace nx {
 namespace network {
@@ -11,6 +13,8 @@ namespace network {
 class NX_NETWORK_API DummySocket:
     public AbstractStreamSocket
 {
+    using base_type = AbstractStreamSocket;
+
 public:
     DummySocket();
 
@@ -18,6 +22,8 @@ public:
     virtual SocketAddress getLocalAddress() const override;
     virtual bool setReuseAddrFlag( bool reuseAddr ) override;
     virtual bool getReuseAddrFlag( bool* val ) const override;
+    virtual bool setReusePortFlag(bool value) override;
+    virtual bool getReusePortFlag(bool* value) const override;
     virtual bool setNonBlockingMode( bool val ) override;
     virtual bool getNonBlockingMode( bool* val ) const override;
     virtual bool getMtu( unsigned int* mtuValue ) const  override;
@@ -30,20 +36,16 @@ public:
     virtual bool setSendTimeout( unsigned int ms ) override;
     virtual bool getSendTimeout( unsigned int* millis ) const override;
     virtual bool getLastError( SystemError::ErrorCode* errorCode ) const  override;
+    virtual bool setIpv6Only( bool val ) override;
     virtual SOCKET_HANDLE handle() const override;
     virtual Pollable* pollable() override;
 
     virtual bool connect(
         const SocketAddress& remoteSocketAddress,
-        unsigned int timeoutMillis = kDefaultTimeoutMillis) override;
+        std::chrono::milliseconds timeout) override;
 
     virtual SocketAddress getForeignAddress() const override;
-    virtual void cancelIOAsync(
-        aio::EventType eventType,
-        nx::utils::MoveOnlyFunc<void()> cancellationDoneHandler) override;
-    virtual void cancelIOSync(aio::EventType eventType) override;
 
-    virtual bool reopen() override;
     virtual bool setNoDelay( bool value ) override;
     virtual bool getNoDelay( bool* value ) const override;
     virtual bool toggleStatisticsCollection( bool val ) override;
@@ -60,11 +62,11 @@ public:
 
     virtual void readSomeAsync(
         nx::Buffer* const buf,
-        std::function<void( SystemError::ErrorCode, size_t )> handler ) override;
+        nx::utils::MoveOnlyFunc<void( SystemError::ErrorCode, size_t )> handler ) override;
 
     virtual void sendAsync(
         const nx::Buffer& buf,
-        std::function<void( SystemError::ErrorCode, size_t )> handler ) override;
+        nx::utils::MoveOnlyFunc<void( SystemError::ErrorCode, size_t )> handler ) override;
 
     virtual void registerTimer(
         std::chrono::milliseconds timeoutMs,
@@ -73,9 +75,13 @@ public:
     virtual aio::AbstractAioThread* getAioThread() const override;
     virtual void bindToAioThread(aio::AbstractAioThread* aioThread) override;
 
+protected:
+    virtual void cancelIoInAioThread(aio::EventType eventType) override;
+
 private:
     SocketAddress m_localAddress;
     SocketAddress m_remotePeerAddress;
+    aio::BasicPollable m_basicPollable;
 };
 
 } // namespace network

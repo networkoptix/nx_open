@@ -1,22 +1,15 @@
-/**********************************************************
-* Sep 4, 2015
-* a.kolesnikov
-***********************************************************/
-
-#ifndef CLOUD_DB_CL_SYSTEM_DATA_H
-#define CLOUD_DB_CL_SYSTEM_DATA_H
+#pragma once
 
 #include <QtCore/QUrlQuery>
 
 #include <string>
 #include <vector>
 
+#include <nx/fusion/fusion/fusion_fwd.h>
 #include <nx/fusion/model_functions_fwd.h>
 #include <nx/utils/uuid.h>
-#include <nx/fusion/fusion/fusion_fwd.h>
 
 #include <nx/cloud/cdb/api/system_data.h>
-
 
 namespace nx {
 namespace cdb {
@@ -24,12 +17,12 @@ namespace api {
 
 #define SystemRegistrationData_Fields (name)(customization)(opaque)
 
-//TODO #ak add corresponding parser/serializer to fusion and remove this function
+// TODO: #ak Add corresponding parser/serializer to fusion and remove this function.
 bool loadFromUrlQuery(const QUrlQuery& urlQuery, SystemRegistrationData* const systemData);
 void serializeToUrlQuery(const SystemRegistrationData& data, QUrlQuery* const urlQuery);
 
 
-//TODO #ak add corresponding parser/serializer to fusion and remove this function
+// TODO: #ak Add corresponding parser/serializer to fusion and remove this function.
 //bool loadFromUrlQuery( const QUrlQuery& urlQuery, SystemData* const systemData );
 
 #define SystemData_Fields (id)(name)(customization)(authKey)(ownerAccountEmail) \
@@ -37,7 +30,9 @@ void serializeToUrlQuery(const SystemRegistrationData& data, QUrlQuery* const ur
                           (opaque)(registrationTime)
 #define SystemDataList_Fields (systems)
 
-//!for requests passing just system id
+/**
+ * For requests passing just system id.
+ */
 class SystemId
 {
 public:
@@ -91,7 +86,11 @@ bool loadFromUrlQuery(const QUrlQuery& urlQuery, SystemSharingList* const system
 #define SystemAccessRoleData_Fields (accessRole)
 #define SystemAccessRoleList_Fields (accessRoles)
 
-#define SystemDataEx_Fields SystemData_Fields(ownerFullName)(accessRole)(sharingPermissions)(stateOfHealth)(usageFrequency)(lastLoginTime)
+#define SystemMergeInfo_Fields (role)(startTime)(anotherSystemId)
+
+#define SystemDataEx_Fields SystemData_Fields \
+    (ownerFullName)(accessRole)(sharingPermissions)(stateOfHealth) \
+    (usageFrequency)(lastLoginTime)(mergeInfo)(capabilities)
 #define SystemDataExList_Fields (systems)
 
 
@@ -112,8 +111,8 @@ QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
     (json));
 
 QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
-    (SystemDataEx)(SystemDataList)(SystemDataExList)(SystemSharingList)(SystemSharingEx) \
-        (SystemSharingExList)(SystemAccessRoleData)(SystemAccessRoleList) \
+    (SystemMergeInfo)(SystemDataEx)(SystemDataList)(SystemDataExList)(SystemSharingList) \
+        (SystemSharingEx)(SystemSharingExList)(SystemAccessRoleData)(SystemAccessRoleList) \
         (SystemHealthHistoryItem)(SystemHealthHistory),
     (json));
 
@@ -121,14 +120,16 @@ QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(nx::cdb::api::SystemStatus)
 QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(nx::cdb::api::SystemHealth)
 QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(nx::cdb::api::SystemAccessRole)
 QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(nx::cdb::api::FilterField)
+QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(nx::cdb::api::MergeRole)
+QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(nx::cdb::api::SystemCapabilityFlag)
 
-}   //api
-}   //cdb
-}   //nx
+} // namespace api
+} // namespace cdb
+} // namespace nx
 
 QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES((nx::cdb::api::SystemStatus), (lexical))
 QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES((nx::cdb::api::SystemHealth), (lexical))
 QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES((nx::cdb::api::SystemAccessRole), (lexical))
 QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES((nx::cdb::api::FilterField), (lexical))
-
-#endif //CLOUD_DB_CL_SYSTEM_DATA_H
+QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES((nx::cdb::api::MergeRole), (lexical))
+QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES((nx::cdb::api::SystemCapabilityFlag), (lexical))

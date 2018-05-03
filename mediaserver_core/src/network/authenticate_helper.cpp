@@ -12,7 +12,6 @@
 #include <core/resource/videowall_resource.h>
 #include "utils/common/util.h"
 #include "utils/common/synctime.h"
-#include <nx/network/simple_http_client.h>
 #include <nx/utils/match/wildcard.h>
 #include "api/app_server_connection.h"
 #include "common/common_module.h"
@@ -23,10 +22,8 @@
 #include <nx_ec/dummy_handler.h>
 #include <ldap/ldap_manager.h>
 #include <nx/network/rtsp/rtsp_types.h>
-#include "network/auth/time_based_nonce_provider.h"
-#include "network/auth/generic_user_data_provider.h"
-#include "network/auth/cdb_nonce_fetcher.h"
-#include "network/auth/cloud_user_authenticator.h"
+#include <nx/vms/auth/time_based_nonce_provider.h>
+#include <nx/vms/auth/generic_user_data_provider.h>
 
 #include <nx_ec/data/api_conversion_functions.h>
 #include <nx_ec/managers/abstract_user_manager.h>
@@ -35,30 +32,28 @@
 #include <nx/utils/log/log.h>
 
 #include <nx/kit/ini_config.h>
+#include <nx/vms/cloud_integration/cloud_manager_group.h>
 
-#include "cloud/cloud_manager_group.h"
-
-namespace {
-
-struct Ini: nx::kit::IniConfig
-{
-    Ini(): IniConfig("QnAuthHelper.ini") { reload(); }
-
-    NX_INI_INT(static_cast<int>(nx::utils::log::Level::none), logLevel, "");
-};
-
-} // namespace
 
 ////////////////////////////////////////////////////////////
 //// class QnAuthHelper
 ////////////////////////////////////////////////////////////
 
-void QnAuthHelper::UserDigestData::parse(const nx_http::Request& request)
+// TODO: Does it make sense to move into some config?
+static const bool kVerifyDigestUriWithParams = false;
+
+namespace {
+
+static const QByteArray kCookieAuthMethod("GET");
+
+} // namespace
+
+void QnAuthHelper::UserDigestData::parse(const nx::network::http::Request& request)
 {
-    ha1Digest = nx_http::getHeaderValue(request.headers, Qn::HA1_DIGEST_HEADER_NAME);
-    realm = nx_http::getHeaderValue(request.headers, Qn::REALM_HEADER_NAME);
-    cryptSha512Hash = nx_http::getHeaderValue(request.headers, Qn::CRYPT_SHA512_HASH_HEADER_NAME);
-    nxUserName = nx_http::getHeaderValue(request.headers, Qn::CUSTOM_USERNAME_HEADER_NAME);
+    ha1Digest = nx::network::http::getHeaderValue(request.headers, Qn::HA1_DIGEST_HEADER_NAME);
+    realm = nx::network::http::getHeaderValue(request.headers, Qn::REALM_HEADER_NAME);
+    cryptSha512Hash = nx::network::http::getHeaderValue(request.headers, Qn::CRYPT_SHA512_HASH_HEADER_NAME);
+    nxUserName = nx::network::http::getHeaderValue(request.headers, Qn::CUSTOM_USERNAME_HEADER_NAME);
 }
 
 bool QnAuthHelper::UserDigestData::empty() const
@@ -76,7 +71,7 @@ const unsigned int QnAuthHelper::MAX_AUTHENTICATION_KEY_LIFE_TIME_MS = 60 * 60 *
 QnAuthHelper::QnAuthHelper(
     QnCommonModule* commonModule,
     TimeBasedNonceProvider* timeBasedNonceProvider,
-    CloudManagerGroup* cloudManagerGroup)
+    nx::vms::cloud_integration::CloudManagerGroup* cloudManagerGroup)
 :
     QnCommonModuleAware(commonModule),
     m_timeBasedNonceProvider(timeBasedNonceProvider),
@@ -84,11 +79,6 @@ QnAuthHelper::QnAuthHelper(
     m_userDataProvider(&cloudManagerGroup->userAuthenticator),
     m_ldap(new QnLdapManager(commonModule))
 {
-    Ini ini;
-
-    const auto logger = nx::utils::log::addLogger({nx::utils::log::Tag(typeid(QnAuthHelper))});
-    logger->setDefaultLevel(static_cast<nx::utils::log::Level>(ini.logLevel));
-    logger->setWriter(std::make_unique<nx::utils::log::StdOut>());
 }
 
 QnAuthHelper::~QnAuthHelper()
@@ -96,16 +86,16 @@ QnAuthHelper::~QnAuthHelper()
 }
 
 Qn::AuthResult QnAuthHelper::authenticate(
-    const nx_http::Request& request,
-    nx_http::Response& response,
+    const nx::network::http::Request& request,
+    nx::network::http::Response& response,
     bool isProxy,
     Qn::UserAccessData* accessRights,
-    nx_http::AuthMethod::Value* usedAuthMethod)
+    nx::network::http::AuthMethod::Value* usedAuthMethod)
 {
     if (accessRights)
         *accessRights = Qn::UserAccessData();
     if (usedAuthMethod)
-        *usedAuthMethod = nx_http::AuthMethod::noAuth;
+        *usedAuthMethod = nx::network::http::AuthMethod::noAuth;
 
     const QUrlQuery urlQuery(request.requestLine.url.query());
 
@@ -116,7 +106,7 @@ Qn::AuthResult QnAuthHelper::authenticate(
     NX_VERBOSE(this, lm("Authenticating %1. Allowed auth methods 0b%2")
         .arg(request.requestLine).arg(allowedAuthMethods, 0, 2));
 
-    if (allowedAuthMethods & nx_http::AuthMethod::noAuth)
+    if (allowedAuthMethods & nx::network::http::AuthMethod::noAuth)
     {
         NX_VERBOSE(this, lm("Authenticated %1 by noauth").arg(request.requestLine));
         return Qn::Auth_OK;
@@ -135,7 +125,7 @@ Qn::AuthResult QnAuthHelper::authenticate(
                 NX_VERBOSE(this, lm("Authenticated %1 by auth key").arg(request.requestLine));
 
                 if (usedAuthMethod)
-                    *usedAuthMethod = nx_http::AuthMethod::tempUrlQueryParam;
+                    *usedAuthMethod = nx::network::http::AuthMethod::tempUrlQueryParam;
                 if (accessRights)
                     *accessRights = it->second.accessRights;
                 return Qn::Auth_OK;
@@ -143,16 +133,16 @@ Qn::AuthResult QnAuthHelper::authenticate(
         }
     }
 
-    if (allowedAuthMethods & nx_http::AuthMethod::videowall)
+    if (allowedAuthMethods & nx::network::http::AuthMethod::videowall)
     {
-        const nx_http::StringType& videoWall_auth = nx_http::getHeaderValue(request.headers, Qn::VIDEOWALL_GUID_HEADER_NAME);
+        const nx::network::http::StringType& videoWall_auth = nx::network::http::getHeaderValue(request.headers, Qn::VIDEOWALL_GUID_HEADER_NAME);
         if (!videoWall_auth.isEmpty())
         {
             NX_VERBOSE(this, lm("Authenticating %1 by video wall key %2")
                 .arg(request.requestLine.url).arg(videoWall_auth));
 
             if (usedAuthMethod)
-                *usedAuthMethod = nx_http::AuthMethod::videowall;
+                *usedAuthMethod = nx::network::http::AuthMethod::videowall;
 
             if (resourcePool()->getResourceById<QnVideoWallResource>(QnUuid(videoWall_auth)).isNull())
             {
@@ -172,7 +162,7 @@ Qn::AuthResult QnAuthHelper::authenticate(
         }
     }
 
-    if (allowedAuthMethods & nx_http::AuthMethod::urlQueryParam)
+    if (allowedAuthMethods & nx::network::http::AuthMethod::urlQueryParam)
     {
         const QByteArray& authQueryParam = urlQuery.queryItemValue(
             isProxy ? lit("proxy_auth") : QString::fromLatin1(Qn::URL_QUERY_AUTH_KEY_NAME)).toLatin1();
@@ -192,199 +182,226 @@ Qn::AuthResult QnAuthHelper::authenticate(
             if (authResult == Qn::Auth_OK)
             {
                 if (usedAuthMethod)
-                    *usedAuthMethod = nx_http::AuthMethod::urlQueryParam;
+                    *usedAuthMethod = nx::network::http::AuthMethod::urlQueryParam;
                 NX_DEBUG(this, lm("%1 with urlQueryParam (%2)").args(Qn::Auth_OK, request.requestLine));
                 return Qn::Auth_OK;
             }
         }
     }
 
-    if (allowedAuthMethods & nx_http::AuthMethod::cookie)
+    auto result = Qn::Auth_Forbidden;
+    if (allowedAuthMethods & nx::network::http::AuthMethod::cookie)
     {
-        const QString& cookie = QLatin1String(nx_http::getHeaderValue(request.headers, "Cookie"));
-        int customAuthInfoPos = cookie.indexOf(Qn::URL_QUERY_AUTH_KEY_NAME);
-        if (customAuthInfoPos >= 0)
+        const auto cookie = nx::network::http::getHeaderValue(request.headers, "Cookie");
+        if (cookie.indexOf(Qn::URL_QUERY_AUTH_KEY_NAME))
         {
             if (usedAuthMethod)
-                *usedAuthMethod = nx_http::AuthMethod::cookie;
-            const auto result = doCookieAuthorization("GET", cookie.toUtf8(), response, accessRights);
-            NX_DEBUG(this, lm("%1 with cookie (%2)").args(result, request.requestLine));
-            return result;
+                *usedAuthMethod = nx::network::http::AuthMethod::cookie;
+
+            boost::optional<QByteArray> csrfToken;
+            if ((allowedAuthMethods & nx::network::http::AuthMethod::allowWithourCsrf) == 0)
+                csrfToken = nx::network::http::getHeaderValue(request.headers, Qn::CSRF_TOKEN_HEADER_NAME);
+
+            result = doCookieAuthorization(
+                request.requestLine.method, cookie, csrfToken, response, accessRights);
+
+            NX_VERBOSE(this, lm("%1 with cookie (%2)").args(result, request.requestLine));
+            if (result == Qn::Auth_OK)
+                return result;
         }
     }
 
-    if (allowedAuthMethods & nx_http::AuthMethod::http)
+    if (allowedAuthMethods & nx::network::http::AuthMethod::http)
     {
         NX_VERBOSE(this, lm("Authenticating %1 with HTTP authentication")
             .arg(request.requestLine));
 
-        const nx_http::StringType& authorization = isProxy
-            ? nx_http::getHeaderValue(request.headers, "Proxy-Authorization")
-            : nx_http::getHeaderValue(request.headers, "Authorization");
-        const nx_http::StringType nxUserName = nx_http::getHeaderValue(request.headers, Qn::CUSTOM_USERNAME_HEADER_NAME);
-        bool canUpdateRealm = request.headers.find(Qn::CUSTOM_CHANGE_REALM_HEADER_NAME) != request.headers.end();
-        if (authorization.isEmpty())
+        result = httpAuthenticate(request, response, isProxy, accessRights, usedAuthMethod);
+        if (result == Qn::Auth_OK)
         {
-            NX_VERBOSE(this, lm("Authenticating %1. Authorization header not found")
-                .arg(request.requestLine));
-
-            Qn::AuthResult authResult = Qn::Auth_WrongDigest;
-            if (usedAuthMethod)
-                *usedAuthMethod = nx_http::AuthMethod::httpDigest;
-            QnUserResourcePtr userResource;
-            if (!nxUserName.isEmpty())
-            {
-                userResource = findUserByName(nxUserName);
-                if (userResource)
-                {
-                    NX_VERBOSE(this, lm("Authenticating %1. Found Nx user %2. Checking realm...")
-                        .arg(request.requestLine).arg(nxUserName));
-
-                    QString desiredRealm = nx::network::AppInfo::realm();
-                    bool needRecalcPassword =
-                        userResource->getRealm() != desiredRealm ||
-                        (userResource->isLdap() && userResource->passwordExpired()) ||
-                        (userResource->getDigest().isEmpty() && !userResource->isCloud());
-                    if (canUpdateRealm && needRecalcPassword)
-                    {
-                        //requesting client to re-calculate digest after upgrade to 2.4 or fill ldap password
-                        nx_http::insertOrReplaceHeader(
-                            &response.headers,
-                            nx_http::HttpHeader(Qn::REALM_HEADER_NAME, desiredRealm.toLatin1()));
-
-                        addAuthHeader(
-                            response,
-                            userResource,
-                            isProxy,
-                            false); //requesting Basic authorization
-                            return authResult;
-                    }
-                }
-            }
-            else {
-                // use admin's realm by default for better compatibility with previous version
-                // in case of default realm upgrade
-                userResource = resourcePool()->getAdministrator();
-            }
-
-            addAuthHeader(
-                response,
-                userResource,
-                isProxy);
-            NX_DEBUG(this, lm("%1 requesting digest auth (%2)").args(authResult, request.requestLine));
-            return authResult;
-        }
-
-        nx_http::header::Authorization authorizationHeader;
-        if (!authorizationHeader.parse(authorization))
-        {
-            NX_VERBOSE(this, lm("Failed to authenticate %1 with HTTP authentication. "
-                "Error parsing Authorization header").arg(request.requestLine.url));
-            return Qn::Auth_Forbidden;
-        }
-        //TODO #ak better call m_userDataProvider->authorize here
-        QnUserResourcePtr userResource = findUserByName(authorizationHeader.userid());
-
-        // Extra step for LDAP authentication
-
-        if (userResource && userResource->isLdap() && userResource->passwordExpired())
-        {
-            NX_VERBOSE(this, lm("Authenticating %1. Authentication LDAP user %2")
-                .arg(request.requestLine).arg(userResource->getName()));
-
-            // Check user password on LDAP server
-            QString password;
-            if (authorizationHeader.authScheme == nx_http::header::AuthScheme::basic)
-            {
-                password = authorizationHeader.basic->password;
-            }
-            else if (authorizationHeader.authScheme == nx_http::header::AuthScheme::digest)
-            {
-                password = userResource->decodeLDAPPassword();
-                if (password.isEmpty())
-                    return Qn::Auth_Forbidden; //< can't perform digest auth for LDAP user yet
-            }
-
-            auto authResult = m_ldap->authenticate(userResource->getName(), password);
-
-            if ((authResult == Qn::Auth_WrongPassword ||
-                authResult == Qn::Auth_WrongDigest ||
-                authResult == Qn::Auth_WrongLogin) &&
-                authorizationHeader.authScheme == nx_http::header::AuthScheme::digest)
-            {
-                if (doDigestAuth(request.requestLine.method,
-                    authorizationHeader, response, isProxy, accessRights) == Qn::Auth_OK)
-                {
-                    // Cached value matched user digest by not LDAP server.
-                    // Reset password in database to force user to relogin.
-                    updateUserHashes(userResource, QString());
-                }
-            }
-
-            if (authResult != Qn::Auth_OK)
-                return authResult;
-            updateUserHashes(userResource, password); //< update stored LDAP password/hash if need
-            userResource->prolongatePassword();
-        }
-
-        // Standard authentication
-
-        Qn::AuthResult authResult = Qn::Auth_Forbidden;
-        if (authorizationHeader.authScheme == nx_http::header::AuthScheme::digest)
-        {
-            if (usedAuthMethod)
-                *usedAuthMethod = nx_http::AuthMethod::httpDigest;
-
-            authResult = doDigestAuth(
-                request.requestLine.method, authorizationHeader, response, isProxy, accessRights);
-            NX_DEBUG(this, lm("%1 with digest (%2)").args(authResult, request.requestLine));
-        }
-        else if (authorizationHeader.authScheme == nx_http::header::AuthScheme::basic)
-        {
-            if (usedAuthMethod)
-                *usedAuthMethod = nx_http::AuthMethod::httpBasic;
-            authResult = doBasicAuth(request.requestLine.method, authorizationHeader, response, accessRights);
-
-            if (authResult == Qn::Auth_OK && userResource &&
-                (userResource->getDigest().isEmpty() || userResource->getRealm() != nx::network::AppInfo::realm()))
-            {
-                updateUserHashes(userResource, authorizationHeader.basic->password);
-            }
+            NX_VERBOSE(this, lm("Authenticated %1 with HTTP authentication").args(request.requestLine.url));
+            return result;
         }
         else
         {
-            if (usedAuthMethod)
-                *usedAuthMethod = nx_http::AuthMethod::httpBasic;
-            authResult = Qn::Auth_Forbidden;
+            NX_VERBOSE(this, lm("Failed to authenticate %1 with HTTP authentication: %2")
+                .args(request.requestLine.url, result));
         }
-
-        if (authResult == Qn::Auth_OK)
-        {
-            NX_VERBOSE(this, lm("Authenticating %1. Fetching access rights").arg(request.requestLine));
-
-            // update user information if authorization by server authKey and user-name is specified
-            if (accessRights &&
-                resourcePool()->getResourceById<QnMediaServerResource>(accessRights->userId))
-            {
-                *accessRights = Qn::kSystemAccess;
-                auto itr = request.headers.find(Qn::CUSTOM_USERNAME_HEADER_NAME);
-                if (itr != request.headers.end())
-                {
-                    auto userRes = findUserByName(itr->second);
-                    if (userRes)
-                        *accessRights = Qn::UserAccessData(userRes->getId());
-                }
-            }
-        }
-        return authResult;
     }
 
     NX_VERBOSE(this, lm("Failed to authenticate %1 with any method").arg(request.requestLine.url));
-
-    return Qn::Auth_Forbidden;   //failed to authorise request with any method
+    return result;
 }
 
-nx_http::AuthMethodRestrictionList* QnAuthHelper::restrictionList()
+Qn::AuthResult QnAuthHelper::httpAuthenticate(
+    const nx::network::http::Request& request,
+    nx::network::http::Response& response,
+    bool isProxy,
+    Qn::UserAccessData* accessRights,
+    nx::network::http::AuthMethod::Value* usedAuthMethod)
+{
+    const nx::network::http::StringType& authorization = isProxy
+        ? nx::network::http::getHeaderValue(request.headers, "Proxy-Authorization")
+        : nx::network::http::getHeaderValue(request.headers, "Authorization");
+    const nx::network::http::StringType nxUserName = nx::network::http::getHeaderValue(request.headers, Qn::CUSTOM_USERNAME_HEADER_NAME);
+    bool canUpdateRealm = request.headers.find(Qn::CUSTOM_CHANGE_REALM_HEADER_NAME) != request.headers.end();
+    if (authorization.isEmpty())
+    {
+        NX_VERBOSE(this, lm("Authenticating %1. Authorization header not found")
+            .arg(request.requestLine));
+
+        Qn::AuthResult authResult = Qn::Auth_WrongDigest;
+        if (usedAuthMethod)
+            *usedAuthMethod = nx::network::http::AuthMethod::httpDigest;
+        QnUserResourcePtr userResource;
+        if (!nxUserName.isEmpty())
+        {
+            userResource = findUserByName(nxUserName);
+            if (userResource)
+            {
+                NX_VERBOSE(this, lm("Authenticating %1. Found Nx user %2. Checking realm...")
+                    .arg(request.requestLine).arg(nxUserName));
+
+                QString desiredRealm = nx::network::AppInfo::realm();
+                bool needRecalcPassword =
+                    userResource->getRealm() != desiredRealm ||
+                    (userResource->isLdap() && userResource->passwordExpired()) ||
+                    (userResource->getDigest().isEmpty() && !userResource->isCloud());
+                if (canUpdateRealm && needRecalcPassword)
+                {
+                    //requesting client to re-calculate digest after upgrade to 2.4 or fill ldap password
+                    nx::network::http::insertOrReplaceHeader(
+                        &response.headers,
+                        nx::network::http::HttpHeader(Qn::REALM_HEADER_NAME, desiredRealm.toLatin1()));
+
+                    addAuthHeader(
+                        response,
+                        userResource,
+                        isProxy,
+                        false); //requesting Basic authorization
+                        return authResult;
+                }
+            }
+        }
+        else {
+            // use admin's realm by default for better compatibility with previous version
+            // in case of default realm upgrade
+            userResource = resourcePool()->getAdministrator();
+        }
+
+        addAuthHeader(
+            response,
+            userResource,
+            isProxy);
+        NX_DEBUG(this, lm("%1 requesting digest auth (%2)").args(authResult, request.requestLine));
+        return authResult;
+    }
+
+    nx::network::http::header::Authorization authorizationHeader;
+    if (!authorizationHeader.parse(authorization))
+    {
+        NX_VERBOSE(this, lm("Failed to authenticate %1 with HTTP authentication. "
+            "Error parsing Authorization header").arg(request.requestLine.url));
+        return Qn::Auth_Forbidden;
+    }
+    //TODO #ak better call m_userDataProvider->authorize here
+    QnUserResourcePtr userResource = findUserByName(authorizationHeader.userid());
+
+    // Extra step for LDAP authentication
+
+    if (userResource && userResource->isLdap() && userResource->passwordExpired())
+    {
+        NX_VERBOSE(this, lm("Authenticating %1. Authentication LDAP user %2")
+            .arg(request.requestLine).arg(userResource->getName()));
+
+        // Check user password on LDAP server
+        QString password;
+        if (authorizationHeader.authScheme == nx::network::http::header::AuthScheme::basic)
+        {
+            password = authorizationHeader.basic->password;
+        }
+        else if (authorizationHeader.authScheme == nx::network::http::header::AuthScheme::digest)
+        {
+            password = userResource->decodeLDAPPassword();
+            if (password.isEmpty())
+                return Qn::Auth_Forbidden; //< can't perform digest auth for LDAP user yet
+        }
+
+        auto authResult = m_ldap->authenticate(userResource->getName(), password);
+
+        if ((authResult == Qn::Auth_WrongPassword ||
+            authResult == Qn::Auth_WrongDigest ||
+            authResult == Qn::Auth_WrongLogin) &&
+            authorizationHeader.authScheme == nx::network::http::header::AuthScheme::digest)
+        {
+            if (doDigestAuth(request.requestLine,
+                authorizationHeader, response, isProxy, accessRights) == Qn::Auth_OK)
+            {
+                // Cached value matched user digest by not LDAP server.
+                // Reset password in database to force user to relogin.
+                updateUserHashes(userResource, QString());
+            }
+        }
+
+        if (authResult != Qn::Auth_OK)
+            return authResult;
+        updateUserHashes(userResource, password); //< update stored LDAP password/hash if need
+        userResource->prolongatePassword();
+    }
+
+    // Standard authentication
+
+    Qn::AuthResult authResult = Qn::Auth_Forbidden;
+    if (authorizationHeader.authScheme == nx::network::http::header::AuthScheme::digest)
+    {
+        if (usedAuthMethod)
+            *usedAuthMethod = nx::network::http::AuthMethod::httpDigest;
+
+        authResult = doDigestAuth(
+            request.requestLine, authorizationHeader, response, isProxy, accessRights);
+        NX_DEBUG(this, lm("%1 with digest (%2)").args(authResult, request.requestLine));
+    }
+    else if (authorizationHeader.authScheme == nx::network::http::header::AuthScheme::basic)
+    {
+        if (usedAuthMethod)
+            *usedAuthMethod = nx::network::http::AuthMethod::httpBasic;
+        authResult = doBasicAuth(request.requestLine.method, authorizationHeader, response, accessRights);
+
+        if (authResult == Qn::Auth_OK && userResource &&
+            (userResource->getDigest().isEmpty() || userResource->getRealm() != nx::network::AppInfo::realm()))
+        {
+            updateUserHashes(userResource, authorizationHeader.basic->password);
+        }
+    }
+    else
+    {
+        if (usedAuthMethod)
+            *usedAuthMethod = nx::network::http::AuthMethod::httpBasic;
+        authResult = Qn::Auth_Forbidden;
+    }
+
+    if (authResult == Qn::Auth_OK)
+    {
+        NX_VERBOSE(this, lm("Authenticating %1. Fetching access rights").arg(request.requestLine));
+
+        // update user information if authorization by server authKey and user-name is specified
+        if (accessRights &&
+            resourcePool()->getResourceById<QnMediaServerResource>(accessRights->userId))
+        {
+            *accessRights = Qn::kSystemAccess;
+            auto itr = request.headers.find(Qn::CUSTOM_USERNAME_HEADER_NAME);
+            if (itr != request.headers.end())
+            {
+                auto userRes = findUserByName(itr->second);
+                if (userRes)
+                    *accessRights = Qn::UserAccessData(userRes->getId());
+            }
+        }
+    }
+    return authResult;
+}
+
+nx::network::http::AuthMethodRestrictionList* QnAuthHelper::restrictionList()
 {
     return &m_authMethodRestrictionList;
 }
@@ -425,10 +442,39 @@ void QnAuthHelper::authenticationExpired(const QString& authKey, quint64 /*timer
     m_authenticatedPaths.erase(authKey);
 }
 
+
+static bool verifyDigestUri(const nx::utils::Url& requestUrl, const QByteArray& uri)
+{
+    static const auto isEqual =
+        [](const QString& request, const QString& digest)
+        {
+            if (request == digest)
+                return true;
+
+            // TODO: #ak Remove in 4.0 and fix another way on cloud side.
+            // Currently VmsGateway proxies queries like /gateway/<SYSTEM_ID>/<QUERY> to mediaserver
+            // as is with just just /<QUERY>, see VMS-9360.
+            static const auto kGatewayPrefix = lit("/gateway/");
+            if (digest.startsWith(kGatewayPrefix))
+            {
+                const auto proxiedPathStart = digest.indexOf('/', kGatewayPrefix.size());
+                if (proxiedPathStart > 0 && request == digest.mid(proxiedPathStart))
+                    return true;
+            }
+
+            return false;
+        };
+
+    const nx::utils::Url digestUrl(QString::fromUtf8(uri));
+    return kVerifyDigestUriWithParams
+        ? isEqual(requestUrl.query(), digestUrl.query())
+        : isEqual(requestUrl.path(), digestUrl.path());
+}
+
 Qn::AuthResult QnAuthHelper::doDigestAuth(
-    const QByteArray& method,
-    const nx_http::header::Authorization& authorization,
-    nx_http::Response& responseHeaders,
+    const nx::network::http::RequestLine& requestLine,
+    const nx::network::http::header::Authorization& authorization,
+    nx::network::http::Response& responseHeaders,
     bool isProxy,
     Qn::UserAccessData* accessRights)
 {
@@ -438,7 +484,7 @@ Qn::AuthResult QnAuthHelper::doDigestAuth(
     const QByteArray realm = authorization.digest->params["realm"];
     const QByteArray uri = authorization.digest->params["uri"];
 
-    if (nonce.isEmpty() || userName.isEmpty() || realm.isEmpty())
+    if (nonce.isEmpty() || userName.isEmpty() || !verifyDigestUri(requestLine.url, uri))
         return Qn::Auth_WrongDigest;
 
     QnUserResourcePtr userResource;
@@ -449,7 +495,7 @@ Qn::AuthResult QnAuthHelper::doDigestAuth(
 
         QnResourcePtr res;
         std::tie(errCode, res) = m_userDataProvider->authorize(
-            method,
+            requestLine.method,
             authorization,
             &responseHeaders.headers);
 
@@ -464,9 +510,9 @@ Qn::AuthResult QnAuthHelper::doDigestAuth(
         userResource->getRealm() != nx::network::AppInfo::realm())
     {
         //requesting client to re-calculate user's HA1 digest
-        nx_http::insertOrReplaceHeader(
+        nx::network::http::insertOrReplaceHeader(
             &responseHeaders.headers,
-            nx_http::HttpHeader(Qn::REALM_HEADER_NAME, nx::network::AppInfo::realm().toLatin1()));
+            nx::network::http::HttpHeader(Qn::REALM_HEADER_NAME, nx::network::AppInfo::realm().toLatin1()));
     }
     addAuthHeader(
         responseHeaders,
@@ -481,11 +527,11 @@ Qn::AuthResult QnAuthHelper::doDigestAuth(
 
 Qn::AuthResult QnAuthHelper::doBasicAuth(
     const QByteArray& method,
-    const nx_http::header::Authorization& authorization,
-    nx_http::Response& response,
+    const nx::network::http::header::Authorization& authorization,
+    nx::network::http::Response& response,
     Qn::UserAccessData* accessRights)
 {
-    NX_ASSERT(authorization.authScheme == nx_http::header::AuthScheme::basic);
+    NX_ASSERT(authorization.authScheme == nx::network::http::header::AuthScheme::basic);
 
     Qn::AuthResult errCode = Qn::Auth_WrongLogin;
 
@@ -521,39 +567,34 @@ Qn::AuthResult QnAuthHelper::doBasicAuth(
 Qn::AuthResult QnAuthHelper::doCookieAuthorization(
     const QByteArray& method,
     const QByteArray& authData,
-    nx_http::Response& responseHeaders,
+    const boost::optional<QByteArray>& csrfToken,
+    nx::network::http::Response& responseHeaders,
     Qn::UserAccessData* accessRights)
 {
-    nx_http::Response tmpHeaders;
-
-    QMap<nx_http::BufferType, nx_http::BufferType> params;
+    QMap<nx::network::http::BufferType, nx::network::http::BufferType> params;
     nx::utils::parseNameValuePairs(authData, ';', &params);
 
-    Qn::AuthResult authResult = Qn::Auth_Forbidden;
-    if (params.contains(Qn::URL_QUERY_AUTH_KEY_NAME))
+    const auto auth = params.value(Qn::URL_QUERY_AUTH_KEY_NAME);
+    if (auth.isEmpty())
+        return Qn::Auth_Forbidden;
+
+    if (csrfToken)
     {
-        //authenticating
-        authResult = authenticateByUrl(
-            QUrl::fromPercentEncoding(params.value(Qn::URL_QUERY_AUTH_KEY_NAME)).toUtf8(),
-            method,
-            responseHeaders,
-            accessRights);
+        const auto csrfParam = params.value(Qn::CSRF_TOKEN_COOKIE_NAME);
+        if (csrfParam.isEmpty() || csrfParam != *csrfToken)
+            return Qn::Auth_InvalidCsrfToken;
     }
-    else
-    {
-        nx_http::header::Authorization authorization(nx_http::header::AuthScheme::digest);
-        authorization.digest->parse(authData, ';');
-        authResult = doDigestAuth(
-            method, authorization, tmpHeaders, false, accessRights);
-    }
-    if (authResult != Qn::Auth_OK)
-    {
-    }
-    return authResult;
+
+    // TODO: Verify UUID and CSRF token against some cache as well.
+    return authenticateByUrl(
+        nx::utils::Url::fromPercentEncoding(auth).toUtf8(),
+        kCookieAuthMethod,
+        responseHeaders, accessRights);
+
 }
 
 void QnAuthHelper::addAuthHeader(
-    nx_http::Response& response,
+    nx::network::http::Response& response,
     const QnUserResourcePtr& userResource,
     bool isProxy,
     bool isDigest)
@@ -573,7 +614,7 @@ void QnAuthHelper::addAuthHeader(
 
     //QString auth(lit("Digest realm=\"%1\",nonce=\"%2\",algorithm=MD5,qop=\"auth\""));
     const QByteArray headerName = isProxy ? "Proxy-Authenticate" : "WWW-Authenticate";
-    nx_http::insertOrReplaceHeader(&response.headers, nx_http::HttpHeader(
+    nx::network::http::insertOrReplaceHeader(&response.headers, nx::network::http::HttpHeader(
         headerName,
         auth.toLatin1()));
 }
@@ -589,7 +630,7 @@ QByteArray QnAuthHelper::generateNonce(NonceProvider provider) const
 Qn::AuthResult QnAuthHelper::authenticateByUrl(
     const QByteArray& authRecordBase64,
     const QByteArray& method,
-    nx_http::Response& response,
+    nx::network::http::Response& response,
     Qn::UserAccessData* accessRights) const
 {
     auto authRecord = QByteArray::fromBase64(authRecordBase64);
@@ -597,7 +638,7 @@ Qn::AuthResult QnAuthHelper::authenticateByUrl(
     if (authFields.size() != 3)
         return Qn::Auth_WrongDigest;
 
-    nx_http::header::Authorization authorization(nx_http::header::AuthScheme::digest);
+    nx::network::http::header::Authorization authorization(nx::network::http::header::AuthScheme::digest);
     authorization.digest->userid = authFields[0];
     authorization.digest->params["response"] = authFields[2];
     authorization.digest->params["nonce"] = authFields[1];
@@ -648,23 +689,6 @@ void QnAuthHelper::updateUserHashes(const QnUserResourcePtr& userResource, const
         QString(),
         ec2::DummyHandler::instance(),
         &ec2::DummyHandler::onRequestDone);
-}
-
-bool QnAuthHelper::checkUserPassword(const QnUserResourcePtr& user, const QString& password)
-{
-    if (!user->isCloud())
-        return user->checkLocalUserPassword(password);
-
-    // 3. Cloud users
-    QByteArray auth = createHttpQueryAuthParam(
-        user->getName(),
-        password,
-        user->getRealm(),
-        "GET",
-        qnAuthHelper->generateNonce());
-
-    nx_http::Response response;
-    return authenticateByUrl(auth, QByteArray("GET"), response) == Qn::Auth_OK;
 }
 
 QnLdapManager* QnAuthHelper::ldapManager() const

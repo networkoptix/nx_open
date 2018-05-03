@@ -12,7 +12,7 @@ public:
         QnCommonModule* commonModule,
         const QnUuid& remoteId,
         const ApiPeerDataEx& localPeer,
-        const QUrl& remotePeerUrl,
+        const nx::utils::Url& remotePeerUrl,
         std::unique_ptr<QObject> opaqueObject,
         ConnectionLockGuard connectionLockGuard);
     Connection(
@@ -26,7 +26,7 @@ public:
 
     const Qn::UserAccessData& userAccessData() const { return m_userAccessData; }
 protected:
-    virtual void fillAuthInfo(nx_http::AsyncClient* httpClient, bool authByKey) override;
+    virtual void fillAuthInfo(nx::network::http::AsyncClient* httpClient, bool authByKey) override;
 private:
     const Qn::UserAccessData m_userAccessData = Qn::kSystemAccess;
 };

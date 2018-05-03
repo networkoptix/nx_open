@@ -11,5 +11,5 @@ public:
     virtual int executeGet(const QString &path, const QnRequestParams &params, QnJsonRestResult &result, const QnRestConnectionProcessor*) override;
 
 private:
-    QnModuleInformation remoteModuleInformation(const QUrl &url, const QString&  getKey, int &status);
+    QnModuleInformation remoteModuleInformation(const nx::utils::Url &url, const QString&  getKey, int &status);
 };

@@ -14,7 +14,7 @@ class QnWeekTimeScheduleDialog : public QnSessionAwareButtonBoxDialog
     typedef QnSessionAwareButtonBoxDialog base_type;
 
 public:
-    explicit QnWeekTimeScheduleDialog(QWidget *parent = 0);
+    explicit QnWeekTimeScheduleDialog(QWidget *parent);
     ~QnWeekTimeScheduleDialog();
 
     /**

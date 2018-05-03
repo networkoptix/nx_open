@@ -9,25 +9,26 @@
 #include "server_connection.h"
 
 namespace nx {
+namespace network {
 namespace stun {
 
 class NX_NETWORK_API StunOverHttpServer
 {
 public:
-    using StunConnectionPool = 
-        nx::network::server::StreamServerConnectionHolder<nx::stun::ServerConnection>;
+    using StunConnectionPool =
+        nx::network::server::StreamServerConnectionHolder<nx::network::stun::ServerConnection>;
 
     static const char* const kStunProtocolName;
 
-    StunOverHttpServer(nx::stun::MessageDispatcher* stunMessageDispatcher);
+    StunOverHttpServer(nx::network::stun::MessageDispatcher* stunMessageDispatcher);
 
     template<typename HttpMessageDispatcherType>
     void setupHttpTunneling(
         HttpMessageDispatcherType* httpMessageDispatcher,
-        const nx_http::StringType& stunOverHttpPath)
+        const nx::network::http::StringType& stunOverHttpPath)
     {
         using namespace std::placeholders;
-        using CreateStunOverHttpConnectionHandler = nx_http::server::handler::CreateTunnelHandler;
+        using CreateStunOverHttpConnectionHandler = nx::network::http::server::handler::CreateTunnelHandler;
 
         httpMessageDispatcher->template registerRequestProcessor<CreateStunOverHttpConnectionHandler>(
             stunOverHttpPath,
@@ -44,10 +45,11 @@ public:
 
 private:
     StunConnectionPool m_stunConnectionPool;
-    nx::stun::MessageDispatcher* m_dispatcher;
+    nx::network::stun::MessageDispatcher* m_dispatcher;
 
     void createStunConnection(std::unique_ptr<AbstractStreamSocket> connection);
 };
 
 } // namespace stun
+} // namespace network
 } // namespace nx

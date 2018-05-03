@@ -5,7 +5,7 @@
 
 namespace ec2 {
 
-ec2::ApiPeerDataEx deserializeFromRequest(const nx_http::Request& request)
+ec2::ApiPeerDataEx deserializeFromRequest(const nx::network::http::Request& request)
 {
     ec2::ApiPeerDataEx remotePeer;
     QUrlQuery query(request.requestLine.url.query());
@@ -15,7 +15,7 @@ ec2::ApiPeerDataEx deserializeFromRequest(const nx_http::Request& request)
         QnLexical::deserialize(query.queryItemValue(QString::fromLatin1("format")), &dataFormat);
 
     bool success = false;
-    QByteArray peerData = nx_http::getHeaderValue(request.headers, Qn::EC2_PEER_DATA);
+    QByteArray peerData = nx::network::http::getHeaderValue(request.headers, Qn::EC2_PEER_DATA);
     peerData = QByteArray::fromBase64(peerData);
     if (dataFormat == Qn::JsonFormat)
         remotePeer = QJson::deserialized(peerData, ec2::ApiPeerDataEx(), &success);
@@ -28,7 +28,7 @@ ec2::ApiPeerDataEx deserializeFromRequest(const nx_http::Request& request)
 }
 
 void serializeToResponse(
-    nx_http::Response* response,
+    nx::network::http::Response* response,
     ec2::ApiPeerDataEx localPeer,
     Qn::SerializationFormat dataFormat)
 {
@@ -40,7 +40,7 @@ void serializeToResponse(
     else
         NX_ASSERT(0, "Unsupported data format.");
 
-    response->headers.insert(nx_http::HttpHeader(Qn::EC2_PEER_DATA, result.toBase64()));
+    response->headers.insert(nx::network::http::HttpHeader(Qn::EC2_PEER_DATA, result.toBase64()));
 }
 
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(

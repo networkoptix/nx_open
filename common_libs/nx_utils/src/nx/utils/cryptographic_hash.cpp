@@ -1,5 +1,8 @@
-#include <cstdio>
 #include "cryptographic_hash.h"
+
+#include <cstdio>
+
+#include <QtCore/QIODevice>
 
 #include <openssl/md4.h>
 #include <openssl/md5.h>
@@ -108,6 +111,22 @@ void QnCryptographicHash::addData(const char *data, int length) {
 
 void QnCryptographicHash::addData(const QByteArray &data) {
     d->update(data.data(), data.size());
+}
+
+bool QnCryptographicHash::addData(QIODevice* device) {
+    if (!device->isReadable())
+        return false;
+
+    if (!device->isOpen())
+        return false;
+
+    char buffer[1024];
+    int length;
+
+    while ((length = device->read(buffer, sizeof(buffer))) > 0)
+        addData(buffer, length);
+
+    return device->atEnd();
 }
 
 void QnCryptographicHash::reset() {
