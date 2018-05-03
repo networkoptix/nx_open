@@ -32,7 +32,7 @@ def runTest(key, langList):
     while True:
         # ping the server at the start to make sure it's ready
         if ping().ok:
-            system('robot -N {}{}{} -d {} -e not-ready -V getvars.py:{} test-cases'.format(
+            system('robot -N {}{}{} -v headless:true -d {} -e not-ready -V getvars.py:{} test-cases'.format(
                 langList[key], "_", key, path.join('outputs', key), key))
             # ping the server at the end to make sure it didn't go down
             if ping().ok:
