@@ -95,7 +95,7 @@ let NxModalGeneralComponent = class NxModalGeneralComponent {
         this.modalRef.componentInstance.buttonClass = actionType;
         this.modalRef.componentInstance.hasFooter = hasFooter;
         this.modalRef.componentInstance.cancellable = cancellable;
-        this.modalRef.componentInstance.closable = closable;
+        this.modalRef.componentInstance.closable = closable || true;
         return this.modalRef;
     }
     openConfirm(message, title, actionLabel, actionType, cancelLabel) {

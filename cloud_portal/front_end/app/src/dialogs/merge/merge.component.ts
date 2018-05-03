@@ -12,6 +12,7 @@ export class MergeModalContent {
     @Input() system;
     @Input() systemName;
     @Input() language;
+    @Input() closable;
 
     merging: any;
     user: any;
@@ -19,6 +20,7 @@ export class MergeModalContent {
     showMergeForm: any;
     targetSystem: any;
     systemMergeable: string;
+    masterId: string;
 
     constructor(public activeModal: NgbActiveModal,
                 @Inject('process') private process: any,
@@ -30,7 +32,7 @@ export class MergeModalContent {
     }
 
     //Add system can merge where added to systems form api call
-    checkMergeAbility(system){
+    checkMergeAbility(system) {
         if (system.stateOfHealth == 'offline') {
             return 'offline'
         }
@@ -40,12 +42,12 @@ export class MergeModalContent {
         return '';
     }
 
-    setTargetSystem (system) {
+    setTargetSystem(system) {
         this.targetSystem = system;
         this.systemMergeable = this.checkMergeAbility(system);
     };
 
-    addStatus (system) {
+    addStatus(system) {
         let status = "";
 
         if (system.stateOfHealth == 'offline') {
@@ -60,18 +62,20 @@ export class MergeModalContent {
     };
 
     ngOnInit() {
-        this.account.get().then((user) => {
-            this.user = user;
-            this.systems = this.systemsProvider.getMySystems(user.email, this.system.id);
-            this.showMergeForm = this.system.canMerge && this.systems.length > 0;
-            this.targetSystem = this.systems[0];
-            this.systemMergeable = this.checkMergeAbility(this.targetSystem);
-        });
+        this.account
+            .get()
+            .then((user) => {
+                this.user = user;
+                this.systems = this.systemsProvider.getMySystems(user.email, this.system.id);
+                this.showMergeForm = this.system.canMerge && this.systems.length > 0;
+                this.targetSystem = this.systems[0];
+                this.systemMergeable = this.checkMergeAbility(this.targetSystem);
+            });
 
-        this.merging = this.process.init(function () {
+        this.merging = this.process.init(() => {
             let masterSystemId = null;
             let slaveSystemId = null;
-            if (this.masterSystemId == this.system.id) {
+            if (this.masterId == this.system.id) {
                 masterSystemId = this.system.id;
                 slaveSystemId = this.targetSystem.id;
             }
@@ -83,11 +87,11 @@ export class MergeModalContent {
             return this.cloudApi.merge(masterSystemId, slaveSystemId);
         }, {
             successMessage: this.language.system.mergeSystemSuccess
-        }).then(function () {
+        }).then(() => {
             this.systemsProvider.forceUpdateSystems();
             this.activeModal.close({
                 "anotherSystemId": this.targetSystem.id,
-                "role": this.masterSystemId == this.system.id ?
+                "role": this.masterId == this.system.id ?
                     this.configService.systemStatuses.master :
                     this.configService.systemStatuses.slave
             });
@@ -113,6 +117,7 @@ export class NxModalMergeComponent implements OnInit {
         this.modalRef = this.modalService.open(MergeModalContent);
         this.modalRef.componentInstance.language = this.language;
         this.modalRef.componentInstance.system = system;
+        this.modalRef.componentInstance.closable = true;
 
         return this.modalRef;
     }

@@ -12,6 +12,7 @@ export class RenameModalContent {
     @Input() systemId;
     @Input() systemName;
     @Input() language;
+    @Input() closable;
 
     rename: any;
 
@@ -55,6 +56,7 @@ export class NxModalRenameComponent implements OnInit {
         this.modalRef.componentInstance.language = this.language.lang;
         this.modalRef.componentInstance.systemId = systemId;
         this.modalRef.componentInstance.systemName = systemName;
+        this.modalRef.componentInstance.closable = true;
 
         return this.modalRef;
     }

@@ -208,11 +208,16 @@
                     },
                     noClientDetected: function () {
                         // message, title, actionLabel, actionType
-                        return this.confirm(null /*L.downloads.noClientDetectedMessage*/,
-                            lang.downloads.noClientDetectedTitle, lang.downloads.action)
-                                   .then(function () {
-                                       $location.path('/download');
-                                   });
+                        return this
+                            .confirm(lang.downloads.noClientDetectedMessage, lang.downloads.noClientDetectedTitle,
+                                lang.downloads.action, 'btn-danger',
+                                lang.dialogs.cancelButton)
+                            .result
+                            .then((result) => {
+                                if ('OK' === result) {
+                                    $location.path('/download');
+                                }
+                            });
                         // return this.notify(L.errorCodes.cantOpenClient, 'danger', true);
                     },
 

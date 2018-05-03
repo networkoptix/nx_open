@@ -32,7 +32,7 @@ let DisconnectModalContent = class DisconnectModalContent {
             },
             successMessage: this.language.system.successDisconnected,
             errorPrefix: this.language.errorCodes.cantDisconnectSystemPrefix
-        }).then(function () {
+        }).then(() => {
             this.activeModal.close('CLOSE');
         });
     }
@@ -52,6 +52,10 @@ __decorate([
     core_1.Input(),
     __metadata("design:type", Object)
 ], DisconnectModalContent.prototype, "disconnect", void 0);
+__decorate([
+    core_1.Input(),
+    __metadata("design:type", Object)
+], DisconnectModalContent.prototype, "closable", void 0);
 DisconnectModalContent = __decorate([
     core_1.Component({
         selector: 'nx-modal-disconnect-content',
@@ -75,6 +79,7 @@ let NxModalDisconnectComponent = class NxModalDisconnectComponent {
         this.modalRef.componentInstance.language = this.language.lang;
         this.modalRef.componentInstance.disconnect = this.disconnect;
         this.modalRef.componentInstance.systemId = systemId;
+        this.modalRef.componentInstance.closable = true;
         return this.modalRef;
     }
     open(systemId) {

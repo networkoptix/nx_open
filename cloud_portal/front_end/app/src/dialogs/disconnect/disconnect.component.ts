@@ -12,6 +12,7 @@ export class DisconnectModalContent {
     @Input() systemId;
     @Input() language;
     @Input() disconnect;
+    @Input() closable;
 
     password: string;
 
@@ -32,7 +33,7 @@ export class DisconnectModalContent {
             },
             successMessage: this.language.system.successDisconnected,
             errorPrefix: this.language.errorCodes.cantDisconnectSystemPrefix
-        }).then(function () {
+        }).then(() => {
             this.activeModal.close('CLOSE');
         });
     }
@@ -63,6 +64,7 @@ export class NxModalDisconnectComponent implements OnInit {
         this.modalRef.componentInstance.language = this.language.lang;
         this.modalRef.componentInstance.disconnect = this.disconnect;
         this.modalRef.componentInstance.systemId = systemId;
+        this.modalRef.componentInstance.closable = true;
 
         return this.modalRef;
     }

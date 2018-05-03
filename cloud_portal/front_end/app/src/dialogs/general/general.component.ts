@@ -65,7 +65,7 @@ export class NxModalGeneralComponent implements OnInit {
 
         this.modalRef.componentInstance.hasFooter = hasFooter;
         this.modalRef.componentInstance.cancellable = cancellable;
-        this.modalRef.componentInstance.closable = closable;
+        this.modalRef.componentInstance.closable = closable || true;
 
         return this.modalRef;
     }

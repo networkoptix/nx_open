@@ -45,6 +45,10 @@ __decorate([
     core_1.Input(),
     __metadata("design:type", Object)
 ], RenameModalContent.prototype, "language", void 0);
+__decorate([
+    core_1.Input(),
+    __metadata("design:type", Object)
+], RenameModalContent.prototype, "closable", void 0);
 RenameModalContent = __decorate([
     core_1.Component({
         selector: 'nx-modal-rename-content',
@@ -66,6 +70,7 @@ let NxModalRenameComponent = class NxModalRenameComponent {
         this.modalRef.componentInstance.language = this.language.lang;
         this.modalRef.componentInstance.systemId = systemId;
         this.modalRef.componentInstance.systemName = systemName;
+        this.modalRef.componentInstance.closable = true;
         return this.modalRef;
     }
     open(systemId, systemName) {

@@ -312,7 +312,7 @@ select.form-control{
   }
 }
 
-.btn-default{
+.btn.btn-default{
   color: $dark10;
   background-color: transparent;
   border-color: $light5;
@@ -333,8 +333,9 @@ select.form-control{
   }
 }
 
-.btn-primary{
+.btn.btn-primary{
   background-color: $brand_core;
+  border-color: $brand_core;
   &:hover,
   &:focus,
   &.focus {
@@ -351,7 +352,7 @@ select.form-control{
   }
 }
 
-.btn-lg {
+.btn.btn-lg {
   padding: 10px 16px;
   font-size: 15px;
   line-height: 1.3333333;
@@ -563,6 +564,6 @@ select {
 
   .badge {
     border-radius: $border-radius-small;
-    margin-left: 10px;
     font-weight: normal;
+    padding: 5px;
   }

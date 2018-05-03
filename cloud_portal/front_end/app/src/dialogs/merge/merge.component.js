@@ -50,17 +50,19 @@ let MergeModalContent = class MergeModalContent {
     }
     ;
     ngOnInit() {
-        this.account.get().then((user) => {
+        this.account
+            .get()
+            .then((user) => {
             this.user = user;
             this.systems = this.systemsProvider.getMySystems(user.email, this.system.id);
             this.showMergeForm = this.system.canMerge && this.systems.length > 0;
             this.targetSystem = this.systems[0];
             this.systemMergeable = this.checkMergeAbility(this.targetSystem);
         });
-        this.merging = this.process.init(function () {
+        this.merging = this.process.init(() => {
             let masterSystemId = null;
             let slaveSystemId = null;
-            if (this.masterSystemId == this.system.id) {
+            if (this.masterId == this.system.id) {
                 masterSystemId = this.system.id;
                 slaveSystemId = this.targetSystem.id;
             }
@@ -72,11 +74,11 @@ let MergeModalContent = class MergeModalContent {
             return this.cloudApi.merge(masterSystemId, slaveSystemId);
         }, {
             successMessage: this.language.system.mergeSystemSuccess
-        }).then(function () {
+        }).then(() => {
             this.systemsProvider.forceUpdateSystems();
             this.activeModal.close({
                 "anotherSystemId": this.targetSystem.id,
-                "role": this.masterSystemId == this.system.id ?
+                "role": this.masterId == this.system.id ?
                     this.configService.systemStatuses.master :
                     this.configService.systemStatuses.slave
             });
@@ -95,6 +97,10 @@ __decorate([
     core_1.Input(),
     __metadata("design:type", Object)
 ], MergeModalContent.prototype, "language", void 0);
+__decorate([
+    core_1.Input(),
+    __metadata("design:type", Object)
+], MergeModalContent.prototype, "closable", void 0);
 MergeModalContent = __decorate([
     core_1.Component({
         selector: 'nx-modal-merge-content',
@@ -118,6 +124,7 @@ let NxModalMergeComponent = class NxModalMergeComponent {
         this.modalRef = this.modalService.open(MergeModalContent);
         this.modalRef.componentInstance.language = this.language;
         this.modalRef.componentInstance.system = system;
+        this.modalRef.componentInstance.closable = true;
         return this.modalRef;
     }
     open(system) {
