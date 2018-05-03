@@ -1859,6 +1859,7 @@ void HanwhaResource::cleanUpOnProxiedDeviceChange()
     setProperty(kSecondaryStreamBitrateParamName, QString());
     setProperty(kPrimaryStreamEntropyCodingParamName, QString());
     setProperty(kSecondaryStreamEntropyCodingParamName, QString());
+    setProperty(kPrimaryStreamFpsParamName, QString());
     setProperty(kSecondaryStreamFpsParamName, QString());
 }
 
@@ -1911,6 +1912,9 @@ int HanwhaResource::streamFrameRate(Qn::ConnectionRole role, int desiredFps) con
     int userDefinedFps = 0;
     if (role == Qn::ConnectionRole::CR_SecondaryLiveVideo)
         userDefinedFps = getProperty(kSecondaryStreamFpsParamName).toInt();
+    else if (role == Qn::ConnectionRole::CR_LiveVideo && isNvr() && isConnectedViaSunapi())
+        userDefinedFps = getProperty(kPrimaryStreamFpsParamName).toInt();
+
     return closestFrameRate(role, userDefinedFps ? userDefinedFps : desiredFps);
 }
 
