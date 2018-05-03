@@ -32,8 +32,12 @@ function(nx_fetch_cloud_build_number buildNumberVarName)
 endfunction(nx_fetch_cloud_build_number)
 
 function(nx_get_cloud_version versionVarName)
-    nx_fetch_cloud_build_number(buildNumber)
-	
+    if(NOT ${buildNumber} OR ${buildNumber} EQUAL "0")
+        nx_fetch_cloud_build_number(buildNumber)
+    else()
+        message("-- Build number ${buildNumber} has been provided")
+    endif()
+
     file(READ ${CMAKE_SOURCE_DIR}/nx_cloud/version.txt cloudVersion)
     string(STRIP ${cloudVersion} cloudVersion)
     set (cloudVersion "${cloudVersion}.${buildNumber}")
