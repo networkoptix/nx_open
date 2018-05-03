@@ -345,7 +345,6 @@ QnMediaResourceWidget::QnMediaResourceWidget(QnWorkbenchContext* context, QnWork
     at_camDisplay_liveChanged();
     at_ptzButton_toggled(false);
     at_histogramButton_toggled(item->imageEnhancement().enabled);
-    updateIconButton();
 
     updateTitleText();
     updateInfoText();
@@ -372,7 +371,9 @@ QnMediaResourceWidget::QnMediaResourceWidget(QnWorkbenchContext* context, QnWork
     const bool canRotate = accessController()->hasPermissions(item->layout()->resource(),
         Qn::WritePermission);
     setOption(WindowRotationForbidden, !hasVideo() || !canRotate);
-    updateButtonsVisibility();
+    updateButtonsVisibility(); // < This function ignores and disables RecordingStatusIconButton
+	updateIconButton();
+
 }
 
 QnMediaResourceWidget::~QnMediaResourceWidget()
