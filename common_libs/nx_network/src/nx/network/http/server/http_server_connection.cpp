@@ -26,10 +26,6 @@ HttpServerConnection::HttpServerConnection(
 {
 }
 
-HttpServerConnection::~HttpServerConnection()
-{
-}
-
 void HttpServerConnection::setPersistentConnectionEnabled(bool value)
 {
     m_persistentConnectionEnabled = value;
