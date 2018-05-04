@@ -143,7 +143,8 @@ Item
         property real animatedRotationX: unconstrainedRotation.x
         Behavior on animatedRotationX
         {
-            enabled: !mouseArea.draggingStarted && !pinchArea.zoomStarted
+            enabled: !mouseArea.draggingStarted
+                && !pinchArea.zoomStarted && !kineticAnimator.inertia
 
             RotationAnimation
             {
@@ -155,7 +156,8 @@ Item
         property real animatedRotationY: unconstrainedRotation.y
         Behavior on animatedRotationY
         {
-            enabled: !mouseArea.draggingStarted && !pinchArea.zoomStarted
+            enabled: !mouseArea.draggingStarted
+                && !pinchArea.zoomStarted && !kineticAnimator.inertia
 
             RotationAnimation
             {
@@ -333,29 +335,18 @@ Item
             property point lastClickPosition
 
             readonly property real pixelRadius: Math.min(width, height) / 2.0
-            readonly property vector2d pixelCenter: Qt.vector2d(width, height).times(0.5)
 
-            KineticAnimation
+            KineticPositionAnimator
             {
-                id: kinetics
-
-                deceleration: 0.005
-
-                property point startPosition
+                id: kineticAnimator
 
                 onPositionChanged:
                 {
                     const kSensitivity = 100.0
                     var normalization = kSensitivity / mouseArea.pixelRadius
-                    var dx = position.x - startPosition.x
-                    var dy = position.y - startPosition.y
+                    var dx = position.x - initialPosition.x
+                    var dy = position.y - initialPosition.y
                     interactor.updateRotation(dy * normalization, dx * normalization)
-                }
-
-                onMeasurementStarted:
-                {
-                    startPosition = position
-                    interactor.startRotation()
                 }
             }
 
@@ -396,7 +387,7 @@ Item
                     return
 
                 clickFilterTimer.stop()
-                kinetics.finishMeasurement(Qt.point(mouse.x, mouse.y))
+                kineticAnimator.finishMeasurement(mouse.x, mouse.y)
                 draggingStarted = false
             }
 
@@ -422,7 +413,7 @@ Item
                 {
                     if (draggingStarted)
                     {
-                        kinetics.continueMeasurement(Qt.point(mouse.x, mouse.y))
+                        kineticAnimator.updateMeasurement(mouse.x, mouse.y)
                     }
                     else
                     {
@@ -430,7 +421,10 @@ Item
                             || Math.abs(mouse.y - pressY) > drag.threshold
 
                         if (draggingStarted)
-                            kinetics.startMeasurement(Qt.point(mouse.x, mouse.y))
+                        {
+                            kineticAnimator.startMeasurement(mouse.x, mouse.y)
+                            interactor.startRotation()
+                        }
                     }
                 }
             }
@@ -438,7 +432,7 @@ Item
             onWheel:
             {
                 if (draggingStarted)
-                    kinetics.startMeasurement(Qt.point(wheel.x, wheel.y))
+                    startDrag(wheel.x, wheel.y)
 
                 const kSensitivity = 100.0
                 var deltaPower = wheel.angleDelta.y * kSensitivity / 1.0e5
