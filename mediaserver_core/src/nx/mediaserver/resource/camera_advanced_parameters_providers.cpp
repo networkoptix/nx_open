@@ -6,6 +6,7 @@
 #include <camera/video_camera.h>
 #include <nx/fusion/serialization/json.h>
 #include <nx/utils/log/log.h>
+#include <nx/fusion/serialization/lexical.h>
 
 namespace nx {
 namespace mediaserver {
@@ -129,27 +130,18 @@ static std::function<bool(const QString&)> hasSimilarAspectRatioFilter(
         };
 }
 
-static TraitMap toTraitMap(const nx::media::CameraStreamCapabilityTraits& traits)
-{
-    TraitMap result;
-    for (const auto& trait: traits)
-        result.emplace(trait.trait, trait.attributes);
-
-    return result;
-}
-
 } // namespace
 
 StreamCapabilityAdvancedParametersProvider::StreamCapabilityAdvancedParametersProvider(
     Camera* camera,
     const StreamCapabilityMaps& capabilities,
-    const nx::media::CameraStreamCapabilityTraits& traits,
+    const nx::media::CameraTraits& traits,
     Qn::StreamIndex streamIndex,
     const QSize& baseResolution)
 :
     m_camera(camera),
     m_capabilities(capabilities),
-    m_traits(toTraitMap(traits)),
+    m_traits(traits),
     m_streamIndex(streamIndex),
     m_descriptions(describeCapabilities()),
     m_defaults(bestParameters(capabilities[streamIndex], baseResolution))
@@ -238,10 +230,15 @@ QSet<QString> StreamCapabilityAdvancedParametersProvider::filterResolutions(
     return result;
 }
 
-bool StreamCapabilityAdvancedParametersProvider::hasTrait(
-    nx::media::CameraStreamCapabilityTraitType traitType) const
+boost::optional<nx::media::CameraTraitAttributes> StreamCapabilityAdvancedParametersProvider::trait(
+    nx::media::CameraTraitType traitType) const
 {
-    return m_traits.find(traitType) != m_traits.cend();
+    const auto traitString = QnLexical::serialized(traitType);
+    auto traitItr = m_traits.find(traitString);
+    if (traitItr == m_traits.cend())
+        return boost::none;
+
+    return traitItr->second;
 }
 
 QnCameraAdvancedParams StreamCapabilityAdvancedParametersProvider::descriptions()
@@ -381,24 +378,22 @@ std::vector<QnCameraAdvancedParameter> StreamCapabilityAdvancedParametersProvide
     resolution.name = lit("Resolution");
     resolution.dataType = QnCameraAdvancedParameter::DataType::Enumeration;
 
+    const auto traitAttributes = trait(nx::media::CameraTraitType::aspectRatioDependent);
     const bool doesResolutionDependOnAspectRatio = m_streamIndex == Qn::StreamIndex::secondary
-        && hasTrait(nx::media::CameraStreamCapabilityTraitType::aspectRatioDependent);
+        && traitAttributes != boost::none;
 
     auto allowedAspectRatioDiff = kDefaultAllowedAspectRatioDiff;
     if (doesResolutionDependOnAspectRatio)
     {
-        const auto traitItr = m_traits.find(
-            nx::media::CameraStreamCapabilityTraitType::aspectRatioDependent);
-
-        if (traitItr != m_traits.cend())
+        for (const auto& entry: *traitAttributes)
         {
-            for (const auto& attr: traitItr->second)
-            {
-                if (attr.name != kAllowedAspectRatioDiffAttribute)
-                    continue;
+            const auto& attributeName = entry.first;
+            const auto& attributeValue = entry.second;
 
-                allowedAspectRatioDiff = attr.value.toDouble();
-            }
+            if (attributeName != kAllowedAspectRatioDiffAttribute)
+                continue;
+
+            allowedAspectRatioDiff = attributeValue.toDouble();
         }
     }
 

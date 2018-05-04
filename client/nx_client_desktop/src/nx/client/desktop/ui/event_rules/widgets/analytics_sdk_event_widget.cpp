@@ -38,12 +38,6 @@ AnalyticsSdkEventWidget::AnalyticsSdkEventWidget(QWidget* parent):
     connect(ui->sdkEventTypeComboBox, QnComboboxCurrentIndexChanged, this,
         &AnalyticsSdkEventWidget::paramsChanged);
 
-    const QString description = tr("Event will trigger only if Analytics Event meets all the above conditions. "
-        "If a keyword field is empty, condition is always met. "
-        "If not, condition is met if the corresponding field of Analytics Event contains any keyword.");
-
-    ui->hintLabel->setText(description);
-
     ui->sdkEventTypeLabelHint->addHintLine(tr("Analytics events can be set up on a certain cameras."));
     ui->sdkEventTypeLabelHint->addHintLine(tr("Choose cameras using the button above to see the list of supported events."));
     ui->sdkEventTypeLabelHint->setHelpTopic(Qn::EventsActions_VideoAnalytics_Help);

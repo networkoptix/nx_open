@@ -1933,7 +1933,7 @@ QString QnMediaResourceWidget::calculateDetailsText() const
     if (hasVideo())
     {
         const QSize channelResolution = d->display()->camDisplay()->getRawDataSize();
-        const QSize videoLayout = d->camera->getVideoLayout()->size();
+        const QSize videoLayout = d->mediaResource->getVideoLayout()->size();
         const QSize actualResolution = QnGeometry::cwiseMul(channelResolution, videoLayout);
 
         result.append(

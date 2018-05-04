@@ -1,11 +1,10 @@
 #include "hint_button.h"
 
-#include <QtWidgets/qmenu.h>
-
 #include <QtWidgets/QLabel>
 #include <QtWidgets/QPushButton>
+#include <QtWidgets/QStyleOption>
 #include <QtWidgets/QStylePainter>
-#include <QtWidgets/QVBoxLayout>
+#include <QtWidgets/QGroupBox>
 #include <QMouseEvent>
 
 #include <QToolTip>
@@ -16,6 +15,11 @@
 #include <ui/style/helper.h>
 
 #include <ui/help/help_handler.h>
+
+namespace {
+    // Offset between header and hint button
+    const int kHeaderHintOffset = 4;
+}
 
 namespace nx {
 namespace client {
@@ -32,6 +36,58 @@ HintButton::HintButton(QWidget* parent)
 
     // For hovering stuff
     setMouseTracking(true);
+}
+
+HintButton* HintButton::hintThat(QGroupBox* groupBox)
+{
+    auto result = new HintButton(groupBox);
+    groupBox->installEventFilter(result);
+    result->updateGeometry(groupBox);
+    result->m_parentBox = groupBox;
+    return result;
+}
+
+bool HintButton::eventFilter(QObject* obj, QEvent* event)
+{
+    if (event->type() == QEvent::Resize && obj == m_parentBox)
+    {
+        QResizeEvent *resizeEvent = static_cast<QResizeEvent*>(event);
+        updateGeometry(m_parentBox.data());
+    }
+    return QWidget::eventFilter(obj, event);
+}
+
+// Awful hackery to get access to protected member function
+template<class T> struct DenyProtectedStyle: public T
+{
+    void publicInitStyleOption(QStyleOptionGroupBox *option) const
+    {
+        return initStyleOption(option);
+    }
+};
+
+void HintButton::updateGeometry(QGroupBox* parent)
+{
+    auto* unlockedStyleInit = static_cast<DenyProtectedStyle<QGroupBox>*>(parent);
+    QStyleOptionGroupBox box;
+    unlockedStyleInit->publicInitStyleOption(&box);
+    int captionWidth = box.fontMetrics.width(parent->title());
+
+    // #dkargin: I just like this magnificent line and want to keep it here for some time.
+    // QRect contentsRect = style()->subControlRect(QStyle::CC_GroupBox, &box, QStyle::SC_GroupBoxContents, q);
+
+    // There is a checkbox, so we should add its width as well
+    if (parent->isCheckable())
+    {
+        captionWidth += style()->pixelMetric(QStyle::PM_IndicatorWidth);
+        captionWidth += style()->pixelMetric(QStyle::PM_CheckBoxLabelSpacing);
+    }
+
+    // Adjusting own position to land right after the caption ends
+    QRect rect;
+    rect.setSize(size());
+    rect.moveLeft(captionWidth + kHeaderHintOffset);
+    setGeometry(rect);
 }
 
 bool HintButton::isClickable() const
@@ -52,11 +108,10 @@ void HintButton::showTooltip(bool show)
 
         if (isClickable())
         {
-            QnGenericPalette palette = nxStyle->genericPalette();
-            QnPaletteColor lineColor = palette.color(lit("light"), 16);
-            QString colorHex = lineColor.color().name(QColor::HexRgb);
+            QColor lineColor = palette().color(QPalette::Text);
+            QString colorHex = lineColor.name(QColor::HexRgb);
 
-            text += lit("<p><i style='color: %1'>%2</i></p>").arg(colorHex, tr("Click to read more"));
+            text += lit("<br/><i style='color: %1'>%2</i>").arg(colorHex, tr("Click to read more"));
         }
 
         QToolTip::showText(hintSpawnPos, text);
@@ -108,6 +163,8 @@ void HintButton::paintEvent(QPaintEvent* event)
     {
         // Always center pixmap
         QPointF centeredCorner = rect().center() - pixmap.rect().center();
+        if (!isEnabled())
+            painter.setOpacity(0.3);
         painter.drawPixmap(centeredCorner*0.5, pixmap);
     }
 }
@@ -120,7 +177,8 @@ void HintButton::mouseReleaseEvent(QMouseEvent *event)
 
 void HintButton::enterEvent(QEvent* event)
 {
-    qDebug() << "HintButton::enterEvent";
+    if (!isEnabled())
+        return;
     if (!m_isHovered)
     {
         m_isHovered = true;
@@ -131,7 +189,6 @@ void HintButton::enterEvent(QEvent* event)
 
 void HintButton::leaveEvent(QEvent* event)
 {
-    qDebug() << "HintButton::leaveEvent";
     if (m_isHovered)
     {
         m_isHovered = false;

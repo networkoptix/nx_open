@@ -262,6 +262,8 @@ QnCameraScheduleWidget::QnCameraScheduleWidget(QWidget* parent):
     setHelpTopic(ui->exportScheduleButton, Qn::CameraSettings_Recording_Export_Help);
 
     ui->qualityLabelHint->setHint(tr("Quality setting determines the compression rate only, and does not affect resolution. Low, Medium, High and Best are preset bitrate values."));
+    auto settingsHint = nx::client::desktop::HintButton::hintThat(ui->settingsGroupBox);
+    settingsHint->addHintLine(tr("First choose a recording option, then apply it to day and time blocks on the recording schedule. (0 block is 12:00am to 1:00am, 23 block is 11:00pm to 12:00am.)"));
 
     // init buttons
     connect(ui->gridWidget, &QnScheduleGridWidget::colorsChanged, this,

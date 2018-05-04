@@ -1321,6 +1321,9 @@ CameraDiagnostics::Result HanwhaResource::initAdvancedParameters()
         if(!info.isValid())
             continue;
 
+        if (!info.isDeviceTypeSupported(deviceType()))
+            continue;
+
         m_advancedParameterInfos.emplace(id, info);
     }
 
@@ -1856,6 +1859,7 @@ void HanwhaResource::cleanUpOnProxiedDeviceChange()
     setProperty(kSecondaryStreamBitrateParamName, QString());
     setProperty(kPrimaryStreamEntropyCodingParamName, QString());
     setProperty(kSecondaryStreamEntropyCodingParamName, QString());
+    setProperty(kPrimaryStreamFpsParamName, QString());
     setProperty(kSecondaryStreamFpsParamName, QString());
 }
 
@@ -1908,6 +1912,9 @@ int HanwhaResource::streamFrameRate(Qn::ConnectionRole role, int desiredFps) con
     int userDefinedFps = 0;
     if (role == Qn::ConnectionRole::CR_SecondaryLiveVideo)
         userDefinedFps = getProperty(kSecondaryStreamFpsParamName).toInt();
+    else if (role == Qn::ConnectionRole::CR_LiveVideo && isNvr() && isConnectedViaSunapi())
+        userDefinedFps = getProperty(kPrimaryStreamFpsParamName).toInt();
+
     return closestFrameRate(role, userDefinedFps ? userDefinedFps : desiredFps);
 }
 
@@ -2773,7 +2780,7 @@ bool HanwhaResource::executeCommandInternal(
             if (channel != kHanwhaInvalidChannel)
                 parameters[kHanwhaChannelProperty] = QString::number(channel);
 
-            HanwhaRequestHelper helper(sharedContext());
+            HanwhaRequestHelper helper(sharedContext(), bypassChannel());
             const auto response = helper.doRequest(
                 info.cgi(),
                 info.submenu(),
@@ -2785,6 +2792,7 @@ bool HanwhaResource::executeCommandInternal(
 
     if (info.shouldAffectAllChannels())
     {
+        // TODO: #dmishin this will not work with proxied multichannel cameras.
         const auto& systemInfo = sharedContext()->information();
         if (!systemInfo)
             return false;

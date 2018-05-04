@@ -416,9 +416,9 @@ CameraDiagnostics::Result Camera::initInternal()
         m_lastInitTime.restart();
         m_lastCredentials = credentials;
 
-        m_streamCapabilityTraits = resData.value<nx::media::CameraStreamCapabilityTraits>(
-            Qn::kStreamCapabilityTraits,
-            nx::media::CameraStreamCapabilityTraits());
+        m_mediaTraits = resData.value<nx::media::CameraTraits>(
+            Qn::kMediaTraits,
+            nx::media::CameraTraits());
     }
 
     m_streamCapabilityAdvancedProviders.clear();
@@ -432,9 +432,9 @@ CameraDiagnostics::Result Camera::initInternal()
     return initializeAdvancedParametersProviders();
 }
 
-nx::media::CameraStreamCapabilityTraits Camera::streamCapabilityTraits()
+nx::media::CameraTraits Camera::mediaTraits() const
 {
-    return m_streamCapabilityTraits;
+    return m_mediaTraits;
 }
 
 QnAbstractPtzController* Camera::createPtzControllerInternal() const
@@ -451,7 +451,7 @@ CameraDiagnostics::Result Camera::initializeAdvancedParametersProviders()
         {Qn::StreamIndex::secondary, getStreamCapabilityMap(Qn::StreamIndex::secondary)}
     };
 
-    const auto traits = streamCapabilityTraits();
+    const auto traits = mediaTraits();
     for (const auto streamType: {Qn::StreamIndex::primary, Qn::StreamIndex::secondary})
     {
         //auto streamCapabilities = getStreamCapabilityMap(streamType);

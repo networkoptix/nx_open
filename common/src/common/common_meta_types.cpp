@@ -371,7 +371,7 @@ void QnCommonMetaTypes::initialize() {
     qRegisterMetaType<QnServerFields>();
 
     qRegisterMetaType<Qn::StatusChangeReason>("Qn::StatusChangeReason");
-    qRegisterMetaType<nx::media::CameraStreamCapabilityTrait>();
+    qRegisterMetaType<nx::media::CameraTraits>();
 
     QnJsonSerializer::registerSerializer<QnPtzMapperPtr>();
     QnJsonSerializer::registerSerializer<Ptz::Traits>();
@@ -393,7 +393,7 @@ void QnCommonMetaTypes::initialize() {
     QnJsonSerializer::registerSerializer<std::vector<QString>>();
 
     QnJsonSerializer::registerSerializer<std::vector<QnCameraAdvancedParameterOverload>>();
-    QnJsonSerializer::registerSerializer<nx::media::CameraStreamCapabilityTraits>();
+    QnJsonSerializer::registerSerializer<nx::media::CameraTraits>();
 
     qn_commonMetaTypes_initialized = true;
 }

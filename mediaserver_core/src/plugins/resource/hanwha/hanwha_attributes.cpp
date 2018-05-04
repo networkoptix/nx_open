@@ -27,7 +27,7 @@ HanwhaAttributes::HanwhaAttributes(
 
 bool HanwhaAttributes::isValid() const
 {
-    return m_isValid;
+    return m_isValid && nx_http::StatusCode::isSuccessCode(statusCode());
 }
 
 nx_http::StatusCode::Value HanwhaAttributes::statusCode() const

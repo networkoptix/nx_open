@@ -319,10 +319,9 @@ QList<QnPlatformMonitor::NetworkLoad> QnGlobalMonitor::totalNetworkLoad() {
     return d->totalNetworkLoad;
 }
 
-QList<QnPlatformMonitor::PartitionSpace> QnGlobalMonitor::totalPartitionSpaceInfo() {
+QList<QnPlatformMonitor::PartitionSpace> QnGlobalMonitor::totalPartitionSpaceInfo()
+{
     Q_D(QnGlobalMonitor);
-    QnMutexLocker locker( &d->mutex );
-
     return d_func()->base->totalPartitionSpaceInfo();
 }
 

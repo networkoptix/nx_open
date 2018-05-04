@@ -1,5 +1,6 @@
 #include <iostream>
 #include <assert.h>
+#include <string>
 #include <nx/system_commands.h>
 #include "command_factory.h"
 #include "command.h"
@@ -47,6 +48,10 @@ void registerCommands(CommandsFactory& factory, nx::SystemCommands* systemComman
         {"mount"}, {"url", "path", "opt_user", "opt_password"},
         [systemCommands](const char** argv)
         {
+            const auto socketPostfix = getOptionalArg(argv);
+            if (!socketPostfix)
+                return Result::invalidArg;
+
             const auto url = getOptionalArg(argv);
             if (!url)
                 return Result::invalidArg;
@@ -58,8 +63,9 @@ void registerCommands(CommandsFactory& factory, nx::SystemCommands* systemComman
             const auto user = getOptionalArg(argv);
             const auto password = getOptionalArg(argv);
 
-            return systemCommands->mount(*url, *directory, user, password, /*usePipe*/ true)
-                == nx::SystemCommands::MountCode::ok ? Result::ok : Result::execFailed;
+            return systemCommands->mount(
+                *url, *directory, user, password, /*usePipe*/ true, std::stol(*socketPostfix))
+                    == nx::SystemCommands::MountCode::ok ? Result::ok : Result::execFailed;
         });
 
     factory.reg({"mv"}, {"source_path", "target_path"},
@@ -79,6 +85,10 @@ void registerCommands(CommandsFactory& factory, nx::SystemCommands* systemComman
     factory.reg({"open"}, {"file_path", "mode"},
         [systemCommands](const char** argv)
         {
+            const auto socketPostfix = getOptionalArg(argv);
+            if (!socketPostfix)
+                return Result::invalidArg;
+
             const auto path = getOptionalArg(argv);
             if (!path)
                 return Result::invalidArg;
@@ -87,40 +97,53 @@ void registerCommands(CommandsFactory& factory, nx::SystemCommands* systemComman
             if (!mode)
                 return Result::invalidArg;
 
-            return systemCommands->open(*path, std::stoi(*mode), /*usePipe*/ true) == -1
-                ? Result::execFailed : Result::ok;
+            return systemCommands->open(
+                *path, std::stoi(*mode), /*usePipe*/ true, std::stol(*socketPostfix)) == -1
+                    ? Result::execFailed : Result::ok;
         });
 
     factory.reg({"freeSpace"}, {"path"},
         [systemCommands](const char** argv)
         {
+            const auto socketPostfix = getOptionalArg(argv);
+            if (!socketPostfix)
+                return Result::invalidArg;
+
             const auto path = getOptionalArg(argv);
             if (!path)
                 return Result::invalidArg;
 
-            return systemCommands->freeSpace(*path, /*usePipe*/ true) == -1
+            return systemCommands->freeSpace(*path, /*usePipe*/ true, std::stol(*socketPostfix)) == -1
                 ? Result::execFailed : Result::ok;
         });
 
     factory.reg({"totalSpace"}, {"path"},
         [systemCommands](const char** argv)
         {
+            const auto socketPostfix = getOptionalArg(argv);
+            if (!socketPostfix)
+                return Result::invalidArg;
+
             const auto path = getOptionalArg(argv);
             if (!path)
                 return Result::invalidArg;
 
-            return systemCommands->totalSpace(*path, /*usePipe*/ true) == -1
+            return systemCommands->totalSpace(*path, /*usePipe*/ true, std::stol(*socketPostfix)) == -1
                 ? Result::execFailed : Result::ok;
         });
 
     factory.reg({"exists"}, {"path"},
         [systemCommands](const char** argv)
         {
+            const auto socketPostfix = getOptionalArg(argv);
+            if (!socketPostfix)
+                return Result::invalidArg;
+
             const auto path = getOptionalArg(argv);
             if (!path)
                 return Result::invalidArg;
 
-            systemCommands->isPathExists(*path, /*usePipe*/ true);
+            systemCommands->isPathExists(*path, /*usePipe*/ true, std::stol(*socketPostfix));
 
             return Result::ok;
         });
@@ -128,11 +151,15 @@ void registerCommands(CommandsFactory& factory, nx::SystemCommands* systemComman
     factory.reg({"list"}, {"path"},
         [systemCommands](const char** argv)
         {
+            const auto socketPostfix = getOptionalArg(argv);
+            if (!socketPostfix)
+                return Result::invalidArg;
+
             const auto path = getOptionalArg(argv);
             if (!path)
                 return Result::invalidArg;
 
-            systemCommands->serializedFileList(*path, /*usePipe*/ true);
+            systemCommands->serializedFileList(*path, /*usePipe*/ true, std::stol(*socketPostfix));
 
             return Result::ok;
         });
@@ -140,11 +167,15 @@ void registerCommands(CommandsFactory& factory, nx::SystemCommands* systemComman
     factory.reg({"devicePath"}, {"path"},
         [systemCommands](const char** argv)
         {
+            const auto socketPostfix = getOptionalArg(argv);
+            if (!socketPostfix)
+                return Result::invalidArg;
+
             const auto path = getOptionalArg(argv);
             if (!path)
                 return Result::invalidArg;
 
-            systemCommands->devicePath(*path, /*usePipe*/ true);
+            systemCommands->devicePath(*path, /*usePipe*/ true, std::stol(*socketPostfix));
 
             return Result::ok;
         });
@@ -152,11 +183,15 @@ void registerCommands(CommandsFactory& factory, nx::SystemCommands* systemComman
     factory.reg({"size"}, {"path"},
         [systemCommands](const char** argv)
         {
+            const auto socketPostfix = getOptionalArg(argv);
+            if (!socketPostfix)
+                return Result::invalidArg;
+
             const auto path = getOptionalArg(argv);
             if (!path)
                 return Result::invalidArg;
 
-            return systemCommands->fileSize(*path, /*usePipe*/ true) == -1
+            return systemCommands->fileSize(*path, /*usePipe*/ true, std::stol(*socketPostfix)) == -1
                 ? Result::execFailed : Result::ok;
         });
 
@@ -173,17 +208,26 @@ void registerCommands(CommandsFactory& factory, nx::SystemCommands* systemComman
     factory.reg({"dmiInfo"}, {},
         [systemCommands](const char** argv)
         {
-            return systemCommands->serializedDmiInfo(true).empty() ? Result::execFailed : Result::ok;
+            const auto socketPostfix = getOptionalArg(argv);
+            if (!socketPostfix)
+                return Result::invalidArg;
+
+            return systemCommands->serializedDmiInfo(true, std::stol(*socketPostfix)).empty()
+                ? Result::execFailed : Result::ok;
         });
 
     factory.reg({"umount", "unmount"}, {"path"},
         [systemCommands](const char** argv)
         {
+            const auto socketPostfix = getOptionalArg(argv);
+            if (!socketPostfix)
+                return Result::invalidArg;
+
             const auto path = getOptionalArg(argv);
             if (!path)
                 return Result::invalidArg;
 
-            return systemCommands->unmount(*path, /*usePipe*/ true) ==
+            return systemCommands->unmount(*path, /*usePipe*/ true, std::stol(*socketPostfix)) ==
                 nx::SystemCommands::UnmountCode::ok ? Result::ok : Result::execFailed;
         });
 
