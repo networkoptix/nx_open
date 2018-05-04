@@ -7,8 +7,9 @@ import os
 import re
 import json
 import codecs
+from cloud import settings
 from ...controllers import structure
-from ...models import Product, Context, Language, ContextTemplate, DataStructure
+from ...models import Product, Context, Language, ContextTemplate, DataStructure, Customization
 from django.core.management.base import BaseCommand
 
 
@@ -133,6 +134,11 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         read_languages('blue')
+        if not Customization.objects.filter(name=settings.CUSTOMIZATION).exists():
+            structure.find_or_add_product('cloud_portal', True)
+            Customization(name=settings.CUSTOMIZATION,
+                          default_language=Language.by_code('en_US'),
+                          preview_status=0).save()
         structure.read_structure_json('cms/cms_structure.json')
         read_structure('cloud_portal')
         self.stdout.write(self.style.SUCCESS(

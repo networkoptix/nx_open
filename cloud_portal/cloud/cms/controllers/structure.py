@@ -56,13 +56,7 @@ def update_from_object(cms_structure):
         can_preview = product['canPreview']
         product_id = find_or_add_product(product_name, can_preview).id
 
-        customization = Customization.objects.filter(name=settings.CUSTOMIZATION)
-        if not customization.exists():
-            lang = Language.by_code('en_US')
-            Customization(name=settings.CUSTOMIZATION, default_language=lang, preview_status=0).save()
-            default_language = 'en_US'
-        else:
-            default_language = customization[0].default_language.code
+        default_language = Customization.objects.get(name=settings.CUSTOMIZATION).default_language.code
         order = 0
 
         for context_data in product['contexts']:
