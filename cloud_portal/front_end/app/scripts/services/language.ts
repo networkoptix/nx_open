@@ -111,6 +111,20 @@ import * as angular from 'angular';
                         newPasswordLabel: '',
                         saveChanges: ''
                     },
+                    activeActions: {
+                        sendConfirm: '',
+                        resetPassword: '',
+                        setNewPassword: '',
+                        setNewPasswordLabel: ''
+                    },
+                    regActions: {
+                        passwordLabel: '',
+                        createAccount: ''
+                    },
+                    header: {
+                        allSystems: '',
+                        systems: ''
+                    },
                     common: {}
                 };
 

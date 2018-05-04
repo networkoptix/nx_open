@@ -233,6 +233,11 @@ cloud_portal/robot_tests/geckodriver.exe
 cloud_portal/robot_tests/test-cases/outputs/*
 cloud_portal/robot_tests/outputs/
 cloud_portal/robot_tests/IEDriverServer.exe
+
+cloud_portal/front_end/app/scripts/services/{language,dialogs,systems,process,nx-config,cloud_api,account,angular-uuid2,authorizationCheckService}.js
+cloud_portal/front_end/app/scripts/downgraded-providers.js
+cloud_portal/front_end/app/{main,polyfills,vendor,overrides.d,app.module,app.component,ajs-upgraded-providers}.js
+
 syntax: regexp
 ^core$
 ^Makefile$

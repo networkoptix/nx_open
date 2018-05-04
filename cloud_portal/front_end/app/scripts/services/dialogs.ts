@@ -18,6 +18,7 @@
                     }
 
                     var modalInstance = null;
+
                     settings.params = settings.params || {};
                     settings.params.getModalInstance = function () {
                         return modalInstance;
