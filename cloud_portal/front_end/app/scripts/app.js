@@ -93,12 +93,14 @@ window.L = {};
                             appState.previewPath = 'preview';
                         }
                     })
-                    .fail(function () {
+                    .fail(function (error) {
+                        //console.log(error);
                         // Fallback to default language
+
                         // if request to api/utils/language fails then
                         // cloud_portal is under maintenance
                         if (PRODUCTION) {
-                            window.location.href = '/503.html';
+                            window.location.href = '/static/503.html';
                         }
 
                         $.ajax({

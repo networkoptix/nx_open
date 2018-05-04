@@ -223,7 +223,7 @@
             "label": "Content",
             "name": "%CONTENT%",
             "old_name": "%BLOCK_CONTENT%",
-            "value": "<h1>{{PRODUCT_NAME}} is under maintenance</h1><p>New better version will be online soon!</p><p>Your {{VMS_NAME}} system is still recording and<br> you can connect there using <a href=\"%DOWNLOAD_LINK%\">our apps</a></p>",
+            "value": "<h1>%PRODUCT_NAME% is under maintenance</h1><p>New better version will be online soon!</p><p>Your %VMS_NAME% system is still recording and<br> you can connect there using <a href=\"%DOWNLOAD_LINK%\">our apps</a></p>",
             "description": "Message to show on Cloud maintenance page (503)"
           },
           {
