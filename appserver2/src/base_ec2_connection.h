@@ -145,7 +145,7 @@ BaseEc2Connection<QueryProcessorType>::BaseEc2Connection(
     m_updatesNotificationManager(new QnUpdatesNotificationManager),
     m_miscNotificationManager(new QnMiscNotificationManager),
     m_discoveryNotificationManager(new QnDiscoveryNotificationManager(commonModule())),
-    m_timeNotificationManager(new QnTimeNotificationManager())
+    m_timeNotificationManager(new QnTimeNotificationManager(connectionFactory->timeSyncManager()))
 {
     m_notificationManager.reset(
         new ECConnectionNotificationManager(

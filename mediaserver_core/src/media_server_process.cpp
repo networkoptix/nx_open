@@ -4133,8 +4133,6 @@ void MediaServerProcess::at_appStarted()
 
 void MediaServerProcess::at_timeChanged(qint64 newTime)
 {
-    QnSyncTime::instance()->updateTime(newTime);
-
     using namespace ec2;
     QnTransaction<ApiPeerSyncTimeData> tran(
         ApiCommand::broadcastPeerSyncTime,

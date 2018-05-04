@@ -45,6 +45,7 @@ private:
 private:
     std::unique_ptr<AbstractAccurateTimeFetcher> m_internetTimeSynchronizer;
     std::atomic<bool> m_internetSyncInProgress{false};
+    std::atomic<bool> m_updateTimePlaned{ false };
     ReverseConnectionManager* m_reverseConnectionManager = nullptr;
 };
 

@@ -72,6 +72,7 @@ void QnCommonMessageProcessor::init(const ec2::AbstractECConnectionPtr& connecti
     if (m_connection) {
         /* Safety check in case connection will not be deleted instantly. */
         m_connection->stopReceivingNotifications();
+        qnSyncTime->setTimeNotificationManager(nullptr);
         disconnectFromConnection(m_connection);
     }
     m_connection = connection;
@@ -79,6 +80,7 @@ void QnCommonMessageProcessor::init(const ec2::AbstractECConnectionPtr& connecti
     if (!connection)
         return;
 
+    qnSyncTime->setTimeNotificationManager(connection->getTimeNotificationManager());
     connectToConnection(connection);
     connection->startReceivingNotifications();
 }
@@ -765,8 +767,6 @@ void QnCommonMessageProcessor::resetCamerasWithArchiveList(
 
 void QnCommonMessageProcessor::resetTime()
 {
-    qnSyncTime->reset();
-
     if (!m_connection)
         return;
 

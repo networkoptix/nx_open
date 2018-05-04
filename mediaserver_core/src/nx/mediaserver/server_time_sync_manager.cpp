@@ -13,11 +13,14 @@
 #include <nx/network/socket_factory.h>
 #include <nx/network/http/http_client.h>
 #include <nx/utils/time.h>
+#include <utils/common/delayed.h>
 
 namespace nx {
 namespace mediaserver {
 
 static const std::chrono::seconds kProxySocetTimeout(10);
+static const std::chrono::seconds kMinTimeUpdateInterval(10);
+
 const QString kTimeSyncUrlPath = QString::fromLatin1("ec2/timeSync");
 static const QByteArray kTimeDeltaParamName = "sync_time_delta";
 
@@ -37,10 +40,19 @@ ServerTimeSyncManager::ServerTimeSyncManager(
         this, [this](const QnResourcePtr& resource, Qn::StatusChangeReason /*reason*/)
     {
         if (auto server = resource.dynamicCast<QnMediaServerResource>())
-            updateTime();
+        {
+            if (m_updateTimePlaned.exchange(true))
+                return;
+            
+            executeDelayed([this]()
+            {
+                m_updateTimePlaned = false;
+                updateTime();
+            },
+            std::chrono::milliseconds(kMinTimeUpdateInterval).count(),
+            this->thread());
+        }
     });
-
-    initializeTimeFetcher();
 }
 
 ServerTimeSyncManager::~ServerTimeSyncManager()
@@ -61,13 +73,7 @@ void ServerTimeSyncManager::start()
     auto timeDelta = std::chrono::milliseconds(deltaData.value.toLongLong());
     setSyncTime(m_systemClock->millisSinceEpoch() + timeDelta);
 
-    connection->getMiscManager(Qn::kSystemAccess)->saveMiscParam(
-        deltaData, this,
-        [this](int /*reqID*/, ec2::ErrorCode errCode)
-    {
-        if (errCode != ec2::ErrorCode::ok)
-            NX_WARNING(this, lm("Failed to save time delta data to the database"));
-    });
+    initializeTimeFetcher();
     base_type::start();
 }
 

@@ -63,8 +63,10 @@ bool QnCachingCameraDataLoader::supportedResource(const QnMediaResourcePtr &reso
 
 void QnCachingCameraDataLoader::init() {
     // TODO: #GDM 2.4 move to camera history
-    if(m_resource.dynamicCast<QnNetworkResource>()) {
-        connect(qnSyncTime, &QnSyncTime::timeChanged,       this, &QnCachingCameraDataLoader::discardCachedData);
+    if(m_resource.dynamicCast<QnNetworkResource>()) 
+    {
+        connect(qnSyncTime, &QnSyncTime::timeChanged,
+                this, &QnCachingCameraDataLoader::discardCachedData);
     }
 }
 
