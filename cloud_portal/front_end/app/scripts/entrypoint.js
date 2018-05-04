@@ -26,7 +26,7 @@ require('./vendor/protocolcheck.js');
 
 //App
 require('./app.js');
-require('./downgraded-providers.js');
+require('./downgraded-providers.ts');
 
 //Directives
 require('./directives/autofocus.js');
@@ -44,20 +44,20 @@ require('./directives/validateField.js');
 require('./filters/escape.js');
 
 //Services
-require('./services/account.js');
-require('./services/angular-uuid2.js');
-require('./services/cloud_api.js');
-require('./services/dialogs.js');
-require('./services/language.js');
+require('./services/account.ts');
+require('./services/angular-uuid2.ts');
+require('./services/cloud_api.ts');
+require('./services/dialogs.ts');
+require('./services/language.ts');
 require('./services/mediaserver.js');
-require('./services/nx-config.js');
+require('./services/nx-config.ts');
 require('./services/page.js');
 require('./services/poll.js');
-require('./services/process.js');
+require('./services/process.ts');
 require('./services/system.js');
-require('./services/systems.js');
+require('./services/systems.ts');
 require('./services/urlProtocol.js');
-require('./services/authorizationCheckService');
+require('./services/authorizationCheckService.ts');
 
 //Controllers
 require('./controllers/account.js');
