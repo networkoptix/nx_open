@@ -4,8 +4,7 @@
 #include <nx/utils/std/cpp14.h>
 
 namespace nx {
-namespace cdb {
-namespace ec2 {
+namespace data_sync_engine {
 
 using VmsDataState = VmsTransactionLogCache::VmsDataState;
 
@@ -251,6 +250,5 @@ const VmsTransactionLogCache::TranContext* VmsTransactionLogCache::findTranConte
     return it != m_tranIdToContext.end() ? &it->second : nullptr;
 }
 
-} // namespace ec2
-} // namespace cdb
+} // namespace data_sync_engine
 } // namespace nx

@@ -30,8 +30,7 @@ namespace nx {
 
 namespace db { class AsyncSqlQueryExecutor; } // namespace db
 
-namespace cdb {
-namespace ec2 {
+namespace data_sync_engine {
 
 class AbstractOutgoingTransactionDispatcher;
 
@@ -360,6 +359,5 @@ private:
     static ResultCode dbResultToApiResult(nx::utils::db::DBResult dbResult);
 };
 
-} // namespace ec2
-} // namespace cdb
+} // namespace data_sync_engine
 } // namespace nx

@@ -8,8 +8,7 @@
 #include <nx/data_sync_engine/transaction_log_cache.h>
 
 namespace nx {
-namespace cdb {
-namespace ec2 {
+namespace data_sync_engine {
 namespace test {
 
 class TransactionLogCache:
@@ -240,6 +239,5 @@ TEST_F(TransactionLogCache, timestamp_sequence_is_updated_by_external_transactio
 }
 
 } // namespace test
-} // namespace ec2
-} // namespace cdb
+} // namespace data_sync_engine
 } // namespace nx

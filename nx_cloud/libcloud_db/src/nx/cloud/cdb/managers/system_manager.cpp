@@ -47,7 +47,7 @@ SystemManager::SystemManager(
     const AbstractSystemHealthInfoProvider& systemHealthInfoProvider,
     nx::utils::db::AsyncSqlQueryExecutor* const dbManager,
     AbstractEmailManager* const emailManager,
-    ec2::SyncronizationEngine* const ec2SyncronizationEngine) noexcept(false)
+    data_sync_engine::SyncronizationEngine* const ec2SyncronizationEngine) noexcept(false)
 :
     m_settings(settings),
     m_timerManager(timerManager),

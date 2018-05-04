@@ -8,8 +8,7 @@
 #include <transaction/transaction_transport_header.h>
 
 namespace nx {
-namespace cdb {
-namespace ec2 {
+namespace data_sync_engine {
 
 class TransactionTransportHeader
 {
@@ -31,6 +30,5 @@ public:
     }
 };
 
-} // namespace ec2
-} // namespace cdb
+} // namespace data_sync_engine
 } // namespace nx

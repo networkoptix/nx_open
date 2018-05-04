@@ -64,7 +64,7 @@ protected:
 
     void verifyThatOnlyLastOneIsPresent()
     {
-        const std::vector<dao::TransactionLogRecord> transactions = readAllTransaction();
+        const std::vector<data_sync_engine::dao::TransactionLogRecord> transactions = readAllTransaction();
 
         ASSERT_EQ(1U, transactions.size());
         ASSERT_EQ(
@@ -74,7 +74,8 @@ protected:
 
     void verifyThatDataObjectIsEmpty()
     {
-        const std::vector<dao::TransactionLogRecord> transactions = readAllTransaction();
+        const std::vector<data_sync_engine::dao::TransactionLogRecord> transactions =
+            readAllTransaction();
         ASSERT_EQ(0U, transactions.size());
     }
 
@@ -97,7 +98,7 @@ private:
     const QnUuid m_peerDbId;
     const nx::String m_systemId;
     std::int64_t m_peerSequence;
-    ec2::dao::memory::TransactionDataObject m_transactionDataObject;
+    data_sync_engine::dao::memory::TransactionDataObject m_transactionDataObject;
     ::ec2::ApiUserData m_transactionData;
     ::ec2::QnTransaction<::ec2::ApiUserData> m_lastAddedTransaction;
     nx::utils::db::DbConnectionHolder m_dbConnectionHolder;
@@ -117,7 +118,7 @@ private:
     {
         const auto tranHash = ::ec2::transactionHash(transaction.command, transaction.params).toSimpleByteArray();
         const auto ubjsonSerializedTransaction = QnUbjson::serialized(transaction);
-        TransactionData transactionData{
+        data_sync_engine::dao::TransactionData transactionData{
             m_systemId,
             transaction,
             tranHash,
@@ -141,9 +142,9 @@ private:
         return transaction;
     }
 
-    std::vector<dao::TransactionLogRecord> readAllTransaction()
+    std::vector<data_sync_engine::dao::TransactionLogRecord> readAllTransaction()
     {
-        std::vector<dao::TransactionLogRecord> transactions;
+        std::vector<data_sync_engine::dao::TransactionLogRecord> transactions;
         const auto resultCode = m_transactionDataObject.fetchTransactionsOfAPeerQuery(
             m_currentTran ? m_currentTran.get() : nullptr,
             m_systemId,

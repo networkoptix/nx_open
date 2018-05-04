@@ -6,8 +6,7 @@
 #include "upgrade_serialized_transactions.h"
 
 namespace nx {
-namespace cdb {
-namespace ec2 {
+namespace data_sync_engine {
 namespace migration {
 namespace addHistoryToTransaction {
 
@@ -20,6 +19,5 @@ nx::utils::db::DBResult migrate(nx::utils::db::QueryContext* const queryContext)
 
 } // namespace addHistoryToTransaction
 } // namespace migration
-} // namespace ec2
-} // namespace cdb
+} // namespace data_sync_engine
 } // namespace nx

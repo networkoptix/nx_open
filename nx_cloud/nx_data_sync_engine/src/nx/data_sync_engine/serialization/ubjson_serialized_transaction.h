@@ -5,8 +5,7 @@
 #include "serializable_transaction.h"
 
 namespace nx {
-namespace cdb {
-namespace ec2 {
+namespace data_sync_engine {
 
 template<typename BaseType>
 class BaseUbjsonSerializedTransaction:
@@ -146,6 +145,5 @@ public:
     TransactionUbjsonDataSource& operator=(TransactionUbjsonDataSource&&) = default;
 };
 
-} // namespace ec2
-} // namespace cdb
+} // namespace data_sync_engine
 } // namespace nx

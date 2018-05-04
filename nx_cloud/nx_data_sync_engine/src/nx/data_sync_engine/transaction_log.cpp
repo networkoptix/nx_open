@@ -7,8 +7,7 @@
 #include "outgoing_transaction_dispatcher.h"
 
 namespace nx {
-namespace cdb {
-namespace ec2 {
+namespace data_sync_engine {
 
 QString toString(const ::ec2::QnAbstractTransaction& tran)
 {
@@ -460,6 +459,5 @@ ResultCode TransactionLog::dbResultToApiResult(
     }
 }
 
-} // namespace ec2
-} // namespace cdb
+} // namespace data_sync_engine
 } // namespace nx

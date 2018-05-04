@@ -9,8 +9,7 @@
 #include "serialization/transaction_deserializer.h"
 
 namespace nx {
-namespace cdb {
-namespace ec2 {
+namespace data_sync_engine {
 
 using namespace ::ec2;
 
@@ -163,6 +162,5 @@ void IncomingTransactionDispatcher::dispatchTransaction(
         });
 }
 
-} // namespace ec2
-} // namespace cdb
+} // namespace data_sync_engine
 } // namespace nx

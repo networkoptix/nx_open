@@ -10,8 +10,7 @@
 #include <nx/data_sync_engine/outgoing_transaction_dispatcher.h>
 
 namespace nx {
-namespace cdb {
-namespace ec2 {
+namespace data_sync_engine {
 namespace test {
 
 class TestOutgoingTransactionDispatcher:
@@ -55,6 +54,5 @@ private:
 };
 
 } // namespace test
-} // namespace ec2
-} // namespace cdb
+} // namespace data_sync_engine
 } // namespace nx

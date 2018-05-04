@@ -107,7 +107,7 @@ EventManager& Controller::eventManager()
     return m_eventManager;
 }
 
-ec2::SyncronizationEngine& Controller::ec2SyncronizationEngine()
+data_sync_engine::SyncronizationEngine& Controller::ec2SyncronizationEngine()
 {
     return m_ec2SyncronizationEngine;
 }

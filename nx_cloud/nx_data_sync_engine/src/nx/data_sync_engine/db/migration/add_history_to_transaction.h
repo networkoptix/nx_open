@@ -5,8 +5,7 @@
 #include <database/migrations/add_history_attributes_to_transaction.h>
 
 namespace nx {
-namespace cdb {
-namespace ec2 {
+namespace data_sync_engine {
 namespace migration {
 namespace addHistoryToTransaction {
 
@@ -23,6 +22,5 @@ NX_DATA_SYNC_ENGINE_API nx::utils::db::DBResult migrate(
 
 } // namespace addHistoryToTransaction
 } // namespace migration
-} // namespace ec2
-} // namespace cdb
+} // namespace data_sync_engine
 } // namespace nx

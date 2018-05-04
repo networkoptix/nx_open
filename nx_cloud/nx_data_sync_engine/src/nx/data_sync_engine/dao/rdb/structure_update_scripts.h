@@ -1,8 +1,7 @@
 #pragma once
 
 namespace nx {
-namespace cdb {
-namespace ec2 {
+namespace data_sync_engine {
 namespace dao {
 namespace rdb {
 
@@ -38,6 +37,5 @@ CREATE INDEX idx_transaction_time
 
 } // namespace rdb
 } // namespace dao
-} // namespace ec2
-} // namespace cdb
+} // namespace data_sync_engine
 } // namespace nx

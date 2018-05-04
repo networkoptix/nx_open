@@ -5,8 +5,7 @@
 #include <transaction/transaction.h>
 
 namespace nx {
-namespace cdb {
-namespace ec2 {
+namespace data_sync_engine {
 
 /**
  * This class is to encapsulate transaction versioning support when relevant.
@@ -29,6 +28,5 @@ public:
     }
 };
 
-} // namespace ec2
-} // namespace cdb
+} // namespace data_sync_engine
 } // namespace nx

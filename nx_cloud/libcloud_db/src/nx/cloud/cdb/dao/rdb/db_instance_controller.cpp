@@ -62,7 +62,7 @@ void DbInstanceController::initializeStructureMigration()
     dbStructureUpdater().addUpdateScript(db::kAddSystemSequence);
     dbStructureUpdater().addUpdateScript(db::kMakeTransactionTimestamp128Bit);
     dbStructureUpdater().addUpdateScript(db::kAddSystemUsageFrequency);
-    dbStructureUpdater().addUpdateFunc(&ec2::migration::addHistoryToTransaction::migrate);
+    dbStructureUpdater().addUpdateFunc(&data_sync_engine::migration::addHistoryToTransaction::migrate);
     dbStructureUpdater().addUpdateScript(db::kAddInviteHasBeenSentAccountStatus);
     dbStructureUpdater().addUpdateScript(db::kAddHa1CalculatedUsingSha256);
     dbStructureUpdater().addUpdateScript(db::kAddVmsOpaqueData);

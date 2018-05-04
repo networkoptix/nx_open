@@ -11,12 +11,11 @@
 #include "test_outgoing_transaction_dispatcher.h"
 
 namespace nx {
-namespace cdb {
-namespace ec2 {
+namespace data_sync_engine {
 namespace test {
 
 class TestOutgoingTransactionSorter:
-    public ec2::OutgoingTransactionSorter
+    public OutgoingTransactionSorter
 {
 public:
     TestOutgoingTransactionSorter(
@@ -24,7 +23,7 @@ public:
         VmsTransactionLogCache* vmsTransactionLogCache,
         AbstractOutgoingTransactionDispatcher* const outgoingTransactionDispatcher)
     :
-        ec2::OutgoingTransactionSorter(
+        OutgoingTransactionSorter(
             systemId,
             vmsTransactionLogCache,
             outgoingTransactionDispatcher)
@@ -359,6 +358,5 @@ TEST_F(FtOutgoingTransactionSorter, concurrent_transactions)
 }
 
 } // namespace test
-} // namespace ec2
-} // namespace cdb
+} // namespace data_sync_engine
 } // namespace nx

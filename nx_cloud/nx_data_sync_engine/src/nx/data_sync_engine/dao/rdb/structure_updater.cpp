@@ -3,8 +3,7 @@
 #include "structure_update_scripts.h"
 
 namespace nx {
-namespace cdb {
-namespace ec2 {
+namespace data_sync_engine {
 namespace dao {
 namespace rdb {
 
@@ -25,6 +24,5 @@ StructureUpdater::StructureUpdater(
 
 } // namespace rdb
 } // namespace dao
-} // namespace ec2
-} // namespace cdb
+} // namespace data_sync_engine
 } // namespace nx

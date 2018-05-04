@@ -5,8 +5,7 @@
 #include "transaction_serializer.h"
 
 namespace nx {
-namespace cdb {
-namespace ec2 {
+namespace data_sync_engine {
 
 class SerializableAbstractTransaction:
     public TransactionSerializer
@@ -80,6 +79,5 @@ private:
     ::ec2::QnTransaction<TransactionDataType> m_transaction;
 };
 
-} // namespace ec2
-} // namespace cdb
+} // namespace data_sync_engine
 } // namespace nx

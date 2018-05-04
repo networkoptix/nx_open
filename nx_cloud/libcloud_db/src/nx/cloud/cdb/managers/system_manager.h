@@ -41,6 +41,8 @@
 #include "../data/data_filter.h"
 #include "../data/system_data.h"
 
+namespace nx { namespace data_sync_engine { class SyncronizationEngine; } }
+
 namespace nx {
 namespace cdb {
 
@@ -49,9 +51,6 @@ namespace conf { class Settings; } // namespace conf
 class AbstractEmailManager;
 class AbstractAccountManager;
 class AbstractSystemHealthInfoProvider;
-
-namespace ec2 { class SyncronizationEngine; } // namespace ec2
-
 class InviteUserNotification;
 
 //-------------------------------------------------------------------------------------------------
@@ -122,7 +121,7 @@ public:
         const AbstractSystemHealthInfoProvider& systemHealthInfoProvider,
         nx::utils::db::AsyncSqlQueryExecutor* const dbManager,
         AbstractEmailManager* const emailManager,
-        ec2::SyncronizationEngine* const ec2SyncronizationEngine) noexcept(false);
+        data_sync_engine::SyncronizationEngine* const ec2SyncronizationEngine) noexcept(false);
     virtual ~SystemManager();
 
     virtual void authenticateByName(
@@ -292,7 +291,7 @@ private:
     const AbstractSystemHealthInfoProvider& m_systemHealthInfoProvider;
     nx::utils::db::AsyncSqlQueryExecutor* const m_dbManager;
     AbstractEmailManager* const m_emailManager;
-    ec2::SyncronizationEngine* const m_ec2SyncronizationEngine;
+    data_sync_engine::SyncronizationEngine* const m_ec2SyncronizationEngine;
     SystemsDict m_systems;
     mutable QnMutex m_mutex;
     AccountSystemAccessRoleDict m_accountAccessRoleForSystem;

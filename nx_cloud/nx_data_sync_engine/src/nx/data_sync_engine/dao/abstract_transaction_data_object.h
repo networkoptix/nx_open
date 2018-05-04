@@ -11,8 +11,7 @@
 #include "../serialization/ubjson_serialized_transaction.h"
 
 namespace nx {
-namespace cdb {
-namespace ec2 {
+namespace data_sync_engine {
 namespace dao {
 
 struct TransactionData
@@ -87,6 +86,5 @@ public:
 };
 
 } // namespace dao
-} // namespace ec2
-} // namespace cdb
+} // namespace data_sync_engine
 } // namespace nx

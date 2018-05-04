@@ -21,8 +21,7 @@
 #include "websocket_transaction_transport.h"
 
 namespace nx {
-namespace cdb {
-namespace ec2 {
+namespace data_sync_engine {
 
 ConnectionManager::ConnectionManager(
     const QnUuid& moduleGuid,
@@ -785,6 +784,5 @@ void ConnectionManager::onHttpConnectionUpgraded(
     }
 }
 
-} // namespace ec2
-} // namespace cdb
+} // namespace data_sync_engine
 } // namespace nx

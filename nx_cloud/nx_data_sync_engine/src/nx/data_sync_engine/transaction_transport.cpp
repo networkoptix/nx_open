@@ -7,8 +7,7 @@
 #include "compatible_ec2_protocol_version.h"
 
 namespace nx {
-namespace cdb {
-namespace ec2 {
+namespace data_sync_engine {
 
 constexpr static const std::chrono::seconds kTcpKeepAliveTimeout = std::chrono::seconds(5);
 constexpr static const int kKeepAliveProbeCount = 3;
@@ -524,6 +523,5 @@ void TransactionTransport::sendTransaction(
         transactionSerializer);
 }
 
-} // namespace ec2
-} // namespace cdb
+} // namespace data_sync_engine
 } // namespace nx
