@@ -22,14 +22,15 @@
 namespace ec2 {
 
 RemoteConnectionFactory::RemoteConnectionFactory(
+    std::unique_ptr<nx::time_sync::TimeSyncManager> timeSynchronizationManager,
     QnCommonModule* commonModule,
     Qn::PeerType peerType,
-    nx::utils::TimerManager* const timerManager,
     bool isP2pMode)
 :
     AbstractECConnectionFactory(commonModule),
     m_jsonTranSerializer(new QnJsonTransactionSerializer()),
     m_ubjsonTranSerializer(new QnUbjsonTransactionSerializer()),
+    m_timeSynchronizationManager(std::move(timeSynchronizationManager)),
     m_terminated(false),
     m_runningRequests(0),
     m_sslEnabled(false),
@@ -40,9 +41,6 @@ RemoteConnectionFactory::RemoteConnectionFactory(
         commonModule,
         m_jsonTranSerializer.get(),
         m_ubjsonTranSerializer.get()));
-
-    // todo:: TIME_SYNC
-    //m_bus->setTimeSyncManager(m_timeSynchronizationManager.get());
 }
 
 void RemoteConnectionFactory::shutdown()
@@ -480,6 +478,11 @@ int RemoteConnectionFactory::testRemoteConnection(
 TransactionMessageBusAdapter* RemoteConnectionFactory::messageBus() const
 {
     return m_bus.get();
+}
+
+nx::time_sync::TimeSyncManager* RemoteConnectionFactory::timeSyncManager() const
+{
+    return m_timeSynchronizationManager.get();
 }
 
 } // namespace ec2

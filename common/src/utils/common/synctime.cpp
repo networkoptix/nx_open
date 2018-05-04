@@ -7,6 +7,7 @@
 #include "synctime.h"
 #include "api/app_server_connection.h"
 #include "api/session_manager.h"
+#include <nx/time_sync/time_sync_manager.h>
 
 enum {
     EcTimeUpdatePeriod = 1000 * 60 * 5, /* 5 minutes. */
@@ -127,8 +128,7 @@ qint64 QnSyncTime::currentMSecsSinceEpoch()
         ec2::AbstractECConnectionPtr appServerConnection = QnAppServerConnectionFactory::ec2Connection();
         if( appServerConnection )
         {
-            // TODO: SYNC_TIME
-            //appServerConnection->getTimeManager(Qn::kSystemAccess)->getCurrentTime( this, (void(QnSyncTime::*)(int, ec2::ErrorCode, qint64))&QnSyncTime::updateTime );
+            updateTime(appServerConnection->timeSyncManager()->getSyncTime().count());
             m_syncTimeRequestIssued = true;
         }
     }

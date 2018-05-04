@@ -56,6 +56,7 @@
 
 #include <nx/utils/log/log.h>
 #include <nx_ec/dummy_handler.h>
+#include <nx/time_sync/time_sync_manager.h>
 
 using namespace nx;
 using namespace nx::vms::api;
@@ -769,18 +770,8 @@ void QnCommonMessageProcessor::resetTime()
     if (!m_connection)
         return;
 
-#if 0
-    // TODO: SYNC_TIME
-    auto timeManager = m_connection->getTimeManager(Qn::kSystemAccess);
-    timeManager->getCurrentTime(this, [this](int /*handle*/, ec2::ErrorCode errCode, qint64 syncTime)
-    {
-        const auto& runtimeManager = runtimeInfoManager();
-        if (errCode != ec2::ErrorCode::ok || !m_connection)
-            return;
-
-        emit syncTimeChanged(syncTime);
-    });
-#endif
+    auto timeManager = m_connection->timeSyncManager();
+    emit syncTimeChanged(timeManager->getSyncTime().count());
 }
 
 void QnCommonMessageProcessor::resetAccessRights(const ec2::ApiAccessRightsDataList& accessRights)

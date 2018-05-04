@@ -1,6 +1,7 @@
 #pragma once
 
 #include "rest/server/request_handler.h"
+#include <nx/time_sync/time_sync_manager.h>
 
 namespace nx {
 namespace mediaserver {
@@ -12,7 +13,7 @@ class QnTimeSyncRestHandler: public QnRestRequestHandler
 public:
     /** Contains peer's time synchronization information. */
 
-    QnTimeSyncRestHandler(TimeSyncManager* timeSyncManager);
+    QnTimeSyncRestHandler();
 
     virtual int executeGet(
         const QString& path,
@@ -29,9 +30,6 @@ public:
         QByteArray& result,
         QByteArray& resultContentType,
         const QnRestConnectionProcessor* owner) override;
-
-private:
-    TimeSyncManager* m_timeSyncManager = nullptr;
 };
 
 } // namespace mediaserver

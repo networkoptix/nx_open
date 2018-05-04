@@ -240,7 +240,7 @@
 #include "proxy/proxy_connection.h"
 #include "nx/mediaserver/hls/hls_session_pool.h"
 #include "nx/mediaserver/hls/hls_server.h"
-#include <nx/mediaserver/time_sync/time_sync_manager.h>
+#include <nx/mediaserver/server_time_sync_manager.h>
 #include "llutil/hardware_id.h"
 #include "api/runtime_info_manager.h"
 #include "rest/handlers/old_client_connect_rest_handler.h"
@@ -2230,7 +2230,7 @@ void MediaServerProcess::registerRestHandlers(
      */
     reg("api/detachFromCloud", new QnDetachFromCloudRestHandler(cloudManagerGroup), kAdmin);
 
-    reg("api/timeSync", new QnTimeSyncRestHandler(m_serverModule->timeSyncManager()));
+    reg("api/timeSync", new QnTimeSyncRestHandler());
 
     reg("api/detachFromSystem", new QnDetachFromSystemRestHandler(
         &cloudManagerGroup->connectionManager, messageBus), kAdmin);
@@ -3429,11 +3429,15 @@ void MediaServerProcess::run()
     runtimeData.hardwareIds = m_hardwareGuidList;
     commonModule()->runtimeInfoManager()->updateLocalItem(runtimeData);    // initializing localInfo
 
+
+    std::unique_ptr<nx::mediaserver::ServerTimeSyncManager> timeSyncManager(
+        new ServerTimeSyncManager(commonModule(), 
+            m_serverModule->reverseConnectionManager()));
     std::unique_ptr<ec2::LocalConnectionFactory> ec2ConnectionFactory(
         new ec2::LocalConnectionFactory(
+            std::move(timeSyncManager),
             commonModule(),
             Qn::PT_Server,
-            nx::utils::TimerManager::instance(),
             settings->value(nx_ms_conf::P2P_MODE_FLAG).toBool()));
 
     TimeBasedNonceProvider timeBasedNonceProvider;
@@ -3820,7 +3824,6 @@ void MediaServerProcess::run()
     // Start receiving local notifications
     auto serverMessageProcessor = dynamic_cast<QnServerMessageProcessor*> (commonModule()->messageProcessor());
     serverMessageProcessor->startReceivingLocalNotifications(ec2Connection);
-    m_serverModule->timeSyncManager()->start();
 
     m_serverModule->metadataManagerPool()->init();
     at_runtimeInfoChanged(runtimeManager->localInfo());
@@ -4075,7 +4078,6 @@ void MediaServerProcess::run()
             //ptzPool.reset();
 
             commonModule()->deleteMessageProcessor(); // stop receiving notifications
-            m_serverModule->timeSyncManager()->stop();
             ec2ConnectionFactory->shutdown();
 
             //disconnecting from EC2

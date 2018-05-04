@@ -128,9 +128,9 @@ int Appserver2Process::exec()
 
     std::unique_ptr<ec2::LocalConnectionFactory>
         ec2ConnectionFactory(new ec2::LocalConnectionFactory(
+            std::unique_ptr<nx::time_sync::TimeSyncManager>(), //< No time sync.
             m_commonModule.get(),
             Qn::PT_Server,
-            nx::utils::TimerManager::instance(),
             settings.isP2pMode()));
 
     std::map<QString, QVariant> confParams;

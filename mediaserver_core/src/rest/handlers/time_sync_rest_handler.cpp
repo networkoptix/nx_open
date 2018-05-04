@@ -7,13 +7,11 @@
 
 #include <local_connection_factory.h>
 #include "managers/time_manager.h"
-#include <nx/mediaserver/time_sync/time_sync_manager.h>
 
 namespace nx {
 namespace mediaserver {
 
-QnTimeSyncRestHandler::QnTimeSyncRestHandler(TimeSyncManager* timeSyncManager):
-    m_timeSyncManager(timeSyncManager)
+QnTimeSyncRestHandler::QnTimeSyncRestHandler()
 {
 }
 
@@ -24,7 +22,10 @@ int QnTimeSyncRestHandler::executeGet(
     QByteArray& /*contentType*/,
     const QnRestConnectionProcessor* connection)
 {
-    result = QByteArray::number(m_timeSyncManager->getTime().count());
+    auto ecConnection = connection->commonModule()->ec2Connection();
+    if (!ecConnection)
+        return nx::network::http::StatusCode::internalServerError;
+    result = QByteArray::number(ecConnection->timeSyncManager()->getSyncTime().count());
     return nx::network::http::StatusCode::ok;
 }
 

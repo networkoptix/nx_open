@@ -1,4 +1,4 @@
-#include "time_sync_manager.h"
+#include "server_time_sync_manager.h"
 
 #include <core/resource/media_server_resource.h>
 #include <core/resource_management/resource_pool.h>
@@ -21,60 +21,34 @@ static const std::chrono::seconds kProxySocetTimeout(10);
 const QString kTimeSyncUrlPath = QString::fromLatin1("ec2/timeSync");
 static const QByteArray kTimeDeltaParamName = "sync_time_delta";
 
-class SystemClock: public AbstractSystemClock
-{
-public:
-    virtual std::chrono::milliseconds millisSinceEpoch() override
-    {
-        return nx::utils::millisSinceEpoch();
-    }
-};
 
-class SteadyClock: public AbstractSteadyClock
-{
-public:
-    virtual std::chrono::milliseconds now() override
-    {
-        using namespace std::chrono;
-        return duration_cast<milliseconds>(steady_clock::now().time_since_epoch());
-    }
-};
-
-TimeSyncManager::TimeSyncManager(
+ServerTimeSyncManager::ServerTimeSyncManager(
     QnCommonModule* commonModule,
     ReverseConnectionManager* reverseConnectionManager,
     const std::shared_ptr<AbstractSystemClock>& systemClock,
     const std::shared_ptr<AbstractSteadyClock>& steadyClock)
     :
-    QnCommonModuleAware(commonModule),
-    m_systemClock(systemClock ? systemClock : std::make_shared<SystemClock>()),
-    m_steadyClock(steadyClock ? steadyClock : std::make_shared<SteadyClock>()),
-    m_thread(new QThread()),
+    base_type(commonModule, systemClock, steadyClock),
     m_reverseConnectionManager(reverseConnectionManager)
 {
-    moveToThread(m_thread);
-        
-    connect(m_thread, &QThread::started,
-        [this]()
+
+    connect(
+        commonModule->resourcePool(), &QnResourcePool::statusChanged,
+        this, [this](const QnResourcePtr& resource, Qn::StatusChangeReason /*reason*/)
     {
-        if (!m_timer)
-        {
-            m_timer = new QTimer();
-            connect(m_timer, &QTimer::timeout, this, &TimeSyncManager::doPeriodicTasks);
-        }
-        m_timer->start(1000);
+        if (auto server = resource.dynamicCast<QnMediaServerResource>())
+            updateTime();
     });
-    connect(m_thread, &QThread::finished, [this]() { m_timer->stop(); });
 
     initializeTimeFetcher();
 }
 
-TimeSyncManager::~TimeSyncManager()
+ServerTimeSyncManager::~ServerTimeSyncManager()
 {
     stop();
 }
 
-void TimeSyncManager::start()
+void ServerTimeSyncManager::start()
 {
     ec2::ApiMiscData deltaData;
     auto connection = commonModule()->ec2Connection();
@@ -85,7 +59,7 @@ void TimeSyncManager::start()
         NX_WARNING(this, "Failed to load time delta parameter from the database");
     }
     auto timeDelta = std::chrono::milliseconds(deltaData.value.toLongLong());
-    setTime(m_systemClock->millisSinceEpoch() + timeDelta);
+    setSyncTime(m_systemClock->millisSinceEpoch() + timeDelta);
 
     connection->getMiscManager(Qn::kSystemAccess)->saveMiscParam(
         deltaData, this,
@@ -94,14 +68,12 @@ void TimeSyncManager::start()
         if (errCode != ec2::ErrorCode::ok)
             NX_WARNING(this, lm("Failed to save time delta data to the database"));
     });
-
-    m_thread->start();
+    base_type::start();
 }
 
-void TimeSyncManager::stop()
+void ServerTimeSyncManager::stop()
 {
-    m_thread->exit();
-    m_thread->wait();
+    base_type::stop();
 
     if (m_internetTimeSynchronizer)
     {
@@ -110,7 +82,7 @@ void TimeSyncManager::stop()
     }
 }
 
-void TimeSyncManager::initializeTimeFetcher()
+void ServerTimeSyncManager::initializeTimeFetcher()
 {
     auto meanTimerFetcher = std::make_unique<nx::network::MeanTimeFetcher>();
     for (const char* timeServer: RFC868_SERVERS)
@@ -123,7 +95,7 @@ void TimeSyncManager::initializeTimeFetcher()
     m_internetTimeSynchronizer = std::move(meanTimerFetcher);
 }
 
-QnMediaServerResourcePtr TimeSyncManager::getPrimaryTimeServer()
+QnMediaServerResourcePtr ServerTimeSyncManager::getPrimaryTimeServer()
 {
     auto resourcePool = commonModule()->resourcePool();
     auto settings = commonModule()->globalSettings();
@@ -147,7 +119,7 @@ QnMediaServerResourcePtr TimeSyncManager::getPrimaryTimeServer()
     return servers.front();
 }
 
-std::unique_ptr<nx::network::AbstractStreamSocket> TimeSyncManager::connectToRemoteHost(const QnRoute& route)
+std::unique_ptr<nx::network::AbstractStreamSocket> ServerTimeSyncManager::connectToRemoteHost(const QnRoute& route)
 {
     if (route.reverseConnect && m_reverseConnectionManager)
     {
@@ -156,44 +128,11 @@ std::unique_ptr<nx::network::AbstractStreamSocket> TimeSyncManager::connectToRem
     }
     else
     {
-        auto socket = nx::network::SocketFactory::createStreamSocket(false);
-        if (socket->connect(
-            route.addr,
-            nx::network::deprecated::kDefaultConnectTimeout))
-        {
-            return std::unique_ptr<nx::network::AbstractStreamSocket>();
-        }
+        return base_type::connectToRemoteHost(route);
     }
-    return std::unique_ptr<nx::network::AbstractStreamSocket>();
 }
 
-void TimeSyncManager::loadTimeFromServer(const QnRoute& route)
-{
-    auto socket = connectToRemoteHost(route);
-    if (!socket)
-        return;
-
-    auto httpClient = std::make_unique<nx::network::http::HttpClient>();
-    httpClient->setSocket(std::move(socket));
-    nx::utils::Url url;
-    url.setPath(kTimeSyncUrlPath);
-
-    nx::utils::ElapsedTimer timer;
-    timer.restart();
-    if (!httpClient->doGet(url))
-        return;
-    auto response = httpClient->fetchEntireMessageBody();
-    if (!response || response->isEmpty())
-        return;
-
-    auto newTime = std::chrono::milliseconds(response->toLongLong() - timer.elapsedMs() / 2);
-    setTime(newTime);
-    NX_DEBUG(this, lm("Received time %1 from the neighbor server %2")
-        .args(QDateTime::fromMSecsSinceEpoch(newTime.count()).toString(Qt::ISODate),
-        route.id.toString()));
-}
-
-void TimeSyncManager::loadTimeFromInternet()
+void ServerTimeSyncManager::loadTimeFromInternet()
 {
     if (m_internetSyncInProgress.exchange(true))
         return; //< Sync already in progress.
@@ -207,59 +146,14 @@ void TimeSyncManager::loadTimeFromInternet()
                     .arg(SystemError::toString(errorCode)));
                 return;
             }
-            setTime(std::chrono::milliseconds(newValue));
+            setSyncTime(std::chrono::milliseconds(newValue));
             NX_DEBUG(this, lm("Received time %1 from the internet").
                 arg(QDateTime::fromMSecsSinceEpoch(newValue).toString(Qt::ISODate)));
             m_internetSyncInProgress = false;
         });
 }
 
-void TimeSyncManager::loadTimeFromLocalClock()
-{
-    auto newValue = m_systemClock->millisSinceEpoch();
-    setTime(newValue);
-    NX_DEBUG(this, lm("Set time %1 from the local clock").
-        arg(QDateTime::fromMSecsSinceEpoch(newValue.count()).toString(Qt::ISODate)));
-}
-
-void TimeSyncManager::setTime(std::chrono::milliseconds value)
-{
-    const auto minDeltaToSync = 
-        commonModule()->globalSettings()->maxDifferenceBetweenSynchronizedAndInternetTime();
-    const auto timeDelta = value - getTime();
-    if (timeDelta < minDeltaToSync)
-        return;
-
-    const auto systemTimeDeltaMs = value.count() - m_systemClock->millisSinceEpoch().count();
-    auto connection = commonModule()->ec2Connection();
-    
-    ec2::ApiMiscData deltaData(
-        kTimeDeltaParamName,
-        QByteArray::number(systemTimeDeltaMs));
-
-    connection->getMiscManager(Qn::kSystemAccess)->saveMiscParam(
-        deltaData, this, 
-        [this](int /*reqID*/, ec2::ErrorCode errCode)
-        {
-        if (errCode != ec2::ErrorCode::ok)
-            NX_WARNING(this, lm("Failed to save time delta data to the database"));
-        });
-
-
-    QnMutexLocker lock(&m_mutex);
-    m_synchronizedTime = value;
-    m_synchronizedOnClock = m_steadyClock->now();
-}
-
-std::chrono::milliseconds TimeSyncManager::getTime() const
-{
-    QnMutexLocker lock(&m_mutex);
-
-    auto elapsed = m_steadyClock->now() - m_synchronizedOnClock;
-    return m_synchronizedTime + elapsed;
-}
-
-void TimeSyncManager::doPeriodicTasks()
+void ServerTimeSyncManager::updateTime()
 {
     auto server = getPrimaryTimeServer();
     if (!server)

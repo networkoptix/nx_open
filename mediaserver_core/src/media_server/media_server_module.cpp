@@ -65,7 +65,7 @@
 #include "wearable_upload_manager.h"
 #include <core/resource/resource_command_processor.h>
 #include <nx/mediaserver/reverse_connection_manager.h>
-#include <nx/mediaserver/time_sync/time_sync_manager.h>
+#include <nx/mediaserver/server_time_sync_manager.h>
 
 using namespace nx::mediaserver;
 
@@ -197,8 +197,6 @@ QnMediaServerModule::QnMediaServerModule(
     registerResourceDataProviders();
     m_resourceCommandProcessor.reset(new QnResourceCommandProcessor());
     m_reverseConnectionManager.reset(new ReverseConnectionManager(commonModule()));
-    m_timeSyncManager.reset(
-        new TimeSyncManager(commonModule(), m_reverseConnectionManager.data()));
 
     store(new nx::mediaserver_core::recorder::WearableArchiveSynchronizer(this));
 
@@ -342,9 +340,4 @@ QnResourceCommandProcessor* QnMediaServerModule::resourceCommandProcessor() cons
 nx::mediaserver::ReverseConnectionManager* QnMediaServerModule::reverseConnectionManager() const
 {
     return m_reverseConnectionManager.data();
-}
-
-nx::mediaserver::TimeSyncManager* QnMediaServerModule::timeSyncManager() const
-{
-    return m_timeSyncManager.data();
 }

@@ -49,9 +49,9 @@ namespace ec2 {
 static const char* const kIncomingTransactionsPath = "ec2/forward_events";
 
 LocalConnectionFactory::LocalConnectionFactory(
+    std::unique_ptr<nx::time_sync::TimeSyncManager> timeSynchronizationManager,
     QnCommonModule* commonModule,
     Qn::PeerType peerType,
-	nx::utils::TimerManager* const timerManager,
 	bool isP2pMode)
 	:
     AbstractECConnectionFactory(commonModule),
@@ -59,6 +59,7 @@ LocalConnectionFactory::LocalConnectionFactory(
 
 	m_jsonTranSerializer(new QnJsonTransactionSerializer()),
 	m_ubjsonTranSerializer(new QnUbjsonTransactionSerializer()),
+    m_timeSynchronizationManager(std::move(timeSynchronizationManager)),
 	m_terminated(false),
 	m_runningRequests(0),
 	m_sslEnabled(false),
@@ -105,6 +106,8 @@ void LocalConnectionFactory::shutdown()
 {
 	// Have to do it before m_transactionMessageBus destruction since TimeSynchronizationManager
 	// uses QnTransactionMessageBus.
+    if (m_timeSynchronizationManager)
+        m_timeSynchronizationManager->stop();
 
 	m_serverQueryProcessor->waitForAsyncTasks();
 
@@ -1956,6 +1959,11 @@ TransactionMessageBusAdapter* LocalConnectionFactory::messageBus() const
 QnDistributedMutexManager* LocalConnectionFactory::distributedMutex() const
 {
 	return m_distributedMutexManager.get();
+}
+
+nx::time_sync::TimeSyncManager* LocalConnectionFactory::timeSyncManager() const
+{
+	return m_timeSynchronizationManager.get();
 }
 
 } // namespace ec2
