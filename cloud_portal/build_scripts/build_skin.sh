@@ -108,12 +108,6 @@ dir=../skins/$SKIN
         echo "Overwrite them with localized sources"
         cp -rf $lang_dir/web_common/views/* $TARGET_DIR/$SKIN/static/lang_$LANG/web_common/ || true
 
-        if [ -f $lang_dir/language_i18n.json ]
-        then
-            echo "Copy Angular 5 i18n file"
-            cp -rf $lang_dir/language_i18n.json $TARGET_DIR/$SKIN/static/lang_$LANG/
-        fi
-
         echo "Generate language.json"
         pushd $TARGET_DIR/$SKIN
         python ../../../../build_scripts/generate_language_json.py $LANG

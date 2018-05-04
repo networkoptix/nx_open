@@ -38,8 +38,6 @@
                     scope.singleSystem = (scope.systems.length == 1);
                     scope.systemCounter = scope.systems.length;
 
-                    scope.activeSystem = { id : 'TSANKO'};
-
                     updateActiveSystem();
                 });
 

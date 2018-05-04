@@ -6,7 +6,6 @@ angular.module('cloudApp.animations', []);
 angular.module('cloudApp.filters', []);
 angular.module('cloudApp.constants', []);
 angular.module('cloudApp.templates', []);
-// angular.module('nxCommon', []);
 
 window.Config = {};
 window.L = {};
@@ -298,33 +297,18 @@ window.L = {};
                                 }
                             })
                             .when('/downloads/history', {
-                                // title: lang.pageTitles.download,
-                                // templateUrl: CONFIG.viewsDir + 'downloadHistory.html',
-                                // controller: 'DownloadHistoryCtrl'
                                 template: ''
                             })
                             .when('/downloads/:build', {
-                                // title: lang.pageTitles.download,
-                                // templateUrl: CONFIG.viewsDir + 'downloadHistory.html',
-                                // controller: 'DownloadHistoryCtrl'
                                 template: ''
                             })
                             .when('/downloads', {
-                                // title: lang.pageTitles.download,
-                                // templateUrl: CONFIG.viewsDir + 'download.html',
-                                // controller: 'DownloadCtrl'
                                 template: ''
                             })
                             .when('/download', {
-                                // title: lang.pageTitles.download,
-                                // templateUrl: CONFIG.viewsDir + 'download.html',
-                                // controller: 'DownloadCtrl'
                                 template: ''
                             })
                             .when('/download/:platform', {
-                                // title: lang.pageTitles.downloadPlatform,
-                                // templateUrl: CONFIG.viewsDir + 'download.html',
-                                // controller: 'DownloadCtrl'
                                 template: ''
                             })
                             .when('/', {

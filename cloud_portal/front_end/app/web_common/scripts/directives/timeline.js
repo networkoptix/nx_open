@@ -5,7 +5,7 @@ angular.module('nxCommon')
         return {
             restrict: 'E',
             scope: {
-                canViewArchive: "=",
+                canViewArchive: '=',
                 recordsProvider: '=',
                 positionProvider: '=',
                 playHandler: '=',

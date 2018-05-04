@@ -238,6 +238,7 @@ cloud_portal/front_end/app/scripts/services/{language,dialogs,systems,process,nx
 cloud_portal/front_end/app/scripts/downgraded-providers.js
 cloud_portal/front_end/app/{main,polyfills,vendor,overrides.d,app.module,app.component,ajs-upgraded-providers}.js
 
+cloud_portal/tmp
 syntax: regexp
 ^core$
 ^Makefile$

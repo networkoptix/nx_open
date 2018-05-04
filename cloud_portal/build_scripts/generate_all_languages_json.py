@@ -32,7 +32,7 @@ def generate_languages_files():
     translations_path = os.path.join("../../../..", "translations")
     for lang in os.listdir(translations_path):
 
-        if '.DS_Store' in lang:
+        if '.' in lang:
             continue
 
         language_json_filename = os.path.join("../../../..", "translations", lang, 'language.json')

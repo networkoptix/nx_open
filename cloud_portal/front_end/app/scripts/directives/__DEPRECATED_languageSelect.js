@@ -4,7 +4,7 @@ angular.module('cloudApp')
     function (cloudApi) {
         return {
             restrict: 'EA',
-            templateUrl: Config.viewsDir + 'components/language-select.html',
+            templateUrl: Config.viewsDir + 'components/__DEPRECATED_language-select.html',
             scope:{
                 system:'=',
                 accountMode:'=',
