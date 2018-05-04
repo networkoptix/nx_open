@@ -168,7 +168,6 @@ private:
 
 private:
     ResourceMetadataContextMap m_contexts;
-    QnMediaServerModule* m_serverModule;
     QnMutex m_contextMutex;
     bool m_compressedFrameWarningIssued = false;
     bool m_uncompressedFrameWarningIssued = false;

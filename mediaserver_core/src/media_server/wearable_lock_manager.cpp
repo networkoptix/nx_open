@@ -15,13 +15,7 @@ const int kCleanupPeriodMSec = 1000 * 60 * 10;
 }
 
 QnWearableLockManager::QnWearableLockManager(QObject* parent):
-    QnCommonModuleAware(parent)
-{
-    initTimer();
-}
-
-QnWearableLockManager::QnWearableLockManager(QnCommonModule* commonModule):
-    QnCommonModuleAware(commonModule)
+    nx::mediaserver::ServerModuleAware(parent)
 {
     initTimer();
 }

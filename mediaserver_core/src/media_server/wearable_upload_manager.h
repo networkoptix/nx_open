@@ -13,6 +13,7 @@ class QnWearableUploadManager:
     public Connective<QObject>, 
     public nx::mediaserver::ServerModuleAware
 {
+    Q_OBJECT
 public:
     QnWearableUploadManager(QObject* parent);
     virtual ~QnWearableUploadManager() override;

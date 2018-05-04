@@ -3504,7 +3504,6 @@ void MediaServerProcess::run()
         QnSleep::msleep(3000);
     }
     QnAppServerConnectionFactory::setEc2Connection(ec2Connection);
-    m_serverModule->timeSyncManager()->start();
 
     while (!needToStop())
     {
@@ -3821,6 +3820,7 @@ void MediaServerProcess::run()
     // Start receiving local notifications
     auto serverMessageProcessor = dynamic_cast<QnServerMessageProcessor*> (commonModule()->messageProcessor());
     serverMessageProcessor->startReceivingLocalNotifications(ec2Connection);
+    m_serverModule->timeSyncManager()->start();
 
     m_serverModule->metadataManagerPool()->init();
     at_runtimeInfoChanged(runtimeManager->localInfo());

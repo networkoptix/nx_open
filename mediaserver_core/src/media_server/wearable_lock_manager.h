@@ -5,6 +5,7 @@
 #include <nx/utils/uuid.h>
 #include <nx/utils/thread/mutex.h>
 #include <common/common_module_aware.h>
+#include <nx/mediaserver/server_module_aware.h>
 
 struct QnWearableLockInfo
 {
@@ -12,11 +13,11 @@ struct QnWearableLockInfo
     QnUuid userId;
 };
 
-class QnWearableLockManager: public QObject, public QnCommonModuleAware
+class QnWearableLockManager: public QObject, public nx::mediaserver::ServerModuleAware
 {
+    Q_OBJECT
 public:
     QnWearableLockManager(QObject* parent);
-    QnWearableLockManager(QnCommonModule* commonModule);
     virtual ~QnWearableLockManager() override;
 
     bool acquireLock(const QnUuid& cameraId, const QnUuid& token, const QnUuid& userId, qint64 ttl);

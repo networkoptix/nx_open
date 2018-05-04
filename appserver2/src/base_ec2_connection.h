@@ -142,7 +142,8 @@ namespace ec2
         m_storedFileNotificationManager(new QnStoredFileNotificationManager),
         m_updatesNotificationManager(new QnUpdatesNotificationManager),
         m_miscNotificationManager(new QnMiscNotificationManager),
-        m_discoveryNotificationManager(new QnDiscoveryNotificationManager(commonModule()))
+        m_discoveryNotificationManager(new QnDiscoveryNotificationManager(commonModule())),
+        m_timeNotificationManager(new QnTimeNotificationManager())
     {
         m_notificationManager.reset(
             new ECConnectionNotificationManager(
@@ -402,6 +403,13 @@ namespace ec2
         BaseEc2Connection<QueryProcessorType>::getDiscoveryNotificationManager()
     {
         return m_discoveryNotificationManager;
+    }
+
+    template<class QueryProcessorType>
+    AbstractTimeNotificationManagerPtr
+        BaseEc2Connection<QueryProcessorType>::getTimeNotificationManager()
+    {
+        return m_timeNotificationManager;
     }
 
     template<class QueryProcessorType>

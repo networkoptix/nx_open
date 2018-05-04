@@ -74,7 +74,7 @@ private:
     void setTime(std::chrono::milliseconds value);
 private:
     std::unique_ptr<AbstractAccurateTimeFetcher> m_internetTimeSynchronizer;
-    std::atomic<bool> m_internetSyncInProgress;
+    std::atomic<bool> m_internetSyncInProgress{false};
 
     std::chrono::milliseconds m_synchronizedTime{0};
     std::chrono::milliseconds m_synchronizedOnClock{0};

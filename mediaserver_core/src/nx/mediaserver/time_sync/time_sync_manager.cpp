@@ -12,12 +12,33 @@
 #include <utils/common/rfc868_servers.h>
 #include <nx/network/socket_factory.h>
 #include <nx/network/http/http_client.h>
+#include <nx/utils/time.h>
 
 namespace nx {
 namespace mediaserver {
 
 static const std::chrono::seconds kProxySocetTimeout(10);
 const QString kTimeSyncUrlPath = QString::fromLatin1("ec2/timeSync");
+static const QByteArray kTimeDeltaParamName = "sync_time_delta";
+
+class SystemClock: public AbstractSystemClock
+{
+public:
+    virtual std::chrono::milliseconds millisSinceEpoch() override
+    {
+        return nx::utils::millisSinceEpoch();
+    }
+};
+
+class SteadyClock: public AbstractSteadyClock
+{
+public:
+    virtual std::chrono::milliseconds now() override
+    {
+        using namespace std::chrono;
+        return duration_cast<milliseconds>(steady_clock::now().time_since_epoch());
+    }
+};
 
 TimeSyncManager::TimeSyncManager(
     QnCommonModule* commonModule,
@@ -26,8 +47,8 @@ TimeSyncManager::TimeSyncManager(
     const std::shared_ptr<AbstractSteadyClock>& steadyClock)
     :
     QnCommonModuleAware(commonModule),
-    m_systemClock(systemClock),
-    m_steadyClock(steadyClock),
+    m_systemClock(systemClock ? systemClock : std::make_shared<SystemClock>()),
+    m_steadyClock(steadyClock ? steadyClock : std::make_shared<SteadyClock>()),
     m_thread(new QThread()),
     m_reverseConnectionManager(reverseConnectionManager)
 {
@@ -55,6 +76,25 @@ TimeSyncManager::~TimeSyncManager()
 
 void TimeSyncManager::start()
 {
+    ec2::ApiMiscData deltaData;
+    auto connection = commonModule()->ec2Connection();
+    auto miscManager = connection->getMiscManager(Qn::kSystemAccess);
+    auto dbResult = miscManager->getMiscParamSync(kTimeDeltaParamName, &deltaData);
+    if (dbResult  != ec2::ErrorCode::ok)
+    {
+        NX_WARNING(this, "Failed to load time delta parameter from the database");
+    }
+    auto timeDelta = std::chrono::milliseconds(deltaData.value.toLongLong());
+    setTime(m_systemClock->millisSinceEpoch() + timeDelta);
+
+    connection->getMiscManager(Qn::kSystemAccess)->saveMiscParam(
+        deltaData, this,
+        [this](int /*reqID*/, ec2::ErrorCode errCode)
+    {
+        if (errCode != ec2::ErrorCode::ok)
+            NX_WARNING(this, lm("Failed to save time delta data to the database"));
+    });
+
     m_thread->start();
 }
 
@@ -190,6 +230,22 @@ void TimeSyncManager::setTime(std::chrono::milliseconds value)
     if (timeDelta < minDeltaToSync)
         return;
 
+    const auto systemTimeDeltaMs = value.count() - m_systemClock->millisSinceEpoch().count();
+    auto connection = commonModule()->ec2Connection();
+    
+    ec2::ApiMiscData deltaData(
+        kTimeDeltaParamName,
+        QByteArray::number(systemTimeDeltaMs));
+
+    connection->getMiscManager(Qn::kSystemAccess)->saveMiscParam(
+        deltaData, this, 
+        [this](int /*reqID*/, ec2::ErrorCode errCode)
+        {
+        if (errCode != ec2::ErrorCode::ok)
+            NX_WARNING(this, lm("Failed to save time delta data to the database"));
+        });
+
+
     QnMutexLocker lock(&m_mutex);
     m_synchronizedTime = value;
     m_synchronizedOnClock = m_steadyClock->now();
@@ -198,6 +254,7 @@ void TimeSyncManager::setTime(std::chrono::milliseconds value)
 std::chrono::milliseconds TimeSyncManager::getTime() const
 {
     QnMutexLocker lock(&m_mutex);
+
     auto elapsed = m_steadyClock->now() - m_synchronizedOnClock;
     return m_synchronizedTime + elapsed;
 }
