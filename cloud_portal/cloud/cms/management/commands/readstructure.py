@@ -101,7 +101,7 @@ def read_structure(product_name):
         read_structure_file(file, product_id, global_strings)
 
 
-def find_or_add_lanugage(language_code):
+def find_or_add_language(language_code):
     language = Language.by_code(language_code)
     if not language:
         language = Language(code=language_code, name=language_code)
@@ -124,7 +124,7 @@ def read_languages(skin_name):
     languages_dir = os.path.join(SOURCE_DIR.replace("{{skin}}", skin_name), "static")
     languages = [dir.replace('lang_','') for dir in os.listdir(languages_dir) if dir.startswith('lang_')]
     for language_code in languages:
-        find_or_add_lanugage(language_code)
+        find_or_add_language(language_code)
 
 
 class Command(BaseCommand):
