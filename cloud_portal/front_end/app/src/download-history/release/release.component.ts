@@ -14,7 +14,6 @@ export class ReleaseComponent implements OnInit {
 
     constructor(@Inject('languageService') private language: any,
                 @Inject('configService') private configService: any) {
-
     }
 
     ngOnInit(): void {
