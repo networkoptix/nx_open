@@ -168,7 +168,7 @@ private:
 
     void warnOnce(bool* warningIssued, const QString& message);
 
-    boost::optional<PixelFormat> ManagerPool::pixelFormatFromManifest(
+    boost::optional<PixelFormat> pixelFormatFromManifest(
         const nx::api::AnalyticsDriverManifest& manifest);
 
     static AVPixelFormat rgbToAVPixelFormat(PixelFormat pixelFormat);
