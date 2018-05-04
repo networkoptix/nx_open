@@ -62,7 +62,7 @@ template<class T> struct DenyProtectedStyle: public T
 {
     void publicInitStyleOption(QStyleOptionGroupBox *option) const
     {
-        return initStyleOption(option);
+        this->initStyleOption(option);
     }
 };
 
