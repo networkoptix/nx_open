@@ -227,7 +227,7 @@ void Controller::initializeDataSynchronizationEngine()
             [this](
                 nx::utils::db::QueryContext* queryContext,
                 const nx::String& /*systemId*/,
-                ::ec2::QnTransaction<::ec2::ApiSystemMergeHistoryRecord> data,
+                data_sync_engine::Command<::ec2::ApiSystemMergeHistoryRecord> data,
                 int*)
             {
                 m_systemMergeManager.processMergeHistoryRecord(queryContext, data.params);

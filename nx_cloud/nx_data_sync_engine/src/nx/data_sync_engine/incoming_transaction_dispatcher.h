@@ -9,9 +9,6 @@
 #include <nx/utils/thread/mutex.h>
 #include <nx/utils/thread/wait_condition.h>
 
-#include <transaction/transaction_transport_header.h>
-#include <transaction/transaction.h>
-
 #include "transaction_processor.h"
 #include "transaction_transport_header.h"
 
@@ -139,7 +136,7 @@ private:
     template<typename TransactionDataSource>
     void dispatchTransaction(
         TransactionTransportHeader transportHeader,
-        ::ec2::QnAbstractTransaction transaction,
+        CommandHeader transaction,
         TransactionDataSource dataSource,
         TransactionProcessedHandler completionHandler);
 };

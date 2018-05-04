@@ -497,7 +497,7 @@ private:
     nx::utils::db::DBResult processEc2SaveUser(
         nx::utils::db::QueryContext* queryContext,
         const nx::String& systemId,
-        ::ec2::QnTransaction<::ec2::ApiUserData> data,
+        data_sync_engine::Command<::ec2::ApiUserData> data,
         data::SystemSharing* const systemSharingData);
     void onEc2SaveUserDone(
         nx::utils::db::QueryContext* /*queryContext*/,
@@ -507,7 +507,7 @@ private:
     nx::utils::db::DBResult processEc2RemoveUser(
         nx::utils::db::QueryContext* queryContext,
         const nx::String& systemId,
-        ::ec2::QnTransaction<nx::vms::api::IdData> data,
+        data_sync_engine::Command<nx::vms::api::IdData> data,
         data::SystemSharing* const systemSharingData);
     void onEc2RemoveUserDone(
         nx::utils::db::QueryContext* /*queryContext*/,
@@ -517,7 +517,7 @@ private:
     nx::utils::db::DBResult processSetResourceParam(
         nx::utils::db::QueryContext* queryContext,
         const nx::String& systemId,
-        ::ec2::QnTransaction<nx::vms::api::ResourceParamWithRefData> data,
+        data_sync_engine::Command<nx::vms::api::ResourceParamWithRefData> data,
         data::SystemAttributesUpdate* const systemNameUpdate);
     void onEc2SetResourceParamDone(
         nx::utils::db::QueryContext* /*queryContext*/,
@@ -527,7 +527,7 @@ private:
     nx::utils::db::DBResult processRemoveResourceParam(
         nx::utils::db::QueryContext* queryContext,
         const nx::String& systemId,
-        ::ec2::QnTransaction<nx::vms::api::ResourceParamWithRefData> data);
+        data_sync_engine::Command<nx::vms::api::ResourceParamWithRefData> data);
     void onEc2RemoveResourceParamDone(
         nx::utils::db::QueryContext* /*queryContext*/,
         nx::utils::db::DBResult dbResult);

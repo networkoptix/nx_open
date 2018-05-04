@@ -62,12 +62,12 @@ public:
         return nx::Buffer();
     }
 
-    virtual const ::ec2::QnAbstractTransaction& transactionHeader() const override
+    virtual const CommandHeader& transactionHeader() const override
     {
         return m_header;
     }
 
-    ::ec2::QnAbstractTransaction& transactionHeader()
+    CommandHeader& transactionHeader()
     {
         return m_header;
     }
@@ -78,7 +78,7 @@ public:
     }
 
 private:
-    ::ec2::QnAbstractTransaction m_header;
+    CommandHeader m_header;
     VmsTransactionLogCache::TranId m_tranId;
 };
 
@@ -107,7 +107,7 @@ public:
             targetFormat, transportHeader, transactionFormatVersion);
     }
 
-    virtual const ::ec2::QnAbstractTransaction& transactionHeader() const override
+    virtual const CommandHeader& transactionHeader() const override
     {
         return m_sharedTransaction->transactionHeader();
     }

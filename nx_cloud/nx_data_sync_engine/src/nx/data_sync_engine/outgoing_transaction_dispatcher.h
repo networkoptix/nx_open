@@ -2,8 +2,6 @@
 
 #include <nx/network/buffer.h>
 #include <nx/utils/move_only_func.h>
-
-#include <transaction/transaction.h>
 #include <nx/utils/subscription.h>
 
 #include "serialization/serializable_transaction.h"

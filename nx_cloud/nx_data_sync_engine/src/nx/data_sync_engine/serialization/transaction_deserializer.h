@@ -2,7 +2,7 @@
 
 #include <nx/fusion/serialization/ubjson_reader.h>
 
-#include <transaction/transaction.h>
+#include "../command.h"
 
 namespace nx {
 namespace data_sync_engine {
@@ -15,7 +15,7 @@ class TransactionDeserializer
 public:
     static bool deserialize(
         QnUbjsonReader<QByteArray>* const stream,
-        ::ec2::QnAbstractTransaction* const transactionHeader,
+        CommandHeader* const transactionHeader,
         int transactionFormatVersion);
 
     template<typename TransactionData>

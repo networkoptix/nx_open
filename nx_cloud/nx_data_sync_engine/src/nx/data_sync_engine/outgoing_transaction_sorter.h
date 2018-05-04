@@ -23,7 +23,7 @@ class AbstractOutgoingTransactionDispatcher;
 class NX_DATA_SYNC_ENGINE_API OutgoingTransactionSorter
 {
 public:
-    using TransactionSequence = decltype(::ec2::QnAbstractTransaction::PersistentInfo::sequence);
+    using TransactionSequence = decltype(CommandHeader::PersistentInfo::sequence);
 
     OutgoingTransactionSorter(
         const nx::String& systemId,

@@ -221,7 +221,7 @@ private:
     void processSpecialTransaction(
         const nx::String& systemId,
         const TransactionTransportHeader& transportHeader,
-        ::ec2::QnTransaction<TransactionDataType> data,
+        Command<TransactionDataType> data,
         TransactionProcessedHandler handler);
 
     nx::network::http::RequestResult prepareOkResponseToCreateTransactionConnection(

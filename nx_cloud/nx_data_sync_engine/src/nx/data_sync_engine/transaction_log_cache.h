@@ -9,8 +9,7 @@
 #include <nx/network/buffer.h>
 #include <nx/utils/thread/mutex.h>
 
-#include <transaction/transaction.h>
-
+#include "command.h"
 #include "transaction_timestamp_calculator.h"
 
 namespace nx {
@@ -49,7 +48,7 @@ public:
 
     bool isShouldBeIgnored(
         const nx::String& systemId,
-        const ::ec2::QnAbstractTransaction& tran,
+        const CommandHeader& tran,
         const QByteArray& hash) const;
 
     void restoreTransaction(
@@ -65,7 +64,7 @@ public:
     void updateTimestampSequence(TranId tranId, quint64 newValue);
     void insertOrReplaceTransaction(
         TranId tranId,
-        const ::ec2::QnAbstractTransaction& transaction,
+        const CommandHeader& transaction,
         const QByteArray& transactionHash);
     /**
      * @return nullptr if tranId is unknown.

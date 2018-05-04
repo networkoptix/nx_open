@@ -15,7 +15,6 @@
 #include <utils/common/id.h>
 #include <nx/utils/db/async_sql_query_executor.h>
 
-#include <transaction/transaction.h>
 #include <transaction/transaction_descriptor.h>
 
 #include "dao/abstract_transaction_data_object.h"
@@ -34,7 +33,7 @@ namespace data_sync_engine {
 
 class AbstractOutgoingTransactionDispatcher;
 
-QString toString(const ::ec2::QnAbstractTransaction& tran);
+QString toString(const CommandHeader& tran);
 
 /**
  * Supports multiple transactions related to a single system at the same time.
@@ -139,7 +138,7 @@ public:
     nx::utils::db::DBResult saveLocalTransaction(
         nx::utils::db::QueryContext* queryContext,
         const nx::String& systemId,
-        ::ec2::QnTransaction<TransactionDataType> transaction)
+        Command<TransactionDataType> transaction)
     {
         TransactionLogContext* vmsTransactionLogData = nullptr;
 
@@ -186,7 +185,7 @@ public:
     }
 
     template<typename TransactionDataType>
-    ::ec2::QnTransaction<TransactionDataType> prepareLocalTransaction(
+    Command<TransactionDataType> prepareLocalTransaction(
         nx::utils::db::QueryContext* queryContext,
         const nx::String& systemId,
         ::ec2::ApiCommand::Value commandCode,
@@ -198,7 +197,7 @@ public:
             generateNewTransactionAttributes(queryContext, systemId);
 
         // Generating transaction.
-        ::ec2::QnTransaction<TransactionDataType> transaction(m_peerId);
+        Command<TransactionDataType> transaction(m_peerId);
         // Filling transaction header.
         transaction.command = commandCode;
         transaction.peerID = m_peerId;
@@ -306,19 +305,19 @@ private:
     bool isShouldBeIgnored(
         nx::utils::db::QueryContext* connection,
         const nx::String& systemId,
-        const ::ec2::QnAbstractTransaction& transaction,
+        const CommandHeader& transaction,
         const QByteArray& transactionHash);
 
     nx::utils::db::DBResult saveToDb(
         nx::utils::db::QueryContext* connection,
         const nx::String& systemId,
-        const ::ec2::QnAbstractTransaction& transaction,
+        const CommandHeader& transaction,
         const QByteArray& transactionHash,
         const QByteArray& ubjsonData);
 
     template<typename TransactionDataType>
     nx::Buffer calculateTransactionHash(
-        const ::ec2::QnTransaction<TransactionDataType>& tran)
+        const Command<TransactionDataType>& tran)
     {
         return ::ec2::transactionHash(tran.command, tran.params).toSimpleByteArray();
     }

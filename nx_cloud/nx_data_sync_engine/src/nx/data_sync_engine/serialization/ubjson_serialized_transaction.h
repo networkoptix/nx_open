@@ -67,7 +67,7 @@ class UbjsonSerializedTransaction:
 
 public:
     UbjsonSerializedTransaction(
-        ::ec2::QnTransaction<TransactionDataType> transaction,
+        Command<TransactionDataType> transaction,
         QByteArray ubjsonData,
         int serializedTransactionVersion)
         :
@@ -78,7 +78,7 @@ public:
     {
     }
 
-    UbjsonSerializedTransaction(::ec2::QnTransaction<TransactionDataType> transaction):
+    UbjsonSerializedTransaction(Command<TransactionDataType> transaction):
         BaseType(
             QnUbjson::serialized(transaction),
             nx_ec::EC2_PROTO_VERSION,

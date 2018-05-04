@@ -1,7 +1,5 @@
 #pragma once
 
-#include <transaction/transaction.h>
-
 #include "../transaction_transport_header.h"
 
 namespace nx {

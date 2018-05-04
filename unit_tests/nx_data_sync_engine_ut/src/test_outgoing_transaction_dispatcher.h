@@ -44,7 +44,7 @@ public:
     }
 
     void assertIfCouldNotFindTransactionWithHeader(
-        const ::ec2::QnAbstractTransaction& transactionHeader);
+        const CommandHeader& transactionHeader);
 
 private:
     OnNewTransactionHandler m_onNewTransactionHandler;

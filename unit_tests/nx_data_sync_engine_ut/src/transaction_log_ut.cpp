@@ -175,7 +175,7 @@ protected:
         const std::vector<dao::TransactionLogRecord> allTransactions = readAllTransactions();
         ASSERT_EQ(1U, allTransactions.size());
 
-        boost::optional<::ec2::QnTransaction<::ec2::ApiUserData>> transaction =
+        boost::optional<Command<::ec2::ApiUserData>> transaction =
             findTransaction(allTransactions, m_transactionData);
         ASSERT_TRUE(static_cast<bool>(transaction));
     }
@@ -252,7 +252,7 @@ private:
     ::ec2::ApiUserData m_transactionData;
     std::shared_ptr<nx::utils::db::QueryContext> m_activeQuery;
     nx::utils::db::DbConnectionHolder m_dbConnectionHolder;
-    boost::optional<::ec2::QnTransaction<::ec2::ApiUserData>> m_initialTransaction;
+    boost::optional<Command<::ec2::ApiUserData>> m_initialTransaction;
     std::uint64_t m_lastUsedSequence = 0;
 
     void init()
@@ -298,7 +298,7 @@ private:
     }
 
     template<typename TransactionDataType>
-    boost::optional<::ec2::QnTransaction<TransactionDataType>> findTransaction(
+    boost::optional<Command<TransactionDataType>> findTransaction(
         const std::vector<dao::TransactionLogRecord>& allTransactions,
         const TransactionDataType& transactionData)
     {
@@ -307,7 +307,7 @@ private:
             const auto serializedTransactionFromLog =
                 logRecord.serializer->serialize(Qn::UbjsonFormat, nx_ec::EC2_PROTO_VERSION);
 
-            ::ec2::QnTransaction<::ec2::ApiUserData> transaction(peerId());
+            Command<::ec2::ApiUserData> transaction(peerId());
             QnUbjsonReader<QByteArray> ubjsonStream(&serializedTransactionFromLog);
             const bool isDeserialized = QnUbjson::deserialize(&ubjsonStream, &transaction);
             NX_GTEST_ASSERT_TRUE(isDeserialized);
@@ -348,10 +348,10 @@ private:
             prepareFromOtherPeerWithTimestampDiff(timestampDiff));
     }
 
-    ::ec2::QnTransaction<::ec2::ApiUserData> prepareFromOtherPeerWithTimestampDiff(
+    Command<::ec2::ApiUserData> prepareFromOtherPeerWithTimestampDiff(
         int timestampDiff)
     {
-        ::ec2::QnTransaction<::ec2::ApiUserData> transaction(m_otherPeerId);
+        Command<::ec2::ApiUserData> transaction(m_otherPeerId);
         transaction.command = ::ec2::ApiCommand::saveUser;
         transaction.persistentInfo.dbID = m_otherPeerDbId;
         transaction.transactionType = ::ec2::TransactionType::Cloud;
@@ -368,7 +368,7 @@ private:
         return transaction;
     }
 
-    void saveTransaction(::ec2::QnTransaction<::ec2::ApiUserData> transaction)
+    void saveTransaction(Command<::ec2::ApiUserData> transaction)
     {
         auto queryContext = getQueryContext();
         const auto dbResult = transactionLog()->checkIfNeededAndSaveToLog(
@@ -379,12 +379,12 @@ private:
             << "Got " << toString(dbResult);
     }
 
-    ::ec2::QnTransaction<::ec2::ApiUserData> getTransactionFromLog()
+    Command<::ec2::ApiUserData> getTransactionFromLog()
     {
         const std::vector<dao::TransactionLogRecord> allTransactions = readAllTransactions();
         NX_GTEST_ASSERT_EQ(1U, allTransactions.size());
 
-        boost::optional<::ec2::QnTransaction<::ec2::ApiUserData>> transaction =
+        boost::optional<Command<::ec2::ApiUserData>> transaction =
             findTransaction(allTransactions, m_transactionData);
         NX_GTEST_ASSERT_TRUE(static_cast<bool>(transaction));
 
@@ -396,7 +396,7 @@ private:
     //    const std::vector<dao::TransactionLogRecord> allTransactions = readAllTransactions();
     //    ASSERT_EQ(1U, allTransactions.size());
 
-    //    boost::optional<::ec2::QnTransaction<::ec2::ApiUserData>> transaction =
+    //    boost::optional<Command<::ec2::ApiUserData>> transaction =
     //        findTransaction(allTransactions, m_transactionData);
     //    ASSERT_TRUE(static_cast<bool>(transaction));
 

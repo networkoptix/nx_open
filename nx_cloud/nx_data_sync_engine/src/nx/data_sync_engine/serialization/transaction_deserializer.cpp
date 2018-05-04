@@ -5,7 +5,7 @@ namespace data_sync_engine {
 
 bool TransactionDeserializer::deserialize(
     QnUbjsonReader<QByteArray>* const stream,
-    ::ec2::QnAbstractTransaction* const transactionHeader,
+    CommandHeader* const transactionHeader,
     int /*transactionFormatVersion*/)
 {
     return QnUbjson::deserialize(stream, transactionHeader);

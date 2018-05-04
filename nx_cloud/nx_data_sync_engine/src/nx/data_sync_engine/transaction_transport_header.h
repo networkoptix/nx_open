@@ -5,7 +5,7 @@
 #include <nx/network/socket_common.h>
 #include <nx/utils/log/log_message.h>
 
-#include <transaction/transaction_transport_header.h>
+#include "command.h"
 
 namespace nx {
 namespace data_sync_engine {
@@ -16,7 +16,7 @@ public:
     nx::String systemId;
     network::SocketAddress endpoint;
     nx::String connectionId;
-    ::ec2::QnTransactionTransportHeader vmsTransportHeader;
+    CommandTransportHeader vmsTransportHeader;
     int transactionFormatVersion;
 
     TransactionTransportHeader():

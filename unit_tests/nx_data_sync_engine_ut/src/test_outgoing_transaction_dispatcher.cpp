@@ -54,7 +54,7 @@ void TestOutgoingTransactionDispatcher::assertIfTransactionsWereNotSentInAscendi
 }
 
 void TestOutgoingTransactionDispatcher::assertIfCouldNotFindTransactionWithHeader(
-    const ::ec2::QnAbstractTransaction& transactionHeader)
+    const CommandHeader& transactionHeader)
 {
     const auto it = std::find_if(
         m_outgoingTransactions.cbegin(),

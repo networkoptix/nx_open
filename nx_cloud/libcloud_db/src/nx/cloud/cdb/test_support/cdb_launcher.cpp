@@ -20,8 +20,7 @@
 #include <nx/cloud/cdb/api/account_manager.h>
 #include <nx/cloud/cdb/client/cdb_request_path.h>
 #include <nx/cloud/cdb/client/data/types.h>
-
-#include <transaction/transaction.h>
+#include <nx/data_sync_engine/command.h>
 
 #include "business_data_generator.h"
 #include "../cloud_db_service.h"

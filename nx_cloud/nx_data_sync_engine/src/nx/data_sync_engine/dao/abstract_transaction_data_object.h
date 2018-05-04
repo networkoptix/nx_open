@@ -4,7 +4,6 @@
 #include <nx/utils/move_only_func.h>
 #include <nx/utils/std/cpp14.h>
 
-#include <transaction/transaction.h>
 #include <nx/utils/db/types.h>
 #include <nx/utils/db/query_context.h>
 
@@ -17,7 +16,7 @@ namespace dao {
 struct TransactionData
 {
     const nx::String& systemId;
-    const ::ec2::QnAbstractTransaction& header;
+    const CommandHeader& header;
     const QByteArray& hash;
     const QByteArray& ubjsonSerializedTransaction;
 };
