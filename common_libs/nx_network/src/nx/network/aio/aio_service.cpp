@@ -55,7 +55,6 @@ void AIOService::startMonitoring(
 void AIOService::stopMonitoring(
     Pollable* const sock,
     aio::EventType eventType,
-    bool waitForRunningHandlerCompletion,
     nx::utils::MoveOnlyFunc<void()> pollingStoppedHandler)
 {
     auto aioThread = sock->impl()->aioThread.load(std::memory_order_relaxed);
@@ -69,7 +68,6 @@ void AIOService::stopMonitoring(
     aioThread->stopMonitoring(
         sock,
         eventType,
-        waitForRunningHandlerCompletion,
         std::move(pollingStoppedHandler));
 }
 
@@ -174,14 +172,12 @@ aio::AIOThread* AIOService::bindSocketToAioThread(Pollable* const sock)
     return threadToUse;
 }
 
-void AIOService::cancelPostedCalls(
-    Pollable* const sock,
-    bool waitForRunningHandlerCompletion)
+void AIOService::cancelPostedCalls(Pollable* const sock)
 {
     AIOThread* aioThread = sock->impl()->aioThread.load(std::memory_order_relaxed);
     if (!aioThread)
         return;
-    aioThread->cancelPostedCalls(sock, waitForRunningHandlerCompletion);
+    aioThread->cancelPostedCalls(sock);
 }
 
 void AIOService::initializeAioThreadPool(unsigned int threadCount)

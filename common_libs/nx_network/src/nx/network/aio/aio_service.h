@@ -68,14 +68,12 @@ public:
      * @param waitForRunningHandlerCompletion true garantees that no aio::AIOEventHandler::eventTriggered will be called after return of this method.
      *   and all running handlers have returned. But this MAKES METHOD BLOCKING and, as a result, this MUST NOT be called from aio thread.
      *   It is strongly recommended to set this parameter to false.
-     * NOTE: If waitForRunningHandlerCompletion is false events that are already posted to the queue can be called after return of this method.
      * NOTE: If this method is called from asio thread, sock is processed in (e.g., from event handler associated with sock).
      *   this method does not block and always works like waitForRunningHandlerCompletion has been set to true.
      */
     void stopMonitoring(
         Pollable* const sock,
         aio::EventType eventType,
-        bool waitForRunningHandlerCompletion = true,
         nx::utils::MoveOnlyFunc<void()> pollingStoppedHandler = nx::utils::MoveOnlyFunc<void()>());
 
     /**
@@ -120,9 +118,11 @@ public:
     void bindSocketToAioThread(Pollable* sock, AbstractAioThread* aioThread);
     aio::AIOThread* bindSocketToAioThread(Pollable* const sock);
 
-    void cancelPostedCalls(
-        Pollable* const sock,
-        bool waitForRunningHandlerCompletion = true);
+    /**
+     * NOTE: If called within sock's aio thread then is non-blocking.
+     * Otherwise, blocks until all calls are cancelled.
+     */
+    void cancelPostedCalls(Pollable* const sock);
 
 private:
     std::vector<std::unique_ptr<AIOThread>> m_aioThreadPool;

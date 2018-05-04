@@ -705,19 +705,17 @@ private:
         m_addressResolver->cancel(this); //< TODO: #ak Must not block here!
 
         if (eventType == aio::etNone)
-            this->m_aioService->cancelPostedCalls(this->m_socket, true);
+            this->m_aioService->cancelPostedCalls(this->m_socket);
 
         if (eventType == aio::etNone || eventType == aio::etRead)
         {
-            this->m_aioService->stopMonitoring(
-                this->m_socket, aio::etRead, true);
+            this->m_aioService->stopMonitoring(this->m_socket, aio::etRead);
             m_recvHandler = nullptr;
         }
 
         if (eventType == aio::etNone || eventType == aio::etWrite)
         {
-            this->m_aioService->stopMonitoring(
-                this->m_socket, aio::etWrite, true);
+            this->m_aioService->stopMonitoring(this->m_socket, aio::etWrite);
             m_connectHandler = nullptr;
             m_sendHandler = nullptr;
             m_asyncSendIssued = false;
@@ -725,8 +723,7 @@ private:
 
         if (eventType == aio::etNone || eventType == aio::etTimedOut)
         {
-            this->m_aioService->stopMonitoring(
-                this->m_socket, aio::etTimedOut, true);
+            this->m_aioService->stopMonitoring(this->m_socket, aio::etTimedOut);
             m_timerHandler = nullptr;
         }
     }
@@ -835,9 +832,9 @@ public:
 
     void stopPolling()
     {
-        this->m_aioService->cancelPostedCalls(this->m_socket, true);
-        this->m_aioService->stopMonitoring(this->m_socket, aio::etRead, true);
-        this->m_aioService->stopMonitoring(this->m_socket, aio::etTimedOut, true);
+        this->m_aioService->cancelPostedCalls(this->m_socket);
+        this->m_aioService->stopMonitoring(this->m_socket, aio::etRead);
+        this->m_aioService->stopMonitoring(this->m_socket, aio::etTimedOut);
     }
 
 private:
@@ -848,7 +845,7 @@ private:
 
     void cancelIoWhileInAioThread()
     {
-        this->m_aioService->stopMonitoring(this->m_socket, aio::etRead, true);
+        this->m_aioService->stopMonitoring(this->m_socket, aio::etRead);
         ++m_acceptAsyncCallCount;
     }
 

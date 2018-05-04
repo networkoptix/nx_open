@@ -58,7 +58,6 @@ public:
      * Guarantees that no AIOEventHandler::eventTriggered will be called after return of this method.
      * If AIOEventHandler::eventTriggered is running and stopMonitoring called not from AIOEventHandler::eventTriggered,
      *   method blocks untill AIOEventHandler::eventTriggered had returned.
-     * @param waitForRunningHandlerCompletion See comment to aio::AIOService::stopMonitoring.
      * NOTE: Calling this method with same parameters simultaneously from
      *   multiple threads can cause undefined behavour.
      * NOTE: MUST be called with mutex locked.
@@ -66,7 +65,6 @@ public:
     void stopMonitoring(
         Pollable* const sock,
         aio::EventType eventType,
-        bool waitForRunningHandlerCompletion,
         nx::utils::MoveOnlyFunc<void()> pollingStoppedHandler);
     /**
      * Queues functor to be executed from within this aio thread as soon as possible.
@@ -80,7 +78,7 @@ public:
     /**
      * Cancels calls scheduled with aio::AIOThread::post and aio::AIOThread::dispatch.
      */
-    void cancelPostedCalls(Pollable* const sock, bool waitForRunningHandlerCompletion);
+    void cancelPostedCalls(Pollable* const sock);
     /**
      * Returns number of sockets handled by this object.
      */
@@ -110,7 +108,6 @@ private:
         QnMutexLockerBase* lock,
         Pollable* const sock,
         aio::EventType eventType,
-        bool waitForRunningHandlerCompletion,
         nx::utils::MoveOnlyFunc<void()> pollingStoppedHandler = nx::utils::MoveOnlyFunc<void()>());
 
     /**
