@@ -917,6 +917,10 @@
             "relayOutputInversed": true,
             "portNamePrefixToIgnore": "AlarmOut"
         },
+		{
+            "keys": ["DW|DWC-PF5M1TIR"],
+			"fixWrongInputPortNumber": true
+		},
         {
             "keys": [
                 "DW|DWC-MPTZ20X",
