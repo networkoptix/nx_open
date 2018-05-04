@@ -16,6 +16,8 @@ const babelLoader = {
     }
 };
 
+let isProd = false;
+
 let thingsToIgnore = [
     'src/**/*.ts',
     'web_common/styles/**',
@@ -32,6 +34,7 @@ let thingsToIgnore = [
 let targetEnv = process.argv[ 3 ].split('.')[ 1 ]; // keep 3rd arg as env configuration
 if (targetEnv === 'prod') {
     thingsToIgnore.push('src/**/*.scss');
+    isProd = true;
 }
 
 module.exports = {
@@ -44,8 +47,11 @@ module.exports = {
         appnew: './main.ts'
     },
     plugins: [
-        //Development plugins
+        new webpack.DefinePlugin({
+            PRODUCTION: JSON.stringify(isProd)
+        }),
 
+        //Development plugins
         new webpack.ContextReplacementPlugin(
             // The (\\|\/) piece accounts for path separators in *nix and Windows
             /*/angular(\\|\/)core(\\|\/)@angular/,*/

@@ -58,9 +58,11 @@ window.L = {};
             function ($routeProvider, $locationProvider, $compileProvider,
                       languageServiceProvider, configServiceProvider) {
 
-                $compileProvider.debugInfoEnabled(true); // PROD -> set to false
+                if (!PRODUCTION) {
+                    $compileProvider.debugInfoEnabled(true);
+                }
+
                 $locationProvider.html5Mode(true);
-                // .hashPrefix('!');
 
                 var CONFIG = configServiceProvider.$get().config;
 
@@ -93,8 +95,12 @@ window.L = {};
                     })
                     .fail(function () {
                         // Fallback to default language
-                        //if request to api/utils/language fails then cloud_portal is under maintaince comment out for dev
-                        window.location.href = '/503.html';
+                        // if request to api/utils/language fails then
+                        // cloud_portal is under maintenance
+                        if (PRODUCTION) {
+                            window.location.href = '/503.html';
+                        }
+
                         $.ajax({
                             url: 'static/language.json',
                             async: false,

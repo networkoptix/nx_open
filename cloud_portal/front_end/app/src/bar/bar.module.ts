@@ -27,24 +27,16 @@ import { NxLanguageDropdown } from "../../src/dropdowns/language/language.compon
         CommonModule,
         BrowserModule,
         UpgradeModule,
-        // NgbDropdownModule,
-        // NgbModalModule,
         FormsModule,
         ReactiveFormsModule,
-        DropdownsModule,
-
-        // RouterModule.forChild(appRoutes)
+        DropdownsModule
     ],
     providers: [
         QuoteService,
         DropdownsModule
     ],
     declarations: [
-        BarComponent,
-        // NxLanguageDropdown,
-        // NxAccountSettingsDropdown,
-        // NxActiveSystemDropdown,
-        // NxSystemsDropdown
+        BarComponent
     ],
     bootstrap: []
 })
