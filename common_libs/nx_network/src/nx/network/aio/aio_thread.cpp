@@ -82,8 +82,7 @@ void AIOThread::startMonitoring(
 
 void AIOThread::stopMonitoring(
     Pollable* const sock,
-    aio::EventType eventType,
-    nx::utils::MoveOnlyFunc<void()> pollingStoppedHandler)
+    aio::EventType eventType)
 {
     QnMutexLocker lock(&m_taskQueue->mutex);
 
@@ -93,13 +92,7 @@ void AIOThread::stopMonitoring(
         stopMonitoringInternal(
             &lock,
             sock,
-            eventType,
-            std::move(pollingStoppedHandler));
-    }
-    else
-    {
-        if (pollingStoppedHandler)
-            post(lock, nullptr, std::move(pollingStoppedHandler));
+            eventType);
     }
 }
 
@@ -312,8 +305,7 @@ void AIOThread::startMonitoringInternal(
 void AIOThread::stopMonitoringInternal(
     QnMutexLockerBase* lock,
     Pollable* const sock,
-    aio::EventType eventType,
-    nx::utils::MoveOnlyFunc<void()> pollingStoppedHandler)
+    aio::EventType eventType)
 {
     // Checking queue for reverse task for sock.
     if (m_taskQueue->removeReverseTask(sock, eventType, detail::TaskType::tRemoving, NULL, 0))

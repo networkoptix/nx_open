@@ -62,10 +62,7 @@ public:
      *   multiple threads can cause undefined behavour.
      * NOTE: MUST be called with mutex locked.
      */
-    void stopMonitoring(
-        Pollable* const sock,
-        aio::EventType eventType,
-        nx::utils::MoveOnlyFunc<void()> pollingStoppedHandler);
+    void stopMonitoring(Pollable* const sock, aio::EventType eventType);
     /**
      * Queues functor to be executed from within this aio thread as soon as possible.
      */
@@ -107,8 +104,7 @@ private:
     void stopMonitoringInternal(
         QnMutexLockerBase* lock,
         Pollable* const sock,
-        aio::EventType eventType,
-        nx::utils::MoveOnlyFunc<void()> pollingStoppedHandler = nx::utils::MoveOnlyFunc<void()>());
+        aio::EventType eventType);
 
     /**
      * Change timeout of existing polling sock for eventToWatch to timeoutMS.

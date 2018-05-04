@@ -71,10 +71,7 @@ public:
      * NOTE: If this method is called from asio thread, sock is processed in (e.g., from event handler associated with sock).
      *   this method does not block and always works like waitForRunningHandlerCompletion has been set to true.
      */
-    void stopMonitoring(
-        Pollable* const sock,
-        aio::EventType eventType,
-        nx::utils::MoveOnlyFunc<void()> pollingStoppedHandler = nx::utils::MoveOnlyFunc<void()>());
+    void stopMonitoring(Pollable* const sock, aio::EventType eventType);
 
     /**
      * Register timeout, associated with socket sock.
