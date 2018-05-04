@@ -81,6 +81,8 @@ protected:
     void whenSendDataToUnknownHost()
     {
         // TODO: Making sure host will not be resolved.
+        ASSERT_TRUE(m_sender->setNonBlockingMode(true))
+            << SystemError::getLastOSErrorText().toStdString();
 
         m_sender->sendToAsync(
             m_testMessage,
