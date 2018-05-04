@@ -180,6 +180,22 @@ void StreamSocket::handleSslError(int sslPipelineResultCode)
     }
 }
 
+//-------------------------------------------------------------------------------------------------
+
+ClientStreamSocket::ClientStreamSocket(
+    std::unique_ptr<AbstractStreamSocket> delegatee)
+    :
+    base_type(std::move(delegatee), false)
+{
+}
+
+ServerSideStreamSocket::ServerSideStreamSocket(
+    std::unique_ptr<AbstractStreamSocket> delegatee)
+    :
+    base_type(std::move(delegatee), true)
+{
+}
+
 } // namespace ssl
 } // namespace network
 } // namespace nx

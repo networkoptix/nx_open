@@ -27,6 +27,7 @@ public:
 
 private:
     std::unique_ptr<AbstractStreamServerSocket> m_delegatee;
+    EncryptionUse m_encryptionUse;
 
     void onAcceptCompletion(
         AcceptCompletionHandler handler,
