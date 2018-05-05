@@ -453,7 +453,7 @@ private:
         {
             QString name;
             QString value;
-            SimpleItem() {}
+            SimpleItem() = default;
             SimpleItem(const QString& name, const QString& value): name(name), value(value) {}
         };
 
@@ -498,7 +498,9 @@ private:
         TriggerOutputTask(
             const QString outputID, const bool active, const unsigned int autoResetTimeoutMS)
             :
-            outputID(outputID), active(active), autoResetTimeoutMS(autoResetTimeoutMS)
+            outputID(outputID),
+            active(active),
+            autoResetTimeoutMS(autoResetTimeoutMS)
         {
         }
     };
