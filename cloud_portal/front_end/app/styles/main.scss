@@ -247,9 +247,18 @@ a.disabled {
     display: none !important;
 }
 
+.card {
+    &.hoverable {
+        margin-bottom: 10px;
 
-.panel.hoverable:hover{
-    box-shadow: 0px 2px 2px 0px transparentize(dark(15),0.8);
+        &:hover {
+            box-shadow: 0 2px 5px 0 transparentize(dark(15), 0.8);
+        }
+    }
+
+    table {
+        margin : 0;
+    }
 }
 
 @include media-breakpoint-up(sm) {
@@ -261,8 +270,6 @@ a.disabled {
     visibility: visible;
   }
 }
-
-
 
 .process-loading{
   border:none;
@@ -432,13 +439,13 @@ td{
     margin-bottom:12px;
   }
 
-  .label {
+  .badge {
     display: inline-block;
     vertical-align: bottom;
 
     height: 20px;
     margin-top: 12px;
-    line-height: 14px;
+    line-height: 12px;
     border-radius: $border-radius-small;
 
     font-weight: normal;
@@ -666,6 +673,10 @@ h1.process-success{
   line-height: 1.5;
 }
 
+h1 .badge {
+    margin-left: 8px;
+}
+
 .search-block{
     padding-top:10px;
     padding-bottom:10px;
@@ -884,21 +895,3 @@ button .icon-caret{
   font-weight: initial;
   padding-left: 4px;
 }
-
-//.app-header-right {
-//    ul {
-//        border: 1px solid blue;
-//
-//        li {
-//            border: 1px solid red;
-//
-//            nx-systems, nx-account-settings-select {
-//                border: 1px solid green;
-//
-//                button {
-//                    border: 1px solid gold;
-//                }
-//            }
-//        }
-//    }
-//}

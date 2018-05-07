@@ -42,22 +42,22 @@
                             'notActivated'
                         ],
                         default     : {
-                            style: 'label-default'
+                            style: 'badge-default'
                         },
                         notActivated: {
-                            style: 'label-danger'
+                            style: 'badge-danger'
                         },
                         activated   : {
-                            style: 'label-info'
+                            style: 'badge-info'
                         },
                         online      : {
-                            style: 'label-success'
+                            style: 'badge-success'
                         },
                         offline     : {
-                            style: 'label-default'
+                            style: 'badge-default'
                         },
                         unavailable : {
-                            style: 'label-default'
+                            style: 'badge-default'
                         }
                     },
                     accessRoles   : {
