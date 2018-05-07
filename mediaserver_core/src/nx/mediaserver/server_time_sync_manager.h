@@ -37,15 +37,19 @@ public:
 protected:
     virtual void updateTime() override;
     virtual AbstractStreamSocketPtr connectToRemoteHost(const QnRoute& route) override;
+    virtual void setSyncTime(std::chrono::milliseconds value) override;
 private:
     void loadTimeFromInternet();
 
-    QnMediaServerResourcePtr getPrimaryTimeServer();
+    QnUuid getPrimaryTimeServerId() const;
     void initializeTimeFetcher();
+    void broadcastSystemTime();
+    void broadcastSystemTimeDelayed();
 private:
     std::unique_ptr<AbstractAccurateTimeFetcher> m_internetTimeSynchronizer;
     std::atomic<bool> m_internetSyncInProgress{false};
     std::atomic<bool> m_updateTimePlaned{ false };
+    std::atomic<bool> m_broadcastTimePlaned{ false };
     ReverseConnectionManager* m_reverseConnectionManager = nullptr;
 };
 

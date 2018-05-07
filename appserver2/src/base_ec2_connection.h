@@ -119,7 +119,7 @@ protected:
     QnUpdatesNotificationManagerPtr m_updatesNotificationManager;
     QnMiscNotificationManagerPtr m_miscNotificationManager;
     QnDiscoveryNotificationManagerPtr m_discoveryNotificationManager;
-    AbstractTimeNotificationManagerPtr m_timeNotificationManager;
+    QnTimeNotificationManagerPtr m_timeNotificationManager;
     std::unique_ptr<ECConnectionNotificationManager> m_notificationManager;
     std::unique_ptr<ECConnectionAuditManager> m_auditManager;
 };
@@ -155,6 +155,7 @@ BaseEc2Connection<QueryProcessorType>::BaseEc2Connection(
             m_mediaServerNotificationManager.get(),
             m_cameraNotificationManager.get(),
             m_userNotificationManager.get(),
+            m_timeNotificationManager.get(),
             m_businessEventNotificationManager.get(),
             m_layoutNotificationManager.get(),
             m_layoutTourNotificationManager.get(),

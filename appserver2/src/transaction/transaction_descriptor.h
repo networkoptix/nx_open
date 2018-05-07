@@ -59,6 +59,7 @@ class QnResourceNotificationManager;
 class QnMediaServerNotificationManager;
 class QnCameraNotificationManager;
 class QnUserNotificationManager;
+class QnTimeNotificationManager;
 class QnBusinessEventNotificationManager;
 class QnLayoutNotificationManager;
 class QnLayoutTourNotificationManager;
@@ -112,6 +113,7 @@ struct NotificationParams
     QnMediaServerNotificationManager* mediaServerNotificationManager;
     QnCameraNotificationManager* cameraNotificationManager;
     QnUserNotificationManager* userNotificationManager;
+    QnTimeNotificationManager* timeNotificationManager;
     QnBusinessEventNotificationManager* businessEventNotificationManager;
     QnLayoutNotificationManager* layoutNotificationManager;
     QnLayoutTourNotificationManager* layoutTourNotificationManager;

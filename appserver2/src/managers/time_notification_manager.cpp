@@ -10,8 +10,11 @@ QnTimeNotificationManager::QnTimeNotificationManager(nx::time_sync::TimeSyncMana
         this, &QnTimeNotificationManager::timeChanged);
 }
 
-QnTimeNotificationManager::~QnTimeNotificationManager()
+void QnTimeNotificationManager::triggerNotification(
+    const QnTransaction<ApiPeerSystemTimeData>& /*transaction*/,
+    NotificationSource /*source*/)
 {
+    emit primaryTimeServerTimeChanged();
 }
 
 } // namespace ec2

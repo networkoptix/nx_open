@@ -536,9 +536,6 @@ bool QnTransactionMessageBus::processSpecialTransaction(const QnTransaction<T> &
         case ApiCommand::forcePrimaryTimeServer:
             // ignore deprecated transaction
             break;
-        case ApiCommand::broadcastPeerSyncTime:
-            // ignore deprecated transaction
-            return true; // do not proxy.
         case ApiCommand::broadcastPeerSystemTime:
         case ApiCommand::getKnownPeersSystemTime:
             return true; // Ignore deprecated transactions

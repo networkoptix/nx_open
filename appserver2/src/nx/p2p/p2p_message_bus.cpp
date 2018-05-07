@@ -865,7 +865,6 @@ bool MessageBus::processSpecialTransaction(
     {
         // TODO: move it to the global setting param or emit this data via NotificationManager
     case ApiCommand::forcePrimaryTimeServer:
-    case ApiCommand::broadcastPeerSyncTime:
         // ignore deprecated transaction
         return true;
     case ApiCommand::runtimeInfoChanged:

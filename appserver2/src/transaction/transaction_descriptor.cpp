@@ -141,6 +141,10 @@ void apiIdDataTriggerNotificationHelper(
             return notificationParams.userNotificationManager->triggerNotification(
                 tran,
                 notificationParams.source);
+        case ApiCommand::broadcastPeerSystemTime:
+            return notificationParams.timeNotificationManager->triggerNotification(
+                tran,
+                notificationParams.source);
         case ApiCommand::removeEventRule:
             return notificationParams.businessEventNotificationManager->triggerNotification(
                 tran,
@@ -242,6 +246,15 @@ struct UserNotificationManagerHelper
     void operator ()(const QnTransaction<Param> &tran, const NotificationParams &notificationParams)
     {
         notificationParams.userNotificationManager->triggerNotification(tran, notificationParams.source);
+    }
+};
+
+struct TimeNotificationManagerHelper
+{
+    template<typename Param>
+    void operator ()(const QnTransaction<Param> &tran, const NotificationParams &notificationParams)
+    {
+        notificationParams.timeNotificationManager->triggerNotification(tran, notificationParams.source);
     }
 };
 

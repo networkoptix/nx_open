@@ -875,6 +875,7 @@ public:
 signals :
     //!Emitted when synchronized time has been changed
     void timeChanged(qint64 syncTime);
+    void primaryTimeServerTimeChanged();
 };
 
 typedef std::shared_ptr<AbstractTimeNotificationManager> AbstractTimeNotificationManagerPtr;

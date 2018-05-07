@@ -139,29 +139,17 @@ void TimeSyncManager::setSyncTime(std::chrono::milliseconds value)
     if (timeDelta < minDeltaToSync)
         return;
 
-    const auto systemTimeDeltaMs = value.count() - m_systemClock->millisSinceEpoch().count();
-    auto connection = commonModule()->ec2Connection();
-    
-    ec2::ApiMiscData deltaData(
-        kTimeDeltaParamName,
-        QByteArray::number(systemTimeDeltaMs));
-
-    connection->getMiscManager(Qn::kSystemAccess)->saveMiscParam(
-        deltaData, this, 
-        [this](int /*reqID*/, ec2::ErrorCode errCode)
-        {
-        if (errCode != ec2::ErrorCode::ok)
-            NX_WARNING(this, lm("Failed to save time delta data to the database"));
-        });
-
-
-    {
-        QnMutexLocker lock(&m_mutex);
-        m_synchronizedTime = value;
-        m_synchronizedOnClock = m_steadyClock->now();
-    }
+    setSyncTimeInternal(value);
     emit timeChanged(value.count());
 }
+
+void TimeSyncManager::setSyncTimeInternal(std::chrono::milliseconds value)
+{
+    QnMutexLocker lock(&m_mutex);
+    m_synchronizedTime = value;
+    m_synchronizedOnClock = m_steadyClock->now();
+}
+
 
 std::chrono::milliseconds TimeSyncManager::getSyncTime() const
 {

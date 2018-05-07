@@ -14,6 +14,8 @@
 #include <nx/network/http/http_client.h>
 #include <nx/utils/time.h>
 #include <utils/common/delayed.h>
+#include <transaction/transaction.h>
+#include <transaction/message_bus_adapter.h>
 
 namespace nx {
 namespace mediaserver {
@@ -23,6 +25,23 @@ static const std::chrono::seconds kMinTimeUpdateInterval(10);
 
 const QString kTimeSyncUrlPath = QString::fromLatin1("ec2/timeSync");
 static const QByteArray kTimeDeltaParamName = "sync_time_delta";
+
+
+bool compareTimePriority(
+    const QnMediaServerResourcePtr& left, const QnMediaServerResourcePtr& right)
+{
+    bool leftIsOnline = left->getStatus();
+    bool rightIsOnline = right->getStatus();
+    if (leftIsOnline != rightIsOnline)
+        return leftIsOnline < rightIsOnline;
+
+    bool leftHasInternet = left->getServerFlags().testFlag(Qn::SF_HasPublicIP);
+    bool rightHasInternet = right->getServerFlags().testFlag(Qn::SF_HasPublicIP);
+    if (leftHasInternet != rightHasInternet)
+        return leftHasInternet < rightHasInternet;
+
+    return left->getId() < right->getId();
+};
 
 
 ServerTimeSyncManager::ServerTimeSyncManager(
@@ -41,9 +60,19 @@ ServerTimeSyncManager::ServerTimeSyncManager(
     {
         if (auto server = resource.dynamicCast<QnMediaServerResource>())
         {
+            auto commonModule = this->commonModule();
+            QnMediaServerResourcePtr ownServer = commonModule->resourcePool()
+                ->getResourceById<QnMediaServerResource>(commonModule->moduleGUID());
+            if (!ownServer)
+                return;
+
+            bool isLess = compareTimePriority(server, ownServer);
+            if (!isLess)
+                return;
+
             if (m_updateTimePlaned.exchange(true))
                 return;
-            
+
             executeDelayed([this]()
             {
                 m_updateTimePlaned = false;
@@ -53,6 +82,39 @@ ServerTimeSyncManager::ServerTimeSyncManager(
             this->thread());
         }
     });
+    connect(this, &ServerTimeSyncManager::timeChanged, this,
+        [this]()
+        {
+            auto primaryTimeServerId = getPrimaryTimeServerId();
+            if (primaryTimeServerId == this->commonModule()->moduleGUID())
+                broadcastSystemTimeDelayed();
+        });
+}
+
+void ServerTimeSyncManager::broadcastSystemTimeDelayed()
+{
+    if (m_broadcastTimePlaned.exchange(true))
+        return;
+
+    executeDelayed([this]()
+    {
+        m_broadcastTimePlaned = false;
+        broadcastSystemTime();
+    },
+        std::chrono::milliseconds(kMinTimeUpdateInterval).count(),
+        this->thread());
+}
+
+void ServerTimeSyncManager::broadcastSystemTime()
+{
+    using namespace ec2;
+    auto connection = commonModule()->ec2Connection();
+    QnTransaction<ApiPeerSyncTimeData> tran(
+        ApiCommand::broadcastPeerSyncTime,
+        commonModule()->moduleGUID());
+    tran.params.syncTimeMs = getSyncTime().count();
+    if (auto connection = commonModule()->ec2Connection())
+        connection->messageBus()->sendTransaction(tran);
 }
 
 ServerTimeSyncManager::~ServerTimeSyncManager()
@@ -71,10 +133,30 @@ void ServerTimeSyncManager::start()
         NX_WARNING(this, "Failed to load time delta parameter from the database");
     }
     auto timeDelta = std::chrono::milliseconds(deltaData.value.toLongLong());
-    setSyncTime(m_systemClock->millisSinceEpoch() + timeDelta);
-
+    setSyncTimeInternal(m_systemClock->millisSinceEpoch() + timeDelta);
+    
     initializeTimeFetcher();
     base_type::start();
+}
+
+void ServerTimeSyncManager::setSyncTime(std::chrono::milliseconds value)
+{
+    base_type::setSyncTime(value);
+
+    const auto systemTimeDeltaMs = value.count() - m_systemClock->millisSinceEpoch().count();
+    auto connection = commonModule()->ec2Connection();
+    ec2::ApiMiscData deltaData(
+        kTimeDeltaParamName,
+        QByteArray::number(systemTimeDeltaMs));
+
+    connection->getMiscManager(Qn::kSystemAccess)->saveMiscParam(
+        deltaData, this,
+        [this](int /*reqID*/, ec2::ErrorCode errCode)
+    {
+        if (errCode != ec2::ErrorCode::ok)
+            NX_WARNING(this, lm("Failed to save time delta data to the database"));
+    });
+
 }
 
 void ServerTimeSyncManager::stop()
@@ -101,28 +183,24 @@ void ServerTimeSyncManager::initializeTimeFetcher()
     m_internetTimeSynchronizer = std::move(meanTimerFetcher);
 }
 
-QnMediaServerResourcePtr ServerTimeSyncManager::getPrimaryTimeServer()
+QnUuid ServerTimeSyncManager::getPrimaryTimeServerId() const
 {
     auto resourcePool = commonModule()->resourcePool();
     auto settings = commonModule()->globalSettings();
     QnUuid primaryTimeServer = settings->primaryTimeServer();
     if (!primaryTimeServer.isNull())
-        return resourcePool->getResourceById<QnMediaServerResource>(primaryTimeServer); //< User-defined time server.
+    {
+        // User-defined time server.
+        auto server = resourcePool->getResourceById<QnMediaServerResource>(primaryTimeServer);
+        return server ? server->getId() : QnUuid();
+    }
     
     // Automatically select primary time server.
     auto servers = resourcePool->getAllServers(Qn::Online);
     if (servers.isEmpty())
-        return QnMediaServerResourcePtr();
-    std::sort(servers.begin(), servers.end(),
-        [](const QnMediaServerResourcePtr& left, const QnMediaServerResourcePtr& right)
-        {
-            bool leftHasInternet = left->getServerFlags().testFlag(Qn::SF_HasPublicIP);
-            bool rightHasInternet = right->getServerFlags().testFlag(Qn::SF_HasPublicIP);
-            if (leftHasInternet != rightHasInternet)
-                return leftHasInternet < rightHasInternet;
-            return left->getId() < right->getId();
-        });
-    return servers.front();
+        return QnUuid();
+    std::sort(servers.begin(), servers.end(), compareTimePriority);
+    return servers.front()->getId();
 }
 
 std::unique_ptr<nx::network::AbstractStreamSocket> ServerTimeSyncManager::connectToRemoteHost(const QnRoute& route)
@@ -161,12 +239,12 @@ void ServerTimeSyncManager::loadTimeFromInternet()
 
 void ServerTimeSyncManager::updateTime()
 {
-    auto server = getPrimaryTimeServer();
-    if (!server)
+    auto primaryTimeServerId = getPrimaryTimeServerId();
+    if (primaryTimeServerId.isNull())
         return;
 
     bool syncWithInternel = commonModule()->globalSettings()->isSynchronizingTimeWithInternet();
-    if (server->getId() == commonModule()->moduleGUID())
+    if (primaryTimeServerId == commonModule()->moduleGUID())
     {
         if (syncWithInternel)
             loadTimeFromInternet();
@@ -175,7 +253,7 @@ void ServerTimeSyncManager::updateTime()
     }
     else
     {
-        auto route = commonModule()->router()->routeTo(server->getId());
+        auto route = commonModule()->router()->routeTo(primaryTimeServerId);
         if (route.isValid())
             loadTimeFromServer(route);
     }

@@ -3573,12 +3573,6 @@ void MediaServerProcess::run()
         miscManager->cleanupDatabaseSync(kCleanupDbObjects, kCleanupTransactionLog);
     }
 
-    connect(
-        ec2Connection->getTimeNotificationManager().get(),
-        &ec2::AbstractTimeNotificationManager::timeChanged,
-        this,
-        &MediaServerProcess::at_timeChanged,
-        Qt::QueuedConnection);
     std::unique_ptr<QnMServerResourceSearcher> mserverResourceSearcher(new QnMServerResourceSearcher(commonModule()));
 
     auto pluginManager = m_serverModule->pluginManager();
@@ -4130,17 +4124,6 @@ void MediaServerProcess::at_appStarted()
     stateDirectory.mkpath(dataLocation + QLatin1String("/state"));
     qnFileDeletor->init(dataLocation + QLatin1String("/state")); // constructor got root folder for temp files
 };
-
-void MediaServerProcess::at_timeChanged(qint64 newTime)
-{
-    using namespace ec2;
-    QnTransaction<ApiPeerSyncTimeData> tran(
-        ApiCommand::broadcastPeerSyncTime,
-        commonModule()->moduleGUID());
-    tran.params.syncTimeMs = newTime;
-    if (auto connection = commonModule()->ec2Connection())
-        connection->messageBus()->sendTransaction(tran);
-}
 
 void MediaServerProcess::at_runtimeInfoChanged(const QnPeerRuntimeInfo& runtimeInfo)
 {

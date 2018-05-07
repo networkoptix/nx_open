@@ -1174,7 +1174,7 @@ APPLY(2002, broadcastPeerSystemTime, ApiPeerSystemTimeData, \
                        false, \
                        true, \
                        InvalidGetHashHelper(), \
-                       EmptyNotificationHelper(), \
+                       TimeNotificationManagerHelper(), \
                        AdminOnlyAccess(), /* save permission checker */ \
                        AllowForAllAccess(), /* read permission checker */ \
                        InvalidFilterFunc(), /* Filter save func */ \
