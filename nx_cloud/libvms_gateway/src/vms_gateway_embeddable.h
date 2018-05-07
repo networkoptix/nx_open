@@ -26,6 +26,9 @@ public:
     SocketAddress endpoint() const;
     void enforceSslFor(const SocketAddress& targetAddress, bool enabled = true);
 
+protected:
+    virtual void beforeModuleStart() override;
+
 private:
     const bool m_isSslEnabled;
     SocketAddress m_endpoint;

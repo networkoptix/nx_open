@@ -683,7 +683,8 @@
                 "*|DW-CP04", "*|DW-CP16",
                 "ACTI|I96","ACTI|I98",
                 "UNIVIEW|IPC6242SR-X22",
-                "Milesight*|MS-C2961-EB"
+                "Milesight*|MS-C2961-EB",
+                "Dahua|DH-SD22404T-GN"
             ],
             "ptzTraits": "EightWayPtz"
         },
@@ -2212,7 +2213,7 @@
         },
         {
             "keys": [
-                "UNIVIEW|IPC6253SR-X33*", "Securicorp|SCL-SDM03MVIR-WD3533X", "NONE|SDM03MVIR-WD3533X"
+                "UNIVIEW|IPC6253SR-X33*", "Securicorp|SCL-SDM03MVIR-WD3533X", "NONE|SCL-SDM03MVIR-WD3533X"
             ],
             "ptzMapper": {
                 "fromCamera": {

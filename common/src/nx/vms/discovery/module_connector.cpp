@@ -119,6 +119,7 @@ ModuleConnector::Module::Module(ModuleConnector* parent, const QnUuid& id):
     m_disconnectTimer(parent->getAioThread())
 {
     NX_DEBUG(this, lm("New %1").args(m_id));
+    m_endpoints[kDefault]; //< TODO: Should not be merged into 4.0!!
 }
 
 ModuleConnector::Module::~Module()
@@ -176,7 +177,7 @@ ModuleConnector::Module::Priority
     if (m_id.isNull())
         return kDefault;
 
-    if (host == HostAddress::localhost)
+    if (host == HostAddress::localhost || host.toString().toLower() == lit("localhost"))
         return kLocalHost;
 
     if (host.isLocal())
@@ -250,6 +251,12 @@ void ModuleConnector::Module::connectToGroup(Endpoints::iterator endpointsGroup)
 
     // Initiate parallel connects to each endpoint in a group.
     size_t endpointsInProgress = 0;
+    if (m_lastSuccessfulEndpoint) //< TODO: Should not be merged into 4.0!!
+    {
+        ++endpointsInProgress;
+        connectToEndpoint(*m_lastSuccessfulEndpoint, endpointsGroup);
+        m_lastSuccessfulEndpoint = boost::none;
+    }
     for (const auto& endpoint: endpointsGroup->second)
     {
         if (m_forbiddenEndpoints.count(endpoint))
@@ -370,7 +377,7 @@ bool ModuleConnector::Module::saveConnection(
 
     const auto buffer = std::make_shared<Buffer>();
     buffer->reserve(1);
-
+    m_lastSuccessfulEndpoint = endpoint; //< TODO: Should not be merged into 4.0!!
     m_socket = std::move(socket);
     m_socket->readSomeAsync(buffer.get(),
         [this, buffer](SystemError::ErrorCode code, size_t size)
