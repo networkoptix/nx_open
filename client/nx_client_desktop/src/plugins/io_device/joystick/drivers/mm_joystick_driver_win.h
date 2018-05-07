@@ -9,10 +9,15 @@
 #include <boost/optional/optional.hpp>
 
 #include <set>
+#include <vector>
+#include <memory>
 
 #include <nx/utils/singleton.h>
 
 namespace nx {
+
+namespace utils { class PendingOperation; }
+
 namespace client {
 namespace plugins {
 namespace io_device {
@@ -53,10 +58,16 @@ private:
 
     QString makeId(const QString& objectType, uint objectIndex);
 
+    static MMRESULT safeJoyGetPos(uint joystickIndex, JOYINFO& info);
+    static MMRESULT safeJoyGetDevCaps(uint joystickIndex, JOYCAPS& caps);
+    static MMRESULT safeJoySetCapture(HWND hWnd, uint joystickIndex, UINT periodMs, bool changed);
+    static MMRESULT safeJoyReleaseCapture(uint joystickIndex);
+
 private:
     HWND m_windowId;
     std::set<uint> m_capturedJoysticks;
     std::vector<JoystickPtr> m_joysticks;
+    std::unique_ptr<utils::PendingOperation> m_updateConfiguration;
     mutable QnMutex m_mutex;
 };
 

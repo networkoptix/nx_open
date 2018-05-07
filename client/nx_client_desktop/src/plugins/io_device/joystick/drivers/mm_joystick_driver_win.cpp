@@ -7,17 +7,20 @@
 #include <plugins/io_device/joystick/controls/joystick_button_control.h>
 #include <plugins/io_device/joystick/controls/joystick_stick_control.h>
 #include <nx/utils/timer_manager.h>
+#include <nx/utils/pending_operation.h>
+#include <nx/utils/log/log.h>
 
 namespace {
 
-const uint kMaxJoystickIndex = 1;
-const uint kMaxButtonNumber = 32;
-const uint kMaxStickNumber = 2;
-const QString kJoystickObjectType = lit("joystick");
-const QString kButtonObjectType = lit("button");
-const QString kStickObjectType = lit("stick");
-const int kDefaultStickLogicalRangeMin = -100;
-const int kDefaultStickLogicalRangeMax = 100;
+static constexpr uint kMaxJoystickIndex = 1;
+static constexpr uint kMaxButtonNumber = 32;
+static constexpr uint kMaxStickNumber = 2;
+static const QString kJoystickObjectType = lit("joystick");
+static const QString kButtonObjectType = lit("button");
+static const QString kStickObjectType = lit("stick");
+static constexpr int kDefaultStickLogicalRangeMin = -100;
+static constexpr int kDefaultStickLogicalRangeMax = 100;
+static constexpr int kUpdateConfigurationDelayMs = 100;
 
 } // namespace
 
@@ -28,17 +31,77 @@ namespace io_device {
 namespace joystick {
 namespace driver {
 
-MmWinDriver::MmWinDriver(HWND windowId):
-    m_windowId(windowId)
+MmWinDriver::MmWinDriver(HWND windowId) :
+    m_windowId(windowId),
+    m_updateConfiguration(new utils::PendingOperation())
 {
-
+    m_updateConfiguration->setFlags(utils::PendingOperation::FireOnlyWhenIdle);
+    m_updateConfiguration->setIntervalMs(kUpdateConfigurationDelayMs);
+    m_updateConfiguration->setCallback(
+        []()
+        {
+            if (auto manager = Manager::instance())
+                manager->notifyHardwareConfigurationChanged();
+        });
 }
 
 MmWinDriver::~MmWinDriver()
 {
     QnMutexLocker lock(&m_mutex);
     for (auto capturedJoystickIndex: m_capturedJoysticks)
-        joyReleaseCapture(capturedJoystickIndex);
+        safeJoyReleaseCapture(capturedJoystickIndex);
+}
+
+MMRESULT MmWinDriver::safeJoyGetPos(uint joystickIndex, JOYINFO& info)
+{
+    __try
+    {
+        return joyGetPos(joystickIndex, &info);
+    }
+    __except(EXCEPTION_EXECUTE_HANDLER)
+    {
+        NX_WARNING("MmWinDriver") << "OS exception at joyGetPos";
+        return JOYERR_NOCANDO;
+    }
+}
+
+MMRESULT MmWinDriver::safeJoyGetDevCaps(uint joystickIndex, JOYCAPS& caps)
+{
+    __try
+    {
+        return joyGetDevCaps(joystickIndex, &caps, sizeof(caps));
+    }
+    __except (EXCEPTION_EXECUTE_HANDLER)
+    {
+        NX_WARNING("MmWinDriver") << "OS exception at safeJoyGetDevCaps";
+        return JOYERR_NOCANDO;
+    }
+}
+
+MMRESULT MmWinDriver::safeJoySetCapture(HWND hWnd, uint joystickIndex, UINT periodMs, bool changed)
+{
+    __try
+    {
+        return joySetCapture(hWnd, joystickIndex, periodMs, changed);
+    }
+    __except (EXCEPTION_EXECUTE_HANDLER)
+    {
+        NX_WARNING("MmWinDriver") << "OS exception at joySetCapture";
+        return JOYERR_NOCANDO;
+    }
+}
+
+MMRESULT MmWinDriver::safeJoyReleaseCapture(uint joystickIndex)
+{
+    __try
+    {
+        return joyReleaseCapture(joystickIndex);
+    }
+    __except (EXCEPTION_EXECUTE_HANDLER)
+    {
+        NX_WARNING("MmWinDriver") << "OS exception at joyReleaseCapture";
+        return JOYERR_NOCANDO;
+    }
 }
 
 std::vector<JoystickPtr> MmWinDriver::enumerateJoysticks()
@@ -46,7 +109,6 @@ std::vector<JoystickPtr> MmWinDriver::enumerateJoysticks()
     QnMutexLocker lock(&m_mutex);
 
     auto maxJoysticks = joyGetNumDevs();
-    auto result = JOYERR_NOERROR;
 
     if (maxJoysticks <= 0)
         return std::vector<JoystickPtr>();
@@ -54,12 +116,30 @@ std::vector<JoystickPtr> MmWinDriver::enumerateJoysticks()
     for (auto i = 0; i < maxJoysticks; ++i)
     {
         JOYINFO joystickInfo;
-        if (joyGetPos(i, &joystickInfo) != JOYERR_NOERROR)
-            continue;
+        switch (safeJoyGetPos(i, joystickInfo))
+        {
+            case JOYERR_NOERROR:
+                break;
+            case JOYERR_NOCANDO:
+                lock.unlock();
+                notifyHardwareConfigurationChanged();
+                return {};
+            default:
+                continue;
+        }
 
         JOYCAPS joystickCapabilities;
-        if (joyGetDevCaps(0, &joystickCapabilities, sizeof(joystickCapabilities)) != JOYERR_NOERROR)
-            continue;
+        switch (safeJoyGetDevCaps(i, joystickCapabilities))
+        {
+            case JOYERR_NOERROR:
+                break;
+            case JOYERR_NOCANDO:
+                lock.unlock();
+                notifyHardwareConfigurationChanged();
+                return {};
+            default:
+                continue;
+        }
 
         auto joy = createJoystick(joystickInfo, joystickCapabilities, i);
         if (!joy)
@@ -82,7 +162,7 @@ bool MmWinDriver::captureJoystick(JoystickPtr& joystickToCapture)
     if (m_capturedJoysticks.find(joystickIndex.get()) != m_capturedJoysticks.end())
         return true;
 
-    auto result = joySetCapture(m_windowId, joystickIndex.get(), kDefaultPeriodMs, false);
+    auto result = safeJoySetCapture(m_windowId, joystickIndex.get(), kDefaultPeriodMs, false);
 
     auto hwnd = m_windowId;
     auto jIndex = joystickIndex.get();
@@ -104,7 +184,7 @@ bool MmWinDriver::releaseJoystick(JoystickPtr& joystickToRelease)
     if (!joystickIndex)
         return false;
 
-    auto result = joyReleaseCapture(joystickIndex.get());
+    auto result = safeJoyReleaseCapture(joystickIndex.get());
 
     if (result != JOYERR_NOERROR)
         return false;
@@ -142,8 +222,7 @@ void MmWinDriver::notifyHardwareConfigurationChanged()
         m_joysticks.clear();
     }
 
-    auto manager = Manager::instance();
-    manager->notifyHardwareConfigurationChanged();
+    m_updateConfiguration->requestOperation();
 }
 
 JoystickPtr MmWinDriver::getJoystickByIndexUnsafe(uint joystickIndex) const
