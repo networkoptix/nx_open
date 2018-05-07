@@ -88,7 +88,7 @@ Object
         function interrupt()
         {
             d.interruptedPosition = d.currentPosition()
-            mediaPlayer.pause()
+            mediaPlayer.stop()
         }
 
         function resumePlaying()
