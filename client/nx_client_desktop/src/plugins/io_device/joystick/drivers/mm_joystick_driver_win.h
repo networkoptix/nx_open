@@ -58,10 +58,12 @@ private:
 
     QString makeId(const QString& objectType, uint objectIndex);
 
-    MMRESULT safeJoyGetPos(uint joystickIndex, JOYINFO& info);
-    MMRESULT safeJoyGetDevCaps(uint joystickIndex, JOYCAPS& caps);
-    MMRESULT safeJoySetCapture(HWND hWnd, uint joystickIndex, UINT periodMs, bool changed);
-    MMRESULT safeJoyReleaseCapture(uint joystickIndex);
+    MMRESULT safeJoyGetPos(uint joystickIndex, JOYINFO& info) const;
+    MMRESULT safeJoyGetDevCaps(uint joystickIndex, JOYCAPS& caps) const;
+    MMRESULT safeJoySetCapture(HWND hWnd, uint joystickIndex, UINT periodMs, bool changed) const;
+    MMRESULT safeJoyReleaseCapture(uint joystickIndex) const;
+
+    void logWarning(const char* message) const;
 
 private:
     HWND m_windowId;

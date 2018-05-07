@@ -52,7 +52,7 @@ MmWinDriver::~MmWinDriver()
         safeJoyReleaseCapture(capturedJoystickIndex);
 }
 
-MMRESULT MmWinDriver::safeJoyGetPos(uint joystickIndex, JOYINFO& info)
+MMRESULT MmWinDriver::safeJoyGetPos(uint joystickIndex, JOYINFO& info) const
 {
     __try
     {
@@ -60,12 +60,12 @@ MMRESULT MmWinDriver::safeJoyGetPos(uint joystickIndex, JOYINFO& info)
     }
     __except(EXCEPTION_EXECUTE_HANDLER)
     {
-        [this]() { NX_WARNING(this) << "OS exception at joyGetPos"; }();
+        logWarning("OS exception at joyGetPos");
         return JOYERR_NOCANDO;
     }
 }
 
-MMRESULT MmWinDriver::safeJoyGetDevCaps(uint joystickIndex, JOYCAPS& caps)
+MMRESULT MmWinDriver::safeJoyGetDevCaps(uint joystickIndex, JOYCAPS& caps) const
 {
     __try
     {
@@ -73,12 +73,13 @@ MMRESULT MmWinDriver::safeJoyGetDevCaps(uint joystickIndex, JOYCAPS& caps)
     }
     __except (EXCEPTION_EXECUTE_HANDLER)
     {
-        [this]() { NX_WARNING(this) << "OS exception at joyGetDevCaps"; }();
+        logWarning("OS exception at joyGetDevCaps");
         return JOYERR_NOCANDO;
     }
 }
 
-MMRESULT MmWinDriver::safeJoySetCapture(HWND hWnd, uint joystickIndex, UINT periodMs, bool changed)
+MMRESULT MmWinDriver::safeJoySetCapture(
+    HWND hWnd, uint joystickIndex, UINT periodMs, bool changed) const
 {
     __try
     {
@@ -86,12 +87,12 @@ MMRESULT MmWinDriver::safeJoySetCapture(HWND hWnd, uint joystickIndex, UINT peri
     }
     __except (EXCEPTION_EXECUTE_HANDLER)
     {
-        [this]() { NX_WARNING(this) << "OS exception at joySetCapture"; }();
+        logWarning("OS exception at joySetCapture");
         return JOYERR_NOCANDO;
     }
 }
 
-MMRESULT MmWinDriver::safeJoyReleaseCapture(uint joystickIndex)
+MMRESULT MmWinDriver::safeJoyReleaseCapture(uint joystickIndex) const
 {
     __try
     {
@@ -99,9 +100,14 @@ MMRESULT MmWinDriver::safeJoyReleaseCapture(uint joystickIndex)
     }
     __except (EXCEPTION_EXECUTE_HANDLER)
     {
-        [this]() { NX_WARNING(this) << "OS exception at joyReleaseCapture"; }();
+        logWarning("OS exception at joyReleaseCapture");
         return JOYERR_NOCANDO;
     }
+}
+
+void MmWinDriver::logWarning(const char* message) const
+{
+    NX_WARNING(this) << message;
 }
 
 std::vector<JoystickPtr> MmWinDriver::enumerateJoysticks()
@@ -113,7 +119,7 @@ std::vector<JoystickPtr> MmWinDriver::enumerateJoysticks()
     if (maxJoysticks <= 0)
         return std::vector<JoystickPtr>();
 
-    for (auto i = 0; i < maxJoysticks; ++i)
+    for (auto i = 0U; i < maxJoysticks; ++i)
     {
         JOYINFO joystickInfo;
         switch (safeJoyGetPos(i, joystickInfo))
@@ -264,7 +270,7 @@ JoystickPtr MmWinDriver::createJoystick(
     joy->setId(makeId(kJoystickObjectType, joystickIndex));
 
     std::vector<controls::ButtonPtr> buttons;
-    for (auto i = 0; i < joystickCapabitlities.wNumButtons; ++i)
+    for (auto i = 0U; i < joystickCapabitlities.wNumButtons; ++i)
     {
         auto button = std::make_shared<controls::Button>();
         button->setId(makeId(kButtonObjectType, i));
