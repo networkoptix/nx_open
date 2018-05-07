@@ -60,13 +60,6 @@ password is actually changed, so login works with new password
     Click Button    ${CHANGE PASSWORD BUTTON}
     Check For Alert    ${YOUR ACCOUNT IS SUCCESSFULLY SAVED}
 
-password change is not possible if old password is wrong
-    Log In To Change Password Page
-    Input Text    ${CURRENT PASSWORD INPUT}    tjyjrsxhrsthr6
-    Input Text    ${NEW PASSWORD INPUT}    ${ALT PASSWORD}
-    Click Button    ${CHANGE PASSWORD BUTTON}
-    Check For Alert    ${CANNOT SAVE PASSWORD} ${PASSWORD INCORRECT}
-
 more than 255 symbols can be entered in new password field and then are cut to 255
     Log In To Change Password Page
     Input Text    ${CURRENT PASSWORD INPUT}    ${300CHARS}
