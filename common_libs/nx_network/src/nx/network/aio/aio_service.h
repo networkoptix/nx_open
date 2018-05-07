@@ -26,8 +26,6 @@ namespace aio {
  * NOTE: Suggested use of this class: few add/remove, many notifications.
  * NOTE: A specific socket always receives all events within the same thread.
  * NOTE: All methods are thread-safe.
- * NOTE: All methods are non-blocking except AIOService::stopMonitoring
- *   (when called with waitForRunningHandlerCompletion set to true).
  */
 class NX_NETWORK_API AIOService
 {
@@ -65,13 +63,11 @@ public:
 
     /**
      * Cancel monitoring sock for event eventType.
-     * @param waitForRunningHandlerCompletion true garantees that no aio::AIOEventHandler::eventTriggered will be called after return of this method.
-     *   and all running handlers have returned. But this MAKES METHOD BLOCKING and, as a result, this MUST NOT be called from aio thread.
-     *   It is strongly recommended to set this parameter to false.
-     * NOTE: If this method is called from asio thread, sock is processed in (e.g., from event handler associated with sock).
-     *   this method does not block and always works like waitForRunningHandlerCompletion has been set to true.
+     * NOTE: If this method is called from socket's aio thread,
+     *   then it is executed without blocking.
+     *   Otherwise, it blocks until already running handler has returned.
      */
-    void stopMonitoring(Pollable* const sock, aio::EventType eventType);
+    void stopMonitoring(Pollable* const socket, aio::EventType eventType);
 
     /**
      * Register timeout, associated with socket sock.
