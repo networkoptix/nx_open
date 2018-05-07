@@ -274,6 +274,50 @@
           ["Legal Company Jurisdiction", "%LEGAL_COMPANY_JURISDICTION%", "State of California", "Company's jurisdiction (for EULA)"],
           ["Legal Company Court", "%LEGAL_COMPANY_COURT%", "state and federal courts located in Los Angeles County, California", "Court to handle disputes (for EULA)"]
         ]
+      },
+      {
+        "name": "SMTP Config",
+        "is_global": true,
+        "description": "Holds settings for smtp server",
+        "translatable": false,
+        "hidden": true,
+        "values":[
+          {
+            "label": "Host",
+            "name": "host",
+            "value": "email-smtp.us-east-1.amazonaws.com",
+            "description": "Host url for smtp server",
+            "advanced": true
+          },
+          {
+            "label": "User",
+            "name": "user",
+            "value": "AKIAJ3DYMIZMDABS43UA",
+            "description": "User for smtp server",
+            "advanced": true
+          },
+          {
+            "label": "Password",
+            "name": "password",
+            "value": "AnC4VkpbBKXPCbik/gBru508QaG8L86uu2cTzTg5yDkI",
+            "description": "Password smtp server",
+            "advanced": true
+          },
+          {
+            "label": "Port",
+            "name": "port",
+            "value": "587",
+            "description": "Port for smtp server",
+            "advanced": true
+          },
+          {
+            "label": "Tls",
+            "name": "tls",
+            "value": true,
+            "description": "Tls for smtp server",
+            "advanced": true
+          }
+        ]
       }
     ]
   }
