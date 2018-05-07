@@ -73,7 +73,7 @@ MMRESULT MmWinDriver::safeJoyGetDevCaps(uint joystickIndex, JOYCAPS& caps)
     }
     __except (EXCEPTION_EXECUTE_HANDLER)
     {
-        [this]() { NX_WARNING(this) << "OS exception at safeJoyGetDevCaps"; }();
+        [this]() { NX_WARNING(this) << "OS exception at joyGetDevCaps"; }();
         return JOYERR_NOCANDO;
     }
 }
