@@ -19,11 +19,17 @@ cloud_gateway:
     url: 'http://$VMS_GATEWAY_HOST:$VMS_GATEWAY_PORT/gateway'
 
 smtp:
-    host: 'mail.smtp2go.com'
-    user: 'smtpsender911'
-    password: 'CfxGalPkaMIe'
+    host: 'email-smtp.us-east-1.amazonaws.com'
+    user: 'AKIAJ6MLW7ZT7WXXXOIA'
+    password: 'AlYDnddPk8mWorQFVogh8sqkQX6Nv01JwxxfMoYJAFeC'
     port: 587
-    tls: true
+    tls: on
+    #settings for local dev
+    #host: 'mail.smtp2go.com'
+    #user: 'smtpsender911'
+    #password: 'CfxGalPkaMIe'
+    #port: 587
+    #tls: on
 
 admins:
     -
