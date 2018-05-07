@@ -6,13 +6,12 @@
 #include <nx/network/system_socket.h>
 #include <nx/network/socket_global.h>
 #include <nx/utils/log/log.h>
+#include <nx/utils/scope_guard.h>
 #include <nx/utils/std/cpp14.h>
 #include <nx/utils/std/future.h>
 #include <nx/utils/std/thread.h>
 #include <nx/utils/string.h>
 #include <nx/utils/thread/sync_queue.h>
-
-#include <nx/utils/scope_guard.h>
 
 namespace nx {
 namespace network {
