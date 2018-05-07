@@ -345,6 +345,7 @@ QnMediaResourceWidget::QnMediaResourceWidget(QnWorkbenchContext* context, QnWork
     at_camDisplay_liveChanged();
     at_ptzButton_toggled(false);
     at_histogramButton_toggled(item->imageEnhancement().enabled);
+    updateIconButton();
 
     updateTitleText();
     updateInfoText();
@@ -371,9 +372,7 @@ QnMediaResourceWidget::QnMediaResourceWidget(QnWorkbenchContext* context, QnWork
     const bool canRotate = accessController()->hasPermissions(item->layout()->resource(),
         Qn::WritePermission);
     setOption(WindowRotationForbidden, !hasVideo() || !canRotate);
-    updateButtonsVisibility(); // < This function ignores and disables RecordingStatusIconButton
-	updateIconButton();
-
+    updateButtonsVisibility();
 }
 
 QnMediaResourceWidget::~QnMediaResourceWidget()
@@ -1448,21 +1447,13 @@ void QnMediaResourceWidget::updateIconButton()
         const auto iconButton = buttonsBar->button(Qn::RecordingStatusIconButton);
         iconButton->setIcon(qnSkin->icon("item/zoom_window_hovered.png"));
         iconButton->setToolTip(tr("Zoom Window"));
-
-        buttonsBar->setButtonsVisible(Qn::RecordingStatusIconButton, true);
         return;
     }
 
     if (!d->camera || d->camera->hasFlags(Qn::wearable_camera))
-    {
-        buttonsBar->setButtonsVisible(Qn::RecordingStatusIconButton, false);
         return;
-    }
 
     const auto icon = m_recordingStatusHelper->icon();
-
-    buttonsBar->setButtonsVisible(Qn::RecordingStatusIconButton, !icon.isNull());
-
     const auto iconButton = buttonsBar->button(Qn::RecordingStatusIconButton);
     iconButton->setIcon(icon);
     iconButton->setToolTip(m_recordingStatusHelper->tooltip());
@@ -2056,6 +2047,7 @@ int QnMediaResourceWidget::calculateButtonsVisibility() const
         {
             result |= Qn::EntropixEnhancementButton;
         }
+        result |= Qn::RecordingStatusIconButton;
 
         return result;
     }
@@ -2107,6 +2099,9 @@ int QnMediaResourceWidget::calculateButtonsVisibility() const
 
     if (d->analyticsMetadataProvider)
         result |= Qn::AnalyticsButton;
+
+	if (d->camera && (!d->camera->hasFlags(Qn::wearable_camera)))
+		result |= Qn::RecordingStatusIconButton;
 
     return result;
 }
