@@ -13,6 +13,7 @@
 
     &-content {
         border-radius: 2px 2px 0 0;
+        box-shadow: 0 16px 32px 0 transparentize(dark(15), 0.8);
     }
 
     &-header {
@@ -74,6 +75,7 @@
 
     &-body {
         padding: 1rem 1rem 0;
+        background-color: $light1;
 
         label {
             font-size: $font-size-base;
@@ -83,6 +85,10 @@
 
         .checkbox {
             margin: 0;
+        }
+
+        .help-block {
+            background-color: transparent;
         }
     }
 

@@ -2,12 +2,19 @@
 @import '../../../styles/native-theme/theme_palette';
 
 .arrow {
-    right: 50px;
+    right: 170px;
     left: auto;
     z-index: 9;
 }
 
 @media (max-width: 768px) {
+    .arrow {
+        right: 150px;
+        left: auto;
+    }
+}
+
+@media (max-width: 700px) {
     .arrow {
         right: 18px;
         left: auto;
