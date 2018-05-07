@@ -30,6 +30,8 @@ public:
     bool isClickable() const;
     void setHint(QString hint);
     QString hint() const;
+    // Returns prefered size from internal pixmap.
+    QSize hintMarkSize() const;
 
 protected:
     void showTooltip(bool show);
