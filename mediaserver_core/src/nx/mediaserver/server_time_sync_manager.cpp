@@ -22,8 +22,6 @@ namespace mediaserver {
 
 static const std::chrono::seconds kProxySocetTimeout(10);
 static const std::chrono::seconds kMinTimeUpdateInterval(10);
-
-const QString kTimeSyncUrlPath = QString::fromLatin1("ec2/timeSync");
 static const QByteArray kTimeDeltaParamName = "sync_time_delta";
 
 

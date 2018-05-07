@@ -18,7 +18,7 @@ namespace time_sync {
 
 static const std::chrono::seconds kProxySocetTimeout(10);
 static const std::chrono::minutes kTimeSyncInterval(10);
-const QString kTimeSyncUrlPath = QString::fromLatin1("ec2/timeSync");
+const QString kTimeSyncUrlPath = QString::fromLatin1("/api/timeSync");
 static const QByteArray kTimeDeltaParamName = "sync_time_delta";
 
 class SystemClock: public AbstractSystemClock
