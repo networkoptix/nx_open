@@ -2,8 +2,10 @@
 
 #include <nx/utils/log/log.h>
 
-#include "structure_update_statements.h"
 #include <nx/data_sync_engine/db/migration/add_history_to_transaction.h>
+
+#include "db_schema_v40.h"
+#include "structure_update_statements.h"
 
 namespace nx {
 namespace cdb {
@@ -92,6 +94,8 @@ void DbInstanceController::initializeStructureMigration()
     dbStructureUpdater().addUpdateScript(db::kAddMergeInformation);
 
     // Version 18.1.
+    dbStructureUpdater().addFullSchemaScript(40, db::kCreateDbVersion40);
+
     dbStructureUpdater().addUpdateScript(db::kSetDataSyncModuleDbStructureVersion);
 }
 
