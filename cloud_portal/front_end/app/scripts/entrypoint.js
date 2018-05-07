@@ -16,6 +16,7 @@ import 'jquery-mousewheel';
 import 'ng-toast/dist/ngToast.css';
 import 'ng-toast/dist/ngToast-animations.css';
 import '../styles/main.scss';
+import '../app.component.scss';
 
 require('./client-detection.js');
 

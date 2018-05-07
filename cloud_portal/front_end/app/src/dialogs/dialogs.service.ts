@@ -1,5 +1,7 @@
 import { Inject, Injectable } from '@angular/core';
 
+import "./../dialogs/dialogs.scss";
+
 import { NxModalLoginComponent }      from "./../dialogs/login/login.component";
 import { NxModalGeneralComponent }    from "./../dialogs/general/general.component";
 import { NxModalShareComponent }      from "./../dialogs/share/share.component";

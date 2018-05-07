@@ -141,9 +141,9 @@ export class AppModule {
 }
 
 declare var angular: angular.IAngularStatic;
-angular
-    .module('cloudApp.directives')
-    .directive('nxModalLogin', downgradeComponent({component: NxModalLoginComponent}) as angular.IDirectiveFactory);
+// angular
+//     .module('cloudApp.directives')
+//     .directive('nxModalLogin', downgradeComponent({component: NxModalLoginComponent}) as angular.IDirectiveFactory);
 
 angular
     .module('cloudApp.services')

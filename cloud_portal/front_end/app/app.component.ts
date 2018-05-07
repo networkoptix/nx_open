@@ -1,4 +1,4 @@
-import { Component, Inject } from '@angular/core';
+import { Component } from '@angular/core';
 import { TranslateService }  from "@ngx-translate/core";
 import { CookieService }     from "ngx-cookie-service";
 
@@ -7,7 +7,7 @@ import { CookieService }     from "ngx-cookie-service";
     template: `
         <router-outlet></router-outlet>
         <div ng-view="" ng-model-options="{ updateOn: 'blur' }"></div>
-    `,
+    `
 })
 
 export class AppComponent {

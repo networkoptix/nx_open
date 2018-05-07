@@ -7,7 +7,7 @@ import { TranslateService }                                    from '@ngx-transl
 @Component({
     selector: 'ngbd-modal-content',
     templateUrl: 'login.component.html',
-    styleUrls: ['login.component.scss'],
+    styleUrls: [],
     providers: [Location, {provide: LocationStrategy, useClass: PathLocationStrategy}],
 })
 export class LoginModalContent {
