@@ -715,6 +715,8 @@ private:
 
         if (eventType == aio::etNone || eventType == aio::etWrite)
         {
+            // Cancelling dispatch call in resolve handler.
+            this->m_aioService->cancelPostedCalls(this->m_socket);
             this->m_aioService->stopMonitoring(this->m_socket, aio::etWrite);
             m_connectHandler = nullptr;
             m_sendHandler = nullptr;
