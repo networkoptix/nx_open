@@ -60,7 +60,7 @@ MMRESULT MmWinDriver::safeJoyGetPos(uint joystickIndex, JOYINFO& info)
     }
     __except(EXCEPTION_EXECUTE_HANDLER)
     {
-        NX_WARNING("MmWinDriver") << "OS exception at joyGetPos";
+        [this]() { NX_WARNING(this) << "OS exception at joyGetPos"; }();
         return JOYERR_NOCANDO;
     }
 }
@@ -73,7 +73,7 @@ MMRESULT MmWinDriver::safeJoyGetDevCaps(uint joystickIndex, JOYCAPS& caps)
     }
     __except (EXCEPTION_EXECUTE_HANDLER)
     {
-        NX_WARNING("MmWinDriver") << "OS exception at safeJoyGetDevCaps";
+        [this]() { NX_WARNING(this) << "OS exception at safeJoyGetDevCaps"; }();
         return JOYERR_NOCANDO;
     }
 }
@@ -86,7 +86,7 @@ MMRESULT MmWinDriver::safeJoySetCapture(HWND hWnd, uint joystickIndex, UINT peri
     }
     __except (EXCEPTION_EXECUTE_HANDLER)
     {
-        NX_WARNING("MmWinDriver") << "OS exception at joySetCapture";
+        [this]() { NX_WARNING(this) << "OS exception at joySetCapture"; }();
         return JOYERR_NOCANDO;
     }
 }
@@ -99,7 +99,7 @@ MMRESULT MmWinDriver::safeJoyReleaseCapture(uint joystickIndex)
     }
     __except (EXCEPTION_EXECUTE_HANDLER)
     {
-        NX_WARNING("MmWinDriver") << "OS exception at joyReleaseCapture";
+        [this]() { NX_WARNING(this) << "OS exception at joyReleaseCapture"; }();
         return JOYERR_NOCANDO;
     }
 }

@@ -58,10 +58,10 @@ private:
 
     QString makeId(const QString& objectType, uint objectIndex);
 
-    static MMRESULT safeJoyGetPos(uint joystickIndex, JOYINFO& info);
-    static MMRESULT safeJoyGetDevCaps(uint joystickIndex, JOYCAPS& caps);
-    static MMRESULT safeJoySetCapture(HWND hWnd, uint joystickIndex, UINT periodMs, bool changed);
-    static MMRESULT safeJoyReleaseCapture(uint joystickIndex);
+    MMRESULT safeJoyGetPos(uint joystickIndex, JOYINFO& info);
+    MMRESULT safeJoyGetDevCaps(uint joystickIndex, JOYCAPS& caps);
+    MMRESULT safeJoySetCapture(HWND hWnd, uint joystickIndex, UINT periodMs, bool changed);
+    MMRESULT safeJoyReleaseCapture(uint joystickIndex);
 
 private:
     HWND m_windowId;
