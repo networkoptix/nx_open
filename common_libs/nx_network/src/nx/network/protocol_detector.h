@@ -19,6 +19,7 @@ public:
     virtual ~AbstractProtocolRule() = default;
 
     virtual int minRequiredDataLength() = 0;
+    virtual int maxRequiredDataLength() = 0;
     virtual bool match(const nx::Buffer& buf) = 0;
 };
 
@@ -34,6 +35,11 @@ public:
     virtual int minRequiredDataLength() override
     {
         return (int) m_prefix.size();
+    }
+
+    virtual int maxRequiredDataLength() override
+    {
+        return (int)m_prefix.size();
     }
 
     virtual bool match(const nx::Buffer& buf) override
@@ -57,6 +63,8 @@ enum class DetectionResult
     unknownProtocol, //< Data provided could not be assigned to one of registered protocols.
 };
 
+NX_NETWORK_API std::string toString(DetectionResult detectionResult);
+
 template<typename ProtocolDescriptor>
 class ProtocolDetector
 {
@@ -67,6 +75,8 @@ public:
     {
         m_minRequiredDataLength =
             std::min(m_minRequiredDataLength, rule->minRequiredDataLength());
+        m_maxRequiredDataLength =
+            std::max(m_maxRequiredDataLength, rule->maxRequiredDataLength());
 
         m_rules.push_back(std::make_pair(std::move(rule), std::move(descriptor)));
     }
@@ -94,11 +104,14 @@ public:
                 return std::make_tuple(DetectionResult::detected, &rule.second);
         }
 
-        return std::make_tuple(DetectionResult::needMoreData, nullptr);
+        return buf.size() >= m_maxRequiredDataLength
+            ? std::make_tuple(DetectionResult::unknownProtocol, nullptr)
+            : std::make_tuple(DetectionResult::needMoreData, nullptr);
     }
 
 private:
     int m_minRequiredDataLength = std::numeric_limits<int>::max();
+    int m_maxRequiredDataLength = std::numeric_limits<int>::min();
     std::vector<std::pair<std::unique_ptr<AbstractProtocolRule>, ProtocolDescriptor>> m_rules;
 };
 

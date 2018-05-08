@@ -10,7 +10,7 @@ namespace cdb {
 
 MaintenanceManager::MaintenanceManager(
     const QnUuid& moduleGuid,
-    ec2::SyncronizationEngine* const syncronizationEngine,
+    data_sync_engine::SyncronizationEngine* const syncronizationEngine,
     const nx::utils::db::InstanceController& dbInstanceController)
     :
     m_moduleGuid(moduleGuid),
@@ -94,8 +94,8 @@ void MaintenanceManager::getStatistics(
 void MaintenanceManager::onTransactionLogRead(
     nx::utils::Counter::ScopedIncrement /*asyncCallLocker*/,
     const std::string& systemId,
-    ec2::ResultCode ec2ResultCode,
-    std::vector<ec2::dao::TransactionLogRecord> serializedTransactions,
+    data_sync_engine::ResultCode ec2ResultCode,
+    std::vector<data_sync_engine::dao::TransactionLogRecord> serializedTransactions,
     ::ec2::QnTranState /*readedUpTo*/,
     std::function<void(
         api::ResultCode,

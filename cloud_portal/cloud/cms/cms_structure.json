@@ -284,35 +284,35 @@
         "values":[
           {
             "label": "Host",
-            "name": "host",
+            "name": "smtp_host",
             "value": "email-smtp.us-east-1.amazonaws.com",
             "description": "Host url for smtp server",
             "advanced": true
           },
           {
             "label": "User",
-            "name": "user",
+            "name": "smtp_user",
             "value": "AKIAJ3DYMIZMDABS43UA",
             "description": "User for smtp server",
             "advanced": true
           },
           {
             "label": "Password",
-            "name": "password",
+            "name": "smtp_password",
             "value": "AnC4VkpbBKXPCbik/gBru508QaG8L86uu2cTzTg5yDkI",
             "description": "Password smtp server",
             "advanced": true
           },
           {
             "label": "Port",
-            "name": "port",
+            "name": "smtp_port",
             "value": "587",
             "description": "Port for smtp server",
             "advanced": true
           },
           {
             "label": "Tls",
-            "name": "tls",
+            "name": "smtp_tls",
             "value": true,
             "description": "Tls for smtp server",
             "advanced": true

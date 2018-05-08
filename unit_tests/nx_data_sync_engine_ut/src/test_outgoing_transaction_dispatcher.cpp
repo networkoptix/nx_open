@@ -7,8 +7,7 @@
 #include <nx/utils/random.h>
 
 namespace nx {
-namespace cdb {
-namespace ec2 {
+namespace data_sync_engine {
 namespace test {
 
 void TestOutgoingTransactionDispatcher::dispatchTransaction(
@@ -55,7 +54,7 @@ void TestOutgoingTransactionDispatcher::assertIfTransactionsWereNotSentInAscendi
 }
 
 void TestOutgoingTransactionDispatcher::assertIfCouldNotFindTransactionWithHeader(
-    const ::ec2::QnAbstractTransaction& transactionHeader)
+    const CommandHeader& transactionHeader)
 {
     const auto it = std::find_if(
         m_outgoingTransactions.cbegin(),
@@ -69,6 +68,5 @@ void TestOutgoingTransactionDispatcher::assertIfCouldNotFindTransactionWithHeade
 }
 
 } // namespace test
-} // namespace ec2
-} // namespace cdb
+} // namespace data_sync_engine
 } // namespace nx

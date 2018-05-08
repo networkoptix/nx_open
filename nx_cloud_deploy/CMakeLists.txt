@@ -19,26 +19,30 @@ function(nx_add_cloud_deploy_target name)
 endfunction(nx_add_cloud_deploy_target)
 
 function(nx_fetch_cloud_build_number buildNumberVarName)
-	set (get_build_number_cmd "curl -s -XPOST la.hdw.mx:8007/next/cloud/ | sed 's/{.*:\\([0-9]*\\)}/\\1/g'")
-	execute_process(
-    	COMMAND  bash -c ${get_build_number_cmd}
-	    OUTPUT_VARIABLE buildNumber)
+    set (get_build_number_cmd "curl -s -XPOST la.hdw.mx:8007/next/cloud/ | sed 's/{.*:\\([0-9]*\\)}/\\1/g'")
+    execute_process(
+        COMMAND bash -c ${get_build_number_cmd}
+            OUTPUT_VARIABLE buildNumber)
 
-	if(NOT "${buildNumber}" MATCHES ^[0-9]+$)
-    	message(FATAL_ERROR "Failed to get build number. Configuration is stopped")
-	endif()
+    if(NOT "${buildNumber}" MATCHES ^[0-9]+$)
+        message(FATAL_ERROR "Failed to get build number. Configuration is stopped")
+    endif()
 
-	set(${buildNumberVarName} ${buildNumber} PARENT_SCOPE)
+    set(${buildNumberVarName} ${buildNumber} PARENT_SCOPE)
 endfunction(nx_fetch_cloud_build_number)
 
 function(nx_get_cloud_version versionVarName)
-	nx_fetch_cloud_build_number(buildNumber)
-	
-	file(READ ${CMAKE_SOURCE_DIR}/nx_cloud/version.txt cloudVersion)
-	string(STRIP ${cloudVersion} cloudVersion)
-	set (cloudVersion "${cloudVersion}.${buildNumber}")
+    if(NOT ${buildNumber} OR ${buildNumber} EQUAL "0")
+        nx_fetch_cloud_build_number(buildNumber)
+    else()
+        message("-- Build number ${buildNumber} has been provided")
+    endif()
 
-	set(${versionVarName} ${cloudVersion} PARENT_SCOPE)
+    file(READ ${CMAKE_SOURCE_DIR}/nx_cloud/version.txt cloudVersion)
+    string(STRIP ${cloudVersion} cloudVersion)
+    set (cloudVersion "${cloudVersion}.${buildNumber}")
+
+    set(${versionVarName} ${cloudVersion} PARENT_SCOPE)
 endfunction(nx_get_cloud_version)
 
 function(define_cloud_group_targets groupName)
@@ -69,3 +73,5 @@ define_cloud_group_targets(frontend ${cloudFrontendModules})
 
 add_custom_target(cloud-docker-build DEPENDS cloud-backend-docker-build cloud-frontend-docker-build)
 add_custom_target(cloud-docker-push DEPENDS cloud-docker-build cloud-backend-docker-push cloud-frontend-docker-push)
+
+add_subdirectory(cloud_connect_test_util)

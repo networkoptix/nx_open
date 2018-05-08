@@ -39,11 +39,7 @@ class MessageDispatcher;
 } // namespace http
 
 namespace nx {
-namespace cdb {
-
-class AuthorizationManager;
-
-namespace ec2 {
+namespace data_sync_engine {
 
 class Settings;
 
@@ -225,7 +221,7 @@ private:
     void processSpecialTransaction(
         const nx::String& systemId,
         const TransactionTransportHeader& transportHeader,
-        ::ec2::QnTransaction<TransactionDataType> data,
+        Command<TransactionDataType> data,
         TransactionProcessedHandler handler);
 
     nx::network::http::RequestResult prepareOkResponseToCreateTransactionConnection(
@@ -238,6 +234,5 @@ private:
         const std::string& systemId);
 };
 
-} // namespace ec2
-} // namespace cdb
+} // namespace data_sync_engine
 } // namespace nx

@@ -8,8 +8,7 @@
 #include "outgoing_transaction_dispatcher.h"
 
 namespace nx {
-namespace cdb {
-namespace ec2 {
+namespace data_sync_engine {
 
 OutgoingTransactionSorter::OutgoingTransactionSorter(
     const nx::String& systemId,
@@ -216,6 +215,5 @@ void OutgoingTransactionSorter::registerTransactionSequence(
     }
 }
 
-} // namespace ec2
-} // namespace cdb
+} // namespace data_sync_engine
 } // namespace nx

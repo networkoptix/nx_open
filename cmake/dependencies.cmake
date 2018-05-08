@@ -83,7 +83,7 @@ function(copy_linux_cpp_runtime)
             --flags "${CMAKE_CXX_FLAGS}"
             --dest-dir ${CMAKE_LIBRARY_OUTPUT_DIRECTORY}
             --list
-            libstdc++.so.6 libatomic.so.1 libgcc_s.so.1
+            libstdc++.so.6 libatomic.so.1 libgcc_s.so.1 libmvec.so.1
         RESULT_VARIABLE result
         OUTPUT_VARIABLE output
     )

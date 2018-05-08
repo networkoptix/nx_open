@@ -23,11 +23,14 @@
         authorizationCheckService
             .requireLogin()
             .then(function (account) {
-                if (account) {
-                    $scope.account = account;
-                    $scope.system = system(systemId, account.email);
-                    $scope.gettingSystem.run();
-                }
+                $scope.account = account;
+                $scope.system = system(systemId, account.email);
+                $scope.gettingSystem.run();
+
+                $scope.$watch('system.info.name', function (value) {
+                    page.title(value ? value + ' -' : '');
+                    systemsProvider.forceUpdateSystems();
+                });
             });
 
         function getMergeTarget(targetSystemId) {
@@ -232,12 +235,7 @@
                 });
         };
 
-        $scope.$watch('system.info.name', function (value) {
-            page.title(value ? value + ' -' : '');
-            systemsProvider.forceUpdateSystems();
-        });
-
-        function normalizePermissionString(permissions) {
+        function normalizePermissionString(permissions){
             return permissions.split('|').sort().join('|');
         }
 

@@ -7,9 +7,12 @@ import * as angular from 'angular';
 
     angular
         .module('cloudApp')
-        .service('systemsProvider', ['cloudApi', '$interval', '$q', 'configService', 'languageService',
+        .service('systemsProvider', ['cloudApi', '$interval', '$q', '$poll',
+            'configService', 'languageService', 'account',
 
-            function (cloudApi, $interval, $q, configService, languageService) {
+            function (cloudApi, $interval, $q, $poll,
+                      configService, languageService, account) {
+
                 const self = this;
                 const CONFIG = configService.config;
 
@@ -22,7 +25,7 @@ import * as angular from 'angular';
                 };
 
                 this.delayedUpdateSystems = function () {
-                    $interval(this.forceUpdateSystems, CONFIG.updateInterval);
+                    this.pollingSystemsUpdate = $poll(this.forceUpdateSystems, CONFIG.updateInterval);
                 };
 
                 this.getSystem = function (systemId) {
@@ -69,7 +72,10 @@ import * as angular from 'angular';
                     });
                 };
 
-                this.forceUpdateSystems();
-                this.delayedUpdateSystems();
+                account.checkLoginState()
+                       .then(() => {
+                           this.forceUpdateSystems();
+                           this.delayedUpdateSystems();
+                       });
             }]);
 })();

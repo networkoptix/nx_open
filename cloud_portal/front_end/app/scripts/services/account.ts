@@ -7,16 +7,17 @@
         .factory('account', AccountService);
 
     AccountService.$inject = ['cloudApi', '$q', '$location', '$localStorage',
-        '$rootScope', '$base64', 'configService'];
+        '$rootScope', '$base64', 'configService', 'dialogs', 'languageService'];
 
     function AccountService(cloudApi, $q, $location, $localStorage,
-                            $rootScope, $base64, configService) {
+                            $rootScope, $base64, configService, dialogs, languageService) {
 
         $rootScope.session = $localStorage;
 
         let requestingLogin: any;
         let initialState = $rootScope.session.loginState;
         const CONFIG = configService.config;
+        const lang = languageService.lang;
 
         $rootScope.$watch('session.loginState', function (value) {  // Catch logout from other tabs
             if (initialState !== value) {
@@ -25,6 +26,12 @@
         });
 
         let service = {
+            checkLoginState: function () {
+                if ($rootScope.session.loginState) {
+                    return $q.resolve(true);
+                }
+                return $q.reject(false);
+            },
             get: function () {
                 let self = this;
                 if (requestingLogin) {
@@ -53,6 +60,28 @@
                     return result.data.emailExists;
                 });
             },
+            requireLogin: function () {
+                var res = this.get();
+                res.catch(function () {
+                    dialogs.login(true).catch(function () {
+                        $location.path(CONFIG.redirectUnauthorised);
+                    });
+                });
+                return res;
+            },
+            redirectAuthorised: function () {
+                this.get().then(function () {
+                    $location.path(CONFIG.redirectAuthorised);
+                });
+            },
+            redirectToHome: function () {
+                this.get().then(function () {
+                    $location.path(CONFIG.redirectAuthorised);
+                }, function () {
+                    $location.path(CONFIG.redirectUnauthorised);
+                })
+            },
+
             setEmail: function (email) {
                 $rootScope.session.email = email;
             },
@@ -82,6 +111,22 @@
                     }
                     setTimeout(function () {
                         document.location.reload();
+                    });
+                });
+            },
+            logoutAuthorised: function () {
+                let self = this;
+                this.get().then(function () {
+                    // logoutAuthorisedLogoutButton
+                    dialogs.confirm(null /*L.dialogs.logoutAuthorisedText*/,
+                        lang.dialogs.logoutAuthorisedTitle,
+                        lang.dialogs.logoutAuthorisedContinueButton,
+                        null,
+                        lang.dialogs.logoutAuthorisedLogoutButton
+                    ).then(function () {
+                        self.redirectAuthorised();
+                    }, function () {
+                        self.logout(true);
                     });
                 });
             },

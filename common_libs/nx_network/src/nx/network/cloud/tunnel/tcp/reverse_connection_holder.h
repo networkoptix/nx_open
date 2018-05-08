@@ -42,7 +42,7 @@ public:
     virtual void stopWhileInAioThread() override;
 
     virtual size_t socketCount() const override;
-        virtual void takeSocket(std::chrono::milliseconds timeout, Handler handler) override;
+    virtual void takeSocket(std::chrono::milliseconds timeout, Handler handler) override;
 
     /**
      * NOTE: Can only be called from object's AIO thread.
@@ -61,6 +61,8 @@ private:
     std::multimap<std::chrono::steady_clock::time_point, Handler> m_handlers;
     std::unique_ptr<aio::Timer> m_timer;
     std::chrono::steady_clock::time_point m_prevConnectionTime;
+
+    void closeExtraConnectionsAsync();
 };
 
 } // namespace tcp

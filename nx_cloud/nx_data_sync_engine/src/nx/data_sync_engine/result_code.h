@@ -3,8 +3,7 @@
 #include <string>
 
 namespace nx {
-namespace cdb {
-namespace ec2 {
+namespace data_sync_engine {
 
 enum class ResultCode
 {
@@ -18,6 +17,5 @@ enum class ResultCode
 
 std::string toString(ResultCode);
 
-} // namespace ec2
-} // namespace cdb
+} // namespace data_sync_engine
 } // namespace nx

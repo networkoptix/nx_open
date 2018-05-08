@@ -1,17 +1,15 @@
 #include "transaction_deserializer.h"
 
 namespace nx {
-namespace cdb {
-namespace ec2 {
+namespace data_sync_engine {
 
 bool TransactionDeserializer::deserialize(
     QnUbjsonReader<QByteArray>* const stream,
-    ::ec2::QnAbstractTransaction* const transactionHeader,
+    CommandHeader* const transactionHeader,
     int /*transactionFormatVersion*/)
 {
     return QnUbjson::deserialize(stream, transactionHeader);
 }
 
-} // namespace ec2
-} // namespace cdb
+} // namespace data_sync_engine
 } // namespace nx

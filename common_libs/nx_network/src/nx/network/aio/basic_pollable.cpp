@@ -33,7 +33,7 @@ BasicPollable::~BasicPollable()
 {
     if (isInSelfAioThread())
     {
-        m_aioService->cancelPostedCalls(&m_pollable, true);
+        m_aioService->cancelPostedCalls(&m_pollable);
     }
     else
     {
@@ -57,12 +57,12 @@ void BasicPollable::pleaseStopSync(bool checkForLocks)
 {
     if (isInSelfAioThread())
     {
-        m_aioService->cancelPostedCalls(&m_pollable, true);
+        m_aioService->cancelPostedCalls(&m_pollable);
 
         nx::utils::ObjectDestructionFlag::Watcher watcher(&m_destructionFlag);
         stopWhileInAioThread();
         if (!watcher.objectDestroyed())
-            m_aioService->cancelPostedCalls(&m_pollable, true);
+            m_aioService->cancelPostedCalls(&m_pollable);
     }
     else
     {
@@ -101,7 +101,7 @@ void BasicPollable::cancelPostedCalls(nx::utils::MoveOnlyFunc<void()> completion
     post(
         [this, completionHandler = std::move(completionHandler)]()
         {
-            m_aioService->cancelPostedCalls(&m_pollable, true);
+            m_aioService->cancelPostedCalls(&m_pollable);
             completionHandler();
         });
 }
@@ -109,7 +109,7 @@ void BasicPollable::cancelPostedCalls(nx::utils::MoveOnlyFunc<void()> completion
 void BasicPollable::cancelPostedCallsSync()
 {
     executeInAioThreadSync(
-        [this]() { m_aioService->cancelPostedCalls(&m_pollable, true); });
+        [this]() { m_aioService->cancelPostedCalls(&m_pollable); });
 }
 
 Pollable& BasicPollable::pollable()

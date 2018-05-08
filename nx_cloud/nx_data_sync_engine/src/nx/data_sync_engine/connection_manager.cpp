@@ -21,8 +21,7 @@
 #include "websocket_transaction_transport.h"
 
 namespace nx {
-namespace cdb {
-namespace ec2 {
+namespace data_sync_engine {
 
 ConnectionManager::ConnectionManager(
     const QnUuid& moduleGuid,
@@ -671,7 +670,7 @@ template<typename TransactionDataType>
 void ConnectionManager::processSpecialTransaction(
     const nx::String& /*systemId*/,
     const TransactionTransportHeader& transportHeader,
-    ::ec2::QnTransaction<TransactionDataType> data,
+    Command<TransactionDataType> data,
     TransactionProcessedHandler handler)
 {
     QnMutexLocker lk(&m_mutex);
@@ -785,6 +784,5 @@ void ConnectionManager::onHttpConnectionUpgraded(
     }
 }
 
-} // namespace ec2
-} // namespace cdb
+} // namespace data_sync_engine
 } // namespace nx

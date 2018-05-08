@@ -1,5 +1,6 @@
 #include "ssl_stream_server_socket.h"
 
+#include "encryption_detecting_stream_socket.h"
 #include "ssl_stream_socket.h"
 
 namespace nx {
@@ -8,10 +9,11 @@ namespace ssl {
 
 StreamServerSocket::StreamServerSocket(
     std::unique_ptr<AbstractStreamServerSocket> delegatee,
-    EncryptionUse /*encryptionUse*/)
+    EncryptionUse encryptionUse)
     :
     base_type(delegatee.get()),
-    m_delegatee(std::move(delegatee))
+    m_delegatee(std::move(delegatee)),
+    m_encryptionUse(encryptionUse)
 {
 }
 
@@ -43,7 +45,18 @@ void StreamServerSocket::onAcceptCompletion(
     std::unique_ptr<AbstractStreamSocket> streamSocket)
 {
     if (streamSocket)
-        streamSocket = std::make_unique<StreamSocket>(std::move(streamSocket), true);
+    {
+        if (m_encryptionUse == EncryptionUse::always)
+        {
+            streamSocket = std::make_unique<ServerSideStreamSocket>(
+                std::move(streamSocket));
+        }
+        else // if (m_encryptionUse == EncryptionUse::autoDetectByReceivedData)
+        {
+            streamSocket = std::make_unique<EncryptionDetectingStreamSocket>(
+                std::move(streamSocket));
+        }
+    }
 
     handler(sysErrorCode, std::move(streamSocket));
 }

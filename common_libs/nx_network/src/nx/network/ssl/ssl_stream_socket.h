@@ -82,6 +82,26 @@ private:
     void handleSslError(int sslPipelineResultCode);
 };
 
+//-------------------------------------------------------------------------------------------------
+
+class NX_NETWORK_API ClientStreamSocket:
+    public StreamSocket
+{
+    using base_type = StreamSocket;
+
+public:
+    ClientStreamSocket(std::unique_ptr<AbstractStreamSocket> delegatee);
+};
+
+class NX_NETWORK_API ServerSideStreamSocket:
+    public StreamSocket
+{
+    using base_type = StreamSocket;
+
+public:
+    ServerSideStreamSocket(std::unique_ptr<AbstractStreamSocket> delegatee);
+};
+
 } // namespace ssl
 } // namespace network
 } // namespace nx

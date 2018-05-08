@@ -50,6 +50,10 @@ ProxyWorker::ProxyWorker(
     m_translatedRequest = std::move(translatedRequest);
 }
 
+ProxyWorker::~ProxyWorker()
+{
+}
+
 void ProxyWorker::setTargetHostConnectionInactivityTimeout(
     std::chrono::milliseconds timeout)
 {

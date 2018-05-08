@@ -9,6 +9,7 @@ namespace cloud {
 namespace tcp {
 
 static std::chrono::milliseconds s_connectionLessHolderExpirationTimeout = std::chrono::seconds(31);
+static constexpr int kMaxAllowedPeerConnectionCount = 17;
 
 void ReverseConnectionHolder::setConnectionlessHolderExpirationTimeout(
     std::chrono::milliseconds value)
@@ -54,10 +55,11 @@ void ReverseConnectionHolder::stopWhileInAioThread()
 void ReverseConnectionHolder::saveSocket(std::unique_ptr<AbstractStreamSocket> socket)
 {
     NX_ASSERT(isInSelfAioThread());
+
     if (!m_handlers.empty())
     {
         NX_LOGX(lm("Host %1. Using newly-acquired socket(%2), %3 sockets left")
-            .args(m_hostName, socket, m_socketCount.load()), cl_logDEBUG1);
+            .args(m_hostName, socket, m_sockets.size()), cl_logDEBUG1);
 
         auto handler = std::move(m_handlers.begin()->second);
         m_handlers.erase(m_handlers.begin());
@@ -67,12 +69,27 @@ void ReverseConnectionHolder::saveSocket(std::unique_ptr<AbstractStreamSocket> s
     const auto it = m_sockets.insert(m_sockets.end(), std::move(socket));
     ++m_socketCount;
     NX_LOGX(lm("Host %1. One socket(%2) added, %3 sockets left")
-        .args(m_hostName, *it, m_socketCount.load()), cl_logDEBUG1);
+        .args(m_hostName, *it, m_sockets.size()), cl_logDEBUG1);
 
     (*it)->bindToAioThread(getAioThread());
     monitorSocket(it);
 
     m_prevConnectionTime = std::chrono::steady_clock::now();
+
+    closeExtraConnectionsAsync();
+}
+
+void ReverseConnectionHolder::closeExtraConnectionsAsync()
+{
+    if (m_sockets.size() <= kMaxAllowedPeerConnectionCount)
+        return;
+
+    NX_WARNING(this, lm("Closing extra %1 connection(s) from peer %2")
+        .args(m_sockets.size() - kMaxAllowedPeerConnectionCount, m_hostName));
+
+    while (m_sockets.size() > kMaxAllowedPeerConnectionCount)
+        m_sockets.pop_front();
+    m_socketCount = m_sockets.size();
 }
 
 bool ReverseConnectionHolder::isActive() const
@@ -107,7 +124,7 @@ void ReverseConnectionHolder::takeSocket(std::chrono::milliseconds timeout, Hand
                 --m_socketCount;
                 m_sockets.pop_front();
                 NX_LOGX(lm("Host %1. One socket(%2) used, %3 sockets left")
-                    .args(m_hostName, socket, m_socketCount.load()), cl_logDEBUG1);
+                    .args(m_hostName, socket, m_sockets.size()), cl_logDEBUG1);
 
                 socket->cancelIOSync(aio::etNone);
                 handler(SystemError::noError, std::move(socket));
@@ -169,14 +186,14 @@ void ReverseConnectionHolder::monitorSocket(
             if (code != SystemError::noError || size == 0)
             {
                 NX_LOGX(lm("Host %1. Connection(%2) has been closed: %3 (%4 sockets left)")
-                    .args(m_hostName, *it, SystemError::toString(code), m_socketCount.load() - 1),
+                    .args(m_hostName, *it, SystemError::toString(code), m_sockets.size() - 1),
                     cl_logDEBUG1);
             }
             else
             {
                 NX_LOGX(lm("Host %1. Unexpected read on socket(%2), size=%3. "
                     "Closing socket (%4 sockets left)")
-                    .args(m_hostName, *it, size, m_socketCount.load() - 1), cl_logERROR);
+                    .args(m_hostName, *it, size, m_sockets.size() - 1), cl_logWARNING);
             }
 
             (void)buffer; //< This buffer might be helpful for debug is case smth goes wrong!
