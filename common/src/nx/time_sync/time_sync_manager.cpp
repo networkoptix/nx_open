@@ -12,13 +12,17 @@
 #include <nx/network/http/http_client.h>
 #include <nx/utils/time.h>
 #include <network/router.h>
+#include <nx/fusion/serialization/json.h>
+#include <rest/server/json_rest_result.h>
+#include <api/model/time_reply.h>
 
 namespace nx {
 namespace time_sync {
 
 static const std::chrono::seconds kProxySocetTimeout(10);
 static const std::chrono::minutes kTimeSyncInterval(10);
-const QString kTimeSyncUrlPath = QString::fromLatin1("/api/timeSync");
+//const QString kTimeSyncUrlPath = QString::fromLatin1("/api/timeSync");
+const QString kTimeSyncUrlPath = QString::fromLatin1("/api/gettime");
 static const QByteArray kTimeDeltaParamName = "sync_time_delta";
 
 class SystemClock: public AbstractSystemClock
@@ -109,24 +113,40 @@ void TimeSyncManager::loadTimeFromServer(const QnRoute& route)
 {
     auto socket = connectToRemoteHost(route);
     if (!socket)
+    {
+        NX_WARNING(this, 
+            lm("Can't read time from server %1. Can't establish connection to the remote host."));
         return;
+    }
 
     auto httpClient = std::make_unique<nx::network::http::HttpClient>();
     httpClient->setSocket(std::move(socket));
-    nx::utils::Url url;
-    url.setPath(kTimeSyncUrlPath);
+    nx::utils::Url url(lit("http://%1:%2%3").arg(route.addr.address.toString()).arg(route.addr.port).arg(kTimeSyncUrlPath));
+    //url.setPath(kTimeSyncUrlPath);
 
     nx::utils::ElapsedTimer timer;
     timer.restart();
-    if (!httpClient->doGet(url))
-        return;
+    bool success = httpClient->doGet(url);
     auto response = httpClient->fetchEntireMessageBody();
-    if (!response || response->isEmpty())
+    if (!success || !response)
+    {
+        NX_WARNING(this, lm("Can't read time from server %1. Error: %2")
+            .args(route.id.toString(), httpClient->lastSysErrorCode()));
         return;
+    }
 
-    auto newTime = std::chrono::milliseconds(response->toLongLong() - timer.elapsedMs() / 2);
+    auto jsonResult = QJson::deserialized<QnJsonRestResult>(*response);
+    QnTimeReply timeData;
+    if (!QJson::deserialize(jsonResult.reply, &timeData))
+    {
+        NX_WARNING(this, lm("Can't deserialize time reply from server %1")
+            .arg(route.id.toString()));
+        return;
+    }
+    
+    auto newTime = std::chrono::milliseconds(timeData.utcTime - timer.elapsedMs() / 2);
     setSyncTime(newTime);
-    NX_DEBUG(this, lm("Received time %1 from the neighbor server %2")
+    NX_DEBUG(this, lm("Got time %1 from the neighbor server %2")
         .args(QDateTime::fromMSecsSinceEpoch(newTime.count()).toString(Qt::ISODate),
         route.id.toString()));
 }

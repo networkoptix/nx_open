@@ -346,7 +346,7 @@ private:
     std::unique_ptr<AbstractMsgBodySource> m_requestBody;
     bool m_expectOnlyBody = false;
     int m_maxNumberOfRedirects = 5;
-    bool m_forceToUseExistingConnection = false;
+    std::unique_ptr<AbstractStreamSocket> m_userDefinedSocket;
 
     virtual void stopWhileInAioThread() override;
 
@@ -357,7 +357,7 @@ private:
     void resetDataBeforeNewRequest();
     void initiateHttpMessageDelivery();
     bool canExistingConnectionBeUsed() const;
-    void initiateTcpConnection();
+    void initiateTcpConnection(std::unique_ptr<AbstractStreamSocket> socket = std::unique_ptr<AbstractStreamSocket>());
     /**
      * @return Bytes parsed or -1 in case of error.
      */

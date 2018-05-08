@@ -308,7 +308,6 @@ void HttpClient::instantiateHttpClient()
 
 void HttpClient::setSocket(std::unique_ptr<nx::network::AbstractStreamSocket> socket)
 {
-    socket->setNonBlockingMode(true);
     if (m_asyncHttpClient)
         m_asyncHttpClient->setSocket(std::move(socket));
     else

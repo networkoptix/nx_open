@@ -96,8 +96,7 @@ const std::unique_ptr<AbstractStreamSocket>& AsyncClient::socket()
 
 void AsyncClient::setSocket(std::unique_ptr<AbstractStreamSocket> socket)
 {
-    m_socket = std::move(socket);
-    m_forceToUseExistingConnection = m_socket->isConnected();
+    m_userDefinedSocket = std::move(socket);
 }
 
 std::unique_ptr<AbstractStreamSocket> AsyncClient::takeSocket()
@@ -691,7 +690,6 @@ void AsyncClient::initiateHttpMessageDelivery()
 
     ++m_totalRequestsSentViaCurrentConnection;
     m_totalBytesReadPerRequest = 0;
-    m_forceToUseExistingConnection = false;
 
     m_state = State::sInit;
 
@@ -715,16 +713,12 @@ void AsyncClient::initiateHttpMessageDelivery()
             }
 
             m_socket.reset();
-
-            initiateTcpConnection();
+            initiateTcpConnection(std::move(m_userDefinedSocket));
         });
 }
 
 bool AsyncClient::canExistingConnectionBeUsed() const
 {
-    if (m_forceToUseExistingConnection)
-        return true;
-
     bool canUseExistingConnection = false;
     if (m_httpStreamReader.message().type == nx::network::http::MessageType::response)
     {
@@ -743,8 +737,10 @@ bool AsyncClient::canExistingConnectionBeUsed() const
     return canUseExistingConnection;
 }
 
-void AsyncClient::initiateTcpConnection()
+void AsyncClient::initiateTcpConnection(std::unique_ptr<AbstractStreamSocket> socket)
 {
+    m_state = State::sInit;
+
     const SocketAddress remoteAddress =
         m_proxyEndpoint
         ? m_proxyEndpoint.get()
@@ -752,23 +748,28 @@ void AsyncClient::initiateTcpConnection()
             m_contentLocationUrl.host(),
             m_contentLocationUrl.port(nx::network::http::defaultPortForScheme(m_contentLocationUrl.scheme().toLatin1())));
 
-    m_state = State::sInit;
+    if (socket)
+    {
+        m_socket = std::move(socket);
+    }
+    else
+    {
+        const int ipVersion =
+            (bool)HostAddress(m_contentLocationUrl.host()).isPureIpV6()
+            ? AF_INET6
+            : SocketFactory::tcpClientIpVersion();
 
-    const int ipVersion =
-        (bool) HostAddress(m_contentLocationUrl.host()).isPureIpV6()
-        ? AF_INET6
-        : SocketFactory::tcpClientIpVersion();
-
-    m_socket = SocketFactory::createStreamSocket(
-        m_contentLocationUrl.scheme() == lm("https"),
-        nx::network::NatTraversalSupport::enabled,
-        ipVersion);
-
-    NX_LOGX(lm("Opening connection to %1. url %2, socket %3")
-        .arg(remoteAddress).arg(m_contentLocationUrl).arg(m_socket->handle()), cl_logDEBUG2);
+        m_socket = SocketFactory::createStreamSocket(
+            m_contentLocationUrl.scheme() == lm("https"),
+            nx::network::NatTraversalSupport::enabled,
+            ipVersion);
+        NX_LOGX(lm("Opening connection to %1. url %2, socket %3")
+            .arg(remoteAddress).arg(m_contentLocationUrl).arg(m_socket->handle()), cl_logDEBUG2);
+    }
 
     m_socket->bindToAioThread(getAioThread());
     m_connectionClosed = false;
+
     if (!m_socket->setNonBlockingMode(true) ||
         !m_socket->setSendTimeout(m_sendTimeout) ||
         !m_socket->setRecvTimeout(m_responseReadTimeout))
@@ -783,9 +784,20 @@ void AsyncClient::initiateTcpConnection()
 
     m_state = State::sWaitingConnectToHost;
 
-    m_socket->connectAsync(
-        remoteAddress,
-        std::bind(&AsyncClient::asyncConnectDone, this, std::placeholders::_1));
+    if (m_socket->isConnected())
+    {
+        m_socket->post(
+            std::bind(
+                &AsyncClient::asyncConnectDone,
+                this,
+                SystemError::getLastOSErrorCode()));
+    }
+    else
+    {
+        m_socket->connectAsync(
+            remoteAddress,
+            std::bind(&AsyncClient::asyncConnectDone, this, std::placeholders::_1));
+    }
 }
 
 size_t AsyncClient::parseReceivedBytes(size_t bytesRead)
