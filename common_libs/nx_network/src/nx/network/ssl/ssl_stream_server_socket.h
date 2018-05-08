@@ -29,10 +29,8 @@ private:
     std::unique_ptr<AbstractStreamServerSocket> m_delegate;
     EncryptionUse m_encryptionUse;
 
-    void onAcceptCompletion(
-        AcceptCompletionHandler handler,
-        SystemError::ErrorCode sysErrorCode,
-        std::unique_ptr<AbstractStreamSocket> streamSocket);
+    std::unique_ptr<AbstractStreamSocket> createSocketWrapper(
+        std::unique_ptr<AbstractStreamSocket> delegate);
 };
 
 } // namespace ssl
