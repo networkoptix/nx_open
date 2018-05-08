@@ -73,3 +73,5 @@ define_cloud_group_targets(frontend ${cloudFrontendModules})
 
 add_custom_target(cloud-docker-build DEPENDS cloud-backend-docker-build cloud-frontend-docker-build)
 add_custom_target(cloud-docker-push DEPENDS cloud-docker-build cloud-backend-docker-push cloud-frontend-docker-push)
+
+add_subdirectory(cloud_connect_test_util)
