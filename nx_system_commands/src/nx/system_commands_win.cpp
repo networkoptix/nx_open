@@ -138,7 +138,7 @@ std::string SystemCommands::devicePath(
     return path;
 }
 
-std::string serializedDmiInfo(bool /*reportViaSocket*/, int /*socketPostfix*/)
+std::string SystemCommands::serializedDmiInfo(bool /*reportViaSocket*/, int /*socketPostfix*/)
 {
     return "";
 }
