@@ -2101,7 +2101,7 @@ int QnMediaResourceWidget::calculateButtonsVisibility() const
         result |= Qn::AnalyticsButton;
 
 	if (d->camera && (!d->camera->hasFlags(Qn::wearable_camera)))
-		result |= Qn::RecordingStatusIconButton;
+        result |= Qn::RecordingStatusIconButton;
 
     return result;
 }
