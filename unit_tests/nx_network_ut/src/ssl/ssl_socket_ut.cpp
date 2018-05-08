@@ -450,8 +450,6 @@ TEST_F(SslSocketSwitchIoMode, from_sync_to_async)
 //-------------------------------------------------------------------------------------------------
 // Common socket tests. These are not enough since they do not even check ssl is actually used.
 
-#if 0
-
 NX_NETWORK_BOTH_SOCKET_TEST_CASE(
     TEST, SslSocketNotEncryptedConnectionAutoDetected,
     []()
@@ -461,8 +459,6 @@ NX_NETWORK_BOTH_SOCKET_TEST_CASE(
             EncryptionUse::autoDetectByReceivedData);
     },
     []() { return std::make_unique<TCPSocket>(AF_INET); });
-
-#endif
 
 NX_NETWORK_BOTH_SOCKET_TEST_CASE(
     TEST, SslSocketEncryptedConnection,

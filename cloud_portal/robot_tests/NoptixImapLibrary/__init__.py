@@ -150,6 +150,15 @@ class NoptixImapLibrary(object):
         res = findall(r'href=[\'"]?([^\'" >]+)', str(body))
         return res[1]
 
+    def get_nx_links_from_email(self, email_index):
+        body = self.get_email_body(email_index)
+        #body = body.decode('utf-8')
+        print(body)
+        res = findall(
+            r'href=[\'\"]?(https:\/\/\S*(\.mx\/|host\/|\.com\/)(register|activate|restore_password)\/[^\'\" >]+)', str(body))
+        return str(res[0][0])
+
+
     def get_matches_from_email(self, email_index, pattern):
         """Returns all Regular Expression ``pattern`` found in the email body
         from given ``email_index``.

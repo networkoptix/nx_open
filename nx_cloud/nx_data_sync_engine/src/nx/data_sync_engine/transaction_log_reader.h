@@ -9,8 +9,7 @@
 #include "transaction_log.h"
 
 namespace nx {
-namespace cdb {
-namespace ec2 {
+namespace data_sync_engine {
 
 /**
  * Asynchronously reads transactions of specified system from log.
@@ -55,6 +54,5 @@ private:
         TransactionsReadHandler completionHandler);
 };
 
-} // namespace ec2
-} // namespace cdb
+} // namespace data_sync_engine
 } // namespace nx

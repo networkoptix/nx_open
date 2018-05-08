@@ -84,7 +84,7 @@ void ReverseConnectionHolder::closeExtraConnectionsAsync()
     if (m_sockets.size() <= kMaxAllowedPeerConnectionCount)
         return;
 
-    NX_DEBUG(this, lm("Closing extra %1 connection(s) from peer %2")
+    NX_WARNING(this, lm("Closing extra %1 connection(s) from peer %2")
         .args(m_sockets.size() - kMaxAllowedPeerConnectionCount, m_hostName));
 
     while (m_sockets.size() > kMaxAllowedPeerConnectionCount)

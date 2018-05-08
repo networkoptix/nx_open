@@ -24,6 +24,12 @@ smtp:
     password: 'AlYDnddPk8mWorQFVogh8sqkQX6Nv01JwxxfMoYJAFeC'
     port: 587
     tls: on
+    #settings for local dev
+    #host: 'mail.smtp2go.com'
+    #user: 'smtpsender911'
+    #password: 'CfxGalPkaMIe'
+    #port: 587
+    #tls: on
 
 admins:
     -

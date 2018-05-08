@@ -3,8 +3,9 @@ import json
 import codecs
 import os
 import re
+from cloud import settings
 from zipfile import ZipFile
-from ..models import Product, Context, ContextTemplate, DataStructure, Customization, DataRecord
+from ..models import Product, Context, ContextTemplate, DataStructure, Customization, DataRecord, Language
 
 
 def find_or_add_product(name, can_preview):
@@ -53,9 +54,9 @@ def update_from_object(cms_structure):
     for product in cms_structure:
         product_name = product['product']
         can_preview = product['canPreview']
-
-        default_language = Customization.objects.get(name='default').default_language.code
         product_id = find_or_add_product(product_name, can_preview).id
+
+        default_language = Customization.objects.get(name=settings.CUSTOMIZATION).default_language.code
         order = 0
 
         for context_data in product['contexts']:

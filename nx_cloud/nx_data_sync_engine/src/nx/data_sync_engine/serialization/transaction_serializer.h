@@ -1,12 +1,9 @@
 #pragma once
 
-#include <transaction/transaction.h>
-
 #include "../transaction_transport_header.h"
 
 namespace nx {
-namespace cdb {
-namespace ec2 {
+namespace data_sync_engine {
 
 /**
  * Holds transaction inside and is able to serialize it to a requested format.
@@ -34,6 +31,5 @@ public:
         int transactionFormatVersion) const = 0;
 };
 
-} // namespace ec2
-} // namespace cdb
+} // namespace data_sync_engine
 } // namespace nx

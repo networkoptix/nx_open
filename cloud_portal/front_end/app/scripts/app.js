@@ -88,9 +88,13 @@ window.L = {};
                             appState.previewPath = 'preview';
                         }
                     })
-                    .fail(function () {
+                    .fail(function (error) {
                         //console.log(error);
                         // Fallback to default language
+                        //if request to api/utils/language fails then cloud_portal is under maintaince
+                        if( error.status > 500) {
+                            window.location.href = '/static/503.html';
+                        }
                         $.ajax({
                             url: 'static/language.json',
                             async: false,

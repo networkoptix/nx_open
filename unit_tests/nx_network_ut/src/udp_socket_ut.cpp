@@ -6,17 +6,18 @@
 #include <nx/network/system_socket.h>
 #include <nx/network/socket_global.h>
 #include <nx/utils/log/log.h>
+#include <nx/utils/scope_guard.h>
 #include <nx/utils/std/cpp14.h>
 #include <nx/utils/std/future.h>
 #include <nx/utils/std/thread.h>
 #include <nx/utils/string.h>
 #include <nx/utils/thread/sync_queue.h>
 
-#include <nx/utils/scope_guard.h>
-
 namespace nx {
 namespace network {
 namespace test {
+
+constexpr char kUnknownHostName[] = "unknown.host";
 
 class UdpSocket:
     public ::testing::Test
@@ -31,6 +32,8 @@ public:
         m_ipVersion(ipVersion),
         m_testMessage(QnUuid::createUuid().toSimpleString().toUtf8())
     {
+        SocketGlobals::addressResolver().dnsResolver().blockHost(
+            kUnknownHostName);
     }
 
     ~UdpSocket()
@@ -46,6 +49,9 @@ public:
         }
         if (m_receiver)
             m_receiver->pleaseStopSync();
+
+        SocketGlobals::addressResolver().dnsResolver().unblockHost(
+            kUnknownHostName);
     }
 
 protected:
@@ -80,11 +86,12 @@ protected:
 
     void whenSendDataToUnknownHost()
     {
-        // TODO: Making sure host will not be resolved.
+        ASSERT_TRUE(m_sender->setNonBlockingMode(true))
+            << SystemError::getLastOSErrorText().toStdString();
 
         m_sender->sendToAsync(
             m_testMessage,
-            "unknown.host",
+            kUnknownHostName,
             [this](
                 SystemError::ErrorCode result,
                 SocketAddress resolvedTargetAddress,

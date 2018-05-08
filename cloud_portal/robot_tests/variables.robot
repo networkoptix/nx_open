@@ -69,11 +69,15 @@ ${PASSWORD IS REQUIRED}               //span[@ng-if='passwordInput.password.$err
 ${REGISTER FIRST NAME INPUT}          //form[@name= 'registerForm']//input[@ng-model='account.firstName']
 ${REGISTER LAST NAME INPUT}           //form[@name= 'registerForm']//input[@ng-model='account.lastName']
 ${REGISTER EMAIL INPUT}               //form[@name= 'registerForm']//input[@ng-model='account.email']
+${REGISTER EMAIL INPUT LOCKED}        //form[@name= 'registerForm']//input['readOnly' and @ng-if='lockEmail']
 ${REGISTER PASSWORD INPUT}            //form[@name= 'registerForm']//password-input[@ng-model='account.password']//input[@type='password']
 ${REGISTER SUBSCRIBE CHECKBOX}        //form[@name= 'registerForm']//input[@ng-model='account.subscribe']
 ${CREATE ACCOUNT BUTTON}              //form[@name= 'registerForm']//button[contains(text(), '${CREATE ACCOUNT BUTTON TEXT}')]
 ${TERMS AND CONDITIONS LINK}          //form[@name= 'registerForm']//a[@href='/content/eula' and contains(text(), '${TERMS AND CONDITIONS LINK TEXT}')]
 ${RESEND ACTIVATION LINK BUTTON}      //form[@name= 'reactivateAccount']//button[contains(text(), "${RESEND ACTIVATION LINK BUTTON TEXT}")]
+
+#targets the open nx witness button presented when logging in after activating with from=mobile or client
+${OPEN NX WITNESS BUTTON FROM =}      //button[text()='${OPEN NX WITNESS BUTTON TEXT}']
 
 ${EMAIL ALREADY REGISTERED}           //span[@ng-if="registerForm.registerEmail.$error.alreadyExists"]
 
@@ -177,6 +181,7 @@ ${TEST FIRST NAME}                    testFirstName
 ${TEST LAST NAME}                     testLastName
 
 #Related to Auto Tests system
+${AUTO TESTS}                         Auto Tests
 ${AUTO_TESTS SYSTEM ID}                     262d629d-144c-4402-bfa9-c490d9f6dbe9
 ${AUTO TESTS TITLE}                   //div[@ng-repeat='system in systems | filter:searchSystems as filtered']//h2[text()='Auto Tests']
 ${AUTO TESTS USER}                    //div[@ng-repeat='system in systems | filter:searchSystems as filtered']//h2[text()='Auto Tests']/following-sibling::span[contains(@class,'user-name')]
