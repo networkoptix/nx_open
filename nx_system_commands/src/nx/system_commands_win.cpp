@@ -70,7 +70,6 @@ bool SystemCommands::execute(
     return false;
 }
 
-
 bool SystemCommands::removePath(const std::string& path)
 {
     return QDir(QString::fromStdString(path)).removeRecursively();

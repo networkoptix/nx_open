@@ -7,12 +7,12 @@ namespace mediaserver_plugins {
 namespace metadata {
 namespace dw_mtt {
 
-enum EventState
+enum class EventState
 {
-    noneEvent = 0b0001,
-    startEvent = 0b0010,
-    stopEvent = 0b0100,
-    procedureEvent = 0b1000
+    noneEvent = 1 << 0,
+    startEvent = 1 << 1,
+    stopEvent = 1 << 2,
+    procedureEvent = 1 << 3,
 };
 Q_DECLARE_FLAGS(EventStatus, EventState)
 

@@ -293,17 +293,15 @@ static void updateTimer(nx::utils::TimerId* timerId, std::chrono::milliseconds t
 // QnPlOnvifResource
 //
 
-QnPlOnvifResource::RelayOutputInfo::RelayOutputInfo(): isBistable(false), activeByDefault(false) {}
-
 QnPlOnvifResource::RelayOutputInfo::RelayOutputInfo(
-    const std::string& _token,
+    std::string _token,
     bool _isBistable,
-    const std::string& _delayTime,
+    std::string _delayTime,
     bool _activeByDefault)
     :
-    token(_token),
+    token(std::move(_token)),
     isBistable(_isBistable),
-    delayTime(_delayTime),
+    delayTime(std::move(_delayTime)),
     activeByDefault(_activeByDefault)
 {
 }

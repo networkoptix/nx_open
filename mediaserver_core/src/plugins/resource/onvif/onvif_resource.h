@@ -96,17 +96,17 @@ public:
     {
     public:
         std::string token;
-        bool isBistable;
+        bool isBistable = false;
         //!Valid only if \a isBistable is \a false
         std::string delayTime;
-        bool activeByDefault;
+        bool activeByDefault = false;
 
-        RelayOutputInfo();
+        RelayOutputInfo() = default;
         RelayOutputInfo(
-            const std::string& _token,
+            std::string _token,
             bool _isBistable,
-            const std::string& _delayTime,
-            bool _activeByDefault );
+            std::string _delayTime,
+            bool _activeByDefault);
     };
 
     struct RelayInputState
