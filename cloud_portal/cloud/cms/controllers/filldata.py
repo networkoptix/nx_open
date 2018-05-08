@@ -33,14 +33,32 @@ def target_file(file_name, customization, language_code, preview):
             'static', customization.name, 'preview', file_name)
     return target_file_name
 
-
 def process_context_structure(customization, context, content,
                               language, version_id, preview, force_global_files):
+    def replace_in(adict, key, value):
+        for dict_key in adict.keys():
+            if dict_key == key:
+                adict[dict_key] = value  # replace in value
+            elif type(adict[dict_key]) is dict:  #
+                replace_in(adict[dict_key], key, value)
+                
+    # check if the file is language JSON
+    json_content = {}
+    if ".json" in context.file_path: # check if it ends with
+        try:
+            json_content = json.loads(content)
+        except: # check for specific err
+            pass
+
     for datastructure in context.datastructure_set.order_by('order').all():
         content_value = datastructure.find_actual_value(customization, language, version_id)
         # replace marker with value
         if datastructure.type not in (DataStructure.DATA_TYPES.image, DataStructure.DATA_TYPES.file):
-            content = content.replace(datastructure.name, content_value)
+            if not json_content:
+                content = content.replace(datastructure.name, content_value)
+            else:
+                replace_in(json_content, datastructure.name, content_value)
+
         elif content_value or datastructure.optional:
             if context.is_global and not force_global_files:
                 # do not update files from global contexts all the time
@@ -60,6 +78,10 @@ def process_context_structure(customization, context, content,
 
             # print "Save file from DB: " + file_name, context, language, context.is_global
             save_b64_to_file(content_value, file_name, image_storage)
+
+    if json_content:
+        content = json.dumps(json_content)
+
     return content
 
 
