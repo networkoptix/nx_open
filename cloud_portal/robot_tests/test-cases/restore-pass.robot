@@ -29,13 +29,6 @@ should demand that email field is not empty
     ${class}    Get Element Attribute    ${RESTORE PASSWORD EMAIL INPUT}/../..    class
     Should Contain    ${class}    has-error
 
-should not succeed, if email is not registered
-    Go To    ${url}/restore_password
-    Wait Until Elements Are Visible    ${RESTORE PASSWORD EMAIL INPUT}    ${RESET PASSWORD BUTTON}
-    Input Text    ${RESTORE PASSWORD EMAIL INPUT}    ${EMAIL UNREGISTERED}
-    Click Button    ${RESET PASSWORD BUTTON}
-    Check For Alert Dismissable    ${CANNOT SEND CONFIRMATION EMAIL} ${ACCOUNT DOES NOT EXIST}
-
 restores password
     [tags]    email
     ${email}    Get Random Email    ${BASE EMAIL}
