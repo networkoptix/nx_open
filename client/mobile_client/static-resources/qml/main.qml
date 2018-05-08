@@ -150,7 +150,7 @@ ApplicationWindow
         // We need periodically update paddings due to Qt does not emit signal
         // screenOrientationChanged when we change it from normal to inverted.
 
-        // TODO: #ynikitenkov #future Check if we can get rid of navigation bar -related
+        // TODO: #ynikitenkov #future Check if we can get rid of navigation bar-related
         // properties and just use custom margins
 
         id: androidBarPositionWorkaround

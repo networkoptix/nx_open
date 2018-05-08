@@ -55,8 +55,15 @@ QMargins getCustomMargins()
     if (!nativeView)
         return QMargins();
     
-    auto safeInsets = [nativeView safeAreaInsets];
-    return QMargins(safeInsets.left, safeInsets.top, safeInsets.right, safeInsets.bottom);
+    if (@available(iOS 11, *))
+    {
+        auto safeInsets = [nativeView safeAreaInsets];
+        return QMargins(safeInsets.left, safeInsets.top, safeInsets.right, safeInsets.bottom);
+    }
+    else
+    {
+        return QMargins();
+    }
 }
 
 bool isPhone() {
