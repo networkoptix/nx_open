@@ -101,7 +101,13 @@ CameraDiagnostics::Result HikvisionResource::initializeMedia(
             hikvision::ChannelCapabilities channelCapabilities;
             auto result = fetchChannelCapabilities(role, &channelCapabilities);
             if (!result)
-                return result;
+            {
+                NX_DEBUG(this, 
+                    lm("Unable to fetch channel capabilities on %1 by ISAPI, fallback to ONVIF")
+                    .args(getUrl()));
+
+                return base_type::initializeMedia(onvifCapabilities);
+            }
 
             m_channelCapabilitiesByRole[role] = channelCapabilities;
             m_hevcSupported = hikvision::codecSupported(

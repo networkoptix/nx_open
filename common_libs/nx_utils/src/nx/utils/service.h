@@ -17,6 +17,8 @@ public:
     Service(int argc, char **argv, const QString& applicationDisplayName);
     virtual ~Service() = default;
 
+    void setEmbeddedMode(bool value);
+
     virtual void pleaseStop() override;
 
     void setOnStartedEventHandler(
@@ -34,6 +36,7 @@ protected:
     int runMainLoop();
 
 private:
+    bool m_isEmbeddedMode = false;
     int m_argc;
     char** m_argv;
     nx::utils::promise<int> m_processTerminationEvent;
