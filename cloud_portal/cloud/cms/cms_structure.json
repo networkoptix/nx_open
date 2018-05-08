@@ -284,35 +284,35 @@
         "values":[
           {
             "label": "Host",
-            "name": "host",
-            "value": "email-smtp.us-east-1.amazonaws.com",
+            "name": "smtp_host",
+            "value": "mail.smtp2go.com",
             "description": "Host url for smtp server",
             "advanced": true
           },
           {
             "label": "User",
-            "name": "user",
-            "value": "AKIAJ3DYMIZMDABS43UA",
+            "name": "smtp_user",
+            "value": "smtpsender911",
             "description": "User for smtp server",
             "advanced": true
           },
           {
             "label": "Password",
-            "name": "password",
-            "value": "AnC4VkpbBKXPCbik/gBru508QaG8L86uu2cTzTg5yDkI",
+            "name": "smtp_password",
+            "value": "CfxGalPkaMIe",
             "description": "Password smtp server",
             "advanced": true
           },
           {
             "label": "Port",
-            "name": "port",
+            "name": "smtp_port",
             "value": "587",
             "description": "Port for smtp server",
             "advanced": true
           },
           {
             "label": "Tls",
-            "name": "tls",
+            "name": "smtp_tls",
             "value": true,
             "description": "Tls for smtp server",
             "advanced": true

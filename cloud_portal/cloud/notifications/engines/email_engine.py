@@ -1,5 +1,7 @@
 import pystache
+from django.core import mail
 from django.core.mail import EmailMultiAlternatives
+from django.core.mail.backends.smtp import EmailBackend
 # from email.mime.image import MIMEImage  # python 3
 from email.MIMEImage import MIMEImage  # python 2
 import json
@@ -59,6 +61,17 @@ def send(email, msg_type, message, language_code, customization_name):
     email_from_email = customization_cache(customization_name, "mail_from_email")
     email_from = '%s <%s>' % (email_from_name, email_from_email)
 
+    con = mail.get_connection()
+    con.open()
+
+    mail_obj = EmailBackend(
+        host=customization_cache(customization_name, "smtp_host"),
+        port=customization_cache(customization_name, "smtp_port"),
+        password=customization_cache(customization_name, "smtp_password"),
+        username=customization_cache(customization_name, "smtp_user"),
+        use_tls=customization_cache(customization_name, "smtp_tls"),
+    )
+
     msg = EmailMultiAlternatives(
         subject, email_txt_body, email_from, to=(email,))
     msg.content_subtype = 'plain'  # Main content is now text/html
@@ -72,7 +85,10 @@ def send(email, msg_type, message, language_code, customization_name):
     msg_img = MIMEImage(read_file(customization_name, 'templates/email_logo.png'), _subtype="png")
     msg_img.add_header('Content-ID', '<logo>')
     msg.attach(msg_img)
-    return msg.send()
+
+    mail_obj.send_messages([msg])
+    mail_obj.close()
+    return True
 
 
 def get_email_title(customization_name, language_code, event):
