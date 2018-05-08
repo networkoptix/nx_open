@@ -442,8 +442,9 @@ std::vector<char> CLVideoDecoderOutput::toRgb(int* outLineSize, AVPixelFormat pi
     targetData[0] = (uint8_t*) &result.at(0);
 
     #if defined(__i386) || defined(__amd64) || defined(_WIN32)
-        if (pixelFormat == AV_PIX_FMT_ARGB)
+        if (pixelFormat == AV_PIX_FMT_BGRA)
         {
+            // ATTENTION: Despite its name, this function actually converts to BGRA.
             yuv420_argb32_simd_intr(
                 (uint8_t*) &result[0],
                 data[0], data[1], data[2],

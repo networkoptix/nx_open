@@ -72,10 +72,9 @@ bool CameraManager::pushCompressedVideoFrame(const CompressedVideoPacket* videoF
         return false;
     }
 
-    NX_OUTPUT << __func__ << "() BEGIN: timestamp " << videoFrame->timestampUsec() << " us";
+    NX_OUTPUT << __func__ << "(): timestamp " << videoFrame->timestampUsec() << " us";
     ++m_frameCounter;
     m_lastVideoFrameTimestampUsec = videoFrame->timestampUsec();
-    NX_OUTPUT << __func__ << "() END -> true";
     return true;
 }
 
@@ -92,34 +91,7 @@ bool CameraManager::pushUncompressedVideoFrame(const UncompressedVideoFrame* vid
     ++m_frameCounter;
     m_lastVideoFrameTimestampUsec = videoFrame->timestampUsec();
 
-    if (videoFrame->pixelFormat() != plugin()->pixelFormat())
-    {
-        NX_PRINT << __func__ << "() END -> false: Video frame has pixel format "
-            << pixelFormatToStdString(videoFrame->pixelFormat()) << " instead of "
-            << pixelFormatToStdString(plugin()->pixelFormat());
-        return false;
-    }
-
-    switch (videoFrame->pixelFormat())
-    {
-        case PixelFormat::yuv420:
-            return checkFrame(videoFrame, /*bitsPerPixelForPlanes*/ {8, 2, 2});
-
-        case PixelFormat::argb:
-        case PixelFormat::abgr:
-        case PixelFormat::rgba:
-        case PixelFormat::bgra:
-            return checkFrame(videoFrame, /*bitsPerPixelForPlanes*/ {32});
-
-        case PixelFormat::rgb:
-        case PixelFormat::bgr:
-            return checkFrame(videoFrame, /*bitsPerPixelForPlanes*/ {24});
-
-        default:
-            NX_PRINT << "INTERNAL ERROR: Unknown pixel format: "
-                << (int) videoFrame->pixelFormat();
-            return false;
-    }
+    return checkFrame(videoFrame);
 }
 
 bool CameraManager::pullMetadataPackets(std::vector<MetadataPacket*>* metadataPackets)
@@ -246,9 +218,8 @@ MetadataPacket* CameraManager::cookSomeObjects()
     commonObject->setTypeId(kCarObjectGuid);
 
     // To be binary modified to be unique for each object.
-    nxpl::NX_GUID objectId = {{
-        0xB5, 0x29, 0x4F, 0x25, 0x4F, 0xE6, 0x46, 0x47,
-        0xB8, 0xD1, 0xA0, 0x72, 0x9F, 0x70, 0xF2, 0xD1}};
+    nxpl::NX_GUID objectId =
+        {{0xB5,0x29,0x4F,0x25,0x4F,0xE6,0x46,0x47,0xB8,0xD1,0xA0,0x72,0x9F,0x70,0xF2,0xD1}};
 
     double dt = m_objectCounter / 32.0;
     ++m_objectCounter;
@@ -293,50 +264,67 @@ int64_t CameraManager::usSinceEpoch() const
         system_clock::now().time_since_epoch()).count();
 }
 
-bool CameraManager::checkFrame(
-    const UncompressedVideoFrame* videoFrame,
-    const std::vector<int>& bitsPerPixelForPlanes) const
+bool CameraManager::checkFrame(const UncompressedVideoFrame* frame) const
 {
-    if (videoFrame->planeCount() != bitsPerPixelForPlanes.size())
+    if (frame->pixelFormat() != plugin()->pixelFormat())
     {
-        NX_PRINT << __func__ << "() END -> false: videoFrame->planeCount() is "
-            << videoFrame->planeCount() << " instead of " << bitsPerPixelForPlanes.size();
+        NX_PRINT << __func__ << "() ERROR: Video frame has pixel format "
+            << pixelFormatToStdString(frame->pixelFormat()) << " instead of "
+            << pixelFormatToStdString(plugin()->pixelFormat());
         return false;
     }
 
-    for (int i = 0; i < videoFrame->planeCount(); ++i)
+    const auto* const pixelFormatDescriptor = getPixelFormatDescriptor(frame->pixelFormat());
+    if (!pixelFormatDescriptor)
+        return false; //< Error is already logged.
+
+    if (frame->planeCount() != pixelFormatDescriptor->planeCount)
+    {
+        NX_PRINT << __func__ << "() ERROR: planeCount() is "
+            << frame->planeCount() << " instead of " << pixelFormatDescriptor->planeCount;
+        return false;
+    }
+
+    if (frame->height() % 2 != 0)
+    {
+        NX_PRINT << __func__ << "() ERROR: height() is not even: " << frame->height();
+        return false;
+    }
+
+    for (int plane = 0; plane < frame->planeCount(); ++plane)
     {
         const int bytesPerPlane =
-            videoFrame->height() * videoFrame->lineSize(i) * bitsPerPixelForPlanes.at(i) / 8;
-        if (videoFrame->dataSize(i) != bytesPerPlane)
+            (frame->height() / pixelFormatDescriptor->chromaHeightFactor) * frame->lineSize(plane)
+            * (plane == 0 ? 1 : (pixelFormatDescriptor->lumaBitsPerPixel / 8));
+        if (frame->dataSize(plane) != bytesPerPlane)
         {
-            NX_PRINT << __func__ << "() END -> false: videoFrame->dataSize(" << i << ") is "
-                << videoFrame->dataSize(i) << " instead of " << bytesPerPlane
-                << ", while videoFrame->lineSize(" << i << ") is " << videoFrame->lineSize(i);
-            return false;
+            NX_PRINT << __func__ << "() ERROR: dataSize(/*plane*/ " << plane << ") is "
+                << frame->dataSize(plane) << " instead of " << bytesPerPlane
+                << ", while lineSize(/*plane*/ " << plane << ") is " << frame->lineSize(plane)
+                << " and height is " << frame->height();
+        }
+
+        // Hex-dump some bytes from raw pixel data.
+        if (NX_DEBUG_ENABLE_OUTPUT)
+        {
+            static const int dumpOffset = 0;
+            static const int dumpSize = 12;
+
+            if (frame->dataSize(plane) < dumpOffset + dumpSize)
+            {
+                NX_PRINT << __func__ << "(): WARNING: dataSize(/*plane*/ " << plane << ") is "
+                    << frame->dataSize(plane) << ", which is suspiciously low";
+            }
+            else
+            {
+                NX_PRINT_HEX_DUMP(nx::kit::debug::format(
+                    "Plane %d bytes %d..%d of %d",
+                    plane, dumpOffset, dumpOffset + dumpSize - 1, frame->dataSize(plane)).c_str(),
+                    frame->data(plane) + dumpOffset, dumpSize);
+            }
         }
     }
 
-    // Hex-dump some bytes from raw pixel data.
-    if (NX_DEBUG_ENABLE_OUTPUT)
-    {
-        static const int dumpOffset = 36;
-        static const int dumpSize = 8;
-
-        if (videoFrame->dataSize(0) >= dumpOffset + dumpSize)
-        {
-            NX_PRINT << __func__ << "(): videoFrame->dataSize(0) == " << videoFrame->dataSize(0)
-                << ", which is suspiciously low";
-        }
-        else
-        {
-            NX_PRINT_HEX_DUMP(nx::kit::debug::format(
-                "bytes %d..%d", dumpOffset, dumpOffset + dumpSize - 1).c_str(),
-                videoFrame->data(0) + dumpOffset, dumpSize);
-        }
-    }
-
-    NX_OUTPUT << __func__ << "() END -> true";
     return true;
 }
 

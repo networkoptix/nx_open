@@ -2,7 +2,6 @@
 
 #include <nx/sdk/metadata/common_plugin.h>
 #include <nx/sdk/metadata/uncompressed_video_frame.h>
-#include <nx/sdk/metadata/pixel_format.h>
 
 namespace nx {
 namespace mediaserver_plugins {

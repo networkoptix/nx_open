@@ -3,6 +3,8 @@
 #include <memory>
 #include <tuple>
 
+#include <libavutil/pixfmt.h>
+
 #include <nx/kit/debug.h>
 #include <common/common_module.h>
 #include <media_server/media_server_module.h>
@@ -33,17 +35,8 @@
 
 #include "video_data_receptor.h"
 #include "yuv420_uncompressed_video_frame.h"
-#include "generic_compressed_video_packet.h"
 #include "generic_uncompressed_video_frame.h"
 #include "wrapping_compressed_video_packet.h"
-
-namespace nx {
-namespace sdk {
-namespace metadata {
-class GenericUncompressedVideoFrame;
-}
-}
-}
 
 namespace nx {
 namespace api {
@@ -856,6 +849,7 @@ boost::optional<PixelFormat> ManagerPool::pixelFormatFromManifest(
 
     int uncompressedFrameCapabilityCount = 0; //< To check there is 0 or 1 of such capabilities.
     PixelFormat pixelFormat = PixelFormat::yuv420;
+    auto pixelFormats = getAllPixelFormats(); //< To assert that all pixel formats are tested.
 
     auto checkCapability =
         [&](Capability value, PixelFormat correspondingPixelFormat)
@@ -865,6 +859,11 @@ boost::optional<PixelFormat> ManagerPool::pixelFormatFromManifest(
                 ++uncompressedFrameCapabilityCount;
                 pixelFormat = correspondingPixelFormat;
             }
+
+            // Delete the pixel format which has been tested.
+            auto it = std::find(pixelFormats.begin(), pixelFormats.end(), correspondingPixelFormat);
+            NX_ASSERT(it != pixelFormats.end());
+            pixelFormats.erase(it);
         };
 
     checkCapability(Capability::needUncompressedVideoFrames_yuv420, PixelFormat::yuv420);
@@ -874,6 +873,8 @@ boost::optional<PixelFormat> ManagerPool::pixelFormatFromManifest(
     checkCapability(Capability::needUncompressedVideoFrames_bgra, PixelFormat::bgra);
     checkCapability(Capability::needUncompressedVideoFrames_rgb, PixelFormat::rgb);
     checkCapability(Capability::needUncompressedVideoFrames_bgr, PixelFormat::bgr);
+
+    NX_ASSERT(pixelFormats.empty());
 
     NX_ASSERT(uncompressedFrameCapabilityCount >= 0);
     if (uncompressedFrameCapabilityCount > 1)
@@ -951,10 +952,9 @@ void ManagerPool::registerDataReceptor(
         case PixelFormat::bgr: return AV_PIX_FMT_BGR24;
 
         default:
-            const std::string& pixelFormatStr = pixelFormatToStdString(pixelFormat);
             NX_ASSERT(false, lm(
                 "Unsupported nx::sdk::metadata::UncompressedVideoFrame::PixelFormat \"%1\" = %2")
-                .args(pixelFormatStr, (int) pixelFormat));
+                .args(pixelFormatToStdString(pixelFormat), (int) pixelFormat));
             return AV_PIX_FMT_NONE;
     }
 }

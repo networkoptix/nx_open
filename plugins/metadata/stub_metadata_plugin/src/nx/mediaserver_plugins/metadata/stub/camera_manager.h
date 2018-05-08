@@ -48,9 +48,7 @@ private:
 
     int64_t usSinceEpoch() const;
 
-    bool checkFrame(
-        const sdk::metadata::UncompressedVideoFrame* videoFrame,
-        const std::vector<int>& bitsPerPixelForPlanes) const;
+    bool checkFrame(const sdk::metadata::UncompressedVideoFrame* videoFrame) const;
 
 private:
     std::unique_ptr<std::thread> m_thread;

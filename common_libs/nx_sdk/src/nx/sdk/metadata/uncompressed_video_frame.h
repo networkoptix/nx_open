@@ -26,6 +26,7 @@ public:
         bgra,
         rgb,
         bgr,
+        count
     };
 
     enum class Handle
