@@ -92,6 +92,10 @@ typedef QnSharedResourcePointer<QnSecurityCamResource> QnSecurityCamResourcePtr;
 typedef QnSharedResourcePointer<const QnSecurityCamResource> QnConstSecurityCamResourcePtr;
 typedef QnSharedResourcePointerList<QnSecurityCamResource> QnSecurityCamResourceList;
 
+class QnC2pCameraResource;
+typedef QnSharedResourcePointer<QnC2pCameraResource> QnC2pCameraResourcePtr;
+typedef QnSharedResourcePointerList<QnC2pCameraResource> QnC2pCameraResourceList;
+
 class QnCameraUserAttributes;
 typedef QSharedPointer<QnCameraUserAttributes> QnCameraUserAttributesPtr;
 typedef QList<QnCameraUserAttributesPtr> QnCameraUserAttributesList;
@@ -184,10 +188,6 @@ typedef QnSharedResourcePointer<QnAviResource> QnAviResourcePtr;
 class QnWebPageResource;
 typedef QnSharedResourcePointer<QnWebPageResource> QnWebPageResourcePtr;
 typedef QnSharedResourcePointerList<QnWebPageResource> QnWebPageResourceList;
-
-class QnC2pWebPageResource;
-typedef QnSharedResourcePointer<QnC2pWebPageResource> QnC2pWebPageResourcePtr;
-typedef QnSharedResourcePointerList<QnC2pWebPageResource> QnC2pWebPageResourceList;
 
 class QnFlirEIPResource;
 typedef QnSharedResourcePointer<QnFlirEIPResource> QnFlirEIPResourcePtr;

@@ -28,18 +28,3 @@ private:
 
 Q_DECLARE_METATYPE(QnWebPageResourcePtr)
 Q_DECLARE_METATYPE(QnWebPageResourceList)
-
-class QnC2pWebPageResource: public QnWebPageResource
-{
-public:
-    QnC2pWebPageResource(QnCommonModule* commonModule = nullptr): QnWebPageResource(commonModule)
-    {
-    }
-    QnC2pWebPageResource(const QUrl& url, QnCommonModule* commonModule = nullptr):
-        QnWebPageResource(url, commonModule)
-    {
-    }
-};
-
-Q_DECLARE_METATYPE(QnC2pWebPageResourcePtr)
-Q_DECLARE_METATYPE(QnC2pWebPageResourceList)

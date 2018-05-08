@@ -2,10 +2,10 @@
 
 #include "core/resource_management/resource_searcher.h"
 
-class QnPlC2pResourceSearcher : public QnAbstractNetworkResourceSearcher
+class QnPlC2pCameraResourceSearcher : public QnAbstractNetworkResourceSearcher
 {
 public:
-    QnPlC2pResourceSearcher(QnCommonModule* commonModule);
+    QnPlC2pCameraResourceSearcher(QnCommonModule* commonModule);
 
     virtual QnResourceList findResources(void) override;
 

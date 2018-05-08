@@ -70,7 +70,7 @@ public:
     static const QString kServerTypeId;
     static const QString kVideoWallTypeId;
     static const QString kWebPageTypeId;
-    static const QString kC2pWebPageTypeId;
+    static const QString kC2pCameraTypeId;
     static const QString kStorageTypeId;
     static const QString kUserTypeId;
 
