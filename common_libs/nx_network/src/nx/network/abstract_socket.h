@@ -472,7 +472,7 @@ public:
      * @return NULL in case of error (use SystemError::getLastOSErrorCode() to get error description).
      * NOTE: Uses read timeout.
      */
-    virtual AbstractStreamSocket* accept() = 0;
+    virtual std::unique_ptr<AbstractStreamSocket> accept() = 0;
     /**
      * Starts async accept operation.
      * @param handler functor with following signature:

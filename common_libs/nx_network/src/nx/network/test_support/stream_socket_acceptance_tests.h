@@ -94,7 +94,7 @@ private:
         ASSERT_TRUE(server->listen());
         m_serverAddress.set_value(server->getLocalAddress());
 
-        std::unique_ptr<AbstractStreamSocket> client(server->accept());
+        auto client = server->accept();
         ASSERT_TRUE((bool)client);
         ASSERT_TRUE(client->setRecvTimeout(kClientDelay));
 

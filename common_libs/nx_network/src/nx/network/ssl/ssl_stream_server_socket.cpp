@@ -31,13 +31,13 @@ void StreamServerSocket::acceptAsync(AcceptCompletionHandler handler)
         });
 }
 
-AbstractStreamSocket* StreamServerSocket::accept()
+std::unique_ptr<AbstractStreamSocket> StreamServerSocket::accept()
 {
-    std::unique_ptr<AbstractStreamSocket> accepted(base_type::accept());
+    auto accepted = base_type::accept();
     if (!accepted)
         return nullptr;
 
-    return createSocketWrapper(std::move(accepted)).release();
+    return createSocketWrapper(std::move(accepted));
 }
 
 std::unique_ptr<AbstractStreamSocket> StreamServerSocket::createSocketWrapper(

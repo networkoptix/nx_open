@@ -190,11 +190,11 @@ public:
 
     // AbstractStreamServerSocket -------------- interface
     virtual bool listen(int queueLen = 128) override;
-    virtual AbstractStreamSocket* accept() override;
+    virtual std::unique_ptr<AbstractStreamSocket> accept() override;
     virtual void acceptAsync(AcceptCompletionHandler handler) override;
 
     /** This method is for use by AsyncServerSocketHelper only. It just calls system call accept */
-    AbstractStreamSocket* systemAccept();
+    std::unique_ptr<AbstractStreamSocket> systemAccept();
 
 protected:
     virtual void cancelIoInAioThread() override;
