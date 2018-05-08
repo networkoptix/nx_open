@@ -163,7 +163,7 @@ cloud_portal/build_scripts/stage
 cloud_portal/env
 cloud_portal/cloud/static
 cloud_portal/front_end/**/*.js.map
-cloud_portal/front_end/app/src/**/*.js
+# cloud_portal/front_end/app/src/**/*.js
 .DS_Store
 .idea
 *.pyc
