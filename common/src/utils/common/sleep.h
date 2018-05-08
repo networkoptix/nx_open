@@ -1,8 +1,6 @@
 #ifndef cl_sleep_100
 #define cl_sleep_100
 
-#include <chrono>
-
 #include <QtCore/QThread>
 
 class QnSleep : public QThread
