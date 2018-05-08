@@ -57,7 +57,7 @@ void VmsGatewayEmbeddable::enforceSslFor(const SocketAddress& targetAddress, boo
 
 void VmsGatewayEmbeddable::beforeModuleStart()
 {
-    moduleInstance()->impl()->setEmbeddedMode(true);
+    moduleInstance()->impl()->initializeLogging(false);
 }
 
 } // namespace gateway
