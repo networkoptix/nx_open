@@ -33,10 +33,14 @@ void StreamServerSocket::acceptAsync(AcceptCompletionHandler handler)
 
 AbstractStreamSocket* StreamServerSocket::accept()
 {
-    AbstractStreamSocket* accepted = base_type::accept();
-    if (accepted)
-        accepted = new StreamSocket(std::unique_ptr<AbstractStreamSocket>(accepted), true);
-    return accepted;
+    std::unique_ptr<AbstractStreamSocket> accepted(base_type::accept());
+    if (!accepted)
+        return nullptr;
+
+    if (m_encryptionUse == EncryptionUse::always)
+        return new ServerSideStreamSocket(std::move(accepted));
+    else // if (m_encryptionUse == EncryptionUse::autoDetectByReceivedData)
+        return new EncryptionDetectingStreamSocket(std::move(accepted));
 }
 
 void StreamServerSocket::onAcceptCompletion(
