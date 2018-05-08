@@ -729,10 +729,10 @@ State CameraSettingsDialogStateReducer::setMotionRegionList(
 State CameraSettingsDialogStateReducer::setFisheyeSettings(
     State state, const QnMediaDewarpingParams& value)
 {
-    state.singleCameraSettings.enableFisheyeDewarping.updateValue(value.enabled);
-    state.singleCameraSettings.fisheyeMountingType.updateValue(value.viewMode);
-    state.singleCameraSettings.fisheyeFovRotation.updateValue(value.fovRot);
-    state.singleCameraSettings.fisheyeCalibrationSettings.updateValue(
+    state.singleCameraSettings.enableFisheyeDewarping.setUserIfChanged(value.enabled);
+    state.singleCameraSettings.fisheyeMountingType.setUserIfChanged(value.viewMode);
+    state.singleCameraSettings.fisheyeFovRotation.setUserIfChanged(value.fovRot);
+    state.singleCameraSettings.fisheyeCalibrationSettings.setUserIfChanged(
         fisheyeCalibrationSettings(value));
 
     state.hasChanges = true;

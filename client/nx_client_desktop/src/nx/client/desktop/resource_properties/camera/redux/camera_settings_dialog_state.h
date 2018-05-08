@@ -32,7 +32,7 @@ struct CameraSettingsDialogState
 
         T operator()() const { return get(); }
 
-        void updateValue(T value)
+        void setUserIfChanged(T value)
         {
             if (m_user || m_base != value)
                 m_user = value;
@@ -152,12 +152,13 @@ struct CameraSettingsDialogState
 
         bool operator==(const FisheyeCalibrationSettings& s) const
         {
-            return offset == s.offset && radius == s.radius && aspectRatio == s.aspectRatio;
+            return offset == s.offset && qFuzzyEquals(radius, s.radius)
+                && qFuzzyEquals(aspectRatio, s.aspectRatio);
         }
 
         bool operator!=(const FisheyeCalibrationSettings& s) const
         {
-            return offset != s.offset || radius != s.radius && aspectRatio != s.aspectRatio;
+            return !(*this == s);
         }
     };
 
