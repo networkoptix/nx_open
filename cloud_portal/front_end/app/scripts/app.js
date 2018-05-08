@@ -37,9 +37,21 @@ window.L = {};
             'cloudApp.templates'
 
         ])
+        .factory('httpResponseInterceptor', ['$q', '$rootScope', function($q, $rootScope) {
+            return {
+                responseError: function(error) {
+                    if (error.status === 401 || error.status === 403) {
+                        // Session expired - try to trigger browser reload
+                        $rootScope.session.loginState = false;
+                    }
+                    return $q.reject(error);
+                }
+            };
+        }])
         .config(['$httpProvider', function ($httpProvider) {
             $httpProvider.defaults.xsrfCookieName = 'csrftoken';
             $httpProvider.defaults.xsrfHeaderName = 'X-CSRFToken';
+            $httpProvider.interceptors.push('httpResponseInterceptor');
         }])
         .config(['ngToastProvider', 'CONFIG', function (ngToastProvider, CONFIG) {
             ngToastProvider.configure({
@@ -56,7 +68,7 @@ window.L = {};
             function ($routeProvider, $locationProvider, $compileProvider,
                       languageServiceProvider, CONFIG) {
 
-                $compileProvider.debugInfoEnabled(true); // PROD -> set to false
+                $compileProvider.debugInfoEnabled(false); // PROD -> set to false
                 $locationProvider.html5Mode(true);
                 // .hashPrefix('!');
 

@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('cloudApp')
-    .service('systemsProvider', [ 'cloudApi', '$poll', '$q', function (cloudApi, $poll, $q ) {
+    .service('systemsProvider', [ 'cloudApi', '$poll', '$q', 'account', function (cloudApi, $poll, $q, account) {
         var self = this;
         this.systems = [];
 
@@ -59,6 +59,9 @@ angular.module('cloudApp')
             });
         };
 
-        this.forceUpdateSystems();
-        this.delayedUpdateSystems();
+        var self = this;
+        account.checkLoginState().then(function(){
+            self.forceUpdateSystems();
+            self.delayedUpdateSystems();
+        });
     }]);
