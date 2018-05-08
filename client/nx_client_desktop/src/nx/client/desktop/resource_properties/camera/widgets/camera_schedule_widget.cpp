@@ -593,11 +593,11 @@ void CameraScheduleWidget::updateAlert(AlertReason when)
             {
                 case Qt::Unchecked:
                 case Qt::PartiallyChecked:
-                    setScheduleAlert(Alert::NotEnoughLicenses);
+                    setScheduleAlert(Alert::notEnoughLicenses);
                     break;
 
                 case Qt::Checked:
-                    setScheduleAlert(Alert::LicenseLimitExceeded);
+                    setScheduleAlert(Alert::licenseLimitExceeded);
                     break;
 
                 default:
@@ -613,7 +613,7 @@ void CameraScheduleWidget::updateAlert(AlertReason when)
         case CurrentParamsChange:
         {
             if (checkCanEnableRecording() && !isRecordingScheduled())
-                setScheduleAlert(Alert::BrushChanged);
+                setScheduleAlert(Alert::brushChanged);
             break;
         }
 
