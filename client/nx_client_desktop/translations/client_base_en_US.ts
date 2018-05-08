@@ -6759,16 +6759,6 @@ to %1</source>
         <translation></translation>
     </message>
     <message>
-        <source>hh:mm</source>
-        <comment>Format for displaying hours and minutes on timeline.</comment>
-        <translation></translation>
-    </message>
-    <message>
-        <source>h ap</source>
-        <comment>Format for displaying hours on timeline, with am/pm indicator.</comment>
-        <translation></translation>
-    </message>
-    <message>
         <source>dd</source>
         <comment>Format for displaying days on timeline.</comment>
         <translation></translation>
@@ -6811,11 +6801,6 @@ to %1</source>
     <message>
         <source>yyyy</source>
         <comment>Format for displaying year caption in timeline&apos;s header</comment>
-        <translation></translation>
-    </message>
-    <message>
-        <source>h:mm ap</source>
-        <comment>Format for displaying hours and minutes on timeline, with am/pm indicator.</comment>
         <translation></translation>
     </message>
     <message>
