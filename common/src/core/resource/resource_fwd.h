@@ -47,7 +47,6 @@ typedef QSharedPointer<QnMediaServerConnection> QnMediaServerConnectionPtr;
 
 // -->
 
-
 class QnResourceFactory;
 class QnResourcePool;
 
@@ -185,6 +184,10 @@ typedef QnSharedResourcePointer<QnAviResource> QnAviResourcePtr;
 class QnWebPageResource;
 typedef QnSharedResourcePointer<QnWebPageResource> QnWebPageResourcePtr;
 typedef QnSharedResourcePointerList<QnWebPageResource> QnWebPageResourceList;
+
+class QnC2pWebPageResource;
+typedef QnSharedResourcePointer<QnC2pWebPageResource> QnC2pWebPageResourcePtr;
+typedef QnSharedResourcePointerList<QnC2pWebPageResource> QnC2pWebPageResourceList;
 
 class QnFlirEIPResource;
 typedef QnSharedResourcePointer<QnFlirEIPResource> QnFlirEIPResourcePtr;

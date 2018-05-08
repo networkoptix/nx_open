@@ -2,7 +2,7 @@
 
 #include <core/resource/resource.h>
 
-class QnWebPageResource: public QnResource
+class QnWebPageResource : public QnResource
 {
     Q_OBJECT
     using base_type = QnResource;
@@ -22,8 +22,24 @@ public:
         Qn::StatusChangeReason reason = Qn::StatusChangeReason::Local) override;
 
 private:
-    Qn::ResourceStatus m_status { Qn::NotDefined }; //< This class must not store its status on server side
+    // This class must not store its status on server side
+    Qn::ResourceStatus m_status{Qn::NotDefined};
 };
 
 Q_DECLARE_METATYPE(QnWebPageResourcePtr)
 Q_DECLARE_METATYPE(QnWebPageResourceList)
+
+class QnC2pWebPageResource: public QnWebPageResource
+{
+public:
+    QnC2pWebPageResource(QnCommonModule* commonModule = nullptr): QnWebPageResource(commonModule)
+    {
+    }
+    QnC2pWebPageResource(const QUrl& url, QnCommonModule* commonModule = nullptr):
+        QnWebPageResource(url, commonModule)
+    {
+    }
+};
+
+Q_DECLARE_METATYPE(QnC2pWebPageResourcePtr)
+Q_DECLARE_METATYPE(QnC2pWebPageResourceList)

@@ -6,15 +6,15 @@
 
 #include <common/common_module.h>
 
-#include "utils/common/util.h"
-#include "managers/time_manager.h"
-#include "nx_ec/data/api_business_rule_data.h"
-#include "nx_ec/data/api_discovery_data.h"
+#include <utils/common/util.h>
+#include <managers/time_manager.h>
+#include <nx_ec/data/api_business_rule_data.h>
+#include <nx_ec/data/api_discovery_data.h>
 #include <nx/vms/event/event_fwd.h>
-#include "utils/common/synctime.h"
-#include "utils/crypt/symmetrical.h"
+#include <utils/common/synctime.h>
+#include <utils/crypt/symmetrical.h>
 
-#include "core/resource/user_resource.h"
+#include <core/resource/user_resource.h>
 #include <core/resource/camera_resource.h>
 
 #include <core/resource_management/user_roles_manager.h>
@@ -229,7 +229,6 @@ bool QnDbManager::QnLazyTransactionLocker::commit()
     m_committed = m_tran->commitLazyTran();
     return m_committed;
 }
-
 
 //-------------------------------------------------------------------------------------------------
 // QnDbManager
@@ -514,7 +513,6 @@ bool QnDbManager::init(const QUrl& dbUrl)
         }
         NX_CRITICAL(!m_adminUserID.isNull());
 
-
         if (!setMediaServersStatus(Qn::Offline))
             return false;
 
@@ -682,7 +680,6 @@ bool QnDbManager::init(const QUrl& dbUrl)
                 commonModule()->setUseLowPriorityAdminPasswordHack(true);
         }
 
-
         bool updateUserResource = false;
 
         if (!defaultAdminPassword.isEmpty())
@@ -790,7 +787,6 @@ bool QnDbManager::syncLicensesBetweenDB()
         licensesStaticDbSet.end(),
         std::inserter(addToStatic, addToStatic.begin()));
 
-
     for (const auto& license : addToMain)
     {
         if (saveLicense(license, m_sdb) != ErrorCode::ok)
@@ -806,7 +802,6 @@ bool QnDbManager::syncLicensesBetweenDB()
     commonModule()->setDbId(m_dbInstanceId);
     return true;
 }
-
 
 template <typename FilterDataType, class ObjectType, class ObjectListType>
 bool QnDbManager::fillTransactionLogInternal(ApiCommand::Value command, std::function<bool (ObjectType& data)> updater)
@@ -1112,7 +1107,6 @@ bool QnDbManager::updateBusinessActionParameters()
             remapData[id] = remappedData;
         }
     }
-
 
     for(auto iter = remapData.cbegin(); iter != remapData.cend(); ++iter) {
         QSqlQuery query(m_sdb);
@@ -1614,13 +1608,27 @@ bool QnDbManager::afterInstallUpdate(const QString& updateName)
     }
 
     if (updateName.endsWith(lit("/99_20170926_refactor_user_access_rights.sql")))
-        return ec2::db::migrateAccessRightsToUbjsonFormat(m_sdb, this) && resyncIfNeeded(ResyncUserAccessRights);
+    {
+        return ec2::db::migrateAccessRightsToUbjsonFormat(m_sdb, this)
+            && resyncIfNeeded(ResyncUserAccessRights);
+    }
 
     if (updateName.endsWith(lit("/99_20171214_update_http_action_enum_values.sql")))
-        return updateDefaultRules(vms::event::Rule::getDefaultRules()) && resyncIfNeeded(ResyncRules);
+    {
+        return updateDefaultRules(vms::event::Rule::getDefaultRules())
+            && resyncIfNeeded(ResyncRules);
+    }
 
     if (updateName.endsWith(lit("/99_20180122_remove_secondary_stream_quality.sql")))
         return resyncIfNeeded(ResyncCameraAttributes);
+
+    if (updateName.endsWith(lit("/99_20180508_01_add_c2p_webpage_table.sql")))
+    {
+        QMap<int, QnUuid> guids = getGuidList(
+            "SELECT rt.id, rt.name || '-' as guid from vms_resourcetype rt "
+            "WHERE rt.name == 'C2pWebPage'", CM_MakeHash);
+        return updateTableGuids("vms_resourcetype", "guid", guids);
+    }
 
     NX_LOG(lit("SQL update %1 does not require post-actions.").arg(updateName), cl_logDEBUG1);
     return true;
@@ -2771,7 +2779,6 @@ ErrorCode QnDbManager::checkExistingUser(const QString &name, qint32 internalId)
                   JOIN vms_userprofile p on p.resource_ptr_id = r.id \
                   WHERE p.resource_ptr_id != :id and r.name = :name");
 
-
     query.bindValue(":id", internalId);
     query.bindValue(":name", name);
     if (!query.exec()) {
@@ -3234,7 +3241,8 @@ ErrorCode QnDbManager::doQueryNoLock(const nullptr_t& /*dummy*/, ApiResourceType
 
     std::vector<ApiPropertyTypeData> allProperties;
     QnSql::fetch_many(queryProperty, &allProperties);
-    mergeObjectListData(data, allProperties, &ApiResourceTypeData::propertyTypes, &ApiPropertyTypeData::resourceTypeId);
+    mergeObjectListData(data, allProperties, &ApiResourceTypeData::propertyTypes,
+        &ApiPropertyTypeData::resourceTypeId);
 
     addResourceTypesFromXML(data);
 
@@ -3544,7 +3552,6 @@ ErrorCode QnDbManager::doQueryNoLock(const QnUuid& id, ApiCameraDataExList& came
         &ApiCameraDataEx::id,
         &ApiScheduleTaskWithRefData::sourceId );
 
-
     return ErrorCode::ok;
 }
 
@@ -3792,7 +3799,6 @@ ec2::ErrorCode QnDbManager::doQueryNoLock(const nullptr_t& /*dummy*/, ApiAccessR
 
     return ErrorCode::ok;
 }
-
 
 //getTransactionLog
 ErrorCode QnDbManager::doQueryNoLock(const ApiTranLogFilter& filter, ApiTransactionDataList& tranList)
@@ -4610,8 +4616,6 @@ ErrorCode QnDbManager::insertOrReplaceVideowall(const ApiVideowallData& data, qi
     qWarning() << Q_FUNC_INFO << insQuery.lastError().text();
     return ErrorCode::dbError;
 }
-
-
 
 ErrorCode QnDbManager::saveWebPage(const ApiWebPageData& params)
 {

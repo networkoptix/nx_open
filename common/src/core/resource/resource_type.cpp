@@ -8,6 +8,7 @@ const QString QnResourceTypePool::kLayoutTypeId(lit("Layout"));
 const QString QnResourceTypePool::kServerTypeId(lit("Server"));
 const QString QnResourceTypePool::kVideoWallTypeId(lit("Videowall"));
 const QString QnResourceTypePool::kWebPageTypeId(lit("WebPage"));
+const QString QnResourceTypePool::kC2pWebPageTypeId(lit("C2pWebPage"));
 const QString QnResourceTypePool::kStorageTypeId(lit("Storage"));
 const QString QnResourceTypePool::kUserTypeId(lit("User"));
 
