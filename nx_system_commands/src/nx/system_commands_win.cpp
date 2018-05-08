@@ -1,10 +1,9 @@
 #include "system_commands.h"
 #include <utils/common/util.h>
 #include <utils/fs/file.h>
-#include <Qt/QtCore>
+#include <QtCore/QDir>
 
 namespace nx {
-
 
 SystemCommands::MountCode SystemCommands::mount(
     const std::string& /*url*/,
@@ -128,7 +127,7 @@ int64_t SystemCommands::fileSize(
     bool /*reportViaSocket*/,
     int /*socketPostfix*/)
 {
-    return QnFile::fileSize(QString::fromStdString(path));
+    return QnFile::getFileSize(QString::fromStdString(path));
 }
 
 std::string SystemCommands::devicePath(
