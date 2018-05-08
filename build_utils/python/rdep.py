@@ -110,12 +110,16 @@ class Rdep:
             show_progress = True,
             additional_args = []):
 
-        command = [ self._config.get_rsync("rsync") ]
-        command.append("--archive")
-        command.append("--delete")
+        command = [
+            self._config.get_rsync("rsync"),
+            "--recursive",
+            "--delete",
+            "--links",
+            "--times"
+        ]
 
-        if OS_IS_WINDOWS:
-            command.append("--chmod=ugo=rwx")
+        if not OS_IS_WINDOWS:
+            command.append("--perms")
 
         if show_progress:
             command.append("--progress")

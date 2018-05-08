@@ -777,12 +777,11 @@ QnTimeSlider::~QnTimeSlider()
 
 void QnTimeSlider::createSteps(QVector<QnTimeStep>* absoluteSteps, QVector<QnTimeStep>* relativeSteps)
 {
-    static const QString hmFormat = tr("hh:mm",
-        "Format for displaying hours and minutes on timeline.");
-    static const QString hmApFormat = tr("h:mm ap",
-        "Format for displaying hours and minutes on timeline, with am/pm indicator.");
-    static const QString hApFormat = tr("h ap",
-        "Format for displaying hours on timeline, with am/pm indicator.");
+    // Decided to disable time only format localizations
+    static const QString hmFormat = lit("hh:mm"); //< "Format for displaying hours and minutes on timeline."
+    static const QString hmApFormat = lit("h:mm ap"); //< "Format for displaying hours and minutes on timeline, with am/pm indicator."
+    static const QString hApFormat = lit("h ap"); //< "Format for displaying hours on timeline, with am/pm indicator.";
+
     static const QString dFormat = tr("dd",
         "Format for displaying days on timeline.");
     static const QString moFormat = tr("MMMM",

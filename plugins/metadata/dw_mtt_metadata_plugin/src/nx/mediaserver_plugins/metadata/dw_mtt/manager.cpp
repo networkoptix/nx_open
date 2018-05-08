@@ -293,7 +293,6 @@ QDomDocument Manager::getDom()
 
     if (xmlEndingIterator == m_buffer.cend())
     {
-
         NX_URL_PRINT << "Received message doesn't contain complete xml. "
             << "Waiting more incomming data ...";
         return dom;

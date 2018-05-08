@@ -519,6 +519,10 @@ void QnCameraScheduleWidget::retranslateUi()
     ui->scheduleGridGroupBox->setTitle(lit("%1\t(%2)").arg(
         tr("Recording Schedule")).arg(
         tr("based on server time")));
+
+    // Adding some spaces to the caption, to allocate some space for hint button.
+    // Otherwise hint button will intersect the frame border
+    ui->settingsGroupBox->setTitle(ui->settingsGroupBox->title() + lit("        "));
 }
 
 void QnCameraScheduleWidget::afterContextInitialized()

@@ -48,7 +48,6 @@ public:
     Qn::StorageInitResult remount(const QUrl& url, const QString& path);
     SystemCommands::UnmountCode unmount(const QString& path);
     bool changeOwner(const QString& path);
-    bool touchFile(const QString& path);
     bool makeDirectory(const QString& path);
     bool removePath(const QString& path);
     bool rename(const QString& oldPath, const QString& newPath);

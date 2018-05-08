@@ -42,8 +42,9 @@ HanwhaSharedResourceContext::HanwhaSharedResourceContext(
     videoSources([this]() { return loadVideoSources(); }, kCacheDataTimeout),
     videoProfiles([this]() { return loadVideoProfiles(); }, kCacheDataTimeout),
     videoCodecInfo([this]() { return loadVideoCodecInfo(); }, kCacheDataTimeout),
+    isBypassSupported([this]() { return checkBypassSupport(); }, kCacheDataTimeout),
     m_sharedId(sharedId),
-    m_requestSemaphore(kMaxConcurrentRequestNumber)
+    m_requestLock(kMaxConcurrentRequestNumber)
 {
 }
 
@@ -92,9 +93,9 @@ QAuthenticator HanwhaSharedResourceContext::authenticator() const
     return m_resourceAuthenticator;
 }
 
-QnSemaphore* HanwhaSharedResourceContext::requestSemaphore()
+nx::utils::RwLock* HanwhaSharedResourceContext::requestLock()
 {
-    return &m_requestSemaphore;
+    return &m_requestLock;
 }
 
 void HanwhaSharedResourceContext::startServices(bool hasVideoArchive, bool isNvr)
@@ -166,7 +167,6 @@ SessionContextPtr HanwhaSharedResourceContext::session(
         return strongSessionCtx;
 
     HanwhaRequestHelper helper(shared_from_this());
-    helper.setIgnoreMutexAnalyzer(true);
     const auto response = helper.view(lit("media/sessionkey"));
     if (!response.isSuccessful())
         return SessionContextPtr();
@@ -231,10 +231,7 @@ qint64 HanwhaSharedResourceContext::timelineEndUs(int channelNumber) const
 HanwhaResult<HanwhaInformation> HanwhaSharedResourceContext::loadInformation()
 {
     HanwhaInformation info;
-
     HanwhaRequestHelper helper(shared_from_this());
-    helper.setIgnoreMutexAnalyzer(true);
-
     info.attributes = helper.fetchAttributes(lit("attributes"));
     if (!info.attributes.isValid())
     {
@@ -318,8 +315,6 @@ HanwhaResult<HanwhaInformation> HanwhaSharedResourceContext::loadInformation()
 HanwhaResult<HanwhaResponse> HanwhaSharedResourceContext::loadEventStatuses()
 {
     HanwhaRequestHelper helper(shared_from_this());
-    helper.setIgnoreMutexAnalyzer(true);
-
     auto eventStatuses = helper.check(lit("eventstatus/eventstatus"));
     if (!eventStatuses.isSuccessful())
     {
@@ -335,8 +330,6 @@ HanwhaResult<HanwhaResponse> HanwhaSharedResourceContext::loadEventStatuses()
 HanwhaResult<HanwhaResponse> HanwhaSharedResourceContext::loadVideoSources()
 {
     HanwhaRequestHelper helper(shared_from_this());
-    helper.setIgnoreMutexAnalyzer(true);
-
     auto videoSources = helper.view(lit("media/videosource"));
     if (!videoSources.isSuccessful())
     {
@@ -353,8 +346,6 @@ HanwhaResult<HanwhaResponse> HanwhaSharedResourceContext::loadVideoSources()
 HanwhaResult<HanwhaResponse> HanwhaSharedResourceContext::loadVideoProfiles()
 {
     HanwhaRequestHelper helper(shared_from_this());
-    helper.setIgnoreMutexAnalyzer(true);
-
     auto videoProfiles = helper.view(lit("media/videoprofile"));
     if (!videoProfiles.isSuccessful()
         && videoProfiles.errorCode() != kHanwhaConfigurationNotFoundError)
@@ -393,11 +384,10 @@ void HanwhaSharedResourceContext::setChunkLoaderSettings(const HanwhaChunkLoader
 HanwhaResult<HanwhaCodecInfo> HanwhaSharedResourceContext::loadVideoCodecInfo()
 {
     HanwhaRequestHelper helper(shared_from_this());
-    helper.setIgnoreMutexAnalyzer(true);
+    helper.setGroupBy(kHanwhaChannelProperty);
     auto response = helper.view(
         lit("media/videocodecinfo"),
-        HanwhaRequestHelper::Parameters(),
-        kHanwhaChannelProperty);
+        HanwhaRequestHelper::Parameters());
 
     if (!response.isSuccessful())
     {
@@ -419,12 +409,20 @@ HanwhaResult<HanwhaCodecInfo> HanwhaSharedResourceContext::loadVideoCodecInfo()
 
     HanwhaCodecInfo codecInfo(response, parameters);
     if (!codecInfo.isValid())
-    {
-        return {CameraDiagnostics::CameraInvalidParams(
-            lit("Video codec info is invalid"))};
-    }
+        return {CameraDiagnostics::CameraInvalidParams(lit("Video codec info is invalid"))};
 
     return {CameraDiagnostics::NoErrorResult(), codecInfo};
+}
+
+HanwhaResult<bool> HanwhaSharedResourceContext::checkBypassSupport()
+{
+    HanwhaRequestHelper helper(shared_from_this());
+    // It's intentionally incorrect request, we use it just to determine bypass presence
+    // If HTTP code of the response is 404 then the device doesn't support bypass otherwise it does.
+    const auto result = helper.control(lit("bypass/bypass"));
+    const bool hasBypassSupport = result.statusCode() != nx_http::StatusCode::notFound;
+
+    return {CameraDiagnostics::NoErrorResult(), hasBypassSupport};
 }
 
 } // namespace plugins

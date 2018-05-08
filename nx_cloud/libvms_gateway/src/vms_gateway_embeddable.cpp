@@ -33,8 +33,6 @@ VmsGatewayEmbeddable::VmsGatewayEmbeddable(
         addArg("-http/sslSupport", "false");
     }
 
-    // do not allow VmsGateway reinit the log
-    addArg("-log/logLevel", "none");
     addArg("-log/baseName", logBaseName.toUtf8());
 
     if (startAndWaitUntilStarted())
@@ -59,6 +57,11 @@ SocketAddress VmsGatewayEmbeddable::endpoint() const
 void VmsGatewayEmbeddable::enforceSslFor(const SocketAddress& targetAddress, bool enabled)
 {
     moduleInstance()->impl()->enforceSslFor(targetAddress, enabled);
+}
+
+void VmsGatewayEmbeddable::beforeModuleStart()
+{
+    moduleInstance()->impl()->setEmbeddedMode(true);
 }
 
 } // namespace gateway
