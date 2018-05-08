@@ -19,14 +19,14 @@ class NX_NETWORK_API StreamServerSocket:
 
 public:
     StreamServerSocket(
-        std::unique_ptr<AbstractStreamServerSocket> delegatee,
+        std::unique_ptr<AbstractStreamServerSocket> delegate,
         EncryptionUse encryptionUse);
 
     virtual void acceptAsync(AcceptCompletionHandler handler) override;
     virtual AbstractStreamSocket* accept() override;
 
 private:
-    std::unique_ptr<AbstractStreamServerSocket> m_delegatee;
+    std::unique_ptr<AbstractStreamServerSocket> m_delegate;
     EncryptionUse m_encryptionUse;
 
     void onAcceptCompletion(
