@@ -16,27 +16,45 @@
 #include <utils/common/scoped_painter_rollback.h>
 
 namespace {
-    // Offset between header and hint button
-    const int kHeaderHintOffset = 4;
+// Offset between header and a hint button.
+const int kHeaderHintOffset = 4;
+
+// Draws a rhombus shape to highlight current widget geometry.
+// TODO: #dkargin I want to keep it here for some time, until
+// I find a better place for it.
+void drawDebugRhombus(QPainter* painter, QRect area)
+{
+    int cx = area.center().x();
+    int cy = area.center().y();
+    QPoint poly[] =
+    {
+        QPoint(area.left(), cy),
+        QPoint(cx, area.top() - 1),
+        QPoint(area.right(), cy),
+        QPoint(cx, area.bottom() - 1)
+    };
+
+    QnScopedPainterBrushRollback brushRollback(painter);
+    painter->setBrush(QColor(128, 128, 190));
+    painter->drawConvexPolygon(poly, 4);
 }
+
+} // namespace
 
 namespace nx {
 namespace client {
 namespace desktop {
 
-HintButton::HintButton(QWidget* parent)
-    :base_type(parent)
+HintButton::HintButton(QWidget* parent):
+    base_type(parent),
+    m_helpTopicId(Qn::Empty_Help)
 {
-    m_helpTopicId = Qn::Empty_Help;
     m_normal = qnSkin->pixmap(lit("buttons/context_info.png"), true);
     m_highlighted = qnSkin->pixmap(lit("buttons/context_info_hovered.png"), true);
 
     setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
-    QRect rect = geometry();
     QSize hintSize = hintMarkSize();
-    rect.setSize(hintSize);
-    setMinimumSize(hintSize);
-    setMaximumSize(hintSize);
+    setFixedSize(hintSize);
     // For hovering stuff
     setMouseTracking(true);
 }
@@ -53,17 +71,14 @@ HintButton* HintButton::hintThat(QGroupBox* groupBox)
 bool HintButton::eventFilter(QObject* obj, QEvent* event)
 {
     if (event->type() == QEvent::Resize && obj == m_parentBox)
-    {
-        QResizeEvent *resizeEvent = static_cast<QResizeEvent*>(event);
         updateGeometry(m_parentBox.data());
-    }
     return QWidget::eventFilter(obj, event);
 }
 
 // Awful hackery to get access to protected member function
 template<class T> struct DenyProtectedStyle: public T
 {
-    void publicInitStyleOption(QStyleOptionGroupBox *option) const
+    void publicInitStyleOption(QStyleOptionGroupBox* option) const
     {
         this->initStyleOption(option);
     }
@@ -164,32 +179,12 @@ void HintButton::setHelpTopic(int topicId)
     m_helpTopicId = topicId;
 }
 
-// Draws a rhombus shape to highlight current widget geometry.
-// TODO: #dkargin I want to keep it here for some time, until
-// I find a better place for it.
-void drawDebugRhombus(QPainter& painter, QRect area)
-{
-    int cx = area.center().x();
-    int cy = area.center().y();
-    QPoint poly[] =
-    {
-        QPoint(area.left(), cy),
-        QPoint(cx, area.top() - 1),
-        QPoint(area.right(), cy),
-        QPoint(cx, area.bottom() - 1)
-    };
-
-    QnScopedPainterBrushRollback brushRollback(&painter);
-    painter.setBrush(QColor(128, 128, 190));
-    painter.drawConvexPolygon(poly, 4);
-}
-
 void HintButton::paintEvent(QPaintEvent* event)
 {
     QPainter painter(this);
 
     // I would like to keep it here for some time.
-    //drawDebugRhombus(painter, rect());
+    //drawDebugRhombus(&painter, rect());
 
     QPixmap& pixmap = m_isHovered ? m_highlighted : m_normal;
     if (!pixmap.isNull())
