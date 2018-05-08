@@ -1,6 +1,8 @@
 #ifndef cl_sleep_100
 #define cl_sleep_100
 
+#include <chrono>
+
 #include <QtCore/QThread>
 
 class QnSleep : public QThread
@@ -20,6 +22,11 @@ public:
     static void usleep ( unsigned long usecs ) //  does not work fine with windows ? delay is always ruound to 1 ms
     {
         QThread::usleep(usecs);
+    }
+
+    static void sleepFor(std::chrono::microseconds usecs)
+    {
+        QThread::usleep(usecs.count());
     }
 
 };

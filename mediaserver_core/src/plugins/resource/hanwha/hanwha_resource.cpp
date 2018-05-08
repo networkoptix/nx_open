@@ -40,6 +40,7 @@
 #include <media_server/media_server_module.h>
 #include <core/resource_management/resource_data_pool.h>
 #include <common/static_common_module.h>
+#include <utils/common/sleep.h>
 
 namespace nx {
 namespace mediaserver_core {
@@ -495,7 +496,7 @@ QnCameraAdvancedParamValueMap HanwhaResource::getApiParameters(const QSet<QStrin
                         // TODO: #dmishin most likely here will be issues with multisensor cameras
                         // (we will always read from the first channel only). Fix it.
                         parameterString += kHanwhaChannelPropertyTemplate.arg(
-                            isNvr() && isConnectedViaSunapi() ? 0 : getChannel());
+                            isBypassSupported() ? 0 : getChannel());
                     }
 
                     auto profile = profileByRole(info->profileDependency());
@@ -621,6 +622,7 @@ QSet<QString> HanwhaResource::setApiParameters(const QnCameraAdvancedParamValueM
             requestCommon.cgi,
             requestCommon.submenu,
             requestCommon.action,
+            nx::utils::RwLockType::write,
             requestParameters);
 
         if (!response.isSuccessful())
@@ -964,14 +966,30 @@ CameraDiagnostics::Result HanwhaResource::initSystem()
         const auto sunapiSupportAttribute = m_attributes.attribute<bool>(
             lit("Media/Protocol.SUNAPI/%1").arg(getChannel()));
 
+        m_isBypassSupported = sharedContext()->isBypassSupported().value;
+
         m_isChannelConnectedViaSunapi = sunapiSupportAttribute != boost::none
             && sunapiSupportAttribute.get();
 
-        if (m_isChannelConnectedViaSunapi)
+        if (isBypassSupported())
         {
             HanwhaRequestHelper helper(sharedContext(), /*bypassChannel*/ getChannel());
             m_bypassDeviceAttributes = helper.fetchAttributes(lit("attributes"));
             m_bypassDeviceCgiParameters = helper.fetchCgiParameters(lit("cgis"));
+
+            if (!m_bypassDeviceAttributes.isValid())
+            {
+                return CameraDiagnostics::CameraInvalidParams(
+                    lit("Can't fetch proxied device attributes"));
+            }
+
+            if (!m_bypassDeviceCgiParameters.isValid())
+            {
+                return CameraDiagnostics::CameraInvalidParams(
+                    lit("Can't fetch proxied device CGI parameters"));
+            }
+
+            m_proxiedDeviceChannelCount = m_bypassDeviceAttributes.numberOfChannels();
 
             const auto proxiedDeviceInfo = helper.view(lit("system/deviceinfo"));
             handleProxiedDeviceInfo(proxiedDeviceInfo);
@@ -990,13 +1008,9 @@ CameraDiagnostics::Result HanwhaResource::initMedia()
     if (!videoProfiles)
         return videoProfiles.diagnostics;
 
-    bool hasDualStreaming = false;
     const auto channel = getChannel();
-
-    const bool hasAudio = m_attributes.attribute<int>(
+    m_capabilities.hasAudio = m_attributes.attribute<int>(
         lit("Media/MaxAudioInput/%1").arg(channel)) > 0;
-
-    m_capabilities.hasAudio = hasAudio;
 
     if (isConnectedViaSunapi())
     {
@@ -1215,7 +1229,7 @@ CameraDiagnostics::Result HanwhaResource::initPtz()
     NX_VERBOSE(this, lm("%1: Supported PTZ capabilities direct: %2")
         .args(getPhysicalId(), ptzCapabilityBits(m_ptzCapabilities)));
 
-    if (isNvr() && m_isChannelConnectedViaSunapi)
+    if (isBypassSupported())
     {
         const auto bypassPtzCapabilities = calculateSupportedPtzCapabilities(
             kHanwhaCameraPtzCapabilityDescriptors,
@@ -1484,7 +1498,6 @@ CameraDiagnostics::Result HanwhaResource::fetchExistingProfiles()
     m_profileByRole.clear();
 
     HanwhaRequestHelper helper(sharedContext());
-    helper.setIgnoreMutexAnalyzer(true);
     const auto response = helper.view(
         lit("media/videoprofilepolicy"),
         {{kHanwhaChannelProperty, QString::number(getChannel())}});
@@ -1633,28 +1646,14 @@ CameraDiagnostics::Result HanwhaResource::findProfiles(
     int* totalProfileNumber,
     std::set<int>* profilesToRemoveIfProfilesExhausted)
 {
-    bool isParametersValid = outPrimaryProfile
-        && outSecondaryProfile
-        && totalProfileNumber
-        && profilesToRemoveIfProfilesExhausted;
+    if (profilesToRemoveIfProfilesExhausted)
+        profilesToRemoveIfProfilesExhausted->clear();
 
-    NX_ASSERT(isParametersValid);
-    if (!isParametersValid)
-    {
-        return CameraDiagnostics::CameraPluginErrorResult(
-            lit("Find profile: wrong output parameters provided"));
-    }
+    if (outPrimaryProfile)
+        *outPrimaryProfile = boost::none;
 
-    NX_ASSERT(profilesToRemoveIfProfilesExhausted);
-    if (!profilesToRemoveIfProfilesExhausted)
-    {
-        return CameraDiagnostics::CameraPluginErrorResult(
-            lit("Find profile: no profiles to remove provided"));
-    }
-
-    profilesToRemoveIfProfilesExhausted->clear();
-    *outPrimaryProfile = boost::none;
-    *outSecondaryProfile = boost::none;
+    if (outSecondaryProfile)
+        *outSecondaryProfile = boost::none;
 
     HanwhaRequestHelper helper(sharedContext());
     const auto response = helper.view(lit("media/videoprofile"));
@@ -1671,8 +1670,10 @@ CameraDiagnostics::Result HanwhaResource::findProfiles(
     if (currentChannelProfiles == profileByChannel.cend())
         return CameraDiagnostics::NoErrorResult();
 
-    *totalProfileNumber = (int) currentChannelProfiles->second.size();
-    for (const auto& entry : currentChannelProfiles->second)
+    if (totalProfileNumber)
+        *totalProfileNumber = (int) currentChannelProfiles->second.size();
+
+    for (const auto& entry: currentChannelProfiles->second)
     {
         const auto& profile = entry.second;
         const bool isPrimaryProfile =
@@ -1687,11 +1688,11 @@ CameraDiagnostics::Result HanwhaResource::findProfiles(
                 Qn::ConnectionRole::CR_SecondaryLiveVideo,
                 kHanwhaProfileNameDefaultMaxLength);
 
-        if (isPrimaryProfile)
+        if (isPrimaryProfile && outPrimaryProfile)
             *outPrimaryProfile = profile;
-        else if (isSecondaryProfile)
+        else if (isSecondaryProfile && outSecondaryProfile)
             *outSecondaryProfile = profile;
-        else if (!profile.isBuiltinProfile())
+        else if (!profile.isBuiltinProfile() && profilesToRemoveIfProfilesExhausted)
             profilesToRemoveIfProfilesExhausted->insert(profile.number);
     }
 
@@ -1744,13 +1745,13 @@ CameraDiagnostics::Result HanwhaResource::createProfile(
     if (isAudioSupported())
         profileParameterFlags |= HanwhaProfileParameterFlag::audioSupported;
 
-    const auto profileParameters = makeProfileParameters(
+    auto profileParameters = makeProfileParameters(
         role,
         streamParameters,
         profileParameterFlags);
 
     HanwhaRequestHelper helper(sharedContext(), bypassChannel());
-    const auto response = helper.add(lit("media/videoprofile"), profileParameters);
+    auto response = helper.add(lit("media/videoprofile"), profileParameters);
 
     if (!response.isSuccessful())
     {
@@ -1759,13 +1760,113 @@ CameraDiagnostics::Result HanwhaResource::createProfile(
             CameraDiagnostics::RequestFailedResult(response.requestUrl(), response.errorString()));
     }
 
-    bool success = false;
-    *outProfileNumber = response.response()[kHanwhaProfileNumberProperty].toInt(&success);
+    // Creation of profiles on the NVR channel has some peculiarities:
+    // 1. If profiles are being created via NVR CGI profile number isn't returned in the response.
+    // 2. NVRs can return garbage instead of actual profiles if make 'view'
+    //  request too fast after profile 'add' or 'update' request. (actual for both types of NVR -
+    //  with bypass and without)
+    // 3. Profile can be created with incorrect settings (fps, resolution)
+    //  so we need to update it after creation (actual for NVRs without bypass).
+    // We need to wait a little after profile adding/updating and then try to verify
+    // newly created profile.
+    if (isNvr())
+    {
+        static const int kMaxUpdateProfileTries = 10;
+        *outProfileNumber = kHanwhaInvalidProfile;
+        for (auto i = 0; i < kMaxUpdateProfileTries; ++i)
+        {
+            const auto profileNumber = verifyProfile(role);
+            if (profileNumber != boost::none)
+            {
+                *outProfileNumber = *profileNumber;
+                break;
+            }
 
-    if (!success)
-        return CameraDiagnostics::CameraInvalidParams(lit("Invalid profile number string"));
+            qDebug() << "@@@@@@@@@@@ Verification failed";
+        }
+
+        if (*outProfileNumber == kHanwhaInvalidProfile)
+        {
+            return CameraDiagnostics::CameraInvalidParams(
+                lm("Can't verify profile for %1 stream.")
+                    .args(role == Qn::ConnectionRole::CR_LiveVideo
+                        ? lit("primary")
+                        : lit("secondary")));
+        }
+    }
+
+    if (isNvr() && !isBypassSupported())
+    {
+        profileParameters.erase(kHanwhaProfileNameProperty);
+        profileParameters.emplace(kHanwhaProfileNumberProperty, QString::number(*outProfileNumber));
+
+        response = helper.update(lit("media/videoprofile"), profileParameters);
+        if (!response.isSuccessful())
+        {
+            return CameraDiagnostics::RequestFailedResult(
+                response.requestUrl(),
+                lit("Can't update profile"));
+        }
+    }
+    else
+    {
+        bool success = false;
+        *outProfileNumber = response.response()[kHanwhaProfileNumberProperty].toInt(&success);
+
+        if (!success)
+            return CameraDiagnostics::CameraInvalidParams(lit("Invalid profile number string"));
+    }
 
     return CameraDiagnostics::NoErrorResult();
+}
+
+boost::optional<int> HanwhaResource::verifyProfile(Qn::ConnectionRole role)
+{
+    QnSleep::sleepFor(std::chrono::milliseconds(500));
+
+    boost::optional<HanwhaVideoProfile> profile;
+    const auto result = findProfiles(
+        role == Qn::ConnectionRole::CR_LiveVideo ? &profile : nullptr,
+        role == Qn::ConnectionRole::CR_SecondaryLiveVideo ? &profile : nullptr,
+        /*totalProfileNumber*/ nullptr,
+        /*profilesToRemove*/ nullptr);
+
+    if (!result || profile == boost::none)
+    {
+        NX_VERBOSE(
+            this,
+            lm("Profile verification is failed because profile for %1 stream "
+                "can't be found. Device: %2 (%3)")
+                .args(
+                    role == Qn::ConnectionRole::CR_LiveVideo
+                        ? lit("primary")
+                        : lit("secondary"),
+                    getName(),
+                    getId()));
+        return boost::none;
+    }
+
+    const bool doesProfileHaveIncorrectParameters = profile->number == kHanwhaInvalidProfile
+        || profile->frameRate <= 0
+        || profile->bitrateKbps <= 0
+        || profile->codec == AVCodecID::AV_CODEC_ID_NONE;
+
+    if (doesProfileHaveIncorrectParameters)
+    {
+        NX_VERBOSE(
+            this,
+            lm("Profile verification is failed because profile for %1 stream "
+                "has incorrect parameters. Device: %2 (%3)")
+                .args(
+                    role == Qn::ConnectionRole::CR_LiveVideo
+                        ? lit("primary")
+                        : lit("secondary"),
+                    getName(),
+                    getId()));
+        return boost::none;
+    }
+
+    return profile->number;
 }
 
 CameraDiagnostics::Result HanwhaResource::updateProfileNameIfNeeded(
@@ -1784,6 +1885,7 @@ CameraDiagnostics::Result HanwhaResource::updateProfileNameIfNeeded(
         const auto response = helper.update(
             lit("media/videoprofile"),
             {
+                {kHanwhaChannelProperty, QString::number(getChannel())},
                 {kHanwhaProfileNumberProperty, QString::number(profile.number)},
                 {kHanwhaProfileNameProperty, properProfileName}
             });
@@ -2785,6 +2887,7 @@ bool HanwhaResource::executeCommandInternal(
                 info.cgi(),
                 info.submenu(),
                 info.updateAction(),
+                nx::utils::RwLockType::write,
                 parameters);
 
             return response.isSuccessful();
@@ -2902,7 +3005,6 @@ bool HanwhaResource::setRelayOutputStateInternal(const QString& outputId, bool a
     }
 
     HanwhaRequestHelper helper(sharedContext());
-    helper.setIgnoreMutexAnalyzer(true);
     const auto response = helper.control(
         lit("io/%1").arg(info.submenu),
         parameters);
@@ -2912,7 +3014,7 @@ bool HanwhaResource::setRelayOutputStateInternal(const QString& outputId, bool a
 
 const HanwhaAttributes& HanwhaResource::attributes() const
 {
-    if (!isNvr() || !isConnectedViaSunapi())
+    if (!isBypassSupported())
         return m_attributes;
 
     return m_bypassDeviceAttributes;
@@ -2920,7 +3022,7 @@ const HanwhaAttributes& HanwhaResource::attributes() const
 
 const HanwhaCgiParameters& HanwhaResource::cgiParameters() const
 {
-    if (!isNvr() || !isConnectedViaSunapi())
+    if (!isBypassSupported())
         return m_cgiParameters;
 
     return m_bypassDeviceCgiParameters;
@@ -2928,7 +3030,7 @@ const HanwhaCgiParameters& HanwhaResource::cgiParameters() const
 
 boost::optional<int> HanwhaResource::bypassChannel() const
 {
-    if (isNvr() && isConnectedViaSunapi())
+    if (isBypassSupported())
         return getChannel();
 
     return boost::none;
@@ -2963,9 +3065,10 @@ QString HanwhaResource::nxProfileName(
         {
             const auto nxProfileNameParameter = cgiParameters().parameter(parameterToCheck);
             if (nxProfileNameParameter != boost::none && nxProfileNameParameter->maxLength() > 0)
+            {
                 maxLength = nxProfileNameParameter->maxLength();
-
-            break;
+                break;
+            }
         }
     }
 
@@ -3156,6 +3259,18 @@ QString HanwhaResource::proxiedId() const
 void HanwhaResource::setProxiedId(const QString& proxiedId)
 {
     setProperty(kHanwhaProxiedIdParamName, proxiedId);
+}
+
+bool HanwhaResource::isBypassSupported() const
+{
+    // temporarily disable bypass for proxied multisensor cameras since we don't have
+    // a reliable way to figure out NVR -> Camera channel mapping.
+    return m_isBypassSupported && isConnectedViaSunapi() && !isProxiedMultisensorCamera();
+}
+
+bool HanwhaResource::isProxiedMultisensorCamera() const
+{
+    return m_proxiedDeviceChannelCount > 1;
 }
 
 } // namespace plugins

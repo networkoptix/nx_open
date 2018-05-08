@@ -35,6 +35,12 @@ nx_http::StatusCode::Value HanwhaAttributes::statusCode() const
     return m_statusCode;
 }
 
+int HanwhaAttributes::numberOfChannels() const
+{
+    // Number of the channel attribute groups except for 'No Channel' one.
+    return m_attributes.size() - 1;
+}
+
 boost::optional<QString> HanwhaAttributes::findAttribute(
     const QString& group,
     const QString& attributeName,
