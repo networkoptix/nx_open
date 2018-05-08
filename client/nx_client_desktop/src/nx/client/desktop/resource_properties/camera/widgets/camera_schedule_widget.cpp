@@ -150,10 +150,15 @@ void CameraScheduleWidget::setupUi()
     ui->enableRecordingCheckBox->setProperty(style::Properties::kCheckBoxAsButton, true);
     ui->enableRecordingCheckBox->setForegroundRole(QPalette::ButtonText);
 
+    //TODO: #dkargin Restore hints.
+    /*
+    auto settingsHint = nx::client::desktop::HintButton::hintThat(ui->settingsGroupBox);
+    settingsHint->addHintLine(tr("First choose a recording option, then apply it to day and time blocks on the recording schedule. (0 block is 12:00am to 1:00am, 23 block is 11:00pm to 12:00am.)"));
     ui->scheduleGridGroupBox->setTitle(
         lit("%1\t(%2)").arg(
             tr("Recording Schedule")).arg(
             tr("based on server time")));
+    */
 
     setHelpTopic(ui->exportScheduleButton, Qn::CameraSettings_Recording_Export_Help);
 }

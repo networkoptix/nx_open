@@ -917,6 +917,10 @@
             "relayOutputInversed": true,
             "portNamePrefixToIgnore": "AlarmOut"
         },
+		{
+            "keys": ["DW|DWC-PF5M1TIR"],
+			"fixWrongInputPortNumber": true
+		},
         {
             "keys": [
                 "DW|DWC-MPTZ20X",
@@ -2550,18 +2554,11 @@
         },
         { 
             "keys": ["DW|DWC-MPZ20XFM"],
-            "streamCapabilityTraits": [
-                {
-                    "trait": "aspectRatioDependent",
-                    "attributes": [
-                        {
-                            "name": "allowedAspectRatioDiff",
-                            "value": "0.1"
-                        }
-                    ]
+            "mediaTraits": {
+                "aspectRatioDependent": {
+                    "allowedAspectRatioDiff": "0.1"
                 }
-            ]
-            
+            }
         }
     ]
 }

@@ -159,17 +159,17 @@ const QByteArray kSubscriptionXmlAvdItem = R"(
 const QMap<QByteArray, QByteArray> kXmlItemsByInternalName =
 {
     {"MOTION", kSubscriptionXmlMotionItem},
-    {"VFD", kSubscriptionXmlVfdItem },
+    {"VFD", kSubscriptionXmlVfdItem},
     {"CDD", kSubscriptionXmlCddItem},
-    {"CPC", kSubscriptionXmlCpcItem },
-    {"IPD", kSubscriptionXmlIpdItem },
-    {"PEA", kSubscriptionXmlPeaItem },
-    {"OSC", kSubscriptionXmlOscItem },
-    {"AVD", kSubscriptionXmlAvdItem },
+    {"CPC", kSubscriptionXmlCpcItem},
+    {"IPD", kSubscriptionXmlIpdItem},
+    {"PEA", kSubscriptionXmlPeaItem},
+    {"OSC", kSubscriptionXmlOscItem},
+    {"AVD", kSubscriptionXmlAvdItem},
 };
 
 /*
- * DW MTT camera is sensitive to enlines in xml int http body. Only '\n' is appropriate.
+ * DW MTT camera is sensitive to endlines in xml int http body. Only '\n' is appropriate.
  * Also no endlines and spaces are allowed in the begin and in the end.
  */
 QByteArray normalizeXmlEndlines(const QByteArray& source)

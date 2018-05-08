@@ -209,7 +209,7 @@ if(withMediaServer)
         add_subdirectory(nx_metadata_sdk)
     endif()
 
-    if (withMediaDbUtil)
+    if(withMediaDbUtil)
         add_subdirectory(media_db_util)
     endif()
 

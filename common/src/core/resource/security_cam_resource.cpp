@@ -1289,6 +1289,7 @@ void QnSecurityCamResource::resetCachedValues()
     m_cachedAnalyticsSupportedEvents.reset();
     m_cachedCameraMediaCapabilities.reset();
     m_cachedLicenseType.reset();
+    m_cachedDeviceType.reset();
 }
 
 Qn::BitratePerGopType QnSecurityCamResource::bitratePerGopType() const

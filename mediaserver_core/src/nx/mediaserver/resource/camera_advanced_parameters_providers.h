@@ -3,7 +3,6 @@
 #include <map>
 
 #include <nx/mediaserver/resource/camera.h>
-#include <nx/core/utils/attribute.h>
 
 namespace nx {
 namespace mediaserver {
@@ -57,9 +56,6 @@ public:
     virtual QSet<QString> set(const QnCameraAdvancedParamValueMap& values) override;
 };
 
-using TraitMap =
-    std::map<nx::media::CameraStreamCapabilityTraitType, nx::core::utils::AttributeList>;
-
 /**
  * Provides codec, resolution, bitrate and FPS options for primary or secondary stream.
  * Stores selected values in a designated property.
@@ -78,7 +74,7 @@ public:
     StreamCapabilityAdvancedParametersProvider(
         Camera* camera,
         const StreamCapabilityMaps& capabilities,
-        const nx::media::CameraStreamCapabilityTraits& traits,
+        const nx::media::CameraTraits& traits,
         Qn::StreamIndex streamIndex,
         const QSize& baseResolution);
 
@@ -113,12 +109,13 @@ private:
         Qn::StreamIndex streamIndex,
         std::function<bool(const QString&)> filterFunc) const;
 
-    bool hasTrait(nx::media::CameraStreamCapabilityTraitType) const;
+    boost::optional<nx::media::CameraTraitAttributes> trait(
+        nx::media::CameraTraitType trait) const;
 
 private:
     Camera* const m_camera;
     const StreamCapabilityMaps m_capabilities;
-    TraitMap m_traits;
+    nx::media::CameraTraits m_traits;
     const Qn::StreamIndex m_streamIndex;
     const QnCameraAdvancedParams m_descriptions;
     const QnLiveStreamParams m_defaults;

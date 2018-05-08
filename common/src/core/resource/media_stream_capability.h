@@ -4,10 +4,11 @@
 
 #include <common/common_globals.h>
 #include <nx/fusion/model_functions_fwd.h>
-#include <nx/core/utils/attribute.h>
 
 namespace nx {
 namespace media {
+
+static const QString kCameraMediaCapabilityParamName = lit("mediaCapabilities");
 
 struct CameraStreamCapability
 {
@@ -21,8 +22,8 @@ struct CameraStreamCapability
     bool isNull() const;
     QString toString() const;
 };
-
 #define CameraStreamCapability_Fields (minBitrateKbps)(maxBitrateKbps)(defaultBitrateKbps)(defaultFps)(maxFps)
+QN_FUSION_DECLARE_FUNCTIONS(CameraStreamCapability, (json))
 
 struct CameraMediaCapability
 {
@@ -31,34 +32,24 @@ struct CameraMediaCapability
     bool hasAudio = false;
     // TODO: move more fields to here like io port settings e.t.c
 };
-
 #define CameraMediaCapability_Fields (streamCapabilities)(hasDualStreaming)(hasAudio)
-
-static const QString kCameraMediaCapabilityParamName = lit("mediaCapabilities");
-
-QN_FUSION_DECLARE_FUNCTIONS(CameraStreamCapability, (json))
 QN_FUSION_DECLARE_FUNCTIONS(CameraMediaCapability, (json))
 
-enum class CameraStreamCapabilityTraitType
+enum class CameraTraitType
 {
     aspectRatioDependent = 1
 };
+QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(CameraTraitType);
 
-QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(CameraStreamCapabilityTraitType);
+// TODO: #dmishin it's workaround for fusion bug (impossibility to serialize/deserialize maps
+// with the key different from QString). Should be fixed in 4.0
+using CameraTraitNameString = QString;
 
-struct CameraStreamCapabilityTrait
-{
-    CameraStreamCapabilityTraitType trait;
-    nx::core::utils::AttributeList attributes;
-};
-
-using CameraStreamCapabilityTraits = std::vector<CameraStreamCapabilityTrait>;
-
-#define CameraStreamCapabilityTrait_Fields (trait)(attributes)
-QN_FUSION_DECLARE_FUNCTIONS(CameraStreamCapabilityTrait, (json))
+using CameraTraitAttributes = std::map<QString, QString>;
+using CameraTraits = std::map<CameraTraitNameString, CameraTraitAttributes>;
 
 } // media
 } // nx
 
-Q_DECLARE_METATYPE(nx::media::CameraStreamCapabilityTrait)
-QN_FUSION_DECLARE_FUNCTIONS(nx::media::CameraStreamCapabilityTraitType, (lexical));
+Q_DECLARE_METATYPE(nx::media::CameraTraits)
+QN_FUSION_DECLARE_FUNCTIONS(nx::media::CameraTraitType, (lexical));

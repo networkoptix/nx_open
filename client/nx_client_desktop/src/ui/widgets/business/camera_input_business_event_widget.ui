@@ -27,35 +27,18 @@
     <number>0</number>
    </property>
    <item>
-     <layout class="QHBoxLayout" name="labelLayout" stretch="0,1">
-       <item>
-         <widget class="QLabel" name="label">
-           <property name="text">
-      <string>Input ID</string>
-           </property>
-           <property name="alignment">
-             <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-           </property>
-         </widget>
-       </item>
-       <item>
-         <widget class="nx::client::desktop::HintButton" name="labelHint">
-           <property name="sizePolicy">
-             <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-               <horstretch>0</horstretch>
-               <verstretch>0</verstretch>
-             </sizepolicy>
-           </property>
-           <property name="hint">
-             <string>
-               Event will trigger only if there are matches in caption with any of entered keywords.
-
-               If the field is empty, event will always trigger.
-             </string>
-           </property>
-         </widget>
-       </item>
-     </layout>
+    <layout class="QHBoxLayout" name="labelLayout" stretch="0">
+     <item>
+      <widget class="QLabel" name="label">
+       <property name="text">
+        <string>Input ID</string>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+       </property>
+      </widget>
+     </item>
+    </layout>
    </item>
    <item>
     <widget class="QComboBox" name="relayComboBox">
@@ -66,13 +49,6 @@
    </item>
   </layout>
  </widget>
-  <customwidgets>
-  <customwidget>
-    <class>nx::client::desktop::HintButton</class>
-    <extends>QWidget</extends>
-    <header location="global">nx/client/desktop/common/widgets/hint_button.h</header>
-  </customwidget>
-  </customwidgets>
  <resources/>
  <connections/>
 </ui>

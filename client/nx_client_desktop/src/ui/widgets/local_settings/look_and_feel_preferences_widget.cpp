@@ -62,7 +62,7 @@ QnLookAndFeelPreferencesWidget::QnLookAndFeelPreferencesWidget(QWidget *parent) 
     setHelpTopic(ui->showIpInTreeCheckBox,                                    Qn::SystemSettings_General_ShowIpInTree_Help);
 
     ui->showIpInTreeCheckBoxHint->setHint(tr("Displays IP addresses for cameras and servers, groups for users, etc. in the Resource Tree."));
-    ui->timeModeHint->setHint(tr("Sets the time to use in the client (timeline, timestamps, etc.) when client and server machines do not have synchronized time."));
+    ui->timeModeHint->setHint(tr("Sets the time to use in the client (timeline, timestamps, etc.) when client and server machines are in different time zones."));
     ui->tourCycleTimeLabelHint->setHint(tr("Length of time each camera on layout will be displayed if you start a Layout Tour."));
 
     auto aligner = new Aligner(this);

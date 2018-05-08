@@ -237,7 +237,11 @@ HanwhaResult<HanwhaInformation> HanwhaSharedResourceContext::loadInformation()
 
     info.attributes = helper.fetchAttributes(lit("attributes"));
     if (!info.attributes.isValid())
-        return {CameraDiagnostics::CameraInvalidParams(lit("Camera attributes are invalid"))};
+    {
+        return {error(
+            info.attributes,
+            CameraDiagnostics::CameraInvalidParams(lit("Camera attributes are invalid")))};
+    }
 
     const auto maxArchiveSessionsAttribute = info.attributes.attribute<int>(
         lit("System/MaxSearchSession"));
@@ -247,7 +251,11 @@ HanwhaResult<HanwhaInformation> HanwhaSharedResourceContext::loadInformation()
 
     info.cgiParameters = helper.fetchCgiParameters(lit("cgis"));
     if (!info.cgiParameters.isValid())
-        return {CameraDiagnostics::CameraInvalidParams(lit("Camera CGI parameters are invalid"))};
+    {
+        return {error(
+            info.cgiParameters,
+            CameraDiagnostics::CameraInvalidParams(lit("Camera CGI parameters are invalid")))};
+    }
 
     const auto deviceinfo = helper.view(lit("system/deviceinfo"));
     if (!deviceinfo.isSuccessful())

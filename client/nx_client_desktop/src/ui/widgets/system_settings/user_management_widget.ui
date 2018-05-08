@@ -153,14 +153,20 @@
        <property name="sizeHint" stdset="0">
         <size>
          <width>40</width>
-         <height>20</height>
+         <height>0</height>
         </size>
        </property>
       </spacer>
      </item>
      <item>
-       <widget class="nx::client::desktop::HintButton" name="ldapTooltip" native="true">
-       </widget>
+      <widget class="nx::client::desktop::HintButton" name="ldapTooltip" native="true">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+      </widget>
      </item>
      <item>
       <widget class="QPushButton" name="ldapSettingsButton">

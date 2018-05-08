@@ -142,6 +142,11 @@ CameraExpertSettingsWidget::CameraExpertSettingsWidget(QWidget* parent):
 
     ui->bitratePerGopHint->setHint(tr("Helps fix image quality issues on some cameras; for others will cause significant bitrate increase."));
     ui->bitratePerGopHint->setHelpTopic(Qn::CameraSettings_Expert_SettingsControl_Help);
+
+    auto logicalIdHint = nx::client::desktop::HintButton::hintThat(ui->logicalIdGroupBox);
+    logicalIdHint->addHintLine(tr("Custom number that can be assigned to a camera for quick identification and access"));
+    // TODO: Fill in help topic when it is implemented
+    //logicalIdHint->setHelpTopic(Qn::)
 }
 
 CameraExpertSettingsWidget::~CameraExpertSettingsWidget()

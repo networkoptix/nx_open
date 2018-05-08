@@ -29,7 +29,6 @@ ArchiveLengthWidget::ArchiveLengthWidget(QWidget* parent):
     ui->setupUi(this);
 
     setHelpTopic(this, Qn::CameraSettings_Recording_ArchiveLength_Help);
-
     m_aligner = new Aligner(this);
     m_aligner->addWidgets(
         {

@@ -161,7 +161,7 @@ protected:
      * @return stream capability traits
      *  (e.g. availability of second stream resolution depending on primary stream resolution)
      */
-    virtual nx::media::CameraStreamCapabilityTraits streamCapabilityTraits();
+    virtual nx::media::CameraTraits mediaTraits() const;
 
     virtual QnAbstractPtzController* createPtzControllerInternal() const;
 private:
@@ -179,7 +179,7 @@ private:
     std::map<QString, AdvancedParametersProvider*> m_advancedParametersProvidersByParameterId;
     std::map<Qn::StreamIndex, std::unique_ptr<StreamCapabilityAdvancedParametersProvider>> m_streamCapabilityAdvancedProviders;
     CameraDiagnostics::Result m_lastMediaIssue = CameraDiagnostics::NoErrorResult();
-    nx::media::CameraStreamCapabilityTraits m_streamCapabilityTraits;
+    nx::media::CameraTraits m_mediaTraits;
 };
 
 } // namespace resource
