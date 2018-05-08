@@ -5,23 +5,31 @@
 
 #include "../redux/camera_settings_dialog_store.h"
 
+#include <nx/utils/log/assert.h>
+
 namespace nx {
 namespace client {
 namespace desktop {
 
-CameraSettingsPanicWatcher::CameraSettingsPanicWatcher(QObject* parent):
+CameraSettingsPanicWatcher::CameraSettingsPanicWatcher(
+    CameraSettingsDialogStore* store,
+    QObject* parent)
+    :
     base_type(parent),
-    QnWorkbenchContextAware(parent, InitializationMode::lazy)
+    QnWorkbenchContextAware(parent, InitializationMode::lazy),
+    m_store(store)
 {
-}
+    const auto watcher = context()->instance<QnWorkbenchPanicWatcher>();
+    NX_ASSERT(watcher && store);
 
-void CameraSettingsPanicWatcher::setStore(CameraSettingsDialogStore* store)
-{
-    connect(
-        context()->instance<QnWorkbenchPanicWatcher>(),
-        &QnWorkbenchPanicWatcher::panicModeChanged,
-        store,
-        [store](bool value) { store->setPanicMode(value); });
+    m_store->setPanicMode(watcher->isPanicMode());
+
+    connect(watcher, &QnWorkbenchPanicWatcher::panicModeChanged, this,
+        [this](bool value)
+        {
+            if (m_store)
+                m_store->setPanicMode(value);
+        });
 }
 
 } // namespace desktop

@@ -1,6 +1,7 @@
 #pragma once
 
 #include <QtCore/QObject>
+#include <QtCore/QPointer>
 
 #include <ui/workbench/workbench_context_aware.h>
 
@@ -18,9 +19,11 @@ class CameraSettingsPanicWatcher:
     using base_type = QObject;
 
 public:
-    explicit CameraSettingsPanicWatcher(QObject* parent = nullptr);
+    explicit CameraSettingsPanicWatcher(
+        CameraSettingsDialogStore* store, QObject* parent = nullptr);
 
-    void setStore(CameraSettingsDialogStore* store);
+private:
+    const QPointer<CameraSettingsDialogStore> m_store;
 };
 
 } // namespace desktop
