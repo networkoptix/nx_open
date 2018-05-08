@@ -332,6 +332,13 @@ USE_ASYNC_QUEUE = True
 
 ADMINS = conf['admins']
 
+EMAIL_SUBJECT_PREFIX = ''
+EMAIL_HOST = conf['smtp']['host']
+EMAIL_HOST_USER = conf['smtp']['user']
+EMAIL_HOST_PASSWORD = conf['smtp']['password']
+EMAIL_PORT = conf['smtp']['port']
+EMAIL_USE_TLS = conf['smtp']['tls']
+
 
 LINKS_LIVE_TIMEOUT = 300  # Five minutes
 

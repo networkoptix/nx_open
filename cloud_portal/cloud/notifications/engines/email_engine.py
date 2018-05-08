@@ -1,5 +1,4 @@
 import pystache
-from django.core import mail
 from django.core.mail import EmailMultiAlternatives
 from django.core.mail.backends.smtp import EmailBackend
 # from email.mime.image import MIMEImage  # python 3
@@ -61,14 +60,11 @@ def send(email, msg_type, message, language_code, customization_name):
     email_from_email = customization_cache(customization_name, "mail_from_email")
     email_from = '%s <%s>' % (email_from_name, email_from_email)
 
-    con = mail.get_connection()
-    con.open()
-
     mail_obj = EmailBackend(
         host=customization_cache(customization_name, "smtp_host"),
-        port=customization_cache(customization_name, "smtp_port"),
-        password=customization_cache(customization_name, "smtp_password"),
-        username=customization_cache(customization_name, "smtp_user"),
+        port=int(customization_cache(customization_name, "smtp_port")),
+        password=str(customization_cache(customization_name, "smtp_password")),
+        username=str(customization_cache(customization_name, "smtp_user")),
         use_tls=customization_cache(customization_name, "smtp_tls"),
     )
 

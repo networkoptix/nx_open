@@ -285,21 +285,21 @@
           {
             "label": "Host",
             "name": "smtp_host",
-            "value": "mail.smtp2go.com",
+            "value": "email-smtp.us-east-1.amazonaws.com",
             "description": "Host url for smtp server",
             "advanced": true
           },
           {
             "label": "User",
             "name": "smtp_user",
-            "value": "smtpsender911",
+            "value": "AKIAJ3DYMIZMDABS43UA",
             "description": "User for smtp server",
             "advanced": true
           },
           {
             "label": "Password",
             "name": "smtp_password",
-            "value": "CfxGalPkaMIe",
+            "value": "AnC4VkpbBKXPCbik/gBru508QaG8L86uu2cTzTg5yDkI",
             "description": "Password smtp server",
             "advanced": true
           },
