@@ -73,7 +73,7 @@ MultipleCameraSettingsWidget::MultipleCameraSettingsWidget(QWidget *parent):
 
     connect(ui->imageControlWidget, &LegacyImageControlWidget::changed, this,
         &MultipleCameraSettingsWidget::at_dbDataChanged);
-    connect(ui->expertSettingsWidget, &CameraExpertSettingsWidget::dataChanged, this,
+    connect(ui->expertSettingsWidget, &LegacyExpertSettingsWidget::dataChanged, this,
         &MultipleCameraSettingsWidget::at_dbDataChanged);
 
 
