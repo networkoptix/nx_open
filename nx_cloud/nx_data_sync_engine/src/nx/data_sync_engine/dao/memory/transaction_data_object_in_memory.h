@@ -15,8 +15,7 @@
 #include "../abstract_transaction_data_object.h"
 
 namespace nx {
-namespace cdb {
-namespace ec2 {
+namespace data_sync_engine {
 namespace dao {
 namespace memory {
 
@@ -86,6 +85,5 @@ private:
 
 } // namespace memory
 } // namespace dao
-} // namespace ec2
-} // namespace cdb
+} // namespace data_sync_engine
 } // namespace nx

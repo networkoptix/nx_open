@@ -64,7 +64,7 @@ protected:
 
     void verifyThatOnlyLastOneIsPresent()
     {
-        const std::vector<dao::TransactionLogRecord> transactions = readAllTransaction();
+        const std::vector<data_sync_engine::dao::TransactionLogRecord> transactions = readAllTransaction();
 
         ASSERT_EQ(1U, transactions.size());
         ASSERT_EQ(
@@ -74,7 +74,8 @@ protected:
 
     void verifyThatDataObjectIsEmpty()
     {
-        const std::vector<dao::TransactionLogRecord> transactions = readAllTransaction();
+        const std::vector<data_sync_engine::dao::TransactionLogRecord> transactions =
+            readAllTransaction();
         ASSERT_EQ(0U, transactions.size());
     }
 
@@ -97,9 +98,9 @@ private:
     const QnUuid m_peerDbId;
     const nx::String m_systemId;
     std::int64_t m_peerSequence;
-    ec2::dao::memory::TransactionDataObject m_transactionDataObject;
+    data_sync_engine::dao::memory::TransactionDataObject m_transactionDataObject;
     ::ec2::ApiUserData m_transactionData;
-    ::ec2::QnTransaction<::ec2::ApiUserData> m_lastAddedTransaction;
+    data_sync_engine::Command<::ec2::ApiUserData> m_lastAddedTransaction;
     nx::utils::db::DbConnectionHolder m_dbConnectionHolder;
     std::shared_ptr<nx::utils::db::QueryContext> m_currentTran;
 
@@ -113,11 +114,11 @@ private:
     }
 
     template<typename TransactionDataType>
-    void saveTransaction(const ::ec2::QnTransaction<TransactionDataType>& transaction)
+    void saveTransaction(const data_sync_engine::Command<TransactionDataType>& transaction)
     {
         const auto tranHash = ::ec2::transactionHash(transaction.command, transaction.params).toSimpleByteArray();
         const auto ubjsonSerializedTransaction = QnUbjson::serialized(transaction);
-        TransactionData transactionData{
+        data_sync_engine::dao::TransactionData transactionData{
             m_systemId,
             transaction,
             tranHash,
@@ -129,9 +130,9 @@ private:
         ASSERT_EQ(nx::utils::db::DBResult::ok, dbResult);
     }
 
-    ::ec2::QnTransaction<::ec2::ApiUserData> generateTransaction()
+    data_sync_engine::Command<::ec2::ApiUserData> generateTransaction()
     {
-        ::ec2::QnTransaction<::ec2::ApiUserData> transaction(m_peerGuid);
+        data_sync_engine::Command<::ec2::ApiUserData> transaction(m_peerGuid);
         transaction.command = ::ec2::ApiCommand::saveUser;
         transaction.persistentInfo.dbID = m_peerDbId;
         transaction.transactionType = ::ec2::TransactionType::Cloud;
@@ -141,9 +142,9 @@ private:
         return transaction;
     }
 
-    std::vector<dao::TransactionLogRecord> readAllTransaction()
+    std::vector<data_sync_engine::dao::TransactionLogRecord> readAllTransaction()
     {
-        std::vector<dao::TransactionLogRecord> transactions;
+        std::vector<data_sync_engine::dao::TransactionLogRecord> transactions;
         const auto resultCode = m_transactionDataObject.fetchTransactionsOfAPeerQuery(
             m_currentTran ? m_currentTran.get() : nullptr,
             m_systemId,

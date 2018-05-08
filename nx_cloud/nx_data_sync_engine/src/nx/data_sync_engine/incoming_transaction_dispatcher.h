@@ -9,15 +9,11 @@
 #include <nx/utils/thread/mutex.h>
 #include <nx/utils/thread/wait_condition.h>
 
-#include <transaction/transaction_transport_header.h>
-#include <transaction/transaction.h>
-
 #include "transaction_processor.h"
 #include "transaction_transport_header.h"
 
 namespace nx {
-namespace cdb {
-namespace ec2 {
+namespace data_sync_engine {
 
 class TransactionLog;
 
@@ -140,11 +136,10 @@ private:
     template<typename TransactionDataSource>
     void dispatchTransaction(
         TransactionTransportHeader transportHeader,
-        ::ec2::QnAbstractTransaction transaction,
+        CommandHeader transaction,
         TransactionDataSource dataSource,
         TransactionProcessedHandler completionHandler);
 };
 
-} // namespace ec2
-} // namespace cdb
+} // namespace data_sync_engine
 } // namespace nx

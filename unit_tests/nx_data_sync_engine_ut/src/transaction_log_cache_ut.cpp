@@ -8,8 +8,7 @@
 #include <nx/data_sync_engine/transaction_log_cache.h>
 
 namespace nx {
-namespace cdb {
-namespace ec2 {
+namespace data_sync_engine {
 namespace test {
 
 class TransactionLogCache:
@@ -156,9 +155,9 @@ private:
         return result;
     }
 
-    ::ec2::QnAbstractTransaction prepareTransaction(TranId tranId)
+    CommandHeader prepareTransaction(TranId tranId)
     {
-        auto transactionHeader = ::ec2::QnAbstractTransaction(QnUuid(m_peerId));
+        auto transactionHeader = CommandHeader(QnUuid(m_peerId));
         transactionHeader.peerID = QnUuid(m_peerId);
         transactionHeader.command = ::ec2::ApiCommand::saveCamera;
         transactionHeader.transactionType = ::ec2::TransactionType::Cloud;
@@ -179,7 +178,7 @@ private:
 
     void saveTransactionToCache(
         TranId tranId,
-        ::ec2::QnAbstractTransaction transactionHeader)
+        CommandHeader transactionHeader)
     {
         m_cache.insertOrReplaceTransaction(tranId, transactionHeader, m_peerId + m_systemId);
         m_transactionSequenceGenerated.insert(transactionHeader.persistentInfo.sequence);
@@ -240,6 +239,5 @@ TEST_F(TransactionLogCache, timestamp_sequence_is_updated_by_external_transactio
 }
 
 } // namespace test
-} // namespace ec2
-} // namespace cdb
+} // namespace data_sync_engine
 } // namespace nx

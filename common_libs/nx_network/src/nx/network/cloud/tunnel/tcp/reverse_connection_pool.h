@@ -1,5 +1,7 @@
 #pragma once
 
+#include <chrono>
+
 #include <nx/network/aio/basic_pollable.h>
 
 #include "reverse_acceptor.h"
@@ -66,6 +68,8 @@ private:
     bool m_isReconnectHandlerSet;
     std::chrono::steady_clock::time_point m_startTime;
     std::chrono::milliseconds m_startTimeout;
+
+    std::chrono::steady_clock::time_point m_prevConnectionDebugPrintTime;
 
     mutable QnMutex m_mutex;
     typedef std::map<String /*name*/, std::shared_ptr<ReverseConnectionHolder>> HoldersByName;

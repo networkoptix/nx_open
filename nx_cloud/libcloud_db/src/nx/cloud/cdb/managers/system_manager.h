@@ -41,6 +41,8 @@
 #include "../data/data_filter.h"
 #include "../data/system_data.h"
 
+namespace nx { namespace data_sync_engine { class SyncronizationEngine; } }
+
 namespace nx {
 namespace cdb {
 
@@ -49,9 +51,6 @@ namespace conf { class Settings; } // namespace conf
 class AbstractEmailManager;
 class AbstractAccountManager;
 class AbstractSystemHealthInfoProvider;
-
-namespace ec2 { class SyncronizationEngine; } // namespace ec2
-
 class InviteUserNotification;
 
 //-------------------------------------------------------------------------------------------------
@@ -122,7 +121,7 @@ public:
         const AbstractSystemHealthInfoProvider& systemHealthInfoProvider,
         nx::utils::db::AsyncSqlQueryExecutor* const dbManager,
         AbstractEmailManager* const emailManager,
-        ec2::SyncronizationEngine* const ec2SyncronizationEngine) noexcept(false);
+        data_sync_engine::SyncronizationEngine* const ec2SyncronizationEngine) noexcept(false);
     virtual ~SystemManager();
 
     virtual void authenticateByName(
@@ -292,7 +291,7 @@ private:
     const AbstractSystemHealthInfoProvider& m_systemHealthInfoProvider;
     nx::utils::db::AsyncSqlQueryExecutor* const m_dbManager;
     AbstractEmailManager* const m_emailManager;
-    ec2::SyncronizationEngine* const m_ec2SyncronizationEngine;
+    data_sync_engine::SyncronizationEngine* const m_ec2SyncronizationEngine;
     SystemsDict m_systems;
     mutable QnMutex m_mutex;
     AccountSystemAccessRoleDict m_accountAccessRoleForSystem;
@@ -498,7 +497,7 @@ private:
     nx::utils::db::DBResult processEc2SaveUser(
         nx::utils::db::QueryContext* queryContext,
         const nx::String& systemId,
-        ::ec2::QnTransaction<::ec2::ApiUserData> data,
+        data_sync_engine::Command<::ec2::ApiUserData> data,
         data::SystemSharing* const systemSharingData);
     void onEc2SaveUserDone(
         nx::utils::db::QueryContext* /*queryContext*/,
@@ -508,7 +507,7 @@ private:
     nx::utils::db::DBResult processEc2RemoveUser(
         nx::utils::db::QueryContext* queryContext,
         const nx::String& systemId,
-        ::ec2::QnTransaction<nx::vms::api::IdData> data,
+        data_sync_engine::Command<nx::vms::api::IdData> data,
         data::SystemSharing* const systemSharingData);
     void onEc2RemoveUserDone(
         nx::utils::db::QueryContext* /*queryContext*/,
@@ -518,7 +517,7 @@ private:
     nx::utils::db::DBResult processSetResourceParam(
         nx::utils::db::QueryContext* queryContext,
         const nx::String& systemId,
-        ::ec2::QnTransaction<nx::vms::api::ResourceParamWithRefData> data,
+        data_sync_engine::Command<nx::vms::api::ResourceParamWithRefData> data,
         data::SystemAttributesUpdate* const systemNameUpdate);
     void onEc2SetResourceParamDone(
         nx::utils::db::QueryContext* /*queryContext*/,
@@ -528,7 +527,7 @@ private:
     nx::utils::db::DBResult processRemoveResourceParam(
         nx::utils::db::QueryContext* queryContext,
         const nx::String& systemId,
-        ::ec2::QnTransaction<nx::vms::api::ResourceParamWithRefData> data);
+        data_sync_engine::Command<nx::vms::api::ResourceParamWithRefData> data);
     void onEc2RemoveResourceParamDone(
         nx::utils::db::QueryContext* /*queryContext*/,
         nx::utils::db::DBResult dbResult);

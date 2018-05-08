@@ -147,7 +147,7 @@ public:
         m_addressResolver->resolveAsync(
             address.toString(),
             [this, handler = std::move(handler)](
-                SystemError::ErrorCode code, std::deque<AddressEntry> addresses)
+                SystemError::ErrorCode code, std::deque<AddressEntry> addresses) mutable
             {
                 std::deque<HostAddress> ips;
                 std::transform(
@@ -155,7 +155,12 @@ public:
                     std::back_inserter(ips),
                     [](AddressEntry& addressEntry) { return std::move(addressEntry.host); });
                 m_addressResolverIsInUse = false;
-                handler(code, std::move(ips));
+
+                this->dispatch(
+                    [handler = std::move(handler), code, ips = std::move(ips)]() mutable
+                    {
+                        handler(code, std::move(ips));
+                    });
             },
             NatTraversalSupport::disabled,
             m_ipVersion,
@@ -700,19 +705,19 @@ private:
         m_addressResolver->cancel(this); //< TODO: #ak Must not block here!
 
         if (eventType == aio::etNone)
-            this->m_aioService->cancelPostedCalls(this->m_socket, true);
+            this->m_aioService->cancelPostedCalls(this->m_socket);
 
         if (eventType == aio::etNone || eventType == aio::etRead)
         {
-            this->m_aioService->stopMonitoring(
-                this->m_socket, aio::etRead, true);
+            this->m_aioService->stopMonitoring(this->m_socket, aio::etRead);
             m_recvHandler = nullptr;
         }
 
         if (eventType == aio::etNone || eventType == aio::etWrite)
         {
-            this->m_aioService->stopMonitoring(
-                this->m_socket, aio::etWrite, true);
+            // Cancelling dispatch call in resolve handler.
+            this->m_aioService->cancelPostedCalls(this->m_socket);
+            this->m_aioService->stopMonitoring(this->m_socket, aio::etWrite);
             m_connectHandler = nullptr;
             m_sendHandler = nullptr;
             m_asyncSendIssued = false;
@@ -720,8 +725,7 @@ private:
 
         if (eventType == aio::etNone || eventType == aio::etTimedOut)
         {
-            this->m_aioService->stopMonitoring(
-                this->m_socket, aio::etTimedOut, true);
+            this->m_aioService->stopMonitoring(this->m_socket, aio::etTimedOut);
             m_timerHandler = nullptr;
         }
     }
@@ -830,9 +834,9 @@ public:
 
     void stopPolling()
     {
-        this->m_aioService->cancelPostedCalls(this->m_socket, true);
-        this->m_aioService->stopMonitoring(this->m_socket, aio::etRead, true);
-        this->m_aioService->stopMonitoring(this->m_socket, aio::etTimedOut, true);
+        this->m_aioService->cancelPostedCalls(this->m_socket);
+        this->m_aioService->stopMonitoring(this->m_socket, aio::etRead);
+        this->m_aioService->stopMonitoring(this->m_socket, aio::etTimedOut);
     }
 
 private:
@@ -843,7 +847,7 @@ private:
 
     void cancelIoWhileInAioThread()
     {
-        this->m_aioService->stopMonitoring(this->m_socket, aio::etRead, true);
+        this->m_aioService->stopMonitoring(this->m_socket, aio::etRead);
         ++m_acceptAsyncCallCount;
     }
 

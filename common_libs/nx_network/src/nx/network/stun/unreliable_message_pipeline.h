@@ -198,7 +198,7 @@ private:
         }
         else
         {
-            NX_ERROR(this, lm("Failed to parse UDP datagram of size %1 received from %2 on %3. %4")
+            NX_WARNING(this, lm("Failed to parse UDP datagram of size %1 received from %2 on %3. %4")
                 .args((unsigned int)datagram.size(), sourceAddress, address(), datagram.toBase64()));
         }
     }

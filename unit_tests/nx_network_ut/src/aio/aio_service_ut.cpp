@@ -39,8 +39,8 @@ class AIOService:
 public:
     ~AIOService()
     {
-        m_service.stopMonitoring(m_socket.get(), aio::EventType::etRead, true);
-        m_service.stopMonitoring(m_socket.get(), aio::EventType::etTimedOut, true);
+        m_service.stopMonitoring(m_socket.get(), aio::EventType::etRead);
+        m_service.stopMonitoring(m_socket.get(), aio::EventType::etTimedOut);
 
         m_service.pleaseStopSync();
     }
@@ -96,12 +96,12 @@ protected:
                     m_socket.get(),
                     [this]()
                     {
-                        m_service.stopMonitoring(m_socket.get(), eventType, true);
+                        m_service.stopMonitoring(m_socket.get(), eventType);
                     });
             }
             else if (action == 2)
             {
-                m_service.stopMonitoring(m_socket.get(), eventType, rand() & 1);
+                m_service.stopMonitoring(m_socket.get(), eventType);
             }
         }
     }

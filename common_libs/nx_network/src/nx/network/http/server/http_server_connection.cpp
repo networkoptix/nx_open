@@ -1,5 +1,6 @@
 #include "http_server_connection.h"
 
+#include <atomic>
 #include <memory>
 
 #include <QtCore/QDateTime>
@@ -22,6 +23,10 @@ HttpServerConnection::HttpServerConnection(
     m_httpMessageDispatcher(httpMessageDispatcher),
     m_isPersistent(false),
     m_persistentConnectionEnabled(true)
+{
+}
+
+HttpServerConnection::~HttpServerConnection()
 {
 }
 
