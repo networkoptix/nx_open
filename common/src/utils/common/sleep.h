@@ -24,11 +24,6 @@ public:
         QThread::usleep(usecs);
     }
 
-    static void sleepFor(const std::chrono::microseconds& usecs)
-    {
-        QThread::usleep(usecs.count());
-    }
-
 };
 
 #endif //cl_sleep_100

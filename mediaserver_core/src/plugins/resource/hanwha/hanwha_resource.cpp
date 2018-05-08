@@ -1781,8 +1781,6 @@ CameraDiagnostics::Result HanwhaResource::createProfile(
                 *outProfileNumber = *profileNumber;
                 break;
             }
-
-            qDebug() << "@@@@@@@@@@@ Verification failed";
         }
 
         if (*outProfileNumber == kHanwhaInvalidProfile)
@@ -1822,8 +1820,7 @@ CameraDiagnostics::Result HanwhaResource::createProfile(
 
 boost::optional<int> HanwhaResource::verifyProfile(Qn::ConnectionRole role)
 {
-    QnSleep::sleepFor(std::chrono::milliseconds(500));
-
+    std::this_thread::sleep_for(std::chrono::milliseconds(500));
     boost::optional<HanwhaVideoProfile> profile;
     const auto result = findProfiles(
         role == Qn::ConnectionRole::CR_LiveVideo ? &profile : nullptr,
@@ -1846,12 +1843,12 @@ boost::optional<int> HanwhaResource::verifyProfile(Qn::ConnectionRole role)
         return boost::none;
     }
 
-    const bool doesProfileHaveIncorrectParameters = profile->number == kHanwhaInvalidProfile
+    const bool isIncorrectProfile = profile->number == kHanwhaInvalidProfile
         || profile->frameRate <= 0
         || profile->bitrateKbps <= 0
         || profile->codec == AVCodecID::AV_CODEC_ID_NONE;
 
-    if (doesProfileHaveIncorrectParameters)
+    if (isIncorrectProfile)
     {
         NX_VERBOSE(
             this,

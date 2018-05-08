@@ -27,7 +27,9 @@ HanwhaAttributes::HanwhaAttributes(
 
 bool HanwhaAttributes::isValid() const
 {
-    return m_isValid && nx_http::StatusCode::isSuccessCode(statusCode());
+    return m_isValid
+        && nx_http::StatusCode::isSuccessCode(statusCode())
+        && !m_attributes.empty();
 }
 
 nx_http::StatusCode::Value HanwhaAttributes::statusCode() const
@@ -38,6 +40,7 @@ nx_http::StatusCode::Value HanwhaAttributes::statusCode() const
 int HanwhaAttributes::numberOfChannels() const
 {
     // Number of the channel attribute groups except for 'No Channel' one.
+    NX_ASSERT(!m_attributes.empty());
     return m_attributes.size() - 1;
 }
 
