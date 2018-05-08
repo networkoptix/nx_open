@@ -268,22 +268,11 @@ bool RootTool::changeOwner(const QString& path)
     return execAndWait({"chown", path});
 }
 
-bool RootTool::touchFile(const QString& path)
-{
-    if (m_toolPath.isEmpty())
-    {
-        SystemCommands commands;
-        if (!commands.touchFile(path.toStdString()))
-            return false;
-
-        return true;
-    }
-
-    return execAndWait({"touch", path});
-}
-
 bool RootTool::makeDirectory(const QString& path)
 {
+    // #TODO #akulikov remove line below when SystemCommands function is implemented without fork.
+    return QDir().mkpath(path);
+
     if (m_toolPath.isEmpty())
     {
         SystemCommands commands;
@@ -298,6 +287,18 @@ bool RootTool::makeDirectory(const QString& path)
 
 bool RootTool::removePath(const QString& path)
 {
+    // #TODO #akulikov remove line below when SystemCommands function is implemented without fork.
+    auto fileInfo = QFileInfo(path);
+    if (fileInfo.isDir())
+        return QDir(path).removeRecursively();
+
+    if (fileInfo.isFile())
+        return QFile(path).remove();
+
+    return false;
+
+
+
     if (m_toolPath.isEmpty())
     {
         SystemCommands commands;
