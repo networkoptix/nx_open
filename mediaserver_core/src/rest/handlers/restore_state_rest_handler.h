@@ -32,5 +32,8 @@ private:
         const QByteArray& body,
         const QnRestConnectionProcessor* owner) override;
 
-    int execute(const QnRestConnectionProcessor* owner, QnJsonRestResult& result);
+    bool verifyCurrentPassword(
+        const QnRequestParams& params,
+        const QnRestConnectionProcessor* owner,
+        QnJsonRestResult* result = nullptr);
 };
