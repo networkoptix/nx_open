@@ -21,7 +21,7 @@ then
                 if [ "$entry" = "front_end" ]
                 then
                     pushd $entry
-                    for element in $(ls -A .)
+                    for element in $(ls -A $VMS_REPOSITORY/cloud_portal/$entry/)
                     do
                         echo "copy $entry/$element"
                         [ -e "$element" ] && rm -rf "$element"
