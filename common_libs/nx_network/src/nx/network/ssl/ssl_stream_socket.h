@@ -45,7 +45,7 @@ class NX_NETWORK_API StreamSocket:
 
 public:
     StreamSocket(
-        std::unique_ptr<AbstractStreamSocket> delegatee,
+        std::unique_ptr<AbstractStreamSocket> delegate,
         bool isServerSide);  // TODO: #ak Get rid of this one.
 
     virtual ~StreamSocket() override;
@@ -69,7 +69,7 @@ protected:
 
 private:
     std::unique_ptr<aio::StreamTransformingAsyncChannel> m_asyncTransformingChannel;
-    std::unique_ptr<AbstractStreamSocket> m_delegatee;
+    std::unique_ptr<AbstractStreamSocket> m_delegate;
     std::unique_ptr<ssl::Pipeline> m_sslPipeline;
     StreamSocketToTwoWayPipelineAdapter m_socketToPipelineAdapter;
     utils::bstream::ProxyConverter m_proxyConverter;
@@ -90,7 +90,7 @@ class NX_NETWORK_API ClientStreamSocket:
     using base_type = StreamSocket;
 
 public:
-    ClientStreamSocket(std::unique_ptr<AbstractStreamSocket> delegatee);
+    ClientStreamSocket(std::unique_ptr<AbstractStreamSocket> delegate);
 };
 
 class NX_NETWORK_API ServerSideStreamSocket:
@@ -99,7 +99,7 @@ class NX_NETWORK_API ServerSideStreamSocket:
     using base_type = StreamSocket;
 
 public:
-    ServerSideStreamSocket(std::unique_ptr<AbstractStreamSocket> delegatee);
+    ServerSideStreamSocket(std::unique_ptr<AbstractStreamSocket> delegate);
 };
 
 } // namespace ssl

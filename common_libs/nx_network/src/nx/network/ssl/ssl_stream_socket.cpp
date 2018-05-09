@@ -68,12 +68,12 @@ int StreamSocketToTwoWayPipelineAdapter::bytesTransferredToPipelineReturnCode(
 //-------------------------------------------------------------------------------------------------
 
 StreamSocket::StreamSocket(
-    std::unique_ptr<AbstractStreamSocket> delegatee,
+    std::unique_ptr<AbstractStreamSocket> delegate,
     bool isServerSide)
     :
-    base_type(delegatee.get()),
-    m_delegatee(std::move(delegatee)),
-    m_socketToPipelineAdapter(m_delegatee.get()),
+    base_type(delegate.get()),
+    m_delegate(std::move(delegate)),
+    m_socketToPipelineAdapter(m_delegate.get()),
     m_proxyConverter(nullptr)
 {
     if (isServerSide)
@@ -81,12 +81,12 @@ StreamSocket::StreamSocket(
     else
         m_sslPipeline = std::make_unique<ssl::ConnectingPipeline>();
 
-    m_proxyConverter.setDelegatee(m_sslPipeline.get());
+    m_proxyConverter.setDelegate(m_sslPipeline.get());
     m_asyncTransformingChannel = std::make_unique<aio::StreamTransformingAsyncChannel>(
-        aio::makeAsyncChannelAdapter(m_delegatee.get()),
+        aio::makeAsyncChannelAdapter(m_delegate.get()),
         &m_proxyConverter);
 
-    base_type::bindToAioThread(m_delegatee->getAioThread());
+    base_type::bindToAioThread(m_delegate->getAioThread());
 }
 
 StreamSocket::~StreamSocket()
@@ -99,7 +99,7 @@ void StreamSocket::bindToAioThread(aio::AbstractAioThread* aioThread)
 {
     base_type::bindToAioThread(aioThread);
     m_asyncTransformingChannel->bindToAioThread(aioThread);
-    m_delegatee->bindToAioThread(aioThread);
+    m_delegate->bindToAioThread(aioThread);
 }
 
 int StreamSocket::recv(void* buffer, unsigned int bufferLen, int flags)
@@ -146,14 +146,14 @@ void StreamSocket::sendAsync(
 
 void StreamSocket::cancelIoInAioThread(nx::network::aio::EventType eventType)
 {
-    m_delegatee->cancelIOSync(eventType);
+    m_delegate->cancelIOSync(eventType);
     m_asyncTransformingChannel->cancelIOSync(eventType);
 }
 
 void StreamSocket::stopWhileInAioThread()
 {
     m_asyncTransformingChannel.reset();
-    m_delegatee.reset();
+    m_delegate.reset();
 }
 
 void StreamSocket::switchToSyncModeIfNeeded()
@@ -164,7 +164,7 @@ void StreamSocket::switchToSyncModeIfNeeded()
 
 void StreamSocket::switchToAsyncModeIfNeeded()
 {
-    m_proxyConverter.setDelegatee(m_sslPipeline.get());
+    m_proxyConverter.setDelegate(m_sslPipeline.get());
 }
 
 void StreamSocket::handleSslError(int sslPipelineResultCode)
@@ -183,16 +183,16 @@ void StreamSocket::handleSslError(int sslPipelineResultCode)
 //-------------------------------------------------------------------------------------------------
 
 ClientStreamSocket::ClientStreamSocket(
-    std::unique_ptr<AbstractStreamSocket> delegatee)
+    std::unique_ptr<AbstractStreamSocket> delegate)
     :
-    base_type(std::move(delegatee), false)
+    base_type(std::move(delegate), false)
 {
 }
 
 ServerSideStreamSocket::ServerSideStreamSocket(
-    std::unique_ptr<AbstractStreamSocket> delegatee)
+    std::unique_ptr<AbstractStreamSocket> delegate)
     :
-    base_type(std::move(delegatee), true)
+    base_type(std::move(delegate), true)
 {
 }
 
