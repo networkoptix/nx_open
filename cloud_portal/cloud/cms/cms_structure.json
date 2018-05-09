@@ -90,6 +90,22 @@
           "End user licence agreement.",
           "HTML"]
       ]
+    },
+    {
+      "name": "Privacy policy",
+      "description":"Privacy policy",
+      "file_path": "static/lang_{{language}}/views/static/privacy.html",
+      "url": "/content/privacy",
+      "translatable": true,
+      "values":[
+        ["%TITLE%",
+          "<p>Personal data and privacy policy</p>",
+          "Privacy policy header."],
+        ["%CONTENT%",
+          "<p>ALL YOUR BASE BELONG TO US</p>",
+          "Privacy policy text.",
+          "HTML"]
+      ]
     }
   ]
 }
