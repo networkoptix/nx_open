@@ -614,10 +614,29 @@ int UdtStreamSocket::recv(void* buffer, unsigned int bufferLen, int flags)
             [newRecvMode = *newRecvMode, this]() { setRecvMode(!newRecvMode); });
     }
 
-    const int bytesRead = UDT::recv(
-        m_impl->udtHandle, reinterpret_cast<char*>(buffer), bufferLen, 0);
+    if ((flags & MSG_WAITALL) == 0)
+    {
+        return handleRecvResult(UDT::recv(
+            m_impl->udtHandle, reinterpret_cast<char*>(buffer), bufferLen, 0));
+    }
 
-    return handleRecvResult(bytesRead);
+    // UDT does not support MSG_WAITALL recv flag.
+    int totalBytesRead = 0;
+    while (totalBytesRead < (int) bufferLen)
+    {
+        int bytesRead = UDT::recv(
+            m_impl->udtHandle,
+            reinterpret_cast<char*>(buffer) + totalBytesRead,
+            bufferLen - totalBytesRead,
+            0);
+        if (bytesRead < 0)
+            return handleRecvResult(bytesRead);
+        if (bytesRead == 0)
+            break;
+        totalBytesRead += bytesRead;
+    }
+
+    return handleRecvResult(totalBytesRead);
 }
 
 int UdtStreamSocket::send(const void* buffer, unsigned int bufferLen)
