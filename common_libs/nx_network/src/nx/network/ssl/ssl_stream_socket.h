@@ -52,6 +52,14 @@ public:
 
     virtual void bindToAioThread(aio::AbstractAioThread* aioThread) override;
 
+    virtual bool connect(
+        const SocketAddress& remoteSocketAddress,
+        std::chrono::milliseconds timeout) override;
+
+    virtual void connectAsync(
+        const SocketAddress& address,
+        nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode)> handler) override;
+
     virtual int recv(void* buffer, unsigned int bufferLen, int flags = 0) override;
 
     virtual int send(const void* buffer, unsigned int bufferLen) override;
@@ -64,6 +72,9 @@ public:
         const nx::Buffer& buffer,
         IoCompletionHandler handler) override;
 
+    void performHandshakeAsync(
+        nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode)> handler);
+
 protected:
     virtual void cancelIoInAioThread(nx::network::aio::EventType eventType) override;
 
@@ -73,6 +84,7 @@ private:
     std::unique_ptr<ssl::Pipeline> m_sslPipeline;
     StreamSocketToTwoWayPipelineAdapter m_socketToPipelineAdapter;
     utils::bstream::ProxyConverter m_proxyConverter;
+    nx::Buffer m_emptyBuffer;
 
     // TODO: #ak Make it virtual override after inheriting AbtractStreamSocket from aio::BasicPollable.
     void stopWhileInAioThread();

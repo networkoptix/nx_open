@@ -33,6 +33,18 @@ int Pipeline::read(void* data, size_t size)
     return performSslIoOperation(&SSL_read, data, size);
 }
 
+bool Pipeline::performHandshake()
+{
+    int ret = performHandshakeInternal();
+    if (ret <= 0)
+    {
+        handleSslIoResult(ret);
+        return false;
+    }
+
+    return true;
+}
+
 bool Pipeline::isReadThirsty() const
 {
     return m_readThirsty;
@@ -105,7 +117,7 @@ int Pipeline::performSslIoOperation(Func sslFunc, Data* data, size_t size)
 {
     if (m_state < State::handshakeDone)
     {
-        int ret = doHandshake();
+        int ret = performHandshakeInternal();
         if (ret <= 0)
             return handleSslIoResult(ret);
     }
@@ -116,7 +128,7 @@ int Pipeline::performSslIoOperation(Func sslFunc, Data* data, size_t size)
     return handleSslIoResult(ret);
 }
 
-int Pipeline::doHandshake()
+int Pipeline::performHandshakeInternal()
 {
     const int ret = SSL_do_handshake(m_ssl.get());
     if (ret == 1)

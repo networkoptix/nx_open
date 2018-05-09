@@ -102,6 +102,33 @@ void StreamSocket::bindToAioThread(aio::AbstractAioThread* aioThread)
     m_delegate->bindToAioThread(aioThread);
 }
 
+bool StreamSocket::connect(
+    const SocketAddress& remoteSocketAddress,
+    std::chrono::milliseconds timeout)
+{
+    if (!base_type::connect(remoteSocketAddress, timeout))
+        return false;
+
+    switchToSyncModeIfNeeded();
+    return m_sslPipeline->performHandshake();
+}
+
+void StreamSocket::connectAsync(
+    const SocketAddress& address,
+    nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode)> handler)
+{
+    base_type::connectAsync(
+        address,
+        [this, handler = std::move(handler)](
+            SystemError::ErrorCode connectResultCode) mutable
+        {
+            if (connectResultCode != SystemError::noError)
+                return handler(connectResultCode);
+
+            performHandshakeAsync(std::move(handler));
+        });
+}
+
 int StreamSocket::recv(void* buffer, unsigned int bufferLen, int flags)
 {
     switchToSyncModeIfNeeded();
@@ -142,6 +169,21 @@ void StreamSocket::sendAsync(
 {
     switchToAsyncModeIfNeeded();
     m_asyncTransformingChannel->sendAsync(buffer, std::move(handler));
+}
+
+void StreamSocket::performHandshakeAsync(
+    nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode)> handler)
+{
+    switchToAsyncModeIfNeeded();
+
+    m_asyncTransformingChannel->sendAsync(
+        m_emptyBuffer,
+        [this, handler = std::move(handler)](
+            SystemError::ErrorCode systemErrorCode,
+            std::size_t /*bytesSent*/)
+        {
+            handler(systemErrorCode);
+        });
 }
 
 void StreamSocket::cancelIoInAioThread(nx::network::aio::EventType eventType)

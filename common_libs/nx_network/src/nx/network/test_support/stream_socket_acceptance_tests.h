@@ -356,7 +356,7 @@ public:
 protected:
     AddressResolver* m_addressResolver = nullptr;
 
-    void givenListeningServer()
+    void givenListeningServerSocket()
     {
         m_serverSocket = std::make_unique<typename SocketTypeSet::ServerSocket>();
         ASSERT_TRUE(m_serverSocket->setNonBlockingMode(true));
@@ -375,17 +375,17 @@ protected:
 
     void givenSilentServer()
     {
-        givenListeningServer();
+        givenListeningServerSocket();
     }
 
     void givenRandomNameMappedToServerHostIp()
     {
         givenRandomHostName();
-        m_mappedEndpoint.port = m_serverSocket->getLocalAddress().port;
+        m_mappedEndpoint.port = serverEndpoint().port;
 
         m_addressResolver->addFixedAddress(
             m_mappedEndpoint.address,
-            m_serverSocket->getLocalAddress());
+            serverEndpoint());
     }
 
     void givenRandomHostName()
@@ -419,7 +419,7 @@ protected:
 
     void givenSocketInConnectStage()
     {
-        givenListeningServer();
+        givenListeningServerSocket();
         givenRandomNameMappedToServerHostIp();
 
         whenConnectUsingHostName();
@@ -613,7 +613,7 @@ protected:
 
     void givenConnectedSockets()
     {
-        givenListeningServer();
+        givenListeningServerSocket();
         startAcceptingConnections();
 
         givenConnectedSocket();
@@ -656,7 +656,7 @@ protected:
     SocketAddress serverEndpoint() const
     {
         if (m_server)
-            return SocketAddress(m_server->address().toString());
+            return SocketAddress(m_server->address()/*.toString()*/);
         else if (m_serverSocket)
             return m_serverSocket->getLocalAddress();
         else if (m_synchronousServer)
@@ -795,7 +795,7 @@ TYPED_TEST_P(StreamSocketAcceptance, sendDelay)
 
 TYPED_TEST_P(StreamSocketAcceptance, uses_address_resolver)
 {
-    this->givenListeningServer();
+    this->givenMessageServer();
     this->givenRandomNameMappedToServerHostIp();
 
     this->assertConnectionToServerCanBeEstablishedUsingMappedName();
@@ -805,7 +805,7 @@ TYPED_TEST_P(
     StreamSocketAcceptance,
     connect_including_resolve_is_cancelled_correctly)
 {
-    this->givenListeningServer();
+    this->givenListeningServerSocket();
     this->givenRandomNameMappedToServerHostIp();
 
     this->whenConnectUsingHostName();
@@ -828,7 +828,7 @@ TYPED_TEST_P(
 
 TYPED_TEST_P(StreamSocketAcceptance, randomly_stopping_multiple_simultaneous_connections)
 {
-    this->givenListeningServer();
+    this->givenListeningServerSocket();
     this->givenRandomNameMappedToServerHostIp();
 
     this->startMaximumConcurrentConnections(this->mappedEndpoint());
@@ -898,7 +898,7 @@ TYPED_TEST_P(StreamSocketAcceptance, transfer_sync)
 
 TYPED_TEST_P(StreamSocketAcceptance, recv_sync_with_wait_all_flag)
 {
-    this->givenListeningServer();
+    this->givenListeningServerSocket();
     this->givenConnectedSocket();
 
     this->whenSendAsyncRandomDataToServer();
