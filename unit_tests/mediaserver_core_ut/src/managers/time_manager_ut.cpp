@@ -27,8 +27,15 @@
 #include <rest/server/json_rest_result.h>
 #include <nx_ec/ec_api.h>
 #include <managers/misc_manager_stub.h>
+#include <nx/utils/test_support/module_instance_launcher.h>
+#include <test_support/appserver2_process.h>
+#include <nx/utils/test_support/test_options.h>
+#include <transaction/message_bus_adapter.h>
 
 using namespace ec2::test;
+
+using Appserver2 = nx::utils::test::ModuleLauncher<::ec2::Appserver2ProcessPublic>;
+using Appserver2Ptr = std::unique_ptr<Appserver2>;
 
 namespace nx {
 namespace time_sync {
@@ -77,36 +84,41 @@ private:
 
 //-------------------------------------------------------------------------------------------------
 
+static Appserver2Ptr createAppserver()
+{
+    static int instanceCounter = 0;
+    const auto tmpDir = nx::utils::TestOptions::temporaryDirectoryPath() +
+        lit("/ec2_server_sync_ut.data") + QString::number(instanceCounter++);
+    QDir(tmpDir).removeRecursively();
+
+    Appserver2Ptr result(new Appserver2());
+
+    const QString dbFileArg = lit("--dbFile=%1").arg(tmpDir);
+    result->addArg(dbFileArg.toStdString().c_str());
+
+    result->start();
+    return result;
+}
+
 class TimeSynchronizationPeer
 {
 public:
     TimeSynchronizationPeer():
-        m_commonModule(
-            /*clientMode*/ false,
-            nx::core::access::Mode::direct),
         m_testSystemClock(std::make_shared<TestSystemClock>()),
-        m_testSteadyClock(std::make_shared<TestSteadyClock>()),
-        m_miscManager(std::make_shared<MiscManagerStub>()),
-        m_transactionMessageBus(std::make_unique<TransactionMessageBusStub>(&m_commonModule)),
-        m_workAroundMiscDataSaverStub(
-            std::make_shared<WorkAroundMiscDataSaverStub>(m_miscManager.get())),
-        m_timeSynchronizationManager(new nx::mediaserver::ServerTimeSyncManager(
-            &m_commonModule,
+        m_testSteadyClock(std::make_shared<TestSteadyClock>())
+    {
+        m_appserver = createAppserver();
+        auto commonModule = m_appserver->moduleInstance()->commonModule();
+        m_timeSynchronizationManager.reset(new nx::mediaserver::ServerTimeSyncManager(
+            commonModule,
             nullptr, //< No reverse connections are supported in this test.
             m_testSystemClock,
-            m_testSteadyClock))
-    {
-        m_commonModule.setModuleGUID(QnUuid::createUuid());
+            m_testSteadyClock));
 
-        m_commonModule.globalSettings()->setOsTimeChangeCheckPeriod(
+        commonModule->globalSettings()->setOsTimeChangeCheckPeriod(
             std::chrono::milliseconds(100));
-        m_commonModule.globalSettings()->setSyncTimeExchangePeriod(
+        commonModule->globalSettings()->setSyncTimeExchangePeriod(
             std::chrono::seconds(1));
-
-        initializeRuntimeInfo();
-
-        m_eventLoopThread.start();
-        m_workAroundMiscDataSaverStub->moveToThread(&m_eventLoopThread);
 
         m_timerManager.start();
     }
@@ -114,19 +126,16 @@ public:
     ~TimeSynchronizationPeer()
     {
         m_timeSynchronizationManager.reset();
-
-        m_eventLoopThread.exit(0);
-        m_eventLoopThread.wait();
     }
 
-    QnCommonModule* commonModule()
+    QnCommonModule* commonModule() const
     {
-        return &m_commonModule;
+        return m_appserver->moduleInstance()->commonModule();
     }
 
     void setSynchronizeWithInternetEnabled(bool val)
     {
-        m_commonModule.globalSettings()->setSynchronizingTimeWithInternet(val);
+        commonModule()->globalSettings()->setSynchronizingTimeWithInternet(val);
     }
 
     bool start()
@@ -145,18 +154,17 @@ public:
     void stop()
     {
         m_timeSynchronizationManager.reset();
-        m_transactionMessageBus.reset();
+        m_appserver.reset();
     }
 
     void restart()
     {
+        m_appserver.reset();
         if (m_timeSynchronizationManager)
             m_timeSynchronizationManager.reset();
-        if (m_transactionMessageBus)
-            m_transactionMessageBus.reset();
 
-        m_transactionMessageBus =
-            std::make_unique<TransactionMessageBusStub>(&m_commonModule);
+        m_appserver = createAppserver();
+
         m_timeSynchronizationManager.reset(new nx::mediaserver::ServerTimeSyncManager(
             commonModule(),
             nullptr, //< No reverse connections are supported in this test.
@@ -172,28 +180,15 @@ public:
 
     void connectTo(TimeSynchronizationPeer* remotePeer)
     {
-        m_transactionMessageBus->addConnectionToRemotePeer(
-            peerData(),
-            remotePeer->peerData(),
-            remotePeer->apiUrl(),
-            /*isIncoming*/ false);
-
-        remotePeer->emulatePeerConnectionAccept(this);
-    }
-
-    void emulatePeerConnectionAccept(TimeSynchronizationPeer* remotePeer)
-    {
-        m_transactionMessageBus->addConnectionToRemotePeer(
-            peerData(),
-            remotePeer->peerData(),
-            remotePeer->apiUrl(),
-            /*isIncoming*/ true);
+        const auto id = remotePeer->peerData().id;
+        auto messageBus = m_appserver->moduleInstance()->ecConnection()->messageBus();
+        messageBus->addOutgoingConnectionToPeer(id, remotePeer->apiUrl());
     }
 
     ::ec2::ApiPeerData peerData() const
     {
         ::ec2::ApiPeerData peerData;
-        peerData.id = m_commonModule.moduleGUID();
+        peerData.id = commonModule()->moduleGUID();
         peerData.peerType = Qn::PT_Server;
         return peerData;
     }
@@ -212,7 +207,7 @@ public:
 
     QnGlobalSettings* globalSettings() const
     {
-        return m_commonModule.globalSettings();
+        return commonModule()->globalSettings();
     }
 
     void shiftSystemClock(std::chrono::milliseconds shift)
@@ -226,28 +221,12 @@ public:
     }
 
 private:
+    Appserver2Ptr m_appserver;
     nx::utils::StandaloneTimerManager m_timerManager;
-    QnCommonModule m_commonModule;
     nx::network::http::TestHttpServer m_httpServer;
     std::shared_ptr<TestSystemClock> m_testSystemClock;
     std::shared_ptr<TestSteadyClock> m_testSteadyClock;
-    std::shared_ptr<MiscManagerStub> m_miscManager;
-    std::shared_ptr<ec2::AbstractECConnection> m_connection;
-    std::unique_ptr<TransactionMessageBusStub> m_transactionMessageBus;
-    std::shared_ptr<WorkAroundMiscDataSaverStub> m_workAroundMiscDataSaverStub;
     std::unique_ptr<nx::time_sync::TimeSyncManager> m_timeSynchronizationManager;
-    QThread m_eventLoopThread;
-
-    void initializeRuntimeInfo()
-    {
-        QnPeerRuntimeInfo localPeerInfo;
-        localPeerInfo.uuid = m_commonModule.moduleGUID();
-        localPeerInfo.data.peer.peerType = Qn::PT_Server;
-        localPeerInfo.data.peer.id = m_commonModule.moduleGUID();
-        localPeerInfo.data.peer.instanceId = m_commonModule.moduleGUID();
-        localPeerInfo.data.peer.persistentId = m_commonModule.moduleGUID();
-        m_commonModule.runtimeInfoManager()->updateLocalItem(localPeerInfo);
-    }
 
     bool startHttpServer()
     {
