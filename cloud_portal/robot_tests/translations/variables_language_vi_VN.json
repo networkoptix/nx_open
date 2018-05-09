@@ -43,6 +43,7 @@
     "ACTIVATE YOUR ACCOUNT EMAIL SUBJECT": "Kích hoạt tài khoản của bạn",
     "RESET PASSWORD EMAIL SUBJECT": "Đặt lại mật khẩu của bạn",
     "INVITED TO SYSTEM EMAIL SUBJECT": "Hệ thống video {{message.system_name}} đã được chia sẻ với bạn",
+    "INVITED TO SYSTEM EMAIL SUBJECT UNREGISTERED": "{{message.sharer_name}} invites you to %PRODUCT_NAME%",
     "DISCONNECT FORM HEADER TEXT": "Hệ thống đã ngắt kết nối từ %PRODUCT_NAME%?",
     "FIRST NAME IS REQUIRED TEXT": "Họ là bắt buộc",
     "LAST NAME IS REQUIRED TEXT": "Họ là bắt buộc",
@@ -57,5 +58,6 @@
     "PASSWORD IS WEAK TEXT": "Sử dụng số, chữ hoa và chữ thường và ký tự đặc biệt để làm cho mật khẩu của bạn mạnh mẽ hơn",
     "THIS LINK IS BROKEN TEXT": "This link is broken,<br>\n            System may be disconnected from %PRODUCT_NAME%,<br>\n            Access to this System may be revoked, <br>\n            or you may be logged into a different account",
     "PAGE NOT FOUND": "Không tìm thấy trang",
-    "TAKE ME HOME": "Quay về trang chủ"
+    "TAKE ME HOME": "Quay về trang chủ",
+    "OPEN NX WITNESS BUTTON TEXT": "Open %VMS_NAME%"
 }

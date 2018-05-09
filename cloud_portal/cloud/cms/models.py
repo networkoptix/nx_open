@@ -39,7 +39,12 @@ def customization_cache(customization_name, value=None, force=False):
             'default_language': customization.default_language.code,
             'mail_from_name': customization.read_global_value('%MAIL_FROM_NAME%'),
             'mail_from_email': customization.read_global_value('%MAIL_FROM_EMAIL%'),
-            'portal_url': custom_config['cloud_portal']['url']
+            'portal_url': custom_config['cloud_portal']['url'],
+            'smtp_host': customization.read_global_value('%SMTP_HOST%'),
+            'smtp_port': customization.read_global_value('%SMTP_PORT%'),
+            'smtp_user': customization.read_global_value('%SMTP_USER%'),
+            'smtp_password': customization.read_global_value('%SMTP_PASSWORD%'),
+            'smtp_tls': customization.read_global_value('%SMTP_TLS%')
         }
         cache.set(customization_name, data)
         update_global_cache(customization, data['version_id'])

@@ -50,7 +50,7 @@ Open Restore Password Dialog With Link
     Wait Until Elements Are Visible    ${RESTORE PASSWORD EMAIL INPUT}    ${RESET PASSWORD BUTTON}
     Input Text    ${RESTORE PASSWORD EMAIL INPUT}    ${email}
     Click Button    ${RESET PASSWORD BUTTON}
-    ${link}    Get Email Link    ${email}    reset
+    ${link}    Get Email Link    ${email}    restore_password
     Go To    ${link}
     Wait Until Elements Are Visible    ${RESET PASSWORD INPUT}    ${SAVE PASSWORD}
 

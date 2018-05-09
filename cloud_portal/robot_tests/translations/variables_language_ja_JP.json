@@ -43,6 +43,7 @@
     "ACTIVATE YOUR ACCOUNT EMAIL SUBJECT": "アカウントの有効化",
     "RESET PASSWORD EMAIL SUBJECT": "パスワードをリセット",
     "INVITED TO SYSTEM EMAIL SUBJECT": "ビデオ システム {{message.system_name}} が共有されました",
+    "INVITED TO SYSTEM EMAIL SUBJECT UNREGISTERED": "{{message.sharer_name}} さんがあなたを %PRODUCT_NAME%に招待しています",
     "DISCONNECT FORM HEADER TEXT": "%PRODUCT_NAME% からシステムを切断?",
     "FIRST NAME IS REQUIRED TEXT": "名前は必須です",
     "LAST NAME IS REQUIRED TEXT": "姓は必須です",
@@ -57,5 +58,6 @@
     "PASSWORD IS WEAK TEXT": "大文字と小文字の文字、特殊記号を使用して、強固なパスワードを作る",
     "THIS LINK IS BROKEN TEXT": "このリンクは壊れています<br>\n            システムは%PRODUCT_NAME%から切断します<br>\n            このシステムへのアクセスは取り消されたか<br>\n            または別のアカウントにログインしている可能性があります",
     "PAGE NOT FOUND": "ページが見つかりません",
-    "TAKE ME HOME": "ホームに移動する"
+    "TAKE ME HOME": "ホームに移動する",
+    "OPEN NX WITNESS BUTTON TEXT": "Open %VMS_NAME%"
 }
