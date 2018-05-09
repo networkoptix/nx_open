@@ -43,8 +43,8 @@ int ProtocolDetectingStreamSocket::recv(
 {
     while (!isProtocolDetected())
     {
-        std::array<char, 128> buf;
-        int bytesRead = actualDataChannel().recv(buf.data(), buf.size(), flags);
+        std::array<char, 1024> buf;
+        int bytesRead = actualDataChannel().recv(buf.data(), buf.size(), 0);
         if (bytesRead <= 0)
             return bytesRead;
 

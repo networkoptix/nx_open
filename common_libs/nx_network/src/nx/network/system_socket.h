@@ -230,13 +230,13 @@ public:
     static int accept(int sockDesc);
 
     virtual bool listen(int queueLen = 128) override;
-    virtual AbstractStreamSocket* accept() override;
+    virtual std::unique_ptr<AbstractStreamSocket> accept() override;
     virtual void pleaseStop(nx::utils::MoveOnlyFunc< void() > handler) override;
     virtual void pleaseStopSync(bool assertIfCalledUnderLock = true) override;
 
     virtual void acceptAsync(AcceptCompletionHandler handler) override;
 
-    AbstractStreamSocket* systemAccept();
+    std::unique_ptr<AbstractStreamSocket> systemAccept();
 
 protected:
     virtual void cancelIoInAioThread() override;

@@ -534,7 +534,7 @@ protected:
                 NX_LOGX(lm("Server address: %1").arg(server->getLocalAddress()), cl_logINFO);
                 address.set_value(server->getLocalAddress());
 
-                std::unique_ptr<AbstractStreamSocket> client(server->accept());
+                auto client = server->accept();
                 ASSERT_TRUE((bool)client);
 
                 do
@@ -1195,7 +1195,7 @@ protected:
         m_serverSocket.setRecvTimeout(acceptTimeout.count());
         while (!m_terminated)
         {
-            std::unique_ptr<AbstractStreamSocket> connection(m_serverSocket.accept());
+            auto connection = m_serverSocket.accept();
             if (!connection)
                 continue;
 

@@ -331,8 +331,9 @@ void QnTcpListener::run()
                 d->localPort = d->serverSocket->getLocalAddress().port;
 
             doPeriodicTasks();
-            nx::network::AbstractStreamSocket* clientSocket = d->serverSocket->accept();
-            if(clientSocket)
+            QSharedPointer<nx::network::AbstractStreamSocket> clientSocket(
+                d->serverSocket->accept().release());
+            if (clientSocket)
             {
                 if (d->connections.size() > d->maxConnections)
                 {
@@ -343,14 +344,12 @@ void QnTcpListener::run()
                             << "Possible ddos attack! Reject incoming TCP connection";
                         d->ddosWarned = true;
                     }
-                    delete clientSocket;
                     continue;
                 }
                 d->ddosWarned = false;
                 NX_VERBOSE(this, lit("New client connection from %1")
                     .arg(clientSocket->getForeignAddress().address.toString()));
-                QnTCPConnectionProcessor* processor =
-                    createRequestProcessor(QSharedPointer<nx::network::AbstractStreamSocket>(clientSocket));
+                QnTCPConnectionProcessor* processor = createRequestProcessor(clientSocket);
                 clientSocket->setRecvTimeout(processor->getSocketTimeout());
                 clientSocket->setSendTimeout(processor->getSocketTimeout());
 
