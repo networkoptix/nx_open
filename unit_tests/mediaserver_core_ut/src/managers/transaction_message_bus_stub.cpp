@@ -141,12 +141,6 @@ ConnectionGuardSharedState* TransactionMessageBusStub::connectionGuardSharedStat
     return nullptr;
 }
 
-void TransactionMessageBusStub::setTimeSyncManager(
-    TimeSynchronizationManager* /*timeSyncManager*/)
-{
-    // TODO
-}
-
 void TransactionMessageBusStub::addConnectionToRemotePeer(
     const ::ec2::ApiPeerData& localPeer,
     const ::ec2::ApiPeerData& remotePeer,

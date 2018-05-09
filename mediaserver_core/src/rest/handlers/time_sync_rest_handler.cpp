@@ -6,7 +6,6 @@
 #include <rest/server/rest_connection_processor.h>
 
 #include <local_connection_factory.h>
-#include "managers/time_manager.h"
 
 namespace nx {
 namespace mediaserver {

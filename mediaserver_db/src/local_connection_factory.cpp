@@ -34,7 +34,6 @@
 #include <http/p2p_connection_listener.h>
 #include <transaction/message_bus_adapter.h>
 #include "server_query_processor.h"
-#include <managers/time_manager.h>
 #include <nx/p2p/p2p_message_bus.h>
 #include <transaction/json_transaction_serializer.h>
 #include <transaction/ubjson_transaction_serializer.h>

@@ -65,7 +65,6 @@ public:
     virtual QnUbjsonTransactionSerializer* ubjsonTranSerializer() const override;
 
     virtual ConnectionGuardSharedState* connectionGuardSharedState() override;
-    virtual void setTimeSyncManager(TimeSynchronizationManager* timeSyncManager) override;
 
     void addConnectionToRemotePeer(
         const ::ec2::ApiPeerData& localPeer,

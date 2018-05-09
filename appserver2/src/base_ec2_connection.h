@@ -26,7 +26,6 @@
 #include "managers/updates_manager.h"
 #include "managers/misc_manager.h"
 #include "managers/discovery_manager.h"
-#include "managers/time_manager.h"
 #include "managers/time_manager_api.h"
 #include <nx/time_sync/time_sync_manager.h>
 

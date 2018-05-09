@@ -25,25 +25,6 @@ static const std::chrono::minutes kTimeSyncInterval(10);
 const QString kTimeSyncUrlPath = QString::fromLatin1("/api/gettime");
 static const QByteArray kTimeDeltaParamName = "sync_time_delta";
 
-class SystemClock: public AbstractSystemClock
-{
-public:
-    virtual std::chrono::milliseconds millisSinceEpoch() override
-    {
-        return nx::utils::millisSinceEpoch();
-    }
-};
-
-class SteadyClock: public AbstractSteadyClock
-{
-public:
-    virtual std::chrono::milliseconds now() override
-    {
-        using namespace std::chrono;
-        return duration_cast<milliseconds>(steady_clock::now().time_since_epoch());
-    }
-};
-
 TimeSyncManager::TimeSyncManager(
     QnCommonModule* commonModule,
     const std::shared_ptr<AbstractSystemClock>& systemClock,
@@ -169,7 +150,6 @@ void TimeSyncManager::setSyncTimeInternal(std::chrono::milliseconds value)
     m_synchronizedTime = value;
     m_synchronizedOnClock = m_steadyClock->now();
 }
-
 
 std::chrono::milliseconds TimeSyncManager::getSyncTime() const
 {

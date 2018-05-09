@@ -100,8 +100,16 @@ public:
 
     QnCommonModule* commonModule() const
     {
-        if (m_serverModule)
-            return m_serverModule->commonModule();
+        if (const auto& module = m_serverModule.lock())
+            return module->commonModule();
+        else
+            return nullptr;
+    }
+
+    QnMediaServerModule* serverModule() const
+    {
+        if (const auto& module = m_serverModule.lock())
+            return module.get();
         else
             return nullptr;
     }
@@ -210,7 +218,7 @@ private:
     CmdLineArguments m_cmdLineArguments;
     QnUuid m_obsoleteGuid;
     std::unique_ptr<nx::utils::promise<void>> m_initStoragesAsyncPromise;
-    std::shared_ptr<QnMediaServerModule> m_serverModule;
+    std::weak_ptr<QnMediaServerModule> m_serverModule;
     const bool m_serviceMode;
     std::unique_ptr<MSSettings> m_settings;
     bool m_stopObjectsCalled = false;

@@ -7,6 +7,7 @@
 #include <nx/network/abstract_socket.h>
 #include <common/common_module_aware.h>
 #include <nx/utils/thread/mutex.h>
+#include <nx/utils/time.h>
 
 class AbstractSystemClock
 {
@@ -25,6 +26,25 @@ public:
      * @return Time from some unspecified epoch.
      */
     virtual std::chrono::milliseconds now() = 0;
+};
+
+class SystemClock: public AbstractSystemClock
+{
+public:
+    virtual std::chrono::milliseconds millisSinceEpoch() override
+    {
+        return nx::utils::millisSinceEpoch();
+    }
+};
+
+class SteadyClock: public AbstractSteadyClock
+{
+public:
+    virtual std::chrono::milliseconds now() override
+    {
+        using namespace std::chrono;
+        return duration_cast<milliseconds>(steady_clock::now().time_since_epoch());
+    }
 };
 
 struct QnRoute;

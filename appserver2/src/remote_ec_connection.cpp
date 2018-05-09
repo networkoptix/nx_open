@@ -10,7 +10,6 @@
 #include <transaction/message_bus_adapter.h>
 #include <nx/p2p/p2p_message_bus.h>
 #include "common/common_module.h"
-#include "managers/time_manager.h"
 
 namespace ec2
 {

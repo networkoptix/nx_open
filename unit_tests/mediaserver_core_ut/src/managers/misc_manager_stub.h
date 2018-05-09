@@ -4,9 +4,8 @@
 
 #include <nx/network/aio/basic_pollable.h>
 
-#include <nx_ec/ec_api.h>
 
-#include <managers/time_manager.h>
+#include <nx_ec/ec_api.h>
 
 namespace ec2 {
 namespace test {
@@ -61,6 +60,15 @@ private:
 };
 
 //-------------------------------------------------------------------------------------------------
+
+// TODO: #ak This class should be removed when we can use m_miscManager to save parameters.
+class AbstractWorkAroundMiscDataSaver
+{
+public:
+    virtual ~AbstractWorkAroundMiscDataSaver() = default;
+
+    virtual ErrorCode saveSync(const ApiMiscData& data) = 0;
+};
 
 class WorkAroundMiscDataSaverStub:
     public AbstractWorkAroundMiscDataSaver,
