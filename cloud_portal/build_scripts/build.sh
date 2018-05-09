@@ -23,11 +23,15 @@ then
                     pushd $entry
                     for element in $(ls -A .)
                     do
+                        echo "copy $entry/$element"
                         [ -e "$element" ] && rm -rf "$element"
+                        cp -pr "$VMS_REPOSITORY/cloud_portal/$entry/$element" "$element"
                     done
                     popd
                 else
+                    echo "copy $entry"
                     [ -e "$entry" ] && rm -rf "$entry"
+                    cp -pr "$VMS_REPOSITORY/cloud_portal/$entry" "$entry"
                 fi
             done
         popd
