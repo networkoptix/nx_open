@@ -363,6 +363,31 @@ protected:
             << SystemError::getLastOSErrorText().toStdString();
     }
 
+    void whenSendAsyncRandomDataToServer()
+    {
+        ASSERT_TRUE(m_connection->setNonBlockingMode(true));
+
+        m_sentData = nx::utils::generateRandomName(16*1024);
+        m_connection->sendAsync(
+            m_sentData,
+            [this](SystemError::ErrorCode /*systemErrorCode*/, std::size_t /*bytesSent*/)
+            {
+            });
+    }
+
+    void whenServerReadsWithFlag(int recvFlags)
+    {
+        auto acceptedConnection = m_serverSocket->accept();
+
+        std::basic_string<uint8_t> readBuf(m_sentData.size(), 'x');
+        ASSERT_EQ(
+            m_sentData.size(),
+            acceptedConnection->recv(readBuf.data(), readBuf.size(), recvFlags))
+            << SystemError::getLastOSErrorText().toStdString();
+
+        m_synchronousServerReceivedData.write(readBuf.data(), m_sentData.size());
+    }
+
     void continueReceiving()
     {
         using namespace std::placeholders;
@@ -692,6 +717,17 @@ TYPED_TEST_P(StreamSocketAcceptance, transfer_sync)
     this->thenServerReceivedData();
 }
 
+TYPED_TEST_P(StreamSocketAcceptance, recv_sync_with_wait_all_flag)
+{
+    this->givenListeningServer();
+    this->givenConnectedSocket();
+
+    this->whenSendAsyncRandomDataToServer();
+    this->whenServerReadsWithFlag(MSG_WAITALL);
+
+    this->thenServerReceivedData();
+}
+
 TYPED_TEST_P(StreamSocketAcceptance, recv_timeout_is_reported)
 {
     this->givenSilentServer();
@@ -731,6 +767,7 @@ REGISTER_TYPED_TEST_CASE_P(StreamSocketAcceptance,
     receive_timeout_change_is_not_ignored,
     transfer_async,
     transfer_sync,
+    recv_sync_with_wait_all_flag,
     recv_timeout_is_reported,
     msg_dont_wait_flag_makes_recv_call_nonblocking,
     async_connect_is_cancelled_by_cancelling_write);

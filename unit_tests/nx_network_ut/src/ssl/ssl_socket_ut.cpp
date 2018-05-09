@@ -17,16 +17,30 @@ namespace test {
 
 namespace {
 
-class SslOverTcpServerSocket:
+class EnforcedSslOverTcpServerSocket:
     public ssl::StreamServerSocket
 {
     using base_type = ssl::StreamServerSocket;
 
 public:
-    SslOverTcpServerSocket(int ipVersion = AF_INET):
+    EnforcedSslOverTcpServerSocket(int ipVersion = AF_INET):
         base_type(
             std::make_unique<TCPServerSocket>(ipVersion),
             ssl::EncryptionUse::always)
+    {
+    }
+};
+
+class AutoDetectedSslOverTcpServerSocket:
+    public ssl::StreamServerSocket
+{
+    using base_type = ssl::StreamServerSocket;
+
+public:
+    AutoDetectedSslOverTcpServerSocket(int ipVersion = AF_INET):
+        base_type(
+            std::make_unique<TCPServerSocket>(ipVersion),
+            ssl::EncryptionUse::autoDetectByReceivedData)
     {
     }
 };
@@ -43,18 +57,40 @@ public:
     }
 };
 
-struct SslSocketTypeSet
+struct SslSocketBothEndsEncryptedTypeSet
 {
     using ClientSocket = SslOverTcpStreamSocket;
-    using ServerSocket = SslOverTcpServerSocket;
+    using ServerSocket = EnforcedSslOverTcpServerSocket;
+};
+
+struct SslSocketBothEndsEncryptedAutoDetectingServerTypeSet
+{
+    using ClientSocket = SslOverTcpStreamSocket;
+    using ServerSocket = AutoDetectedSslOverTcpServerSocket;
+};
+
+struct SslSocketClientNotEncryptedTypeSet
+{
+    using ClientSocket = TCPSocket;
+    using ServerSocket = AutoDetectedSslOverTcpServerSocket;
 };
 
 } // namespace
 
 INSTANTIATE_TYPED_TEST_CASE_P(
-    SslStreamSocket,
+    SslSocketBothEndsEncrypted,
     StreamSocketAcceptance,
-    SslSocketTypeSet);
+    SslSocketBothEndsEncryptedTypeSet);
+
+INSTANTIATE_TYPED_TEST_CASE_P(
+    SslSocketBothEndsEncryptedAutoDetectingServer,
+    StreamSocketAcceptance,
+    SslSocketBothEndsEncryptedAutoDetectingServerTypeSet);
+
+INSTANTIATE_TYPED_TEST_CASE_P(
+    SslSocketClientNotEncrypted,
+    StreamSocketAcceptance,
+    SslSocketClientNotEncryptedTypeSet);
 
 } // namespace test
 
