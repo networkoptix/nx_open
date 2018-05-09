@@ -42,7 +42,8 @@
     "YOUR SYSTEM TEXT": "Uw systeem",
     "ACTIVATE YOUR ACCOUNT EMAIL SUBJECT": "Account activeren",
     "RESET PASSWORD EMAIL SUBJECT": "Herstel uw wachtwoord",
-    "INVITED TO SYSTEM EMAIL SUBJECT": "Videosysteem {{message.system_name}} is met u gedeeld",
+    "INVITED TO SYSTEM EMAIL SUBJECT": "Het volgende video systeem werd met u gedeeld; {{message.system_name}}",
+    "INVITED TO SYSTEM EMAIL SUBJECT UNREGISTERED": "{{message.sharer_name}} nodigt u uit voor%PRODUCT_NAME%",
     "DISCONNECT FORM HEADER TEXT": "Verbinding verbreken met systeem %PRODUCT_NAME%?",
     "FIRST NAME IS REQUIRED TEXT": "Voornaam is verplicht",
     "LAST NAME IS REQUIRED TEXT": "Achternaam is verplicht",
@@ -57,5 +58,6 @@
     "PASSWORD IS WEAK TEXT": "Gebruik cijfers, hoofdletters, kleine letters en speciale tekens om uw wachtwoord sterker te maken",
     "THIS LINK IS BROKEN TEXT": "Deze link is gebroken, <br>het systeem kan worden losgekoppeld van %PRODUCT_NAME%, <br>toegang tot dit systeem kan zijn ingetrokken, <br>of u bent reeds ingelogd bij een ander account",
     "PAGE NOT FOUND": "Pagina niet gevonden",
-    "TAKE ME HOME": "Breng me terug naar de homepagina"
+    "TAKE ME HOME": "Breng me terug naar de homepagina",
+    "OPEN NX WITNESS BUTTON TEXT": "Open %VMS_NAME%"
 }

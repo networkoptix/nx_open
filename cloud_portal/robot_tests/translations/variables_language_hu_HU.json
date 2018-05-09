@@ -43,6 +43,7 @@
     "ACTIVATE YOUR ACCOUNT EMAIL SUBJECT": "Fiók aktiválása",
     "RESET PASSWORD EMAIL SUBJECT": "A jelszó alaphelyzetbe állítása",
     "INVITED TO SYSTEM EMAIL SUBJECT": "Hozzáférést kapott {{message.system_name}} videó rendszerhez",
+    "INVITED TO SYSTEM EMAIL SUBJECT UNREGISTERED": "{{message.sharer_name}} invites you to %PRODUCT_NAME%",
     "DISCONNECT FORM HEADER TEXT": "Megszünteti a kapcsolatot %PRODUCT_NAME% felhővel?",
     "FIRST NAME IS REQUIRED TEXT": "Utónév megadása szükséges",
     "LAST NAME IS REQUIRED TEXT": "Vezetéknév megadása szükséges",
@@ -57,5 +58,6 @@
     "PASSWORD IS WEAK TEXT": "Használjon számokat, kis és nagybetűket és speciális karaktereket az erősebb jelszó érdekében",
     "THIS LINK IS BROKEN TEXT": "This link is broken,<br>\n            System may be disconnected from %PRODUCT_NAME%,<br>\n            Access to this System may be revoked, <br>\n            or you may be logged into a different account",
     "PAGE NOT FOUND": "Az oldal nem található",
-    "TAKE ME HOME": "Vigyen haza"
+    "TAKE ME HOME": "Vigyen haza",
+    "OPEN NX WITNESS BUTTON TEXT": "Open %VMS_NAME%"
 }
