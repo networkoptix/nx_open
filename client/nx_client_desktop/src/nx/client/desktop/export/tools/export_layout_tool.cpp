@@ -482,9 +482,7 @@ bool ExportLayoutTool::exportMediaResource(const QnMediaResourcePtr& resource)
         lit("mkv"),
         d->storage,
         role,
-        serverTimeZone,
-        0,
-        nx::core::transcoding::FilterChain());
+        serverTimeZone);
 
     return true;
 }

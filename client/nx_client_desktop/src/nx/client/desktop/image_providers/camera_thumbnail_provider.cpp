@@ -80,7 +80,7 @@ QSize CameraThumbnailProvider::sizeHint() const
     if (!m_image.isNull())
         return m_image.size();
 
-    return QnCameraThumbnailManager::sizeHintForCamera(m_request.camera, m_request.size);
+    return CameraThumbnailManager::sizeHintForCamera(m_request.camera, m_request.size);
 }
 
 Qn::ThumbnailStatus CameraThumbnailProvider::status() const

@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>562</width>
-    <height>115</height>
+    <width>539</width>
+    <height>120</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -34,11 +34,38 @@
     </widget>
    </item>
    <item>
-    <widget class="QCheckBox" name="auditTrailCheckBox">
-     <property name="text">
-      <string>Enable audit trail</string>
-     </property>
-    </widget>
+    <layout class="QHBoxLayout" name="horizontalLayout_3">
+     <item>
+      <widget class="QCheckBox" name="auditTrailCheckBox">
+       <property name="text">
+        <string>Enable audit trail</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="nx::client::desktop::HintButton" name="auditTrailHint" native="true">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <spacer name="horizontalSpacer_3">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>40</width>
+         <height>20</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+    </layout>
    </item>
    <item>
     <layout class="QHBoxLayout" name="horizontalLayout">
@@ -56,6 +83,16 @@
        </property>
        <property name="alignment">
         <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="nx::client::desktop::HintButton" name="statisticsReportHint" native="true">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
        </property>
       </widget>
      </item>
@@ -120,9 +157,15 @@
    </item>
   </layout>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>nx::client::desktop::HintButton</class>
+   <extends>QWidget</extends>
+   <header location="global">nx/client/desktop/common/widgets/hint_button.h</header>
+  </customwidget>
+ </customwidgets>
  <tabstops>
   <tabstop>autoDiscoveryCheckBox</tabstop>
-  <tabstop>auditTrailCheckBox</tabstop>
   <tabstop>statisticsReportCheckBox</tabstop>
   <tabstop>autoSettingsCheckBox</tabstop>
  </tabstops>

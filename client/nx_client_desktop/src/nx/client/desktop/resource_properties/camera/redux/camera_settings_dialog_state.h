@@ -2,19 +2,19 @@
 
 #include <QtCore/QList>
 
+#include <api/model/api_ioport_data.h>
+#include <core/ptz/media_dewarping_params.h>
 #include <core/resource/device_dependent_strings.h>
 #include <core/resource/media_stream_capability.h>
 #include <core/resource/motion_window.h>
 #include <core/misc/schedule_task.h>
-
-#include <nx/vms/api/data/camera_attributes_data.h>
+#include <utils/common/aspect_ratio.h>
 
 #include <nx/client/desktop/common/data/rotation.h>
 #include <nx/client/desktop/resource_properties/camera/utils/schedule_cell_params.h>
-
-#include <utils/common/aspect_ratio.h>
-
 #include <nx/utils/std/optional.h>
+#include <nx/vms/api/data/camera_attributes_data.h>
+#include <nx/vms/api/types_fwd.h>
 
 namespace nx {
 namespace client {
@@ -32,8 +32,14 @@ struct CameraSettingsDialogState
 
         T operator()() const { return get(); }
 
+        void setUserIfChanged(T value)
+        {
+            if (m_user || m_base != value)
+                m_user = value;
+        }
+
     private:
-        T m_base;
+        T m_base = T();
         std::optional<T> m_user;
     };
 
@@ -65,34 +71,34 @@ struct CameraSettingsDialogState
     enum class Alert
     {
         // Brush was changed (mode, fps, quality).
-        BrushChanged,
+        brushChanged,
 
         // Recording was enabled, while schedule is empty.
-        EmptySchedule,
+        emptySchedule,
 
         // Not enough licenses to enable recording.
-        NotEnoughLicenses,
+        notEnoughLicenses,
 
         // License limit exceeded, recording will not be enabled.
-        LicenseLimitExceeded,
+        licenseLimitExceeded,
 
         // Schedule was changed but recording is not enabled.
-        RecordingIsNotEnabled,
+        recordingIsNotEnabled,
 
         // High minimal archive length value selected.
-        HighArchiveLength,
+        highArchiveLength,
 
         // Motion detection was enabled while recording was not.
-        MotionDetectionRequiresRecording,
+        motionDetectionRequiresRecording,
 
         // Selection attempt produced too many motion rectangles.
-        MotionDetectionTooManyRectangles,
+        motionDetectionTooManyRectangles,
 
         // Selection attempt produced too many motion mask rectangles.
-        MotionDetectionTooManyMaskRectangles,
+        motionDetectionTooManyMaskRectangles,
 
         // Selection attempt produced too many motion sensitivity rectangles.
-        MotionDetectionTooManySensitivityRectangles,
+        motionDetectionTooManySensitivityRectangles,
     };
 
     CameraSettingsDialogState() = default;
@@ -111,6 +117,13 @@ struct CameraSettingsDialogState
     int devicesCount = 0;
     QnCameraDeviceType deviceType = QnCameraDeviceType::Mixed;
 
+    struct MotionConstraints
+    {
+        int maxTotalRects = 0;
+        int maxSensitiveRects = 0;
+        int maxMaskRects = 0;
+    };
+
     struct SingleCameraProperties
     {
         QString id;
@@ -123,27 +136,56 @@ struct CameraSettingsDialogState
         QString webPage;
         std::optional<QString> primaryStream;
         std::optional<QString> secondaryStream;
+        bool hasVideo = false;
 
         int maxFpsWithoutMotion = 0;
 
-        bool hasMotionConstraints = false;
-        int maxMotionRects = 0;
-        int maxMotionMaskRects = 0;
-        int maxMotionSensitivityRects = 0;
+        std::optional<MotionConstraints> motionConstraints;
     };
     SingleCameraProperties singleCameraProperties;
+
+    struct FisheyeCalibrationSettings
+    {
+        QPointF offset;
+        qreal radius = 0.5;
+        qreal aspectRatio = 1.0;
+
+        bool operator==(const FisheyeCalibrationSettings& s) const
+        {
+            return offset == s.offset && qFuzzyEquals(radius, s.radius)
+                && qFuzzyEquals(aspectRatio, s.aspectRatio);
+        }
+
+        bool operator!=(const FisheyeCalibrationSettings& s) const
+        {
+            return !(*this == s);
+        }
+    };
 
     struct SingleCameraSettings
     {
         UserEditable<bool> enableMotionDetection;
         UserEditable<QList<QnMotionRegion>> motionRegionList;
+
+        UserEditable<bool> enableFisheyeDewarping;
+        UserEditable<QnMediaDewarpingParams::ViewMode> fisheyeMountingType;
+        UserEditable<FisheyeCalibrationSettings> fisheyeCalibrationSettings;
+        UserEditable<qreal> fisheyeFovRotation;
     };
     SingleCameraSettings singleCameraSettings;
+
+    struct IoModuleSettings
+    {
+        UserEditable<QnIOPortDataList> ioPortsData;
+        UserEditable<vms::api::IoModuleVisualStyle> visualStyle;
+    };
+    IoModuleSettings singleIoModuleSettings;
 
     struct CombinedProperties
     {
         CombinedValue isDtsBased;
         CombinedValue isWearable;
+        CombinedValue isIoModule;
         CombinedValue hasMotion;
         CombinedValue hasDualStreaming;
 
@@ -253,6 +295,19 @@ struct CameraSettingsDialogState
     {
         return devicesDescription.isDtsBased == CombinedValue::None
             && devicesDescription.isWearable == CombinedValue::None;
+    }
+
+    QnMediaDewarpingParams fisheyeSettings() const
+    {
+        QnMediaDewarpingParams params;
+        FisheyeCalibrationSettings calibration = singleCameraSettings.fisheyeCalibrationSettings();
+        params.enabled = singleCameraSettings.enableFisheyeDewarping();
+        params.xCenter = 0.5 + calibration.offset.x();
+        params.yCenter = 0.5 + calibration.offset.y();
+        params.radius = calibration.radius;
+        params.hStretch = calibration.aspectRatio;
+        params.fovRot = singleCameraSettings.fisheyeFovRotation();
+        return params;
     }
 };
 

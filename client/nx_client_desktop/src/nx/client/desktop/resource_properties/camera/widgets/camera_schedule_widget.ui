@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1137</width>
-    <height>893</height>
+    <width>761</width>
+    <height>755</height>
    </rect>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout_6">
@@ -39,8 +39,8 @@
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>1103</width>
-        <height>891</height>
+        <width>741</width>
+        <height>735</height>
        </rect>
       </property>
       <layout class="QVBoxLayout" name="verticalLayout_7" stretch="0,0,0,0,0,1">
@@ -284,6 +284,11 @@
   </layout>
  </widget>
  <customwidgets>
+  <customwidget>
+   <class>nx::client::desktop::HintButton</class>
+   <extends>QWidget</extends>
+   <header location="global">nx/client/desktop/common/widgets/hint_button.h</header>
+  </customwidget>
   <customwidget>
    <class>QnScheduleGridWidget</class>
    <extends>QWidget</extends>

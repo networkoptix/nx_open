@@ -47,7 +47,7 @@ def _write_config(config, path):
 @pytest.fixture(scope='session')
 def ad_hoc_ssh_dir():
     path = Path.home() / '.func_tests/ad_hoc_ssh'
-    rmtree(str(path))
+    rmtree(str(path), ignore_errors=True)
     path.mkdir(exist_ok=True)
     return path
 

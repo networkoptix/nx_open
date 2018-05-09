@@ -918,6 +918,14 @@
         }
     },
 
+    "nx::client::desktop::HintButton": {
+        "palette": {
+            "default": {
+                "text": "light16"
+            }
+        }
+    },
+
     "nx::client::desktop::CompactTabBar": {
         "palette": {
             "default": {

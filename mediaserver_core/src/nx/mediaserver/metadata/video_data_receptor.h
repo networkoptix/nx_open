@@ -1,8 +1,8 @@
 #pragma once
 
+#include <set>
+
 #include <nx/streaming/video_data_packet.h>
-#include <nx/sdk/metadata/common_compressed_video_packet.h>
-#include <core/dataconsumer/abstract_data_receptor.h>
 #include <utils/media/frame_info.h>
 #include "nx/sdk/metadata/uncompressed_video_frame.h"
 
@@ -13,6 +13,8 @@ namespace metadata {
 class VideoDataReceptor
 {
 public:
+    using PixelFormat = nx::sdk::metadata::UncompressedVideoFrame::PixelFormat;
+
     /**
      * Accept a video frame. Either one of the supplied pointers may be null if the respective
      * frame kind was not requested by acceptedFrameKind().
@@ -21,34 +23,29 @@ public:
         const QnConstCompressedVideoDataPtr& compressedFrame,
         const CLConstVideoDecoderOutputPtr& uncompressedFrame)>;
 
-    /**
-     * Should be called from the callback to copy the incoming data to the SDK format. To obtain
-     * multiple copies of the same data, should be called multiple times.
-     * @return Null if the data is null.
-     */
-    static nx::sdk::metadata::CommonCompressedVideoPacket* compressedVideoDataToPlugin(
-        const QnConstCompressedVideoDataPtr& frame, bool needDeepCopy);
+    using NeededUncompressedPixelFormats = std::set<PixelFormat>;
 
-    /**
-     * Should be called from the callback to copy the incoming data to the SDK format. To obtain
-     * multiple copies of the same data, should be called multiple times.
-     * @return Null if the data is null.
-     */
-    static nx::sdk::metadata::UncompressedVideoFrame* videoDecoderOutputToPlugin(
-        const CLConstVideoDecoderOutputPtr& frame, bool needDeepCopy);
-
-    enum class AcceptedFrameKind { compressed, uncompressed };
-
-    VideoDataReceptor(Callback callback, AcceptedFrameKind acceptedFrameKind):
-        m_callback(callback), m_acceptedFrameKind(acceptedFrameKind)
+    VideoDataReceptor(
+        Callback callback,
+        bool needsCompressedFrames,
+        NeededUncompressedPixelFormats neededUncompressedPixelFormats)
+        :
+        m_callback(callback),
+        m_needsCompressedFrames(needsCompressedFrames),
+        m_neededUncompressedPixelFormats(neededUncompressedPixelFormats)
     {
     }
 
-    AcceptedFrameKind acceptedFrameKind() const { return m_acceptedFrameKind; }
+    bool needsCompressedFrames() const { return m_needsCompressedFrames; }
+
+    NeededUncompressedPixelFormats neededUncompressedPixelFormats() const
+    {
+        return m_neededUncompressedPixelFormats;
+    }
 
     /**
      * Call the callback for a video frame. Either one of the supplied pointers may be null if the
-     * respective frame kind was not requested by acceptedFrameKind().
+     * respective frame kind is not in acceptedFrameKinds().
      */
     void putFrame(
         const QnConstCompressedVideoDataPtr& compressedFrame,
@@ -58,17 +55,9 @@ public:
     }
 
 private:
-    static nx::sdk::metadata::UncompressedVideoFrame* convertToYuv420pSdkFrame(
-        CLConstVideoDecoderOutputPtr frame,
-        bool needDeepCopy);
-
-    static nx::sdk::metadata::UncompressedVideoFrame* convertToArgbSdkFrame(
-        CLConstVideoDecoderOutputPtr frame,
-        bool needDeepCopy);
-
-private:
     Callback m_callback;
-    AcceptedFrameKind m_acceptedFrameKind = AcceptedFrameKind::compressed;
+    const bool m_needsCompressedFrames;
+    const NeededUncompressedPixelFormats m_neededUncompressedPixelFormats;
 };
 using VideoDataReceptorPtr = QSharedPointer<VideoDataReceptor>;
 

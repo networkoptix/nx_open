@@ -87,6 +87,12 @@ Q_DECLARE_FLAGS(CameraBackupQualities, CameraBackupQuality)
 QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(CameraBackupQuality)
 Q_DECLARE_OPERATORS_FOR_FLAGS(CameraBackupQualities)
 
+enum class IoModuleVisualStyle
+{
+    form,
+    tile
+};
+
 } // namespace api
 } // namespace vms
 } // namespace nx

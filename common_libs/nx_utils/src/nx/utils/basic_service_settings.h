@@ -18,6 +18,7 @@ public:
     virtual void load(int argc, const char **argv) override;
     virtual bool isShowHelpRequested() const override;
     virtual void printCmdLineArgsHelp() override;
+    virtual QString logBaseName() const override;
 
 protected:
     virtual void loadSettings() = 0;

@@ -1,8 +1,9 @@
 #pragma once
 
+#include <memory>
+
 #include <QtCore/QTimer>
 
-#include <memory>
 #include <nx/utils/uuid.h>
 #include <common/common_module_aware.h>
 #include <nx/utils/thread/mutex.h>
@@ -18,6 +19,7 @@
 #include "routing_helpers.h"
 #include "connection_context.h"
 #include "p2p_serialization.h"
+#include <managers/time_manager.h>
 
 namespace nx {
 namespace p2p {
@@ -40,10 +42,10 @@ using SubscribeForDataUpdatesMessageType = QVector<SubscribeForDataUpdateRecord>
 
 class MessageBus: public ec2::TransactionMessageBusBase
 {
-    Q_OBJECT;
+    Q_OBJECT
     using base_type = ec2::TransactionMessageBusBase;
-public:
 
+public:
     const static QString kUrlPath;
     const static QString kCloudPathPrefix;
 
@@ -52,7 +54,7 @@ public:
         QnCommonModule* commonModule,
         ec2::QnJsonTransactionSerializer* jsonTranSerializer,
         QnUbjsonTransactionSerializer* ubjsonTranSerializer);
-    virtual ~MessageBus();
+    ~MessageBus() override;
 
     virtual void addOutgoingConnectionToPeer(const QnUuid& id, const nx::utils::Url& url) override;
     virtual void removeOutgoingConnectionFromPeer(const QnUuid& id) override;
@@ -278,9 +280,6 @@ protected:
 protected:
 	QMap<ApiPersistentIdData, P2pConnectionPtr> getCurrentSubscription() const;
 
-	template <typename Function>
-	bool handleTransactionWithHeader(const P2pConnectionPtr& connection, const QByteArray& data, Function function);
-
 	/**  Local connections are not supposed to be shown in 'aliveMessage' */
 	bool isLocalConnection(const ApiPersistentIdData& peer) const;
     void createOutgoingConnections(const QMap<ApiPersistentIdData, P2pConnectionPtr>& currentSubscription);
@@ -290,14 +289,39 @@ protected:
 	void emitPeerFoundLostSignals();
 	void connectSignals(const P2pConnectionPtr& connection);
 	void startReading(P2pConnectionPtr connection);
-	void sendRuntimeData(const P2pConnectionPtr& connection, const QList<ApiPersistentIdData>& peers);
+    void sendRuntimeData(const P2pConnectionPtr& connection, const QList<ApiPersistentIdData>& peers);
 
-
-    template <class T>
+    template<typename T>
     bool processSpecialTransaction(
         const QnTransaction<T>& tran,
-        const P2pConnectionPtr& connection,
-        const TransportHeader& transportHeader);
+        const nx::p2p::P2pConnectionPtr& connection,
+        const nx::p2p::TransportHeader& transportHeader)
+    {
+        if (nx::utils::log::isToBeLogged(nx::utils::log::Level::verbose, this))
+            printTran(connection, tran, Connection::Direction::incoming);
+
+        ApiPersistentIdData peerId(tran.peerID, tran.persistentInfo.dbID);
+
+        // Process special cases.
+        switch (tran.command)
+        {
+            // TODO: Move this to the global settings param or emit this data via
+            // NotificationManager.
+            case ApiCommand::forcePrimaryTimeServer:
+                m_timeSyncManager->onGotPrimariTimeServerTran(tran);
+                if (localPeer().isServer())
+                    sendTransaction(tran, transportHeader); //< Proxy.
+                return true;
+            case ApiCommand::broadcastPeerSyncTime:
+                m_timeSyncManager->resyncTimeWithPeer(tran.peerID);
+                return true;
+            case ApiCommand::runtimeInfoChanged:
+                processRuntimeInfo(tran, connection, transportHeader);
+                return true;
+            default:
+                return false; //< Not a special case.
+        }
+    }
 
     void gotTransaction(
         const QnTransaction<nx::vms::api::UpdateSequenceData> &tran,

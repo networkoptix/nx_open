@@ -764,7 +764,7 @@
     </message>
     <message>
       <location/>
-      <source>Logical Id</source>
+      <source>Logical ID</source>
       <translation>論理ID</translation>
     </message>
   </context>
@@ -772,7 +772,7 @@
     <name>CameraInputBusinessEventWidget</name>
     <message>
       <location filename="../src/ui/widgets/business/camera_input_business_event_widget.ui"/>
-      <source>Input Id</source>
+      <source>Input ID</source>
       <translation>入力ID</translation>
     </message>
   </context>
@@ -798,7 +798,7 @@
     </message>
     <message>
       <location/>
-      <source>Output Id:</source>
+      <source>Output ID:</source>
       <translation>出力ID：</translation>
     </message>
   </context>
@@ -1513,7 +1513,7 @@
     </message>
     <message>
       <location/>
-      <source>Locked to Hardware Id:</source>
+      <source>Locked to Hardware ID:</source>
       <translation>ハードウェアID:</translation>
     </message>
   </context>
@@ -1612,8 +1612,8 @@
     </message>
     <message>
       <location/>
-      <source>Hardware Id</source>
-      <translation>ハードウェア Id</translation>
+      <source>Hardware ID</source>
+      <translation>ハードウェア ID</translation>
     </message>
   </context>
   <context>

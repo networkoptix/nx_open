@@ -27,3 +27,7 @@ QN_FUSION_ADAPT_STRUCT_FUNCTIONS(CameraMediaCapability, (json), CameraMediaCapab
 
 } // namespace media
 } // namespace nx
+
+QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(nx::media, CameraTraitType,
+    (nx::media::CameraTraitType::aspectRatioDependent, "aspectRatioDependent")
+);

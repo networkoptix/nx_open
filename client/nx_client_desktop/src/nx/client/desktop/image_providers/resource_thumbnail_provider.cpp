@@ -83,13 +83,13 @@ struct ResourceThumbnailProvider::Private
             painter.drawPixmap(0, 0, pixmap);
             painter.setOpacity(1.0);
 
-            baseProvider.reset(new QnBasicImageProvider(dst.toImage()));
+            baseProvider.reset(new BasicImageProvider(dst.toImage()));
         }
 
         return true;
     }
 
-    QScopedPointer<QnImageProvider> baseProvider;
+    QScopedPointer<ImageProvider> baseProvider;
     api::ResourceImageRequest request;
 };
 
@@ -126,9 +126,9 @@ void ResourceThumbnailProvider::setRequestData(const api::ResourceImageRequest& 
     }
     else if (auto p = d->baseProvider.data())
     {
-        connect(p, &QnImageProvider::imageChanged, this, &QnImageProvider::imageChanged);
-        connect(p, &QnImageProvider::statusChanged, this, &QnImageProvider::statusChanged);
-        connect(p, &QnImageProvider::sizeHintChanged, this, &QnImageProvider::sizeHintChanged);
+        connect(p, &ImageProvider::imageChanged, this, &ImageProvider::imageChanged);
+        connect(p, &ImageProvider::statusChanged, this, &ImageProvider::statusChanged);
+        connect(p, &ImageProvider::sizeHintChanged, this, &ImageProvider::sizeHintChanged);
     }
 }
 

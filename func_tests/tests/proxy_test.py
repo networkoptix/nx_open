@@ -36,6 +36,8 @@ def test_ping(iterations, proxy, proxy_headers):
 
 @pytest.mark.parametrize('iterations', [1, 2, 10])
 def test_ping_alternate_addressee(proxy, proxy_headers, iterations):
+    # When doing non-proxy request after proxy request,
+    # connection sometimes is closed by MediaServer.
     with Session() as session:
         for _ in range(iterations):
             session.get(proxy.api.url('api/ping')).raise_for_status()

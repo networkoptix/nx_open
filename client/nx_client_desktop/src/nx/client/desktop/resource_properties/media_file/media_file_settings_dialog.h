@@ -11,11 +11,11 @@ namespace Ui {
 class MediaFileSettingsDialog;
 }
 
-class QnImageProvider;
-
 namespace nx {
 namespace client {
 namespace desktop {
+
+class ImageProvider;
 
 class MediaFileSettingsDialog:
     public QnButtonBoxDialog,
@@ -39,7 +39,7 @@ private:
 
     bool m_updating;
     QnMediaResourcePtr m_resource;
-    QScopedPointer<QnImageProvider> m_imageProvider;
+    QScopedPointer<ImageProvider> m_imageProvider;
 };
 
 } // namespace desktop

@@ -1,6 +1,6 @@
 import logging
 
-from framework.mediaserver_installation import install_mediaserver
+from framework.dpkg_installation import install_mediaserver
 
 _logger = logging.getLogger(__name__)
 

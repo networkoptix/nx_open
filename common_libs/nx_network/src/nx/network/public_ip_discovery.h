@@ -35,9 +35,9 @@ signals:
 
 private:
     void handleReply(const nx::network::http::AsyncHttpClientPtr& httpClient);
-    void sendRequest(const QString &url);
+    void sendRequestUnsafe(const QString &url);
     void nextStage();
-
+    int requestsInProgress() const;
 private:
     enum class Stage
     {
@@ -46,13 +46,13 @@ private:
         secondaryUrlsRequesting,
         publicIpFound
     };
+    void setStage(Stage value);
 
     QHostAddress m_publicIP;
     Stage m_stage;
-    int m_replyInProgress;
     QStringList m_primaryUrls;
     QStringList m_secondaryUrls;
-    QnMutex m_mutex;
+    mutable QnMutex m_mutex;
     std::set<nx::network::http::AsyncHttpClientPtr> m_httpRequests;
 
     virtual void stopWhileInAioThread() override;

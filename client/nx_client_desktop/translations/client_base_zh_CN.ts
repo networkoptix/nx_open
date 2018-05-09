@@ -979,7 +979,7 @@ to view more bookmarks</source>
       <translation>此授权的重置次数超出了限制.</translation>
     </message>
     <message>
-      <source>Hardware Id of Server with this license does not match Hardware Id on which license was activated.</source>
+      <source>Hardware ID of Server with this license does not match Hardware ID on which license was activated.</source>
       <translation>此服务器的硬件ID与原启动本授权的硬件ID不匹配.</translation>
     </message>
   </context>
@@ -2207,14 +2207,6 @@ to view more bookmarks</source>
       <translation>I/O 模块有没有音频流</translation>
     </message>
     <message>
-      <source>I/O Module Id</source>
-      <translation>I/O 模块 Id</translation>
-    </message>
-    <message>
-      <source>Camera Id</source>
-      <translation>摄像机 Id</translation>
-    </message>
-    <message>
       <source>Settings</source>
       <translation>设置</translation>
     </message>
@@ -2225,6 +2217,14 @@ to view more bookmarks</source>
     <message>
       <source>No settings</source>
       <translation>无设置</translation>
+    </message>
+    <message>
+      <source>I/O Module ID</source>
+      <translation>I/O 模块 ID</translation>
+    </message>
+    <message>
+      <source>Camera ID</source>
+      <translation>摄像机 ID</translation>
     </message>
   </context>
   <context>
@@ -2337,9 +2337,9 @@ to view more bookmarks</source>
       <translation>Edge</translation>
     </message>
     <message numerus="yes">
-      <source>This Id is already used on the following %n cameras: %1</source>
+      <source>This ID is already used on the following %n cameras: %1</source>
       <translation type="unfinished">
-        <numerusform>This Id is already used on the following %n cameras: %1</numerusform>
+        <numerusform>This ID is already used on the following %n cameras: %1</numerusform>
       </translation>
     </message>
   </context>
@@ -2457,8 +2457,8 @@ to view more bookmarks</source>
       <translation>服务器</translation>
     </message>
     <message>
-      <source>Id</source>
-      <translation>Id</translation>
+      <source>ID</source>
+      <translation type="unfinished">ID</translation>
     </message>
   </context>
   <context>
@@ -3692,8 +3692,8 @@ to %1</source>
       <translation>脉冲</translation>
     </message>
     <message>
-      <source>Id</source>
-      <translation>Id</translation>
+      <source>ID</source>
+      <translation type="unfinished">ID</translation>
     </message>
   </context>
   <context>
@@ -3844,6 +3844,21 @@ to %1</source>
     </message>
   </context>
   <context>
+    <name>QnLensCameraAdvancedParamWidget</name>
+    <message>
+      <source>Zoom</source>
+      <translation type="unfinished">Zoom</translation>
+    </message>
+    <message>
+      <source>Focus</source>
+      <translation type="unfinished">Focus</translation>
+    </message>
+    <message>
+      <source>Rotation:</source>
+      <translation type="unfinished">Rotation:</translation>
+    </message>
+  </context>
+  <context>
     <name>QnLicenseDetailsDialog</name>
     <message>
       <source>Screens Allowed:</source>
@@ -3874,7 +3889,7 @@ to %1</source>
       <translation>功能:</translation>
     </message>
     <message>
-      <source>Locked to Hardware Id</source>
+      <source>Locked to Hardware ID</source>
       <translation>已关联硬件ID</translation>
     </message>
   </context>
@@ -4140,16 +4155,16 @@ to %1</source>
       <translation>请联系客服以获取有效的授权。</translation>
     </message>
     <message>
-      <source>This license is already activated and linked to Hardware Id %1</source>
-      <translation>本授权已经激活并链接到硬件 Id %1</translation>
-    </message>
-    <message>
-      <source>This license is already activated and linked to Hardware Id %1 on %2</source>
-      <translation>本授权已经激活并链接到硬件 Id %1 於 %2</translation>
-    </message>
-    <message>
       <source>If the problem persists please contact Customer Support.</source>
       <translation>如果问题仍然存在，请与客户支持联系。</translation>
+    </message>
+    <message>
+      <source>This license is already activated and linked to Hardware ID %1</source>
+      <translation>本授权已经激活并链接到硬件 ID %1</translation>
+    </message>
+    <message>
+      <source>This license is already activated and linked to Hardware ID %1 on %2</source>
+      <translation>本授权已经激活并链接到硬件 ID %1 於 %2</translation>
     </message>
   </context>
   <context>
@@ -4171,16 +4186,16 @@ to %1</source>
       <translation>打开文件失败</translation>
     </message>
     <message>
-      <source>Please send email with License Key and Hardware Id provided to %1 to obtain an Activation Key file.</source>
+      <source>All files</source>
+      <translation type="unfinished">All files</translation>
+    </message>
+    <message>
+      <source>Please send email with License Key and Hardware ID provided to %1 to obtain an Activation Key file.</source>
       <translation>请以电子邮件将硬件ID及授权发送給 %1 来获取离线激活档。</translation>
     </message>
     <message>
-      <source>Please send License Key and Hardware Id provided to %1 to obtain an Activation Key file.</source>
+      <source>Please send License Key and Hardware ID provided to %1 to obtain an Activation Key file.</source>
       <translation>请以将硬件ID及授权发送給 %1 来获取离线激活档。</translation>
-    </message>
-    <message>
-      <source>All files</source>
-      <translation type="unfinished">All files</translation>
     </message>
   </context>
   <context>

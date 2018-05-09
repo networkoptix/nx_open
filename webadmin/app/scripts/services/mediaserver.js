@@ -494,6 +494,8 @@ angular.module('webadminApp')
                     params = delimeter + $.param(getParams);
                 }
 
+                params = params.replace(/=API_TOOL_OPTION_SET/,''); // special code for 'option' methods
+
                 url = proxy + url + params;
                 if(url.indexOf('/')!==0){
                     url = '/' + url;

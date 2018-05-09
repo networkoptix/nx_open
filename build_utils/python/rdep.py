@@ -217,7 +217,8 @@ class Rdep:
         dst_config_file = os.path.join(dst, PackageConfig.FILE_NAME)
         self._verbose_message("Moving {0} to {1}".format(
                 config_file, dst_config_file))
-        shutil.move(config_file, dst_config_file)
+        shutil.copy(config_file, dst_config_file)
+        os.remove(config_file)
 
         return self.SYNC_SUCCESS
 

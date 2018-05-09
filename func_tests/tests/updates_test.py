@@ -1,5 +1,6 @@
 from pathlib2 import Path, PurePosixPath
 
+from framework.os_access.path import copy_file
 from framework.remote_daemon import RemoteDaemon
 from framework.remote_python import RemotePython
 from framework.waiting import ensure_persistence, wait_for_true
@@ -20,8 +21,8 @@ def install_updates_server(ssh_access, python_path):
     daemon = RemoteDaemon('mock_updates_server', [python_path, REMOTE_DIR / 'server.py', 'serve'], env=UTF_LOCALE_ENV)
     if daemon.status(ssh_access) != 'started':
         remote_dir = ssh_access.Path(REMOTE_DIR)
-        remote_dir.joinpath('server.py').upload(LOCAL_DIR / 'server.py')
-        remote_dir.joinpath('requirements.txt').upload(LOCAL_DIR / 'requirements.txt')
+        copy_file(LOCAL_DIR / 'server.py', remote_dir / 'server.py')
+        copy_file(LOCAL_DIR / 'requirements.txt', remote_dir / 'requirements.txt')
         ssh_access.run_command([python_path, '-m', 'pip', 'install', '-r', remote_dir / 'requirements.txt'])
         ssh_access.run_command([python_path, remote_dir / 'server.py', 'generate'], env=UTF_LOCALE_ENV)
         daemon.start(ssh_access)

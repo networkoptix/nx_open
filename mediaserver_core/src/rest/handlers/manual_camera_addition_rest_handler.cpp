@@ -140,7 +140,6 @@ int QnManualCameraAdditionRestHandler::searchStopAction(
     return CODE_OK;
 }
 
-
 int QnManualCameraAdditionRestHandler::addCamerasAction(
     const QnRequestParams& params,
     QnJsonRestResult& result,

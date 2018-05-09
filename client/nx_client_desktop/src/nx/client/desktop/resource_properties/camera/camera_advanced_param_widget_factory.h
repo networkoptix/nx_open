@@ -1,5 +1,7 @@
 #pragma once
 
+#include <QtWidgets/QWidget>
+
 #include <core/resource/camera_advanced_param.h>
 #include <nx/utils/log/assert.h>
 

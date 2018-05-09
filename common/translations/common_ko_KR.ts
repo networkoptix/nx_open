@@ -557,7 +557,7 @@
       <translation>알 수 없는 오류</translation>
     </message>
     <message>
-      <source>Server with matching Hardware Id not found</source>
+      <source>Server with matching Hardware ID not found</source>
       <translation>HWID와 일치하는 서버를 찾지 못했습니다</translation>
     </message>
   </context>
@@ -674,12 +674,12 @@
       <translation>워터 마크: %1</translation>
     </message>
     <message>
-      <source>Hardware Id: %1</source>
-      <translation>하드웨어 Id: %1</translation>
-    </message>
-    <message>
       <source>Time License</source>
       <translation>Time Licenses</translation>
+    </message>
+    <message>
+      <source>Hardware ID: %1</source>
+      <translation>하드웨어 ID: %1</translation>
     </message>
   </context>
   <context>

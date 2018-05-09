@@ -4,7 +4,7 @@
 #include <map>
 
 #include <plugins/plugin_tools.h>
-#include <nx/sdk/utils/debug.h>
+#include <nx/sdk/utils.h>
 
 #include "plugin.h"
 #include "objects_metadata_packet.h"
@@ -16,29 +16,32 @@ namespace metadata {
 /**
  * Base class for a typical implementation of the metadata plugin. Hides many technical details of
  * the Metadata Plugin SDK, but may limit plugin capabilities - use only when suitable.
+ *
+ * To use NX_PRINT/NX_OUTPUT in a derived class with the same printPrefix as used in this class,
+ * add the following to the derived class cpp:
+ * <pre><code>
+ *     #define NX_PRINT_PREFIX (this->utils.printPrefix)
+ *     #include <nx/kit/debug.h>
+ * </code></pre>
  */
 class CommonPlugin:
-    public nxpt::CommonRefCounter<Plugin>,
-    protected nx::sdk::utils::Debug
+    public nxpt::CommonRefCounter<Plugin>
 {
+protected:
+    nx::sdk::Utils utils;
+
 protected:
     /**
      * @param name Full plugin name in English, capitalized as a header.
      * @param libName Short plugin name: small_letters_and_underscores, as in the library filename.
-     * @param enableOutput_ Enables NX_OUTPUT. Typically, use NX_DEBUG_ENABLE_OUTPUT as a value.
-     * @param printPrefix_ Prefix for NX_PRINT and NX_OUTPUT. If empty, will be made from libName.
-     *     To use the same prefix in the derived class NX_PRINT/NX_OUTPUT, add the following lines
-     *     to its .cpp:
-     *     <pre><code>
-     *         #define NX_PRINT_PREFIX printPrefix()
-     *         #include <nx/kit/debug.h>
-     *     </code></pre>
+     * @param enableOutput Enables NX_OUTPUT. Typically, use NX_DEBUG_ENABLE_OUTPUT as a value.
+     * @param printPrefix Prefix for NX_PRINT and NX_OUTPUT. If empty, will be made from libName.
      */
     CommonPlugin(
         const std::string& name,
         const std::string& libName,
-        bool enableOutput_,
-        const std::string& printPrefix_ = "");
+        bool enableOutput,
+        const std::string& printPrefix = "");
 
     virtual std::string capabilitiesManifest() const = 0;
 
@@ -97,7 +100,7 @@ public:
 private:
     bool fillSettingsMap(
         std::map<std::string, std::string>* map, const nxpl::Setting* settings, int count,
-        const std::string& func) const;
+        const std::string& outputCaption, int outputIndent = 0) const;
 
 private:
     const std::string m_name;

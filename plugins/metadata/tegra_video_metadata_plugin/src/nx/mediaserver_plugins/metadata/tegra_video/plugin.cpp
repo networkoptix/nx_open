@@ -1,6 +1,6 @@
 #include "plugin.h"
 
-#define NX_PRINT_PREFIX printPrefix()
+#define NX_PRINT_PREFIX (this->utils.printPrefix)
 #include <nx/kit/debug.h>
 
 #include <plugins/plugin_tools.h>
@@ -77,9 +77,7 @@ std::string Plugin::capabilitiesManifest() const
                         }
                     }
                 }
-            ],
-
-            "options": "needDeepCopyOfVideoFrames"
+            ]
         }
     )json";
 }

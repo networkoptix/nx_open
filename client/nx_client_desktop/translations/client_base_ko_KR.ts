@@ -978,7 +978,7 @@ to view more bookmarks</source>
       <translation>라이센스의 비활성화 횟수가 한도를 초과했습니다.</translation>
     </message>
     <message>
-      <source>Hardware Id of Server with this license does not match Hardware Id on which license was activated.</source>
+      <source>Hardware ID of Server with this license does not match Hardware ID on which license was activated.</source>
       <translation>이 라이센스가있는 서버의 하드웨어 ID가 라이센스가 활성화 된 하드웨어 ID와 일치하지 않습니다.</translation>
     </message>
   </context>
@@ -2206,14 +2206,6 @@ to view more bookmarks</source>
       <translation>I/O 모듈에는 오디오 스트림 없음</translation>
     </message>
     <message>
-      <source>I/O Module Id</source>
-      <translation>I/O 모듈 Id</translation>
-    </message>
-    <message>
-      <source>Camera Id</source>
-      <translation>카메라 Id</translation>
-    </message>
-    <message>
       <source>Settings</source>
       <translation>설정</translation>
     </message>
@@ -2224,6 +2216,14 @@ to view more bookmarks</source>
     <message>
       <source>No settings</source>
       <translation>설정 없음</translation>
+    </message>
+    <message>
+      <source>I/O Module ID</source>
+      <translation>I/O 모듈 ID</translation>
+    </message>
+    <message>
+      <source>Camera ID</source>
+      <translation>카메라 ID</translation>
     </message>
   </context>
   <context>
@@ -2336,9 +2336,9 @@ to view more bookmarks</source>
       <translation>Edge</translation>
     </message>
     <message numerus="yes">
-      <source>This Id is already used on the following %n cameras: %1</source>
+      <source>This ID is already used on the following %n cameras: %1</source>
       <translation>
-        <numerusform>이 Id는 이미 %n 카메라에서 사용되었습니다: %1</numerusform>
+        <numerusform>이 ID는 이미 %n 카메라에서 사용되었습니다: %1</numerusform>
       </translation>
     </message>
   </context>
@@ -2456,8 +2456,8 @@ to view more bookmarks</source>
       <translation>서버</translation>
     </message>
     <message>
-      <source>Id</source>
-      <translation>Id</translation>
+      <source>ID</source>
+      <translation type="unfinished">ID</translation>
     </message>
   </context>
   <context>
@@ -2807,20 +2807,20 @@ to %1</source>
     <name>QnCloudResultMessages</name>
     <message>
       <source>Account not found</source>
-      <translation type="unfinished">Account not found</translation>
+      <translation>계정을 찾을 수 없습니다</translation>
     </message>
     <message>
       <source>Account is not activated.</source>
-      <translation type="unfinished">Account is not activated.</translation>
+      <translation>계정이 활성화되지 않았습니다.</translation>
     </message>
     <message>
       <source>Please log in to %1 and follow the provided instructions.</source>
       <comment>%1 is a cloud site name like &quot;Nx Cloud&quot;</comment>
-      <translation type="unfinished">Please log in to %1 and follow the provided instructions.</translation>
+      <translation>%1 에 로그인하고 제공된 지침을 따르십시오.</translation>
     </message>
     <message>
       <source>Invalid password</source>
-      <translation type="unfinished">Invalid password</translation>
+      <translation>잘못된 암호</translation>
     </message>
   </context>
   <context>
@@ -3159,7 +3159,7 @@ to %1</source>
     </message>
     <message>
       <source>Database Backup Files</source>
-      <translation type="unfinished">Database Backup Files</translation>
+      <translation>데이터베이스 백업 파일</translation>
     </message>
   </context>
   <context>
@@ -3691,8 +3691,8 @@ to %1</source>
       <translation>Impulse</translation>
     </message>
     <message>
-      <source>Id</source>
-      <translation>Id</translation>
+      <source>ID</source>
+      <translation type="unfinished">ID</translation>
     </message>
   </context>
   <context>
@@ -3843,6 +3843,21 @@ to %1</source>
     </message>
   </context>
   <context>
+    <name>QnLensCameraAdvancedParamWidget</name>
+    <message>
+      <source>Zoom</source>
+      <translation type="unfinished">Zoom</translation>
+    </message>
+    <message>
+      <source>Focus</source>
+      <translation type="unfinished">Focus</translation>
+    </message>
+    <message>
+      <source>Rotation:</source>
+      <translation type="unfinished">Rotation:</translation>
+    </message>
+  </context>
+  <context>
     <name>QnLicenseDetailsDialog</name>
     <message>
       <source>Screens Allowed:</source>
@@ -3873,8 +3888,8 @@ to %1</source>
       <translation>기능:</translation>
     </message>
     <message>
-      <source>Locked to Hardware Id</source>
-      <translation>하드웨어 Id에 잠김</translation>
+      <source>Locked to Hardware ID</source>
+      <translation>하드웨어 ID에 잠김</translation>
     </message>
   </context>
   <context>
@@ -4139,16 +4154,16 @@ to %1</source>
       <translation>유효한 라이센스 키를 받으려면 고객 지원에 문의하십시오.</translation>
     </message>
     <message>
-      <source>This license is already activated and linked to Hardware Id %1</source>
-      <translation>이 라이센스는 이미 활성화되어 있으며 하드웨어 Id %1에 연결되어 있습니다.</translation>
-    </message>
-    <message>
-      <source>This license is already activated and linked to Hardware Id %1 on %2</source>
-      <translation>이 라이센스 %2 의 하드웨어 Id %1에서 활성화 되었습니다.</translation>
-    </message>
-    <message>
       <source>If the problem persists please contact Customer Support.</source>
       <translation>문제가 지속되면 고객 지원부에 문의하십시오.</translation>
+    </message>
+    <message>
+      <source>This license is already activated and linked to Hardware ID %1</source>
+      <translation>이 라이센스는 이미 활성화되어 있으며 하드웨어 ID %1에 연결되어 있습니다.</translation>
+    </message>
+    <message>
+      <source>This license is already activated and linked to Hardware ID %1 on %2</source>
+      <translation>이 라이센스 %2 의 하드웨어 ID %1에서 활성화 되었습니다.</translation>
     </message>
   </context>
   <context>
@@ -4170,16 +4185,16 @@ to %1</source>
       <translation>파일 열기 실패!</translation>
     </message>
     <message>
-      <source>Please send email with License Key and Hardware Id provided to %1 to obtain an Activation Key file.</source>
-      <translation>활성화 키 파일을 얻으려면 라이센스 키와 %1에 제공된 하드웨어 Id를 이메일로 보내주십시오.</translation>
-    </message>
-    <message>
-      <source>Please send License Key and Hardware Id provided to %1 to obtain an Activation Key file.</source>
-      <translation>활성화 키 파일을 얻으려면 라이센스 키와 %1에 제공된 하드웨어 Id를 보내주십시오.</translation>
-    </message>
-    <message>
       <source>All files</source>
-      <translation type="unfinished">All files</translation>
+      <translation>모든 파일</translation>
+    </message>
+    <message>
+      <source>Please send email with License Key and Hardware ID provided to %1 to obtain an Activation Key file.</source>
+      <translation>활성화 키 파일을 얻으려면 라이센스 키와 %1에 제공된 하드웨어 ID를 이메일로 보내주십시오.</translation>
+    </message>
+    <message>
+      <source>Please send License Key and Hardware ID provided to %1 to obtain an Activation Key file.</source>
+      <translation>활성화 키 파일을 얻으려면 라이센스 키와 %1에 제공된 하드웨어 ID를 보내주십시오.</translation>
     </message>
   </context>
   <context>
@@ -5758,7 +5773,7 @@ to %1</source>
     </message>
     <message>
       <source>Update Files</source>
-      <translation type="unfinished">Update Files</translation>
+      <translation>업데이트 파일</translation>
     </message>
   </context>
   <context>

@@ -9,11 +9,11 @@ namespace Ui {
 class FisheyeSettingsWidget;
 } // namespace Ui
 
-class QnImageProvider;
-
 namespace nx {
 namespace client {
 namespace desktop {
+
+class ImageProvider;
 
 class FisheyeSettingsWidget: public QWidget
 {
@@ -24,7 +24,7 @@ public:
     FisheyeSettingsWidget(QWidget* parent = 0);
     virtual ~FisheyeSettingsWidget();
 
-    void updateFromParams(const QnMediaDewarpingParams& params, QnImageProvider* imageProvider);
+    void updateFromParams(const QnMediaDewarpingParams& params, ImageProvider* imageProvider);
     void submitToParams(QnMediaDewarpingParams& params);
 
 signals:

@@ -58,7 +58,7 @@ private:
 
     struct CacheItem
     {
-        QSharedPointer<QnImageProvider> provider;
+        QSharedPointer<nx::client::desktop::ImageProvider> provider;
         Qn::ThumbnailStatus status;
         quint64 timestamp;
     };

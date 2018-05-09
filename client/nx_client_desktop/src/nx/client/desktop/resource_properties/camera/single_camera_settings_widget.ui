@@ -493,7 +493,7 @@
         <number>16</number>
        </property>
        <item>
-        <widget class="nx::client::desktop::IoPortSettingsWidget" name="ioPortSettingsWidget" native="true"/>
+        <widget class="nx::client::desktop::LegacyIoPortSettingsWidget" name="ioPortSettingsWidget" native="true"/>
        </item>
       </layout>
      </widget>
@@ -721,9 +721,9 @@
    <container>1</container>
   </customwidget>
   <customwidget>
-   <class>nx::client::desktop::IoPortSettingsWidget</class>
+   <class>nx::client::desktop::LegacyIoPortSettingsWidget</class>
    <extends>QWidget</extends>
-   <header location="global">nx/client/desktop/resource_properties/camera/ioport_settings_widget.h</header>
+   <header location="global">nx/client/desktop/resource_properties/camera/legacy_ioport_settings_widget.h</header>
    <container>1</container>
   </customwidget>
   <customwidget>

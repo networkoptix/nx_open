@@ -6,6 +6,7 @@ import logging
 from requests.exceptions import ReadTimeout
 
 from framework.mediaserver_factory import CORE_FILE_ARTIFACT_TYPE, SERVER_LOG_ARTIFACT_TYPE, TRACEBACK_ARTIFACT_TYPE
+from framework.os_access.path import copy_file
 from framework.rest_api import RestApi
 from framework.waiting import wait_for_true
 from . import utils
@@ -160,7 +161,7 @@ class LightweightServersHost(object):
         pih.ensure_mediaserver_is_unpacked()
         self._lws_dir.mkdir(exist_ok=True)
         self._cleanup_log_files()
-        self._lws_dir.upload(self._test_binary_path)
+        copy_file(self._test_binary_path, self._lws_dir)
         self._write_lws_ctl(server_dir, server_count, lws_params)
         self.service.start()
         # must be set before loop following it
@@ -227,7 +228,7 @@ class LightweightServersHost(object):
             artifact_factory = self._artifact_factory(
                 ['lws', self._host_name, fname], name=fname, is_error=True, artifact_type=CORE_FILE_ARTIFACT_TYPE)
             local_core_path = artifact_factory.produce_file_path()
-            remote_core_path.download(local_core_path)
+            copy_file(remote_core_path, local_core_path)
             log.debug('core file for lws at %s is stored to %s', self._host_name, local_core_path)
             traceback = create_core_file_traceback(
                 self._os_access, self._installation.dir / LWS_BINARY_NAME,

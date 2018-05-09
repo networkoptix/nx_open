@@ -979,8 +979,8 @@ to view more bookmarks</translation>
       <translation>Number of deactivations exceeded limit for this license.</translation>
     </message>
     <message>
-      <source>Hardware Id of Server with this license does not match Hardware Id on which license was activated.</source>
-      <translation>Hardware Id of Server with this license does not match Hardware Id on which license was activated.</translation>
+      <source>Hardware ID of Server with this license does not match Hardware ID on which license was activated.</source>
+      <translation type="unfinished">Hardware ID of Server with this license does not match Hardware ID on which license was activated.</translation>
     </message>
   </context>
   <context>
@@ -2229,14 +2229,6 @@ to view more bookmarks</translation>
       <translation>I/O module has no audio stream</translation>
     </message>
     <message>
-      <source>I/O Module Id</source>
-      <translation>I/O Module Id</translation>
-    </message>
-    <message>
-      <source>Camera Id</source>
-      <translation>Camera Id</translation>
-    </message>
-    <message>
       <source>Settings</source>
       <translation>Settings</translation>
     </message>
@@ -2247,6 +2239,14 @@ to view more bookmarks</translation>
     <message>
       <source>No settings</source>
       <translation type="unfinished">No settings</translation>
+    </message>
+    <message>
+      <source>I/O Module ID</source>
+      <translation type="unfinished">I/O Module ID</translation>
+    </message>
+    <message>
+      <source>Camera ID</source>
+      <translation type="unfinished">Camera ID</translation>
     </message>
   </context>
   <context>
@@ -2360,10 +2360,10 @@ to view more bookmarks</translation>
       <translation type="unfinished">Edge</translation>
     </message>
     <message numerus="yes">
-      <source>This Id is already used on the following %n cameras: %1</source>
+      <source>This ID is already used on the following %n cameras: %1</source>
       <translation type="unfinished">
-        <numerusform>This Id is already used on the following %n cameras: %1</numerusform>
-        <numerusform>This Id is already used on the following %n cameras: %1</numerusform>
+        <numerusform>This ID is already used on the following %n cameras: %1</numerusform>
+        <numerusform>This ID is already used on the following %n cameras: %1</numerusform>
       </translation>
     </message>
   </context>
@@ -2485,8 +2485,8 @@ to view more bookmarks</translation>
       <translation>Server</translation>
     </message>
     <message>
-      <source>Id</source>
-      <translation>Id</translation>
+      <source>ID</source>
+      <translation type="unfinished">ID</translation>
     </message>
   </context>
   <context>
@@ -3734,8 +3734,8 @@ to %1</translation>
       <translation>Impulse</translation>
     </message>
     <message>
-      <source>Id</source>
-      <translation>Id</translation>
+      <source>ID</source>
+      <translation type="unfinished">ID</translation>
     </message>
   </context>
   <context>
@@ -3887,6 +3887,21 @@ to %1</translation>
     </message>
   </context>
   <context>
+    <name>QnLensCameraAdvancedParamWidget</name>
+    <message>
+      <source>Zoom</source>
+      <translation type="unfinished">Zoom</translation>
+    </message>
+    <message>
+      <source>Focus</source>
+      <translation type="unfinished">Focus</translation>
+    </message>
+    <message>
+      <source>Rotation:</source>
+      <translation type="unfinished">Rotation:</translation>
+    </message>
+  </context>
+  <context>
     <name>QnLicenseDetailsDialog</name>
     <message>
       <source>Screens Allowed:</source>
@@ -3917,8 +3932,8 @@ to %1</translation>
       <translation>Features:</translation>
     </message>
     <message>
-      <source>Locked to Hardware Id</source>
-      <translation>Locked to Hardware Id</translation>
+      <source>Locked to Hardware ID</source>
+      <translation type="unfinished">Locked to Hardware ID</translation>
     </message>
   </context>
   <context>
@@ -4193,16 +4208,16 @@ to %1</translation>
       <translation>Please contact Customer Support to get a valid License Key.</translation>
     </message>
     <message>
-      <source>This license is already activated and linked to Hardware Id %1</source>
-      <translation>This license is already activated and linked to Hardware Id %1</translation>
-    </message>
-    <message>
-      <source>This license is already activated and linked to Hardware Id %1 on %2</source>
-      <translation>This license is already activated and linked to Hardware Id %1 on %2</translation>
-    </message>
-    <message>
       <source>If the problem persists please contact Customer Support.</source>
       <translation>If the problem persists please contact Customer Support.</translation>
+    </message>
+    <message>
+      <source>This license is already activated and linked to Hardware ID %1</source>
+      <translation type="unfinished">This license is already activated and linked to Hardware ID %1</translation>
+    </message>
+    <message>
+      <source>This license is already activated and linked to Hardware ID %1 on %2</source>
+      <translation type="unfinished">This license is already activated and linked to Hardware ID %1 on %2</translation>
     </message>
   </context>
   <context>
@@ -4224,16 +4239,16 @@ to %1</translation>
       <translation>Failed to open file</translation>
     </message>
     <message>
-      <source>Please send email with License Key and Hardware Id provided to %1 to obtain an Activation Key file.</source>
-      <translation>Please send email with License Key and Hardware Id provided to %1 to obtain an Activation Key file.</translation>
-    </message>
-    <message>
-      <source>Please send License Key and Hardware Id provided to %1 to obtain an Activation Key file.</source>
-      <translation>Please send License Key and Hardware Id provided to %1 to obtain an Activation Key file.</translation>
-    </message>
-    <message>
       <source>All files</source>
       <translation type="unfinished">All files</translation>
+    </message>
+    <message>
+      <source>Please send email with License Key and Hardware ID provided to %1 to obtain an Activation Key file.</source>
+      <translation type="unfinished">Please send email with License Key and Hardware ID provided to %1 to obtain an Activation Key file.</translation>
+    </message>
+    <message>
+      <source>Please send License Key and Hardware ID provided to %1 to obtain an Activation Key file.</source>
+      <translation type="unfinished">Please send License Key and Hardware ID provided to %1 to obtain an Activation Key file.</translation>
     </message>
   </context>
   <context>

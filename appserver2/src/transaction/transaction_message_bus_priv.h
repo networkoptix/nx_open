@@ -1,4 +1,8 @@
+#include <nx/p2p/p2p_connection_base.h>
+#include <nx/p2p/p2p_serialization.h>
 #include <utils/common/warnings.h>
+#include <transaction/transaction_message_bus_base.h>
+
 #include "ubjson_transaction_serializer.h"
 
 namespace ec2 {
@@ -128,6 +132,32 @@ bool handleTransaction(
     {
         return false;
     }
+}
+
+template<typename MessageBus, typename Function>
+bool handleTransactionWithHeader(
+    MessageBus* bus,
+    const nx::p2p::P2pConnectionPtr& connection,
+    const QByteArray& data,
+    Function function)
+{
+    int headerSize = 0;
+    nx::p2p::TransportHeader header;
+    if (connection->remotePeer().dataFormat == Qn::UbjsonFormat)
+        header = nx::p2p::deserializeTransportHeader(data, &headerSize);
+    else
+        header.dstPeers.push_back(bus->localPeer().id);
+
+    using namespace std::placeholders;
+
+    return handleTransaction(
+        bus,
+        connection->remotePeer().dataFormat,
+        data.mid(headerSize),
+        std::bind(function, bus, _1, connection, header),
+        [](Qn::SerializationFormat, const QByteArray&) { return false; });
+
+    return true;
 }
 
 } // namespace ec2

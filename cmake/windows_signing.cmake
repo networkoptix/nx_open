@@ -2,7 +2,17 @@ nx_option(hardwareSigning
     "Sign windows binaries with hardware smart card key"
     OFF)
 
-set(signing_timestamp_server "http://tsa.startssl.com/rfc3161")
+cmake_dependent_option(trustedTimestamping
+    "Sign windows binaries with trusted timestamp"
+    ON "NOT developerBuild"
+    OFF
+)
+
+set(timestamp_server_parameters "")
+if(trustedTimestamping)
+    set(signing_timestamp_server "http://timestamp.comodoca.com/rfc3161")
+    set(timestamp_server_parameters /td sha256 /tr ${signing_timestamp_server})
+endif()
 
 function(nx_sign_windows_executable target)
     find_program(SIGNTOOL_EXECUTABLE signtool.exe
@@ -16,9 +26,8 @@ function(nx_sign_windows_executable target)
     if(hardwareSigning)
         add_custom_command(TARGET ${target} POST_BUILD
             COMMAND ${SIGNTOOL_EXECUTABLE} sign
-                /td sha256
                 /fd sha256
-                /tr "${signing_timestamp_server}"
+                ${timestamp_server_parameters}
                 /v
                 /a
                 $<TARGET_FILE:${target}>
@@ -31,9 +40,8 @@ function(nx_sign_windows_executable target)
 
         add_custom_command(TARGET ${target} POST_BUILD
             COMMAND ${SIGNTOOL_EXECUTABLE} sign
-                /td sha256
                 /fd sha256
-                /tr "${signing_timestamp_server}"
+                ${timestamp_server_parameters}
                 /v
                 /f ${certificate_file}
                 /p ${sign.password}

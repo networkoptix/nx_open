@@ -145,6 +145,7 @@ def test_merge_cloud_with_local(two_linux_mediaservers, cloud_account, test_syst
     one, two = two_linux_mediaservers
 
     one.start()
+    one.machine.networking.enable_internet()
     setup_cloud_system(one, cloud_account, test_system_settings)
 
     two.start()
@@ -176,9 +177,11 @@ def test_merge_cloud_systems(two_linux_mediaservers, cloud_account_factory, take
     one, two = two_linux_mediaservers
 
     one.start()
+    one.machine.networking.enable_internet()
     setup_cloud_system(one, cloud_account_1, {})
 
     two.start()
+    two.machine.networking.enable_internet()
     setup_cloud_system(two, cloud_account_2, {})
 
     # Merge 2 cloud systems one way
@@ -200,9 +203,11 @@ def test_cloud_merge_after_disconnect(two_linux_mediaservers, cloud_account, tes
     one, two = two_linux_mediaservers
 
     one.start()
+    one.machine.networking.enable_internet()
     setup_cloud_system(one, cloud_account, test_system_settings)
 
     two.start()
+    two.machine.networking.enable_internet()
     setup_cloud_system(two, cloud_account, {})
 
     # Check setupCloud's settings on Server1
@@ -270,6 +275,7 @@ def test_restart_one_server(one, two, cloud_account):
     one.api.ec2.removeResource.POST(id=guid2)
 
     # Start server 2 again and move it from initial to working state
+    two.machine.networking.enable_internet()
     setup_cloud_system(two, cloud_account, {})
     two.api.get('ec2/getUsers')
 
