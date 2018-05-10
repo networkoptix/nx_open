@@ -110,8 +110,7 @@ CameraSettingsDialog::CameraSettingsDialog(QWidget* parent):
     d->previewManager->setThumbnailSize(QSize(0, 0));
     d->previewManager->setAutoRefresh(false);
 
-    auto panicWatcher = new CameraSettingsPanicWatcher(this);
-    panicWatcher->setStore(d->store);
+    new CameraSettingsPanicWatcher(d->store, this);
 
     addPage(
         int(CameraSettingsTab::general),
