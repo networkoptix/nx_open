@@ -46,6 +46,6 @@ class AccountAdmin(CMSAdmin, CSVExportAdmin):
 
 @admin.register(AccountLoginHistory)
 class AccountLoginHistoryAdmin(admin.ModelAdmin):
-    list_display = ('action', 'username', 'ip',)
+    list_display = ('action', 'email', 'ip',)
     list_filter = ('action',)
-    search_fields = ('username', 'ip', )
+    search_fields = ('email', 'ip', )
