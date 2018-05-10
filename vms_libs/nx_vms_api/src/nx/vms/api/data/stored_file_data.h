@@ -16,11 +16,7 @@ struct StoredFileData: Data
 struct StoredFilePath: Data
 {
     StoredFilePath() = default;
-
-    StoredFilePath(const QString& path):
-        path(path)
-    {
-    }
+    StoredFilePath(const QString& path): path(path) {}
 
     bool operator<(const StoredFilePath& other) const
     {

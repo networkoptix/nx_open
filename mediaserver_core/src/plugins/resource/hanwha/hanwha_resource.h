@@ -178,6 +178,8 @@ private:
 
     CameraDiagnostics::Result fetchPtzLimits(QnPtzLimits* outPtzLimits);
 
+    CameraDiagnostics::Result fetchCodecInfo(HanwhaCodecInfo* outCodecInfo);
+
     void cleanUpOnProxiedDeviceChange();
 
     AVCodecID defaultCodecForStream(Qn::ConnectionRole role) const;
