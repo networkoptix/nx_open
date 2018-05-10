@@ -394,8 +394,9 @@ Item
                 if (!doubleTapScaleMode)
                     return
 
-                var size = pinchArea.initialHeight
-                var targetScale = (size - currentVector.y * 3) / size
+                var sideSize = Math.min(flick.width, flick.height) / 2
+                var scaleChange = 1 + Math.abs(currentVector.y / sideSize)
+                var targetScale = currentVector.y > 0 ? 1 / scaleChange : scaleChange
                 pinchArea.updatePinch(doubleTapDownPos, doubleTapDownPos, targetScale)
             }
 
