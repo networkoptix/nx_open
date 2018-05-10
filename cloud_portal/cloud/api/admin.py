@@ -46,6 +46,16 @@ class AccountAdmin(CMSAdmin, CSVExportAdmin):
 
 @admin.register(AccountLoginHistory)
 class AccountLoginHistoryAdmin(admin.ModelAdmin):
-    list_display = ('action', 'email', 'ip',)
-    list_filter = ('action',)
-    search_fields = ('email', 'ip', )
+    list_display = ('action', 'email', 'ip', 'date')
+    list_filter = ('action', 'date')
+    search_fields = ('email', 'ip', 'date')
+
+    actions = ['clean_old_records']
+
+    def clean_old_records(self, request, queryset):
+        from datetime import datetime, timedelta
+        cutoff_date = datetime.now() - timedelta(days=settings.CLEAR_HISTORY_RECORDS_OLDER_THAN_X_DAYS)
+        AccountLoginHistory.objects.filter(date__lt=cutoff_date).delete()
+
+    clean_old_records.short_description = "Remove messages older than {} days".format(
+        settings.CLEAR_HISTORY_RECORDS_OLDER_THAN_X_DAYS)

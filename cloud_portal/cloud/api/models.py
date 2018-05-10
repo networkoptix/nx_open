@@ -66,6 +66,7 @@ class AccountLoginHistory(models.Model):
     action = models.CharField(max_length=64)
     ip = models.GenericIPAddressField(null=True)
     email = models.CharField(max_length=256, null=True)
+    date = models.DateTimeField(auto_now_add=True)
 
     def __unicode__(self):
         return '{0} - {1} - {2}'.format(self.action, self.username, self.ip)
