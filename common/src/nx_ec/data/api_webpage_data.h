@@ -2,11 +2,12 @@
 
 #include "api_resource_data.h"
 
-namespace ec2
+namespace ec2 {
+
+struct ApiWebPageData: ApiResourceData
 {
-    struct ApiWebPageData: ApiResourceData
-    {
-        ApiWebPageData() {}
-    };
+    ApiWebPageData() {}
+};
 #define ApiWebPageData_Fields ApiResourceData_Fields
-}
+
+} // namespace ec2

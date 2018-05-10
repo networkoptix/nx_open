@@ -1,19 +1,17 @@
-#ifndef __API_LICENSE_OVERFLOW_DATA_H_
-#define __API_LICENSE_OVERFLOW_DATA_H_
+#pragma once
 
 #include "api_globals.h"
 #include "api_data.h"
 
-namespace ec2
+namespace ec2 {
+
+struct ApiLicenseOverflowData: ApiData
 {
-    struct ApiLicenseOverflowData : ApiData
-    {
-        ApiLicenseOverflowData(): value(false), time(0) {}
+    ApiLicenseOverflowData(): value(false), time(0) {}
 
-        bool   value;
-        qint64 time;
-    };
+    bool value;
+    qint64 time;
+};
 #define ApiLicenseOverflowData_Fields (value)(time)
-}
 
-#endif // __API_LICENSE_OVERFLOW_DATA_H_
+} // namespace ec2

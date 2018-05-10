@@ -18,8 +18,6 @@ namespace nx {
 namespace mediaserver_core {
 namespace plugins {
 
-
-
 struct HanwhaCodecLimits
 {
     int maxFps = kHanwhaInvalidFps;
@@ -80,6 +78,8 @@ public:
     QStringList codecProfiles(AVCodecID codec) const;
 
     bool isValid() const;
+
+    void updateToChannel(int channel);
 
 private:
     bool parseResponse(const HanwhaResponse& response);

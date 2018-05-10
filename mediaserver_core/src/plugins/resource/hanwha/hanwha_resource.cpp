@@ -1040,14 +1040,13 @@ CameraDiagnostics::Result HanwhaResource::initMedia()
         m_maxProfileCount = *maxProfileCount;
         m_capabilities.hasDualStreaming = m_maxProfileCount - fixedProfileCount > 1;
 
-        auto codecInfo = sharedContext()->videoCodecInfo();
-        if (!codecInfo)
-            return codecInfo.diagnostics;
+        auto result = fetchCodecInfo(&m_codecInfo);
+        if (!result)
+            return result;
 
-        m_codecInfo = codecInfo.value;
         initMediaStreamCapabilities();
 
-        auto result = createNxProfiles();
+        result = createNxProfiles();
         if (!result)
             return result;
 
@@ -1939,6 +1938,38 @@ CameraDiagnostics::Result HanwhaResource::fetchPtzLimits(QnPtzLimits* outPtzLimi
     // TODO: #dmishin don't forget it
     outPtzLimits->maxPresetNumber;
 
+    return CameraDiagnostics::NoErrorResult();
+}
+
+CameraDiagnostics::Result HanwhaResource::fetchCodecInfo(HanwhaCodecInfo* outCodecInfo)
+{
+    if (isBypassSupported())
+    {
+        HanwhaRequestHelper helper(sharedContext(), bypassChannel());
+        helper.setGroupBy(kHanwhaChannelProperty);
+        const auto response = helper.view(lit("media/videocodecinfo"));
+
+        if (!response.isSuccessful())
+        {
+            return CameraDiagnostics::RequestFailedResult(
+                response.requestUrl(),
+                lit("Can't fetch codec info via bypass"));
+        }
+
+        *outCodecInfo = HanwhaCodecInfo(response, cgiParameters());
+        if (!outCodecInfo->isValid())
+            return CameraDiagnostics::CameraInvalidParams(lit("Can't fetch bypass codec info"));
+
+        outCodecInfo->updateToChannel(getChannel());
+    }
+    else
+    {
+        auto codecInfo = sharedContext()->videoCodecInfo();
+        if (!codecInfo)
+            return codecInfo.diagnostics;
+
+        *outCodecInfo = codecInfo.value;
+    }
     return CameraDiagnostics::NoErrorResult();
 }
 
@@ -3262,7 +3293,10 @@ bool HanwhaResource::isBypassSupported() const
 {
     // temporarily disable bypass for proxied multisensor cameras since we don't have
     // a reliable way to figure out NVR -> Camera channel mapping.
-    return m_isBypassSupported && isConnectedViaSunapi() && !isProxiedMultisensorCamera();
+    return m_isBypassSupported
+        && isNvr()
+        && isConnectedViaSunapi()
+        && !isProxiedMultisensorCamera();
 }
 
 bool HanwhaResource::isProxiedMultisensorCamera() const

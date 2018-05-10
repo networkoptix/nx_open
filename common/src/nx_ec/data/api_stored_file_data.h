@@ -1,32 +1,29 @@
-#ifndef EC2_STORED_FILE_DATA_H
-#define EC2_STORED_FILE_DATA_H
+#pragma once
 
 #include "api_globals.h"
 #include "api_data.h"
 
-namespace ec2
+namespace ec2 {
+
+struct ApiStoredFileData: ApiData
 {
-    struct ApiStoredFileData: ApiData
-    {
-        QString path;
-        QByteArray data;
-    };
+    QString path;
+    QByteArray data;
+};
 #define ApiStoredFileData_Fields (path)(data)
 
-    struct ApiStoredFilePath: ApiData
+struct ApiStoredFilePath: ApiData
+{
+    ApiStoredFilePath() {}
+    ApiStoredFilePath(const QString& path): path(path) {}
+
+    bool operator<(const ApiStoredFilePath& other) const
     {
-        ApiStoredFilePath() {}
-        ApiStoredFilePath(const QString &path): path(path) {}
+        return path < other.path;
+    }
 
-        bool operator<(const ApiStoredFilePath& other) const
-        {
-            return path < other.path;
-        }
-
-        QString path;
-    };
+    QString path;
+};
 #define ApiStoredFilePath_Fields (path)
 
-}
-
-#endif //EC2_STORED_FILE_DATA_H
+} // namespace ec2
