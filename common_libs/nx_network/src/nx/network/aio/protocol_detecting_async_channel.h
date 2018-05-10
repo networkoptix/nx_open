@@ -290,7 +290,7 @@ void BaseProtocolDetectingAsyncChannel<Base, AsyncChannelInterface>::readProtoco
 template<typename Base, typename AsyncChannelInterface>
 void BaseProtocolDetectingAsyncChannel<Base, AsyncChannelInterface>::analyzeReadResult(
     SystemError::ErrorCode osErrorCode,
-    std::size_t bytesRead)
+    std::size_t /*bytesRead*/)
 {
     if (osErrorCode != SystemError::noError)
     {
