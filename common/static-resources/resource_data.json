@@ -205,7 +205,8 @@
             "adamStartInputCoil": 0,
             "adamInputCount": 8,
             "adamStartOutputCoil": 16,
-            "adamOutputCount": 8
+            "adamOutputCount": 8,
+            "noVideoSupport": true
         },
         {
             "keys": [
@@ -710,6 +711,7 @@
             ],
             "noVideoSupport": true
         },
+
         {
             "keys": [
                 "VISTA|VK2-1080XVRDIR3V9F",
