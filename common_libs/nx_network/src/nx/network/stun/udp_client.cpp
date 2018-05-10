@@ -281,7 +281,6 @@ void UdpClient::messageSent(
         if (requestContextIter->second.retryNumber > m_maxRetransmissions)
         {
             auto completionHandler = std::move(requestContextIter->second.completionHandler);
-            requestContextIter->second.timer->cancelSync();
             m_ongoingRequests.erase(requestContextIter);
             completionHandler(errorCode, Message());
             return;
