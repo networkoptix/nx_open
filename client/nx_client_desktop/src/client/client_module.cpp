@@ -528,21 +528,24 @@ void QnClientModule::initLog(const QnStartupParameters& startupParams)
     logSettings.updateDirectoryIfEmpty(QStandardPaths::writableLocation(QStandardPaths::DataLocation));
 
     logSettings.level.parse(logLevel);
+    logSettings.logBaseName = logFile.isEmpty() 
+        ? lit("client_log") + logFileNameSuffix
+        : logFile;
+        
     nx::utils::log::initialize(
         logSettings,
         qApp->applicationName(),
-        qApp->applicationFilePath(),
-        !logFile.isEmpty() ? logFile : (lit("client_log") + logFileNameSuffix));
+        qApp->applicationFilePath());
 
     const auto ec2logger = nx::utils::log::addLogger({QnLog::EC2_TRAN_LOG});
     if (ec2TranLogLevel != lit("none"))
     {
         logSettings.level.parse(ec2TranLogLevel);
+        logSettings.logBaseName = lit("ec2_tran") + logFileNameSuffix;
         nx::utils::log::initialize(
             logSettings,
             qApp->applicationName(),
             qApp->applicationFilePath(),
-            lit("ec2_tran") + logFileNameSuffix,
             ec2logger);
     }
 

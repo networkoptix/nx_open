@@ -9,6 +9,7 @@
 namespace
 {
 static const QString kC2pScheme("c2p");
+static const QString kManufacture("C2P");
 }
 
 QnPlC2pCameraResourceSearcher::QnPlC2pCameraResourceSearcher(QnCommonModule* commonModule):
@@ -41,7 +42,7 @@ QList<QnResourcePtr> QnPlC2pCameraResourceSearcher::checkHostAddr(
     {
         QnC2pCameraResourcePtr resource(new QnC2pCameraResource(commonModule()));
         QnUuid resourceTypeId = qnResTypePool->getResourceTypeId(
-            "" /*manufacture*/,
+            kManufacture /*manufacture*/,
             QnResourceTypePool::kC2pCameraTypeId /*name*/);
         resource->setTypeId(resourceTypeId);
         resource->setUrl(url.toString());

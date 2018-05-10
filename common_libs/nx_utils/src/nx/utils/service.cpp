@@ -123,7 +123,7 @@ void Service::initializeLog(const AbstractServiceSettings& settings)
 {
     auto logSettings = settings.logging();
     logSettings.updateDirectoryIfEmpty(settings.dataDir());
-    utils::log::initialize(logSettings, m_applicationDisplayName, {}, settings.logBaseName());
+    utils::log::initialize(logSettings, m_applicationDisplayName);
 }
 
 void Service::reportStartupResult(bool result)
