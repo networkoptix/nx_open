@@ -144,14 +144,10 @@ public:
         SocketGlobals::addressResolver().dnsResolver().resolveAsync(
             address.toString(),
             [this, handler = std::move(handler)](
-                SystemError::ErrorCode code, std::deque<HostAddress> ips) mutable
+                SystemError::ErrorCode code, std::deque<HostAddress> ips)
             {
-                dispatch(
-                    [this, handler = std::move(handler), code, ips = std::move(ips)]
-                    {
-                        m_addressResolverIsInUse = false;
-                        handler(code, std::move(ips));
-                    });
+                m_addressResolverIsInUse = false;
+                handler(code, std::move(ips));
             },
             m_ipVersion,
             this);
