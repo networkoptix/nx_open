@@ -472,20 +472,22 @@ Item
                 visible: opacity > 0
                 opacity: 0
 
-                Binding
+                property bool invisible:
                 {
-                    target: liveModeButton
-                    property: "opacity"
-                    property bool invisible:
-                    {
-                        var currentTime = (new Date()).getTime()
-                        var playerPosition = videoScreenController.mediaPlayer.position
-                        var futurePosition = playerPosition > currentTime
-                        var canViewArchive = videoNavigation.canViewArchive
-                        return (d.liveMode || futurePosition) && canViewArchive
-                    }
+                    var currentTime = (new Date()).getTime()
+                    var futurePosition = position > currentTime
+                    var canViewArchive = videoNavigation.canViewArchive
+                    return (d.liveMode || futurePosition) && canViewArchive
+                        || videoScreenController.resourceHelper.isWearableCamera;
+                }
 
-                    onInvisibleChanged: value = invisible ? 0 : 1
+                readonly property real position: videoScreenController.mediaPlayer.position
+                onPositionChanged: updateOpacity()
+                onInvisibleChanged: updateOpacity()
+
+                function updateOpacity()
+                {
+                    opacity = invisible ? 0 : 1
                 }
 
                 Behavior on opacity { NumberAnimation { duration: 200 } }

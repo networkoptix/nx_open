@@ -16,6 +16,8 @@ class QnMediaResourceHelper: public QnResourceHelper
     Q_PROPERTY(QnMediaDewarpingParams fisheyeParams READ fisheyeParams NOTIFY fisheyeParamsChanged)
     Q_PROPERTY(bool analogCameraWithoutLicense READ analogCameraWithoutLicense
         NOTIFY analogCameraWithoutLicenseChanged)
+    Q_PROPERTY(bool isWearableCamera READ isWearableCamera NOTIFY wearableCameraChanged)
+
     Q_ENUMS(Qn::ResourceStatus)
 
     using base_type = QnResourceHelper;
@@ -32,6 +34,7 @@ public:
     QnMediaDewarpingParams fisheyeParams() const;
     bool analogCameraWithoutLicense() const;
     Q_INVOKABLE QPoint channelPosition(int channel) const;
+    bool isWearableCamera() const;
 
 signals:
     void serverNameChanged();
@@ -40,6 +43,7 @@ signals:
     void videoLayoutChanged();
     void fisheyeParamsChanged();
     void analogCameraWithoutLicenseChanged();
+    void wearableCameraChanged();
 
 private:
     QScopedPointer<QnMediaResourceHelperPrivate> d_ptr;

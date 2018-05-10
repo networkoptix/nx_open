@@ -43,6 +43,12 @@ QnMediaResourceHelper::~QnMediaResourceHelper()
 {
 }
 
+bool QnMediaResourceHelper::isWearableCamera() const
+{
+    Q_D(const QnMediaResourceHelper);
+    return d->camera && d->camera->flags().testFlag(Qn::wearable_camera);
+}
+
 bool QnMediaResourceHelper::analogCameraWithoutLicense() const
 {
     Q_D(const QnMediaResourceHelper);
@@ -182,4 +188,5 @@ void QnMediaResourceHelperPrivate::handleResourceChanged()
     emit q->videoLayoutChanged();
     emit q->fisheyeParamsChanged();
     emit q->analogCameraWithoutLicenseChanged();
+    emit q->wearableCameraChanged();
 }
