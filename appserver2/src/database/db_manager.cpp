@@ -1622,14 +1622,6 @@ bool QnDbManager::afterInstallUpdate(const QString& updateName)
     if (updateName.endsWith(lit("/99_20180122_remove_secondary_stream_quality.sql")))
         return resyncIfNeeded(ResyncCameraAttributes);
 
-    if (updateName.endsWith(lit("/99_20180508_01_add_c2p_camera_resource_type.sql")))
-    {
-        QMap<int, QnUuid> guids = getGuidList(
-            "SELECT rt.id, rt.name || '-' as guid from vms_resourcetype rt "
-            "WHERE rt.name == 'C2pCamera'", CM_MakeHash);
-        return updateTableGuids("vms_resourcetype", "guid", guids);
-    }
-
     NX_LOG(lit("SQL update %1 does not require post-actions.").arg(updateName), cl_logDEBUG1);
     return true;
 }
