@@ -46,6 +46,7 @@ namespace style
         static const int kPushButtonIconMargin;         /**< Margin around push button icon */
         static const int kPushButtonIconOnlyMargin;     /**< Margin around push button icon if button has no text. */
         static const QSize kMinimumDialogSize;          /**< Minimum dialog window size */
+        static const int kHintButtonMargin;             /**< Space between a widget and its hint button. */
 
         static const int kTabBarFontPixelSize;
         static const int kTextEditFontPixelSize;

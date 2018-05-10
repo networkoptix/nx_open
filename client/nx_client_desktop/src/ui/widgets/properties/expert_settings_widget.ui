@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>1001</width>
-    <height>894</height>
+    <height>772</height>
    </rect>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout_5">
@@ -59,8 +59,8 @@
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>981</width>
-        <height>384</height>
+        <width>967</width>
+        <height>422</height>
        </rect>
       </property>
       <layout class="QHBoxLayout" name="horizontalLayout_5" stretch="1,1">
@@ -83,7 +83,10 @@
             </property>
             <layout class="QVBoxLayout" name="verticalLayout_4">
              <item>
-              <layout class="QHBoxLayout" name="settingsDisableControlLayout" stretch="0,1,0">
+              <layout class="QHBoxLayout" name="settingsDisableControlLayout" stretch="0,0,1">
+               <property name="spacing">
+                <number>4</number>
+               </property>
                <item>
                 <widget class="QCheckBox" name="settingsDisableControlCheckBox">
                  <property name="sizePolicy">
@@ -133,7 +136,10 @@
               </widget>
              </item>
              <item>
-              <layout class="QHBoxLayout" name="bitratePerGopLayout" stretch="0,1,0">
+              <layout class="QHBoxLayout" name="bitratePerGopLayout" stretch="0,0,1">
+               <property name="spacing">
+                <number>4</number>
+               </property>
                <item>
                 <widget class="QCheckBox" name="bitratePerGopCheckBox">
                  <property name="sizePolicy">
@@ -428,6 +434,9 @@
             <layout class="QVBoxLayout" name="verticalLayout_11">
              <item>
               <layout class="QHBoxLayout" name="horizontalLayout_3">
+               <property name="spacing">
+                <number>4</number>
+               </property>
                <item>
                 <widget class="QSpinBox" name="logicalIdSpinBox">
                  <property name="maximum">
@@ -457,7 +466,7 @@
                  <property name="sizeHint" stdset="0">
                   <size>
                    <width>40</width>
-                   <height>20</height>
+                   <height>0</height>
                   </size>
                  </property>
                 </spacer>
