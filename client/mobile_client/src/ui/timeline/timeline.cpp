@@ -72,26 +72,24 @@ namespace {
 
         QPainter p(&image);
 
-        p.setRenderHint(QPainter::Antialiasing);
-
         QPen pen;
         pen.setWidth(0);
         pen.setColor(Qt::transparent);
         p.setPen(pen);
         p.setBrush(color);
 
-        p.fillRect(image.rect(), background);
-
         QPolygon polygon;
+        polygon.append(QPoint(-size, size));
+        polygon.append(QPoint(0, 0));
+        polygon.append(QPoint(stripeWidth, 0));
         polygon.append(QPoint(-stripeWidth, size));
-        polygon.append(QPoint(-stripeWidth + size, 0));
-        polygon.append(QPoint(size, 0));
-        polygon.append(QPoint(0, size));
 
-        while (polygon[0].x() < size)
+        int colorNum = 0;
+        while (polygon[0].x() <= stripeWidth)
         {
+            p.setBrush(++colorNum % 2 ? color : background);
             p.drawPolygon(polygon);
-            polygon.translate(stripeWidth * 2, 0);
+            polygon.translate(stripeWidth, 0);
         }
 
         return image;
@@ -109,7 +107,7 @@ public:
     QColor chunkColor = QColor("#3a911e");
 
     QColor activeLiveColorLight = QColor("#358815");
-    QColor activeLiveColorDark= QColor("#398f16");
+    QColor activeLiveColorDark = QColor("#398f16");
     QColor inactiveLiveColorLight = toTransparent(QColor("#3d6228"), 0.4);
     QColor inactiveLiveColorDark = toTransparent(QColor("#2f4623"), 0.4);
 
@@ -1236,14 +1234,16 @@ QSGGeometryNode* QnTimeline::updateChunksNode(QSGGeometryNode* chunksNode)
 
     qreal y = height() - d->chunkBarHeight;
 
+    qreal liveX = qMin(width(), d->timeToPixelPos(liveMs));
+
     QnTimelineChunkPainter chunkPainter(geometry);
     auto colors = chunkPainter.colors();
     colors[Qn::RecordingContent] = d->chunkColor;
     colors[Qn::TimePeriodContentCount] = d->hasArchive() ? d->chunkBarColor : Qt::transparent;
     chunkPainter.setColors(colors);
     chunkPainter.start(
-        value, QRectF(0, y, width(), height() - y),
-        chunkCount, minimumValue, maximumValue);
+        value, QRectF(0, y, liveX, height() - y),
+        chunkCount, minimumValue, std::min(liveMs, maximumValue));
 
     while (value < kRightChunksBound)
     {
@@ -1317,7 +1317,6 @@ QSGGeometryNode* QnTimeline::updateChunksNode(QSGGeometryNode* chunksNode)
     stripesOpacityNode->setOpacity(d->liveOpacity);
     lightStripesOpacityNode->setOpacity(d->activeLiveOpacity);
 
-    qreal liveX = qMin(width(), d->timeToPixelPos(liveMs));
     qreal textureX = (width() - liveX) / d->chunkBarHeight;
     const auto stripesPoints = stripesGeometry->vertexDataAsTexturedPoint2D();
     stripesPoints[0].set(liveX, y, d->stripesPosition, 0);
