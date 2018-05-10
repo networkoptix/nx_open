@@ -711,7 +711,7 @@
   <customwidget>
    <class>nx::client::desktop::LegacyExpertSettingsWidget</class>
    <extends>QWidget</extends>
-   <header location="global">nx/client/desktop/resource_properties/camera/expert_settings_widget.h</header>
+   <header location="global">nx/client/desktop/resource_properties/camera/legacy_expert_settings_widget.h</header>
    <container>1</container>
   </customwidget>
   <customwidget>
