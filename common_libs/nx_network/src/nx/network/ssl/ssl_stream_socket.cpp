@@ -91,8 +91,37 @@ StreamSocket::StreamSocket(
 
 StreamSocket::~StreamSocket()
 {
+}
+
+void StreamSocket::pleaseStop(nx::utils::MoveOnlyFunc<void()> completionHandler)
+{
+    post(
+        [this, completionHandler = std::move(completionHandler)]()
+        {
+            stopWhileInAioThread();
+            completionHandler();
+        });
+}
+
+void StreamSocket::pleaseStopSync(bool checkForLocks)
+{
+    if (!m_delegate)
+        return;
+
     if (isInSelfAioThread())
+    {
         stopWhileInAioThread();
+    }
+    else
+    {
+        std::promise<void> stopped;
+        pleaseStop(
+            [&stopped]()
+            {
+                stopped.set_value();
+            });
+        stopped.get_future().wait();
+    }
 }
 
 void StreamSocket::bindToAioThread(aio::AbstractAioThread* aioThread)
@@ -125,7 +154,7 @@ void StreamSocket::connectAsync(
             if (connectResultCode != SystemError::noError)
                 return handler(connectResultCode);
 
-            performHandshakeAsync(std::move(handler));
+            handshakeAsync(std::move(handler));
         });
 }
 
@@ -171,7 +200,7 @@ void StreamSocket::sendAsync(
     m_asyncTransformingChannel->sendAsync(buffer, std::move(handler));
 }
 
-void StreamSocket::performHandshakeAsync(
+void StreamSocket::handshakeAsync(
     nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode)> handler)
 {
     switchToAsyncModeIfNeeded();
@@ -188,6 +217,14 @@ void StreamSocket::performHandshakeAsync(
 
 void StreamSocket::cancelIoInAioThread(nx::network::aio::EventType eventType)
 {
+    // Performing handshake (part of connect) and cancellation of connect has been requested?
+    if (eventType == aio::EventType::etWrite && !m_sslPipeline->isHandshakeCompleted())
+    {
+        // Then we cancel all I/O since handshake invokes both send & recv.
+        eventType = aio::EventType::etNone;
+        m_asyncTransformingChannel->cancelPostedCallsSync();
+    }
+
     m_delegate->cancelIOSync(eventType);
     m_asyncTransformingChannel->cancelIOSync(eventType);
 }

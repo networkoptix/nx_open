@@ -25,6 +25,13 @@ EncryptionDetectingStreamSocket::EncryptionDetectingStreamSocket(
         std::bind(&EncryptionDetectingStreamSocket::createSslSocket, this, _1));
 }
 
+void EncryptionDetectingStreamSocket::handshakeAsync(
+    nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode)> handler)
+{
+    // TODO
+    NX_ASSERT(false);
+}
+
 std::unique_ptr<AbstractStreamSocket> EncryptionDetectingStreamSocket::createSslSocket(
     std::unique_ptr<AbstractStreamSocket> rawDataSource)
 {

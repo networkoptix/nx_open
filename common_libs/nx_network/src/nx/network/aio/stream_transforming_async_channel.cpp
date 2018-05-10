@@ -131,16 +131,34 @@ void StreamTransformingAsyncChannel::processWriteTask(WriteTask* task)
 {
     SystemError::ErrorCode sysErrorCode = SystemError::noError;
     int bytesWritten = 0;
-    std::tie(sysErrorCode, bytesWritten) = invokeConverter(
-        std::bind(&utils::bstream::Converter::write, m_converter,
-            task->buffer.data(),
-            task->buffer.size()));
-    if (sysErrorCode == SystemError::wouldBlock)
-        return;
+
+    const auto rawWriteQueueSizeBak = m_rawWriteQueue.size();
+
+    //if (!task->buffer.isEmpty())
+    {
+        std::tie(sysErrorCode, bytesWritten) = invokeConverter(
+            std::bind(&utils::bstream::Converter::write, m_converter,
+                task->buffer.data(),
+                task->buffer.size()));
+        if (sysErrorCode == SystemError::wouldBlock)
+            return; //< Could not schedule user data send.
+    }
 
     task->status = UserTaskStatus::done;
-    auto userHandler = std::move(task->handler);
-    userHandler(sysErrorCode, bytesWritten);
+
+    if (m_rawWriteQueue.size() > rawWriteQueueSizeBak)
+    {
+        // User data send has been scheduled.
+        // Reporting result only after send completion on underlying raw channel.
+        NX_ASSERT(!m_rawWriteQueue.empty());
+        m_rawWriteQueue.back().userHandler =
+            std::exchange(task->handler, nullptr);
+        m_rawWriteQueue.back().userByteCount = task->buffer.size();
+    }
+    else
+    {
+        nx::utils::swapAndCall(task->handler, sysErrorCode, 0);
+    }
 }
 
 template<typename TransformerFunc>
@@ -149,7 +167,7 @@ std::tuple<SystemError::ErrorCode, int /*bytesTransferred*/>
         TransformerFunc func)
 {
     const int result = func();
-    if (result > 0)
+    if (result >= 0)
         return std::make_tuple(SystemError::noError, result);
 
     if (m_converter->failed())
@@ -245,11 +263,12 @@ int StreamTransformingAsyncChannel::writeRawBytes(const void* data, size_t count
 
     // TODO: #ak Put a limit on send queue size.
 
-    m_rawWriteQueue.push_back(nx::Buffer((const char*)data, (int)count));
+    m_rawWriteQueue.push_back(RawSendContext());
+    m_rawWriteQueue.back().data = nx::Buffer((const char*)data, (int)count);
     if (m_rawWriteQueue.size() == 1)
     {
         m_rawDataChannel->sendAsync(
-            m_rawWriteQueue.front(),
+            m_rawWriteQueue.front().data,
             std::bind(&StreamTransformingAsyncChannel::onRawDataWritten, this, _1, _2));
     }
 
@@ -264,28 +283,52 @@ void StreamTransformingAsyncChannel::onRawDataWritten(
 
     if (sysErrorCode == SystemError::noError)
     {
-        NX_ASSERT(bytesTransferred == static_cast<std::size_t>(m_rawWriteQueue.front().size()));
+        NX_ASSERT(
+            bytesTransferred ==
+            static_cast<std::size_t>(m_rawWriteQueue.front().data.size()));
+        auto userHandler = std::move(m_rawWriteQueue.front().userHandler);
+        const auto userByteCount = m_rawWriteQueue.front().userByteCount;
         m_rawWriteQueue.pop_front();
         if (!m_rawWriteQueue.empty())
         {
             m_rawDataChannel->sendAsync(
-                m_rawWriteQueue.front(),
+                m_rawWriteQueue.front().data,
                 std::bind(&StreamTransformingAsyncChannel::onRawDataWritten, this, _1, _2));
+        }
+
+        if (userHandler)
+        {
+            utils::ObjectDestructionFlag::Watcher thisDestructionWatcher(&m_destructionFlag);
+            userHandler(sysErrorCode, userByteCount);
+            if (thisDestructionWatcher.objectDestroyed())
+                return;
         }
 
         return tryToCompleteUserTasks();
     }
 
     if (nx::network::socketCannotRecoverFromError(sysErrorCode))
+    {
+        // TODO: #ak This is copy-paste. Refactor!
+        auto userHandler = std::move(m_rawWriteQueue.front().userHandler);
+        if (userHandler)
+        {
+            utils::ObjectDestructionFlag::Watcher thisDestructionWatcher(&m_destructionFlag);
+            userHandler(sysErrorCode, -1);
+            if (thisDestructionWatcher.objectDestroyed())
+                return;
+        }
         return handleIoError(sysErrorCode);
+    }
 
     // Retrying I/O.
     m_rawDataChannel->sendAsync(
-        m_rawWriteQueue.front(),
+        m_rawWriteQueue.front().data,
         std::bind(&StreamTransformingAsyncChannel::onRawDataWritten, this, _1, _2));
 }
 
-void StreamTransformingAsyncChannel::handleIoError(SystemError::ErrorCode sysErrorCode)
+void StreamTransformingAsyncChannel::handleIoError(
+    SystemError::ErrorCode sysErrorCode)
 {
     // We can have SystemError::noError here in case of a connection closure.
     decltype(m_userTaskQueue) userTaskQueue;

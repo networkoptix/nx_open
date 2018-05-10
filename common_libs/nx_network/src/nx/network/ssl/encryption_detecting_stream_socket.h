@@ -24,6 +24,9 @@ class NX_NETWORK_API EncryptionDetectingStreamSocket:
 public:
     EncryptionDetectingStreamSocket(std::unique_ptr<AbstractStreamSocket> source);
 
+    void handshakeAsync(
+        nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode)> handler);
+
 private:
     std::unique_ptr<AbstractStreamSocket> createSslSocket(
         std::unique_ptr<AbstractStreamSocket> /*rawDataSource*/);

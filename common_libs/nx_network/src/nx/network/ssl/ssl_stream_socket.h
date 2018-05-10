@@ -50,6 +50,9 @@ public:
 
     virtual ~StreamSocket() override;
 
+    virtual void pleaseStop(nx::utils::MoveOnlyFunc<void()> handler) override;
+    virtual void pleaseStopSync(bool checkForLocks = true) override;
+
     virtual void bindToAioThread(aio::AbstractAioThread* aioThread) override;
 
     virtual bool connect(
@@ -72,7 +75,7 @@ public:
         const nx::Buffer& buffer,
         IoCompletionHandler handler) override;
 
-    void performHandshakeAsync(
+    void handshakeAsync(
         nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode)> handler);
 
 protected:

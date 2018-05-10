@@ -25,7 +25,11 @@ Pipeline::Pipeline(SSL_CTX* sslContext):
 
 int Pipeline::write(const void* data, size_t size)
 {
-    return performSslIoOperation(&SSL_write, data, size);
+    bool eofBak = m_eof;
+    int result = performSslIoOperation(&SSL_write, data, size);
+    if (result == 0 && m_eof && !eofBak)
+        m_eof = false; //< TODO: #ak Remove this & fix handleSslIoResult().
+    return result;
 }
 
 int Pipeline::read(void* data, size_t size)
@@ -43,6 +47,11 @@ bool Pipeline::performHandshake()
     }
 
     return true;
+}
+
+bool Pipeline::isHandshakeCompleted() const
+{
+    return m_state == State::handshakeDone;
 }
 
 bool Pipeline::isReadThirsty() const

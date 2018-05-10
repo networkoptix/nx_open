@@ -32,6 +32,7 @@ public:
     virtual bool failed() const override;
 
     bool performHandshake();
+    bool isHandshakeCompleted() const;
 
     bool isReadThirsty() const;
     bool isWriteThirsty() const;

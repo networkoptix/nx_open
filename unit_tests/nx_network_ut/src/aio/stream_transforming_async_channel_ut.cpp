@@ -4,6 +4,7 @@
 
 #include <nx/network/aio/stream_transforming_async_channel.h>
 #include <nx/network/aio/test/aio_test_async_channel.h>
+#include <nx/utils/thread/sync_queue.h>
 
 namespace nx {
 namespace network {
@@ -192,6 +193,28 @@ protected:
         waitUntilWriteHasBeenScheduledOnRawDataChannel();
     }
 
+    void whenSendSomeData()
+    {
+        using namespace std::placeholders;
+
+        if (!m_channel)
+            createTransformingChannel();
+        prepareRandomInputData();
+        m_channel->sendAsync(
+            m_inputData,
+            std::bind(&StreamTransformingAsyncChannel::onBytesWritten, this, _1, _2));
+    }
+
+    void thenSendHasSucceeded()
+    {
+        ASSERT_EQ(SystemError::noError, m_sendResultQueue.pop());
+    }
+
+    void assertRawChannelHasCompletedSend()
+    {
+        ASSERT_FALSE(m_rawDataChannel->isWriteScheduled());
+    }
+
     void whenCancelledRead()
     {
         m_channel->cancelIOSync(aio::EventType::etRead);
@@ -264,6 +287,7 @@ private:
     nx::Buffer m_outputData;
     nx::Buffer m_readBuffer;
     int m_readCallSequence;
+    nx::utils::SyncQueue<SystemError::ErrorCode> m_sendResultQueue;
 
     void createTransformingChannel()
     {
@@ -305,10 +329,10 @@ private:
     }
 
     void onBytesWritten(
-        SystemError::ErrorCode /*sysErrorCode*/,
+        SystemError::ErrorCode sysErrorCode,
         std::size_t /*bytesWritten*/)
     {
-        FAIL();
+        m_sendResultQueue.push(sysErrorCode);
     }
 
     void waitUntilReadHasBeenScheduledOnRawDataChannel()
@@ -355,6 +379,16 @@ TEST_F(StreamTransformingAsyncChannel, cancel_write)
     givenScheduledWrite();
     whenCancelledWrite();
     assertIoHasBeenProperlyCancelled();
+}
+
+TEST_F(
+    StreamTransformingAsyncChannel,
+    send_completion_is_reported_after_send_completion_on_raw_channel)
+{
+    whenSendSomeData();
+    thenSendHasSucceeded();
+
+    assertRawChannelHasCompletedSend();
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -426,6 +460,7 @@ TEST_F(StreamTransformingAsyncChannelIoErrors, read_timeout)
     whenTransferringFiniteData();
     assertDataReadMatchesDataWritten();
 }
+
 
 TEST_F(StreamTransformingAsyncChannelIoErrors, send_timeout_on_underlying_channel)
 {

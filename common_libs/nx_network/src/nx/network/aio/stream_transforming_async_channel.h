@@ -90,6 +90,13 @@ private:
         }
     };
 
+    struct RawSendContext
+    {
+        nx::Buffer data;
+        int userByteCount = 0;
+        UserIoHandler userHandler;
+    };
+
     std::unique_ptr<AbstractAsyncChannel> m_rawDataChannel;
     nx::utils::bstream::Converter* m_converter;
     nx::Buffer m_readBuffer;
@@ -101,7 +108,7 @@ private:
     std::deque<std::unique_ptr<UserTask>> m_userTaskQueue;
     nx::Buffer m_rawDataReadBuffer;
     std::deque<nx::Buffer> m_readRawData;
-    std::deque<nx::Buffer> m_rawWriteQueue;
+    std::deque<RawSendContext> m_rawWriteQueue;
     bool m_asyncReadInProgress;
     nx::utils::ObjectDestructionFlag m_destructionFlag;
 
