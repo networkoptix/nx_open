@@ -8,6 +8,8 @@
 #include <ui/workbench/workbench_access_controller.h>
 #include <ui/workbench/workbench_context.h>
 
+#include <nx/utils/log/assert.h>
+
 namespace nx {
 namespace client {
 namespace desktop {
@@ -21,12 +23,8 @@ CameraSettingsReadOnlyWatcher::CameraSettingsReadOnlyWatcher(
 {
     NX_ASSERT(store);
 
-    connect(this, &CameraSettingsReadOnlyWatcher::readOnlyChanged, store,
-        [store = QPointer<CameraSettingsDialogStore>(store)](bool value)
-        {
-            if (store)
-                store->setReadOnly(value);
-        });
+    connect(this, &CameraSettingsReadOnlyWatcher::readOnlyChanged,
+        store, &CameraSettingsDialogStore::setReadOnly);
 }
 
 QnVirtualCameraResourceList CameraSettingsReadOnlyWatcher::cameras() const
