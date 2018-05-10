@@ -100,8 +100,7 @@ CameraSettingsDialog::CameraSettingsDialog(QWidget* parent):
     connect(d->store, &CameraSettingsDialogStore::stateChanged, this,
         &CameraSettingsDialog::loadState);
 
-    d->readOnlyWatcher = new CameraSettingsReadOnlyWatcher(this);
-    d->readOnlyWatcher->setStore(d->store);
+    d->readOnlyWatcher = new CameraSettingsReadOnlyWatcher(d->store, this);
 
     d->licenseUsageHelper = new QnCamLicenseUsageHelper(commonModule(), this);
 

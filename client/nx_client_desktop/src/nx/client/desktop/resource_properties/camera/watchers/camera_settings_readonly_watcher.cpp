@@ -1,22 +1,32 @@
 #include "camera_settings_readonly_watcher.h"
+#include "../redux/camera_settings_dialog_store.h"
+
+#include <QtCore/QPointer>
 
 #include <common/common_module.h>
-
 #include <core/resource/camera_resource.h>
-
 #include <ui/workbench/workbench_access_controller.h>
 #include <ui/workbench/workbench_context.h>
-
-#include "../redux/camera_settings_dialog_store.h"
 
 namespace nx {
 namespace client {
 namespace desktop {
 
-CameraSettingsReadOnlyWatcher::CameraSettingsReadOnlyWatcher(QObject* parent):
+CameraSettingsReadOnlyWatcher::CameraSettingsReadOnlyWatcher(
+    CameraSettingsDialogStore* store,
+    QObject* parent)
+    :
     base_type(parent),
     QnWorkbenchContextAware(parent, InitializationMode::lazy)
 {
+    NX_ASSERT(store);
+
+    connect(this, &CameraSettingsReadOnlyWatcher::readOnlyChanged, store,
+        [store = QPointer<CameraSettingsDialogStore>(store)](bool value)
+        {
+            if (store)
+                store->setReadOnly(value);
+        });
 }
 
 QnVirtualCameraResourceList CameraSettingsReadOnlyWatcher::cameras() const
@@ -31,12 +41,6 @@ void CameraSettingsReadOnlyWatcher::setCameras(const QnVirtualCameraResourceList
 
     m_cameras = value;
     updateReadOnly();
-}
-
-void CameraSettingsReadOnlyWatcher::setStore(CameraSettingsDialogStore* store)
-{
-    connect(this, &CameraSettingsReadOnlyWatcher::readOnlyChanged, store,
-        [store](bool value) { store->setReadOnly(value); });
 }
 
 void CameraSettingsReadOnlyWatcher::afterContextInitialized()
