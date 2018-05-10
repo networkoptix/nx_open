@@ -74,7 +74,7 @@ then
 fi
 
 SetFile -c icnC $SRC/.VolumeIcon.icns
-hdiutil create -srcfolder $SRC -volname "$VOLUME_NAME" -format UDRW -ov "raw-$DMG_FILE"
+hdiutil create -srcfolder $SRC -volname "$VOLUME_NAME" -fs "HFS+" -format UDRW -ov "raw-$DMG_FILE"
 
 [ "$1" == "rwonly" ] && exit 0
 
