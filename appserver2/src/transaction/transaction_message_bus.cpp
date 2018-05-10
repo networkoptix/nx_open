@@ -11,7 +11,6 @@
 
 #include "common/common_module.h"
 #include "ec_connection_notification_manager.h"
-#include "managers/time_manager.h"
 #include "nx/vms/discovery/manager.h"
 #include "settings.h"
 

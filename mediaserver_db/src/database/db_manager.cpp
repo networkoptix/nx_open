@@ -7,7 +7,6 @@
 #include <common/common_module.h>
 
 #include "utils/common/util.h"
-#include "managers/time_manager.h"
 #include "nx_ec/data/api_discovery_data.h"
 #include <nx/vms/event/event_fwd.h>
 #include "utils/common/synctime.h"

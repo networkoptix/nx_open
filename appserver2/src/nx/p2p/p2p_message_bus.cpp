@@ -13,7 +13,6 @@
 #include <nx_ec/ec_proto_version.h>
 #include <utils/math/math.h>
 #include <api/runtime_info_manager.h>
-#include <managers/time_manager.h>
 #include <nx/cloud/cdb/api/ec2_request_paths.h>
 
 namespace nx {
