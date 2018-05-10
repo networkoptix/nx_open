@@ -108,15 +108,18 @@ class AccountManager(db.models.Manager):
 @receiver(user_logged_in)
 def user_logged_in_callback(sender, request, user, **kwargs):
     ip = request.META.get('REMOTE_ADDR')
-    models.AccountLoginHistory.objects.create(action='user_logged_in', ip=ip, username=user.username)
+    logger.info('User logged in: {}, IP: {}'.format(user.email, ip))
+    models.AccountLoginHistory.objects.create(action='user_logged_in', ip=ip, email=user.email)
 
 
 @receiver(user_logged_out)
 def user_logged_out_callback(sender, request, user, **kwargs):
     ip = request.META.get('REMOTE_ADDR')
-    models.AccountLoginHistory.objects.create(action='user_logged_out', ip=ip, username=user.username)
+    logger.info('User logged our: {}, IP: {}'.format(user.email, ip))
+    models.AccountLoginHistory.objects.create(action='user_logged_out', ip=ip, email=user.email)
 
 
 @receiver(user_login_failed)
 def user_login_failed_callback(sender, credentials, **kwargs):
-    models.AccountLoginHistory.objects.create(action='user_login_failed', email=credentials.get('email', None))
+    logger.info('Failed login attempt: {}'.format(credentials.get('username', None)))
+    models.AccountLoginHistory.objects.create(action='user_login_failed', email=credentials.get('username', None))
