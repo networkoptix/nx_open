@@ -6,6 +6,7 @@ from cms.admin import CMSAdmin
 from django_csv_exports.admin import CSVExportAdmin
 
 
+@admin.register(Account)
 class AccountAdmin(CMSAdmin, CSVExportAdmin):
     list_display = ('short_email', 'short_first_name', 'short_last_name', 'created_date', 'last_login',
                     'subscribe', 'is_staff', 'language', 'customization')
@@ -42,4 +43,9 @@ class AccountAdmin(CMSAdmin, CSVExportAdmin):
     def has_delete_permission(self, request, obj=None):  # No deleting users at all
         return False
 
-admin.site.register(Account, AccountAdmin)
+
+@admin.register(AccountLoginHistory)
+class AccountLoginHistoryAdmin(admin.ModelAdmin):
+    list_display = ('action', 'username', 'ip',)
+    list_filter = ('action',)
+    search_fields = ('username', 'ip', )

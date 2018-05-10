@@ -60,3 +60,12 @@ class Account(PermissionsMixin):
     short_email.short_description = "email"
     short_first_name.short_description = "first name"
     short_last_name.short_description = "last name"
+
+
+class AccountLoginHistory(models.Model):
+    action = models.CharField(max_length=64)
+    ip = models.GenericIPAddressField(null=True)
+    username = models.CharField(max_length=256, null=True)
+
+    def __unicode__(self):
+        return '{0} - {1} - {2}'.format(self.action, self.username, self.ip)
