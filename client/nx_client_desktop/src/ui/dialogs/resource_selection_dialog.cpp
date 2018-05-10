@@ -160,7 +160,7 @@ void QnResourceSelectionDialog::initModel()
 
     // For the sake of VMS-9698 we do apply auto-expanding policy.
     // Expanding all cameras only if (numberOfServers - 1) * numberOfCameras <= 100
-    if (auto treeRoot = m_resourceModel->rootNode(Qn::NodeType::ServersNode))
+    if (auto treeRoot = m_resourceModel->rootNode(ResourceTreeNodeType::servers))
     {
         int numServers = treeRoot->children().size();
         int numResources = treeRoot->childrenRecursive().size() - numServers;

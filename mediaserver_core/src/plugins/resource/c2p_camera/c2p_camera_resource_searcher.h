@@ -13,7 +13,7 @@ public:
         const QnUuid &resourceTypeId, const QnResourceParams& params) override;
 
     virtual QList<QnResourcePtr> checkHostAddr(
-        const QUrl& url, const QAuthenticator& auth, bool doMultichannelCheck) override;
+        const nx::utils::Url& url, const QAuthenticator& auth, bool doMultichannelCheck) override;
 
 protected:
     // return the manufacture of the server

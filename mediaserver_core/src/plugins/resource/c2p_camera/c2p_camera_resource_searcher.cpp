@@ -35,7 +35,7 @@ QString QnPlC2pCameraResourceSearcher::manufacture() const
 }
 
 QList<QnResourcePtr> QnPlC2pCameraResourceSearcher::checkHostAddr(
-    const QUrl& url, const QAuthenticator& auth, bool isSearchAction)
+    const nx::utils::Url& url, const QAuthenticator& auth, bool isSearchAction)
 {
     QList<QnResourcePtr> result;
     if (url.scheme().toLower() == kC2pScheme && url.isValid())

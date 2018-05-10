@@ -420,7 +420,7 @@ HanwhaResult<bool> HanwhaSharedResourceContext::checkBypassSupport()
     // It's intentionally incorrect request, we use it just to determine bypass presence
     // If HTTP code of the response is 404 then the device doesn't support bypass otherwise it does.
     const auto result = helper.control(lit("bypass/bypass"));
-    const bool hasBypassSupport = result.statusCode() != nx_http::StatusCode::notFound;
+    const bool hasBypassSupport = result.statusCode() != nx::network::http::StatusCode::notFound;
 
     return {CameraDiagnostics::NoErrorResult(), hasBypassSupport};
 }
