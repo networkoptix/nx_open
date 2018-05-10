@@ -694,7 +694,8 @@
                 "*|DW-CP04", "*|DW-CP16",
                 "ACTI|I96","ACTI|I98",
                 "UNIVIEW|IPC6242SR-X22",
-                "Milesight*|MS-C2961-EB"
+                "Milesight*|MS-C2961-EB",
+                "Dahua|DH-SD22404T-GN"
             ],
             "ptzTraits": "EightWayPtz"
         },

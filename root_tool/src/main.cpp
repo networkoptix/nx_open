@@ -35,8 +35,6 @@ void registerCommands(CommandsFactory& factory, nx::SystemCommands* systemComman
 
     factory.reg({"chown"}, {"path"},
         oneArgAction(std::bind(&nx::SystemCommands::changeOwner, systemCommands, _1)));
-    factory.reg({"touch"}, {"file_path"},
-        oneArgAction(std::bind(&nx::SystemCommands::touchFile, systemCommands, _1)));
     factory.reg({"mkdir"}, {"path"},
         oneArgAction(std::bind(&nx::SystemCommands::makeDirectory, systemCommands, _1)));
     factory.reg({"rm"}, {"path"},

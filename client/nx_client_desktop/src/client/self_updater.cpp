@@ -85,6 +85,11 @@ bool SelfUpdater::registerUriHandler()
             QnClientAppInfo::protocolHandlerBundleName());
     #endif
 
+    #if defined(_DEBUG)
+        if (m_clientVersion.build() == 0)
+            return true;
+    #endif
+
     return nx::vms::utils::registerSystemUriProtocolHandler(
         nx::vms::utils::AppInfo::nativeUriProtocol(),
         binaryPath,

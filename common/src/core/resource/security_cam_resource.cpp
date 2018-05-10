@@ -38,6 +38,16 @@ static const int kSharePixelsDefaultReservedSecondStreamFps = 0;
 static const Qn::StreamFpsSharingMethod kDefaultStreamFpsSharingMethod = Qn::PixelsFpsSharing;
 //static const Qn::MotionType defaultMotionType = Qn::MotionType::MT_MotionWindow;
 
+bool stringEmptinessChecker(const QString& value)
+{
+    return value.isEmpty();
+};
+
+bool deviceTypeEmptinessChecker(nx::core::resource::DeviceType value)
+{
+    return value == nx::core::resource::DeviceType::unknown;
+};
+
 } // namespace
 
 const int QnSecurityCamResource::kDefaultSecondStreamFpsLow = 2;
@@ -1226,10 +1236,10 @@ bool QnSecurityCamResource::mergeResourcesIfNeeded(const QnNetworkResourcePtr &s
 
     bool result = base_type::mergeResourcesIfNeeded(source);
     const auto mergeValue =
-        [&](auto getter, auto setter)
+        [&](auto getter, auto setter, auto emptinessChecker)
         {
             const auto newValue = (camera->*getter)();
-            if (!newValue.isEmpty())
+            if (!emptinessChecker(newValue))
             {
                 const auto currentValue = (this->*getter)();
                 if (currentValue != newValue)
@@ -1242,10 +1252,26 @@ bool QnSecurityCamResource::mergeResourcesIfNeeded(const QnNetworkResourcePtr &s
 
     // Group id and name can be changed for any resource because if we unable to authorize,
     // number of channels is not accessible.
-    mergeValue(&QnSecurityCamResource::getGroupId, &QnSecurityCamResource::setGroupId);
-    mergeValue(&QnSecurityCamResource::getGroupName, &QnSecurityCamResource::setGroupName);
-    mergeValue(&QnSecurityCamResource::getModel, &QnSecurityCamResource::setModel);
-    mergeValue(&QnSecurityCamResource::getVendor, &QnSecurityCamResource::setVendor);
+    mergeValue(
+        &QnSecurityCamResource::getGroupId,
+        &QnSecurityCamResource::setGroupId,
+        stringEmptinessChecker);
+    mergeValue(
+        &QnSecurityCamResource::getGroupName,
+        &QnSecurityCamResource::setGroupName,
+        stringEmptinessChecker);
+    mergeValue(
+        &QnSecurityCamResource::getModel,
+        &QnSecurityCamResource::setModel,
+        stringEmptinessChecker);
+    mergeValue(
+        &QnSecurityCamResource::getVendor,
+        &QnSecurityCamResource::setVendor,
+        stringEmptinessChecker);
+    mergeValue(
+        &QnSecurityCamResource::deviceType,
+        &QnSecurityCamResource::setDeviceType,
+        deviceTypeEmptinessChecker);
     return result;
 }
 

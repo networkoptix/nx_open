@@ -2,6 +2,11 @@
 
 #include <QStringList>
 
+namespace nx {
+namespace mediaserver_plugins {
+namespace metadata {
+namespace dw_mtt {
+
 /**
 * Scans all children of a node 'node' and finds an element with tag 'tag'.
 * If no such a child returns null element.
@@ -48,14 +53,14 @@ QDomElement findNestedChildElement(const QDomNode& node, const QString& tags)
 * It is quite common, that some objects have SMART_START status and some others have
 * SMART_STOP status at the same time.
 */
-StartStopStatus readEventStatus(const QDomNode& node)
+EventStatus readEventStatus(const QDomNode& node)
 {
     static const QString kItem = "item";
     static const QString kStatus = "status";
     static const QString kStartValue = "SMART_START";
     static const QString kStopValue = "SMART_STOP";
 
-    StartStopStatus eventStatus{ false /*start*/, false /*stop*/ };
+    EventStatus eventStatus;
 
     for (QDomNode item = node.firstChild(); !item.isNull(); item = item.nextSibling())
     {
@@ -63,9 +68,9 @@ StartStopStatus readEventStatus(const QDomNode& node)
         {
             const QString text = findChildElementByTag(item, kStatus).toElement().text();
             if (text == kStartValue)
-                eventStatus.start = true;
+                eventStatus |= EventState::startEvent;
             else if (text == kStopValue)
-                eventStatus.stop = true;
+                eventStatus |= EventState::stopEvent;
         }
     }
     return eventStatus;
@@ -75,7 +80,7 @@ StartStopStatus readEventStatus(const QDomNode& node)
 * For each item in the node 'node' reads it ratio and theshold. If at least one ratio is bigger
 * then the threshold, return true. Otherwise returns false.
 */
-bool ratioExceedsThreshold(const QDomNode& node)
+bool isRatioMoreThenTreshold(const QDomNode& node)
 {
     static const QString kItem = "item";
     static const QString kThreshold = "alarmThreshold";
@@ -147,16 +152,15 @@ QByteArray getEventName(const QDomDocument& dom)
 
         const QDomElement perInfo =
             findNestedChildElement(configNode, kPerInfo);
-        const StartStopStatus perStatus = readEventStatus(perInfo);
+        const EventStatus perStatus = readEventStatus(perInfo);
 
         const QDomElement tripInfo =
             findNestedChildElement(configNode, kTripInfo);
-        const StartStopStatus tripStatus = readEventStatus(tripInfo);
+        const EventStatus tripStatus = readEventStatus(tripInfo);
 
-        const StartStopStatus globalStatus{
-            perStatus.start || tripStatus.start, perStatus.stop || tripStatus.stop };
+        const EventStatus globalStatus(perStatus | tripStatus);
 
-        if (!globalStatus.start)
+        if (!globalStatus.testFlag(EventState::startEvent))
             alarmMessage.clear();
     }
 
@@ -165,14 +169,15 @@ QByteArray getEventName(const QDomDocument& dom)
     {
         // The value of ratio may be different for diferent items,
         // so we should read values for every item and choose maximum.
-
-        const QDomElement listInfo =
-            findChildElementByTag(configNode, kListInfo);
-
-        bool b = ratioExceedsThreshold(listInfo);
-        if (!b)
+        const QDomElement listInfo = findChildElementByTag(configNode, kListInfo);
+        if (!isRatioMoreThenTreshold(listInfo))
             alarmMessage.clear();
     }
 
     return alarmMessage;
 }
+
+} // namespace dw_mtt
+} // namespace metadata
+} // namespace mediaserver_plugin
+} // namespace nx
