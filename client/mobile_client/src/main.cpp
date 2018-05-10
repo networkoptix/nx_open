@@ -247,33 +247,29 @@ void initLog(const QString& logLevel)
 
     logSettings.maxFileSize = 10 * 1024 * 1024;
     logSettings.maxBackupCount = 5;
+    logSettings.logBaseName = *ini().logFile
+        ? QString::fromUtf8(ini().logFile)
+        : QnAppInfo::isAndroid()
+            ? lit("-")
+            : (QString::fromUtf8(nx::kit::IniConfig::iniFilesDir()) + lit("mobile_client"));
 
     if (ini().enableLog)
     {
         nx::utils::log::initialize(
             logSettings,
-            /*applicationName*/ lit("mobile_client"),
-            /*binaryPath*/ QString(),
-            /*baseName*/
-                *ini().logFile
-                ? QString::fromUtf8(ini().logFile)
-                : QnAppInfo::isAndroid()
-                    ? lit("-")
-                    : (QString::fromUtf8(nx::kit::IniConfig::iniFilesDir())
-                        + lit("mobile_client")));
+            /*applicationName*/ lit("mobile_client"));
     }
 
     const auto ec2logger = nx::utils::log::addLogger({QnLog::EC2_TRAN_LOG});
     if (ini().enableEc2TranLog)
     {
+        logSettings.logBaseName = QnAppInfo::isAndroid()
+            ? lit("-")
+            : (QString::fromUtf8(nx::kit::IniConfig::iniFilesDir()) + lit("ec2_tran"));
         nx::utils::log::initialize(
             logSettings,
             /*applicationName*/ lit("mobile_client"),
             /*binaryPath*/ QString(),
-            /*baseName*/
-                QnAppInfo::isAndroid()
-                ? lit("-")
-                : (QString::fromUtf8(nx::kit::IniConfig::iniFilesDir()) + lit("ec2_tran")),
             ec2logger);
     }
 }

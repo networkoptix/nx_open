@@ -189,7 +189,10 @@ private:
     void saveServerInfo(const QnMediaServerResourcePtr& server);
 
     nx::utils::log::Settings makeLogSettings(
-        const QString& argValue, const QString& settingsKey, const QString& defaultValue);
+        const QString& argValue,
+        const QString& settingsKey,
+        const QString& defaultValue,
+        const QString& logBaseName);
 
     void initializeLogging();
     void initializeHardwareId();

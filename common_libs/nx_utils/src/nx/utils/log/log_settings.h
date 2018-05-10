@@ -24,6 +24,7 @@ public:
     QString directory = QString(); //< dataDir/log
     quint32 maxFileSize = nx::utils::stringToBytesConst("10M");
     quint8 maxBackupCount = 5;
+    QString logBaseName;
 
     /** Rewrites values from settings if specified */
     void load(const QnSettings& settings, const QString& prefix = QLatin1String("log"));

@@ -159,9 +159,10 @@ int main(int argc, char* argv[])
         settings.level = nx::utils::log::Level::warning;
         settings.maxFileSize = 1024 * 1024 * 10;
         settings.maxBackupCount = 5;
+        settings.logBaseName = logFilePath;
 
         nx::utils::log::initialize(
-            settings, QnApplauncherAppInfo::applicationName(), QString(), logFilePath);
+            settings, QnApplauncherAppInfo::applicationName());
     }
 
     InstallationManager installationManager;

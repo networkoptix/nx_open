@@ -33,7 +33,7 @@ VmsGatewayEmbeddable::VmsGatewayEmbeddable(
         addArg("-http/sslSupport", "false");
     }
 
-    addArg("-log/baseName", logBaseName.toUtf8());
+    addArg("-log/baseName", logBaseName.isEmpty() ? "vms_gateway" : logBaseName.toUtf8());
 
     if (startAndWaitUntilStarted())
     {
