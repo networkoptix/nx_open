@@ -198,7 +198,7 @@ Object
 
     function start(timestamp)
     {
-        if (cameraOffline || cameraUnauthorized || resourceId === "")
+        if (resourceId === "")
             return
 
         mediaPlayer.maxTextureSize = getMaxTextureSize()
