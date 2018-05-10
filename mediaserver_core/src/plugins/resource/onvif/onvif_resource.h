@@ -148,7 +148,6 @@ public:
 
     virtual void setHostAddress(const QString &ip) override;
 
-
     //!Implementation of QnNetworkResource::checkIfOnlineAsync
     virtual void checkIfOnlineAsync( std::function<void(bool)> completionHandler ) override;
 
@@ -197,7 +196,6 @@ public:
 
     void updateOnvifUrls(const QnPlOnvifResourcePtr& other);
 
-
     QString getMediaUrl() const;
     void setMediaUrl(const QString& src);
 
@@ -243,7 +241,6 @@ public:
     static CameraDiagnostics::Result readDeviceInformation(const QString& onvifUrl, const QAuthenticator& auth, int timeDrift, OnvifResExtInfo* extInfo);
     CameraDiagnostics::Result readDeviceInformation();
     CameraDiagnostics::Result getFullUrlInfo();
-
 
     //!Relay input with token \a relayToken has changed its state to \a active
     //void notificationReceived( const std::string& relayToken, bool active );
@@ -341,7 +338,6 @@ private:
     int findClosestRateFloor(const std::vector<int>& values, int threshold) const;
     int  getH264StreamProfile(const VideoOptionsLocal& videoOptionsLocal);
     void checkMaxFps(VideoConfigsResp& response, const QString& encoderId);
-
 
     void updateVideoSource(VideoSource* source, const QRect& maxRect) const;
     CameraDiagnostics::Result sendVideoSourceToCamera(VideoSource* source);
@@ -518,6 +514,7 @@ private:
     mutable QTimeZone m_cameraTimeZone;
     std::vector<RelayOutputInfo> m_relayOutputInfo;
     bool m_isRelayOutputInversed;
+    bool m_fixWrongInputPortNumber;
     std::map<QString, RelayInputState> m_relayInputStates;
     std::string m_deviceIOUrl;
     QString m_onvifNotificationSubscriptionID;

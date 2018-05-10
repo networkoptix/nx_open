@@ -469,7 +469,7 @@
                 "BOSCH|VJT-X40XF-E",
                 "CAP|NVN4100",
                 "DS-6701HWI|Embedded Net DVS",
-                "DS-6716HQHI-SATA|Embedded_Net_DVR", 
+                "DS-6716HQHI-SATA|Embedded_Net_DVR",
                 "Hangzhou Hikvision Digital Technology Co., Ltd|DS-6716HQHI-SATA",
                 "GrandStream|GXV3504",
                 "Hikvision|DS-6701*",
@@ -851,6 +851,10 @@
             ],
             "relayOutputInversed": true,
             "portNamePrefixToIgnore": "AlarmOut"
+        },
+        {
+            "keys": ["DW|DWC-PF5M1TIR"],
+	  		    "fixWrongInputPortNumber": true
         },
         {
             "keys": [
@@ -2131,7 +2135,7 @@
                     "VideoEncoderToken_301,VideoEncoderToken_302"
                 ]
             }
-        },        
+        },
         {
             "keys": [
                 "IQA*|IQEYE*"
@@ -2273,7 +2277,7 @@
             "ignoreMultisensors": true,
             "shouldAppearAsSingleChannel": true,
             "videoLayout": "width=4;height=1;sensors=0,1,2,3"
-        },   
+        },
         {
             "keys":[
             "Axis|AXISQ6000*","AXIS|AXISQ6000*","Axis|Q6000*","AXIS|Q6000*"
@@ -2320,7 +2324,7 @@
             "ignoreMultisensors": true,
             "shouldAppearAsSingleChannel": true,
             "videoLayout": "width=2;height=2;sensors=0,1,2,3"
-        },        
+        },
         {
             "keys": ["*|CMD-C244","COMMANDCO|*"],
             "onvifManufacturerReplacement": "Hikvision"
@@ -2403,7 +2407,7 @@
                     "VideoEncoderConfigurationToken016,VideoEncoderConfigurationToken034"
                 ]
             }
-        },        
+        },
         {
             "keys": [
                 "HIKVISION|DS-2DE4A220IW*", "Hikvision|DS-2DE4A220IW*"
@@ -2482,6 +2486,6 @@
                     }
                 }
             }
-        }        
+        }
     ]
 }

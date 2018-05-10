@@ -77,7 +77,6 @@ namespace
     };
 }
 
-
 const QString QnPlOnvifResource::MANUFACTURE(lit("OnvifDevice"));
 static const float MAX_EPS = 0.01f;
 //static const quint64 MOTION_INFO_UPDATE_INTERVAL = 1000000ll * 60;
@@ -323,6 +322,7 @@ QnPlOnvifResource::QnPlOnvifResource(QnCommonModule* commonModule):
     m_audioSamplerate(0),
     m_timeDrift(0),
     m_isRelayOutputInversed(false),
+    m_fixWrongInputPortNumber(false),
     m_inputMonitored(false),
     m_clearInputsTimeoutUSec(0),
     m_eventMonitorType(emtNone),
@@ -456,7 +456,6 @@ const QString QnPlOnvifResource::createOnvifEndpointUrl(const QString& ipAddress
     return QLatin1String(ONVIF_PROTOCOL_PREFIX) + ipAddress + QLatin1String(ONVIF_URL_SUFFIX);
 }
 
-
 typedef GSoapAsyncCallWrapper <
     DeviceSoapWrapper,
     NetIfacesReq,
@@ -557,7 +556,6 @@ QnAbstractStreamDataProvider* QnPlOnvifResource::createLiveDataProvider()
     auto resData = qnStaticCommon->dataPool()->data(toSharedPointer(this));
     bool shouldAppearAsSingleChannel = resData.value<bool>(
         Qn::SHOULD_APPEAR_AS_SINGLE_CHANNEL_PARAM_NAME);
-
 
     if (shouldAppearAsSingleChannel)
         return new nx::plugins::utils::MultisensorDataProvider(toSharedPointer(this));
@@ -698,7 +696,6 @@ CameraDiagnostics::Result QnPlOnvifResource::initializeMedia(
     if (addFlags != Qn::NoCapabilities)
         setCameraCapabilities(getCameraCapabilities() | addFlags);
 
-
     auto resourceData = qnStaticCommon->dataPool()->data(toSharedPointer(this));
     if (getProperty(QnMediaResource::customAspectRatioKey()).isEmpty())
     {
@@ -741,7 +738,7 @@ CameraDiagnostics::Result QnPlOnvifResource::initializeIo(const CapabilitiesResp
 {
     const QnResourceData resourceData = qnStaticCommon->dataPool()->data(toSharedPointer(this));
     m_isRelayOutputInversed = resourceData.value(QString("relayOutputInversed"), false);
-
+    m_fixWrongInputPortNumber = resourceData.value(QString("fixWrongInputPortNumber"), false);
     //registering onvif event handler
     std::vector<QnPlOnvifResource::RelayOutputInfo> relayOutputs;
     fetchRelayOutputs(&relayOutputs);
@@ -954,7 +951,6 @@ void QnPlOnvifResource::fetchAndSetPrimarySecondaryResolution()
 
     m_secondaryResolution = findSecondaryResolution(m_primaryResolution, m_secondaryResolutionList);
     float currentAspect = getResolutionAspectRatio(m_primaryResolution);
-
 
     if (m_secondaryResolution != EMPTY_RESOLUTION_PAIR) {
         NX_ASSERT(m_secondaryResolution.width() <= SECONDARY_STREAM_MAX_RESOLUTION.width() &&
@@ -1273,7 +1269,11 @@ void QnPlOnvifResource::notificationReceived(
         return;
     }
 
-    //some cameras (especially, Vista) send here events on output port, filtering them out
+    // Some cameras (especially, Vista) send here events on output port, filtering them out.
+    // And some cameras, e.g. DW-PF5M1TIR correctly send here events on input port,
+    // but set port number to output port, so to distinguish these two situations we use
+    // "fixWrongInputPortNumber" parameter from resource_data.json.
+
     const bool sourceNameMatchesRelayOutPortName =
         std::find_if(
             m_relayOutputInfo.begin(),
@@ -1281,15 +1281,15 @@ void QnPlOnvifResource::notificationReceived(
             [&handler](const RelayOutputInfo& outputInfo) {
                 return QString::fromStdString(outputInfo.token) == handler.source.front().value;
             }) != m_relayOutputInfo.end();
-    const bool sourceIsRelayOutPort =
-        (!m_portNamePrefixToIgnore.isEmpty() && handler.source.front().value.startsWith(m_portNamePrefixToIgnore)) ||
-        sourceNameMatchesRelayOutPortName;
-    if (!sourceIsExplicitRelayInput &&
-        !handler.source.empty() &&
-        sourceIsRelayOutPort)
-    {
-        return; //this is notification about output port
-    }
+
+    const bool sourceNameHasPrefixToIgnore = (!m_portNamePrefixToIgnore.isEmpty()
+        && handler.source.front().value.startsWith(m_portNamePrefixToIgnore));
+
+    const bool sourceIsRelayOutPort = sourceNameHasPrefixToIgnore
+        || (sourceNameMatchesRelayOutPortName && !m_fixWrongInputPortNumber);
+
+    if (!sourceIsExplicitRelayInput && !handler.source.empty() && sourceIsRelayOutPort)
+        return; //< This is notification about output port
 
     //saving port state
     const bool newValue = (handler.data.value == lit("true")) || (handler.data.value == lit("active")) || (handler.data.value.toInt() > 0);
@@ -1361,7 +1361,6 @@ CameraDiagnostics::Result QnPlOnvifResource::fetchAndSetResourceOptions()
         arg(m_primaryResolution.width()).arg(m_primaryResolution.height()).arg(getHostAddress()), cl_logDEBUG1);
     NX_LOGX(QString(lit("ONVIF debug: got secondary resolution %1x%2 for camera %3")).
         arg(m_secondaryResolution.width()).arg(m_secondaryResolution.height()).arg(getHostAddress()), cl_logDEBUG1);
-
 
     //Before invoking <fetchAndSetHasDualStreaming> Primary and Secondary Resolutions MUST be set
     fetchAndSetDualStreaming(soapWrapper);
@@ -1679,7 +1678,6 @@ int QnPlOnvifResource::round(float value)
     float floorVal = floorf(value);
     return floorVal - value < 0.5? (int)value: (int)value + 1;
 }
-
 
 bool QnPlOnvifResource::mergeResourcesIfNeeded(const QnNetworkResourcePtr &source)
 {
@@ -2069,7 +2067,6 @@ CameraDiagnostics::Result QnPlOnvifResource::getVideoEncoderTokens(MediaSoapWrap
     if(m_appStopping)
         return CameraDiagnostics::ServerTerminatedResult();
 
-
     int confRangeStart = 0;
     int confRangeEnd = (int) confResponse->Configurations.size();
     if (m_maxChannels > 1)
@@ -2393,7 +2390,6 @@ bool QnPlOnvifResource::fetchAndSetAudioEncoderOptions(MediaSoapWrapper& soapWra
 
     }
 
-
     setAudioCodec(codec);
 
     setAudioEncoderOptions(*options);
@@ -2478,7 +2474,6 @@ CameraDiagnostics::Result QnPlOnvifResource::updateResourceCapabilities()
     if (!m_videoSourceSize.isValid())
         return CameraDiagnostics::NoErrorResult();
 
-
     NX_LOGX(QString(lit("ONVIF debug: videoSourceSize is %1x%2 for camera %3")).
         arg(m_videoSourceSize.width()).arg(m_videoSourceSize.height()).arg(getHostAddress()), cl_logDEBUG1);
 
@@ -2500,7 +2495,6 @@ CameraDiagnostics::Result QnPlOnvifResource::updateResourceCapabilities()
             arg(m_videoSourceSize.width()).arg(m_videoSourceSize.height()).arg(getHostAddress()), cl_logDEBUG1);
         return CameraDiagnostics::NoErrorResult();
     }
-
 
     QList<QSize>::iterator it = m_resolutionList.begin();
     while (it != m_resolutionList.end())
@@ -2918,7 +2912,6 @@ bool QnPlOnvifResource::setAdvancedParametersUnderLock(const QnCameraAdvancedPar
     return success;
 }
 
-
 //positive number means timeout in seconds
 //negative number - timeout in milliseconds
 void QnPlOnvifResource::setOnvifRequestsRecieveTimeout(int timeout)
@@ -3003,7 +2996,6 @@ bool QnPlOnvifResource::loadXmlParametersInternal(QnCameraAdvancedParams &params
     {
         NX_LOGX(lit("Error while parsing xml (onvif) %1").arg(paramsTemplateFileName), cl_logWARNING);
     }
-
 
     return result;
 }
@@ -3345,7 +3337,6 @@ void QnPlOnvifResource::stopInputPortMonitoringAsync()
     NX_LOGX(lit("Port monitoring is stopped"), cl_logDEBUG1);
 }
 
-
 //////////////////////////////////////////////////////////
 // QnPlOnvifResource::SubscriptionReferenceParametersParseHandler
 //////////////////////////////////////////////////////////
@@ -3383,7 +3374,6 @@ bool QnPlOnvifResource::SubscriptionReferenceParametersParseHandler::endElement(
         m_readingSubscriptionID = false;
     return true;
 }
-
 
 //////////////////////////////////////////////////////////
 // QnPlOnvifResource::NotificationMessageParseHandler
