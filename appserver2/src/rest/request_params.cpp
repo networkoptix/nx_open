@@ -40,7 +40,7 @@ bool parseHttpRequestParams(
     const QString& command, const QnRequestParamList& params, ApiStoredFilePath* value)
 {
     NX_ASSERT(command != "getHelp");
-    return deserialize(params, lit("folder"),& (value->path)); // ApiStoredFilePath
+    return deserialize(params, lit("folder"), &(value->path)); //< ApiStoredFilePath
 }
 
 void toUrlParams(const ApiStoredFilePath& name, QUrlQuery* query)

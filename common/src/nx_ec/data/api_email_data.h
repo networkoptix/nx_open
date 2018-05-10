@@ -1,5 +1,4 @@
-#ifndef QN_API_EMAIL_DATA_H
-#define QN_API_EMAIL_DATA_H
+#pragma once
 
 #include "api_globals.h"
 #include "api_data.h"
@@ -9,45 +8,50 @@
 #include <utils/email/email_fwd.h>
 #include <utils/common/ldap_fwd.h>
 
-namespace ec2
+namespace ec2 {
+
+struct ApiEmailSettingsData: ApiData
 {
-    struct ApiEmailSettingsData: ApiData
-    {
-        ApiEmailSettingsData(): port(0), connectionType(QnEmail::Unsecure) {}
+    ApiEmailSettingsData(): port(0), connectionType(QnEmail::Unsecure) {}
 
-        QString host;
-        int port;
-        QString user;
-        QString from;
-        QString password;
-        QnEmail::ConnectionType connectionType;
-    };
+    QString host;
+    int port;
+    QString user;
+    QString from;
+    QString password;
+    QnEmail::ConnectionType connectionType;
+};
 #define ApiEmailSettingsData_Fields (host)(port)(user)(from)(password)(connectionType)
-	
 
-    struct ApiEmailData: ApiData
+struct ApiEmailData: ApiData
+{
+    ApiEmailData() {}
+
+    ApiEmailData(
+        const QStringList& to,
+        const QString& subject,
+        const QString& body,
+        const QString& plainBody,
+        int timeout,
+        const QnEmailAttachmentList& attachments)
+        :
+        to(to),
+        subject(subject),
+        body(body),
+        plainBody(plainBody),
+        timeout(timeout),
+        attachments(attachments)
     {
-        ApiEmailData() {}
+    }
 
-        ApiEmailData (const QStringList& to_, const QString& subject_, const QString& body_, const QString& plainBody_, int timeout_, const QnEmailAttachmentList& attachments_)
-            : to(to_),
-            subject(subject_),
-            body(body_),
-            plainBody(plainBody_),
-            timeout(timeout_),
-            attachments(attachments_)
-        {}
+    QStringList to;
+    QString subject;
+    QString body;
+    QString plainBody;
+    int timeout;
 
-        QStringList to;
-        QString subject;
-        QString body;
-        QString plainBody;
-        int timeout;
-
-        QnEmailAttachmentList attachments;
-    };
+    QnEmailAttachmentList attachments;
+};
 #define ApiEmailData_Fields (to)(subject)(body)(plainBody)(timeout)
 
 } // namespace ec2
-
-#endif // QN_API_EMAIL_DATA_H
