@@ -181,14 +181,17 @@ QIODevice* QnFileStorageResource::open(
 
 #elif defined(Q_OS_UNIX)
 
-    if ((openMode & QIODevice::WriteOnly) && !rootTool()->isPathExists(QnFile::absolutePath(fileName)));
-        rootTool()->makeDirectory(QnFile::absolutePath(fileName));
-
     int fd = rootTool()->open(fileName, openMode);
-    if (fd <= 0)
+    if (fd < 0)
     {
-        NX_ERROR(this, lm("[open] failed to open file %1").args(fileName));
-        return nullptr;
+        if (openMode & QIODevice::WriteOnly && rootTool()->makeDirectory(QnFile::absolutePath(fileName)))
+            fd = rootTool()->open(fileName, openMode);
+
+        if (fd < 0)
+        {
+            NX_ERROR(this, lm("[open] failed to open file %1").args(fileName));
+            return nullptr;
+        }
     }
 
     auto result = new QBufferedFile(
