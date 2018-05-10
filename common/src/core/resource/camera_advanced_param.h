@@ -217,7 +217,7 @@ struct QnCameraAdvancedParams
 
 QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
     QnCameraAdvancedParameterTypes,
-    (json)(metatype)
+    (json)(metatype)(eq)
 )
 
 Q_DECLARE_METATYPE(QnCameraAdvancedParamValueList)

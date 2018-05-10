@@ -1315,8 +1315,11 @@ CameraDiagnostics::Result HanwhaResource::initAlternativePtz()
 
 CameraDiagnostics::Result HanwhaResource::initAdvancedParameters()
 {
-    if (isNvr() && !isConnectedViaSunapi())
+    if (isNvr() && !isBypassSupported())
+    {
+        m_advancedParametersProvider.assign(QnCameraAdvancedParams());
         return CameraDiagnostics::NoErrorResult();
+    }
 
     QnCameraAdvancedParams parameters;
     QFile advancedParametersFile(kAdvancedParametersTemplateFile);
