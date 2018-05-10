@@ -27,8 +27,8 @@
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>741</width>
-        <height>735</height>
+        <width>727</width>
+        <height>737</height>
        </rect>
       </property>
       <layout class="QVBoxLayout" name="verticalLayout_7" stretch="0,0,0,0,0,0,1">
@@ -531,12 +531,6 @@
             </item>
             <item row="0" column="0">
              <layout class="QGridLayout" name="gridLayout_3" columnstretch="0,0,1">
-              <property name="bottomMargin">
-               <number>8</number>
-              </property>
-              <property name="spacing">
-               <number>8</number>
-              </property>
               <item row="0" column="2">
                <widget class="QSpinBox" name="fpsSpinBox">
                 <property name="minimum">
@@ -552,6 +546,9 @@
               </item>
               <item row="1" column="0" colspan="2">
                <layout class="QHBoxLayout" name="qualityLabelLayout" stretch="1,1,0">
+                <property name="spacing">
+                 <number>4</number>
+                </property>
                 <item>
                  <spacer name="horizontalSpacer_3">
                   <property name="orientation">
@@ -560,7 +557,7 @@
                   <property name="sizeHint" stdset="0">
                    <size>
                     <width>0</width>
-                    <height>20</height>
+                    <height>0</height>
                    </size>
                   </property>
                  </spacer>
@@ -568,7 +565,7 @@
                 <item>
                  <widget class="QLabel" name="qualityLabel">
                   <property name="sizePolicy">
-                   <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+                   <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
                     <horstretch>0</horstretch>
                     <verstretch>0</verstretch>
                    </sizepolicy>
@@ -651,13 +648,7 @@
                </spacer>
               </item>
               <item row="0" column="0" colspan="2">
-               <layout class="QHBoxLayout" name="fpsHorizontalLayout" stretch="0,0">
-                <property name="spacing">
-                 <number>2</number>
-                </property>
-                <property name="topMargin">
-                 <number>8</number>
-                </property>
+               <layout class="QHBoxLayout" name="fpsHorizontalLayout" stretch="1,0">
                 <item>
                  <spacer name="horizontalSpacer_4">
                   <property name="orientation">
@@ -666,7 +657,7 @@
                   <property name="sizeHint" stdset="0">
                    <size>
                     <width>0</width>
-                    <height>20</height>
+                    <height>0</height>
                    </size>
                   </property>
                  </spacer>

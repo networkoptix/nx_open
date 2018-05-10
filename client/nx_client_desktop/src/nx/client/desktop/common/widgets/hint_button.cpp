@@ -16,9 +16,6 @@
 #include <utils/common/scoped_painter_rollback.h>
 
 namespace {
-// Offset between header and a hint button.
-const int kHeaderHintOffset = 4;
-
 // Draws a rhombus shape to highlight current widget geometry.
 // TODO: #dkargin I want to keep it here for some time, until
 // I find a better place for it.
@@ -101,7 +98,7 @@ void HintButton::updateGeometry(QGroupBox* parent)
 
     // We manually add some spaces to the caption of group box, to push away its border
     // and provide some space to hint button.
-    int offset = parent->isFlat() ? kHeaderHintOffset : -pixmapSize.width();
+    int offset = parent->isFlat() ? style::Metrics::kHintButtonMargin : -pixmapSize.width();
     rect.moveLeft(captionRect.right() + offset);
     setGeometry(rect);
 }
@@ -134,7 +131,7 @@ void HintButton::showTooltip(bool show)
             QColor lineColor = palette().color(QPalette::Text);
             QString colorHex = lineColor.name(QColor::HexRgb);
 
-            text += lit("<br/><i style='color: %1'>%2</i>").arg(colorHex, tr("Click to read more"));
+            text += lit("<i style='color: %1'>%2</i>").arg(colorHex, tr("Click to read more"));
         }
 
         QRect rc = rect();
