@@ -1908,23 +1908,16 @@ bool SslServerSocket::listen(int queueLen)
     return m_delegateSocket->listen(queueLen);
 }
 
-AbstractStreamSocket* SslServerSocket::accept()
+std::unique_ptr<AbstractStreamSocket> SslServerSocket::accept()
 {
-    AbstractStreamSocket* acceptedSock = m_delegateSocket->accept();
+    auto acceptedSock = m_delegateSocket->accept();
     if (!acceptedSock)
         return nullptr;
+
     if (m_allowNonSecureConnect)
-    {
-        return new MixedSslSocket(
-            std::unique_ptr<AbstractStreamSocket>(acceptedSock));
-    }
+        return std::make_unique<MixedSslSocket>(std::move(acceptedSock));
     else
-    {
-        return new SslSocket(
-            std::unique_ptr<AbstractStreamSocket>(acceptedSock),
-            true,
-            true);
-    }
+        return std::make_unique<SslSocket>(std::move(acceptedSock), true, true);
 }
 
 void SslServerSocket::pleaseStop(nx::utils::MoveOnlyFunc<void()> handler)

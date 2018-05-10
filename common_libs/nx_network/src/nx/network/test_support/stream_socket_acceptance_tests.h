@@ -94,7 +94,7 @@ private:
         ASSERT_TRUE(server->listen());
         m_serverAddress.set_value(server->getLocalAddress());
 
-        std::unique_ptr<AbstractStreamSocket> client(server->accept());
+        auto client = server->accept();
         ASSERT_TRUE((bool)client);
         ASSERT_TRUE(client->setRecvTimeout(kClientDelay));
 
@@ -224,6 +224,99 @@ private:
     SocketAddress m_serverEndpoint;
     std::atomic<int> m_startedConnectionsCount;
     std::atomic<int> m_completedConnectionsCount;
+};
+
+//-------------------------------------------------------------------------------------------------
+
+/**
+ * Writes and reads socket concurrently using synchronous socket API.
+ * Two threads are created internally for that purpose.
+ */
+template<typename SocketType>
+class ConcurrentSocketPipe
+{
+public:
+    ConcurrentSocketPipe(
+        std::unique_ptr<SocketType> socket,
+        nx::utils::SyncQueue<nx::Buffer>* dataToSendQueue,
+        nx::utils::SyncQueue<nx::Buffer>* dataReceivedQueue)
+        :
+        m_socket(std::move(socket)),
+        m_dataToSendQueue(dataToSendQueue),
+        m_dataReceivedQueue(dataReceivedQueue),
+        m_terminated(false)
+    {
+    }
+
+    ~ConcurrentSocketPipe()
+    {
+        m_terminated = true;
+
+        if (m_readThread.joinable())
+            m_readThread.join();
+        if (m_writeThread.joinable())
+            m_writeThread.join();
+    }
+
+    bool start()
+    {
+        if (!m_socket->setRecvTimeout(std::chrono::milliseconds(1)))
+            return false;
+
+        m_readThread = std::thread(
+            std::bind(&ConcurrentSocketPipe::readThreadMain, this));
+        m_writeThread = std::thread(
+            std::bind(&ConcurrentSocketPipe::writeThreadMain, this));
+
+        return true;
+    }
+
+private:
+    std::unique_ptr<SocketType> m_socket;
+    nx::utils::SyncQueue<nx::Buffer>* m_dataToSendQueue;
+    nx::utils::SyncQueue<nx::Buffer>* m_dataReceivedQueue;
+    std::atomic<bool> m_terminated;
+    std::thread m_readThread;
+    std::thread m_writeThread;
+
+    void readThreadMain()
+    {
+        while (!m_terminated)
+        {
+            nx::Buffer readBuf;
+            readBuf.reserve(4*1024);
+            int bytesRead = m_socket->recv(readBuf.data(), readBuf.capacity(), 0);
+            if (bytesRead < 0)
+            {
+                if (SystemError::getLastOSErrorCode() == SystemError::timedOut ||
+                    SystemError::getLastOSErrorCode() == SystemError::wouldBlock)
+                {
+                    continue;
+                }
+
+                break;
+            }
+
+            if (bytesRead == 0)
+                break;
+
+            readBuf.resize(bytesRead);
+            m_dataReceivedQueue->push(std::move(readBuf));
+        }
+    }
+
+    void writeThreadMain()
+    {
+        while (!m_terminated)
+        {
+            auto dataToSend = m_dataToSendQueue->pop(std::chrono::milliseconds(1));
+            if (!dataToSend)
+                continue;
+
+            if (m_socket->send(dataToSend->data(), dataToSend->size()) < 0)
+                break;
+        }
+    }
 };
 
 //-------------------------------------------------------------------------------------------------
@@ -363,6 +456,31 @@ protected:
             << SystemError::getLastOSErrorText().toStdString();
     }
 
+    void whenSendAsyncRandomDataToServer()
+    {
+        ASSERT_TRUE(m_connection->setNonBlockingMode(true));
+
+        m_sentData = nx::utils::generateRandomName(16*1024);
+        m_connection->sendAsync(
+            m_sentData,
+            [this](SystemError::ErrorCode /*systemErrorCode*/, std::size_t /*bytesSent*/)
+            {
+            });
+    }
+
+    void whenServerReadsWithFlag(int recvFlags)
+    {
+        auto acceptedConnection = m_serverSocket->accept();
+
+        std::basic_string<uint8_t> readBuf(m_sentData.size(), 'x');
+        ASSERT_EQ(
+            m_sentData.size(),
+            acceptedConnection->recv(readBuf.data(), (unsigned int) readBuf.size(), recvFlags))
+            << SystemError::getLastOSErrorText().toStdString();
+
+        m_synchronousServerReceivedData.write(readBuf.data(), m_sentData.size());
+    }
+
     void continueReceiving()
     {
         using namespace std::placeholders;
@@ -491,6 +609,45 @@ protected:
         m_synchronousServerReceivedData.waitForReceivedDataToMatch(m_sentData);
     }
 
+    //---------------------------------------------------------------------------------------------
+
+    void givenConnectedSockets()
+    {
+        givenListeningServer();
+        startAcceptingConnections();
+
+        givenConnectedSocket();
+
+        m_prevAcceptedConnection = m_acceptedConnections.pop();
+    }
+
+    void startConcurrentReadersAndWriters()
+    {
+        m_concurrentSocketPipes.push_back(
+            std::make_unique<ConcurrentSocketPipeContext>(
+                std::exchange(m_connection, nullptr)));
+
+        m_concurrentSocketPipes.push_back(
+            std::make_unique<ConcurrentSocketPipeContext>(
+                std::exchange(m_prevAcceptedConnection, nullptr)));
+    }
+
+    void whenSendDataThroughBothSockets()
+    {
+        m_sentData = nx::utils::generateRandomName(16 * 1024);
+
+        for (auto& pipe: m_concurrentSocketPipes)
+            pipe->dataToSendQueue.push(m_sentData);
+    }
+
+    void thenBothSocketsReceiveExpectedData()
+    {
+        for (auto& pipe: m_concurrentSocketPipes)
+            pipe->waitUntilReceivedDataMatch(m_sentData);
+    }
+
+    //---------------------------------------------------------------------------------------------
+
     SocketAddress mappedEndpoint() const
     {
         return m_mappedEndpoint;
@@ -539,6 +696,39 @@ private:
     std::unique_ptr<server::SimpleMessageServer> m_server;
     nx::utils::MoveOnlyFunc<void()> m_auxiliaryRecvHandler;
     std::vector<std::unique_ptr<ClientConnectionContext>> m_clientConnections;
+    nx::utils::SyncQueue<std::unique_ptr<AbstractStreamSocket>> m_acceptedConnections;
+    std::unique_ptr<AbstractStreamSocket> m_prevAcceptedConnection;
+
+    //---------------------------------------------------------------------------------------------
+    // Concurrent I/O.
+
+    class ConcurrentSocketPipeContext
+    {
+    public:
+        nx::utils::SyncQueue<nx::Buffer> dataToSendQueue;
+        nx::utils::SyncQueue<nx::Buffer> dataReceivedQueue;
+        ConcurrentSocketPipe<AbstractStreamSocket> pipe;
+
+        ConcurrentSocketPipeContext(std::unique_ptr<AbstractStreamSocket> socket):
+            pipe(
+                std::move(socket),
+                &dataToSendQueue,
+                &dataReceivedQueue)
+        {
+            pipe.start();
+        }
+
+        void waitUntilReceivedDataMatch(const nx::Buffer& expected)
+        {
+            nx::Buffer received;
+            while (!received.startsWith(expected))
+                received += dataReceivedQueue.pop();
+        }
+    };
+
+    std::vector<std::unique_ptr<ConcurrentSocketPipeContext>> m_concurrentSocketPipes;
+
+    //---------------------------------------------------------------------------------------------
 
     std::unique_ptr<SynchronousReceivingServer> m_synchronousServer;
     nx::Buffer m_sentData;
@@ -570,6 +760,20 @@ private:
 
         if (m_auxiliaryRecvHandler)
             nx::utils::swapAndCall(m_auxiliaryRecvHandler);
+    }
+
+    void startAcceptingConnections()
+    {
+        m_serverSocket->acceptAsync(
+            [this](
+                SystemError::ErrorCode /*systemErrorCode*/,
+                std::unique_ptr<AbstractStreamSocket> connection)
+            {
+                if (connection)
+                    m_acceptedConnections.push(std::move(connection));
+
+                this->startAcceptingConnections();
+            });
     }
 };
 
@@ -692,6 +896,17 @@ TYPED_TEST_P(StreamSocketAcceptance, transfer_sync)
     this->thenServerReceivedData();
 }
 
+TYPED_TEST_P(StreamSocketAcceptance, recv_sync_with_wait_all_flag)
+{
+    this->givenListeningServer();
+    this->givenConnectedSocket();
+
+    this->whenSendAsyncRandomDataToServer();
+    this->whenServerReadsWithFlag(MSG_WAITALL);
+
+    this->thenServerReceivedData();
+}
+
 TYPED_TEST_P(StreamSocketAcceptance, recv_timeout_is_reported)
 {
     this->givenSilentServer();
@@ -721,6 +936,16 @@ TYPED_TEST_P(StreamSocketAcceptance, async_connect_is_cancelled_by_cancelling_wr
     this->thenSocketCanBeSafelyRemoved();
 }
 
+TYPED_TEST_P(StreamSocketAcceptance, concurrent_recv_send_in_blocking_mode)
+{
+     this->givenConnectedSockets();
+     this->startConcurrentReadersAndWriters();
+
+     this->whenSendDataThroughBothSockets();
+
+     this->thenBothSocketsReceiveExpectedData();
+}
+
 REGISTER_TYPED_TEST_CASE_P(StreamSocketAcceptance,
     DISABLED_receiveDelay,
     sendDelay,
@@ -731,9 +956,11 @@ REGISTER_TYPED_TEST_CASE_P(StreamSocketAcceptance,
     receive_timeout_change_is_not_ignored,
     transfer_async,
     transfer_sync,
+    recv_sync_with_wait_all_flag,
     recv_timeout_is_reported,
     msg_dont_wait_flag_makes_recv_call_nonblocking,
-    async_connect_is_cancelled_by_cancelling_write);
+    async_connect_is_cancelled_by_cancelling_write,
+    concurrent_recv_send_in_blocking_mode);
 
 } // namespace test
 } // namespace network

@@ -1,5 +1,5 @@
 {
-    "YOU HAVE NO SYSTEMS TEXT": "You have no Systems connected to %PRODUCT_NAME%",
+    "YOU HAVE NO SYSTEMS TEXT": "No tiene ningún sistema conectado a %PRODUCT_NAME%",
     "LOG OUT BUTTON TEXT": "Cerrar Sessión",
     "ACCOUNT SETTINGS BUTTON TEXT": "Configuración de cuenta",
     "RESET EMAIL SENT MESSAGE TEXT": "Las instrucciones del reinicio de la contraseña son enviadas al correo electrónico %email%",
@@ -28,7 +28,7 @@
     "SHARE PERMISSIONS HINT ADV VIEWER": "Puede ver el vídeo vivo, hojear el archivo, configurar cámaras, controlar PTZ etc",
     "SHARE PERMISSIONS HINT VIEWER": "Puede ver video en vivo y ver el archivo",
     "SHARE PERMISSIONS HINT LIVE VIEWER": "Sólo puede ver vídeo en vivo",
-    "SHARE PERMISSIONS HINT CUSTOM": "Use the %PRODUCT_NAME% Client application to set up custom permissions",
+    "SHARE PERMISSIONS HINT CUSTOM": "Use la aplicación de cliente %PRODUCT_NAME% para configurar permisos personalizados",
     "ACCOUNT TEXT": "Cuenta",
     "EDIT USER BUTTON TEXT": "Editar",
     "DELETE USER BUTTON TEXT": "borrar",
@@ -43,11 +43,12 @@
     "ACTIVATE YOUR ACCOUNT EMAIL SUBJECT": "Activar tu cuenta",
     "RESET PASSWORD EMAIL SUBJECT": "Reestablecer su contraseña",
     "INVITED TO SYSTEM EMAIL SUBJECT": "Sistema de video {{message.system_name}} fue compartido con usted",
+    "INVITED TO SYSTEM EMAIL SUBJECT UNREGISTERED": "{{message.sharer_name}} te invita a %PRODUCT_NAME%",
     "DISCONNECT FORM HEADER TEXT": "¿Desconectar el Sistema de %PRODUCT_NAME%?",
     "FIRST NAME IS REQUIRED TEXT": "Nombre es requerido",
     "LAST NAME IS REQUIRED TEXT": "Apellido es requerido",
     "EMAIL IS REQUIRED TEXT": "Correo electrónico es necesario",
-    "EMAIL ALREADY REGISTERED TEXT": "This Email has been already registered in %PRODUCT_NAME%",
+    "EMAIL ALREADY REGISTERED TEXT": "Este correo electrónico ya ha sido registrado en %PRODUCT_NAME%",
     "EMAIL INVALID TEXT": "Por favor, introduce una dirección de email válida",
     "PASSWORD IS REQUIRED TEXT": "Se requiere contraseña",
     "CURRENT PASSWORD IS REQUIRED TEXT": "Contraseña actual no es válido",
@@ -55,7 +56,8 @@
     "PASSWORD TOO SHORT TEXT": "La contraseña debe tener al menos 8 caracteres",
     "PASSWORD TOO COMMON TEXT": "Esta contraseña se encuentra entre los más populares en el mundo",
     "PASSWORD IS WEAK TEXT": "Uso de números, letras mayúsculas y minúsculas y caracteres especiales para hacer su contraseña más fuerte",
-    "THIS LINK IS BROKEN TEXT": "This link is broken,<br>\n            System may be disconnected from %PRODUCT_NAME%,<br>\n            Access to this System may be revoked, <br>\n            or you may be logged into a different account",
+    "THIS LINK IS BROKEN TEXT": "Este enlace está roto,<br>\n            El sistema puede estar desconectado de %PRODUCT_NAME%,<br>\n            El acceso a este sistema puede ser revocado, <br>\n            o puede haber iniciado sesión en una cuenta diferente",
     "PAGE NOT FOUND": "Página no encontrada",
-    "TAKE ME HOME": "Llévame a casa"
+    "TAKE ME HOME": "Llévame a casa",
+    "OPEN NX WITNESS BUTTON TEXT": "Abierto %VMS_NAME%"
 }

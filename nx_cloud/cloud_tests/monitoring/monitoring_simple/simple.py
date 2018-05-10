@@ -218,16 +218,16 @@ class CloudSession(object):
 
         assert next(filter(lambda x: x['accountEmail'] == self.user_email, data), None) is None, 'User still exists'
 
-    @testmethod()
-    def test_cloud_connect(self):
-        command = '--log-level=DEBUG2 --http-client --url=http://{user}:{password}@{system_id}/ec2/getUsers'.format(
+    def test_cloud_connect_base(self, extra_args=''):
+        command = '--log-level=DEBUG2 --http-client --url=http://{user}:{password}@{system_id}/ec2/getUsers {extra_args}'.format(
             user=quote(self.email),
             password=quote(self.password),
-            system_id=self.system_id)
+            system_id=self.system_id,
+            extra_args=extra_args)
 
         client = docker.client.from_env()
         container = client.containers.run(
-            '009544449203.dkr.ecr.us-east-1.amazonaws.com/cloud/cloud_connect_test_util:3.1.0.13200', command, detach=True)
+            '009544449203.dkr.ecr.us-east-1.amazonaws.com/cloud/cloud_connect_test_util:18.1.0.13642', command, detach=True)
         status = container.wait()
         log.info('Container exited with exit status {}'.format(status))
         stdout = container.logs(stdout=True, stderr=False)
@@ -237,9 +237,16 @@ class CloudSession(object):
         log.info('Stderr:\n{}'.format(stderr.decode('utf-8')))
         container.remove()
 
-        assert b'HTTP/1.1 200 OK' in stdout, 'Received invalid output from cloud connect'
+        assert b'HTTP/1.1 200 OK' in stdout, 'Received invalid output from cloud connect (extra_args: {})}'.format(extra_args)
         assert status == 0, 'Cloud connect test util exited with non-zero status {}'.format(status)
 
+    @testmethod()
+    def test_cloud_connect(self):
+        self.test_cloud_connect_base():
+
+    @testmethod()
+    def test_cloud_connect_proxy(self):
+        self.test_cloud_connect_base('--cloud-connect-enable-proxy-only'):
 
 def main():
     host = sys.argv[1]

@@ -16,20 +16,20 @@ then
     if [ -e "cloud_portal" ]
     then
         pushd cloud_portal
-            for entry in $(ls -A .)
+            for entry in $(ls -A $VMS_REPOSITORY/cloud_portal/)
             do
                 if [ "$entry" = "front_end" ]
                 then
                     pushd $entry
-                    for element in $(ls -A .)
+                    for element in $(ls -A $VMS_REPOSITORY/cloud_portal/$entry/)
                     do
-                        [ "$element" = "node_modules" ] && continue
+                        echo "copy $entry/$element"
                         [ -e "$element" ] && rm -rf "$element"
                         cp -pr "$NX_VMS/cloud_portal/$entry/$element" "$element"
                     done
                     popd
                 else
-                    [[ "$entry" = "env" ]] && continue
+                    echo "copy $entry"
                     [ -e "$entry" ] && rm -rf "$entry"
                     cp -pr "$NX_VMS/cloud_portal/$entry" "$entry"
                 fi

@@ -8,57 +8,53 @@ namespace network {
 namespace ssl {
 
 StreamServerSocket::StreamServerSocket(
-    std::unique_ptr<AbstractStreamServerSocket> delegatee,
+    std::unique_ptr<AbstractStreamServerSocket> delegate,
     EncryptionUse encryptionUse)
     :
-    base_type(delegatee.get()),
-    m_delegatee(std::move(delegatee)),
+    base_type(delegate.get()),
+    m_delegate(std::move(delegate)),
     m_encryptionUse(encryptionUse)
 {
 }
 
 void StreamServerSocket::acceptAsync(AcceptCompletionHandler handler)
 {
-    return m_delegatee->acceptAsync(
+    return m_delegate->acceptAsync(
         [this, handler = std::move(handler)](
             SystemError::ErrorCode sysErrorCode,
             std::unique_ptr<AbstractStreamSocket> streamSocket) mutable
         {
-            onAcceptCompletion(
-                std::move(handler),
-                sysErrorCode,
-                std::move(streamSocket));
+            if (streamSocket)
+                streamSocket = createSocketWrapper(std::move(streamSocket));
+
+            handler(sysErrorCode, std::move(streamSocket));
         });
 }
 
-AbstractStreamSocket* StreamServerSocket::accept()
+std::unique_ptr<AbstractStreamSocket> StreamServerSocket::accept()
 {
-    AbstractStreamSocket* accepted = base_type::accept();
-    if (accepted)
-        accepted = new StreamSocket(std::unique_ptr<AbstractStreamSocket>(accepted), true);
-    return accepted;
+    auto accepted = base_type::accept();
+    if (!accepted)
+        return nullptr;
+
+    return createSocketWrapper(std::move(accepted));
 }
 
-void StreamServerSocket::onAcceptCompletion(
-    AcceptCompletionHandler handler,
-    SystemError::ErrorCode sysErrorCode,
-    std::unique_ptr<AbstractStreamSocket> streamSocket)
+std::unique_ptr<AbstractStreamSocket> StreamServerSocket::createSocketWrapper(
+    std::unique_ptr<AbstractStreamSocket> delegate)
 {
-    if (streamSocket)
+    switch (m_encryptionUse)
     {
-        if (m_encryptionUse == EncryptionUse::always)
-        {
-            streamSocket = std::make_unique<ServerSideStreamSocket>(
-                std::move(streamSocket));
-        }
-        else // if (m_encryptionUse == EncryptionUse::autoDetectByReceivedData)
-        {
-            streamSocket = std::make_unique<EncryptionDetectingStreamSocket>(
-                std::move(streamSocket));
-        }
-    }
+        case EncryptionUse::always:
+            return std::make_unique<ServerSideStreamSocket>(std::move(delegate));
 
-    handler(sysErrorCode, std::move(streamSocket));
+        case EncryptionUse::autoDetectByReceivedData:
+            return std::make_unique<EncryptionDetectingStreamSocket>(std::move(delegate));
+
+        default:
+            NX_ASSERT(false);
+            return nullptr;
+    }
 }
 
 } // namespace ssl

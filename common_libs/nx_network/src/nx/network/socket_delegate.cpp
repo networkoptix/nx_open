@@ -64,7 +64,7 @@ bool StreamServerSocketDelegate::listen(int backlog)
     return m_target->listen(backlog);
 }
 
-AbstractStreamSocket* StreamServerSocketDelegate::accept()
+std::unique_ptr<AbstractStreamSocket> StreamServerSocketDelegate::accept()
 {
     return m_target->accept();
 }

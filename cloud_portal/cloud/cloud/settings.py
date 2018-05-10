@@ -387,6 +387,7 @@ DOWNLOADS_JSON = 'http://updates.hdwitness.com.s3.amazonaws.com/{{customization}
 DOWNLOADS_VERSION_JSON = 'http://updates.hdwitness.com.s3.amazonaws.com/{{customization}}/{{build}}/downloads.json'
 
 MAX_RETRIES = conf['max_retries']
+CLEAN_TASKS_AND_MSGS_OLDER_THAN_X_DAYS = 30
 
 SUPERUSER_DOMAIN = '@networkoptix.com'  # Only user from this domain can have superuser permissions
 
