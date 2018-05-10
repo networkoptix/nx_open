@@ -98,7 +98,7 @@ void HintButton::updateGeometry(QGroupBox* parent)
 
     // We manually add some spaces to the caption of group box, to push away its border
     // and provide some space to hint button.
-    int offset = parent->isFlat() ? style::Metrics::kHintButtonMargin : -pixmapSize.width();
+    int offset = parent->isFlat() ? style::Metrics::kHintButtonMargin : style::Metrics::kHintButtonMargin - pixmapSize.width();
     rect.moveLeft(captionRect.right() + offset);
     setGeometry(rect);
 }
