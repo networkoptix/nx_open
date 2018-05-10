@@ -840,9 +840,7 @@ Qn::StorageInitResult QnFileStorageResource::initOrUpdate()
     }
     QString localPath = getLocalPathSafe();
     QString path = localPath.isEmpty() ? getPath() : localPath;
-    m_cachedTotalSpace = getDiskTotalSpace(path); // update cached value periodically
-    if (m_cachedTotalSpace < 0)
-        m_cachedTotalSpace = rootTool()->totalSpace(path);
+    m_cachedTotalSpace = rootTool()->totalSpace(path); // update cached value periodically
     NX_VERBOSE(
         this,
         lm("QnFileStorageResource::initOrUpdate successfully completed for %1").args(getUrl()));
