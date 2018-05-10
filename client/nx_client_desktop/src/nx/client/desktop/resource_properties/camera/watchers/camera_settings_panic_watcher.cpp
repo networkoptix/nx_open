@@ -1,5 +1,7 @@
 #include "camera_settings_panic_watcher.h"
 
+#include <QtCore/QPointer>
+
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/watchers/workbench_panic_watcher.h>
 
@@ -16,19 +18,18 @@ CameraSettingsPanicWatcher::CameraSettingsPanicWatcher(
     QObject* parent)
     :
     base_type(parent),
-    QnWorkbenchContextAware(parent, InitializationMode::lazy),
-    m_store(store)
+    QnWorkbenchContextAware(parent, InitializationMode::lazy)
 {
     const auto watcher = context()->instance<QnWorkbenchPanicWatcher>();
     NX_ASSERT(watcher && store);
 
-    m_store->setPanicMode(watcher->isPanicMode());
+    store->setPanicMode(watcher->isPanicMode());
 
     connect(watcher, &QnWorkbenchPanicWatcher::panicModeChanged, this,
-        [this](bool value)
+        [store = QPointer<CameraSettingsDialogStore>(store)](bool value)
         {
-            if (m_store)
-                m_store->setPanicMode(value);
+            if (store)
+                store->setPanicMode(value);
         });
 }
 
