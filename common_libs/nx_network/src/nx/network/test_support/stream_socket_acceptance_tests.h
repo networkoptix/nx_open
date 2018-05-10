@@ -496,6 +496,14 @@ protected:
         m_connection->pleaseStopSync();
     }
 
+    void whenClientSendsPing()
+    {
+        ASSERT_EQ(
+            m_clientMessage.size(),
+            m_connection->send(m_clientMessage.constData(), m_clientMessage.size()))
+            << SystemError::getLastOSErrorText().toStdString();
+    }
+
     void whenSendMultiplePingsViaMultipleConnections()
     {
         m_expectedResponseCount = 7;
@@ -611,33 +619,24 @@ protected:
 
     //---------------------------------------------------------------------------------------------
 
-    void givenConnectedSockets()
+    void whenSendDataConcurrentlyThroughConnectedSockets()
     {
+        m_sentData = nx::utils::generateRandomName(16 * 1024);
+
         givenListeningServerSocket();
         startAcceptingConnections();
 
         givenConnectedSocket();
-
-        m_prevAcceptedConnection = m_acceptedConnections.pop();
-    }
-
-    void startConcurrentReadersAndWriters()
-    {
         m_concurrentSocketPipes.push_back(
             std::make_unique<ConcurrentSocketPipeContext>(
                 std::exchange(m_connection, nullptr)));
+        m_concurrentSocketPipes.back()->dataToSendQueue.push(m_sentData);
 
+        m_prevAcceptedConnection = m_acceptedConnections.pop();
         m_concurrentSocketPipes.push_back(
             std::make_unique<ConcurrentSocketPipeContext>(
                 std::exchange(m_prevAcceptedConnection, nullptr)));
-    }
-
-    void whenSendDataThroughBothSockets()
-    {
-        m_sentData = nx::utils::generateRandomName(16 * 1024);
-
-        for (auto& pipe: m_concurrentSocketPipes)
-            pipe->dataToSendQueue.push(m_sentData);
+        m_concurrentSocketPipes.back()->dataToSendQueue.push(m_sentData);
     }
 
     void thenBothSocketsReceiveExpectedData()
@@ -866,9 +865,10 @@ TYPED_TEST_P(StreamSocketAcceptance, randomly_stopping_multiple_simultaneous_con
 
 TYPED_TEST_P(StreamSocketAcceptance, receive_timeout_change_is_not_ignored)
 {
-    this->givenMessageServer();
+    this->givenPingPongServer();
     this->givenConnectedSocket();
 
+    this->whenClientSendsPing();
     this->whenReceivedMessageFromServerAsync(
         [this]()
         {
@@ -878,6 +878,19 @@ TYPED_TEST_P(StreamSocketAcceptance, receive_timeout_change_is_not_ignored)
 
     this->thenClientSocketReportedTimedout();
 }
+
+// TODO: #ak Modify and uncomment this test.
+// But, the use case is not valid in case of encryption
+// auto-detection is enabled on server side.
+//TYPED_TEST_P(StreamSocketAcceptance, server_sends_first)
+//{
+//    this->givenMessageServer();
+//    this->givenConnectedSocket();
+//
+//    this->whenReadClientSocket();
+
+//    this->thenServerMessageIsReceived();
+//}
 
 TYPED_TEST_P(StreamSocketAcceptance, transfer_async)
 {
@@ -938,12 +951,8 @@ TYPED_TEST_P(StreamSocketAcceptance, async_connect_is_cancelled_by_cancelling_wr
 
 TYPED_TEST_P(StreamSocketAcceptance, concurrent_recv_send_in_blocking_mode)
 {
-     this->givenConnectedSockets();
-     this->startConcurrentReadersAndWriters();
-
-     this->whenSendDataThroughBothSockets();
-
-     this->thenBothSocketsReceiveExpectedData();
+    this->whenSendDataConcurrentlyThroughConnectedSockets();
+    this->thenBothSocketsReceiveExpectedData();
 }
 
 REGISTER_TYPED_TEST_CASE_P(StreamSocketAcceptance,
