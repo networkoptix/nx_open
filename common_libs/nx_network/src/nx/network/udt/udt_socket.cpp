@@ -954,6 +954,7 @@ std::unique_ptr<AbstractStreamSocket> UdtStreamServerSocket::accept()
         SystemError::setLastErrorCode(acceptedSocketPair.first);
         return nullptr;
     }
+
     return std::move(acceptedSocketPair.second);
 }
 
@@ -1034,8 +1035,12 @@ std::unique_ptr<AbstractStreamSocket> UdtStreamServerSocket::systemAccept()
         detail::SocketState::connected);
     acceptedSocket->bindToAioThread(SocketGlobals::aioService().getRandomAioThread());
 
-    if (!acceptedSocket->setSendTimeout(0) || !acceptedSocket->setRecvTimeout(0))
+    if (!acceptedSocket->setSendTimeout(0) ||
+        !acceptedSocket->setRecvTimeout(0) ||
+        !acceptedSocket->setNonBlockingMode(false))
+    {
         return nullptr;
+    }
 
     return acceptedSocket;
 }
