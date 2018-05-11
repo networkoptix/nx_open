@@ -290,7 +290,7 @@ void LocalConnectionFactory::registerRestHandlers(QnRestProcessorPool* const p)
      */
     regUpdate<ApiMediaServerUserAttributesData>(p, ApiCommand::saveMediaServerUserAttributes);
 
-    /**%apidoc POST /ec2/saveMediaServerUserAttributesList
+    /**%apidoc:arrayParams POST /ec2/saveMediaServerUserAttributesList
      * Save additional attributes of a number of servers.
      * <p>
      * Parameters should be passed as a JSON array of objects in POST message body with
@@ -415,7 +415,7 @@ void LocalConnectionFactory::registerRestHandlers(QnRestProcessorPool* const p)
     // AbstractCameraManager::getCameras
     regGet<QnCameraUuid, CameraDataList>(p, ApiCommand::getCameras);
 
-    /**%apidoc POST /ec2/saveCameraUserAttributesList
+    /**%apidoc:arrayParams POST /ec2/saveCameraUserAttributesList
      * Save additional camera attributes for a number of cameras.
      * <p>
      * Parameters should be passed as a JSON array of objects in POST message body with
@@ -444,17 +444,17 @@ void LocalConnectionFactory::registerRestHandlers(QnRestProcessorPool* const p)
      *     x and y (for left top corner), width, height.
      * %param scheduleTasks List of scheduleTask objects which define the camera recording
      *     schedule.
-     *     %param scheduleTask.startTime Time of day when the backup starts (in seconds passed
+     *     %param scheduleTasks[].startTime Time of day when the backup starts (in seconds passed
      *         from 00:00:00).
-     *     %param scheduleTask.endTime Time of day when the backup ends (in seconds passed
+     *     %param scheduleTasks[].endTime Time of day when the backup ends (in seconds passed
      *         from 00:00:00).
-     *     %param scheduleTask.recordingType
+     *     %param scheduleTasks[].recordingType
      *         %value RT_Always Record always.
      *         %value RT_MotionOnly Record only when the motion is detected.
      *         %value RT_Never Never record.
      *         %value RT_MotionAndLowQuality Always record low quality
      *             stream, and record high quality stream on motion.
-     *     %param scheduleTask.dayOfWeek Day of week for the recording task.
+     *     %param scheduleTasks[].dayOfWeek Day of week for the recording task.
      *         %value 1 Monday
      *         %value 2 Tuesday
      *         %value 3 Wednesday
@@ -462,7 +462,7 @@ void LocalConnectionFactory::registerRestHandlers(QnRestProcessorPool* const p)
      *         %value 5 Friday
      *         %value 6 Saturday
      *         %value 7 Sunday
-     *     %param scheduleTask.streamQuality Quality of the recording.
+     *     %param scheduleTasks[].streamQuality Quality of the recording.
      *         %value QualityLowest
      *         %value QualityLow
      *         %value QualityNormal
@@ -470,7 +470,7 @@ void LocalConnectionFactory::registerRestHandlers(QnRestProcessorPool* const p)
      *         %value QualityHighest
      *         %value QualityPreSet
      *         %value QualityNotDefined
-     *     %param scheduleTask.fps Frames per second (integer).
+     *     %param scheduleTasks[].fps Frames per second (integer).
      * %param audioEnabled Whether audio is enabled on the camera.
      *     %value false
      *     %value true
@@ -541,17 +541,17 @@ void LocalConnectionFactory::registerRestHandlers(QnRestProcessorPool* const p)
      *     x and y (for left top corner), width, height.
      * %param scheduleTasks List of scheduleTask objects which define the camera recording
      *     schedule.
-     *     %param scheduleTask.startTime Time of day when the backup starts (in seconds passed
+     *     %param scheduleTasks[].startTime Time of day when the backup starts (in seconds passed
      *         from 00:00:00).
-     *     %param scheduleTask.endTime Time of day when the backup ends (in seconds passed
+     *     %param scheduleTasks[].endTime Time of day when the backup ends (in seconds passed
      *         from 00:00:00).
-     *     %param scheduleTask.recordingType
+     *     %param scheduleTasks[].recordingType
      *         %value RT_Always Record always.
      *         %value RT_MotionOnly Record only when the motion is detected.
      *         %value RT_Never Never record.
      *         %value RT_MotionAndLowQuality Always record low quality
      *             stream, and record high quality stream on motion.
-     *     %param scheduleTask.dayOfWeek Weekday for the recording task.
+     *     %param scheduleTasks[].dayOfWeek Weekday for the recording task.
      *         %value 1 Monday
      *         %value 2 Tuesday
      *         %value 3 Wednesday
@@ -559,7 +559,7 @@ void LocalConnectionFactory::registerRestHandlers(QnRestProcessorPool* const p)
      *         %value 5 Friday
      *         %value 6 Saturday
      *         %value 7 Sunday
-     *     %param scheduleTask.streamQuality Quality of the recording.
+     *     %param scheduleTasks[].streamQuality Quality of the recording.
      *         %value QualityLowest
      *         %value QualityLow
      *         %value QualityNormal
@@ -567,7 +567,7 @@ void LocalConnectionFactory::registerRestHandlers(QnRestProcessorPool* const p)
      *         %value QualityHighest
      *         %value QualityPreSet
      *         %value QualityNotDefined
-     *     %param scheduleTask.fps Frames per second (integer).
+     *     %param scheduleTasks[].fps Frames per second (integer).
      * %param audioEnabled Whether audio is enabled on the camera.
      *     %value false
      *     %value true
@@ -611,7 +611,9 @@ void LocalConnectionFactory::registerRestHandlers(QnRestProcessorPool* const p)
     /**%apidoc GET /ec2/getCameraUserAttributesList
      * Read additional camera attributes.
      * %param[default] format
-     * %param[opt] id Camera unique id. If omitted, return data for all cameras.
+     * %param[opt]:string id Camera id (can be obtained from "id", "physicalId" or "logicalId"
+     *     field via /ec2/getCamerasEx or /ec2/getCameras?extraFormatting) or MAC address (not
+     *     supported for certain cameras). If omitted, return data for all cameras.
      * %return List of objects with additional camera attributes for all cameras, in the requested
      *     format.
      *     %param cameraId Camera unique id.
@@ -636,17 +638,17 @@ void LocalConnectionFactory::registerRestHandlers(QnRestProcessorPool* const p)
      *         x and y (for left top corner), width, height.
      *     %param scheduleTasks List of scheduleTask objects which define the camera recording
      *         schedule.
-     *         %param scheduleTask.startTime Time of day when the backup starts (in seconds passed
+     *         %param scheduleTasks[].startTime Time of day when the backup starts (in seconds
+     *             passed from 00:00:00).
+     *         %param scheduleTasks[].endTime Time of day when the backup ends (in seconds passed
      *             from 00:00:00).
-     *         %param scheduleTask.endTime Time of day when the backup ends (in seconds passed
-     *             from 00:00:00).
-     *         %param scheduleTask.recordingType
+     *         %param scheduleTasks[].recordingType
      *             %value RT_Always Record always.
      *             %value RT_MotionOnly Record only when the motion is detected.
      *             %value RT_Never Never record.
      *             %value RT_MotionAndLowQuality Always record low quality
      *                 stream, and record high quality stream on motion.
-     *         %param scheduleTask.dayOfWeek Weekday for the recording task.
+     *         %param scheduleTasks[].dayOfWeek Weekday for the recording task.
      *             %value 1 Monday
      *             %value 2 Tuesday
      *             %value 3 Wednesday
@@ -654,7 +656,7 @@ void LocalConnectionFactory::registerRestHandlers(QnRestProcessorPool* const p)
      *             %value 5 Friday
      *             %value 6 Saturday
      *             %value 7 Sunday
-     *         %param scheduleTask.streamQuality Quality of the recording.
+     *         %param scheduleTasks[].streamQuality Quality of the recording.
      *             %value QualityLowest
      *             %value QualityLow
      *             %value QualityNormal
@@ -662,7 +664,7 @@ void LocalConnectionFactory::registerRestHandlers(QnRestProcessorPool* const p)
      *             %value QualityHighest
      *             %value QualityPreSet
      *             %value QualityNotDefined
-     *         %param scheduleTask.fps Frames per second (integer).
+     *         %param scheduleTasks[].fps Frames per second (integer).
      *     %param audioEnabled Whether audio is enabled on the camera.
      *         %value false
      *         %value true
@@ -719,9 +721,11 @@ void LocalConnectionFactory::registerRestHandlers(QnRestProcessorPool* const p)
     /**%apidoc GET /ec2/getCamerasEx
      * Read camera list.
      * %param[default] format
-     * %param[opt] id Camera unique id. If omitted, return data for all cameras.
+     * %param[opt]:string id Camera id (can be obtained from "id", "physicalId" or "logicalId"
+     *     field via /ec2/getCamerasEx or /ec2/getCameras?extraFormatting) or MAC address (not
+     *     supported for certain cameras). If omitted, return data for all cameras.
      * %return List of camera information objects in the requested format.
-     *     %// From struct ResourceData:
+     *     %// From struct ApiResourceData:
      *     %param id Camera unique id.
      *     %param parentId Unique id of the server hosting the camera.
      *     %param name Camera name.
@@ -746,8 +750,9 @@ void LocalConnectionFactory::registerRestHandlers(QnRestProcessorPool* const p)
      *         is causing a lot of network issues.
      *     %param vendor Camera manufacturer.
      *
-     *     %// From struct CameraAttributesData:
-     *     %param cameraId Camera unique id. If such object exists, omitted fields will not be changed.
+     *     %// From struct ApiCameraAttributesData:
+     *     %param cameraId Camera unique id. If such object exists, omitted fields will not be
+     *           changed.
      *     %param cameraName Camera name.
      *     %param userDefinedGroupName Name of the user-defined camera group.
      *     %param scheduleEnabled Whether recording to the archive is enabled for the camera.
@@ -769,17 +774,17 @@ void LocalConnectionFactory::registerRestHandlers(QnRestProcessorPool* const p)
      *         x and y (for the left top corner), width, height.
      *     %param scheduleTasks List of scheduleTask objects which define the camera recording
      *         schedule.
-     *         %param scheduleTask.startTime Time of day when the backup starts (in seconds passed
+     *         %param scheduleTasks[].startTime Time of day when the backup starts (in seconds
+     *             passed from 00:00:00).
+     *         %param scheduleTasks[].endTime Time of day when the backup ends (in seconds passed
      *             from 00:00:00).
-     *         %param scheduleTask.endTime Time of day when the backup ends (in seconds passed
-     *             from 00:00:00).
-     *         %param scheduleTask.recordingType
+     *         %param scheduleTasks[].recordingType
      *             %value RT_Always Record always.
      *             %value RT_MotionOnly Record only when the motion is detected.
      *             %value RT_Never Never record.
      *             %value RT_MotionAndLowQuality Always record low quality
      *                 stream, and record high quality stream on motion.
-     *         %param scheduleTask.dayOfWeek Day of week for the recording task.
+     *         %param scheduleTasks[].dayOfWeek Day of week for the recording task.
      *             %value 1 Monday
      *             %value 2 Tuesday
      *             %value 3 Wednesday
@@ -787,7 +792,7 @@ void LocalConnectionFactory::registerRestHandlers(QnRestProcessorPool* const p)
      *             %value 5 Friday
      *             %value 6 Saturday
      *             %value 7 Sunday
-     *         %param scheduleTask.streamQuality Quality of the recording.
+     *         %param scheduleTasks[].streamQuality Quality of the recording.
      *             %value QualityLowest
      *             %value QualityLow
      *             %value QualityNormal
@@ -795,7 +800,7 @@ void LocalConnectionFactory::registerRestHandlers(QnRestProcessorPool* const p)
      *             %value QualityHighest
      *             %value QualityPreSet
      *             %value QualityNotDefined
-     *         %param scheduleTask.fps Frames per second (integer).
+     *         %param scheduleTasks[].fps Frames per second (integer).
      *     %param audioEnabled Whether audio is enabled on the camera.
      *         %value false
      *         %value true
@@ -904,10 +909,10 @@ void LocalConnectionFactory::registerRestHandlers(QnRestProcessorPool* const p)
      *         %value[proprietary] anyEvent Event group.
      *         %value userDefinedEvent Custom event defined by the user.
      *     %param eventResourceIds List of event resource ids.
-     *     %param eventCondition String containing a JSON object, some fields of which depend on
-     *         eventType. Defines the filter for an event to make the rule applicable. NOTE: Other
-     *         fields than the described below can be stored in this object, but they are not used
-     *         for event matching.
+     *     %param:objectJson eventCondition String containing a JSON object, some fields of which
+     *         depend on eventType. Defines the filter for an event to make the rule applicable.
+     *         NOTE: Other fields than the described below can be stored in this object, but they
+     *         are not used for event matching.
      *         %// ATTENTION: Commented-out params are present in the struct but are not used in
      *             eventCondition. Also, params which are not commented-out may have descriptions
      *             applicable only to the current usage of the struct.
@@ -1093,7 +1098,6 @@ void LocalConnectionFactory::registerRestHandlers(QnRestProcessorPool* const p)
      *     exists, omitted fields will not be changed.
      * %param[opt] parentId Should be empty.
      * %param name User name.
-     * %param fullName Full name of the user.
      * %param[opt] url Should be empty.
      * %param[proprietary] typeId Should have fixed value.
      *     %value {774e6ecd-ffc6-ae88-0165-8f4a6d0eafa7}
@@ -1130,17 +1134,18 @@ void LocalConnectionFactory::registerRestHandlers(QnRestProcessorPool* const p)
      * %param[opt] isLdap Whether the user was imported from LDAP.
      *     %value false
      *     %value true
-     * %param[opt] isCloud Whether the user is a cloud user, as opposed to a local one.
-     *     %value false Default value.
-     *     %value true
      * %param[opt] isEnabled Whether the user is enabled.
      *     %value false
      *     %value true Default value.
+     * %param[opt] isCloud Whether the user is a cloud user, as opposed to a local one.
+     *     %value false Default value.
+     *     %value true
+     * %param fullName Full name of the user.
      * %// AbstractUserManager::save
      */
     regUpdate<ApiUserData>(p, ApiCommand::saveUser);
 
-    /**%apidoc POST /ec2/saveUsers
+    /**%apidoc:arrayParams POST /ec2/saveUsers
     * Saves the list of users. Only local and LDAP users are supported. Cloud users won't be saved.
     * <p>
     * Parameters should be passed as a JSON array of objects in POST message body with
@@ -1152,7 +1157,6 @@ void LocalConnectionFactory::registerRestHandlers(QnRestProcessorPool* const p)
     *     exists, omitted fields will not be changed.
     * %param[opt] parentId Should be empty.
     * %param name User name.
-    * %param fullName Full name of the user.
     * %param[opt] url Should be empty.
     * %param[proprietary] typeId Should have fixed value.
     *     %value {774e6ecd-ffc6-ae88-0165-8f4a6d0eafa7}
@@ -1189,12 +1193,13 @@ void LocalConnectionFactory::registerRestHandlers(QnRestProcessorPool* const p)
     * %param[opt] isLdap Whether the user was imported from LDAP.
     *     %value false
     *     %value true
-    * %param[opt] isCloud Whether the user is a cloud user, as opposed to a local one.
-    *     %value false Default value.
-    *     %value true
     * %param[opt] isEnabled Whether the user is enabled.
     *     %value false
     *     %value true Default value.
+    * %param[opt] isCloud Whether the user is a cloud user, as opposed to a local one.
+    *     %value false Default value.
+    *     %value true
+    * %param fullName Full name of the user.
     * %// AbstractUserManager::save
     */
     regUpdate<ApiUserDataList>(p, ApiCommand::saveUsers);
@@ -1219,8 +1224,8 @@ void LocalConnectionFactory::registerRestHandlers(QnRestProcessorPool* const p)
      * the result of the corresponding GET function.
      * </p>
      * %permissions Administrator.
-     * %param[opt] id User role unique id. Can be omitted when creating a new object. If such object
-     *     exists, omitted fields will not be changed.
+     * %param[opt] id User role unique id. Can be omitted when creating a new object. If such
+     *     object exists, omitted fields will not be changed.
      * %param name User role name.
      * %param permissions Combination (via "|") of the following flags:
      *     %value GlobalEditCamerasPermission Can edit camera settings.
@@ -1286,10 +1291,10 @@ void LocalConnectionFactory::registerRestHandlers(QnRestProcessorPool* const p)
      * %permissions Administrator.
      * %param[opt] id Web page unique id. Can be omitted when creating a new object. If such object
      *     exists, omitted fields will not be changed.
-     * %param[proprietary] typeId Should have fixed value.
-     *     %value {57d7112a-b9c3-247b-c045-1660250adae5}
      * %param name Web page name.
      * %param url Web page url.
+     * %param[proprietary] typeId Should have fixed value.
+     *     %value {57d7112a-b9c3-247b-c045-1660250adae5}
      * %// AbstractWebPageManager::save
      */
     regUpdate<WebPageData>(p, ApiCommand::saveWebPage);
@@ -1339,38 +1344,38 @@ void LocalConnectionFactory::registerRestHandlers(QnRestProcessorPool* const p)
      * %param verticalSpacing Vertical spacing between layout items
      *     (floating-point).
      * %param items List of the layout items.
-     *     %param item.id Item unique id. Can be omitted when creating a new object.
-     *     %param item.flags Should have fixed value.
+     *     %param items[].id Item unique id. Can be omitted when creating a new object.
+     *     %param items[].flags Should have fixed value.
      *         %value 0
-     *     %param item.left Left coordinate of the layout item (floating-point).
-     *     %param item.top Top coordinate of the layout item (floating-point).
-     *     %param item.right Right coordinate of the layout item (floating-point).
-     *     %param item.bottom Bottom coordinate of the layout item (floating-point).
-     *     %param item.rotation Degree of image tilt; a positive value rotates
+     *     %param items[].left Left coordinate of the layout item (floating-point).
+     *     %param items[].top Top coordinate of the layout item (floating-point).
+     *     %param items[].right Right coordinate of the layout item (floating-point).
+     *     %param items[].bottom Bottom coordinate of the layout item (floating-point).
+     *     %param items[].rotation Degree of image tilt; a positive value rotates
      *         counter-clockwise (floating-point, 0..360).
-     *     %param item.resourceId Camera unique id.
-     *     %param item.resourcePath If the item represents a local file - URL of
+     *     %param items[].resourceId Camera unique id.
+     *     %param items[].resourcePath If the item represents a local file - URL of
      *         the file, otherwise is empty.
-     *     %param item.zoomLeft Left coordinate of the displayed window inside
+     *     %param items[].zoomLeft Left coordinate of the displayed window inside
      *         the camera image, as a fraction of the image width
      *         (floating-point, 0..1).
-     *     %param item.zoomTop Top coordinate of the displayed window inside
+     *     %param items[].zoomTop Top coordinate of the displayed window inside
      *         the camera image, as a fraction of the image height
      *         (floating-point, 0..1).
-     *     %param item.zoomRight Right coordinate of the displayed window inside
+     *     %param items[].zoomRight Right coordinate of the displayed window inside
      *         the camera image, as a fraction of the image width
      *         (floating-point, 0..1).
-     *     %param item.zoomBottom Bottom coordinate of the displayed window inside
+     *     %param items[].zoomBottom Bottom coordinate of the displayed window inside
      *         the camera image, as a fraction of the image width
      *         (floating-point, 0..1).
-     *     %param item.zoomTargetId Unique id of the original layout item for
+     *     %param items[].zoomTargetId Unique id of the original layout item for
      *         which the zoom window was created.
-     *     %param item.contrastParams Image enhancement parameters. The format
+     *     %param items[].contrastParams Image enhancement parameters. The format
      *         is proprietary and is likely to change in future API versions.
-     *     %param item.dewarpingParams Image dewarping parameters.
+     *     %param items[].dewarpingParams Image dewarping parameters.
      *         The format is proprietary and is likely to change in future API
      *         versions.
-     *     %param item.displayInfo Whether to display info for the layout item.
+     *     %param items[].displayInfo Whether to display info for the layout item.
      *         %value false
      *         %value true
      * %param locked Whether the layout is locked.
@@ -1385,7 +1390,7 @@ void LocalConnectionFactory::registerRestHandlers(QnRestProcessorPool* const p)
      */
     regUpdate<LayoutData>(p, ApiCommand::saveLayout);
 
-    /**%apidoc POST /ec2/saveLayouts
+    /**%apidoc:arrayParams POST /ec2/saveLayouts
      * Save the list of layouts.
      * <p>
      * Parameters should be passed as a JSON array of objects in POST message body with
@@ -1406,38 +1411,38 @@ void LocalConnectionFactory::registerRestHandlers(QnRestProcessorPool* const p)
      * %param verticalSpacing Vertical spacing between layout items
      *     (floating-point).
      * %param items List of the layout items.
-     *     %param item.id Item unique id. Can be omitted when creating a new object.
-     *     %param item.flags Should have fixed value.
+     *     %param items[].id Item unique id. Can be omitted when creating a new object.
+     *     %param items[].flags Should have fixed value.
      *         %value 0
-     *     %param item.left Left coordinate of the layout item (floating-point).
-     *     %param item.top Top coordinate of the layout item (floating-point).
-     *     %param item.right Right coordinate of the layout item (floating-point).
-     *     %param item.bottom Bottom coordinate of the layout item (floating-point).
-     *     %param item.rotation Degree of image tilt; a positive value rotates
+     *     %param items[].left Left coordinate of the layout item (floating-point).
+     *     %param items[].top Top coordinate of the layout item (floating-point).
+     *     %param items[].right Right coordinate of the layout item (floating-point).
+     *     %param items[].bottom Bottom coordinate of the layout item (floating-point).
+     *     %param items[].rotation Degree of image tilt; a positive value rotates
      *         counter-clockwise (floating-point, 0..360).
-     *     %param item.resourceId Camera unique id.
-     *     %param item.resourcePath If the item represents a local file - URL of
+     *     %param items[].resourceId Camera unique id.
+     *     %param items[].resourcePath If the item represents a local file - URL of
      *         the file, otherwise is empty.
-     *     %param item.zoomLeft Left coordinate of the displayed window inside
+     *     %param items[].zoomLeft Left coordinate of the displayed window inside
      *         the camera image, as a fraction of the image width
      *         (floating-point, 0..1).
-     *     %param item.zoomTop Top coordinate of the displayed window inside
+     *     %param items[].zoomTop Top coordinate of the displayed window inside
      *         the camera image, as a fraction of the image height
      *         (floating-point, 0..1).
-     *     %param item.zoomRight Right coordinate of the displayed window inside
+     *     %param items[].zoomRight Right coordinate of the displayed window inside
      *         the camera image, as a fraction of the image width
      *         (floating-point, 0..1).
-     *     %param item.zoomBottom Bottom coordinate of the displayed window inside
+     *     %param items[].zoomBottom Bottom coordinate of the displayed window inside
      *         the camera image, as a fraction of the image width
      *         (floating-point, 0..1).
-     *     %param item.zoomTargetId Unique id of the original layout item for
+     *     %param items[].zoomTargetId Unique id of the original layout item for
      *         which the zoom window was created.
-     *     %param item.contrastParams Image enhancement parameters. The format
+     *     %param items[].contrastParams Image enhancement parameters. The format
      *         is proprietary and is likely to change in future API versions.
-     *     %param item.dewarpingParams Image dewarping parameters.
+     *     %param items[].dewarpingParams Image dewarping parameters.
      *         The format is proprietary and is likely to change in future API
      *         versions.
-     *     %param item.displayInfo Whether to display info for the layout item.
+     *     %param items[].displayInfo Whether to display info for the layout item.
      *         %value false
      *         %value true
      * %param locked Whether the layout is locked.
@@ -1482,12 +1487,12 @@ void LocalConnectionFactory::registerRestHandlers(QnRestProcessorPool* const p)
     * the result of the corresponding GET function.
     * </p>
     * %permissions Administrator
-    * %param[opt] id Layout tour unique id. Can be omitted when creating a new object. If such object
-    *     exists, omitted fields will not be changed.
+    * %param[opt] id Layout tour unique id. Can be omitted when creating a new object. If such
+    *     object exists, omitted fields will not be changed.
     * %param name Tour name.
     * %param items List of the layout tour items.
-    * %param item.resourceId Resource unique id. Can be a layout or a camera or something else.
-    * %param item.delayMs Delay between layouts switching in milliseconds.
+    * %param items[].resourceId Resource unique id. Can be a layout or a camera or something else.
+    * %param items[].delayMs Delay between layouts switching in milliseconds.
     * %// AbstractLayoutTourManager::save
     */
     regUpdate<LayoutTourData>(p, ApiCommand::saveLayoutTour);

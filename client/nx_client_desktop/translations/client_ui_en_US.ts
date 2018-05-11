@@ -1940,19 +1940,7 @@
     </message>
     <message>
         <location/>
-        <source>Time, which will be displayed on the timeline if client and servers machines are in the different time zones</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
         <source>IP addresses for cameras, and servers, groups for users, etc.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>
-                  Time, for which every camera on layout will be displayed if you start Layout Tour
-                </source>
         <translation type="unfinished"></translation>
     </message>
 </context>

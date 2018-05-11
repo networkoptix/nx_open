@@ -939,6 +939,46 @@ bool QnDbManager::fillTransactionLogInternal(ApiCommand::Value command, std::fun
     return true;
 }
 
+bool QnDbManager::updateBusinessRulesTransactions()
+{
+    if (!fillTransactionLogInternal<QnUuid, EventRuleData, EventRuleDataList>(
+            ApiCommand::saveEventRule, businessRuleObjectUpdater))
+    {
+        return false;
+    }
+    auto defaultRules = nx::vms::event::Rule::getDefaultRules();
+    EventRuleDataList currentBusinessRulesList;
+    if (doQueryNoLock(QnUuid(), currentBusinessRulesList) != ErrorCode::ok)
+        return false;
+    for (const auto& rulePtr: defaultRules)
+    {
+        if (std::find_if(currentBusinessRulesList.cbegin(), currentBusinessRulesList.cend(),
+                [&rulePtr](const EventRuleData& ruleData)
+                {
+                    return ruleData.id == rulePtr->id();
+                }) == currentBusinessRulesList.cend())
+        {
+            IdData ruleData;
+            ruleData.id = rulePtr->id();
+            QnTransaction<IdData> removeRuleTransaction(ApiCommand::removeEventRule,
+                commonModule()->moduleGUID(), ruleData);
+            m_tranLog->fillPersistentInfo(removeRuleTransaction);
+            if (removeBusinessRule(ruleData.id) != ErrorCode::ok)
+            {
+                NX_WARNING(this, lm("Failed to remove auto added event rule %1").args(ruleData.id));
+                return false;
+            }
+            if (m_tranLog->saveTransaction(removeRuleTransaction) != ErrorCode::ok)
+            {
+                NX_WARNING(this, lm("Failed to save remove event rule transaction to the log %1")
+                    .args(ruleData.id));
+                return false;
+            }
+        }
+    }
+    return true;
+}
+
 bool QnDbManager::resyncTransactionLog()
 {
     if (!fillTransactionLogInternal<
@@ -989,13 +1029,8 @@ bool QnDbManager::resyncTransactionLog()
         return false;
     }
 
-    if (!fillTransactionLogInternal<
-        QnUuid,
-        EventRuleData,
-        EventRuleDataList>(ApiCommand::saveEventRule, businessRuleObjectUpdater))
-    {
+    if (!updateBusinessRulesTransactions())
         return false;
-    }
 
     if (!fillTransactionLogInternal<
         QnUuid,

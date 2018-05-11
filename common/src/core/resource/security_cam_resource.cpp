@@ -137,6 +137,12 @@ QnSecurityCamResource::QnSecurityCamResource(QnCommonModule* commonModule):
         {
             if (key == Qn::CAMERA_CAPABILITIES_PARAM_NAME)
                 emit capabilitiesChanged(toSharedPointer());
+
+            if (key == Qn::DTS_PARAM_NAME)
+                emit licenseTypeChanged(toSharedPointer(this));
+
+            if (key == Qn::kDeviceType)
+                emit licenseTypeChanged(toSharedPointer(this));
         });
 
     QnMediaResource::initMediaResource();
@@ -527,8 +533,9 @@ nx::core::resource::DeviceType QnSecurityCamResource::deviceType() const
 
 void QnSecurityCamResource::setDeviceType(nx::core::resource::DeviceType deviceType)
 {
-    setProperty(Qn::kDeviceType, QnLexical::serialized(deviceType));
     m_cachedDeviceType.reset();
+    m_cachedLicenseType.reset();
+    setProperty(Qn::kDeviceType, QnLexical::serialized(deviceType));
 }
 
 Qn::LicenseType QnSecurityCamResource::licenseType() const
