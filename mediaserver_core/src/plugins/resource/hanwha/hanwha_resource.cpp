@@ -2200,7 +2200,7 @@ Qn::EntropyCoding HanwhaResource::defaultEntropyCodingForStream(Qn::ConnectionRo
 {
     const auto codec = defaultCodecForStream(role);
 
-    const auto entropyCodingParameter = m_cgiParameters.parameter(
+    const auto entropyCodingParameter = cgiParameters().parameter(
         lit("media/videoprofile/add_update/%1.EntropyCoding").arg(toHanwhaString(codec)));
 
     if (!entropyCodingParameter)
@@ -2220,7 +2220,7 @@ QString HanwhaResource::defaultCodecProfileForStream(Qn::ConnectionRole role) co
 {
     const auto codec = streamCodec(role);
 
-    const auto codecProfileParameter = m_cgiParameters.parameter(
+    const auto codecProfileParameter = cgiParameters().parameter(
         lit("media/videoprofile/add_update/%1.Profile").arg(toHanwhaString(codec)));
 
     if (!codecProfileParameter)
@@ -2546,7 +2546,7 @@ bool HanwhaResource::addDependencies(
             resolutionCondition.value = resolutionString;
 
             QStringList bitrateControlTypeList;
-            const auto bitrateControlTypes = m_cgiParameters.parameter(
+            const auto bitrateControlTypes = cgiParameters().parameter(
                 lit("media/videoprofile/add_update/%1.BitrateControlType")
                     .arg(codecString));
 
@@ -2876,7 +2876,7 @@ bool HanwhaResource::executeCommand(const QnCameraAdvancedParamValue& command)
     if (info->isService())
         return executeServiceCommand(parameter, *info);
 
-    const auto cgiParameter = m_cgiParameters.parameter(
+    const auto cgiParameter = cgiParameters().parameter(
         info->cgi(),
         info->submenu(),
         info->updateAction(),
