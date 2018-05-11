@@ -234,6 +234,24 @@ select.form-control{
   background-color: transparent;
 }
 
+nx-language-select {
+  width: 100%;
+}
+
+.dropdown {
+  &.dropdown-wide {
+    .dropdown-toggle {
+      max-width: none;
+      width: 100%;
+
+      .arrow {
+        position: absolute;
+        margin-top: 4px;
+        margin-right: 10px !important;
+      }
+    }
+  }
+}
 
 .btn{
   outline: none !important;
@@ -261,6 +279,7 @@ select.form-control{
 
   &.dropdown-toggle{
     display: flex;
+    padding: 7px 10px;
 
     &::after {
       display: none;

@@ -62,8 +62,8 @@ export class NxModalLoginComponent implements OnInit {
     login: any;
     modalRef: NgbModalRef;
     auth = {
-        email: 'ttsolov@networkoptix.com',
-        password: '2l2b2l2n1ts2',
+        email: '',
+        password: '',
         remember: true
     };
     location: Location;
