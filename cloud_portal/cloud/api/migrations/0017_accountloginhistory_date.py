@@ -3,6 +3,8 @@
 from __future__ import unicode_literals
 
 from django.db import migrations, models
+import datetime
+
 
 
 class Migration(migrations.Migration):
@@ -15,7 +17,7 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='accountloginhistory',
             name='date',
-            field=models.DateTimeField(auto_now_add=True, default=0),
+            field=models.DateTimeField(auto_now_add=True, default=datetime.now),
             preserve_default=False,
         ),
     ]
