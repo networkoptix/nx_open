@@ -33,9 +33,9 @@
 #include <transaction/message_bus_adapter.h>
 
 using namespace ec2::test;
+using namespace nx::utils::test;
 
-using Appserver2 = nx::utils::test::ModuleLauncher<::ec2::Appserver2ProcessPublic>;
-using Appserver2Ptr = std::unique_ptr<Appserver2>;
+using Appserver2Ptr = std::unique_ptr<ec2::Appserver2Launcher>;
 
 namespace nx {
 namespace time_sync {
@@ -84,24 +84,7 @@ private:
 
 //-------------------------------------------------------------------------------------------------
 
-static Appserver2Ptr createAppserver()
-{
-    static int instanceCounter = 0;
-    const auto tmpDir = nx::utils::TestOptions::temporaryDirectoryPath() +
-        lit("/ec2_server_sync_ut.data") + QString::number(instanceCounter++);
-    QDir(tmpDir).removeRecursively();
-
-    Appserver2Ptr result(new Appserver2());
-
-    const QString dbFileArg = lit("--dbFile=%1").arg(tmpDir);
-    result->addArg(dbFileArg.toStdString().c_str());
-
-    result->start();
-    result->waitUntilStarted();
-    return result;
-}
-
-class TimeSynchronizationPeer
+class TimeSynchronizationPeer: public QObject
 {
 public:
     TimeSynchronizationPeer()
@@ -118,26 +101,53 @@ public:
         return m_appserver->moduleInstance()->commonModule();
     }
 
-    void setSynchronizeWithInternetEnabled(bool val)
+    void setSynchronizeWithInternetEnabled(bool value)
     {
-        commonModule()->globalSettings()->setSynchronizingTimeWithInternet(val);
+        m_syncWithInternetEnabled = value;
     }
 
     bool start()
     {
-        m_appserver = createAppserver();
+        static int instanceCounter = 0;
+        const auto tmpDir = nx::utils::TestOptions::temporaryDirectoryPath() +
+            lit("/ec2_server_sync_ut.data") + QString::number(instanceCounter++);
+        QDir(tmpDir).removeRecursively();
 
-        m_testSystemClock = std::make_shared<TestSystemClock>();
-        m_testSteadyClock = std::make_shared<TestSteadyClock>();
-        auto timeSyncManager = m_appserver->moduleInstance()->ecConnection()->timeSyncManager();
-        timeSyncManager->setClock(m_testSystemClock, m_testSteadyClock);
+        m_appserver.reset();
+        m_appserver.reset(new ec2::Appserver2Launcher());
 
-        auto commonModule = m_appserver->moduleInstance()->commonModule();
-        commonModule->globalSettings()->setOsTimeChangeCheckPeriod(
-            std::chrono::milliseconds(100));
-        commonModule->globalSettings()->setSyncTimeExchangePeriod(
-            std::chrono::seconds(1));
+        const QString dbFileArg = lit("--dbFile=%1").arg(tmpDir);
+        m_appserver->addArg(dbFileArg.toStdString().c_str());
 
+        connect(m_appserver.get(), &ec2::Appserver2Launcher::beforeStart,
+            this,
+            [this]()
+            {
+                auto moduleInstance = dynamic_cast<ec2::Appserver2Process*>(m_appserver->moduleInstance().get());
+                connect(moduleInstance, &ec2::Appserver2Process::beforeStart,
+                    this,
+                    [this]()
+                {
+                    auto commonModule = m_appserver->moduleInstance()->commonModule();
+                    auto globalSettings = commonModule->globalSettings();
+                    globalSettings->setSynchronizingTimeWithInternet(m_syncWithInternetEnabled);
+
+                    m_testSystemClock = std::make_shared<TestSystemClock>();
+                    m_testSteadyClock = std::make_shared<TestSteadyClock>();
+                    auto timeSyncManager = m_appserver->moduleInstance()->ecConnection()->timeSyncManager();
+                    timeSyncManager->setClock(m_testSystemClock, m_testSteadyClock);
+
+                    commonModule->globalSettings()->setOsTimeChangeCheckPeriod(
+                        std::chrono::milliseconds(100));
+                    commonModule->globalSettings()->setSyncTimeExchangePeriod(
+                        std::chrono::seconds(1));
+
+                }, Qt::DirectConnection);
+            }, Qt::DirectConnection);
+
+
+        m_appserver->start();
+        m_appserver->waitUntilStarted();
         return true;
     }
 
@@ -208,6 +218,7 @@ public:
 
 private:
     Appserver2Ptr m_appserver;
+    bool m_syncWithInternetEnabled = false;
     std::shared_ptr<TestSystemClock> m_testSystemClock;
     std::shared_ptr<TestSteadyClock> m_testSteadyClock;
 };

@@ -204,8 +204,9 @@ int Appserver2Process::exec()
     if (!tcpListener.bindToLocalAddress())
         return 1;
 
-    tcpListener.start();
+    emit beforeStart();
 
+    tcpListener.start();
     m_commonModule->messageProcessor()->init(ec2Connection);
     m_ecConnection = ec2Connection.get();
 
@@ -451,50 +452,6 @@ void Appserver2Process::addSelfServerResource(
         != ec2::ErrorCode::ok)
     {
     }
-}
-
-//-------------------------------------------------------------------------------------------------
-// class Appserver2ProcessPublic
-
-Appserver2ProcessPublic::Appserver2ProcessPublic(int argc, char **argv):
-    m_impl(std::make_unique<Appserver2Process>(argc, argv))
-{
-}
-
-void Appserver2ProcessPublic::pleaseStop()
-{
-    m_impl->pleaseStop();
-}
-
-void Appserver2ProcessPublic::setOnStartedEventHandler(
-    nx::utils::MoveOnlyFunc<void(bool)> handler)
-{
-    m_impl->setOnStartedEventHandler(std::move(handler));
-}
-
-int Appserver2ProcessPublic::exec()
-{
-    return m_impl->exec();
-}
-
-const Appserver2Process* Appserver2ProcessPublic::impl() const
-{
-    return m_impl.get();
-}
-
-ec2::AbstractECConnection* Appserver2ProcessPublic::ecConnection()
-{
-    return m_impl->ecConnection();
-}
-
-nx::network::SocketAddress Appserver2ProcessPublic::endpoint() const
-{
-    return m_impl->endpoint();
-}
-
-QnCommonModule* Appserver2ProcessPublic::commonModule() const
-{
-    return m_impl->commonModule();
 }
 
 }   // namespace ec2
