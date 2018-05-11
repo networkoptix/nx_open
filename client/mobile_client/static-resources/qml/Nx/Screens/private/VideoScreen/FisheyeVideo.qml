@@ -303,6 +303,7 @@ Item
         onPinchStarted:
         {
             interactor.startZoom(pinch.startCenter.x, pinch.startCenter.y)
+            kineticAnimator.interrupt()
             zoomStarted = true
         }
 

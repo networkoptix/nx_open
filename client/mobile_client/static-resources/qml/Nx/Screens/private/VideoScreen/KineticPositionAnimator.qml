@@ -11,6 +11,13 @@ QtObject
     property alias inertiaDuration: speedVectorAnimation.duration
     property alias inertiaEasing: speedVectorAnimation.easing.type
 
+    function interrupt()
+    {
+        if (d.lastPosition)
+            finishMeasurement(d.lastPosition.x, d.lastPosition.y)
+        d.animation.stop()
+    }
+
     function startMeasurement(x, y)
     {
         speedVectorAnimation.stop()
