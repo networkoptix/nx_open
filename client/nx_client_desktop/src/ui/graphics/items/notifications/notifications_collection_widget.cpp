@@ -289,7 +289,7 @@ void QnNotificationsCollectionWidget::loadThumbnailForItem(
         ? Qn::ViewLivePermission
         : Qn::ViewFootagePermission;
 
-    QnMultiImageProvider::Providers providers;
+    MultiImageProvider::Providers providers;
     for (const auto& camera: cameraList)
     {
         NX_ASSERT(accessController()->hasPermissions(camera, Qn::ViewContentPermission));
@@ -302,7 +302,7 @@ void QnNotificationsCollectionWidget::loadThumbnailForItem(
         request.camera = camera;
         request.usecSinceEpoch = microseconds(milliseconds(msecSinceEpoch)).count();
         request.size = kDefaultThumbnailSize;
-        std::unique_ptr<QnImageProvider> provider(new CameraThumbnailProvider(request));
+        std::unique_ptr<ImageProvider> provider(new CameraThumbnailProvider(request));
 
         providers.push_back(std::move(provider));
     }
@@ -310,7 +310,7 @@ void QnNotificationsCollectionWidget::loadThumbnailForItem(
     if (providers.empty())
         return;
 
-    item->setImageProvider(new QnMultiImageProvider(std::move(providers), Qt::Vertical, kMultiThumbnailSpacing, item));
+    item->setImageProvider(new MultiImageProvider(std::move(providers), Qt::Vertical, kMultiThumbnailSpacing, item));
 }
 
 void QnNotificationsCollectionWidget::addAcknoledgeButtonIfNeeded(

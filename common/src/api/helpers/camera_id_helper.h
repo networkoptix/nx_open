@@ -44,6 +44,14 @@ QnSecurityCamResourcePtr findCameraByFlexibleId(
     QnResourcePool* resourcePool,
     const QString& flexibleId);
 
+/**
+ * @param resourcePool Resources pool where the search will occur.
+ * @return camera id, or null if not found.
+ */
+QnUuid flexibleIdToId(
+    QnResourcePool* resourcePool,
+    const QString& flexibleId);
+
 } // namespace camera_id_helper
 
 } // namespace nx

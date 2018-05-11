@@ -216,7 +216,7 @@ QVariant QnIOPortsViewModel::headerData(int section, Qt::Orientation orientation
     if (orientation == Qt::Horizontal && role == Qt::DisplayRole && section < ColumnCount) {
         switch(section) {
         case NumberColumn:       return lit("#");
-        case IdColumn:           return tr("Id");
+        case IdColumn:           return tr("ID");
         case TypeColumn:         return tr("Type");
         case DefaultStateColumn: return tr("Default state");
         case NameColumn:         return tr("Name");
@@ -283,7 +283,8 @@ bool QnIOPortsViewModel::isDisabledData(const QModelIndex &index) const
     return false;
 }
 
-void QnIOPortsViewModel::clear() {
+void QnIOPortsViewModel::clear()
+{
     beginResetModel();
     m_data.clear();
     endResetModel();
@@ -291,6 +292,9 @@ void QnIOPortsViewModel::clear() {
 
 void QnIOPortsViewModel::setModelData(const QnIOPortDataList& data)
 {
+    if (m_data == data)
+        return;
+
     beginResetModel();
     m_data = data;
     endResetModel();

@@ -28,6 +28,8 @@ FisheyeSettingsWidget::FisheyeSettingsWidget(QWidget* parent):
     ui->setupUi(this);
 
     setHelpTopic(this, Qn::CameraSettings_Dewarping_Help);
+    ui->angleCorrectionHint->setHint(tr("Use this setting to compensate for distortion if camera is not mounted exactly vertically or horizontally."));
+    ui->angleCorrectionHint->setHelpTopic(Qn::CameraSettings_Dewarping_Help);
 
     ui->sizeIcon1->setPixmap(qnSkin->pixmap("fisheye/circle_small.png"));
     ui->sizeIcon2->setPixmap(qnSkin->pixmap("fisheye/circle_big.png"));
@@ -131,7 +133,7 @@ FisheyeSettingsWidget::~FisheyeSettingsWidget()
 {
 }
 
-void FisheyeSettingsWidget::updateFromParams(const QnMediaDewarpingParams& params, QnImageProvider* imageProvider)
+void FisheyeSettingsWidget::updateFromParams(const QnMediaDewarpingParams& params, ImageProvider* imageProvider)
 {
     QSignalBlocker updateBlock(this);
 

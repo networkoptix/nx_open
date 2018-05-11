@@ -127,7 +127,7 @@ class Message(object):
                 payload = part.get_payload(decode=True)
                 # mo = re.search(r'https?://{}/activate/(\w+)'.format(cloud_host), payload)
                 # Activation domain may not match account cloud host. Strange, yes.
-                mo = re.search(r'https?://\S+/activate/(\w+)', payload)
+                mo = re.search(r'https?://\S+/activate/(\w+=?)', payload)
                 if mo:
                     return mo.group(1)
         return None

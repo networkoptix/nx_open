@@ -50,7 +50,8 @@ public:
      * @param eventTypeListSize guid array size.
      * @return noError in case of success, other value otherwise.
      */
-    virtual Error startFetchingMetadata(nxpl::NX_GUID* typeList, int typeListSize) = 0;
+    virtual Error startFetchingMetadata(
+        nxpl::NX_GUID* typeList, int typeListSize) = 0;
 
     /**
      * @param handler Processes event metadata and object metadata fetched by the plugin. The

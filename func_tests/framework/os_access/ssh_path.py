@@ -1,63 +1,67 @@
-from abc import ABCMeta, abstractmethod
+from abc import ABCMeta, abstractproperty
+from functools import wraps
 
 from pathlib2 import PurePosixPath
 
-from framework.os_access.args import sh_quote_arg
-from framework.os_access.exceptions import FileNotFound, exit_status_error_cls
-from framework.os_access.local_access import LocalAccess
+from framework.os_access.exceptions import (
+    AlreadyExists,
+    BadParent,
+    DoesNotExist,
+    NonZeroExitStatus,
+    NotADir,
+    NotAFile,
+    exit_status_error_cls,
+    )
 from framework.os_access.path import FileSystemPath
+
+
+def _raising_on_exit_status(exit_status_to_error_cls):
+    def decorator(func):
+        @wraps(func)
+        def decorated(self, *args, **kwargs):
+            try:
+                return func(self, *args, **kwargs)
+            except NonZeroExitStatus as e:
+                if e.exit_status in exit_status_to_error_cls:
+                    error_cls = exit_status_to_error_cls[e.exit_status]
+                    raise error_cls(e)
+                raise
+
+        return decorated
+
+    return decorator
 
 
 class SSHPath(FileSystemPath, PurePosixPath):
     __metaclass__ = ABCMeta
-
-    @staticmethod
-    @abstractmethod
-    def _ssh_access():
-        from framework.os_access.ssh_access import SSHAccess
-        return SSHAccess('', '')
+    _ssh_access = abstractproperty()
 
     @classmethod
     def home(cls):
-        return cls(cls._ssh_access().run_sh_script('echo ~').rstrip())
+        return cls(cls._ssh_access.run_sh_script('echo ~').rstrip())
 
     @classmethod
     def tmp(cls):
         return cls('/tmp/func_tests')
 
-    def touch(self, mode=0o666, exist_ok=True):
-        self._ssh_access().run_sh_script(
-            # language=Bash
-            '''
-                if [[ -e $FILE_PATH ]]; then
-                    echo "$FILE_PATH already exists" >&2
-                    if [[ $EXIST_OK == false ]]; then
-                        exit 2
-                    fi
-                else
-                    touch "$FILE_PATH"
-                    chmod $MODE "$FILE_PATH"  # Change permissions only if created as in pathlib2.
-                fi
-                ''',
-            env={
-                'FILE_PATH': self,  # Don't overwrite $PATH!
-                'EXIST_OK': 'true' if exist_ok else 'false',
-                'MODE': oct(mode),
-                })
-
     def exists(self):
         try:
-            self._ssh_access().run_command(['test', '-e', self])
+            self._ssh_access.run_command(['test', '-e', self])
         except exit_status_error_cls(1):
             return False
         else:
             return True
 
+    @_raising_on_exit_status({2: NotADir, 3: NotAFile})
     def unlink(self):
-        self._ssh_access().run_command(['rm', '-v', '--', self])
-
-    def iterdir(self):
-        return self._run_find_command(max_depth=1)
+        self._ssh_access.run_sh_script(
+            # language=Bash
+            '''
+                test ! -e "$SELF" && >&2 echo "does not exist: $SELF" && echo 2
+                test ! -f "$SELF" && >&2 echo "not a file: $SELF" && exit 3
+                rm -v -- "$SELF"
+                ''',
+            env={'SELF': self})
 
     def expanduser(self):
         """Expand tilde at the beginning safely (without passing complete path to sh)"""
@@ -66,64 +70,95 @@ class SSHPath(FileSystemPath, PurePosixPath):
         if self.parts[0] == '~':
             return self.home().joinpath(*self.parts[1:])
         user_name = self.parts[0][1:]
-        output = self._ssh_access().run_command(['getent', 'passwd', user_name])
+        output = self._ssh_access.run_command(['getent', 'passwd', user_name])
         if not output:
             raise RuntimeError("Can't determine home directory for {!r}".format(user_name))
         user_home_dir = output.split(':')[6]
         return self.__class__(user_home_dir, *self.parts[1:])
 
-    def _run_find_command(self, whole_name_pattern=None, max_depth=None):
-        command = ['find', self]
-        if max_depth is not None:
-            command += ['-maxdepth', max_depth]
-        if whole_name_pattern is not None:
-            command += ['-wholename', whole_name_pattern]
-        output = self._ssh_access().run_command(command)
-        lines = output.rstrip().splitlines()
-        return [self.__class__(line) for line in lines]
-
+    @_raising_on_exit_status({2: DoesNotExist, 3: NotADir})
     def glob(self, pattern):
-        return self._run_find_command(whole_name_pattern=self / pattern, max_depth=1)
-
-    def rglob(self, pattern):
-        return self._run_find_command(whole_name_pattern=self / pattern)
-
-    def mkdir(self, parents=False, exist_ok=False):
-        self._ssh_access().run_sh_script(
+        output = self._ssh_access.run_sh_script(
             # language=Bash
             '''
-                if [ -e "$DIR" ]; then
-                    if [ -d "$DIR" ]; then
-                        >&2 echo "$DIR already exists"
-                        if [ "$EXIST_OK" == true ]; then
-                            exit 0
-                        else
-                            exit 2
-                        fi
-                    else
-                        >&2 echo "$DIR already exists but not a dir" && exit 3
-                    fi
+                test ! -e "$SELF" && >&2 echo "does not exist: $SELF" && exit 2
+                test ! -d "$SELF" && >&2 echo "not a dir: $SELF" && exit 3
+                find "$SELF" -mindepth 1 -maxdepth 1 -name "$PATTERN"
+                ''',
+            env={'SELF': self, 'PATTERN': pattern})
+        lines = output.rstrip().splitlines()
+        paths = [self.__class__(line) for line in lines]
+        return paths
+
+    @_raising_on_exit_status({2: BadParent, 3: AlreadyExists, 4: BadParent})
+    def mkdir(self, parents=False, exist_ok=False):
+        self._ssh_access.run_sh_script(
+            # language=Bash
+            '''
+                ancestor="$DIR"
+                while [ ! -e "$ancestor" ]; do
+                    ancestor="$(dirname "$ancestor")"
+                done
+                test ! -d "$ancestor" && >&2 echo "not a dir: $ancestor" && exit 2
+                test "$ancestor" = "$DIR" -a $EXIST_OK = true && exit 0 
+                test "$ancestor" = "$DIR" && >&2 echo "dir exists: $DIR" && exit 3
+                if [ "$ancestor" = "$(dirname "$DIR")" ]; then
+                    mkdir -v -- "$DIR"
                 else
-                    if [ "$PARENTS" == true ]; then
+                    if [ $PARENTS = true ]; then
                         mkdir -vp -- "$DIR"
-                    else
-                        mkdir -v -- "$DIR"
+                    else 
+                        >&2 echo "does not exist: $(dirname "$DIR")"
+                        exit 4
                     fi
                 fi
                 ''',
             env={'DIR': self, 'PARENTS': parents, 'EXIST_OK': exist_ok})
 
     def rmtree(self, ignore_errors=False):
-        self._ssh_access().run_command(['rm', '-v', '-rf' if ignore_errors else '-r', '--', self])
-
-    def read_bytes(self):
         try:
-            return self._ssh_access().run_command(['cat', self])
-        except exit_status_error_cls(1):
-            raise FileNotFound(self)
+            self._ssh_access.run_sh_script(
+                # language=Bash
+                '''
+                    test -e "$SELF" || exit 2
+                    test -d "$SELF" || exit 3
+                    rm -r -- "$SELF"
+                    ''',
+                env={'SELF': self})
+        except exit_status_error_cls(2):
+            if not ignore_errors:
+                raise DoesNotExist(self)
+        except exit_status_error_cls(3):
+            if not ignore_errors:
+                raise NotADir(self)
 
+    @_raising_on_exit_status({2: DoesNotExist, 3: NotAFile})
+    def read_bytes(self):
+        return self._ssh_access.run_sh_script(
+            # language=Bash
+            '''
+                test ! -e "$SELF" && >&2 echo "does not exist: $SELF" && exit 2
+                test ! -f "$SELF" && >&2 echo "not a file: $SELF" && exit 3
+                cat "$SELF"
+                ''',
+            env={'SELF': self})
+
+    @_raising_on_exit_status({2: BadParent, 3: BadParent, 4: NotAFile})
     def write_bytes(self, contents):
-        self._ssh_access().run_sh_script('cat > {}'.format(sh_quote_arg(self)), input=contents)
+        output = self._ssh_access.run_sh_script(
+            # language=Bash
+            '''
+                parent="$(dirname "$SELF")"
+                test ! -e "$parent" && >&2 echo "no parent: $parent" && exit 2
+                test ! -d "$parent" && >&2 echo "parent not a dir: $parent" && exit 3
+                test -e "$SELF" -a ! -f "$SELF" && >&2 echo "not a file: $SELF" && exit 4
+                cat >"$SELF"
+                stat --printf="%s" "$SELF"
+                ''',
+            env={'SELF': self},
+            input=contents)
+        written = int(output)
+        return written
 
     def read_text(self, encoding='ascii', errors='strict'):
         # ASCII encoding is single used encoding in the project.
@@ -132,26 +167,3 @@ class SSHPath(FileSystemPath, PurePosixPath):
     def write_text(self, data, encoding='ascii', errors='strict'):
         # ASCII encoding is single used encoding in the project.
         self.write_bytes(data.encode(encoding=encoding, errors=errors))
-
-    def _call_rsync(self, source, destination):
-        # If file size and modification time is same, rsync doesn't copy file.
-        LocalAccess().run_command([
-            'scp',
-            '-C',  # Compression.
-            '-F', self._ssh_access().config_path,
-            '-P', self._ssh_access().port,
-            source, destination,
-            ])
-
-    def upload(self, local_source_path):
-        remote_destination_path = '{}:{}'.format(self._ssh_access().hostname, self)
-        try:
-            self._ssh_access().run_command(['test', '-d', self])
-        except exit_status_error_cls(1):
-            self._call_rsync(local_source_path, remote_destination_path)
-        else:
-            raise RuntimeError("Destination is a dir; had command run, file would've been placed into this dir")
-
-    def download(self, local_destination_path):
-        remote_source_path = '{}:{}'.format(self._ssh_access().hostname, self)
-        self._call_rsync(remote_source_path, local_destination_path)

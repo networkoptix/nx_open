@@ -4,10 +4,10 @@
 
 #include <ui/graphics/items/generic/styled_tooltip_widget.h>
 
-class QnImageProvider;
 class QGraphicsProxyWidget;
 namespace nx { namespace client { namespace desktop { class AsyncImageWidget; }}}
 namespace nx { namespace client { namespace desktop { class TextEditLabel; }}}
+namespace nx { namespace client { namespace desktop { class ImageProvider; }}}
 
 class QnGraphicsToolTipWidget: public QnStyledTooltipWidget
 {
@@ -29,7 +29,7 @@ public:
 
     void setThumbnailVisible(bool visible);
 
-    void setImageProvider(QnImageProvider* provider);
+    void setImageProvider(nx::client::desktop::ImageProvider* provider);
 
     void setHighlightRect(const QRectF& relativeRect);
 

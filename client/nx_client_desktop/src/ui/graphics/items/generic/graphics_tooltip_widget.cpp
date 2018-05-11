@@ -104,7 +104,7 @@ void QnGraphicsToolTipWidget::setThumbnailVisible(bool visible)
     updateTailPos();
 }
 
-void QnGraphicsToolTipWidget::setImageProvider(QnImageProvider* provider)
+void QnGraphicsToolTipWidget::setImageProvider(ImageProvider* provider)
 {
     if (m_previewWidget->imageProvider() == provider)
         return;

@@ -166,7 +166,9 @@ public:
     ~CLVideoDecoderOutput();
 
     QImage toImage() const;
-    std::vector<char> toArgb(int* outLineSize) const;
+
+    /** On error, return an empty array after logging the error. */
+    std::vector<char> toRgb(int* outLineSize, AVPixelFormat pixelFormat) const;
 
     static void copy(const CLVideoDecoderOutput* src, CLVideoDecoderOutput* dst);
     static bool imagesAreEqual(const CLVideoDecoderOutput* img1, const CLVideoDecoderOutput* img2, unsigned int max_diff);

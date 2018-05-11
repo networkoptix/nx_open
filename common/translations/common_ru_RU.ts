@@ -569,8 +569,8 @@
       <translation>Неизвестная ошибка</translation>
     </message>
     <message>
-      <source>Server with matching Hardware Id not found</source>
-      <translation>Сервер с соответствующим аппаратным Id не найден</translation>
+      <source>Server with matching Hardware ID not found</source>
+      <translation>Сервер с соответствующим аппаратным ID не найден</translation>
     </message>
   </context>
   <context>
@@ -704,12 +704,12 @@
       <translation>Водяной знак: %1</translation>
     </message>
     <message>
-      <source>Hardware Id: %1</source>
-      <translation>Аппаратный Id: %1</translation>
-    </message>
-    <message>
       <source>Time License</source>
       <translation>Возобновляемая лицензия</translation>
+    </message>
+    <message>
+      <source>Hardware ID: %1</source>
+      <translation>Аппаратный ID: %1</translation>
     </message>
   </context>
   <context>

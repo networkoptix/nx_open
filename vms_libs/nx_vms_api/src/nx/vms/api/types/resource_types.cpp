@@ -71,3 +71,7 @@ QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(nx::vms::api, CameraBackupQuality,
     (nx::vms::api::CameraBackup_LowQuality, "CameraBackupLowQuality")
     (nx::vms::api::CameraBackup_Both, "CameraBackupBoth")
     (nx::vms::api::CameraBackup_Default, "CameraBackupDefault"))
+
+QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(nx::vms::api, IoModuleVisualStyle,
+    (nx::vms::api::IoModuleVisualStyle::form, "Form")
+    (nx::vms::api::IoModuleVisualStyle::tile, "Tile"))

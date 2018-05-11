@@ -25,7 +25,7 @@ if(MACOSX)
     set(mac_sources src/ui/workaround/mac_utils.mm)
 endif()
 
-file(GLOB_RECURSE QML_FILES static-resources/src/qml/*.qml static-resources/src/qml/*.js)
+file(GLOB_RECURSE QML_FILES static-resources/qml/*.qml static-resources/qml/*.js)
 
 nx_add_target(nx_client_desktop LIBRARY
     ADDITIONAL_SOURCES

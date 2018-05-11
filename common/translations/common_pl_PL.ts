@@ -569,8 +569,8 @@
       <translation>Nieznany błąd</translation>
     </message>
     <message>
-      <source>Server with matching Hardware Id not found</source>
-      <translation>Nie znaleziono serwera o zgodnym Id sprzętu</translation>
+      <source>Server with matching Hardware ID not found</source>
+      <translation>Nie znaleziono serwera o zgodnym ID sprzętu</translation>
     </message>
   </context>
   <context>
@@ -704,12 +704,12 @@
       <translation>Znak wodny: %1</translation>
     </message>
     <message>
-      <source>Hardware Id: %1</source>
-      <translation>ID sprzętu: %1</translation>
-    </message>
-    <message>
       <source>Time License</source>
       <translation>Licencja okresowa</translation>
+    </message>
+    <message>
+      <source>Hardware ID: %1</source>
+      <translation>ID sprzętu: %1</translation>
     </message>
   </context>
   <context>

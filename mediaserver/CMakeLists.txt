@@ -1,4 +1,12 @@
-nx_add_target(mediaserver EXECUTABLE
+if(LINUX)
+    # In Linux we apply capabilities to server binary (setcap CAP_NET_BIND_SERVICE=+eip). This
+    # disables "$ORIGIN" processing in RPATH, this server cannot find libraries. The simplest
+    # solution is to add an absolute libs path because we know it. The "$ORIGIN/../lib" stays here
+    # too to simplify server execution by developers.
+    list(APPEND CMAKE_INSTALL_RPATH "/opt/${deb.customization.company.name}/mediaserver/lib")
+endif()
+
+nx_add_target(mediaserver EXECUTABLE SIGNED
     PUBLIC_LIBS mediaserver_core)
 
 if(TARGET festival_libs)

@@ -4,7 +4,7 @@ from pylru import lrudecorator
 def _error_message_from_stderr(stderr):
     """Simple heuristic to get short message from STDERR"""
     for line in reversed(stderr.splitlines()):
-        if line and not line.startswith('+ '):  # Omit empty lines and lines from set -x.
+        if line and not line.startswith('+'):  # Omit empty lines and lines from set -x.
             return line
     return 'stderr empty'
 
@@ -31,10 +31,33 @@ def exit_status_error_cls(exit_status):
 
 class Timeout(Exception):
     def __init__(self, timeout_sec):
-        super(Timeout, self).__init__("Process was timed out ({} sec)".format(self.timeout_sec))
+        super(Timeout, self).__init__("Process was timed out ({} sec)".format(timeout_sec))
         self.timeout_sec = timeout_sec
 
 
-class FileNotFound(Exception):
-    def __init__(self, path):
-        super(FileNotFound, self).__init__("File {} not found".format(path))
+class DoesNotExist(Exception):
+    pass
+
+
+class AlreadyExists(Exception):
+    pass
+
+
+class BadParent(Exception):
+    pass
+
+
+class NotADir(Exception):
+    pass
+
+
+class NotAFile(Exception):
+    pass
+
+
+class FileIsADir(Exception):
+    pass
+
+
+class DirIsAFile(Exception):
+    pass

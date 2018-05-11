@@ -2,8 +2,8 @@
 
 #include <plugins/plugin_tools.h>
 
+#include <nx/sdk/metadata/compressed_video_packet.h>
 #include <nx/sdk/metadata/common_metadata_packet.h>
-#include <nx/sdk/metadata/common_compressed_video_packet.h>
 
 #include <nx/mediaserver_plugins/metadata/deepstream/deepstream_common.h>
 #include <nx/mediaserver_plugins/metadata/deepstream/openalpr_common.h>
@@ -147,7 +147,7 @@ const char* Manager::capabilitiesManifest(Error* error)
     if (ini().pipelineType == kOpenAlprPipeline)
     {
         m_manifest += "\""
-            + nxpt::NxGuidHelper::toStdString(kLicensePlateGuid);
+            + nxpt::toStdString(kLicensePlateGuid);
             +"\"";
     }
     else
@@ -155,7 +155,7 @@ const char* Manager::capabilitiesManifest(Error* error)
         for (auto i = 0; i < descriptions.size(); ++i)
         {
             m_manifest += "\""
-                + nxpt::NxGuidHelper::toStdString(descriptions[i].guid);
+                + nxpt::toStdString(descriptions[i].guid);
                 +"\"";
 
             if (i < descriptions.size() - 1)

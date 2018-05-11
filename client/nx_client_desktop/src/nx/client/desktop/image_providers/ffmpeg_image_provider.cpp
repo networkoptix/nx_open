@@ -32,7 +32,7 @@ FfmpegImageProvider::FfmpegImageProvider(const QnResourcePtr& resource, QObject*
     base_type(parent),
     d(new Private(resource))
 {
-    connect(this, &FfmpegImageProvider::loadDelayed, this, &QnImageProvider::imageChanged,
+    connect(this, &FfmpegImageProvider::loadDelayed, this, &ImageProvider::imageChanged,
         Qt::QueuedConnection);
 }
 

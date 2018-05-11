@@ -978,8 +978,8 @@ to view more bookmarks</source>
       <translation>Aantal deactiveringen overschreden voor deze licentie.</translation>
     </message>
     <message>
-      <source>Hardware Id of Server with this license does not match Hardware Id on which license was activated.</source>
-      <translation>Hardware-Id van server met deze licentie komt niet overeen met hardware-id waarop de licentie is geactiveerd.</translation>
+      <source>Hardware ID of Server with this license does not match Hardware ID on which license was activated.</source>
+      <translation>Hardware-ID van server met deze licentie komt niet overeen met Hardware-ID waarop de licentie is geactiveerd.</translation>
     </message>
   </context>
   <context>
@@ -2228,14 +2228,6 @@ to view more bookmarks</source>
       <translation>I/O module heeft geen audio stream</translation>
     </message>
     <message>
-      <source>I/O Module Id</source>
-      <translation>I/O Module Id</translation>
-    </message>
-    <message>
-      <source>Camera Id</source>
-      <translation>Camera Id</translation>
-    </message>
-    <message>
       <source>Settings</source>
       <translation>Instellingen</translation>
     </message>
@@ -2246,6 +2238,14 @@ to view more bookmarks</source>
     <message>
       <source>No settings</source>
       <translation>Geen instellingen</translation>
+    </message>
+    <message>
+      <source>I/O Module ID</source>
+      <translation type="unfinished">I/O Module ID</translation>
+    </message>
+    <message>
+      <source>Camera ID</source>
+      <translation type="unfinished">Camera ID</translation>
     </message>
   </context>
   <context>
@@ -2359,10 +2359,10 @@ to view more bookmarks</source>
       <translation>Edge</translation>
     </message>
     <message numerus="yes">
-      <source>This Id is already used on the following %n cameras: %1</source>
+      <source>This ID is already used on the following %n cameras: %1</source>
       <translation>
-        <numerusform>Deze Id wordt al gebruikt op de volgende %n camera's: %1</numerusform>
-        <numerusform>Deze Id wordt al gebruikt op de volgende %n camera's: %1</numerusform>
+        <numerusform>Deze ID wordt al gebruikt op de volgende camera: %1</numerusform>
+        <numerusform>Deze ID wordt al gebruikt op de volgende %n camera's: %1</numerusform>
       </translation>
     </message>
   </context>
@@ -2484,8 +2484,8 @@ to view more bookmarks</source>
       <translation>Server</translation>
     </message>
     <message>
-      <source>Id</source>
-      <translation>Id</translation>
+      <source>ID</source>
+      <translation type="unfinished">ID</translation>
     </message>
   </context>
   <context>
@@ -3729,8 +3729,8 @@ to %1</source>
       <translation>Impuls</translation>
     </message>
     <message>
-      <source>Id</source>
-      <translation>Id</translation>
+      <source>ID</source>
+      <translation type="unfinished">ID</translation>
     </message>
   </context>
   <context>
@@ -3882,6 +3882,21 @@ to %1</source>
     </message>
   </context>
   <context>
+    <name>QnLensCameraAdvancedParamWidget</name>
+    <message>
+      <source>Zoom</source>
+      <translation type="unfinished">Zoom</translation>
+    </message>
+    <message>
+      <source>Focus</source>
+      <translation type="unfinished">Focus</translation>
+    </message>
+    <message>
+      <source>Rotation:</source>
+      <translation type="unfinished">Rotation:</translation>
+    </message>
+  </context>
+  <context>
     <name>QnLicenseDetailsDialog</name>
     <message>
       <source>Screens Allowed:</source>
@@ -3912,8 +3927,8 @@ to %1</source>
       <translation>Functies:</translation>
     </message>
     <message>
-      <source>Locked to Hardware Id</source>
-      <translation>Gelieerd aan Hardware Id</translation>
+      <source>Locked to Hardware ID</source>
+      <translation>Gelieerd aan Hardware ID</translation>
     </message>
   </context>
   <context>
@@ -4188,16 +4203,16 @@ to %1</source>
       <translation>Neem contact op met customer support om een ​​geldige licentiecode te verkrijgen.</translation>
     </message>
     <message>
-      <source>This license is already activated and linked to Hardware Id %1</source>
-      <translation>Deze licentie is al geactiveerd en gekoppeld aan Hardware Id %1</translation>
-    </message>
-    <message>
-      <source>This license is already activated and linked to Hardware Id %1 on %2</source>
-      <translation>Deze licentie is al geactiveerd en gekoppeld aan Hardware Id %1 op %2</translation>
-    </message>
-    <message>
       <source>If the problem persists please contact Customer Support.</source>
       <translation>Als het probleem aanhoudt, neem dan contact op met customer support.</translation>
+    </message>
+    <message>
+      <source>This license is already activated and linked to Hardware ID %1</source>
+      <translation>Deze licentie is al geactiveerd en gekoppeld aan Hardware ID %1</translation>
+    </message>
+    <message>
+      <source>This license is already activated and linked to Hardware ID %1 on %2</source>
+      <translation>Deze licentie is al geactiveerd en gekoppeld aan Hardware ID %1 op %2</translation>
     </message>
   </context>
   <context>
@@ -4219,16 +4234,16 @@ to %1</source>
       <translation>Kan het bestand niet openen</translation>
     </message>
     <message>
-      <source>Please send email with License Key and Hardware Id provided to %1 to obtain an Activation Key file.</source>
-      <translation>Stuur alsjeblieft een e-mail met de licentiecode en het Hardware-Id dat is verstrekt aan %1 om een ​​activatie bestand te verkrijgen.</translation>
-    </message>
-    <message>
-      <source>Please send License Key and Hardware Id provided to %1 to obtain an Activation Key file.</source>
-      <translation>Stuur alsjeblieft een e-mail met de licentiecode en het Hardware-Id dat is verstrekt aan %1 om een ​​activatie bestand te verkrijgen.</translation>
-    </message>
-    <message>
       <source>All files</source>
       <translation>Alle bestanden</translation>
+    </message>
+    <message>
+      <source>Please send email with License Key and Hardware ID provided to %1 to obtain an Activation Key file.</source>
+      <translation>Stuur alsjeblieft een e-mail met de licentiecode en het Hardware-ID dat is verstrekt aan %1 om een ​​activatie bestand te verkrijgen.</translation>
+    </message>
+    <message>
+      <source>Please send License Key and Hardware ID provided to %1 to obtain an Activation Key file.</source>
+      <translation>Stuur alsjeblieft een e-mail met de licentiecode en het Hardware-ID dat is verstrekt aan %1 om een ​​activatie bestand te verkrijgen.</translation>
     </message>
   </context>
   <context>

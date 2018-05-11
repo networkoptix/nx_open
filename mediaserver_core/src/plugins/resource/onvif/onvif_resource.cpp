@@ -321,6 +321,7 @@ QnPlOnvifResource::QnPlOnvifResource(QnCommonModule* commonModule):
     m_audioSamplerate(0),
     m_timeDrift(0),
     m_isRelayOutputInversed(false),
+    m_fixWrongInputPortNumber(false),
     m_inputMonitored(false),
     m_clearInputsTimeoutUSec(0),
     m_eventMonitorType(emtNone),
@@ -715,7 +716,7 @@ CameraDiagnostics::Result QnPlOnvifResource::initializeIo(
 {
     const QnResourceData resourceData = qnStaticCommon->dataPool()->data(toSharedPointer(this));
     m_isRelayOutputInversed = resourceData.value(QString("relayOutputInversed"), false);
-
+    m_fixWrongInputPortNumber = resourceData.value(QString("fixWrongInputPortNumber"), false);
     //registering onvif event handler
     std::vector<QnPlOnvifResource::RelayOutputInfo> relayOutputs;
     fetchRelayOutputs(&relayOutputs);
@@ -1154,7 +1155,11 @@ void QnPlOnvifResource::notificationReceived(
         return;
     }
 
-    //some cameras (especially, Vista) send here events on output port, filtering them out
+    // Some cameras (especially, Vista) send here events on output port, filtering them out.
+    // And some cameras, e.g. DW-PF5M1TIR correctly send here events on input port,
+    // but set port number to output port, so to distinguish these two situations we use
+    // "fixWrongInputPortNumber" parameter from resource_data.json.
+
     const bool sourceNameMatchesRelayOutPortName =
         std::find_if(
             m_relayOutputInfo.begin(),
@@ -1163,14 +1168,16 @@ void QnPlOnvifResource::notificationReceived(
             {
                 return QString::fromStdString(outputInfo.token) == handler.source.front().value;
             }) != m_relayOutputInfo.end();
-    const bool sourceIsRelayOutPort = (!m_portNamePrefixToIgnore.isEmpty()
+
+    bool sourceIsRelayOutPort = (!m_portNamePrefixToIgnore.isEmpty()
         && handler.source.front().value.startsWith(m_portNamePrefixToIgnore))
         || sourceNameMatchesRelayOutPortName;
 
+    if (sourceIsRelayOutPort && m_fixWrongInputPortNumber)
+        sourceIsRelayOutPort = false;
+
     if (!sourceIsExplicitRelayInput && !handler.source.empty() && sourceIsRelayOutPort)
-    {
         return; //< This is notification about output port.
-    }
 
     // saving port state
     const bool newValue = (handler.data.value == lit("true"))
@@ -1544,9 +1551,11 @@ bool QnPlOnvifResource::fetchPtzInfo()
 
     _onvifPtz__GetConfigurations request;
     _onvifPtz__GetConfigurationsResponse response;
-    if (ptz.doGetConfigurations(request, response) == SOAP_OK && response.PTZConfiguration.size() > 0)
+    if (ptz.doGetConfigurations(request, response) == SOAP_OK
+        && response.PTZConfiguration.size() > 0)
+    {
         m_ptzConfigurationToken = QString::fromStdString(response.PTZConfiguration[0]->token);
-
+    }
     return true;
 }
 
@@ -3002,7 +3011,8 @@ void QnPlOnvifResource::checkMaxFps(VideoConfigsResp& response, const QString& e
             {
                 if (currentFps >= maxFpsOrig-2)
                 {
-                    // If first try success, does not change maxFps at all. (HikVision has working range 0..15, and 25 fps, so try from max-1 checking)
+                    // If first try success, does not change maxFps at all. (HikVision has
+                    // working range 0..15, and 25 fps, so try from max-1 checking).
                     return;
                 }
                 setMaxFps(currentFps);
@@ -3062,7 +3072,8 @@ QnAbstractPtzController *QnPlOnvifResource::createPtzControllerInternal() const
     return result.take();
 }
 
-bool QnPlOnvifResource::startInputPortMonitoringAsync(std::function<void(bool)>&& /*completionHandler*/)
+bool QnPlOnvifResource::startInputPortMonitoringAsync(
+    std::function<void(bool)>&& /*completionHandler*/)
 {
     if(hasFlags(Qn::foreigner) ||      //we do not own camera
         !hasCameraCapabilities(Qn::RelayInputCapability))
@@ -3585,11 +3596,10 @@ void QnPlOnvifResource::onPullMessagesResponseReceived(
     const time_t minNotificationTime = response.CurrentTime - roundUp<qint64>(m_monotonicClock.elapsed() - m_prevPullMessageResponseClock, MS_PER_SECOND) / MS_PER_SECOND;
     if(response.oasisWsnB2__NotificationMessage.size() > 0)
     {
-        for(size_t i = 0;
-            i < response.oasisWsnB2__NotificationMessage.size();
-            ++i)
+        for(size_t i = 0; i < response.oasisWsnB2__NotificationMessage.size(); ++i)
         {
-            notificationReceived(*response.oasisWsnB2__NotificationMessage[i], minNotificationTime);
+            notificationReceived(
+                *response.oasisWsnB2__NotificationMessage[i], minNotificationTime);
         }
     }
 

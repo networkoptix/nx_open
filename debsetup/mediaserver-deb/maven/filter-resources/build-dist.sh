@@ -112,6 +112,7 @@ buildDistribution()
     PLUGINS+=(
         hikvision_metadata_plugin
         axis_metadata_plugin
+        dw_mtt_metadata_plugin
         vca_metadata_plugin
     )
     if [ "$ENABLE_HANWHA" == "true" ]
@@ -128,7 +129,7 @@ buildDistribution()
     echo "Copying Festival VOX files"
     cp -r $SERVER_VOX_PATH $BINSTAGE
 
-    cp_sys_lib "$LIBSTAGE" libstdc++.so.6 libgcc_s.so.1 libatomic.so.1
+    cp_sys_lib "$LIBSTAGE" @cpp_runtime_libs_string@
 
     if [ '@arch@' != 'arm' ]
     then

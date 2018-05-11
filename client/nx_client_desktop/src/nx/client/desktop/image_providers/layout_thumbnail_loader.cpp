@@ -62,7 +62,7 @@ static const char * statusToString(Qn::ThumbnailStatus status)
 } // namespace
 
 using ResourceThumbnailProviderPtr = QSharedPointer<ResourceThumbnailProvider>;
-using QnImageProviderPtr = QSharedPointer<QnImageProvider>;
+using ImageProviderPtr = QSharedPointer<ImageProvider>;
 
 struct LayoutThumbnailLoader::Private
 {
@@ -81,7 +81,7 @@ struct LayoutThumbnailLoader::Private
         // Resource to be loaded. Can be empty when we load a background
         QnResourcePtr resource;
         // Image provider that deals with loading process
-        QnImageProviderPtr provider;
+        ImageProviderPtr provider;
         // Last status for an item
         Qn::ThumbnailStatus status;
         // Desired rotation for a tile.
@@ -122,7 +122,7 @@ struct LayoutThumbnailLoader::Private
         setPaletteColor(nonCameraWidget.data(), QPalette::WindowText, qnGlobals->errorTextColor());
     }
 
-    //ItemPtr trackLoader(const QnResourcePtr& resource, QnImageProviderPtr loader)
+    //ItemPtr trackLoader(const QnResourcePtr& resource, ImageProviderPtr loader)
     // Allocate a new item to be tracked.
     ItemPtr newItem()
     {
@@ -587,7 +587,7 @@ void LayoutThumbnailLoader::doLoadAsync()
         // We connect only to statusChanged event.
         // We expect that provider sends signals in a proper order
         // and it already has generated image.
-        connect(item->provider.data(), &QnImageProvider::statusChanged, this,
+        connect(item->provider.data(), &ImageProvider::statusChanged, this,
             [this, item](Qn::ThumbnailStatus status)
             {
                 if (status == Qn::ThumbnailStatus::Loaded)
@@ -640,7 +640,7 @@ void LayoutThumbnailLoader::doLoadAsync()
         // We connect only to statusChanged event.
         // We expect that provider sends signals in a proper order
         // and it already has generated image.
-        connect(thumbnailItem->provider.data(), &QnImageProvider::statusChanged, this,
+        connect(thumbnailItem->provider.data(), &ImageProvider::statusChanged, this,
             [this, thumbnailItem, zoomRect](Qn::ThumbnailStatus status)
             {
                 QnAspectRatio sourceAr(thumbnailItem->provider->sizeHint());

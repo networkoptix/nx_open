@@ -16,3 +16,5 @@ pylru==1.0.9
 datadiff==2.0.0
 pywinrm==0.3.0
 cryptography==2.2.2
+pysmb==1.1.22
+pytest-lazy-fixture==0.4.0

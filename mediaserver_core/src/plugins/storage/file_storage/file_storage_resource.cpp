@@ -90,15 +90,14 @@ static QString sysDrivePath()
 
 #elif defined(Q_OS_LINUX)
 
-static QString sysDrivePath()
-{
-    static QString devicePath = qnServerModule->rootTool()->devicePath("/");
-    return devicePath;
-}
-
 static QString getDevicePath(const QString& path)
 {
     return qnServerModule->rootTool()->devicePath(path);
+}
+
+static QString sysDrivePath()
+{
+    return getDevicePath("/");
 }
 
 #else // Unsupported OS so far
@@ -231,9 +230,8 @@ static qint64 getDeviceSizeByLocalPossiblyNonExistingPath(const QString &path)
 
     if (QDir(path).exists())
     {
-        qnServerModule->rootTool()->changeOwner(path);
         result = getDiskTotalSpace(path);
-        return result< 0 ? qnServerModule->rootTool()->totalSpace(path) : result;
+        return result < 0 ? qnServerModule->rootTool()->totalSpace(path) : result;
     }
 
     if (!QDir().mkpath(path) && !qnServerModule->rootTool()->makeDirectory(path))
@@ -312,7 +310,6 @@ Qn::StorageInitResult QnFileStorageResource::initOrUpdateInternal()
         QDir storageDir(url);
         if (storageDir.exists() || storageDir.mkpath(url))
         {
-            rootTool()->changeOwner(url); //< Just in case it was not ours.
             result = Qn::StorageInit_Ok;
         }
         else

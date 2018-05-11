@@ -1,43 +1,99 @@
 # coding=utf-8
-import filecmp
 import os
 from string import whitespace
 
 import pytest
-from pathlib2 import Path
 
+from framework.os_access.exceptions import BadParent, DoesNotExist, NotAFile, NotADir
 from framework.os_access.local_path import LocalPath
 
 pytest_plugins = ['fixtures.ad_hoc_ssh']
 
 
-@pytest.fixture(params=['ssh', 'local'])
-def base_dir(request, ad_hoc_ssh_access):
-    # Creation is checked in SSHAccess tests.
-    if request.param == 'ssh':
-        return ad_hoc_ssh_access.Path('/tmp/func_tests/paths_test_sandbox')
-    if request.param == 'local':
-        return LocalPath('/tmp/func_tests/paths_test_sandbox')
-    assert False
+@pytest.fixture()
+def local_path():
+    return LocalPath.tmp() / 'test_path-remote'
 
 
-def prepare_sandbox_path(base_dir, file_name):
-    file_path = base_dir / file_name
-    file_path.parent.mkdir(exist_ok=True, parents=True)
-    assert file_path.parent.exists()
-    if file_path.exists():
-        file_path.unlink()
-    return file_path
+@pytest.fixture()
+def ssh_path(ad_hoc_ssh_access):
+    return ad_hoc_ssh_access.Path.tmp() / 'test_path-remote'
 
 
-def test_unlink_touch_exists(base_dir):
-    path = prepare_sandbox_path(base_dir, 'touched.empty')
-    assert not path.exists()
-    path.touch(exist_ok=False)
-    assert path.exists()
-    path.touch(exist_ok=True)
-    with pytest.raises(Exception):
-        path.touch(exist_ok=False)
+@pytest.fixture()
+def smb_path(windows_vm):
+    return windows_vm.os_access.Path.tmp() / 'test_path-remote'
+
+
+@pytest.fixture(params=['local_path', 'ssh_path', 'smb_path'])
+def dirty_remote_test_dir(request):
+    """Just a name, cleaned up by test"""
+    # See: https://docs.pytest.org/en/latest/proposals/parametrize_with_fixtures.html
+    base_remote_dir = request.getfixturevalue(request.param)
+    return base_remote_dir / request.node.name
+
+
+@pytest.fixture()
+def remote_test_dir(dirty_remote_test_dir):
+    dirty_remote_test_dir.rmtree(ignore_errors=True)
+    dirty_remote_test_dir.mkdir()
+    return dirty_remote_test_dir
+
+
+@pytest.fixture()
+def local_test_dir():
+    path = LocalPath.tmp() / 'test_path-local'
+    path.mkdir(parents=True, exist_ok=True)
+    return path
+
+
+@pytest.fixture()
+def existing_remote_file(remote_test_dir, existing_remote_file_size=65537):
+    path = remote_test_dir / 'existing_file'
+    path.write_bytes(os.urandom(existing_remote_file_size))
+    return path
+
+
+@pytest.fixture()
+def existing_remote_dir(remote_test_dir):
+    path = remote_test_dir / 'existing_dir'
+    path.mkdir()
+    return path
+
+
+def test_rmtree_write_exists(dirty_remote_test_dir):
+    dirty_remote_test_dir.rmtree(ignore_errors=True)
+    dirty_remote_test_dir.mkdir()
+    touched_file = dirty_remote_test_dir / 'touched.empty'
+    assert not touched_file.exists()
+    touched_file.write_bytes(b'')
+    assert touched_file.exists()
+
+
+@pytest.mark.parametrize('depth', [1, 2, 3, 4], ids='depth_{}'.format)
+def test_rmtree_mkdir_exists(dirty_remote_test_dir, depth):
+    dirty_remote_test_dir.rmtree(ignore_errors=True)
+    dirty_remote_test_dir.mkdir()
+    root_dir = dirty_remote_test_dir / 'root'
+    root_dir.mkdir()
+    target_dir = root_dir.joinpath(*['level_{}'.format(level) for level in range(1, depth + 1)])
+    assert not target_dir.exists()
+    with pytest.raises(DoesNotExist):
+        target_dir.rmtree(ignore_errors=False)  # Not exists, raise.
+    target_dir.rmtree(ignore_errors=True)  # No effect even if parent doesn't exist.
+    if depth == 1:
+        target_dir.mkdir(parents=False)
+    else:
+        with pytest.raises(BadParent):
+            target_dir.mkdir(parents=False)
+        target_dir.mkdir(parents=True)
+    assert target_dir.exists()
+    target_file = target_dir.joinpath('deep_file')
+    assert not target_file.exists()
+    target_file.write_bytes(b'')
+    assert target_file.exists()
+    root_dir.rmtree()
+    assert not root_dir.exists()
 
 
 @pytest.mark.parametrize(
@@ -50,66 +106,85 @@ def test_unlink_touch_exists(base_dir):
         ('linux_newlines', '\n' * 100),
         ('ending_with_chr0', 'abc\0'),
         ],
-    ids=lambda data: data[0])
-def test_write_read_bytes(data, base_dir):
+    ids='{0[0]}'.format)
+def test_write_read_bytes(data, remote_test_dir):
     name, written = data
-    file_path = prepare_sandbox_path(base_dir, name + '.dat')
+    file_path = remote_test_dir / '{}.dat'.format(name)
     file_path.write_bytes(written)
     read = file_path.read_bytes()
     assert read == written
 
 
-# noinspection SpellCheckingInspection
 @pytest.mark.parametrize(
     'data',
     [
         ('latin', 'ascii', u"Two wrongs don't make a right.\nThe pen is mightier than the sword."),
         ('latin', 'utf8', u"Alla sätt är bra utom de dåliga.\nGräv där du står."),
         ('cyrillic', 'utf8', u"А дело бывало — и коза волка съедала.\nАзбука — к мудрости ступенька."),
-        ('cyrillic', 'utf16', u"Загляне сонца i ў наша ваконца.\nКаб свiнне poгi - нiкому б не было дарогi."),
+        ('cyrillic', 'utf16', u"Загляне сонца і ў наша аконца.\nКаб свiнне poгi - нiкому б не было дарогi."),
         ('pinyin', 'utf8', u"防人之心不可無。\n福無重至,禍不單行。"),
         ('pinyin', 'utf16', u"[与其]临渊羡鱼，不如退而结网。\n君子之心不胜其小，而气量涵盖一世。"),
         ],
-    ids=lambda data: '{0}-{1}'.format(*data))
-def test_write_read_text(data, base_dir):
+    ids='{0[0]}_{0[1]}'.format)
+def test_write_read_text(remote_test_dir, data):
     name, encoding, written = data
-    file_path = prepare_sandbox_path(base_dir, name + '.txt')
+    file_path = remote_test_dir / '{}_{}.txt'.format(name, encoding)
     file_path.write_text(written, encoding=encoding)
     read = file_path.read_text(encoding=encoding)
     assert read == written
 
 
-def test_rmtree_mkdir(base_dir):
-    path = base_dir / 'tree'
-    path.parent.mkdir(exist_ok=True, parents=True)
-    path.rmtree(ignore_errors=True)
-    with pytest.raises(Exception):
-        path.rmtree(ignore_errors=False)
-    path.mkdir(exist_ok=False)
-    grand_child_path = path / 'level_1_dir' / 'level_2_dir'
-    with pytest.raises(Exception):
-        grand_child_path.mkdir(parents=False)
-    grand_child_path.mkdir(parents=True)
-    grand_child_path.with_name('level_2_file').write_bytes(b'F\0\0D')
-    path.rmtree()
-    assert not path.exists()
+def test_write_to_dir(existing_remote_dir):
+    with pytest.raises(NotAFile):
+        existing_remote_dir.write_bytes(os.urandom(1000))
 
 
-def test_upload_download(base_dir):
-    path = prepare_sandbox_path(base_dir, 'uploaded.dat')
-    local_source_path = Path('/tmp/func_tests/paths_test_sandbox/to_upload.dat')  # Not dependent on base_dir!
-    if not local_source_path.exists():
-        local_source_path.write_bytes(os.urandom(1000 * 1000))
-    path.upload(local_source_path)
-    local_destination_path = base_dir / 'download.dat'
-    path.download(local_destination_path)
-    assert filecmp.cmp(str(local_destination_path), str(local_source_path))
+@pytest.fixture(params=[1, 2, 3], ids='depth_{}'.format)
+def path_with_file_in_parents(request, existing_remote_file):
+    path = existing_remote_file
+    for level in range(1, request.param + 1):
+        path /= 'level_{}'.format(level)
+    return path
 
 
-def test_upload_destination_is_dir(base_dir):
-    destination_path = base_dir / 'dir_preventing_upload'
-    destination_path.rmtree()
-    destination_path.mkdir()
-    local_source_path = Path('/tmp/func_tests/paths_test_sandbox/to_upload.dat')  # Not dependent on base_dir!
-    with pytest.raises(Exception):
-        destination_path.upload(local_source_path)
+def test_write_when_parent_is_a_file(path_with_file_in_parents):
+    with pytest.raises(BadParent):
+        path_with_file_in_parents.write_bytes(b'anything')
+
+
+def test_mkdir_when_parent_is_a_file(path_with_file_in_parents):
+    with pytest.raises(BadParent):
+        path_with_file_in_parents.mkdir()
+
+
+def test_read_from_dir(existing_remote_dir):
+    with pytest.raises(NotAFile):
+        _ = existing_remote_dir.read_bytes()
+
+
+def test_unlink_dir(existing_remote_dir):
+    with pytest.raises(NotAFile):
+        existing_remote_dir.unlink()
+
+
+def test_write_to_existing_file(existing_remote_file):
+    data = os.urandom(1000)
+    bytes_written = existing_remote_file.write_bytes(data)
+    assert bytes_written == len(data)
+
+
+def test_read_from_non_existent(remote_test_dir):
+    non_existent_file = remote_test_dir / 'non_existent'
+    with pytest.raises(DoesNotExist):
+        _ = non_existent_file.read_bytes()
+
+
+def test_glob_on_file(existing_remote_file):
+    with pytest.raises(NotADir):
+        _ = list(existing_remote_file.glob('*'))
+
+
+def test_glob_on_non_existent(existing_remote_dir):
+    non_existent_path = existing_remote_dir / 'non_existent'
+    with pytest.raises(DoesNotExist):
+        _ = list(non_existent_path.glob('*'))

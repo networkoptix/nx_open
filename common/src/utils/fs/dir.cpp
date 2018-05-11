@@ -84,10 +84,12 @@ SystemError::ErrorCode readPartitions(
         partitionInfo.devName = QString::fromLatin1(deviceKey);
         partitionInfo.path = QString::fromLatin1(pathInfo.fsPath);
         partitionInfo.fsName = QString::fromLatin1(pathInfo.fsType);
-        partitionInfo.freeBytes = systemInfoProvider->freeSpace(pathInfo.fsPath);
         partitionInfo.sizeBytes = systemInfoProvider->totalSpace(pathInfo.fsPath);
+        if (partitionInfo.sizeBytes == -1)
+            continue;
 
-        if (partitionInfo.freeBytes == -1 || partitionInfo.sizeBytes == -1)
+        partitionInfo.freeBytes = systemInfoProvider->freeSpace(pathInfo.fsPath);
+        if (partitionInfo.freeBytes == -1)
             continue;
 
         partitionInfoList->emplace_back(std::move(partitionInfo));

@@ -29,10 +29,10 @@ protected:
     virtual void settingsChanged() override;
 
     virtual bool pushCompressedVideoFrame(
-        const sdk::metadata::CommonCompressedVideoPacket* videoFrame) override;
+        const sdk::metadata::CompressedVideoPacket* videoFrame) override;
 
     virtual bool pushUncompressedVideoFrame(
-        const sdk::metadata::CommonUncompressedVideoFrame* videoFrame) override;
+        const sdk::metadata::UncompressedVideoFrame* videoFrame) override;
 
     virtual bool pullMetadataPackets(
         std::vector<sdk::metadata::MetadataPacket*>* metadataPackets) override;
@@ -48,8 +48,7 @@ private:
 
     int64_t usSinceEpoch() const;
 
-    bool checkYuv420pFrame(const sdk::metadata::CommonUncompressedVideoFrame* videoFrame) const;
-    bool checkRgbFrame(const sdk::metadata::CommonUncompressedVideoFrame* videoFrame) const;
+    bool checkFrame(const sdk::metadata::UncompressedVideoFrame* videoFrame) const;
 
 private:
     std::unique_ptr<std::thread> m_thread;

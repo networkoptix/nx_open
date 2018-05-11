@@ -17,11 +17,13 @@ struct ImageRequest
      */
     enum class RoundMethod
     {
-        // Get the thumbnail from the nearest keyframe before the given time.
+        /** Get the thumbnail from the nearest keyframe before the given time. */
         iFrameBefore,
-        // Get the thumbnail as near to given time as possible.
+
+        /** Get the thumbnail as near to given time as possible. */
         precise,
-        // Get the thumbnail from the nearest keyframe after the given time.
+
+        /** Get the thumbnail from the nearest keyframe after the given time. */
         iFrameAfter,
     };
 
@@ -29,21 +31,21 @@ struct ImageRequest
     {
         png,
         jpg,
-        tiff,
-        raw, //< Raw video frame. Makes the request much more lightweight for Edge servers.
+        tif,
+        raw, /**< Raw video frame. Makes the request much more lightweight for Edge servers. */
     };
 
     enum class AspectRatio
     {
-        custom, //< Resize to camera's custom aspect ratio (if set).
-        source, //< Use actual image aspect ratio.
+        auto_, /**< Use aspect ratio from camera settings (if any). */
+        source, /**< Use actual image aspect ratio. */
     };
 
     static const qint64 kLatestThumbnail = -1;
     static const int kDefaultRotation = -1;
 
     /**
-     * Timestamp of the image. A negative value means "latest" Can have the special value
+     * Timestamp of the image. A negative value means "latest". Can have the special value
      * DATETIME_NOW.
      */
     qint64 usecSinceEpoch = kLatestThumbnail;
@@ -63,7 +65,7 @@ struct ImageRequest
     /** Method of rounding, influences the precision. Round after is better for most situations. */
     RoundMethod roundMethod = RoundMethod::iFrameAfter;
 
-    AspectRatio aspectRatio = AspectRatio::custom;
+    AspectRatio aspectRatio = AspectRatio::auto_;
 };
 
 struct ResourceImageRequest: ImageRequest

@@ -48,6 +48,13 @@ struct QnCameraAdvancedParameterCondition
         unknown
     };
 
+    QnCameraAdvancedParameterCondition() = default;
+
+    QnCameraAdvancedParameterCondition(
+        QnCameraAdvancedParameterCondition::ConditionType type,
+        const QString& paramId,
+        const QString& value);
+
     ConditionType type = ConditionType::unknown;
     QString paramId;
     QString value;
@@ -76,7 +83,7 @@ struct QnCameraAdvancedParameterDependency
     std::vector<QnCameraAdvancedParameterCondition> conditions;
 
     /** Auto fill id field as a hash of depended ids and values */
-    void autoFillId();
+    void autoFillId(const QString& prefix = QString());
 };
 
 QN_FUSION_DECLARE_FUNCTIONS(QnCameraAdvancedParameterDependency::DependencyType, (lexical))

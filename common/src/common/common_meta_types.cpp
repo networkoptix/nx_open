@@ -12,6 +12,8 @@
 #include <nx/fusion/serialization/json_functions.h>
 #include <utils/math/space_mapper.h>
 #include <nx/streaming/media_data_packet.h>
+#include <core/resource/media_stream_capability.h>
+
 
 #include <api/model/storage_space_reply.h>
 #include <api/model/storage_status_reply.h>
@@ -350,6 +352,7 @@ void QnCommonMetaTypes::initialize()
     qRegisterMetaType<QnServerFields>();
 
     qRegisterMetaType<Qn::StatusChangeReason>("Qn::StatusChangeReason");
+    qRegisterMetaType<nx::media::CameraTraits>();
 
     QnJsonSerializer::registerSerializer<QnPtzMapperPtr>();
     QnJsonSerializer::registerSerializer<Ptz::Traits>();
@@ -369,6 +372,7 @@ void QnCommonMetaTypes::initialize()
     QnJsonSerializer::registerSerializer<std::vector<QString>>();
 
     QnJsonSerializer::registerSerializer<std::vector<QnCameraAdvancedParameterOverload>>();
+    QnJsonSerializer::registerSerializer<nx::media::CameraTraits>();
 
     qRegisterMetaType<QnChannelMapping>();
     qRegisterMetaType<QList<QnChannelMapping>>();
