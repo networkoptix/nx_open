@@ -21,7 +21,7 @@ struct Ini: public nx::kit::IniConfig
     NX_INI_FLAG(0, externalMetadata, "Use external metadata for local files.");
     NX_INI_FLAG(0, allowCustomArZoomWindows, "Allow zoom windows to have custom aspect ratio.");
     NX_INI_FLAG(0, hideEnhancedVideo, "Hide enhanced video from the scene.");
-    NX_INI_FLAG(0, enableWearableCameras, "Enable wearable cameras.");
+    NX_INI_FLAG(1, enableWearableCameras, "Enable wearable cameras.");
     NX_INI_FLAG(0, debugThumbnailProviders, "Enable debug mode for thumbnail providers");
     NX_INI_FLAG(0, allowOsScreenSaver, "Allow OS to enable screensaver when user is not active.");
     NX_INI_FLAG(0, enableWebKitDeveloperExtras, "Enable WebKit developer tools like Inspector.");
