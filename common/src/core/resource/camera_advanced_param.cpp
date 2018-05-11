@@ -558,4 +558,4 @@ QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(QnCameraAdvancedParameterDependency, D
     (QnCameraAdvancedParameterDependency::DependencyType::trigger, "Trigger")
 )
 
-QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(QnCameraAdvancedParameterTypes, (json), _Fields)
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(QnCameraAdvancedParameterTypes, (json)(eq), _Fields)

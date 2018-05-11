@@ -155,16 +155,18 @@ bool QnThirdPartyResource::mergeResourcesIfNeeded( const QnNetworkResourcePtr& n
     //TODO #ak antipattern: calling virtual function from base class
     bool mergedSomething = base_type::mergeResourcesIfNeeded( newResource );
 
-    QString localParams = QnCameraAdvancedParamsReader::encodedParamsFromResource(this->toSharedPointer());
-    QString sourceParams = QnCameraAdvancedParamsReader::encodedParamsFromResource(newResource);
-    if (!sourceParams.isEmpty() && localParams != sourceParams) {
-        QnCameraAdvancedParamsReader::setEncodedParamsToResource(this->toSharedPointer(), sourceParams);
+    const auto localParams = QnCameraAdvancedParamsReader::paramsFromResource(
+        this->toSharedPointer());
+    const auto sourceParams = QnCameraAdvancedParamsReader::paramsFromResource(newResource);
+
+    if (sourceParams != localParams)
+    {
+        QnCameraAdvancedParamsReader::setParamsToResource(this->toSharedPointer(), sourceParams);
         mergedSomething = true;
     }
-    //TODO #ak to make minimal influence on existing code, merging only few properties.
 
-        //But, perharps, other properties should be processed too (in QnResource)
-
+    // TODO: #ak to make minimal influence on existing code, merging only few properties.
+    // But, perharps, other properties should be processed too (in QnResource)
     for( const auto propertyName: PROPERTIES_TO_MERGE )
     {
         const auto newVal = newResource->getProperty( propertyName );
