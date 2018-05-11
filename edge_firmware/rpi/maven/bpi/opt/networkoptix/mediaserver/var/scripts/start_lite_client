@@ -46,6 +46,12 @@ closeInheritedFileDescriptors()
 main()
 {
     logArgs "$@"
+
+    if [ ! -d "$LITE_CLIENT_DIR" ]; then
+        echo "[$0]: ERROR: Lite Client directory does not exist"
+        exit 1
+    fi
+
     closeInheritedFileDescriptors
 
     export LESS_TERMCAP_ue=""
