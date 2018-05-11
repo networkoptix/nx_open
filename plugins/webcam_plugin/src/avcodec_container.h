@@ -13,24 +13,21 @@ extern "C"
 class AVCodecContainer
 {
 public:
-    AVCodecContainer(AVFormatContext * formatContext, AVStream * stream, bool isEncoder);
-    AVCodecContainer(AVFormatContext * formatContext, AVCodecID codecID, bool isEncoder);
+    AVCodecContainer(AVFormatContext * formatContext);
     ~AVCodecContainer();
 
     void open();
     void close();
 
-    int encode(AVPacket *outPacket, const AVFrame *frame, int *outGotPacket);
-    int readAndDecode(AVFrame * outFrame, int* outGotPicture, AVPacket * packet, bool* outIsReadCode);
-
+    int encodeVideo(AVPacket *outPacket, const AVFrame *frame, int *outGotPacket);
+    int decodeVideo(AVFrame * outFrame, int* outGotPicture, AVPacket * packet);
+    
+    void initializeEncoder(AVCodecID codecID);
+    void initializeDecoder(AVCodecParameters * codecParameters);
     bool isValid();
 
     AVCodecContext* getCodecContext();
-
     QString getAvError();
-
-private:
-    void initialize(AVCodecID codecID, bool isEncoder);
 
 private:
     AVFormatContext * m_formatContext;

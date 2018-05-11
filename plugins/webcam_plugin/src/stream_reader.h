@@ -24,13 +24,9 @@
 #include "ilp_video_packet.h"
 #include "av_string_error.h"
 
+#include <libavutil/pixfmt.h>
 #include "libav_forward_declarations.h"
 
-//extern"C"
-//{
-//#include <libavcodec/avcodec.h>
-//#include <libavformat/avformat.h>
-//}
 
 class AVCodecContainer;
 
@@ -97,12 +93,11 @@ private:
 
     AVStringError m_lastError;
 
-
 private:
     void writeToVideoPacket(AVPacket* packet);
-    void gotJpegFrame(const nx::network::http::ConstBufferRefType& jpgFrame);
+    AVPixelFormat unDeprecatePixelFormat(AVPixelFormat pixelFormat);
 
-    AVFrame* getDecodedFrame();
+    AVFrame* getDecodedVideoFrame();
     AVPacket* getEncodedPacket(AVFrame* frame);
 
     bool isValid();
@@ -112,6 +107,7 @@ private:
     AVFrame* toYUV420(AVCodecContext* codecContext, AVFrame* frame);
 
     const char * getAvInputFormat();
+    QString getAvCameraUrl();
 
     //void gotJpegFrame( const nx::network::http::ConstBufferRefType& jpgFrame );
     /*!

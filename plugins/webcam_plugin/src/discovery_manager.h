@@ -52,6 +52,11 @@ public:
 private:
     nxpt::CommonRefManager m_refManager;
     nxpl::TimeProvider *const m_timeProvider;
+
+private:
+    int findDirectShowCameras(nxcip::CameraInfo* cameras, const char * localIpInterfaceIpAddr);
+    int findVideo4Linux2Cameras(nxcip::CameraInfo* cameras, const char * localIpInterfaceIpAddr);
+    int findAvFoundationCameras(nxcip::CameraInfo* cameras, const char * localIpInterfaceIpAddr);
 };
 
 #endif  //ILP_DISCOVERY_MANAGER_H

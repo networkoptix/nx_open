@@ -45,24 +45,28 @@ extern "C"
 #include "motion_data_picture.h"
 #include "plugin.h"
 
-AVStream* getAvStream(AVFormatContext * context, int * streamIndex, enum AVMediaType mediaType)
-{
-    for (unsigned int i = 0; i < context->nb_streams; ++i)
+namespace {
+
+    static const nxcip::UsecUTCTimestamp USEC_IN_MS = 1000;
+    static const nxcip::UsecUTCTimestamp USEC_IN_SEC = 1000*1000;
+    static const nxcip::UsecUTCTimestamp NSEC_IN_USEC = 1000;
+    static const int MAX_FRAME_SIZE = 4*1024*1024;
+
+
+    AVStream* getAvStream(AVFormatContext * context, int * streamIndex, enum AVMediaType mediaType)
     {
-        if (context->streams[i]->codecpar->codec_type == mediaType)
+        for (unsigned int i = 0; i < context->nb_streams; ++i)
         {
-            *streamIndex = i;
-            return context->streams[i];
+            if (context->streams[i]->codecpar->codec_type == mediaType)
+            {
+                *streamIndex = i;
+                return context->streams[i];
+            }
         }
+
+        return nullptr;
     }
-
-    return nullptr;
-}
-
-static const nxcip::UsecUTCTimestamp USEC_IN_MS = 1000;
-static const nxcip::UsecUTCTimestamp USEC_IN_SEC = 1000*1000;
-static const nxcip::UsecUTCTimestamp NSEC_IN_USEC = 1000;
-static const int MAX_FRAME_SIZE = 4*1024*1024;
+} // namespace
 
 StreamReader::StreamReader(
     nxpt::CommonRefManager* const parentRefManager,
@@ -98,7 +102,7 @@ StreamReader::~StreamReader()
     NX_ASSERT( m_isInGetNextData == 0 );
     m_timeProvider->releaseRef();
 
-    //m_videoPacket.reset();
+    m_videoPacket.reset();
 }
 
 //!Implementation of nxpl::PluginInterface::queryInterface
@@ -136,7 +140,7 @@ int StreamReader::getNextData( nxcip::MediaDataPacket** lpPacket )
     if (!isValid())
         return nxcip::NX_IO_ERROR;
 
-    AVFrame* decodedFrame = getDecodedFrame();
+    AVFrame* decodedFrame = getDecodedVideoFrame();
     if (!decodedFrame)
         return nxcip::NX_NETWORK_ERROR;
 
@@ -148,7 +152,7 @@ int StreamReader::getNextData( nxcip::MediaDataPacket** lpPacket )
     encodedPacket->size = 0;
 
     int gotPacket;
-    m_videoEncoder->encode(encodedPacket, convertedFrame, &gotPacket);
+    m_videoEncoder->encodeVideo(encodedPacket, convertedFrame, &gotPacket);
 
     writeToVideoPacket(encodedPacket);
     *lpPacket = m_videoPacket.release();
@@ -157,7 +161,7 @@ int StreamReader::getNextData( nxcip::MediaDataPacket** lpPacket )
     av_frame_free(&convertedFrame);
     av_free_packet(encodedPacket);
 
-    return nxcip::NX_NETWORK_ERROR;
+    return nxcip::NX_NO_ERROR;
 }
 
 void StreamReader::interrupt()
@@ -203,26 +207,38 @@ void StreamReader::writeToVideoPacket(AVPacket * packet)
          memcpy(m_videoPacket->data(), packet->data, packet->size);
 }
 
+AVPixelFormat StreamReader::unDeprecatePixelFormat(AVPixelFormat pixelFormat)
+{
+    switch (pixelFormat)
+    {
+        case AV_PIX_FMT_YUVJ420P:
+            return AV_PIX_FMT_YUV420P;
+        case AV_PIX_FMT_YUVJ422P:
+            return AV_PIX_FMT_YUV422P;
+        case AV_PIX_FMT_YUVJ444P:
+            return AV_PIX_FMT_YUV444P;
+        case AV_PIX_FMT_YUVJ440P:
+            return AV_PIX_FMT_YUV440P;
+        default:
+            return pixelFormat;
+    }
+}
 
-AVFrame * StreamReader::getDecodedFrame()
+
+AVFrame * StreamReader::getDecodedVideoFrame()
 {
     AVFrame * decodedFrame = av_frame_alloc();
     AVPacket * packet = av_packet_alloc();
-    //av_init_packet(packet);
-
-    bool isReadCode;
     int gotPicture = 0;
-
     while (!gotPicture)
     {
-        int returnCode = m_videoDecoder->readAndDecode(decodedFrame, &gotPicture, packet, &isReadCode);
+        int returnCode = m_videoDecoder->decodeVideo(decodedFrame, &gotPicture, packet);
         if (m_lastError.updateIfError(returnCode))
         {
             av_packet_free(&packet);
             return nullptr;
         }
     }
-
     av_packet_free(&packet);
     return decodedFrame;
 }
@@ -235,7 +251,7 @@ AVPacket * StreamReader::getEncodedPacket(AVFrame * frame)
     packet->size = 0;
 
     int gotPacket;
-    int encodeCode = m_videoEncoder->encode(packet, frame, &gotPacket);
+    int encodeCode = m_videoEncoder->encodeVideo(packet, frame, &gotPacket);
     
     if (encodeCode < 0 || !gotPacket)
     {
@@ -250,9 +266,8 @@ bool StreamReader::isValid()
 {
     return m_formatContext != nullptr
         && m_inputFormat != nullptr
-        && m_videoDecoder != nullptr 
-        && m_videoEncoder != nullptr 
-        && !m_lastError.hasError();
+        && m_videoDecoder != nullptr
+        && m_videoEncoder != nullptr;
 }
 
 AVFrame * StreamReader::toYUV420(AVCodecContext * codecContext, AVFrame * frame)
@@ -264,31 +279,29 @@ AVFrame * StreamReader::toYUV420(AVCodecContext * codecContext, AVFrame * frame)
     av_image_alloc(resultFrame->data, resultFrame->linesize, frame->width, frame->height,
         pix_fmt, 32);
 
-    struct SwsContext * img_convert_ctx = sws_getCachedContext(
+   struct SwsContext * img_convert_ctx = sws_getCachedContext(
         NULL,
-        codecContext->width, codecContext->height, codecContext->pix_fmt, /*source*/
-        codecContext->width, codecContext->height, pix_fmt, /*destination*/
+        codecContext->width, codecContext->height, unDeprecatePixelFormat(codecContext->pix_fmt),
+        codecContext->width, codecContext->height, pix_fmt,
         SWS_BICUBIC, NULL, NULL, NULL);
 
     sws_scale(img_convert_ctx, frame->data, frame->linesize, 0, codecContext->height,
         resultFrame->data, resultFrame->linesize);
+
+    // ffmpeg prints warnings if these fields are not explicitly set
+    resultFrame->width = frame->width;
+    resultFrame->height = frame->height;
+    resultFrame->format = pix_fmt;
 
     sws_freeContext(img_convert_ctx);
 
     return resultFrame;
 }
 
-static int init = 0;
-
 void StreamReader::initializeAv()
 {
-    if (init)
-        return;
-
-    ++init;
-
-    setOptions();
     avdevice_register_all();
+    setOptions();
 
     const char * inputFormat = getAvInputFormat();
     m_inputFormat = av_find_input_format(inputFormat);
@@ -298,9 +311,11 @@ void StreamReader::initializeAv()
         return;
     }
 
-    //todo actually fill out m_options
-    const char * url = "video=HD Pro Webcam C920";
-    int formatOpenCode = avformat_open_input(&m_formatContext, url, m_inputFormat, &m_options);
+    //todo get the url from the m_info
+    
+    QString url = getAvCameraUrl();
+
+    int formatOpenCode = avformat_open_input(&m_formatContext, url.toLatin1().data(), m_inputFormat, &m_options);
     if (m_lastError.updateIfError(formatOpenCode))
         return;
 
@@ -316,19 +331,22 @@ void StreamReader::initializeAv()
         return;
     }
 
-    m_videoDecoder.reset(new AVCodecContainer(m_formatContext, videoStream, false));
+    m_videoDecoder.reset(new AVCodecContainer(m_formatContext));
+    m_videoDecoder->initializeDecoder(videoStream->codecpar);
     if (!m_videoDecoder->isValid())
     {
         m_lastError.setAvError(m_videoDecoder->getAvError());
         m_videoDecoder.reset(nullptr);
         return;
     }
+    m_videoDecoder->open();
 
-    m_videoEncoder.reset(new AVCodecContainer(m_formatContext, AV_CODEC_ID_MJPEG, true));
+    m_videoEncoder.reset(new AVCodecContainer(m_formatContext));
+    m_videoEncoder->initializeEncoder(AV_CODEC_ID_MJPEG);
     if (!m_videoDecoder->isValid())
     {
-        m_lastError.setAvError(m_videoDecoder->getAvError());
-        m_videoDecoder.reset(nullptr);
+        m_lastError.setAvError(m_videoEncoder->getAvError());
+        m_videoEncoder.reset(nullptr);
         return;
     }
 
@@ -337,15 +355,18 @@ void StreamReader::initializeAv()
 
 void StreamReader::setOptions()
 {
+    //todo actually fill out m_options instead of hardcoding
     av_dict_set(&m_options, "video_size", "1920x1080", 0);
-    av_dict_set(&m_options, "frame_rate", "30", 0);
+    av_dict_set(&m_options, "framerate", "30", 0);
+    
+    //todo find out why this delays the realtime buffer error and fix the error
     av_dict_set(&m_options, "rtbufsize", "2000M", 0);
 }
 
 void StreamReader::setEncoderOptions()
 {
     AVCodecContext * pOCodecCtx = m_videoEncoder->getCodecContext();
-    pOCodecCtx->bit_rate = m_videoDecoder->getCodecContext()->bit_rate;
+    //pOCodecCtx->bit_rate = m_videoDecoder->getCodecContext()->bit_rate;
     
     //todo unhardcode these
     pOCodecCtx->width = 1920;
@@ -354,10 +375,10 @@ void StreamReader::setEncoderOptions()
     pOCodecCtx->pix_fmt = pOCodecCtx->codec_id == AV_CODEC_ID_MJPEG ? AV_PIX_FMT_YUVJ420P : AV_PIX_FMT_YUV420P;
     pOCodecCtx->codec_type = AVMEDIA_TYPE_VIDEO;
     pOCodecCtx->time_base.num = 1;
-    pOCodecCtx->time_base.den = 25;
-    pOCodecCtx->thread_count = 1;
+    pOCodecCtx->time_base.den = 30;
+//    pOCodecCtx->thread_count = 1;
     pOCodecCtx->flags = AV_CODEC_FLAG_GLOBAL_HEADER;
-    pOCodecCtx->global_quality = pOCodecCtx->qmin * FF_QP2LAMBDA;
+    pOCodecCtx->global_quality = 1; //pOCodecCtx->qmin * FF_QP2LAMBDA;
 
     m_videoEncoder->open();
 }
@@ -373,6 +394,20 @@ const char * StreamReader::getAvInputFormat()
         "avfoundation";
 #else
         "";
+#endif
+}
+
+QString StreamReader::getAvCameraUrl()
+{
+    return
+#ifdef _WIN32
+        QString("video=").append(m_info.modelName);
+#elif __linux__ 
+        "Linux not implemented";
+#elif __APPLE__
+        "Apple not implemented";
+#else
+        "unsupported OS";
 #endif
 }
                                                                                                   
