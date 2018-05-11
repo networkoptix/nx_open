@@ -11,7 +11,7 @@ StackView
     {
         var item = d.safeCreatePageComponent(url, properties)
         return item
-            ? push(item, properties, d.safafeOperation(operation))
+            ? push(item, properties, d.safeOperation(operation))
             : undefined
     }
 
@@ -19,7 +19,7 @@ StackView
     {
         var item = d.safeCreatePageComponent(url, properties)
         return item
-            ? replace(target, item, properties, d.safafeOperation(operation))
+            ? replace(target, item, properties, d.safeOperation(operation))
             : undefined
     }
 
@@ -66,7 +66,7 @@ StackView
             return dy > 0 ? normalized : -normalized
         }
 
-        function safafeOperation(operation)
+        function safeOperation(operation)
         {
             return busy ? StackView.Immediate : operation
         }

@@ -57,10 +57,8 @@ void QnMobileClientUiController::openConnectToServerScreen(
     const nx::utils::Url& url,
     const QString& operationId)
 {
-    const auto port = url.port(-1);
-    const auto host = lit("%1%2").arg(url.host(),
-        port > 0 ? lit(":1").arg(QString::number(port)) : QString());
-    emit connectToServerScreenRequested(host, url.userName(), url.password(), operationId);
+    emit connectToServerScreenRequested(
+        url.displayAddress(), url.userName(), url.password(), operationId);
 }
 
 void QnMobileClientUiController::openResourcesScreen(const ResourceIdList& filterIds)

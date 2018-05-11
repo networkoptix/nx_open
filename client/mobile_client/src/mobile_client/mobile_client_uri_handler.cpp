@@ -70,7 +70,7 @@ QnMobileClientUriHandler::Private::Private(QnContext* context):
 
     const auto connectionManager = context->connectionManager();
     connect(connectionManager, &QnConnectionManager::connectionFailed, this,
-        [this](Qn::ConnectionResult /*status*/, const QVariant &/*infoParameter*/)
+        [this](Qn::ConnectionResult /*status*/, const QVariant& /*infoParameter*/)
         {
             handleConnectionStateChanged(false);
         });
@@ -204,8 +204,8 @@ void QnMobileClientUriHandler::Private::showConnectToServerByHostScreen(const Sy
                 successConnectionCallback();
         };
 
-    const auto Handle = operationManager->startOperation(callback);
-    uiController->openConnectToServerScreen(uri.connectionUrl(), Handle);
+    const auto handle = operationManager->startOperation(callback);
+    uiController->openConnectToServerScreen(uri.connectionUrl(), handle);
 }
 
 void QnMobileClientUriHandler::Private::connectToServerDirectly(const SystemUri& uri)
