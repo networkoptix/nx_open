@@ -60,7 +60,7 @@
                             <target>
                                 <chmod file="${project.build.directory}/*.sh" perm="755"/>
                                 <exec dir="${project.build.directory}" executable="${project.build.directory}/create_arm_installer.sh" failonerror="true" failifexecutionfails="true">
-                                    <arg line="--no-client"/>
+                                    <!-- Disable Lite Client. --><arg line="--no-client"/>
                                 </exec>
                             </target>
                         </configuration>
