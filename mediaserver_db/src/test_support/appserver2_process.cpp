@@ -204,11 +204,11 @@ int Appserver2Process::exec()
     if (!tcpListener.bindToLocalAddress())
         return 1;
 
+    m_ecConnection = ec2Connection.get();
     emit beforeStart();
 
     tcpListener.start();
     m_commonModule->messageProcessor()->init(ec2Connection);
-    m_ecConnection = ec2Connection.get();
 
     processStartResult = true;
     triggerOnStartedEventHandlerGuard.fire();

@@ -62,8 +62,6 @@ void TimeSyncManager::setClock(
 {
     m_systemClock = systemClock;
     m_steadyClock = steadyClock;
-    stop();
-    start();
 }
 
 TimeSyncManager::~TimeSyncManager()
