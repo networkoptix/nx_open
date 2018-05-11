@@ -1003,7 +1003,16 @@ CameraDiagnostics::Result HanwhaResource::initSystem()
                     lit("Can't fetch proxied device CGI parameters"));
             }
 
-            m_proxiedDeviceChannelCount = m_bypassDeviceAttributes.numberOfChannels();
+            const auto proxiedChannelCount = m_bypassDeviceAttributes
+                .attribute<int>(lit("System/MaxChannel"));
+
+            if (proxiedChannelCount == boost::none)
+            {
+                return CameraDiagnostics::CameraInvalidParams(
+                    lit("Can't fetch proxied channel count"));
+            }
+
+            m_proxiedDeviceChannelCount = proxiedChannelCount.get();
 
             const auto proxiedDeviceInfo = helper.view(lit("system/deviceinfo"));
             handleProxiedDeviceInfo(proxiedDeviceInfo);
