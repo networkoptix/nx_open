@@ -355,6 +355,7 @@ Item
             {
                 pressX = mouse.x
                 pressY = mouse.y
+                kineticAnimator.interrupt()
             }
 
             onDoubleClicked:
