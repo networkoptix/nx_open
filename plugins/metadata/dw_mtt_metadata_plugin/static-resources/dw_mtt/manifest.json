@@ -23,13 +23,12 @@
             "eventName": { "value": "video face detection [exclusive]", "localization": {} },
             "flags": "stateDependent",
             "internalName": "VFD",
-            "group": 1,
-            "unsupported": true
+            "group": 1
         },
         {
             "eventTypeId": "ba0cde26-a5c9-4101-ae59-7cda70a2fa76",
             "eventName": { "value": "crowd density detection [exclusive]", "localization": {} },
-            "flags": "stateDependent",
+            "flags": "noFlags",
             "internalName": "CDD",
             "group": 1
         },
@@ -50,7 +49,7 @@
         {
             "eventTypeId": "3f46d496-798d-49f7-9299-cdfff7914b1f",
             "eventName": { "value": "line crossing and perimeter intrusion [exclusive]", "localization": {} },
-            "flags": "stateDependent",
+            "flags": "noFlags",
             "internalName": "PEA",
             "group": 1
         },

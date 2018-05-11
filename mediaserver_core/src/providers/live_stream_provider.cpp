@@ -145,7 +145,7 @@ void QnLiveStreamProvider::setRole(Qn::ConnectionRole role)
     if (role == roleForAnalytics && qnServerModule)
     {
         auto pool = qnServerModule->metadataManagerPool();
-        m_videoDataReceptor = pool->mediaDataReceptor(m_cameraRes->getId());
+        m_videoDataReceptor = pool->createVideoDataReceptor(m_cameraRes->getId());
     }
 }
 
@@ -397,16 +397,9 @@ VideoDataReceptorPtr QnLiveStreamProvider::getVideoDataReceptorForMetadataPlugin
         if (needToAnalyzeFrame && needToAnalyzeStream)
             videoDataReceptor = m_videoDataReceptor.toStrongRef();
     }
-    if (!videoDataReceptor)
-    {
-        *outNeedUncompressedFrame = false;
-    }
-    else
-    {
-        *outNeedUncompressedFrame =
-           videoDataReceptor->acceptedFrameKind() ==
-               VideoDataReceptor::AcceptedFrameKind::uncompressed;
-    }
+
+    *outNeedUncompressedFrame =
+        videoDataReceptor && !videoDataReceptor->neededUncompressedPixelFormats().empty();
 
     return videoDataReceptor;
 }
@@ -484,12 +477,7 @@ void QnLiveStreamProvider::onGotVideoFrame(
     if (videoDataReceptor)
     {
         NX_VERBOSE(this) << "Pushing to receptor, timestamp:" << compressedFrame->timestamp;
-
-        // NOTE: In case uncompressedFrame is passed, compressedFrame is not passed to avoid its
-        // potential deep-copying.
-        videoDataReceptor->putFrame(
-            uncompressedFrame ? nullptr : compressedFrame,
-            uncompressedFrame);
+        videoDataReceptor->putFrame(compressedFrame, uncompressedFrame);
     }
 
 #endif // ENABLE_SOFTWARE_MOTION_DETECTION

@@ -107,32 +107,29 @@ void MessageBus::printTran(
     const ec2::QnAbstractTransaction& tran,
     Connection::Direction direction) const
 {
-
     auto localPeerName = qnStaticCommon->moduleDisplayName(commonModule()->moduleGUID());
     auto remotePeerName = qnStaticCommon->moduleDisplayName(connection->remotePeer().id);
     QString msgName;
     QString directionName;
     if (direction == Connection::Direction::outgoing)
     {
-        msgName = lm("Send");
-        directionName = lm("--->");
+        msgName = lit("Send");
+        directionName = lit("--->");
     }
     else
     {
-        msgName = lm("Got");
-        directionName = lm("<---");
+        msgName = lit("Got");
+        directionName = lit("<---");
     }
 
-    NX_VERBOSE(
-        this,
-        lit("%1 tran:\t %2 %3 %4. Command: %5. Seq=%6. Created by %7")
-        .arg(msgName)
-        .arg(localPeerName)
-        .arg(directionName)
-        .arg(remotePeerName)
-        .arg(toString(tran.command))
-        .arg(tran.persistentInfo.sequence)
-        .arg(qnStaticCommon->moduleDisplayName(tran.peerID)));
+    NX_VERBOSE(this, lm("%1 tran:\t %2 %3 %4. Command: %5. Seq=%6. Created by %7").args(
+        msgName,
+        localPeerName,
+        directionName,
+        remotePeerName,
+        toString(tran.command),
+        tran.persistentInfo.sequence,
+        qnStaticCommon->moduleDisplayName(tran.peerID)));
 }
 
 void MessageBus::start()
@@ -557,6 +554,7 @@ void MessageBus::at_gotMessage(
         break;
     case MessageType::pushImpersistentUnicastTransaction:
         result = handleTransactionWithHeader(
+            this,
             connection,
             payload,
             GotUnicastTransactionFuction());
@@ -577,7 +575,8 @@ bool MessageBus::handlePushImpersistentBroadcastTransaction(
 	const QByteArray& payload)
 {
 	return handleTransactionWithHeader(
-		connection,
+        this,
+        connection,
 		payload,
 		GotTransactionFuction());
 }
@@ -849,32 +848,6 @@ void MessageBus::processRuntimeInfo(
 }
 
 template <class T>
-bool MessageBus::processSpecialTransaction(
-    const QnTransaction<T>& tran,
-    const P2pConnectionPtr& connection,
-    const TransportHeader& transportHeader)
-{
-    if (nx::utils::log::isToBeLogged(cl_logDEBUG2, this))
-        printTran(connection, tran, Connection::Direction::incoming);
-
-    ApiPersistentIdData peerId(tran.peerID, tran.persistentInfo.dbID);
-
-    // process special cases
-    switch (tran.command)
-    {
-        // TODO: move it to the global setting param or emit this data via NotificationManager
-    case ApiCommand::forcePrimaryTimeServer:
-        // ignore deprecated transaction
-        return true;
-    case ApiCommand::runtimeInfoChanged:
-        processRuntimeInfo(tran, connection, transportHeader);
-        return true;
-    default:
-        return false;; //< Not a special case
-    }
-}
-
-template <class T>
 void MessageBus::gotTransaction(
     const QnTransaction<T>& tran,
     const P2pConnectionPtr& connection,
@@ -946,29 +919,6 @@ bool MessageBus::handlePushTransactionList(const P2pConnectionPtr& connection, c
         if (!handlePushTransactionData(connection, transaction, TransportHeader()))
             return false;
     }
-    return true;
-}
-
-template <typename Function>
-bool MessageBus::handleTransactionWithHeader(
-    const P2pConnectionPtr& connection,
-    const QByteArray& data,
-    Function function)
-{
-    int headerSize = 0;
-    TransportHeader header;
-    if (connection->remotePeer().dataFormat == Qn::UbjsonFormat)
-        header = deserializeTransportHeader(data, &headerSize);
-    else
-        header.dstPeers.push_back(localPeer().id);
-    using namespace std::placeholders;
-    return handleTransaction(
-        this,
-        connection->remotePeer().dataFormat,
-        data.mid(headerSize),
-        std::bind(function, this, _1, connection, header),
-        [](Qn::SerializationFormat, const QByteArray&) { return false; });
-
     return true;
 }
 

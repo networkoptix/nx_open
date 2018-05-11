@@ -23,7 +23,7 @@ struct DataContext
     ssize_t size;
 };
 
-static const int kMaximumAcceptTimeoutSec = 3;
+static const int kMaximumAcceptTimeoutSec = 10;
 
 static int acceptWithTimeout(int fd, int timeoutSec)
 {
@@ -153,39 +153,45 @@ static ssize_t readData(int transportFd, void* context)
     return total;
 }
 
-static ssize_t readImpl(void* context, ssize_t (*action)(int, void*))
+static ssize_t readImpl(int socketPostfix, void* context, ssize_t (*action)(int, void*))
 {
+    static const int baseLen = strlen(SystemCommands::kDomainSocket);
     ssize_t result = -1;
-    int transportFd = acceptConnection(SystemCommands::kDomainSocket);
+    char buf[512];
+
+    strncpy(buf, SystemCommands::kDomainSocket, sizeof(buf));
+    snprintf(buf + baseLen, sizeof(buf) - baseLen, "%d", socketPostfix);
+
+    int transportFd = acceptConnection(buf);
     if (transportFd > 0)
     {
         result = action(transportFd, context);
         ::close(transportFd);
     }
-    unlink(SystemCommands::kDomainSocket);
+    unlink(buf);
 
     return result;
 }
 
-int readFd()
+int readFd(int socketPostfix)
 {
     int recvFd;
-    if (readImpl(&recvFd, &readFdImpl) < 0)
+    if (readImpl(socketPostfix, &recvFd, &readFdImpl) < 0)
         return -1;
 
     return recvFd;
 }
 
-bool readInt64(int64_t* value)
+bool readInt64(int socketPostfix, int64_t* value)
 {
     struct DataContext context = {value, NULL, NULL, sizeof(*value)};
-    return readImpl(&context, &readData) > 0;
+    return readImpl(socketPostfix, &context, &readData) > 0;
 }
 
-bool readBuffer(void* (*reallocCallback)(void*, ssize_t), void* reallocContext)
+bool readBuffer(int socketPostfix, void* (*reallocCallback)(void*, ssize_t), void* reallocContext)
 {
     struct DataContext context = {NULL, reallocCallback, reallocContext, 0};
-    return readImpl(&context, &readData) > 0;
+    return readImpl(socketPostfix, &context, &readData) > 0;
 }
 
 } // namespace domain_socket

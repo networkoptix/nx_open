@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>CameraExpertSettingsWidget</class>
- <widget class="QWidget" name="CameraExpertSettingsWidget">
+ <class>LegacyExpertSettingsWidget</class>
+ <widget class="QWidget" name="LegacyExpertSettingsWidget">
   <property name="geometry">
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1088</width>
-    <height>716</height>
+    <width>1001</width>
+    <height>772</height>
    </rect>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout_5">
@@ -74,8 +74,8 @@
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>1034</width>
-        <height>500</height>
+        <width>967</width>
+        <height>422</height>
        </rect>
       </property>
       <layout class="QHBoxLayout" name="horizontalLayout_5" stretch="1,1">
@@ -98,25 +98,47 @@
             </property>
             <layout class="QVBoxLayout" name="verticalLayout_4">
              <item>
-               <layout class="QHBoxLayout" name="settingsDisableControlLayout" stretch="0,1">
-                 <item>
-                   <widget class="QCheckBox" name="settingsDisableControlCheckBox">
-                     <property name="text">
-                       <string>Keep camera stream and profile settings</string>
-                     </property>
-                   </widget>
-                 </item>
-                 <item>
-                   <widget class="nx::client::desktop::HintButton" name="settingsDisableControlHint">
-                     <property name="sizePolicy">
-                       <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-                         <horstretch>0</horstretch>
-                         <verstretch>0</verstretch>
-                       </sizepolicy>
-                     </property>
-                   </widget>
-                 </item>
-               </layout>
+              <layout class="QHBoxLayout" name="settingsDisableControlLayout" stretch="0,0,1">
+               <property name="spacing">
+                <number>4</number>
+               </property>
+               <item>
+                <widget class="QCheckBox" name="settingsDisableControlCheckBox">
+                 <property name="sizePolicy">
+                  <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+                   <horstretch>0</horstretch>
+                   <verstretch>0</verstretch>
+                  </sizepolicy>
+                 </property>
+                 <property name="text">
+                  <string>Keep camera stream and profile settings</string>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="nx::client::desktop::HintButton" name="settingsDisableControlHint" native="true">
+                 <property name="sizePolicy">
+                  <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+                   <horstretch>0</horstretch>
+                   <verstretch>0</verstretch>
+                  </sizepolicy>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <spacer name="horizontalSpacer_3">
+                 <property name="orientation">
+                  <enum>Qt::Horizontal</enum>
+                 </property>
+                 <property name="sizeHint" stdset="0">
+                  <size>
+                   <width>20</width>
+                   <height>0</height>
+                  </size>
+                 </property>
+                </spacer>
+               </item>
+              </layout>
              </item>
              <item>
               <widget class="QLabel" name="settingsWarningLabel">
@@ -129,24 +151,46 @@
               </widget>
              </item>
              <item>
-              <layout class="QHBoxLayout" name="bitratePerGopLayout" stretch="0,1">
-                <item>
-                  <widget class="QCheckBox" name="bitratePerGopCheckBox">
-                    <property name="text">
-                      <string>Calculate bitrate per GOP instead of bitrate per second</string>
-                    </property>
-                  </widget>
-                </item>
-                <item>
-                  <widget class="nx::client::desktop::HintButton" name="bitratePerGopHint">
-                    <property name="sizePolicy">
-                      <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-                        <horstretch>0</horstretch>
-                        <verstretch>0</verstretch>
-                      </sizepolicy>
-                    </property>
-                  </widget>
-                </item>
+              <layout class="QHBoxLayout" name="bitratePerGopLayout" stretch="0,0,1">
+               <property name="spacing">
+                <number>4</number>
+               </property>
+               <item>
+                <widget class="QCheckBox" name="bitratePerGopCheckBox">
+                 <property name="sizePolicy">
+                  <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+                   <horstretch>0</horstretch>
+                   <verstretch>0</verstretch>
+                  </sizepolicy>
+                 </property>
+                 <property name="text">
+                  <string>Calculate bitrate per GOP instead of bitrate per second</string>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="nx::client::desktop::HintButton" name="bitratePerGopHint" native="true">
+                 <property name="sizePolicy">
+                  <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+                   <horstretch>0</horstretch>
+                   <verstretch>0</verstretch>
+                  </sizepolicy>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <spacer name="horizontalSpacer_4">
+                 <property name="orientation">
+                  <enum>Qt::Horizontal</enum>
+                 </property>
+                 <property name="sizeHint" stdset="0">
+                  <size>
+                   <width>40</width>
+                   <height>0</height>
+                  </size>
+                 </property>
+                </spacer>
+               </item>
               </layout>
              </item>
              <item>
@@ -405,6 +449,9 @@
             <layout class="QVBoxLayout" name="verticalLayout_11">
              <item>
               <layout class="QHBoxLayout" name="horizontalLayout_3">
+               <property name="spacing">
+                <number>4</number>
+               </property>
                <item>
                 <widget class="QSpinBox" name="logicalIdSpinBox">
                  <property name="maximum">
@@ -434,7 +481,7 @@
                  <property name="sizeHint" stdset="0">
                   <size>
                    <width>40</width>
-                   <height>20</height>
+                   <height>0</height>
                   </size>
                  </property>
                 </spacer>
@@ -475,7 +522,7 @@
      <property name="sizeHint" stdset="0">
       <size>
        <width>20</width>
-       <height>1</height>
+       <height>0</height>
       </size>
      </property>
     </spacer>
@@ -508,15 +555,15 @@
  </widget>
  <customwidgets>
   <customwidget>
+   <class>nx::client::desktop::HintButton</class>
+   <extends>QWidget</extends>
+   <header location="global">nx/client/desktop/common/widgets/hint_button.h</header>
+  </customwidget>
+  <customwidget>
    <class>QnWordWrappedLabel</class>
    <extends>QWidget</extends>
    <header location="global">ui/widgets/word_wrapped_label.h</header>
    <container>1</container>
-  </customwidget>
-  <customwidget>
-    <class>nx::client::desktop::HintButton</class>
-    <extends>QPushButton</extends>
-    <header location="global">nx/client/desktop/common/widgets/hint_button.h</header>
   </customwidget>
  </customwidgets>
  <tabstops>

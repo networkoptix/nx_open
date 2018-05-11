@@ -5,7 +5,7 @@ import pytest
 
 from framework.os_access.windows_remoting.dot_net.files import get_file_info, rename_file
 from framework.os_access.windows_remoting.dot_net.services import Service
-from framework.os_access.windows_remoting.dot_net.users import user_profiles, get_system_user_profile, get_user
+from framework.os_access.windows_remoting.dot_net.users import get_system_user_profile, get_user, user_profiles
 
 log = logging.getLogger(__name__)
 

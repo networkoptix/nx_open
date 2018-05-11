@@ -1,11 +1,10 @@
 import logging
 import string
-from abc import ABCMeta
+from abc import ABCMeta, abstractproperty
 from contextlib import closing
 from functools import wraps
 from io import BytesIO
 
-from netaddr.ip import IPAddress
 from nmb.NetBIOS import NetBIOS
 from pathlib2 import PureWindowsPath
 from pylru import lrudecorator
@@ -44,9 +43,9 @@ def _reraising_on_operation_failure(status_to_error_cls):
 
 class SMBPath(FileSystemPath, PureWindowsPath):
     __metaclass__ = ABCMeta
-    _username, _password = '', ''
-    _name_service_address, _name_service_port = IPAddress('0.0.0.0'), 0
-    _session_service_address, _session_service_port = IPAddress('0.0.0.0'), 0
+    _username, _password = abstractproperty(), abstractproperty()
+    _name_service_address, _name_service_port = abstractproperty(), abstractproperty()
+    _session_service_address, _session_service_port = abstractproperty(), abstractproperty()
 
     @classmethod
     @lrudecorator(1)
@@ -104,9 +103,6 @@ class SMBPath(FileSystemPath, PureWindowsPath):
         if '*' in str(self):
             raise ValueError("{!r} contains '*', but files can be deleted only by one")
         self._connection().deleteFiles(self._service_name, self._relative_path)
-
-    def iterdir(self):
-        return self.glob('*')
 
     def expanduser(self):
         """Don't do any expansion on Windows"""
@@ -166,7 +162,7 @@ class SMBPath(FileSystemPath, PureWindowsPath):
 
     def rmtree(self, ignore_errors=False):
         try:
-            iter_entries = self.iterdir()
+            iter_entries = self.glob('*')
         except DoesNotExist:
             if ignore_errors:
                 pass

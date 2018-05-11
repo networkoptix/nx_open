@@ -1810,10 +1810,16 @@ bool QnDbManager::afterInstallUpdate(const QString& updateName)
     }
 
     if (updateName.endsWith(lit("/99_20170926_refactor_user_access_rights.sql")))
-        return ec2::db::migrateAccessRightsToUbjsonFormat(m_sdb, this) && resyncIfNeeded(ResyncUserAccessRights);
+    {
+        return ec2::db::migrateAccessRightsToUbjsonFormat(m_sdb, this)
+            && resyncIfNeeded(ResyncUserAccessRights);
+    }
 
     if (updateName.endsWith(lit("/99_20171214_update_http_action_enum_values.sql")))
-        return updateDefaultRules(vms::event::Rule::getDefaultRules()) && resyncIfNeeded(ResyncRules);
+    {
+        return updateDefaultRules(vms::event::Rule::getDefaultRules())
+            && resyncIfNeeded(ResyncRules);
+    }
 
     if (updateName.endsWith(lit("/99_20180122_remove_secondary_stream_quality.sql")))
         return resyncIfNeeded(ResyncCameraAttributes);

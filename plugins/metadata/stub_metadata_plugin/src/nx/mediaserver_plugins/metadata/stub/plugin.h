@@ -1,11 +1,14 @@
 #pragma once
 
 #include <nx/sdk/metadata/common_plugin.h>
+#include <nx/sdk/metadata/uncompressed_video_frame.h>
 
 namespace nx {
 namespace mediaserver_plugins {
 namespace metadata {
 namespace stub {
+
+using PixelFormat = nx::sdk::metadata::UncompressedVideoFrame::PixelFormat;
 
 class Plugin: public sdk::metadata::CommonPlugin
 {
@@ -15,8 +18,9 @@ public:
     virtual nx::sdk::metadata::CameraManager* obtainCameraManager(
         const nx::sdk::CameraInfo& cameraInfo, nx::sdk::Error* outError) override;
 
-    bool needDeepCopyOfVideoFrames() const { return m_needDeepCopyOfVideoFrames; }
+    // Capabilities.
     bool needUncompressedVideoFrames() const { return m_needUncompressedVideoFrames; }
+    PixelFormat pixelFormat() const { return m_pixelFormat; }
 
 protected:
     virtual std::string capabilitiesManifest() const override;
@@ -38,8 +42,8 @@ private:
 
 private:
     std::string m_capabilities;
-    bool m_needDeepCopyOfVideoFrames = false;
     bool m_needUncompressedVideoFrames = false;
+    PixelFormat m_pixelFormat = PixelFormat::yuv420;
 };
 
 } // namespace stub

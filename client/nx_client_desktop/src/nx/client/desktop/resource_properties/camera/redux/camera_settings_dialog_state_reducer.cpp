@@ -484,7 +484,7 @@ State CameraSettingsDialogStateReducer::setScheduleBrush(
         state.maxRecordingBrushFps());
 
     state = setScheduleBrushFps(std::move(state), fps);
-    state.alert = State::Alert::BrushChanged;
+    state.alert = State::Alert::brushChanged;
 
     return state;
 }
@@ -503,7 +503,7 @@ State CameraSettingsDialogStateReducer::setScheduleBrushRecordingType(
             state.recording.brush.fps,
             state.maxRecordingBrushFps());
     }
-    state.alert = State::Alert::BrushChanged;
+    state.alert = State::Alert::brushChanged;
 
     return state;
 }
@@ -525,7 +525,7 @@ State CameraSettingsDialogStateReducer::setScheduleBrushFps(State state, int val
         state = loadMinMaxCustomBitrate(std::move(state));
         state = setCustomRecordingBitrateNormalized(std::move(state), normalizedBitrate);
     }
-    state.alert = State::Alert::BrushChanged;
+    state.alert = State::Alert::brushChanged;
 
     return state;
 }
@@ -536,7 +536,7 @@ State CameraSettingsDialogStateReducer::setScheduleBrushQuality(
 {
     state.recording.brush.quality = value;
     state = fillBitrateFromFixedQuality(std::move(state));
-    state.alert = State::Alert::BrushChanged;
+    state.alert = State::Alert::brushChanged;
 
     return state;
 }
@@ -554,7 +554,7 @@ State CameraSettingsDialogStateReducer::setSchedule(State state, const ScheduleT
 
     state.recording.schedule.setUser(processed);
 
-    if (state.alert == State::Alert::BrushChanged || state.alert == State::Alert::EmptySchedule)
+    if (state.alert == State::Alert::brushChanged || state.alert == State::Alert::emptySchedule)
         state.alert = {};
 
     return state;
@@ -692,8 +692,8 @@ State CameraSettingsDialogStateReducer::setMotionDetectionEnabled(State state, b
     state.singleCameraSettings.enableMotionDetection.setUser(value);
 
     if (state.hasMotion() && !state.recording.enabled())
-        state.alert = State::Alert::MotionDetectionRequiresRecording;
-    else if (state.alert == State::Alert::MotionDetectionRequiresRecording)
+        state.alert = State::Alert::motionDetectionRequiresRecording;
+    else if (state.alert == State::Alert::motionDetectionRequiresRecording)
         state.alert = {};
 
     return state;
@@ -708,13 +708,13 @@ State CameraSettingsDialogStateReducer::setMotionRegionList(
         switch (errorCode)
         {
             case QnMotionRegion::ErrorCode::Windows:
-                state.alert = State::Alert::MotionDetectionTooManyRectangles;
+                state.alert = State::Alert::motionDetectionTooManyRectangles;
                 break;
             case QnMotionRegion::ErrorCode::Masks:
-                state.alert = State::Alert::MotionDetectionTooManyMaskRectangles;
+                state.alert = State::Alert::motionDetectionTooManyMaskRectangles;
                 break;
             case QnMotionRegion::ErrorCode::Sens:
-                state.alert = State::Alert::MotionDetectionTooManySensitivityRectangles;
+                state.alert = State::Alert::motionDetectionTooManySensitivityRectangles;
                 break;
         }
 
@@ -729,10 +729,10 @@ State CameraSettingsDialogStateReducer::setMotionRegionList(
 State CameraSettingsDialogStateReducer::setFisheyeSettings(
     State state, const QnMediaDewarpingParams& value)
 {
-    state.singleCameraSettings.enableFisheyeDewarping.updateValue(value.enabled);
-    state.singleCameraSettings.fisheyeMountingType.updateValue(value.viewMode);
-    state.singleCameraSettings.fisheyeFovRotation.updateValue(value.fovRot);
-    state.singleCameraSettings.fisheyeCalibrationSettings.updateValue(
+    state.singleCameraSettings.enableFisheyeDewarping.setUserIfChanged(value.enabled);
+    state.singleCameraSettings.fisheyeMountingType.setUserIfChanged(value.viewMode);
+    state.singleCameraSettings.fisheyeFovRotation.setUserIfChanged(value.fovRot);
+    state.singleCameraSettings.fisheyeCalibrationSettings.setUserIfChanged(
         fisheyeCalibrationSettings(value));
 
     state.hasChanges = true;

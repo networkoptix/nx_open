@@ -100,8 +100,7 @@ CameraSettingsDialog::CameraSettingsDialog(QWidget* parent):
     connect(d->store, &CameraSettingsDialogStore::stateChanged, this,
         &CameraSettingsDialog::loadState);
 
-    d->readOnlyWatcher = new CameraSettingsReadOnlyWatcher(this);
-    d->readOnlyWatcher->setStore(d->store);
+    d->readOnlyWatcher = new CameraSettingsReadOnlyWatcher(d->store, this);
 
     d->licenseUsageHelper = new QnCamLicenseUsageHelper(commonModule(), this);
 
@@ -110,8 +109,7 @@ CameraSettingsDialog::CameraSettingsDialog(QWidget* parent):
     d->previewManager->setThumbnailSize(QSize(0, 0));
     d->previewManager->setAutoRefresh(false);
 
-    auto panicWatcher = new CameraSettingsPanicWatcher(this);
-    panicWatcher->setStore(d->store);
+    new CameraSettingsPanicWatcher(d->store, this);
 
     addPage(
         int(CameraSettingsTab::general),
@@ -326,41 +324,41 @@ QString CameraSettingsDialog::getAlertText(const CameraSettingsDialogState& stat
     using Alert = CameraSettingsDialogState::Alert;
     switch (*state.alert)
     {
-        case Alert::BrushChanged:
+        case Alert::brushChanged:
             return tr("Select areas on the schedule to apply chosen parameters to.");
 
-        case Alert::EmptySchedule:
+        case Alert::emptySchedule:
             return tr(
                 "Set recording parameters and select areas "
                 "on the schedule grid to apply them to.");
 
-        case Alert::NotEnoughLicenses:
+        case Alert::notEnoughLicenses:
             return tr("Not enough licenses to enable recording.");
 
-        case Alert::LicenseLimitExceeded:
+        case Alert::licenseLimitExceeded:
             return tr("License limit exceeded, recording will not be enabled.");
 
-        case Alert::RecordingIsNotEnabled:
+        case Alert::recordingIsNotEnabled:
             return tr("Turn on selector at the top of the window to enable recording.");
 
-        case Alert::HighArchiveLength:
+        case Alert::highArchiveLength:
             return QnCameraDeviceStringSet(
                     tr("High minimum value can lead to archive length decrease on other devices."),
                     tr("High minimum value can lead to archive length decrease on other cameras."))
                 .getString(state.deviceType);
 
-        case Alert::MotionDetectionRequiresRecording:
+        case Alert::motionDetectionRequiresRecording:
             return tr(
                 "Motion detection will work only when camera is being viewed. "
                 "Enable recording to make it work all the time.");
 
-        case Alert::MotionDetectionTooManyRectangles:
+        case Alert::motionDetectionTooManyRectangles:
             return tr("Maximum number of motion detection rectangles for current camera is reached");
 
-        case Alert::MotionDetectionTooManyMaskRectangles:
+        case Alert::motionDetectionTooManyMaskRectangles:
             return tr("Maximum number of ignore motion rectangles for current camera is reached");
 
-        case Alert::MotionDetectionTooManySensitivityRectangles:
+        case Alert::motionDetectionTooManySensitivityRectangles:
             return tr("Maximum number of detect motion rectangles for current camera is reached");
 
         default:

@@ -1,10 +1,10 @@
-#include "common_compressed_video_packet.h"
+#include "generic_compressed_video_packet.h"
 
 namespace nx {
 namespace sdk {
 namespace metadata {
 
-void* CommonCompressedVideoPacket::queryInterface(const nxpl::NX_GUID& interfaceId)
+void* GenericCompressedVideoPacket::queryInterface(const nxpl::NX_GUID& interfaceId)
 {
     if (interfaceId == IID_CompressedVideoPacket)
     {

@@ -166,7 +166,7 @@ const char* Plugin::capabilitiesManifest(Error* error) const
 
     static const std::string kManifestPostfix = (R"json(
             ],
-            "capabilities": "needDeepCopyOfVideoFrames"
+            "capabilities": ""
         })json");
 
     m_manifest = kManifestPrefix;
@@ -291,7 +291,7 @@ std::vector<nxpl::NX_GUID> Plugin::loadClassGuids(const std::string& guidsFilePa
         if (trim(&line)->empty())
             continue;
 
-        auto guid = nxpt::fromStdString(line);
+        auto guid = nxpt::NxGuidHelper::fromStdString(line);
         if (guid == kNullGuid)
             continue;
 

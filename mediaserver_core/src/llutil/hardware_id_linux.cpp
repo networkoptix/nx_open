@@ -58,7 +58,7 @@ QString readFile(const char* path)
     }
 
     auto content = file.readAll();
-    return QString::fromUtf8(content);
+    return QString::fromUtf8(content).trimmed();
 }
 
 void trim2(std::string& str) {

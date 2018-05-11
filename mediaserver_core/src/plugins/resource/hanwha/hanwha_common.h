@@ -225,18 +225,20 @@ static const QString kHanwhaProxiedIdParamName = lit("proxiedId");
 // TODO: #dmishin get rid of the properties below and move Hanwha driver to the standard
 // profile configuration mechanism.
 static const QString kPrimaryStreamResolutionParamName = lit("primaryStreamResolution");
-static const QString kSecondaryStreamResolutionParamName = lit("secondaryStreamResolution");
 static const QString kPrimaryStreamCodecParamName = lit("primaryStreamCodec");
 static const QString kPrimaryStreamCodecProfileParamName = lit("primaryStreamCodecProfile");
+static const QString kPrimaryStreamGovLengthParamName = lit("primaryStreamGovLength");
+static const QString kPrimaryStreamBitrateControlParamName = lit("primaryStreamBitrateControl");
+static const QString kPrimaryStreamBitrateParamName = lit("primaryStreamBitrate");
+static const QString kPrimaryStreamEntropyCodingParamName = lit("primaryStreamEntropyCoding");
+static const QString kPrimaryStreamFpsParamName = lit("primaryStreamFps");
+
+static const QString kSecondaryStreamResolutionParamName = lit("secondaryStreamResolution");
 static const QString kSecondaryStreamCodecParamName = lit("secondaryStreamCodec");
 static const QString kSecondaryStreamCodecProfileParamName = lit("secondaryStreamCodecProfile");
-static const QString kPrimaryStreamGovLengthParamName = lit("primaryStreamGovLength");
 static const QString kSecondaryStreamGovLengthParamName = lit("secondaryStreamGovLength");
-static const QString kPrimaryStreamBitrateControlParamName = lit("primaryStreamBitrateControl");
 static const QString kSecondaryStreamBitrateControlParamName = lit("secondaryStreamBitrateControl");
-static const QString kPrimaryStreamBitrateParamName = lit("primaryStreamBitrate");
 static const QString kSecondaryStreamBitrateParamName = lit("secondaryStreamBitrate");
-static const QString kPrimaryStreamEntropyCodingParamName = lit("primaryStreamEntropyCoding");
 static const QString kSecondaryStreamEntropyCodingParamName = lit("secondaryStreamEntropyCoding");
 static const QString kSecondaryStreamFpsParamName = lit("secondaryStreamFps");
 

@@ -4,7 +4,7 @@ from string import whitespace
 
 import pytest
 
-from framework.os_access.exceptions import BadParent, DoesNotExist, NotAFile
+from framework.os_access.exceptions import BadParent, DoesNotExist, NotAFile, NotADir
 from framework.os_access.local_path import LocalPath
 
 pytest_plugins = ['fixtures.ad_hoc_ssh']
@@ -177,3 +177,14 @@ def test_read_from_non_existent(remote_test_dir):
     non_existent_file = remote_test_dir / 'non_existent'
     with pytest.raises(DoesNotExist):
         _ = non_existent_file.read_bytes()
+
+
+def test_glob_on_file(existing_remote_file):
+    with pytest.raises(NotADir):
+        _ = list(existing_remote_file.glob('*'))
+
+
+def test_glob_on_non_existent(existing_remote_dir):
+    non_existent_path = existing_remote_dir / 'non_existent'
+    with pytest.raises(DoesNotExist):
+        _ = list(non_existent_path.glob('*'))

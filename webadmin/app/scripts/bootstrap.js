@@ -17,7 +17,7 @@ window.setLanguage = function(lang){
 
     setCookie("language", lang, 100); // Almost never expiring cookie
 };
-(function LanguageDetect(){
+setTimeout(function LanguageDetect(){
 
     function getCookie(cname) {
         var name = cname + "=";
@@ -113,4 +113,4 @@ window.setLanguage = function(lang){
             });
         }
     });
-})();
+});

@@ -97,6 +97,7 @@ static Appserver2Ptr createAppserver()
     result->addArg(dbFileArg.toStdString().c_str());
 
     result->start();
+    result->waitUntilStarted();
     return result;
 }
 
@@ -125,8 +126,6 @@ public:
     bool start()
     {
         m_appserver = createAppserver();
-        if (!m_appserver->waitUntilStarted())
-            return false;
 
         m_testSystemClock = std::make_shared<TestSystemClock>();
         m_testSteadyClock = std::make_shared<TestSteadyClock>();

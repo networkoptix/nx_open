@@ -26,6 +26,7 @@
 #include <nx/streaming/video_data_packet.h>
 #include <decoders/video/ffmpeg_video_decoder.h>
 #include <nx/debugging/abstract_visual_metadata_debugger.h>
+#include <nx/sdk/metadata/uncompressed_video_frame.h>
 #include <nx/mediaserver/server_module_aware.h>
 
 class QnMediaServerModule;
@@ -55,16 +56,16 @@ public:
     void at_rulesUpdated(const QSet<QnUuid>& affectedResources);
 
     /**
-     * Return QnAbstractDataReceptor that will receive data from audio/video data provider.
+     * @return An object that will receive the data from a video data provider.
      */
-    QWeakPointer<VideoDataReceptor> mediaDataReceptor(const QnUuid& id);
+    QWeakPointer<VideoDataReceptor> createVideoDataReceptor(const QnUuid& id);
 
     /**
      * Register data receptor that will receive metadata packets.
      */
     void registerDataReceptor(
         const QnResourcePtr& resource,
-        QWeakPointer<QnAbstractDataReceptor> metadaReceptor);
+        QWeakPointer<QnAbstractDataReceptor> dataReceptor);
 
     using PluginList = QList<nx::sdk::metadata::Plugin*>;
 
@@ -84,6 +85,8 @@ public slots:
     void initExistingResources();
 
 private:
+    using PixelFormat = nx::sdk::metadata::UncompressedVideoFrame::PixelFormat;
+
     std::vector<nxpl::Setting> loadSettingsFromFile(
         const QString& fileDescription, const QString& filename);
 
@@ -165,6 +168,14 @@ private:
         const CLConstVideoDecoderOutputPtr& uncompressedFrame);
 
     void warnOnce(bool* warningIssued, const QString& message);
+
+    boost::optional<PixelFormat> pixelFormatFromManifest(
+        const nx::api::AnalyticsDriverManifest& manifest);
+
+    static AVPixelFormat rgbToAVPixelFormat(PixelFormat pixelFormat);
+
+    static nx::sdk::metadata::UncompressedVideoFrame* videoDecoderOutputToUncompressedVideoFrame(
+        const CLConstVideoDecoderOutputPtr& frame, PixelFormat pixelFormat);
 
 private:
     ResourceMetadataContextMap m_contexts;

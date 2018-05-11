@@ -1,6 +1,6 @@
 from abc import ABCMeta, abstractmethod
 
-from pathlib2 import Path, PurePath
+from pathlib2 import PurePath
 
 
 class FileSystemPath(PurePath):
@@ -26,10 +26,6 @@ class FileSystemPath(PurePath):
     @abstractmethod
     def unlink(self):
         pass
-
-    @abstractmethod
-    def iterdir(self):
-        yield self.__class__()
 
     @abstractmethod
     def expanduser(self):

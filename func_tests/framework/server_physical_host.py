@@ -5,8 +5,8 @@ import uuid
 
 from framework.os_access.path import FileSystemPath, copy_file
 from framework.rest_api import RestApi
+from .dpkg_installation import DPKGInstallation, MEDIASERVER_CONFIG_PATH, MEDIASERVER_CONFIG_PATH_INITIAL
 from .mediaserver import Mediaserver
-from .mediaserver_installation import MEDIASERVER_CONFIG_PATH, MEDIASERVER_CONFIG_PATH_INITIAL, DPKGInstallation
 from .service import AdHocService
 from .template_renderer import TemplateRenderer
 from .utils import is_list_inst
@@ -175,7 +175,7 @@ class PhysicalInstallationHost(object):
                 'Provided package was built with another customization. '
                 'Expected: {}. But files in unpacked dir are:\n{}'.format(
                     self._customization_company_name,
-                    self._unpacked_mediaserver_root_dir.joinpath('opt').iterdir(),
+                    self._unpacked_mediaserver_root_dir.joinpath('opt').glob('*'),
                     ),
                 )
         self._dist_unpacked = True

@@ -8,11 +8,33 @@
 #include <QtCore/QUrl>
 #include <common/common_globals.h>
 #include <nx/utils/thread/mutex.h>
+#include <nx/utils/thread/wait_condition.h>
 #include <nx/system_commands.h>
 #include <core/resource/abstract_storage_resource.h>
 
 namespace nx {
 namespace mediaserver {
+
+namespace detail {
+
+/**
+ * Helper class for getting unused domain socket path postfix.
+ */
+class UniqueIdHelper
+{
+public:
+    int take() const;
+    void putBack(int id);
+
+private:
+    mutable QBitArray m_ids{100};
+    mutable QnMutex m_mutex;
+    mutable QnWaitCondition m_condition;
+
+    int takeFirstAvailable() const;
+};
+
+} // namespace detail
 
 /**
  * Helper tool to execute some system actions as root.
@@ -26,7 +48,6 @@ public:
     Qn::StorageInitResult remount(const QUrl& url, const QString& path);
     SystemCommands::UnmountCode unmount(const QString& path);
     bool changeOwner(const QString& path);
-    bool touchFile(const QString& path);
     bool makeDirectory(const QString& path);
     bool removePath(const QString& path);
     bool rename(const QString& oldPath, const QString& newPath);
@@ -41,7 +62,7 @@ public:
 
 private:
     const QString m_toolPath;
-    QnMutex m_mutex;
+    detail::UniqueIdHelper m_idHelper;
 
     template<typename R, typename DefaultAction, typename SocketAction>
     R commandHelper(
@@ -56,7 +77,7 @@ private:
     std::string stringCommandHelper(const char* command, DefaultAction action, Args&&... args);
 
     template<typename Action>
-    void execAndReadResult(const std::vector<QString>& args, Action action);
+    void execAndReadResult(int socketPostfix, const std::vector<QString>& args, Action action);
 
     bool waitForProc(int childPid);
     int forkRoolTool(const std::vector<QString>& args);

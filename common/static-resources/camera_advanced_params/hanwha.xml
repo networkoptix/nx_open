@@ -76,6 +76,25 @@
                         writeCmd="update"
                         aux="range=media/videoprofile/add_update/Resolution;profile=primary;resourceProperty=primaryStreamResolution;">
                 </param>
+                
+                <!-- NVR only properties -->
+                <param id="PRIMARY%media/videoprofile/FrameRate"
+                    name="Frame Rate"
+                    dataType="Number"
+                    writeCmd="update"
+                    aux="range=media/videoprofile/add_update/FrameRate;profile=primary;resourceProperty=primaryStreamFps;specific=true;deviceTypes=nvr">
+                </param>
+
+                <param id="PRIMARY%media/videoprofile/Bitrate"
+                        name="Bitrate"
+                        dataType="Number"
+                        writeCmd="update"
+                        unit="Kbit/s"
+                        aux="range=media/videoprofile/add_update/Bitrate;profile=primary;resourceProperty=primaryStreamBitrate;specific=true;deviceTypes=nvr"
+                        shouldKeepInitialValue="true"
+                        bindDefaultToMinimum="true">
+                </param>
+                <!-- NVR only properties -->
 
                 <param id="PRIMARY%media/videoprofile/H264.BitrateControlType"
                         name="Bitrate Control Type"

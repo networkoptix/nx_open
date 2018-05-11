@@ -147,21 +147,20 @@
         switch (os) {
             case 'Mac OS X':
                 osVersion = /Mac OS X (10[\.\_\d]+)/.exec(nAgt);
-                if (osVersion && osVersion.length > 1) {
-                    osVersion = osVersion[1];
-                }
+                osVersion = osVersion && osVersion.length > 1 ? osVersion[1] : unknown;
                 touch = true;
                 break;
 
             case 'Android':
-                osVersion = /Android ([\.\_\d]+)/.exec(nAgt)[1];
+                osVersion = /Android ([\.\_\d]+)/.exec(nAgt);
+                osVersion = osVersion && osVersion.length > 1 ? osVersion[1] : unknown;
                 touch = true;
                 break;
 
             case 'iOS':
                 osVersion = /OS (\d+)_(\d+)_?(\d+)?/.exec(nVer);
+                osVersion = osVersion && osVersion.length > 2 ? osVersion[1] + '.' + osVersion[2] + '.' + (osVersion[3] | 0) : unknown;
                 touch = true;
-                osVersion = osVersion[1] + '.' + osVersion[2] + '.' + (osVersion[3] | 0);
                 break;
         }
 

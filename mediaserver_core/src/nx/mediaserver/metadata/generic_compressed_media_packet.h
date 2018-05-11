@@ -7,15 +7,14 @@
 
 #include <plugins/plugin_tools.h>
 
-#include "media_context.h"
-#include "compressed_media_packet.h"
+#include <nx/sdk/metadata/media_context.h>
 
 namespace nx {
 namespace sdk {
 namespace metadata {
 
 template <class T>
-class CommonCompressedMediaPacket: public nxpt::CommonRefCounter<T>
+class GenericCompressedMediaPacket: public nxpt::CommonRefCounter<T>
 {
 public:
     virtual const char* codec() const { return m_codec.c_str(); }

@@ -1,10 +1,10 @@
 from errno import EEXIST, EISDIR, ENOENT, ENOTDIR
 from functools import wraps
-from shutil import copyfile, rmtree
+from shutil import rmtree
 
 from pathlib2 import PosixPath
 
-from framework.os_access.exceptions import (AlreadyExists, DirIsAFile, DoesNotExist, NotAFile, BadParent)
+from framework.os_access.exceptions import AlreadyExists, BadParent, DirIsAFile, DoesNotExist, NotAFile, NotADir
 from framework.os_access.path import FileSystemPath
 
 
@@ -54,6 +54,13 @@ class LocalPath(PosixPath, FileSystemPath):
     read_text = _reraising_existing_file_errors(PosixPath.read_text)
     read_bytes = _reraising_existing_file_errors(PosixPath.read_bytes)
     unlink = _reraising_existing_file_errors(PosixPath.unlink)
+
+    def glob(self, pattern):
+        if not self.exists():
+            raise DoesNotExist(self)
+        if not self.is_dir():
+            raise NotADir(self)
+        return self.glob(pattern)
 
     @_reraising_existing_dir_errors
     def rmtree(self, ignore_errors=False):

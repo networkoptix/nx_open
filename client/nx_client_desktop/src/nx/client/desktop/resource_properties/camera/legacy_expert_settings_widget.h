@@ -8,14 +8,14 @@
 #include <nx/utils/uuid.h>
 
 namespace Ui {
-class CameraExpertSettingsWidget;
+class LegacyExpertSettingsWidget;
 } // namespace Ui
 
 namespace nx {
 namespace client {
 namespace desktop {
 
-class CameraExpertSettingsWidget:
+class LegacyExpertSettingsWidget:
     public QWidget,
     public QnConnectionContextAware
 {
@@ -23,8 +23,8 @@ class CameraExpertSettingsWidget:
     using base_type = QWidget;
 
 public:
-    CameraExpertSettingsWidget(QWidget* parent = nullptr);
-    virtual ~CameraExpertSettingsWidget() override;
+    LegacyExpertSettingsWidget(QWidget* parent = nullptr);
+    virtual ~LegacyExpertSettingsWidget() override;
 
     void updateFromResources(const QnVirtualCameraResourceList& cameras);
     void submitToResources(const QnVirtualCameraResourceList& cameras);
@@ -51,7 +51,7 @@ private:
     int generateFreeLogicalId() const;
     void updateLogicalIdControls();
 
-    QScopedPointer<Ui::CameraExpertSettingsWidget> ui;
+    QScopedPointer<Ui::LegacyExpertSettingsWidget> ui;
     bool m_updating = false;
 
     bool m_hasDualStreaming = false;

@@ -1,6 +1,7 @@
 import logging
 from collections import OrderedDict
 from contextlib import contextmanager
+from pprint import pformat
 
 from framework.move_lock import MoveLock
 from framework.serialize import dump, load
@@ -22,31 +23,38 @@ class Registry(object):
     def __init__(self, ssh_access, path, name_format, limit):
         self._path = path
         self._lock = MoveLock(ssh_access, self._path.with_suffix('.lock'))
-        if not self._path.parent.exists():
-            logger.warning("Create %r; OK only if a clean run", self._path.parent)
-            self._path.parent.mkdir(parents=True)
-        with self._lock:
-            self._path.write_bytes(b'')
+        self._path.parent.mkdir(parents=True, exist_ok=True)
         self._name_format = name_format
         self._limit = limit
 
     def __repr__(self):
         return '<Registry {}>'.format(self._path)
 
+    def _read_reservations(self):
+        if self._path.exists():
+            reservations_raw = self._path.read_text()
+            reservations = load(reservations_raw)
+            if reservations is not None:
+                logger.debug("Read from %r:\n%s", self, pformat(reservations))
+                return reservations
+        logger.debug("Empty or non-existent %r.", self)
+        return OrderedDict()
+
+    def _write_reservations(self, reservations):
+        logger.debug("Write to %r:\n%s", self, pformat(reservations))
+        self._path.write_text(dump(reservations))
+
     @contextmanager
     def _reservations_locked(self):
         with self._lock:
-            reservations = load(self._path.read_text())
-            if reservations is None:
-                reservations = OrderedDict()
             try:
+                reservations = self._read_reservations()
                 yield reservations
             except Exception:
                 logger.warning("Exception thrown, don't save reservations in %r.", self)
                 raise
             else:
-                logger.info("Write reservations in %r.", self)
-                self._path.write_text(dump(reservations))
+                self._write_reservations(reservations)
 
     def _make_name(self, index):
         digits = max(len(str(self._limit)), 3)
@@ -75,7 +83,7 @@ class Registry(object):
                 alias = reservations[name]
                 if alias is None:
                     raise RegistryError("%r: %r is known but not reserved.", self, name)
-                logger.info("%r: free %r.", name, self)
+                logger.info("%r: free %r.", self, name)
                 reservations[name] = None
             except KeyError:
                 raise RegistryError("%r: %r is not even known.", self, name)

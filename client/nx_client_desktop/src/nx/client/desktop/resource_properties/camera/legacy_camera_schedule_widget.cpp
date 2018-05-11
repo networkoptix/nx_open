@@ -137,6 +137,8 @@ LegacyCameraScheduleWidget::LegacyCameraScheduleWidget(QWidget* parent, bool sna
     setHelpTopic(ui->exportScheduleButton, Qn::CameraSettings_Recording_Export_Help);
 
     ui->qualityLabelHint->setHint(tr("Quality setting determines the compression rate only, and does not affect resolution. Low, Medium, High and Best are preset bitrate values."));
+    auto settingsHint = nx::client::desktop::HintButton::hintThat(ui->settingsGroupBox);
+    settingsHint->addHintLine(tr("First choose a recording option, then apply it to day and time blocks on the recording schedule. (0 block is 12:00am to 1:00am, 23 block is 11:00pm to 12:00am.)"));
 
     // init buttons
     updateColors();
@@ -383,6 +385,10 @@ void LegacyCameraScheduleWidget::retranslateUi()
     ui->scheduleGridGroupBox->setTitle(lit("%1\t(%2)").arg(
         tr("Recording Schedule")).arg(
         tr("based on server time")));
+
+    // Adding some spaces to the caption, to allocate some space for hint button.
+    // Otherwise hint button will intersect the frame border
+    ui->settingsGroupBox->setTitle(ui->settingsGroupBox->title() + lit("      "));
 }
 
 void LegacyCameraScheduleWidget::afterContextInitialized()

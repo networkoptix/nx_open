@@ -1,5 +1,5 @@
-#include "expert_settings_widget.h"
-#include "ui_expert_settings_widget.h"
+#include "legacy_expert_settings_widget.h"
+#include "ui_legacy_expert_settings_widget.h"
 
 #include <QtWidgets/QListView>
 
@@ -44,9 +44,9 @@ namespace nx {
 namespace client {
 namespace desktop {
 
-CameraExpertSettingsWidget::CameraExpertSettingsWidget(QWidget* parent):
+LegacyExpertSettingsWidget::LegacyExpertSettingsWidget(QWidget* parent):
     QWidget(parent),
-    ui(new Ui::CameraExpertSettingsWidget)
+    ui(new Ui::LegacyExpertSettingsWidget)
 {
     ui->setupUi(this);
 
@@ -84,11 +84,11 @@ CameraExpertSettingsWidget::CameraExpertSettingsWidget(QWidget* parent):
     connect(ui->settingsDisableControlCheckBox, &QCheckBox::toggled,
         ui->secondStreamGroupBox, &QGroupBox::setDisabled);
     connect(ui->settingsDisableControlCheckBox, &QCheckBox::toggled,
-        this, &CameraExpertSettingsWidget::updateControlBlock);
+        this, &LegacyExpertSettingsWidget::updateControlBlock);
     connect(ui->bitratePerGopCheckBox, &QCheckBox::toggled,
-        this, &CameraExpertSettingsWidget::updateControlBlock);
+        this, &LegacyExpertSettingsWidget::updateControlBlock);
     connect(qnGlobalSettings, &QnGlobalSettings::cameraSettingsOptimizationChanged,
-        this, &CameraExpertSettingsWidget::updateControlBlock);
+        this, &LegacyExpertSettingsWidget::updateControlBlock);
     updateControlBlock();
 
     connect(ui->restoreDefaultsButton, SIGNAL(clicked()), this, SLOT(at_restoreDefaultsButton_clicked()));
@@ -101,7 +101,7 @@ CameraExpertSettingsWidget::CameraExpertSettingsWidget(QWidget* parent):
     connect(ui->checkBoxDisableNativePtzPresets, SIGNAL(toggled(bool)), this, SLOT(at_dataChanged()));
 
     connect(ui->secondStreamDisableCheckBox, &QCheckBox::stateChanged,
-        this, &CameraExpertSettingsWidget::at_dataChanged);
+        this, &LegacyExpertSettingsWidget::at_dataChanged);
 
     connect(
         ui->checkBoxForceMotionDetection, &QCheckBox::stateChanged,
@@ -114,21 +114,21 @@ CameraExpertSettingsWidget::CameraExpertSettingsWidget(QWidget* parent):
 
     connect(
         ui->checkBoxForceMotionDetection, &QCheckBox::toggled,
-        this, &CameraExpertSettingsWidget::at_dataChanged);
+        this, &LegacyExpertSettingsWidget::at_dataChanged);
 
     connect(
         ui->comboBoxForcedMotionStream, QnComboboxCurrentIndexChanged,
-        this, &CameraExpertSettingsWidget::at_dataChanged);
+        this, &LegacyExpertSettingsWidget::at_dataChanged);
 
     connect(
         ui->logicalIdSpinBox, QnSpinboxIntValueChanged,
-        this, &CameraExpertSettingsWidget::at_dataChanged);
+        this, &LegacyExpertSettingsWidget::at_dataChanged);
     connect(
         ui->resetLogicalIdButton, &QPushButton::clicked,
         this, [this]() {ui->logicalIdSpinBox->setValue(0);});
     connect(
         ui->generateLogicalIdButton, &QPushButton::clicked,
-        this, &CameraExpertSettingsWidget::at_generateLogicalId);
+        this, &LegacyExpertSettingsWidget::at_generateLogicalId);
 
 
     setHelpTopic(ui->secondStreamGroupBox, Qn::CameraSettings_SecondStream_Help);
@@ -142,14 +142,19 @@ CameraExpertSettingsWidget::CameraExpertSettingsWidget(QWidget* parent):
 
     ui->bitratePerGopHint->setHint(tr("Helps fix image quality issues on some cameras; for others will cause significant bitrate increase."));
     ui->bitratePerGopHint->setHelpTopic(Qn::CameraSettings_Expert_SettingsControl_Help);
+
+    auto logicalIdHint = nx::client::desktop::HintButton::hintThat(ui->logicalIdGroupBox);
+    logicalIdHint->addHintLine(tr("Custom number that can be assigned to a camera for quick identification and access"));
+    // TODO: Fill in help topic when it is implemented
+    //logicalIdHint->setHelpTopic(Qn::)
 }
 
-CameraExpertSettingsWidget::~CameraExpertSettingsWidget()
+LegacyExpertSettingsWidget::~LegacyExpertSettingsWidget()
 {
 
 }
 
-void CameraExpertSettingsWidget::updateFromResources(const QnVirtualCameraResourceList &cameras)
+void LegacyExpertSettingsWidget::updateFromResources(const QnVirtualCameraResourceList &cameras)
 {
     QN_SCOPED_VALUE_ROLLBACK(&m_updating, true);
 
@@ -371,7 +376,7 @@ void CameraExpertSettingsWidget::updateFromResources(const QnVirtualCameraResour
     ui->logicalIdGroupBox->setEnabled(cameras.size() == 1);
 }
 
-void CameraExpertSettingsWidget::submitToResources(const QnVirtualCameraResourceList& cameras)
+void LegacyExpertSettingsWidget::submitToResources(const QnVirtualCameraResourceList& cameras)
 {
     bool disableControls = ui->settingsDisableControlCheckBox->checkState() == Qt::Checked;
     bool enableControls = ui->settingsDisableControlCheckBox->checkState() == Qt::Unchecked;
@@ -444,12 +449,12 @@ void CameraExpertSettingsWidget::submitToResources(const QnVirtualCameraResource
 }
 
 
-bool CameraExpertSettingsWidget::isArecontCamera(const QnVirtualCameraResourcePtr &camera) const {
+bool LegacyExpertSettingsWidget::isArecontCamera(const QnVirtualCameraResourcePtr &camera) const {
     QnResourceTypePtr cameraType = qnResTypePool->getResourceType(camera->getTypeId());
     return cameraType && cameraType->getManufacture() == lit("ArecontVision");
 }
 
-bool CameraExpertSettingsWidget::isMdPolicyAllowedForCamera(const QnVirtualCameraResourcePtr& camera, const QString& mdPolicy) const
+bool LegacyExpertSettingsWidget::isMdPolicyAllowedForCamera(const QnVirtualCameraResourcePtr& camera, const QString& mdPolicy) const
 {
     const bool hasDualStreaming  = camera->hasDualStreamingInternal();
     const bool hasRemoteArchive = camera->hasCameraCapabilities(Qn::RemoteArchiveCapability);
@@ -460,7 +465,7 @@ bool CameraExpertSettingsWidget::isMdPolicyAllowedForCamera(const QnVirtualCamer
         || (mdPolicy == QnMediaResource::edgeStreamValue() && hasRemoteArchive);
 }
 
-int CameraExpertSettingsWidget::generateFreeLogicalId() const
+int LegacyExpertSettingsWidget::generateFreeLogicalId() const
 {
     auto cameras = commonModule()->resourcePool()->getAllCameras();
     std::set<int> usedValues;
@@ -483,12 +488,12 @@ int CameraExpertSettingsWidget::generateFreeLogicalId() const
     return previousValue + 1;
 }
 
-void CameraExpertSettingsWidget::at_generateLogicalId()
+void LegacyExpertSettingsWidget::at_generateLogicalId()
 {
     ui->logicalIdSpinBox->setValue(generateFreeLogicalId());
 }
 
-void CameraExpertSettingsWidget::updateLogicalIdControls()
+void LegacyExpertSettingsWidget::updateLogicalIdControls()
 {
     auto duplicateCameras = commonModule()->resourcePool()->getAllCameras().filtered(
         [this](const QnVirtualCameraResourcePtr camera)
@@ -513,14 +518,14 @@ void CameraExpertSettingsWidget::updateLogicalIdControls()
     setWarningStyleOn(ui->logicalIdSpinBox, !duplicateCameras.isEmpty());
 }
 
-void CameraExpertSettingsWidget::at_dataChanged()
+void LegacyExpertSettingsWidget::at_dataChanged()
 {
     updateLogicalIdControls();
     if (!m_updating)
         emit dataChanged();
 }
 
-bool CameraExpertSettingsWidget::areDefaultValues() const
+bool LegacyExpertSettingsWidget::areDefaultValues() const
 {
     if (ui->bitratePerGopCheckBox->isEnabled() && ui->bitratePerGopCheckBox->isChecked())
         return false;
@@ -534,7 +539,7 @@ bool CameraExpertSettingsWidget::areDefaultValues() const
         && ui->secondStreamDisableCheckBox->checkState() == Qt::Unchecked;
 }
 
-void CameraExpertSettingsWidget::at_restoreDefaultsButton_clicked()
+void LegacyExpertSettingsWidget::at_restoreDefaultsButton_clicked()
 {
     ui->settingsDisableControlCheckBox->setCheckState(Qt::Unchecked);
     ui->secondStreamDisableCheckBox->setChecked(false);
@@ -548,7 +553,7 @@ void CameraExpertSettingsWidget::at_restoreDefaultsButton_clicked()
     ui->logicalIdSpinBox->setValue(0);
 }
 
-void CameraExpertSettingsWidget::updateControlBlock()
+void LegacyExpertSettingsWidget::updateControlBlock()
 {
     const auto globalControlEnabled = qnGlobalSettings->isCameraSettingsOptimizationEnabled();
     ui->settingsDisableControlCheckBox->setEnabled(globalControlEnabled);
@@ -563,7 +568,7 @@ void CameraExpertSettingsWidget::updateControlBlock()
     ui->leftWidget->layout()->activate();
 }
 
-bool CameraExpertSettingsWidget::isSecondStreamEnabled() const
+bool LegacyExpertSettingsWidget::isSecondStreamEnabled() const
 {
     if (ui->settingsDisableControlCheckBox->checkState() != Qt::Unchecked)
         return true;
@@ -574,7 +579,7 @@ bool CameraExpertSettingsWidget::isSecondStreamEnabled() const
     return ui->secondStreamDisableCheckBox->checkState() == Qt::Unchecked;
 }
 
-void CameraExpertSettingsWidget::setSecondStreamEnabled(bool value)
+void LegacyExpertSettingsWidget::setSecondStreamEnabled(bool value)
 {
     if (ui->settingsDisableControlCheckBox->checkState() != Qt::Unchecked)
         return;

@@ -32,9 +32,9 @@ struct CameraSettingsDialogState
 
         T operator()() const { return get(); }
 
-        void updateValue(T value)
+        void setUserIfChanged(T value)
         {
-            if (m_user.has_value() || m_base != value)
+            if (m_user || m_base != value)
                 m_user = value;
         }
 
@@ -71,34 +71,34 @@ struct CameraSettingsDialogState
     enum class Alert
     {
         // Brush was changed (mode, fps, quality).
-        BrushChanged,
+        brushChanged,
 
         // Recording was enabled, while schedule is empty.
-        EmptySchedule,
+        emptySchedule,
 
         // Not enough licenses to enable recording.
-        NotEnoughLicenses,
+        notEnoughLicenses,
 
         // License limit exceeded, recording will not be enabled.
-        LicenseLimitExceeded,
+        licenseLimitExceeded,
 
         // Schedule was changed but recording is not enabled.
-        RecordingIsNotEnabled,
+        recordingIsNotEnabled,
 
         // High minimal archive length value selected.
-        HighArchiveLength,
+        highArchiveLength,
 
         // Motion detection was enabled while recording was not.
-        MotionDetectionRequiresRecording,
+        motionDetectionRequiresRecording,
 
         // Selection attempt produced too many motion rectangles.
-        MotionDetectionTooManyRectangles,
+        motionDetectionTooManyRectangles,
 
         // Selection attempt produced too many motion mask rectangles.
-        MotionDetectionTooManyMaskRectangles,
+        motionDetectionTooManyMaskRectangles,
 
         // Selection attempt produced too many motion sensitivity rectangles.
-        MotionDetectionTooManySensitivityRectangles,
+        motionDetectionTooManySensitivityRectangles,
     };
 
     CameraSettingsDialogState() = default;
@@ -152,12 +152,13 @@ struct CameraSettingsDialogState
 
         bool operator==(const FisheyeCalibrationSettings& s) const
         {
-            return offset == s.offset && radius == s.radius && aspectRatio == s.aspectRatio;
+            return offset == s.offset && qFuzzyEquals(radius, s.radius)
+                && qFuzzyEquals(aspectRatio, s.aspectRatio);
         }
 
         bool operator!=(const FisheyeCalibrationSettings& s) const
         {
-            return offset != s.offset || radius != s.radius && aspectRatio != s.aspectRatio;
+            return !(*this == s);
         }
     };
 

@@ -694,7 +694,8 @@
                 "*|DW-CP04", "*|DW-CP16",
                 "ACTI|I96","ACTI|I98",
                 "UNIVIEW|IPC6242SR-X22",
-                "Milesight*|MS-C2961-EB"
+                "Milesight*|MS-C2961-EB",
+                "Dahua|DH-SD22404T-GN"
             ],
             "ptzTraits": "EightWayPtz"
         },
@@ -910,6 +911,7 @@
                 "Hikvision|DS-2CD2522FWD*",
                 "HIKVISION|DS-2CD2522FWD*",
                 "HIKVISION|DS-2CD4032FWD*",
+                "HIKVISION|DS-2CD2142FWD-IWS",
                 "ONVIF|H47",
                 "ONVIF|IP-2CD4B26FWD-IZS",
                 "*|NC304-WDA"
@@ -917,6 +919,10 @@
             "relayOutputInversed": true,
             "portNamePrefixToIgnore": "AlarmOut"
         },
+		{
+            "keys": ["DW|DWC-PF5M1TIR"],
+			"fixWrongInputPortNumber": true
+		},
         {
             "keys": [
                 "DW|DWC-MPTZ20X",
@@ -2550,18 +2556,11 @@
         },
         { 
             "keys": ["DW|DWC-MPZ20XFM"],
-            "streamCapabilityTraits": [
-                {
-                    "trait": "aspectRatioDependent",
-                    "attributes": [
-                        {
-                            "name": "allowedAspectRatioDiff",
-                            "value": "0.1"
-                        }
-                    ]
+            "mediaTraits": {
+                "aspectRatioDependent": {
+                    "allowedAspectRatioDiff": "0.1"
                 }
-            ]
-            
+            }
         }
     ]
 }

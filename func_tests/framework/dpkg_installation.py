@@ -6,7 +6,7 @@ import sys
 from pathlib2 import PurePosixPath
 
 from framework.build_info import build_info_from_text, customizations_from_paths
-from framework.os_access.exceptions import DoesNotExist, exit_status_error_cls
+from framework.os_access.exceptions import DoesNotExist
 from framework.os_access.path import copy_file
 from framework.os_access.ssh_access import SSHAccess
 from framework.os_access.ssh_path import SSHPath
@@ -176,15 +176,6 @@ def find_deb_installation(os_access, mediaserver_deb, installation_root):
     return None
 
 
-def _port_is_opened_on_server_machine(hostname, port):
-    try:
-        hostname.run_command(['nc', '-z', 'localhost', port])
-    except exit_status_error_cls(1):
-        return False
-    else:
-        return True
-
-
 def install_mediaserver(ssh_access, mediaserver_deb, reinstall=False):
     installation_root = ssh_access.Path('/opt')
     if not reinstall:
@@ -202,15 +193,20 @@ def install_mediaserver(ssh_access, mediaserver_deb, reinstall=False):
         # language=Bash
         '''
             # Commands and dependencies for Ubuntu 14.04 (ubuntu/trusty64 from Vagrant's Atlas).
-            export DEBIAN_FRONTEND=noninteractive  # Bypass EULA on install.
-            dpkg --install --force-depends "$DEB"  # Ignore unmet dependencies, which are installed just after.
-            apt-get update  # Or "Unable to fetch some archives, maybe run apt-get update or try with --fix-missing?"
-            apt-get --fix-broken --assume-yes install  # Install dependencies left by Mediaserver.
+            CORE_PATTERN_FILE='/etc/sysctl.d/60-core-pattern.conf'
+            echo 'kernel.core_pattern=core.%t.%p' > "$CORE_PATTERN_FILE"  # %t is timestamp, %p is pid.
+            sysctl -p "$CORE_PATTERN_FILE"  # See: https://superuser.com/questions/625840
+            POINT=/mnt/trusty-packages
+            mkdir -p "$POINT"
+            mount -t nfs -o ro "$SHARE" "$POINT"
+            DEBIAN_FRONTEND=noninteractive dpkg -i "$DEB" "$POINT"/*  # GDB (to parse core dumps) and deps.
+            umount "$POINT"
             cp "$CONFIG" "$CONFIG_INITIAL"
             ''',
         env={
             'DEB': remote_path,
             'CONFIG': installation.config_path,
             'CONFIG_INITIAL': installation.config_path_initial,
+            'SHARE': '10.0.2.107:/data/QA/func_tests/trusty-packages',
             })
     return installation

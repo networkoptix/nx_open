@@ -28,16 +28,19 @@ nx::sdk::metadata::CameraManager* Plugin::obtainCameraManager(
 
 void Plugin::initCapabilities()
 {
-    if (ini().needDeepCopyOfVideoFrames)
+    const std::string pixelFormatString = ini().needUncompressedVideoFrames;
+    if (!pixelFormatString.empty())
     {
-        m_needDeepCopyOfVideoFrames = true;
-        m_capabilities += "|needDeepCopyOfVideoFrames";
-    }
-
-    if (ini().needUncompressedVideoFrames)
-    {
-        m_needUncompressedVideoFrames = true;
-        m_capabilities += "|needUncompressedVideoFrames";
+        if (!pixelFormatFromStdString(pixelFormatString, &m_pixelFormat))
+        {
+            NX_PRINT << "ERROR: Invalid value of needUncompressedVideoFrames in "
+                << ini().iniFile() << ": [" << pixelFormatString << "].";
+        }
+        else
+        {
+            m_needUncompressedVideoFrames = true;
+            m_capabilities += std::string("|needUncompressedVideoFrames_") + pixelFormatString;
+        }
     }
 
     // Delete first '|', if any.
@@ -51,7 +54,7 @@ std::string Plugin::capabilitiesManifest() const
         {
             "driverId": ")json" + nxpt::toStdString(kDriverGuid) + R"json(",
             "driverName": {
-                "value": "Stub Driver"
+                "value": "Stub Metadata Plugin"
             },
             "outputEventTypes": [
                 {

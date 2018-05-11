@@ -16,6 +16,8 @@
 #include <nx/sdk/metadata/common_event_metadata_packet.h>
 
 #include <nx/mediaserver_plugins/utils/uuid.h>
+
+#include "parser.h"
 #include "log.h"
 
 #define NX_URL_PRINT NX_PRINT << m_url.host().toStdString() << " : "
@@ -33,7 +35,8 @@ static const std::chrono::seconds kReconnectTimeout(30);
 
 static const std::chrono::milliseconds kMinTimeBetweenEvents = std::chrono::seconds(3);
 
-static const int kBufferCapacity = 4096;
+// Camera may send an image in face detection notification, so we need large buffer
+static const int kBufferCapacity = 512 * 1024;
 
 nx::sdk::metadata::CommonEvent* createCommonEvent(
     const AnalyticsEventType& event, bool active)
@@ -107,7 +110,7 @@ void* Manager::queryInterface(const nxpl::NX_GUID& interfaceId)
     return nullptr;
 }
 
-/*
+/**
  * The manager has received message from camera and should send corresponding message to saerver.
  */
 void Manager::treatMessage(QByteArray message)
@@ -131,7 +134,7 @@ void Manager::treatMessage(QByteArray message)
     }
     else
     {
-        NX_URL_PRINT << "Packed with undefined event type received. Uuid = "
+        NX_URL_PRINT << "A packet with undefined event type received. Uuid = "
             << internalName.toStdString();
     }
 }
@@ -275,6 +278,60 @@ void Manager::onSendSubscriptionQuery(SystemError::ErrorCode code, size_t size)
     });
 }
 
+/**
+ * Extracts xml-data from m_buffer to QDomDocument. Deletes bytes for the beginning of a m_buffer
+ * till the end of xml-data.
+ * If m_buffer doesn'd contain a complete xml, does nothing, returns null document.
+ */
+QDomDocument Manager::getDom()
+{
+    QDomDocument dom;
+    static const QByteArray kXmlBeginning =
+        R"(<config version="1.7" xmlns="http://www.ipc.com/ver10">)";
+    static const QByteArray kXmlEnding = R"(</config>)";
+    const auto xmlEndingIterator =
+        std::search(m_buffer.cbegin(), m_buffer.cend(), kXmlEnding.cbegin(), kXmlEnding.cend());
+
+    if (xmlEndingIterator == m_buffer.cend())
+    {
+        NX_URL_PRINT << "Received message doesn't contain complete xml. "
+            << "Waiting more incomming data ...";
+        return dom;
+    }
+
+    const auto xmlBeginningIterator =
+        std::search(m_buffer.cbegin(), m_buffer.cend(),
+            kXmlBeginning.cbegin(), kXmlBeginning.cend());
+
+    const int xmlSize = xmlEndingIterator - xmlBeginningIterator + kXmlEnding.size();
+    const int dataSize = xmlEndingIterator - m_buffer.cbegin() + kXmlEnding.size();
+
+    if (xmlBeginningIterator == m_buffer.cend())
+    {
+        NX_URL_PRINT << "Bad message received. " <<
+            "Threre is xml ending, but no xml beginning in it";
+
+        m_buffer.remove(0, dataSize);
+        return dom;
+    }
+
+    const QByteArray xml(&*xmlBeginningIterator, xmlSize);
+    dom.setContent(xml);
+    m_buffer.remove(0, dataSize);
+
+    static const int kTypicalSubscriptionResponseSize = 523;
+    if (dataSize == kTypicalSubscriptionResponseSize)
+    {
+        int set_a_breakpoint_here_in_you_need_to_catch_a_subscription_response = 0;
+    }
+    else
+    {
+        int set_a_breakpoint_here_in_you_need_to_catch_a_notification_message = 0;
+    }
+
+    return dom;
+}
+
 /*
 * New metadata have been received from camera. We try to find there information abount
 * event occurred. If so, we treat this event.
@@ -288,28 +345,18 @@ void Manager::onReceive(SystemError::ErrorCode code, size_t size)
         m_reconnectTimer.start(kReconnectTimeout, [this]() { reconnectSocket(); });
         return;
     }
-
-    NX_URL_PRINT << size << "byte(s) received";
-
-    const QByteArray alarmTagOpen = R"(<smartType type="openAlramObj">)";
-    const QByteArray alarmTagClose = R"(</smartType>)";
-
-    auto ce = m_buffer.cend();
-    auto it = std::search(m_buffer.cbegin(), m_buffer.cend(), alarmTagOpen.cbegin(), alarmTagOpen.cend());
-    if (it == m_buffer.cend())
-    {
-        m_buffer.remove(0, std::distance(m_buffer.cbegin(), it));
-    }
     else
     {
-        auto start = it + alarmTagOpen.size();
-        auto it2 = std::search(start, m_buffer.cend(), alarmTagClose.cbegin(), alarmTagClose.cend());
-        if (it2 != m_buffer.cend())
-        {
-            QByteArray alarmMessage = m_buffer.mid(start - m_buffer.begin(), it2 - start);
-            m_buffer.remove(0, std::distance(m_buffer.cbegin(), it2 + alarmTagClose.size()));
+        NX_URL_PRINT << size << "byte(s) received";
+    }
+
+    QDomDocument dom = this->getDom();
+    if(!dom.isNull())
+    {
+         QByteArray alarmMessage = getEventName(dom);
+
+        if(!alarmMessage.isEmpty())
             treatMessage(alarmMessage);
-        }
     }
 
     m_tcpSocket->readSomeAsync(
