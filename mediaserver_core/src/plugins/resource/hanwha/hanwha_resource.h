@@ -259,6 +259,9 @@ private:
     QnCameraAdvancedParamValueList filterGroupParameters(
         const QnCameraAdvancedParamValueList& values);
 
+    QnCameraAdvancedParamValueList addAssociatedParameters(
+        const QnCameraAdvancedParamValueList& values);
+
     QString groupLead(const QString& groupName) const;
 
     boost::optional<QnCameraAdvancedParamValue> findButtonParameter(

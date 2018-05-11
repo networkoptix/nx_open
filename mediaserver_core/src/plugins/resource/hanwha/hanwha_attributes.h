@@ -58,8 +58,6 @@ public:
 
     nx::network::http::StatusCode::Value statusCode() const;
 
-    int numberOfChannels() const;
-
 private:
 
     boost::optional<QString> findAttribute(
