@@ -231,8 +231,8 @@ void StreamSocket::cancelIoInAioThread(nx::network::aio::EventType eventType)
 
 void StreamSocket::stopWhileInAioThread()
 {
-    m_asyncTransformingChannel.reset();
-    m_delegate.reset();
+    m_asyncTransformingChannel->pleaseStopSync();
+    m_delegate->pleaseStopSync();
 }
 
 void StreamSocket::switchToSyncModeIfNeeded()
