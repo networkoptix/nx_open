@@ -35,7 +35,7 @@
 #include <ui/window_utils.h>
 #include <ui/texture_size_helper.h>
 #include <camera/camera_thumbnail_cache.h>
-#include <ui/helpers/font_loader.h>
+#include <nx/client/core/utils/font_loader.h>
 #include <utils/intent_listener_android.h>
 #include <handlers/lite_client_handler.h>
 
@@ -65,7 +65,7 @@ int runUi(QtSingleGuiApplication* application)
 
     // TODO: #dklychkov Detect fonts dir for iOS.
     QString fontsDir = QDir(qApp->applicationDirPath()).absoluteFilePath(lit("fonts"));
-    QnFontLoader::loadFonts(fontsDir);
+    nx::client::core::FontLoader::loadFonts(fontsDir);
 
     QFont font;
     font.setFamily(lit("Roboto"));

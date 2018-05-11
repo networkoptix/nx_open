@@ -81,6 +81,7 @@
 #include <nx/client/desktop/utils/performance_test.h>
 #include <utils/server_interface_watcher.h>
 #include <nx/client/core/watchers/known_server_connections.h>
+#include <nx/client/core/utils/font_loader.h>
 #include <nx/client/desktop/utils/applauncher_guard.h>
 #include <nx/client/desktop/utils/resource_widget_pixmap_cache.h>
 #include <nx/client/desktop/layout_templates/layout_template_manager.h>
@@ -91,7 +92,6 @@
 #include <statistics/storage/statistics_file_storage.h>
 #include <statistics/settings/statistics_settings_watcher.h>
 
-#include <ui/helpers/font_loader.h>
 #include <ui/customization/customization.h>
 #include <ui/customization/customizer.h>
 #include <ui/style/globals.h>
@@ -584,8 +584,9 @@ void QnClientModule::initSkin(const QnStartupParameters& startupParams)
     /* Initialize application UI. Skip if run in console (e.g. unit-tests). */
     if (qApp)
     {
-        QnFontLoader::loadFonts(QDir(QApplication::applicationDirPath()).absoluteFilePath(
-            nx::utils::AppInfo::isMacOsX() ? lit("../Resources/fonts") : lit("fonts")));
+        nx::client::core::FontLoader::loadFonts(
+            QDir(QApplication::applicationDirPath()).absoluteFilePath(
+                nx::utils::AppInfo::isMacOsX() ? lit("../Resources/fonts") : lit("fonts")));
 
         QApplication::setWindowIcon(qnSkin->icon(":/logo.png"));
         QApplication::setStyle(skin->newStyle(customizer->genericPalette()));
