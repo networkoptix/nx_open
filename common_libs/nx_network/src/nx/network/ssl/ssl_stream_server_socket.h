@@ -57,6 +57,10 @@ public:
     virtual void pleaseStopSync(bool assertIfCalledUnderLock = true) override;
 
     virtual void bindToAioThread(nx::network::aio::AbstractAioThread* aioThread) override;
+
+    virtual bool setNonBlockingMode(bool value) override;
+    virtual bool getNonBlockingMode(bool* value) const override;
+
     virtual bool listen(int backlog = kDefaultBacklogSize) override;
     virtual void acceptAsync(AcceptCompletionHandler handler) override;
     virtual std::unique_ptr<AbstractStreamSocket> accept() override;
@@ -73,9 +77,13 @@ private:
     aio::Timer m_timer;
     EncryptionUse m_encryptionUse;
     AcceptCompletionHandler m_userHandler;
+    bool m_nonBlockingModeEnabled = false;
 
     std::unique_ptr<detail::AbstractAcceptedSslStreamSocketWrapper> createSocketWrapper(
         std::unique_ptr<AbstractStreamSocket> delegate);
+
+    std::unique_ptr<AbstractStreamSocket> acceptNonBlocking();
+    std::unique_ptr<AbstractStreamSocket> acceptBlocking();
 
     void startTimer(std::chrono::milliseconds timeout);
     void onAccepted(

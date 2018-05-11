@@ -359,9 +359,14 @@ protected:
     void givenListeningServerSocket()
     {
         m_serverSocket = std::make_unique<typename SocketTypeSet::ServerSocket>();
-        ASSERT_TRUE(m_serverSocket->setNonBlockingMode(true));
         ASSERT_TRUE(m_serverSocket->bind(SocketAddress::anyPrivateAddress));
         ASSERT_TRUE(m_serverSocket->listen());
+    }
+
+    void givenListeningNonBlockingServerSocket()
+    {
+        givenListeningServerSocket();
+        ASSERT_TRUE(m_serverSocket->setNonBlockingMode(true));
     }
 
     void givenListeningSynchronousServer()
@@ -563,6 +568,81 @@ protected:
         }
     }
 
+    void whenAcceptNonBlocking()
+    {
+        ASSERT_TRUE(m_serverSocket->setNonBlockingMode(true))
+            << SystemError::getLastOSErrorText().toStdString();
+
+        whenAcceptConnection();
+    }
+
+    void whenAcceptConnection()
+    {
+        auto acceptedConnection = m_serverSocket->accept();
+        const auto systemErrorCode =
+            acceptedConnection == nullptr
+            ? SystemError::getLastOSErrorCode()
+            : SystemError::noError;
+        m_acceptedConnections.push(
+            std::make_tuple(systemErrorCode, std::move(acceptedConnection)));
+    }
+
+    void waitUntilConnectionIsAcceptedInNonBlockingMode()
+    {
+        ASSERT_TRUE(m_serverSocket->setNonBlockingMode(true))
+            << SystemError::getLastOSErrorText().toStdString();
+
+        waitUntilConnectionIsAccepted();
+    }
+
+    void waitUntilConnectionIsAccepted()
+    {
+        for (;;)
+        {
+            whenAcceptConnection();
+
+            m_prevAcceptResult = m_acceptedConnections.pop();
+            if (std::get<0>(m_prevAcceptResult) == SystemError::wouldBlock)
+            {
+                std::this_thread::sleep_for(std::chrono::milliseconds(1));
+                continue;
+            }
+
+            ASSERT_NE(nullptr, std::move(std::get<1>(m_prevAcceptResult)));
+            break;
+        }
+    }
+
+    void whenConnectionIsAccepted()
+    {
+        this->givenConnectedSocket();
+        // E.g., for socket with encryption auto-detection
+        this->whenClientSendsPing();
+
+        this->waitUntilConnectionIsAccepted();
+    }
+
+    void assertAcceptedConnectionNonBlockingModeIs(bool expected)
+    {
+        bool isNonBlockingMode = false;
+        ASSERT_TRUE(std::get<1>(m_prevAcceptResult)->getNonBlockingMode(&isNonBlockingMode));
+        ASSERT_EQ(expected, isNonBlockingMode);
+    }
+
+    void thenAcceptReported(SystemError::ErrorCode expected)
+    {
+        m_prevAcceptResult = m_acceptedConnections.pop();
+
+        ASSERT_EQ(expected, std::get<0>(m_prevAcceptResult));
+    }
+
+    void thenConnectionHasBeenAccepted()
+    {
+        thenAcceptReported(SystemError::noError);
+
+        ASSERT_NE(nullptr, std::get<1>(m_prevAcceptResult));
+    }
+
     void thenConnectionIsEstablished()
     {
         ASSERT_EQ(SystemError::noError, m_connectResultQueue.pop());
@@ -638,10 +718,11 @@ protected:
                 std::exchange(m_connection, nullptr)));
         m_concurrentSocketPipes.back()->dataToSendQueue.push(m_sentData);
 
-        m_prevAcceptedConnection = m_acceptedConnections.pop();
+        auto acceptResult = m_acceptedConnections.pop();
+        ASSERT_NE(nullptr, std::get<1>(acceptResult));
         m_concurrentSocketPipes.push_back(
             std::make_unique<ConcurrentSocketPipeContext>(
-                std::exchange(m_prevAcceptedConnection, nullptr)));
+                std::exchange(std::get<1>(acceptResult), nullptr)));
         m_concurrentSocketPipes.back()->dataToSendQueue.push(m_sentData);
     }
 
@@ -682,6 +763,8 @@ protected:
 
 private:
     using RecvResult = std::tuple<SystemError::ErrorCode, nx::Buffer>;
+    using AcceptResult =
+        std::tuple<SystemError::ErrorCode, std::unique_ptr<AbstractStreamSocket>>;
 
     struct ClientConnectionContext
     {
@@ -701,8 +784,8 @@ private:
     std::unique_ptr<server::SimpleMessageServer> m_server;
     nx::utils::MoveOnlyFunc<void()> m_auxiliaryRecvHandler;
     std::vector<std::unique_ptr<ClientConnectionContext>> m_clientConnections;
-    nx::utils::SyncQueue<std::unique_ptr<AbstractStreamSocket>> m_acceptedConnections;
-    std::unique_ptr<AbstractStreamSocket> m_prevAcceptedConnection;
+    nx::utils::SyncQueue<AcceptResult> m_acceptedConnections;
+    AcceptResult m_prevAcceptResult;
 
     //---------------------------------------------------------------------------------------------
     // Concurrent I/O.
@@ -769,13 +852,20 @@ private:
 
     void startAcceptingConnections()
     {
+        ASSERT_TRUE(m_serverSocket->setNonBlockingMode(true));
+
         m_serverSocket->acceptAsync(
             [this](
-                SystemError::ErrorCode /*systemErrorCode*/,
+                SystemError::ErrorCode systemErrorCode,
                 std::unique_ptr<AbstractStreamSocket> connection)
             {
                 if (connection)
-                    m_acceptedConnections.push(std::move(connection));
+                {
+                    m_acceptedConnections.push(
+                        std::make_tuple(
+                            systemErrorCode,
+                            std::move(connection)));
+                }
 
                 this->startAcceptingConnections();
             });
@@ -963,6 +1053,45 @@ TYPED_TEST_P(StreamSocketAcceptance, concurrent_recv_send_in_blocking_mode)
     this->thenBothSocketsReceiveExpectedData();
 }
 
+TYPED_TEST_P(
+    StreamSocketAcceptance,
+    nonblocking_accept_reports_wouldBlock_if_no_incoming_connections)
+{
+    this->givenListeningServerSocket();
+    this->whenAcceptNonBlocking();
+    this->thenAcceptReported(SystemError::wouldBlock);
+}
+
+TYPED_TEST_P(StreamSocketAcceptance, nonblocking_accept_actually_accepts_connections)
+{
+    this->givenListeningServerSocket();
+    this->givenConnectedSocket();
+    // E.g., for socket with encryption auto-detection
+    this->whenClientSendsPing();
+
+    this->waitUntilConnectionIsAcceptedInNonBlockingMode();
+}
+
+TYPED_TEST_P(
+    StreamSocketAcceptance,
+    accepted_socket_is_in_blocking_mode_when_server_socket_is_nonblocking)
+{
+    this->givenListeningNonBlockingServerSocket();
+    this->whenConnectionIsAccepted();
+    this->assertAcceptedConnectionNonBlockingModeIs(false);
+}
+
+TYPED_TEST_P(
+    StreamSocketAcceptance,
+    accepted_socket_is_in_blocking_mode_when_server_socket_is_blocking)
+{
+    this->givenListeningServerSocket();
+    this->whenConnectionIsAccepted();
+    this->assertAcceptedConnectionNonBlockingModeIs(false);
+}
+
+//TYPED_TEST_P(StreamSocketAcceptance, socket_is_reusable_after_recv_timeout)
+
 REGISTER_TYPED_TEST_CASE_P(StreamSocketAcceptance,
     DISABLED_receiveDelay,
     sendDelay,
@@ -977,7 +1106,11 @@ REGISTER_TYPED_TEST_CASE_P(StreamSocketAcceptance,
     recv_timeout_is_reported,
     msg_dont_wait_flag_makes_recv_call_nonblocking,
     async_connect_is_cancelled_by_cancelling_write,
-    concurrent_recv_send_in_blocking_mode);
+    concurrent_recv_send_in_blocking_mode,
+    nonblocking_accept_reports_wouldBlock_if_no_incoming_connections,
+    nonblocking_accept_actually_accepts_connections,
+    accepted_socket_is_in_blocking_mode_when_server_socket_is_nonblocking,
+    accepted_socket_is_in_blocking_mode_when_server_socket_is_blocking);
 
 } // namespace test
 } // namespace network

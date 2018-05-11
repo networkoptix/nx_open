@@ -57,8 +57,6 @@ StreamServerSocket::StreamServerSocket(
     m_encryptionUse(encryptionUse)
 {
     bindToAioThread(m_acceptor.getAioThread());
-
-    setNonBlockingMode(true);
 }
 
 StreamServerSocket::~StreamServerSocket()
@@ -103,10 +101,26 @@ void StreamServerSocket::bindToAioThread(
     m_timer.bindToAioThread(aioThread);
 }
 
+bool StreamServerSocket::setNonBlockingMode(bool value)
+{
+    m_nonBlockingModeEnabled = value;
+    return true;
+}
+
+bool StreamServerSocket::getNonBlockingMode(bool* value) const
+{
+    *value = m_nonBlockingModeEnabled;
+    return true;
+}
+
 bool StreamServerSocket::listen(int backlog)
 {
-    if (!base_type::listen(backlog))
+    // Always switching underlying socket to non-blocking mode as required by m_acceptor.
+    if (!base_type::setNonBlockingMode(true) ||
+        !base_type::listen(backlog))
+    {
         return false;
+    }
 
     m_acceptor.start();
     return true;
@@ -134,30 +148,11 @@ void StreamServerSocket::acceptAsync(AcceptCompletionHandler handler)
 
 std::unique_ptr<AbstractStreamSocket> StreamServerSocket::accept()
 {
-    // TODO: #ak Implement non-blocking mode.
+    auto connection = m_nonBlockingModeEnabled
+        ? acceptNonBlocking()
+        : acceptBlocking();
 
-    std::promise<std::tuple<
-        SystemError::ErrorCode,
-        std::unique_ptr<AbstractStreamSocket>>
-        > accepted;
-
-    acceptAsync(
-        [this, &accepted](
-            SystemError::ErrorCode systemErrorCode,
-            std::unique_ptr<AbstractStreamSocket> connection)
-        {
-            accepted.set_value(std::make_tuple(systemErrorCode, std::move(connection)));
-        });
-
-    auto result = accepted.get_future().get();
-    auto connection = std::move(std::get<1>(result));
-    if (!connection)
-    {
-        SystemError::setLastErrorCode(std::get<0>(result));
-        return nullptr;
-    }
-
-    if (!connection->setNonBlockingMode(false))
+    if (!connection || !connection->setNonBlockingMode(false))
         return nullptr;
 
     return connection;
@@ -189,6 +184,44 @@ std::unique_ptr<detail::AbstractAcceptedSslStreamSocketWrapper>
             NX_ASSERT(false);
             return nullptr;
     }
+}
+
+std::unique_ptr<AbstractStreamSocket> StreamServerSocket::acceptNonBlocking()
+{
+    auto connection = m_acceptor.getNextConnectionIfAny();
+    if (!connection)
+        SystemError::setLastErrorCode(SystemError::wouldBlock);
+
+    return connection;
+}
+
+std::unique_ptr<AbstractStreamSocket> StreamServerSocket::acceptBlocking()
+{
+    std::promise<std::tuple<
+        SystemError::ErrorCode,
+        std::unique_ptr<AbstractStreamSocket>>
+        > accepted;
+
+    acceptAsync(
+        [this, &accepted](
+            SystemError::ErrorCode systemErrorCode,
+            std::unique_ptr<AbstractStreamSocket> connection)
+        {
+            accepted.set_value(std::make_tuple(systemErrorCode, std::move(connection)));
+        });
+
+    auto result = accepted.get_future().get();
+    auto connection = std::move(std::get<1>(result));
+    if (!connection)
+    {
+        SystemError::setLastErrorCode(std::get<0>(result));
+        return nullptr;
+    }
+
+    if (!connection->setNonBlockingMode(false))
+        return nullptr;
+
+    return connection;
 }
 
 void StreamServerSocket::startTimer(std::chrono::milliseconds timeout)
