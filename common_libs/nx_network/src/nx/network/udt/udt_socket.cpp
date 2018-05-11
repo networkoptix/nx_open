@@ -39,15 +39,13 @@ class UdtSocketImpl:
 {
 public:
     UdtSocketImpl() = default;
+    UdtSocketImpl(const UdtSocketImpl&) = delete;
+    UdtSocketImpl& operator=(const UdtSocketImpl&) = delete;
 
     UdtSocketImpl(UDTSOCKET socket):
         UDTSocketImpl(socket)
     {
     }
-
-private:
-    UdtSocketImpl(const UdtSocketImpl&);
-    UdtSocketImpl& operator=(const UdtSocketImpl&);
 };
 
 struct UdtEpollHandlerHelper
