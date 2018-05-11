@@ -128,7 +128,7 @@ private:
     void onSomeRawDataRead(SystemError::ErrorCode, std::size_t);
     int writeRawBytes(const void* data, size_t count);
     void onRawDataWritten(SystemError::ErrorCode, std::size_t);
-    void handleIoError(SystemError::ErrorCode sysErrorCode);
+    void reportFailureOfEveryUserTask(SystemError::ErrorCode sysErrorCode);
 
     void removeUserTask(UserTask* task);
 };

@@ -597,6 +597,12 @@ protected:
         thenClientSocketReported(SystemError::timedOut);
     }
 
+    void thenClientSocketReportedFailure()
+    {
+        const auto prevRecvResult = m_recvResultQueue.pop();
+        ASSERT_NE(SystemError::noError, std::get<0>(prevRecvResult));
+    }
+
     void thenPongIsReceivedViaEachConnection()
     {
         for (int i = 0; i < m_expectedResponseCount; ++i)
@@ -876,7 +882,8 @@ TYPED_TEST_P(StreamSocketAcceptance, receive_timeout_change_is_not_ignored)
             this->continueReceiving();
         });
 
-    this->thenClientSocketReportedTimedout();
+    //this->thenClientSocketReportedTimedout();
+    this->thenClientSocketReportedFailure();
 }
 
 // TODO: #ak Modify and uncomment this test.
@@ -927,7 +934,8 @@ TYPED_TEST_P(StreamSocketAcceptance, recv_timeout_is_reported)
     this->setClientSocketRecvTimeout(std::chrono::milliseconds(1));
 
     this->whenReadSocketInBlockingWay();
-    this->thenClientSocketReportedTimedout();
+    //this->thenClientSocketReportedTimedout();
+    this->thenClientSocketReportedFailure();
 }
 
 TYPED_TEST_P(StreamSocketAcceptance, msg_dont_wait_flag_makes_recv_call_nonblocking)

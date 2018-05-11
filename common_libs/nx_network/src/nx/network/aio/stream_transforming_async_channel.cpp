@@ -134,15 +134,12 @@ void StreamTransformingAsyncChannel::processWriteTask(WriteTask* task)
 
     const auto rawWriteQueueSizeBak = m_rawWriteQueue.size();
 
-    //if (!task->buffer.isEmpty())
-    {
-        std::tie(sysErrorCode, bytesWritten) = invokeConverter(
-            std::bind(&utils::bstream::Converter::write, m_converter,
-                task->buffer.data(),
-                task->buffer.size()));
-        if (sysErrorCode == SystemError::wouldBlock)
-            return; //< Could not schedule user data send.
-    }
+    std::tie(sysErrorCode, bytesWritten) = invokeConverter(
+        std::bind(&utils::bstream::Converter::write, m_converter,
+            task->buffer.data(),
+            task->buffer.size()));
+    if (sysErrorCode == SystemError::wouldBlock)
+        return; //< Could not schedule user data send.
 
     task->status = UserTaskStatus::done;
 
@@ -252,7 +249,12 @@ void StreamTransformingAsyncChannel::onSomeRawDataRead(
         return;
     }
 
-    handleIoError(sysErrorCode);
+    // TODO: #ak It is not correct.
+    // Should report failure only to user tasks that depend on this particular read.
+    if (!nx::network::socketCannotRecoverFromError(sysErrorCode))
+        sysErrorCode = SystemError::connectionReset;
+
+    reportFailureOfEveryUserTask(sysErrorCode);
 }
 
 int StreamTransformingAsyncChannel::writeRawBytes(const void* data, size_t count)
@@ -307,27 +309,28 @@ void StreamTransformingAsyncChannel::onRawDataWritten(
         return tryToCompleteUserTasks();
     }
 
-    if (nx::network::socketCannotRecoverFromError(sysErrorCode))
-    {
-        // TODO: #ak This is copy-paste. Refactor!
-        auto userHandler = std::move(m_rawWriteQueue.front().userHandler);
-        if (userHandler)
-        {
-            utils::ObjectDestructionFlag::Watcher thisDestructionWatcher(&m_destructionFlag);
-            userHandler(sysErrorCode, -1);
-            if (thisDestructionWatcher.objectDestroyed())
-                return;
-        }
-        return handleIoError(sysErrorCode);
-    }
+    // TODO: #ak Not sure, if it is correct. Review...
+    if (!nx::network::socketCannotRecoverFromError(sysErrorCode))
+        sysErrorCode = SystemError::connectionReset;
 
-    // Retrying I/O.
-    m_rawDataChannel->sendAsync(
-        m_rawWriteQueue.front().data,
-        std::bind(&StreamTransformingAsyncChannel::onRawDataWritten, this, _1, _2));
+    // TODO: #ak This is copy-paste. Refactor!
+    auto userHandler = std::move(m_rawWriteQueue.front().userHandler);
+    if (userHandler)
+    {
+        utils::ObjectDestructionFlag::Watcher thisDestructionWatcher(&m_destructionFlag);
+        userHandler(sysErrorCode, -1);
+        if (thisDestructionWatcher.objectDestroyed())
+            return;
+    }
+    return reportFailureOfEveryUserTask(sysErrorCode);
+
+    //// Retrying I/O in case of not fatal connection error.
+    //m_rawDataChannel->sendAsync(
+    //    m_rawWriteQueue.front().data,
+    //    std::bind(&StreamTransformingAsyncChannel::onRawDataWritten, this, _1, _2));
 }
 
-void StreamTransformingAsyncChannel::handleIoError(
+void StreamTransformingAsyncChannel::reportFailureOfEveryUserTask(
     SystemError::ErrorCode sysErrorCode)
 {
     // We can have SystemError::noError here in case of a connection closure.
