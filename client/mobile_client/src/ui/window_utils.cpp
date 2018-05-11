@@ -12,7 +12,7 @@ QWindow *getMainWindow()
     return windows.first();
 }
 
-#if (!defined(Q_OS_IOS))
+#if !defined(Q_OS_IOS)
     QMargins getCustomMargins()
     {
         return QMargins();

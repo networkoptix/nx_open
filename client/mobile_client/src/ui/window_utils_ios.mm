@@ -51,10 +51,10 @@ bool isLeftSideNavigationBar()
 QMargins getCustomMargins()
 {
     const auto windowId = getMainWindow()->winId();
-    UIView* nativeView = reinterpret_cast<UIView*>(windowId);
+    const auto nativeView = reinterpret_cast<UIView*>(windowId);
     if (!nativeView)
         return QMargins();
-    
+
     if (@available(iOS 11, *))
     {
         auto safeInsets = [nativeView safeAreaInsets];

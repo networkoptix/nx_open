@@ -17,14 +17,18 @@ Drawer
 
     Rectangle
     {
-        width: Math.min(ApplicationWindow.window.width - 56, ApplicationWindow.window.height - 56, 56 * 6)
+        readonly property real offset:
+            Screen.orientation == Qt.LandscapeOrientation ? leftCustomMargin : 0
+        width:
+            Math.min(ApplicationWindow.window.width - 56, ApplicationWindow.window.height - 56, 56 * 6)
+            + offset
         height: ApplicationWindow.window.height - y
         color: ColorTheme.base8
         clip: true
 
         Item
         {
-            x: Screen.orientation == Qt.LandscapeOrientation ? leftCustomMargin : 0
+            x: parent.offset
             width: parent.width - x
             height: parent.height
 
