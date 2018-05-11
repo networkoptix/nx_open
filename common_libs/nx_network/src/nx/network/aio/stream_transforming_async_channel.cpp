@@ -309,7 +309,8 @@ void StreamTransformingAsyncChannel::onRawDataWritten(
         return tryToCompleteUserTasks();
     }
 
-    // TODO: #ak Not sure, if it is correct. Review...
+    // TODO: #ak Should report error as-is, but mark socket as unusable
+    // and fail any subsequent operation with SystemError::connectionReset.
     if (!nx::network::socketCannotRecoverFromError(sysErrorCode))
         sysErrorCode = SystemError::connectionReset;
 
@@ -322,12 +323,8 @@ void StreamTransformingAsyncChannel::onRawDataWritten(
         if (thisDestructionWatcher.objectDestroyed())
             return;
     }
-    return reportFailureOfEveryUserTask(sysErrorCode);
 
-    //// Retrying I/O in case of not fatal connection error.
-    //m_rawDataChannel->sendAsync(
-    //    m_rawWriteQueue.front().data,
-    //    std::bind(&StreamTransformingAsyncChannel::onRawDataWritten, this, _1, _2));
+    reportFailureOfEveryUserTask(sysErrorCode);
 }
 
 void StreamTransformingAsyncChannel::reportFailureOfEveryUserTask(
