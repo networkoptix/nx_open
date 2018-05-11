@@ -10,6 +10,7 @@
 #include <common/common_module_aware.h>
 #include <nx/time_sync/time_sync_manager.h>
 #include <nx/vms/network/abstract_server_connector.h>
+#include <nx/utils/elapsed_timer.h>
 
 namespace nx {
 namespace time_sync {
@@ -35,7 +36,6 @@ public:
 protected:
     virtual void updateTime() override;
     virtual AbstractStreamSocketPtr connectToRemoteHost(const QnRoute& route) override;
-    virtual void setSyncTime(std::chrono::milliseconds value) override;
 private:
     void loadTimeFromInternet();
 
@@ -49,6 +49,8 @@ private:
     std::atomic<bool> m_updateTimePlaned{ false };
     std::atomic<bool> m_broadcastTimePlaned{ false };
     nx::vms::network::AbstractServerConnector* m_serverConnector = nullptr;
+    std::chrono::milliseconds m_networkTimeSyncInterval;
+    nx::utils::ElapsedTimer m_timer;
 };
 
 } // namespace time_sync

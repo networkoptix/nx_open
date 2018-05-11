@@ -74,6 +74,8 @@ public:
         const std::shared_ptr<AbstractSystemClock>& systemClock,
         const std::shared_ptr<AbstractSteadyClock>& steadyClock);
 
+    void setTimeSyncInterval(std::chrono::milliseconds value);
+    std::chrono::milliseconds timeSyncInterval() const;
 signals:
     /** Emitted when synchronized time has been changed. */
     void timeChanged(qint64 syncTimeMs);
@@ -97,6 +99,7 @@ protected:
 private:
     std::chrono::milliseconds m_synchronizedTime{0};
     std::chrono::milliseconds m_synchronizedOnClock{0};
+    std::chrono::milliseconds m_timeSyncInterval;
 
     mutable QnMutex m_mutex;
 
