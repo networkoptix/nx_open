@@ -26,13 +26,11 @@ const QString kTimeSyncUrlPath = QString::fromLatin1("/api/gettime");
 static const QByteArray kTimeDeltaParamName = "sync_time_delta";
 
 TimeSyncManager::TimeSyncManager(
-    QnCommonModule* commonModule,
-    const std::shared_ptr<AbstractSystemClock>& systemClock,
-    const std::shared_ptr<AbstractSteadyClock>& steadyClock)
+    QnCommonModule* commonModule)
     :
     QnCommonModuleAware(commonModule),
-    m_systemClock(systemClock ? systemClock : std::make_shared<SystemClock>()),
-    m_steadyClock(steadyClock ? steadyClock : std::make_shared<SteadyClock>()),
+    m_systemClock(std::make_shared<SystemClock>()),
+    m_steadyClock(std::make_shared<SteadyClock>()),
     m_thread(new QThread())
 {
     moveToThread(m_thread);
@@ -56,6 +54,16 @@ TimeSyncManager::TimeSyncManager(
         { 
             updateTime(); 
         });
+}
+
+void TimeSyncManager::setClock(
+    const std::shared_ptr<AbstractSystemClock>& systemClock,
+    const std::shared_ptr<AbstractSteadyClock>& steadyClock)
+{
+    m_systemClock = systemClock;
+    m_steadyClock = steadyClock;
+    stop();
+    start();
 }
 
 TimeSyncManager::~TimeSyncManager()

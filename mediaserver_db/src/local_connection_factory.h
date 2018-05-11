@@ -13,6 +13,7 @@
 #include "ec2_connection.h"
 #include "settings.h"
 #include <nx/time_sync/time_sync_manager.h>
+#include <nx/vms/network/abstract_server_connector.h>
 
 namespace ec2 {
 
@@ -26,12 +27,12 @@ class LocalConnectionFactory:
 	public QnJoinable
 {
 public:
-	LocalConnectionFactory(
-        std::unique_ptr<nx::time_sync::TimeSyncManager> timeSynchronizationManager,
+    LocalConnectionFactory(
         QnCommonModule* commonModule,
         Qn::PeerType peerType,
-		bool isP2pMode);
-	virtual ~LocalConnectionFactory();
+        bool isP2pMode,
+        nx::vms::network::AbstractServerConnector* serverConnector);
+    virtual ~LocalConnectionFactory();
 
 	virtual void pleaseStop() override;
 	virtual void join() override;

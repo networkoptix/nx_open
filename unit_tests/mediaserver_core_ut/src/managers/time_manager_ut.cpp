@@ -18,7 +18,7 @@
 #include <api/runtime_info_manager.h>
 #include <common/common_module.h>
 
-#include <nx/mediaserver/server_time_sync_manager.h>
+#include <nx/time_sync/server_time_sync_manager.h>
 #include <settings.h>
 #include <api/model/time_reply.h>
 
@@ -103,29 +103,13 @@ static Appserver2Ptr createAppserver()
 class TimeSynchronizationPeer
 {
 public:
-    TimeSynchronizationPeer():
-        m_testSystemClock(std::make_shared<TestSystemClock>()),
-        m_testSteadyClock(std::make_shared<TestSteadyClock>())
+    TimeSynchronizationPeer()
     {
-        m_appserver = createAppserver();
-        auto commonModule = m_appserver->moduleInstance()->commonModule();
-        m_timeSynchronizationManager.reset(new nx::mediaserver::ServerTimeSyncManager(
-            commonModule,
-            nullptr, //< No reverse connections are supported in this test.
-            m_testSystemClock,
-            m_testSteadyClock));
-
-        commonModule->globalSettings()->setOsTimeChangeCheckPeriod(
-            std::chrono::milliseconds(100));
-        commonModule->globalSettings()->setSyncTimeExchangePeriod(
-            std::chrono::seconds(1));
-
-        m_timerManager.start();
     }
 
     ~TimeSynchronizationPeer()
     {
-        m_timeSynchronizationManager.reset();
+        m_appserver.reset();
     }
 
     QnCommonModule* commonModule() const
@@ -140,37 +124,39 @@ public:
 
     bool start()
     {
-        if (!startHttpServer())
+        m_appserver = createAppserver();
+        if (!m_appserver->waitUntilStarted())
             return false;
-        m_timeSynchronizationManager->start();
+
+        m_testSystemClock = std::make_shared<TestSystemClock>();
+        m_testSteadyClock = std::make_shared<TestSteadyClock>();
+        auto timeSyncManager = m_appserver->moduleInstance()->ecConnection()->timeSyncManager();
+        timeSyncManager->setClock(m_testSystemClock, m_testSteadyClock);
+
+        auto commonModule = m_appserver->moduleInstance()->commonModule();
+        commonModule->globalSettings()->setOsTimeChangeCheckPeriod(
+            std::chrono::milliseconds(100));
+        commonModule->globalSettings()->setSyncTimeExchangePeriod(
+            std::chrono::seconds(1));
+
         return true;
     }
 
     std::chrono::milliseconds getSyncTime() const
     {
-        return std::chrono::milliseconds(m_timeSynchronizationManager->getSyncTime());
+        auto timeSyncManager = commonModule()->ec2Connection()->timeSyncManager();
+        return std::chrono::milliseconds(timeSyncManager->getSyncTime());
     }
 
     void stop()
     {
-        m_timeSynchronizationManager.reset();
         m_appserver.reset();
     }
 
     void restart()
     {
-        m_appserver.reset();
-        if (m_timeSynchronizationManager)
-            m_timeSynchronizationManager.reset();
-
-        m_appserver = createAppserver();
-
-        m_timeSynchronizationManager.reset(new nx::mediaserver::ServerTimeSyncManager(
-            commonModule(),
-            nullptr, //< No reverse connections are supported in this test.
-            m_testSystemClock,
-            m_testSteadyClock));
-        m_timeSynchronizationManager->start();
+        stop();
+        start();
     }
 
     void setPrimaryPeerId(const QnUuid& peerId)
@@ -195,9 +181,10 @@ public:
 
     nx::utils::Url apiUrl() const
     {
+        auto endpoint = m_appserver->moduleInstance()->endpoint();
         return nx::network::url::Builder()
             .setScheme(nx::network::http::kUrlSchemeName)
-            .setEndpoint(m_httpServer.serverAddress()).toUrl();
+            .setEndpoint(endpoint).toUrl();
     }
 
     std::chrono::milliseconds getSystemTime() const
@@ -222,40 +209,8 @@ public:
 
 private:
     Appserver2Ptr m_appserver;
-    nx::utils::StandaloneTimerManager m_timerManager;
-    nx::network::http::TestHttpServer m_httpServer;
     std::shared_ptr<TestSystemClock> m_testSystemClock;
     std::shared_ptr<TestSteadyClock> m_testSteadyClock;
-    std::unique_ptr<nx::time_sync::TimeSyncManager> m_timeSynchronizationManager;
-
-    bool startHttpServer()
-    {
-        using namespace std::placeholders;
-
-        if (!m_httpServer.bindAndListen())
-            return false;
-
-        m_httpServer.registerRequestProcessorFunc(
-            "/api/gettime",
-            std::bind(&TimeSynchronizationPeer::syncTimeHttpHandler, this, _1, _2, _3, _4, _5));
-
-        return true;
-    }
-
-    void syncTimeHttpHandler(
-        nx::network::http::HttpServerConnection* const connection,
-        nx::utils::stree::ResourceContainer /*authInfo*/,
-        nx::network::http::Request request,
-        nx::network::http::Response* const response,
-        nx::network::http::RequestProcessedHandler completionHandler)
-    {
-        QnTimeReply reply;
-        reply.utcTime = m_timeSynchronizationManager->getSyncTime().count();
-        QnJsonRestResult result;
-        result.setReply(reply);
-        response->messageBody = QJson::serialized(result);
-        return completionHandler(nx::network::http::StatusCode::ok);
-    }
 };
 
 } // namespace

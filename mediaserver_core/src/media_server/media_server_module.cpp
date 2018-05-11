@@ -65,7 +65,7 @@
 #include "wearable_upload_manager.h"
 #include <core/resource/resource_command_processor.h>
 #include <nx/mediaserver/reverse_connection_manager.h>
-#include <nx/mediaserver/server_time_sync_manager.h>
+#include <nx/time_sync/server_time_sync_manager.h>
 
 using namespace nx::mediaserver;
 
@@ -93,11 +93,6 @@ QnMediaServerModule::QnMediaServerModule(
     Q_INIT_RESOURCE(mediaserver_core);
     Q_INIT_RESOURCE(appserver2);
     nx::mediaserver::MetaTypes::initialize();
-
-    store(new QnStaticCommonModule(
-        Qn::PT_Server,
-        QnAppInfo::productNameShort(),
-        QnAppInfo::customizationName()));
 
     m_settings = store(new MSSettings(roSettingsPath, rwSettingsPath));
 

@@ -111,5 +111,17 @@ void ReverseConnectionManager::doPeriodicTasks()
     }
 }
 
+std::unique_ptr<nx::network::AbstractStreamSocket> ReverseConnectionManager::connect(
+    const QnRoute& route, std::chrono::milliseconds timeout)
+{
+    if (route.reverseConnect)
+        return getProxySocket(route.id, timeout);
+
+    auto socket = nx::network::SocketFactory::createStreamSocket(false);
+    if (socket->connect(route.addr, nx::network::deprecated::kDefaultConnectTimeout))
+        return socket;
+    return std::unique_ptr<nx::network::AbstractStreamSocket>();
+}
+
 } // namespace mediaserver
 } // namespace nx

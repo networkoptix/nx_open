@@ -6,8 +6,6 @@
 #include <api/global_settings.h>
 #include <nx/utils/elapsed_timer.h>
 #include <nx_ec/data/api_reverse_connection_data.h>
-#include <media_server/media_server_module.h>
-#include <nx/mediaserver/reverse_connection_manager.h>
 #include <nx/network/time/time_protocol_client.h>
 #include <utils/common/rfc868_servers.h>
 #include <nx/network/socket_factory.h>
@@ -18,9 +16,9 @@
 #include <transaction/message_bus_adapter.h>
 
 namespace nx {
-namespace mediaserver {
+namespace time_sync {
 
-static const std::chrono::seconds kProxySocetTimeout(10);
+static const std::chrono::seconds kMaxServerConnectionTimeout(10);
 static const std::chrono::seconds kMinTimeUpdateInterval(10);
 static const QByteArray kTimeDeltaParamName = "sync_time_delta";
 
@@ -41,15 +39,12 @@ bool compareTimePriority(
     return left->getId() < right->getId();
 };
 
-
 ServerTimeSyncManager::ServerTimeSyncManager(
     QnCommonModule* commonModule,
-    ReverseConnectionManager* reverseConnectionManager,
-    const std::shared_ptr<AbstractSystemClock>& systemClock,
-    const std::shared_ptr<AbstractSteadyClock>& steadyClock)
+    nx::vms::network::AbstractServerConnector* serverConnector)
     :
-    base_type(commonModule, systemClock, steadyClock),
-    m_reverseConnectionManager(reverseConnectionManager)
+    base_type(commonModule),
+    m_serverConnector(serverConnector)
 {
 
     connect(
@@ -203,15 +198,9 @@ QnUuid ServerTimeSyncManager::getPrimaryTimeServerId() const
 
 std::unique_ptr<nx::network::AbstractStreamSocket> ServerTimeSyncManager::connectToRemoteHost(const QnRoute& route)
 {
-    if (route.reverseConnect && m_reverseConnectionManager)
-    {
-        const auto& target = route.gatewayId.isNull() ? route.id : route.gatewayId;
-        return m_reverseConnectionManager->getProxySocket(target, kProxySocetTimeout);
-    }
-    else
-    {
-        return base_type::connectToRemoteHost(route);
-    }
+    if (m_serverConnector)
+        return m_serverConnector->connect(route, kMaxServerConnectionTimeout);
+    return base_type::connectToRemoteHost(route);
 }
 
 void ServerTimeSyncManager::loadTimeFromInternet()
@@ -257,5 +246,5 @@ void ServerTimeSyncManager::updateTime()
     }
 }
 
-} // namespace mediaserver
+} // namespace time_sync
 } // namespace nx

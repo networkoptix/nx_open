@@ -34,7 +34,6 @@ class RemoteConnectionFactory:
 {
 public:
     RemoteConnectionFactory(
-        std::unique_ptr<nx::time_sync::TimeSyncManager> timeSynchronizationManager,
         QnCommonModule* commonModule,
         Qn::PeerType peerType,
         bool isP2pMode);
@@ -58,7 +57,7 @@ public:
         const nx::vms::api::ClientInfoData& clientInfo,
         impl::ConnectHandlerPtr handler) override;
 
-    virtual void setConfParams(std::map<QString, QVariant> confParams) override;
+    virtual void setConfParams(std::map<QString, QVariant> confParams) override;    
 
     virtual TransactionMessageBusAdapter* messageBus() const override;
     virtual nx::time_sync::TimeSyncManager* timeSyncManager() const override;

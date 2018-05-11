@@ -240,7 +240,7 @@
 #include "proxy/proxy_connection.h"
 #include "nx/mediaserver/hls/hls_session_pool.h"
 #include "nx/mediaserver/hls/hls_server.h"
-#include <nx/mediaserver/server_time_sync_manager.h>
+#include <nx/time_sync/server_time_sync_manager.h>
 #include "llutil/hardware_id.h"
 #include "api/runtime_info_manager.h"
 #include "rest/handlers/old_client_connect_rest_handler.h"
@@ -332,6 +332,7 @@ void stopServer(int signal);
 bool restartFlag = false;
 
 namespace {
+
 const QString YES = lit("yes");
 const QString NO = lit("no");
 const QString GUID_IS_HWID = lit("guidIsHWID");
@@ -373,6 +374,8 @@ void addFakeVideowallUser(QnCommonModule* commonModule)
 }
 
 } // namespace
+
+std::unique_ptr<QnStaticCommonModule> MediaServerProcess::m_staticCommonModule;
 
 #ifdef EDGE_SERVER
 static const int DEFAULT_MAX_CAMERAS = 1;
@@ -1125,6 +1128,7 @@ MediaServerProcess::~MediaServerProcess()
 {
     quit();
     stop();
+    m_staticCommonModule.reset();
 }
 
 bool MediaServerProcess::isStopping() const
@@ -3430,16 +3434,12 @@ void MediaServerProcess::run()
     runtimeData.hardwareIds = m_hardwareGuidList;
     commonModule()->runtimeInfoManager()->updateLocalItem(runtimeData);    // initializing localInfo
 
-
-    std::unique_ptr<nx::mediaserver::ServerTimeSyncManager> timeSyncManager(
-        new ServerTimeSyncManager(commonModule(), 
-            serverModule->reverseConnectionManager()));
     std::unique_ptr<ec2::LocalConnectionFactory> ec2ConnectionFactory(
         new ec2::LocalConnectionFactory(
-            std::move(timeSyncManager),
             commonModule(),
             Qn::PT_Server,
-            settings->value(nx_ms_conf::P2P_MODE_FLAG).toBool()));
+            settings->value(nx_ms_conf::P2P_MODE_FLAG).toBool(),
+            serverModule->reverseConnectionManager()));
 
     TimeBasedNonceProvider timeBasedNonceProvider;
 
@@ -4341,6 +4341,12 @@ int MediaServerProcess::main(int argc, char* argv[])
 #endif
 
     QnVideoService service( argc, argv );
+    
+    m_staticCommonModule.reset(new QnStaticCommonModule(
+        Qn::PT_Server,
+        QnAppInfo::productNameShort(),
+        QnAppInfo::customizationName()));
+
     int res = service.exec();
     if (restartFlag && res == 0)
         return 1;

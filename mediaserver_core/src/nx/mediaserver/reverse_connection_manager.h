@@ -8,11 +8,14 @@
 #include <nx/utils/thread/wait_condition.h>
 #include <nx/utils/elapsed_timer.h>
 #include <common/common_module_aware.h>
+#include <nx/vms/network/abstract_server_connector.h>
 
 namespace nx {
 namespace mediaserver {
 
-class ReverseConnectionManager: public QnCommonModuleAware
+class ReverseConnectionManager: 
+    public QnCommonModuleAware, 
+    public nx::vms::network::AbstractServerConnector
 {
 public:
     ReverseConnectionManager(QnCommonModule* commonModule);
@@ -28,6 +31,9 @@ public:
      */
     std::unique_ptr<nx::network::AbstractStreamSocket> getProxySocket(
         const QnUuid& guid, std::chrono::milliseconds timeout);
+
+    virtual std::unique_ptr<nx::network::AbstractStreamSocket> connect(
+        const QnRoute& route, std::chrono::milliseconds timeout) override;
 private:
     void doPeriodicTasks();
 private:

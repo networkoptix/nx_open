@@ -17,11 +17,11 @@
 #include "ec2_thread_pool.h"
 #include "remote_ec_connection.h"
 #include <transaction/message_bus_adapter.h>
+#include <nx/time_sync/client_time_sync_manager.h>
 
 namespace ec2 {
 
 RemoteConnectionFactory::RemoteConnectionFactory(
-    std::unique_ptr<nx::time_sync::TimeSyncManager> timeSynchronizationManager,
     QnCommonModule* commonModule,
     Qn::PeerType peerType,
     bool isP2pMode)
@@ -29,7 +29,8 @@ RemoteConnectionFactory::RemoteConnectionFactory(
     AbstractECConnectionFactory(commonModule),
     m_jsonTranSerializer(new QnJsonTransactionSerializer()),
     m_ubjsonTranSerializer(new QnUbjsonTransactionSerializer()),
-    m_timeSynchronizationManager(std::move(timeSynchronizationManager)),
+    m_timeSynchronizationManager(new nx::time_sync::ClientTimeSyncManager(
+        commonModule)),
     m_terminated(false),
     m_runningRequests(0),
     m_sslEnabled(false),

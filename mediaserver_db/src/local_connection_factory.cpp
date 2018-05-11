@@ -40,6 +40,7 @@
 
 #include <nx/p2p/p2p_server_message_bus.h>
 #include <transaction/server_transaction_message_bus.h>
+#include <nx/time_sync/server_time_sync_manager.h>
 
 using namespace nx::vms::api;
 
@@ -48,17 +49,18 @@ namespace ec2 {
 static const char* const kIncomingTransactionsPath = "ec2/forward_events";
 
 LocalConnectionFactory::LocalConnectionFactory(
-    std::unique_ptr<nx::time_sync::TimeSyncManager> timeSynchronizationManager,
     QnCommonModule* commonModule,
     Qn::PeerType peerType,
-	bool isP2pMode)
+	bool isP2pMode,
+    nx::vms::network::AbstractServerConnector* serverConnector)
 	:
     AbstractECConnectionFactory(commonModule),
 	// dbmanager is initialized by direct connection.
 
 	m_jsonTranSerializer(new QnJsonTransactionSerializer()),
 	m_ubjsonTranSerializer(new QnUbjsonTransactionSerializer()),
-    m_timeSynchronizationManager(std::move(timeSynchronizationManager)),
+    m_timeSynchronizationManager(new nx::time_sync::ServerTimeSyncManager(
+        commonModule, serverConnector)),
 	m_terminated(false),
 	m_runningRequests(0),
 	m_sslEnabled(false),

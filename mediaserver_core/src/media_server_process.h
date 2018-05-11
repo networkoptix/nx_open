@@ -29,6 +29,7 @@
 #include <nx/utils/log/log.h>
 #include <nx/utils/log/log_settings.h>
 #include <nx/vms/discovery/manager.h>
+#include <common/static_common_module.h>
 
 class QnAppserverResourceProcessor;
 class QNetworkReply;
@@ -219,6 +220,7 @@ private:
     QnUuid m_obsoleteGuid;
     std::unique_ptr<nx::utils::promise<void>> m_initStoragesAsyncPromise;
     std::weak_ptr<QnMediaServerModule> m_serverModule;
+    static std::unique_ptr<QnStaticCommonModule> m_staticCommonModule;
     const bool m_serviceMode;
     std::unique_ptr<MSSettings> m_settings;
     bool m_stopObjectsCalled = false;

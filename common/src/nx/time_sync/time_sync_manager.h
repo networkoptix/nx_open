@@ -60,10 +60,7 @@ public:
     /**
      * TimeSynchronizationManager::start MUST be called before using class instance.
      */
-    TimeSyncManager(
-        QnCommonModule* commonModule,
-        const std::shared_ptr<AbstractSystemClock>& systemClock = nullptr,
-        const std::shared_ptr<AbstractSteadyClock>& steadyClock = nullptr);
+    TimeSyncManager(QnCommonModule* commonModule);
     virtual ~TimeSyncManager();
 
     virtual void stop();
@@ -72,6 +69,10 @@ public:
 
     /** @return synchronized time (milliseconds from epoch, UTC). */
     std::chrono::milliseconds getSyncTime() const;
+
+    void setClock(
+        const std::shared_ptr<AbstractSystemClock>& systemClock,
+        const std::shared_ptr<AbstractSteadyClock>& steadyClock);
 
 signals:
     /** Emitted when synchronized time has been changed. */

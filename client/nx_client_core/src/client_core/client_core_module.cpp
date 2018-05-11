@@ -19,7 +19,6 @@
 #include <nx/utils/timer_manager.h>
 #include <nx/client/core/watchers/known_server_connections.h>
 #include <ec2/remote_connection_factory.h>
-#include <nx/client/time_sync/client_time_sync_manager.h>
 
 using namespace nx::client::core;
 
@@ -34,10 +33,7 @@ QnClientCoreModule::QnClientCoreModule(QObject* parent):
     m_commonModule->store(new QnFfmpegInitializer());
 
     NX_ASSERT(nx::utils::TimerManager::instance());
-    std::unique_ptr<nx::time_sync::ClientTimeSyncManager> timeSyncManager(
-        new nx::time_sync::ClientTimeSyncManager(m_commonModule));
     m_connectionFactory.reset(new ec2::RemoteConnectionFactory(
-        std::move(timeSyncManager),
         m_commonModule, 
         qnStaticCommon->localPeerType(),
         false));
