@@ -30,13 +30,15 @@ function openSessionsScreen()
 function openSessionsScreenWithWarning(systemName)
 {
     var item = stackView.safeReplace(null, Qt.resolvedUrl("Screens/SessionsScreen.qml"))
-    item.openConnectionWarningDialog(systemName)
+    if (item)
+        item.openConnectionWarningDialog(systemName)
 }
 
 function openNewSessionScreen()
 {
     var item = stackView.safePush(Qt.resolvedUrl("Screens/CustomConnectionScreen.qml"))
-    item.focusHostField()
+    if (item)
+        item.focusHostField()
 }
 
 function openConnectToServerScreen(host, user, password, operationId)
@@ -50,7 +52,8 @@ function openConnectToServerScreen(host, user, password, operationId)
                 "operationId": operationId
             }
     )
-    item.focusCredentialsField()
+    if (item)
+        item.focusCredentialsField()
 }
 
 function openDiscoveredSession(systemId, localSystemId, systemName, address)
@@ -64,7 +67,8 @@ function openDiscoveredSession(systemId, localSystemId, systemName, address)
                 "address": address
             }
     )
-    item.focusCredentialsField()
+    if (item)
+        item.focusCredentialsField()
 }
 
 function openSavedSession(systemId, localSystemId, systemName, address, login, password)
@@ -81,7 +85,8 @@ function openSavedSession(systemId, localSystemId, systemName, address, login, p
             "saved": true
         }
     )
-    item.focusCredentialsField()
+    if (item)
+        item.focusCredentialsField()
 }
 
 function openResourcesScreen(systemName, filterIds)
