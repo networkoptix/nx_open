@@ -63,7 +63,7 @@ Item
         onButtonPressed:
         {
             hintControl.hide()
-            switch(d.getType(index))
+            switch (d.getType(index))
             {
                 case ActionButtonsModel.PtzButton:
                     return
@@ -76,13 +76,13 @@ Item
                         d.tryActivateTrigger(index)
                     return
                 default:
-                    throw "Shouldn't get there"
+                    throw "Shouldn't get here"
             }
         }
 
         onButtonClicked:
         {
-            switch(d.getType(index))
+            switch (d.getType(index))
             {
                 case ActionButtonsModel.PtzButton:
                     control.ptzButtonClicked()
@@ -92,13 +92,13 @@ Item
                     d.handleTriggerClicked(index)
                     return
                 default:
-                    throw "Shouldn't get there"
+                    throw "Shouldn't get here"
             }
         }
 
         onLongPressedChanged:
         {
-            switch(d.getType(index))
+            switch (d.getType(index))
             {
                 case ActionButtonsModel.PtzButton:
                     return
@@ -125,7 +125,7 @@ Item
                     }
                     return
                 default:
-                    throw "Shouldn't get there"
+                    throw "Shouldn't get here"
             }
         }
 
