@@ -1242,7 +1242,7 @@ QSGGeometryNode* QnTimeline::updateChunksNode(QSGGeometryNode* chunksNode)
     colors[Qn::TimePeriodContentCount] = d->hasArchive() ? d->chunkBarColor : Qt::transparent;
     chunkPainter.setColors(colors);
     chunkPainter.start(
-        value, QRectF(0, y, liveX, height() - y),
+        value, QRectF(0, y, liveX - 1, height() - y),
         chunkCount, minimumValue, std::min(liveMs, maximumValue));
 
     while (value < kRightChunksBound)
