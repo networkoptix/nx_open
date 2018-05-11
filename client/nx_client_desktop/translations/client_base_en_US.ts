@@ -3218,10 +3218,6 @@ to %1</source>
         <translation></translation>
     </message>
     <message>
-        <source>You can create a backup for System configurations that can be restored in case of failure.</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>Database Backup Files</source>
         <translation type="unfinished"></translation>
     </message>
