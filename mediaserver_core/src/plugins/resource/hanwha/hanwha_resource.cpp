@@ -433,6 +433,9 @@ nx::core::resource::AbstractRemoteArchiveManager* HanwhaResource::remoteArchiveM
 
 QnCameraAdvancedParamValueMap HanwhaResource::getApiParameters(const QSet<QString>& ids)
 {
+    if (ids.isEmpty())
+        return QnCameraAdvancedParamValueMap();
+
     QnCameraAdvancedParamValueMap result;
 
     using ParameterList = std::vector<QString>;
@@ -564,7 +567,9 @@ QSet<QString> HanwhaResource::setApiParameters(const QnCameraAdvancedParamValueM
         return success ? QSet<QString>{buttonParameter->id} : QSet<QString>();
     }
 
-    const auto filteredParameters = filterGroupParameters(values.toValueList());
+    const auto filteredParameters =
+        addAssociatedParameters(filterGroupParameters(values.toValueList()));
+
     for (const auto& value: filteredParameters)
     {
         UpdateInfo updateInfo;
@@ -2861,6 +2866,42 @@ QnCameraAdvancedParamValueList HanwhaResource::filterGroupParameters(
     }
 
     return result;
+}
+
+QnCameraAdvancedParamValueList HanwhaResource::addAssociatedParameters(
+    const QnCameraAdvancedParamValueList& values)
+{
+    std::map<QString, QString> parameterValues;
+    for (const auto& value: values)
+        parameterValues[value.id] = value.value;
+
+    QSet<QString> parametersToFetch;
+    for (const auto& entry: parameterValues)
+    {
+        const auto& id = entry.first;
+        const auto& value = entry.second;
+
+        const auto info = advancedParameterInfo(id);
+        if (!info)
+            continue;
+
+        const auto associatedParameters = info->associatedParameters();
+        if (associatedParameters.empty())
+            continue;
+
+        for (const auto& associatedParameter: associatedParameters)
+        {
+            if (parameterValues.find(associatedParameter) != parameterValues.cend())
+                continue; //< Parameter is already present.
+
+            parametersToFetch.insert(associatedParameter);
+        }
+    }
+
+    auto associatedParameterValues = getApiParameters(parametersToFetch);
+    associatedParameterValues.appendValueList(values);
+
+    return associatedParameterValues.toValueList();
 }
 
 QString HanwhaResource::groupLead(const QString& groupName) const
