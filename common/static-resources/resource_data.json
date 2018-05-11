@@ -503,6 +503,7 @@
                 "*|DW-CP04", "*|DW-CP16",
                 "Avigilon|ENC-*",
                 "ACTI|V32", "ACTi Corporation|V32",
+                "ACTI|V23", "ACTi Corporation|V23",
                 "BOSCH|VIP-X1600-XFM4",
                 "Axis|AXISM7014*",
                 "Axis|AXISM7016*",
@@ -721,7 +722,9 @@
         {
             "keys": [
                 "ACTI|V32",
-                "ACTi Corporation|V32"
+                "ACTi Corporation|V32",
+                "ACTI|V23",
+                "ACTi Corporation|V23"
             ],
             "forceONVIF": true
         },
@@ -792,7 +795,7 @@
         },
         {
             "keys": [
-                "ACTi|V32"
+                "ACTi|V32", "ACTi|V23"
             ],
             "defaultAR": "16x9",
             "ptzTraits": "EightWayPtz"
