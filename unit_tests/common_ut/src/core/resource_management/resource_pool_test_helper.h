@@ -31,8 +31,9 @@ public:
     QnLayoutResourcePtr createLayout();
     QnLayoutResourcePtr addLayout();
 
-    nx::CameraResourceStubPtr createCamera(Qn::LicenseType licenseType = Qn::LC_Professional);
-    nx::CameraResourceStubPtr addCamera(Qn::LicenseType licenseType = Qn::LC_Professional);
+    static constexpr auto kUseDefaultLicense = Qn::LC_Count;
+    nx::CameraResourceStubPtr createCamera(Qn::LicenseType licenseType = kUseDefaultLicense);
+    nx::CameraResourceStubPtr addCamera(Qn::LicenseType licenseType = kUseDefaultLicense);
 
     QnWebPageResourcePtr addWebPage();
 
