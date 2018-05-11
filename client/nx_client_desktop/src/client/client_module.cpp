@@ -584,7 +584,9 @@ void QnClientModule::initSkin(const QnStartupParameters& startupParams)
     /* Initialize application UI. Skip if run in console (e.g. unit-tests). */
     if (qApp)
     {
-        QnFontLoader::loadFonts(QDir(QApplication::applicationDirPath()).absoluteFilePath(lit("fonts")));
+        QnFontLoader::loadFonts(QDir(QApplication::applicationDirPath()).absoluteFilePath(
+            nx::utils::AppInfo::isMacOsX() ? lit("../Resources/fonts") : lit("fonts")));
+
         QApplication::setWindowIcon(qnSkin->icon(":/logo.png"));
         QApplication::setStyle(skin->newStyle(customizer->genericPalette()));
     }
