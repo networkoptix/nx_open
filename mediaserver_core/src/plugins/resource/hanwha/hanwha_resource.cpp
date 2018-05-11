@@ -433,6 +433,9 @@ nx::core::resource::AbstractRemoteArchiveManager* HanwhaResource::remoteArchiveM
 
 QnCameraAdvancedParamValueMap HanwhaResource::getApiParameters(const QSet<QString>& ids)
 {
+    if (ids.isEmpty())
+        return QnCameraAdvancedParamValueMap();
+
     QnCameraAdvancedParamValueMap result;
 
     using ParameterList = std::vector<QString>;
@@ -564,7 +567,9 @@ QSet<QString> HanwhaResource::setApiParameters(const QnCameraAdvancedParamValueM
         return success ? QSet<QString>{buttonParameter->id} : QSet<QString>();
     }
 
-    const auto filteredParameters = filterGroupParameters(values.toValueList());
+    const auto filteredParameters =
+        addAssociatedParameters(filterGroupParameters(values.toValueList()));
+
     for (const auto& value: filteredParameters)
     {
         UpdateInfo updateInfo;
@@ -953,10 +958,7 @@ CameraDiagnostics::Result HanwhaResource::initSystem()
     if (!info)
         return info.diagnostics;
 
-    m_deviceType = QnLexical::deserialized<HanwhaDeviceType>(
-        info->deviceType,
-        HanwhaDeviceType::unknown);
-
+    m_deviceType = info->deviceType;
     const auto nxDeviceType = fromHanwhaToNxDeviceType(deviceType());
 
     // Set device type only for NVRs and encoders due to optimization purposes.
@@ -998,7 +1000,16 @@ CameraDiagnostics::Result HanwhaResource::initSystem()
                     lit("Can't fetch proxied device CGI parameters"));
             }
 
-            m_proxiedDeviceChannelCount = m_bypassDeviceAttributes.numberOfChannels();
+            const auto proxiedChannelCount = m_bypassDeviceAttributes
+                .attribute<int>(lit("System/MaxChannel"));
+
+            if (proxiedChannelCount == boost::none)
+            {
+                return CameraDiagnostics::CameraInvalidParams(
+                    lit("Can't fetch proxied channel count"));
+            }
+
+            m_proxiedDeviceChannelCount = proxiedChannelCount.get();
 
             const auto proxiedDeviceInfo = helper.view(lit("system/deviceinfo"));
             handleProxiedDeviceInfo(proxiedDeviceInfo);
@@ -2861,6 +2872,42 @@ QnCameraAdvancedParamValueList HanwhaResource::filterGroupParameters(
     }
 
     return result;
+}
+
+QnCameraAdvancedParamValueList HanwhaResource::addAssociatedParameters(
+    const QnCameraAdvancedParamValueList& values)
+{
+    std::map<QString, QString> parameterValues;
+    for (const auto& value: values)
+        parameterValues[value.id] = value.value;
+
+    QSet<QString> parametersToFetch;
+    for (const auto& entry: parameterValues)
+    {
+        const auto& id = entry.first;
+        const auto& value = entry.second;
+
+        const auto info = advancedParameterInfo(id);
+        if (!info)
+            continue;
+
+        const auto associatedParameters = info->associatedParameters();
+        if (associatedParameters.empty())
+            continue;
+
+        for (const auto& associatedParameter: associatedParameters)
+        {
+            if (parameterValues.find(associatedParameter) != parameterValues.cend())
+                continue; //< Parameter is already present.
+
+            parametersToFetch.insert(associatedParameter);
+        }
+    }
+
+    auto associatedParameterValues = getApiParameters(parametersToFetch);
+    associatedParameterValues.appendValueList(values);
+
+    return associatedParameterValues.toValueList();
 }
 
 QString HanwhaResource::groupLead(const QString& groupName) const
