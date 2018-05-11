@@ -958,10 +958,7 @@ CameraDiagnostics::Result HanwhaResource::initSystem()
     if (!info)
         return info.diagnostics;
 
-    m_deviceType = QnLexical::deserialized<HanwhaDeviceType>(
-        info->deviceType,
-        HanwhaDeviceType::unknown);
-
+    m_deviceType = info->deviceType;
     const auto nxDeviceType = fromHanwhaToNxDeviceType(deviceType());
 
     // Set device type only for NVRs and encoders due to optimization purposes.

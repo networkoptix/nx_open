@@ -83,7 +83,7 @@ private:
         int numberOfChannels = 0;
         nx::core::resource::DeviceType deviceType = nx::core::resource::DeviceType::unknown;
 
-        bool isValid()
+        bool isValid() const
         {
             return numberOfChannels != 0
                 && deviceType != nx::core::resource::DeviceType::unknown;

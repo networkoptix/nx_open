@@ -28,7 +28,7 @@ static const std::chrono::seconds kUnsuccessfulUpdateCacheTimeout(10);
 
 struct HanwhaInformation
 {
-    QString deviceType;
+    HanwhaDeviceType deviceType;
     QString firmware;
     QString macAddress;
     QString model;
