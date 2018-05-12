@@ -203,7 +203,7 @@ std::unique_ptr<AbstractStreamSocket> StreamServerSocket::acceptBlocking()
         > accepted;
 
     acceptAsync(
-        [this, &accepted](
+        [&accepted](
             SystemError::ErrorCode systemErrorCode,
             std::unique_ptr<AbstractStreamSocket> connection)
         {

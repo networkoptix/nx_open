@@ -93,7 +93,7 @@ public:
             });
     }
 
-    void acceptAsync(AcceptCompletionHandler handler)
+    virtual void acceptAsync(AcceptCompletionHandler handler) override
     {
         m_acceptCallScheduler.post(
             [this, handler = std::move(handler)]() mutable
@@ -109,7 +109,7 @@ public:
             });
     }
 
-    void cancelIOSync()
+    virtual void cancelIOSync() override
     {
         if (isInSelfAioThread())
         {

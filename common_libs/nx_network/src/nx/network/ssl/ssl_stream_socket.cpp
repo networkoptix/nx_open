@@ -207,7 +207,7 @@ void StreamSocket::handshakeAsync(
 
     m_asyncTransformingChannel->sendAsync(
         m_emptyBuffer,
-        [this, handler = std::move(handler)](
+        [handler = std::move(handler)](
             SystemError::ErrorCode systemErrorCode,
             std::size_t /*bytesSent*/)
         {
