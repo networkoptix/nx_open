@@ -230,6 +230,17 @@ QWidget* CameraAdvancedParamWidgetsManager::createWidgetsForPage(
     auto gridLayout = new QGridLayout(scrollAreaWidgetContents);
     scrollArea->setWidget(scrollAreaWidgetContents);
 
+    // Container for a group of 'compact' widgets
+    QHBoxLayout* compactLayout = nullptr;
+    auto checkFinishGroup = [&compactLayout]()
+        {
+            if (compactLayout)
+            {
+                compactLayout->addStretch(1);
+                compactLayout = nullptr;
+            }
+        };
+
     for (const auto& param : params)
     {
         m_parametersById[param.id] = param;
@@ -241,36 +252,49 @@ QWidget* CameraAdvancedParamWidgetsManager::createWidgetsForPage(
 
         if (param.dataType == QnCameraAdvancedParameter::DataType::Separator)
         {
+            checkFinishGroup();
             gridLayout->addWidget(widget, row, 0, 1, 2);
             continue;
         }
 
-        // Column span for a control
-        int colSpan = 1;
-        
-        bool hasLabel = false;
-
-        if (param.dataType != QnCameraAdvancedParameter::DataType::Button
-            && param.dataType != QnCameraAdvancedParameter::DataType::LensControl)
+        if (param.compact)
         {
-            auto label = new QLabel(scrollAreaWidgetContents);
-            label->setToolTip(param.description);
-            setLabelText(label, param, param.range);
-            label->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
-            label->setBuddy(widget);
-            gridLayout->addWidget(label, row, 0);
-            m_paramLabelsById[param.id] = label;
-            label->setFixedWidth(kParameterLabelWidth);
-            label->setWordWrap(true);
-            hasLabel = true;
+            if (!compactLayout)
+            {
+                // Creating container for compact controls
+                compactLayout = new QHBoxLayout(m_contentsWidget);
+                compactLayout->addWidget(widget, 0, Qt::AlignRight);
+                gridLayout->addLayout(compactLayout, row, 0, 1, 2, Qt::AlignVCenter);
+            }
+            else
+            {
+                // Adding a widget to existing contaner for compact control group
+                compactLayout->addWidget(widget, 0, Qt::AlignRight);
+            }
         }
         else
         {
-            hasLabel = false;
-            colSpan = 2;
+            checkFinishGroup();
+
+            if (param.dataType == QnCameraAdvancedParameter::DataType::Button)
+            {
+                gridLayout->addWidget(widget, row, 0, 2, 1, Qt::AlignVCenter);
+            }
+            else
+            {
+                auto label = new QLabel(scrollAreaWidgetContents);
+                label->setToolTip(param.description);
+                setLabelText(label, param, param.range);
+                label->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
+                label->setBuddy(widget);
+                gridLayout->addWidget(label, row, 0);
+                m_paramLabelsById[param.id] = label;
+                label->setFixedWidth(kParameterLabelWidth);
+                label->setWordWrap(true);
+                gridLayout->addWidget(widget, row, 1, 1, 1, Qt::AlignVCenter);
+            }
         }
 
-        gridLayout->addWidget(widget, row, hasLabel ? 1:0, 1, colSpan, Qt::AlignVCenter);
         m_paramWidgetsById[param.id] = widget;
 
         /* Widget is disabled until it receives correct value. */
@@ -284,7 +308,7 @@ QWidget* CameraAdvancedParamWidgetsManager::createWidgetsForPage(
                 &CameraAdvancedParamWidgetsManager::paramValueChanged);
         }
 
-        if (!param.notes.isEmpty())
+        if (!param.notes.isEmpty() && !param.compact)
         {
             auto label = new QLabel(scrollAreaWidgetContents);
             label->setWordWrap(true);
@@ -292,6 +316,7 @@ QWidget* CameraAdvancedParamWidgetsManager::createWidgetsForPage(
             gridLayout->addWidget(label, row + 1, 1);
         }
     }
+    checkFinishGroup();
 
     gridLayout->setColumnStretch(1, 1);
 

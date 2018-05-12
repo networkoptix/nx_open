@@ -38,12 +38,12 @@ static const int kSharePixelsDefaultReservedSecondStreamFps = 0;
 static const Qn::StreamFpsSharingMethod kDefaultStreamFpsSharingMethod = Qn::PixelsFpsSharing;
 //static const Qn::MotionType defaultMotionType = Qn::MotionType::MT_MotionWindow;
 
-bool stringEmptinessChecker(const QString& value)
+bool isStringEmpty(const QString& value)
 {
     return value.isEmpty();
 };
 
-bool deviceTypeEmptinessChecker(nx::core::resource::DeviceType value)
+bool isDeviceTypeEmpty(nx::core::resource::DeviceType value)
 {
     return value == nx::core::resource::DeviceType::unknown;
 };
@@ -137,6 +137,12 @@ QnSecurityCamResource::QnSecurityCamResource(QnCommonModule* commonModule):
         {
             if (key == Qn::CAMERA_CAPABILITIES_PARAM_NAME)
                 emit capabilitiesChanged(toSharedPointer());
+
+            if (key == Qn::DTS_PARAM_NAME)
+                emit licenseTypeChanged(toSharedPointer(this));
+
+            if (key == Qn::kDeviceType)
+                emit licenseTypeChanged(toSharedPointer(this));
         });
 
     QnMediaResource::initMediaResource();
@@ -527,8 +533,9 @@ nx::core::resource::DeviceType QnSecurityCamResource::deviceType() const
 
 void QnSecurityCamResource::setDeviceType(nx::core::resource::DeviceType deviceType)
 {
-    setProperty(Qn::kDeviceType, QnLexical::serialized(deviceType));
     m_cachedDeviceType.reset();
+    m_cachedLicenseType.reset();
+    setProperty(Qn::kDeviceType, QnLexical::serialized(deviceType));
 }
 
 Qn::LicenseType QnSecurityCamResource::licenseType() const
@@ -1255,23 +1262,23 @@ bool QnSecurityCamResource::mergeResourcesIfNeeded(const QnNetworkResourcePtr &s
     mergeValue(
         &QnSecurityCamResource::getGroupId,
         &QnSecurityCamResource::setGroupId,
-        stringEmptinessChecker);
+        isStringEmpty);
     mergeValue(
         &QnSecurityCamResource::getGroupName,
         &QnSecurityCamResource::setGroupName,
-        stringEmptinessChecker);
+        isStringEmpty);
     mergeValue(
         &QnSecurityCamResource::getModel,
         &QnSecurityCamResource::setModel,
-        stringEmptinessChecker);
+        isStringEmpty);
     mergeValue(
         &QnSecurityCamResource::getVendor,
         &QnSecurityCamResource::setVendor,
-        stringEmptinessChecker);
+        isStringEmpty);
     mergeValue(
         &QnSecurityCamResource::deviceType,
         &QnSecurityCamResource::setDeviceType,
-        deviceTypeEmptinessChecker);
+        isDeviceTypeEmpty);
     return result;
 }
 

@@ -779,6 +779,7 @@ namespace detail
         bool syncLicensesBetweenDB();
         bool encryptKvPairs();
         bool fixDefaultBusinessRuleGuids();
+        bool updateBusinessRulesTransactions();
 
         ErrorCode getLicenses(ApiLicenseDataList& data, QSqlDatabase& database);
 

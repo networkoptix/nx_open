@@ -82,7 +82,7 @@ private:
 };
 
 // Threshold for expanding camera list.
-const int kAutoExpandThreshold = 100;
+const int kAutoExpandThreshold = 50;
 
 } // namespace
 
@@ -158,19 +158,22 @@ void QnResourceSelectionDialog::initModel()
 
     m_resourceModel = new QnResourceTreeModel(scope, this);
 
-    // For the sake of VMS-9698 we do apply auto-expanding policy.
-    // Expanding all cameras only if (numberOfServers - 1) * numberOfCameras <= 100
-    if (auto treeRoot = m_resourceModel->rootNode(ResourceTreeNodeType::servers))
+    // For the sake of VMS-9733 we do apply auto-expanding policy.
+    // Means expand if and only if server count <= 1 or cameras count <= 50.
+    if (scope == QnResourceTreeModel::CamerasScope)
     {
-        int numServers = treeRoot->children().size();
-        int numResources = treeRoot->childrenRecursive().size() - numServers;
-        bool expandAll = std::max(numServers - 1, 0) * numResources <= kAutoExpandThreshold;
+    if (auto treeRoot = m_resourceModel->rootNode(ResourceTreeNodeType::servers))
+        {
+            int numServers = treeRoot->children().size();
+            int numResources = treeRoot->childrenRecursive().size() - numServers;
+            bool expandAll = numServers <= 1 || numResources <= kAutoExpandThreshold;
 
-        auto expandPolicy = [this, expandAll](const QModelIndex& index)
+            auto expandPolicy = [expandAll](const QModelIndex& index)
             {
                 return expandAll;
             };
-        ui->resourcesWidget->setAutoExpandPolicy(expandPolicy);
+            ui->resourcesWidget->setAutoExpandPolicy(expandPolicy);
+        }
     }
 
     connect(m_resourceModel, &QnResourceTreeModel::dataChanged, this,

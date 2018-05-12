@@ -23,6 +23,7 @@ static const QString kGropupIncludeAux = lit("groupInclude");
 static const QString kStreamsToReopenAux = lit("streamsToReopen");
 static const QString kShouldAffectAllChannels = lit("shouldAffectAllChannels");
 static const QString kDeviceTypesAux = lit("deviceTypes");
+static const QString kAssociatedParametersAux = lit("associatedWith");
 
 static const QString kPrimaryProfile = lit("primary");
 static const QString kSecondaryProfile = lit("secondary");
@@ -199,6 +200,11 @@ bool HanwhaAdavancedParameterInfo::isDeviceTypeSupported(HanwhaDeviceType device
     return m_deviceTypes.find(deviceType) != m_deviceTypes.cend();
 }
 
+QSet<QString> HanwhaAdavancedParameterInfo::associatedParameters() const
+{
+    return m_associatedParameters;
+}
+
 bool HanwhaAdavancedParameterInfo::isValid() const
 {
     return (!m_cgi.isEmpty()
@@ -267,11 +273,18 @@ void HanwhaAdavancedParameterInfo::parseAux(const QString& auxString)
             for (const auto& deviceTypeString: split)
             {
                 const auto deviceType = QnLexical::deserialized<HanwhaDeviceType>(
-                    deviceTypeString,
+                    deviceTypeString.trimmed(),
                     HanwhaDeviceType::unknown);
 
                 m_deviceTypes.insert(deviceType);
             }
+        }
+        if (auxName == kAssociatedParametersAux)
+        {
+            m_associatedParameters.clear();
+            const auto split = auxValue.split(L',');
+            for (const auto& parameterId: split)
+                m_associatedParameters.insert(parameterId.trimmed());
         }
     }
 }

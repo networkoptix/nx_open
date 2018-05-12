@@ -8,6 +8,7 @@
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/abstract_remote_archive_manager.h>
 #include <nx/utils/log/log.h>
+#include <nx/fusion/serialization/lexical.h>
 
 namespace nx {
 namespace mediaserver_core {
@@ -301,7 +302,11 @@ HanwhaResult<HanwhaInformation> HanwhaSharedResourceContext::loadInformation()
         info.model = *value;
 
     if (const auto value = deviceinfo.parameter<QString>(lit("DeviceType")))
-        info.deviceType = value->trimmed();
+    {
+        info.deviceType = QnLexical::deserialized<HanwhaDeviceType>(
+            value->trimmed(),
+            HanwhaDeviceType::unknown);
+    }
 
     if (const auto value = deviceinfo.parameter<QString>(lit("FirmwareVersion")))
         info.firmware = value->trimmed();
