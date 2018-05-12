@@ -27,7 +27,7 @@ public:
     Ec2MserverCloudSynchronization();
     ~Ec2MserverCloudSynchronization();
 
-    utils::test::ModuleLauncher<::ec2::Appserver2ProcessPublic>* appserver2();
+    utils::test::ModuleLauncher<::ec2::Appserver2Process>* appserver2();
     CdbLauncher* cdb();
     const CdbLauncher* cdb() const;
     api::ResultCode setOwnerAccountCredentials(
@@ -89,7 +89,7 @@ protected:
 
 private:
     QnStaticCommonModule m_staticCommonModule;
-    utils::test::ModuleLauncher<::ec2::Appserver2ProcessPublic> m_appserver2;
+    utils::test::ModuleLauncher<::ec2::Appserver2Process> m_appserver2;
     CdbLauncher m_cdb;
     AccountWithPassword m_account;
     api::SystemData m_system;

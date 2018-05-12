@@ -15,7 +15,7 @@ namespace nx {
 namespace p2p {
 namespace test {
 
-using Appserver2 = nx::utils::test::ModuleLauncher<::ec2::Appserver2ProcessPublic>;
+using Appserver2 = nx::utils::test::ModuleLauncher<::ec2::Appserver2Process>;
 using Appserver2Ptr = std::unique_ptr<Appserver2>;
 
 /**
