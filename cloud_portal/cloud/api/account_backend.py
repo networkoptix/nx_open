@@ -6,6 +6,8 @@ from django.contrib.auth.backends import ModelBackend
 from api.helpers.exceptions import APIRequestException, APIException, APILogicException, ErrorCodes
 from django.core.exceptions import ObjectDoesNotExist
 from cloud import settings
+from django.contrib.auth.signals import user_logged_in, user_logged_out, user_login_failed
+from django.dispatch import receiver
 
 import logging
 logger = logging.getLogger(__name__)
@@ -99,3 +101,25 @@ class AccountManager(db.models.Manager):
 
     def create_superuser(self, email, password, **extra_fields):
         return self._create_user(email, password, **extra_fields)
+
+
+
+
+@receiver(user_logged_in)
+def user_logged_in_callback(sender, request, user, **kwargs):
+    ip = request.META.get('REMOTE_ADDR')
+    logger.info('User logged in: {}, IP: {}'.format(user.email, ip))
+    models.AccountLoginHistory.objects.create(action='user_logged_in', ip=ip, email=user.email)
+
+
+@receiver(user_logged_out)
+def user_logged_out_callback(sender, request, user, **kwargs):
+    ip = request.META.get('REMOTE_ADDR')
+    logger.info('User logged our: {}, IP: {}'.format(user.email, ip))
+    models.AccountLoginHistory.objects.create(action='user_logged_out', ip=ip, email=user.email)
+
+
+@receiver(user_login_failed)
+def user_login_failed_callback(sender, credentials, **kwargs):
+    logger.info('Failed login attempt: {}'.format(credentials.get('username', None)))
+    models.AccountLoginHistory.objects.create(action='user_login_failed', email=credentials.get('username', None))

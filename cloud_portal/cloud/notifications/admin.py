@@ -27,11 +27,11 @@ class MessageAdmin(admin.ModelAdmin):
 
     def clean_old_messages(self, request, queryset):
         from datetime import datetime, timedelta
-        cutoff_date = datetime.now() - timedelta(days=settings.CLEAN_TASKS_AND_MSGS_OLDER_THAN_X_DAYS)
+        cutoff_date = datetime.now() - timedelta(days=settings.CLEAR_HISTORY_RECORDS_OLDER_THAN_X_DAYS)
         Message.objects.filter(send_date__lt=cutoff_date).delete()
 
     clean_old_messages.short_description = "Remove messages older than {} days"\
-        .format(settings.CLEAN_TASKS_AND_MSGS_OLDER_THAN_X_DAYS)
+        .format(settings.CLEAR_HISTORY_RECORDS_OLDER_THAN_X_DAYS)
 
 
 admin.site.register(Message, MessageAdmin)
@@ -132,11 +132,11 @@ class TaskResultAdmin(admin.ModelAdmin):
 
     def clean_old_tasks(self, request, queryset):
         from datetime import datetime, timedelta
-        cutoff_date = datetime.now() - timedelta(days=settings.CLEAN_TASKS_AND_MSGS_OLDER_THAN_X_DAYS)
+        cutoff_date = datetime.now() - timedelta(days=settings.CLEAR_HISTORY_RECORDS_OLDER_THAN_X_DAYS)
         TaskResult.objects.filter(date_done__lt=cutoff_date).delete()
 
     clean_old_tasks.short_description = "Remove tasks older than {} days"\
-        .format(settings.CLEAN_TASKS_AND_MSGS_OLDER_THAN_X_DAYS)
+        .format(settings.CLEAR_HISTORY_RECORDS_OLDER_THAN_X_DAYS)
 
 
 admin.site.register(TaskResult, TaskResultAdmin)
