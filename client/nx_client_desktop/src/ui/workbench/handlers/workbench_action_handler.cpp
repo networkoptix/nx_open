@@ -704,7 +704,7 @@ void ActionHandler::showEula()
     textEdit->setPlainText(eulaText);
     textEdit->setReadOnly(true);
     textEdit->setFixedSize(740, 560);
-    eulaDialog.addCustomWidget(textEdit, QnMessageBox::Layout::Content, 1);
+    eulaDialog.addCustomWidget(textEdit);
     eulaDialog.addButton(tr("Accept"), QDialogButtonBox::AcceptRole, Qn::ButtonAccent::Standard);
     eulaDialog.addButton(tr("Decline"), QDialogButtonBox::RejectRole);
 
