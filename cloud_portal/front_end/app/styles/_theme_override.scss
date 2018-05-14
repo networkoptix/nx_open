@@ -81,53 +81,6 @@ h1>.label{
   overflow: auto;
 }
 
-.modal-old {
-  &.fade .modal-dialog {
-    transform : translate(0, -20px);
-    transition: 0.1s ease-out;
-  }
-
-  &.in .modal-dialog {
-    transform : translate(0, 0);
-  }
-
-  .modal-body{
-    padding-top: 0;
-    padding-bottom: 0;
-  }
-
-  .modal-footer{
-    padding-top: 0;
-    margin-top: 0;
-    text-align: left;
-    white-space: nowrap;
-
-    &>button,
-    & .process-button {
-      margin-right:8px;
-    }
-  }
-  .modal-title{
-    margin-right: 24px;
-  }
-  .modal-header .close{
-    position: absolute;
-    right: 0;
-    top: 2px;
-    width:40px;
-    height:40px;
-
-    &:hover{
-      background-color: $light2;
-    }
-  }
-
-  .help-block{ /* Do not jump modal size when help block changes (help-block is below the input)*/
-    min-height:40px;
-    background-color: $modal-content-bg;
-  }
-}
-
 
 @media (min-width: $dialog-sm-float-breakpoint) {
   .modal-sm {

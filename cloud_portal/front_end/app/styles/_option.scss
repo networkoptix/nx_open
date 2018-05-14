@@ -12,13 +12,39 @@
     -moz-user-select: none;
     -ms-user-select: none;
     user-select: none;
-}
 
-/* Hide the browser's default checkbox */
-.option input {
-    position: absolute;
-    opacity: 0;
-    cursor: pointer;
+    /* Hide the browser's default checkbox */
+    & input {
+        position: absolute;
+        opacity: 0;
+        cursor: pointer;
+    }
+
+    /* On mouse-over, add a grey background color */
+    &:hover input ~ .optionmark {
+        background-color: #ccc;
+    }
+
+    /* When the checkbox is checked, add a blue background */
+    & input:checked ~ .optionmark {
+        background-color: transparent;
+    }
+
+    /* Show the checkmark when checked */
+    & input:checked ~ .optionmark:after {
+        display: block;
+    }
+
+    /* Style the checkmark/indicator */
+    & .optionmark:after {
+        left: 2px;
+        top: 2px;
+        width: 10px;
+        height: 10px;
+        border: solid $brand_core;
+        background-color: $brand_core;
+        border-radius: 10px;
+    }
 }
 
 /* Create a custom checkbox */
@@ -30,37 +56,11 @@
     width: 16px;
     border: 1px solid $light5;
     border-radius: 20px;
-}
 
-/* On mouse-over, add a grey background color */
-.option:hover input ~ .optionmark {
-    background-color: #ccc;
-}
-
-/* When the checkbox is checked, add a blue background */
-.option input:checked ~ .optionmark {
-    background-color: transparent;
-}
-
-/* Create the checkmark/indicator (hidden when not checked) */
-.optionmark:after {
-    content: "";
-    position: absolute;
-    display: none;
-}
-
-/* Show the checkmark when checked */
-.option input:checked ~ .optionmark:after {
-    display: block;
-}
-
-/* Style the checkmark/indicator */
-.option .optionmark:after {
-    left: 2px;
-    top: 2px;
-    width: 10px;
-    height: 10px;
-    border: solid $brand_core;
-    background-color: $brand_core;
-    border-radius: 10px;
+    /* Create the checkmark/indicator (hidden when not checked) */
+    &:after {
+        content: "";
+        position: absolute;
+        display: none;
+    }
 }

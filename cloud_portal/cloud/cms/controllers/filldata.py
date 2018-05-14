@@ -45,7 +45,7 @@ def process_context_structure(customization, context, content, language, version
                     if type(item) in [str, unicode]:
                         idx = adict[dict_key].index(item)
                         adict[dict_key][idx] = item.replace(key, value)
-                    else:
+                    elif item in [dict, list]:
                         replace_in(item, key, value)
 
             elif itm_type is dict:
@@ -96,21 +96,21 @@ def save_content(filename, content):
 
 def process_context(context, language_code, customization, preview, version_id, global_contexts):
     language = Language.by_code(language_code, customization.default_language)
-    context_template_text = context.template_for_language(language)
+    context_template = context.template_for_language(language)
     is_json = False
 
     # check if the file is language JSON
-    if context.file_path.endswith(".json") and isinstance(context_template_text, unicode):
+    if context.file_path.endswith(".json") and isinstance(context_template, unicode):
         try:
-            context_template_text = json.loads(context_template_text)
+            context_template = json.loads(context_template)
             is_json = True
         except ValueError:
             print("Failed to decode file -> " + context.file_path)
 
-    if not context_template_text:
-        context_template_text = ''
+    if not context_template:
+        context_template = ''
 
-    content = process_context_structure(customization, context, context_template_text, language,
+    content = process_context_structure(customization, context, context_template, language,
                                         version_id, preview, context.is_global, is_json)  # if context is global - process it
     if not context.is_global:  # if current context is global - do not apply other contexts
         for global_context in global_contexts.all():
