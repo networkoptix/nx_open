@@ -10,12 +10,6 @@
 
 #include <ui/common/aligner.h>
 
-namespace {
-
-
-
-} // namespace
-
 namespace nx {
 namespace client {
 namespace desktop {

@@ -4,9 +4,7 @@
 
 #include "../models/camera_streams_model.h"
 
-namespace Ui {
-class CameraStreamsDialog;
-}
+namespace Ui { class CameraStreamsDialog; }
 
 namespace nx {
 namespace client {
@@ -25,7 +23,7 @@ public:
     void setModel(const CameraStreamsModel& model);
 
 private:
-    QScopedPointer<Ui::CameraStreamsDialog> ui;
+    const QScopedPointer<Ui::CameraStreamsDialog> ui;
 };
 
 } // namespace desktop
