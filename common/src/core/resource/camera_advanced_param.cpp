@@ -79,6 +79,20 @@ QnCameraAdvancedParamValueList QnCameraAdvancedParamValueMap::difference(const Q
     return result;
 }
 
+QnCameraAdvancedParamValueMap QnCameraAdvancedParamValueMap::differenceMap(
+    const QnCameraAdvancedParamValueMap & other) const
+{
+    QnCameraAdvancedParamValueMap result;
+    for (auto iter = this->cbegin(); iter != this->cend(); ++iter)
+    {
+        if (other.contains(iter.key()) && other[iter.key()] == iter.value())
+            continue;
+
+        result[iter.key()] = iter.value();
+    }
+    return result;
+}
+
 bool QnCameraAdvancedParamValueMap::differsFrom(const QnCameraAdvancedParamValueMap &other) const
 {
     for (auto it = this->cbegin(); it != this->cend(); ++it)

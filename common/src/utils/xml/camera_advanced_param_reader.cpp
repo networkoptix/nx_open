@@ -177,6 +177,7 @@ namespace QnXmlTag {
     const QString paramDefaultValue     = lit("defaultValue");
     const QString paramShouldKeepInitialValue = lit("shouldKeepInitialValue");
     const QString paramBindDefaultToMinimum = lit("bindDefaultToMinimum");
+    const QString parameterGroup = lit("group");
 
     const QString dependenciesRoot          = lit("dependencies");
     const QString dependenciesShow          = lit("dependencies-ranges");
@@ -287,6 +288,8 @@ bool QnCameraAdvacedParamsXmlParser::parseElementXml(const QDomElement& elementX
 
     param.bindDefaultToMinimum = parseBooleanXmlValue(
         elementXml.attribute(QnXmlTag::paramBindDefaultToMinimum));
+
+    param.group = elementXml.attribute(QnXmlTag::parameterGroup);
 
     auto childNodes = elementXml.childNodes();
 
