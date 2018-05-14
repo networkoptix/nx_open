@@ -6,8 +6,6 @@ extern "C"
 #include <libavcodec/avcodec.h>
 #include <libavformat/avformat.h>
 }
-
-//#include "libav_forward_declarations.h"
 #include "av_string_error.h"
 
 class AVCodecContainer
@@ -19,15 +17,24 @@ public:
     void open();
     void close();
 
+    int readFrame(AVPacket * outPacket);
+
     int encodeVideo(AVPacket *outPacket, const AVFrame *frame, int *outGotPacket);
-    int decodeVideo(AVFrame * outFrame, int* outGotPicture, AVPacket * packet);
+    int decodeVideo(AVFrame *outFrame, int *outGotPicture, AVPacket *packet);
+
+    int encodeAudio(AVPacket *outPacket, const AVFrame *frame, int *outGotPacket);
+    int decodeAudio(AVFrame * frame, int* outGotFrame, const AVPacket *packet);
     
     void initializeEncoder(AVCodecID codecID);
     void initializeDecoder(AVCodecParameters * codecParameters);
+    void initializeDecoder(AVCodecID codecID);
     bool isValid();
 
-    AVCodecContext* getCodecContext();
-    QString getAvError();
+
+    AVCodecContext* codecContext();
+    AVCodecID codecID();
+
+    QString avErrorString();
 
 private:
     AVFormatContext * m_formatContext;

@@ -14,7 +14,7 @@
 #endif
 #include <cstdio>
 #ifdef _WIN32
-#include "dshow.h"
+#include "dshow_utils.h"
 #elif __linux__
 #elif __APPLE__
 #endif
@@ -28,60 +28,33 @@
 
 namespace {
 
-#ifdef _WIN32
-    /**
-    * shamelessly borrowed from: https://ffmpeg.zeranoe.com/forum/viewtopic.php?t=651
-    */
-    QList<QString> dshowListDevices()
-    {
-        QList<QString> deviceNames;
-        ICreateDevEnum *pDevEnum;
-        HRESULT hr = CoCreateInstance(CLSID_SystemDeviceEnum, 0, CLSCTX_INPROC_SERVER, IID_ICreateDevEnum, (void**) &pDevEnum);
-        if (FAILED(hr))
-            return deviceNames;
-
-        IEnumMoniker *pEnum;
-        hr = pDevEnum->CreateClassEnumerator(CLSID_VideoInputDeviceCategory, &pEnum, 0);
-        if (FAILED(hr))
-            return deviceNames;
-
-        IMoniker *pMoniker = NULL;
-        while (S_OK == pEnum->Next(1, &pMoniker, NULL))
-        {
-            IPropertyBag *pPropBag;
-            LPOLESTR str = 0;
-            hr = pMoniker->GetDisplayName(0, 0, &str);
-            if (SUCCEEDED(hr))
-            {
-                hr = pMoniker->BindToStorage(0, 0, IID_IPropertyBag, (void**) &pPropBag);
-                if (SUCCEEDED(hr))
-                {
-                    VARIANT var;
-                    VariantInit(&var);
-                    hr = pPropBag->Read(L"FriendlyName", &var, 0);
-                    QString fName = QString::fromWCharArray(var.bstrVal);
-                    deviceNames.append(fName);
-                }
-            }
-        }
-        return deviceNames;
-    }
-#endif
-
-int dummyFindCameras(nxcip::CameraInfo* cameras, const char* /*localInterfaceIPAddr*/)
+int findDShowCameras(nxcip::CameraInfo * cameras, const char * localIpInterfaceIpAddr)
 {
-    int cameraCount = 1;
+    QList<QString> deviceNames = dshow::utils::listDevices();
+    int deviceCount = deviceNames.count();
+    for (int i = 0; i < deviceCount && i < nxcip::CAMERA_INFO_ARRAY_SIZE; ++i)
+    {
+        strcpy(cameras[i].modelName, deviceNames[i].toLatin1().data());
 
-    const char* dummyModel = "HD Pro Webcam C920";
-    strcpy(cameras[0].modelName, dummyModel);
-    QByteArray url = nx::utils::Url::toPercentEncoding(dummyModel);
-    url.prepend("webcam://");
-    const QByteArray& uid = QCryptographicHash::hash(url, QCryptographicHash::Md5 ).toHex();
-    strcpy(cameras[0].uid, uid.data());
-    strcpy(cameras[0].url, url.data());
-    
-    return cameraCount;
+        QByteArray url = 
+            QByteArray("webcam://").append(nx::utils::Url::toPercentEncoding(deviceNames[i]));
+        strcpy(cameras[i].url, url.data());
+
+        const QByteArray& uid = QCryptographicHash::hash(url, QCryptographicHash::Md5).toHex();
+        strcpy(cameras[i].uid, uid.data());
+    }
+    return deviceCount;
 }
+int findV4L2Cameras(nxcip::CameraInfo * cameras, const char * localIpInterfaceIpAddr)
+{
+    return 0; // todo
+}
+
+int findAvFoundationCameras(nxcip::CameraInfo * cameras, const char * localIpInterfaceIpAddr)
+{
+    return 0; // todo
+}
+
 } // namespace
 
 DiscoveryManager::DiscoveryManager(nxpt::CommonRefManager* const refManager, 
@@ -127,13 +100,13 @@ void DiscoveryManager::getVendorName(char* buf) const
 int DiscoveryManager::findCameras( nxcip::CameraInfo* cameras, const char* localInterfaceIPAddr )
 {    
 #ifdef _WIN32
-        return findDirectShowCameras(cameras, localInterfaceIPAddr);
+        return findDShowCameras(cameras, localInterfaceIPAddr);
 #elif __linux__
-        findVideo4Linux2Cameras(cameras, localInterfaceIPAddr);
+        findV4L2Cameras(cameras, localInterfaceIPAddr);
 #elif __APPLE__
         findAvFoundationCameras(cameras, localInterfaceIPAddr);
 #else
-        0 // unsuported os
+        0 // unsupported os
 #endif
 }
 
@@ -169,33 +142,5 @@ int DiscoveryManager::getReservedModelList( char** /*modelList*/, int* count )
 {
     *count = 0;
     return nxcip::NX_NO_ERROR;
-}
-
-int DiscoveryManager::findDirectShowCameras(nxcip::CameraInfo * cameras, const char * localIpInterfaceIpAddr)
-{
-    QList<QString> deviceNames = dshowListDevices();
-    int deviceCount = deviceNames.count();
-    for (int i = 0; i < deviceCount && i < nxcip::CAMERA_INFO_ARRAY_SIZE; ++i)
-    {
-        strcpy(cameras[i].modelName, deviceNames[i].toLatin1().data());
-
-        QByteArray url = 
-            QByteArray("webcam://").append(nx::utils::Url::toPercentEncoding(deviceNames[i]));
-        strcpy(cameras[i].url, url.data());
-
-        const QByteArray& uid = QCryptographicHash::hash(url, QCryptographicHash::Md5).toHex();
-        strcpy(cameras[i].uid, uid.data());
-    }
-    return deviceCount;
-}
-
-int DiscoveryManager::findVideo4Linux2Cameras(nxcip::CameraInfo * cameras, const char * localIpInterfaceIpAddr)
-{
-    return 0; // todo
-}
-
-int DiscoveryManager::findAvFoundationCameras(nxcip::CameraInfo * cameras, const char * localIpInterfaceIpAddr)
-{
-    return 0; // todo
 }
 

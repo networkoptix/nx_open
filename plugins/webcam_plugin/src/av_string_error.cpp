@@ -24,7 +24,7 @@ void AVStringError::setAvError(const QString& error)
     qDebug() << m_lastError;
 }
 
-QString AVStringError::getAvError()
+QString AVStringError::avErrorString()
 {
     return m_lastError;
 }

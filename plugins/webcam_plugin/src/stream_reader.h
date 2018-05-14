@@ -27,6 +27,10 @@
 #include <libavutil/pixfmt.h>
 #include "libav_forward_declarations.h"
 
+extern "C"
+{
+    #include <libavcodec/avcodec.h>
+}
 
 class AVCodecContainer;
 
@@ -72,10 +76,7 @@ private:
     float m_fps;
     int m_encoderNumber;
     nxcip::UsecUTCTimestamp m_curTimestamp;
-    //std::shared_ptr<nx::network::http::HttpClient> m_httpClient;
-    //std::unique_ptr<nx::network::http::MultipartContentParser> m_multipartContentParser;
-    std::unique_ptr<ILPVideoPacket> m_videoPacket;
-    
+   
     StreamType m_streamType;
     qint64 m_prevFrameClock;
     qint64 m_frameDurationMSec;
@@ -91,12 +92,14 @@ private:
     std::unique_ptr<AVCodecContainer> m_videoEncoder;
     std::unique_ptr<AVCodecContainer> m_videoDecoder;
 
+    AVPacket* m_avVideoPacket;
+
     AVStringError m_lastError;
 
 private:
-    void writeToVideoPacket(AVPacket* packet);
-    AVPixelFormat unDeprecatePixelFormat(AVPixelFormat pixelFormat);
-
+    std::unique_ptr<ILPVideoPacket> toNxVideoPacket(AVPacket *packet, AVCodecID codecID);
+    std::unique_ptr<ILPVideoPacket> transcodeVideo(int *nxcipErrorCode);
+    
     AVFrame* getDecodedVideoFrame();
     AVPacket* getEncodedPacket(AVFrame* frame);
 

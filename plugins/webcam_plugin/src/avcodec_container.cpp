@@ -40,10 +40,16 @@ void AVCodecContainer::close()
         avcodec_close(m_codecContext);
 }
 
+int AVCodecContainer::readFrame(AVPacket * outPacket)
+{
+    return av_read_frame(m_formatContext, outPacket);
+}
+
 int AVCodecContainer::encodeVideo(AVPacket * outPacket, const AVFrame * frame, int * outGotPacket)
 {
     return avcodec_encode_video2(m_codecContext, outPacket, frame, outGotPacket);
 }
+
 
 int AVCodecContainer::decodeVideo(AVFrame * outFrame, int * outGotPicture, AVPacket * packet)
 {
@@ -55,6 +61,16 @@ int AVCodecContainer::decodeVideo(AVFrame * outFrame, int * outGotPicture, AVPac
             return decodeCode;
     }
     return readCode;
+}
+
+int AVCodecContainer::encodeAudio(AVPacket * outPacket, const AVFrame * frame, int * outGotPacket)
+{
+    return avcodec_encode_audio2(m_codecContext, outPacket, frame, outGotPacket);
+}
+
+int AVCodecContainer::decodeAudio(AVFrame * frame, int* outGotFrame, const AVPacket *packet)
+{
+    return avcodec_decode_audio4(m_codecContext, frame, outGotFrame, packet);
 }
 
 void AVCodecContainer::initializeEncoder(AVCodecID codecID)
@@ -95,6 +111,27 @@ void AVCodecContainer::initializeDecoder(AVCodecParameters * codecParameters)
         return;
 }
 
+void AVCodecContainer::initializeDecoder(AVCodecID codecID)
+{
+    m_codec = avcodec_find_decoder(codecID);
+    if (!m_codec)
+    {
+        m_lastError.setAvError("couldn't find the decoder");
+        return;
+    }
+
+    m_codecContext = avcodec_alloc_context3(m_codec);
+    if (!m_codecContext)
+    {
+        m_lastError.setAvError("couldn't allocate codec context");
+        return;
+    }
+
+//    int paramToCodecContextCode = avcodec_parameters_to_context(m_codecContext, codecParameters);
+  //  if (m_lastError.updateIfError(paramToCodecContextCode))
+    //    return;
+}
+
 bool AVCodecContainer::isValid()
 {
     return m_codecContext != nullptr
@@ -103,13 +140,18 @@ bool AVCodecContainer::isValid()
 }
 
 
-AVCodecContext * AVCodecContainer::getCodecContext()
+AVCodecContext * AVCodecContainer::codecContext()
 {
     return m_codecContext;
 }
 
-QString AVCodecContainer::getAvError()
+AVCodecID AVCodecContainer::codecID()
 {
-    return m_lastError.getAvError();
+    return m_codecContext->codec_id;
+}
+
+QString AVCodecContainer::avErrorString()
+{
+    return m_lastError.avErrorString();
 }
 

@@ -66,6 +66,48 @@ namespace {
 
         return nullptr;
     }
+
+AVPixelFormat suggestPixelFormat(AVCodecID codecID)
+{
+    switch (codecID)
+    {
+        case AV_CODEC_ID_H264:
+            return AV_PIX_FMT_YUV444P;
+        case AV_CODEC_ID_MJPEG:
+            return AV_PIX_FMT_YUVJ420P;
+        default:
+            return AV_PIX_FMT_YUV420P;
+    }
+}
+
+AVPixelFormat unDeprecatePixelFormat(AVPixelFormat pixelFormat)
+{
+    switch (pixelFormat)
+    {
+        case AV_PIX_FMT_YUVJ420P:
+            return AV_PIX_FMT_YUV420P;
+        case AV_PIX_FMT_YUVJ422P:
+            return AV_PIX_FMT_YUV422P;
+        case AV_PIX_FMT_YUVJ444P:
+            return AV_PIX_FMT_YUV444P;
+        case AV_PIX_FMT_YUVJ440P:
+            return AV_PIX_FMT_YUV440P;
+        default:
+            return pixelFormat;
+    }
+}
+
+nxcip::CompressionType toNxCompressionType(AVCodecID codecID)
+{
+    switch (codecID)
+    {
+        case AV_CODEC_ID_H264:
+            return nxcip::AV_CODEC_ID_H264;
+        case AV_CODEC_ID_MJPEG:
+        default:
+            return nxcip::AV_CODEC_ID_MJPEG;
+    }
+}
 } // namespace
 
 StreamReader::StreamReader(
@@ -102,7 +144,9 @@ StreamReader::~StreamReader()
     NX_ASSERT( m_isInGetNextData == 0 );
     m_timeProvider->releaseRef();
 
-    m_videoPacket.reset();
+    av_packet_free(&m_avVideoPacket);
+    av_dict_free(&m_options);
+    avformat_close_input(&m_formatContext);
 }
 
 //!Implementation of nxpl::PluginInterface::queryInterface
@@ -135,33 +179,33 @@ unsigned int StreamReader::releaseRef()
 
 static const unsigned int MAX_FRAME_DURATION_MS = 5000;
 
-int StreamReader::getNextData( nxcip::MediaDataPacket** lpPacket )
+int StreamReader::getNextData(nxcip::MediaDataPacket** lpPacket)
 {
     if (!isValid())
         return nxcip::NX_IO_ERROR;
 
-    AVFrame* decodedFrame = getDecodedVideoFrame();
-    if (!decodedFrame)
-        return nxcip::NX_NETWORK_ERROR;
+    int nxcipErrorCode;
+    std::unique_ptr<ILPVideoPacket> nxVideoPacket;
+        
+    switch (m_videoDecoder->codecID())
+    {
+        case AV_CODEC_ID_H264:
+        case AV_CODEC_ID_MJPEG:
+        {
+            int readCode = m_videoDecoder->readFrame(m_avVideoPacket);
+            if (m_lastError.updateIfError(readCode))
+                return nxcip::NX_TRY_AGAIN;
 
-    AVFrame* convertedFrame = toYUV420(m_videoDecoder->getCodecContext(), decodedFrame);
+            nxVideoPacket = toNxVideoPacket(m_avVideoPacket, m_videoDecoder->codecID());
+            nxcipErrorCode = nxcip::NX_NO_ERROR;
+            break;
+        }
+        default:
+            nxVideoPacket = transcodeVideo(&nxcipErrorCode);
+    }
 
-    AVPacket * encodedPacket = av_packet_alloc();
-    av_init_packet(encodedPacket);
-    encodedPacket->data = NULL;
-    encodedPacket->size = 0;
-
-    int gotPacket;
-    m_videoEncoder->encodeVideo(encodedPacket, convertedFrame, &gotPacket);
-
-    writeToVideoPacket(encodedPacket);
-    *lpPacket = m_videoPacket.release();
-
-    av_frame_free(&decodedFrame);
-    av_frame_free(&convertedFrame);
-    av_free_packet(encodedPacket);
-
-    return nxcip::NX_NO_ERROR;
+    *lpPacket = nxVideoPacket.release();
+    return nxcipErrorCode;
 }
 
 void StreamReader::interrupt()
@@ -171,7 +215,6 @@ void StreamReader::interrupt()
         QnMutexLocker lk(&m_mutex);
         m_terminated = true;
         m_cond.wakeAll();
-        //std::swap(client, m_httpClient);
     }
 
     //closing connection
@@ -193,53 +236,72 @@ void StreamReader::updateCameraInfo( const nxcip::CameraInfo& info )
     m_info = info;
 }
 
-void StreamReader::writeToVideoPacket(AVPacket * packet)
+std::unique_ptr<ILPVideoPacket> StreamReader::toNxVideoPacket(AVPacket *packet, AVCodecID codecID)
 {
-     m_videoPacket.reset( new ILPVideoPacket(
+    std::unique_ptr<ILPVideoPacket> nxVideoPacket(new ILPVideoPacket(
         &m_allocator,
         0,
         m_timeProvider->millisSinceEpoch()  * USEC_IN_MS,
         nxcip::MediaDataPacket::fKeyPacket,
         0 ) );
+     
+     nxVideoPacket->resizeBuffer(packet->size);
+     if (nxVideoPacket->data())
+         memcpy(nxVideoPacket->data(), packet->data, packet->size);
 
-     m_videoPacket->resizeBuffer(packet->size);
-     if (m_videoPacket->data())
-         memcpy(m_videoPacket->data(), packet->data, packet->size);
+     nxVideoPacket->setCodecType(toNxCompressionType(codecID));
+
+     return nxVideoPacket;
 }
 
-AVPixelFormat StreamReader::unDeprecatePixelFormat(AVPixelFormat pixelFormat)
+std::unique_ptr<ILPVideoPacket> StreamReader::transcodeVideo(int * nxcipErrorCode)
 {
-    switch (pixelFormat)
+    AVFrame* decodedFrame = getDecodedVideoFrame();
+    if (!decodedFrame)
     {
-        case AV_PIX_FMT_YUVJ420P:
-            return AV_PIX_FMT_YUV420P;
-        case AV_PIX_FMT_YUVJ422P:
-            return AV_PIX_FMT_YUV422P;
-        case AV_PIX_FMT_YUVJ444P:
-            return AV_PIX_FMT_YUV444P;
-        case AV_PIX_FMT_YUVJ440P:
-            return AV_PIX_FMT_YUV440P;
-        default:
-            return pixelFormat;
+        * nxcipErrorCode = nxcip::NX_NETWORK_ERROR;
+        return nullptr;
     }
+
+    AVFrame* convertedFrame = toYUV420(m_videoDecoder->codecContext(), decodedFrame);
+
+    AVPacket * encodedPacket = av_packet_alloc();
+    av_init_packet(encodedPacket);
+    encodedPacket->data = NULL;
+    encodedPacket->size = 0;
+
+    int gotPacket;
+    int encodeCode = m_videoEncoder->encodeVideo(encodedPacket, convertedFrame, &gotPacket);
+    if (m_lastError.updateIfError(encodeCode))
+    {
+        * nxcipErrorCode = nxcip::NX_TRY_AGAIN;
+        return nullptr;
+    }
+        
+
+    auto nxVideoPacket = toNxVideoPacket(encodedPacket, m_videoEncoder->codecID());
+
+    av_frame_free(&decodedFrame);
+    av_frame_free(&convertedFrame);
+    av_free_packet(encodedPacket);
+
+    *nxcipErrorCode = nxcip::NX_NO_ERROR;
+    return nxVideoPacket;
 }
+
 
 
 AVFrame * StreamReader::getDecodedVideoFrame()
 {
     AVFrame * decodedFrame = av_frame_alloc();
-    AVPacket * packet = av_packet_alloc();
     int gotPicture = 0;
     while (!gotPicture)
     {
-        int returnCode = m_videoDecoder->decodeVideo(decodedFrame, &gotPicture, packet);
+        int returnCode = m_videoDecoder->decodeVideo(decodedFrame, &gotPicture, m_avVideoPacket);
         if (m_lastError.updateIfError(returnCode))
-        {
-            av_packet_free(&packet);
             return nullptr;
-        }
     }
-    av_packet_free(&packet);
+   
     return decodedFrame;
 }
 
@@ -274,7 +336,7 @@ AVFrame * StreamReader::toYUV420(AVCodecContext * codecContext, AVFrame * frame)
 {
     AVFrame* resultFrame = av_frame_alloc();
 
-    AVPixelFormat pix_fmt = AV_PIX_FMT_YUV420P;
+    AVPixelFormat pix_fmt = suggestPixelFormat(codecContext->codec_id);
 
     av_image_alloc(resultFrame->data, resultFrame->linesize, frame->width, frame->height,
         pix_fmt, 32);
@@ -301,8 +363,7 @@ AVFrame * StreamReader::toYUV420(AVCodecContext * codecContext, AVFrame * frame)
 void StreamReader::initializeAv()
 {
     avdevice_register_all();
-    setOptions();
-
+    
     const char * inputFormat = getAvInputFormat();
     m_inputFormat = av_find_input_format(inputFormat);
     if (!m_inputFormat)
@@ -314,6 +375,9 @@ void StreamReader::initializeAv()
     //todo get the url from the m_info
     
     QString url = getAvCameraUrl();
+
+    m_formatContext = avformat_alloc_context();
+    setOptions();
 
     int formatOpenCode = avformat_open_input(&m_formatContext, url.toLatin1().data(), m_inputFormat, &m_options);
     if (m_lastError.updateIfError(formatOpenCode))
@@ -335,7 +399,7 @@ void StreamReader::initializeAv()
     m_videoDecoder->initializeDecoder(videoStream->codecpar);
     if (!m_videoDecoder->isValid())
     {
-        m_lastError.setAvError(m_videoDecoder->getAvError());
+        m_lastError.setAvError(m_videoDecoder->avErrorString());
         m_videoDecoder.reset(nullptr);
         return;
     }
@@ -343,42 +407,45 @@ void StreamReader::initializeAv()
 
     m_videoEncoder.reset(new AVCodecContainer(m_formatContext));
     m_videoEncoder->initializeEncoder(AV_CODEC_ID_MJPEG);
-    if (!m_videoDecoder->isValid())
+    if (!m_videoEncoder->isValid())
     {
-        m_lastError.setAvError(m_videoEncoder->getAvError());
+        m_lastError.setAvError(m_videoEncoder->avErrorString());
         m_videoEncoder.reset(nullptr);
         return;
     }
+
+    m_avVideoPacket = av_packet_alloc();
 
     setEncoderOptions();
 }
 
 void StreamReader::setOptions()
 {
+    //m_formatContext->video_codec_id = AV_CODEC_ID_MJPEG;
+    m_formatContext->video_codec_id = AV_CODEC_ID_H264;
+
     //todo actually fill out m_options instead of hardcoding
     av_dict_set(&m_options, "video_size", "1920x1080", 0);
-    av_dict_set(&m_options, "framerate", "30", 0);
+    
+    QString fps = QString::number(m_fps);
+    av_dict_set(&m_options, "framerate", fps.toLatin1().data(), 0);
     
     //todo find out why this delays the realtime buffer error and fix the error
-    av_dict_set(&m_options, "rtbufsize", "2000M", 0);
+    //av_dict_set(&m_options, "rtbufsize", "2000M", 0);
 }
 
 void StreamReader::setEncoderOptions()
 {
-    AVCodecContext * pOCodecCtx = m_videoEncoder->getCodecContext();
-    //pOCodecCtx->bit_rate = m_videoDecoder->getCodecContext()->bit_rate;
-    
+    AVCodecContext * encoderContext = m_videoEncoder->codecContext();
+    AVCodecContext * decoderContext = m_videoDecoder->codecContext();
+
     //todo unhardcode these
-    pOCodecCtx->width = 1920;
-    pOCodecCtx->height = 1080;
-    pOCodecCtx->codec_id = AV_CODEC_ID_MJPEG;
-    pOCodecCtx->pix_fmt = pOCodecCtx->codec_id == AV_CODEC_ID_MJPEG ? AV_PIX_FMT_YUVJ420P : AV_PIX_FMT_YUV420P;
-    pOCodecCtx->codec_type = AVMEDIA_TYPE_VIDEO;
-    pOCodecCtx->time_base.num = 1;
-    pOCodecCtx->time_base.den = 30;
-//    pOCodecCtx->thread_count = 1;
-    pOCodecCtx->flags = AV_CODEC_FLAG_GLOBAL_HEADER;
-    pOCodecCtx->global_quality = 1; //pOCodecCtx->qmin * FF_QP2LAMBDA;
+    encoderContext->width = decoderContext->width;
+    encoderContext->height = decoderContext->height;
+    encoderContext->pix_fmt = suggestPixelFormat(encoderContext->codec_id);
+    encoderContext->time_base = { 1, (int)m_fps };
+    encoderContext->flags = AV_CODEC_FLAG_GLOBAL_HEADER;
+    encoderContext->global_quality = encoderContext->qmin * FF_QP2LAMBDA;
 
     m_videoEncoder->open();
 }

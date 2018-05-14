@@ -9,7 +9,7 @@ public:
     ~AVStringError();
 
     void setAvError(const QString& error);
-    QString getAvError();
+    QString avErrorString();
 
     bool updateIfError(int code);
     bool hasError();

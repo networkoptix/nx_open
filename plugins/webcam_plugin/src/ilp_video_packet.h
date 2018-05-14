@@ -49,9 +49,10 @@ public:
     virtual unsigned int flags() const override;
     //!Implementation of nxpl::MediaDataPacket::cSeq
     virtual unsigned int cSeq() const override;
-
     //!Implementation of nxpl::VideoDataPacket::getMotionData
     virtual nxcip::Picture* getMotionData() const override;
+
+    void setCodecType(nxcip::CompressionType codecType);
 
     /*!
         \note Does keep contents of current buffer
@@ -68,6 +69,7 @@ private:
     size_t m_bufSize;
     unsigned int m_flags;
     unsigned int m_cSeq;
+    nxcip::CompressionType m_codecType;
 };
 
 #endif  //ILP_VIDEO_PACKET_H
