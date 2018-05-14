@@ -8838,6 +8838,18 @@ to %1</source>
         <source>Failed to change password on %1 of %2 cameras</source>
         <translation></translation>
     </message>
+    <message>
+        <source>To use the software you must accept the end user license agreement</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Accept</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Decline</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>nx::client::desktop::ui::workbench::LayoutTourExecutor</name>
