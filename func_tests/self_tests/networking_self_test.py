@@ -1,8 +1,10 @@
 import pytest
 from netaddr import IPAddress, IPNetwork
 
+from fixtures.big_flat_networks import make_big_flat_network
 from framework.networking import setup_flat_network, setup_networks
 from framework.pool import ClosingPool
+from framework.vms.factory import VM
 from framework.waiting import wait_for_true
 
 
@@ -66,3 +68,10 @@ def test_linux_and_windows(linux_vm, windows_vm, hypervisor):
     wait_for_true(
         lambda: windows_vm.os_access.networking.can_reach(linux_vm_ip, timeout_sec=2),
         "{} can ping {} by {}".format(windows_vm, linux_vm, linux_vm_ip))
+
+
+def test_big_flat_network(vm_factory, hypervisor):
+    machines, ips = make_big_flat_network(vm_factory, hypervisor, 10)
+    random_machine = machines[0]
+    for other_machine in machines[1:]:
+        random_machine.os_access.networking.can_reach(ips[other_machine.alias])
