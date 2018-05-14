@@ -295,15 +295,10 @@ void CameraSettingsDialogStore::setMotionStreamType(vms::api::MotionStreamType v
         [&](State state) { return Reducer::setMotionStreamType(std::move(state), value); });
 }
 
-void CameraSettingsDialogStore::setLogicalId(const QString& value)
+void CameraSettingsDialogStore::setLogicalId(int value)
 {
     d->executeAction(
         [&](State state) { return Reducer::setLogicalId(std::move(state), value); });
-}
-
-void CameraSettingsDialogStore::setIntegerLogicalId(int value)
-{
-    setLogicalId(value > 0 ? QString::number(value) : QString());
 }
 
 void CameraSettingsDialogStore::generateLogicalId()

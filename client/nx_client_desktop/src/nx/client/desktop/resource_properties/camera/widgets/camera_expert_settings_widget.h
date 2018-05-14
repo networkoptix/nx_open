@@ -31,7 +31,7 @@ private:
     void loadState(const CameraSettingsDialogState& state);
 
 private:
-    QScopedPointer<Ui::CameraExpertSettingsWidget> ui;
+    const QScopedPointer<Ui::CameraExpertSettingsWidget> ui;
 };
 
 } // namespace desktop

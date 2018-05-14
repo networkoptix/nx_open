@@ -107,13 +107,13 @@ CameraExpertSettingsWidget::CameraExpertSettingsWidget(
         store, &CameraSettingsDialogStore::setNativePtzPresetsDisabled);
 
     connect(ui->logicalIdSpinBox, QnSpinboxIntValueChanged,
-        store, &CameraSettingsDialogStore::setIntegerLogicalId);
+        store, &CameraSettingsDialogStore::setLogicalId);
 
     connect(ui->generateLogicalIdButton, &QPushButton::clicked,
         store, &CameraSettingsDialogStore::generateLogicalId);
 
     connect(ui->resetLogicalIdButton, &QPushButton::clicked, store,
-        [store]() { store->setIntegerLogicalId(0); });
+        [store]() { store->setLogicalId({}); });
 
     connect(ui->comboBoxTransport, QnComboboxCurrentIndexChanged, store,
         [this, store](int index)
@@ -334,10 +334,10 @@ void CameraExpertSettingsWidget::loadState(const CameraSettingsDialogState& stat
 
     ui->logicalIdGroupBox->setEnabled(state.isSingleCamera());
     if (state.isSingleCamera())
-        ui->logicalIdSpinBox->setValue(state.singleCameraSettings.logicalId().toInt());
+        ui->logicalIdSpinBox->setValue(state.singleCameraSettings.logicalId());
 
     const bool hasDuplicateLogicalIds =
-        !state.singleCameraProperties.camerasWithSameLogicalId.isEmpty();
+        !state.singleCameraSettings.sameLogicalIdCameraNames.isEmpty();
 
     ui->logicalIdWarningLabel->setVisible(hasDuplicateLogicalIds);
     setWarningStyleOn(ui->logicalIdSpinBox, hasDuplicateLogicalIds);
@@ -345,10 +345,10 @@ void CameraExpertSettingsWidget::loadState(const CameraSettingsDialogState& stat
     if (hasDuplicateLogicalIds)
     {
         const auto cameraList = lit(" <b>%1</b>")
-            .arg(state.singleCameraProperties.camerasWithSameLogicalId.join(lit(", ")));
+            .arg(state.singleCameraSettings.sameLogicalIdCameraNames.join(lit(", ")));
 
         const auto errorMessage = tr("This ID is already used on the following %n cameras:", "",
-            state.singleCameraProperties.camerasWithSameLogicalId.size()) + cameraList;
+            state.singleCameraSettings.sameLogicalIdCameraNames.size()) + cameraList;
 
         ui->logicalIdWarningLabel->setText(errorMessage);
     }

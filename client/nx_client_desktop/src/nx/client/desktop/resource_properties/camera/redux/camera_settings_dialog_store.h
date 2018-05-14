@@ -69,8 +69,7 @@ public:
     void setNativePtzPresetsDisabled(bool value);
     void setRtpTransportType(vms::api::RtpTransportType value);
     void setMotionStreamType(vms::api::MotionStreamType value);
-    void setLogicalId(const QString& value);
-    void setIntegerLogicalId(int value);
+    void setLogicalId(int value);
     void generateLogicalId();
     void resetExpertSettings();
 

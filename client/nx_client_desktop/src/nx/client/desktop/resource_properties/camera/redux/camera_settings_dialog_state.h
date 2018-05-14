@@ -142,8 +142,6 @@ struct CameraSettingsDialogState
         int maxFpsWithoutMotion = 0;
 
         std::optional<MotionConstraints> motionConstraints;
-
-        QStringList camerasWithSameLogicalId;
     };
     SingleCameraProperties singleCameraProperties;
 
@@ -175,7 +173,8 @@ struct CameraSettingsDialogState
         UserEditable<FisheyeCalibrationSettings> fisheyeCalibrationSettings;
         UserEditable<qreal> fisheyeFovRotation;
 
-        UserEditable<QString> logicalId;
+        UserEditable<int> logicalId;
+        QStringList sameLogicalIdCameraNames; //< Read-only informational value.
     };
     SingleCameraSettings singleCameraSettings;
 

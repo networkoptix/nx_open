@@ -230,7 +230,8 @@ void CameraSettingsDialogStateConversionFunctions::applyStateToCameras(
 
         camera->setDewarpingParams(state.fisheyeSettings());
 
-        camera->setLogicalId(state.singleCameraSettings.logicalId());
+        const int logicalId = state.singleCameraSettings.logicalId();
+        camera->setLogicalId((logicalId > 0) ? QString::number(logicalId) : QString());
 
         if (state.devicesDescription.hasMotion == State::CombinedValue::All)
         {

@@ -334,7 +334,7 @@ vms::api::MotionStreamType motionStreamType(const Camera& camera)
 
 State updateDuplicateLogicalIdInfo(State state)
 {
-    state.singleCameraProperties.camerasWithSameLogicalId.clear();
+    state.singleCameraSettings.sameLogicalIdCameraNames.clear();
 
     const QnUuid currentId(state.singleCameraProperties.id);
     const auto currentLogicalId = state.singleCameraSettings.logicalId();
@@ -343,7 +343,7 @@ State updateDuplicateLogicalIdInfo(State state)
         [&currentId, &currentLogicalId](const Camera& camera)
         {
             return !camera->getLogicalId().isEmpty()
-                && camera->getLogicalId() == currentLogicalId
+                && camera->getLogicalId().toInt() == currentLogicalId
                 && camera->getId() != currentId;
         };
 
@@ -351,14 +351,14 @@ State updateDuplicateLogicalIdInfo(State state)
         getAllCameras().filtered(isSameLogicalId);
 
     for (const auto& camera: duplicateCameras)
-        state.singleCameraProperties.camerasWithSameLogicalId << camera->getName();
+        state.singleCameraSettings.sameLogicalIdCameraNames << camera->getName();
 
     return state;
 }
 
 bool isDefaultExpertSettings(const State& state)
 {
-    if (state.isSingleCamera() && !state.singleCameraSettings.logicalId().isEmpty())
+    if (state.isSingleCamera() && state.singleCameraSettings.logicalId() > 0)
         return false;
 
     if (state.settingsOptimizationEnabled)
@@ -544,7 +544,7 @@ State CameraSettingsDialogStateReducer::loadCameras(
             state.singleIoModuleSettings.ioPortsData.setBase(firstCamera->getIOPorts());
         }
 
-        state.singleCameraSettings.logicalId.setBase(firstCamera->getLogicalId());
+        state.singleCameraSettings.logicalId.setBase(firstCamera->getLogicalId().toInt());
         state = updateDuplicateLogicalIdInfo(std::move(state));
 
         Qn::calculateMaxFps(
@@ -1038,7 +1038,7 @@ State CameraSettingsDialogStateReducer::setMotionStreamType(
     return state;
 }
 
-State CameraSettingsDialogStateReducer::setLogicalId(State state, const QString& value)
+State CameraSettingsDialogStateReducer::setLogicalId(State state, int value)
 {
     if (!state.isSingleCamera())
         return state;
@@ -1061,12 +1061,8 @@ State CameraSettingsDialogStateReducer::generateLogicalId(State state)
     const QnUuid currentId(state.singleCameraProperties.id);
     for (const auto& camera: cameras)
     {
-        if (camera->getId() == currentId)
-            continue;
-
-        const auto id = camera->getLogicalId().toInt();
-        if (id > 0)
-            usedValues.insert(id);
+        if (camera->getId() != currentId)
+            usedValues.insert(camera->getLogicalId().toInt());
     }
 
     int previousValue = 0;
@@ -1078,11 +1074,11 @@ State CameraSettingsDialogStateReducer::generateLogicalId(State state)
         previousValue = value;
     }
 
-    const auto logicalId = QString::number(previousValue + 1);
-    if (logicalId == state.singleCameraSettings.logicalId())
+    const auto newLogicalId = previousValue + 1;
+    if (newLogicalId == state.singleCameraSettings.logicalId())
         return state;
 
-    return setLogicalId(std::move(state), logicalId);
+    return setLogicalId(std::move(state), newLogicalId);
 }
 
 State CameraSettingsDialogStateReducer::resetExpertSettings(State state)
