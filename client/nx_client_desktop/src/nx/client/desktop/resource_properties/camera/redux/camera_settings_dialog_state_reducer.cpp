@@ -47,11 +47,11 @@ template<class Data, class Intermediate>
 void fetchFromCameras(
     State::UserEditableMultiple<Data>& value,
     const Cameras& cameras,
-    std::function<Intermediate(const Camera&)> predicate,
+    std::function<Intermediate(const Camera&)> getter,
     std::function<Data(const Intermediate&)> converter)
 {
     Intermediate data;
-    if (utils::algorithm::same(cameras.cbegin(), cameras.cend(), predicate, &data))
+    if (utils::algorithm::same(cameras.cbegin(), cameras.cend(), getter, &data))
         value.setBase(converter(data));
 }
 
