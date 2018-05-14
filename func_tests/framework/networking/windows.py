@@ -6,7 +6,7 @@ from pylru import lrudecorator
 
 from framework.networking.interface import Networking
 from framework.os_access.windows_remoting import WinRM
-from framework.os_access.windows_remoting._powershell import PowershellError
+from framework.waiting import wait_for_true
 
 _logger = logging.getLogger(__name__)
 
@@ -205,35 +205,18 @@ class WindowsNetworking(Networking):
                 ''',
             {})
 
-    def ping(self, ip, count=1, timeout_sec=5):
-        try:
-            _ = self._winrm.run_powershell_script(
-                # language=PowerShell
-                '''
-                    $timer = [Diagnostics.Stopwatch]::StartNew()
-                    $countLeft = $count
-                    while ($true) {
-                        try {
-                            Test-Connection $computerName -Count 1 -Delay 1
-                        } catch [System.Net.NetworkInformation.PingException] {
-                            $countLeft--
-                            if ($countLeft -le 0 -or $timer.Elapsed.TotalSeconds -ge $timeoutSeconds) {
-                                throw
-                            }
-                            continue
-                        }
-                        break
-                    }
-                    ''',
-                {'count': count, 'computerName': str(ip), 'timeoutSeconds': timeout_sec})
-        except PowershellError as e:
-            if e.type_name == 'System.Net.NetworkInformation.PingException':
-                raise PingError(ip, e.message)
-            raise
+    def ping(self, ip, timeout_sec=5):
+        def ping_once():
+            query = self._winrm.wmi_query(u'Win32_PingStatus', {u'Address': str(ip)})
+            status = query.get_one()
+            is_successful = status[u'StatusCode'] == u'0'
+            return is_successful
+
+        wait_for_true(ping_once, "{} is reachable".format(ip), timeout_sec=timeout_sec)
 
     def can_reach(self, ip, timeout_sec=4):
         try:
-            self.ping(ip, count=100, timeout_sec=timeout_sec)
+            self.ping(ip, timeout_sec=timeout_sec)
         except PingError:
             return False
         else:
