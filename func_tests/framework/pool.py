@@ -1,6 +1,7 @@
 """Pool -- containers with .get(key) method with additional functionality via decorator pattern"""
 # TODO: Come up with better name.
 import logging
+from multiprocessing.pool import ThreadPool
 
 logger = logging.getLogger(__name__)
 
@@ -66,3 +67,8 @@ class ClosingPool(object):  # TODO: Consider renaming to ResourcePool or similar
         self._entered_allocations.append((resource, allocation))
         logger.info("Remember to dispose: %r.", resource)
         return resource
+
+    def get_many(self, keys, parallel_jobs=10):
+        thread_pools = ThreadPool(processes=parallel_jobs)
+        resources = thread_pools.map_async(self.get, keys).get()
+        return resources
