@@ -122,6 +122,7 @@ bool StreamServerSocket::listen(int backlog)
         return false;
     }
 
+    m_acceptor.setReadyConnectionQueueSize(backlog);
     m_acceptor.start();
     return true;
 }

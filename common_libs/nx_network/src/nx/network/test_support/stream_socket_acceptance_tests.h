@@ -170,7 +170,7 @@ protected:
         auto connection = std::make_unique<typename SocketTypeSet::ClientSocket>();
 
         ASSERT_TRUE(connection->setNonBlockingMode(true));
-        AbstractStreamSocket* connectionPtr = connection.get();
+        typename SocketTypeSet::ClientSocket* connectionPtr = connection.get();
         m_connections.push_back(std::move(connection));
         connectionPtr->connectAsync(
             m_serverEndpoint,
@@ -179,7 +179,7 @@ protected:
     }
 
     void onConnectionComplete(
-        AbstractStreamSocket* connectionPtr,
+        typename SocketTypeSet::ClientSocket* connectionPtr,
         SystemError::ErrorCode errorCode)
     {
         ASSERT_TRUE(errorCode == SystemError::noError);
@@ -188,7 +188,7 @@ protected:
 
         auto iterToRemove = std::remove_if(
             m_connections.begin(), m_connections.end(),
-            [connectionPtr](const std::unique_ptr<AbstractStreamSocket>& elem) -> bool
+            [connectionPtr](const auto& elem) -> bool
             {
                 return elem.get() == connectionPtr;
             });
@@ -218,7 +218,7 @@ protected:
     }
 
     std::mutex m_mutex;
-    std::deque<std::unique_ptr<AbstractStreamSocket>> m_connections;
+    std::deque<std::unique_ptr<typename SocketTypeSet::ClientSocket>> m_connections;
 
 private:
     SocketAddress m_serverEndpoint;
@@ -356,11 +356,18 @@ public:
 protected:
     AddressResolver* m_addressResolver = nullptr;
 
-    void givenListeningServerSocket()
+    void givenListeningServerSocket(
+        int backLogSize = AbstractStreamServerSocket::kDefaultBacklogSize)
     {
         m_serverSocket = std::make_unique<typename SocketTypeSet::ServerSocket>();
         ASSERT_TRUE(m_serverSocket->bind(SocketAddress::anyPrivateAddress));
-        ASSERT_TRUE(m_serverSocket->listen());
+        ASSERT_TRUE(m_serverSocket->listen(backLogSize));
+    }
+
+    void givenAcceptingServerSocket()
+    {
+        givenListeningServerSocket();
+        startAcceptingConnections();
     }
 
     void givenListeningNonBlockingServerSocket()
@@ -509,9 +516,9 @@ protected:
             << SystemError::getLastOSErrorText().toStdString();
     }
 
-    void whenSendMultiplePingsViaMultipleConnections()
+    void whenSendMultiplePingsViaMultipleConnections(int connectionCount)
     {
-        m_expectedResponseCount = 7;
+        m_expectedResponseCount = connectionCount;
         for (int i = 0; i < m_expectedResponseCount; ++i)
         {
             m_clientConnections.push_back(
@@ -622,6 +629,32 @@ protected:
         this->waitUntilConnectionIsAccepted();
     }
 
+    void whenEstablishMultipleConnectionsAsync(int connectionCount)
+    {
+        m_clientConnections.resize(connectionCount);
+
+        for (auto& connectionCtx: m_clientConnections)
+        {
+            connectionCtx = std::make_unique<ClientConnectionContext>();
+            ASSERT_TRUE(connectionCtx->connection.setNonBlockingMode(true));
+            connectionCtx->connection.connectAsync(
+                serverEndpoint(),
+                [this, &connectionCtx](SystemError::ErrorCode systemErrorCode)
+                {
+                    m_connectResultQueue.push(systemErrorCode);
+                    if (systemErrorCode != SystemError::noError)
+                        return;
+
+                    // TODO: #ak Have to send something here because server socket with
+                    // encryption auto-detection will not return socket until something is received.
+                    // This condition should be handled by a more generic approach.
+                    connectionCtx->connection.sendAsync(
+                        m_clientMessage,
+                        [](SystemError::ErrorCode, std::size_t) {});
+                });
+        }
+    }
+
     void assertAcceptedConnectionNonBlockingModeIs(bool expected)
     {
         bool isNonBlockingMode = false;
@@ -646,6 +679,14 @@ protected:
     void thenConnectionIsEstablished()
     {
         ASSERT_EQ(SystemError::noError, m_connectResultQueue.pop());
+    }
+
+    void thenEveryConnectionEstablishedSuccessfully()
+    {
+        for (int i = 0; i < (int) m_clientConnections.size(); ++i)
+        {
+            ASSERT_EQ(SystemError::noError, m_connectResultQueue.pop());
+        }
     }
 
     void assertConnectionToServerCanBeEstablishedUsingMappedName()
@@ -701,6 +742,14 @@ protected:
     void thenServerReceivedData()
     {
         m_synchronousServerReceivedData.waitForReceivedDataToMatch(m_sentData);
+    }
+
+    void thenEveryConnectionIsAccepted()
+    {
+        for (int i = 0; i < (int) m_clientConnections.size(); ++i)
+        {
+            ASSERT_NE(nullptr, std::get<1>(m_acceptedConnections.pop()));
+        }
     }
 
     //---------------------------------------------------------------------------------------------
@@ -923,7 +972,7 @@ TYPED_TEST_P(
 
 TYPED_TEST_P(StreamSocketAcceptance, randomly_stopping_multiple_simultaneous_connections)
 {
-    this->givenListeningServerSocket();
+    this->givenListeningServerSocket(kTotalConnections);
     this->givenRandomNameMappedToServerHostIp();
 
     this->startMaximumConcurrentConnections(this->mappedEndpoint());
@@ -991,8 +1040,10 @@ TYPED_TEST_P(StreamSocketAcceptance, receive_timeout_change_is_not_ignored)
 
 TYPED_TEST_P(StreamSocketAcceptance, transfer_async)
 {
+    constexpr int connectionCount = 7;
+
     this->givenPingPongServer();
-    this->whenSendMultiplePingsViaMultipleConnections();
+    this->whenSendMultiplePingsViaMultipleConnections(connectionCount);
     this->thenPongIsReceivedViaEachConnection();
 }
 
@@ -1090,6 +1141,27 @@ TYPED_TEST_P(
     this->assertAcceptedConnectionNonBlockingModeIs(false);
 }
 
+TYPED_TEST_P(
+    StreamSocketAcceptance,
+    server_socket_accepts_many_connections_in_a_row)
+{
+    constexpr int connectionCount = 51;
+
+    this->givenAcceptingServerSocket();
+    this->whenEstablishMultipleConnectionsAsync(connectionCount);
+    this->thenEveryConnectionIsAccepted();
+}
+
+TYPED_TEST_P(StreamSocketAcceptance, server_socket_listen_queue_size_is_used)
+{
+    constexpr int listenQueueSize =
+        AbstractStreamServerSocket::kDefaultBacklogSize + 11;
+
+    this->givenListeningServerSocket(listenQueueSize);
+    this->whenEstablishMultipleConnectionsAsync(listenQueueSize);
+    this->thenEveryConnectionEstablishedSuccessfully();
+}
+
 //TYPED_TEST_P(StreamSocketAcceptance, socket_is_reusable_after_recv_timeout)
 
 REGISTER_TYPED_TEST_CASE_P(StreamSocketAcceptance,
@@ -1110,7 +1182,9 @@ REGISTER_TYPED_TEST_CASE_P(StreamSocketAcceptance,
     nonblocking_accept_reports_wouldBlock_if_no_incoming_connections,
     nonblocking_accept_actually_accepts_connections,
     accepted_socket_is_in_blocking_mode_when_server_socket_is_nonblocking,
-    accepted_socket_is_in_blocking_mode_when_server_socket_is_blocking);
+    accepted_socket_is_in_blocking_mode_when_server_socket_is_blocking,
+    server_socket_accepts_many_connections_in_a_row,
+    server_socket_listen_queue_size_is_used);
 
 } // namespace test
 } // namespace network
