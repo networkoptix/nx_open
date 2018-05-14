@@ -12,8 +12,8 @@ def mediaserver_factory(artifact_factory, mediaserver_deb, ca):
 @pytest.fixture()
 def two_linux_mediaservers(mediaserver_factory, two_linux_vms):
     first_vm, second_vm = two_linux_vms
-    with mediaserver_factory.allocated_mediaserver('first', first_vm) as first_mediaserver:
-        with mediaserver_factory.allocated_mediaserver('second', second_vm) as second_mediaserver:
+    with mediaserver_factory.allocated_mediaserver(first_vm) as first_mediaserver:
+        with mediaserver_factory.allocated_mediaserver(second_vm) as second_mediaserver:
             yield first_mediaserver, second_mediaserver
 
 
@@ -33,7 +33,7 @@ def two_merged_linux_mediaservers(two_running_linux_mediaservers):
 
 @pytest.fixture()
 def linux_mediaserver(linux_vm, mediaserver_factory):
-    with mediaserver_factory.allocated_mediaserver('single', linux_vm) as mediaserver:
+    with mediaserver_factory.allocated_mediaserver(linux_vm) as mediaserver:
         yield mediaserver
 
 
