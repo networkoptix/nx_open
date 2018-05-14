@@ -1,2 +1,3 @@
+# This file is branch-dependend. Never merge it's content from one branch to another!
 release:
   default_cloud_group: prod
