@@ -849,6 +849,7 @@ ResultCode CommonUpdateRegistry::latestUpdate(
     const UpdateRequestData& updateRequestData,
     QnSoftwareVersion* outSoftwareVersion) const
 {
+    // #TODO #akulikov check manual data here
     CustomizationData customizationData;
     if (!hasUpdateForCustomizationAndVersion(updateRequestData, &customizationData))
         return ResultCode::noData;
