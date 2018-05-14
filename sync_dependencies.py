@@ -182,8 +182,6 @@ def sync_dependencies(syncher):
         #sync("libcedrus-1.0-deb7")
         #sync("uboot-2014.04-10733-gbb5691c-dirty-vanilla")
 
-        sync("libstdc++-6.0.19")
-
     sync("any/certificates-" + customization, path_variable="certificates_path")
 
 
