@@ -18,14 +18,14 @@
 static const int VMAX_API_PORT = 9010;
 static const int TCP_TIMEOUT = 3000;
 static const QString NAME_PREFIX(QLatin1String("VMAX-"));
+static const QString kUpnpBasicDeviceType("dvrdevice");
 
 // ====================================================================
 QnPlVmax480ResourceSearcher::QnPlVmax480ResourceSearcher(QnCommonModule* commonModule):
     QnAbstractResourceSearcher(commonModule),
     QnAbstractNetworkResourceSearcher(commonModule),
-    QnUpnpResourceSearcherAsync(commonModule)
+    QnUpnpResourceSearcherAsync(commonModule, kUpnpBasicDeviceType)
 {
-
 }
 
 QnPlVmax480ResourceSearcher::~QnPlVmax480ResourceSearcher()
