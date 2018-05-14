@@ -880,8 +880,6 @@ CameraDiagnostics::Result HanwhaResource::initDevice()
 
     const bool hasVideoArchive = isNvr() || hasCameraCapabilities(Qn::RemoteArchiveCapability);
     sharedContext->startServices(hasVideoArchive, isNvr());
-    if (isNvr())
-        setCameraCapability(Qn::isPlaybackSpeedSupported, true);
 
     // it's saved in isDefaultPasswordGuard
     isDefaultPassword = getAuth() == HanwhaResourceSearcher::getDefaultAuth();
@@ -976,6 +974,8 @@ CameraDiagnostics::Result HanwhaResource::initSystem()
 
     if (isNvr())
     {
+        setCameraCapability(Qn::isPlaybackSpeedSupported, true);
+
         const auto sunapiSupportAttribute = m_attributes.attribute<bool>(
             lit("Media/Protocol.SUNAPI/%1").arg(getChannel()));
 

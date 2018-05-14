@@ -236,7 +236,7 @@ void QnVMax480ConnectionProcessor::run()
 
         if (dataSize >= MAX_ALLOWED_FRAME_SIZE)
         {
-            NX_WARNING(this, lm("Got mailformed vmax packet. Too large size %1.").arg(dataSize));
+            NX_WARNING(this, lm("Got malformed vmax packet. Too large size %1.").arg(dataSize));
             break;
         }
 
