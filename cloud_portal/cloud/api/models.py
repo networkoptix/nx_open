@@ -68,5 +68,9 @@ class AccountLoginHistory(models.Model):
     email = models.CharField(max_length=256, null=True)
     date = models.DateTimeField(auto_now_add=True)
 
+    class Meta:
+        verbose_name = 'Authentication log record'
+        verbose_name_plural = 'Authentication log'
+
     def __unicode__(self):
         return '{0} - {1} - {2}'.format(self.action, self.username, self.ip)
