@@ -167,19 +167,22 @@ def sync_dependencies(syncher):
             sync("sasl2")
 
     if box == "bpi":
-        sync("libvdpau-sunxi-1.0-deb7")
-        sync("proxy-decoder-deb7")
-        sync("ldpreloadhook-1.0-deb7")
-        sync("libpixman-0.34.0-deb7")
-        sync("libcedrus-1.0-deb7")
+        # Lite Client dependencies.
+        #sync("fontconfig-2.11.0")
+        #sync("additional-fonts")
+        #sync("read-edid-3.0.2")
+        #sync("a10-display")
+        
+        # Hardware video decoding in Lite Client on Debian 7; kernel upgrade.
+        #sync("libvdpau-1.0.4.1")
+        #sync("libvdpau-sunxi-1.0-deb7")
+        #sync("proxy-decoder-deb7")
+        #sync("ldpreloadhook-1.0-deb7")
+        #sync("libpixman-0.34.0-deb7")
+        #sync("libcedrus-1.0-deb7")
+        #sync("uboot-2014.04-10733-gbb5691c-dirty-vanilla")
 
-        sync("fontconfig-2.11.0")
-        sync("additional-fonts")
-        sync("libvdpau-1.0.4.1")
-
-        sync("read-edid-3.0.2")
-        sync("a10-display")
-        sync("uboot-2014.04-10733-gbb5691c-dirty-vanilla")
+        sync("libstdc++-6.0.19")
 
     sync("any/certificates-" + customization, path_variable="certificates_path")
 

@@ -45,6 +45,9 @@ private:
     void updateButtonsState();
     QnMediaServerConnectionPtr getServerConnection() const;
 
+    // Returns current values of all parameters that belong to the given group set.
+    QnCameraAdvancedParamValueMap groupParameters(const QSet<QString>& groups) const;
+
     void at_advancedParamChanged(const QString &id, const QString &value);
 
 private slots:

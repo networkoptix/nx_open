@@ -32,6 +32,8 @@ public:
     /** Get all values from this map that differs from corresponding values from other map. */
     QnCameraAdvancedParamValueList difference(const QnCameraAdvancedParamValueMap &other) const;
 
+    QnCameraAdvancedParamValueMap differenceMap(const QnCameraAdvancedParamValueMap &other) const;
+
     bool differsFrom(const QnCameraAdvancedParamValueMap &other) const;
 };
 
@@ -127,6 +129,9 @@ struct QnCameraAdvancedParameter
     bool resync = false;
     bool shouldKeepInitialValue = false;
     bool bindDefaultToMinimum = false;
+    // Parameters with the same group must be sent together
+    // even if some of their values have not been changed.
+    QString group;
 
     bool isValid() const;
     bool isValueValid(const QString& value) const;
@@ -165,7 +170,8 @@ QN_FUSION_DECLARE_FUNCTIONS(QnCameraAdvancedParameter::DataType, (lexical))
     (notes)\
     (shouldKeepInitialValue)\
     (bindDefaultToMinimum)\
-    (resync)
+    (resync)\
+    (group)
 
 struct QnCameraAdvancedParamGroup
 {
