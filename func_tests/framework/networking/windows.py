@@ -243,7 +243,6 @@ class WindowsNetworking(Networking):
         self.remove_routes()
         self.remove_ips()
         self.create_firewall_rule()
-        self.disable_internet()
 
     def setup_nat(self, outer_mac):
         raise NotImplementedError("Windows 10 cannot be set up as router out-of-the-box")
