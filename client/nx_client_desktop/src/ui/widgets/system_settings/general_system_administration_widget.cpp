@@ -136,8 +136,8 @@ QnGeneralSystemAdministrationWidget::QnGeneralSystemAdministrationWidget(QWidget
     setHelpTopic(m_buttons[kBookmarksButton    ], Qn::Bookmarks_Usage_Help);
 
     auto backupHint = nx::client::desktop::HintButton::hintThat(ui->backupGroupBox);
-    backupHint->addHintLine(tr("Creates a backup of local System configurations that can be restored in case of failure."));
-    backupHint->addHintLine(tr("Backup includes registry flags, file systems, and server settings related to archive, events, and audit trail logs. Does not backup archives."));
+    backupHint->addHintLine(tr("Creates a backup of System configuration that can be restored in case of failure."));
+    backupHint->addHintLine(tr("Backup includes servers and cameras settings, users, webpages, event rules, etc. Video is not saved."));
     backupHint->setHelpTopic(Qn::SystemSettings_Server_Backup_Help);
 
     connect(m_buttons[kBusinessRulesButton], &QPushButton::clicked, this,

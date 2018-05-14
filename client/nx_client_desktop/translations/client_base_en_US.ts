@@ -3680,11 +3680,11 @@ to %1</source>
         <translation></translation>
     </message>
     <message>
-        <source>Creates a backup of local System configurations that can be restored in case of failure.</source>
+        <source>Backup includes servers and cameras settings, users, webpages, event rules, etc. Video is not saved.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Backup includes registry flags, file systems, and server settings related to archive, events, and audit trail logs. Does not backup archives.</source>
+        <source>Creates a backup of System configuration that can be restored in case of failure.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -6391,11 +6391,11 @@ to %1</source>
         <translation></translation>
     </message>
     <message>
-        <source>Creates a backup of local System configurations that can be restored in case of failure.</source>
+        <source>Backup includes servers and cameras settings, users, webpages, event rules, etc. Video is not saved.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Backup includes registry flags, file systems, and server settings related to archive, events, and audit trail logs. Does not backup archives.</source>
+        <source>Creates a backup of System configuration that can be restored in case of failure.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -6691,11 +6691,11 @@ to %1</source>
         <translation></translation>
     </message>
     <message>
-        <source>Tracks and logs all user actions</source>
+        <source>Sends anonymous System information (firmware, codecs, streams, etc.).</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Sends device, server and System information (firmware, codecs, streams, license keys, etc.).</source>
+        <source>Tracks and logs all user actions.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
