@@ -7,11 +7,11 @@ import { RouterModule, Routes } from '@angular/router';
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 
 import { DownloadComponent } from './download.component';
-
+import { OsResolver }        from "../core";
 
 const appRoutes: Routes = [
     // {path: 'downloads', component: DownloadComponent},
-    {path: 'download', component: DownloadComponent},
+    {path: 'download', component: DownloadComponent, resolve: {platform: OsResolver}},
     {path: 'download/:platform', component: DownloadComponent}
 ];
 
@@ -25,6 +25,7 @@ const appRoutes: Routes = [
         RouterModule.forChild(appRoutes)
     ],
     providers: [
+        OsResolver
     ],
     declarations: [
         DownloadComponent,

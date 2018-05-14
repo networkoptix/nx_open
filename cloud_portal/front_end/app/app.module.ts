@@ -94,7 +94,7 @@ class HybridUrlHandlingStrategy implements UrlHandlingStrategy {
         }),
         DeviceDetectorModule.forRoot(),
         NgbModule.forRoot(),
-        RouterModule.forRoot([], {initialNavigation: false})
+        RouterModule.forRoot([], {initialNavigation: true})
     ],
     entryComponents: [
         NxProcessButtonComponent,

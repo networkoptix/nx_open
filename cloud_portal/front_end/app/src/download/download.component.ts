@@ -18,7 +18,7 @@ export class DownloadComponent implements OnInit, OnDestroy, AfterViewChecked {
     private sub: any;
     private platform: any;
     private activeOs: string;
-    private deviceInfo = null;
+    private routeData: any;
 
     installers: any;
     downloads: any;
@@ -51,13 +51,36 @@ export class DownloadComponent implements OnInit, OnDestroy, AfterViewChecked {
                 @Inject(DOCUMENT) private document: any,
                 private route: ActivatedRoute,
                 private router: Router,
-                private titleService: Title,
-                private deviceService: DeviceDetectorService) {
+                private titleService: Title) {
 
         this.setupDefaults();
 
         this.downloads = this.configService.config.downloads;
-        this.deviceInfo = this.deviceService.getDeviceInfo();
+    }
+
+    private getDownloadersPer(platform: string) {
+        this.cloudApi
+            .getDownloads()
+            .then(data => {
+                this.downloadsData = data.data;
+
+                this.downloads.groups.forEach(platform => {
+                    return platform.installers.filter(installer => {
+                        const targetInstaller = this.downloadsData.installers.find(existingInstaller => {
+
+                            return installer.platform === existingInstaller.platform &&
+                                installer.appType === existingInstaller.appType;
+                        });
+
+                        if (targetInstaller) {
+                            Object.assign(installer, targetInstaller);
+                            installer.formatName = this.language.lang.downloads.platforms[installer.platform] + ' - ' + this.language.lang.downloads.appTypes[installer.appType];
+                            installer.url = this.downloadsData.releaseUrl + installer.path;
+                        }
+                        return !!targetInstaller;
+                    })[0];
+                });
+            });
     }
 
     public beforeChange($event: NgbTabChangeEvent) {
@@ -65,14 +88,18 @@ export class DownloadComponent implements OnInit, OnDestroy, AfterViewChecked {
 
         this.titleService.setTitle(this.language.lang.pageTitles.downloadPlatform + platform);
 
-        this.router.navigate(['/download', platform]);
+        this.activeOs = platform;
+        this.getDownloadersPer(platform);
+        // this.router.navigate(['/download', platform]);
     };
 
     ngOnInit(): void {
+        this.routeData = this.route.snapshot.data;
+
         this.sub = this.route.params.subscribe(params => {
             this.platform = params['platform'];
 
-            this.activeOs = this.platform || this.platformMatch[this.deviceInfo.os];
+            this.activeOs = this.platform || this.platformMatch[this.routeData.platform.os];
 
             for (let mobile in this.downloads.mobile) {
                 if (this.downloads.mobile[mobile].os === this.activeOs) {
@@ -100,28 +127,7 @@ export class DownloadComponent implements OnInit, OnDestroy, AfterViewChecked {
             }
         });
 
-        this.cloudApi
-            .getDownloads()
-            .then(data => {
-                this.downloadsData = data.data;
-
-                this.downloads.groups.forEach(platform => {
-                    platform.installers.filter(installer => {
-                        const targetInstaller = this.downloadsData.installers.find(existingInstaller => {
-
-                            return installer.platform === existingInstaller.platform &&
-                                installer.appType === existingInstaller.appType;
-                        });
-
-                        if (targetInstaller) {
-                            Object.assign(installer, targetInstaller);
-                            installer.formatName = this.language.lang.downloads.platforms[installer.platform] + ' - ' + this.language.lang.downloads.appTypes[installer.appType];
-                            installer.url = this.downloadsData.releaseUrl + installer.path;
-                        }
-                        return !!targetInstaller;
-                    })[0];
-                });
-            });
+        this.getDownloadersPer(this.activeOs);
     }
 
     ngOnDestroy() {
