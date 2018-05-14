@@ -13,6 +13,7 @@
 #include <QtWidgets/QCheckBox>
 #include <QtWidgets/QDesktopWidget>
 #include <QtWidgets/QLineEdit>
+#include <QtWidgets/QPlainTextEdit>
 #include <QtWidgets/QPushButton>
 #include <QtWidgets/QWhatsThis>
 
@@ -178,6 +179,7 @@
 #include "ui/widgets/palette_widget.h"
 #include "network/authutil.h"
 #include <core/resource/fake_media_server.h>
+#include <client/client_app_info.h>
 
 namespace {
 
@@ -342,6 +344,7 @@ ActionHandler::ActionHandler(QObject *parent) :
     connect(action(action::BrowseUrlAction), SIGNAL(triggered()), this, SLOT(at_browseUrlAction_triggered()));
     connect(action(action::VersionMismatchMessageAction), &QAction::triggered, this, &ActionHandler::at_versionMismatchMessageAction_triggered);
     connect(action(action::BetaVersionMessageAction), SIGNAL(triggered()), this, SLOT(at_betaVersionMessageAction_triggered()));
+    connect(action(action::ShowEulaAction), &QAction::triggered, this, &ActionHandler::showEula);
     connect(action(action::AllowStatisticsReportMessageAction), &QAction::triggered, this, [this] { checkIfStatisticsReportAllowed(); });
 
     connect(action(action::QueueAppRestartAction), SIGNAL(triggered()), this, SLOT(at_queueAppRestartAction_triggered()));
@@ -685,6 +688,34 @@ void ActionHandler::showMultipleCamerasErrorMessage(
 
     messageBox.setStandardButtons(QDialogButtonBox::Ok);
     messageBox.exec();
+}
+
+void ActionHandler::showEula()
+{
+    QFile eula(lit(":/license.txt"));
+    eula.open(QIODevice::ReadOnly);
+    const QString eulaText = QString::fromUtf8(eula.readAll());
+
+    QnMessageBox eulaDialog(context()->mainWindow());
+    eulaDialog.setIcon(QnMessageBoxIcon::Warning);
+    eulaDialog.setText(tr("To use the software you must accept the end user license agreement"));
+
+    auto textEdit = new QPlainTextEdit(&eulaDialog);
+    textEdit->setPlainText(eulaText);
+    textEdit->setReadOnly(true);
+    textEdit->setFixedSize(740, 560);
+    eulaDialog.addCustomWidget(textEdit, QnMessageBox::Layout::Content, 1);
+    eulaDialog.addButton(tr("Accept"), QDialogButtonBox::AcceptRole, Qn::ButtonAccent::Standard);
+    eulaDialog.addButton(tr("Decline"), QDialogButtonBox::RejectRole);
+
+    if (eulaDialog.exec() == QDialogButtonBox::AcceptRole)
+    {
+        qnSettings->setAcceptedEulaVersion(QnClientAppInfo::eulaVersion());
+    }
+    else
+    {
+        menu()->trigger(action::DelayedForcedExitAction);
+    }
 }
 
 void ActionHandler::changeDefaultPasswords(

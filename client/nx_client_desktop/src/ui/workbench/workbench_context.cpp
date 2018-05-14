@@ -39,6 +39,7 @@
 
 #include <nx/utils/log/log.h>
 #include <client/client_module.h>
+#include <client/client_app_info.h>
 
 using namespace nx::client::desktop::ui;
 
@@ -340,8 +341,12 @@ bool QnWorkbenchContext::handleStartupParameters(const QnStartupParameters& star
         menu()->trigger(action::InstantDropResourcesAction, {Qn::SerializedDataRole, data});
     }
 
+    const bool showEula = qnSettings->acceptedEulaVersion() < QnClientAppInfo::eulaVersion();
+    if (showEula)
+        action(action::ShowEulaAction)->trigger();
+
     /* Show beta version warning message for the main instance only */
-    bool showBetaWarning = QnAppInfo::beta()
+    const bool showBetaWarning = QnAppInfo::beta()
         && !startupParams.allowMultipleClientInstances
         && qnRuntime->isDesktopMode()
         && !qnRuntime->isDevMode()
