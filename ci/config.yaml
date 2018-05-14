@@ -1,0 +1,2 @@
+release:
+  default_cloud_group: prod
