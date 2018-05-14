@@ -1,3 +1,9 @@
+'''
+Script is required to update ArecontVision models xml file using online database.
+Must be run from the repository root directory.
+'''
+
+
 #script puts file with mismatches to your home directory
 import requests, re, os
 from os.path import expanduser
@@ -27,7 +33,7 @@ for i in range(len(get_list)):
         model = af_series[0][5:].lower()
     else:
         model = a_series[0][5:].lower()
-    upd = {model : fps}    
+    upd = {model : fps}
     site_list.update(upd)
 
 
