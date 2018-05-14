@@ -33,6 +33,9 @@ const char OnvifResourceSearcherWsdd::WSA_ADDRESS[] = "http://schemas.xmlsoap.or
 const char OnvifResourceSearcherWsdd::WSDD_ADDRESS[] = "urn:schemas-xmlsoap-org:ws:2005:04:discovery";
 const char OnvifResourceSearcherWsdd::WSDD_ACTION[] = "http://schemas.xmlsoap.org/ws/2005/04/discovery/Probe";
 
+static const std::vector<QString> kManufacturerScopePrefixes
+    = {lit("onvif://www.onvif.org/manufacturer/")};
+
 const char OnvifResourceSearcherWsdd::WSDD_GSOAP_MULTICAST_ADDRESS[] = "soap.udp://239.255.255.250:3702";
 
 static const int WSDD_MULTICAST_PORT = 3702;
@@ -510,6 +513,22 @@ QString OnvifResourceSearcherWsdd::getManufacturer(const T* source, const QStrin
     return result;
 }
 
+template<typename T>
+std::set<QString> OnvifResourceSearcherWsdd::additionalManufacturers(
+    const T* source,
+    const std::vector<QString> additionalManufacturerPrefixes) const
+{
+    std::set<QString> result;
+    for (const auto& prefix : additionalManufacturerPrefixes)
+    {
+        auto scopeValue = extractScope(source, prefix);
+        if (!scopeValue.isEmpty())
+            result.insert(scopeValue);
+    }
+
+    return result;
+}
+
 template <class T>
 QString OnvifResourceSearcherWsdd::extractScope(const T* source, const QString& pattern) const
 {
@@ -565,9 +584,12 @@ void OnvifResourceSearcherWsdd::addEndpointToHash(EndpointInfoHash& hash, const 
         return;
     }
 
-    QString name = extractScope(source, QLatin1String(SCOPES_NAME_PREFIX));
-    QString manufacturer = getManufacturer(source, name);
-    QString location = extractScope(source, QLatin1String(SCOPES_LOCATION_PREFIX));
+    const auto name = extractScope(source, QLatin1String(SCOPES_NAME_PREFIX));
+    const auto manufacturer = getManufacturer(source, name);
+    const auto location = extractScope(source, QLatin1String(SCOPES_LOCATION_PREFIX));
+    const auto additionalVendors = additionalManufacturers(
+        source,
+        kManufacturerScopePrefixes);
 
     QString mac = getMac(source, header);
 
@@ -582,7 +604,8 @@ void OnvifResourceSearcherWsdd::addEndpointToHash(EndpointInfoHash& hash, const 
             location,
             mac,
             uniqId,
-            host));
+            host,
+            additionalVendors));
 }
 
 template <class T>

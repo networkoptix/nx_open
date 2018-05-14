@@ -514,6 +514,10 @@
             ],
             "analogEncoder": true
         },
+        {
+            "keys": ["UNIVIEW|DVS4116"],
+            "enableAdditionalManufacturerNormalization": true
+        },
 
         {
             "keys": [
