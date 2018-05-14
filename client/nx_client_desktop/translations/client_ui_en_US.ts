@@ -117,20 +117,6 @@
         <source>Disable blur</source>
         <translation></translation>
     </message>
-    <message>
-        <location/>
-        <source>
-            Helps avoid problems with OpenGL drawing, which result in 100% CPU load.
-          </source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>
-              Bigger buffer makes playback smoother but increases the delay between real situation and live view.
-            </source>
-        <translation type="unfinished"></translation>
-    </message>
 </context>
 <context>
     <name>AggregationWidget</name>
