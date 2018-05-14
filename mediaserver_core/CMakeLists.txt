@@ -1,4 +1,5 @@
 include(camera_vendors.cmake)
+include(find_java)
 
 find_package(Qt5 COMPONENTS WebSockets)
 
@@ -31,8 +32,12 @@ set(apidoctool_params
     "-DhandlerRegistrationCpp=/mediaserver_core/src/media_server_process.cpp"
 )
 
+if(Java_VERSION_MINOR LESS 6 OR Java_VERSION_MINOR GREATER 8)
+    message(FATAL_ERROR "Java Runtime Environment 6, 7 or 8 is required for apidoctool.")
+endif()
+
 execute_process(
-    COMMAND java -jar "${apidoctool_jar}" print-deps ${apidoctool_params}
+    COMMAND "${Java_JAVA_EXECUTABLE}" -jar "${apidoctool_jar}" print-deps ${apidoctool_params}
     RESULT_VARIABLE apidoctool_result
     OUTPUT_VARIABLE apidoctool_deps
 )
@@ -56,7 +61,7 @@ add_custom_command(
         "${CMAKE_CURRENT_SOURCE_DIR}/api/api_template.xml"
         ${apidoctool_deps_absolute}
     COMMAND
-        java -jar "${apidoctool_jar}"
+        "${Java_JAVA_EXECUTABLE}" -jar "${apidoctool_jar}"
         code-to-xml
         -vms-path "${PROJECT_SOURCE_DIR}"
         -template-xml "${CMAKE_CURRENT_SOURCE_DIR}/api/api_template.xml"
