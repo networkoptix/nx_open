@@ -1,15 +1,19 @@
-from django.utils import timezone
+import logging
+
 from django import db
-import models
-from api.controllers.cloud_api import Account
+from django.utils import timezone
 from django.contrib.auth.backends import ModelBackend
-from api.helpers.exceptions import APIRequestException, APIException, APILogicException, ErrorCodes
 from django.core.exceptions import ObjectDoesNotExist
-from cloud import settings
 from django.contrib.auth.signals import user_logged_in, user_logged_out, user_login_failed
 from django.dispatch import receiver
 
-import logging
+from cloud import settings
+import models
+
+from api.controllers.cloud_api import Account
+from api.helpers.exceptions import APIRequestException, APIException, APILogicException, ErrorCodes, APINotAuthorisedException
+
+
 logger = logging.getLogger(__name__)
 
 
@@ -29,7 +33,10 @@ class AccountBackend(ModelBackend):
 
     @staticmethod
     def authenticate(username=None, password=None):
-        user = Account.get(username, password)  # first - check cloud_db
+        try:
+            user = Account.get(username, password)  # first - check cloud_db
+        except APINotAuthorisedException:
+            return None  # not authorised - return None which tells django that auth failed and it will log it
 
         if user and 'email' in user:
             if username.find('@') > -1:

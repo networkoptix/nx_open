@@ -21,7 +21,7 @@ reload(sys)
 sys.setdefaultencoding("utf-8")
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-LOCAL_ENVIRONMENT = False
+LOCAL_ENVIRONMENT = 'runserver' in sys.argv
 conf = get_config()
 
 CUSTOMIZATION = os.getenv('CUSTOMIZATION')

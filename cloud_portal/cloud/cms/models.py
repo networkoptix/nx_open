@@ -205,7 +205,7 @@ class DataStructure(models.Model):
                     content_value = content_record.latest('version_id').value
 
         # if no value or optional and type file - use default value from structure
-        if not content_value and (not self.optional or self.optional and self.type == DataStructure.DATA_TYPES.file):
+        if not content_value and (not self.optional or self.optional and self.type in [DataStructure.DATA_TYPES.file, DataStructure.DATA_TYPES.image]):
             content_value = self.default
 
         return content_value
