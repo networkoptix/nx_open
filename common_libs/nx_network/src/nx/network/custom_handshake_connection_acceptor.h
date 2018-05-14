@@ -33,7 +33,6 @@ public:
         nx::utils::MoveOnlyFunc<std::unique_ptr<CustomHandshakeConnection>(
             std::unique_ptr<AbstractStreamSocket>)>;
 
-    constexpr static std::size_t kDefaultPreemptiveConnectionCount = 7;
     constexpr static std::size_t kDefaultMaxReadyConnectionCount = 32;
 
     CustomHandshakeConnectionAcceptor(
@@ -57,16 +56,6 @@ public:
             connection->bindToAioThread(aioThread);
         for (auto& connection: m_acceptedConnections)
             connection->bindToAioThread(aioThread);
-    }
-
-    void setPreemptiveConnectionCount(std::size_t count)
-    {
-        m_preemptiveConnectionCount = count;
-    }
-
-    std::size_t preemptiveConnectionCount() const
-    {
-        return m_preemptiveConnectionCount;
     }
 
     /**
@@ -170,7 +159,6 @@ private:
     Connections m_connections;
     AcceptCompletionHandler m_acceptHandler;
     std::deque<std::unique_ptr<CustomHandshakeConnection>> m_acceptedConnections;
-    std::size_t m_preemptiveConnectionCount = kDefaultPreemptiveConnectionCount;
     std::size_t m_maxReadyConnectionCount = kDefaultMaxReadyConnectionCount;
     aio::BasicPollable m_acceptCallScheduler;
     mutable QnMutex m_mutex;
