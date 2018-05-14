@@ -52,12 +52,12 @@ class SSHPath(FileSystemPath, PurePosixPath):
         else:
             return True
 
-    @_raising_on_exit_status({2: NotADir, 3: NotAFile})
+    @_raising_on_exit_status({2: DoesNotExist, 3: NotAFile})
     def unlink(self):
         self._ssh_access.run_sh_script(
             # language=Bash
             '''
-                test ! -e "$SELF" && >&2 echo "does not exist: $SELF" && echo 2
+                test ! -e "$SELF" && >&2 echo "does not exist: $SELF" && exit 2
                 test ! -f "$SELF" && >&2 echo "not a file: $SELF" && exit 3
                 rm -v -- "$SELF"
                 ''',
