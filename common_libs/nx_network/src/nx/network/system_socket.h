@@ -229,7 +229,7 @@ public:
      */
     static int accept(int sockDesc);
 
-    virtual bool listen(int queueLen = 128) override;
+    virtual bool listen(int queueLen = AbstractStreamServerSocket::kDefaultBacklogSize) override;
     virtual std::unique_ptr<AbstractStreamSocket> accept() override;
     virtual void pleaseStop(nx::utils::MoveOnlyFunc< void() > handler) override;
     virtual void pleaseStopSync(bool assertIfCalledUnderLock = true) override;
