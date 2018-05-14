@@ -109,6 +109,7 @@ OnvifResourceInformationFetcher::OnvifResourceInformationFetcher(QnCommonModule*
     m_hookChain.registerHook(searcher_hooks::hikvisionManufacturerReplacement);
     m_hookChain.registerHook(searcher_hooks::manufacturerReplacementByModel);
     m_hookChain.registerHook(searcher_hooks::pelcoModelNormalization);
+    m_hookChain.registerHook(searcher_hooks::additionalManufacturerNormalization);
 }
 
 void OnvifResourceInformationFetcher::findResources(const EndpointInfoHash& endpointInfo, QnResourceList& result, DiscoveryMode discoveryMode) const

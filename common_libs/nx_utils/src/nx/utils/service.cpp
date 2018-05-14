@@ -14,9 +14,9 @@ Service::Service(int argc, char **argv, const QString& applicationDisplayName):
 {
 }
 
-void Service::setEmbeddedMode(bool value)
+void Service::initializeLogging(bool value)
 {
-    m_isEmbeddedMode = value;
+    m_isLoggingInitializationRequired = value;
 }
 
 void Service::pleaseStop()
@@ -49,7 +49,7 @@ int Service::exec()
             return 0;
         }
 
-        if (!m_isEmbeddedMode)
+        if (m_isLoggingInitializationRequired)
             initializeLog(*settings);
 
         return serviceMain(*settings);

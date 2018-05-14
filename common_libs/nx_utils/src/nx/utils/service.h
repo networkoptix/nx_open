@@ -17,7 +17,7 @@ public:
     Service(int argc, char **argv, const QString& applicationDisplayName);
     virtual ~Service() = default;
 
-    void setEmbeddedMode(bool value);
+    void initializeLogging(bool value);
 
     virtual void pleaseStop() override;
 
@@ -36,9 +36,9 @@ protected:
     int runMainLoop();
 
 private:
-    bool m_isEmbeddedMode = false;
-    int m_argc;
-    char** m_argv;
+    bool m_isLoggingInitializationRequired = true;
+    int m_argc = 0;
+    char** m_argv = nullptr;
     nx::utils::promise<int> m_processTerminationEvent;
     nx::utils::MoveOnlyFunc<void(bool /*isStarted*/)> m_startedEventHandler;
     const QString m_applicationDisplayName;

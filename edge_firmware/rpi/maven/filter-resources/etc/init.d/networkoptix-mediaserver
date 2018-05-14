@@ -30,17 +30,6 @@ OUT_FLAG="$LOGS_DIR/$(basename "$0")-out.flag"
 OUT_LOG="$LOGS_DIR/$(basename "$0")-out.log"
 
 VERSION_FILE="$INSTALL_DIR/version.txt"
-INITIALIZED_FLAG="$INSTALL_DIR/initialized-$(cat "$VERSION_FILE").flag"
-
-OBSOLETE_LIBS=(
-    ffmpeg #< Was a dedicated ffmpeg for vdpau. Now one ffmpeg is used for vms and vdpau.
-    libclient_core.so #< Renamed to libnx_client_core.so.
-    libnx_streaming.so #< Eliminated (went to libnx_media).
-)
-OBSOLETE_FILES=(
-    # Eliminated (went to libnx_client_core).
-    "$LITE_CLIENT_DIR/bin/video/videonode/libnx_bpi_videonode_plugin.so"
-)
 
 export VMS_PLUGIN_DIR="$MEDIASERVER_DIR/plugins"
 export SASL_PATH="$LIBS_DIR/sasl2"
@@ -238,47 +227,6 @@ Supported commands:
 EOF
 }
 
-initialize_if_needed()
-{
-    if [ ! -f "$INITIALIZED_FLAG" ]; then
-        echo "First run: initialization BEGIN"
-
-        # Register autostart for Debian 8, if not yet.
-        if grep -- "$CUSTOMIZATION-mediaserver" /etc/init.d/.depend.stop >/dev/null 2>&1; then
-            echo "Mediaserver autostart already enabled."
-        else
-            echo "Enabling mediaserver autostart via update-rc.d"
-            update-rc.d -f "$CUSTOMIZATION-mediaserver" defaults
-        fi
-
-        # Delete obsolete libs.
-        local LIB
-        for LIB in "${OBSOLETE_LIBS[@]}"; do
-            local LIB_PATH="$LIBS_DIR/$LIB"
-            if [ -e "$LIB_PATH" ]; then
-                echo "Deleting obsolete $LIB_PATH"
-                rm -rf "$LIB_PATH"
-            fi
-        done
-
-        # Delete obsolete files and their parent dirs (if empty).
-        local FILE
-        for FILE in "${OBSOLETE_FILES[@]}"; do
-            if [ -e "$FILE" ]; then
-                echo "Deleting obsolete $FILE"
-                rm -rf "$FILE"
-                local DIR=$(dirname "$FILE")
-                while echo "    Deleting $DIR if empty" && rmdir "$DIR"; do
-                    DIR=$(dirname "$DIR")
-                done
-            fi
-        done
-
-        touch "$INITIALIZED_FLAG"
-        echo "First run: initialization END"
-    fi
-}
-
 #--------------------------------------------------------------------------------------------------
 # main
 
@@ -293,7 +241,6 @@ ulimit -c unlimited
 
 case "$1" in
     start)
-        initialize_if_needed
         start || true
         start_watchdog
         ;;
