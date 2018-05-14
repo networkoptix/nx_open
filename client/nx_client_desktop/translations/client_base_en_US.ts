@@ -5902,6 +5902,14 @@ to %1</source>
         <source>Update Files</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Validating the update...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Checking for free space...</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QnSessionAwareTabbedDialog</name>
