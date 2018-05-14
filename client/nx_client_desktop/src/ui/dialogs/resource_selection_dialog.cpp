@@ -154,8 +154,7 @@ void QnResourceSelectionDialog::initModel()
 
     m_resourceModel = new QnResourceTreeModel(scope, this);
 
-    // For the sake of VMS-9733 we do apply auto-expanding policy.
-    // Means expand if and only if server count <= 1 or cameras count <= 50.
+    // Auto expand if and only if server count <= 1 or cameras count <= 50.
     if (scope == QnResourceTreeModel::CamerasScope)
     {
         if (auto treeRoot = m_resourceModel->rootNode(Qn::NodeType::ServersNode))
@@ -164,10 +163,7 @@ void QnResourceSelectionDialog::initModel()
             int numResources = treeRoot->childrenRecursive().size() - numServers;
             bool expandAll = numServers <= 1 || numResources <= kAutoExpandThreshold;
 
-            auto expandPolicy = [expandAll](const QModelIndex& index)
-            {
-                return expandAll;
-            };
+            auto expandPolicy = [expandAll](const QModelIndex& index) { return expandAll; };
             ui->resourcesWidget->setAutoExpandPolicy(expandPolicy);
         }
     }
