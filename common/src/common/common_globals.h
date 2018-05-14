@@ -45,6 +45,7 @@ QN_DECLARE_METAOBJECT_HEADER(Qn,
         SetUserPasswordCapability           = 0x200, //< Can change password on a camera.
         isDefaultPasswordCapability         = 0x400, //< Camera has default password now.
         isOldFirmwareCapability             = 0x800, //< Camera has too old firmware.
+        CanEditStreamsCapability            = 0x1000, //< Camera's streams are editable.
     };
     Q_DECLARE_FLAGS(CameraCapabilities, CameraCapability)
     Q_DECLARE_OPERATORS_FOR_FLAGS(CameraCapabilities)

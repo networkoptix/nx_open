@@ -263,6 +263,7 @@ void QnCameraSettingsDialog::buttonBoxClicked(QDialogButtonBox::StandardButton b
         case QDialogButtonBox::Ok:
         case QDialogButtonBox::Apply:
             submitToResources();
+            at_settingsWidget_hasChangesChanged();
             break;
         case QDialogButtonBox::Cancel:
             m_settingsWidget->reject();
