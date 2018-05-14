@@ -6,8 +6,6 @@ import { ActivatedRoute, Router }       from '@angular/router';
 import { Title }                        from "@angular/platform-browser";
 import { DOCUMENT }                     from "@angular/common";
 import { NgbTabChangeEvent, NgbTabset } from "@ng-bootstrap/ng-bootstrap";
-import { DeviceDetectorService }        from 'ngx-device-detector';
-
 
 @Component({
     selector: 'download-component',
@@ -87,10 +85,7 @@ export class DownloadComponent implements OnInit, OnDestroy, AfterViewChecked {
         const platform = $event.nextId;
 
         this.titleService.setTitle(this.language.lang.pageTitles.downloadPlatform + platform);
-
-        this.activeOs = platform;
-        this.getDownloadersPer(platform);
-        // this.router.navigate(['/download', platform]);
+        this.router.navigate(['/download', platform]);
     };
 
     ngOnInit(): void {
@@ -127,7 +122,8 @@ export class DownloadComponent implements OnInit, OnDestroy, AfterViewChecked {
             }
         });
 
-        this.getDownloadersPer(this.activeOs);
+        this.getDownloadersPer(this.platform);
+        this.titleService.setTitle(this.language.lang.pageTitles.downloadPlatform + this.platform);
     }
 
     ngOnDestroy() {
