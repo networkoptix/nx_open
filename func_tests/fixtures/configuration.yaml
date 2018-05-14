@@ -2,7 +2,7 @@ vm_types:
   linux:
     os_family: linux
     registry_path: ~/.func_tests/trusty-registry.yaml
-    power_on_timeout_sec: 60
+    power_on_timeout_sec: 120
     name_format: trusty-{vm_index}
     limit: 100
     vm:
