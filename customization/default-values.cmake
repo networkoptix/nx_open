@@ -22,6 +22,7 @@ set(defaultSkin "dark_blue")
 
 set(freeLicenseCount "4")
 set(freeLicenseIsTrial "true")
+set(eulaVersion 1)
 
 # Update parameters
 set(update.generator.url "http://updates.hdw.mx/upcombiner/upcombine")
