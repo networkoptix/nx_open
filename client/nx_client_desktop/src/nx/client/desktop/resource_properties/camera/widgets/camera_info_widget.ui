@@ -265,7 +265,7 @@
            </property>
            <layout class="QHBoxLayout" name="ipAddressDetailLayout">
             <property name="spacing">
-             <number>12</number>
+             <number>8</number>
             </property>
             <property name="leftMargin">
              <number>0</number>
@@ -370,6 +370,12 @@
          </item>
          <item row="2" column="1">
           <widget class="QWidget" name="secondaryStreamControlWidget" native="true">
+           <property name="minimumSize">
+            <size>
+             <width>0</width>
+             <height>20</height>
+            </size>
+           </property>
            <property name="maximumSize">
             <size>
              <width>16777215</width>
@@ -433,6 +439,12 @@
          </item>
          <item row="1" column="1">
           <widget class="QWidget" name="primaryStreamControlWidget" native="true">
+           <property name="minimumSize">
+            <size>
+             <width>0</width>
+             <height>20</height>
+            </size>
+           </property>
            <property name="maximumSize">
             <size>
              <width>16777215</width>
