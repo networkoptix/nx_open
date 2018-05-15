@@ -26,7 +26,7 @@
 #include <ui/style/resource_icon_cache.h>
 #include <ui/style/skin.h>
 #include <ui/workbench/workbench_context.h>
-#include <ui/workbench/watchers/workbench_server_time_watcher.h>
+#include <nx/client/core/watchers/server_time_watcher.h>
 
 #include <utils/common/warnings.h>
 #include <utils/common/synctime.h>
@@ -280,7 +280,8 @@ QString QnAuditLogModel::formatDateTime(int timestampSecs, bool showDate, bool s
     if (timestampSecs == 0)
         return QString();
 
-    QDateTime dateTime = context()->instance<QnWorkbenchServerTimeWatcher>()->displayTime(timestampSecs * 1000ll);
+    const auto timeWatcher = context()->instance<nx::client::core::ServerTimeWatcher>();
+    QDateTime dateTime = timeWatcher->displayTime(timestampSecs * 1000ll);
     return formatDateTime(dateTime, showDate, showTime);
 }
 
@@ -782,8 +783,9 @@ bool QnAuditLogModel::skipDate(const QnAuditRecord *record, int row) const
     if (row < 1)
         return false;
 
-    QDate d1 = context()->instance<QnWorkbenchServerTimeWatcher>()->displayTime(record->createdTimeSec * 1000).date();
-    QDate d2 = context()->instance<QnWorkbenchServerTimeWatcher>()->displayTime(m_index->at(row - 1)->createdTimeSec * 1000).date();
+    const auto timeWatcher = context()->instance<nx::client::core::ServerTimeWatcher>();
+    QDate d1 = timeWatcher->displayTime(record->createdTimeSec * 1000).date();
+    QDate d2 = timeWatcher->displayTime(m_index->at(row - 1)->createdTimeSec * 1000).date();
     return d1 == d2;
 }
 

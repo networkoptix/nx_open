@@ -41,7 +41,28 @@ Page
             {
                 width: parent.width
                 text: qsTr("Save passwords for servers")
-                visible: false
+                checked: settings.savePasswords
+                onClicked:
+                {
+                    settings.savePasswords = checked
+                    if (checked)
+                        return
+
+                    var dialog = Workflow.openStandardDialog(
+                        "", qsTr("What to do with currently saved passwords?"),
+                        [
+                            "Keep",
+                            { "id": "DELETE", "text": qsTr("Delete") }
+                        ])
+
+                    dialog.buttonClicked.connect(
+                        function(buttonId)
+                        {
+                            if (buttonId == "DELETE")
+                                clearSavedPasswords()
+                        })
+
+                }
             }
         }
     }

@@ -21,6 +21,8 @@
 #include <utils/media/nalUnits.h>
 #include <utils/media/av_codec_helper.h>
 #include <utils/common/synctime.h>
+#include <nx/streaming/config.h>
+#include <utils/media/hevc_sps.h>
 #include <camera/video_camera.h>
 #include <mediaserver_ini.h>
 #include <analytics/detected_objects_storage/analytics_events_receptor.h>
@@ -623,8 +625,20 @@ void QnLiveStreamProvider::extractMediaStreamParams(
 {
     switch( videoData->compressionType )
     {
+        case AV_CODEC_ID_H265:
+            if (videoData->width > 0 && videoData->height > 0)
+            {
+                *newResolution = QSize(videoData->width, videoData->height);
+            }
+            else
+            {
+                nx::media_utils::hevc::Sps sps;
+                if (sps.decodeFromVideoFrame(videoData))
+                    *newResolution = QSize(sps.picWidthInLumaSamples, sps.picHeightInLumaSamples);
+            }
+            break;
         case AV_CODEC_ID_H264:
-            extractSpsPps(
+            nx::media_utils::avc::extractSpsPps(
                 videoData,
                 (videoData->width > 0 && videoData->height > 0)
                     ? nullptr   //taking resolution from sps only if video frame does not already contain it

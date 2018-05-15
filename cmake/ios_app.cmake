@@ -1,5 +1,3 @@
-set(loginKeychainPassword "qweasd123" CACHE STRING "Password to unlock login keychain.")
-
 function(add_ios_ipa target)
     cmake_parse_arguments(IPA "" "TARGET;FILE_NAME" "" ${ARGN})
 
@@ -11,7 +9,7 @@ function(add_ios_ipa target)
         COMMAND ${CMAKE_COMMAND} -E make_directory "${payload_dir}"
         COMMAND ${CMAKE_COMMAND} -E copy_directory "${app_dir}" "${payload_dir}"
         COMMAND
-            cd "$<CONFIGURATION>"
+            cd "ipa/$<CONFIGURATION>"
                 && ${CMAKE_COMMAND} -E tar cfv "${IPA_FILE_NAME}" --format=zip "Payload"
         DEPENDS ${IPA_TARGET}
         BYPRODUCTS "${IPA_FILE_NAME}"
@@ -111,9 +109,4 @@ function(setup_ios_application target)
             --output "${app_dir}/qt_qml"
         COMMENT "Copying QML imports for ${target}"
     )
-
-    if(loginKeychainPassword)
-        add_custom_command(TARGET ${target} POST_BUILD
-            COMMAND security unlock-keychain -p ${loginKeychainPassword} login.keychain)
-    endif()
 endfunction()

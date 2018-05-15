@@ -49,6 +49,12 @@
 #include <nx/mobile_client/webchannel/web_channel_server.h>
 #include <nx/mobile_client/controllers/web_admin_controller.h>
 #include <nx/mobile_client/helpers/inter_client_message.h>
+#include <nx/network/system_socket.h>
+
+extern "C"
+{
+#include <libavcodec/avcodec.h>
+}
 
 #include <ini.h>
 
@@ -56,6 +62,7 @@
 #include <nx/utils/crash_dump/systemexcept.h>
 
 using namespace nx::mobile_client;
+using namespace std::chrono;
 
 int runUi(QtSingleGuiApplication* application)
 {
@@ -73,10 +80,9 @@ int runUi(QtSingleGuiApplication* application)
     font.setFamily(lit("Roboto"));
     QGuiApplication::setFont(font);
 
-    QnContext context;
+    const auto context = qnMobileClientModule->context();
 
-    QScopedPointer<QnMobileClientUriHandler> uriHandler(new QnMobileClientUriHandler());
-    uriHandler->setUiController(context.uiController());
+    QScopedPointer<QnMobileClientUriHandler> uriHandler(new QnMobileClientUriHandler(context));
     for (const auto& scheme: uriHandler->supportedSchemes())
         QDesktopServices::setUrlHandler(scheme, uriHandler.data(), uriHandler->handlerMethodName());
 
@@ -93,10 +99,10 @@ int runUi(QtSingleGuiApplication* application)
             qnSettings->setWebSocketPort(webChannel->serverPort());
 
             auto liteClientHandler = commonModule->store(new QnLiteClientHandler());
-            liteClientHandler->setUiController(context.uiController());
+            liteClientHandler->setUiController(context->uiController());
 
             auto webAdminController = commonModule->store(new controllers::WebAdminController());
-            webAdminController->setUiController(context.uiController());
+            webAdminController->setUiController(context->uiController());
 
             webChannel->registerObject(lit("liteClientController"), webAdminController);
         }
@@ -104,7 +110,7 @@ int runUi(QtSingleGuiApplication* application)
 
     QStringList selectors;
 
-    if (context.liteMode())
+    if (context->liteMode())
     {
         selectors.append(lit("lite"));
         qWarning() << "Starting in lite mode";
@@ -119,7 +125,7 @@ int runUi(QtSingleGuiApplication* application)
 
     engine->addImageProvider(lit("thumbnail"), thumbnailProvider);
     engine->addImageProvider(lit("active"), activeCameraThumbnailProvider);
-    engine->rootContext()->setContextObject(&context);
+    engine->rootContext()->setContextObject(context);
 
     QQmlComponent mainComponent(engine, QUrl(lit("main.qml")));
     QPointer<QQuickWindow> mainWindow(qobject_cast<QQuickWindow*>(mainComponent.create()));
@@ -131,7 +137,7 @@ int runUi(QtSingleGuiApplication* application)
     {
         if (mainWindow)
         {
-            if (context.liteMode() && !ini().disableFullScreen)
+            if (context->liteMode() && !ini().disableFullScreen)
             {
                 mainWindow->showFullScreen();
                 if (const auto screen = mainWindow->screen())
@@ -159,14 +165,32 @@ int runUi(QtSingleGuiApplication* application)
     prepareWindow();
 
     QSize maxFfmpegResolution = qnSettings->maxFfmpegResolution();
+    QSize maxFfmpegHevcResolution = maxFfmpegResolution;
     if (maxFfmpegResolution.isEmpty())
-        maxFfmpegResolution = nx::media::VideoDecoderRegistry::platformMaxFfmpegResolution();
+    {
+        // Use platform-dependent defaults.
+
+        if (QnAppInfo::isArm())
+        {
+            if (QnAppInfo::isBpi() && !QnAppInfo::isMobile())
+            {
+                maxFfmpegResolution = QSize(1280, 720);
+                maxFfmpegHevcResolution = QSize(640, 480);
+            }
+            else
+            {
+                maxFfmpegResolution = QSize(1920, 1080);
+                maxFfmpegHevcResolution = QSize(800, 600);
+            }
+        }
+    }
+
+    QMap<int, QSize> maxFfmpegResolutions;
+    maxFfmpegResolutions[(int) AV_CODEC_ID_NONE] = maxFfmpegResolution;
+    maxFfmpegResolutions[(int) AV_CODEC_ID_H265] = maxFfmpegHevcResolution;
 
     nx::media::DecoderRegistrar::registerDecoders(
-        maxFfmpegResolution, /*isTranscodingEnabled*/ !context.liteMode());
-
-    nx::media::VideoDecoderRegistry::instance()->setDefaultRenderContextSynchronizer(
-        nx::media::RenderContextSynchronizerPtr(new GlContextSynchronizer(mainWindow)));
+        allocator, maxFfmpegResolutions, /*isTranscodingEnabled*/ !context->liteMode());
 
     #if defined(Q_OS_ANDROID)
         QUrl initialIntentData = getInitialIntentData();
@@ -187,8 +211,8 @@ int runUi(QtSingleGuiApplication* application)
             switch (message.command)
             {
                 case InterClientMessage::Command::startCamerasMode:
-                    context.uiController()->openResourcesScreen();
-                    context.uiController()->connectToSystem(qnSettings->startupParameters().url);
+                    context->uiController()->openResourcesScreen();
+                    context->uiController()->connectToSystem(qnSettings->startupParameters().url);
                     mainWindow->update();
                     break;
                 case InterClientMessage::Command::refresh:
@@ -217,6 +241,42 @@ int runApplication(QtSingleGuiApplication* application)
     return result;
 }
 
+
+class TcpLogWriterOut : public nx::utils::log::AbstractWriter
+{
+public:
+    TcpLogWriterOut(const nx::network::SocketAddress& targetAddress) :
+        m_targetAddress(targetAddress)
+    {
+    }
+
+    virtual void write(nx::utils::log::Level level, const QString& message) override
+    {
+        constexpr milliseconds kTimeout = seconds(3);
+        if (!m_tcpSock)
+        {
+            m_tcpSock = std::make_unique<nx::network::TCPSocket>();
+            auto ipV4Address = m_targetAddress.address.ipV4();
+            if (!ipV4Address)
+                return; //< Can't connect to non IPv4 address.
+            if (!m_tcpSock->connect(
+                nx::network::SocketAddress(*ipV4Address, m_targetAddress.port), kTimeout))
+            {
+                m_tcpSock.reset();
+                return;
+            }
+            m_tcpSock->setSendTimeout(kTimeout);
+        }
+        QByteArray data = message.toUtf8();
+        data.append('\n');
+        if (m_tcpSock->send(data.data(), data.size()) < 1)
+            m_tcpSock.reset(); //< Reconnect.
+    }
+private:
+    std::unique_ptr<nx::network::AbstractStreamSocket> m_tcpSock;
+    nx::network::SocketAddress m_targetAddress;
+};
+
 void initLog(const QString& logLevel)
 {
     nx::utils::log::Settings logSettings;
@@ -240,6 +300,17 @@ void initLog(const QString& logLevel)
                     ? lit("-")
                     : (QString::fromUtf8(nx::kit::IniConfig::iniFilesDir())
                         + lit("mobile_client")));
+        const QString tcpLogAddress(QLatin1String(ini().tcpLogAddress));
+        if (!tcpLogAddress.isEmpty())
+        {
+            auto params = tcpLogAddress.split(L':');
+            auto address = params[0];
+            int port = 7001;
+            if (params.size() >= 2)
+                port = params[1].toInt();
+            nx::utils::log::mainLogger()->setWriter(
+                std::make_unique<TcpLogWriterOut>(nx::network::SocketAddress(address, port)));
+        }
     }
 
     const auto ec2logger = nx::utils::log::addLogger({QnLog::EC2_TRAN_LOG});
@@ -329,6 +400,8 @@ int main(int argc, char *argv[])
     Q_UNUSED(staticModule);
 
     QnMobileClientModule mobile_client(startupParams);
+    mobile_client.initDesktopCamera();
+    mobile_client.startLocalSearches();
     Q_UNUSED(mobile_client);
 
     qnSettings->setStartupParameters(startupParams);

@@ -84,20 +84,7 @@ add_custom_target(desktop_client_dmg ALL
         ${CMAKE_CURRENT_BINARY_DIR}/${update_file_name} ${distribution_output_dir}
 )
 
-if(NOT useLoginKeychain AND NOT ${mac.skip.sign})
-    nx_find_first_matching_file(certificate "${certificates_path}/macosx/*.p12")
-    if(NOT certificate)
-        message(FATAL_ERROR "Cannot find any certificates in ${certificates_path}/macosx")
-    endif()
-
-    add_custom_target(prepare_keychain
-        ${CMAKE_SOURCE_DIR}/build_utils/macos/prepare_build_keychain.sh
-            --keychain ${codeSigningKeychainName}
-            --keychain-password ${codeSigningKeychainPassword}
-            --certificate ${certificate}
-            --certificate-password ${mac_certificate_file_password}
-    )
-
-    add_dependencies(desktop_client_dmg prepare_keychain)
+if(NOT mac.skip.sign)
+    prepare_mac_keychain(desktop_client_dmg)
 endif()
 

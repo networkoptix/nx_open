@@ -1,6 +1,7 @@
 #pragma once
 
 #include <QtCore/Qt>
+#include <QtCore/QMargins>
 
 class QWindow;
 
@@ -18,3 +19,5 @@ bool isPhone();
 void setKeepScreenOn(bool keepScreenOn);
 
 void setScreenOrientation(Qt::ScreenOrientation orientation);
+
+QMargins getCustomMargins();

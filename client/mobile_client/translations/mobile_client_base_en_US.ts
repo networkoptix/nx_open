@@ -8,4 +8,11 @@
         <translation type="unfinished"></translation>
     </message>
 </context>
+<context>
+    <name>nx::client::mobile::ActionButtonsModel</name>
+    <message>
+        <source>Press and hold to speak</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
 </TS>

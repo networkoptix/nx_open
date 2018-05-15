@@ -44,12 +44,12 @@ Pane
         onClicked: Workflow.openCloudScreen()
     }
 
-    contentItem: RowLayout
+    contentItem: Item
     {
-        spacing: 12
-
         Image
         {
+            id: cloudStatusImage
+
             source: login ? lp("/images/cloud_logged_in.png")
                           : lp("/images/cloud_not_logged_in.png")
             anchors.verticalCenter: parent.verticalCenter
@@ -57,9 +57,11 @@ Pane
 
         Text
         {
-            Layout.fillWidth: true
-            text: login ? login
-                        : qsTr("Log in to %1").arg(applicationInfo.cloudName())
+            x: cloudStatusImage.x + cloudStatusImage.width + 12
+            width: parent.width - x
+            text: login
+                ? login
+                : qsTr("Log in to %1").arg(applicationInfo.cloudName())
             anchors.verticalCenter: parent.verticalCenter
             font.pixelSize: 14
             font.weight: Font.DemiBold

@@ -1,4 +1,4 @@
 <?xml version='1.0' encoding='utf-8'?>
 <resources>
-    <string name="app_name">${display.mobile.name}</string>
+    <string name="app_name">${display_mobile_name}</string>
 </resources>

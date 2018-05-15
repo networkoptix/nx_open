@@ -39,6 +39,7 @@
 
 #include <nx/utils/log/log.h>
 #include <client/client_module.h>
+#include <nx/client/core/watchers/user_watcher.h>
 
 using namespace nx::client::desktop::ui;
 
@@ -56,6 +57,9 @@ QnWorkbenchContext::QnWorkbenchContext(QnWorkbenchAccessController* accessContro
     m_workbench.reset(new QnWorkbench(this));
 
     m_userWatcher = instance<QnWorkbenchUserWatcher>();
+
+    // We need to instantiate core user watcher for two way audio availability watcher.
+    const auto coreUserWatcher = instance<nx::client::core::UserWatcher>();
 
     instance<QnWorkbenchDesktopCameraWatcher>();
 

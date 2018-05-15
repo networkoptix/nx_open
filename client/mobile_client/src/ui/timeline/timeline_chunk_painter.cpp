@@ -12,6 +12,14 @@ namespace {
                       x.blue() * a + y.blue() * b,
                       x.alpha() * a + y.alpha() * b);
     }
+
+    QColor makePremultiplied(QColor color)
+    {
+        color.setRedF(color.redF() * color.alphaF());
+        color.setGreenF(color.greenF() * color.alphaF());
+        color.setBlueF(color.blueF() * color.alphaF());
+        return color;
+    }
 }
 
 std::array<QColor, Qn::TimePeriodContentCount + 1> QnTimelineChunkPainter::colors() const {
@@ -112,13 +120,20 @@ void QnTimelineChunkPainter::flushChunk() {
     std::fill(m_weights.begin(), m_weights.end(), 0);
 }
 
-void QnTimelineChunkPainter::addRect(const QRectF &rect, const QColor &color) {
-    m_points[m_index + 0].set(rect.left(),  rect.top(),     color.red(), color.green(), color.blue(), color.alpha());
-    m_points[m_index + 1].set(rect.right(), rect.top(),     color.red(), color.green(), color.blue(), color.alpha());
-    m_points[m_index + 2].set(rect.right(), rect.bottom(),  color.red(), color.green(), color.blue(), color.alpha());
+void QnTimelineChunkPainter::addRect(const QRectF &rect, const QColor &color)
+{
+    const auto fixedColor = makePremultiplied(color);
+    const auto a = fixedColor.alpha();
+    const auto r = fixedColor.red();
+    const auto g = fixedColor.green();
+    const auto b = fixedColor.blue();
+
+    m_points[m_index + 0].set(rect.left(),  rect.top(), r, g, b, a);
+    m_points[m_index + 1].set(rect.right(), rect.top(), r, g, b, a);
+    m_points[m_index + 2].set(rect.right(), rect.bottom(), r, g, b, a);
     m_points[m_index + 3] = m_points[m_index + 0];
     m_points[m_index + 4] = m_points[m_index + 2];
-    m_points[m_index + 5].set(rect.left(),  rect.bottom(),  color.red(), color.green(), color.blue(), color.alpha());
+    m_points[m_index + 5].set(rect.left(),  rect.bottom(),  r, g, b, a);
     m_index += 6;
 }
 
