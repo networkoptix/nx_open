@@ -109,7 +109,7 @@ QString AbstractEventListModel::timestampText(qint64 timestampUs) const
     const auto dateTime = QDateTime::fromMSecsSinceEpoch(timestampMs);
     if (qnSyncTime->currentDateTime().date() != dateTime.date())
         return datetime::toString(dateTime.date());
-    else 
+    else
         return datetime::toString(dateTime.time());
 }
 

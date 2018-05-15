@@ -1,8 +1,8 @@
 #include "datetime_formatter.h"
 
-#include <map> 
+#include <map>
 
-#include <QtCore/QCoreApplication> 
+#include <QtCore/QCoreApplication>
 #include <QtCore/QString>
 #include <QtCore/QLocale>
 
@@ -17,6 +17,11 @@ class DateTimeFormats
 public:
     static void setFormats();
 };
+
+void removeTimezone(QString& source)
+{
+    source.remove(lit(" t"));
+}
 
 // These default values are used ONLY in emergency when proper values are not initialized.
 std::map<Format, QString> formatStrings =
@@ -43,15 +48,15 @@ std::map<Format, QString> formatStrings =
 void DateTimeFormats::setFormats()
 {
     QLocale Locale = QLocale();
-    const bool AmPm = Locale.timeFormat().contains(lit("AP"), Qt::CaseInsensitive);
+    const bool amPm = Locale.timeFormat().contains(lit("AP"), Qt::CaseInsensitive);
 
     formatStrings[Format::mm_ss] = lit("mm:ss");
-    formatStrings[Format::hh] = AmPm ? lit("h AP") : lit("hh:00");
+    formatStrings[Format::hh] = amPm ? lit("h AP") : lit("hh:00");
     formatStrings[Format::hh_mm] = Locale.timeFormat(QLocale::ShortFormat);
     formatStrings[Format::hh_mm_ss] = Locale.timeFormat(QLocale::LongFormat);
-    
+
     // Fix - we never want timezone in time string
-    formatStrings[Format::hh_mm_ss] = formatStrings[Format::hh_mm_ss].remove(lit(" t"));
+    removeTimezone(formatStrings[Format::hh_mm_ss]);
 
     formatStrings[Format::hh_mm_ss_zzz] = formatStrings[Format::hh_mm_ss] + lit(".zzz");
 
@@ -63,32 +68,30 @@ void DateTimeFormats::setFormats()
     formatStrings[Format::MMMM_yyyy] = tr("MMMM yyyy"); //< Localizable
     formatStrings[Format::dd_MM_yyyy] = Locale.dateFormat(QLocale::ShortFormat);
     formatStrings[Format::yyyy_MM_dd_hh_mm_ss] = Locale.dateTimeFormat(QLocale::ShortFormat);
-    
-    // Fix - we never want timezone in time string
-    formatStrings[Format::yyyy_MM_dd_hh_mm_ss] = 
-        formatStrings[Format::yyyy_MM_dd_hh_mm_ss].remove(lit(" t"));
+
+    // Fix - we never want timezone in time string.
+    removeTimezone(formatStrings[Format::yyyy_MM_dd_hh_mm_ss]);
 
     formatStrings[Format::filename_date] = lit("yyyy_MM_dd_hh_mm_ss");
     formatStrings[Format::filename_time] = lit("hh_mm_ss");
 }
 
-} // unnamed namespace 
+} // namespace
 
-QString toString(QDateTime time, Format format)
+QString toString(const QDateTime& time, Format format)
 {
     return time.toString(formatStrings[format]);
 }
 
-QString toString(QTime time, Format format)
+QString toString(const QTime& time, Format format)
 {
     return time.toString(formatStrings[format]);
 }
 
-QString toString(QDate date, Format format)
+QString toString(const QDate& date, Format format)
 {
     return date.toString(formatStrings[format]);
 }
-
 
 QString toString(qint64 msSinceEpoch, Format format)
 {
@@ -105,4 +108,4 @@ void initLocale()
     DateTimeFormats::setFormats();
 }
 
-} // namespace datetime_formatter
+} // namespace datetime

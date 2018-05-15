@@ -19,7 +19,6 @@
 
 #include <nx/utils/crash_dump/systemexcept.h>
 
-
 #include <camera/camera_bookmarks_manager.h>
 
 #include <client_core/client_core_settings.h>
@@ -179,7 +178,7 @@ QnTranslationManagerPtr initializeTranslations(QnClientSettings* settings)
         translation = translationManager->defaultTranslation();
 
     translationManager->installTranslation(translation);
-    
+
     // It is now safe to localize time and date formats. Mind the dot.
     datetime::initLocale();
 

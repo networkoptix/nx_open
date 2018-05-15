@@ -306,12 +306,12 @@ QVariant QnSearchBookmarksModelPrivate::getData(const QModelIndex& index, int ro
         return QVariant();
     }
 
-    // Return formatted time if display text is requested. Mind the dot.
+    // Return formatted time if display text is requested.
     if (role == Qt::DisplayRole)
     {
         if (index.column() == QnSearchBookmarksModel::kStartTime)
             return datetime::toString(displayTime(bookmark.startTimeMs));
-        else if (index.column() == QnSearchBookmarksModel::kCreationTime)
+        if (index.column() == QnSearchBookmarksModel::kCreationTime)
             return datetime::toString(displayTime(bookmark.creationTimeMs()));
     }
 

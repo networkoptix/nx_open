@@ -561,7 +561,7 @@ void ExportSettingsDialog::setMediaParams(
     QString timePart;
     if (resource->hasFlags(Qn::utc))
     {
-        timePart = datetime::toString(startTimeMs + timestampOffsetMs, 
+        timePart = datetime::toString(startTimeMs + timestampOffsetMs,
             datetime::Format::filename_date);
     }
     else
