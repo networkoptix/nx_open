@@ -1396,6 +1396,14 @@ to view more bookmarks</source>
       <source>Folder not found</source>
       <translation>找不到文件夹</translation>
     </message>
+    <message>
+      <source>Helps avoid problems with OpenGL drawing which result in 100% CPU load.</source>
+      <translation type="unfinished">Helps avoid problems with OpenGL drawing which result in 100% CPU load.</translation>
+    </message>
+    <message>
+      <source>Adjust to smallest value that does not degrade live view. Bigger buffer makes playback smoother but increases delay between real time and live view; smaller buffer decreases delay but can cause stutters.</source>
+      <translation type="unfinished">Adjust to smallest value that does not degrade live view. Bigger buffer makes playback smoother but increases delay between real time and live view; smaller buffer decreases delay but can cause stutters.</translation>
+    </message>
   </context>
   <context>
     <name>QnArchiveLengthWidget</name>
@@ -1406,6 +1414,14 @@ to view more bookmarks</source>
     <message>
       <source>High minimum value can lead to archive length decrease on other cameras.</source>
       <translation>最小值可能会导致其他摄像机上的录像长度减小。</translation>
+    </message>
+    <message>
+      <source>Sets when camera archive will be deleted or saved when there is no space for new recordings.</source>
+      <translation type="unfinished">Sets when camera archive will be deleted or saved when there is no space for new recordings.</translation>
+    </message>
+    <message>
+      <source>&quot;Auto&quot; deletes the oldest footage first, regardless of the source.</source>
+      <translation type="unfinished">&quot;Auto&quot; deletes the oldest footage first, regardless of the source.</translation>
     </message>
   </context>
   <context>
@@ -2171,40 +2187,12 @@ to view more bookmarks</source>
       <translation>加载中...</translation>
     </message>
     <message>
-      <source>Primary Stream</source>
-      <translation>主码流</translation>
-    </message>
-    <message>
-      <source>Secondary Stream</source>
-      <translation>副码流</translation>
-    </message>
-    <message>
-      <source>Camera has no secondary stream</source>
-      <translation>摄像机未提供副码流</translation>
-    </message>
-    <message>
       <source>This I/O module has no advanced settings</source>
       <translation>此 I/O 模块有没有高级的设置</translation>
     </message>
     <message>
       <source>This camera has no advanced settings</source>
       <translation>摄像机没有高级的设置</translation>
-    </message>
-    <message>
-      <source>Audio Stream</source>
-      <translation>音频流</translation>
-    </message>
-    <message>
-      <source>URL is not available. Open stream and try again.</source>
-      <translation>URL 不是可用的。打开流，然后再试。</translation>
-    </message>
-    <message>
-      <source>URL is not available. Open video stream and try again.</source>
-      <translation>URL 不是可用的。打开流，然后再试。</translation>
-    </message>
-    <message>
-      <source>I/O module has no audio stream</source>
-      <translation>I/O 模块有没有音频流</translation>
     </message>
     <message>
       <source>Settings</source>
@@ -2219,12 +2207,40 @@ to view more bookmarks</source>
       <translation>无设置</translation>
     </message>
     <message>
+      <source>Secondary Stream</source>
+      <translation>副码流</translation>
+    </message>
+    <message>
       <source>I/O Module ID</source>
       <translation>I/O 模块 ID</translation>
     </message>
     <message>
       <source>Camera ID</source>
       <translation>摄像机 ID</translation>
+    </message>
+    <message>
+      <source>Audio Stream</source>
+      <translation>音频流</translation>
+    </message>
+    <message>
+      <source>Primary Stream</source>
+      <translation>主码流</translation>
+    </message>
+    <message>
+      <source>URL is not available. Open stream and try again.</source>
+      <translation>URL 不是可用的。打开流，然后再试。</translation>
+    </message>
+    <message>
+      <source>URL is not available. Open video stream and try again.</source>
+      <translation>URL 不是可用的。打开流，然后再试。</translation>
+    </message>
+    <message>
+      <source>I/O module has no audio stream</source>
+      <translation>I/O 模块有没有音频流</translation>
+    </message>
+    <message>
+      <source>Camera has no secondary stream</source>
+      <translation>摄像机未提供副码流</translation>
     </message>
   </context>
   <context>
@@ -2341,6 +2357,18 @@ to view more bookmarks</source>
       <translation type="unfinished">
         <numerusform>This ID is already used on the following %n cameras: %1</numerusform>
       </translation>
+    </message>
+    <message>
+      <source>Helps fix image quality issues on some cameras; for others will cause significant bitrate increase.</source>
+      <translation type="unfinished">Helps fix image quality issues on some cameras; for others will cause significant bitrate increase.</translation>
+    </message>
+    <message>
+      <source>Custom number that can be assigned to a camera for quick identification and access</source>
+      <translation type="unfinished">Custom number that can be assigned to a camera for quick identification and access</translation>
+    </message>
+    <message>
+      <source>Server will not change any cameras settings, it will receive and use camera stream as-is.</source>
+      <translation type="unfinished">Server will not change any cameras settings, it will receive and use camera stream as-is.</translation>
     </message>
   </context>
   <context>
@@ -2618,6 +2646,14 @@ to view more bookmarks</source>
     <message>
       <source>More Settings</source>
       <translation>更多设置</translation>
+    </message>
+    <message>
+      <source>Quality setting determines the compression rate only, and does not affect resolution. Low, Medium, High and Best are preset bitrate values.</source>
+      <translation type="unfinished">Quality setting determines the compression rate only, and does not affect resolution. Low, Medium, High and Best are preset bitrate values.</translation>
+    </message>
+    <message>
+      <source>First choose a recording option, then apply it to day and time blocks on the recording schedule. (0 block is 12:00am to 1:00am, 23 block is 11:00pm to 12:00am.)</source>
+      <translation type="unfinished">First choose a recording option, then apply it to day and time blocks on the recording schedule. (0 block is 12:00am to 1:00am, 23 block is 11:00pm to 12:00am.)</translation>
     </message>
   </context>
   <context>
@@ -3076,16 +3112,12 @@ to %1</source>
   <context>
     <name>QnCustomBusinessEventWidget</name>
     <message>
-      <source>Server API</source>
-      <translation>服务器API</translation>
+      <source>Event will trigger only if there are matches in caption with any of entered keywords.</source>
+      <translation type="unfinished">Event will trigger only if there are matches in caption with any of entered keywords.</translation>
     </message>
     <message>
-      <source>To generate Generic Event, please refer to %1.</source>
-      <translation>生成通用事件,请参考 %1.</translation>
-    </message>
-    <message>
-      <source>Event will trigger only if Generic Event meets all the above conditions. If a keyword field is empty, condition is always met. If not, condition is met if the corresponding field of Generic Event contains any keyword.</source>
-      <translation>只有通用事件满足上述条件,事件才会被触发.</translation>
+      <source>If the field is empty, event will always trigger.</source>
+      <translation type="unfinished">If the field is empty, event will always trigger.</translation>
     </message>
   </context>
   <context>
@@ -3153,10 +3185,6 @@ to %1</source>
     <message>
       <source>System configuration will be restored from backup, Server application will be restarted.</source>
       <translation>将从备份中还原系统配置、 服务器应用程序将重新启动。</translation>
-    </message>
-    <message>
-      <source>You can create a backup for System configurations that can be restored in case of failure.</source>
-      <translation>请创建系统配置备份，以便在系统出错时可还原。</translation>
     </message>
     <message>
       <source>Database Backup Files</source>
@@ -3301,6 +3329,13 @@ to %1</source>
       <source>You will not be able to connect to this System with your %1 account after you disconnect this System from %1.</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
       <translation>你将不能连接到此系统与您的 %1 帐户后该系统断开 %1。</translation>
+    </message>
+  </context>
+  <context>
+    <name>QnEmptyBusinessActionWidget</name>
+    <message>
+      <source>Panic Recording mode switches recording settings for all Cameras to maximum FPS and Quality</source>
+      <translation type="unfinished">Panic Recording mode switches recording settings for all Cameras to maximum FPS and Quality</translation>
     </message>
   </context>
   <context>
@@ -3532,6 +3567,13 @@ to %1</source>
     </message>
   </context>
   <context>
+    <name>QnFisheyeSettingsWidget</name>
+    <message>
+      <source>Use this setting to compensate for distortion if camera is not mounted exactly vertically or horizontally.</source>
+      <translation type="unfinished">Use this setting to compensate for distortion if camera is not mounted exactly vertically or horizontally.</translation>
+    </message>
+  </context>
+  <context>
     <name>QnGeneralPreferencesWidget</name>
     <message>
       <source>Select folder...</source>
@@ -3599,6 +3641,14 @@ to %1</source>
     <message>
       <source>Open Camera List</source>
       <translation>打开摄像机列表</translation>
+    </message>
+    <message>
+      <source>Backup includes servers and cameras settings, users, webpages, event rules, etc. Video is not saved.</source>
+      <translation type="unfinished">Backup includes servers and cameras settings, users, webpages, event rules, etc. Video is not saved.</translation>
+    </message>
+    <message>
+      <source>Creates a backup of System configuration that can be restored in case of failure.</source>
+      <translation type="unfinished">Creates a backup of System configuration that can be restored in case of failure.</translation>
     </message>
   </context>
   <context>
@@ -3693,7 +3743,7 @@ to %1</source>
     </message>
     <message>
       <source>ID</source>
-      <translation type="unfinished">ID</translation>
+      <translation>ID</translation>
     </message>
   </context>
   <context>
@@ -3847,15 +3897,15 @@ to %1</source>
     <name>QnLensCameraAdvancedParamWidget</name>
     <message>
       <source>Zoom</source>
-      <translation type="unfinished">Zoom</translation>
-    </message>
-    <message>
-      <source>Focus</source>
-      <translation type="unfinished">Focus</translation>
+      <translation>缩放</translation>
     </message>
     <message>
       <source>Rotation:</source>
-      <translation type="unfinished">Rotation:</translation>
+      <translation>旋转:</translation>
+    </message>
+    <message>
+      <source>Focus</source>
+      <translation>聚焦</translation>
     </message>
   </context>
   <context>
@@ -4187,7 +4237,7 @@ to %1</source>
     </message>
     <message>
       <source>All files</source>
-      <translation type="unfinished">All files</translation>
+      <translation>所有文件</translation>
     </message>
     <message>
       <source>Please send email with License Key and Hardware ID provided to %1 to obtain an Activation Key file.</source>
@@ -4401,6 +4451,18 @@ to %1</source>
     <message>
       <source>No image</source>
       <translation>无图像</translation>
+    </message>
+    <message>
+      <source>Sets the time to use in the client (timeline, timestamps, etc.) when client and server machines are in different time zones.</source>
+      <translation type="unfinished">Sets the time to use in the client (timeline, timestamps, etc.) when client and server machines are in different time zones.</translation>
+    </message>
+    <message>
+      <source>Length of time each camera on layout will be displayed if you start a Layout Tour.</source>
+      <translation type="unfinished">Length of time each camera on layout will be displayed if you start a Layout Tour.</translation>
+    </message>
+    <message>
+      <source>Displays IP addresses for cameras and servers and groups for users.</source>
+      <translation type="unfinished">Displays IP addresses for cameras and servers and groups for users.</translation>
     </message>
   </context>
   <context>
@@ -5560,16 +5622,12 @@ to %1</source>
       <translation>为避免问题请调整最大的摄像机数</translation>
     </message>
     <message>
-      <source>server will take devices automatically from offline servers</source>
-      <translation>容灾备援启用（服务器将自动接管离线服务器上的设备进行管理）</translation>
-    </message>
-    <message>
-      <source>server will take cameras automatically from offline servers</source>
-      <translation>容灾备援启用（服务器将自动接管离线服务器上的摄像机进行管理）</translation>
-    </message>
-    <message>
       <source>Failover</source>
       <translation>服务器冗余</translation>
+    </message>
+    <message>
+      <source>Servers with failover enabled will automatically take cameras from offline servers.</source>
+      <translation type="unfinished">Servers with failover enabled will automatically take cameras from offline servers.</translation>
     </message>
   </context>
   <context>
@@ -5775,6 +5833,14 @@ to %1</source>
     <message>
       <source>Update Files</source>
       <translation type="unfinished">Update Files</translation>
+    </message>
+    <message>
+      <source>Validating the update...</source>
+      <translation type="unfinished">Validating the update...</translation>
+    </message>
+    <message>
+      <source>Checking for free space...</source>
+      <translation type="unfinished">Checking for free space...</translation>
     </message>
   </context>
   <context>
@@ -6256,6 +6322,14 @@ to %1</source>
       <source>Recording was enabled on the USB storage</source>
       <translation>在USB存储器上启用了录制</translation>
     </message>
+    <message>
+      <source>Backup includes servers and cameras settings, users, webpages, event rules, etc. Video is not saved.</source>
+      <translation type="unfinished">Backup includes servers and cameras settings, users, webpages, event rules, etc. Video is not saved.</translation>
+    </message>
+    <message>
+      <source>Creates a backup of System configuration that can be restored in case of failure.</source>
+      <translation type="unfinished">Creates a backup of System configuration that can be restored in case of failure.</translation>
+    </message>
   </context>
   <context>
     <name>QnStorageListModel</name>
@@ -6548,6 +6622,14 @@ to %1</source>
       <source>Allow System to optimize camera settings</source>
       <translation>允许系统优化摄像机设置</translation>
     </message>
+    <message>
+      <source>Sends anonymous System information (firmware, codecs, streams, etc.).</source>
+      <translation type="unfinished">Sends anonymous System information (firmware, codecs, streams, etc.).</translation>
+    </message>
+    <message>
+      <source>Tracks and logs all user actions.</source>
+      <translation type="unfinished">Tracks and logs all user actions.</translation>
+    </message>
   </context>
   <context>
     <name>QnTableExportHelper</name>
@@ -6613,16 +6695,6 @@ to %1</source>
       <translation>没有可用的缩图</translation>
     </message>
     <message>
-      <source>hh:mm</source>
-      <comment>Format for displaying hours and minutes on timeline.</comment>
-      <translation>hh:mm</translation>
-    </message>
-    <message>
-      <source>h ap</source>
-      <comment>Format for displaying hours on timeline, with am/pm indicator.</comment>
-      <translation>h时 ap</translation>
-    </message>
-    <message>
       <source>dd</source>
       <comment>Format for displaying days on timeline.</comment>
       <translation>dd日</translation>
@@ -6666,11 +6738,6 @@ to %1</source>
       <source>yyyy</source>
       <comment>Format for displaying year caption in timeline&apos;s header</comment>
       <translation>yyyy</translation>
-    </message>
-    <message>
-      <source>h:mm ap</source>
-      <comment>Format for displaying hours and minutes on timeline, with am/pm indicator.</comment>
-      <translation>h: mm ap</translation>
     </message>
     <message>
       <source>dd MMMM yyyy h:mm ap</source>
@@ -6857,6 +6924,10 @@ to %1</source>
     <message>
       <source>Edit</source>
       <translation>编辑</translation>
+    </message>
+    <message>
+      <source>Users can be imported from an LDAP server. They will be able to log in only if LDAP server is online and their accounts are active on it.</source>
+      <translation type="unfinished">Users can be imported from an LDAP server. They will be able to log in only if LDAP server is online and their accounts are active on it.</translation>
     </message>
   </context>
   <context>
@@ -7047,6 +7118,25 @@ to %1</source>
       <source>%1 user with specified email already exists.</source>
       <comment>%1 is the short cloud name (like Cloud)</comment>
       <translation type="unfinished">%1 user with specified email already exists.</translation>
+    </message>
+    <message>
+      <source>Local users</source>
+      <translation type="unfinished">Local users</translation>
+    </message>
+    <message>
+      <source>%1 users</source>
+      <comment>%1 is the short cloud name (like Cloud)</comment>
+      <translation type="unfinished">%1 users</translation>
+    </message>
+    <message>
+      <source>%1 belong to this system only and are fully managed by system administrators.</source>
+      <comment>%1 is local users definition, e.g. &apos;Local users&apos;</comment>
+      <translation type="unfinished">%1 belong to this system only and are fully managed by system administrators.</translation>
+    </message>
+    <message>
+      <source>%1 can have access to many Systems. Administrators can manage their rights only.</source>
+      <comment>%1 is cloud users definition, e.g. &apos;Cloud users&apos;</comment>
+      <translation type="unfinished">%1 can have access to many Systems. Administrators can manage their rights only.</translation>
     </message>
   </context>
   <context>
@@ -8026,6 +8116,13 @@ to %1</source>
     </message>
   </context>
   <context>
+    <name>nx::client::desktop::HintButton</name>
+    <message>
+      <source>Click to read more</source>
+      <translation type="unfinished">Click to read more</translation>
+    </message>
+  </context>
+  <context>
     <name>nx::client::desktop::ImageOverlaySettingsWidget</name>
     <message>
       <source>Select file...</source>
@@ -8270,17 +8367,26 @@ to %1</source>
     </message>
   </context>
   <context>
-    <name>nx::client::desktop::ui::AnalyticsSdkEventModel</name>
-    <message>
-      <source>No event types supported</source>
-      <translation>没有支持的事件类型</translation>
-    </message>
-  </context>
-  <context>
     <name>nx::client::desktop::ui::AnalyticsSdkEventWidget</name>
     <message>
-      <source>Event will trigger only if Analytics Event meets all the above conditions. If a keyword field is empty, condition is always met. If not, condition is met if the corresponding field of Analytics Event contains any keyword.</source>
-      <translation>仅当分析事件符合上述所有条件时，才会触发事件。如果关键字字段为空，则始终满足条件。如果不是，则在分析事件的相应字段包含任何关键字的情况下满足条件。</translation>
+      <source>Analytics events can be set up on a certain cameras.</source>
+      <translation type="unfinished">Analytics events can be set up on a certain cameras.</translation>
+    </message>
+    <message>
+      <source>Choose cameras using the button above to see the list of supported events.</source>
+      <translation type="unfinished">Choose cameras using the button above to see the list of supported events.</translation>
+    </message>
+    <message>
+      <source>Event will trigger only if there are matches in caption with any of entered keywords.</source>
+      <translation type="unfinished">Event will trigger only if there are matches in caption with any of entered keywords.</translation>
+    </message>
+    <message>
+      <source>If the field is empty, event will always trigger.</source>
+      <translation type="unfinished">If the field is empty, event will always trigger.</translation>
+    </message>
+    <message>
+      <source>Event will trigger only if there are matches in the description field with any of the entered keywords.</source>
+      <translation type="unfinished">Event will trigger only if there are matches in the description field with any of the entered keywords.</translation>
     </message>
   </context>
   <context>
@@ -8624,6 +8730,18 @@ to %1</source>
     <message>
       <source>Failed to change password on %1 of %2 cameras</source>
       <translation>无法更改%2个摄像机中%1个摄像机上的密码</translation>
+    </message>
+    <message>
+      <source>To use the software you must accept the end user license agreement</source>
+      <translation type="unfinished">To use the software you must accept the end user license agreement</translation>
+    </message>
+    <message>
+      <source>Accept</source>
+      <translation type="unfinished">Accept</translation>
+    </message>
+    <message>
+      <source>Decline</source>
+      <translation type="unfinished">Decline</translation>
     </message>
   </context>
   <context>
