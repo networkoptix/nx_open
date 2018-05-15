@@ -43,6 +43,7 @@
     "ACTIVATE YOUR ACCOUNT EMAIL SUBJECT": "Activez votre compte",
     "RESET PASSWORD EMAIL SUBJECT": "Réinitialisez votre mot de passe",
     "INVITED TO SYSTEM EMAIL SUBJECT": "Système vidéo {{message.system_name}} a été partagé avec vous",
+    "INVITED TO SYSTEM EMAIL SUBJECT UNREGISTERED": "{{message.sharer_name}} invites you to %PRODUCT_NAME%",
     "DISCONNECT FORM HEADER TEXT": "Déconnecter le système de %PRODUCT_NAME% ?",
     "FIRST NAME IS REQUIRED TEXT": "Prénom requis",
     "LAST NAME IS REQUIRED TEXT": "Nom de famille requis",
@@ -57,5 +58,6 @@
     "PASSWORD IS WEAK TEXT": "Utiliser des nombres, majuscules et minuscules et caractères spéciaux pour rendre votre mot de passe plus fort",
     "THIS LINK IS BROKEN TEXT": "This link is broken,<br>\n            System may be disconnected from %PRODUCT_NAME%,<br>\n            Access to this System may be revoked, <br>\n            or you may be logged into a different account",
     "PAGE NOT FOUND": "Page non trouvée",
-    "TAKE ME HOME": "Me ramener à l'accueil"
+    "TAKE ME HOME": "Me ramener à l'accueil",
+    "OPEN NX WITNESS BUTTON TEXT": "Open %VMS_NAME%"
 }

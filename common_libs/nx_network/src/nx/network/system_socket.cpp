@@ -1374,12 +1374,12 @@ public:
     {
     }
 
-    AbstractStreamSocket* accept(unsigned int recvTimeoutMs, bool nonBlockingMode)
+    std::unique_ptr<AbstractStreamSocket> accept(unsigned int recvTimeoutMs, bool nonBlockingMode)
     {
         int newConnSD = acceptWithTimeout(socketHandle, recvTimeoutMs, nonBlockingMode);
         if (newConnSD >= 0)
         {
-            auto tcpSocket = new TCPSocket(newConnSD, ipVersion);
+            auto tcpSocket = std::unique_ptr<TCPSocket>(new TCPSocket(newConnSD, ipVersion));
             tcpSocket->bindToAioThread(SocketGlobals::aioService().getRandomAioThread());
             return tcpSocket;
         }
@@ -1481,12 +1481,12 @@ void TCPServerSocket::pleaseStopSync(bool assertIfCalledUnderLock)
         QnStoppableAsync::pleaseStopSync(assertIfCalledUnderLock);
 }
 
-AbstractStreamSocket* TCPServerSocket::accept()
+std::unique_ptr<AbstractStreamSocket> TCPServerSocket::accept()
 {
     return systemAccept();
 }
 
-AbstractStreamSocket* TCPServerSocket::systemAccept()
+std::unique_ptr<AbstractStreamSocket> TCPServerSocket::systemAccept()
 {
     TCPServerSocketPrivate* d = static_cast<TCPServerSocketPrivate*>(impl());
 
@@ -1498,8 +1498,7 @@ AbstractStreamSocket* TCPServerSocket::systemAccept()
     if (!getNonBlockingMode(&nonBlockingMode))
         return nullptr;
 
-    std::unique_ptr<AbstractStreamSocket> acceptedSocket(
-        d->accept(recvTimeoutMs, nonBlockingMode));
+    auto acceptedSocket = d->accept(recvTimeoutMs, nonBlockingMode);
     if (!acceptedSocket)
         return nullptr;
 
@@ -1520,7 +1519,7 @@ AbstractStreamSocket* TCPServerSocket::systemAccept()
         return nullptr;
     }
 
-    return acceptedSocket.release();
+    return acceptedSocket;
 }
 
 bool TCPServerSocket::setListen(int queueLen)

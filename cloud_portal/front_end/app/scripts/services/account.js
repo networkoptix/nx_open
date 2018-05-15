@@ -13,6 +13,12 @@ angular.module('cloudApp')
         });
 
         var service = {
+            checkLoginState:function(){
+                if($rootScope.session.loginState){
+                    return $q.resolve(true);
+                }
+                return $q.reject(false);
+            },
             get:function(){
                 var self = this;
                 if(requestingLogin){
@@ -22,6 +28,7 @@ angular.module('cloudApp')
                         return self.get(); // Try again
                     });
                 }
+                
                 return cloudApi.account().then(function(account){
                     return account.data;
                 });
@@ -119,7 +126,7 @@ angular.module('cloudApp')
                 }
                 return true;
             }
-        }
+        };
 
         // Check auth parameter in url
         var search = $location.search();

@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('cloudApp')
-    .service('systemsProvider', [ 'cloudApi', '$interval', '$q', function (cloudApi, $interval, $q) {
+    .service('systemsProvider', [ 'cloudApi', '$poll', '$q', 'account', function (cloudApi, $poll, $q, account) {
         var self = this;
         this.systems = [];
 
@@ -12,7 +12,7 @@ angular.module('cloudApp')
         };
 
         this.delayedUpdateSystems = function(){
-            $interval(this.forceUpdateSystems,Config.updateInterval);
+            this.pollingSystemsUpdate = $poll(this.forceUpdateSystems, Config.updateInterval);
         };
 
         this.getSystem = function(systemId){
@@ -59,6 +59,9 @@ angular.module('cloudApp')
             });
         };
 
-        this.forceUpdateSystems();
-        this.delayedUpdateSystems();
+        var self = this;
+        account.checkLoginState().then(function(){
+            self.forceUpdateSystems();
+            self.delayedUpdateSystems();
+        });
     }]);

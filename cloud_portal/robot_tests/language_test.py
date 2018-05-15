@@ -12,14 +12,13 @@ with codecs.open('language_list.json', 'r', encoding='utf-8-sig') as languages_l
 
 
 def allLanguages():
-    
+
     for key in langList:
-        rebotString=""
         runTest(key, langList)
-        mergableOutputs = (path.join('outputs', lang, 'output.xml ') for lang in langList if path.isfile(path.join('outputs', lang, 'output.xml ')))
-        for item in mergableOutputs:
-            rebotString += item
-        system('rebot --suitestatlevel 4 -o allLanguages.xml -l allLanguagesLog.html -r allLanguagesReport.html ' + rebotString)
+        mergableOutputs = (path.join('outputs', lang, 'output.xml')
+                           for lang in langList if path.isfile(path.join('outputs', lang, 'output.xml')))
+        system('rebot --suitestatlevel 4 -o allLanguages.xml -l allLanguagesLog.html -r allLanguagesReport.html ' +
+               ' '.join(mergableOutputs))
 
 
 def runTest(key, langList):
