@@ -49,6 +49,7 @@ private:
 
         void addEndpoints(std::set<SocketAddress> endpoints);
         void ensureConnection();
+        void remakeConnection();
         void setForbiddenEndpoints(std::set<SocketAddress> endpoints);
 
     private:
