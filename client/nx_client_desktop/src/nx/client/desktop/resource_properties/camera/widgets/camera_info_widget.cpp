@@ -3,6 +3,8 @@
 #include "../redux/camera_settings_dialog_state.h"
 #include "../redux/camera_settings_dialog_store.h"
 
+#include <QtCore/QMetaType>
+
 #include <core/resource/camera_resource.h>
 #include <core/resource/device_dependent_strings.h>
 #include <ui/style/custom_style.h>
@@ -51,17 +53,19 @@ CameraInfoWidget::CameraInfoWidget(QWidget* parent):
     connect(ui->secondaryStreamCopyButton, &ClipboardButton::clicked, this,
         [this]() { ClipboardButton::setClipboardText(ui->secondaryStreamLabel->text()); });
 
-    connect(ui->pingButton, &QPushButton::clicked,
-        this, &CameraInfoWidget::requestPing);
+    qRegisterMetaType<Action>();
 
-    connect(ui->eventLogButton, &QPushButton::clicked,
-        this, &CameraInfoWidget::requestEventLog);
+    connect(ui->pingButton, &QPushButton::clicked, this,
+        [this]() { emit actionRequested(Action::ping); });
 
-    connect(ui->cameraRulesButton, &QPushButton::clicked,
-        this, &CameraInfoWidget::requestEventRules);
+    connect(ui->eventLogButton, &QPushButton::clicked, this,
+        [this]() { emit actionRequested(Action::openEventLog); });
 
-    connect(ui->showOnLayoutButton, &QPushButton::clicked,
-        this, &CameraInfoWidget::requestShowOnLayout);
+    connect(ui->cameraRulesButton, &QPushButton::clicked, this,
+        [this]() { emit actionRequested(Action::openEventRules); });
+
+    connect(ui->showOnLayoutButton, &QPushButton::clicked, this,
+        [this]() { emit actionRequested(Action::showOnLayout); });
 }
 
 CameraInfoWidget::~CameraInfoWidget()

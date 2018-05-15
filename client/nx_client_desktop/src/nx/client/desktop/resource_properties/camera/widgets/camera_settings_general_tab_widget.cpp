@@ -24,17 +24,8 @@ CameraSettingsGeneralTabWidget::CameraSettingsGeneralTabWidget(
     connect(store, &CameraSettingsDialogStore::stateChanged, this,
         &CameraSettingsGeneralTabWidget::loadState);
 
-    connect(ui->cameraInfoWidget, &CameraInfoWidget::requestPing,
-        this, &CameraSettingsGeneralTabWidget::requestPing);
-
-    connect(ui->cameraInfoWidget, &CameraInfoWidget::requestEventLog,
-        this, &CameraSettingsGeneralTabWidget::requestEventLog);
-
-    connect(ui->cameraInfoWidget, &CameraInfoWidget::requestEventRules,
-        this, &CameraSettingsGeneralTabWidget::requestEventRules);
-
-    connect(ui->cameraInfoWidget, &CameraInfoWidget::requestShowOnLayout,
-        this, &CameraSettingsGeneralTabWidget::requestShowOnLayout);
+    connect(ui->cameraInfoWidget, &CameraInfoWidget::actionRequested,
+        this, &CameraSettingsGeneralTabWidget::actionRequested);
 }
 
 CameraSettingsGeneralTabWidget::~CameraSettingsGeneralTabWidget()

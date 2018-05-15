@@ -25,11 +25,16 @@ public:
 
     void setStore(CameraSettingsDialogStore* store);
 
+    enum class Action
+    {
+        ping,
+        showOnLayout,
+        openEventLog,
+        openEventRules
+    };
+
 signals:
-    void requestPing();
-    void requestShowOnLayout();
-    void requestEventLog();
-    void requestEventRules();
+    void actionRequested(nx::client::desktop::CameraInfoWidget::Action action);
 
 private:
     void loadState(const CameraSettingsDialogState& state);
@@ -46,3 +51,5 @@ private:
 } // namespace desktop
 } // namespace client
 } // namespace nx
+
+Q_DECLARE_METATYPE(nx::client::desktop::CameraInfoWidget::Action)

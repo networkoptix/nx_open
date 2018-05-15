@@ -3,6 +3,8 @@
 #include <QtCore/QScopedPointer>
 #include <QtWidgets/QWidget>
 
+#include "camera_info_widget.h"
+
 namespace Ui { class CameraSettingsGeneralTabWidget; }
 
 namespace nx {
@@ -24,10 +26,7 @@ public:
     virtual ~CameraSettingsGeneralTabWidget() override;
 
 signals:
-    void requestPing();
-    void requestShowOnLayout();
-    void requestEventLog();
-    void requestEventRules();
+    void actionRequested(nx::client::desktop::CameraInfoWidget::Action action);
 
 private:
     void loadState(const CameraSettingsDialogState& state);

@@ -91,21 +91,30 @@ struct CameraSettingsDialog::Private
     CameraSettingsGeneralTabWidget* createGeneralTab(CameraSettingsDialog* q)
     {
         auto generalTab = new CameraSettingsGeneralTabWidget(store, q->ui->tabWidget);
-        QObject::connect(generalTab, &CameraSettingsGeneralTabWidget::requestPing, q,
-            [this, q]()
+        QObject::connect(generalTab, &CameraSettingsGeneralTabWidget::actionRequested, q,
+            [this, q](CameraInfoWidget::Action action)
             {
-                q->menu()->trigger(ui::action::PingAction,
-                    {Qn::TextRole, store->state().singleCameraProperties.ipAddress});
+                switch (action)
+                {
+                    case CameraInfoWidget::Action::ping:
+                        NX_ASSERT(store);
+                        q->menu()->trigger(ui::action::PingAction,
+                            {Qn::TextRole, store->state().singleCameraProperties.ipAddress});
+                        break;
+
+                    case CameraInfoWidget::Action::openEventLog:
+                        q->menu()->trigger(ui::action::CameraIssuesAction, cameras);
+                        break;
+
+                    case CameraInfoWidget::Action::openEventRules:
+                        q->menu()->trigger(ui::action::CameraBusinessRulesAction, cameras);
+                        break;
+
+                    case CameraInfoWidget::Action::showOnLayout:
+                        q->menu()->trigger(ui::action::OpenInNewTabAction, cameras);
+                        break;
+                }
             });
-
-        QObject::connect(generalTab, &CameraSettingsGeneralTabWidget::requestShowOnLayout, q,
-            [this, q]() { q->menu()->trigger(ui::action::OpenInNewTabAction, cameras); });
-
-        QObject::connect(generalTab, &CameraSettingsGeneralTabWidget::requestEventLog, q,
-            [this, q]() { q->menu()->trigger(ui::action::CameraIssuesAction, cameras); });
-
-        QObject::connect(generalTab, &CameraSettingsGeneralTabWidget::requestEventRules, q,
-            [this, q]() { q->menu()->trigger(ui::action::CameraBusinessRulesAction, cameras); });
 
         return generalTab;
     }
