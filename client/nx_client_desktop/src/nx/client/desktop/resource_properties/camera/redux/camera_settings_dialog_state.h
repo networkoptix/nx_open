@@ -137,7 +137,7 @@ struct CameraSettingsDialogState
         QString webPage;
         std::optional<QString> primaryStream;
         std::optional<QString> secondaryStream;
-        bool hasVideo = false;
+        bool hasVideo = true;
 
         int maxFpsWithoutMotion = 0;
 
