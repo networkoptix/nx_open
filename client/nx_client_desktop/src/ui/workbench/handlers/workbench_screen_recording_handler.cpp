@@ -6,10 +6,12 @@
 
 #include <QtOpenGL/QGLWidget>
 
-#include <translation/datetime_formatter.h>
+#include <client_core/client_core_module.h>
 
 #include <client/client_settings.h>
 #include <client/client_runtime_settings.h>
+
+#include <translation/datetime_formatter.h>
 
 #include <ui/style/skin.h>
 #include <ui/dialogs/common/custom_file_dialog.h>
