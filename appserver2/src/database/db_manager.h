@@ -228,7 +228,7 @@ namespace detail
         ErrorCode doQueryNoLock(nullptr_t /*dummy*/, ApiResourceParamDataList& data);
 
         //listDirectory
-        ErrorCode doQueryNoLock(const ApiStoredFilePath& path, ApiStoredDirContents& data);
+        ErrorCode doQueryNoLock(const ApiStoredFilePath& path, ApiStoredFilePathList& data);
         //getStorageData
         ErrorCode doQueryNoLock(const ApiStoredFilePath& path, ApiStoredFileData& data);
 

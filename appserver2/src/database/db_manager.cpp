@@ -4361,7 +4361,7 @@ bool QnDbManager::resyncIfNeeded(ResyncFlags flags)
     return true;
 }
 
-ErrorCode QnDbManager::doQueryNoLock(const ApiStoredFilePath& _path, ApiStoredDirContents& data)
+ErrorCode QnDbManager::doQueryNoLock(const ApiStoredFilePath& _path, ApiStoredFilePathList& data)
 {
     QSqlQuery query(m_sdb);
     QString path;

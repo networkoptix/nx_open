@@ -959,7 +959,7 @@ APPLY(903, updateStoredFile, ApiStoredFileData, \
                        InvalidFilterFunc(), /* Filter read func */ \
                        AllowForAllAccessOut(), /* Check remote peer rights for outgoing transaction */ \
                        RegularTransactionType()) /* regular transaction type */ \
-APPLY(900, listDirectory, ApiStoredDirContents, \
+APPLY(900, listDirectory, ApiStoredFilePathList, \
                        false, \
                        false, \
                        InvalidGetHashHelper(), \

@@ -26,8 +26,12 @@ nx_configure_directory(
 
 set(apidoctool_jar "${APIDOCTOOL_PATH}/apidoctool.jar")
 
+set(apidoctool_params
+    "-config" "${CMAKE_CURRENT_SOURCE_DIR}/api/apidoctool.properties"
+)
+
 execute_process(
-    COMMAND java -jar "${apidoctool_jar}" print-deps
+    COMMAND java -jar "${apidoctool_jar}" print-deps ${apidoctool_params}
     RESULT_VARIABLE apidoctool_result
     OUTPUT_VARIABLE apidoctool_deps
 )
@@ -57,6 +61,7 @@ add_custom_command(
         -template-xml "${CMAKE_CURRENT_SOURCE_DIR}/api/api_template.xml"
         -output-xml "${CMAKE_CURRENT_BINARY_DIR}/api.xml"
         -output-json "${CMAKE_CURRENT_BINARY_DIR}/api.json"
+        ${apidoctool_params}
     COMMAND
         ${CMAKE_COMMAND} -E copy_if_different
             "${CMAKE_CURRENT_BINARY_DIR}/api.xml"
