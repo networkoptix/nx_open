@@ -1,6 +1,6 @@
-import { Component, OnInit, Inject } from '@angular/core';
-import { NgbDropdownModule }         from '@ng-bootstrap/ng-bootstrap';
-import { TranslateService }          from "@ngx-translate/core";
+import { Component, OnInit, Inject, ViewEncapsulation } from '@angular/core';
+import { NgbDropdownModule }                            from '@ng-bootstrap/ng-bootstrap';
+import { TranslateService }                             from "@ngx-translate/core";
 
 export interface activeLanguage {
     language: string;
@@ -11,6 +11,7 @@ export interface activeLanguage {
     selector: 'nx-language-select',
     templateUrl: 'language.component.html',
     styleUrls: ['language.component.scss'],
+    encapsulation: ViewEncapsulation.None,
     inputs: ['accountMode'],
 })
 

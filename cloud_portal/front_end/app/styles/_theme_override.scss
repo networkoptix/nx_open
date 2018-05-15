@@ -77,28 +77,28 @@ h1>.label{
   vertical-align: 33%;
 }
 
-.modal-open {
-  overflow: auto;
-}
-
-
-@media (min-width: $dialog-sm-float-breakpoint) {
-  .modal-sm {
-    width: $modal-sm;
-    margin: 108px auto;
-  }
-}
-
-@include media-breakpoint-up(sm) {
-  /* Automatically set modal's width for larger viewports */
-  .modal-dialog {
-    margin: 108px auto;
-  }
-
-  .modal-content {
-    @include box-shadow(0px 20px 50px 0px transparentize($dark15,0.85));
-  }
-}
+//.modal-open {
+//  overflow: auto;
+//}
+//
+//
+//@media (min-width: $dialog-sm-float-breakpoint) {
+//  .modal-sm {
+//    width: $modal-sm;
+//    margin: 108px auto;
+//  }
+//}
+//
+//@include media-breakpoint-up(sm) {
+//  /* Automatically set modal's width for larger viewports */
+//  .modal-dialog {
+//    margin: 108px auto;
+//  }
+//
+//  .modal-content {
+//    @include box-shadow(0px 20px 50px 0px transparentize($dark15,0.85));
+//  }
+//}
 
 .card > .table, .card > .table-responsive {
   margin-bottom: 16px;
@@ -185,10 +185,6 @@ select.form-control{
   -webkit-appearance: none;
   -moz-appearance: none;
   background-color: transparent;
-}
-
-nx-language-select {
-  width: 100%;
 }
 
 .dropdown {

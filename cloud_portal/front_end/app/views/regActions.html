@@ -17,30 +17,30 @@
         <!-- /end of special hack -->
 
         <div class="form-group row" validate-field>
-            <label for="firstName" class="col-12 col-md-4 text-left text-md-right control-label">First name</label>
-            <div class="col-12 col-md-4">
+            <label for="firstName" class="col-md-4 text-left text-md-right control-label">First name</label>
+            <div class="col-md-4">
                 <input type="text" class="form-control"
                        ng-model="account.firstName" id="firstName" maxlength="255"
                        required name="firstName" autocomplete="off" autofocus>
             </div>
-            <div class="col-12 col-md-4">
+            <div class="col-md-4">
                 <span class="help-block input-error" ng-if="registerForm.firstName.$touched && registerForm.firstName.$error.required">First name is required</span>
             </div>
         </div>
         <div class="form-group row" validate-field>
-            <label for="lastName"  class="col-12 col-md-4 text-left text-md-right control-label">Last name</label>
-            <div class="col-12 col-md-4">
+            <label for="lastName"  class="col-md-4 text-left text-md-right control-label">Last name</label>
+            <div class="col-md-4">
                 <input type="text" class="form-control"
                        ng-model="account.lastName" id="lastName" maxlength="255"
                        required name="lastName" autocomplete="off">
             </div>
-            <div class="col-12 col-md-4">
+            <div class="col-md-4">
                 <span class="help-block input-error" ng-if="registerForm.lastName.$touched && registerForm.lastName.$error.required">Last name is required</span>
             </div>
         </div>
         <div class="form-group row" validate-field>
-            <label for="registerEmail"  class="col-12 col-md-4 text-left text-md-right control-label">Email</label>
-            <div class="col-12 col-md-4">
+            <label for="registerEmail"  class="col-md-4 text-left text-md-right control-label">Email</label>
+            <div class="col-md-4">
                 <input ng-hide="lockEmail" type="email" class="form-control"
                        ng-model="account.email" id="registerEmail" maxlength="255"
                        name="registerEmail" required autocomplete="off"  validate-email
@@ -49,7 +49,7 @@
                 <input type="text" ng-if="lockEmail"
                        class="form-control" ng-model="account.email" readonly>
             </div>
-            <div class="col-12 col-md-4">
+            <div class="col-md-4">
                 <div><span class="help-block input-error" ng-if="registerForm.registerEmail.$touched && registerForm.registerEmail.$error.required">Email is required</span></div>
                 <div><span class="help-block input-error" ng-if="registerForm.registerEmail.$touched && registerForm.registerEmail.$error.email">Please enter a valid Email</span></div>
                 <div><span class="help-block input-error" ng-if="registerForm.registerEmail.$error.alreadyExists">This Email has been already registered in %PRODUCT_NAME%</span></div>
@@ -57,7 +57,7 @@
         </div>
         <password-input ng-model="account.password" id="'registerPassword'" label="$root.L.regActions.passwordLabel"></password-input>
         <div class="form-group" >
-            <div class="col-12 offset-md-4 col-md-8">
+            <div class="offset-md-4 col-md-8">
                 <label class="checkbox">Subscribe to email newsletters
                     <input type="checkbox" checked="checked"
                            ng-model="account.subscribe"
@@ -68,7 +68,7 @@
             </div>
         </div>
         <div class="form-group">
-            <div class="col-12 offset-md-4 col-md-8">
+            <div class="offset-md-4 col-md-8">
                 <process-button process="register"
                                 form="registerForm"
                                 class="float-left"

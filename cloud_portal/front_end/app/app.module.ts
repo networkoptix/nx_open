@@ -16,6 +16,7 @@ import { TranslateModule, TranslateLoader } from '@ngx-translate/core';
 import { TranslateHttpLoader }              from '@ngx-translate/http-loader';
 import { CookieService }                    from "ngx-cookie-service";
 
+// bulk import
 import { cloudApiServiceModule }           from './ajs-upgraded-providers';
 import { systemsModule }                   from './ajs-upgraded-providers';
 import { languageServiceModule }           from './ajs-upgraded-providers';
@@ -26,6 +27,7 @@ import { ngToastModule }                   from './ajs-upgraded-providers';
 import { configServiceModule }             from './ajs-upgraded-providers';
 import { authorizationCheckServiceModule } from './ajs-upgraded-providers';
 
+// reduce import lines .... bulk import or move imports to the components
 import { AppComponent }                                       from './app.component';
 import { DownloadModule }                                     from './src/download/download.module';
 import { DownloadHistoryModule }                              from './src/download-history/download-history.module';

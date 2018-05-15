@@ -33,7 +33,7 @@ def target_file(file_name, customization, language_code, preview):
             'static', customization.name, 'preview', file_name)
     return target_file_name
 
-def process_context_structure(customization, context, content, language, version_id, preview, force_global_files, is_json):
+def process_context_structure(customization, context, content, language, version_id, preview, force_global_files):
     def replace_in(adict, key, value):
         for dict_key in adict.keys():
             itm_type = type(adict[dict_key])
@@ -59,7 +59,7 @@ def process_context_structure(customization, context, content, language, version
         content_value = datastructure.find_actual_value(customization, language, version_id)
         # replace marker with value
         if datastructure.type not in (DataStructure.DATA_TYPES.image, DataStructure.DATA_TYPES.file):
-            if is_json:
+            if type(content) == dict:
                 # Process language JSON file
                 replace_in(content, datastructure.name, content_value)
             else:
@@ -97,13 +97,11 @@ def save_content(filename, content):
 def process_context(context, language_code, customization, preview, version_id, global_contexts):
     language = Language.by_code(language_code, customization.default_language)
     context_template = context.template_for_language(language)
-    is_json = False
 
     # check if the file is language JSON
     if context.file_path.endswith(".json") and isinstance(context_template, unicode):
         try:
             context_template = json.loads(context_template)
-            is_json = True
         except ValueError:
             print("Failed to decode file -> " + context.file_path)
 
@@ -111,14 +109,14 @@ def process_context(context, language_code, customization, preview, version_id, 
         context_template = ''
 
     content = process_context_structure(customization, context, context_template, language,
-                                        version_id, preview, context.is_global, is_json)  # if context is global - process it
+                                        version_id, preview, context.is_global)  # if context is global - process it
     if not context.is_global:  # if current context is global - do not apply other contexts
         for global_context in global_contexts.all():
             content = process_context_structure(customization, global_context, content, None,
-                                                version_id, preview, False, is_json)
+                                                version_id, preview, False)
 
     # dump json to string
-    if is_json:
+    if type(content) == dict:
         content = json.dumps(content)
 
     return content
