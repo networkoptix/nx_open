@@ -155,8 +155,8 @@ void QnLiteClientController::startLiteClient()
     }
 
     auto handleReply =
-        [this, d, guard = QPointer<QnLiteClientController>(this)]
-        (bool success, rest::Handle handle, const QnJsonRestResult& result)
+        [this, d, guard = QPointer<QnLiteClientController>(this)](
+            bool success, rest::Handle handle, const QnJsonRestResult& result)
         {
             if (!guard)
                 return;
