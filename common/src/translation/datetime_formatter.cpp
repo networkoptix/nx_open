@@ -47,15 +47,15 @@ std::map<Format, QString> formatStrings =
 
 void DateTimeFormats::setFormats()
 {
-    QLocale Locale = QLocale();
-    const bool amPm = Locale.timeFormat().contains(lit("AP"), Qt::CaseInsensitive);
+    QLocale locale = QLocale();
+    const bool amPm = locale.timeFormat().contains(lit("AP"), Qt::CaseInsensitive);
 
     formatStrings[Format::mm_ss] = lit("mm:ss");
     formatStrings[Format::hh] = amPm ? lit("h AP") : lit("hh:00");
-    formatStrings[Format::hh_mm] = Locale.timeFormat(QLocale::ShortFormat);
-    formatStrings[Format::hh_mm_ss] = Locale.timeFormat(QLocale::LongFormat);
+    formatStrings[Format::hh_mm] = locale.timeFormat(QLocale::ShortFormat);
+    formatStrings[Format::hh_mm_ss] = locale.timeFormat(QLocale::LongFormat);
 
-    // Fix - we never want timezone in time string
+    // Fix - we never want timezone in time string.
     removeTimezone(formatStrings[Format::hh_mm_ss]);
 
     formatStrings[Format::hh_mm_ss_zzz] = formatStrings[Format::hh_mm_ss] + lit(".zzz");
@@ -66,8 +66,8 @@ void DateTimeFormats::setFormats()
 
     formatStrings[Format::dd_MM] = tr("dd/MM"); //< Localizable
     formatStrings[Format::MMMM_yyyy] = tr("MMMM yyyy"); //< Localizable
-    formatStrings[Format::dd_MM_yyyy] = Locale.dateFormat(QLocale::ShortFormat);
-    formatStrings[Format::yyyy_MM_dd_hh_mm_ss] = Locale.dateTimeFormat(QLocale::ShortFormat);
+    formatStrings[Format::dd_MM_yyyy] = locale.dateFormat(QLocale::ShortFormat);
+    formatStrings[Format::yyyy_MM_dd_hh_mm_ss] = locale.dateTimeFormat(QLocale::ShortFormat);
 
     // Fix - we never want timezone in time string.
     removeTimezone(formatStrings[Format::yyyy_MM_dd_hh_mm_ss]);
@@ -95,7 +95,7 @@ QString toString(const QDate& date, Format format)
 
 QString toString(qint64 msSinceEpoch, Format format)
 {
-    return  QDateTime::fromMSecsSinceEpoch(msSinceEpoch).toString(formatStrings[format]);
+    return QDateTime::fromMSecsSinceEpoch(msSinceEpoch).toString(formatStrings[format]);
 }
 
 QString getFormatString(Format format)
