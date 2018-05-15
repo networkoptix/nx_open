@@ -59,6 +59,9 @@ PageBase
 
         property bool animatePlaybackControls: true
         property bool showOfflineStatus: false
+        property bool showNoLicensesWarning:
+            videoScreenController.noLicenses
+            && !videoScreenController.mediaPlayer.liveMode
         property bool showDefaultPasswordWarning:
             videoScreenController.hasDefaultCameraPassword
             && videoScreenController.mediaPlayer.liveMode
@@ -68,14 +71,14 @@ PageBase
                 || videoScreenController.cameraOffline
                 || videoScreenController.cameraUnauthorized
                 || videoScreenController.failed
-                || videoScreenController.noVideoStreams
-                || videoScreenController.noLicenses)
-            && !videoScreenController.mediaPlayer.playing)
+                || videoScreenController.noVideoStreams)
+                && !videoScreenController.mediaPlayer.playing)
             || videoScreenController.hasOldFirmware
             || videoScreenController.tooManyConnections
             || videoScreenController.ioModuleWarning
             || videoScreenController.ioModuleAudioPlaying
             || showDefaultPasswordWarning
+            || showNoLicensesWarning
 
         readonly property bool applicationActive: Qt.application.state === Qt.ApplicationActive
 
