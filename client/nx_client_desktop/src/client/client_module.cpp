@@ -460,7 +460,6 @@ void QnClientModule::initSingletons(const QnStartupParameters& startupParams)
     m_analyticsMetadataProviderFactory.reset(new AnalyticsMetadataProviderFactory());
     m_analyticsMetadataProviderFactory->registerMetadataProviders();
 
-    m_resourceDataProviderFactory.reset(new QnDataProviderFactory());
     registerResourceDataProviders();
 }
 
@@ -540,10 +539,10 @@ void QnClientModule::initLog(const QnStartupParameters& startupParams)
     logSettings.updateDirectoryIfEmpty(QStandardPaths::writableLocation(QStandardPaths::DataLocation));
 
     logSettings.level.parse(logLevel);
-    logSettings.logBaseName = logFile.isEmpty() 
+    logSettings.logBaseName = logFile.isEmpty()
         ? lit("client_log") + logFileNameSuffix
         : logFile;
-        
+
     nx::utils::log::initialize(
         logSettings,
         qApp->applicationName(),
@@ -694,11 +693,6 @@ QnCameraDataManager* QnClientModule::cameraDataManager() const
     return m_cameraDataManager;
 }
 
-QnDataProviderFactory* QnClientModule::dataProviderFactory() const
-{
-    return m_resourceDataProviderFactory.data();
-}
-
 nx::client::desktop::RadassController* QnClientModule::radassController() const
 {
     return m_radassController;
@@ -739,10 +733,10 @@ void QnClientModule::initLocalInfo(const QnStartupParameters& startupParams)
 
 void QnClientModule::registerResourceDataProviders()
 {
-    m_resourceDataProviderFactory->registerResourceType<QnAviResource>();
-    m_resourceDataProviderFactory->registerResourceType<QnClientCameraResource>();
-    m_resourceDataProviderFactory->registerResourceType<QnDesktopAudioOnlyResource>();
+    auto factory = qnClientCoreModule->dataProviderFactory();
+    factory->registerResourceType<QnAviResource>();
+    factory->registerResourceType<QnClientCameraResource>();
     #if defined(Q_OS_WIN)
-        m_resourceDataProviderFactory->registerResourceType<QnWinDesktopResource>();
+        factory->registerResourceType<QnWinDesktopResource>();
     #endif
 }

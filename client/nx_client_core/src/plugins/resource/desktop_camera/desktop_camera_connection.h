@@ -4,7 +4,7 @@
 
 #include <client_core/connection_context_aware.h>
 
-#include <core/resource/client_resource_fwd.h>
+#include <core/resource/client_core_resource_fwd.h>
 
 #include <nx/utils/thread/long_runnable.h>
 #include <nx/network/deprecated/simple_http_client.h>

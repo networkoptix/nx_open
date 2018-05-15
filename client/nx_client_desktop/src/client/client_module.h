@@ -15,7 +15,6 @@ class QnNetworkProxyFactory;
 class QnStaticCommonModule;
 class QnCloudStatusWatcher;
 class QnCameraDataManager;
-class QnDataProviderFactory;
 
 namespace nx {
 namespace client {
@@ -43,7 +42,6 @@ public:
     QnNetworkProxyFactory* networkProxyFactory() const;
     QnCloudStatusWatcher* cloudStatusWatcher() const;
     QnCameraDataManager* cameraDataManager() const;
-    QnDataProviderFactory* dataProviderFactory() const;
 
     nx::client::desktop::RadassController* radassController() const;
 
@@ -76,7 +74,6 @@ private:
     nx::client::desktop::RadassController* m_radassController = nullptr;
     nx::client::desktop::UploadManager* m_uploadManager = nullptr;
     nx::client::desktop::WearableManager* m_wearableManager = nullptr;
-    QScopedPointer<QnDataProviderFactory> m_resourceDataProviderFactory;
 };
 
 #define qnClientModule QnClientModule::instance()

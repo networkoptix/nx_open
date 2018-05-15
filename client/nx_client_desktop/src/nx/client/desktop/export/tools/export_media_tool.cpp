@@ -2,7 +2,7 @@
 
 #include <QtCore/QFileInfo>
 
-#include <client/client_module.h>
+#include <client_core/client_core_module.h>
 
 #include <core/resource/media_resource.h>
 #include <core/resource/camera_resource.h>
@@ -173,7 +173,7 @@ private:
             return true;
         }
 
-        const auto tmpReader = qnClientModule->dataProviderFactory()->createDataProvider(
+        const auto tmpReader = qnClientCoreModule->dataProviderFactory()->createDataProvider(
                 settings.mediaResource->toResourcePtr());
 
         auto archiveReader = dynamic_cast<QnAbstractArchiveStreamReader*>(tmpReader);

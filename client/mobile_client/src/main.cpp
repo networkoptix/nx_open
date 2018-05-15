@@ -190,7 +190,7 @@ int runUi(QtSingleGuiApplication* application)
     maxFfmpegResolutions[(int) AV_CODEC_ID_H265] = maxFfmpegHevcResolution;
 
     nx::media::DecoderRegistrar::registerDecoders(
-        allocator, maxFfmpegResolutions, /*isTranscodingEnabled*/ !context->liteMode());
+        maxFfmpegResolutions, /*isTranscodingEnabled*/ !context->liteMode());
 
     #if defined(Q_OS_ANDROID)
         QUrl initialIntentData = getInitialIntentData();

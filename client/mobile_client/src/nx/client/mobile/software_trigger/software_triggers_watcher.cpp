@@ -31,7 +31,7 @@ bool appropriateSoftwareTriggerRule(
     const QnUserResourcePtr& currentUser,
     const QnUuid& resourceId)
 {
-    if (rule->isDisabled() || rule->eventType() != nx::vms::event::softwareTriggerEvent)
+    if (rule->isDisabled() || rule->eventType() != nx::vms::api::softwareTriggerEvent)
         return false;
 
     if (!rule->eventResources().empty() && !rule->eventResources().contains(resourceId))

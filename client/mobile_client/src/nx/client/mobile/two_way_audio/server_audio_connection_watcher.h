@@ -3,7 +3,9 @@
 #include <QtCore/QObject>
 
 #include <nx/utils/uuid.h>
-#include <core/resource/resource_fwd.h>
+
+#include <core/resource/client_core_resource_fwd.h>
+
 #include <client_core/connection_context_aware.h>
 
 namespace nx {

@@ -3,8 +3,7 @@
 #include <QtCore/QElapsedTimer>
 
 #include <common/common_module.h>
-
-#include <client/client_module.h>
+#include <client_core/client_core_module.h>
 
 #include "core/resource/media_server_resource.h"
 #include <core/dataprovider/data_provider_factory.h>
@@ -144,7 +143,8 @@ void QnDesktopCameraConnectionProcessor::processRequest()
     {
         if (!d->dataProvider)
         {
-            d->dataProvider = qnClientModule->dataProviderFactory()->createDataProvider(d->desktop);
+            d->dataProvider = qnClientCoreModule->dataProviderFactory()->createDataProvider(
+                d->desktop);
             d->dataConsumer = new QnDesktopCameraDataConsumer(this);
             d->dataProvider->addDataProcessor(d->dataConsumer);
             d->dataConsumer->start();
