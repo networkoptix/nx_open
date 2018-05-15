@@ -441,8 +441,9 @@ State CameraSettingsDialogStateReducer::loadCameras(
     state.devicesCount = cameras.size();
     state.alert = {};
 
-    state.deviceType = QnDeviceDependentStrings::calculateDeviceType(
-        qnClientCoreModule->commonModule()->resourcePool(), cameras);
+    state.deviceType = firstCamera
+        ? QnDeviceDependentStrings::calculateDeviceType(firstCamera->resourcePool(), cameras)
+        : QnCameraDeviceType::Mixed;
 
     state.devicesDescription.isDtsBased = combinedValue(cameras,
         [](const Camera& camera) { return camera->isDtsBased(); });
