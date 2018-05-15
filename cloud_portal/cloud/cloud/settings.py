@@ -21,7 +21,7 @@ reload(sys)
 sys.setdefaultencoding("utf-8")
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-LOCAL_ENVIRONMENT = False
+LOCAL_ENVIRONMENT = 'runserver' in sys.argv
 conf = get_config()
 
 CUSTOMIZATION = os.getenv('CUSTOMIZATION')
@@ -387,6 +387,7 @@ DOWNLOADS_JSON = 'http://updates.hdwitness.com.s3.amazonaws.com/{{customization}
 DOWNLOADS_VERSION_JSON = 'http://updates.hdwitness.com.s3.amazonaws.com/{{customization}}/{{build}}/downloads.json'
 
 MAX_RETRIES = conf['max_retries']
+CLEAR_HISTORY_RECORDS_OLDER_THAN_X_DAYS = 30
 
 SUPERUSER_DOMAIN = '@networkoptix.com'  # Only user from this domain can have superuser permissions
 

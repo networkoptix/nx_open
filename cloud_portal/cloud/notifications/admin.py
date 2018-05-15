@@ -2,7 +2,6 @@ from django.conf import settings
 from django.contrib import admin
 from django.utils.html import format_html
 import pytz
-import datetime
 
 # Register your models here.
 
@@ -10,8 +9,10 @@ from .models import *
 from django_celery_results.models import TaskResult
 admin.site.unregister(TaskResult)
 
+
 class SubscriptionAdmin(admin.ModelAdmin):
     list_display = ('id', 'object', 'type', 'user_email', 'created_date', 'enabled')
+
 
 admin.site.register(Subscription, SubscriptionAdmin)
 
@@ -22,12 +23,23 @@ class MessageAdmin(admin.ModelAdmin):
                        'message', 'created_date', 'send_date', 'delivery_time_interval', 'event')
     list_filter = ('type', 'created_date', 'send_date')
     search_fields = ('user_email', 'created_date', 'send_date',)
+    actions = ['clean_old_messages']
+
+    def clean_old_messages(self, request, queryset):
+        from datetime import datetime, timedelta
+        cutoff_date = datetime.now() - timedelta(days=settings.CLEAR_HISTORY_RECORDS_OLDER_THAN_X_DAYS)
+        Message.objects.filter(send_date__lt=cutoff_date).delete()
+
+    clean_old_messages.short_description = "Remove messages older than {} days"\
+        .format(settings.CLEAR_HISTORY_RECORDS_OLDER_THAN_X_DAYS)
+
 
 admin.site.register(Message, MessageAdmin)
 
 
 class EventAdmin(admin.ModelAdmin):
     list_display = ('type', 'object', 'created_date', 'send_date', 'data')
+
 
 admin.site.register(Event, EventAdmin)
 
@@ -44,7 +56,6 @@ class CloudNotificationAdmin(admin.ModelAdmin):
         ("When and who sent the notification", {'fields': (('sent_by', 'convert_date'))})
     ]
 
-
     def add_view(self, request, form_url='', extra_context=None):
         extra_context = extra_context or {}
         extra_context['BROADCAST_NOTIFICATIONS_SUPERUSERS_ONLY'] = settings.BROADCAST_NOTIFICATIONS_SUPERUSERS_ONLY
@@ -59,7 +70,6 @@ class CloudNotificationAdmin(admin.ModelAdmin):
         return super(CloudNotificationAdmin, self).change_view(
             request, object_id, form_url, extra_context=extra_context,
         )
-
 
     def convert_date(self, obj):
         session = self.request.session
@@ -80,11 +90,11 @@ class CloudNotificationAdmin(admin.ModelAdmin):
             return False
         return super(CloudNotificationAdmin, self).has_delete_permission(request,obj=obj)
 
-
     def get_readonly_fields(self, request, obj=None):
         if obj and obj.sent_date:
             return self.readonly_fields + ('subject', 'body')
         return self.readonly_fields
+
 
 admin.site.register(CloudNotification, CloudNotificationAdmin)
 
@@ -117,16 +127,16 @@ class TaskResultAdmin(admin.ModelAdmin):
         }),
     )
 
-
     class Meta:
         proxy = True
 
-
     def clean_old_tasks(self, request, queryset):
         from datetime import datetime, timedelta
-        cutoff_date = datetime.now() - timedelta(days=7)
+        cutoff_date = datetime.now() - timedelta(days=settings.CLEAR_HISTORY_RECORDS_OLDER_THAN_X_DAYS)
         TaskResult.objects.filter(date_done__lt=cutoff_date).delete()
 
-    clean_old_tasks.short_description = "Remove tasks older than a week"
+    clean_old_tasks.short_description = "Remove tasks older than {} days"\
+        .format(settings.CLEAR_HISTORY_RECORDS_OLDER_THAN_X_DAYS)
+
 
 admin.site.register(TaskResult, TaskResultAdmin)
