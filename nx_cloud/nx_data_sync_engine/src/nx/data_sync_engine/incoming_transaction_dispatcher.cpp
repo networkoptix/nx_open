@@ -4,15 +4,11 @@
 #include <nx/fusion/serialization/json.h>
 #include <nx/fusion/serialization/ubjson.h>
 #include <nx/utils/log/log.h>
-#include <transaction/transaction.h>
 
 #include "serialization/transaction_deserializer.h"
 
 namespace nx {
-namespace cdb {
-namespace ec2 {
-
-using namespace ::ec2;
+namespace data_sync_engine {
 
 IncomingTransactionDispatcher::IncomingTransactionDispatcher(
     const QnUuid& moduleGuid,
@@ -60,12 +56,12 @@ void IncomingTransactionDispatcher::dispatchUbjsonTransaction(
     QByteArray serializedTransaction,
     TransactionProcessedHandler handler)
 {
-    QnAbstractTransaction transactionHeader(m_moduleGuid);
+    CommandHeader commandHeader(m_moduleGuid);
     auto dataSource =
         std::make_unique<TransactionUbjsonDataSource>(std::move(serializedTransaction));
     if (!TransactionDeserializer::deserialize(
             &dataSource->stream,
-            &transactionHeader,
+            &commandHeader,
             transportHeader.transactionFormatVersion))
     {
         NX_LOGX(QnLog::EC2_TRAN_LOG,
@@ -79,7 +75,7 @@ void IncomingTransactionDispatcher::dispatchUbjsonTransaction(
 
     return dispatchTransaction(
         std::move(transportHeader),
-        std::move(transactionHeader),
+        std::move(commandHeader),
         std::move(dataSource),
         std::move(handler));
 }
@@ -89,7 +85,7 @@ void IncomingTransactionDispatcher::dispatchJsonTransaction(
     QByteArray serializedTransaction,
     TransactionProcessedHandler handler)
 {
-    QnAbstractTransaction transactionHeader(m_moduleGuid);
+    CommandHeader commandHeader(m_moduleGuid);
     QJsonObject tranObject;
     // TODO: #ak put tranObject to some cache for later use
     if (!QJson::deserialize(serializedTransaction, &tranObject))
@@ -102,7 +98,7 @@ void IncomingTransactionDispatcher::dispatchJsonTransaction(
             [handler = std::move(handler)]{ handler(ResultCode::badRequest); });
         return;
     }
-    if (!QJson::deserialize(tranObject["tran"], &transactionHeader))
+    if (!QJson::deserialize(tranObject["tran"], &commandHeader))
     {
         NX_LOGX(QnLog::EC2_TRAN_LOG,
             lm("Failed to deserialize json transaction received from (%1, %2). size %3")
@@ -115,7 +111,7 @@ void IncomingTransactionDispatcher::dispatchJsonTransaction(
 
     return dispatchTransaction(
         std::move(transportHeader),
-        std::move(transactionHeader),
+        std::move(commandHeader),
         tranObject["tran"].toObject(),
         std::move(handler));
 }
@@ -123,19 +119,19 @@ void IncomingTransactionDispatcher::dispatchJsonTransaction(
 template<typename TransactionDataSource>
 void IncomingTransactionDispatcher::dispatchTransaction(
     TransactionTransportHeader transportHeader,
-    ::ec2::QnAbstractTransaction transactionHeader,
+    CommandHeader commandHeader,
     TransactionDataSource dataSource,
     TransactionProcessedHandler completionHandler)
 {
     QnMutexLocker lock(&m_mutex);
 
-    auto it = m_transactionProcessors.find(transactionHeader.command);
-    if (transactionHeader.command == ::ec2::ApiCommand::updatePersistentSequence)
+    auto it = m_transactionProcessors.find(commandHeader.command);
+    if (commandHeader.command == ::ec2::ApiCommand::updatePersistentSequence)
         return; // TODO: #ak Do something.
     if (it == m_transactionProcessors.end() || it->second->markedForRemoval)
     {
         NX_VERBOSE(this, lm("Received unsupported transaction %1")
-            .arg(::ec2::ApiCommand::toString(transactionHeader.command)));
+            .arg(::ec2::ApiCommand::toString(commandHeader.command)));
         // No handler registered for transaction type.
         m_aioTimer.post(
             [completionHandler = std::move(completionHandler)]
@@ -152,7 +148,7 @@ void IncomingTransactionDispatcher::dispatchTransaction(
     // TODO: should we always call completionHandler in the same thread?
     return it->second->processor->processTransaction(
         std::move(transportHeader),
-        std::move(transactionHeader),
+        std::move(commandHeader),
         std::move(dataSource),
         [it, completionHandler = std::move(completionHandler)](
             ResultCode resultCode)
@@ -163,6 +159,5 @@ void IncomingTransactionDispatcher::dispatchTransaction(
         });
 }
 
-} // namespace ec2
-} // namespace cdb
+} // namespace data_sync_engine
 } // namespace nx

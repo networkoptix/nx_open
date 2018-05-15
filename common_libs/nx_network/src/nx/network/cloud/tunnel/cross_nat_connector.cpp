@@ -140,7 +140,8 @@ void CrossNatConnector::ioFailure(SystemError::ErrorCode /*errorCode*/)
 }
 
 utils::ResultCounter<nx::hpm::api::ResultCode>
-    CrossNatConnector::s_mediatorResponseCounter(&nx::hpm::api::toString);
+    CrossNatConnector::s_mediatorResponseCounter(
+        static_cast<QString(*)(nx::hpm::api::ResultCode)>(&nx::hpm::api::toString));
 
 void CrossNatConnector::issueConnectRequestToMediator(
     std::chrono::milliseconds timeout,

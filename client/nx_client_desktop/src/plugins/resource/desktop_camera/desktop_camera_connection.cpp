@@ -247,15 +247,8 @@ void QnDesktopCameraConnection::terminatedSleep(int sleep)
 QSharedPointer<nx::network::AbstractStreamSocket> QnDesktopCameraConnection::takeSocketFromHttpClient(
     std::unique_ptr<nx::network::http::HttpClient>& httpClient)
 {
-    auto socket = QSharedPointer<nx::network::BufferedStreamSocket>(
-        new nx::network::BufferedStreamSocket(httpClient->takeSocket()));
-
-    auto buffer = httpClient->fetchMessageBodyBuffer();
-
-    if (buffer.size())
-        socket->injectRecvData(std::move(buffer));
-
-    return socket;
+    return QSharedPointer<nx::network::BufferedStreamSocket>(
+        new nx::network::BufferedStreamSocket(httpClient->takeSocket(), httpClient->fetchMessageBodyBuffer()));
 }
 
 void QnDesktopCameraConnection::pleaseStop()

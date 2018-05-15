@@ -62,6 +62,7 @@ DbStructureUpdater::DbStructureUpdater(
 void DbStructureUpdater::setInitialVersion(unsigned int version)
 {
     m_initialVersion = version;
+    m_updateScripts.erase(m_updateScripts.begin());
 }
 
 void DbStructureUpdater::addUpdateScript(QByteArray updateScript)

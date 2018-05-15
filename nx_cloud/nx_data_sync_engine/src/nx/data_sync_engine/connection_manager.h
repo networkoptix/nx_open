@@ -3,13 +3,12 @@
 #include <list>
 #include <map>
 #include <memory>
+#include <vector>
 
 #include <boost/multi_index_container.hpp>
 #include <boost/multi_index/ordered_index.hpp>
 #include <boost/multi_index/identity.hpp>
 #include <boost/multi_index/member.hpp>
-
-#include <nx/cloud/cdb/api/maintenance_manager.h>
 
 #include <nx/network/http/abstract_msg_body_source.h>
 #include <nx/network/http/server/abstract_http_request_handler.h>
@@ -40,11 +39,7 @@ class MessageDispatcher;
 } // namespace http
 
 namespace nx {
-namespace cdb {
-
-class AuthorizationManager;
-
-namespace ec2 {
+namespace data_sync_engine {
 
 class Settings;
 
@@ -60,6 +55,12 @@ struct SystemStatusDescriptor
     int protoVersion = nx_ec::INITIAL_EC2_PROTO_VERSION;
 
     SystemStatusDescriptor() = default;
+};
+
+struct SystemConnectionInfo
+{
+    std::string systemId;
+    nx::network::SocketAddress peerEndpoint;
 };
 
 /**
@@ -111,8 +112,8 @@ public:
         const nx::String& systemId,
         std::shared_ptr<const SerializableAbstractTransaction> transactionSerializer);
 
-    api::VmsConnectionDataList getVmsConnections() const;
-    std::size_t getVmsConnectionCount() const;
+    std::vector<SystemConnectionInfo> getConnections() const;
+    std::size_t getConnectionCount() const;
     bool isSystemConnected(const std::string& systemId) const;
 
     unsigned int getConnectionCountBySystemId(const nx::String& systemId) const;
@@ -220,7 +221,7 @@ private:
     void processSpecialTransaction(
         const nx::String& systemId,
         const TransactionTransportHeader& transportHeader,
-        ::ec2::QnTransaction<TransactionDataType> data,
+        Command<TransactionDataType> data,
         TransactionProcessedHandler handler);
 
     nx::network::http::RequestResult prepareOkResponseToCreateTransactionConnection(
@@ -233,6 +234,5 @@ private:
         const std::string& systemId);
 };
 
-} // namespace ec2
-} // namespace cdb
+} // namespace data_sync_engine
 } // namespace nx

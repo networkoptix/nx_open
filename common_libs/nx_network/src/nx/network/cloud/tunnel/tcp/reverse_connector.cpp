@@ -68,7 +68,7 @@ void ReverseConnector::connect(const SocketAddress& endpoint, ConnectHandler han
 
 std::unique_ptr<BufferedStreamSocket> ReverseConnector::takeSocket()
 {
-    auto socket = std::make_unique<BufferedStreamSocket>(m_httpClient.takeSocket());
+    auto socket = std::make_unique<BufferedStreamSocket>(m_httpClient.takeSocket(), nx::Buffer());
     if (socket->setSendTimeout(0) && socket->setRecvTimeout(0))
         return socket;
 

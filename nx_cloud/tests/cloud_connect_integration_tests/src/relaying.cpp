@@ -1,4 +1,5 @@
 #include <thread>
+#include <type_traits>
 
 #include <gtest/gtest.h>
 
@@ -131,13 +132,8 @@ REGISTER_TYPED_TEST_CASE_P(
     exchanging_fixed_data,
     multiple_connections);
 
-namespace {
-struct True { static const bool value = true; };
-struct False { static const bool value = false; };
-} // namespace
-
-INSTANTIATE_TYPED_TEST_CASE_P(UsingHttpConnectRelaying, Relaying, True);
-INSTANTIATE_TYPED_TEST_CASE_P(NotUsingHttpConnect, Relaying, False);
+INSTANTIATE_TYPED_TEST_CASE_P(UsingHttpConnectRelaying, Relaying, std::true_type);
+INSTANTIATE_TYPED_TEST_CASE_P(NotUsingHttpConnect, Relaying, std::false_type);
 
 } // namespace test
 } // namespace cloud

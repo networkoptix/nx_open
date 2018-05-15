@@ -1,8 +1,7 @@
 #include "transaction_timestamp_calculator.h"
 
 namespace nx {
-namespace cdb {
-namespace ec2 {
+namespace data_sync_engine {
 
 constexpr const int kTimeShiftDelta = 1000;
 
@@ -78,6 +77,5 @@ void TransactionTimestampCalculator::shiftTimestampIfNeeded(
     m_lastTimestamp = qMax(m_lastTimestamp, receivedTransactionTimestamp);
 }
 
-} // namespace ec2
-} // namespace cdb
+} // namespace data_sync_engine
 } // namespace nx

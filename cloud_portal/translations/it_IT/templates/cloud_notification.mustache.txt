@@ -1,3 +1,0 @@
-Buongiorno, {{message.full_name}}
-
-{{message.text_body}}

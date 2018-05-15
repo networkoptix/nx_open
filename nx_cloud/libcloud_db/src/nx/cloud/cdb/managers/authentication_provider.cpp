@@ -435,6 +435,12 @@ void AuthenticationProvider::updateUserAuthInSystem(
         queryContext, userSharing.accountEmail, &account);
     if (dbResult != utils::db::DBResult::ok)
         throw utils::db::Exception(dbResult);
+    if (account.passwordHa1.empty() && account.passwordHa1Sha256.empty())
+    {
+        NX_VERBOSE(this, lm("Skipping user %1, system %2. User does not have password")
+            .args(userSharing.accountEmail, systemId));
+        return;
+    }
 
     addUserAuthRecord(
         queryContext,

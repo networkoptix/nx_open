@@ -36,7 +36,7 @@
 
 #include "media_player_quality_chooser.h"
 
-static uint qHash(MetadataType value)
+static uint qHash(const MetadataType& value)
 {
     return uint(value);
 }

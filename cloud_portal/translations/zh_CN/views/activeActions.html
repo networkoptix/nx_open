@@ -1,7 +1,7 @@
 <div class="container" >
     <div ng-if="data.activateCode" process-loading="activate">
         <h1 class="process-success" ng-if="activate.success">
-            已成功激活您的帐户。
+            已成功激活您的帐户
         </h1>
         <h1 class="process-success" ng-if="activate.success">
             <a class="btn btn-default" href="/login">登录</a>
@@ -14,7 +14,7 @@
 
     <div ng-if="!data.activateCode && activationSuccess">
         <h1 class="process-success">
-            已成功激活您的帐户。
+            已成功激活您的帐户
         </h1>
         <h1 class="process-success">
             <a class="btn btn-default" href="/login">登录</a>
@@ -23,7 +23,7 @@
     
     <div ng-if="reactivating" class="text-center">
         <div ng-if='data.email'>
-            <h1>您已在 {{PRODUCT_NAME}} 中注册</h1>
+            <h1>您已在 %PRODUCT_NAME% 中注册</h1>
             <p>我们已经将激活链接发信给{{data.email}}。<br>
             请通过访问此链接激活您的帐户。</p>
         </div>
@@ -40,7 +40,7 @@
                 </div>
                 <div class="col-sm-4">
                     <span class="help-block" ng-if="reactivateAccount.email.$touched && reactivateAccount.email.$error.required">电子邮件是需要</span>
-                    <span class="help-block" ng-if="reactivateAccount.email.$touched && reactivateAccount.email.$error.email">请输入一个有效的电子邮件</span>
+                    <span class="help-block" ng-if="reactivateAccount.email.$touched && reactivateAccount.email.$error.email">请输入一个有效的电子邮件地址</span>
                 </div>
             </div>
             <div class="form-group">
@@ -73,7 +73,7 @@
                 </div>
                 <div class="col-sm-4">
                     <span class="help-block" ng-if="restorePassword.email.$touched && restorePassword.email.$error.required">电子邮件是需要</span>
-                    <span class="help-block" ng-if="restorePassword.email.$touched && restorePassword.email.$error.email">请输入一个有效的电子邮件</span>
+                    <span class="help-block" ng-if="restorePassword.email.$touched && restorePassword.email.$error.email">请输入一个有效的电子邮件地址</span>
                 </div>
             </div>
             <div class="form-group">

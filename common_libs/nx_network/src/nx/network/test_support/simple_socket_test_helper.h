@@ -136,7 +136,7 @@ private:
         ASSERT_TRUE(m_server->listen((int)testClientCount())) << SystemError::getLastOSErrorText().toStdString();
 
         ASSERT_TRUE(m_server->setRecvTimeout(100)) << SystemError::getLastOSErrorText().toStdString();
-        std::unique_ptr<AbstractStreamSocket> client(m_server->accept());
+        auto client = m_server->accept();
         ASSERT_FALSE(client);
         ASSERT_EQ(SystemError::timedOut, SystemError::getLastOSErrorCode());
 
@@ -278,7 +278,7 @@ void socketTransferSyncFlags(
         nx::utils::thread acceptThread(
             [&]()
             {
-                accepted.reset(server->accept());
+                accepted = server->accept();
                 ASSERT_TRUE(accepted.get());
                 EXPECT_EQ(readNBytes(accepted.get(), testMessage.size()), kTestMessage);
             });
@@ -462,7 +462,7 @@ void socketSyncAsyncSwitch(
         });
     ASSERT_EQ(SystemError::noError, connectPromise.get_future().get());
 
-    std::unique_ptr<AbstractStreamSocket> accepted(server->accept());
+    auto accepted = server->accept();
     ASSERT_TRUE((bool) accepted);
     const auto acceptedGuard = makeScopeGuard(
         [&accepted]() { accepted->pleaseStopSync(); });
@@ -519,7 +519,7 @@ void socketTransferFragmentation(
     ASSERT_TRUE(client->setNonBlockingMode(true));
     const auto clientGuard = makeScopeGuard([&](){ client->pleaseStopSync(); });
 
-    std::unique_ptr<AbstractStreamSocket> accepted(server->accept());
+    auto accepted = server->accept();
     ASSERT_NE(nullptr, accepted);
 
     for (size_t runNumber = 0; runNumber <= kTestRuns; ++runNumber)
@@ -728,54 +728,6 @@ void socketShutdown(
 }
 
 template<typename ServerSocketMaker, typename ClientSocketMaker>
-void socketAcceptMixed(
-    const ServerSocketMaker& serverMaker,
-    const ClientSocketMaker& clientMaker,
-    boost::optional<SocketAddress> endpointToConnectTo = boost::none)
-{
-    auto server = serverMaker();
-    auto serverGuard = makeScopeGuard([&](){ server->pleaseStopSync(); });
-    ASSERT_TRUE(server->setNonBlockingMode(true));
-    ASSERT_TRUE(server->setReuseAddrFlag(true));
-    ASSERT_TRUE(server->bind(SocketAddress::anyPrivateAddress));
-    ASSERT_TRUE(server->listen((int)testClientCount()));
-
-    auto serverAddress = server->getLocalAddress();
-    NX_LOG(lm("Server address: %1").arg(serverAddress.toString()), cl_logDEBUG1);
-    if (!endpointToConnectTo)
-        endpointToConnectTo = std::move(serverAddress);
-
-    // no clients yet
-    {
-        std::unique_ptr<AbstractStreamSocket> accepted(server->accept());
-        ASSERT_EQ(nullptr, accepted);
-        ASSERT_EQ(SystemError::wouldBlock, SystemError::getLastOSErrorCode());
-        std::this_thread::sleep_for(std::chrono::seconds(1));
-    }
-
-    auto client = clientMaker();
-    auto clientGuard = makeScopeGuard([&](){ client->pleaseStopSync(); });
-    ASSERT_TRUE(client->setSendTimeout(kTestTimeout.count()));
-    ASSERT_TRUE(client->setNonBlockingMode(true));
-    nx::utils::promise<SystemError::ErrorCode> connectionEstablishedPromise;
-    client->connectAsync(
-        *endpointToConnectTo,
-        [&connectionEstablishedPromise](SystemError::ErrorCode code)
-        {
-            connectionEstablishedPromise.set_value(code);
-        });
-
-    ASSERT_EQ(SystemError::noError, connectionEstablishedPromise.get_future().get());
-
-    //if connect returned, it does not mean that accept has actually returned,
-        //so giving internal socket implementation some time...
-    std::this_thread::sleep_for(std::chrono::seconds(1));
-
-    std::unique_ptr<AbstractStreamSocket> accepted(server->accept());
-    ASSERT_NE(accepted, nullptr) << SystemError::getLastOSErrorText().toStdString();
-}
-
-template<typename ServerSocketMaker, typename ClientSocketMaker>
 void acceptedSocketOptionsInheritance(
     const ServerSocketMaker& serverMaker,
     const ClientSocketMaker& clientMaker)
@@ -791,7 +743,7 @@ void acceptedSocketOptionsInheritance(
     auto client = clientMaker();
     ASSERT_TRUE(client->connect(serverAddress, nx::network::kNoTimeout));
 
-    std::unique_ptr<AbstractStreamSocket> accepted(server->accept());
+    auto accepted = server->accept();
     ASSERT_TRUE((bool)accepted);
 
     unsigned int acceptedSocketRecvTimeout = 0;
@@ -965,8 +917,8 @@ void socketIsUsefulAfterCancelIo(
         endpointToConnectTo = std::move(serverAddress);
 
     auto client = clientMaker();
-    ASSERT_TRUE(client->setNonBlockingMode(true));
     ASSERT_TRUE(client->connect(*endpointToConnectTo, nx::network::kNoTimeout));
+    ASSERT_TRUE(client->setNonBlockingMode(true));
 
     ASSERT_TRUE(server->setRecvTimeout(0));
     std::unique_ptr<AbstractStreamSocket> accepted(server->accept());
@@ -1280,8 +1232,6 @@ typedef nx::network::test::StopType StopType;
         { nx::network::test::socketIsUsefulAfterCancelIo(mkServer, mkClient, endpointToConnectTo); } \
 
 #define NX_NETWORK_SERVER_SOCKET_TEST_GROUP(Type, Name, mkServer, mkClient, endpointToConnectTo) \
-    Type(Name, AcceptMixed) \
-        { nx::network::test::socketAcceptMixed(mkServer, mkClient, endpointToConnectTo); } \
     Type(Name, AcceptedSocketOptionsInheritance) \
         { nx::network::test::acceptedSocketOptionsInheritance(mkServer, mkClient); } \
     Type(Name, AcceptTimeoutSync) \

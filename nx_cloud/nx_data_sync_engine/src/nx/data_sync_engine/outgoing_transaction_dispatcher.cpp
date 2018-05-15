@@ -1,8 +1,7 @@
 #include "outgoing_transaction_dispatcher.h"
 
 namespace nx {
-namespace cdb {
-namespace ec2 {
+namespace data_sync_engine {
 
 OutgoingTransactionDispatcher::OutgoingTransactionDispatcher()
 {
@@ -23,6 +22,5 @@ OutgoingTransactionDispatcher::OnNewTransactionSubscription*
     return &m_onNewTransactionSubscription;
 }
 
-} // namespace ec2
-} // namespace cdb
+} // namespace data_sync_engine
 } // namespace nx

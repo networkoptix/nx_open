@@ -17,7 +17,7 @@
 #include <relay/relay_cluster_client_factory.h>
 #include <test_support/mediaserver_emulator.h>
 
-#include "functional_tests/mediator_functional_test.h"
+#include "mediator_functional_test.h"
 
 namespace nx {
 namespace hpm {
@@ -49,7 +49,7 @@ public:
     }
 
 protected:
-    // TODO: #ak Get rid of this method.
+    // TODO: #ak Get rid of this method. Logically, it is a duplicate of a givenListeningServer.
     void givenListeningMediaServer()
     {
         m_mediaServerEmulator = addRandomServer(system(), boost::none);

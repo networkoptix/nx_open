@@ -274,3 +274,12 @@ else()
 endif()
 
 nx_save_known_files()
+
+if(withClouds)
+    add_subdirectory(cloud_portal)
+    add_custom_target(cloud-frontend DEPENDS cloud_portal)
+    if(LINUX)
+        add_subdirectory(nx_cloud_deploy)
+    endif()
+    add_custom_target(cloud DEPENDS cloud-backend cloud-frontend)
+endif()

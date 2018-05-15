@@ -27,7 +27,7 @@ public:
     virtual bool isConnected() const override;
 
 private:
-    const std::string& m_data;
+    const std::string m_data;
     bool m_isOpened;
     size_t m_curPos;
 };

@@ -76,11 +76,12 @@ public:
         }
     }
 
+    Pollable& pollable();
+    const Pollable& pollable() const;
+
 protected:
     /** Cancel your asynchronous operations here. */
     virtual void stopWhileInAioThread();
-
-    Pollable& pollable();
 
 private:
     mutable Pollable m_pollable;

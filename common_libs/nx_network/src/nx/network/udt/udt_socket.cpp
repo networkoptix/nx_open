@@ -39,15 +39,13 @@ class UdtSocketImpl:
 {
 public:
     UdtSocketImpl() = default;
+    UdtSocketImpl(const UdtSocketImpl&) = delete;
+    UdtSocketImpl& operator=(const UdtSocketImpl&) = delete;
 
     UdtSocketImpl(UDTSOCKET socket):
         UDTSocketImpl(socket)
     {
     }
-
-private:
-    UdtSocketImpl(const UdtSocketImpl&);
-    UdtSocketImpl& operator=(const UdtSocketImpl&);
 };
 
 struct UdtEpollHandlerHelper
@@ -614,10 +612,29 @@ int UdtStreamSocket::recv(void* buffer, unsigned int bufferLen, int flags)
             [newRecvMode = *newRecvMode, this]() { setRecvMode(!newRecvMode); });
     }
 
-    const int bytesRead = UDT::recv(
-        m_impl->udtHandle, reinterpret_cast<char*>(buffer), bufferLen, 0);
+    if ((flags & MSG_WAITALL) == 0)
+    {
+        return handleRecvResult(UDT::recv(
+            m_impl->udtHandle, reinterpret_cast<char*>(buffer), bufferLen, 0));
+    }
 
-    return handleRecvResult(bytesRead);
+    // UDT does not support MSG_WAITALL recv flag.
+    int totalBytesRead = 0;
+    while (totalBytesRead < (int) bufferLen)
+    {
+        int bytesRead = UDT::recv(
+            m_impl->udtHandle,
+            reinterpret_cast<char*>(buffer) + totalBytesRead,
+            bufferLen - totalBytesRead,
+            0);
+        if (bytesRead < 0)
+            return handleRecvResult(bytesRead);
+        if (bytesRead == 0)
+            break;
+        totalBytesRead += bytesRead;
+    }
+
+    return handleRecvResult(totalBytesRead);
 }
 
 int UdtStreamSocket::send(const void* buffer, unsigned int bufferLen)
@@ -664,20 +681,6 @@ SocketAddress UdtStreamSocket::getForeignAddress() const
 bool UdtStreamSocket::isConnected() const
 {
     return m_state == detail::SocketState::connected;
-}
-
-void UdtStreamSocket::cancelIOAsync(
-    aio::EventType eventType,
-    nx::utils::MoveOnlyFunc<void()> cancellationDoneHandler)
-{
-    return m_aioHelper->cancelIOAsync(
-        eventType,
-        std::move(cancellationDoneHandler));
-}
-
-void UdtStreamSocket::cancelIOSync(aio::EventType eventType)
-{
-    m_aioHelper->cancelIOSync(eventType);
 }
 
 bool UdtStreamSocket::setNoDelay(bool value)
@@ -753,6 +756,11 @@ void UdtStreamSocket::registerTimer(
     nx::utils::MoveOnlyFunc<void()> handler)
 {
     return m_aioHelper->registerTimer(timeoutMillis, std::move(handler));
+}
+
+void UdtStreamSocket::cancelIoInAioThread(aio::EventType eventType)
+{
+    m_aioHelper->cancelIOSync(eventType);
 }
 
 bool UdtStreamSocket::connectToIp(
@@ -906,7 +914,7 @@ bool UdtStreamServerSocket::listen(int backlog)
     }
 }
 
-AbstractStreamSocket* UdtStreamServerSocket::accept()
+std::unique_ptr<AbstractStreamSocket> UdtStreamServerSocket::accept()
 {
     bool isNonBlocking = false;
     if (!getNonBlockingMode(&isNonBlocking))
@@ -946,7 +954,8 @@ AbstractStreamSocket* UdtStreamServerSocket::accept()
         SystemError::setLastErrorCode(acceptedSocketPair.first);
         return nullptr;
     }
-    return acceptedSocketPair.second.release();
+
+    return std::move(acceptedSocketPair.second);
 }
 
 void UdtStreamServerSocket::acceptAsync(AcceptCompletionHandler handler)
@@ -982,16 +991,6 @@ void UdtStreamServerSocket::acceptAsync(AcceptCompletionHandler handler)
         });
 }
 
-void UdtStreamServerSocket::cancelIOAsync(nx::utils::MoveOnlyFunc<void()> handler)
-{
-    m_aioHelper->cancelIOAsync(std::move(handler));
-}
-
-void UdtStreamServerSocket::cancelIOSync()
-{
-    m_aioHelper->cancelIOSync();
-}
-
 void UdtStreamServerSocket::pleaseStop(
     nx::utils::MoveOnlyFunc< void() > completionHandler)
 {
@@ -1012,7 +1011,12 @@ void UdtStreamServerSocket::pleaseStopSync(bool assertIfCalledUnderLock)
         QnStoppableAsync::pleaseStopSync(assertIfCalledUnderLock);
 }
 
-AbstractStreamSocket* UdtStreamServerSocket::systemAccept()
+void UdtStreamServerSocket::cancelIoInAioThread()
+{
+    m_aioHelper->cancelIOSync();
+}
+
+std::unique_ptr<AbstractStreamSocket> UdtStreamServerSocket::systemAccept()
 {
     NX_ASSERT(m_state == detail::SocketState::connected);
     UDTSOCKET ret = UDT::accept(m_impl->udtHandle, NULL, NULL);
@@ -1025,15 +1029,16 @@ AbstractStreamSocket* UdtStreamServerSocket::systemAccept()
 #ifdef TRACE_UDT_SOCKET
     NX_LOGX(lit("accepted UDT socket %1").arg(ret), cl_logDEBUG2);
 #endif
-    auto acceptedSocket = new UdtStreamSocket(
+    auto acceptedSocket = std::make_unique<UdtStreamSocket>(
         m_ipVersion,
         new detail::UdtSocketImpl(ret),
         detail::SocketState::connected);
     acceptedSocket->bindToAioThread(SocketGlobals::aioService().getRandomAioThread());
 
-    if (!acceptedSocket->setSendTimeout(0) || !acceptedSocket->setRecvTimeout(0))
+    if (!acceptedSocket->setSendTimeout(0) ||
+        !acceptedSocket->setRecvTimeout(0) ||
+        !acceptedSocket->setNonBlockingMode(false))
     {
-        delete acceptedSocket;
         return nullptr;
     }
 
