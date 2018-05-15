@@ -1,5 +1,4 @@
-<!--<div ng-controller="ShareCtrl">-->
-<form #shareForm="ngForm" novalidate>
+<form #shareForm="ngForm" name="shareForm" novalidate>
     <div class="modal-header">
         <h1 class="modal-title" translate>Share</h1>
         <button type="button" class="close"
@@ -31,7 +30,8 @@
             <select class="form-control"
                     name="role" id="role"
                     [(ngModel)]="user.role">
-                <option *ngFor="let option of accessRoles" [ngValue]="option.optionLabel"> {{option.optionLabel}}</option>
+                <option *ngFor="let option of accessRoles" [ngValue]="option.optionLabel"> {{option.optionLabel}}
+                </option>
             </select>
 
             <span class="help-block">
@@ -48,4 +48,3 @@
         <button type="button" class="btn btn-default" (click)="activeModal.close()" translate>Cancel</button>
     </div>
 </form>
-<!--</div>-->

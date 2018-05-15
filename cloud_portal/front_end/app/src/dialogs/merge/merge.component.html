@@ -1,5 +1,3 @@
-<!--<div ng-controller="MergeCtrl">-->
-
 <div class="modal-header">
     <h1 class="modal-title" translate>Merge Systems</h1>
     <button type="button" class="close"
@@ -28,7 +26,7 @@
     </div>
 </div>
 
-<form *ngIf="showMergeForm" #mergeForm="ngForm" novalidate>
+<form *ngIf="showMergeForm" #mergeForm="ngForm" name="mergeForm" novalidate>
     <div class="modal-body">
         <div class="form-group">
             <label for="system" translate>Merge current System with</label>
@@ -82,4 +80,3 @@
                            buttonText="{{ 'Merge' | translate}}"></nx-process-button>
     </div>
 </form>
-<!--</div>-->
