@@ -68,9 +68,11 @@ void DateTimeFormats::setFormats()
     formatStrings[Format::MMMM_yyyy] = tr("MMMM yyyy"); //< Localizable
     formatStrings[Format::dd_MM_yyyy] = locale.dateFormat(QLocale::ShortFormat);
     formatStrings[Format::yyyy_MM_dd_hh_mm_ss] = locale.dateTimeFormat(QLocale::ShortFormat);
+    formatStrings[Format::dddd_d_MMMM_yyyy_hh_mm_ss] = locale.dateTimeFormat(QLocale::LongFormat);
 
     // Fix - we never want timezone in time string.
     removeTimezone(formatStrings[Format::yyyy_MM_dd_hh_mm_ss]);
+    removeTimezone(formatStrings[Format::dddd_d_MMMM_yyyy_hh_mm_ss]);
 
     formatStrings[Format::filename_date] = lit("yyyy_MM_dd_hh_mm_ss");
     formatStrings[Format::filename_time] = lit("hh_mm_ss");
