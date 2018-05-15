@@ -125,7 +125,7 @@ typedef std::vector<ApiPredefinedRoleData> ApiPredefinedRoleDataList;
 typedef std::vector<ApiAccessRightsData> ApiAccessRightsDataList;
 typedef std::vector<ApiVideowallData> ApiVideowallDataList;
 typedef std::vector<ApiDiscoveryData> ApiDiscoveryDataList;
-typedef std::vector<ApiStoredFilePath> ApiStoredDirContents;
+typedef std::vector<ApiStoredFilePath> ApiStoredFilePathList;
 typedef std::vector<ApiResourceParamWithRefData> ApiResourceParamWithRefDataList;
 typedef std::vector<ApiStorageData> ApiStorageDataList;
 typedef std::vector<ApiIdData> ApiIdDataList;

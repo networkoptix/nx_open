@@ -61,12 +61,12 @@ namespace ec2
     {
         const int reqID = generateRequestID();
 
-        auto queryDoneHandler = [reqID, handler, this]( ErrorCode errorCode, const ApiStoredDirContents& folderContents) {
+        auto queryDoneHandler = [reqID, handler, this]( ErrorCode errorCode, const ApiStoredFilePathList& folderContents) {
             QStringList outputFolderContents;
             std::transform(folderContents.cbegin(), folderContents.cend(), std::back_inserter(outputFolderContents), [](const ApiStoredFilePath &path) {return path.path; } );
             handler->done( reqID, errorCode, outputFolderContents );
         };
-        m_queryProcessor->getAccess(m_userAccessData).template processQueryAsync<ApiStoredFilePath, ApiStoredDirContents, decltype(queryDoneHandler)>( ApiCommand::listDirectory, ApiStoredFilePath(folderName), queryDoneHandler );
+        m_queryProcessor->getAccess(m_userAccessData).template processQueryAsync<ApiStoredFilePath, ApiStoredFilePathList, decltype(queryDoneHandler)>( ApiCommand::listDirectory, ApiStoredFilePath(folderName), queryDoneHandler );
         return reqID;
     }
 
