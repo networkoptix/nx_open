@@ -30,18 +30,20 @@ namespace {
 
 int findDShowCameras(nxcip::CameraInfo * cameras, const char * localIpInterfaceIpAddr)
 {
-    QList<QString> deviceNames = dshow::utils::listDevices();
-    int deviceCount = deviceNames.count();
+    QList<utils::DeviceInfo> devices = utils::dshow::listDevices();
+    int deviceCount = devices.count();
     for (int i = 0; i < deviceCount && i < nxcip::CAMERA_INFO_ARRAY_SIZE; ++i)
     {
-        strcpy(cameras[i].modelName, deviceNames[i].toLatin1().data());
+        QString deviceName = devices[i].deviceName();
+        strcpy(cameras[i].modelName, deviceName.toLatin1().data());
 
-        QByteArray url = 
-            QByteArray("webcam://").append(nx::utils::Url::toPercentEncoding(deviceNames[i]));
+        QByteArray url =
+            QByteArray("webcam://").append(nx::utils::Url::toPercentEncoding(deviceName));
         strcpy(cameras[i].url, url.data());
 
         const QByteArray& uid = QCryptographicHash::hash(url, QCryptographicHash::Md5).toHex();
         strcpy(cameras[i].uid, uid.data());
+
     }
     return deviceCount;
 }

@@ -6,7 +6,6 @@
 #include "plugin.h"
 #include "discovery_manager.h"
 
-
 extern "C"
 {
 #ifdef _WIN32
@@ -14,13 +13,13 @@ extern "C"
 #endif
         nxpl::PluginInterface* createNXPluginInstance()
     {
-        return new WebCamPlugin();
+        return new Plugin();
     }
 }
 
-static WebCamPlugin* webCameraPluginInstance = NULL;
+static Plugin* webCameraPluginInstance = NULL;
 
-WebCamPlugin::WebCamPlugin()
+Plugin::Plugin()
 :
     m_refManager( this ),
     m_timeProvider(nullptr)
@@ -28,7 +27,7 @@ WebCamPlugin::WebCamPlugin()
     webCameraPluginInstance = this;
 }
 
-WebCamPlugin::~WebCamPlugin()
+Plugin::~Plugin()
 {
     webCameraPluginInstance = NULL;
 }
@@ -37,7 +36,7 @@ WebCamPlugin::~WebCamPlugin()
 /*!
     Supports cast to nxcip::CameraDiscoveryManager interface
 */
-void* WebCamPlugin::queryInterface( const nxpl::NX_GUID& interfaceID )
+void* Plugin::queryInterface( const nxpl::NX_GUID& interfaceID )
 {
     if( memcmp( &interfaceID, &nxcip::IID_CameraDiscoveryManager, sizeof(nxcip::IID_CameraDiscoveryManager) ) == 0 )
     {
@@ -67,37 +66,37 @@ void* WebCamPlugin::queryInterface( const nxpl::NX_GUID& interfaceID )
     return NULL;
 }
 
-unsigned int WebCamPlugin::addRef()
+unsigned int Plugin::addRef()
 {
     return m_refManager.addRef();
 }
 
-unsigned int WebCamPlugin::releaseRef()
+unsigned int Plugin::releaseRef()
 {
     return m_refManager.releaseRef();
 }
 
-const char* WebCamPlugin::name() const
+const char* Plugin::name() const
 {
     return "webcam_plugin";
 }
 
-void WebCamPlugin::setSettings(const nxpl::Setting* /*settings*/, int /*count*/)
+void Plugin::setSettings(const nxpl::Setting* /*settings*/, int /*count*/)
 {
 }
 
-void WebCamPlugin::setPluginContainer(nxpl::PluginInterface* pluginContainer)
+void Plugin::setPluginContainer(nxpl::PluginInterface* pluginContainer)
 {
     m_timeProvider = static_cast<nxpl::TimeProvider *>(
             pluginContainer->queryInterface(nxpl::IID_TimeProvider));
 }
 
-nxpt::CommonRefManager* WebCamPlugin::refManager()
+nxpt::CommonRefManager* Plugin::refManager()
 {
     return &m_refManager;
 }
 
-WebCamPlugin* WebCamPlugin::instance()
+Plugin* Plugin::instance()
 {
     return webCameraPluginInstance;
 }

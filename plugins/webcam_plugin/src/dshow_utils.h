@@ -1,14 +1,11 @@
 #pragma once
 
-#include <QtCore/QList>
-#include <QtCore/QString>
-#include <QtCore/QSize>
+#include "device_info.h"
 
-namespace dshow{
 namespace utils{
+namespace dshow{
 
-    QList<QString> listDevices();
-    QList<QSize> listResolutions();
+    QList<DeviceInfo> listDevices();
 
-} // namespace utils
 } // namespace dshow
+} // namespace utils

@@ -16,7 +16,7 @@ CameraManager::CameraManager(const nxcip::CameraInfo& info,
                              nxpl::TimeProvider *const timeProvider)
 :
     m_refManager( this ),
-    m_pluginRef( WebCamPlugin::instance() ),
+    m_pluginRef( Plugin::instance() ),
     m_info( info ),
     m_capabilities(
         nxcip::BaseCameraManager::nativeMediaStreamCapability |

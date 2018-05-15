@@ -17,13 +17,13 @@
 class DiscoveryManager;
 
 //!Main plugin class. Hosts and initializes necessary internal data
-class WebCamPlugin
+class Plugin
 :
     public nxpl::Plugin2
 {
 public:
-    WebCamPlugin();
-    virtual ~WebCamPlugin();
+    Plugin();
+    virtual ~Plugin();
 
     //!Implementation of nxpl::PluginInterface::queryInterface
     /*!
@@ -45,7 +45,7 @@ public:
 
     nxpt::CommonRefManager* refManager();
 
-    static WebCamPlugin* instance();
+    static Plugin* instance();
 
 private:
     nxpt::CommonRefManager m_refManager;

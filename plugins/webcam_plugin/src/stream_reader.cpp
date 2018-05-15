@@ -40,6 +40,8 @@ extern "C"
 #include <nx/utils/thread/mutex.h>
 #include <nx/utils/byte_stream/custom_output_stream.h>
 
+#include "av_utils.h"
+#include "dshow_utils.h"
 #include "avcodec_container.h"
 #include "ilp_empty_packet.h"
 #include "motion_data_picture.h"
@@ -51,64 +53,7 @@ namespace {
     static const nxcip::UsecUTCTimestamp USEC_IN_SEC = 1000*1000;
     static const nxcip::UsecUTCTimestamp NSEC_IN_USEC = 1000;
     static const int MAX_FRAME_SIZE = 4*1024*1024;
-
-
-    AVStream* getAvStream(AVFormatContext * context, int * streamIndex, enum AVMediaType mediaType)
-    {
-        for (unsigned int i = 0; i < context->nb_streams; ++i)
-        {
-            if (context->streams[i]->codecpar->codec_type == mediaType)
-            {
-                *streamIndex = i;
-                return context->streams[i];
-            }
-        }
-
-        return nullptr;
-    }
-
-AVPixelFormat suggestPixelFormat(AVCodecID codecID)
-{
-    switch (codecID)
-    {
-        case AV_CODEC_ID_H264:
-            return AV_PIX_FMT_YUV444P;
-        case AV_CODEC_ID_MJPEG:
-            return AV_PIX_FMT_YUVJ420P;
-        default:
-            return AV_PIX_FMT_YUV420P;
-    }
 }
-
-AVPixelFormat unDeprecatePixelFormat(AVPixelFormat pixelFormat)
-{
-    switch (pixelFormat)
-    {
-        case AV_PIX_FMT_YUVJ420P:
-            return AV_PIX_FMT_YUV420P;
-        case AV_PIX_FMT_YUVJ422P:
-            return AV_PIX_FMT_YUV422P;
-        case AV_PIX_FMT_YUVJ444P:
-            return AV_PIX_FMT_YUV444P;
-        case AV_PIX_FMT_YUVJ440P:
-            return AV_PIX_FMT_YUV440P;
-        default:
-            return pixelFormat;
-    }
-}
-
-nxcip::CompressionType toNxCompressionType(AVCodecID codecID)
-{
-    switch (codecID)
-    {
-        case AV_CODEC_ID_H264:
-            return nxcip::AV_CODEC_ID_H264;
-        case AV_CODEC_ID_MJPEG:
-        default:
-            return nxcip::AV_CODEC_ID_MJPEG;
-    }
-}
-} // namespace
 
 StreamReader::StreamReader(
     nxpt::CommonRefManager* const parentRefManager,
@@ -132,7 +77,8 @@ StreamReader::StreamReader(
     m_inputFormat(nullptr),
     m_options(nullptr),
     m_videoDecoder(nullptr),
-    m_videoEncoder(nullptr)
+    m_videoEncoder(nullptr),
+    m_avVideoPacket(nullptr)
 {
     NX_ASSERT(m_timeProvider);
     setFps( fps );
@@ -144,9 +90,13 @@ StreamReader::~StreamReader()
     NX_ASSERT( m_isInGetNextData == 0 );
     m_timeProvider->releaseRef();
 
-    av_packet_free(&m_avVideoPacket);
+    if(m_avVideoPacket)
+        av_packet_free(&m_avVideoPacket);
+    
     av_dict_free(&m_options);
-    avformat_close_input(&m_formatContext);
+
+    if(m_formatContext)
+        avformat_close_input(&m_formatContext);
 }
 
 //!Implementation of nxpl::PluginInterface::queryInterface
@@ -249,7 +199,7 @@ std::unique_ptr<ILPVideoPacket> StreamReader::toNxVideoPacket(AVPacket *packet, 
      if (nxVideoPacket->data())
          memcpy(nxVideoPacket->data(), packet->data, packet->size);
 
-     nxVideoPacket->setCodecType(toNxCompressionType(codecID));
+     nxVideoPacket->setCodecType(utils::av::toNxCompressionType(codecID));
 
      return nxVideoPacket;
 }
@@ -336,14 +286,15 @@ AVFrame * StreamReader::toYUV420(AVCodecContext * codecContext, AVFrame * frame)
 {
     AVFrame* resultFrame = av_frame_alloc();
 
-    AVPixelFormat pix_fmt = suggestPixelFormat(codecContext->codec_id);
+    AVPixelFormat pix_fmt = utils::av::suggestPixelFormat(codecContext->codec_id);
 
     av_image_alloc(resultFrame->data, resultFrame->linesize, frame->width, frame->height,
         pix_fmt, 32);
 
    struct SwsContext * img_convert_ctx = sws_getCachedContext(
         NULL,
-        codecContext->width, codecContext->height, unDeprecatePixelFormat(codecContext->pix_fmt),
+        codecContext->width, codecContext->height,
+        utils::av::unDeprecatePixelFormat(codecContext->pix_fmt),
         codecContext->width, codecContext->height, pix_fmt,
         SWS_BICUBIC, NULL, NULL, NULL);
 
@@ -388,7 +339,8 @@ void StreamReader::initializeAv()
         return;
 
     int videoStreamIndex;
-    AVStream * videoStream = getAvStream(m_formatContext, &videoStreamIndex, AVMEDIA_TYPE_VIDEO);
+    AVStream * videoStream = 
+        utils::av::getAvStream(m_formatContext, &videoStreamIndex, AVMEDIA_TYPE_VIDEO);
     if (!videoStream)
     {
         m_lastError.setAvError("could not find a video stream");
@@ -442,7 +394,7 @@ void StreamReader::setEncoderOptions()
     //todo unhardcode these
     encoderContext->width = decoderContext->width;
     encoderContext->height = decoderContext->height;
-    encoderContext->pix_fmt = suggestPixelFormat(encoderContext->codec_id);
+    encoderContext->pix_fmt = utils::av::suggestPixelFormat(encoderContext->codec_id);
     encoderContext->time_base = { 1, (int)m_fps };
     encoderContext->flags = AV_CODEC_FLAG_GLOBAL_HEADER;
     encoderContext->global_quality = encoderContext->qmin * FF_QP2LAMBDA;

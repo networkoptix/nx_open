@@ -87,7 +87,7 @@ protected:
         Holding reference to \a AxisCameraPlugin, but not \a AxisCameraDiscoveryManager, 
         since \a AxisCameraDiscoveryManager instance is not required for \a AxisCameraManager object
     */
-    nxpt::ScopedRef<WebCamPlugin> m_pluginRef;
+    nxpt::ScopedRef<Plugin> m_pluginRef;
     nxcip::CameraInfo m_info;
     unsigned int m_capabilities;
     nxpl::TimeProvider *const m_timeProvider;
