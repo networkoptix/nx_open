@@ -6,6 +6,7 @@
 #include <QtGui/QPainter>
 #include <QtGui/QFontMetrics>
 
+#include <translation/datetime_formatter.h>
 #include <utils/common/util.h>
 #include <utils/media/frame_info.h>
 #include <nx/core/transcoding/filters/image_to_frame_painter.h>
@@ -125,8 +126,7 @@ QString TimestampFilter::timestampTextUtc(
 
 QString TimestampFilter::timestampTextSimple(qint64 timeOffsetMs)
 {
-    const auto time = QTime(0, 0).addMSecs(timeOffsetMs);
-    return time.toString(lit("hh:mm:ss"));
+    return datetime::toString(timeOffsetMs, datetime::Format::hh_mm_ss);
 }
 
 } // namespace transcoding

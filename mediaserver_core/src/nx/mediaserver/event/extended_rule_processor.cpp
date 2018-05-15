@@ -867,7 +867,7 @@ QVariantMap ExtendedRuleProcessor::eventDescriptionMap(
                 ? helper.defaultSoftwareTriggerName()
                 : params.caption;
 
-            contextMap[tpTimestamp] = helper.eventTimestampShort(params, aggregationCount);
+            contextMap[tpTimestamp] = helper.eventTimestampInHtml(params, aggregationCount);
             contextMap[tpTimestampDate] = helper.eventTimestampDate(params);
             contextMap[tpTimestampTime] = helper.eventTimestampTime(params);
 
@@ -886,7 +886,7 @@ QVariantMap ExtendedRuleProcessor::eventDescriptionMap(
         case EventType::analyticsSdkEvent:
         {
             contextMap[tpAnalyticsSdkEventType] = helper.getAnalyticsSdkEventName(params);
-            contextMap[tpTimestamp] = helper.eventTimestampShort(params, aggregationCount);
+            contextMap[tpTimestamp] = helper.eventTimestampInHtml(params, aggregationCount);
             contextMap[tpTimestampDate] = helper.eventTimestampDate(params);
             contextMap[tpTimestampTime] = helper.eventTimestampTime(params);
 
@@ -1033,7 +1033,7 @@ QVariantMap ExtendedRuleProcessor::eventDetailsMap(
     }
 
     detailsMap[tpCount] = QString::number(aggregationCount);
-    detailsMap[tpTimestamp] = helper.eventTimestampShort(params, aggregationCount);
+    detailsMap[tpTimestamp] = helper.eventTimestampInHtml(params, aggregationCount);
     detailsMap[tpTimestampDate] = helper.eventTimestampDate(params);
     detailsMap[tpTimestampTime] = helper.eventTimestampTime(params);
 

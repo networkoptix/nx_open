@@ -13,6 +13,7 @@
 #include <api/model/rebuild_archive_reply.h>
 
 #include <common/common_module.h>
+#include <translation/datetime_formatter.h>
 
 #include <camera/camera_data_manager.h>
 #include <core/resource/client_storage_resource.h>
@@ -862,10 +863,7 @@ quint64 QnStorageConfigWidget::nextScheduledBackupTimeMs() const
 
 QString QnStorageConfigWidget::backupPositionToString(qint64 backupTimeMs)
 {
-    const QDateTime backupDateTime = QDateTime::fromMSecsSinceEpoch(backupTimeMs);
-    return lit("%1 %2").arg(
-        backupDateTime.date().toString(Qt::DefaultLocaleLongDate)).arg(
-        backupDateTime.time().toString(Qt::DefaultLocaleShortDate));
+    return datetime::toString(backupTimeMs);
 }
 
 QString QnStorageConfigWidget::intervalToString(qint64 backupTimeMs)

@@ -6,7 +6,7 @@
 
 #include <QtOpenGL/QGLWidget>
 
-#include <client_core/client_core_module.h>
+#include <translation/datetime_formatter.h>
 
 #include <client/client_settings.h>
 #include <client/client_runtime_settings.h>
@@ -199,9 +199,9 @@ void QnWorkbenchScreenRecordingHandler::startRecordingInternal()
 
     QDateTime dt = QDateTime::currentDateTime();
     QString filePath = recorderSettings.recordingFolder() + QString(lit("/")) +
-                       nx::utils::replaceNonFileNameCharacters(
-                           QString(lit("video_recording_%1.avi"))
-                           .arg(nx::utils::datetimeSaveDialogSuggestion(dt)), QLatin1Char('_'));
+        nx::utils::replaceNonFileNameCharacters(
+            QString(lit("video_recording_%1.avi"))
+                .arg(datetime::toString(dt, datetime::Format::filename_date)), QLatin1Char('_'));
     QnAudioDeviceInfo audioDevice = recorderSettings.primaryAudioDevice();
     QnAudioDeviceInfo secondAudioDevice;
     if (recorderSettings.secondaryAudioDevice().fullName() != audioDevice.fullName())
