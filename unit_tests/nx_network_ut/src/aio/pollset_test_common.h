@@ -349,37 +349,38 @@ TYPED_TEST_CASE_P(PollSetAcceptance);
 
 TYPED_TEST_P(PollSetAcceptance, allEventsAreActuallyReported)
 {
-    givenRegularSocketSubscribedToReadWriteEventPolling();
-    whenMadeSocketAvailableForReadWrite();
-    thenReadWriteEventsShouldBeReportedEventually();
+    this->givenRegularSocketSubscribedToReadWriteEventPolling();
+    this->whenMadeSocketAvailableForReadWrite();
+    this->thenReadWriteEventsShouldBeReportedEventually();
 }
 
 TYPED_TEST_P(PollSetAcceptance, removingSocketWithMultipleEvents)
 {
-    initializeBunchOfSocketsOfRandomType();
-    runRemoveSocketWithMultipleEventsTest();
+    this->initializeBunchOfSocketsOfRandomType();
+    this->runRemoveSocketWithMultipleEventsTest();
 }
 
 TYPED_TEST_P(PollSetAcceptance, multiplePollsetIterators)
 {
-    const auto additionalPollsetIteratorInstance = m_pollset.getSocketEventsIterator();
+    const auto additionalPollsetIteratorInstance =
+        this->m_pollset.getSocketEventsIterator();
 
-    initializeRegularSocket();
-    runRemoveSocketWithMultipleEventsTest();
+    this->initializeRegularSocket();
+    this->runRemoveSocketWithMultipleEventsTest();
 }
 
 TYPED_TEST_P(PollSetAcceptance, removeSocketThatHasUnprocessedEvents)
 {
-    givenRegularSocketAvailableForReadWrite();
-    whenRemovedSocketFromPollSetOnFirstEvent();
-    thenPollsetDidNotReportEventsForRemovedSockets();
+    this->givenRegularSocketAvailableForReadWrite();
+    this->whenRemovedSocketFromPollSetOnFirstEvent();
+    this->thenPollsetDidNotReportEventsForRemovedSockets();
 }
 
 TYPED_TEST_P(PollSetAcceptance, pollIsActuallyLevelTriggered)
 {
-    givenSocketsOfAllSupportedTypes();
-    whenChangedEverySocketState();
-    thenPollsetReportsSocketsAsSignalledMultipleTimes();
+    this->givenSocketsOfAllSupportedTypes();
+    this->whenChangedEverySocketState();
+    this->thenPollsetReportsSocketsAsSignalledMultipleTimes();
 }
 
 //-------------------------------------------------------------------------------------------------
