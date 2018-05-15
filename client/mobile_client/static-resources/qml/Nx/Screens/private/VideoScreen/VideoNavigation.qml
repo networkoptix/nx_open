@@ -7,22 +7,38 @@ import Nx.Media 1.0
 import Nx.Controls 1.0
 import com.networkoptix.qml 1.0
 
+// TODO: #ynikitenkov After 18.1 refactor this control.
+
 Item
 {
     id: videoNavigation
 
-    property string resourceId
     property var videoScreenController
     property bool paused: true
     property bool ptzAvailable: false
     property real controlsOpacity: 1.0
     property alias animatePlaybackControls: playbackControlsOpacityBehaviour.enabled
+    property bool canViewArchive: true
+    property int buttonsPanelHeight: buttonsPanel.visible ? buttonsPanel.height : 0
 
     signal ptzButtonClicked()
+    signal switchToNextCamera()
+    signal switchToPreviousCamera()
 
     implicitWidth: parent ? parent.width : 0
-    implicitHeight: navigator.height + navigationPanel.height
+    implicitHeight: navigator.height + buttonsPanel.height
     anchors.bottom: parent ? parent.bottom : undefined
+
+    Connections
+    {
+        target: videoScreenController
+        onResourceIdChanged:
+        {
+            actionButtonsPanelOpacityBehaviour.enabled = false
+            actionButtonsPanel.opacity = 0
+            actionButtonsPanelOpacityBehaviour.enabled = true
+        }
+    }
 
     Connections
     {
@@ -118,12 +134,42 @@ Item
         onTriggered: cameraChunkProvider.update()
     }
 
+    Button
+    {
+        y: 56 / 2 - height / 2
+        padding: 8
+        width: 56
+        height: width
+        color: ColorTheme.transparent(ColorTheme.base1, 0.2)
+        icon: lp("/images/previous.png")
+        radius: width / 2
+        z: 1
+        onClicked: videoNavigation.switchToPreviousCamera()
+    }
+
+    Button
+    {
+        y: 56 / 2 - height / 2
+        anchors.right: parent.right
+        padding: 8
+        width: 56
+        height: width
+        color: ColorTheme.transparent(ColorTheme.base1, 0.2)
+        icon: lp("/images/next.png")
+        radius: width / 2
+        z: 1
+        onClicked: videoNavigation.switchToNextCamera()
+    }
+
     Item
     {
         id: navigator
 
-        width: parent.width
-        height: timeline.height + playbackController.height
+        implicitWidth: parent.width
+        implicitHeight: videoNavigation.canViewArchive
+            ? timeline.height + playbackController.height - 16
+            : 56
+
         Behavior on y { SmoothedAnimation { duration: 200; reversingMode: SmoothedAnimation.Sync } }
 
         MouseArea
@@ -133,7 +179,7 @@ Item
             anchors.fill: navigator
             drag.axis: Drag.YAxis
             drag.minimumY: 0
-            drag.maximumY: navigationPanel.height
+            drag.maximumY: buttonsPanel.height
             drag.filterChildren: true
             drag.threshold: 10
 
@@ -180,45 +226,51 @@ Item
             }
         }
 
-        Image
-        {
-            width: parent.width
-            anchors.bottom: timeline.bottom
-            height: timeline.chunkBarHeight
-            source: lp("/images/timeline_chunkbar_preloader.png")
-            sourceSize: Qt.size(timeline.chunkBarHeight, timeline.chunkBarHeight)
-            fillMode: Image.Tile
-        }
-
-        Image
-        {
-            width: timeline.width
-            height: sourceSize.height
-            anchors.bottom: timeline.bottom
-            anchors.bottomMargin: timeline.chunkBarHeight
-            sourceSize.height: 150 - timeline.chunkBarHeight
-            source: lp("/images/timeline_gradient.png")
-        }
-
         Timeline
         {
             id: timeline
 
             property bool resumeWhenDragFinished: false
 
+            serverTimeZoneShift: videoScreenController.resourceHelper.serverTimeOffset;
             enabled: d.hasArchive
+            visible: videoNavigation.canViewArchive
 
             anchors.bottom: parent.bottom
             width: parent.width
-            height: 104
+            height: 96
 
             stickToEnd: d.liveMode && !paused
 
-            chunkBarHeight: 32
-            textY: height - chunkBarHeight - 16 - 24
+            chunkBarHeight: 16
+            textY: height - chunkBarHeight - 16 - 14
 
             chunkProvider: cameraChunkProvider
             startBound: cameraChunkProvider.bottomBound
+
+            readonly property color lineColor: ColorTheme.transparent(ColorTheme.base1, 0.2)
+            readonly property real lineOpacity:
+                videoNavigation.canViewArchive && d.hasArchive ? d.timelineOpacity : 0
+
+            Rectangle
+            {
+                width: parent.width
+                height: 1
+                anchors.bottom: timeline.bottom
+                anchors.bottomMargin: -1
+                opacity: timeline.lineOpacity
+                color: timeline.lineColor
+            }
+
+            Rectangle
+            {
+                width: parent.width
+                height: 1
+                anchors.bottom: timeline.bottom
+                anchors.bottomMargin: timeline.chunkBarHeight
+                opacity: timeline.lineOpacity
+                color: timeline.lineColor
+            }
 
             onMovingChanged:
             {
@@ -320,7 +372,7 @@ Item
             anchors.fill: timeline
             source: timeline.timelineView
             maskSource: timelineMask
-            opacity: Math.min(d.controlsOpacity, d.timelineOpacity)
+            opacity: Math.min(d.controlsOpacity, d.timelineOpacity, timeline.visible ? 1 : 0)
 
             Component.onCompleted: timeline.timelineView.visible = false
         }
@@ -332,24 +384,36 @@ Item
             font.capitalization: Font.AllUppercase
             font.pixelSize: 12
             anchors.bottom: timeline.bottom
-            anchors.bottomMargin: (timeline.chunkBarHeight - height) / 2
+            anchors.bottomMargin: (timeline.chunkBarHeight - height) / 2 + 12
             color: ColorTheme.windowText
-            visible: !d.hasArchive
+            visible: d.liveMode && !d.hasArchive && videoNavigation.canViewArchive
             opacity: 0.5 * timelineOpactiyMask.opacity
         }
 
         Pane
         {
-            id: navigationPanel
+            id: buttonsPanel
+
+            readonly property real minimalWidth: width - (zoomButtonsRow.x + zoomButtonsRow.width)
+            readonly property bool showZoomControls: actionButtonsPanel.contentWidth < minimalWidth
 
             width: parent.width
-            height: 64
+            height: visible ? 56 : 0
             anchors.top: timeline.bottom
-            background: Rectangle { color: ColorTheme.base3 }
+            background: Item {}
             padding: 4
+            z: 1
+
+            readonly property bool showButtonsPanel: actionButtonsPanel.buttonsCount > 0
+            visible: videoNavigation.canViewArchive || showButtonsPanel
+
+            opacity: d.controlsOpacity
 
             IconButton
             {
+                id: calendarButton
+
+                visible: videoNavigation.canViewArchive
                 anchors.verticalCenter: parent.verticalCenter
                 icon: lp("/images/calendar.png")
                 enabled: d.hasArchive
@@ -363,7 +427,11 @@ Item
 
             Row
             {
+                id: zoomButtonsRow
+
                 anchors.centerIn: parent
+                visible: (buttonsPanel.showZoomControls || !d.liveMode)
+                    && videoNavigation.canViewArchive
 
                 IconButton
                 {
@@ -386,6 +454,8 @@ Item
 
             Button
             {
+                id: liveModeButton
+
                 anchors.right: parent.right
                 anchors.verticalCenter: parent.verticalCenter
                 text: qsTr("LIVE")
@@ -398,18 +468,76 @@ Item
                     playbackController.checked = false
                     videoScreenController.playLive()
                 }
-                opacity: d.liveMode ? 0.0 : 1.0
+
+                visible: opacity > 0
+                opacity: 0
+
+                property bool invisible:
+                {
+                    var currentTime = (new Date()).getTime()
+                    var futurePosition = position > currentTime
+                    var canViewArchive = videoNavigation.canViewArchive
+                    return (d.liveMode || futurePosition) && canViewArchive
+                        || videoScreenController.resourceHelper.isWearableCamera;
+                }
+
+                readonly property real position: videoScreenController.mediaPlayer.position
+                onPositionChanged: updateOpacity()
+                onInvisibleChanged: updateOpacity()
+
+                function updateOpacity()
+                {
+                    opacity = invisible ? 0 : 1
+                }
+
                 Behavior on opacity { NumberAnimation { duration: 200 } }
             }
 
-            IconButton
+            ActionButtonsPanel
             {
-                icon: lp("images/ptz/ptz.png")
-                anchors.right: parent.right
-                anchors.verticalCenter: parent.verticalCenter
-                visible: videoNavigation.ptzAvailable && d && d.liveMode
+                id: actionButtonsPanel
 
-                onClicked: videoNavigation.ptzButtonClicked()
+                visible: opacity > 0
+
+                resourceId: videoScreenController.resourceId
+                anchors.left: buttonsPanel.showZoomControls
+                    ? zoomButtonsRow.right
+                    : calendarButton.right
+                anchors.right: parent.right
+                anchors.rightMargin: -4
+
+                anchors.verticalCenter: parent.verticalCenter
+
+                Binding
+                {
+                    target: actionButtonsPanel
+                    property: "opacity"
+                    value:
+                    {
+                        var futurePosition =
+                            videoScreenController.mediaPlayer.position > (new Date()).getTime()
+                        var live = d.liveMode || futurePosition
+                        return live && buttonsPanel.showButtonsPanel ? 1 : 0
+                    }
+                }
+
+                onPtzButtonClicked: videoNavigation.ptzButtonClicked()
+                onTwoWayAudioButtonPressed: twoWayAudioController.start()
+                onTwoWayAudioButtonReleased: twoWayAudioController.stop()
+
+                Behavior on opacity
+                {
+                    id: actionButtonsPanelOpacityBehaviour
+
+                    NumberAnimation { duration: 200 }
+                }
+
+                Binding
+                {
+                    target: twoWayAudioController
+                    property: "resourceId"
+                    value: videoScreenController.resourceId
+                }
             }
 
             Timer
@@ -432,10 +560,11 @@ Item
         {
             id: dateTimeLabel
 
-            height: 56
+            visible: videoNavigation.canViewArchive
+            height: 48
             width: parent.width
             anchors.bottom: timeline.bottom
-            anchors.bottomMargin: timeline.chunkBarHeight + 16
+            anchors.bottomMargin: timeline.chunkBarHeight + 8
             opacity: d.controlsOpacity
 
             Text
@@ -444,13 +573,12 @@ Item
 
                 anchors.horizontalCenter: parent.horizontalCenter
 
-                height: 24
-                font.pixelSize: 14
+                height: 20
+                font.pixelSize: 13
                 font.weight: Font.Normal
                 verticalAlignment: Text.AlignVCenter
 
-                // TODO: Remove qsTr from this string!
-                text: timeline.positionDate.toLocaleDateString(d.locale, qsTr("d MMMM yyyy", "DO NOT TRANSLATE THIS STRING!"))
+                text: timeline.positionDate.toLocaleDateString(d.locale, "d MMMM yyyy")
                 color: ColorTheme.windowText
 
                 opacity: d.liveMode ? 0.0 : 1.0
@@ -480,7 +608,7 @@ Item
                 {
                     id: liveLabel
                     anchors.verticalCenter: parent.verticalCenter
-                    font.pixelSize: 32
+                    font.pixelSize: 28
                     font.weight: Font.Normal
                     color: ColorTheme.windowText
                     text: qsTr("LIVE")
@@ -489,12 +617,28 @@ Item
             }
         }
 
+        Text
+        {
+            id: liveOnlyText
+
+            anchors.horizontalCenter: parent.horizontalCenter
+            anchors.bottom: parent.bottom
+            verticalAlignment: Text.AlignVCenter
+            height: 56
+            font.pixelSize: 28
+            font.weight: Font.Normal
+            color: ColorTheme.windowText
+            text: qsTr("LIVE")
+            visible: d.liveMode && !videoNavigation.canViewArchive
+        }
+
         PlaybackController
         {
             id: playbackController
 
-            anchors.verticalCenter: timeline.bottom
-            anchors.verticalCenterOffset: -150
+            visible: videoNavigation.canViewArchive
+
+            anchors.top: navigator.top
             anchors.horizontalCenter: parent.horizontalCenter
 
             loading: videoScreenController.mediaPlayer.loading || timeline.dragging
@@ -526,21 +670,10 @@ Item
         {
             color: ColorTheme.windowText
             anchors.horizontalCenter: parent.horizontalCenter
-            anchors.bottom: playbackController.bottom
-            width: 2
-            height: 8
-            visible: d.hasArchive
-            opacity: timelineOpactiyMask.opacity
-        }
-
-        Rectangle
-        {
-            color: ColorTheme.windowText
-            anchors.horizontalCenter: parent.horizontalCenter
             anchors.bottom: parent.bottom
             width: 2
-            height: timeline.chunkBarHeight + 8
-            visible: d.hasArchive
+            height: 20
+            visible: d.hasArchive && videoNavigation.canViewArchive
             opacity: timelineOpactiyMask.opacity
         }
     }
@@ -550,8 +683,8 @@ Item
         // This rectangle guarantees the same color under android navigation buttons as under the navigation panel
         width: parent.width
         anchors.top: parent.bottom
-        color: ColorTheme.base3
-        height: navigationPanel.height
+        color: "black"
+        height: buttonsPanel.height
     }
 
     CalendarPanel
@@ -583,7 +716,9 @@ Item
         }
     }
 
-    onResourceIdChanged: d.playbackStarted = false
-
-    Component.onCompleted: d.updateNavigatorPosition()
+    Component.onCompleted:
+    {
+        d.updateNavigatorPosition()
+        liveModeButton.opacity = 0
+    }
 }

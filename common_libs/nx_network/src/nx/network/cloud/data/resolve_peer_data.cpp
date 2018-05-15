@@ -45,7 +45,7 @@ bool ResolvePeerResponse::parseAttributes(const nx::network::stun::Message& mess
     {
         return false;
     }
-    connectionMethods = connectionMethodsStr.toLongLong();
+    connectionMethods = connectionMethodsStr.toInt();
 
     return true;
 }

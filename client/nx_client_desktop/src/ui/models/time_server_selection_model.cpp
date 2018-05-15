@@ -17,8 +17,7 @@
 
 #include <ui/style/resource_icon_cache.h>
 #include <ui/workbench/workbench_context.h>
-#include <ui/workbench/watchers/workbench_server_time_watcher.h>
-
+#include <nx/client/core/watchers/server_time_watcher.h>
 #include <nx/client/core/utils/human_readable.h>
 #include <utils/common/synctime.h>
 
@@ -174,7 +173,8 @@ QnTimeServerSelectionModel::QnTimeServerSelectionModel(QObject* parent):
                 kTextRoles);
         });
 
-    connect(context()->instance<QnWorkbenchServerTimeWatcher>(), &QnWorkbenchServerTimeWatcher::displayOffsetsChanged, this,
+    const auto timeWatcher = context()->instance<nx::client::core::ServerTimeWatcher>();
+    connect(timeWatcher, &nx::client::core::ServerTimeWatcher::displayOffsetsChanged, this,
         [this]
         {
             m_sameTimezoneValid = false;
@@ -334,8 +334,10 @@ QVariant QnTimeServerSelectionModel::data(const QModelIndex& index, int role) co
                     }
                     else
                     {
-                        dateTime = context()->instance<QnWorkbenchServerTimeWatcher>()->
-                            serverTime(server, sinceEpochMs);
+                        const auto timeWatcher =
+                            context()->instance<nx::client::core::ServerTimeWatcher>();
+
+                        dateTime = timeWatcher->serverTime(server, sinceEpochMs);
                     }
 
                     auto offsetFromUtc = dateTime.offsetFromUtc();

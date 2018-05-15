@@ -5,6 +5,8 @@
 
 #include <utils/media/bitStream.h>
 
+class QnCompressedVideoData;
+
 namespace nx {
 namespace media_utils {
 namespace hevc {
@@ -81,9 +83,11 @@ struct ScalingListData
 struct Sps
 {
 public:
-    // Now it decodes SPS only till conformance_window_flag field
+    // Decode a single SPS NAL unit. Now it decodes SPS only till conformance_window_flag field
     bool decode(const uint8_t* payload, int payloadLength);
 
+    // Decode from video frame that can contains many NAL units.
+    bool decodeFromVideoFrame(const std::shared_ptr<const QnCompressedVideoData>& videoData);
 private:
     bool decodeProfileTierLevel(
         BitStreamReader& reader,

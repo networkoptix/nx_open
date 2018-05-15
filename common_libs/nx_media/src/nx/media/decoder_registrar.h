@@ -3,6 +3,7 @@
 #include <memory>
 
 #include <QtCore/QSize>
+#include <QtCore/QMap>
 
 namespace nx {
 namespace media {
@@ -13,13 +14,12 @@ public:
     /**
      * Should be called once from main().
      *
-     * @param maxFfmpegResolution Limits applicability of ffmpeg software decoder. If empty, there
-     * is no limit.
-     *
+     * @param maxResolution Limits applicability of the decoder. If empty, there is no limit.
+     * Map key with value 0 means default resolution limit otherwise limit for specified AV codec.
      * @param liteMode Whether the library is used in Mobile Client in Lite mode.
      */
     static void registerDecoders(
-        const QSize& maxFfmpegResolution,
+        const QMap<int, QSize>& maxFfmpegResolutions,
         bool isTranscodingEnabled);
 };
 

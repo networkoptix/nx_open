@@ -9,7 +9,7 @@
     </message>
     <message>
       <source>Invalid login or password.</source>
-      <translation>שם וסיסמא לא תואמים.</translation>
+      <translation>שם וסיסמה לא תואמים.</translation>
     </message>
     <message>
       <source>Requested operation is not allowed with provided credentials.</source>

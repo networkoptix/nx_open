@@ -8,6 +8,7 @@
 
 #include <nx/utils/thread/mutex.h>
 #include <nx/network/http/auth_tools.h>
+#include <nx/network/address_resolver.h>
 #include <nx/network/deprecated/simple_http_client.h>
 
 #include <utils/common/app_info.h>

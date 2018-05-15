@@ -77,7 +77,7 @@
     </message>
     <message>
       <source>Incorrect email or password</source>
-      <translation type="unfinished">Incorrect email or password</translation>
+      <translation>Неправильная электронная почта или пароль</translation>
     </message>
   </context>
   <context>
@@ -266,7 +266,7 @@
     </message>
     <message>
       <source>Software image rotation is not supported in fullscreen mode</source>
-      <translation type="unfinished">Software image rotation is not supported in fullscreen mode</translation>
+      <translation>Вращение через ПО не поддерживается в полноэкранном режиме</translation>
     </message>
   </context>
   <context>
@@ -287,11 +287,11 @@
     <name>MoveOnTapOverlay</name>
     <message>
       <source>Tap on the image to position your camera</source>
-      <translation type="unfinished">Tap on the image to position your camera</translation>
+      <translation>Нажмите на изображение, чтобы разместить камеру</translation>
     </message>
     <message>
       <source>CANCEL</source>
-      <translation type="unfinished">CANCEL</translation>
+      <translation>ОТМЕНА</translation>
     </message>
   </context>
   <context>
@@ -319,14 +319,14 @@
     <name>PresetsButton</name>
     <message>
       <source>PRESETS</source>
-      <translation type="unfinished">PRESETS</translation>
+      <translation>ПРЕДУСТАНОВКИ</translation>
     </message>
   </context>
   <context>
     <name>PresetsDialog</name>
     <message>
       <source>PTZ Presets</source>
-      <translation type="unfinished">PTZ Presets</translation>
+      <translation>PTZ позиции</translation>
     </message>
   </context>
   <context>
@@ -394,11 +394,11 @@
     <name>SelectCameraDummy</name>
     <message>
       <source>Select camera</source>
-      <translation type="unfinished">Select camera</translation>
+      <translation>Выбрать камеру</translation>
     </message>
     <message>
       <source>Press Ctrl + Arrow or use mouse wheel</source>
-      <translation type="unfinished">Press Ctrl + Arrow or use mouse wheel</translation>
+      <translation>Клавиши Ctrl + стрелка или колесо прокрутки</translation>
     </message>
   </context>
   <context>
@@ -447,11 +447,11 @@
     </message>
     <message>
       <source>UNREACHABLE</source>
-      <translation type="unfinished">UNREACHABLE</translation>
+      <translation>НЕДОСТУПНА</translation>
     </message>
     <message>
       <source>Connect to this server from web browser or through desktop client to set it up</source>
-      <translation type="unfinished">Connect to this server from web browser or through desktop client to set it up</translation>
+      <translation>Подключитесь к этому серверу из веб-браузера или с помощью клиент, чтобы настроить его</translation>
     </message>
   </context>
   <context>
@@ -553,7 +553,7 @@
     </message>
     <message>
       <source>New Server</source>
-      <translation type="unfinished">New Server</translation>
+      <translation>Новый сервер</translation>
     </message>
   </context>
   <context>
@@ -586,15 +586,15 @@
     <name>TransformationsNotSupportedWarning</name>
     <message>
       <source>Software image rotation is not supported in fullscreen mode</source>
-      <translation type="unfinished">Software image rotation is not supported in fullscreen mode</translation>
+      <translation>Вращение через ПО не поддерживается в полноэкранном режиме</translation>
     </message>
     <message>
       <source>Show as is</source>
-      <translation type="unfinished">Show as is</translation>
+      <translation>Показать как есть</translation>
     </message>
     <message>
       <source>(Space)</source>
-      <translation type="unfinished">(Space)</translation>
+      <translation>(Пробел)</translation>
     </message>
   </context>
   <context>
@@ -624,15 +624,15 @@
     </message>
     <message>
       <source>Offline</source>
-      <translation type="unfinished">Offline</translation>
+      <translation>Не в сети</translation>
     </message>
     <message>
       <source>Unauthorized</source>
-      <translation type="unfinished">Unauthorized</translation>
+      <translation>Не авторизован</translation>
     </message>
     <message>
       <source>Cannot play any video stream</source>
-      <translation type="unfinished">Cannot play any video stream</translation>
+      <translation>Невозможно воспроизвести ни один видеопоток</translation>
     </message>
   </context>
   <context>

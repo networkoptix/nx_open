@@ -49,7 +49,7 @@ set(releaseVersion ${PROJECT_VERSION})
 set(releaseVersion.short ${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR})
 set(releaseVersion.full ${releaseVersion}.${buildNumber})
 
-set(mobileClientVersion 17.3)
+set(mobileClientVersion 18.1)
 set(mobileClientVersion.full ${mobileClientVersion}.${buildNumber})
 
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
@@ -84,10 +84,6 @@ include(compiler_options)
 include(output_directories)
 include(distribution_names)
 
-if(MACOSX OR IOS)
-    include(macosx_keychain)
-endif()
-
 if(WINDOWS)
     include(windows_signing)
 endif()
@@ -103,6 +99,11 @@ endif()
 include(dependencies)
 include(maven_compatibility)
 include(generate_current_config)
+
+if(MACOSX OR IOS)
+    include(macosx_keychain)
+endif()
+
 include(project_utils)
 include(test_utils)
 

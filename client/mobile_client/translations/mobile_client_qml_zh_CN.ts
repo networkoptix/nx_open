@@ -266,7 +266,7 @@
     </message>
     <message>
       <source>Software image rotation is not supported in fullscreen mode</source>
-      <translation type="unfinished">Software image rotation is not supported in fullscreen mode</translation>
+      <translation>全屏模式不支持软件影像旋转</translation>
     </message>
   </context>
   <context>
@@ -394,11 +394,11 @@
     <name>SelectCameraDummy</name>
     <message>
       <source>Select camera</source>
-      <translation type="unfinished">Select camera</translation>
+      <translation>选择摄像机</translation>
     </message>
     <message>
       <source>Press Ctrl + Arrow or use mouse wheel</source>
-      <translation type="unfinished">Press Ctrl + Arrow or use mouse wheel</translation>
+      <translation>按 Ctrl + 箭头或使用鼠标滚轮</translation>
     </message>
   </context>
   <context>
@@ -447,11 +447,11 @@
     </message>
     <message>
       <source>UNREACHABLE</source>
-      <translation type="unfinished">UNREACHABLE</translation>
+      <translation>不可取得</translation>
     </message>
     <message>
       <source>Connect to this server from web browser or through desktop client to set it up</source>
-      <translation type="unfinished">Connect to this server from web browser or through desktop client to set it up</translation>
+      <translation>从Web浏览器或桌面客户端连接到此服务器进行设置</translation>
     </message>
   </context>
   <context>
@@ -553,7 +553,7 @@
     </message>
     <message>
       <source>New Server</source>
-      <translation type="unfinished">New Server</translation>
+      <translation>新服务器</translation>
     </message>
   </context>
   <context>
@@ -586,15 +586,15 @@
     <name>TransformationsNotSupportedWarning</name>
     <message>
       <source>Software image rotation is not supported in fullscreen mode</source>
-      <translation type="unfinished">Software image rotation is not supported in fullscreen mode</translation>
+      <translation>全屏模式不支持软件影像旋转</translation>
     </message>
     <message>
       <source>Show as is</source>
-      <translation type="unfinished">Show as is</translation>
+      <translation>显示为：</translation>
     </message>
     <message>
       <source>(Space)</source>
-      <translation type="unfinished">(Space)</translation>
+      <translation>(空间)</translation>
     </message>
   </context>
   <context>
@@ -624,15 +624,15 @@
     </message>
     <message>
       <source>Offline</source>
-      <translation type="unfinished">Offline</translation>
+      <translation>离线</translation>
     </message>
     <message>
       <source>Unauthorized</source>
-      <translation type="unfinished">Unauthorized</translation>
+      <translation>未经身分检证</translation>
     </message>
     <message>
       <source>Cannot play any video stream</source>
-      <translation type="unfinished">Cannot play any video stream</translation>
+      <translation>无法播放任何视频流</translation>
     </message>
   </context>
   <context>
@@ -648,7 +648,7 @@
     <message>
       <source>d MMMM yyyy</source>
       <comment>DO NOT TRANSLATE THIS STRING!</comment>
-      <translation>d MMMM yyyy</translation>
+      <translation type="unfinished">d MMMM yyyy</translation>
     </message>
   </context>
   <context>

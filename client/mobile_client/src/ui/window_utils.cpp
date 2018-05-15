@@ -12,6 +12,14 @@ QWindow *getMainWindow()
     return windows.first();
 }
 
+#if !defined(Q_OS_IOS)
+    QMargins getCustomMargins()
+    {
+        return QMargins();
+    }
+
+#endif
+
 #if !defined(Q_OS_ANDROID) && !defined(Q_OS_IOS)
 
     void prepareWindow() {}

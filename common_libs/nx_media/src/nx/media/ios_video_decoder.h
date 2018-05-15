@@ -1,4 +1,5 @@
 #pragma once
+#include <QtCore/QtGlobal>
 #if defined (Q_OS_IOS)
 
 #include <QtCore/QObject>
@@ -32,6 +33,7 @@ public:
     virtual int decode(
         const QnConstCompressedVideoDataPtr& frame, QVideoFramePtr* result = nullptr) override;
 
+    virtual Capabilities capabilities() const override;
 private:
     void ffmpegToQtVideoFrame(QVideoFramePtr* result);
 

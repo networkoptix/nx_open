@@ -9,6 +9,7 @@ import "private"
 PageBase
 {
     id: welcomeScreen
+    objectName: "welcomeScreen"
 
     padding: 16
     topPadding: 24

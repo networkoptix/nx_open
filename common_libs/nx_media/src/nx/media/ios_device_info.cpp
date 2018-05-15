@@ -1,5 +1,6 @@
 #include "ios_device_info.h"
-#if defined(TARGET_OS_IPHONE)
+
+#if defined (Q_OS_IOS)
 
 #include <sys/utsname.h>
 
@@ -15,7 +16,7 @@ IosDeviceInformation iosDeviceInformation()
 
     const auto& infoString = QString::fromLatin1(systemInfo.machine);
 
-    QRegExp infoRegExp(lit("(\\w+)(\\d+),(\\d+)"));
+    QRegExp infoRegExp(lit("([^\\d]+)(\\d+),(\\d+)"));
 
     if (!infoRegExp.exactMatch(infoString))
         return IosDeviceInformation();
@@ -37,4 +38,4 @@ IosDeviceInformation iosDeviceInformation()
 } // namespace media
 } // namespace nx
 
-#endif // defined(TARGET_OS_IPHONE)
+#endif // if defined (Q_OS_IOS)

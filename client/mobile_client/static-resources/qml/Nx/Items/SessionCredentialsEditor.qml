@@ -177,8 +177,11 @@ Pane
         addressField.forceActiveFocus()
     }
 
-    function focusLoginField()
+    function focusCredentialsField()
     {
-        loginField.forceActiveFocus()
+        if (loginField.text.trim().length > 0)
+            passwordField.forceActiveFocus()
+        else
+            loginField.forceActiveFocus()
     }
 }
