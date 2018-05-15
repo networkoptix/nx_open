@@ -154,7 +154,12 @@ void ModuleConnector::Module::addEndpoints(std::set<SocketAddress> endpoints)
             hasNewEndpoints |= (bool) saveEndpoint(std::move(endpoint));
 
         if (hasNewEndpoints)
-            ensureConnection();
+        {
+            if (m_socket || m_httpClients.size())
+                remakeConnection();
+            else
+                ensureConnection();
+        }
     }
 }
 
@@ -164,11 +169,25 @@ void ModuleConnector::Module::ensureConnection()
         connectToGroup(m_endpoints.begin());
 }
 
+void ModuleConnector::Module::remakeConnection()
+{
+    NX_DEBUG(this, "Initiate reconnect for better endpoints");
+    m_lastSuccessfulEndpoint = boost::none; //< TODO: Should not be merged into 4.0!!
+    m_socket.reset();
+    m_httpClients.clear();
+    ensureConnection();
+}
+
 void ModuleConnector::Module::setForbiddenEndpoints(std::set<SocketAddress> endpoints)
 {
     NX_VERBOSE(this, lm("Forbid endpoints %1").container(endpoints));
     NX_ASSERT(!m_id.isNull(), "Does not make sense to block endpoints for unknown servers");
-    m_forbiddenEndpoints = std::move(endpoints);
+    if (m_forbiddenEndpoints != endpoints)
+    {
+        m_forbiddenEndpoints = std::move(endpoints);
+        if (m_socket || m_httpClients.size())
+            remakeConnection();
+    }
 }
 
 ModuleConnector::Module::Priority
@@ -251,7 +270,8 @@ void ModuleConnector::Module::connectToGroup(Endpoints::iterator endpointsGroup)
 
     // Initiate parallel connects to each endpoint in a group.
     size_t endpointsInProgress = 0;
-    if (m_lastSuccessfulEndpoint) //< TODO: Should not be merged into 4.0!!
+    if (m_lastSuccessfulEndpoint //< TODO: Should not be merged into 4.0!!
+        && !m_forbiddenEndpoints.count(*m_lastSuccessfulEndpoint))
     {
         ++endpointsInProgress;
         connectToEndpoint(*m_lastSuccessfulEndpoint, endpointsGroup);

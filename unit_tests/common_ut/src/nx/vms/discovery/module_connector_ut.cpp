@@ -73,6 +73,8 @@ public:
 
     void expectConnect(const QnUuid& id, const SocketAddress& endpoint)
     {
+        NX_INFO(this, lm("Excpecting connect to %1 on %2").args(id, endpoint));
+
         QnMutexLocker lock(&m_mutex);
         const auto start = std::chrono::steady_clock::now();
         while (m_knownServers.count(id) == 0 || m_knownServers[id] != endpoint)
@@ -84,6 +86,8 @@ public:
 
     void expectDisconnect(const QnUuid& id)
     {
+        NX_INFO(this, lm("Excpecting disconnect of %1").arg(id));
+
         QnMutexLocker lock(&m_mutex);
         const auto start = std::chrono::steady_clock::now();
         while (m_knownServers.count(id) != 0)
@@ -95,8 +99,18 @@ public:
 
     void expectNoChanges()
     {
+        NX_INFO(this, "Excpecting no changes");
+
         QnMutexLocker lock(&m_mutex);
         ASSERT_FALSE(waitCondition(kExpectNoChanesDelay)) << "Unexpected event";
+    }
+
+    void expectPossibleChange()
+    {
+        NX_INFO(this, "Excpecting possible address change");
+
+        QnMutexLocker lock(&m_mutex);
+        waitCondition(kExpectNoChanesDelay);
     }
 
     SocketAddress addMediaserver(QnUuid id, HostAddress ip = HostAddress::localhost)
@@ -166,7 +180,7 @@ TEST_F(DiscoveryModuleConnector, AddEndpoints)
 
     const auto endpoint1replace = addMediaserver(id1);
     connector.newEndpoints({endpoint1replace}, id1);
-    expectNoChanges();
+    expectPossibleChange(); //< Endpoint will be changed if works faster.
 
     removeMediaserver(endpoint1);
     expectConnect(id1, endpoint1replace);
@@ -284,6 +298,11 @@ TEST_F(DiscoveryModuleConnector, IgnoredEndpoints)
 
     connector.setForbiddenEndpoints({}, id);
     expectConnect(id, endpoint3); //< The last one is unblocked now.
+
+    const auto endpoint4 = addMediaserver(id);
+    connector.newEndpoints({endpoint4}, id);
+    connector.setForbiddenEndpoints({endpoint3}, id);
+    expectConnect(id, endpoint4); //< Automatic switch from blocked endpoint.
 }
 
 } // namespace test
