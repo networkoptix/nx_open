@@ -89,11 +89,6 @@
     </message>
     <message>
       <location/>
-      <source>Disable only if the client takes too much CPU</source>
-      <translation>Sadece istemcinin yüksek CPU kullandığı durumda devre dışı bırak</translation>
-    </message>
-    <message>
-      <location/>
       <source>Maximum Live Buffer Length</source>
       <translation>Maksimum tampon bellek Büyüklüğü</translation>
     </message>
@@ -1741,6 +1736,11 @@
       <location/>
       <source>Tour cycle</source>
       <translation>Tour cycle</translation>
+    </message>
+    <message>
+      <location/>
+      <source>IP addresses for cameras, and servers, groups for users, etc.</source>
+      <translation>Kameralar ve sunucular için IP adresleri. Kullanıcılar için gruplar.</translation>
     </message>
   </context>
   <context>

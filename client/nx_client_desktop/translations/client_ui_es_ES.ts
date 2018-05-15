@@ -89,11 +89,6 @@
     </message>
     <message>
       <location/>
-      <source>Disable only if the client takes too much CPU</source>
-      <translation>Deshabilitar sólo si el cliente toma demasiado CPU</translation>
-    </message>
-    <message>
-      <location/>
       <source>Maximum Live Buffer Length</source>
       <translation>Longitud máxima del búfer en vivo</translation>
     </message>
@@ -1613,7 +1608,7 @@
     <message>
       <location/>
       <source>Hardware ID</source>
-      <translation type="unfinished">Hardware ID</translation>
+      <translation>ID de hardware</translation>
     </message>
   </context>
   <context>
@@ -1741,6 +1736,11 @@
       <location/>
       <source>Tour cycle</source>
       <translation>Tour cycle</translation>
+    </message>
+    <message>
+      <location/>
+      <source>IP addresses for cameras, and servers, groups for users, etc.</source>
+      <translation>Direcciones IP para cámaras y servidores, grupos para usuarios, etc.</translation>
     </message>
   </context>
   <context>
