@@ -2917,6 +2917,7 @@ bool MediaServerProcess::initTcpListener(
     regTcp<QnRtspConnectionProcessor>("RTSP", "*");
     regTcp<QnRestConnectionProcessor>("HTTP", "api");
     regTcp<QnRestConnectionProcessor>("HTTP", "ec2");
+    regTcp<QnRestConnectionProcessor>("HTTP", "favicon.ico");
     regTcp<QnFileConnectionProcessor>("HTTP", "static");
     regTcp<QnCrossdomainConnectionProcessor>("HTTP", "crossdomain.xml");
     regTcp<QnProgressiveDownloadingConsumer>("HTTP", "media");
@@ -4546,6 +4547,7 @@ void MediaServerProcess::configureApiRestrictions(nx_http::AuthMethodRestriction
     restrictions->allow(webPrefix + lit("/api/getCurrentUser"), nx_http::AuthMethod::noAuth);
     restrictions->allow(webPrefix + lit("/static/.*"), nx_http::AuthMethod::noAuth);
     restrictions->allow(lit("/crossdomain.xml"), nx_http::AuthMethod::noAuth);
+    restrictions->allow(lit("/favicon.ico"), nx_http::AuthMethod::noAuth);
     restrictions->allow(webPrefix + lit("/api/startLiteClient"), nx_http::AuthMethod::noAuth);
 
     // For open in new browser window.
