@@ -441,6 +441,9 @@ State CameraSettingsDialogStateReducer::loadCameras(
     state.devicesCount = cameras.size();
     state.alert = {};
 
+    state.deviceType = QnDeviceDependentStrings::calculateDeviceType(
+        qnClientCoreModule->commonModule()->resourcePool(), cameras);
+
     state.devicesDescription.isDtsBased = combinedValue(cameras,
         [](const Camera& camera) { return camera->isDtsBased(); });
     state.devicesDescription.isWearable = combinedValue(cameras,
