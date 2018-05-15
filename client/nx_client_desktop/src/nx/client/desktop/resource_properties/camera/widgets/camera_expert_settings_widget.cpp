@@ -332,7 +332,7 @@ void CameraExpertSettingsWidget::loadState(const CameraSettingsDialogState& stat
 
     // Logical ID.
 
-    ui->logicalIdGroupBox->setEnabled(state.isSingleCamera());
+    ui->logicalIdGroupBox->setVisible(state.isSingleCamera());
     if (state.isSingleCamera())
         ui->logicalIdSpinBox->setValue(state.singleCameraSettings.logicalId());
 
