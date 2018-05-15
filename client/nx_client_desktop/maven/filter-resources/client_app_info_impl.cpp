@@ -76,3 +76,8 @@ QString QnClientAppInfo::libDirSuffix()
         return QString();
     #endif
 }
+
+int QnClientAppInfo::eulaVersion()
+{
+    return ${eulaVersion};
+}

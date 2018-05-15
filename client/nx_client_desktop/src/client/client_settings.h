@@ -157,6 +157,9 @@ public:
         LAST_EXPORT_MODE,
 
         DETECTED_OBJECT_DISPLAY_SETTINGS,
+        
+        /** Version of the latest read and accepted EULA. */
+        ACCEPTED_EULA_VERSION,
 
         VARIABLE_COUNT
     };
@@ -252,6 +255,7 @@ private:
 
         // Was used earlier. Kept to migrate old settings.
         QN_DECLARE_RW_PROPERTY(QList<QUrl>,                 knownServerUrls,        setKnownServerUrls,         KNOWN_SERVER_URLS,          QList<QUrl>())
+        QN_DECLARE_RW_PROPERTY(int,                         acceptedEulaVersion,    setAcceptedEulaVersion,     ACCEPTED_EULA_VERSION,      0)
     QN_END_PROPERTY_STORAGE()
 
     void migrateKnownServerConnections();

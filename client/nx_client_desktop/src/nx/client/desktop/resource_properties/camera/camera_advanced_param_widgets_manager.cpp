@@ -63,14 +63,14 @@ void CameraAdvancedParamWidgetsManager::displayParams(const QnCameraAdvancedPara
 
     const auto currentItemChanged =
         [this](QTreeWidgetItem* current)
-    {
-        if (!current)
-            return;
+        {
+            if (!current)
+                return;
 
-        const auto target = current->data(0, Qt::UserRole).value<QWidget*>();
-        if (target && m_contentsWidget->children().contains(target))
-            m_contentsWidget->setCurrentWidget(target);
-    };
+            const auto target = current->data(0, Qt::UserRole).value<QWidget*>();
+            if (target && m_contentsWidget->children().contains(target))
+                m_contentsWidget->setCurrentWidget(target);
+        };
 
     connect(m_groupWidget, &QTreeWidget::currentItemChanged, this, currentItemChanged);
     currentItemChanged(m_groupWidget->currentItem());
@@ -142,6 +142,16 @@ void CameraAdvancedParamWidgetsManager::loadValues(const QnCameraAdvancedParamVa
             &CameraAdvancedParamWidgetsManager::paramValueChanged);
     }
 }
+
+boost::optional<QString> CameraAdvancedParamWidgetsManager::parameterValue(
+    const QString & parameterId) const
+{
+    if (!m_paramWidgetsById.contains(parameterId))
+        return boost::none;
+
+    return m_paramWidgetsById[parameterId]->value();
+}
+
 
 bool CameraAdvancedParamWidgetsManager::hasValidValues(const QnCameraAdvancedParamGroup& group) const
 {

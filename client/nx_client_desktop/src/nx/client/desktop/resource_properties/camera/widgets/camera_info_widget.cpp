@@ -25,7 +25,7 @@ CameraInfoWidget::CameraInfoWidget(QWidget* parent):
 
     ui->multipleNameLabel->setReadOnly(true);
     ui->showOnLayoutButton->setIcon(qnSkin->icon("text_buttons/video.png"));
-    ui->eventLogButton->setIcon(qnSkin->icon("buttons/event_log.png"));
+    ui->eventLogButton->setIcon(qnSkin->icon("text_buttons/text.png"));
     ui->cameraRulesButton->setIcon(qnSkin->icon("text_buttons/event_rules.png"));
 
     autoResizePagesToContents(ui->stackedWidget,

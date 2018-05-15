@@ -185,10 +185,15 @@ void MultipleCameraSettingsWidget::submitToResources()
         if (!password.isEmpty() || !m_passwordWasEmpty)
             auth.setPassword(password);
 
-        if (camera->isMultiSensorCamera() || camera->isNvr())
+        if ((camera->isMultiSensorCamera() || camera->isNvr())
+             && !camera->getGroupId().isEmpty())
+        {
             QnClientCameraResource::setAuthToCameraGroup(camera, auth);
+        }
         else
+        {
             camera->setAuth(auth);
+        }
 
         if (ui->enableAudioCheckBox->checkState() != Qt::PartiallyChecked && camera->isAudioSupported())
             camera->setAudioEnabled(ui->enableAudioCheckBox->isChecked());

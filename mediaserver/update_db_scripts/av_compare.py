@@ -1,3 +1,8 @@
+'''
+Script is required to update ArecontVision models xml file using online database.
+Must be run from the repository root directory.
+'''
+
 #script puts file with mismatches to your home directory
 import requests
 import re
@@ -16,5 +21,5 @@ result_file = open(os.path.join(home_dir, "new_av_models.txt"), 'w')
 for model in site_list:
     if model not in cur_list:
         result_file.write(model + '\n')
-        
+
 result_file.close()

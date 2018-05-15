@@ -3,7 +3,7 @@
     "dialogs": {
         "okButton": "Oké",
         "openLink": "Bezoek deze link",
-        "openLinkWithTitle": "Bezoek deze link naar {{title}}"
+        "openLinkWithTitle": "Om {{title}} te bezoeken, klik op deze link"
     },
     "setup": {
         "createAccount": "account aanmaken",
@@ -11,8 +11,8 @@
         "errorNoNetwork": "Dit apparaat heeft een netwerkverbinding nodig om te functioneren.<br>\n                Sluit het apparaat aan op het  lokale netwerk of het internet"
     },
     "passwordRequirements": {
-        "minLengthMessage": "Wachtwoord moet ten minste 8 karakters hebben",
-        "requiredMessage": "Alleen letters, cijfers en symbolen van het toetsenbord zijn toegestaan",
+        "minLengthMessage": "Het wachtwoord moet tenminste 8 karakters lang zijn",
+        "requiredMessage": "Alleen alfanumerieke letters, cijfers en symbolen van het toetsenbord zijn toegestaan",
         "weakMessage": "Het wachtwoord moet bestaan uit verschillende soorten symbolen",
         "strongMessage": "Sterk wachtwoord!",
         "commonMessage": "Dit wachtwoord staat in de lijst van meest populaire wachtwoorden"
@@ -25,7 +25,7 @@
         },
         "confirmRestart": "Server nu herstarten?",
         "couldntCheckInternet": "Kan de cloudverbinding niet controleren",
-        "confirmRestoreDefault": "Database en instellingen wissen? Dit proces zal enige tijd duren en de server zal daarna opnieuw worden opgestart.",
+        "confirmRestoreDefault": "Wilt u de database en instellingen wissen? Dit proces zal enige tijd duren en de server zal daarna opnieuw worden opgestart.",
         "confirmRestoreDefaultTitle": "Fabrieksinstellingen herstellen",
         "unexpectedError": "Mislukt: er heeft zich een onverwachte fout voorgedaan",
         "connnetionError": "Netwerkfout",
@@ -38,38 +38,38 @@
         "confirmRestoreSettingsNotNetwork": "De configuratie van de server wissen? Archief-en netwerkinstellingen worden opgeslagen.",
         "unavailable": "Niet Beschikbaar",
         "unsafePortConfirm": "Het is niet veilig om een poortnummer te gebruiken lager dan 1025. De server kan hierdoor niet toegankelijk zijn. Toch doorgaan?",
-        "confirmDisconnectFromCloud": "Verbinding verbreken met systeem {{CLOUD_NAME}}",
+        "confirmDisconnectFromCloud": "Koppel het systeem los van {{CLOUD_NAME}}",
         "confirmDisconnectFromCloudTitle": "<span class='warning-label'>Alle cloud gebruikersaccounts worden verwijderd.</span><br><br>Het systeem zal toegankelijk zijn via het lokale netwerk middels het lokale administrator account.",
         "confirmDisconnectFromCloudAction": "Verbinding verbreken",
-        "disconnectedFromCloudSuccess": "Systeem is succesvol afgesloten van {{CLOUD_NAME}}",
-        "confirmDisconnectFromSystem": "Maak de server los van het huidige systeem",
-        "confirmDisconnectFromSystemAction": "Losmaken",
-        "disconnectedFromSystemSuccess": "Server is succesvol losgemaakt van het systeem",
+        "disconnectedFromCloudSuccess": "Het systeem is succesvol losgekoppeld van {{CLOUD_NAME}}",
+        "confirmDisconnectFromSystem": "Koppel de server los van het huidige systeem",
+        "confirmDisconnectFromSystemAction": "Loskoppelen",
+        "disconnectedFromSystemSuccess": "De server is succesvol van het systeem losgekoppeld",
         "connectedSuccess": "Verbinding maken met het systeem is mislukt",
         "createLocalOwnerTitle": "Maak een lokaal administrator account aan",
         "confirmChangePassword": "Wijzig admin wachtwoord",
         "confirmChangePasswordTitle": "Systeemwachtwoord veranderen? Het zal gevolgen hebben voor gebruiker 'admin' en het root-wachtwoord voor sommige servers",
         "confirmChangePasswordAction": "Nieuw wachtwoord opslaan",
-        "nx1ControlHint": "Client applicatie is gestart. Gebruik een toetsenbord en muis of de mobiele applicatie om deze te beheren."
+        "nx1ControlHint": "De client applicatie is gestart. Gebruik een toetsenbord, muis en/of de mobiele applicatie om deze te bedienen."
     },
     "settingsConfig": {
         "arecontRtspEnabled": "Arecont RTSP ingeschakeld",
         "auditTrailEnabled": "Audit trail ingeschakeld",
         "auditTrailPeriodDays": "Aantal dagen voor de systeemrapportage",
-        "autoDiscoveryEnabled": "Schakel automatische detectie van apparaten in",
+        "autoDiscoveryEnabled": "Schakel de automatische detectie van apparaten in",
         "autoUpdateThumbnails": "Miniaturen automatisch bijwerken",
         "backupNewCamerasByDefault": "Maak standaard een back-up van nieuwe camera's",
         "backupQualities": "Backup Kwaliteitsniveaus",
         "cameraSettingsOptimization": "Optimalisatie van apparaatinstellingen toestaan",
         "clientStatisticsSettingsUrl": "Relatieve url van klantstatistieken",
-        "cloudAccountName": "Cloud eigenaar-account",
+        "cloudAccountName": "Cloud eigenaar account",
         "cloudConnectRelayingEnabled": "Schakel relaying in voor cloud connect",
         "cloudConnectUdpHolePunchingEnabled": "Schakel UDP hole punching in voor de cloud verbinding",
         "cloudHost": "Cloud host",
         "cloudSystemID": "Cloud systeem id",
         "disabledVendors": "Uitgeschakelde leveranciers",
-        "ec2AliveUpdateIntervalSec": "Systeam update interval (seconden)",
-        "ec2ConnectionKeepAliveTimeoutSec": "Verbinding behouden timeout (seconden)",
+        "ec2AliveUpdateIntervalSec": "System alive update interval (seconden)",
+        "ec2ConnectionKeepAliveTimeoutSec": "Verbinding keep alive timeout (seconden)",
         "ec2KeepAliveProbeCount": "Verbinding behouden probes (seconden)",
         "emailFrom": "Email van",
         "emailSignature": "Email handtekening",
@@ -122,7 +122,7 @@
         }
     },
     "join": {
-        "systemIsUnreacheble": "Systeem is onbereikbaar of bestaat niet.",
+        "systemIsUnreacheble": "Het systeem is onbereikbaar of bestaat niet.",
         "incorrectCurrentPassword": "Wachtwoord onjuist.",
         "incorrectRemotePassword": "Naam of wachtwoord onjuist.",
         "incompatibleVersion": "Het systeem is onbereikbaar, niet bestaand of is voorzien van een incompatibele versie.",
@@ -132,8 +132,8 @@
         "configError": "Kan de systemen niet samenvoegen. Eén van de systemen staat wellicht in de veilige modus.",
         "cloudError": "De systemen kunnen niet worden samengevoegd. Het gekozen systeem is verbonden met de cloud. Verbreek de cloudverbinding.",
         "cloudBothError": "De systemen kunnen niet worden samengevoegd. Beide systemen zijn verbonden met de cloud. Verbreek de cloudverbinding.",
-        "cloudHostConflict": "Kan de systemen niet samenvoegen, omdat de server verbonden zijn verschillende clouds hosts",
-        "licenceError": "Waarschuwing! U wilt systemen met samenvoegen met meerdere starterpacks. Slechts één starterpack is toegestaan per systeem, zodat de andere starterpacks zullen worden gedeactiveerd. Doorgaan met samenvoegen?",
+        "cloudHostConflict": "Kan de systemen niet samenvoegen, omdat de servers verbonden zijn verschillende clouds hosts",
+        "licenceError": "Waarschuwing! U wilt systemen samenvoegen met meerdere starterpacks. Slechts één starterpack is toegestaan per systeem, zodat de andere starterpacks zullen worden gedeactiveerd. Wilt u doorgaan met het samenvoegen?",
         "connectionFailed": "Verbinding mislukt: ",
         "unknownError": "Onbekende fout",
         "mergeFailed": "Samenvoegen mislukt: ",
@@ -205,9 +205,9 @@
             "noFormat": "Deze browser ondersteunt het afspelen van de beelden van deze camera niet.",
             "ieWin10": "Gebruik alsjeblieft de browsers Microsoft Edge of Google Chrome.",
             "iosVideoTooLarge": "iOS ondersteunt geen video die groter is dan FullHD (2MP: 1920x1080).",
-            "unauthorized": "Authentication required",
+            "unauthorized": "Authenticatie vereist",
             "ubuntuNX": "Deze browser ondersteunt geen video van ARM-gebaseerde servers. Gebruik alsjeblieft de Chromium-browser.",
-            "ieNoWebm": "Installeer alstublieft <a href='https://tools.google.com/dlpage/webmmf/' target='_blank'>WebM codec</a> voor Internet Explorer.",
+            "ieNoWebm": "Installeer alstublieft de <a href='https://tools.google.com/dlpage/webmmf/' target='_blank'>WebM codec</a> voor Internet Explorer.",
             "flashOrWebmRequired": "Gelieve <a href='https://get.adobe.com/flashplayer/' target='_blank'> Adobe Flash</a> of <a href='https://tools.google.com/dlpage/webmmf/' target='_blank'>WebM codec</a> te installeren voor het afspelen van video's in Internet Explorer.",
             "noArmSupport": "Deze browser of dit apparaat ondersteunt geen videoweergave van ARM-gebaseerde servers.",
             "error": "Error",
@@ -219,7 +219,7 @@
         "resolution": {
             "high": "Hoog",
             "auto": "Automatisch",
-            "low": "Lage"
+            "low": "Laag"
         }
     }
 }
