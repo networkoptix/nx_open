@@ -14,8 +14,8 @@ ${ENV}                                ${CLOUD TEST}
 
 ${BROWSER}                            Chrome
 
-${LANGUAGE DROPDOWN}                  //footer//button[@uib-dropdown-toggle]
-${LANGUAGE TO SELECT}                 //footer//span[@lang='${LANGUAGE}']/..
+${LANGUAGE DROPDOWN}                  //nx-footer//button[@ngbdropdowntoggle]
+${LANGUAGE TO SELECT}                 //nx-footer//span[@lang='${LANGUAGE}']/..
 
 @{LANGUAGES LIST}                          en_US    en_GB    ru_RU           fr_FR   de_DE    es_ES   hu_HU  zh_CN  zh_TW  ja_JP   ko_KR  tr_TR  th_TH     nl_NL    he_IL  pl_PL  vi_VN
 @{LANGUAGES ACCOUNT TEXT LIST}             Account  Account  Учетная запись  Compte  Account  Cuenta  Fiók   帐户    帳號   アカウント  계정    Hesap  บัญชีผู้ใช้  Account  חשבון    Konto  Tài khoản
