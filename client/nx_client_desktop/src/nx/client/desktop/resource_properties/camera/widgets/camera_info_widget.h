@@ -1,8 +1,10 @@
 #pragma once
 
-#include <nx/client/desktop/common/widgets/panel.h>
 #include <ui/widgets/common/abstract_preferences_widget.h>
 
+#include <nx/client/desktop/common/widgets/panel.h>
+
+class QnDisconnectHelper;
 namespace Ui { class CameraInfoWidget; }
 
 namespace nx {
@@ -23,6 +25,12 @@ public:
 
     void setStore(CameraSettingsDialogStore* store);
 
+signals:
+    void requestPing();
+    void requestShowOnLayout();
+    void requestEventLog();
+    void requestEventRules();
+
 private:
     void loadState(const CameraSettingsDialogState& state);
 
@@ -32,6 +40,7 @@ private:
 
 private:
     QScopedPointer<Ui::CameraInfoWidget> ui;
+    QScopedPointer<QnDisconnectHelper> m_storeConnections;
 };
 
 } // namespace desktop

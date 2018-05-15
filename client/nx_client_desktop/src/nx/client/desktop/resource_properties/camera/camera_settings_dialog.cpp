@@ -35,6 +35,7 @@
 #include <utils/license_usage_helper.h>
 
 #include <nx/client/desktop/image_providers/camera_thumbnail_manager.h>
+#include <nx/client/desktop/ui/actions/action_manager.h>
 
 namespace nx {
 namespace client {
@@ -86,6 +87,28 @@ struct CameraSettingsDialog::Private
     {
         store->loadCameras(cameras);
     }
+
+    CameraSettingsGeneralTabWidget* createGeneralTab(CameraSettingsDialog* q)
+    {
+        auto generalTab = new CameraSettingsGeneralTabWidget(store, q->ui->tabWidget);
+        QObject::connect(generalTab, &CameraSettingsGeneralTabWidget::requestPing, q,
+            [this, q]()
+            {
+                q->menu()->trigger(ui::action::PingAction,
+                    {Qn::TextRole, store->state().singleCameraProperties.ipAddress});
+            });
+
+        QObject::connect(generalTab, &CameraSettingsGeneralTabWidget::requestShowOnLayout, q,
+            [this, q]() { q->menu()->trigger(ui::action::OpenInNewTabAction, cameras); });
+
+        QObject::connect(generalTab, &CameraSettingsGeneralTabWidget::requestEventLog, q,
+            [this, q]() { q->menu()->trigger(ui::action::CameraIssuesAction, cameras); });
+
+        QObject::connect(generalTab, &CameraSettingsGeneralTabWidget::requestEventRules, q,
+            [this, q]() { q->menu()->trigger(ui::action::CameraBusinessRulesAction, cameras); });
+
+        return generalTab;
+    }
 };
 
 CameraSettingsDialog::CameraSettingsDialog(QWidget* parent):
@@ -116,7 +139,7 @@ CameraSettingsDialog::CameraSettingsDialog(QWidget* parent):
 
     addPage(
         int(CameraSettingsTab::general),
-        new CameraSettingsGeneralTabWidget(d->store, ui->tabWidget),
+        d->createGeneralTab(this),
         tr("General"));
 
     addPage(

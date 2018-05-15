@@ -18,9 +18,16 @@ class CameraSettingsGeneralTabWidget: public QWidget
     using base_type = QWidget;
 
 public:
-    explicit CameraSettingsGeneralTabWidget(CameraSettingsDialogStore* store,
-        QWidget* parent = nullptr);
+    explicit CameraSettingsGeneralTabWidget(
+        CameraSettingsDialogStore* store, QWidget* parent = nullptr);
+
     virtual ~CameraSettingsGeneralTabWidget() override;
+
+signals:
+    void requestPing();
+    void requestShowOnLayout();
+    void requestEventLog();
+    void requestEventRules();
 
 private:
     void loadState(const CameraSettingsDialogState& state);
