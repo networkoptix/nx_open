@@ -1160,8 +1160,9 @@ void ServerConnection::onHttpClientDone(
     lock.unlock();
     if (callback)
     {
-        callback(requestId, systemError, statusCode, contentType, messageBody,
-            httpClient->response()->headers);
+        const auto response = httpClient->response();
+        const auto headers = response ? response->headers : nx::network::http::HttpHeaders();
+        callback(requestId, systemError, statusCode, contentType, messageBody, headers);
     }
 };
 
