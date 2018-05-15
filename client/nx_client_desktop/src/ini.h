@@ -33,7 +33,7 @@ struct Ini: public nx::kit::IniConfig
     NX_INI_FLAG(0, displayAnalyticsDelay, "Add delay label to detected object description.");
     NX_INI_FLAG(0, enableProgressInformers, "Enable global operation progress informers in the notification panel.");
     NX_INI_FLAG(0, enableDeviceSearch, "Enable reworked device search dialog");
-    NX_INI_FLAG(0, enableWearableCameras, "Enable wearable cameras.");
+    NX_INI_FLAG(1, enableWearableCameras, "Enable wearable cameras.");
     NX_INI_FLAG(0, enableResourceFiltering, "Enable reworked resource filtering");
     NX_INI_FLAG(0, debugThumbnailProviders, "Enable debug mode for thumbnail providers");
     NX_INI_FLAG(0, ignoreZoomWindowConstraints, "Ignore constrains for a zoom region");

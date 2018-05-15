@@ -1402,6 +1402,14 @@ to view more bookmarks</source>
         <source>Folder not found</source>
         <translation></translation>
     </message>
+    <message>
+        <source>Helps avoid problems with OpenGL drawing which result in 100% CPU load.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Adjust to smallest value that does not degrade live view. Bigger buffer makes playback smoother but increases delay between real time and live view; smaller buffer decreases delay but can cause stutters.</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QnArchiveLengthWidget</name>
@@ -1412,6 +1420,14 @@ to view more bookmarks</source>
     <message>
         <source>High minimum value can lead to archive length decrease on other cameras.</source>
         <translation></translation>
+    </message>
+    <message>
+        <source>Sets when camera archive will be deleted or saved when there is no space for new recordings.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&quot;Auto&quot; deletes the oldest footage first, regardless of the source.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -2365,6 +2381,18 @@ to view more bookmarks</source>
             <numerusform>This ID is already used on the following %n cameras: %1</numerusform>
         </translation>
     </message>
+    <message>
+        <source>Server will not change any cameras settings, it will receive and use camera stream as-is. </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Helps fix image quality issues on some cameras; for others will cause significant bitrate increase.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Custom number that can be assigned to a camera for quick identification and access</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QnCameraInputBusinessEventWidget</name>
@@ -2646,6 +2674,14 @@ to view more bookmarks</source>
     <message>
         <source>More Settings</source>
         <translation></translation>
+    </message>
+    <message>
+        <source>Quality setting determines the compression rate only, and does not affect resolution. Low, Medium, High and Best are preset bitrate values.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>First choose a recording option, then apply it to day and time blocks on the recording schedule. (0 block is 12:00am to 1:00am, 23 block is 11:00pm to 12:00am.)</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -3107,16 +3143,12 @@ to %1</source>
 <context>
     <name>QnCustomBusinessEventWidget</name>
     <message>
-        <source>Server API</source>
-        <translation></translation>
+        <source>Event will trigger only if there are matches in caption with any of entered keywords.</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>To generate Generic Event, please refer to %1.</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Event will trigger only if Generic Event meets all the above conditions. If a keyword field is empty, condition is always met. If not, condition is met if the corresponding field of Generic Event contains any keyword.</source>
-        <translation></translation>
+        <source>If the field is empty, event will always trigger.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -3183,10 +3215,6 @@ to %1</source>
     </message>
     <message>
         <source>System configuration will be restored from backup, Server application will be restarted.</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>You can create a backup for System configurations that can be restored in case of failure.</source>
         <translation></translation>
     </message>
     <message>
@@ -3331,6 +3359,13 @@ to %1</source>
     <message>
         <source>You will not be able to connect to this System with your %1 account after you disconnect this System from %1.</source>
         <comment>%1 is the cloud name (like Nx Cloud)</comment>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>QnEmptyBusinessActionWidget</name>
+    <message>
+        <source>Panic Recording mode switches recording settings for all Cameras to maximum FPS and Quality</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -3569,6 +3604,13 @@ to %1</source>
     </message>
 </context>
 <context>
+    <name>QnFisheyeSettingsWidget</name>
+    <message>
+        <source>Use this setting to compensate for distortion if camera is not mounted exactly vertically or horizontally.</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>QnGeneralPreferencesWidget</name>
     <message>
         <source>Select folder...</source>
@@ -3636,6 +3678,14 @@ to %1</source>
     <message>
         <source>Open Camera List</source>
         <translation></translation>
+    </message>
+    <message>
+        <source>Creates a backup of local System configurations that can be restored in case of failure.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Backup includes registry flags, file systems, and server settings related to archive, events, and audit trail logs. Does not backup archives.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -4453,6 +4503,18 @@ to %1</source>
     <message>
         <source>No image</source>
         <translation></translation>
+    </message>
+    <message>
+        <source>Displays IP addresses for cameras and servers, groups for users, etc. in the Resource Tree.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Sets the time to use in the client (timeline, timestamps, etc.) when client and server machines are in different time zones.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Length of time each camera on layout will be displayed if you start a Layout Tour.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -5627,16 +5689,12 @@ to %1</source>
         <translation></translation>
     </message>
     <message>
-        <source>server will take devices automatically from offline servers</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>server will take cameras automatically from offline servers</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>Failover</source>
         <translation></translation>
+    </message>
+    <message>
+        <source>Servers with failover enabled will automatically take cameras from offline servers.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -5842,6 +5900,14 @@ to %1</source>
     </message>
     <message>
         <source>Update Files</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Validating the update...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Checking for free space...</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -6324,6 +6390,14 @@ to %1</source>
         <source>Recording was enabled on the USB storage</source>
         <translation></translation>
     </message>
+    <message>
+        <source>Creates a backup of local System configurations that can be restored in case of failure.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Backup includes registry flags, file systems, and server settings related to archive, events, and audit trail logs.Does not backup archives.</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QnStorageListModel</name>
@@ -6616,6 +6690,14 @@ to %1</source>
         <source>Allow System to optimize camera settings</source>
         <translation></translation>
     </message>
+    <message>
+        <source>Sends device, server, and system information (firmware, codecs, streams, license keys, etc.).</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Tracks and logs all user actions</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QnTableExportHelper</name>
@@ -6681,16 +6763,6 @@ to %1</source>
         <translation></translation>
     </message>
     <message>
-        <source>hh:mm</source>
-        <comment>Format for displaying hours and minutes on timeline.</comment>
-        <translation></translation>
-    </message>
-    <message>
-        <source>h ap</source>
-        <comment>Format for displaying hours on timeline, with am/pm indicator.</comment>
-        <translation></translation>
-    </message>
-    <message>
         <source>dd</source>
         <comment>Format for displaying days on timeline.</comment>
         <translation></translation>
@@ -6733,11 +6805,6 @@ to %1</source>
     <message>
         <source>yyyy</source>
         <comment>Format for displaying year caption in timeline&apos;s header</comment>
-        <translation></translation>
-    </message>
-    <message>
-        <source>h:mm ap</source>
-        <comment>Format for displaying hours and minutes on timeline, with am/pm indicator.</comment>
         <translation></translation>
     </message>
     <message>
@@ -6931,6 +6998,10 @@ to %1</source>
         <source>Edit</source>
         <translation></translation>
     </message>
+    <message>
+        <source>Users can be imported from an LDAP server. They will be able to log in only if LDAP server is online and their accounts are active on it.</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QnUserProfileWidget</name>
@@ -7120,6 +7191,14 @@ to %1</source>
     <message>
         <source>%1 user with specified email already exists.</source>
         <comment>%1 is the short cloud name (like Cloud)</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&lt;b&gt;Local users&lt;/b&gt; belong to this system only and are fully managed by system administrators.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&lt;b&gt;Cloud users&lt;/b&gt; can have access to many systems. Administrators can manage their rights only.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -8136,6 +8215,13 @@ to %1</source>
     </message>
 </context>
 <context>
+    <name>nx::client::desktop::HintButton</name>
+    <message>
+        <source>Click to read more</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>nx::client::desktop::ImageOverlaySettingsWidget</name>
     <message>
         <source>Select file...</source>
@@ -8381,17 +8467,26 @@ to %1</source>
     </message>
 </context>
 <context>
-    <name>nx::client::desktop::ui::AnalyticsSdkEventModel</name>
-    <message>
-        <source>No event types supported</source>
-        <translation></translation>
-    </message>
-</context>
-<context>
     <name>nx::client::desktop::ui::AnalyticsSdkEventWidget</name>
     <message>
-        <source>Event will trigger only if Analytics Event meets all the above conditions. If a keyword field is empty, condition is always met. If not, condition is met if the corresponding field of Analytics Event contains any keyword.</source>
-        <translation></translation>
+        <source>Analytics events can be set up on a certain cameras.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Choose cameras using the button above to see the list of supported events.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Event will trigger only if there are matches in caption with any of entered keywords.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>If the field is empty, event will always trigger.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Event will trigger only if there are matches in the description field with any of the entered keywords.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>

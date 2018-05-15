@@ -28,6 +28,9 @@ public:
     network::SocketAddress endpoint() const;
     void enforceSslFor(const network::SocketAddress& targetAddress, bool enabled = true);
 
+protected:
+    virtual void beforeModuleStart() override;
+
 private:
     const bool m_isSslEnabled;
     network::SocketAddress m_endpoint;

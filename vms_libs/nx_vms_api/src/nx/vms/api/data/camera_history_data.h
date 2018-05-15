@@ -16,7 +16,7 @@ struct ServerFootageData: Data
 
     ServerFootageData() = default;
 
-    ServerFootageData(const QnUuid& serverGuid, std::vector<QnUuid> archivedCameras) :
+    ServerFootageData(const QnUuid& serverGuid, std::vector<QnUuid> archivedCameras):
         serverGuid(serverGuid),
         archivedCameras(std::move(archivedCameras))
     {

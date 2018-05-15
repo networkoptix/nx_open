@@ -102,6 +102,8 @@ struct QnCameraAdvancedParameter
         String,
         Separator,
         LensControl,
+        SliderControl,
+        PtrControl,
     };
 
     QString id;
@@ -118,6 +120,8 @@ struct QnCameraAdvancedParameter
     QString aux; //< Auxiliary driver dependent data.
     std::vector<QnCameraAdvancedParameterDependency> dependencies;
     bool showRange = false; //< Show range near parameter's label
+    // If control can be packed with another such control in the same line.
+    bool compact = false;
     QString unit;
     QString notes;
     bool resync = false;
@@ -156,6 +160,7 @@ QN_FUSION_DECLARE_FUNCTIONS(QnCameraAdvancedParameter::DataType, (lexical))
     (aux)\
     (dependencies)\
     (showRange)\
+    (compact)\
     (unit)\
     (notes)\
     (shouldKeepInitialValue)\
@@ -217,7 +222,7 @@ struct QnCameraAdvancedParams
 
 QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
     QnCameraAdvancedParameterTypes,
-    (json)(metatype)
+    (json)(metatype)(eq)
 )
 
 Q_DECLARE_METATYPE(QnCameraAdvancedParamValueList)

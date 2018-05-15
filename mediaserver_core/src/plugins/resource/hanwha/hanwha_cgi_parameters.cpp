@@ -65,7 +65,9 @@ boost::optional<HanwhaCgiParameter> HanwhaCgiParameters::parameter(const QString
 
 bool HanwhaCgiParameters::isValid() const
 {
-    return m_isValid && nx::network::http::StatusCode::isSuccessCode(m_statusCode);
+    return m_isValid
+        && nx::network::http::StatusCode::isSuccessCode(m_statusCode)
+        && !m_parameters.empty();
 }
 
 nx::network::http::StatusCode::Value HanwhaCgiParameters::statusCode() const

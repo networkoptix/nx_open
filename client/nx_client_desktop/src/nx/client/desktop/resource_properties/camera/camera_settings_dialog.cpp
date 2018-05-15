@@ -21,6 +21,7 @@
 #include "widgets/camera_schedule_widget.h"
 #include "widgets/camera_motion_settings_widget.h"
 #include "widgets/camera_fisheye_settings_widget.h"
+#include "widgets/camera_expert_settings_widget.h"
 #include "widgets/io_module_settings_widget.h"
 
 #include "redux/camera_settings_dialog_state.h"
@@ -28,6 +29,7 @@
 
 #include "watchers/camera_settings_readonly_watcher.h"
 #include "watchers/camera_settings_panic_watcher.h"
+#include "watchers/camera_settings_global_settings_watcher.h"
 
 #include "utils/camera_settings_dialog_state_conversion_functions.h"
 #include <utils/license_usage_helper.h>
@@ -100,8 +102,7 @@ CameraSettingsDialog::CameraSettingsDialog(QWidget* parent):
     connect(d->store, &CameraSettingsDialogStore::stateChanged, this,
         &CameraSettingsDialog::loadState);
 
-    d->readOnlyWatcher = new CameraSettingsReadOnlyWatcher(this);
-    d->readOnlyWatcher->setStore(d->store);
+    d->readOnlyWatcher = new CameraSettingsReadOnlyWatcher(d->store, this);
 
     d->licenseUsageHelper = new QnCamLicenseUsageHelper(commonModule(), this);
 
@@ -110,8 +111,8 @@ CameraSettingsDialog::CameraSettingsDialog(QWidget* parent):
     d->previewManager->setThumbnailSize(QSize(0, 0));
     d->previewManager->setAutoRefresh(false);
 
-    auto panicWatcher = new CameraSettingsPanicWatcher(this);
-    panicWatcher->setStore(d->store);
+    new CameraSettingsPanicWatcher(d->store, this);
+    new CameraSettingsGlobalSettingsWatcher(d->store, this);
 
     addPage(
         int(CameraSettingsTab::general),
@@ -137,6 +138,11 @@ CameraSettingsDialog::CameraSettingsDialog(QWidget* parent):
         int(CameraSettingsTab::fisheye),
         new CameraFisheyeSettingsWidget(d->previewManager, d->store, ui->tabWidget),
         tr("Fisheye"));
+
+    addPage(
+        int(CameraSettingsTab::expert),
+        new CameraExpertSettingsWidget(d->store, ui->tabWidget),
+        tr("Expert"));
 
     auto selectionWatcher = new QnWorkbenchSelectionWatcher(this);
     connect(
@@ -314,6 +320,9 @@ void CameraSettingsDialog::loadState(const CameraSettingsDialogState& state)
 
     setPageVisible(int(CameraSettingsTab::io), state.isSingleCamera()
         && state.devicesDescription.isIoModule == CombinedValue::All);
+
+    setPageVisible(int(CameraSettingsTab::expert),
+        state.devicesDescription.isIoModule == CombinedValue::None);
 
     ui->alertBar->setText(getAlertText(state));
 }

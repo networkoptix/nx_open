@@ -29,7 +29,6 @@ QnDatabaseManagementWidget::QnDatabaseManagementWidget(QWidget *parent):
     ui(new Ui::DatabaseManagementWidget())
 {
     ui->setupUi(this);
-    ui->labelWidget->setText(tr("You can create a backup for System configurations that can be restored in case of failure."));
 
     setHelpTopic(this, Qn::SystemSettings_Server_Backup_Help);
 

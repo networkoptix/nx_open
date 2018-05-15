@@ -111,6 +111,7 @@ struct CameraSettingsDialogState
     bool hasChanges = false;
     bool readOnly = true;
     bool panicMode = false;
+    bool settingsOptimizationEnabled = false;
 
     // Generic cameras info.
 
@@ -171,6 +172,9 @@ struct CameraSettingsDialogState
         UserEditable<QnMediaDewarpingParams::ViewMode> fisheyeMountingType;
         UserEditable<FisheyeCalibrationSettings> fisheyeCalibrationSettings;
         UserEditable<qreal> fisheyeFovRotation;
+
+        UserEditable<int> logicalId;
+        QStringList sameLogicalIdCameraNames; //< Read-only informational value.
     };
     SingleCameraSettings singleCameraSettings;
 
@@ -186,13 +190,34 @@ struct CameraSettingsDialogState
         CombinedValue isDtsBased;
         CombinedValue isWearable;
         CombinedValue isIoModule;
+        CombinedValue isArecontCamera;
         CombinedValue hasMotion;
-        CombinedValue hasDualStreaming;
+        CombinedValue hasDualStreamingCapability;
+        CombinedValue hasRemoteArchiveCapability;
+        CombinedValue hasPredefinedBitratePerGOP;
+        CombinedValue hasPtzPresets;
+        CombinedValue canDisableNativePtzPresets;
+        CombinedValue supportsMotionStreamOverride;
 
         int maxFps = 0;
         int maxDualStreamingFps = 0;
     };
     CombinedProperties devicesDescription;
+
+    struct ExpertSettings
+    {
+        UserEditableMultiple<bool> dualStreamingDisabled;
+        UserEditableMultiple<bool> cameraControlDisabled;
+        UserEditableMultiple<bool> useBitratePerGOP;
+        UserEditableMultiple<bool> primaryRecordingDisabled;
+        UserEditableMultiple<bool> secondaryRecordingDisabled;
+        UserEditableMultiple<bool> nativePtzPresetsDisabled;
+        UserEditableMultiple<vms::api::RtpTransportType> rtpTransportType;
+        UserEditableMultiple<vms::api::MotionStreamType> motionStreamType;
+        CombinedValue motionStreamOverridden; //< Read-only informational value.
+    };
+    ExpertSettings expert;
+    bool isDefaultExpertSettings = false;
 
     struct RecordingDays
     {
@@ -284,11 +309,6 @@ struct CameraSettingsDialogState
         if (isSingleCamera())
             result &= singleCameraSettings.enableMotionDetection();
         return result;
-    }
-
-    bool hasDualStreaming() const
-    {
-        return hasMotion() && devicesDescription.hasDualStreaming == CombinedValue::All;
     }
 
     bool supportsSchedule() const

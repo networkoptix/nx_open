@@ -65,6 +65,7 @@
 #include <nx/network/http/http_mod_manager.h>
 #include <vms_gateway_embeddable.h>
 #include <nx/utils/log/log_initializer.h>
+#include <nx/utils/app_info.h>
 #include <nx_ec/dummy_handler.h>
 
 #include <platform/platform_abstraction.h>
@@ -93,6 +94,7 @@
 #include <nx/client/desktop/utils/performance_test.h>
 #include <watchers/server_interface_watcher.h>
 #include <nx/client/core/watchers/known_server_connections.h>
+#include <nx/client/core/utils/font_loader.h>
 #include <nx/client/desktop/utils/applauncher_guard.h>
 #include <nx/client/desktop/utils/resource_widget_pixmap_cache.h>
 #include <nx/client/desktop/layout_templates/layout_template_manager.h>
@@ -105,7 +107,6 @@
 #include <statistics/storage/statistics_file_storage.h>
 #include <statistics/settings/statistics_settings_watcher.h>
 
-#include <ui/helpers/font_loader.h>
 #include <ui/customization/customization.h>
 #include <ui/customization/customizer.h>
 #include <ui/style/globals.h>
@@ -539,21 +540,24 @@ void QnClientModule::initLog(const QnStartupParameters& startupParams)
     logSettings.updateDirectoryIfEmpty(QStandardPaths::writableLocation(QStandardPaths::DataLocation));
 
     logSettings.level.parse(logLevel);
+    logSettings.logBaseName = logFile.isEmpty() 
+        ? lit("client_log") + logFileNameSuffix
+        : logFile;
+        
     nx::utils::log::initialize(
         logSettings,
         qApp->applicationName(),
-        qApp->applicationFilePath(),
-        !logFile.isEmpty() ? logFile : (lit("client_log") + logFileNameSuffix));
+        qApp->applicationFilePath());
 
     const auto ec2logger = nx::utils::log::addLogger({QnLog::EC2_TRAN_LOG});
     if (ec2TranLogLevel != lit("none"))
     {
         logSettings.level.parse(ec2TranLogLevel);
+        logSettings.logBaseName = lit("ec2_tran") + logFileNameSuffix;
         nx::utils::log::initialize(
             logSettings,
             qApp->applicationName(),
             qApp->applicationFilePath(),
-            lit("ec2_tran") + logFileNameSuffix,
             ec2logger);
     }
 
@@ -632,7 +636,10 @@ void QnClientModule::initSkin(const QnStartupParameters& startupParams)
     /* Initialize application UI. Skip if run in console (e.g. unit-tests). */
     if (qApp)
     {
-        QnFontLoader::loadFonts(QDir(QApplication::applicationDirPath()).absoluteFilePath(lit("fonts")));
+        nx::client::core::FontLoader::loadFonts(
+            QDir(QApplication::applicationDirPath()).absoluteFilePath(
+                nx::utils::AppInfo::isMacOsX() ? lit("../Resources/fonts") : lit("fonts")));
+
         QApplication::setWindowIcon(qnSkin->icon(":/logo.png"));
         QApplication::setStyle(skin->newStyle(customizer->genericPalette()));
     }

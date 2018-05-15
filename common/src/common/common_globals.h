@@ -9,6 +9,7 @@
 
 #include <nx/fusion/model_functions_fwd.h>
 #include <nx/fusion/serialization_format.h>
+#include <nx/vms/api/types/motion_types.h>
 #include <nx/vms/api/types/resource_types.h>
 
 #ifdef THIS_BLOCK_IS_REQUIRED_TO_MAKE_FILE_BE_PROCESSED_BY_MOC_DO_NOT_DELETE
@@ -147,7 +148,6 @@ QN_DECLARE_METAOBJECT_HEADER(Qn,
         /** Second stream does not affect first stream's fps. */
         NoFpsSharing
     };
-
 
     using MotionType = nx::vms::api::MotionType;
     using MotionTypes = nx::vms::api::MotionTypes;

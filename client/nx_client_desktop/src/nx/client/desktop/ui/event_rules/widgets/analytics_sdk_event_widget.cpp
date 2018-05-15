@@ -38,17 +38,17 @@ AnalyticsSdkEventWidget::AnalyticsSdkEventWidget(QWidget* parent):
     connect(ui->sdkEventTypeComboBox, QnComboboxCurrentIndexChanged, this,
         &AnalyticsSdkEventWidget::paramsChanged);
 
-    ui->sdkEventTypeLabelHint->addHintLine(tr("Analytics events can be set up on a certain cameras."));
-    ui->sdkEventTypeLabelHint->addHintLine(tr("Choose cameras using the button above to see the list of supported events."));
-    ui->sdkEventTypeLabelHint->setHelpTopic(Qn::EventsActions_VideoAnalytics_Help);
+    ui->sdkEventTypeLabel->addHintLine(tr("Analytics events can be set up on a certain cameras."));
+    ui->sdkEventTypeLabel->addHintLine(tr("Choose cameras using the button above to see the list of supported events."));
+    ui->sdkEventTypeLabel->setHelpTopic(Qn::EventsActions_VideoAnalytics_Help);
 
-    ui->captionLabelHint->addHintLine(tr("Event will trigger only if there are matches in caption with any of entered keywords."));
-    ui->captionLabelHint->addHintLine(tr("If the field is empty, event will always trigger."));
-    ui->captionLabelHint->setHelpTopic(Qn::EventsActions_VideoAnalytics_Help);
+    ui->captionLabel->addHintLine(tr("Event will trigger only if there are matches in caption with any of entered keywords."));
+    ui->captionLabel->addHintLine(tr("If the field is empty, event will always trigger."));
+    ui->captionLabel->setHelpTopic(Qn::EventsActions_VideoAnalytics_Help);
 
-    ui->descriptionLabelHint->addHintLine(tr("Event will trigger only if there are matches in the description field with any of the entered keywords."));
-    ui->descriptionLabelHint->addHintLine(tr("If the field is empty, event will always trigger."));
-    ui->descriptionLabelHint->setHelpTopic(Qn::EventsActions_VideoAnalytics_Help);
+    ui->descriptionLabel->addHintLine(tr("Event will trigger only if there are matches in the description field with any of the entered keywords."));
+    ui->descriptionLabel->addHintLine(tr("If the field is empty, event will always trigger."));
+    ui->descriptionLabel->setHelpTopic(Qn::EventsActions_VideoAnalytics_Help);
 }
 
 AnalyticsSdkEventWidget::~AnalyticsSdkEventWidget()

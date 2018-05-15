@@ -19,8 +19,11 @@
 #include <core/resource_management/resource_pool.h>
 #include <core/resource_management/resource_data_pool.h>
 
+#include <utils/xml/camera_advanced_param_reader.h>
+
 #include <nx/client/desktop/common/utils/aligner.h>
 #include <ui/style/webview_style.h>
+#include <nx/client/desktop/resource_properties/camera/camera_advanced_settings_web_page.h>
 
 #include <vms_gateway_embeddable.h>
 
@@ -145,7 +148,9 @@ bool CameraAdvancedSettingsWidget::hasManualPage() const
 {
     if (!m_camera || !isStatusValid(m_camera->getStatus()))
         return false;
-    return !m_camera->getProperty(Qn::CAMERA_ADVANCED_PARAMETERS).isEmpty();
+
+    auto params = QnCameraAdvancedParamsReader::paramsFromResource(m_camera);
+    return !params.groups.empty();
 }
 
 bool CameraAdvancedSettingsWidget::hasWebPage() const

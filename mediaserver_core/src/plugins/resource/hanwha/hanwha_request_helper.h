@@ -4,7 +4,7 @@
 
 #include <boost/optional.hpp>
 
-#include <nx/utils/thread/semaphore.h>
+#include <nx/utils/thread/rw_lock.h>
 
 #include <core/resource/resource_fwd.h>
 #include <plugins/resource/hanwha/hanwha_attributes.h>
@@ -37,13 +37,12 @@ public:
         const QString& cgi,
         const QString& submenu,
         const QString& action,
-        const Parameters& parameters = Parameters(),
-        const QString& groupBy = QString());
+        nx::utils::RwLockType lockType,
+        const Parameters& parameters = Parameters());
 
     HanwhaResponse view(
         const QString& path,
-        const Parameters& parameters = Parameters(),
-        const QString& groupBy = QString());
+        const Parameters& parameters = Parameters());
 
     HanwhaResponse set(
         const QString& path,
@@ -69,7 +68,7 @@ public:
         const QString& path,
         const Parameters& parameters = Parameters());
 
-    void setIgnoreMutexAnalyzer(bool ignoreMutexAnalyzer);
+    void setGroupBy(const QString& groupBy);
 
     static utils::Url buildRequestUrl(
         utils::Url deviceUrl,
@@ -95,6 +94,7 @@ private:
     bool doRequestInternal(
         const utils::Url& url,
         const QAuthenticator& auth,
+        nx::utils::RwLockType requestType,
         nx::Buffer* outBuffer,
         nx::network::http::StatusCode::Value* outStatusCode);
 
@@ -102,13 +102,13 @@ private:
         const QString& action,
         const QString& path,
         const Parameters& parameters,
-        const QString& groupBy = QString());
+        nx::utils::RwLockType requestType);
 
     utils::Url makeBypassUrl(const utils::Url &url) const;
 
 private:
     const std::shared_ptr<HanwhaSharedResourceContext> m_resourceContext;
-    bool m_ignoreMutexAnalyzer = false;
+    QString m_groupBy;
     boost::optional<int> m_bypassChannel;
 };
 

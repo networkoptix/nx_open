@@ -18,9 +18,8 @@ class CameraSettingsPanicWatcher:
     using base_type = QObject;
 
 public:
-    explicit CameraSettingsPanicWatcher(QObject* parent = nullptr);
-
-    void setStore(CameraSettingsDialogStore* store);
+    explicit CameraSettingsPanicWatcher(
+        CameraSettingsDialogStore* store, QObject* parent = nullptr);
 };
 
 } // namespace desktop

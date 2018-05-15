@@ -36,48 +36,6 @@
       <item row="0" column="1">
        <widget class="QComboBox" name="languageComboBox"/>
       </item>
-      <item row="1" column="0">
-       <layout class="QHBoxLayout" name="timeModeHorizontalLayout" stretch="0,1">
-        <item>
-         <widget class="QLabel" name="timeModeLabel">
-          <property name="sizePolicy">
-           <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-            <horstretch>0</horstretch>
-            <verstretch>0</verstretch>
-           </sizepolicy>
-          </property>
-          <property name="text">
-           <string>Time Mode</string>
-          </property>
-          <property name="alignment">
-           <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-          </property>
-          <property name="buddy">
-           <cstring>timeModeComboBox</cstring>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="nx::client::desktop::HintButton" name="timeModeHint" native="true">
-          <property name="sizePolicy">
-           <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-            <horstretch>0</horstretch>
-            <verstretch>0</verstretch>
-           </sizepolicy>
-          </property>
-          <property name="minimumSize">
-           <size>
-            <width>10</width>
-            <height>10</height>
-           </size>
-          </property>
-          <property name="hint" stdset="0">
-           <string>Time, which will be displayed on the timeline if client and servers machines are in the different time zones</string>
-          </property>
-         </widget>
-        </item>
-       </layout>
-      </item>
       <item row="1" column="1">
        <widget class="QComboBox" name="timeModeComboBox">
         <property name="minimumSize">
@@ -100,6 +58,9 @@
       </item>
       <item row="3" column="1">
        <layout class="QHBoxLayout" name="showIpInTreeCheckBoxLayout" stretch="0,1,0">
+        <property name="spacing">
+         <number>4</number>
+        </property>
         <property name="sizeConstraint">
          <enum>QLayout::SetMinimumSize</enum>
         </property>
@@ -118,18 +79,6 @@
         </item>
         <item>
          <widget class="nx::client::desktop::HintButton" name="showIpInTreeCheckBoxHint" native="true">
-          <property name="sizePolicy">
-           <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-            <horstretch>0</horstretch>
-            <verstretch>0</verstretch>
-           </sizepolicy>
-          </property>
-          <property name="minimumSize">
-           <size>
-            <width>10</width>
-            <height>10</height>
-           </size>
-          </property>
           <property name="hint" stdset="0">
            <string>IP addresses for cameras, and servers, groups for users, etc.</string>
           </property>
@@ -143,54 +92,10 @@
           <property name="sizeHint" stdset="0">
            <size>
             <width>40</width>
-            <height>20</height>
+            <height>0</height>
            </size>
           </property>
          </spacer>
-        </item>
-       </layout>
-      </item>
-      <item row="4" column="0">
-       <layout class="QHBoxLayout" name="tourCycleTimeLabelLayout" stretch="0,1">
-        <item>
-         <widget class="QLabel" name="tourCycleTimeLabel">
-          <property name="sizePolicy">
-           <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-            <horstretch>0</horstretch>
-            <verstretch>0</verstretch>
-           </sizepolicy>
-          </property>
-          <property name="text">
-           <string>Tour cycle</string>
-          </property>
-          <property name="alignment">
-           <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-          </property>
-          <property name="buddy">
-           <cstring>tourCycleTimeSpinBox</cstring>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="nx::client::desktop::HintButton" name="tourCycleTimeLabelHint" native="true">
-          <property name="sizePolicy">
-           <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-            <horstretch>0</horstretch>
-            <verstretch>0</verstretch>
-           </sizepolicy>
-          </property>
-          <property name="minimumSize">
-           <size>
-            <width>10</width>
-            <height>10</height>
-           </size>
-          </property>
-          <property name="hint" stdset="0">
-           <string>
-                  Time, for which every camera on layout will be displayed if you start Layout Tour
-                </string>
-          </property>
-         </widget>
         </item>
        </layout>
       </item>
@@ -217,6 +122,44 @@
          </widget>
         </item>
        </layout>
+      </item>
+      <item row="1" column="0">
+       <widget class="nx::client::desktop::LabelWithHint" name="timeModeLabel">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="text">
+         <string>Time Mode</string>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+        </property>
+        <property name="buddy">
+         <cstring>timeModeComboBox</cstring>
+        </property>
+       </widget>
+      </item>
+      <item row="4" column="0">
+       <widget class="nx::client::desktop::LabelWithHint" name="tourCycleTimeLabel">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="text">
+         <string>Tour cycle</string>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+        </property>
+        <property name="buddy">
+         <cstring>tourCycleTimeSpinBox</cstring>
+        </property>
+       </widget>
       </item>
      </layout>
     </widget>
@@ -322,7 +265,7 @@
           <property name="sizeHint" stdset="0">
            <size>
             <width>40</width>
-            <height>20</height>
+            <height>0</height>
            </size>
           </property>
          </spacer>
@@ -355,6 +298,11 @@
    <class>nx::client::desktop::HintButton</class>
    <extends>QWidget</extends>
    <header location="global">nx/client/desktop/common/widgets/hint_button.h</header>
+  </customwidget>
+  <customwidget>
+   <class>nx::client::desktop::LabelWithHint</class>
+   <extends>QLabel</extends>
+   <header location="global">nx/client/desktop/common/widgets/widget_with_hint.h</header>
   </customwidget>
  </customwidgets>
  <tabstops>

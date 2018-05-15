@@ -176,7 +176,7 @@ SingleCameraSettingsWidget::SingleCameraSettingsWidget(QWidget *parent) :
             ui->cameraScheduleWidget->setScheduleEnabled(ui->licensingWidget->state() == Qt::Checked);
         });
 
-    connect(ui->expertSettingsWidget, &CameraExpertSettingsWidget::dataChanged,
+    connect(ui->expertSettingsWidget, &LegacyExpertSettingsWidget::dataChanged,
         this, &SingleCameraSettingsWidget::at_dbDataChanged);
 
     connect(ui->fisheyeSettingsWidget, &FisheyeSettingsWidget::dataChanged,

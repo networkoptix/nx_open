@@ -34,6 +34,7 @@ public:
     void applyChanges();
     void setReadOnly(bool value);
     void setPanicMode(bool value);
+    void setSettingsOptimizationEnabled(bool value);
     void loadCameras(const QnVirtualCameraResourceList& cameras);
     void setSingleCameraUserName(const QString& text);
     void setScheduleBrush(const ScheduleCellParams& brush);
@@ -60,6 +61,17 @@ public:
     void setFisheyeSettings(const QnMediaDewarpingParams& value);
     void setIoPortDataList(const QnIOPortDataList& value);
     void setIoModuleVisualStyle(vms::api::IoModuleVisualStyle value);
+    void setCameraControlDisabled(bool value);
+    void setDualStreamingDisabled(bool value);
+    void setUseBitratePerGOP(bool value);
+    void setPrimaryRecordingDisabled(bool value);
+    void setSecondaryRecordingDisabled(bool value);
+    void setNativePtzPresetsDisabled(bool value);
+    void setRtpTransportType(vms::api::RtpTransportType value);
+    void setMotionStreamType(vms::api::MotionStreamType value);
+    void setLogicalId(int value);
+    void generateLogicalId();
+    void resetExpertSettings();
 
 signals:
     void stateChanged(const CameraSettingsDialogState& state);

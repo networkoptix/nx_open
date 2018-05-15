@@ -101,7 +101,7 @@
                         dataType="Enumeration"
                         range="CBR,VBR"
                         writeCmd="update"
-                        aux="range=media/videoprofile/add_update/H264.BitrateControlType;profile=primary;resourceProperty=primaryStreamBitrateControl;group=primaryCodec;groupInclude=H264">
+                        aux="range=media/videoprofile/add_update/H264.BitrateControlType;profile=primary;resourceProperty=primaryStreamBitrateControl;group=primaryCodec;groupInclude=H264;associatedWith=PRIMARY%media/videoprofile/Bitrate">
                     <dependencies>
                         <dependencies-show>
                             <conditional-show>
@@ -313,7 +313,7 @@
                         name="Bitrate Control Type"
                         dataType="Enumeration"
                         writeCmd="update"
-                        aux="range=media/videoprofile/add_update/H264.BitrateControlType;profile=secondary;resourceProperty=secondaryStreamBitrateControl;group=secondaryCodec;groupInclude=H264">
+                        aux="range=media/videoprofile/add_update/H264.BitrateControlType;profile=secondary;resourceProperty=secondaryStreamBitrateControl;group=secondaryCodec;groupInclude=H264;associatedWith=SECONDARY%media/videoprofile/Bitrate">
                     <dependencies>
                         <dependencies-show>
                             <conditional-show>

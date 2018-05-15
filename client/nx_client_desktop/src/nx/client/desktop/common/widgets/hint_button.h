@@ -10,8 +10,8 @@ namespace client {
 namespace desktop {
 
 /**
- * Question mark that spawns tooltip when hovered
- * It can be attached to QGroupBox and appear right after caption
+ * Question mark that spawns tooltip when hovered.
+ * It can be attached to QGroupBox and appear right after its caption.
  */
 class HintButton: public QWidget
 {
@@ -22,7 +22,7 @@ class HintButton: public QWidget
 public:
     HintButton(QWidget* parent);
 
-    // Create hint button, that is attached to box's header
+    // Create hint button, that is attached to box's header.
     static HintButton* hintThat(QGroupBox* groupBox);
 
     void addHintLine(QString line);
@@ -30,18 +30,19 @@ public:
     bool isClickable() const;
     void setHint(QString hint);
     QString hint() const;
-
-protected:
-    void showTooltip(bool show);
+    // Returns prefered size from internal pixmap.
+    QSize hintMarkSize() const;
+    QSize sizeHint() const override;
     // Updates geometry, relative to current groupBox state.
     void updateGeometry(QGroupBox* parent);
 
-    QSize sizeHint() const override;
-    void paintEvent(QPaintEvent* event) override;
-    void mouseReleaseEvent(QMouseEvent *event) override;
-    void enterEvent(QEvent * event) override;
-    void leaveEvent(QEvent * event) override;
-    bool eventFilter(QObject *obj, QEvent *event) override;
+protected:
+    void showTooltip(bool show);
+    virtual void paintEvent(QPaintEvent* event) override;
+    void mouseReleaseEvent(QMouseEvent* event) override;
+    void enterEvent(QEvent* event) override;
+    void leaveEvent(QEvent* event) override;
+    bool eventFilter(QObject* obj, QEvent* event) override;
 
 protected:
     bool m_isHovered = false;

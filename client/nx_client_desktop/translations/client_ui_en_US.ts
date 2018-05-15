@@ -89,11 +89,6 @@
     </message>
     <message>
         <location/>
-        <source>Disable only if the client takes too much CPU</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location/>
         <source>Maximum Live Buffer Length</source>
         <translation></translation>
     </message>
@@ -121,6 +116,20 @@
         <location/>
         <source>Disable blur</source>
         <translation></translation>
+    </message>
+    <message>
+        <location/>
+        <source>
+            Helps avoid problems with OpenGL drawing, which result in 100% CPU load.
+          </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>
+              Bigger buffer makes playback smoother but increases the delay between real situation and live view.
+            </source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -2020,6 +2029,11 @@
         <location/>
         <source>Tour cycle</source>
         <translation></translation>
+    </message>
+    <message>
+        <location/>
+        <source>IP addresses for cameras, and servers, groups for users, etc.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
