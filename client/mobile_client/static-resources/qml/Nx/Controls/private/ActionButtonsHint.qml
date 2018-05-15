@@ -47,7 +47,7 @@ Rectangle
             {
                 target: control
                 property: "opacity"
-                duration: 80
+                duration: 160
             }
         },
         Transition
@@ -59,21 +59,23 @@ Rectangle
             {
                 target: control
                 property: "opacity"
-                duration: 160
+                duration:  80
             }
         }
     ]
 
-    function showHint(text, iconPath, keepOpened)
+    function showHint(prefix, text, iconPath, keepOpened)
     {
         if (keepOpened)
             hideTimer.stop()
         else
             hideTimer.restart()
 
+        var prefixText = prefix ? prefix : ""
         loader.sourceComponent = textComponent
         loader.item.text = text
-        loader.item.color = ColorTheme.brightText
+        loader.item.prefix = prefixText
+        loader.item.textColor = ColorTheme.brightText
 
         activityPreloader.visible = false
 
@@ -105,7 +107,8 @@ Rectangle
 
         loader.sourceComponent = textComponent
         loader.item.text = text
-        loader.item.color = ColorTheme.brightText
+        loader.item.textColor = ColorTheme.brightText
+        loader.item.prefix = ""
 
         visualDataLoader.sourceComponent = dotsPreloader
         control.state = "visible"
@@ -113,7 +116,7 @@ Rectangle
 
     function showActivity(text, iconPath)
     {
-        showHint(text, iconPath, true)
+        showHint("", text, iconPath, true)
         activityPreloader.visible = true
     }
 
@@ -139,7 +142,8 @@ Rectangle
 
         loader.sourceComponent = textComponent
         loader.item.text = text
-        loader.item.color = customColor
+        loader.item.textColor = customColor
+        loader.item.prefix = ""
 
         visualDataLoader.sourceComponent = imageComponent
         visualDataLoader.item.source = success
@@ -201,15 +205,38 @@ Rectangle
     {
         id: textComponent
 
-        Text
+        Row
         {
-            height: 24
-            wrapMode: Text.NoWrap
-            verticalAlignment: Text.AlignVCenter
-            color: ColorTheme.brightText
-            font.pixelSize: 14
-            font.weight: Font.Normal
+            property alias text: textItem.text
+            property alias textColor: textItem.color
+            property alias prefix: prefixItem.text
+
+            Text
+            {
+                id: prefixItem
+
+                height: 24
+                wrapMode: Text.NoWrap
+                verticalAlignment: Text.AlignVCenter
+                color: ColorTheme.contrast16
+                font.pixelSize: 14
+                font.weight: Font.Normal
+                visible: text.length > 0
+            }
+
+            Text
+            {
+                id: textItem
+
+                height: 24
+                wrapMode: Text.NoWrap
+                verticalAlignment: Text.AlignVCenter
+                color: ColorTheme.brightText
+                font.pixelSize: 14
+                font.weight: Font.Normal
+            }
         }
+
     }
 
     Component

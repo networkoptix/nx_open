@@ -56,7 +56,9 @@ Item
             if (d.getType(index) != ActionButtonsModel.SoftTriggerButton || d.isProlonged(index))
                 return
 
-            if (!down)
+            if (down)
+                hintControl.showHint(d.getPrefix(index), d.getText(index), d.getIcon(index), true)
+            else
                 hintControl.hide()
         }
 
@@ -119,9 +121,10 @@ Item
                         else
                             d.tryActivateTrigger(index)
                     }
-                    else if (!d.isProlonged(index))
+                    else if (!d.isProlonged(index) && down)
                     {
-                        hintControl.showHint(d.getText(index), d.getIcon(index), true)
+                        hintControl.showHint(d.getPrefix(index),
+                            d.getText(index), d.getIcon(index), true)
                     }
                     return
                 default:
@@ -176,27 +179,46 @@ Item
 
         function isProlonged(index)
         {
-            return d.modelDataAccessor.getData(index, "prolongedAction")
+            return modelDataAccessor.getData(index, "prolongedAction")
         }
 
         function getType(index)
         {
-            return d.modelDataAccessor.getData(index, "type")
+            return modelDataAccessor.getData(index, "type")
         }
 
         function getId(index)
         {
-            return d.modelDataAccessor.getData(index, "id")
+            return modelDataAccessor.getData(index, "id")
+        }
+
+        function getPrefix(index)
+        {
+            switch(getType(index))
+            {
+                case ActionButtonsModel.PtzButton:
+                    return ""
+                case ActionButtonsModel.TwoWayAudioButton:
+                    return modelDataAccessor.getData(index, "hint")
+                case ActionButtonsModel.SoftTriggerButton:
+                    return isProlonged(index)
+                        ? qsTr("Press and hold to") + " "
+                        : ""
+                default:
+                    throw "Shouldn't get here"
+            }
         }
 
         function getText(index)
         {
-            return d.modelDataAccessor.getData(index, "hint")
+            return getType(index) == ActionButtonsModel.TwoWayAudioButton
+                ? ""
+                : modelDataAccessor.getData(index, "hint")
         }
 
         function getIcon(index)
         {
-            return d.modelDataAccessor.getData(index, "iconPath")
+            return modelDataAccessor.getData(index, "iconPath")
         }
 
         function tryActivateTrigger(index)
@@ -221,8 +243,8 @@ Item
         {
             if (isProlonged(index))
             {
-                d.tryDeactivateTrigger(index, true)
-                hintControl.showHint(getText(index), getIcon(index))
+                tryDeactivateTrigger(index, true)
+                hintControl.showHint(getPrefix(index), getText(index), getIcon(index))
             }
             else
             {
