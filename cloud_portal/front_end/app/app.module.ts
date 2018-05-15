@@ -2,11 +2,9 @@ import { NgModule }                                                       from '
 import { Location, PathLocationStrategy, LocationStrategy, CommonModule } from '@angular/common';
 import { BrowserModule }                                                  from '@angular/platform-browser';
 import { BrowserAnimationsModule }                                        from '@angular/platform-browser/animations';
-import { downgradeComponent, downgradeInjectable, UpgradeModule }         from '@angular/upgrade/static';
+import { UpgradeModule }                                                  from '@angular/upgrade/static';
 import { RouterModule, UrlHandlingStrategy, UrlTree }                     from '@angular/router';
 import { HttpClient, HttpClientModule }                                   from '@angular/common/http';
-
-import { FormsModule } from '@angular/forms';
 
 import { NgbModule }                        from '@ng-bootstrap/ng-bootstrap';
 import { NgbModal }                         from '@ng-bootstrap/ng-bootstrap';
@@ -16,30 +14,17 @@ import { TranslateModule, TranslateLoader } from '@ngx-translate/core';
 import { TranslateHttpLoader }              from '@ngx-translate/http-loader';
 import { CookieService }                    from "ngx-cookie-service";
 
-// bulk import
-import { cloudApiServiceModule }           from './ajs-upgraded-providers';
-import { systemsModule }                   from './ajs-upgraded-providers';
-import { languageServiceModule }           from './ajs-upgraded-providers';
-import { accountServiceModule }            from './ajs-upgraded-providers';
-import { processServiceModule }            from './ajs-upgraded-providers';
-import { uuid2ServiceModule }              from './ajs-upgraded-providers';
-import { ngToastModule }                   from './ajs-upgraded-providers';
-import { configServiceModule }             from './ajs-upgraded-providers';
-import { authorizationCheckServiceModule } from './ajs-upgraded-providers';
+import {
+    cloudApiServiceModule, systemsModule, languageServiceModule,
+    accountServiceModule, processServiceModule, uuid2ServiceModule,
+    ngToastModule, configServiceModule, authorizationCheckServiceModule
+} from './src/ajs-upgrade/ajs-upgraded-providers';
 
-// reduce import lines .... bulk import or move imports to the components
-import { AppComponent }                                       from './app.component';
-import { DownloadModule }                                     from './src/download/download.module';
-import { DownloadHistoryModule }                              from './src/download-history/download-history.module';
-import { DropdownsModule }                                    from './src/dropdowns/dropdowns.module';
-import { NxModalLoginComponent, LoginModalContent }           from "./src/dialogs/login/login.component";
-import { NxProcessButtonComponent }                           from './src/components/process-button/process-button.component';
-import { nxDialogsService }                                   from "./src/dialogs/dialogs.service";
-import { GeneralModalContent, NxModalGeneralComponent }       from "./src/dialogs/general/general.component";
-import { DisconnectModalContent, NxModalDisconnectComponent } from "./src/dialogs/disconnect/disconnect.component";
-import { RenameModalContent, NxModalRenameComponent }         from "./src/dialogs/rename/rename.component";
-import { ShareModalContent, NxModalShareComponent }           from "./src/dialogs/share/share.component";
-import { MergeModalContent, NxModalMergeComponent }           from "./src/dialogs/merge/merge.component";
+import { AppComponent }          from './app.component';
+import { DownloadModule }        from './src/download/download.module';
+import { DownloadHistoryModule } from './src/download-history/download-history.module';
+import { DropdownsModule }       from './src/dropdowns/dropdowns.module';
+import { DialogsModule }         from './src/dialogs/dialogs.module';
 
 // AoT requires an exported function for factories
 export function createTranslateLoader(http: HttpClient) {
@@ -68,7 +53,6 @@ class HybridUrlHandlingStrategy implements UrlHandlingStrategy {
         BrowserAnimationsModule,
         UpgradeModule,
         HttpClientModule,
-        FormsModule,
         OrderModule,
         DownloadModule,
         DownloadHistoryModule,
@@ -82,6 +66,7 @@ class HybridUrlHandlingStrategy implements UrlHandlingStrategy {
         configServiceModule,
         authorizationCheckServiceModule,
         DropdownsModule,
+        DialogsModule,
 
         TranslateModule.forRoot({
             loader: {
@@ -94,41 +79,16 @@ class HybridUrlHandlingStrategy implements UrlHandlingStrategy {
         NgbModule.forRoot(),
         RouterModule.forRoot([], {initialNavigation: true})
     ],
-    entryComponents: [
-        NxProcessButtonComponent,
-        LoginModalContent, NxModalLoginComponent,
-        GeneralModalContent, NxModalGeneralComponent,
-        DisconnectModalContent, NxModalDisconnectComponent,
-        RenameModalContent, NxModalRenameComponent,
-        ShareModalContent, NxModalShareComponent,
-        MergeModalContent, NxModalMergeComponent
-    ],
+    entryComponents: [],
     providers: [
         NgbModal,
         Location,
         CookieService,
         {provide: LocationStrategy, useClass: PathLocationStrategy},
-        {provide: UrlHandlingStrategy, useClass: HybridUrlHandlingStrategy},
-        // {provide: '$scope', useFactory: i => i.get('$rootScope'), deps: ['$injector']},
-        // {provide: '$rootScope', useFactory: i => i.get('$rootScope'), deps: ['$injector']},
-        NxModalLoginComponent,
-        NxModalGeneralComponent,
-        NxModalDisconnectComponent,
-        NxModalRenameComponent,
-        NxModalShareComponent,
-        NxModalMergeComponent,
-        NxProcessButtonComponent,
-        nxDialogsService
+        {provide: UrlHandlingStrategy, useClass: HybridUrlHandlingStrategy}
     ],
     declarations: [
         AppComponent,
-        LoginModalContent, NxModalLoginComponent,
-        GeneralModalContent, NxModalGeneralComponent,
-        DisconnectModalContent, NxModalDisconnectComponent,
-        RenameModalContent, NxModalRenameComponent,
-        ShareModalContent, NxModalShareComponent,
-        MergeModalContent, NxModalMergeComponent,
-        NxProcessButtonComponent,
     ],
     bootstrap: [AppComponent]
 })
@@ -137,13 +97,4 @@ export class AppModule {
     ngDoBootstrap() {
     }
 }
-
-declare var angular: angular.IAngularStatic;
-// angular
-//     .module('cloudApp.directives')
-//     .directive('nxModalLogin', downgradeComponent({component: NxModalLoginComponent}) as angular.IDirectiveFactory);
-
-angular
-    .module('cloudApp.services')
-    .service('nxDialogsService', downgradeInjectable(nxDialogsService));
 

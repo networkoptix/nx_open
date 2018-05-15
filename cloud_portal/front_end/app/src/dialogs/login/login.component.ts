@@ -1,8 +1,6 @@
 import { Component, Inject, OnInit, Input, ViewEncapsulation } from '@angular/core';
 import { Location, LocationStrategy, PathLocationStrategy }    from '@angular/common';
 import { NgbModal, NgbActiveModal, NgbModalRef }               from '@ng-bootstrap/ng-bootstrap';
-import { EmailValidator }                                      from '@angular/forms';
-import { TranslateService }                                    from '@ngx-translate/core';
 
 @Component({
     selector: 'ngbd-modal-content',

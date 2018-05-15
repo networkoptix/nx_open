@@ -1,5 +1,4 @@
-import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
-import { FormControl } from '@angular/forms';
+import { Component, OnInit, Input } from '@angular/core';
 
 @Component({
     selector: 'nx-process-button',
@@ -27,16 +26,14 @@ export class NxProcessButtonComponent implements OnInit {
     }
 
     touchForm() {
-        for (const ctrl in this.form.form.controls) {
+        for (let ctrl in this.form.form.controls) {
             this.form.form.get(ctrl).markAsTouched();
         }
     }
 
     setFocusToInvalid() {
-        for(const ctrl in this.form.form.controls) {
-            const control = this.form.form.get(ctrl);
-
-            if (control.invalid) {
+        for(let ctrl in this.form.form.controls) {
+            if (this.form.form.get(ctrl).invalid) {
                 // TODO : find how to set element's focus
                 // control.focused = true;
                 return;
@@ -55,5 +52,4 @@ export class NxProcessButtonComponent implements OnInit {
             this.process.run();
         }
     }
-
 }

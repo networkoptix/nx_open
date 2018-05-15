@@ -1,0 +1,59 @@
+import { NgModule }     from '@angular/core';
+import { CommonModule } from '@angular/common';
+
+import { ComponentsModule }                                   from '../components/components.module';
+
+import { nxDialogsService }                                   from "./dialogs.service";
+import { NxModalLoginComponent, LoginModalContent }           from "./login/login.component";
+import { GeneralModalContent, NxModalGeneralComponent }       from "./general/general.component";
+import { DisconnectModalContent, NxModalDisconnectComponent } from "./disconnect/disconnect.component";
+import { RenameModalContent, NxModalRenameComponent }         from "./rename/rename.component";
+import { ShareModalContent, NxModalShareComponent }           from "./share/share.component";
+import { MergeModalContent, NxModalMergeComponent }           from "./merge/merge.component";
+import { downgradeInjectable }                                from "@angular/upgrade/static";
+import { FormsModule, EmailValidator }                        from "@angular/forms";
+import { TranslateModule }                                    from '@ngx-translate/core';
+
+
+@NgModule({
+    imports: [
+        CommonModule,
+        FormsModule,
+        TranslateModule,
+        ComponentsModule
+    ],
+    declarations: [
+        LoginModalContent, NxModalLoginComponent,
+        GeneralModalContent, NxModalGeneralComponent,
+        DisconnectModalContent, NxModalDisconnectComponent,
+        RenameModalContent, NxModalRenameComponent,
+        ShareModalContent, NxModalShareComponent,
+        MergeModalContent, NxModalMergeComponent,
+    ],
+    entryComponents: [
+        LoginModalContent, NxModalLoginComponent,
+        GeneralModalContent, NxModalGeneralComponent,
+        DisconnectModalContent, NxModalDisconnectComponent,
+        RenameModalContent, NxModalRenameComponent,
+        ShareModalContent, NxModalShareComponent,
+        MergeModalContent, NxModalMergeComponent
+    ],
+    providers: [
+        nxDialogsService,
+        NxModalLoginComponent,
+        NxModalGeneralComponent,
+        NxModalDisconnectComponent,
+        NxModalRenameComponent,
+        NxModalShareComponent,
+        NxModalMergeComponent,
+    ],
+    exports: []
+})
+export class DialogsModule {
+}
+
+declare var angular: angular.IAngularStatic;
+angular
+    .module('cloudApp.services')
+    .service('nxDialogsService', downgradeInjectable(nxDialogsService));
+
