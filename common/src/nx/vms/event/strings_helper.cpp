@@ -424,8 +424,8 @@ QString StringsHelper::eventTimestamp(const EventParameters &params,
             .arg(datetime::toString(time.time()))
             .arg(datetime::toString(time.date()))
         : tr("First occurrence: %1 on %2 (%n times total)", "%1 means time, %2 means date", count)
-            .arg(datetime::toString(time.time())
-            .arg(datetime::toString(time.date())));
+            .arg(datetime::toString(time.time()))
+            .arg(datetime::toString(time.date()));
 }
 
 QString StringsHelper::eventTimestampDate(const EventParameters &params) const
