@@ -3,10 +3,10 @@
 import logging
 import uuid
 
-from framework.os_access.path import FileSystemPath
+from framework.os_access.path import FileSystemPath, copy_file
 from framework.rest_api import RestApi
+from .dpkg_installation import DPKGInstallation, MEDIASERVER_CONFIG_PATH, MEDIASERVER_CONFIG_PATH_INITIAL
 from .mediaserver import Mediaserver
-from .mediaserver_installation import MEDIASERVER_CONFIG_PATH, MEDIASERVER_CONFIG_PATH_INITIAL, MediaserverInstallation
 from .service import AdHocService
 from .template_renderer import TemplateRenderer
 from .utils import is_list_inst
@@ -109,7 +109,7 @@ class PhysicalInstallationHost(object):
         self._template_renderer = TemplateRenderer()
         self._dist_unpacked = self.unpacked_mediaserver_dir.exists()
         self._ensure_root_dir_exists()
-        self._installations = list(self._read_installations())  # MediaserverInstallation list.
+        self._installations = list(self._read_installations())  # DPKGInstallation list.
         self._available_installations = self._installations[:]  # Set up but not allocated yet.
         self._allocated_server_list = []
 
@@ -168,14 +168,14 @@ class PhysicalInstallationHost(object):
             return
         remote_dist_path = self._remote_dist_root / self._deb_path.name
         self._remote_dist_root.parent.mkdir(parents=True, exist_ok=True)
-        self._remote_dist_root.upload(self._deb_path)
+        copy_file(self._deb_path, self._remote_dist_root)
         self.os_access.run_command(['dpkg', '--extract', remote_dist_path, self._unpacked_mediaserver_root_dir])
         if not self.unpacked_mediaserver_dir.exists():
             raise RuntimeError(
                 'Provided package was built with another customization. '
                 'Expected: {}. But files in unpacked dir are:\n{}'.format(
                     self._customization_company_name,
-                    self._unpacked_mediaserver_root_dir.joinpath('opt').iterdir(),
+                    self._unpacked_mediaserver_root_dir.joinpath('opt').glob('*'),
                     ),
                 )
         self._dist_unpacked = True
@@ -189,7 +189,7 @@ class PhysicalInstallationHost(object):
 
     def _read_installations(self):
         for dir in self.root_dir.glob('server-*'):
-            yield MediaserverInstallation(self.os_access, dir)
+            yield DPKGInstallation(self.os_access, dir)
 
     def _ensure_servers_are_stopped(self):
         for installation in self._installations:
@@ -203,7 +203,7 @@ class PhysicalInstallationHost(object):
         idx = len(self._installations)
         dir = self.root_dir / ('server-%03d' % (idx + 1))
         self._prepare_installation_dir(dir, self._installation_server_port(idx))
-        installation = MediaserverInstallation(self.os_access, dir)
+        installation = DPKGInstallation(self.os_access, dir)
         self._installations.append(installation)
         return installation
 

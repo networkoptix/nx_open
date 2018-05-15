@@ -9,6 +9,8 @@
 #include <nx/api/analytics/supported_events.h>
 #include <nx/vms/event/events/events_fwd.h>
 
+#include <nx/core/resource/device_type.h>
+
 #include <utils/common/value_cache.h>
 #include <common/common_globals.h>
 #include <api/model/api_ioport_data.h>
@@ -121,6 +123,10 @@ public:
 
     bool isMultiSensorCamera() const;
 
+    nx::core::resource::DeviceType deviceType() const;
+
+    void setDeviceType(nx::core::resource::DeviceType);
+
     virtual Qn::StreamFpsSharingMethod streamFpsSharingMethod() const;
     void setStreamFpsSharingMethod(Qn::StreamFpsSharingMethod value);
 
@@ -167,10 +173,6 @@ public:
     virtual void setGroupId(const QString& value);
 
     virtual QString getSharedId() const;
-
-    // Proxied id is an id of a device connected to some proxy (e.g. NVR)
-    virtual QString getProxiedId() const;
-    virtual void setProxiedId(const QString& proxiedId);
 
     /** Check if a license is used for the current camera. */
     bool isLicenseUsed() const;
@@ -438,6 +440,7 @@ private:
     Qn::MotionType calculateMotionType() const;
     CachedValue<nx::api::AnalyticsSupportedEvents> m_cachedAnalyticsSupportedEvents;
     CachedValue<nx::media::CameraMediaCapability> m_cachedCameraMediaCapabilities;
+    CachedValue<nx::core::resource::DeviceType> m_cachedDeviceType;
 
 private slots:
     void resetCachedValues();

@@ -764,16 +764,16 @@
     </message>
     <message>
       <location/>
-      <source>Logical Id</source>
-      <translation>Id Lógico</translation>
+      <source>Logical ID</source>
+      <translation>ID Lógico</translation>
     </message>
   </context>
   <context>
     <name>CameraInputBusinessEventWidget</name>
     <message>
       <location filename="../src/ui/widgets/business/camera_input_business_event_widget.ui"/>
-      <source>Input Id</source>
-      <translation>Entrada Id</translation>
+      <source>Input ID</source>
+      <translation>Entrada ID</translation>
     </message>
   </context>
   <context>
@@ -798,8 +798,8 @@
     </message>
     <message>
       <location/>
-      <source>Output Id:</source>
-      <translation>Salida Id:</translation>
+      <source>Output ID:</source>
+      <translation>Salida ID:</translation>
     </message>
   </context>
   <context>
@@ -1513,8 +1513,8 @@
     </message>
     <message>
       <location/>
-      <source>Locked to Hardware Id:</source>
-      <translation>Enlazado al Hardware Id:</translation>
+      <source>Locked to Hardware ID:</source>
+      <translation>Enlazado al Hardware ID:</translation>
     </message>
   </context>
   <context>
@@ -1612,8 +1612,8 @@
     </message>
     <message>
       <location/>
-      <source>Hardware Id</source>
-      <translation>Hardware Id</translation>
+      <source>Hardware ID</source>
+      <translation type="unfinished">Hardware ID</translation>
     </message>
   </context>
   <context>

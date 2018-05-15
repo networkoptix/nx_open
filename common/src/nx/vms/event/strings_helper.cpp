@@ -131,7 +131,7 @@ QString StringsHelper::eventName(EventType value, int count) const
     switch (value)
     {
         case EventType::cameraMotionEvent:    return tr("Motion on Cameras", "", count);
-        case EventType::storageFailureEvent:  return tr("Storage Failure");
+        case EventType::storageFailureEvent:  return tr("Storage Issue");
         case EventType::networkIssueEvent:    return tr("Network Issue");
         case EventType::serverFailureEvent:   return tr("Server Failure");
         case EventType::serverConflictEvent:  return tr("Server Conflict");
@@ -200,7 +200,7 @@ QString StringsHelper::eventAtResource(const EventParameters& params,
             return tr("Motion on %1").arg(resourceName);
 
         case EventType::storageFailureEvent:
-            return tr("Storage Failure at %1").arg(resourceName);
+            return tr("Storage Issue at %1").arg(resourceName);
 
         case EventType::networkIssueEvent:
             return tr("Network Issue at %1").arg(resourceName);
@@ -242,6 +242,13 @@ QString StringsHelper::eventAtResource(const EventParameters& params,
                 .arg(resourceName);
 
         case EventType::analyticsSdkEvent:
+            if (!params.caption.isEmpty())
+            {
+                return tr("%1 - %2")
+                    .arg(getAnalyticsSdkEventName(params))
+                    .arg(params.caption);
+            }
+
             return tr("%1 at %2", "Analytics Event at some camera")
                 .arg(getAnalyticsSdkEventName(params))
                 .arg(resourceName);

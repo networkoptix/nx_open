@@ -5,7 +5,6 @@ import time
 import pytest
 
 from framework.api_shortcuts import get_server_id
-from framework.merging import merge_systems
 
 log = logging.getLogger(__name__)
 

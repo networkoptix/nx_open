@@ -169,6 +169,13 @@ void ConnectionProcessor::run()
         return;
     parseRequest();
 
+    if (commonModule()->isStandAloneMode())
+    {
+        NX_DEBUG(this, "Incoming messageBus connections are temporary disabled. Ignore new incoming connection.");
+        sendResponse(nx::network::http::StatusCode::forbidden, nx::network::http::StringType());
+        return;
+    }
+
     ec2::ApiPeerDataEx remotePeer = deserializeFromRequest(d->request);
     if (!isPeerCompatible(remotePeer))
     {

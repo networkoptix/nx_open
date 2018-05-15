@@ -212,6 +212,15 @@ void P2pMessageBusTestBase::connectServers(const Appserver2Ptr& srcServer, const
         addOutgoingConnectionToPeer(peerId, url);
 }
 
+void P2pMessageBusTestBase::disconnectServers(const Appserver2Ptr& srcServer, const Appserver2Ptr& dstServer)
+{
+    const auto addr = dstServer->moduleInstance()->endpoint();
+    auto peerId = dstServer->moduleInstance()->commonModule()->moduleGUID();
+
+    srcServer->moduleInstance()->ecConnection()->messageBus()->
+        removeOutgoingConnectionFromPeer(peerId);
+}
+
 // connect servers: 0 --> 1 -->2 --> N
 void P2pMessageBusTestBase::sequenceConnect(std::vector<Appserver2Ptr>& servers)
 {

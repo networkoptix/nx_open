@@ -336,6 +336,10 @@ CameraDiagnostics::Result Camera::initInternal()
 
         m_lastInitTime.restart();
         m_lastCredentials = credentials;
+
+        m_mediaTraits = resData.value<nx::media::CameraTraits>(
+            Qn::kMediaTraits,
+            nx::media::CameraTraits());
     }
 
     m_streamCapabilityAdvancedProviders.clear();
@@ -349,6 +353,11 @@ CameraDiagnostics::Result Camera::initInternal()
     return initializeAdvancedParametersProviders();
 }
 
+nx::media::CameraTraits Camera::mediaTraits() const
+{
+    return m_mediaTraits;
+}
+
 QnAbstractPtzController* Camera::createPtzControllerInternal() const
 {
     return nullptr;
@@ -358,13 +367,22 @@ CameraDiagnostics::Result Camera::initializeAdvancedParametersProviders()
 {
     std::vector<Camera::AdvancedParametersProvider*> allProviders;
     boost::optional<QSize> baseResolution;
+    const StreamCapabilityMaps streamCapabilityMaps = {
+        {Qn::StreamIndex::primary, getStreamCapabilityMap(Qn::StreamIndex::primary)},
+        {Qn::StreamIndex::secondary, getStreamCapabilityMap(Qn::StreamIndex::secondary)}
+    };
+
+    const auto traits = mediaTraits();
     for (const auto streamType: {Qn::StreamIndex::primary, Qn::StreamIndex::secondary})
     {
-        auto streamCapabilities = getStreamCapabilityMap(streamType);
-        if (!streamCapabilities.isEmpty())
+        //auto streamCapabilities = getStreamCapabilityMap(streamType);
+        if (!streamCapabilityMaps[streamType].isEmpty())
         {
             auto provider = std::make_unique<StreamCapabilityAdvancedParametersProvider>(
-                this, streamCapabilities, streamType,
+                this,
+                streamCapabilityMaps,
+                traits,
+                streamType,
                 baseResolution ? *baseResolution : QSize());
 
             if (!baseResolution)

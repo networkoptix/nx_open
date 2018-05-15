@@ -2,10 +2,11 @@
 
 #include <limits>
 
+#include <camera/fps_calculator.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/resource_display_info.h>
-#include <camera/fps_calculator.h>
 #include <utils/camera/camera_bitrate_calculator.h>
+#include <nx/fusion/model_functions.h>
 #include <nx/utils/algorithm/same.h>
 
 namespace nx {
@@ -67,6 +68,15 @@ QString calculateWebPage(const Camera& camera)
     }
 
     return lit("<a href=\"%1\">%1</a>").arg(webPageAddress);
+}
+
+State::FisheyeCalibrationSettings fisheyeCalibrationSettings(const QnMediaDewarpingParams& params)
+{
+    State::FisheyeCalibrationSettings calibration;
+    calibration.offset = QPointF(params.xCenter - 0.5, params.yCenter - 0.5);
+    calibration.radius = params.radius;
+    calibration.aspectRatio = params.hStretch;
+    return calibration;
 }
 
 bool isMotionDetectionEnabled(const Camera& camera)
@@ -280,15 +290,15 @@ int calculateRecordingThresholdAfter(const Camera& camera)
 QnMotionRegion::ErrorCode validateMotionRegionList(const State& state,
     const QList<QnMotionRegion>& regionList)
 {
-    if (!state.singleCameraProperties.hasMotionConstraints)
+    if (!state.singleCameraProperties.motionConstraints)
         return QnMotionRegion::ErrorCode::Ok;
 
-    for (const auto& region : regionList)
+    for (const auto& region: regionList)
     {
         const auto errorCode = region.isValid(
-            state.singleCameraProperties.maxMotionRects,
-            state.singleCameraProperties.maxMotionMaskRects,
-            state.singleCameraProperties.maxMotionSensitivityRects);
+            state.singleCameraProperties.motionConstraints->maxTotalRects,
+            state.singleCameraProperties.motionConstraints->maxMaskRects,
+            state.singleCameraProperties.motionConstraints->maxSensitiveRects);
 
         if (errorCode != QnMotionRegion::ErrorCode::Ok)
             return errorCode;
@@ -329,6 +339,7 @@ State CameraSettingsDialogStateReducer::loadCameras(
     state.hasChanges = false;
     state.singleCameraProperties = {};
     state.singleCameraSettings = {};
+    state.singleIoModuleSettings = {};
     state.devicesDescription = {};
     state.recording = {};
     state.devicesCount = cameras.size();
@@ -338,6 +349,8 @@ State CameraSettingsDialogStateReducer::loadCameras(
         [](const Camera& camera) { return camera->isDtsBased(); });
     state.devicesDescription.isWearable = combinedValue(cameras,
         [](const Camera& camera) { return camera->hasFlags(Qn::wearable_camera); });
+    state.devicesDescription.isIoModule = combinedValue(cameras,
+        [](const Camera& camera) { return camera->isIOModule(); });
     state.devicesDescription.hasMotion = combinedValue(cameras,
         [](const Camera& camera) { return camera->hasMotion(); });
     state.devicesDescription.hasDualStreaming = combinedValue(cameras,
@@ -352,22 +365,23 @@ State CameraSettingsDialogStateReducer::loadCameras(
         singleProperties.macAddress = firstCamera->getMAC().toString();
         singleProperties.model = firstCamera->getModel();
         singleProperties.vendor = firstCamera->getVendor();
+        singleProperties.hasVideo = firstCamera->hasVideo();
 
-        singleProperties.hasMotionConstraints =
-            firstCamera->getDefaultMotionType() == Qn::MotionType::MT_HardwareGrid;
+        if (firstCamera->getDefaultMotionType() == Qn::MotionType::MT_HardwareGrid)
+        {
+            singleProperties.motionConstraints = State::MotionConstraints();
+            singleProperties.motionConstraints->maxTotalRects = firstCamera->motionWindowCount();
+            singleProperties.motionConstraints->maxMaskRects = firstCamera->motionMaskWindowCount();
+            singleProperties.motionConstraints->maxSensitiveRects
+                = firstCamera->motionSensWindowCount();
+        }
 
-        if (singleProperties.hasMotionConstraints)
-        {
-            singleProperties.maxMotionRects = firstCamera->motionWindowCount();
-            singleProperties.maxMotionMaskRects = firstCamera->motionMaskWindowCount();
-            singleProperties.maxMotionSensitivityRects =
-                firstCamera->motionSensWindowCount();
-        }
-        else
-        {
-            singleProperties.maxMotionRects = singleProperties.maxMotionMaskRects
-                = singleProperties.maxMotionSensitivityRects = std::numeric_limits<int>::max();
-        }
+        const auto fisheyeParams = firstCamera->getDewarpingParams();
+        state.singleCameraSettings.enableFisheyeDewarping.setBase(fisheyeParams.enabled);
+        state.singleCameraSettings.fisheyeMountingType.setBase(fisheyeParams.viewMode);
+        state.singleCameraSettings.fisheyeFovRotation.setBase(fisheyeParams.fovRot);
+        state.singleCameraSettings.fisheyeCalibrationSettings.setBase(
+            fisheyeCalibrationSettings(fisheyeParams));
 
         state = loadNetworkInfo(std::move(state), firstCamera);
 
@@ -387,11 +401,18 @@ State CameraSettingsDialogStateReducer::loadCameras(
         {
             for (auto& region: regionList)
                 region = QnMotionRegion(); //< Reset to default.
-
-            // TODO: #vkutin #GDM Should we set hasChanges flag here?
         }
 
         state.singleCameraSettings.motionRegionList.setBase(regionList);
+
+        if (firstCamera->isIOModule())
+        {
+            state.singleIoModuleSettings.visualStyle.setBase(
+                QnLexical::deserialized<vms::api::IoModuleVisualStyle>(
+                    firstCamera->getProperty(Qn::IO_OVERLAY_STYLE_PARAM_NAME), {}));
+
+            state.singleIoModuleSettings.ioPortsData.setBase(firstCamera->getIOPorts());
+        }
 
         Qn::calculateMaxFps(
             {firstCamera},
@@ -463,7 +484,7 @@ State CameraSettingsDialogStateReducer::setScheduleBrush(
         state.maxRecordingBrushFps());
 
     state = setScheduleBrushFps(std::move(state), fps);
-    state.alert = State::Alert::BrushChanged;
+    state.alert = State::Alert::brushChanged;
 
     return state;
 }
@@ -482,7 +503,7 @@ State CameraSettingsDialogStateReducer::setScheduleBrushRecordingType(
             state.recording.brush.fps,
             state.maxRecordingBrushFps());
     }
-    state.alert = State::Alert::BrushChanged;
+    state.alert = State::Alert::brushChanged;
 
     return state;
 }
@@ -504,7 +525,7 @@ State CameraSettingsDialogStateReducer::setScheduleBrushFps(State state, int val
         state = loadMinMaxCustomBitrate(std::move(state));
         state = setCustomRecordingBitrateNormalized(std::move(state), normalizedBitrate);
     }
-    state.alert = State::Alert::BrushChanged;
+    state.alert = State::Alert::brushChanged;
 
     return state;
 }
@@ -515,7 +536,7 @@ State CameraSettingsDialogStateReducer::setScheduleBrushQuality(
 {
     state.recording.brush.quality = value;
     state = fillBitrateFromFixedQuality(std::move(state));
-    state.alert = State::Alert::BrushChanged;
+    state.alert = State::Alert::brushChanged;
 
     return state;
 }
@@ -533,7 +554,7 @@ State CameraSettingsDialogStateReducer::setSchedule(State state, const ScheduleT
 
     state.recording.schedule.setUser(processed);
 
-    if (state.alert == State::Alert::BrushChanged || state.alert == State::Alert::EmptySchedule)
+    if (state.alert == State::Alert::brushChanged || state.alert == State::Alert::emptySchedule)
         state.alert = {};
 
     return state;
@@ -671,8 +692,8 @@ State CameraSettingsDialogStateReducer::setMotionDetectionEnabled(State state, b
     state.singleCameraSettings.enableMotionDetection.setUser(value);
 
     if (state.hasMotion() && !state.recording.enabled())
-        state.alert = State::Alert::MotionDetectionRequiresRecording;
-    else if (state.alert == State::Alert::MotionDetectionRequiresRecording)
+        state.alert = State::Alert::motionDetectionRequiresRecording;
+    else if (state.alert == State::Alert::motionDetectionRequiresRecording)
         state.alert = {};
 
     return state;
@@ -687,13 +708,13 @@ State CameraSettingsDialogStateReducer::setMotionRegionList(
         switch (errorCode)
         {
             case QnMotionRegion::ErrorCode::Windows:
-                state.alert = State::Alert::MotionDetectionTooManyRectangles;
+                state.alert = State::Alert::motionDetectionTooManyRectangles;
                 break;
             case QnMotionRegion::ErrorCode::Masks:
-                state.alert = State::Alert::MotionDetectionTooManyMaskRectangles;
+                state.alert = State::Alert::motionDetectionTooManyMaskRectangles;
                 break;
             case QnMotionRegion::ErrorCode::Sens:
-                state.alert = State::Alert::MotionDetectionTooManySensitivityRectangles;
+                state.alert = State::Alert::motionDetectionTooManySensitivityRectangles;
                 break;
         }
 
@@ -702,6 +723,41 @@ State CameraSettingsDialogStateReducer::setMotionRegionList(
 
     state.hasChanges = true;
     state.singleCameraSettings.motionRegionList.setUser(value);
+    return state;
+}
+
+State CameraSettingsDialogStateReducer::setFisheyeSettings(
+    State state, const QnMediaDewarpingParams& value)
+{
+    state.singleCameraSettings.enableFisheyeDewarping.setUserIfChanged(value.enabled);
+    state.singleCameraSettings.fisheyeMountingType.setUserIfChanged(value.viewMode);
+    state.singleCameraSettings.fisheyeFovRotation.setUserIfChanged(value.fovRot);
+    state.singleCameraSettings.fisheyeCalibrationSettings.setUserIfChanged(
+        fisheyeCalibrationSettings(value));
+
+    state.hasChanges = true;
+    return state;
+}
+
+State CameraSettingsDialogStateReducer::setIoPortDataList(
+    State state, const QnIOPortDataList& value)
+{
+    if (!state.isSingleCamera() || state.devicesDescription.isIoModule != State::CombinedValue::All)
+        return state;
+
+    state.singleIoModuleSettings.ioPortsData.setUser(value);
+    state.hasChanges = true;
+    return state;
+}
+
+State CameraSettingsDialogStateReducer::setIoModuleVisualStyle(
+    State state, vms::api::IoModuleVisualStyle value)
+{
+    if (!state.isSingleCamera() || state.devicesDescription.isIoModule != State::CombinedValue::All)
+        return state;
+
+    state.singleIoModuleSettings.visualStyle.setUser(value);
+    state.hasChanges = true;
     return state;
 }
 

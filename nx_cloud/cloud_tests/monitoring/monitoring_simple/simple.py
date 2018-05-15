@@ -219,15 +219,17 @@ class CloudSession(object):
         assert next(filter(lambda x: x['accountEmail'] == self.user_email, data), None) is None, 'User still exists'
 
     def test_cloud_connect_base(self, extra_args=''):
+        image = '009544449203.dkr.ecr.us-east-1.amazonaws.com/cloud/cloud_connect_test_util:18.1.0.20026'
         command = '--log-level=DEBUG2 --http-client --url=http://{user}:{password}@{system_id}/ec2/getUsers {extra_args}'.format(
             user=quote(self.email),
             password=quote(self.password),
             system_id=self.system_id,
             extra_args=extra_args)
 
+        log.info('Running image: {} command: {}'.format(image, command))
+
         client = docker.client.from_env()
-        container = client.containers.run(
-            '009544449203.dkr.ecr.us-east-1.amazonaws.com/cloud/cloud_connect_test_util:18.1.0.13642', command, detach=True)
+        container = client.containers.run(image, command, detach=True)
         status = container.wait()
         log.info('Container exited with exit status {}'.format(status))
         stdout = container.logs(stdout=True, stderr=False)
@@ -242,11 +244,11 @@ class CloudSession(object):
 
     @testmethod()
     def test_cloud_connect(self):
-        self.test_cloud_connect_base():
+        self.test_cloud_connect_base()
 
     @testmethod()
     def test_cloud_connect_proxy(self):
-        self.test_cloud_connect_base('--cloud-connect-enable-proxy-only'):
+        self.test_cloud_connect_base('--cloud-connect-enable-proxy-only')
 
 def main():
     host = sys.argv[1]

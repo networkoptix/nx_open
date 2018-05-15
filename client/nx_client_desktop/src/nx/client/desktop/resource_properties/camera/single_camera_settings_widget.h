@@ -16,7 +16,6 @@ class SingleCameraSettingsWidget;
 }
 
 class QVBoxLayout;
-class QnCameraThumbnailManager;
 
 namespace nx {
 namespace client {
@@ -24,6 +23,7 @@ namespace desktop {
 
 class CameraAdvancedSettingsWebPage;
 class LegacyCameraMotionMaskWidget;
+class CameraThumbnailManager;
 
 class SingleCameraSettingsWidget: public Connective<QWidget>, public QnWorkbenchContextAware
 {
@@ -111,7 +111,7 @@ private:
     Q_DISABLE_COPY(SingleCameraSettingsWidget)
 
     QScopedPointer<Ui::SingleCameraSettingsWidget> ui;
-    QScopedPointer<QnCameraThumbnailManager> m_cameraThumbnailManager;
+    QScopedPointer<CameraThumbnailManager> m_cameraThumbnailManager;
     QnVirtualCameraResourcePtr m_camera;
 
     bool m_cameraSupportsMotion = false;

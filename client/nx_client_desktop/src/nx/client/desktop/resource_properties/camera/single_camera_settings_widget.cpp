@@ -74,7 +74,7 @@ SingleCameraSettingsWidget::SingleCameraSettingsWidget(QWidget *parent) :
     base_type(parent),
     QnWorkbenchContextAware(parent),
     ui(new Ui::SingleCameraSettingsWidget),
-    m_cameraThumbnailManager(new QnCameraThumbnailManager()),
+    m_cameraThumbnailManager(new CameraThumbnailManager()),
     m_sensitivityButtons(new QButtonGroup(this))
 {
     ui->setupUi(this);
@@ -185,7 +185,7 @@ SingleCameraSettingsWidget::SingleCameraSettingsWidget(QWidget *parent) :
     connect(ui->imageControlWidget, &LegacyImageControlWidget::changed,
         this, &SingleCameraSettingsWidget::at_dbDataChanged);
 
-    connect(ui->ioPortSettingsWidget, &IoPortSettingsWidget::dataChanged,
+    connect(ui->ioPortSettingsWidget, &LegacyIoPortSettingsWidget::dataChanged,
         this, &SingleCameraSettingsWidget::at_dbDataChanged);
 
     connect(ui->advancedSettingsWidget, &CameraAdvancedSettingsWidget::hasChangesChanged,

@@ -1,9 +1,10 @@
 #include "camera_settings_dialog_state_conversion_functions.h"
+#include "../redux/camera_settings_dialog_state.h"
 
 #include <core/resource/resource_display_info.h>
 #include <core/resource/camera_resource.h>
 
-#include "../redux/camera_settings_dialog_state.h"
+#include <nx/fusion/model_functions.h>
 
 namespace nx {
 namespace client {
@@ -121,21 +122,32 @@ void setRecordingEnabled(bool value, const Cameras& cameras)
 } // namespace
 
 void CameraSettingsDialogStateConversionFunctions::applyStateToCameras(
-    const CameraSettingsDialogState& state,
-    const Cameras& cameras)
+    const State& state, const Cameras& cameras)
 {
     if (state.isSingleCamera())
     {
         auto camera = cameras.first();
         camera->setName(state.singleCameraProperties.name());
 
-        if (state.devicesDescription.hasMotion == CameraSettingsDialogState::CombinedValue::All)
+        camera->setDewarpingParams(state.fisheyeSettings());
+
+        if (state.devicesDescription.hasMotion == State::CombinedValue::All)
         {
             camera->setMotionType(state.singleCameraSettings.enableMotionDetection()
                 ? camera->getDefaultMotionType()
                 : Qn::MotionType::MT_NoMotion);
 
             camera->setMotionRegionList(state.singleCameraSettings.motionRegionList());
+        }
+
+        if (camera->isIOModule() && state.devicesDescription.isIoModule == State::CombinedValue::All)
+        {
+            camera->setProperty(Qn::IO_OVERLAY_STYLE_PARAM_NAME, QnLexical::serialized(
+                state.singleIoModuleSettings.visualStyle()));
+
+            const auto ioPortDataList = state.singleIoModuleSettings.ioPortsData();
+            if (!ioPortDataList.empty()) //< Can happen if it's just discovered unauthorized module.
+                camera->setIOPorts(ioPortDataList);
         }
     }
 

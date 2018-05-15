@@ -2,15 +2,16 @@
 
 #include <string>
 #include <map>
+#include <vector>
 
 #include <plugins/plugin_tools.h>
-#include <nx/sdk/utils/debug.h>
+#include <nx/sdk/utils.h>
 
 #include "plugin.h"
 #include "consuming_camera_manager.h"
-#include "common_compressed_video_packet.h"
-#include "common_uncompressed_video_frame.h"
 #include "objects_metadata_packet.h"
+#include "compressed_video_packet.h"
+#include "uncompressed_video_frame.h"
 
 namespace nx {
 namespace sdk {
@@ -20,11 +21,20 @@ namespace metadata {
  * Base class for a typical implementation of CameraManager which receives video frames and sends
  * back constructed metadata packets. Hides many technical details of Metadata Plugin SDK, but may
  * limit CameraManager capabilities - use only when suitable.
+ *
+ * To use NX_PRINT/NX_OUTPUT in a derived class with the same printPrefix as used in this class,
+ * add the following to the derived class cpp:
+ * <pre><code>
+ *     #define NX_PRINT_PREFIX (this->utils.printPrefix)
+ *     #include <nx/kit/debug.h>
+ * </code></pre>
  */
 class CommonVideoFrameProcessingCameraManager:
-    public nxpt::CommonRefCounter<ConsumingCameraManager>,
-    protected nx::sdk::utils::Debug
+    public nxpt::CommonRefCounter<ConsumingCameraManager>
 {
+protected:
+    const nx::sdk::Utils utils;
+
 protected:
     /**
      * @param enableOutput Enables NX_OUTPUT. Typically, use NX_DEBUG_ENABLE_OUTPUT as a value.
@@ -33,34 +43,30 @@ protected:
      */
     CommonVideoFrameProcessingCameraManager(
         Plugin* plugin,
-        bool enableOutput_,
-        const std::string& printPrefix_ = "");
+        bool enableOutput,
+        const std::string& printPrefix = "");
 
     virtual std::string capabilitiesManifest() = 0;
 
     /**
      * Override to accept next compressed video frame for processing. Should not block the caller
      * thread for long.
-     * @param videoFrame Contains a pointer to the compressed video frame raw bytes. If the plugin
-     *     manifest declares "needDeepCopyOfVideoFrames" in "capabilities", the lifetime (validity)
-     *     of this pointer is the same as of videoFrame. Otherwise, the pointer is valid only until
-     *     and during the subsequent call to pullMetadataPackets(), even if the lifetime of
-     *     videoFrame is extended by addRef() or queryInterface() inside this method.
+     * @param videoFrame Contains a pointer to the compressed video frame raw bytes. The lifetime
+     *     (validity) of this pointer is the same as of videoFrame. Thus, it can be extended by
+     *     addRef() or queryInterface() inside this method.
      */
-    virtual bool pushCompressedVideoFrame(const CommonCompressedVideoPacket* /*videoFrame*/)
+    virtual bool pushCompressedVideoFrame(const CompressedVideoPacket* /*videoFrame*/)
     {
         return true;
     }
 
     /**
      * Override to accept next uncompressed video frame for processing.
-     * @param videoFrame Contains a pointer to the uncompressed video frame raw bytes. If the plugin
-     *     manifest declares "needDeepCopyOfVideoFrames" in "capabilities", the lifetime (validity)
-     *     of this pointer is the same as of videoFrame. Otherwise, the pointer is valid only until
-     *     and during the subsequent call to pullMetadataPackets(), even if the lifetime of
-     *     videoFrame is extended by addRef() or queryInterface() inside this method.
+     * @param videoFrame Contains a pointer to the compressed video frame raw bytes. The lifetime
+     *     (validity) of this pointer is the same as of videoFrame. Thus, it can be extended by
+     *     addRef() or queryInterface() inside this method.
      */
-    virtual bool pushUncompressedVideoFrame(const CommonUncompressedVideoFrame* /*videoFrame*/)
+    virtual bool pushUncompressedVideoFrame(const UncompressedVideoFrame* /*videoFrame*/)
     {
         return true;
     }

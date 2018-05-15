@@ -1,6 +1,7 @@
 #include "camera_settings_dialog.h"
 #include "ui_camera_settings_dialog.h"
 
+#include <QtCore/QSharedPointer>
 #include <QtWidgets/QPushButton>
 
 #include <core/resource_management/resource_pool.h>
@@ -19,6 +20,8 @@
 #include "widgets/camera_settings_general_tab_widget.h"
 #include "widgets/camera_schedule_widget.h"
 #include "widgets/camera_motion_settings_widget.h"
+#include "widgets/camera_fisheye_settings_widget.h"
+#include "widgets/io_module_settings_widget.h"
 
 #include "redux/camera_settings_dialog_state.h"
 #include "redux/camera_settings_dialog_store.h"
@@ -28,6 +31,8 @@
 
 #include "utils/camera_settings_dialog_state_conversion_functions.h"
 #include <utils/license_usage_helper.h>
+
+#include <nx/client/desktop/image_providers/camera_thumbnail_manager.h>
 
 namespace nx {
 namespace client {
@@ -39,6 +44,7 @@ struct CameraSettingsDialog::Private
     QPointer<CameraSettingsReadOnlyWatcher> readOnlyWatcher;
     QnVirtualCameraResourceList cameras;
     QPointer<QnCamLicenseUsageHelper> licenseUsageHelper;
+    QSharedPointer<CameraThumbnailManager> previewManager;
 
     bool hasChanges() const
     {
@@ -99,6 +105,11 @@ CameraSettingsDialog::CameraSettingsDialog(QWidget* parent):
 
     d->licenseUsageHelper = new QnCamLicenseUsageHelper(commonModule(), this);
 
+    d->previewManager.reset(new CameraThumbnailManager());
+    d->previewManager->setAutoRotate(true);
+    d->previewManager->setThumbnailSize(QSize(0, 0));
+    d->previewManager->setAutoRefresh(false);
+
     auto panicWatcher = new CameraSettingsPanicWatcher(this);
     panicWatcher->setStore(d->store);
 
@@ -113,9 +124,19 @@ CameraSettingsDialog::CameraSettingsDialog(QWidget* parent):
         tr("Recording"));
 
     addPage(
+        int(CameraSettingsTab::io),
+        new IoModuleSettingsWidget(d->store, ui->tabWidget),
+        tr("I/O Ports"));
+
+    addPage(
         int(CameraSettingsTab::motion),
         new CameraMotionSettingsWidget(d->store, ui->tabWidget),
         tr("Motion"));
+
+    addPage(
+        int(CameraSettingsTab::fisheye),
+        new CameraFisheyeSettingsWidget(d->previewManager, d->store, ui->tabWidget),
+        tr("Fisheye"));
 
     auto selectionWatcher = new QnWorkbenchSelectionWatcher(this);
     connect(
@@ -198,6 +219,9 @@ bool CameraSettingsDialog::setCameras(const QnVirtualCameraResourceList& cameras
     d->cameras = cameras;
     d->resetChanges();
     d->readOnlyWatcher->setCameras(cameras);
+    d->previewManager->selectCamera(cameras.size() == 1
+        ? cameras.front()
+        : QnVirtualCameraResourcePtr());
 
     return true;
 }
@@ -277,8 +301,19 @@ void CameraSettingsDialog::loadState(const CameraSettingsDialogState& state)
             applyButton->setEnabled(!state.readOnly && state.hasChanges);
     }
 
-    setPageVisible(int(CameraSettingsTab::motion), state.devicesCount == 1
-        && state.devicesDescription.hasMotion == CameraSettingsDialogState::CombinedValue::All);
+    // TODO: #vkutin #gdm Ensure correct visibility/enabled state.
+    // Legacy code has more complicated conditions.
+
+    using CombinedValue = CameraSettingsDialogState::CombinedValue;
+
+    setPageVisible(int(CameraSettingsTab::motion), state.isSingleCamera()
+        && state.devicesDescription.hasMotion == CombinedValue::All);
+
+    setPageVisible(int(CameraSettingsTab::fisheye),
+        state.isSingleCamera() && state.singleCameraProperties.hasVideo);
+
+    setPageVisible(int(CameraSettingsTab::io), state.isSingleCamera()
+        && state.devicesDescription.isIoModule == CombinedValue::All);
 
     ui->alertBar->setText(getAlertText(state));
 }
@@ -291,41 +326,41 @@ QString CameraSettingsDialog::getAlertText(const CameraSettingsDialogState& stat
     using Alert = CameraSettingsDialogState::Alert;
     switch (*state.alert)
     {
-        case Alert::BrushChanged:
+        case Alert::brushChanged:
             return tr("Select areas on the schedule to apply chosen parameters to.");
 
-        case Alert::EmptySchedule:
+        case Alert::emptySchedule:
             return tr(
                 "Set recording parameters and select areas "
                 "on the schedule grid to apply them to.");
 
-        case Alert::NotEnoughLicenses:
+        case Alert::notEnoughLicenses:
             return tr("Not enough licenses to enable recording.");
 
-        case Alert::LicenseLimitExceeded:
+        case Alert::licenseLimitExceeded:
             return tr("License limit exceeded, recording will not be enabled.");
 
-        case Alert::RecordingIsNotEnabled:
+        case Alert::recordingIsNotEnabled:
             return tr("Turn on selector at the top of the window to enable recording.");
 
-        case Alert::HighArchiveLength:
+        case Alert::highArchiveLength:
             return QnCameraDeviceStringSet(
                     tr("High minimum value can lead to archive length decrease on other devices."),
                     tr("High minimum value can lead to archive length decrease on other cameras."))
                 .getString(state.deviceType);
 
-        case Alert::MotionDetectionRequiresRecording:
+        case Alert::motionDetectionRequiresRecording:
             return tr(
                 "Motion detection will work only when camera is being viewed. "
                 "Enable recording to make it work all the time.");
 
-        case Alert::MotionDetectionTooManyRectangles:
+        case Alert::motionDetectionTooManyRectangles:
             return tr("Maximum number of motion detection rectangles for current camera is reached");
 
-        case Alert::MotionDetectionTooManyMaskRectangles:
+        case Alert::motionDetectionTooManyMaskRectangles:
             return tr("Maximum number of ignore motion rectangles for current camera is reached");
 
-        case Alert::MotionDetectionTooManySensitivityRectangles:
+        case Alert::motionDetectionTooManySensitivityRectangles:
             return tr("Maximum number of detect motion rectangles for current camera is reached");
 
         default:

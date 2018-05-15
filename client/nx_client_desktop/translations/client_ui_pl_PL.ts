@@ -764,15 +764,15 @@
     </message>
     <message>
       <location/>
-      <source>Logical Id</source>
-      <translation>Identyfikator logiczny</translation>
+      <source>Logical ID</source>
+      <translation>ID logiczny</translation>
     </message>
   </context>
   <context>
     <name>CameraInputBusinessEventWidget</name>
     <message>
       <location filename="../src/ui/widgets/business/camera_input_business_event_widget.ui"/>
-      <source>Input Id</source>
+      <source>Input ID</source>
       <translation>ID wejścia</translation>
     </message>
   </context>
@@ -798,7 +798,7 @@
     </message>
     <message>
       <location/>
-      <source>Output Id:</source>
+      <source>Output ID:</source>
       <translation>ID wyjściowe:</translation>
     </message>
   </context>
@@ -1513,7 +1513,7 @@
     </message>
     <message>
       <location/>
-      <source>Locked to Hardware Id:</source>
+      <source>Locked to Hardware ID:</source>
       <translation>Przypisane trwale do ID sprzętu:</translation>
     </message>
   </context>
@@ -1612,7 +1612,7 @@
     </message>
     <message>
       <location/>
-      <source>Hardware Id</source>
+      <source>Hardware ID</source>
       <translation>ID sprzętu</translation>
     </message>
   </context>

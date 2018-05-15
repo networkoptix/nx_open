@@ -3,7 +3,7 @@ SET PASSWORD=${sign.password}
 SET SIGNCER=${certificates_dir}/wixsetup/${sign.cer}
 SET TIMESTAMP=
 IF NOT ["${beta}"] == ["true"] (
-    SET TIMESTAMP=/tr http://tsa.startssl.com/rfc3161
+    SET TIMESTAMP=/tr http://timestamp.digicert.com/
 )
 
 IF NOT ["${windows.skip.sign}"] == ["true"] (

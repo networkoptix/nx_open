@@ -119,7 +119,7 @@ QnResourceBrowserWidget::QnResourceBrowserWidget(QWidget* parent, QnWorkbenchCon
     m_tooltipWidget(nullptr),
     m_hoverProcessor(nullptr),
     m_disconnectHelper(new QnDisconnectHelper()),
-    m_thumbnailManager(new QnCameraThumbnailManager())
+    m_thumbnailManager(new CameraThumbnailManager())
 {
     ui->setupUi(this);
 

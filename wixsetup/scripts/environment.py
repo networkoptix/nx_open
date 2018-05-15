@@ -49,9 +49,6 @@ def find_all_files(dir):
 def ffmpeg_files(source_dir):
     templates = [
         'av*.dll',
-        'libogg*.dll',
-        'libvorbis*.dll',
-        'libmp3*.dll',
         'swscale-*.dll',
         'swresample-*.dll']
     for template in templates:

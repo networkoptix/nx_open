@@ -44,7 +44,7 @@ protected:
 private:
     nx::Buffer* m_readBuffer = nullptr;
     IoCompletionHandler m_readHandler;
-    nx::network::TCPSocket m_delegatee;
+    nx::network::TCPSocket m_delegate;
     nx::utils::bstream::Pipe m_reflectingPipeline;
     SocketAddress m_foreignAddress;
     boost::optional<KeepAliveOptions> m_keepAliveOptions;

@@ -63,7 +63,6 @@ ImageControlWidget::ImageControlWidget(QWidget* parent):
     qobject_cast<QListView*>(ui->rotationComboBox->view())->setRowHidden(0, true);
     if (auto model = qobject_cast<QStandardItemModel*>(ui->rotationComboBox->model()))
         model->item(0)->setFlags(Qt::NoItemFlags);
-    ui->rotationComboBox->addItem(tr("Auto"), qVariantFromValue(Rotation()));
     for (const auto& rotation: Rotation::standardRotations())
     {
         ui->rotationComboBox->addItem(

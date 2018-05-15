@@ -25,8 +25,8 @@
 
 namespace {
 
-static const QSize kSensitivityButtonSize(34, 34);
-static const qreal kSensitivityButtonOpacity = 0.3;
+static constexpr QSize kSensitivityButtonSize(34, 34);
+static constexpr qreal kSensitivityButtonOpacity = 0.3;
 
 } // namespace
 

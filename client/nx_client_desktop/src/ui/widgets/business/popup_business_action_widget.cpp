@@ -21,9 +21,7 @@ QnPopupBusinessActionWidget::QnPopupBusinessActionWidget(QWidget* parent):
 {
     ui->setupUi(this);
 
-    ui->hintLabel->setPixmap(qnSkin->pixmap("buttons/context_info.png"));
-    ui->hintLabel->setToolTip(tr("Notification will be shown until one of the users who see it "
-        "creates bookmark with event description"));
+    ui->hintLabel->setHint(tr("Notification will be shown until one of the users who see it creates bookmark with event description"));
 
     connect(ui->settingsButton, &QPushButton::clicked,
         this, &QnPopupBusinessActionWidget::at_settingsButton_clicked);

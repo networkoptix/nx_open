@@ -61,6 +61,11 @@ void doExecuteGet(
     nx::network::http::BufferType* outResponse,
     int httpStatus);
 
+void doExecuteGet(
+    const nx::utils::Url& url,
+    nx::network::http::BufferType* outResponse,
+    int httpStatus);
+
 /**
  * @param urlStr Part of the URL after the origin - staring with a slash, path and query.
  */
@@ -73,6 +78,18 @@ void executeGet(
 {
     nx::network::http::BufferType response;
     ASSERT_NO_FATAL_FAILURE(doExecuteGet(launcher, urlStr, &response, httpStatus));
+    if (responseData)
+        ASSERT_TRUE(QJson::deserialize(response, responseData));
+}
+
+template<class ResponseData>
+void executeGet(
+    const nx::utils::Url& url,
+    ResponseData* responseData = nullptr,
+    int httpStatus = nx::network::http::StatusCode::ok)
+{
+    nx::network::http::BufferType response;
+    ASSERT_NO_FATAL_FAILURE(doExecuteGet(url, &response, httpStatus));
     if (responseData)
         ASSERT_TRUE(QJson::deserialize(response, responseData));
 }

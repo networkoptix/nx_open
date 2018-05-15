@@ -106,11 +106,11 @@
     </message>
     <message>
       <source>Triggers the action</source>
-      <translation>Trigger de actie</translation>
+      <translation>Activeert de actie</translation>
     </message>
     <message>
       <source>Increase the value</source>
-      <translation>Verhogen de waarde</translation>
+      <translation>Verhoog de waarde</translation>
     </message>
     <message>
       <source>Decrease the value</source>
@@ -266,7 +266,7 @@
     </message>
     <message>
       <source>&amp;HTML:</source>
-      <translation type="unfinished">&amp;HTML:</translation>
+      <translation>&amp;HTML:</translation>
     </message>
     <message>
       <source>Cursor at %1, %2
@@ -729,11 +729,11 @@ Do you want to delete it anyway?</source>
     </message>
     <message>
       <source>&amp;Close</source>
-      <translation>&amp;Sluiten</translation>
+      <translation>&amp;Afsluiten</translation>
     </message>
     <message>
       <source>Close without Saving</source>
-      <translation>Sluiten zonder op te slaan</translation>
+      <translation>Afluiten zonder opslaan</translation>
     </message>
   </context>
   <context>
@@ -760,7 +760,7 @@ Do you want to delete it anyway?</source>
     </message>
     <message>
       <source>No space left on device</source>
-      <translation>Geen ruimte over op apparaat</translation>
+      <translation>Geen ruimte over op het apparaat</translation>
     </message>
     <message>
       <source>Unknown error</source>
@@ -806,7 +806,7 @@ Do you want to delete it anyway?</source>
     </message>
     <message>
       <source>Device not writable</source>
-      <translation>Apparaat niet schrijfbaar</translation>
+      <translation>Apparaat niet beschrijfbaar</translation>
     </message>
     <message>
       <source>Unsupported image format</source>
@@ -829,7 +829,7 @@ Do you want to delete it anyway?</source>
     <message>
       <source>%1, ...</source>
       <extracomment>This text is an &quot;unfinished&quot; shortcut, expands like &quot;Ctrl+A, ...&quot;</extracomment>
-      <translation type="unfinished">%1, ...</translation>
+      <translation>%1, ...</translation>
     </message>
   </context>
   <context>
@@ -856,7 +856,7 @@ Do you want to delete it anyway?</source>
     </message>
     <message>
       <source>Delete</source>
-      <translation>Verwijder</translation>
+      <translation>Verwijderen</translation>
     </message>
     <message>
       <source>Select All</source>
@@ -930,7 +930,7 @@ Do you want to delete it anyway?</source>
     </message>
     <message>
       <source>Close</source>
-      <translation>Sluiten</translation>
+      <translation>Afsluiten</translation>
     </message>
     <message>
       <source>Cancel</source>

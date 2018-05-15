@@ -209,6 +209,10 @@ if(withMediaServer)
         add_subdirectory(nx_metadata_sdk)
     endif()
 
+    if(withMediaDbUtil)
+        add_subdirectory(media_db_util)
+    endif()
+
     if(LINUX AND box MATCHES "none|tx1")
         add_subdirectory(root_tool)
     endif()

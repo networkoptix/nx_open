@@ -764,7 +764,7 @@
     </message>
     <message>
       <location/>
-      <source>Logical Id</source>
+      <source>Logical ID</source>
       <translation>รหัสตรรกะ</translation>
     </message>
   </context>
@@ -772,8 +772,8 @@
     <name>CameraInputBusinessEventWidget</name>
     <message>
       <location filename="../src/ui/widgets/business/camera_input_business_event_widget.ui"/>
-      <source>Input Id</source>
-      <translation>หมายเลข Id:</translation>
+      <source>Input ID</source>
+      <translation>หมายเลข ID:</translation>
     </message>
   </context>
   <context>
@@ -798,7 +798,7 @@
     </message>
     <message>
       <location/>
-      <source>Output Id:</source>
+      <source>Output ID:</source>
       <translation>รหัสการแสดงผล:</translation>
     </message>
   </context>
@@ -1513,7 +1513,7 @@
     </message>
     <message>
       <location/>
-      <source>Locked to Hardware Id:</source>
+      <source>Locked to Hardware ID:</source>
       <translation>ล็อคไปยังรหัสฮาร์ดแวร์:</translation>
     </message>
   </context>
@@ -1612,7 +1612,7 @@
     </message>
     <message>
       <location/>
-      <source>Hardware Id</source>
+      <source>Hardware ID</source>
       <translation>รหัสฮาร์ดแวร์</translation>
     </message>
   </context>

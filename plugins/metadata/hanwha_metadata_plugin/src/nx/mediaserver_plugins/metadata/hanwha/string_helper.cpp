@@ -10,15 +10,14 @@ namespace metadata {
 namespace hanwha {
 
 QString StringHelper::buildCaption(
-    const Hanwha::DriverManifest& manifest,
-    const QnUuid& eventTypeId,
+    const Hanwha::DriverManifest& /*manifest*/,
+    const QnUuid& /*eventTypeId*/,
     boost::optional<int> /*eventChannel*/,
     boost::optional<int> /*eventRegion*/,
     Hanwha::EventItemType /*eventItemType*/,
     bool /*isActive*/)
 {
-    const auto& descriptor = manifest.eventDescriptorById(eventTypeId);
-    return descriptor.name.value;
+    return QString(); //< Not used so far.
 }
 
 QString StringHelper::buildDescription(
