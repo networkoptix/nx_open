@@ -87,7 +87,7 @@ class Context(models.Model):
     def __str__(self):
         return self.name
 
-    def template_for_language(self, language, default_language=None):
+    def template_for_language(self, language, default_language):
         context_template = self.contexttemplate_set.filter(language=language)
         if not context_template.exists():  # No template for language - try to get default language
             context_template = self.contexttemplate_set.filter(language=default_language)
