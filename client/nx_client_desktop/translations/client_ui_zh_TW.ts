@@ -89,11 +89,6 @@
     </message>
     <message>
       <location/>
-      <source>Disable only if the client takes too much CPU</source>
-      <translation>若用戶端耗費太多 CPU 時再停用它</translation>
-    </message>
-    <message>
-      <location/>
       <source>Maximum Live Buffer Length</source>
       <translation>最大緩衝長度</translation>
     </message>
@@ -1741,6 +1736,11 @@
       <location/>
       <source>Tour cycle</source>
       <translation>Tour cycle</translation>
+    </message>
+    <message>
+      <location/>
+      <source>IP addresses for cameras, and servers, groups for users, etc.</source>
+      <translation type="unfinished">IP addresses for cameras, and servers, groups for users, etc.</translation>
     </message>
   </context>
   <context>

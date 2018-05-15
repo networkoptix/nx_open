@@ -195,16 +195,33 @@ void CameraAdvancedParamsWidget::saveValues() {
         return;
     }
 
-    /* Check that there are queued changes. */
-    QnCameraAdvancedParamValueList modifiedValues = m_currentValues.difference(m_loadedValues);
-    if (modifiedValues.isEmpty()) {
-        /* Notify user about error. */
-        // TODO: #GDM
+    auto modifiedValues = m_currentValues.differenceMap(m_loadedValues);
+    if (modifiedValues.isEmpty())
         return;
+
+    QSet<QString> groups;
+    const auto parameters = m_advancedParamsReader->params(m_camera);
+    for (auto itr = modifiedValues.cbegin(); itr != modifiedValues.cend(); ++itr)
+    {
+        const auto parameter = parameters.getParameterById(itr.key());
+        if (!parameter.group.isEmpty())
+            groups.insert(parameter.group);
+    }
+
+    const auto additionalValues = groupParameters(groups);
+    for (auto itr = additionalValues.cbegin(); itr != additionalValues.cend(); ++itr)
+    {
+        if (!modifiedValues.contains(itr.key()))
+            modifiedValues[itr.key()] = itr.value();
     }
 
     /* Update state. */
-    m_paramRequestHandle = serverConnection->setParamsAsync(m_camera, modifiedValues, this, SLOT(at_advancedParam_saved(int, const QnCameraAdvancedParamValueList &, int)));
+    m_paramRequestHandle = serverConnection->setParamsAsync(
+        m_camera,
+        modifiedValues.toValueList(),
+        this,
+        SLOT(at_advancedParam_saved(int, const QnCameraAdvancedParamValueList &, int)));
+
     setState(State::Applying);
 }
 
@@ -245,6 +262,28 @@ QnMediaServerConnectionPtr CameraAdvancedParamsWidget::getServerConnection() con
         return mediaServer->apiConnection();
 
     return QnMediaServerConnectionPtr();
+}
+
+
+QnCameraAdvancedParamValueMap CameraAdvancedParamsWidget::groupParameters(
+    const QSet<QString>& groups) const
+{
+    QnCameraAdvancedParamValueMap result;
+    const auto parameters = m_advancedParamsReader->params(m_camera);
+    const auto ids = parameters.allParameterIds();
+
+    for (const auto& id: ids)
+    {
+        const auto parameter = parameters.getParameterById(id);
+        if (groups.contains(parameter.group))
+        {
+            const auto parameterValue = m_advancedParamWidgetsManager->parameterValue(parameter.id);
+            if (parameterValue != boost::none)
+                result[parameter.id] = *parameterValue;
+        }
+    }
+
+    return result;
 }
 
 

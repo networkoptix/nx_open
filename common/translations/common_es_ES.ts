@@ -913,7 +913,7 @@
       <source>milliseconds</source>
       <comment>Full suffix for displaying milliseconds</comment>
       <translation>
-        <numerusform>milisegundo</numerusform>
+        <numerusform>milisegundos</numerusform>
         <numerusform>milisegundos</numerusform>
       </translation>
     </message>

@@ -682,7 +682,7 @@ State CameraSettingsDialogStateReducer::setScheduleBrushRecordingType(
     NX_EXPECT(value != Qn::RecordingType::motionOnly || state.hasMotion());
     NX_EXPECT(value != Qn::RecordingType::motionAndLow
         || (state.hasMotion()
-            && state.devicesDescription.hasDualStreamingCapability == CombinedValue::All));
+            && state.devicesDescription.hasDualStreamingCapability == State::CombinedValue::All));
 
     state.recording.brush.recordingType = value;
     if (value == Qn::RecordingType::motionAndLow)

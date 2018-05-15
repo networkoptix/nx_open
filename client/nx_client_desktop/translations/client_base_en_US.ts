@@ -2208,39 +2208,11 @@ to view more bookmarks</source>
         <translation></translation>
     </message>
     <message>
-        <source>Primary Stream</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Secondary Stream</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Camera has no secondary stream</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>This I/O module has no advanced settings</source>
         <translation></translation>
     </message>
     <message>
         <source>This camera has no advanced settings</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Audio Stream</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>URL is not available. Open stream and try again.</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>URL is not available. Open video stream and try again.</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>I/O module has no audio stream</source>
         <translation></translation>
     </message>
     <message>
@@ -2256,11 +2228,39 @@ to view more bookmarks</source>
         <translation></translation>
     </message>
     <message>
+        <source>Secondary Stream</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>I/O Module ID</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Camera ID</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Audio Stream</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Primary Stream</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>URL is not available. Open stream and try again.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>URL is not available. Open video stream and try again.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>I/O module has no audio stream</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Camera has no secondary stream</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -2382,15 +2382,15 @@ to view more bookmarks</source>
         </translation>
     </message>
     <message>
-        <source>Server will not change any cameras settings, it will receive and use camera stream as-is. </source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Helps fix image quality issues on some cameras; for others will cause significant bitrate increase.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Custom number that can be assigned to a camera for quick identification and access</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Server will not change any cameras settings, it will receive and use camera stream as-is.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -3680,11 +3680,11 @@ to %1</source>
         <translation></translation>
     </message>
     <message>
-        <source>Creates a backup of local System configurations that can be restored in case of failure.</source>
+        <source>Backup includes servers and cameras settings, users, webpages, event rules, etc. Video is not saved.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Backup includes registry flags, file systems, and server settings related to archive, events, and audit trail logs. Does not backup archives.</source>
+        <source>Creates a backup of System configuration that can be restored in case of failure.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -3938,11 +3938,11 @@ to %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Focus</source>
+        <source>Rotation:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Rotation:</source>
+        <source>Focus</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -4505,15 +4505,15 @@ to %1</source>
         <translation></translation>
     </message>
     <message>
-        <source>Displays IP addresses for cameras and servers, groups for users, etc. in the Resource Tree.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Sets the time to use in the client (timeline, timestamps, etc.) when client and server machines are in different time zones.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Length of time each camera on layout will be displayed if you start a Layout Tour.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Displays IP addresses for cameras and servers and groups for users.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -6391,11 +6391,11 @@ to %1</source>
         <translation></translation>
     </message>
     <message>
-        <source>Creates a backup of local System configurations that can be restored in case of failure.</source>
+        <source>Backup includes servers and cameras settings, users, webpages, event rules, etc. Video is not saved.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Backup includes registry flags, file systems, and server settings related to archive, events, and audit trail logs.Does not backup archives.</source>
+        <source>Creates a backup of System configuration that can be restored in case of failure.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -6691,11 +6691,11 @@ to %1</source>
         <translation></translation>
     </message>
     <message>
-        <source>Sends device, server, and system information (firmware, codecs, streams, license keys, etc.).</source>
+        <source>Sends anonymous System information (firmware, codecs, streams, etc.).</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Tracks and logs all user actions</source>
+        <source>Tracks and logs all user actions.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -7194,11 +7194,22 @@ to %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>&lt;b&gt;Local users&lt;/b&gt; belong to this system only and are fully managed by system administrators.</source>
+        <source>Local users</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>&lt;b&gt;Cloud users&lt;/b&gt; can have access to many systems. Administrators can manage their rights only.</source>
+        <source>%1 users</source>
+        <comment>%1 is the short cloud name (like Cloud)</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1 belong to this system only and are fully managed by system administrators.</source>
+        <comment>%1 is local users definition, e.g. &apos;Local users&apos;</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1 can have access to many Systems. Administrators can manage their rights only.</source>
+        <comment>%1 is cloud users definition, e.g. &apos;Cloud users&apos;</comment>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -8837,6 +8848,18 @@ to %1</source>
     <message>
         <source>Failed to change password on %1 of %2 cameras</source>
         <translation></translation>
+    </message>
+    <message>
+        <source>To use the software you must accept the end user license agreement</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Accept</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Decline</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>

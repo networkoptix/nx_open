@@ -6,6 +6,8 @@
 #include "onvif_resource_information_fetcher.h"
 
 #include <map>
+#include <set>
+#include <vector>
 #include <memory>
 
 #include <QtCore/QString>
@@ -85,6 +87,12 @@ private:
     template <class T> QString getAppropriateAddress(const T* source, const QStringList& prefixes) const;
     template <class T> QString extractScope(const T* source, const QString& pattern) const;
     template <class T> QString getManufacturer(const T* source, const QString& name) const;
+
+    template <typename T>
+    std::set<QString> additionalManufacturers(
+        const T* source,
+        const std::vector<QString> additionalManufacturerPrefixes) const;
+
     template <class T> QString getMac(const T* source, const SOAP_ENV__Header* header) const;
     template <class T> QString getEndpointAddress(const T* source) const;
     template <class T> void printProbeMatches(const T* source, const SOAP_ENV__Header* header) const;

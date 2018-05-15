@@ -1383,10 +1383,6 @@
         <comment>Analytics Event at some camera</comment>
         <translation></translation>
     </message>
-    <message>
-        <source>%1 - %2</source>
-        <translation type="unfinished"></translation>
-    </message>
 </context>
 <context>
     <name>utils::QnCameraNamesWatcher</name>
