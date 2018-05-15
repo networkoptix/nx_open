@@ -24,6 +24,11 @@ nx_configure_directory(
     ${CMAKE_CURRENT_BINARY_DIR}/resources/static/skin
     COPYONLY)
 
+nx_configure_file(
+   ${customization_dir}/icons/all/favicon.ico
+   ${CMAKE_CURRENT_BINARY_DIR}/resources/static/customization
+   COPYONLY)
+
 set(apidoctool_jar "${APIDOCTOOL_PATH}/apidoctool.jar")
 
 set(apidoctool_params
@@ -95,7 +100,6 @@ nx_add_target(mediaserver_core LIBRARY
         ${vendor_source_exclusions}
     ADDITIONAL_RESOURCES
         "${customization_dir}/mediaserver_core/resources"
-        "${customization_dir}/icons/all/favicon.ico"
         "${CMAKE_CURRENT_BINARY_DIR}/resources"
         "${CMAKE_CURRENT_BINARY_DIR}/resources/static/api.xml"
         "${CMAKE_CURRENT_BINARY_DIR}/resources/static/api.json"

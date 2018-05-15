@@ -70,13 +70,10 @@ namespace {
         }
 
         /* Check internal resources. */
-        for (const auto& fileName: {":" + relativePath, ":" + QFileInfo(relativePath).fileName()})
-        {
-            QIODevicePtr result(new QFile(fileName));
-            if (result->open(QFile::ReadOnly))
-                return result;
-        }
-
+        const QString fileName = ":" + relativePath;
+        QIODevicePtr result(new QFile(fileName));
+        if (result->open(QFile::ReadOnly))
+            return result;
 
         return QIODevicePtr();
     }
