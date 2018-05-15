@@ -2493,6 +2493,32 @@
                     }
                 }
             }
+        },
+        {
+            "keys": [
+                "HIKVISION|DS-2DE7330IW-*", "Hikvision|DS-2DE7330IW-*"
+            ],
+            "ptzMapper": {
+                "fromCamera": {
+                    "x": {
+                        "extrapolationMode": "PeriodicExtrapolation",
+                        "device":  [  -1,1],
+                        "logical": [-180, 180]
+                    },
+                    "y": {
+                        "extrapolationMode": "ConstantExtrapolation",
+                        "device":  [1, -1],
+                        "logical": [-90, -15]
+                    },
+                    "z": {
+                        "extrapolationMode": "ConstantExtrapolation",
+                        "device":  [0, 0.06, 0.1, 0.13, 0.15, 0.2, 0.3, 0.4, 0.5, 0.7, 1],
+                        "logical": [1, 2, 2.5, 3.0, 3.3, 3.7, 4.0, 5.5, 6.5, 7.5, 8],
+                        "logicalMultiplier": 40,
+                        "space": "35MmEquiv"
+                    }
+                }
+            }
         }
     ]
 }
