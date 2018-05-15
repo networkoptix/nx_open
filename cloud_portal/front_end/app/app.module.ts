@@ -6,8 +6,7 @@ import { UpgradeModule }                                                  from '
 import { RouterModule, UrlHandlingStrategy, UrlTree }                     from '@angular/router';
 import { HttpClient, HttpClientModule }                                   from '@angular/common/http';
 
-import { NgbModule }                        from '@ng-bootstrap/ng-bootstrap';
-import { NgbModal }                         from '@ng-bootstrap/ng-bootstrap';
+import { NgbModule, NgbModal }              from '@ng-bootstrap/ng-bootstrap';
 import { OrderModule }                      from 'ngx-order-pipe';
 import { DeviceDetectorModule }             from 'ngx-device-detector';
 import { TranslateModule, TranslateLoader } from '@ngx-translate/core';
@@ -20,11 +19,10 @@ import {
     ngToastModule, configServiceModule, authorizationCheckServiceModule
 } from './src/ajs-upgrade/ajs-upgraded-providers';
 
-import { AppComponent }          from './app.component';
-import { DownloadModule }        from './src/download/download.module';
-import { DownloadHistoryModule } from './src/download-history/download-history.module';
-import { DropdownsModule }       from './src/dropdowns/dropdowns.module';
-import { DialogsModule }         from './src/dialogs/dialogs.module';
+import { AppComponent }    from './app.component';
+import { DropdownsModule } from './src/dropdowns/dropdowns.module';
+import { DialogsModule }   from './src/dialogs/dialogs.module';
+import { PagesModule }     from './src/pages/pages.module';
 
 // AoT requires an exported function for factories
 export function createTranslateLoader(http: HttpClient) {
@@ -54,8 +52,6 @@ class HybridUrlHandlingStrategy implements UrlHandlingStrategy {
         UpgradeModule,
         HttpClientModule,
         OrderModule,
-        DownloadModule,
-        DownloadHistoryModule,
         cloudApiServiceModule,
         uuid2ServiceModule,
         languageServiceModule,
@@ -67,6 +63,7 @@ class HybridUrlHandlingStrategy implements UrlHandlingStrategy {
         authorizationCheckServiceModule,
         DropdownsModule,
         DialogsModule,
+        PagesModule,
 
         TranslateModule.forRoot({
             loader: {
