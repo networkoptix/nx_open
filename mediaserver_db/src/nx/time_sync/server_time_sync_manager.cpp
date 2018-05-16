@@ -178,13 +178,9 @@ QnUuid ServerTimeSyncManager::getPrimaryTimeServerId() const
 {
     auto resourcePool = commonModule()->resourcePool();
     auto settings = commonModule()->globalSettings();
-    QnUuid primaryTimeServer = settings->primaryTimeServer();
-    if (!primaryTimeServer.isNull())
-    {
-        // User-defined time server.
-        auto server = resourcePool->getResourceById<QnMediaServerResource>(primaryTimeServer);
-        return server ? server->getId() : QnUuid();
-    }
+    QnUuid primaryTimeServerId = settings->primaryTimeServer();
+    if (!primaryTimeServerId.isNull())
+        return primaryTimeServerId; //< User-defined time server.
     
     // Automatically select primary time server.
     auto servers = resourcePool->getAllServers(Qn::Online);

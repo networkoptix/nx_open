@@ -56,6 +56,7 @@
 #include "cloud_integration/cloud_connector.h"
 #include "ec2_connection_processor.h"
 #include <local_connection_factory.h>
+#include <api/model/time_reply.h>
 
 static int registerQtResources()
 {
@@ -426,6 +427,18 @@ void Appserver2Process::registerHttpHandlers(
                 result->setError(QnRestResult::CantProcessRequest);
             return resultCode;
         });
+
+    m_tcpListener->addHandler<JsonConnectionProcessor>("HTTP", "api/gettime",
+        [](const nx::network::http::Request& request, QnHttpConnectionListener* owner, QnJsonRestResult* result)
+    {
+
+        QnTimeReply reply;
+        reply.utcTime = 
+            owner->commonModule()->ec2Connection()->timeSyncManager()->getSyncTime().count();
+        result->setReply(reply);
+        return nx::network::http::StatusCode::ok;
+    });
+
 
     m_tcpListener->disableAuthForPath("/api/getNonce");
     m_tcpListener->disableAuthForPath("/api/moduleInformation");

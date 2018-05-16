@@ -89,6 +89,8 @@ class TimeSynchronizationPeer: public QObject
 public:
     TimeSynchronizationPeer()
     {
+        m_testSystemClock = std::make_shared<TestSystemClock>();
+        m_testSteadyClock = std::make_shared<TestSteadyClock>();
     }
 
     ~TimeSynchronizationPeer()
@@ -132,8 +134,6 @@ public:
                     auto globalSettings = commonModule->globalSettings();
                     globalSettings->setSynchronizingTimeWithInternet(m_syncWithInternetEnabled);
 
-                    m_testSystemClock = std::make_shared<TestSystemClock>();
-                    m_testSteadyClock = std::make_shared<TestSteadyClock>();
                     auto timeSyncManager = m_appserver->moduleInstance()->ecConnection()->timeSyncManager();
                     timeSyncManager->setClock(m_testSystemClock, m_testSteadyClock);
 
@@ -171,6 +171,7 @@ public:
     void setPrimaryPeerId(const QnUuid& peerId)
     {
         commonModule()->globalSettings()->setPrimaryTimeServer(peerId);
+        commonModule()->globalSettings()->synchronizeNow();
     }
 
     void connectTo(TimeSynchronizationPeer* remotePeer)
