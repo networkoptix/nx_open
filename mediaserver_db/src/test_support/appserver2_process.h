@@ -27,6 +27,7 @@ namespace ec2 {
 class AbstractECConnection;
 class LocalConnectionFactory;
 class QnSimpleHttpConnectionListener;
+class Appserver2Process;
 
 class Appserver2Process: public QObject, public QnStoppable
 {
@@ -45,6 +46,10 @@ public:
     QnCommonModule* commonModule() const;
     ec2::AbstractECConnection* ecConnection();
     nx::network::SocketAddress endpoint() const;
+
+    bool createInitialData(const QString& systemName);
+
+    void connectTo(const Appserver2Process* dstServer);
 signals:
     void beforeStart();
 private:
@@ -65,13 +70,17 @@ private:
     void addSelfServerResource(ec2::AbstractECConnectionPtr ec2Connection);
 };
 
-class Appserver2Launcher: 
+class Appserver2Launcher:
     public QObject, public nx::utils::test::ModuleLauncher<ec2::Appserver2Process>
 {
     Q_OBJECT;
     using base_type = ModuleLauncher<ec2::Appserver2Process>;
 signals:
     void beforeStart();
+public:
+    static std::unique_ptr<ec2::Appserver2Launcher> createAppserver(
+        bool keepDbFile = false,
+        quint16 baseTcpPort = 0);
 protected:
     virtual void beforeModuleStart() override
     {
@@ -79,5 +88,7 @@ protected:
         emit beforeStart();
     }
 };
+
+using Appserver2Ptr = std::unique_ptr<Appserver2Launcher>;
 
 } // namespace ec2

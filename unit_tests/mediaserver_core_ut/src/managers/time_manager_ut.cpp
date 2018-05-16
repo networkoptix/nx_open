@@ -35,13 +35,13 @@
 using namespace ec2::test;
 using namespace nx::utils::test;
 
-using Appserver2Ptr = std::unique_ptr<ec2::Appserver2Launcher>;
-
 namespace nx {
 namespace time_sync {
 namespace test {
 
 namespace {
+
+static const QString kSystemName("timeSyncTestSystem");
 
 class TestSystemClock:
     public AbstractSystemClock
@@ -110,16 +110,7 @@ public:
 
     bool start()
     {
-        static int instanceCounter = 0;
-        const auto tmpDir = nx::utils::TestOptions::temporaryDirectoryPath() +
-            lit("/ec2_server_sync_ut.data") + QString::number(instanceCounter++);
-        QDir(tmpDir).removeRecursively();
-
-        m_appserver.reset();
-        m_appserver.reset(new ec2::Appserver2Launcher());
-
-        const QString dbFileArg = lit("--dbFile=%1").arg(tmpDir);
-        m_appserver->addArg(dbFileArg.toStdString().c_str());
+        m_appserver = ec2::Appserver2Launcher::createAppserver();
 
         connect(m_appserver.get(), &ec2::Appserver2Launcher::beforeStart,
             this,
@@ -147,8 +138,8 @@ public:
 
 
         m_appserver->start();
-        m_appserver->waitUntilStarted();
-        return true;
+        return m_appserver->waitUntilStarted()
+            && m_appserver->moduleInstance()->createInitialData(kSystemName);
     }
 
     std::chrono::milliseconds getSyncTime() const
@@ -176,9 +167,7 @@ public:
 
     void connectTo(TimeSynchronizationPeer* remotePeer)
     {
-        const auto id = remotePeer->peerData().id;
-        auto messageBus = m_appserver->moduleInstance()->ecConnection()->messageBus();
-        messageBus->addOutgoingConnectionToPeer(id, remotePeer->apiUrl());
+        m_appserver->moduleInstance()->connectTo(remotePeer->m_appserver->moduleInstance().get());
     }
 
     ::ec2::ApiPeerData peerData() const
@@ -218,7 +207,7 @@ public:
     }
 
 private:
-    Appserver2Ptr m_appserver;
+    ec2::Appserver2Ptr m_appserver;
     bool m_syncWithInternetEnabled = false;
     std::shared_ptr<TestSystemClock> m_testSystemClock;
     std::shared_ptr<TestSteadyClock> m_testSteadyClock;

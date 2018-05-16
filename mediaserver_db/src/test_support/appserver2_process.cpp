@@ -57,6 +57,7 @@
 #include "ec2_connection_processor.h"
 #include <local_connection_factory.h>
 #include <api/model/time_reply.h>
+#include <nx/utils/test_support/test_options.h>
 
 static int registerQtResources()
 {
@@ -65,6 +66,8 @@ static int registerQtResources()
 }
 
 namespace ec2 {
+
+int m_instanceCounter = 0;
 
 //-------------------------------------------------------------------------------------------------
 // class Appserver2Process
@@ -455,16 +458,152 @@ void Appserver2Process::addSelfServerResource(
     m_commonModule->resourcePool()->addResource(server);
     server->setStatus(Qn::Online);
     server->setServerFlags(Qn::SF_HasPublicIP);
+    server->setName(QString::number(m_instanceCounter));
 
     m_commonModule->bindModuleInformation(server);
 
     ::ec2::ApiMediaServerData apiServer;
     apiServer.id = commonModule()->moduleGUID();
+    apiServer.name = server->getName();
     ::ec2::fromResourceToApi(server, apiServer);
     if (ec2Connection->getMediaServerManager(Qn::kSystemAccess)->saveSync(apiServer)
         != ec2::ErrorCode::ok)
     {
     }
+}
+
+bool initResourceTypes(ec2::AbstractECConnection* ec2Connection)
+{
+    QList<QnResourceTypePtr> resourceTypeList;
+    const ec2::ErrorCode errorCode = ec2Connection->getResourceManager(Qn::kSystemAccess)->getResourceTypesSync(&resourceTypeList);
+    if (errorCode != ec2::ErrorCode::ok)
+        return false;
+    qnResTypePool->replaceResourceTypeList(resourceTypeList);
+    return true;
+}
+
+bool initUsers(ec2::AbstractECConnection* ec2Connection)
+{
+    ec2::ApiUserDataList users;
+    const ec2::ErrorCode errorCode = ec2Connection->getUserManager(Qn::kSystemAccess)->getUsersSync(&users);
+    auto messageProcessor = ec2Connection->commonModule()->messageProcessor();
+    if (errorCode != ec2::ErrorCode::ok)
+        return false;
+    for (const auto &user : users)
+        messageProcessor->updateResource(user, ec2::NotificationSource::Local);
+    return true;
+}
+
+bool Appserver2Process::createInitialData(const QString& systemName)
+{
+    const auto connection = ecConnection();
+    if (connection == nullptr)
+        return false;
+    auto messageProcessor = commonModule()->messageProcessor();
+
+    if (!initResourceTypes(connection))
+        return false;
+    if (!initUsers(connection))
+        return false;
+
+    const auto settings = connection->commonModule()->globalSettings();
+    settings->setSystemName(systemName);
+    settings->setLocalSystemId(guidFromArbitraryData(systemName));
+    settings->setAutoDiscoveryEnabled(false);
+
+    //read server list
+    ec2::ApiMediaServerDataList mediaServerList;
+    auto resultCode =
+        connection->getMediaServerManager(Qn::kSystemAccess)->getServersSync(&mediaServerList);
+    if (resultCode != ec2::ErrorCode::ok)
+        return false;
+    for (const auto &mediaServer : mediaServerList)
+        messageProcessor->updateResource(mediaServer, ec2::NotificationSource::Local);
+
+    //read camera list
+    nx::vms::api::CameraDataList cameraList;
+    resultCode = 
+        connection->getCameraManager(Qn::kSystemAccess)->getCamerasSync(&cameraList);
+    if (resultCode != ec2::ErrorCode::ok)
+        return false;
+
+    for (const auto &camera : cameraList)
+        messageProcessor->updateResource(camera, ec2::NotificationSource::Local);
+
+    ec2::ApiMediaServerData serverData;
+    auto resTypePtr = qnResTypePool->getResourceTypeByName("Server");
+    if (resTypePtr.isNull())
+        return false;
+    serverData.typeId = resTypePtr->getId();
+    serverData.id = commonModule()->moduleGUID();
+    serverData.authKey = QnUuid::createUuid().toString();
+    serverData.name = lm("server %1").arg(serverData.id);
+    if (resTypePtr.isNull())
+        return false;
+    serverData.typeId = resTypePtr->getId();
+
+    auto serverManager = connection->getMediaServerManager(Qn::kSystemAccess);
+    resultCode = serverManager->saveSync(serverData);
+    if (resultCode != ec2::ErrorCode::ok)
+        return false;
+
+    auto ownServer = commonModule()->resourcePool()->getResourceById(serverData.id);
+    if (!ownServer)
+        return false;
+    ownServer->setStatus(Qn::Online);
+
+    return true;
+}
+
+void Appserver2Process::connectTo(const Appserver2Process* dstServer)
+{
+    const auto addr = dstServer->endpoint();
+    auto peerId = dstServer->commonModule()->moduleGUID();
+
+    nx::utils::Url url = lit("http://%1:%2/ec2/messageBus").arg(addr.address.toString()).arg(addr.port);
+    ecConnection()->messageBus()->
+        addOutgoingConnectionToPeer(peerId, url);
+}
+
+// ----------------------------- Appserver2Launcher ----------------------------------------------
+
+std::unique_ptr<ec2::Appserver2Launcher> Appserver2Launcher::createAppserver(
+    bool keepDbFile,
+    quint16 baseTcpPort)
+{
+    auto tmpDir = nx::utils::TestOptions::temporaryDirectoryPath();
+    if (tmpDir.isEmpty())
+        tmpDir = QDir::homePath();
+    tmpDir += lm("/ec2_server_sync_ut.data%1").arg(m_instanceCounter);
+    if (!keepDbFile)
+        QDir(tmpDir).removeRecursively();
+
+    Appserver2Ptr result(new Appserver2Launcher());
+    auto guid = guidFromArbitraryData(lm("guid_hash%1").arg(m_instanceCounter));
+
+    const QString dbFileArg = lit("--dbFile=%1").arg(tmpDir);
+    result->addArg(dbFileArg.toStdString().c_str());
+
+    const QString p2pModeArg = lit("--p2pMode=1");
+    result->addArg(p2pModeArg.toStdString().c_str());
+
+    const QString instanceArg = lit("--moduleInstance=%1").arg(m_instanceCounter);
+    result->addArg(instanceArg.toStdString().c_str());
+    const QString guidArg = lit("--moduleGuid=%1").arg(guid.toString());
+    result->addArg(guidArg.toStdString().c_str());
+
+    // Some p2p synchronization tests rely on broken authentication in appserver2.
+    result->addArg("--disableAuth");
+
+    if (baseTcpPort)
+    {
+        const QString guidArg = lit("--endpoint=0.0.0.0:%1").arg(baseTcpPort + m_instanceCounter);
+        result->addArg(guidArg.toStdString().c_str());
+    }
+
+    ++m_instanceCounter;
+
+    return result;
 }
 
 }   // namespace ec2

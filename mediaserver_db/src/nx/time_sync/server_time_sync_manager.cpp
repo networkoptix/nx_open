@@ -70,6 +70,7 @@ ServerTimeSyncManager::ServerTimeSyncManager(
             executeDelayed([this]()
             {
                 m_updateTimePlaned = false;
+                m_timer.invalidate();
                 updateTime();
             },
             std::chrono::milliseconds(kMinTimeUpdateInterval).count(),
@@ -183,7 +184,7 @@ QnUuid ServerTimeSyncManager::getPrimaryTimeServerId() const
         return primaryTimeServerId; //< User-defined time server.
     
     // Automatically select primary time server.
-    auto servers = resourcePool->getAllServers(Qn::Online);
+    auto servers = resourcePool->getAllServers(Qn::AnyStatus);
     if (servers.isEmpty())
         return QnUuid();
     std::sort(servers.begin(), servers.end(), compareTimePriority);
