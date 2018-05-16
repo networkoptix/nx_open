@@ -93,6 +93,9 @@ if(NOT targetDevice STREQUAL edge1)
     list(APPEND private_libs nx_speech_synthesizer)
 endif()
 
+set(favicon ${customization_dir}/icons/all/favicon.ico)
+set_property(SOURCE ${favicon} PROPERTY RESOURCE_ALIAS_PREFIX static/customization/)
+
 nx_add_target(mediaserver_core LIBRARY
     ADDITIONAL_SOURCES
         "${CMAKE_CURRENT_BINARY_DIR}/mediaserver_core_app_info_impl.cpp"
@@ -100,6 +103,7 @@ nx_add_target(mediaserver_core LIBRARY
         ${vendor_source_exclusions}
     ADDITIONAL_RESOURCES
         "${customization_dir}/mediaserver_core/resources"
+        ${favicon}
         "${CMAKE_CURRENT_BINARY_DIR}/resources"
         "${CMAKE_CURRENT_BINARY_DIR}/resources/static/api.xml"
         "${CMAKE_CURRENT_BINARY_DIR}/resources/static/api.json"
