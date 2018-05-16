@@ -39,5 +39,3 @@ class Users(object):
                 if account[u'Name'] == local_name:
                     return account
         return RuntimeError("Cannot find user {}", local_name)
-
-

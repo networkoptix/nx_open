@@ -37,7 +37,7 @@ def check_system_settings(server, **kw):
 
 def change_bool_setting(server, setting):
     val = str_to_bool(get_system_settings(server.api)[setting])
-    settings = {setting:  bool_to_str(not val)}
+    settings = {setting: bool_to_str(not val)}
     server.api.get('/api/systemSettings', params=settings)
     check_system_settings(server, **settings)
     return val
@@ -104,9 +104,9 @@ def test_merge_take_local_settings(one, two, test_system_settings):
     merge_systems(two, one)
     wait_for_settings_merge(one, two)
     check_system_settings(
-      one,
-      arecontRtspEnabled=bool_to_str(expected_arecont_rtsp_enabled),
-      auditTrailEnabled=bool_to_str(expected_audit_trail_enabled))
+        one,
+        arecontRtspEnabled=bool_to_str(expected_arecont_rtsp_enabled),
+        auditTrailEnabled=bool_to_str(expected_audit_trail_enabled))
 
     # Ensure both servers are merged and sync
     expected_arecont_rtsp_enabled = not change_bool_setting(one, 'arecontRtspEnabled')
@@ -131,9 +131,9 @@ def test_merge_take_remote_settings(one, two):
     merge_systems(two, one, take_remote_settings=True)
     wait_for_settings_merge(one, two)
     check_system_settings(
-      one,
-      arecontRtspEnabled=bool_to_str(expected_arecont_rtsp_enabled),
-      auditTrailEnabled=bool_to_str(expected_audit_trail_enabled))
+        one,
+        arecontRtspEnabled=bool_to_str(expected_arecont_rtsp_enabled),
+        auditTrailEnabled=bool_to_str(expected_audit_trail_enabled))
 
     # Ensure both servers are merged and sync
     expected_audit_trail_enabled = not change_bool_setting(one, 'auditTrailEnabled')
