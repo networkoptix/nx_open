@@ -830,7 +830,9 @@
                 "Hikvision|DS-2CD4A26FWD-IZS",
                 "Hikvision|DS-2CD63C2F-IS",
                 "Hikvision|DS-2DE4A220IW-DE",
-                "HIKVISION|DS-2CD4032FWD*"
+                "HIKVISION|DS-2CD4032FWD*",
+                "HIKVISION|DS-2CD2142FWD*",
+                "hikvision|DS-2CD2142FWD*"
             ],
             "parseOnvifNotificationsWithHttpReader": true
         },
@@ -854,7 +856,9 @@
                 "HIKVISION|DS-2CD2142FWD-IWS",
                 "ONVIF|H47",
                 "ONVIF|IP-2CD4B26FWD-IZS",
-                "*|NC304-WDA"
+                "*|NC304-WDA",
+                "HIKVISION|DS-2CD2142FWD*",
+                "hikvision|DS-2CD2142FWD*"
             ],
             "relayOutputInversed": true,
             "portNamePrefixToIgnore": "AlarmOut"
