@@ -1028,16 +1028,16 @@ void LocalConnectionFactory::registerRestHandlers(QnRestProcessorPool* const p)
      *     %param system Whether the rule is a built-in one, which cannot be deleted.
      *         %value false
      *         %value true
-     * %// AbstractBusinessEventManager::getBusinessRules
+     * %// AbstractEventRulesManager::getEventRules
      */
     regGet<QnUuid, EventRuleDataList>(p, ApiCommand::getEventRules);
 
     regGet<ApiTranLogFilter, ApiTransactionDataList>(p, ApiCommand::getTransactionLog);
 
-    // AbstractBusinessEventManager::save
+    // AbstractEventRulesManager::save
     regUpdate<EventRuleData>(p, ApiCommand::saveEventRule);
 
-    // AbstractBusinessEventManager::deleteRule
+    // AbstractEventRulesManager::deleteRule
     regUpdate<IdData>(p, ApiCommand::removeEventRule);
 
     regUpdate<ResetEventRulesData>(p, ApiCommand::resetEventRules);

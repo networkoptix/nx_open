@@ -12,7 +12,7 @@
 
 #include <transaction/message_bus_adapter.h>
 
-#include "managers/business_event_manager.h"
+#include <managers/event_rules_manager.h>
 #include "managers/camera_manager.h"
 #include "managers/layout_manager.h"
 #include <managers/layout_tour_manager.h>
@@ -50,7 +50,7 @@ namespace ec2
         virtual AbstractMediaServerManagerPtr getMediaServerManager(const Qn::UserAccessData &userAccessData) override;
         virtual AbstractCameraManagerPtr getCameraManager(const Qn::UserAccessData &userAccessData) override;
         virtual AbstractLicenseManagerPtr getLicenseManager(const Qn::UserAccessData &userAccessData) override;
-        virtual AbstractBusinessEventManagerPtr getBusinessEventManager(const Qn::UserAccessData &userAccessData) override;
+        virtual AbstractEventRulesManagerPtr getEventRulesManager(const Qn::UserAccessData &userAccessData) override;
         virtual AbstractUserManagerPtr getUserManager(const Qn::UserAccessData &userAccessData) override;
         virtual AbstractLayoutManagerPtr getLayoutManager(const Qn::UserAccessData &userAccessData) override;
         virtual AbstractLayoutTourManagerPtr getLayoutTourManager(const Qn::UserAccessData& userAccessData) override;
@@ -256,10 +256,10 @@ namespace ec2
     }
 
     template<class QueryProcessorType>
-    AbstractBusinessEventManagerPtr BaseEc2Connection<QueryProcessorType>::getBusinessEventManager(
+    AbstractEventRulesManagerPtr BaseEc2Connection<QueryProcessorType>::getEventRulesManager(
         const Qn::UserAccessData& userAccessData)
     {
-        return std::make_shared<QnBusinessEventManager<QueryProcessorType>>(
+        return std::make_shared<EventRulesManager<QueryProcessorType>>(
             messageBus(), m_queryProcessor, userAccessData);
     }
 

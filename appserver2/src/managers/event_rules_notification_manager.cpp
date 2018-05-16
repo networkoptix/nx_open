@@ -1,4 +1,4 @@
-#include "business_event_notification_manager.h"
+#include "event_rules_notification_manager.h"
 
 #include <nx/vms/api/data/event_rule_data.h>
 #include <nx_ec/data/api_conversion_functions.h>
@@ -35,9 +35,7 @@ void QnBusinessEventNotificationManager::triggerNotification(
     NotificationSource source)
 {
     NX_ASSERT(tran.command == ApiCommand::saveEventRule);
-    nx::vms::event::RulePtr businessRule(new nx::vms::event::Rule());
-    fromApiToResource(tran.params, businessRule);
-    emit addedOrUpdated(businessRule, source);
+    emit addedOrUpdated(tran.params, source);
 }
 
 void QnBusinessEventNotificationManager::triggerNotification(
