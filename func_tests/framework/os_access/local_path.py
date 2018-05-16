@@ -60,7 +60,7 @@ class LocalPath(PosixPath, FileSystemPath):
             raise DoesNotExist(self)
         if not self.is_dir():
             raise NotADir(self)
-        return self.glob(pattern)
+        return super(LocalPath, self).glob(pattern)
 
     @_reraising_existing_dir_errors
     def rmtree(self, ignore_errors=False):
