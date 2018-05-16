@@ -282,8 +282,6 @@ void QnAccessibleResourcesWidget::applyChanges()
 
     accessibleResources.subtract(unavailable);
 
-    m_permissionsModel->setAccessibleResources(accessibleResources);
-
     if (m_controlsVisible)
     {
         bool checkedAll = !m_controlsModel->checkedResources().isEmpty();
@@ -294,6 +292,10 @@ void QnAccessibleResourcesWidget::applyChanges()
             permissions &= ~Qn::GlobalAccessAllMediaPermission;
         m_permissionsModel->setRawPermissions(permissions);
     }
+
+    // Accessible resources must be set after m_permissionsModel change as updatePermissions will
+    // be called and accessible resources will be reset.
+    m_permissionsModel->setAccessibleResources(accessibleResources);
 }
 
 void QnAccessibleResourcesWidget::initControlsModel()
@@ -310,7 +312,7 @@ void QnAccessibleResourcesWidget::initControlsModel()
     m_controlsModel->setHasCheckboxes(true);
     m_controlsModel->setUserCheckable(false);
 
-    m_controlsModel->setOptions(QnResourceListModel::HideStatusOption | 
+    m_controlsModel->setOptions(QnResourceListModel::HideStatusOption |
         QnResourceListModel::ServerAsHealthMonitorOption);
 
     auto modelUpdated = [this](const QModelIndex& index = QModelIndex())
