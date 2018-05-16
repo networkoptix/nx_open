@@ -30,19 +30,19 @@ ${TM TEXT}                            qweasdzxc123®™
 
 #Log In Elements
 ${LOG IN MODAL}                       //div[contains(@class, 'modal-content')]
-${EMAIL INPUT}                        //form[contains(@name, 'loginForm')]//input[@ng-model='auth.email']
-${PASSWORD INPUT}                     //form[contains(@name, 'loginForm')]//input[@ng-model='auth.password']
-${LOG IN BUTTON}                      //form[contains(@name, 'loginForm')]//button[@ng-click='checkForm()']
-${REMEMBER ME CHECKBOX}               //form[contains(@name, 'loginForm')]//input[@ng-model='auth.remember']
-${FORGOT PASSWORD}                    //form[contains(@name, 'loginForm')]//a[@href='/restore_password']
-${LOG IN CLOSE BUTTON}                //button[@ng-click='close()']
+${EMAIL INPUT}                        //form//input[@id='email']
+${PASSWORD INPUT}                     //form//input[@id='password']
+${LOG IN BUTTON}                      //form//button[text()= 'Log in']
+${REMEMBER ME CHECKBOX}               //form//input[@id='remember']
+${FORGOT PASSWORD}                    //form//a[@href='/restore_password']
+${LOG IN CLOSE BUTTON}                //button[@data-dismiss='modal']
 
 ${LOG IN NAV BAR}                     //nav//a[contains(@ng-click, 'login()')]
 ${YOU HAVE NO SYSTEMS}                //span[contains(text(),'${YOU HAVE NO SYSTEMS TEXT}')]
 
-${ACCOUNT DROPDOWN}                   //li[contains(@class, 'collapse-first')]//a['uib-dropdown-toggle']
+${ACCOUNT DROPDOWN}                   //button[@id = 'accountSettingsSelect']
 ${LOG OUT BUTTON}                     //li[contains(@class, 'collapse-first')]//a[contains(text(), '${LOG OUT BUTTON TEXT}')]
-${ACCOUNT SETTINGS BUTTON}            //li[contains(@class, 'collapse-first')]//a[contains(text(), '${ACCOUNT SETTINGS BUTTON TEXT}')]
+${ACCOUNT SETTINGS BUTTON}            //li//a[(@href = '/account/')]
 ${SYSTEMS DROPDOWN}                   //li[contains(@class, 'collapse-second')]//a['uib-dropdown-toggle']
 ${ALL SYSTEMS}                        //li[contains(@class, 'collapse-second')]//a[@ng-href='/systems']
 ${AUTHORIZED BODY}                    //body[contains(@class, 'authorized')]
@@ -143,16 +143,15 @@ ${EDIT PERMISSIONS HINT}              //form[@name='shareForm']//span[contains(@
 ${ACCOUNT EMAIL}                      //form[@name='accountForm']//input[@ng-model='account.email']
 ${ACCOUNT FIRST NAME}                 //form[@name='accountForm']//input[@ng-model='account.first_name']
 ${ACCOUNT LAST NAME}                  //form[@name='accountForm']//input[@ng-model='account.last_name']
-${ACCOUNT LANGUAGE DROPDOWN}          //form[@name='accountForm']//language-select//button
+${ACCOUNT LANGUAGE DROPDOWN}          //form[@name='accountForm']//nx-language-select//button[@id = 'languageSelect']
 ${ACCOUNT SAVE}                       //form[@name='accountForm']//button[@ng-click='checkForm()']
-${ACCOUNT SUBSCRIBE CHECKBOX}         //form[@name='accountForm']//input[@ng-model='account.subscribe']
-
+${ACCOUNT SUBSCRIBE CHECKBOX}         //form[@name='accountForm']//input[@ng-model='account.subscribe']/following-sibling::span[contains(@class, 'checkmark')]
 #Already logged in modal
 ${LOGGED IN CONTINUE BUTTON}          //div[@uib-modal-transclude]//button[@ng-click='ok()']
 ${LOGGED IN LOG OUT BUTTON}           //div[@uib-modal-transclude]//button[@ng-click='cancel()']
 
-${CONTINUE BUTTON}                    //div[@uib-modal-window='modal-window']//button[@ng-class='settings.buttonClass' and @ng-click='ok()']
-${CONTINUE MODAL}                     //div[@uib-modal-window='modal-window']
+${CONTINUE BUTTON}                    //ngb-modal-window//button[contains(text(), 'Continue')]
+${CONTINUE MODAL}                     //ngb-modal-window
 
 ${300CHARS}                           QWErtyuiopasdfghhkljzxcvbnmqwertyuiopasdfghhkljzxcvbnmqwertyuiopasdfghhkljzxcvbnmqwertyuiopasdfghhkljzxcvbnmqwertyuiopasdfghhkljzxcvbnmqwertyuiopasdfghhkljzxcvbnmqwertyuiopasdfghhkljzxcvbnmqwertyuiopasdfghhkljzxcvbnmqwertyuiopasdfghhkljzxcvbnmqwertyuiopasdfghhkljzxcvbnmqwertyuiopasdfghhkljzxcvbnmyy
 ${255CHARS}                           QWErtyuiopasdfghhkljzxcvbnmqwertyuiopasdfghhkljzxcvbnmqwertyuiopasdfghhkljzxcvbnmqwertyuiopasdfghhkljzxcvbnmqwertyuiopasdfghhkljzxcvbnmqwertyuiopasdfghhkljzxcvbnmqwertyuiopasdfghhkljzxcvbnmqwertyuiopasdfghhkljzxcvbnmqwertyuiopasdfghhkljzxcvbnmqwertyuiopas

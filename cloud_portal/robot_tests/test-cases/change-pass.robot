@@ -16,6 +16,8 @@ Log In To Change Password Page
     Go To    ${url}/account/password
     Log In    ${email}    ${password}    None
     Validate Log In
+    ######## TEMPORARYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYY
+    Go To    ${url}/account/password
     Wait Until Elements Are Visible    ${CURRENT PASSWORD INPUT}    ${NEW PASSWORD INPUT}    ${CHANGE PASSWORD BUTTON}
 
 Restart

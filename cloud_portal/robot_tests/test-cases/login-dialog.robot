@@ -31,8 +31,8 @@ can be opened in anonymous state
 can be closed after clicking on background
     Wait Until Element Is Visible    ${LOG IN NAV BAR}
     Click Link    ${LOG IN NAV BAR}
-    Wait Until Elements Are Visible    ${LOG IN MODAL}    //div[@uib-modal-backdrop='modal-backdrop']/..    ${LOG IN BUTTON}    ${EMAIL INPUT}    ${PASSWORD INPUT}
-    Click Element At Coordinates    //div[@uib-modal-backdrop='modal-backdrop']/..    10    10
+    Wait Until Elements Are Visible    ${LOG IN MODAL}    //ngb-modal-backdrop    ${LOG IN BUTTON}    ${EMAIL INPUT}    ${PASSWORD INPUT}
+    Click Element At Coordinates    //ngb-modal-backdrop    10    10
     Wait Until Page Does Not Contain Element    ${LOG IN MODAL}
     Page Should Not Contain Element    ${LOG IN MODAL}
 
@@ -67,19 +67,11 @@ allows log in with existing email in uppercase
     Log In    ${email uppercase}    ${password}
     Validate Log In
 
-shows red outline if field is wrong/empty after blur
-    Wait Until Element Is Visible    ${LOG IN NAV BAR}
-    Click Link    ${LOG IN NAV BAR}
-    Wait Until Elements Are Visible    ${EMAIL INPUT}    ${PASSWORD INPUT}
-    Wait Until Element Is Visible    ${LOG IN BUTTON}
-    Click Element    ${LOG IN BUTTON}
-    Wait Until Elements Are Visible    ${EMAIL INPUT}/parent::div[contains(@class, 'has-error')]    ${PASSWORD INPUT}/parent::div[contains(@class, 'has-error')]
-
 allows log in with 'Remember Me checkmark' switched off
     Wait Until Element Is Visible    ${LOG IN NAV BAR}
     Click Link    ${LOG IN NAV BAR}
-    Wait Until Elements Are Visible    ${REMEMBER ME CHECKBOX}   ${EMAIL INPUT}    ${PASSWORD INPUT}    ${LOG IN BUTTON}
-    Click Element    ${REMEMBER ME CHECKBOX}
+    Wait Until Elements Are Visible    ${REMEMBER ME CHECKBOX}/..   ${EMAIL INPUT}    ${PASSWORD INPUT}    ${LOG IN BUTTON}
+    Click Element    ${REMEMBER ME CHECKBOX}/..
     Checkbox Should Not Be Selected    ${REMEMBER ME CHECKBOX}
     input text    ${EMAIL INPUT}    ${email}
     input text    ${PASSWORD INPUT}    ${password}
@@ -188,11 +180,11 @@ should respond to Tab key
 should respond to Space key and toggle checkbox
     Wait Until Element Is Visible    ${LOG IN NAV BAR}
     Click Link    ${LOG IN NAV BAR}
-    Wait Until Element Is Visible    ${REMEMBER ME CHECKBOX}
-    Set Focus To Element    ${REMEMBER ME CHECKBOX}
-    Press Key    ${REMEMBER ME CHECKBOX}    ${SPACEBAR}
+    Wait Until Element Is Visible    ${REMEMBER ME CHECKBOX}/..
+    Set Focus To Element    ${REMEMBER ME CHECKBOX}/..
+    Press Key    ${REMEMBER ME CHECKBOX}/..    ${SPACEBAR}
     Checkbox Should Not Be Selected    ${REMEMBER ME CHECKBOX}
-    Press Key    ${REMEMBER ME CHECKBOX}    ${SPACEBAR}
+    Press Key    ${REMEMBER ME CHECKBOX}/..    ${SPACEBAR}
     Checkbox Should Be Selected    ${REMEMBER ME CHECKBOX}
 
 handles two tabs, updates second tab state if logout is done on first
