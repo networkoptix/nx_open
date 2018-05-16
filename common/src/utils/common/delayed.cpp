@@ -3,7 +3,7 @@
 #include <QtCore/QTimer>
 #include <QtCore/QThread>
 #include <QtCore/QEvent>
-#include <QtWidgets/QApplication>
+#include <QtCore/QCoreApplication>
 
 #include <utils/common/event_loop.h>
 
