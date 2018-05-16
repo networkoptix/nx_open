@@ -97,14 +97,14 @@ void TimeSyncManager::loadTimeFromLocalClock()
         arg(QDateTime::fromMSecsSinceEpoch(newValue.count()).toString(Qt::ISODate)));
 }
 
-void TimeSyncManager::loadTimeFromServer(const QnRoute& route)
+bool TimeSyncManager::loadTimeFromServer(const QnRoute& route)
 {
     auto socket = connectToRemoteHost(route);
     if (!socket)
     {
         NX_WARNING(this, 
             lm("Can't read time from server %1. Can't establish connection to the remote host."));
-        return;
+        return false;
     }
 
     auto httpClient = std::make_unique<nx::network::http::HttpClient>();
@@ -120,7 +120,7 @@ void TimeSyncManager::loadTimeFromServer(const QnRoute& route)
     {
         NX_WARNING(this, lm("Can't read time from server %1. Error: %2")
             .args(route.id.toString(), httpClient->lastSysErrorCode()));
-        return;
+        return false;
     }
 
     auto jsonResult = QJson::deserialized<QnJsonRestResult>(*response);
@@ -129,7 +129,7 @@ void TimeSyncManager::loadTimeFromServer(const QnRoute& route)
     {
         NX_WARNING(this, lm("Can't deserialize time reply from server %1")
             .arg(route.id.toString()));
-        return;
+        return false;
     }
     
     auto newTime = std::chrono::milliseconds(timeData.utcTime - timer.elapsedMs() / 2);
@@ -146,10 +146,11 @@ void TimeSyncManager::setSyncTime(std::chrono::milliseconds value)
     const auto syncTime = getSyncTime();
     const auto timeDelta = value < syncTime ? syncTime - value : value - syncTime;
     if (timeDelta < minDeltaToSync)
-        return;
+        return false;
 
     setSyncTimeInternal(value);
     emit timeChanged(value.count());
+    return true;
 }
 
 void TimeSyncManager::setSyncTimeInternal(std::chrono::milliseconds value)

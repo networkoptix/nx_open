@@ -82,7 +82,7 @@ signals:
 protected:
     using AbstractStreamSocketPtr = std::unique_ptr<nx::network::AbstractStreamSocket>;
 
-    void loadTimeFromServer(const QnRoute& route);
+    bool loadTimeFromServer(const QnRoute& route);
     void loadTimeFromLocalClock();
 
     virtual void updateTime() = 0;

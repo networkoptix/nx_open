@@ -48,35 +48,6 @@ ServerTimeSyncManager::ServerTimeSyncManager(
     m_serverConnector(serverConnector)
 {
 
-    connect(
-        commonModule->resourcePool(), &QnResourcePool::statusChanged,
-        this, [this](const QnResourcePtr& resource, Qn::StatusChangeReason /*reason*/)
-    {
-        if (auto server = resource.dynamicCast<QnMediaServerResource>())
-        {
-            auto commonModule = this->commonModule();
-            QnMediaServerResourcePtr ownServer = commonModule->resourcePool()
-                ->getResourceById<QnMediaServerResource>(commonModule->moduleGUID());
-            if (!ownServer)
-                return;
-
-            bool isLess = compareTimePriority(server, ownServer);
-            if (!isLess)
-                return;
-
-            if (m_updateTimePlaned.exchange(true))
-                return;
-
-            executeDelayed([this]()
-            {
-                m_updateTimePlaned = false;
-                m_timer.invalidate();
-                updateTime();
-            },
-            std::chrono::milliseconds(kMinTimeUpdateInterval).count(),
-            this->thread());
-        }
-    });
     connect(this, &ServerTimeSyncManager::timeChanged, this,
         [this](qint64 syncTimeMs)
         {
@@ -94,10 +65,17 @@ ServerTimeSyncManager::ServerTimeSyncManager(
                     NX_WARNING(this, lm("Failed to save time delta data to the database"));
             });
 
+            
+
             auto primaryTimeServerId = getPrimaryTimeServerId();
             if (primaryTimeServerId == this->commonModule()->moduleGUID())
                 broadcastSystemTimeDelayed();
         });
+    connect(
+        commonModule->ec2Connection()->getTimeNotificationManager().get(),
+        &ec2::AbstractTimeNotificationManager::primaryTimeServerTimeChanged,
+        this,
+        [this]() { m_lastNetworkSyncTime.restart(); });
 }
 
 void ServerTimeSyncManager::broadcastSystemTimeDelayed()
@@ -177,18 +155,8 @@ void ServerTimeSyncManager::initializeTimeFetcher()
 
 QnUuid ServerTimeSyncManager::getPrimaryTimeServerId() const
 {
-    auto resourcePool = commonModule()->resourcePool();
     auto settings = commonModule()->globalSettings();
-    QnUuid primaryTimeServerId = settings->primaryTimeServer();
-    if (!primaryTimeServerId.isNull())
-        return primaryTimeServerId; //< User-defined time server.
-    
-    // Automatically select primary time server.
-    auto servers = resourcePool->getAllServers(Qn::AnyStatus);
-    if (servers.isEmpty())
-        return QnUuid();
-    std::sort(servers.begin(), servers.end(), compareTimePriority);
-    return servers.front()->getId();
+    return settings->primaryTimeServer();
 }
 
 std::unique_ptr<nx::network::AbstractStreamSocket> ServerTimeSyncManager::connectToRemoteHost(const QnRoute& route)
@@ -198,10 +166,10 @@ std::unique_ptr<nx::network::AbstractStreamSocket> ServerTimeSyncManager::connec
     return base_type::connectToRemoteHost(route);
 }
 
-void ServerTimeSyncManager::loadTimeFromInternet()
+bool ServerTimeSyncManager::loadTimeFromInternet()
 {
     if (m_internetSyncInProgress.exchange(true))
-        return; //< Sync already in progress.
+        return false; //< Sync already in progress.
 
     m_internetTimeSynchronizer->getTimeAsync(
         [this](const qint64 newValue, SystemError::ErrorCode errorCode)
@@ -210,6 +178,7 @@ void ServerTimeSyncManager::loadTimeFromInternet()
             {
                 NX_WARNING(this, lm("Failed to get time from the internet. %1")
                     .arg(SystemError::toString(errorCode)));
+                m_lastNetworkSyncTime.invalidate();
                 return;
             }
             setSyncTime(std::chrono::milliseconds(newValue));
@@ -217,14 +186,86 @@ void ServerTimeSyncManager::loadTimeFromInternet()
                 arg(QDateTime::fromMSecsSinceEpoch(newValue).toString(Qt::ISODate)));
             m_internetSyncInProgress = false;
         });
+    return true;
+}
+
+QnRoute ServerTimeSyncManager::getNearestServerWithInternet()
+{
+    auto servers = commonModule()->resourcePool()->getAllServers(Qn::Online);
+    int minDistance = std::numeric_limits<int>::max();
+    QnRoute result;
+    for (const auto& server: servers)
+    {
+        if (!server->getServerFlags().testFlag(Qn::SF_HasPublicIP))
+            continue;
+        auto route = commonModule()->router()->routeTo(server->getId());
+        if (route.distance < minDistance)
+        {
+            result = route;
+            minDistance = route.distance;
+        }
+    }
+    return result;
 }
 
 void ServerTimeSyncManager::updateTime()
 {
     const auto primaryTimeServerId = getPrimaryTimeServerId();
+    const auto ownId = commonModule()->moduleGUID();
+    bool syncWithInternel = commonModule()->globalSettings()->isSynchronizingTimeWithInternet();
+
+    const bool isTimeRecentlySync = m_lastNetworkSyncTime.isValid() 
+        && !m_lastNetworkSyncTime.hasExpired(m_networkTimeSyncInterval);
+
+    if (syncWithInternel)
+    {
+        QnRoute route = getNearestServerWithInternet();
+        if (!route.isValid())
+            return;
+        if (isTimeRecentlySync && m_timeLoadFromServer == route.id)
+            return;
+        m_timeLoadFromServer == route.id;
+        m_lastNetworkSyncTime.restart();
+
+        bool success = false;
+        if (route.id == ownId)
+            success = loadTimeFromInternet();
+        else
+            success = loadTimeFromServer(route);
+        if (success)
+        {
+            m_timeLoadFromServer == route.id;
+            m_lastNetworkSyncTime.restart();
+        }
+    }
+    else if (primaryTimeServerId == ownId)
+    {
+        loadTimeFromLocalClock();
+    }
+    else
+    {
+        auto route = commonModule()->router()->routeTo(primaryTimeServerId);
+        if (route.isValid())
+        {
+            if (isTimeRecentlySync && m_timeLoadFromServer == route.id)
+                return;
+            if (loadTimeFromServer(route))
+            {
+                m_timeLoadFromServer == route.id;
+                m_lastNetworkSyncTime.restart();
+            }
+        }
+    }
+}
+
+#if 0
+void ServerTimeSyncManager::updateTime()
+{
+    const auto primaryTimeServerId = getPrimaryTimeServerId();
     bool syncWithInternel = commonModule()->globalSettings()->isSynchronizingTimeWithInternet();
     const bool canSyncNetworkTime = m_timer.hasExpired(m_networkTimeSyncInterval);
-    m_timer.restart();
+    if (canSyncNetworkTime)
+        m_timer.restart();
 
     if (primaryTimeServerId.isNull())
     {
@@ -251,6 +292,7 @@ void ServerTimeSyncManager::updateTime()
             loadTimeFromServer(route);
     }
 }
+#endif
 
 } // namespace time_sync
 } // namespace nx
