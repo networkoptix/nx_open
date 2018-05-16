@@ -39,6 +39,10 @@ func (report *TestsRunReport) totalFailureCount() int {
 	return result
 }
 
+func (report *TestsRunReport) success() bool {
+	return report.totalFailureCount() == 0
+}
+
 //-------------------------------------------------------------------------------------------------
 
 type TestSuite interface {

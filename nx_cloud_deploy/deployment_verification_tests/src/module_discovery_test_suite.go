@@ -9,6 +9,8 @@ import (
 	"net/url"
 )
 
+var moduleNamesToVerify = []string{"hpm", "cdb"}
+
 type CloudModules struct {
 	Modules []struct {
 		Name string `xml:"resName,attr"`
@@ -34,37 +36,39 @@ func (cloudModules *CloudModules) getModuleUrl(name string) (*url.URL, error) {
 //-------------------------------------------------------------------------------------------------
 
 type ModuleDiscoveryTestSuite struct {
-	configuration Configuration
+	configuration *Configuration
 }
 
-func NewModuleDiscoveryTestSuite(configuration Configuration) *ModuleDiscoveryTestSuite {
+func NewModuleDiscoveryTestSuite(configuration *Configuration) *ModuleDiscoveryTestSuite {
 	return &ModuleDiscoveryTestSuite{configuration}
 }
 
 func (testSuite *ModuleDiscoveryTestSuite) run() TestSuiteReport {
 	testSuiteReport := TestSuiteReport{}
 
-	testSuiteReport.testReports = append(testSuiteReport.testReports, testSuite.testMediatorHost())
+	testSuiteReport.testReports = append(testSuiteReport.testReports, testSuite.verifyEveryModuleIsAccesible())
 
 	return testSuiteReport
 }
 
-func (testSuite *ModuleDiscoveryTestSuite) testMediatorHost() TestReport {
+func (testSuite *ModuleDiscoveryTestSuite) verifyEveryModuleIsAccesible() TestReport {
 	cloudModules, err := testSuite.fetchCloudModulesXml()
 	if err != nil {
-		return TestReport{"testMediatorHost", false, err}
+		return TestReport{"verifyEveryModuleIsAccesible", false, err}
 	}
 
-	mediatorUrl, err := cloudModules.getModuleUrl("hpm")
-	if err != nil {
-		return TestReport{"testMediatorHost", false, err}
+	for _, moduleName := range moduleNamesToVerify {
+		moduleUrl, err := cloudModules.getModuleUrl(moduleName)
+		if err != nil {
+			return TestReport{"verifyEveryModuleIsAccesible", false, err}
+		}
+
+		if err := testSuite.verifyUrlPointsToAValidResource(moduleUrl); err != nil {
+			return TestReport{"verifyEveryModuleIsAccesible", false, err}
+		}
 	}
 
-	if err := testSuite.verifyUrlPointsToAValidResource(mediatorUrl); err != nil {
-		return TestReport{"testMediatorHost", false, err}
-	}
-
-	return TestReport{"testMediatorHost", true, nil}
+	return TestReport{"verifyEveryModuleIsAccesible", true, nil}
 }
 
 func (testSuite *ModuleDiscoveryTestSuite) fetchCloudModulesXml() (CloudModules, error) {

@@ -1,10 +1,10 @@
 package main
 
 type CloudPortalTestSuite struct {
-	configuration Configuration
+	configuration *Configuration
 }
 
-func NewCloudPortalTestSuite(configuration Configuration) *CloudPortalTestSuite {
+func NewCloudPortalTestSuite(configuration *Configuration) *CloudPortalTestSuite {
 	return &CloudPortalTestSuite{configuration}
 }
 

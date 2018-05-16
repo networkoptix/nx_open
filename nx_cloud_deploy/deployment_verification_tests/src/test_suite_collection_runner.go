@@ -1,29 +1,51 @@
 package main
 
+import (
+	"time"
+)
+
 type TestSuiteCollectionRunner struct {
-	configuration       Configuration
-	testSuites          []TestSuite
-	testSuiteResultPipe chan TestSuiteReport
-	report              TestsRunReport
+	configuration              *Configuration
+	testSuites                 []TestSuite
+	testSuiteResultPipe        chan TestSuiteReport
+	report                     TestsRunReport
+	testSuiteCollectionFactory TestSuiteCollectionFactory
 }
 
-func NewTestSuiteCollectionRunner(configuration Configuration) *TestSuiteCollectionRunner {
+func NewTestSuiteCollectionRunner(configuration *Configuration) *TestSuiteCollectionRunner {
 	instance := TestSuiteCollectionRunner{}
 	instance.configuration = configuration
+	instance.testSuiteCollectionFactory = &DefaultTestSuiteCollectionFactory{}
 	return &instance
 }
 
 func (testRunner *TestSuiteCollectionRunner) run() error {
-	if err := testRunner.initializeTestSuites(); err != nil {
-		return err
-	}
+	startTime := time.Now()
 
-	if err := testRunner.startTestSuites(); err != nil {
-		return err
-	}
+	for {
+		if err := testRunner.initializeTestSuites(); err != nil {
+			return err
+		}
 
-	if err := testRunner.waitForCompletion(); err != nil {
-		return err
+		if err := testRunner.startTestSuites(); err != nil {
+			return err
+		}
+
+		if err := testRunner.waitForCompletion(); err != nil {
+			return err
+		}
+
+		if testRunner.report.success() {
+			break
+		}
+
+		curTime := time.Now()
+		if curTime.Sub(startTime) > testRunner.configuration.maxTimeToWaitForTestsToPass {
+			// There are failures in the report.
+			break
+		}
+
+		time.Sleep(testRunner.configuration.retryTestPeriod)
 	}
 
 	return nil
@@ -32,13 +54,14 @@ func (testRunner *TestSuiteCollectionRunner) run() error {
 //-------------------------------------------------------------------------------------------------
 
 func (testRunner *TestSuiteCollectionRunner) initializeTestSuites() error {
-	testRunner.testSuites = append(testRunner.testSuites, NewCloudPortalTestSuite(testRunner.configuration))
-	testRunner.testSuites = append(testRunner.testSuites, NewModuleDiscoveryTestSuite(testRunner.configuration))
+	testRunner.testSuites = testRunner.testSuiteCollectionFactory.create(testRunner.configuration)
 	testRunner.testSuiteResultPipe = make(chan TestSuiteReport, len(testRunner.testSuites))
 	return nil
 }
 
 func (testRunner *TestSuiteCollectionRunner) startTestSuites() error {
+	testRunner.report = TestsRunReport{}
+
 	for _, testSuite := range testRunner.testSuites {
 		go testRunner.runTestSuite(testSuite)
 	}

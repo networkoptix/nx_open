@@ -7,14 +7,22 @@ import (
 	"strconv"
 	"strings"
 	"testing"
+	"time"
 )
 
-const invalidCloudModulesXml string = `<?xml version="1.0" encoding="utf-8"?>
+const cloudModulesXmlWithInvalidMediatorUrl string = `<?xml version="1.0" encoding="utf-8"?>
+<sequence>
+	<set resName="cdb" resValue="http://127.0.0.1:%port%" />
+    <set resName="hpm" resValue="stun://None:3345" />
+    <set resName="notification_module" resValue="http://127.0.0.1:%port%" />
+</sequence>`
+
+const cloudModulesXmlWithInvalidCdbUrl string = `<?xml version="1.0" encoding="utf-8"?>
 <sequence>
 	<set resName="cdb" resValue="https://
 	nxvms.com:443" />
-    <set resName="hpm" resValue="stun://None:3345" />
-    <set resName="notification_module" resValue="https://nxvms.com:443" />
+    <set resName="hpm" resValue="stun://127.0.0.1:%port%" />
+    <set resName="notification_module" resValue="http://127.0.0.1:%port%" />
 </sequence>`
 
 const validCloudModulesXmlTemplate string = `<?xml version="1.0" encoding="utf-8"?>
@@ -62,22 +70,26 @@ func (testCtx *ModuleDiscoveryTestContext) givenCloudModulesXmlServerWithContent
 	testCtx.cloudModuleXmlServerPort = listener.Addr().(*net.TCPAddr).Port
 }
 
-func (testCtx *ModuleDiscoveryTestContext) givenInvalidCloudModulesXmlServer() {
-	testCtx.givenCloudModulesXmlServerWithContents(invalidCloudModulesXml)
+func (testCtx *ModuleDiscoveryTestContext) givenValidCloudModulesXmlServer() {
+	testCtx.givenCloudModulesXmlServer(validCloudModulesXmlTemplate)
 }
 
-func (testCtx *ModuleDiscoveryTestContext) givenValidCloudModulesXmlServer() {
+func (testCtx *ModuleDiscoveryTestContext) givenCloudModulesXmlServer(cloudModulesXmlTemplate string) {
 	testCtx.givenCloudModulesXmlServerWithContents("dummy response")
 	testCtx.cloudModuleEmulationServer = testCtx.cloudModuleXmlServer
 	testCtx.cloudModuleEmulationServerPort = testCtx.cloudModuleXmlServerPort
 
-	validCloudModulesXml := strings.Replace(validCloudModulesXmlTemplate, "%port%", strconv.Itoa(testCtx.cloudModuleEmulationServerPort), -1)
-	testCtx.givenCloudModulesXmlServerWithContents(validCloudModulesXml)
+	cloudModulesXml := strings.Replace(cloudModulesXmlTemplate, "%port%", strconv.Itoa(testCtx.cloudModuleEmulationServerPort), -1)
+	testCtx.givenCloudModulesXmlServerWithContents(cloudModulesXml)
 }
 
 func (testCtx *ModuleDiscoveryTestContext) whenVerifyCloudModuleXml() {
-	conf := Configuration{"127.0.0.1", testCtx.cloudModuleXmlServerPort}
-	moduleDiscoveryTestSuite := NewModuleDiscoveryTestSuite(conf)
+	conf := NewConfiguration()
+	conf.instanceHostname = "127.0.0.1"
+	conf.httpPort = testCtx.cloudModuleXmlServerPort
+	conf.maxTimeToWaitForTestsToPass = time.Duration(0)
+
+	moduleDiscoveryTestSuite := NewModuleDiscoveryTestSuite(&conf)
 	testCtx.report = moduleDiscoveryTestSuite.run()
 }
 
@@ -93,19 +105,24 @@ func (testCtx *ModuleDiscoveryTestContext) thenVerificationHasSucceeded() {
 	}
 }
 
-//-------------------------------------------------------------------------------------------------
-
-func TestIncorrectModuleUrlIsDetected(t *testing.T) {
+func assertIncorrectModuleUrlIsDetected(t *testing.T, cloudModulesXml string) {
 	testCtx := NewModuleDiscoveryTestContext(t)
 
-	testCtx.givenInvalidCloudModulesXmlServer()
+	testCtx.givenCloudModulesXmlServer(cloudModulesXml)
 	defer testCtx.cloudModuleXmlServer.Close()
 
 	testCtx.whenVerifyCloudModuleXml()
 	testCtx.thenVerificationHasFailed()
 }
 
-func TestCorrectModuleUrlIsDetected(t *testing.T) {
+//-------------------------------------------------------------------------------------------------
+
+func TestModuleDiscoveryIncorrectModuleUrlIsDetected(t *testing.T) {
+	assertIncorrectModuleUrlIsDetected(t, cloudModulesXmlWithInvalidCdbUrl)
+	assertIncorrectModuleUrlIsDetected(t, cloudModulesXmlWithInvalidMediatorUrl)
+}
+
+func TestModuleDiscoveryCorrectModuleUrlIsDetected(t *testing.T) {
 	testCtx := NewModuleDiscoveryTestContext(t)
 
 	testCtx.givenValidCloudModulesXmlServer()

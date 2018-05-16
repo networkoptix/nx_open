@@ -10,7 +10,7 @@ func main() {
 
 	configuration := readConfiguration()
 
-	testSuiteCollectionRunner := NewTestSuiteCollectionRunner(configuration)
+	testSuiteCollectionRunner := NewTestSuiteCollectionRunner(&configuration)
 	if err := testSuiteCollectionRunner.run(); err != nil {
 		log.Println("Tests failed with error: " + err.Error())
 		os.Exit(1)
