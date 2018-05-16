@@ -126,8 +126,8 @@ class VagrantBoxFactory(object):
                 box.init(safe=True)
 
     def destroy_all(self):
-        if not self._boxes: return
         self._vagrant.destroy()
+        if not self._boxes: return
         self._boxes.clear()
         self._save_boxes_config_to_cache()
         self._last_box_idx = 0
