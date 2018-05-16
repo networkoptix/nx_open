@@ -205,22 +205,10 @@ class WindowsNetworking(Networking):
                 ''',
             {})
 
-    def ping(self, ip, timeout_sec=5):
-        def ping_once():
-            query = self._winrm.wmi_query(u'Win32_PingStatus', {u'Address': str(ip)})
-            status = query.get_one()
-            is_successful = status[u'StatusCode'] == u'0'
-            return is_successful
-
-        wait_for_true(ping_once, "{} is reachable".format(ip), timeout_sec=timeout_sec)
-
     def can_reach(self, ip, timeout_sec=4):
-        try:
-            self.ping(ip, timeout_sec=timeout_sec)
-        except PingError:
-            return False
-        else:
-            return True
+        query = self._winrm.wmi_query(u'Win32_PingStatus', {u'Address': str(ip)})
+        status = query.get_one()
+        return status[u'StatusCode'] == u'0'
 
     def reset(self):
         self.remove_routes()

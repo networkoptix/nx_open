@@ -74,10 +74,7 @@ def test_ping_localhost(networking):
 
 
 def test_ping_invalid_address(networking):
-    with pytest.raises(PingError) as pytest_exception_info:
-        networking.ping('127.0.0.0')
-    python_exception = pytest_exception_info.value
-    assert python_exception.ip == '127.0.0.0'
+    assert not networking.can_reach('127.0.0.0')
 
 
 def test_internet_access(networking):
