@@ -25,11 +25,15 @@ nx_configure_directory(
     ${CMAKE_CURRENT_BINARY_DIR}/resources/static/skin
     COPYONLY)
 
+nx_configure_file(
+   ${customization_dir}/icons/all/favicon.ico
+   ${CMAKE_CURRENT_BINARY_DIR}/resources/static/customization
+   COPYONLY)
+
 set(apidoctool_jar "${APIDOCTOOL_PATH}/apidoctool.jar")
 
 set(apidoctool_params
-    "-DtemplateRegistrationCpp=/mediaserver_db/src/local_connection_factory.cpp"
-    "-DhandlerRegistrationCpp=/mediaserver_core/src/media_server_process.cpp"
+    "-config" "${CMAKE_CURRENT_SOURCE_DIR}/api/apidoctool.properties"
 )
 
 if(Java_VERSION_MINOR LESS 6 OR Java_VERSION_MINOR GREATER 8)
@@ -101,7 +105,6 @@ nx_add_target(mediaserver_core LIBRARY
         ${vendor_source_exclusions}
     ADDITIONAL_RESOURCES
         "${customization_dir}/mediaserver_core/resources"
-        "${customization_dir}/icons/all/favicon.ico"
         "${CMAKE_CURRENT_BINARY_DIR}/resources"
         "${CMAKE_CURRENT_BINARY_DIR}/resources/static/api.xml"
         "${CMAKE_CURRENT_BINARY_DIR}/resources/static/api.json"

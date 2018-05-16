@@ -373,7 +373,7 @@ void LocalConnectionFactory::registerRestHandlers(QnRestProcessorPool* const p)
 
     regUpdate<ApiStorageDataList>(p, ApiCommand::saveStorages);
 
-    /**%apidoc POST /ec2/saveStorage
+    /**%apidoc[proprietary] POST /ec2/saveStorage
      * Save the storage.
      * <p>
      * Parameters should be passed as a JSON object in POST message body with
@@ -385,6 +385,8 @@ void LocalConnectionFactory::registerRestHandlers(QnRestProcessorPool* const p)
      * %param parentId Parent server unique id.
      * %param name Arbitrary resource name (optional)
      * %param url Full storage url (path to the local folder).
+     * %param[proprietary] typeId Should have fixed value.
+     *     %value {f8544a40-880e-9442-b78a-9da6db6862b4}
      * %param spaceLimit Free space to maintain on the storage,
      *     in bytes. Recommended value is 10 gigabytes for local storages and
      *     100 gigabytes for NAS.
@@ -1292,6 +1294,7 @@ void LocalConnectionFactory::registerRestHandlers(QnRestProcessorPool* const p)
      * %permissions Administrator.
      * %param[opt] id Web page unique id. Can be omitted when creating a new object. If such object
      *     exists, omitted fields will not be changed.
+     * %param[proprietary] parentId
      * %param name Web page name.
      * %param url Web page url.
      * %param[proprietary] typeId Should have fixed value.
@@ -1490,10 +1493,13 @@ void LocalConnectionFactory::registerRestHandlers(QnRestProcessorPool* const p)
     * %permissions Administrator
     * %param[opt] id Layout tour unique id. Can be omitted when creating a new object. If such
     *     object exists, omitted fields will not be changed.
+    * %param parentId
     * %param name Tour name.
     * %param items List of the layout tour items.
     * %param items[].resourceId Resource unique id. Can be a layout or a camera or something else.
     * %param items[].delayMs Delay between layouts switching in milliseconds.
+    * %param[opt] settings
+    * %param[opt] settings.manual
     * %// AbstractLayoutTourManager::save
     */
     regUpdate<LayoutTourData>(p, ApiCommand::saveLayoutTour);
@@ -1516,6 +1522,8 @@ void LocalConnectionFactory::registerRestHandlers(QnRestProcessorPool* const p)
      * database. This function is used to add files (such audio for notifications)
      * to database.
      * %param[default] format
+     * %param[unused] path
+     *     %// NOTE: ApiStoredFilePath.path is serialized as "folder".
      * %param[opt] folder Folder name in a virtual FS
      * %return List of objects in the requested format.
      *    %// TODO: Describe params.
@@ -1526,6 +1534,8 @@ void LocalConnectionFactory::registerRestHandlers(QnRestProcessorPool* const p)
     /**%apidoc GET /ec2/getStoredFile
      * Read file data from a virtual FS
      * %param[default] format
+     * %param[unused] path
+     *     %// NOTE: ApiStoredFilePath.path is serialized as "folder".
      * %param[opt] folder File name
      * %return Object in the requested format.
      * %// AbstractStoredFileManager::getStoredFile
