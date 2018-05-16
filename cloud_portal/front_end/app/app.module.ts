@@ -2,7 +2,6 @@ import { NgModule }                                                       from '
 import { Location, PathLocationStrategy, LocationStrategy, CommonModule } from '@angular/common';
 import { BrowserModule }                                                  from '@angular/platform-browser';
 import { BrowserAnimationsModule }                                        from '@angular/platform-browser/animations';
-import { UpgradeModule }                                                  from '@angular/upgrade/static';
 import { RouterModule, UrlHandlingStrategy, UrlTree }                     from '@angular/router';
 import { HttpClient, HttpClientModule }                                   from '@angular/common/http';
 
@@ -49,7 +48,6 @@ class HybridUrlHandlingStrategy implements UrlHandlingStrategy {
         CommonModule,
         BrowserModule,
         BrowserAnimationsModule,
-        UpgradeModule,
         HttpClientModule,
         OrderModule,
         cloudApiServiceModule,

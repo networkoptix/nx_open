@@ -6,9 +6,9 @@ import { Router, Resolve, RouterModule, Routes } from '@angular/router';
 
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 
-import { DownloadComponent }     from './download.component';
-import { Observable }            from "rxjs/Observable";
-import { DeviceDetectorService } from "ngx-device-detector";
+import { DownloadComponent }          from './download.component';
+import { Observable, EMPTY as empty } from "rxjs";
+import { DeviceDetectorService }      from "ngx-device-detector";
 
 @Injectable()
 export class OsResolver implements Resolve<Observable<string>> {
@@ -34,7 +34,7 @@ export class OsResolver implements Resolve<Observable<string>> {
         this.platform = this.platformMatch[this.deviceInfo.os];
         if (this.platform) {
             this.router.navigate(["/download/" + this.platform]);
-            return Observable.empty();
+            return empty;
         }
 
         return this.deviceInfo;
