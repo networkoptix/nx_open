@@ -105,7 +105,7 @@ class NX_UTILS_API ProxyConverter:
     using base_type = Converter;
 
 public:
-    ProxyConverter(Converter* delegatee);
+    ProxyConverter(Converter* delegate);
 
     virtual int read(void* data, size_t count) override;
     virtual int write(const void* data, size_t count) override;
@@ -116,10 +116,10 @@ public:
     virtual bool eof() const override;
     virtual bool failed() const override;
 
-    void setDelegatee(Converter* delegatee);
+    void setDelegate(Converter* delegate);
 
 private:
-    Converter* m_delegatee;
+    Converter* m_delegate;
 };
 
 //-------------------------------------------------------------------------------------------------

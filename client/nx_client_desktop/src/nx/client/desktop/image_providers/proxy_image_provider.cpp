@@ -12,7 +12,7 @@ ProxyImageProvider::ProxyImageProvider(QObject* parent):
 {
 }
 
-ProxyImageProvider::ProxyImageProvider(QnImageProvider* sourceProvider, QObject* parent):
+ProxyImageProvider::ProxyImageProvider(ImageProvider* sourceProvider, QObject* parent):
     ProxyImageProvider(parent)
 {
     setSourceProvider(sourceProvider);
@@ -39,12 +39,12 @@ Qn::ThumbnailStatus ProxyImageProvider::status() const
     return m_status;
 }
 
-QnImageProvider* ProxyImageProvider::sourceProvider() const
+ImageProvider* ProxyImageProvider::sourceProvider() const
 {
     return m_sourceProvider;
 }
 
-void ProxyImageProvider::setSourceProvider(QnImageProvider* sourceProvider)
+void ProxyImageProvider::setSourceProvider(ImageProvider* sourceProvider)
 {
     if (m_sourceProvider == sourceProvider)
         return;
@@ -57,13 +57,13 @@ void ProxyImageProvider::setSourceProvider(QnImageProvider* sourceProvider)
         *m_sourceProviderConnections << connect(m_sourceProvider, &QObject::destroyed,
             this, [this]() { setSourceProvider(nullptr); });
 
-        *m_sourceProviderConnections << connect(m_sourceProvider, &QnImageProvider::statusChanged,
+        *m_sourceProviderConnections << connect(m_sourceProvider, &ImageProvider::statusChanged,
             this, &ProxyImageProvider::setStatus);
 
-        *m_sourceProviderConnections << connect(m_sourceProvider, &QnImageProvider::sizeHintChanged,
+        *m_sourceProviderConnections << connect(m_sourceProvider, &ImageProvider::sizeHintChanged,
             this, &ProxyImageProvider::setSourceSizeHint);
 
-        *m_sourceProviderConnections << connect(m_sourceProvider, &QnImageProvider::imageChanged,
+        *m_sourceProviderConnections << connect(m_sourceProvider, &ImageProvider::imageChanged,
             this, &ProxyImageProvider::setSourceImage);
 
         setStatus(m_sourceProvider->status());

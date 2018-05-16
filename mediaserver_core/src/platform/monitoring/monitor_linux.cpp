@@ -562,7 +562,7 @@ public:
         int fd = qnServerModule->rootTool()->open(
             m_commonSystemInfoProvider.fileName(), QIODevice::ReadOnly);
 
-        if (fd > 0)
+        if (fd > 0) //< Root tool has successfully opened file
             mountsFile.open(fd, QIODevice::ReadOnly, QFileDevice::AutoCloseHandle);
         else
             mountsFile.open(QIODevice::ReadOnly);
@@ -580,16 +580,56 @@ public:
 
     virtual qint64 totalSpace(const QByteArray& fsPath) const override
     {
-        return qnServerModule->rootTool()->totalSpace(QString::fromLatin1(fsPath));
+        QnMutexLocker lock(&m_mutex);
+        if (m_deviceSpacesCache[fsPath].totalSpace == kUnknownValue)
+        {
+            m_deviceSpacesCache[fsPath].totalSpace =
+                qnServerModule->rootTool()->totalSpace(QString::fromLatin1(fsPath));
+        }
+        return m_deviceSpacesCache[fsPath].totalSpace;
     }
 
     virtual qint64 freeSpace(const QByteArray& fsPath) const override
     {
-        return qnServerModule->rootTool()->freeSpace(QString::fromLatin1(fsPath));
+        QnMutexLocker lock(&m_mutex);
+        if (m_deviceSpacesCache[fsPath].freeSpace == kUnknownValue)
+        {
+            m_deviceSpacesCache[fsPath].freeSpace =
+                qnServerModule->rootTool()->freeSpace(QString::fromLatin1(fsPath));
+        }
+
+        bool freeSpaceIsInvalid = m_deviceSpacesCache[fsPath].freeSpace <= 0;
+        if (m_tries++ % 10 == 0 || !freeSpaceIsInvalid)
+        {
+            m_deviceSpacesCache[fsPath].freeSpace =
+                qnServerModule->rootTool()->freeSpace(QString::fromLatin1(fsPath));
+        }
+
+        // If free space becomes available and total space is invalid let's reset totalSpace to the
+        // initial value to let it be checked next iteration.
+        if (m_deviceSpacesCache[fsPath].freeSpace > 0
+            && freeSpaceIsInvalid
+            && m_deviceSpacesCache[fsPath].totalSpace != kUnknownValue
+            && m_deviceSpacesCache[fsPath].totalSpace <= 0)
+        {
+            m_deviceSpacesCache[fsPath].totalSpace = kUnknownValue;
+        }
+
+        return m_deviceSpacesCache[fsPath].freeSpace;
     }
 
 private:
+    static const qint64 kUnknownValue = std::numeric_limits<qint64>::min();
+    struct DeviceSpaces
+    {
+        qint64 freeSpace = kUnknownValue;
+        qint64 totalSpace = kUnknownValue;
+    };
+
     CommonSystemInfoProvider m_commonSystemInfoProvider;
+    mutable QMap<QString, DeviceSpaces> m_deviceSpacesCache;
+    mutable QnMutex m_mutex;
+    mutable int m_tries;
 };
 
 /*!
@@ -597,7 +637,7 @@ private:
 */
 static QList<QnPlatformMonitor::PartitionSpace> readPartitionsAndSizes()
 {
-    ServerSystemInfoProvider serverSystemInfoProvider;
+    static ServerSystemInfoProvider serverSystemInfoProvider;
     std::list<PartitionInfo> partitions;
     QList<QnPlatformMonitor::PartitionSpace> result;
 

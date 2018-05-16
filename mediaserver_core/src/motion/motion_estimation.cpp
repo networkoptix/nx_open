@@ -1019,6 +1019,11 @@ CLConstVideoDecoderOutputPtr QnMotionEstimation::decodeFrame(const QnCompressedV
     QnMutexLocker lock(&m_mutex);
     CLVideoDecoderOutputPtr videoDecoderOutput(new CLVideoDecoderOutput());
 
+    // TODO: This always makes a deep copy of the frame, which is helpful to supply the frame to
+    // metadata plugins. To optimize, rewrite video decoding via AbstractVideoDecoder: the frame
+    // will use its internal reference counting.
+    videoDecoderOutput->setUseExternalData(true);
+
     if (!m_decoder && !(frame->flags & AV_PKT_FLAG_KEY))
         return CLConstVideoDecoderOutputPtr{nullptr};
     if (!m_decoder || m_decoder->getContext()->codec_id != frame->compressionType)

@@ -27,7 +27,7 @@ static const QSize kCameraPreviewSize(160, 240);
 
 QnResourceDetailsWidget::QnResourceDetailsWidget(QWidget* parent) :
     base_type(parent),
-    m_thumbnailManager(new QnCameraThumbnailManager()),
+    m_thumbnailManager(new CameraThumbnailManager()),
     m_preview(new nx::client::desktop::AsyncImageWidget(this)),
     m_nameTextEdit(new TextEditLabel(this)),
     m_descriptionLabel(new QLabel(this))

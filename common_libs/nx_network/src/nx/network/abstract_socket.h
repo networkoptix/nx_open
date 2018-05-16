@@ -460,7 +460,7 @@ public:
 
     /**
      * Start listening for incoming connections.
-     * @param queueLen Size of queue of fully established connections
+     * @param backlog Size of queue of fully established connections
      *   waiting for AbstractStreamServerSocket::accept().
      *   If queue is full and new connection arrives, it receives ECONNREFUSED error.
      * @return false on error.

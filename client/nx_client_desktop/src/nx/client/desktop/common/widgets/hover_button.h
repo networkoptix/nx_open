@@ -1,7 +1,5 @@
 #pragma once
 
-#include <QtWidgets/QLabel>
-#include <QtWidgets/QSlider>
 #include <QtWidgets/QPushButton>
 
 namespace nx {
@@ -23,10 +21,10 @@ public:
 protected:
     QSize sizeHint() const override;
     void paintEvent(QPaintEvent* event) override;
-    void mouseMoveEvent(QMouseEvent* event);
-    void mousePressEvent(QMouseEvent* event);
-    void mouseReleaseEvent(QMouseEvent* event);
-    void leaveEvent(QEvent * event);
+    void mouseMoveEvent(QMouseEvent* event) override;
+    void mousePressEvent(QMouseEvent* event) override;
+    void mouseReleaseEvent(QMouseEvent* event) override;
+    void leaveEvent(QEvent * event) override;
 
 private:
     bool m_isClicked = false;

@@ -40,11 +40,17 @@ def sh_convert_env_values_to_str(env):
     return converted_env
 
 
+_SH_PROHIBITED_ENV_NAMES = {'PATH', 'HOME', 'USER', 'SHELL', 'PWD', 'TERM'}
+
+
 def sh_env_to_command(env):
     converted_env = sh_convert_env_values_to_str(env)
-    return [
-        '{}={}'.format(name, sh_quote_arg(str(value)))
-        for name, value in converted_env.items()]
+    command = []
+    for name, value in converted_env.items():
+        if name in _SH_PROHIBITED_ENV_NAMES:
+            raise ValueError("")
+        command.append('{}={}'.format(name, sh_quote_arg(str(value))))
+    return command
 
 
 def sh_augment_script(script, cwd, env):

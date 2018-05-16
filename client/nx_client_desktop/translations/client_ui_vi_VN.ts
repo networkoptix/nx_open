@@ -764,16 +764,16 @@
     </message>
     <message>
       <location/>
-      <source>Logical Id</source>
-      <translation>Id hợp lý</translation>
+      <source>Logical ID</source>
+      <translation>ID hợp lý</translation>
     </message>
   </context>
   <context>
     <name>CameraInputBusinessEventWidget</name>
     <message>
       <location filename="../src/ui/widgets/business/camera_input_business_event_widget.ui"/>
-      <source>Input Id</source>
-      <translation>Id đầu vào</translation>
+      <source>Input ID</source>
+      <translation>ID đầu vào</translation>
     </message>
   </context>
   <context>
@@ -798,8 +798,8 @@
     </message>
     <message>
       <location/>
-      <source>Output Id:</source>
-      <translation>Id đầu ra:</translation>
+      <source>Output ID:</source>
+      <translation>ID đầu ra:</translation>
     </message>
   </context>
   <context>
@@ -1513,8 +1513,8 @@
     </message>
     <message>
       <location/>
-      <source>Locked to Hardware Id:</source>
-      <translation>Khóa Id phần cứng:</translation>
+      <source>Locked to Hardware ID:</source>
+      <translation>Khóa ID phần cứng:</translation>
     </message>
   </context>
   <context>
@@ -1612,8 +1612,8 @@
     </message>
     <message>
       <location/>
-      <source>Hardware Id</source>
-      <translation>Id phần cứng</translation>
+      <source>Hardware ID</source>
+      <translation>ID phần cứng</translation>
     </message>
   </context>
   <context>

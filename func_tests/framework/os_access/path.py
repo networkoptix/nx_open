@@ -1,6 +1,6 @@
 from abc import ABCMeta, abstractmethod
 
-from pathlib2 import Path, PurePath
+from pathlib2 import PurePath
 
 
 class FileSystemPath(PurePath):
@@ -20,10 +20,6 @@ class FileSystemPath(PurePath):
         return cls()
 
     @abstractmethod
-    def touch(self, mode, exist_ok):
-        pass
-
-    @abstractmethod
     def exists(self):
         return True
 
@@ -32,19 +28,11 @@ class FileSystemPath(PurePath):
         pass
 
     @abstractmethod
-    def iterdir(self):
-        yield self.__class__()
-
-    @abstractmethod
     def expanduser(self):
         return self.__class__()
 
     @abstractmethod
     def glob(self, pattern):
-        yield self.__class__()
-
-    @abstractmethod
-    def rglob(self, pattern):
         yield self.__class__()
 
     @abstractmethod
@@ -71,10 +59,6 @@ class FileSystemPath(PurePath):
     def write_text(self, data, encoding, errors):
         pass
 
-    @abstractmethod
-    def upload(self, local_source_path):  # type: (Path) -> None
-        pass
 
-    @abstractmethod
-    def download(self, local_destination_path):  # type: (Path) -> None
-        pass
+def copy_file(source, destination):  # type: (FileSystemPath, FileSystemPath) -> None
+    destination.write_bytes(source.read_bytes())

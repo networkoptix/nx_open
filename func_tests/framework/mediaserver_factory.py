@@ -2,7 +2,8 @@ import logging
 from contextlib import contextmanager
 
 from framework.core_file_traceback import create_core_file_traceback
-from framework.mediaserver_installation import install_mediaserver
+from framework.dpkg_installation import install_mediaserver
+from framework.os_access.path import copy_file
 from framework.rest_api import RestApi
 from framework.service import UpstartService
 from .artifact import ArtifactType
@@ -92,7 +93,7 @@ def collect_core_dumps_from_mediaserver(mediaserver, root_artifact_factory):
             is_error=True,
             artifact_type=CORE_FILE_ARTIFACT_TYPE)
         local_core_dump_path = code_dumps_artifact_factory.produce_file_path()
-        core_dump.download(local_core_dump_path)
+        copy_file(core_dump, local_core_dump_path)
         traceback = create_core_file_traceback(
             mediaserver.machine.os_access,
             mediaserver.installation.binary,

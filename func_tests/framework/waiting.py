@@ -16,7 +16,7 @@ class Wait(object):
         self.log_continue = log_continue
         self.log_stop = log_stop
         self.log_continue(
-            "Start waiting %s: %.1f sec, %d attempts.",
+            "Start waiting until %s: %.1f sec, %d attempts.",
             self._until, self._timeout_sec, self._attempts_limit)
 
     def again(self):

@@ -47,6 +47,11 @@ public:
         return utils::log::Settings();
     }
 
+    virtual QString logBaseName() const override
+    {
+        return QString();
+    }
+
 private:
     QString m_dataDir;
 };

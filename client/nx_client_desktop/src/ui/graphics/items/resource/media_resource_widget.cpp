@@ -530,12 +530,13 @@ void QnMediaResourceWidget::initAreaSelectOverlay()
 
 QRectF QnMediaResourceWidget::analyticsSearchRect() const
 {
-    return m_areaSelectOverlayWidget->selectedArea();
+    return m_areaSelectOverlayWidget ? m_areaSelectOverlayWidget->selectedArea() : QRectF();
 }
 
 void QnMediaResourceWidget::setAnalyticsSearchRect(const QRectF& value)
 {
-    m_areaSelectOverlayWidget->setSelectedArea(value);
+    if (m_areaSelectOverlayWidget)
+        m_areaSelectOverlayWidget->setSelectedArea(value);
 }
 
 void QnMediaResourceWidget::initAreaHighlightOverlay()
@@ -598,6 +599,9 @@ void QnMediaResourceWidget::initStatusOverlayController()
 
 void QnMediaResourceWidget::setAnalyticsSearchModeEnabled(bool enabled)
 {
+    if (!m_areaSelectOverlayWidget)
+        return;
+
     m_areaSelectOverlayWidget->setActive(enabled);
     if (enabled)
     {
@@ -627,11 +631,16 @@ QString QnMediaResourceWidget::overlayCustomButtonText(
         : QString();
 }
 
-void QnMediaResourceWidget::updateTriggerAvailability(const vms::event::RulePtr& rule)
+void QnMediaResourceWidget::updateTriggerAvailability(const vms::event::RulePtr& rule, bool force)
 {
     const auto ruleId = rule->id();
     const auto triggerIt = lowerBoundbyTriggerRuleId(ruleId);
-    if (triggerIt == m_triggers.end() || triggerIt->ruleId == ruleId)
+
+    if (triggerIt == m_triggers.end())
+        return;
+
+    // Do not update data for the same rule, until we force it
+    if (!force && triggerIt->ruleId == ruleId)
         return;
 
     const auto button = qobject_cast<QnSoftwareTriggerButton*>(
@@ -1438,21 +1447,13 @@ void QnMediaResourceWidget::updateIconButton()
         const auto iconButton = buttonsBar->button(Qn::RecordingStatusIconButton);
         iconButton->setIcon(qnSkin->icon("item/zoom_window_hovered.png"));
         iconButton->setToolTip(tr("Zoom Window"));
-
-        buttonsBar->setButtonsVisible(Qn::RecordingStatusIconButton, true);
         return;
     }
 
     if (!d->camera || d->camera->hasFlags(Qn::wearable_camera))
-    {
-        buttonsBar->setButtonsVisible(Qn::RecordingStatusIconButton, false);
         return;
-    }
 
     const auto icon = m_recordingStatusHelper->icon();
-
-    buttonsBar->setButtonsVisible(Qn::RecordingStatusIconButton, !icon.isNull());
-
     const auto iconButton = buttonsBar->button(Qn::RecordingStatusIconButton);
     iconButton->setIcon(icon);
     iconButton->setToolTip(m_recordingStatusHelper->tooltip());
@@ -1913,9 +1914,6 @@ QString QnMediaResourceWidget::calculateDetailsText() const
         mbps += statistics->getBitrateMbps();
     }
 
-    QSize size = d->display()->camDisplay()->getRawDataSize();
-    size.setWidth(size.width() * d->display()->camDisplay()->channelsCount());
-
     QString codecString;
     if (QnConstMediaContextPtr codecContext = d->display()->mediaProvider()->getCodecContext())
         codecString = codecContext->getCodecName();
@@ -1930,7 +1928,15 @@ QString QnMediaResourceWidget::calculateDetailsText() const
     QString result;
     if (hasVideo())
     {
-        result.append(htmlFormattedParagraph(lit("%1x%2").arg(size.width()).arg(size.height()), kDetailsTextPixelSize, true));
+        const QSize channelResolution = d->display()->camDisplay()->getRawDataSize();
+        const QSize videoLayout = d->mediaResource->getVideoLayout()->size();
+        const QSize actualResolution = Geometry::cwiseMul(channelResolution, videoLayout);
+
+        result.append(
+            htmlFormattedParagraph(
+                lit("%1x%2").arg(actualResolution.width()).arg(actualResolution.height()),
+                kDetailsTextPixelSize,
+                true));
         result.append(htmlFormattedParagraph(lit("%1fps").arg(fps, 0, 'f', 2), kDetailsTextPixelSize, true));
     }
     result.append(htmlFormattedParagraph(lit("%1Mbps").arg(mbps, 0, 'f', 2), kDetailsTextPixelSize, true));
@@ -2041,6 +2047,7 @@ int QnMediaResourceWidget::calculateButtonsVisibility() const
         {
             result |= Qn::EntropixEnhancementButton;
         }
+        result |= Qn::RecordingStatusIconButton;
 
         return result;
     }
@@ -2092,6 +2099,9 @@ int QnMediaResourceWidget::calculateButtonsVisibility() const
 
     if (d->analyticsMetadataProvider)
         result |= Qn::AnalyticsButton;
+
+    if (d->camera && (!d->camera->hasFlags(Qn::wearable_camera)))
+        result |= Qn::RecordingStatusIconButton;
 
     return result;
 }
@@ -2677,7 +2687,9 @@ void QnMediaResourceWidget::setMotionSearchModeEnabled(bool enabled)
         titleBar()->rightButtonsBar()->setButtonsChecked(
             Qn::PtzButton | Qn::FishEyeButton | Qn::ZoomWindowButton, false);
         action(action::ToggleTimelineAction)->setChecked(true);
-        m_areaSelectOverlayWidget->setActive(false);
+
+        if (m_areaSelectOverlayWidget)
+            m_areaSelectOverlayWidget->setActive(false);
     }
 
     setOption(WindowResizingForbidden, enabled);
@@ -3018,7 +3030,8 @@ void QnMediaResourceWidget::at_eventRuleAddedOrUpdated(const vms::event::RulePtr
         createTriggerIfRelevant(rule);
     }
 
-    updateTriggerAvailability(rule);
+    // Forcing update of trigger button
+    updateTriggerAvailability(rule, true);
 };
 
 rest::Handle QnMediaResourceWidget::invokeTrigger(

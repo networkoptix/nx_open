@@ -323,7 +323,7 @@ void EventRibbon::Private::updateTile(EventTile* tile, const QModelIndex& index)
 
         if (ini().showDebugTimeInformationInRibbon)
         {
-            connect(provider, &QnImageProvider::statusChanged, tile,
+            connect(provider, &ImageProvider::statusChanged, tile,
                 [showPreviewTimestamp, provider]() { showPreviewTimestamp(provider); });
         }
 

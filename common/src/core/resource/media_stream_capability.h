@@ -1,10 +1,14 @@
 #pragma once
 
+#include <vector>
+
 #include <common/common_globals.h>
 #include <nx/fusion/model_functions_fwd.h>
 
 namespace nx {
 namespace media {
+
+static const QString kCameraMediaCapabilityParamName = lit("mediaCapabilities");
 
 struct CameraStreamCapability
 {
@@ -18,8 +22,8 @@ struct CameraStreamCapability
     bool isNull() const;
     QString toString() const;
 };
-
 #define CameraStreamCapability_Fields (minBitrateKbps)(maxBitrateKbps)(defaultBitrateKbps)(defaultFps)(maxFps)
+QN_FUSION_DECLARE_FUNCTIONS(CameraStreamCapability, (json))
 
 struct CameraMediaCapability
 {
@@ -28,13 +32,24 @@ struct CameraMediaCapability
     bool hasAudio = false;
     // TODO: move more fields to here like io port settings e.t.c
 };
-
 #define CameraMediaCapability_Fields (streamCapabilities)(hasDualStreaming)(hasAudio)
-
-static const QString kCameraMediaCapabilityParamName = lit("mediaCapabilities");
-
-QN_FUSION_DECLARE_FUNCTIONS(CameraStreamCapability, (json))
 QN_FUSION_DECLARE_FUNCTIONS(CameraMediaCapability, (json))
+
+enum class CameraTraitType
+{
+    aspectRatioDependent = 1
+};
+QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(CameraTraitType);
+
+// TODO: #dmishin it's workaround for fusion bug (impossibility to serialize/deserialize maps
+// with the key different from QString). Should be fixed in 4.0
+using CameraTraitNameString = QString;
+
+using CameraTraitAttributes = std::map<QString, QString>;
+using CameraTraits = std::map<CameraTraitNameString, CameraTraitAttributes>;
 
 } // media
 } // nx
+
+Q_DECLARE_METATYPE(nx::media::CameraTraits)
+QN_FUSION_DECLARE_FUNCTIONS(nx::media::CameraTraitType, (lexical));

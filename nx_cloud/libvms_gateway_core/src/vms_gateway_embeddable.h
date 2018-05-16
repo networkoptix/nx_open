@@ -19,7 +19,10 @@ class NX_VMS_GATEWAY_API VmsGatewayEmbeddable:
     Q_OBJECT
 
 public:
-    VmsGatewayEmbeddable(bool isSslEnabled, const QString& certPath = {});
+    VmsGatewayEmbeddable(
+        bool isSslEnabled,
+        const QString& certPath = {},
+        const QString& logBaseName = {});
 
     bool isSslEnabled() const;
     network::SocketAddress endpoint() const;

@@ -16,6 +16,8 @@
 #include <ui/style/skin.h>
 #include <utils/common/delayed.h>
 
+using namespace nx::client::desktop;
+
 namespace {
 
 static const QSize kDefaultThumbnailSize(0, 200);
@@ -30,7 +32,6 @@ QnCameraThumbnailCache::ThumbnailData::ThumbnailData():
     status(Qn::ThumbnailStatus::Invalid),
     loadingHandle(kInvalidHandle)
 {}*/
-
 
 QnCameraThumbnailCache::QnCameraThumbnailCache(QObject* parent) :
     m_refreshingTimer(new QTimer(parent))

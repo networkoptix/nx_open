@@ -557,8 +557,8 @@
       <translation>ข้อผิดพลาดที่ไม่รู้จัก</translation>
     </message>
     <message>
-      <source>Server with matching Hardware Id not found</source>
-      <translation>ไม่พบเซิร์ฟเวอร์ที่มี Id ฮาร์ดแวร์ที่ตรงกัน</translation>
+      <source>Server with matching Hardware ID not found</source>
+      <translation>ไม่พบเซิร์ฟเวอร์ที่มี ID ฮาร์ดแวร์ที่ตรงกัน</translation>
     </message>
   </context>
   <context>
@@ -674,12 +674,12 @@
       <translation>ลายน้ำ: %1</translation>
     </message>
     <message>
-      <source>Hardware Id: %1</source>
-      <translation>รหัสฮาร์ดแวร์: %1</translation>
-    </message>
-    <message>
       <source>Time License</source>
       <translation>เวลาใบอนุญาต</translation>
+    </message>
+    <message>
+      <source>Hardware ID: %1</source>
+      <translation>รหัสฮาร์ดแวร์: %1</translation>
     </message>
   </context>
   <context>

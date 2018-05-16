@@ -96,7 +96,7 @@ def save_content(filename, content):
 
 def process_context(context, language_code, customization, preview, version_id, global_contexts):
     language = Language.by_code(language_code, customization.default_language)
-    context_template = context.template_for_language(language)
+    context_template = context.template_for_language(language, customization.default_language)
 
     # check if the file is language JSON
     if context.file_path.endswith(".json") and isinstance(context_template, unicode):
@@ -163,7 +163,7 @@ def read_customized_file(filename, customization_name, language_code=None, versi
 def save_context(context, context_path, language_code, customization, preview, version_id, global_contexts):
     content = process_context(context, language_code, customization, preview, version_id, global_contexts)
     language = Language.by_code(language_code, customization.default_language)
-    if context.template_for_language(language):  # if we have template - save context to file
+    if context.template_for_language(language, customization.default_language):  # if we have template - save context to file
         target_file_name = target_file(context_path, customization, language_code, preview)
         save_content(target_file_name, content)
 
@@ -316,7 +316,7 @@ def fill_content(customization_name='default', product_name='cloud_portal',
 def zip_context(zip_file, context, customization, language_code, preview, version_id, global_contexts, add_root):
     language = Language.by_code(language_code, customization.default_language)
 
-    if context.template_for_language(language):  # if we have template - save context to file
+    if context.template_for_language(language, customization.default_language):  # if we have template - save context to file
         data = process_context(context, language_code, customization, preview, version_id, global_contexts)
         name = context.file_path.replace("{{language}}", language_code) if language_code else context.file_path
         if add_root:

@@ -14,8 +14,8 @@
 
 class QnProxyLabel;
 class HoverFocusProcessor;
-class QnImageProvider;
 class QGraphicsLinearLayout;
+namespace nx { namespace client { namespace desktop { class ImageProvider; }}}
 
 class QnNotificationToolTipWidget: public QnGraphicsToolTipWidget
 {
@@ -75,7 +75,7 @@ public:
      */
     void setTooltipEnclosingRect(const QRectF& rect);
 
-    void setImageProvider(QnImageProvider* provider);
+    void setImageProvider(nx::client::desktop::ImageProvider* provider);
 
     void setText(const QString& text);
 
@@ -139,7 +139,7 @@ private:
     QnImageButtonWidget* m_closeButton;
     bool m_closeButtonAvailable = true;
     QnNotificationLevel::Value m_notificationLevel;
-    QPointer<QnImageProvider> m_imageProvider;
+    QPointer<nx::client::desktop::ImageProvider> m_imageProvider;
     QColor m_color;
 
     QnNotificationToolTipWidget* m_tooltipWidget;

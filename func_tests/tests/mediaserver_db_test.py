@@ -18,6 +18,7 @@ import pytest
 
 from framework.mediaserver import MEDIASERVER_MERGE_TIMEOUT
 from framework.merging import merge_systems, setup_local_system
+from framework.os_access.path import copy_file
 from framework.utils import SimpleNamespace, bool_to_str, datetime_utc_now
 
 SERVER_CONFIG = dict(
@@ -77,7 +78,7 @@ def copy_database_file(server, bin_dir, backup_db_filename):
     assert backup_db_path.exists(), (
         "Binary artifact required for this test (database file) '%s' does not exist." % backup_db_path)
     server_db_path = server.installation.dir / MEDIASERVER_DATABASE_PATH
-    server.machine.os_access.Path(server_db_path).upload(backup_db_path)
+    copy_file(backup_db_path, server.machine.os_access.Path(server_db_path))
 
 
 def check_camera(server, camera_guid):

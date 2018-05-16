@@ -25,6 +25,7 @@
 
 #include <network/cloud_url_validator.h>
 
+#include <nx/client/desktop/common/widgets/hint_button.h>
 #include <nx/client/desktop/ui/actions/action_manager.h>
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
@@ -74,6 +75,10 @@ QnServerSettingsWidget::QnServerSettingsWidget(QWidget* parent /* = 0*/) :
     setHelpTopic(ui->ipAddressLabel, ui->ipAddressLineEdit, Qn::ServerSettings_General_Help);
     setHelpTopic(ui->portLabel, ui->portLineEdit, Qn::ServerSettings_General_Help);
     setHelpTopic(ui->failoverGroupBox, Qn::ServerSettings_Failover_Help);
+
+    auto failoverHint = nx::client::desktop::HintButton::hintThat(ui->failoverGroupBox);
+    failoverHint->addHintLine(tr("Servers with failover enabled will automatically take cameras from offline servers."));
+    failoverHint->setHelpTopic(Qn::ServerSettings_Failover_Help);
 
     connect(ui->pingButton, &QPushButton::clicked, this, &QnServerSettingsWidget::at_pingButton_clicked);
 
@@ -186,12 +191,7 @@ bool QnServerSettingsWidget::hasChanges() const
 
 void QnServerSettingsWidget::retranslateUi()
 {
-    QString failoverText = QnDeviceDependentStrings::getDefaultNameFromSet(
-        resourcePool(),
-        tr("server will take devices automatically from offline servers"),
-        tr("server will take cameras automatically from offline servers"));
-
-    ui->failoverGroupBox->setTitle(tr("Failover") + lit("\t(%1)").arg(failoverText));
+    ui->failoverGroupBox->setTitle(tr("Failover"));
 
     ui->maxCamerasLabel->setText(QnDeviceDependentStrings::getDefaultNameFromSet(
         resourcePool(),

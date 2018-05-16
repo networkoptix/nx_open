@@ -7,7 +7,7 @@
 #include <utils/common/connective.h>
 
 class QLabel;
-class QnCameraThumbnailManager;
+namespace nx { namespace client { namespace desktop { class CameraThumbnailManager; }}}
 namespace nx { namespace client { namespace desktop { class AsyncImageWidget; }}}
 namespace nx { namespace client { namespace desktop { class TextEditLabel; }}}
 
@@ -30,7 +30,7 @@ public:
     void setResource(const QnResourcePtr& resource);
 
 private:
-    QScopedPointer<QnCameraThumbnailManager> m_thumbnailManager;
+    QScopedPointer<nx::client::desktop::CameraThumbnailManager> m_thumbnailManager;
     nx::client::desktop::AsyncImageWidget* m_preview;
     nx::client::desktop::TextEditLabel* m_nameTextEdit;
     QLabel* m_descriptionLabel;

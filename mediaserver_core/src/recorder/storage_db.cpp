@@ -54,12 +54,8 @@ public:
         if (error != nx::media_db::Error::NoError && error != nx::media_db::Error::Eof)
             NX_LOG(lit("%1 temporary DB file write error: %2").arg(Q_FUNC_INFO).arg((int)error), cl_logWARNING);
 
-        m_recordCount++;
-        if (m_recordCount / 1000 > m_recordThousandsCount)
-        {
+        if (++m_recordCount % 1000 == 0)
             NX_VERBOSE(this, lm("[vacuum] %1 records written").args(m_recordCount));
-            m_recordThousandsCount = m_recordCount / 1000;
-        }
 
         m_error = error;
     }
@@ -70,7 +66,6 @@ private:
     QnStorageDb::UuidToCatalogs &m_readData;
     nx::media_db::Error m_error = nx::media_db::Error::NoError;
     int64_t m_recordCount = 0;
-    int64_t m_recordThousandsCount = 0;
 };
 
 } // namespace <anonynous>
@@ -443,15 +438,10 @@ bool QnStorageDb::parseDbContent(QByteArray fileContent)
 
     nx::media_db::Error error;
     int64_t recordCount = 0;
-    int64_t recordThousandsCount = 0;
     while ((error = m_dbHelper.readRecord()) == nx::media_db::Error::NoError)
     {
-        recordCount++;
-        if (recordCount / 1000 > recordThousandsCount)
-        {
+        if (++recordCount % 1000 == 0)
             NX_VERBOSE(this, lm("[vacuum] %1 records read from %2").args(recordCount, m_dbFileName));
-            recordThousandsCount = recordCount / 1000;
-        }
 
         QnMutexLocker lk(&m_errorMutex);
         m_lastReadError = error;

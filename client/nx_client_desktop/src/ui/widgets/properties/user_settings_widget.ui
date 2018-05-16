@@ -78,6 +78,16 @@
               </property>
              </widget>
             </item>
+             <item>
+               <widget class="nx::client::desktop::HintButton" name="userTypeHint">
+                 <property name="sizePolicy">
+                   <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+                     <horstretch>0</horstretch>
+                     <verstretch>0</verstretch>
+                   </sizepolicy>
+                 </property>
+               </widget>
+             </item>
             <item>
              <widget class="QComboBox" name="userTypeComboBox"/>
             </item>
@@ -298,6 +308,11 @@
    <extends>QWidget</extends>
    <header location="global">ui/widgets/word_wrapped_label.h</header>
    <container>1</container>
+  </customwidget>
+  <customwidget>
+    <class>nx::client::desktop::HintButton</class>
+    <extends>QWidget</extends>
+    <header location="global">nx/client/desktop/common/widgets/hint_button.h</header>
   </customwidget>
  </customwidgets>
  <tabstops>

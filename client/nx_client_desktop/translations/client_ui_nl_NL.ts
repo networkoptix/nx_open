@@ -764,7 +764,7 @@
     </message>
     <message>
       <location/>
-      <source>Logical Id</source>
+      <source>Logical ID</source>
       <translation>Logische ID</translation>
     </message>
   </context>
@@ -772,8 +772,8 @@
     <name>CameraInputBusinessEventWidget</name>
     <message>
       <location filename="../src/ui/widgets/business/camera_input_business_event_widget.ui"/>
-      <source>Input Id</source>
-      <translation>Input Id</translation>
+      <source>Input ID</source>
+      <translation type="unfinished">Input ID</translation>
     </message>
   </context>
   <context>
@@ -798,8 +798,8 @@
     </message>
     <message>
       <location/>
-      <source>Output Id:</source>
-      <translation>Uitgang Id:</translation>
+      <source>Output ID:</source>
+      <translation>Uitgang ID:</translation>
     </message>
   </context>
   <context>
@@ -1513,8 +1513,8 @@
     </message>
     <message>
       <location/>
-      <source>Locked to Hardware Id:</source>
-      <translation>Gelieerd aan Hardware Id:</translation>
+      <source>Locked to Hardware ID:</source>
+      <translation>Gelieerd aan Hardware ID:</translation>
     </message>
   </context>
   <context>
@@ -1612,8 +1612,8 @@
     </message>
     <message>
       <location/>
-      <source>Hardware Id</source>
-      <translation>Hardware Id</translation>
+      <source>Hardware ID</source>
+      <translation type="unfinished">Hardware ID</translation>
     </message>
   </context>
   <context>

@@ -28,6 +28,7 @@
 
 #include <nx/utils/string.h>
 
+#include <nx/client/desktop/common/widgets/hint_button.h>
 #include <utils/common/event_processors.h>
 
 using namespace nx::client::desktop;
@@ -126,6 +127,11 @@ QnGeneralSystemAdministrationWidget::QnGeneralSystemAdministrationWidget(QWidget
     setHelpTopic(m_buttons[kAuditLogButton     ], Qn::AuditTrail_Help);
     setHelpTopic(m_buttons[kHealthMonitorButton], Qn::Administration_General_HealthMonitoring_Help);
     setHelpTopic(m_buttons[kBookmarksButton    ], Qn::Bookmarks_Usage_Help);
+
+    auto backupHint = nx::client::desktop::HintButton::hintThat(ui->backupGroupBox);
+    backupHint->addHintLine(tr("Creates a backup of local System configurations that can be restored in case of failure."));
+    backupHint->addHintLine(tr("Backup includes registry flags, file systems, and server settings related to archive, events, and audit trail logs. Does not backup archives."));
+    backupHint->setHelpTopic(Qn::SystemSettings_Server_Backup_Help);
 
     connect(m_buttons[kBusinessRulesButton], &QPushButton::clicked, this,
         [this] { menu()->trigger(ui::action::OpenBusinessRulesAction); });

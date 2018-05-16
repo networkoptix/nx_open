@@ -136,6 +136,17 @@ CameraExpertSettingsWidget::CameraExpertSettingsWidget(QWidget* parent):
     setHelpTopic(ui->checkBoxPrimaryRecorder, Qn::CameraSettings_Expert_DisableArchivePrimary_Help);
     setHelpTopic(ui->checkBoxSecondaryRecorder, Qn::CameraSettings_Expert_DisableArchivePrimary_Help);
     setHelpTopic(ui->groupBoxRTP, Qn::CameraSettings_Expert_Rtp_Help);
+
+    ui->settingsDisableControlHint->setHint(tr("Server will not change any cameras settings, it will receive and use camera stream as-is. "));
+    ui->settingsDisableControlHint->setHelpTopic(Qn::CameraSettings_Expert_SettingsControl_Help);
+
+    ui->bitratePerGopHint->setHint(tr("Helps fix image quality issues on some cameras; for others will cause significant bitrate increase."));
+    ui->bitratePerGopHint->setHelpTopic(Qn::CameraSettings_Expert_SettingsControl_Help);
+
+    auto logicalIdHint = nx::client::desktop::HintButton::hintThat(ui->logicalIdGroupBox);
+    logicalIdHint->addHintLine(tr("Custom number that can be assigned to a camera for quick identification and access"));
+    // TODO: Fill in help topic when it is implemented
+    //logicalIdHint->setHelpTopic(Qn::)
 }
 
 CameraExpertSettingsWidget::~CameraExpertSettingsWidget()
@@ -496,7 +507,7 @@ void CameraExpertSettingsWidget::updateLogicalIdControls()
     for (const auto& camera : duplicateCameras)
         cameraNames << camera->getName();
     const auto errorMessage = tr(
-            "This Id is already used on the following %n cameras: %1",
+            "This ID is already used on the following %n cameras: %1",
             "",
             cameraNames.size())
         .arg(lit("<b>%1</b>").arg(cameraNames.join(lit(", "))));

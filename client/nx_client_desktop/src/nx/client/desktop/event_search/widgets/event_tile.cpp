@@ -244,12 +244,12 @@ void EventTile::setIcon(const QPixmap& value)
     // Icon label is always visible. It keeps column width fixed.
 }
 
-QnImageProvider* EventTile::preview() const
+ImageProvider* EventTile::preview() const
 {
     return ui->previewWidget->imageProvider();
 }
 
-void EventTile::setPreview(QnImageProvider* value)
+void EventTile::setPreview(ImageProvider* value)
 {
     ui->previewWidget->setImageProvider(value);
     ui->previewWidget->parentWidget()->setHidden(!value);
