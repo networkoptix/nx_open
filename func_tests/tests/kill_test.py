@@ -18,5 +18,5 @@ def test_coredump_one(linux_mediaservers_pool):
 def test_coredump_two(linux_mediaservers_pool):
     server = linux_mediaservers_pool.get('bad-server')
     server.service.make_core_dump()  # first coredump
-    wait_for_true(server.is_online, "{} is online".format(server))
+    wait_for_true(server.is_online)
     server.service.make_core_dump()  # second coredump

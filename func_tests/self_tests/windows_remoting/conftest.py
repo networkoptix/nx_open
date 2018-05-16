@@ -17,7 +17,7 @@ def windows_vm_info(configuration, hypervisor, vm_registries):
 def winrm(windows_vm_info):
     address, port = windows_vm_info.ports['tcp', 5985]
     winrm = WinRM(address, port, u'Administrator', u'qweasd123')
-    wait_for_true(winrm.is_working, "{} is working".format(winrm))
+    wait_for_true(winrm.is_working)
     return winrm
 
 

@@ -76,7 +76,7 @@ class Mediaserver(object):
                 raise Exception("Already started")
         else:
             self.service.start()
-            wait_for_true(self.is_online, "{} is online after being started".format(self))
+            wait_for_true(self.is_online)
 
     def stop(self, already_stopped_ok=False):
         if self.service.is_running():

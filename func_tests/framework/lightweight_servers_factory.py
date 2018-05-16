@@ -172,7 +172,7 @@ class LightweightServersHost(object):
             name = 'lws-%05d' % idx
             api = RestApi(name, self._os_access.hostname, server_port)
             server = LightweightServer(name, self._os_access, self.service, self._installation, api, port=server_port)
-            wait_for_true(server.is_online, "{} is online after allocation".format(server))
+            wait_for_true(server.is_online)
             if not self._first_server:
                 self._first_server = server
             yield server

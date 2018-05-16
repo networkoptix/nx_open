@@ -12,7 +12,7 @@ def winrm_raw(windows_vm_info):
 
 @pytest.fixture()
 def winrm(winrm_raw):
-    wait_for_true(winrm_raw.is_working, "{} is working".format(winrm))
+    wait_for_true(winrm_raw.is_working)
     return winrm_raw
 
 

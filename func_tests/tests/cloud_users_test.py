@@ -41,7 +41,5 @@ def test_mediaserver_cloud_protocol_synchronization(linux_mediaserver, cloud_acc
 
     (linux_mediaserver).api = linux_mediaserver.api.with_credentials(
         SECOND_CLOUD_USER, SECOND_CLOUD_PASSWORD)
-    wait_for_true(
-        linux_mediaserver.api.credentials_work,
-        "credentials of {} work".format(linux_mediaserver.api))
+    wait_for_true(linux_mediaserver.api.credentials_wor)
     assert not linux_mediaserver.installation.list_core_dumps()

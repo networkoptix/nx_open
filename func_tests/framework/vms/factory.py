@@ -33,10 +33,7 @@ class VMFactory(object):
                 os_access = WindowsAccess(info.ports, info.macs, u'Administrator', u'qweasd123')
             else:
                 raise UnknownOsFamily("Expected 'linux' or 'windows', got %r", vm_type_configuration['os_family'])
-            wait_for_true(
-                os_access.is_accessible,
-                'Machine {} cannot be accessed'.format(os_access),
-                timeout_sec=vm_type_configuration['power_on_timeout_sec'])
+            wait_for_true(os_access.is_accessible, timeout_sec=vm_type_configuration['power_on_timeout_sec'])
             # TODO: Consider unplug and reset only before network setup: that will make tests much faster.
             self._hypervisor.unplug_all(info.name)
             os_access.networking.reset()

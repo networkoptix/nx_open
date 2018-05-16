@@ -62,7 +62,21 @@ class WaitTimeout(Exception):
     pass
 
 
-def wait_for_true(bool_func, description, timeout_sec=30):
+def _description_from_func(func):
+    try:
+        object_bound_to = func.__self__
+    except AttributeError:
+        if func.__name__ == '<lambda>':
+            raise ValueError("Cannot make description from lambda")
+        return func.__name__
+    if object_bound_to is None:
+        raise ValueError("Cannot make description from unbound method")
+    return '{func.__self__!r}.{func.__name__!s}'.format(func=func)
+
+
+def wait_for_true(bool_func, description=None, timeout_sec=30):
+    if description is None:
+        description = _description_from_func(bool_func)
     wait = Wait(description, timeout_sec=timeout_sec)
     while True:
         if bool_func():
@@ -77,6 +91,8 @@ class NotPersistent(Exception):
 
 
 def ensure_persistence(condition_is_true, description, timeout_sec=10):
+    if description is None:
+        description = _description_from_func(condition_is_true)
     wait = Wait(description, timeout_sec=timeout_sec, log_continue=log.debug, log_stop=log.info)
     while True:
         if not condition_is_true():

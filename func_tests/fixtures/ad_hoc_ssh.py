@@ -144,5 +144,5 @@ def ad_hoc_ssh_client_config(ad_hoc_ssh_dir, ad_hoc_client_private_key):
 @pytest.fixture(scope='session')
 def ad_hoc_ssh(ad_hoc_ssh_server, ad_hoc_ssh_client_config):
     ssh = SSH(ad_hoc_ssh_server.hostname, ad_hoc_ssh_server.port, config_path=ad_hoc_ssh_client_config)
-    wait_for_true(ssh.is_working, "SSH access to ad-hoc server is working")
+    wait_for_true(ssh.is_working)
     return ssh
