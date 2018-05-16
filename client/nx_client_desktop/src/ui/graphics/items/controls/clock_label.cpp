@@ -28,9 +28,7 @@ QnClockDataProvider::QnClockDataProvider(QObject *parent) :
     m_timer->start(100);
 }
 
-QnClockDataProvider::~QnClockDataProvider() {
-    return;
-}
+QnClockDataProvider::~QnClockDataProvider() = default;
 
 void QnClockDataProvider::setClockType( ClockType clockType )
 {
@@ -54,9 +52,7 @@ QnClockLabel::QnClockLabel(QGraphicsItem *parent):
     addAction(m_localTimeAction);
 }
 
-QnClockLabel::~QnClockLabel()
-{
-}
+QnClockLabel::~QnClockLabel() = default;
 
 void QnClockLabel::contextMenuEvent(QGraphicsSceneContextMenuEvent* event)
 {

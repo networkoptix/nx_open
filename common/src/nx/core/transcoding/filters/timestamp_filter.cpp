@@ -124,16 +124,16 @@ QString TimestampFilter::timestampTextUtc(
 
     switch (format)
     {
-    case Qt::DefaultLocaleLongDate:
-        return datetime::toString(dateTime, datetime::Format::dddd_d_MMMM_yyyy_hh_mm_ss);
-    case Qt::DefaultLocaleShortDate:
-        return datetime::toString(dateTime);
-    case Qt::ISODate:
-    case Qt::RFC2822Date:
-        return dateTime.toString(format);
-    default:
-        NX_ASSERT(false, "Invalid DateTime Format");
-        return QString();
+        case Qt::DefaultLocaleLongDate:
+            return datetime::toString(dateTime, datetime::Format::dddd_d_MMMM_yyyy_hh_mm_ss);
+        case Qt::DefaultLocaleShortDate:
+            return datetime::toString(dateTime);
+        case Qt::ISODate:
+        case Qt::RFC2822Date:
+            return dateTime.toString(format);
+        default:
+            NX_ASSERT(false, "Invalid DateTime Format");
+            return QString();
     }
 }
 

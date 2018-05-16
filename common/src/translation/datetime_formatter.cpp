@@ -40,6 +40,7 @@ std::map<Format, QString> formatStrings =
     {Format::MMMM_yyyy, lit("MMMM yyyy")},
     {Format::dd_MM_yyyy, lit("dd-MM-yyyy")},
     {Format::yyyy_MM_dd_hh_mm_ss, lit("yyyy-MM-dd hh:mm:ss")},
+    {Format::dddd_d_MMMM_yyyy_hh_mm_ss, lit("dddd, d MMMM yyyy hh:mm:ss")},
 
     {Format::filename_date, lit("yyyy_MM_dd_hh_mm_ss")},
     {Format::filename_time, lit("hh_mm_ss")},
@@ -50,7 +51,6 @@ void DateTimeFormats::setFormats()
     QLocale locale = QLocale();
     const bool amPm = locale.timeFormat().contains(lit("AP"), Qt::CaseInsensitive);
 
-    formatStrings[Format::mm_ss] = lit("mm:ss");
     formatStrings[Format::hh] = amPm ? lit("h AP") : lit("hh:00");
     formatStrings[Format::hh_mm] = locale.timeFormat(QLocale::ShortFormat);
     formatStrings[Format::hh_mm_ss] = locale.timeFormat(QLocale::LongFormat);
@@ -60,9 +60,6 @@ void DateTimeFormats::setFormats()
 
     formatStrings[Format::hh_mm_ss_zzz] = formatStrings[Format::hh_mm_ss] + lit(".zzz");
 
-    formatStrings[Format::dd] = lit("dd");
-    formatStrings[Format::MMM] = lit("MMM");
-    formatStrings[Format::yyyy] = lit("yyyy");
 
     formatStrings[Format::dd_MM] = tr("dd/MM"); //< Localizable
     formatStrings[Format::MMMM_yyyy] = tr("MMMM yyyy"); //< Localizable
@@ -73,9 +70,6 @@ void DateTimeFormats::setFormats()
     // Fix - we never want timezone in time string.
     removeTimezone(formatStrings[Format::yyyy_MM_dd_hh_mm_ss]);
     removeTimezone(formatStrings[Format::dddd_d_MMMM_yyyy_hh_mm_ss]);
-
-    formatStrings[Format::filename_date] = lit("yyyy_MM_dd_hh_mm_ss");
-    formatStrings[Format::filename_time] = lit("hh_mm_ss");
 }
 
 } // namespace
