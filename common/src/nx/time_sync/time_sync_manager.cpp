@@ -137,9 +137,10 @@ bool TimeSyncManager::loadTimeFromServer(const QnRoute& route)
     NX_DEBUG(this, lm("Got time %1 from the neighbor server %2")
         .args(QDateTime::fromMSecsSinceEpoch(newTime.count()).toString(Qt::ISODate),
         route.id.toString()));
+    return true;
 }
 
-void TimeSyncManager::setSyncTime(std::chrono::milliseconds value)
+bool TimeSyncManager::setSyncTime(std::chrono::milliseconds value)
 {
     const auto minDeltaToSync = 
         commonModule()->globalSettings()->maxDifferenceBetweenSynchronizedAndInternetTime();

@@ -71,11 +71,6 @@ ServerTimeSyncManager::ServerTimeSyncManager(
             if (primaryTimeServerId == this->commonModule()->moduleGUID())
                 broadcastSystemTimeDelayed();
         });
-    connect(
-        commonModule->ec2Connection()->getTimeNotificationManager().get(),
-        &ec2::AbstractTimeNotificationManager::primaryTimeServerTimeChanged,
-        this,
-        [this]() { m_lastNetworkSyncTime.restart(); });
 }
 
 void ServerTimeSyncManager::broadcastSystemTimeDelayed()
@@ -123,6 +118,12 @@ void ServerTimeSyncManager::start()
     setSyncTimeInternal(m_systemClock->millisSinceEpoch() + timeDelta);
     
     initializeTimeFetcher();
+
+    connect(
+        commonModule()->ec2Connection()->getTimeNotificationManager().get(),
+        &ec2::AbstractTimeNotificationManager::primaryTimeServerTimeChanged,
+        this,
+        [this]() { m_lastNetworkSyncTime.restart(); });
 
     m_networkTimeSyncInterval = timeSyncInterval();
     setTimeSyncInterval(kTimeSyncInterval);
