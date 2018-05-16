@@ -41,7 +41,7 @@ extern "C"
 #include <nx/utils/byte_stream/custom_output_stream.h>
 
 #include "av_utils.h"
-#include "dshow_utils.h"
+//#include "dshow_utils.h"
 #include "avcodec_container.h"
 #include "ilp_empty_packet.h"
 #include "motion_data_picture.h"
@@ -93,9 +93,13 @@ StreamReader::~StreamReader()
     if(m_avVideoPacket)
         av_packet_free(&m_avVideoPacket);
     
+    m_videoDecoder.reset(nullptr);
+    m_videoEncoder.reset(nullptr);
+
     av_dict_free(&m_options);
 
-    if(m_formatContext)
+    //todo when closing the sream on the client, av_formatclose_input() seg faults
+    if (m_formatContext)
         avformat_close_input(&m_formatContext);
 }
 
@@ -131,8 +135,12 @@ static const unsigned int MAX_FRAME_DURATION_MS = 5000;
 
 int StreamReader::getNextData(nxcip::MediaDataPacket** lpPacket)
 {
+    ++m_isInGetNextData;
     if (!isValid())
+    {
+        --m_isInGetNextData;
         return nxcip::NX_IO_ERROR;
+    }
 
     int nxcipErrorCode;
     std::unique_ptr<ILPVideoPacket> nxVideoPacket;
@@ -144,7 +152,10 @@ int StreamReader::getNextData(nxcip::MediaDataPacket** lpPacket)
         {
             int readCode = m_videoDecoder->readFrame(m_avVideoPacket);
             if (m_lastError.updateIfError(readCode))
+            {
+                --m_isInGetNextData;
                 return nxcip::NX_TRY_AGAIN;
+            }
 
             nxVideoPacket = toNxVideoPacket(m_avVideoPacket, m_videoDecoder->codecID());
             nxcipErrorCode = nxcip::NX_NO_ERROR;
@@ -152,9 +163,11 @@ int StreamReader::getNextData(nxcip::MediaDataPacket** lpPacket)
         }
         default:
             nxVideoPacket = transcodeVideo(&nxcipErrorCode);
+            break;
     }
 
     *lpPacket = nxVideoPacket.release();
+    --m_isInGetNextData;
     return nxcipErrorCode;
 }
 
@@ -311,26 +324,24 @@ AVFrame * StreamReader::toYUV420(AVCodecContext * codecContext, AVFrame * frame)
     return resultFrame;
 }
 
+static int init = 0;
 void StreamReader::initializeAv()
 {
     avdevice_register_all();
     
-    const char * inputFormat = getAvInputFormat();
-    m_inputFormat = av_find_input_format(inputFormat);
+    m_inputFormat = av_find_input_format(getAvInputFormat());
     if (!m_inputFormat)
     {
         m_lastError.setAvError("could not find input format.");
         return;
     }
-
-    //todo get the url from the m_info
     
-    QString url = getAvCameraUrl();
-
     m_formatContext = avformat_alloc_context();
     setOptions();
 
-    int formatOpenCode = avformat_open_input(&m_formatContext, url.toLatin1().data(), m_inputFormat, &m_options);
+    QString url = getAvCameraUrl();
+    int formatOpenCode = avformat_open_input(&m_formatContext, url.toLatin1().data(),
+        m_inputFormat, &m_options);
     if (m_lastError.updateIfError(formatOpenCode))
         return;
 

@@ -13,16 +13,12 @@
 #include <unistd.h>
 #endif
 #include <cstdio>
-#ifdef _WIN32
-#include "dshow_utils.h"
-#elif __linux__
-#elif __APPLE__
-#endif
 
 #include <QtCore/QCryptographicHash>
 #include <nx/network/http/http_client.h>
 #include <nx/network/http/multipart_content_parser.h>
 
+#include "utils.h"
 #include "camera_manager.h"
 #include "plugin.h"
 
@@ -30,7 +26,7 @@ namespace {
 
 int findDShowCameras(nxcip::CameraInfo * cameras, const char * localIpInterfaceIpAddr)
 {
-    QList<utils::DeviceInfo> devices = utils::dshow::listDevices();
+    QList<utils::DeviceInfo> devices = utils::getDeviceList();
     int deviceCount = devices.count();
     for (int i = 0; i < deviceCount && i < nxcip::CAMERA_INFO_ARRAY_SIZE; ++i)
     {
@@ -38,7 +34,7 @@ int findDShowCameras(nxcip::CameraInfo * cameras, const char * localIpInterfaceI
         strcpy(cameras[i].modelName, deviceName.toLatin1().data());
 
         QByteArray url =
-            QByteArray("webcam://").append(nx::utils::Url::toPercentEncoding(deviceName));
+            QByteArray("webcam://").append(nx::utils::Url::toPercentEncoding(devices[i].devicePath()));
         strcpy(cameras[i].url, url.data());
 
         const QByteArray& uid = QCryptographicHash::hash(url, QCryptographicHash::Md5).toHex();
@@ -101,15 +97,23 @@ void DiscoveryManager::getVendorName(char* buf) const
 
 int DiscoveryManager::findCameras( nxcip::CameraInfo* cameras, const char* localInterfaceIPAddr )
 {    
-#ifdef _WIN32
-        return findDShowCameras(cameras, localInterfaceIPAddr);
-#elif __linux__
-        findV4L2Cameras(cameras, localInterfaceIPAddr);
-#elif __APPLE__
-        findAvFoundationCameras(cameras, localInterfaceIPAddr);
-#else
-        0 // unsupported os
-#endif
+    QList<utils::DeviceInfo> devices = utils::getDeviceList();
+    int deviceCount = devices.count();
+    for (int i = 0; i < deviceCount && i < nxcip::CAMERA_INFO_ARRAY_SIZE; ++i)
+    {
+        QString deviceName = devices[i].deviceName();
+        strcpy(cameras[i].modelName, deviceName.toLatin1().data());
+
+        QByteArray url =
+            QByteArray("webcam://").append(
+                nx::utils::Url::toPercentEncoding(devices[i].devicePath()));
+        strcpy(cameras[i].url, url.data());
+
+        const QByteArray& uid = QCryptographicHash::hash(url, QCryptographicHash::Md5).toHex();
+        strcpy(cameras[i].uid, uid.data());
+
+    }
+    return deviceCount;
 }
 
 //static const QString HTTP_PROTO_NAME( QString::fromLatin1("http") );

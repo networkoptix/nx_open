@@ -11,6 +11,16 @@ namespace utils{
         return m_deviceName;
     }
 
+    void DeviceInfo::setDevicePath(const QString & devicePath)
+    {
+        m_devicePath = devicePath;
+    }
+
+    QString DeviceInfo::devicePath()
+    {
+        return m_devicePath;
+    }
+
     void DeviceInfo::setResolutionList(const QList<QSize>& resolutionList)
     {
         m_resolutionList = resolutionList;

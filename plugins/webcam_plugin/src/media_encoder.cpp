@@ -7,6 +7,7 @@
 
 #include "camera_manager.h"
 #include "stream_reader.h"
+#include "utils.h"
 
 
 static const double MIN_FPS = 1.0 / 86400.0; //once per day
@@ -66,11 +67,29 @@ int MediaEncoder::getMediaUrl( char* urlBuf ) const
 
 int MediaEncoder::getResolutionList( nxcip::ResolutionInfo* infoList, int* infoListCount ) const
 {
-    infoList[0].resolution.width = 800;
-    infoList[0].resolution.height = 450;
-    infoList[0].maxFps = MAX_FPS;
-    *infoListCount = 1;
-    
+    //infoList[0].resolution.width = 800;
+    //infoList[0].resolution.height = 450;
+    //infoList[0].maxFps = MAX_FPS;
+    //*infoListCount = 1;
+
+    //taken from DiscoveryManagers::findCameras(), for reference only
+    /*QByteArray url =
+            QByteArray("webcam://").append(nx::utils::Url::toPercentEncoding(devices[i].devicePath()));*/
+
+    QString url = QString(m_cameraManager->info().url).mid(9);
+    url = nx::utils::Url::fromPercentEncoding(url.toLatin1());
+
+    QList<QSize> resolutionList = utils::getResolutionList(url.toLatin1().data());
+
+    int count = resolutionList.count();
+    for (int i = 0; i < count; ++i)
+    {
+        infoList[i].resolution.width = resolutionList[i].width();
+        infoList[i].resolution.height = resolutionList[i].height();
+        infoList[i].maxFps = MAX_FPS;
+    }
+    *infoListCount = count;
+
     return nxcip::NX_NO_ERROR;
 }
 

@@ -12,6 +12,9 @@ namespace utils {
         void setDeviceName(const QString& deviceName);
         QString deviceName();
 
+        void setDevicePath(const QString& devicePath);
+        QString devicePath();
+
         void setResolutionList(const QList<QSize>& resolutionList);
         QList<QSize> resolutionList();
 
@@ -19,6 +22,7 @@ namespace utils {
 
     private:
         QString m_deviceName;
+        QString m_devicePath;
         QList<QSize> m_resolutionList;
         QSize m_highestResolution;
     };

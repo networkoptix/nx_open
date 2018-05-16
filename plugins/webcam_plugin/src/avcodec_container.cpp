@@ -13,7 +13,8 @@ AVCodecContainer::AVCodecContainer(AVFormatContext * formatContext)
 AVCodecContainer::~AVCodecContainer()
 {
     close();
-    avcodec_free_context(&m_codecContext);
+    if(m_codecContext)
+        avcodec_free_context(&m_codecContext);
 }
 
 void AVCodecContainer::open()
@@ -38,6 +39,8 @@ void AVCodecContainer::close()
 
     if (m_codecContext)
         avcodec_close(m_codecContext);
+        
+    m_open = false;
 }
 
 int AVCodecContainer::readFrame(AVPacket * outPacket)
