@@ -250,6 +250,13 @@ public:
         QnMutexLocker lock(&m_mutex);
         m_remoteUpdateFinished = true;
         m_remoteUpdateCondition.wakeOne();
+        if (m_afterRemoteUpdateAction)
+            m_afterRemoteUpdateAction();
+    }
+
+    void setAfterRemoteUpdateAction(std::function<void()> afterRemoteUpdateAction)
+    {
+        m_afterRemoteUpdateAction = afterRemoteUpdateAction;
     }
 
     MOCK_CONST_METHOD0(peerId, QnUuid());
@@ -258,6 +265,7 @@ public:
 private:
     std::function<update::info::AbstractUpdateRegistryPtr()> m_globalRegistryFactoryFunc;
     std::function<update::info::AbstractUpdateRegistryPtr()> m_remoteRegistryFactoryFunc;
+    std::function<void()> m_afterRemoteUpdateAction = nullptr;
     QnMutex m_mutex;
     QnWaitCondition m_remoteUpdateCondition;
     bool m_remoteUpdateFinished = false;
@@ -405,6 +413,11 @@ protected:
     void whenDownloadRequestIssued()
     {
         m_testUpdates2Manager->download();
+    }
+
+    void setAfterRemoteUpdateAction(std::function<void()> afterRemoteUpdateAction)
+    {
+        m_testUpdates2Manager->setAfterRemoteUpdateAction(afterRemoteUpdateAction);
     }
 
     enum class FilesExpectations
@@ -1362,47 +1375,212 @@ TEST_F(Updates2Manager, HasRemoteUpdate_Download_addFile_fail)
     thenStateShouldBe(api::Updates2StatusData::StatusCode::available);
 }
 
-//TEST_F(Updates2Manager, HasRemoteUpdate_Download_notAvailableStateBecauseNoUpdate)
+TEST_F(Updates2Manager, HasRemoteUpdate_Download_notAvailableStateBecauseNoUpdate)
+{
+    givenInitialUpdates2ManagerWithInitialRegistry(
+        [this]()
+        {
+            return createUpdateRegistry(
+                /*version*/ nullptr,
+                FindUpdateExpectations::wontBeCalled,
+                LatestUpdateExpectations::wontBeCalled,
+                AddFileExpectations::wontBeCalled,
+                AlternativeServersExpectations::wontBeCalled,
+                ToBytesExpectations::wontBeCalled,
+                FromBytesExpectations::wontBeCalled,
+                EqualExpectations::wontBeCalled,
+                MergeExpectations::wontBeCalled);
+        });
+
+    prepareUpdateManagerExpectations(
+        RefreshTimeoutExpectations::willBeCalled,
+        FilePathExpectations::wontBeCalled,
+        LoadStatusFromFileExpectations::willBeCalledNotAvailable,
+        ConnectToSignalsExpectations::willBeCalled,
+        ModuleGuuidExpectations::willBeCalled,
+        DownloaderExpectations::wontBeCalled,
+        InstallerExpectations::wontBeCalled,
+        PeerIdExpectations::wontBeCalled,
+        IsClientExpectations::willBeCalledFalse,
+        UpdateGlobalRegistryExpectations::willBeCalled);
+
+    givenGlobalRegistryFactoryFunc([]() { return update::info::AbstractUpdateRegistryPtr(); });
+    givenRemoteRegistryFactoryFunc(
+        [this]()
+        {
+            auto result = createUpdateRegistry(
+                nullptr,
+                FindUpdateExpectations::wontBeCalled,
+                LatestUpdateExpectations::willBeCalledNoNewVersion,
+                AddFileExpectations::wontBeCalled,
+                AlternativeServersExpectations::wontBeCalled,
+                ToBytesExpectations::willBeCalled,
+                FromBytesExpectations::wontBeCalled,
+                EqualExpectations::returnsFalse,
+                MergeExpectations::willBeCalled);
+
+             return result;
+        });
+
+    whenServerStarted();
+    whenRemoteUpdateDone();
+    thenStateShouldBe(api::Updates2StatusData::StatusCode::notAvailable);
+
+    givenGlobalRegistryFactoryFunc(
+        [this]()
+        {
+            return createUpdateRegistry(
+                nullptr,
+                FindUpdateExpectations::wontBeCalled,
+                LatestUpdateExpectations::wontBeCalled,
+                AddFileExpectations::wontBeCalled,
+                AlternativeServersExpectations::wontBeCalled,
+                ToBytesExpectations::wontBeCalled,
+                FromBytesExpectations::wontBeCalled,
+                EqualExpectations::wontBeCalled,
+                MergeExpectations::wontBeCalled);
+        });
+
+    prepareUpdateRegistryExpectations(
+                currentRemoteRegistry(),
+                nullptr,
+                FindUpdateExpectations::wontBeCalled,
+                LatestUpdateExpectations::willBeCalledNoNewVersion,
+                AddFileExpectations::wontBeCalled,
+                AlternativeServersExpectations::wontBeCalled,
+                ToBytesExpectations::wontBeCalled,
+                FromBytesExpectations::wontBeCalled,
+                EqualExpectations::returnsTrue,
+                MergeExpectations::wontBeCalled);
+
+    givenRemoteRegistryFactoryFunc(
+        [this]()
+        {
+            auto result = createUpdateRegistry(
+                nullptr,
+                FindUpdateExpectations::wontBeCalled,
+                LatestUpdateExpectations::wontBeCalled,
+                AddFileExpectations::wontBeCalled,
+                AlternativeServersExpectations::wontBeCalled,
+                ToBytesExpectations::wontBeCalled,
+                FromBytesExpectations::wontBeCalled,
+                EqualExpectations::returnsTrue,
+                MergeExpectations::wontBeCalled);
+
+             return result;
+        });
+
+    whenDownloadRequestIssued();
+    whenRemoteUpdateDone();
+    thenStateShouldBe(api::Updates2StatusData::StatusCode::notAvailable);
+}
+
+//TEST_F(Updates2Manager, HasRemoteUpdate_Download_alreadyDownloadingState)
 //{
-//    givenFileState(api::Updates2StatusData::StatusCode::notAvailable);
-//    givenGlobalRegistryFactoryFunc(
+//    givenInitialUpdates2ManagerWithInitialRegistry(
 //        [this]()
 //        {
 //            return createUpdateRegistry(
 //                /*version*/ nullptr,
-//                /*hasUpdate*/ false,
-//                /*expectFindUpdateFileWillBeCalled*/ true,
-//                /*expectToByteArrayWillBeCalled*/ false,
-//                /*shouldBeEqualWithCurrent*/ true);
+//                FindUpdateExpectations::wontBeCalled,
+//                LatestUpdateExpectations::wontBeCalled,
+//                AddFileExpectations::wontBeCalled,
+//                AlternativeServersExpectations::wontBeCalled,
+//                ToBytesExpectations::wontBeCalled,
+//                FromBytesExpectations::wontBeCalled,
+//                EqualExpectations::wontBeCalled,
+//                MergeExpectations::wontBeCalled);
 //        });
-//    givenRemoteRegistryFactoryFunc([]() { return update::info::AbstractUpdateRegistryPtr(); });
-//    whenServerStarted();
-//    whenRemoteUpdateDone();
-//    whenDownloadRequestIssued(DownloadExpectedOutcome::fail_wrongState);
-//    thenStateShouldBe(api::Updates2StatusData::StatusCode::notAvailable);
-//}
 
-//TEST_F(Updates2Manager, Download_notAvailableState_GotUpdateInfo_noNewVersions)
-//{
-//    givenFileState(api::Updates2StatusData::StatusCode::notAvailable);
+//    prepareUpdateManagerExpectations(
+//        RefreshTimeoutExpectations::willBeCalled,
+//        FilePathExpectations::wontBeCalled,
+//        LoadStatusFromFileExpectations::willBeCalledNotAvailable,
+//        ConnectToSignalsExpectations::willBeCalled,
+//        ModuleGuuidExpectations::willBeCalled,
+//        DownloaderExpectations::willBeCalled,
+//        InstallerExpectations::willBeCalled,
+//        PeerIdExpectations::wontBeCalled,
+//        IsClientExpectations::willBeCalledFalse,
+//        UpdateGlobalRegistryExpectations::willBeCalled);
+
+//    prepareDownloadExpectations(
+//        FilesExpectations::wontBeCalled,
+//        FilePathExpectations::wontBeCalled,
+//        FileInformationExpectations::willBeCalled_OnceNotFound,
+//        DownloaderAddFileExpectations::willBeCalled_failedWithNoSpace,
+//        DeleteFileExpectations::willBeCalled);
+
 //    givenGlobalRegistryFactoryFunc([]() { return update::info::AbstractUpdateRegistryPtr(); });
-//    givenRemoteRegistryFactoryFunc([]() { return update::info::AbstractUpdateRegistryPtr(); });
+//    givenRemoteRegistryFactoryFunc(
+//        [this]()
+//        {
+//            auto result = createUpdateRegistry(
+//                &kNewVersion,
+//                FindUpdateExpectations::willBeCalledNewVersion,
+//                LatestUpdateExpectations::willBeCalledNewVersion,
+//                AddFileExpectations::wontBeCalled,
+//                AlternativeServersExpectations::wontBeCalled,
+//                ToBytesExpectations::willBeCalled,
+//                FromBytesExpectations::wontBeCalled,
+//                EqualExpectations::returnsFalse,
+//                MergeExpectations::willBeCalled);
+
+//             return result;
+//        });
+
 //    whenServerStarted();
 //    whenRemoteUpdateDone();
-//    whenDownloadRequestIssued(DownloadExpectedOutcome::fail_wrongState);
-//    thenStateShouldBe(api::Updates2StatusData::StatusCode::error);
-//}
+//    thenStateShouldBe(api::Updates2StatusData::StatusCode::available);
 
-//TEST_F(Updates2Manager, Download_alreadyDownloadingState)
-//{
-//    givenAvailableRemoteUpdate();
-//    whenDownloadRequestIssued(DownloadExpectedOutcome::success_fileNotExists);
+//    givenGlobalRegistryFactoryFunc(
+//        [this]()
+//        {
+//            return createUpdateRegistry(
+//                nullptr,
+//                FindUpdateExpectations::wontBeCalled,
+//                LatestUpdateExpectations::wontBeCalled,
+//                AddFileExpectations::wontBeCalled,
+//                AlternativeServersExpectations::wontBeCalled,
+//                ToBytesExpectations::wontBeCalled,
+//                FromBytesExpectations::wontBeCalled,
+//                EqualExpectations::wontBeCalled,
+//                MergeExpectations::wontBeCalled);
+//        });
 
-//    whenDownloadRequestIssued(DownloadExpectedOutcome::fail_wrongState);
+//    prepareUpdateRegistryExpectations(
+//                currentRemoteRegistry(),
+//                nullptr,
+//                FindUpdateExpectations::wontBeCalled,
+//                LatestUpdateExpectations::wontBeCalled,
+//                AddFileExpectations::wontBeCalled,
+//                AlternativeServersExpectations::wontBeCalled,
+//                ToBytesExpectations::wontBeCalled,
+//                FromBytesExpectations::wontBeCalled,
+//                EqualExpectations::wontBeCalled,
+//                MergeExpectations::wontBeCalled);
+
+//    givenRemoteRegistryFactoryFunc(
+//        [this]()
+//        {
+//            auto result = createUpdateRegistry(
+//                nullptr,
+//                FindUpdateExpectations::wontBeCalled,
+//                LatestUpdateExpectations::wontBeCalled,
+//                AddFileExpectations::wontBeCalled,
+//                AlternativeServersExpectations::wontBeCalled,
+//                ToBytesExpectations::wontBeCalled,
+//                FromBytesExpectations::wontBeCalled,
+//                EqualExpectations::returnsTrue,
+//                MergeExpectations::wontBeCalled);
+
+//             return result;
+//        });
+
+//    whenDownloadRequestIssued();
 //    thenStateShouldBe(api::Updates2StatusData::StatusCode::downloading);
-
 //    whenDownloadFinishedSuccessfully();
-//    thenStateShouldBe(api::Updates2StatusData::StatusCode::preparing);
+
 //    thenStateShouldBeAtLast(api::Updates2StatusData::StatusCode::readyToInstall);
 //}
 
