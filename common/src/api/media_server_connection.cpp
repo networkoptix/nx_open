@@ -25,6 +25,9 @@
 #include <utils/common/ldap.h>
 #include <utils/common/warnings.h>
 #include <utils/common/request_param.h>
+
+#include <nx/vms/api/data/email_settings_data.h>
+
 #include <nx/fusion/model_functions.h>
 #include <nx/fusion/serialization/compressed_time_functions.h>
 #include <nx/network/http/http_types.h>

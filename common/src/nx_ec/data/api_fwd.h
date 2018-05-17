@@ -73,8 +73,6 @@ typedef std::vector<ApiDiscoveredServerData> ApiDiscoveredServerDataList;
 typedef std::vector<ApiUpdateUploadResponceData> ApiUpdateUploadResponceDataList;
 typedef std::vector<ApiSystemMergeHistoryRecord> ApiSystemMergeHistoryRecordList;
 
-struct ApiEmailData;
-
 /**
  * Wrapper to be used for overloading as a distinct type for ApiStorageData api requests.
  */
@@ -86,7 +84,6 @@ struct ParentId
 };
 
 #define QN_EC2_API_DATA_TYPES \
-    (ApiEmailData)\
     (ApiFullInfoData)\
     (ApiLicenseData)\
     (ApiDetailedLicenseData)\

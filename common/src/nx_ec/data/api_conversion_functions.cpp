@@ -28,7 +28,7 @@
 #include <nx/vms/api/data/camera_attributes_data.h>
 #include <nx/vms/api/data/camera_data_ex.h>
 #include <nx/vms/api/data/camera_history_data.h>
-#include "api_email_data.h"
+#include <nx/vms/api/data/email_settings_data.h>
 #include <nx/vms/api/data/layout_data.h>
 #include "api_license_data.h"
 #include "api_media_server_data.h"

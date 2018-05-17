@@ -461,12 +461,6 @@ namespace detail
             return ErrorCode::notImplemented;
         }
 
-        ErrorCode executeTransactionInternal(const QnTransaction<ApiEmailData>&)
-        {
-            NX_ASSERT(false, Q_FUNC_INFO, "This is a non persistent transaction!");
-            return ErrorCode::notImplemented;
-        }
-
         ErrorCode executeTransactionInternal(const QnTransaction<ApiFullInfoData>&)
         {
             NX_ASSERT(false, Q_FUNC_INFO, "This is a non persistent transaction!");

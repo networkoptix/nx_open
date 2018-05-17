@@ -3,6 +3,7 @@
 #include <core/resource/resource_fwd.h>
 #include <nx/mediaserver/event/rule_processor.h>
 #include <nx/vms/event/actions/actions_fwd.h>
+#include <nx/email/email_manager_impl.h>
 
 namespace nx {
 namespace mediaserver {
@@ -106,7 +107,7 @@ private:
     QVariantMap eventDescriptionMap(
         const vms::event::AbstractActionPtr& action,
         const vms::event::AggregationInfo &aggregationInfo,
-        QnEmailAttachmentList& attachments) const;
+        EmailManagerImpl::AttachmentList& attachments) const;
 
     QVariantMap eventDetailsMap(
         const vms::event::AbstractActionPtr& action,
