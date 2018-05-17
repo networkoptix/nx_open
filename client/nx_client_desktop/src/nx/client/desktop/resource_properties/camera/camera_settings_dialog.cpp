@@ -343,18 +343,21 @@ void CameraSettingsDialog::loadState(const CameraSettingsDialogState& state)
     // Legacy code has more complicated conditions.
 
     using CombinedValue = CameraSettingsDialogState::CombinedValue;
+    const bool notWearable = state.devicesDescription.isWearable == CombinedValue::None;
 
-    setPageVisible(int(CameraSettingsTab::motion), state.isSingleCamera()
+    setPageVisible(int(CameraSettingsTab::motion), state.isSingleCamera() && notWearable
         && state.devicesDescription.hasMotion == CombinedValue::All);
 
-    setPageVisible(int(CameraSettingsTab::fisheye),
-        state.isSingleCamera() && state.singleCameraProperties.hasVideo);
+    setPageVisible(int(CameraSettingsTab::recording), notWearable);
 
-    setPageVisible(int(CameraSettingsTab::io), state.isSingleCamera()
+    setPageVisible(int(CameraSettingsTab::fisheye), state.isSingleCamera()
+        && state.singleCameraProperties.hasVideo);
+
+    setPageVisible(int(CameraSettingsTab::io), state.isSingleCamera() && notWearable
         && state.devicesDescription.isIoModule == CombinedValue::All);
 
-    setPageVisible(int(CameraSettingsTab::expert),
-        state.devicesDescription.isIoModule == CombinedValue::None);
+    setPageVisible(int(CameraSettingsTab::expert), notWearable
+        && state.devicesDescription.isIoModule == CombinedValue::None);
 
     ui->alertBar->setText(getAlertText(state));
 }
