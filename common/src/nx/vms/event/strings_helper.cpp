@@ -130,7 +130,7 @@ QString StringsHelper::eventName(EventType value, int count) const
     switch (value)
     {
         case cameraMotionEvent:    return tr("Motion on Cameras", "", count);
-        case storageFailureEvent:  return tr("Storage Failure");
+        case storageFailureEvent:  return tr("Storage Issue");
         case networkIssueEvent:    return tr("Network Issue");
         case serverFailureEvent:   return tr("Server Failure");
         case serverConflictEvent:  return tr("Server Conflict");
@@ -199,7 +199,7 @@ QString StringsHelper::eventAtResource(const EventParameters& params,
             return tr("Motion on %1").arg(resourceName);
 
         case storageFailureEvent:
-            return tr("Storage Failure at %1").arg(resourceName);
+            return tr("Storage Issue at %1").arg(resourceName);
 
         case networkIssueEvent:
             return tr("Network Issue at %1").arg(resourceName);
