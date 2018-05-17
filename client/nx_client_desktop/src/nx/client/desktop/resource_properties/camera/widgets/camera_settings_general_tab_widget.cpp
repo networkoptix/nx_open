@@ -1,7 +1,8 @@
 #include "camera_settings_general_tab_widget.h"
 #include "ui_camera_settings_general_tab_widget.h"
-
 #include "../redux/camera_settings_dialog_store.h"
+
+#include <nx/utils/log/assert.h>
 
 namespace nx {
 namespace client {
@@ -14,15 +15,22 @@ CameraSettingsGeneralTabWidget::CameraSettingsGeneralTabWidget(
     base_type(parent),
     ui(new Ui::CameraSettingsGeneralTabWidget())
 {
+    NX_ASSERT(store);
+
     ui->setupUi(this);
     ui->cameraInfoWidget->setStore(store);
     ui->imageControlWidget->setStore(store);
 
     connect(store, &CameraSettingsDialogStore::stateChanged, this,
         &CameraSettingsGeneralTabWidget::loadState);
+
+    connect(ui->cameraInfoWidget, &CameraInfoWidget::actionRequested,
+        this, &CameraSettingsGeneralTabWidget::actionRequested);
 }
 
-CameraSettingsGeneralTabWidget::~CameraSettingsGeneralTabWidget() = default;
+CameraSettingsGeneralTabWidget::~CameraSettingsGeneralTabWidget()
+{
+}
 
 void CameraSettingsGeneralTabWidget::loadState(const CameraSettingsDialogState& state)
 {

@@ -4,7 +4,9 @@
 #include <common/common_module.h>
 #include <nx/vms/event/rule.h>
 #include <nx/vms/event/rule_manager.h>
-#include <managers/business_event_manager.h>
+#include <managers/event_rules_manager.h>
+
+#include <nx_ec/data/api_conversion_functions.h>
 
 namespace nx {
 namespace client {
@@ -36,15 +38,17 @@ void EventRulesWatcher::handleRulesReset(const nx::vms::event::RuleList& rules)
     if (!connection)
         return;
 
-    const auto manager = connection->getBusinessEventManager(Qn::kSystemAccess);
-    nx::vms::event::RuleList receivedRules;
-    if (manager->getBusinessRulesSync(&receivedRules) != ec2::ErrorCode::ok)
+    const auto manager = connection->getEventRulesManager(Qn::kSystemAccess);
+    nx::vms::api::EventRuleDataList receivedRules;
+    if (manager->getEventRulesSync(&receivedRules) != ec2::ErrorCode::ok)
         return;
 
     m_updated = true;
 
+    vms::event::RuleList ruleList;
+    ec2::fromApiToResourceList(receivedRules, ruleList);
     const auto eventRuleManager = commonModule->eventRuleManager();
-    eventRuleManager->resetRules(receivedRules);
+    eventRuleManager->resetRules(ruleList);
 }
 
 void EventRulesWatcher::handleConnectionChanged()

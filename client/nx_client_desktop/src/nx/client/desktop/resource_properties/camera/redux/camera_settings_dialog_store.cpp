@@ -58,11 +58,6 @@ void CameraSettingsDialogStore::setReadOnly(bool value)
     d->executeAction([&](State state) { return Reducer::setReadOnly(std::move(state), value); });
 }
 
-void CameraSettingsDialogStore::setPanicMode(bool value)
-{
-    d->executeAction([&](State state) { return Reducer::setPanicMode(std::move(state), value); });
-}
-
 void CameraSettingsDialogStore::setSettingsOptimizationEnabled(bool value)
 {
     d->executeAction(

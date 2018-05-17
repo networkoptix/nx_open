@@ -4,6 +4,7 @@
 #include <api/common_message_processor.h>
 #include <api/runtime_info_manager.h>
 
+#include <translation/datetime_formatter.h>
 #include <common/common_module.h>
 
 #include <core/resource_management/resource_changes_listener.h>
@@ -347,11 +348,11 @@ QVariant QnTimeServerSelectionModel::data(const QModelIndex& index, int role) co
                     switch (column)
                     {
                         case Columns::DateColumn:
-                            return dateTime.toString(lit("dd/MM/yyyy"));
+                            return datetime::toString(dateTime.date());
                         case Columns::ZoneColumn:
                             return dateTime.timeZoneAbbreviation();
                         case Columns::TimeColumn:
-                            return dateTime.toString(lit("HH:mm:ss"));
+                            return datetime::toString(dateTime.time());
                     }
                 }
 

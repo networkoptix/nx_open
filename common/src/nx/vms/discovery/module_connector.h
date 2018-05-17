@@ -71,6 +71,7 @@ private:
 
         void addEndpoints(std::set<nx::network::SocketAddress> endpoints);
         void ensureConnection();
+        void remakeConnection();
         void setForbiddenEndpoints(std::set<nx::network::SocketAddress> endpoints);
         QString idForToStringFromPtr() const; //< Used by toString(const T*).
 

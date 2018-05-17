@@ -9,6 +9,8 @@
 #include <QtOpenGL/QGLContext>
 #include <QtOpenGL/QGLWidget>
 
+#include <translation/datetime_formatter.h>
+
 #include <utils/common/warnings.h>
 #include <utils/common/checked_cast.h>
 #include <utils/common/delete_later.h>
@@ -2121,8 +2123,8 @@ void QnWorkbenchDisplay::at_workbench_currentLayoutChanged()
 
             // TODO: #Elric move out, common code, another copy is in QnWorkbenchScreenshotHandler
             QString timeString = (widget->resource()->toResource()->flags() & Qn::utc)
-                ? QDateTime::fromMSecsSinceEpoch(displayTime).toString(lit("yyyy MMM dd hh:mm:ss"))
-                : QTime(0, 0, 0, 0).addMSecs(displayTime).toString(lit("hh:mm:ss.zzz"));
+                ? datetime::toString(displayTime)
+                : datetime::toString(displayTime, datetime::Format::hh_mm_ss_zzz);
             widget->setTitleTextFormat(QLatin1String("%1\t") + timeString);
         }
 

@@ -75,7 +75,6 @@ private:
     void updateGridEnabledState();
     void updateLicensesLabelText();
     void updateMotionButtons();
-    void updatePanicLabelText();
     void updateLicensesButtonVisible();
     void updateRecordSpinboxes();
     void updateMaxFpsValue(bool motionPlusLqToggled);

@@ -33,7 +33,6 @@ public:
     // Actions.
     void applyChanges();
     void setReadOnly(bool value);
-    void setPanicMode(bool value);
     void setSettingsOptimizationEnabled(bool value);
     void loadCameras(const QnVirtualCameraResourceList& cameras);
     void setSingleCameraUserName(const QString& text);

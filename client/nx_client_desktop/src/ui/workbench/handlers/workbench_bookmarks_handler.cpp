@@ -56,8 +56,7 @@ const int kHintTimeoutMs = 5000;
 
 QnWorkbenchBookmarksHandler::QnWorkbenchBookmarksHandler(QObject *parent /* = NULL */):
     base_type(parent),
-    QnWorkbenchContextAware(parent),
-    m_hintDisplayed(false)
+    QnWorkbenchContextAware(parent)
 {
     connect(action(action::AddCameraBookmarkAction),     &QAction::triggered, this,
         &QnWorkbenchBookmarksHandler::at_addCameraBookmarkAction_triggered);
@@ -69,9 +68,6 @@ QnWorkbenchBookmarksHandler::QnWorkbenchBookmarksHandler(QObject *parent /* = NU
         &QnWorkbenchBookmarksHandler::at_removeBookmarksAction_triggered);
     connect(action(action::BookmarksModeAction),         &QAction::toggled,   this,
         &QnWorkbenchBookmarksHandler::at_bookmarksModeAction_triggered);
-
-    /* Reset hint flag for each user. */
-    connect(context(), &QnWorkbenchContext::userChanged, this, [this]() { m_hintDisplayed = false; });
 
     const auto getActionParamsFunc =
         [this](const QnCameraBookmark &bookmark) -> action::Parameters
@@ -321,17 +317,6 @@ void QnWorkbenchBookmarksHandler::at_bookmarksModeAction_triggered()
 
     if (checked)
         menu()->trigger(action::StopSmartSearchAction, display()->widgets());
-
-    if (!m_hintDisplayed && enabled && checked && !navigator()->bookmarksModeEnabled())
-    {
-        const auto hotkey = action(action::OpenBookmarksSearchAction)->shortcut().toString(
-            QKeySequence::NativeText);
-        QnGraphicsMessageBox::information(
-            tr("Press %1 to search bookmarks").arg(hotkey)
-            , kHintTimeoutMs
-        );
-        m_hintDisplayed = true;
-    }
 
     navigator()->setBookmarksModeEnabled(checked);
 }

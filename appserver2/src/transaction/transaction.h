@@ -1602,7 +1602,7 @@ APPLY(10201, getSystemMergeHistory, ApiSystemMergeHistoryRecordList, \
     {
         QJson::serialize(ctx, static_cast<const QnAbstractTransaction&>(tran), target);
         QJsonObject localTarget = target->toObject();
-        QJson::serialize(ctx, tran.params, "params", &localTarget);
+        QJson::serialize(ctx, tran.params, QLatin1String("params"), &localTarget);
         *target = localTarget;
     }
 
@@ -1611,7 +1611,7 @@ APPLY(10201, getSystemMergeHistory, ApiSystemMergeHistoryRecordList, \
     {
         return
             QJson::deserialize(ctx, value, static_cast<QnAbstractTransaction*>(target)) &&
-            QJson::deserialize(ctx, value.toObject(), "params", &target->params);
+            QJson::deserialize(ctx, value.toObject(), QLatin1String("params"), &target->params);
     }
 
     /*QnUbjson format functions for QnTransaction<T>*/

@@ -12,6 +12,7 @@
 #include <nx/vms/event/analytics_helper.h>
 
 #include <common/common_module.h>
+#include <translation/datetime_formatter.h>
 
 #include <client_core/client_core_module.h>
 
@@ -385,7 +386,7 @@ QString QnEventLogModel::textData(Column column, const vms::event::ActionData& a
 
             const auto timeWatcher = context()->instance<nx::client::core::ServerTimeWatcher>();
             QDateTime dt = timeWatcher->displayTime(timestampMs);
-            return dt.toString(Qt::DefaultLocaleShortDate);
+            return datetime::toString(dt);
         }
         case EventColumn:
         {
