@@ -2,6 +2,7 @@
 
 #include <chrono>
 #include <numeric>
+#include <thread>
 
 #include <audit/mserver_audit_manager.h>
 #include <utils/common/synctime.h>
