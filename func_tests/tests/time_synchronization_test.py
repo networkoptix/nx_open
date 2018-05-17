@@ -69,7 +69,7 @@ def test_primary_follows_vm_time(two_mediaservers):
     primary, secondary = two_mediaservers
     wait_for_true(
         lambda: get_time(primary.api).is_close_to(BASE_TIME),
-        "time on PRIMARY time server {} does NOT FOLLOW time on MACHINE WITH PRIMARY time server {}.".format(
+        "time on PRIMARY time server {} follows its machine time {}.".format(
             get_time(primary.api), BASE_TIME))
     assert not primary.installation.list_core_dumps()
     assert not secondary.installation.list_core_dumps()
@@ -85,7 +85,7 @@ def test_secondary_follows_primary(two_mediaservers, shift_hours):
     secondary.os_access.set_time(BASE_TIME.current + timedelta(hours=shift_hours))
     wait_for_true(
         lambda: get_time(secondary.api).is_close_to(BASE_TIME),
-        "time {} on NON-PRIMARY time server doesn't align with time {} on MACHINE WITH PRIMARY time server.".format(
+        "time {} on NON-PRIMARY time server aligns with time {} on MACHINE WITH PRIMARY time server.".format(
             get_time(secondary.api), BASE_TIME))
     assert not primary.installation.list_core_dumps()
     assert not secondary.installation.list_core_dumps()
@@ -104,11 +104,11 @@ def test_change_primary_server(two_mediaservers):
     new_primary_vm_time = new_primary.os_access.set_time(BASE_TIME.current + timedelta(hours=5))
     wait_for_true(
         lambda: get_time(new_primary.api).is_close_to(new_primary_vm_time),
-        "time on NEW PRIMARY time server {} does NOT FOLLOW time on MACHINE WITH NEW PRIMARY time server {}".format(
+        "time on NEW PRIMARY time server {} follows time on MACHINE WITH NEW PRIMARY time server {}".format(
             get_time(new_primary.api), new_primary_vm_time))
     wait_for_true(
         lambda: get_time(new_secondary.api).is_close_to(new_primary_vm_time),
-        "time on NEW NON-PRIMARY time server {} does NOT FOLLOW time on NEW PRIMARY time server {}".format(
+        "time on NEW NON-PRIMARY time server {} follows time on NEW PRIMARY time server {}".format(
             get_time(new_secondary.api), new_primary_vm_time))
     assert not old_primary.installation.list_core_dumps()
     assert not old_secondary.installation.list_core_dumps()
@@ -120,7 +120,7 @@ def test_change_time_on_secondary_server(two_mediaservers):
     secondary.os_access.set_time(BASE_TIME.current + timedelta(hours=10))
     ensure_persistence(
         lambda: get_time(secondary.api).is_close_to(BASE_TIME),
-        "time on NON-PRIMARY time server {} does NOT FOLLOW time on PRIMARY time server {}".format(
+        "time on NON-PRIMARY time server {} follows time on PRIMARY time server {}".format(
             get_time(secondary.api), BASE_TIME))
     assert not primary.installation.list_core_dumps()
     assert not secondary.installation.list_core_dumps()
@@ -132,7 +132,7 @@ def test_primary_server_temporary_offline(two_mediaservers):
     secondary.os_access.set_time(BASE_TIME.current + timedelta(hours=4))
     ensure_persistence(
         lambda: get_time(secondary.api).is_close_to(BASE_TIME),
-        "time on NON-PRIMARY time server {} does NOT FOLLOW time on PRIMARY time server {}"
+        "time on NON-PRIMARY time server {} follows time on PRIMARY time server {}"
         "after PRIMARY time server was stopped".format(get_time(secondary.api), BASE_TIME))
     assert not primary.installation.list_core_dumps()
     assert not secondary.installation.list_core_dumps()
