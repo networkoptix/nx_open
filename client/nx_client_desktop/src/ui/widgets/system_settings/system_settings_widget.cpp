@@ -74,14 +74,13 @@ void QnSystemSettingsWidget::retranslateUi()
 
 void QnSystemSettingsWidget::at_forceTrafficEncryptionCheckBoxClicked(bool value)
 {
-    if (value)
+    if (!value)
     {
         if (ui->forceVideoTrafficEncryptionCheckBox->isChecked())
             emit forceVideoTrafficEncryptionChanged(false);
         ui->forceVideoTrafficEncryptionCheckBox->setChecked(false);
     }
     ui->forceVideoTrafficEncryptionCheckBox->setEnabled(value);
-    emit forceVideoTrafficEncryptionChanged(ui->forceVideoTrafficEncryptionCheckBox->isChecked());
 }
 
 void QnSystemSettingsWidget::loadDataToUi()
