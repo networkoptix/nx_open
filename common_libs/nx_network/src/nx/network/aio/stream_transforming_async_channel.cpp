@@ -283,13 +283,13 @@ void StreamTransformingAsyncChannel::onRawDataWritten(
 {
     using namespace std::placeholders;
 
+    UserIoHandler userHandler = std::exchange(m_rawWriteQueue.front().userHandler, nullptr);
+    int userByteCount = m_rawWriteQueue.front().userByteCount;
     if (sysErrorCode == SystemError::noError)
     {
         NX_ASSERT(
             bytesTransferred ==
             static_cast<std::size_t>(m_rawWriteQueue.front().data.size()));
-        auto userHandler = std::move(m_rawWriteQueue.front().userHandler);
-        const auto userByteCount = m_rawWriteQueue.front().userByteCount;
         m_rawWriteQueue.pop_front();
         if (!m_rawWriteQueue.empty())
         {
@@ -297,34 +297,27 @@ void StreamTransformingAsyncChannel::onRawDataWritten(
                 m_rawWriteQueue.front().data,
                 std::bind(&StreamTransformingAsyncChannel::onRawDataWritten, this, _1, _2));
         }
-
-        if (userHandler)
-        {
-            utils::ObjectDestructionFlag::Watcher thisDestructionWatcher(&m_destructionFlag);
-            userHandler(sysErrorCode, userByteCount);
-            if (thisDestructionWatcher.objectDestroyed())
-                return;
-        }
-
-        return tryToCompleteUserTasks();
+    }
+    else
+    {
+        // TODO: #ak Should report error as-is, but mark socket as unusable
+        // and fail any subsequent operation with SystemError::connectionReset.
+        if (!nx::network::socketCannotRecoverFromError(sysErrorCode))
+            sysErrorCode = SystemError::connectionReset;
     }
 
-    // TODO: #ak Should report error as-is, but mark socket as unusable
-    // and fail any subsequent operation with SystemError::connectionReset.
-    if (!nx::network::socketCannotRecoverFromError(sysErrorCode))
-        sysErrorCode = SystemError::connectionReset;
-
-    // TODO: #ak This is copy-paste. Refactor!
-    auto userHandler = std::move(m_rawWriteQueue.front().userHandler);
     if (userHandler)
     {
         utils::ObjectDestructionFlag::Watcher thisDestructionWatcher(&m_destructionFlag);
-        userHandler(sysErrorCode, -1);
+        userHandler(sysErrorCode, userByteCount);
         if (thisDestructionWatcher.objectDestroyed())
             return;
     }
 
-    reportFailureOfEveryUserTask(sysErrorCode);
+    if (sysErrorCode == SystemError::noError)
+        tryToCompleteUserTasks();
+    else
+        reportFailureOfEveryUserTask(sysErrorCode);
 }
 
 void StreamTransformingAsyncChannel::reportFailureOfEveryUserTask(
