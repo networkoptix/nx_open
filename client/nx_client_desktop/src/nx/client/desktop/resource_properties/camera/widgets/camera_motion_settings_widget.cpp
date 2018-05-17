@@ -19,14 +19,14 @@
 #include <ui/style/helper.h>
 #include <ui/workaround/widgets_signals_workaround.h>
 
-#include <nx/client/core/resource/camera_motion_helper.h>
+#include <nx/client/core/motion/helpers/camera_motion_helper.h>
 #include <nx/client/core/utils/geometry.h>
 #include <nx/client/desktop/common/widgets/selectable_button.h>
 
 namespace {
 
-static const QSize kSensitivityButtonSize(34, 34);
-static const qreal kSensitivityButtonOpacity = 0.3;
+static constexpr QSize kSensitivityButtonSize(34, 34);
+static constexpr qreal kSensitivityButtonOpacity = 0.3;
 
 } // namespace
 
@@ -135,6 +135,8 @@ void CameraMotionSettingsWidget::loadState(const CameraSettingsDialogState& stat
 {
     m_cameraId = state.isSingleCamera() ? state.singleCameraProperties.id : QString();
     m_motionHelper->setMotionRegionList(state.singleCameraSettings.motionRegionList());
+
+    ui->motionDetectionCheckBox->setChecked(state.hasMotion());
 
     if (auto motionItem = m_motionView->rootObject())
         motionItem->setProperty("cameraResourceId", m_cameraId);

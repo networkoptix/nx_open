@@ -54,18 +54,6 @@ enum class StreamQuality
 };
 QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(StreamQuality)
 
-enum MotionType
-{
-    MT_Default = 0x0,
-    MT_HardwareGrid = 0x1,
-    MT_SoftwareGrid = 0x2,
-    MT_MotionWindow = 0x4,
-    MT_NoMotion = 0x8
-};
-Q_DECLARE_FLAGS(MotionTypes, MotionType)
-QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(MotionType)
-Q_DECLARE_OPERATORS_FOR_FLAGS(MotionTypes)
-
 enum class FailoverPriority
 {
     never = 0,
@@ -87,15 +75,17 @@ Q_DECLARE_FLAGS(CameraBackupQualities, CameraBackupQuality)
 QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(CameraBackupQuality)
 Q_DECLARE_OPERATORS_FOR_FLAGS(CameraBackupQualities)
 
+enum class IoModuleVisualStyle
+{
+    form,
+    tile
+};
+
 } // namespace api
 } // namespace vms
 } // namespace nx
 
 QN_FUSION_DECLARE_FUNCTIONS(nx::vms::api::CameraStatusFlags, (metatype)(numeric)(lexical),
-    NX_VMS_API)
-QN_FUSION_DECLARE_FUNCTIONS(nx::vms::api::MotionType, (metatype)(numeric)(lexical),
-    NX_VMS_API)
-QN_FUSION_DECLARE_FUNCTIONS(nx::vms::api::MotionTypes, (metatype)(numeric)(lexical),
     NX_VMS_API)
 QN_FUSION_DECLARE_FUNCTIONS(nx::vms::api::CameraBackupQualities, (metatype)(numeric)(lexical),
     NX_VMS_API)

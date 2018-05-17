@@ -1,5 +1,4 @@
-#ifndef sequrity_cam_resource_h_1239
-#define sequrity_cam_resource_h_1239
+#pragma once
 
 #include <mutex>
 #include <map>
@@ -8,6 +7,8 @@
 #include <nx/vms/event/event_fwd.h>
 #include <nx/api/analytics/supported_events.h>
 #include <nx/vms/event/events/events_fwd.h>
+
+#include <nx/core/resource/device_type.h>
 
 #include <utils/common/value_cache.h>
 #include <common/common_globals.h>
@@ -121,6 +122,10 @@ public:
 
     bool isMultiSensorCamera() const;
 
+    nx::core::resource::DeviceType deviceType() const;
+
+    void setDeviceType(nx::core::resource::DeviceType);
+
     virtual Qn::StreamFpsSharingMethod streamFpsSharingMethod() const;
     void setStreamFpsSharingMethod(Qn::StreamFpsSharingMethod value);
 
@@ -167,10 +172,6 @@ public:
     virtual void setGroupId(const QString& value);
 
     virtual QString getSharedId() const;
-
-    // Proxied id is an id of a device connected to some proxy (e.g. NVR)
-    virtual QString getProxiedId() const;
-    virtual void setProxiedId(const QString& proxiedId);
 
     /** Check if a license is used for the current camera. */
     bool isLicenseUsed() const;
@@ -438,6 +439,7 @@ private:
     Qn::MotionType calculateMotionType() const;
     CachedValue<nx::api::AnalyticsSupportedEvents> m_cachedAnalyticsSupportedEvents;
     CachedValue<nx::media::CameraMediaCapability> m_cachedCameraMediaCapabilities;
+    CachedValue<nx::core::resource::DeviceType> m_cachedDeviceType;
 
 private slots:
     void resetCachedValues();
@@ -446,4 +448,16 @@ private slots:
 Q_DECLARE_METATYPE(QnSecurityCamResourcePtr)
 Q_DECLARE_METATYPE(QnSecurityCamResourceList)
 
-#endif //sequrity_cam_resource_h_1239
+class QnC2pCameraResource: public QnSecurityCamResource
+{
+public:
+    QnC2pCameraResource(QnCommonModule* commonModule = nullptr):
+        QnSecurityCamResource(commonModule)
+    {
+    }
+    virtual QString getDriverName() const override {return QnResourceTypePool::kC2pCameraTypeId;}
+    virtual QnAbstractStreamDataProvider* createLiveDataProvider() override {return nullptr;}
+};
+
+Q_DECLARE_METATYPE(QnC2pCameraResourcePtr)
+Q_DECLARE_METATYPE(QnC2pCameraResourceList)

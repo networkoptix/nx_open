@@ -1,4 +1,5 @@
 import os
+
 import pytest
 
 from framework.cloud_host import CloudAccountFactory, resolve_cloud_host_from_registry

@@ -7,10 +7,10 @@
 
 #include "system_manager.h"
 
+namespace nx { namespace data_sync_engine { class ConnectionManager; } }
+
 namespace nx {
 namespace cdb {
-
-namespace ec2 { class ConnectionManager; }
 
 class SystemCapabilitiesProvider:
     public AbstractSystemExtension
@@ -18,7 +18,7 @@ class SystemCapabilitiesProvider:
 public:
     SystemCapabilitiesProvider(
         AbstractSystemManager* systemManager,
-        ec2::ConnectionManager* ec2ConnectionManager);
+        data_sync_engine::ConnectionManager* ec2ConnectionManager);
     virtual ~SystemCapabilitiesProvider();
 
     virtual void modifySystemBeforeProviding(api::SystemDataEx* system) override;
@@ -26,13 +26,13 @@ public:
 private:
     mutable QnMutex m_mutex;
     AbstractSystemManager* m_systemManager;
-    ec2::ConnectionManager* m_ec2ConnectionManager;
+    data_sync_engine::ConnectionManager* m_ec2ConnectionManager;
     nx::utils::SubscriptionId m_systemStatusChangedSubscriptionId;
     std::map<std::string /*system id*/, int /*proto version*/> m_systemIdToProtoVersion;
 
     void onSystemStatusChanged(
         const std::string& systemId,
-        ec2::SystemStatusDescriptor statusDescription);
+        data_sync_engine::SystemStatusDescriptor statusDescription);
 };
 
 } // namespace cdb

@@ -557,7 +557,7 @@
       <translation>未知的錯誤</translation>
     </message>
     <message>
-      <source>Server with matching Hardware Id not found</source>
+      <source>Server with matching Hardware ID not found</source>
       <translation>找不到符合硬體ID的伺服器</translation>
     </message>
   </context>
@@ -674,12 +674,12 @@
       <translation>浮水印: %1</translation>
     </message>
     <message>
-      <source>Hardware Id: %1</source>
-      <translation>硬體 Id: %1</translation>
-    </message>
-    <message>
       <source>Time License</source>
       <translation>時效性授權</translation>
+    </message>
+    <message>
+      <source>Hardware ID: %1</source>
+      <translation>硬體 ID: %1</translation>
     </message>
   </context>
   <context>

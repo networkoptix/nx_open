@@ -89,11 +89,6 @@
     </message>
     <message>
       <location/>
-      <source>Disable only if the client takes too much CPU</source>
-      <translation>Sadece istemcinin yüksek CPU kullandığı durumda devre dışı bırak</translation>
-    </message>
-    <message>
-      <location/>
       <source>Maximum Live Buffer Length</source>
       <translation>Maksimum tampon bellek Büyüklüğü</translation>
     </message>
@@ -764,7 +759,7 @@
     </message>
     <message>
       <location/>
-      <source>Logical Id</source>
+      <source>Logical ID</source>
       <translation>Mantıksal Kimlik</translation>
     </message>
   </context>
@@ -772,7 +767,7 @@
     <name>CameraInputBusinessEventWidget</name>
     <message>
       <location filename="../src/ui/widgets/business/camera_input_business_event_widget.ui"/>
-      <source>Input Id</source>
+      <source>Input ID</source>
       <translation>Giriş kimliği</translation>
     </message>
   </context>
@@ -798,7 +793,7 @@
     </message>
     <message>
       <location/>
-      <source>Output Id:</source>
+      <source>Output ID:</source>
       <translation>Çıkış Kimliği:</translation>
     </message>
   </context>
@@ -1513,7 +1508,7 @@
     </message>
     <message>
       <location/>
-      <source>Locked to Hardware Id:</source>
+      <source>Locked to Hardware ID:</source>
       <translation>Donanım Kimliği'ne kaydedildi:</translation>
     </message>
   </context>
@@ -1612,7 +1607,7 @@
     </message>
     <message>
       <location/>
-      <source>Hardware Id</source>
+      <source>Hardware ID</source>
       <translation>Donanım Kimliği</translation>
     </message>
   </context>
@@ -1741,6 +1736,11 @@
       <location/>
       <source>Tour cycle</source>
       <translation>Tour cycle</translation>
+    </message>
+    <message>
+      <location/>
+      <source>IP addresses for cameras, and servers, groups for users, etc.</source>
+      <translation>Kameralar ve sunucular için IP adresleri. Kullanıcılar için gruplar.</translation>
     </message>
   </context>
   <context>

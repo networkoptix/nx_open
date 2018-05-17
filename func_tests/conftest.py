@@ -70,8 +70,8 @@ def mediaserver_deb(request, bin_dir):
     if customization_from_command_line is not None:
         if deb.customization.name != customization_from_command_line:
             raise Exception(
-                "Customization {!r} provided by --customization option "
-                "doesn't match customization {!r} from .deb file. "
+                "Customization {} provided by --customization option "
+                "doesn't match customization {} from .deb file. "
                 "This option is maintained for backward compatibility, "
                 "either don't use it or make sure it matches .deb file.".format(
                     customization_from_command_line,

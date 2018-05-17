@@ -41,7 +41,7 @@ def detect_language_by_request(request):
 
     if not lang or lang not in languages:  # not supported language
         lang = default_language  # return default
-    return lang
+    return lang.replace('-', '_')
 
 
 def get_language_for_email(email, customization):

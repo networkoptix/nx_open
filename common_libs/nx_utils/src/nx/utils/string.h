@@ -41,15 +41,6 @@ inline QString replaceNonFileNameCharacters(const QString &string, const QChar &
     return replaceCharacters(string, "\\/:*?\"<>|", replacement);
 }
 
-/**
-* \param dt                            dateTime
-* \returns                             Return string dateTime suggestion for saving dialogs
-*/
-inline QString datetimeSaveDialogSuggestion(const QDateTime& dt) {
-    return dt.toString(lit("yyyy-MMM-dd_hh_mm_ss"));
-}
-
-
 /*!
 \param dateTime Can be one of following:\n
 - usec or millis since since 1971-01-01 (not supporting 1970 to be able to distinguish millis and usec)

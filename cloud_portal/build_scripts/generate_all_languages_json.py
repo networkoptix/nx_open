@@ -27,6 +27,7 @@ def save_content(filename, content):
 
 def generate_languages_files():
     languages_json = []
+    languages_names = []
 
     translations_path = os.path.join("../../../..", "translations")
     for lang in os.listdir(translations_path):
@@ -35,9 +36,18 @@ def generate_languages_files():
         print("Load: " + language_json_filename)
         with codecs.open(language_json_filename, 'r', 'utf-8') as file_descriptor:
             data = json.load(file_descriptor)
-            name = data["language_name"] if "language_name" in data else data["name"]
-            if name == 'LANGUAGE_NAME':
+            name = data["language_name"]
+
+            # validate that there are no dublicates in languages_json structure
+            if not name or name == 'LANGUAGE_NAME':
+                sys.stderr.write('ERROR: For BORIS to fix: language.json has wrong or missing language_name. '
+                                 'File: ' + language_json_filename + '\n')
                 name = lang
+            if name in languages_names:
+                raise ValueError('CRITICAL  ERROR: For BORIS to fix: language.json has not unique language_name. '
+                                 'File: ' + language_json_filename)
+            languages_names.append(name)
+
             languages_json.append({
                 "language": lang,
                 "name": name

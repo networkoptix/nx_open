@@ -561,8 +561,8 @@
       <translation>Errore sconosciuto</translation>
     </message>
     <message>
-      <source>Server with matching Hardware Id not found</source>
-      <translation>Server con Id hardware corrispondente non trovato</translation>
+      <source>Server with matching Hardware ID not found</source>
+      <translation>Server con ID Hardware corrispondente non trovato</translation>
     </message>
   </context>
   <context>
@@ -684,12 +684,12 @@
       <translation>Filigrana: %1</translation>
     </message>
     <message>
-      <source>Hardware Id: %1</source>
-      <translation>Id hardware: %1</translation>
-    </message>
-    <message>
       <source>Time License</source>
       <translation>Licenza a tempo</translation>
+    </message>
+    <message>
+      <source>Hardware ID: %1</source>
+      <translation>ID Hardware: %1</translation>
     </message>
   </context>
   <context>

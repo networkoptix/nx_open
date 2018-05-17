@@ -978,7 +978,7 @@ to view more bookmarks</source>
       <translation>라이센스의 비활성화 횟수가 한도를 초과했습니다.</translation>
     </message>
     <message>
-      <source>Hardware Id of Server with this license does not match Hardware Id on which license was activated.</source>
+      <source>Hardware ID of Server with this license does not match Hardware ID on which license was activated.</source>
       <translation>이 라이센스가있는 서버의 하드웨어 ID가 라이센스가 활성화 된 하드웨어 ID와 일치하지 않습니다.</translation>
     </message>
   </context>
@@ -1395,6 +1395,14 @@ to view more bookmarks</source>
       <source>Folder not found</source>
       <translation>폴더를 찾을 수 없습니다</translation>
     </message>
+    <message>
+      <source>Helps avoid problems with OpenGL drawing which result in 100% CPU load.</source>
+      <translation type="unfinished">Helps avoid problems with OpenGL drawing which result in 100% CPU load.</translation>
+    </message>
+    <message>
+      <source>Adjust to smallest value that does not degrade live view. Bigger buffer makes playback smoother but increases delay between real time and live view; smaller buffer decreases delay but can cause stutters.</source>
+      <translation type="unfinished">Adjust to smallest value that does not degrade live view. Bigger buffer makes playback smoother but increases delay between real time and live view; smaller buffer decreases delay but can cause stutters.</translation>
+    </message>
   </context>
   <context>
     <name>QnArchiveLengthWidget</name>
@@ -1405,6 +1413,14 @@ to view more bookmarks</source>
     <message>
       <source>High minimum value can lead to archive length decrease on other cameras.</source>
       <translation>High minimum value can lead to archive length decrease on other cameras.</translation>
+    </message>
+    <message>
+      <source>Sets when camera archive will be deleted or saved when there is no space for new recordings.</source>
+      <translation type="unfinished">Sets when camera archive will be deleted or saved when there is no space for new recordings.</translation>
+    </message>
+    <message>
+      <source>&quot;Auto&quot; deletes the oldest footage first, regardless of the source.</source>
+      <translation type="unfinished">&quot;Auto&quot; deletes the oldest footage first, regardless of the source.</translation>
     </message>
   </context>
   <context>
@@ -2170,18 +2186,6 @@ to view more bookmarks</source>
       <translation>읽는 중...</translation>
     </message>
     <message>
-      <source>Primary Stream</source>
-      <translation>기본 스트림</translation>
-    </message>
-    <message>
-      <source>Secondary Stream</source>
-      <translation>2 차 스트림</translation>
-    </message>
-    <message>
-      <source>Camera has no secondary stream</source>
-      <translation>카메라는 2nd 스트림 없음</translation>
-    </message>
-    <message>
       <source>This I/O module has no advanced settings</source>
       <translation>이 장치는고급 설정 없음</translation>
     </message>
@@ -2190,8 +2194,36 @@ to view more bookmarks</source>
       <translation>이 카메라는고급 설정 없음</translation>
     </message>
     <message>
+      <source>Settings</source>
+      <translation>설정</translation>
+    </message>
+    <message>
+      <source>Web</source>
+      <translation type="unfinished">Web</translation>
+    </message>
+    <message>
+      <source>No settings</source>
+      <translation>설정 없음</translation>
+    </message>
+    <message>
+      <source>Secondary Stream</source>
+      <translation>2 차 스트림</translation>
+    </message>
+    <message>
+      <source>I/O Module ID</source>
+      <translation>I/O 모듈 ID</translation>
+    </message>
+    <message>
+      <source>Camera ID</source>
+      <translation>카메라 ID</translation>
+    </message>
+    <message>
       <source>Audio Stream</source>
       <translation>오디오 스트림</translation>
+    </message>
+    <message>
+      <source>Primary Stream</source>
+      <translation>기본 스트림</translation>
     </message>
     <message>
       <source>URL is not available. Open stream and try again.</source>
@@ -2206,24 +2238,8 @@ to view more bookmarks</source>
       <translation>I/O 모듈에는 오디오 스트림 없음</translation>
     </message>
     <message>
-      <source>I/O Module Id</source>
-      <translation>I/O 모듈 Id</translation>
-    </message>
-    <message>
-      <source>Camera Id</source>
-      <translation>카메라 Id</translation>
-    </message>
-    <message>
-      <source>Settings</source>
-      <translation>설정</translation>
-    </message>
-    <message>
-      <source>Web</source>
-      <translation type="unfinished">Web</translation>
-    </message>
-    <message>
-      <source>No settings</source>
-      <translation>설정 없음</translation>
+      <source>Camera has no secondary stream</source>
+      <translation>카메라는 2nd 스트림 없음</translation>
     </message>
   </context>
   <context>
@@ -2336,10 +2352,22 @@ to view more bookmarks</source>
       <translation>Edge</translation>
     </message>
     <message numerus="yes">
-      <source>This Id is already used on the following %n cameras: %1</source>
+      <source>This ID is already used on the following %n cameras: %1</source>
       <translation>
-        <numerusform>이 Id는 이미 %n 카메라에서 사용되었습니다: %1</numerusform>
+        <numerusform>이 ID는 이미 %n 카메라에서 사용되었습니다: %1</numerusform>
       </translation>
+    </message>
+    <message>
+      <source>Helps fix image quality issues on some cameras; for others will cause significant bitrate increase.</source>
+      <translation type="unfinished">Helps fix image quality issues on some cameras; for others will cause significant bitrate increase.</translation>
+    </message>
+    <message>
+      <source>Custom number that can be assigned to a camera for quick identification and access</source>
+      <translation type="unfinished">Custom number that can be assigned to a camera for quick identification and access</translation>
+    </message>
+    <message>
+      <source>Server will not change any cameras settings, it will receive and use camera stream as-is.</source>
+      <translation type="unfinished">Server will not change any cameras settings, it will receive and use camera stream as-is.</translation>
     </message>
   </context>
   <context>
@@ -2456,8 +2484,8 @@ to view more bookmarks</source>
       <translation>서버</translation>
     </message>
     <message>
-      <source>Id</source>
-      <translation>Id</translation>
+      <source>ID</source>
+      <translation>계정</translation>
     </message>
   </context>
   <context>
@@ -2617,6 +2645,14 @@ to view more bookmarks</source>
     <message>
       <source>More Settings</source>
       <translation>더 많은 설정</translation>
+    </message>
+    <message>
+      <source>Quality setting determines the compression rate only, and does not affect resolution. Low, Medium, High and Best are preset bitrate values.</source>
+      <translation type="unfinished">Quality setting determines the compression rate only, and does not affect resolution. Low, Medium, High and Best are preset bitrate values.</translation>
+    </message>
+    <message>
+      <source>First choose a recording option, then apply it to day and time blocks on the recording schedule. (0 block is 12:00am to 1:00am, 23 block is 11:00pm to 12:00am.)</source>
+      <translation type="unfinished">First choose a recording option, then apply it to day and time blocks on the recording schedule. (0 block is 12:00am to 1:00am, 23 block is 11:00pm to 12:00am.)</translation>
     </message>
   </context>
   <context>
@@ -2807,20 +2843,20 @@ to %1</source>
     <name>QnCloudResultMessages</name>
     <message>
       <source>Account not found</source>
-      <translation type="unfinished">Account not found</translation>
+      <translation>계정을 찾을 수 없습니다</translation>
     </message>
     <message>
       <source>Account is not activated.</source>
-      <translation type="unfinished">Account is not activated.</translation>
+      <translation>계정이 활성화되지 않았습니다.</translation>
     </message>
     <message>
       <source>Please log in to %1 and follow the provided instructions.</source>
       <comment>%1 is a cloud site name like &quot;Nx Cloud&quot;</comment>
-      <translation type="unfinished">Please log in to %1 and follow the provided instructions.</translation>
+      <translation>%1 에 로그인하고 제공된 지침을 따르십시오.</translation>
     </message>
     <message>
       <source>Invalid password</source>
-      <translation type="unfinished">Invalid password</translation>
+      <translation>잘못된 암호</translation>
     </message>
   </context>
   <context>
@@ -3075,16 +3111,12 @@ to %1</source>
   <context>
     <name>QnCustomBusinessEventWidget</name>
     <message>
-      <source>Server API</source>
-      <translation>서버 API</translation>
+      <source>Event will trigger only if there are matches in caption with any of entered keywords.</source>
+      <translation type="unfinished">Event will trigger only if there are matches in caption with any of entered keywords.</translation>
     </message>
     <message>
-      <source>To generate Generic Event, please refer to %1.</source>
-      <translation>이벤트 설정은 %1을 참조 하세요</translation>
-    </message>
-    <message>
-      <source>Event will trigger only if Generic Event meets all the above conditions. If a keyword field is empty, condition is always met. If not, condition is met if the corresponding field of Generic Event contains any keyword.</source>
-      <translation>위 조건에 맞을 경우만 이벤트 발생합니다.</translation>
+      <source>If the field is empty, event will always trigger.</source>
+      <translation type="unfinished">If the field is empty, event will always trigger.</translation>
     </message>
   </context>
   <context>
@@ -3154,12 +3186,8 @@ to %1</source>
       <translation>시스템 구성 백업에서 복원 될 것입니다, 그리고 서버 응용 프로그램을 다시 시작 됩니다.</translation>
     </message>
     <message>
-      <source>You can create a backup for System configurations that can be restored in case of failure.</source>
-      <translation>오류가 발생할 경우 복원할 수 있는 시스템 구성에 대 한 백업을 만들 수 있습니다.</translation>
-    </message>
-    <message>
       <source>Database Backup Files</source>
-      <translation type="unfinished">Database Backup Files</translation>
+      <translation>데이터베이스 백업 파일</translation>
     </message>
   </context>
   <context>
@@ -3300,6 +3328,13 @@ to %1</source>
       <source>You will not be able to connect to this System with your %1 account after you disconnect this System from %1.</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
       <translation>You will not be able to connect to this System with your %1 account after you disconnect this System from %1.</translation>
+    </message>
+  </context>
+  <context>
+    <name>QnEmptyBusinessActionWidget</name>
+    <message>
+      <source>Panic Recording mode switches recording settings for all Cameras to maximum FPS and Quality</source>
+      <translation type="unfinished">Panic Recording mode switches recording settings for all Cameras to maximum FPS and Quality</translation>
     </message>
   </context>
   <context>
@@ -3531,6 +3566,13 @@ to %1</source>
     </message>
   </context>
   <context>
+    <name>QnFisheyeSettingsWidget</name>
+    <message>
+      <source>Use this setting to compensate for distortion if camera is not mounted exactly vertically or horizontally.</source>
+      <translation type="unfinished">Use this setting to compensate for distortion if camera is not mounted exactly vertically or horizontally.</translation>
+    </message>
+  </context>
+  <context>
     <name>QnGeneralPreferencesWidget</name>
     <message>
       <source>Select folder...</source>
@@ -3598,6 +3640,14 @@ to %1</source>
     <message>
       <source>Open Camera List</source>
       <translation>카메라 리스트 열기</translation>
+    </message>
+    <message>
+      <source>Backup includes servers and cameras settings, users, webpages, event rules, etc. Video is not saved.</source>
+      <translation type="unfinished">Backup includes servers and cameras settings, users, webpages, event rules, etc. Video is not saved.</translation>
+    </message>
+    <message>
+      <source>Creates a backup of System configuration that can be restored in case of failure.</source>
+      <translation type="unfinished">Creates a backup of System configuration that can be restored in case of failure.</translation>
     </message>
   </context>
   <context>
@@ -3691,8 +3741,8 @@ to %1</source>
       <translation>Impulse</translation>
     </message>
     <message>
-      <source>Id</source>
-      <translation>Id</translation>
+      <source>ID</source>
+      <translation>계정</translation>
     </message>
   </context>
   <context>
@@ -3843,6 +3893,21 @@ to %1</source>
     </message>
   </context>
   <context>
+    <name>QnLensCameraAdvancedParamWidget</name>
+    <message>
+      <source>Zoom</source>
+      <translation>확대</translation>
+    </message>
+    <message>
+      <source>Rotation:</source>
+      <translation>회전:</translation>
+    </message>
+    <message>
+      <source>Focus</source>
+      <translation>초점</translation>
+    </message>
+  </context>
+  <context>
     <name>QnLicenseDetailsDialog</name>
     <message>
       <source>Screens Allowed:</source>
@@ -3873,8 +3938,8 @@ to %1</source>
       <translation>기능:</translation>
     </message>
     <message>
-      <source>Locked to Hardware Id</source>
-      <translation>하드웨어 Id에 잠김</translation>
+      <source>Locked to Hardware ID</source>
+      <translation>하드웨어 ID에 잠김</translation>
     </message>
   </context>
   <context>
@@ -4139,16 +4204,16 @@ to %1</source>
       <translation>유효한 라이센스 키를 받으려면 고객 지원에 문의하십시오.</translation>
     </message>
     <message>
-      <source>This license is already activated and linked to Hardware Id %1</source>
-      <translation>이 라이센스는 이미 활성화되어 있으며 하드웨어 Id %1에 연결되어 있습니다.</translation>
-    </message>
-    <message>
-      <source>This license is already activated and linked to Hardware Id %1 on %2</source>
-      <translation>이 라이센스 %2 의 하드웨어 Id %1에서 활성화 되었습니다.</translation>
-    </message>
-    <message>
       <source>If the problem persists please contact Customer Support.</source>
       <translation>문제가 지속되면 고객 지원부에 문의하십시오.</translation>
+    </message>
+    <message>
+      <source>This license is already activated and linked to Hardware ID %1</source>
+      <translation>이 라이센스는 이미 활성화되어 있으며 하드웨어 ID %1에 연결되어 있습니다.</translation>
+    </message>
+    <message>
+      <source>This license is already activated and linked to Hardware ID %1 on %2</source>
+      <translation>이 라이센스 %2 의 하드웨어 ID %1에서 활성화 되었습니다.</translation>
     </message>
   </context>
   <context>
@@ -4170,16 +4235,16 @@ to %1</source>
       <translation>파일 열기 실패!</translation>
     </message>
     <message>
-      <source>Please send email with License Key and Hardware Id provided to %1 to obtain an Activation Key file.</source>
-      <translation>활성화 키 파일을 얻으려면 라이센스 키와 %1에 제공된 하드웨어 Id를 이메일로 보내주십시오.</translation>
-    </message>
-    <message>
-      <source>Please send License Key and Hardware Id provided to %1 to obtain an Activation Key file.</source>
-      <translation>활성화 키 파일을 얻으려면 라이센스 키와 %1에 제공된 하드웨어 Id를 보내주십시오.</translation>
-    </message>
-    <message>
       <source>All files</source>
-      <translation type="unfinished">All files</translation>
+      <translation>모든 파일</translation>
+    </message>
+    <message>
+      <source>Please send email with License Key and Hardware ID provided to %1 to obtain an Activation Key file.</source>
+      <translation>활성화 키 파일을 얻으려면 라이센스 키와 %1에 제공된 하드웨어 ID를 이메일로 보내주십시오.</translation>
+    </message>
+    <message>
+      <source>Please send License Key and Hardware ID provided to %1 to obtain an Activation Key file.</source>
+      <translation>활성화 키 파일을 얻으려면 라이센스 키와 %1에 제공된 하드웨어 ID를 보내주십시오.</translation>
     </message>
   </context>
   <context>
@@ -4385,6 +4450,18 @@ to %1</source>
     <message>
       <source>No image</source>
       <translation>이미지 없음</translation>
+    </message>
+    <message>
+      <source>Sets the time to use in the client (timeline, timestamps, etc.) when client and server machines are in different time zones.</source>
+      <translation type="unfinished">Sets the time to use in the client (timeline, timestamps, etc.) when client and server machines are in different time zones.</translation>
+    </message>
+    <message>
+      <source>Length of time each camera on layout will be displayed if you start a Layout Tour.</source>
+      <translation type="unfinished">Length of time each camera on layout will be displayed if you start a Layout Tour.</translation>
+    </message>
+    <message>
+      <source>Displays IP addresses for cameras and servers and groups for users.</source>
+      <translation type="unfinished">Displays IP addresses for cameras and servers and groups for users.</translation>
     </message>
   </context>
   <context>
@@ -5544,16 +5621,12 @@ to %1</source>
       <translation>최대 카메라수 변경하여 문제 해결</translation>
     </message>
     <message>
-      <source>server will take devices automatically from offline servers</source>
-      <translation>이 서버는 오프라인서버의 장치를 자동으로 가져 옮니다.</translation>
-    </message>
-    <message>
-      <source>server will take cameras automatically from offline servers</source>
-      <translation>이 서버는 오프라인서버의 장치를 자동으로 가져 옮니다.</translation>
-    </message>
-    <message>
       <source>Failover</source>
       <translation>장애 조치(이중화)</translation>
+    </message>
+    <message>
+      <source>Servers with failover enabled will automatically take cameras from offline servers.</source>
+      <translation type="unfinished">Servers with failover enabled will automatically take cameras from offline servers.</translation>
     </message>
   </context>
   <context>
@@ -5758,7 +5831,15 @@ to %1</source>
     </message>
     <message>
       <source>Update Files</source>
-      <translation type="unfinished">Update Files</translation>
+      <translation>업데이트 파일</translation>
+    </message>
+    <message>
+      <source>Validating the update...</source>
+      <translation type="unfinished">Validating the update...</translation>
+    </message>
+    <message>
+      <source>Checking for free space...</source>
+      <translation type="unfinished">Checking for free space...</translation>
     </message>
   </context>
   <context>
@@ -6240,6 +6321,14 @@ to %1</source>
       <source>Recording was enabled on the USB storage</source>
       <translation>USB 저장소에서 저장이 활성화되었습니다.</translation>
     </message>
+    <message>
+      <source>Backup includes servers and cameras settings, users, webpages, event rules, etc. Video is not saved.</source>
+      <translation type="unfinished">Backup includes servers and cameras settings, users, webpages, event rules, etc. Video is not saved.</translation>
+    </message>
+    <message>
+      <source>Creates a backup of System configuration that can be restored in case of failure.</source>
+      <translation type="unfinished">Creates a backup of System configuration that can be restored in case of failure.</translation>
+    </message>
   </context>
   <context>
     <name>QnStorageListModel</name>
@@ -6532,6 +6621,14 @@ to %1</source>
       <source>Allow System to optimize camera settings</source>
       <translation>카메라 설정을 최적화 하는 시스템을 허용</translation>
     </message>
+    <message>
+      <source>Sends anonymous System information (firmware, codecs, streams, etc.).</source>
+      <translation type="unfinished">Sends anonymous System information (firmware, codecs, streams, etc.).</translation>
+    </message>
+    <message>
+      <source>Tracks and logs all user actions.</source>
+      <translation type="unfinished">Tracks and logs all user actions.</translation>
+    </message>
   </context>
   <context>
     <name>QnTableExportHelper</name>
@@ -6597,16 +6694,6 @@ to %1</source>
       <translation>썸내일 서피 사용불가</translation>
     </message>
     <message>
-      <source>hh:mm</source>
-      <comment>Format for displaying hours and minutes on timeline.</comment>
-      <translation>hh:mm</translation>
-    </message>
-    <message>
-      <source>h ap</source>
-      <comment>Format for displaying hours on timeline, with am/pm indicator.</comment>
-      <translation>h ap</translation>
-    </message>
-    <message>
       <source>dd</source>
       <comment>Format for displaying days on timeline.</comment>
       <translation>dd</translation>
@@ -6650,11 +6737,6 @@ to %1</source>
       <source>yyyy</source>
       <comment>Format for displaying year caption in timeline&apos;s header</comment>
       <translation>yyyy</translation>
-    </message>
-    <message>
-      <source>h:mm ap</source>
-      <comment>Format for displaying hours and minutes on timeline, with am/pm indicator.</comment>
-      <translation>h:mm ap</translation>
     </message>
     <message>
       <source>dd MMMM yyyy h:mm ap</source>
@@ -6841,6 +6923,10 @@ to %1</source>
     <message>
       <source>Edit</source>
       <translation>수정하기</translation>
+    </message>
+    <message>
+      <source>Users can be imported from an LDAP server. They will be able to log in only if LDAP server is online and their accounts are active on it.</source>
+      <translation type="unfinished">Users can be imported from an LDAP server. They will be able to log in only if LDAP server is online and their accounts are active on it.</translation>
     </message>
   </context>
   <context>
@@ -7031,6 +7117,25 @@ to %1</source>
       <source>%1 user with specified email already exists.</source>
       <comment>%1 is the short cloud name (like Cloud)</comment>
       <translation>지정된 이메일의 %1 사용자가 존재합니다.</translation>
+    </message>
+    <message>
+      <source>Local users</source>
+      <translation type="unfinished">Local users</translation>
+    </message>
+    <message>
+      <source>%1 users</source>
+      <comment>%1 is the short cloud name (like Cloud)</comment>
+      <translation type="unfinished">%1 users</translation>
+    </message>
+    <message>
+      <source>%1 belong to this system only and are fully managed by system administrators.</source>
+      <comment>%1 is local users definition, e.g. &apos;Local users&apos;</comment>
+      <translation type="unfinished">%1 belong to this system only and are fully managed by system administrators.</translation>
+    </message>
+    <message>
+      <source>%1 can have access to many Systems. Administrators can manage their rights only.</source>
+      <comment>%1 is cloud users definition, e.g. &apos;Cloud users&apos;</comment>
+      <translation type="unfinished">%1 can have access to many Systems. Administrators can manage their rights only.</translation>
     </message>
   </context>
   <context>
@@ -8010,6 +8115,13 @@ to %1</source>
     </message>
   </context>
   <context>
+    <name>nx::client::desktop::HintButton</name>
+    <message>
+      <source>Click to read more</source>
+      <translation type="unfinished">Click to read more</translation>
+    </message>
+  </context>
+  <context>
     <name>nx::client::desktop::ImageOverlaySettingsWidget</name>
     <message>
       <source>Select file...</source>
@@ -8254,17 +8366,26 @@ to %1</source>
     </message>
   </context>
   <context>
-    <name>nx::client::desktop::ui::AnalyticsSdkEventModel</name>
-    <message>
-      <source>No event types supported</source>
-      <translation>지원 되는 이벤트 형식</translation>
-    </message>
-  </context>
-  <context>
     <name>nx::client::desktop::ui::AnalyticsSdkEventWidget</name>
     <message>
-      <source>Event will trigger only if Analytics Event meets all the above conditions. If a keyword field is empty, condition is always met. If not, condition is met if the corresponding field of Analytics Event contains any keyword.</source>
-      <translation>애널리틱스 이벤트가 위의 모든 조건을 충족하는 경우에만 이벤트가 실행됩니다. 키워드 필드가 비어 있으면 조건이 항상 충족됩니다. 일치하지 않으면 웹 로그 분석 이벤트의 해당 필드에 키워드가 포함되어 있으면 조건이 충족됩니다.</translation>
+      <source>Analytics events can be set up on a certain cameras.</source>
+      <translation type="unfinished">Analytics events can be set up on a certain cameras.</translation>
+    </message>
+    <message>
+      <source>Choose cameras using the button above to see the list of supported events.</source>
+      <translation type="unfinished">Choose cameras using the button above to see the list of supported events.</translation>
+    </message>
+    <message>
+      <source>Event will trigger only if there are matches in caption with any of entered keywords.</source>
+      <translation type="unfinished">Event will trigger only if there are matches in caption with any of entered keywords.</translation>
+    </message>
+    <message>
+      <source>If the field is empty, event will always trigger.</source>
+      <translation type="unfinished">If the field is empty, event will always trigger.</translation>
+    </message>
+    <message>
+      <source>Event will trigger only if there are matches in the description field with any of the entered keywords.</source>
+      <translation type="unfinished">Event will trigger only if there are matches in the description field with any of the entered keywords.</translation>
     </message>
   </context>
   <context>
@@ -8608,6 +8729,18 @@ to %1</source>
     <message>
       <source>Failed to change password on %1 of %2 cameras</source>
       <translation>%2 카메라의 %1에 암호를 변경하지 못했습니다.</translation>
+    </message>
+    <message>
+      <source>To use the software you must accept the end user license agreement</source>
+      <translation type="unfinished">To use the software you must accept the end user license agreement</translation>
+    </message>
+    <message>
+      <source>Accept</source>
+      <translation type="unfinished">Accept</translation>
+    </message>
+    <message>
+      <source>Decline</source>
+      <translation type="unfinished">Decline</translation>
     </message>
   </context>
   <context>

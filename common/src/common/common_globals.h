@@ -9,6 +9,7 @@
 
 #include <nx/fusion/model_functions_fwd.h>
 #include <nx/fusion/serialization_format.h>
+#include <nx/vms/api/types/motion_types.h>
 #include <nx/vms/api/types/resource_types.h>
 
 #ifdef THIS_BLOCK_IS_REQUIRED_TO_MAKE_FILE_BE_PROCESSED_BY_MOC_DO_NOT_DELETE
@@ -45,6 +46,8 @@ QN_DECLARE_METAOBJECT_HEADER(Qn,
         SetUserPasswordCapability           = 0x200, //< Can change password on a camera.
         isDefaultPasswordCapability         = 0x400, //< Camera has default password now.
         isOldFirmwareCapability             = 0x800, //< Camera has too old firmware.
+        CanEditStreamsCapability            = 0x1000, //< Camera's streams are editable.
+        isPlaybackSpeedSupported            = 0x2000, //< For NVR which support playback speed 1,2,4 e.t.c natively.
     };
     Q_DECLARE_FLAGS(CameraCapabilities, CameraCapability)
     Q_DECLARE_OPERATORS_FOR_FLAGS(CameraCapabilities)
@@ -147,7 +150,6 @@ QN_DECLARE_METAOBJECT_HEADER(Qn,
         /** Second stream does not affect first stream's fps. */
         NoFpsSharing
     };
-
 
     using MotionType = nx::vms::api::MotionType;
     using MotionTypes = nx::vms::api::MotionTypes;

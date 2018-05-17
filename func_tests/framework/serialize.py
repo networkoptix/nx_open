@@ -35,7 +35,7 @@ _Loader.add_constructor(
 
 
 def load(raw):
-    return yaml.load(raw)
+    return yaml.load(raw.encode())
 
 
 class _Representer(yaml.representer.Representer):
@@ -69,4 +69,4 @@ class _Dumper(yaml.emitter.Emitter, yaml.serializer.Serializer, _Representer, ya
 
 
 def dump(data):
-    return yaml.dump(data, Dumper=_Dumper, default_flow_style=False)
+    return yaml.dump(data, Dumper=_Dumper, default_flow_style=False).decode()

@@ -1,3 +1,5 @@
+#include <QRegExp>
+#include <nx/utils/log/assert.h>
 #include "manual_file_data.h"
 
 namespace nx {
@@ -13,10 +15,22 @@ ManualFileData::ManualFileData(const QString& file, const OsVersion& osVersion,
     isClient(isClient)
 {}
 
-ManualFileData ManualFileData::fromFileName(const QString& /*fileName*/)
+ManualFileData ManualFileData::fromFileName(const QString& fileName)
 {
-    // #TODO #akulikov: Implement this!
-    return ManualFileData();
+    const QRegExp fileRegExp("^.+-([a-z]+)_update-([0-9:.]+)-(.+)\\.zip$");
+    ManualFileData result;
+
+    if (int pos = fileRegExp.indexIn(fileName); pos == -1)
+        return ManualFileData();
+
+    const auto capture1 = fileRegExp.cap(1);
+    NX_ASSERT(capture1 == "server" || capture1 == "client");
+    result.isClient = capture1 == "client";
+    result.nxVersion = QnSoftwareVersion(fileRegExp.cap(2));
+    result.osVersion = OsVersion::fromString(fileRegExp.cap(3));
+    result.file = fileName;
+
+    return result;
 }
 
 bool ManualFileData::isNull() const

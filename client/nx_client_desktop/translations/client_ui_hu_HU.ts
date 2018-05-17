@@ -89,11 +89,6 @@
     </message>
     <message>
       <location/>
-      <source>Disable only if the client takes too much CPU</source>
-      <translation>Tiltás csak akkor, ha a kliens CPU használata túl magas</translation>
-    </message>
-    <message>
-      <location/>
       <source>Maximum Live Buffer Length</source>
       <translation>Legnagyobb élő puffer hossz</translation>
     </message>
@@ -764,15 +759,15 @@
     </message>
     <message>
       <location/>
-      <source>Logical Id</source>
-      <translation type="unfinished">Logical Id</translation>
+      <source>Logical ID</source>
+      <translation>Logikai azonosító</translation>
     </message>
   </context>
   <context>
     <name>CameraInputBusinessEventWidget</name>
     <message>
       <location filename="../src/ui/widgets/business/camera_input_business_event_widget.ui"/>
-      <source>Input Id</source>
+      <source>Input ID</source>
       <translation>Bemenet ID</translation>
     </message>
   </context>
@@ -798,7 +793,7 @@
     </message>
     <message>
       <location/>
-      <source>Output Id:</source>
+      <source>Output ID:</source>
       <translation>Kimenet ID:</translation>
     </message>
   </context>
@@ -1513,7 +1508,7 @@
     </message>
     <message>
       <location/>
-      <source>Locked to Hardware Id:</source>
+      <source>Locked to Hardware ID:</source>
       <translation>Hozzárendelt hardver ID:</translation>
     </message>
   </context>
@@ -1612,7 +1607,7 @@
     </message>
     <message>
       <location/>
-      <source>Hardware Id</source>
+      <source>Hardware ID</source>
       <translation>Hardver ID</translation>
     </message>
   </context>
@@ -1741,6 +1736,11 @@
       <location/>
       <source>Tour cycle</source>
       <translation>Tour cycle</translation>
+    </message>
+    <message>
+      <location/>
+      <source>IP addresses for cameras, and servers, groups for users, etc.</source>
+      <translation type="unfinished">IP addresses for cameras, and servers, groups for users, etc.</translation>
     </message>
   </context>
   <context>

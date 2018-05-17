@@ -128,6 +128,9 @@
    </item>
    <item>
     <layout class="QHBoxLayout" name="horizontalLayout_2">
+     <property name="spacing">
+      <number>4</number>
+     </property>
      <property name="topMargin">
       <number>0</number>
      </property>
@@ -153,10 +156,13 @@
        <property name="sizeHint" stdset="0">
         <size>
          <width>40</width>
-         <height>20</height>
+         <height>0</height>
         </size>
        </property>
       </spacer>
+     </item>
+     <item>
+      <widget class="nx::client::desktop::HintButton" name="ldapTooltip" native="true"/>
      </item>
      <item>
       <widget class="QPushButton" name="ldapSettingsButton">
@@ -181,6 +187,11 @@
    <class>nx::client::desktop::TreeView</class>
    <extends>QTreeView</extends>
    <header location="global">nx/client/desktop/common/widgets/tree_view.h</header>
+  </customwidget>
+  <customwidget>
+    <class>nx::client::desktop::HintButton</class>
+    <extends>QPushButton</extends>
+    <header location="global">nx/client/desktop/common/widgets/hint_button.h</header>
   </customwidget>
  </customwidgets>
  <tabstops>

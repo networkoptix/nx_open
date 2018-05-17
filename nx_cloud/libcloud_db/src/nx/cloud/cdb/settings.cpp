@@ -238,7 +238,7 @@ const EventManager& Settings::eventManager() const
     return m_eventManager;
 }
 
-const ec2::Settings& Settings::p2pDb() const
+const data_sync_engine::Settings& Settings::p2pDb() const
 {
     return m_p2pDb;
 }

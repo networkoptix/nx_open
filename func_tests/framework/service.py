@@ -1,8 +1,7 @@
 import abc
 import logging
 
-from framework.os_access import NonZeroExitStatus
-
+from framework.os_access.exceptions import NonZeroExitStatus
 
 _logger = logging.getLogger(__name__)
 
@@ -69,9 +68,11 @@ class AdHocService(Service):
         self._service_script_path = dir / 'server_ctl.sh'
 
     def is_running(self):
-        if not self._os_access.file_exists(self._service_script_path):
+        # TODO: Make a script.
+        if not self._service_script_path.exists():
             return False  # not even installed
-        return self._os_access.run_command([self._service_script_path, 'is_active']).strip() == 'active'
+        output = self._os_access.run_command([self._service_script_path, 'is_active'])
+        return output.strip() == 'active'
 
     def start(self):
         return self._os_access.run_command([self._service_script_path, 'start'])

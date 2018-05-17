@@ -74,7 +74,7 @@ SingleCameraSettingsWidget::SingleCameraSettingsWidget(QWidget *parent) :
     base_type(parent),
     QnWorkbenchContextAware(parent),
     ui(new Ui::SingleCameraSettingsWidget),
-    m_cameraThumbnailManager(new QnCameraThumbnailManager()),
+    m_cameraThumbnailManager(new CameraThumbnailManager()),
     m_sensitivityButtons(new QButtonGroup(this))
 {
     ui->setupUi(this);
@@ -176,7 +176,7 @@ SingleCameraSettingsWidget::SingleCameraSettingsWidget(QWidget *parent) :
             ui->cameraScheduleWidget->setScheduleEnabled(ui->licensingWidget->state() == Qt::Checked);
         });
 
-    connect(ui->expertSettingsWidget, &CameraExpertSettingsWidget::dataChanged,
+    connect(ui->expertSettingsWidget, &LegacyExpertSettingsWidget::dataChanged,
         this, &SingleCameraSettingsWidget::at_dbDataChanged);
 
     connect(ui->fisheyeSettingsWidget, &FisheyeSettingsWidget::dataChanged,
@@ -185,7 +185,7 @@ SingleCameraSettingsWidget::SingleCameraSettingsWidget(QWidget *parent) :
     connect(ui->imageControlWidget, &LegacyImageControlWidget::changed,
         this, &SingleCameraSettingsWidget::at_dbDataChanged);
 
-    connect(ui->ioPortSettingsWidget, &IoPortSettingsWidget::dataChanged,
+    connect(ui->ioPortSettingsWidget, &LegacyIoPortSettingsWidget::dataChanged,
         this, &SingleCameraSettingsWidget::at_dbDataChanged);
 
     connect(ui->advancedSettingsWidget, &CameraAdvancedSettingsWidget::hasChangesChanged,
@@ -411,10 +411,15 @@ void SingleCameraSettingsWidget::submitToResource()
         loginEditAuth.setPassword(ui->passwordEdit->text().trimmed());
         if (m_camera->getAuth() != loginEditAuth)
         {
-            if (m_camera->isMultiSensorCamera() || m_camera->isNvr())
+            if ((m_camera->isMultiSensorCamera() || m_camera->isNvr())
+                && !m_camera->getGroupId().isEmpty())
+            {
                 QnClientCameraResource::setAuthToCameraGroup(m_camera, loginEditAuth);
+            }
             else
+            {
                 m_camera->setAuth(loginEditAuth);
+            }
         }
 
         ui->cameraScheduleWidget->applyChanges();

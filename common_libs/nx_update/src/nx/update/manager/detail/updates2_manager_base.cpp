@@ -29,7 +29,6 @@ void Updates2ManagerBase::atServerStart()
     using namespace std::placeholders;
 
     loadStatusFromFile();
-    NX_ASSERT(m_currentStatus.files.size() <= 1);
     checkForGlobalDictionaryUpdate();
 
     // Amending initial state
@@ -203,39 +202,81 @@ api::Updates2StatusData Updates2ManagerBase::download()
     if (result != update::info::ResultCode::ok)
     {
         setStatus(
-            api::Updates2StatusData::StatusCode::error,  "Failed to get update file information");
+            api::Updates2StatusData::StatusCode::error, "Failed to get update file information");
         return m_currentStatus.base();
     }
 
     using namespace vms::common::p2p::downloader;
+    NX_ASSERT(!fileData.file.isNull());
 
-    FileInformation fileInformation;
-    fileInformation.md5 = QByteArray::fromHex(fileData.md5.toBase64());
-    fileInformation.name = fileData.file;
-    fileInformation.size = fileData.size;
-    fileInformation.url = fileData.url;
-    fileInformation.peerPolicy = FileInformation::PeerSelectionPolicy::byPlatform;
+    auto fileInformation = downloader()->fileInformation(fileData.file);
+    bool alreadyHasFileInDownLoader = fileInformation.isValid();
+    if (!alreadyHasFileInDownLoader)
+    {
+        NX_ASSERT(!fileData.md5.isNull());
+        NX_ASSERT(fileData.size != 0);
 
-    downloader()->deleteFile(fileData.file);
-    for (const auto& fileName : m_currentStatus.files)
-        downloader()->deleteFile(fileName);
+        fileInformation.md5 = QByteArray::fromHex(fileData.md5.toBase64());
+        fileInformation.name = fileData.file;
+        fileInformation.size = fileData.size;
+        fileInformation.url = fileData.url;
+        fileInformation.peerPolicy = FileInformation::PeerSelectionPolicy::byPlatform;
+
+        downloader()->deleteFile(fileData.file);
+        if (!m_currentStatus.file.isEmpty())
+            downloader()->deleteFile(m_currentStatus.file);
+
+        m_currentStatus.file.clear();
+    }
 
     ResultCode resultCode = downloader()->addFile(fileInformation);
     switch (resultCode)
     {
         case ResultCode::fileAlreadyDownloaded:
         case ResultCode::fileAlreadyExists:
+            if (alreadyHasFileInDownLoader)
+            {
+                switch (fileInformation.status)
+                {
+                    case FileInformation::Status::downloaded:
+                    case FileInformation::Status::uploading:
+                        setStatus(
+                            api::Updates2StatusData::StatusCode::preparing,
+                            "Update has been downloaded and now is preparing for install");
+                        startPreparing(downloader()->filePath(fileInformation.name));
+                        break;
+                    case FileInformation::Status::corrupted:
+                        setStatus(
+                            api::Updates2StatusData::StatusCode::error,
+                            QString("Update file is corrupted: %1").arg(fileInformation.name));
+                        downloader()->deleteFile(fileInformation.name, /*deleteData*/ true);
+                        m_currentStatus.file.clear();
+                        // #TODO #akulikov deal with below
+//                        m_updateRegistry->removeManualFileData(fileInformation.name);
+                        break;
+                    case FileInformation::Status::downloading:
+                        setStatus(
+                            api::Updates2StatusData::StatusCode::downloading,
+                            lit("Downloading update file: %1").arg(fileInformation.name));
+                        m_currentStatus.file = fileInformation.name;
+                        break;
+                    case FileInformation::Status::notFound:
+                        NX_ASSERT(false);
+                        break;
+                }
+                break;
+            }
             NX_ASSERT(false);
             setStatus(
                 api::Updates2StatusData::StatusCode::error,
                 lit("Downloader internal error: File exists after preliminary deleting: %1")
-                    .arg(fileData.file));
+                    .arg(fileInformation.name));
             break;
         case ResultCode::ok:
             setStatus(
                 api::Updates2StatusData::StatusCode::downloading,
-                lit("Downloading update file: %1").arg(fileData.file));
-            m_currentStatus.files.insert(fileData.file);
+                lit("Downloading update file: %1").arg(fileInformation.name));
+            m_currentStatus.file = fileInformation.name;
             break;
         case ResultCode::fileDoesNotExist:
         case ResultCode::ioError:
@@ -246,14 +287,14 @@ api::Updates2StatusData Updates2ManagerBase::download()
             setStatus(
                 api::Updates2StatusData::StatusCode::error,
                 lit("Downloader failed to start downloading: %1. Result code: %2")
-                    .arg(fileData.file).arg(static_cast<int>(resultCode)));
-            m_currentStatus.files.remove(fileData.file);
+                    .arg(fileInformation.name).arg(static_cast<int>(resultCode)));
+            m_currentStatus.file.clear();
             break;
         case ResultCode::noFreeSpace:
             setStatus(
                 api::Updates2StatusData::StatusCode::error,
-                lit("No free space on device. Failed to download: %1").arg(fileData.file));
-            m_currentStatus.files.remove(fileData.file);
+                lit("No free space on device. Failed to download: %1").arg(fileInformation.name));
+            m_currentStatus.file.clear();
             break;
     }
 
@@ -329,8 +370,10 @@ void Updates2ManagerBase::onDownloadFinished(const QString& fileName)
             setStatus(api::Updates2StatusData::StatusCode::error, errorMessage);
         };
 
-    if (!m_currentStatus.files.contains(fileName))
+    if (m_currentStatus.file != fileName)
         return;
+
+    auto onExit = makeScopeGuard([this]() { m_currentStatus.file.clear(); });
 
     NX_ASSERT(m_currentStatus.state == api::Updates2StatusData::StatusCode::downloading);
     if (m_currentStatus.state != api::Updates2StatusData::StatusCode::downloading)
@@ -359,8 +402,10 @@ void Updates2ManagerBase::onDownloadFailed(const QString& fileName)
             setStatus(api::Updates2StatusData::StatusCode::error, errorMessage);
         };
 
-    if (!m_currentStatus.files.contains(fileName))
+    if (m_currentStatus.file != fileName)
         return;
+
+    auto onExit = makeScopeGuard([this]() { m_currentStatus.file.clear(); });
 
     NX_ASSERT(m_currentStatus.state == api::Updates2StatusData::StatusCode::downloading);
     if (m_currentStatus.state != api::Updates2StatusData::StatusCode::downloading)
@@ -386,7 +431,6 @@ void Updates2ManagerBase::onDownloadFailed(const QString& fileName)
     }
 
     downloader()->deleteFile(fileName, /*deleteData*/ true);
-    m_currentStatus.files.remove(fileName);
 }
 
 void Updates2ManagerBase::onFileAdded(const FileInformation& fileInformation)
@@ -398,7 +442,7 @@ void Updates2ManagerBase::onFileAdded(const FileInformation& fileInformation)
     QByteArray serializedGlobalRegistry;
     {
         QnMutexLocker lock(&m_mutex);
-        if (m_currentStatus.files.contains(fileInformation.name))
+        if (m_currentStatus.file == fileInformation.name)
             return;
 
         NX_VERBOSE(this, lm("External update file %1 added to the Downloader")
@@ -436,10 +480,9 @@ void Updates2ManagerBase::onFileInformationStatusChanged(const FileInformation& 
 void Updates2ManagerBase::onChunkDownloadFailed(const QString& fileName)
 {
     QnMutexLocker lock(&m_mutex);
-    if (!m_currentStatus.files.contains(fileName))
+    if (m_currentStatus.file != fileName)
         return;
 
-    NX_ASSERT(m_currentStatus.files.size() == 1);
     NX_ASSERT(m_currentStatus.state == api::Updates2StatusData::StatusCode::downloading);
 
     setStatus(

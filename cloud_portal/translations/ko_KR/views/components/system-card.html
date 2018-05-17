@@ -6,10 +6,13 @@
         <p>
             <button class="btn btn-default" ng-click="rename()">시스템 이름 바꾸기</button>
         </p>
-        <button class="btn btn-default" ng-click="disconnect()"><span class="product-name">{{PRODUCT_NAME}} </span>에서 연결 해제</button>
+        <p>
+            <button class="btn btn-default" ng-if="canMerge || debugMode" ng-click="mergeSystems()">다른 시스템과 병합</button>
+        </p>
+        <hr></hr>
+        <button class="btn btn-default" ng-click="disconnect()"><span class="product-name">%PRODUCT_NAME% </span>에서 연결 해제</button>
     </div>
 </div>
-
 <div class="panel panel-default" ng-if="!system.isMine">
     <div class="panel-body">
         <h2>소유자</h2>
@@ -25,5 +28,22 @@
             <button class="btn btn-default" ng-click="rename()">시스템 이름 바꾸기</button>
         </p>
         <button class="btn btn-default" ng-click="delete()">내 계정에서 분리</button>
+    </div>
+</div>
+<div class="panel panel-default" ng-if="currentlyMerging">
+    <div class="panel-body" ng-if="isMaster && system.isMine">
+        <div><strong>{{mergeTargetSystem.name}}</strong>
+            이 현재 시스템에 병합됩니다</div>
+        <hr></hr>
+        <div class="merge-info-text">데이터베이스 크기에 따라 최대 몇 시간이 소요될 수 있습니다.</div>
+    </div>
+    <div class="panel-body" ng-if="!isMaster || !system.isMine">
+        <div>이 시스템은             <strong>{{mergeTargetSystem.name}}에 병합됩니다</strong></div>
+        <hr></hr>
+        <div class="merge-info-text">
+            <p>데이터베이스 크기에 따라 최대 몇 시간이 소요될 수 있습니다.</p>
+            <p>병합이 완료 될 때까지 현재 시스템에 접속하여 비디오를 볼 수는 있지만 설정을 변경할 수는 없습니다.</p>
+            <p>병합이 완료되면 현재 시스템의 모든 사용자와 카메라를                 <span class="merge-system-name">{{mergeTargetSystem.name}}에서 사용할 수있게됩니다</span>. 시스템, 그리고 현재 시스템은 삭제됩니다.</p>
+        </div>
     </div>
 </div>

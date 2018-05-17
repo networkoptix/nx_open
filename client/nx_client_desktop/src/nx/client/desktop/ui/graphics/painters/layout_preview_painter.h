@@ -8,7 +8,7 @@
 #include <core/resource_management/resource_pool.h>
 #include <ui/customization/customized.h>
 
-class QnCameraThumbnailManager;
+class CameraThumbnailManager;
 class QnResourcePool;
 
 namespace nx {

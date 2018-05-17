@@ -96,17 +96,17 @@ public:
     {
     public:
         std::string token;
-        bool isBistable;
+        bool isBistable = false;
         //!Valid only if \a isBistable is \a false
         std::string delayTime;
-        bool activeByDefault;
+        bool activeByDefault = false;
 
-        RelayOutputInfo();
+        RelayOutputInfo() = default;
         RelayOutputInfo(
-            const std::string& _token,
+            std::string _token,
             bool _isBistable,
-            const std::string& _delayTime,
-            bool _activeByDefault );
+            std::string _delayTime,
+            bool _activeByDefault);
     };
 
     struct RelayInputState
@@ -453,7 +453,7 @@ private:
         {
             QString name;
             QString value;
-            SimpleItem() {}
+            SimpleItem() = default;
             SimpleItem(const QString& name, const QString& value): name(name), value(value) {}
         };
 
@@ -498,7 +498,9 @@ private:
         TriggerOutputTask(
             const QString outputID, const bool active, const unsigned int autoResetTimeoutMS)
             :
-            outputID(outputID), active(active), autoResetTimeoutMS(autoResetTimeoutMS)
+            outputID(outputID),
+            active(active),
+            autoResetTimeoutMS(autoResetTimeoutMS)
         {
         }
     };
@@ -529,6 +531,7 @@ private:
     mutable QTimeZone m_cameraTimeZone;
     std::vector<RelayOutputInfo> m_relayOutputInfo;
     bool m_isRelayOutputInversed;
+    bool m_fixWrongInputPortNumber;
     std::map<QString, RelayInputState> m_relayInputStates;
     std::string m_deviceIOUrl;
     QString m_onvifNotificationSubscriptionID;

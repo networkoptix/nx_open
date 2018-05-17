@@ -1,18 +1,17 @@
 import pytest
 
-from framework.os_access.windows_remoting.winrm_access import WinRMAccess
-from framework.utils import wait_until
+from framework.os_access.winrm_access import WinRMAccess
+from framework.waiting import wait_for_true
 
 
 @pytest.fixture()
 def winrm_access_raw(windows_vm_info):
-    hostname, port = windows_vm_info.ports['tcp', 5985]
-    return WinRMAccess(hostname, port)
+    return WinRMAccess(windows_vm_info.ports)
 
 
 @pytest.fixture()
 def winrm_access(winrm_access_raw):
-    assert wait_until(winrm_access_raw.is_working)
+    wait_for_true(winrm_access_raw.is_working, "{} is working".format(winrm_access))
     return winrm_access_raw
 
 

@@ -63,6 +63,15 @@ void CameraSettingsDialogStore::setPanicMode(bool value)
     d->executeAction([&](State state) { return Reducer::setPanicMode(std::move(state), value); });
 }
 
+void CameraSettingsDialogStore::setSettingsOptimizationEnabled(bool value)
+{
+    d->executeAction(
+        [&](State state)
+        {
+            return Reducer::setSettingsOptimizationEnabled(std::move(state), value);
+        });
+}
+
 void CameraSettingsDialogStore::loadCameras(const QnVirtualCameraResourceList& cameras)
 {
     d->executeAction([&](State state) { return Reducer::loadCameras(std::move(state), cameras); });
@@ -219,6 +228,89 @@ void CameraSettingsDialogStore::setMotionRegionList(const QList<QnMotionRegion>&
 {
     d->executeAction(
         [&](State state) { return Reducer::setMotionRegionList(std::move(state), value); });
+}
+
+void CameraSettingsDialogStore::setFisheyeSettings(const QnMediaDewarpingParams& value)
+{
+    d->executeAction(
+        [&](State state) { return Reducer::setFisheyeSettings(std::move(state), value); });
+}
+
+void CameraSettingsDialogStore::setIoPortDataList(const QnIOPortDataList& value)
+{
+    d->executeAction(
+        [&](State state) { return Reducer::setIoPortDataList(std::move(state), value); });
+}
+
+void CameraSettingsDialogStore::setIoModuleVisualStyle(vms::api::IoModuleVisualStyle value)
+{
+    d->executeAction(
+        [&](State state) { return Reducer::setIoModuleVisualStyle(std::move(state), value); });
+}
+
+void CameraSettingsDialogStore::setCameraControlDisabled(bool value)
+{
+    d->executeAction(
+        [&](State state) { return Reducer::setCameraControlDisabled(std::move(state), value); });
+}
+
+void CameraSettingsDialogStore::setDualStreamingDisabled(bool value)
+{
+    d->executeAction(
+        [&](State state) { return Reducer::setDualStreamingDisabled(std::move(state), value); });
+}
+
+void CameraSettingsDialogStore::setUseBitratePerGOP(bool value)
+{
+    d->executeAction(
+        [&](State state) { return Reducer::setUseBitratePerGOP(std::move(state), value); });
+}
+
+void CameraSettingsDialogStore::setPrimaryRecordingDisabled(bool value)
+{
+    d->executeAction(
+        [&](State state) { return Reducer::setPrimaryRecordingDisabled(std::move(state), value); });
+}
+void CameraSettingsDialogStore::setSecondaryRecordingDisabled(bool value)
+{
+    d->executeAction(
+        [&](State state) { return Reducer::setSecondaryRecordingDisabled(std::move(state), value); });
+}
+
+void CameraSettingsDialogStore::setNativePtzPresetsDisabled(bool value)
+{
+    d->executeAction(
+        [&](State state) { return Reducer::setNativePtzPresetsDisabled(std::move(state), value); });
+}
+
+void CameraSettingsDialogStore::setRtpTransportType(vms::api::RtpTransportType value)
+{
+    d->executeAction(
+        [&](State state) { return Reducer::setRtpTransportType(std::move(state), value); });
+}
+
+void CameraSettingsDialogStore::setMotionStreamType(vms::api::MotionStreamType value)
+{
+    d->executeAction(
+        [&](State state) { return Reducer::setMotionStreamType(std::move(state), value); });
+}
+
+void CameraSettingsDialogStore::setLogicalId(int value)
+{
+    d->executeAction(
+        [&](State state) { return Reducer::setLogicalId(std::move(state), value); });
+}
+
+void CameraSettingsDialogStore::generateLogicalId()
+{
+    d->executeAction(
+        [&](State state) { return Reducer::generateLogicalId(std::move(state)); });
+}
+
+void CameraSettingsDialogStore::resetExpertSettings()
+{
+    d->executeAction(
+        [&](State state) { return Reducer::resetExpertSettings(std::move(state)); });
 }
 
 } // namespace desktop

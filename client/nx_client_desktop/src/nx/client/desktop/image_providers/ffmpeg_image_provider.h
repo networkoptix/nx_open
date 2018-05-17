@@ -9,10 +9,10 @@ namespace client {
 namespace desktop {
 
 /** Utility class to get an image from the local media file using ffmpeg. */
-class FfmpegImageProvider: public QnImageProvider
+class FfmpegImageProvider: public ImageProvider
 {
     Q_OBJECT
-    using base_type = QnImageProvider;
+    using base_type = ImageProvider;
 
 public:
     explicit FfmpegImageProvider(const QnResourcePtr& resource, QObject* parent = nullptr);

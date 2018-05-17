@@ -25,6 +25,8 @@ public:
     LensPtzControl(QWidget* parent);
     virtual ~LensPtzControl();
 
+    virtual QSize sizeHint() const override;
+
     struct Value
     {
         float rotation;
@@ -36,16 +38,14 @@ signals:
     void onUpdateValue(const Value& value);
 
 protected:
-    void paintEvent(QPaintEvent* event) override;
-    void changeEvent(QEvent* event) override;
-    QSize minimumSizeHint() const override;
-    void resizeEvent(QResizeEvent* event) override;
-    void mousePressEvent(QMouseEvent* event) override;
-    void mouseReleaseEvent(QMouseEvent* event) override;
-    void mouseMoveEvent(QMouseEvent *event) override;
+    virtual void paintEvent(QPaintEvent* event) override;
+    virtual void changeEvent(QEvent* event) override;
+    virtual void resizeEvent(QResizeEvent* event) override;
+    virtual void mousePressEvent(QMouseEvent* event) override;
+    virtual void mouseReleaseEvent(QMouseEvent* event) override;
+    virtual void mouseMoveEvent(QMouseEvent *event) override;
 
 protected:
-
     // Works like button, but without soul of Qt widget
     struct Button
     {

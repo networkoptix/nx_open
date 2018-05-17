@@ -367,6 +367,18 @@ int Url::port(int defaultPort) const
     return m_url.port(defaultPort);
 }
 
+QString Url::displayAddress(QUrl::ComponentFormattingOptions) const
+{
+    auto result = host();
+    const auto port = m_url.port();
+    if (port > 0)
+    {
+        result += L':';
+        result += QString::number(port);
+    }
+    return result;
+}
+
 void Url::setPath(const QString &path, QUrl::ParsingMode mode)
 {
     m_url.setPath(path, mode);
@@ -440,6 +452,15 @@ Url Url::fromLocalFile(const QString &localfile)
 QString Url::toLocalFile() const
 {
     return m_url.toLocalFile();
+}
+
+Url Url::cleanUrl() const
+{
+    nx::utils::Url url;
+    url.setScheme(m_url.scheme());
+    url.setHost(m_url.host());
+    url.setPort(m_url.port());
+    return url;
 }
 
 bool Url::operator <(const Url &url) const

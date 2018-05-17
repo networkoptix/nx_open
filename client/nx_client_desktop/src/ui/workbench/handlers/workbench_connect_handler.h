@@ -11,8 +11,9 @@
 
 class QnGraphicsMessageBox;
 class QnReconnectInfoDialog;
-class QnReconnectHelper;
 struct QnConnectionInfo;
+
+namespace nx { namespace client { namespace core { class ReconnectHelper; } } }
 
 class QnWorkbenchConnectHandler: public Connective<QObject>, public QnWorkbenchContextAware
 {
@@ -150,5 +151,5 @@ private:
     ec2::CrashReporter m_crashReporter;
 
     QPointer<QnReconnectInfoDialog> m_reconnectDialog;
-    QScopedPointer<QnReconnectHelper> m_reconnectHelper;
+    QScopedPointer<nx::client::core::ReconnectHelper> m_reconnectHelper;
 };

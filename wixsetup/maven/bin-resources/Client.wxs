@@ -21,6 +21,13 @@
                 </RegistryKey>
             </Component>
 
+            <Component Id="ClientEulaVersion">
+                <RegistryKey Root="HKCU"
+                         Key="Software\[Manufacturer]\$(var.clientInternalName)">
+                    <RegistryValue Type="integer" Name="acceptedEulaVersion" Value="$(var.eulaVersion)"/>
+                </RegistryKey>
+            </Component>
+
             <Component Id="ClientUriHandler">
                 <RegistryKey Root="HKCR" Key="$(var.uriProtocol)">
                     <RegistryValue Type="string" Value="$(var.clientDisplayName)"/>
@@ -115,15 +122,6 @@
             </Component>
             <Component>
                 <File Id="swresample.dll" Name="swresample-2.dll" Source="$(var.SourceDir)/swresample-2.dll" DiskId="3"/>
-            </Component>
-            <Component>
-                <File Id="libogg.dll" Name="libogg.dll" Source="$(var.SourceDir)/libogg.dll" DiskId="3"/>
-            </Component>
-            <Component>
-                <File Id="libvorbis.dll" Name="libvorbis.dll" Source="$(var.SourceDir)/libvorbis.dll" DiskId="3"/>
-            </Component>
-            <Component>
-                <File Id="libmp3lame.dll" Name="libmp3lame.dll" Source="$(var.SourceDir)/libmp3lame.dll" DiskId="3"/>
             </Component>
         </ComponentGroup>
         <ComponentGroup Id="ClientLibs" Directory="ClientRootDir">
@@ -301,6 +299,7 @@
             <ComponentRef Id="AppLauncherConfigurationSystem" />
             <ComponentRef Id="ClientExecutable" />
             <ComponentRef Id="ClientUriHandler"/>
+            <ComponentRef Id="ClientEulaVersion"/>
             <ComponentRef Id="QtConf"/>
             <ComponentGroupRef Id="ClientHelpComponent"/>
             <ComponentGroupRef Id="ClientVoxComponent"/>

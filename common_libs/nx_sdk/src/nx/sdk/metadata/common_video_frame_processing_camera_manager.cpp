@@ -1,12 +1,42 @@
 #include "common_video_frame_processing_camera_manager.h"
 
-#define NX_DEBUG_ENABLE_OUTPUT m_enableOutput
-#define NX_PRINT_PREFIX (std::string("[") + this->plugin()->name() + " CameraManager] ")
+#define NX_PRINT_PREFIX (this->utils.printPrefix)
+#define NX_DEBUG_ENABLE_OUTPUT (this->utils.enableOutput)
 #include <nx/kit/debug.h>
+
+#include <nx/sdk/metadata/common_plugin.h>
+#include <nx/sdk/utils.h>
 
 namespace nx {
 namespace sdk {
 namespace metadata {
+
+static std::string makePrintPrefix(Plugin* plugin)
+{
+    std::string base;
+    if (const auto commonPlugin = dynamic_cast<CommonPlugin*>(plugin))
+        base = commonPlugin->libName();
+    else //< The plugin is not derived from CommonPlugin.
+        base = plugin->name();
+
+    return "[" + base + " camera] ";
+}
+
+CommonVideoFrameProcessingCameraManager::CommonVideoFrameProcessingCameraManager(
+    Plugin* plugin,
+    bool enableOutput,
+    const std::string& printPrefix)
+    :
+    utils(enableOutput, !printPrefix.empty() ? printPrefix : makePrintPrefix(plugin)),
+    m_plugin(plugin)
+{
+    NX_PRINT << "Created " << this;
+}
+
+CommonVideoFrameProcessingCameraManager::~CommonVideoFrameProcessingCameraManager()
+{
+    NX_PRINT << "Destroyed " << this;
+}
 
 //-------------------------------------------------------------------------------------------------
 // Implementations of interface methods.
@@ -49,7 +79,7 @@ Error CommonVideoFrameProcessingCameraManager::pushDataPacket(DataPacket* dataPa
         return Error::unknownError;
     }
 
-    if (auto videoFrame = nxpt::ScopedRef<CommonCompressedVideoPacket>(
+    if (auto videoFrame = nxpt::ScopedRef<CompressedVideoPacket>(
         dataPacket->queryInterface(IID_CompressedVideoPacket)))
     {
         if (!pushCompressedVideoFrame(videoFrame.get()))
@@ -58,7 +88,7 @@ Error CommonVideoFrameProcessingCameraManager::pushDataPacket(DataPacket* dataPa
             return Error::unknownError;
         }
     }
-    else if (auto videoFrame = nxpt::ScopedRef<CommonUncompressedVideoFrame>(
+    else if (auto videoFrame = nxpt::ScopedRef<UncompressedVideoFrame>(
         dataPacket->queryInterface(IID_UncompressedVideoFrame)))
     {
         if (!pushUncompressedVideoFrame(videoFrame.get()))
@@ -132,22 +162,8 @@ void CommonVideoFrameProcessingCameraManager::freeManifest(const char* data)
 void CommonVideoFrameProcessingCameraManager::setDeclaredSettings(
     const nxpl::Setting* settings, int count)
 {
-    if (count > 0 && settings == nullptr)
-    {
-        NX_PRINT << __func__ << "(): INTERNAL ERROR: settings is null and count is " << count;
-        return;
-    }
-
-    NX_OUTPUT << "Received CameraManager settings:";
-    NX_OUTPUT << "{";
-    for (int i = 0; i < count; ++i)
-    {
-        m_settings[settings[i].name] = settings[i].value;
-        NX_OUTPUT << "    " << nx::kit::debug::toString(settings[i].name)
-            << ": " << nx::kit::debug::toString(settings[i].value)
-            << ((i < count - 1) ? "," : "");
-    }
-    NX_OUTPUT << "}";
+    if (!utils.fillAndOutputSettingsMap(&m_settings, settings, count, "Received settings"))
+        return; //< The error is already logged.
 
     settingsChanged();
 }

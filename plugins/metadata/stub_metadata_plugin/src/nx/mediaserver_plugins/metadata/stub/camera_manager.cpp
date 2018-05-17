@@ -8,9 +8,8 @@
 #include <nx/sdk/metadata/common_metadata_packet.h>
 #include <nx/sdk/metadata/common_event.h>
 #include <nx/sdk/metadata/common_object.h>
-#include <nx/sdk/metadata/common_compressed_video_packet.h>
 
-#define NX_PRINT_PREFIX (std::string("[") + this->plugin()->name() + " CameraManager] ")
+#define NX_PRINT_PREFIX (this->utils.printPrefix)
 #include <nx/kit/debug.h>
 
 #include "stub_metadata_plugin_ini.h"
@@ -23,15 +22,9 @@ namespace stub {
 using namespace nx::sdk;
 using namespace nx::sdk::metadata;
 
-CameraManager::CameraManager(Plugin* plugin): CommonVideoFrameProcessingCameraManager(plugin)
+CameraManager::CameraManager(Plugin* plugin):
+    CommonVideoFrameProcessingCameraManager(plugin, NX_DEBUG_ENABLE_OUTPUT)
 {
-    NX_PRINT << "Created " << this;
-    setEnableOutput(NX_DEBUG_ENABLE_OUTPUT); //< Base class is verbose when this descendant is.
-}
-
-CameraManager::~CameraManager()
-{
-    NX_PRINT << "Destroyed " << this;
 }
 
 std::string CameraManager::capabilitiesManifest()
@@ -39,11 +32,11 @@ std::string CameraManager::capabilitiesManifest()
     return R"json(
         {
             "supportedEventTypes": [
-                ")json" + nxpt::NxGuidHelper::toStdString(kLineCrossingEventGuid) + R"json(",
-                ")json" + nxpt::NxGuidHelper::toStdString(kObjectInTheAreaEventGuid) + R"json("
+                ")json" + nxpt::toStdString(kLineCrossingEventGuid) + R"json(",
+                ")json" + nxpt::toStdString(kObjectInTheAreaEventGuid) + R"json("
             ],
             "supportedObjectTypes": [
-                ")json" + nxpt::NxGuidHelper::toStdString(kCarObjectGuid) + R"json("
+                ")json" + nxpt::toStdString(kCarObjectGuid) + R"json("
             ],
             "settings": {
                 "params": [
@@ -71,31 +64,34 @@ void CameraManager::settingsChanged()
     NX_PRINT << __func__ << "()";
 }
 
-bool CameraManager::pushCompressedVideoFrame(const CommonCompressedVideoPacket* videoFrame)
+bool CameraManager::pushCompressedVideoFrame(const CompressedVideoPacket* videoFrame)
 {
-    NX_OUTPUT << __func__ << "() BEGIN: timestamp " << videoFrame->timestampUsec() << " us";
+    if (plugin()->needUncompressedVideoFrames())
+    {
+        NX_PRINT << "ERROR: Received compressed video frame, contrary to manifest.";
+        return false;
+    }
+
+    NX_OUTPUT << __func__ << "(): timestamp " << videoFrame->timestampUsec() << " us";
     ++m_frameCounter;
     m_lastVideoFrameTimestampUsec = videoFrame->timestampUsec();
-    NX_OUTPUT << __func__ << "() END -> true";
     return true;
 }
 
-bool CameraManager::pushUncompressedVideoFrame(const CommonUncompressedVideoFrame* videoFrame)
+bool CameraManager::pushUncompressedVideoFrame(const UncompressedVideoFrame* videoFrame)
 {
+    if (!plugin()->needUncompressedVideoFrames())
+    {
+        NX_PRINT << "ERROR: Received uncompressed video frame, contrary to manifest.";
+        return false;
+    }
+
     NX_OUTPUT << __func__ << "(): timestamp " << videoFrame->timestampUsec() << " us";
 
     ++m_frameCounter;
     m_lastVideoFrameTimestampUsec = videoFrame->timestampUsec();
 
-    if (videoFrame->pixelFormat() == UncompressedVideoFrame::PixelFormat::argb)
-        return checkRgbFrame(videoFrame);
-
-    if (videoFrame->pixelFormat() == UncompressedVideoFrame::PixelFormat::yuv420)
-        return checkYuv420pFrame(videoFrame);
-
-    NX_OUTPUT << __func__ << "(): ERROR: Unsupported pixel format: "
-        << (int) videoFrame->pixelFormat();
-    return false;
+    return checkFrame(videoFrame);
 }
 
 bool CameraManager::pullMetadataPackets(std::vector<MetadataPacket*>* metadataPackets)
@@ -222,9 +218,8 @@ MetadataPacket* CameraManager::cookSomeObjects()
     commonObject->setTypeId(kCarObjectGuid);
 
     // To be binary modified to be unique for each object.
-    nxpl::NX_GUID objectId = {{
-        0xB5, 0x29, 0x4F, 0x25, 0x4F, 0xE6, 0x46, 0x47,
-        0xB8, 0xD1, 0xA0, 0x72, 0x9F, 0x70, 0xF2, 0xD1}};
+    nxpl::NX_GUID objectId =
+        {{0xB5,0x29,0x4F,0x25,0x4F,0xE6,0x46,0x47,0xB8,0xD1,0xA0,0x72,0x9F,0x70,0xF2,0xD1}};
 
     double dt = m_objectCounter / 32.0;
     ++m_objectCounter;
@@ -269,46 +264,67 @@ int64_t CameraManager::usSinceEpoch() const
         system_clock::now().time_since_epoch()).count();
 }
 
-bool CameraManager::checkYuv420pFrame(const sdk::metadata::CommonUncompressedVideoFrame* videoFrame) const
+bool CameraManager::checkFrame(const UncompressedVideoFrame* frame) const
 {
-    if (videoFrame->planeCount() != 3)
+    if (frame->pixelFormat() != plugin()->pixelFormat())
     {
-        NX_PRINT << __func__ << "() END -> false: videoFrame->planeCount() is "
-            << videoFrame->planeCount() << " instead of 3";
+        NX_PRINT << __func__ << "() ERROR: Video frame has pixel format "
+            << pixelFormatToStdString(frame->pixelFormat()) << " instead of "
+            << pixelFormatToStdString(plugin()->pixelFormat());
         return false;
     }
 
-    const auto expectedPixelFormat = UncompressedVideoFrame::PixelFormat::yuv420;
-    if (videoFrame->pixelFormat() != expectedPixelFormat)
+    const auto* const pixelFormatDescriptor = getPixelFormatDescriptor(frame->pixelFormat());
+    if (!pixelFormatDescriptor)
+        return false; //< Error is already logged.
+
+    if (frame->planeCount() != pixelFormatDescriptor->planeCount)
     {
-        NX_PRINT << __func__ << "() END -> false: videoFrame->pixelFormat() is "
-            << (int)videoFrame->pixelFormat() << " instead of " << (int)expectedPixelFormat;
+        NX_PRINT << __func__ << "() ERROR: planeCount() is "
+            << frame->planeCount() << " instead of " << pixelFormatDescriptor->planeCount;
         return false;
     }
 
-    // Dump 8 bytes at offset 16 of the plane 0.
-    if (videoFrame->dataSize(0) < 44)
+    if (frame->height() % 2 != 0)
     {
-        NX_PRINT << __func__ << "(): videoFrame->dataSize(0) == " << videoFrame->dataSize(0)
-            << ", which is suspiciously low";
+        NX_PRINT << __func__ << "() ERROR: height() is not even: " << frame->height();
+        return false;
     }
-    else
+
+    for (int plane = 0; plane < frame->planeCount(); ++plane)
     {
+        const int bytesPerPlane =
+            (frame->height() / pixelFormatDescriptor->chromaHeightFactor) * frame->lineSize(plane)
+            * (plane == 0 ? 1 : (pixelFormatDescriptor->lumaBitsPerPixel / 8));
+        if (frame->dataSize(plane) != bytesPerPlane)
+        {
+            NX_PRINT << __func__ << "() ERROR: dataSize(/*plane*/ " << plane << ") is "
+                << frame->dataSize(plane) << " instead of " << bytesPerPlane
+                << ", while lineSize(/*plane*/ " << plane << ") is " << frame->lineSize(plane)
+                << " and height is " << frame->height();
+        }
+
+        // Hex-dump some bytes from raw pixel data.
         if (NX_DEBUG_ENABLE_OUTPUT)
         {
-            // Hex dump some 8 bytes from raw pixel data.
-            NX_PRINT_HEX_DUMP("bytes 36..43", videoFrame->data(0) + 36, 8);
+            static const int dumpOffset = 0;
+            static const int dumpSize = 12;
+
+            if (frame->dataSize(plane) < dumpOffset + dumpSize)
+            {
+                NX_PRINT << __func__ << "(): WARNING: dataSize(/*plane*/ " << plane << ") is "
+                    << frame->dataSize(plane) << ", which is suspiciously low";
+            }
+            else
+            {
+                NX_PRINT_HEX_DUMP(nx::kit::debug::format(
+                    "Plane %d bytes %d..%d of %d",
+                    plane, dumpOffset, dumpOffset + dumpSize - 1, frame->dataSize(plane)).c_str(),
+                    frame->data(plane) + dumpOffset, dumpSize);
+            }
         }
     }
-    NX_OUTPUT << __func__ << "() END -> true";
 
-    return true;
-}
-
-bool CameraManager::checkRgbFrame(const sdk::metadata::CommonUncompressedVideoFrame* videoFrame) const
-{
-    // TODO: #dmishin check BGRA frames somehow.
-    NX_OUTPUT << __func__ << "() END -> true";
     return true;
 }
 

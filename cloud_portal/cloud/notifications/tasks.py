@@ -2,7 +2,7 @@ from __future__ import absolute_import
 from celery import shared_task
 from .engines import email_engine
 
-from smtplib import SMTPException, SMTPConnectError
+from smtplib import SMTPException, SMTPConnectError, SMTPServerDisconnected
 from ssl import SSLError
 from celery.exceptions import Ignore
 
@@ -16,20 +16,26 @@ import traceback
 import logging
 logger = logging.getLogger(__name__)
 
-def log_error(error, user_email, type, message, customization, language_code, queue_name, attempt):
-    error_formatted = '\n{}:{}\nTarget Email: {}\nType: {}\nMessage:{}\nCustomization: {}\nLanguage: {}\nQueue: {}\nAttempt: {}\nCall Stack: {}'\
+
+class MaxResendException(Exception):
+    def __str__(self):
+        return "Emails was not sent because it hit max retry limit!!!"
+
+
+def log_error(error, user_email, type, message, lang, customization, queue, attempt):
+    error_formatted = '\n{}:{}\nTarget Email: {}\nType: {}\nMessage:{}\nLanguage: {}\nCustomization: {}\nQueue: {}\nAttempt: {}\nCall Stack: {}'\
         .format(error.__class__.__name__,
                 error,
                 user_email,
                 type,
                 message,
+                lang,
                 customization,
-                language_code,
-                queue_name,
+                queue,
                 attempt,
                 traceback.format_exc())
 
-    if isinstance(error, SMTPException):
+    if isinstance(error, SMTPException) or isinstance(error, SMTPServerDisconnected):
         logger.warning(error_formatted)
     else:
         logger.error(error_formatted)
@@ -37,29 +43,31 @@ def log_error(error, user_email, type, message, customization, language_code, qu
 
 @shared_task
 def send_email(user_email, type, message, customization, queue="", attempt=1):
-    language_code = get_language_for_email(user_email, customization)
+    lang = get_language_for_email(user_email, customization)
     try:
-        email_engine.send(user_email, type, message, language_code, customization)
+        email_engine.send(user_email, type, message, lang, customization)
     except Exception as error:
         if (isinstance(error, SMTPException) or isinstance(error, SSLError)) and attempt < settings.MAX_RETRIES:
             send_email.apply_async(args=[user_email, type, message, customization, queue, attempt+1],
                                    queue=queue)
+        elif attempt >= settings.MAX_RETRIES:
+            error = MaxResendException()
 
-        log_error(error, user_email, type, message, customization, language_code, queue, attempt)
+        log_error(error, user_email, type, message, lang, customization, queue, attempt)
 
         send_email.update_state(state="FAILURE", meta={'error': str(error),
                                                        'user_email': user_email,
                                                        'type': type,
                                                        'message': message,
                                                        'customization': customization,
-                                                       'language': language_code,
+                                                       'language': lang,
                                                        'queue': queue,
                                                        'attempt': attempt,
                                                        })
         raise Ignore()
     else:
         return {'user_email': user_email, 'type': type, 'message': message, 'customization': customization,
-                'language': language_code, 'queue': queue, 'attempt': attempt}
+                'language': lang, 'queue': queue, 'attempt': attempt}
 
 
 # For testing we dont want to send emails to everyone so we need to set
@@ -68,7 +76,7 @@ def send_email(user_email, type, message, customization, queue="", attempt=1):
 def send_to_all_users(notification_id, message, force=False):
     # if forced and not testing dont apply any filters to send to all users
     users = Account.objects.exclude(activated_date=None, last_login=None)
-    
+
     if not force:
         users = users.filter(subscribe=True)
 

@@ -68,7 +68,7 @@ void SynchronousStreamSocketServer::threadMain()
 {
     while (!m_stopped)
     {
-        m_connection.reset(m_serverSocket->accept());
+        m_connection = m_serverSocket->accept();
         if (!m_connection)
             continue;
         processConnection(m_connection.get());

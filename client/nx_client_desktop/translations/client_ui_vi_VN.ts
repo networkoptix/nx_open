@@ -89,11 +89,6 @@
     </message>
     <message>
       <location/>
-      <source>Disable only if the client takes too much CPU</source>
-      <translation>Chỉ vô hiệu hoá khi máy trạm dùng quá nhiều CPU</translation>
-    </message>
-    <message>
-      <location/>
       <source>Maximum Live Buffer Length</source>
       <translation>Độ dài lớn nhất của bộ đệm khi xem trực tuyến</translation>
     </message>
@@ -764,16 +759,16 @@
     </message>
     <message>
       <location/>
-      <source>Logical Id</source>
-      <translation>Id hợp lý</translation>
+      <source>Logical ID</source>
+      <translation>ID hợp lý</translation>
     </message>
   </context>
   <context>
     <name>CameraInputBusinessEventWidget</name>
     <message>
       <location filename="../src/ui/widgets/business/camera_input_business_event_widget.ui"/>
-      <source>Input Id</source>
-      <translation>Id đầu vào</translation>
+      <source>Input ID</source>
+      <translation>ID đầu vào</translation>
     </message>
   </context>
   <context>
@@ -798,8 +793,8 @@
     </message>
     <message>
       <location/>
-      <source>Output Id:</source>
-      <translation>Id đầu ra:</translation>
+      <source>Output ID:</source>
+      <translation>ID đầu ra:</translation>
     </message>
   </context>
   <context>
@@ -1513,8 +1508,8 @@
     </message>
     <message>
       <location/>
-      <source>Locked to Hardware Id:</source>
-      <translation>Khóa Id phần cứng:</translation>
+      <source>Locked to Hardware ID:</source>
+      <translation>Khóa ID phần cứng:</translation>
     </message>
   </context>
   <context>
@@ -1612,8 +1607,8 @@
     </message>
     <message>
       <location/>
-      <source>Hardware Id</source>
-      <translation>Id phần cứng</translation>
+      <source>Hardware ID</source>
+      <translation>ID phần cứng</translation>
     </message>
   </context>
   <context>
@@ -1741,6 +1736,11 @@
       <location/>
       <source>Tour cycle</source>
       <translation>Tour cycle</translation>
+    </message>
+    <message>
+      <location/>
+      <source>IP addresses for cameras, and servers, groups for users, etc.</source>
+      <translation type="unfinished">IP addresses for cameras, and servers, groups for users, etc.</translation>
     </message>
   </context>
   <context>

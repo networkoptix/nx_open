@@ -1,6 +1,7 @@
 
 #include "search_bookmarks_model.h"
 
+#include <translation/datetime_formatter.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/camera_bookmark.h>
 #include <core/resource_management/resource_pool.h>
@@ -9,7 +10,6 @@
 
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_context_aware.h>
-#include <ui/workbench/watchers/workbench_server_time_watcher.h>
 #include <ui/style/resource_icon_cache.h>
 
 #include <utils/camera/bookmark_helpers.h>
@@ -18,6 +18,7 @@
 #include <nx/utils/collection.h>
 #include <nx/utils/raii_guard.h>
 #include <nx/utils/algorithm/index_of.h>
+#include <nx/client/core/watchers/server_time_watcher.h>
 
 namespace
 {
@@ -168,7 +169,7 @@ int QnSearchBookmarksModelPrivate::getBookmarkIndex(const QnUuid& bookmarkId) co
 
 QDateTime QnSearchBookmarksModelPrivate::displayTime(qint64 millisecondsSinceEpoch) const
 {
-    const auto timeWatcher = context()->instance<QnWorkbenchServerTimeWatcher>();
+    const auto timeWatcher = context()->instance<nx::client::core::ServerTimeWatcher>();
     return timeWatcher->displayTime(millisecondsSinceEpoch);
 }
 
@@ -303,6 +304,15 @@ QVariant QnSearchBookmarksModelPrivate::getData(const QModelIndex& index, int ro
         }
 
         return QVariant();
+    }
+
+    // Return formatted time if display text is requested.
+    if (role == Qt::DisplayRole)
+    {
+        if (index.column() == QnSearchBookmarksModel::kStartTime)
+            return datetime::toString(displayTime(bookmark.startTimeMs));
+        if (index.column() == QnSearchBookmarksModel::kCreationTime)
+            return datetime::toString(displayTime(bookmark.creationTimeMs()));
     }
 
     switch(index.column())

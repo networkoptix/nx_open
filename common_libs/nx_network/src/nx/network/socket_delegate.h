@@ -12,6 +12,7 @@ namespace network {
  * and delegate rest of API calls to existing implementation.
  */
 template<typename SocketInterfaceToImplement>
+// requires std::is_base_of<AbstractSocket, SocketInterfaceToImplement>::value
 class SocketDelegate:
     public SocketInterfaceToImplement
 {
@@ -236,6 +237,10 @@ public:
         return this->m_target->readSomeAsync(buffer, std::move(handler));
     }
 
+    /*
+     * Warning! Buffer should live at least till asynchronous send occurres, so
+     * do not use buffers with local scope here.
+     */
     virtual void sendAsync(
         const nx::Buffer& buffer,
         IoCompletionHandler handler) override
@@ -250,14 +255,8 @@ public:
         return this->m_target->registerTimer(timeout, std::move(handler));
     }
 
-    virtual void cancelIOAsync(
-        nx::network::aio::EventType eventType,
-        nx::utils::MoveOnlyFunc<void()> handler) override
-    {
-        return this->m_target->cancelIOAsync(eventType, std::move(handler));
-    }
-
-    virtual void cancelIOSync(nx::network::aio::EventType eventType) override
+protected:
+    virtual void cancelIoInAioThread(nx::network::aio::EventType eventType) override
     {
         return this->m_target->cancelIOSync(eventType);
     }
@@ -293,10 +292,11 @@ public:
     virtual void pleaseStop(nx::utils::MoveOnlyFunc<void()> handler) override;
     virtual void pleaseStopSync(bool assertIfCalledUnderLock = true) override;
     virtual bool listen(int backlog = kDefaultBacklogSize) override;
-    virtual AbstractStreamSocket* accept() override;
+    virtual std::unique_ptr<AbstractStreamSocket> accept() override;
     virtual void acceptAsync(AcceptCompletionHandler handler) override;
-    virtual void cancelIOAsync(nx::utils::MoveOnlyFunc<void()> handler) override;
-    virtual void cancelIOSync() override;
+
+protected:
+    virtual void cancelIoInAioThread() override;
 };
 
 } // namespace network

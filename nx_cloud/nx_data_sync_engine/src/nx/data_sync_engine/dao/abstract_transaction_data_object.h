@@ -4,21 +4,19 @@
 #include <nx/utils/move_only_func.h>
 #include <nx/utils/std/cpp14.h>
 
-#include <transaction/transaction.h>
 #include <nx/utils/db/types.h>
 #include <nx/utils/db/query_context.h>
 
 #include "../serialization/ubjson_serialized_transaction.h"
 
 namespace nx {
-namespace cdb {
-namespace ec2 {
+namespace data_sync_engine {
 namespace dao {
 
 struct TransactionData
 {
     const nx::String& systemId;
-    const ::ec2::QnAbstractTransaction& header;
+    const CommandHeader& header;
     const QByteArray& hash;
     const QByteArray& ubjsonSerializedTransaction;
 };
@@ -87,6 +85,5 @@ public:
 };
 
 } // namespace dao
-} // namespace ec2
-} // namespace cdb
+} // namespace data_sync_engine
 } // namespace nx

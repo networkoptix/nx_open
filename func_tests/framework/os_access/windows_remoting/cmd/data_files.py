@@ -10,6 +10,7 @@ log = logging.getLogger(__name__)
 
 
 def read_bytes(shell, path):
+    # language=PowerShell
     script_template = '''
         $ProgressPreference = 'SilentlyContinue'
         $File = [System.IO.File]::Open('{path}', [System.IO.FileMode]::Open, [System.IO.FileAccess]::Read)
@@ -32,6 +33,7 @@ def read_bytes(shell, path):
 
 
 def write_bytes(shell, path, data, max_envelope_size_kb=8192):
+    # language=PowerShell
     script_template = '''
         $ProgressPreference = 'SilentlyContinue'
         $StandardInput = [System.Console]::OpenStandardInput()

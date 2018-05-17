@@ -1,6 +1,6 @@
 #include "metatypes.h"
 
-#include <QtCore/QMetatype>
+#include <QtCore/QMetaType>
 
 #include "data/database_dump_data.h"
 #include "data/database_dump_to_file_data.h"

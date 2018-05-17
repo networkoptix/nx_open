@@ -26,6 +26,14 @@ namespace nx {
 namespace mediaserver_core {
 namespace plugins {
 
+enum class HanwhaProfileParameterFlag
+{
+    newProfile = 1,
+    audioSupported = 1 << 1
+};
+
+Q_DECLARE_FLAGS(HanwhaProfileParameterFlags, HanwhaProfileParameterFlag);
+
 class HanwhaResource: public QnPlOnvifResource
 {
     using base_type = QnPlOnvifResource;
@@ -90,8 +98,8 @@ public:
     int profileByRole(Qn::ConnectionRole role) const;
 
     CameraDiagnostics::Result findProfiles(
-        int* outPrimaryProfileNumber,
-        int* outSecondaryProfileNumber,
+        boost::optional<HanwhaVideoProfile>* outPrimaryProfileNumber,
+        boost::optional<HanwhaVideoProfile>* outSecondaryProfileNumber,
         int* totalProfileNumber,
         std::set<int>* profilesToRemoveIfProfilesExhausted);
 
@@ -99,10 +107,22 @@ public:
 
     CameraDiagnostics::Result createProfile(int* outProfileNumber, Qn::ConnectionRole role);
 
+    // Returns profile number for role if profile was found and has been considered as correct,
+    // otherwise returns boost::none.
+    boost::optional<int> verifyProfile(Qn::ConnectionRole role);
+
+    CameraDiagnostics::Result updateProfileNameIfNeeded(
+        Qn::ConnectionRole role,
+        const HanwhaVideoProfile& profile);
+
     void updateToChannel(int value);
 
     bool isNvr() const;
-    QString nxProfileName(Qn::ConnectionRole role) const;
+    HanwhaDeviceType deviceType() const;
+
+    QString nxProfileName(
+        Qn::ConnectionRole role,
+        boost::optional<int> forcedProfileNameLength = boost::none) const;
 
     std::shared_ptr<HanwhaSharedResourceContext> sharedContext() const;
 
@@ -113,8 +133,7 @@ public:
     HanwhaProfileParameters makeProfileParameters(
         Qn::ConnectionRole role,
         const QnLiveStreamParams& parameters,
-        bool isAudioSupported,
-        bool isNewProfile = false) const;
+        HanwhaProfileParameterFlags flags) const;
 
 protected:
     virtual nx::mediaserver::resource::StreamCapabilityMap getStreamCapabilityMapFromDrives(
@@ -129,7 +148,10 @@ protected:
 private:
     CameraDiagnostics::Result initDevice();
     CameraDiagnostics::Result initSystem();
+
     CameraDiagnostics::Result initMedia();
+    CameraDiagnostics::Result setProfileSessionPolicy();
+
     CameraDiagnostics::Result initIo();
     CameraDiagnostics::Result initPtz();
     CameraDiagnostics::Result initAlternativePtz();
@@ -155,6 +177,8 @@ private:
         int secondaryProfile);
 
     CameraDiagnostics::Result fetchPtzLimits(QnPtzLimits* outPtzLimits);
+
+    CameraDiagnostics::Result fetchCodecInfo(HanwhaCodecInfo* outCodecInfo);
 
     void cleanUpOnProxiedDeviceChange();
 
@@ -235,6 +259,9 @@ private:
     QnCameraAdvancedParamValueList filterGroupParameters(
         const QnCameraAdvancedParamValueList& values);
 
+    QnCameraAdvancedParamValueList addAssociatedParameters(
+        const QnCameraAdvancedParamValueList& values);
+
     QString groupLead(const QString& groupName) const;
 
     boost::optional<QnCameraAdvancedParamValue> findButtonParameter(
@@ -272,6 +299,13 @@ private:
     const HanwhaCgiParameters& cgiParameters() const;
     boost::optional<int> bypassChannel() const;
 
+    // Proxied id is an id of a device connected to some proxy (e.g. NVR)
+    virtual QString proxiedId() const;
+    virtual void setProxiedId(const QString& proxiedId);
+
+    bool isBypassSupported() const;
+    bool isProxiedMultisensorCamera() const;
+
 private:
     using AdvancedParameterId = QString;
 
@@ -287,13 +321,16 @@ private:
 
     std::map<AdvancedParameterId, HanwhaAdavancedParameterInfo> m_advancedParameterInfos;
 
+    bool m_isBypassSupported = false;
+    int m_proxiedDeviceChannelCount = 1;
+
     HanwhaAttributes m_attributes;
     HanwhaAttributes m_bypassDeviceAttributes;
 
     HanwhaCgiParameters m_cgiParameters;
     HanwhaCgiParameters m_bypassDeviceCgiParameters;
 
-    bool m_isNvr = false;
+    HanwhaDeviceType m_deviceType = HanwhaDeviceType::unknown;
     bool m_isChannelConnectedViaSunapi = false;
 
     nx::media::CameraMediaCapability m_capabilities;

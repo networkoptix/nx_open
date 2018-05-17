@@ -1,6 +1,7 @@
 #include "camera_settings_dialog.h"
 #include "ui_camera_settings_dialog.h"
 
+#include <QtCore/QSharedPointer>
 #include <QtWidgets/QPushButton>
 
 #include <core/resource_management/resource_pool.h>
@@ -19,15 +20,22 @@
 #include "widgets/camera_settings_general_tab_widget.h"
 #include "widgets/camera_schedule_widget.h"
 #include "widgets/camera_motion_settings_widget.h"
+#include "widgets/camera_fisheye_settings_widget.h"
+#include "widgets/camera_expert_settings_widget.h"
+#include "widgets/io_module_settings_widget.h"
 
 #include "redux/camera_settings_dialog_state.h"
 #include "redux/camera_settings_dialog_store.h"
 
 #include "watchers/camera_settings_readonly_watcher.h"
 #include "watchers/camera_settings_panic_watcher.h"
+#include "watchers/camera_settings_global_settings_watcher.h"
 
 #include "utils/camera_settings_dialog_state_conversion_functions.h"
 #include <utils/license_usage_helper.h>
+
+#include <nx/client/desktop/image_providers/camera_thumbnail_manager.h>
+#include <nx/client/desktop/ui/actions/action_manager.h>
 
 namespace nx {
 namespace client {
@@ -39,6 +47,7 @@ struct CameraSettingsDialog::Private
     QPointer<CameraSettingsReadOnlyWatcher> readOnlyWatcher;
     QnVirtualCameraResourceList cameras;
     QPointer<QnCamLicenseUsageHelper> licenseUsageHelper;
+    QSharedPointer<CameraThumbnailManager> previewManager;
 
     bool hasChanges() const
     {
@@ -78,6 +87,37 @@ struct CameraSettingsDialog::Private
     {
         store->loadCameras(cameras);
     }
+
+    CameraSettingsGeneralTabWidget* createGeneralTab(CameraSettingsDialog* q)
+    {
+        auto generalTab = new CameraSettingsGeneralTabWidget(store, q->ui->tabWidget);
+        QObject::connect(generalTab, &CameraSettingsGeneralTabWidget::actionRequested, q,
+            [this, q](CameraInfoWidget::Action action)
+            {
+                switch (action)
+                {
+                    case CameraInfoWidget::Action::ping:
+                        NX_ASSERT(store);
+                        q->menu()->trigger(ui::action::PingAction,
+                            {Qn::TextRole, store->state().singleCameraProperties.ipAddress});
+                        break;
+
+                    case CameraInfoWidget::Action::openEventLog:
+                        q->menu()->trigger(ui::action::CameraIssuesAction, cameras);
+                        break;
+
+                    case CameraInfoWidget::Action::openEventRules:
+                        q->menu()->trigger(ui::action::CameraBusinessRulesAction, cameras);
+                        break;
+
+                    case CameraInfoWidget::Action::showOnLayout:
+                        q->menu()->trigger(ui::action::OpenInNewTabAction, cameras);
+                        break;
+                }
+            });
+
+        return generalTab;
+    }
 };
 
 CameraSettingsDialog::CameraSettingsDialog(QWidget* parent):
@@ -94,17 +134,21 @@ CameraSettingsDialog::CameraSettingsDialog(QWidget* parent):
     connect(d->store, &CameraSettingsDialogStore::stateChanged, this,
         &CameraSettingsDialog::loadState);
 
-    d->readOnlyWatcher = new CameraSettingsReadOnlyWatcher(this);
-    d->readOnlyWatcher->setStore(d->store);
+    d->readOnlyWatcher = new CameraSettingsReadOnlyWatcher(d->store, this);
 
     d->licenseUsageHelper = new QnCamLicenseUsageHelper(commonModule(), this);
 
-    auto panicWatcher = new CameraSettingsPanicWatcher(this);
-    panicWatcher->setStore(d->store);
+    d->previewManager.reset(new CameraThumbnailManager());
+    d->previewManager->setAutoRotate(true);
+    d->previewManager->setThumbnailSize(QSize(0, 0));
+    d->previewManager->setAutoRefresh(false);
+
+    new CameraSettingsPanicWatcher(d->store, this);
+    new CameraSettingsGlobalSettingsWatcher(d->store, this);
 
     addPage(
         int(CameraSettingsTab::general),
-        new CameraSettingsGeneralTabWidget(d->store, ui->tabWidget),
+        d->createGeneralTab(this),
         tr("General"));
 
     addPage(
@@ -113,9 +157,24 @@ CameraSettingsDialog::CameraSettingsDialog(QWidget* parent):
         tr("Recording"));
 
     addPage(
+        int(CameraSettingsTab::io),
+        new IoModuleSettingsWidget(d->store, ui->tabWidget),
+        tr("I/O Ports"));
+
+    addPage(
         int(CameraSettingsTab::motion),
         new CameraMotionSettingsWidget(d->store, ui->tabWidget),
         tr("Motion"));
+
+    addPage(
+        int(CameraSettingsTab::fisheye),
+        new CameraFisheyeSettingsWidget(d->previewManager, d->store, ui->tabWidget),
+        tr("Fisheye"));
+
+    addPage(
+        int(CameraSettingsTab::expert),
+        new CameraExpertSettingsWidget(d->store, ui->tabWidget),
+        tr("Expert"));
 
     auto selectionWatcher = new QnWorkbenchSelectionWatcher(this);
     connect(
@@ -198,6 +257,9 @@ bool CameraSettingsDialog::setCameras(const QnVirtualCameraResourceList& cameras
     d->cameras = cameras;
     d->resetChanges();
     d->readOnlyWatcher->setCameras(cameras);
+    d->previewManager->selectCamera(cameras.size() == 1
+        ? cameras.front()
+        : QnVirtualCameraResourcePtr());
 
     return true;
 }
@@ -277,8 +339,22 @@ void CameraSettingsDialog::loadState(const CameraSettingsDialogState& state)
             applyButton->setEnabled(!state.readOnly && state.hasChanges);
     }
 
-    setPageVisible(int(CameraSettingsTab::motion), state.devicesCount == 1
-        && state.devicesDescription.hasMotion == CameraSettingsDialogState::CombinedValue::All);
+    // TODO: #vkutin #gdm Ensure correct visibility/enabled state.
+    // Legacy code has more complicated conditions.
+
+    using CombinedValue = CameraSettingsDialogState::CombinedValue;
+
+    setPageVisible(int(CameraSettingsTab::motion), state.isSingleCamera()
+        && state.devicesDescription.hasMotion == CombinedValue::All);
+
+    setPageVisible(int(CameraSettingsTab::fisheye),
+        state.isSingleCamera() && state.singleCameraProperties.hasVideo);
+
+    setPageVisible(int(CameraSettingsTab::io), state.isSingleCamera()
+        && state.devicesDescription.isIoModule == CombinedValue::All);
+
+    setPageVisible(int(CameraSettingsTab::expert),
+        state.devicesDescription.isIoModule == CombinedValue::None);
 
     ui->alertBar->setText(getAlertText(state));
 }
@@ -291,41 +367,41 @@ QString CameraSettingsDialog::getAlertText(const CameraSettingsDialogState& stat
     using Alert = CameraSettingsDialogState::Alert;
     switch (*state.alert)
     {
-        case Alert::BrushChanged:
+        case Alert::brushChanged:
             return tr("Select areas on the schedule to apply chosen parameters to.");
 
-        case Alert::EmptySchedule:
+        case Alert::emptySchedule:
             return tr(
                 "Set recording parameters and select areas "
                 "on the schedule grid to apply them to.");
 
-        case Alert::NotEnoughLicenses:
+        case Alert::notEnoughLicenses:
             return tr("Not enough licenses to enable recording.");
 
-        case Alert::LicenseLimitExceeded:
+        case Alert::licenseLimitExceeded:
             return tr("License limit exceeded, recording will not be enabled.");
 
-        case Alert::RecordingIsNotEnabled:
+        case Alert::recordingIsNotEnabled:
             return tr("Turn on selector at the top of the window to enable recording.");
 
-        case Alert::HighArchiveLength:
+        case Alert::highArchiveLength:
             return QnCameraDeviceStringSet(
                     tr("High minimum value can lead to archive length decrease on other devices."),
                     tr("High minimum value can lead to archive length decrease on other cameras."))
                 .getString(state.deviceType);
 
-        case Alert::MotionDetectionRequiresRecording:
+        case Alert::motionDetectionRequiresRecording:
             return tr(
                 "Motion detection will work only when camera is being viewed. "
                 "Enable recording to make it work all the time.");
 
-        case Alert::MotionDetectionTooManyRectangles:
+        case Alert::motionDetectionTooManyRectangles:
             return tr("Maximum number of motion detection rectangles for current camera is reached");
 
-        case Alert::MotionDetectionTooManyMaskRectangles:
+        case Alert::motionDetectionTooManyMaskRectangles:
             return tr("Maximum number of ignore motion rectangles for current camera is reached");
 
-        case Alert::MotionDetectionTooManySensitivityRectangles:
+        case Alert::motionDetectionTooManySensitivityRectangles:
             return tr("Maximum number of detect motion rectangles for current camera is reached");
 
         default:

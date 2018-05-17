@@ -38,7 +38,7 @@ void TrackingMapper::addMapping(int nvidiaTrackingId, const nxpl::NX_GUID& nxObj
     NX_OUTPUT
         << __func__
         << " Adding a mapping for object with tracking id "
-        << ",  Nx Guid" << nxpt::NxGuidHelper::toStdString(nxObjectId);
+        << ",  Nx Guid" << nxObjectId;
 
     m_trackingMap.emplace(nvidiaTrackingId, TrackedObject(nxObjectId, m_lifetime));
 }

@@ -1,5 +1,9 @@
 #pragma once
 
+#include <set>
+
+#include <plugins/resource/hanwha/hanwha_common.h>
+
 #include <common/common_globals.h>
 #include <core/resource/camera_advanced_param.h>
 
@@ -37,6 +41,10 @@ public:
     QString parameterValue() const;
     bool shouldAffectAllChannels() const;
 
+    // Parameter can be applied only to certain device types.
+    bool isDeviceTypeSupported(HanwhaDeviceType deviceType) const;
+    QSet<QString> associatedParameters() const;
+
     bool isValid() const;
 
 private:
@@ -63,11 +71,14 @@ private:
     QString m_groupIncludeCondition;
     bool m_isGroupLead = false;
     bool m_shouldAffectAllChannels = false;
+    std::set<HanwhaDeviceType> m_deviceTypes;
 
     QString m_cgi;
     QString m_submenu;
     QString m_parameterName;
     QString m_parameterValue;
+
+    QSet<QString> m_associatedParameters;
 
     static const std::map<QString, QString HanwhaAdavancedParameterInfo::*> m_stringAuxes;
     static const std::map<QString, bool HanwhaAdavancedParameterInfo::*> m_boolAuxes;

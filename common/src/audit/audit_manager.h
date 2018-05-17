@@ -16,6 +16,16 @@
 #include <nx/utils/singleton.h>
 #include <common/common_module_aware.h>
 
+namespace nx {
+namespace mediaserver {
+namespace test { 
+
+class AuditManagerTest; 
+
+} // namespace test
+} // namespace mediaserver
+} // namespace nx
+
 class QnAuditManager:
     public QObject,
     public QnCommonModuleAware,
@@ -64,6 +74,8 @@ private slots:
     void at_timer();
 
 private:
+    friend nx::mediaserver::test::AuditManagerTest;
+
     int registerNewConnection(const QnAuthSession &data, bool explicitCall);
     bool hasSimilarRecentlyRecord(const QnAuditRecord& data) const;
 
@@ -117,10 +129,15 @@ private:
     std::deque<QnAuditRecord> m_recentlyAddedRecords;
 
 private:
-    bool canJoinRecords(const QnAuditRecord& left, const QnAuditRecord& right);
+    static bool canJoinRecords(const QnAuditRecord& left, const QnAuditRecord& right);
     void cleanupExpiredSessions();
     template <class T>
-    void processDelayedRecords(QVector<T>& recordsToAggregate); // group and write to DB playback records
+    static std::vector<QnAuditRecord> processDelayedRecordsInternal(
+        QVector<T>& recordsToAggregate,
+        int recordAggregationTimeMs); // group and write to DB playback records
+    template <class T>
+    void processDelayedRecords(
+        QVector<T>& recordsToAggregate); // group and write to DB playback records
 };
 
 #define qnAuditManager QnAuditManager::instance()

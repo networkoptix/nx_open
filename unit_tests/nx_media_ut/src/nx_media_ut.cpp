@@ -51,11 +51,17 @@ static QString qSizeToString(const QSize& size)
 class MockVideoDecoder: public AbstractVideoDecoder
 {
 public:
-    MockVideoDecoder(const RenderContextSynchronizerPtr& /*allocator*/, const QSize& /*resolution*/)
+    MockVideoDecoder(
+        const RenderContextSynchronizerPtr& /*synchronizer*/, const QSize& /*resolution*/)
     {
     }
 
     virtual ~MockVideoDecoder() {}
+
+    virtual Capabilities capabilities() const override
+    {
+        return Capability::noCapability;
+    }
 
     static bool isCompatible(
         const AVCodecID codec, const QSize& resolution, bool /*allowOverlay*/)
@@ -572,7 +578,9 @@ TEST_F(NxMediaPlayerTest, SetQuality)
     T.channels(4).noTrans()
                .low(320, 240).high(1920, 1080).max(1920, 1080).req(high) >> low;
 
-    #undef T
+    T                        .high(4096, 2160).max(1920, 1080).req(1080) >> QSize(1920, 1012);
+
+#undef T
 }
 
 } // namespace test

@@ -1,9 +1,9 @@
 {
   "cameraLinks": {
-    "highStream": "Yüksek akış",
-    "lowStream": "Düşük akış",
+    "highStream": "Yüksek çözünürlük",
+    "lowStream": "Düşük çözünürlük",
     "transcoding": "Dönüştürme",
-    "unknown": "Bilinmeyen",
+    "unknown": "Belirtilmemiş",
     "copyToClipboard": "panoya yapıştır",
     "copyDefaultText": "kopyala",
     "copyActiveText": "panoya kopyalandı"
@@ -15,7 +15,7 @@
     "unauthorized": "Kimlik doğrulaması gerekli",
     "noData": "Veri bulunamadı",
     "iosVideoTooLarge": "iOS, fullHD'den daha büyük videoyu desteklemez (2MP: 1920x1080).",
-    "flashRequired": "Please <a href='https://get.adobe.com/flashplayer/' target='_blank'>install Adobe Flash</a> for playing videos.",
+    "flashRequired": "Videoları oynatmak için lütfen <a href='https://get.adobe.com/flashplayer/' target='_blank'>Adobe Flash</a>'i yükleyin.",
     "flashOrWebmRequired": "Internet Explorer'da video oynatmak için lütfen <a href='https://get.adobe.com/flashplayer/' target='_blank'> Adobe Flash</a> veya<a href='https://tools.google.com/dlpage/webmmf/' target='_blank'>WebM codec'i</a> yükleyin.",
     "noArmSupport": "Bu tarayıcı veya aygıt, ARM tabanlı sunuculardan video oynatmayı desteklemez.",
     "noFormat": "Bu tarayıcı veya cihaz bu kameradan video oynatmayı desteklemez.",
@@ -29,19 +29,19 @@
     "high": "Yüksek",
     "low": "Düşük"
   },
-  "chromeCastWarning": "Chromecast is resource intensive and may cause issues on your server.",
+  "chromeCastWarning": "Chromecast kaynak yoğunluğudur ve sunucunuzda sorunlara neden olabilir.",
   "voiceCommands": {
     "play": "oynat",
     "pause": "duraklat",
     "live": "go to live | show me live",
     "view": "view + [camera name]",
     "search": "find + [text for searchbar]",
-    "clear search": "clear search",
+    "clear search": "aramayı temizle",
     "expand server": "expand server + [server name]",
     "collapse server": "collapse server + [server name]",
-    "expand all servers": "expand all servers",
-    "collapse all servers": "collapse all servers",
-    "stop listening": "stop listening",
+    "expand all servers": "tüm sunucuları genişlet",
+    "collapse all servers": "tüm sunucuları daralt",
+    "stop listening": "dinlemeyi durdur",
     "help": "help | show commands"
   }
 }

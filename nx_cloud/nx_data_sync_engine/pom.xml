@@ -23,7 +23,7 @@
         <targetName>nx_data_sync_engine</targetName>
 
         <qt.libs>core network concurrent sql xml</qt.libs>
-        <global.libs>-lcommon -lnx_network -ludt -lcloud_db_client -lappserver2 -lnx_utils -lnx_fusion</global.libs>
+        <global.libs>-lcommon -lnx_network -ludt -lcloud_db_client -lappserver2 -lmediaserver_db -lnx_utils -lnx_fusion</global.libs>
         <windows.oslibs>-lws2_32 -lIphlpapi DbgHelp.lib -lwinmm</windows.oslibs>
         <mac.oslibs>-lbz2 -framework IOKit -framework CoreServices -lcrypto</mac.oslibs>
 
@@ -56,6 +56,15 @@
             <type>pom</type>
             <scope>system</scope>
             <systemPath>${root.dir}/appserver2/pom.xml</systemPath>
+        </dependency>
+
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>mediaserver_db</artifactId>
+            <version>${project.version}</version>
+            <type>pom</type>
+            <scope>system</scope>
+            <systemPath>${root.dir}/mediaserver_db/pom.xml</systemPath>
         </dependency>
     </dependencies>
 

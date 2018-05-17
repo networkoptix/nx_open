@@ -306,7 +306,7 @@ void WebSocket::sendPreparedMessage(nx::Buffer* buffer, int writeSize, IoComplet
             });
 }
 
-void WebSocket::cancelIOSync(nx::network::aio::EventType eventType)
+void WebSocket::cancelIoInAioThread(nx::network::aio::EventType eventType)
 {
     nx::utils::promise<void> p;
     auto f = p.get_future();

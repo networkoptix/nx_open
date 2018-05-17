@@ -17,6 +17,7 @@ public:
     QString directory = QString(); //< dataDir/log
     uint32_t maxFileSize = (uint32_t) stringToBytesConst("10M");
     uint8_t maxBackupCount = 5;
+    QString logBaseName;
 
     Settings();
 

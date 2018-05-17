@@ -25,7 +25,7 @@ if(MACOSX)
     set(mac_sources src/ui/workaround/mac_utils.mm)
 endif()
 
-file(GLOB_RECURSE QML_FILES static-resources/src/qml/*.qml static-resources/src/qml/*.js)
+file(GLOB_RECURSE QML_FILES static-resources/qml/*.qml static-resources/qml/*.js)
 
 nx_add_target(nx_client_desktop LIBRARY
     ADDITIONAL_SOURCES
@@ -36,6 +36,7 @@ nx_add_target(nx_client_desktop LIBRARY
         "${CMAKE_CURRENT_LIST_DIR}/skins/${defaultSkin}"
         "${customization_dir}/nx_client_desktop/resources"
         "${customization_dir}/icons/all/logo.png"
+        "${customization_dir}/license.txt"
         "${CMAKE_CURRENT_BINARY_DIR}/globals.json"
         "${nov_file_launcher_executable}"
     OTHER_SOURCES

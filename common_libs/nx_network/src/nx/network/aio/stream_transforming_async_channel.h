@@ -20,6 +20,7 @@ using UserIoHandler = IoCompletionHandler;
  *   moving data through utils::bstream::Converter first.
  * WARNING: Converter MUST NOT generate wouldBlock error by itself before
  *   invoking underlying input/output. Otherwise, behavior is undefined.
+ *   Effectively, that means conversion cannot change size of data.
  */
 class NX_NETWORK_API StreamTransformingAsyncChannel:
     public AbstractAsyncChannel
@@ -36,7 +37,9 @@ public:
 
     virtual void readSomeAsync(nx::Buffer* const buffer, UserIoHandler handler) override;
     virtual void sendAsync(const nx::Buffer& buffer, UserIoHandler handler) override;
-    virtual void cancelIOSync(aio::EventType eventType) override;
+
+protected:
+    virtual void cancelIoInAioThread(aio::EventType eventType) override;
 
 private:
     enum class UserTaskType
@@ -87,6 +90,13 @@ private:
         }
     };
 
+    struct RawSendContext
+    {
+        nx::Buffer data;
+        int userByteCount = 0;
+        UserIoHandler userHandler;
+    };
+
     std::unique_ptr<AbstractAsyncChannel> m_rawDataChannel;
     nx::utils::bstream::Converter* m_converter;
     nx::Buffer m_readBuffer;
@@ -98,7 +108,7 @@ private:
     std::deque<std::unique_ptr<UserTask>> m_userTaskQueue;
     nx::Buffer m_rawDataReadBuffer;
     std::deque<nx::Buffer> m_readRawData;
-    std::deque<nx::Buffer> m_rawWriteQueue;
+    std::deque<RawSendContext> m_rawWriteQueue;
     bool m_asyncReadInProgress;
     nx::utils::ObjectDestructionFlag m_destructionFlag;
 
@@ -118,10 +128,9 @@ private:
     void onSomeRawDataRead(SystemError::ErrorCode, std::size_t);
     int writeRawBytes(const void* data, size_t count);
     void onRawDataWritten(SystemError::ErrorCode, std::size_t);
-    void handleIoError(SystemError::ErrorCode sysErrorCode);
+    void reportFailureOfEveryUserTask(SystemError::ErrorCode sysErrorCode);
 
     void removeUserTask(UserTask* task);
-    void cancelIoWhileInAioThread(aio::EventType eventType);
 };
 
 } // namespace aio

@@ -15,7 +15,7 @@
 #include <utils/common/connective.h>
 #include <nx/utils/string.h>
 #include <common/common_module.h>
-#include <watchers/user_watcher.h>
+#include <nx/client/core/watchers/user_watcher.h>
 #include <watchers/available_cameras_watcher.h>
 #include <watchers/layout_cameras_watcher.h>
 #include <mobile_client/mobile_client_roles.h>
@@ -117,8 +117,8 @@ private:
 QnLayoutsModelUnsorted::QnLayoutsModelUnsorted(QObject* parent):
     base_type(parent)
 {
-    const auto userWatcher = commonModule()->instance<QnUserWatcher>();
-    connect(userWatcher, &QnUserWatcher::userChanged,
+    const auto userWatcher = commonModule()->instance<nx::client::core::UserWatcher>();
+    connect(userWatcher, &nx::client::core::UserWatcher::userChanged,
             this, &QnLayoutsModelUnsorted::at_userChanged);
     at_userChanged(userWatcher->user());
 

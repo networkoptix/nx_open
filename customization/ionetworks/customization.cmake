@@ -1,6 +1,8 @@
 # Components Namings
 set(product.name "EZ Pro")
 set(display.product.name "EZ Pro")
+set(display_mobile_name "EZ Pro Mobile")
+set(mobile_bundle_name "EZPro")
 set(product.name.short "ionetworks")
 set(product.appName "ezpro")
 set(company.name "ioEZ INC.")

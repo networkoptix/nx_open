@@ -3,19 +3,21 @@
 #include <QtCore/QList>
 #include <QtCore/QObject>
 
+#include <api/model/api_ioport_data.h>
 #include <common/common_globals.h>
 #include <core/resource/resource_fwd.h>
 #include <core/resource/motion_window.h>
 
 class QnAspectRatio;
+struct QnMediaDewarpingParams;
 
 namespace nx {
 namespace client {
 namespace desktop {
 
 class Rotation;
-struct CameraSettingsDialogState;
 struct ScheduleCellParams;
+struct CameraSettingsDialogState;
 
 class CameraSettingsDialogStore: public QObject
 {
@@ -32,6 +34,7 @@ public:
     void applyChanges();
     void setReadOnly(bool value);
     void setPanicMode(bool value);
+    void setSettingsOptimizationEnabled(bool value);
     void loadCameras(const QnVirtualCameraResourceList& cameras);
     void setSingleCameraUserName(const QString& text);
     void setScheduleBrush(const ScheduleCellParams& brush);
@@ -55,6 +58,20 @@ public:
     void setRecordingEnabled(bool value);
     void setMotionDetectionEnabled(bool value);
     void setMotionRegionList(const QList<QnMotionRegion>& value);
+    void setFisheyeSettings(const QnMediaDewarpingParams& value);
+    void setIoPortDataList(const QnIOPortDataList& value);
+    void setIoModuleVisualStyle(vms::api::IoModuleVisualStyle value);
+    void setCameraControlDisabled(bool value);
+    void setDualStreamingDisabled(bool value);
+    void setUseBitratePerGOP(bool value);
+    void setPrimaryRecordingDisabled(bool value);
+    void setSecondaryRecordingDisabled(bool value);
+    void setNativePtzPresetsDisabled(bool value);
+    void setRtpTransportType(vms::api::RtpTransportType value);
+    void setMotionStreamType(vms::api::MotionStreamType value);
+    void setLogicalId(int value);
+    void generateLogicalId();
+    void resetExpertSettings();
 
 signals:
     void stateChanged(const CameraSettingsDialogState& state);

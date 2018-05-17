@@ -1,7 +1,7 @@
 #include "sign_dialog.h"
 #include "ui_sign_dialog.h"
 
-#include <client/client_module.h>
+#include <client_core/client_core_module.h>
 
 #include "core/resource/avi/avi_resource.h"
 #include <core/dataprovider/data_provider_factory.h>
@@ -100,7 +100,7 @@ SignDialog::SignDialog(QnResourcePtr checkResource, QWidget* parent):
     m_resource = QnAviResourcePtr(new QnAviResource(checkResource->getUrl()));
 
     m_reader.reset(qobject_cast<QnAbstractArchiveStreamReader*> (
-        qnClientModule->dataProviderFactory()->createDataProvider(m_resource)));
+        qnClientCoreModule->dataProviderFactory()->createDataProvider(m_resource)));
 
     m_reader->setCycleMode(false);
 

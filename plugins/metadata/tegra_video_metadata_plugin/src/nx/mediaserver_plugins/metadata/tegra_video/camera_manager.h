@@ -1,20 +1,17 @@
 #pragma once
 
-#include <thread>
-#include <atomic>
 #include <memory>
 #include <mutex>
 #include <vector>
 
 #include <nx/sdk/metadata/common_video_frame_processing_camera_manager.h>
 
-#include <tegra_video.h> //< libtegra_video.so - analytics lib for Tx1 and Tx2.
+#include <tegra_video.h> //< libtegra_video.so - analytics for Tegra; the lib is a stub on a PC.
 
 #include "plugin.h"
 
 #include <nx/mediaserver_plugins/metadata/tegra_video/naive_object_tracker.h>
-#include <nx/mediaserver_plugins/metadata/tegra_video/naive_detection_smoother.h>
-#include <nx/sdk/metadata/common_compressed_video_packet.h>
+#include <nx/sdk/metadata/compressed_video_packet.h>
 
 namespace nx {
 namespace mediaserver_plugins {
@@ -31,14 +28,14 @@ protected:
     virtual std::string capabilitiesManifest() override;
 
     virtual bool pushCompressedVideoFrame(
-        const nx::sdk::metadata::CommonCompressedVideoPacket* videoFrame) override;
+        const nx::sdk::metadata::CompressedVideoPacket* videoFrame) override;
 
     virtual bool pullMetadataPackets(
         std::vector<nx::sdk::metadata::MetadataPacket*>* metadataPackets) override;
 
 private:
     bool pushCompressedFrame(
-        const nx::sdk::metadata::CommonCompressedVideoPacket* videoPacket);
+        const nx::sdk::metadata::CompressedVideoPacket* videoPacket);
 
     bool pullRectsForFrame(std::vector<TegraVideo::Rect>* rects, int64_t* outPtsUs);
 

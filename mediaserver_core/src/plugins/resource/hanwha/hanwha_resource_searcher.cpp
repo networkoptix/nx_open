@@ -6,6 +6,7 @@
 #include <common/static_common_module.h>
 #include <nx/utils/log/log_main.h>
 #include <nx/utils/scope_guard.h>
+#include <nx/fusion/serialization/lexical.h>
 
 #include "hanwha_resource_searcher.h"
 #include "hanwha_resource.h"
@@ -41,11 +42,6 @@ HanwhaResult<HanwhaInformation> HanwhaResourceSearcher::cachedDeviceInfo(const Q
     auto sharedId = lit("hash_%1:%2").arg(url.host()).arg(url.port(80));
     const auto context = qnServerModule->sharedContextPool()
         ->sharedContext<HanwhaSharedResourceContext>(sharedId);
-
-    {
-        QnMutexLocker lock(&m_mutex);
-        m_sharedContexts[sharedId] = context;
-    }
 
     context->setRecourceAccess(url, auth);
     return context->information();
@@ -135,6 +131,9 @@ QList<QnResourcePtr> HanwhaResourceSearcher::checkHostAddr(const utils::Url &url
         addMultichannelResources(result, auth);
     else if (channel > 0 || info->channelCount > 1)
         resource->updateToChannel(channel);
+
+    resource->setDeviceType(fromHanwhaToNxDeviceType(info->deviceType));
+
     return result;
 }
 
@@ -385,19 +384,23 @@ void HanwhaResourceSearcher::createResource(
 template <typename T>
 void HanwhaResourceSearcher::addMultichannelResources(QList<T>& result, const QAuthenticator& auth)
 {
-    HanwhaResourcePtr firstResource = result.last().template dynamicCast<HanwhaResource>();
+    const auto firstResource = result.last().template dynamicCast<HanwhaResource>();
     const auto physicalId = firstResource->getPhysicalId();
-    auto channels = m_channelsByCamera[physicalId];
-    if (channels == 0)
+
+    auto& baseDeviceInfo = m_baseDeviceInfos[physicalId];
+    if (!baseDeviceInfo.isValid())
     {
-        if (auto info = cachedDeviceInfo(auth, firstResource->getUrl()))
-            channels = m_channelsByCamera[physicalId] = info->channelCount;
+        const auto deviceInfo = cachedDeviceInfo(auth, firstResource->getUrl());
+        baseDeviceInfo.numberOfChannels = deviceInfo->channelCount;
+        baseDeviceInfo.deviceType = fromHanwhaToNxDeviceType(deviceInfo->deviceType);
     }
 
-    if (channels > 1)
+    if (baseDeviceInfo.isValid() && baseDeviceInfo.numberOfChannels > 1)
     {
+        firstResource->setDeviceType(baseDeviceInfo.deviceType);
         firstResource->updateToChannel(0);
-        for (int i = 1; i < channels; ++i)
+
+        for (int i = 1; i < baseDeviceInfo.numberOfChannels; ++i)
         {
             HanwhaResourcePtr resource(new HanwhaResource());
 
@@ -415,6 +418,7 @@ void HanwhaResourceSearcher::addMultichannelResources(QList<T>& result, const QA
 
             resource->setUrl(firstResource->getUrl());
             resource->updateToChannel(i);
+            resource->setDeviceType(baseDeviceInfo.deviceType);
 
             result.push_back(resource);
         }

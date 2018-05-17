@@ -1,9 +1,12 @@
 #include "camera_advanced_parameters_providers.h"
 
+#include <boost/rational.hpp>
+
 #include <camera/camera_pool.h>
 #include <camera/video_camera.h>
 #include <nx/fusion/serialization/json.h>
 #include <nx/utils/log/log.h>
+#include <nx/fusion/serialization/lexical.h>
 
 namespace nx {
 namespace mediaserver {
@@ -18,6 +21,8 @@ static const auto kFps = lit("fps");
 static const auto kResetToDefaults = lit("resetToDefaults");
 static const auto kStreamParametersProviderId = lit("971009D8-384D-43C1-85BF-44A2B99253D5");
 static const auto kStreamParametersProviderVersion = lit("1.0");
+static const double kDefaultAllowedAspectRatioDiff = 0.1;
+static const QString kAllowedAspectRatioDiffAttribute = lit("allowedAspectRatioDiff");
 
 // TODO: Makes sense to somewhere in nx::utils.
 static const QString sizeToString(const QSize& size)
@@ -53,19 +58,43 @@ static QString makeRange(QStringList list)
 }
 
 // TODO: Makes sense to move into QnCameraAdvancedParameterCondition.
-static QnCameraAdvancedParameterCondition valueCondition(const QString& name, const QString& value)
+static QnCameraAdvancedParameterCondition condition(
+    const QString& name,
+    const QString& value,
+    QnCameraAdvancedParameterCondition::ConditionType conditionType)
 {
     QnCameraAdvancedParameterCondition condition;
     condition.paramId = name;
-    condition.type = QnCameraAdvancedParameterCondition::ConditionType::equal;
+    condition.type = conditionType;
     condition.value = value;
     return condition;
+}
+
+// TODO: Makes sense to move into QnCameraAdvancedParameterCondition.
+static QnCameraAdvancedParameterCondition valueCondition(const QString& name, const QString& value)
+{
+    return condition(name, value, QnCameraAdvancedParameterCondition::ConditionType::equal);
+}
+
+static QnCameraAdvancedParameterDependency dependency(
+    QnCameraAdvancedParameterDependency::DependencyType type,
+    const QString& value,
+    std::vector<QnCameraAdvancedParameterCondition> conditions,
+    const QString& prefix = QString())
+{
+    QnCameraAdvancedParameterDependency dependency;
+    dependency.type = type;
+    dependency.range = value;
+    dependency.conditions = std::move(conditions);
+    dependency.autoFillId(prefix);
+    return dependency;
 }
 
 // TODO: Makes sense to move into QnCameraAdvancedParameterDependency.
 static QnCameraAdvancedParameterDependency valueDependency(
     QnCameraAdvancedParameterDependency::DependencyType type,
-    const QString& value, const std::map<QString, QString>& valueConditions)
+    const QString& value,
+    const std::map<QString, QString>& valueConditions)
 {
     QnCameraAdvancedParameterDependency dependency;
     dependency.type = type;
@@ -76,21 +105,48 @@ static QnCameraAdvancedParameterDependency valueDependency(
     return dependency;
 }
 
+static boost::optional<boost::rational<int>> resolutionAspectRatio(const QString& resolutionString)
+{
+    const auto resolution = sizeFromString(resolutionString);
+    if (resolution == boost::none)
+        return boost::none;
+
+    return boost::rational<int>(resolution->width(), resolution->height());
+}
+
+static std::function<bool(const QString&)> hasSimilarAspectRatioFilter(
+    double aspectRatio,
+    double allowedAspectRatioDifference)
+{
+    return
+        [aspectRatio, allowedAspectRatioDifference](const QString& resolutionString)
+        {
+            const auto aspectFromResolution = resolutionAspectRatio(resolutionString);
+            if (aspectFromResolution == boost::none)
+                return false;
+
+            const auto diff = aspectRatio - boost::rational_cast<double>(*aspectFromResolution);
+            return diff < allowedAspectRatioDifference && diff > -allowedAspectRatioDifference;
+        };
+}
+
 } // namespace
 
 StreamCapabilityAdvancedParametersProvider::StreamCapabilityAdvancedParametersProvider(
     Camera* camera,
-    const StreamCapabilityMap& capabilities,
+    const StreamCapabilityMaps& capabilities,
+    const nx::media::CameraTraits& traits,
     Qn::StreamIndex streamIndex,
     const QSize& baseResolution)
 :
     m_camera(camera),
     m_capabilities(capabilities),
+    m_traits(traits),
     m_streamIndex(streamIndex),
     m_descriptions(describeCapabilities()),
-    m_defaults(bestParameters(capabilities, baseResolution))
+    m_defaults(bestParameters(capabilities[streamIndex], baseResolution))
 {
-    for (auto it = capabilities.begin(); it != capabilities.end(); ++it)
+    for (auto it = capabilities[m_streamIndex].begin(); it != capabilities[m_streamIndex].end(); ++it)
     {
         NX_VERBOSE(this, lm("Camera %1 supports %2 with %3").args(
             m_camera->getPhysicalId(), it.key(), it.value()));
@@ -150,11 +206,39 @@ void StreamCapabilityAdvancedParametersProvider::updateMediaCapabilities()
     StreamCapabilityKey key;
     key.codec = m_parameters.codec;
     key.resolution = m_parameters.resolution;
-    auto streamCapabilities = m_capabilities.value(key);
+    auto streamCapabilities = currentStreamCapabilities().value(key);
 
     auto mediaCapabilities = m_camera->cameraMediaCapability();
     mediaCapabilities.streamCapabilities[m_streamIndex] = streamCapabilities;
     m_camera->setCameraMediaCapability(mediaCapabilities);
+}
+
+QSet<QString> StreamCapabilityAdvancedParametersProvider::filterResolutions(
+    Qn::StreamIndex streamIndex,
+    std::function<bool(const QString&)> filterFunc) const
+{
+    const auto& capabilities = m_capabilities[streamIndex];
+    QSet<QString> result;
+
+    for (auto codecItr = capabilities.cbegin(); codecItr != capabilities.cend(); ++codecItr)
+    {
+        const auto resolutionString = sizeToString(codecItr.key().resolution);
+        if (filterFunc(resolutionString))
+            result.insert(resolutionString);
+    }
+
+    return result;
+}
+
+boost::optional<nx::media::CameraTraitAttributes> StreamCapabilityAdvancedParametersProvider::trait(
+    nx::media::CameraTraitType traitType) const
+{
+    const auto traitString = QnLexical::serialized(traitType);
+    auto traitItr = m_traits.find(traitString);
+    if (traitItr == m_traits.cend())
+        return boost::none;
+
+    return traitItr->second;
 }
 
 QnCameraAdvancedParams StreamCapabilityAdvancedParametersProvider::descriptions()
@@ -239,10 +323,19 @@ QSet<QString> StreamCapabilityAdvancedParametersProvider::set(
     return setParameters(parameters) ? ids : QSet<QString>();
 }
 
+const StreamCapabilityMap&
+    StreamCapabilityAdvancedParametersProvider::currentStreamCapabilities() const
+{
+    return m_capabilities.find(m_streamIndex).value();
+}
+
 QnCameraAdvancedParams StreamCapabilityAdvancedParametersProvider::describeCapabilities() const
 {
     QMap<QString, QMap<QString, nx::media::CameraStreamCapability>> codecResolutionCapabilities;
-    for (auto it = m_capabilities.begin(); it != m_capabilities.end(); ++it)
+    const auto streamCapabilities = currentStreamCapabilities();
+
+    auto rpt = streamCapabilities.begin();
+    for (auto it = streamCapabilities.begin(); it != streamCapabilities.end(); ++it)
         codecResolutionCapabilities[it.key().codec][sizeToString(it.key().resolution)] = it.value();
 
     QnCameraAdvancedParamGroup streamParameters;
@@ -271,7 +364,7 @@ QnCameraAdvancedParams StreamCapabilityAdvancedParametersProvider::describeCapab
 }
 
 std::vector<QnCameraAdvancedParameter> StreamCapabilityAdvancedParametersProvider::describeCapabilities(
-    const QMap<QString, QMap<QString, nx::media::CameraStreamCapability>>&
+    const QMap<CodecString, QMap<ResolutionString, nx::media::CameraStreamCapability>>&
         codecResolutionCapabilities) const
 {
     QnCameraAdvancedParameter codec;
@@ -285,14 +378,85 @@ std::vector<QnCameraAdvancedParameter> StreamCapabilityAdvancedParametersProvide
     resolution.name = lit("Resolution");
     resolution.dataType = QnCameraAdvancedParameter::DataType::Enumeration;
 
-    // Dependency: resolution -> codec.
+    const auto traitAttributes = trait(nx::media::CameraTraitType::aspectRatioDependent);
+    const bool doesResolutionDependOnAspectRatio = m_streamIndex == Qn::StreamIndex::secondary
+        && traitAttributes != boost::none;
+
+    auto allowedAspectRatioDiff = kDefaultAllowedAspectRatioDiff;
+    if (doesResolutionDependOnAspectRatio)
+    {
+        for (const auto& entry: *traitAttributes)
+        {
+            const auto& attributeName = entry.first;
+            const auto& attributeValue = entry.second;
+
+            if (attributeName != kAllowedAspectRatioDiffAttribute)
+                continue;
+
+            allowedAspectRatioDiff = attributeValue.toDouble();
+        }
+    }
+
     for (auto codecResolution = codecResolutionCapabilities.begin();
          codecResolution != codecResolutionCapabilities.end(); ++codecResolution)
     {
-        resolution.dependencies.push_back(valueDependency(
-            QnCameraAdvancedParameterDependency::DependencyType::range,
-            makeRange(codecResolution.value().keys()),
-            {{parameterName(kCodec), codecResolution.key()}}));
+        if (!doesResolutionDependOnAspectRatio)
+        {
+            resolution.dependencies.push_back(valueDependency(
+                QnCameraAdvancedParameterDependency::DependencyType::range,
+                makeRange(codecResolution.value().keys()),
+                { {parameterName(kCodec), codecResolution.key()} }));
+        }
+        else
+        {
+            const auto resolutionsRestrictedByCodec = codecResolution.value().keys().toSet();
+            std::set<boost::rational<int>> processedAspects;
+            for (auto resolutionCapability = codecResolution.value().cbegin();
+                resolutionCapability != codecResolution.value().cend();
+                ++resolutionCapability)
+            {
+                const auto& resolutionString = resolutionCapability.key();
+                const auto aspectRatio = resolutionAspectRatio(resolutionString);
+                if (aspectRatio == boost::none)
+                    continue;
+
+                if (processedAspects.find(*aspectRatio) != processedAspects.cend())
+                    continue;
+
+                processedAspects.insert(*aspectRatio);
+                const auto filter = hasSimilarAspectRatioFilter(
+                    boost::rational_cast<double>(*aspectRatio),
+                    allowedAspectRatioDiff);
+
+                const auto primaryResolutionsRestrictedByAspectRatio = filterResolutions(
+                    Qn::StreamIndex::primary,
+                    filter);
+
+                auto secondaryResolutionsRestrictedByAspectRatio = filterResolutions(
+                    Qn::StreamIndex::secondary,
+                    filter);
+
+                const auto availableSecondaryResolutionRange = makeRange(
+                    secondaryResolutionsRestrictedByAspectRatio.intersect(
+                        resolutionsRestrictedByCodec).toList());
+
+                resolution.dependencies.push_back(
+                    dependency(
+                        QnCameraAdvancedParameterDependency::DependencyType::range,
+                        availableSecondaryResolutionRange,
+                        {
+                            QnCameraAdvancedParameterCondition(
+                                QnCameraAdvancedParameterCondition::ConditionType::equal,
+                                parameterName(kCodec),
+                                codecResolution.key()),
+                            QnCameraAdvancedParameterCondition(
+                                QnCameraAdvancedParameterCondition::ConditionType::inRange,
+                                streamParameterName(Qn::StreamIndex::primary, kResolution),
+                                primaryResolutionsRestrictedByAspectRatio.toList().join(L','))
+                        },
+                        lit("aspectRatio")));
+            }
+        }
     }
 
     if (m_streamIndex == Qn::StreamIndex::primary)
@@ -374,7 +538,7 @@ static const std::vector<QnLiveStreamParams> calculateRecomendedOptions(
         optionsByCodec[option.codec].push_back(option);
     }
 
-    // By default we recomentd to use h264 because of the performance and wide support.
+    // By default we recommend to use h264 because of the performance and wide support.
     const auto h264 = optionsByCodec.find(lit("H264"));
     if (h264 != optionsByCodec.end())
         return h264->second;
@@ -439,9 +603,17 @@ QString StreamCapabilityAdvancedParametersProvider::proprtyName() const
 
 QString StreamCapabilityAdvancedParametersProvider::parameterName(const QString& baseName) const
 {
+    return streamParameterName(m_streamIndex, baseName);
+}
+
+QString StreamCapabilityAdvancedParametersProvider::streamParameterName(
+    Qn::StreamIndex stream,
+    const QString & baseName)
+{
     return lm("%1.%2").args(
-        m_streamIndex == Qn::StreamIndex::primary ? lit("primaryStream") : lit("secondaryStream"),
+        stream == Qn::StreamIndex::primary ? lit("primaryStream") : lit("secondaryStream"),
         baseName);
+    return QString();
 }
 
 boost::optional<QString> StreamCapabilityAdvancedParametersProvider::getValue(

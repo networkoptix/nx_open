@@ -4,20 +4,12 @@ from contextlib import contextmanager
 
 from framework.networking.linux import LinuxNetworking
 from framework.networking.windows import WindowsNetworking
-from framework.os_access.ssh import SSHAccess
-from framework.os_access.windows_remoting.winrm_access import WinRMAccess
-from framework.utils import wait_until
+from framework.os_access.ssh_access import SSHAccess
+from framework.os_access.winrm_access import WinRMAccess
 from framework.vms.hypervisor import VMNotFound, obtain_running_vm
+from framework.waiting import wait_for_true
 
 logger = logging.getLogger(__name__)
-
-
-class VMNotResponding(Exception):
-    def __init__(self, alias, name):
-        super(VMNotResponding, self).__init__("Machine {} ({}) is not responding".format(name, alias))
-        self.alias = alias
-        self.name = name
-
 
 VM = namedtuple('VM', ['alias', 'index', 'type', 'name', 'ports', 'networking', 'os_access'])
 
@@ -43,26 +35,22 @@ class VMFactory(object):
                 networking = LinuxNetworking(ssh_access, info.macs.values())
                 os_access = ssh_access  # Lose type information.
             elif vm_type_configuration['os_family'] == 'windows':
-                hostname, port = info.ports['tcp', 5985]
-                winrm_access = WinRMAccess(hostname, port)
+                winrm_access = WinRMAccess(info.ports)
                 networking = WindowsNetworking(winrm_access, info.macs)
                 os_access = winrm_access  # Lose type information.
             else:
                 raise UnknownOsFamily("Expected 'linux' or 'windows', got %r", vm_type_configuration['os_family'])
-            if not wait_until(
-                    os_access.is_working,
-                    name='until {} ({}) can be accesses via {!r}'.format(alias, info.name, os_access),
-                    timeout_sec=vm_type_configuration['power_on_timeout_sec']):
-                raise VMNotResponding(alias, info.name)
+            wait_for_true(
+                os_access.is_working,
+                'VM {} ({}) can be accessed via {}'.format(alias, info.name, os_access),
+                timeout_sec=vm_type_configuration['power_on_timeout_sec'])
             vm = VM(alias, vm_index, vm_type, info.name, info.ports, networking, os_access)
             self._hypervisor.unplug_all(vm.name)
             vm.networking.reset()
-            vm.networking.enable_internet()
             yield vm
 
     def cleanup(self):
-        def destroy(vm_index, vm_alias):
-            name = self._vm_configuration['name_format'].format(vm_index=vm_index)
+        def destroy(name, vm_alias):
             if vm_alias is None:
                 try:
                     self._hypervisor.destroy(name)

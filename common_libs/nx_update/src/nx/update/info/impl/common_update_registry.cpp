@@ -239,7 +239,7 @@ private:
             QJsonObject arrayObject;
             arrayObject[kFileKey] = data.file;
             arrayObject[kIsClientKey] = data.isClient;
-            arrayObject[kOsVersionKey] = data.osVersion.toString();
+            arrayObject[kOsVersionKey] = data.osVersion.serialize();
             arrayObject[kNxVersionKey] = data.nxVersion.toString();
 
             QJsonArray peerArray;
@@ -416,7 +416,7 @@ private:
             manualFileData.file = arrayObj[kFileKey].toString();
             manualFileData.isClient = arrayObj[kIsClientKey].toBool();
             manualFileData.nxVersion = QnSoftwareVersion(arrayObj[kNxVersionKey].toString());
-            manualFileData.osVersion = OsVersion::fromString(arrayObj[kOsVersionKey].toString());
+            manualFileData.osVersion = OsVersion::deserialize(arrayObj[kOsVersionKey].toString());
 
             auto peersArrayObj = arrayObj[kPeersKey].toArray();
             for (int j = 0; j < peersArrayObj.size(); ++j)
@@ -749,6 +749,17 @@ ResultCode CommonUpdateRegistry::findUpdateFile(
 {
     NX_VERBOSE(this, lm("Requested update for %1").args(updateRequestData.toString()));
 
+    for (const auto& manualDataEntry: m_manualData)
+    {
+        if (manualDataEntry.isClient == updateRequestData.isClient
+            && manualDataEntry.nxVersion > updateRequestData.currentNxVersion
+            && manualDataEntry.osVersion == updateRequestData.osVersion)
+        {
+            *outFileData = FileData(manualDataEntry.file, QString(), -1, QByteArray());
+            return ResultCode::ok;
+        }
+    }
+
     CustomizationData customizationData;
     if (!hasUpdateForCustomizationAndVersion(updateRequestData, &customizationData))
         return ResultCode::noData;
@@ -838,6 +849,7 @@ ResultCode CommonUpdateRegistry::latestUpdate(
     const UpdateRequestData& updateRequestData,
     QnSoftwareVersion* outSoftwareVersion) const
 {
+    // #TODO #akulikov check manual data here
     CustomizationData customizationData;
     if (!hasUpdateForCustomizationAndVersion(updateRequestData, &customizationData))
         return ResultCode::noData;

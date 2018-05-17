@@ -77,8 +77,8 @@ public:
 private:
     struct Metadata
     {
-        std::function<AbstractVideoDecoder*(
-            const RenderContextSynchronizerPtr& allocator, const QSize& resolution)> createVideoDecoder;
+        std::function<AbstractVideoDecoder*(const RenderContextSynchronizerPtr& synchronizer,
+            const QSize& resolution)> createVideoDecoder;
         std::function<bool(
             const AVCodecID codec, const QSize& resolution, bool allowOverlay)> isCompatible;
         std::function<QSize(const AVCodecID codec)> maxResolution;
@@ -94,9 +94,9 @@ private:
         MetadataImpl(int maxUseCount)
         {
             createVideoDecoder =
-                [](const RenderContextSynchronizerPtr& allocator, const QSize& resolution)
+                [](const RenderContextSynchronizerPtr& synchronizer, const QSize& resolution)
                 {
-                    return new Decoder(allocator, resolution);
+                    return new Decoder(synchronizer, resolution);
                 };
             isCompatible = &Decoder::isCompatible;
             maxResolution = &Decoder::maxResolution;

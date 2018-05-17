@@ -1,5 +1,6 @@
 #include "http_server_connection.h"
 
+#include <atomic>
 #include <memory>
 
 #include <QtCore/QDateTime>

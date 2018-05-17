@@ -36,6 +36,8 @@ const QString kMaxSceneItemsOverrideKey(lit("maxSceneItems"));
 const QString kUseTextEmailFormat(lit("useTextEmailFormat"));
 const QString kNameAuditTrailEnabled(lit("auditTrailEnabled"));
 const QString kAuditTrailPeriodDaysName(lit("auditTrailPeriodDays"));
+const QString kNameTrafficEncryptionForced(lit("trafficEncryptionForced"));
+const QString kNameVideoTrafficEncryptionForced(lit("videoTrafficEncryptionForced"));
 const QString kEventLogPeriodDaysName(lit("eventLogPeriodDays"));
 const QString kNameHost(lit("smtpHost"));
 const QString kNamePort(lit("smtpPort"));
@@ -150,6 +152,12 @@ public:
     void setAuditTrailEnabled(bool value);
     int auditTrailPeriodDays() const;
     int eventLogPeriodDays() const;
+
+    bool isTrafficEncriptionForced() const;
+    void setTrafficEncriptionForced(bool value);
+
+    bool isVideoTrafficEncriptionForced() const;
+    void setVideoTrafficEncryptionForced(bool value);
 
     bool isAutoDiscoveryEnabled() const;
     void setAutoDiscoveryEnabled(bool enabled);
@@ -294,6 +302,15 @@ public:
     bool hanwhaDeleteProfilesOnInitIfNeeded() const;
     void setHanwhaDeleteProfilesOnInitIfNeeded(bool deleteProfiles);
 
+    bool showHanwhaAlternativePtzControlsOnTile() const;
+    void setShowHanwhaAlternativePtzControlsOnTile(bool showPtzControls);
+
+    int hanwhaChunkReaderResponseTimeoutSeconds() const;
+    void setHanwhaChunkReaderResponseTimeoutSeconds(int value);
+
+    int hanwhaChunkReaderMessageBodyTimeoutSeconds() const;
+    void setHanwhaChunkReaderMessageBodyTimeoutSeconds(int value);
+
     bool isEdgeRecordingEnabled() const;
     void setEdgeRecordingEnabled(bool enabled);
 
@@ -324,6 +341,8 @@ signals:
     void emailSettingsChanged();
     void ldapSettingsChanged();
     void statisticsAllowedChanged();
+    void trafficEncryptionForcedChanged();
+    void videoTrafficEncryptionForcedChanged();
     void updateNotificationsChanged();
     void upnpPortMappingEnabledChanged();
     void ec2ConnectionSettingsChanged(const QString& key);
@@ -356,6 +375,8 @@ private:
     QnResourcePropertyAdaptor<bool> *m_auditTrailEnabledAdaptor = nullptr;
     QnResourcePropertyAdaptor<int>* m_auditTrailPeriodDaysAdaptor = nullptr;
     QnResourcePropertyAdaptor<int>* m_eventLogPeriodDaysAdaptor = nullptr;
+    QnResourcePropertyAdaptor<bool>* m_trafficEncryptionForcedAdaptor = nullptr;
+    QnResourcePropertyAdaptor<bool>* m_videoTrafficEncryptionForcedAdaptor = nullptr;
 
     QnResourcePropertyAdaptor<QString> *m_disabledVendorsAdaptor = nullptr;
     QnResourcePropertyAdaptor<bool> *m_autoDiscoveryEnabledAdaptor = nullptr;
@@ -432,6 +453,9 @@ private:
     QnResourcePropertyAdaptor<bool>* m_cloudConnectRelayingEnabledAdaptor = nullptr;
 
     QnResourcePropertyAdaptor<bool>* m_hanwhaDeleteProfilesOnInitIfNeeded = nullptr;
+    QnResourcePropertyAdaptor<bool>* m_showHanwhaAlternativePtzControlsOnTile = nullptr;
+    QnResourcePropertyAdaptor<int>* m_hanwhaChunkReaderResponseTimeoutSeconds = nullptr;
+    QnResourcePropertyAdaptor<int>* m_hanwhaChunkReaderMessageBodyTimeoutSeconds = nullptr;
 
     QnResourcePropertyAdaptor<bool>* m_edgeRecordingEnabledAdaptor = nullptr;
 

@@ -128,7 +128,7 @@ void Impl::displayDecodedFrame(void* frameHandle)
     if (ini().displayAsync)
     {
         auto selfPtr = std::weak_ptr<Impl>(std::dynamic_pointer_cast<Impl>(sharedPtrToThis()));
-        allocator().execInRenderContextAsync(
+        renderContextSynchronizer().execInRenderContextAsync(
             [selfPtr, frameHandle]()
             {
                 if (auto self = selfPtr.lock())

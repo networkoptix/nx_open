@@ -154,9 +154,12 @@ void QnLiteClientController::startLiteClient()
         return;
     }
 
-    auto handleReply = [this, d](bool success, rest::Handle handle, const QnJsonRestResult& result)
+    auto handleReply =
+        [this, d, guard = QPointer<QnLiteClientController>(this)](
+            bool success, rest::Handle handle, const QnJsonRestResult& result)
         {
-            Q_UNUSED(result);
+            if (!guard)
+                return;
 
             if (d->clientStartHandle != handle)
                 return;
@@ -165,7 +168,7 @@ void QnLiteClientController::startLiteClient()
                 d->setClientStartResult(false);
         };
 
-    d->clientStartHandle = d->server->restConnection()->startLiteClient(handleReply);
+    d->clientStartHandle = d->server->restConnection()->startLiteClient(handleReply, thread());
     if (d->clientStartHandle <= 0)
         d->setClientStartResult(false);
 }

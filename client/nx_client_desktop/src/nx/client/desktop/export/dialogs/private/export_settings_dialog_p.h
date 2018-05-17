@@ -23,7 +23,6 @@
 
 class QWidget;
 class QnSingleThumbnailLoader;
-class QnImageProvider;
 
 namespace nx {
 namespace client {
@@ -34,6 +33,7 @@ class ProxyImageProvider;
 class TranscodingImageProcessor;
 class ResourceThumbnailProvider;
 class AsyncImageWidget;
+class ImageProvider;
 
 class ExportSettingsDialog::Private: public Connective<QObject>
 {
@@ -144,7 +144,7 @@ private:
     // Applies filters to make media thumbnails look the same way as on real output
     QScopedPointer<TranscodingImageProcessor> m_mediaPreviewProcessor;
     // Image provider for media preview
-    std::unique_ptr<QnImageProvider> m_mediaPreviewProvider;
+    std::unique_ptr<ImageProvider> m_mediaPreviewProvider;
     QPointer<nx::client::desktop::AsyncImageWidget> m_mediaPreviewWidget;
 
     // This one provides raw image without any transforms
@@ -157,7 +157,7 @@ private:
     ExportLayoutPersistentSettings m_exportLayoutPersistentSettings;
     bool m_needValidateLayout = false;
     // Image provider for layout preview
-    std::unique_ptr<QnImageProvider> m_layoutPreviewProvider;
+    std::unique_ptr<ImageProvider> m_layoutPreviewProvider;
     QPointer<nx::client::desktop::AsyncImageWidget> m_layoutPreviewWidget;
 
     nx::core::transcoding::Settings m_availableTranscodingSettings;

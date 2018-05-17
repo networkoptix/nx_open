@@ -134,7 +134,7 @@ private:
     AccountManagerStub m_accountManagerStub;
     SystemHealthInfoProviderStub m_systemHealthInfoProvider;
     TestEmailManager m_emailManager;
-    ec2::SyncronizationEngine m_ec2SyncronizationEngine;
+    data_sync_engine::SyncronizationEngine m_ec2SyncronizationEngine;
     std::unique_ptr<cdb::SystemManager> m_systemManager;
     std::string m_systemId;
     api::AccountData m_ownerAccount;

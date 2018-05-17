@@ -18,9 +18,10 @@ def create_core_file_traceback(os_access, bin_path, lib_dir, core_path):
         LIB_DIR=str(lib_dir),
         CORE_PATH=str(core_path),
         )
-    os_access.mk_dir(WORK_DIR)
-    commands_path = WORK_DIR / ('gdb_commands.%s' % os.urandom(3).encode('hex'))
-    os_access.write_file(commands_path, gdb_commands)
+    work_dir = os_access.Path(WORK_DIR)
+    work_dir.mkdir(exist_ok=True)
+    commands_path = work_dir / ('gdb_commands.%s' % os.urandom(3).encode('hex'))
+    commands_path.write_text(gdb_commands)
     traceback = os_access.run_command(['gdb', '--quiet', '--command=%s' % commands_path],
-                                      cwd=WORK_DIR, timeout=GDB_TIMEOUT)
+                                      cwd=WORK_DIR, timeout_sec=GDB_TIMEOUT)
     return traceback

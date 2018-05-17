@@ -54,11 +54,6 @@ public:
     virtual SocketAddress getForeignAddress() const override;
     virtual bool isConnected() const override;
 
-    virtual void cancelIOAsync(
-        aio::EventType eventType,
-        nx::utils::MoveOnlyFunc<void()> handler) override;
-    virtual void cancelIOSync(aio::EventType eventType) override;
-
     virtual void post(nx::utils::MoveOnlyFunc<void()> handler ) override;
     virtual void dispatch(nx::utils::MoveOnlyFunc<void()> handler ) override;
 
@@ -83,6 +78,9 @@ public:
 
     virtual QString getForeignHostName() const override;
 
+protected:
+    virtual void cancelIoInAioThread(aio::EventType eventType) override;
+
 private:
     typedef nx::utils::promise<std::pair<SystemError::ErrorCode, size_t>>*
         SocketResultPrimisePtr;
@@ -98,7 +96,6 @@ private:
         boost::optional<TunnelAttributes> cloudTunnelAttributes,
         std::unique_ptr<AbstractStreamSocket> connection);
 
-    void cancelIoWhileInAioThread(aio::EventType eventType);
     void stopWhileInAioThread();
 
     nx::utils::AtomicUniquePtr<AbstractStreamSocket> m_socketDelegate;

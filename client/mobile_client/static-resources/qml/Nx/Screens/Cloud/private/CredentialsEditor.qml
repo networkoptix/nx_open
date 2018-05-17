@@ -6,6 +6,8 @@ import com.networkoptix.qml 1.0
 
 Item
 {
+    id: control
+
     property alias email: emailField.text
     property alias password: passwordField.text
     property alias learnMoreLinkVisible: learnMoreLink.visible
@@ -20,10 +22,16 @@ Item
     {
         id: d
 
-        property bool invalidCredentials: false
+        property bool invalidUser: false
+        property bool invalidPassword: false
+        property bool notActivated: false
         property bool connecting: false
+        property bool reactivationRequested: false
         property string initialLogin
+        property string lastNotActivatedAccount
     }
+
+    onVisibleChanged: d.reactivationRequested = false
 
     Column
     {
@@ -45,7 +53,7 @@ Item
                 id: emailField
                 placeholderText: qsTr("Email")
                 width: parent.availableWidth
-                showError: d.invalidCredentials
+                showError: d.invalidUser || d.notActivated
                 activeFocusOnTab: true
                 inputMethodHints:
                     Qt.ImhSensitiveData
@@ -56,13 +64,34 @@ Item
                 onAccepted: nextItemInFocusChain(true).forceActiveFocus()
                 onActiveFocusChanged:
                 {
-                    if (activeFocus && d.invalidCredentials)
-                    {
-                        d.invalidCredentials = false
-                        hideWarning()
-                    }
+                    if (activeFocus && (d.invalidUser || d.notActivated))
+                        hideWarnings()
                 }
             }
+
+            FieldWarning
+            {
+                id: accountWarningPanel
+
+                width: parent.availableWidth
+            }
+
+            LinkButton
+            {
+                width: parent.width
+                visible: d.notActivated && d.lastNotActivatedAccount.length > 0
+                enabled: !d.connecting && !d.reactivationRequested
+                opacity: enabled ? 1.0 : 0.3
+
+                text: qsTr("Resend activation email")
+
+                onClicked:
+                {
+                    d.reactivationRequested = true
+                    cloudStatusWatcher.resendActivationEmail(d.lastNotActivatedAccount)
+                }
+            }
+
             TextField
             {
                 id: passwordField
@@ -70,23 +99,21 @@ Item
                 passwordMaskDelay: 1500
                 placeholderText: qsTr("Password")
                 width: parent.availableWidth
-                showError: d.invalidCredentials
+                showError: d.invalidPassword
                 activeFocusOnTab: true
                 inputMethodHints: Qt.ImhSensitiveData | Qt.ImhPreferLatin
 
                 onAccepted: login()
                 onActiveFocusChanged:
                 {
-                    if (activeFocus && d.invalidCredentials)
-                    {
-                        d.invalidCredentials = false
-                        hideWarning()
-                    }
+                    if (activeFocus && d.invalidPassword)
+                        hideWarnings()
                 }
             }
+
             FieldWarning
             {
-                id: warningPanel
+                id: bottomWarningPanel
                 width: parent.availableWidth
             }
         }
@@ -97,6 +124,7 @@ Item
             text: qsTr("Log in")
             width: parent.width
             showProgress: d.connecting
+            enabled: !d.reactivationRequested
             onClicked: login()
         }
 
@@ -133,67 +161,129 @@ Item
     {
         target: cloudStatusWatcher
 
-        onErrorChanged:
+        onActivationEmailResent:
         {
-            if (error == QnCloudStatusWatcher.NoError)
+            if (!control.visible)
                 return
 
-            d.connecting = false
-            if (error == QnCloudStatusWatcher.InvalidCredentials)
-            {
-                d.invalidCredentials = true
-                showWarning(qsTr("Incorrect email or password"))
-            }
-            else
-            {
-                showWarning(qsTr("Cannot connect to %1").arg(applicationInfo.cloudName()))
-            }
-            setCloudCredentials(d.initialLogin, "")
+            var caption = success
+                ? qsTr("Activation email sent")
+                : qsTr("Cannot send activation email")
+            var text = success
+                ? qsTr("Check your inbox and visit provided link to activate account")
+                : qsTr("Check your internet connection or try again later")
+
+            var dialog = Workflow.openStandardDialog("", text)
+            d.reactivationRequested = false
         }
 
-        onStatusChanged:
+        onErrorChanged: handleConnectStatusChanged()
+        onStatusChanged: handleConnectStatusChanged()
+    }
+
+    function handleConnectStatusChanged()
+    {
+        var status = cloudStatusWatcher.status
+        if (status == QnCloudStatusWatcher.Online)
         {
-            if (status == QnCloudStatusWatcher.Online)
-            {
-                loggedIn()
-                d.connecting = false
-                return
-            }
+            loggedIn()
+            d.connecting = false
+            d.reactivationRequested = false
+            return
+        }
+
+        var error = cloudStatusWatcher.error
+        if (error == QnCloudStatusWatcher.NoError)
+            return
+
+        d.connecting = false
+        if (error == QnCloudStatusWatcher.InvalidUser)
+        {
+            d.invalidUser = true
+            showAccountWarning(qsTr("Account not found"))
+            passwordField.text = ""
+        }
+        else if (error == QnCloudStatusWatcher.InvalidPassword)
+        {
+            d.invalidPassword = true
+            showBottomWarning(qsTr("Wrong password"))
+            passwordField.text = ""
+        }
+        else if (error == QnCloudStatusWatcher.AccountNotActivated)
+        {
+            d.notActivated = true
+            d.lastNotActivatedAccount = emailField.text
+            showAccountWarning(qsTr("Account not activated"))
+            passwordField.text = ""
+        }
+        else
+        {
+            showBottomWarning(qsTr("Cannot connect to %1").arg(applicationInfo.cloudName()))
         }
     }
 
     function login()
     {
+        hideWarnings()
         loginButton.forceActiveFocus()
 
-        if (!emailField.text || !passwordField.text)
+        if (!emailField.text.trim())
         {
-            d.invalidCredentials = true
-            showWarning(qsTr("Email and password cannot be empty"))
+            d.invalidUser = true
+            showAccountWarning(qsTr("Email cannot be empty"))
             return
         }
 
-        hideWarning()
-        d.invalidCredentials = false
+        if (!passwordField.text.trim())
+        {
+            d.invalidPassword = true
+            showBottomWarning(qsTr("Password cannot be empty"))
+            return
+        }
+
         d.connecting = true
-        setCloudCredentials(email, password)
+        d.reactivationRequested = false
+        if (!setCloudCredentials(email, password))
+            handleConnectStatusChanged()
     }
 
-    function showWarning(text)
+    function showAccountWarning(text)
     {
-        warningPanel.text = text
-        warningPanel.opened = true
+        bottomWarningPanel.opened = false
+
+        accountWarningPanel.text = text
+        accountWarningPanel.opened = true
     }
 
-    function hideWarning()
+    function showBottomWarning(text)
     {
-        warningPanel.opened = false
+        accountWarningPanel.opened = false
+
+        bottomWarningPanel.text = text
+        bottomWarningPanel.opened = true
+    }
+
+    function hideWarnings()
+    {
+        bottomWarningPanel.opened = false
+        accountWarningPanel.opened = false
+        d.invalidUser = false
+        d.invalidPassword = false
+        d.notActivated = false
+    }
+
+    function focusCredentialFields()
+    {
+        if (emailField.text.length)
+            passwordField.forceActiveFocus()
+        else
+            emailField.forceActiveFocus()
     }
 
     Component.onCompleted:
     {
         d.initialLogin = cloudStatusWatcher.effectiveUserName
         emailField.text = d.initialLogin
-        emailField.forceActiveFocus()
+        focusCredentialFields()
     }
 }

@@ -173,7 +173,7 @@ int runApplication(QtSingleApplication* application, const QnStartupParameters& 
         qunsetenv("RESOURCE_NAME");
     #endif
 
-    nx::media::DecoderRegistrar::registerDecoders(QSize(), true);
+    nx::media::DecoderRegistrar::registerDecoders({}, true);
 
     QDesktopWidget *desktop = qApp->desktop();
     bool customScreen = startupParams.screen != QnStartupParameters::kInvalidScreen

@@ -1,5 +1,7 @@
 #pragma once
 
+#include <nx/fusion/model_functions_fwd.h>
+
 namespace nx {
 namespace mediaserver_core {
 namespace plugins {
@@ -52,6 +54,19 @@ enum class HanwhaSessionType
 
 //TODO: #dmishin consider using Fusion instead of custom methods.
 
+enum class HanwhaDeviceType
+{
+    unknown,
+    nwc,
+    nvr,
+    dvr,
+    encoder,
+    decoder,
+    hybrid
+};
+
+QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(HanwhaDeviceType);
+
 static const int kHanwhaBlockedHttpCode = 490;
 static const int kHanwhaInvalidParameterHttpCode = 602;
 
@@ -64,7 +79,7 @@ static const int kHanwhaInvalidChannel = -1;
 static const int kHanwhaDefaultOverlappedId = 0;
 static const int kHanwhaMaxSecondaryStreamArea = 1024 * 768;
 static const int kHanwhaDefaultMaxPresetNumber = 1000;
-static const int kHanwhaProfileNameMaxLength = 12;
+static const int kHanwhaProfileNameDefaultMaxLength = 12;
 
 static const QString kHanwhaDateTimeFormat("yyyy-MM-dd hh:mm:ss");
 static const QString kHanwhaUtcDateTimeFormat("yyyy-MM-ddThh:mm:ssZ");
@@ -194,8 +209,6 @@ static const QString kHanwhaMaxLengthAttribute = lit("maxlen");
 
 static const int kHanwhaConfigurationNotFoundError = 612;
 
-static const QString kHanwhaNvrDeviceType = lit("NVR");
-
 static const QString kHanwhaNormalizedSpeedPtzTrait("NormalizedSpeed");
 static const QString kHanwhaHas3AxisPtz("3AxisPTZ");
 static const QString kHanwhaSimpleFocusTrait("SimpleFocusTrait");
@@ -205,6 +218,30 @@ static const QString kHanwhaAlternativeFocusTrait("AlternativeFocusTrait");
 
 static const int kMaxPossibleFps = 1000;
 
+static const QString kHanwhaProxiedIdParamName = lit("proxiedId");
+
+// TODO: #dmishin get rid of the properties below and move Hanwha driver to the standard
+// profile configuration mechanism.
+static const QString kPrimaryStreamResolutionParamName = lit("primaryStreamResolution");
+static const QString kPrimaryStreamCodecParamName = lit("primaryStreamCodec");
+static const QString kPrimaryStreamCodecProfileParamName = lit("primaryStreamCodecProfile");
+static const QString kPrimaryStreamGovLengthParamName = lit("primaryStreamGovLength");
+static const QString kPrimaryStreamBitrateControlParamName = lit("primaryStreamBitrateControl");
+static const QString kPrimaryStreamBitrateParamName = lit("primaryStreamBitrate");
+static const QString kPrimaryStreamEntropyCodingParamName = lit("primaryStreamEntropyCoding");
+static const QString kPrimaryStreamFpsParamName = lit("primaryStreamFps");
+
+static const QString kSecondaryStreamResolutionParamName = lit("secondaryStreamResolution");
+static const QString kSecondaryStreamCodecParamName = lit("secondaryStreamCodec");
+static const QString kSecondaryStreamCodecProfileParamName = lit("secondaryStreamCodecProfile");
+static const QString kSecondaryStreamGovLengthParamName = lit("secondaryStreamGovLength");
+static const QString kSecondaryStreamBitrateControlParamName = lit("secondaryStreamBitrateControl");
+static const QString kSecondaryStreamBitrateParamName = lit("secondaryStreamBitrate");
+static const QString kSecondaryStreamEntropyCodingParamName = lit("secondaryStreamEntropyCoding");
+static const QString kSecondaryStreamFpsParamName = lit("secondaryStreamFps");
+
 } // namespace plugins
 } // namespace mediaserver_core
 } // namespace nx
+
+QN_FUSION_DECLARE_FUNCTIONS(nx::mediaserver_core::plugins::HanwhaDeviceType, (lexical));

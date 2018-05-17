@@ -27,7 +27,7 @@
 
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_layout_snapshot_manager.h>
-#include <ui/workbench/watchers/workbench_server_time_watcher.h>
+#include <nx/client/core/watchers/server_time_watcher.h>
 
 #include <nx/fusion/model_functions.h>
 #include <nx/client/desktop/utils/server_image_cache.h>
@@ -138,7 +138,8 @@ ExportLayoutTool::ItemInfoList ExportLayoutTool::prepareLayout()
                 m_resources << mediaRes;
                 uniqIdList << uniqueId;
             }
-            info.timezone = context()->instance<QnWorkbenchServerTimeWatcher>()->utcOffset(mediaRes, Qn::InvalidUtcOffset);
+            const auto timeWatcher = context()->instance<nx::client::core::ServerTimeWatcher>();
+            info.timezone = timeWatcher->utcOffset(mediaRes, Qn::InvalidUtcOffset);
         }
 
         items.insert(localItem.uuid, localItem);
@@ -417,16 +418,15 @@ bool ExportLayoutTool::exportMediaResource(const QnMediaResourcePtr& resource) {
     uniqId = uniqId.mid(uniqId.indexOf(L'?')+1); // simplify name if export from existing layout
     auto role = StreamRecorderRole::fileExport;
 
-    qint64 serverTimeZone = context()->instance<QnWorkbenchServerTimeWatcher>()->utcOffset(resource, Qn::InvalidUtcOffset);
+    const auto timeWatcher = context()->instance<nx::client::core::ServerTimeWatcher>();
+    qint64 serverTimeZone = timeWatcher->utcOffset(resource, Qn::InvalidUtcOffset);
 
     m_currentCamera->exportMediaPeriodToFile(m_settings.period,
         uniqId,
         lit("mkv"),
         m_storage,
         role,
-        serverTimeZone,
-        0,
-        nx::core::transcoding::FilterChain());
+        serverTimeZone);
 
     emit stageChanged(tr("Exporting to \"%1\"...").arg(QFileInfo(m_settings.filename.completeFileName()).fileName()));
     return true;

@@ -32,6 +32,7 @@
 
 #include <licensing/license.h>
 #include <licensing/license_validator.h>
+#include <licensing/hardware_id_version.h>
 
 #include <nx/fusion/serialization/json_functions.h>
 
@@ -1125,8 +1126,8 @@ void QnLicenseManagerWidget::showAlreadyActivatedLater(
     const QString& time)
 {
     auto extras = (time.isEmpty()
-        ? tr("This license is already activated and linked to Hardware Id %1").arg(hwid)
-        : tr("This license is already activated and linked to Hardware Id %1 on %2")
+        ? tr("This license is already activated and linked to Hardware ID %1").arg(hwid)
+        : tr("This license is already activated and linked to Hardware ID %1 on %2")
             .arg(hwid).arg(time));
 
     extras += L'\n' + getContactSupportMessage();

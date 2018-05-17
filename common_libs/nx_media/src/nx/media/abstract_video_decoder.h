@@ -17,7 +17,7 @@ namespace media {
 /**
  * Interface for video decoder implementation. Each derived class should provide a constructor with
  * the following signature:
- * <pre> ...VideoDecoder(const RenderContextSynchronizerPtr& allocator, const QSize& resolution); </pre>
+ * <pre> ...VideoDecoder(const RenderContextSynchronizerPtr& synchronizer, const QSize& resolution); </pre>
  *
  */
 class AbstractVideoDecoder: public QObject
@@ -27,8 +27,20 @@ class AbstractVideoDecoder: public QObject
 public:
     typedef std::function<QRect()> VideoGeometryAccessor;
 
+    enum class Capability
+    {
+        noCapability = 0,
+        hardwareAccelerated = 1 << 0,
+    };
+    Q_DECLARE_FLAGS(Capabilities, Capability);
+
 public:
     virtual ~AbstractVideoDecoder() = default;
+
+    /**
+     * @return video decoder capabilities
+     */
+    virtual Capabilities capabilities() const = 0;
 
     /**
      * Used from a template; should be overridden despite being static.

@@ -23,6 +23,9 @@ class MediaResourceHelper: public ResourceHelper
     Q_PROPERTY(int channelCount READ channelCount NOTIFY videoLayoutChanged)
     Q_PROPERTY(QSize layoutSize READ layoutSize NOTIFY videoLayoutChanged)
     Q_PROPERTY(QnMediaDewarpingParams fisheyeParams READ fisheyeParams NOTIFY fisheyeParamsChanged)
+    Q_PROPERTY(bool analogCameraWithoutLicense READ analogCameraWithoutLicense
+        NOTIFY analogCameraWithoutLicenseChanged)
+    Q_PROPERTY(bool isWearableCamera READ isWearableCamera NOTIFY wearableCameraChanged)
 
     Q_ENUMS(Qn::ResourceStatus)
 
@@ -38,7 +41,9 @@ public:
     int channelCount() const;
     QSize layoutSize() const;
     QnMediaDewarpingParams fisheyeParams() const;
+    bool analogCameraWithoutLicense() const;
     Q_INVOKABLE QPoint channelPosition(int channel) const;
+    bool isWearableCamera() const;
 
 signals:
     void serverNameChanged();
@@ -46,6 +51,8 @@ signals:
     void customRotationChanged();
     void videoLayoutChanged();
     void fisheyeParamsChanged();
+    void analogCameraWithoutLicenseChanged();
+    void wearableCameraChanged();
 
 private:
     class Private;

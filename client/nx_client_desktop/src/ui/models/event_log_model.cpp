@@ -12,6 +12,7 @@
 #include <nx/vms/event/analytics_helper.h>
 
 #include <common/common_module.h>
+#include <translation/datetime_formatter.h>
 
 #include <client_core/client_core_module.h>
 
@@ -31,13 +32,13 @@
 #include <ui/style/resource_icon_cache.h>
 #include <ui/help/business_help.h>
 #include <ui/workbench/workbench_context.h>
-#include <ui/workbench/watchers/workbench_server_time_watcher.h>
 #include <ui/workbench/workbench_access_controller.h>
 
 #include <utils/common/html.h>
 #include <utils/common/synctime.h>
 #include <utils/common/warnings.h>
 #include <utils/math/math.h>
+#include <nx/client/core/watchers/server_time_watcher.h>
 
 using namespace nx;
 
@@ -383,8 +384,9 @@ QString QnEventLogModel::textData(Column column, const vms::event::ActionData& a
         {
             qint64 timestampMs = action.eventParams.eventTimestampUsec / 1000;
 
-            QDateTime dt = context()->instance<QnWorkbenchServerTimeWatcher>()->displayTime(timestampMs);
-            return dt.toString(Qt::DefaultLocaleShortDate);
+            const auto timeWatcher = context()->instance<nx::client::core::ServerTimeWatcher>();
+            QDateTime dt = timeWatcher->displayTime(timestampMs);
+            return datetime::toString(dt);
         }
         case EventColumn:
         {

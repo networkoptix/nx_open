@@ -9,7 +9,7 @@ import requests.auth
 
 from framework.api_shortcuts import get_server_id
 from framework.mediaserver import TimePeriod
-from framework.utils import Wait
+from framework.waiting import Wait
 
 log = logging.getLogger(__name__)
 
@@ -49,8 +49,9 @@ def test_responses_are_equal(system, target_alias, proxy_alias, api_endpoint):
             context=100)
         if not diff:
             break
-        if not wait.sleep_and_continue():
+        if not wait.again():
             assert not diff, 'Found difference:\n{}'.format(diff)
+        wait.sleep()
 
     assert not system[target_alias].installation.list_core_dumps()
     assert not system[proxy_alias].installation.list_core_dumps()

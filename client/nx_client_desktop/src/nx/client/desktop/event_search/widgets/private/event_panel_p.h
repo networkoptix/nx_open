@@ -43,9 +43,7 @@ public:
 
 private:
     void currentWorkbenchWidgetChanged(Qn::ItemRole role);
-
-    void addCameraTabs();
-    void removeCameraTabs();
+    void updateTabs();
 
     void setupEventSearch();
     void setupMotionSearch();

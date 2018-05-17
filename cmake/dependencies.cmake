@@ -83,7 +83,7 @@ function(copy_linux_cpp_runtime)
             --flags "${CMAKE_CXX_FLAGS}"
             --dest-dir ${CMAKE_LIBRARY_OUTPUT_DIRECTORY}
             --list
-            libstdc++.so.6 libatomic.so.1 libgcc_s.so.1
+            ${cpp_runtime_libs}
         RESULT_VARIABLE result
         OUTPUT_VARIABLE output
     )
@@ -96,6 +96,16 @@ function(copy_linux_cpp_runtime)
     nx_store_known_files(${files})
 endfunction()
 
-if(targetDevice MATCHES "linux-x64|linux-x86")
-    copy_linux_cpp_runtime()
+if(LINUX)
+    set(cpp_runtime_libs libstdc++.so.6 libatomic.so.1 libgcc_s.so.1)
+
+    if(arch MATCHES "x64|x86")
+        if(arch STREQUAL "x64")
+            list(APPEND cpp_runtime_libs libmvec.so.1)
+        endif()
+
+        copy_linux_cpp_runtime()
+    endif()
+
+    string(REPLACE ";" " " cpp_runtime_libs_string "${cpp_runtime_libs}")
 endif()

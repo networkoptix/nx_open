@@ -48,14 +48,15 @@ public:
         m_adaptee->sendAsync(buffer, std::move(handler));
     }
 
-    virtual void cancelIOSync(nx::network::aio::EventType eventType) override
-    {
-        m_adaptee->cancelIOSync(eventType);
-    }
-
     const AdapteePtr& adaptee() const
     {
         return m_adaptee;
+    }
+
+protected:
+    virtual void cancelIoInAioThread(nx::network::aio::EventType eventType) override
+    {
+        m_adaptee->cancelIOSync(eventType);
     }
 
 private:

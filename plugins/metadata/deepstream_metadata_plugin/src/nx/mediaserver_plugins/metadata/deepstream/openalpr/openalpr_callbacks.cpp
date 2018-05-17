@@ -144,7 +144,7 @@ gboolean handleOpenAlprMetadata(GstBuffer* buffer, GstMeta** meta, gpointer user
             attributes.emplace_front(
                 nx::sdk::AttributeType::string,
                 "GUID",
-                nxpt::NxGuidHelper::toStdString(guid));
+                nxpt::toStdString(guid));
         }
 
         detectedObject->setAttributes(

@@ -22,12 +22,13 @@
 #include <media_server/media_server_module.h>
 
 static const QLatin1String THIRD_PARTY_MANUFACTURER_NAME( "THIRD_PARTY" );
+static const QString kUpnpBasicDeviceType("Basic");
 
 ThirdPartyResourceSearcher::ThirdPartyResourceSearcher(QnCommonModule* commonModule):
     QnAbstractResourceSearcher(commonModule),
     QnAbstractNetworkResourceSearcher(commonModule),
     QnMdnsResourceSearcher(commonModule),
-    QnUpnpResourceSearcherAsync(commonModule)
+    QnUpnpResourceSearcherAsync(commonModule, kUpnpBasicDeviceType)
 {
     auto pluginManager = qnServerModule->pluginManager();
     NX_ASSERT(pluginManager, lit("There is no plugin manager"));
@@ -61,7 +62,7 @@ QnResourcePtr ThirdPartyResourceSearcher::createResource( const QnUuid &resource
 
     if( resourceType.isNull() )
     {
-        NX_DEBUG(this, lit("ThirdPartyResourceSearcher. No resource type for ID = %1").arg(resourceTypeId.toString()));
+        NX_DEBUG(this, lm("ThirdPartyResourceSearcher. No resource type for ID = %1").arg(resourceTypeId.toString()));
         return result;
     }
 
@@ -98,12 +99,12 @@ QnResourcePtr ThirdPartyResourceSearcher::createResource( const QnUuid &resource
     // If third party driver returns MAC based physical ID then re-format MAC address string
     // to ensure it has same string format as build-in drivers.
     auto uuidStr = QString::fromUtf8(cameraInfo.uid).trimmed();
-    auto uuidMac = nx::network::QnMacAddress(uuidStr);
+    const auto uuidMac = nx::network::QnMacAddress(uuidStr);
     if (!uuidMac.isNull())
         uuidStr = uuidMac.toString();
     result->setPhysicalId(uuidStr);
 
-    NX_LOG( lit("Created third party resource (manufacturer %1, res type id %2)").
+    NX_LOG( lm("Created third party resource (manufacturer %1, res type id %2)").
         arg(discoveryManager->getVendorName()).arg(resourceTypeId.toString()), cl_logDEBUG2 );
 
     return result;
@@ -314,8 +315,8 @@ QnThirdPartyResourcePtr ThirdPartyResourceSearcher::createResourceFromCameraInfo
         resource->setName( QString::fromUtf8("%1-%2").arg(vendor).arg(QString::fromUtf8(cameraInfo.modelName)) );
     resource->setModel( QString::fromUtf8(cameraInfo.modelName) );
 
-    auto uuid = QString::fromUtf8(cameraInfo.uid).trimmed();
-    auto uuidMac = nx::network::QnMacAddress(uuid);
+    const auto uuid = QString::fromUtf8(cameraInfo.uid).trimmed();
+    const auto uuidMac = nx::network::QnMacAddress(uuid);
     resource->setPhysicalId(uuidMac.isNull() ? uuid : uuidMac.toString());
     resource->setMAC(uuidMac);
     resource->setDefaultAuth( QString::fromUtf8(cameraInfo.defaultLogin), QString::fromUtf8(cameraInfo.defaultPassword) );

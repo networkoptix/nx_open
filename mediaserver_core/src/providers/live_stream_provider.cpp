@@ -21,6 +21,8 @@
 #include <utils/media/nalUnits.h>
 #include <utils/media/av_codec_helper.h>
 #include <utils/common/synctime.h>
+#include <nx/streaming/config.h>
+#include <utils/media/hevc_sps.h>
 #include <camera/video_camera.h>
 #include <mediaserver_ini.h>
 #include <analytics/detected_objects_storage/analytics_events_receptor.h>
@@ -145,7 +147,7 @@ void QnLiveStreamProvider::setRole(Qn::ConnectionRole role)
     if (role == roleForAnalytics && qnServerModule)
     {
         auto pool = qnServerModule->metadataManagerPool();
-        m_videoDataReceptor = pool->mediaDataReceptor(m_cameraRes->getId());
+        m_videoDataReceptor = pool->createVideoDataReceptor(m_cameraRes->getId());
     }
 }
 
@@ -397,16 +399,9 @@ VideoDataReceptorPtr QnLiveStreamProvider::getVideoDataReceptorForMetadataPlugin
         if (needToAnalyzeFrame && needToAnalyzeStream)
             videoDataReceptor = m_videoDataReceptor.toStrongRef();
     }
-    if (!videoDataReceptor)
-    {
-        *outNeedUncompressedFrame = false;
-    }
-    else
-    {
-        *outNeedUncompressedFrame =
-           videoDataReceptor->acceptedFrameKind() ==
-               VideoDataReceptor::AcceptedFrameKind::uncompressed;
-    }
+
+    *outNeedUncompressedFrame =
+        videoDataReceptor && !videoDataReceptor->neededUncompressedPixelFormats().empty();
 
     return videoDataReceptor;
 }
@@ -484,12 +479,7 @@ void QnLiveStreamProvider::onGotVideoFrame(
     if (videoDataReceptor)
     {
         NX_VERBOSE(this) << "Pushing to receptor, timestamp:" << compressedFrame->timestamp;
-
-        // NOTE: In case uncompressedFrame is passed, compressedFrame is not passed to avoid its
-        // potential deep-copying.
-        videoDataReceptor->putFrame(
-            uncompressedFrame ? nullptr : compressedFrame,
-            uncompressedFrame);
+        videoDataReceptor->putFrame(compressedFrame, uncompressedFrame);
     }
 
 #endif // ENABLE_SOFTWARE_MOTION_DETECTION
@@ -635,8 +625,20 @@ void QnLiveStreamProvider::extractMediaStreamParams(
 {
     switch( videoData->compressionType )
     {
+        case AV_CODEC_ID_H265:
+            if (videoData->width > 0 && videoData->height > 0)
+            {
+                *newResolution = QSize(videoData->width, videoData->height);
+            }
+            else
+            {
+                nx::media_utils::hevc::Sps sps;
+                if (sps.decodeFromVideoFrame(videoData))
+                    *newResolution = QSize(sps.picWidthInLumaSamples, sps.picHeightInLumaSamples);
+            }
+            break;
         case AV_CODEC_ID_H264:
-            extractSpsPps(
+            nx::media_utils::avc::extractSpsPps(
                 videoData,
                 (videoData->width > 0 && videoData->height > 0)
                     ? nullptr   //taking resolution from sps only if video frame does not already contain it

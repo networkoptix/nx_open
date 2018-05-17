@@ -79,7 +79,7 @@
     <message>
       <source>%1 System can only be merged with non-%1. System name and password are taken from %1 System.</source>
       <comment>%1 is the short cloud name (like Cloud)</comment>
-      <translation type="unfinished">%1 System can only be merged with non-%1. System name and password are taken from %1 System.</translation>
+      <translation>System w chmurze %1 można złączyć tylko z systemem spoza chmury %1. Nazwa systemu i hasło zostaną pobrane z systemu w chmurze %1.</translation>
     </message>
     <message>
       <source>Both Systems are connected to %1. Merge is not allowed.</source>
@@ -569,8 +569,8 @@
       <translation>Nieznany błąd</translation>
     </message>
     <message>
-      <source>Server with matching Hardware Id not found</source>
-      <translation>Nie znaleziono serwera o zgodnym Id sprzętu</translation>
+      <source>Server with matching Hardware ID not found</source>
+      <translation>Nie znaleziono serwera o zgodnym ID sprzętu</translation>
     </message>
   </context>
   <context>
@@ -602,7 +602,7 @@
     </message>
     <message numerus="yes">
       <source>%n Device(s)</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%n urządzeń</numerusform>
         <numerusform>%n Urządzeń</numerusform>
         <numerusform>%n Urządzeń</numerusform>
@@ -704,12 +704,12 @@
       <translation>Znak wodny: %1</translation>
     </message>
     <message>
-      <source>Hardware Id: %1</source>
-      <translation>ID sprzętu: %1</translation>
-    </message>
-    <message>
       <source>Time License</source>
       <translation>Licencja okresowa</translation>
+    </message>
+    <message>
+      <source>Hardware ID: %1</source>
+      <translation>ID sprzętu: %1</translation>
     </message>
   </context>
   <context>
@@ -1155,7 +1155,7 @@
     </message>
     <message numerus="yes">
       <source>Motion on Cameras</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Ruch na kamerze</numerusform>
         <numerusform>Ruch na kamerach</numerusform>
         <numerusform>Ruch na kamerach</numerusform>
@@ -1209,7 +1209,7 @@
     </message>
     <message numerus="yes">
       <source>Input Signal on Cameras</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Sygnał na wejściu kamery</numerusform>
         <numerusform>Sygnały na wejściach kamer</numerusform>
         <numerusform>Sygnały na wejściach kamer</numerusform>
@@ -1384,7 +1384,7 @@
     <message numerus="yes">
       <source>%n times, first: %2 &lt;b&gt;%1&lt;/b&gt;</source>
       <comment>%1 means time, %2 means date</comment>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%n raz: %2 &lt;b&gt;%1&lt;/b&gt;</numerusform>
         <numerusform>%n razy: %2 &lt;b&gt;%1&lt;/b&gt;</numerusform>
         <numerusform>%n razy: %2 &lt;b&gt;%1&lt;/b&gt;</numerusform>
@@ -1399,7 +1399,7 @@
     <message numerus="yes">
       <source>First occurrence: %1 on %2 (%n times total)</source>
       <comment>%1 means time, %2 means date</comment>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Pierwsze wystąpienie: %1 w dniu %2 (%n raz)</numerusform>
         <numerusform>Pierwsze wystąpienie: %1 w dniu %2 (%n razy)</numerusform>
         <numerusform>Pierwsze wystąpienie: %1 w dniu %2 (%n razy)</numerusform>
@@ -1533,7 +1533,7 @@
     </message>
     <message numerus="yes">
       <source>%n Users</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%n Użytkowników</numerusform>
         <numerusform>%n użytkowników</numerusform>
         <numerusform>%n użytkownik</numerusform>

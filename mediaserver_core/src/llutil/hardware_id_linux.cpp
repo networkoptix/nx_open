@@ -25,10 +25,14 @@
 #include "licensing/hardware_info.h"
 #include "hardware_id.h"
 #include "hardware_id_p.h"
+#include <nx/mediaserver/root_tool.h>
+#include <media_server/media_server_module.h>
+#include <nx/utils/license/util.h>
 
 namespace {
 
 const QString kEmptyMac = lit("");
+const static nx::utils::log::Tag kLogTag(lit("HardwareId"));
 
 QByteArray fromString(const std::string& s) {
     return QByteArray(s.data(), s.size());
@@ -43,64 +47,27 @@ std::string trim(const std::string& str) {
     return result;
 }
 
-QString read_file(const char* path) {
-    std::ifstream ifs(path);
-    std::string content = trim(std::string((std::istreambuf_iterator<char>(ifs)), std::istreambuf_iterator<char>()));
-    return QString::fromStdString(content);
+QString readFile(const char* path)
+{
+    int fd = qnServerModule->rootTool()->open(path, QIODevice::ReadOnly);
+    QFile file(path);
+    if (fd < 0 || !file.open(fd, QIODevice::ReadOnly))
+    {
+        NX_WARNING(kLogTag, lm("[RootTool] Failed to open %1").args(path));
+        return QString();
+    }
+
+    auto content = file.readAll();
+    return QString::fromLatin1(content).trimmed();
 }
 
-void trim2(std::string& str) {
-    std::string::size_type pos = str.find_last_not_of(" \n\t");
-
-    if(pos != std::string::npos) {
-        str.erase(pos + 1);
-        pos = str.find_first_not_of(' ');
-        if(pos != std::string::npos) str.erase(0, pos);
-    } else {
-        str.erase(str.begin(), str.end());
-    }
-}
-
-void getMemoryInfo(QString &partNumber, QString &serialNumber) {
-    static const int PARAMETER_COUNT = 2;
-
-    const char *STRINGS[] = {
-       "Part Number: ",
-       "Serial Number: ",
-    };
-
-    typedef std::set<std::string> StrSet;
-    StrSet values[PARAMETER_COUNT];
-
-    FILE *fp = popen("/usr/sbin/dmidecode -t17", "r");
-
-    if (fp == NULL)
-        return;
-
-    char buf[1024];
-    while (fgets(buf, 1024, fp) != NULL) {
-        for (int index = 0; index < PARAMETER_COUNT; index++) {
-            char* ptr = strstr(buf, STRINGS[index]);
-            if (ptr) {
-                std::string value = std::string(ptr + strlen(STRINGS[index]));
-                trim2(value);
-                values[index].insert(value);
-            }
-        }
-    }
-
-
-    for (StrSet::const_iterator ci = values[0].begin(); ci != values[0].end(); ++ci) {
-        partNumber += ci->c_str();
-    }
-
-
-    for (StrSet::const_iterator ci = values[1].begin(); ci != values[1].end(); ++ci) {
-        serialNumber += ci->c_str();
-    }
-
-
-    pclose(fp);
+void getMemoryInfo(QString &partNumber, QString &serialNumber)
+{
+    bool result = qnServerModule->rootTool()->dmiInfo(&partNumber, &serialNumber);
+    NX_VERBOSE(
+        kLogTag,
+        lm("[RootTool] Got memory info. Result: %1 PN: %2, SN: %3")
+            .args(result, partNumber, serialNumber));
 }
 
 } // namespace {}
@@ -172,15 +139,15 @@ void calcHardwareIdMap(QMap<QString, QString>& hardwareIdMap, const QnHardwareIn
 
 void fillHardwareIds(HardwareIdListType& hardwareIds, QnHardwareInfo& hardwareInfo)
 {
-    hardwareInfo.boardUUID = read_file("/sys/class/dmi/id/product_uuid");
+    hardwareInfo.boardUUID = readFile("/sys/class/dmi/id/product_uuid");
     hardwareInfo.compatibilityBoardUUID = nx::utils::license::changedGuidByteOrder(hardwareInfo.boardUUID);
 
-    hardwareInfo.boardID = read_file("/sys/class/dmi/id/board_serial");
-    hardwareInfo.boardManufacturer = read_file("/sys/class/dmi/id/board_vendor");
-    hardwareInfo.boardProduct = read_file("/sys/class/dmi/id/board_name");
+    hardwareInfo.boardID = readFile("/sys/class/dmi/id/board_serial");
+    hardwareInfo.boardManufacturer = readFile("/sys/class/dmi/id/board_vendor");
+    hardwareInfo.boardProduct = readFile("/sys/class/dmi/id/board_name");
 
-    hardwareInfo.biosID = read_file("/sys/class/dmi/id/product_serial");
-    hardwareInfo.biosManufacturer = read_file("/sys/class/dmi/id/bios_vendor");
+    hardwareInfo.biosID = readFile("/sys/class/dmi/id/product_serial");
+    hardwareInfo.biosManufacturer = readFile("/sys/class/dmi/id/bios_vendor");
 
     getMemoryInfo(hardwareInfo.memoryPartNumber, hardwareInfo.memorySerialNumber);
 

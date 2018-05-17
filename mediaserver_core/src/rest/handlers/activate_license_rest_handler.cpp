@@ -21,6 +21,7 @@
 #include "rest/server/rest_connection_processor.h"
 #include <llutil/hardware_id.h>
 #include <licensing/license_validator.h>
+#include <licensing/hardware_id_version.h>
 #include <nx/utils/license/util.h>
 
 static const int TCP_TIMEOUT = 1000 * 5;

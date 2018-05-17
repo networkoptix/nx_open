@@ -2,11 +2,11 @@ import logging
 
 import pytest
 
+from framework.dpkg_installation import install_mediaserver
+from framework.mediaserver import Mediaserver
 from framework.mediaserver_factory import cleanup_mediaserver
 from framework.merging import IncompatibleServersMerge, merge_systems, setup_cloud_system, setup_local_system
 from framework.rest_api import HttpError, RestApi
-from framework.mediaserver import Mediaserver
-from framework.mediaserver_installation import install_mediaserver
 from framework.service import UpstartService
 
 pytest_plugins = ['fixtures.cloud']
@@ -30,6 +30,7 @@ def test_with_different_cloud_hosts_must_not_be_able_to_merge(two_linux_mediaser
     test_cloud_server, wrong_cloud_server = two_linux_mediaservers
 
     test_cloud_server.start()
+    test_cloud_server.machine.networking.enable_internet()
     setup_cloud_system(test_cloud_server, cloud_account, {})
 
     wrong_cloud_server.installation.patch_binary_set_cloud_host('cloud.non.existent')
@@ -49,6 +50,7 @@ def test_server_should_be_able_to_merge_local_to_cloud_one(two_linux_mediaserver
     cloud_bound_server, local_server = two_linux_mediaservers
 
     cloud_bound_server.start()
+    cloud_bound_server.machine.networking.enable_internet()
     setup_cloud_system(cloud_bound_server, cloud_account, {})
     check_user_exists(cloud_bound_server, is_cloud=True)
 
@@ -78,6 +80,7 @@ def original_cloud_host_server(linux_vm, mediaserver_deb, ca):
 # https://networkoptix.atlassian.net/wiki/spaces/SD/pages/85204446/Cloud+test
 def test_server_with_hardcoded_cloud_host_should_be_able_to_setup_with_cloud(original_cloud_host_server, cloud_account):
     try:
+        original_cloud_host_server.machine.networking.enable_internet()
         setup_cloud_system(original_cloud_host_server, cloud_account, {})
     except HttpError as x:
         if x.reason == 'Could not connect to cloud: notAuthorized':

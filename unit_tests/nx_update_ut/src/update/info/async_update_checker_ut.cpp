@@ -13,28 +13,13 @@ namespace update {
 namespace info {
 namespace test {
 
-// #TODO #akulikov: Extract common_update_registry_ut from this.
-// #TODO #akulikov: Check every commented code here and deal with it somehow.
-
 static const QString kBaseUrl = "http://updates.networkoptix.com";
-static const UpdateFileRequestData kManualDataKey1{"manualCloudHost1", "manualCustomization1",
-    QnSoftwareVersion("1.2.3.4"),
-    OsVersion("manualfamily1", "manualArchitecture1", "manualVersion1"), false};
-
-static const UpdateFileRequestData kManualDataKey2{ "manualCloudHost2", "manualCustomization2",
-    QnSoftwareVersion("1.2.3.4"),
-    OsVersion("manualfamily1", "manualArchitecture2", "manualVersion2"), false };
-
-//static const FileData kManualDataValue1{"file1", "url1", 11, "md51" };
-//static const FileData kManualDataValue2{"file2", "url2", 22, "md52" };
 
 class AsyncUpdateChecker: public ::testing::Test
 {
 protected:
     virtual void SetUp() override
     {
-        //m_manualData.insert(kManualDataKey1, kManualDataValue1);
-        //m_manualData.insert(kManualDataKey2, kManualDataValue2);
     }
 
     virtual void TearDown() override
@@ -68,9 +53,8 @@ protected:
 
     void whenSomeManualDataHasBeenAdded()
     {
-        // #TODO #akulikov. Uncomment and implement this correctly.
-        //m_updateRegistry->addFileData(kManualDataKey1, kManualDataValue1);
-        //m_updateRegistry->addFileData(kManualDataKey2, kManualDataValue2);
+        m_updateRegistry->addFileData(m_manualData1);
+        m_updateRegistry->addFileData(m_manualData2);
     }
 
     void thenCorrectUpdateRegistryShouldBeReturned()
@@ -87,6 +71,13 @@ private:
     QnWaitCondition m_condition;
     bool m_done = false;
     ResultCode m_resultCode = ResultCode::noData;
+    QList<ManualFileData> m_manualData;
+    ManualFileData m_manualData1{ "manualFile1", macosx(), QnSoftwareVersion("5.3.2.1"), false };
+    ManualFileData m_manualData2{ "manualFile2", ubuntuX64(), QnSoftwareVersion("6.5.4.3"), true };
+    QList<QnUuid> m_manualData1Peers = { QnUuid::createUuid(), QnUuid::createUuid() };
+    QList<QnUuid> m_manualData2Peers =
+        { QnUuid::createUuid(), QnUuid::createUuid(), QnUuid::createUuid() };
+
 
     void onCheckCompleted(ResultCode resultCode, AbstractUpdateRegistryPtr updateRegistry)
     {
@@ -190,42 +181,67 @@ private:
     {
         FileData fileData;
         ResultCode resultCode = m_updateRegistry->findUpdateFile(
-            UpdateFileRequestData("nxvms.com", "default", QnSoftwareVersion(2, 0, 0, 0), ubuntuX64(), false),
+            UpdateFileRequestData(
+                "nxvms.com", "default", QnSoftwareVersion(2, 0, 0, 0), ubuntuX64(), false),
             &fileData);
         assertFindResult(resultCode, fileData, false);
 
         resultCode = m_updateRegistry->findUpdateFile(
-            UpdateFileRequestData("nxvms.com", "default", QnSoftwareVersion(10, 0, 0, 0), ubuntuX64(), false),
+            UpdateFileRequestData(
+                "nxvms.com", "default", QnSoftwareVersion(10, 0, 0, 0), ubuntuX64(), false),
             &fileData);
         assertFindResult(resultCode, fileData, true);
 
         resultCode = m_updateRegistry->findUpdateFile(
-            UpdateFileRequestData("not-existing-host", "default", QnSoftwareVersion(2, 0, 0, 0), ubuntuX64(), false),
+            UpdateFileRequestData(
+                "not-existing-host", "default",
+                QnSoftwareVersion(2, 0, 0, 0), ubuntuX64(), false),
             &fileData);
         assertFindResult(resultCode, fileData, true);
 
         resultCode = m_updateRegistry->findUpdateFile(
-            UpdateFileRequestData("nxvms.com", "not-existing-customization", QnSoftwareVersion(2, 0, 0, 0), ubuntuX64(), false),
+            UpdateFileRequestData(
+                "nxvms.com", "not-existing-customization",
+                QnSoftwareVersion(2, 0, 0, 0), ubuntuX64(), false),
             &fileData);
         assertFindResult(resultCode, fileData, true);
 
         resultCode = m_updateRegistry->findUpdateFile(
-            UpdateFileRequestData("qcloud.vista-cctv.com", "vista", QnSoftwareVersion(3, 0, 2, 9872), windowsX64(), false),
+            UpdateFileRequestData(
+                "qcloud.vista-cctv.com", "vista",
+                QnSoftwareVersion(3, 0, 2, 9872), windowsX64(), false),
             &fileData);
         assertFindResult(resultCode, fileData, false);
 
         resultCode = m_updateRegistry->findUpdateFile(
-            UpdateFileRequestData("tricom.cloud-demo.hdw.mx", "tricom", QnSoftwareVersion(3, 0, 0, 9872), armRpi(), false),
+            UpdateFileRequestData(
+                "tricom.cloud-demo.hdw.mx", "tricom",
+                QnSoftwareVersion(3, 0, 0, 9872), armRpi(), false),
             &fileData);
         assertFindResult(resultCode, fileData, false);
 
-        //resultCode = m_updateRegistry->findUpdateFile(kManualDataKey1, &fileData);
-        //ASSERT_EQ(ResultCode::ok, resultCode);
-        //ASSERT_EQ(kManualDataValue1, fileData);
+        resultCode = m_updateRegistry->findUpdateFile(
+            UpdateFileRequestData(
+                "any_cloud_host", "any_customization",
+                QnSoftwareVersion(3, 0, 0, 9872), macosx(), false),
+            &fileData);
+        assertFoundWithManualData(resultCode, fileData, m_manualData1);
 
-        //resultCode = m_updateRegistry->findUpdateFile(kManualDataKey2, &fileData);
-        //ASSERT_EQ(ResultCode::ok, resultCode);
-        //ASSERT_EQ(kManualDataValue2, fileData);
+        resultCode = m_updateRegistry->findUpdateFile(
+            UpdateFileRequestData(
+                "any_cloud_host", "any_customization",
+                QnSoftwareVersion(3, 0, 0, 9872), ubuntuX64(), true),
+            &fileData);
+        assertFoundWithManualData(resultCode, fileData, m_manualData2);
+    }
+
+    void assertFoundWithManualData(
+        ResultCode resultCode,
+        const FileData& fileData,
+        const ManualFileData& manualFileData) const
+    {
+        ASSERT_EQ(ResultCode::ok, resultCode);
+        ASSERT_EQ(fileData.file, manualFileData.file);
     }
 
     void assertFindResult(ResultCode resultCode, const FileData& fileData, bool shouldFail) const
@@ -252,8 +268,7 @@ private:
     }
 };
 
-// #TODO #akulikov: Enable and fix this!
-TEST_F(AsyncUpdateChecker, DISABLED_CorrectUpdateRegistryProvided)
+TEST_F(AsyncUpdateChecker, CorrectUpdateRegistryProvided)
 {
     whenMockupDataProviderHasBeenSetUp();
     whenAsyncCheckRequestHasBeenIssued();

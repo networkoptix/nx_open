@@ -1,9 +1,8 @@
-from itertools import islice
 from uuid import uuid1
 
 from netaddr import IPNetwork
 
-from framework.utils import wait_until
+from framework.waiting import wait_for_true
 
 
 def setup_networks(machines, hypervisor, networks_tree, reachability):
@@ -56,17 +55,17 @@ def setup_networks(machines, hypervisor, networks_tree, reachability):
 
     for alias, ips in nodes_ips.items():
         for ip in ips.values():
-            assert wait_until(
+            wait_for_true(
                 lambda: allocated_machines[alias].networking.can_reach(ip, timeout_sec=1),
-                name="until {} can ping itself by {}".format(alias, ip),
+                "machine {} can reach itself by {}".format(alias, ip),
                 timeout_sec=20)
     for destination_net in reachability:
         for destination_alias in reachability[destination_net]:
             for source_alias in reachability[destination_net][destination_alias]:
                 destination_ip = nodes_ips[destination_alias][IPNetwork(destination_net)]
-                assert wait_until(
+                wait_for_true(
                     lambda: allocated_machines[source_alias].networking.can_reach(destination_ip, timeout_sec=1),
-                    name="until {} can ping {} by {}".format(source_alias, destination_alias, destination_ip),
+                    "machine {} can reach {} by {}".format(source_alias, destination_alias, destination_ip),
                     timeout_sec=60)
 
     return allocated_machines, nodes_ips

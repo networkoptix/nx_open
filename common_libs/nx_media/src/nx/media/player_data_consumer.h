@@ -5,7 +5,7 @@
 #include <functional>
 
 #include <utils/media/externaltimesource.h>
-
+#include <common/common_globals.h>
 #include <nx/streaming/abstract_data_consumer.h>
 #include <nx/streaming/video_data_packet.h>
 #include <nx/streaming/audio_data_packet.h>
@@ -89,6 +89,8 @@ public:
 
     void setAllowOverlay(bool value);
 
+    Qn::MediaStreamEvent mediaEvent() const;
+
 signals:
     /** Hint to render to display current data with no delay due to seek operation in progress. */
     void hurryUp();
@@ -99,6 +101,10 @@ signals:
     /** Jump to new position. */
     void jumpOccurred(int sequence);
 
+    void mediaEventChanged();
+
+    /** Got metadata in the media stream. */
+    void gotMetadata(QnAbstractCompressedMetadataPtr data);
 private slots:
     void onBeforeJump(qint64 timeUsec);
     void onJumpCanceled(qint64 timeUsec);
@@ -121,6 +127,8 @@ private:
     int getBufferingMask() const;
     QnCompressedVideoDataPtr queueVideoFrame(const QnCompressedVideoDataPtr& videoFrame);
     bool checkSequence(int sequence);
+
+    void updateMediaEvent(const QnAbstractMediaDataPtr& data);
 
 private:
     /**
@@ -189,7 +197,7 @@ private:
     std::atomic<bool> m_audioEnabled;
     std::atomic<bool> m_needToResetAudio;
     std::atomic<bool> m_allowOverlay;
-
+    Qn::MediaStreamEvent m_mediaEvent = Qn::MediaStreamEvent::NoEvent;
     RenderContextSynchronizerPtr m_renderContextSynchronizer;
 };
 

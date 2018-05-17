@@ -32,7 +32,13 @@ const QString kEnumerationDataType = lit("Enumeration");
 const QString kButtonDataType = lit("Button");
 const QString kStringDataType = lit("String");
 const QString kSeparatorDataType = lit("Separator");
-const QString kSeparatorLensControl = lit("LensControlDebug");
+
+// Fancy PTZL + lens control
+const QString kLensControl = lit("LensControlDebug");
+// Vertical slider with additional buttons.
+const QString kSliderControl = lit("SliderControl");
+// Pan tilt rotation control.
+const QString kPtrControl = lit("PtrControl");
 
 } //< anonymous namespace
 
@@ -75,6 +81,20 @@ QnCameraAdvancedParamValueList QnCameraAdvancedParamValueMap::difference(const Q
         if (other.contains(iter.key()) && other[iter.key()] == iter.value())
             continue;
         result << QnCameraAdvancedParamValue(iter.key(), iter.value());
+    }
+    return result;
+}
+
+QnCameraAdvancedParamValueMap QnCameraAdvancedParamValueMap::differenceMap(
+    const QnCameraAdvancedParamValueMap & other) const
+{
+    QnCameraAdvancedParamValueMap result;
+    for (auto iter = this->cbegin(); iter != this->cend(); ++iter)
+    {
+        if (other.contains(iter.key()) && other[iter.key()] == iter.value())
+            continue;
+
+        result[iter.key()] = iter.value();
     }
     return result;
 }
@@ -157,7 +177,11 @@ QString QnCameraAdvancedParameter::dataTypeToString(DataType value)
         case DataType::Separator:
             return kSeparatorDataType;
         case DataType::LensControl:
-            return kSeparatorLensControl;
+            return kLensControl;
+        case DataType::PtrControl:
+            return kPtrControl;
+        case DataType::SliderControl:
+            return kSliderControl;
         default:
             return QString();
     }
@@ -165,14 +189,16 @@ QString QnCameraAdvancedParameter::dataTypeToString(DataType value)
 
 QnCameraAdvancedParameter::DataType QnCameraAdvancedParameter::stringToDataType(const QString &value)
 {
-	QList<QnCameraAdvancedParameter::DataType> allDataTypes = QList<QnCameraAdvancedParameter::DataType>()
-		<< DataType::Bool
-		<< DataType::Number
-		<< DataType::Enumeration
-		<< DataType::Button
-		<< DataType::String
+    QList<QnCameraAdvancedParameter::DataType> allDataTypes = QList<QnCameraAdvancedParameter::DataType>()
+        << DataType::Bool
+        << DataType::Number
+        << DataType::Enumeration
+        << DataType::Button
+        << DataType::String
         << DataType::Separator
-        << DataType::LensControl;
+        << DataType::LensControl
+        << DataType::SliderControl
+        << DataType::PtrControl;
 
 	for (auto dataType: allDataTypes)
 		if (dataTypeToString(dataType) == value)
@@ -472,6 +498,17 @@ void QnCameraAdvancedParams::merge(QnCameraAdvancedParams params)
     mergeGroups(&groups, &params.groups);
 }
 
+QnCameraAdvancedParameterCondition::QnCameraAdvancedParameterCondition(
+    QnCameraAdvancedParameterCondition::ConditionType type,
+    const QString& paramId,
+    const QString& value)
+    :
+    type(type),
+    paramId(paramId),
+    value(value)
+{
+}
+
 bool QnCameraAdvancedParameterCondition::checkValue(const QString& valueToCheck) const
 {
     switch (type)
@@ -500,13 +537,15 @@ bool QnCameraAdvancedParameterCondition::checkValue(const QString& valueToCheck)
     }
 }
 
-void QnCameraAdvancedParameterDependency::autoFillId()
+void QnCameraAdvancedParameterDependency::autoFillId(const QString& prefix)
 {
     static const QChar kDelimiter(L',');
     QString hash = range + kDelimiter + internalRange;
     for (const auto& condition: conditions)
         hash += kDelimiter + condition.paramId + kDelimiter + condition.value;
-    id = guidFromArbitraryData(hash).toSimpleString();
+    id = prefix.isEmpty()
+        ? guidFromArbitraryData(hash).toSimpleString()
+        : prefix + lit("_") + guidFromArbitraryData(hash).toSimpleString();
 }
 
 QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(QnCameraAdvancedParameter, DataType,
@@ -533,4 +572,4 @@ QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(QnCameraAdvancedParameterDependency, D
     (QnCameraAdvancedParameterDependency::DependencyType::trigger, "Trigger")
 )
 
-QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(QnCameraAdvancedParameterTypes, (json), _Fields)
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(QnCameraAdvancedParameterTypes, (json)(eq), _Fields)

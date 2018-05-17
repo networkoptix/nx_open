@@ -157,7 +157,7 @@ void QnResourceListModel::setCheckedResources(const QSet<QnUuid>& ids)
     // We will gather all resource ids to a separate set, and then check ids
     // from selection with this set. O(NlogM) is here.
     QSet<QnUuid> contained_ids;
-    for (const auto& resource : m_resources)
+    for (const auto& resource: m_resources)
     {
         auto id = resource->getId();
         contained_ids.insert(id);

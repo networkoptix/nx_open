@@ -345,6 +345,12 @@ void QnResourceAccessManager::handleResourceAdded(const QnResourcePtr& resource)
 
     if (const auto& camera = resource.dynamicCast<QnVirtualCameraResource>())
     {
+        connect(camera, &QnVirtualCameraResource::licenseTypeChanged, this,
+            &QnResourceAccessManager::updatePermissionsToResource);
+
+        connect(camera, &QnVirtualCameraResource::licenseTypeChanged, this,
+            &QnResourceAccessManager::updatePermissionsToResource);
+
         connect(camera, &QnVirtualCameraResource::licenseUsedChanged, this,
             &QnResourceAccessManager::updatePermissionsToResource);
 

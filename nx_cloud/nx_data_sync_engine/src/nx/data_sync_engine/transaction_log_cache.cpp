@@ -4,8 +4,7 @@
 #include <nx/utils/std/cpp14.h>
 
 namespace nx {
-namespace cdb {
-namespace ec2 {
+namespace data_sync_engine {
 
 using VmsDataState = VmsTransactionLogCache::VmsDataState;
 
@@ -17,7 +16,7 @@ VmsTransactionLogCache::VmsTransactionLogCache():
 
 bool VmsTransactionLogCache::isShouldBeIgnored(
     const nx::String& systemId,
-    const ::ec2::QnAbstractTransaction& tran,
+    const CommandHeader& tran,
     const QByteArray& hash) const
 {
     using namespace ::ec2;
@@ -144,7 +143,7 @@ void VmsTransactionLogCache::updateTimestampSequence(TranId tranId, quint64 newV
 
 void VmsTransactionLogCache::insertOrReplaceTransaction(
     TranId tranId,
-    const ::ec2::QnAbstractTransaction& transaction,
+    const CommandHeader& transaction,
     const QByteArray& transactionHash)
 {
     QnMutexLocker lock(&m_mutex);
@@ -251,6 +250,5 @@ const VmsTransactionLogCache::TranContext* VmsTransactionLogCache::findTranConte
     return it != m_tranIdToContext.end() ? &it->second : nullptr;
 }
 
-} // namespace ec2
-} // namespace cdb
+} // namespace data_sync_engine
 } // namespace nx

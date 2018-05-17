@@ -748,21 +748,21 @@ QMimeData *QnResourceTreeModel::mimeData(const QModelIndexList& indexes) const
 }
 
 bool QnResourceTreeModel::dropMimeData(const QMimeData* mimeData, Qt::DropAction action,
-    int row, int column, const QModelIndex& parent)
+    int row, int column, const QModelIndex& index)
 {
     if (!mimeData)
         return false;
 
-    /* Check if the action is supported. */
+    // Check if the action is supported.
     if (!supportedDropActions().testFlag(action))
         return false;
 
-    /* Check if the format is supported. */
+    // Check if the format is supported.
     if (!intersects(mimeData->formats(), MimeData::mimeTypes()))
-        return base_type::dropMimeData(mimeData, action, row, column, parent);
+        return base_type::dropMimeData(mimeData, action, row, column, index);
 
-    /* Check where we're dropping it. */
-    auto node = this->node(parent);
+    // Check where we're dropping it.
+    auto node = this->node(index);
     NX_ASSERT(node);
     if (!node)
         return false;
@@ -779,7 +779,10 @@ bool QnResourceTreeModel::dropMimeData(const QMimeData* mimeData, Qt::DropAction
 
     TRACE("Dropping on the node " << node->data(Qt::DisplayRole, 0).toString() << " type " << (int)
         node->type());
-    /* Dropping into an item is the same as dropping into a layout. */
+
+    // There are some drag&drop behaviours, that require to move up through the tree
+
+    // Dropping into an item is the same as dropping into a layout.
     if (node->type() == ResourceTreeNodeType::layoutItem)
     {
         node = node->parent();
@@ -787,7 +790,7 @@ bool QnResourceTreeModel::dropMimeData(const QMimeData* mimeData, Qt::DropAction
             return false;
     }
 
-    /* Dropping into accessible layouts is the same as dropping into a user. */
+    // Dropping into accessible layouts is the same as dropping into a user.
     if (node->type() == ResourceTreeNodeType::sharedLayouts)
     {
         node = node->parent();
@@ -795,7 +798,7 @@ bool QnResourceTreeModel::dropMimeData(const QMimeData* mimeData, Qt::DropAction
             return false;
     }
 
-    /* Dropping into a server camera is the same as dropping into a server */
+    // Dropping into a server camera is the same as dropping into a server.
     if (node->parent() && (node->parent()->resourceFlags().testFlag(Qn::server)))
     {
         node = node->parent();
@@ -803,12 +806,28 @@ bool QnResourceTreeModel::dropMimeData(const QMimeData* mimeData, Qt::DropAction
             return false;
     }
 
-    /* Decode. */
+    // Dropping something into a group of resources.
+    // Dropping at a group of cameras -> ResourceTreeNodeType::sharedResources
+    // Dropping at a group of layouts -> ResourceTreeNodeType::sharedLayouts
+    // In both cases we expect that parent node is user or user role.
+    if (node->type() == ResourceTreeNodeType::sharedResources
+        || node->type() == ResourceTreeNodeType::sharedLayouts)
+    {
+        node = node->parent();
+        if (!node)
+            return false;
+        auto parentType = node->type();
+        if (parentType != ResourceTreeNodeType::role
+            && parentType != ResourceTreeNodeType::resource)
+            return false;
+    }
+
+    // Decode.
     // Resource tree drop is working only for resources that are already in the pool.
     MimeData data(mimeData, resourcePool());
     resourcePool()->addNewResources(data.resources());
 
-    /* Drop on videowall is handled in videowall. */
+    // Drop on videowall is handled in videowall.
     if (node->type() == ResourceTreeNodeType::videoWallItem)
     {
         const auto videoWallItems = resourcePool()->getVideoWallItemsByUuid(data.entities());
@@ -838,11 +857,8 @@ bool QnResourceTreeModel::dropMimeData(const QMimeData* mimeData, Qt::DropAction
             TRACE("Sharing layout " << layout->getName() << " with role "
                 << node->m_displayName);
 
-            menu()->trigger(
-                action::ShareLayoutAction,
-                action::Parameters(layout)
-                    .withArgument(Qn::UuidRole, roleId)
-            );
+            menu()->trigger(action::ShareLayoutAction,
+                action::Parameters(layout).withArgument(Qn::UuidRole, roleId));
         }
         auto camerasToShare = data.resources().filtered<QnVirtualCameraResource>();
         for (const auto& camera: camerasToShare)
@@ -850,18 +866,14 @@ bool QnResourceTreeModel::dropMimeData(const QMimeData* mimeData, Qt::DropAction
             TRACE("Sharing camera " << camera->getName() << " with role "
                 << node->m_displayName);
 
-            menu()->trigger(
-                action::ShareCameraAction,
-                action::Parameters(camera)
-                .withArgument(Qn::UuidRole, roleId)
-            );
+            menu()->trigger(action::ShareCameraAction,
+                action::Parameters(camera).withArgument(Qn::UuidRole, roleId));
         }
     }
     else
     {
         handleDrop(data.resources(), node->resource(), mimeData);
     }
-
     return true;
 }
 

@@ -71,9 +71,9 @@ void LayoutPreviewPainter::setLayout(const QnLayoutResourcePtr& layout)
         m_layoutThumbnailProvider.reset(
             new LayoutThumbnailLoader(m_layout, previewSize, nx::api::ImageRequest::kLatestThumbnail));
 
-        connect(m_layoutThumbnailProvider.get(), &QnImageProvider::statusChanged,
+        connect(m_layoutThumbnailProvider.get(), &ImageProvider::statusChanged,
             this, &LayoutPreviewPainter::at_updateThumbnailStatus);
-        connect(m_layoutThumbnailProvider.get(), &QnImageProvider::imageChanged,
+        connect(m_layoutThumbnailProvider.get(), &ImageProvider::imageChanged,
             this, &LayoutPreviewPainter::at_updateThumbnailImage);
 
         m_layoutThumbnailProvider->setResourcePool(m_resourcePool);

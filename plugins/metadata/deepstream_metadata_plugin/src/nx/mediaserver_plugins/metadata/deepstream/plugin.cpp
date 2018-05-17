@@ -166,7 +166,7 @@ const char* Plugin::capabilitiesManifest(Error* error) const
 
     static const std::string kManifestPostfix = (R"json(
             ],
-            "capabilities": "needDeepCopyForMediaFrame"
+            "capabilities": ""
         })json");
 
     m_manifest = kManifestPrefix;
@@ -314,7 +314,7 @@ std::string Plugin::buildManifestObectTypeString(const ObjectClassDescription& d
     })json");
 
     return kObjectTypeStringPrefix
-        + nxpt::NxGuidHelper::toStdString(description.guid)
+        + nxpt::toStdString(description.guid)
         + kObjectTypeStringMiddle
         + description.name
         + kObjectTypeStringPostfix;

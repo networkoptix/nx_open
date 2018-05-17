@@ -37,21 +37,21 @@ api::ResultCode dbResultToApiResult(nx::utils::db::DBResult dbResult)
     return api::ResultCode::dbError;
 }
 
-api::ResultCode ec2ResultToResult(ec2::ResultCode resultCode)
+api::ResultCode ec2ResultToResult(data_sync_engine::ResultCode resultCode)
 {
     switch (resultCode)
     {
-        case ec2::ResultCode::ok:
+        case data_sync_engine::ResultCode::ok:
             return api::ResultCode::ok;
-        case ec2::ResultCode::partialContent:
+        case data_sync_engine::ResultCode::partialContent:
             return api::ResultCode::partialContent;
-        case ec2::ResultCode::dbError:
+        case data_sync_engine::ResultCode::dbError:
             return api::ResultCode::dbError;
-        case ec2::ResultCode::retryLater:
+        case data_sync_engine::ResultCode::retryLater:
             return api::ResultCode::retryLater;
-        case ec2::ResultCode::notFound:
+        case data_sync_engine::ResultCode::notFound:
             return api::ResultCode::notFound;
-        case ec2::ResultCode::badRequest:
+        case data_sync_engine::ResultCode::badRequest:
             return api::ResultCode::badRequest;
         default:
             return api::ResultCode::unknownError;

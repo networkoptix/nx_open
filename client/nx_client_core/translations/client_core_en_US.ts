@@ -101,6 +101,13 @@
     </message>
 </context>
 <context>
+    <name>QObject</name>
+    <message>
+        <source>None</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>QnCloudResultInfo</name>
     <message>
         <source>Successful.</source>
@@ -195,6 +202,25 @@
     </message>
 </context>
 <context>
+    <name>QnDesktopAudioOnlyDataProvider</name>
+    <message>
+        <source>Could not find audio encoder &quot;%1&quot;.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Could not initialize audio encoder.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Sample format of input device %1 is not supported.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Primary audio device is not selected.</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>QnDirectSystemsFinder</name>
     <message>
         <source>System</source>
@@ -216,6 +242,153 @@
     <message>
         <source>Your System</source>
         <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>QnTimeStrings</name>
+    <message>
+        <source>ms</source>
+        <comment>Suffix for displaying milliseconds</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>s</source>
+        <comment>Suffix for displaying seconds</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>m</source>
+        <comment>Suffix for displaying minutes</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>h</source>
+        <comment>Suffix for displaying hours</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>d</source>
+        <comment>Suffix for displaying days</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>w</source>
+        <comment>Suffix for displaying weeks</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>M</source>
+        <comment>Suffix for displaying months</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>y</source>
+        <comment>Suffix for displaying years</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>msec</source>
+        <comment>Long suffix for displaying milliseconds</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>sec</source>
+        <comment>Long suffix for displaying seconds</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>min</source>
+        <comment>Long suffix for displaying minutes</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>hrs</source>
+        <comment>Long suffix for displaying hours</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>days</source>
+        <comment>Long suffix for displaying days</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>wks</source>
+        <comment>Long suffix for displaying weeks</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>mos</source>
+        <comment>Long suffix for displaying months</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>yrs</source>
+        <comment>Long suffix for displaying years</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message numerus="yes">
+        <source>milliseconds</source>
+        <comment>Full suffix for displaying milliseconds</comment>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>seconds</source>
+        <comment>Full suffix for displaying seconds</comment>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>minutes</source>
+        <comment>Full suffix for displaying minutes</comment>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>hours</source>
+        <comment>Full suffix for displaying hours</comment>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>days</source>
+        <comment>Full suffix for displaying days</comment>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>weeks</source>
+        <comment>Full suffix for displaying weeks</comment>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>months</source>
+        <comment>Full suffix for displaying months</comment>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>years</source>
+        <comment>Full suffix for displaying years</comment>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
     </message>
 </context>
 </TS>

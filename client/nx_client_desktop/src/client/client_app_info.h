@@ -33,4 +33,7 @@ struct QnClientAppInfo
     static QString binDirSuffix();
     /** lib directory location relative to client package root. */
     static QString libDirSuffix();
+
+    /** Version of the EULA. */
+    static int eulaVersion();
 };

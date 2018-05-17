@@ -17,12 +17,16 @@
 #include <mobile_client/mobile_client_module.h>
 #include <watchers/available_cameras_watcher.h>
 #include <watchers/cloud_status_watcher.h>
-#include <watchers/user_watcher.h>
 #include <helpers/cloud_url_helper.h>
 #include <helpers/system_helpers.h>
 #include <settings/last_connection.h>
 #include <settings/qml_settings_adaptor.h>
 #include <nx/network/url/url_builder.h>
+#include <nx/network/socket_global.h>
+#include <nx/network/address_resolver.h>
+#include <nx/client/core/two_way_audio/two_way_audio_mode_controller.h>
+#include <nx/client/core/watchers/user_watcher.h>
+#include <nx/client/core/utils/operation_manager.h>
 
 using namespace nx::vms::utils;
 
@@ -88,6 +92,9 @@ QnContext::QnContext(QObject* parent) :
                     break;
             }
         });
+
+    connect(qApp->screens().first(), &QScreen::orientationChanged,
+        this, &QnContext::customMarginsChanged);
 }
 
 QnContext::~QnContext() {}
@@ -97,9 +104,24 @@ QnCloudStatusWatcher* QnContext::cloudStatusWatcher() const
     return qnMobileClientModule->cloudStatusWatcher();
 }
 
-QnUserWatcher* QnContext::userWatcher() const
+QnConnectionManager* QnContext::connectionManager() const
 {
-    return commonModule()->instance<QnUserWatcher>();
+    return m_connectionManager;
+}
+
+nx::client::core::TwoWayAudioController* QnContext::twoWayAudioController() const
+{
+    return commonModule()->instance<nx::client::core::TwoWayAudioController>();
+}
+
+nx::client::core::OperationManager* QnContext::operationManager() const
+{
+    return commonModule()->instance<nx::client::core::OperationManager>();
+}
+
+nx::client::core::UserWatcher* QnContext::userWatcher() const
+{
+    return commonModule()->instance<nx::client::core::UserWatcher>();
 }
 
 QmlSettingsAdaptor* QnContext::settings() const
@@ -224,6 +246,11 @@ void QnContext::removeSavedConnection(const QString& localSystemId, const QStrin
     qnClientCoreSettings->save();
 }
 
+void QnContext::clearSavedPasswords()
+{
+    nx::client::core::helpers::clearSavedPasswords();
+}
+
 void QnContext::clearLastUsedConnection()
 {
     qnSettings->setLastUsedConnection(LastConnectionData());
@@ -237,6 +264,11 @@ QString QnContext::getLastUsedSystemName() const
 nx::utils::Url QnContext::getLastUsedUrl() const
 {
     return qnSettings->lastUsedConnection().urlWithCredentials();
+}
+
+bool QnContext::isCloudConnectionUrl(const nx::utils::Url& url)
+{
+    return url.scheme() == QnConnectionManager::kCloudConnectionScheme;
 }
 
 nx::utils::Url QnContext::getInitialUrl() const
@@ -256,13 +288,14 @@ nx::utils::Url QnContext::getWebSocketUrl() const
         .setPort(port);
 }
 
-void QnContext::setCloudCredentials(const QString& login, const QString& password)
+bool QnContext::setCloudCredentials(const QString& login, const QString& password)
 {
     // TODO: #GDM do we need store temporary credentials here?
     qnClientCoreSettings->setCloudLogin(login);
     qnClientCoreSettings->setCloudPassword(password);
-    cloudStatusWatcher()->setCredentials(QnEncodedCredentials(login, password));
+    const bool result = cloudStatusWatcher()->setCredentials(QnEncodedCredentials(login, password));
     qnClientCoreSettings->save();
+    return result;
 }
 
 QString QnContext::lp(const QString& path) const
@@ -278,4 +311,29 @@ void QnContext::setLocalPrefix(const QString& prefix)
     m_localPrefix = prefix;
     if (!m_localPrefix.endsWith(lit("/")))
         m_localPrefix.append(lit("/"));
+}
+
+void QnContext::updateCustomMargins()
+{
+    emit customMarginsChanged();
+}
+
+int QnContext::leftCustomMargin() const
+{
+    return getCustomMargins().left();
+}
+
+int QnContext::rightCustomMargin() const
+{
+    return getCustomMargins().right();
+}
+
+int QnContext::topCustomMargin() const
+{
+    return getCustomMargins().top();
+}
+
+int QnContext::bottomCustomMargin() const
+{
+    return getCustomMargins().bottom();
 }

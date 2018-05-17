@@ -18,6 +18,8 @@
 #include <QtWidgets/QGraphicsLinearLayout>
 #include <QtWidgets/QGraphicsSceneWheelEvent>
 
+#include <translation/datetime_formatter.h>
+
 #include <camera/thumbnails_loader.h>
 
 #include <core/resource/camera_bookmark.h>
@@ -778,32 +780,20 @@ QnTimeSlider::~QnTimeSlider()
 
 void QnTimeSlider::createSteps(QVector<QnTimeStep>* absoluteSteps, QVector<QnTimeStep>* relativeSteps)
 {
-    static const QString hmFormat = tr("hh:mm",
-        "Format for displaying hours and minutes on timeline.");
-    static const QString hmApFormat = tr("h:mm ap",
-        "Format for displaying hours and minutes on timeline, with am/pm indicator.");
-    static const QString hApFormat = tr("h ap",
-        "Format for displaying hours on timeline, with am/pm indicator.");
-    static const QString dFormat = tr("dd",
-        "Format for displaying days on timeline.");
-    static const QString moFormat = tr("MMMM",
-        "Format for displaying months on timeline.");
-    static const QString yFormat = tr("yyyy",
-        "Format for displaying years on timeline");
-    static const QString dateMinsFormat = tr("dd MMMM yyyy hh:mm",
-        "Format for displaying minute caption in timeline's header, without am/pm indicator.");
-    static const QString dateMinsApFormat = tr("dd MMMM yyyy h:mm ap",
-        "Format for displaying minute caption in timeline's header, with am/pm indicator.");
-    static const QString dateHoursFormat = tr("dd MMMM yyyy hh:mm",
-        "Format for displaying hour caption in timeline's header, without am/pm indicator.");
-    static const QString dateHoursApFormat = tr("dd MMMM yyyy h ap",
-        "Format for displaying hour caption in timeline's header, with am/pm indicator.");
-    static const QString dateDaysFormat = tr("dd MMMM yyyy",
-        "Format for displaying day caption in timeline's header.");
-    static const QString dateMonthsFormat = tr("MMMM yyyy",
-        "Format for displaying month caption in timeline's header.");
-    static const QString dateYearsFormat = tr("yyyy",
-        "Format for displaying year caption in timeline's header");
+
+    static const QString mFormat = datetime::getFormatString(datetime::Format::hh_mm);
+    static const QString hFormat = datetime::getFormatString(datetime::Format::hh);
+
+    static const QString dFormat = datetime::getFormatString(datetime::Format::dd);
+    static const QString moFormat = datetime::getFormatString(datetime::Format::MMM);
+    static const QString yFormat = datetime::getFormatString(datetime::Format::yyyy);
+    static const QString dateMinsFormat = datetime::getFormatString(datetime::Format::dd_MM_yyyy)
+        + QChar::Space + datetime::getFormatString(datetime::Format::hh_mm);
+    static const QString dateHoursFormat = datetime::getFormatString(datetime::Format::dd_MM_yyyy)
+        + QChar::Space + datetime::getFormatString(datetime::Format::hh);
+    static const QString dateDaysFormat = datetime::getFormatString(datetime::Format::dd_MM_yyyy);
+    static const QString dateMonthsFormat = datetime::getFormatString(datetime::Format::MMMM_yyyy);
+    static const QString dateYearsFormat = datetime::getFormatString(datetime::Format::yyyy);;
 
     QString msSuffix = QnTimeStrings::suffix(QnTimeStrings::Suffix::Milliseconds);
     QString sSuffix = QnTimeStrings::suffix(QnTimeStrings::Suffix::Seconds);
@@ -812,11 +802,6 @@ void QnTimeSlider::createSteps(QVector<QnTimeStep>* absoluteSteps, QVector<QnTim
     QString dSuffix = QnTimeStrings::suffix(QnTimeStrings::Suffix::Days);
     QString moSuffix = QnTimeStrings::suffix(QnTimeStrings::Suffix::Months);
     QString ySuffix = QnTimeStrings::suffix(QnTimeStrings::Suffix::Years);
-
-    bool ampm = QLocale().timeFormat().contains(lit("ap"), Qt::CaseInsensitive);
-
-    const QString& hFormat = ampm ? hApFormat : hmFormat;
-    const QString& mFormat = ampm ? hmApFormat : hmFormat;
 
     *absoluteSteps <<
         QnTimeStep(QnTimeStep::Milliseconds,    1ll,                                10,     1000,   msSuffix,       QString(),          false) <<
@@ -827,11 +812,11 @@ void QnTimeSlider::createSteps(QVector<QnTimeStep>* absoluteSteps, QVector<QnTim
         QnTimeStep(QnTimeStep::Seconds,         1000ll,                             5,      60,     sSuffix,        QString(),          false) <<
         QnTimeStep(QnTimeStep::Seconds,         1000ll,                             10,     60,     sSuffix,        QString(),          false) <<
         QnTimeStep(QnTimeStep::Seconds,         1000ll,                             30,     60,     sSuffix,        QString(),          false) <<
-        QnTimeStep(QnTimeStep::Minutes,         1000ll * 60,                        1,      24*60,  mFormat,        ampm ? dateMinsApFormat : dateMinsFormat, false) <<
+        QnTimeStep(QnTimeStep::Minutes,         1000ll * 60,                        1,      24*60,  mFormat,        dateMinsFormat,     false) <<
         QnTimeStep(QnTimeStep::Minutes,         1000ll * 60,                        5,      24*60,  mFormat,        QString(),          false) <<
         QnTimeStep(QnTimeStep::Minutes,         1000ll * 60,                        10,     24*60,  mFormat,        QString(),          false) <<
         QnTimeStep(QnTimeStep::Minutes,         1000ll * 60,                        30,     24*60,  mFormat,        QString(),          false) <<
-        QnTimeStep(QnTimeStep::Hours,           1000ll * 60 * 60,                   1,      24,     hFormat,        ampm ? dateHoursApFormat : dateHoursFormat, false) <<
+        QnTimeStep(QnTimeStep::Hours,           1000ll * 60 * 60,                   1,      24,     hFormat,        dateHoursFormat,    false) <<
         QnTimeStep(QnTimeStep::Hours,           1000ll * 60 * 60,                   3,      24,     hFormat,        QString(),          false) <<
         QnTimeStep(QnTimeStep::Hours,           1000ll * 60 * 60,                   12,     24,     hFormat,        QString(),          false) <<
         QnTimeStep(QnTimeStep::Days,            1000ll * 60 * 60 * 24,              1,      31,     dFormat,        dateDaysFormat,     false) <<
@@ -1774,27 +1759,19 @@ void QnTimeSlider::updateToolTipText()
     }
     else
     {
-        static const QString tooltipFormatDate = lit("dd MMMM yyyy");
-        static const QString tooltipFormatTimeLong = lit("hh:mm:ss");
-        static const QString tooltipFormatTimeLongAP = lit("h:mm:ss ap");
-        static const QString tooltipFormatTimeShort = lit("mm:ss");
-
-        const bool ampm = m_locale.timeFormat().contains(lit("ap"), Qt::CaseInsensitive);
-        const auto tooltipFormatTime = ampm ? tooltipFormatTimeLongAP : tooltipFormatTimeLong;
-
         if (m_options.testFlag(UseUTC))
         {
             QDateTime dateTime = QDateTime::fromMSecsSinceEpoch(pos + m_localOffset);
-            line1 = m_locale.toString(dateTime, tooltipFormatDate);
-            line2 = m_locale.toString(dateTime, tooltipFormatTime);
+            line1 = datetime::toString(dateTime.date());
+            line2 = datetime::toString(dateTime.time());
         }
         else
         {
-            const auto& format = maximum() >= 60ll * 60ll * 1000ll /* Longer than 1 hour? */
-                ? tooltipFormatTimeLong
-                : tooltipFormatTimeShort;
+            const auto format = maximum() >= 60ll * 60ll * 1000ll /* Longer than 1 hour? */
+                ? datetime::Format::hh_mm_ss
+                : datetime::Format::mm_ss;
 
-            line1 = m_locale.toString(msecsToTime(pos), format);
+            line1 = datetime::toString(pos, format);
         }
     }
 

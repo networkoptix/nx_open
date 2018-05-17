@@ -58,9 +58,6 @@
     </layout>
    </item>
    <item>
-    <widget class="QnWordWrappedLabel" name="labelWidget" native="true"/>
-   </item>
-   <item>
     <spacer name="verticalSpacer">
      <property name="orientation">
       <enum>Qt::Vertical</enum>
@@ -75,14 +72,6 @@
    </item>
   </layout>
  </widget>
- <customwidgets>
-  <customwidget>
-   <class>QnWordWrappedLabel</class>
-   <extends>QWidget</extends>
-   <header location="global">ui/widgets/word_wrapped_label.h</header>
-   <container>1</container>
-  </customwidget>
- </customwidgets>
  <resources/>
  <connections/>
 </ui>

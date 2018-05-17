@@ -32,38 +32,40 @@ def format_script(body, variables):
                 )
             )
     function_name = 'Execute-Script'
-    script = dedent(
-        '''
+    # Stub but valid PowerShell script. PyCharm syntax highlight can be enabled.
+    # language=PowerShell
+    script = '''
         $ProgressPreference = 'SilentlyContinue'
         $ErrorActionPreference = 'Stop'
-        function {function_name} ({parameters}) {{
-            {body}
-        }}
-        try {{
-            $Result = {execution}
+        function Do-Something <# Function name #> (<# Parameters #>) {
+            <# Body #>
+        }
+        try {
+            $Result = Do-Something <# Execution #>
             # @( $Result ) converts $null to empty array, single object to array with single element
             # and don't make an array nested.
             ConvertTo-Json @( 'success', @( $Result ) )
-        }} catch {{
+        } catch {
             $ExceptionInfo = @(
                 $_.Exception.GetType().FullName,
                 $_.CategoryInfo.Category.ToString(),
                 $_.Exception.Message
             )
             ConvertTo-Json @( 'fail', $ExceptionInfo )
-        }}
-        ''').strip().format(
-        function_name=function_name,
-        parameters=', '.join(parameters),
-        execution=_indent(
-            ' `\n'.join([function_name] + arguments)
-            if arguments else
-            function_name,
-            ' ' * 8),
-        body=_indent(
-            dedent(body).strip(),
-            ' ' * 4),
-        ).replace(' \n', '\n')
+        }
+        '''
+    script = dedent(script).strip()
+    script = script.replace('Do-Something <# Function name #>', function_name)
+    script = script.replace('<# Parameters #>', ', '.join(parameters))
+    script = script.replace('Do-Something <# Execution #>', _indent(
+        ' `\n'.join([function_name] + arguments)
+        if arguments else
+        function_name,
+        ' ' * 8))
+    script = script.replace('<# Body #>', _indent(
+        dedent(body).strip(),
+        ' ' * 4))
+    script = script.replace(' \n', '\n')
 
     return script
 
