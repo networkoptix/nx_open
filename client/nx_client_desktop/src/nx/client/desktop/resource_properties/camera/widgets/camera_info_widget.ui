@@ -139,9 +139,6 @@
      </widget>
      <widget class="QWidget" name="moreInfoPage">
       <layout class="QGridLayout" name="moreInfoLayout" rowminimumheight="20,20,20,8,20,20,20,8,20,20,20">
-       <property name="sizeConstraint">
-        <enum>QLayout::SetFixedSize</enum>
-       </property>
        <property name="leftMargin">
         <number>8</number>
        </property>
