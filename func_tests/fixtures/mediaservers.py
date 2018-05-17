@@ -8,12 +8,14 @@ from framework.merging import merge_systems, setup_local_system
 
 def pytest_addoption(parser):
     parser.addoption('--mediaserver-deb', type=Path)
+    parser.addoption('--mediaserver-msi', type=Path)
 
 
 @pytest.fixture(scope='session')
 def mediaserver_packages(request):
     return {
         'deb': request.config.getoption('--mediaserver-deb').expanduser(),
+        'msi': request.config.getoption('--mediaserver-msi').expanduser(),
         }
 
 

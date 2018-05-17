@@ -12,6 +12,7 @@ from ._cim_query import CIMQuery
 from ._cmd import Shell, run_command
 from ._env_vars import EnvVars
 from ._powershell import run_powershell_script
+from ._registry import Key
 from ._users import Users
 
 _logger = logging.getLogger(__name__)
@@ -34,7 +35,8 @@ class WinRM(object):
         self._protocol = winrm.Protocol(
             'http://{}:{}/wsman'.format(address, port),
             username=username, password=password,
-            transport='ntlm')
+            transport='ntlm',
+            operation_timeout_sec=120, read_timeout_sec=240)
         self._username = username
 
     def __del__(self):
@@ -67,7 +69,11 @@ class WinRM(object):
         account = users.account_by_name(self._username)
         profile = users.profile_by_sid(account[u'SID'])
         profile_dir = profile[u'LocalPath']
-        env_vars = EnvVars.request(self._protocol, account[u'Caption'], {u'USERPROFILE': profile_dir})
+        default_env_vars = {
+            u'USERPROFILE': profile_dir,
+            u'PROGRAMFILES': u'C:\\Program Files',
+            }
+        env_vars = EnvVars.request(self._protocol, account[u'Caption'], default_env_vars)
         return env_vars
 
     @lrudecorator(1)
@@ -79,6 +85,9 @@ class WinRM(object):
 
     def wmi_query(self, class_name, selectors):
         return CIMQuery(self._protocol, class_name, selectors)
+
+    def registry_key(self, path):
+        return Key(self.wmi_query(u'StdRegProv', {}), path)
 
     def is_working(self):
         try:

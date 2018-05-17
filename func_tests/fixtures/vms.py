@@ -1,4 +1,5 @@
 from collections import namedtuple
+from itertools import combinations_with_replacement
 
 import pytest
 from netaddr import IPAddress
@@ -107,7 +108,7 @@ def one_vm_type(request):
 
 @pytest.fixture(
     scope='session',
-    params=[('linux', 'linux')],
+    params=combinations_with_replacement(vm_types_configuration().keys(), 2),
     ids='-'.join)
 def two_vm_types(request):
     return request.param
