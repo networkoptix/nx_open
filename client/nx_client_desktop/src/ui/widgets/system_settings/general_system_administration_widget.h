@@ -30,6 +30,9 @@ public:
 protected:
     void setReadOnlyInternal(bool readOnly) override;
 
+private slots:
+    void at_setVideoTrafficEncryptionWarning(bool checkboxChecked);
+
 private:
     bool isDatabaseBackupAvailable() const;
 
