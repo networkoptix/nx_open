@@ -136,9 +136,12 @@ class Command(BaseCommand):
         read_languages('blue')
         if not Customization.objects.filter(name=settings.CUSTOMIZATION).exists():
             structure.find_or_add_product('cloud_portal', True)
-            Customization(name=settings.CUSTOMIZATION,
-                          default_language=Language.by_code('en_US'),
-                          preview_status=0).save()
+            default_customization = Customization(name=settings.CUSTOMIZATION,
+                                                  default_language=Language.by_code('en_US'),
+                                                  preview_status=0)
+            default_customization.save()
+            default_customization.languages = [Language.by_code('en_US')]
+            default_customization.save()
         structure.read_structure_json('cms/cms_structure.json')
         read_structure('cloud_portal')
         self.stdout.write(self.style.SUCCESS(

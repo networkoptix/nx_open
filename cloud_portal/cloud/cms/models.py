@@ -87,7 +87,7 @@ class Context(models.Model):
     def __str__(self):
         return self.name
 
-    def template_for_language(self, language, default_language=None):
+    def template_for_language(self, language, default_language):
         context_template = self.contexttemplate_set.filter(language=language)
         if not context_template.exists():  # No template for language - try to get default language
             context_template = self.contexttemplate_set.filter(language=default_language)
@@ -205,7 +205,7 @@ class DataStructure(models.Model):
                     content_value = content_record.latest('version_id').value
 
         # if no value or optional and type file - use default value from structure
-        if not content_value and (not self.optional or self.optional and self.type == DataStructure.DATA_TYPES.file):
+        if not content_value and (not self.optional or self.optional and self.type in [DataStructure.DATA_TYPES.file, DataStructure.DATA_TYPES.image]):
             content_value = self.default
 
         return content_value
