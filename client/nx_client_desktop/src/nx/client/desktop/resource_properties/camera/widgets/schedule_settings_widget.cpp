@@ -60,17 +60,11 @@ void ScheduleSettingsWidget::setStore(CameraSettingsDialogStore* store)
             store->setScheduleBrushFps(value);
         });
 
-    connect(ui->displayQualityCheckBox, &QCheckBox::stateChanged, store,
-        [store](int state)
-        {
-            store->setRecordingShowQuality(state == Qt::Checked);
-        });
+    connect(ui->displayQualityCheckBox, &QCheckBox::clicked,
+        store, &CameraSettingsDialogStore::setRecordingShowQuality);
 
-    connect(ui->displayFpsCheckBox, &QCheckBox::stateChanged, store,
-        [store](int state)
-        {
-            store->setRecordingShowFps(state == Qt::Checked);
-        });
+    connect(ui->displayFpsCheckBox, &QCheckBox::clicked,
+        store, &CameraSettingsDialogStore::setRecordingShowFps);
 
     const auto makeRecordingTypeHandler =
         [store](Qn::RecordingType value)
@@ -135,9 +129,10 @@ void ScheduleSettingsWidget::setupUi()
     labelFont.setPixelSize(kRecordingTypeLabelFontSize);
     labelFont.setWeight(kRecordingTypeLabelFontWeight);
 
-    for (auto label: {
-        ui->labelAlways, ui->labelMotionOnly, ui->labelMotionPlusLQ, ui->labelNoRecord
-    })
+    const auto labels =
+        {ui->labelAlways, ui->labelMotionOnly, ui->labelMotionPlusLQ, ui->labelNoRecord};
+
+    for (auto label: labels)
     {
         label->setFont(labelFont);
         label->setProperty(style::Properties::kDontPolishFontProperty, true);
@@ -185,7 +180,6 @@ void ScheduleSettingsWidget::setupUi()
         paintFunctions->paintCellFunction(Qn::RecordingType::motionAndLow));
     ui->noRecordButton->setCustomPaintFunction(
         paintFunctions->paintCellFunction(Qn::RecordingType::never));
-
 }
 
 void ScheduleSettingsWidget::loadState(const CameraSettingsDialogState& state)
@@ -273,11 +267,19 @@ void ScheduleSettingsWidget::loadState(const CameraSettingsDialogState& state)
         ui->advancedSettingsButton->setIcon(buttonIcon);
     }
 
+    ui->displayQualityCheckBox->setChecked(state.recording.showQuality);
+    ui->displayFpsCheckBox->setChecked(state.recording.showFps);
+
+    ui->displaySettingsWidget->setVisible(state.recording.parametersAvailable);
+    ui->fpsAndQualityWidget->setVisible(state.recording.parametersAvailable);
+
     ui->settingsGroupBox->layout()->activate();
+    layout()->activate();
 
     const bool recordingEnabled = recording.enabled.valueOr(false);
     const auto labels =
         {ui->labelAlways, ui->labelMotionOnly, ui->labelMotionPlusLQ, ui->labelNoRecord};
+
     for (auto label: labels)
     {
         const auto button = qobject_cast<QAbstractButton*>(label->buddy());
