@@ -273,9 +273,6 @@ void ScheduleSettingsWidget::loadState(const CameraSettingsDialogState& state)
         ui->advancedSettingsButton->setIcon(buttonIcon);
     }
 
-    ui->panicModeLabel->setText(state.panicMode ? tr("On") : tr("Off"));
-    setWarningStyleOn(ui->panicModeLabel, state.panicMode);
-
     ui->settingsGroupBox->layout()->activate();
 
     const bool recordingEnabled = recording.enabled.valueOr(false);

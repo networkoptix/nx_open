@@ -411,12 +411,6 @@ State CameraSettingsDialogStateReducer::setReadOnly(State state, bool value)
     return state;
 }
 
-State CameraSettingsDialogStateReducer::setPanicMode(State state, bool value)
-{
-    state.panicMode = value;
-    return state;
-}
-
 State CameraSettingsDialogStateReducer::setSettingsOptimizationEnabled(State state, bool value)
 {
     state.settingsOptimizationEnabled = value;

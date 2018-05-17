@@ -28,7 +28,6 @@
 #include "redux/camera_settings_dialog_store.h"
 
 #include "watchers/camera_settings_readonly_watcher.h"
-#include "watchers/camera_settings_panic_watcher.h"
 #include "watchers/camera_settings_global_settings_watcher.h"
 
 #include "utils/camera_settings_dialog_state_conversion_functions.h"
@@ -143,7 +142,6 @@ CameraSettingsDialog::CameraSettingsDialog(QWidget* parent):
     d->previewManager->setThumbnailSize(QSize(0, 0));
     d->previewManager->setAutoRefresh(false);
 
-    new CameraSettingsPanicWatcher(d->store, this);
     new CameraSettingsGlobalSettingsWatcher(d->store, this);
 
     addPage(
