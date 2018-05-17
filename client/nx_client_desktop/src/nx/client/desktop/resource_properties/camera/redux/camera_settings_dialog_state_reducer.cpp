@@ -112,6 +112,8 @@ bool calculateRecordingParametersAvailable(const Cameras& cameras)
         [](const Camera& camera)
         {
             return camera->hasVideo()
+            // TODO: Probably server should set param NO_RECORDING_PARAMS_PARAM_NAME for rtsp links.
+                && camera->getVendor() != lit("GENERIC_RTSP")
                 && !camera->hasParam(Qn::NO_RECORDING_PARAMS_PARAM_NAME);
         });
 }

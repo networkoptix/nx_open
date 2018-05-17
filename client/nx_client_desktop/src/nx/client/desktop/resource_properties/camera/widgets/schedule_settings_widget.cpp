@@ -245,7 +245,8 @@ void ScheduleSettingsWidget::loadState(const CameraSettingsDialogState& state)
 
     ui->advancedSettingsWidget->setVisible(
         recording.customBitrateAvailable
-        && recording.customBitrateVisible);
+        && recording.customBitrateVisible
+        && recording.parametersAvailable);
 
     if (recording.customBitrateAvailable)
     {
@@ -267,11 +268,11 @@ void ScheduleSettingsWidget::loadState(const CameraSettingsDialogState& state)
         ui->advancedSettingsButton->setIcon(buttonIcon);
     }
 
-    ui->displayQualityCheckBox->setChecked(state.recording.showQuality);
-    ui->displayFpsCheckBox->setChecked(state.recording.showFps);
+    ui->displayQualityCheckBox->setChecked(recording.showQuality);
+    ui->displayFpsCheckBox->setChecked(recording.showFps);
 
-    ui->displaySettingsWidget->setVisible(state.recording.parametersAvailable);
-    ui->fpsAndQualityWidget->setVisible(state.recording.parametersAvailable);
+    ui->displaySettingsWidget->setVisible(recording.parametersAvailable);
+    ui->fpsAndQualityWidget->setVisible(recording.parametersAvailable);
 
     ui->settingsGroupBox->layout()->activate();
     layout()->activate();
