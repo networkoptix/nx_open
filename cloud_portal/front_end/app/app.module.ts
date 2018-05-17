@@ -80,7 +80,7 @@ class HybridUrlHandlingStrategy implements UrlHandlingStrategy {
         Location,
         CookieService,
         {provide: LocationStrategy, useClass: PathLocationStrategy},
-        {provide: UrlHandlingStrategy, useClass: HybridUrlHandlingStrategy}
+        {provide: UrlHandlingStrategy, useClass: HybridUrlHandlingStrategy},
     ],
     declarations: [
         AppComponent,
@@ -92,4 +92,6 @@ export class AppModule {
     ngDoBootstrap() {
     }
 }
+
+
 

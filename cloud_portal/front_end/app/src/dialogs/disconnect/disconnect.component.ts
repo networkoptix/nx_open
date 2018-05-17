@@ -60,7 +60,7 @@ export class NxModalDisconnectComponent implements OnInit {
     }
 
     private dialog(systemId) {
-        this.modalRef = this.modalService.open(DisconnectModalContent, {backdrop: 'static'});
+        this.modalRef = this.modalService.open(DisconnectModalContent, {backdrop: 'static', centered: true});
         this.modalRef.componentInstance.language = this.language.lang;
         this.modalRef.componentInstance.disconnect = this.disconnect;
         this.modalRef.componentInstance.systemId = systemId;

@@ -52,7 +52,7 @@ export class NxModalRenameComponent implements OnInit {
     }
 
     private dialog(systemId, systemName) {
-        this.modalRef = this.modalService.open(RenameModalContent, {backdrop: 'static'});
+        this.modalRef = this.modalService.open(RenameModalContent, {backdrop: 'static', centered: true});
         this.modalRef.componentInstance.language = this.language.lang;
         this.modalRef.componentInstance.systemId = systemId;
         this.modalRef.componentInstance.systemName = systemName;

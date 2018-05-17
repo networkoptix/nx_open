@@ -15,7 +15,7 @@
                     }
                     if (errorCodes && typeof(errorCodes[error.resultCode]) != 'undefined') {
                         if (angular.isFunction(errorCodes[error.resultCode])) {
-                            let result = errorCodes[error.resultCode](error);
+                            let result = (errorCodes[error.resultCode])(error) || false;
                             if (result !== true) {
                                 return result;
                             }
@@ -117,8 +117,8 @@
                                     self.processing = false;
                                     self.finished = true;
 
-                                    let error = false;
-                                    if (error = cloudApi.checkResponseHasError(data)) {
+                                    const error = cloudApi.checkResponseHasError(data);
+                                    if (error) {
                                         handleError(error);
                                     } else {
                                         self.success = true;

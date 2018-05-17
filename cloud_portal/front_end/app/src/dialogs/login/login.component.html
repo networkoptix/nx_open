@@ -12,10 +12,14 @@
         <div class="form-group">
             <label for="email" translate>Email</label>
             <input type="email" class="form-control"
-                   id="email" name="email"
+                   id="email" name="email" #email
                    [(ngModel)]="auth.email"
                    email maxlength="255"
                    required autofocus>
+            <div *ngIf="userStatus.notValidUsername">
+                <label class="input-error" translate>Account not found</label>
+                <a class="float-right" href (click)="gotoRegister()" translate>Create account</a>
+            </div>
         </div>
         <div class="form-group">
             <label for="password" translate>Password</label>

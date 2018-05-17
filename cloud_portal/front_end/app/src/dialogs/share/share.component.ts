@@ -143,7 +143,7 @@ export class NxModalShareComponent implements OnInit {
     }
 
     private dialog(system?, user?) {
-        this.modalRef = this.modalService.open(ShareModalContent, {backdrop: 'static'});
+        this.modalRef = this.modalService.open(ShareModalContent, {backdrop: 'static', centered: true});
         this.modalRef.componentInstance.language = this.language.lang;
         this.modalRef.componentInstance.system = system;
         this.modalRef.componentInstance.user = user;

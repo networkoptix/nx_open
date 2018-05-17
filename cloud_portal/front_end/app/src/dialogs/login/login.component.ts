@@ -1,6 +1,6 @@
-import { Component, Inject, OnInit, Input, ViewEncapsulation } from '@angular/core';
-import { Location, LocationStrategy, PathLocationStrategy }    from '@angular/common';
-import { NgbModal, NgbActiveModal, NgbModalRef }               from '@ng-bootstrap/ng-bootstrap';
+import { Component, Inject, OnInit, Input, ViewEncapsulation, ViewChild, ElementRef } from '@angular/core';
+import { Location, LocationStrategy, PathLocationStrategy }                           from '@angular/common';
+import { NgbModal, NgbActiveModal, NgbModalRef }                                      from '@ng-bootstrap/ng-bootstrap';
 
 @Component({
     selector: 'ngbd-modal-content',
@@ -16,9 +16,30 @@ export class LoginModalContent {
     @Input() closable;
     @Input() location;
 
+    @ViewChild('loginForm') loginForm: HTMLFormElement;
+    @ViewChild('email') email: ElementRef;
+
+    userStatus: {
+        notValidUsername: boolean,
+        notValidPassword: boolean,
+    };
+
     constructor(public activeModal: NgbActiveModal,
                 @Inject('account') private account: any,
                 @Inject('process') private process: any) {
+
+        this.userStatus = {
+            notValidUsername: false,
+            notValidPassword: false,
+        }
+    }
+
+    gotoRegister() {
+        // TODO: Repace this once 'register' page is moved to A5
+        // AJS and A5 routers freak out about route change *****
+        //this.location.go('/register');
+        document.location.href = '/register';
+        this.activeModal.close();
     }
 
     ngOnInit() {
@@ -35,7 +56,22 @@ export class LoginModalContent {
                     // *****************************************************
                     return false;
                 },
-                notFound: this.language.lang.errorCodes.emailNotFound,
+                notAuthorized: () => {
+                    alert(this.language.lang.errorCodes.notAuthorized);
+                },
+                notFound: () => {
+                    // alert(this.language.lang.errorCodes.emailNotFound)
+                    this.auth.password = '';
+                    this.loginForm.controls['email'].setErrors({'no_user': true});
+                    this.loginForm.controls['password'].markAsPristine();
+                    this.loginForm.controls['password'].markAsUntouched();
+
+                    <HTMLInputElement>this.email.nativeElement.select();
+
+                    // Using non-standard form validation is because
+                    // it breaks select() functionality -> switches ElementRef to FormControl
+                    this.userStatus.notValidUsername = true;
+                },
                 portalError: this.language.lang.errorCodes.brokenAccount
             }
         }).then(() => {
@@ -74,7 +110,7 @@ export class NxModalLoginComponent implements OnInit {
     }
 
     open(keepPage?) {
-        this.modalRef = this.modalService.open(LoginModalContent, {size: 'sm'});
+        this.modalRef = this.modalService.open(LoginModalContent, {size: 'sm', centered: true});
         this.modalRef.componentInstance.auth = this.auth;
         this.modalRef.componentInstance.language = this.language;
         this.modalRef.componentInstance.login = this.login;

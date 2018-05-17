@@ -55,16 +55,13 @@ def login(request):
         require_params(request, ('email', 'password'))
         email = request.data['email'].lower()
         password = request.data['password']
-        try:
-            user = django.contrib.auth.authenticate(username=email, password=password)
-        except APINotAuthorisedException:  # two possible reasons here - user not found or password incorrect
-            # try to find user in the DB
-            if not AccountBackend.is_email_in_portal(email):
-                raise APINotFoundException("User not in cloud portal") # user not found here
-            raise  # wrong password - just - re-raise the exception
+        user = django.contrib.auth.authenticate(username=email, password=password)
 
     if user is None:
-        raise APINotAuthorisedException('Username or password are invalid')
+        # try to find user in the DB
+        if not AccountBackend.is_email_in_portal(email):
+            raise APINotFoundException("User not in cloud portal", )  # user not found here
+        raise APINotAuthorisedException("Password is invalid")
 
     if 'remember' not in request.data or not request.data['remember']:
         request.session.set_expiry(0)
