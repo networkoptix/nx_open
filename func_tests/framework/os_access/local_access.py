@@ -1,3 +1,7 @@
+import datetime
+
+import tzlocal
+
 from framework.networking.prohibited import ProhibitedNetworking
 from framework.os_access.local_path import LocalPath
 from framework.os_access.os_access_interface import OSAccess
@@ -30,6 +34,14 @@ class LocalAccess(OSAccess):
     @property
     def forwarded_ports(self):
         return _local_ports
+
+    def get_time(self):
+        local_timezone = tzlocal.get_localzone()
+        local_datetime = datetime.datetime.now(tz=local_timezone)
+        return local_datetime
+
+    def set_time(self, new_time):
+        raise NotImplementedError("Changing local time is prohibited")
 
 
 local_access = LocalAccess()

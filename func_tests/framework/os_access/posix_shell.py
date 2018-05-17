@@ -1,4 +1,3 @@
-import datetime
 import errno
 import logging
 import math
@@ -7,12 +6,10 @@ import select
 import subprocess
 from abc import ABCMeta, abstractmethod
 
-import pytz
 from pathlib2 import Path
 
 from framework.os_access.exceptions import Timeout, exit_status_error_cls
 from framework.os_access.posix_shell_utils import sh_augment_script, sh_command_to_script
-from framework.utils import RunningTime
 from framework.waiting import Wait
 
 _logger = logging.getLogger(__name__)
@@ -54,12 +51,6 @@ class SSH(PosixShell):
             input=input,
             timeout_sec=timeout_sec)
         return output
-
-    def set_time(self, new_time):  # type: (SSH, datetime.datetime) -> RunningTime
-        # TODO: Make a separate Time class.
-        started_at = datetime.datetime.now(pytz.utc)
-        self.run_command(['date', '--set', new_time.isoformat()])
-        return RunningTime(new_time, datetime.datetime.now(pytz.utc) - started_at)
 
     def is_working(self):
         try:

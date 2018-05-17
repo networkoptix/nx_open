@@ -1,10 +1,14 @@
+import datetime
+import timeit
+
+import pytz
 from pylru import lrudecorator
 
-from framework.installation.deb_installation import DebInstallation
 from framework.networking.linux import LinuxNetworking
 from framework.os_access.os_access_interface import OSAccess
 from framework.os_access.posix_shell import SSH
 from framework.os_access.ssh_path import make_ssh_path_cls
+from framework.utils import RunningTime
 
 
 class SSHAccess(OSAccess):
@@ -32,3 +36,18 @@ class SSHAccess(OSAccess):
     @lrudecorator(1)
     def networking(self):
         return LinuxNetworking(self.ssh, self._macs)
+
+    def get_time(self):
+        started_at = timeit.default_timer()
+        timestamp_output = self.run_command(['date', '+%s'])
+        delay_sec = timeit.default_timer() - started_at
+        timestamp = int(timestamp_output.rstrip())
+        timezone_name = self.Path('/etc/timezone')
+        timezone = pytz.timezone(timezone_name)
+        local_time = datetime.datetime.fromtimestamp(timestamp, tz=timezone)
+        return RunningTime(local_time, datetime.timedelta(seconds=delay_sec))
+
+    def set_time(self, new_time):
+        started_at = datetime.datetime.now(pytz.utc)
+        self.run_command(['date', '--set', new_time.isoformat()])
+        return RunningTime(new_time, datetime.datetime.now(pytz.utc) - started_at)

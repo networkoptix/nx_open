@@ -1,9 +1,11 @@
 from abc import ABCMeta, abstractmethod, abstractproperty
+from datetime import datetime
 
 from netaddr import IPAddress
 
 from framework.networking.interface import Networking
 from framework.os_access.path import FileSystemPath
+from framework.utils import RunningTime
 
 
 class OSAccess(object):
@@ -30,3 +32,11 @@ class OSAccess(object):
     @abstractproperty
     def forwarded_ports(self):
         return {('tcp', 22): (IPAddress('127.0.0.1'), 60022)}
+
+    @abstractmethod
+    def get_time(self):
+        pass
+
+    @abstractmethod
+    def set_time(self, new_time):  # type: (datetime.datetime) -> RunningTime
+        return RunningTime(datetime.now())
