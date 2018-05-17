@@ -19,7 +19,6 @@
 #include <nx/vms/api/data/camera_data.h>
 #include <nx/vms/api/data/camera_attributes_data.h>
 #include <nx/vms/api/data/camera_history_data.h>
-#include <nx_ec/data/api_email_data.h>
 #include <nx/vms/api/data/layout_data.h>
 #include <nx/vms/api/data/layout_tour_data.h>
 #include <nx_ec/data/api_peer_system_time_data.h>

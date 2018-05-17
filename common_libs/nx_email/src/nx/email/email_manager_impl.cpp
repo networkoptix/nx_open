@@ -2,6 +2,9 @@
 
 #include <memory>
 
+#include <QtCore/QFile>
+#include <QtCore/QIODevice>
+
 #include <api/global_settings.h>
 #include <nx/utils/log/log.h>
 #include <utils/email/email.h>
