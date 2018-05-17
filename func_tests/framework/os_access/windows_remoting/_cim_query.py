@@ -15,7 +15,7 @@ class _CimAction(object):
         'http://schemas.xmlsoap.org/ws/2004/09/enumeration': 'n',
         'http://www.w3.org/2001/XMLSchema-instance': 'xsi',
         'http://www.w3.org/2001/XMLSchema': 'xs',
-        'http://schemas.dmtf.org/wbem/wscim/1/common': 'datetime',
+        'http://schemas.dmtf.org/wbem/wscim/1/common': 'cim',
         'http://schemas.dmtf.org/wbem/wsman/1/wsman.xsd': 'w',
         cim_directory + 'Win32_FolderRedirectionHealth': 'folder',  # Commonly encountered in responses.
         }
@@ -93,7 +93,9 @@ class _Enumeration(object):
             }
         response = _CimAction(resource_uri, action, self.selectors, body).perform(self.protocol)
         self.enumeration_context = response['n:EnumerateResponse']['n:EnumerationContext']
-        self.is_ended = 'n:EndOfSequence' in response['n:EnumerateResponse']
+        self.is_ended = any((
+            'n:EndOfSequence' in response['n:EnumerateResponse'],
+            'w:EndOfSequence' in response['n:EnumerateResponse']))
         items = response['n:EnumerateResponse']['w:Items'][self.class_name]
         assert isinstance(items, list)
         return items if isinstance(items, list) else [items]
@@ -111,7 +113,9 @@ class _Enumeration(object):
                 }
             }
         response = _CimAction(resource_uri, action, self.selectors, body).perform(self.protocol)
-        self.is_ended = 'n:EndOfSequence' in response['n:PullResponse']
+        self.is_ended = any((
+            'n:EndOfSequence' in response['n:PullResponse'],
+            'w:EndOfSequence' in response['n:PullResponse']))
         items = response['n:PullResponse']['n:Items'][self.class_name]
         assert isinstance(items, list)
         return items if isinstance(items, list) else [items]
