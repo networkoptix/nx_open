@@ -8,7 +8,6 @@ from pathlib2 import PurePath
 from pylru import lrudecorator
 from requests import RequestException
 
-from framework.installation.windows_service import WindowsService
 from ._cim_query import CIMQuery
 from ._cmd import Shell, run_command
 from ._env_vars import EnvVars
@@ -47,9 +46,6 @@ class WinRM(object):
         shell = Shell(self._protocol)
         shell.__enter__()
         return shell
-
-    def service(self, name):
-        return WindowsService(self._protocol, name)
 
     def run_command(self, command, input=b''):
         command_str_list = command_args_to_str_list(command)

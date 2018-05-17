@@ -1,9 +1,11 @@
 import logging
+from pprint import pformat
 
-from netaddr import EUI, mac_eui48
+from netaddr import EUI, IPNetwork, mac_eui48
 from pylru import lrudecorator
 
 from framework.networking.interface import Networking
+from framework.os_access.windows_remoting import WinRM
 from framework.os_access.windows_remoting._powershell import PowershellError
 
 _logger = logging.getLogger(__name__)
@@ -22,7 +24,7 @@ class WindowsNetworking(Networking):
     def __init__(self, winrm, macs):
         super(WindowsNetworking, self).__init__()
         self._names = {mac: 'Plugable {}'.format(slot) for slot, mac in macs.items()}
-        self._winrm = winrm
+        self._winrm = winrm  # type: WinRM
         self.__repr__ = lambda: '<WindowsNetworking on {}>'.format(winrm)
 
     def rename_interfaces(self, mac_to_new_name):
@@ -115,6 +117,19 @@ class WindowsNetworking(Networking):
         return not all(profile['DefaultOutboundAction'] == 'Block' for profile in all_profiles)
 
     def setup_ip(self, mac, ip, prefix_length):
+        all_configurations = self._winrm.wmi_query(u'Win32_NetworkAdapterConfiguration', {}).enumerate()
+        requested_configuration, = [
+            configuration for configuration in all_configurations
+            if configuration[u'MACAddress'] != {u'@xsi:nil': u'true'} and EUI(configuration[u'MACAddress']) == mac]
+        invoke_selectors = {u'Index': requested_configuration[u'Index']}
+        invoke_query = self._winrm.wmi_query(u'Win32_NetworkAdapterConfiguration', invoke_selectors)
+        subnet_mask = IPNetwork('{}/{}'.format(ip, prefix_length)).netmask
+        invoke_arguments = {u'IPAddress': [str(ip)], u'SubnetMask': [str(subnet_mask)]}
+        invoke_result = invoke_query.invoke_method(u'EnableStatic', invoke_arguments)
+        if invoke_result[u'ReturnValue'] != u'0':
+            raise RuntimeError('EnableStatic returned {}'.format(pformat(invoke_result)))
+
+    def _setup_ip(self, mac, ip, prefix_length):
         self._winrm.run_powershell_script(
             # language=PowerShell
             '''
