@@ -58,16 +58,19 @@ def test_setup_basic(machines, hypervisor):
     assert not nodes['first'].os_access.networking.can_reach(ip_addresses['second'][IPNetwork('10.254.3.0/24')], timeout_sec=2)
 
 
-def test_linux_and_windows(linux_vm, windows_vm, hypervisor):
-    ips = setup_flat_network((linux_vm, windows_vm), IPNetwork('10.254.0.0/28'), hypervisor)
-    windows_vm_ip = ips[windows_vm.alias]
-    wait_for_true(
-        lambda: linux_vm.os_access.networking.can_reach(windows_vm_ip, timeout_sec=2),
-        "{} can ping {} by {}".format(linux_vm, windows_vm, windows_vm_ip))
-    linux_vm_ip = ips[linux_vm.alias]
-    wait_for_true(
-        lambda: windows_vm.os_access.networking.can_reach(linux_vm_ip, timeout_sec=2),
-        "{} can ping {} by {}".format(windows_vm, linux_vm, linux_vm_ip))
+def test_two_vms(two_vm_types, vm_factory, hypervisor):
+    first_vm_type, second_vm_type = two_vm_types
+    with vm_factory.allocated_vm('first-{}'.format(first_vm_type), vm_type=first_vm_type) as first_vm:
+        with vm_factory.allocated_vm('second-{}'.format(second_vm_type), vm_type=second_vm_type) as second_vm:
+            ips = setup_flat_network([first_vm, second_vm], IPNetwork('10.254.254.0/28'), hypervisor)
+            second_vm_ip = ips[second_vm.alias]
+            wait_for_true(
+                lambda: first_vm.os_access.networking.can_reach(second_vm_ip),
+                "{} can ping {} by {}".format(first_vm, second_vm, second_vm_ip))
+            first_vm_ip = ips[first_vm.alias]
+            wait_for_true(
+                lambda: second_vm.os_access.networking.can_reach(first_vm_ip),
+                "{} can ping {} by {}".format(second_vm, first_vm, first_vm_ip))
 
 
 def test_big_flat_network(vm_factory, hypervisor):

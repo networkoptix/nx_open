@@ -3,7 +3,7 @@ from pprint import pformat
 
 import pytest
 
-from framework.os_access.windows_remoting._services import WindowsService
+from framework.installation.windows_service import WindowsService
 from framework.os_access.windows_remoting._users import get_system_user_profile, get_user, all_user_profiles
 
 log = logging.getLogger(__name__)

@@ -62,8 +62,8 @@ def check_admin_disabled(server):
 
 
 @pytest.fixture
-def one(two_linux_mediaservers, test_system_settings, cloud_host):
-    one, _ = two_linux_mediaservers
+def one(two_stopped_mediaservers, test_system_settings, cloud_host):
+    one, _ = two_stopped_mediaservers
     one.installation.patch_binary_set_cloud_host(cloud_host)
     one.os_access.networking.enable_internet()
     one.start()
@@ -72,8 +72,8 @@ def one(two_linux_mediaservers, test_system_settings, cloud_host):
 
 
 @pytest.fixture
-def two(two_linux_mediaservers, cloud_host):
-    _, two = two_linux_mediaservers
+def two(two_stopped_mediaservers, cloud_host):
+    _, two = two_stopped_mediaservers
     two.installation.patch_binary_set_cloud_host(cloud_host)
     two.os_access.networking.enable_internet()
     two.start()
@@ -82,7 +82,8 @@ def two(two_linux_mediaservers, cloud_host):
 
 
 @pytest.mark.local
-def test_simplest_merge(one, two):
+def test_simplest_merge(two_separate_mediaservers):
+    one, two = two_separate_mediaservers
     merge_systems(one, two)
     assert get_local_system_id(one.api) == get_local_system_id(two.api)
     assert not one.installation.list_core_dumps()
@@ -145,8 +146,8 @@ def test_merge_take_remote_settings(one, two):
     assert not two.installation.list_core_dumps()
 
 
-def test_merge_cloud_with_local(two_linux_mediaservers, cloud_account, test_system_settings, cloud_host):
-    one, two = two_linux_mediaservers
+def test_merge_cloud_with_local(two_stopped_mediaservers, cloud_account, test_system_settings, cloud_host):
+    one, two = two_stopped_mediaservers
 
     one.installation.patch_binary_set_cloud_host(cloud_host)
     one.os_access.networking.enable_internet()
@@ -177,11 +178,11 @@ def test_merge_cloud_with_local(two_linux_mediaservers, cloud_account, test_syst
 
 # https://networkoptix.atlassian.net/wiki/spaces/SD/pages/71467018/Merge+systems+test#Mergesystemstest-test_merge_cloud_systems
 @pytest.mark.parametrize('take_remote_settings', [True, False], ids=['settings_from_remote', 'settings_from_local'])
-def test_merge_cloud_systems(two_linux_mediaservers, cloud_account_factory, take_remote_settings, cloud_host):
+def test_merge_cloud_systems(two_stopped_mediaservers, cloud_account_factory, take_remote_settings, cloud_host):
     cloud_account_1 = cloud_account_factory()
     cloud_account_2 = cloud_account_factory()
 
-    one, two = two_linux_mediaservers
+    one, two = two_stopped_mediaservers
 
     one.installation.patch_binary_set_cloud_host(cloud_host)
     one.os_access.networking.enable_internet()
@@ -208,8 +209,8 @@ def test_merge_cloud_systems(two_linux_mediaservers, cloud_account_factory, take
     assert not two.installation.list_core_dumps()
 
 
-def test_cloud_merge_after_disconnect(two_linux_mediaservers, cloud_account, test_system_settings, cloud_host):
-    one, two = two_linux_mediaservers
+def test_cloud_merge_after_disconnect(two_stopped_mediaservers, cloud_account, test_system_settings, cloud_host):
+    one, two = two_stopped_mediaservers
 
     one.installation.patch_binary_set_cloud_host(cloud_host)
     one.os_access.networking.enable_internet()
@@ -258,8 +259,8 @@ def wait_entity_merge_done(one, two, method, api_object, api_method, expected_re
 
 
 @pytest.mark.local
-def test_merge_resources(two_running_linux_mediaservers):
-    one, two = two_running_linux_mediaservers
+def test_merge_resources(two_separate_mediaservers):
+    one, two = two_separate_mediaservers
     user_data = generator.generate_user_data(1)
     camera_data = generator.generate_camera_data(1)
     one.api.ec2.saveUser.POST(**user_data)

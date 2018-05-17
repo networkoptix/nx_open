@@ -32,15 +32,15 @@ def install_updates_server(ssh_access, python_path):
         "{} is reachable".format(updates_json_url))
 
 
-def test_running_linux_mediaserver(running_linux_mediaserver):
-    api = running_linux_mediaserver.api.api.updates2
+def test_running_linux_mediaserver(one_running_mediaserver):
+    api = one_running_mediaserver.api.api.updates2
     ensure_persistence(lambda: api.status.GET()['status'] in {'notAvailable', 'checking'}, None)
-    python_path = prepare_virtual_environment(running_linux_mediaserver.machine.os_access)
-    install_updates_server(running_linux_mediaserver.machine.os_access, python_path)
-    running_linux_mediaserver.stop(already_stopped_ok=True)
-    running_linux_mediaserver.installation.update_mediaserver_conf({'checkForUpdateUrl': ROOT_URL})
-    running_linux_mediaserver.start(already_started_ok=False)
+    python_path = prepare_virtual_environment(one_running_mediaserver.machine.os_access)
+    install_updates_server(one_running_mediaserver.machine.os_access, python_path)
+    one_running_mediaserver.stop(already_stopped_ok=True)
+    one_running_mediaserver.installation.update_mediaserver_conf({'checkForUpdateUrl': ROOT_URL})
+    one_running_mediaserver.start(already_started_ok=False)
     wait_for_true(
         lambda: api.status.GET()['status'] == 'available',
-        "{} reports update is available".format(running_linux_mediaserver))
-    assert not running_linux_mediaserver.installation.list_core_dumps()
+        "{} reports update is available".format(one_running_mediaserver))
+    assert not one_running_mediaserver.installation.list_core_dumps()

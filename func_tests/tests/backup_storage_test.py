@@ -114,20 +114,20 @@ def second_camera_backup_type(request):
 
 
 @pytest.fixture
-def linux_vm_volume(linux_mediaserver):
-    return LinuxVMVolume(linux_mediaserver.machine.os_access)
+def linux_vm_volume(one_mediaserver):
+    return LinuxVMVolume(one_mediaserver.machine.os_access)
 
 
 @pytest.fixture
-def server(linux_mediaserver, linux_vm_volume, system_backup_type):
+def server(one_mediaserver, linux_vm_volume, system_backup_type):
     config_file_params = dict(minStorageSpace=1024*1024)  # 1M
-    linux_mediaserver.installation.update_mediaserver_conf(config_file_params)
+    one_mediaserver.installation.update_mediaserver_conf(config_file_params)
     linux_vm_volume.ensure_volume_exists(BACKUP_STORAGE_PATH)
-    linux_mediaserver.machine.os_access.run_sh_script('rm -rfv {}/*'.format(sh_quote_arg(str(BACKUP_STORAGE_PATH))))
-    linux_mediaserver.start()
-    setup_local_system(linux_mediaserver, {})
-    linux_mediaserver.api.api.systemSettings.GET(backupQualities=system_backup_type)
-    return linux_mediaserver
+    one_mediaserver.machine.os_access.run_sh_script('rm -rfv {}/*'.format(sh_quote_arg(str(BACKUP_STORAGE_PATH))))
+    one_mediaserver.start()
+    setup_local_system(one_mediaserver, {})
+    one_mediaserver.api.api.systemSettings.GET(backupQualities=system_backup_type)
+    return one_mediaserver
 
 
 def wait_storage_ready(server, storage_guid):

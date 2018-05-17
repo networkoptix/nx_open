@@ -41,9 +41,9 @@ def _timeless_mediaserver(vm, mediaserver_packages, ca, artifact_factory):
 
 
 @pytest.fixture()
-def two_mediaservers(two_linux_vms, mediaserver_packages, ca, artifact_factory):
+def two_mediaservers(two_vms, mediaserver_packages, ca, artifact_factory):
     """Make sure mediaservers are installed, stopped and internet is disabled."""
-    first_vm, second_vm = two_linux_vms
+    first_vm, second_vm = two_vms
     with timeless_mediaserver(first_vm, mediaserver_packages, ca, artifact_factory) as first:
         with timeless_mediaserver(second_vm, mediaserver_packages, ca, artifact_factory) as second:
             for mediaserver in (first, second):

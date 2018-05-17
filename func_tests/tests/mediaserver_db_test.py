@@ -43,14 +43,14 @@ def db_version(request):
 
 
 @pytest.fixture
-def one(two_linux_mediaservers, bin_dir, db_version):
-    one, _ = two_linux_mediaservers
+def one(two_stopped_mediaservers, bin_dir, db_version):
+    one, _ = two_stopped_mediaservers
     yield server('one', one, bin_dir, db_version)
 
 
 @pytest.fixture
-def two(two_linux_mediaservers, bin_dir, db_version):
-    _, two = two_linux_mediaservers
+def two(two_stopped_mediaservers, bin_dir, db_version):
+    _, two = two_stopped_mediaservers
     yield server('two', two, bin_dir, db_version)
 
 
