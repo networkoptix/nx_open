@@ -32,7 +32,7 @@ public:
 private:
     QString m_text;
     QString m_hint;
-    utils::PasswordAcceptance m_acceptance = utils::PasswordAcceptance::Inacceptable;
+    utils::PasswordAcceptance m_acceptance = utils::PasswordAcceptance::Unaccaptable;
 
     Q_DECLARE_TR_FUNCTIONS(PasswordInformation)
 };

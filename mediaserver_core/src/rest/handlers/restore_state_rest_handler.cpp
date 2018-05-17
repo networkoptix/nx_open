@@ -62,13 +62,23 @@ bool QnRestoreStateRestHandler::verifyCurrentPassword(
     const auto user = owner->commonModule()->resourcePool()
         ->getResourceById<QnUserResource>(owner->accessRights().userId);
 
+    if (!user)
+    {
+        const auto error = lit(
+            "User is not available, this handler is supposed to be used with authorization only");
+
+        NX_ASSERT(false, error);
+        result->setError(QnJsonRestResult::CantProcessRequest, error);
+        return false;
+    }
+
     if (user->checkLocalUserPassword(params.value(kCurrentPasswordParamName)))
         return true;
 
     if (result)
     {
         result->setError(QnJsonRestResult::CantProcessRequest,
-            lit("Mandatory paramiter %1 is invalid").arg(kCurrentPasswordParamName));
+            lit("Mandatory parameter '%1' is invalid").arg(kCurrentPasswordParamName));
     }
 
     return false;

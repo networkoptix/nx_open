@@ -148,7 +148,7 @@ ValidationResult InputField::calculateValidationResult() const
         && d->passwordIndicator && d->passwordIndicator->isVisible())
     {
         const auto& info = d->passwordIndicator->currentInformation();
-        if (info.acceptance() == utils::PasswordAcceptance::Inacceptable)
+        if (info.acceptance() == utils::PasswordAcceptance::Unaccaptable)
             result = ValidationResult(info.hint());
     }
 

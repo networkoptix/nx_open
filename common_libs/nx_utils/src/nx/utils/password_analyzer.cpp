@@ -83,8 +83,9 @@ QString toString(PasswordStrength strength)
     {
         case PasswordStrength::Good: return lit("good");
         case PasswordStrength::Fair: return lit("fair");
+        case PasswordStrength::Common: return lit("common");
         case PasswordStrength::Weak: return lit("weak");
-        case PasswordStrength::Short: return lit("sort");
+        case PasswordStrength::Short: return lit("short");
         case PasswordStrength::Conseq: return lit("consecutive sequence of characters");
         case PasswordStrength::Repeat: return lit("repeating characters");
         case PasswordStrength::Long: return lit("too much characters");
@@ -215,7 +216,7 @@ PasswordAcceptance passwordAcceptance(PasswordStrength strength)
             return PasswordAcceptance::Acceptable;
 
         default:
-            return PasswordAcceptance::Inacceptable;
+            return PasswordAcceptance::Unaccaptable;
     }
 }
 

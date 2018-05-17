@@ -2103,7 +2103,7 @@ void MediaServerProcess::registerRestHandlers(
     /**%apidoc[proprietary] POST /api/restoreState
      * Restore initial server state, i.e. <b>delete server's database</b>.
      * <br/>Server will restart after executing this command.
-     * %param currentPassword Password of a current user security check.
+     * %param currentPassword Password of a current user for confirmation.
      * %permissions Administrator.
      * %return JSON result with error code
      */
