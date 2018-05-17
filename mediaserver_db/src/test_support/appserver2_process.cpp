@@ -450,6 +450,11 @@ void Appserver2Process::registerHttpHandlers(
     ec2ConnectionFactory->registerTransactionListener(m_tcpListener);
 }
 
+void Appserver2Process::resetInstanceCounter()
+{
+    m_instanceCounter = 0;
+}
+
 void Appserver2Process::addSelfServerResource(
     ec2::AbstractECConnectionPtr ec2Connection)
 {

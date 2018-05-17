@@ -50,6 +50,8 @@ public:
     bool createInitialData(const QString& systemName);
 
     void connectTo(const Appserver2Process* dstServer);
+
+    static void resetInstanceCounter();
 signals:
     void beforeStart();
 private:

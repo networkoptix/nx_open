@@ -23,23 +23,6 @@ static const std::chrono::seconds kMinTimeUpdateInterval(10);
 static const std::chrono::seconds kTimeSyncInterval(1);
 static const QByteArray kTimeDeltaParamName = "sync_time_delta";
 
-
-bool compareTimePriority(
-    const QnMediaServerResourcePtr& left, const QnMediaServerResourcePtr& right)
-{
-    bool leftIsOnline = left->getStatus();
-    bool rightIsOnline = right->getStatus();
-    if (leftIsOnline != rightIsOnline)
-        return leftIsOnline < rightIsOnline;
-
-    bool leftHasInternet = left->getServerFlags().testFlag(Qn::SF_HasPublicIP);
-    bool rightHasInternet = right->getServerFlags().testFlag(Qn::SF_HasPublicIP);
-    if (leftHasInternet != rightHasInternet)
-        return leftHasInternet < rightHasInternet;
-
-    return left->getId() < right->getId();
-};
-
 ServerTimeSyncManager::ServerTimeSyncManager(
     QnCommonModule* commonModule,
     nx::vms::network::AbstractServerConnector* serverConnector)
@@ -239,7 +222,7 @@ void ServerTimeSyncManager::updateTime()
             m_lastNetworkSyncTime.restart();
         }
     }
-    else if (primaryTimeServerId == ownId)
+    else if (primaryTimeServerId.isNull() || primaryTimeServerId == ownId)
     {
         loadTimeFromLocalClock();
     }
@@ -258,42 +241,6 @@ void ServerTimeSyncManager::updateTime()
         }
     }
 }
-
-#if 0
-void ServerTimeSyncManager::updateTime()
-{
-    const auto primaryTimeServerId = getPrimaryTimeServerId();
-    bool syncWithInternel = commonModule()->globalSettings()->isSynchronizingTimeWithInternet();
-    const bool canSyncNetworkTime = m_timer.hasExpired(m_networkTimeSyncInterval);
-    if (canSyncNetworkTime)
-        m_timer.restart();
-
-    if (primaryTimeServerId.isNull())
-    {
-        if (!syncWithInternel)
-            loadTimeFromLocalClock();
-    }
-    else if (primaryTimeServerId == commonModule()->moduleGUID())
-    {
-        if (syncWithInternel && !canSyncNetworkTime)
-            return;
-
-        if (syncWithInternel)
-            loadTimeFromInternet();
-        else
-            loadTimeFromLocalClock();
-    }
-    else
-    {
-        if (!canSyncNetworkTime)
-            return;
-
-        auto route = commonModule()->router()->routeTo(primaryTimeServerId);
-        if (route.isValid())
-            loadTimeFromServer(route);
-    }
-}
-#endif
 
 } // namespace time_sync
 } // namespace nx

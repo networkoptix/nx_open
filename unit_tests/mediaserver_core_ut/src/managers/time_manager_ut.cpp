@@ -108,9 +108,9 @@ public:
         m_syncWithInternetEnabled = value;
     }
 
-    bool start()
+    bool start(bool keepDatabase = false)
     {
-        m_appserver = ec2::Appserver2Launcher::createAppserver();
+        m_appserver = ec2::Appserver2Launcher::createAppserver(keepDatabase);
 
         connect(m_appserver.get(), &ec2::Appserver2Launcher::beforeStart,
             this,
@@ -151,12 +151,6 @@ public:
     void stop()
     {
         m_appserver.reset();
-    }
-
-    void restart()
-    {
-        stop();
-        start();
     }
 
     void setPrimaryPeerId(const QnUuid& peerId)
@@ -272,6 +266,7 @@ protected:
     void givenMultipleSynchronizedPeers()
     {
         givenMultipleOfflinePeersEachWithDifferentLocalTime();
+        selectRandomPeerAsPrimary();
         waitForTimeToBeSynchronizedAcrossAllPeers();
     }
 
@@ -313,8 +308,10 @@ protected:
     void restartAllPeers()
     {
         for (const auto& peer: m_peers)
-            peer->restart();
-
+            peer->stop();
+        ec2::Appserver2Process::resetInstanceCounter();
+        for (const auto& peer : m_peers)
+            peer->start(true);
         if (m_peersConnected)
             connectEveryPeerToEachOther();
     }
@@ -332,11 +329,11 @@ protected:
                 kMinMonotonicClockSkew.count(), kMaxMonotonicClockSkew.count())));
     }
 
-    void shiftMonotonicClockOnRandomPeer()
+    void shiftLocalTimeOnNonPrimaryPeer()
     {
-        const auto randomPeerIndex =
-            nx::utils::random::number<int>(0, m_peers.size() - 1);
-        shiftMonotonicClockOnPeer(randomPeerIndex);
+        int index = (m_primaryPeerIndex + 1) % m_peers.size();
+        m_peers[index]->shiftSystemClock(
+            std::chrono::hours(nx::utils::random::number<int>(-1000, 1000)));
     }
 
     void shiftLocalTimeOnPrimaryPeer()
@@ -504,7 +501,7 @@ TEST_F(TimeSynchronization, multiple_peers_synchronize_time)
 TEST_F(TimeSynchronization, multiple_peers_synchronize_time_after_monotonic_clock_skew)
 {
     givenMultipleSynchronizedPeers();
-    shiftMonotonicClockOnRandomPeer();
+    shiftLocalTimeOnNonPrimaryPeer();
     waitForTimeToBeSynchronizedAcrossAllPeers();
 }
 
