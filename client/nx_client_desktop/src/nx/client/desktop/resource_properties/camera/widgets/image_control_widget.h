@@ -21,7 +21,7 @@ class ImageControlWidget: public QWidget
 
 public:
     explicit ImageControlWidget(QWidget* parent = nullptr);
-    virtual ~ImageControlWidget();
+    virtual ~ImageControlWidget() override;
 
     Aligner* aligner() const;
 

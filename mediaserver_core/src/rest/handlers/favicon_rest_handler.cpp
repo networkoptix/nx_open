@@ -13,7 +13,7 @@ static const int READ_BLOCK_SIZE = 1024*512;
 int QnFavIconRestHandler::executeGet(const QString& /*path*/, const QnRequestParamList& /*params*/,
     QByteArray& result, QByteArray& contentType, const QnRestConnectionProcessor*)
 {
-    QFile f(":/favicon.ico");
+    QFile f(":/static/customization/favicon.ico");
     if (f.open(QFile::ReadOnly))
     {
         result = f.readAll();

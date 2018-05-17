@@ -9,6 +9,8 @@
 #include <QtWidgets/QAction>
 #include <QtWidgets/QComboBox>
 
+#include <translation/datetime_formatter.h>
+
 #include <camera/cam_display.h>
 #include <camera/resource_display.h>
 #include <nx/client/desktop/image_providers/camera_thumbnail_provider.h>
@@ -60,14 +62,13 @@ QnScreenshotParameters::QnScreenshotParameters()
     timestampParams.corner = Qt::BottomRightCorner;
 }
 
-QString QnScreenshotParameters::timeString() const {
+QString QnScreenshotParameters::timeString() const 
+{
     if (utcTimestampMsec == latestScreenshotTime)
-        return QDateTime::currentDateTime().toString(lit("hh.mm.ss"));
-
-    qint64 timeMSecs = displayTimeMsec;
+        return datetime::toString(QTime::currentTime());
     if (isUtc)
-        return nx::utils::datetimeSaveDialogSuggestion(QDateTime::fromMSecsSinceEpoch(timeMSecs));
-    return QTime(0, 0, 0, 0).addMSecs(timeMSecs).toString(lit("hh.mm.ss"));
+        return datetime::toString(displayTimeMsec);
+    return datetime::toString(displayTimeMsec, datetime::Format::hh_mm_ss);
 }
 
 
@@ -381,8 +382,9 @@ bool QnWorkbenchScreenshotHandler::updateParametersFromDialog(QnScreenshotParame
     QString previousDir = qnSettings->lastScreenshotDir();
     if (previousDir.isEmpty())
         previousDir = qnSettings->mediaFolder();
-    QString suggestion = nx::utils::replaceNonFileNameCharacters(parameters.filename, QLatin1Char('_'))
-        + QLatin1Char('_') + parameters.timeString();
+    QString suggestion = nx::utils::replaceNonFileNameCharacters(parameters.filename
+        + QLatin1Char('_') + parameters.timeString(), QLatin1Char('_')).
+        replace(QChar::Space, QLatin1Char('_'));
     suggestion = QnEnvironment::getUniqueFileName(previousDir, suggestion);
 
     QString filterSeparator = lit(";;");

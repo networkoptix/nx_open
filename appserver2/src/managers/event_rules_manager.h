@@ -1,36 +1,37 @@
 #pragma once
 
-#include "nx_ec/ec_api.h"
+#include <nx_ec/ec_api.h>
+#include <nx_ec/managers/abstract_event_rules_manager.h>
 
 #include <nx/utils/concurrent.h>
-#include <ec2_thread_pool.h>
-#include <transaction/transaction.h>
-#include <nx/vms/event/rule.h>
 
-using namespace nx;
+#include <ec2_thread_pool.h>
+
+#include <transaction/transaction.h>
+#include <transaction/message_bus_adapter.h>
 
 namespace ec2 {
 
 template<class QueryProcessorType>
-class QnBusinessEventManager: public AbstractBusinessEventManager
+class EventRulesManager: public AbstractEventRulesManager
 {
 public:
-    QnBusinessEventManager(
+    EventRulesManager(
         TransactionMessageBusAdapter* messageBus,
         QueryProcessorType* const queryProcessor,
         const Qn::UserAccessData& userAccessData);
 
-    virtual int getBusinessRules(impl::GetBusinessRulesHandlerPtr handler) override;
+    virtual int getEventRules(impl::GetEventRulesHandlerPtr handler) override;
 
     virtual int save(
-        const nx::vms::event::RulePtr& rule,
-        impl::SaveBusinessRuleHandlerPtr handler) override;
-    virtual int deleteRule(QnUuid ruleId, impl::SimpleHandlerPtr handler) override;
-    virtual int broadcastBusinessAction(
-        const nx::vms::event::AbstractActionPtr& businessAction,
+        const nx::vms::api::EventRuleData& rule,
         impl::SimpleHandlerPtr handler) override;
-    virtual int sendBusinessAction(
-        const nx::vms::event::AbstractActionPtr& businessAction,
+    virtual int deleteRule(QnUuid ruleId, impl::SimpleHandlerPtr handler) override;
+    virtual int broadcastEventAction(
+        const nx::vms::api::EventActionData& actionData,
+        impl::SimpleHandlerPtr handler) override;
+    virtual int sendEventAction(
+        const nx::vms::api::EventActionData& actionData,
         const QnUuid& dstPeer,
         impl::SimpleHandlerPtr handler) override;
     virtual int resetBusinessRules(impl::SimpleHandlerPtr handler) override;
@@ -39,14 +40,10 @@ private:
     TransactionMessageBusAdapter* m_messageBus;
     QueryProcessorType* const m_queryProcessor;
     Qn::UserAccessData m_userAccessData;
-
-    QnTransaction<nx::vms::api::EventActionData> prepareTransaction(
-        ApiCommand::Value command,
-        const nx::vms::event::AbstractActionPtr& resource);
 };
 
 template<class QueryProcessorType>
-QnBusinessEventManager<QueryProcessorType>::QnBusinessEventManager(
+EventRulesManager<QueryProcessorType>::EventRulesManager(
     TransactionMessageBusAdapter* messageBus,
     QueryProcessorType* const queryProcessor,
     const Qn::UserAccessData& userAccessData)
@@ -58,7 +55,7 @@ QnBusinessEventManager<QueryProcessorType>::QnBusinessEventManager(
 }
 
 template<class T>
-int QnBusinessEventManager<T>::getBusinessRules(impl::GetBusinessRulesHandlerPtr handler)
+int EventRulesManager<T>::getEventRules(impl::GetEventRulesHandlerPtr handler)
 {
     const int reqID = generateRequestID();
 
@@ -66,10 +63,7 @@ int QnBusinessEventManager<T>::getBusinessRules(impl::GetBusinessRulesHandlerPtr
         ErrorCode errorCode,
         const nx::vms::api::EventRuleDataList& rules)
         {
-            vms::event::RuleList outData;
-            if (errorCode == ErrorCode::ok)
-                fromApiToResourceList(rules, outData);
-            handler->done(reqID, errorCode, outData);
+            handler->done(reqID, errorCode, rules);
         };
     m_queryProcessor->getAccess(m_userAccessData).template processQueryAsync<
         QnUuid,
@@ -79,46 +73,45 @@ int QnBusinessEventManager<T>::getBusinessRules(impl::GetBusinessRulesHandlerPtr
 }
 
 template<class T>
-int QnBusinessEventManager<T>::save(
-    const vms::event::RulePtr& rule,
-    impl::SaveBusinessRuleHandlerPtr handler)
+int EventRulesManager<T>::save(
+    const nx::vms::api::EventRuleData& rule,
+    impl::SimpleHandlerPtr handler)
 {
     const int reqID = generateRequestID();
-    if (rule->id().isNull())
-        rule->setId(QnUuid::createUuid());
-
-    nx::vms::api::EventRuleData params;
-    fromResourceToApi(rule, params);
-
-    using namespace std::placeholders;
     m_queryProcessor->getAccess(m_userAccessData).processUpdateAsync(
         ApiCommand::saveEventRule,
-        params,
-        std::bind(&impl::SaveBusinessRuleHandler::done, handler, reqID, _1, rule));
+        rule,
+        [handler, reqID](ec2::ErrorCode errorCode){ handler->done(reqID, errorCode); });
 
     return reqID;
 }
 
 template<class T>
-int QnBusinessEventManager<T>::deleteRule(QnUuid ruleId, impl::SimpleHandlerPtr handler)
+int EventRulesManager<T>::deleteRule(QnUuid ruleId, impl::SimpleHandlerPtr handler)
 {
     const int reqID = generateRequestID();
-    using namespace std::placeholders;
     m_queryProcessor->getAccess(m_userAccessData).processUpdateAsync(
         ApiCommand::removeEventRule,
         nx::vms::api::IdData(ruleId),
-        std::bind(std::mem_fn(&impl::SimpleHandler::done), handler, reqID, _1));
+        [handler, reqID](ec2::ErrorCode errorCode)
+        {
+            handler->done(reqID, errorCode);
+        });
     return reqID;
 }
 
 template<class T>
-int QnBusinessEventManager<T>::broadcastBusinessAction(
-    const vms::event::AbstractActionPtr& businessAction,
+int EventRulesManager<T>::broadcastEventAction(
+    const nx::vms::api::EventActionData& actionData,
     impl::SimpleHandlerPtr handler)
 {
-    const int reqID = generateRequestID();
-    auto tran = prepareTransaction(ApiCommand::broadcastAction, businessAction);
+    QnTransaction<nx::vms::api::EventActionData> tran(
+        ApiCommand::broadcastAction,
+        m_messageBus->commonModule()->moduleGUID(),
+        actionData);
     m_messageBus->sendTransaction(tran);
+
+    const int reqID = generateRequestID();
     nx::utils::concurrent::run(
         Ec2ThreadPool::instance(),
         std::bind(&impl::SimpleHandler::done, handler, reqID, ErrorCode::ok));
@@ -126,14 +119,18 @@ int QnBusinessEventManager<T>::broadcastBusinessAction(
 }
 
 template<class T>
-int QnBusinessEventManager<T>::sendBusinessAction(
-    const vms::event::AbstractActionPtr& businessAction,
+int EventRulesManager<T>::sendEventAction(
+    const nx::vms::api::EventActionData& actionData,
     const QnUuid& dstPeer,
     impl::SimpleHandlerPtr handler)
 {
+    QnTransaction<nx::vms::api::EventActionData> tran(
+        ApiCommand::execAction,
+        m_messageBus->commonModule()->moduleGUID(),
+        actionData);
+    m_messageBus->sendTransaction(tran);
+
     const int reqID = generateRequestID();
-    auto tran = prepareTransaction(ApiCommand::execAction, businessAction);
-    m_messageBus->sendTransaction(tran, dstPeer);
     nx::utils::concurrent::run(
         Ec2ThreadPool::instance(),
         std::bind(&impl::SimpleHandler::done, handler, reqID, ErrorCode::ok));
@@ -141,7 +138,7 @@ int QnBusinessEventManager<T>::sendBusinessAction(
 }
 
 template<class T>
-int QnBusinessEventManager<T>::resetBusinessRules(impl::SimpleHandlerPtr handler)
+int EventRulesManager<T>::resetBusinessRules(impl::SimpleHandlerPtr handler)
 {
     const int reqID = generateRequestID();
     nx::vms::api::ResetEventRulesData params;
@@ -151,21 +148,12 @@ int QnBusinessEventManager<T>::resetBusinessRules(impl::SimpleHandlerPtr handler
     m_queryProcessor->getAccess(m_userAccessData).processUpdateAsync(
         ApiCommand::resetEventRules,
         params,
-        std::bind(std::mem_fn(&impl::SimpleHandler::done), handler, reqID, _1));
+        [handler, reqID](ec2::ErrorCode errorCode)
+        {
+            handler->done(reqID, errorCode);
+        });
 
     return reqID;
-}
-
-template<class T>
-QnTransaction<nx::vms::api::EventActionData> QnBusinessEventManager<T>::prepareTransaction(
-    ApiCommand::Value command,
-    const vms::event::AbstractActionPtr& resource)
-{
-    QnTransaction<nx::vms::api::EventActionData> tran(
-        command,
-        m_messageBus->commonModule()->moduleGUID());
-    fromResourceToApi(resource, tran.params);
-    return tran;
 }
 
 } // namespace ec2

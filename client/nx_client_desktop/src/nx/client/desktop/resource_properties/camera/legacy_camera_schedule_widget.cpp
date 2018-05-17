@@ -35,7 +35,6 @@
 #include <ui/workaround/widgets_signals_workaround.h>
 #include <ui/widgets/common/snapped_scrollbar.h>
 #include <ui/widgets/properties/legacy_archive_length_widget.h>
-#include <ui/workbench/watchers/workbench_panic_watcher.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_access_controller.h>
 
@@ -394,13 +393,6 @@ void LegacyCameraScheduleWidget::retranslateUi()
 void LegacyCameraScheduleWidget::afterContextInitialized()
 {
     connect(
-        context()->instance<QnWorkbenchPanicWatcher>(),
-        &QnWorkbenchPanicWatcher::panicModeChanged,
-        this,
-        &LegacyCameraScheduleWidget::updatePanicLabelText);
-    updatePanicLabelText();
-
-    connect(
         context(),
         &QnWorkbenchContext::userChanged,
         this,
@@ -558,7 +550,6 @@ void LegacyCameraScheduleWidget::loadDataToUi()
     ui->archiveLengthWidget->updateFromResources(m_cameras);
 
     updateScheduleEnabled();
-    updatePanicLabelText();
     updateMotionButtons();
     updateLicensesLabelText();
     updateGridParams();
@@ -729,23 +720,6 @@ void LegacyCameraScheduleWidget::setExportScheduleButtonEnabled(bool enabled)
 {
     ui->exportScheduleButton->setEnabled(enabled);
     ui->exportWarningLabel->setVisible(!enabled);
-}
-
-void LegacyCameraScheduleWidget::updatePanicLabelText()
-{
-    ui->panicModeLabel->setText(tr("Off"));
-    ui->panicModeLabel->setPalette(this->palette());
-
-    if (!context())
-        return;
-
-    if (context()->instance<QnWorkbenchPanicWatcher>()->isPanicMode())
-    {
-        QPalette palette = this->palette();
-        palette.setColor(QPalette::WindowText, QColor(255, 0, 0));
-        ui->panicModeLabel->setPalette(palette);
-        ui->panicModeLabel->setText(tr("On"));
-    }
 }
 
 QnScheduleTaskList LegacyCameraScheduleWidget::scheduleTasks() const

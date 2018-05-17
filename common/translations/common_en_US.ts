@@ -2,6 +2,17 @@
 <!DOCTYPE TS>
 <TS version="2.1" language="en_US" sourcelanguage="en">
 <context>
+    <name>DateTimeFormats</name>
+    <message>
+        <source>dd/MM</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>MMMM yyyy</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>Language</name>
     <message>
         <source>Language Name</source>
@@ -98,6 +109,26 @@
         <source>System Event</source>
         <comment>Shows that the bookmark was created by a system event</comment>
         <translation></translation>
+    </message>
+    <message>
+        <source>System already bound to cloud (id %1)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Server is not connected to the Internet.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Failed to save cloud credentials to local DB</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Failed to save cloud owner to local DB</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Could not connect to cloud: %1</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -693,67 +724,6 @@
     </message>
 </context>
 <context>
-    <name>QnStreamQualityStrings</name>
-    <message>
-        <source>Lowest</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Low</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Medium</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>High</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Best</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Preset</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Undefined</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Lst</source>
-        <extracomment>Short for &apos;Lowest&apos;</extracomment>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Lo</source>
-        <extracomment>Short for &apos;Low&apos;</extracomment>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Me</source>
-        <extracomment>Short for &apos;Medium&apos;</extracomment>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Hi</source>
-        <extracomment>Short for &apos;High&apos;</extracomment>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Bst</source>
-        <extracomment>Short for &apos;Best&apos;</extracomment>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Ps</source>
-        <extracomment>Short for &apos;Preset&apos;</extracomment>
-        <translation></translation>
-    </message>
-</context>
-<context>
     <name>QnStreamRecorder</name>
     <message>
         <source>Corresponding container in FFMPEG library was not found.</source>
@@ -978,10 +948,6 @@
         </translation>
     </message>
     <message>
-        <source>Storage Failure</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>Network Issue</source>
         <translation></translation>
     </message>
@@ -1085,10 +1051,6 @@
     </message>
     <message>
         <source>Motion on %1</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Storage Failure at %1</source>
         <translation></translation>
     </message>
     <message>
@@ -1382,6 +1344,18 @@
         <source>%1 at %2</source>
         <comment>Analytics Event at some camera</comment>
         <translation></translation>
+    </message>
+    <message>
+        <source>Open layout</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Storage Issue</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Storage Issue at %1</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>

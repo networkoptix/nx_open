@@ -165,8 +165,11 @@ void Updates2ManagerBase::refreshStatusAfterCheck()
             nx::update::info::FileData fileData;
             const auto result = m_updateRegistry->findUpdateFile(
                 detail::UpdateFileRequestDataFactory::create(isClient()), &fileData);
+
             NX_ASSERT(result == update::info::ResultCode::ok);
-            if (result != update::info::ResultCode::ok)
+            NX_ASSERT(!fileData.isNull());
+
+            if (result != update::info::ResultCode::ok || fileData.isNull())
             {
                 setStatus(
                     api::Updates2StatusData::StatusCode::error,
@@ -405,7 +408,12 @@ void Updates2ManagerBase::onDownloadFailed(const QString& fileName)
     if (m_currentStatus.file != fileName)
         return;
 
-    auto onExit = makeScopeGuard([this]() { m_currentStatus.file.clear(); });
+    auto onExit = makeScopeGuard(
+        [this, fileName]()
+        {
+            m_currentStatus.file.clear();
+            downloader()->deleteFile(fileName, /*deleteData*/ true);
+        });
 
     NX_ASSERT(m_currentStatus.state == api::Updates2StatusData::StatusCode::downloading);
     if (m_currentStatus.state != api::Updates2StatusData::StatusCode::downloading)
@@ -429,8 +437,6 @@ void Updates2ManagerBase::onDownloadFailed(const QString& fileName)
             NX_ASSERT(false, "Wrong file information state");
             break;
     }
-
-    downloader()->deleteFile(fileName, /*deleteData*/ true);
 }
 
 void Updates2ManagerBase::onFileAdded(const FileInformation& fileInformation)

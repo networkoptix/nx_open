@@ -10,6 +10,7 @@
 
 #include <client_core/client_core_module.h>
 
+#include <translation/datetime_formatter.h>
 #include <common/common_module.h>
 
 #include <core/resource/resource.h>
@@ -288,13 +289,13 @@ QString QnAuditLogModel::formatDateTime(int timestampSecs, bool showDate, bool s
 QString QnAuditLogModel::formatDateTime(const QDateTime& dateTime, bool showDate, bool showTime)
 {
     if (showDate && showTime)
-        return dateTime.toString(Qt::DefaultLocaleShortDate);
+        return datetime::toString(dateTime);
 
     if (showDate)
-        return dateTime.date().toString(Qt::DefaultLocaleShortDate);
+        return datetime::toString(dateTime.date());
 
     if (showTime)
-        return dateTime.time().toString(Qt::DefaultLocaleShortDate);
+        return datetime::toString(dateTime.time());
 
     return QString();
 }

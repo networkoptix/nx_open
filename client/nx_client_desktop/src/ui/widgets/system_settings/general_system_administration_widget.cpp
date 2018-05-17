@@ -50,6 +50,8 @@ QnGeneralSystemAdministrationWidget::QnGeneralSystemAdministrationWidget(QWidget
 {
     ui->setupUi(this);
 
+    ui->forceVideoEncryptionWarning->setVisible(false);
+
     ui->systemNameLabel->setMaximumWidth(kMaxSystemNameLabelWidth);
     ui->systemNameLabel->setValidator(
         [this](QString& text) -> bool
@@ -153,6 +155,9 @@ QnGeneralSystemAdministrationWidget::QnGeneralSystemAdministrationWidget(QWidget
 
     connect(ui->systemSettingsWidget, &QnAbstractPreferencesWidget::hasChangesChanged,
         this, &QnAbstractPreferencesWidget::hasChangesChanged);
+
+    connect(ui->systemSettingsWidget, &QnSystemSettingsWidget::forceVideoTrafficEncryptionChanged,
+        ui->forceVideoEncryptionWarning, &QWidget::setVisible);
 }
 
 void QnGeneralSystemAdministrationWidget::loadDataToUi()
@@ -166,6 +171,8 @@ void QnGeneralSystemAdministrationWidget::applyChanges()
 {
     ui->systemSettingsWidget->applyChanges();
     ui->systemNameLabel->setEditing(false);
+    ui->forceVideoEncryptionWarning->setVisible(false);
+
     qnGlobalSettings->setSystemName(ui->systemNameLabel->text().trimmed());
     qnGlobalSettings->synchronizeNow();
 }

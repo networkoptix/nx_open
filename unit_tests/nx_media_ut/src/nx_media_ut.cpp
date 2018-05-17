@@ -58,6 +58,11 @@ public:
 
     virtual ~MockVideoDecoder() {}
 
+    virtual Capabilities capabilities() const override
+    {
+        return Capability::noCapability;
+    }
+
     static bool isCompatible(
         const AVCodecID codec, const QSize& resolution, bool /*allowOverlay*/)
     {

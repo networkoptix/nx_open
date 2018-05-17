@@ -265,7 +265,12 @@ void ModuleConnector::Module::addEndpoints(std::set<nx::network::SocketAddress> 
             hasNewEndpoints |= (bool) saveEndpoint(std::move(endpoint));
 
         if (hasNewEndpoints)
-            ensureConnection();
+        {
+            if (m_connectedReader || !m_attemptingReaders.empty())
+                remakeConnection();
+            else
+                ensureConnection();
+        }
     }
 }
 
@@ -275,11 +280,23 @@ void ModuleConnector::Module::ensureConnection()
         connectToGroup(m_endpoints.begin());
 }
 
+void ModuleConnector::Module::remakeConnection()
+{
+    NX_DEBUG(this, "Initiate reconnect for better endpoints");
+    m_connectedReader.reset();
+    ensureConnection();
+}
+
 void ModuleConnector::Module::setForbiddenEndpoints(std::set<nx::network::SocketAddress> endpoints)
 {
     NX_VERBOSE(this, lm("Forbid endpoints %1").container(endpoints));
     NX_ASSERT(!m_id.isNull(), "Does not make sense to block endpoints for unknown servers");
-    m_forbiddenEndpoints = std::move(endpoints);
+    if (m_forbiddenEndpoints != endpoints)
+    {
+        m_forbiddenEndpoints = std::move(endpoints);
+        if (m_connectedReader || !m_attemptingReaders.empty())
+            remakeConnection();
+    }
 }
 
 ModuleConnector::Module::Priority
@@ -368,7 +385,6 @@ void ModuleConnector::Module::connectToGroup(Endpoints::iterator endpointsGroup)
 
     // Initiate parallel connects to each endpoint in a group.
     size_t endpointsInProgress = 0;
-
     for (const auto& endpoint: endpointsGroup->second)
     {
         if (m_forbiddenEndpoints.count(endpoint))

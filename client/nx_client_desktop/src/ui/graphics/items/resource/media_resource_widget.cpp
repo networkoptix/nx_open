@@ -33,6 +33,8 @@
 #include <client_core/client_core_module.h>
 
 #include <common/common_module.h>
+#include <translation/datetime_formatter.h>
+
 
 #include <core/resource/media_resource.h>
 #include <core/resource/media_server_resource.h>
@@ -1972,10 +1974,8 @@ QString QnMediaResourceWidget::calculatePositionText() const
             if (isSpecialDateTimeValueUsec(dateTimeUsec))
                 return QString();
 
-            static const auto kOutputFormat = lit("yyyy-MM-dd hh:mm:ss");
-
             const auto dateTimeMs = dateTimeUsec / kMicroInMilliSeconds;
-            const auto result = QDateTime::fromMSecsSinceEpoch(dateTimeMs).toString(kOutputFormat);
+            const QString result = datetime::toString(dateTimeMs);
 
             return ini().showPreciseItemTimestamps
                 ? lit("%1<br>%2 us").arg(result).arg(dateTimeUsec)

@@ -1,6 +1,7 @@
 
 #include "search_bookmarks_model.h"
 
+#include <translation/datetime_formatter.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/camera_bookmark.h>
 #include <core/resource_management/resource_pool.h>
@@ -303,6 +304,15 @@ QVariant QnSearchBookmarksModelPrivate::getData(const QModelIndex& index, int ro
         }
 
         return QVariant();
+    }
+
+    // Return formatted time if display text is requested.
+    if (role == Qt::DisplayRole)
+    {
+        if (index.column() == QnSearchBookmarksModel::kStartTime)
+            return datetime::toString(displayTime(bookmark.startTimeMs));
+        if (index.column() == QnSearchBookmarksModel::kCreationTime)
+            return datetime::toString(displayTime(bookmark.creationTimeMs()));
     }
 
     switch(index.column())

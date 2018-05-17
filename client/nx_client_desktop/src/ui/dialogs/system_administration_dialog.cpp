@@ -72,5 +72,4 @@ QnSystemAdministrationDialog::QnSystemAdministrationDialog(QWidget *parent)
     setPageEnabled(UpdatesPage, !commonModule()->isReadOnly());
 }
 
-QnSystemAdministrationDialog::~QnSystemAdministrationDialog()
-{}
+QnSystemAdministrationDialog::~QnSystemAdministrationDialog() = default;
