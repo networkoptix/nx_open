@@ -225,13 +225,15 @@ function(nx_get_dependencies)
         #nx_rdep_add_package(a10-display)
 
         # Hardware video decoding in Lite Client on Debian 7; kernel upgrade.
-        #nx_rdep_add_package(libvdpau-1.0.4.1)
         #nx_rdep_add_package(libvdpau-sunxi-1.0-deb7)
         #nx_rdep_add_package(proxy-decoder-deb7)
         #nx_rdep_add_package(ldpreloadhook-1.0-deb7)
         #nx_rdep_add_package(libpixman-0.34.0-deb7)
         #nx_rdep_add_package(libcedrus-1.0-deb7)
         #nx_rdep_add_package(uboot-2014.04-10733-gbb5691c-dirty-vanilla)
+
+        # Required for ffmpeg.
+        nx_rdep_add_package(libvdpau-1.0.4.1)
 
         nx_rdep_add_package(libstdc++-6.0.19)
     endif()

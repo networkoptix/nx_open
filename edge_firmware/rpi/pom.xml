@@ -69,7 +69,7 @@
             </activation>
             <properties>
                 <rdep.linux.packages>
-                <!-- Lite Client dependencies -->
+                    <!-- Lite Client dependencies -->
                 <!--
                     fontconfig-2.11.0
                     bpi/additional-fonts
@@ -77,10 +77,8 @@
                     a10-display
                 -->
 
-                <!-- Hardware video decoding in Lite Client on Debian 7; kernel upgrade -->
+                    <!-- Hardware video decoding in Lite Client on Debian 7; kernel upgrade -->
                 <!--
-                    libvdpau-1.0.4.1
-
                     libvdpau-sunxi-1.0-deb7
                     proxy-decoder-deb7
                     ldpreloadhook-1.0-deb7
@@ -90,7 +88,7 @@
                     uboot-2014.04-10733-gbb5691c-dirty-vanilla
                 -->
 
-                <!-- Hardware video decoding in Lite Client on Debian 8; libc/libstdc++ upgrade -->
+                    <!-- Hardware video decoding in Lite Client on Debian 8; libc/c++ upgrade -->
                 <!--
                     libvdpau-1.0.4.1
 
@@ -104,6 +102,9 @@
                     libc6-2.23
                     curl-7.51.0
                 -->
+
+                    <!-- Required for ffmpeg. -->
+                    libvdpau-1.0.4.1
 
                     libstdc++-6.0.19
                  </rdep.linux.packages>
