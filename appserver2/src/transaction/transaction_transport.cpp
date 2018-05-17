@@ -7,6 +7,8 @@
 #include <core/resource/media_server_resource.h>
 #include <core/resource_management/resource_pool.h>
 
+#include "transaction_descriptor.h"
+
 #include <nx/network/http/custom_headers.h>
 #include <core/resource/user_resource.h>
 

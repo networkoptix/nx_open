@@ -7,7 +7,6 @@
 
 #include "transaction_transport_base.h"
 #include "transaction_message_bus_base.h"
-#include "transaction_descriptor.h"
 
 namespace ec2 {
 
