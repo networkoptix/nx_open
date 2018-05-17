@@ -29,18 +29,21 @@ def make_dirty_mediaserver(name, installation):
 
 def cleanup_mediaserver(mediaserver, ca):
     """Stop and remove everything produced by previous runs. Make installation "fresh"."""
+    mediaserver.stop(already_stopped_ok=True)
+    for core_dump_path in mediaserver.installation.list_core_dumps():
+        core_dump_path.unlink()
+    try:
+        mediaserver.installation.var.rmtree()
+    except DoesNotExist:
+        pass
+    mediaserver.installation.key_pair.parent.mkdir(parents=True, exist_ok=True)
+    mediaserver.installation.key_pair.write_text(ca.generate_key_and_cert())
     mediaserver.installation.restore_mediaserver_conf()
     mediaserver.installation.update_mediaserver_conf({
         'logLevel': 'DEBUG2',
         'tranLogLevel': 'DEBUG2',
         'checkForUpdateUrl': 'http://127.0.0.1:8080',  # TODO: Use fake server responding with small updates.
         })
-    mediaserver.start(already_started_ok=True)
-    for core_dump_path in mediaserver.installation.list_core_dumps():
-        core_dump_path.unlink()
-    factory_reset(mediaserver.api)
-    mediaserver.installation.key_pair.parent.mkdir(parents=True, exist_ok=True)
-    mediaserver.installation.key_pair.write_text(ca.generate_key_and_cert())
 
 
 def setup_clean_mediaserver(mediaserver_name, installation, ca):

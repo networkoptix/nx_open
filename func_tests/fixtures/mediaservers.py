@@ -41,7 +41,7 @@ def mediaserver_factory(mediaserver_packages, artifact_factory, ca):
 
 
 @pytest.fixture()
-def two_clean_mediaservers(mediaserver_factory, two_vms):
+def two_stopped_mediaservers(mediaserver_factory, two_vms):
     first_vm, second_vm = two_vms
     with mediaserver_factory.allocated_mediaserver(first_vm) as first_mediaserver:
         with mediaserver_factory.allocated_mediaserver(second_vm) as second_mediaserver:
@@ -49,10 +49,10 @@ def two_clean_mediaservers(mediaserver_factory, two_vms):
 
 
 @pytest.fixture()
-def two_stopped_mediaservers(two_clean_mediaservers):
-    for mediaserver in two_clean_mediaservers:
-        mediaserver.stop()
-    return two_clean_mediaservers
+def two_clean_mediaservers(two_stopped_mediaservers):
+    for mediaserver in two_stopped_mediaservers:
+        mediaserver.start()
+    return two_stopped_mediaservers
 
 
 @pytest.fixture()
