@@ -1,7 +1,9 @@
 #!/bin/bash -e
 
-. ../environment
-. ../common.sh
+SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+
+. $SCRIPT_DIR/../environment
+. $SCRIPT_DIR/../common.sh
 
 MODULE=deployment_verification_tests
 
