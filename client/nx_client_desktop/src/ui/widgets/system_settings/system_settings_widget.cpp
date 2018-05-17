@@ -41,10 +41,10 @@ QnSystemSettingsWidget::QnSystemSettingsWidget(QWidget *parent):
     connect(ui->forceVideoTrafficEncryptionCheckBox, &QCheckBox::stateChanged, this,
         &QnAbstractPreferencesWidget::hasChangesChanged);
 
-    connect(ui->forceTrafficEncryptionCheckBox, SIGNAL(clicked(bool)),
-        this, SLOT(at_forceTrafficEncryptionCheckBoxClicked(bool)));
-    connect(ui->forceVideoTrafficEncryptionCheckBox, SIGNAL(clicked(bool)),
-        this, SLOT(at_forceVideoTrafficEncryptionCheckBoxClicked(bool)));
+    connect(ui->forceTrafficEncryptionCheckBox, &QCheckBox::clicked,
+        this, &QnSystemSettingsWidget::at_forceTrafficEncryptionCheckBoxClicked);
+    connect(ui->forceVideoTrafficEncryptionCheckBox, &QCheckBox::clicked,
+        this, &QnSystemSettingsWidget::at_forceVideoTrafficEncryptionCheckBoxClicked);
 
     retranslateUi();
 

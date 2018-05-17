@@ -156,8 +156,8 @@ QnGeneralSystemAdministrationWidget::QnGeneralSystemAdministrationWidget(QWidget
     connect(ui->systemSettingsWidget, &QnAbstractPreferencesWidget::hasChangesChanged,
         this, &QnAbstractPreferencesWidget::hasChangesChanged);
 
-    connect(ui->systemSettingsWidget, SIGNAL(forceVideoTrafficEncryptionChanged(bool)),
-        this, SLOT(at_setVideoTrafficEncryptionWarning(bool)));
+    connect(ui->systemSettingsWidget, &QnSystemSettingsWidget::forceVideoTrafficEncryptionChanged,
+        ui->forceVideoEncryptionWarning, &QWidget::setVisible);
 }
 
 void QnGeneralSystemAdministrationWidget::loadDataToUi()
@@ -238,10 +238,4 @@ void QnGeneralSystemAdministrationWidget::setReadOnlyInternal(bool readOnly)
 {
     ::setReadOnly(ui->systemSettingsWidget, readOnly);
     ::setReadOnly(ui->backupWidget, readOnly);
-}
-
-void QnGeneralSystemAdministrationWidget::at_setVideoTrafficEncryptionWarning(
-    bool checkboxChecked)
-{
-    ui->forceVideoEncryptionWarning->setVisible(checkboxChecked);
 }
