@@ -893,8 +893,7 @@
                     name="Initialize Focus"
                     dataType="Button"
                     writeCmd="control"
-                    description="Restores the focus adjustment to the default flange back position"
-                    aux="support=Image/ResetFocus"/>
+                    description="Restores the focus adjustment to the default flange back position"/>
             <param id="image/focus/Mode=AutoFocus"
                     name="Simple Focus"
                     dataType="Button"
