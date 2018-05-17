@@ -97,7 +97,10 @@ public:
     virtual ECConnectionNotificationManager* notificationManager() override;
     ECConnectionAuditManager* auditManager() { return m_auditManager.get(); }
 
-    virtual QnUuid routeToPeerVia(const QnUuid& dstPeer, int* distance) const override;
+    virtual QnUuid routeToPeerVia(
+        const QnUuid& dstPeer, 
+        int* distance, 
+        nx::network::SocketAddress* knownPeerAddress) const override;
 
     virtual TransactionMessageBusAdapter* messageBus() const override;
     virtual nx::time_sync::TimeSyncManager* timeSyncManager() const override;
@@ -502,10 +505,10 @@ void BaseEc2Connection<QueryProcessorType>::deleteRemotePeer(const QnUuid& id)
 
 template<class QueryProcessorType>
 QnUuid BaseEc2Connection<QueryProcessorType>::routeToPeerVia(
-    const QnUuid& dstPeer, int* distance) const
+    const QnUuid& dstPeer, int* distance, nx::network::SocketAddress* knownPeerAddress) const
 {
     auto messageBus = m_connectionFactory->messageBus();
-    return messageBus ? messageBus->routeToPeerVia(dstPeer, distance) : QnUuid();
+    return messageBus ? messageBus->routeToPeerVia(dstPeer, distance, knownPeerAddress) : QnUuid();
 }
 
 template<class QueryProcessorType>

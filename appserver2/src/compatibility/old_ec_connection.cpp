@@ -231,7 +231,7 @@ int OldEcConnection::restoreDatabaseAsync(
     {
     }
 
-    QnUuid OldEcConnection::routeToPeerVia(const QnUuid& /*uuid*/, int* ) const
+    QnUuid OldEcConnection::routeToPeerVia(const QnUuid& /*uuid*/, int*, nx::network::SocketAddress*) const
     {
         return QnUuid();
     }

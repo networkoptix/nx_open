@@ -54,7 +54,10 @@ public:
 
     virtual void startReceivingNotifications() override;
     virtual void stopReceivingNotifications() override;
-    virtual QnUuid routeToPeerVia(const QnUuid& dstPeer, int* distance) const override;
+    virtual QnUuid routeToPeerVia(
+        const QnUuid& dstPeer, 
+        int* distance, 
+        nx::network::SocketAddress* knownPeerAddress) const override;
     virtual TransactionMessageBusAdapter* messageBus() const override { return nullptr; }
     virtual nx::time_sync::TimeSyncManager* timeSyncManager() const override { return nullptr; }
     virtual QnCommonModule* commonModule() const override { return nullptr; }

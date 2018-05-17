@@ -118,7 +118,8 @@ public slots:
     * If can't find route info then return null value.
     * Otherwise return route gateway.
     */
-    virtual QnUuid routeToPeerVia(const QnUuid& dstPeer, int* distance) const override;
+    virtual QnUuid routeToPeerVia(
+        const QnUuid& dstPeer, int* distance, nx::network::SocketAddress* knownPeerAddress) const override;
 
     virtual int distanceToPeer(const QnUuid& dstPeer) const override;
 

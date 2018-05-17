@@ -70,7 +70,8 @@ public:
 
     virtual QSet<QnUuid> directlyConnectedClientPeers() const override;
     virtual QSet<QnUuid> directlyConnectedServerPeers() const override;
-    virtual QnUuid routeToPeerVia(const QnUuid& dstPeer, int* distance) const override;
+    virtual QnUuid routeToPeerVia(
+        const QnUuid& dstPeer, int* distance, nx::network::SocketAddress* knownPeerAddress) const override;
     virtual int distanceToPeer(const QnUuid& dstPeer) const override;
     virtual void dropConnections() override;
     virtual QVector<QnTransportConnectionInfo> connectionsInfo() const override;
@@ -207,7 +208,7 @@ protected:
         for (const auto& peer : dstPeers)
         {
             qint32 distance = kMaxDistance;
-            auto dstPeer = routeToPeerVia(peer, &distance);
+            auto dstPeer = routeToPeerVia(peer, &distance, /*address*/ nullptr);
             if (auto& connection = m_connections.value(dstPeer))
                 dstByConnection[connection].dstPeers.push_back(peer);
         }

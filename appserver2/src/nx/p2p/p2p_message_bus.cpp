@@ -887,7 +887,7 @@ void MessageBus::gotUnicastTransaction(
     {
         QVector<ApiPersistentIdData> via;
         int distance = kMaxDistance;
-        QnUuid dstPeerId = routeToPeerVia(dstPeer, &distance);
+        QnUuid dstPeerId = routeToPeerVia(dstPeer, &distance, /*address*/ nullptr);
         if (distance > kMaxOnlineDistance || dstPeerId.isNull())
         {
             NX_WARNING(this, lm("Drop unicast transaction because no route found"));
@@ -988,8 +988,22 @@ QSet<QnUuid> MessageBus::directlyConnectedServerPeers() const
     return m_connections.keys().toSet();
 }
 
-QnUuid MessageBus::routeToPeerVia(const QnUuid& peerId, int* distance) const
+QnUuid MessageBus::routeToPeerVia(
+    const QnUuid& peerId, int* distance, nx::network::SocketAddress* knownPeerAddress) const
 {
+    if (knownPeerAddress)
+    {
+        *knownPeerAddress = nx::network::SocketAddress();
+        for (const auto& peer: m_remoteUrls)
+        {
+            if (peerId == peer.peerId)
+            {
+                *knownPeerAddress = nx::network::SocketAddress(peer.url.host(), peer.url.port());
+                break;
+            }
+        }
+    }
+
     if (localPeer().id == peerId)
     {
         *distance = 0;

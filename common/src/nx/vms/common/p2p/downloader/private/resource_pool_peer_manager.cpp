@@ -118,7 +118,7 @@ int ResourcePoolPeerManager::distanceTo(const QnUuid& peerId) const
         return -1;
 
     int distance = std::numeric_limits<int>::max();
-    connection->routeToPeerVia(peerId, &distance);
+    connection->routeToPeerVia(peerId, &distance, /*address*/ nullptr);
     return distance;
 }
 

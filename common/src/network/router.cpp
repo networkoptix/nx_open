@@ -56,7 +56,9 @@ QnRoute QnRouter::routeTo(const QnUuid &id)
     }
 
     result.distance = INT_MAX;
-    QnUuid routeVia = connection->routeToPeerVia(id, &result.distance);
+    QnUuid routeVia = connection->routeToPeerVia(id, &result.distance, &result.addr);
+    if (!result.addr.isNull())
+        return result; //< Peer has found in message bus among outgoing connections.
     if (routeVia.isNull())
         return result; // can't route
 

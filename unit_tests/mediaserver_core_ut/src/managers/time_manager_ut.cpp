@@ -442,8 +442,10 @@ private:
     {
         for (int i = 0; i < m_peers.size(); ++i)
         {
-            for (int j = i + 1; j < m_peers.size(); ++j)
+            for (int j = 0; j < m_peers.size(); ++j)
             {
+                if (i == j)
+                    continue;
                 if (m_connectTable[i][j])
                     m_peers[i]->connectTo(m_peers[j].get());
             }
@@ -495,6 +497,7 @@ TEST_F(TimeSynchronization, single_offline_server_follows_local_system_clock)
 TEST_F(TimeSynchronization, multiple_peers_synchronize_time)
 {
     givenMultipleOfflinePeersEachWithDifferentLocalTime();
+    selectRandomPeerAsPrimary();
     waitForTimeToBeSynchronizedAcrossAllPeers();
 }
 

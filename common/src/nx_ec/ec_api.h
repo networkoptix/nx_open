@@ -1195,7 +1195,10 @@ public:
 
     virtual QnCommonModule* commonModule() const = 0;
 
-    virtual QnUuid routeToPeerVia(const QnUuid& dstPeer, int* distance) const = 0;
+    virtual QnUuid routeToPeerVia(
+        const QnUuid& dstPeer, 
+        int* distance, 
+        nx::network::SocketAddress* knownPeerAddress) const = 0;
     virtual TransactionMessageBusAdapter* messageBus() const = 0;
     virtual nx::time_sync::TimeSyncManager* timeSyncManager() const = 0;
 
