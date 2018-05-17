@@ -49,7 +49,7 @@ class WinRM(object):
         shell.__enter__()
         return shell
 
-    def run_command(self, command, input=b''):
+    def run_command(self, command, input=None):
         command_str_list = command_args_to_str_list(command)
         _logger.debug("Command: %s", list2cmdline(command_str_list))
         exit_code, stdout_bytes, stderr_bytes = run_command(self._shell(), command_str_list, stdin_bytes=input)
