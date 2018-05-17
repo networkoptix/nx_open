@@ -10,29 +10,36 @@
 
 #include <nx/vms/api/data/email_settings_data.h>
 
-namespace ec2
+namespace ec2 {
+struct ApiEmailData: nx::vms::api::Data
 {
-    struct ApiEmailData: nx::vms::api::Data
+    ApiEmailData() = default;
+
+    ApiEmailData(
+        const QStringList& to,
+        const QString& subject,
+        const QString& body,
+        const QString& plainBody,
+        int timeout,
+        const QnEmailAttachmentList& attachments)
+        :
+        to(to),
+        subject(subject),
+        body(body),
+        plainBody(plainBody),
+        timeout(timeout),
+        attachments(attachments)
     {
-        ApiEmailData() = default;
+    }
 
-        ApiEmailData (const QStringList& to_, const QString& subject_, const QString& body_, const QString& plainBody_, int timeout_, const QnEmailAttachmentList& attachments_)
-            : to(to_),
-            subject(subject_),
-            body(body_),
-            plainBody(plainBody_),
-            timeout(timeout_),
-            attachments(attachments_)
-        {}
+    QStringList to;
+    QString subject;
+    QString body;
+    QString plainBody;
+    int timeout = 0;
 
-        QStringList to;
-        QString subject;
-        QString body;
-        QString plainBody;
-        int timeout = 0;
-
-        QnEmailAttachmentList attachments;
-    };
+    QnEmailAttachmentList attachments;
+};
 #define ApiEmailData_Fields (to)(subject)(body)(plainBody)(timeout)
 
 } // namespace ec2

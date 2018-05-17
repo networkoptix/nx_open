@@ -47,6 +47,9 @@ public:
 
                 m_moduleInstance = std::make_unique<ModuleProcessType>(
                     static_cast<int>(m_args.size()), m_args.data());
+
+                beforeModuleStart();
+
                 m_moduleInstance->setOnStartedEventHandler(
                     [this](bool isStarted)
                     {
@@ -142,6 +145,7 @@ public:
 
 protected:
     virtual void beforeModuleCreation() {}
+    virtual void beforeModuleStart() {}
     virtual void afterModuleDestruction() {}
 
 private:

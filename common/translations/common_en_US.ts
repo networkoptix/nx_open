@@ -99,26 +99,6 @@
         <comment>Shows that the bookmark was created by a system event</comment>
         <translation></translation>
     </message>
-    <message>
-        <source>System already bound to cloud (id %1)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Server is not connected to the Internet.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Failed to save cloud credentials to local DB</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Failed to save cloud owner to local DB</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Could not connect to cloud: %1</source>
-        <translation type="unfinished"></translation>
-    </message>
 </context>
 <context>
     <name>QnCameraDiagnosticsErrorCodeStrings</name>
@@ -847,153 +827,6 @@
     </message>
 </context>
 <context>
-    <name>QnTimeStrings</name>
-    <message>
-        <source>ms</source>
-        <comment>Suffix for displaying milliseconds</comment>
-        <translation></translation>
-    </message>
-    <message>
-        <source>s</source>
-        <comment>Suffix for displaying seconds</comment>
-        <translation></translation>
-    </message>
-    <message>
-        <source>m</source>
-        <comment>Suffix for displaying minutes</comment>
-        <translation></translation>
-    </message>
-    <message>
-        <source>h</source>
-        <comment>Suffix for displaying hours</comment>
-        <translation></translation>
-    </message>
-    <message>
-        <source>d</source>
-        <comment>Suffix for displaying days</comment>
-        <translation></translation>
-    </message>
-    <message>
-        <source>w</source>
-        <comment>Suffix for displaying weeks</comment>
-        <translation></translation>
-    </message>
-    <message>
-        <source>M</source>
-        <comment>Suffix for displaying months</comment>
-        <translation></translation>
-    </message>
-    <message>
-        <source>y</source>
-        <comment>Suffix for displaying years</comment>
-        <translation></translation>
-    </message>
-    <message>
-        <source>msec</source>
-        <comment>Long suffix for displaying milliseconds</comment>
-        <translation></translation>
-    </message>
-    <message>
-        <source>sec</source>
-        <comment>Long suffix for displaying seconds</comment>
-        <translation></translation>
-    </message>
-    <message>
-        <source>min</source>
-        <comment>Long suffix for displaying minutes</comment>
-        <translation></translation>
-    </message>
-    <message>
-        <source>hrs</source>
-        <comment>Long suffix for displaying hours</comment>
-        <translation></translation>
-    </message>
-    <message>
-        <source>days</source>
-        <comment>Long suffix for displaying days</comment>
-        <translation></translation>
-    </message>
-    <message>
-        <source>wks</source>
-        <comment>Long suffix for displaying weeks</comment>
-        <translation></translation>
-    </message>
-    <message>
-        <source>mos</source>
-        <comment>Long suffix for displaying months</comment>
-        <translation></translation>
-    </message>
-    <message>
-        <source>yrs</source>
-        <comment>Long suffix for displaying years</comment>
-        <translation></translation>
-    </message>
-    <message numerus="yes">
-        <source>milliseconds</source>
-        <comment>Full suffix for displaying milliseconds</comment>
-        <translation>
-            <numerusform>millisecond</numerusform>
-            <numerusform>milliseconds</numerusform>
-        </translation>
-    </message>
-    <message numerus="yes">
-        <source>seconds</source>
-        <comment>Full suffix for displaying seconds</comment>
-        <translation>
-            <numerusform>second</numerusform>
-            <numerusform>seconds</numerusform>
-        </translation>
-    </message>
-    <message numerus="yes">
-        <source>minutes</source>
-        <comment>Full suffix for displaying minutes</comment>
-        <translation>
-            <numerusform>minute</numerusform>
-            <numerusform>minutes</numerusform>
-        </translation>
-    </message>
-    <message numerus="yes">
-        <source>hours</source>
-        <comment>Full suffix for displaying hours</comment>
-        <translation>
-            <numerusform>hour</numerusform>
-            <numerusform>hours</numerusform>
-        </translation>
-    </message>
-    <message numerus="yes">
-        <source>days</source>
-        <comment>Full suffix for displaying days</comment>
-        <translation>
-            <numerusform>day</numerusform>
-            <numerusform>days</numerusform>
-        </translation>
-    </message>
-    <message numerus="yes">
-        <source>weeks</source>
-        <comment>Full suffix for displaying weeks</comment>
-        <translation>
-            <numerusform>week</numerusform>
-            <numerusform>weeks</numerusform>
-        </translation>
-    </message>
-    <message numerus="yes">
-        <source>months</source>
-        <comment>Full suffix for displaying months</comment>
-        <translation>
-            <numerusform>month</numerusform>
-            <numerusform>months</numerusform>
-        </translation>
-    </message>
-    <message numerus="yes">
-        <source>years</source>
-        <comment>Full suffix for displaying years</comment>
-        <translation>
-            <numerusform>year</numerusform>
-            <numerusform>years</numerusform>
-        </translation>
-    </message>
-</context>
-<context>
     <name>QnTranscoder</name>
     <message>
         <source>OpenCL transcoding is not implemented.</source>
@@ -1549,10 +1382,6 @@
         <source>%1 at %2</source>
         <comment>Analytics Event at some camera</comment>
         <translation></translation>
-    </message>
-    <message>
-        <source>Open layout</source>
-        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>

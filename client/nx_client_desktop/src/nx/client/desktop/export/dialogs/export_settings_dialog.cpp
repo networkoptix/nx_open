@@ -19,7 +19,6 @@
 #include <ui/workbench/workbench_item.h>
 #include <ui/workbench/workbench_layout.h>
 #include <ui/workbench/workbench_context.h>
-#include <ui/workbench/watchers/workbench_server_time_watcher.h>
 #include <utils/common/event_processors.h>
 #include <utils/math/math.h>
 #include <nx/client/desktop/common/widgets/busy_indicator.h>
@@ -27,6 +26,7 @@
 #include <nx/client/desktop/common/widgets/selectable_text_button_group.h>
 #include <nx/client/desktop/image_providers/layout_thumbnail_loader.h>
 #include <nx/fusion/model_functions.h>
+#include <nx/client/core/watchers/server_time_watcher.h>
 
 namespace nx {
 namespace client {
@@ -547,7 +547,7 @@ void ExportSettingsDialog::setMediaParams(
     const QnLayoutItemData& itemData,
     QnWorkbenchContext* context)
 {
-    const auto timeWatcher = context->instance<QnWorkbenchServerTimeWatcher>();
+    const auto timeWatcher = context->instance<core::ServerTimeWatcher>();
     d->setServerTimeZoneOffsetMs(timeWatcher->utcOffset(mediaResource, Qn::InvalidUtcOffset));
 
     const auto timestampOffsetMs = timeWatcher->displayOffset(mediaResource);

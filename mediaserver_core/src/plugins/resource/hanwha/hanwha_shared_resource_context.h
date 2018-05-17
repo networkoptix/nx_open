@@ -10,6 +10,7 @@
 #include <nx/utils/elapsed_timer.h>
 #include <nx/utils/thread/mutex.h>
 #include <nx/utils/thread/semaphore.h>
+#include <nx/utils/thread/rw_lock.h>
 #include <plugins/resource/hanwha/hanwha_common.h>
 #include <plugins/resource/hanwha/hanwha_time_synchronizer.h>
 #include <plugins/resource/hanwha/hanwha_utils.h>
@@ -27,7 +28,7 @@ static const std::chrono::seconds kUnsuccessfulUpdateCacheTimeout(10);
 
 struct HanwhaInformation
 {
-    QString deviceType;
+    HanwhaDeviceType deviceType;
     QString firmware;
     QString macAddress;
     QString model;
@@ -120,7 +121,7 @@ public:
 
     nx::utils::Url url() const;
     QAuthenticator authenticator() const;
-    QnSemaphore* requestSemaphore();
+    nx::utils::RwLock* requestLock();
 
     void startServices(bool hasVideoArchive, bool isNvr);
 
@@ -146,6 +147,7 @@ public:
     HanwhaCachedData<HanwhaResponse> videoSources;
     HanwhaCachedData<HanwhaResponse> videoProfiles;
     HanwhaCachedData<HanwhaCodecInfo> videoCodecInfo;
+    HanwhaCachedData<bool> isBypassSupported;
 
 private:
     HanwhaResult<HanwhaInformation> loadInformation();
@@ -153,6 +155,7 @@ private:
     HanwhaResult<HanwhaResponse> loadVideoSources();
     HanwhaResult<HanwhaResponse> loadVideoProfiles();
     HanwhaResult<HanwhaCodecInfo> loadVideoCodecInfo();
+    HanwhaResult<bool> checkBypassSupport();
 
     void cleanupUnsafe();
 
@@ -173,7 +176,7 @@ private:
     // key: live = true, archive = false
     QMap<bool, QMap<ClientId, SessionContextWeakPtr>> m_sessions;
 
-    QnSemaphore m_requestSemaphore;
+    nx::utils::RwLock m_requestLock;
     std::shared_ptr<HanwhaChunkLoader> m_chunkLoader;
     std::unique_ptr<HanwhaTimeSyncronizer> m_timeSynchronizer;
 

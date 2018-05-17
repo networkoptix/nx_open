@@ -3,10 +3,16 @@
 #include <limits>
 
 #include <camera/fps_calculator.h>
+#include <client_core/client_core_module.h>
+#include <common/common_module.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/resource_display_info.h>
+#include <core/resource_management/resource_pool.h>
 #include <utils/camera/camera_bitrate_calculator.h>
+
 #include <nx/fusion/model_functions.h>
+#include <nx/vms/api/types/rtp_types.h>
+#include <nx/vms/api/types/motion_types.h>
 #include <nx/utils/algorithm/same.h>
 
 namespace nx {
@@ -30,11 +36,23 @@ template<class Data>
 void fetchFromCameras(
     State::UserEditableMultiple<Data>& value,
     const Cameras& cameras,
-    std::function<Data(const Camera&)> predicate)
+    std::function<Data(const Camera&)> getter)
 {
     Data data;
-    if (utils::algorithm::same(cameras.cbegin(), cameras.cend(), predicate, &data))
+    if (utils::algorithm::same(cameras.cbegin(), cameras.cend(), getter, &data))
         value.setBase(data);
+}
+
+template<class Data, class Intermediate>
+void fetchFromCameras(
+    State::UserEditableMultiple<Data>& value,
+    const Cameras& cameras,
+    std::function<Intermediate(const Camera&)> getter,
+    std::function<Data(const Intermediate&)> converter)
+{
+    Intermediate data;
+    if (utils::algorithm::same(cameras.cbegin(), cameras.cend(), getter, &data))
+        value.setBase(converter(data));
 }
 
 State::CombinedValue combinedValue(const Cameras& cameras,
@@ -307,6 +325,77 @@ QnMotionRegion::ErrorCode validateMotionRegionList(const State& state,
     return QnMotionRegion::ErrorCode::Ok;
 }
 
+vms::api::MotionStreamType motionStreamType(const Camera& camera)
+{
+    return QnLexical::deserialized<vms::api::MotionStreamType>(
+        camera->getProperty(QnMediaResource::motionStreamKey()),
+        vms::api::MotionStreamType::automatic);
+}
+
+State updateDuplicateLogicalIdInfo(State state)
+{
+    state.singleCameraSettings.sameLogicalIdCameraNames.clear();
+
+    const QnUuid currentId(state.singleCameraProperties.id);
+    const auto currentLogicalId = state.singleCameraSettings.logicalId();
+
+    const auto isSameLogicalId =
+        [&currentId, &currentLogicalId](const Camera& camera)
+        {
+            return !camera->getLogicalId().isEmpty()
+                && camera->getLogicalId().toInt() == currentLogicalId
+                && camera->getId() != currentId;
+        };
+
+    const auto duplicateCameras = qnClientCoreModule->commonModule()->resourcePool()->
+        getAllCameras().filtered(isSameLogicalId);
+
+    for (const auto& camera: duplicateCameras)
+        state.singleCameraSettings.sameLogicalIdCameraNames << camera->getName();
+
+    return state;
+}
+
+bool isDefaultExpertSettings(const State& state)
+{
+    if (state.isSingleCamera() && state.singleCameraSettings.logicalId() > 0)
+        return false;
+
+    if (state.settingsOptimizationEnabled)
+    {
+        if ((state.devicesDescription.isArecontCamera == State::CombinedValue::None
+                && state.expert.cameraControlDisabled.valueOr(true))
+            || (state.devicesDescription.hasPredefinedBitratePerGOP == State::CombinedValue::None
+                && state.expert.useBitratePerGOP.valueOr(true))
+            || state.expert.dualStreamingDisabled.valueOr(true))
+        {
+            return false;
+        }
+    }
+
+    if (state.expert.primaryRecordingDisabled.valueOr(true)
+        || (state.devicesDescription.hasDualStreamingCapability != State::CombinedValue::None
+            && state.expert.secondaryRecordingDisabled.valueOr(true)))
+    {
+        return false;
+    }
+
+    if (state.devicesDescription.canDisableNativePtzPresets != State::CombinedValue::None
+        && state.expert.nativePtzPresetsDisabled.valueOr(true))
+    {
+        return false;
+    }
+
+    if (state.devicesDescription.supportsMotionStreamOverride == State::CombinedValue::All
+        && state.expert.motionStreamType() != vms::api::MotionStreamType::automatic)
+    {
+        return false;
+    }
+
+    return state.expert.rtpTransportType.hasValue()
+        && state.expert.rtpTransportType() == vms::api::RtpTransportType::automatic;
+}
+
 } // namespace
 
 State CameraSettingsDialogStateReducer::applyChanges(State state)
@@ -328,6 +417,12 @@ State CameraSettingsDialogStateReducer::setPanicMode(State state, bool value)
     return state;
 }
 
+State CameraSettingsDialogStateReducer::setSettingsOptimizationEnabled(State state, bool value)
+{
+    state.settingsOptimizationEnabled = value;
+    return state;
+}
+
 State CameraSettingsDialogStateReducer::loadCameras(
     State state,
     const Cameras& cameras)
@@ -341,9 +436,14 @@ State CameraSettingsDialogStateReducer::loadCameras(
     state.singleCameraSettings = {};
     state.singleIoModuleSettings = {};
     state.devicesDescription = {};
+    state.expert = {};
     state.recording = {};
     state.devicesCount = cameras.size();
     state.alert = {};
+
+    state.deviceType = firstCamera
+        ? QnDeviceDependentStrings::calculateDeviceType(firstCamera->resourcePool(), cameras)
+        : QnCameraDeviceType::Mixed;
 
     state.devicesDescription.isDtsBased = combinedValue(cameras,
         [](const Camera& camera) { return camera->isDtsBased(); });
@@ -353,8 +453,42 @@ State CameraSettingsDialogStateReducer::loadCameras(
         [](const Camera& camera) { return camera->isIOModule(); });
     state.devicesDescription.hasMotion = combinedValue(cameras,
         [](const Camera& camera) { return camera->hasMotion(); });
-    state.devicesDescription.hasDualStreaming = combinedValue(cameras,
-        [](const Camera& camera) { return camera->hasDualStreaming(); });
+    state.devicesDescription.hasDualStreamingCapability = combinedValue(cameras,
+        [](const Camera& camera) { return camera->hasDualStreamingInternal(); });
+
+    state.devicesDescription.hasRemoteArchiveCapability = combinedValue(cameras,
+        [](const Camera& camera)
+        {
+            return camera->hasCameraCapabilities(Qn::RemoteArchiveCapability);
+        });
+
+    state.devicesDescription.isArecontCamera = combinedValue(cameras,
+        [](const Camera& camera)
+        {
+            const auto cameraType = qnResTypePool->getResourceType(camera->getTypeId());
+            return cameraType && cameraType->getManufacture() == lit("ArecontVision");
+        });
+
+    state.devicesDescription.hasPredefinedBitratePerGOP = combinedValue(cameras,
+        [](const Camera& camera)
+        {
+            return camera->bitratePerGopType() == Qn::BPG_Predefined;
+        });
+
+    state.devicesDescription.hasPtzPresets = combinedValue(cameras,
+        [](const Camera& camera)
+        {
+            return camera->hasAnyOfPtzCapabilities(Ptz::PresetsPtzCapability);
+        });
+
+    state.devicesDescription.canDisableNativePtzPresets = combinedValue(cameras,
+        [](const Camera& camera) { return camera->canDisableNativePtzPresets(); });
+
+    state.devicesDescription.supportsMotionStreamOverride = combinedValue(cameras,
+        [](const Camera& camera)
+        {
+            return camera->supportedMotionType().testFlag(Qn::MotionType::MT_SoftwareGrid);
+        });
 
     if (firstCamera)
     {
@@ -414,6 +548,9 @@ State CameraSettingsDialogStateReducer::loadCameras(
             state.singleIoModuleSettings.ioPortsData.setBase(firstCamera->getIOPorts());
         }
 
+        state.singleCameraSettings.logicalId.setBase(firstCamera->getLogicalId().toInt());
+        state = updateDuplicateLogicalIdInfo(std::move(state));
+
         Qn::calculateMaxFps(
             {firstCamera},
             &state.singleCameraProperties.maxFpsWithoutMotion,
@@ -427,7 +564,7 @@ State CameraSettingsDialogStateReducer::loadCameras(
 
     state.recording.parametersAvailable = calculateRecordingParametersAvailable(cameras);
 
-     Qn::calculateMaxFps(
+    Qn::calculateMaxFps(
             cameras,
             &state.devicesDescription.maxFps,
             &state.devicesDescription.maxDualStreamingFps,
@@ -463,6 +600,56 @@ State CameraSettingsDialogStateReducer::loadCameras(
 
     state.imageControl = calculateImageControlSettings(cameras);
 
+    fetchFromCameras<bool>(state.expert.dualStreamingDisabled, cameras,
+        [](const Camera& camera) { return camera->isDualStreamingDisabled(); });
+    fetchFromCameras<bool>(state.expert.cameraControlDisabled, cameras,
+        [](const Camera& camera) { return camera->isCameraControlDisabled(); });
+
+    fetchFromCameras<bool, Qn::BitratePerGopType>(state.expert.useBitratePerGOP, cameras,
+        [](const Camera& camera) { return camera->bitratePerGopType(); },
+        [](Qn::BitratePerGopType bpg) { return bpg != Qn::BPG_None; });
+
+    fetchFromCameras<bool>(state.expert.primaryRecordingDisabled, cameras,
+        [](const Camera& camera)
+        {
+            return camera->getProperty(QnMediaResource::dontRecordPrimaryStreamKey()).toInt() > 0;
+        });
+
+    fetchFromCameras<bool>(state.expert.secondaryRecordingDisabled, cameras,
+        [](const Camera& camera)
+        {
+            return camera->getProperty(QnMediaResource::dontRecordSecondaryStreamKey()).toInt() > 0;
+        });
+
+    fetchFromCameras<vms::api::RtpTransportType>(state.expert.rtpTransportType, cameras,
+        [](const Camera& camera)
+        {
+            return QnLexical::deserialized<vms::api::RtpTransportType>(
+                camera->getProperty(QnMediaResource::rtpTransportKey()),
+                vms::api::RtpTransportType::automatic);
+        });
+
+    fetchFromCameras<vms::api::MotionStreamType>(state.expert.motionStreamType, cameras,
+        [](const Camera& camera) { return motionStreamType(camera); });
+
+    state.expert.motionStreamOverridden = combinedValue(cameras,
+        [](const Camera& camera)
+        {
+            return motionStreamType(camera) != vms::api::MotionStreamType::automatic;
+        });
+
+    if (state.devicesDescription.canDisableNativePtzPresets != State::CombinedValue::None)
+    {
+        fetchFromCameras<bool>(state.expert.nativePtzPresetsDisabled, cameras,
+            [](const Camera& camera)
+            {
+                return camera->canDisableNativePtzPresets()
+                    & !camera->getProperty(Qn::DISABLE_NATIVE_PTZ_PRESETS_PARAM_NAME).isEmpty();
+            });
+    }
+
+    state.isDefaultExpertSettings = isDefaultExpertSettings(state);
+
     return state;
 }
 
@@ -494,7 +681,10 @@ State CameraSettingsDialogStateReducer::setScheduleBrushRecordingType(
     Qn::RecordingType value)
 {
     NX_EXPECT(value != Qn::RecordingType::motionOnly || state.hasMotion());
-    NX_EXPECT(value != Qn::RecordingType::motionAndLow || state.hasDualStreaming());
+    NX_EXPECT(value != Qn::RecordingType::motionAndLow
+        || (state.hasMotion()
+            && state.devicesDescription.hasDualStreamingCapability == State::CombinedValue::All));
+
     state.recording.brush.recordingType = value;
     if (value == Qn::RecordingType::motionAndLow)
     {
@@ -758,6 +948,162 @@ State CameraSettingsDialogStateReducer::setIoModuleVisualStyle(
 
     state.singleIoModuleSettings.visualStyle.setUser(value);
     state.hasChanges = true;
+    return state;
+}
+
+State CameraSettingsDialogStateReducer::setCameraControlDisabled(State state, bool value)
+{
+    const bool hasArecontCameras =
+        state.devicesDescription.isArecontCamera != State::CombinedValue::None;
+
+    if (hasArecontCameras || !state.settingsOptimizationEnabled)
+        return state;
+
+    state.expert.cameraControlDisabled.setUser(value);
+    state.isDefaultExpertSettings = isDefaultExpertSettings(state);
+    state.hasChanges = true;
+    return state;
+}
+
+State CameraSettingsDialogStateReducer::setDualStreamingDisabled(State state, bool value)
+{
+    if (!state.settingsOptimizationEnabled)
+        return state;
+
+    state.expert.dualStreamingDisabled.setUser(value);
+    state.isDefaultExpertSettings = isDefaultExpertSettings(state);
+    state.hasChanges = true;
+    return state;
+}
+
+State CameraSettingsDialogStateReducer::setUseBitratePerGOP(State state, bool value)
+{
+    const bool hasPredefinedBitratePerGOP =
+        state.devicesDescription.hasPredefinedBitratePerGOP != State::CombinedValue::None;
+
+    if (hasPredefinedBitratePerGOP || !state.settingsOptimizationEnabled)
+        return state;
+
+    state.expert.useBitratePerGOP.setUser(value);
+    state.isDefaultExpertSettings = isDefaultExpertSettings(state);
+    state.hasChanges = true;
+    return state;
+}
+
+State CameraSettingsDialogStateReducer::setPrimaryRecordingDisabled(State state, bool value)
+{
+    state.expert.primaryRecordingDisabled.setUser(value);
+    state.isDefaultExpertSettings = isDefaultExpertSettings(state);
+    state.hasChanges = true;
+    return state;
+}
+
+State CameraSettingsDialogStateReducer::setSecondaryRecordingDisabled(State state, bool value)
+{
+    if (state.devicesDescription.hasDualStreamingCapability == State::CombinedValue::None)
+        return state;
+
+    state.expert.secondaryRecordingDisabled.setUser(value);
+    state.isDefaultExpertSettings = isDefaultExpertSettings(state);
+    state.hasChanges = true;
+    return state;
+}
+
+State CameraSettingsDialogStateReducer::setNativePtzPresetsDisabled(State state, bool value)
+{
+    if (state.devicesDescription.canDisableNativePtzPresets == State::CombinedValue::None)
+        return state;
+
+    state.expert.nativePtzPresetsDisabled.setUser(value);
+    state.isDefaultExpertSettings = isDefaultExpertSettings(state);
+    state.hasChanges = true;
+    return state;
+}
+
+State CameraSettingsDialogStateReducer::setRtpTransportType(
+    State state, vms::api::RtpTransportType value)
+{
+    state.expert.rtpTransportType.setUser(value);
+    state.isDefaultExpertSettings = isDefaultExpertSettings(state);
+    state.hasChanges = true;
+    return state;
+}
+
+State CameraSettingsDialogStateReducer::setMotionStreamType(
+    State state, vms::api::MotionStreamType value)
+{
+    if (state.devicesDescription.supportsMotionStreamOverride != State::CombinedValue::All)
+        return state;
+
+    state.expert.motionStreamType.setUser(value);
+    state.expert.motionStreamOverridden = value == vms::api::MotionStreamType::automatic
+        ? State::CombinedValue::None
+        : State::CombinedValue::All;
+
+    state.isDefaultExpertSettings = isDefaultExpertSettings(state);
+    state.hasChanges = true;
+    return state;
+}
+
+State CameraSettingsDialogStateReducer::setLogicalId(State state, int value)
+{
+    if (!state.isSingleCamera())
+        return state;
+
+    state.singleCameraSettings.logicalId.setUser(value);
+    state.isDefaultExpertSettings = isDefaultExpertSettings(state);
+    state.hasChanges = true;
+
+    return updateDuplicateLogicalIdInfo(std::move(state));
+}
+
+State CameraSettingsDialogStateReducer::generateLogicalId(State state)
+{
+    if (!state.isSingleCamera())
+        return state;
+
+    auto cameras = qnClientCoreModule->commonModule()->resourcePool()->getAllCameras();
+    std::set<int> usedValues;
+
+    const QnUuid currentId(state.singleCameraProperties.id);
+    for (const auto& camera: cameras)
+    {
+        if (camera->getId() != currentId)
+            usedValues.insert(camera->getLogicalId().toInt());
+    }
+
+    int previousValue = 0;
+    for (auto value: usedValues)
+    {
+        if (value > previousValue + 1)
+            break;
+
+        previousValue = value;
+    }
+
+    const auto newLogicalId = previousValue + 1;
+    if (newLogicalId == state.singleCameraSettings.logicalId())
+        return state;
+
+    return setLogicalId(std::move(state), newLogicalId);
+}
+
+State CameraSettingsDialogStateReducer::resetExpertSettings(State state)
+{
+    if (state.isDefaultExpertSettings)
+        return state;
+
+    state = setCameraControlDisabled(std::move(state), false);
+    state = setDualStreamingDisabled(std::move(state), false);
+    state = setUseBitratePerGOP(std::move(state), false);
+    state = setPrimaryRecordingDisabled(std::move(state), false);
+    state = setSecondaryRecordingDisabled(std::move(state), false);
+    state = setNativePtzPresetsDisabled(std::move(state), false);
+    state = setRtpTransportType(std::move(state), vms::api::RtpTransportType::automatic);
+    state = setMotionStreamType(std::move(state), vms::api::MotionStreamType::automatic);
+    state = setLogicalId(std::move(state), {});
+
+    state.isDefaultExpertSettings = true;
     return state;
 }
 

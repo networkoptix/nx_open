@@ -151,6 +151,12 @@ int ProxyVideoDecoder::decode(
     return d->decode(compressedVideoData, outDecodedFrame);
 }
 
+virtual Capabilities ProxyVideoDecoder::capabilities() const
+{
+    // TODO: #mike deliver this information from proxy_decoder.h.
+    return Capability::hardwareAccelerated;
+}
+
 } // namespace media
 } // namespace nx
 

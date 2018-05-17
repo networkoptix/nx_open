@@ -244,7 +244,7 @@ QString StringsHelper::eventAtResource(const EventParameters& params,
         case EventType::analyticsSdkEvent:
             if (!params.caption.isEmpty())
             {
-                return tr("%1 - %2")
+                return lit("%1 - %2")
                     .arg(getAnalyticsSdkEventName(params))
                     .arg(params.caption);
             }
@@ -704,9 +704,10 @@ QString StringsHelper::defaultSoftwareTriggerName()
     return tr("Trigger Name");
 }
 
-QString StringsHelper::getSoftwareTriggerName(const QString& id)
+
+QString StringsHelper::getSoftwareTriggerName(const QString& name)
 {
-    const auto triggerId = id.trimmed();
+    const auto triggerId = name.trimmed();
     return triggerId.isEmpty() ? defaultSoftwareTriggerName() : triggerId;
 }
 

@@ -291,7 +291,7 @@ std::vector<nxpl::NX_GUID> Plugin::loadClassGuids(const std::string& guidsFilePa
         if (trim(&line)->empty())
             continue;
 
-        auto guid = nxpt::fromStdString(line);
+        auto guid = nxpt::NxGuidHelper::fromStdString(line);
         if (guid == kNullGuid)
             continue;
 

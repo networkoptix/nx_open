@@ -348,6 +348,9 @@ void QnResourceAccessManager::handleResourceAdded(const QnResourcePtr& resource)
         connect(camera, &QnVirtualCameraResource::licenseTypeChanged, this,
             &QnResourceAccessManager::updatePermissionsToResource);
 
+        connect(camera, &QnVirtualCameraResource::licenseTypeChanged, this,
+            &QnResourceAccessManager::updatePermissionsToResource);
+
         connect(camera, &QnVirtualCameraResource::licenseUsedChanged, this,
             &QnResourceAccessManager::updatePermissionsToResource);
 

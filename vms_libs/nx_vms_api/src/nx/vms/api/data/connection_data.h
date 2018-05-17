@@ -7,14 +7,15 @@ namespace nx {
 namespace vms {
 namespace api {
 
-//!Parameters of connect request
+/**
+ * Parameters of connect request.
+ */
 struct ConnectionData: Data
 {
     QString login;
     QByteArray passwordHash;
     ClientInfoData clientInfo;
 };
-
 #define ConnectionData_Fields (login)(passwordHash)(clientInfo)
 
 } // namespace api

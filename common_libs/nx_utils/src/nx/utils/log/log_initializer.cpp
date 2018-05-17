@@ -6,6 +6,12 @@
 
 #include "log_main.h"
 
+namespace {
+
+static const QString kDefaultLogBaseName("log_file");
+
+} // namespace
+
 namespace nx {
 namespace utils {
 namespace log {
@@ -16,7 +22,6 @@ void initialize(
     const Settings& settings,
     const QString& applicationName,
     const QString& binaryPath,
-    const QString& baseName,
     std::shared_ptr<Logger> logger)
 {
     if (settings.level.primary == Level::undefined || settings.level.primary == Level::notConfigured)
@@ -30,6 +35,9 @@ void initialize(
     {
         logger->setDefaultLevel(settings.level.primary);
         logger->setLevelFilters(settings.level.filters);
+        const QString baseName = settings.logBaseName.isEmpty()
+            ? kDefaultLogBaseName
+            : settings.logBaseName;
         if (baseName != QLatin1String("-"))
         {
             File::Settings fileSettings;

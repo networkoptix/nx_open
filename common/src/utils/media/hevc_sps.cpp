@@ -5,6 +5,8 @@
 
 #include <utils/media/bitStream.h>
 #include <utils/media/nalUnits.h>
+#include <nx/streaming/video_data_packet.h>
+#include "h264_utils.h"
 
 namespace nx {
 namespace media_utils {
@@ -15,6 +17,31 @@ namespace {
 static const int kReservedNalSpace = 16; //< Where this number comes from?
 
 } // namespace
+
+bool Sps::decodeFromVideoFrame(const QnConstCompressedVideoDataPtr& videoData)
+{
+    using namespace nx::media_utils;
+
+    // H.265 nal units have same format (unit delimiter) as H.264 nal units
+    std::vector<std::pair<const quint8*, size_t>> nalUnits =
+        nx::media_utils::avc::decodeNalUnits(videoData);
+
+    for (const std::pair<const quint8*, size_t>& nalu : nalUnits)
+    {
+        hevc::NalUnitHeader packetHeader;
+        if (!packetHeader.decode(nalu.first, nalu.second))
+            return false;
+
+        switch (packetHeader.unitType)
+        {
+            case hevc::NalUnitType::spsNut:
+                return decode(nalu.first, nalu.second);
+            default:
+                break;
+        }
+    }
+    return false;
+}
 
 bool Sps::decode(const uint8_t* payload, int payloadLength)
 {

@@ -18,7 +18,7 @@ Pane
 
     padding: 0
 
-    background: Rectangle { color: ColorTheme.windowBackground }
+    background: Item {}
 
     contentItem: Item
     {

@@ -95,7 +95,7 @@
 #include <ui/workbench/handlers/workbench_notifications_handler.h>
 
 #include "camera/thumbnails_loader.h" // TODO: remove?
-#include "watchers/workbench_server_time_watcher.h"
+#include <nx/client/core/watchers/server_time_watcher.h>
 
 #include <nx/utils/log/log.h>
 
@@ -2116,7 +2116,8 @@ void QnWorkbenchDisplay::at_workbench_currentLayoutChanged()
             widget->setOverlayVisible(true, false);
             widget->setInfoVisible(true, false);
 
-            qint64 displayTime = time + context()->instance<QnWorkbenchServerTimeWatcher>()->displayOffset(widget->resource());
+            const auto timeWatcher = context()->instance<nx::client::core::ServerTimeWatcher>();
+            qint64 displayTime = time + timeWatcher->displayOffset(widget->resource());
 
             // TODO: #Elric move out, common code, another copy is in QnWorkbenchScreenshotHandler
             QString timeString = (widget->resource()->toResource()->flags() & Qn::utc)

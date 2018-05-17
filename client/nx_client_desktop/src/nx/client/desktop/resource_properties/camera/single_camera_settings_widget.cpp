@@ -176,7 +176,7 @@ SingleCameraSettingsWidget::SingleCameraSettingsWidget(QWidget *parent) :
             ui->cameraScheduleWidget->setScheduleEnabled(ui->licensingWidget->state() == Qt::Checked);
         });
 
-    connect(ui->expertSettingsWidget, &CameraExpertSettingsWidget::dataChanged,
+    connect(ui->expertSettingsWidget, &LegacyExpertSettingsWidget::dataChanged,
         this, &SingleCameraSettingsWidget::at_dbDataChanged);
 
     connect(ui->fisheyeSettingsWidget, &FisheyeSettingsWidget::dataChanged,
@@ -411,10 +411,15 @@ void SingleCameraSettingsWidget::submitToResource()
         loginEditAuth.setPassword(ui->passwordEdit->text().trimmed());
         if (m_camera->getAuth() != loginEditAuth)
         {
-            if (m_camera->isMultiSensorCamera() || m_camera->isNvr())
+            if ((m_camera->isMultiSensorCamera() || m_camera->isNvr())
+                && !m_camera->getGroupId().isEmpty())
+            {
                 QnClientCameraResource::setAuthToCameraGroup(m_camera, loginEditAuth);
+            }
             else
+            {
                 m_camera->setAuth(loginEditAuth);
+            }
         }
 
         ui->cameraScheduleWidget->applyChanges();

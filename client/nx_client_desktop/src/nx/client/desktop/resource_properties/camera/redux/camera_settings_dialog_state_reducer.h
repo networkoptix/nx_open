@@ -16,6 +16,7 @@ public:
     static State applyChanges(State state);
     static State setReadOnly(State state, bool value);
     static State setPanicMode(State state, bool value);
+    static State setSettingsOptimizationEnabled(State state, bool value);
     static State loadCameras(State state, const QnVirtualCameraResourceList& cameras);
     static State setSingleCameraUserName(State state, const QString& text);
     static State setScheduleBrush(State state, const ScheduleCellParams& brush);
@@ -42,6 +43,17 @@ public:
     static State setFisheyeSettings(State state, const QnMediaDewarpingParams& value);
     static State setIoPortDataList(State state, const QnIOPortDataList& value);
     static State setIoModuleVisualStyle(State state, vms::api::IoModuleVisualStyle value);
+    static State setCameraControlDisabled(State state, bool value);
+    static State setDualStreamingDisabled(State state, bool value);
+    static State setUseBitratePerGOP(State state, bool value);
+    static State setPrimaryRecordingDisabled(State state, bool value);
+    static State setSecondaryRecordingDisabled(State state, bool value);
+    static State setNativePtzPresetsDisabled(State state, bool value);
+    static State setRtpTransportType(State state, vms::api::RtpTransportType value);
+    static State setMotionStreamType(State state, vms::api::MotionStreamType value);
+    static State setLogicalId(State state, int value);
+    static State generateLogicalId(State state);
+    static State resetExpertSettings(State state);
 };
 
 } // namespace desktop

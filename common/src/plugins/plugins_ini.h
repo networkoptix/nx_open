@@ -18,6 +18,9 @@ struct PluginsIniConfig: public nx::kit::IniConfig
     NX_INI_STRING("", metadataPluginCameraManagerSettingsPath,
         "Path to {plugin_name}_camera_manager.json: array of objects with name and value strings.\n"
         "Empty means .ini path.");
+
+    NX_INI_STRING("", metadataPluginManifestOutputPath,
+        "Path (absolute or relative to .ini path) to dir for saving metadata plugin manifests.");
 };
 
 inline PluginsIniConfig& pluginsIni()

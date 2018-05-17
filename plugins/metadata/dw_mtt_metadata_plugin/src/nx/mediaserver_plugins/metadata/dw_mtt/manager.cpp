@@ -35,7 +35,8 @@ static const std::chrono::seconds kReconnectTimeout(30);
 
 static const std::chrono::milliseconds kMinTimeBetweenEvents = std::chrono::seconds(3);
 
-static const int kBufferCapacity = 16 * 1024; //< Enough for big xmls (according to examples).
+// Camera may send an image in face detection notification, so we need large buffer
+static const int kBufferCapacity = 512 * 1024;
 
 nx::sdk::metadata::CommonEvent* createCommonEvent(
     const AnalyticsEventType& event, bool active)
@@ -133,7 +134,7 @@ void Manager::treatMessage(QByteArray message)
     }
     else
     {
-        NX_URL_PRINT << "Packed with undefined event type received. Uuid = "
+        NX_URL_PRINT << "A packet with undefined event type received. Uuid = "
             << internalName.toStdString();
     }
 }
@@ -293,7 +294,6 @@ QDomDocument Manager::getDom()
 
     if (xmlEndingIterator == m_buffer.cend())
     {
-
         NX_URL_PRINT << "Received message doesn't contain complete xml. "
             << "Waiting more incomming data ...";
         return dom;

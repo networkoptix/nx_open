@@ -68,9 +68,15 @@ QnCameraAdvancedParams QnCameraAdvancedParamsReader::paramsFromResource(const Qn
     return QJson::deserialized<QnCameraAdvancedParams>(serialized);
 }
 
-void QnCameraAdvancedParamsReader::setParamsToResource(const QnResourcePtr &resource, const QnCameraAdvancedParams &params)
+void QnCameraAdvancedParamsReader::setParamsToResource(
+    const QnResourcePtr &resource,
+    const QnCameraAdvancedParams &params)
 {
     NX_ASSERT(resource);
+    const auto oldParameters = paramsFromResource(resource);
+    if (oldParameters == params)
+        return;
+
     QByteArray serialized = QJson::serialized(params);
     setEncodedParamsToResource(resource, QString::fromUtf8(serialized));
 }
@@ -165,12 +171,14 @@ namespace QnXmlTag {
     const QString paramWriteCmd         = lit("writeCmd");
     const QString paramAux              = lit("aux");
     const QString paramShowRange        = lit("showRange");
+    const QString paramCompact          = lit("compact");
     const QString paramNotes            = lit("notes");
     const QString paramUnit             = lit("unit");
     const QString paramResync           = lit("resync");
     const QString paramDefaultValue     = lit("defaultValue");
     const QString paramShouldKeepInitialValue = lit("shouldKeepInitialValue");
     const QString paramBindDefaultToMinimum = lit("bindDefaultToMinimum");
+    const QString parameterGroup = lit("group");
 
     const QString dependenciesRoot          = lit("dependencies");
     const QString dependenciesShow          = lit("dependencies-ranges");
@@ -273,6 +281,7 @@ bool QnCameraAdvacedParamsXmlParser::parseElementXml(const QDomElement& elementX
     param.writeCmd = elementXml.attribute(QnXmlTag::paramWriteCmd);
     param.aux = elementXml.attribute(QnXmlTag::paramAux);
     param.showRange = parseBooleanXmlValue(elementXml.attribute(QnXmlTag::paramShowRange));
+    param.compact = parseBooleanXmlValue(elementXml.attribute(QnXmlTag::paramCompact));
     param.notes = elementXml.attribute(QnXmlTag::paramNotes);
     param.unit = elementXml.attribute(QnXmlTag::paramUnit);
     param.resync = parseBooleanXmlValue(elementXml.attribute(QnXmlTag::paramResync));
@@ -281,6 +290,8 @@ bool QnCameraAdvacedParamsXmlParser::parseElementXml(const QDomElement& elementX
 
     param.bindDefaultToMinimum = parseBooleanXmlValue(
         elementXml.attribute(QnXmlTag::paramBindDefaultToMinimum));
+
+    param.group = elementXml.attribute(QnXmlTag::parameterGroup);
 
     auto childNodes = elementXml.childNodes();
 

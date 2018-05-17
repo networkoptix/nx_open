@@ -8,6 +8,7 @@ const QString QnResourceTypePool::kLayoutTypeId(lit("Layout"));
 const QString QnResourceTypePool::kServerTypeId(lit("Server"));
 const QString QnResourceTypePool::kVideoWallTypeId(lit("Videowall"));
 const QString QnResourceTypePool::kWebPageTypeId(lit("WebPage"));
+const QString QnResourceTypePool::kC2pCameraTypeId(lit("C2pCamera"));
 const QString QnResourceTypePool::kStorageTypeId(lit("Storage"));
 const QString QnResourceTypePool::kUserTypeId(lit("User"));
 
@@ -200,7 +201,7 @@ QnUuid QnResourceTypePool::getResourceTypeId(const QString& manufacture, const Q
     QnMutexLocker lock( &m_mutex );
     for(const QnResourceTypePtr& rt: m_resourceTypeMap)
     {
-        if (rt->getManufacture()==manufacture && rt->getName().compare(name, Qt::CaseInsensitive) == 0)
+        if (rt->getManufacture() == manufacture && rt->getName().compare(name, Qt::CaseInsensitive) == 0)
             return rt->getId();
     }
 

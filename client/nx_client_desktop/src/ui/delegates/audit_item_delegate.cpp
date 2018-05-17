@@ -14,11 +14,12 @@
 
 #include <ui/models/audit/audit_log_model.h>
 #include <ui/style/helper.h>
-#include <ui/workbench/watchers/workbench_server_time_watcher.h>
 #include <ui/workbench/workbench_context.h>
 
 #include <utils/common/scoped_painter_rollback.h>
 #include <utils/math/color_transformations.h>
+
+#include <nx/client/core/watchers/server_time_watcher.h>
 
 namespace
 {
@@ -428,7 +429,8 @@ void QnAuditItemDelegate::paintDateTime(const QStyle* style, QPainter* painter, 
         return;
 
     /* Get date and time strings: */
-    QDateTime dateTime = context()->instance<QnWorkbenchServerTimeWatcher>()->displayTime(dateTimeSecs * 1000ll);
+    const auto serverTimeWatcher = context()->instance<nx::client::core::ServerTimeWatcher>();
+    QDateTime dateTime = serverTimeWatcher->displayTime(dateTimeSecs * 1000ll);
     QString dateStr = dateTime.date().toString(Qt::DefaultLocaleShortDate) + lit(" ");
     QString timeStr = dateTime.time().toString(Qt::DefaultLocaleShortDate);
 
@@ -466,14 +468,17 @@ void QnAuditItemDelegate::paintDescription(const QStyle* style, QPainter* painte
         case Qn::AR_ViewLive:
         case Qn::AR_ViewArchive:
         case Qn::AR_ExportVideo:
-            mainText = lit("%1 - %2").arg(
-                context()->instance<QnWorkbenchServerTimeWatcher>()->
-                    displayTime(record->rangeStartSec * 1000ll).toString(Qt::DefaultLocaleShortDate)).arg(
-                context()->instance<QnWorkbenchServerTimeWatcher>()->
-                    displayTime(record->rangeEndSec * 1000ll).toString(Qt::DefaultLocaleShortDate));
+        {
+            const auto serverTimeWatcher =
+                context()->instance<nx::client::core::ServerTimeWatcher>();
+            const auto rangeStartTime = serverTimeWatcher->displayTime(
+                record->rangeStartSec * 1000ll).toString(Qt::DefaultLocaleShortDate);
+            const auto rangeEndTime = serverTimeWatcher->displayTime(
+                record->rangeEndSec * 1000ll).toString(Qt::DefaultLocaleShortDate);
+            mainText = lit("%1 - %2").arg(rangeStartTime, rangeEndTime);
             cameras = QnAuditLogModel::getCameras(record);
             break;
-
+        }
         case Qn::AR_CameraUpdate:
         case Qn::AR_CameraInsert:
             cameras = QnAuditLogModel::getCameras(record);

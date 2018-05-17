@@ -24,10 +24,12 @@ class QnConnectionManager: public QObject, public QnConnectionContextAware
     Q_PROPERTY(QString currentHost READ currentHost NOTIFY currentHostChanged)
     Q_PROPERTY(QString currentLogin READ currentLogin NOTIFY currentLoginChanged)
     Q_PROPERTY(QString currentPassword READ currentPassword NOTIFY currentPasswordChanged)
-
+    Q_PROPERTY(bool restoringConnection READ restoringConnection NOTIFY restoringConnectionChanged)
     Q_ENUM(Qn::ConnectionResult)
 
 public:
+    static const QString kCloudConnectionScheme;
+
     enum State
     {
         Disconnected = static_cast<int>(QnConnectionState::Disconnected),
@@ -65,7 +67,10 @@ public:
 
     QnSoftwareVersion connectionVersion() const;
 
+    bool restoringConnection() const;
+
 signals:
+    void connected(bool initialConnect);
     void connectionFailed(Qn::ConnectionResult status, const QVariant &infoParameter);
     void systemNameChanged(const QString &systemName);
     void connectionStateChanged();
@@ -78,10 +83,15 @@ signals:
     void connectionTypeChanged();
 
     void connectionVersionChanged();
+    void restoringConnectionChanged();
 
 public slots:
-    bool connectToServer(const nx::utils::Url &url);
-    bool connectToServer(const nx::utils::Url &url, const QString& userName, const QString& password);
+    bool connectToServer(const nx::utils::Url& url);
+    bool connectToServer(
+        const nx::utils::Url& url,
+        const QString& userName,
+        const QString& password,
+        bool cloudConnection);
     bool connectByUserInput(
         const QString& address, const QString& userName, const QString& password);
     void disconnectFromServer();

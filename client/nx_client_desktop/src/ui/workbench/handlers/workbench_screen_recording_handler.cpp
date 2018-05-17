@@ -6,7 +6,8 @@
 
 #include <QtOpenGL/QGLWidget>
 
-#include <client/client_module.h>
+#include <client_core/client_core_module.h>
+
 #include <client/client_settings.h>
 #include <client/client_runtime_settings.h>
 
@@ -220,7 +221,7 @@ void QnWorkbenchScreenRecordingHandler::startRecordingInternal()
     }
 
     m_dataProvider.reset(dynamic_cast<QnDesktopDataProviderWrapper*>(
-        qnClientModule->dataProviderFactory()->createDataProvider(res)));
+        qnClientCoreModule->dataProviderFactory()->createDataProvider(res)));
     m_recorder.reset(new QnStreamRecorder(res->toResourcePtr()));
     m_dataProvider->addDataProcessor(m_recorder.data());
     m_recorder->addRecordingContext(filePath);

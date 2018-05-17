@@ -27,8 +27,20 @@ class AbstractVideoDecoder: public QObject
 public:
     typedef std::function<QRect()> VideoGeometryAccessor;
 
+    enum class Capability
+    {
+        noCapability = 0,
+        hardwareAccelerated = 1 << 0,
+    };
+    Q_DECLARE_FLAGS(Capabilities, Capability);
+
 public:
     virtual ~AbstractVideoDecoder() = default;
+
+    /**
+     * @return video decoder capabilities
+     */
+    virtual Capabilities capabilities() const = 0;
 
     /**
      * Used from a template; should be overridden despite being static.

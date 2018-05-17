@@ -1,24 +1,19 @@
 #include "schedule_settings_widget.h"
 #include "ui_schedule_settings_widget.h"
-
-#include <QtGui/QStandardItemModel>
-
-#include <QtWidgets/QListView>
-
-#include <nx/client/desktop/common/utils/aligner.h>
-#include <nx/client/desktop/common/utils/stream_quality_strings.h>
+#include "../redux/camera_settings_dialog_state.h"
+#include "../redux/camera_settings_dialog_store.h"
+#include "../utils/schedule_paint_functions.h"
 
 #include <ui/common/read_only.h>
 #include <ui/style/helper.h>
 #include <ui/style/skin.h>
 #include <ui/style/custom_style.h>
 #include <ui/workaround/widgets_signals_workaround.h>
-
 #include <utils/common/event_processors.h>
 
-#include "../redux/camera_settings_dialog_state.h"
-#include "../redux/camera_settings_dialog_store.h"
-#include "../utils/schedule_paint_functions.h"
+#include <nx/client/desktop/common/utils/aligner.h>
+#include <nx/client/desktop/common/utils/combo_box_utils.h>
+#include <nx/client/desktop/common/utils/stream_quality_strings.h>
 
 namespace {
 
@@ -156,11 +151,8 @@ void ScheduleSettingsWidget::setupUi()
         {
             const auto text = toDisplayString(quality);
             ui->qualityComboBox->addItem(text, (int)quality);
-            const auto index = ui->qualityComboBox->count();
-            ui->qualityComboBox->addItem(text + lit(" *"), kCustomQualityOffset + (int)quality);
-            qobject_cast<QListView*>(ui->qualityComboBox->view())->setRowHidden(index, true);
-            if (auto model = qobject_cast<QStandardItemModel*>(ui->qualityComboBox->model()))
-                model->item(index)->setFlags(Qt::NoItemFlags);
+            ComboBoxUtils::addHiddenItem(ui->qualityComboBox,
+                text + lit(" *"), kCustomQualityOffset + (int)quality);
         };
 
     addQualityItem(Qn::StreamQuality::low);
@@ -223,10 +215,14 @@ void ScheduleSettingsWidget::loadState(const CameraSettingsDialogState& state)
         ui->recordMotionButton->setToolTip(motionOptionHint(state));
     }
 
-    const bool hasDualStreaming = state.hasDualStreaming();
-    ui->recordMotionPlusLQButton->setEnabled(hasDualStreaming);
-    ui->labelMotionPlusLQ->setEnabled(hasDualStreaming);
-    if (hasDualStreaming)
+    using CombinedValue = CameraSettingsDialogState::CombinedValue;
+
+    const bool hasDualRecordingOption = state.hasMotion()
+        && state.devicesDescription.hasDualStreamingCapability == CombinedValue::All;
+
+    ui->recordMotionPlusLQButton->setEnabled(hasDualRecordingOption);
+    ui->labelMotionPlusLQ->setEnabled(hasDualRecordingOption);
+    if (hasDualRecordingOption)
     {
         ui->recordMotionPlusLQButton->setChecked(brush.recordingType == Qn::RecordingType::motionAndLow);
         setReadOnly(ui->recordMotionPlusLQButton, state.readOnly);
@@ -299,14 +295,17 @@ QString ScheduleSettingsWidget::motionOptionHint(const CameraSettingsDialogState
 {
     using CombinedValue = CameraSettingsDialogState::CombinedValue;
     const bool devicesHaveMotion = state.devicesDescription.hasMotion == CombinedValue::All;
-    const bool devicesHaveDS = state.devicesDescription.hasDualStreaming == CombinedValue::All;
+    const bool devicesHaveDualStreaming =
+        state.devicesDescription.hasDualStreamingCapability == CombinedValue::All;
+
+    // TODO: #vkutin #gdm Should we check whether dual-streaming is disabled?
 
     if (state.isSingleCamera())
     {
-        if (devicesHaveMotion && !devicesHaveDS)
+        if (devicesHaveMotion && !devicesHaveDualStreaming)
             return tr("Dual-Streaming not supported for this camera");
 
-        if (!devicesHaveMotion && !devicesHaveDS)
+        if (!devicesHaveMotion && !devicesHaveDualStreaming)
             return tr("Dual-Streaming and motion detection not supported for this camera");
 
         const bool motionDetectionEnabled = state.singleCameraSettings.enableMotionDetection();
@@ -320,7 +319,7 @@ QString ScheduleSettingsWidget::motionOptionHint(const CameraSettingsDialogState
         return QString();
     }
 
-    if (!devicesHaveMotion || !devicesHaveDS)
+    if (!devicesHaveMotion || !devicesHaveDualStreaming)
     {
         return tr("Motion detection disabled or not supported")
             + L'\n'
@@ -330,7 +329,6 @@ QString ScheduleSettingsWidget::motionOptionHint(const CameraSettingsDialogState
 
     return QString();
 }
-
 
 } // namespace desktop
 } // namespace client

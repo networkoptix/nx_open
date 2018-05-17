@@ -47,9 +47,9 @@ Item
             ? (resourceHelper.fisheyeParams.fovRot + resourceHelper.customRotation)
             : 0.0
 
-        viewRotationMatrix: interactor.currentRotationMatrix
+        viewRotationMatrix: interactor.animatedRotationMatrix
 
-        viewScale: interactor.currentScale
+        viewScale: interactor.animatedScale
 
         viewShift: width > height
             ? Qt.vector2d(0, 0)
@@ -60,84 +60,163 @@ Item
     {
         id: interactor
 
-        readonly property real currentScale: Math.pow(2.0, animatedScalePower)
+        // Queryables.
 
-        readonly property matrix4x4 currentRotationMatrix:
-        {
-            switch (viewMode)
-            {
-                case MediaDewarpingParams.VerticalUp:
-                    return Utils3D.rotationZ(Utils3D.radians(currentRotation.y)).times(
-                        Utils3D.rotationX(Utils3D.radians(currentRotation.x)))
+        readonly property real animatedScale: scaleByPower(animatedScalePower)
+        readonly property real currentScale: scaleByPower(scalePower)
 
-                case MediaDewarpingParams.VerticalDown:
-                    return Utils3D.rotationZ(-Utils3D.radians(currentRotation.y)).times(
-                        Utils3D.rotationX(Utils3D.radians(currentRotation.x)))
+        readonly property vector2d animatedRotation: constrainRotation(
+            Qt.vector2d(animatedRotationX, animatedRotationY), animatedScale)
 
-                default:
-                    return Utils3D.rotationY(Utils3D.radians(currentRotation.y)).times(
-                        Utils3D.rotationX(Utils3D.radians(currentRotation.x)))
-            }
-        }
+        readonly property vector2d currentRotation: constrainRotation(
+            Qt.vector2d(unconstrainedRotation.x, unconstrainedRotation.y), currentScale)
 
-        /* Interactor implementation: */
+        readonly property matrix4x4 animatedRotationMatrix: rotationMatrix(animatedRotation)
+        readonly property matrix4x4 currentRotationMatrix: rotationMatrix(currentRotation)
 
-        property vector2d currentRotation:
-        {
-            var limitByEdge = (180.0 - fisheyeShader.fov) / 2.0
-            var limitByCenter = Math.min(fisheyeShader.fov / 2.0, limitByEdge)
-
-            switch (viewMode)
-            {
-                case MediaDewarpingParams.VerticalUp:
-                    return Qt.vector2d(Math.max(-limitByEdge, Math.min(-limitByCenter, unboundedRotation.x)),
-                        normalizedAngle(unboundedRotation.y))
-
-                case MediaDewarpingParams.VerticalDown:
-                    return Qt.vector2d(Math.max(limitByCenter, Math.min(limitByEdge, unboundedRotation.x)),
-                        normalizedAngle(unboundedRotation.y))
-
-                default:
-                    return Qt.vector2d(Math.max(-limitByEdge, Math.min(limitByEdge, unboundedRotation.x)),
-                        Math.max(-limitByEdge, Math.min(limitByEdge, unboundedRotation.y)))
-            }
-        }
-
-        property vector2d unboundedRotation: Qt.vector2d(0.0, 0.0)
-
-        property vector2d previousRotation
-
-        property real scalePower: 0.0
-        property real animatedScalePower: scalePower
-
-        Behavior on animatedScalePower
-        {
-            id: scalePowerAnimationBehavior
-            NumberAnimation { duration: 150 }
-        }
+        // Interface functions.
 
         function startRotation()
         {
-            previousRotation = currentRotation
+            previousRotation = Qt.vector2d(animatedRotation.x, animatedRotation.y) //< Deep copy.
         }
 
-        function updateRotation(aroundX, aroundY) // angle deltas since start, in degrees
+        function updateRotation(aroundX, aroundY) //< Angle deltas since start, in degrees.
         {
-            var rotationFactor = fisheyeShader.fov / 180.0
-
-            unboundedRotation = previousRotation.plus(Qt.vector2d(
-                aroundX * rotationFactor,
-                aroundY * rotationFactor))
+            var rotationFactor = fisheyeShader.fov(animatedScale) / 180.0
+            unconstrainedRotation = Qt.vector2d(
+                previousRotation.x + aroundX * rotationFactor,
+                previousRotation.y + aroundY * rotationFactor)
         }
 
-        function scaleBy(deltaPower, animated)
+        function updateScaleCenter(x, y)
+        {
+            scaleCenter = currentRotationMatrix.times(fisheyeShader.unproject(
+                fisheyeShader.pixelToProjection(x, y, currentScale)))
+        }
+
+        function startZoom(x, y)
+        {
+            previousScalePower = scalePower
+            updateScaleCenter(x, y)
+        }
+
+        function updateZoom(x, y, deltaPower, animated)
         {
             scalePowerAnimationBehavior.enabled = animated
-            scalePower = Math.min(4.0, Math.max(0.0, scalePower + deltaPower))
-            unboundedRotation = currentRotation
+            scalePower = Math.min(4.0, Math.max(0.0, previousScalePower + deltaPower))
+
+            if (viewMode != MediaDewarpingParams.Horizontal && fisheyeShader.fov(currentScale) >= 90.0)
+            {
+                updateScaleCenter(x, y)
+                return //< No rotations if we have no freedom around axis X.
+            }
+
+            var relocatedCenter =
+                fisheyeShader.unproject(fisheyeShader.pixelToProjection(x, y, currentScale))
+
+            unconstrainedRotation = relativeRotationAngles(relocatedCenter, scaleCenter)
         }
 
-        function normalizedAngle(degrees) // brings angle to [-180, 180] range
+        function centerAtPixel(x, y)
+        {
+            centerAt(animatedRotationMatrix.times(fisheyeShader.unproject(
+                fisheyeShader.pixelToProjection(x, y, animatedScale))))
+        }
+
+        // Values modified by user interaction.
+
+        property real scalePower: 0.0
+        property vector2d unconstrainedRotation: Qt.vector2d(0.0, 0.0)
+
+        // Animated intermediates.
+
+        readonly property int kAnimationDurationMs: 250
+
+        property real animatedScalePower: scalePower
+        Behavior on animatedScalePower
+        {
+            id: scalePowerAnimationBehavior
+            NumberAnimation { duration: interactor.kAnimationDurationMs }
+        }
+
+        property real animatedRotationX: unconstrainedRotation.x
+        Behavior on animatedRotationX
+        {
+            enabled: !mouseArea.draggingStarted
+                && !pinchArea.zoomStarted && !kineticAnimator.inertia
+
+            RotationAnimation
+            {
+                direction: RotationAnimation.Shortest
+                duration: interactor.kAnimationDurationMs
+            }
+        }
+
+        property real animatedRotationY: unconstrainedRotation.y
+        Behavior on animatedRotationY
+        {
+            enabled: !mouseArea.draggingStarted
+                && !pinchArea.zoomStarted && !kineticAnimator.inertia
+
+            RotationAnimation
+            {
+                direction: RotationAnimation.Shortest
+                duration: interactor.kAnimationDurationMs
+            }
+        }
+
+        // Internal properties and functions.
+
+        property vector2d previousRotation
+        property real previousScalePower
+        property vector3d scaleCenter
+
+        function scaleByPower(scalePower)
+        {
+            return Math.pow(2.0, scalePower)
+        }
+
+        function rotationMatrix(degrees)
+        {
+            switch (viewMode)
+            {
+                case MediaDewarpingParams.VerticalUp:
+                    return Utils3D.rotationZ(Utils3D.radians(degrees.y)).times(
+                        Utils3D.rotationX(Utils3D.radians(degrees.x)))
+
+                case MediaDewarpingParams.VerticalDown:
+                    return Utils3D.rotationZ(-Utils3D.radians(degrees.y)).times(
+                        Utils3D.rotationX(Utils3D.radians(degrees.x)))
+
+                default: // MediaDewarpingParams.Horizontal
+                    return Utils3D.rotationY(Utils3D.radians(degrees.y)).times(
+                        Utils3D.rotationX(Utils3D.radians(degrees.x)))
+            }
+        }
+
+        function constrainRotation(unconstrained, scale)
+        {
+            var limitByEdge = (180.0 - fisheyeShader.fov(scale)) / 2.0
+            var limitByCenter = Math.min(fisheyeShader.fov(scale) / 2.0, limitByEdge)
+
+            switch (viewMode)
+            {
+                case MediaDewarpingParams.VerticalUp:
+                    return Qt.vector2d(Math.max(-limitByEdge, Math.min(-limitByCenter, unconstrained.x)),
+                        normalizedAngle(unconstrained.y))
+
+                case MediaDewarpingParams.VerticalDown:
+                    return Qt.vector2d(Math.max(limitByCenter, Math.min(limitByEdge, unconstrained.x)),
+                        normalizedAngle(unconstrained.y))
+
+                default: // MediaDewarpingParams.Horizontal
+                    return Qt.vector2d(Math.max(-limitByEdge, Math.min(limitByEdge, unconstrained.x)),
+                        Math.max(-limitByEdge, Math.min(limitByEdge, unconstrained.y)))
+            }
+        }
+
+        function normalizedAngle(degrees) //< Brings angle to [-180, 180] range.
         {
             var angle = degrees % 360
             if (angle < -180)
@@ -147,6 +226,71 @@ Item
             else
                 return angle
         }
+
+        function centerAt(pointOnSphere)
+        {
+            unconstrainedRotation = rotationAngles(pointOnSphere)
+        }
+
+        function rotationAngles(pointOnSphere)
+        {
+            switch (viewMode)
+            {
+                case MediaDewarpingParams.VerticalUp:
+                {
+                    var alpha = -Utils3D.degrees(Math.acos(-pointOnSphere.z))
+                    var beta = -Utils3D.degrees(Math.atan2(pointOnSphere.x, pointOnSphere.y))
+                    return Qt.vector2d(alpha, beta)
+                }
+
+                case MediaDewarpingParams.VerticalDown:
+                {
+                    var alpha = Utils3D.degrees(Math.acos(-pointOnSphere.z))
+                    var beta = -Utils3D.degrees(Math.atan2(pointOnSphere.x, -pointOnSphere.y))
+                    return Qt.vector2d(alpha, beta)
+                }
+
+                default: // MediaDewarpingParams.Horizontal
+                {
+                    var alpha = -Utils3D.degrees(Math.asin(pointOnSphere.y))
+                    var beta = -Utils3D.degrees(Math.atan2(pointOnSphere.x, -pointOnSphere.z))
+                    return Qt.vector2d(alpha, beta)
+                }
+            }
+        }
+
+		function relativeRotationAngles(from, to)
+        {
+            switch (viewMode)
+            {
+                case MediaDewarpingParams.VerticalUp:
+                {
+                    var scaledY = -Math.sqrt(Math.max(0, to.x * to.x + to.y * to.y - from.x * from.x))
+                    var beta = Math.atan2(to.x, -to.y) - Math.atan2(from.x, scaledY)
+                    var rotatedTo = Utils3D.rotationZ(-beta).times(to)
+                    var alpha = Math.atan2(from.y, -from.z) - Math.atan2(rotatedTo.y, -rotatedTo.z)
+                    return Qt.vector2d(Utils3D.degrees(alpha), Utils3D.degrees(beta))
+                }
+
+                case MediaDewarpingParams.VerticalDown:
+                {
+                    var scaledY = -Math.sqrt(Math.max(0, to.x * to.x + to.y * to.y - from.x * from.x))
+                    var beta = Math.atan2(to.x, to.y) - Math.atan2(from.x, scaledY)
+                    var rotatedTo = Utils3D.rotationZ(beta).times(to)
+                    var alpha = Math.atan2(from.y, -from.z) - Math.atan2(rotatedTo.y, -rotatedTo.z)
+                    return Qt.vector2d(Utils3D.degrees(alpha), Utils3D.degrees(beta))
+                }
+
+                default: // MediaDewarpingParams.Horizontal
+                {
+                    var scaledZ = Math.sqrt(Math.max(0, to.x * to.x + to.z * to.z - from.x * from.x))
+                    var beta = Math.atan2(from.x, scaledZ) - Math.atan2(to.x, -to.z)
+                    var rotatedTo = Utils3D.rotationY(-beta).times(to)
+                    var alpha = Math.atan2(from.y, -from.z) - Math.atan2(rotatedTo.y, -rotatedTo.z)
+                    return Qt.vector2d(Utils3D.degrees(alpha), Utils3D.degrees(beta))
+                }
+            }
+        }
     }
 
     PinchArea
@@ -154,22 +298,27 @@ Item
         id: pinchArea
 
         anchors.fill: parent
-
-        property real startScalePower
+        property bool zoomStarted: false
 
         onPinchStarted:
         {
-            startScalePower = interactor.scalePower
+            interactor.startZoom(pinch.startCenter.x, pinch.startCenter.y)
+            kineticAnimator.interrupt()
+            zoomStarted = true
         }
 
-        onPinchUpdated: updateScale(pinch.scale)
+        onPinchUpdated:
+            updateZoom(pinch.center.x, pinch.center.y, pinch.scale)
 
-        onPinchFinished: updateScale(pinch.scale)
-
-        function updateScale(scale)
+        onPinchFinished:
         {
-            interactor.scalePower = startScalePower
-            interactor.scaleBy(Math.log(scale) / Math.LN2, false)
+            updateZoom(pinch.center.x, pinch.center.y, pinch.scale)
+            zoomStarted = false
+        }
+
+        function updateZoom(x, y, scale)
+        {
+            interactor.updateZoom(x, y, Math.log(scale) / Math.LN2, false)
         }
 
         MouseArea
@@ -183,31 +332,22 @@ Item
             property bool draggingStarted
             property real pressX
             property real pressY
+            property bool acceptClick
+            property point lastClickPosition
 
             readonly property real pixelRadius: Math.min(width, height) / 2.0
-            readonly property vector2d pixelCenter: Qt.vector2d(width, height).times(0.5)
 
-            KineticAnimation
+            KineticPositionAnimator
             {
-                id: kinetics
-
-                deceleration: 0.005
-
-                property point startPosition
+                id: kineticAnimator
 
                 onPositionChanged:
                 {
                     const kSensitivity = 100.0
                     var normalization = kSensitivity / mouseArea.pixelRadius
-                    var dx = position.x - startPosition.x
-                    var dy = position.y - startPosition.y
+                    var dx = position.x - initialPosition.x
+                    var dy = position.y - initialPosition.y
                     interactor.updateRotation(dy * normalization, dx * normalization)
-                }
-
-                onMeasurementStarted:
-                {
-                    startPosition = position
-                    interactor.startRotation()
                 }
             }
 
@@ -215,19 +355,58 @@ Item
             {
                 pressX = mouse.x
                 pressY = mouse.y
+                kineticAnimator.interrupt()
+            }
+
+            onDoubleClicked:
+            {
+                var distance = Qt.vector2d(
+                    lastClickPosition.x - mouse.x,
+                    lastClickPosition.y - mouse.y).length()
+
+                if (distance > drag.threshold)
+                    return
+
+                clickFilterTimer.stop()
+                scalePowerAnimationBehavior.enabled = true
+
+                const kPowerThreshold = 0.8
+                if (interactor.scalePower > kPowerThreshold)
+                {
+                    interactor.scalePower = 0.0
+                }
+                else
+                {
+                    interactor.centerAtPixel(mouse.x, mouse.y)
+                    interactor.scalePower = 1.0
+                }
             }
 
             onReleased:
             {
-                if (draggingStarted)
-                {
-                    kinetics.finishMeasurement(Qt.point(mouse.x, mouse.y))
-                    draggingStarted = false
-                }
-                else
-                {
-                    content.clicked()
-                }
+                acceptClick = !draggingStarted
+                if (!draggingStarted)
+                    return
+
+                clickFilterTimer.stop()
+                kineticAnimator.finishMeasurement(mouse.x, mouse.y)
+                draggingStarted = false
+            }
+
+            onClicked:
+            {
+                lastClickPosition = Qt.point(mouse.x, mouse.y)
+                if (acceptClick)
+                    clickFilterTimer.restart()
+            }
+
+            Timer
+            {
+                id: clickFilterTimer
+
+                interval: 200
+
+                onTriggered: content.clicked()
             }
 
             onPositionChanged:
@@ -236,7 +415,7 @@ Item
                 {
                     if (draggingStarted)
                     {
-                        kinetics.continueMeasurement(Qt.point(mouse.x, mouse.y))
+                        kineticAnimator.updateMeasurement(mouse.x, mouse.y)
                     }
                     else
                     {
@@ -244,7 +423,10 @@ Item
                             || Math.abs(mouse.y - pressY) > drag.threshold
 
                         if (draggingStarted)
-                            kinetics.startMeasurement(Qt.point(mouse.x, mouse.y))
+                        {
+                            kineticAnimator.startMeasurement(mouse.x, mouse.y)
+                            interactor.startRotation()
+                        }
                     }
                 }
             }
@@ -252,10 +434,13 @@ Item
             onWheel:
             {
                 if (draggingStarted)
-                    kinetics.startMeasurement(Qt.point(mouse.x, mouse.y))
+                    startDrag(wheel.x, wheel.y)
 
                 const kSensitivity = 100.0
-                interactor.scaleBy(wheel.angleDelta.y * kSensitivity / 1.0e5, true)
+                var deltaPower = wheel.angleDelta.y * kSensitivity / 1.0e5
+
+                interactor.startZoom(wheel.x, wheel.y)
+                interactor.updateZoom(wheel.x, wheel.y, deltaPower, true)
 
                 if (draggingStarted)
                     interactor.startRotation()

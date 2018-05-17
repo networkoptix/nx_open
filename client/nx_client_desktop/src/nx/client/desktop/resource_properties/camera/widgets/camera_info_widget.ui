@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>957</width>
-    <height>290</height>
+    <width>1195</width>
+    <height>347</height>
    </rect>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
@@ -32,7 +32,7 @@
    <item>
     <widget class="QStackedWidget" name="stackedWidget">
      <widget class="QWidget" name="lessInfoPage">
-      <layout class="QGridLayout" name="gridLayout" rowstretch="0,1" columnstretch="0,0,1">
+      <layout class="QGridLayout" name="gridLayout" rowstretch="0,1" columnstretch="0,0,1" rowminimumheight="20,20">
        <property name="leftMargin">
         <number>8</number>
        </property>
@@ -59,7 +59,7 @@
          </property>
         </widget>
        </item>
-       <item row="1" column="1">
+       <item row="1" column="1" alignment="Qt::AlignTop">
         <widget class="QLabel" name="modelLabel">
          <property name="text">
           <string notr="true">&lt;E96&gt;</string>
@@ -69,7 +69,7 @@
          </property>
         </widget>
        </item>
-       <item row="1" column="0">
+       <item row="1" column="0" alignment="Qt::AlignTop">
         <widget class="QLabel" name="vendorLabel">
          <property name="text">
           <string notr="true">&lt;ACTI&gt;</string>
@@ -86,7 +86,7 @@
          </property>
         </widget>
        </item>
-       <item row="1" column="2">
+       <item row="1" column="2" alignment="Qt::AlignTop">
         <widget class="QLabel" name="ipAddressLabel">
          <property name="text">
           <string notr="true">&lt;192.168.1.1&gt;</string>
@@ -404,9 +404,6 @@
             </item>
             <item>
              <widget class="nx::client::desktop::ClipboardButton" name="secondaryStreamCopyButton">
-              <property name="text">
-               <string notr="true">&lt;Copy&gt;</string>
-              </property>
               <property name="iconSize">
                <size>
                 <width>20</width>
@@ -470,9 +467,6 @@
             </item>
             <item>
              <widget class="nx::client::desktop::ClipboardButton" name="primaryStreamCopyButton">
-              <property name="text">
-               <string notr="true">&lt;Copy&gt;</string>
-              </property>
               <property name="flat">
                <bool>true</bool>
               </property>
@@ -502,6 +496,9 @@
    </item>
    <item>
     <layout class="QHBoxLayout" name="horizontalLayout">
+     <property name="spacing">
+      <number>16</number>
+     </property>
      <item>
       <widget class="QStackedWidget" name="controlsStackedWidget">
        <property name="currentIndex">

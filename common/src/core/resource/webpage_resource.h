@@ -2,7 +2,7 @@
 
 #include <core/resource/resource.h>
 
-class QnWebPageResource: public QnResource
+class QnWebPageResource : public QnResource
 {
     Q_OBJECT
     using base_type = QnResource;
@@ -22,7 +22,8 @@ public:
         Qn::StatusChangeReason reason = Qn::StatusChangeReason::Local) override;
 
 private:
-    Qn::ResourceStatus m_status { Qn::NotDefined }; //< This class must not store its status on server side
+    // This class must not store its status on server side
+    Qn::ResourceStatus m_status{Qn::NotDefined};
 };
 
 Q_DECLARE_METATYPE(QnWebPageResourcePtr)

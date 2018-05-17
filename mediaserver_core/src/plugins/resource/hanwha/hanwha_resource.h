@@ -107,6 +107,10 @@ public:
 
     CameraDiagnostics::Result createProfile(int* outProfileNumber, Qn::ConnectionRole role);
 
+    // Returns profile number for role if profile was found and has been considered as correct,
+    // otherwise returns boost::none.
+    boost::optional<int> verifyProfile(Qn::ConnectionRole role);
+
     CameraDiagnostics::Result updateProfileNameIfNeeded(
         Qn::ConnectionRole role,
         const HanwhaVideoProfile& profile);
@@ -173,6 +177,8 @@ private:
         int secondaryProfile);
 
     CameraDiagnostics::Result fetchPtzLimits(QnPtzLimits* outPtzLimits);
+
+    CameraDiagnostics::Result fetchCodecInfo(HanwhaCodecInfo* outCodecInfo);
 
     void cleanUpOnProxiedDeviceChange();
 
@@ -253,6 +259,9 @@ private:
     QnCameraAdvancedParamValueList filterGroupParameters(
         const QnCameraAdvancedParamValueList& values);
 
+    QnCameraAdvancedParamValueList addAssociatedParameters(
+        const QnCameraAdvancedParamValueList& values);
+
     QString groupLead(const QString& groupName) const;
 
     boost::optional<QnCameraAdvancedParamValue> findButtonParameter(
@@ -294,6 +303,9 @@ private:
     virtual QString proxiedId() const;
     virtual void setProxiedId(const QString& proxiedId);
 
+    bool isBypassSupported() const;
+    bool isProxiedMultisensorCamera() const;
+
 private:
     using AdvancedParameterId = QString;
 
@@ -308,6 +320,9 @@ private:
     std::map<QString, std::set<int>> m_alternativePtzRanges;
 
     std::map<AdvancedParameterId, HanwhaAdavancedParameterInfo> m_advancedParameterInfos;
+
+    bool m_isBypassSupported = false;
+    int m_proxiedDeviceChannelCount = 1;
 
     HanwhaAttributes m_attributes;
     HanwhaAttributes m_bypassDeviceAttributes;

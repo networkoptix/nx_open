@@ -22,8 +22,8 @@ QnSystemSettingsWidget::QnSystemSettingsWidget(QWidget *parent):
     setHelpTopic(ui->auditTrailCheckBox,        Qn::AuditTrail_Help);
     setHelpTopic(ui->statisticsReportCheckBox,  Qn::SystemSettings_General_AnonymousUsage_Help);
 
-    ui->statisticsReportHint->setHint(tr("Sends device, server, and system information (firmware, codecs, streams, license keys, etc.)."));
-    ui->auditTrailHint->setHint(tr("Tracks and logs all user actions"));
+    ui->statisticsReportHint->setHint(tr("Sends anonymous System information (firmware, codecs, streams, etc.)."));
+    ui->auditTrailHint->setHint(tr("Tracks and logs all user actions."));
 
     setWarningStyle(ui->settingsWarningLabel);
 

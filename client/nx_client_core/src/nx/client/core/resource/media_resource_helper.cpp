@@ -42,6 +42,16 @@ MediaResourceHelper::~MediaResourceHelper()
 {
 }
 
+bool MediaResourceHelper::isWearableCamera() const
+{
+    return d->camera && d->camera->flags().testFlag(Qn::wearable_camera);
+}
+
+bool MediaResourceHelper::analogCameraWithoutLicense() const
+{
+    return d->camera && d->camera->isDtsBased() && !d->camera->isLicenseUsed();
+}
+
 QString MediaResourceHelper::serverName() const
 {
     return d->server ? d->server->getName() : QString();
@@ -49,7 +59,11 @@ QString MediaResourceHelper::serverName() const
 
 qreal MediaResourceHelper::customAspectRatio() const
 {
-    return d->camera ? d->camera->customAspectRatio().toFloat() : 0.0;
+    if (!d->camera)
+        return 0.0;
+
+    const auto customRatio = d->camera->customAspectRatio();
+    return customRatio.isValid() ? customRatio.toFloat() : 0.0;
 }
 
 int MediaResourceHelper::customRotation() const
@@ -144,6 +158,8 @@ void MediaResourceHelper::Private::handleResourceChanged()
             q, &MediaResourceHelper::videoLayoutChanged);
         connect(camera, &QnResource::mediaDewarpingParamsChanged,
             q, &MediaResourceHelper::fisheyeParamsChanged);
+        connect(camera, &QnVirtualCameraResource::licenseUsedChanged,
+            q, &MediaResourceHelper::analogCameraWithoutLicenseChanged);
 
         updateServer();
     }
@@ -153,6 +169,8 @@ void MediaResourceHelper::Private::handleResourceChanged()
     emit q->resourceStatusChanged();
     emit q->videoLayoutChanged();
     emit q->fisheyeParamsChanged();
+    emit q->analogCameraWithoutLicenseChanged();
+    emit q->wearableCameraChanged();
 }
 
 } // namespace core

@@ -40,7 +40,7 @@ bool parseHttpRequestParams(
     const QString& command, const QnRequestParamList& params, nx::vms::api::StoredFilePath* value)
 {
     NX_ASSERT(command != "getHelp");
-    return deserialize(params, lit("folder"),& (value->path)); // nx::vms::api::StoredFilePath
+    return deserialize(params, lit("folder"), &(value->path)); //< nx::vms::api::StoredFilePath
 }
 
 void toUrlParams(const nx::vms::api::StoredFilePath& name, QUrlQuery* query)
