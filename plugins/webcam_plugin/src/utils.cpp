@@ -1,4 +1,10 @@
 #include "utils.h"
+#ifdef _WIN32
+#include "dshow_utils.h"
+#elif __linux__
+#elif __APPLE__
+#endif
+
 
 namespace nx {
 namespace webcam_plugin {
@@ -33,7 +39,6 @@ QList<ResolutionData> getResolutionList(const char * devicePath)
 #endif
     QList<QSize>();
 }
-
 
 } // namespace utils
 } // namespace webcam_plugin

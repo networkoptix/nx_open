@@ -1,6 +1,6 @@
 #pragma once
 
-#include "device_info.h"
+#include "device_data.h"
 
 namespace nx {
 namespace webcam_plugin {
