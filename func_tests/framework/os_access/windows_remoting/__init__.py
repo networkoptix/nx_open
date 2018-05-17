@@ -35,7 +35,7 @@ class WinRM(object):
         self._protocol = winrm.Protocol(
             'http://{}:{}/wsman'.format(address, port),
             username=username, password=password,
-            transport='ntlm',
+            transport='plaintext',  # 'ntlm' works fast, 'plaintext' is easier to debug.
             operation_timeout_sec=120, read_timeout_sec=240)
         self._username = username
 
