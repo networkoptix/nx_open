@@ -132,7 +132,7 @@ Qn::StreamQuality calculateQualityForBitrateMbps(const State& state, float bitra
     auto current = kMinQuality;
     auto currentBr = calculateBitrateForQualityMbps(state, current);
 
-    for (int i = (int)current + 1; i <= (int)kMaxQuality; ++i)
+    for (int i = (int) current + 1; i <= (int) kMaxQuality; ++i)
     {
         const auto next = Qn::StreamQuality(i);
         const auto nextBr = calculateBitrateForQualityMbps(state, next);

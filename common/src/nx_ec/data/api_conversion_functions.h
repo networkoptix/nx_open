@@ -11,11 +11,7 @@
 
 #include <nx/vms/api/data_fwd.h>
 
-namespace nx {
-namespace network {
-class SocketAddress;
-}
-}
+namespace nx { namespace network { class SocketAddress; }}
 
 class QnCameraUserAttributePool;
 class QnCommonModule;

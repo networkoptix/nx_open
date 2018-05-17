@@ -51,13 +51,7 @@ class QnHttpConnectionListener;
 class QnCommonModule;
 struct QnModuleInformation;
 
-namespace nx {
-namespace vms {
-namespace discovery {
-class Manager;
-}
-}
-}
+namespace nx { namespace vms { namespace discovery { class Manager; }}}
 
 //!Contains API classes for the new Server
 /*!

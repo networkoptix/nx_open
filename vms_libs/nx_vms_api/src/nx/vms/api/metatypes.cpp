@@ -55,7 +55,6 @@ void Metatypes::initialize()
     qRegisterMetaType<nx::vms::api::LockData>();
     qRegisterMetaType<nx::vms::api::VideowallData>();
     qRegisterMetaType<nx::vms::api::VideowallControlMessageData>();
-
 };
 
 } // namespace api
