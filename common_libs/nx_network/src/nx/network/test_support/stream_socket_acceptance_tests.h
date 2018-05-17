@@ -791,7 +791,7 @@ protected:
     SocketAddress serverEndpoint() const
     {
         if (m_server)
-            return SocketAddress(m_server->address()/*.toString()*/);
+            return SocketAddress(m_server->address());
         else if (m_serverSocket)
             return m_serverSocket->getLocalAddress();
         else if (m_synchronousServer)
