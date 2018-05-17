@@ -15,6 +15,8 @@
 
 #include "stream_reader.h"
 
+namespace nx {
+namespace webcam_plugin {
 
 class CameraManager;
 
@@ -66,8 +68,9 @@ private:
     int m_encoderNumber;
     QSize m_resolution;
     float m_currentFps;
-
-    AVCodecContext* m_avCodecContext;
 };
+
+} // namespace nx 
+} // namespace webcam_plugin 
 
 #endif  //ILP_MEDIA_ENCODER_H

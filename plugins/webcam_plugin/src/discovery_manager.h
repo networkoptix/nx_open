@@ -11,6 +11,9 @@
 #include <plugins/plugin_tools.h>
 #include <plugins/plugin_container_api.h>
 
+namespace nx {
+namespace webcam_plugin {
+
 //!Represents defined (in settings) image directories as cameras with dts archive storage
 class DiscoveryManager
 :
@@ -53,5 +56,8 @@ private:
     nxpt::CommonRefManager m_refManager;
     nxpl::TimeProvider *const m_timeProvider;
 };
+
+} // namespace nx 
+} // namespace webcam_plugin 
 
 #endif  //ILP_DISCOVERY_MANAGER_H

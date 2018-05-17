@@ -13,6 +13,8 @@
 #include <plugins/plugin_api.h>
 #include <plugins/plugin_container_api.h>
 
+namespace nx {
+namespace webcam_plugin {
 
 class DiscoveryManager;
 
@@ -52,5 +54,8 @@ private:
     std::unique_ptr<DiscoveryManager> m_discoveryManager;
     nxpl::TimeProvider *m_timeProvider;
 };
+
+} // namespace nx 
+} // namespace webcam_plugin 
 
 #endif  //IMAGE_LIBRARY_PLUGIN_H

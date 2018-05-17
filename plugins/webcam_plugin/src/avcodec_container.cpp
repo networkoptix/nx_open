@@ -1,6 +1,9 @@
 #include "StdAfx.h"
 #include "avcodec_container.h"
 
+namespace nx {
+namespace webcam_plugin {
+
 AVCodecContainer::AVCodecContainer(AVFormatContext * formatContext)
     :
     m_formatContext(formatContext),
@@ -158,3 +161,5 @@ QString AVCodecContainer::avErrorString()
     return m_lastError.avErrorString();
 }
 
+} // namespace webcam_plugin
+} // namespace nx

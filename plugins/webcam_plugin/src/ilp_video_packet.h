@@ -13,21 +13,23 @@
 
 class CyclicAllocator;
 
+namespace nx {
+namespace webcam_plugin {
+
 class ILPVideoPacket
-:
-    public nxcip::VideoDataPacket
-{
+    :
+    public nxcip::VideoDataPacket{
 public:
     ILPVideoPacket(
         CyclicAllocator* const allocator,
         int channelNumber,
         nxcip::UsecUTCTimestamp _timestamp,
         unsigned int flags,
-        unsigned int cSeq );
+        unsigned int cSeq);
     virtual ~ILPVideoPacket();
 
     //!Implementation of nxpl::PluginInterface::queryInterface
-    virtual void* queryInterface( const nxpl::NX_GUID& interfaceID ) override;
+    virtual void* queryInterface(const nxpl::NX_GUID& interfaceID) override;
     //!Implementation of nxpl::PluginInterface::addRef
     virtual unsigned int addRef() override;
     //!Implementation of nxpl::PluginInterface::releaseRef
@@ -57,7 +59,7 @@ public:
     /*!
         \note Does keep contents of current buffer
     */
-    void resizeBuffer( size_t bufSize );
+    void resizeBuffer(size_t bufSize);
     void* data();
 
 private:
@@ -71,5 +73,8 @@ private:
     unsigned int m_cSeq;
     nxcip::CompressionType m_codecType;
 };
+
+} // namespace webcam_plugin
+} // namespace nx
 
 #endif  //ILP_VIDEO_PACKET_H

@@ -9,6 +9,8 @@
 #include "stream_reader.h"
 #include "utils.h"
 
+namespace nx {
+namespace webcam_plugin {
 
 static const double MIN_FPS = 1.0 / 86400.0; //once per day
 static const double MAX_FPS = 30;
@@ -67,25 +69,16 @@ int MediaEncoder::getMediaUrl( char* urlBuf ) const
 
 int MediaEncoder::getResolutionList( nxcip::ResolutionInfo* infoList, int* infoListCount ) const
 {
-    //infoList[0].resolution.width = 800;
-    //infoList[0].resolution.height = 450;
-    //infoList[0].maxFps = MAX_FPS;
-    //*infoListCount = 1;
-
-    //taken from DiscoveryManagers::findCameras(), for reference only
-    /*QByteArray url =
-            QByteArray("webcam://").append(nx::utils::Url::toPercentEncoding(devices[i].devicePath()));*/
-
     QString url = QString(m_cameraManager->info().url).mid(9);
     url = nx::utils::Url::fromPercentEncoding(url.toLatin1());
 
-    QList<QSize> resolutionList = utils::getResolutionList(url.toLatin1().data());
+    QList<utils::ResolutionData> resolutionList = utils::getResolutionList(url.toLatin1().data());
 
     int count = resolutionList.count();
     for (int i = 0; i < count; ++i)
     {
-        infoList[i].resolution.width = resolutionList[i].width();
-        infoList[i].resolution.height = resolutionList[i].height();
+        infoList[i].resolution.width = resolutionList[i].resolution.width();
+        infoList[i].resolution.height = resolutionList[i].resolution.height();
         infoList[i].maxFps = MAX_FPS;
     }
     *infoListCount = count;
@@ -99,8 +92,12 @@ int MediaEncoder::getMaxBitrate( int* maxBitrate ) const
     return nxcip::NX_NO_ERROR;
 }
 
-int MediaEncoder::setResolution( const nxcip::Resolution& /*resolution*/ )
+int MediaEncoder::setResolution( const nxcip::Resolution& resolution )
 {
+    m_resolution.setWidth(resolution.width);
+    m_resolution.setHeight(resolution.height);
+    if (m_streamReader.get())
+        m_streamReader->setResolution(m_resolution);
     return nxcip::NX_NO_ERROR;
 }
 
@@ -126,7 +123,6 @@ nxcip::StreamReader* MediaEncoder::getLiveStreamReader()
             &m_refManager,
             m_timeProvider,
             m_cameraManager->info(),
-            m_currentFps,
             m_encoderNumber ) );
 
     m_streamReader->addRef();
@@ -144,3 +140,7 @@ void MediaEncoder::updateCameraInfo( const nxcip::CameraInfo& info )
     if( m_streamReader.get() )
         m_streamReader->updateCameraInfo( info );
 }
+
+
+} // namespace nx 
+} // namespace webcam_plugin

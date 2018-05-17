@@ -13,6 +13,8 @@
 #include <plugins/plugin_tools.h>
 #include <utils/memory/cyclic_allocator.h>
 
+namespace nx {
+namespace webcam_plugin {
 
 ILPVideoPacket::ILPVideoPacket(
     CyclicAllocator* const allocator,
@@ -165,3 +167,6 @@ void* ILPVideoPacket::data()
 {
     return m_buffer;
 }
+
+} // namespace webcam_plugin
+} // namespace nx

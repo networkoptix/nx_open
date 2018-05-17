@@ -11,6 +11,8 @@
 
 #include <libavformat/avformat.h>
 
+namespace nx {
+namespace webcam_plugin {
 
 CameraManager::CameraManager(const nxcip::CameraInfo& info, 
                              nxpl::TimeProvider *const timeProvider)
@@ -159,3 +161,6 @@ nxpt::CommonRefManager* CameraManager::refManager()
 {
     return &m_refManager;
 }
+
+} // namespace nx 
+} // namespace webcam_plugin 

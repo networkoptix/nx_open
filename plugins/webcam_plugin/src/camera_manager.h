@@ -12,6 +12,8 @@
 #include <plugins/plugin_tools.h>
 #include "plugin.h"
 
+namespace nx {
+namespace webcam_plugin {
 
 class MediaEncoder;
 
@@ -92,7 +94,9 @@ protected:
     unsigned int m_capabilities;
     nxpl::TimeProvider *const m_timeProvider;
     std::unique_ptr<MediaEncoder> m_encoder;
-    //QString m_avErrorMessage;
 };
+
+} // namespace nx 
+} // namespace webcam_plugin 
 
 #endif  //ILP_CAMERA_MANAGER_H

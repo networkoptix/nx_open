@@ -6,16 +6,18 @@
 #include "plugin.h"
 #include "discovery_manager.h"
 
-extern "C"
-{
+extern "C" {
 #ifdef _WIN32
     __declspec(dllexport)
 #endif
         nxpl::PluginInterface* createNXPluginInstance()
     {
-        return new Plugin();
+        return new nx::webcam_plugin::Plugin();
     }
 }
+
+namespace nx {
+namespace webcam_plugin {
 
 static Plugin* webCameraPluginInstance = NULL;
 
@@ -100,3 +102,6 @@ Plugin* Plugin::instance()
 {
     return webCameraPluginInstance;
 }
+
+} // namespace nx 
+} // namespace webcam_plugin 

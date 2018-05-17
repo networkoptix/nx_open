@@ -27,10 +27,12 @@
 #include <libavutil/pixfmt.h>
 #include "libav_forward_declarations.h"
 
-extern "C"
-{
-    #include <libavcodec/avcodec.h>
+extern "C" {
+#include <libavcodec/avcodec.h>
 }
+
+namespace nx {
+namespace webcam_plugin {
 
 class AVCodecContainer;
 
@@ -43,7 +45,6 @@ public:
     StreamReader(nxpt::CommonRefManager* const parentRefManager,
                  nxpl::TimeProvider *const timeProvider,
                  const nxcip::CameraInfo& cameraInfo,
-                 float fps,
                  int encoderNumber );
     virtual ~StreamReader();
 
@@ -60,32 +61,27 @@ public:
     virtual void interrupt() override;
 
     void setFps( float fps );
+    void setResolution(const QSize& resolution);
+    void setBitrate(int64_t bitrate);
     void updateCameraInfo( const nxcip::CameraInfo& info );
 
 private:
-    enum StreamType
-    {
-        none,
-        mjpg,
-        jpg
-    };
-
     nxpt::CommonRefManager m_refManager;
+    nxpl::TimeProvider* const m_timeProvider;
+
     CyclicAllocator m_allocator;
     nxcip::CameraInfo m_info;
-    float m_fps;
     int m_encoderNumber;
-    nxcip::UsecUTCTimestamp m_curTimestamp;
+    
+    int m_fps;
+    QSize m_resolution;
+    int64_t m_bitrate;
+    bool m_modified;
    
-    StreamType m_streamType;
-    qint64 m_prevFrameClock;
-    qint64 m_frameDurationMSec;
     bool m_terminated;
     QnWaitCondition m_cond;
     QnMutex m_mutex;
-    std::atomic<int> m_isInGetNextData;
-    nxpl::TimeProvider* const m_timeProvider;
- 
+
     AVFormatContext * m_formatContext;
     AVInputFormat * m_inputFormat;
     AVDictionary * m_options;
@@ -101,22 +97,21 @@ private:
     std::unique_ptr<ILPVideoPacket> transcodeVideo(int *nxcipErrorCode);
     
     AVFrame* getDecodedVideoFrame();
-    AVPacket* getEncodedPacket(AVFrame* frame);
+    AVPacket* getEncodedVideoPacket(AVFrame* frame);
 
-    bool isValid();
+    bool isValid() const;
     void initializeAv();
+    void unInitializeAv();
     void setOptions();
     void setEncoderOptions();
     AVFrame* toYUV420(AVCodecContext* codecContext, AVFrame* frame);
 
     const char * getAvInputFormat();
     QString getAvCameraUrl();
-
-    //void gotJpegFrame( const nx::network::http::ConstBufferRefType& jpgFrame );
-    /*!
-        \return false, if has been interrupted. Otherwise \a true
-    */
-    bool waitForNextFrameTime();
 };
+
+} // namespace webcam_plugin
+} // namespace nx
+
 
 #endif  //ILP_STREAM_READER_H

@@ -6,8 +6,13 @@
 #elif __APPLE__
 #endif
 
-namespace utils 
-{
-    QList<DeviceInfo> getDeviceList(bool getResolution = false);
-    QList<QSize> getResolutionList(const char * devicePath);
-}
+namespace nx {
+namespace webcam_plugin {
+namespace utils  {
+
+QList<DeviceData> getDeviceList(bool getResolution = false);
+QList<ResolutionData> getResolutionList(const char * devicePath);
+
+} // namespace utils
+} // namespace webcam_plugin
+} // namespace nx

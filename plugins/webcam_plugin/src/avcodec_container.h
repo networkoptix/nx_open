@@ -1,12 +1,14 @@
 #pragma once
 
 #include <QtCore/Qstring>
-extern "C"
-{
+extern "C" {
 #include <libavcodec/avcodec.h>
 #include <libavformat/avformat.h>
 }
 #include "av_string_error.h"
+
+namespace nx {
+namespace webcam_plugin {
 
 class AVCodecContainer
 {
@@ -46,3 +48,5 @@ private:
     bool m_open;
 };
 
+} // namespace webcam_plugin
+} // namespace nx

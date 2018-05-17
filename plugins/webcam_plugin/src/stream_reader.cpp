@@ -14,8 +14,7 @@
 #include <unistd.h>
 #endif
 
-extern "C"
-{
+extern "C" {
 #include <libavutil/imgutils.h>
 #include <libavcodec/avcodec.h>
 #include <libavformat/avformat.h>
@@ -24,54 +23,42 @@ extern "C"
 }
 
 #include <sys/timeb.h>
-#include <sys/types.h>
-#include <sys/stat.h>
 
-#include <algorithm>
-#include <fstream>
-#include <functional>
 #include <memory>
 
-#include <QtCore/QElapsedTimer>
-#include <QtCore/QThread>
-
-#include <nx/utils/std/cpp14.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/thread/mutex.h>
-#include <nx/utils/byte_stream/custom_output_stream.h>
 
 #include "av_utils.h"
-//#include "dshow_utils.h"
 #include "avcodec_container.h"
 #include "ilp_empty_packet.h"
-#include "motion_data_picture.h"
 #include "plugin.h"
 
 namespace {
 
-    static const nxcip::UsecUTCTimestamp USEC_IN_MS = 1000;
-    static const nxcip::UsecUTCTimestamp USEC_IN_SEC = 1000*1000;
-    static const nxcip::UsecUTCTimestamp NSEC_IN_USEC = 1000;
-    static const int MAX_FRAME_SIZE = 4*1024*1024;
+static const nxcip::UsecUTCTimestamp USEC_IN_MS = 1000;
+static const nxcip::UsecUTCTimestamp USEC_IN_SEC = 1000*1000;
+static const nxcip::UsecUTCTimestamp NSEC_IN_USEC = 1000;
+static const int MAX_FRAME_SIZE = 4*1024*1024;
 }
+
+
+namespace nx {
+namespace webcam_plugin {
 
 StreamReader::StreamReader(
     nxpt::CommonRefManager* const parentRefManager,
     nxpl::TimeProvider *const timeProvider,
     const nxcip::CameraInfo& cameraInfo,
-    float fps,
     int encoderNumber )
 :
     m_refManager( parentRefManager ),
     m_info( cameraInfo ),
-    m_fps( fps ),
     m_encoderNumber( encoderNumber ),
-    m_curTimestamp( 0 ),
-    m_streamType( none ),
-    m_prevFrameClock( -1 ),
-    m_frameDurationMSec( 0 ),
+    m_fps(0),
+    m_bitrate(0),
+    m_modified(false),
     m_terminated( false ),
-    m_isInGetNextData( 0 ),
     m_timeProvider(timeProvider),
     m_formatContext(nullptr),
     m_inputFormat(nullptr),
@@ -81,26 +68,13 @@ StreamReader::StreamReader(
     m_avVideoPacket(nullptr)
 {
     NX_ASSERT(m_timeProvider);
-    setFps( fps );
     initializeAv();
 }
 
 StreamReader::~StreamReader()
 {
-    NX_ASSERT( m_isInGetNextData == 0 );
     m_timeProvider->releaseRef();
-
-    if(m_avVideoPacket)
-        av_packet_free(&m_avVideoPacket);
-    
-    m_videoDecoder.reset(nullptr);
-    m_videoEncoder.reset(nullptr);
-
-    av_dict_free(&m_options);
-
-    //todo when closing the sream on the client, av_formatclose_input() seg faults
-    if (m_formatContext)
-        avformat_close_input(&m_formatContext);
+    unInitializeAv();
 }
 
 //!Implementation of nxpl::PluginInterface::queryInterface
@@ -135,12 +109,8 @@ static const unsigned int MAX_FRAME_DURATION_MS = 5000;
 
 int StreamReader::getNextData(nxcip::MediaDataPacket** lpPacket)
 {
-    ++m_isInGetNextData;
     if (!isValid())
-    {
-        --m_isInGetNextData;
         return nxcip::NX_IO_ERROR;
-    }
 
     int nxcipErrorCode;
     std::unique_ptr<ILPVideoPacket> nxVideoPacket;
@@ -152,10 +122,7 @@ int StreamReader::getNextData(nxcip::MediaDataPacket** lpPacket)
         {
             int readCode = m_videoDecoder->readFrame(m_avVideoPacket);
             if (m_lastError.updateIfError(readCode))
-            {
-                --m_isInGetNextData;
                 return nxcip::NX_TRY_AGAIN;
-            }
 
             nxVideoPacket = toNxVideoPacket(m_avVideoPacket, m_videoDecoder->codecID());
             nxcipErrorCode = nxcip::NX_NO_ERROR;
@@ -167,7 +134,7 @@ int StreamReader::getNextData(nxcip::MediaDataPacket** lpPacket)
     }
 
     *lpPacket = nxVideoPacket.release();
-    --m_isInGetNextData;
+
     return nxcipErrorCode;
 }
 
@@ -191,7 +158,19 @@ void StreamReader::interrupt()
 void StreamReader::setFps( float fps )
 {
     m_fps = fps;
-    m_frameDurationMSec = (qint64)(1000.0 / m_fps);
+    m_modified = true;
+}
+
+void StreamReader::setResolution(const QSize& resolution)
+{
+    m_resolution = resolution;
+    m_modified = true;
+}
+
+void StreamReader::setBitrate(int64_t bitrate)
+{
+    m_bitrate = bitrate;
+    m_modified = true;
 }
 
 void StreamReader::updateCameraInfo( const nxcip::CameraInfo& info )
@@ -241,7 +220,6 @@ std::unique_ptr<ILPVideoPacket> StreamReader::transcodeVideo(int * nxcipErrorCod
         return nullptr;
     }
         
-
     auto nxVideoPacket = toNxVideoPacket(encodedPacket, m_videoEncoder->codecID());
 
     av_frame_free(&decodedFrame);
@@ -268,7 +246,7 @@ AVFrame * StreamReader::getDecodedVideoFrame()
     return decodedFrame;
 }
 
-AVPacket * StreamReader::getEncodedPacket(AVFrame * frame)
+AVPacket * StreamReader::getEncodedVideoPacket(AVFrame * frame)
 {
     AVPacket* packet = av_packet_alloc();
     av_init_packet(packet);
@@ -287,7 +265,7 @@ AVPacket * StreamReader::getEncodedPacket(AVFrame * frame)
     return packet;
 }
 
-bool StreamReader::isValid()
+bool StreamReader::isValid() const
 {
     return m_formatContext != nullptr
         && m_inputFormat != nullptr
@@ -305,8 +283,7 @@ AVFrame * StreamReader::toYUV420(AVCodecContext * codecContext, AVFrame * frame)
         pix_fmt, 32);
 
    struct SwsContext * img_convert_ctx = sws_getCachedContext(
-        NULL,
-        codecContext->width, codecContext->height,
+        NULL, codecContext->width, codecContext->height,
         utils::av::unDeprecatePixelFormat(codecContext->pix_fmt),
         codecContext->width, codecContext->height, pix_fmt,
         SWS_BICUBIC, NULL, NULL, NULL);
@@ -324,7 +301,6 @@ AVFrame * StreamReader::toYUV420(AVCodecContext * codecContext, AVFrame * frame)
     return resultFrame;
 }
 
-static int init = 0;
 void StreamReader::initializeAv()
 {
     avdevice_register_all();
@@ -345,9 +321,9 @@ void StreamReader::initializeAv()
     if (m_lastError.updateIfError(formatOpenCode))
         return;
 
-    int findStreamCode = avformat_find_stream_info(m_formatContext, nullptr);
+    /*int findStreamCode = avformat_find_stream_info(m_formatContext, nullptr);
     if (m_lastError.updateIfError(findStreamCode))
-        return;
+        return;*/
 
     int videoStreamIndex;
     AVStream * videoStream = 
@@ -382,18 +358,47 @@ void StreamReader::initializeAv()
     setEncoderOptions();
 }
 
+void StreamReader::unInitializeAv()
+{
+    if (m_avVideoPacket)
+        av_packet_free(&m_avVideoPacket);
+
+    //close the codecs before we close_input() below
+    m_videoDecoder.reset(nullptr);
+    m_videoEncoder.reset(nullptr);
+
+    av_dict_free(&m_options);
+
+    if (m_formatContext)
+        avformat_close_input(&m_formatContext);
+}
+
 void StreamReader::setOptions()
 {
-    //m_formatContext->video_codec_id = AV_CODEC_ID_MJPEG;
-    m_formatContext->video_codec_id = AV_CODEC_ID_H264;
+    if(m_formatContext)
+    {
+        m_formatContext->flags |= AVFMT_FLAG_NOBUFFER;
+        m_formatContext->flags |= AVFMT_FLAG_DISCARD_CORRUPT;
+        m_formatContext->flags |= AVFMT_FLAG_FLUSH_PACKETS;
+    }
 
-    //todo actually fill out m_options instead of hardcoding
-    av_dict_set(&m_options, "video_size", "1920x1080", 0);
+    if(m_resolution.isValid())
+    {
+        QString video_size =
+            QString("%1x%2").arg(m_resolution.width()).arg(m_resolution.height());
+        av_dict_set(&m_options, "video_size", video_size.toLatin1().data(), 0);
+    }
+
+    if(m_fps)
+    {
+        QString fps = QString::number(m_fps);
+        av_dict_set(&m_options, "framerate", fps.toLatin1().data(), 0);
+    }
     
-    QString fps = QString::number(m_fps);
-    av_dict_set(&m_options, "framerate", fps.toLatin1().data(), 0);
-    
-    //todo find out why this delays the realtime buffer error and fix the error
+    // todo find out why this doesn't appear to have any effect
+    if(m_bitrate && m_formatContext)
+        m_formatContext->bit_rate = m_bitrate;
+
     //av_dict_set(&m_options, "rtbufsize", "2000M", 0);
 }
 
@@ -406,7 +411,7 @@ void StreamReader::setEncoderOptions()
     encoderContext->width = decoderContext->width;
     encoderContext->height = decoderContext->height;
     encoderContext->pix_fmt = utils::av::suggestPixelFormat(encoderContext->codec_id);
-    encoderContext->time_base = { 1, (int)m_fps };
+    encoderContext->time_base = { 1, m_fps > 0 ? (int)m_fps : 30}; // 30 is default framerate
     encoderContext->flags = AV_CODEC_FLAG_GLOBAL_HEADER;
     encoderContext->global_quality = encoderContext->qmin * FF_QP2LAMBDA;
 
@@ -440,33 +445,6 @@ QString StreamReader::getAvCameraUrl()
         "unsupported OS";
 #endif
 }
-                                                                                                  
-bool StreamReader::waitForNextFrameTime()
-{
-    const qint64 currentTime = m_timeProvider->millisSinceEpoch();
-    if( m_prevFrameClock != -1 &&
-        !((m_prevFrameClock > currentTime) || (currentTime - m_prevFrameClock > m_frameDurationMSec)) ) //system time changed
-    {
-        const qint64 msecToSleep = m_frameDurationMSec - (currentTime - m_prevFrameClock);
-        if( msecToSleep > 0 )
-        {
-            QnMutexLocker lk( &m_mutex );
-            QElapsedTimer monotonicTimer;
-            monotonicTimer.start();
-            qint64 msElapsed = monotonicTimer.elapsed();
-            while( !m_terminated && (msElapsed < msecToSleep) )
-            {
-                m_cond.wait( lk.mutex(), msecToSleep - msElapsed );
-                msElapsed = monotonicTimer.elapsed();
-            }
-            if( m_terminated )
-            {
-                //call has been interrupted
-                m_terminated = false;
-                return false;
-            }
-        }
-    }
-    m_prevFrameClock = m_timeProvider->millisSinceEpoch();
-    return true;
-}
+
+} // namespace webcam_plugin
+} // namespace nx
