@@ -67,7 +67,12 @@ class _Command(object):
         if end:
             stream['@End'] = 'true'
         self._protocol.send_message(xmltodict.unparse(rq))
-        log.getChild('stdin').debug("Sent")
+        try:
+            stdin_text = stdin_bytes.decode('ascii')
+        except UnicodeDecodeError:
+            log.getChild('stdin').debug("Sent:\n%r", stdin_bytes)
+        else:
+            log.getChild('stdin').debug("Sent:\n%s", stdin_text)
 
     def receive_stdout_and_stderr(self):
         assert not self.is_done
