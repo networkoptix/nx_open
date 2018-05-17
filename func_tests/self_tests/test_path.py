@@ -4,8 +4,9 @@ from string import whitespace
 
 import pytest
 
-from framework.os_access.exceptions import BadParent, DoesNotExist, NotAFile, NotADir
+from framework.os_access.exceptions import BadParent, DoesNotExist, NotADir, NotAFile
 from framework.os_access.local_path import LocalPath
+from framework.os_access.ssh_path import make_ssh_path_cls
 
 pytest_plugins = ['fixtures.ad_hoc_ssh']
 
@@ -16,8 +17,8 @@ def local_path():
 
 
 @pytest.fixture()
-def ssh_path(ad_hoc_ssh_access):
-    return ad_hoc_ssh_access.Path.tmp() / 'test_path-remote'
+def ssh_path(ad_hoc_ssh):
+    return make_ssh_path_cls(ad_hoc_ssh).tmp() / 'test_path-remote'
 
 
 @pytest.fixture()

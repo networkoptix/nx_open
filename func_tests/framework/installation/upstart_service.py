@@ -1,26 +1,9 @@
-import abc
 import logging
 
+from framework.installation.service import Service
 from framework.os_access.exceptions import NonZeroExitStatus
 
 _logger = logging.getLogger(__name__)
-
-
-class Service(object):
-    __metaclass__ = abc.ABCMeta
-
-    # returns bool: True if server is running, False if it's not
-    @abc.abstractmethod
-    def is_running(self):
-        pass
-
-    @abc.abstractmethod
-    def start(self):
-        pass
-
-    @abc.abstractmethod
-    def stop(self):
-        pass
 
 
 class UpstartService(Service):

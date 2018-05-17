@@ -6,7 +6,8 @@ from netaddr.ip import IPNetwork
 from pathlib2 import Path
 
 from framework.networking import setup_flat_network
-from framework.os_access.local_access import LocalAccess
+from framework.os_access.local_access import local_access
+from framework.os_access.posix_shell import local_shell
 from framework.registry import Registry
 from framework.serialize import load
 from framework.vms.factory import VMFactory
@@ -60,21 +61,26 @@ def configuration():
 
 
 @pytest.fixture(scope='session')
+def host_posix_shell():
+    return local_shell
+
+
+@pytest.fixture(scope='session')
 def host_os_access():
-    return LocalAccess()
+    return local_access
 
 
 @pytest.fixture(scope='session')
-def hypervisor(configuration, host_os_access):
-    return VirtualBox(host_os_access, configuration['vm_host']['address'])
+def hypervisor(host_os_access):
+    return VirtualBox(host_os_access)
 
 
 @pytest.fixture(scope='session')
-def vm_registries(configuration, hypervisor):
+def vm_registries(configuration, host_posix_shell, host_os_access):
     return {
         vm_type: Registry(
-            hypervisor.host_os_access,
-            hypervisor.host_os_access.Path(vm_type_configuration['registry_path']).expanduser(),
+            host_posix_shell,
+            host_os_access.Path(vm_type_configuration['registry_path']).expanduser(),
             vm_type_configuration['name_format'].format(vm_index='{index}'),  # Registry doesn't know about VMs.
             vm_type_configuration['limit'],
             )

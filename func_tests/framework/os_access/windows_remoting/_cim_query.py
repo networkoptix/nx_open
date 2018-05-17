@@ -1,4 +1,9 @@
+import logging
+from pprint import pformat
+
 import xmltodict
+
+_logger = logging.getLogger(__name__)
 
 
 class _CimAction(object):
@@ -76,6 +81,8 @@ class _Enumeration(object):
         self.is_ended = False
 
     def _start(self):
+        _logger.debug("Start enumerating %s where %r", self.class_name, self.selectors)
+        assert not self.is_ended
         action = 'http://schemas.xmlsoap.org/ws/2004/09/enumeration/Enumerate'
         resource_uri = _CimAction.cim_directory + self.class_name
         body = {
@@ -92,6 +99,7 @@ class _Enumeration(object):
         return items if isinstance(items, list) else [items]
 
     def _pull(self):
+        _logger.debug("Continue enumerating %s where %r", self.class_name, self.selectors)
         assert self.enumeration_context is not None
         assert not self.is_ended
         action = 'http://schemas.xmlsoap.org/ws/2004/09/enumeration/Pull'
@@ -116,25 +124,35 @@ class _Enumeration(object):
                 yield item
 
 
-def enumerate_cim_instances(protocol, class_name, selectors, max_elements=32000):
-    return _Enumeration(protocol, class_name, selectors, max_elements=max_elements).enumerate()
+class CIMQuery(object):
+    def __init__(self, protocol, class_name, selectors):
+        self.protocol = protocol
+        self.class_name = class_name
+        self.selectors = selectors
 
+    def enumerate(self, max_elements=32000):
+        _logger.debug("Enumerate %s where %r", self.class_name, self.selectors)
+        return _Enumeration(self.protocol, self.class_name, self.selectors, max_elements=max_elements).enumerate()
 
-def get_cim_instance(protocol, class_name, selectors):
-    action_url = 'http://schemas.xmlsoap.org/ws/2004/09/transfer/Get'
-    resource_uri = _CimAction.cim_directory + class_name
-    action = _CimAction(resource_uri, action_url, selectors, {})
-    outcome = action.perform(protocol)
-    instance = outcome[class_name]
-    return instance
+    def get_one(self):
+        _logger.debug("Get %s where %r", self.class_name, self.selectors)
+        action_url = 'http://schemas.xmlsoap.org/ws/2004/09/transfer/Get'
+        resource_uri = _CimAction.cim_directory + self.class_name
+        action = _CimAction(resource_uri, action_url, self.selectors, {})
+        outcome = action.perform(self.protocol)
+        instance = outcome[self.class_name]
+        return instance
 
-
-def invoke_cim_instance_method(protocol, class_name, selectors, method_name, params):
-    resource_uri = _CimAction.cim_directory + class_name
-    action = resource_uri + '/' + method_name
-    method_input = {'p:' + param_name: param_value for param_name, param_value in params.items()}
-    method_input['@xmlns:p'] = resource_uri
-    body = {method_name + '_INPUT': method_input}
-    response = _CimAction(resource_uri, action, selectors, body).perform(protocol)
-    method_output = response[method_name + '_OUTPUT']
-    return method_output
+    def invoke_method(self, method_name, params):
+        _logger.debug("Invoke %s.%s(%r) where %r", self.class_name, method_name, params, self.selectors)
+        resource_uri = _CimAction.cim_directory + self.class_name
+        action = resource_uri + '/' + method_name
+        method_input = {'p:' + param_name: param_value for param_name, param_value in params.items()}
+        method_input['@xmlns:p'] = resource_uri
+        body = {method_name + '_INPUT': method_input}
+        response = _CimAction(resource_uri, action, self.selectors, body).perform(self.protocol)
+        method_output = response[method_name + '_OUTPUT']
+        if method_output[u'ReturnValue'] != u'0':
+            raise RuntimeError('Non-zero return value of {!s}.{!s}({!r}) where {!r}:\n{!s}'.format(
+                self.class_name, method_name, params, self.selectors, pformat(method_output)))
+        return method_output

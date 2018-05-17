@@ -1,5 +1,3 @@
-vm_host:
-  address: 127.0.0.1
 vm_types:
   linux:
     os_family: linux

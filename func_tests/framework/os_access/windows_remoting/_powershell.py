@@ -3,7 +3,7 @@ import json
 import logging
 from textwrap import dedent
 
-from framework.os_access.windows_remoting.cmd import receive_stdout_and_stderr_until_done
+from ._cmd import receive_stdout_and_stderr_until_done
 
 log = logging.getLogger(__name__)
 

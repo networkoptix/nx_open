@@ -10,7 +10,7 @@ import pytest
 
 import server_api_data_generators as generator
 from framework.api_shortcuts import get_local_system_id, get_server_id, get_system_settings
-from framework.mediaserver import MEDIASERVER_MERGE_TIMEOUT
+from framework.installation.mediaserver import MEDIASERVER_MERGE_TIMEOUT
 from framework.merging import (
     ExplicitMergeError,
     detach_from_cloud,
@@ -46,7 +46,7 @@ def change_bool_setting(server, setting):
 def wait_for_settings_merge(one, two):
     wait_for_true(
         lambda: get_system_settings(one.api) == get_system_settings(two.api),
-        '{} and {} response identically to /api/systemSettings'.format(one.machine.alias, two.machine.alias))
+        '{} and {} response identically to /api/systemSettings'.format(one, two))
 
 
 def check_admin_disabled(server):
@@ -65,7 +65,7 @@ def check_admin_disabled(server):
 def one(two_linux_mediaservers, test_system_settings, cloud_host):
     one, _ = two_linux_mediaservers
     one.installation.patch_binary_set_cloud_host(cloud_host)
-    one.machine.networking.enable_internet()
+    one.os_access.networking.enable_internet()
     one.start()
     setup_local_system(one, test_system_settings)
     return one
@@ -75,7 +75,7 @@ def one(two_linux_mediaservers, test_system_settings, cloud_host):
 def two(two_linux_mediaservers, cloud_host):
     _, two = two_linux_mediaservers
     two.installation.patch_binary_set_cloud_host(cloud_host)
-    two.machine.networking.enable_internet()
+    two.os_access.networking.enable_internet()
     two.start()
     setup_local_system(two, {})
     return two
@@ -149,7 +149,7 @@ def test_merge_cloud_with_local(two_linux_mediaservers, cloud_account, test_syst
     one, two = two_linux_mediaservers
 
     one.installation.patch_binary_set_cloud_host(cloud_host)
-    one.machine.networking.enable_internet()
+    one.os_access.networking.enable_internet()
     one.start()
     setup_cloud_system(one, cloud_account, test_system_settings)
 
@@ -158,7 +158,7 @@ def test_merge_cloud_with_local(two_linux_mediaservers, cloud_account, test_syst
     setup_local_system(two, {})
 
     # Merge systems (takeRemoteSettings = False) -> Error
-    two.machine.networking.enable_internet()
+    two.os_access.networking.enable_internet()
     try:
         merge_systems(two, one)
     except ExplicitMergeError as e:
@@ -184,12 +184,12 @@ def test_merge_cloud_systems(two_linux_mediaservers, cloud_account_factory, take
     one, two = two_linux_mediaservers
 
     one.installation.patch_binary_set_cloud_host(cloud_host)
-    one.machine.networking.enable_internet()
+    one.os_access.networking.enable_internet()
     one.start()
     setup_cloud_system(one, cloud_account_1, {})
 
     two.installation.patch_binary_set_cloud_host(cloud_host)
-    two.machine.networking.enable_internet()
+    two.os_access.networking.enable_internet()
     two.start()
     setup_cloud_system(two, cloud_account_2, {})
 
@@ -212,12 +212,12 @@ def test_cloud_merge_after_disconnect(two_linux_mediaservers, cloud_account, tes
     one, two = two_linux_mediaservers
 
     one.installation.patch_binary_set_cloud_host(cloud_host)
-    one.machine.networking.enable_internet()
+    one.os_access.networking.enable_internet()
     one.start()
     setup_cloud_system(one, cloud_account, test_system_settings)
 
     two.installation.patch_binary_set_cloud_host(cloud_host)
-    two.machine.networking.enable_internet()
+    two.os_access.networking.enable_internet()
     two.start()
     setup_cloud_system(two, cloud_account, {})
 
@@ -279,7 +279,7 @@ def test_restart_one_server(one, two, cloud_account):
     # Stop Server2 and clear its database
     guid2 = get_server_id(two.api)
     two.stop()
-    two.installation.cleanup_var_dir()
+    two.installation.var.rmtree()
     two.start()
 
     # Remove Server2 from database on Server1

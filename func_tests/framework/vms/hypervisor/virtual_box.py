@@ -4,9 +4,11 @@ from pprint import pformat
 from uuid import UUID
 
 from netaddr import EUI
+from netaddr import IPAddress
 from netaddr.strategy.eui48 import mac_bare
 
 from framework.os_access.exceptions import exit_status_error_cls
+from framework.os_access.os_access_interface import OSAccess
 from framework.vms.hypervisor import VMAllAdaptersBusy, VMInfo, VMNotFound
 from framework.vms.port_forwarding import calculate_forwarded_ports
 from framework.waiting import wait_for_true
@@ -16,7 +18,7 @@ _logger = logging.getLogger(__name__)
 _INTERNAL_NIC_INDICES = [2, 3, 4, 5, 6, 7, 8]
 
 
-def vm_info_from_raw_info(host_hostname, raw_info):
+def vm_info_from_raw_info(raw_info):
     ports = {}
     for index in range(10):  # Arbitrary.
         try:
@@ -26,16 +28,16 @@ def vm_info_from_raw_info(host_hostname, raw_info):
         tag, protocol, host_address, host_port, guest_address, guest_port = raw_value.split(',')
         # Hostname is given with port because knowledge that VMs are accessible through
         # forwarded port is not part of logical interface. Other possibility is to make virtual network
-        # in which host can access VMs on IP level. One more option is special VM which is accessible by IP
+        # in which host can access VMs on IP level. One more option is special Machine which is accessible by IP
         # and forwards ports to target VMs.
-        ports[protocol, int(guest_port)] = host_hostname, int(host_port)
+        ports[protocol, int(guest_port)] = IPAddress('127.0.0.1'), int(host_port)
     macs = {}
     networks = {}
     for nic_index in _INTERNAL_NIC_INDICES:
         try:
             raw_mac = raw_info['macaddress{}'.format(nic_index)]
         except KeyError:
-            _logger.warning("Skip NIC %d is not present in VM %s.", nic_index, raw_info['name'])
+            _logger.warning("Skip NIC %d is not present in Machine %s.", nic_index, raw_info['name'])
             continue
         macs[nic_index] = EUI(raw_mac)
         if raw_info['nic{}'.format(nic_index)] == 'null':
@@ -52,25 +54,24 @@ def vm_info_from_raw_info(host_hostname, raw_info):
 class VirtualBox(object):
     """Interface for VirtualBox as hypervisor."""
 
-    def __init__(self, host_os_access, host_hostname):
-        self.host_hostname = host_hostname
-        self.host_os_access = host_os_access
+    def __init__(self, os_access):
+        self.host_os_access = os_access  # type: OSAccess
 
     def _get_info(self, vm_name):
         try:
             output = self.host_os_access.run_command(['VBoxManage', 'showvminfo', vm_name, '--machinereadable'])
         except exit_status_error_cls(1) as e:
-            raise VMNotFound("Cannot find VM {}; VBoxManage says:\n{}".format(vm_name, e.stderr))
+            raise VMNotFound("Cannot find Machine {}; VBoxManage says:\n{}".format(vm_name, e.stderr))
         raw_info = dict(csv.reader(output.splitlines(), delimiter='=', escapechar='\\', doublequote=False))
         return raw_info
 
     def find(self, vm_name):
         raw_info = self._get_info(vm_name)
-        info = vm_info_from_raw_info(self.host_hostname, raw_info)
+        info = vm_info_from_raw_info(raw_info)
         return info
 
     def clone(self, vm_name, vm_index, vm_configuration):
-        """Clone and setup VM with simple and generic parameters. Template can be any specific type."""
+        """Clone and setup Machine with simple and generic parameters. Template can be any specific type."""
         self.host_os_access.run_command([
             'VBoxManage', 'clonevm', vm_configuration['template_vm'],
             '--snapshot', vm_configuration['template_vm_snapshot'],
@@ -97,15 +98,15 @@ class VirtualBox(object):
         for extra_key, extra_value in extra_data.items():
             self.host_os_access.run_command(['VBoxManage', 'setextradata', vm_name, extra_key, extra_value])
         raw_info = self._get_info(vm_name)
-        info = vm_info_from_raw_info(self.host_hostname, raw_info)
+        info = vm_info_from_raw_info(raw_info)
         return info
 
     def destroy(self, vm_name):
         if self.find(vm_name).is_running:
             self.host_os_access.run_command(['VBoxManage', 'controlvm', vm_name, 'poweroff'])
-            wait_for_true(lambda: not self.find(vm_name).is_running, 'VM {} is off'.format(vm_name))
+            wait_for_true(lambda: not self.find(vm_name).is_running, 'Machine {} is off'.format(vm_name))
         self.host_os_access.run_command(['VBoxManage', 'unregistervm', vm_name, '--delete'])
-        _logger.info("VM %r destroyed.", vm_name)
+        _logger.info("Machine %r destroyed.", vm_name)
 
     def power_on(self, vm_name):
         self.host_os_access.run_command(['VBoxManage', 'startvm', vm_name, '--type', 'headless'])
@@ -128,7 +129,8 @@ class VirtualBox(object):
         info = self.find(vm_name)
         for nic_index in info.networks:
             if info.networks[nic_index] is not None:
-                self.host_os_access.run_command(['VBoxManage', 'controlvm', vm_name, 'nic{}'.format(nic_index), 'null'])
+                self.host_os_access.run_command(
+                    ['VBoxManage', 'controlvm', vm_name, 'nic{}'.format(nic_index), 'null'])
 
     def list_vm_names(self):
         output = self.host_os_access.run_command(['VBoxManage', 'list', 'vms'])

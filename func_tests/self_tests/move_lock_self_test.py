@@ -6,8 +6,8 @@ pytest_plugins = ['fixtures.ad_hoc_ssh']
 
 
 @pytest.fixture()
-def path(ad_hoc_ssh_access):
-    path = ad_hoc_ssh_access.Path('/tmp/func_tests/move_lock_sandbox/oi.lock')
+def path(ad_hoc_ssh):
+    path = ad_hoc_ssh.Path('/tmp/func_tests/move_lock_sandbox/oi.lock')
     path.parent.mkdir(exist_ok=True, parents=True)
     if path.exists():
         path.unlink()
@@ -15,13 +15,13 @@ def path(ad_hoc_ssh_access):
 
 
 @pytest.fixture()
-def lock(ad_hoc_ssh_access, path):
-    return MoveLock(ad_hoc_ssh_access, path)
+def lock(ad_hoc_ssh, path):
+    return MoveLock(ad_hoc_ssh, path)
 
 
 @pytest.fixture()
-def same_path_lock(ad_hoc_ssh_access, path):
-    return MoveLock(ad_hoc_ssh_access, path)
+def same_path_lock(ad_hoc_ssh, path):
+    return MoveLock(ad_hoc_ssh, path)
 
 
 def test_already_acquired(lock, same_path_lock):

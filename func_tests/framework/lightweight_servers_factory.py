@@ -5,14 +5,14 @@ import logging
 
 from requests.exceptions import ReadTimeout
 
-from framework.mediaserver_factory import CORE_FILE_ARTIFACT_TYPE, SERVER_LOG_ARTIFACT_TYPE, TRACEBACK_ARTIFACT_TYPE
+from framework.installation.mediaserver_factory import CORE_FILE_ARTIFACT_TYPE, SERVER_LOG_ARTIFACT_TYPE, TRACEBACK_ARTIFACT_TYPE
 from framework.os_access.path import copy_file
 from framework.rest_api import RestApi
 from framework.waiting import wait_for_true
 from . import utils
 from .core_file_traceback import create_core_file_traceback
-from .mediaserver import Mediaserver
-from .service import AdHocService
+from framework.installation.mediaserver import Mediaserver
+from framework.installation.upstart_service import AdHocService
 from .template_renderer import TemplateRenderer
 from .utils import GrowingSleep
 
@@ -110,9 +110,9 @@ class LightweightServersInstallation(object):
 
 
 class LightweightServer(Mediaserver):
-    def __init__(self, name, os_access, service, installation, api, port=None):
-        super(LightweightServer, self).__init__(name, service, installation, api, None, port=port)
-        self.internal_ip_address = os_access.hostname
+    def __init__(self, name, installation, api, port=None):
+        super(LightweightServer, self).__init__(name, installation, api, port=port)
+        self.internal_ip_address = installation.os_access.hostname
 
     def wait_until_synced(self, timeout):
         log.info('Waiting for lightweight servers to merge between themselves')

@@ -11,11 +11,12 @@ from pathlib2 import Path
 from pylru import lrudecorator
 
 from framework.api_shortcuts import get_server_id
-from framework.os_access.local_access import LocalAccess
+from framework.os_access.posix_shell import local_shell
+from framework.rest_api import RestApi
 from framework.waiting import wait_for_true
-from .camera import Camera, SampleMediaFile, make_schedule_task
-from .media_stream import open_media_stream
-from .utils import datetime_utc_to_timestamp
+from framework.camera import Camera, SampleMediaFile, make_schedule_task
+from framework.media_stream import open_media_stream
+from framework.utils import datetime_utc_to_timestamp
 
 DEFAULT_HTTP_SCHEMA = 'http'
 
@@ -25,7 +26,6 @@ MEDIASERVER_CREDENTIALS_TIMEOUT = datetime.timedelta(minutes=5)
 MEDIASERVER_MERGE_TIMEOUT = MEDIASERVER_CREDENTIALS_TIMEOUT  # timeout for local system ids become the same
 MEDIASERVER_MERGE_REQUEST_TIMEOUT = datetime.timedelta(seconds=90)  # timeout for mergeSystems REST api request
 MEDIASERVER_START_TIMEOUT = datetime.timedelta(minutes=20)  # timeout when waiting for server become online (pingable)
-
 
 log = logging.getLogger(__name__)
 
@@ -50,13 +50,14 @@ class TimePeriod(object):
 class Mediaserver(object):
     """Mediaserver, same for physical and virtual machines"""
 
-    def __init__(self, name, service, installation, api, machine, port):
+    def __init__(self, name, installation):
         self.name = name
         self.installation = installation
-        self.service = service
-        self.machine = machine
-        self.api = api
-        self.port = port
+        self.service = installation.service
+        self.os_access = installation.os_access
+        self.port = 7001
+        forwarded_address, forwarded_port = installation.os_access.forwarded_ports['tcp', self.port]
+        self.api = RestApi(name, forwarded_address, forwarded_port)
 
     def __repr__(self):
         return '<Mediaserver {} at {}>'.format(self.name, self.api.url(''))
@@ -137,7 +138,7 @@ class Mediaserver(object):
     def storage(self):
         # GET /ec2/getStorages is not always possible: server sometimes is not started.
         storage_path = self.installation.dir / MEDIASERVER_STORAGE_PATH
-        return Storage(self.machine.os_access, storage_path)
+        return Storage(self.os_access, storage_path)
 
     def rebuild_archive(self):
         self.api.api.rebuildArchive.GET(mainPool=1, action='start')
@@ -150,9 +151,10 @@ class Mediaserver(object):
 
     def get_recorded_time_periods(self, camera):
         assert camera.id, 'Camera %r is not yet registered on server' % camera.name
-        periods = [TimePeriod(datetime.datetime.utcfromtimestamp(int(d['startTimeMs'])/1000.).replace(tzinfo=pytz.utc),
-                              datetime.timedelta(seconds=int(d['durationMs']) / 1000.))
-                   for d in self.api.ec2.recordedTimePeriods.GET(cameraId=camera.id, flat=True)]
+        periods = [
+            TimePeriod(datetime.datetime.utcfromtimestamp(int(d['startTimeMs']) / 1000.).replace(tzinfo=pytz.utc),
+                       datetime.timedelta(seconds=int(d['durationMs']) / 1000.))
+            for d in self.api.ec2.recordedTimePeriods.GET(cameraId=camera.id, flat=True)]
         log.info('Mediaserver %r returned %d recorded periods:', self.name, len(periods))
         for period in periods:
             log.info('\t%s', period)
@@ -196,7 +198,7 @@ class Storage(object):
         _, path = tempfile.mkstemp(suffix=sample.fpath.suffix)
         path = Path(path)
         try:
-            LocalAccess().run_command([
+            local_shell.run_command([
                 'ffmpeg',
                 '-i', sample.fpath,
                 '-codec', 'copy',
@@ -217,7 +219,7 @@ class Storage(object):
     #   low_quality/urn_uuid_b0e78864-c021-11d3-a482-f12907312681/
     #     2017/01/27/12/1485511093576_21332.mkv
     def _construct_fpath(self, camera_mac_addr, quality_part, start_time, unixtime_utc_ms, duration):
-        local_dt = start_time.astimezone(self.timezone)  # Local to VM.
+        local_dt = start_time.astimezone(self.timezone)  # Local to Machine.
         duration_ms = int(duration.total_seconds() * 1000)
         return self.dir.joinpath(
             quality_part, camera_mac_addr,

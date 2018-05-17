@@ -11,7 +11,8 @@ class MediaserverDeb(object):
     class InvalidDeb(Exception):
         pass
 
-    def __init__(self, path, installation_root=PurePosixPath('/opt')):
+    def __init__(self, path):
+        installation_root = PurePosixPath('/opt')
         self.path = path
         try:
             deb_file = DebFile(str(self.path)).data.tgz()

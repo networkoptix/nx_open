@@ -5,6 +5,7 @@ import requests
 from pytz import utc
 
 from framework.utils import RunningTime
+from framework.waiting import wait_for_true
 
 
 def get_server_id(api):
@@ -40,3 +41,17 @@ def is_primary_time_server(api):
     response = api.get('ec2/getCurrentTime')
     is_primary = response['isPrimaryTimeServer']
     return is_primary
+
+
+def factory_reset(api):
+    old_runtime_id = api.get('api/moduleInformation')['runtimeId']
+    api.post('api/restoreState', {})
+
+    def _mediaserver_has_restarted():
+        try:
+            current_runtime_id = api.get('api/moduleInformation')['runtimeId']
+        except requests.RequestException:
+            return False
+        return current_runtime_id != old_runtime_id
+
+    wait_for_true(_mediaserver_has_restarted)

@@ -2,7 +2,7 @@ from datetime import datetime
 
 import pytz
 
-from framework.mediaserver import TimePeriod
+from framework.installation.mediaserver import TimePeriod
 
 
 # https://networkoptix.atlassian.net/browse/TEST-181

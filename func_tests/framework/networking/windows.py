@@ -4,7 +4,7 @@ from netaddr import EUI, mac_eui48
 from pylru import lrudecorator
 
 from framework.networking.interface import Networking
-from framework.os_access.windows_remoting.cmd.powershell import PowershellError
+from framework.os_access.windows_remoting._powershell import PowershellError
 
 _logger = logging.getLogger(__name__)
 
@@ -19,14 +19,14 @@ class WindowsNetworking(Networking):
     _firewall_rule_name = 'NX-TestStandNetwork'
     _firewall_rule_display_name = 'NX Test Stand Network'
 
-    def __init__(self, winrm_access, macs):
+    def __init__(self, winrm, macs):
         super(WindowsNetworking, self).__init__()
         self._names = {mac: 'Plugable {}'.format(slot) for slot, mac in macs.items()}
-        self._winrm_access = winrm_access
-        self.__repr__ = lambda: '<WindowsNetworking on {}>'.format(winrm_access)
+        self._winrm = winrm
+        self.__repr__ = lambda: '<WindowsNetworking on {}>'.format(winrm)
 
     def rename_interfaces(self, mac_to_new_name):
-        self._winrm_access.run_powershell_script(
+        self._winrm.run_powershell_script(
             # language=PowerShell
             '''
                 $adapters = @( Get-NetAdapter )
@@ -61,7 +61,7 @@ class WindowsNetworking(Networking):
         return self._names
 
     def firewall_rule_exists(self):
-        rules = self._winrm_access.run_powershell_script(
+        rules = self._winrm.run_powershell_script(
             # language=PowerShell
             '''
                 Get-NetFirewallRule -Name:$Name -ErrorAction:SilentlyContinue |
@@ -71,7 +71,7 @@ class WindowsNetworking(Networking):
         return bool(rules)
 
     def create_firewall_rule(self):
-        self._winrm_access.run_powershell_script(
+        self._winrm.run_powershell_script(
             # language=PowerShell
             '''
                 if ( -not ( Get-NetFirewallRule -Name:$Name -ErrorAction:SilentlyContinue ) ) {
@@ -86,7 +86,7 @@ class WindowsNetworking(Networking):
             {'Name': self._firewall_rule_name, 'DisplayName': self._firewall_rule_display_name})
 
     def remove_firewall_rule(self):
-        self._winrm_access.run_powershell_script(
+        self._winrm.run_powershell_script(
             # language=PowerShell
             '''
                 Remove-NetFirewallRule `
@@ -97,25 +97,25 @@ class WindowsNetworking(Networking):
             {'Name': self._firewall_rule_name})
 
     def disable_internet(self):
-        self._winrm_access.run_powershell_script(
+        self._winrm.run_powershell_script(
             # language=PowerShell
             '''Set-NetFirewallProfile -DefaultOutboundAction:Block''',
             {})
 
     def enable_internet(self):
-        self._winrm_access.run_powershell_script(
+        self._winrm.run_powershell_script(
             # language=PowerShell
             '''Set-NetFirewallProfile -DefaultOutboundAction:Allow''',
             {})
 
     def internet_is_enabled(self):
-        all_profiles = self._winrm_access.run_powershell_script(
+        all_profiles = self._winrm.run_powershell_script(
             # language=PowerShell
             '''Get-NetFirewallProfile | select DefaultOutboundAction | ConvertTo-Json''')
         return not all(profile['DefaultOutboundAction'] == 'Block' for profile in all_profiles)
 
     def setup_ip(self, mac, ip, prefix_length):
-        self._winrm_access.run_powershell_script(
+        self._winrm.run_powershell_script(
             # language=PowerShell
             '''
                 $newIpAddressObject = New-NetIPAddress `
@@ -126,7 +126,7 @@ class WindowsNetworking(Networking):
             {'interfaceAlias': self.interfaces[mac], 'ipAddress': str(ip), 'prefixLength': prefix_length})
 
     def list_ips(self):
-        result = self._winrm_access.run_powershell_script(
+        result = self._winrm.run_powershell_script(
             # language=PowerShell
             '''
                 Get-NetIPAddress -PolicyStore:PersistentStore -AddressFamily:IPv4 -ErrorAction:SilentlyContinue |
@@ -136,7 +136,7 @@ class WindowsNetworking(Networking):
         return result
 
     def remove_ips(self):
-        self._winrm_access.run_powershell_script(
+        self._winrm.run_powershell_script(
             # language=PowerShell
             ''' 
                 # Get addresses from PersistentStore and delete them and their ActiveStore counterparts.
@@ -151,7 +151,7 @@ class WindowsNetworking(Networking):
             {})
 
     def route(self, destination_ip_net, gateway_bound_mac, gateway_ip):
-        self._winrm_access.run_powershell_script(
+        self._winrm.run_powershell_script(
             # language=PowerShell
             '''
                 $newRoute = New-NetRoute `
@@ -166,7 +166,7 @@ class WindowsNetworking(Networking):
                 })
 
     def list_routes(self):
-        result = self._winrm_access.run_powershell_script(
+        result = self._winrm.run_powershell_script(
             # language=PowerShell
             '''
                 Get-NetRoute -PolicyStore:PersistentStore -AddressFamily:IPv4 -ErrorAction:SilentlyContinue |
@@ -176,7 +176,7 @@ class WindowsNetworking(Networking):
         return result
 
     def remove_routes(self):
-        self._winrm_access.run_powershell_script(
+        self._winrm.run_powershell_script(
             # language=PowerShell
             '''
                 $persistentRules = (Get-NetRoute -PolicyStore:PersistentStore -ErrorAction:SilentlyContinue)
@@ -192,7 +192,7 @@ class WindowsNetworking(Networking):
 
     def ping(self, ip, count=1, timeout_sec=5):
         try:
-            _ = self._winrm_access.run_powershell_script(
+            _ = self._winrm.run_powershell_script(
                 # language=PowerShell
                 '''
                     $timer = [Diagnostics.Stopwatch]::StartNew()

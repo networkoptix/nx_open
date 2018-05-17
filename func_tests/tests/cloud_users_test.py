@@ -25,7 +25,7 @@ ADMIN_PERMISSIONS = '|'.join([
 @pytest.mark.skip(reason="Disabled until release")
 def test_mediaserver_cloud_protocol_synchronization(linux_mediaserver, cloud_account, cloud_host):
     linux_mediaserver.installation.patch_binary_set_cloud_host(cloud_host)
-    linux_mediaserver.machine.networking.enable_internet()
+    linux_mediaserver.os_access.networking.enable_internet()
     linux_mediaserver.start()
     setup_cloud_system(linux_mediaserver, cloud_account, {})
     linux_mediaserver.api.ec2.saveUser.POST(

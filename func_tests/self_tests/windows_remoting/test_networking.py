@@ -9,8 +9,8 @@ def macs(windows_vm_info):
 
 
 @pytest.fixture(scope='session')
-def networking(macs, winrm_access):
-    return WindowsNetworking(winrm_access, macs)
+def networking(macs, winrm):
+    return WindowsNetworking(winrm, macs)
 
 
 def test_interfaces(networking, windows_vm_info):

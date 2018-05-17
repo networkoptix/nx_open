@@ -1,13 +1,17 @@
 import logging
 from contextlib import contextmanager
 
+from framework.api_shortcuts import factory_reset
+from framework.artifact import ArtifactType
 from framework.core_file_traceback import create_core_file_traceback
-from framework.dpkg_installation import install_mediaserver
+from framework.installation.deb_installation import DebInstallation
+from framework.installation.make_installation import make_installation
+from framework.installation.mediaserver import Mediaserver
+from framework.installation.mediaserver_deb import MediaserverDeb
+from framework.installation.windows_installation import WindowsInstallation
+from framework.os_access.exceptions import DoesNotExist
 from framework.os_access.path import copy_file
-from framework.rest_api import RestApi
-from framework.service import UpstartService
-from .artifact import ArtifactType
-from .mediaserver import Mediaserver
+from framework.waiting import wait_for_true
 
 log = logging.getLogger(__name__)
 
@@ -16,34 +20,32 @@ TRACEBACK_ARTIFACT_TYPE = ArtifactType(name='core-traceback')
 SERVER_LOG_ARTIFACT_TYPE = ArtifactType(name='log', ext='.log')
 
 
-def make_dirty_mediaserver(mediaserver_name, machine, mediaserver_deb):
+def make_dirty_mediaserver(name, installation):
     """Install mediaserver if needed and construct its object. Nothing else."""
-    service = UpstartService(machine.os_access, mediaserver_deb.customization.service)
-    installation = install_mediaserver(machine.os_access, mediaserver_deb)
-    original_port = 7001
-    hostname_from_here, port_from_here = machine.ports['tcp', original_port]
-    api = RestApi(mediaserver_name, hostname_from_here, port_from_here)
-    server = Mediaserver(mediaserver_name, service, installation, api, machine, original_port)
-    return server
+    installation.install()
+    mediaserver = Mediaserver(name, installation)
+    return mediaserver
 
 
 def cleanup_mediaserver(mediaserver, ca):
     """Stop and remove everything produced by previous runs. Make installation "fresh"."""
-    mediaserver.stop(already_stopped_ok=True)
-    mediaserver.installation.cleanup_core_files()
-    mediaserver.installation.cleanup_var_dir()
-    mediaserver.installation.put_key_and_cert(ca.generate_key_and_cert())
     mediaserver.installation.restore_mediaserver_conf()
     mediaserver.installation.update_mediaserver_conf({
         'logLevel': 'DEBUG2',
         'tranLogLevel': 'DEBUG2',
         'checkForUpdateUrl': 'http://127.0.0.1:8080',  # TODO: Use fake server responding with small updates.
         })
+    mediaserver.start(already_started_ok=True)
+    for core_dump_path in mediaserver.installation.list_core_dumps():
+        core_dump_path.unlink()
+    factory_reset(mediaserver.api)
+    mediaserver.installation.key_pair.parent.mkdir(parents=True, exist_ok=True)
+    mediaserver.installation.key_pair.write_text(ca.generate_key_and_cert())
 
 
-def setup_clean_mediaserver(mediaserver_name, machine, mediaserver_deb, ca):
+def setup_clean_mediaserver(mediaserver_name, installation, ca):
     """Get mediaserver as if it hasn't run before."""
-    mediaserver = make_dirty_mediaserver(mediaserver_name, machine, mediaserver_deb)
+    mediaserver = make_dirty_mediaserver(mediaserver_name, installation)
     cleanup_mediaserver(mediaserver, ca)
     return mediaserver
 
@@ -83,7 +85,7 @@ def collect_core_dumps_from_mediaserver(mediaserver, root_artifact_factory):
         local_core_dump_path = code_dumps_artifact_factory.produce_file_path()
         copy_file(core_dump, local_core_dump_path)
         traceback = create_core_file_traceback(
-            mediaserver.machine.os_access,
+            mediaserver.os_access,
             mediaserver.installation.binary,
             mediaserver.installation.dir / 'lib',
             core_dump)
@@ -105,15 +107,15 @@ def collect_artifacts_from_mediaserver(mediaserver, root_artifact_factory):
 
 
 class MediaserverFactory(object):
-    def __init__(self, artifact_factory, mediaserver_deb, ca):
+    def __init__(self, mediaserver_packages, artifact_factory, ca):
+        self._mediaserver_packages = mediaserver_packages
         self._artifact_factory = artifact_factory
-        self._allocated_servers = []
         self._ca = ca
-        self._mediaserver_deb = mediaserver_deb
 
     @contextmanager
-    def allocated_mediaserver(self, name, vm):
-        mediaserver = setup_clean_mediaserver(name, vm, self._mediaserver_deb, self._ca)
+    def allocated_mediaserver(self, vm):
+        installation = make_installation(self._mediaserver_packages, vm.type, vm.os_access)
+        mediaserver = setup_clean_mediaserver(vm.alias, installation, self._ca)
         yield mediaserver
         examine_mediaserver(mediaserver)
         collect_artifacts_from_mediaserver(mediaserver, self._artifact_factory)

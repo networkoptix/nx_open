@@ -1,7 +1,7 @@
 #!/bin/bash
 set -euxo pipefail
 NAME='trusty'
-DIRTY="${NAME}-dirty"  # "Dirty" VM can be deleted in this script, completed cannot.
+DIRTY="${NAME}-dirty"  # "Dirty" Machine can be deleted in this script, completed cannot.
 COMPLETE="${NAME}-template"
 KEY=~/".func_tests/${NAME}-key"
 VBoxManage controlvm "${DIRTY}" poweroff || :

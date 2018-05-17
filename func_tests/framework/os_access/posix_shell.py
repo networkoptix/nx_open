@@ -1,0 +1,225 @@
+import datetime
+import errno
+import logging
+import math
+import os
+import select
+import subprocess
+from abc import ABCMeta, abstractmethod
+
+import pytz
+from pathlib2 import Path
+
+from framework.os_access.exceptions import Timeout, exit_status_error_cls
+from framework.os_access.posix_shell_utils import sh_augment_script, sh_command_to_script
+from framework.utils import RunningTime
+from framework.waiting import Wait
+
+_logger = logging.getLogger(__name__)
+
+
+class PosixShell(object):
+    """Posix-specific interface"""
+    __metaclass__ = ABCMeta
+
+    @abstractmethod
+    def run_command(self, command, input=None, cwd=None, timeout_sec=60, env=None):
+        return b'stdout'
+
+    @abstractmethod
+    def run_sh_script(self, script, input=None, cwd=None, timeout_sec=60, env=None):
+        return b'stdout'
+
+
+class SSH(PosixShell):
+    def __init__(self, hostname, port, config_path=Path(__file__).with_name('ssh_config')):
+        self._hostname = hostname
+        self._config_path = config_path
+        self._port = port
+        self._ssh_command = ['ssh', '-F', config_path, '-p', port]
+
+    def __repr__(self):
+        return '<SSH {} {}>'.format(sh_command_to_script(self._ssh_command), self._hostname)
+
+    def run_command(self, command, input=None, cwd=None, timeout_sec=60, env=None):
+        script = sh_command_to_script(command)
+        output = self.run_sh_script(script, input=input, cwd=cwd, timeout_sec=timeout_sec, env=env)
+        return output
+
+    def run_sh_script(self, script, input=None, cwd=None, timeout_sec=60, env=None):
+        augmented_script = sh_augment_script(script, cwd, env)
+        _logger.debug("Run on %r:\n%s", self, augmented_script)
+        output = local_shell.run_command(
+            self._ssh_command + [self._hostname] + ['\n' + augmented_script + '\n'],
+            input=input,
+            timeout_sec=timeout_sec)
+        return output
+
+    def set_time(self, new_time):  # type: (SSH, datetime.datetime) -> RunningTime
+        # TODO: Make a separate Time class.
+        started_at = datetime.datetime.now(pytz.utc)
+        self.run_command(['date', '--set', new_time.isoformat()])
+        return RunningTime(new_time, datetime.datetime.now(pytz.utc) - started_at)
+
+    def is_working(self):
+        try:
+            self.run_sh_script(':')
+        except exit_status_error_cls(255):
+            return False
+        return True
+
+
+class _LoggedOutputBuffer(object):
+    def __init__(self, logger):
+        self.chunks = []
+        self._considered_binary = False
+        self._logger = logger
+        self._indent = 0
+
+    def append(self, chunk):
+        self.chunks.append(chunk)
+        if not self._considered_binary:
+            try:
+                decoded = chunk.decode()
+            except UnicodeDecodeError:
+                self._considered_binary = True
+            else:
+                # Potentially expensive.
+                if len(decoded) < 5000 and decoded.count('\n') < 50:
+                    self._logger.debug(u'\n%s', decoded)
+                else:
+                    self._logger.debug('%d characters.', len(decoded))
+        if self._considered_binary:  # Property may be changed, and, therefore, both if's may be entered.
+            self._logger.debug('%d bytes.', len(chunk))
+
+
+def _communicate(process, input, timeout_sec):
+    """Patched version of method with same name from standard Popen class"""
+    process_logger = _logger.getChild(str(process.pid))
+
+    stdout = None  # Return
+    stderr = None  # Return
+    fd2file = {}
+    fd2output = {}
+
+    poller = select.poll()
+
+    def register_and_append(file_obj, eventmask):
+        poller.register(file_obj.fileno(), eventmask)
+        fd2file[file_obj.fileno()] = file_obj
+
+    def close_unregister_and_remove(fd):
+        poller.unregister(fd)
+        fd2file[fd].close()
+        fd2file.pop(fd)
+
+    if process.stdin and input is not None:
+        register_and_append(process.stdin, select.POLLOUT)
+
+    if process.stdout:
+        register_and_append(process.stdout, select.POLLIN | select.POLLPRI)
+        fd2output[process.stdout.fileno()] = stdout = _LoggedOutputBuffer(process_logger.getChild('stdout'))
+    if process.stderr:
+        register_and_append(process.stderr, select.POLLIN | select.POLLPRI)
+        fd2output[process.stderr.fileno()] = stderr = _LoggedOutputBuffer(process_logger.getChild('stderr'))
+
+    input_offset = 0
+
+    wait = Wait(
+        'process responds',
+        timeout_sec=timeout_sec,
+        log_continue=process_logger.debug,
+        log_stop=process_logger.error)
+
+    while fd2file:
+        try:
+            ready = poller.poll(int(math.ceil(wait.delay_sec * 1000)))
+        except select.error as e:
+            if e.args[0] == errno.EINTR:
+                continue
+            raise
+
+        for fd, mode in ready:
+            if mode & select.POLLOUT:
+                chunk = input[input_offset: input_offset + 16 * 1024]
+                try:
+                    input_offset += os.write(fd, chunk)
+                except OSError as e:
+                    if e.errno == errno.EPIPE:
+                        close_unregister_and_remove(fd)
+                    else:
+                        raise
+                else:
+                    if input_offset >= len(input):
+                        close_unregister_and_remove(fd)
+            elif mode & (select.POLLIN | select.POLLPRI):
+                data = os.read(fd, 16 * 1024)
+                if not data:
+                    close_unregister_and_remove(fd)
+                fd2output[fd].append(data)
+            else:
+                # Ignore hang up or errors.
+                close_unregister_and_remove(fd)
+        else:
+            if not wait.again():
+                for fd in list(fd2file):
+                    close_unregister_and_remove(fd)
+                break  # Unnecessary but explicit.
+
+    while True:
+        exit_status = process.poll()
+        if exit_status is not None:
+            break
+        if not wait.again():
+            break
+        wait.sleep()
+
+    return exit_status, b''.join(stdout.chunks), b''.join(stderr.chunks)  # TODO: Return io.BytesIO.
+
+
+class _LocalShell(PosixShell):
+    def __repr__(self):
+        return '<LocalShell>'
+
+    @staticmethod
+    def _make_kwargs(cwd, env, has_input):
+        kwargs = {
+            'close_fds': True,
+            'bufsize': 16 * 1024 * 1024,
+            'stdout': subprocess.PIPE,
+            'stderr': subprocess.PIPE,
+            'stdin': subprocess.PIPE if has_input else None}
+        if cwd is not None:
+            kwargs['cwd'] = str(cwd)
+        if env is not None:
+            kwargs['env'] = {name: str(value) for name, value in env.items()}
+        return kwargs
+
+    @classmethod
+    def _communicate(cls, process, input, timeout_sec):
+        exit_status, stdout, stderr = _communicate(process, input, timeout_sec)
+        if exit_status is None:
+            raise Timeout(timeout_sec)
+        if exit_status != 0:
+            raise exit_status_error_cls(exit_status)(stdout, stderr)
+        return stdout
+
+    @classmethod
+    def run_command(cls, command, input=None, cwd=None, env=None, timeout_sec=60 * 60):
+        kwargs = cls._make_kwargs(cwd, env, input is not None)
+        command = [str(arg) for arg in command]
+        _logger.debug('Run command:\n%s', sh_command_to_script(command))
+        process = subprocess.Popen(command, shell=False, **kwargs)
+        return cls._communicate(process, input, timeout_sec)
+
+    @classmethod
+    def run_sh_script(cls, script, input=None, cwd=None, env=None, timeout_sec=60 * 60):
+        augmented_script_to_run = sh_augment_script(script, None, None)
+        augmented_script_to_log = sh_augment_script(script, cwd, env)
+        _logger.debug('Run:\n%s', augmented_script_to_log)
+        kwargs = cls._make_kwargs(cwd, env, input is not None)
+        process = subprocess.Popen(augmented_script_to_run, shell=True, **kwargs)
+        return cls._communicate(process, input, timeout_sec)
+
+
+local_shell = _LocalShell()

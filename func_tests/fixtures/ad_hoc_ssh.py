@@ -11,8 +11,8 @@ from cryptography.hazmat.primitives.asymmetric import rsa
 from netaddr.ip import IPAddress
 from pathlib2 import Path
 
-from framework.os_access.args import sh_command_to_script
-from framework.os_access.ssh_access import SSHAccess
+from framework.os_access.posix_shell_utils import sh_command_to_script
+from framework.os_access.posix_shell import SSH
 from framework.waiting import wait_for_true
 
 _logger = logging.getLogger(__name__)
@@ -142,7 +142,7 @@ def ad_hoc_ssh_client_config(ad_hoc_ssh_dir, ad_hoc_client_private_key):
 
 
 @pytest.fixture(scope='session')
-def ad_hoc_ssh_access(ad_hoc_ssh_server, ad_hoc_ssh_client_config):
-    ssh_access = SSHAccess(ad_hoc_ssh_server.hostname, ad_hoc_ssh_server.port, config_path=ad_hoc_ssh_client_config)
-    wait_for_true(ssh_access.is_working, "SSH access to ad-hoc server is working")
-    return ssh_access
+def ad_hoc_ssh(ad_hoc_ssh_server, ad_hoc_ssh_client_config):
+    ssh = SSH(ad_hoc_ssh_server.hostname, ad_hoc_ssh_server.port, config_path=ad_hoc_ssh_client_config)
+    wait_for_true(ssh.is_working, "SSH access to ad-hoc server is working")
+    return ssh

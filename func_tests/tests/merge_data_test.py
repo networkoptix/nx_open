@@ -8,7 +8,7 @@ import requests
 import requests.auth
 
 from framework.api_shortcuts import get_server_id
-from framework.mediaserver import TimePeriod
+from framework.installation.mediaserver import TimePeriod
 from framework.waiting import Wait
 
 log = logging.getLogger(__name__)

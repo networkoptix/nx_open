@@ -7,8 +7,8 @@ pytest_plugins = ['fixtures.ad_hoc_ssh']
 
 
 @pytest.fixture()
-def registry_path(ad_hoc_ssh_access):
-    path = ad_hoc_ssh_access.Path.tmp() / 'test_registry.yaml'
+def registry_path(ad_hoc_ssh):
+    path = ad_hoc_ssh.Path.tmp() / 'test_registry.yaml'
     path.parent.mkdir(exist_ok=True, parents=True)
     try:
         path.unlink()
@@ -18,8 +18,8 @@ def registry_path(ad_hoc_ssh_access):
 
 
 @pytest.fixture()
-def registry(ad_hoc_ssh_access, registry_path):
-    return Registry(ad_hoc_ssh_access, registry_path, 'test-name-{index}', 3)
+def registry(ad_hoc_ssh, registry_path):
+    return Registry(ad_hoc_ssh, registry_path, 'test-name-{index}', 3)
 
 
 def test_reserve_two(registry):
@@ -44,12 +44,12 @@ def test_reserve_two_interweave(registry):
     b_take.__exit__(None, None, None)
 
 
-def test_another_instance_on_same_file(registry_path, ad_hoc_ssh_access):
+def test_another_instance_on_same_file(registry_path, ad_hoc_ssh):
     # Creation is tested too.
-    instance_1 = registry(ad_hoc_ssh_access, registry_path)
+    instance_1 = registry(ad_hoc_ssh, registry_path)
     with instance_1.taken('a') as vm_1:
         vm_1_index, vm_1_name = vm_1
-        instance_2 = registry(ad_hoc_ssh_access, registry_path)
+        instance_2 = registry(ad_hoc_ssh, registry_path)
         with instance_2.taken('a') as vm_2:  # Same names must be supported.
             vm_2_index, vm_2_name = vm_2
             assert vm_1_index != vm_2_index

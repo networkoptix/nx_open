@@ -11,7 +11,7 @@ from requests.auth import HTTPDigestAuth
 
 import server_api_data_generators as generator
 from framework.api_shortcuts import get_time
-from framework.mediaserver import TimePeriod
+from framework.installation.mediaserver import TimePeriod
 from framework.rest_api import HttpError
 from framework.utils import log_list
 from framework.waiting import wait_for_true

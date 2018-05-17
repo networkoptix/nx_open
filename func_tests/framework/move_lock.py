@@ -1,7 +1,7 @@
 import logging
 
 from framework.os_access.exceptions import exit_status_error_cls
-from framework.os_access.ssh_access import SSHAccess
+from framework.os_access.posix_shell import SSH
 from framework.os_access.ssh_path import SSHPath
 
 logger = logging.getLogger(__name__)
@@ -17,7 +17,7 @@ class MoveLockNotAcquired(Exception):
 
 class MoveLock(object):
     def __init__(self, ssh_access, path):
-        self._ssh_access = ssh_access  # type: SSHAccess
+        self._ssh_access = ssh_access  # type: SSH
         self._path = path  # type: SSHPath
 
     def __repr__(self):

@@ -1,6 +1,6 @@
 import re
 
-from framework.os_access.windows_remoting.dot_net import enumerate_cim_instances
+from framework.os_access.windows_remoting._cim_query import CIMQuery
 
 
 class EnvVars(object):
@@ -12,17 +12,18 @@ class EnvVars(object):
         self._resolved_vars.update(all_vars[user_name])
 
     @classmethod
-    def request(cls, protocol, user_name, default_user_env_vars):
+    def request(cls, pywinrm_protocol, user_name, default_user_env_vars):
         """Return (user name -> (var name -> var value)); values may contain other vars"""
-        var_objects = list(enumerate_cim_instances(protocol, 'Win32_Environment', {}))
-        variables = {}
+        query = CIMQuery(pywinrm_protocol, 'Win32_Environment', {})
+        var_objects = list(query.enumerate())
+        vars = {}
         for var_object in var_objects:
             user_name = var_object['UserName']
-            user_variables = variables.setdefault(user_name, {})
+            user_variables = vars.setdefault(user_name, {})
             name = var_object['Name'].upper()  # Names are case-insensitive.
             value = var_object['VariableValue']
             user_variables[name] = value
-        return cls(variables, user_name, default_user_env_vars)
+        return cls(vars, user_name, default_user_env_vars)
 
     def _resolution_dfs(self, name, depth):
         # Env vars are resolved on demand.

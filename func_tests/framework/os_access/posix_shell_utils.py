@@ -1,12 +1,7 @@
-from subprocess import list2cmdline
 from textwrap import dedent
 
 from netaddr import EUI, IPAddress
 from pathlib2 import PurePath
-
-
-def cmd_command_to_script(command):
-    return list2cmdline(str(arg) for arg in command)
 
 
 def sh_quote_arg(arg):

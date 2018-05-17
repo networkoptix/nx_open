@@ -11,7 +11,7 @@ import framework.utils as utils
 import server_api_data_generators as generator
 from framework.api_shortcuts import get_server_id
 from framework.merging import setup_local_system
-from framework.os_access.args import sh_quote_arg
+from framework.os_access.posix_shell_utils import sh_quote_arg
 from framework.os_access.exceptions import NonZeroExitStatus
 
 log = logging.getLogger(__name__)
@@ -53,7 +53,7 @@ DF_SIZE_REGEX = re.compile(r'^.*\s+([0-9\.]+)G$', re.MULTILINE)
 
 class LinuxVMVolume(object):
     def __init__(self, ssh_access):
-        self._ssh_access = ssh_access  # SSHAccess
+        self._ssh_access = ssh_access  # SSH
 
     def _need_create(self, mount_point, size_gb):
         try:

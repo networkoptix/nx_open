@@ -27,12 +27,12 @@ def test_with_different_cloud_hosts_must_not_be_able_to_merge(two_linux_mediaser
     test_cloud_server, wrong_cloud_server = two_linux_mediaservers
 
     test_cloud_server.installation.patch_binary_set_cloud_host(cloud_host)
-    test_cloud_server.machine.networking.enable_internet()
+    test_cloud_server.os_access.networking.enable_internet()
     test_cloud_server.start()
     setup_cloud_system(test_cloud_server, cloud_account, {})
 
     wrong_cloud_server.installation.patch_binary_set_cloud_host('cloud.non.existent')
-    wrong_cloud_server.machine.networking.enable_internet()
+    wrong_cloud_server.os_access.networking.enable_internet()
     wrong_cloud_server.start()
     setup_local_system(wrong_cloud_server, {})
 
@@ -49,7 +49,7 @@ def test_server_should_be_able_to_merge_local_to_cloud_one(two_linux_mediaserver
     cloud_bound_server, local_server = two_linux_mediaservers
 
     cloud_bound_server.installation.patch_binary_set_cloud_host(cloud_host)
-    cloud_bound_server.machine.networking.enable_internet()
+    cloud_bound_server.os_access.networking.enable_internet()
     cloud_bound_server.start()
     setup_cloud_system(cloud_bound_server, cloud_account, {})
     check_user_exists(cloud_bound_server, is_cloud=True)
@@ -68,7 +68,7 @@ def test_server_should_be_able_to_merge_local_to_cloud_one(two_linux_mediaserver
 
 # https://networkoptix.atlassian.net/wiki/spaces/SD/pages/85204446/Cloud+test
 def test_server_with_hardcoded_cloud_host_should_be_able_to_setup_with_cloud(linux_mediaserver, cloud_account):
-    linux_mediaserver.machine.networking.enable_internet()
+    linux_mediaserver.os_access.networking.enable_internet()
     linux_mediaserver.start()
     try:
         setup_cloud_system(linux_mediaserver, cloud_account, {})
@@ -84,7 +84,7 @@ def test_server_with_hardcoded_cloud_host_should_be_able_to_setup_with_cloud(lin
 
 def test_setup_cloud_system(linux_mediaserver, cloud_account, cloud_host):
     linux_mediaserver.installation.patch_binary_set_cloud_host(cloud_host)
-    linux_mediaserver.machine.networking.enable_internet()
+    linux_mediaserver.os_access.networking.enable_internet()
     linux_mediaserver.start()
     setup_cloud_system(linux_mediaserver, cloud_account, {})
 
@@ -93,8 +93,8 @@ def test_setup_cloud_system(linux_mediaserver, cloud_account, cloud_host):
 @pytest.mark.parametrize('sleep_sec', [0, 1, 5], ids='sleep_{}s'.format)
 def test_setup_cloud_system_enable_internet_after_start(linux_mediaserver, cloud_account, sleep_sec):
     linux_mediaserver.installation.patch_binary_set_cloud_host(cloud_host)
-    linux_mediaserver.machine.networking.disable_internet()
+    linux_mediaserver.os_access.networking.disable_internet()
     linux_mediaserver.start()
-    linux_mediaserver.machine.networking.enable_internet()
+    linux_mediaserver.os_access.networking.enable_internet()
     sleep(sleep_sec)
     setup_cloud_system(linux_mediaserver, cloud_account, {})
