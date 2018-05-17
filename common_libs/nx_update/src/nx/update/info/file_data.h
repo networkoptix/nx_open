@@ -26,6 +26,11 @@ struct FileData
         md5(md5)
     {}
 
+    bool isNull() const
+    {
+        return file.isNull() || size <= 0 || md5.isNull();
+    }
+
     FileData(FileData&&) = default;
     FileData(const FileData&) = default;
     FileData& operator = (FileData&&) = default;
