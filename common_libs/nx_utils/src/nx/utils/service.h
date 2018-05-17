@@ -17,7 +17,7 @@ public:
     Service(int argc, char **argv, const QString& applicationDisplayName);
     virtual ~Service() = default;
 
-    void initializeLogging(bool value);
+    void setEnableLoggingInitialization(bool value);
 
     virtual void pleaseStop() override;
 
