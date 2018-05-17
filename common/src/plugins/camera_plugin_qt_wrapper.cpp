@@ -108,8 +108,8 @@ namespace nxcip_qt
             tempModelList[i] = new char[nxcip::MAX_MODEL_NAME_SIZE];
 
         //requesting list
-        int actualCount = 0;
-        m_intf->getReservedModelList( tempModelList, &count );
+        int actualCount = count;
+        m_intf->getReservedModelList( tempModelList, &actualCount );
         if( count == actualCount )
         {
             for( int i = 0; i < count; ++i )
