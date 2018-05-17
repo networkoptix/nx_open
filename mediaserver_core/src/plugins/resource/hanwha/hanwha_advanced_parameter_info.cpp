@@ -193,8 +193,7 @@ bool HanwhaAdavancedParameterInfo::shouldAffectAllChannels() const
 bool HanwhaAdavancedParameterInfo::isValid() const
 {
     return (!m_cgi.isEmpty()
-        && !m_submenu.isEmpty()
-        && !m_parameterName.isEmpty())
+        && !m_submenu.isEmpty())
         || m_isService;
 }
 
@@ -272,19 +271,23 @@ void HanwhaAdavancedParameterInfo::parseId(const QString& idString)
         idInfoPart = split[0];
 
     split = idInfoPart.split(L'/');
-    if (split.size() != 3)
+    NX_ASSERT(split.size() == 2 || split.size() == 3);
+    if (split.size() != 2 && split.size() != 3)
         return;
 
     m_cgi = split[0];
     m_submenu = split[1];
 
-    const auto nameAndValue = split[2].split(L'=');
-    if (nameAndValue.isEmpty())
-        return;
+    if (split.size() == 3)
+    {
+        const auto nameAndValue = split[2].split(L'=');
+        if (nameAndValue.isEmpty())
+            return;
 
-    m_parameterName = nameAndValue[0];
-    if (nameAndValue.size() == 2)
-        m_parameterValue = nameAndValue[1];
+        m_parameterName = nameAndValue[0];
+        if (nameAndValue.size() == 2)
+            m_parameterValue = nameAndValue[1];
+    }
 }
 
 } // namespace plugins

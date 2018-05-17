@@ -1842,23 +1842,31 @@ QnCameraAdvancedParams HanwhaResource::filterParameters(
         if (needToCheck && parameter.range.isEmpty())
             continue;
 
-        boost::optional<HanwhaCgiParameter> cgiParameter;
-        const auto rangeParameter = info->rangeParameter();
-        if (rangeParameter.isEmpty())
+        if (!info->parameterName().isEmpty())
         {
-            cgiParameter = m_cgiParameters.parameter(
-                info->cgi(),
-                info->submenu(),
-                info->updateAction(),
-                info->parameterName());
-        }
-        else
-        {
-            cgiParameter = m_cgiParameters.parameter(rangeParameter);
-        }
+            boost::optional<HanwhaCgiParameter> cgiParameter;
+            const auto rangeParameter = info->rangeParameter();
 
-        if (!cgiParameter)
-            continue;
+            if (rangeParameter.isEmpty())
+            {
+                cgiParameter = m_cgiParameters.parameter(
+                    info->cgi(),
+                    info->submenu(),
+                    info->updateAction(),
+                    info->parameterName());
+            }
+            else
+            {
+                cgiParameter = m_cgiParameters.parameter(rangeParameter);
+            }
+
+            if (!cgiParameter)
+                continue;
+
+            const auto parameterValue = info->parameterValue();
+            if (!parameterValue.isEmpty() && !cgiParameter->isValueSupported(parameterValue))
+                continue;
+        }
 
         bool isSupported = true;
         auto supportAttribute = info->supportAttribute();
@@ -2375,29 +2383,32 @@ bool HanwhaResource::executeCommand(const QnCameraAdvancedParamValue& command)
     if (info->isService())
         return executeServiceCommand(parameter, *info);
 
-    const auto cgiParameter = m_cgiParameters.parameter(
-        info->cgi(),
-        info->submenu(),
-        info->updateAction(),
-        info->parameterName());
-
-    if (!cgiParameter)
-        return false;
-
-    const auto possibleValues = cgiParameter->possibleValues();
-    const auto requestedParameterValues = info->parameterValue()
-        .split(L',');
-
-    QStringList parameterValues;
-    for (const auto& requestedValue: requestedParameterValues)
-    {
-        if (possibleValues.contains(requestedValue))
-            parameterValues.push_back(requestedValue);
-    }
-
     HanwhaRequestHelper::Parameters requestParameters;
-    if (!parameterValues.isEmpty())
-        requestParameters.emplace(info->parameterName(), parameterValues.join(L','));
+    if (!info->parameterName().isEmpty())
+    {
+        const auto cgiParameter = m_cgiParameters.parameter(
+            info->cgi(),
+            info->submenu(),
+            info->updateAction(),
+            info->parameterName());
+
+        if (!cgiParameter)
+            return false;
+
+        const auto possibleValues = cgiParameter->possibleValues();
+        const auto requestedParameterValues = info->parameterValue()
+            .split(L',');
+
+        QStringList parameterValues;
+        for (const auto& requestedValue: requestedParameterValues)
+        {
+            if (possibleValues.contains(requestedValue))
+                parameterValues.push_back(requestedValue);
+        }
+
+        if (!parameterValues.isEmpty())
+            requestParameters.emplace(info->parameterName(), parameterValues.join(L','));
+    }
 
     return executeCommandInternal(*info, requestParameters);
 }

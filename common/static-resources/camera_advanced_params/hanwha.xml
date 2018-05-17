@@ -932,7 +932,7 @@
                     confirmation="Are you sure you want to reset all settings (except network) to default?"
                     description="Resets all camera parameters to defaults except for network settings"
                     aux="noChannel=true"/>
-            <param id="system/factoryreset/ExcludeSettings=None"
+            <param id="system/factoryreset"
                     name="Reset to Factory Defaults"
                     dataType="Button"
                     writeCmd="control"

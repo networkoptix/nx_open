@@ -198,6 +198,11 @@ void HanwhaCgiParameter::setPossibleValues(QStringList possibleValues)
     m_possibleValues = possibleValues;
 }
 
+bool HanwhaCgiParameter::isValueSupported(const QString & parameterValue) const
+{
+    return m_possibleValues.contains(parameterValue);
+}
+
 } // namespace plugins
 } // namespace mediaserver_core
 } // namespace nx
