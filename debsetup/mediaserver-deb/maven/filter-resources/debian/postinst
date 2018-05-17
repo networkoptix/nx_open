@@ -290,8 +290,12 @@ if [ $(which systemctl) ]; then
     systemctl enable $COMPANY_NAME-mediaserver || exit $?
 fi
 
-service $COMPANY_NAME-mediaserver start
-sleep 1
-echo Start service $(ps aux | grep "mediaserver-bin -e" | grep -v grep)
+if service $COMPANY_NAME-mediaserver start; then
+    sleep 1
+    echo Start service $(ps aux | grep "mediaserver-bin -e" | grep -v grep)
+else
+    # We do not fail instalation process because in this case dpkg makes a package hard to remove.
+    echo WARNING: Unable to start service >&2
+fi
 
 display_complete_setup_hint $PORT
