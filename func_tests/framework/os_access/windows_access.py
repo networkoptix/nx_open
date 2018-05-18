@@ -24,6 +24,9 @@ class WindowsAccess(OSAccess):
         self.winrm = WinRM(winrm_address, winrm_port, username, password)
         self._forwarded_ports = forwarded_ports
 
+    def __repr__(self):
+        return '<WindowsAccess via {!r}>'.format(self.winrm)
+
     @property
     def forwarded_ports(self):
         return self._forwarded_ports

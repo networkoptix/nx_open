@@ -38,6 +38,10 @@ class WinRM(object):
             transport='plaintext',  # 'ntlm' works fast, 'plaintext' is easier to debug.
             operation_timeout_sec=120, read_timeout_sec=240)
         self._username = username
+        self._repr = 'WinRM({!r}, {!r}, {!r}, {!r})'.format(address, port, username, password)
+
+    def __repr__(self):
+        return self._repr
 
     def __del__(self):
         self._shell().__exit__(None, None, None)
