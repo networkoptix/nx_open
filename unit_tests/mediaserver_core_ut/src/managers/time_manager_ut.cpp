@@ -22,17 +22,13 @@
 #include <settings.h>
 #include <api/model/time_reply.h>
 
-#include "misc_manager_stub.h"
-#include "transaction_message_bus_stub.h"
 #include <rest/server/json_rest_result.h>
 #include <nx_ec/ec_api.h>
-#include <managers/misc_manager_stub.h>
 #include <nx/utils/test_support/module_instance_launcher.h>
 #include <test_support/appserver2_process.h>
 #include <nx/utils/test_support/test_options.h>
 #include <transaction/message_bus_adapter.h>
 
-using namespace ec2::test;
 using namespace nx::utils::test;
 
 namespace nx {
@@ -248,7 +244,7 @@ protected:
         for (int i = 0; i < peerCount; ++i)
         {
             m_connectTable[i].resize(peerCount);
-            for (int j = i+1; j < peerCount; ++j)
+            for (int j = 0; j < peerCount; ++j)
                 m_connectTable[i][j] = connectTable[i][j];
         }
 

@@ -76,6 +76,7 @@ void P2pMessageBusTestBase::createData(
                     lit("value%1").arg(j)));
         }
     }
+    auto connection = server->moduleInstance()->commonModule()->ec2Connection();
     auto userManager = connection->getUserManager(Qn::kSystemAccess);
     auto cameraManager = connection->getCameraManager(Qn::kSystemAccess);
     auto resourceManager = connection->getResourceManager(Qn::kSystemAccess);
@@ -93,9 +94,9 @@ void P2pMessageBusTestBase::startServers(int count, int keepDbAtServerIndex, qui
     t.restart();
     for (int i = 0; i < count; ++i)
     {
-        auto appserver = createAppserver(i == keepDbAtServerIndex, baseTcpPort);
+        auto appserver = Appserver2Launcher::createAppserver(i == keepDbAtServerIndex, baseTcpPort);
         appserver->start();
-        m_servers.push_back(appserver);
+        m_servers.push_back(std::move(appserver));
     }
 
     for (const auto& server: m_servers)
@@ -106,6 +107,11 @@ void P2pMessageBusTestBase::startServers(int count, int keepDbAtServerIndex, qui
             .arg(qnStaticCommon->moduleDisplayName(commonModule->moduleGUID()))
             .arg(server->moduleInstance()->endpoint().toString()));
     }
+}
+
+void P2pMessageBusTestBase::connectServers(const Appserver2Ptr& srcServer, const Appserver2Ptr& dstServer)
+{
+    srcServer->moduleInstance()->connectTo(dstServer->moduleInstance().get());
 }
 
 void P2pMessageBusTestBase::disconnectServers(const Appserver2Ptr& srcServer, const Appserver2Ptr& dstServer)
