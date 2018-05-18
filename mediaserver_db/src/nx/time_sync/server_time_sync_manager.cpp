@@ -204,7 +204,7 @@ void ServerTimeSyncManager::updateTime()
     if (syncWithInternel)
     {
         QnRoute route = getNearestServerWithInternet();
-        if (!route.isValid())
+        if (!route.isValid() && !route.reverseConnect)
             return;
         if (isTimeRecentlySync && m_timeLoadFromServer == route.id)
             return;
@@ -229,7 +229,7 @@ void ServerTimeSyncManager::updateTime()
     else
     {
         auto route = commonModule()->router()->routeTo(primaryTimeServerId);
-        if (route.isValid())
+        if (route.isValid() || route.reverseConnect)
         {
             if (isTimeRecentlySync && m_timeLoadFromServer == route.id)
                 return;
