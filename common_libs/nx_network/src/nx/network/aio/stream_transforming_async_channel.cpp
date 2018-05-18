@@ -1,5 +1,7 @@
 #include "stream_transforming_async_channel.h"
 
+#include <nx/utils/std/algorithm.h>
+
 namespace nx {
 namespace network {
 namespace aio {
@@ -249,12 +251,11 @@ void StreamTransformingAsyncChannel::onSomeRawDataRead(
         return;
     }
 
-    // TODO: #ak It is not correct.
-    // Should report failure only to user tasks that depend on this particular read.
-    if (!nx::network::socketCannotRecoverFromError(sysErrorCode))
-        sysErrorCode = SystemError::connectionReset;
+    if (nx::network::socketCannotRecoverFromError(sysErrorCode))
+        return reportFailureOfEveryUserTask(sysErrorCode);
 
-    reportFailureOfEveryUserTask(sysErrorCode);
+    // Reporting failure to user task(s) that depend on this read.
+    reportFailureToTasksFilteredByType(sysErrorCode, UserTaskType::read);
 }
 
 int StreamTransformingAsyncChannel::writeRawBytes(const void* data, size_t count)
@@ -323,9 +324,28 @@ void StreamTransformingAsyncChannel::onRawDataWritten(
 void StreamTransformingAsyncChannel::reportFailureOfEveryUserTask(
     SystemError::ErrorCode sysErrorCode)
 {
+    reportFailureToTasksFilteredByType(sysErrorCode, std::nullopt);
+}
+
+void StreamTransformingAsyncChannel::reportFailureToTasksFilteredByType(
+    SystemError::ErrorCode sysErrorCode,
+    std::optional<UserTaskType> userTypeFilter)
+{
     // We can have SystemError::noError here in case of a connection closure.
     decltype(m_userTaskQueue) userTaskQueue;
-    userTaskQueue.swap(m_userTaskQueue);
+    if (!userTypeFilter)
+    {
+        userTaskQueue.swap(m_userTaskQueue);
+    }
+    else
+    {
+        auto movedTaskRangeIter = nx::utils::move_if(
+            m_userTaskQueue.begin(), m_userTaskQueue.end(),
+            std::back_inserter(userTaskQueue),
+            [&userTypeFilter](const auto& userTask) { return userTask->type == *userTypeFilter; });
+        m_userTaskQueue.erase(movedTaskRangeIter, m_userTaskQueue.end());
+    }
+
     for (auto& userTask: userTaskQueue)
     {
         auto handler = std::move(userTask->handler);

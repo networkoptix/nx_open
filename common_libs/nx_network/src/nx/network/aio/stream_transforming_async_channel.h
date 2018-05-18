@@ -4,8 +4,9 @@
 #include <memory>
 #include <tuple>
 
-#include <nx/utils/object_destruction_flag.h>
 #include <nx/utils/byte_stream/pipeline.h>
+#include <nx/utils/object_destruction_flag.h>
+#include <nx/utils/std/optional.h>
 
 #include "abstract_async_channel.h"
 
@@ -128,7 +129,11 @@ private:
     void onSomeRawDataRead(SystemError::ErrorCode, std::size_t);
     int writeRawBytes(const void* data, size_t count);
     void onRawDataWritten(SystemError::ErrorCode, std::size_t);
+
     void reportFailureOfEveryUserTask(SystemError::ErrorCode sysErrorCode);
+    void reportFailureToTasksFilteredByType(
+        SystemError::ErrorCode sysErrorCode,
+        std::optional<UserTaskType> userTypeFilter);
 
     void removeUserTask(UserTask* task);
 };

@@ -493,6 +493,14 @@ protected:
         m_synchronousServerReceivedData.write(readBuf.data(), m_sentData.size());
     }
 
+    void startReadingConnectionAsync()
+    {
+        ASSERT_TRUE(m_connection->setNonBlockingMode(true));
+
+        m_waitForSingleRecvResult = false;
+        continueReceiving();
+    }
+
     void continueReceiving()
     {
         using namespace std::placeholders;
@@ -501,6 +509,15 @@ protected:
         m_connection->readSomeAsync(
             &m_readBuffer,
             std::bind(&StreamSocketAcceptance::saveReadResult, this, _1, _2));
+    }
+
+    void waitForConnectionRecvTimeout()
+    {
+        for (;;)
+        {
+            if (std::get<0>(m_recvResultQueue.pop()) == SystemError::timedOut)
+                break;
+        }
     }
 
     void whenCancelAllSocketOperations()
@@ -514,6 +531,18 @@ protected:
             m_clientMessage.size(),
             m_connection->send(m_clientMessage.constData(), m_clientMessage.size()))
             << SystemError::getLastOSErrorText().toStdString();
+    }
+
+    void whenClientSendsPingAsync()
+    {
+        std::promise<SystemError::ErrorCode> done;
+        m_connection->sendAsync(
+            m_clientMessage,
+            [&done](SystemError::ErrorCode systemErrorCode, std::size_t bytesSent)
+            {
+                done.set_value(systemErrorCode);
+            });
+        ASSERT_EQ(SystemError::noError, done.get_future().get());
     }
 
     void whenSendMultiplePingsViaMultipleConnections(int connectionCount)
@@ -702,9 +731,16 @@ protected:
 
     void thenServerMessageIsReceived()
     {
-        const auto prevRecvResult = m_recvResultQueue.pop();
-        ASSERT_EQ(SystemError::noError, std::get<0>(prevRecvResult));
-        ASSERT_EQ(m_serverMessage, std::get<1>(prevRecvResult));
+        for (;;)
+        {
+            const auto prevRecvResult = m_recvResultQueue.pop();
+            if (std::get<0>(prevRecvResult) != SystemError::noError)
+                continue;
+
+            ASSERT_EQ(SystemError::noError, std::get<0>(prevRecvResult));
+            ASSERT_EQ(m_serverMessage, std::get<1>(prevRecvResult));
+            break;
+        }
     }
 
     void thenClientSocketReported(SystemError::ErrorCode expected)
@@ -835,6 +871,7 @@ private:
     std::vector<std::unique_ptr<ClientConnectionContext>> m_clientConnections;
     nx::utils::SyncQueue<AcceptResult> m_acceptedConnections;
     AcceptResult m_prevAcceptResult;
+    bool m_waitForSingleRecvResult = true;
 
     //---------------------------------------------------------------------------------------------
     // Concurrent I/O.
@@ -897,6 +934,9 @@ private:
 
         if (m_auxiliaryRecvHandler)
             nx::utils::swapAndCall(m_auxiliaryRecvHandler);
+
+        if (!m_waitForSingleRecvResult)
+            continueReceiving();
     }
 
     void startAcceptingConnections()
@@ -1165,7 +1205,19 @@ TYPED_TEST_P(StreamSocketAcceptance, server_socket_listen_queue_size_is_used)
 }
 #endif
 
-//TYPED_TEST_P(StreamSocketAcceptance, socket_is_reusable_after_recv_timeout)
+TYPED_TEST_P(StreamSocketAcceptance, socket_is_reusable_after_recv_timeout)
+{
+    this->givenPingPongServer();
+
+    this->givenConnectedSocket();
+    this->setClientSocketRecvTimeout(std::chrono::milliseconds(1));
+
+    this->startReadingConnectionAsync();
+    this->waitForConnectionRecvTimeout();
+
+    this->whenClientSendsPingAsync();
+    this->thenServerMessageIsReceived();
+}
 
 REGISTER_TYPED_TEST_CASE_P(StreamSocketAcceptance,
     DISABLED_receiveDelay,
@@ -1186,7 +1238,8 @@ REGISTER_TYPED_TEST_CASE_P(StreamSocketAcceptance,
     nonblocking_accept_actually_accepts_connections,
     accepted_socket_is_in_blocking_mode_when_server_socket_is_nonblocking,
     accepted_socket_is_in_blocking_mode_when_server_socket_is_blocking,
-    server_socket_accepts_many_connections_in_a_row);
+    server_socket_accepts_many_connections_in_a_row,
+    socket_is_reusable_after_recv_timeout);
 
 } // namespace test
 } // namespace network
