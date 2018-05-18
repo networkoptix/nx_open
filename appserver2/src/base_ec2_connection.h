@@ -122,7 +122,7 @@ protected:
     QnUpdatesNotificationManagerPtr m_updatesNotificationManager;
     QnMiscNotificationManagerPtr m_miscNotificationManager;
     QnDiscoveryNotificationManagerPtr m_discoveryNotificationManager;
-    AbstractTimeNotificationManagerPtr m_timeNotificationManager;
+    QnTimeNotificationManagerPtr m_timeNotificationManager;
     std::unique_ptr<ECConnectionNotificationManager> m_notificationManager;
     std::unique_ptr<ECConnectionAuditManager> m_auditManager;
 };
