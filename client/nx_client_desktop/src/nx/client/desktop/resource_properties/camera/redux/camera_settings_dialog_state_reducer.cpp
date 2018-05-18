@@ -525,6 +525,13 @@ State CameraSettingsDialogStateReducer::loadCameras(
             isMotionDetectionEnabled(firstCamera));
 
         auto regionList = firstCamera->getMotionRegionList();
+        const int channelCount = firstCamera->getVideoLayout()->channelCount();
+
+        if (regionList.size() > channelCount)
+            regionList.erase(regionList.begin() + channelCount, regionList.end());
+        else while (regionList.size() < channelCount)
+            regionList << QnMotionRegion();
+
         if (validateMotionRegionList(state, regionList) != QnMotionRegion::ErrorCode::Ok)
         {
             for (auto& region: regionList)
