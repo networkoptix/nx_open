@@ -12,7 +12,6 @@
 
 #include <QtGui/QOpenGLFunctions>
 #include <QtGui/QOffscreenSurface>
-#include <QtOpenGL/QtOpenGL>
 #include <QtCore/QCache>
 #include <QtCore/QMap>
 
