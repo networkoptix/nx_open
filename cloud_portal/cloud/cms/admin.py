@@ -7,11 +7,6 @@ from cloud import settings
 from django.contrib import admin
 
 
-admin.site.site_header = 'Cloud Administration'
-admin.site.site_title = 'Cloud Administration'
-admin.site.index_title = 'Cloud Administration'
-
-
 class CMSAdmin(admin.ModelAdmin):
     # this class protects us from user error:
     # 1. only superuser can edit specific data in CMS (get_readonly_fields, has_add_permission, has_delete_permission)
