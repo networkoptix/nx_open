@@ -87,7 +87,7 @@ def process_context(context, language_code, customization, preview, version_id, 
 def read_customized_file(filename, customization_name, language_code=None, version_id=None, preview=False):
     # 1. try to find context for this file
     customization = Customization.objects.get(name=customization_name)
-    clean_name = filename.replace("{{language}}", language_code) if language_code else filename
+    clean_name = filename.replace(language_code, "{{language}}") if language_code else filename
     context = Context.objects.filter(file_path=clean_name)
     if context.exists():
         # success -> return process_context
