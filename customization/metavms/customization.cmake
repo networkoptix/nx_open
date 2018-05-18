@@ -3,16 +3,17 @@ set(build_paxton ON)
 set(enable_hanwha true)
 
 set(defaultSkin "dark_blue")
+set(compatibleCustomizations "default_cn" "default_zh_CN")
 
 # Components Namings
-set(display.product.name "Nx MetaVMS")
+set(display.product.name "Nx Witness")
 set(display.mobile.name "Nx Mobile")
-set(product.name "Nx MetaVMS")
-set(product.name.short "metavms")
-set(product.appName "Nx MetaVMS")
+set(product.name "HD Witness")
+set(product.name.short "hdwitness")
+set(product.appName "hdwitness")
 set(company.name "Network Optix")
 set(liteDeviceName "nx1")
-set(cloudName "Nx Meta Cloud")
+set(cloudName "Nx Cloud")
 set(uri.protocol "nx-vms")
 
 # Default settings
@@ -24,12 +25,12 @@ set(defaultWebPages
 # Support section
 set(companyUrl "http://networkoptix.com")
 set(productUrl "http://networkoptix.com/nxwitness-overview")
-set(supportUrl "https://networkoptix.com/meta/")
-set(supportEmail "meta@networkoptix.com)
+set(supportUrl "http://support.networkoptix.com")
+set(supportEmail "support@networkoptix.com")
 set(supportPhone "")
-set(licenseEmail "meta@networkoptix.com")
+set(licenseEmail "support@networkoptix.com")
 
-set(installer.name "metavms")
+set(installer.name "nxwitness")
 set(android.packageName "com.networkoptix.nxwitness")
 set(android.oldPackageName "com.networkoptix.hdwitness")
 set(android.alias "hdwitness")
@@ -37,16 +38,16 @@ set(android.storepass "hYCmvTDu")
 set(android.keypass "31O2zNNy")
 
 # Custom Installer (if needed). If not leave "default"
-set(customization.upgradeCode "{5c6f8f50-99d3-4bd5-9201-08e5c375bb13}")
-set(customization.clientUpgradeCode "{0f2ed89b-8c56-4a6c-a858-59007eb004c0}")
-set(customization.serverUpgradeCode "{8ac4ddb5-8ebe-423f-ae52-5df4ef9e5f20}")
+set(customization.upgradeCode "{ce572797-45bf-4f1c-a783-369ea79c597e}")
+set(customization.clientUpgradeCode "{6ae0699e-af9d-4cc1-85a3-9bf8819563af}")
+set(customization.serverUpgradeCode "{b4582e3d-c6e1-4f51-806b-ad69417a2584}")
 
-set(customization.clientBundleUpgradeCode "{3401937b-5715-40f7-bf3d-d34b67b3b317}")
-set(customization.serverBundleUpgradeCode "{b0f6cba5-66f5-4ecd-bba5-87064c7618a6}")
-set(customization.fullBundleUpgradeCode "{b98a8e7a-2e21-472c-b951-e16f82a43798}")
+set(customization.clientBundleUpgradeCode "{4505af3c-b20c-4ae9-b5c4-c1fddbc5db34}")
+set(customization.serverBundleUpgradeCode "{4904f26d-6146-45f4-be37-80a31c15872d}")
+set(customization.fullBundleUpgradeCode "{2c83e785-23e4-4b70-be6c-ed49fa329bb5}")
 
 set(nxtool.company.name "Nx")
-set(nxtool.bundleUpgradeCode "{37d2fd11-7e22-43f3-ae84-91342168257d}")
+set(nxtool.bundleUpgradeCode "{222b19dc-f75f-4096-9cf2-807e309ce06b}")
 
 set(deb.customization.company.name "networkoptix")
 
@@ -69,13 +70,13 @@ set(mac.skip.sign false)
 set(mac.sign.identity "Developer ID Application: Network Optix, Inc. (L6FE34GJWM)")
 set(mac.app.sign.identity "3rd Party Mac Developer Application: Network Optix, Inc. (L6FE34GJWM)")
 set(mac.pkg.sign.identity "3rd Party Mac Developer Installer: Network Optix, Inc. (L6FE34GJWM)")
-set(mac.bundle.identifier "com.networkoptix.metavms")
+set(mac.bundle.identifier "com.networkoptix.HDWitness2")
 set(mac.protocol_handler_bundle.identifier "com.networkoptix.protocol_handler")
 
 # Other customizations.
 set(freeLicenseIsTrial true)
 set(freeLicenseCount 4)
-set(freeLicenseKey "0000-0000-0000-0029")
+set(freeLicenseKey "0000-0000-0000-0005")
 
 # Installer Customizations
 set(sign.password "qweasd123")
