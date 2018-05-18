@@ -2978,8 +2978,7 @@ bool HanwhaResource::executeCommand(const QnCameraAdvancedParamValue& command)
     HanwhaRequestHelper::Parameters requestParameters;
     if (!info->parameterName().isEmpty())
     {
-        const auto& cgiParams = cgiParameters();
-        const auto cgiParameter = cgiParams.parameter(
+        const auto cgiParameter = cgiParameters().parameter(
             info->cgi(),
             info->submenu(),
             info->updateAction(),
