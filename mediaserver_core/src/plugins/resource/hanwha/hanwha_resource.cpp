@@ -2400,7 +2400,7 @@ QnCameraAdvancedParams HanwhaResource::filterParameters(
             }
             else
             {
-                cgiParameter = m_cgiParameters.parameter(rangeParameter);
+                cgiParameter = cgiParams.parameter(rangeParameter);
             }
 
             if (!cgiParameter)
@@ -3398,3 +3398,4 @@ bool HanwhaResource::isProxiedMultisensorCamera() const
 } // namespace plugins
 } // namespace mediaserver_core
 } // namespace nx
+
