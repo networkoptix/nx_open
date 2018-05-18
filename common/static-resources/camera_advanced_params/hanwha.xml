@@ -929,6 +929,30 @@
                         dataType="Enumeration"/>
             </group>
         </group>
+        <group name="Lens Control">
+            <param id="root.Zoom"
+                name="Zoom"
+                description="Zoom machinery"
+                range="-30,30"
+                dataType="SliderControl"
+                writeCmd="custom_zoom"
+                compact="true"/>
+            <param id="root.Ptr"
+                name=""
+                description="Pan tilt rotation machinery"
+                dataType="PtrControl"
+                range="-30,30,-30,30,-30,30"
+                readCmd="param.cgi"
+                writeCmd="custom_ptr"
+                compact="true"/>
+            <param id="root.Focus"
+                name="Focus"
+                description="Focus machinery"
+                range="-30,30"
+                dataType="SliderControl"
+                writeCmd="custom_focus"
+                compact="true"/>
+        </group>
         <group name="Maintenance">
             <param id="image/focus/Mode=SimpleFocus"
                     name="Simple Focus"

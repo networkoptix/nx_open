@@ -2367,6 +2367,20 @@ QnCameraAdvancedParams HanwhaResource::filterParameters(
     for (const auto& id: allParameters.allParameterIds())
     {
         const auto parameter = allParameters.getParameterById(id);
+        #if 1 //< TODO: #dmishin properly handle lens control parameters
+        static const std::set<QString> kLensControlParameters = {
+            lit("custom_ptr"),
+            lit("custom_zoom"),
+            lit("custom_focus")
+        };
+
+        if (kLensControlParameters.find(parameter.writeCmd) != kLensControlParameters.cend())
+        {
+            supportedIds.insert(parameter.id);
+            continue;
+        }
+        #endif
+
         const auto info = advancedParameterInfo(parameter.id);
 
         if (!info)

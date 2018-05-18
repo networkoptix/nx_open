@@ -291,7 +291,6 @@ void HanwhaAdavancedParameterInfo::parseAux(const QString& auxString)
 void HanwhaAdavancedParameterInfo::parseId(const QString& idString)
 {
     m_id = idString;
-
     if (m_id.contains(lit("SERVICE%")))
     {
         m_isService = true;
@@ -306,7 +305,6 @@ void HanwhaAdavancedParameterInfo::parseId(const QString& idString)
         idInfoPart = split[0];
 
     split = idInfoPart.split(L'/');
-    NX_ASSERT(split.size() == 2 || split.size() == 3);
     if (split.size() != 2 && split.size() != 3)
         return;
 
