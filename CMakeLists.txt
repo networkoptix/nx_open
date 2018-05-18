@@ -39,6 +39,11 @@ if(targetDevice AND NOT targetDevice STREQUAL "ios")
     include(cmake/sync_toolchain.cmake)
 endif()
 
+cmake_dependent_option(codeSigning "Enable code signing"
+    ON "NOT developerBuild"
+    OFF
+)
+
 project(vms VERSION 4.0.0)
 
 if(targetDevice STREQUAL "ios")
@@ -108,11 +113,6 @@ include(project_utils)
 include(test_utils)
 
 nx_create_dev_qt_conf()
-
-cmake_dependent_option(codeSigning "Enable code signing"
-    ON "NOT developerBuild"
-    OFF
-)
 
 list(APPEND CMAKE_PREFIX_PATH ${QT_DIR})
 if(MACOSX)
