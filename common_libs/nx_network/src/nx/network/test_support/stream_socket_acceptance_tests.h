@@ -567,7 +567,7 @@ protected:
 
         m_connection->sendAsync(
             m_randomDataBuffer,
-            [this](SystemError::ErrorCode systemErrorCode, std::size_t bytesSent)
+            [this](SystemError::ErrorCode systemErrorCode, std::size_t /*bytesSent*/)
             {
                 if (systemErrorCode == SystemError::noError)
                 {

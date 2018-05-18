@@ -284,7 +284,7 @@ int StreamTransformingAsyncChannel::writeRawBytes(const void* data, size_t count
 
 void StreamTransformingAsyncChannel::onRawDataWritten(
     SystemError::ErrorCode sysErrorCode,
-    std::size_t bytesTransferred)
+    std::size_t /*bytesTransferred*/)
 {
     auto completedIoRange =
         std::make_tuple(m_rawWriteQueue.begin(), std::next(m_rawWriteQueue.begin()));
