@@ -54,15 +54,15 @@ export class NxModalGeneralComponent implements OnInit {
 
     private dialog(message, title, actionLabel, actionType?, cancelLabel?,
                    hasFooter?, cancellable?, closable?) {
-        this.modalRef = this.modalService.open(GeneralModalContent, {backdrop: 'static'});
+        this.modalRef = this.modalService.open(GeneralModalContent, {backdrop: 'static', centered: true});
         this.modalRef.componentInstance.language = this.language.lang;
 
         this.modalRef.componentInstance.message = message;
         this.modalRef.componentInstance.title = title;
         this.modalRef.componentInstance.actionLabel = actionLabel;
-        this.modalRef.componentInstance.buttonType = actionType;
+        this.modalRef.componentInstance.buttonType = actionType || 'default';
         this.modalRef.componentInstance.cancelLabel = cancelLabel;
-        this.modalRef.componentInstance.buttonClass = actionType;
+        this.modalRef.componentInstance.buttonClass = actionType || 'btn-primary';
 
         this.modalRef.componentInstance.hasFooter = hasFooter;
         this.modalRef.componentInstance.cancellable = cancellable;

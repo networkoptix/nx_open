@@ -1,6 +1,15 @@
-import { Component, Inject, OnInit, Input, ViewEncapsulation, ViewChild, ElementRef } from '@angular/core';
-import { Location, LocationStrategy, PathLocationStrategy }                           from '@angular/common';
-import { NgbModal, NgbActiveModal, NgbModalRef }                                      from '@ng-bootstrap/ng-bootstrap';
+import {
+    Component,
+    Inject,
+    OnInit,
+    Input,
+    ViewEncapsulation,
+    ViewChild,
+    Renderer2, AfterViewInit
+}                                                           from '@angular/core';
+import { Location, LocationStrategy, PathLocationStrategy } from '@angular/common';
+import { NgbModal, NgbActiveModal, NgbModalRef }            from '@ng-bootstrap/ng-bootstrap';
+import { NxModalGeneralComponent }                          from "../general/general.component";
 
 @Component({
     selector: 'ngbd-modal-content',
@@ -8,7 +17,7 @@ import { NgbModal, NgbActiveModal, NgbModalRef }                                
     styleUrls: [],
     providers: [Location, {provide: LocationStrategy, useClass: PathLocationStrategy}],
 })
-export class LoginModalContent {
+export class LoginModalContent implements OnInit, AfterViewInit {
     @Input() auth;
     @Input() language;
     @Input() login;
@@ -16,22 +25,40 @@ export class LoginModalContent {
     @Input() closable;
     @Input() location;
 
-    @ViewChild('loginForm') loginForm: HTMLFormElement;
-    @ViewChild('email') email: ElementRef;
+    nx_wrong_password: boolean;
 
-    userStatus: {
-        notValidUsername: boolean,
-        notValidPassword: boolean,
-    };
+    @ViewChild('loginForm') loginForm: HTMLFormElement;
 
     constructor(public activeModal: NgbActiveModal,
                 @Inject('account') private account: any,
-                @Inject('process') private process: any) {
+                @Inject('process') private process: any,
+                @Inject('cloudApiService') private cloudApi: any,
+                private renderer: Renderer2,
+                private generalModal: NxModalGeneralComponent) {
 
-        this.userStatus = {
-            notValidUsername: false,
-            notValidPassword: false,
-        }
+        this.nx_wrong_password = false;
+    }
+
+    resendActivation(email) {
+        this.activeModal.close();
+
+        this.process.init(() => {
+            return this.cloudApi.reactivate(email);
+        }, {
+            errorCodes: {
+                forbidden: this.language.lang.errorCodes.accountAlreadyActivated,
+                notFound: this.language.lang.errorCodes.emailNotFound
+            },
+            holdAlerts: true,
+            errorPrefix: this.language.lang.errorCodes.cantSendConfirmationPrefix
+        })
+        .run()
+        .then(() => {
+            this.generalModal.openConfirm(
+                'Check your inbox and visit provided link to activate account',
+                'Activation email sent',
+                'OK');
+        });
     }
 
     gotoRegister() {
@@ -44,33 +71,38 @@ export class LoginModalContent {
 
     ngOnInit() {
         this.login = this.process.init(() => {
+            this.loginForm.controls['email'].setErrors(null);
+            this.loginForm.controls['password'].setErrors(null);
+            this.nx_wrong_password = false;
+
             return this.account.login(this.auth.email, this.auth.password, this.auth.remember);
         }, {
             ignoreUnauthorized: true,
             errorCodes: {
                 accountNotActivated: () => {
-                    // TODO: Repace this once 'activate' page is moved to A5
-                    // AJS and A5 routers freak out about route change *****
-                    //this.location.go('/activate');
-                    document.location.href = '/activate';
-                    // *****************************************************
-                    return false;
-                },
-                notAuthorized: () => {
-                    alert(this.language.lang.errorCodes.notAuthorized);
-                },
-                notFound: () => {
-                    // alert(this.language.lang.errorCodes.emailNotFound)
                     this.auth.password = '';
-                    this.loginForm.controls['email'].setErrors({'no_user': true});
                     this.loginForm.controls['password'].markAsPristine();
                     this.loginForm.controls['password'].markAsUntouched();
 
-                    <HTMLInputElement>this.email.nativeElement.select();
+                    this.loginForm.controls['email'].setErrors({'not_activated': true});
+                    this.renderer.selectRootElement('#email').select();
+                },
+                notAuthorized: () => {
+                    this.nx_wrong_password = true;
+                    this.loginForm.controls['password'].setErrors({'nx_wrong_password': true});
+                    this.auth.password = '';
 
-                    // Using non-standard form validation is because
-                    // it breaks select() functionality -> switches ElementRef to FormControl
-                    this.userStatus.notValidUsername = true;
+                    console.log(this.loginForm.controls['password'].errors);
+                    this.renderer.selectRootElement('#password').focus();
+
+                },
+                notFound: () => {
+                    this.auth.password = '';
+                    this.loginForm.controls['password'].markAsPristine();
+                    this.loginForm.controls['password'].markAsUntouched();
+
+                    this.loginForm.controls['email'].setErrors({'no_user': true});
+                    this.renderer.selectRootElement('#email').select();
                 },
                 portalError: this.language.lang.errorCodes.brokenAccount
             }
@@ -84,6 +116,10 @@ export class LoginModalContent {
             });
         });
     }
+
+    ngAfterViewInit() {
+        this.renderer.selectRootElement('#email').focus();
+    }
 }
 
 @Component({
@@ -92,7 +128,7 @@ export class LoginModalContent {
     encapsulation: ViewEncapsulation.None,
     styleUrls: []
 })
-export class NxModalLoginComponent implements OnInit {
+export class NxModalLoginComponent implements OnInit, AfterViewInit {
     login: any;
     modalRef: NgbModalRef;
     auth = {
@@ -123,6 +159,10 @@ export class NxModalLoginComponent implements OnInit {
 
     close() {
         this.modalRef.close();
+    }
+
+    ngAfterViewInit() {
+
     }
 
     ngOnInit() {

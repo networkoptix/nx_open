@@ -6,14 +6,14 @@
     </button>
     <h1 class="modal-title">{{title}}</h1>
 </div>
-<div class="modal-body" *ngIf="content">
-    <p [innerHTML]="content"></p>
+<div class="modal-body" *ngIf="message">
+    <p [innerHTML]="message"></p>
 </div>
 
 <div class="modal-footer" *ngIf="hasFooter">
     <button type="button" class="btn"
             [ngClass]="buttonClass" *ngIf="cancellable"
-            (click)="close('CLOSE')"
+            (click)="close('CANCEL')"
             translate>Close
     </button>
     <button type="button" class="btn"
@@ -21,7 +21,7 @@
             (click)="ok('OK')">{{actionLabel}}
     </button>
     <button type="button" class="btn btn-default"
-            *ngIf="!cancellable"
-            (click)="close('CANCEL')">{{cancelLabel}}
+            *ngIf="!cancellable && cancelLabel"
+            (click)="close('CLOSE')">{{cancelLabel}}
     </button>
 </div>
