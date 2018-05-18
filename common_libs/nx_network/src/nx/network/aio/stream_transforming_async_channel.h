@@ -55,6 +55,12 @@ private:
         done,
     };
 
+    enum class UserHandlerResult
+    {
+        proceed,
+        thisDeleted,
+    };
+
     struct UserTask
     {
         UserTaskType type;
@@ -112,6 +118,7 @@ private:
     std::deque<RawSendContext> m_rawWriteQueue;
     bool m_asyncReadInProgress;
     nx::utils::ObjectDestructionFlag m_destructionFlag;
+    bool m_sendShutdown = false;
 
     virtual void stopWhileInAioThread() override;
 
@@ -128,7 +135,13 @@ private:
     void readRawChannelAsync();
     void onSomeRawDataRead(SystemError::ErrorCode, std::size_t);
     int writeRawBytes(const void* data, size_t count);
+
     void onRawDataWritten(SystemError::ErrorCode, std::size_t);
+    template<typename Range>
+        UserHandlerResult completeRawSendTasks(
+            Range completedIoRange,
+            SystemError::ErrorCode sysErrorCode);
+    void scheduleNextRawSendTaskIfAny();
 
     void reportFailureOfEveryUserTask(SystemError::ErrorCode sysErrorCode);
     void reportFailureToTasksFilteredByType(

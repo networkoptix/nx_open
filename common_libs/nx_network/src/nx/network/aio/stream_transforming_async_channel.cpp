@@ -260,8 +260,6 @@ void StreamTransformingAsyncChannel::onSomeRawDataRead(
 
 int StreamTransformingAsyncChannel::writeRawBytes(const void* data, size_t count)
 {
-    using namespace std::placeholders;
-
     NX_ASSERT(isInSelfAioThread());
 
     // TODO: #ak Put a limit on send queue size.
@@ -270,9 +268,15 @@ int StreamTransformingAsyncChannel::writeRawBytes(const void* data, size_t count
     m_rawWriteQueue.back().data = nx::Buffer((const char*)data, (int)count);
     if (m_rawWriteQueue.size() == 1)
     {
-        m_rawDataChannel->sendAsync(
-            m_rawWriteQueue.front().data,
-            std::bind(&StreamTransformingAsyncChannel::onRawDataWritten, this, _1, _2));
+        if (m_sendShutdown)
+        {
+            post(std::bind(&StreamTransformingAsyncChannel::onRawDataWritten, this,
+                SystemError::connectionReset, (size_t) -1));
+        }
+        else
+        {
+            scheduleNextRawSendTaskIfAny();
+        }
     }
 
     return (int)count;
@@ -282,43 +286,67 @@ void StreamTransformingAsyncChannel::onRawDataWritten(
     SystemError::ErrorCode sysErrorCode,
     std::size_t bytesTransferred)
 {
+    auto completedIoRange =
+        std::make_tuple(m_rawWriteQueue.begin(), std::next(m_rawWriteQueue.begin()));
+    if (sysErrorCode != SystemError::noError)
+    {
+        // Marking socket unusable since we cannot throw away bytes out of SSL stream.
+        m_sendShutdown = true;
+
+        // Considering every queue raw write failed since send has been shut down.
+        std::get<1>(completedIoRange) = m_rawWriteQueue.end();
+    }
+
+    if (completeRawSendTasks(completedIoRange, sysErrorCode) == UserHandlerResult::thisDeleted)
+        return;
+
+    if (sysErrorCode == SystemError::noError)
+    {
+        scheduleNextRawSendTaskIfAny();
+        tryToCompleteUserTasks();
+        return;
+    }
+
+    if (socketCannotRecoverFromError(sysErrorCode))
+        reportFailureOfEveryUserTask(sysErrorCode);
+    else
+        reportFailureToTasksFilteredByType(sysErrorCode, UserTaskType::write);
+}
+
+template<typename Range>
+StreamTransformingAsyncChannel::UserHandlerResult
+    StreamTransformingAsyncChannel::completeRawSendTasks(
+        Range completedIoRange,
+        SystemError::ErrorCode sysErrorCode)
+{
+    for (auto it = std::get<0>(completedIoRange); it != std::get<1>(completedIoRange); ++it)
+    {
+        if (!it->userHandler)
+            continue;
+
+        utils::ObjectDestructionFlag::Watcher thisDestructionWatcher(&m_destructionFlag);
+        nx::utils::swapAndCall(
+            it->userHandler,
+            sysErrorCode,
+            sysErrorCode == SystemError::noError ? it->userByteCount : (size_t) -1);
+        if (thisDestructionWatcher.objectDestroyed())
+            return UserHandlerResult::thisDeleted;
+    }
+
+    m_rawWriteQueue.erase(std::get<0>(completedIoRange), std::get<1>(completedIoRange));
+    return UserHandlerResult::proceed;
+}
+
+void StreamTransformingAsyncChannel::scheduleNextRawSendTaskIfAny()
+{
     using namespace std::placeholders;
 
-    UserIoHandler userHandler = std::exchange(m_rawWriteQueue.front().userHandler, nullptr);
-    int userByteCount = m_rawWriteQueue.front().userByteCount;
-    if (sysErrorCode == SystemError::noError)
+    if (!m_rawWriteQueue.empty())
     {
-        NX_ASSERT(
-            bytesTransferred ==
-            static_cast<std::size_t>(m_rawWriteQueue.front().data.size()));
-        m_rawWriteQueue.pop_front();
-        if (!m_rawWriteQueue.empty())
-        {
-            m_rawDataChannel->sendAsync(
-                m_rawWriteQueue.front().data,
-                std::bind(&StreamTransformingAsyncChannel::onRawDataWritten, this, _1, _2));
-        }
+        m_rawDataChannel->sendAsync(
+            m_rawWriteQueue.front().data,
+            std::bind(&StreamTransformingAsyncChannel::onRawDataWritten, this, _1, _2));
     }
-    else
-    {
-        // TODO: #ak Should report error as-is, but mark socket as unusable
-        // and fail any subsequent operation with SystemError::connectionReset.
-        if (!nx::network::socketCannotRecoverFromError(sysErrorCode))
-            sysErrorCode = SystemError::connectionReset;
-    }
-
-    if (userHandler)
-    {
-        utils::ObjectDestructionFlag::Watcher thisDestructionWatcher(&m_destructionFlag);
-        userHandler(sysErrorCode, userByteCount);
-        if (thisDestructionWatcher.objectDestroyed())
-            return;
-    }
-
-    if (sysErrorCode == SystemError::noError)
-        tryToCompleteUserTasks();
-    else
-        reportFailureOfEveryUserTask(sysErrorCode);
 }
 
 void StreamTransformingAsyncChannel::reportFailureOfEveryUserTask(

@@ -437,6 +437,35 @@ TEST_F(SslSocketVerifySslIsActuallyUsed, ssl_used_by_sync_io)
 }
 
 //-------------------------------------------------------------------------------------------------
+
+class SslSocketSpecific:
+    public network::test::StreamSocketAcceptance<
+        network::test::SslSocketBothEndsEncryptedTypeSet>
+{
+    using base_type = network::test::StreamSocketAcceptance<
+        network::test::SslSocketBothEndsEncryptedTypeSet>;
+
+protected:
+    void givenSocketWithTimedoutSend()
+    {
+        givenAcceptingServerSocket();
+        givenConnectedSocket();
+        setClientSocketSendTimeout(std::chrono::milliseconds(1));
+
+        whenClientSendsRandomDataAsyncNonStop();
+
+        thenClientSendTimesOutEventually();
+    }
+};
+
+TEST_F(SslSocketSpecific, socket_becomes_unusable_after_async_send_timeout)
+{
+    givenSocketWithTimedoutSend();
+    whenClientSendsPingAsync();
+    thenSendFailedWith(SystemError::connectionReset);
+}
+
+//-------------------------------------------------------------------------------------------------
 // Mixing sync & async mode.
 
 class SslSocketSwitchIoMode:
