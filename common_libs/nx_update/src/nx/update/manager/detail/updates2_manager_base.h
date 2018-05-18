@@ -35,7 +35,7 @@ protected:
     update::info::AbstractUpdateRegistryPtr m_updateRegistry;
     utils::StandaloneTimerManager m_timerManager;
 
-    void checkForRemoteUpdate(utils::TimerId timerId);
+    void checkForRemoteUpdate(utils::TimerId timerId, bool forced);
     void checkForGlobalDictionaryUpdate();
     void refreshStatusAfterCheck();
     void setStatus(api::Updates2StatusData::StatusCode code, const QString& message);

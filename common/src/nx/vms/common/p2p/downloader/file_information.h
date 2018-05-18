@@ -5,6 +5,7 @@
 
 #include <nx/fusion/model_functions_fwd.h>
 #include <nx/utils/url.h>
+#include <nx/utils/uuid.h>
 
 namespace nx {
 namespace vms {
@@ -59,10 +60,12 @@ public:
     PeerSelectionPolicy peerPolicy = PeerSelectionPolicy::none;
     qint64 touchTime = 0;
     qint64 ttl = 0;
+    QList<QnUuid> additionalPeers;
 };
 
 #define FileInformation_Fields \
-    (name)(size)(md5)(url)(chunkSize)(status)(downloadedChunks)(peerPolicy)(touchTime)(ttl)
+    (name)(size)(md5)(url)(chunkSize)(status)(downloadedChunks)(peerPolicy)(touchTime)(ttl) \
+    (additionalPeers)
 
 QN_FUSION_DECLARE_FUNCTIONS(FileInformation, (json)(eq))
 QN_FUSION_DECLARE_FUNCTIONS(FileInformation::Status, (lexical))

@@ -58,7 +58,7 @@ void Updates2ManagerBase::atServerStart()
     connectToSignals();
 
     m_timerManager.addNonStopTimer(
-        std::bind(&Updates2ManagerBase::checkForRemoteUpdate, this, _1),
+        std::bind(&Updates2ManagerBase::checkForRemoteUpdate, this, _1, false),
         std::chrono::milliseconds(refreshTimeout()),
         std::chrono::milliseconds(0));
 }
@@ -79,9 +79,10 @@ void Updates2ManagerBase::checkForGlobalDictionaryUpdate()
     refreshStatusAfterCheck();
 }
 
-void Updates2ManagerBase::checkForRemoteUpdate(utils::TimerId /*timerId*/)
+void Updates2ManagerBase::checkForRemoteUpdate(utils::TimerId /*timerId*/, bool forced)
 {
     auto onExitGuard = makeScopeGuard([this]() { remoteUpdateCompleted(); });
+    if (!forced)
     {
         QnMutexLocker lock(&m_mutex);
         switch (m_currentStatus.state)
@@ -100,25 +101,20 @@ void Updates2ManagerBase::checkForRemoteUpdate(utils::TimerId /*timerId*/)
         }
     }
 
-    auto remoteRegistry = getRemoteRegistry();
-    if (remoteRegistry)
+    updateRegistryIfNeeded(std::move(getRemoteRegistry()));
+    auto globalRegistry = getGlobalRegistry();
+    QByteArray serializedUpdatedRegistry;
     {
-        updateRegistryIfNeeded(std::move(remoteRegistry));
-
-        auto globalRegistry = getGlobalRegistry();
-        QByteArray serializedUpdatedRegistry;
+        QnMutexLocker lock(&m_mutex);
+        if (!globalRegistry || !m_updateRegistry->equals(globalRegistry.get()))
         {
-            QnMutexLocker lock(&m_mutex);
-            if (!globalRegistry || !m_updateRegistry->equals(globalRegistry.get()))
-            {
-                m_updateRegistry->merge(globalRegistry.get());
-                serializedUpdatedRegistry = m_updateRegistry->toByteArray();
-            }
+            m_updateRegistry->merge(globalRegistry.get());
+            serializedUpdatedRegistry = m_updateRegistry->toByteArray();
         }
-
-        if (!serializedUpdatedRegistry.isNull())
-            updateGlobalRegistry(serializedUpdatedRegistry);
     }
+
+    if (!serializedUpdatedRegistry.isNull())
+        updateGlobalRegistry(serializedUpdatedRegistry);
 
     refreshStatusAfterCheck();
 }
@@ -220,12 +216,18 @@ api::Updates2StatusData Updates2ManagerBase::download()
     {
         NX_ASSERT(!fileData.md5.isNull());
         NX_ASSERT(fileData.size != 0);
+        if (fileData.md5.isNull() || fileData.size == 0)
+        {
+            setStatus(
+                api::Updates2StatusData::StatusCode::error,
+                "File data is corrupted");
+            return m_currentStatus.base();
+        }
 
         fileInformation.md5 = QByteArray::fromHex(fileData.md5.toBase64());
         fileInformation.name = fileData.file;
         fileInformation.size = fileData.size;
         fileInformation.url = fileData.url;
-        fileInformation.peerPolicy = FileInformation::PeerSelectionPolicy::byPlatform;
 
         downloader()->deleteFile(fileData.file);
         if (!m_currentStatus.file.isEmpty())
@@ -233,6 +235,8 @@ api::Updates2StatusData Updates2ManagerBase::download()
 
         m_currentStatus.file.clear();
     }
+    fileInformation.peerPolicy = FileInformation::PeerSelectionPolicy::byPlatform;
+    fileInformation.additionalPeers = m_updateRegistry->additionalPeers(fileInformation.name);
 
     ResultCode resultCode = downloader()->addFile(fileInformation);
     switch (resultCode)
@@ -447,26 +451,30 @@ void Updates2ManagerBase::onFileAdded(const FileInformation& fileInformation)
     if (manualFileData.isNull())
         return;
 
-    QByteArray serializedGlobalRegistry;
+    if (fileInformation.status != FileInformation::Status::downloaded
+        && fileInformation.status != FileInformation::Status::uploading)
+    {
+        NX_VERBOSE(
+            this,
+            lm("External update file %1 added, but has an inappropriate status")
+                .arg(fileInformation.name));
+        return;
+    }
+
     {
         QnMutexLocker lock(&m_mutex);
         if (m_currentStatus.file == fileInformation.name)
             return;
 
-        NX_VERBOSE(this, lm("External update file %1 added to the Downloader")
-            .args(fileInformation.name));
+        NX_VERBOSE(
+            this,
+            lm("External update file %1 added to the Downloader").args(fileInformation.name));
 
         manualFileData.peers.append(peerId());
         m_updateRegistry->addFileData(manualFileData);
-        auto globalRegistry = getGlobalRegistry();
-        if (!m_updateRegistry->equals(globalRegistry.get()))
-        {
-            m_updateRegistry->merge(globalRegistry.get());
-            serializedGlobalRegistry = m_updateRegistry->toByteArray();
-        }
     }
 
-    updateGlobalRegistry(serializedGlobalRegistry);
+    checkForRemoteUpdate(utils::TimerId(), true);
 }
 
 void Updates2ManagerBase::onFileDeleted(const QString& /*fileName*/)
