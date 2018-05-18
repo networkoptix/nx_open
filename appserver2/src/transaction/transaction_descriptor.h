@@ -143,7 +143,7 @@ struct TransactionDescriptorBase
         value(value),
         isPersistent(isPersistent),
         isSystem(isSystem),
-        name(name)
+        name(QString::fromLatin1(name))
     {}
 
     virtual ~TransactionDescriptorBase() {}

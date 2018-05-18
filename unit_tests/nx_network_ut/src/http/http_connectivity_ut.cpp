@@ -153,13 +153,9 @@ protected:
     std::unique_ptr<nx::network::BufferedStreamSocket> takeSocketFromHttpClient(
         std::unique_ptr<nx::network::http::HttpClient>& httpClient)
     {
-        auto socket = std::make_unique<nx::network::BufferedStreamSocket>(httpClient->takeSocket());
-        auto buffer = httpClient->fetchMessageBodyBuffer();
-
-        if (buffer.size())
-            socket->injectRecvData(std::move(buffer));
-
-        return socket;
+        return std::make_unique<nx::network::BufferedStreamSocket>(
+            httpClient->takeSocket(),
+            httpClient->fetchMessageBodyBuffer());
     }
 
     void parse(char* buffer, std::size_t bufferLength)

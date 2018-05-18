@@ -1,5 +1,7 @@
 #pragma once
 
+#include <string>
+
 #include "stun_message_data.h"
 
 #include <nx/fusion/model_functions_fwd.h>
@@ -28,6 +30,8 @@ enum class NatTraversalResultCode
  * This method is needed since socket API provides SystemError::ErrorCode as a result.
  */
 NX_NETWORK_API SystemError::ErrorCode toSystemErrorCode(NatTraversalResultCode resultCode);
+
+std::string toString(NatTraversalResultCode code);
 
 class NX_NETWORK_API ConnectionResultRequest:
     public StunRequestData

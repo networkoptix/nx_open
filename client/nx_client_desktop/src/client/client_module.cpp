@@ -86,6 +86,7 @@
 #include <server/server_storage_manager.h>
 
 #include <translation/translation_manager.h>
+#include <translation/datetime_formatter.h>
 
 #include <utils/common/app_info.h>
 #include <utils/common/command_line_parser.h>
@@ -122,6 +123,12 @@
 #endif
 
 #include <watchers/cloud_status_watcher.h>
+
+#if defined(Q_OS_WIN)
+#include <plugins/resource/desktop_win/desktop_resource_searcher_impl.h>
+#else
+#include <plugins/resource/desktop_audio_only/desktop_audio_only_resource_searcher_impl.h>
+#endif
 
 #include <ini.h>
 
@@ -171,6 +178,10 @@ QnTranslationManagerPtr initializeTranslations(QnClientSettings* settings)
         translation = translationManager->defaultTranslation();
 
     translationManager->installTranslation(translation);
+
+    // It is now safe to localize time and date formats. Mind the dot.
+    datetime::initLocale();
+
     return translationManager;
 }
 
@@ -307,7 +318,12 @@ void QnClientModule::initDesktopCamera(QGLWidget* window)
 {
     /* Initialize desktop camera searcher. */
     auto commonModule = m_clientCoreModule->commonModule();
-    auto desktopSearcher = commonModule->store(new QnDesktopResourceSearcher(window));
+#if defined(Q_OS_WIN)
+    auto impl = new QnDesktopResourceSearcherImpl(window);
+#else
+    auto impl = new QnDesktopAudioOnlyResourceSearcherImpl();
+#endif
+    auto desktopSearcher = commonModule->store(new QnDesktopResourceSearcher(impl));
     desktopSearcher->setLocal(true);
     commonModule->resourceDiscoveryManager()->addDeviceServer(desktopSearcher);
 }
@@ -449,7 +465,6 @@ void QnClientModule::initSingletons(const QnStartupParameters& startupParams)
     m_analyticsMetadataProviderFactory.reset(new AnalyticsMetadataProviderFactory());
     m_analyticsMetadataProviderFactory->registerMetadataProviders();
 
-    m_resourceDataProviderFactory.reset(new QnDataProviderFactory());
     registerResourceDataProviders();
 }
 
@@ -529,10 +544,10 @@ void QnClientModule::initLog(const QnStartupParameters& startupParams)
     logSettings.updateDirectoryIfEmpty(QStandardPaths::writableLocation(QStandardPaths::DataLocation));
 
     logSettings.level.parse(logLevel);
-    logSettings.logBaseName = logFile.isEmpty() 
+    logSettings.logBaseName = logFile.isEmpty()
         ? lit("client_log") + logFileNameSuffix
         : logFile;
-        
+
     nx::utils::log::initialize(
         logSettings,
         qApp->applicationName(),
@@ -683,11 +698,6 @@ QnCameraDataManager* QnClientModule::cameraDataManager() const
     return m_cameraDataManager;
 }
 
-QnDataProviderFactory* QnClientModule::dataProviderFactory() const
-{
-    return m_resourceDataProviderFactory.data();
-}
-
 nx::client::desktop::RadassController* QnClientModule::radassController() const
 {
     return m_radassController;
@@ -728,10 +738,10 @@ void QnClientModule::initLocalInfo(const QnStartupParameters& startupParams)
 
 void QnClientModule::registerResourceDataProviders()
 {
-    m_resourceDataProviderFactory->registerResourceType<QnAviResource>();
-    m_resourceDataProviderFactory->registerResourceType<QnClientCameraResource>();
-    m_resourceDataProviderFactory->registerResourceType<QnDesktopAudioOnlyResource>();
+    auto factory = qnClientCoreModule->dataProviderFactory();
+    factory->registerResourceType<QnAviResource>();
+    factory->registerResourceType<QnClientCameraResource>();
     #if defined(Q_OS_WIN)
-        m_resourceDataProviderFactory->registerResourceType<QnWinDesktopResource>();
+        factory->registerResourceType<QnWinDesktopResource>();
     #endif
 }

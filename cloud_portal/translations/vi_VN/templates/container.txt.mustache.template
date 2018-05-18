@@ -4,5 +4,5 @@ Hệ thống: {{systemName}} {{systemSignature}}
 
 {{>body}}
 
-{{companyUrl}}
-Hỗ trợ: {{supportLink}}
+%COMPANY_LINK%
+Hỗ trợ: %SUPPORT_LINK%

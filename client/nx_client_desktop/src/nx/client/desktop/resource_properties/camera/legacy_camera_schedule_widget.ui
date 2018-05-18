@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>761</width>
+    <width>1349</width>
     <height>755</height>
    </rect>
   </property>
@@ -27,8 +27,8 @@
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>727</width>
-        <height>737</height>
+        <width>1277</width>
+        <height>964</height>
        </rect>
       </property>
       <layout class="QVBoxLayout" name="verticalLayout_7" stretch="0,0,0,0,0,0,1">
@@ -693,11 +693,11 @@
              <height>100</height>
             </size>
            </property>
-           <layout class="QFormLayout" name="formLayout_2">
+           <layout class="QVBoxLayout" name="verticalLayout_2">
             <property name="topMargin">
              <number>6</number>
             </property>
-            <item row="0" column="0">
+            <item>
              <widget class="QCheckBox" name="displayQualityCheckBox">
               <property name="text">
                <string>Show Quality</string>
@@ -707,7 +707,7 @@
               </property>
              </widget>
             </item>
-            <item row="1" column="0">
+            <item>
              <widget class="QCheckBox" name="displayFpsCheckBox">
               <property name="text">
                <string>Show FPS</string>
@@ -717,27 +717,7 @@
               </property>
              </widget>
             </item>
-            <item row="2" column="0" colspan="2">
-             <layout class="QHBoxLayout" name="horizontalLayout_13" stretch="0,1">
-              <property name="spacing">
-               <number>2</number>
-              </property>
-              <property name="topMargin">
-               <number>8</number>
-              </property>
-              <item>
-               <widget class="QLabel" name="panicModeTitleLabel">
-                <property name="text">
-                 <string>Panic Mode:</string>
-                </property>
-               </widget>
-              </item>
-              <item>
-               <widget class="QLabel" name="panicModeLabel"/>
-              </item>
-             </layout>
-            </item>
-            <item row="3" column="0" colspan="2">
+            <item>
              <spacer name="verticalSpacer_3">
               <property name="orientation">
                <enum>Qt::Vertical</enum>
@@ -965,15 +945,15 @@
    <container>1</container>
   </customwidget>
   <customwidget>
-   <class>nx::client::desktop::SelectableButton</class>
-   <extends>QToolButton</extends>
-   <header location="global">nx/client/desktop/common/widgets/selectable_button.h</header>
-  </customwidget>
-  <customwidget>
    <class>QnLicensesUsageWidget</class>
    <extends>QWidget</extends>
    <header location="global">ui/widgets/licensing/licenses_usage_widget.h</header>
    <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>nx::client::desktop::SelectableButton</class>
+   <extends>QToolButton</extends>
+   <header location="global">nx/client/desktop/common/widgets/selectable_button.h</header>
   </customwidget>
   <customwidget>
    <class>QnArchiveLengthWidget</class>

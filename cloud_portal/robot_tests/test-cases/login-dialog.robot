@@ -1,7 +1,10 @@
 *** Settings ***
 Resource          ../resource.robot
 Resource          ../variables.robot
-Test Teardown     Close Browser
+Test Setup        Restart
+Test Teardown     Run Keyword If Test Failed    Open New Browser On Failure
+Suite Setup       Open Browser and go to URL    ${url}
+Suite Teardown    Close All Browsers
 
 *** Variables ***
 ${email}    ${EMAIL OWNER}
@@ -9,15 +12,23 @@ ${email invalid}    aodehurgjaegir
 ${password}    ${BASE PASSWORD}
 ${url}         ${ENV}
 
+*** Keywords ***
+Open New Browser On Failure
+    Close Browser
+    Open Browser and go to URL    ${url}
+
+Restart
+    ${status}    Run Keyword And Return Status    Validate Log Out
+    Run Keyword Unless    ${status}    Log Out
+    Go To    ${url}
+
 *** Test Cases ***
 can be opened in anonymous state
-    Open Browser and Go To URL    ${url}
     Wait Until Element Is Visible    ${LOG IN NAV BAR}
     Click Link    ${LOG IN NAV BAR}
     Wait Until Element Is Visible    ${LOG IN MODAL}
 
 can be closed after clicking on background
-    Open Browser and Go To URL    ${url}
     Wait Until Element Is Visible    ${LOG IN NAV BAR}
     Click Link    ${LOG IN NAV BAR}
     Wait Until Elements Are Visible    ${LOG IN MODAL}    //div[@uib-modal-backdrop='modal-backdrop']/..    ${LOG IN BUTTON}    ${EMAIL INPUT}    ${PASSWORD INPUT}
@@ -26,7 +37,6 @@ can be closed after clicking on background
     Page Should Not Contain Element    ${LOG IN MODAL}
 
 allows to log in with existing credentials and to log out
-    Open Browser and go to URL    ${url}
     Log In    ${email}    ${password}
     Validate Log In
     Wait Until Element Is Visible    ${ACCOUNT DROPDOWN}
@@ -36,33 +46,28 @@ allows to log in with existing credentials and to log out
     Wait Until Element Is Visible    ${LOG IN NAV BAR}
 
 redirects to systems after log In
-    Open Browser and go to URL    ${url}
     Log In    ${email}    ${password}
     Validate Log In
     Wait Until Element Is Visible    ${ACCOUNT DROPDOWN}
     Location Should Be    ${url}/systems
 
 after log In, display user's email and menu in top right corner
-    Open Browser and go to URL    ${url}
-    Maximize Browser Window
+    Set Window Size    1920    1080
     Log In    ${email}    ${password}
     Validate Log In
     Wait Until Element Is Visible    ${ACCOUNT DROPDOWN}
     Element Text Should Be    ${ACCOUNT DROPDOWN}    ${email}
 
 valid but unregistered email shows error message
-    Open Browser and go to URL    ${url}
     Log In    ${EMAIL UNREGISTERED}    ${password}
     Wait Until Element Is Visible    ${ALERT}
 
 allows log in with existing email in uppercase
-    Open Browser and go to URL    ${url}
     ${email uppercase}    Convert To Uppercase    ${email}
     Log In    ${email uppercase}    ${password}
     Validate Log In
 
 shows red outline if field is wrong/empty after blur
-    Open Browser and go to URL    ${url}
     Wait Until Element Is Visible    ${LOG IN NAV BAR}
     Click Link    ${LOG IN NAV BAR}
     Wait Until Elements Are Visible    ${EMAIL INPUT}    ${PASSWORD INPUT}
@@ -71,7 +76,6 @@ shows red outline if field is wrong/empty after blur
     Wait Until Elements Are Visible    ${EMAIL INPUT}/parent::div[contains(@class, 'has-error')]    ${PASSWORD INPUT}/parent::div[contains(@class, 'has-error')]
 
 allows log in with 'Remember Me checkmark' switched off
-    Open Browser and go to URL    ${url}
     Wait Until Element Is Visible    ${LOG IN NAV BAR}
     Click Link    ${LOG IN NAV BAR}
     Wait Until Elements Are Visible    ${REMEMBER ME CHECKBOX}   ${EMAIL INPUT}    ${PASSWORD INPUT}    ${LOG IN BUTTON}
@@ -83,7 +87,6 @@ allows log in with 'Remember Me checkmark' switched off
     Validate Log In
 
 contains 'I forgot password' link that leads to Restore Password page with pre-filled email from log In form
-    Open Browser and go to URL    ${url}
     Log In    ${email}    'aderhgadehf'
     Wait Until Element Is Visible    ${FORGOT PASSWORD}
     Click Link    ${FORGOT PASSWORD}
@@ -91,7 +94,6 @@ contains 'I forgot password' link that leads to Restore Password page with pre-f
     Textfield Should Contain    ${RESTORE PASSWORD EMAIL INPUT}    ${email}
 
 passes email from email input to Restore password page, even without clicking 'Log in' button
-    Open Browser and go to URL    ${url}
     Wait Until Element Is Visible    ${LOG IN NAV BAR}
     Click Link    ${LOG IN NAV BAR}
     Wait Until Element Is Visible    ${EMAIL INPUT}
@@ -105,7 +107,7 @@ passes email from email input to Restore password page, even without clicking 'L
 
 redirects to /activate and shows non-activated user message when not activated; Resend activation button sends email
     [tags]    email
-    Open Browser and go to URL    ${url}/register
+    Go To    ${url}/register
     ${random email}    get random email    ${BASE EMAIL}
     Register    'mark'    'hamill'    ${random email}    ${BASE PASSWORD}
     Wait Until Element Is Visible    //h1[contains(@class,'process-success')]
@@ -117,7 +119,6 @@ redirects to /activate and shows non-activated user message when not activated; 
     Validate Register Email Received    ${random email}
 
 displays password masked
-    Open Browser and go to URL    ${url}
     Wait Until Element Is Visible    ${LOG IN NAV BAR}
     Click Link    ${LOG IN NAV BAR}
     Wait Until Element Is Visible    ${PASSWORD INPUT}
@@ -125,7 +126,6 @@ displays password masked
     Should Be Equal    '${input type}'    'password'
 
 requires log In, if the user has just logged out and pressed back button in browser
-    Open Browser and go to URL    ${url}
     Log In    ${email}    ${password}
     Validate Log In
     Log Out
@@ -134,7 +134,6 @@ requires log In, if the user has just logged out and pressed back button in brow
     Validate Log Out
 
 handles more than 255 symbols email and password
-    Open Browser and go to URL    ${url}
     Wait Until Element Is Visible    ${LOG IN NAV BAR}
     Click Link    ${LOG IN NAV BAR}
     Wait Until Elements Are Visible    ${EMAIL INPUT}    ${PASSWORD INPUT}
@@ -144,7 +143,6 @@ handles more than 255 symbols email and password
     Textfield Should Contain    ${PASSWORD INPUT}    ${255CHARS}
 
 logout refreshes page
-    Open Browser and go to URL    ${url}
     Log In    ${email}    ${password}
     Validate Log In
     Log Out
@@ -152,7 +150,6 @@ logout refreshes page
 
 # We don't actually allow copy of the password field at log in.
 allows copy-paste in input fields
-    Open Browser and go to URL    ${url}
     Wait Until Element Is Visible    ${LOG IN NAV BAR}
     Click Link    ${LOG IN NAV BAR}
     Wait Until Element Is Visible    ${EMAIL INPUT}
@@ -164,7 +161,6 @@ allows copy-paste in input fields
     Textfield Should Contain    ${EMAIL INPUT}    Copy Paste Test
 
 should respond to Esc key and close dialog
-    Open Browser and go to URL    ${url}
     Wait Until Element Is Visible    ${LOG IN NAV BAR}
     Click Link    ${LOG IN NAV BAR}
     Wait Until Element Is Visible    ${PASSWORD INPUT}
@@ -173,7 +169,6 @@ should respond to Esc key and close dialog
     Element Should Not Be Visible    ${LOG IN MODAL}
 
 should respond to Enter key and log in
-    Open Browser and go to URL    ${url}
     Wait Until Element Is Visible    ${LOG IN NAV BAR}
     Click Link    ${LOG IN NAV BAR}
     Wait Until Elements Are Visible    ${EMAIL INPUT}    ${PASSWORD INPUT}    ${LOG IN BUTTON}
@@ -183,7 +178,6 @@ should respond to Enter key and log in
     Validate Log In
 
 should respond to Tab key
-    Open Browser and go to URL    ${url}
     Wait Until Element Is Visible    ${LOG IN NAV BAR}
     Click Link    ${LOG IN NAV BAR}
     Wait Until Element Is Visible    ${EMAIL INPUT}
@@ -192,7 +186,6 @@ should respond to Tab key
     Element Should Be Focused    ${PASSWORD INPUT}
 
 should respond to Space key and toggle checkbox
-    Open Browser and go to URL    ${url}
     Wait Until Element Is Visible    ${LOG IN NAV BAR}
     Click Link    ${LOG IN NAV BAR}
     Wait Until Element Is Visible    ${REMEMBER ME CHECKBOX}
@@ -203,7 +196,7 @@ should respond to Space key and toggle checkbox
     Checkbox Should Be Selected    ${REMEMBER ME CHECKBOX}
 
 handles two tabs, updates second tab state if logout is done on first
-    Open Browser and go to URL    ${url}/register
+    Go To    ${url}/register
     Wait Until Elements Are Visible    ${REGISTER FIRST NAME INPUT}    ${REGISTER LAST NAME INPUT}    ${REGISTER EMAIL INPUT}    ${REGISTER PASSWORD INPUT}    ${CREATE ACCOUNT BUTTON}
     Click Link    ${TERMS AND CONDITIONS LINK}
     Sleep    2    #This is specifically for Ubuntu Firefox because the new page isn't created fast enough and Get Window Handles only gets 1 item.

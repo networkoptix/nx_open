@@ -113,11 +113,11 @@ std::unique_ptr<AbstractStreamSocket> AsyncClient::takeSocket()
     result->cancelIOSync(nx::network::aio::etNone);
     if (!m_receivedBytesLeft.isEmpty())
     {
-        auto bufferedStreamSocket =
-            std::make_unique<nx::network::BufferedStreamSocket>(std::move(result));
-        BufferType buf;
-        buf.swap(m_receivedBytesLeft);
-        bufferedStreamSocket->injectRecvData(std::move(buf));
+        decltype(m_receivedBytesLeft) receivedBytesLeft;
+        receivedBytesLeft.swap(m_receivedBytesLeft);
+        auto bufferedStreamSocket = std::make_unique<nx::network::BufferedStreamSocket>(
+            std::move(result),
+            std::move(receivedBytesLeft));
         result = std::move(bufferedStreamSocket);
     }
     return result;

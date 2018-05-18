@@ -70,10 +70,9 @@ extern "C"
 #include <utils/common/util.h>
 
 #include "extensions/workbench_stream_synchronizer.h"
-#include "watchers/workbench_server_time_watcher.h"
 #include "watchers/workbench_user_inactivity_watcher.h"
 #include <utils/common/long_runable_cleanup.h>
-
+#include <nx/client/core/watchers/server_time_watcher.h>
 #include "workbench.h"
 #include "workbench_display.h"
 #include "workbench_context.h"
@@ -121,8 +120,6 @@ QnWorkbenchNavigator::QnWorkbenchNavigator(QObject *parent):
             kUpdateBookmarksInterval,
             this))
 {
-    /* We'll be using this one, so make sure it's created. */
-    context()->instance<QnWorkbenchServerTimeWatcher>();
     m_updateSliderTimer.restart();
 
     connect(this, &QnWorkbenchNavigator::currentWidgetChanged, this, &QnWorkbenchNavigator::updateTimelineRelevancy);
@@ -444,7 +441,9 @@ void QnWorkbenchNavigator::initialize()
 
     connect(m_dayTimeWidget, SIGNAL(timeClicked(const QTime &)), this, SLOT(at_dayTimeWidget_timeClicked(const QTime &)));
 
-    connect(context()->instance<QnWorkbenchServerTimeWatcher>(), &QnWorkbenchServerTimeWatcher::displayOffsetsChanged, this, &QnWorkbenchNavigator::updateLocalOffset);
+    const auto timeWatcher = context()->instance<nx::client::core::ServerTimeWatcher>();
+    connect(timeWatcher, &nx::client::core::ServerTimeWatcher::displayOffsetsChanged,
+        this, &QnWorkbenchNavigator::updateLocalOffset);
 
     connect(context()->instance<QnWorkbenchUserInactivityWatcher>(),
         &QnWorkbenchUserInactivityWatcher::stateChanged,
@@ -479,7 +478,8 @@ void QnWorkbenchNavigator::deinitialize()
 
     disconnect(m_calendar, NULL, this, NULL);
 
-    disconnect(context()->instance<QnWorkbenchServerTimeWatcher>(), NULL, this, NULL);
+    const auto timeWatcher = context()->instance<nx::client::core::ServerTimeWatcher>();
+    disconnect(timeWatcher, NULL, this, NULL);
     disconnect(qnSettings->notifier(QnClientSettings::TIME_MODE), NULL, this, NULL);
 
     m_currentWidget = NULL;
@@ -1202,8 +1202,9 @@ void QnWorkbenchNavigator::updateCurrentWidget()
 
 void QnWorkbenchNavigator::updateLocalOffset()
 {
+    const auto timeWatcher = context()->instance<nx::client::core::ServerTimeWatcher>();
     qint64 localOffset = m_currentMediaWidget
-        ? context()->instance<QnWorkbenchServerTimeWatcher>()->displayOffset(m_currentMediaWidget->resource())
+        ? timeWatcher->displayOffset(m_currentMediaWidget->resource())
         : 0;
 
     if (m_timeSlider)

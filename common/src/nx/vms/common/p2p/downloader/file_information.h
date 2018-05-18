@@ -44,8 +44,8 @@ public:
     enum PeerSelectionPolicy
     {
         none, //< only provided url will be used for downloading
-        all = 1 << 0,
-        byPlatform = 1 << 1,
+        all,
+        byPlatform,
     };
     Q_ENUM(PeerSelectionPolicy)
 

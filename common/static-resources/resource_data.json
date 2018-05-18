@@ -207,7 +207,8 @@
             "adamStartInputCoil": 0,
             "adamInputCount": 8,
             "adamStartOutputCoil": 16,
-            "adamOutputCount": 8
+            "adamOutputCount": 8,
+            "noVideoSupport": true
         },
         {
             "keys": [
@@ -493,6 +494,7 @@
                 "*|DW-CP04", "*|DW-CP16",
                 "Avigilon|ENC-*",
                 "ACTI|V32", "ACTi Corporation|V32",
+                "ACTI|V23", "ACTi Corporation|V23",
                 "BOSCH|VIP-X1600-XFM4",
                 "Axis|AXISM7014*",
                 "Axis|AXISM7016*",
@@ -536,7 +538,7 @@
                 "BOSCH|VJT-X40XF-E",
                 "CAP|NVN4100",
                 "DS-6701HWI|Embedded Net DVS",
-                "DS-6716HQHI-SATA|Embedded_Net_DVR", 
+                "DS-6716HQHI-SATA|Embedded_Net_DVR",
                 "Hangzhou Hikvision Digital Technology Co., Ltd|DS-6716HQHI-SATA",
                 "GrandStream|GXV3504",
                 "Hikvision|DS-6701*",
@@ -579,6 +581,10 @@
                 "TCS-300|TCAM"
             ],
             "analogEncoder": true
+        },
+        {
+            "keys": ["UNIVIEW|DVS4116"],
+            "enableAdditionalManufacturerNormalization": true
         },
 
         {
@@ -702,7 +708,9 @@
         {
             "keys": [
                 "ACTI|V32",
-                "ACTi Corporation|V32"
+                "ACTi Corporation|V32",
+                "ACTI|V23",
+                "ACTi Corporation|V23"
             ],
             "forceONVIF": true
         },
@@ -713,6 +721,13 @@
             "DW|DWC-MB421TIR","Win4NET Co., Ltd.|Clebo-BL20","DW|DWC-MD421D"
             ],
             "ptzCapabilities": "ContinuousZoomCapability"
+        },
+        {
+            "keys": [
+                "AXIS|AXISP8221",
+                "AXIS|AXISC3003E"
+            ],
+            "noVideoSupport": true
         },
         {
             "keys": [
@@ -773,7 +788,7 @@
         },
         {
             "keys": [
-                "ACTi|V32"
+                "ACTi|V32", "ACTi|V23"
             ],
             "defaultAR": "16x9",
             "ptzTraits": "EightWayPtz"
@@ -923,6 +938,10 @@
             "keys": ["DW|DWC-PF5M1TIR"],
 			"fixWrongInputPortNumber": true
 		},
+        {
+            "keys": ["DW|DWC-PF5M1TIR"],
+	  		    "fixWrongInputPortNumber": true
+        },
         {
             "keys": [
                 "DW|DWC-MPTZ20X",
@@ -2202,7 +2221,7 @@
                     "VideoEncoderToken_301,VideoEncoderToken_302"
                 ]
             }
-        },        
+        },
         {
             "keys": [
                 "IQA*|IQEYE*"
@@ -2344,7 +2363,7 @@
             "ignoreMultisensors": true,
             "shouldAppearAsSingleChannel": true,
             "videoLayout": "width=4;height=1;sensors=0,1,2,3"
-        },   
+        },
         {
             "keys":[
             "Axis|AXISQ6000*","AXIS|AXISQ6000*","Axis|Q6000*","AXIS|Q6000*"
@@ -2391,7 +2410,7 @@
             "ignoreMultisensors": true,
             "shouldAppearAsSingleChannel": true,
             "videoLayout": "width=2;height=2;sensors=0,1,2,3"
-        },             
+        },
         {
             "keys": ["*|CMD-C244","COMMANDCO|*","ONVIF|NTH-IP4T"],
             "onvifManufacturerReplacement": "Hikvision"
@@ -2474,7 +2493,7 @@
                     "VideoEncoderConfigurationToken016,VideoEncoderConfigurationToken034"
                 ]
             }
-        },        
+        },
         {
             "keys": [
                 "HIKVISION|DS-2DE4A220IW*", "Hikvision|DS-2DE4A220IW*"

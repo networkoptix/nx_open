@@ -8,7 +8,6 @@ set(product.name.short "hdwitness_cn")
 set(company.name "Network Optix")
 
 set(product.appName "hdwitness")
-set(display.mobile.name "Nx Mobile")
 set(uri.protocol "nx-vms")
 set(liteDeviceName "nx1")
 
@@ -54,7 +53,7 @@ set(freeLicenseCount "4")
 set(freeLicenseKey "0000-0000-0000-0007")
 
 # Installer Customizations
-set(installer.language "zh_CN")
+set(installerLanguage "zh_CN")
 set(installer.cultures "zh-cn")
 set(sign.password "qweasd123")
 set(sign.cer "app.p12")

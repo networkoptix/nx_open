@@ -44,7 +44,7 @@ public:
 
     EventManager& eventManager();
 
-    ec2::SyncronizationEngine& ec2SyncronizationEngine();
+    data_sync_engine::SyncronizationEngine& ec2SyncronizationEngine();
 
     AbstractSystemHealthInfoProvider& systemHealthInfoProvider();
 
@@ -71,7 +71,7 @@ private:
     TemporaryAccountPasswordManager m_tempPasswordManager;
     AccountManager m_accountManager;
     EventManager m_eventManager;
-    ec2::SyncronizationEngine m_ec2SyncronizationEngine;
+    data_sync_engine::SyncronizationEngine m_ec2SyncronizationEngine;
     ec2::VmsP2pCommandBus m_vmsP2pCommandBus;
     std::unique_ptr<AbstractSystemHealthInfoProvider> m_systemHealthInfoProvider;
     nx::utils::StandaloneTimerManager m_timerManager;

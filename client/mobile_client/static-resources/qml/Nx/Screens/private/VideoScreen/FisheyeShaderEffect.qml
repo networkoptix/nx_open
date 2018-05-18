@@ -32,23 +32,6 @@ ShaderEffect
     property matrix4x4 viewRotationMatrix
     property vector2d viewShift
 
-    /* Feedback parameters (to be queried from outside): */
-
-    readonly property real fov: // field of view in degrees
-    {
-        switch (viewProjectionType)
-        {
-            case Utils3D.SphereProjectionTypes.Equidistant:
-                return 180.0 / viewScale
-
-            case Utils3D.SphereProjectionTypes.Equisolid:
-                return 4.0 * Utils3D.degrees(Math.asin(1.0 / (viewScale * Math.sqrt(2.0))))
-
-            default: // Utils3D.SphereProjectionTypes.Stereographic
-                return 4.0 * Utils3D.degrees(Math.atan(1.0 / viewScale))
-        }
-    }
-
     /* Shader uniforms: */
 
     ShaderEffectSource
@@ -63,7 +46,9 @@ ShaderEffect
 
     readonly property var sourceTexture: shaderSource
 
-    readonly property vector2d projectionCoordsScale:
+    readonly property vector2d projectionCoordsScale: calculateProjectionScale(viewScale)
+
+    function calculateProjectionScale(viewScale)
     {
         var targetAspectRatio = width / height
         return (targetAspectRatio < 1.0
@@ -227,6 +212,55 @@ ShaderEffect
                         float r2 = dot(coords, coords);
                         return vec3(coords * 2.0, r2 - 1.0) / (r2 + 1.0);
                     }"
+            }
+        }
+    }
+
+    function fov(scale) //< Field of view in degrees.
+    {
+        switch (viewProjectionType)
+        {
+            case Utils3D.SphereProjectionTypes.Equidistant:
+                return 180.0 / scale
+
+            case Utils3D.SphereProjectionTypes.Equisolid:
+                return 4.0 * Utils3D.degrees(Math.asin(1.0 / (scale * Math.sqrt(2.0))))
+
+            default: // Utils3D.SphereProjectionTypes.Stereographic
+                return 4.0 * Utils3D.degrees(Math.atan(1.0 / scale))
+        }
+    }
+
+    function pixelToProjection(x, y, scale)
+    {
+        return Qt.vector2d(x / width, y / height).minus(viewCenter)
+            .times(calculateProjectionScale(scale))
+    }
+
+    function unproject(projectionCoords)
+    {
+        switch (viewProjectionType)
+        {
+            case Utils3D.SphereProjectionTypes.Equidistant:
+            {
+                var r = Math.min(projectionCoords.length(), 2.0)
+                var theta = r * Math.PI / 2.0
+                var xy = projectionCoords.times(Math.sin(theta) / r)
+                return Qt.vector3d(xy.x, xy.y, -Math.cos(theta))
+            }
+
+            case Utils3D.SphereProjectionTypes.Equisolid:
+            {
+                var r2 = Math.min(projectionCoords.dotProduct(projectionCoords), 2.0)
+                var xy = projectionCoords.times(Math.sqrt(2.0 - r2))
+                return Qt.vector3d(xy.x, xy.y, r2 - 1.0)
+            }
+
+            default: // Utils3D.SphereProjectionTypes.Stereographic
+            {
+                var r2 = projectionCoords.dotProduct(projectionCoords)
+                var xy = projectionCoords.times(2.0)
+                return Qt.vector3d(xy.x, xy.y, r2 - 1.0).times(1.0 / (r2 + 1.0))
             }
         }
     }

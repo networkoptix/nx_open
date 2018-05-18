@@ -64,6 +64,24 @@ protected:
         assertUpdateRegistryContent();
     }
 
+    void thenManuallyAddedDataShouldBeFoundCorrectly()
+    {
+        FileData fileData;
+        auto resultCode = m_updateRegistry->findUpdateFile(
+            UpdateFileRequestData(
+                "any_cloud_host", "any_customization",
+                QnSoftwareVersion(3, 0, 0, 9872), macosx(), false),
+            &fileData);
+        assertFoundWithManualData(resultCode, fileData, m_manualData1);
+
+        resultCode = m_updateRegistry->findUpdateFile(
+            UpdateFileRequestData(
+                "any_cloud_host", "any_customization",
+                QnSoftwareVersion(3, 0, 0, 9872), ubuntuX64(), true),
+            &fileData);
+        assertFoundWithManualData(resultCode, fileData, m_manualData2);
+    }
+
 private:
     info::AsyncUpdateChecker m_asyncUpdateChecker;
     AbstractUpdateRegistryPtr m_updateRegistry;
@@ -219,20 +237,6 @@ private:
                 QnSoftwareVersion(3, 0, 0, 9872), armRpi(), false),
             &fileData);
         assertFindResult(resultCode, fileData, false);
-
-        resultCode = m_updateRegistry->findUpdateFile(
-            UpdateFileRequestData(
-                "any_cloud_host", "any_customization",
-                QnSoftwareVersion(3, 0, 0, 9872), macosx(), false),
-            &fileData);
-        assertFoundWithManualData(resultCode, fileData, m_manualData1);
-
-        resultCode = m_updateRegistry->findUpdateFile(
-            UpdateFileRequestData(
-                "any_cloud_host", "any_customization",
-                QnSoftwareVersion(3, 0, 0, 9872), ubuntuX64(), true),
-            &fileData);
-        assertFoundWithManualData(resultCode, fileData, m_manualData2);
     }
 
     void assertFoundWithManualData(
@@ -272,8 +276,9 @@ TEST_F(AsyncUpdateChecker, CorrectUpdateRegistryProvided)
 {
     whenMockupDataProviderHasBeenSetUp();
     whenAsyncCheckRequestHasBeenIssued();
-    whenSomeManualDataHasBeenAdded();
     thenCorrectUpdateRegistryShouldBeReturned();
+    whenSomeManualDataHasBeenAdded();
+    thenManuallyAddedDataShouldBeFoundCorrectly();
 }
 
 } // namespace test

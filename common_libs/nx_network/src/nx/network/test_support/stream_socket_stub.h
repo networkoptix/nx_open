@@ -32,18 +32,19 @@ public:
     virtual bool setKeepAlive(boost::optional<KeepAliveOptions> info) override;
     virtual bool getKeepAlive(boost::optional<KeepAliveOptions>* result) const override;
 
-    virtual void cancelIOSync(nx::network::aio::EventType eventType) override;
-
     QByteArray read();
     void setConnectionToClosedState();
     void setForeignAddress(const SocketAddress& endpoint);
 
     void setPostDelay(boost::optional<std::chrono::milliseconds> postDelay);
 
+protected:
+    virtual void cancelIoInAioThread(nx::network::aio::EventType eventType) override;
+
 private:
     nx::Buffer* m_readBuffer = nullptr;
     IoCompletionHandler m_readHandler;
-    nx::network::TCPSocket m_delegatee;
+    nx::network::TCPSocket m_delegate;
     nx::utils::bstream::Pipe m_reflectingPipeline;
     SocketAddress m_foreignAddress;
     boost::optional<KeepAliveOptions> m_keepAliveOptions;

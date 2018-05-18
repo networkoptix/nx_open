@@ -32,11 +32,14 @@ EventMessageBus::~EventMessageBus()
     }
 }
 
-int EventMessageBus::deliverAction(const vms::event::AbstractActionPtr&action, const QnUuid& dstPeer)
+int EventMessageBus::deliverAction(const vms::event::AbstractActionPtr& action, const QnUuid& dstPeer)
 {
+    nx::vms::api::EventActionData actionData;
+    ec2::fromResourceToApi(action, actionData);
+
     ec2::AbstractECConnectionPtr ec2Connection = commonModule()->ec2Connection();
-    int handle = ec2Connection->getBusinessEventManager(Qn::kSystemAccess)->sendBusinessAction(
-        action, dstPeer, this, &EventMessageBus::at_DeliverActionFinished);
+    int handle = ec2Connection->getEventRulesManager(Qn::kSystemAccess)->sendEventAction(
+        actionData, dstPeer, this, &EventMessageBus::at_DeliverActionFinished);
 
     QnMutexLocker lock(&m_mutex);
     m_sendingActions.insert(handle, action);

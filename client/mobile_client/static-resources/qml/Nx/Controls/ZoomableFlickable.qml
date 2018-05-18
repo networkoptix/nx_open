@@ -1,4 +1,5 @@
 import QtQuick 2.6
+import nx.client.core 1.0
 
 Item
 {
@@ -6,8 +7,11 @@ Item
 
     property string message
 
+    property alias contentX: flick.contentX
+    property alias contentY: flick.contentY
     property alias contentWidth: flick.contentWidth
     property alias contentHeight: flick.contentHeight
+
     default property alias data: contentItem.data
 
     property real minContentWidth: 0
@@ -24,11 +28,14 @@ Item
     property real allowedTopMargin: 0
     property real allowedBottomMargin: 0
 
-    readonly property alias contentX: flick.contentX
-    readonly property alias contentY: flick.contentY
+    readonly property alias flickable: flick
+    readonly property real contentScale: Geometry.scaleFactor(
+        Qt.size(width, height), Qt.size(contentWidth, contentHeight))
 
     signal clicked()
-    signal doubleClicked()
+    signal doubleClicked(int mouseX, int mouseY)
+
+    property var doubleTapStartCheckFuncion
 
     function resizeContent(width, height, animate, forceSize)
     {
@@ -55,6 +62,8 @@ Item
 
         flickableDirection: Flickable.HorizontalAndVerticalFlick
         boundsBehavior: allowOvershoot ? Flickable.DragOverBounds : Flickable.StopAtBounds
+
+        interactive: !mouseArea.doubleTapScaleMode
 
         Item
         {
@@ -181,13 +190,8 @@ Item
 
             if (animate)
             {
-                widthAnimation.to = w
-                heightAnimation.to = h
-                xAnimation.to = x
-                yAnimation.to = y
-
+                setAnimationParameters(x, y , w, h, Easing.Linear)
                 fixMargins()
-
                 boundsAnimation.start()
             }
             else
@@ -201,6 +205,26 @@ Item
 
                 bindMargins()
             }
+        }
+
+        function setAnimationParameters(x, y, width, height, easing)
+        {
+            widthAnimation.easing.type = easing
+            heightAnimation.easing.type = easing
+            xAnimation.easing.type = easing
+            yAnimation.easing.type = easing
+
+            widthAnimation.to = width
+            heightAnimation.to = height
+            xAnimation.to = x
+            yAnimation.to = y
+        }
+
+        function animateTo(x, y, width, height, easing)
+        {
+            boundsAnimation.stop()
+            setAnimationParameters(x,y, width, height, easing)
+            boundsAnimation.start()
         }
 
         Component.onCompleted:
@@ -269,7 +293,7 @@ Item
         property real initialContentX
         property real initialContentY
 
-        onPinchStarted:
+        function startPinch()
         {
             boundsAnimation.stop()
             initialWidth = flick.contentWidth
@@ -283,50 +307,144 @@ Item
             flick.fixMargins()
         }
 
-        onPinchUpdated:
-        {
-            flick.contentX += pinch.previousCenter.x - pinch.center.x
-            flick.contentY += pinch.previousCenter.y - pinch.center.y
-
-            var cx = pinch.center.x + flick.contentX
-            var cy = pinch.center.y + flick.contentY
-
-            var scale = pinch.scale
-
-            var w = initialWidth * scale
-            var h = initialHeight * scale
-
-            if (w > maxContentWidth)
-                scale = maxContentWidth / initialWidth
-            if (h > maxContentHeight)
-                scale = Math.min(scale, maxContentHeight / initialHeight)
-
-            flick.resizeContent(initialWidth * scale, initialHeight * scale, Qt.point(cx, cy))
-        }
-
-        onPinchFinished:
+        function finishPinch()
         {
             flick.animating = true
             flick.fixMargins()
             flick.animateToBounds()
         }
 
+        function updatePinch(center, previousCenter, targetScale)
+        {
+            flick.contentX += previousCenter.x - center.x
+            flick.contentY += previousCenter.y - center.y
+
+            var cx = center.x + flick.contentX
+            var cy = center.y + flick.contentY
+
+            var w = initialWidth * targetScale
+            var h = initialHeight * targetScale
+
+            if (w > maxContentWidth)
+                targetScale = maxContentWidth / initialWidth
+
+            w = initialWidth * targetScale
+            h = initialHeight * targetScale
+
+            if (h > maxContentHeight)
+                targetScale = Math.min(targetScale, maxContentHeight / initialHeight)
+
+            if (targetScale < 0.1)
+                targetScale = 0.1
+            flick.resizeContent(initialWidth * targetScale, initialHeight * targetScale, Qt.point(cx, cy))
+        }
+
+        onPinchStarted: startPinch()
+        onPinchUpdated: updatePinch(pinch.center, pinch.previousCenter, pinch.scale)
+        onPinchFinished: finishPinch()
+
+        enabled: !flick.dragging
+
         MouseArea
         {
             id: mouseArea
 
-            readonly property real zoomFactor: 1.1
-            readonly property real wheelStep: 120
+            property var doubleTapDownPos: undefined
+            property bool doubleTapScaleMode: false
 
             anchors.fill: parent
 
             propagateComposedEvents: true
 
-            onDoubleClicked: rootItem.doubleClicked()
-            onClicked:
+            onDoubleTapDownPosChanged:
             {
-                rootItem.clicked()
-                mouse.accepted = false
+                // doubleTapDownPos can be "undefined".
+                flick.interactive = doubleTapDownPos ? false : true
+            }
+
+            onDoubleTapScaleModeChanged:
+            {
+                if (doubleTapScaleMode)
+                {
+                    pinchArea.startPinch()
+                }
+                else
+                {
+                    doubleTapDownPos = undefined
+                    pinchArea.finishPinch()
+                }
+            }
+
+            onPositionChanged:
+            {
+                if (!doubleTapDownPos)
+                    return
+
+                var currentVector = Qt.vector2d(
+                    doubleTapDownPos.x - mouseX,
+                    doubleTapDownPos.y - mouseY)
+
+                if (!doubleTapScaleMode)
+                {
+                    var minDoubleTapStartLength = 15
+                    if (currentVector.length() > minDoubleTapStartLength)
+                        doubleTapScaleMode = true
+                }
+
+                if (!doubleTapScaleMode)
+                    return
+
+                var sideSize = Math.min(flick.width, flick.height) / 2
+                var scaleChange = 1 + Math.abs(currentVector.y / sideSize)
+                var targetScale = currentVector.y > 0 ? 1 / scaleChange : scaleChange
+                pinchArea.updatePinch(doubleTapDownPos, doubleTapDownPos, targetScale)
+            }
+
+            onDoubleClicked:
+            {
+                clickFilterTimer.stop()
+                doubleClickFilter.restart();
+
+                var mousePosition = Qt.point(mouseX, mouseY)
+                if (rootItem.doubleTapStartCheckFuncion
+                    && rootItem.doubleTapStartCheckFuncion(mousePosition))
+                {
+                    doubleTapDownPos = mousePosition
+                }
+            }
+
+            onCanceled:
+            {
+                doubleTapScaleMode = false
+                doubleTapDownPos = undefined
+            }
+
+            onReleased:
+            {
+                doubleTapScaleMode = false
+                doubleTapDownPos = undefined
+                if (!doubleClickFilter.running)
+                    return
+
+                doubleClickFilter.stop()
+                rootItem.doubleClicked(mouse.x, mouse.y)
+            }
+
+            onClicked: clickFilterTimer.restart()
+
+            Timer
+            {
+                id: clickFilterTimer
+
+                interval: 200
+
+                onTriggered: rootItem.clicked()
+            }
+
+            Timer
+            {
+                id: doubleClickFilter
+                interval: 200
             }
 
             onWheel:
@@ -334,10 +452,7 @@ Item
                 var cx = wheel.x + flick.contentX
                 var cy = wheel.y + flick.contentY
 
-                var scale = wheel.angleDelta.y / wheelStep * zoomFactor
-                if (scale < 0)
-                    scale = 1 / -scale
-
+                var scale = wheel.angleDelta.y > 0 ? 1.1 : 0.9
                 var w = flick.contentWidth * scale
                 var h = flick.contentHeight * scale
 

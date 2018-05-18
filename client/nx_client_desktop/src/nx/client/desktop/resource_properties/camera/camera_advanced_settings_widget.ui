@@ -30,31 +30,7 @@
     <number>0</number>
    </property>
    <item>
-    <widget class="nx::client::desktop::Panel" name="topPanel" native="true">
-     <layout class="QVBoxLayout" name="verticalLayout_6">
-      <property name="leftMargin">
-       <number>16</number>
-      </property>
-      <property name="topMargin">
-       <number>16</number>
-      </property>
-      <property name="rightMargin">
-       <number>16</number>
-      </property>
-      <property name="bottomMargin">
-       <number>16</number>
-      </property>
-      <item>
-       <widget class="nx::client::desktop::InputField" name="cameraIdInputField" native="true"/>
-      </item>
-      <item>
-       <widget class="nx::client::desktop::InputField" name="primaryStreamUrlInputField" native="true"/>
-      </item>
-      <item>
-       <widget class="nx::client::desktop::InputField" name="secondaryStreamUrlInputField" native="true"/>
-      </item>
-     </layout>
-    </widget>
+    <widget class="nx::client::desktop::LegacyCameraSettingsStreamsPanel" name="streamsPanel" native="true"/>
    </item>
    <item>
     <widget class="Line" name="line">
@@ -75,6 +51,9 @@
    <item>
     <widget class="QTabWidget" name="tabWidget">
      <widget class="QWidget" name="noSettingsPage">
+      <attribute name="title">
+       <string/>
+      </attribute>
       <layout class="QVBoxLayout" name="verticalLayout_4">
        <item>
         <widget class="QLabel" name="noSettingsLabel">
@@ -89,6 +68,9 @@
       </layout>
      </widget>
      <widget class="QWidget" name="manualPage">
+      <attribute name="title">
+       <string/>
+      </attribute>
       <layout class="QVBoxLayout" name="verticalLayout" stretch="0">
        <item>
         <widget class="nx::client::desktop::CameraAdvancedParamsWidget" name="cameraAdvancedParamsWidget" native="true"/>
@@ -96,6 +78,9 @@
       </layout>
      </widget>
      <widget class="QWidget" name="webPage">
+      <attribute name="title">
+       <string/>
+      </attribute>
       <layout class="QVBoxLayout" name="verticalLayout_3">
        <item>
         <widget class="QWebView" name="webView" native="true">
@@ -125,15 +110,9 @@
    <container>1</container>
   </customwidget>
   <customwidget>
-   <class>nx::client::desktop::InputField</class>
+   <class>nx::client::desktop::LegacyCameraSettingsStreamsPanel</class>
    <extends>QWidget</extends>
-   <header location="global">nx/client/desktop/common/widgets/input_field.h</header>
-   <container>1</container>
-  </customwidget>
-  <customwidget>
-   <class>nx::client::desktop::Panel</class>
-   <extends>QWidget</extends>
-   <header location="global">nx/client/desktop/common/widgets/panel.h</header>
+   <header location="global">nx/client/desktop/resource_properties/camera/widgets/legacy_camera_settings_streams_panel.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

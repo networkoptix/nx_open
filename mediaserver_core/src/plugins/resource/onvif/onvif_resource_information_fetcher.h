@@ -1,6 +1,8 @@
 #pragma once
 #if defined(ENABLE_ONVIF)
 
+#include <set>
+
 #include <QtCore/QCoreApplication>
 
 #include "core/resource_management/resource_searcher.h"
@@ -16,11 +18,13 @@ struct EndpointAdditionalInfo
     QString mac;
     QString uniqId;
     QString discoveryIp;
+    std::set<QString> additionalManufacturers;
 
     QString defaultLogin;
     QString defaultPassword;
 
-    EndpointAdditionalInfo() {}
+    EndpointAdditionalInfo() = default;
+    EndpointAdditionalInfo(const EndpointAdditionalInfo& src) = default;
 
     EndpointAdditionalInfo(
         const QString& newName,
@@ -28,27 +32,17 @@ struct EndpointAdditionalInfo
         const QString& newLocation,
         const QString& newMac,
         const QString& newUniqId,
-        const QString& newDiscoveryIp):
-
+        const QString& newDiscoveryIp,
+        const std::set<QString> additionalManufacturers = std::set<QString>())
+        :
         name(newName),
         manufacturer(newManufacturer),
         location(newLocation),
         mac(newMac),
         uniqId(newUniqId),
-        discoveryIp(newDiscoveryIp)
+        discoveryIp(newDiscoveryIp),
+        additionalManufacturers(additionalManufacturers)
     {
-
-    }
-
-    EndpointAdditionalInfo(const EndpointAdditionalInfo& src) :
-        name(src.name),
-        manufacturer(src.manufacturer),
-        location(src.location),
-        mac(src.mac),
-        uniqId(src.uniqId),
-        discoveryIp(src.discoveryIp)
-    {
-
     }
 };
 

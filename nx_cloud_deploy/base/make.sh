@@ -4,7 +4,7 @@
 . ../common.sh
 
 MODULE=base
-VERSION=1.7
+VERSION=2.01
 
 function stage()
 {

@@ -86,7 +86,12 @@ void ProxyHandler::sendResponse(
     boost::optional<nx::network::http::Response> responseMessage)
 {
     if (responseMessage)
+    {
         *response() = std::move(*responseMessage);
+        nx::network::http::insertOrReplaceHeader(
+            &response()->headers,
+            nx::network::http::HttpHeader("Access-Control-Allow-Origin", "*"));
+    }
 
     nx::utils::swapAndCall(m_requestCompletionHandler, std::move(requestResult));
 }
@@ -278,6 +283,8 @@ void ProxyHandler::onConnected(
         std::move(m_request),
         this,
         std::move(connection));
+    m_requestProxyWorker->setTargetHostConnectionInactivityTimeout(
+        m_settings.proxy().targetConnectionInactivityTimeout);
     m_requestProxyWorker->start();
 }
 

@@ -184,7 +184,7 @@ private:
     SystemManagerStub m_systemManagerStub;
     SystemHealthInfoProviderStub m_systemHealthInfoProviderStub;
     VmsGatewayStub m_vmsGatewayStub;
-    std::unique_ptr<ec2::SyncronizationEngine> m_syncronizationEngine;
+    std::unique_ptr<data_sync_engine::SyncronizationEngine> m_syncronizationEngine;
     std::unique_ptr<cdb::SystemMergeManager> m_systemMergeManager;
     nx::utils::SyncQueue<api::ResultCode> m_mergeResults;
     boost::optional<std::future<void>> m_systemMergeManagerDestroyed;
@@ -199,7 +199,7 @@ private:
 
         m_ownerAccount = insertRandomAccount();
 
-        m_syncronizationEngine = std::make_unique<ec2::SyncronizationEngine>(
+        m_syncronizationEngine = std::make_unique<data_sync_engine::SyncronizationEngine>(
             QnUuid::createUuid(),
             m_settings.p2pDb(),
             &queryExecutor());

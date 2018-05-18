@@ -88,12 +88,12 @@ QnCloudManagementWidget::QnCloudManagementWidget(QWidget *parent):
     connect(ui->goToCloudButton, &QPushButton::clicked, this,
         [this]
         {
-            QDesktopServices::openUrl(m_cloudUrlHelper->mainUrl().toQUrl());
+            QDesktopServices::openUrl(m_cloudUrlHelper->mainUrl());
         });
     connect(ui->createAccountButton, &QPushButton::clicked, this,
         [this]
         {
-            QDesktopServices::openUrl(m_cloudUrlHelper->createAccountUrl().toQUrl());
+            QDesktopServices::openUrl(m_cloudUrlHelper->createAccountUrl());
         });
 
     connect(ui->unlinkButton, &QPushButton::clicked, this, &QnCloudManagementWidget::unlinkFromCloud);

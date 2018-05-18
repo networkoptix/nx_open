@@ -755,7 +755,8 @@ ResultCode CommonUpdateRegistry::findUpdateFile(
             && manualDataEntry.nxVersion > updateRequestData.currentNxVersion
             && manualDataEntry.osVersion == updateRequestData.osVersion)
         {
-            *outFileData = FileData(manualDataEntry.file, QString(), -1, QByteArray());
+            if (outFileData)
+                *outFileData = FileData(manualDataEntry.file, QString(), -1, QByteArray());
             return ResultCode::ok;
         }
     }
@@ -849,6 +850,16 @@ ResultCode CommonUpdateRegistry::latestUpdate(
     const UpdateRequestData& updateRequestData,
     QnSoftwareVersion* outSoftwareVersion) const
 {
+    for (const auto& md: m_manualData)
+    {
+        if (updateRequestData.currentNxVersion < md.nxVersion)
+        {
+            if (outSoftwareVersion)
+                *outSoftwareVersion = md.nxVersion;
+            return ResultCode::ok;
+        }
+    }
+
     CustomizationData customizationData;
     if (!hasUpdateForCustomizationAndVersion(updateRequestData, &customizationData))
         return ResultCode::noData;
@@ -871,8 +882,18 @@ ResultCode CommonUpdateRegistry::latestUpdate(
 
 void CommonUpdateRegistry::addFileData(const ManualFileData& manualFileData)
 {
-    if (m_manualData.contains(manualFileData))
-        return;
+    for (auto& selfManualFileData: m_manualData)
+    {
+        if (selfManualFileData.file == manualFileData.file)
+        {
+            for (const auto& peer: manualFileData.peers)
+            {
+                if (!selfManualFileData.peers.contains(peer))
+                    selfManualFileData.peers.append(peer);
+            }
+            return;
+        }
+    }
 
     m_manualData.append(manualFileData);
 }
@@ -914,6 +935,17 @@ void CommonUpdateRegistry::merge(AbstractUpdateRegistry* other)
         if (!m_manualData.contains(otherManualData))
             m_manualData.append(otherManualData);
     }
+}
+
+QList<QnUuid> CommonUpdateRegistry::additionalPeers(const QString& fileName) const
+{
+    for (const auto& md: m_manualData)
+    {
+        if (md.file == fileName)
+            return md.peers;
+    }
+
+    return QList<QnUuid>();
 }
 
 } // namespace impl

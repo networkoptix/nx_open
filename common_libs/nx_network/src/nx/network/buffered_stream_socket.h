@@ -14,22 +14,15 @@ class NX_NETWORK_API BufferedStreamSocket:
     public StreamSocketDelegate
 {
 public:
-    BufferedStreamSocket(std::unique_ptr<AbstractStreamSocket> socket);
+    BufferedStreamSocket(
+        std::unique_ptr<AbstractStreamSocket> socket,
+        nx::Buffer preReadData);
 
     /**
      * Handler will be called as soon as there is some data ready to recv.
-     * NOTE:: is not thread safe (conflicts with recv and recvAsync)
+     * NOTE: is not thread safe (conflicts with recv and recvAsync)
      */
     void catchRecvEvent(nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode)> handler);
-
-    enum class Inject { only, replace, begin, end };
-
-    /**
-     * Injects data to internal buffer if we need to pass socket to another processor but read
-     * more we could process ourserve.
-     * NOTE:: does not affect catchRecvEvent and is not thread safe (conflicts with recv and recvAsync)
-     */
-    void injectRecvData(Buffer buffer, Inject injectType = Inject::only);
 
     // TODO: Usefull if we want to reuse connection when user is done with it.
     // void setDoneHandler(nx::utils::MoveOnlyFunc<void(std::unique_ptr<AbstractStreamSocket>)>);

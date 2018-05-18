@@ -9,16 +9,23 @@ ZoomableFlickable
 {
     id: zf
 
-    property alias mediaPlayer: video.mediaPlayer
-    property alias resourceHelper: video.resourceHelper
+    property alias mediaPlayer: content.mediaPlayer
+    property alias resourceHelper: content.resourceHelper
 
     property real maxZoomFactor: 4
     property alias videoCenterHeightOffsetFactor: content.videoCenterHeightOffsetFactor
     property size fitSize: content.boundedSize(width, height)
     function getMoveViewportData(position)
     {
-        var mapped = mapToItem(video, position.x, position.y)
-        return video.getMoveViewportData(mapped)
+        var videoItem = content.videoOutput
+        var mapped = mapToItem(videoItem, position.x, position.y)
+        return videoItem.getMoveViewportData(mapped)
+    }
+
+    Connections
+    {
+        target: resourceHelper
+        onResourceIdChanged: to1xScale()
     }
 
     minContentWidth: width
@@ -36,43 +43,118 @@ ZoomableFlickable
                 : content.sourceSize.height,
             height)
 
-    readonly property bool zoomed: contentWidth > width * 1.05 || contentHeight > height * 1.05
-
-    allowedLeftMargin: zoomed ? width / 4 - content.leftPadding : 0
-    allowedRightMargin: zoomed ? width / 4 - content.rightPadding : 0
-    allowedTopMargin: zoomed ? height / 4 - content.topPadding : 0
-    allowedBottomMargin: zoomed ? height / 4 - content.bottomPadding : 0
+    allowedLeftMargin: d.allowedLeftMargin(contentWidth, contentHeight)
+    allowedRightMargin: d.allowedRightMargin(contentWidth, contentHeight)
+    allowedTopMargin: d.allowedTopMargin(contentWidth, contentHeight)
+    allowedBottomMargin: d.allowedBottomMargin(contentWidth, contentHeight)
 
     clip: true
 
-    VideoPositioner
+    function to1xScale()
+    {
+        d.toggleScale(false, width / 2, height / 2)
+    }
+
+    doubleTapStartCheckFuncion:
+        function(initialPosition)
+        {
+            var videoItem = content.videoOutput
+            var videoMappedPosition = mapToItem(videoItem, initialPosition.x, initialPosition.y)
+            return videoItem.pointInVideo(videoMappedPosition);
+        }
+
+    onDoubleClicked:
+    {
+        var videoItem = content.videoOutput
+        var videoMappedPosition = mapToItem(videoItem, mouseX, mouseY)
+        if (!videoItem.pointInVideo(videoMappedPosition))
+            return
+
+        var twiceTargetScale = 2
+        var eps = 0.000001
+        var zoomIn = zf.contentScale < twiceTargetScale - eps
+
+        d.toggleScale(zoomIn, mouseX, mouseY)
+    }
+
+    QtObject
+    {
+        id: d
+
+        function allowedMargin(targetWidth, targetHeight, size, padding, factor)
+        {
+            var zoomed = targetWidth > width * 1.05 || targetHeight > height * 1.05;
+            return zoomed ? size * factor - padding : 0
+        }
+
+        function allowedLeftMargin(targetWidth, targetHeight)
+        {
+            return allowedMargin(targetWidth, targetHeight, width, leftPadding + content.leftPadding, 0.3)
+        }
+
+        function allowedRightMargin(targetWidth, targetHeight)
+        {
+            return allowedMargin(targetWidth, targetHeight, width, rightPadding + content.rightPadding, 0.3)
+        }
+
+        function allowedTopMargin(targetWidth, targetHeight)
+        {
+            return allowedMargin(targetWidth, targetHeight, height, topPadding + content.topPadding, 0.3)
+        }
+
+        function allowedBottomMargin(targetWidth, targetHeight)
+        {
+            return allowedMargin(targetWidth, targetHeight, height, bottomPadding + content.bottomPadding, 0.5)
+        }
+
+        function toggleScale(to2x, mouseX, mouseY)
+        {
+            var targetScale = to2x ? 2 : 1
+
+            var baseWidth = contentWidth / zf.contentScale
+            var baseHeight = contentHeight / zf.contentScale
+
+            flickable.animating = true
+            flickable.fixMargins()
+
+            var point = mapToItem(content, mouseX, mouseY)
+            var dx = point.x / zf.contentScale
+            var dy = point.y / zf.contentScale
+
+            var newContentWidth = baseWidth * targetScale
+            var newContentHeight = baseHeight * targetScale
+
+            var newX = to2x ? (width / 2 - targetScale * dx) : (width - newContentWidth) / 2
+            var newY = to2x ? (height / 2 - targetScale * dy) : (height - newContentHeight) / 2
+
+            var leftMargin = Math.abs(d.allowedLeftMargin(newContentWidth, newContentHeight))
+            var rightMargin = Math.abs(d.allowedRightMargin(newContentWidth, newContentHeight))
+            var topMargin = Math.abs(d.allowedTopMargin(newContentWidth, newContentHeight))
+            var bottomMargin = Math.abs(d.allowedBottomMargin(newContentWidth, newContentHeight))
+
+            if (newX > leftMargin)
+                newX = leftMargin - 1
+            if (newX + newContentWidth < width - rightMargin)
+                newX = width - newContentWidth - rightMargin + 1
+
+            if (newY > topMargin)
+                newY = topMargin - 1
+            if (newY + newContentHeight < height - bottomMargin)
+                newY = height - newContentHeight - bottomMargin + 1
+
+            var easing = newContentWidth > contentWidth ? Easing.InOutCubic : Easing.OutCubic
+            flickable.animateTo(-newX, -newY, newContentWidth, newContentHeight, easing)
+        }
+    }
+
+    MultiVideoPositioner
     {
         id: content
 
+        resourceHelper: zf.resourceHelper
+
         width: contentWidth
         height: contentHeight
-        sourceSize: Qt.size(video.implicitWidth, video.implicitHeight)
-        videoRotation: resourceHelper ? resourceHelper.customRotation : 0
-        customAspectRatio:
-        {
-            var aspectRatio = resourceHelper ? resourceHelper.customAspectRatio : 0.0
-            if (aspectRatio === 0.0)
-            {
-                if (mediaPlayer)
-                    aspectRatio = mediaPlayer.aspectRatio
-                else
-                    aspectRatio = sourceSize.width / sourceSize.height
-            }
-
-            var layoutSize = resourceHelper ? resourceHelper.layoutSize : Qt.size(1, 1)
-            aspectRatio *= layoutSize.width / layoutSize.height
-
-            return aspectRatio
-        }
-
-        item: video
-
-        MultiVideoOutput { id: video }
 
         onSourceSizeChanged: fitToBounds()
     }
@@ -87,6 +169,6 @@ ZoomableFlickable
 
     function clear()
     {
-        video.clear()
+        content.videoOutput.clear()
     }
 }

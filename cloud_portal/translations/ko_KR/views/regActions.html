@@ -51,9 +51,9 @@
             <div class="col-sm-4">
                 <div><span class="help-block" ng-if="registerForm.registerEmail.$touched && registerForm.registerEmail.$error.required">이메일이 필요합니다</span></div>
 
-                <div><span class="help-block" ng-if="registerForm.registerEmail.$touched && registerForm.registerEmail.$error.email">유효한 이메일을 입력하십시오</span></div>
+                <div><span class="help-block" ng-if="registerForm.registerEmail.$touched && registerForm.registerEmail.$error.email">유효한 이메일을 입력하여 주시기 바랍니다</span></div>
 
-                <div><span class="help-block" ng-if="registerForm.registerEmail.$error.alreadyExists">이 이메일은 이미 {{PRODUCT_NAME}} 에 등록되었습니다</span></div>
+                <div><span class="help-block" ng-if="registerForm.registerEmail.$error.alreadyExists">이 이메일은 이미 %PRODUCT_NAME% 에 등록되었습니다</span></div>
             </div>
         </div>
         <password-input ng-model="account.password" id="'registerPassword'" label="$root.L.regActions.passwordLabel"></password-input>

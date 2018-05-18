@@ -46,9 +46,7 @@
      <item>
       <widget class="nx::client::desktop::HintButton" name="doubleBufferCheckboxHint" native="true">
        <property name="hint" stdset="0">
-        <string>
-            Helps avoid problems with OpenGL drawing, which result in 100% CPU load.
-          </string>
+        <string/>
        </property>
       </widget>
      </item>
@@ -91,9 +89,7 @@
         </sizepolicy>
        </property>
        <property name="hint" stdset="0">
-        <string>
-              Bigger buffer makes playback smoother but increases the delay between real situation and live view.
-            </string>
+        <string/>
        </property>
       </widget>
      </item>

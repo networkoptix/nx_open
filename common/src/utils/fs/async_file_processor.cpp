@@ -10,8 +10,8 @@
 #include <memory>
 #include <typeinfo>
 
-#ifdef Q_OS_IOS
-#define stat64 stat
+#if defined(Q_OS_IOS) || (defined(Q_OS_ANDROID) && __ANDROID_API__ < 21)
+    #define stat64 stat
 #endif
 
 class FileTask

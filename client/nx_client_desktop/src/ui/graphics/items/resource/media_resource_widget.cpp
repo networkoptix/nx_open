@@ -33,6 +33,8 @@
 #include <client_core/client_core_module.h>
 
 #include <common/common_module.h>
+#include <translation/datetime_formatter.h>
+
 
 #include <core/resource/media_resource.h>
 #include <core/resource/media_server_resource.h>
@@ -101,7 +103,6 @@
 #include <ui/workbench/workbench_navigator.h>
 #include <ui/workbench/workbench_item.h>
 #include <ui/workbench/workbench_layout.h>
-#include <ui/workbench/watchers/workbench_server_time_watcher.h>
 #include <ui/workbench/watchers/workbench_render_watcher.h>
 #include <ui/workbench/watchers/default_password_cameras_watcher.h>
 
@@ -116,6 +117,7 @@
 #include <utils/media/sse_helper.h>
 #include <core/resource/avi/avi_resource.h>
 #include <core/resource_management/resource_runtime_data.h>
+#include <nx/client/core/watchers/server_time_watcher.h>
 #include <ini.h>
 
 using namespace std::chrono;
@@ -1972,10 +1974,8 @@ QString QnMediaResourceWidget::calculatePositionText() const
             if (isSpecialDateTimeValueUsec(dateTimeUsec))
                 return QString();
 
-            static const auto kOutputFormat = lit("yyyy-MM-dd hh:mm:ss");
-
             const auto dateTimeMs = dateTimeUsec / kMicroInMilliSeconds;
-            const auto result = QDateTime::fromMSecsSinceEpoch(dateTimeMs).toString(kOutputFormat);
+            const QString result = datetime::toString(dateTimeMs);
 
             return ini().showPreciseItemTimestamps
                 ? lit("%1<br>%2 us").arg(result).arg(dateTimeUsec)
@@ -2641,8 +2641,8 @@ qint64 QnMediaResourceWidget::getDisplayTimeUsec() const
     qint64 result = getUtcCurrentTimeUsec();
     if (!isSpecialDateTimeValueUsec(result))
     {
-        result += context()->instance<QnWorkbenchServerTimeWatcher>()->displayOffset(
-            d->mediaResource) * 1000ll;
+        const auto timeWatcher = context()->instance<nx::client::core::ServerTimeWatcher>();
+        result += timeWatcher->displayOffset(d->mediaResource) * 1000ll;
     }
     return result;
 }

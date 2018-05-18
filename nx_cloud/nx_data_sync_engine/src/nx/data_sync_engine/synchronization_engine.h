@@ -14,8 +14,7 @@
 #include "transaction_log.h"
 
 namespace nx {
-namespace cdb {
-namespace ec2 {
+namespace data_sync_engine {
 
 class Settings;
 
@@ -76,6 +75,5 @@ private:
     void onSystemDeleted(const std::string& systemId);
 };
 
-} // namespace ec2
-} // namespace cdb
+} // namespace data_sync_engine
 } // namespace nx

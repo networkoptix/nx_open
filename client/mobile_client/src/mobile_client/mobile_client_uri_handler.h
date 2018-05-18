@@ -4,22 +4,23 @@
 #include <QtCore/QPointer>
 #include <nx/utils/url.h>
 
-class QnMobileClientUiController;
+class QnContext;
 class QnMobileClientUriHandler : public QObject
 {
     Q_OBJECT
+    using base_type = QObject;
 
 public:
-    explicit QnMobileClientUriHandler(QObject* parent = nullptr);
-
-    void setUiController(QnMobileClientUiController* uiController);
+    explicit QnMobileClientUriHandler(QnContext* context, QObject* parent = nullptr);
+    virtual ~QnMobileClientUriHandler() override;
 
     static QStringList supportedSchemes();
     static const char* handlerMethodName();
 
 public slots:
-    void handleUrl(const nx::utils::Url& url);
+    void handleUrl(const QUrl& url);
 
 private:
-    QPointer<QnMobileClientUiController> m_uiController;
+    class Private;
+    const QScopedPointer<Private> d;
 };

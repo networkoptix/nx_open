@@ -1,7 +1,10 @@
 *** Settings ***
 Resource          ../resource.robot
 Resource          ../variables.robot
-Test Teardown     Close Browser
+Test Setup        Restart
+Test Teardown     Run Keyword If Test Failed    Reset DB and Open New Browser On Failure
+Suite Setup       Open Browser and go to URL    ${url}
+Suite Teardown    Clean up
 
 *** Variables ***
 ${password}    ${BASE PASSWORD}
@@ -10,10 +13,25 @@ ${url}         ${ENV}
 
 *** Keywords ***
 Log In To Change Password Page
-    Open Browser and go to URL    ${url}/account/password
+    Go To    ${url}/account/password
     Log In    ${email}    ${password}    None
     Validate Log In
     Wait Until Elements Are Visible    ${CURRENT PASSWORD INPUT}    ${NEW PASSWORD INPUT}    ${CHANGE PASSWORD BUTTON}
+
+Restart
+    ${status}    Run Keyword And Return Status    Validate Log In
+    Run Keyword If    ${status}    Log Out
+    Validate Log Out
+    Go To    ${url}
+
+Clean up
+    Close Browser
+    Run Keyword If Any Tests Failed    Reset user noperm first/last name
+
+Reset DB and Open New Browser On Failure
+    Close Browser
+    Reset user noperm first/last name
+    Open Browser and go to URL    ${url}
 
 *** Test Cases ***
 password can be changed
@@ -41,13 +59,6 @@ password is actually changed, so login works with new password
     Input Text    ${NEW PASSWORD INPUT}    ${password}
     Click Button    ${CHANGE PASSWORD BUTTON}
     Check For Alert    ${YOUR ACCOUNT IS SUCCESSFULLY SAVED}
-
-password change is not possible if old password is wrong
-    Log In To Change Password Page
-    Input Text    ${CURRENT PASSWORD INPUT}    tjyjrsxhrsthr6
-    Input Text    ${NEW PASSWORD INPUT}    ${ALT PASSWORD}
-    Click Button    ${CHANGE PASSWORD BUTTON}
-    Check For Alert    ${CANNOT SAVE PASSWORD} ${PASSWORD INCORRECT}
 
 more than 255 symbols can be entered in new password field and then are cut to 255
     Log In To Change Password Page

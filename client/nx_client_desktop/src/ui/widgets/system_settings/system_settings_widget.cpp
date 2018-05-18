@@ -22,8 +22,8 @@ QnSystemSettingsWidget::QnSystemSettingsWidget(QWidget *parent):
     setHelpTopic(ui->auditTrailCheckBox,        Qn::AuditTrail_Help);
     setHelpTopic(ui->statisticsReportCheckBox,  Qn::SystemSettings_General_AnonymousUsage_Help);
 
-    ui->statisticsReportHint->setHint(tr("Sends device, server, and system information (firmware, codecs, streams, license keys, etc.)."));
-    ui->auditTrailHint->setHint(tr("Tracks and logs all user actions"));
+    ui->statisticsReportHint->setHint(tr("Sends anonymous System information (firmware, codecs, streams, etc.)."));
+    ui->auditTrailHint->setHint(tr("Tracks and logs all user actions."));
 
     setWarningStyle(ui->settingsWarningLabel);
 
@@ -36,19 +36,28 @@ QnSystemSettingsWidget::QnSystemSettingsWidget(QWidget *parent):
     connect(ui->auditTrailCheckBox,         &QCheckBox::stateChanged, this, &QnAbstractPreferencesWidget::hasChangesChanged);
     connect(ui->statisticsReportCheckBox,   &QCheckBox::stateChanged, this, &QnAbstractPreferencesWidget::hasChangesChanged);
     connect(ui->autoSettingsCheckBox,       &QCheckBox::stateChanged, this, &QnAbstractPreferencesWidget::hasChangesChanged);
+    connect(ui->forceTrafficEncryptionCheckBox, &QCheckBox::stateChanged, this,
+        &QnAbstractPreferencesWidget::hasChangesChanged);
+    connect(ui->forceVideoTrafficEncryptionCheckBox, &QCheckBox::stateChanged, this,
+        &QnAbstractPreferencesWidget::hasChangesChanged);
+
+    connect(ui->forceTrafficEncryptionCheckBox, &QCheckBox::clicked,
+        this, &QnSystemSettingsWidget::at_forceTrafficEncryptionCheckBoxClicked);
+    connect(ui->forceVideoTrafficEncryptionCheckBox, &QCheckBox::clicked,
+        this, &QnSystemSettingsWidget::at_forceVideoTrafficEncryptionCheckBoxClicked);
 
     retranslateUi();
 
     /* Let suggest these options are changes so rare, so we can safely drop unsaved changes. */
-    connect(qnGlobalSettings, &QnGlobalSettings::autoDiscoveryChanged,              this,   &QnSystemSettingsWidget::loadDataToUi);
-    connect(qnGlobalSettings, &QnGlobalSettings::auditTrailEnableChanged,           this,   &QnSystemSettingsWidget::loadDataToUi);
-    connect(qnGlobalSettings, &QnGlobalSettings::cameraSettingsOptimizationChanged, this,   &QnSystemSettingsWidget::loadDataToUi);
-    connect(qnGlobalSettings, &QnGlobalSettings::statisticsAllowedChanged,          this,   &QnSystemSettingsWidget::loadDataToUi);
+    connect(qnGlobalSettings, &QnGlobalSettings::autoDiscoveryChanged,                this,   &QnSystemSettingsWidget::loadDataToUi);
+    connect(qnGlobalSettings, &QnGlobalSettings::auditTrailEnableChanged,             this,   &QnSystemSettingsWidget::loadDataToUi);
+    connect(qnGlobalSettings, &QnGlobalSettings::cameraSettingsOptimizationChanged,   this,   &QnSystemSettingsWidget::loadDataToUi);
+    connect(qnGlobalSettings, &QnGlobalSettings::statisticsAllowedChanged,            this,   &QnSystemSettingsWidget::loadDataToUi);
+    connect(qnGlobalSettings, &QnGlobalSettings::trafficEncryptionForcedChanged,      this,   &QnSystemSettingsWidget::loadDataToUi);
+    connect(qnGlobalSettings, &QnGlobalSettings::videoTrafficEncryptionForcedChanged, this,   &QnSystemSettingsWidget::loadDataToUi);
 }
 
-QnSystemSettingsWidget::~QnSystemSettingsWidget()
-{
-}
+QnSystemSettingsWidget::~QnSystemSettingsWidget() = default;
 
 void QnSystemSettingsWidget::retranslateUi()
 {
@@ -63,6 +72,16 @@ void QnSystemSettingsWidget::retranslateUi()
         tr("Allow System to optimize camera settings")));
 }
 
+void QnSystemSettingsWidget::at_forceTrafficEncryptionCheckBoxClicked(bool value)
+{
+    if (!value)
+    {
+        if (ui->forceVideoTrafficEncryptionCheckBox->isChecked())
+            emit forceVideoTrafficEncryptionChanged(false);
+        ui->forceVideoTrafficEncryptionCheckBox->setChecked(false);
+    }
+    ui->forceVideoTrafficEncryptionCheckBox->setEnabled(value);
+}
 
 void QnSystemSettingsWidget::loadDataToUi()
 {
@@ -70,6 +89,10 @@ void QnSystemSettingsWidget::loadDataToUi()
     ui->auditTrailCheckBox->setChecked(qnGlobalSettings->isAuditTrailEnabled());
     ui->autoSettingsCheckBox->setChecked(qnGlobalSettings->isCameraSettingsOptimizationEnabled());
     ui->settingsWarningLabel->setVisible(false);
+
+    ui->forceTrafficEncryptionCheckBox->setChecked(qnGlobalSettings->isTrafficEncriptionForced());
+    ui->forceVideoTrafficEncryptionCheckBox->setChecked(qnGlobalSettings->isVideoTrafficEncriptionForced());
+    ui->forceVideoTrafficEncryptionCheckBox->setEnabled(qnGlobalSettings->isTrafficEncriptionForced());
 
     ui->statisticsReportCheckBox->setChecked(qnGlobalSettings->isStatisticsAllowed());
 }
@@ -83,8 +106,11 @@ void QnSystemSettingsWidget::applyChanges()
     qnGlobalSettings->setAuditTrailEnabled(ui->auditTrailCheckBox->isChecked());
     qnGlobalSettings->setCameraSettingsOptimizationEnabled(ui->autoSettingsCheckBox->isChecked());
     qnGlobalSettings->setStatisticsAllowed(ui->statisticsReportCheckBox->isChecked());
+    qnGlobalSettings->setTrafficEncriptionForced(ui->forceTrafficEncryptionCheckBox->isChecked());
+    qnGlobalSettings->setVideoTrafficEncryptionForced(ui->forceVideoTrafficEncryptionCheckBox->isChecked());
 
     ui->settingsWarningLabel->setVisible(false);
+
     qnGlobalSettings->synchronizeNow();
 }
 
@@ -96,20 +122,31 @@ bool QnSystemSettingsWidget::hasChanges() const
     if (ui->autoDiscoveryCheckBox->isChecked() != qnGlobalSettings->isAutoDiscoveryEnabled())
         return true;
 
-    if (qnGlobalSettings->isCameraSettingsOptimizationEnabled() != ui->autoSettingsCheckBox->isChecked())
+    if (ui->autoSettingsCheckBox->isChecked() != qnGlobalSettings->isCameraSettingsOptimizationEnabled())
         return true;
 
     /* Always mark as 'has changes' if we have not still decided to allow the statistics. */
     if (!qnGlobalSettings->isStatisticsAllowedDefined())
         return true;
 
-    if (qnGlobalSettings->isStatisticsAllowed() != ui->statisticsReportCheckBox->isChecked())
+    if (ui->statisticsReportCheckBox->isChecked() != qnGlobalSettings->isStatisticsAllowed())
         return true;
 
     if (ui->auditTrailCheckBox->isChecked() != qnGlobalSettings->isAuditTrailEnabled())
         return true;
 
+    if (ui->forceTrafficEncryptionCheckBox->isChecked() != qnGlobalSettings->isTrafficEncriptionForced())
+        return true;
+
+    if (ui->forceVideoTrafficEncryptionCheckBox->isChecked() != qnGlobalSettings->isVideoTrafficEncriptionForced())
+        return true;
+
     return false;
+}
+
+void QnSystemSettingsWidget::at_forceVideoTrafficEncryptionCheckBoxClicked(bool value)
+{
+    emit forceVideoTrafficEncryptionChanged(value);
 }
 
 void QnSystemSettingsWidget::setReadOnlyInternal(bool readOnly)
@@ -120,4 +157,6 @@ void QnSystemSettingsWidget::setReadOnlyInternal(bool readOnly)
     setReadOnly(ui->auditTrailCheckBox, readOnly);
     setReadOnly(ui->autoSettingsCheckBox, readOnly);
     setReadOnly(ui->statisticsReportCheckBox, readOnly);
+    setReadOnly(ui->forceTrafficEncryptionCheckBox, readOnly);
+    setReadOnly(ui->forceVideoTrafficEncryptionCheckBox, readOnly);
 }

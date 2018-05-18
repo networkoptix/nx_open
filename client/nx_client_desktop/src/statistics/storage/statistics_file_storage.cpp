@@ -5,6 +5,8 @@
 #include <QtCore/QStandardPaths>
 
 #include <nx/fusion/model_functions.h>
+#include <nx/utils/file_system.h>
+#include <nx/utils/log/log.h>
 
 namespace
 {
@@ -15,17 +17,17 @@ namespace
 
     QDir getCustomDirectory(const QString &leafDirectoryName)
     {
-        auto directory = QDir(QStandardPaths::writableLocation(QStandardPaths::DataLocation));
-        if (!directory.exists(leafDirectoryName))
+        const QDir dir(QDir(QStandardPaths::writableLocation(QStandardPaths::DataLocation))
+            .absoluteFilePath(leafDirectoryName));
+
+        if (!nx::utils::file_system::ensureDir(dir))
         {
-            if (!directory.mkdir(leafDirectoryName))
-                return QDir();
+            NX_WARNING(nx::utils::log::Tag(lit("Statistics")),
+                lm("Unable to create directory %1").arg(dir));
+            return QDir();
         }
 
-        if (!directory.cd(leafDirectoryName))
-            return QDir();
-
-        return directory;
+        return dir;
     }
 
     QDir getStatisticsDirectory()

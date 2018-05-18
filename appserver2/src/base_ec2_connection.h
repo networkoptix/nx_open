@@ -12,7 +12,7 @@
 
 #include <transaction/message_bus_adapter.h>
 
-#include "managers/business_event_manager.h"
+#include <managers/event_rules_manager.h>
 #include "managers/camera_manager.h"
 #include "managers/layout_manager.h"
 #include <managers/layout_tour_manager.h>
@@ -31,6 +31,7 @@
 
 namespace ec2
 {
+
 class ECConnectionNotificationManager;
 class Ec2DirectConnectionFactory;
 
@@ -50,7 +51,7 @@ public:
     virtual AbstractMediaServerManagerPtr getMediaServerManager(const Qn::UserAccessData &userAccessData) override;
     virtual AbstractCameraManagerPtr getCameraManager(const Qn::UserAccessData &userAccessData) override;
     virtual AbstractLicenseManagerPtr getLicenseManager(const Qn::UserAccessData &userAccessData) override;
-    virtual AbstractBusinessEventManagerPtr getBusinessEventManager(const Qn::UserAccessData &userAccessData) override;
+    virtual AbstractEventRulesManagerPtr getEventRulesManager(const Qn::UserAccessData &userAccessData) override;
     virtual AbstractUserManagerPtr getUserManager(const Qn::UserAccessData &userAccessData) override;
     virtual AbstractLayoutManagerPtr getLayoutManager(const Qn::UserAccessData &userAccessData) override;
     virtual AbstractLayoutTourManagerPtr getLayoutTourManager(const Qn::UserAccessData& userAccessData) override;
@@ -121,7 +122,7 @@ protected:
     QnUpdatesNotificationManagerPtr m_updatesNotificationManager;
     QnMiscNotificationManagerPtr m_miscNotificationManager;
     QnDiscoveryNotificationManagerPtr m_discoveryNotificationManager;
-    QnTimeNotificationManagerPtr m_timeNotificationManager;
+    AbstractTimeNotificationManagerPtr m_timeNotificationManager;
     std::unique_ptr<ECConnectionNotificationManager> m_notificationManager;
     std::unique_ptr<ECConnectionAuditManager> m_auditManager;
 };
@@ -261,10 +262,10 @@ AbstractLicenseNotificationManagerPtr
 }
 
 template<class QueryProcessorType>
-AbstractBusinessEventManagerPtr BaseEc2Connection<QueryProcessorType>::getBusinessEventManager(
+AbstractEventRulesManagerPtr BaseEc2Connection<QueryProcessorType>::getEventRulesManager(
     const Qn::UserAccessData& userAccessData)
 {
-    return std::make_shared<QnBusinessEventManager<QueryProcessorType>>(
+    return std::make_shared<EventRulesManager<QueryProcessorType>>(
         messageBus(), m_queryProcessor, userAccessData);
 }
 
@@ -428,64 +429,64 @@ ECConnectionNotificationManager* BaseEc2Connection<QueryProcessorType>::notifica
 template<class QueryProcessorType>
 int BaseEc2Connection<QueryProcessorType>::dumpDatabaseAsync(impl::DumpDatabaseHandlerPtr handler)
 {
-    const int reqID = generateRequestID();
+const int reqID = generateRequestID();
 
-    auto queryDoneHandler =
-        [reqID, handler](ErrorCode errorCode, const nx::vms::api::DatabaseDumpData& data)
-        {
-            nx::vms::api::DatabaseDumpData outData;
-            if (errorCode == ErrorCode::ok)
-                outData = data;
-            handler->done(reqID, errorCode, outData);
-        };
-    m_queryProcessor->getAccess(Qn::kSystemAccess).template processQueryAsync<
-        std::nullptr_t, nx::vms::api::DatabaseDumpData, decltype(queryDoneHandler)>(
-        ApiCommand::dumpDatabase,
-        nullptr,
-        queryDoneHandler);
-    return reqID;
+auto queryDoneHandler =
+    [reqID, handler](ErrorCode errorCode, const nx::vms::api::DatabaseDumpData& data)
+    {
+        nx::vms::api::DatabaseDumpData outData;
+        if (errorCode == ErrorCode::ok)
+            outData = data;
+        handler->done(reqID, errorCode, outData);
+    };
+m_queryProcessor->getAccess(Qn::kSystemAccess).template processQueryAsync<
+    std::nullptr_t, nx::vms::api::DatabaseDumpData, decltype(queryDoneHandler)>(
+    ApiCommand::dumpDatabase,
+    nullptr,
+    queryDoneHandler);
+return reqID;
 }
 
 template<class QueryProcessorType>
 int BaseEc2Connection<QueryProcessorType>::dumpDatabaseToFileAsync(
-    const QString& dumpFilePath,
-    impl::SimpleHandlerPtr handler)
+const QString& dumpFilePath,
+impl::SimpleHandlerPtr handler)
 {
-    const int reqID = generateRequestID();
+const int reqID = generateRequestID();
 
-    nx::vms::api::StoredFilePath dumpFilePathData;
-    dumpFilePathData.path = dumpFilePath;
+nx::vms::api::StoredFilePath dumpFilePathData;
+dumpFilePathData.path = dumpFilePath;
 
-    auto queryDoneHandler =
-        [reqID, handler](
-        ErrorCode errorCode,
-        const nx::vms::api::DatabaseDumpToFileData& /*dumpFileSize*/)
-        {
-            handler->done(reqID, errorCode);
-        };
-    m_queryProcessor->getAccess(Qn::kSystemAccess).template processQueryAsync<
-        nx::vms::api::StoredFilePath, nx::vms::api::DatabaseDumpToFileData, decltype(
-            queryDoneHandler)>(
-        ApiCommand::dumpDatabaseToFile,
-        dumpFilePathData,
-        queryDoneHandler);
-    return reqID;
+auto queryDoneHandler =
+    [reqID, handler](
+    ErrorCode errorCode,
+    const nx::vms::api::DatabaseDumpToFileData& /*dumpFileSize*/)
+    {
+        handler->done(reqID, errorCode);
+    };
+m_queryProcessor->getAccess(Qn::kSystemAccess).template processQueryAsync<
+    nx::vms::api::StoredFilePath, nx::vms::api::DatabaseDumpToFileData, decltype(
+        queryDoneHandler)>(
+    ApiCommand::dumpDatabaseToFile,
+    dumpFilePathData,
+    queryDoneHandler);
+return reqID;
 }
 
 template<class QueryProcessorType>
 int BaseEc2Connection<QueryProcessorType>::restoreDatabaseAsync(
-    const nx::vms::api::DatabaseDumpData& data,
-    impl::SimpleHandlerPtr handler)
+const nx::vms::api::DatabaseDumpData& data,
+impl::SimpleHandlerPtr handler)
 {
-    const int reqID = generateRequestID();
+const int reqID = generateRequestID();
 
-    using namespace std::placeholders;
-    m_queryProcessor->getAccess(Qn::kSystemAccess).processUpdateAsync(
-        ApiCommand::restoreDatabase,
-        data,
-        std::bind(std::mem_fn(&impl::SimpleHandler::done), handler, reqID, _1));
+using namespace std::placeholders;
+m_queryProcessor->getAccess(Qn::kSystemAccess).processUpdateAsync(
+    ApiCommand::restoreDatabase,
+    data,
+    std::bind(std::mem_fn(&impl::SimpleHandler::done), handler, reqID, _1));
 
-    return reqID;
+return reqID;
 }
 
 template<class QueryProcessorType>

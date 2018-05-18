@@ -2,8 +2,6 @@
 
 #include <nx/network/buffer.h>
 #include <nx/utils/move_only_func.h>
-
-#include <transaction/transaction.h>
 #include <nx/utils/subscription.h>
 
 #include "serialization/serializable_transaction.h"
@@ -11,8 +9,7 @@
 #include "transaction_transport_header.h"
 
 namespace nx {
-namespace cdb {
-namespace ec2 {
+namespace data_sync_engine {
 
 class AbstractOutgoingTransactionDispatcher
 {
@@ -48,6 +45,5 @@ private:
     OnNewTransactionSubscription m_onNewTransactionSubscription;
 };
 
-} // namespace ec2
-} // namespace cdb
+} // namespace data_sync_engine
 } // namespace nx

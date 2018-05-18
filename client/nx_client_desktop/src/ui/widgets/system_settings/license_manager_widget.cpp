@@ -183,7 +183,6 @@ protected:
 
 } // namespace
 
-
 QnLicenseManagerWidget::QnLicenseManagerWidget(QWidget *parent) :
     base_type(parent),
     QnWorkbenchContextAware(parent),
@@ -403,7 +402,7 @@ void QnLicenseManagerWidget::showMessageLater(
             showMessage(icon, text, extras, button);
         };
 
-    executeDelayedParented(showThisMessage, 0, this);
+    executeLater(showThisMessage, this);
 }
 
 void QnLicenseManagerWidget::showMessage(

@@ -12,7 +12,7 @@ Item
     implicitWidth: contentRow.implicitWidth
 
     readonly property var _locale: Qt.locale()
-    readonly property int _fontSize: 28
+    readonly property int _fontSize: 24
 
     Row
     {
@@ -22,8 +22,8 @@ Item
         {
             text: dateTime.toLocaleTimeString(_locale, "hh")
 
-            width: 40
-            height: 32
+            width: 32
+            height: 28
 
             horizontalAlignment: Text.AlignHCenter
             verticalAlignment: Text.AlignHCenter
@@ -38,7 +38,7 @@ Item
             text: ":"
 
             width: 8
-            height: 32
+            height: 28
 
             horizontalAlignment: Text.AlignHCenter
             verticalAlignment: Text.AlignHCenter
@@ -52,8 +52,8 @@ Item
         {
             text: dateTime.toLocaleTimeString(_locale, "mm")
 
-            width: 40
-            height: 32
+            width: 32
+            height: 28
 
             horizontalAlignment: Text.AlignHCenter
             verticalAlignment: Text.AlignHCenter
@@ -68,7 +68,7 @@ Item
             text: ":"
 
             width: 8
-            height: 32
+            height: 28
 
             horizontalAlignment: Text.AlignHCenter
             verticalAlignment: Text.AlignHCenter
@@ -82,8 +82,8 @@ Item
         {
             text: dateTime.toLocaleTimeString(_locale, "ss")
 
-            width: 40
-            height: 32
+            width: 32
+            height: 28
 
             horizontalAlignment: Text.AlignHCenter
             verticalAlignment: Text.AlignHCenter

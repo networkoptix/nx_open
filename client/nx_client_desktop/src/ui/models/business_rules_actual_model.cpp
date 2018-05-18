@@ -3,10 +3,15 @@
 #include <api/app_server_connection.h>
 #include <api/common_message_processor.h>
 
+#include <nx_ec/data/api_conversion_functions.h>
+
+#include <nx/vms/api/data/event_rule_data.h>
 #include <nx/vms/event/rule_manager.h>
+
 #include <common/common_module.h>
 
 #include <ui/workbench/workbench_context.h>
+
 
 using namespace nx;
 
@@ -43,10 +48,20 @@ void QnBusinessRulesActualModel::saveRule(const QModelIndex& index)
         return;
 
     vms::event::RulePtr rule = ruleModel->createRule();
+    if (rule->id().isNull())
+        rule->setId(QnUuid::createUuid());
+
+    nx::vms::api::EventRuleData params;
+    ec2::fromResourceToApi(rule, params);
 
     // TODO: #GDM SafeMode
-    int handle = commonModule()->ec2Connection()->getBusinessEventManager(Qn::kSystemAccess)->save(
-        rule, this, [this, rule]( int handle, ec2::ErrorCode errorCode ){ at_resources_saved( handle, errorCode, rule ); } );
+    int handle = commonModule()->ec2Connection()->getEventRulesManager(Qn::kSystemAccess)->save(
+        params,
+        this,
+        [this, rule](int handle, ec2::ErrorCode errorCode)
+        {
+            at_resources_saved(handle, errorCode, rule);
+        });
     m_savingRules[handle] = ruleModel;
 }
 

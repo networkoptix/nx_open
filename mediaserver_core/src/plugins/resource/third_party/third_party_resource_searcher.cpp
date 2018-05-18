@@ -22,12 +22,13 @@
 #include <media_server/media_server_module.h>
 
 static const QLatin1String THIRD_PARTY_MANUFACTURER_NAME( "THIRD_PARTY" );
+static const QString kUpnpBasicDeviceType("Basic");
 
 ThirdPartyResourceSearcher::ThirdPartyResourceSearcher(QnCommonModule* commonModule):
     QnAbstractResourceSearcher(commonModule),
     QnAbstractNetworkResourceSearcher(commonModule),
     QnMdnsResourceSearcher(commonModule),
-    QnUpnpResourceSearcherAsync(commonModule)
+    QnUpnpResourceSearcherAsync(commonModule, kUpnpBasicDeviceType)
 {
     auto pluginManager = qnServerModule->pluginManager();
     NX_ASSERT(pluginManager, lit("There is no plugin manager"));

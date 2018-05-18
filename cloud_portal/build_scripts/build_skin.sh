@@ -23,12 +23,12 @@ dir=../skins/$SKIN
 
 
     echo "Build statics"
-        pushd ../front_end
+    pushd ../front_end
         npm run setSkin $SKIN
         npm run build
         # Save the repository info.
         echo "Create version.txt"
-        hg log -r . --repository "$DIR/../.." > dist/version.txt
+        hg log -r . --repository "$2" | head -n 7 > dist/version.txt
         cat dist/version.txt
     popd
 

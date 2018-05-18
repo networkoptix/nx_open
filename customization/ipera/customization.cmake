@@ -1,6 +1,8 @@
 # Components Namings
 set(product.name "FlyView")
 set(display.product.name "FlyView")
+set(display_mobile_name "FlyView Mobile")
+set(mobile_bundle_name "FlyView")
 set(product.name.short "ipera_ru")
 set(product.appName "flyview")
 set(company.name "iPera")
@@ -63,7 +65,7 @@ set(freeLicenseCount "4")
 set(freeLicenseKey "0000-0000-0000-0011")
 
 # Installer Customizations
-set(installer.language "ru_RU")
+set(installerLanguage "ru_RU")
 set(installer.cultures "ru-ru")
 set(sign.password "qweasd123")
 set(sign.cer "app.p12")

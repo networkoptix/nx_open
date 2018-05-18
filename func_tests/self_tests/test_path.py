@@ -36,7 +36,7 @@ def dirty_remote_test_dir(request):
 @pytest.fixture()
 def remote_test_dir(dirty_remote_test_dir):
     dirty_remote_test_dir.rmtree(ignore_errors=True)
-    dirty_remote_test_dir.mkdir()
+    dirty_remote_test_dir.mkdir(parents=True)
     return dirty_remote_test_dir
 
 

@@ -63,9 +63,6 @@ public:
     virtual bool setKeepAlive(boost::optional< KeepAliveOptions > info) override;
     virtual bool getKeepAlive(boost::optional< KeepAliveOptions >* result) const override;
 
-    virtual void cancelIOAsync(aio::EventType eventType, utils::MoveOnlyFunc<void()> handler) override;
-    virtual void cancelIOSync(nx::network::aio::EventType eventType) override;
-
     virtual bool setNonBlockingMode(bool val) override;
     virtual bool getNonBlockingMode(bool* val) const override;
     virtual bool shutdown() override;
@@ -99,6 +96,8 @@ protected:
         std::unique_ptr<AbstractStreamSocket> wrappedSocket,
         bool isServerSide,
         bool encriptionEnforced);
+
+    virtual void cancelIoInAioThread(nx::network::aio::EventType eventType) override;
 
     int recvInternal(void* buffer, unsigned int bufferLen, int flags);
     int sendInternal(const void* buffer, unsigned int bufferLen);
@@ -137,10 +136,6 @@ public:
     virtual int send(const void* buffer, unsigned int bufferLen) override;
     virtual bool setNonBlockingMode(bool val) override;
 
-    virtual void cancelIOAsync(
-        nx::network::aio::EventType eventType,
-        nx::utils::MoveOnlyFunc<void()> cancellationDoneHandler) override;
-
     virtual void connectAsync(
         const SocketAddress& addr,
         nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode)> handler) override;
@@ -152,6 +147,10 @@ public:
     virtual void sendAsync(
         const nx::Buffer& buf,
         IoCompletionHandler handler) override;
+
+protected:
+    virtual void cancelIoInAioThread(
+        nx::network::aio::EventType eventType) override;
 
 private:
     bool updateInternalBlockingMode();
@@ -170,14 +169,13 @@ public:
         bool allowNonSecureConnect);
 
     virtual bool listen(int backlog = kDefaultBacklogSize) override;
-    virtual AbstractStreamSocket* accept() override;
+    virtual std::unique_ptr<AbstractStreamSocket> accept() override;
     virtual void pleaseStop(nx::utils::MoveOnlyFunc<void()> handler) override;
     virtual void pleaseStopSync(bool assertIfCalledUnderLock = true) override;
 
     virtual void acceptAsync(AcceptCompletionHandler handler) override;
 
-    virtual void cancelIOAsync(nx::utils::MoveOnlyFunc<void()> handler) override;
-    virtual void cancelIOSync() override;
+    virtual void cancelIoInAioThread() override;
 
 private:
     const bool m_allowNonSecureConnect;

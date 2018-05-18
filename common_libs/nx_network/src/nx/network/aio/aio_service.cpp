@@ -52,25 +52,15 @@ void AIOService::startMonitoring(
         std::move(socketAddedToPollHandler));
 }
 
-void AIOService::stopMonitoring(
-    Pollable* const sock,
-    aio::EventType eventType,
-    bool waitForRunningHandlerCompletion,
-    nx::utils::MoveOnlyFunc<void()> pollingStoppedHandler)
+void AIOService::stopMonitoring(Pollable* const sock, aio::EventType eventType)
 {
     auto aioThread = sock->impl()->aioThread.load(std::memory_order_relaxed);
     if (!aioThread)
-    {
-        if (pollingStoppedHandler)
-            post(std::move(pollingStoppedHandler));
         return; //< Not bound to a thread. Socket is definitely not monitored.
-    }
 
     aioThread->stopMonitoring(
         sock,
-        eventType,
-        waitForRunningHandlerCompletion,
-        std::move(pollingStoppedHandler));
+        eventType);
 }
 
 void AIOService::registerTimer(
@@ -174,14 +164,12 @@ aio::AIOThread* AIOService::bindSocketToAioThread(Pollable* const sock)
     return threadToUse;
 }
 
-void AIOService::cancelPostedCalls(
-    Pollable* const sock,
-    bool waitForRunningHandlerCompletion)
+void AIOService::cancelPostedCalls(Pollable* const sock)
 {
     AIOThread* aioThread = sock->impl()->aioThread.load(std::memory_order_relaxed);
     if (!aioThread)
         return;
-    aioThread->cancelPostedCalls(sock, waitForRunningHandlerCompletion);
+    aioThread->cancelPostedCalls(sock);
 }
 
 void AIOService::initializeAioThreadPool(unsigned int threadCount)

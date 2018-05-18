@@ -33,14 +33,19 @@ void View::stop()
     m_httpServer.stopAcceptingNewRequests();
 }
 
-std::vector<network::SocketAddress> View::httpEndpoints() const
+const http::Server& View::httpServer() const
 {
-    return m_httpServer.endpoints();
+    return m_httpServer;
 }
 
-std::vector<network::SocketAddress> View::stunEndpoints() const
+http::Server& View::httpServer()
 {
-    return m_stunServer.endpoints();
+    return m_httpServer;
+}
+
+const StunServer& View::stunServer() const
+{
+    return m_stunServer;
 }
 
 void View::registerStunApiHandlers(Controller* controller)

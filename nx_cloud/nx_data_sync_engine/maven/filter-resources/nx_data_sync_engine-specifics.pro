@@ -1,6 +1,6 @@
 INCLUDEPATH += ${root.dir}/appserver2/src/
-INCLUDEPATH += ${root.dir}/nx_cloud/cloud_db_client/src/include/
-INCLUDEPATH += ${root.dir}/nx_cloud/cloud_db_client/src/
+INCLUDEPATH += ${root.dir}/mediaserver_db/src/
+INCLUDEPATH += ${root.dir}/vms_libs/nx_vms_api/src/
 
 win* {
     DEFINES += NX_DATA_SYNC_ENGINE_API=__declspec(dllexport)

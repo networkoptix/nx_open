@@ -556,6 +556,10 @@ void initialize(Manager* manager, Action* root)
         .flags(NoTarget)
         .mode(DesktopMode);
 
+    factory(ShowEulaAction)
+        .flags(NoTarget)
+        .mode(DesktopMode);
+
     factory(AllowStatisticsReportMessageAction)
         .flags(NoTarget)
         .mode(DesktopMode)
@@ -1339,6 +1343,23 @@ void initialize(Manager* manager, Action* root)
         .requiredGlobalPermission(Qn::GlobalEditCamerasPermission)
         .condition(condition::hasFlags(Qn::live_cam, MatchMode::Any)
             && !condition::tourIsRunning()
+            && condition::scoped(SceneScope,
+                !condition::isLayoutTourReviewMode()
+                && !condition::isPreviewSearchMode()));
+
+    factory(CameraSettingsActionNew)
+        .mode(DesktopMode)
+        .flags(Scene | Tree | SingleTarget | MultiTarget | ResourceTarget | LayoutItemTarget)
+        .dynamicText(new DevicesNameTextFactory(
+            QnCameraDeviceStringSet(
+                ContextMenu::tr("Device Settings (new)..."), ContextMenu::tr("Devices Settings (new)..."),
+                ContextMenu::tr("Camera Settings (new)..."), ContextMenu::tr("Cameras Settings (new)..."),
+                ContextMenu::tr("I/O Module Settings (new)..."), ContextMenu::tr("I/O Modules Settings (new)...")
+            ), manager))
+        .requiredGlobalPermission(Qn::GlobalEditCamerasPermission)
+        .condition(condition::hasFlags(Qn::live_cam, MatchMode::Any)
+            && !condition::tourIsRunning()
+            && condition::isTrue(ini().redesignedCameraSettingsDialog)
             && condition::scoped(SceneScope,
                 !condition::isLayoutTourReviewMode()
                 && !condition::isPreviewSearchMode()));

@@ -39,6 +39,9 @@ extern const char* const kMaintenanceGetTransactionLog;
 extern const char* const kMaintenanceGetStatistics;
 
 extern const char* const kDeprecatedCloudModuleXmlPath;
+// TODO: #ak Added because of lack of URL rewrite support in Amazon balancer.
+// Remove kDeprecatedCloudModuleXmlPath after switching to new balancer on every instance.
+extern const char* const kAnotherDeprecatedCloudModuleXmlPath;
 
 extern const char* const kDiscoveryCloudModuleXmlPath;
 

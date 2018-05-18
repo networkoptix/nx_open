@@ -24,7 +24,7 @@ MEDIASERVER_STORAGE_PATH = 'var/data'
 MEDIASERVER_CREDENTIALS_TIMEOUT = datetime.timedelta(minutes=5)
 MEDIASERVER_MERGE_TIMEOUT = MEDIASERVER_CREDENTIALS_TIMEOUT  # timeout for local system ids become the same
 MEDIASERVER_MERGE_REQUEST_TIMEOUT = datetime.timedelta(seconds=90)  # timeout for mergeSystems REST api request
-MEDIASERVER_START_TIMEOUT = datetime.timedelta(minutes=5)  # timeout when waiting for server become online (pingable)
+MEDIASERVER_START_TIMEOUT = datetime.timedelta(minutes=20)  # timeout when waiting for server become online (pingable)
 
 
 log = logging.getLogger(__name__)

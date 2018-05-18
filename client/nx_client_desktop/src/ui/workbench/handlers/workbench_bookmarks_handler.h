@@ -31,8 +31,4 @@ private slots:
 
 private:
     void setupBookmarksExport();
-
-private:
-    /** If 'Press Ctrl-B' hint was already displayed for the current user. */
-    bool m_hintDisplayed;
 };

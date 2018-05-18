@@ -23,3 +23,5 @@ if(withClouds)
         add_subdirectory(tests)
     endif()
 endif()
+
+add_custom_target(cloud-backend DEPENDS cloud_db_client vms_gateway connection_mediator cloud_db traffic_relay time_server cloud_connect_test_util)

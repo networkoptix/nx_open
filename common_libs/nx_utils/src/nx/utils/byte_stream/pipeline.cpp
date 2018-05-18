@@ -34,51 +34,51 @@ void AbstractInputConverter::setInput(AbstractInput* inputStream)
 //-------------------------------------------------------------------------------------------------
 // ProxyConverter
 
-ProxyConverter::ProxyConverter(Converter* delegatee):
-    m_delegatee(nullptr)
+ProxyConverter::ProxyConverter(Converter* delegate):
+    m_delegate(nullptr)
 {
-    setDelegatee(delegatee);
+    setDelegate(delegate);
 }
 
 int ProxyConverter::read(void* data, size_t count)
 {
-    return m_delegatee->read(data, count);
+    return m_delegate->read(data, count);
 }
 
 int ProxyConverter::write(const void* data, size_t count)
 {
-    return m_delegatee->write(data, count);
+    return m_delegate->write(data, count);
 }
 
 void ProxyConverter::setInput(AbstractInput* input)
 {
     base_type::setInput(input);
-    m_delegatee->setInput(input);
+    m_delegate->setInput(input);
 }
 
 void ProxyConverter::setOutput(AbstractOutput* output)
 {
     base_type::setOutput(output);
-    m_delegatee->setOutput(output);
+    m_delegate->setOutput(output);
 }
 
 bool ProxyConverter::eof() const
 {
-    return m_delegatee->eof();
+    return m_delegate->eof();
 }
 
 bool ProxyConverter::failed() const
 {
-    return m_delegatee->failed();
+    return m_delegate->failed();
 }
 
-void ProxyConverter::setDelegatee(Converter* delegatee)
+void ProxyConverter::setDelegate(Converter* delegate)
 {
-    m_delegatee = delegatee;
-    if (m_delegatee)
+    m_delegate = delegate;
+    if (m_delegate)
     {
-        m_delegatee->setInput(m_inputStream);
-        m_delegatee->setOutput(m_outputStream);
+        m_delegate->setInput(m_inputStream);
+        m_delegate->setOutput(m_outputStream);
     }
 }
 

@@ -21,18 +21,20 @@
 #include "widgets/camera_schedule_widget.h"
 #include "widgets/camera_motion_settings_widget.h"
 #include "widgets/camera_fisheye_settings_widget.h"
+#include "widgets/camera_expert_settings_widget.h"
 #include "widgets/io_module_settings_widget.h"
 
 #include "redux/camera_settings_dialog_state.h"
 #include "redux/camera_settings_dialog_store.h"
 
 #include "watchers/camera_settings_readonly_watcher.h"
-#include "watchers/camera_settings_panic_watcher.h"
+#include "watchers/camera_settings_global_settings_watcher.h"
 
 #include "utils/camera_settings_dialog_state_conversion_functions.h"
 #include <utils/license_usage_helper.h>
 
 #include <nx/client/desktop/image_providers/camera_thumbnail_manager.h>
+#include <nx/client/desktop/ui/actions/action_manager.h>
 
 namespace nx {
 namespace client {
@@ -84,6 +86,37 @@ struct CameraSettingsDialog::Private
     {
         store->loadCameras(cameras);
     }
+
+    CameraSettingsGeneralTabWidget* createGeneralTab(CameraSettingsDialog* q)
+    {
+        auto generalTab = new CameraSettingsGeneralTabWidget(store, q->ui->tabWidget);
+        QObject::connect(generalTab, &CameraSettingsGeneralTabWidget::actionRequested, q,
+            [this, q](CameraInfoWidget::Action action)
+            {
+                switch (action)
+                {
+                    case CameraInfoWidget::Action::ping:
+                        NX_ASSERT(store);
+                        q->menu()->trigger(ui::action::PingAction,
+                            {Qn::TextRole, store->state().singleCameraProperties.ipAddress});
+                        break;
+
+                    case CameraInfoWidget::Action::openEventLog:
+                        q->menu()->trigger(ui::action::CameraIssuesAction, cameras);
+                        break;
+
+                    case CameraInfoWidget::Action::openEventRules:
+                        q->menu()->trigger(ui::action::CameraBusinessRulesAction, cameras);
+                        break;
+
+                    case CameraInfoWidget::Action::showOnLayout:
+                        q->menu()->trigger(ui::action::OpenInNewTabAction, cameras);
+                        break;
+                }
+            });
+
+        return generalTab;
+    }
 };
 
 CameraSettingsDialog::CameraSettingsDialog(QWidget* parent):
@@ -109,11 +142,11 @@ CameraSettingsDialog::CameraSettingsDialog(QWidget* parent):
     d->previewManager->setThumbnailSize(QSize(0, 0));
     d->previewManager->setAutoRefresh(false);
 
-    new CameraSettingsPanicWatcher(d->store, this);
+    new CameraSettingsGlobalSettingsWatcher(d->store, this);
 
     addPage(
         int(CameraSettingsTab::general),
-        new CameraSettingsGeneralTabWidget(d->store, ui->tabWidget),
+        d->createGeneralTab(this),
         tr("General"));
 
     addPage(
@@ -135,6 +168,11 @@ CameraSettingsDialog::CameraSettingsDialog(QWidget* parent):
         int(CameraSettingsTab::fisheye),
         new CameraFisheyeSettingsWidget(d->previewManager, d->store, ui->tabWidget),
         tr("Fisheye"));
+
+    addPage(
+        int(CameraSettingsTab::expert),
+        new CameraExpertSettingsWidget(d->store, ui->tabWidget),
+        tr("Expert"));
 
     auto selectionWatcher = new QnWorkbenchSelectionWatcher(this);
     connect(
@@ -303,15 +341,21 @@ void CameraSettingsDialog::loadState(const CameraSettingsDialogState& state)
     // Legacy code has more complicated conditions.
 
     using CombinedValue = CameraSettingsDialogState::CombinedValue;
+    const bool hasWearableCameras = state.devicesDescription.isWearable != CombinedValue::None;
 
-    setPageVisible(int(CameraSettingsTab::motion), state.isSingleCamera()
+    setPageVisible(int(CameraSettingsTab::motion), state.isSingleCamera() && !hasWearableCameras
         && state.devicesDescription.hasMotion == CombinedValue::All);
 
-    setPageVisible(int(CameraSettingsTab::fisheye),
-        state.isSingleCamera() && state.singleCameraProperties.hasVideo);
+    setPageVisible(int(CameraSettingsTab::recording), !hasWearableCameras);
 
-    setPageVisible(int(CameraSettingsTab::io), state.isSingleCamera()
+    setPageVisible(int(CameraSettingsTab::fisheye), state.isSingleCamera()
+        && state.singleCameraProperties.hasVideo);
+
+    setPageVisible(int(CameraSettingsTab::io), state.isSingleCamera() && !hasWearableCameras
         && state.devicesDescription.isIoModule == CombinedValue::All);
+
+    setPageVisible(int(CameraSettingsTab::expert), !hasWearableCameras
+        && state.devicesDescription.isIoModule == CombinedValue::None);
 
     ui->alertBar->setText(getAlertText(state));
 }

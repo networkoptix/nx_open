@@ -272,7 +272,7 @@ copyBins()
         if [ -d "$BIN_BUILD_DIR/plugins" ]; then
             local FILE
             for FILE in "$BIN_BUILD_DIR/plugins/"*; do
-                if [ -f $FILE ] && [[ $FILE != *.debug ]]; then
+                if [[ -f $FILE ]] && [[ $FILE != *.debug ]]; then
                     if [ "$ENABLE_HANWHA" != "true" ] && [[ "$FILE" == *hanwha* ]]; then
                         continue
                     fi
@@ -283,6 +283,7 @@ copyBins()
             done
         fi
     fi
+
     if [ "$BOX" = "bpi" ]; then
         echo "Creating symlink for rpath needed by mediaserver binary"
         ln -s "../lib" "$INSTALL_DIR/mediaserver/lib"
@@ -360,12 +361,12 @@ copyBpiLiteClient()
         cp -r "$LIB_BUILD_DIR/ffmpeg" "$LIB_INSTALL_DIR/"
     fi
 
-    echo "Copying lite_client bin"
+    echo "Copying mobile_client binary"
     mkdir -p "$LITE_CLIENT_BIN_DIR"
     cp "$BIN_BUILD_DIR/mobile_client" "$LITE_CLIENT_BIN_DIR/"
 
-    echo "Creating symlink for rpath needed by mediaserver binary"
-    ln -s "../lib" "$INSTALL_DIR/mediaserver/lib"
+    echo "Creating symlink for rpath needed by mobile_client binary"
+    ln -s "../lib" "$INSTALL_DIR/lite_client/lib"
 
     echo "Creating symlink for rpath needed by Qt plugins"
     ln -s "../../lib" "$LITE_CLIENT_BIN_DIR/lib"
@@ -400,11 +401,15 @@ copyBpiLiteClient()
 # [in] TAR_DIR
 copyBpiSpecificFiles()
 {
-    # echo "Copying (bpi) uboot files to root/"
-    # cp -r "$BUILD_DIR/root" "$TAR_DIR/"
+    if [ -d "$BUILD_DIR/root" ]; then
+        echo "Copying (bpi) uboot files (linux kernel upgrade) to root/"
+        cp -r "$BUILD_DIR/root" "$TAR_DIR/"
+    fi
 
-    echo "Copying (bpi) usr/"
-    cp -r "$BUILD_DIR/usr" "$TAR_DIR/"
+    if [ -d "$BUILD_DIR/usr" ]; then
+        echo "Copying (bpi) usr/"
+        cp -r "$BUILD_DIR/usr" "$TAR_DIR/"
+    fi
 
     echo "Copying (bpi) root/"
     cp -r "$CURRENT_BUILD_DIR/root" "$TAR_DIR/"

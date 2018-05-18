@@ -3,8 +3,7 @@
 class QnSettings;
 
 namespace nx {
-namespace cdb {
-namespace ec2 {
+namespace data_sync_engine {
 
 class NX_DATA_SYNC_ENGINE_API Settings
 {
@@ -16,6 +15,5 @@ public:
     void load(const QnSettings& settings);
 };
 
-} // namespace ec2
-} // namespace cdb
+} // namespace data_sync_engine
 } // namespace nx

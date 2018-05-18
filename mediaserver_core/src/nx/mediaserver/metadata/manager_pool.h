@@ -90,6 +90,12 @@ private:
     std::vector<nxpl::Setting> loadSettingsFromFile(
         const QString& fileDescription, const QString& filename);
 
+    void saveManifestToFile(
+        const char* manifest,
+        const QString& fileDescription,
+        const QString& pluginLibName,
+        const QString& filenameExtraSuffix = "");
+
     void setCameraManagerDeclaredSettings(
         sdk::metadata::CameraManager* manager,
         const QnSecurityCamResourcePtr& camera,
@@ -151,6 +157,7 @@ private:
         boost::optional<nx::api::AnalyticsDriverManifest>
     >
     loadManagerManifest(
+        const nx::sdk::metadata::Plugin* plugin,
         nx::sdk::metadata::CameraManager* manager,
         const QnSecurityCamResourcePtr& camera);
 

@@ -107,7 +107,7 @@ EventManager& Controller::eventManager()
     return m_eventManager;
 }
 
-ec2::SyncronizationEngine& Controller::ec2SyncronizationEngine()
+data_sync_engine::SyncronizationEngine& Controller::ec2SyncronizationEngine()
 {
     return m_ec2SyncronizationEngine;
 }
@@ -193,6 +193,7 @@ void Controller::initializeSecurity()
 {
     // TODO: #ak Move following to stree xml.
     m_authRestrictionList = std::make_unique<nx::network::http::AuthMethodRestrictionList>();
+    m_authRestrictionList->allow(kAnotherDeprecatedCloudModuleXmlPath, nx::network::http::AuthMethod::noAuth);
     m_authRestrictionList->allow(kDeprecatedCloudModuleXmlPath, nx::network::http::AuthMethod::noAuth);
     m_authRestrictionList->allow(kDiscoveryCloudModuleXmlPath, nx::network::http::AuthMethod::noAuth);
     m_authRestrictionList->allow(http_handler::Ping::kHandlerPath, nx::network::http::AuthMethod::noAuth);
@@ -226,7 +227,7 @@ void Controller::initializeDataSynchronizationEngine()
             [this](
                 nx::utils::db::QueryContext* queryContext,
                 const nx::String& /*systemId*/,
-                ::ec2::QnTransaction<::ec2::ApiSystemMergeHistoryRecord> data,
+                data_sync_engine::Command<::ec2::ApiSystemMergeHistoryRecord> data,
                 int*)
             {
                 m_systemMergeManager.processMergeHistoryRecord(queryContext, data.params);

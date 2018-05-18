@@ -60,17 +60,11 @@ void ScheduleSettingsWidget::setStore(CameraSettingsDialogStore* store)
             store->setScheduleBrushFps(value);
         });
 
-    connect(ui->displayQualityCheckBox, &QCheckBox::stateChanged, store,
-        [store](int state)
-        {
-            store->setRecordingShowQuality(state == Qt::Checked);
-        });
+    connect(ui->displayQualityCheckBox, &QCheckBox::clicked,
+        store, &CameraSettingsDialogStore::setRecordingShowQuality);
 
-    connect(ui->displayFpsCheckBox, &QCheckBox::stateChanged, store,
-        [store](int state)
-        {
-            store->setRecordingShowFps(state == Qt::Checked);
-        });
+    connect(ui->displayFpsCheckBox, &QCheckBox::clicked,
+        store, &CameraSettingsDialogStore::setRecordingShowFps);
 
     const auto makeRecordingTypeHandler =
         [store](Qn::RecordingType value)
@@ -135,9 +129,10 @@ void ScheduleSettingsWidget::setupUi()
     labelFont.setPixelSize(kRecordingTypeLabelFontSize);
     labelFont.setWeight(kRecordingTypeLabelFontWeight);
 
-    for (auto label: {
-        ui->labelAlways, ui->labelMotionOnly, ui->labelMotionPlusLQ, ui->labelNoRecord
-    })
+    const auto labels =
+        {ui->labelAlways, ui->labelMotionOnly, ui->labelMotionPlusLQ, ui->labelNoRecord};
+
+    for (auto label: labels)
     {
         label->setFont(labelFont);
         label->setProperty(style::Properties::kDontPolishFontProperty, true);
@@ -185,7 +180,6 @@ void ScheduleSettingsWidget::setupUi()
         paintFunctions->paintCellFunction(Qn::RecordingType::motionAndLow));
     ui->noRecordButton->setCustomPaintFunction(
         paintFunctions->paintCellFunction(Qn::RecordingType::never));
-
 }
 
 void ScheduleSettingsWidget::loadState(const CameraSettingsDialogState& state)
@@ -215,10 +209,14 @@ void ScheduleSettingsWidget::loadState(const CameraSettingsDialogState& state)
         ui->recordMotionButton->setToolTip(motionOptionHint(state));
     }
 
-    const bool hasDualStreaming = state.hasDualStreaming();
-    ui->recordMotionPlusLQButton->setEnabled(hasDualStreaming);
-    ui->labelMotionPlusLQ->setEnabled(hasDualStreaming);
-    if (hasDualStreaming)
+    using CombinedValue = CameraSettingsDialogState::CombinedValue;
+
+    const bool hasDualRecordingOption = state.hasMotion()
+        && state.devicesDescription.hasDualStreamingCapability == CombinedValue::All;
+
+    ui->recordMotionPlusLQButton->setEnabled(hasDualRecordingOption);
+    ui->labelMotionPlusLQ->setEnabled(hasDualRecordingOption);
+    if (hasDualRecordingOption)
     {
         ui->recordMotionPlusLQButton->setChecked(brush.recordingType == Qn::RecordingType::motionAndLow);
         setReadOnly(ui->recordMotionPlusLQButton, state.readOnly);
@@ -247,7 +245,8 @@ void ScheduleSettingsWidget::loadState(const CameraSettingsDialogState& state)
 
     ui->advancedSettingsWidget->setVisible(
         recording.customBitrateAvailable
-        && recording.customBitrateVisible);
+        && recording.customBitrateVisible
+        && recording.parametersAvailable);
 
     if (recording.customBitrateAvailable)
     {
@@ -269,14 +268,19 @@ void ScheduleSettingsWidget::loadState(const CameraSettingsDialogState& state)
         ui->advancedSettingsButton->setIcon(buttonIcon);
     }
 
-    ui->panicModeLabel->setText(state.panicMode ? tr("On") : tr("Off"));
-    setWarningStyleOn(ui->panicModeLabel, state.panicMode);
+    ui->displayQualityCheckBox->setChecked(recording.showQuality);
+    ui->displayFpsCheckBox->setChecked(recording.showFps);
+
+    ui->displaySettingsWidget->setVisible(recording.parametersAvailable);
+    ui->fpsAndQualityWidget->setVisible(recording.parametersAvailable);
 
     ui->settingsGroupBox->layout()->activate();
+    layout()->activate();
 
     const bool recordingEnabled = recording.enabled.valueOr(false);
     const auto labels =
         {ui->labelAlways, ui->labelMotionOnly, ui->labelMotionPlusLQ, ui->labelNoRecord};
+
     for (auto label: labels)
     {
         const auto button = qobject_cast<QAbstractButton*>(label->buddy());
@@ -291,14 +295,17 @@ QString ScheduleSettingsWidget::motionOptionHint(const CameraSettingsDialogState
 {
     using CombinedValue = CameraSettingsDialogState::CombinedValue;
     const bool devicesHaveMotion = state.devicesDescription.hasMotion == CombinedValue::All;
-    const bool devicesHaveDS = state.devicesDescription.hasDualStreaming == CombinedValue::All;
+    const bool devicesHaveDualStreaming =
+        state.devicesDescription.hasDualStreamingCapability == CombinedValue::All;
+
+    // TODO: #vkutin #gdm Should we check whether dual-streaming is disabled?
 
     if (state.isSingleCamera())
     {
-        if (devicesHaveMotion && !devicesHaveDS)
+        if (devicesHaveMotion && !devicesHaveDualStreaming)
             return tr("Dual-Streaming not supported for this camera");
 
-        if (!devicesHaveMotion && !devicesHaveDS)
+        if (!devicesHaveMotion && !devicesHaveDualStreaming)
             return tr("Dual-Streaming and motion detection not supported for this camera");
 
         const bool motionDetectionEnabled = state.singleCameraSettings.enableMotionDetection();
@@ -312,7 +319,7 @@ QString ScheduleSettingsWidget::motionOptionHint(const CameraSettingsDialogState
         return QString();
     }
 
-    if (!devicesHaveMotion || !devicesHaveDS)
+    if (!devicesHaveMotion || !devicesHaveDualStreaming)
     {
         return tr("Motion detection disabled or not supported")
             + L'\n'
@@ -322,7 +329,6 @@ QString ScheduleSettingsWidget::motionOptionHint(const CameraSettingsDialogState
 
     return QString();
 }
-
 
 } // namespace desktop
 } // namespace client

@@ -77,6 +77,8 @@ public:
     void setPossibleValues(QStringList possibleValues);
     void addPossibleValues(const QString& value);
 
+    bool isValueSupported(const QString& parameterValue) const;
+
 private:
     QString m_name;
     HanwhaCgiParameterType m_type = HanwhaCgiParameterType::unknown;

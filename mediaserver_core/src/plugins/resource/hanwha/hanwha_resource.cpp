@@ -29,7 +29,6 @@
 #include <nx/sdk/metadata/plugin.h>
 #include <nx/mediaserver/resource/shared_context_pool.h>
 #include <nx/streaming/abstract_archive_delegate.h>
-#include <nx/fusion/serialization/lexical.h>
 
 #include <core/resource_management/resource_discovery_manager.h>
 #include <core/resource/media_stream_capability.h>
@@ -40,7 +39,6 @@
 #include <media_server/media_server_module.h>
 #include <core/resource_management/resource_data_pool.h>
 #include <common/static_common_module.h>
-#include <utils/common/sleep.h>
 
 namespace nx {
 namespace mediaserver_core {
@@ -974,6 +972,8 @@ CameraDiagnostics::Result HanwhaResource::initSystem()
 
     if (isNvr())
     {
+        setCameraCapability(Qn::isPlaybackSpeedSupported, true);
+
         const auto sunapiSupportAttribute = m_attributes.attribute<bool>(
             lit("Media/Protocol.SUNAPI/%1").arg(getChannel()));
 
@@ -2367,6 +2367,20 @@ QnCameraAdvancedParams HanwhaResource::filterParameters(
     for (const auto& id: allParameters.allParameterIds())
     {
         const auto parameter = allParameters.getParameterById(id);
+        #if 1 //< TODO: #dmishin properly handle lens control parameters
+        static const std::set<QString> kLensControlParameters = {
+            lit("custom_ptr"),
+            lit("custom_zoom"),
+            lit("custom_focus")
+        };
+
+        if (kLensControlParameters.find(parameter.writeCmd) != kLensControlParameters.cend())
+        {
+            supportedIds.insert(parameter.id);
+            continue;
+        }
+        #endif
+
         const auto info = advancedParameterInfo(parameter.id);
 
         if (!info)
@@ -2384,24 +2398,32 @@ QnCameraAdvancedParams HanwhaResource::filterParameters(
         if (needToCheck && parameter.range.isEmpty())
             continue;
 
-        const auto& cgiParams = cgiParameters();
-        boost::optional<HanwhaCgiParameter> cgiParameter;
-        const auto rangeParameter = info->rangeParameter();
-        if (rangeParameter.isEmpty())
+        if (!info->parameterName().isEmpty())
         {
-            cgiParameter = cgiParams.parameter(
-                info->cgi(),
-                info->submenu(),
-                info->updateAction(),
-                info->parameterName());
-        }
-        else
-        {
-            cgiParameter = cgiParams.parameter(rangeParameter);
-        }
+            const auto& cgiParams = cgiParameters();
+            boost::optional<HanwhaCgiParameter> cgiParameter;
+            const auto rangeParameter = info->rangeParameter();
 
-        if (!cgiParameter)
-            continue;
+            if (rangeParameter.isEmpty())
+            {
+                cgiParameter = cgiParams.parameter(
+                    info->cgi(),
+                    info->submenu(),
+                    info->updateAction(),
+                    info->parameterName());
+            }
+            else
+            {
+                cgiParameter = cgiParams.parameter(rangeParameter);
+            }
+
+            if (!cgiParameter)
+                continue;
+
+            const auto parameterValue = info->parameterValue();
+            if (!parameterValue.isEmpty() && !cgiParameter->isValueSupported(parameterValue))
+                continue;
+        }
 
         bool isSupported = true;
         auto supportAttribute = info->supportAttribute();
@@ -2953,29 +2975,32 @@ bool HanwhaResource::executeCommand(const QnCameraAdvancedParamValue& command)
     if (info->isService())
         return executeServiceCommand(parameter, *info);
 
-    const auto cgiParameter = cgiParameters().parameter(
-        info->cgi(),
-        info->submenu(),
-        info->updateAction(),
-        info->parameterName());
-
-    if (!cgiParameter)
-        return false;
-
-    const auto possibleValues = cgiParameter->possibleValues();
-    const auto requestedParameterValues = info->parameterValue()
-        .split(L',');
-
-    QStringList parameterValues;
-    for (const auto& requestedValue: requestedParameterValues)
-    {
-        if (possibleValues.contains(requestedValue))
-            parameterValues.push_back(requestedValue);
-    }
-
     HanwhaRequestHelper::Parameters requestParameters;
-    if (!parameterValues.isEmpty())
-        requestParameters.emplace(info->parameterName(), parameterValues.join(L','));
+    if (!info->parameterName().isEmpty())
+    {
+        const auto cgiParameter = cgiParameters().parameter(
+            info->cgi(),
+            info->submenu(),
+            info->updateAction(),
+            info->parameterName());
+
+        if (!cgiParameter)
+            return false;
+
+        const auto possibleValues = cgiParameter->possibleValues();
+        const auto requestedParameterValues = info->parameterValue()
+            .split(L',');
+
+        QStringList parameterValues;
+        for (const auto& requestedValue: requestedParameterValues)
+        {
+            if (possibleValues.contains(requestedValue))
+                parameterValues.push_back(requestedValue);
+        }
+
+        if (!parameterValues.isEmpty())
+            requestParameters.emplace(info->parameterName(), parameterValues.join(L','));
+    }
 
     return executeCommandInternal(*info, requestParameters);
 }
@@ -3387,3 +3412,4 @@ bool HanwhaResource::isProxiedMultisensorCamera() const
 } // namespace plugins
 } // namespace mediaserver_core
 } // namespace nx
+

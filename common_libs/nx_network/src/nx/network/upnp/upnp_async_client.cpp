@@ -1,9 +1,9 @@
 #include "upnp_async_client.h"
 
-#include "upnp_device_description.h"
-#include "nx/fusion/model_functions.h"
-#include "nx/fusion/serialization/lexical_functions.h"
+#include <nx/fusion/serialization/lexical_functions.h>
 #include <nx/utils/log/log.h>
+
+#include "upnp_device_description.h"
 
 namespace nx {
 namespace network {
