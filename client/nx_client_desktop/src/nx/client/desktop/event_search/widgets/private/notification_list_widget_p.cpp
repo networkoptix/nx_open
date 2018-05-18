@@ -51,6 +51,7 @@ public:
     }
 };
 
+static constexpr int kPlaceholderFontPixelSize = 15;
 } // namespace
 
 
@@ -70,10 +71,35 @@ NotificationListWidget::Private::Private(NotificationListWidget* q) :
     headerLayout->addWidget(newActionButton(ui::action::BusinessEventsAction, -1));
     headerLayout->addWidget(newActionButton(ui::action::PreferencesNotificationTabAction, -1));
 
+    placeholder = new QWidget(q);
+    placeholder->setMinimumSize(QSize(0, 100));
+
     auto layout = new QVBoxLayout(q);
     layout->setSpacing(0);
     layout->addWidget(headerWidget);
+    layout->addWidget(placeholder);
     layout->addWidget(m_eventRibbon);
+
+    QVBoxLayout * verticalLayout = new QVBoxLayout(placeholder);
+    verticalLayout->setSpacing(16);
+    verticalLayout->setObjectName(QStringLiteral("verticalLayout_4"));
+    verticalLayout->setContentsMargins(24, 64, 24, 24);
+    QLabel * placeholderIcon = new QLabel(placeholder);
+    placeholderIcon->setFixedSize(QSize(64, 64));
+    placeholderIcon->setPixmap(qnSkin->pixmap(lit("events/placeholders/notifications.png")));
+    verticalLayout->addWidget(placeholderIcon, 0, Qt::AlignHCenter);
+    QLabel * placeholderText = new QLabel(placeholder);
+    QFont font;
+    font.setPixelSize(kPlaceholderFontPixelSize);
+    placeholderText->setProperty(style::Properties::kDontPolishFontProperty, true);
+    placeholderText->setFont(font);
+    placeholderText->setForegroundRole(QPalette::Mid);
+    placeholderText->setText(tr("No new notifications."));
+    placeholderText->setAlignment(Qt::AlignCenter);
+    placeholderText->setWordWrap(true);
+    verticalLayout->addWidget(placeholderText);
+    QSpacerItem * verticalSpacer = new QSpacerItem(20, 159, QSizePolicy::Minimum, QSizePolicy::Expanding);
+    verticalLayout->addItem(verticalSpacer);
 
     m_eventRibbon->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 
@@ -92,11 +118,15 @@ NotificationListWidget::Private::Private(NotificationListWidget* q) :
 
     connect(m_eventRibbon, &EventRibbon::unreadCountChanged,
         q, &NotificationListWidget::unreadCountChanged);
+
+    connect(m_eventRibbon, &EventRibbon::countChanged,
+        this, [this](int count)
+        {
+            placeholder->setVisible(count < 1);
+        });
 }
 
-NotificationListWidget::Private::~Private()
-{
-}
+NotificationListWidget::Private::~Private() = default;
 
 QToolButton* NotificationListWidget::Private::newActionButton(
     ui::action::IDType actionId,
