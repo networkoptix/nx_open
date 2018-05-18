@@ -86,6 +86,7 @@ copyToDataPartition()
     rm -rf "$MNT/$INSTALL_PATH" || true
     rm -rf "$MNT/opt/deb" || true
     rm -rf "$MNT$LITE_CLIENT_STARTUP_SCRIPT" || true
+    rm -rf "$MNT/$MEDIASERVER_PATH/var/scripts" || true
 
     # Unpack the distro to sdcard.
     tar xfv "$TAR_FILE" -C "$MNT/" || return $?
@@ -130,6 +131,7 @@ upgradeVms()
     rm -rf "/$INSTALL_PATH/lib" "/$MEDIASERVER_PATH/lib" "/$MEDIASERVER_PATH/bin" || true
     rm -rf "/opt/deb" || true
     rm -rf "/$LITE_CLIENT_PATH" "$LITE_CLIENT_STARTUP_SCRIPT" || true
+    rm -rf "/$MEDIASERVER_PATH/var/scripts" || true
 
     tar xfv "$TAR_FILE" -C / #< Extract the distro to the root.
 
