@@ -64,8 +64,11 @@ def login(request):
             raise  # wrong password - just - re-raise the exception
 
     if user is None:
-        raise APINotAuthorisedException('Username or password are invalid')
-
+        # try to find user in the DB
+        if not AccountBackend.is_email_in_portal(email):
+            raise APINotFoundException("User not in cloud portal", )  # user not found here
+        raise APINotAuthorisedException("Password is invalid")
+    
     if 'remember' not in request.data or not request.data['remember']:
         request.session.set_expiry(0)
 
