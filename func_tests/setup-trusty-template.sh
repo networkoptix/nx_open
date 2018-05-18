@@ -30,8 +30,7 @@ cd -
 rm -rf .temp_vagrant
 VBoxManage controlvm "${DIRTY}" acpipowerbutton
 sleep 10s
+
 VBoxManage modifyvm "${DIRTY}" --natpf1 delete "ssh"  # Left by Vagrant.
-VBoxManage modifyvm "${DIRTY}" --ioapic 'on' # See: https://www.virtualbox.org/manual/ch03.html#settings-motherboard.
-VBoxManage modifyvm "${DIRTY}" --cpus 2 --cpuexecutioncap 100 --memory 2048 --vram 32 --audio none
 VBoxManage snapshot "${DIRTY}" take "template"
 VBoxManage modifyvm "${DIRTY}" --name "${COMPLETE}"  # If this line is reached, above was successful (set -e).

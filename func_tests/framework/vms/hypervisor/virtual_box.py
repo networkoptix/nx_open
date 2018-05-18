@@ -79,24 +79,14 @@ class VirtualBox(object):
             '--options', 'link',
             '--register',
             ])
-        modify_command = [
-            'VBoxManage', 'modifyvm', vm_name,
-            '--paravirtprovider=kvm',
-            '--cpus=2', '--cpuexecutioncap=100', '--memory=2048',
-            '--nic1=nat', '--natnet1=192.168.254.0/24',
-            ]
+        modify_command = ['VBoxManage', 'modifyvm', vm_name]
         forwarded_ports = calculate_forwarded_ports(vm_index, vm_configuration['port_forwarding'])
         for tag, protocol, host_port, guest_port in forwarded_ports:
             modify_command.append('--natpf1={},{},,{},,{}'.format(tag, protocol, host_port, guest_port))
-        for nic_index in _INTERNAL_NIC_INDICES:
-            modify_command.append('--nic{}=null'.format(nic_index))
         for nic_index in [1] + _INTERNAL_NIC_INDICES:
             raw_mac = vm_configuration['mac_address_format'].format(vm_index=vm_index, nic_index=nic_index)
             modify_command.append('--macaddress{}={}'.format(nic_index, EUI(raw_mac, dialect=mac_bare)))
         self.host_os_access.run_command(modify_command)
-        extra_data = {'VBoxInternal/Devices/VMMDev/0/Config/GetHostTimeDisabled': 1}
-        for extra_key, extra_value in extra_data.items():
-            self.host_os_access.run_command(['VBoxManage', 'setextradata', vm_name, extra_key, extra_value])
         raw_info = self._get_info(vm_name)
         info = vm_info_from_raw_info(raw_info)
         return info
