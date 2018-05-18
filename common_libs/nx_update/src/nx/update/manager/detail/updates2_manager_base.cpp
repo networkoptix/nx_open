@@ -199,13 +199,15 @@ api::Updates2StatusData Updates2ManagerBase::download()
 
     nx::update::info::FileData fileData;
     const auto result = m_updateRegistry->findUpdateFile(
-        detail::UpdateFileRequestDataFactory::create(isClient()), &fileData);
+        detail::UpdateFileRequestDataFactory::create(isClient()),
+        &fileData);
     NX_ASSERT(result == update::info::ResultCode::ok);
 
     if (result != update::info::ResultCode::ok)
     {
         setStatus(
-            api::Updates2StatusData::StatusCode::error, "Failed to get update file information");
+            api::Updates2StatusData::StatusCode::error,
+            "Failed to get update file information");
         return m_currentStatus.base();
     }
 

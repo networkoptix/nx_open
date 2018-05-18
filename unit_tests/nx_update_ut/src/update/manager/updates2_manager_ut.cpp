@@ -103,13 +103,19 @@ public:
                 info::ResultCode::ok);
     }
 
-    virtual void merge(AbstractUpdateRegistry* other)
+    virtual void merge(AbstractUpdateRegistry* other) override
     {
         if (other)
         {
             m_cfg.hasUpdate |= (other->latestUpdate(info::UpdateRequestData(), nullptr) ==
                 info::ResultCode::ok);
         }
+    }
+
+
+    virtual QList<QnUuid> additionalPeers(const QString& /*fileName*/) const override
+    {
+        return QList<QnUuid>();
     }
 
 private:

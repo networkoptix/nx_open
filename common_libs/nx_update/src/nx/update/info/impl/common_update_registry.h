@@ -17,19 +17,23 @@ public:
         const QString& baseUrl,
         detail::data_parser::UpdatesMetaData metaData,
         detail::CustomizationVersionToUpdate customizationVersionToUpdate);
+
     CommonUpdateRegistry() = default;
     virtual ResultCode findUpdateFile(
         const UpdateFileRequestData& updateFileRequestData,
         FileData* outFileData) const override;
+
     virtual ResultCode latestUpdate(
         const UpdateRequestData& updateRequestData,
         QnSoftwareVersion* outSoftwareVersion) const override;
+
     virtual void addFileData(const ManualFileData& manualFileData) override;
     virtual QList<QString> alternativeServers() const override;
     virtual QByteArray toByteArray() const override;
     virtual bool fromByteArray(const QByteArray& rawData) override;
     virtual bool equals(AbstractUpdateRegistry* other) const override;
     virtual void merge(AbstractUpdateRegistry* other) override;
+    virtual QList<QnUuid> additionalPeers(const QString& fileName) const override;
 
 private:
     QString m_baseUrl;
