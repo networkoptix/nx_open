@@ -16,6 +16,7 @@ using DependencyType = QnCameraAdvancedParameterDependency::DependencyType;
 namespace {
 
 const QString kEqualConditionType = lit("value");
+const QString kNotEqualConditionType = lit("valueNe");
 const QString kInRangeConditionType = lit("valueIn");
 const QString kNotInRangeConditionType = lit("valueNotIn");
 const QString kPresenceConditionType = lit("present");
@@ -502,7 +503,13 @@ bool QnCameraAdvancedParameterCondition::checkValue(const QString& valueToCheck)
     switch (type)
     {
         case ConditionType::equal:
+        {
             return value == valueToCheck;
+        }
+        case ConditionType::notEqual:
+        {
+            return value != valueToCheck;
+        }
         case ConditionType::inRange:
         {
             auto valuesList = value.split(L',');
@@ -547,6 +554,7 @@ QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(QnCameraAdvancedParameter, DataType,
 
 QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(QnCameraAdvancedParameterCondition, ConditionType,
     (QnCameraAdvancedParameterCondition::ConditionType::equal, kEqualConditionType)
+    (QnCameraAdvancedParameterCondition::ConditionType::notEqual, kNotEqualConditionType)
     (QnCameraAdvancedParameterCondition::ConditionType::inRange, kInRangeConditionType)
     (QnCameraAdvancedParameterCondition::ConditionType::notInRange, kNotInRangeConditionType)
     (QnCameraAdvancedParameterCondition::ConditionType::present, kPresenceConditionType)
