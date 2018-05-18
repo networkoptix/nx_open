@@ -137,6 +137,9 @@ if(IOS)
         message(FATAL_ERROR "Cannot get provisioning profile id from \"${provisioning_profile}\"")
     endif()
 
+    message(STATUS
+        "Using provisioning profile: ${provisioning_profile}, id: ${provisioning_profile_id}")
+
     set(system_provisioning_profiles_dir "$ENV{HOME}/Library/MobileDevice/Provisioning Profiles")
     execute_process(
         COMMAND ${CMAKE_COMMAND} -E copy "${provisioning_profile}"
