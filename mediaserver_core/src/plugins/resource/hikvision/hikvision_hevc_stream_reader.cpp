@@ -233,11 +233,11 @@ CameraDiagnostics::Result HikvisionHevcStreamReader::fetchChannelProperties(
             if (statusCode == nx_http::StatusCode::Value::unauthorized)
                 return CameraDiagnostics::NotAuthorisedResult(url.toString());
 
-            if (statusCode != nx_http::StatusCode::Value::unauthorized)
+            if (statusCode != nx_http::StatusCode::Value::ok)
                 continue;
-
-            return CameraDiagnostics::RequestFailedResult(kRequestName, toString(statusCode));
         }
+        if (statusCode != nx_http::StatusCode::Value::ok)
+            return CameraDiagnostics::RequestFailedResult(kRequestName, toString(statusCode));
 
         if (!parseChannelPropertiesResponse(response, outChannelProperties))
             return CameraDiagnostics::CameraResponseParseErrorResult(url.toString(), kRequestName);
