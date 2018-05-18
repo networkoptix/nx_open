@@ -39,11 +39,6 @@ if(targetDevice AND NOT targetDevice STREQUAL "ios")
     include(cmake/sync_toolchain.cmake)
 endif()
 
-cmake_dependent_option(codeSigning "Enable code signing"
-    ON "NOT developerBuild"
-    OFF
-)
-
 project(vms VERSION 4.0.0)
 
 if(targetDevice STREQUAL "ios")
@@ -68,6 +63,12 @@ list(APPEND CMAKE_MODULE_PATH
 include(CMakeParseArguments)
 include(CMakeDependentOption)
 include(ExternalProject)
+
+cmake_dependent_option(codeSigning "Enable code signing"
+    ON "NOT developerBuild"
+    OFF
+)
+
 include(target_detection)
 include(utils)
 include(find_sources)
