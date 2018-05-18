@@ -47,7 +47,7 @@ set(dynamic.customization false)
 
 # Localization
 set(additionalTranslations "")
-set(installer.language "en_US")
+set(installerLanguage "en_US")
 set(installer.cultures "en-us")
 
 set(customization.defines "")

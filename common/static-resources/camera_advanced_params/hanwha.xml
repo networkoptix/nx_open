@@ -929,6 +929,30 @@
                         dataType="Enumeration"/>
             </group>
         </group>
+        <group name="Lens Control">
+            <param id="root.Zoom"
+                name="Zoom"
+                description="Zoom machinery"
+                range="-30,30"
+                dataType="SliderControl"
+                writeCmd="custom_zoom"
+                compact="true"/>
+            <param id="root.Ptr"
+                name=""
+                description="Pan tilt rotation machinery"
+                dataType="PtrControl"
+                range="-30,30,-30,30,-30,30"
+                readCmd="param.cgi"
+                writeCmd="custom_ptr"
+                compact="true"/>
+            <param id="root.Focus"
+                name="Focus"
+                description="Focus machinery"
+                range="-30,30"
+                dataType="SliderControl"
+                writeCmd="custom_focus"
+                compact="true"/>
+        </group>
         <group name="Maintenance">
             <param id="image/focus/Mode=SimpleFocus"
                     name="Simple Focus"
@@ -940,8 +964,7 @@
                     name="Initialize Focus"
                     dataType="Button"
                     writeCmd="control"
-                    description="Restores the focus adjustment to the default flange back position"
-                    aux="support=Image/ResetFocus"/>
+                    description="Restores the focus adjustment to the default flange back position"/>
             <param id="image/focus/Mode=AutoFocus"
                     name="Simple Focus"
                     dataType="Button"
@@ -979,7 +1002,7 @@
                     confirmation="Are you sure you want to reset all settings (except network) to default?"
                     description="Resets all camera parameters to defaults except for network settings"
                     aux="noChannel=true"/>
-            <param id="system/factoryreset/ExcludeSettings=None"
+            <param id="system/factoryreset"
                     name="Reset to Factory Defaults"
                     dataType="Button"
                     writeCmd="control"

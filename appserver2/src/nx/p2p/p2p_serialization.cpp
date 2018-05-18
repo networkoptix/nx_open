@@ -299,7 +299,12 @@ QList<QByteArray> deserializeTransactionList(const QByteArray& tranList, bool* s
         {
             quint32 size = deserializeCompressedSize(reader);
             int offset = reader.getBitsCount() / 8;
-            result.push_back(QByteArray::fromRawData(tranList.data() + offset, size));
+            if (offset + size > tranList.size())
+            {
+                *success = false;
+                return result;
+            }
+            result.push_back(tranList.mid(offset, size));
             reader.skipBytes(size);
         }
         *success = true;

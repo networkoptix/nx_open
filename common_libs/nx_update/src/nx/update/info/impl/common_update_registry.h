@@ -10,7 +10,7 @@ namespace update {
 namespace info {
 namespace impl {
 
-class CommonUpdateRegistry: public AbstractUpdateRegistry
+class NX_UPDATE_API CommonUpdateRegistry: public AbstractUpdateRegistry
 {
 public:
     CommonUpdateRegistry(
