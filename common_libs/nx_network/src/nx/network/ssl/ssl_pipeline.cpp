@@ -25,16 +25,15 @@ Pipeline::Pipeline(SSL_CTX* sslContext):
 
 int Pipeline::write(const void* data, size_t size)
 {
-    bool eofBak = m_eof;
-    int result = performSslIoOperation(&SSL_write, data, size);
-    if (result == 0 && m_eof && !eofBak)
-        m_eof = false; //< TODO: #ak Remove this & fix handleSslIoResult().
-    return result;
+    return performSslIoOperation(&SSL_write, data, size);
 }
 
 int Pipeline::read(void* data, size_t size)
 {
-    return performSslIoOperation(&SSL_read, data, size);
+    const auto result = performSslIoOperation(&SSL_read, data, size);
+    if (result == 0)
+        m_eof = true;
+    return result;
 }
 
 bool Pipeline::performHandshake()
@@ -163,11 +162,7 @@ int Pipeline::bioWrite(const void* buffer, unsigned int bufferLen)
 int Pipeline::handleSslIoResult(int result)
 {
     if (result >= 0)
-    {
-        if (result == 0)
-            m_eof = true;
         return result;
-    }
 
     const auto sslErrorCode = SSL_get_error(m_ssl.get(), result);
     switch (sslErrorCode)
