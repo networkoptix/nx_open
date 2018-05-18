@@ -2073,13 +2073,15 @@ Qn::ServerFlags MediaServerProcess::calcServerFlags()
     if (QnAppInfo::isBpi())
     {
         serverFlags |= Qn::SF_IfListCtrl | Qn::SF_timeCtrl;
-        serverFlags |= Qn::SF_HasLiteClient;
+        if (QnStartLiteClientRestHandler::isLiteClientPresent())
+            serverFlags |= Qn::SF_HasLiteClient;
     }
 
-    bool compatibilityMode = m_cmdLineArguments.devModeKey == lit("razrazraz");
+    const bool compatibilityMode = m_cmdLineArguments.devModeKey == lit("razrazraz");
     if (compatibilityMode) // check compatibilityMode here for testing purpose
     {
-        serverFlags |= Qn::SF_HasLiteClient;
+        if (QnStartLiteClientRestHandler::isLiteClientPresent())
+            serverFlags |= Qn::SF_HasLiteClient;
     }
 
 #ifdef __arm__
@@ -2555,7 +2557,7 @@ void MediaServerProcess::run()
 
     initializeCloudConnect();
 
-    bool compatibilityMode = m_cmdLineArguments.devModeKey == lit("razrazraz");
+    const bool compatibilityMode = m_cmdLineArguments.devModeKey == lit("razrazraz");
     const QString appserverHostString = qnServerModule->roSettings()->value("appserverHost").toString();
 
     commonModule()->setSystemIdentityTime(nx::ServerSetting::getSysIdTime(), commonModule()->moduleGUID());
