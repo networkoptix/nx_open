@@ -446,7 +446,7 @@ class SslSocketSpecific:
         network::test::SslSocketBothEndsEncryptedTypeSet>;
 
 protected:
-    void givenSocketWithTimedoutSend()
+    void givenSocketTimedOutOnSendAsync()
     {
         givenAcceptingServerSocket();
         givenConnectedSocket();
@@ -456,14 +456,42 @@ protected:
 
         thenClientSendTimesOutEventually();
     }
+
+    void givenSocketTimedOutOnSend()
+    {
+        givenAcceptingServerSocket();
+        givenConnectedSocket();
+        setClientSocketSendTimeout(std::chrono::milliseconds(1));
+
+        const auto randomData = nx::utils::generateRandomName(64*1024);
+        for (;;)
+        {
+            int bytesSent =
+                connection()->send(randomData.constData(), randomData.size());
+            if (bytesSent >= 0)
+                continue;
+
+            ASSERT_EQ(SystemError::timedOut, SystemError::getLastOSErrorCode());
+            break;
+        }
+    }
 };
 
 TEST_F(SslSocketSpecific, socket_becomes_unusable_after_async_send_timeout)
 {
-    givenSocketWithTimedoutSend();
+    givenSocketTimedOutOnSendAsync();
     whenClientSendsPingAsync();
-    thenSendFailedWith(SystemError::connectionReset);
+    thenSendFailedUnrecoverableError();
 }
+
+TEST_F(SslSocketSpecific, socket_becomes_unusable_after_sync_send_timeout)
+{
+    givenSocketTimedOutOnSend();
+    whenClientSendsPing();
+    thenSendFailedUnrecoverableError();
+}
+
+// TEST_F(SslSocketSpecific, timeout_during_handshake_is_handled_properly)
 
 //-------------------------------------------------------------------------------------------------
 // Mixing sync & async mode.

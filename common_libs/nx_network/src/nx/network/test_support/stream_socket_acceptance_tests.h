@@ -525,12 +525,21 @@ protected:
         m_connection->pleaseStopSync();
     }
 
+    void whenClientSentPing()
+    {
+        whenClientSendsPing();
+        thenSendSucceeded();
+    }
+
     void whenClientSendsPing()
     {
-        ASSERT_EQ(
-            m_clientMessage.size(),
-            m_connection->send(m_clientMessage.constData(), m_clientMessage.size()))
-            << SystemError::getLastOSErrorText().toStdString();
+        const auto bytesSent =
+            m_connection->send(m_clientMessage.constData(), m_clientMessage.size());
+
+        m_sendResultQueue.push(
+            bytesSent == m_clientMessage.size()
+            ? SystemError::noError
+            : SystemError::getLastOSErrorCode());
     }
 
     void whenClientSentPingAsync()
@@ -557,6 +566,13 @@ protected:
     void thenSendFailedWith(SystemError::ErrorCode systemErrorCode)
     {
         ASSERT_EQ(systemErrorCode, m_sendResultQueue.pop());
+    }
+
+    void thenSendFailedUnrecoverableError()
+    {
+        const auto errorCode = m_sendResultQueue.pop();
+        ASSERT_NE(SystemError::noError, errorCode);
+        ASSERT_TRUE(socketCannotRecoverFromError(errorCode));
     }
 
     void whenClientSendsRandomDataAsyncNonStop()
@@ -687,7 +703,7 @@ protected:
     {
         this->givenConnectedSocket();
         // E.g., for socket with encryption auto-detection
-        this->whenClientSendsPing();
+        this->whenClientSentPing();
 
         this->waitUntilConnectionIsAccepted();
     }
@@ -1099,7 +1115,7 @@ TYPED_TEST_P(StreamSocketAcceptance, receive_timeout_change_is_not_ignored)
     this->givenPingPongServer();
     this->givenConnectedSocket();
 
-    this->whenClientSendsPing();
+    this->whenClientSentPing();
     this->whenReceivedMessageFromServerAsync(
         [this]()
         {
@@ -1204,7 +1220,7 @@ TYPED_TEST_P(StreamSocketAcceptance, nonblocking_accept_actually_accepts_connect
     this->givenListeningServerSocket();
     this->givenConnectedSocket();
     // E.g., for socket with encryption auto-detection
-    this->whenClientSendsPing();
+    this->whenClientSentPing();
 
     this->waitUntilConnectionIsAcceptedInNonBlockingMode();
 }
