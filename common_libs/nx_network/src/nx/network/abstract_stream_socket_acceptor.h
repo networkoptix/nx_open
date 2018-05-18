@@ -17,7 +17,7 @@ public:
      */
     virtual void acceptAsync(AcceptCompletionHandler handler) = 0;
     /**
-     * Does not block if called within object's aio thread.
+     * Does not block if called within object's AIO thread.
      * If called from any other thread then will block if completion handler is already running.
      */
     virtual void cancelIOSync() = 0;
