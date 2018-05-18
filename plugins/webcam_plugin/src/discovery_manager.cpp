@@ -3,8 +3,6 @@
 * akolesnikov
 ***********************************************************/
 
-//#pragma comment(lib, "strmiids.lib")
-
 #include "discovery_manager.h"
 
 #include <sys/types.h>
@@ -67,22 +65,28 @@ void DiscoveryManager::getVendorName(char* buf) const
 
 int DiscoveryManager::findCameras(nxcip::CameraInfo* cameras, const char* localInterfaceIPAddr)
 {
-    QList<utils::DeviceData> devices = utils::getDeviceList();
-    int deviceCount = devices.count();
+    std::vector<utils::DeviceData> devices = utils::getDeviceList();
+    int deviceCount = devices.size();
     for (int i = 0; i < deviceCount && i < nxcip::CAMERA_INFO_ARRAY_SIZE; ++i)
     {
-        QString deviceName = devices[i].deviceName();
-        strcpy(cameras[i].modelName, deviceName.toLatin1().data());
+        std::string deviceName = devices[i].deviceName();
+        strcpy(cameras[i].modelName, deviceName.c_str());
 
         QByteArray url =
             QByteArray("webcam://").append(
-            nx::utils::Url::toPercentEncoding(devices[i].devicePath()));
+            nx::utils::Url::toPercentEncoding(devices[i].devicePath().c_str()));
         strcpy(cameras[i].url, url.data());
 
         const QByteArray& uid = QCryptographicHash::hash(url, QCryptographicHash::Md5).toHex();
         strcpy(cameras[i].uid, uid.data());
 
     }
+
+    for(const auto& d : devices)
+    {
+        auto codecs = utils::getSupportedCodecs(d.devicePath().c_str());
+    }
+
     return deviceCount;
 }
 

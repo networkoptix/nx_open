@@ -10,34 +10,53 @@ namespace nx {
 namespace webcam_plugin {
 namespace utils {
 
-QList<DeviceData> getDeviceList(bool getResolution)
+std::vector<DeviceData> getDeviceList(
+    bool getResolution, 
+    nxcip::CompressionType targetCodecID)
 {
     return
 #ifdef _WIN32
-        dshow::getDeviceList(getResolution);
+        dshow::getDeviceList(getResolution, targetCodecID);
 #elif __linux__
         //todo
-        QList<DeviceInfo>();
+        std::vector<DeviceInfo>();
 #elif __APPLE__
         //todo
-        QList<DeviceInfo>();
+        std::vector<DeviceInfo>();
 #endif
-    QList<DeviceData>();
+    std::vector<DeviceData>();
 }
 
-QList<ResolutionData> getResolutionList(const char * devicePath)
+std::vector<nxcip::CompressionType> getSupportedCodecs(const char *devicePath)
+{
+    return
+#ifdef _WIN32
+        dshow::getSupportedCodecs(devicePath);
+#elif __linux__
+        //todo
+        std::vector<DeviceInfo>();
+#elif __APPLE__
+        //todo
+        std::vector<DeviceInfo>();
+#endif
+    std::vector<DeviceData>();
+}
+
+std::vector<ResolutionData> getResolutionList(
+    const char * devicePath,
+    nxcip::CompressionType targetCodecID)
 {
      return
 #ifdef _WIN32
-        dshow::getResolutionList(devicePath);
+        dshow::getResolutionList(devicePath, targetCodecID);
 #elif __linux__
         //todo
-        QList<DeviceInfo>();
+        std::vector<DeviceInfo>();
 #elif __APPLE__
         //todo
-        QList<DeviceInfo>();
+        std::vector<DeviceInfo>();
 #endif
-    QList<QSize>();
+    std::vector<nxcip::Resolution>();
 }
 
 } // namespace utils

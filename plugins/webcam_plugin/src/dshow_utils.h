@@ -7,19 +7,15 @@ namespace webcam_plugin {
 namespace utils {
 namespace dshow {
 
-    /*!
-    * Get the list of devices on the system, with fields filled out.
-    * @param[in] getResolution - whether or not to fill each DeviceData with supported resolutions
-    */
-    QList<DeviceData> getDeviceList(bool getResolution = false);
+std::vector<nxcip::CompressionType> getSupportedCodecs(const char * devicePath);
 
-    /*!
-    * Get the list of supported resolutions for the device with the given path.
-    * On Windows this corresponds to the device's L"DevicePath" field for COM.
-    * On Linux, this corresponds to the devices's /dev/video* entry.
-    * ON Mac, tbd
-    */
-    QList<ResolutionData> getResolutionList(const char * devicePath);
+std::vector<DeviceData> getDeviceList(
+    bool getResolution,
+    nxcip::CompressionType codecID);
+
+std::vector<ResolutionData> getResolutionList(
+    const char * devicePath,
+    nxcip::CompressionType codecID);
 
 } // namespace dshow
 } // namespace utils

@@ -2,9 +2,9 @@
 
 #include <camera/camera_plugin_types.h>
 
-#include <QtCore/QList>
-#include <QtCore/QString>
-#include <QtCore/QSize>
+#include <vector>
+#include <string>
+#include "camera/camera_plugin.h"
 
 namespace nx {
 namespace webcam_plugin {
@@ -12,34 +12,35 @@ namespace utils {
 
 struct ResolutionData
 {
-    QSize resolution;
+    nxcip::Resolution resolution;
     nxcip::CompressionType codecID;
     //nxcip::PixelFormat pixelFormat;
 
     bool operator==(const ResolutionData & rhs) const
     {
-        return resolution == rhs.resolution
-        && codecID == rhs.codecID;
+        return resolution.width == rhs.resolution.width
+            && resolution.height == rhs.resolution.height
+            && codecID == rhs.codecID;
     }
 };
 
 class DeviceData
 {
 public:
-    void setDeviceName(const QString& deviceName);
-    QString deviceName();
+    void setDeviceName(const std::string& deviceName);
+    std::string deviceName() const;
 
-    void setDevicePath(const QString& devicePath);
-    QString devicePath();
+    void setDevicePath(const std::string& devicePath);
+    std::string devicePath() const;
 
-    void setResolutionList(const QList<ResolutionData>& resolutionDataList);
-    QList<ResolutionData> resolutionList();
+    void setResolutionList(const std::vector<ResolutionData>& resolutionDataList);
+    std::vector<ResolutionData> resolutionList();
 
 private:
-    QString m_deviceName;
-    QString m_devicePath;
+    std::string m_deviceName;
+    std::string m_devicePath;
 
-    QList<ResolutionData> m_resolutionDataList;
+    std::vector<ResolutionData> m_resolutionDataList;
 };
 
 } // namespace utils

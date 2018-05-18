@@ -5,31 +5,31 @@ namespace nx {
 namespace webcam_plugin {
 namespace utils {
 
-void DeviceData::setDeviceName(const QString & deviceName)
+void DeviceData::setDeviceName(const std::string & deviceName)
 {
     m_deviceName = deviceName;
 }
-QString DeviceData::deviceName()
+std::string DeviceData::deviceName() const
 {
     return m_deviceName;
 }
 
-void DeviceData::setDevicePath(const QString & devicePath)
+void DeviceData::setDevicePath(const std::string & devicePath)
 {
     m_devicePath = devicePath;
 }
 
-QString DeviceData::devicePath()
+std::string DeviceData::devicePath() const
 {
     return m_devicePath;
 }
 
-void DeviceData::setResolutionList(const QList<ResolutionData>& resolutionDataList)
+void DeviceData::setResolutionList(const std::vector<ResolutionData>& resolutionDataList)
 {
     m_resolutionDataList = resolutionDataList;
 }
 
-QList<ResolutionData> DeviceData::resolutionList()
+std::vector<ResolutionData> DeviceData::resolutionList()
 {
     return m_resolutionDataList;
 }

@@ -72,13 +72,14 @@ int MediaEncoder::getResolutionList( nxcip::ResolutionInfo* infoList, int* infoL
     QString url = QString(m_cameraManager->info().url).mid(9);
     url = nx::utils::Url::fromPercentEncoding(url.toLatin1());
 
-    QList<utils::ResolutionData> resolutionList = utils::getResolutionList(url.toLatin1().data());
-
-    int count = resolutionList.count();
+    std::vector<utils::ResolutionData> resList 
+        = utils::getResolutionList(url.toLatin1().data(), nxcip::AV_CODEC_ID_H264);
+    
+    int count = resList.size();
     for (int i = 0; i < count; ++i)
     {
-        infoList[i].resolution.width = resolutionList[i].resolution.width();
-        infoList[i].resolution.height = resolutionList[i].resolution.height();
+        infoList[i].resolution.width = resList[i].resolution.width;
+        infoList[i].resolution.height = resList[i].resolution.height;
         infoList[i].maxFps = MAX_FPS;
     }
     *infoListCount = count;

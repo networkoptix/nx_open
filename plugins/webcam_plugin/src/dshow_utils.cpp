@@ -1,13 +1,20 @@
 #ifdef _WIN32
 
 #include "dshow_utils.h"
+
 #include <dshow.h>
 #include <windows.h>
+#include <comip.h>
+#include <atlmem.h>
+#include <ATLComMem.h>
 
 namespace nx {
 namespace webcam_plugin {
 namespace utils {
 namespace dshow {
+
+//-------------------------------------------------------------------------------------------------
+// Private helper functions
 
 void FreeMediaType(AM_MEDIA_TYPE& mt);
 void DeleteMediaType(AM_MEDIA_TYPE *pmt);
@@ -17,23 +24,26 @@ HRESULT getDeviceProperty(IMoniker * pMoniker, LPCOLESTR propName, VARIANT * out
 HRESULT enumerateDevices(REFGUID category, IEnumMoniker **ppEnum);
 HRESULT findDevice(REFGUID category, const char * devicePath, IMoniker ** outMoniker);
 
-HRESULT getResolutionList(IMoniker *pMoniker, QList<ResolutionData>* outResolutionList);
+HRESULT getSupportedCodecs(IMoniker *pMoniker, std::vector<nxcip::CompressionType>* codecList);
+HRESULT getResolutionList(IMoniker *pMoniker, 
+    std::vector<ResolutionData>* outResolutionList, 
+    nxcip::CompressionType codecID);
 
+std::string toStdString(BSTR str);
 nxcip::CompressionType toNxCodecID(DWORD biCompression);
-//nxcip::PixelFormat toNxPixelFormat(VIDEOINFOHEADER * tag_videoinfoheader);
-
+    
 HRESULT getDeviceName(IMoniker *pMoniker, DeviceData *outDeviceInfo);
 HRESULT getDevicePath(IMoniker *pMoniker, DeviceData *outDeviceInfo);
-HRESULT getResolutionList(IMoniker *pMoniker, DeviceData *outDeviceInfo);
+HRESULT getResolutionList(IMoniker *pMoniker,
+    DeviceData *outDeviceInfo,
+    nxcip::CompressionType codecID);
 
 
-/*!
-* initializes dshow for the thread that calls the public util functions
-* https://msdn.microsoft.com/en-us/library/windows/desktop/ms695279(v=vs.85).aspx
-* note: only use this from the public api functions listed in "dshow_utils.h"
-* todo: This is a work around, we shouldn't have to initialze and deinitialize every time the util 
-*       functions are called.
-*/
+// initializes dshow for the thread that calls the public util functions
+// https://msdn.microsoft.com/en-us/library/windows/desktop/ms695279(v=vs.85).aspx
+// note: only use this from the public api functions listed in "dshow_utils.h"
+// todo: This is a work around, we shouldn't have to init and deinit every time the util 
+//       functions are called.
 class DShowInitializer
 {
 public:
@@ -51,57 +61,29 @@ private:
     HRESULT m_result;
 };
 
-
-QList<ResolutionData> getResolutionList(const char * devicePath)
+std::string toStdString(BSTR bstr)
 {
-    //todo figure out how to avoid this init everytime
-    DShowInitializer init;
-
-    QList<ResolutionData> resolutionList;
-
-    IMoniker * pMoniker = NULL;
-    HRESULT hr = findDevice(CLSID_VideoInputDeviceCategory, devicePath, &pMoniker);
-    if (FAILED(hr))
-        return resolutionList;
-
-    if (pMoniker)
-        getResolutionList(pMoniker, &resolutionList);
-
-    // pMoniker needs to be released even if findDevice() or getResolutionList() failed
-    if (pMoniker)
-        pMoniker->Release();
-    return resolutionList;
+    char * ch = _com_util::ConvertBSTRToString(bstr);
+    std::string str(ch);
+    delete ch;
+    return str;
 }
 
-/*!
-* borrowed and modified from: https://ffmpeg.zeranoe.com/forum/viewtopic.php?t=651
-*/
-QList<DeviceData> getDeviceList(bool getResolution)
+nxcip::CompressionType toNxCodecID(DWORD biCompression)
 {
-    //todo figure out how to avoid this init everytime
-    DShowInitializer init;
-
-    QList<DeviceData> deviceNames;
-    IEnumMoniker * pEnum;
-    HRESULT hr = enumerateDevices(CLSID_VideoInputDeviceCategory, &pEnum);
-    if (FAILED(hr))
-        return deviceNames;
-
-    IMoniker *pMoniker = NULL;
-    while (S_OK == pEnum->Next(1, &pMoniker, NULL))
+    switch (biCompression)
     {
-        DeviceData deviceInfo;
-        getDeviceName(pMoniker, &deviceInfo);
-        getDevicePath(pMoniker, &deviceInfo);
-        if (getResolution)
-            getResolutionList(pMoniker, &deviceInfo);
-        deviceNames.append(deviceInfo);
-        pMoniker->Release();
+        case MAKEFOURCC('H', '2', '6', '3'):
+            return nxcip::AV_CODEC_ID_H263;
+        case MAKEFOURCC('M', 'J', 'P', 'G'):
+            return nxcip::AV_CODEC_ID_MJPEG;
+        case MAKEFOURCC('H', '2', '6', '4'):
+            return nxcip::AV_CODEC_ID_H264;
+            //these are all the formats supported by the webcam plugingetR
+        default:
+            return nxcip::AV_CODEC_ID_NONE;
     }
-    pEnum->Release();
-    return deviceNames;
 }
-
 
 // borrowed from https://msdn.microsoft.com/en-us/library/windows/desktop/dd375432(v=vs.85).aspx
 // Release the format block for a media type.
@@ -183,6 +165,30 @@ HRESULT getDeviceProperty(IMoniker * pMoniker, LPCOLESTR propName, VARIANT * out
     return hr;
 }
 
+HRESULT enumerateMediaTypes(IMoniker* pMoniker, IEnumMediaTypes ** outEnumMediaTypes)
+{
+    *outEnumMediaTypes = NULL;
+
+    IBaseFilter * baseFilter = NULL;
+    HRESULT hr = pMoniker->BindToObject(NULL, NULL, IID_IBaseFilter, (void **) &baseFilter);
+    if (FAILED(hr))
+        return hr;
+
+    IPin * pin = NULL;
+    //todo find out if there are multiple output pins for a device. For now we assume only one
+    hr = getPin(baseFilter, PINDIR_OUTPUT, &pin);
+    if (SUCCEEDED(hr))
+    {
+        IEnumMediaTypes * enumMediaTypes = NULL;
+        hr = pin->EnumMediaTypes(&enumMediaTypes);
+        if (SUCCEEDED(hr))
+            *outEnumMediaTypes = enumMediaTypes;
+        pin->Release();
+    }
+    baseFilter->Release();
+    return hr;
+}
+
 HRESULT enumerateDevices(REFGUID category, IEnumMoniker ** ppEnum)
 {
     // Create the System Device Enumerator.
@@ -208,7 +214,9 @@ HRESULT findDevice(REFGUID category, const char * devicePath, IMoniker ** outMon
     HRESULT hr = enumerateDevices(category, &pEnum);
     if (FAILED(hr))
         return hr;
-    
+
+    CComBSTR devPathBstr(devicePath);
+   
     IMoniker *pMoniker = NULL;
     while (S_OK == (hr = pEnum->Next(1, &pMoniker, NULL)))
     {
@@ -216,40 +224,28 @@ HRESULT findDevice(REFGUID category, const char * devicePath, IMoniker ** outMon
         getDeviceProperty(pMoniker, L"DevicePath", &var);
         
         // don't release the moniker in this case, it's the one we are looking for
-        if (QString::fromWCharArray(var.bstrVal) == devicePath)
+        if (wcscmp(var.bstrVal, devPathBstr) == 0)
         {
             pEnum->Release();
             *outMoniker = pMoniker;
             return hr;
         }
-
         pMoniker->Release();
     }
-    
+
     pEnum->Release();
     *outMoniker = NULL;
     return hr;
 }
 
-HRESULT getResolutionList(IMoniker *pMoniker, QList<ResolutionData>* outResolutionList)
+HRESULT getSupportedCodecs(IMoniker *pMoniker, std::vector<nxcip::CompressionType> *outCodecList)
 {
-    IBaseFilter * baseFilter = NULL;
-    HRESULT hr = pMoniker->BindToObject(NULL, NULL, IID_IBaseFilter, (void **) &baseFilter);
-    if (FAILED(hr))
-        return hr;
-
-    IPin * pin = NULL;
-    //todo find out if there are multiple output pins for a device. For now we assume only one
-    hr = getPin(baseFilter, PINDIR_OUTPUT, &pin);
-    if (FAILED(hr))
-        return hr;
-
     IEnumMediaTypes * enumMediaTypes = NULL;
-    hr = pin->EnumMediaTypes(&enumMediaTypes);
+    HRESULT hr = enumerateMediaTypes(pMoniker, &enumMediaTypes);
     if (FAILED(hr))
         return hr;
 
-    QList<ResolutionData> resolutionList;
+    std::vector<nxcip::CompressionType> codecList;
 
     AM_MEDIA_TYPE* mediaType = NULL;
     while (S_OK == enumMediaTypes->Next(1, &mediaType, NULL))
@@ -262,42 +258,57 @@ HRESULT getResolutionList(IMoniker *pMoniker, QList<ResolutionData>* outResoluti
             BITMAPINFOHEADER *bmiHeader = &viHeader->bmiHeader;
 
             nxcip::CompressionType codecID = toNxCodecID(bmiHeader->biCompression);
-            //if (codecID == nxcip::AV_CODEC_ID_NONE)
-            //    continue;
 
-            ResolutionData resData;
-            resData.resolution = QSize(bmiHeader->biWidth, bmiHeader->biHeight);
-            resData.codecID = toNxCodecID(bmiHeader->biCompression);
-
-            if (!resolutionList.contains(resData))
-                resolutionList.append(resData);
+            if (std::find(codecList.begin(), codecList.end(), codecID) == codecList.end())
+                codecList.push_back(codecID);
         }
         DeleteMediaType(mediaType);
+    }
 
+    *outCodecList = codecList;
+    enumMediaTypes->Release();
+    return hr;
+}
+
+HRESULT getResolutionList(IMoniker *pMoniker,
+    std::vector<ResolutionData>* outResolutionList,
+    nxcip::CompressionType targetCodecID)
+{
+    IEnumMediaTypes * enumMediaTypes = NULL;
+    HRESULT hr = enumerateMediaTypes(pMoniker, &enumMediaTypes);
+    if (FAILED(hr))
+        return hr;
+
+    std::vector<ResolutionData> resolutionList;
+
+    AM_MEDIA_TYPE* mediaType = NULL;
+    while (S_OK == enumMediaTypes->Next(1, &mediaType, NULL))
+    {
+        if ((mediaType->formattype == FORMAT_VideoInfo) &&
+            (mediaType->cbFormat >= sizeof(VIDEOINFOHEADER)) &&
+            (mediaType->pbFormat != NULL))
+        {
+            auto viHeader = reinterpret_cast<VIDEOINFOHEADER*>(mediaType->pbFormat);
+            BITMAPINFOHEADER *bmiHeader = &viHeader->bmiHeader;
+
+            nxcip::CompressionType codecID = toNxCodecID(bmiHeader->biCompression);
+            if (codecID != targetCodecID)
+                continue;
+
+            ResolutionData resData;
+            resData.resolution = nxcip::Resolution(bmiHeader->biWidth, bmiHeader->biHeight);
+            resData.codecID = codecID;
+
+            if(std::find(resolutionList.begin(), resolutionList.end(), resData) == resolutionList.end())
+                resolutionList.push_back(resData);
+        }
+        DeleteMediaType(mediaType);
     }
 
     *outResolutionList = resolutionList;
 
     enumMediaTypes->Release();
-    pin->Release();
-    baseFilter->Release();
     return hr;
-}
-
-nxcip::CompressionType toNxCodecID(DWORD biCompression)
-{
-    switch (biCompression)
-    {
-        case MAKEFOURCC('H', '2', '6', '3'):
-            return nxcip::AV_CODEC_ID_H263;
-        case MAKEFOURCC('M', 'J', 'P', 'G'):
-            return nxcip::AV_CODEC_ID_MJPEG;
-        case MAKEFOURCC('H', '2', '6', '4'):
-            return nxcip::AV_CODEC_ID_H264;
-            //these are all the formats supported by the webcam plugin
-        default:
-            return nxcip::AV_CODEC_ID_NONE;
-    }
 }
 
 HRESULT getDeviceName(IMoniker *pMoniker, DeviceData *outDeviceInfo)
@@ -307,7 +318,8 @@ HRESULT getDeviceName(IMoniker *pMoniker, DeviceData *outDeviceInfo)
     if (FAILED(hr))
         return hr;
 
-    outDeviceInfo->setDeviceName(QString::fromWCharArray(var.bstrVal));
+    outDeviceInfo->setDeviceName(toStdString(var.bstrVal));
+
     return hr;
 }
 
@@ -318,18 +330,87 @@ HRESULT getDevicePath(IMoniker *pMoniker, DeviceData *outDeviceInfo)
     if (FAILED(hr))
         return hr;
 
-    outDeviceInfo->setDevicePath(QString::fromWCharArray(var.bstrVal));
+    outDeviceInfo->setDevicePath(toStdString(var.bstrVal));
+
     return hr;
 }
 
-HRESULT getResolutionList(IMoniker *pMoniker, DeviceData *outDeviceInfo)
+HRESULT getResolutionList(IMoniker *pMoniker, DeviceData *outDeviceInfo, nxcip::CompressionType targetCodecID)
 {
-    QList<ResolutionData> resolutionList;
-    HRESULT hr = getResolutionList(pMoniker, &resolutionList);
+    std::vector<ResolutionData> resolutionList;
+    HRESULT hr = getResolutionList(pMoniker, &resolutionList, targetCodecID);
     if (FAILED(hr))
         return hr;
 
     outDeviceInfo->setResolutionList(resolutionList);
+}
+
+//-------------------------------------------------------------------------------------------------
+// Public API 
+
+std::vector<DeviceData> getDeviceList(bool getResolution, nxcip::CompressionType targetCodecID)
+{
+    //todo figure out how to avoid this init everytime
+    DShowInitializer init;
+
+    std::vector<DeviceData> deviceNames;
+    IEnumMoniker * pEnum;
+    HRESULT hr = enumerateDevices(CLSID_VideoInputDeviceCategory, &pEnum);
+    if (FAILED(hr))
+        return deviceNames;
+
+    IMoniker *pMoniker = NULL;
+    while (S_OK == pEnum->Next(1, &pMoniker, NULL))
+    {
+        DeviceData deviceInfo;
+        getDeviceName(pMoniker, &deviceInfo);
+        getDevicePath(pMoniker, &deviceInfo);
+        if (getResolution)
+            getResolutionList(pMoniker, &deviceInfo, targetCodecID);
+        deviceNames.push_back(deviceInfo);
+        pMoniker->Release();
+    }
+    pEnum->Release();
+    return deviceNames;
+}
+
+std::vector<nxcip::CompressionType> getSupportedCodecs(const char * devicePath)
+{
+    //todo figure out how to avoid this init everytime
+    DShowInitializer init;
+
+    std::vector<nxcip::CompressionType> codecList;
+
+    IMoniker * pMoniker = NULL;
+    HRESULT hr = findDevice(CLSID_VideoInputDeviceCategory, devicePath, &pMoniker);
+    if (SUCCEEDED(hr) && pMoniker)
+        getSupportedCodecs(pMoniker, &codecList);
+
+    if (pMoniker)
+        pMoniker->Release();
+
+    return codecList;
+}
+
+std::vector<ResolutionData> getResolutionList(const char * devicePath, nxcip::CompressionType targetCodecID)
+{
+    //todo figure out how to avoid this init everytime
+    DShowInitializer init;
+
+    std::vector<ResolutionData> resolutionList;
+
+    IMoniker * pMoniker = NULL;
+    HRESULT hr = findDevice(CLSID_VideoInputDeviceCategory, devicePath, &pMoniker);
+    if (FAILED(hr))
+        return resolutionList;
+
+    if (pMoniker)
+    {
+        getResolutionList(pMoniker, &resolutionList, targetCodecID);
+        pMoniker->Release();
+    }
+
+    return resolutionList;
 }
 
 } // namespace dshow
