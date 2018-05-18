@@ -35,6 +35,14 @@ VBoxManage modifyvm $NAME --nic5 null
 VBoxManage modifyvm $NAME --nic6 null
 VBoxManage modifyvm $NAME --nic7 null
 VBoxManage modifyvm $NAME --nic8 null
+VBoxManage modifyvm $NAME --nictype1 virtio
+VBoxManage modifyvm $NAME --nictype2 virtio
+VBoxManage modifyvm $NAME --nictype3 virtio
+VBoxManage modifyvm $NAME --nictype4 virtio
+VBoxManage modifyvm $NAME --nictype5 virtio
+VBoxManage modifyvm $NAME --nictype6 virtio
+VBoxManage modifyvm $NAME --nictype7 virtio
+VBoxManage modifyvm $NAME --nictype8 virtio
 
 VBoxManage snapshot $NAME delete template
 VBoxManage snapshot $NAME take template
