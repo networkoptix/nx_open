@@ -112,7 +112,6 @@ struct QnCameraAdvancedParameter
         Button,
         String,
         Separator,
-        LensControl,
         SliderControl,
         PtrControl,
     };
@@ -157,6 +156,8 @@ struct QnCameraAdvancedParameter
     static DataType stringToDataType(const QString &value);
 
     static bool dataTypeHasValue(DataType value);
+    // Returns true if specified DataType is instant value and should be sent immediately
+    static bool dataTypeIsInstant(DataType value);
 };
 
 QN_FUSION_DECLARE_FUNCTIONS(QnCameraAdvancedParameter::DataType, (lexical))

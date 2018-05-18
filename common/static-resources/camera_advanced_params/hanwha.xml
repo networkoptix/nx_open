@@ -961,14 +961,14 @@
             </group>
         </group>
         <group name="Lens Control">
-            <param id="root.Zoom"
+            <param id="image/custom/zoom"
                 name="Zoom"
                 description="Zoom machinery"
                 range="-30,30"
                 dataType="SliderControl"
                 writeCmd="custom_zoom"
                 compact="true"/>
-            <param id="root.Ptr"
+            <param id="image/custom/Ptr"
                 name=""
                 description="Pan tilt rotation machinery"
                 dataType="PtrControl"
@@ -976,7 +976,7 @@
                 readCmd="param.cgi"
                 writeCmd="custom_ptr"
                 compact="true"/>
-            <param id="root.Focus"
+            <param id="image/custom/focus"
                 name="Focus"
                 description="Focus machinery"
                 range="-30,30"

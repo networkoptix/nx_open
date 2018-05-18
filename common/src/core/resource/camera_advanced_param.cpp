@@ -34,8 +34,6 @@ const QString kButtonDataType = lit("Button");
 const QString kStringDataType = lit("String");
 const QString kSeparatorDataType = lit("Separator");
 
-// Fancy PTZL + lens control
-const QString kLensControl = lit("LensControlDebug");
 // Vertical slider with additional buttons.
 const QString kSliderControl = lit("SliderControl");
 // Pan tilt rotation control.
@@ -177,8 +175,6 @@ QString QnCameraAdvancedParameter::dataTypeToString(DataType value)
             return kStringDataType;
         case DataType::Separator:
             return kSeparatorDataType;
-        case DataType::LensControl:
-            return kLensControl;
         case DataType::PtrControl:
             return kPtrControl;
         case DataType::SliderControl:
@@ -197,7 +193,6 @@ QnCameraAdvancedParameter::DataType QnCameraAdvancedParameter::stringToDataType(
         << DataType::Button
         << DataType::String
         << DataType::Separator
-        << DataType::LensControl
         << DataType::SliderControl
         << DataType::PtrControl;
 
@@ -217,6 +212,10 @@ bool QnCameraAdvancedParameter::dataTypeHasValue(DataType value)
 		return true;
 	case DataType::Button:
     case DataType::Separator:
+    // It is weird, but right now hanwha plugin can not properly
+    // provide any value for those controls.
+    case DataType::SliderControl:
+    case DataType::PtrControl:
         return false;
     default:
         return false;
@@ -562,6 +561,8 @@ QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(QnCameraAdvancedParameter, DataType,
     (QnCameraAdvancedParameter::DataType::Number, "Number")
     (QnCameraAdvancedParameter::DataType::Button, "Button")
     (QnCameraAdvancedParameter::DataType::Separator, "Separator")
+    (QnCameraAdvancedParameter::DataType::SliderControl, "SliderControl")
+    (QnCameraAdvancedParameter::DataType::PtrControl, "PtrControl")
 )
 
 QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(QnCameraAdvancedParameterCondition, ConditionType,

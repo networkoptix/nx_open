@@ -231,7 +231,7 @@ QWidget* QnCameraAdvancedParamWidgetsManager::createWidgetsForPage(
     auto gridLayout = new QGridLayout(scrollAreaWidgetContents);
     scrollArea->setWidget(scrollAreaWidgetContents);
 
-    // Container for a group of 'compact' widgets
+    // Container for a group of 'compact' widgets.
     QHBoxLayout* compactLayout = nullptr;
     auto checkFinishGroup = [&compactLayout]()
         {
@@ -262,14 +262,14 @@ QWidget* QnCameraAdvancedParamWidgetsManager::createWidgetsForPage(
         {
             if (!compactLayout)
             {
-                // Creating container for compact controls
+                // Creating container for compact controls.
                 compactLayout = new QHBoxLayout(m_contentsWidget);
                 compactLayout->addWidget(widget, 0, Qt::AlignRight);
                 gridLayout->addLayout(compactLayout, row, 0, 1, 2, Qt::AlignVCenter);
             }
             else
             {
-                // Adding a widget to existing contaner for compact control group
+                // Adding a widget to existing contaner for compact control group.
                 compactLayout->addWidget(widget, 0, Qt::AlignRight);
             }
         }
@@ -298,7 +298,7 @@ QWidget* QnCameraAdvancedParamWidgetsManager::createWidgetsForPage(
 
         m_paramWidgetsById[param.id] = widget;
 
-        /* Widget is disabled until it receives correct value. */
+        // Widget is disabled until it receives correct value.
         if (QnCameraAdvancedParameter::dataTypeHasValue(param.dataType))
         {
             widget->setEnabled(false);

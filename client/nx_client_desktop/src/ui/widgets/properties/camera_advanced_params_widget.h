@@ -6,6 +6,8 @@
 #include <core/resource/camera_advanced_param.h>
 
 #include <utils/common/connective.h>
+#include <nx/utils/uuid.h>
+
 
 namespace Ui {
     class CameraAdvancedParamsWidget;
@@ -38,7 +40,9 @@ private:
     void initialize();
     void displayParams();
 
-    void saveSingleValue(const QnCameraAdvancedParamValue &value);
+    void saveSingleValue(const QnCameraAdvancedParamValue& value);
+    void sendCustomParameterCommand(const QnCameraAdvancedParameter& parameter,
+        const QString& value);
 
     bool isCameraAvailable() const;
     void updateCameraAvailability();
@@ -53,6 +57,7 @@ private:
 private slots:
     void at_advancedSettingsLoaded(int status, const QnCameraAdvancedParamValueList &params, int handle);
     void at_advancedParam_saved(int status, const QnCameraAdvancedParamValueList &params, int handle);
+    void at_ptzCommandProcessed(int status, const QVariant& reply, int handle);
 
 private:
     enum class State {
@@ -73,4 +78,8 @@ private:
     State m_state;
     QnCameraAdvancedParamValueMap m_loadedValues;
     QnCameraAdvancedParamValueMap m_currentValues;
+
+    // Special crutch for pan-tilt-zoom-lens control
+    QnUuid m_ptzSequenceId;
+    int m_ptzSequenceNumber = 1;
 };
