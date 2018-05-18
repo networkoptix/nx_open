@@ -13,7 +13,7 @@
             </AutoLogon>
             <FirstLogonCommands>
                 <SynchronousCommand wcm:action="add">
-                    <CommandLine>C:\Users\Public\Desktop\FirstLogon.cmd</CommandLine>
+                    <CommandLine>PowerShell -NonInteractive -ExecutionPolicy Unrestricted -NoExit -File C:\Users\Public\Desktop\FirstLogon.ps1</CommandLine>
                     <Order>1</Order>
                     <RequiresUserInput>true</RequiresUserInput>
                 </SynchronousCommand>

@@ -15,8 +15,8 @@ defrag C: /X /H /U /V
 sdelete /accepteula -z C:
 
 @echo Copy script to run on first logon.
-copy /V /Y %~dp0\FirstLogon.cmd C:\Users\Public\Desktop\FirstLogon.cmd
-copy /V /Y %~dp0\MakeAllConnectionsPrivate.ps1 C:\Users\Public\Desktop\MakeAllConnectionsPrivate.ps1
+copy /V /Y %~dp0\FirstLogon.ps1 C:\Users\Public\Desktop\FirstLogon.ps1
 
-@echo SysPrep will shutdown machine.
+@echo SysPrep will shutdown machine. GUI instance, which was shown at startup in Audit mode is killed.
+TaskKill /IM SysPrep.exe /F
 C:\Windows\System32\SysPrep\SysPrep.exe /generalize /oobe /shutdown /unattend:%~dp0\Autounattend.xml
