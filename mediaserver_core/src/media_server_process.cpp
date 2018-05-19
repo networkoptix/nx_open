@@ -236,7 +236,7 @@
 #include "core/ptz/server_ptz_controller_pool.h"
 #include "plugins/resource/acti/acti_resource.h"
 #include "common/common_module.h"
-#include "proxy/proxy_receiver_connection_processor.h"
+#include <nx/vms/network/reverse_connection_listener.h>
 #include "proxy/proxy_connection.h"
 #include "nx/mediaserver/hls/hls_session_pool.h"
 #include "nx/mediaserver/hls/hls_server.h"
@@ -2758,8 +2758,7 @@ bool MediaServerProcess::initTcpListener(
     //regTcp<QnDefaultTcpConnectionProcessor>("HTTP", "*");
 
     regTcp<QnProxyConnectionProcessor>("*", "proxy", serverModule()->reverseConnectionManager());
-    //regTcp<QnProxyReceiverConnection>("PROXY", "*");
-    regTcp<QnProxyReceiverConnection>("HTTP", "proxy-reverse", serverModule());
+    regTcp<nx::vms::network::ReverseConnectionListener>("HTTP", "proxy-reverse", serverModule()->reverseConnectionManager());
     regTcp<QnAudioProxyReceiver>("HTTP", "proxy-2wayaudio");
 
     if( !serverModule()->roSettings()->value("authenticationEnabled", "true").toBool())

@@ -58,6 +58,8 @@
 #include <local_connection_factory.h>
 #include <api/model/time_reply.h>
 #include <nx/utils/test_support/test_options.h>
+#include <nx/vms/network/reverse_connection_manager.h>
+#include <nx/vms/network/reverse_connection_listener.h>
 
 static int registerQtResources()
 {
@@ -129,13 +131,15 @@ int Appserver2Process::exec()
     qnStaticCommon->setModuleShortId(m_commonModule->moduleGUID(), settings.moduleInstance());
 
     AuditManager auditManager(m_commonModule.get());
+    using namespace nx::vms::network;
+    ReverseConnectionManager serverConnector(m_commonModule.get());
 
     std::unique_ptr<ec2::LocalConnectionFactory>
         ec2ConnectionFactory(new ec2::LocalConnectionFactory(
             m_commonModule.get(),
             Qn::PT_Server,
             settings.isP2pMode(),
-            nullptr)); //< No server connector for timeManager manager provided.
+            &serverConnector));
 
     std::map<QString, QVariant> confParams;
     ec2ConnectionFactory->setConfParams(std::move(confParams));
@@ -204,6 +208,7 @@ int Appserver2Process::exec()
     }
 
     registerHttpHandlers(ec2ConnectionFactory.get());
+    m_tcpListener->addHandler<nx::vms::network::ReverseConnectionListener>("HTTP", "proxy-reverse", &serverConnector);
 
     if (!tcpListener.bindToLocalAddress())
         return 1;
@@ -441,7 +446,21 @@ void Appserver2Process::registerHttpHandlers(
         result->setReply(reply);
         return nx::network::http::StatusCode::ok;
     });
+    
+#if 0
+    m_tcpListener->addHandler<JsonConnectionProcessor>("HTTP", "proxy-reverse",
+        [](const nx::network::http::Request& request, QnHttpConnectionListener* owner, QnJsonRestResult* result)
+    {
 
+        QnTimeReply reply;
+        reply.utcTime =
+            owner->commonModule()->ec2Connection()->timeSyncManager()->getSyncTime().count();
+        result->setReply(reply);
+        return nx::network::http::StatusCode::ok;
+    });
+
+    regTcp<QnProxyReceiverConnection>("HTTP", "proxy-reverse", serverModule());
+#endif
 
     m_tcpListener->disableAuthForPath("/api/getNonce");
     m_tcpListener->disableAuthForPath("/api/moduleInformation");

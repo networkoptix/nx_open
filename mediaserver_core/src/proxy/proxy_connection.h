@@ -3,7 +3,7 @@
 #include <QtNetwork/QHostAddress>
 #include "network/universal_request_processor.h"
 #include <nx/mediaserver/server_module_aware.h>
-#include <nx/mediaserver/reverse_connection_manager.h>
+#include <nx/vms/network/reverse_connection_manager.h>
 
 class QnAbstractStreamDataProvider;
 class QnProxyConnectionProcessorPrivate;
@@ -17,15 +17,9 @@ class QnProxyConnectionProcessor: public QnTCPConnectionProcessor
 {
 public:
     QnProxyConnectionProcessor(
-        nx::mediaserver::ReverseConnectionManager* reverseConnectionManager,
+        nx::vms::network::ReverseConnectionManager* reverseConnectionManager,
         QSharedPointer<nx::network::AbstractStreamSocket> socket,
         QnHttpConnectionListener* owner);
-#if 0
-    QnProxyConnectionProcessor(
-        QnProxyConnectionProcessorPrivate* priv,
-        QSharedPointer<nx::network::AbstractStreamSocket> socket,
-        QnHttpConnectionListener* owner);
-#endif
 
     static void cleanupProxyInfo(nx::network::http::Request* request);
 

@@ -1,9 +1,5 @@
 #include "router.h"
 
-// #include <nx/utils/log/log.h>
-// #include "nx_ec/dummy_handler.h"
-// #include "nx_ec/ec_api.h"
-
 #include <api/app_server_connection.h>
 #include <common/common_module.h>
 

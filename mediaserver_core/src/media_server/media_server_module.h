@@ -21,6 +21,7 @@ class QnResourceCommandProcessor;
 
 namespace nx {
 
+namespace vms { namespace network { class ReverseConnectionManager; } }
 namespace analytics { namespace storage { class AbstractEventsStorage; } }
 namespace time_sync { class TimeSyncManager; }
 
@@ -29,7 +30,6 @@ namespace mediaserver {
 class UnusedWallpapersWatcher;
 class LicenseWatcher;
 class RootTool;
-class ReverseConnectionManager;
 class ServerTimeSyncManager;
 
 namespace updates2 { class ServerUpdates2Manager; }
@@ -92,7 +92,7 @@ public:
 
     nx::mediaserver::RootTool* rootTool() const;
 
-    nx::mediaserver::ReverseConnectionManager* reverseConnectionManager() const;
+    nx::vms::network::ReverseConnectionManager* reverseConnectionManager() const;
 
 private:
     void registerResourceDataProviders();
@@ -124,7 +124,7 @@ private:
     nx::mediaserver::updates2::ServerUpdates2Manager* m_updates2Manager;
     QScopedPointer<QnDataProviderFactory> m_resourceDataProviderFactory;
     QScopedPointer<QnResourceCommandProcessor> m_resourceCommandProcessor;
-    QScopedPointer<nx::mediaserver::ReverseConnectionManager> m_reverseConnectionManager;
+    QScopedPointer<nx::vms::network::ReverseConnectionManager> m_reverseConnectionManager;
 };
 
 #define qnServerModule QnMediaServerModule::instance()

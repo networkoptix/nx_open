@@ -1,6 +1,9 @@
 #pragma once
 
+#include <chrono>
+
 #include <network/router.h>
+#include <nx/network/abstract_socket.h>
 
 namespace nx {
 namespace vms {

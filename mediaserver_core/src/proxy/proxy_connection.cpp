@@ -46,7 +46,7 @@ static const int kReadBufferSize = 1024 * 128; /* ~ 1 gbit/s */
 // ----------------------------- QnProxyConnectionProcessor ----------------------------
 
 QnProxyConnectionProcessor::QnProxyConnectionProcessor(
-    nx::mediaserver::ReverseConnectionManager* reverseConnectionManager,
+    nx::vms::network::ReverseConnectionManager* reverseConnectionManager,
     QSharedPointer<nx::network::AbstractStreamSocket> socket,
     QnHttpConnectionListener* owner)
 :

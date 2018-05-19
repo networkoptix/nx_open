@@ -24,5 +24,5 @@ public:
     nx::utils::Url lastConnectedUrl;
     std::chrono::milliseconds connectTimeout;
 	std::chrono::steady_clock::time_point lastIoTimePoint;
-    nx::mediaserver::ReverseConnectionManager* reverseConnectionManager = nullptr;
+    nx::vms::network::ReverseConnectionManager* reverseConnectionManager = nullptr;
 };

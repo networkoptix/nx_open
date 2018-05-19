@@ -13,7 +13,8 @@ static const int kProxyConnectionsToRequest = 3;
 } // namespace
 
 namespace nx {
-namespace mediaserver {
+namespace vms {
+namespace network {
 
 ReverseConnectionManager::ReverseConnectionManager(QnCommonModule* commonModule):
     QnCommonModuleAware(commonModule)
@@ -75,7 +76,7 @@ std::unique_ptr<nx::network::AbstractStreamSocket> ReverseConnectionManager::get
     return socket;
 }
 
-bool ReverseConnectionManager::registerProxyReceiverConnection(
+bool ReverseConnectionManager::addIncomingTcpConnection(
     const QString& guid, std::unique_ptr<nx::network::AbstractStreamSocket> socket)
 {
     QnMutexLocker lock(&m_proxyMutex);
@@ -123,5 +124,6 @@ std::unique_ptr<nx::network::AbstractStreamSocket> ReverseConnectionManager::con
     return std::unique_ptr<nx::network::AbstractStreamSocket>();
 }
 
-} // namespace mediaserver
+} // namespace network
+} // namespace vms
 } // namespace nx

@@ -11,16 +11,17 @@
 #include <nx/vms/network/abstract_server_connector.h>
 
 namespace nx {
-namespace mediaserver {
+namespace vms {
+namespace network {
 
 class ReverseConnectionManager: 
     public QnCommonModuleAware, 
-    public nx::vms::network::AbstractServerConnector
+    public AbstractServerConnector
 {
 public:
     ReverseConnectionManager(QnCommonModule* commonModule);
 
-    bool registerProxyReceiverConnection(
+    bool addIncomingTcpConnection(
         const QString& url, 
         std::unique_ptr<nx::network::AbstractStreamSocket> socket);
 
@@ -63,5 +64,6 @@ private:
     QnWaitCondition m_proxyCondition;
 };
 
-} // namespace mediaserver
+} // namespace network
+} // namespace vms
 } // namespace nx
