@@ -35,7 +35,7 @@ public:
     Manager(bool clientMode, QObject* parent = nullptr);
     virtual ~Manager() override;
 
-    void setReconnectPolicy(network::RetryPolicy value);
+    void setReconnectPolicy(nx::network::RetryPolicy value);
     void setUpdateInterfacesInterval(std::chrono::milliseconds value);
     void setMulticastInterval(std::chrono::milliseconds value);
 

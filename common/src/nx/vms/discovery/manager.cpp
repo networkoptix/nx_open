@@ -30,7 +30,7 @@ Manager::~Manager()
     m_moduleConnector->pleaseStopSync();
 }
 
-void Manager::setReconnectPolicy(network::RetryPolicy value)
+void Manager::setReconnectPolicy(nx::network::RetryPolicy value)
 {
     m_moduleConnector->setReconnectPolicy(value);
 }

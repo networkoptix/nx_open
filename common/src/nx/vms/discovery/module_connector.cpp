@@ -34,7 +34,7 @@ void ModuleConnector::setDisconnectTimeout(std::chrono::milliseconds value)
     m_disconnectTimeout = value;
 }
 
-void ModuleConnector::setReconnectPolicy(network::RetryPolicy value)
+void ModuleConnector::setReconnectPolicy(nx::network::RetryPolicy value)
 {
     NX_ASSERT(m_modules.size() == 0);
     m_retryPolicy = value;
