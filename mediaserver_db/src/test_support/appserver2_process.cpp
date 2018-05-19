@@ -446,21 +446,6 @@ void Appserver2Process::registerHttpHandlers(
         return nx::network::http::StatusCode::ok;
     });
     
-#if 0
-    m_tcpListener->addHandler<JsonConnectionProcessor>("HTTP", "proxy-reverse",
-        [](const nx::network::http::Request& request, QnHttpConnectionListener* owner, QnJsonRestResult* result)
-    {
-
-        QnTimeReply reply;
-        reply.utcTime =
-            owner->commonModule()->ec2Connection()->timeSyncManager()->getSyncTime().count();
-        result->setReply(reply);
-        return nx::network::http::StatusCode::ok;
-    });
-
-    regTcp<QnProxyReceiverConnection>("HTTP", "proxy-reverse", serverModule());
-#endif
-
     m_tcpListener->disableAuthForPath("/api/getNonce");
     m_tcpListener->disableAuthForPath("/api/moduleInformation");
 

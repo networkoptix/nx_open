@@ -241,19 +241,6 @@ void QnServerMessageProcessor::at_updateInstallationRequested(const QString& upd
         updateId, QnServerUpdateTool::UpdateType::Delayed);
 }
 
-void QnServerMessageProcessor::at_reverseConnectionRequested(
-    const ec2::ApiReverseConnectionData& data)
-{
-    if (m_universalTcpListener)
-    {
-        QnRoute route = commonModule()->router()->routeTo(data.targetServer);
-
-        // just to be sure that we have direct access to the server
-        if (route.gatewayId.isNull() && !route.addr.isNull())
-            m_universalTcpListener->addProxySenderConnections(route.addr, data.socketCount);
-    }
-}
-
 void QnServerMessageProcessor::at_remotePeerUnauthorized(const QnUuid& id)
 {
     QnResourcePtr mServer = resourcePool()->getResourceById(id);

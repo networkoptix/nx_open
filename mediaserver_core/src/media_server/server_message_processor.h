@@ -58,8 +58,6 @@ private slots:
     void at_updateChunkReceived(const QString& updateId, const QByteArray& data, qint64 offset);
     void at_updateInstallationRequested(const QString& updateId);
 
-    void at_reverseConnectionRequested(const ec2::ApiReverseConnectionData& data);
-
     void at_remotePeerUnauthorized(const QnUuid& id);
 
 private:

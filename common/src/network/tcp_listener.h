@@ -28,6 +28,13 @@ public:
 
     void setAuth(const QByteArray& userName, const QByteArray& password);
 
+    /*
+     * Main call to process TCP connection. Usually tcp listener gets connections via accept() call.
+     * But this function can be called manually to pass some external socket.
+     * For instance, It is used for reverse connections.
+     */
+    void processNewConnection(std::unique_ptr<nx::network::AbstractStreamSocket> socket);
+
     explicit QnTcpListener(
         QnCommonModule* commonModule,
         const QHostAddress& address,

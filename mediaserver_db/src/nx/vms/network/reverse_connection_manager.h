@@ -18,8 +18,10 @@ class ReverseConnectionManager:
     public QnCommonModuleAware, 
     public AbstractServerConnector
 {
+    Q_OBJECT
 public:
     ReverseConnectionManager(QnHttpConnectionListener* tcpListener);
+    virtual ~ReverseConnectionManager() override;
 
     bool addIncomingTcpConnection(
         const QString& url, 
@@ -35,33 +37,19 @@ public:
 
     virtual std::unique_ptr<nx::network::AbstractStreamSocket> connect(
         const QnRoute& route, std::chrono::milliseconds timeout) override;
+    private slots:
+    void at_reverseConnectionRequested(const ec2::ApiReverseConnectionData& data);
 private:
     void doPeriodicTasks();
+    void onHttpClientDone(nx::network::http::AsyncClient* httpClient);
 private:
-    struct AwaitProxyInfo
-    {
-        AwaitProxyInfo(std::unique_ptr<nx::network::AbstractStreamSocket> socket):
-            socket(std::move(socket))
-        {
-            timer.restart();
-        }
+    mutable QnMutex m_mutex;
+    std::set<std::unique_ptr<nx::network::http::AsyncClient>> m_runningHttpClients;
 
-        std::unique_ptr<nx::network::AbstractStreamSocket> socket;
-        nx::utils::ElapsedTimer timer;
-    };
-
-    struct ServerProxyPool
-    {
-        ServerProxyPool() : requested(0) {}
-
-        size_t requested;
-        std::deque<AwaitProxyInfo> available;
-        nx::utils::ElapsedTimer timer;
-    };
-
-    QnMutex m_proxyMutex;
-    std::map<QString, ServerProxyPool> m_proxyPool;
+    using PreparedSocketPool = std::vector<std::unique_ptr<nx::network::AbstractStreamSocket>>;
+    std::map<QnUuid, PreparedSocketPool> m_preparedSockets;
     QnWaitCondition m_proxyCondition;
+    QnHttpConnectionListener* m_tcpListener = nullptr;
 };
 
 } // namespace network

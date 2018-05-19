@@ -5,11 +5,15 @@
 #include <common/common_module.h>
 #include <transaction/message_bus_adapter.h>
 #include "reverse_connection_listener.h"
+#include <nx/utils/scope_guard.h>
+#include <core/resource/media_server_resource.h>
 
 namespace {
 
 static const int kProxyKeepAliveIntervalMs = 40 * 1000;
 static const int kProxyConnectionsToRequest = 3;
+static const std::chrono::seconds kReverseConnectionTimeout(10);
+static const QByteArray kReverseConnectionListenerPath("/proxy-reverse");
 
 } // namespace
 
@@ -18,9 +22,85 @@ namespace vms {
 namespace network {
 
 ReverseConnectionManager::ReverseConnectionManager(QnHttpConnectionListener* tcpListener):
-    QnCommonModuleAware(tcpListener->commonModule())
+    QnCommonModuleAware(tcpListener->commonModule()),
+    m_tcpListener(tcpListener)
 {
-    tcpListener->addHandler<ReverseConnectionListener>("HTTP", "proxy-reverse", this);
+    tcpListener->addHandler<ReverseConnectionListener>("HTTP", kReverseConnectionListenerPath.mid(1), this);
+
+    connect(connection, &ec2::AbstractECConnection::reverseConnectionRequested,
+        this, &ReverseConnectionManager::at_reverseConnectionRequested);
+}
+
+ReverseConnectionManager::~ReverseConnectionManager()
+{
+    decltype (m_runningHttpClients) httpClients;
+    {
+        QnMutexLocker lock(&m_mutex);
+        std::swap(httpClients, m_runningHttpClients);
+    }
+    for (const auto& client: httpClients)
+        client->pleaseStopSync();
+}
+
+void ReverseConnectionManager::at_reverseConnectionRequested(
+    const ec2::ApiReverseConnectionData& data)
+{
+    QnMutexLocker lock(&m_mutex);
+
+    NX_DEBUG(this, lm("QnHttpConnectionListener: %1 reverse connection(s) to %2 is(are) needed")
+        .arg(size).arg(proxyUrl.toString()));
+
+    QnRoute route = commonModule()->router()->routeTo(data.targetServer);
+    if (!route.gatewayId.isNull() || route.addr.isNull())
+    {
+        NX_WARNING(this, 
+            lm("Got reverse connection request that can't be processed. Target server=%1").arg(data.targetServer));
+        return;
+    }
+    auto server = resourcePool()->getResourceById<QnMediaServerResource>(data.targetServer);
+    if (!server)
+    {
+        NX_WARNING(this, lm("Target server %1 is not known yet").arg(data.targetServer));
+        return;
+    }
+
+    for (int i = 0; i < data.socketCount; ++i)
+    {
+        auto httpClient = std::make_unique<nx::network::http::AsyncClient>();
+        httpClient->setUserName(server->getId().toByteArray());
+        httpClient->setUserPassword(server->getAuthKey().toUtf8());
+
+        httpClient->setSendTimeout(kReverseConnectionTimeout);
+        httpClient->setResponseReadTimeout(kReverseConnectionTimeout);
+
+        httpClient->doGet(
+            kReverseConnectionListenerPath,
+            std::bind(&ReverseConnectionManager::onHttpClientDone, this, httpClient.get()));
+
+        m_runningHttpClients.insert(std::move(httpClient));
+    }
+}
+
+void ReverseConnectionManager::onHttpClientDone(nx::network::http::AsyncClient* httpClient)
+{
+    QnMutexLocker lock(&m_mutex);
+    if (m_runningHttpClients.find(httpClient) == m_runningHttpClients.end())
+        return;
+
+    auto guard = makeScopeGuard(
+        [&]
+        {
+            m_runningHttpClients.erase(httpClient);
+        });
+
+    nx::network::http::AsyncClient::State state = httpClient->state();
+    if (state == nx::network::http::AsyncClient::State::sFailed)
+    {
+        NX_WARNING(this,
+            lm("Failed to establish reverse connection to the target server=%1").arg(data.targetServer));
+        return;
+    }
+    m_tcpListener->processNewConnection(httpClient->takeSocket());
 }
 
 std::unique_ptr<nx::network::AbstractStreamSocket> ReverseConnectionManager::getProxySocket(
@@ -29,7 +109,7 @@ std::unique_ptr<nx::network::AbstractStreamSocket> ReverseConnectionManager::get
     NX_DEBUG(this, lit("QnHttpConnectionListener: reverse connection from %1 is needed")
         .arg(guid.toString()));
     
-    auto socketRequest = [&](int socketCount)
+    auto doSocketRequest = [&](int socketCount)
     {
         ec2::QnTransaction<ec2::ApiReverseConnectionData> tran(
             ec2::ApiCommand::openReverseConnection,
@@ -39,8 +119,19 @@ std::unique_ptr<nx::network::AbstractStreamSocket> ReverseConnectionManager::get
         commonModule()->ec2Connection()->messageBus()->sendTransaction(tran, guid);
     };
 
-    QnMutexLocker lock(&m_proxyMutex);
-    auto& serverPool = m_proxyPool[guid.toString()]; //< Get or create with new code.
+    QnMutexLocker lock(&m_mutex);
+    while (1)
+    {
+        auto socket = getPreparedSocket(guid);
+        if (socket)
+            return socket;
+        auto& socketList = m_preparedSockets[guid];
+        if (socketList.requestedCount == 0)
+            doSocketRequest();
+        m_proxyCondition.wait(&m_mutex, std::chrono::milliseconds(kReverseConnectionTimeout).count());
+    }
+#if 0
+    auto& socketList = m_preparedSockets[guid];
     if (serverPool.available.empty())
     {
         nx::utils::ElapsedTimer timer;
@@ -76,26 +167,19 @@ std::unique_ptr<nx::network::AbstractStreamSocket> ReverseConnectionManager::get
         .arg(guid.toString()).arg(serverPool.available.size()));
     socket->setNonBlockingMode(false);
     return socket;
+#endif
 }
 
 bool ReverseConnectionManager::addIncomingTcpConnection(
     const QString& guid, std::unique_ptr<nx::network::AbstractStreamSocket> socket)
 {
-    QnMutexLocker lock(&m_proxyMutex);
-    auto serverPool = m_proxyPool.find(guid);
-    if (serverPool == m_proxyPool.end() || serverPool->second.requested == 0)
-    {
-        NX_WARNING(this, lit("QnHttpConnectionListener: reverse connection was not requested from %1")
-            .arg(guid));
-        return false;
-    }
-
-    socket->setNonBlockingMode(true);
-    serverPool->second.requested -= 1;
-    serverPool->second.available.emplace_back(AwaitProxyInfo(std::move(socket)));
+    QnMutexLocker lock(&m_mutex);
+    auto& preparedSockets = m_preparedSockets[QnUuid(guid)];
+    preparedSockets.push_back(std::move(socket));
+    
     NX_DEBUG(this, lit(
-        "QnHttpConnectionListener: got new reverse connection from %1, there is (are) %2 avaliable and %3 requested")
-        .arg(guid).arg(serverPool->second.available.size()).arg(serverPool->second.requested));
+        "Got new reverse connection from %1, there is (are) %2 avaliable and %3 requested")
+        .arg(guid).arg(preparedSockets.size()));
 
     m_proxyCondition.wakeAll();
     return true;
@@ -104,14 +188,12 @@ bool ReverseConnectionManager::addIncomingTcpConnection(
 void ReverseConnectionManager::doPeriodicTasks()
 {
     QnMutexLocker lock(&m_proxyMutex);
-    for (auto& serverPool : m_proxyPool)
+    for (auto& socketPool: m_preparedSockets)
     {
-        while (!serverPool.second.available.empty()
-            && serverPool.second.available.front().timer.elapsedMs() > kProxyKeepAliveIntervalMs)
+        for (const auto& socket: socketPool)
         {
-            serverPool.second.available.pop_front();
+            sendKeepAliveMessage(socket);
         }
-    }
 }
 
 std::unique_ptr<nx::network::AbstractStreamSocket> ReverseConnectionManager::connect(
