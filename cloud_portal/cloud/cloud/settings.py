@@ -49,7 +49,6 @@ INSTALLED_APPS = (
     'admin_tools.dashboard',
 
     'django.contrib.admin',
-    'django.contrib.sites',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',

@@ -15,22 +15,14 @@ ${directory}    ${SCREENSHOTDIRECTORY}
 Open Browser and go to URL
     [Arguments]    ${url}
     Set Screenshot Directory    ${SCREENSHOT_DIRECTORY}
-    Run Keyword Unless    "${headless}"=="true" and "${BROWSER}" == "Chrome"   Open Browser    ${ENV}    ${BROWSER}
-    Run Keyword If    "${headless}"=="true" and "${BROWSER}" == "Chrome"    Headless Startup
+    Open Browser    ${ENV}    ${BROWSER}
 #    Maximize Browser Window
     Set Selenium Speed    0
     Check Language
     Go To    ${url}
 
-Headless Startup
-    ${options}=    Evaluate    sys.modules['selenium.webdriver'].ChromeOptions()    sys, selenium.webdriver
-    : FOR    ${option}    IN    @{chrome_arguments}
-    \    Call Method    ${options}    add_argument    ${option}
-    Create Webdriver    Chrome    chrome_options=${options}
-    Go To    ${ENV}
-
 Check Language
-    Wait Until Element Is Visible    ${LANGUAGE DROPDOWN}
+    Wait Until Element Is Visible    ${LANGUAGE DROPDOWN}    5
     Register Keyword To Run On Failure    NONE
     ${status}    ${value}=    Run Keyword And Ignore Error    Wait Until Element Is Visible    ${LANGUAGE DROPDOWN}/span[@lang='${LANGUAGE}']    2
     Register Keyword To Run On Failure    Failure Tasks
@@ -65,6 +57,7 @@ Log Out
     Validate Log Out
 
 Validate Log Out
+    sleep    .5
     Wait Until Element Is Visible    ${ANONYMOUS BODY}
 
 Register
