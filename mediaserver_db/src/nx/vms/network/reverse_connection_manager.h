@@ -42,11 +42,30 @@ public:
 private:
     void doPeriodicTasks();
     void onHttpClientDone(nx::network::http::AsyncClient* httpClient);
+    std::unique_ptr<nx::network::AbstractStreamSocket> getPreparedSocketUnsafe(const QnUuid& guid);
+
+    void at_socketReadTimeout(
+        const QnUuid& serverId,
+        nx::network::AbstractStreamSocket* socket,
+        SystemError::ErrorCode errorCode,
+        size_t bytesRead);
 private:
     mutable QnMutex m_mutex;
     std::set<std::unique_ptr<nx::network::http::AsyncClient>> m_runningHttpClients;
 
-    using PreparedSocketPool = std::vector<std::unique_ptr<nx::network::AbstractStreamSocket>>;
+    struct SocketData
+    {
+        std::unique_ptr<nx::network::AbstractStreamSocket> socket;
+        QByteArray tmpReadBuffer;
+    };
+
+    struct PreparedSocketPool
+    {
+        std::vector<SocketData> sockets;
+        nx::utils::ElapsedTimer timer;
+        int requested = 0;
+    };
+
     std::map<QnUuid, PreparedSocketPool> m_preparedSockets;
     QnWaitCondition m_proxyCondition;
     QnHttpConnectionListener* m_tcpListener = nullptr;
