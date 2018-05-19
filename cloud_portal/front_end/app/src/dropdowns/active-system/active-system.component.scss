@@ -1,5 +1,11 @@
+.popup {
+    &.arrow {
+        left: 17px;
+    }
+}
+
 .dropdown-toggle {
-    height: 45px;
+    height: 32px;
 }
 
 .dropdown-toggle::after {

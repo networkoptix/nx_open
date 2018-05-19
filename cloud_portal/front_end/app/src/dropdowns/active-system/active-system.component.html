@@ -3,11 +3,15 @@
     <button class="btn btn-dropdown-toggle"
             id="activeSystemDropdown"
             ngbDropdownToggle>
-        <span class="glyphicon glyphicon-menu-hamburger"></span>
+        <div class="nav-hamburger">
+            <span></span>
+            <span></span>
+            <span></span>
+        </div>
     </button>
 
     <ul ngbDropdownMenu aria-labelledby="activeSystemDropdown">
-        <div class="arrow up"></div>
+        <div class="popup arrow up"></div>
 
         <li *ngIf="activeSystem" [ngClass]="{ 'active' :active.settings}">
             <a [href]="'/systems/' + activeSystem.id" translate>Settings</a>

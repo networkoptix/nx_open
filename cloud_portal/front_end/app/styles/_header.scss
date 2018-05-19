@@ -32,7 +32,6 @@ $header-collapsing-width-1: 1px;
     .navbar-nav {
         flex-direction: row;
         align-items: center;
-        align-items: center;
         line-height: $line-height;
     }
 
@@ -61,7 +60,7 @@ $header-collapsing-width-1: 1px;
         align-items: center;
 
         &.vertical-bar{
-            border-right: 1px solid $common-border-color;
+            border-right: 1px solid $light4;
             height: 25px;
 
         }
@@ -136,6 +135,7 @@ $header-collapsing-width-1: 1px;
                 margin:0 $horizontal-spacing;
                 padding-left:0;
                 padding-right:0;
+                color: $brand_core;
                 border-bottom: $active-border-width solid $brand_core;
 
                 &:hover{
@@ -248,12 +248,6 @@ $header-collapsing-width-1: 1px;
         .dropdown-menu-left {
             right: 0;
             left: auto;
-        }
-    }
-
-    @media (min-width: $grid-float-breakpoint) {
-        .hidden-expanded{
-            display:none;
         }
     }
 

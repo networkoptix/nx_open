@@ -3,7 +3,7 @@
     <nav class="navbar navbar-default">
         <div class="container-fluid">
             <div class="app-header-left">
-                <ul ng-if="activeSystem" class="nav navbar-nav navbar-left auth-visible hidden-expanded">
+                <ul ng-if="activeSystem" class="nav navbar-nav navbar-left auth-visible d-block d-md-none">
                     <li>
                         <nx-active-system [active-system]="activeSystem"></nx-active-system>
                     </li>
@@ -15,7 +15,7 @@
                     </a>{{config.previewPath}}
                 </div>
 
-                <ul ng-if="activeSystem" class="nav navbar-nav auth-visible hidden-collapsed">
+                <ul ng-if="activeSystem" class="nav navbar-nav auth-visible d-none d-md-flex">
                     <li ng-class="{ 'active' :active.view }">
                         <a ng-href="/systems/{{activeSystem.id}}/view">View</a>
                     </li>

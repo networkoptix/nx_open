@@ -1,5 +1,11 @@
 @import '../../../styles/theme_palette';
 
+.popup {
+    &.arrow {
+        left: 16px;
+    }
+}
+
 @media (max-width: 922px) {
 
     .dropdown-menu {
@@ -11,16 +17,28 @@
         text-align: right;
     }
 
-    .arrow {
-        right: 40px;
-        left: auto;
+    .popup {
+        &.arrow {
+            right: 34px;
+            left: auto;
+        }
     }
 }
 
 @media (max-width: 768px) {
-    .arrow {
-        right: 18px;
-        left: auto;
+    .popup {
+        &.arrow {
+            right: 12px;
+            left: auto;
+        }
+    }
+
+    .dropdown-toggle {
+        padding-right: 10px !important;
+
+        .glyphicon {
+            margin: 0 4px !important;
+        }
     }
 
     .dropdown-menu {

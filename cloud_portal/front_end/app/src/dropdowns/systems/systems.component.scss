@@ -1,23 +1,47 @@
-
 @import '../../../styles/native-theme/theme_palette';
 
-.arrow {
-    right: 170px;
-    left: auto;
-    z-index: 9;
-}
-
-@media (max-width: 768px) {
-    .arrow {
-        right: 150px;
-        left: auto;
+.popup {
+    &.arrow {
+        left: 16px;
     }
 }
 
 @media (max-width: 700px) {
-    .arrow {
-        right: 18px;
-        left: auto;
+    .dropdown-toggle {
+        padding-right: 10px !important;
+    }
+
+    .popup {
+        &.arrow {
+            right: 16px;
+            left: auto;
+        }
+    }
+}
+
+@media (max-width: 768px) {
+    .popup {
+        &.arrow {
+            right: 16px;
+            left: auto;
+        }
+    }
+
+    .dropdown-toggle {
+        padding-right: 10px !important;
+
+        .glyphicon {
+            margin: 0 4px !important;
+        }
+    }
+
+    .dropdown-menu {
+        right: 0;
+        left: auto !important;
+    }
+
+    .dropdown-menu li > a {
+        text-align: right !important;
     }
 }
 
@@ -26,9 +50,6 @@
 }
 
 .dropdown .dropdown-menu {
-    top: 43px !important;
-    right: 0 !important;
-    left: auto !important;
     width: auto !important;
 }
 

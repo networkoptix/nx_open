@@ -5,11 +5,14 @@
             ngbDropdownToggle>
         <span class="glyphicon glyphicon-user"></span>
         <span class="ellipsis" [innerHTML]="settings.email"></span>
-        <div class="arrow down d-none d-md-block"></div>
+        <div class="nav-arrow d-none d-md-block ">
+            <span></span>
+            <span></span>
+        </div>
     </button>
 
     <ul ngbDropdownMenu aria-labelledby="accountSettingsSelect">
-        <div class="arrow up"></div>
+        <div class="popup arrow up"></div>
 
         <li><a [href]="'/account/'" translate>Account Settings</a></li>
         <li><a [href]="'/account/password/'" translate>Change Password</a></li>
