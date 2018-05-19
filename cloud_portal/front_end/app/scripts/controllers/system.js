@@ -23,13 +23,13 @@ angular.module('cloudApp')
 
             function getMergeTarget(targetSystemId) {
                 return _.find(systemsProvider.systems, function (system) {
-                    return targetSystemId == system.id;
+                    return targetSystemId === system.id;
                 });
             }
 
             function setMergeStatus(mergeInfo) {
                 $scope.currentlyMerging = true;
-                $scope.isMaster = mergeInfo.role ? mergeInfo.role != Config.systemStatuses.slave : mergeInfo.masterSystemId == $scope.system.id;
+                $scope.isMaster = mergeInfo.role ? mergeInfo.role !== Config.systemStatuses.slave : mergeInfo.masterSystemId === $scope.system.id;
                 $scope.mergeTargetSystem = getMergeTarget(mergeInfo.anotherSystemId);
             }
 
@@ -70,7 +70,7 @@ angular.module('cloudApp')
             function delayedUpdateSystemInfo() {
                 pollingSystemUpdate = $poll(function () {
                     return $scope.system.update().catch(function (error) {
-                        if (error.data.resultCode == 'forbidden' || error.data.resultCode == 'notFound') {
+                        if (error.data.resultCode === 'forbidden' || error.data.resultCode === 'notFound') {
                             connectionLost();
                         }
                     });
@@ -105,7 +105,7 @@ angular.module('cloudApp')
                 systemsProvider
                     .forceUpdateSystems()
                     .then(function () {
-                            $location.path('/systems');
+                        $location.path('/systems');
                     });
             }
 
@@ -162,7 +162,7 @@ angular.module('cloudApp')
             };
 
             $scope.unshare = function (user) {
-                if ($scope.account.email == user.email) {
+                if ($scope.account.email === user.email) {
                     return $scope.delete();
                 }
                 if ($scope.locked[ user.email ]) {
@@ -179,7 +179,7 @@ angular.module('cloudApp')
                         errorPrefix   : L.errorCodes.cantSharePrefix
                     }).then(function () {
                         $scope.locked[ user.email ] = false;
-                        $scope.system.getUsers()
+                        $scope.system.getUsers();
                         delayedUpdateSystemInfo();
                     }, function () {
                         $scope.locked[ user.email ] = false;
@@ -187,10 +187,16 @@ angular.module('cloudApp')
                     $scope.unsharing.run();
                 }, function () {
                     $scope.locked[ user.email ] = false;
-                    $scope.system.getUsers()
+                    $scope.system.getUsers();
                     delayedUpdateSystemInfo();
                 });
             };
+
+            _.each(Config.accessRoles.options, function (option) {
+                if (option.permissions) {
+                    option.permissions = normalizePermissionString(option.permissions);
+                }
+            });
 
             function normalizePermissionString(permissions) {
                 return permissions.split('|').sort().join('|');
@@ -210,10 +216,8 @@ angular.module('cloudApp')
 
             var cancelSubscription = $scope.$on("unauthorized_" + $routeParams.systemId, connectionLost);
 
-            $scope.$on('$destroy', function (event) {
+            $scope.$on('$destroy', function () {
                 cancelSubscription();
-                dialogs.dismissNotifications();
             });
-
-
-        } ]);
+        }
+    ]);
