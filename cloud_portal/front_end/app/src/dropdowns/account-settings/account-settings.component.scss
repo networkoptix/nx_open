@@ -52,14 +52,11 @@
 }
 
 .dropdown-toggle {
-    height: 43px;
+    height: 47px;
+    border: none;
 }
 
-.dropdown .arrow::after {
-    border-top-color: $light1;
+.dropdown .dropdown-menu {
+    width: auto !important;
+    top: 45px !important;
 }
-
-.dropdown .dropdown-menu .arrow::after {
-    border-top-color: transparent !important;
-}
-

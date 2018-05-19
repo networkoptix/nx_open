@@ -280,7 +280,7 @@ select.form-control{
   }
 }
 
-.btn.btn-default{
+.btn.btn-default, .btn.btn-dropdown-toggle{
   color: $dark10;
   background-color: transparent;
   border-color: $light5;

@@ -46,15 +46,13 @@
 }
 
 .dropdown-toggle {
-    height: 43px;
+    height: 47px;
+    border: none;
 }
 
 .dropdown .dropdown-menu {
     width: auto !important;
-}
-
-.dropdown .dropdown-menu .arrow::after {
-    border-top-color: transparent !important;
+    top: 45px !important;
 }
 
 .dropdown .dropdown-menu li > a {
@@ -64,19 +62,11 @@
     font-size: 0.8rem;
 }
 
-.dropdown .dropdown-menu li > a .system-name {
-
-}
-
 .dropdown .dropdown-menu li > a .system-owner {
     color: $blue10; // TODO: vars not available here ... Hmmmm
 }
 
 .dropdown .dropdown-menu li > a:hover .system-owner {
     color: white;
-}
-
-.dropdown .arrow::after {
-    border-top-color: $light1;
 }
 
