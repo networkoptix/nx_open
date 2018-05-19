@@ -130,9 +130,16 @@ int Appserver2Process::exec()
 
     qnStaticCommon->setModuleShortId(m_commonModule->moduleGUID(), settings.moduleInstance());
 
+    QnSimpleHttpConnectionListener tcpListener(
+        m_commonModule.get(),
+        QHostAddress::Any,
+        settings.endpoint().port,
+        QnTcpListener::DEFAULT_MAX_CONNECTIONS,
+        true);
+
     AuditManager auditManager(m_commonModule.get());
     using namespace nx::vms::network;
-    ReverseConnectionManager serverConnector(m_commonModule.get());
+    ReverseConnectionManager serverConnector(&tcpListener);
 
     std::unique_ptr<ec2::LocalConnectionFactory>
         ec2ConnectionFactory(new ec2::LocalConnectionFactory(
@@ -184,13 +191,6 @@ int Appserver2Process::exec()
         QnMediaServerResourcePtr(),
         []() { return false; });
 
-    QnSimpleHttpConnectionListener tcpListener(
-        m_commonModule.get(),
-        QHostAddress::Any,
-        settings.endpoint().port,
-        QnTcpListener::DEFAULT_MAX_CONNECTIONS,
-        true);
-
     {
         QnMutexLocker lk(&m_mutex);
         m_tcpListener = &tcpListener;
@@ -208,7 +208,6 @@ int Appserver2Process::exec()
     }
 
     registerHttpHandlers(ec2ConnectionFactory.get());
-    m_tcpListener->addHandler<nx::vms::network::ReverseConnectionListener>("HTTP", "proxy-reverse", &serverConnector);
 
     if (!tcpListener.bindToLocalAddress())
         return 1;

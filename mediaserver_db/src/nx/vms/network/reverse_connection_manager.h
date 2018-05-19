@@ -7,7 +7,7 @@
 #include <nx/network/abstract_socket.h>
 #include <nx/utils/thread/wait_condition.h>
 #include <nx/utils/elapsed_timer.h>
-#include <common/common_module_aware.h>
+#include <network/http_connection_listener.h>
 #include <nx/vms/network/abstract_server_connector.h>
 
 namespace nx {
@@ -19,7 +19,7 @@ class ReverseConnectionManager:
     public AbstractServerConnector
 {
 public:
-    ReverseConnectionManager(QnCommonModule* commonModule);
+    ReverseConnectionManager(QnHttpConnectionListener* tcpListener);
 
     bool addIncomingTcpConnection(
         const QString& url, 

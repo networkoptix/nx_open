@@ -4,6 +4,7 @@
 #include <transaction/transaction.h>
 #include <common/common_module.h>
 #include <transaction/message_bus_adapter.h>
+#include "reverse_connection_listener.h"
 
 namespace {
 
@@ -16,9 +17,10 @@ namespace nx {
 namespace vms {
 namespace network {
 
-ReverseConnectionManager::ReverseConnectionManager(QnCommonModule* commonModule):
-    QnCommonModuleAware(commonModule)
+ReverseConnectionManager::ReverseConnectionManager(QnHttpConnectionListener* tcpListener):
+    QnCommonModuleAware(tcpListener->commonModule())
 {
+    tcpListener->addHandler<ReverseConnectionListener>("HTTP", "proxy-reverse", this);
 }
 
 std::unique_ptr<nx::network::AbstractStreamSocket> ReverseConnectionManager::getProxySocket(
