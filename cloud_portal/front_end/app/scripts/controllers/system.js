@@ -203,9 +203,8 @@ angular.module('cloudApp')
         }
         var cancelSubscription = $scope.$on("unauthorized_" + $routeParams.systemId, connectionLost);
 
-        $scope.$on('$destroy', function( event ) {
+        $scope.$on('$destroy', function() {
             cancelSubscription();
-            dialogs.dismissNotifications();
         });
 
 
