@@ -4,6 +4,8 @@
 #include <QtWidgets/QHBoxLayout>
 #include <QtWidgets/QVBoxLayout>
 #include <QtWidgets/QToolButton>
+#include <QtWidgets/QMenu>
+#include <QtGui/QMouseEvent>
 
 #include <business/business_resource_validation.h>
 #include <client/client_settings.h>
@@ -13,6 +15,7 @@
 #include <nx/client/desktop/common/utils/custom_painted.h>
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
+#include <ui/workaround/hidpi_workarounds.h>
 #include <ui/models/sort_filter_list_model.h>
 #include <ui/statistics/modules/controls_statistics_module.h>
 #include <ui/style/skin.h>
@@ -122,6 +125,10 @@ NotificationListWidget::Private::Private(NotificationListWidget* q) :
         {
             m_placeholder->setVisible(count < 1);
         });
+
+    q->setContextMenuPolicy(Qt::CustomContextMenu);
+    connect(q, &NotificationListWidget::customContextMenuRequested,
+        this, &NotificationListWidget::Private::showContextMenu);
 }
 
 NotificationListWidget::Private::~Private() = default;
@@ -169,6 +176,17 @@ QToolButton* NotificationListWidget::Private::newActionButton(
 
     context()->statisticsModule()->registerButton(statAlias, button);
     return button;
+}
+
+void NotificationListWidget::Private::showContextMenu(const QPoint& pos)
+{
+    QMenu contextMenu;
+    contextMenu.addAction(action(ui::action::OpenBusinessLogAction));
+    contextMenu.addAction(action(ui::action::BusinessEventsAction));
+    contextMenu.addAction(action(ui::action::PreferencesNotificationTabAction));
+    contextMenu.addSeparator();
+    contextMenu.addAction(action(ui::action::ToggleNotificationsAction));
+    contextMenu.exec(QnHiDpiWorkarounds::safeMapToGlobal(q, pos));
 }
 
 } // namespace desktop

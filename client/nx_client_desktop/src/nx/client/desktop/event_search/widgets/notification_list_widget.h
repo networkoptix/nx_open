@@ -27,6 +27,9 @@ signals:
     void tileHovered(const QModelIndex& index, const EventTile* tile);
 
 private:
+    // We capture mouse press to cancel global context menu.
+    virtual void mousePressEvent(QMouseEvent *event) override;
+
     class Private;
     QScopedPointer<Private> d;
 };

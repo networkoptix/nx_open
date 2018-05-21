@@ -30,6 +30,7 @@ public:
 
 private:
     QToolButton* newActionButton(ui::action::IDType actionId, int helpTopicId);
+    void showContextMenu(const QPoint& pos);
 
 private:
     NotificationListWidget* q = nullptr;
