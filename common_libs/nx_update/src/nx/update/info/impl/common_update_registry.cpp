@@ -880,6 +880,21 @@ ResultCode CommonUpdateRegistry::latestUpdate(
 
 void CommonUpdateRegistry::addFileData(const ManualFileData& manualFileData)
 {
+    addFileDataImpl(manualFileData, /* ignoreRemoved */ true);
+}
+
+void CommonUpdateRegistry::addFileDataImpl(const ManualFileData& manualFileData, bool ignoreRemoved)
+{
+    int index = m_removedManualDataKeys.indexOf(manualFileData.file);
+    if (index != -1)
+    {
+        if (ignoreRemoved)
+            m_removedManualDataKeys.removeAt(index);
+        else
+            return;
+    }
+
+    bool sameFileFound = false;
     for (auto& selfManualFileData: m_manualData)
     {
         if (selfManualFileData.file == manualFileData.file)
@@ -889,18 +904,46 @@ void CommonUpdateRegistry::addFileData(const ManualFileData& manualFileData)
                 if (!selfManualFileData.peers.contains(peer))
                     selfManualFileData.peers.append(peer);
             }
-            return;
+            sameFileFound = true;
+            break;
         }
     }
 
-    m_manualData.append(manualFileData);
+    if (!sameFileFound)
+        m_manualData.append(manualFileData);
+
+    for (auto& selfManualFileData: m_manualData)
+    {
+        if (selfManualFileData.file == manualFileData.file)
+        {
+            std::sort(
+                selfManualFileData.peers.begin(),
+                selfManualFileData.peers.end(),
+                [](const QnUuid& l, const QnUuid& r) { return l < r; });
+        }
+    }
+
+    std::sort(
+        m_manualData.begin(),
+        m_manualData.end(),
+        [](const ManualFileData& l, const ManualFileData& r) { return l.file < r.file; });
+}
+
+void CommonUpdateRegistry::removeFileData(const QString& fileName)
+{
+    for (int i = 0; i < m_manualData.size(); ++i)
+    {
+        if (m_manualData[i].file == fileName)
+        {
+            m_manualData.removeAt(i);
+            m_removedManualDataKeys.append(fileName);
+            return;
+        }
+    }
 }
 
 void CommonUpdateRegistry::merge(AbstractUpdateRegistry* other)
 {
-    if (!other)
-        return;
-
     auto otherCommonUpdateRegistry = dynamic_cast<CommonUpdateRegistry*>(other);
     if (!otherCommonUpdateRegistry)
         return;
@@ -929,10 +972,10 @@ void CommonUpdateRegistry::merge(AbstractUpdateRegistry* other)
     }
 
     for (const auto& otherManualData: otherCommonUpdateRegistry->m_manualData)
-    {
-        if (!m_manualData.contains(otherManualData))
-            m_manualData.append(otherManualData);
-    }
+        addFileDataImpl(otherManualData, /* ignoreRemoved */ false);
+
+    for (const auto& otherRemovedManualKey: otherCommonUpdateRegistry->m_removedManualDataKeys)
+        removeFileData(otherRemovedManualKey);
 }
 
 QList<QnUuid> CommonUpdateRegistry::additionalPeers(const QString& fileName) const

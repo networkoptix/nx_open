@@ -40,7 +40,6 @@ protected:
     void refreshStatusAfterCheck();
     void setStatus(api::Updates2StatusData::StatusCode code, const QString& message);
     void startPreparing(const QString& updateFilePath);
-    void updateRegistryIfNeeded(update::info::AbstractUpdateRegistryPtr other);
 
     void onDownloadFinished(const QString& fileName);
     void onDownloadFailed(const QString& fileName);

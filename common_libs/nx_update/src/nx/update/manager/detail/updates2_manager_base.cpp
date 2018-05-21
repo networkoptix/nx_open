@@ -75,7 +75,7 @@ void Updates2ManagerBase::checkForGlobalDictionaryUpdate()
     if (!globalRegistry)
         return;
 
-    updateRegistryIfNeeded(std::move(globalRegistry));
+    m_updateRegistry->merge(globalRegistry.get());
     refreshStatusAfterCheck();
 }
 
@@ -101,7 +101,7 @@ void Updates2ManagerBase::checkForRemoteUpdate(utils::TimerId /*timerId*/, bool 
         }
     }
 
-    updateRegistryIfNeeded(std::move(getRemoteRegistry()));
+    m_updateRegistry->merge(getRemoteRegistry().get());
     auto globalRegistry = getGlobalRegistry();
     QByteArray serializedUpdatedRegistry;
     {
@@ -117,16 +117,6 @@ void Updates2ManagerBase::checkForRemoteUpdate(utils::TimerId /*timerId*/, bool 
         updateGlobalRegistry(serializedUpdatedRegistry);
 
     refreshStatusAfterCheck();
-}
-
-void Updates2ManagerBase::updateRegistryIfNeeded(update::info::AbstractUpdateRegistryPtr other)
-{
-    QnMutexLocker lock(&m_mutex);
-    if (!other->equals(m_updateRegistry.get()))
-    {
-        other->merge(m_updateRegistry.get());
-        m_updateRegistry = std::move(other);
-    }
 }
 
 void Updates2ManagerBase::refreshStatusAfterCheck()
@@ -208,7 +198,14 @@ api::Updates2StatusData Updates2ManagerBase::download()
     }
 
     using namespace vms::common::p2p::downloader;
-    NX_ASSERT(!fileData.file.isNull());
+    NX_ASSERT(!fileData.isNull());
+    if (fileData.isNull())
+    {
+        setStatus(
+            api::Updates2StatusData::StatusCode::error,
+            "File data is empty");
+        return m_currentStatus.base();
+    }
 
     auto fileInformation = downloader()->fileInformation(fileData.file);
     bool alreadyHasFileInDownLoader = fileInformation.isValid();
@@ -260,8 +257,7 @@ api::Updates2StatusData Updates2ManagerBase::download()
                             QString("Update file is corrupted: %1").arg(fileInformation.name));
                         downloader()->deleteFile(fileInformation.name, /*deleteData*/ true);
                         m_currentStatus.file.clear();
-                        // #TODO #akulikov deal with below
-//                        m_updateRegistry->removeManualFileData(fileInformation.name);
+                        m_updateRegistry->removeFileData(fileInformation.name);
                         break;
                     case FileInformation::Status::downloading:
                         setStatus(
@@ -451,8 +447,8 @@ void Updates2ManagerBase::onFileAdded(const FileInformation& fileInformation)
     if (manualFileData.isNull())
         return;
 
-    if (fileInformation.status != FileInformation::Status::downloaded
-        && fileInformation.status != FileInformation::Status::uploading)
+    if (fileInformation.status == FileInformation::Status::notFound
+        || fileInformation.status == FileInformation::Status::corrupted)
     {
         NX_VERBOSE(
             this,
@@ -463,23 +459,33 @@ void Updates2ManagerBase::onFileAdded(const FileInformation& fileInformation)
 
     {
         QnMutexLocker lock(&m_mutex);
-        if (m_currentStatus.file == fileInformation.name)
-            return;
-
         NX_VERBOSE(
             this,
-            lm("External update file %1 added to the Downloader").args(fileInformation.name));
+            lm("External update file %1 was added to the Downloader").args(fileInformation.name));
 
         manualFileData.peers.append(peerId());
         m_updateRegistry->addFileData(manualFileData);
     }
 
-    checkForRemoteUpdate(utils::TimerId(), true);
+    checkForRemoteUpdate(utils::TimerId(), /* forced */ true);
 }
 
-void Updates2ManagerBase::onFileDeleted(const QString& /*fileName*/)
+void Updates2ManagerBase::onFileDeleted(const QString& fileName)
 {
-    // #TODO #akulikov Implement this.
+    auto manualFileData = update::info::ManualFileData::fromFileName(fileName);
+    if (manualFileData.isNull())
+        return;
+
+    {
+        QnMutexLocker lock(&m_mutex);
+        NX_VERBOSE(
+            this,
+            lm("External update file %1 was removed from the Downloader").args(fileName));
+
+        m_updateRegistry->removeFileData(fileName);
+    }
+
+    checkForRemoteUpdate(utils::TimerId(), /* forced */ true);
 }
 
 void Updates2ManagerBase::onFileInformationChanged(const FileInformation& /*fileInformation*/)

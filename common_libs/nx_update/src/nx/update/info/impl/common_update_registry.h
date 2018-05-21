@@ -28,6 +28,7 @@ public:
         QnSoftwareVersion* outSoftwareVersion) const override;
 
     virtual void addFileData(const ManualFileData& manualFileData) override;
+    virtual void removeFileData(const QString& fileName) override;
     virtual QList<QString> alternativeServers() const override;
     virtual QByteArray toByteArray() const override;
     virtual bool fromByteArray(const QByteArray& rawData) override;
@@ -40,10 +41,13 @@ private:
     detail::data_parser::UpdatesMetaData m_metaData;
     detail::CustomizationVersionToUpdate m_customizationVersionToUpdate;
     QList<ManualFileData> m_manualData;
+    QList<QString> m_removedManualDataKeys;
 
     bool hasUpdateForCustomizationAndVersion(
         const UpdateRequestData& updateRequestData,
         detail::data_parser::CustomizationData* customizationData) const;
+
+    void addFileDataImpl(const ManualFileData& manualFileData, bool ignoreRemoved);
 };
 
 } // namespace impl

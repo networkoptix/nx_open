@@ -88,6 +88,11 @@ public:
         m_manualData.append(manualFileData);
     }
 
+    virtual void removeFileData(const QString& /*fileName*/) override
+    {
+        m_manualData.clear();
+    }
+
     virtual QList<QString> alternativeServers() const override
     {
         return QStringList();
@@ -166,12 +171,12 @@ public:
         m_fi.status = downloader::FileInformation::Status::downloaded;
     }
 
-    void setExternallyAddedFileInformation()
+    void setExternallyAddedFileInformation(downloader::FileInformation::Status status)
     {
         m_fi.name = kManualFileName;
         m_fi.size = kFileSize;
         m_fi.md5 = kFileMd5;
-        m_fi.status = downloader::FileInformation::Status::downloaded;
+        m_fi.status = status;
     }
 
     void setAddFileCode(downloader::ResultCode addFileCode)
@@ -386,6 +391,11 @@ public:
     void emitFileAddedSignal(const downloader::FileInformation& fileInformation)
     {
         onFileAdded(fileInformation);
+    }
+
+    void emitFileDeletedSignal()
+    {
+        onFileDeleted(kManualFileName);
     }
 
     const detail::Updates2StatusDataEx& fileWrittenData() const
@@ -624,9 +634,9 @@ protected:
         m_downloader.setAddFileCode(downloader::ResultCode::fileAlreadyExists);
     }
 
-    void givenFileHasBeenAddedExternally()
+    void givenFileHasBeenAddedExternally(downloader::FileInformation::Status status)
     {
-        m_downloader.setExternallyAddedFileInformation();
+        m_downloader.setExternallyAddedFileInformation(status);
         m_downloader.setAddFileCode(downloader::ResultCode::fileAlreadyExists);
     }
 
@@ -635,11 +645,16 @@ protected:
         m_installer.setExpectedOutcome(PrepareExpectedOutcome::fail_noFreeSpace);
     }
 
-    void whenDownloaderAddFileSignalWithFineInfoReceived()
+    void whenDownloaderAddFileSignalWithFineInfoReceived(downloader::FileInformation::Status status)
     {
         downloader::FileInformation fileInformation(kManualFileName);
-        fileInformation.status = downloader::FileInformation::Status::downloaded;
+        fileInformation.status = status;
         m_updatesManager->emitFileAddedSignal(fileInformation);
+    }
+
+    void whenDownloaderDeleteFileSignalReceived()
+    {
+        m_updatesManager->emitFileDeletedSignal();
     }
 
     void whenDownloaderAddFileSignalWithBadInfoReceived()
@@ -652,6 +667,11 @@ protected:
     void thenAdditionalPeersShouldHaveBeenPassedToDownloader()
     {
         ASSERT_TRUE(m_downloader.additionalPeers().contains(kCurrentPeerId));
+    }
+
+    void whenDownloaderSetsBadStatusForFile()
+    {
+        m_downloader.setExternallyAddedFileInformation(downloader::FileInformation::Status::corrupted);
     }
 
 private:
@@ -712,9 +732,9 @@ TEST_F(Updates2Manager, Download_successful)
 TEST_F(Updates2Manager, Download_additionalPeersFromManualData)
 {
     givenUpdateRegistries(/*remoteHasUpdate*/ false, /*globalHasUpdate*/ false);
-    givenFileHasBeenAddedExternally();
+    givenFileHasBeenAddedExternally(downloader::FileInformation::Status::downloaded);
     whenServerHasBeenStarted();
-    whenDownloaderAddFileSignalWithFineInfoReceived();
+    whenDownloaderAddFileSignalWithFineInfoReceived(downloader::FileInformation::Status::downloaded);
 
     whenDownloadRequestIssuedWithFinalResult(api::Updates2StatusData::StatusCode::preparing);
     thenAdditionalPeersShouldHaveBeenPassedToDownloader();
@@ -724,12 +744,45 @@ TEST_F(Updates2Manager, Download_additionalPeersFromManualData)
 TEST_F(Updates2Manager, Download_externalFileAdded_wrongState)
 {
     givenUpdateRegistries(/*remoteHasUpdate*/ false, /*globalHasUpdate*/ false);
-    givenFileHasBeenAddedExternally();
+    givenFileHasBeenAddedExternally(downloader::FileInformation::Status::downloading);
     whenServerHasBeenStarted();
     whenDownloaderAddFileSignalWithBadInfoReceived();
     whenRemoteUpdateDone();
 
     whenDownloadRequestIssued(api::Updates2StatusData::StatusCode::notAvailable);
+    thenStateShouldFinallyBecome(api::Updates2StatusData::StatusCode::notAvailable);
+}
+
+TEST_F(Updates2Manager, Download_externalFileAdded_stateDownloading_butThenBecomesCorrupted)
+{
+    givenUpdateRegistries(/*remoteHasUpdate*/ false, /*globalHasUpdate*/ false);
+    givenFileHasBeenAddedExternally(downloader::FileInformation::Status::downloading);
+    whenServerHasBeenStarted();
+    whenDownloaderAddFileSignalWithFineInfoReceived(downloader::FileInformation::Status::downloading);
+    whenRemoteUpdateDone();
+
+    thenStateShouldFinallyBecome(api::Updates2StatusData::StatusCode::available);
+
+    whenDownloaderSetsBadStatusForFile();
+    whenDownloadRequestIssued(api::Updates2StatusData::StatusCode::error);
+    whenRemoteUpdateDone();
+
+    thenStateShouldFinallyBecome(api::Updates2StatusData::StatusCode::notAvailable);
+}
+
+TEST_F(Updates2Manager, Download_externalFileDeleted)
+{
+    givenUpdateRegistries(/*remoteHasUpdate*/ false, /*globalHasUpdate*/ false);
+    givenFileHasBeenAddedExternally(downloader::FileInformation::Status::downloaded);
+    whenServerHasBeenStarted();
+    whenDownloaderAddFileSignalWithFineInfoReceived(downloader::FileInformation::Status::downloaded);
+    whenRemoteUpdateDone();
+
+    thenStateShouldFinallyBecome(api::Updates2StatusData::StatusCode::available);
+
+    whenDownloaderDeleteFileSignalReceived();
+    whenDownloadRequestIssued(api::Updates2StatusData::StatusCode::notAvailable);
+    whenRemoteUpdateDone();
     thenStateShouldFinallyBecome(api::Updates2StatusData::StatusCode::notAvailable);
 }
 
