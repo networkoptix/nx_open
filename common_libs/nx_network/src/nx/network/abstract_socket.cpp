@@ -72,11 +72,10 @@ void AbstractCommunicatingSocket::readAsyncAtLeast(
 
 void AbstractCommunicatingSocket::pleaseStop(nx::utils::MoveOnlyFunc<void()> handler)
 {
-    cancelIOAsync(
-        aio::EventType::etNone,
+    post(
         [this, handler = std::move(handler)]()
         {
-            pollable()->getAioThread()->cancelPostedCalls(pollable());
+            pleaseStopSync(false);
             handler();
         });
 }
@@ -87,7 +86,8 @@ void AbstractCommunicatingSocket::pleaseStopSync(bool /*checkForLocks*/)
     {
         cancelIOSync(aio::EventType::etNone);
         // TODO: #ak Refactor after inheriting AbstractSocket from BasicPollable.
-        pollable()->getAioThread()->cancelPostedCalls(pollable());
+        if (pollable())
+            pollable()->getAioThread()->cancelPostedCalls(pollable());
     }
     else
     {
