@@ -1,43 +1,40 @@
-import pytest
-from pathlib2 import Path
+import logging
 
-from framework.installation.mediaserver_deb import MediaserverDeb
+import pytest
+
+from framework.installation.installer import Installer, PackageNameParseError
 from framework.installation.mediaserver_factory import MediaserverFactory
 from framework.merging import merge_systems, setup_local_system
+from framework.os_access.local_path import LocalPath
+
+_logger = logging.getLogger(__name__)
 
 
 def pytest_addoption(parser):
-    parser.addoption('--mediaserver-deb', type=Path)
-    parser.addoption('--mediaserver-msi', type=Path)
+    parser.addoption('--mediaserver-installers-dir', type=LocalPath, default=LocalPath.home() / 'Downloads')
 
 
 @pytest.fixture(scope='session')
-def mediaserver_packages(request):
-    return {
-        'deb': request.config.getoption('--mediaserver-deb').expanduser(),
-        'msi': request.config.getoption('--mediaserver-msi').expanduser(),
-        }
-
-
-@pytest.fixture(scope='session')
-def mediaserver_deb(mediaserver_packages, request):
-    deb = MediaserverDeb(mediaserver_packages['deb'])
-    customization_from_command_line = request.config.getoption('--customization')
-    if customization_from_command_line is not None:
-        if deb.customization.name != customization_from_command_line:
-            raise Exception(
-                "Customization {} provided by --customization option "
-                "doesn't match customization {} from .deb file. "
-                "This option is maintained for backward compatibility, "
-                "either don't use it or make sure it matches .deb file.".format(
-                    customization_from_command_line,
-                    deb.customization))
-    return deb
+def mediaserver_installers(request):
+    installers = []
+    installers_dir = request.config.getoption('--mediaserver-installers-dir')  # type: LocalPath
+    for path in installers_dir.glob('*'):
+        try:
+            installer = Installer(path)
+        except PackageNameParseError as e:
+            _logger.debug("File {}: {!s}".format(path, e.message))
+            continue
+        _logger.info("File {}: {!r}".format(path, installer))
+        installers.append(installer)
+    if len(set((installer.customization, installer.version) for installer in installers)) != 1:
+        raise ValueError("Multiple names and versions in {}: {}".format(installers_dir, installers))
+    installers_by_platform = {installer.platform: installer for installer in installers}
+    return installers_by_platform
 
 
 @pytest.fixture()
-def mediaserver_factory(mediaserver_packages, artifact_factory, ca):
-    return MediaserverFactory(mediaserver_packages, artifact_factory, ca)
+def mediaserver_factory(mediaserver_installers, artifact_factory, ca):
+    return MediaserverFactory(mediaserver_installers, artifact_factory, ca)
 
 
 @pytest.fixture()

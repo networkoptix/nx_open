@@ -1,17 +1,12 @@
 import logging
 from contextlib import contextmanager
 
-from framework.api_shortcuts import factory_reset
 from framework.artifact import ArtifactType
 from framework.core_file_traceback import create_core_file_traceback
-from framework.installation.deb_installation import DebInstallation
 from framework.installation.make_installation import make_installation
 from framework.installation.mediaserver import Mediaserver
-from framework.installation.mediaserver_deb import MediaserverDeb
-from framework.installation.windows_installation import WindowsInstallation
 from framework.os_access.exceptions import DoesNotExist
 from framework.os_access.path import copy_file
-from framework.waiting import wait_for_true
 
 log = logging.getLogger(__name__)
 
@@ -110,14 +105,14 @@ def collect_artifacts_from_mediaserver(mediaserver, root_artifact_factory):
 
 
 class MediaserverFactory(object):
-    def __init__(self, mediaserver_packages, artifact_factory, ca):
-        self._mediaserver_packages = mediaserver_packages
+    def __init__(self, mediaserver_installers, artifact_factory, ca):
+        self._mediaserver_installers = mediaserver_installers
         self._artifact_factory = artifact_factory
         self._ca = ca
 
     @contextmanager
     def allocated_mediaserver(self, vm):
-        installation = make_installation(self._mediaserver_packages, vm.type, vm.os_access)
+        installation = make_installation(self._mediaserver_installers, vm.type, vm.os_access)
         mediaserver = setup_clean_mediaserver(vm.alias, installation, self._ca)
         yield mediaserver
         examine_mediaserver(mediaserver)

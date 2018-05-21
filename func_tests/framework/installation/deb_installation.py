@@ -5,9 +5,8 @@ import re
 import sys
 from io import BytesIO
 
-from framework.build_info import build_info_from_text
 from framework.installation.installation import Installation
-from framework.installation.mediaserver_deb import MediaserverDeb
+from framework.installation.installer import Version, known_customizations
 from framework.os_access.exceptions import DoesNotExist
 from framework.os_access.path import copy_file
 from framework.installation.upstart_service import UpstartService
@@ -25,12 +24,11 @@ _logger = logging.getLogger(__name__)
 class DebInstallation(Installation):
     """Either installed via dpkg or unpacked"""
 
-    def __init__(self, ssh_access, deb_path):
+    def __init__(self, ssh_access, deb):
         """Either valid or hypothetical (invalid or non-existent) installation."""
         self._ssh = ssh_access.ssh
-        mediaserver_deb = MediaserverDeb(deb_path)
-        self._customization = mediaserver_deb.customization
-        self.dir = ssh_access.Path('/opt', self._customization.installation_subdir)
+        self._deb = deb
+        self.dir = ssh_access.Path('/opt', self._deb.customization.linux_subdir)
         self._bin = self.dir / 'bin'
         self._executable = self._bin / 'mediaserver-bin'
         self._config = self.dir / 'etc' / 'mediaserver.conf'
@@ -38,14 +36,8 @@ class DebInstallation(Installation):
         self.var = self.dir / 'var'
         self._log_file = self.var / 'log' / 'log_file.log'
         self.key_pair = self.var / 'ssl' / 'cert.pem'
-        self._mediaserver_deb = mediaserver_deb
         self.os_access = ssh_access
-        self.service = UpstartService(self.os_access.ssh, self._customization.service)
-
-    def _installed_build_info(self):
-        build_info_path = self.dir.joinpath('build_info.txt')
-        build_info_text = build_info_path.read_text(encoding='ascii')
-        return build_info_from_text(build_info_text)
+        self.service = UpstartService(self.os_access.ssh, self._deb.customization.linux_service_name)
 
     def is_valid(self):
         paths_to_check = [
@@ -105,13 +97,34 @@ class DebInstallation(Installation):
                     assert len(lib_bytes_replaced) == len(lib_bytes_original)
                     lib_path.write_bytes(lib_bytes_replaced)
 
+    def _can_be_reused(self):
+        if not self.is_valid():
+            return False
+        build_info_path = self.dir / 'build_info.txt'
+        try:
+            build_info_text = build_info_path.read_text(encoding='ascii')
+        except DoesNotExist:
+            return False
+        build_info = dict(
+            line.split('=', 1)
+            for line in build_info_text.splitlines(False))
+        if self._deb.version != Version(build_info['version']):
+            return False
+        customization, = (
+            customization
+            for customization in known_customizations
+            if customization.customization_name == build_info['customization'])
+        if self._deb.customization != customization:
+            return False
+        return True
+
     def install(self):
-        if self.is_valid() and self._installed_build_info() == self._mediaserver_deb.build_info:
+        if self._can_be_reused():
             return
 
-        remote_path = self.os_access.Path.tmp() / self._mediaserver_deb.path.name
+        remote_path = self.os_access.Path.tmp() / self._deb.path.name
         remote_path.parent.mkdir(parents=True, exist_ok=True)
-        copy_file(self._mediaserver_deb.path, remote_path)
+        copy_file(self._deb.path, remote_path)
         self.os_access.ssh.run_sh_script(
             # language=Bash
             '''

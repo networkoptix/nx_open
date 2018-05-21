@@ -23,9 +23,9 @@ BASE_TIME = RunningTime(datetime(2017, 3, 14, 15, 0, 0, tzinfo=utc))  # Tue Mar 
 
 
 @contextmanager
-def _timeless_mediaserver(vm, mediaserver_packages, ca, artifact_factory):
+def _timeless_mediaserver(vm, mediaserver_installers, ca, artifact_factory):
     """Mediaserver never exposed to internet depending on machine time"""
-    installation = make_installation(mediaserver_packages, vm.type, vm.os_access)
+    installation = make_installation(mediaserver_installers, vm.type, vm.os_access)
     mediaserver = make_dirty_mediaserver(vm.alias, installation)
     mediaserver.stop(already_stopped_ok=True)
     vm.os_access.networking.disable_internet()
@@ -41,11 +41,11 @@ def _timeless_mediaserver(vm, mediaserver_packages, ca, artifact_factory):
 
 
 @pytest.fixture()
-def two_mediaservers(two_vms, mediaserver_packages, ca, artifact_factory):
+def two_mediaservers(two_vms, mediaserver_installers, ca, artifact_factory):
     """Make sure mediaservers are installed, stopped and internet is disabled."""
     first_vm, second_vm = two_vms
-    with timeless_mediaserver(first_vm, mediaserver_packages, ca, artifact_factory) as first:
-        with timeless_mediaserver(second_vm, mediaserver_packages, ca, artifact_factory) as second:
+    with timeless_mediaserver(first_vm, mediaserver_installers, ca, artifact_factory) as first:
+        with timeless_mediaserver(second_vm, mediaserver_installers, ca, artifact_factory) as second:
             for mediaserver in (first, second):
                 setup_local_system(mediaserver, {})
             merge_systems(first, second)

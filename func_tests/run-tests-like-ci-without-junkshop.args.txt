@@ -1,8 +1,7 @@
 -s
 --work-dir=~/Development/func_tests_dir/
 --bin-dir=~/Development/func_tests_dir/bin/
---mediaserver-deb=~/Downloads/wave-server-4.0.0.763-linux64-beta-test.deb
---mediaserver-msi=~/Downloads/wave-server-4.0.0.763-win64-beta-test.msi
+--mediaserver-installers-dir=~/Downloads/
 --cloud-group=test
 --customization=hanwha
 --timeout=3600
