@@ -46,25 +46,21 @@
     }
 }
 
-.show {
+.dropdown.show {
     .nav-arrow span:nth-child(1) {
         -webkit-transform: rotate(45deg);
         -moz-transform: rotate(45deg);
         -o-transform: rotate(45deg);
         transform: rotate(-45deg);
     }
-}
 
-.show {
     .nav-arrow span:nth-child(2) {
         -webkit-transform: rotate(-45deg);
         -moz-transform: rotate(-45deg);
         -o-transform: rotate(-45deg);
         transform: rotate(45deg);
     }
-}
 
-.show {
     .nav-arrow {
         & span:nth-child(1) {
             left: 4px;
