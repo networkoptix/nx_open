@@ -31,7 +31,7 @@ public:
     ProtocolDetectingStreamSocket(std::unique_ptr<AbstractStreamSocket> source):
         base_type(source.get())
     {
-        setDataSource(std::move(source));
+        this->setDataSource(std::move(source));
     }
 
     virtual bool connect(
@@ -48,7 +48,7 @@ public:
         nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode)> handler) override
     {
         NX_ASSERT(false);
-        post(
+        this->post(
             [handler = std::move(handler)]()
             {
                 handler(SystemError::notImplemented);
@@ -57,33 +57,33 @@ public:
 
     virtual int recv(void* buffer, unsigned int bufferLen, int flags) override
     {
-        while (!isProtocolDetected())
+        while (!this->isProtocolDetected())
         {
             std::array<char, 1024> buf;
-            int bytesRead = actualDataChannel().recv(buf.data(), (unsigned int) buf.size(), 0);
+            int bytesRead = this->actualDataChannel().recv(buf.data(), (unsigned int) buf.size(), 0);
             if (bytesRead <= 0)
                 return bytesRead;
 
-            analyzeMoreData(nx::Buffer(buf.data(), bytesRead));
+            this->analyzeMoreData(nx::Buffer(buf.data(), bytesRead));
         }
 
-        return actualDataChannel().recv(buffer, bufferLen, flags);
+        return this->actualDataChannel().recv(buffer, bufferLen, flags);
     }
 
     virtual int send(const void* buffer, unsigned int bufferLen) override
     {
-        if (!isProtocolDetected())
+        if (!this->isProtocolDetected())
         {
             SystemError::setLastErrorCode(SystemError::invalidData);
             return -1;
         }
 
-        return actualDataChannel().send(buffer, bufferLen);
+        return this->actualDataChannel().send(buffer, bufferLen);
     }
 
 protected:
     virtual std::unique_ptr<AbstractStreamSocket> installProtocolHandler(
-        ProtocolProcessorFactoryFunc& factoryFunc,
+        typename base_type::ProtocolProcessorFactoryFunc& factoryFunc,
         std::unique_ptr<AbstractStreamSocket> dataSource,
         nx::Buffer readDataCache) override
     {

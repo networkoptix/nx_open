@@ -279,32 +279,32 @@ public:
 
     virtual bool setNoDelay(bool value) override
     {
-        return m_target->setNoDelay(value);
+        return this->m_target->setNoDelay(value);
     }
 
     virtual bool getNoDelay(bool* value) const override
     {
-        return m_target->getNoDelay(value);
+        return this->m_target->getNoDelay(value);
     }
 
     virtual bool toggleStatisticsCollection(bool value) override
     {
-        return m_target->toggleStatisticsCollection(value);
+        return this->m_target->toggleStatisticsCollection(value);
     }
 
     virtual bool getConnectionStatistics(StreamSocketInfo* info) override
     {
-        return m_target->getConnectionStatistics(info);
+        return this->m_target->getConnectionStatistics(info);
     }
 
     virtual bool setKeepAlive(boost::optional< KeepAliveOptions > info) override
     {
-        return m_target->setKeepAlive(info);
+        return this->m_target->setKeepAlive(info);
     }
 
     virtual bool getKeepAlive(boost::optional< KeepAliveOptions >* result) const override
     {
-        return m_target->getKeepAlive(result);
+        return this->m_target->getKeepAlive(result);
     }
 };
 
