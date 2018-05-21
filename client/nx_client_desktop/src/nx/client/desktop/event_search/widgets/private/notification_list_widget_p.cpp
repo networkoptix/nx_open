@@ -185,7 +185,7 @@ void NotificationListWidget::Private::showContextMenu(const QPoint& pos)
     contextMenu.addAction(action(ui::action::BusinessEventsAction));
     contextMenu.addAction(action(ui::action::PreferencesNotificationTabAction));
     contextMenu.addSeparator();
-    contextMenu.addAction(action(ui::action::ToggleNotificationsAction));
+    contextMenu.addAction(action(ui::action::PinNotificationsAction));
     contextMenu.exec(QnHiDpiWorkarounds::safeMapToGlobal(q, pos));
 }
 
