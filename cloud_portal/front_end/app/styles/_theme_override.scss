@@ -189,6 +189,10 @@ select.form-control{
 
 .dropdown {
   &.dropdown-wide {
+    .dropdown-menu {
+      width: 100%;
+    }
+
     .dropdown-toggle {
       max-width: none;
       width: 100%;

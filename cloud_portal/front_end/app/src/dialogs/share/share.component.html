@@ -27,12 +27,17 @@
         <div class="form-group">
             <label for="role" translate>Permissions</label>
 
-            <select class="form-control"
-                    name="role" id="role"
-                    [(ngModel)]="user.role">
-                <option *ngFor="let option of accessRoles" [ngValue]="option.optionLabel"> {{option.optionLabel}}
-                </option>
-            </select>
+            <!--<select class="form-control"-->
+                    <!--name="role" id="role"-->
+                    <!--[(ngModel)]="user.role">-->
+                <!--<option *ngFor="let option of accessRoles" [ngValue]="option.optionLabel"> {{option.optionLabel}}-->
+                <!--</option>-->
+            <!--</select>-->
+
+            <nx-permissions-select
+                    [roles]="accessRoles"
+                    (onPersmissionSelected)="setPermission($event)">
+            </nx-permissions-select>
 
             <span class="help-block">
                 {{getRoleDescription()}}

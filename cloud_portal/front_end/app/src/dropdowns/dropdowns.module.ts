@@ -2,10 +2,11 @@ import { NgModule }     from '@angular/core';
 import { CommonModule } from '@angular/common';
 
 import { NgbModalModule, NgbDropdownModule } from '@ng-bootstrap/ng-bootstrap';
-import { NxAccountSettingsDropdown }         from "../dropdowns/account-settings/account-settings.component";
-import { NxLanguageDropdown }                from "../dropdowns/language/language.component";
-import { NxActiveSystemDropdown }            from "../dropdowns/active-system/active-system.component";
-import { NxSystemsDropdown }                 from "../dropdowns/systems/systems.component";
+import { NxAccountSettingsDropdown }         from "./account-settings/account-settings.component";
+import { NxLanguageDropdown }                from "./language/language.component";
+import { NxActiveSystemDropdown }            from "./active-system/active-system.component";
+import { NxSystemsDropdown }                 from "./systems/systems.component";
+import { NxPermissionsDropdown }             from "./permissions/permissions.component";
 import { downgradeComponent }                from "@angular/upgrade/static";
 
 @NgModule({
@@ -19,19 +20,22 @@ import { downgradeComponent }                from "@angular/upgrade/static";
         NxLanguageDropdown,
         NxAccountSettingsDropdown,
         NxActiveSystemDropdown,
-        NxSystemsDropdown
+        NxSystemsDropdown,
+        NxPermissionsDropdown
     ],
     entryComponents: [
         NxLanguageDropdown,
         NxAccountSettingsDropdown,
         NxActiveSystemDropdown,
-        NxSystemsDropdown
+        NxSystemsDropdown,
+        NxPermissionsDropdown
     ],
     exports: [
         NxLanguageDropdown,
         NxAccountSettingsDropdown,
         NxActiveSystemDropdown,
-        NxSystemsDropdown
+        NxSystemsDropdown,
+        NxPermissionsDropdown
     ]
 })
 export class DropdownsModule {
@@ -44,3 +48,4 @@ angular
     .directive('nxAccountSettingsSelect', downgradeComponent({component: NxAccountSettingsDropdown}) as angular.IDirectiveFactory)
     .directive('nxActiveSystem', downgradeComponent({component: NxActiveSystemDropdown}) as angular.IDirectiveFactory)
     .directive('nxSystems', downgradeComponent({component: NxSystemsDropdown}) as angular.IDirectiveFactory)
+    .directive('nxPermissions', downgradeComponent({component: NxPermissionsDropdown}) as angular.IDirectiveFactory);

@@ -2,6 +2,7 @@ import { Component, Inject, OnInit, Input, ViewEncapsulation } from '@angular/co
 import { NgbModal, NgbActiveModal, NgbModalRef }               from '@ng-bootstrap/ng-bootstrap';
 import { EmailValidator }                                      from '@angular/forms';
 import { NxModalGeneralComponent }                             from "../general/general.component";
+// import { NxPermissionsDropdown }                               from "../../dropdowns/permissions/permissions.component";
 
 @Component({
     selector: 'nx-modal-share-content',
@@ -27,9 +28,13 @@ export class ShareModalContent {
                 @Inject('process') private process: any,
                 @Inject('configService') private configService: any,
                 @Inject('ngToast') private toast: any,
-                private generalModal: NxModalGeneralComponent,) {
+                private generalModal: NxModalGeneralComponent) {
 
         this.url = 'share';
+    }
+
+    setPermission(evt) {
+        this.user.role = evt;
     }
 
     processAccessRoles() {
@@ -80,7 +85,7 @@ export class ShareModalContent {
         this.buttonText = this.language.sharing.shareConfirmButton;
         this.isNewShare = !this.user;
 
-        this.user = (this.user) ? {...this.user} : {email:'', isEnabled: true};
+        this.user = (this.user) ? {...this.user} : {email: '', isEnabled: true};
 
         if (!this.isNewShare) {
             this.account
@@ -153,7 +158,7 @@ export class NxModalShareComponent implements OnInit {
     }
 
     open(system?, user?) {
-        return this.dialog(system, user);
+        return this.dialog(system, user).result;
     }
 
     close() {

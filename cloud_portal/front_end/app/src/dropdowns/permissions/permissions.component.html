@@ -1,0 +1,27 @@
+<!--<select class="form-control"-->
+        <!--name="role" id="role"-->
+        <!--[(ngModel)]="user.role">-->
+    <!--<option *ngFor="let option of accessRoles" [ngValue]="option.optionLabel"> {{option.optionLabel}}-->
+    <!--</option>-->
+<!--</select>-->
+
+<div ngbDropdown class="d-inline-block dropdown-wide">
+
+    <button class="btn btn-dropdown-toggle"
+            id="permissionsSelect"
+            ngbDropdownToggle>
+        <span [innerHtml]="selection"></span>
+        <div class="nav-arrow">
+            <span></span>
+            <span></span>
+        </div>
+    </button>
+
+    <div ngbDropdownMenu aria-labelledby="permissionsSelect">
+        <button class="dropdown-item"
+                *ngFor="let role of roles"
+                (click)="changePermission(role)">
+            <span>{{role.optionLabel}}</span>
+        </button>
+    </div>
+</div>

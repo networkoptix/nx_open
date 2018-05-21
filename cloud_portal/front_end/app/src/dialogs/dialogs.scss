@@ -77,10 +77,15 @@
         padding: 1rem 1rem 0;
         background-color: $light1;
 
+        .form-group {
+            margin-bottom: 1rem;
+        }
+
         label {
             font-size: $font-size-base;
             font-weight: normal;
             margin: 0;
+            padding: 0 0 0.5rem 0;
         }
 
         .checkbox {
@@ -88,7 +93,10 @@
         }
 
         .help-block {
+            display: block;
             background-color: transparent;
+            color: $light16;
+            padding: 0.5rem 0 0 0;
         }
     }
 

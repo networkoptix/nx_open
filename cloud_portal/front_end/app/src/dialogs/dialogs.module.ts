@@ -1,7 +1,8 @@
 import { NgModule }     from '@angular/core';
 import { CommonModule } from '@angular/common';
 
-import { ComponentsModule }                                   from '../components/components.module';
+import { ComponentsModule } from '../components/components.module';
+import { DropdownsModule }  from '../dropdowns/dropdowns.module';
 
 import { nxDialogsService }                                   from "./dialogs.service";
 import { NxModalLoginComponent, LoginModalContent }           from "./login/login.component";
@@ -20,7 +21,8 @@ import { TranslateModule }                                    from '@ngx-transla
         CommonModule,
         FormsModule,
         TranslateModule,
-        ComponentsModule
+        ComponentsModule,
+        DropdownsModule
     ],
     declarations: [
         LoginModalContent, NxModalLoginComponent,
