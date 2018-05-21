@@ -128,9 +128,9 @@ if(WINDOWS)
 
     # Get rid of useless MSVC warnings.
     add_definitions(
-        _CRT_SECURE_NO_WARNINGS #< Don't warn for deprecated 'unsecure' CRT functions.
-        _CRT_NONSTDC_NO_DEPRECATE #< Don't warn for deprecated POSIX functions.
-        _SCL_SECURE_NO_WARNINGS #< Don't warn for 'unsafe' STL functions.
+        -D_CRT_SECURE_NO_WARNINGS #< Don't warn for deprecated 'unsecure' CRT functions.
+        -D_CRT_NONSTDC_NO_DEPRECATE #< Don't warn for deprecated POSIX functions.
+        -D_SCL_SECURE_NO_WARNINGS #< Don't warn for 'unsafe' STL functions.
     )
 
     if(CMAKE_BUILD_TYPE STREQUAL "Debug")
