@@ -68,6 +68,7 @@
             "flags": "stateDependent",
             "internalName": "OSC",
             "group": 1,
+            "unsupported": true
         },
         {
             "eventTypeId": "e499faf1-b818-4c38-a6b1-7150e56ff54f",
