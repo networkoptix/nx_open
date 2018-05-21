@@ -252,9 +252,7 @@ void SingleCameraSettingsWidget::setCamera(const QnVirtualCameraResourcePtr &cam
         return;
 
     if (m_camera)
-    {
-        disconnect(m_camera, NULL, this, NULL);
-    }
+        m_camera->disconnect(this);
 
     m_camera = camera;
     QnVirtualCameraResourceList cameras;
@@ -683,8 +681,7 @@ void SingleCameraSettingsWidget::setHasDbChanges(bool hasChanges)
 void SingleCameraSettingsWidget::disconnectFromMotionWidget()
 {
     NX_ASSERT(m_motionWidget);
-
-    disconnect(m_motionWidget, NULL, this, NULL);
+    m_motionWidget->disconnect(this);
 }
 
 void SingleCameraSettingsWidget::connectToMotionWidget()

@@ -76,9 +76,8 @@ void CameraAdvancedParamsWidget::setCamera(const QnVirtualCameraResourcePtr &cam
     if (m_camera == camera)
         return;
 
-    if (m_camera) {
-        disconnect(m_camera, NULL, this, NULL);
-    }
+    if (m_camera)
+        m_camera->disconnect(this);
 
     m_camera = camera;
 
