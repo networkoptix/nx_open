@@ -1,7 +1,10 @@
 #pragma once
 
 #include <deque>
+#include <set>
+#include <deque>
 
+#include <QtCore/QObject>
 #include <QtCore/QSharedPointer>
 
 #include <nx/network/abstract_socket.h>
@@ -9,12 +12,15 @@
 #include <nx/utils/elapsed_timer.h>
 #include <network/http_connection_listener.h>
 #include <nx/vms/network/abstract_server_connector.h>
+#include <nx_ec/data/api_reverse_connection_data.h>
+#include <nx/network/http/http_async_client.h>
 
 namespace nx {
 namespace vms {
 namespace network {
 
-class ReverseConnectionManager: 
+class ReverseConnectionManager:
+    public QObject,
     public QnCommonModuleAware, 
     public AbstractServerConnector
 {
@@ -35,12 +41,11 @@ public:
     std::unique_ptr<nx::network::AbstractStreamSocket> getProxySocket(
         const QnUuid& guid, std::chrono::milliseconds timeout);
 
-    virtual std::unique_ptr<nx::network::AbstractStreamSocket> connect(
+    virtual std::unique_ptr<nx::network::AbstractStreamSocket> connectTo(
         const QnRoute& route, std::chrono::milliseconds timeout) override;
-    private slots:
+private slots:
     void at_reverseConnectionRequested(const ec2::ApiReverseConnectionData& data);
 private:
-    void doPeriodicTasks();
     void onHttpClientDone(nx::network::http::AsyncClient* httpClient);
     std::unique_ptr<nx::network::AbstractStreamSocket> getPreparedSocketUnsafe(const QnUuid& guid);
 
@@ -51,6 +56,7 @@ private:
         size_t bytesRead);
 private:
     mutable QnMutex m_mutex;
+
     std::set<std::unique_ptr<nx::network::http::AsyncClient>> m_runningHttpClients;
 
     struct SocketData
@@ -61,13 +67,14 @@ private:
 
     struct PreparedSocketPool
     {
-        std::vector<SocketData> sockets;
+        std::deque<SocketData> sockets;
         nx::utils::ElapsedTimer timer;
         int requested = 0;
     };
 
     std::map<QnUuid, PreparedSocketPool> m_preparedSockets;
     QnWaitCondition m_proxyCondition;
+
     QnHttpConnectionListener* m_tcpListener = nullptr;
 };
 

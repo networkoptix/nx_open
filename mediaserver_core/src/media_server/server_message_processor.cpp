@@ -120,8 +120,6 @@ void QnServerMessageProcessor::connectToConnection(const ec2::AbstractECConnecti
 
     connect(connection, &ec2::AbstractECConnection::remotePeerUnauthorized,
         this, &QnServerMessageProcessor::at_remotePeerUnauthorized);
-    connect(connection, &ec2::AbstractECConnection::reverseConnectionRequested,
-        this, &QnServerMessageProcessor::at_reverseConnectionRequested);
 
     connect(connection->getMiscNotificationManager().get(), &ec2::AbstractMiscNotificationManager::systemIdChangeRequested,
             this, [this](const QnUuid& systemId, qint64 sysIdTime, ec2::Timestamp tranLogTime)
