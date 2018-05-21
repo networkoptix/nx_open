@@ -407,19 +407,50 @@ QnCameraAdvancedParamWidgetsManager::makeDependencyHandler(
                 if (!allConditionsSatisfied)
                     return false;
 
-                widget->setRange(dependency.range);
-                if (parameter.bindDefaultToMinimum)
+                if (!dependency.valuesToAddToRange.isEmpty())
                 {
-                    const auto minMax = dependency.range.split(L',');
-                    if (!minMax.isEmpty())
-                        widget->setValue(minMax.first().trimmed());
+                    auto range = widget->range();
+                    for (const auto& valueToAdd: dependency.valuesToAddToRange)
+                    {
+                        if (!range.contains(valueToAdd))
+                            range.push_back(valueToAdd);
+                    }
+
+                    widget->setRange(range.join(L','));
                 }
 
-                auto label = dynamic_cast<QLabel*>(m_paramLabelsById[paramId]);
-                if (!label)
-                    return false;
+                if (!dependency.valuesToRemoveFromRange.isEmpty())
+                {
+                    QStringList result;
+                    const auto range = widget->range();
+                    for (const auto& value: range)
+                    {
+                        if (!dependency.valuesToRemoveFromRange.contains(value))
+                            result.push_back(value);
+                    }
 
-                setLabelText(label, parameter, dependency.range);
+                    widget->setRange(result.join(L','));
+                }
+
+                if (!dependency.range.isEmpty())
+                {
+                    NX_ASSERT(dependency.valuesToAddToRange.isEmpty()
+                        && dependency.valuesToRemoveFromRange.isEmpty());
+
+                    widget->setRange(dependency.range);
+                    if (parameter.bindDefaultToMinimum)
+                    {
+                        const auto minMax = dependency.range.split(L',');
+                        if (!minMax.isEmpty())
+                            widget->setValue(minMax.first().trimmed());
+                    }
+
+                    auto label = dynamic_cast<QLabel*>(m_paramLabelsById[paramId]);
+                    if (!label)
+                        return false;
+
+                    setLabelText(label, parameter, dependency.range);
+                }
             }
             else if (dependency.type == DependencyType::trigger)
             {

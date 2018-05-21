@@ -33,6 +33,12 @@ QnAbstractCameraAdvancedParamWidget::QnAbstractCameraAdvancedParamWidget(const Q
     setLayout(m_layout);
 }
 
+QStringList QnAbstractCameraAdvancedParamWidget::range() const
+{
+    NX_ASSERT(false, lit("range allowed to be called only for Enumeration widget."));
+    return QStringList();
+}
+
 void QnAbstractCameraAdvancedParamWidget::setRange(const QString& /*range*/)
 {
     NX_ASSERT(false, lit("setRange allowed to be called only for Enumeration widget."));
@@ -183,10 +189,19 @@ public:
             });
     }
 
-    virtual void setRange(const QString& range)
+    virtual void setRange(const QString& range) override
     {
         auto rangeToSet = range.split(L',');
         setRange(rangeToSet);
+    }
+
+    virtual QStringList range() const override
+    {
+        QStringList result;
+        for (auto i = 0; i < m_comboBox->count(); ++i)
+            result << m_comboBox->itemText(i);
+
+        return result;
     }
 
     void setRange(const QStringList& range)

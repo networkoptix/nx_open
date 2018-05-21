@@ -5,11 +5,11 @@
     <name>QnCloudResultInfo</name>
     <message>
       <source>Successful.</source>
-      <translation>Riuscito.</translation>
+      <translation>Completato.</translation>
     </message>
     <message>
       <source>Invalid login or password.</source>
-      <translation>Login o password non validi.</translation>
+      <translation>Nome utente o password non validi.</translation>
     </message>
     <message>
       <source>Requested operation is not allowed with provided credentials.</source>

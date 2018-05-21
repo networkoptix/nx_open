@@ -11,10 +11,11 @@ class QHBoxLayout;
 class QnAbstractCameraAdvancedParamWidget: public QWidget {
 	Q_OBJECT
 public:
-	explicit QnAbstractCameraAdvancedParamWidget(const QnCameraAdvancedParameter &parameter, QWidget* parent);
+    explicit QnAbstractCameraAdvancedParamWidget(const QnCameraAdvancedParameter &parameter, QWidget* parent);
 
-	virtual QString value() const = 0;
-	virtual void setValue(const QString &newValue) = 0;
+    virtual QString value() const = 0;
+    virtual void setValue(const QString &newValue) = 0;
+    virtual QStringList range() const;
     virtual void setRange(const QString& /*range*/);
 
 signals:
