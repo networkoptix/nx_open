@@ -66,20 +66,11 @@ NotificationListWidget::Private::Private(NotificationListWidget* q) :
     m_systemHealthModel(new SystemHealthListModel(this)),
     m_notificationsModel(new NotificationListModel(this))
 {
-    auto headerWidget = new QWidget(q);
-    auto headerLayout = new QHBoxLayout(headerWidget);
-    headerLayout->addStretch();
-    headerLayout->addWidget(newActionButton(ui::action::OpenBusinessLogAction,
-        Qn::MainWindow_Notifications_EventLog_Help));
-    headerLayout->addWidget(newActionButton(ui::action::BusinessEventsAction, -1));
-    headerLayout->addWidget(newActionButton(ui::action::PreferencesNotificationTabAction, -1));
-
     m_placeholder = new QWidget(q);
     m_placeholder->setMinimumSize(QSize(0, 100));
 
     auto layout = new QVBoxLayout(q);
     layout->setSpacing(0);
-    layout->addWidget(headerWidget);
     layout->addWidget(m_placeholder);
     layout->addWidget(m_eventRibbon);
 

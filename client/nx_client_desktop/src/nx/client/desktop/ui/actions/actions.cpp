@@ -109,7 +109,6 @@ void initialize(Manager* manager, Action* root)
 
     factory(PreferencesNotificationTabAction)
         .flags(NoTarget)
-        .icon(qnSkin->icon("events/filter.png"))
         .text(ContextMenu::tr("Filter...")); //< To be displayed on button tooltip
 
     factory(PreferencesCloudTabAction)
@@ -150,7 +149,6 @@ void initialize(Manager* manager, Action* root)
             | LayoutItemTarget | WidgetTarget | GlobalHotkey)
         .mode(DesktopMode)
         .requiredGlobalPermission(Qn::GlobalViewLogsPermission)
-        .icon(qnSkin->icon("events/log.png"))
         .shortcut(lit("Ctrl+L"))
         .condition(!condition::tourIsRunning())
         .text(ContextMenu::tr("Event Log...")); //< To be displayed on button tooltip
@@ -657,7 +655,6 @@ void initialize(Manager* manager, Action* root)
         .mode(DesktopMode)
         .requiredGlobalPermission(Qn::GlobalAdminPermission)
         .text(ContextMenu::tr("Event Rules..."))
-        .icon(qnSkin->icon("events/settings.png"))
         .shortcut(lit("Ctrl+E"))
         .condition(!condition::tourIsRunning())
         .autoRepeat(false);
