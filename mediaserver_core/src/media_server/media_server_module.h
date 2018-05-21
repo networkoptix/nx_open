@@ -124,7 +124,6 @@ private:
     nx::mediaserver::updates2::ServerUpdates2Manager* m_updates2Manager;
     QScopedPointer<QnDataProviderFactory> m_resourceDataProviderFactory;
     QScopedPointer<QnResourceCommandProcessor> m_resourceCommandProcessor;
-    QScopedPointer<nx::vms::network::ReverseConnectionManager> m_reverseConnectionManager;
 };
 
 #define qnServerModule QnMediaServerModule::instance()

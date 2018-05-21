@@ -1226,8 +1226,10 @@ void MediaServerProcess::stopObjects()
     if (const auto manager = commonModule()->moduleDiscoveryManager())
         manager->stop();
 
-    if (m_universalTcpListener) {
+    if (m_universalTcpListener) 
+    {
         m_universalTcpListener->stop();
+        m_reverseConnectionManager.reset();
         delete m_universalTcpListener;
         m_universalTcpListener = 0;
     }
@@ -3625,6 +3627,8 @@ void MediaServerProcess::run()
         QCoreApplication::quit();
         return;
     }
+    m_reverseConnectionManager.reset(
+        new nx::vms::network::ReverseConnectionManager(m_universalTcpListener));
 
     if (appServerUrl.scheme().toLower() == lit("file"))
         ec2ConnectionFactory->registerRestHandlers(m_universalTcpListener->processorPool());

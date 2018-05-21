@@ -191,8 +191,6 @@ QnMediaServerModule::QnMediaServerModule(
     m_resourceDataProviderFactory.reset(new QnDataProviderFactory());
     registerResourceDataProviders();
     m_resourceCommandProcessor.reset(new QnResourceCommandProcessor());
-    m_reverseConnectionManager.reset(
-        new nx::vms::network::ReverseConnectionManager(this->commonModule()));
 
     store(new nx::mediaserver_core::recorder::WearableArchiveSynchronizer(this));
 
@@ -331,9 +329,4 @@ QnDataProviderFactory* QnMediaServerModule::dataProviderFactory() const
 QnResourceCommandProcessor* QnMediaServerModule::resourceCommandProcessor() const
 {
     return m_resourceCommandProcessor.data();
-}
-
-nx::vms::network::ReverseConnectionManager* QnMediaServerModule::reverseConnectionManager() const
-{
-    return m_reverseConnectionManager.data();
 }

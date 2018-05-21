@@ -146,7 +146,7 @@ QnUuid ServerTimeSyncManager::getPrimaryTimeServerId() const
 std::unique_ptr<nx::network::AbstractStreamSocket> ServerTimeSyncManager::connectToRemoteHost(const QnRoute& route)
 {
     if (m_serverConnector)
-        return m_serverConnector->connect(route, kMaxServerConnectionTimeout);
+        return m_serverConnector->connectTo(route, kMaxServerConnectionTimeout);
     return base_type::connectToRemoteHost(route);
 }
 

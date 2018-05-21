@@ -203,6 +203,7 @@ private:
 
     std::unique_ptr<QnAutoRequestForwarder> m_autoRequestForwarder;
     QnUniversalTcpListener* m_universalTcpListener;
+    std::unique_ptr<nx::vms::network::ReverseConnectionManager> m_reverseConnectionManager;
     QnMediaServerResourcePtr m_mediaServer;
     QSet<QnUuid> m_updateUserRequests;
     std::map<nx::network::HostAddress, quint16> m_forwardedAddresses;
