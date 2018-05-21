@@ -4,7 +4,7 @@ if(WINDOWS)
 endif()
 
 nx_configure_file(
-    maven/filter-resources/app_info_impl.cpp
+    app_info_impl.cpp
     ${CMAKE_CURRENT_BINARY_DIR})
 
 nx_add_target(nx_network LIBRARY ${library_type}
