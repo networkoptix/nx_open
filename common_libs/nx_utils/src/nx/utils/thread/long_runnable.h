@@ -11,7 +11,6 @@
 
 #include "semaphore.h"
 #include "stoppable.h"
-#include "../compiler_options.h"
 
 class QnLongRunnablePoolPrivate;
 

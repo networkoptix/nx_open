@@ -1,5 +1,3 @@
-#include <nx/utils/compiler_options.h>
-
 /* Windows headers. */
 #ifdef _WIN32
 #   define FD_SETSIZE 2048
