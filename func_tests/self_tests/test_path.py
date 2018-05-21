@@ -195,3 +195,15 @@ def test_glob_on_non_existent(existing_remote_dir):
     non_existent_path = existing_remote_dir / 'non_existent'
     with pytest.raises(DoesNotExist):
         _ = list(non_existent_path.glob('*'))
+
+
+@pytest.mark.parametrize('iterations', [2, 10], ids='{}iterations'.format)
+@pytest.mark.parametrize('depth', [2, 10], ids='depth{}'.format)
+def test_many_mkdir_rmtree(remote_test_dir, iterations, depth):
+    """Sometimes mkdir after rmtree fails because of pending delete operations"""
+    top_path = remote_test_dir / 'top'
+    deep_path = top_path.joinpath(*('level{}'.format(level) for level in range(depth)))
+    for _ in range(iterations):
+        deep_path.mkdir(parents=True)
+        deep_path.joinpath('treasure').write_bytes(b'\0' * 1000000)
+        top_path.rmtree()
