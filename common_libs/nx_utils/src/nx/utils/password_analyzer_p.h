@@ -41,7 +41,8 @@ private:
 class CommonPasswordsDictionary
 {
 public:
-    CommonPasswordsDictionary(const QString& dictionaryPath = lit(":/common_passwords.txt"));
+    CommonPasswordsDictionary(
+        const QString& dictionaryPath = QLatin1String(":/common_passwords.txt"));
 
     bool operator () (const QString& password) const;
 

@@ -104,7 +104,7 @@ void DbStructureUpdater::updateStruct(QueryContext* const queryContext)
     DbSchemaState dbState = analyzeDbSchemaState(queryContext);
     if (dbState.version < m_initialVersion)
     {
-        NX_LOGX(lit("DB of version %1 cannot be upgraded! Minimal supported version is %2")
+        NX_LOGX(lm("DB of version %1 cannot be upgraded! Minimal supported version is %2")
             .arg(dbState.version).arg(m_initialVersion), cl_logERROR);
         throw Exception(DBResult::notFound);
     }
@@ -137,7 +137,7 @@ DbStructureUpdater::DbSchemaState DbStructureUpdater::analyzeDbSchemaState(
     fetchDbVersionQuery.bindValue(":schemaName", QString::fromStdString(m_schemaName));
     if (fetchDbVersionQuery.exec() && fetchDbVersionQuery.next())
     {
-        dbSchemaState.version = fetchDbVersionQuery.value(lit("db_version")).toUInt();
+        dbSchemaState.version = fetchDbVersionQuery.value("db_version").toUInt();
         dbSchemaState.someSchemaExists = true;
     }
 
@@ -158,7 +158,7 @@ DBResult DbStructureUpdater::createInitialSchema(
                 m_fullSchemaScriptByVersion.rbegin()->second,
                 RdbmsDriverType::unknown))
         {
-            NX_LOG(lit("DbStructureUpdater. Failed to create schema of version %1: %2")
+            NX_LOG(lm("DbStructureUpdater. Failed to create schema of version %1: %2")
                 .arg(m_fullSchemaScriptByVersion.rbegin()->first)
                 .arg(queryContext->connection()->lastError().text()), cl_logWARNING);
             return DBResult::ioError;
@@ -204,7 +204,7 @@ DBResult DbStructureUpdater::applyNextUpdateScript(
             m_updateScripts[dbState->version - m_initialVersion],
             queryContext))
     {
-        NX_LOG(lit("DbStructureUpdater. Failure updating to version %1: %2")
+        NX_LOG(lm("DbStructureUpdater. Failure updating to version %1: %2")
             .arg(dbState->version).arg(queryContext->connection()->lastError().text()),
             cl_logWARNING);
         return DBResult::ioError;

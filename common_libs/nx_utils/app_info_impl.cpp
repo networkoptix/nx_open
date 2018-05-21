@@ -28,8 +28,8 @@ QString AppInfo::customizationName()
 
 QString AppInfo::applicationFullVersion()
 {
-    static const QString kBeta = beta() ? lit("-beta") : QString();
-    static const QString kFullVersion = lit("%1-%2-%3%4")
+    static const QString kBeta = beta() ? "-beta" : QString();
+    static const QString kFullVersion = QString("%1-%2-%3%4")
         .arg(applicationVersion())
         .arg(applicationRevision())
         .arg(customizationName().replace(L' ', L'_'))

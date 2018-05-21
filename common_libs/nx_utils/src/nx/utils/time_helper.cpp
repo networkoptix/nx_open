@@ -76,9 +76,9 @@ static QString deltaMs(qint64 baseUs, qint64 valueUs)
 {
     const int64_t deltaMs = (valueUs - baseUs) / 1000;
     if (deltaMs >= 0)
-        return lit("+%1 ms").arg(deltaMs);
+        return QString("+%1 ms").arg(deltaMs);
     else
-        return lit("%1 ms").arg(deltaMs);
+        return QString("%1 ms").arg(deltaMs);
 }
 
 qint64 TimeHelper::getTimeUs(const qint64 cameraTimeUs)

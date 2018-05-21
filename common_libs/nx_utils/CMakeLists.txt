@@ -1,5 +1,5 @@
 nx_configure_file(
-    maven/filter-resources/app_info_impl.cpp
+    app_info_impl.cpp
     ${CMAKE_CURRENT_BINARY_DIR})
 
 set(library_type)
@@ -27,11 +27,11 @@ target_compile_definitions(nx_utils
 if(WINDOWS)
     target_link_libraries(nx_utils PRIVATE DbgHelp ws2_32)
 endif()
-    
+
 if(LINUX AND NOT ANDROID)
     target_link_libraries(nx_utils PRIVATE pthread)
 endif()
-    
+
 if(MACOSX)
     find_library(Foundation_LIBRARY Foundation)
     mark_as_advanced(Foundation_LIBRARY)

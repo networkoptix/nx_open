@@ -61,13 +61,10 @@ QString joinFields(
     const InnerJoinFilterFields& fields,
     const QString& separator)
 {
-    QString result;
-    for (const auto& field : fields)
-        result += lit("%1%2=%3")
-            .arg(result.isEmpty() ? QString() : separator)
-            .arg(QLatin1String(field.name))
-            .arg(QLatin1String(field.placeHolderName));
-    return result;
+    QStringList result;
+    for (const auto& field: fields)
+        result.push_back(QLatin1String(field.name) + '=' + QLatin1String(field.placeHolderName));
+    return result.join(separator);
 }
 
 void bindFields(QSqlQuery* const query, const InnerJoinFilterFields& fields)
