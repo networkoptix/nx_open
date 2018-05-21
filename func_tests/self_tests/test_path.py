@@ -21,6 +21,12 @@ def ssh_path(ad_hoc_ssh):
     return make_ssh_path_cls(ad_hoc_ssh).tmp() / 'test_path-remote'
 
 
+@pytest.fixture(scope='session')
+def windows_vm(vm_factory):
+    with vm_factory.allocated_vm('paths-test', vm_type='windows') as windows_vm:
+        yield windows_vm
+
+
 @pytest.fixture()
 def smb_path(windows_vm):
     return windows_vm.os_access.Path.tmp() / 'test_path-remote'
