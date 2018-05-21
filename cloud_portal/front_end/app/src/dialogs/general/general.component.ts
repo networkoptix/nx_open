@@ -77,7 +77,7 @@ export class NxModalGeneralComponent implements OnInit {
             cancelLabel,
             true,
             false,
-            false);
+            false).result;
     }
 
     openAlert(message, title) {
@@ -87,7 +87,7 @@ export class NxModalGeneralComponent implements OnInit {
             this.language.lang.dialogs.cancelButton,
             true,
             true,
-            true);
+            true).result;
 
     }
 

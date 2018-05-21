@@ -39,7 +39,7 @@ export class nxDialogsService {
         });
     }
 
-    confirm(message, title, actionLabel, actionType, cancelLabel) {
+    confirm(message, title, actionLabel, actionType?, cancelLabel?) {
         //title, template, url, content, hasFooter, cancellable, params, closable, actionLabel, buttonType, size
         return this.generalModal.openConfirm(message, title, actionLabel, actionType, cancelLabel);
     }

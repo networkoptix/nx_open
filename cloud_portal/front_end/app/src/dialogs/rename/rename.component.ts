@@ -62,7 +62,7 @@ export class NxModalRenameComponent implements OnInit {
     }
 
     open(systemId, systemName) {
-        return this.dialog(systemId, systemName);
+        return this.dialog(systemId, systemName).result;
     }
 
     ngOnInit() {

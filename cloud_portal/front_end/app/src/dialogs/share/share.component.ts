@@ -116,7 +116,6 @@ export class ShareModalContent {
                                this.language.sharing.shareConfirmButton,
                                null,
                                this.language.dialogs.cancelButton)
-                           .result
                            .then((result) => {
                                if (result === 'OK') {
                                    this.doShare();

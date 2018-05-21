@@ -70,7 +70,7 @@ export class NxModalDisconnectComponent implements OnInit {
     }
 
     open(systemId) {
-        return this.dialog(systemId);
+        return this.dialog(systemId).result;
     }
 
     ngOnInit() {

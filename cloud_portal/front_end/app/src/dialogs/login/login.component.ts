@@ -145,7 +145,7 @@ export class NxModalLoginComponent implements OnInit, AfterViewInit {
         this.location = location;
     }
 
-    open(keepPage?) {
+    private dialog(keepPage?) {
         this.modalRef = this.modalService.open(LoginModalContent, {size: 'sm', centered: true});
         this.modalRef.componentInstance.auth = this.auth;
         this.modalRef.componentInstance.language = this.language;
@@ -155,6 +155,10 @@ export class NxModalLoginComponent implements OnInit, AfterViewInit {
         this.modalRef.componentInstance.location = this.location;
 
         return this.modalRef;
+    }
+
+    open(keepPage?) {
+        return this.dialog(keepPage).result;
     }
 
     close() {
