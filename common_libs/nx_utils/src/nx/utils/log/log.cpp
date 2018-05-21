@@ -1,5 +1,4 @@
 #include "log.h"
-#include <nx/utils/literal.h>
 
 static QString kMainLogName("MAIN");
 const nx::utils::log::Tag QnLog::MAIN_LOG_ID(QLatin1String(""));
