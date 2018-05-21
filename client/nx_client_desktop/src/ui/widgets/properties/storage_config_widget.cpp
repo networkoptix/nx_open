@@ -257,7 +257,7 @@ QnStorageConfigWidget::QnStorageConfigWidget(QWidget* parent) :
 
     ui->rebuildBackupButtonHint->addHintLine(tr("Creates a backup of System configuration that can be restored in case of failure."));
     ui->rebuildBackupButtonHint->addHintLine(tr("Backup includes servers and cameras settings, users, webpages, event rules, etc. Video is not saved."));
-    ui->rebuildBackupButtonHint->setHelpTopic(Qn::SystemSettings_Server_Backup_Help);
+    setHelpTopic(ui->rebuildBackupButtonHint, Qn::SystemSettings_Server_Backup_Help);
 
     auto hoverTracker = new QnItemViewHoverTracker(ui->storageView);
     hoverTracker->setAutomaticMouseCursor(true);
