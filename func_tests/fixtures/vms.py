@@ -126,4 +126,4 @@ def two_vms(two_vm_types, hypervisor, vm_factory):
     with vm_factory.allocated_vm('first-{}'.format(first_vm_type), vm_type=first_vm_type) as first_vm:
         with vm_factory.allocated_vm('second-{}'.format(second_vm_type), vm_type=second_vm_type) as second_vm:
             setup_flat_network([first_vm, second_vm], IPNetwork('10.254.254.0/28'), hypervisor)
-            return first_vm, second_vm
+            yield first_vm, second_vm
