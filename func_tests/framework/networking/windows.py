@@ -128,17 +128,6 @@ class WindowsNetworking(Networking):
         if invoke_result[u'ReturnValue'] != u'0':
             raise RuntimeError('EnableStatic returned {}'.format(pformat(invoke_result)))
 
-    def _setup_ip(self, mac, ip, prefix_length):
-        self._winrm.run_powershell_script(
-            # language=PowerShell
-            '''
-                $newIpAddressObject = New-NetIPAddress `
-                    -InterfaceAlias:$interfaceAlias `
-                    -IPAddress:$ipAddress `
-                    -PrefixLength:$prefixLength
-                ''',
-            {'interfaceAlias': self.interfaces[mac], 'ipAddress': str(ip), 'prefixLength': prefix_length})
-
     def list_ips(self):
         result = self._winrm.run_powershell_script(
             # language=PowerShell
