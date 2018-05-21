@@ -165,10 +165,8 @@ private:
             return;
 
         m_fileData = fileData;
-        auto filePath = lit("/%1/%2/%3")
-            .arg(m_customizationData.name)
-            .arg(QString::number(version.build()))
-            .arg(fileData.file);
+        const auto filePath = QString("/%1/%2/%3").arg(
+            m_customizationData.name, QString::number(version.build()), fileData.file);
         m_fileData.url = m_baseUrl + filePath;
         m_found = true;
     }

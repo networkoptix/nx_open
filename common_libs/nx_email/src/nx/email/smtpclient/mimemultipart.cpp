@@ -61,12 +61,12 @@ void MimeMultiPart::prepare() {
 
     content = "";
     for (it = m_parts.begin(); it != m_parts.end(); it++) {
-        content += lit("--") + cBoundary + lit("\r\n");
+        content += "--" + cBoundary + "\r\n";
         (*it)->prepare();
         content += (*it)->toString();
     };
 
-    content += lit("--") + cBoundary + lit("--\r\n");
+    content += "--" + cBoundary + "--\r\n";
 
     MimePart::prepare();
 }

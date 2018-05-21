@@ -28,10 +28,8 @@ struct NX_UPDATE_API UpdateRequestData
 
     QString toString() const
     {
-        return lit("cloud host=%1, customization=%2, current nx version=%3")
-            .arg(cloudHost)
-            .arg(customization)
-            .arg(currentNxVersion.toString());
+        return QString::fromLatin1("cloud host=%1, customization=%2, current nx version=%3").arg(
+            cloudHost, customization, currentNxVersion.toString());
     }
 };
 
@@ -56,7 +54,8 @@ struct NX_UPDATE_API UpdateFileRequestData: UpdateRequestData
 
     QString toString() const
     {
-        return UpdateRequestData::toString() + lit(", os=%1").arg(osVersion.serialize());
+        return UpdateRequestData::toString()
+            + QString::fromLatin1(", os=%1").arg(osVersion.serialize());
     }
 };
 

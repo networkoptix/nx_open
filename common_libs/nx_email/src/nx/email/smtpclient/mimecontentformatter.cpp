@@ -31,7 +31,7 @@ QString MimeContentFormatter::format(const QString &content, bool quotedPrintabl
         chars++;
         if (!quotedPrintable) {
             if (chars > max_length) {
-                    out.append(lit("\r\n"));
+                    out.append("\r\n");
                     chars = 1;
             }
         }
@@ -44,8 +44,8 @@ QString MimeContentFormatter::format(const QString &content, bool quotedPrintabl
 
             if ((chars > max_length - 1)
                 || ((content[i] == QLatin1Char('=')) && (chars > max_length - 3) )) {
-                out.append(QLatin1Char('='));
-                out.append(lit("\r\n"));
+                out.append('=');
+                out.append("\r\n");
                 chars = 1;
             }
 

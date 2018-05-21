@@ -23,8 +23,8 @@
 MimeText::MimeText(const QString &txt)
 {
     this->text = txt;
-    this->cType = lit("text/plain");
-    this->cCharset = lit("utf-8");
+    this->cType = "text/plain";
+    this->cCharset = "utf-8";
     this->cEncoding = _8Bit;
 }
 
