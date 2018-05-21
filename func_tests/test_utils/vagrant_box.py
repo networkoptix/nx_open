@@ -4,13 +4,14 @@ import logging
 import os
 import os.path
 import tempfile
+import time
 
 import jinja2
 import vagrant
 import vagrant.compat
 
 from test_utils.ca import CA
-from .host import ProcessError, RemoteSshHost, host_from_config
+from .host import ProcessError, ProcessTimeoutError, RemoteSshHost, host_from_config
 from .server import Server
 from .server_ctl import VagrantBoxServerCtl
 from .server_installation import ServerInstallation
@@ -126,7 +127,15 @@ class VagrantBoxFactory(object):
                 box.init(safe=True)
 
     def destroy_all(self):
-        self._vagrant.destroy()
+        for i in range(10):
+            try:
+                self._vagrant.destroy()
+            except ProcessError as x:
+                if i < 9 and 'another process is already executing an action' in x.output:
+                    log.warning('Vagrant is locked by another process. Retrying in 1 second...')
+                    time.sleep(1)
+                    continue
+            break
         if not self._boxes: return
         self._boxes.clear()
         self._save_boxes_config_to_cache()
@@ -254,6 +263,10 @@ class VagrantBox(object):
             self.timezone = self._load_timezone()  # and check it is accessible
             self._server_ctl = VagrantBoxServerCtl(self.config.server_customization_company_name, self)
             self._installation = ServerInstallation(self.host, self._server_ctl.server_dir)
+        except ProcessTimeoutError:
+            log.info('Unable to access machine %s (timed out), will reinit it', self.name)  # looks like it is broken
+            self.host = None
+            self.is_running = False
         except ProcessError as x:
             if safe and 'Permission denied' in x.output:
                 log.info('Unable to access machine %s as root, will reinit it', self.name)  # .ssh copying to root was missing?

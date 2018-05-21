@@ -23,6 +23,7 @@ log = logging.getLogger(__name__)
 
 
 PROCESS_TIMEOUT = datetime.timedelta(hours=1)
+GET_TIMEZONE_TIMEOUT = datetime.timedelta(seconds=20)  # vm may be broken, do not hang for long here
 
 
 class ProcessError(subprocess.CalledProcessError):
@@ -370,12 +371,12 @@ class RemoteSshHost(Host):
                to_local_path]
         self._local_host.run_command(cmd)
 
-    def read_file(self, from_remote_path, ofs=None):
+    def read_file(self, from_remote_path, ofs=None, timeout=None):
         if ofs:
             assert type(ofs) is int, repr(ofs)
             return self.run_command(['tail', '--bytes=+%d' % ofs, from_remote_path], log_output=False)
         else:
-            return self.run_command(['cat', from_remote_path], log_output=False)
+            return self.run_command(['cat', from_remote_path], log_output=False, timeout=timeout)
         
     def write_file(self, to_remote_path, contents):
         remote_dir = os.path.dirname(to_remote_path)
@@ -407,7 +408,7 @@ class RemoteSshHost(Host):
                 return output.split()
 
     def get_timezone(self):
-        tzname = self.read_file('/etc/timezone').strip()
+        tzname = self.read_file('/etc/timezone', timeout=GET_TIMEZONE_TIMEOUT).strip()
         return pytz.timezone(tzname)
         
     def make_proxy_command(self):
