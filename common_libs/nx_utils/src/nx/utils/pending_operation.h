@@ -29,6 +29,7 @@ public:
     };
     Q_DECLARE_FLAGS(Flags, Flag)
 
+    PendingOperation(QObject* parent = nullptr);
     PendingOperation(const Callback& callback, int intervalMs, QObject* parent = nullptr);
 
     void requestOperation();
@@ -44,7 +45,7 @@ public:
 private:
     Callback m_callback;
     Flags m_flags = FireImmediately;
-    QTimer* m_timer = nullptr;
+    QTimer* const m_timer = nullptr;
     bool m_requested = false;
 };
 
