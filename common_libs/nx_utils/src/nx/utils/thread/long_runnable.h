@@ -59,12 +59,14 @@ private slots:
     void at_finished();
 
 protected:
-    std::atomic<bool> m_needStop;
-    std::atomic<bool> m_onPause;
+    std::atomic<bool> m_needStop = false;
+    std::atomic<bool> m_onPause = false;
     QnSemaphore m_semaphore;
-    uintptr_t m_systemThreadId;
+    uintptr_t m_systemThreadId = 0;
     QSharedPointer<QnLongRunnablePoolPrivate> m_pool;
-    DEBUG_CODE(const std::type_info *m_type;)
+    #if defined(_DEBUG)
+        const std::type_info* m_type = nullptr;
+    #endif
 };
 
 

@@ -94,13 +94,8 @@ void QnLongRunnablePool::waitAll() {
 // -------------------------------------------------------------------------- //
 // QnLongRunnable
 // -------------------------------------------------------------------------- //
-QnLongRunnable::QnLongRunnable(bool isTrackedByPool):
-    m_needStop(false),
-    m_onPause(false),
-    m_systemThreadId(0)
+QnLongRunnable::QnLongRunnable(bool isTrackedByPool)
 {
-    DEBUG_CODE(m_type = NULL);
-
     if (isTrackedByPool)
     {
         if (QnLongRunnablePool* pool = QnLongRunnablePool::instance())
@@ -198,7 +193,9 @@ void QnLongRunnable::start(Priority priority) {
     if (isRunning())
         return;
 
-    DEBUG_CODE(m_type = &typeid(*this));
+    #if defined(_DEBUG)
+        m_type = &typeid(*this);
+    #endif
 
     m_needStop = false;
     QThread::start(priority);
@@ -210,15 +207,16 @@ void QnLongRunnable::pleaseStop() {
         resume();
 }
 
-void QnLongRunnable::stop() {
-    DEBUG_CODE(
-        if(m_type) {
-            const std::type_info *type = &typeid(*this);
-            NX_ASSERT(*type == *m_type); /* You didn't call stop() from derived class's destructor! Die! */
-
-            m_type = NULL; /* So that we don't check it again. */
+void QnLongRunnable::stop()
+{
+    #if defined(_DEBUG)
+        if (m_type)
+        {
+            NX_ASSERT(typeid(*this) == *m_type,
+                "stop() must be called from derived class destructor.");
+            m_type = nullptr; //< So that we don't check it again.
         }
-    );
+    #endif
 
     pleaseStop();
     wait();

@@ -20,18 +20,6 @@
     using ::std::nullptr_t;
 #endif
 
-// -------------------------------------------------------------------------- //
-// Useful utility definitions
-// -------------------------------------------------------------------------- //
-/* Macros to avoid using #ifdef _DEBUG. */
-#ifdef _DEBUG
-#   define DEBUG_CODE(...) __VA_ARGS__
-#   define RELEASE_CODE(...)
-#else
-#   define DEBUG_CODE(...)
-#   define RELEASE_CODE(...) __VA_ARGS__
-#endif
-
 //
 #ifndef BOOST_BIND_NO_PLACEHOLDERS
 #define BOOST_BIND_NO_PLACEHOLDERS
