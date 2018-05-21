@@ -156,9 +156,12 @@ angular.module('cloudApp')
                     return;
                 }
                 $scope.locked[ user.email ] = true;
-                return dialogs.share($scope.system, user).then(loadUsers).finally(function () {
-                    $scope.locked[ user.email ] = false;
-                });
+                return dialogs
+                    .share($scope.system, user)
+                    .then(loadUsers)
+                    .finally(function () {
+                        $scope.locked[ user.email ] = false;
+                    });
             };
 
             $scope.unshare = function (user) {
@@ -172,7 +175,7 @@ angular.module('cloudApp')
                 dialogs.confirm(L.system.confirmUnshare,
                     L.system.confirmUnshareTitle,
                     L.system.confirmUnshareAction,
-                    'btn-danger','Cancel')
+                    'btn-danger', 'Cancel')
                     .then(function (result) {
                         if (result === 'OK') {
                             // Run a process of sharing
@@ -189,7 +192,12 @@ angular.module('cloudApp')
                             }, function () {
                                 $scope.locked[ user.email ] = false;
                             });
+
                             $scope.unsharing.run();
+                        } else {
+                            $scope.locked[ user.email ] = false;
+                            $scope.system.getUsers();
+                            delayedUpdateSystemInfo();
                         }
                     }, function () {
                         $scope.locked[ user.email ] = false;

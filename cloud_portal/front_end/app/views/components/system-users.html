@@ -31,7 +31,7 @@
                 <td class="button-cell"><a href=''
                        class="hover-visible image-link"
                        ng-if="system.isAvailable && user.canBeDeleted"
-                       ng-class="{disabled:locked[user.email]}"
+                       ng-class="{ 'disabled': locked[user.email]}"
                        title="Delete"
                        ng-click="unshare(user)"><span class="glyphicon glyphicon-remove"></span><span class="visible-lg-inline">&nbsp;&nbsp;Delete</span></a></td>
             </tr>
