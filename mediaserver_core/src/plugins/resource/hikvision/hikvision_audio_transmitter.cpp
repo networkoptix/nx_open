@@ -50,11 +50,6 @@ void HikvisionAudioTransmitter::setChannelId(QString channelId)
     m_channelId = channelId;
 }
 
-void HikvisionAudioTransmitter::enable(bool value)
-{
-    m_isEnabled = value;
-}
-
 bool HikvisionAudioTransmitter::sendData(const QnAbstractMediaDataPtr& data)
 {
     return sendBuffer(m_socket.get(), data->data(), data->dataSize());
@@ -76,16 +71,14 @@ bool HikvisionAudioTransmitter::isReadyForTransmission(
     nx::network::http::AsyncHttpClientPtr /*httpClient*/,
     bool /*isRetryAfterUnauthorizedResponse*/) const
 {
-    return m_isEnabled;
+    return true;
 }
 
 utils::Url HikvisionAudioTransmitter::transmissionUrl() const
 {
-    if (!m_isEnabled)
-        return nx::utils::Url();
-
     nx::utils::Url url(m_resource->getUrl());
     url.setPath(kTwoWayAudioPrefix + kTransmitTwoWayAudioUrlTemplate.arg(m_channelId));
+
     return url;
 }
 
