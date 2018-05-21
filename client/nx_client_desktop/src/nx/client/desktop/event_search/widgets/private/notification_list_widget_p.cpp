@@ -97,7 +97,7 @@ NotificationListWidget::Private::Private(NotificationListWidget* q) :
     placeholderText->setAlignment(Qt::AlignCenter);
     placeholderText->setWordWrap(true);
     verticalLayout->addWidget(placeholderText);
-    verticalLayout->addItem(new QSpacerItem(20, 159, QSizePolicy::Minimum, QSizePolicy::Expanding));
+    verticalLayout->addStretch(1);
 
     m_eventRibbon->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 
