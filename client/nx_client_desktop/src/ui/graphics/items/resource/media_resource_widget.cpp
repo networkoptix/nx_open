@@ -1453,22 +1453,14 @@ void QnMediaResourceWidget::updateIconButton()
         auto iconButton = buttonsBar->button(Qn::RecordingStatusIconButton);
         iconButton->setIcon(qnSkin->icon("item/zoom_window_hovered.png"));
         iconButton->setToolTip(tr("Zoom Window"));
-
-        buttonsBar->setButtonsVisible(Qn::RecordingStatusIconButton, true);
         return;
     }
 
     if (!d->camera || d->camera->hasFlags(Qn::wearable_camera))
-    {
-        buttonsBar->setButtonsVisible(Qn::RecordingStatusIconButton, false);
         return;
-    }
 
     int recordingMode = QnRecordingStatusHelper::currentRecordingMode(d->camera);
     QIcon recIcon = QnRecordingStatusHelper::icon(recordingMode);
-
-    buttonsBar->setButtonsVisible(Qn::RecordingStatusIconButton, !recIcon.isNull());
-
     auto iconButton = buttonsBar->button(Qn::RecordingStatusIconButton);
     iconButton->setIcon(recIcon);
     iconButton->setToolTip(QnRecordingStatusHelper::tooltip(recordingMode));
@@ -2043,6 +2035,7 @@ int QnMediaResourceWidget::calculateButtonsVisibility() const
         {
             result |= Qn::EntropixEnhancementButton;
         }
+        result |= Qn::RecordingStatusIconButton;
 
         return result;
     }
@@ -2091,6 +2084,9 @@ int QnMediaResourceWidget::calculateButtonsVisibility() const
             )
             result |= Qn::ZoomWindowButton;
     }
+
+    if (d->camera && (!d->camera->hasFlags(Qn::wearable_camera)))
+        result |= Qn::RecordingStatusIconButton;
 
     return result;
 }
