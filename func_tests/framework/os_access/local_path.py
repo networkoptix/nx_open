@@ -4,7 +4,7 @@ from shutil import rmtree
 
 from pathlib2 import PosixPath
 
-from framework.os_access.exceptions import AlreadyExists, BadParent, DirIsAFile, DoesNotExist, NotAFile, NotADir
+from framework.os_access.exceptions import AlreadyExists, BadParent, DirIsAFile, DoesNotExist, NotADir, NotAFile
 from framework.os_access.path import FileSystemPath
 
 

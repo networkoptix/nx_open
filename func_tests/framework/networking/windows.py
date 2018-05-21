@@ -6,7 +6,6 @@ from pylru import lrudecorator
 
 from framework.networking.interface import Networking
 from framework.os_access.windows_remoting import WinRM
-from framework.waiting import wait_for_true
 
 _logger = logging.getLogger(__name__)
 

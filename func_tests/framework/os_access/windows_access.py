@@ -1,7 +1,7 @@
-import dateutil.parser
 import datetime
 import timeit
 
+import dateutil.parser
 import pytz
 import tzlocal.windows_tz
 from pylru import lrudecorator

@@ -1,19 +1,20 @@
 #!/usr/bin/env python
+import abc
 import argparse
 import logging
-import abc
-from pathlib2 import Path
-from netaddr.ip import IPNetwork
+
 # from multiprocessing.dummy import Pool as ThreadPool
 from framework.os_access.args import cmd_command_to_script
-from framework.os_access.local_access import LocalAccess
-from framework.vms.hypervisor.virtual_box import VirtualBox
-from framework.registry import Registry
-from framework.vms.factory import VMFactory
-from framework.serialize import load
-from framework.networking import setup_flat_network
-from framework.pool import ClosingPool
+from netaddr.ip import IPNetwork
+from pathlib2 import Path
 
+from framework.networking import setup_flat_network
+from framework.os_access.local_access import LocalAccess
+from framework.pool import ClosingPool
+from framework.registry import Registry
+from framework.serialize import load
+from framework.vms.factory import VMFactory
+from framework.vms.hypervisor.virtual_box import VirtualBox
 
 DEFAULT_VMS_COUNT = 10
 MAX_COMMAND_LENGTH = 50

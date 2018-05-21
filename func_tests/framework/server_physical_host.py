@@ -4,10 +4,10 @@ import logging
 import uuid
 
 from framework.installation.deb_installation import DebInstallation
-from framework.os_access.path import FileSystemPath, copy_file
-from framework.rest_api import RestApi
 from framework.installation.mediaserver import Mediaserver
 from framework.installation.upstart_service import AdHocService
+from framework.os_access.path import FileSystemPath, copy_file
+from framework.rest_api import RestApi
 from .template_renderer import TemplateRenderer
 from .utils import is_list_inst
 

@@ -4,7 +4,6 @@ from netaddr import IPAddress, IPNetwork
 from fixtures.big_flat_networks import make_big_flat_network
 from framework.networking import setup_flat_network, setup_networks
 from framework.pool import ClosingPool
-from framework.vms.factory import VM
 from framework.waiting import wait_for_true
 
 

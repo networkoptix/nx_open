@@ -11,12 +11,12 @@ from pathlib2 import Path
 from pylru import lrudecorator
 
 from framework.api_shortcuts import get_server_id
-from framework.os_access.posix_shell import local_shell
-from framework.rest_api import RestApi
-from framework.waiting import wait_for_true
 from framework.camera import Camera, SampleMediaFile, make_schedule_task
 from framework.media_stream import open_media_stream
+from framework.os_access.posix_shell import local_shell
+from framework.rest_api import RestApi
 from framework.utils import datetime_utc_to_timestamp
+from framework.waiting import wait_for_true
 
 DEFAULT_HTTP_SCHEMA = 'http'
 

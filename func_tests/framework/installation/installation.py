@@ -1,4 +1,4 @@
-from abc import abstractmethod, ABCMeta
+from abc import ABCMeta, abstractmethod
 
 from framework.os_access.path import FileSystemPath
 

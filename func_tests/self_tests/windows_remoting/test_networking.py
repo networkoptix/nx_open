@@ -1,6 +1,6 @@
 import pytest
 
-from framework.networking.windows import PingError, WindowsNetworking
+from framework.networking.windows import WindowsNetworking
 
 
 @pytest.fixture(scope='session')

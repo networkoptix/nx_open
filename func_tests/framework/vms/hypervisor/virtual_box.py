@@ -3,8 +3,7 @@ import logging
 from pprint import pformat
 from uuid import UUID
 
-from netaddr import EUI
-from netaddr import IPAddress
+from netaddr import EUI, IPAddress
 from netaddr.strategy.eui48 import mac_bare
 
 from framework.os_access.exceptions import exit_status_error_cls

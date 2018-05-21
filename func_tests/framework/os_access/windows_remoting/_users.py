@@ -1,7 +1,6 @@
 from pylru import lrudecorator
 
 from ._cim_query import CIMQuery
-from ._env_vars import EnvVars
 
 
 class Users(object):

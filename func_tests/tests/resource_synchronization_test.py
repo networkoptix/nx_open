@@ -4,11 +4,11 @@ import time
 from multiprocessing.dummy import Pool as ThreadPool
 
 import pytest
+from framework.mediaserver import MEDIASERVER_MERGE_TIMEOUT
 
 import server_api_data_generators as generator
 import transaction_log
 from framework.api_shortcuts import get_server_id
-from framework.mediaserver import MEDIASERVER_MERGE_TIMEOUT
 from framework.utils import SimpleNamespace, datetime_utc_now
 
 log = logging.getLogger(__name__)

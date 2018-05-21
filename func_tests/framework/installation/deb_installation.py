@@ -7,9 +7,9 @@ from io import BytesIO
 
 from framework.installation.installation import Installation
 from framework.installation.installer import Version, known_customizations
+from framework.installation.upstart_service import UpstartService
 from framework.os_access.exceptions import DoesNotExist
 from framework.os_access.path import copy_file
-from framework.installation.upstart_service import UpstartService
 
 if sys.version_info[:2] == (2, 7):
     # noinspection PyCompatibility,PyUnresolvedReferences

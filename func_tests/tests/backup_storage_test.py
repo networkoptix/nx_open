@@ -11,8 +11,8 @@ import framework.utils as utils
 import server_api_data_generators as generator
 from framework.api_shortcuts import get_server_id
 from framework.merging import setup_local_system
-from framework.os_access.posix_shell_utils import sh_quote_arg
 from framework.os_access.exceptions import NonZeroExitStatus
+from framework.os_access.posix_shell_utils import sh_quote_arg
 
 log = logging.getLogger(__name__)
 
