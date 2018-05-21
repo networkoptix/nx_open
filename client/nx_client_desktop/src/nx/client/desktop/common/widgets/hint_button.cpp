@@ -108,10 +108,7 @@ void HintButton::updateGeometry(QGroupBox* parent)
 // Returns prefered size from internal pixmap.
 QSize HintButton::hintMarkSize() const
 {
-    QSize normal = m_normal.size() / m_normal.devicePixelRatioF();
-    QSize highlighted = m_highlighted.size() / m_highlighted.devicePixelRatioF();
-    return QSize(std::max(normal.width(), highlighted.width()),
-        std::max(normal.height(), highlighted.height()));
+    return m_normal.size() / m_normal.devicePixelRatioF();
 }
 
 int HintButton::getHelpTopicId() const
