@@ -158,7 +158,6 @@ void EventPanel::Private::setupMotionSearch()
 {
     auto model = new UnifiedAsyncSearchListModel(m_motionModel, this);
     m_motionTab->setModel(model);
-    //m_motionTab->setPlaceholderTexts(tr("No events"), tr("No events occured"));
     m_motionTab->setPlaceholderIcon(qnSkin->pixmap(lit("events/placeholders/motion.png")));
 
     m_motionTab->filterEdit()->hide();
@@ -197,7 +196,7 @@ void EventPanel::Private::setupBookmarkSearch()
         [this]()
         {
             const auto count = m_bookmarksModel->rowCount();
-            m_bookmarksTab->counterLabel()->setText(count
+            m_bookmarksTab->counterLabel()->setText(count > 0
                 ? (count > 99 ? tr(">99 bookmarks") : tr("%n bookmarks", "", count))
                 : QString());
         });

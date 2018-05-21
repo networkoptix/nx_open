@@ -71,24 +71,23 @@ NotificationListWidget::Private::Private(NotificationListWidget* q) :
     headerLayout->addWidget(newActionButton(ui::action::BusinessEventsAction, -1));
     headerLayout->addWidget(newActionButton(ui::action::PreferencesNotificationTabAction, -1));
 
-    placeholder = new QWidget(q);
-    placeholder->setMinimumSize(QSize(0, 100));
+    m_placeholder = new QWidget(q);
+    m_placeholder->setMinimumSize(QSize(0, 100));
 
     auto layout = new QVBoxLayout(q);
     layout->setSpacing(0);
     layout->addWidget(headerWidget);
-    layout->addWidget(placeholder);
+    layout->addWidget(m_placeholder);
     layout->addWidget(m_eventRibbon);
 
-    QVBoxLayout * verticalLayout = new QVBoxLayout(placeholder);
+    const auto verticalLayout = new QVBoxLayout(m_placeholder);
     verticalLayout->setSpacing(16);
-    verticalLayout->setObjectName(QStringLiteral("verticalLayout_4"));
     verticalLayout->setContentsMargins(24, 64, 24, 24);
-    QLabel * placeholderIcon = new QLabel(placeholder);
+    const auto placeholderIcon = new QLabel(m_placeholder);
     placeholderIcon->setFixedSize(QSize(64, 64));
     placeholderIcon->setPixmap(qnSkin->pixmap(lit("events/placeholders/notifications.png")));
     verticalLayout->addWidget(placeholderIcon, 0, Qt::AlignHCenter);
-    QLabel * placeholderText = new QLabel(placeholder);
+    const auto placeholderText = new QLabel(m_placeholder);
     QFont font;
     font.setPixelSize(kPlaceholderFontPixelSize);
     placeholderText->setProperty(style::Properties::kDontPolishFontProperty, true);
@@ -98,8 +97,7 @@ NotificationListWidget::Private::Private(NotificationListWidget* q) :
     placeholderText->setAlignment(Qt::AlignCenter);
     placeholderText->setWordWrap(true);
     verticalLayout->addWidget(placeholderText);
-    QSpacerItem * verticalSpacer = new QSpacerItem(20, 159, QSizePolicy::Minimum, QSizePolicy::Expanding);
-    verticalLayout->addItem(verticalSpacer);
+    verticalLayout->addItem(new QSpacerItem(20, 159, QSizePolicy::Minimum, QSizePolicy::Expanding));
 
     m_eventRibbon->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 
@@ -122,7 +120,7 @@ NotificationListWidget::Private::Private(NotificationListWidget* q) :
     connect(m_eventRibbon, &EventRibbon::countChanged,
         this, [this](int count)
         {
-            placeholder->setVisible(count < 1);
+            m_placeholder->setVisible(count < 1);
         });
 }
 

@@ -37,7 +37,7 @@ private:
     AbstractEventListModel* m_systemHealthModel = nullptr;
     AbstractEventListModel* m_notificationsModel = nullptr;
 
-    QWidget* placeholder;
+    QWidget* m_placeholder = nullptr;
 };
 
 } // namespace desktop
