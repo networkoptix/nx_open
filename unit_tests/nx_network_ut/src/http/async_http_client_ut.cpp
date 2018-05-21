@@ -127,18 +127,17 @@ protected:
         const nx::utils::Url url(lit("%1://%2/%3")
             .arg(scheme).arg(m_testHttpServer->serverAddress().toString()).arg(path));
 
-        nx::utils::promise<void> promise;
         NX_LOGX(lm("httpsTest: %1").arg(url), cl_logINFO);
 
         const auto client = nx::network::http::AsyncHttpClient::create();
+        std::promise<bool /*hasRequestSucceeded*/> promise;
         client->doGet(url,
             [&promise](AsyncHttpClientPtr ptr)
             {
-                 EXPECT_TRUE(ptr->hasRequestSucceeded());
-                 promise.set_value();
+                 promise.set_value(ptr->hasRequestSucceeded());
             });
 
-        promise.get_future().wait();
+        ASSERT_TRUE(promise.get_future().get());
     }
 
     void testResult(const QString& path, const nx::network::http::BufferType& expectedResult)
