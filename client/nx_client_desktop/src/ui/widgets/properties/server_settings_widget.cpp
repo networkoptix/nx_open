@@ -77,8 +77,8 @@ QnServerSettingsWidget::QnServerSettingsWidget(QWidget* parent /* = 0*/) :
     setHelpTopic(ui->failoverGroupBox, Qn::ServerSettings_Failover_Help);
 
     auto failoverHint = nx::client::desktop::HintButton::hintThat(ui->failoverGroupBox);
+    // Notice: this hint button uses help topic from the parent class.
     failoverHint->addHintLine(tr("Servers with failover enabled will automatically take cameras from offline servers."));
-    failoverHint->setHelpTopic(Qn::ServerSettings_Failover_Help);
 
     connect(ui->pingButton, &QPushButton::clicked, this, &QnServerSettingsWidget::at_pingButton_clicked);
 
