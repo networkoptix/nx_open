@@ -36,6 +36,7 @@ private slots:
     void at_newWearableCameraAction_triggered();
     void at_uploadWearableCameraFileAction_triggered();
     void at_uploadWearableCameraFolderAction_triggered();
+    void at_cancelWearableCameraUploadsAction_triggered();
     void at_resourcePool_resourceAdded(const QnResourcePtr& resource);
     void at_context_userChanged();
     void at_wearableManager_stateChanged(const nx::client::desktop::WearableState& state);

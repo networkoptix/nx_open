@@ -1283,16 +1283,24 @@ void initialize(Manager* manager, Action* root)
         .flags(Scene | Tree | SingleTarget | ResourceTarget)
         .requiredGlobalPermission(Qn::GlobalEditCamerasPermission)
         .text(ContextMenu::tr("Upload File..."))
-        .condition(condition::hasFlags(Qn::wearable_camera, MatchMode::All)
-            && condition::isTrue(ini().enableWearableCameras));
+        .condition(condition::isTrue(ini().enableWearableCameras)
+            && condition::wearableCameraUploadEnabled());
 
     factory(UploadWearableCameraFolderAction)
         .mode(DesktopMode)
         .flags(Scene | Tree | SingleTarget | ResourceTarget)
         .requiredGlobalPermission(Qn::GlobalEditCamerasPermission)
         .text(ContextMenu::tr("Upload Folder..."))
-        .condition(condition::hasFlags(Qn::wearable_camera, MatchMode::All)
-            && condition::isTrue(ini().enableWearableCameras));
+        .condition(condition::isTrue(ini().enableWearableCameras)
+            && condition::wearableCameraUploadEnabled());
+
+    factory(CancelWearableCameraUploadsAction)
+        .mode(DesktopMode)
+        .flags(Scene | Tree | SingleTarget | ResourceTarget)
+        .requiredGlobalPermission(Qn::GlobalEditCamerasPermission)
+        .text(ContextMenu::tr("Cancel Upload..."))
+        .condition(condition::isTrue(ini().enableWearableCameras)
+            && condition::wearableCameraUploadCancellable());
 
     factory(CameraIssuesAction)
         .mode(DesktopMode)

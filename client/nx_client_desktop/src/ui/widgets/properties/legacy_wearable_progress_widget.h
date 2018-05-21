@@ -28,10 +28,7 @@ signals:
 private:
     void updateFromState(const nx::client::desktop::WearableState& state);
 
-    void at_cancelButton_clicked();
-
     bool calculateActive(const nx::client::desktop::WearableState& state);
-    bool calculateCancelable(const nx::client::desktop::WearableState& state);
     QString calculateMessage(const nx::client::desktop::WearableState& state);
     QString calculateQueueMessage(const nx::client::desktop::WearableState& state);
     QString calculateFileName(const nx::client::desktop::WearableState& state);

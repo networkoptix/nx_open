@@ -79,6 +79,11 @@ struct WearableState
     bool isDone() const;
 
     /**
+     * @returns                         Whether this state represents a cancellable operation.
+     */
+    bool isCancellable() const;
+
+    /**
      * @returns                         Progress the whole operation, a number in [0, 100] range.
      */
     int progress() const;

@@ -2,8 +2,11 @@
 
 #include <QtWidgets/QWidget>
 
-namespace Ui { class ArchiveLengthWidget; }
+#include <nx/client/desktop/ui/actions/actions.h>
+#include <nx/client/desktop/utils/wearable_fwd.h>
+
 class QnDisconnectHelper;
+namespace Ui { class WearableCameraUploadWidget; }
 
 namespace nx {
 namespace client {
@@ -11,28 +14,27 @@ namespace desktop {
 
 struct CameraSettingsDialogState;
 class CameraSettingsDialogStore;
-class Aligner;
 
-class ArchiveLengthWidget: public QWidget
+class WearableCameraUploadWidget: public QWidget
 {
     Q_OBJECT
     using base_type = QWidget;
 
 public:
-    explicit ArchiveLengthWidget(QWidget* parent = nullptr);
-    virtual ~ArchiveLengthWidget();
-
-    Aligner* aligner() const;
+    explicit WearableCameraUploadWidget(QWidget* parent = nullptr);
+    virtual ~WearableCameraUploadWidget() override;
 
     void setStore(CameraSettingsDialogStore* store);
+
+signals:
+    void actionRequested(nx::client::desktop::ui::action::IDType action);
 
 private:
     void loadState(const CameraSettingsDialogState& state);
 
 private:
-    const QScopedPointer<Ui::ArchiveLengthWidget> ui;
+    const QScopedPointer<Ui::WearableCameraUploadWidget> ui;
     QScopedPointer<QnDisconnectHelper> m_storeConnections;
-    Aligner* const m_aligner = nullptr;
 };
 
 } // namespace desktop

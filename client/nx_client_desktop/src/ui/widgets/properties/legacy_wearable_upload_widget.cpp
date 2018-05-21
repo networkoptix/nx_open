@@ -1,5 +1,5 @@
-#include "wearable_upload_widget.h"
-#include "ui_wearable_upload_widget.h"
+#include "legacy_wearable_upload_widget.h"
+#include "ui_legacy_wearable_upload_widget.h"
 
 #include <QtCore/QTimer>
 
