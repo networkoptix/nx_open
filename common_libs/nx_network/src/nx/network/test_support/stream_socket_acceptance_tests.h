@@ -906,6 +906,11 @@ protected:
         return m_serverSocket.get();
     }
 
+    typename AbstractStreamSocket* lastAcceptedSocket()
+    {
+        return std::get<1>(m_prevAcceptResult).get();
+    }
+
 private:
     using RecvResult = std::tuple<SystemError::ErrorCode, nx::Buffer>;
     using AcceptResult =
