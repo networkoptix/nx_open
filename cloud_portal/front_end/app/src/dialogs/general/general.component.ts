@@ -77,7 +77,7 @@ export class NxModalGeneralComponent implements OnInit {
             cancelLabel,
             true,
             false,
-            false).result;
+            true).result;
     }
 
     openAlert(message, title) {

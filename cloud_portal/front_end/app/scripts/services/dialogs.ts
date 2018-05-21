@@ -211,9 +211,8 @@
                         // message, title, actionLabel, actionType
                         return this
                             .confirm(lang.downloads.noClientDetectedMessage, lang.downloads.noClientDetectedTitle,
-                                lang.downloads.action, 'btn-danger',
+                                lang.downloads.action, 'btn-primary',
                                 lang.dialogs.cancelButton)
-                            .result
                             .then((result) => {
                                 if ('OK' === result) {
                                     $location.path('/download');
