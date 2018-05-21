@@ -28,7 +28,8 @@
           "Logo for email. Height must be between 32px and 64px, Width must be between 32px and 240px",
           "Image", {"height_ge": 32, "height_le": 64, "width_le": 240, "width_ge": 32}],
         ["%MAIL_FROM_NAME%", "", "Reserved for future use"],
-        ["%MAIL_FROM_EMAIL%", "", "Reserved for future use"]
+        ["%MAIL_FROM_EMAIL%", "", "Reserved for future use"],
+        ["%PRIVACY_LINK%", "/content/privacy", "Privacy policy link (use /content/privacy to use embedded page)"]
       ]
     },
     {
@@ -92,8 +93,8 @@
       ]
     },
     {
-      "name": "Privacy policy",
-      "description":"Privacy policy",
+      "name": "Privacy policy page",
+      "description":"Embedded privacy policy page",
       "file_path": "static/lang_{{language}}/views/static/privacy.html",
       "url": "/content/privacy",
       "translatable": true,
