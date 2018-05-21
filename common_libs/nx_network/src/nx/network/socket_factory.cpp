@@ -51,14 +51,20 @@ std::unique_ptr<AbstractStreamSocket> SocketFactory::createStreamSocket(
 
 #ifdef ENABLE_SSL
     if (sslRequired || s_isSslEnforced)
-#ifdef USE_NEW_SSL_SOCKET
-        result.reset(new ssl::ClientStreamSocket(std::move(result)));
-#else
-        result.reset(new deprecated::SslSocket(std::move(result), false));
-#endif // USE_NEW_SSL_SOCKET
+        return createSslAdapter(std::move(result));
 #endif // ENABLE_SSL
 
     return result;
+}
+
+std::unique_ptr<nx::network::AbstractStreamSocket> SocketFactory::createSslAdapter(
+    std::unique_ptr<nx::network::AbstractStreamSocket> connection)
+{
+#ifdef USE_NEW_SSL_SOCKET
+    return std::make_unique<ssl::ClientStreamSocket>(std::move(connection));
+#else
+    return std::make_unique<deprecated::SslSocket>(std::move(connection), false);
+#endif // USE_NEW_SSL_SOCKET
 }
 
 std::unique_ptr< AbstractStreamServerSocket > SocketFactory::createStreamServerSocket(
