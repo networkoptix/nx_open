@@ -48,7 +48,7 @@ void StreamTransformingAsyncChannel::readSomeAsync(
         [this, buffer, handler = std::move(handler)]() mutable
         {
             m_userTaskQueue.push_back(
-                std::make_unique<ReadTask>(buffer, std::move(handler)));
+                std::make_shared<ReadTask>(buffer, std::move(handler)));
             tryToCompleteUserTasks();
         });
 }
@@ -63,7 +63,7 @@ void StreamTransformingAsyncChannel::sendAsync(
         [this, &buffer, handler = std::move(handler)]() mutable
         {
             m_userTaskQueue.push_back(
-                std::make_unique<WriteTask>(buffer, std::move(handler)));
+                std::make_shared<WriteTask>(buffer, std::move(handler)));
             tryToCompleteUserTasks();
         });
 }
@@ -75,22 +75,22 @@ void StreamTransformingAsyncChannel::stopWhileInAioThread()
 
 void StreamTransformingAsyncChannel::tryToCompleteUserTasks()
 {
-    std::vector<UserTask*> tasksToProcess;
+    std::vector<std::shared_ptr<UserTask>> tasksToProcess;
     tasksToProcess.reserve(m_userTaskQueue.size());
-    for (auto& task: m_userTaskQueue)
-        tasksToProcess.push_back(task.get());
+    for (const auto& task: m_userTaskQueue)
+        tasksToProcess.push_back(task);
 
     // m_userTaskQueue can be changed during processing.
 
-    for (UserTask* task: tasksToProcess)
+    for (const std::shared_ptr<UserTask>& task: tasksToProcess)
     {
         utils::ObjectDestructionFlag::Watcher watcher(&m_destructionFlag);
-        processTask(task);
+        processTask(task.get());
         if (watcher.objectDestroyed())
             return;
 
         if (task->status == UserTaskStatus::done)
-            removeUserTask(task);
+            removeUserTask(task.get());
     }
 }
 
