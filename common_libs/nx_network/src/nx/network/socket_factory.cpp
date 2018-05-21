@@ -5,9 +5,13 @@
 #include <nx/network/cloud/cloud_connect_controller.h>
 #include <nx/network/cloud/cloud_stream_socket.h>
 #include <nx/network/ssl_socket.h>
+#include <nx/network/ssl/ssl_stream_server_socket.h>
+#include <nx/network/ssl/ssl_stream_socket.h>
 #include <nx/network/system_socket.h>
 #include <nx/network/udt/udt_socket.h>
 #include <nx/utils/std/cpp14.h>
+
+//#define USE_NEW_SSL_SOCKET
 
 namespace nx {
 namespace network {
@@ -47,7 +51,11 @@ std::unique_ptr<AbstractStreamSocket> SocketFactory::createStreamSocket(
 
 #ifdef ENABLE_SSL
     if (sslRequired || s_isSslEnforced)
+#ifdef USE_NEW_SSL_SOCKET
+        result.reset(new ssl::ClientStreamSocket(std::move(result)));
+#else
         result.reset(new deprecated::SslSocket(std::move(result), false));
+#endif // USE_NEW_SSL_SOCKET
 #endif // ENABLE_SSL
 
     return result;
@@ -70,12 +78,34 @@ std::unique_ptr< AbstractStreamServerSocket > SocketFactory::createStreamServerS
         return std::unique_ptr<AbstractStreamServerSocket>();
 
 #ifdef ENABLE_SSL
-    if (s_isSslEnforced)
-        result.reset(new deprecated::SslServerSocket(std::move(result), false));
-    else
-        if (sslRequired)
-            result.reset(new deprecated::SslServerSocket(std::move(result), true));
+    if (s_isSslEnforced || sslRequired)
+    {
+        return createSslAdapter(
+            std::move(result),
+            s_isSslEnforced
+                ? ssl::EncryptionUse::always
+                : ssl::EncryptionUse::autoDetectByReceivedData);
+    }
 #endif // ENABLE_SSL
+
+    return result;
+}
+
+std::unique_ptr<nx::network::AbstractStreamServerSocket> SocketFactory::createSslAdapter(
+    std::unique_ptr<nx::network::AbstractStreamServerSocket> serverSocket,
+    ssl::EncryptionUse encryptionUse)
+{
+    std::unique_ptr<nx::network::AbstractStreamServerSocket> result;
+
+#ifdef USE_NEW_SSL_SOCKET
+    result.reset(new ssl::StreamServerSocket(
+        std::move(serverSocket),
+        encryptionUse));
+#else
+    result.reset(new deprecated::SslServerSocket(
+        std::move(serverSocket),
+        encryptionUse == ssl::EncryptionUse::autoDetectByReceivedData));
+#endif // USE_NEW_SSL_SOCKET
 
     return result;
 }

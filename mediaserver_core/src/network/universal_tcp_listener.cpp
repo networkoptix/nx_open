@@ -124,9 +124,9 @@ nx::network::AbstractStreamServerSocket* QnUniversalTcpListener::createAndPrepar
     #ifdef ENABLE_SSL
         if (sslNeeded)
         {
-            m_serverSocket = std::make_unique<nx::network::deprecated::SslServerSocket>(
+            m_serverSocket = nx::network::SocketFactory::createSslAdapter(
                 std::move(m_serverSocket),
-                true);
+                nx::network::ssl::EncryptionUse::autoDetectByReceivedData);
         }
     #endif
 
@@ -241,7 +241,7 @@ void QnUniversalTcpListener::enableUnauthorizedForwarding(const QString& path)
 }
 
 
-std::vector<std::unique_ptr<nx::network::AbstractStreamServerSocket>> 
+std::vector<std::unique_ptr<nx::network::AbstractStreamServerSocket>>
     QnUniversalTcpListener::createAndPrepareTcpSockets(const nx::network::SocketAddress& localAddress)
 {
     uint16_t assignedPort = 0;
