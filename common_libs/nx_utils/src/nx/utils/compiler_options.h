@@ -15,7 +15,3 @@
 #   endif
 #endif
 
-#if defined(__cplusplus) && defined(__clang__)
-    #include <cstddef>
-    using ::std::nullptr_t;
-#endif
