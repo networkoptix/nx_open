@@ -427,6 +427,7 @@ template<typename SocketInterfaceToImplement>
 bool Socket<SocketInterfaceToImplement>::createSocket(int type, int protocol)
 {
 #ifdef _WIN32
+    // TODO: #ak Remove it from here.
     if (!win32SocketsInitialized)
     {
         WORD wVersionRequested;
@@ -542,7 +543,7 @@ CommunicatingSocket<SocketInterfaceToImplement>::CommunicatingSocket(
         protocol,
         ipVersion,
         sockImpl),
-    m_aioHelper(new aio::AsyncSocketImplHelper<SelfType>(this, ipVersion)),
+    m_aioHelper(new aio::AsyncSocketImplHelper<self_type>(this, ipVersion)),
     m_connected(false)
 #ifdef WIN32
     , m_eventObject(::CreateEvent(0, false, false, nullptr))
@@ -560,7 +561,7 @@ CommunicatingSocket<SocketInterfaceToImplement>::CommunicatingSocket(
         newConnSD,
         ipVersion,
         sockImpl),
-    m_aioHelper(new aio::AsyncSocketImplHelper<SelfType>(this, ipVersion)),
+    m_aioHelper(new aio::AsyncSocketImplHelper<self_type>(this, ipVersion)),
     m_connected(true)   // This constructor is used by server socket.
 #ifdef WIN32
     , m_eventObject(::CreateEvent(0, false, false, nullptr))
@@ -604,6 +605,15 @@ bool CommunicatingSocket<SocketInterfaceToImplement>::connect(
     }
 
     return false; //< Could not connect by any of addresses.
+}
+
+template<typename SocketInterfaceToImplement>
+void CommunicatingSocket<SocketInterfaceToImplement>::bindToAioThread(
+    nx::network::aio::AbstractAioThread* aioThread)
+{
+    base_type::bindToAioThread(aioThread);
+
+    m_aioHelper->bindToAioThread(aioThread);
 }
 
 template<typename SocketInterfaceToImplement>

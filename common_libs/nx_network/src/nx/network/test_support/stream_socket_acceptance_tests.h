@@ -906,6 +906,11 @@ protected:
         return m_serverSocket.get();
     }
 
+    AbstractStreamSocket* lastAcceptedSocket()
+    {
+        return std::get<1>(m_prevAcceptResult).get();
+    }
+
 private:
     using RecvResult = std::tuple<SystemError::ErrorCode, nx::Buffer>;
     using AcceptResult =
@@ -1123,8 +1128,8 @@ TYPED_TEST_P(StreamSocketAcceptance, receive_timeout_change_is_not_ignored)
             this->continueReceiving();
         });
 
-    //this->thenClientSocketReportedTimedout();
-    this->thenClientSocketReportedFailure();
+    this->thenClientSocketReportedTimedout();
+    //this->thenClientSocketReportedFailure();
 }
 
 // TODO: #ak Modify and uncomment this test.
@@ -1177,8 +1182,9 @@ TYPED_TEST_P(StreamSocketAcceptance, recv_timeout_is_reported)
     this->setClientSocketRecvTimeout(std::chrono::milliseconds(1));
 
     this->whenReadSocketInBlockingWay();
-    //this->thenClientSocketReportedTimedout();
-    this->thenClientSocketReportedFailure();
+
+    this->thenClientSocketReportedTimedout();
+    //this->thenClientSocketReportedFailure();
 }
 
 TYPED_TEST_P(StreamSocketAcceptance, msg_dont_wait_flag_makes_recv_call_nonblocking)
@@ -1294,6 +1300,19 @@ TYPED_TEST_P(StreamSocketAcceptance, socket_reports_send_timeout)
     this->thenClientSendTimesOutEventually();
 }
 
+TYPED_TEST_P(StreamSocketAcceptance, cancel_io)
+{
+    this->givenPingPongServer();
+    this->givenConnectedSocket();
+
+    this->whenClientSentPing();
+    this->whenReceivedMessageFromServerAsync(
+        [this]()
+        {
+            this->connection()->cancelIOSync(aio::etNone);
+        });
+}
+
 REGISTER_TYPED_TEST_CASE_P(StreamSocketAcceptance,
     DISABLED_receiveDelay,
     sendDelay,
@@ -1315,7 +1334,8 @@ REGISTER_TYPED_TEST_CASE_P(StreamSocketAcceptance,
     accepted_socket_is_in_blocking_mode_when_server_socket_is_blocking,
     server_socket_accepts_many_connections_in_a_row,
     socket_is_reusable_after_recv_timeout,
-    socket_reports_send_timeout);
+    socket_reports_send_timeout,
+    cancel_io);
 
 } // namespace test
 } // namespace network

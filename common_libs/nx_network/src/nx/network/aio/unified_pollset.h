@@ -143,6 +143,8 @@ private:
 
     std::unique_ptr<AbstractUdtEpollWrapper> m_udtEpollWrapper;
 
+    std::set<ConstIteratorImpl*> m_iterators;
+
     template<typename SocketHandle>
     bool addSocket(
         SocketHandle handle,
@@ -169,8 +171,6 @@ private:
     bool isSysElementBeingUsed(
         CurrentSet currentSet,
         AbstractSocket::SOCKET_HANDLE handle) const;
-    std::set<ConstIteratorImpl*> m_iterators;
-    UDPSocket m_interruptSocket;
 
     void moveIterToTheNextEvent(ConstIteratorImpl* const iter) const;
     void removePhantomSockets(std::map<UDTSOCKET, int>* const udtFdSet);

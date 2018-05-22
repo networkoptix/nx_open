@@ -112,7 +112,7 @@ private:
     std::function<void(SystemError::ErrorCode, size_t)> m_userWriteHandler;
     std::unique_ptr<utils::bstream::AbstractInput> m_inputPipeline;
     std::unique_ptr<utils::bstream::AbstractOutput> m_outputPipeline;
-    std::deque<std::unique_ptr<UserTask>> m_userTaskQueue;
+    std::deque<std::shared_ptr<UserTask>> m_userTaskQueue;
     nx::Buffer m_rawDataReadBuffer;
     std::deque<nx::Buffer> m_readRawData;
     std::deque<RawSendContext> m_rawWriteQueue;

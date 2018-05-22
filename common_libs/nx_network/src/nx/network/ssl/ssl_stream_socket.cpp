@@ -200,6 +200,11 @@ void StreamSocket::sendAsync(
     m_asyncTransformingChannel->sendAsync(buffer, std::move(handler));
 }
 
+bool StreamSocket::isEncryptionEnabled() const
+{
+    return true;
+}
+
 void StreamSocket::handshakeAsync(
     nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode)> handler)
 {

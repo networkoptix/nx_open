@@ -117,6 +117,8 @@ public:
 
     bool setRendezvous(bool val);
 
+    virtual void bindToAioThread(nx::network::aio::AbstractAioThread* aioThread) override;
+
     // AbstractCommunicatingSocket.
     virtual bool connect(
         const SocketAddress& remoteAddress,
