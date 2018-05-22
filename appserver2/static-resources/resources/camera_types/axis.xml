@@ -344,5 +344,18 @@
         <resource name = "AXISM5054" public = "AXISQ6044"/>
         <resource name = "AXISD2050" public = "AXISQ1942"/>
         <resource name = "AXISP12MkII" public = "AXISP1428E"/>
+        <resource name = "AXISP1447" public = "AXISM3104"/>
+        <resource name = "AXISQ3515" public = "AXISP1365"/>        
+        <resource name = "AXISM5065" public = "AXISM3104"/>
+        <resource name = "AXISM3058" public = "AXISM3104"/>
+        <resource name = "AXISM3015" public = "AXISM3104"/>
+        <resource name = "AXISP1290" public = "AXISQ1659"/>
+        <resource name = "AXISQ6125" public = "AXISP1365"/>    
+        <resource name = "AXISM3057" public = "AXISP1365"/> 
+        <resource name = "AXISQ1645" public = "AXISP1365"/> 
+        <resource name = "AXISQ1647" public = "AXISP1365"/> 
+        <resource name = "AXISM5055" public = "AXISM3104"/>
+        <resource name = "AXISM3016" public = "AXISM3104"/>
+        <resource name = "AXISP1280" public = "AXISQ1659"/>                
     </oem>
 </resources>
