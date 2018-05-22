@@ -576,7 +576,11 @@
                 "UNIVIEW|NVR302-08E-P8",
                 "Samsung Techwin|SPE-400*",
                 "VIVOTEK|VS8102",
-                "TCS-300|TCAM"
+                "TCS-300|TCAM",
+                "Sony|SNT-EX104",
+                "Sony|SNT-EX154",
+                "Sony|SNT-EP154",
+                "Dahua|DHI-HCVR7108H*"
             ],
             "analogEncoder": true
         },
