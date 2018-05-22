@@ -764,7 +764,8 @@ table.webclient-window>tbody>tr>td{
   &-options:hover{
     background-color: $brand-core;
     color: $light1;
-    font: bold 12px;
+    font-weight: bold;
+    font-size: 12px;
   }
 
   &-divider{
@@ -786,7 +787,7 @@ table.webclient-window>tbody>tr>td{
   &-item,
   &-item a{
     height: 20px;
-    line-height: 13px !important;
+    line-height: 18px !important;
     font-size: 12px !important;
     color: $light1 !important;
   }
