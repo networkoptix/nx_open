@@ -9,11 +9,9 @@ namespace cloud {
 namespace gateway {
 
 TargetPeerConnector::TargetPeerConnector(
-    relaying::AbstractListeningPeerPool* listeningPeerPool,
-    const network::SocketAddress& targetEndpoint)
+    relaying::AbstractListeningPeerPool* listeningPeerPool)
     :
-    m_listeningPeerPool(listeningPeerPool),
-    m_targetEndpoint(targetEndpoint)
+    m_listeningPeerPool(listeningPeerPool)
 {
     bindToAioThread(getAioThread());
 }
@@ -27,13 +25,12 @@ void TargetPeerConnector::bindToAioThread(network::aio::AbstractAioThread* aioTh
     m_timer.bindToAioThread(aioThread);
 }
 
-void TargetPeerConnector::setTimeout(std::chrono::milliseconds timeout)
+void TargetPeerConnector::connectAsync(
+    const network::SocketAddress& targetEndpoint,
+    ConnectHandler handler)
 {
-    m_timeout = timeout;
-}
+    m_targetEndpoint = targetEndpoint;
 
-void TargetPeerConnector::connectAsync(ConnectHandler handler)
-{
     post(
         [this, handler = std::move(handler)]() mutable
         {
@@ -51,6 +48,23 @@ void TargetPeerConnector::connectAsync(ConnectHandler handler)
             else
                 initiateDirectConnection();
         });
+}
+
+void TargetPeerConnector::setTimeout(std::chrono::milliseconds timeout)
+{
+    m_timeout = timeout;
+}
+
+void TargetPeerConnector::setTargetConnectionRecvTimeout(
+    std::optional<std::chrono::milliseconds> value)
+{
+    m_targetConnectionRecvTimeout = value;
+}
+
+void TargetPeerConnector::setTargetConnectionSendTimeout(
+    std::optional<std::chrono::milliseconds> value)
+{
+    m_targetConnectionSendTimeout = value;
 }
 
 void TargetPeerConnector::stopWhileInAioThread()
@@ -132,6 +146,22 @@ void TargetPeerConnector::processConnectionResult(
     std::unique_ptr<network::AbstractStreamSocket> connection)
 {
     m_timer.pleaseStopSync();
+
+    if (connection)
+    {
+        if ((m_targetConnectionRecvTimeout &&
+                !connection->setRecvTimeout(*m_targetConnectionRecvTimeout)) ||
+            (m_targetConnectionSendTimeout &&
+                !connection->setSendTimeout(*m_targetConnectionSendTimeout)))
+        {
+            systemErrorCode = SystemError::getLastOSErrorCode();
+            NX_INFO(this, lm("Failed to set socket options. %1")
+                .arg(SystemError::toString(systemErrorCode)));
+
+            connection.reset();
+        }
+    }
+
     nx::utils::swapAndCall(
         m_completionHandler,
         systemErrorCode,
