@@ -286,10 +286,6 @@
       <source>Custom-Res</source>
       <translation>Tùy chỉnh-Res</translation>
     </message>
-    <message>
-      <source> (%1)</source>
-      <translation type="unfinished"> (%1)</translation>
-    </message>
   </context>
   <context>
     <name>LaunchButton</name>

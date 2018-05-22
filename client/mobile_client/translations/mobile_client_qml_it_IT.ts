@@ -5,7 +5,7 @@
     <name>ActionButtonsPanel</name>
     <message>
       <source>Press and hold to</source>
-      <translation type="unfinished">Press and hold to</translation>
+      <translation>Premere e tenere premuto su</translation>
     </message>
   </context>
   <context>
@@ -285,10 +285,6 @@
     <message>
       <source>Custom-Res</source>
       <translation>Risoluzione Custom</translation>
-    </message>
-    <message>
-      <source> (%1)</source>
-      <translation> (%1)</translation>
     </message>
   </context>
   <context>

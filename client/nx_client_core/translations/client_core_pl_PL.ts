@@ -13,15 +13,10 @@
         <numerusform>Bajtów</numerusform>
       </translation>
     </message>
-    <message numerus="yes">
+    <message>
       <source>B</source>
       <comment>Suffix for displaying bytes</comment>
-      <translation>
-        <numerusform>B</numerusform>
-        <numerusform>B</numerusform>
-        <numerusform>B</numerusform>
-        <numerusform>B</numerusform>
-      </translation>
+      <translation type="unfinished">B</translation>
     </message>
     <message numerus="yes">
       <source>Kilobytes</source>
@@ -33,15 +28,10 @@
         <numerusform>Kilobajtów</numerusform>
       </translation>
     </message>
-    <message numerus="yes">
+    <message>
       <source>KB</source>
       <comment>Suffix for displaying kilobytes</comment>
-      <translation>
-        <numerusform>KB</numerusform>
-        <numerusform>KB</numerusform>
-        <numerusform>KB</numerusform>
-        <numerusform>KB</numerusform>
-      </translation>
+      <translation type="unfinished">KB</translation>
     </message>
     <message numerus="yes">
       <source>Megabytes</source>
@@ -53,15 +43,10 @@
         <numerusform>Megabajtów</numerusform>
       </translation>
     </message>
-    <message numerus="yes">
+    <message>
       <source>MB</source>
       <comment>Suffix for displaying megabytes</comment>
-      <translation>
-        <numerusform>MB</numerusform>
-        <numerusform>MB</numerusform>
-        <numerusform>MB</numerusform>
-        <numerusform>MB</numerusform>
-      </translation>
+      <translation type="unfinished">MB</translation>
     </message>
     <message numerus="yes">
       <source>Gigabytes</source>
@@ -73,15 +58,10 @@
         <numerusform>Gigabajtów</numerusform>
       </translation>
     </message>
-    <message numerus="yes">
+    <message>
       <source>GB</source>
       <comment>Suffix for displaying gigabytes</comment>
-      <translation>
-        <numerusform>GB</numerusform>
-        <numerusform>GB</numerusform>
-        <numerusform>GB</numerusform>
-        <numerusform>GB</numerusform>
-      </translation>
+      <translation type="unfinished">GB</translation>
     </message>
     <message numerus="yes">
       <source>Terabytes</source>
@@ -93,15 +73,10 @@
         <numerusform>Terabajtów</numerusform>
       </translation>
     </message>
-    <message numerus="yes">
+    <message>
       <source>TB</source>
       <comment>Suffix for displaying terabytes</comment>
-      <translation>
-        <numerusform>TB</numerusform>
-        <numerusform>TB</numerusform>
-        <numerusform>TB</numerusform>
-        <numerusform>TB</numerusform>
-      </translation>
+      <translation type="unfinished">TB</translation>
     </message>
     <message numerus="yes">
       <source>Petabytes</source>
@@ -113,15 +88,10 @@
         <numerusform>Petabajtów</numerusform>
       </translation>
     </message>
-    <message numerus="yes">
+    <message>
       <source>PB</source>
       <comment>Suffix for displaying petabytes</comment>
-      <translation>
-        <numerusform>PB</numerusform>
-        <numerusform>PB</numerusform>
-        <numerusform>PB</numerusform>
-        <numerusform>PB</numerusform>
-      </translation>
+      <translation type="unfinished">PB</translation>
     </message>
   </context>
   <context>

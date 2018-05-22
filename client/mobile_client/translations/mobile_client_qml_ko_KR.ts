@@ -286,10 +286,6 @@
       <source>Custom-Res</source>
       <translation>사용자 정의 해상도</translation>
     </message>
-    <message>
-      <source> (%1)</source>
-      <translation type="unfinished"> (%1)</translation>
-    </message>
   </context>
   <context>
     <name>LaunchButton</name>

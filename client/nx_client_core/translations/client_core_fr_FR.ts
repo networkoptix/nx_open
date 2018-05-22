@@ -11,13 +11,10 @@
         <numerusform>Octets</numerusform>
       </translation>
     </message>
-    <message numerus="yes">
+    <message>
       <source>B</source>
       <comment>Suffix for displaying bytes</comment>
-      <translation>
-        <numerusform>O</numerusform>
-        <numerusform>O</numerusform>
-      </translation>
+      <translation type="unfinished">B</translation>
     </message>
     <message numerus="yes">
       <source>Kilobytes</source>
@@ -27,13 +24,10 @@
         <numerusform>Kilooctets</numerusform>
       </translation>
     </message>
-    <message numerus="yes">
+    <message>
       <source>KB</source>
       <comment>Suffix for displaying kilobytes</comment>
-      <translation>
-        <numerusform>Ko</numerusform>
-        <numerusform>Ko</numerusform>
-      </translation>
+      <translation type="unfinished">KB</translation>
     </message>
     <message numerus="yes">
       <source>Megabytes</source>
@@ -43,13 +37,10 @@
         <numerusform>Mégaoctets</numerusform>
       </translation>
     </message>
-    <message numerus="yes">
+    <message>
       <source>MB</source>
       <comment>Suffix for displaying megabytes</comment>
-      <translation>
-        <numerusform>Mo</numerusform>
-        <numerusform>Mo</numerusform>
-      </translation>
+      <translation type="unfinished">MB</translation>
     </message>
     <message numerus="yes">
       <source>Gigabytes</source>
@@ -59,13 +50,10 @@
         <numerusform>Gigaoctets</numerusform>
       </translation>
     </message>
-    <message numerus="yes">
+    <message>
       <source>GB</source>
       <comment>Suffix for displaying gigabytes</comment>
-      <translation>
-        <numerusform>Go</numerusform>
-        <numerusform>Go</numerusform>
-      </translation>
+      <translation type="unfinished">GB</translation>
     </message>
     <message numerus="yes">
       <source>Terabytes</source>
@@ -75,13 +63,10 @@
         <numerusform>Téraoctet</numerusform>
       </translation>
     </message>
-    <message numerus="yes">
+    <message>
       <source>TB</source>
       <comment>Suffix for displaying terabytes</comment>
-      <translation>
-        <numerusform>To</numerusform>
-        <numerusform>To</numerusform>
-      </translation>
+      <translation type="unfinished">TB</translation>
     </message>
     <message numerus="yes">
       <source>Petabytes</source>
@@ -91,13 +76,10 @@
         <numerusform>Pétaoctets</numerusform>
       </translation>
     </message>
-    <message numerus="yes">
+    <message>
       <source>PB</source>
       <comment>Suffix for displaying petabytes</comment>
-      <translation>
-        <numerusform>Po</numerusform>
-        <numerusform>Po</numerusform>
-      </translation>
+      <translation type="unfinished">PB</translation>
     </message>
   </context>
   <context>

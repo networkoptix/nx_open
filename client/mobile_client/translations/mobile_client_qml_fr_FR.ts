@@ -286,10 +286,6 @@
       <source>Custom-Res</source>
       <translation>Perso-Res</translation>
     </message>
-    <message>
-      <source> (%1)</source>
-      <translation> (%1)</translation>
-    </message>
   </context>
   <context>
     <name>LaunchButton</name>

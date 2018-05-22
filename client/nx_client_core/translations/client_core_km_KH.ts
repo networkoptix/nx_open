@@ -10,12 +10,10 @@
         <numerusform>Bytes</numerusform>
       </translation>
     </message>
-    <message numerus="yes">
+    <message>
       <source>B</source>
       <comment>Suffix for displaying bytes</comment>
-      <translation type="unfinished">
-        <numerusform>B</numerusform>
-      </translation>
+      <translation type="unfinished">B</translation>
     </message>
     <message numerus="yes">
       <source>Kilobytes</source>
@@ -24,12 +22,10 @@
         <numerusform>Kilobytes</numerusform>
       </translation>
     </message>
-    <message numerus="yes">
+    <message>
       <source>KB</source>
       <comment>Suffix for displaying kilobytes</comment>
-      <translation type="unfinished">
-        <numerusform>KB</numerusform>
-      </translation>
+      <translation type="unfinished">KB</translation>
     </message>
     <message numerus="yes">
       <source>Megabytes</source>
@@ -38,12 +34,10 @@
         <numerusform>Megabytes</numerusform>
       </translation>
     </message>
-    <message numerus="yes">
+    <message>
       <source>MB</source>
       <comment>Suffix for displaying megabytes</comment>
-      <translation type="unfinished">
-        <numerusform>MB</numerusform>
-      </translation>
+      <translation type="unfinished">MB</translation>
     </message>
     <message numerus="yes">
       <source>Gigabytes</source>
@@ -52,12 +46,10 @@
         <numerusform>Gigabytes</numerusform>
       </translation>
     </message>
-    <message numerus="yes">
+    <message>
       <source>GB</source>
       <comment>Suffix for displaying gigabytes</comment>
-      <translation type="unfinished">
-        <numerusform>GB</numerusform>
-      </translation>
+      <translation type="unfinished">GB</translation>
     </message>
     <message numerus="yes">
       <source>Terabytes</source>
@@ -66,12 +58,10 @@
         <numerusform>Terabytes</numerusform>
       </translation>
     </message>
-    <message numerus="yes">
+    <message>
       <source>TB</source>
       <comment>Suffix for displaying terabytes</comment>
-      <translation type="unfinished">
-        <numerusform>TB</numerusform>
-      </translation>
+      <translation type="unfinished">TB</translation>
     </message>
     <message numerus="yes">
       <source>Petabytes</source>
@@ -80,12 +70,10 @@
         <numerusform>Petabytes</numerusform>
       </translation>
     </message>
-    <message numerus="yes">
+    <message>
       <source>PB</source>
       <comment>Suffix for displaying petabytes</comment>
-      <translation type="unfinished">
-        <numerusform>PB</numerusform>
-      </translation>
+      <translation type="unfinished">PB</translation>
     </message>
   </context>
   <context>

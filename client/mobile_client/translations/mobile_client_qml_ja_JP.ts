@@ -286,10 +286,6 @@
       <source>Custom-Res</source>
       <translation>カスタム解像度</translation>
     </message>
-    <message>
-      <source> (%1)</source>
-      <translation> (%1)</translation>
-    </message>
   </context>
   <context>
     <name>LaunchButton</name>
