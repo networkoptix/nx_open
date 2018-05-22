@@ -31,7 +31,6 @@ extern "C" {
 
 #include "av_utils.h"
 #include "avcodec_container.h"
-#include "ilp_empty_packet.h"
 #include "plugin.h"
 
 namespace {
@@ -107,7 +106,6 @@ unsigned int StreamReader::releaseRef()
 
 int StreamReader::getNextData(nxcip::MediaDataPacket** lpPacket)
 {
-    //return nxcip::NX_NETWORK_ERROR;
     if (!ensureInitialized())
         return nxcip::NX_TRY_AGAIN;
 
