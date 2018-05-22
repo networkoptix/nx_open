@@ -241,7 +241,7 @@ def get_records_for_version(version):
     return contexts
 
 
-def is_valid_file_type(file_type, meta_types):
+def is_not_valid_file_type(file_type, meta_types):
     for meta_type in meta_types.split(','):
         if meta_type.strip() in file_type:
             return False
@@ -253,7 +253,7 @@ def handle_file_upload(file, data_structure):
     file_type = file.content_type
 
     if 'format' in data_structure.meta_settings and\
-            is_valid_file_type(file_type.lower(), data_structure.meta_settings['format']):
+            is_not_valid_file_type(file_type.lower(), data_structure.meta_settings['format']):
         return None, None, True
 
     if data_structure.type == DataStructure.DATA_TYPES.image:
