@@ -86,7 +86,9 @@ class _LoggedOutputBuffer(object):
 
 def _communicate(process, input, timeout_sec):
     """Patched version of method with same name from standard Popen class"""
-    process_logger = _logger.getChild(str(process.pid))
+    process_logger = _logger.getChild('pid{}'.format(process.pid))
+    interaction_logger = process_logger.getChild('interaction')
+    interaction_logger.setLevel(logging.INFO)  # Too verbose for everyday usage.
 
     stdout = None  # Return
     stderr = None  # Return
@@ -96,10 +98,12 @@ def _communicate(process, input, timeout_sec):
     poller = select.poll()
 
     def register_and_append(file_obj, eventmask):
+        interaction_logger.debug("Register file descriptor %d, event mask %x.", file_obj.fileno(), eventmask)
         poller.register(file_obj.fileno(), eventmask)
         fd2file[file_obj.fileno()] = file_obj
 
     def close_unregister_and_remove(fd):
+        interaction_logger.debug("Unregister file descriptor %d.", fd)
         poller.unregister(fd)
         fd2file[fd].close()
         fd2file.pop(fd)
@@ -119,33 +123,46 @@ def _communicate(process, input, timeout_sec):
     wait = Wait(
         'process responds',
         timeout_sec=timeout_sec,
-        log_continue=process_logger.debug,
-        log_stop=process_logger.error)
+        log_continue=process_logger.getChild('wait').debug,
+        log_stop=process_logger.getChild('wait').error)
 
     while fd2file:
         try:
             ready = poller.poll(int(math.ceil(wait.delay_sec * 1000)))
         except select.error as e:
             if e.args[0] == errno.EINTR:
+                interaction_logger.debug("Got EINTR.")
                 continue
             raise
 
         for fd, mode in ready:
             if mode & select.POLLOUT:
+                interaction_logger.debug("STDIN ready.")
+                assert fd == process.stdin.fileno()
                 chunk = input[input_offset: input_offset + 16 * 1024]
                 try:
+                    interaction_logger.debug("Write %d bytes.", len(chunk))
                     input_offset += os.write(fd, chunk)
                 except OSError as e:
                     if e.errno == errno.EPIPE:
+                        interaction_logger.debug("EPIPE on STDIN.")
                         close_unregister_and_remove(fd)
                     else:
                         raise
                 else:
                     if input_offset >= len(input):
+                        interaction_logger.debug("Everything is transmitted to STDIN.")
                         close_unregister_and_remove(fd)
             elif mode & (select.POLLIN | select.POLLPRI):
+                if not process.stdout.closed and fd == process.stdout.fileno():
+                    interaction_logger.debug("STDOUT ready.")
+                elif not process.stderr.closed and fd == process.stderr.fileno():
+                    interaction_logger.debug("STDERR ready.")
+                else:
+                    assert False
                 data = os.read(fd, 16 * 1024)
                 if not data:
+                    interaction_logger.debug("No data (%r), close %d.", fd)
                     close_unregister_and_remove(fd)
                 fd2output[fd].append(data)
             else:
@@ -156,6 +173,8 @@ def _communicate(process, input, timeout_sec):
                 for fd in list(fd2file):
                     close_unregister_and_remove(fd)
                 break  # Unnecessary but explicit.
+
+    interaction_logger.debug("All file descriptors are closed.")
 
     while True:
         exit_status = process.poll()
