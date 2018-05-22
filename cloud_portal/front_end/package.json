@@ -46,6 +46,7 @@
         "rangeslider.js": "2.3.0",
         "rxjs": "^6.1.0",
         "rxjs-compat": "^6.1.0",
+        "sass-rem": "^2.0.1",
         "screenfull": "^3.3.2",
         "serve-static": "^1.13.2",
         "tc-angular-chartjs": "2.1.4",

@@ -1,3 +1,4 @@
+@import "~sass-rem";
 
 @import 'native-theme/_theme_palette';
 @import '_theme_palette';
@@ -16,10 +17,12 @@
 @import '../web_common/styles/common';
 
 html {
-  position: relative;
-  min-height: 100%;
-  overflow-y: scroll; /* CLOUD-373: this is hack: we fix vertical scroll to prevent the page from shaking when it appears or disappears*/
+    @include rem-baseline;
+    position: relative;
+    min-height: 100%;
+    overflow-y: scroll; /* CLOUD-373: this is hack: we fix vertical scroll to prevent the page from shaking when it appears or disappears*/
 }
+
 body {
   /* Margin bottom by footer height */
   margin-bottom: 80px;
