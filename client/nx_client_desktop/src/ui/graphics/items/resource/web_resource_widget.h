@@ -11,8 +11,9 @@ class QnWebResourceWidget : public QnResourceWidget
     typedef QnResourceWidget base_type;
 public:
     QnWebResourceWidget(QnWorkbenchContext *context, QnWorkbenchItem *item, QGraphicsItem *parent = NULL);
-
     virtual ~QnWebResourceWidget();
+
+    virtual bool eventFilter(QObject* object, QEvent* event) override;
 
 protected:
     virtual int helpTopicAt(const QPointF& pos) const override;
@@ -29,10 +30,6 @@ private:
 
     virtual void optionsChangedNotify(Options changedFlags) override;
 
-private:
-    virtual bool eventFilter(QObject *object
-        , QEvent *event) override;
-
-private:
-    QnGraphicsWebView * const m_webView;
+protected:
+    QnGraphicsWebView* const m_webView;
 };

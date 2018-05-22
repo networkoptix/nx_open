@@ -7,7 +7,6 @@
 #include <QtWidgets/QToolButton>
 #include <QtWidgets/QAction>
 
-#include <QtWebKitWidgets/QWebFrame>
 #include <QtWebKitWidgets/QWebView>
 
 #include <common/common_module.h>
@@ -78,14 +77,6 @@ public:
         connect(m_urlLineEdit, &QLineEdit::returnPressed, this, [this]()
             {
                 m_webView->load(m_urlLineEdit->text());
-            });
-
-        auto handler = new QnDebugWebPageHandler(this);
-        QWebFrame* frame = m_page->mainFrame();
-        connect(frame, &QWebFrame::javaScriptWindowObjectCleared, this,
-            [this, frame, handler]()
-            {
-                frame->addToJavaScriptWindowObject(lit("external"), handler);
             });
         }
 
@@ -361,11 +352,6 @@ QnSystemTilesTestCase *QnDebugControlDialog::m_tilesTests = nullptr;
 
 
 } // namespace
-
-void QnDebugWebPageHandler::c2pplayback(const QString& cameras, int timestamp)
-{
-    qDebug() << "c2pplayback" << cameras << timestamp;
-}
 
 // -------------------------------------------------------------------------- //
 // QnWorkbenchDebugHandler

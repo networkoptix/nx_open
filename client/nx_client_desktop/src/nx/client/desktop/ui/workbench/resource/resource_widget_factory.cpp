@@ -10,6 +10,7 @@
 #include <ui/graphics/items/resource/videowall_screen_widget.h>
 #include <ui/graphics/items/resource/web_resource_widget.h>
 #include <nx/client/desktop/ui/workbench/resource/layout_tour_item_widget.h>
+#include <nx/client/desktop/c2p_integration/c2p_resource_widget.h>
 
 #include <ui/workbench/workbench_access_controller.h>
 #include <ui/workbench/workbench_context.h>
@@ -69,7 +70,11 @@ QnResourceWidget* ResourceWidgetFactory::createWidget(QnWorkbenchContext* contex
         return new QnMediaResourceWidget(context, item);
 
     if (resource->hasFlags(Qn::web_page))
+    {
+        if (resource->getName().toLower().startsWith(lit("c2p")))
+            return new C2pResourceWidget(context, item);
         return new QnWebResourceWidget(context, item);
+    }
 
     NX_EXPECT(false, lit("ResourceWidgetFactory: unsupported resource type %1")
         .arg(resource->flags()));
