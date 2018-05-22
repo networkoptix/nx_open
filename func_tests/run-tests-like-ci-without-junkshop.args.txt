@@ -1,7 +1,7 @@
 -s
 --work-dir=~/Development/func_tests_dir/
 --bin-dir=~/Development/func_tests_dir/bin/
---mediaserver-installers-dir=~/Downloads/
+--mediaserver-installers-dir=/home/george/Downloads/
 --mediaserver-dist-path=IGNORED
 --cloud-group=test
 --customization=hanwha
