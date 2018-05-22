@@ -20,7 +20,8 @@ module.exports = merge(common, {
             {
                 context: [ '/api/', '/gateway/' ],
                 // target : 'http://cloud-local'
-                target : 'https://cloud-dev2.hdw.mx:80'
+                target : 'https://cloud-dev2.hdw.mx',
+                changeOrigin: true
 
             },
             // Rewrite English translations to be served from DEV files
