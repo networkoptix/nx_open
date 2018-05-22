@@ -8,3 +8,4 @@ struct AVCodec;
 struct AVStream;
 struct AVFrame;
 struct AVPacket;
+struct SwsContext;

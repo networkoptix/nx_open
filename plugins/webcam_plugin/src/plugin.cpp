@@ -5,6 +5,9 @@
 
 #include "plugin.h"
 #include "discovery_manager.h"
+extern "C" {
+#include <libavdevice/avdevice.h>
+}
 
 extern "C" {
 #ifdef _WIN32
@@ -26,6 +29,10 @@ Plugin::Plugin()
     m_refManager( this ),
     m_timeProvider(nullptr)
 {
+    avdevice_register_all();
+    // avoid error constant error messages about dropped frames because of a full buffer
+    //av_log_set_level(AV_LOG_QUIET);
+
     webCameraPluginInstance = this;
 }
 

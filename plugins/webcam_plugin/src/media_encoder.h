@@ -14,6 +14,8 @@
 #include <plugins/plugin_tools.h>
 
 #include "stream_reader.h"
+#include "device_data.h"
+#include "codec_context.h"
 
 namespace nx {
 namespace webcam_plugin {
@@ -30,7 +32,8 @@ class MediaEncoder
 public:
     MediaEncoder(CameraManager* const cameraManager, 
                  nxpl::TimeProvider *const timeProvider,
-                 int encoderNumber );
+                 int encoderNumber,
+                 const CodecContext& codecContext);
     virtual ~MediaEncoder();
 
     //!Implementation of nxpl::PluginInterface::queryInterface
@@ -59,6 +62,7 @@ public:
     virtual int getAudioFormat( nxcip::AudioFormat* audioFormat ) const override;
 
     void updateCameraInfo( const nxcip::CameraInfo& info );
+    void setVideoCodecID(nxcip::CompressionType codecID);
 
 private:
     nxpt::CommonRefManager m_refManager;
@@ -66,8 +70,10 @@ private:
     nxpl::TimeProvider *const m_timeProvider;
     std::unique_ptr<StreamReader> m_streamReader;
     int m_encoderNumber;
-    QSize m_resolution;
-    float m_currentFps;
+    CodecContext m_videoCodecContext;
+    mutable int m_maxBitrate;
+private:
+    QString decodeCameraInfoUrl() const;
 };
 
 } // namespace nx 

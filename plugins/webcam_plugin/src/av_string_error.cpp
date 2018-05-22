@@ -7,26 +7,30 @@ extern "C"
 #include <libavutil/error.h>
 }
 
-#include <QtCore/qdebug.h>
 
-
-AVStringError::AVStringError()
-{
-}
-
-AVStringError::~AVStringError()
+AVStringError::AVStringError () : m_errorCode(0)
 {
 }
 
 void AVStringError::setAvError(const QString& error)
 {
     m_lastError = error;
-    qDebug() << m_lastError;
 }
 
-QString AVStringError::avErrorString()
+QString AVStringError::avErrorString() const
 {
     return m_lastError;
+}
+
+void AVStringError::setAvErrorCode (int errorCode)
+{
+    m_errorCode = errorCode;
+    updateIfError(errorCode);
+}
+
+int AVStringError::errorCode () const
+{
+    return m_errorCode;
 }
 
 bool AVStringError::updateIfError(int errorCode)
@@ -34,6 +38,7 @@ bool AVStringError::updateIfError(int errorCode)
     bool error = errorCode < 0;
     if (error)
     {
+        m_errorCode = errorCode;
         const int length = 256;
         char errorBuffer[length];
         av_strerror(errorCode, errorBuffer, length);
@@ -42,7 +47,8 @@ bool AVStringError::updateIfError(int errorCode)
     return error;
 }
 
-bool AVStringError::hasError()
+bool AVStringError::hasError() const
 {
-    return !m_lastError.isEmpty();
+    return !m_lastError.isEmpty()
+    || m_errorCode != 0;
 }

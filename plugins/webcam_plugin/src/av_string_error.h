@@ -6,15 +6,18 @@ class AVStringError
 {
 public:
     AVStringError();
-    ~AVStringError();
 
     void setAvError(const QString& error);
-    QString avErrorString();
+    QString avErrorString() const;
+
+    void setAvErrorCode(int errorCode);
+    int errorCode() const;
 
     bool updateIfError(int code);
-    bool hasError();
+    bool hasError() const;
 
 private:
     QString m_lastError;
+    int m_errorCode;
 };
 

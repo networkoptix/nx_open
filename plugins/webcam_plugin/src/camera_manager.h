@@ -11,6 +11,8 @@
 
 #include <plugins/plugin_tools.h>
 #include "plugin.h"
+#include "video_codec_priority.h"
+#include "codec_context.h"
 
 namespace nx {
 namespace webcam_plugin {
@@ -80,9 +82,6 @@ public:
     const nxcip::CameraInfo& info() const;
     nxpt::CommonRefManager* refManager();
 
-    //AVFormatContext * getFormatContext();
-    //AVInputFormat * getInputFormat();
-
 protected:
     nxpt::CommonRefManager m_refManager;
     /*!
@@ -94,6 +93,11 @@ protected:
     unsigned int m_capabilities;
     nxpl::TimeProvider *const m_timeProvider;
     std::unique_ptr<MediaEncoder> m_encoder;
+
+    VideoCodecPriority m_videoCodecPriority;
+
+private:
+    CodecContext getEncoderDefaults();
 };
 
 } // namespace nx 

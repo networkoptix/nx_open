@@ -8,8 +8,7 @@
 #include <cstring>
 
 #include "media_encoder.h"
-
-#include <libavformat/avformat.h>
+#include "utils.h"
 
 namespace nx {
 namespace webcam_plugin {
@@ -75,9 +74,16 @@ int CameraManager::getEncoder( int encoderIndex, nxcip::CameraMediaEncoder** enc
     if( encoderIndex > 0 )
         return nxcip::NX_INVALID_ENCODER_NUMBER;
 
-    if( !m_encoder.get() )
-        m_encoder.reset( new MediaEncoder(this, m_timeProvider, encoderIndex) );
+    if (!m_encoder.get())
+    {
+        m_encoder.reset(new MediaEncoder(
+            this,
+            m_timeProvider,
+            encoderIndex,
+            getEncoderDefaults()));
+    }
     m_encoder->addRef();
+    
     *encoderPtr = m_encoder.get();
 
     return nxcip::NX_NO_ERROR;
@@ -160,6 +166,32 @@ const nxcip::CameraInfo& CameraManager::info() const
 nxpt::CommonRefManager* CameraManager::refManager()
 {
     return &m_refManager;
+}
+
+CodecContext CameraManager::getEncoderDefaults()
+{
+    QString url = QString(m_info.url).mid(9);
+    url = nx::utils::Url::fromPercentEncoding(url.toLatin1());
+
+    auto codecList = utils::getSupportedCodecs(url.toLatin1().data());
+    nxcip::CompressionType codecID = m_videoCodecPriority.getPriorityCodec(codecList);
+
+    auto resolutionList = utils::getResolutionList(url.toLatin1().data(), codecID);
+    auto it = std::max_element(resolutionList.begin(), resolutionList.end(), 
+        [](const utils::ResolutionData& a, const utils::ResolutionData& b)
+        {
+            return
+                a.resolution.width 
+                 * a.resolution.height <
+                b.resolution.width 
+                 * b.resolution.height;
+        });
+
+    float defaultFPS = 30;
+    int64_t defaultBitrate = 0;
+    auto res = it != resolutionList.end() ? it->resolution : nxcip::Resolution();
+
+    return CodecContext(codecID, res, defaultFPS, defaultBitrate);
 }
 
 } // namespace nx 

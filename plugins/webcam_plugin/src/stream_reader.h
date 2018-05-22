@@ -23,18 +23,18 @@
 
 #include "ilp_video_packet.h"
 #include "av_string_error.h"
+#include "codec_context.h"
 
-#include <libavutil/pixfmt.h>
 #include "libav_forward_declarations.h"
-
 extern "C" {
 #include <libavcodec/avcodec.h>
 }
 
 namespace nx {
 namespace webcam_plugin {
+    class CodecContext;
 
-class AVCodecContainer;
+    class AVCodecContainer;
 
 //!Reads picture files from specified directory as video-stream
 class StreamReader
@@ -43,9 +43,10 @@ class StreamReader
 {
 public:
     StreamReader(nxpt::CommonRefManager* const parentRefManager,
-                 nxpl::TimeProvider *const timeProvider,
-                 const nxcip::CameraInfo& cameraInfo,
-                 int encoderNumber );
+        nxpl::TimeProvider *const timeProvider,
+        const nxcip::CameraInfo& cameraInfo,
+        int encoderNumber,
+        const CodecContext& codecContext);
     virtual ~StreamReader();
 
     //!Implementation of nxpl::PluginInterface::queryInterface
@@ -61,7 +62,7 @@ public:
     virtual void interrupt() override;
 
     void setFps( float fps );
-    void setResolution(const QSize& resolution);
+    void setResolution(const nxcip::Resolution& resolution);
     void setBitrate(int64_t bitrate);
     void updateCameraInfo( const nxcip::CameraInfo& info );
 
@@ -73,10 +74,9 @@ private:
     nxcip::CameraInfo m_info;
     int m_encoderNumber;
     
-    int m_fps;
-    QSize m_resolution;
-    int64_t m_bitrate;
+    CodecContext m_codecContext;
     bool m_modified;
+    bool m_initialized;
    
     bool m_terminated;
     QnWaitCondition m_cond;
@@ -84,30 +84,29 @@ private:
 
     AVFormatContext * m_formatContext;
     AVInputFormat * m_inputFormat;
-    AVDictionary * m_options;
+    AVDictionary * m_formatContextOptions;
+    AVPacket* m_avDecodePacket;
     std::unique_ptr<AVCodecContainer> m_videoEncoder;
     std::unique_ptr<AVCodecContainer> m_videoDecoder;
-
-    AVPacket* m_avVideoPacket;
-
     AVStringError m_lastError;
 
 private:
     std::unique_ptr<ILPVideoPacket> toNxVideoPacket(AVPacket *packet, AVCodecID codecID);
-    std::unique_ptr<ILPVideoPacket> transcodeVideo(int *nxcipErrorCode);
+    std::unique_ptr<ILPVideoPacket> transcodeVideo(int *nxcipErrorCode, AVPacket * decodePacket);
     
-    AVFrame* getDecodedVideoFrame();
-    AVPacket* getEncodedVideoPacket(AVFrame* frame);
+    int getDecodedVideoFrame(AVFrame** outFrame, AVPacket* decodePacket);
 
     bool isValid() const;
     void initializeAv();
     void unInitializeAv();
-    void setOptions();
-    void setEncoderOptions();
-    AVFrame* toYUV420(AVCodecContext* codecContext, AVFrame* frame);
+    bool ensureInitialized();
+    void setFormatContextOptions();
+    void setEncoderOptions() const;
+    void setDecoderOptions() const;
+    AVFrame* toEncodableFrame(AVFrame* frame) const;
 
-    const char * getAvInputFormat();
-    QString getAvCameraUrl();
+    const char * getAVInputFormat();
+    std::string getAVCameraUrl();
 };
 
 } // namespace webcam_plugin

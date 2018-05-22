@@ -13,35 +13,44 @@ namespace webcam_plugin {
 class AVCodecContainer
 {
 public:
-    AVCodecContainer(AVFormatContext * formatContext);
+    AVCodecContainer();
     ~AVCodecContainer();
 
-    void open();
-    void close();
+    /*!
+    * Convenience function for setting the bitrate in bits/s before callings open()
+    * @param[in] bitrate - the bitrate in bits/s.
+    */
+    void setBitrate(int bitrate);
 
-    int readFrame(AVPacket * outPacket);
+    int open();
+    int close();
 
-    int encodeVideo(AVPacket *outPacket, const AVFrame *frame, int *outGotPacket);
-    int decodeVideo(AVFrame *outFrame, int *outGotPicture, AVPacket *packet);
+    static int readFrame(AVFormatContext * formatContext, AVPacket * outPacket);
 
-    int encodeAudio(AVPacket *outPacket, const AVFrame *frame, int *outGotPacket);
-    int decodeAudio(AVFrame * frame, int* outGotFrame, const AVPacket *packet);
-    
+    int encodeVideo(AVPacket *outPacket, const AVFrame *frame, int *outGotPacket) const;
+    int decodeVideo(AVFormatContext* formatContext, AVFrame *outFrame, int *outGotPicture, AVPacket *packet) const;
+
+    int encodeAudio(AVPacket *outPacket, const AVFrame *frame, int *outGotPacket) const;
+    int decodeAudio(AVFrame * frame, int* outGotFrame, const AVPacket *packet) const;
+
     void initializeEncoder(AVCodecID codecID);
     void initializeDecoder(AVCodecParameters * codecParameters);
     void initializeDecoder(AVCodecID codecID);
-    bool isValid();
+    bool isValid() const;
 
+    AVStringError lastError() const;
 
-    AVCodecContext* codecContext();
-    AVCodecID codecID();
+    AVCodecContext* codecContext() const;
+    AVCodec* codec() const;
+    AVCodecID codecID() const;
+    AVDictionary* options() const;
 
-    QString avErrorString();
+    QString avErrorString() const;
 
 private:
-    AVFormatContext * m_formatContext;
     AVCodecContext * m_codecContext;
     AVCodec * m_codec;
+    AVDictionary* m_options;
 
     AVStringError m_lastError;
 

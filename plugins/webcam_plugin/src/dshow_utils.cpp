@@ -54,8 +54,12 @@ public:
 
     ~DShowInitializer()
     {
-        if(S_OK == m_result)
+        // S_OK should not uninit immediately:
+        // https://msdn.microsoft.com/en-us/library/windows/desktop/ms678543(v=vs.85).aspx
+        if (S_FALSE == m_result)
             CoUninitialize();
+
+        // todo figure out how to call Couninitialize() eventually is S_OK was returned
     }
 private:
     HRESULT m_result;
@@ -79,7 +83,8 @@ nxcip::CompressionType toNxCodecID(DWORD biCompression)
             return nxcip::AV_CODEC_ID_MJPEG;
         case MAKEFOURCC('H', '2', '6', '4'):
             return nxcip::AV_CODEC_ID_H264;
-            //these are all the formats supported by the webcam plugingetR
+            // these are all the formats supported by the webcam plugin.
+            // todo add the rest
         default:
             return nxcip::AV_CODEC_ID_NONE;
     }
@@ -260,7 +265,7 @@ HRESULT getSupportedCodecs(IMoniker *pMoniker, std::vector<nxcip::CompressionTyp
             nxcip::CompressionType codecID = toNxCodecID(bmiHeader->biCompression);
 
             if (std::find(codecList.begin(), codecList.end(), codecID) == codecList.end())
-                codecList.push_back(codecID);
+                codecList.push_back(codecID);      
         }
         DeleteMediaType(mediaType);
     }
@@ -295,9 +300,11 @@ HRESULT getResolutionList(IMoniker *pMoniker,
             if (codecID != targetCodecID)
                 continue;
 
+            auto timePerFrame = viHeader->AvgTimePerFrame;
             ResolutionData resData;
             resData.resolution = nxcip::Resolution(bmiHeader->biWidth, bmiHeader->biHeight);
-            resData.codecID = codecID;
+            resData.maxFps = timePerFrame ? (REFERENCE_TIME) 10000000 / timePerFrame : 0;
+            resData.bitrate = viHeader->dwBitRate;
 
             if(std::find(resolutionList.begin(), resolutionList.end(), resData) == resolutionList.end())
                 resolutionList.push_back(resData);
@@ -337,12 +344,13 @@ HRESULT getDevicePath(IMoniker *pMoniker, DeviceData *outDeviceInfo)
 
 HRESULT getResolutionList(IMoniker *pMoniker, DeviceData *outDeviceInfo, nxcip::CompressionType targetCodecID)
 {
-    std::vector<ResolutionData> resolutionList;
+    return S_FALSE;
+    /*std::vector<ResolutionData> resolutionList;
     HRESULT hr = getResolutionList(pMoniker, &resolutionList, targetCodecID);
     if (FAILED(hr))
-        return hr;
+        return hr;*/
 
-    outDeviceInfo->setResolutionList(resolutionList);
+    //outDeviceInfo->setResolutionList(resolutionList);
 }
 
 //-------------------------------------------------------------------------------------------------

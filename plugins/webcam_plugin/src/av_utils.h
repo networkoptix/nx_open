@@ -9,10 +9,11 @@ namespace nx {
 namespace utils{
 namespace av{
 
-    AVStream* getAvStream(AVFormatContext * context, int * streamIndex, enum AVMediaType mediaType);
-    AVPixelFormat suggestPixelFormat(AVCodecID codecID);
-    AVPixelFormat unDeprecatePixelFormat(AVPixelFormat pixelFormat);
-    nxcip::CompressionType toNxCompressionType(AVCodecID codecID);
+AVStream* getAVStream(AVFormatContext * context, int * streamIndex, AVMediaType mediaType);
+AVPixelFormat suggestPixelFormat(AVCodecID codecID);
+AVPixelFormat unDeprecatePixelFormat(AVPixelFormat pixelFormat);
+nxcip::CompressionType toNxCompressionType(AVCodecID codecID);
+AVCodecID toAVCodecID(nxcip::CompressionType);
 
 } // namespace av
 } // namespace utils

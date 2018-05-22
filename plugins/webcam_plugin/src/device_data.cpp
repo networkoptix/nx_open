@@ -24,16 +24,6 @@ std::string DeviceData::devicePath() const
     return m_devicePath;
 }
 
-void DeviceData::setResolutionList(const std::vector<ResolutionData>& resolutionDataList)
-{
-    m_resolutionDataList = resolutionDataList;
-}
-
-std::vector<ResolutionData> DeviceData::resolutionList()
-{
-    return m_resolutionDataList;
-}
-
 } // namespace utils
 } // namespace webcam_plugin
 } // namespace nx

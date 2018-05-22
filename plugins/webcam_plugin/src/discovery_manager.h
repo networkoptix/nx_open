@@ -10,6 +10,7 @@
 
 #include <plugins/plugin_tools.h>
 #include <plugins/plugin_container_api.h>
+#include <vector>
 
 namespace nx {
 namespace webcam_plugin {

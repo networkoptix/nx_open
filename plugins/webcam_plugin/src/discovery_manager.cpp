@@ -72,21 +72,15 @@ int DiscoveryManager::findCameras(nxcip::CameraInfo* cameras, const char* localI
         std::string deviceName = devices[i].deviceName();
         strcpy(cameras[i].modelName, deviceName.c_str());
 
+        std::string devicePath = devices[i].devicePath();
         QByteArray url =
             QByteArray("webcam://").append(
-            nx::utils::Url::toPercentEncoding(devices[i].devicePath().c_str()));
+            nx::utils::Url::toPercentEncoding(devicePath.c_str()));
         strcpy(cameras[i].url, url.data());
 
         const QByteArray& uid = QCryptographicHash::hash(url, QCryptographicHash::Md5).toHex();
         strcpy(cameras[i].uid, uid.data());
-
     }
-
-    for(const auto& d : devices)
-    {
-        auto codecs = utils::getSupportedCodecs(d.devicePath().c_str());
-    }
-
     return deviceCount;
 }
 

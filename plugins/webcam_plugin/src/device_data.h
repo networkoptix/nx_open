@@ -12,15 +12,21 @@ namespace utils {
 
 struct ResolutionData
 {
+    //resolution
     nxcip::Resolution resolution;
-    nxcip::CompressionType codecID;
-    //nxcip::PixelFormat pixelFormat;
+    
+    // bitrate in Kb/s
+    uint32_t bitrate;
+    
+    //maximum frames per second
+    float maxFps;
 
     bool operator==(const ResolutionData & rhs) const
     {
         return resolution.width == rhs.resolution.width
             && resolution.height == rhs.resolution.height
-            && codecID == rhs.codecID;
+            && bitrate == rhs.bitrate
+            && maxFps == rhs.maxFps;
     }
 };
 
@@ -33,14 +39,9 @@ public:
     void setDevicePath(const std::string& devicePath);
     std::string devicePath() const;
 
-    void setResolutionList(const std::vector<ResolutionData>& resolutionDataList);
-    std::vector<ResolutionData> resolutionList();
-
 private:
     std::string m_deviceName;
     std::string m_devicePath;
-
-    std::vector<ResolutionData> m_resolutionDataList;
 };
 
 } // namespace utils

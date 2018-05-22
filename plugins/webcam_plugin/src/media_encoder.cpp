@@ -13,17 +13,19 @@ namespace nx {
 namespace webcam_plugin {
 
 static const double MIN_FPS = 1.0 / 86400.0; //once per day
-static const double MAX_FPS = 30;
+static const double MAX_FPS = 60;
 
 MediaEncoder::MediaEncoder(CameraManager* const cameraManager, 
                            nxpl::TimeProvider *const timeProvider,
-                           int encoderNumber )
+                           int encoderNumber,
+                           const CodecContext& codecContext)
 :
     m_refManager( cameraManager->refManager() ),
     m_cameraManager( cameraManager ),
     m_timeProvider( timeProvider ),
     m_encoderNumber( encoderNumber ),
-    m_currentFps( MAX_FPS )
+    m_videoCodecContext(codecContext),
+    m_maxBitrate(0)
 {
 }
 
@@ -69,18 +71,16 @@ int MediaEncoder::getMediaUrl( char* urlBuf ) const
 
 int MediaEncoder::getResolutionList( nxcip::ResolutionInfo* infoList, int* infoListCount ) const
 {
-    QString url = QString(m_cameraManager->info().url).mid(9);
-    url = nx::utils::Url::fromPercentEncoding(url.toLatin1());
+    QString url = decodeCameraInfoUrl();
 
     std::vector<utils::ResolutionData> resList 
-        = utils::getResolutionList(url.toLatin1().data(), nxcip::AV_CODEC_ID_H264);
+        = utils::getResolutionList(url.toLatin1().data(), m_videoCodecContext.codecID());
     
     int count = resList.size();
     for (int i = 0; i < count; ++i)
     {
         infoList[i].resolution.width = resList[i].resolution.width;
-        infoList[i].resolution.height = resList[i].resolution.height;
-        infoList[i].maxFps = MAX_FPS;
+        infoList[i].maxFps = resList[i].maxFps;
     }
     *infoListCount = count;
 
@@ -89,42 +89,78 @@ int MediaEncoder::getResolutionList( nxcip::ResolutionInfo* infoList, int* infoL
 
 int MediaEncoder::getMaxBitrate( int* maxBitrate ) const
 {
-    *maxBitrate = 0;
+    if(m_maxBitrate)
+    {
+        *maxBitrate = m_maxBitrate / 1000;
+        return nxcip::NX_NO_ERROR;
+    }
+
+    QString url = decodeCameraInfoUrl();
+
+    std::vector<utils::ResolutionData> resList
+        = utils::getResolutionList(url.toLatin1().data(), m_videoCodecContext.codecID());
+
+    if (resList.empty())
+    {
+        *maxBitrate = 0;
+        return nxcip::NX_IO_ERROR;
+    }
+    
+    auto max = std::max_element(resList.begin(), resList.end(),
+        [](const utils::ResolutionData& a, const utils::ResolutionData& b)
+    {
+        return a.bitrate < b.bitrate;
+    });
+
+    m_maxBitrate = max != resList.end() ? (int) max->bitrate : 0;
+    *maxBitrate = m_maxBitrate / 1000;
     return nxcip::NX_NO_ERROR;
 }
 
 int MediaEncoder::setResolution( const nxcip::Resolution& resolution )
 {
-    m_resolution.setWidth(resolution.width);
-    m_resolution.setHeight(resolution.height);
-    if (m_streamReader.get())
-        m_streamReader->setResolution(m_resolution);
+    m_videoCodecContext.setResolution(resolution);
+    if (m_streamReader)
+        m_streamReader->setResolution(resolution);
     return nxcip::NX_NO_ERROR;
 }
 
 int MediaEncoder::setFps( const float& fps, float* selectedFps )
 {
-    m_currentFps = std::min<float>( std::max<float>( fps, MIN_FPS ), MAX_FPS );
-    *selectedFps = m_currentFps;
-    if( m_streamReader.get() )
-        m_streamReader->setFps( m_currentFps );
+    auto newFps = std::min<float>( std::max<float>( fps, MIN_FPS ), MAX_FPS );
+    m_videoCodecContext.setFps(newFps);
+    if( m_streamReader)
+        m_streamReader->setFps( newFps );
+    *selectedFps = newFps;
     return nxcip::NX_NO_ERROR;
 }
 
 int MediaEncoder::setBitrate( int bitrateKbps, int* selectedBitrateKbps )
 {
-    *selectedBitrateKbps = bitrateKbps;
-    return nxcip::NX_NO_ERROR;
+    // convert everything to bits per second first
+    int bitratebps = bitrateKbps * 1000;
+    int maxBitrate;
+    int ret = getMaxBitrate(&maxBitrate);
+    maxBitrate *= 1000;
+    int bitrateClamped = std::min<int>(std::max<int>(bitratebps, 0), maxBitrate);
+    m_videoCodecContext.setBitrate(bitrateClamped);
+    if (m_streamReader)
+        m_streamReader->setBitrate(bitrateClamped);
+    *selectedBitrateKbps = bitrateClamped / 1000;
+    return ret;
 }
 
 nxcip::StreamReader* MediaEncoder::getLiveStreamReader()
 {
-    if( !m_streamReader.get() )
-        m_streamReader.reset( new StreamReader(
+    if (!m_streamReader)
+    {
+        m_streamReader.reset(new StreamReader(
             &m_refManager,
             m_timeProvider,
             m_cameraManager->info(),
-            m_encoderNumber ) );
+            m_encoderNumber,
+            m_videoCodecContext));
+    }
 
     m_streamReader->addRef();
     return m_streamReader.get();
@@ -140,6 +176,17 @@ void MediaEncoder::updateCameraInfo( const nxcip::CameraInfo& info )
 {
     if( m_streamReader.get() )
         m_streamReader->updateCameraInfo( info );
+}
+
+void MediaEncoder::setVideoCodecID (nxcip::CompressionType codecID)
+{
+    m_videoCodecContext.setCodecID(codecID);
+}
+
+QString MediaEncoder::decodeCameraInfoUrl() const
+{
+    QString url = QString(m_cameraManager->info().url).mid(9);
+    return nx::utils::Url::fromPercentEncoding(url.toLatin1());
 }
 
 
