@@ -92,7 +92,7 @@ void AbstractCommunicatingSocket::pleaseStopSync(bool /*checkForLocks*/)
     else
     {
         std::promise<void> stopped;
-        pleaseStop([this, &stopped]() { stopped.set_value(); });
+        pleaseStop([&stopped]() { stopped.set_value(); });
         stopped.get_future().wait();
     }
 }
