@@ -10,7 +10,7 @@ from framework.waiting import wait_for_true
 log = logging.getLogger(__name__)
 
 
-def check_servers_online(server):
+def servers_is_online(server):
     servers_list = server.api.ec2.getMediaServersEx.GET()
     s_guid = get_server_id(server.api)
     this_servers = [v for v in servers_list if v['id'] == s_guid and v['status'] == 'Online']
@@ -18,7 +18,7 @@ def check_servers_online(server):
     return len(this_servers) == 1 and len(other_servers) != 0
 
 
-def check_neighbor_offline(server):
+def neighbor_is_offline(server):
     servers_list = server.api.ec2.getMediaServersEx.GET()
     s_guid = get_server_id(server.api)
     this_servers = [v for v in servers_list if v['id'] == s_guid and v['status'] == 'Online']
@@ -27,26 +27,26 @@ def check_neighbor_offline(server):
     return len(this_servers) == 1 and other_servers == other_offline_servers
 
 
-def test_change_local_system_id(two_merged_linux_mediaservers):
-    one, two = two_merged_linux_mediaservers
+def test_change_local_system_id(two_merged_mediaservers):
+    one, two = two_merged_mediaservers
     wait_for_true(
-        lambda: check_servers_online(one),
-        "{} and {} should be online".format(one, two),
+        lambda: servers_is_online(one),
+        "{} and {} are online".format(one, two),
         timeout_sec=10)
     wait_for_true(
-        lambda: check_servers_online(two),
-        "{} and {} should be online".format(two, one),
+        lambda: servers_is_online(two),
+        "{} and {} are online".format(two, one),
         timeout_sec=10)
     new_local_system_id = generator.generate_server_guid(1, True)
     one.api.api.configure.POST(localSystemId=new_local_system_id)
     assert get_local_system_id(one.api) == uuid.UUID(new_local_system_id)
     wait_for_true(
-        lambda: check_neighbor_offline(one),
-        "{} should be offline for {}".format(two, one),
+        lambda: neighbor_is_offline(one),
+        "{} marks {} as offline".format(one, two),
         timeout_sec=10)
     wait_for_true(
-        lambda: check_neighbor_offline(two),
-        "{} should be offline for {}".format(one, two),
+        lambda: neighbor_is_offline(two),
+        "{} marks {} as offline".format(two, one),
         timeout_sec=10)
 
     assert not one.installation.list_core_dumps()
