@@ -54,6 +54,13 @@ HintButton::HintButton(QWidget* parent):
     setFixedSize(hintSize);
     // For hovering stuff
     setMouseTracking(true);
+
+    connect(this, &QAbstractButton::clicked, this,
+        [this]()
+        {
+            if (hasHelpTopic())
+                QnHelpHandler::openHelpTopic(getHelpTopicId());
+        });
 }
 
 HintButton* HintButton::hintThat(QGroupBox* groupBox)
@@ -183,7 +190,9 @@ void HintButton::paintEvent(QPaintEvent* event)
     // I would like to keep it here for some time.
     //drawDebugRhombus(&painter, rect());
 
-    QPixmap& pixmap = m_isHovered ? m_highlighted : m_normal;
+    bool highlight = isDown() ? false : m_isHovered;
+
+    QPixmap& pixmap = highlight ? m_highlighted : m_normal;
     if (!pixmap.isNull())
     {
         // Always center pixmap
@@ -192,12 +201,6 @@ void HintButton::paintEvent(QPaintEvent* event)
             painter.setOpacity(0.3);
         painter.drawPixmap(centeredCorner, pixmap);
     }
-}
-
-void HintButton::mouseReleaseEvent(QMouseEvent *event)
-{
-    if (hasHelpTopic())
-        QnHelpHandler::openHelpTopic(getHelpTopicId());
 }
 
 void HintButton::enterEvent(QEvent* event)
