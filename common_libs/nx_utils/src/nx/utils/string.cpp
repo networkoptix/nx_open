@@ -44,7 +44,7 @@ qint64 parseDateTime(const QString& dateTimeStr)
     static const qint64 MS_PER_SEC = 1000;
     static const qint64 USEC_PER_MS = 1000;
 
-    if (dateTimeStr.toLower().trimmed() == lit("now"))
+    if (dateTimeStr.toLower().trimmed() == "now")
     {
         return DATETIME_NOW;
     }
@@ -537,7 +537,7 @@ QString removeMnemonics(QString text)
      * Regular expression is:
      * (not match '&') match '&' (not match whitespace or '&')
      */
-    return text.remove(QRegularExpression(lit("(?<!&)&(?!([\\s&]|$))")));
+    return text.remove(QRegularExpression(QStringLiteral("(?<!&)&(?!([\\s&]|$))")));
 }
 
 template <class T, class T2>

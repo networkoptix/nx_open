@@ -15,7 +15,7 @@ namespace {
 // Searches for bundle path. Bundle path should be a folder with ".app" ending
 QString getBundlePath(const QString& applicationPath)
 {
-    static const auto kBundleSuffix = lit(".app");
+    static const QString kBundleSuffix = ".app";
 
     auto dir = QDir(applicationPath);
     while(!dir.dirName().endsWith(kBundleSuffix) && !dir.dirName().isEmpty())
@@ -44,7 +44,7 @@ bool isBundleExist(const QString& bundleId)
     for (int i = 0; i != count; ++i)
     {
         const auto path = cf::QnCFUrl::toString(urls.at<CFURLRef>(i));
-        if (path.startsWith(lit("file:///Volumes"))) //< Excludes systems from mounted 'dmg' disks
+        if (path.startsWith("file:///Volumes")) //< Excludes systems from mounted 'dmg' disks
             --realCount;
     }
     return (realCount > 0);
@@ -109,7 +109,7 @@ bool nx::vms::utils::registerSystemUriProtocolHandler(
             targetVersion = handlerVersion;
     }
 
-    const auto handlerBundleId = lit("%1%2").arg(
+    const auto handlerBundleId = QString("%1%2").arg(
         macHandlerBundleIdBase, targetVersion.toString());
 
     if (targetVersion == version && !registerAsLaunchService(applicationBinaryPath))

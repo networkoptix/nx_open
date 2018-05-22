@@ -101,14 +101,15 @@ public:
         AbstractResourceWriter* const out) const override
     {
         #if defined(NX_STREE_ENABLE_DEBUG_LOGGING)
-            NX_LOG(lit("Stree. Condition. Selecting child by resource %1").arg(m_matchResId), cl_logDEBUG2);
+            NX_VERBOSE(this, lm("Condition. Selecting child by resource %1").arg(m_matchResId));
         #endif
 
         QVariant value;
         if (!in.get(m_matchResId, &value))
         {
             #if defined(NX_STREE_ENABLE_DEBUG_LOGGING)
-                NX_LOG(lit("Stree. Condition. Resource (%1) not found in input data").arg(m_matchResId), cl_logDEBUG2);
+                NX_VERBOSE(this,
+                    lm("Condition. Resource (%1) not found in input data").arg(m_matchResId));
             #endif
             return;
         }
@@ -119,14 +120,15 @@ public:
         if (it == m_children.end())
         {
             #if defined(NX_STREE_ENABLE_DEBUG_LOGGING)
-                NX_LOG(lit("Stree. Condition. Could not find child by value %1").arg(value.toString()), cl_logDEBUG2);
+                NX_VERBOSE(this,
+                    lm("Condition. Could not find child by value %1").arg(value.toString()));
             #endif
             return;
         }
 
         #if defined(NX_STREE_ENABLE_DEBUG_LOGGING)
-            NX_LOG(lm("Stree. Condition. Found child with value %1 by search value %2")
-                .arg(it->first).arg(value.toString()), cl_logDEBUG2);
+            NX_VERBOSE(this, lm("Condition. Found child with value %1 by search value %2")
+                .arg(it->first).arg(value.toString()));
         #endif
         it->second->get(in, out);
     }

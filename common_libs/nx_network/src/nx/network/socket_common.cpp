@@ -52,7 +52,7 @@ HostAddress::HostAddress(
 const HostAddress HostAddress::localhost(
     QString("localhost"), in4addr_loopback, in6addr_loopback);
 
-const HostAddress HostAddress::anyHost(*ipV4from(lit("0.0.0.0")));
+const HostAddress HostAddress::anyHost(*ipV4from("0.0.0.0"));
 
 HostAddress::HostAddress(const in_addr& addr):
     m_ipV4(addr)

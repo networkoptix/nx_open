@@ -1,7 +1,5 @@
 #include "xml.h"
 
-#include <nx/utils/string.h>
-
 namespace QnXml {
 
 QString replaceProhibitedChars(const QString& s)
@@ -21,7 +19,7 @@ QString replaceProhibitedChars(const QString& s)
                 result.reserve(s.size() + 100); //< Optimize potential re-allocations.
                 result = s.left(i); //< Copy all the preceding chars (they are valid).
             }
-            result.append(lit("\\u%1").arg(
+            result.append(QStringLiteral("\\u%1").arg(
                 c.unicode(), /*fieldWidth*/ 4, /*base*/ 16, /*fillChar*/ QChar('0')));
         }
         else

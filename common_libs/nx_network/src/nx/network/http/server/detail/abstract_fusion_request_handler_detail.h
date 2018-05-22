@@ -240,8 +240,8 @@ private:
                 FusionRequestErrorClass::badRequest,
                 QnLexical::serialized(FusionRequestErrorDetail::deserializationError),
                 FusionRequestErrorDetail::deserializationError,
-                lit("Error deserializing input of type %1").
-                arg(Qn::serializationFormatToHttpContentType(inputDataFormat)));
+                QStringLiteral("Error deserializing input of type %1").
+                    arg(Qn::serializationFormatToHttpContentType(inputDataFormat)));
             this->requestCompleted(std::move(result));
             return;
         }

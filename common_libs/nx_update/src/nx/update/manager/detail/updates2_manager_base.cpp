@@ -8,6 +8,7 @@
 #include <nx/fusion/model_functions.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/scope_guard.h>
+#include <nx/utils/literal.h>
 #include <api/global_settings.h>
 #include <nx/vms/common/p2p/downloader/downloader.h>
 

@@ -8,7 +8,8 @@
 
 namespace {
 
-const QString kWindowsRegistryPath = lit("HKEY_CURRENT_USER\\Software\\Microsoft\\Windows\\CurrentVersion\\Run");
+const QString kWindowsRegistryPath(
+    "HKEY_CURRENT_USER\\Software\\Microsoft\\Windows\\CurrentVersion\\Run");
 
 } // namespace
 

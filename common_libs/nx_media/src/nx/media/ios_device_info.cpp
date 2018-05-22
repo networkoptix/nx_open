@@ -16,7 +16,7 @@ IosDeviceInformation iosDeviceInformation()
 
     const auto& infoString = QString::fromLatin1(systemInfo.machine);
 
-    QRegExp infoRegExp(lit("([^\\d]+)(\\d+),(\\d+)"));
+    QRegExp infoRegExp("([^\\d]+)(\\d+),(\\d+)");
 
     if (!infoRegExp.exactMatch(infoString))
         return IosDeviceInformation();
@@ -24,9 +24,9 @@ IosDeviceInformation iosDeviceInformation()
     IosDeviceInformation info;
 
     const auto& type = infoRegExp.cap(1);
-    if (type == lit("iPhone"))
+    if (type == "iPhone")
         info.type = IosDeviceInformation::Type::iPhone;
-    else if (type == lit("iPad"))
+    else if (type == "iPad")
         info.type = IosDeviceInformation::Type::iPad;
 
     info.majorVersion = infoRegExp.cap(2).toInt();

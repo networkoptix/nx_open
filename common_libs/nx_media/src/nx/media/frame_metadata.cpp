@@ -5,7 +5,7 @@ namespace media {
 
 namespace {
 
-static const QString kMetadataFlagsKey(lit("metadata"));
+static const QString kMetadataFlagsKey("metadata");
 
 } // namespace
 FrameMetadata::FrameMetadata():

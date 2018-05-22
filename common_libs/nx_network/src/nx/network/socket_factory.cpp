@@ -85,11 +85,11 @@ QString SocketFactory::toString(SocketType type)
     switch (type)
     {
         case SocketType::cloud:
-            return lit("cloud");
+            return "cloud";
         case SocketType::tcp:
-            return lit("tcp");
+            return "tcp";
         case SocketType::udt:
-            return lit("udt");
+            return "udt";
     }
 
     NX_ASSERT(false, lm("Unrecognized socket type: ").arg(static_cast<int>(type)));
@@ -98,11 +98,11 @@ QString SocketFactory::toString(SocketType type)
 
 SocketFactory::SocketType SocketFactory::stringToSocketType(QString type)
 {
-    if (type.toLower() == lit("cloud"))
+    if (type.toLower() == "cloud")
         return SocketType::cloud;
-    if (type.toLower() == lit("tcp"))
+    if (type.toLower() == "tcp")
         return SocketType::tcp;
-    if (type.toLower() == lit("udt"))
+    if (type.toLower() == "udt")
         return SocketType::udt;
 
     NX_ASSERT(false, lm("Unrecognized socket type: ").arg(type));
@@ -160,7 +160,7 @@ void SocketFactory::setIpVersion(const QString& ipVersion)
     if (ipVersion.isEmpty())
         return;
 
-    NX_LOG(lit("SocketFactory::setIpVersion( %1 )").arg(ipVersion), cl_logALWAYS);
+    NX_LOG(lm("SocketFactory::setIpVersion(%1)").arg(ipVersion), cl_logALWAYS);
 
     if (ipVersion == QLatin1String("4"))
     {

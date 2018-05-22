@@ -3,6 +3,7 @@
 #include <nx/utils/app_info.h>
 #include <nx/utils/argument_parser.h>
 #include <nx/utils/std/cpp14.h>
+#include <nx/utils/string.h>
 
 #include "log_main.h"
 
@@ -45,7 +46,7 @@ void initialize(
             fileSettings.count = settings.maxBackupCount;
             fileSettings.name = settings.directory.isEmpty()
                 ? baseName
-                : (settings.directory + lit("/") + baseName);
+                : (settings.directory + "/" + baseName);
 
             logger->setWriter(std::make_unique<File>(fileSettings));
         }
@@ -55,7 +56,7 @@ void initialize(
         }
     }
 
-    const nx::utils::log::Tag kStart(lit("START"));
+    const nx::utils::log::Tag kStart(QLatin1String("START"));
     const auto write = [&](const Message& message) { logger->log(Level::always, kStart, message); };
     write(QByteArray(80, '='));
     write(lm("%1 started, version: %2, revision: %3").args(
@@ -68,7 +69,7 @@ void initialize(
     write(lm("Log level: %1").arg(settings.level));
     write(lm("Log file size: %2, backup count: %3, file: %4").args(
         nx::utils::bytesToString(settings.maxFileSize), settings.maxBackupCount,
-        filePath ? *filePath : lit("-")));
+        filePath ? *filePath : QString("-")));
 }
 
 void initializeGlobally(const nx::utils::ArgumentParser& arguments)

@@ -127,7 +127,7 @@ DBResult InstanceController::configureSqliteInstance(
     //setLockingModeQuery.prepare("PRAGMA locking_mode = NORMAL");
     //if (!setLockingModeQuery.exec())
     //{
-    //    NX_LOG(lit("sqlite configure. Failed to set locking mode. %1")
+    //    NX_LOG(lm("sqlite configure. Failed to set locking mode. %1")
     //        .arg(setLockingModeQuery.lastError().text()), cl_logWARNING);
     //    return DBResult::ioError;
     //}

@@ -263,8 +263,9 @@ public:
         const auto hostName = parseLocalHostname(systemId);
 
         nx::utils::Url result;
-        result.setScheme(
-            protocol == SystemUri::Protocol::Native ? lit("http") : protocolToString[protocol]);
+        result.setScheme(protocol == SystemUri::Protocol::Native
+            ? QString("http")
+            : protocolToString[protocol]);
         result.setHost(hostName.first);
         result.setPort(hostName.second);
         result.setUserName(authenticator.user);
