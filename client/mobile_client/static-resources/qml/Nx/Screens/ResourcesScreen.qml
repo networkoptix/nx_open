@@ -112,6 +112,13 @@ Page
         active: searchToolBar.text && searchToolBar.opacity == 1.0
         sourceComponent: searchListComponent
         enabled: d.enabled
+
+        Binding
+        {
+            target: searchListLoader.item
+            property: "filterString"
+            value: searchToolBar.text
+        }
     }
 
     Component
@@ -120,6 +127,9 @@ Page
 
         Rectangle
         {
+            property string filterString
+            onFilterStringChanged: camerasList.model.setFilterFixedString(filterString)
+
             color: ColorTheme.windowBackground
 
             CamerasList
@@ -130,12 +140,6 @@ Page
                 anchors.margins: 8
                 displayMarginBeginning: 8
                 displayMarginEnd: 8
-
-                Connections
-                {
-                    target: searchToolBar
-                    onTextChanged: camerasList.model.setFilterFixedString(searchToolBar.text)
-                }
 
                 ScrollIndicator.vertical: ScrollIndicator
                 {
