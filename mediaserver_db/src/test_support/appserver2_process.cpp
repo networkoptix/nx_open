@@ -139,14 +139,13 @@ int Appserver2Process::exec()
 
     AuditManager auditManager(m_commonModule.get());
     using namespace nx::vms::network;
-    ReverseConnectionManager serverConnector(&tcpListener);
 
     std::unique_ptr<ec2::LocalConnectionFactory>
         ec2ConnectionFactory(new ec2::LocalConnectionFactory(
             m_commonModule.get(),
             Qn::PT_Server,
             settings.isP2pMode(),
-            &serverConnector));
+            &tcpListener));
 
     std::map<QString, QVariant> confParams;
     ec2ConnectionFactory->setConfParams(std::move(confParams));

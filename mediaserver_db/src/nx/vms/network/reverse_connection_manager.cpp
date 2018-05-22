@@ -30,9 +30,12 @@ ReverseConnectionManager::ReverseConnectionManager(QnHttpConnectionListener* tcp
     m_tcpListener(tcpListener)
 {
     tcpListener->addHandler<ReverseConnectionListener>("HTTP", kReverseConnectionListenerPath.mid(1), this);
-    auto connection = commonModule()->ec2Connection();
+}
+
+void ReverseConnectionManager::startReceivingNotifications(ec2::AbstractECConnection* connection)
+{
     connect(
-        connection.get(), &ec2::AbstractECConnection::reverseConnectionRequested,
+        connection, &ec2::AbstractECConnection::reverseConnectionRequested,
         this, &ReverseConnectionManager::at_reverseConnectionRequested);
 }
 
@@ -78,8 +81,9 @@ void ReverseConnectionManager::at_reverseConnectionRequested(
         httpClient->setSendTimeout(kReverseConnectionTimeout);
         httpClient->setResponseReadTimeout(kReverseConnectionTimeout);
 
-        httpClient->doGet(
+        httpClient->doConnect(
             kReverseConnectionListenerPath,
+            commonModule()->moduleGUID().toSimpleByteArray(),
             std::bind(&ReverseConnectionManager::onHttpClientDone, this, httpClient.get()));
 
         m_runningHttpClients.insert(std::move(httpClient));
@@ -226,4 +230,3 @@ std::unique_ptr<nx::network::AbstractStreamSocket> ReverseConnectionManager::con
 } // namespace network
 } // namespace vms
 } // namespace nx
-

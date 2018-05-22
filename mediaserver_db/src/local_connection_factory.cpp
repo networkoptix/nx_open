@@ -53,15 +53,15 @@ LocalConnectionFactory::LocalConnectionFactory(
     QnCommonModule* commonModule,
     Qn::PeerType peerType,
 	bool isP2pMode,
-    nx::vms::network::AbstractServerConnector* serverConnector)
+    QnHttpConnectionListener* tcpListener)
 	:
     AbstractECConnectionFactory(commonModule),
-	// dbmanager is initialized by direct connection.
 
 	m_jsonTranSerializer(new QnJsonTransactionSerializer()),
 	m_ubjsonTranSerializer(new QnUbjsonTransactionSerializer()),
+    m_serverConnector(new nx::vms::network::ReverseConnectionManager(tcpListener)),
     m_timeSynchronizationManager(new nx::time_sync::ServerTimeSyncManager(
-        commonModule, serverConnector)),
+        commonModule, m_serverConnector.get())),
 	m_terminated(false),
 	m_runningRequests(0),
 	m_sslEnabled(false),
@@ -99,9 +99,6 @@ LocalConnectionFactory::LocalConnectionFactory(
 	// TODO: #Elric #EC2 register in a proper place!
 	// Registering ec2 types with Qt meta-type system.
 	qRegisterMetaType<QnTransactionTransportHeader>("QnTransactionTransportHeader");
-
-	// TODO: Add comment why this code is commented out.
-	//m_transactionMessageBus->start();
 }
 
 void LocalConnectionFactory::shutdown()
@@ -115,6 +112,8 @@ void LocalConnectionFactory::shutdown()
 
 	pleaseStop();
 	join();
+
+    messageBus()->removeHandler(m_directConnection->notificationManager());
 }
 
 LocalConnectionFactory::~LocalConnectionFactory()
@@ -1666,8 +1665,11 @@ int LocalConnectionFactory::establishDirectConnection(
 					m_serverQueryProcessor.get(),
 					connectionInfo,
 					url));
+            messageBus()->setHandler(m_directConnection->notificationManager());
+
 			if (m_directConnection->initialized())
 			{
+                m_serverConnector->startReceivingNotifications(m_directConnection.get());
 			}
 			else
 			{

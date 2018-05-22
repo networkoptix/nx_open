@@ -387,10 +387,11 @@ void QnTcpListener::processNewConnection(std::unique_ptr<nx::network::AbstractSt
     d->ddosWarned = false;
     NX_VERBOSE(this, lit("New client connection from %1")
         .arg(socket->getForeignAddress().address.toString()));
-    QnTCPConnectionProcessor* processor = createRequestProcessor(
-        QSharedPointer<nx::network::AbstractStreamSocket>(socket.release()));
-    socket->setRecvTimeout(processor->getSocketTimeout());
-    socket->setSendTimeout(processor->getSocketTimeout());
+    // Convert socket to a SharedPtr.
+    auto socketPtr = QSharedPointer<nx::network::AbstractStreamSocket>(socket.release());
+    QnTCPConnectionProcessor* processor = createRequestProcessor(socketPtr);
+    socketPtr->setRecvTimeout(processor->getSocketTimeout());
+    socketPtr->setSendTimeout(processor->getSocketTimeout());
 
     QnMutexLocker lock(&d->connectionMtx);
     d->connections << processor;

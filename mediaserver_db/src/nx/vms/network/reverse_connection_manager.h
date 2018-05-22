@@ -14,6 +14,7 @@
 #include <nx/vms/network/abstract_server_connector.h>
 #include <nx_ec/data/api_reverse_connection_data.h>
 #include <nx/network/http/http_async_client.h>
+#include <nx_ec/ec_api.h>
 
 namespace nx {
 namespace vms {
@@ -28,6 +29,8 @@ class ReverseConnectionManager:
 public:
     ReverseConnectionManager(QnHttpConnectionListener* tcpListener);
     virtual ~ReverseConnectionManager() override;
+
+    void startReceivingNotifications(ec2::AbstractECConnection* connection);
 
     bool addIncomingTcpConnection(
         const QString& url, 

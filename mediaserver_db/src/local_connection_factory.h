@@ -14,6 +14,7 @@
 #include "settings.h"
 #include <nx/time_sync/time_sync_manager.h>
 #include <nx/vms/network/abstract_server_connector.h>
+#include <nx/vms/network/reverse_connection_manager.h>
 
 namespace ec2 {
 
@@ -31,7 +32,7 @@ public:
         QnCommonModule* commonModule,
         Qn::PeerType peerType,
         bool isP2pMode,
-        nx::vms::network::AbstractServerConnector* serverConnector);
+        QnHttpConnectionListener* tcpListener);
     virtual ~LocalConnectionFactory();
 
 	virtual void pleaseStop() override;
@@ -73,6 +74,7 @@ private:
 
 	std::unique_ptr<QnJsonTransactionSerializer> m_jsonTranSerializer;
 	std::unique_ptr<QnUbjsonTransactionSerializer> m_ubjsonTranSerializer;
+    std::unique_ptr<nx::vms::network::ReverseConnectionManager> m_serverConnector;
     std::unique_ptr<nx::time_sync::TimeSyncManager> m_timeSynchronizationManager;
 
 	std::unique_ptr<detail::QnDbManager> m_dbManager;

@@ -24,8 +24,6 @@ void ReverseConnectionListener::run()
     Q_D(QnTCPConnectionProcessor);
 
     parseRequest();
-
-    const QString mServerAddress = d->socket->getForeignAddress().address.toString();
     sendResponse(nx::network::http::StatusCode::ok, QByteArray());
 
     auto guid = nx::network::http::getHeaderValue(d->request.headers, Qn::PROXY_SENDER_HEADER_NAME);

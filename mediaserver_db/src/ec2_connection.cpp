@@ -23,8 +23,6 @@ namespace ec2
         // todo: #singletone. Only one connection for each connection factory allowed now
         m_isInitialized = queryProcessor->getDb()->init(dbUrl);
 
-        connectionFactory->messageBus()->setHandler(notificationManager());
-
         // NOTE: Ec2StaticticsReporter can only be created after connection is established
         if (m_isInitialized)
         {
@@ -36,7 +34,6 @@ namespace ec2
 
     Ec2DirectConnection::~Ec2DirectConnection()
     {
-        m_connectionFactory->messageBus()->removeHandler(notificationManager());
     }
 
     ec2::detail::QnDbManager* Ec2DirectConnection::getDb() const
