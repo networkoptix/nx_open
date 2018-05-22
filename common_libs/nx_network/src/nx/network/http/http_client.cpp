@@ -25,7 +25,8 @@ HttpClient::HttpClient():
 HttpClient::~HttpClient()
 {
     pleaseStop();
-    m_asyncHttpClient->pleaseStopSync(false);
+    if (m_asyncHttpClient)
+        m_asyncHttpClient->pleaseStopSync(false);
 }
 
 void HttpClient::pleaseStop()

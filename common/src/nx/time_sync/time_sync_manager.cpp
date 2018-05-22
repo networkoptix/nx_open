@@ -100,6 +100,7 @@ void TimeSyncManager::loadTimeFromLocalClock()
 bool TimeSyncManager::loadTimeFromServer(const QnRoute& route)
 {
     auto socket = connectToRemoteHost(route);
+
     if (!socket)
     {
         NX_WARNING(this, 
@@ -109,8 +110,17 @@ bool TimeSyncManager::loadTimeFromServer(const QnRoute& route)
 
     auto httpClient = std::make_unique<nx::network::http::HttpClient>();
     httpClient->setSocket(std::move(socket));
-    nx::utils::Url url(lit("http://%1:%2%3").arg(route.addr.address.toString()).arg(route.addr.port).arg(kTimeSyncUrlPath));
-    //url.setPath(kTimeSyncUrlPath);
+    auto server = commonModule()->resourcePool()->getResourceById<QnMediaServerResource>(route.id);
+    if (!server)
+    {
+        NX_WARNING(this,
+            lm("Can't find server with id %1").arg(route.id));
+        return false;
+    }
+    nx::utils::Url url(server->getApiUrl());
+    url.setHost(route.addr.address.toString());
+    url.setPort(route.addr.port);
+    url.setPath(kTimeSyncUrlPath);
 
     nx::utils::ElapsedTimer timer;
     timer.restart();

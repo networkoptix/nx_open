@@ -64,6 +64,7 @@ private:
 
     struct SocketData
     {
+        SocketData() { tmpReadBuffer.reserve(32); }
         std::unique_ptr<nx::network::AbstractStreamSocket> socket;
         QByteArray tmpReadBuffer;
     };

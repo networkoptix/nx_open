@@ -27,9 +27,9 @@ void ReverseConnectionListener::run()
     sendResponse(nx::network::http::StatusCode::ok, QByteArray());
 
     auto guid = nx::network::http::getHeaderValue(d->request.headers, Qn::PROXY_SENDER_HEADER_NAME);
-    std::unique_ptr<nx::network::AbstractStreamSocket> socketPtr(d->socket.data());
-    if (m_reverseConnectionManager->addIncomingTcpConnection(guid, std::move(socketPtr)))
-        takeSocket();
+    auto socket = takeSocket();
+    
+    m_reverseConnectionManager->addIncomingTcpConnection(guid, socket);
 }
 
 } // namespace network

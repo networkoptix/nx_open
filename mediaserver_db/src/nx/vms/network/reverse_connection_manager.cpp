@@ -11,12 +11,14 @@
 #include <core/resource/media_server_resource.h>
 #include <nx/utils/log/log_main.h>
 #include <core/resource_management/resource_pool.h>
+#include <nx/network/http/custom_headers.h>
 
 namespace {
 
 static const int kProxyKeepAliveIntervalMs = 40 * 1000;
 static const int kProxyConnectionsToRequest = 3;
 static const std::chrono::seconds kReverseConnectionTimeout(10);
+static const std::chrono::minutes kPreperedSocketTimeout(1);
 static const QByteArray kReverseConnectionListenerPath("/proxy-reverse");
 
 } // namespace
@@ -80,10 +82,15 @@ void ReverseConnectionManager::at_reverseConnectionRequested(
 
         httpClient->setSendTimeout(kReverseConnectionTimeout);
         httpClient->setResponseReadTimeout(kReverseConnectionTimeout);
-
+        nx::utils::Url url(server->getApiUrl());
+        url.setHost(route.addr.address.toString());
+        url.setPort(route.addr.port);
+        url.setPath(kReverseConnectionListenerPath);
+        httpClient->addAdditionalHeader(
+            Qn::PROXY_SENDER_HEADER_NAME, commonModule()->moduleGUID().toSimpleByteArray());
         httpClient->doConnect(
+            url,
             kReverseConnectionListenerPath,
-            commonModule()->moduleGUID().toSimpleByteArray(),
             std::bind(&ReverseConnectionManager::onHttpClientDone, this, httpClient.get()));
 
         m_runningHttpClients.insert(std::move(httpClient));
@@ -97,20 +104,18 @@ void ReverseConnectionManager::onHttpClientDone(nx::network::http::AsyncClient* 
     {
         if (httpClient == itr->get())
         {
-            auto guard = makeScopeGuard(
-                [&]
-                {
-                    m_runningHttpClients.erase(itr);
-                });
-
             nx::network::http::AsyncClient::State state = httpClient->state();
             if (state == nx::network::http::AsyncClient::State::sFailed)
             {
                 NX_WARNING(this,
                     lm("Failed to establish reverse connection to the target server=%1").arg(httpClient->url()));
-                return;
             }
-            m_tcpListener->processNewConnection(httpClient->takeSocket());
+            else
+            {
+                m_tcpListener->processNewConnection(httpClient->takeSocket());
+            }
+            m_runningHttpClients.erase(itr);
+            break;
         }
     }
 }
@@ -180,11 +185,11 @@ bool ReverseConnectionManager::addIncomingTcpConnection(
     
     using namespace std::placeholders;
     socket->setNonBlockingMode(true);
-    socket->setRecvTimeout(kReverseConnectionTimeout);
+    socket->setRecvTimeout(kPreperedSocketTimeout);
     
     SocketData data;
     data.socket = std::move(socket);
-    socket->readSomeAsync(&data.tmpReadBuffer,
+    data.socket->readSomeAsync(&data.tmpReadBuffer,
         std::bind(&ReverseConnectionManager::at_socketReadTimeout, this, QnUuid(guid), socket.get(), _1, _2));
     
     socketPool->second.sockets.push_back(std::move(data));
