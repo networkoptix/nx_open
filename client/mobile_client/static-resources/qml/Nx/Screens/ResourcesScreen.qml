@@ -112,13 +112,6 @@ Page
         active: searchToolBar.text && searchToolBar.opacity == 1.0
         sourceComponent: searchListComponent
         enabled: d.enabled
-
-        Binding
-        {
-            target: searchListLoader.item
-            property: "filterString"
-            value: searchToolBar.text
-        }
     }
 
     Component
@@ -127,7 +120,7 @@ Page
 
         Rectangle
         {
-            property string filterString
+            property string filterString: searchToolBar.text
             onFilterStringChanged: camerasList.model.setFilterFixedString(filterString)
 
             color: ColorTheme.windowBackground
