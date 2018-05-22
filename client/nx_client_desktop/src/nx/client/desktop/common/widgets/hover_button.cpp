@@ -9,10 +9,6 @@
 #include <ui/style/nx_style.h>
 #include <ui/style/helper.h>
 
-namespace {
-    const int kControlBtn = Qt::LeftButton;
-} // namespace
-
 namespace nx {
 namespace client {
 namespace desktop {
@@ -38,7 +34,7 @@ void HoverButton::paintEvent(QPaintEvent* event)
 {
     QPainter painter(this);
     bool highlighted = false;
-    if (!m_isClicked)
+    if (!isDown())
         highlighted = m_isHovered;
 
     QPixmap& pixmap = highlighted ? m_highlighted : m_normal;
@@ -66,32 +62,6 @@ void HoverButton::leaveEvent(QEvent* event)
     {
         m_isHovered = false;
         update();
-    }
-}
-
-void HoverButton::mousePressEvent(QMouseEvent* event)
-{
-    bool clicked = rect().contains(event->pos()) && event->button() & kControlBtn;
-    if (m_isClicked != clicked)
-    {
-        m_isClicked = clicked;
-        update();
-
-        // Raise event
-        if (m_isClicked)
-            emit pressed();
-        else
-            emit released();
-    }
-}
-
-void HoverButton::mouseReleaseEvent(QMouseEvent* event)
-{
-    if (event->button() & kControlBtn)
-    {
-        m_isClicked = false;
-        update();
-        emit released();
     }
 }
 

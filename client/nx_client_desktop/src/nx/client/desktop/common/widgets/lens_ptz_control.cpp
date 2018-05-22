@@ -46,6 +46,11 @@ namespace {
         lit("buttons/arrow_up_hovered.png"),
         lit("buttons/arrow_down_hovered.png"),
     };
+
+    inline qreal length(const QPointF& point)
+    {
+        return qSqrt(QPointF::dotProduct(point, point));
+    }
 } // namespace
 
 namespace nx {
@@ -97,9 +102,9 @@ void LensPtzControl::updateState()
     // Auto return central handler if it is released
     if (m_state != StateHandlePtz)
     {
-        if (int len2 = QPointF::dotProduct(m_ptzHandler.position, m_ptzHandler.position))
+        auto distance = length(m_ptzHandler.position);
+        if (distance > 0)
         {
-            float distance = sqrt(len2);
             if (distance > kReturnSpeed)
             {
                 float newDistance = distance - kReturnSpeed;
@@ -190,15 +195,6 @@ void LensPtzControl::resizeEvent(QResizeEvent* event)
     m_buttons[ButtonUp].rect = centerRect.translated(0, -kButtonOffset);
     m_buttons[ButtonDown].rect = centerRect.translated(0, kButtonOffset);
 }
-
-/*
-void LensPtzControl::changeEvent(QEvent* event)
-{
-    if (event->type() == QEvent::FontChange)
-        updateGeometry();
-
-    base_type::changeEvent(event);
-}*/
 
 void LensPtzControl::mousePressEvent(QMouseEvent* event)
 {
@@ -356,7 +352,7 @@ void LensPtzControl::paintEvent(QPaintEvent* event)
 void LensPtzControl::drawRotationCircle(QPainter* painter, const QRectF& rect) const
 {
     QPointF center = rect.center();
-    QRectF centered(QPointF(0.f, 0.f), QSizeF(m_radius, m_radius) * 2);
+    QRectF centered(QPointF(0, 0), QSizeF(m_radius, m_radius) * 2);
     centered.moveCenter(center);
 
     // Drawing circle with border color.
@@ -375,7 +371,7 @@ void LensPtzControl::drawRotationCircle(QPainter* painter, const QRectF& rect) c
 void LensPtzControl::drawRotationValue(QPainter* painter, const QRectF& rect, float rotation) const
 {
     QPointF center = rect.center();
-    QRectF centered(QPointF(0.f, 0.f), QSizeF(m_radius, m_radius) * 2);
+    QRectF centered(QPointF(0, 0), QSizeF(m_radius, m_radius) * 2);
     centered.moveCenter(center);
     // Drawing current 'value'.
     QColor fillColor = palette().color(QPalette::WindowText);
@@ -471,12 +467,12 @@ bool LensPtzControl::Button::setHover(bool value)
 
 bool LensPtzControl::Button::picks(const QPointF& point) const
 {
-    return rect.contains(point.x(), point.y());
+    return rect.contains(point.toPoint());
 }
 
 bool LensPtzControl::Handler::dragTo(const QPointF& point)
 {
-    qreal distance = qSqrt(QPointF::dotProduct(point, point));
+    const auto distance = length(point);
 
     position = point;
     if (distance > 0)
