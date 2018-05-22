@@ -50,7 +50,16 @@
                 border-radius: 25px;
             }
 
-            &:hover {
+            &:hover,
+            &:active,
+            &:focus {
+                box-shadow: none;
+                outline: none !important;
+                outline: 0 !important;
+            }
+
+            &:hover,
+            &:focus {
                 .close-content {
                     background-color: $additional_light2;
                 }
