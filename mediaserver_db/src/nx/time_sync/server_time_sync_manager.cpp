@@ -235,7 +235,7 @@ void ServerTimeSyncManager::updateTime()
                 return;
             if (loadTimeFromServer(route))
             {
-                m_timeLoadFromServer == route.id;
+                m_timeLoadFromServer = route.id;
                 m_lastNetworkSyncTime.restart();
             }
         }
