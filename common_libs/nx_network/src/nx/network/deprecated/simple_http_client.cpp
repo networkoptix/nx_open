@@ -19,17 +19,17 @@ QString toString(CLHttpStatus status)
     switch (status)
     {
         case CL_HTTP_SUCCESS:
-            return lm("%1 (OK)").arg(status);
+            return QStringLiteral("%1 (OK)").arg(status);
         case CL_HTTP_REDIRECT:
-            return lm("%1 (REDIRECT)").arg(status);
+            return QStringLiteral("%1 (REDIRECT)").arg(status);
         case CL_HTTP_BAD_REQUEST:
-            return lm("%1 (BAD REQUEST)").arg(status);
+            return QStringLiteral("%1 (BAD REQUEST)").arg(status);
         case CL_HTTP_AUTH_REQUIRED:
-            return lm("%1 (AUTH REQUIRED)").arg(status);
+            return QStringLiteral("%1 (AUTH REQUIRED)").arg(status);
         case CL_HTTP_NOT_FOUND:
-            return lm("%1 (NOT FOUND)").arg(status);
+            return QStringLiteral("%1 (NOT FOUND)").arg(status);
         default:
-            return lm("%1 (UNKNOWN)").arg(status);
+            return QStringLiteral("%1 (UNKNOWN)").arg(status);
     }
 }
 
