@@ -2,6 +2,13 @@
 <!DOCTYPE TS>
 <TS version="2.1" language="en_US" sourcelanguage="en">
 <context>
+    <name>ActionButtonsPanel</name>
+    <message>
+        <source>Press and hold to</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>CameraItem</name>
     <message>
         <source>Select camera</source>
