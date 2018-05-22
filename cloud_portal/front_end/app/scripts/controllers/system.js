@@ -234,17 +234,13 @@ angular.module('cloudApp')
                 $location.path("/systems");
             }
 
-            $scope.$on('$destroy', function() {
-                cancelSubscription();
-               if( $scope.userDisconnectSystem === undefined){
-                   dialogs.dismissNotifications();
-               }
-            });
-
             var cancelSubscription = $scope.$on("unauthorized_" + $routeParams.systemId, connectionLost);
 
-            $scope.$on('$destroy', function () {
+            $scope.$on('$destroy', function() {
                 cancelSubscription();
+               if( typeof($scope.userDisconnectSystem) === 'undefined'){
+                   dialogs.dismissNotifications();
+               }
             });
         }
     ]);
