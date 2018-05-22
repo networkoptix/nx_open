@@ -40,12 +40,6 @@ class Wait(object):
     def sleep(self):
         time.sleep(self.delay_sec)
 
-    def sleep_and_continue(self):
-        if self.again():
-            self.sleep()
-            return True
-        return False
-
 
 def retry_on_exception(func, exception_type, until, timeout_sec=10):
     wait = Wait(until, timeout_sec=timeout_sec)
