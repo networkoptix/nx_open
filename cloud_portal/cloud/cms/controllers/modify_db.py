@@ -243,7 +243,7 @@ def get_records_for_version(version):
 
 def is_valid_file_type(file_type, meta_types):
     for meta_type in meta_types.split(','):
-        if meta_type in file_type:
+        if meta_type.strip() in file_type:
             return False
     return True
 
