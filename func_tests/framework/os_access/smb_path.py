@@ -53,6 +53,7 @@ class SMBPath(FileSystemPath, PureWindowsPath):
         with closing(NetBIOS(broadcast=False)) as client:
             server_name = client.queryIPForName(
                 str(cls._name_service_address), port=cls._name_service_port)
+            # TODO: Check and retry when got None.
         return server_name[0]
 
     @classmethod
