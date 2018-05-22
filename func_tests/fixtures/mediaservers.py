@@ -68,7 +68,7 @@ def two_merged_mediaservers(two_separate_mediaservers):
 
 @pytest.fixture()
 def one_mediaserver(one_vm, mediaserver_factory):
-    with mediaserver_factory.allocated_mediaserver('single', one_vm) as mediaserver:
+    with mediaserver_factory.allocated_mediaserver(one_vm) as mediaserver:
         yield mediaserver
 
 
