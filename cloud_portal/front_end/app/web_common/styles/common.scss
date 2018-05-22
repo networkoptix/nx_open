@@ -97,10 +97,6 @@ placeholder{ /* Hack to have full-screen */
         line-height:30px;
         color: $light;
 
-        @include media-breakpoint-down(md) {
-            top: 40%;
-        }
-
         &>*{
             text-align: center;
             margin: auto;

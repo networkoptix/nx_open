@@ -233,7 +233,9 @@ table.webclient-window>tbody>tr>td{
 
   .icons-right{
     float: right;
-    display: inline-block;
+    display: flex;
+    align-items: center;
+    justify-items: center;
     position: relative;
     cursor: pointer;
 
@@ -270,8 +272,9 @@ table.webclient-window>tbody>tr>td{
     }
 
     &>*{
-      text-align: center;
-      display: inline-block;
+      display: flex;
+      align-items: center;
+      justify-content: center;
     }
   }
 

@@ -480,8 +480,12 @@ select {
     background-color: $brand_l2 !important;
   }
 
-  .webclient-panel .dropdown-menu > li > a.active{
-    background-color: $brand_l1 !important;
+  .webclient-panel .dropdown-menu {
+    box-shadow: none;
+
+    & > li > a.active {
+      background-color: $brand_l1 !important;
+    }
   }
 
   ///////////////////////
