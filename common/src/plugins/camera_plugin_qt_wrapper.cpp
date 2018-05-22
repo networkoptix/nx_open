@@ -108,13 +108,9 @@ namespace nxcip_qt
             tempModelList[i] = new char[nxcip::MAX_MODEL_NAME_SIZE];
 
         //requesting list
-        int actualCount = count;
-        m_intf->getReservedModelList( tempModelList, &actualCount );
-        if( count == actualCount )
-        {
-            for( int i = 0; i < count; ++i )
-                modelList.push_back( QString::fromUtf8(tempModelList[i]) );
-        }
+        m_intf->getReservedModelList( tempModelList, &count );
+        for( int i = 0; i < count; ++i )
+            modelList.push_back( QString::fromUtf8(tempModelList[i]) );
 
         for( int i = 0; i < count; ++i )
             delete[] tempModelList[i];
