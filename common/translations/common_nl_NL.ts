@@ -6,7 +6,7 @@
     <message>
       <source>Language Name</source>
       <extracomment>Language name that will be displayed to user. Must not be empty.</extracomment>
-      <translation>Dutch</translation>
+      <translation type="unfinished">Language Name</translation>
     </message>
   </context>
   <context>
@@ -21,11 +21,11 @@
     </message>
     <message>
       <source>Cannot create database backup.</source>
-      <translation>Kan database backup niet maken.</translation>
+      <translation>Kan de database backup niet maken.</translation>
     </message>
     <message>
       <source>System name is not configured yet.</source>
-      <translation>Systeemnaam is nog niet geconfigureerd.</translation>
+      <translation>De systeemnaam is nog niet geconfigureerd.</translation>
     </message>
     <message>
       <source>Unknown error.</source>
@@ -45,7 +45,7 @@
     </message>
     <message>
       <source>System was not found.</source>
-      <translation>Systeem werd niet gevonden.</translation>
+      <translation>Het systeem werd niet gevonden.</translation>
     </message>
     <message>
       <source>The discovered System %1 has an incompatible version %2.</source>
@@ -89,7 +89,7 @@
     <message>
       <source>%1 System can only be merged with non-%1. System name and password are taken from %1 System.</source>
       <comment>%1 is the short cloud name (like &apos;Cloud&apos;)</comment>
-      <translation type="unfinished">%1 System can only be merged with non-%1. System name and password are taken from %1 System.</translation>
+      <translation>%1 Systeem kan alleen worden samengevoegd met niet-%1. De systeemnaam en het wachtwoord zijn overgenomen van %1 Systeem.</translation>
     </message>
   </context>
   <context>
@@ -98,6 +98,26 @@
       <source>System Event</source>
       <comment>Shows that the bookmark was created by a system event</comment>
       <translation>Systeemgebeurtenis</translation>
+    </message>
+    <message>
+      <source>System already bound to cloud (id %1)</source>
+      <translation>Systeem al vebonden met de cloud (ID %1)</translation>
+    </message>
+    <message>
+      <source>Server is not connected to the Internet.</source>
+      <translation>De server is niet verbonden met het internet.</translation>
+    </message>
+    <message>
+      <source>Failed to save cloud credentials to local DB</source>
+      <translation>Het is niet gelukt om de cloud inloggegevens op te slaan in de lokale database</translation>
+    </message>
+    <message>
+      <source>Failed to save cloud owner to local DB</source>
+      <translation>Het is niet gelukt om de cloud eigenaar op te slaan in de lokale database</translation>
+    </message>
+    <message>
+      <source>Could not connect to cloud: %1</source>
+      <translation>Kan geen verbinding maken met cloud: %1</translation>
     </message>
   </context>
   <context>
@@ -108,11 +128,11 @@
     </message>
     <message>
       <source>Server has been stopped.</source>
-      <translation>Server is gestopt.</translation>
+      <translation>De server is gestopt.</translation>
     </message>
     <message>
       <source>Media stream is opened but no media data was received.</source>
-      <translation>Media stream is geopend, maar er zijn geen mediagegevens ontvangen.</translation>
+      <translation>D media stream is geopend, maar er zijn geen mediagegevens ontvangen.</translation>
     </message>
     <message>
       <source>Unknown error. Please contact support.</source>
@@ -120,7 +140,7 @@
     </message>
     <message>
       <source>(unknown)</source>
-      <translation>(unknown)</translation>
+      <translation>(onbekend)</translation>
     </message>
     <message>
       <source>Server %1 is not available.</source>
@@ -136,7 +156,7 @@
     </message>
     <message>
       <source>Check if Server is up and has the proper version.</source>
-      <translation>Controleer of Server online is en de juiste versie heeft.</translation>
+      <translation>Controleer of de server online is en over de juiste versie beschikt.</translation>
     </message>
     <message>
       <source>Cannot connect to http port %1.</source>
@@ -144,7 +164,7 @@
     </message>
     <message>
       <source>Finally, try to update firmware. If the problem persists, please contact support.</source>
-      <translation>Probeer de firmware te updaten. Als het probleem blijft bestaan, neem dan contact op met onze ondersteuning.</translation>
+      <translation>Tot slot, probeer de firmware te updaten. Als het probleem blijft bestaan, neem dan contact op met onze support.</translation>
     </message>
     <message>
       <source>Failed to configure parameter %1.</source>
@@ -204,7 +224,7 @@
     </message>
     <message>
       <source>Too many media errors. Please open device issues dialog for more details.</source>
-      <translation>Te veel mediafouten. Open het dialoogvenster Device Issues voor meer informatie.</translation>
+      <translation>Te veel mediafouten. Open het dialoogvenster 'apparaatproblemen' voor meer informatie.</translation>
     </message>
     <message>
       <source>Too many media errors. Please open camera issues dialog for more details.</source>
@@ -216,27 +236,27 @@
     </message>
     <message>
       <source>Please try to reboot the I/O module, then restore factory defaults on the web-page.</source>
-      <translation>Probeer de I / O-module opnieuw te starten en herstel de fabrieksinstellingen op de webpagina.</translation>
+      <translation>Probeer de I/O-module opnieuw op te starten en herstel de fabrieksinstellingen op de webpagina.</translation>
     </message>
     <message>
       <source>Make sure the I/O module is plugged into the network. Try to reboot the I/O module.</source>
-      <translation>Zorg ervoor dat de I / O-module in het netwerk is aangesloten. Probeer de I / O-module opnieuw te starten.</translation>
+      <translation>Zorg ervoor dat de I/O-module in het netwerk is aangesloten. Probeer de I/O-module opnieuw te starten.</translation>
     </message>
     <message>
       <source>I/O Module request &quot;%1&quot; failed with error &quot;%2&quot;.</source>
-      <translation>I / O-moduleverzoek &quot;%1&quot; mislukt met fout &quot;%2&quot;.</translation>
+      <translation>I/O-moduleverzoek &quot;%1&quot; mislukt met fout &quot;%2&quot;.</translation>
     </message>
     <message>
       <source>Unknown I/O module issue.</source>
-      <translation>Onbekend I / O-module probleem.</translation>
+      <translation>Onbekend I/O-module probleem.</translation>
     </message>
     <message>
       <source>Invalid data was received from the I/O module %1.</source>
-      <translation>Er zijn ongeldige gegevens ontvangen van de I / O-module %1.</translation>
+      <translation>Er zijn ongeldige gegevens ontvangen van de I/O-module %1.</translation>
     </message>
     <message>
       <source>Too many media errors. Please open I/O module issues dialog for more details.</source>
-      <translation>Te veel mediafouten. Open de I / O-module problemen dialoog voor meer details.</translation>
+      <translation>Te veel mediafouten. Open het dialoogvenster 'I/O module problemen' voor meer informatie.</translation>
     </message>
     <message>
       <source>Device initialization process is in progress.</source>
@@ -386,7 +406,7 @@
     </message>
     <message>
       <source>Video or audio codec is incompatible with container %1.</source>
-      <translation>Video- of audiocodec is niet compatible met container %1.</translation>
+      <translation>De video- of audiocodec is niet compatible met container %1.</translation>
     </message>
   </context>
   <context>
@@ -496,7 +516,7 @@
     </message>
     <message>
       <source>Bridge Licenses</source>
-      <translation>Recorder licentie</translation>
+      <translation>Recorder licenties</translation>
     </message>
   </context>
   <context>
@@ -511,8 +531,8 @@
     <message numerus="yes">
       <source>%n %2 will be used out of %1.</source>
       <translation>
-        <numerusform>%n %2 zullen worden gebruikt van %1.</numerusform>
-        <numerusform>%n %2 zullen worden gebruikt van %1.</numerusform>
+        <numerusform>%n %2 zal worden gebruikt van de %1.</numerusform>
+        <numerusform>%n %2 zullen worden gebruikt van de %1.</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -525,7 +545,7 @@
     <message numerus="yes">
       <source>%n more %1 will be used.</source>
       <translation>
-        <numerusform>%n meer %1 worden gebruikt.</numerusform>
+        <numerusform>%n meer %1 word gebruikt.</numerusform>
         <numerusform>%n meer %1 worden gebruikt.</numerusform>
       </translation>
     </message>
@@ -591,8 +611,8 @@
     <message numerus="yes">
       <source>%n Device(s)</source>
       <translation>
-        <numerusform>%n Apparaat (en)</numerusform>
-        <numerusform>%n Apparaat (en)</numerusform>
+        <numerusform>%n Apparaat</numerusform>
+        <numerusform>%n Apparaten</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -637,15 +657,15 @@
     <message numerus="yes">
       <source>%n I/O Module(s)</source>
       <translation>
-        <numerusform>%n I/O Module(s)</numerusform>
-        <numerusform>%n I/O Module(s)</numerusform>
+        <numerusform>%n I/O Module</numerusform>
+        <numerusform>%n I/O Modules</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n I/O module(s)</source>
       <translation>
-        <numerusform>%n I/O module(s)</numerusform>
-        <numerusform>%n I/O module(s)</numerusform>
+        <numerusform>%n I/O Module</numerusform>
+        <numerusform>%n I/O Modules</numerusform>
       </translation>
     </message>
     <message>
@@ -669,7 +689,7 @@
     <name>QnSignHelper</name>
     <message>
       <source>Unknown</source>
-      <translation>Unknown</translation>
+      <translation>Onbekend</translation>
     </message>
     <message>
       <source>FREE License</source>
@@ -689,7 +709,7 @@
     </message>
     <message>
       <source>Time License</source>
-      <translation>Testicentie</translation>
+      <translation>Proeflicentie</translation>
     </message>
   </context>
   <context>
@@ -827,153 +847,6 @@
     </message>
   </context>
   <context>
-    <name>QnTimeStrings</name>
-    <message>
-      <source>ms</source>
-      <comment>Suffix for displaying milliseconds</comment>
-      <translation>ms</translation>
-    </message>
-    <message>
-      <source>s</source>
-      <comment>Suffix for displaying seconds</comment>
-      <translation>s</translation>
-    </message>
-    <message>
-      <source>m</source>
-      <comment>Suffix for displaying minutes</comment>
-      <translation>m</translation>
-    </message>
-    <message>
-      <source>h</source>
-      <comment>Suffix for displaying hours</comment>
-      <translation>u</translation>
-    </message>
-    <message>
-      <source>d</source>
-      <comment>Suffix for displaying days</comment>
-      <translation>d</translation>
-    </message>
-    <message>
-      <source>w</source>
-      <comment>Suffix for displaying weeks</comment>
-      <translation>w</translation>
-    </message>
-    <message>
-      <source>M</source>
-      <comment>Suffix for displaying months</comment>
-      <translation>M</translation>
-    </message>
-    <message>
-      <source>y</source>
-      <comment>Suffix for displaying years</comment>
-      <translation>j</translation>
-    </message>
-    <message>
-      <source>msec</source>
-      <comment>Long suffix for displaying milliseconds</comment>
-      <translation>msec</translation>
-    </message>
-    <message>
-      <source>sec</source>
-      <comment>Long suffix for displaying seconds</comment>
-      <translation>sec</translation>
-    </message>
-    <message>
-      <source>min</source>
-      <comment>Long suffix for displaying minutes</comment>
-      <translation>min</translation>
-    </message>
-    <message>
-      <source>hrs</source>
-      <comment>Long suffix for displaying hours</comment>
-      <translation>uren</translation>
-    </message>
-    <message>
-      <source>days</source>
-      <comment>Long suffix for displaying days</comment>
-      <translation>dagen</translation>
-    </message>
-    <message>
-      <source>wks</source>
-      <comment>Long suffix for displaying weeks</comment>
-      <translation>weken</translation>
-    </message>
-    <message>
-      <source>mos</source>
-      <comment>Long suffix for displaying months</comment>
-      <translation>maanden</translation>
-    </message>
-    <message>
-      <source>yrs</source>
-      <comment>Long suffix for displaying years</comment>
-      <translation>jaren</translation>
-    </message>
-    <message numerus="yes">
-      <source>milliseconds</source>
-      <comment>Full suffix for displaying milliseconds</comment>
-      <translation>
-        <numerusform>milliseconden</numerusform>
-        <numerusform>milliseconden</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>seconds</source>
-      <comment>Full suffix for displaying seconds</comment>
-      <translation>
-        <numerusform>seconden</numerusform>
-        <numerusform>seconden</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>minutes</source>
-      <comment>Full suffix for displaying minutes</comment>
-      <translation>
-        <numerusform>minuten</numerusform>
-        <numerusform>minuten</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>hours</source>
-      <comment>Full suffix for displaying hours</comment>
-      <translation>
-        <numerusform>uren</numerusform>
-        <numerusform>uren</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>days</source>
-      <comment>Full suffix for displaying days</comment>
-      <translation>
-        <numerusform>dagen</numerusform>
-        <numerusform>dagen</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>weeks</source>
-      <comment>Full suffix for displaying weeks</comment>
-      <translation>
-        <numerusform>weken</numerusform>
-        <numerusform>weken</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>months</source>
-      <comment>Full suffix for displaying months</comment>
-      <translation>
-        <numerusform>maanden</numerusform>
-        <numerusform>maanden</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>years</source>
-      <comment>Full suffix for displaying years</comment>
-      <translation>
-        <numerusform>jaren</numerusform>
-        <numerusform>jaren</numerusform>
-      </translation>
-    </message>
-  </context>
-  <context>
     <name>QnTranscoder</name>
     <message>
       <source>OpenCL transcoding is not implemented.</source>
@@ -989,7 +862,7 @@
     </message>
     <message>
       <source>Unknown transcode method</source>
-      <translation>Onbekende transcode methode</translation>
+      <translation>Onbekende transcodeer methode</translation>
     </message>
   </context>
   <context>
@@ -1004,15 +877,15 @@
     </message>
     <message>
       <source>Advanced Viewer</source>
-      <translation>Geavanceerde kijker</translation>
+      <translation>Gebruiker 'Geavanceerd'</translation>
     </message>
     <message>
       <source>Viewer</source>
-      <translation>Kijker</translation>
+      <translation>Gebruiker 'Basis'</translation>
     </message>
     <message>
       <source>Live Viewer</source>
-      <translation>Live kijker</translation>
+      <translation>Gebruiker 'Live'</translation>
     </message>
     <message>
       <source>Custom Role</source>
@@ -1134,7 +1007,7 @@
     </message>
     <message>
       <source>Server Failure</source>
-      <translation>Sensor fout</translation>
+      <translation>Server storing</translation>
     </message>
     <message>
       <source>Server Conflict</source>
@@ -1249,7 +1122,7 @@
     <message>
       <source>Device IP Conflict at %1</source>
       <comment>Device IP Conflict at &lt;server_name&gt;</comment>
-      <translation>Device IP Conflict op %1</translation>
+      <translation>Apparaat IP conflict op %1</translation>
     </message>
     <message>
       <source>Camera IP Conflict at %1</source>
@@ -1329,7 +1202,7 @@
     <message>
       <source>%2 &lt;b&gt;%1&lt;/b&gt;</source>
       <comment>%1 means time, %2 means date</comment>
-      <translation type="unfinished">%2 &lt;b&gt;%1&lt;/b&gt;</translation>
+      <translation>%2 &lt;b&gt;%1&lt;/b&gt;</translation>
     </message>
     <message numerus="yes">
       <source>%n times, first: %2 &lt;b&gt;%1&lt;/b&gt;</source>
@@ -1401,7 +1274,7 @@
     </message>
     <message>
       <source>HDD/SSD disk &quot;%1&quot; is full. Disk contains too much data that is not managed by VMS.</source>
-      <translation>HDD / SSD-schijf &quot;%1&quot; is vol. Disk bevat te veel gegevens die niet door VMS worden beheerd.</translation>
+      <translation>HDD / SSD-schijf &quot;%1&quot; is vol. De schijf bevat te veel gegevens die niet door het VMS worden beheerd.</translation>
     </message>
     <message>
       <source>System disk &quot;%1&quot; is almost full.</source>
@@ -1530,12 +1403,16 @@
       <comment>Analytics Event at some camera</comment>
       <translation>%1 op %2</translation>
     </message>
+    <message>
+      <source>Open layout</source>
+      <translation>Open schermindeling</translation>
+    </message>
   </context>
   <context>
     <name>utils::QnCameraNamesWatcher</name>
     <message>
       <source>Removed camera</source>
-      <translation>Camera verwijderd</translation>
+      <translation>Verwijderde camera</translation>
     </message>
   </context>
 </TS>

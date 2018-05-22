@@ -5,7 +5,14 @@
     <name>QnLayoutsModelUnsorted</name>
     <message>
       <source>All Cameras</source>
-      <translation>Alle camera 's</translation>
+      <translation>Alle camera's</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::client::mobile::ActionButtonsModel</name>
+    <message>
+      <source>Press and hold to speak</source>
+      <translation>Ingedrukt houden om te spreken</translation>
     </message>
   </context>
 </TS>
