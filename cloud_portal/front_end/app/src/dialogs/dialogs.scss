@@ -46,10 +46,13 @@
             margin: 0;
             padding: 0;
 
+            .close-content {
+                border-radius: 25px;
+            }
+
             &:hover {
                 .close-content {
                     background-color: $additional_light2;
-                    border-radius: 25px;
                 }
             }
 
