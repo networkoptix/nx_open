@@ -99,6 +99,7 @@ angular.module('cloudApp')
         }
 
         function reloadSystems(){
+            $scope.userDisconnectSystem = true;
             systemsProvider.forceUpdateSystems().then(function(){$location.path('/systems')});
         }
 
@@ -205,6 +206,7 @@ angular.module('cloudApp')
 
         $scope.$on('$destroy', function() {
             cancelSubscription();
+            $timeout(dialogs.dismissNotifications, $scope.userDisconnectSystem ? Config.notificationTimeout: 0);
         });
 
 
