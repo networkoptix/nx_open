@@ -695,8 +695,9 @@ Item
         {
             close()
             d.resumePosition = -1
-            timeline.jumpTo(date.getTime())
-            videoScreenController.setPosition(date.getTime(), true)
+            var targetTime = date.getTime() - timeline.serverTimeZoneShift
+            timeline.jumpTo(targetTime)
+            videoScreenController.setPosition(targetTime, true)
         }
     }
 
