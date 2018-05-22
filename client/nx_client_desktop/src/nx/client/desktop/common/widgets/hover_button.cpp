@@ -1,24 +1,24 @@
 #include "hover_button.h"
 
-#include <QtWidgets/QStylePainter>
 #include <QtWidgets/QVBoxLayout>
-#include <QMouseEvent>
+#include <QtGui/QMouseEvent>
+#include <QtGui/QPainter>
 
 #include <ui/style/globals.h>
 #include <ui/style/skin.h>
 #include <ui/style/nx_style.h>
 #include <ui/style/helper.h>
 
-namespace{
+namespace {
     const int kControlBtn = Qt::LeftButton;
-}
+} // namespace
 
 namespace nx {
 namespace client {
 namespace desktop {
 
-HoverButton::HoverButton(const QString& normal, const QString& highligthed, QWidget* parent)
-    :QAbstractButton(parent)
+HoverButton::HoverButton(const QString& normal, const QString& highligthed, QWidget* parent):
+    QAbstractButton(parent)
 {
     m_normal = qnSkin->pixmap(normal, true);
     m_highlighted = qnSkin->pixmap(highligthed, true);
@@ -34,14 +34,11 @@ QSize HoverButton::sizeHint() const
     return m_normal.size();
 }
 
-
 void HoverButton::paintEvent(QPaintEvent* event)
 {
     QPainter painter(this);
     bool highlighted = false;
-    if (m_isClicked)
-        highlighted = false;
-    else
+    if (!m_isClicked)
         highlighted = m_isHovered;
 
     QPixmap& pixmap = highlighted ? m_highlighted : m_normal;
@@ -49,7 +46,7 @@ void HoverButton::paintEvent(QPaintEvent* event)
     {
         auto icon = pixmap.rect();
         QPointF centeredCorner = rect().center() - icon.center();
-        painter.drawPixmap(centeredCorner*0.5, pixmap);
+        painter.drawPixmap(centeredCorner * 0.5, pixmap);
     }
 }
 
@@ -94,6 +91,7 @@ void HoverButton::mouseReleaseEvent(QMouseEvent* event)
     {
         m_isClicked = false;
         update();
+        emit released();
     }
 }
 

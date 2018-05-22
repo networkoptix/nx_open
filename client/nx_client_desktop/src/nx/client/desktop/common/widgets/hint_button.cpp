@@ -5,14 +5,15 @@
 #include <QtWidgets/QStyleOption>
 #include <QtWidgets/QStylePainter>
 #include <QtWidgets/QGroupBox>
-#include <QMouseEvent>
-#include <QToolTip>
+#include <QtGui/QMouseEvent>
+#include <QtWidgets/QToolTip>
 
 #include <ui/style/globals.h>
 #include <ui/style/skin.h>
 #include <ui/style/nx_style.h>
 #include <ui/style/helper.h>
 #include <ui/help/help_handler.h>
+#include <ui/help/help_topic_accessor.h>
 #include <utils/common/scoped_painter_rollback.h>
 
 namespace {
@@ -43,8 +44,7 @@ namespace client {
 namespace desktop {
 
 HintButton::HintButton(QWidget* parent):
-    base_type(parent),
-    m_helpTopicId(Qn::Empty_Help)
+    base_type(parent)
 {
     m_normal = qnSkin->pixmap(lit("buttons/context_info.png"), true);
     m_highlighted = qnSkin->pixmap(lit("buttons/context_info_hovered.png"), true);
@@ -61,14 +61,15 @@ HintButton* HintButton::hintThat(QGroupBox* groupBox)
     auto result = new HintButton(groupBox);
     groupBox->installEventFilter(result);
     result->updateGeometry(groupBox);
-    result->m_parentBox = groupBox;
     return result;
 }
 
 bool HintButton::eventFilter(QObject* obj, QEvent* event)
 {
-    if (event->type() == QEvent::Resize && obj == m_parentBox)
-        updateGeometry(m_parentBox.data());
+    // We have subscribed exactly to events of QGroupBox instance,
+    // so we are quite confident in objects we get here.
+    if (event->type() == QEvent::Resize)
+        updateGeometry(static_cast<QGroupBox*>(obj));
     return QWidget::eventFilter(obj, event);
 }
 
@@ -91,14 +92,15 @@ void HintButton::updateGeometry(QGroupBox* parent)
         QStyle::SC_GroupBoxLabel, parent);
     QSize pixmapSize = hintMarkSize();
 
-    // Adjusting own position to land right after the caption ends
+    // Adjusting own position to land right after the caption ends.
     QRect rect;
     rect.setSize(pixmapSize);
     rect.moveCenter(captionRect.center());
 
     // We manually add some spaces to the caption of group box, to push away its border
     // and provide some space to hint button.
-    int offset = parent->isFlat() ? style::Metrics::kHintButtonMargin : style::Metrics::kHintButtonMargin - pixmapSize.width();
+    int margin = style::Metrics::kHintButtonMargin;
+    int offset = parent->isFlat() ? margin : margin - pixmapSize.width();
     rect.moveLeft(captionRect.right() + offset);
     setGeometry(rect);
 }
@@ -106,15 +108,18 @@ void HintButton::updateGeometry(QGroupBox* parent)
 // Returns prefered size from internal pixmap.
 QSize HintButton::hintMarkSize() const
 {
-    QSize normal = m_normal.size() / m_normal.devicePixelRatioF();
-    QSize highlighted = m_highlighted.size() / m_highlighted.devicePixelRatioF();
-    return QSize(std::max(normal.width(), highlighted.width()),
-        std::max(normal.height(), highlighted.height()));
+    return m_normal.size() / m_normal.devicePixelRatioF();
 }
 
-bool HintButton::isClickable() const
+int HintButton::getHelpTopicId() const
 {
-    return m_helpTopicId != Qn::Empty_Help;
+    return helpTopic((QWidget*)this);
+}
+
+bool HintButton::hasHelpTopic() const
+{
+    auto id = getHelpTopicId();
+    return id != Qn::Empty_Help;
 }
 
 void HintButton::showTooltip(bool show)
@@ -126,7 +131,7 @@ void HintButton::showTooltip(bool show)
         auto nxStyle = QnNxStyle::instance();
         NX_ASSERT(nxStyle);
 
-        if (isClickable())
+        if (hasHelpTopic())
         {
             QColor lineColor = palette().color(QPalette::Text);
             QString colorHex = lineColor.name(QColor::HexRgb);
@@ -171,11 +176,6 @@ void HintButton::addHintLine(QString line)
     }
 }
 
-void HintButton::setHelpTopic(int topicId)
-{
-    m_helpTopicId = topicId;
-}
-
 void HintButton::paintEvent(QPaintEvent* event)
 {
     QPainter painter(this);
@@ -196,8 +196,8 @@ void HintButton::paintEvent(QPaintEvent* event)
 
 void HintButton::mouseReleaseEvent(QMouseEvent *event)
 {
-    if (m_helpTopicId != Qn::Empty_Help)
-        QnHelpHandler::openHelpTopic(m_helpTopicId);
+    if (hasHelpTopic())
+        QnHelpHandler::openHelpTopic(getHelpTopicId());
 }
 
 void HintButton::enterEvent(QEvent* event)

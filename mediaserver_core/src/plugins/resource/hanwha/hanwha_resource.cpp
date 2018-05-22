@@ -977,7 +977,11 @@ CameraDiagnostics::Result HanwhaResource::initSystem()
         const auto sunapiSupportAttribute = m_attributes.attribute<bool>(
             lit("Media/Protocol.SUNAPI/%1").arg(getChannel()));
 
-        m_isBypassSupported = sharedContext()->isBypassSupported().value;
+        const auto bypassSupportResult = sharedContext()->isBypassSupported();
+        if (!bypassSupportResult)
+            return bypassSupportResult.diagnostics;
+
+        m_isBypassSupported = bypassSupportResult.value;
 
         m_isChannelConnectedViaSunapi = sunapiSupportAttribute != boost::none
             && sunapiSupportAttribute.get();

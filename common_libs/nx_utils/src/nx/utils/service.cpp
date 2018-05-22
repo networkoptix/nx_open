@@ -41,7 +41,7 @@ Service::Service(int argc, char **argv, const QString& applicationDisplayName):
 {
 }
 
-void Service::initializeLogging(bool value)
+void Service::setEnableLoggingInitialization(bool value)
 {
     m_isLoggingInitializationRequired = value;
 }

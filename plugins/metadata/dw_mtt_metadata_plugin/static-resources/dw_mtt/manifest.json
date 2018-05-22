@@ -7,7 +7,15 @@
     },
     "supportedCameraModels":
     [
+        "DWC-MVT4Wi28",
+        "DWC-MVT4Wi36",
+        "DWC-MVT4Wi6",
+        "DWC-MBT4Wi28",
+        "DWC-MBT4Wi36",
+        "DWC-MVT4WiA",
+        "DWC-MTT4Wi28",
         "DWC-MTT4Wi36",
+        "DWC-MTT4Wi6",
         "DWC-MTT4WiA"
     ],
     "outputEventTypes":
@@ -23,7 +31,8 @@
             "eventName": { "value": "video face detection [exclusive]", "localization": {} },
             "flags": "stateDependent",
             "internalName": "VFD",
-            "group": 1
+            "group": 1,
+            "unsupported": true
         },
         {
             "eventTypeId": "ba0cde26-a5c9-4101-ae59-7cda70a2fa76",
@@ -58,7 +67,8 @@
             "eventName": { "value": "object status changed (object removal) [exclusive]", "localization": {} },
             "flags": "stateDependent",
             "internalName": "OSC",
-            "group": 1
+            "group": 1,
+            "unsupported": true
         },
         {
             "eventTypeId": "e499faf1-b818-4c38-a6b1-7150e56ff54f",
