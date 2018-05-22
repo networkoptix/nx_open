@@ -12,7 +12,6 @@ admin.site.register(GeneratedRule, GeneratedRuleAdmin)
 
 class ZapHookAdmin(admin.ModelAdmin):
     list_display = ("id", "user", "event", "target")
-    list_filter = ("user__email", "event")
     search_fields = ("user", "event")
 
 admin.site.register(ZapHook, ZapHookAdmin)

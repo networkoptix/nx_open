@@ -4,7 +4,6 @@ from django.urls import reverse
 from django.utils.html import format_html
 from models import *
 from cloud import settings
-from django.contrib import admin
 
 
 class CMSAdmin(admin.ModelAdmin):
@@ -105,6 +104,7 @@ class DataRecordAdmin(CMSAdmin):
     list_filter = ('data_structure__context', 'data_structure', 'customization', 'language')
     search_fields = ('data_structure__context__name', 'data_structure__name', 'customization__name',
                      'data_structure__description', 'value', 'language__code')
+    readonly_fields = ('created_by',)
 
 admin.site.register(DataRecord, DataRecordAdmin)
 
@@ -117,6 +117,7 @@ class ContentVersionAdmin(CMSAdmin):
     list_display_links = ('id', )
     list_filter = ('product', 'customization')
     search_fields = ('accepted_by__email', 'created_by__email')
+    readonly_fields = ('created_by', 'accepted_by',)
 
     def content_version_actions(self, obj):
         return format_html('<button class="btn btn-sm btn-info"> <a href="{}">review version</a></button>',
