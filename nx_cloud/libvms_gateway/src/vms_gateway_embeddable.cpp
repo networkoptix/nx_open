@@ -8,8 +8,7 @@ namespace gateway {
 
 VmsGatewayEmbeddable::VmsGatewayEmbeddable(
     bool isSslEnabled,
-    const QString& certPath,
-    const QString& logBaseName)
+    const QString& certPath)
     :
     m_isSslEnabled(isSslEnabled)
 {
@@ -32,8 +31,6 @@ VmsGatewayEmbeddable::VmsGatewayEmbeddable(
     {
         addArg("-http/sslSupport", "false");
     }
-
-    addArg("-log/baseName", logBaseName.isEmpty() ? "vms_gateway" : logBaseName.toUtf8());
 
     if (startAndWaitUntilStarted())
     {

@@ -22,8 +22,7 @@ class VmsGatewayEmbeddable
 public:
     VmsGatewayEmbeddable(
         bool isSslEnabled,
-        const QString& certPath = {},
-        const QString& logBaseName = {});
+        const QString& certPath = {});
 
     bool isSslEnabled() const;
     SocketAddress endpoint() const;
