@@ -206,6 +206,12 @@ bool QnProxyPtzController::getData(Qn::PtzDataFields query, QnPtzData* data) con
     return base_type::getData(query, data);
 }
 
+QnResourcePtr QnProxyPtzController::resource() const
+{
+    const auto base = baseController();
+    return base ? base->resource() : QnResourcePtr();
+}
+
 void QnProxyPtzController::baseFinished(Qn::PtzCommand command, const QVariant& data)
 {
     emit finished(command, data);

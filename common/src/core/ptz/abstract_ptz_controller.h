@@ -35,7 +35,7 @@ public:
     /**
      * @returns Resource that this PTZ controller belongs to.
      */
-    QnResourcePtr resource() const;
+    virtual QnResourcePtr resource() const;
 
 public slots: //< Class is exposed to QML. All functions in section below are invokable
     /**
