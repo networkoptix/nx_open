@@ -46,6 +46,7 @@
     }
 }
 
+.dropup.show,
 .dropdown.show {
     .nav-arrow span:nth-child(1) {
         -webkit-transform: rotate(45deg);
@@ -75,8 +76,8 @@
 }
 
 .nav-hamburger {
-    width: 60px;
-    height: 24px;
+    width: 28px;
+    height: 21px;
     position: absolute;
     -webkit-transform: rotate(0deg);
     -moz-transform: rotate(0deg);
@@ -91,62 +92,103 @@
 
 .nav-hamburger span {
     display: block;
-    position: relative;
-    height: 2px;
-    width: 50%;
+    position: absolute;
+    height: 3px;
+    width: 100%;
     background: $dark7;
-    opacity: 1;
     border-radius: 9px;
+    opacity: 1;
+    left: 0;
     -webkit-transform: rotate(0deg);
     -moz-transform: rotate(0deg);
     -o-transform: rotate(0deg);
     transform: rotate(0deg);
-    -webkit-transition: .2s ease-in-out;
-    -moz-transition: .2s ease-in-out;
-    -o-transition: .2s ease-in-out;
-    transition: .2s ease-in-out;
+    -webkit-transition: .25s ease-in-out;
+    -moz-transition: .25s ease-in-out;
+    -o-transition: .25s ease-in-out;
+    transition: .25s ease-in-out;
 }
+
+//.nav-hamburger {
+//    & span:nth-child(1) {
+//        top: 0;
+//        -webkit-transform-origin: left center;
+//        -moz-transform-origin: left center;
+//        -o-transform-origin: left center;
+//        transform-origin: left center;
+//    }
+//
+//    & span:nth-child(2) {
+//        top: 6px;
+//        -webkit-transform-origin: left center;
+//        -moz-transform-origin: left center;
+//        -o-transform-origin: left center;
+//        transform-origin: left center;
+//    }
+//
+//    & span:nth-child(3) {
+//        top: 12px;
+//        -webkit-transform-origin: left center;
+//        -moz-transform-origin: left center;
+//        -o-transform-origin: left center;
+//        transform-origin: left center;
+//    }
+//}
+//
+//.show {
+//    .nav-hamburger {
+//        & span:nth-child(1) {
+//            -webkit-transform: rotate(45deg);
+//            -moz-transform: rotate(45deg);
+//            -o-transform: rotate(45deg);
+//            transform: rotate(45deg);
+//            top: -4px;
+//            left: 4px;
+//        }
+//
+//        & span:nth-child(2) {
+//            width: 0;
+//            opacity: 0;
+//        }
+//
+//        & span:nth-child(3) {
+//            -webkit-transform: rotate(-45deg);
+//            -moz-transform: rotate(-45deg);
+//            -o-transform: rotate(-45deg);
+//            transform: rotate(-45deg);
+//            top: 13px;
+//            left: 4px;
+//        }
+//    }
+//}
 
 .nav-hamburger {
     & span:nth-child(1) {
         top: 0;
-        -webkit-transform-origin: left center;
-        -moz-transform-origin: left center;
-        -o-transform-origin: left center;
-        transform-origin: left center;
     }
 
-    & span:nth-child(2) {
-        top: 6px;
-        -webkit-transform-origin: left center;
-        -moz-transform-origin: left center;
-        -o-transform-origin: left center;
-        transform-origin: left center;
+    & span:nth-child(2), & span:nth-child(3) {
+        top: 9px;
     }
 
-    & span:nth-child(3) {
-        top: 12px;
-        -webkit-transform-origin: left center;
-        -moz-transform-origin: left center;
-        -o-transform-origin: left center;
-        transform-origin: left center;
+    & span:nth-child(4) {
+        top: 18px;
     }
 }
 
 .show {
     .nav-hamburger {
         & span:nth-child(1) {
+            top: 18px;
+            width: 0;
+            left: 50%;
+        }
+
+        & span:nth-child(2) {
             -webkit-transform: rotate(45deg);
             -moz-transform: rotate(45deg);
             -o-transform: rotate(45deg);
             transform: rotate(45deg);
-            top: -4px;
-            left: 4px;
-        }
-
-        & span:nth-child(2) {
-            width: 0;
-            opacity: 0;
         }
 
         & span:nth-child(3) {
@@ -154,8 +196,12 @@
             -moz-transform: rotate(-45deg);
             -o-transform: rotate(-45deg);
             transform: rotate(-45deg);
-            top: 13px;
-            left: 4px;
+        }
+
+        & span:nth-child(4) {
+            top: 18px;
+            width: 0;
+            left: 50%;
         }
     }
 }

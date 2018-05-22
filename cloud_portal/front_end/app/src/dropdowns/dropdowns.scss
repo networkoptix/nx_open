@@ -5,3 +5,12 @@
         margin: 0 14px 0 4px;
     }
 }
+
+.dropdown-menu {
+    margin-top: 0;
+
+    .dropdown-item {
+        display: flex;
+        align-items: center;
+    }
+}

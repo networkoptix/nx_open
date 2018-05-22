@@ -797,8 +797,10 @@ h2.version-number{
     }
 }
 
-.dropdown .lang-sm{
-    margin-right: $padding-input-horizontal/2;
+.dropdown, .dropup {
+    .lang-sm {
+        margin-right: $padding-input-horizontal/2;
+    }
 }
 .two-columns{
     -moz-column-count: 2;
