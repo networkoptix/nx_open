@@ -1827,8 +1827,8 @@ void initialize(Manager* manager, Action* root)
 
     factory(PinNotificationsAction)
         .flags(Notifications | NoTarget)
-        .text(ContextMenu::tr("Pin Notifications")) //< To be displayed on button tooltip
-        .toggledText(ContextMenu::tr("Unpin Notifications"));
+        .text(ContextMenu::tr("Pin Panel")) //< To be displayed on button tooltip
+        .toggledText(ContextMenu::tr("Unpin Panel"));
 
     factory(GoToNextItemAction)
         .flags(NoTarget);
