@@ -24,6 +24,16 @@
             "macFromMulticast": true
         },
         {
+            "_comment1": "Autodiscovery response contains scopes like onvif://www.onvif.org/hardware/DWC-MTT4Wi36 and onvif://www.onvif.org/name/ONVIF",
+            "_comment2": "thereby manufacture is detected as DWC-MTT4Wi36 and name - as ONVIF.",
+            "keys": [
+                "DWC-MBT4Wi*|ONVIF",
+                "DWC-MTT4Wi*|ONVIF",
+                "DWC-MVT4Wi*|ONVIF"
+            ],
+            "ignoreMacFromMulticast": true
+        },
+        {
             "keys": [
                 "Hanwha|PRN-4011"
             ],
@@ -939,18 +949,18 @@
             "relayOutputInversed": true,
             "portNamePrefixToIgnore": "AlarmOut"
         },
-		{
+    {
             "keys": ["DW|DWC-PF5M1TIR"],
-			"fixWrongInputPortNumber": true
-		},
+      "fixWrongInputPortNumber": true
+    },
         {
             "keys": [
-            	"DW|DWC-PF5M1TIR",
-            	"DW|DWC-MB45DiA",
-            	"DW|DWC-MV85DiA",
-            	"DW|DWC-PB6M4T"
+                "DW|DWC-PF5M1TIR",
+                "DW|DWC-MB45DiA",
+                "DW|DWC-MV85DiA",
+                "DW|DWC-PB6M4T"
             ],
-	  		    "fixWrongInputPortNumber": true
+            "fixWrongInputPortNumber": true
         },
         {
             "keys": [
@@ -2583,7 +2593,7 @@
                 }
             }
         },
-        { 
+        {
             "keys": ["DW|DWC-MPZ20XFM"],
             "mediaTraits": {
                 "aspectRatioDependent": {

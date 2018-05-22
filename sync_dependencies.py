@@ -186,12 +186,14 @@ def sync_dependencies(syncher):
         
         # Hardware video decoding in Lite Client on Debian 7; kernel upgrade.
         #sync("libvdpau-sunxi-1.0-deb7")
-        #sync("proxy-decoder-deb7")
         #sync("ldpreloadhook-1.0-deb7")
         #sync("libpixman-0.34.0-deb7")
         #sync("libcedrus-1.0-deb7")
         #sync("uboot-2014.04-10733-gbb5691c-dirty-vanilla")
-        
+
+        # Required to build Lite Client with proxy-decoder support.
+        sync("proxy-decoder-deb7")
+
         # Required for ffmpeg.
         sync("libvdpau-1.0.4.1")
 

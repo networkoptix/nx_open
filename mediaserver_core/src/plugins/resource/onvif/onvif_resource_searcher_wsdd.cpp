@@ -18,7 +18,6 @@
 #include <core/resource/resource_data.h>
 #include <core/resource_management/resource_data_pool.h>
 
-
 //static const int SOAP_DISCOVERY_TIMEOUT = 1; // "+" in seconds, "-" in mseconds
 static const int SOAP_DISCOVERY_TIMEOUT = -500; // "+" in seconds, "-" in mseconds
 static const int SOAP_HELLO_CHECK_TIMEOUT = -1; // "+" in seconds, "-" in mseconds
@@ -44,7 +43,6 @@ const char OnvifResourceSearcherWsdd::WSDD_GSOAP_MULTICAST_ADDRESS[] = "soap.udp
 static const int WSDD_MULTICAST_PORT = 3702;
 static const char WSDD_MULTICAST_ADDRESS[] = "239.255.255.250";
 static const nx::network::SocketAddress WSDD_MULTICAST_ENDPOINT( WSDD_MULTICAST_ADDRESS, WSDD_MULTICAST_PORT );
-
 
 namespace
 {
@@ -88,7 +86,6 @@ http://schemas.xmlsoap.org/ws/2004/08/addressing/role/anonymous\
 </s:Body>\
 </s:Envelope>";
 
-
     // avoid SOAP select call
     size_t gsoapFrecv(struct soap* soap, char* data, size_t maxSize)
     {
@@ -96,7 +93,6 @@ http://schemas.xmlsoap.org/ws/2004/08/addressing/role/anonymous\
         int readed = qSocket->recv(data, static_cast<unsigned int>(maxSize), 0);
         return (size_t) qMax(0, readed);
     }
-
 
     //Socket send through UDPSocket
     int gsoapFsendSmall(struct soap *soap, const char *s, size_t n)
@@ -139,8 +135,6 @@ http://schemas.xmlsoap.org/ws/2004/08/addressing/role/anonymous\
 #endif
 }
 
-
-
 OnvifResourceSearcherWsdd::ProbeContext::ProbeContext()
 :
     soapWsddProxy( SOAP_IO_UDP )
@@ -164,7 +158,6 @@ void OnvifResourceSearcherWsdd::ProbeContext::initializeSoap()
     soapWsddProxy.soap->socket = -1;
     soapWsddProxy.soap->master = -1;
 }
-
 
 OnvifResourceSearcherWsdd::OnvifResourceSearcherWsdd(OnvifResourceInformationFetcher* informationFetcher):
     m_onvifFetcher(informationFetcher),
@@ -474,14 +467,17 @@ QString OnvifResourceSearcherWsdd::getMac(const T* source, const SOAP_ENV__Heade
         QString manufacturer = getManufacturer(source, name);
 
         const QnResourceData resourceData = qnStaticCommon->dataPool()->data(manufacturer, name);
+        const bool ignoreMacFromMulticast =
+            resourceData.value<bool>(Qn::IGNORE_MAC_FROM_MULTICAST_PARAM_NAME);
+        const bool useMacFromMulticast = (macFromEndpoint == macFromMessageId
+            || resourceData.value<bool>(Qn::MAC_FROM_MULTICAST_PARAM_NAME));
 
-        if (macFromEndpoint == macFromMessageId
-            || resourceData.value<bool>(Qn::MAC_FROM_MULTICAST_PARAM_NAME))
+        if (!ignoreMacFromMulticast && useMacFromMulticast)
         {
             QString result;
             for (int i = 1; i < kMacAddressLength; i += 2)
             {
-                int ind = i + i / 2;
+                const int ind = i + i / 2;
                 if (i < 11) result[ind + 1] = QLatin1Char('-');
                 result[ind] = macFromEndpoint[i];
                 result[ind - 1] = macFromEndpoint[i - 1];
@@ -552,7 +548,6 @@ QString OnvifResourceSearcherWsdd::extractScope(const T* source, const QString& 
     }
 
     QString scopes = QLatin1String(source->Scopes->__item);
-
 
     int posStart = scopes.indexOf(pattern);
     if (posStart == -1) {

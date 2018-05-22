@@ -40,6 +40,7 @@ def pytest_addoption(parser):
     parser.addoption('--clean', '--reinstall', action='store_true', help='destroy VMs first')
 
 
+    parser.addoption('--mediaserver-installers-dir', help='Unused. For forward compatibility with vms 4.0 funtests.')
 @pytest.fixture(scope='session')
 def work_dir(request):
     work_dir = request.config.getoption('--work-dir').expanduser()

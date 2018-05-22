@@ -119,7 +119,7 @@ protected:
         StateInitial,
         StateHandlePtz,
         StateHandleRotation,
-        StateHoldButton,    //< Holding arrow button
+        StateHoldButton,
     };
 
     State m_state = StateInitial;

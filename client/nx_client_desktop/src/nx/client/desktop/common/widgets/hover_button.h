@@ -21,12 +21,9 @@ protected:
     virtual QSize sizeHint() const override;
     virtual void paintEvent(QPaintEvent* event) override;
     virtual void mouseMoveEvent(QMouseEvent* event) override;
-    virtual void mousePressEvent(QMouseEvent* event) override;
-    virtual void mouseReleaseEvent(QMouseEvent* event) override;
     virtual void leaveEvent(QEvent* event) override;
 
 private:
-    bool m_isClicked = false;
     bool m_isHovered = false;
     QPixmap m_normal;
     QPixmap m_highlighted;
