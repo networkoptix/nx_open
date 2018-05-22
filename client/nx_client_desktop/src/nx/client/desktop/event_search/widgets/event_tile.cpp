@@ -303,11 +303,6 @@ bool EventTile::event(QEvent* event)
             handleHoverChanged(false);
             break;
 
-        case QEvent::MouseMove:
-        case QEvent::HoverMove:
-            updateBackgroundRole(!m_closeButton->underMouse());
-            break;
-
         case QEvent::MouseButtonPress:
             base_type::event(event);
             event->accept();
@@ -330,7 +325,7 @@ void EventTile::handleHoverChanged(bool hovered)
     const auto showCloseButton = hovered & m_closeable;
     ui->timestampLabel->setHidden(showCloseButton || ui->timestampLabel->text().isEmpty());
     m_closeButton->setVisible(showCloseButton);
-    updateBackgroundRole(hovered && !m_closeButton->underMouse());
+    updateBackgroundRole(hovered);
 
     if (showCloseButton)
         m_closeButton->raise();
