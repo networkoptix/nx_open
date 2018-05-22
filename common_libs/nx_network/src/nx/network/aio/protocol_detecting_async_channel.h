@@ -297,6 +297,7 @@ void BaseProtocolDetectingAsyncChannel<Base, AsyncChannelInterface>::analyzeRead
         nx::utils::swapAndCall(
             m_protocolDetectionCompletionHandler,
             osErrorCode);
+        return;
     }
 
     decltype(m_readBuffer) readBuffer;
