@@ -11,7 +11,8 @@ _logger = logging.getLogger(__name__)
 
 
 def pytest_addoption(parser):
-    parser.addoption('--mediaserver-installers-dir', type=LocalPath, default=LocalPath.home() / 'Downloads')
+    parser.addoption('--mediaserver-installers-dir', type=LocalPath, required=True,
+                         help='Directory to mediaserver distributives')
 
 
 @pytest.fixture(scope='session')
