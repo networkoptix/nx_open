@@ -206,7 +206,7 @@ angular.module('cloudApp')
 
         $scope.$on('$destroy', function() {
             cancelSubscription();
-           if( $scope.userDisconnectSystem === undefined){
+           if( typeof($scope.userDisconnectSystem) === 'undefined'){
                dialogs.dismissNotifications();
            }
         });
