@@ -7,6 +7,7 @@
 #include <QtWidgets/QToolButton>
 #include <QtWidgets/QAction>
 
+#include <QtWebKitWidgets/QWebFrame>
 #include <QtWebKitWidgets/QWebView>
 
 #include <common/common_module.h>
@@ -24,6 +25,7 @@
 #include <ui/widgets/palette_widget.h>
 #include <ui/dialogs/common/dialog.h>
 #include <ui/dialogs/common/message_box.h>
+#include <ui/style/webview_style.h>
 #include <ui/widgets/common/web_page.h>
 #include <ui/widgets/views/resource_list_view.h>
 
@@ -67,6 +69,8 @@ public:
     {
         m_webView->setPage(m_page);
 
+        NxUi::setupWebViewStyle(m_webView);
+
         QVBoxLayout *layout = new QVBoxLayout(this);
         layout->setContentsMargins(QMargins());
         layout->addWidget(m_urlLineEdit);
@@ -75,7 +79,15 @@ public:
             {
                 m_webView->load(m_urlLineEdit->text());
             });
-    }
+
+        auto handler = new QnDebugWebPageHandler(this);
+        QWebFrame* frame = m_page->mainFrame();
+        connect(frame, &QWebFrame::javaScriptWindowObjectCleared, this,
+            [this, frame, handler]()
+            {
+                frame->addToJavaScriptWindowObject(lit("external"), handler);
+            });
+        }
 
     QString url() const { return m_urlLineEdit->text(); }
     void setUrl(const QString& value)
@@ -349,6 +361,11 @@ QnSystemTilesTestCase *QnDebugControlDialog::m_tilesTests = nullptr;
 
 
 } // namespace
+
+void QnDebugWebPageHandler::c2pplayback(const QString& cameras, int timestamp)
+{
+    qDebug() << "c2pplayback" << cameras << timestamp;
+}
 
 // -------------------------------------------------------------------------- //
 // QnWorkbenchDebugHandler

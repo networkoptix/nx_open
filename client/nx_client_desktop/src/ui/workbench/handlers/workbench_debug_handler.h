@@ -4,6 +4,15 @@
 
 #include <ui/workbench/workbench_context_aware.h>
 
+class QnDebugWebPageHandler: public QObject
+{
+    Q_OBJECT
+public:
+    QnDebugWebPageHandler(QObject* parent): QObject(parent){}
+public slots:
+    Q_INVOKABLE void c2pplayback(const QString& cameras, int timestamp);
+};
+
 class QnWorkbenchDebugHandler : public QObject, public QnWorkbenchContextAware
 {
     Q_OBJECT
