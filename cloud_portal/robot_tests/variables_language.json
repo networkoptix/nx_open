@@ -66,6 +66,7 @@
     "PASSWORD TOO SHORT TEXT"              :    "Password must contain at least 8 characters",
     "PASSWORD TOO COMMON TEXT"             :    "This password is in top most popular passwords in the world",
     "PASSWORD IS WEAK TEXT"                :    "Use numbers, upper and lower case letters and special characters to make your password stronger",
+    "TERMS AND CONDITIONS ERROR TEXT"      :    "Please review and agree to the Terms and Conditions and Privacy policy in order to proceed",
 
     "THIS LINK IS BROKEN TEXT"             :    "This link is broken,<br>\n            System may be disconnected from %PRODUCT_NAME%,<br>\n            Access to this System may be revoked, <br>\n            or you may be logged into a different account",
 

@@ -116,8 +116,8 @@ should respond to Tab key
     Press Key    ${REGISTER EMAIL INPUT}    ${TAB}
     Element Should Be Focused    ${REGISTER PASSWORD INPUT}
     Press Key    ${REGISTER PASSWORD INPUT}    ${TAB}
-    Element Should Be Focused    ${REGISTER SUBSCRIBE CHECKBOX}
-    Press Key    ${REGISTER SUBSCRIBE CHECKBOX}    ${TAB}
+    Element Should Be Focused    ${TERMS AND CONDITIONS CHECKBOX}
+    Press Key    ${TERMS AND CONDITIONS CHECKBOX}    ${TAB}
     Element Should Be Focused    ${CREATE ACCOUNT BUTTON}
 
 should open Terms and conditions in a new page
