@@ -102,7 +102,6 @@ private:
     bool ensureInitialized();
     void setFormatContextOptions();
     void setEncoderOptions() const;
-    void setDecoderOptions() const;
     AVFrame* toEncodableFrame(AVFrame* frame) const;
 
     const char * getAVInputFormat();

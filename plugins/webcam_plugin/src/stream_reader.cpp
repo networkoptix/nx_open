@@ -235,7 +235,6 @@ std::unique_ptr<ILPVideoPacket> StreamReader::transcodeVideo(
     av_freep(&convertedFrame->data[0]);
     av_frame_free(&convertedFrame);
 
-    av_freep(&encodedPacket->data[0]);
     av_packet_free(&encodedPacket);
 
     return nxVideoPacket;
@@ -356,7 +355,6 @@ void StreamReader::initializeAv()
         m_videoDecoder.reset(nullptr);
         return;
     }
-    setDecoderOptions();
     int openCode = m_videoDecoder->open();
     if(m_lastError.updateIfError(openCode))
     {
@@ -387,10 +385,7 @@ void StreamReader::initializeAv()
 
 void StreamReader::unInitializeAv()
 {
-    if (!m_initialized)
-        return;
-
-    if (m_avDecodePacket)
+   if (m_avDecodePacket)
         av_packet_free(&m_avDecodePacket);
     
     //close the codecs before we close_input() below
@@ -463,19 +458,7 @@ void StreamReader::setEncoderOptions() const
     int bitrate = m_codecContext.bitrate();
     if (bitrate)
     { 
-        //m_videoEncoder->setBitrate(m_codecContext.bitrate());
         encoderContext->bit_rate = bitrate;
-    }
-}
-
-void StreamReader::setDecoderOptions () const
-{
-    AVCodecContext * decoderContext = m_videoDecoder->codecContext();
-    int bitrate = m_codecContext.bitrate();
-    if (bitrate)
-    {
-        //m_videoEncoder->setBitrate(m_codecContext.bitrate());
-        //decoderContext->bit_rate = bitrate;
     }
 }
 
