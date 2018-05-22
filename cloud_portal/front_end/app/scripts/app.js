@@ -90,6 +90,7 @@ window.L = {};
                     dataType: 'json'
                 })
                     .done(function (response) {
+                        console.log('Set language');
                         languageServiceProvider.setLanguage(response);// Set current language
 
                         // set local variables as providers cannot get values in config phase
@@ -115,24 +116,12 @@ window.L = {};
                         }
 
                         $.ajax({
-                            url: 'static/language.json',
-                            async: false,
-                            dataType: 'json'
-                        })
+                                url     : 'static/language.json',
+                                async   : false,
+                                dataType: 'json'
+                            })
                             .done(function (response) {
                                 languageServiceProvider.setLanguage(response);
-
-                                $.ajax({
-                                    url: 'web_common/commonLanguage.json',
-                                    async: false,
-                                    dataType: 'json'
-                                })
-                                    .done(function (response) {
-                                        languageServiceProvider.setCommonLanguage(response);
-                                    })
-                                    .fail(function (error) {
-                                        console.error('Can\'t get commonLanguage.json -> ' + error);
-                                    });
                             });
                     })
                     .always(function () {

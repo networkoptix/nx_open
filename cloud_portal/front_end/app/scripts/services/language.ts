@@ -133,10 +133,6 @@ import * as angular from 'angular';
                     lang = language;
                     // lang.language = lang.language.replace('-', '_');
                 };
-
-                this.setCommonLanguage = function (language) {
-                    lang.common = language;
-                };
                 // ************************************************
 
                 this.$get = function () {

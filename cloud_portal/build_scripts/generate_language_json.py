@@ -75,7 +75,6 @@ def generate_languages_files(languages, template_filename):
                 data["language_name"] = lang
             merge(data, all_strings)
         save_content("static/lang_" + lang + "/language.json", json.dumps(all_strings, ensure_ascii=False))
-        merge_json("static/lang_" + lang + "/language.json",  "static/lang_" + lang + "/web_common/commonLanguage.json", 'common')
 
         # Process i18n files
         i18n_json_filename = os.path.join("../../../..", "translations", lang, 'language_i18n.json')
@@ -103,5 +102,4 @@ languages = sys.argv[1:]
 if not languages:
     languages = ["en_US"]
 
-merge_json('static/language.json', 'static/web_common/commonLanguage.json', 'common')
 generate_languages_files(languages, 'static/language.json')
