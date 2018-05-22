@@ -112,7 +112,10 @@ void ReverseConnectionManager::onHttpClientDone(nx::network::http::AsyncClient* 
             }
             else
             {
-                m_tcpListener->processNewConnection(httpClient->takeSocket());
+                auto socket = httpClient->takeSocket();
+                socket->setRecvTimeout(kReverseConnectionTimeout);
+                socket->setNonBlockingMode(false);
+                m_tcpListener->processNewConnection(std::move(socket));
             }
             m_runningHttpClients.erase(itr);
             break;
@@ -192,7 +195,7 @@ bool ReverseConnectionManager::addIncomingTcpConnection(
     SocketData data;
     data.socket = std::move(socket);
     data.socket->readSomeAsync(data.tmpReadBuffer.get(),
-        std::bind(&ReverseConnectionManager::at_socketReadTimeout, this, QnUuid(guid), socket.get(), _1, _2));
+        std::bind(&ReverseConnectionManager::at_socketReadTimeout, this, QnUuid(guid), data.socket.get(), _1, _2));
     
     socketPool->second.sockets.push_back(std::move(data));
     

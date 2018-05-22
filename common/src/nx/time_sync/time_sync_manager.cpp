@@ -110,6 +110,7 @@ bool TimeSyncManager::loadTimeFromServer(const QnRoute& route)
 
     auto httpClient = std::make_unique<nx::network::http::HttpClient>();
     httpClient->setSocket(std::move(socket));
+    httpClient->setResponseReadTimeoutMs(std::chrono::milliseconds(kProxySocetTimeout).count());
     auto server = commonModule()->resourcePool()->getResourceById<QnMediaServerResource>(route.id);
     if (!server)
     {
