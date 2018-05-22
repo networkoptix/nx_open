@@ -139,11 +139,6 @@ ApplicationWindow
         }
     }
 
-    Component.onDestruction:
-    {
-        connectionManager.disconnectFromServer()
-    }
-
     Screen.onPrimaryOrientationChanged: androidBarPositionWorkaround.updateBarPosition()
 
     Timer
