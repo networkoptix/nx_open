@@ -2,6 +2,7 @@ import csv
 import logging
 from pprint import pformat
 from uuid import UUID
+import re
 
 from netaddr import EUI, IPAddress
 from netaddr.strategy.eui48 import mac_bare
@@ -71,13 +72,22 @@ class VirtualBox(object):
 
     def clone(self, vm_name, vm_index, vm_configuration):
         """Clone and setup Machine with simple and generic parameters. Template can be any specific type."""
-        self.host_os_access.run_command([
-            'VBoxManage', 'clonevm', vm_configuration['template_vm'],
-            '--snapshot', vm_configuration['template_vm_snapshot'],
-            '--name', vm_name,
-            '--options', 'link',
-            '--register',
-            ])
+        try:
+            self.host_os_access.run_command([
+                'VBoxManage', 'clonevm', vm_configuration['template_vm'],
+                '--snapshot', vm_configuration['template_vm_snapshot'],
+                '--name', vm_name,
+                '--options', 'link',
+                '--register',
+                ])
+        except exit_status_error_cls(1) as x:
+            _logger.error(x.stderr)
+            if 'VBOX_E_OBJECT_NOT_FOUND' not in x.stderr:
+                raise
+            mo = re.search(r"Could not find a registered machine named '(.+)'", x.stderr, re.MULTILINE)
+            if not mo:
+                raise
+            raise RuntimeError('Template VM is missing: %r' % mo.group(1))
         modify_command = ['VBoxManage', 'modifyvm', vm_name]
         forwarded_ports = calculate_forwarded_ports(vm_index, vm_configuration['port_forwarding'])
         for tag, protocol, host_port, guest_port in forwarded_ports:
