@@ -21,9 +21,9 @@
   <String Id="HelpHeader">安裝程式説明</String>
   <String Id="HelpCloseButton">關閉​​​</String>
   <String Id="InstallOptionsButton">選項</String>
-  <String Id="InstallInstallButton">Install</String>
+  <String Id="InstallInstallButton">安裝</String>
   <String Id="InstallCloseButton">關閉​​​</String>
-  <String Id="InstallAcceptCheckbox">I agree to the</String>
+  <String Id="InstallAcceptCheckbox">我同意使用條款及條件</String>
   <String Id="InstallLicenseLinkText">使用者授權協議</String>
   <String Id="OptionsHeader">設定選項</String>
   <String Id="OptionsLocationLabel">安裝位置︰</String>
@@ -69,4 +69,7 @@
   <String Id="WixExecFirewallExceptionsUninstall">移除 Windows 防火牆設定</String>
   <String Id="Product_ArchMismatch_x86">此安裝包是為 32 位元作業系統設計的. 安裝程式將立即退出.</String>
   <String Id="Product_ArchMismatch_x64">此安裝包是為 64 位元作業系統設計的. 安裝程式將立即退出.</String>
+
+  <UI Dialog="BalExtension" Control="EulaAcceptCheckbox" Width="136"/>
+  <UI Dialog="BalExtension" Control="EulaHyperlink" X="150"/>
 </WixLocalization>

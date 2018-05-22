@@ -407,7 +407,7 @@
 <div class="panel-body text-center" ng-if="stepIs('noInternetOnServer')">
     <h2>Connetti il ​​server ad Internet</h2>
     <p class="master-description">
-        Impostare la connessione Internet sul server per poter <br> collegarsi ad esso ovunque utilizzando {{Config.cloud.productName}}.
+        Impostare la connessione Internet sul server per poter <br> collegarsi ad esso ovunque utilizzando {{Config.cloud.productName}}.{{Config.cloud.productName}}.
     </p>
     <p class="master-controls">
         <button class="btn btn-default" ng-click="retry()"> Riprova </button> <button class="btn btn-default" ng-click="skip()"> Imposta il sistema locale </button>
@@ -424,8 +424,7 @@
         Controlla la connessione Internet.
     </p>
     <p class="master-controls">
-        <button class="btn btn-default" ng-click="retry()">Try again</button>
-        <button class="btn btn-default" ng-click="skip()">Setup local system</button>
+        <button class="btn btn-default" ng-click="retry()"> Riprovare </button> <button class="btn btn-default" ng-click="skip()"> Imposta il sistema locale </button>
     </p>
 </div>
 
@@ -446,7 +445,7 @@
     <p class="master-description">Qualcosa è andato completamente storto. <br> Descrizione errore: {{settings.localError}}
     </p>
     <p class="master-controls">
-        <button class="btn btn-default" ng-click="retry()">Riprova</button>
+        <button class="btn btn-default" ng-click="retry()">Riprovare</button>
     </p>
 </div>
 
