@@ -146,7 +146,7 @@ bool validatePasswordData(const PasswordData& passwordData, QString* errStr)
     if (!passwordData.password.isEmpty())
     {
         const auto passwordStrength = nx::utils::passwordStrength(passwordData.password);
-        if (nx::utils::passwordAcceptance(passwordStrength) == nx::utils::PasswordAcceptance::Unaccaptable)
+        if (nx::utils::passwordAcceptance(passwordStrength) == nx::utils::PasswordAcceptance::Unacceptable)
         {
             if (errStr)
                 *errStr = lit("New password is not acceptable: %1").arg(nx::utils::toString(passwordStrength));

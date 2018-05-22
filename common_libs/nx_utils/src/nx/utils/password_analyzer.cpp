@@ -216,7 +216,7 @@ PasswordAcceptance passwordAcceptance(PasswordStrength strength)
             return PasswordAcceptance::Acceptable;
 
         default:
-            return PasswordAcceptance::Unaccaptable;
+            return PasswordAcceptance::Unacceptable;
     }
 }
 

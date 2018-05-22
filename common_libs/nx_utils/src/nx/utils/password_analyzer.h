@@ -55,7 +55,7 @@ NX_UTILS_API PasswordStrength cameraPasswordStrength(const QString& password);
 
 enum PasswordAcceptance
 {
-    Unaccaptable = -1,
+    Unacceptable = -1,
     Acceptable,
     Good
 };
