@@ -453,34 +453,6 @@ PageBase
                     moveOnTapOverlay.close()
                 }
             }
-
-            Connections
-            {
-                target: moveOnTapOverlay
-                onClicked:
-                {
-                    if (videoScreenController.resourceHelper.fisheyeParams.enabled || !video.item)
-                        return
-
-                    var mapped = mapToItem(video.item, pos.x, pos.y)
-                    var data = video.item.getMoveViewportData(mapped)
-                    if (!data)
-                        return
-
-                    ptzPanel.moveViewport(data.viewport, data.aspect)
-                    preloader.pos = pos
-                    preloader.visible = true
-                }
-
-                onVisibleChanged:
-                {
-                    if (moveOnTapOverlay.visible)
-                        return
-
-                    showUi()
-                    ptzPanel.moveOnTapMode = false
-                }
-            }
         }
 
         PtzViewportMovePreloader
@@ -499,6 +471,30 @@ PageBase
             width: mainWindow.width
             height: mainWindow.height
             parent: videoScreen
+
+            onClicked:
+            {
+                if (videoScreenController.resourceHelper.fisheyeParams.enabled || !video.item)
+                    return
+
+                var mapped = contentItem.mapToItem(video.item, pos.x, pos.y)
+                var data = video.item.getMoveViewportData(mapped)
+                if (!data)
+                    return
+
+                ptzPanel.moveViewport(data.viewport, data.aspect)
+                preloader.pos = contentItem.mapToItem(preloader.parent, pos.x, pos.y)
+                preloader.visible = true
+            }
+
+            onVisibleChanged:
+            {
+                if (moveOnTapOverlay.visible)
+                    return
+
+                showUi()
+                ptzPanel.moveOnTapMode = false
+            }
         }
 
         VideoNavigation
