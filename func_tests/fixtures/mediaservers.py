@@ -11,8 +11,9 @@ _logger = logging.getLogger(__name__)
 
 
 def pytest_addoption(parser):
-    parser.addoption('--mediaserver-installers-dir', type=LocalPath, required=True,
-                         help='Directory to mediaserver distributives')
+    parser.addoption(
+        '--mediaserver-installers-dir', type=LocalPath, required=True,
+        help="Directory with installers of same version and customization.")
     parser.addoption('--mediaserver-dist-path', help="Ignored.")
 
 
