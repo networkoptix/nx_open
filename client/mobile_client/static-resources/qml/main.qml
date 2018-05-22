@@ -14,6 +14,7 @@ ApplicationWindow
     property real rightPadding: rightCustomMargin
     property real bottomPadding: bottomCustomMargin
 
+    readonly property bool hasNavigationBar: getNavigationBarHeight()
     readonly property real keyboardHeight: Qt.inputMethod.visible
         ? Qt.inputMethod.keyboardRectangle.height
             / (Qt.platform.os !== "ios" ? Screen.devicePixelRatio : 1)

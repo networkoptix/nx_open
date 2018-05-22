@@ -237,7 +237,10 @@ Item
             visible: videoNavigation.canViewArchive
 
             anchors.bottom: parent.bottom
-            width: parent.width
+
+            x: mainWindow.hasNavigationBar ? 0 : -mainWindow.leftPadding
+            width: mainWindow.hasNavigationBar ? parent.width : mainWindow.width
+
             height: 96
 
             stickToEnd: d.liveMode && !paused

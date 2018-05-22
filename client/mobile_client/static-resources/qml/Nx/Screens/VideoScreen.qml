@@ -149,7 +149,8 @@ PageBase
         background: Image
         {            
             y: -toolBar.statusBarHeight
-            width: parent.width
+            x: -mainWindow.leftPadding
+            width: mainWindow.width
             height: 96
             source: lp("/images/toolbar_gradient.png")
         }
@@ -557,6 +558,7 @@ PageBase
         id: navigationBarTint
 
         color: ColorTheme.base3
+        visible: mainWindow.hasNavigationBar
         width: mainWindow.width - parent.width
         height: video.height
         x: mainWindow.leftPadding ? -mainWindow.leftPadding : parent.width
