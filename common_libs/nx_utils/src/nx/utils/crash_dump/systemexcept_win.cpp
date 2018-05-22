@@ -8,6 +8,7 @@
 #include <Dbghelp.h>
 #include <Windows.h>
 #include <ShlObj.h>
+#include <signal.h>
 
 #include <QtCore/QCoreApplication>
 #include <QtCore/QStandardPaths>
@@ -234,14 +235,28 @@ static void myPurecallHandler()
     dumpCrtError();
 }
 
+static void abortHandler(int signal)
+{
+    if (signal == SIGABRT)
+    {
+        // Cause access violation so abort is handled the same way.
+        // if we call dumpCrtError() here instead minidump will not contain any exception code.
+        *static_cast<volatile int*>(0) = 7;
+    }
+}
+
 void win32_exception::installGlobalUnhandledExceptionHandler()
 {
      //_set_se_translator( &win32_exception::translate );
     SetUnhandledExceptionFilter( &unhandledSEHandler );
 
-    //installing CRT handlers (invalid parameter, purecall, etc.)
+    // installing CRT handlers (invalid parameter, purecall, etc.)
     _set_invalid_parameter_handler( invalidCrtCallParameterHandler );
     _set_purecall_handler( myPurecallHandler );
+
+    // unhandled c++ exceptions, abort(), etc.
+    signal( SIGABRT, abortHandler );
+    _set_abort_behavior( 0, _WRITE_ABORT_MSG );
 }
 
 void win32_exception::installThreadSpecificUnhandledExceptionHandler()
