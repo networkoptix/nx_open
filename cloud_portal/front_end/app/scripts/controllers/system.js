@@ -109,11 +109,16 @@ angular.module('cloudApp')
                     });
             }
 
-            $scope.disconnect = function () {
-                if ($scope.system.isMine) {
+            function updateAndGoToSystems(){
+                $scope.userDisconnectSystem = true;
+                systemsProvider.forceUpdateSystems().then(function(){$location.path('/systems')});
+            }
+
+            $scope.disconnect = function(){
+                if($scope.system.isMine){
                     // User is the owner. Deleting system means unbinding it and disconnecting all accounts
                     // dialogs.confirm(L.system.confirmDisconnect, L.system.confirmDisconnectTitle, L.system.confirmDisconnectAction, 'danger').
-                    dialogs.disconnect(systemId).then(reloadSystems);
+                    dialogs.disconnect(systemId).then(updateAndGoToSystems);
                 }
             };
 
@@ -126,7 +131,8 @@ angular.module('cloudApp')
                         }, {
                             successMessage: L.system.successDeleted.replace('{{systemName}}', $scope.system.info.name),
                             errorPrefix   : L.errorCodes.cantUnshareWithMeSystemPrefix
-                        }).then(reloadSystems);
+                        }).then(updateAndGoToSystems);
+
                         $scope.deletingSystem.run();
                     });
                 }
@@ -227,6 +233,13 @@ angular.module('cloudApp')
                     $scope.system.info.name || L.errorCodes.thisSystem), 'warning');
                 $location.path("/systems");
             }
+
+            $scope.$on('$destroy', function() {
+                cancelSubscription();
+               if( $scope.userDisconnectSystem === undefined){
+                   dialogs.dismissNotifications();
+               }
+            });
 
             var cancelSubscription = $scope.$on("unauthorized_" + $routeParams.systemId, connectionLost);
 

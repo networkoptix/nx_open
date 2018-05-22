@@ -12,97 +12,92 @@
                 // previewPath: '',
                 // viewsDirCommon: 'static/web_common/views/',
                 // ***************************************************************
+
                 const config = {
-                    gatewayUrl    : '/gateway',
+                    gatewayUrl: '/gateway',
                     googleTagsCode: 'GTM-5MRNWP',
-                    apiBase       : '/api',
-                    realm         : 'VMS',
-
-                    cacheTimeout     : 20 * 1000, // Cache lives for 30 seconds
-                    updateInterval   : 30 * 1000, // Update content on pages every 30 seconds
-                    openClientTimeout: 20 * 1000, // 20 seconds we wait for client to open
-
-                    openMobileClientTimeout: 300, // 300ms for mobile browsers
-
-                    alertTimeout       : 3 * 1000,  // Alerts are shown for 3 seconds
-                    alertsMaxCount     : 5,
-                    minSystemsToSearch : 9, //We need at least 9 system to enable search
-                    maxSystemsForHeader: 6, // Dropdown at the top is limited in terms of number of cameras to display
-
-                    redirectAuthorised  : '/systems', // Page for redirecting all authorised users
-                    redirectUnauthorised: '/', // Page for redirecting all unauthorised users by default
-
+                    apiBase: '/api',
+                    realm: 'VMS',
+                    cacheTimeout: 20 * 1000,
+                    updateInterval: 30 * 1000,
+                    openClientTimeout: 20 * 1000,
+                    openMobileClientTimeout: 300,
+                    alertTimeout: 3 * 1000,
+                    alertsMaxCount: 5,
+                    minSystemsToSearch: 9,
+                    maxSystemsForHeader: 6,
+                    redirectAuthorised: '/systems',
+                    redirectUnauthorised: '/',
                     systemStatuses: {
-                        onlineStatus: 'online', //*/'offline', // - special hack for a bug
-                        sortOrder   : [
+                        onlineStatus: 'online',
+                        sortOrder: [
                             'online',
                             'offline',
                             'activated',
                             'unavailable',
                             'notActivated'
                         ],
-                        default     : {
+                        default: {
                             style: 'badge-default'
                         },
                         notActivated: {
                             style: 'badge-danger'
                         },
-                        activated   : {
+                        activated: {
                             style: 'badge-info'
                         },
-                        online      : {
+                        online: {
                             style: 'badge-success'
                         },
-                        offline     : {
+                        offline: {
                             style: 'badge-default'
                         },
-                        unavailable : {
+                        unavailable: {
                             style: 'badge-default'
                         }
                     },
-                    accessRoles   : {
-                        unshare                  : 'none',
-                        default                  : 'Viewer',
-                        disabled                 : 'disabled',
-                        custom                   : 'custom',
-                        owner                    : 'Owner',
-                        editUserPermissionFlag   : 'GlobalAdminPermission',
+                    accessRoles: {
+                        unshare: 'none',
+                        default: 'Viewer',
+                        disabled: 'disabled',
+                        custom: 'custom',
+                        owner: 'Owner',
+                        editUserPermissionFlag: 'GlobalAdminPermission',
                         globalAdminPermissionFlag: 'GlobalAdminPermission',
-                        customPermission         : {
-                            name       : 'Custom',
+                        customPermission: {
+                            name: 'Custom',
                             permissions: 'NoPermission'
                         },
-
-                        editUserAccessRoleFlag   : 'Admin', // TODO: remove it later when cloud permissions are ready
-                        globalAdminAccessRoleFlag: 'Admin', // TODO: remove it later when cloud permissions are ready
-                        predefinedRoles          : [
+                        editUserAccessRoleFlag: 'Admin',
+                        globalAdminAccessRoleFlag: 'Admin',
+                        predefinedRoles: [
                             {
-                                'isOwner'    : true,
-                                'name'       : 'Owner',
+                                'isOwner': true,
+                                'name': 'Owner',
                                 'permissions': 'GlobalAdminPermission|GlobalEditCamerasPermission|GlobalControlVideoWallPermission|GlobalViewLogsPermission|GlobalViewArchivePermission|GlobalExportPermission|GlobalViewBookmarksPermission|GlobalManageBookmarksPermission|GlobalUserInputPermission|GlobalAccessAllMediaPermission'
                             },
                             {
-                                'name'       : 'Administrator',
+                                'name': 'Administrator',
                                 'permissions': 'GlobalAdminPermission|GlobalEditCamerasPermission|GlobalControlVideoWallPermission|GlobalViewLogsPermission|GlobalViewArchivePermission|GlobalExportPermission|GlobalViewBookmarksPermission|GlobalManageBookmarksPermission|GlobalUserInputPermission|GlobalAccessAllMediaPermission'
                             },
                             {
-                                'name'       : 'Advanced Viewer',
+                                'name': 'Advanced Viewer',
                                 'permissions': 'GlobalViewLogsPermission|GlobalViewArchivePermission|GlobalExportPermission|GlobalViewBookmarksPermission|GlobalManageBookmarksPermission|GlobalUserInputPermission|GlobalAccessAllMediaPermission'
                             },
                             {
-                                'name'       : 'Viewer',
+                                'name': 'Viewer',
                                 'permissions': 'GlobalViewArchivePermission|GlobalExportPermission|GlobalViewBookmarksPermission|GlobalAccessAllMediaPermission'
                             },
                             {
-                                'name'       : 'Live Viewer',
+                                'name': 'Live Viewer',
                                 'permissions': 'GlobalAccessAllMediaPermission'
                             },
                             {
-                                'name'       : 'Custom',
+                                'name': 'Custom',
                                 'permissions': 'NoPermission'
                             }
                         ],
-                        order                    : [
+                        order: [
                             'Live Viewer',
                             'liveViewer',
                             'Viewer',
@@ -117,126 +112,121 @@
                             'owner'
                         ]
                     },
-
-                    emailRegex: '^[-!#$%&\'*+/=?^_`{}|~0-9a-zA-Z]+(\\.[-!#$%&\'*+/=?^_`{}|~0-9a-zA-Z]+)*@(?:[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?\\.)+[a-zA-Z]{2,6}\\.?$', // Check only @ and . in the email
-
+                    emailRegex: '^[-!#$%&\'*+/=?^_`{}|~0-9a-zA-Z]+(\\.[-!#$%&\'*+/=?^_`{}|~0-9a-zA-Z]+)*@(?:[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?\\.)+[a-zA-Z]{2,6}\\.?$',
                     passwordRequirements: {
-                        minLength         : 8,
-                        maxLength         : 255,
-                        requiredRegex     : '^[\x21-\x7E]$|^[\x21-\x7E][\x20-\x7E]*[\x21-\x7E]$',
-                        minClassesCount   : 2,
+                        minLength: 8,
+                        maxLength: 255,
+                        requiredRegex: '^[\x21-\x7E]$|^[\x21-\x7E][\x20-\x7E]*[\x21-\x7E]$',
+                        minClassesCount: 2,
                         strongClassesCount: 3
                     },
-
-
-                    downloads                     : {
-                        mobile: [ // Mobile apps have permanent links, depending on customization
+                    downloads: {
+                        mobile: [
                             {
                                 name: 'ios',
-                                os  : 'iOS'
+                                os: 'iOS'
                             },
                             {
                                 name: 'android',
-                                os  : 'Android'
+                                os: 'Android'
                             }
                         ],
                         groups: [
-                            { // Tabs
-                                name      : 'windows', // platform id
-                                os        : 'Windows', // For browser auto-detection
-                                installers: [  // This also sets the order for links on the page. Each file to download must be specified here
-                                    { // Check https://networkoptix.atlassian.net/wiki/display/SD/Installer+Filenames for specification
-                                        platform: 'win64',
-                                        appType : 'client'
-                                    },
+                            {
+                                name: 'windows',
+                                os: 'Windows',
+                                installers: [
                                     {
                                         platform: 'win64',
-                                        appType : 'server'
+                                        appType: 'client'
                                     },
                                     {
                                         platform: 'win64',
-                                        appType : 'bundle'
+                                        appType: 'server'
+                                    },
+                                    {
+                                        platform: 'win64',
+                                        appType: 'bundle'
                                     },
                                     {
                                         platform: 'win86',
-                                        appType : 'client'
+                                        appType: 'client'
                                     },
                                     {
                                         platform: 'win86',
-                                        appType : 'server'
+                                        appType: 'server'
                                     },
                                     {
                                         platform: 'win86',
-                                        appType : 'bundle'
+                                        appType: 'bundle'
                                     }
                                 ]
                             },
                             {
-                                name      : 'linux',
-                                os        : 'Linux',
+                                name: 'linux',
+                                os: 'Linux',
                                 installers: [
                                     {
                                         platform: 'linux64',
-                                        appType : 'client'
+                                        appType: 'client'
                                     },
                                     {
                                         platform: 'linux64',
-                                        appType : 'server'
+                                        appType: 'server'
                                     },
                                     {
                                         platform: 'linux86',
-                                        appType : 'client'
+                                        appType: 'client'
                                     },
                                     {
                                         platform: 'linux86',
-                                        appType : 'server'
+                                        appType: 'server'
                                     }
                                 ]
                             },
                             {
-                                name      : 'mac',
-                                os        : 'MacOS',
+                                name: 'mac',
+                                os: 'MacOS',
                                 installers: [
                                     {
                                         platform: 'mac',
-                                        appType : 'client'
+                                        appType: 'client'
                                     }
                                 ]
                             }
                         ]
                     },
-                    webclient                     : {
-                        useServerTime            : true,
-                        disableVolume            : true,
-                        reloadInterval           : 5 * 1000,
-                        leftPanelPreviewHeight   : 128, // 128px is the height for previews in the left panel
-                        resetDisplayedTextTimer  : 3 * 1000,
-                        hlsLoadingTimeout        : 90 * 1000,
+                    webclient: {
+                        useServerTime: true,
+                        disableVolume: true,
+                        reloadInterval: 5 * 1000,
+                        leftPanelPreviewHeight: 128,
+                        resetDisplayedTextTimer: 3 * 1000,
+                        hlsLoadingTimeout: 90 * 1000,
                         // One minute timeout for manifest:
                         // * 30 seconds for gateway to open connection
                         // * 30 seconds for server to init camera
                         // * 20 seconds for chunks
                         // * 10 seconds extra
-                        updateArchiveStateTimeout: 60 * 1000, // If camera hs no archive - try to update it every minute
-                        flashChromelessPath      : 'components/flashlsChromeless.swf',
-                        flashChromelessDebugPath : 'components/flashlsChromeless_debug.swf',
-                        staticResources          : 'static/web_common/',
-                        maxCrashCount            : 2,
-                        nativeTimeout            : 60 * 1000, //60s
-                        playerReadyTimeout       : 100,
-                        endOfArchiveTime         : 30 * 1000, //30s
-                        chunksToCheckFatal       : 30 //This is used in short cache when requesting chunks for jumpToPosition in timeline directive
-
+                        updateArchiveStateTimeout: 60 * 1000,
+                        flashChromelessPath: 'components/flashlsChromeless.swf',
+                        flashChromelessDebugPath: 'components/flashlsChromeless_debug.swf',
+                        staticResources: 'static/web_common/',
+                        maxCrashCount: 2,
+                        nativeTimeout: 60 * 1000,
+                        playerReadyTimeout: 100,
+                        endOfArchiveTime: 30 * 1000,
+                        chunksToCheckFatal: 30 //This is used in short cache when requesting chunks for jumpToPosition in timeline directive
                     },
-                    globalEditServersPermissions  : 'GlobalAdminPermission',
-                    globalViewArchivePermission   : 'GlobalViewArchivePermission',
+                    globalEditServersPermissions: 'GlobalAdminPermission',
+                    globalViewArchivePermission: 'GlobalViewArchivePermission',
                     globalAccessAllMediaPermission: 'GlobalAccessAllMediaPermission',
-                    allowBetaMode                 : false, //Enables usage of beta features
-                    allowDebugMode                : false, // Allow debugging at all. Set to false in production
-                    debug                         : {
+                    allowBetaMode: false,
+                    allowDebugMode: false,
+                    debug: {
                         chunksOnTimeline: false // timeline.js - draw debug events
                     },
-                    responseOk                    : 'ok'
+                    responseOk: 'ok'
                 };
 
                 this.$get = function () {
