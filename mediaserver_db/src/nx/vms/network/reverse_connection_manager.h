@@ -50,7 +50,6 @@ private slots:
     void at_reverseConnectionRequested(const ec2::ApiReverseConnectionData& data);
 private:
     void onHttpClientDone(nx::network::http::AsyncClient* httpClient);
-    std::unique_ptr<nx::network::AbstractStreamSocket> getPreparedSocketUnsafe(const QnUuid& guid);
 
     void at_socketReadTimeout(
         const QnUuid& serverId,
@@ -64,9 +63,12 @@ private:
 
     struct SocketData
     {
-        SocketData() { tmpReadBuffer.reserve(32); }
+        SocketData(): tmpReadBuffer(new QByteArray())
+        { 
+            tmpReadBuffer->reserve(32);
+        }
         std::unique_ptr<nx::network::AbstractStreamSocket> socket;
-        QByteArray tmpReadBuffer;
+        std::unique_ptr<QByteArray> tmpReadBuffer;
     };
 
     struct PreparedSocketPool
@@ -80,6 +82,8 @@ private:
     QnWaitCondition m_proxyCondition;
 
     QnHttpConnectionListener* m_tcpListener = nullptr;
+private:
+    SocketData getPreparedSocketUnsafe(const QnUuid& guid);
 };
 
 } // namespace network

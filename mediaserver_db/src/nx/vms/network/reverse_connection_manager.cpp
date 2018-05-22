@@ -120,16 +120,17 @@ void ReverseConnectionManager::onHttpClientDone(nx::network::http::AsyncClient* 
     }
 }
 
-std::unique_ptr<nx::network::AbstractStreamSocket> ReverseConnectionManager::getPreparedSocketUnsafe(const QnUuid& guid)
+ReverseConnectionManager::SocketData 
+    ReverseConnectionManager::getPreparedSocketUnsafe(const QnUuid& guid)
 {
     auto& socketPool = m_preparedSockets[guid];
     if (!socketPool.sockets.empty())
     {
         auto result = std::move(socketPool.sockets.front());
         socketPool.sockets.pop_front();
-        return std::move(result.socket);
+        return result;
     }
-    return std::unique_ptr<nx::network::AbstractStreamSocket>();
+    return SocketData();
 }
 
 std::unique_ptr<nx::network::AbstractStreamSocket> ReverseConnectionManager::getProxySocket(
@@ -152,11 +153,12 @@ std::unique_ptr<nx::network::AbstractStreamSocket> ReverseConnectionManager::get
     timer.restart();
     while (!timer.hasExpired(kReverseConnectionTimeout))
     {
-        if (auto socket = getPreparedSocketUnsafe(guid))
+        auto socketData = getPreparedSocketUnsafe(guid);
+        if (socketData.socket)
         {
             lock.unlock();
-            socket->cancelIOSync(nx::network::aio::etRead);
-            return socket;
+            socketData.socket->cancelIOSync(nx::network::aio::etRead);
+            return std::move(socketData.socket);
         }
         auto& socketPool = m_preparedSockets[guid];
         if (socketPool.requested == 0 || socketPool.timer.hasExpired(kReverseConnectionTimeout))
@@ -189,7 +191,7 @@ bool ReverseConnectionManager::addIncomingTcpConnection(
     
     SocketData data;
     data.socket = std::move(socket);
-    data.socket->readSomeAsync(&data.tmpReadBuffer,
+    data.socket->readSomeAsync(data.tmpReadBuffer.get(),
         std::bind(&ReverseConnectionManager::at_socketReadTimeout, this, QnUuid(guid), socket.get(), _1, _2));
     
     socketPool->second.sockets.push_back(std::move(data));
