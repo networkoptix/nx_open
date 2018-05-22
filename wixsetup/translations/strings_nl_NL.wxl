@@ -21,9 +21,9 @@
   <String Id="HelpHeader">Setup Help</String>
   <String Id="HelpCloseButton">Sluiten</String>
   <String Id="InstallOptionsButton">Opties</String>
-  <String Id="InstallInstallButton">Install</String>
+  <String Id="InstallInstallButton">Installeren</String>
   <String Id="InstallCloseButton">Sluiten</String>
-  <String Id="InstallAcceptCheckbox">I agree to the</String>
+  <String Id="InstallAcceptCheckbox">Ik ga akkoord met de</String>
   <String Id="InstallLicenseLinkText">Eindgebruiker licentieovereenkomst</String>
   <String Id="OptionsHeader">Setup-opties</String>
   <String Id="OptionsLocationLabel">Installatie locatie:</String>

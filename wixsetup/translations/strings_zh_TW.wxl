@@ -21,9 +21,9 @@
   <String Id="HelpHeader">安裝程式説明</String>
   <String Id="HelpCloseButton">關閉​​​</String>
   <String Id="InstallOptionsButton">選項</String>
-  <String Id="InstallInstallButton">Install</String>
+  <String Id="InstallInstallButton">安裝</String>
   <String Id="InstallCloseButton">關閉​​​</String>
-  <String Id="InstallAcceptCheckbox">I agree to the</String>
+  <String Id="InstallAcceptCheckbox">我同意使用條款及條件</String>
   <String Id="InstallLicenseLinkText">使用者授權協議</String>
   <String Id="OptionsHeader">設定選項</String>
   <String Id="OptionsLocationLabel">安裝位置︰</String>
