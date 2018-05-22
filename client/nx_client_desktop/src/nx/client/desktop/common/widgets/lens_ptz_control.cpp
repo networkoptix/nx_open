@@ -198,14 +198,13 @@ void LensPtzControl::resizeEvent(QResizeEvent* event)
 
 void LensPtzControl::mousePressEvent(QMouseEvent* event)
 {
-    const int controlBtn = Qt::LeftButton;
-    QPointF localPos = screenToLocal(event->pos());
-
     if (m_state != StateInitial)
         return;
 
-    if (!(event->button() & controlBtn))
+    if (!(event->buttons().testFlag(Qt::LeftButton)))
         return;
+
+    QPointF localPos = screenToLocal(event->pos());
 
     if (m_panTiltEnabled && m_ptzHandler.picks(localPos))
     {
