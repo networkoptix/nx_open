@@ -125,7 +125,7 @@ nx::network::AbstractStreamServerSocket* QnUniversalTcpListener::createAndPrepar
         if (sslNeeded)
         {
             m_serverSocket = nx::network::SocketFactory::createSslAdapter(
-                std::move(m_serverSocket),
+                std::exchange(m_serverSocket, nullptr),
                 nx::network::ssl::EncryptionUse::autoDetectByReceivedData);
         }
     #endif
