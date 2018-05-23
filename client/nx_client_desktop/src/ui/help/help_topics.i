@@ -142,6 +142,7 @@ QN_HELP_TOPIC(CameraSettings_Dewarping_Help,                    "setting_up_fish
 QN_HELP_TOPIC(CameraSettings_AspectRatio_Help,                  "forcing_aspect_ratio_for_camer.htm")
 QN_HELP_TOPIC(CameraSettings_Rotation_Help,                     "setting_up_camera_orientation.htm")
 QN_HELP_TOPIC(CameraSettings_Expert_SettingsControl_Help,       "preventing_VMS_from_C.htm")
+QN_HELP_TOPIC(CameraSettings_Expert_CalculateBitratePerGop,       "adjustiung_average_bitrate_on_.htm")
 QN_HELP_TOPIC(CameraSettings_Expert_DisableArchivePrimary_Help, "disabling_recording_of_primary.htm")
 QN_HELP_TOPIC(CameraSettings_Expert_Rtp_Help,                   "setting_up_camera_transport_pr.htm")
 
