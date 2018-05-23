@@ -15,6 +15,7 @@
 #include <nx/fusion/serialization/json.h>
 #include <rest/server/json_rest_result.h>
 #include <api/model/time_reply.h>
+#include <nx/network/http/custom_headers.h>
 
 namespace nx {
 namespace time_sync {
@@ -108,6 +109,7 @@ bool TimeSyncManager::loadTimeFromServer(const QnRoute& route)
     auto httpClient = std::make_unique<nx::network::http::HttpClient>();
     httpClient->setSocket(std::move(socket));
     httpClient->setResponseReadTimeoutMs(std::chrono::milliseconds(kProxySocetTimeout).count());
+    httpClient->addAdditionalHeader(Qn::SERVER_GUID_HEADER_NAME, route.id.toByteArray());
     auto server = commonModule()->resourcePool()->getResourceById<QnMediaServerResource>(route.id);
     if (!server)
     {
@@ -121,14 +123,21 @@ bool TimeSyncManager::loadTimeFromServer(const QnRoute& route)
     url.setPath(kTimeSyncUrlPath);
 
     nx::utils::ElapsedTimer timer;
-    timer.restart();
-    bool success = httpClient->doGet(url);
-    auto response = httpClient->fetchEntireMessageBody();
-    if (!success || !response)
+    // With gateway repeat request twice to make sure we have opened tunnel to the target server.
+    // That way it is possible to reduce rtt.
+    const int iterations = route.gatewayId.isNull() ? 1 : 2;
+    boost::optional<QByteArray> response;
+    for (int i = 0; i < iterations; ++i)
     {
-        NX_WARNING(this, lm("Can't read time from server %1. Error: %2")
-            .args(route.id.toString(), httpClient->lastSysErrorCode()));
-        return false;
+        timer.restart();
+        bool success = httpClient->doGet(url);
+        response = httpClient->fetchEntireMessageBody();
+        if (!success || !response)
+        {
+            NX_WARNING(this, lm("Can't read time from server %1. Error: %2")
+                .args(route.id.toString(), httpClient->lastSysErrorCode()));
+            return false;
+        }
     }
 
     auto jsonResult = QJson::deserialized<QnJsonRestResult>(*response);
