@@ -1,6 +1,7 @@
 #include "hanwha_codec_limits.h"
 
 #include "hanwha_utils.h"
+#include <nx/utils/log/log.h>
 
 namespace nx {
 namespace mediaserver_core {
@@ -89,11 +90,17 @@ boost::optional<HanwhaCodecLimits> HanwhaCodecInfo::limits(
 
     auto channelInfo = m_channelInfo.find(channelString);
     if (channelInfo == m_channelInfo.cend())
+    {
+        NX_WARNING(this, lm("Channel information for channel %1 not found in cache").args(channel));
         return boost::none;
+    }
 
     auto codecInfo = channelInfo->second.find(codec);
     if (codecInfo == channelInfo->second.cend())
+    {
+        NX_WARNING(this, lm("Codec information for codec %1 not found in cache").args(codec));
         return boost::none;
+    }
 
     auto streamTypeInfo = codecInfo->second.find(streamType);
     if (streamTypeInfo == codecInfo->second.cend())
@@ -101,7 +108,12 @@ boost::optional<HanwhaCodecLimits> HanwhaCodecInfo::limits(
 
     auto resolutionInfo = streamTypeInfo->second.find(resolution);
     if (resolutionInfo == streamTypeInfo->second.cend())
+    {
+        NX_WARNING(
+            this,
+            lm("Resolution information for resolution %1 not found in cache").args(resolution));
         return boost::none;
+    }
 
     return resolutionInfo->second;
 }
