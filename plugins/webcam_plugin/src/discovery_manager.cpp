@@ -5,16 +5,12 @@
 
 #include "discovery_manager.h"
 
-#include <sys/types.h>
-#include <sys/stat.h>
 #ifdef _POSIX_C_SOURCE
 #include <unistd.h>
 #endif
 #include <cstdio>
 
-#include <QtCore/QCryptographicHash>
 #include <nx/network/http/http_client.h>
-#include <nx/network/http/multipart_content_parser.h>
 
 #include "utils.h"
 #include "camera_manager.h"
