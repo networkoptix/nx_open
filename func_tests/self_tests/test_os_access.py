@@ -10,7 +10,6 @@ from framework.os_access.exceptions import Timeout
 from framework.os_access.posix_shell import local_shell
 
 
-
 @pytest.fixture(scope='session')
 def os_access(one_vm):
     return one_vm.os_access
@@ -25,6 +24,7 @@ def test_timeout():
     script = 'import time; time.sleep(60)'
     with pytest.raises(Timeout):
         result = local_shell.run_command([sys.executable, '-c', script], timeout_sec=1)
+
 
 def test_unclosed_stdout():
     sleep_time_sec = 60
