@@ -16,7 +16,7 @@ namespace {
         }
 
         QDateTime toDateTime() const {
-            return QDateTime(date, QTime(0, 0, 0));
+            return QDateTime(date, QTime(0, 0, 0), Qt::UTC);
         }
     };
 }
