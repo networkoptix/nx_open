@@ -11,7 +11,7 @@ namespace nx {
 namespace camera_id_helper {
 
 /**
- * @param resourcePool Resources pool where the search will occur.
+ * @param resourcePool Resource pool where the search will occur.
  * @param params Expected to contain at least one param from the flexibleIdParamNames list,
  *     otherwise nothing is added to the list and the error is logged.
  * @param request Used for logging.
@@ -23,7 +23,7 @@ void findAllCamerasByFlexibleIds(
     const QStringList& flexibleIdParamNames);
 
 /**
- * @param resourcePool Resources pool where the search will occur.
+ * @param resourcePool Resource pool where the search will occur.
  * @param params Expected to contain exactly one param from the flexibleIdParamNames list,
  *     otherwise result is null and the error is logged.
  * @param outNotFoundCameraId If result is null, this argument (if not null) is set to the
@@ -46,7 +46,7 @@ QnSecurityCamResourcePtr findCameraByFlexibleId(
 
 /**
  * @param resourcePool Resources pool where the search will occur.
- * @return camera id, or null if not found.
+ * @return Camera id, or null if not found.
  */
 QnUuid flexibleIdToId(
     QnResourcePool* resourcePool,
