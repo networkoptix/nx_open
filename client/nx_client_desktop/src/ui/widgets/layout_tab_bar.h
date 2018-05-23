@@ -77,9 +77,6 @@ private:
     /** Tab-to-layout mapping. */
     QList<QnWorkbenchLayout *> m_layouts;
 
-    /** Context associated with this tab bar. */
-    QnWorkbenchContext *m_context;
-
     /** Tab we are trying to close with middle mouse button */
     int m_midClickedTab;
 };
