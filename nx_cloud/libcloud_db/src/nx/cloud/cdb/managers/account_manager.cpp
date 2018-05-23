@@ -305,7 +305,7 @@ void AccountManager::reactivateAccount(
     m_dbManager->executeUpdate<std::string, data::AccountConfirmationCode>(
         [this, notification = std::move(notification), account = *existingAccount](
             nx::utils::db::QueryContext* const queryContext,
-            const std::string& accountEmail,
+            const std::string& /*accountEmail*/,
             data::AccountConfirmationCode* const resultData) mutable
         {
             return issueAccountActivationCode(
