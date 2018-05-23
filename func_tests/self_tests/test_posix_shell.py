@@ -58,12 +58,12 @@ if __name__ == '__main__':
     sleep_time_sec = int(sys.argv[1])
 
     if os.fork():
-        print('Parent process, finished.')
+        print("Parent process, finished.")
     else:
-        print('Child process, sleeping for {:d} seconds...'.format(sleep_time_sec))
+        print("Child process, sleeping for {:d} seconds...".format(sleep_time_sec))
         sys.stdout.flush()
         time.sleep(sleep_time_sec)
-        print('Child process, finished.')
+        print("Child process, finished.")
 '''
 
 
