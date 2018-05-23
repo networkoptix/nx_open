@@ -45,6 +45,9 @@
        <property name="bottomMargin">
         <number>0</number>
        </property>
+       <property name="horizontalSpacing">
+        <number>16</number>
+       </property>
        <property name="verticalSpacing">
         <number>2</number>
        </property>
