@@ -38,3 +38,8 @@ def has_value(data_structure_name, context, customization, language):
                                              customization=customization,
                                              language=language)
     return data_records.exists()
+
+
+@register.simple_tag
+def get_datastructure_type(data_structure):
+    return DataStructure.DATA_TYPES[data_structure.type]
