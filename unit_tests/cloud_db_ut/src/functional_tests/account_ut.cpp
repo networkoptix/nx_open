@@ -818,10 +818,31 @@ public:
     {
     }
 
+    ~AccountNewTest()
+    {
+        if (m_emailManagerFactoryBak)
+            EMailManagerFactory::setFactory(std::move(*m_emailManagerFactoryBak));
+    }
+
 protected:
     virtual void SetUp() override
     {
+        using namespace std::placeholders;
+
+        m_emailManager.setOnReceivedNotification(
+            std::bind(&AccountNewTest::notificationReceived, this, _1));
+
+        m_emailManagerFactoryBak = EMailManagerFactory::setFactory(
+            [this](const conf::Settings& /*settings*/)
+            {
+                return std::make_unique<EmailManagerStub>(&m_emailManager);
+            });
+
         ASSERT_TRUE(startAndWaitUntilStarted());
+    }
+
+    virtual void notificationReceived(const nx::cdb::AbstractNotification& /*notification*/)
+    {
     }
 
     void givenNotActivatedAccount()
@@ -972,6 +993,8 @@ private:
     std::optional<api::ResultCode> m_prevResultCode;
     std::optional<std::string> m_usernameToUse;
     std::optional<std::string> m_passwordToUse;
+    TestEmailManager m_emailManager;
+    std::optional<EMailManagerFactory::FactoryFunc> m_emailManagerFactoryBak;
 
     api::AccountData getFreshAccountCopy()
     {
@@ -1097,6 +1120,25 @@ protected:
             ASSERT_LT(accountData.activationTime, nx::utils::utcTime() + maxAllowedDiff);
         }
     }
+
+    void assertNotificationContainsFullName()
+    {
+        ASSERT_EQ(
+            account().fullName,
+            m_activateNotifications.back().message.userFullName);
+    }
+
+private:
+    std::vector<ActivateAccountNotification> m_activateNotifications;
+
+    virtual void notificationReceived(
+        const nx::cdb::AbstractNotification& notification) override
+    {
+        const auto activateNotification =
+            dynamic_cast<const ActivateAccountNotification*>(&notification);
+        if (activateNotification)
+            m_activateNotifications.push_back(*activateNotification);
+    }
 };
 
 TEST_F(
@@ -1123,6 +1165,12 @@ TEST_F(AccountActivation, account_can_be_activated_by_password_reset)
     thenAccountIsActivated();
 }
 
+TEST_F(AccountActivation, activate_notification_contains_full_name)
+{
+    givenNotActivatedAccount();
+    assertNotificationContainsFullName();
+}
+
 //-------------------------------------------------------------------------------------------------
 
 class AccountInvite:
@@ -1134,11 +1182,6 @@ public:
     AccountInvite():
         m_timeShift(nx::utils::test::ClockType::system)
     {
-    }
-
-    ~AccountInvite()
-    {
-        EMailManagerFactory::setFactory(std::move(m_emailManagerFactoryBak));
     }
 
 protected:
@@ -1218,27 +1261,14 @@ protected:
     }
 
 private:
-    TestEmailManager m_emailManager;
     std::string m_newAccountEmail;
     std::vector<api::SystemData> m_systems;
-    EMailManagerFactory::FactoryFunc m_emailManagerFactoryBak;
     std::vector<InviteUserNotification> m_inviteNotifications;
     nx::utils::test::ScopedTimeShift m_timeShift;
 
     virtual void SetUp() override
     {
-        using namespace std::placeholders;
-
         constexpr const std::size_t kSystemCount = 7;
-
-        m_emailManager.setOnReceivedNotification(
-            std::bind(&AccountInvite::notificationReceived, this, _1));
-
-        m_emailManagerFactoryBak = EMailManagerFactory::setFactory(
-            [this](const conf::Settings& /*settings*/)
-            {
-                return std::make_unique<EmailManagerStub>(&m_emailManager);
-            });
 
         base_type::SetUp();
 
@@ -1252,7 +1282,8 @@ private:
             system = addRandomSystemToAccount(account());
     }
 
-    void notificationReceived(const nx::cdb::AbstractNotification& notification)
+    virtual void notificationReceived(
+        const nx::cdb::AbstractNotification& notification) override
     {
         const auto inviteNotification =
             dynamic_cast<const InviteUserNotification*>(&notification);
