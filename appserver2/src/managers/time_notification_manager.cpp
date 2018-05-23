@@ -11,7 +11,7 @@ QnTimeNotificationManager::QnTimeNotificationManager(nx::time_sync::TimeSyncMana
 }
 
 void QnTimeNotificationManager::triggerNotification(
-    const QnTransaction<ApiPeerSystemTimeData>& /*transaction*/,
+    const QnTransaction<ApiPeerSyncTimeData>& /*transaction*/,
     NotificationSource /*source*/)
 {
     emit primaryTimeServerTimeChanged();

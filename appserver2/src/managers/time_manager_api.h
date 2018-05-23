@@ -60,20 +60,6 @@ namespace ec2
     }
 
     template<class QueryProcessorType>
-    int QnTimeManager<QueryProcessorType>::forcePrimaryTimeServerImpl( const QnUuid& serverGuid, impl::SimpleHandlerPtr handler )
-    {
-        const int reqID = generateRequestID();
-
-        using namespace std::placeholders;
-        m_queryProcessor->getAccess(m_userAccessData).processUpdateAsync(
-            ApiCommand::forcePrimaryTimeServer,
-            nx::vms::api::IdData(serverGuid),
-            std::bind( &impl::SimpleHandler::done, handler, reqID, _1) );
-
-        return reqID;
-    }
-
-    template<class QueryProcessorType>
     void QnTimeManager<QueryProcessorType>::forceTimeResync()
     {
         return m_timeSyncManager->forceTimeResync();

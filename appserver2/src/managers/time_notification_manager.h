@@ -19,7 +19,7 @@ public:
     virtual ~QnTimeNotificationManager() override {}
 
     void triggerNotification(
-        const QnTransaction<ApiPeerSystemTimeData> &transaction,
+        const QnTransaction<ApiPeerSyncTimeData> &transaction,
         NotificationSource source);
 };
 

@@ -305,8 +305,6 @@ protected:
         // Process special cases.
         switch (tran.command)
         {
-            case ApiCommand::forcePrimaryTimeServer:
-                return true; //< Ignore deprecated transaction.
             case ApiCommand::runtimeInfoChanged:
                 processRuntimeInfo(tran, connection, transportHeader);
                 return true;

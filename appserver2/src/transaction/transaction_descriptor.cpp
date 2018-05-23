@@ -141,7 +141,7 @@ void apiIdDataTriggerNotificationHelper(
             return notificationParams.userNotificationManager->triggerNotification(
                 tran,
                 notificationParams.source);
-        case ApiCommand::broadcastPeerSystemTime:
+        case ApiCommand::broadcastPeerSyncTime:
             return notificationParams.timeNotificationManager->triggerNotification(
                 tran,
                 notificationParams.source);
@@ -169,7 +169,6 @@ void apiIdDataTriggerNotificationHelper(
             return notificationParams.cameraNotificationManager->triggerNotification(
                 tran,
                 notificationParams.source);
-        case ApiCommand::forcePrimaryTimeServer:
         case ApiCommand::removeAccessRights:
             //#ak no notification needed
             break;

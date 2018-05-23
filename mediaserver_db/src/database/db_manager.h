@@ -548,18 +548,6 @@ namespace detail
             return ErrorCode::notImplemented;
         }
 
-        ErrorCode executeTransactionInternal(const QnTransaction<ApiPeerSystemTimeData>&)
-        {
-            NX_ASSERT(false, Q_FUNC_INFO, "This is a non persistent transaction!");
-            return ErrorCode::notImplemented;
-        }
-
-        ErrorCode executeTransactionInternal(const QnTransaction<ApiPeerSystemTimeDataList>&)
-        {
-            NX_ASSERT(false, Q_FUNC_INFO, "This is a non persistent transaction!");
-            return ErrorCode::notImplemented;
-        }
-
         ErrorCode executeTransactionInternal(const QnTransaction<ApiLicenseOverflowData>&);
         ErrorCode executeTransactionInternal(const QnTransaction<ApiCleanupDatabaseData>& tran);
 

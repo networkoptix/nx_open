@@ -289,9 +289,6 @@ bool QnTransactionMessageBus::processSpecialTransaction(
         case ApiCommand::peerAliveInfo:
             onGotServerAliveInfo(tran, sender, transportHeader);
             return true; //< Do not proxy. This call contains built in proxy.
-        case ApiCommand::forcePrimaryTimeServer:
-        case ApiCommand::getKnownPeersSystemTime:
-            return true; //< Ignore deprecated transactions.
         case ApiCommand::runtimeInfoChanged:
             if (!onGotServerRuntimeInfo(tran, sender, transportHeader))
                 return true; //< Already processed. Do not proxy and ignore the transaction.

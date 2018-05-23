@@ -775,20 +775,6 @@ public:
             time);
     }
 
-    /** Set peer identified by \a serverGuid to be primary time server (every other peer
-     * synchronizes time with server \a serverGuid)
-     */
-    template<class TargetType, class HandlerType>
-    int forcePrimaryTimeServer(const QnUuid& serverGuid, TargetType* target, HandlerType handler)
-    {
-        return forcePrimaryTimeServerImpl(
-            serverGuid,
-            std::static_pointer_cast<impl::SimpleHandler>(
-                std::make_shared<impl::CustomSimpleHandler<TargetType, HandlerType>>(
-                    target,
-                    handler)));
-    }
-
     //!Returns list of peers whose local system time is known
     virtual void forceTimeResync() = 0;
 

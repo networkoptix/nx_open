@@ -42,9 +42,7 @@ struct ApiDiscoveredServerData;
 struct ApiTimeData;
 struct ApiMiscData;
 typedef std::vector<ApiMiscData> ApiMiscDataList;
-struct ApiPeerSystemTimeData;
 struct ApiPeerSyncTimeData;
-typedef std::vector<ApiPeerSystemTimeData> ApiPeerSystemTimeDataList;
 
 struct ApiPeerData;
 struct ApiPeerDataEx;
@@ -93,7 +91,6 @@ struct ParentId
     (ApiMediaServerData)\
     (ApiMediaServerUserAttributesData)\
     (ApiMediaServerDataEx)\
-    (ApiPeerSystemTimeData)\
     (ApiPeerSyncTimeData)\
     (ApiReverseConnectionData)\
     (ApiPersistentIdData)\

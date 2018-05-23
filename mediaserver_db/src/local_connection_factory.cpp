@@ -1566,22 +1566,6 @@ void LocalConnectionFactory::registerRestHandlers(QnRestProcessorPool* const p)
     // AbstractECConnection
     regUpdate<DatabaseDumpData>(p, ApiCommand::restoreDatabase);
 
-#if 0
-    /**%apidoc GET /ec2/getCurrentTime
-     * Read current time.
-     * %permissions Administrator.
-     * %param[default] format
-     * %return Object in the requested format.
-     * %// AbstractTimeManager::getCurrentTimeImpl
-     */
-    regGet<nullptr_t, ApiTimeData>(p, ApiCommand::getCurrentTime);
-
-    // AbstractTimeManager::forcePrimaryTimeServer
-    regUpdate<IdData>(p, ApiCommand::forcePrimaryTimeServer,
-        std::bind(&TimeSynchronizationManager::primaryTimeServerChanged,
-            m_timeSynchronizationManager.get(), _1));
-#endif
-
     /**%apidoc GET /ec2/getFullInfo
      * Read all data such as all servers, cameras, users, etc.
      * %param[default] format

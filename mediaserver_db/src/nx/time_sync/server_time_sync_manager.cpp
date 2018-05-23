@@ -19,7 +19,7 @@ namespace nx {
 namespace time_sync {
 
 static const std::chrono::seconds kMaxServerConnectionTimeout(10);
-static const std::chrono::seconds kMinTimeUpdateInterval(10);
+static const std::chrono::milliseconds kMinBroadcastTimeChangedInterval(100);
 static const QByteArray kTimeDeltaParamName = "sync_time_delta";
 
 ServerTimeSyncManager::ServerTimeSyncManager(
@@ -65,7 +65,7 @@ void ServerTimeSyncManager::broadcastSystemTimeDelayed()
         m_broadcastTimePlaned = false;
         broadcastSystemTime();
     },
-        std::chrono::milliseconds(kMinTimeUpdateInterval).count(),
+        std::chrono::milliseconds(kMinBroadcastTimeChangedInterval).count(),
         this->thread());
 }
 
@@ -105,7 +105,10 @@ void ServerTimeSyncManager::start()
         commonModule()->ec2Connection()->getTimeNotificationManager().get(),
         &ec2::AbstractTimeNotificationManager::primaryTimeServerTimeChanged,
         this,
-        [this]() { m_lastNetworkSyncTime.restart(); });
+        [this]() 
+        { 
+            m_lastNetworkSyncTime.invalidate();
+        });
 
     base_type::start();
 }
