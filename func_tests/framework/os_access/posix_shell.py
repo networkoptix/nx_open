@@ -109,11 +109,13 @@ class SSH(PosixShell):
             }
         while open_streams:
             channel.settimeout(wait_for_data.delay_sec)
+            subprocess_responded = False
             for key, (recv, output_chunks, output_logger) in open_streams.items():
                 try:
                     output_chunk = recv(1024 * 1024)
                 except socket.timeout:
                     continue  # Next stream might have data on it.
+                subprocess_responded = True
                 if not output_chunk:
                     output_logger.debug("Closed from the other side.")
                     del open_streams[key]
@@ -127,8 +129,13 @@ class SSH(PosixShell):
                         output_logger.debug("Text:\n%s", output_chunk.decode('ascii'))
                     except UnicodeDecodeError:
                         output_logger.debug("Binary: %d bytes", len(output_chunk))
-            if not wait_for_data.again():
-                raise Timeout("Streams not closed yet")
+            if not subprocess_responded:
+                if channel.exit_status != -1:
+                    subprocess_logger.error("Remote process exited but streams left open (child forked?)")
+                    break  # Leave
+                if not wait_for_data.again():
+                    raise Timeout("Streams not closed yet")
+        channel.shutdown_read()  # Other side could be open by forked child.
 
         return b''.join(stdout_chunks)
 
