@@ -289,9 +289,9 @@ select.form-control{
   background-color: transparent;
   border-color: $light5;
 
-  &:hover,
-  &:focus,
-  &.focus {
+  &:hover:not([disabled]):not(.disabled),
+  &:focus:not([disabled]):not(.disabled),
+  &.focus:not([disabled]):not(.disabled) {
     background-color: transparentize($light5,0.75);
     border-color: $light8;
   }
