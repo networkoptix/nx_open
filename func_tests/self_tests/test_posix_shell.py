@@ -78,3 +78,27 @@ def test_streams_left_open(posix_shell):
     start_time = timeit.default_timer()
     posix_shell.run_command(['python', '-c', _forked_child_script, sleep_time_sec], timeout_sec=5)
     assert timeit.default_timer() - start_time < sleep_time_sec
+
+
+# language=Python
+_early_closing_streams_script = '''
+import sys
+import time
+
+if __name__ == '__main__':
+    sleep_time_sec = int(sys.argv[1])
+    sys.stdout.write("Test data on stdout.")
+    sys.stderr.write("Test data on stderr.")
+    sys.stdout.close()
+    sys.stderr.close()
+    time.sleep(sleep_time_sec)
+'''
+
+
+def test_streams_closed_early_but_process_timed_out(posix_shell):
+    with pytest.raises(Timeout):
+        posix_shell.run_command(['python', '-c', _early_closing_streams_script, 5], timeout_sec=2)
+
+
+def test_streams_closed_early_and_process_on_time(posix_shell):
+    posix_shell.run_command(['python', '-c', _early_closing_streams_script, 2], timeout_sec=5)
