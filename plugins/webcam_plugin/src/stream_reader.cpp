@@ -196,7 +196,6 @@ std::unique_ptr<ILPVideoPacket> StreamReader::toNxVideoPacket(AVPacket *packet, 
      if (nxVideoPacket->data())
          memcpy(nxVideoPacket->data(), packet->data, packet->size);
 
-
      nxVideoPacket->setCodecType(utils::av::toNxCompressionType(codecID));
 
      return nxVideoPacket;
@@ -364,7 +363,7 @@ void StreamReader::initializeAv()
 
     m_videoEncoder.reset(new AVCodecContainer());
     //todo compile ffmpeg with h264 support for encoding
-    m_videoEncoder->initializeEncoder(AV_CODEC_ID_MJPEG);
+    m_videoEncoder->initializeEncoder(AV_CODEC_ID_H263P);
     if (!m_videoEncoder->isValid())
     {
         m_lastError = m_videoEncoder->lastError();

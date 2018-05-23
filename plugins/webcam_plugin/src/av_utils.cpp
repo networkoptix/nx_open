@@ -57,6 +57,8 @@ nxcip::CompressionType toNxCompressionType(AVCodecID codecID)
         case AV_CODEC_ID_MPEG2VIDEO:
             return nxcip::AV_CODEC_ID_MPEG2VIDEO;
         case AV_CODEC_ID_H263:
+        case AV_CODEC_ID_H263P:
+        case AV_CODEC_ID_H263I:
             return nxcip::AV_CODEC_ID_H263;
         case AV_CODEC_ID_MJPEG:
             return nxcip::AV_CODEC_ID_MJPEG;
@@ -99,7 +101,7 @@ nxcip::CompressionType toNxCompressionType(AVCodecID codecID)
             case nxcip::AV_CODEC_ID_MPEG2VIDEO:
                 return AV_CODEC_ID_MPEG2VIDEO;
             case nxcip::AV_CODEC_ID_H263:
-                return AV_CODEC_ID_H263;
+                return AV_CODEC_ID_H263P;
             case nxcip::AV_CODEC_ID_MJPEG:
                 return AV_CODEC_ID_MJPEG;
             case nxcip::AV_CODEC_ID_MPEG4:

@@ -30,8 +30,9 @@ Plugin::Plugin()
     m_timeProvider(nullptr)
 {
     avdevice_register_all();
-    // avoid error constant error messages about dropped frames because of a full buffer
-    //av_log_set_level(AV_LOG_QUIET);
+#ifndef _DEBUG
+    av_log_set_level(AV_LOG_QUIET);
+#endif
 
     webCameraPluginInstance = this;
 }
