@@ -1,5 +1,6 @@
 import logging
 import os.path
+import datetime
 
 from .core_file_traceback import create_core_file_traceback
 from .server import ServerConfig
@@ -113,7 +114,7 @@ class ServerFactory(object):
 
     def _check_if_servers_are_online(self):
         for server in self._allocated_servers:
-            if server.is_started() and not server.is_server_online():
+            if server.is_started() and not server.is_server_online(timeout=datetime.timedelta(seconds=30)):
                 log.warning('Server %s is started but does not respond to ping - making core dump', server)
                 server.make_core_dump()
 

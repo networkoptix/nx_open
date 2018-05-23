@@ -223,9 +223,9 @@ class Server(object):
         else:
             raise RuntimeError('Server %s has not went online in %s' % (self, timeout))
 
-    def is_server_online(self):
+    def is_server_online(self, timeout=None):
         try:
-            return self.rest_api.api.ping.GET(timeout=datetime.timedelta(seconds=10))
+            return self.rest_api.api.ping.GET(timeout=timeout or datetime.timedelta(seconds=10))
         except (requests.exceptions.Timeout, requests.exceptions.ConnectionError):
             return False
 
