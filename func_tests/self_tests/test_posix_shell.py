@@ -54,8 +54,6 @@ def test_timeout(posix_shell):
 
 # language=Python
 _forked_child_script = '''
-from __future__ import print_function
-
 import os
 import sys
 import time
