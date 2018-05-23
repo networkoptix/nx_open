@@ -21,16 +21,20 @@ class Wait(object):
 
     def again(self):
         now = timeit.default_timer()
-        if now - self._last_checked_at < self.delay_sec:
-            return True
-        self._attempts_made += 1
-        self.delay_sec *= 2
         since_start_sec = time.time() - self._started_at
         if since_start_sec > self._timeout_sec or self._attempts_made >= self._attempts_limit:
             self.log_stop(
                 "Stop waiting until %s: %g/%g sec, %d/%d attempts.",
                 self._until, since_start_sec, self._timeout_sec, self._attempts_made, self._attempts_limit)
             return False
+        since_last_checked_sec = now - self._last_checked_at
+        if since_last_checked_sec < self.delay_sec:
+            self.log_continue(
+                "Continue waiting (asked earlier) until %s: %.1f/%.1f sec, %d/%d attempts, delay %.1f sec.",
+                self._until, since_start_sec, self._timeout_sec, self._attempts_made, self._attempts_limit, self.delay_sec)
+            return True
+        self._attempts_made += 1
+        self.delay_sec *= 2
         self.log_continue(
             "Continue waiting until %s: %.1f/%.1f sec, %d/%d attempts, delay %.1f sec.",
             self._until, since_start_sec, self._timeout_sec, self._attempts_made, self._attempts_limit, self.delay_sec)
@@ -38,6 +42,7 @@ class Wait(object):
         return True
 
     def sleep(self):
+        self.log_continue("Sleep for %.1f seconds" % self.delay_sec)
         time.sleep(self.delay_sec)
 
 
