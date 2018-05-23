@@ -47,26 +47,10 @@ ServerTimeSyncManager::ServerTimeSyncManager(
                     NX_WARNING(this, lm("Failed to save time delta data to the database"));
             });
 
-            
-
             auto primaryTimeServerId = getPrimaryTimeServerId();
             if (primaryTimeServerId == this->commonModule()->moduleGUID())
-                broadcastSystemTimeDelayed();
+                broadcastSystemTime();
         });
-}
-
-void ServerTimeSyncManager::broadcastSystemTimeDelayed()
-{
-    if (m_broadcastTimePlaned.exchange(true))
-        return;
-
-    executeDelayed([this]()
-    {
-        m_broadcastTimePlaned = false;
-        broadcastSystemTime();
-    },
-        std::chrono::milliseconds(kMinBroadcastTimeChangedInterval).count(),
-        this->thread());
 }
 
 void ServerTimeSyncManager::broadcastSystemTime()
@@ -169,6 +153,7 @@ bool ServerTimeSyncManager::loadTimeFromInternet()
             NX_DEBUG(this, lm("Received time %1 from the internet").
                 arg(QDateTime::fromMSecsSinceEpoch(newValue).toString(Qt::ISODate)));
             m_internetSyncInProgress = false;
+            m_isTimeTakenFromInternet = true;
         });
     return true;
 }
@@ -243,5 +228,9 @@ void ServerTimeSyncManager::updateTime()
     }
 }
 
+bool ServerTimeSyncManager::isTimeTakenFromInternet() const 
+{ 
+    return m_isTimeTakenFromInternet; 
+}
 } // namespace time_sync
 } // namespace nx

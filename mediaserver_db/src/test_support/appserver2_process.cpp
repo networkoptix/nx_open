@@ -433,14 +433,15 @@ void Appserver2Process::registerHttpHandlers(
                 result->setError(QnRestResult::CantProcessRequest);
             return resultCode;
         });
-
-    m_tcpListener->addHandler<JsonConnectionProcessor>("HTTP", "api/gettime",
+    
+    m_tcpListener->addHandler<JsonConnectionProcessor>("HTTP", 
+        nx::time_sync::TimeSyncManager::kTimeSyncUrlPath.mid(1), //< remove '/'
         [](const nx::network::http::Request& request, QnHttpConnectionListener* owner, QnJsonRestResult* result)
     {
-
-        QnTimeReply reply;
-        reply.utcTime = 
-            owner->commonModule()->ec2Connection()->timeSyncManager()->getSyncTime().count();
+        auto timeSyncManager = owner->commonModule()->ec2Connection()->timeSyncManager();
+        SyncTimeData reply;
+        reply.isTakenFromInternet = timeSyncManager->isTimeTakenFromInternet();
+        reply.utcTimeMs = timeSyncManager->getSyncTime().count();
         result->setReply(reply);
         return nx::network::http::StatusCode::ok;
     });

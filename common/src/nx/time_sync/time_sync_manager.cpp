@@ -20,9 +20,9 @@
 namespace nx {
 namespace time_sync {
 
-static const std::chrono::seconds kProxySocetTimeout(10);
-const QString kTimeSyncUrlPath = QString::fromLatin1("/api/gettime");
-static const QByteArray kTimeDeltaParamName = "sync_time_delta";
+const QString TimeSyncManager::kTimeSyncUrlPath(lit("/api/synchronizedTime"));
+
+static const std::chrono::seconds kLoadTimeTimeout(10);
 
 TimeSyncManager::TimeSyncManager(
     QnCommonModule* commonModule)
@@ -108,7 +108,7 @@ bool TimeSyncManager::loadTimeFromServer(const QnRoute& route)
 
     auto httpClient = std::make_unique<nx::network::http::HttpClient>();
     httpClient->setSocket(std::move(socket));
-    httpClient->setResponseReadTimeoutMs(std::chrono::milliseconds(kProxySocetTimeout).count());
+    httpClient->setResponseReadTimeoutMs(std::chrono::milliseconds(kLoadTimeTimeout).count());
     httpClient->addAdditionalHeader(Qn::SERVER_GUID_HEADER_NAME, route.id.toByteArray());
     auto server = commonModule()->resourcePool()->getResourceById<QnMediaServerResource>(route.id);
     if (!server)
@@ -141,7 +141,7 @@ bool TimeSyncManager::loadTimeFromServer(const QnRoute& route)
     }
 
     auto jsonResult = QJson::deserialized<QnJsonRestResult>(*response);
-    QnTimeReply timeData;
+    SyncTimeData timeData;
     if (!QJson::deserialize(jsonResult.reply, &timeData))
     {
         NX_WARNING(this, lm("Can't deserialize time reply from server %1")
@@ -149,7 +149,10 @@ bool TimeSyncManager::loadTimeFromServer(const QnRoute& route)
         return false;
     }
     
-    auto newTime = std::chrono::milliseconds(timeData.utcTime - timer.elapsedMs() / 2);
+    auto newTime = std::chrono::milliseconds(timeData.utcTimeMs - timer.elapsedMs() / 2);
+    bool syncWithInternel = commonModule()->globalSettings()->isSynchronizingTimeWithInternet();
+    if (syncWithInternel && !timeData.isTakenFromInternet)
+        return false; //< Target server is not ready yet. Time is not taken from internet yet. Repeat later.
     setSyncTime(newTime);
     NX_DEBUG(this, lm("Got time %1 from the neighbor server %2")
         .args(QDateTime::fromMSecsSinceEpoch(newTime.count()).toString(Qt::ISODate),

@@ -57,6 +57,8 @@ class TimeSyncManager: public QObject, public QnCommonModuleAware
     Q_OBJECT
 public:
 
+    static const QString kTimeSyncUrlPath;
+
     /**
      * TimeSynchronizationManager::start MUST be called before using class instance.
      */
@@ -69,6 +71,9 @@ public:
 
     /** @return synchronized time (milliseconds from epoch, UTC). */
     std::chrono::milliseconds getSyncTime() const;
+    
+    /** @return True if current server has load time from internet at least once after start. */
+    virtual bool isTimeTakenFromInternet() const { return false; }
 
     void setClock(
         const std::shared_ptr<AbstractSystemClock>& systemClock,

@@ -33,6 +33,7 @@ public:
     virtual void stop() override;
     virtual void start() override;
 
+    virtual bool isTimeTakenFromInternet() const;
 protected:
     virtual void updateTime() override;
     virtual AbstractStreamSocketPtr connectToRemoteHost(const QnRoute& route) override;
@@ -42,16 +43,16 @@ private:
     QnUuid getPrimaryTimeServerId() const;
     void initializeTimeFetcher();
     void broadcastSystemTime();
-    void broadcastSystemTimeDelayed();
     QnRoute getNearestServerWithInternet();
 private:
     std::unique_ptr<AbstractAccurateTimeFetcher> m_internetTimeSynchronizer;
-    std::atomic<bool> m_internetSyncInProgress{false};
-    std::atomic<bool> m_updateTimePlaned{ false };
-    std::atomic<bool> m_broadcastTimePlaned{ false };
+    std::atomic<bool> m_internetSyncInProgress {false};
+    std::atomic<bool> m_updateTimePlaned {false};
+    std::atomic<bool> m_broadcastTimePlaned {false};
     nx::vms::network::AbstractServerConnector* m_serverConnector = nullptr;
     nx::utils::ElapsedTimer m_lastNetworkSyncTime;
     QnUuid m_timeLoadFromServer;
+    std::atomic<bool> m_isTimeTakenFromInternet {false};
 };
 
 } // namespace time_sync
