@@ -10,6 +10,9 @@ namespace nx {
 namespace network {
 namespace aio {
 
+/**
+ * NOTE: In general, instance of this class can only be used once.
+ */
 class NX_NETWORK_API AbstractAsyncConnector:
     public network::aio::BasicPollable
 {

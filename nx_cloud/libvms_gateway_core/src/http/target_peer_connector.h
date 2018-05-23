@@ -6,13 +6,13 @@
 #include <boost/optional.hpp>
 
 #include <nx/network/abstract_socket.h>
-#include <nx/network/aio/basic_pollable.h>
 #include <nx/network/aio/timer.h>
 #include <nx/network/http/server/proxy/proxy_handler.h>
 #include <nx/utils/move_only_func.h>
 #include <nx/utils/std/optional.h>
 
 #include <nx/cloud/relaying/listening_peer_pool.h>
+#include <nx/cloud/relaying/listening_peer_connector.h>
 
 namespace nx {
 namespace cloud {
@@ -50,12 +50,13 @@ private:
     nx::network::aio::Timer m_timer;
     std::optional<std::chrono::milliseconds> m_targetConnectionRecvTimeout;
     std::optional<std::chrono::milliseconds> m_targetConnectionSendTimeout;
+    std::unique_ptr<relaying::ListeningPeerConnector> m_relayConnector;
 
     virtual void stopWhileInAioThread() override;
 
     void takeConnectionFromListeningPeerPool();
     void processTakeConnectionResult(
-        cloud::relay::api::ResultCode resultCode,
+        SystemError::ErrorCode resultCode,
         std::unique_ptr<network::AbstractStreamSocket> connection);
 
     void initiateDirectConnection();

@@ -23,6 +23,8 @@ void TargetPeerConnector::bindToAioThread(network::aio::AbstractAioThread* aioTh
     if (m_targetPeerSocket)
         m_targetPeerSocket->bindToAioThread(aioThread);
     m_timer.bindToAioThread(aioThread);
+    if (m_relayConnector)
+        m_relayConnector->bindToAioThread(aioThread);
 }
 
 void TargetPeerConnector::connectAsync(
@@ -74,36 +76,37 @@ void TargetPeerConnector::stopWhileInAioThread()
     if (m_targetPeerSocket)
         m_targetPeerSocket.reset();
     m_timer.pleaseStopSync();
+    m_relayConnector.reset();
 }
 
 void TargetPeerConnector::takeConnectionFromListeningPeerPool()
 {
     using namespace std::placeholders;
 
-    m_listeningPeerPool->takeIdleConnection(
-        relaying::ClientInfo(), //< TODO: #ak
-        m_targetEndpoint.address.toString().toStdString(),
+    m_relayConnector = std::make_unique<relaying::ListeningPeerConnector>(
+        m_listeningPeerPool);
+    m_relayConnector->bindToAioThread(getAioThread());
+    m_relayConnector->connectAsync(
+        m_targetEndpoint,
         std::bind(&TargetPeerConnector::processTakeConnectionResult, this, _1, _2));
 }
 
 void TargetPeerConnector::processTakeConnectionResult(
-    cloud::relay::api::ResultCode resultCode,
+    SystemError::ErrorCode resultCode,
     std::unique_ptr<network::AbstractStreamSocket> connection)
 {
-    dispatch(
-        [this, resultCode, connection = std::move(connection)]() mutable
-        {
-            NX_VERBOSE(this, lm("Take connection to %1 finished with result %2")
-                .args(m_targetEndpoint.address, QnLexical::serialized(resultCode)));
+    NX_VERBOSE(this, lm("Take connection to %1 finished with result %2")
+        .args(m_targetEndpoint.address, SystemError::toString(resultCode)));
 
-            if (resultCode == cloud::relay::api::ResultCode::ok)
-            {
-                processConnectionResult(SystemError::noError, std::move(connection));
-                return;
-            }
+    m_relayConnector.reset();
 
-            initiateDirectConnection();
-        });
+    if (resultCode == SystemError::noError)
+    {
+        processConnectionResult(SystemError::noError, std::move(connection));
+        return;
+    }
+
+    initiateDirectConnection();
 }
 
 void TargetPeerConnector::initiateDirectConnection()
