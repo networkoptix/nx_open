@@ -134,7 +134,7 @@ class SSH(PosixShell):
                     subprocess_logger.error("Remote process exited but streams left open (child forked?)")
                     break  # Leave
                 if not wait_for_data.again():
-                    raise Timeout("Streams not closed yet")
+                    raise Timeout(timeout_sec)
         channel.shutdown_read()  # Other side could be open by forked child.
 
         return b''.join(stdout_chunks)
