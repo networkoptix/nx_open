@@ -11,7 +11,8 @@ import { TranslateService }                                                     
 
 export class NxPermissionsDropdown implements OnInit {
     @Input() roles: any;
-    @Output() onPersmissionSelected = new EventEmitter<string>();
+    @Input() selected: any;
+    @Output() onSelected = new EventEmitter<string>();
 
     selection: string;
 
@@ -19,15 +20,15 @@ export class NxPermissionsDropdown implements OnInit {
                 @Inject('languageService') private language: any,
                 private translate: TranslateService) {
 
-        this.selection = 'Please select...';
+
     }
 
     ngOnInit(): void {
-
+        this.selection = (this.selected) ? this.selected : 'Please select...';
     }
 
     changePermission(role) {
         this.selection = role.optionLabel;
-        this.onPersmissionSelected.emit(this.selection);
+        this.onSelected.emit(this.selection);
     }
 }

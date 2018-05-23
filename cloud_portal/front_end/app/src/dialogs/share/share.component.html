@@ -36,12 +36,11 @@
 
             <nx-permissions-select
                     [roles]="accessRoles"
-                    (onPersmissionSelected)="setPermission($event)">
+                    [selected]="user.role.name"
+                    (onSelected)="setPermission($event)">
             </nx-permissions-select>
 
-            <span class="help-block">
-                {{getRoleDescription()}}
-            </span>
+            <span class="help-block" [innerHtml]="accessDescription"></span>
         </div>
     </div>
 

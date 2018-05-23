@@ -22,6 +22,10 @@ export class ShareModalContent {
     options: any;
     isNewShare: boolean;
     buttonText: string;
+    selectedPermission: {
+        name: ''
+    };
+    accessDescription: string;
 
     constructor(public activeModal: NgbActiveModal,
                 @Inject('account') private account: any,
@@ -33,8 +37,27 @@ export class ShareModalContent {
         this.url = 'share';
     }
 
-    setPermission(evt) {
-        this.user.role = evt;
+    private getRoleDescription() {
+        if (this.user.role.description) {
+            return this.user.role.description;
+        }
+        if (this.user.role.userRoleId) {
+            return this.language.accessRoles.customRole.description;
+        }
+        if (this.language.accessRoles[this.user.role.name]) {
+            return this.language.accessRoles[this.user.role.name].description;
+        }
+        return this.language.accessRoles.customRole.description;
+    }
+
+    setPermission(role: string) {
+        this.selectedPermission = this.accessRoles.filter((accessRole) => {
+            if (accessRole.name === role) {
+                return role;
+            }
+        })[0];
+
+        this.accessDescription = this.language.accessRoles[this.selectedPermission.name].description;
     }
 
     processAccessRoles() {
@@ -64,20 +87,9 @@ export class ShareModalContent {
     };
 
     doShare() {
+        this.user.role = this.selectedPermission;
+        console.log(this.user);
         return this.system.saveUser(this.user, this.user.role);
-    }
-
-    getRoleDescription() {
-        if (this.user.role.description) {
-            return this.user.role.description;
-        }
-        if (this.user.role.userRoleId) {
-            return this.language.accessRoles.customRole.description;
-        }
-        if (this.language.accessRoles[this.user.role.name]) {
-            return this.language.accessRoles[this.user.role.name].description;
-        }
-        return this.language.accessRoles.customRole.description;
     }
 
     ngOnInit() {
@@ -101,6 +113,8 @@ export class ShareModalContent {
                             dismissButton: false
                         });
                     }
+
+                    this.accessDescription = this.getRoleDescription();
                 });
 
             this.buttonText = this.language.sharing.editShareConfirmButton;
