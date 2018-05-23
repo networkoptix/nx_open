@@ -333,7 +333,7 @@ private:
         switch (clientCommand)
         {
             case SystemUri::ClientCommand::Client:
-                return hasDomain && (hasSystemId ? isValidSystemId() : !hasAuth);
+                return hasDomain && !hasOnlyPassword && (hasSystemId ? isValidSystemId() : !hasAuth);
             case SystemUri::ClientCommand::LoginToCloud:
                 return hasDomain && !hasOnlyPassword;
             case SystemUri::ClientCommand::OpenOnPortal:
