@@ -46,7 +46,9 @@ _reraising_existing_dir_errors = _reraising({
 class LocalPath(PosixPath, FileSystemPath):
     @classmethod
     def tmp(cls):
-        return cls('/tmp/func_tests')
+        temp_dir = cls('/tmp/func_tests')
+        temp_dir.mkdir(parents=True, exist_ok=True)
+        return temp_dir
 
     mkdir = _reraising_new_file_errors(PosixPath.mkdir)
     write_text = _reraising_new_file_errors(PosixPath.write_text)

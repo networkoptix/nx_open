@@ -40,10 +40,16 @@ def dirty_remote_test_dir(request):
     return base_remote_dir / request.node.name
 
 
+def _cleanup_dir(dir):
+    # To avoid duplication but makes setup and test distinct.
+    dir.rmtree(ignore_errors=True)
+    dir.mkdir(parents=True)  # Its parents may not exist.
+    return dir
+
+
 @pytest.fixture()
 def remote_test_dir(dirty_remote_test_dir):
-    dirty_remote_test_dir.rmtree(ignore_errors=True)
-    dirty_remote_test_dir.mkdir(parents=True)
+    _cleanup_dir(dirty_remote_test_dir)
     return dirty_remote_test_dir
 
 
@@ -69,8 +75,7 @@ def existing_remote_dir(remote_test_dir):
 
 
 def test_rmtree_write_exists(dirty_remote_test_dir):
-    dirty_remote_test_dir.rmtree(ignore_errors=True)
-    dirty_remote_test_dir.mkdir()
+    _cleanup_dir(dirty_remote_test_dir)
     touched_file = dirty_remote_test_dir / 'touched.empty'
     assert not touched_file.exists()
     touched_file.write_bytes(b'')
@@ -79,8 +84,7 @@ def test_rmtree_write_exists(dirty_remote_test_dir):
 
 @pytest.mark.parametrize('depth', [1, 2, 3, 4], ids='depth_{}'.format)
 def test_rmtree_mkdir_exists(dirty_remote_test_dir, depth):
-    dirty_remote_test_dir.rmtree(ignore_errors=True)
-    dirty_remote_test_dir.mkdir()
+    _cleanup_dir(dirty_remote_test_dir)
     root_dir = dirty_remote_test_dir / 'root'
     root_dir.mkdir()
     target_dir = root_dir.joinpath(*['level_{}'.format(level) for level in range(1, depth + 1)])
