@@ -8,7 +8,7 @@ Resource          ${variables file}
 *** variables ***
 ${headless}    false
 ${directory}    ${SCREENSHOTDIRECTORY}
-${variables file}    variables.robot
+${variables_file}    variables.robot
 
 *** Keywords ***
 Open Browser and go to URL
