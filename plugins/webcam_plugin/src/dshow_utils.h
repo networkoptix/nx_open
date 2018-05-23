@@ -9,9 +9,7 @@ namespace dshow {
 
 std::vector<nxcip::CompressionType> getSupportedCodecs(const char * devicePath);
 
-std::vector<DeviceData> getDeviceList(
-    bool getResolution,
-    nxcip::CompressionType codecID);
+std::vector<DeviceData> getDeviceList();
 
 std::vector<ResolutionData> getResolutionList(
     const char * devicePath,

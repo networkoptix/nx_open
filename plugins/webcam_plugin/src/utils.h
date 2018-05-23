@@ -10,9 +10,7 @@ namespace utils  {
 * @param[in] getResolution - whether or not to fill each DeviceData with supported resolutions
 * @param[in] codecID - the codec whose resolution list is desired
 */
-std::vector<DeviceData> getDeviceList(
-    bool getResolution= false,
-    nxcip::CompressionType targetCodecID = nxcip::AV_CODEC_ID_NONE);
+std::vector<DeviceData> getDeviceList();
 
 /*!
 * Get a list of codecs supported by this device

@@ -10,13 +10,11 @@ namespace nx {
 namespace webcam_plugin {
 namespace utils {
 
-std::vector<DeviceData> getDeviceList(
-    bool getResolution, 
-    nxcip::CompressionType targetCodecID)
+std::vector<DeviceData> getDeviceList()
 {
     return
 #ifdef _WIN32
-        dshow::getDeviceList(getResolution, targetCodecID);
+        dshow::getDeviceList();
 #elif __linux__
         //todo
         std::vector<DeviceInfo>();

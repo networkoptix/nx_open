@@ -34,10 +34,6 @@ nxcip::CompressionType toNxCodecID(DWORD biCompression);
     
 HRESULT getDeviceName(IMoniker *pMoniker, DeviceData *outDeviceInfo);
 HRESULT getDevicePath(IMoniker *pMoniker, DeviceData *outDeviceInfo);
-HRESULT getResolutionList(IMoniker *pMoniker,
-    DeviceData *outDeviceInfo,
-    nxcip::CompressionType codecID);
-
 
 // initializes dshow for the thread that calls the public util functions
 // https://msdn.microsoft.com/en-us/library/windows/desktop/ms695279(v=vs.85).aspx
@@ -342,21 +338,10 @@ HRESULT getDevicePath(IMoniker *pMoniker, DeviceData *outDeviceInfo)
     return hr;
 }
 
-HRESULT getResolutionList(IMoniker *pMoniker, DeviceData *outDeviceInfo, nxcip::CompressionType targetCodecID)
-{
-    return S_FALSE;
-    /*std::vector<ResolutionData> resolutionList;
-    HRESULT hr = getResolutionList(pMoniker, &resolutionList, targetCodecID);
-    if (FAILED(hr))
-        return hr;*/
-
-    //outDeviceInfo->setResolutionList(resolutionList);
-}
-
 //-------------------------------------------------------------------------------------------------
 // Public API 
 
-std::vector<DeviceData> getDeviceList(bool getResolution, nxcip::CompressionType targetCodecID)
+std::vector<DeviceData> getDeviceList()
 {
     //todo figure out how to avoid this init everytime
     DShowInitializer init;
@@ -373,8 +358,6 @@ std::vector<DeviceData> getDeviceList(bool getResolution, nxcip::CompressionType
         DeviceData deviceInfo;
         getDeviceName(pMoniker, &deviceInfo);
         getDevicePath(pMoniker, &deviceInfo);
-        if (getResolution)
-            getResolutionList(pMoniker, &deviceInfo, targetCodecID);
         deviceNames.push_back(deviceInfo);
         pMoniker->Release();
     }
