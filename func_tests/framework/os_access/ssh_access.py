@@ -12,10 +12,10 @@ from framework.utils import RunningTime
 
 
 class SSHAccess(OSAccess):
-    def __init__(self, forwarded_ports, macs):  # TODO: Provide username and password as well.
+    def __init__(self, forwarded_ports, macs, username, key_path):
         self._macs = macs
         ssh_hostname, ssh_port = forwarded_ports['tcp', 22]
-        self.ssh = SSH(ssh_hostname, ssh_port)
+        self.ssh = SSH(ssh_hostname, ssh_port, username, key_path)
         self._forwarded_ports = forwarded_ports
 
     @property

@@ -3,10 +3,12 @@ import logging
 import math
 import os
 import select
+import socket
 import subprocess
 from abc import ABCMeta, abstractmethod
 
-from pathlib2 import Path
+import paramiko
+from pylru import lrudecorator
 
 from framework.os_access.exceptions import Timeout, exit_status_error_cls
 from framework.os_access.posix_shell_utils import sh_augment_script, sh_command_to_script
@@ -28,34 +30,112 @@ class PosixShell(object):
         return b'stdout'
 
 
+class SSHNotConnected(Exception):
+    pass
+
+
 class SSH(PosixShell):
-    def __init__(self, hostname, port, config_path=Path(__file__).with_name('ssh_config')):
+    def __init__(self, hostname, port, username, key_path):
         self._hostname = hostname
-        self._config_path = config_path
         self._port = port
-        self._ssh_command = ['ssh', '-F', config_path, '-p', port]
+        self._username = username
+        self._key_path = key_path
 
     def __repr__(self):
-        return '<SSH {} {}>'.format(sh_command_to_script(self._ssh_command), self._hostname)
+        return '<SSH: ssh {}@{} -p {:d} -i {}>'.format(self._username, self._hostname, self._port, self._key_path)
 
     def run_command(self, command, input=None, cwd=None, timeout_sec=60, env=None):
         script = sh_command_to_script(command)
         output = self.run_sh_script(script, input=input, cwd=cwd, timeout_sec=timeout_sec, env=env)
         return output
 
+    @lrudecorator(1)
+    def _client(self):
+        client = paramiko.SSHClient()
+        client.set_missing_host_key_policy(paramiko.MissingHostKeyPolicy())  # Ignore completely.
+        try:
+            client.connect(
+                str(self._hostname), port=self._port,
+                username=self._username, key_filename=str(self._key_path),
+                look_for_keys=False, allow_agent=False)
+        except paramiko.ssh_exception.NoValidConnectionsError:
+            raise SSHNotConnected("Cannot connect with {}.".format(self))
+        channel = client.get_transport().open_session()
+        return client
+
+    def __del__(self):
+        self._client().close()
+
+    def _channel(self):
+        transport = self._client().get_transport()
+        channel = transport.open_session()
+        return channel
+
+    @staticmethod
+    def _send_input(channel, input):
+        if input is not None:
+            channel.settimeout(10)  # Must never time out.
+            input_offset = 0
+            while True:
+                assert 0 <= input_offset <= len(input)
+                if input_offset == len(input):  # If input is empty, nothing is sent.
+                    _logger.debug("Input sent successfully.")
+                    break
+                input_chunk = input[input_offset:input_offset + 64 * 1024]
+                input_bytes_sent = channel.send(input_chunk)
+                input_offset += input_bytes_sent
+                if input_bytes_sent == 0:
+                    _logger.warning("Write direction preliminary closed from the other side.")
+                    break
+                _logger.debug("Chunk of input sent: %d bytes.", input_bytes_sent)
+        _logger.debug("Shutdown write direction.")
+        channel.shutdown_write()
+
     def run_sh_script(self, script, input=None, cwd=None, timeout_sec=60, env=None):
         augmented_script = sh_augment_script(script, cwd, env)
-        _logger.debug("Run on %r:\n%s", self, augmented_script)
-        output = local_shell.run_command(
-            self._ssh_command + [self._hostname] + ['\n' + augmented_script + '\n'],
-            input=input,
-            timeout_sec=timeout_sec)
-        return output
+        subprocess_logger = _logger.getChild('subprocess')
+        subprocess_logger.debug("Run on %r:\n%s", self, augmented_script)
+        channel = self._channel()
+        channel.exec_command(augmented_script)
+
+        self._send_input(channel, input)
+
+        wait_for_data = Wait("data received on stdout and stderr", timeout_sec=timeout_sec, attempts_limit=10000)
+        stdout_chunks = []
+        stderr_chunks = []
+        open_streams = {
+            "STDOUT": (channel.recv, stdout_chunks, subprocess_logger.getChild('stdout')),
+            "STDERR": (channel.recv_stderr, stderr_chunks, subprocess_logger.getChild('stderr')),
+            }
+        while open_streams:
+            channel.settimeout(wait_for_data.delay_sec)
+            for key, (recv, output_chunks, output_logger) in open_streams.items():
+                try:
+                    output_chunk = recv(1024 * 1024)
+                except socket.timeout:
+                    continue  # Next stream might have data on it.
+                if not output_chunk:
+                    output_logger.debug("Closed from the other side.")
+                    del open_streams[key]
+                    break  # Avoid iteration over mutated dict.
+                output_logger.debug("Received: %d bytes.", len(output_chunk))
+                output_chunks.append(output_chunk)
+                if len(output_chunk) > 10000:
+                    output_logger.debug("Big chunk: %d bytes", len(output_chunk))
+                else:
+                    try:
+                        output_logger.debug("Text:\n%s", output_chunk.decode('ascii'))
+                    except UnicodeDecodeError:
+                        output_logger.debug("Binary: %d bytes", len(output_chunk))
+            if not wait_for_data.again():
+                raise Timeout("Streams not closed yet")
+
+        return b''.join(stdout_chunks)
 
     def is_working(self):
         try:
             self.run_sh_script(':')
-        except exit_status_error_cls(255):
+        except SSHNotConnected:
             return False
         return True
 

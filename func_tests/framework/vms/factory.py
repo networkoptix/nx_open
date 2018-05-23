@@ -2,12 +2,15 @@ import logging
 from collections import namedtuple
 from contextlib import contextmanager
 
+from framework.os_access.local_path import LocalPath
 from framework.os_access.ssh_access import SSHAccess
 from framework.os_access.windows_access import WindowsAccess
 from framework.vms.hypervisor import VMNotFound, obtain_running_vm
 from framework.waiting import wait_for_true
 
 logger = logging.getLogger(__name__)
+
+SSH_PRIVATE_KEY_PATH = LocalPath.home() / '.func_tests' / 'ssh' / 'private_key'  # Get from VM's description.
 
 VM = namedtuple('VM', ['alias', 'index', 'type', 'name', 'ports', 'os_access'])
 
@@ -28,7 +31,7 @@ class VMFactory(object):
             vm_type_configuration = self._vm_configuration[vm_type]
             info = obtain_running_vm(self._hypervisor, name, vm_index, vm_type_configuration['vm'])
             if vm_type_configuration['os_family'] == 'linux':
-                os_access = SSHAccess(info.ports, info.macs)
+                os_access = SSHAccess(info.ports, info.macs, 'root', SSH_PRIVATE_KEY_PATH)
             elif vm_type_configuration['os_family'] == 'windows':
                 os_access = WindowsAccess(info.ports, info.macs, u'Administrator', u'qweasd123')
             else:

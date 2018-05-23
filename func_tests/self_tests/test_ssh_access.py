@@ -1,16 +1,8 @@
 from pathlib2 import PurePath
 
-from fixtures.ad_hoc_ssh import ad_hoc_ssh
-from framework.os_access.posix_shell import SSH
 from framework.os_access.ssh_path import make_ssh_path_cls
 
 pytest_plugins = ['fixtures.ad_hoc_ssh']
-
-
-def test_create(ad_hoc_ssh_server, ad_hoc_ssh_client_config):
-    ssh_access = ad_hoc_ssh(ad_hoc_ssh_server, ad_hoc_ssh_client_config)
-    assert isinstance(ssh_access, SSH)
-    assert ssh_access.is_working()
 
 
 def test_run_command(ad_hoc_ssh):
