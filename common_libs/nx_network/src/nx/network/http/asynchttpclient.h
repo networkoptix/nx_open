@@ -564,7 +564,7 @@ void NX_NETWORK_API downloadFileAsyncEx(
     const nx_http::HttpHeaders& extraHeaders,
     AsyncHttpClient::AuthType authType,
     AsyncHttpClient::Timeouts timeouts,
-    nx_http::Method::ValueType method = nx_http::Method::ValueType());
+    nx_http::Method::ValueType method = nx_http::Method::get);
 
 using UploadCompletionHandler = std::function<void(SystemError::ErrorCode, int httpStatus)>;
 
