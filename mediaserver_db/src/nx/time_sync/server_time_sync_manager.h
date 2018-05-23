@@ -50,7 +50,6 @@ private:
     std::atomic<bool> m_updateTimePlaned{ false };
     std::atomic<bool> m_broadcastTimePlaned{ false };
     nx::vms::network::AbstractServerConnector* m_serverConnector = nullptr;
-    std::chrono::milliseconds m_networkTimeSyncInterval;
     nx::utils::ElapsedTimer m_lastNetworkSyncTime;
     QnUuid m_timeLoadFromServer;
 };

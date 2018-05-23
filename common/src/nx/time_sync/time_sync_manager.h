@@ -99,7 +99,6 @@ protected:
 private:
     std::chrono::milliseconds m_synchronizedTime{0};
     std::chrono::milliseconds m_synchronizedOnClock{0};
-    std::chrono::milliseconds m_timeSyncInterval;
 
     mutable QnMutex m_mutex;
 

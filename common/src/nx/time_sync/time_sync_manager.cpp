@@ -20,8 +20,6 @@ namespace nx {
 namespace time_sync {
 
 static const std::chrono::seconds kProxySocetTimeout(10);
-static const std::chrono::minutes kDefaultTimeSyncInterval(10);
-//const QString kTimeSyncUrlPath = QString::fromLatin1("/api/timeSync");
 const QString kTimeSyncUrlPath = QString::fromLatin1("/api/gettime");
 static const QByteArray kTimeDeltaParamName = "sync_time_delta";
 
@@ -31,22 +29,21 @@ TimeSyncManager::TimeSyncManager(
     QnCommonModuleAware(commonModule),
     m_systemClock(std::make_shared<SystemClock>()),
     m_steadyClock(std::make_shared<SteadyClock>()),
-    m_timeSyncInterval(kDefaultTimeSyncInterval),
     m_thread(new QThread())
 {
     moveToThread(m_thread);
         
     connect(m_thread, &QThread::started,
         [this]()
-    {
-        if (!m_timer)
         {
-            m_timer = new QTimer();
-            connect(m_timer, &QTimer::timeout, this, &TimeSyncManager::doPeriodicTasks);
-        }
-        updateTime();
-        m_timer->start(std::chrono::milliseconds(m_timeSyncInterval).count());
-    });
+            if (!m_timer)
+            {
+                m_timer = new QTimer();
+                connect(m_timer, &QTimer::timeout, this, &TimeSyncManager::doPeriodicTasks);
+            }
+            updateTime();
+            m_timer->start(std::chrono::milliseconds(1000).count());
+        });
     connect(m_thread, &QThread::finished, [this]() { m_timer->stop(); });
 
     connect(
@@ -183,16 +180,6 @@ std::chrono::milliseconds TimeSyncManager::getSyncTime() const
 void TimeSyncManager::doPeriodicTasks()
 {
     updateTime();
-}
-
-void TimeSyncManager::setTimeSyncInterval(std::chrono::milliseconds value)
-{
-    m_timeSyncInterval = value;
-}
-
-std::chrono::milliseconds TimeSyncManager::timeSyncInterval() const
-{
-    return m_timeSyncInterval;
 }
 
 } // namespace time_sync

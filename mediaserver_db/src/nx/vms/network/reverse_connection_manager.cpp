@@ -229,7 +229,10 @@ std::unique_ptr<nx::network::AbstractStreamSocket> ReverseConnectionManager::con
     const QnRoute& route, std::chrono::milliseconds timeout)
 {
     if (route.reverseConnect)
-        return getProxySocket(route.gatewayId, timeout);
+    {
+        const auto serverId = route.gatewayId.isNull() ? route.id : route.gatewayId;
+        return getProxySocket(serverId, timeout);
+    }
 
     auto socket = nx::network::SocketFactory::createStreamSocket(false);
     if (socket->connect(route.addr, nx::network::deprecated::kDefaultConnectTimeout))

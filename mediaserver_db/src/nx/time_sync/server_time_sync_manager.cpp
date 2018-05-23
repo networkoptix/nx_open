@@ -20,7 +20,6 @@ namespace time_sync {
 
 static const std::chrono::seconds kMaxServerConnectionTimeout(10);
 static const std::chrono::seconds kMinTimeUpdateInterval(10);
-static const std::chrono::seconds kTimeSyncInterval(1);
 static const QByteArray kTimeDeltaParamName = "sync_time_delta";
 
 ServerTimeSyncManager::ServerTimeSyncManager(
@@ -108,8 +107,6 @@ void ServerTimeSyncManager::start()
         this,
         [this]() { m_lastNetworkSyncTime.restart(); });
 
-    m_networkTimeSyncInterval = timeSyncInterval();
-    setTimeSyncInterval(kTimeSyncInterval);
     base_type::start();
 }
 
@@ -198,8 +195,9 @@ void ServerTimeSyncManager::updateTime()
     const auto ownId = commonModule()->moduleGUID();
     bool syncWithInternel = commonModule()->globalSettings()->isSynchronizingTimeWithInternet();
 
+    auto networkTimeSyncInterval = commonModule()->globalSettings()->syncTimeExchangePeriod();
     const bool isTimeRecentlySync = m_lastNetworkSyncTime.isValid() 
-        && !m_lastNetworkSyncTime.hasExpired(m_networkTimeSyncInterval);
+        && !m_lastNetworkSyncTime.hasExpired(networkTimeSyncInterval);
 
     if (syncWithInternel)
     {
