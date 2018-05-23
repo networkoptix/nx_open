@@ -101,6 +101,7 @@ should respond to Enter key and save data
     Input Text    ${REGISTER LAST NAME INPUT}    hamil
     Input Text    ${REGISTER EMAIL INPUT}    ${email}
     Input Text    ${REGISTER PASSWORD INPUT}    ${password}
+    Click Element    ${TERMS AND CONDITIONS CHECKBOX}
     Press Key    ${REGISTER PASSWORD INPUT}    ${ENTER}
     Validate Register Success
 
@@ -118,6 +119,8 @@ should respond to Tab key
     Press Key    ${REGISTER PASSWORD INPUT}    ${TAB}
     Element Should Be Focused    ${TERMS AND CONDITIONS CHECKBOX}
     Press Key    ${TERMS AND CONDITIONS CHECKBOX}    ${TAB}
+    Press Key    ${TERMS AND CONDITIONS LINK}    ${TAB}
+    Press Key    ${PRIVACY POLICY LINK}    ${TAB}
     Element Should Be Focused    ${CREATE ACCOUNT BUTTON}
 
 should open Terms and conditions in a new page
