@@ -42,7 +42,7 @@ class SSHAccess(OSAccess):
         timestamp_output = self.run_command(['date', '+%s'])
         delay_sec = timeit.default_timer() - started_at
         timestamp = int(timestamp_output.rstrip())
-        timezone_name = self.Path('/etc/timezone')
+        timezone_name = self.Path('/etc/timezone').read_text().rstrip()
         timezone = pytz.timezone(timezone_name)
         local_time = datetime.datetime.fromtimestamp(timestamp, tz=timezone)
         return RunningTime(local_time, datetime.timedelta(seconds=delay_sec))
