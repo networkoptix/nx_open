@@ -3,7 +3,7 @@ import timeit
 import pytest
 from pathlib2 import PurePath
 
-from framework.os_access.exceptions import Timeout
+from framework.os_access.exceptions import Timeout, exit_status_error_cls
 from framework.os_access.posix_shell import local_shell
 from framework.os_access.ssh_path import make_ssh_path_cls
 
@@ -35,6 +35,12 @@ def test_run_script(posix_shell):
     given = 'It works!'
     received = posix_shell.run_sh_script('echo -n ' "'" + given + "'")
     assert received == given
+
+
+def test_non_zero_exit_code(posix_shell):
+    random_exit_status = 42
+    with pytest.raises(exit_status_error_cls(random_exit_status)):
+        posix_shell.run_sh_script('exit {}'.format(random_exit_status))
 
 
 def test_create_path(posix_shell):

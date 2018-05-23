@@ -135,9 +135,22 @@ class SSH(PosixShell):
                     break  # Leave
                 if not wait_for_data.again():
                     raise Timeout(timeout_sec)
+
+        subprocess_logger.debug("No data will be read from stdout and stderr.")
+        stdout = b''.join(stdout_chunks)
+        stderr = b''.join(stderr_chunks)
+
+        while True:
+            if channel.exit_status_ready():
+                subprocess_logger.debug("Process exit status: %d.", channel.exit_status)
+                if channel.exit_status != 0:
+                    raise exit_status_error_cls(channel.exit_status)(stdout, stderr)
+                break
+            subprocess_logger.debug("Process still not exited")
+
         channel.shutdown_read()  # Other side could be open by forked child.
 
-        return b''.join(stdout_chunks)
+        return stdout
 
     def is_working(self):
         try:
