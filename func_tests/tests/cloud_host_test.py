@@ -91,7 +91,7 @@ def test_setup_cloud_system(one_mediaserver, cloud_account, cloud_host):
 
 @pytest.mark.xfail(reason="https://networkoptix.atlassian.net/browse/VMS-9740")
 @pytest.mark.parametrize('sleep_sec', [0, 1, 5], ids='sleep_{}s'.format)
-def test_setup_cloud_system_enable_internet_after_start(one_mediaserver, cloud_account, sleep_sec):
+def test_setup_cloud_system_enable_internet_after_start(one_mediaserver, cloud_account, sleep_sec, cloud_host):
     one_mediaserver.installation.patch_binary_set_cloud_host(cloud_host)
     one_mediaserver.os_access.networking.disable_internet()
     one_mediaserver.start()

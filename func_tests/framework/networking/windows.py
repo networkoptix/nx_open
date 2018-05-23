@@ -112,7 +112,8 @@ class WindowsNetworking(Networking):
     def internet_is_enabled(self):
         all_profiles = self._winrm.run_powershell_script(
             # language=PowerShell
-            '''Get-NetFirewallProfile | select DefaultOutboundAction | ConvertTo-Json''')
+            '''Get-NetFirewallProfile | select DefaultOutboundAction | ConvertTo-Json''',
+            {})
         return not all(profile['DefaultOutboundAction'] == 'Block' for profile in all_profiles)
 
     def setup_ip(self, mac, ip, prefix_length):

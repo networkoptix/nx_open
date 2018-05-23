@@ -44,8 +44,8 @@ def _timeless_mediaserver(vm, mediaserver_installers, ca, artifact_factory):
 def two_mediaservers(two_vms, mediaserver_installers, ca, artifact_factory):
     """Make sure mediaservers are installed, stopped and internet is disabled."""
     first_vm, second_vm = two_vms
-    with timeless_mediaserver(first_vm, mediaserver_installers, ca, artifact_factory) as first:
-        with timeless_mediaserver(second_vm, mediaserver_installers, ca, artifact_factory) as second:
+    with _timeless_mediaserver(first_vm, mediaserver_installers, ca, artifact_factory) as first:
+        with _timeless_mediaserver(second_vm, mediaserver_installers, ca, artifact_factory) as second:
             for mediaserver in (first, second):
                 setup_local_system(mediaserver, {})
             merge_systems(first, second)

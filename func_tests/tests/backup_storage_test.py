@@ -13,6 +13,7 @@ from framework.api_shortcuts import get_server_id
 from framework.merging import setup_local_system
 from framework.os_access.exceptions import NonZeroExitStatus
 from framework.os_access.posix_shell_utils import sh_quote_arg
+from framework.waiting import wait_for_true
 
 log = logging.getLogger(__name__)
 
@@ -166,7 +167,7 @@ def get_storage(server, storage_path):
         return None
 
 def add_backup_storage(server):
-    storage = utils.wait_until(
+    storage = wait_for_true(
         lambda: get_storage(server, BACKUP_STORAGE_PATH),
         BACKUP_STORAGE_APPEARS_TIMEOUT_SEC)
     assert storage, 'Mediaserver did not accept storage %r in %r seconds' % (
