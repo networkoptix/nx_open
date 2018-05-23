@@ -77,7 +77,7 @@ void CommonUpdates2Manager::loadStatusFromFile()
 
 update::info::AbstractUpdateRegistryPtr CommonUpdates2Manager::getGlobalRegistry()
 {
-    auto globalRegistry = update::info::UpdateRegistryFactory::create();
+    auto globalRegistry = update::info::UpdateRegistryFactory::create(peerId());
     bool deserializeResult = globalRegistry->fromByteArray(globalSettings()->updates2Registry());
     if (!deserializeResult)
         return update::info::AbstractUpdateRegistryPtr();

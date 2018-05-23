@@ -198,6 +198,8 @@ static const QString kFileKey = "file";
 static const QString kSizeKey = "size";
 static const QString kMd5Key = "md5";
 
+// #TODO #akulikov Implement removedData serialization and deserialization.
+
 class Serializer
 {
 public:
@@ -732,14 +734,18 @@ private:
 } // namespace
 
 CommonUpdateRegistry::CommonUpdateRegistry(
+    const QnUuid& selfPeerId,
     const QString& baseUrl,
     detail::data_parser::UpdatesMetaData metaData,
     detail::CustomizationVersionToUpdate customizationVersionToUpdate)
     :
+    m_peerId(selfPeerId),
     m_baseUrl(baseUrl),
     m_metaData(std::move(metaData)),
     m_customizationVersionToUpdate(std::move(customizationVersionToUpdate))
 {}
+
+CommonUpdateRegistry::CommonUpdateRegistry(const QnUuid& selfPeerId): m_peerId(selfPeerId) {}
 
 ResultCode CommonUpdateRegistry::findUpdateFile(
     const UpdateFileRequestData& updateRequestData,
@@ -841,7 +847,8 @@ bool CommonUpdateRegistry::equals(AbstractUpdateRegistry* other) const
     return otherCommonUpdateRegistry->m_baseUrl == m_baseUrl
         && otherCommonUpdateRegistry->m_metaData == m_metaData
         && otherCommonUpdateRegistry->m_customizationVersionToUpdate == m_customizationVersionToUpdate
-        && otherCommonUpdateRegistry->m_manualData == m_manualData;
+        && otherCommonUpdateRegistry->m_manualData == m_manualData
+        && otherCommonUpdateRegistry->m_removedData == m_removedData;
 }
 
 ResultCode CommonUpdateRegistry::latestUpdate(
@@ -880,37 +887,48 @@ ResultCode CommonUpdateRegistry::latestUpdate(
 
 void CommonUpdateRegistry::addFileData(const ManualFileData& manualFileData)
 {
-    addFileDataImpl(manualFileData, /* ignoreRemoved */ true);
-}
-
-void CommonUpdateRegistry::addFileDataImpl(const ManualFileData& manualFileData, bool ignoreRemoved)
-{
-    int index = m_removedManualDataKeys.indexOf(manualFileData.file);
-    if (index != -1)
+    for (const auto& selfManualFileData: m_manualData)
     {
-        if (ignoreRemoved)
-            m_removedManualDataKeys.removeAt(index);
-        else
-            return;
+        if (selfManualFileData.file == manualFileData.file)
+        {
+            if (selfManualFileData.peers.contains(m_peerId))
+                return;
+        }
     }
 
+    if (m_removedData.contains(manualFileData.file))
+        m_removedData[manualFileData.file].removeAll(m_peerId);
+
+    addFileDataImpl(manualFileData, QList<QnUuid>() << m_peerId);
+}
+
+void CommonUpdateRegistry::addFileDataImpl(
+    const ManualFileData& manualFileData,
+    const QList<QnUuid>& peers)
+{
     bool sameFileFound = false;
     for (auto& selfManualFileData: m_manualData)
     {
         if (selfManualFileData.file == manualFileData.file)
         {
-            for (const auto& peer: manualFileData.peers)
+
+            for (int j = 0; j < peers.size(); ++j)
             {
-                if (!selfManualFileData.peers.contains(peer))
-                    selfManualFileData.peers.append(peer);
+                if (!selfManualFileData.peers.contains(peers[j]))
+                    selfManualFileData.peers.append(peers[j]);
             }
+
             sameFileFound = true;
             break;
         }
     }
 
     if (!sameFileFound)
-        m_manualData.append(manualFileData);
+    {
+        auto manualFileDataCopy = manualFileData;
+        manualFileDataCopy.peers = peers;
+        m_manualData.append(manualFileDataCopy);
+    }
 
     for (auto& selfManualFileData: m_manualData)
     {
@@ -931,15 +949,44 @@ void CommonUpdateRegistry::addFileDataImpl(const ManualFileData& manualFileData,
 
 void CommonUpdateRegistry::removeFileData(const QString& fileName)
 {
+    if (!removeFileDataImpl(fileName, QList<QnUuid>() << m_peerId))
+        return;
+
+    if (m_removedData.contains(fileName))
+    {
+        if (!m_removedData[fileName].contains(m_peerId))
+            m_removedData[fileName].append(m_peerId);
+    }
+    else
+    {
+        m_removedData.insert(fileName, QList<QnUuid>() << m_peerId);
+    }
+}
+
+bool CommonUpdateRegistry::removeFileDataImpl(const QString& fileName, const QList<QnUuid>& peers)
+{
+    bool result = false;
     for (int i = 0; i < m_manualData.size(); ++i)
     {
         if (m_manualData[i].file == fileName)
         {
-            m_manualData.removeAt(i);
-            m_removedManualDataKeys.append(fileName);
-            return;
+            for (int j = 0; j < m_manualData[i].peers.size(); ++j)
+            {
+                if (peers.contains(m_manualData[i].peers[j]))
+                {
+                    result = true;
+                    m_manualData[i].peers.removeAt(j);
+                }
+            }
+
+            if (m_manualData[i].peers.isEmpty())
+                m_manualData.removeAt(i);
+
+            return result;
         }
     }
+
+    return result;
 }
 
 void CommonUpdateRegistry::merge(AbstractUpdateRegistry* other)
@@ -969,13 +1016,37 @@ void CommonUpdateRegistry::merge(AbstractUpdateRegistry* other)
     {
         m_metaData = otherCommonUpdateRegistry->m_metaData;
         m_customizationVersionToUpdate = otherCommonUpdateRegistry->m_customizationVersionToUpdate;
+        m_baseUrl = otherCommonUpdateRegistry->m_baseUrl;
     }
 
     for (const auto& otherManualData: otherCommonUpdateRegistry->m_manualData)
-        addFileDataImpl(otherManualData, /* ignoreRemoved */ false);
+        addFileDataImpl(otherManualData, otherManualData.peers);
 
-    for (const auto& otherRemovedManualKey: otherCommonUpdateRegistry->m_removedManualDataKeys)
-        removeFileData(otherRemovedManualKey);
+    for (auto removedIt = otherCommonUpdateRegistry->m_removedData.cbegin();
+         removedIt != otherCommonUpdateRegistry->m_removedData.cend();
+         ++removedIt)
+    {
+        auto peers = removedIt.value();
+        peers.removeAll(m_peerId);
+        removeFileDataImpl(removedIt.key(), peers);
+        mergeToRemovedData(removedIt.key(), peers);
+    }
+}
+
+void CommonUpdateRegistry::mergeToRemovedData(const QString& fileName, const QList<QnUuid>& peers)
+{
+    if (m_removedData.contains(fileName))
+    {
+        for (const auto& peer: peers)
+        {
+            if (!m_removedData[fileName].contains(peer))
+                m_removedData[fileName].append(peer);
+        }
+    }
+    else
+    {
+        m_removedData.insert(fileName, peers);
+    }
 }
 
 QList<QnUuid> CommonUpdateRegistry::additionalPeers(const QString& fileName) const

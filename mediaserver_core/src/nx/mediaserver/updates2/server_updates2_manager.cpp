@@ -57,7 +57,7 @@ update::info::AbstractUpdateRegistryPtr ServerUpdates2Manager::getRemoteRegistry
         qnServerModule->roSettings()->value(nx_ms_conf::CHECK_FOR_UPDATE_URL).toString();
     updateUrl = updateUrl.isNull() ? update::info::kDefaultUrl : updateUrl;
 
-    return update::info::checkSync(updateUrl);
+    return update::info::checkSync(peerId(), updateUrl);
 }
 
 QString ServerUpdates2Manager::filePath() const

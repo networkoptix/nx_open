@@ -20,8 +20,7 @@ namespace detail {
 
 using namespace vms::common::p2p::downloader;
 
-Updates2ManagerBase::Updates2ManagerBase():
-    m_updateRegistry(info::UpdateRegistryFactory::create())
+Updates2ManagerBase::Updates2ManagerBase()
 {
 }
 
@@ -29,6 +28,7 @@ void Updates2ManagerBase::atServerStart()
 {
     using namespace std::placeholders;
 
+    m_updateRegistry = info::UpdateRegistryFactory::create(peerId());
     loadStatusFromFile();
     checkForGlobalDictionaryUpdate();
 
@@ -76,7 +76,11 @@ void Updates2ManagerBase::checkForGlobalDictionaryUpdate()
     if (!globalRegistry)
         return;
 
-    m_updateRegistry->merge(globalRegistry.get());
+    {
+        QnMutexLocker lock(&m_mutex);
+        m_updateRegistry->merge(globalRegistry.get());
+    }
+
     refreshStatusAfterCheck();
 }
 
@@ -102,11 +106,12 @@ void Updates2ManagerBase::checkForRemoteUpdate(utils::TimerId /*timerId*/, bool 
         }
     }
 
-    m_updateRegistry->merge(getRemoteRegistry().get());
+    auto remoteRegistry = getRemoteRegistry();
     auto globalRegistry = getGlobalRegistry();
     QByteArray serializedUpdatedRegistry;
     {
         QnMutexLocker lock(&m_mutex);
+        m_updateRegistry->merge(remoteRegistry.get());
         if (!globalRegistry || !m_updateRegistry->equals(globalRegistry.get()))
         {
             m_updateRegistry->merge(globalRegistry.get());
@@ -333,6 +338,10 @@ void Updates2ManagerBase::startPreparing(const QString& updateFilePath)
         updateFilePath,
         [this](PrepareResult prepareResult)
         {
+            QnMutexLocker lock(&m_mutex);
+            if (m_currentStatus.state != api::Updates2StatusData::StatusCode::preparing)
+                return;
+
             switch (prepareResult)
             {
                 case PrepareResult::ok:
@@ -529,6 +538,41 @@ api::Updates2StatusData Updates2ManagerBase::install()
         setStatus(api::Updates2StatusData::StatusCode::installing, "Installing update");
     else
         setStatus(api::Updates2StatusData::StatusCode::error, "Error while installing update");
+
+    return m_currentStatus.base();
+}
+
+api::Updates2StatusData Updates2ManagerBase::cancel()
+{
+    QnMutexLocker lock(&m_mutex);
+    switch (m_currentStatus.state)
+    {
+    case api::Updates2StatusData::StatusCode::notAvailable:
+        break;
+    case api::Updates2StatusData::StatusCode::available:
+    case api::Updates2StatusData::StatusCode::error:
+    case api::Updates2StatusData::StatusCode::checking:
+        setStatus(
+            api::Updates2StatusData::StatusCode::notAvailable,
+            "Update is unavailable");
+        break;
+    case api::Updates2StatusData::StatusCode::downloading:
+        NX_ASSERT(!m_currentStatus.file.isEmpty());
+        downloader()->deleteFile(m_currentStatus.file);
+        m_updateRegistry->removeFileData(m_currentStatus.file);
+        setStatus(
+            api::Updates2StatusData::StatusCode::notAvailable,
+            "Update is unavailable");
+        break;
+    case api::Updates2StatusData::StatusCode::readyToInstall:
+    case api::Updates2StatusData::StatusCode::preparing:
+        setStatus(
+            api::Updates2StatusData::StatusCode::available,
+            "Update is unavailable");
+        break;
+    case api::Updates2StatusData::StatusCode::installing:
+        break;
+    }
 
     return m_currentStatus.base();
 }

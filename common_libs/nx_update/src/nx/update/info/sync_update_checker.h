@@ -6,7 +6,9 @@ namespace nx {
 namespace update {
 namespace info {
 
-NX_UPDATE_API AbstractUpdateRegistryPtr checkSync(const QString& url = kDefaultUrl);
+NX_UPDATE_API AbstractUpdateRegistryPtr checkSync(
+    const QnUuid& selfPeerId,
+    const QString& url = kDefaultUrl);
 
 } // namespace info
 } // namespace update

@@ -17,12 +17,15 @@ static const QnSoftwareVersion kNxVersion{"4.0.0.0"};
 static const OsVersion kOsVersion1 = ubuntuX64();
 static const OsVersion kOsVersion2 = ubuntuX86();
 
+static const QnUuid kPeer1Id = QnUuid::createUuid();
+static const QnUuid kPeer2Id = QnUuid::createUuid();
+
 class CommonUpdateRegistry: public ::testing::Test
 {
 protected:
     CommonUpdateRegistry():
-        m_registry(kBaseUrl, createMetaData(), createUpdateData()),
-        m_registry2(kBaseUrl, createMetaData(), createUpdateData())
+        m_registry(kPeer1Id, kBaseUrl, createMetaData(), createUpdateData()),
+        m_registry2(kPeer2Id, kBaseUrl, createMetaData(), createUpdateData())
     {
     }
 
@@ -35,11 +38,9 @@ protected:
     void whenManualDataAdded(
         const QString& fileName,
         const OsVersion& osVersion,
-        const QList<QnUuid>& additionalPeers,
         RegistryNum registryNum = RegistryNum::first)
     {
         auto newManualData = ManualFileData(fileName, osVersion, kNxVersion, false);
-        newManualData.peers = additionalPeers;
 
         switch (registryNum)
         {
@@ -79,17 +80,14 @@ protected:
         m_registry.removeFileData(fileName);
     }
 
-    void thenManualDataShouldNotBeFound(const OsVersion& version1)
+    void thenManualDataShouldNotBeFound(const OsVersion& version)
     {
-        UpdateFileRequestData request;
+        assertDataPresence(version, /* shouldBePresent*/ false);
+    }
 
-        request.isClient = false;
-        request.currentNxVersion = QnSoftwareVersion("3.1.0");
-        request.osVersion = version1;
-
-        FileData fileData;
-        ASSERT_EQ(ResultCode::ok, m_registry.latestUpdate(request, nullptr));
-        ASSERT_EQ(ResultCode::noData, m_registry.findUpdateFile(request, &fileData));
+    void thenManualDataShouldBeFound(const OsVersion& version)
+    {
+        assertDataPresence(version, /* shouldBePresent*/ true);
     }
 
     void whenRegistriesAreMerged()
@@ -100,27 +98,30 @@ protected:
 
     void thenMergedRegistriesShouldBeEqual()
     {
-        ASSERT_TRUE(m_mergedRegistry1to2.equals(&m_mergedRegistry2to1));
-        ASSERT_TRUE(m_mergedRegistry2to1.equals(&m_mergedRegistry1to2));
+        ASSERT_TRUE(m_mergedRegistry1to2->equals(m_mergedRegistry2to1.get()));
+        ASSERT_TRUE(m_mergedRegistry2to1->equals(m_mergedRegistry1to2.get()));
     }
 
-    void andWhenManualDataRemovedFromMergedRegistry(RegistryNum removeFrom, const QString& fileName)
+    void andWhenManualDataRemovedFromMergedRegistry(
+        RegistryNum removeFrom,
+        const QString& fileName,
+        const QList<QnUuid>& expectedRestPeers)
     {
         impl::CommonUpdateRegistry* to, *from;
         switch (removeFrom)
         {
         case RegistryNum::first:
-            from = &m_mergedRegistry1to2;
-            to = &m_mergedRegistry2to1;
+            from = m_mergedRegistry1to2.get();
+            to = m_mergedRegistry2to1.get();
             break;
         case RegistryNum::second:
-            from = &m_mergedRegistry2to1;
-            to = &m_mergedRegistry1to2;
+            from = m_mergedRegistry2to1.get();
+            to = m_mergedRegistry1to2.get();
             break;
         }
 
         from->removeFileData(fileName);
-        ASSERT_EQ(from->additionalPeers(fileName), QList<QnUuid>());
+        ASSERT_EQ(from->additionalPeers(fileName), expectedRestPeers);
 
         to->merge(from);
     }
@@ -128,8 +129,8 @@ protected:
 private:
     impl::CommonUpdateRegistry m_registry;
     impl::CommonUpdateRegistry m_registry2;
-    impl::CommonUpdateRegistry m_mergedRegistry1to2;
-    impl::CommonUpdateRegistry m_mergedRegistry2to1;
+    std::unique_ptr<impl::CommonUpdateRegistry> m_mergedRegistry1to2;
+    std::unique_ptr<impl::CommonUpdateRegistry> m_mergedRegistry2to1;
 
     static detail::data_parser::UpdatesMetaData createMetaData()
     {
@@ -141,62 +142,89 @@ private:
         return detail::CustomizationVersionToUpdate();
     }
 
-    static impl::CommonUpdateRegistry doMerge(
+    static std::unique_ptr<impl::CommonUpdateRegistry> doMerge(
         const impl::CommonUpdateRegistry& to,
         const impl::CommonUpdateRegistry& from)
     {
-        impl::CommonUpdateRegistry _to = to;
+        std::unique_ptr<impl::CommonUpdateRegistry> _to =
+            std::unique_ptr<impl::CommonUpdateRegistry>(new impl::CommonUpdateRegistry(to));
+
         impl::CommonUpdateRegistry _from = from;
-        _to.merge(&_from);
+        _to->merge(&_from);
 
         return _to;
     }
+
+    void assertDataPresence(const OsVersion& version, bool shouldBePresent)
+    {
+        UpdateFileRequestData request;
+
+        request.isClient = false;
+        request.currentNxVersion = QnSoftwareVersion("3.1.0");
+        request.osVersion = version;
+
+        FileData fileData;
+        if (shouldBePresent)
+            ASSERT_EQ(ResultCode::ok, m_registry.findUpdateFile(request, &fileData));
+        else
+            ASSERT_EQ(ResultCode::noData, m_registry.findUpdateFile(request, &fileData));
+    }
 };
 
-TEST_F(CommonUpdateRegistry, manualData)
+TEST_F(CommonUpdateRegistry, manualData_remove)
 {
-    QList<QnUuid> ids1 = QList<QnUuid>() << QnUuid::createUuid() << QnUuid::createUuid();
-    whenManualDataAdded(kManualFile1, kOsVersion1, ids1);
+    whenManualDataAdded(kManualFile1, kOsVersion1);
+    whenManualDataAdded(kManualFile2, kOsVersion2);
 
-    QList<QnUuid> ids2 = QList<QnUuid>() << QnUuid::createUuid();
+    thenAllPeersShouldBePresent(kOsVersion1, QList<QnUuid>() << kPeer1Id);
+    thenAllPeersShouldBePresent(kOsVersion2, QList<QnUuid>() << kPeer1Id);
 
-    whenManualDataAdded(kManualFile2, kOsVersion2, ids2);
-
-    thenAllPeersShouldBePresent(kOsVersion1, ids1);
-    thenAllPeersShouldBePresent(kOsVersion2, ids2);
+    whenManualDataRemoved(kManualFile2);
+    thenManualDataShouldNotBeFound(kOsVersion2);
+    thenAllPeersShouldBePresent(kOsVersion1, QList<QnUuid>() << kPeer1Id);
 
     whenManualDataRemoved(kManualFile1);
     thenManualDataShouldNotBeFound(kOsVersion1);
-    thenAllPeersShouldBePresent(kOsVersion2, ids2);
 }
 
 TEST_F(CommonUpdateRegistry, manualData_merge)
 {
     whenManualDataAdded(
         kManualFile1,
-        kOsVersion1,
-        QList<QnUuid>() << QnUuid::createUuid() << QnUuid::createUuid());
+        kOsVersion1);
 
     whenManualDataAdded(
         kManualFile2,
-        kOsVersion2,
-        QList<QnUuid>() << QnUuid::createUuid());
+        kOsVersion2);
 
     whenManualDataAdded(
         kManualFile3,
         kOsVersion2,
-        QList<QnUuid>() << QnUuid::createUuid(),
         RegistryNum::second);
 
     whenRegistriesAreMerged();
     thenMergedRegistriesShouldBeEqual();
 
-    andWhenManualDataRemovedFromMergedRegistry(RegistryNum::first, kManualFile3);
+    andWhenManualDataRemovedFromMergedRegistry(
+        RegistryNum::first,
+        kManualFile3,
+        QList<QnUuid>() << kPeer2Id);
     thenMergedRegistriesShouldBeEqual();
 
-    andWhenManualDataRemovedFromMergedRegistry(RegistryNum::second, kManualFile1);
+    andWhenManualDataRemovedFromMergedRegistry(
+        RegistryNum::second,
+        kManualFile1,
+        QList<QnUuid>() << kPeer1Id);
+    thenMergedRegistriesShouldBeEqual();
+
+    andWhenManualDataRemovedFromMergedRegistry(
+        RegistryNum::first,
+        kManualFile1,
+        QList<QnUuid>());
     thenMergedRegistriesShouldBeEqual();
 }
+
+// #TODO #akulikov Implement serialization after merge/remove tests.
 
 } // namespace test
 } // namespace impl

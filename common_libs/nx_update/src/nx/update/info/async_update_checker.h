@@ -18,7 +18,10 @@ class NX_UPDATE_API AsyncUpdateChecker
 public:
     AsyncUpdateChecker();
     ~AsyncUpdateChecker();
-    void check(UpdateCheckCallback callback, const QString& baseUrl = kDefaultUrl);
+    void check(
+        UpdateCheckCallback callback,
+        const QnUuid& selfPeerId,
+        const QString& baseUrl = kDefaultUrl);
 
 private:
     std::unique_ptr<detail::AsyncUpdateCheckerImpl> m_impl;

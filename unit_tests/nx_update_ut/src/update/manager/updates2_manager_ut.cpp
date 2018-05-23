@@ -508,7 +508,7 @@ protected:
             });
 
         info::UpdateRegistryFactory::setEmptyFactoryFunction(
-            []()
+            [](const QnUuid& /*selfPeerId*/)
             {
                 return std::make_unique<TestUpdateRegistry>();
             });
@@ -884,6 +884,8 @@ TEST_F(Updates2Manager, Prepare_failedNoFreeSpace)
     thenStateShouldFinallyBecome(api::Updates2StatusData::StatusCode::error);
     thenStateShouldFinallyBecome(api::Updates2StatusData::StatusCode::available);
 }
+
+// #TODO #akulikov Implement cancel() related unit tests.
 
 } // namespace test
 } // namespace detail
