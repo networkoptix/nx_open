@@ -206,7 +206,7 @@ std::unique_ptr<ILPVideoPacket> StreamReader::transcodeVideo(
     AVPacket * decodePacket)
 {
     AVFrame * decodedFrame = NULL;
-    getDecodedVideoFrame(&decodedFrame, decodePacket);
+    decodeVideoFrame(&decodedFrame, decodePacket);
     if (!decodedFrame)
     {
         *nxcipErrorCode = nxcip::NX_IO_ERROR;
@@ -239,7 +239,7 @@ std::unique_ptr<ILPVideoPacket> StreamReader::transcodeVideo(
     return nxVideoPacket;
 }
 
-int StreamReader::getDecodedVideoFrame(AVFrame**outFrame, AVPacket * decodePacket)
+int StreamReader::decodeVideoFrame(AVFrame**outFrame, AVPacket * decodePacket)
 {
     AVFrame * decodedFrame = av_frame_alloc();
     int gotPicture = 0;
@@ -263,6 +263,12 @@ int StreamReader::getDecodedVideoFrame(AVFrame**outFrame, AVPacket * decodePacke
     }
 
     return decodeCode;
+}
+
+QString StreamReader::decodeCameraInfoUrl() const
+{
+    QString url = QString(m_info.url).mid(9);
+    return nx::utils::Url::fromPercentEncoding(url.toLatin1());
 }
 
 
@@ -477,9 +483,10 @@ const char * StreamReader::getAVInputFormat()
 
 std::string StreamReader::getAVCameraUrl()
 {
+    QString s = decodeCameraInfoUrl();
     return
 #ifdef _WIN32
-        std::string("video=").append(m_info.modelName);
+        std::string("video=@device_pnp_").append(s.toLatin1().data());
 #elif __linux__ 
         "Linux not implemented";
 #elif __APPLE__

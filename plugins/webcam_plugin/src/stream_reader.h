@@ -94,7 +94,8 @@ private:
     std::unique_ptr<ILPVideoPacket> toNxVideoPacket(AVPacket *packet, AVCodecID codecID);
     std::unique_ptr<ILPVideoPacket> transcodeVideo(int *nxcipErrorCode, AVPacket * decodePacket);
     
-    int getDecodedVideoFrame(AVFrame** outFrame, AVPacket* decodePacket);
+    int decodeVideoFrame(AVFrame** outFrame, AVPacket* decodePacket);
+    QString decodeCameraInfoUrl() const;
 
     bool isValid() const;
     void initializeAv();
