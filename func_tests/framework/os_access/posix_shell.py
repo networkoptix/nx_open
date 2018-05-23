@@ -285,9 +285,13 @@ def _communicate(process, input, timeout_sec):
     while True:
         exit_status = process.poll()
         if exit_status is not None:
+            interaction_logger.debug("Polled and got exit status: %d.", exit_status)
             break
+        interaction_logger.debug("Polled and got no exit status.")
         if not wait.again():
+            interaction_logger.debug("No more waiting for exit.")
             break
+        interaction_logger.debug("Wait for exit.")
         wait.sleep()
 
     return exit_status, b''.join(stdout.chunks), b''.join(stderr.chunks)  # TODO: Return io.BytesIO.
