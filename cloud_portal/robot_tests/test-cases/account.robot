@@ -55,7 +55,7 @@ Accessing the account page from a direct link while logged out asks for login, o
     Validate Log In
     Verify in account page
 
-Check box is checked when registering with it checked
+Check box is automatically checked when registering
     [tags]    email
     ${random email}    Get Random Email    ${BASE EMAIL}
     Go To    ${url}/register
@@ -67,19 +67,6 @@ Check box is checked when registering with it checked
     Verify In Account Page
     ${checked}    Get Element Attribute    ${ACCOUNT SUBSCRIBE CHECKBOX}    checked
     Should Be True    "${checked}"
-
-Check box is not checked when registering with it not checked
-    [tags]    email
-    ${random email}    Get Random Email    ${BASE EMAIL}
-    Go To    ${url}/register
-    Register    mark    hamill    ${random email}    ${password}    false
-    Activate    ${random email}
-    Log In    ${random email}    ${password}
-    Validate Log In
-    Go To    ${url}/account
-    Verify In Account Page
-    ${checked}    Get Element Attribute    ${ACCOUNT SUBSCRIBE CHECKBOX}    checked
-    Should Not Be True    ${checked}
 
 Unchecking check box and saving maintains that setting
     [tags]    email

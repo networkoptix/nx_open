@@ -61,14 +61,14 @@ Validate Log Out
     Wait Until Element Is Visible    ${ANONYMOUS BODY}
 
 Register
-    [arguments]    ${first name}    ${last name}    ${email}    ${password}    ${checked}=true
+    [arguments]    ${first name}    ${last name}    ${email}    ${password}    ${checked}=false
     Wait Until Elements Are Visible    ${REGISTER FIRST NAME INPUT}    ${REGISTER LAST NAME INPUT}    ${REGISTER PASSWORD INPUT}    ${CREATE ACCOUNT BUTTON}
     Input Text    ${REGISTER FIRST NAME INPUT}    ${first name}
     Input Text    ${REGISTER LAST NAME INPUT}    ${last name}
     ${read only}    Run Keyword And Return Status    Wait Until Element Is Visible    ${REGISTER EMAIL INPUT LOCKED}
     Run Keyword Unless    ${read only}    Input Text    ${REGISTER EMAIL INPUT}    ${email}
     Input Text    ${REGISTER PASSWORD INPUT}    ${password}
-    Run Keyword If    "${checked}"=="false"    Click Element    ${REGISTER SUBSCRIBE CHECKBOX}
+    Run Keyword If    "${checked}"=="false"    Click Element    ${TERMS AND CONDITIONS CHECKBOX}
     Click Button    ${CREATE ACCOUNT BUTTON}
 
 Validate Register Success
