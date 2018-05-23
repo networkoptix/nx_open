@@ -56,8 +56,9 @@
     "PASSWORD TOO SHORT TEXT": "Mật khẩu phải chứa ít nhất 8 ký tự",
     "PASSWORD TOO COMMON TEXT": "Mật khẩu này nằm trong mật khẩu phổ biến nhất trên thế giới",
     "PASSWORD IS WEAK TEXT": "Sử dụng số, chữ hoa và chữ thường và ký tự đặc biệt để làm cho mật khẩu của bạn mạnh mẽ hơn",
+    "TERMS AND CONDITIONS ERROR TEXT": "Please review and agree to the Terms and Conditions and Privacy policy in order to proceed",
     "THIS LINK IS BROKEN TEXT": "This link is broken,<br>\n            System may be disconnected from %PRODUCT_NAME%,<br>\n            Access to this System may be revoked, <br>\n            or you may be logged into a different account",
     "PAGE NOT FOUND": "Không tìm thấy trang",
     "TAKE ME HOME": "Quay về trang chủ",
-    "OPEN NX WITNESS BUTTON TEXT": "Open %VMS_NAME%"
+    "OPEN NX WITNESS BUTTON TEXT": "Mở %VMS_NAME%"
 }

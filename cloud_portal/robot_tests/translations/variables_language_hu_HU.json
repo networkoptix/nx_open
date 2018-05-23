@@ -56,8 +56,9 @@
     "PASSWORD TOO SHORT TEXT": "A jelszónak legalább 8 karakterből kell állnia",
     "PASSWORD TOO COMMON TEXT": "Ez a jelszó a leggyakoribb jelszavak egyike",
     "PASSWORD IS WEAK TEXT": "Használjon számokat, kis és nagybetűket és speciális karaktereket az erősebb jelszó érdekében",
+    "TERMS AND CONDITIONS ERROR TEXT": "Please review and agree to the Terms and Conditions and Privacy policy in order to proceed",
     "THIS LINK IS BROKEN TEXT": "This link is broken,<br>\n            System may be disconnected from %PRODUCT_NAME%,<br>\n            Access to this System may be revoked, <br>\n            or you may be logged into a different account",
     "PAGE NOT FOUND": "Az oldal nem található",
     "TAKE ME HOME": "Vigyen haza",
-    "OPEN NX WITNESS BUTTON TEXT": "Open %VMS_NAME%"
+    "OPEN NX WITNESS BUTTON TEXT": "%VMS_NAME% Megnyitása"
 }

@@ -56,8 +56,9 @@
     "PASSWORD TOO SHORT TEXT": "הסיסמה חייבת להכיל 8 תווים לפחות",
     "PASSWORD TOO COMMON TEXT": "סיסמה זו חלשה מאחר והיא מהסיסמאות הפופולריות ביותר בעולם",
     "PASSWORD IS WEAK TEXT": "השתמש במספרים, אותיות גדולות וקטנות ותווים מיוחדים כדי להפוך את הסיסמה שלך חזקה יותר",
+    "TERMS AND CONDITIONS ERROR TEXT": "Please review and agree to the Terms and Conditions and Privacy policy in order to proceed",
     "THIS LINK IS BROKEN TEXT": "This link is broken,<br>\n            System may be disconnected from %PRODUCT_NAME%,<br>\n            Access to this System may be revoked, <br>\n            or you may be logged into a different account",
     "PAGE NOT FOUND": "דף לא נמצא",
     "TAKE ME HOME": "קח אותי לדף הבית",
-    "OPEN NX WITNESS BUTTON TEXT": "Open %VMS_NAME%"
+    "OPEN NX WITNESS BUTTON TEXT": "פתח %VMS_NAME%"
 }

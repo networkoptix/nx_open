@@ -238,5 +238,6 @@ Langauge is changeable on the account page
     Wait Until Element Is Visible    //form[@name='accountForm']//button/span[@lang='${LANGUAGE}']
     Click Element    //form[@name='accountForm']//button/span[@lang='${LANGUAGE}']
     Click Button    ${ACCOUNT SAVE}
+    Sleep    1
     Verify In Account Page
     Wait Until Element Is Visible    //h1['${ACCOUNT TEXT}']

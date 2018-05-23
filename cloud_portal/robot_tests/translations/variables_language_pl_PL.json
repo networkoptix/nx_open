@@ -56,6 +56,7 @@
     "PASSWORD TOO SHORT TEXT": "Hasło musi zawierać co najmniej 8 znaków",
     "PASSWORD TOO COMMON TEXT": "To hasło znajduje się na liście najczęściej stosowanych haseł na świecie",
     "PASSWORD IS WEAK TEXT": "Użyj liczb, wielkich i małych liter oraz znaków specjalnych, aby ustawić bezpieczniejsze hasło",
+    "TERMS AND CONDITIONS ERROR TEXT": "Proszę zapoznać się i wyrazić zgodę na zasady i warunki oraz politykę prywatności, aby kontynuować",
     "THIS LINK IS BROKEN TEXT": "Ten link jest uszkodzony,<br>\n            System może być odłączony od %PRODUCT_NAME%,<br>\n            Uprawnienia do tego systemu mogły zostać odebrane, <br>\n            lub możesz być zalogowany na inne konto",
     "PAGE NOT FOUND": "Nie znaleziono strony",
     "TAKE ME HOME": "Wróć na stronę główną",

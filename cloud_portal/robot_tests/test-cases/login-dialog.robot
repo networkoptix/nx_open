@@ -18,6 +18,7 @@ Open New Browser On Failure
     Open Browser and go to URL    ${url}
 
 Restart
+#    Go To    ${url}
     ${status}    Run Keyword And Return Status    Validate Log Out
     Run Keyword Unless    ${status}    Log Out
     Go To    ${url}
@@ -122,7 +123,6 @@ requires log In, if the user has just logged out and pressed back button in brow
     Validate Log In
     Log Out
     Go Back
-    Wait Until Page Contains Element    ${ANONYMOUS BODY}
     Validate Log Out
 
 handles more than 255 symbols email and password

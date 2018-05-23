@@ -36,7 +36,7 @@ should confirm, if owner deletes system (You are going to disconnect your system
     Click Button    ${DISCONNECT FROM NX}
     Wait Until Elements Are Visible    ${DISCONNECT FORM}    ${DISCONNECT FORM HEADER}    ${DISCONNECT FORM CANCEL}
     Click Button    ${DISCONNECT FORM CANCEL}
-    Wait Until Page Does Not Contain Element    ${DELETE USER MODAL}
+    Wait Until Page Does Not Contain Element    ${BACKDROP}
 
 
 should confirm, if not owner deletes system (You will loose access to this system)
@@ -99,7 +99,7 @@ rename button opens dialog; cancel closes without rename; save renames system wh
     Click Button    ${RENAME SYSTEM}
     Wait Until Elements Are Visible    ${RENAME CANCEL}    ${RENAME SAVE}
     Click Button    ${RENAME CANCEL}
-    Wait Until Page Does Not Contain Element    //div[@modal-render='true']
+    Wait Until Page Does Not Contain Element    ${BACKDROP}
     Verify In System    Auto Tests 2
     Click Button    ${RENAME SYSTEM}
     Wait Until Elements Are Visible    ${RENAME CANCEL}    ${RENAME SAVE}    ${RENAME INPUT}

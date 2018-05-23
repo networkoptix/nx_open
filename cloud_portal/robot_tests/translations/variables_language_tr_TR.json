@@ -1,5 +1,5 @@
 {
-    "YOU HAVE NO SYSTEMS TEXT": "You have no Systems connected to %PRODUCT_NAME%",
+    "YOU HAVE NO SYSTEMS TEXT": "%PRODUCT_NAME% ile bağlı hiçbir Sisteminiz yok",
     "LOG OUT BUTTON TEXT": "Oturumu Kapat",
     "ACCOUNT SETTINGS BUTTON TEXT": "Hesap Ayarları",
     "RESET EMAIL SENT MESSAGE TEXT": "Şifre sıfırlama talimatları E-posta adresine gönderilir  %email%",
@@ -44,7 +44,7 @@
     "RESET PASSWORD EMAIL SUBJECT": "Parolanızı sıfırlayın",
     "INVITED TO SYSTEM EMAIL SUBJECT": "Video sistemi {{message.system_name}} sizinle paylaşılan yapıldı",
     "INVITED TO SYSTEM EMAIL SUBJECT UNREGISTERED": "{{message.sharer_name}} invites you to %PRODUCT_NAME%",
-    "DISCONNECT FORM HEADER TEXT": "%PRODUCT_NAME% den bağlantıyı kesmek istiyor musunuz?",
+    "DISCONNECT FORM HEADER TEXT": "Sistem %PRODUCT_NAME% den bağlantıyı kes?",
     "FIRST NAME IS REQUIRED TEXT": "Ad girmek zorunludur",
     "LAST NAME IS REQUIRED TEXT": "Soyad girmek zorunludur",
     "EMAIL IS REQUIRED TEXT": "E-posta zorunludur",
@@ -56,8 +56,9 @@
     "PASSWORD TOO SHORT TEXT": "Şifre en az 8 karakter içermelidir",
     "PASSWORD TOO COMMON TEXT": "Dünyada en çok kullanılan parolayı seçtiniz",
     "PASSWORD IS WEAK TEXT": "Parolanın güçlü olması için \nküçük büyük harf ve özel karakterler kullanın",
+    "TERMS AND CONDITIONS ERROR TEXT": "Devam etmek için lütfen Şartlar ve Koşullar ve Gizlilik politikasını inceleyin ve kabul edin",
     "THIS LINK IS BROKEN TEXT": "This link is broken,<br>\n            System may be disconnected from %PRODUCT_NAME%,<br>\n            Access to this System may be revoked, <br>\n            or you may be logged into a different account",
     "PAGE NOT FOUND": "Sayfa bulunamadı",
     "TAKE ME HOME": "Geri Dön",
-    "OPEN NX WITNESS BUTTON TEXT": "Open %VMS_NAME%"
+    "OPEN NX WITNESS BUTTON TEXT": "Aç%VMS_NAME%"
 }

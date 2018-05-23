@@ -56,6 +56,7 @@
     "PASSWORD TOO SHORT TEXT": "Het wachtwoord moet minstens 8 karakters bevatten",
     "PASSWORD TOO COMMON TEXT": "Dit wachtwoord bevind zich in de top van de meest populaire wachtwoorden in de wereld",
     "PASSWORD IS WEAK TEXT": "Gebruik cijfers, hoofdletters, kleine letters en speciale tekens om uw wachtwoord sterker te maken",
+    "TERMS AND CONDITIONS ERROR TEXT": "Lees hier onze Algemene voorwaarden en ons Privacybeleid en ga akkoord om door te gaan",
     "THIS LINK IS BROKEN TEXT": "Deze link is gebroken, <br>het systeem kan worden losgekoppeld van %PRODUCT_NAME%, <br>toegang tot dit systeem kan zijn ingetrokken, <br>of u bent reeds ingelogd bij een ander account",
     "PAGE NOT FOUND": "Pagina niet gevonden",
     "TAKE ME HOME": "Breng me terug naar de homepagina",
