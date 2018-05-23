@@ -187,7 +187,7 @@ ${TEST LAST NAME}                     testLastName
 
 #Related to Auto Tests system
 ${AUTO TESTS}                         Auto Tests
-${AUTO_TESTS SYSTEM ID}                     262d629d-144c-4402-bfa9-c490d9f6dbe9
+${AUTO_TESTS SYSTEM ID}                     9a4c9037-f265-436c-a0c6-8ef714465528
 ${AUTO TESTS TITLE}                   //div[@ng-repeat='system in systems | filter:searchSystems as filtered']//h2[text()='Auto Tests']
 ${AUTO TESTS USER}                    //div[@ng-repeat='system in systems | filter:searchSystems as filtered']//h2[text()='Auto Tests']/following-sibling::span[contains(@class,'user-name')]
 ${AUTO TESTS OPEN NX}                 //div[@ng-repeat='system in systems | filter:searchSystems as filtered']//h2[text()='Auto Tests']/..//button[@ng-click='checkForm()']
@@ -198,7 +198,7 @@ ${NOT OWNER IN SYSTEM}                //div[@process-loading='gettingSystemUsers
 #AUTO TESTS 2 is an offline system used for testing offline status on the systems page and offline status on the system page
 ${AUTOTESTS OFFLINE}                  //div[@ng-repeat='system in systems | filter:searchSystems as filtered']//h2[contains(text(),'Auto Tests 2')]/following-sibling::span[contains(text(), '${AUTOTESTS OFFLINE TEXT}')]
 ${AUTOTESTS OFFLINE OPEN NX}          //div[@ng-repeat='system in systems | filter:searchSystems as filtered']//h2[contains(text(),'Auto Tests 2')]/..//button[@ng-click='checkForm()']
-${AUTOTESTS OFFLINE SYSTEM ID}                aee1df1e-ea9d-43c8-9c04-0463758d3616
+${AUTOTESTS OFFLINE SYSTEM ID}                6f53b2b9-422f-48d7-87b1-b82c032e7ba0
 
 #ASCII
 ${ESCAPE}                             \\27

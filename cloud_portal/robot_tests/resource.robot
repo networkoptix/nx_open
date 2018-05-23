@@ -1,14 +1,14 @@
 *** Settings ***
-
 Library           SeleniumLibrary    run_on_failure=Failure Tasks
 Library           NoptixImapLibrary/
 Library           String
 Library           NoptixLibrary/
-Resource          variables.robot
+Resource          ${variables file}
 
 *** variables ***
 ${headless}    false
 ${directory}    ${SCREENSHOTDIRECTORY}
+${variables file}    variables.robot
 
 *** Keywords ***
 Open Browser and go to URL
@@ -49,6 +49,7 @@ Validate Log In
     Check Language
 
 Log Out
+    Wait Until Page Does Not Contain Element    ${BACKDROP}
     Wait Until Element Is Visible    ${ACCOUNT DROPDOWN}
     Click Element    ${ACCOUNT DROPDOWN}
     Wait Until Element Is Visible    ${LOG OUT BUTTON}
@@ -56,7 +57,8 @@ Log Out
     Validate Log Out
 
 Validate Log Out
-    sleep    .5
+    Go To    ${url}
+    Wait Until Element Is Not Visible    ${BACKDROP}
     Wait Until Element Is Visible    ${ANONYMOUS BODY}
 
 Register
