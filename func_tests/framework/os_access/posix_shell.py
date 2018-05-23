@@ -127,6 +127,12 @@ def _communicate(process, input, timeout_sec):
         log_stop=process_logger.getChild('wait').error)
 
     while fd2file:
+        if process.poll() is not None:
+            interaction_logger.debug("Process is finished.")
+            for fd in fd2file:
+                poller.unregister(fd)
+            break  # process finished; ignore output from possible children
+
         try:
             ready = poller.poll(int(math.ceil(wait.delay_sec * 1000)))
         except select.error as e:
@@ -168,7 +174,7 @@ def _communicate(process, input, timeout_sec):
             else:
                 # Ignore hang up or errors.
                 close_unregister_and_remove(fd)
-        else:
+        if not ready:
             if not wait.again():
                 for fd in list(fd2file):
                     close_unregister_and_remove(fd)
