@@ -214,12 +214,6 @@ def _communicate(process, input, timeout_sec):
         log_stop=process_logger.getChild('wait').error)
 
     while fd2file:
-        if process.poll() is not None:
-            interaction_logger.debug("Process is finished.")
-            for fd in fd2file:
-                poller.unregister(fd)
-            break  # process finished; ignore output from possible children
-
         try:
             ready = poller.poll(int(math.ceil(wait.delay_sec * 1000)))
         except select.error as e:
@@ -227,6 +221,15 @@ def _communicate(process, input, timeout_sec):
                 interaction_logger.debug("Got EINTR.")
                 continue
             raise
+
+        if not ready:
+            interaction_logger.warning("Nothing on streams. Some still open.")
+            if process.poll() is not None:
+                interaction_logger.error("Process exited but some streams open. Ignore them.")
+                break
+            if not wait.again():
+                break
+            continue
 
         for fd, mode in ready:
             if mode & select.POLLOUT:
@@ -261,12 +264,9 @@ def _communicate(process, input, timeout_sec):
             else:
                 # Ignore hang up or errors.
                 close_unregister_and_remove(fd)
-        if not ready:
-            if not wait.again():
-                for fd in list(fd2file):
-                    close_unregister_and_remove(fd)
-                break  # Unnecessary but explicit.
 
+    for fd in list(fd2file):  # List is preserved during iteration. Dict is emptying.
+        close_unregister_and_remove(fd)
     interaction_logger.debug("All file descriptors are closed.")
 
     while True:
