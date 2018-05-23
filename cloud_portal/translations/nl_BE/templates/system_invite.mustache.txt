@@ -5,7 +5,7 @@ Welkom bij {{PRODUCT_NAME}}
 {{/message.sharer_name}}
 
 {{^message.sharer_name}}
-U wordt uitgenodigd om deel te nemen aan {{PRODUCT_NAME}}.
+U wordt uitgenodigd om deel te nemen aan  {{PRODUCT_NAME}} .
 Je hebt toegang gekregen tot {{message.system_name}}.
 {{/message.sharer_name}}
 

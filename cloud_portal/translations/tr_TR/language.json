@@ -143,7 +143,7 @@
     "weakMessage": "Parolanın güçlü olması için \nküçük büyük harf ve özel karakterler kullanın",
     "strongMessage": "Güçlü parola!",
     "commonMessage": "Dünyada en çok kullanılan parolayı seçtiniz",
-    "missingMessage": "Password is required"
+    "missingMessage": "Parola gerekmektedir"
   },
   "sharing": {
     "confirmOwner": "Sistem sahibini değiştirirseniz, hesabınızdaki yetkileri iptal edersiniz. Bu eylem geri döndürülemez. Emin misiniz?",
@@ -159,7 +159,7 @@
     "unavailable": "Sistem erişilebilir değil",
     "offline": "Sistem çevrimdışı",
     "openClient": "{{VMS_NAME}} içinde aç",
-    "openClientNoSystem": "Aç{{VMS_NAME}}",
+    "openClientNoSystem": "Open {{VMS_NAME}}",
     "confirmRenameTitle": "Sistem Adı",
     "confirmRenameAction": "Kaydet",
     "successRename": "Sistem ismi kaydedildi",

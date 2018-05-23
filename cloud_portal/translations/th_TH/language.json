@@ -143,7 +143,7 @@
     "weakMessage": "ใช้ตัวเลขตัวพิมพ์ใหญ่และตัวพิมพ์เล็กและตัวอักษรพิเศษเพื่อทำให้รหัสผ่านของคุณแข็งแกร่งขึ้น",
     "strongMessage": "รหัสผ่านที่แข็งแกร่ง!",
     "commonMessage": "รหัสผ่านนี้อยู่ในรหัสผ่านที่ได้รับความนิยมมากที่สุดในโลก",
-    "missingMessage": "Password is required"
+    "missingMessage": "จำเป็นต้องใช้รหัสผ่าน"
   },
   "sharing": {
     "confirmOwner": "หากคุณเปลี่ยนเจ้าของระบบคุณจะยกเลิกการเป็นเจ้าของจากบัญชีปัจจุบัน การกระทำนี้ไม่สามารถย้อนกลับได้ คุณแน่ใจไหม?",
@@ -159,7 +159,7 @@
     "unavailable": "ระบบไม่สามารถเข้าถึงได้",
     "offline": "ระบบออฟไลน์",
     "openClient": "เปิดใน {{VMS_NAME}}",
-    "openClientNoSystem": "เปิด {{VMS_NAME}}",
+    "openClientNoSystem": "Open {{VMS_NAME}}",
     "confirmRenameTitle": "ชื่อระบบ",
     "confirmRenameAction": "บันทึก",
     "successRename": "ระบบเปลี่ยนชื่อ",

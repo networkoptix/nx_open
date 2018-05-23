@@ -6,7 +6,7 @@
     "okButton": "Oké",
     "cancelButton": "Annuleren",
     "loginTitle": "Log in op {{PRODUCT_NAME}}",
-    "loginButton": "Inloggen",
+    "loginButton": "Log in",
     "logoutAuthorisedTitle": "U bent reeds ingelogd",
     "logoutAuthorisedContinueButton": "Doorgaan",
     "logoutAuthorisedLogoutButton": "Uitloggen"
@@ -53,7 +53,7 @@
     },
     "Viewer": {
       "label": "Viewer",
-      "description": "Kan live video bekijken en zoeken in het archief"
+      "description": "Kan live video bekijken en zoeken in opgenomen beelden"
     },
     "Live Viewer": {
       "label": "Live Viewer",
@@ -61,7 +61,7 @@
     },
     "Advanced Viewer": {
       "label": "Geavanceerde Viewer",
-      "description": "Kan live video bekijken, bladeren in het archief, camera configureren, PTZ, enz. bedienen"
+      "description": "Kan live video bekijken, zoeken in opgenomen beelden, camera configureren, PTZ, enz. bedienen"
     },
     "Administrator": {
       "label": "Administrator",
@@ -111,7 +111,7 @@
     "cantRegisterPrefix": "Fout opgetreden",
     "cantGetSystemInfoPrefix": "Systeeminformatie is niet beschikbaar",
     "cantChangeAccountPrefix": "Kan geen wijzigingen opslaan",
-    "cantChangePasswordPrefix": "Kan geen wachtwoord opslaan",
+    "cantChangePasswordPrefix": "Wachtwoord kan niet worden opgeslagen",
     "cantActivatePrefix": "Kan uw account niet activeren",
     "cantSendConfirmationPrefix": "Kan geen bevestigingsmail versturen",
     "cloudInvalidResponse": "Cloud DB heeft een onverwacht antwoord teruggezonden",
@@ -173,7 +173,7 @@
     "confirmUnshareAction": "Verwijder",
     "successDisconnected": "Systeem is succesvol afgesloten van {{PRODUCT_NAME}}",
     "successDeleted": "Systeem {{systemName}} is succesvol verwijderd van uw account",
-    "permissionsRemoved": "Toestemmingen zijn verwijderd voor {{email}}"
+    "permissionsRemoved": "Machtigingen zijn verwijderd uit {{email}}"
   },
   "account": {
     "accountSavedSuccess": "Uw account is succesvol opgeslagen",
@@ -256,7 +256,7 @@
     "setNewPasswordLabel": "Nieuw wachtwoord"
   },
   "regActions": {
-    "passwordLabel": "Password",
+    "passwordLabel": "Wachtwoord",
     "createAccount": "Account aanmaken"
   },
   "header": {

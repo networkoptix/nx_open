@@ -17,7 +17,7 @@
     "ACCOUNT SUCCESSFULLY ACTIVATED TEXT": "Tài khoản của bạn đã được kích hoạt thành công",
     "SYSTEM NAME SAVED": "Đã lưu tên hệ thống",
     "ACCOUNT IS CREATED": "Tài khoản được tạo",
-    "CONFIRMATION MESSAGE IS SENT TO": "Thông báo xác nhận được gửi tới {{email}}",
+    "CONFIRMATION MESSAGE IS SENT TO": "Confirmation message is sent to {{email}}",
     "CANNOT SAVE PASSWORD": "Không thể lưu mật khẩu:",
     "PASSWORD INCORRECT": "Mật khẩu hiện tại không đúng.",
     "WRONG PASSWORD": "Sai mật khẩu",

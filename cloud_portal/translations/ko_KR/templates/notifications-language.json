@@ -1,6 +1,6 @@
 {
   "activate_account": {
-    "emailSubject": "귀하의 계정을 활성화 합니다"
+    "emailSubject": "귀하의 계정을 활성화합니다"
   },
   "restore_password": {
     "emailSubject": "사용자 암호 초기화"
@@ -9,7 +9,7 @@
     "emailSubject": "{{message.sharer_name}} 님이 당신을 {{PRODUCT_NAME}}에 초대했습니다."
   },
   "system_shared": {
-    "emailSubject": "Video system {{message.system_name}} was shared with you"
+    "emailSubject": "비디오 시스템 {{message.system_name}} 공유 되었습니다."
   },
   "review_version": {
     "emailSubject": "{{message.id}} 버전을 검토 할 준비가되었습니다."

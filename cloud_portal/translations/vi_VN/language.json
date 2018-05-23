@@ -159,7 +159,7 @@
     "unavailable": "Hệ thống không thể truy cập được",
     "offline": "Hệ thống offline",
     "openClient": "Mở trong {{VMS_NAME}}",
-    "openClientNoSystem": "Mở {{VMS_NAME}}",
+    "openClientNoSystem": "Open {{VMS_NAME}}",
     "confirmRenameTitle": "Tên hệ thống",
     "confirmRenameAction": "Tiết kiệm",
     "successRename": "Đã lưu tên hệ thống",

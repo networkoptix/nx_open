@@ -159,7 +159,7 @@
     "unavailable": "Le système est inaccessible",
     "offline": "System Hors ligne",
     "openClient": "Ouvert à {{VMS_NAME}}",
-    "openClientNoSystem": "Ouvrir {{VMS_NAME}}",
+    "openClientNoSystem": "Open {{VMS_NAME}}",
     "confirmRenameTitle": "Nom système",
     "confirmRenameAction": "Enregistrer",
     "successRename": "Nom du système sauvegardé",

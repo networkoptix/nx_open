@@ -25,9 +25,9 @@
   },
   "searchCamPlaceholder": "Tìm kiếm",
   "resolution": {
-    "auto": "tự động",
-    "high": "cao (H)",
-    "low": "thấp (L)"
+    "auto": "Tự động",
+    "high": "Cao (H)",
+    "low": "Thấp (L)"
   },
   "chromeCastWarning": "Chromecast tốn nhiều tài nguyên và có thể gây ra sự cố trên máy chủ của bạn.",
   "voiceCommands": {

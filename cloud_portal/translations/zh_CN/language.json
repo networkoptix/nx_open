@@ -30,7 +30,7 @@
     "restorePasswordCode": "重置密码-",
     "view": "查看相机 - ",
     "debug": "调试",
-    "login": "登录 -",
+    "login": "登录-",
     "download": "下载 {{VMS_NAME}}",
     "downloadPlatform": "下载的 {{VMS_NAME}} ",
     "pageNotFound": "找不到页面"
@@ -69,7 +69,7 @@
     },
     "Custom": {
       "label": "自定义",
-      "description": "使用 {{PRODUCT_NAME}} 客户端应用程序设置自定义权限"
+      "description": "使用 {{PRODUCT_NAME}} 客户端应用程序可以设置自定义权限"
     },
     "cloudAdmin": {
       "label": "管理员",
@@ -97,7 +97,7 @@
     },
     "custom": {
       "label": "自定义",
-      "description": "使用 {{PRODUCT_NAME}} 客户端应用程序设置自定义权限"
+      "description": "使用 {{PRODUCT_NAME}} 客户端应用程序可以设置自定义权限"
     }
   },
   "errorCodes": {

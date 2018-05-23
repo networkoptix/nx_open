@@ -52,15 +52,15 @@
       "description": "不受限權限包括共用及從雲端連接/斷開系統的能力"
     },
     "Viewer": {
-      "label": "瀏覽者",
+      "label": "瀏覽",
       "description": "可以瀏覽即時影像和回放錄影資料"
     },
     "Live Viewer": {
-      "label": "即時影像瀏覽者",
+      "label": "即時影像瀏覽",
       "description": "只能瀏覽即時影像"
     },
     "Advanced Viewer": {
-      "label": "進階瀏覽者",
+      "label": "進階瀏覽",
       "description": "可以瀏覽即時影像, 回放錄影資料, 設定攝影機, 控制 PTZ 等"
     },
     "Administrator": {
@@ -69,7 +69,7 @@
     },
     "Custom": {
       "label": "自訂",
-      "description": "使用 {{PRODUCT_NAME}} 用戶端應用程式以設置自訂權限"
+      "description": "使用 {{PRODUCT_NAME}} 用戶端應用程式可以設置自訂權限"
     },
     "cloudAdmin": {
       "label": "管理者",
@@ -84,11 +84,11 @@
       "description": "不受限權限包括共用及從雲端連接/斷開系統的能力"
     },
     "viewer": {
-      "label": "瀏覽者",
+      "label": "瀏覽",
       "description": "可以瀏覽即時影像和回放錄影資料"
     },
     "liveViewer": {
-      "label": "即時影像瀏覽者",
+      "label": "即時影像瀏覽",
       "description": "只能瀏覽即時影像"
     },
     "advancedViewer": {
@@ -97,7 +97,7 @@
     },
     "custom": {
       "label": "自訂",
-      "description": "使用 {{PRODUCT_NAME}} 用戶端應用程式以設置自訂權限"
+      "description": "使用 {{PRODUCT_NAME}} 用戶端應用程式可以設置自訂權限"
     }
   },
   "errorCodes": {
@@ -143,7 +143,7 @@
     "weakMessage": "使用數字, 大寫和小寫字母及特殊字元使您密碼更強",
     "strongMessage": "理想的密碼!",
     "commonMessage": "此密碼是很常用的組合",
-    "missingMessage": "Password is required"
+    "missingMessage": "密碼是必填的"
   },
   "sharing": {
     "confirmOwner": "如果您更改系統擁有者, 您將註銷目前此帳號的所有權. 此操作是不可逆的, 是否確定?",
@@ -159,7 +159,7 @@
     "unavailable": "無法連接至系統",
     "offline": "系統處於離線狀態",
     "openClient": "在 {{VMS_NAME}} 中打開",
-    "openClientNoSystem": "開啟 {{VMS_NAME}}",
+    "openClientNoSystem": "Open {{VMS_NAME}}",
     "confirmRenameTitle": "系統名稱",
     "confirmRenameAction": "儲存",
     "successRename": "系統名稱已儲存",

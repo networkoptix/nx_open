@@ -159,7 +159,7 @@
     "unavailable": "システムに到達できません",
     "offline": "システムはオフライン",
     "openClient": "{{VMS_NAME}} で開く",
-    "openClientNoSystem": "{{VMS_NAME}} を開く",
+    "openClientNoSystem": "Open {{VMS_NAME}}",
     "confirmRenameTitle": "システム名",
     "confirmRenameAction": "保存",
     "successRename": "システム名は保存されました",

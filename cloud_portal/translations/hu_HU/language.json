@@ -69,7 +69,7 @@
     },
     "Custom": {
       "label": "Egyéni",
-      "description": "Egyéni engedélyek konfigurálásához használjon {{PRODUCT_NAME}} klienst"
+      "description": "Egyéni engedélyek konfigurálásához használja a {{PRODUCT_NAME}} klienst"
     },
     "cloudAdmin": {
       "label": "Adminisztrátor",
@@ -97,7 +97,7 @@
     },
     "custom": {
       "label": "Egyéni",
-      "description": "Egyéni engedélyek konfigurálásához használjon {{PRODUCT_NAME}} klienst"
+      "description": "Egyéni engedélyek konfigurálásához használja a {{PRODUCT_NAME}} klienst"
     }
   },
   "errorCodes": {
@@ -143,7 +143,7 @@
     "weakMessage": "Használjon számokat, kis és nagybetűket és speciális karaktereket az erősebb jelszó érdekében",
     "strongMessage": "Erős jelszó!",
     "commonMessage": "Ez a jelszó a leggyakoribb jelszavak egyike",
-    "missingMessage": "Password is required"
+    "missingMessage": "Jelszó megadása szükséges"
   },
   "sharing": {
     "confirmOwner": "Ha megváltoztatja a rendszertulajdonost, érvényteleníti a tulajdonjogot ehhez a fiókhoz. Ez a művelet nem fordítható vissza. Folytatja?",
@@ -158,8 +158,8 @@
     "mySystemSearch": "IMeMyMine",
     "unavailable": "Rendszer nem elérhető",
     "offline": "A rendszer offline",
-    "openClient": "Megnyitás {{VMS_NAME}}",
-    "openClientNoSystem": "{{VMS_NAME}} Megnyitása",
+    "openClient": "Megnyitás {{VMS_NAME}} alkalmazással",
+    "openClientNoSystem": "Open {{VMS_NAME}}",
     "confirmRenameTitle": "Rendszer neve",
     "confirmRenameAction": "Mentés",
     "successRename": "Rendszer neve mentve",

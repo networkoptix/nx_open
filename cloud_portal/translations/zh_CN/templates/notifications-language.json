@@ -9,7 +9,7 @@
     "emailSubject": "{{message.sharer_name}}邀请您前往{{PRODUCT_NAME}}"
   },
   "system_shared": {
-    "emailSubject": "Video system {{message.system_name}} was shared with you"
+    "emailSubject": "与你分享了视频系统 {{message.system_name}}"
   },
   "review_version": {
     "emailSubject": "版本{{message.id}}已准备好审核"

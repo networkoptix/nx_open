@@ -143,7 +143,7 @@
     "weakMessage": "Użyj liczb, wielkich i małych liter oraz znaków specjalnych, aby ustawić bezpieczniejsze hasło",
     "strongMessage": "Bezpieczne hasło!",
     "commonMessage": "To hasło znajduje się na liście najczęściej stosowanych haseł na świecie",
-    "missingMessage": "Password is required"
+    "missingMessage": "Hasło jest wymagane"
   },
   "sharing": {
     "confirmOwner": "Jeśli zmienisz właściciela systemu, odbierzesz mu kontrolę nad bieżącym kontem. Ta operacja jest nieodwracalna. Czy na pewno kontynuować?",

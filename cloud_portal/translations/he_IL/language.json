@@ -129,7 +129,7 @@
     "accountAlreadyActivated": "חשבון זה כבר פעיל",
     "emailNotFound": "החשבון לא קיים.",
     "EmailAlreadyExists": "האימייל הזה כבר רשום",
-    "oldPasswordMistmatch": "הסיסמה הנוכחית אינה נכונה.",
+    "oldPasswordMistmatch": "הסיסמא הנוכחית אינה נכונה.",
     "passwordMismatch": "סיסמה שגויה",
     "cantEditYourself": "שינוי הרשאות של המשתמש אינו מאופשר",
     "cantEditAdmin": "למשתמש זה יש הרשאות מנהל",
@@ -143,7 +143,7 @@
     "weakMessage": "השתמש במספרים, אותיות גדולות וקטנות ותווים מיוחדים כדי להפוך את הסיסמה שלך חזקה יותר",
     "strongMessage": "סיסמא חזקה!",
     "commonMessage": "סיסמה זו חלשה מאחר והיא מהסיסמאות הפופולריות ביותר בעולם",
-    "missingMessage": "Password is required"
+    "missingMessage": "נדרשת סיסמא"
   },
   "sharing": {
     "confirmOwner": "אם תשנה את 'בעל המערכת', תשלול את הבעלות מהחשבון הנוכחי. פעולה זו היא בלתי הפיכה. האם להמשיך?",
@@ -158,8 +158,8 @@
     "mySystemSearch": "IMeMyMine",
     "unavailable": "המערכת אינה זמינה",
     "offline": "השרת אינו זמין",
-    "openClient": "פתח ב {{VMS_NAME}}",
-    "openClientNoSystem": "פתח {{VMS_NAME}}",
+    "openClient": "פתח ב- {{VMS_NAME}}",
+    "openClientNoSystem": "Open {{VMS_NAME}}",
     "confirmRenameTitle": "שם מערכת",
     "confirmRenameAction": "שמור",
     "successRename": "שם המערכת נשמר",
@@ -184,7 +184,7 @@
     "saveChanges": "שמור"
   },
   "downloads": {
-    "noClientDetectedTitle": "להתקין {{VMS_NAME}} כדי לצפות במערכת שלך",
+    "noClientDetectedTitle": "התקן את {{VMS_NAME}} כדי לצפות במערכת שלך",
     "action": "הורד את {{VMS_NAME}}",
     "mobile": {
       "ios": {
@@ -256,7 +256,7 @@
     "setNewPasswordLabel": "סיסמה חדשה"
   },
   "regActions": {
-    "passwordLabel": "סיסמא",
+    "passwordLabel": "סיסמה",
     "createAccount": "צור חשבון"
   },
   "header": {

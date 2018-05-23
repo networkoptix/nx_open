@@ -9,7 +9,7 @@
     "emailSubject": "{{message.sharer_name}} meghívott {{PRODUCT_NAME}} használatára"
   },
   "system_shared": {
-    "emailSubject": "Video system {{message.system_name}} was shared with you"
+    "emailSubject": "Hozzáférést kapott {{message.system_name}} videó rendszerhez"
   },
   "review_version": {
     "emailSubject": "{{message.id}} verzió készen áll a felülvizsgálatra"

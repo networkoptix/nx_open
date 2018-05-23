@@ -37,7 +37,7 @@
         "confirmRestoreSettings": "Ripristina tutte le impostazioni del server? L'archivio verrà salvato, ma le impostazioni di rete verranno ripristinate.",
         "confirmRestoreSettingsNotNetwork": "Reimposta la configurazione del server? Le impostazioni di archiviazione e di rete verranno salvate.",
         "unavailable": "Non disponibile",
-        "unsafePortConfirm": "Non è sicuro utilizzare il numero di porta inferiore a 1025. Il server potrebbe non essere accessibile. Continua comunque?",
+        "unsafePortConfirm": "Non è sicuro usare il numero di porta inferiore a 1025. Il server potrebbe non essere accessibile. Continua comunque?",
         "confirmDisconnectFromCloud": "Disconnettere il sistema da {{CLOUD_NAME}}",
         "confirmDisconnectFromCloudTitle": "<span class='warning-label'>Tutti gli utenti cloud verranno eliminati.</span><br><br>Il sistema sarà accessibile tramite la rete locale con account di amministratore locale.",
         "confirmDisconnectFromCloudAction": "Scollegamento",
@@ -55,49 +55,49 @@
     },
     "settingsConfig": {
         "auditTrailEnabled": "Controllo Audit abilitato",
-        "cameraSettingsOptimization": "Allow device setting optimization",
-        "disabledVendors": "Disabled vendors",
-        "ec2AliveUpdateIntervalSec": "System alive update interval (seconds)",
-        "ec2ConnectionKeepAliveTimeoutSec": "Connection keep alive timeout (seconds)",
-        "ec2KeepAliveProbeCount": "Connection keep alive probes (seconds)",
-        "emailFrom": "Email from",
-        "emailSignature": "Email signature",
-        "emailSupportEmail": "Support Email",
+        "cameraSettingsOptimization": "Consenti l'ottimizzazione delle impostazioni del dispositivo",
+        "disabledVendors": "Fornitori disabilitati",
+        "ec2AliveUpdateIntervalSec": "Intervallo aggiornamento sistema attivo (secondi)",
+        "ec2ConnectionKeepAliveTimeoutSec": "Timeout connessione keep alive (secondi)",
+        "ec2KeepAliveProbeCount": "Interrogazione connessione keep-alive (secondi)",
+        "emailFrom": "Email da",
+        "emailSignature": "Firma e-mail",
+        "emailSupportEmail": "Email di supporto",
         "ldapAdminDn": "LDAP admin DN",
         "ldapAdminPassword": "Password amministratore LDAP",
-        "ldapSearchBase": "LDAP search base",
-        "ldapSearchFilter": "LDAP search filter",
-        "ldapUri": "LDAP URI",
+        "ldapSearchBase": "Base di ricerca LDAP",
+        "ldapSearchFilter": "Filtro di ricerca LDAP",
+        "ldapUri": "URI LDAP",
         "autoDiscoveryEnabled": "Abilita il rilevamento automatico del dispositivo",
-        "smtpConnectionType": "SMTP connection type",
-        "smtpHost": "SMTP host",
-        "smtpPort": "SMTP port",
-        "smtpSimple": "SMTP simple",
-        "smtpTimeout": "SMTP timeout",
+        "smtpConnectionType": "Tipo di connessione SMTP",
+        "smtpHost": "Host SMTP",
+        "smtpPort": "Porta SMTP",
+        "smtpSimple": "SMTP semplice",
+        "smtpTimeout": "Timeout SMTP",
         "smptPassword": "Password SMTP",
-        "smtpUser": "SMTP user",
-        "updateNotificationsEnabled": "Update notifications enabled",
+        "smtpUser": "Utente SMTP",
+        "updateNotificationsEnabled": "Notifiche di aggiornamento abilitate",
         "arecontRtspEnabled": "Arecont RTSP abilitato",
         "backupNewCamerasByDefault": "Backup di nuove videocamere per impostazione predefinita",
-        "statisticsAllowed": "Send anonymous usage statistics and crash reports",
+        "statisticsAllowed": "Invia statistiche di utilizzo anonime e rapporti sugli arresti anomali",
         "backupQualities": "Qualità di backup",
-        "serverDiscoveryPingTimeoutSec": "Server discovery timeout",
-        "cloudAccountName": "Cloud owner account",
-        "cloudHost": "Cloud host",
+        "serverDiscoveryPingTimeoutSec": "Timeout rilevamento server",
+        "cloudAccountName": "Proprietario account cloud",
+        "cloudHost": "Host cloud",
         "cloudAuthKey": "Chiave di autenticazione cloud",
-        "cloudSystemID": "Cloud system id",
+        "cloudSystemID": "Id sistema cloud",
         "systemName": "Nome del sistema",
         "newSystem": "Il server è \"nuovo\"",
-        "proxyConnectTimeoutSec": "Proxy connection timeout (seconds)",
+        "proxyConnectTimeoutSec": "Timeout connessione proxy (secondi)",
         "crossdomainEnabled": "Abilitare il client web",
-        "statisticsReportLastNumber": "Statistics report - last number",
-        "statisticsReportLastTime": "Statistics report - last time",
-        "statisticsReportServerApi": "Statistics server api",
-        "statisticsReportTimeCycle": "Statistics report interval",
+        "statisticsReportLastNumber": "Rapporto statistiche - ultimo numero",
+        "statisticsReportLastTime": "Rapporto statistiche - ultima volta",
+        "statisticsReportServerApi": "Statistiche del server api",
+        "statisticsReportTimeCycle": "Intervallo dei report statistici",
         "systemId": "ID di sistema",
         "systemNameForId": "Nome del sistema",
-        "takeCameraOwnershipWithoutLock": "Take cameras ownership without lock",
-        "timeSynchronizationEnabled": "Time synchronization enabled",
+        "takeCameraOwnershipWithoutLock": "Assumi la proprietà delle telecamere senza blocco",
+        "timeSynchronizationEnabled": "Sincronizzazione dell'ora abilitata",
         "upnpPortMappingEnabled": "Funzione UPNP abilitata"
     },
     "info": {
@@ -123,42 +123,42 @@
         "connectionFailed": "Connessione fallita: ",
         "unknownError": "Errore sconosciuto",
         "mergeFailed": "Unione non riuscita: ",
-        "mergeSucceed": "Merge succeed.",
-        "newSystemDisplayName": "New system",
-        "incompatibleProtocol": "incompatible version",
-        "incompatibleCloudHost": "cloud conflict",
-        "incompatibleCloudState": "cloud connected"
+        "mergeSucceed": "Successo Unione.",
+        "newSystemDisplayName": "Nuovo sistema",
+        "incompatibleProtocol": "versione incompatibile",
+        "incompatibleCloudHost": "conflitto nel cloud",
+        "incompatibleCloudState": "cloud connesso"
     },
     "login": {
-        "incorrectPassword": "Login or password is incorrect"
+        "incorrectPassword": "Login o password non corretti"
     },
     "navigaion": {
-        "cannotGetUser": "Server failure: cannot retrieve current user data"
+        "cannotGetUser": "Errore del server: impossibile recuperare i dati utente correnti"
     },
     "offlineDialog": {
-        "serverOffline": "server is offline"
+        "serverOffline": "il server è offline"
     },
     "restartDialog": {
-        "serverStarting": "server is starting",
-        "serverRestarting": "server is restarting",
-        "serverOffline": "server is offline"
+        "serverStarting": "il server si sta avviando",
+        "serverRestarting": "il server si sta riavviando",
+        "serverOffline": "il server è offline"
     },
     "fileUpload": {
-        "started": "Update successfully started. It will take several minutes",
-        "upToDate": "Update failed. The provided version is already installed.",
-        "invalidFile": "Update failed. Provided file is not a valid update archive.",
-        "incompatibleSystem": "Update failed. Provided file is targeted for another system.",
-        "extractionError": "Update failed. Insufficient space to extract archive, check available storage.",
-        "installationError": "Updating failed. Cannot execute installation script.",
-        "selectFiles": "Select files"
+        "started": "Aggiornamento avviato correttamente. Ci vorranno diversi minuti",
+        "upToDate": "Aggiornamento non riuscito. La versione fornita è già installata.",
+        "invalidFile": "Aggiornamento non riuscito. Il file fornito non è un archivio di aggiornamento valido.",
+        "incompatibleSystem": "Aggiornamento non riuscito. Il file fornito è destinato a un altro sistema.",
+        "extractionError": "Aggiornamento non riuscito. Spazio insufficiente per estrarre l'archivio, controllare la memoria disponibile.",
+        "installationError": "Aggiornamento fallito. Impossibile eseguire script di installazione.",
+        "selectFiles": "Selezionare i file"
     },
     "advanced": {
         "free": "Versione gratuita",
-        "total": "Total",
-        "occupied": "Occupied",
-        "reserved": "Reserved"
+        "total": "Totale",
+        "occupied": "Occupato",
+        "reserved": "Riservato"
     },
     "pageTitles": {
-        "default": "{{PRODUCT_NAME}} web interface"
+        "default": "{{PRODUCT_NAME}} interfaccia web"
     }
 }

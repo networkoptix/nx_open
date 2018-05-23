@@ -133,7 +133,7 @@
     "passwordMismatch": "Contraseña incorrecta",
     "cantEditYourself": "Cambiar permisos propios no está permitido",
     "cantEditAdmin": "Este usuario tiene permisos de administrador",
-    "cantOpenClient": "{{VMS_NAME}} aplicación no ha sido detectada.<a href=\"/download\">Descargar</a>",
+    "cantOpenClient": "{{VMS_NAME}} aplicación no es detectada.<a href=\"/download\">Descargar</a>",
     "lostConnection": "Conexión al {{systemName}} se ha perdido",
     "thisSystem": "el sistema"
   },
@@ -159,7 +159,7 @@
     "unavailable": "El sistema es inalcanzable",
     "offline": "Sistema está desconectado",
     "openClient": "Abierto en {{VMS_NAME}}",
-    "openClientNoSystem": "Abrir {{VMS_NAME}}",
+    "openClientNoSystem": "Open {{VMS_NAME}}",
     "confirmRenameTitle": "Nombre del sistema",
     "confirmRenameAction": "Guardar",
     "successRename": "Nombre del sistema guardado",
