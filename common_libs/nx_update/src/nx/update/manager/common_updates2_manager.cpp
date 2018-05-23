@@ -91,7 +91,7 @@ QnUuid CommonUpdates2Manager::moduleGuid() const
 
 void CommonUpdates2Manager::updateGlobalRegistry(const QByteArray& serializedRegistry)
 {
-    // #TODO #akulikov Return here if called on the client or make up somehow.
+    // #TODO #akulikov Return here if called on the client or figure out something better.
 
     globalSettings()->setUpdates2Registry(serializedRegistry);
     globalSettings()->synchronizeNow();

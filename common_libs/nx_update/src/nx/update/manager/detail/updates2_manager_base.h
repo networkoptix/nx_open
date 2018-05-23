@@ -23,10 +23,12 @@ public:
     api::Updates2StatusData status();
     api::Updates2StatusData download();
     api::Updates2StatusData install();
-    /** #TODO #akulikov Implement this. */
     api::Updates2StatusData cancel();
     void atServerStart();
-    /** After this method is called manager is not operational and should be destroyed */
+    /**
+     * After this method has been called Updates2Manager is not operational and should be
+     * destroyed
+     */
     void stopAsyncTasks();
 
 protected:

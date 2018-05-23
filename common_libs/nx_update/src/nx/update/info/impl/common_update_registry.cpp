@@ -174,6 +174,7 @@ private:
 
 static const QString kUrlKey = "url";
 static const QString kManualDataKey = "manualData";
+static const QString kRemovedDataKey = "removedData";
 static const QString kMetaDataKey = "metaData";
 static const QString kPeersKey = "peers";
 static const QString kIsClientKey = "isClient";
@@ -198,8 +199,6 @@ static const QString kFileKey = "file";
 static const QString kSizeKey = "size";
 static const QString kMd5Key = "md5";
 
-// #TODO #akulikov Implement removedData serialization and deserialization.
-
 class Serializer
 {
 public:
@@ -207,7 +206,8 @@ public:
         const QString& url,
         const UpdatesMetaData& metaData,
         const CustomizationVersionToUpdate& customizationVersionToUpdate,
-        const QList<ManualFileData>& manualData)
+        const QList<ManualFileData>& manualData,
+        const QMap<QString, QList<QnUuid>>& removedData)
         :
         m_url(url),
         m_metaData(metaData),
@@ -216,6 +216,7 @@ public:
         serializeUrl();
         serializeMetaData();
         serializeManualData(manualData);
+        serializeRemovedData(removedData);
         serializeCustomizationVersionToUpdate();
     }
 
@@ -251,6 +252,21 @@ private:
         }
 
         m_jsonObject[kManualDataKey] = manualDataArray;
+    }
+
+    void serializeRemovedData(const QMap<QString, QList<QnUuid>>& removedData)
+    {
+        QJsonObject removedDataMap;
+        for (auto removedIt = removedData.cbegin(); removedIt != removedData.cend(); ++removedIt)
+        {
+            QJsonArray peerArray;
+            for (const auto& peer: removedIt.value())
+                peerArray.append(peer.toString());
+
+            removedDataMap[removedIt.key()] = peerArray;
+        }
+
+        m_jsonObject[kRemovedDataKey] = removedDataMap;
     }
 
     void serializeMetaData()
@@ -362,6 +378,7 @@ public:
         deserializeUrl();
         deserializeMetaData();
         deserializeManualData();
+        deserializeRemovedData();
         deserializeCustomizationVersionToUpdate();
 
         if (!m_ok)
@@ -375,6 +392,7 @@ public:
         return m_customizationVersionToUpdate;
     }
     QList<ManualFileData> manualData() const { return m_manualData; }
+    QMap<QString, QList<QnUuid>> removedData() const { return m_removedData; }
     bool ok() const { return m_ok; }
 
 private:
@@ -383,6 +401,7 @@ private:
     UpdatesMetaData m_metaData;
     CustomizationVersionToUpdate m_customizationVersionToUpdate;
     QList<ManualFileData> m_manualData;
+    QMap<QString, QList<QnUuid>> m_removedData;
     bool m_ok = true;
     QJsonObject m_rootObject;
 
@@ -423,6 +442,29 @@ private:
                 manualFileData.peers.append(QnUuid::fromStringSafe(peersArrayObj[j].toString()));
 
             m_manualData.append(manualFileData);
+        }
+    }
+
+    void deserializeRemovedData()
+    {
+        if (!m_ok)
+            return;
+
+        if (!m_rootObject.contains(kRemovedDataKey) || !m_rootObject[kRemovedDataKey].isObject())
+        {
+            m_ok = false;
+            return;
+        }
+
+        auto removedDataObject = m_rootObject[kRemovedDataKey].toObject();
+        for (const auto& key: removedDataObject.keys())
+        {
+            QList<QnUuid> peers;
+            auto peerArray = removedDataObject[key].toArray();
+            for (int i = 0; i < peerArray.size(); ++i)
+                peers.append(QnUuid::fromStringSafe(peerArray[i].toString()));
+
+            m_removedData.insert(key, peers);
         }
     }
 
@@ -821,7 +863,12 @@ bool CommonUpdateRegistry::hasUpdateForCustomizationAndVersion(
 
 QByteArray CommonUpdateRegistry::toByteArray() const
 {
-    return Serializer(m_baseUrl, m_metaData, m_customizationVersionToUpdate, m_manualData).json();
+    return Serializer(
+        m_baseUrl,
+        m_metaData,
+        m_customizationVersionToUpdate,
+        m_manualData,
+        m_removedData).json();
 }
 
 bool CommonUpdateRegistry::fromByteArray(const QByteArray& rawData)
@@ -834,6 +881,7 @@ bool CommonUpdateRegistry::fromByteArray(const QByteArray& rawData)
     m_metaData = deserializer.metaData();
     m_customizationVersionToUpdate = deserializer.customizationVersionToUpdate();
     m_manualData = deserializer.manualData();
+    m_removedData = deserializer.removedData();
 
     return true;
 }

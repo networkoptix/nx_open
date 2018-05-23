@@ -126,6 +126,12 @@ protected:
         to->merge(from);
     }
 
+    void thenMergedRegistriesShouldRemainEqualAfterSerialization()
+    {
+        assertEqualityAfterSerialization(m_mergedRegistry1to2.get());
+        assertEqualityAfterSerialization(m_mergedRegistry2to1.get());
+    }
+
 private:
     impl::CommonUpdateRegistry m_registry;
     impl::CommonUpdateRegistry m_registry2;
@@ -168,6 +174,15 @@ private:
             ASSERT_EQ(ResultCode::ok, m_registry.findUpdateFile(request, &fileData));
         else
             ASSERT_EQ(ResultCode::noData, m_registry.findUpdateFile(request, &fileData));
+    }
+
+    void assertEqualityAfterSerialization(impl::CommonUpdateRegistry* registry)
+    {
+        auto buf = registry->toByteArray();
+        impl::CommonUpdateRegistry restoredRegistry(kPeer1Id);
+        restoredRegistry.fromByteArray(buf);
+
+        ASSERT_TRUE(registry->equals(&restoredRegistry));
     }
 };
 
@@ -222,9 +237,9 @@ TEST_F(CommonUpdateRegistry, manualData_merge)
         kManualFile1,
         QList<QnUuid>());
     thenMergedRegistriesShouldBeEqual();
-}
 
-// #TODO #akulikov Implement serialization after merge/remove tests.
+    thenMergedRegistriesShouldRemainEqualAfterSerialization();
+}
 
 } // namespace test
 } // namespace impl
