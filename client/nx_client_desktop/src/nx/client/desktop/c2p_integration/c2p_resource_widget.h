@@ -6,11 +6,11 @@ namespace nx {
 namespace client {
 namespace desktop {
 
-class C2pResourceWidget : public QnWebResourceWidget
+class C2pResourceWidget: public QnWebResourceWidget
 {
     Q_OBJECT
 
-    typedef QnWebResourceWidget base_type;
+    using base_type = QnWebResourceWidget;
 public:
     C2pResourceWidget(
         QnWorkbenchContext* context,
