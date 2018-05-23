@@ -150,6 +150,7 @@ QnConnectionManager::QnConnectionManager(QObject* parent):
 
 QnConnectionManager::~QnConnectionManager()
 {
+    disconnectFromServer();
 }
 
 QString QnConnectionManager::systemName() const

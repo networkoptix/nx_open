@@ -120,6 +120,9 @@ Page
 
         Rectangle
         {
+            property string filterString: searchToolBar.text
+            onFilterStringChanged: camerasList.model.setFilterFixedString(filterString)
+
             color: ColorTheme.windowBackground
 
             CamerasList
@@ -130,12 +133,6 @@ Page
                 anchors.margins: 8
                 displayMarginBeginning: 8
                 displayMarginEnd: 8
-
-                Connections
-                {
-                    target: searchToolBar
-                    onTextChanged: camerasList.model.setFilterFixedString(searchToolBar.text)
-                }
 
                 ScrollIndicator.vertical: ScrollIndicator
                 {

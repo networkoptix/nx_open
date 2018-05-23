@@ -237,7 +237,10 @@ Item
             visible: videoNavigation.canViewArchive
 
             anchors.bottom: parent.bottom
-            width: parent.width
+
+            x: mainWindow.hasNavigationBar ? 0 : -mainWindow.leftPadding
+            width: mainWindow.hasNavigationBar ? parent.width : mainWindow.width
+
             height: 96
 
             stickToEnd: d.liveMode && !paused
@@ -695,8 +698,11 @@ Item
         {
             close()
             d.resumePosition = -1
-            timeline.jumpTo(date.getTime())
-            videoScreenController.setPosition(date.getTime(), true)
+            // TODO: Make refactoring and get rid of serverTimeZoneShift (etc) properties.
+            // Timeline and calendar should work in a same way.
+            var targetTime = date.getTime() - timeline.serverTimeZoneShift
+            timeline.jumpTo(targetTime)
+            videoScreenController.setPosition(targetTime, true)
         }
     }
 

@@ -2,6 +2,13 @@
 <!DOCTYPE TS>
 <TS version="2.1" language="th" sourcelanguage="en">
   <context>
+    <name>ActionButtonsPanel</name>
+    <message>
+      <source>Press and hold to</source>
+      <translation type="unfinished">Press and hold to</translation>
+    </message>
+  </context>
+  <context>
     <name>CameraItem</name>
     <message>
       <source>Select camera</source>
@@ -15,19 +22,28 @@
       <source>Offline</source>
       <translation>ออฟไลน์</translation>
     </message>
+    <message>
+      <source>Password required</source>
+      <translation>กรุณาใส่รหัสผ่าน</translation>
+    </message>
+    <message>
+      <source>Unsupported firmware version</source>
+      <translation>เวอร์ชันเฟิร์มแวร์ที่ไม่สนับสนุน</translation>
+    </message>
   </context>
   <context>
     <name>CloudPanel</name>
     <message>
       <source>Log in to %1</source>
-      <translation>เข้าสู่ระบบ %1</translation>
+      <translation>ยินดีต้อนรับสู่ %1</translation>
     </message>
   </context>
   <context>
     <name>CloudScreen</name>
     <message>
-      <source>Cloud Account</source>
-      <translation>บัญชี Cloud</translation>
+      <source>%1 Account</source>
+      <comment>%1 is the short cloud name (like &apos;Cloud&apos;)</comment>
+      <translation>%1 บัญชี</translation>
     </message>
   </context>
   <context>
@@ -68,16 +84,48 @@
       <translation>ไม่สามารถเชื่อมต่อกับ %1</translation>
     </message>
     <message>
-      <source>Email and password cannot be empty</source>
-      <translation>อีเมลและรหัสผ่านต้องไม่ว่างเปล่า</translation>
-    </message>
-    <message>
       <source>Log in</source>
       <translation>ลงชื่อเข้าสู่ระบบ</translation>
     </message>
     <message>
-      <source>Incorrect email or password</source>
-      <translation>อีเมลหรือรหัสผ่านไม่ถูกต้อง</translation>
+      <source>Resend activation email</source>
+      <translation>ส่งอีเมลยืนยันซ้ำ</translation>
+    </message>
+    <message>
+      <source>Activation email sent</source>
+      <translation>ส่งอีเมลยืนยันแล้ว</translation>
+    </message>
+    <message>
+      <source>Cannot send activation email</source>
+      <translation>ไม่สามารถส่งอีเมลยืนยัน</translation>
+    </message>
+    <message>
+      <source>Check your inbox and visit provided link to activate account</source>
+      <translation>ตรวจสอบกล่องจดหมายของคุณและไปที่ลิงก์ที่ให้ไว้เพื่อเปิดใช้งานบัญชี</translation>
+    </message>
+    <message>
+      <source>Check your internet connection or try again later</source>
+      <translation type="unfinished">Check your internet connection or try again later</translation>
+    </message>
+    <message>
+      <source>Account not found</source>
+      <translation type="unfinished">Account not found</translation>
+    </message>
+    <message>
+      <source>Wrong password</source>
+      <translation type="unfinished">Wrong password</translation>
+    </message>
+    <message>
+      <source>Account not activated</source>
+      <translation type="unfinished">Account not activated</translation>
+    </message>
+    <message>
+      <source>Email cannot be empty</source>
+      <translation type="unfinished">Email cannot be empty</translation>
+    </message>
+    <message>
+      <source>Password cannot be empty</source>
+      <translation type="unfinished">Password cannot be empty</translation>
     </message>
   </context>
   <context>
@@ -108,11 +156,11 @@
     </message>
     <message>
       <source>Login cannot be empty</source>
-      <translation>ช่องผู้ใช้งาน ต้องไม่ปล่อยว่าง.</translation>
+      <translation>ช่องผู้ใช้งาน ต้องไม่ปล่อยว่าง</translation>
     </message>
     <message>
       <source>Password cannot be empty</source>
-      <translation>รหัสผ่านต้องไม่ปล่อยว่าง.</translation>
+      <translation>รหัสผ่านต้องไม่ปล่อยว่าง</translation>
     </message>
   </context>
   <context>
@@ -212,7 +260,7 @@
     <name>InformationLabel</name>
     <message>
       <source>Unknown</source>
-      <translation>ที่ไม่รู้จัก</translation>
+      <translation>ม่รู้จัก</translation>
     </message>
     <message>
       <source>%1 fps</source>
@@ -337,7 +385,7 @@
     </message>
     <message>
       <source>Unknown</source>
-      <translation>ที่ไม่รู้จัก</translation>
+      <translation>ม่รู้จัก</translation>
     </message>
     <message>
       <source>Highest speed</source>
@@ -346,6 +394,22 @@
     <message>
       <source>Best quality</source>
       <translation>คุณภาพดีที่สุด</translation>
+    </message>
+    <message>
+      <source>Transcoding is disabled.</source>
+      <translation>การแปลงรหัสถูกปิดใช้งาน</translation>
+    </message>
+    <message>
+      <source>Transcoding is not supported for this camera.</source>
+      <translation>ไม่สนับสนุนการ Transcoding สำหรับกล้องนี้</translation>
+    </message>
+    <message>
+      <source>Transcoding is not supported for servers with version lower than 3.0.</source>
+      <translation>ไม่สนับสนุนการ Transcoding สำหรับเซิร์ฟเวอร์ที่มีรุ่นต่ำกว่า 3.0</translation>
+    </message>
+    <message>
+      <source>Transcoding is not supported for ARM servers.</source>
+      <translation>ไม่สนับสนุนการ Transcoding สำหรับเซิร์ฟเวอร์ ARM</translation>
     </message>
   </context>
   <context>
@@ -461,10 +525,6 @@
       <translation>เข้าสู่ระบบ %1</translation>
     </message>
     <message>
-      <source>Cannot connect to %1</source>
-      <translation>ไม่สามารถเชื่อมต่อกับ %1</translation>
-    </message>
-    <message>
       <source>Check your network connection or press &quot;%1&quot; button to enter a known server address.</source>
       <translation>ตรวจสอบการเชื่อมต่อเครือข่ายของคุณหรือกดปุ่ม &quot;%1&quot; เพื่อป้อนที่อยู่เซิร์ฟเวอร์ที่รู้จัก</translation>
     </message>
@@ -506,6 +566,14 @@
     <message>
       <source>Save passwords for servers</source>
       <translation>บันทึกรหัสผ่านสำหรับเซิร์ฟเวอร์</translation>
+    </message>
+    <message>
+      <source>What to do with currently saved passwords?</source>
+      <translation type="unfinished">What to do with currently saved passwords?</translation>
+    </message>
+    <message>
+      <source>Delete</source>
+      <translation type="unfinished">Delete</translation>
     </message>
   </context>
   <context>
@@ -549,7 +617,7 @@
     <name>SystemInformationBlock</name>
     <message>
       <source>Unknown</source>
-      <translation>ที่ไม่รู้จัก</translation>
+      <translation>ม่รู้จัก</translation>
     </message>
     <message>
       <source>New Server</source>
@@ -571,11 +639,11 @@
     </message>
     <message>
       <source>Copy</source>
-      <translation>สำเนา</translation>
+      <translation>คัดลอก</translation>
     </message>
     <message>
       <source>Paste</source>
-      <translation>แปะ</translation>
+      <translation>วาง</translation>
     </message>
     <message>
       <source>Select All</source>
@@ -634,6 +702,38 @@
       <source>Cannot play any video stream</source>
       <translation>ไม่สามารถเล่นวิดีโอสตรีมใดก็ได้</translation>
     </message>
+    <message>
+      <source>Not enough licenses</source>
+      <translation type="unfinished">Not enough licenses</translation>
+    </message>
+    <message>
+      <source>Password required</source>
+      <translation type="unfinished">Password required</translation>
+    </message>
+    <message>
+      <source>Set password on this camera using Wisenet WAVE client or camera web-page to view video</source>
+      <translation type="unfinished">Set password on this camera using Wisenet WAVE client or camera web-page to view video</translation>
+    </message>
+    <message>
+      <source>Unsupported firmware version</source>
+      <translation type="unfinished">Unsupported firmware version</translation>
+    </message>
+    <message>
+      <source>Please update firmware</source>
+      <translation type="unfinished">Please update firmware</translation>
+    </message>
+    <message>
+      <source>Too many connections</source>
+      <translation type="unfinished">Too many connections</translation>
+    </message>
+    <message>
+      <source>I/O interface not supported yet</source>
+      <translation type="unfinished">I/O interface not supported yet</translation>
+    </message>
+    <message>
+      <source>In this app I/O module can be used as a sound input device only. To use it as a control module, please use desktop version of %1</source>
+      <translation type="unfinished">In this app I/O module can be used as a sound input device only. To use it as a control module, please use desktop version of %1</translation>
+    </message>
   </context>
   <context>
     <name>VideoNavigation</name>
@@ -644,11 +744,6 @@
     <message>
       <source>LIVE</source>
       <translation>สด</translation>
-    </message>
-    <message>
-      <source>d MMMM yyyy</source>
-      <comment>DO NOT TRANSLATE THIS STRING!</comment>
-      <translation type="unfinished">d MMMM yyyy</translation>
     </message>
   </context>
   <context>
@@ -667,6 +762,17 @@
     <message>
       <source>Skip</source>
       <translation>ข้าม</translation>
+    </message>
+  </context>
+  <context>
+    <name>main</name>
+    <message>
+      <source>Server offline. Reconnecting...</source>
+      <translation type="unfinished">Server offline. Reconnecting...</translation>
+    </message>
+    <message>
+      <source>Cannot connect to %1</source>
+      <translation type="unfinished">Cannot connect to %1</translation>
     </message>
   </context>
 </TS>

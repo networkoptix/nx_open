@@ -2,6 +2,13 @@
 <!DOCTYPE TS>
 <TS version="2.1" language="he" sourcelanguage="en">
   <context>
+    <name>ActionButtonsPanel</name>
+    <message>
+      <source>Press and hold to</source>
+      <translation type="unfinished">Press and hold to</translation>
+    </message>
+  </context>
+  <context>
     <name>CameraItem</name>
     <message>
       <source>Select camera</source>
@@ -15,6 +22,14 @@
       <source>Offline</source>
       <translation>לא מקוון</translation>
     </message>
+    <message>
+      <source>Password required</source>
+      <translation type="unfinished">Password required</translation>
+    </message>
+    <message>
+      <source>Unsupported firmware version</source>
+      <translation type="unfinished">Unsupported firmware version</translation>
+    </message>
   </context>
   <context>
     <name>CloudPanel</name>
@@ -26,8 +41,9 @@
   <context>
     <name>CloudScreen</name>
     <message>
-      <source>Cloud Account</source>
-      <translation>חשבון ענן</translation>
+      <source>%1 Account</source>
+      <comment>%1 is the short cloud name (like &apos;Cloud&apos;)</comment>
+      <translation type="unfinished">%1 Account</translation>
     </message>
   </context>
   <context>
@@ -61,30 +77,62 @@
     </message>
     <message>
       <source>Forgot your password?</source>
-      <translation>שכחת סיסמה?</translation>
+      <translation>שכחת סיסמא?</translation>
     </message>
     <message>
       <source>Cannot connect to %1</source>
       <translation>אין אפשרות להתחבר אל %1</translation>
     </message>
     <message>
-      <source>Email and password cannot be empty</source>
-      <translation>כתובת האימייל והסיסמה אינם יכולים להיות ריקים</translation>
-    </message>
-    <message>
       <source>Log in</source>
       <translation>התחבר</translation>
     </message>
     <message>
-      <source>Incorrect email or password</source>
-      <translation>דוא"ל או סיסמה שגויים</translation>
+      <source>Resend activation email</source>
+      <translation type="unfinished">Resend activation email</translation>
+    </message>
+    <message>
+      <source>Activation email sent</source>
+      <translation type="unfinished">Activation email sent</translation>
+    </message>
+    <message>
+      <source>Cannot send activation email</source>
+      <translation type="unfinished">Cannot send activation email</translation>
+    </message>
+    <message>
+      <source>Check your inbox and visit provided link to activate account</source>
+      <translation type="unfinished">Check your inbox and visit provided link to activate account</translation>
+    </message>
+    <message>
+      <source>Check your internet connection or try again later</source>
+      <translation type="unfinished">Check your internet connection or try again later</translation>
+    </message>
+    <message>
+      <source>Account not found</source>
+      <translation type="unfinished">Account not found</translation>
+    </message>
+    <message>
+      <source>Wrong password</source>
+      <translation type="unfinished">Wrong password</translation>
+    </message>
+    <message>
+      <source>Account not activated</source>
+      <translation type="unfinished">Account not activated</translation>
+    </message>
+    <message>
+      <source>Email cannot be empty</source>
+      <translation type="unfinished">Email cannot be empty</translation>
+    </message>
+    <message>
+      <source>Password cannot be empty</source>
+      <translation type="unfinished">Password cannot be empty</translation>
     </message>
   </context>
   <context>
     <name>CustomConnectionScreen</name>
     <message>
       <source>Delete</source>
-      <translation>מחיקה</translation>
+      <translation>מחק</translation>
     </message>
     <message>
       <source>Connect to Server</source>
@@ -262,7 +310,7 @@
     </message>
     <message>
       <source>%1 is offline</source>
-      <translation>%1 לא מחובר</translation>
+      <translation>%1 נמצא במצב לא מקוון</translation>
     </message>
     <message>
       <source>Software image rotation is not supported in fullscreen mode</source>
@@ -347,6 +395,22 @@
       <source>Best quality</source>
       <translation>האיכות הטובה ביותר</translation>
     </message>
+    <message>
+      <source>Transcoding is disabled.</source>
+      <translation>קידוד מחדש מושבת.</translation>
+    </message>
+    <message>
+      <source>Transcoding is not supported for this camera.</source>
+      <translation>קידוד מחדש אינו נתמך עבור מצלמה זו.</translation>
+    </message>
+    <message>
+      <source>Transcoding is not supported for servers with version lower than 3.0.</source>
+      <translation>קידוד מחדש אינו נתמך עבור שרתים עם גרסה נמוכה מ -3.0.</translation>
+    </message>
+    <message>
+      <source>Transcoding is not supported for ARM servers.</source>
+      <translation>קידוד מחדש אינו נתמך עבור שרתי ARM.</translation>
+    </message>
   </context>
   <context>
     <name>ResourcesScreen</name>
@@ -416,7 +480,7 @@
     </message>
     <message>
       <source>Login</source>
-      <translation>כניסה</translation>
+      <translation>שם משתמש</translation>
     </message>
     <message>
       <source>Password</source>
@@ -447,7 +511,7 @@
     </message>
     <message>
       <source>UNREACHABLE</source>
-      <translation>לא זמין</translation>
+      <translation>בלתי ניתן להשגה</translation>
     </message>
     <message>
       <source>Connect to this server from web browser or through desktop client to set it up</source>
@@ -459,10 +523,6 @@
     <message>
       <source>Log in to %1</source>
       <translation>התחבר אל %1</translation>
-    </message>
-    <message>
-      <source>Cannot connect to %1</source>
-      <translation>אין אפשרות להתחבר אל %1</translation>
     </message>
     <message>
       <source>Check your network connection or press &quot;%1&quot; button to enter a known server address.</source>
@@ -506,6 +566,14 @@
     <message>
       <source>Save passwords for servers</source>
       <translation>שמור סיסמאות עבור שרתים</translation>
+    </message>
+    <message>
+      <source>What to do with currently saved passwords?</source>
+      <translation type="unfinished">What to do with currently saved passwords?</translation>
+    </message>
+    <message>
+      <source>Delete</source>
+      <translation type="unfinished">Delete</translation>
     </message>
   </context>
   <context>
@@ -634,6 +702,38 @@
       <source>Cannot play any video stream</source>
       <translation>לא ניתן להציג אף זרם וידאו</translation>
     </message>
+    <message>
+      <source>Not enough licenses</source>
+      <translation type="unfinished">Not enough licenses</translation>
+    </message>
+    <message>
+      <source>Password required</source>
+      <translation type="unfinished">Password required</translation>
+    </message>
+    <message>
+      <source>Set password on this camera using Wisenet WAVE client or camera web-page to view video</source>
+      <translation type="unfinished">Set password on this camera using Wisenet WAVE client or camera web-page to view video</translation>
+    </message>
+    <message>
+      <source>Unsupported firmware version</source>
+      <translation type="unfinished">Unsupported firmware version</translation>
+    </message>
+    <message>
+      <source>Please update firmware</source>
+      <translation type="unfinished">Please update firmware</translation>
+    </message>
+    <message>
+      <source>Too many connections</source>
+      <translation type="unfinished">Too many connections</translation>
+    </message>
+    <message>
+      <source>I/O interface not supported yet</source>
+      <translation type="unfinished">I/O interface not supported yet</translation>
+    </message>
+    <message>
+      <source>In this app I/O module can be used as a sound input device only. To use it as a control module, please use desktop version of %1</source>
+      <translation type="unfinished">In this app I/O module can be used as a sound input device only. To use it as a control module, please use desktop version of %1</translation>
+    </message>
   </context>
   <context>
     <name>VideoNavigation</name>
@@ -644,11 +744,6 @@
     <message>
       <source>LIVE</source>
       <translation>חי</translation>
-    </message>
-    <message>
-      <source>d MMMM yyyy</source>
-      <comment>DO NOT TRANSLATE THIS STRING!</comment>
-      <translation type="unfinished">d MMMM yyyy</translation>
     </message>
   </context>
   <context>
@@ -667,6 +762,17 @@
     <message>
       <source>Skip</source>
       <translation>דלג</translation>
+    </message>
+  </context>
+  <context>
+    <name>main</name>
+    <message>
+      <source>Server offline. Reconnecting...</source>
+      <translation type="unfinished">Server offline. Reconnecting...</translation>
+    </message>
+    <message>
+      <source>Cannot connect to %1</source>
+      <translation type="unfinished">Cannot connect to %1</translation>
     </message>
   </context>
 </TS>
