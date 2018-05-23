@@ -61,3 +61,5 @@ struct ResetEventRulesData: Data
 } // namespace api
 } // namespace vms
 } // namespace nx
+
+Q_DECLARE_METATYPE(nx::vms::api::EventRuleData)

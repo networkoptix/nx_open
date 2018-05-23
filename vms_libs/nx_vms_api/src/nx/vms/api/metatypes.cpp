@@ -13,6 +13,7 @@
 #include "data/layout_tour_data.h"
 #include "data/lock_data.h"
 #include "data/videowall_data.h"
+#include "data/event_rule_data.h"
 
 namespace {
 
