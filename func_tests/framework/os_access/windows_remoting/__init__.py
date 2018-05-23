@@ -69,6 +69,7 @@ class WinRM(object):
 
     @lrudecorator(1)
     def user_env_vars(self):
+        # TODO: Work via Users class.
         users = Users(self._protocol)
         account = users.account_by_name(self._username)
         profile = users.profile_by_sid(account[u'SID'])
@@ -82,6 +83,7 @@ class WinRM(object):
 
     @lrudecorator(1)
     def system_profile_dir(self):
+        # TODO: Work via Users class.
         users = Users(self._protocol)
         system_profile = users.system_profile()
         profile_dir = system_profile[u'LocalPath']
@@ -91,6 +93,7 @@ class WinRM(object):
         return CIMQuery(self._protocol, class_name, selectors)
 
     def registry_key(self, path):
+        # TODO: Make a separate Registry class.
         return Key(self.wmi_query(u'StdRegProv', {}), path)
 
     def is_working(self):

@@ -5,6 +5,7 @@ from ._cim_query import CIMQuery
 
 class Users(object):
     def __init__(self, protocol):
+        # TODO: Work via WinRM in this class.
         self.protocol = protocol
 
     @lrudecorator(1)
