@@ -27,6 +27,7 @@ struct NX_NETWORK_API Ini:
 
     NX_INI_FLAG(0, httpClientTraffic, "Trace HTTP traffic for nx::network::http::AsyncHttpClient");
     NX_INI_STRING("", disableHosts, "Comma-separated list of forbidden IPs and domains");
+    NX_INI_FLAG(0, enableNewSslSocket, "Enable new SSL socket implementation");
 
     bool isHostDisabled(const HostAddress& address) const;
 };
