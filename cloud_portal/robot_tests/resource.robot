@@ -7,7 +7,6 @@ Library           NoptixLibrary/
 Resource          variables.robot
 
 *** variables ***
-@{chrome_arguments}    --disable-infobars    --headless    --disable-gpu
 ${headless}    false
 ${directory}    ${SCREENSHOTDIRECTORY}
 

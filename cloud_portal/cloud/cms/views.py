@@ -218,8 +218,7 @@ def version(request, version_id=None):
                                                    'has_permission': mysite.has_permission(request),
                                                    'site_url': mysite.site_url,
                                                    'site_header': admin.site.site_header,
-                                                   'site_title': admin.site.site_title,
-                                                   'title': 'Review a Version'
+                                                   'site_title': admin.site.site_title
                                                    })
 
 
