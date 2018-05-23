@@ -23,7 +23,7 @@ class VirtualBoxError(Exception):
 
     def __init__(self, code, message):
         Exception.__init__(self, message)
-        self.code = code  # 'VBOX_E_XXX'
+        self.code = code
         self.message = message
 
 
