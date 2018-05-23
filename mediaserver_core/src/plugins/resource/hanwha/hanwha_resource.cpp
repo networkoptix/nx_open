@@ -915,6 +915,9 @@ nx::media::CameraStreamCapability HanwhaResource::mediaCapabilityForRole(Qn::Con
         lit("General"),
         resolution);
 
+    if (!limits)
+        return capability;
+
     capability.minBitrateKbps = bitrateControlType == Qn::BitrateControl::cbr
         ? limits->minCbrBitrate
         : limits->minVbrBitrate;
