@@ -90,7 +90,6 @@ window.L = {};
                     dataType: 'json'
                 })
                     .done(function (response) {
-                        console.log('Set language');
                         languageServiceProvider.setLanguage(response);// Set current language
 
                         // set local variables as providers cannot get values in config phase

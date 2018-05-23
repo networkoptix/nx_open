@@ -92,7 +92,6 @@ export class LoginModalContent implements OnInit, AfterViewInit {
                     this.loginForm.controls['password'].setErrors({'nx_wrong_password': true});
                     this.auth.password = '';
 
-                    console.log(this.loginForm.controls['password'].errors);
                     this.renderer.selectRootElement('#password').focus();
 
                 },
@@ -128,7 +127,7 @@ export class LoginModalContent implements OnInit, AfterViewInit {
     encapsulation: ViewEncapsulation.None,
     styleUrls: []
 })
-export class NxModalLoginComponent implements OnInit, AfterViewInit {
+export class NxModalLoginComponent implements OnInit {
     login: any;
     modalRef: NgbModalRef;
     auth = {
@@ -163,10 +162,6 @@ export class NxModalLoginComponent implements OnInit, AfterViewInit {
 
     close() {
         this.modalRef.close();
-    }
-
-    ngAfterViewInit() {
-
     }
 
     ngOnInit() {
