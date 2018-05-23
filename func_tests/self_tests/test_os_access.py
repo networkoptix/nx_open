@@ -21,9 +21,8 @@ def test_get_set_time(os_access):
 
 
 def test_timeout():
-    script = 'import time; time.sleep(60)'
     with pytest.raises(Timeout):
-        result = local_shell.run_command([sys.executable, '-c', script], timeout_sec=1)
+        local_shell.run_command(['sleep', 60], timeout_sec=1)
 
 
 def test_unclosed_stdout():
