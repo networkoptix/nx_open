@@ -15,16 +15,22 @@ export class NxPermissionsDropdown implements OnInit {
     @Output() onSelected = new EventEmitter<string>();
 
     selection: string;
+    message: string;
 
     constructor(@Inject('cloudApiService') private cloudApi: any,
                 @Inject('languageService') private language: any,
                 private translate: TranslateService) {
 
 
+
+        translate.get('Please select...')
+                 .subscribe((res: string) => {
+                     this.message = res;
+                 });
     }
 
     ngOnInit(): void {
-        this.selection = (this.selected) ? this.selected : 'Please select...';
+        this.selection = (this.selected) ? this.selected : this.message;
     }
 
     changePermission(role) {
