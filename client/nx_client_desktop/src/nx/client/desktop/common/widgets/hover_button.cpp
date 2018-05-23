@@ -13,11 +13,21 @@ namespace nx {
 namespace client {
 namespace desktop {
 
-HoverButton::HoverButton(const QString& normal, const QString& highligthed, QWidget* parent):
-    QAbstractButton(parent)
+
+HoverButton::HoverButton(const QString& normal, const QString& highlighted, QWidget* parent) :
+    HoverButton(normal, highlighted, QString(), parent)
+{
+}
+
+HoverButton::HoverButton(const QString& normal, const QString& highlighted, const QString& pressed,
+    QWidget* parent) : QAbstractButton(parent)
 {
     m_normal = qnSkin->pixmap(normal, true);
-    m_highlighted = qnSkin->pixmap(highligthed, true);
+    m_highlighted = qnSkin->pixmap(highlighted, true);
+    m_hasPressedState = !pressed.isEmpty();
+    if (m_hasPressedState)
+        m_pressed = qnSkin->pixmap(pressed, true);
+
     installEventFilter(this);
 
     setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
@@ -33,11 +43,13 @@ QSize HoverButton::sizeHint() const
 void HoverButton::paintEvent(QPaintEvent* event)
 {
     QPainter painter(this);
-    bool highlighted = false;
-    if (!isDown())
-        highlighted = m_isHovered;
 
-    QPixmap& pixmap = highlighted ? m_highlighted : m_normal;
+    QPixmap& pixmap = m_normal;
+    if (m_hasPressedState && isDown())
+        pixmap = m_pressed;
+    if(m_isHovered & !isDown())
+        pixmap = m_highlighted;
+
     if (!pixmap.isNull())
     {
         auto icon = pixmap.rect();
