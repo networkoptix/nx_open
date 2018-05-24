@@ -18,7 +18,7 @@ Open New Browser On Failure
     Open Browser and go to URL    ${url}
 
 Restart
-#    Go To    ${url}
+    Go To    ${url}
     ${status}    Run Keyword And Return Status    Validate Log Out
     Run Keyword Unless    ${status}    Log Out
     Go To    ${url}
