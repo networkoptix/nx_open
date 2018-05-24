@@ -50,7 +50,10 @@ CameraSettingsWearableStateWatcher::CameraSettingsWearableStateWatcher(
 
 void CameraSettingsWearableStateWatcher::setCameras(const QnVirtualCameraResourceList& cameras)
 {
-    const auto camera = cameras.size() == 1 ? cameras.front() : QnVirtualCameraResourcePtr();
+    const auto camera = cameras.size() == 1 && cameras.front()->hasFlags(Qn::wearable_camera)
+        ? cameras.front()
+        : QnVirtualCameraResourcePtr();
+
     if (m_camera == camera)
         return;
 
