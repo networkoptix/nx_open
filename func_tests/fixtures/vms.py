@@ -42,7 +42,7 @@ def pytest_addoption(parser):
     parser.addoption('--vm-host-key', help=(
         'Identity file to use for ssh to login to VirtualBox host'))
     parser.addoption('--vm-host-dir', default=DEFAULT_VM_HOST_DIR, help=(
-        'Working directory at host with VirtualBox, used to store vagrant files'))
+        'Working directory at host with VirtualBox'))
 
 
 @pytest.fixture(scope='session')

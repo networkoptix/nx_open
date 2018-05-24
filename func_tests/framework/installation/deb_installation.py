@@ -132,7 +132,7 @@ class DebInstallation(Installation):
         self.os_access.ssh.run_sh_script(
             # language=Bash
             '''
-                # Commands and dependencies for Ubuntu 14.04 (ubuntu/trusty64 from Vagrant's Atlas).
+                # Commands and dependencies for trusty template.
                 CORE_PATTERN_FILE='/etc/sysctl.d/60-core-pattern.conf'
                 echo 'kernel.core_pattern=core.%t.%p' > "$CORE_PATTERN_FILE"  # %t is timestamp, %p is pid.
                 sysctl -p "$CORE_PATTERN_FILE"  # See: https://superuser.com/questions/625840

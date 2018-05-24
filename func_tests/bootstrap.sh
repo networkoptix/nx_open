@@ -17,7 +17,6 @@ sudo apt-add-repository http://download.virtualbox.org/virtualbox/debian
 wget https://www.virtualbox.org/download/oracle_vbox_2016.asc -O- | sudo apt-key add -
 wget https://www.virtualbox.org/download/oracle_vbox.asc -O- | sudo apt-key add -
 sudo apt-get update
-sudo apt-get install virtualbox-5.1 vagrant python-virtualenv python-opencv
 
 test -e "${VENV_DIR}" || virtualenv --system-site-packages "${VENV_DIR}"
 "${VENV_DIR}/bin/pip" install -U pip setuptools wheel  # Update to avoid compilation where possible.
