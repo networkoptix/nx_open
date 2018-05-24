@@ -1,6 +1,0 @@
-[Unit]
-Description=Runs cloud portal tests. Reports to Amazon Cloud Watch.
-
-[Service]
-Type=oneshot
-ExecStart=/bin/bash -c /etc/systemd/system/vanyas_tests.sh
