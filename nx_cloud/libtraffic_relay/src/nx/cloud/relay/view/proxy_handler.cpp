@@ -15,7 +15,7 @@ ProxyHandler::ProxyHandler(
 }
 
 ProxyHandler::TargetHost ProxyHandler::cutTargetFromRequest(
-    const nx::network::http::HttpServerConnection& connection,
+    const nx::network::http::HttpServerConnection& /*connection*/,
     nx::network::http::Request* const request)
 {
     ProxyHandler::TargetHost result;
