@@ -14,19 +14,21 @@ class UpstartService(Service):
     These tests are running mostly on Ubuntu 14.04, that is stated as requirement.
     """
 
-    def __init__(self, ssh, service_name):
+    def __init__(self, ssh, service_name, start_timeout_sec=10, stop_timeout_sec=10):
         self._ssh = ssh  # type: SSH
         self._service_name = service_name
+        self._start_timeout_sec = start_timeout_sec
+        self._stop_timeout_sec = stop_timeout_sec
 
     def is_running(self):
         output = self._ssh.run_command(['status', self._service_name])
         return output.split()[1].split('/')[0] == 'start'
 
     def start(self):
-        self._ssh.ssh.run_command(['start', self._service_name])
+        self._ssh.run_command(['start', self._service_name], timeout_sec=self._start_timeout_sec)
 
     def stop(self):
-        self._ssh.run_command(['stop', self._service_name])
+        self._ssh.run_command(['stop', self._service_name], timeout_sec=self._stop_timeout_sec)
 
     def make_core_dump(self):
         try:
