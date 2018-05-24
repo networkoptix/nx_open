@@ -10,6 +10,7 @@
 #include <client/client_globals.h>
 #include <ui/common/palette.h>
 #include <nx/client/desktop/common/utils/widget_anchor.h>
+#include <nx/client/desktop/common/widgets/close_button.h>
 #include <ui/style/helper.h>
 #include <ui/style/skin.h>
 #include <ui/widgets/common/elided_label.h>
@@ -40,16 +41,12 @@ static constexpr int kProgressBarResolution = 1000;
 EventTile::EventTile(QWidget* parent):
     base_type(parent, Qt::FramelessWindowHint),
     ui(new Ui::EventTile()),
-    m_closeButton(new QPushButton(this)),
+    m_closeButton(new CloseButton(this)),
     m_progressLabel(new QnElidedLabel(this))
 {
     ui->setupUi(this);
     setAttribute(Qt::WA_Hover);
 
-    m_closeButton->setIcon(qnSkin->icon(lit("events/notification_close.png")));
-    m_closeButton->setIconSize(QnSkin::maximumSize(m_closeButton->icon()));
-    m_closeButton->setFixedSize(m_closeButton->iconSize());
-    m_closeButton->setFlat(true);
     m_closeButton->setHidden(true);
     auto anchor = new WidgetAnchor(m_closeButton);
     anchor->setEdges(Qt::RightEdge | Qt::TopEdge);
@@ -303,11 +300,6 @@ bool EventTile::event(QEvent* event)
             handleHoverChanged(false);
             break;
 
-        case QEvent::MouseMove:
-        case QEvent::HoverMove:
-            updateBackgroundRole(!m_closeButton->underMouse());
-            break;
-
         case QEvent::MouseButtonPress:
             base_type::event(event);
             event->accept();
@@ -330,7 +322,7 @@ void EventTile::handleHoverChanged(bool hovered)
     const auto showCloseButton = hovered & m_closeable;
     ui->timestampLabel->setHidden(showCloseButton || ui->timestampLabel->text().isEmpty());
     m_closeButton->setVisible(showCloseButton);
-    updateBackgroundRole(hovered && !m_closeButton->underMouse());
+    updateBackgroundRole(hovered);
 
     if (showCloseButton)
         m_closeButton->raise();

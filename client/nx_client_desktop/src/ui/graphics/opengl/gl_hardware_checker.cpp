@@ -2,13 +2,14 @@
 
 #include <QtGui/QOpenGLFunctions>
 
-#include <client/client_app_info.h>
+#include <nx/utils/log/log.h>
+#include <nx/utils/literal.h>
 
 #include <utils/common/warnings.h>
 #include <utils/common/software_version.h>
 
-#include <nx/utils/log/log.h>
-
+#include <client/client_app_info.h>
+#include <ui/dialogs/common/message_box.h>
 
 bool QnGlHardwareChecker::checkCurrentContext(bool displayWarnings)
 {

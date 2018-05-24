@@ -23,7 +23,8 @@ class QnJsonContext;
  * static DeprecatedFieldNames* getDeprecatedFieldNames()
  * {
  *     static DeprecatedFieldNames kDeprecatedFieldNames{
- *         {lit("currentFieldName"), lit("deprecatedFieldName")}, //< up to v2.6
+ *         {QStringLiteral("currentFieldName"),
+ *             QStringLiteral("deprecatedFieldName")}, //< up to v2.6
  *     };
  *     return &kDeprecatedFieldNames;
  * }

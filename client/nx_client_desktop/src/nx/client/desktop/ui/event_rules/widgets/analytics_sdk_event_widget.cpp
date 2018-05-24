@@ -13,6 +13,7 @@
 
 #include <utils/common/scoped_value_rollback.h>
 #include <ui/help/help_topics.h>
+#include <ui/help/help_topic_accessor.h>
 
 namespace nx {
 namespace client {
@@ -40,15 +41,15 @@ AnalyticsSdkEventWidget::AnalyticsSdkEventWidget(QWidget* parent):
 
     ui->sdkEventTypeLabel->addHintLine(tr("Analytics events can be set up on a certain cameras."));
     ui->sdkEventTypeLabel->addHintLine(tr("Choose cameras using the button above to see the list of supported events."));
-    ui->sdkEventTypeLabel->setHelpTopic(Qn::EventsActions_VideoAnalytics_Help);
+    setHelpTopic(ui->sdkEventTypeLabel, Qn::EventsActions_VideoAnalytics_Help);
 
     ui->captionLabel->addHintLine(tr("Event will trigger only if there are matches in caption with any of entered keywords."));
     ui->captionLabel->addHintLine(tr("If the field is empty, event will always trigger."));
-    ui->captionLabel->setHelpTopic(Qn::EventsActions_VideoAnalytics_Help);
+    setHelpTopic(ui->captionLabel, Qn::EventsActions_VideoAnalytics_Help);
 
     ui->descriptionLabel->addHintLine(tr("Event will trigger only if there are matches in the description field with any of the entered keywords."));
     ui->descriptionLabel->addHintLine(tr("If the field is empty, event will always trigger."));
-    ui->descriptionLabel->setHelpTopic(Qn::EventsActions_VideoAnalytics_Help);
+    setHelpTopic(ui->descriptionLabel, Qn::EventsActions_VideoAnalytics_Help);
 }
 
 AnalyticsSdkEventWidget::~AnalyticsSdkEventWidget()

@@ -48,6 +48,7 @@ private:
         Qn::ConnectionRole role);
 private:
     std::map<Qn::ConnectionRole, hikvision::ChannelCapabilities> m_channelCapabilitiesByRole;
+    bool m_isIsapiSupported = false;
     bool m_hevcSupported = false;
 };
 

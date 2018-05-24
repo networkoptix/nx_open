@@ -12,6 +12,7 @@
 
 #include <nx/client/desktop/common/data/rotation.h>
 #include <nx/client/desktop/resource_properties/camera/utils/schedule_cell_params.h>
+#include <nx/client/desktop/utils/wearable_state.h>
 #include <nx/utils/std/optional.h>
 #include <nx/vms/api/data/camera_attributes_data.h>
 #include <nx/vms/api/types_fwd.h>
@@ -143,6 +144,9 @@ struct CameraSettingsDialogState
         std::optional<MotionConstraints> motionConstraints;
     };
     SingleCameraProperties singleCameraProperties;
+
+    WearableState singleWearableState;
+    QString wearableUploaderName; //< Name of user currently uploading footage to wearable camera.
 
     struct FisheyeCalibrationSettings
     {
@@ -288,9 +292,21 @@ struct CameraSettingsDialogState
     };
     ImageControlSettings imageControl;
 
+    struct WearableCameraMotionDetection
+    {
+        UserEditableMultiple<bool> enabled;
+        UserEditableMultiple<int> sensitivity;
+    };
+    WearableCameraMotionDetection wearableMotion;
+
     // Helper methods.
 
     bool isSingleCamera() const { return devicesCount == 1; }
+
+    bool isSingleWearableCamera() const
+    {
+        return isSingleCamera() && devicesDescription.isWearable == CombinedValue::All;
+    }
 
     int maxRecordingBrushFps() const
     {

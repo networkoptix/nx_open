@@ -29,7 +29,6 @@ public:
     QString hint() const { return d()->hint(); }
     void setHint(const QString& value) { d()->setHint(value); }
     void addHintLine(const QString& value) { d()->addHintLine(value); }
-    void setHelpTopic(int topicId) { d()->setHelpTopic(topicId); }
 
     int spacing() const { return d()->spacing(); }
     void setSpacing(int value) { d()->setSpacing(value); }

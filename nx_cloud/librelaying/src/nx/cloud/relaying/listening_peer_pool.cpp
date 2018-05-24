@@ -4,6 +4,7 @@
 #include <nx/network/socket_common.h>
 #include <nx/utils/std/algorithm.h>
 #include <nx/utils/std/cpp14.h>
+#include <nx/utils/log/log.h>
 
 #include "settings.h"
 

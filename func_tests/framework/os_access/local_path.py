@@ -4,7 +4,7 @@ from shutil import rmtree
 
 from pathlib2 import PosixPath
 
-from framework.os_access.exceptions import AlreadyExists, BadParent, DirIsAFile, DoesNotExist, NotAFile, NotADir
+from framework.os_access.exceptions import AlreadyExists, BadParent, DirIsAFile, DoesNotExist, NotADir, NotAFile
 from framework.os_access.path import FileSystemPath
 
 
@@ -46,7 +46,9 @@ _reraising_existing_dir_errors = _reraising({
 class LocalPath(PosixPath, FileSystemPath):
     @classmethod
     def tmp(cls):
-        return cls('/tmp/func_tests')
+        temp_dir = cls('/tmp/func_tests')
+        temp_dir.mkdir(parents=True, exist_ok=True)
+        return temp_dir
 
     mkdir = _reraising_new_file_errors(PosixPath.mkdir)
     write_text = _reraising_new_file_errors(PosixPath.write_text)
@@ -60,7 +62,7 @@ class LocalPath(PosixPath, FileSystemPath):
             raise DoesNotExist(self)
         if not self.is_dir():
             raise NotADir(self)
-        return self.glob(pattern)
+        return super(LocalPath, self).glob(pattern)
 
     @_reraising_existing_dir_errors
     def rmtree(self, ignore_errors=False):

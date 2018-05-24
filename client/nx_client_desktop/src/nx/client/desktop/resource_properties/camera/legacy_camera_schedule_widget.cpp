@@ -21,6 +21,7 @@
 
 #include <nx/client/desktop/ui/actions/action_manager.h>
 #include <nx/client/desktop/common/utils/checkbox_utils.h>
+#include <nx/client/desktop/common/widgets/hint_button.h>
 #include <nx/client/desktop/common/utils/aligner.h>
 #include <nx/client/desktop/common/utils/stream_quality_strings.h>
 
@@ -135,7 +136,7 @@ LegacyCameraScheduleWidget::LegacyCameraScheduleWidget(QWidget* parent, bool sna
 
     setHelpTopic(ui->exportScheduleButton, Qn::CameraSettings_Recording_Export_Help);
 
-    ui->qualityLabelHint->setHint(tr("Quality setting determines the compression rate only, and does not affect resolution. Low, Medium, High and Best are preset bitrate values."));
+    ui->qualityLabel->setHint(tr("Quality setting determines the compression rate only, and does not affect resolution. Low, Medium, High and Best are preset bitrate values."));
     auto settingsHint = nx::client::desktop::HintButton::hintThat(ui->settingsGroupBox);
     settingsHint->addHintLine(tr("First choose a recording option, then apply it to day and time blocks on the recording schedule. (0 block is 12:00am to 1:00am, 23 block is 11:00pm to 12:00am.)"));
 
@@ -1045,6 +1046,7 @@ void LegacyCameraScheduleWidget::updateRecordingParamsAvailable()
         [](const QnVirtualCameraResourcePtr& camera)
         {
             return camera->hasVideo(0)
+                && camera->getVendor() != lit("GENERIC_RTSP")
                 && !camera->hasParam(Qn::NO_RECORDING_PARAMS_PARAM_NAME);
         });
 

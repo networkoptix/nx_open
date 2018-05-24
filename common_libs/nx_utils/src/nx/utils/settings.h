@@ -1,12 +1,10 @@
 #pragma once
 
-#include <map>
+#include <memory>
 
 #include <QtCore/QSettings>
 
 #include "argument_parser.h"
-#include "log/log.h"
-#include "string.h"
 
 /**
  * Able to take settings from QSettings class (win32 registry or linux ini file) or from

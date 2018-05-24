@@ -2780,7 +2780,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Cannot edit properties for several wearable and non-wearable cameras.</source>
-      <translation type="unfinished">Cannot edit properties for several wearable and non-wearable cameras.</translation>
+      <translation>Giyilebilir ve giyilemeyen çeşitli kameraların özellikleri düzenlenemez.</translation>
     </message>
     <message>
       <source>Cannot edit properties for several wearable cameras.</source>
@@ -7308,7 +7308,7 @@ to %1</source>
     <name>QnWearableUploadWidget</name>
     <message>
       <source>User &quot;%1&quot; is currently uploading footage to this camera.</source>
-      <translation type="unfinished">User &quot;%1&quot; is currently uploading footage to this camera.</translation>
+      <translation>Başka bir kullanıcı &quot;%1&quot; şu anda bu kamera için görüntü yüklüyor.</translation>
     </message>
     <message>
       <source>Another user is currently uploading footage to this camera.</source>
@@ -7719,11 +7719,11 @@ to %1</source>
     </message>
     <message>
       <source>Could not start upload as user &quot;%1&quot; is currently uploading footage to this camera.</source>
-      <translation type="unfinished">Could not start upload as user &quot;%1&quot; is currently uploading footage to this camera.</translation>
+      <translation>Kullanıcı &quot;%1&quot; şu anda bu kamera görüntülerini kullandığı için gibi yükleme başlatılamadı.</translation>
     </message>
     <message>
       <source>Could not start upload as another user is currently uploading footage to this camera.</source>
-      <translation type="unfinished">Could not start upload as another user is currently uploading footage to this camera.</translation>
+      <translation>Yükleme başlatılamadı başka bir kullanıcı şu anda bu kamera görüntülerini kullanıyor.</translation>
     </message>
     <message>
       <source>Failed to add wearable camera</source>
@@ -7735,9 +7735,9 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>Selected file formats are not supported</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Seçilen dosya biçimleri desteklenmiyor</numerusform>
-        <numerusform>Selected file formats are not supported</numerusform>
+        <numerusform>Seçilen dosya biçimleri desteklenmiyor</numerusform>
       </translation>
     </message>
     <message>
@@ -7746,30 +7746,30 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>Selected files do not have timestamps</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Seçilen dosyalarda zaman damgası yok</numerusform>
-        <numerusform>Selected files do not have timestamps</numerusform>
+        <numerusform>Seçilen dosyalarda zaman damgası yok</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Selected files cover periods for which videos are already being uploaded</source>
-      <translation type="unfinished">
-        <numerusform>Selected files cover periods for which videos are already being uploaded</numerusform>
-        <numerusform>Selected files cover periods for which videos are already being uploaded</numerusform>
+      <translation>
+        <numerusform>Seçilen dosyalar, videoların zaten yüklendiği süreleri kapsar</numerusform>
+        <numerusform>Seçilen dosyalar, videoların zaten yüklendiği süreleri kapsar</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>You can upload these files to a different instance of a Wearable Camera.</source>
-      <translation type="unfinished">
-        <numerusform>You can upload these files to a different instance of a Wearable Camera.</numerusform>
-        <numerusform>You can upload these files to a different instance of a Wearable Camera.</numerusform>
+      <translation>
+        <numerusform>Bu dosyaları Giyilebilir Kamera'nın farklı bir örneğine yükleyebilirsiniz.</numerusform>
+        <numerusform>Bu dosyaları Giyilebilir Kamera'nın farklı bir örneğine yükleyebilirsiniz.</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Selected files cover periods for which videos have already been uploaded</source>
-      <translation type="unfinished">
-        <numerusform>Selected files cover periods for which videos have already been uploaded</numerusform>
-        <numerusform>Selected files cover periods for which videos have already been uploaded</numerusform>
+      <translation>
+        <numerusform>Seçilen dosya, videonun zaten yüklendiği süreleri kapsar</numerusform>
+        <numerusform>Seçilen dosyalar, videoların zaten yüklendiği süreleri kapsar</numerusform>
       </translation>
     </message>
     <message>
@@ -8054,9 +8054,9 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>Some video file(s) are still being uploaded to %n wearable cameras:</source>
-      <translation type="unfinished">
-        <numerusform>Some video file(s) are still being uploaded to %n wearable cameras:</numerusform>
-        <numerusform>Some video file(s) are still being uploaded to %n wearable cameras:</numerusform>
+      <translation>
+        <numerusform>Bazı video dosyaları hala yükleniyor %n giyilebilir kameralar:</numerusform>
+        <numerusform>Bazı video dosyaları hala yükleniyor %n giyilebilir kameralar:</numerusform>
       </translation>
     </message>
   </context>
@@ -8313,23 +8313,23 @@ to %1</source>
     <name>nx::client::desktop::UploadWorker</name>
     <message>
       <source>Could not open file &quot;%1&quot;</source>
-      <translation type="unfinished">Could not open file &quot;%1&quot;</translation>
+      <translation>Dosya açılamadı &quot;%1&quot;</translation>
     </message>
     <message>
       <source>Could not calculate md5 for file &quot;%1&quot;</source>
-      <translation type="unfinished">Could not calculate md5 for file &quot;%1&quot;</translation>
+      <translation>Dosya için md5 hesaplanamadı &quot;%1&quot;</translation>
     </message>
     <message>
       <source>Could not create upload on the server side</source>
-      <translation type="unfinished">Could not create upload on the server side</translation>
+      <translation>Sunucu tarafında yükleme oluşturulamadı</translation>
     </message>
     <message>
       <source>Could not upload file chunk to the server</source>
-      <translation type="unfinished">Could not upload file chunk to the server</translation>
+      <translation>Sunucuya dosya öbeği yüklenemedi</translation>
     </message>
     <message>
       <source>Could not check uploaded file on the server</source>
-      <translation type="unfinished">Could not check uploaded file on the server</translation>
+      <translation>Sunucuya yüklenen dosya kontrol edilemedi</translation>
     </message>
     <message>
       <source>File was corrupted while being uploaded to the server</source>

@@ -16,7 +16,7 @@ TestWithTemporaryDirectory::TestWithTemporaryDirectory(QString moduleName, QStri
         m_tmpDir =
             (TestOptions::temporaryDirectoryPath().isEmpty()
                 ? QDir::homePath() : TestOptions::temporaryDirectoryPath()) +
-            lit("/%1_ut.data").arg(moduleName);
+            QString("/%1_ut.data").arg(moduleName);
     }
     QDir(m_tmpDir).removeRecursively();
     QDir().mkpath(m_tmpDir);

@@ -21,6 +21,8 @@ namespace media {
 
 namespace {
 
+static const nx::utils::log::Tag kLogTag(QString("FfmpegVideoDecoder"));
+
 QVideoFrame::PixelFormat toQtPixelFormat(AVPixelFormat pixFormat)
 {
     switch (pixFormat)
@@ -165,7 +167,7 @@ void FfmpegVideoDecoderPrivate::initContext(const QnConstCompressedVideoDataPtr&
     //codecContext->thread_count = 4; //< Uncomment this line if decoder with internal buffer is required
     if (avcodec_open2(codecContext, codec, nullptr) < 0)
     {
-        NX_LOG(lit("Can't open decoder for codec %1").arg(frame->compressionType), cl_logDEBUG1);
+        NX_DEBUG(kLogTag, lm("Can't open decoder for codec %1").arg(frame->compressionType));
         closeCodecContext();
         return;
     }
@@ -189,7 +191,7 @@ AVFrame* FfmpegVideoDecoderPrivate::convertPixelFormat(const AVFrame* srcFrame)
         scaleContext = sws_getContext(
             srcFrame->width, srcFrame->height, (AVPixelFormat)srcFrame->format,
             srcFrame->width, srcFrame->height, dstAvFormat,
-            SWS_BICUBIC, NULL, NULL, NULL);
+            SWS_BICUBIC, nullptr, nullptr, nullptr);
     }
 
     AVFrame* dstFrame = av_frame_alloc();
@@ -246,16 +248,12 @@ bool FfmpegVideoDecoder::isCompatible(
     if (resolution.width() <= maxRes.width() && resolution.height() <= maxRes.height())
         return true;
 
-    NX_LOG(lit("[ffmpeg_video_decoder] Max resolution %1 x %2 exceeded: %3 x %4")
-        .arg(maxRes.width()).arg(maxRes.height())
-        .arg(resolution.width()).arg(resolution.height()),
-        cl_logWARNING);
+    NX_WARNING(kLogTag, lm("Max resolution %1 x %2 exceeded: %3 x %4").args(
+        maxRes.width(), maxRes.height(), resolution.width(), resolution.height()));
 
     if (ini().unlimitFfmpegMaxResolution)
     {
-        NX_LOG(lit(
-            "[ffmpeg_video_decoder] .ini unlimitFfmpegMaxResolution is set => ignore limit"),
-            cl_logWARNING);
+        NX_WARNING(kLogTag, ".ini unlimitFfmpegMaxResolution is set => ignore limit");
         return true;
     }
     else

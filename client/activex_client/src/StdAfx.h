@@ -2,8 +2,6 @@
 
 #define BLIB_EXPORT
 
-#include <nx/utils/compiler_options.h>
-
 /* Windows headers. */
 #ifdef _WIN32
 #   include <winsock2.h>

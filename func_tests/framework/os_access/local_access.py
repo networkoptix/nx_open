@@ -1,60 +1,47 @@
-import logging
-import subprocess
+import datetime
 
-from framework.os_access.args import sh_augment_script, sh_command_to_script
-from framework.os_access.exceptions import Timeout, exit_status_error_cls
+import tzlocal
+
+from framework.networking.prohibited import ProhibitedNetworking
 from framework.os_access.local_path import LocalPath
-from framework.os_access.popen_communicate import communicate
+from framework.os_access.os_access_interface import OSAccess
+from framework.os_access.posix_shell import local_shell
 
-_logger = logging.getLogger(__name__)
+
+class _LocalPorts(object):
+    def __getitem__(self, item):
+        return '127.0.0.1', item
 
 
-class LocalAccess(object):
-    Path = LocalPath
+_local_ports = _LocalPorts()
 
-    def __init__(self):
-        self.name = 'localhost'
-        self.hostname = 'localhost'
 
-    def __repr__(self):
-        return '<LocalAccess>'
+class LocalAccess(OSAccess):
+    def run_command(self, command, input=None):
+        return local_shell.run_command(command, input=input)
 
-    @staticmethod
-    def _make_kwargs(cwd, env, has_input):
-        kwargs = {
-            'close_fds': True,
-            'bufsize': 16 * 1024 * 1024,
-            'stdout': subprocess.PIPE,
-            'stderr': subprocess.PIPE,
-            'stdin': subprocess.PIPE if has_input else None}
-        if cwd is not None:
-            kwargs['cwd'] = str(cwd)
-        if env is not None:
-            kwargs['env'] = {name: str(value) for name, value in env.items()}
-        return kwargs
+    def is_accessible(self):
+        return True
 
-    @classmethod
-    def _communicate(cls, process, input, timeout_sec):
-        exit_status, stdout, stderr = communicate(process, input, timeout_sec)
-        if exit_status is None:
-            raise Timeout(timeout_sec)
-        if exit_status != 0:
-            raise exit_status_error_cls(exit_status)(stdout, stderr)
-        return stdout
+    @property
+    def Path(self):
+        return LocalPath
 
-    @classmethod
-    def run_command(cls, command, input=None, cwd=None, env=None, timeout_sec=60 * 60):
-        kwargs = cls._make_kwargs(cwd, env, input is not None)
-        command = [str(arg) for arg in command]
-        _logger.debug('Run command:\n%s', sh_command_to_script(command))
-        process = subprocess.Popen(command, shell=False, **kwargs)
-        return cls._communicate(process, input, timeout_sec)
+    @property
+    def networking(self):
+        return ProhibitedNetworking()
 
-    @classmethod
-    def run_sh_script(cls, script, input=None, cwd=None, env=None, timeout_sec=60 * 60):
-        augmented_script_to_run = sh_augment_script(script, None, None)
-        augmented_script_to_log = sh_augment_script(script, cwd, env)
-        _logger.debug('Run:\n%s', augmented_script_to_log)
-        kwargs = cls._make_kwargs(cwd, env, input is not None)
-        process = subprocess.Popen(augmented_script_to_run, shell=True, **kwargs)
-        return cls._communicate(process, input, timeout_sec)
+    @property
+    def forwarded_ports(self):
+        return _local_ports
+
+    def get_time(self):
+        local_timezone = tzlocal.get_localzone()
+        local_datetime = datetime.datetime.now(tz=local_timezone)
+        return local_datetime
+
+    def set_time(self, new_time):
+        raise NotImplementedError("Changing local time is prohibited")
+
+
+local_access = LocalAccess()

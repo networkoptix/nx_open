@@ -4,8 +4,8 @@ from textwrap import dedent
 
 import pytest
 
-from framework.os_access.windows_remoting.cmd import Shell, receive_stdout_and_stderr_until_done
-from framework.os_access.windows_remoting.cmd.powershell import (
+from framework.os_access.windows_remoting._cmd import Shell, receive_stdout_and_stderr_until_done
+from framework.os_access.windows_remoting._powershell import (
     PowershellError,
     format_script,
     run_powershell_script,

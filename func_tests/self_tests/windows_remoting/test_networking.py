@@ -1,6 +1,6 @@
 import pytest
 
-from framework.networking.windows import PingError, WindowsNetworking
+from framework.networking.windows import WindowsNetworking
 
 
 @pytest.fixture(scope='session')
@@ -9,8 +9,8 @@ def macs(windows_vm_info):
 
 
 @pytest.fixture(scope='session')
-def networking(macs, winrm_access):
-    return WindowsNetworking(winrm_access, macs)
+def networking(macs, winrm):
+    return WindowsNetworking(winrm, macs)
 
 
 def test_interfaces(networking, windows_vm_info):
@@ -74,10 +74,7 @@ def test_ping_localhost(networking):
 
 
 def test_ping_invalid_address(networking):
-    with pytest.raises(PingError) as pytest_exception_info:
-        networking.ping('127.0.0.0')
-    python_exception = pytest_exception_info.value
-    assert python_exception.ip == '127.0.0.0'
+    assert not networking.can_reach('127.0.0.0')
 
 
 def test_internet_access(networking):

@@ -50,7 +50,7 @@ set(freeLicenseCount "4")
 set(freeLicenseKey "0000-0000-0000-0020")
 
 # Installer Customizations
-set(installer.language "zh_TW")
+set(installerLanguage "zh_TW")
 set(installer.cultures "zh-tw")
 set(sign.password "qweasd123")
 set(sign.cer "app.p12")

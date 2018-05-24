@@ -35,7 +35,7 @@ ResPresenceNode::ResPresenceNode(int matchResId):
 void ResPresenceNode::get(const AbstractResourceReader& in, AbstractResourceWriter* const out) const
 {
     #if defined(NX_STREE_ENABLE_DEBUG_LOGGING)
-        NX_LOG(lit("Stree. Condition. Selecting child by resource %1").arg(m_matchResId), cl_logDEBUG2);
+        NX_VERBOSE(this, lm("Condition. Selecting child by resource %1").arg(m_matchResId));
     #endif
 
     QVariant value;
@@ -44,13 +44,14 @@ void ResPresenceNode::get(const AbstractResourceReader& in, AbstractResourceWrit
     if (!m_children[intVal])
     {
         #if defined(NX_STREE_ENABLE_DEBUG_LOGGING)
-            NX_LOG(lit("Stree. Presence Condition. Could not find child by value %1").arg(intVal), cl_logDEBUG2);
+            NX_VERBOSE(this,
+                lm("Presence Condition. Could not find child by value %1").arg(intVal));
         #endif
         return;
     }
 
     #if defined(NX_STREE_ENABLE_DEBUG_LOGGING)
-        NX_LOG(lit("Stree. Presence Condition. Found child by search value %1").arg(intVal), cl_logDEBUG2);
+        NX_VERBOSE(this, lm("Presence Condition. Found child by search value %1").arg(intVal));
     #endif
     m_children[intVal]->get(in, out);
 }

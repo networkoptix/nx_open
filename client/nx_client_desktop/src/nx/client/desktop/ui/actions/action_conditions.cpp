@@ -40,6 +40,8 @@
 #include <nx/client/desktop/condition/generic_condition.h>
 #include <nx/client/desktop/radass/radass_support.h>
 #include <nx/client/desktop/ui/actions/action_manager.h>
+#include <nx/client/desktop/utils/wearable_manager.h>
+#include <nx/client/desktop/utils/wearable_state.h>
 
 #include <ui/graphics/items/resource/button_ids.h>
 #include <ui/graphics/items/resource/resource_widget.h>
@@ -207,6 +209,37 @@ public:
     virtual ActionVisibility check(const Parameters& parameters, QnWorkbenchContext* context) override
     {
         return m_delegate(parameters, context);
+    }
+
+private:
+    CheckDelegate m_delegate;
+};
+
+class WearableCameraCondition: public Condition
+{
+public:
+    using CheckDelegate = std::function<ActionVisibility(const WearableState& state)>;
+
+    WearableCameraCondition(CheckDelegate delegate):
+        m_delegate(delegate)
+    {
+        NX_ASSERT(m_delegate);
+    }
+
+    virtual ActionVisibility check(
+        const Parameters& parameters, QnWorkbenchContext* /*context*/) override
+    {
+        const auto& resources = parameters.resources();
+        if (resources.size() != 1 || !resources.front()->hasFlags(Qn::wearable_camera))
+            return InvisibleAction;
+
+        const auto& camera = resources.front().dynamicCast<QnVirtualCameraResource>();
+        NX_ASSERT(camera);
+        if (!camera)
+            return InvisibleAction;
+
+        const auto state = qnClientModule->wearableManager()->state(camera);
+        return m_delegate(state);
     }
 
 private:
@@ -1814,8 +1847,29 @@ ConditionWrapper syncIsForced()
         });
 }
 
-} // namespace condition
+ConditionWrapper wearableCameraUploadEnabled()
+{
+    return new WearableCameraCondition(
+        [](const WearableState& state)
+        {
+            return (state.status == WearableState::Unlocked)
+                ? EnabledAction
+                : InvisibleAction;
+        });
+}
 
+ConditionWrapper wearableCameraUploadCancellable()
+{
+    return new WearableCameraCondition(
+        [](const WearableState& state)
+        {
+            return state.isRunning()
+                ? (state.isCancellable() ? EnabledAction : DisabledAction)
+                : InvisibleAction;
+        });
+}
+
+} // namespace condition
 
 } // namespace action
 } // namespace ui

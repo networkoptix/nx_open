@@ -20,8 +20,11 @@ struct NX_UPDATE_API ManualFileData
     QList<QnUuid> peers;
     bool isClient = false;
 
-    ManualFileData(const QString& file, const OsVersion& osVersion,
-        const QnSoftwareVersion& nxVersion, bool isClient);
+    ManualFileData(
+        const QString& file,
+        const OsVersion& osVersion,
+        const QnSoftwareVersion& nxVersion,
+        bool isClient);
 
     ManualFileData() = default;
     bool isNull() const;

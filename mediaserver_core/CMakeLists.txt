@@ -10,20 +10,9 @@ nx_configure_file(
     maven/filter-resources/mediaserver_core_app_info_impl.cpp
     ${CMAKE_CURRENT_BINARY_DIR})
 
-file(MAKE_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/resources/static")
-nx_copy(IF_NEWER "${NX_SDK_PACKAGE}"
-    DESTINATION "${CMAKE_CURRENT_BINARY_DIR}/resources/static")
-nx_copy(IF_NEWER "${NX_STORAGE_SDK_PACKAGE}"
-    DESTINATION "${CMAKE_CURRENT_BINARY_DIR}/resources/static")
-
 nx_configure_file(
     maven/filter-resources/resources/serverProperties.json
-    ${CMAKE_CURRENT_BINARY_DIR}/resources)
-
-nx_configure_directory(
-    ${CMAKE_CURRENT_SOURCE_DIR}/webadmin_skins/${defaultSkin}
-    ${CMAKE_CURRENT_BINARY_DIR}/resources/static/skin
-    COPYONLY)
+    ${CMAKE_CURRENT_BINARY_DIR}/serverProperties.json)
 
 nx_configure_file(
    ${customization_dir}/icons/all/favicon.ico
@@ -58,39 +47,32 @@ endforeach()
 
 add_custom_command(
     OUTPUT
-        "${CMAKE_CURRENT_BINARY_DIR}/resources/static/api.xml"
-        "${CMAKE_CURRENT_BINARY_DIR}/resources/static/api.json"
-    MAIN_DEPENDENCY "${apidoctool_jar}"
+        ${CMAKE_CURRENT_BINARY_DIR}/api.xml
+        ${CMAKE_CURRENT_BINARY_DIR}/api.json
+    MAIN_DEPENDENCY ${apidoctool_jar}
     DEPENDS
-        "${CMAKE_CURRENT_SOURCE_DIR}/api/api_template.xml"
+        ${CMAKE_CURRENT_SOURCE_DIR}/api/api_template.xml
         ${apidoctool_deps_absolute}
     COMMAND
-        "${Java_JAVA_EXECUTABLE}" -jar "${apidoctool_jar}"
+        ${Java_JAVA_EXECUTABLE} -jar ${apidoctool_jar}
         code-to-xml
-        -vms-path "${PROJECT_SOURCE_DIR}"
-        -template-xml "${CMAKE_CURRENT_SOURCE_DIR}/api/api_template.xml"
-        -output-xml "${CMAKE_CURRENT_BINARY_DIR}/api.xml"
-        -output-json "${CMAKE_CURRENT_BINARY_DIR}/api.json"
+        -vms-path ${PROJECT_SOURCE_DIR}
+        -template-xml ${CMAKE_CURRENT_SOURCE_DIR}/api/api_template.xml
+        -output-xml ${CMAKE_CURRENT_BINARY_DIR}/api.xml.copy
+        -output-json ${CMAKE_CURRENT_BINARY_DIR}/api.json.copy
         ${apidoctool_params}
     COMMAND
         ${CMAKE_COMMAND} -E copy_if_different
-            "${CMAKE_CURRENT_BINARY_DIR}/api.xml"
-            "${CMAKE_CURRENT_BINARY_DIR}/resources/static/api.xml"
+            ${CMAKE_CURRENT_BINARY_DIR}/api.xml.copy
+            ${CMAKE_CURRENT_BINARY_DIR}/api.xml
     COMMAND
-        ${CMAKE_COMMAND} -E remove "${CMAKE_CURRENT_BINARY_DIR}/api.xml"
+        ${CMAKE_COMMAND} -E remove ${CMAKE_CURRENT_BINARY_DIR}/api.xml.copy
     COMMAND
         ${CMAKE_COMMAND} -E copy_if_different
-            "${CMAKE_CURRENT_BINARY_DIR}/api.json"
-            "${CMAKE_CURRENT_BINARY_DIR}/resources/static/api.json"
+            ${CMAKE_CURRENT_BINARY_DIR}/api.json.copy
+            ${CMAKE_CURRENT_BINARY_DIR}/api.json
     COMMAND
-        ${CMAKE_COMMAND} -E remove "${CMAKE_CURRENT_BINARY_DIR}/api.json"
-)
-
-set_source_files_properties(
-    "${CMAKE_CURRENT_BINARY_DIR}/resources/static/api.xml"
-    "${CMAKE_CURRENT_BINARY_DIR}/resources/static/api.json"
-    PROPERTIES
-        RESOURCE_BASE_DIR "${CMAKE_CURRENT_BINARY_DIR}/resources"
+        ${CMAKE_COMMAND} -E remove ${CMAKE_CURRENT_BINARY_DIR}/api.json.copy
 )
 
 set(private_libs qtservice qtsinglecoreapplication sigar)
@@ -98,16 +80,31 @@ if(NOT targetDevice STREQUAL edge1)
     list(APPEND private_libs nx_speech_synthesizer)
 endif()
 
+set(static_resources
+    ${CMAKE_CURRENT_BINARY_DIR}/api.xml
+    ${CMAKE_CURRENT_BINARY_DIR}/api.json
+    ${NX_SDK_PACKAGE}
+    ${NX_STORAGE_SDK_PACKAGE}
+)
+set_source_files_properties(${static_resources} PROPERTIES RESOURCE_ALIAS_PREFIX static/)
+
+set(favicon ${customization_dir}/icons/all/favicon.ico)
+set_property(SOURCE ${favicon} PROPERTY RESOURCE_ALIAS_PREFIX static/customization/)
+
+set_property(SOURCE ${CMAKE_CURRENT_SOURCE_DIR}/webadmin_skins/${defaultSkin}
+    PROPERTY RESOURCE_ALIAS_PREFIX static/skin/)
+
 nx_add_target(mediaserver_core LIBRARY
     ADDITIONAL_SOURCES
         "${CMAKE_CURRENT_BINARY_DIR}/mediaserver_core_app_info_impl.cpp"
     SOURCE_EXCLUSIONS
         ${vendor_source_exclusions}
     ADDITIONAL_RESOURCES
-        "${customization_dir}/mediaserver_core/resources"
-        "${CMAKE_CURRENT_BINARY_DIR}/resources"
-        "${CMAKE_CURRENT_BINARY_DIR}/resources/static/api.xml"
-        "${CMAKE_CURRENT_BINARY_DIR}/resources/static/api.json"
+        ${customization_dir}/mediaserver_core/resources
+        ${CMAKE_CURRENT_SOURCE_DIR}/webadmin_skins/${defaultSkin}
+        ${favicon}
+        ${static_resources}
+        ${CMAKE_CURRENT_BINARY_DIR}/serverProperties.json
     PUBLIC_LIBS
         Qt5::WebSockets
         appserver2

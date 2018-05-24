@@ -21,6 +21,7 @@ namespace client {
 namespace desktop {
 
 class ImageProvider;
+class CloseButton;
 
 class EventTile: public Customized<QWidget>
 {
@@ -134,7 +135,7 @@ private:
 
 private:
     QScopedPointer<Ui::EventTile> ui;
-    QPushButton* const m_closeButton = nullptr;
+    CloseButton* const m_closeButton = nullptr;
     bool m_closeable = false;
     CommandActionPtr m_action; //< Button action.
     QnElidedLabel* const m_progressLabel = nullptr;

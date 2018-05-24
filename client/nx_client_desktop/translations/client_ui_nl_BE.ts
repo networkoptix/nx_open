@@ -768,7 +768,7 @@
     <message>
       <location filename="../src/ui/widgets/business/camera_input_business_event_widget.ui"/>
       <source>Input ID</source>
-      <translation>Input ID</translation>
+      <translation>Ingang ID</translation>
     </message>
   </context>
   <context>

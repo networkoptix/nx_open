@@ -16,8 +16,7 @@
   See the LICENSE file for more details.
 */
 
-#ifndef MIMEMESSAGE_H
-#define MIMEMESSAGE_H
+#pragma once
 
 #include <memory>
 
@@ -30,8 +29,8 @@
 class MimeMessage
 {
 public:
-
-    enum RecipientType {
+    enum RecipientType
+    {
         To,                 // primary
         Cc,                 // carbon copy
         Bcc                 // blind carbon copy
@@ -40,6 +39,7 @@ public:
     /* [1] Constructors and Destructors */
 
     MimeMessage();
+    virtual ~MimeMessage() = default;
 
     /* [1] --- */
 
@@ -97,5 +97,3 @@ private:
 };
 
 typedef QSharedPointer<MimeMessage> MimeMessagePtr;
-
-#endif // MIMEMESSAGE_H

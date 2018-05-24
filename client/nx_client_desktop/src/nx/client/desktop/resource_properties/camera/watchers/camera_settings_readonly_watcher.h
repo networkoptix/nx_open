@@ -27,7 +27,7 @@ public:
     void setCameras(const QnVirtualCameraResourceList& value);
 
 signals:
-    void readOnlyChanged(bool value);
+    void readOnlyChanged(bool value, QPrivateSignal);
 
 protected:
     virtual void afterContextInitialized() override;

@@ -43,7 +43,8 @@ wix_extensions = [
     'WixFirewallExtension',
     'WixUtilExtension',
     'WixUIExtension',
-    'WixBalExtensionExt']
+    'WixBalExtension'
+]
 
 client_components = [
     'Associations',

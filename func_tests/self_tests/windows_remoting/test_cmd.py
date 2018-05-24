@@ -2,7 +2,7 @@ import logging
 
 import pytest
 
-from framework.os_access.windows_remoting.cmd import Shell, receive_stdout_and_stderr_until_done, run_command
+from framework.os_access.windows_remoting._cmd import Shell, receive_stdout_and_stderr_until_done, run_command
 
 log = logging.getLogger(__name__)
 

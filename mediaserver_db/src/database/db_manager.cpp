@@ -614,7 +614,7 @@ bool QnDbManager::init(const nx::utils::Url& dbUrl)
             if (m_resyncFlags.testFlag(ResyncLicences))
             {
                 if (!fillTransactionLogInternal<
-                    nullptr_t,
+                    std::nullptr_t,
                     ApiLicenseData,
                     ApiLicenseDataList>(ApiCommand::addLicense))
                 {
@@ -624,7 +624,7 @@ bool QnDbManager::init(const nx::utils::Url& dbUrl)
             if (m_resyncFlags.testFlag(ResyncFiles))
             {
                 if (!fillTransactionLogInternal<
-                    nullptr_t,
+                    std::nullptr_t,
                     StoredFileData,
                     StoredFileDataList>(ApiCommand::addStoredFile))
                 {
@@ -726,7 +726,7 @@ bool QnDbManager::init(const nx::utils::Url& dbUrl)
                     return false;
 
                 if (!fillTransactionLogInternal<
-                    nullptr_t,
+                    std::nullptr_t,
                     ApiAccessRightsData,
                     ApiAccessRightsDataList>(ApiCommand::setAccessRights))
                 {
@@ -740,7 +740,7 @@ bool QnDbManager::init(const nx::utils::Url& dbUrl)
                     return false;
 
                 if (!fillTransactionLogInternal<
-                    nullptr_t,
+                    std::nullptr_t,
                     ApiAccessRightsData,
                     ApiAccessRightsDataList>(ApiCommand::setAccessRights))
                 {
@@ -1049,7 +1049,7 @@ bool QnDbManager::resyncTransactionLog()
     }
 
     if (!fillTransactionLogInternal<
-        nullptr_t,
+        std::nullptr_t,
         ApiLicenseData,
         ApiLicenseDataList>(ApiCommand::addLicense))
     {
@@ -1057,7 +1057,7 @@ bool QnDbManager::resyncTransactionLog()
     }
 
     if (!fillTransactionLogInternal<
-            nullptr_t,
+            std::nullptr_t,
             StoredFileData,
             StoredFileDataList>(ApiCommand::addStoredFile))
     {
@@ -1081,7 +1081,7 @@ bool QnDbManager::resyncTransactionLog()
     }
 
     if (!fillTransactionLogInternal<
-        nullptr_t,
+        std::nullptr_t,
         ApiAccessRightsData,
         ApiAccessRightsDataList>(ApiCommand::setAccessRights))
     {
@@ -1120,7 +1120,7 @@ bool QnDbManager::resyncTransactionLog()
     }
 
     if (!fillTransactionLogInternal<
-        nullptr_t,
+        std::nullptr_t,
         ServerFootageData,
         ServerFootageDataList>(ApiCommand::addCameraHistoryItem))
     {
@@ -3463,12 +3463,12 @@ ErrorCode QnDbManager::doQueryNoLock(
     return ErrorCode::ok;
 }
 
-ErrorCode QnDbManager::doQueryNoLock(nullptr_t /*dummy*/, ResourceParamDataList& data)
+ErrorCode QnDbManager::doQueryNoLock(std::nullptr_t /*dummy*/, ResourceParamDataList& data)
 {
     return readSettings(data);
 }
 
-ErrorCode QnDbManager::doQueryNoLock(const nullptr_t& /*dummy*/, ResourceTypeDataList& data)
+ErrorCode QnDbManager::doQueryNoLock(const std::nullptr_t& /*dummy*/, ResourceTypeDataList& data)
 {
     if (!m_cachedResTypes.empty())
     {
@@ -3976,7 +3976,7 @@ ErrorCode QnDbManager::doQueryNoLock(const QnUuid& mServerId, ApiMediaServerUser
 }
 
 //getCameraHistoryItems
-ErrorCode QnDbManager::doQueryNoLock(const nullptr_t& /*dummy*/, ServerFootageDataList& historyList)
+ErrorCode QnDbManager::doQueryNoLock(const std::nullptr_t& /*dummy*/, ServerFootageDataList& historyList)
 {
     QSqlQuery query(m_sdb);
     query.setForwardOnly(true);
@@ -4054,13 +4054,13 @@ ErrorCode QnDbManager::doQueryNoLock(const QnUuid& id, ApiUserRoleDataList& resu
     return ErrorCode::ok;
 }
 
-ErrorCode QnDbManager::doQueryNoLock(const nullptr_t& /*dummy*/, ApiPredefinedRoleDataList& result)
+ErrorCode QnDbManager::doQueryNoLock(const std::nullptr_t& /*dummy*/, ApiPredefinedRoleDataList& result)
 {
     result = QnUserRolesManager::getPredefinedRoles();
     return ErrorCode::ok;
 }
 
-ec2::ErrorCode QnDbManager::doQueryNoLock(const nullptr_t& /*dummy*/, ApiAccessRightsDataList& accessRightsList)
+ec2::ErrorCode QnDbManager::doQueryNoLock(const std::nullptr_t& /*dummy*/, ApiAccessRightsDataList& accessRightsList)
 {
     QSqlQuery query(m_sdb);
     query.setForwardOnly(true);
@@ -4297,14 +4297,14 @@ ErrorCode QnDbManager::doQueryNoLock(const QnUuid& resourceId, ResourceParamWith
 }
 
 // getCurrentTime
-ErrorCode QnDbManager::doQuery(const nullptr_t& /*dummy*/, ApiTimeData& currentTime)
+ErrorCode QnDbManager::doQuery(const std::nullptr_t& /*dummy*/, ApiTimeData& currentTime)
 {
     currentTime = m_timeSyncManager->getTimeInfo();
     return ErrorCode::ok;
 }
 
 // dumpDatabase
-ErrorCode QnDbManager::doQuery(const nullptr_t& /*dummy*/, DatabaseDumpData& data)
+ErrorCode QnDbManager::doQuery(const std::nullptr_t& /*dummy*/, DatabaseDumpData& data)
 {
     QnWriteLocker lock(&m_mutex);
 
@@ -4609,7 +4609,7 @@ ErrorCode QnDbManager::executeTransactionInternal(const QnTransaction<ApiLicense
     return ErrorCode::ok;
 }
 
-ErrorCode QnDbManager::doQueryNoLock(const nullptr_t& /*dummy*/, ec2::ApiLicenseDataList& data)
+ErrorCode QnDbManager::doQueryNoLock(const std::nullptr_t& /*dummy*/, ec2::ApiLicenseDataList& data)
 {
     return getLicenses(data, m_sdb);
 }

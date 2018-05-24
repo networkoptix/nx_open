@@ -79,7 +79,7 @@ nx::mediaserver::resource::StreamCapabilityMap HikvisionResource::getStreamCapab
 
 CameraDiagnostics::Result HikvisionResource::initializeCameraDriver()
 {
-    tryToEnableIntegrationProtocols(getDeviceOnvifUrl(), getAuth());
+    m_isIsapiSupported = tryToEnableIntegrationProtocols(getDeviceOnvifUrl(), getAuth());
     return QnPlOnvifResource::initializeCameraDriver();
 }
 
@@ -94,7 +94,7 @@ CameraDiagnostics::Result HikvisionResource::initializeMedia(
     auto resourceData = qnStaticCommon->dataPool()->data(toSharedPointer(this));
     bool hevcIsDisabled = resourceData.value<bool>(Qn::DISABLE_HEVC_PARAMETER_NAME, false);
 
-    if (!hevcIsDisabled)
+    if (!hevcIsDisabled && m_isIsapiSupported)
     {
         for (const auto& role: kRoles)
         {
@@ -183,6 +183,9 @@ CameraDiagnostics::Result HikvisionResource::fetchChannelCapabilities(
 
 QnAudioTransmitterPtr HikvisionResource::initializeTwoWayAudio()
 {
+    if (!m_isIsapiSupported)
+        return QnPlOnvifResource::initializeTwoWayAudio();
+
     auto httpClient = getHttpClient();
 
     nx::utils::Url requestUrl(getUrl());

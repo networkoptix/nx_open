@@ -65,7 +65,10 @@ bool VideoDecoderRegistry::hasCompatibleDecoder(
     auto codecString =
         [codec, &resolution]()
         {
-            return lit("%1 [%2x%3]").arg(codec).arg(resolution.width()).arg(resolution.height());
+            return QString("%1 [%2x%3]")
+                .arg(codec)
+                .arg(resolution.width())
+                .arg(resolution.height());
         };
 
     NX_LOGX(lm("Checking for decoder compatible with codec %1.").arg(codecString()), cl_logDEBUG2);

@@ -14,6 +14,7 @@ configure()
     LOG_FILE="$LOGS_DIR/vms-upgrade.log"
     DISTRIB="@artifact.name.server@"
     STARTUP_SCRIPT="/etc/init.d/$CUSTOMIZATION-mediaserver"
+    LITE_CLIENT_STARTUP_SCRIPT="/etc/init.d/$CUSTOMIZATION-lite-client"
     INSTALLER_DIR="$(dirname "$0")"
     TAR_FILE="$INSTALLER_DIR/$DISTRIB.tar.gz"
     ZIP_FILE="$INSTALLER_DIR/../$DISTRIB.zip"
@@ -83,7 +84,9 @@ copyToDataPartition()
 {
     # Clean up sdcard from potentially unwanted files from previous installations.
     rm -rf "$MNT/$INSTALL_PATH" || true
-    rm -rf "$MNT/opt/deb"
+    rm -rf "$MNT/opt/deb" || true
+    rm -rf "$MNT$LITE_CLIENT_STARTUP_SCRIPT" || true
+    rm -rf "$MNT/$MEDIASERVER_PATH/var/scripts" || true
 
     # Unpack the distro to sdcard.
     tar xfv "$TAR_FILE" -C "$MNT/" || return $?
@@ -127,7 +130,8 @@ upgradeVms()
     # Clean up potentially unwanted files from previous installations.
     rm -rf "/$INSTALL_PATH/lib" "/$MEDIASERVER_PATH/lib" "/$MEDIASERVER_PATH/bin" || true
     rm -rf "/opt/deb" || true
-    rm -rf "/$LITE_CLIENT_PATH" || true
+    rm -rf "/$LITE_CLIENT_PATH" "$LITE_CLIENT_STARTUP_SCRIPT" || true
+    rm -rf "/$MEDIASERVER_PATH/var/scripts" || true
 
     tar xfv "$TAR_FILE" -C / #< Extract the distro to the root.
 

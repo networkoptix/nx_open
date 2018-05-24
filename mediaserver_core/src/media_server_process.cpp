@@ -2853,11 +2853,15 @@ Qn::ServerFlags MediaServerProcess::calcServerFlags()
     if (QnAppInfo::isBpi())
     {
         serverFlags |= Qn::SF_IfListCtrl | Qn::SF_timeCtrl;
-        serverFlags |= Qn::SF_HasLiteClient;
+        if (QnStartLiteClientRestHandler::isLiteClientPresent())
+            serverFlags |= Qn::SF_HasLiteClient;
     }
 
     if (ini().forceLiteClient)
-        serverFlags |= Qn::SF_HasLiteClient;
+    {
+        if (QnStartLiteClientRestHandler::isLiteClientPresent())
+            serverFlags |= Qn::SF_HasLiteClient;
+    }
 
 #ifdef __arm__
     serverFlags |= Qn::SF_ArmServer;

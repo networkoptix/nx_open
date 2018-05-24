@@ -18,7 +18,7 @@ import server_api_data_generators as generator
 import transaction_log
 from framework.api_shortcuts import get_server_id, get_system_settings
 from framework.compare import compare_values
-from framework.mediaserver import MEDIASERVER_MERGE_TIMEOUT
+from framework.installation.mediaserver import MEDIASERVER_MERGE_TIMEOUT
 from framework.utils import GrowingSleep
 from memory_usage_metrics import load_host_memory_usage
 

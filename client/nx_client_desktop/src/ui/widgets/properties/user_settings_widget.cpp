@@ -94,7 +94,8 @@ QnUserSettingsWidget::QnUserSettingsWidget(QnUserSettingsModel* model, QWidget* 
         tr("%1 can have access to many Systems. Administrators can manage their rights only.",
             "%1 is cloud users definition, e.g. 'Cloud users'")
         .arg(cloudUsers));
-    ui->userTypeHint->setHelpTopic(Qn::NewUser_Help);
+
+    setHelpTopic(ui->userTypeHint, Qn::NewUser_Help);
 
     ui->roleComboBox->setModel(m_rolesModel);
 

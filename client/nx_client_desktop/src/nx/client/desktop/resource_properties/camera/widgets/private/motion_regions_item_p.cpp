@@ -413,6 +413,7 @@ void MotionRegionsItem::Private::updateLabelPositions()
         return;
 
     m_labels.clear();
+    m_motionGrid = grid;
 
     // Label takes 1x2 cells. Find good areas to fit labels in,
     // going from the top to the bottom, from the left to the right.
@@ -439,7 +440,6 @@ void MotionRegionsItem::Private::updateLabelPositions()
         }
     }
 
-    m_motionGrid = grid;
     m_labelsDirty = true;
 }
 

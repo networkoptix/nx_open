@@ -421,13 +421,19 @@ HanwhaResult<HanwhaCodecInfo> HanwhaSharedResourceContext::loadVideoCodecInfo()
 
 HanwhaResult<bool> HanwhaSharedResourceContext::checkBypassSupport()
 {
-    HanwhaRequestHelper helper(shared_from_this());
-    // It's intentionally incorrect request, we use it just to determine bypass presence
-    // If HTTP code of the response is 404 then the device doesn't support bypass otherwise it does.
-    const auto result = helper.control(lit("bypass/bypass"));
-    const bool hasBypassSupport = result.statusCode() != nx::network::http::StatusCode::notFound;
+    const auto& info = information();
+    if (!info)
+        return {info.diagnostics, false};
 
-    return {CameraDiagnostics::NoErrorResult(), hasBypassSupport};
+    const auto& parameters = info->cgiParameters;
+    if (!parameters.isValid())
+    {
+        return {CameraDiagnostics::CameraInvalidParams(
+            lit("Camera CGI parameters are not valid."))};
+    }
+
+    const auto bypassParameter = parameters.parameter(lit("bypass/bypass/control/BypassURI"));
+    return {CameraDiagnostics::NoErrorResult(), bypassParameter != boost::none};
 }
 
 } // namespace plugins

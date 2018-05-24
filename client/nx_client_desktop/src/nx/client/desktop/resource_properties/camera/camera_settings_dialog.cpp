@@ -28,6 +28,7 @@
 #include "redux/camera_settings_dialog_store.h"
 
 #include "watchers/camera_settings_readonly_watcher.h"
+#include "watchers/camera_settings_wearable_state_watcher.h"
 #include "watchers/camera_settings_global_settings_watcher.h"
 
 #include "utils/camera_settings_dialog_state_conversion_functions.h"
@@ -44,6 +45,7 @@ struct CameraSettingsDialog::Private
 {
     QPointer<CameraSettingsDialogStore> store;
     QPointer<CameraSettingsReadOnlyWatcher> readOnlyWatcher;
+    QPointer<CameraSettingsWearableStateWatcher> wearableStateWatcher;
     QnVirtualCameraResourceList cameras;
     QPointer<QnCamLicenseUsageHelper> licenseUsageHelper;
     QSharedPointer<CameraThumbnailManager> previewManager;
@@ -91,27 +93,33 @@ struct CameraSettingsDialog::Private
     {
         auto generalTab = new CameraSettingsGeneralTabWidget(store, q->ui->tabWidget);
         QObject::connect(generalTab, &CameraSettingsGeneralTabWidget::actionRequested, q,
-            [this, q](CameraInfoWidget::Action action)
+            [this, q](ui::action::IDType action)
             {
                 switch (action)
                 {
-                    case CameraInfoWidget::Action::ping:
+                    case ui::action::PingAction:
                         NX_ASSERT(store);
                         q->menu()->trigger(ui::action::PingAction,
                             {Qn::TextRole, store->state().singleCameraProperties.ipAddress});
                         break;
 
-                    case CameraInfoWidget::Action::openEventLog:
-                        q->menu()->trigger(ui::action::CameraIssuesAction, cameras);
+                    case ui::action::CameraIssuesAction:
+                    case ui::action::CameraBusinessRulesAction:
+                    case ui::action::OpenInNewTabAction:
+                        q->menu()->trigger(action, cameras);
                         break;
 
-                    case CameraInfoWidget::Action::openEventRules:
-                        q->menu()->trigger(ui::action::CameraBusinessRulesAction, cameras);
+                    case ui::action::UploadWearableCameraFileAction:
+                    case ui::action::UploadWearableCameraFolderAction:
+                    case ui::action::CancelWearableCameraUploadsAction:
+                        NX_ASSERT(cameras.size() == 1
+                            && cameras.front()->hasFlags(Qn::wearable_camera));
+                        if (cameras.size() == 1)
+                            q->menu()->trigger(action, cameras.front());
                         break;
 
-                    case CameraInfoWidget::Action::showOnLayout:
-                        q->menu()->trigger(ui::action::OpenInNewTabAction, cameras);
-                        break;
+                    default:
+                        NX_ASSERT(false, Q_FUNC_INFO, "Unsupported action request");
                 }
             });
 
@@ -134,6 +142,7 @@ CameraSettingsDialog::CameraSettingsDialog(QWidget* parent):
         &CameraSettingsDialog::loadState);
 
     d->readOnlyWatcher = new CameraSettingsReadOnlyWatcher(d->store, this);
+    d->wearableStateWatcher = new CameraSettingsWearableStateWatcher(d->store, this);
 
     d->licenseUsageHelper = new QnCamLicenseUsageHelper(commonModule(), this);
 
@@ -255,6 +264,7 @@ bool CameraSettingsDialog::setCameras(const QnVirtualCameraResourceList& cameras
     d->cameras = cameras;
     d->resetChanges();
     d->readOnlyWatcher->setCameras(cameras);
+    d->wearableStateWatcher->setCameras(cameras);
     d->previewManager->selectCamera(cameras.size() == 1
         ? cameras.front()
         : QnVirtualCameraResourcePtr());
@@ -341,20 +351,20 @@ void CameraSettingsDialog::loadState(const CameraSettingsDialogState& state)
     // Legacy code has more complicated conditions.
 
     using CombinedValue = CameraSettingsDialogState::CombinedValue;
-    const bool notWearable = state.devicesDescription.isWearable == CombinedValue::None;
+    const bool hasWearableCameras = state.devicesDescription.isWearable != CombinedValue::None;
 
-    setPageVisible(int(CameraSettingsTab::motion), state.isSingleCamera() && notWearable
+    setPageVisible(int(CameraSettingsTab::motion), state.isSingleCamera() && !hasWearableCameras
         && state.devicesDescription.hasMotion == CombinedValue::All);
 
-    setPageVisible(int(CameraSettingsTab::recording), notWearable);
+    setPageVisible(int(CameraSettingsTab::recording), !hasWearableCameras);
 
     setPageVisible(int(CameraSettingsTab::fisheye), state.isSingleCamera()
         && state.singleCameraProperties.hasVideo);
 
-    setPageVisible(int(CameraSettingsTab::io), state.isSingleCamera() && notWearable
+    setPageVisible(int(CameraSettingsTab::io), state.isSingleCamera() && !hasWearableCameras
         && state.devicesDescription.isIoModule == CombinedValue::All);
 
-    setPageVisible(int(CameraSettingsTab::expert), notWearable
+    setPageVisible(int(CameraSettingsTab::expert), !hasWearableCameras
         && state.devicesDescription.isIoModule == CombinedValue::None);
 
     ui->alertBar->setText(getAlertText(state));

@@ -45,6 +45,9 @@
        <property name="bottomMargin">
         <number>0</number>
        </property>
+       <property name="horizontalSpacing">
+        <number>16</number>
+       </property>
        <property name="verticalSpacing">
         <number>2</number>
        </property>
@@ -159,6 +162,18 @@
        </property>
        <item row="9" column="1">
         <widget class="QWidget" name="primaryStreamControlWidget" native="true">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="minimumSize">
+          <size>
+           <width>250</width>
+           <height>0</height>
+          </size>
+         </property>
          <layout class="QHBoxLayout" name="primaryStreamLayout">
           <property name="spacing">
            <number>12</number>
@@ -294,6 +309,18 @@
        </item>
        <item row="10" column="1">
         <widget class="QWidget" name="secondaryStreamControlWidget" native="true">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="minimumSize">
+          <size>
+           <width>250</width>
+           <height>0</height>
+          </size>
+         </property>
          <layout class="QHBoxLayout" name="secondaryStreamLayout">
           <property name="spacing">
            <number>12</number>
@@ -617,8 +644,14 @@
      </property>
      <item>
       <widget class="QStackedWidget" name="controlsStackedWidget">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="MinimumExpanding" vsizetype="Preferred">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
        <property name="currentIndex">
-        <number>0</number>
+        <number>2</number>
        </property>
        <widget class="QWidget" name="toggleInfoPage">
         <layout class="QVBoxLayout" name="verticalLayout_3">
@@ -665,20 +698,8 @@
          </item>
         </layout>
        </widget>
+       <widget class="nx::client::desktop::WearableCameraUploadWidget" name="wearableControlsPage"/>
       </widget>
-     </item>
-     <item>
-      <spacer name="horizontalSpacer">
-       <property name="orientation">
-        <enum>Qt::Horizontal</enum>
-       </property>
-       <property name="sizeHint" stdset="0">
-        <size>
-         <width>40</width>
-         <height>20</height>
-        </size>
-       </property>
-      </spacer>
      </item>
      <item>
       <widget class="QPushButton" name="showOnLayoutButton">
@@ -725,6 +746,12 @@
    <class>nx::client::desktop::ClipboardButton</class>
    <extends>QPushButton</extends>
    <header location="global">nx/client/desktop/common/widgets/clipboard_button.h</header>
+  </customwidget>
+  <customwidget>
+   <class>nx::client::desktop::WearableCameraUploadWidget</class>
+   <extends>QWidget</extends>
+   <header location="global">nx/client/desktop/resource_properties/camera/widgets/wearable_camera_upload_widget.h</header>
+   <container>1</container>
   </customwidget>
  </customwidgets>
  <resources/>

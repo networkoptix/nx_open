@@ -16,6 +16,7 @@ namespace client {
 namespace desktop {
 
 class Rotation;
+struct WearableState;
 struct ScheduleCellParams;
 struct CameraSettingsDialogState;
 
@@ -34,6 +35,7 @@ public:
     void applyChanges();
     void setReadOnly(bool value);
     void setSettingsOptimizationEnabled(bool value);
+    void setSingleWearableState(const WearableState& value);
     void loadCameras(const QnVirtualCameraResourceList& cameras);
     void setSingleCameraUserName(const QString& text);
     void setScheduleBrush(const ScheduleCellParams& brush);
@@ -71,6 +73,8 @@ public:
     void setLogicalId(int value);
     void generateLogicalId();
     void resetExpertSettings();
+    void setWearableMotionDetectionEnabled(bool value);
+    void setWearableMotionSensitivity(int value);
 
 signals:
     void stateChanged(const CameraSettingsDialogState& state);
