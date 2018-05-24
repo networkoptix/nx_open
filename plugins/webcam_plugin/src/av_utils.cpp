@@ -1,15 +1,22 @@
-#include "StdAfx.h"
 #include "av_utils.h"
-#include "camera/camera_plugin.h"
+
+#include <camera/camera_plugin.h>
 
 namespace nx {
+namespace webcam_plugin {
 namespace utils{
 namespace av{
 
 AVStream* getAVStream(AVFormatContext * context, int * streamIndex, AVMediaType mediaType)
 {
+    if(!context)
+        return nullptr;
+
     for (unsigned int i = 0; i < context->nb_streams; ++i)
     {
+        if(!context->streams[i] || !context->streams[i]->codecpar)
+            continue;
+
         if (context->streams[i]->codecpar->codec_type == mediaType)
         {
             *streamIndex = i;
@@ -139,4 +146,5 @@ nxcip::CompressionType toNxCompressionType(AVCodecID codecID)
 
 } // namespace av
 } // namespace utils
+} // namespace webcam_plugin
 } // namesapce nx

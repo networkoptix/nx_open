@@ -1,4 +1,3 @@
-#include "StdAfx.h"
 #include "codec_context.h"
 
 namespace nx {

@@ -1,15 +1,7 @@
-/**********************************************************
-* 05 sep 2013
-* akolesnikov
-***********************************************************/
-
-#ifndef ILP_VIDEO_PACKET_H
-#define ILP_VIDEO_PACKET_H
+#pragma once
 
 #include <camera/camera_plugin.h>
-
 #include <plugins/plugin_tools.h>
-
 
 class CyclicAllocator;
 
@@ -76,5 +68,3 @@ private:
 
 } // namespace webcam_plugin
 } // namespace nx
-
-#endif  //ILP_VIDEO_PACKET_H

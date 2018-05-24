@@ -1,13 +1,9 @@
-/**********************************************************
-* 03 sep 2013
-* akolesnikov
-***********************************************************/
-
 #include "plugin.h"
-#include "discovery_manager.h"
 extern "C" {
 #include <libavdevice/avdevice.h>
-}
+} // extern "C"
+
+#include "discovery_manager.h"
 
 extern "C" {
 #ifdef _WIN32
@@ -17,7 +13,7 @@ extern "C" {
     {
         return new nx::webcam_plugin::Plugin();
     }
-}
+} // extern "C"
 
 namespace nx {
 namespace webcam_plugin {

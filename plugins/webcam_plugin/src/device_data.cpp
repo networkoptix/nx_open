@@ -1,4 +1,3 @@
-#include "StdAfx.h"
 #include "device_data.h"
 
 namespace nx {

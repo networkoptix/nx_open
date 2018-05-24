@@ -1,4 +1,5 @@
 #pragma once
+
 #include "device_data.h"
 
 namespace nx {

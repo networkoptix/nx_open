@@ -1,5 +1,6 @@
 #pragma once
-#include "camera/camera_plugin.h"
+
+#include <camera/camera_plugin.h>
 
 namespace nx {
 namespace webcam_plugin {

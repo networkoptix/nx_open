@@ -1,4 +1,3 @@
-#include "StdAfx.h"
 #include "avcodec_container.h"
 
 namespace nx {

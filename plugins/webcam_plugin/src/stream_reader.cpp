@@ -1,8 +1,3 @@
-/**********************************************************
-* 04 sep 2013
-* akolesnikov@networkoptix.com
-***********************************************************/
-
 #include "stream_reader.h"
 
 #ifdef _WIN32
@@ -14,17 +9,16 @@
 #include <unistd.h>
 #endif
 
+#include <sys/timeb.h>
+#include <memory>
+
 extern "C" {
 #include <libavutil/imgutils.h>
 #include <libavcodec/avcodec.h>
 #include <libavformat/avformat.h>
 #include <libavdevice/avdevice.h>
 #include <libswscale/swscale.h>
-}
-
-#include <sys/timeb.h>
-
-#include <memory>
+} // extern "C"
 
 #include <nx/utils/log/log.h>
 #include <nx/utils/thread/mutex.h>
@@ -34,11 +28,7 @@ extern "C" {
 #include "plugin.h"
 
 namespace {
-
 static const nxcip::UsecUTCTimestamp USEC_IN_MS = 1000;
-static const nxcip::UsecUTCTimestamp USEC_IN_SEC = 1000*1000;
-static const nxcip::UsecUTCTimestamp NSEC_IN_USEC = 1000;
-static const int MAX_FRAME_SIZE = 4*1024*1024;
 }
 
 
@@ -470,7 +460,7 @@ void StreamReader::setEncoderOptions() const
 const char * StreamReader::getAVInputFormat()
 {
     return
-#ifdef _WIN32 || _WIN64
+#ifdef _WIN32
         "dshow";
 #elif __linux__ 
         "v4l2";

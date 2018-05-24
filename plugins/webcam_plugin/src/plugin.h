@@ -1,15 +1,9 @@
-/**********************************************************
-* 03 sep 2013
-* akolesnikov
-***********************************************************/
-
 #ifndef IMAGE_LIBRARY_PLUGIN_H
 #define IMAGE_LIBRARY_PLUGIN_H
 
-#include <plugins/plugin_tools.h>
-
 #include <memory>
 
+#include <plugins/plugin_tools.h>
 #include <plugins/plugin_api.h>
 #include <plugins/plugin_container_api.h>
 

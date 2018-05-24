@@ -1,9 +1,9 @@
 #pragma once
 
-#include <camera/camera_plugin_types.h>
-
 #include <vector>
 #include <string>
+
+#include <camera/camera_plugin_types.h>
 #include "camera/camera_plugin.h"
 
 namespace nx {

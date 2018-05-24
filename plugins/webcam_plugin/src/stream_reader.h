@@ -1,15 +1,12 @@
-/**********************************************************
-* 04 sep 2013
-* akolesnikov@networkoptix.com
-***********************************************************/
-
-#ifndef ILP_STREAM_READER_H
-#define ILP_STREAM_READER_H
+#pragma once
 
 #include <atomic>
 #include <memory>
 
 #include <QtCore/QUrl>
+extern "C" {
+#include <libavcodec/avcodec.h>
+} //extern "C"
 
 #include <nx/utils/thread/mutex.h>
 #include <nx/utils/thread/wait_condition.h>
@@ -24,17 +21,13 @@
 #include "ilp_video_packet.h"
 #include "av_string_error.h"
 #include "codec_context.h"
-
 #include "libav_forward_declarations.h"
-extern "C" {
-#include <libavcodec/avcodec.h>
-}
 
 namespace nx {
 namespace webcam_plugin {
-    class CodecContext;
 
-    class AVCodecContainer;
+class CodecContext;
+class AVCodecContainer;
 
 //!Reads picture files from specified directory as video-stream
 class StreamReader
@@ -111,6 +104,3 @@ private:
 
 } // namespace webcam_plugin
 } // namespace nx
-
-
-#endif  //ILP_STREAM_READER_H

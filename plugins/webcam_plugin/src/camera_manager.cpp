@@ -1,12 +1,6 @@
-/**********************************************************
-* 03 sep 2013
-* akolesnikov
-***********************************************************/
-
-#include "camera_manager.h"
-
 #include <cstring>
 
+#include "camera_manager.h"
 #include "media_encoder.h"
 #include "utils.h"
 
@@ -63,7 +57,6 @@ unsigned int CameraManager::releaseRef()
 //!Implementation of nxcip::BaseCameraManager::getEncoderCount
 int CameraManager::getEncoderCount( int* encoderCount ) const
 {
-    //todo assuming just mjpeg for now
     *encoderCount = 1;
     return nxcip::NX_NO_ERROR;
 }

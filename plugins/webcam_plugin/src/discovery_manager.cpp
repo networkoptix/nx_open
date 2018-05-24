@@ -1,8 +1,3 @@
-/**********************************************************
-* 03 sep 2013
-* akolesnikov
-***********************************************************/
-
 #include "discovery_manager.h"
 
 #ifdef _POSIX_C_SOURCE
@@ -80,10 +75,7 @@ int DiscoveryManager::findCameras(nxcip::CameraInfo* cameras, const char* localI
     return deviceCount;
 }
 
-//static const QString HTTP_PROTO_NAME( QString::fromLatin1("http") );
-//static const QString HTTPS_PROTO_NAME( QString::fromLatin1("https") );
-
-int DiscoveryManager::checkHostAddress(nxcip::CameraInfo* cameras, const char* address, const char* login, const char* password)
+int DiscoveryManager::checkHostAddress(nxcip::CameraInfo* /*cameras*/, const char* /*address*/, const char* /*login*/, const char* /*password*/)
 {
     //host address doesn't mean anything for a local web cam
     return 0;

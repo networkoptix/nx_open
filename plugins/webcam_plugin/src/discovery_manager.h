@@ -1,16 +1,10 @@
-/**********************************************************
-* 03 sep 2013
-* akolesnikov
-***********************************************************/
+#pragma once
 
-#ifndef ILP_DISCOVERY_MANAGER_H
-#define ILP_DISCOVERY_MANAGER_H
+#include <vector>
 
 #include <camera/camera_plugin.h>
-
 #include <plugins/plugin_tools.h>
 #include <plugins/plugin_container_api.h>
-#include <vector>
 
 namespace nx {
 namespace webcam_plugin {
@@ -60,5 +54,3 @@ private:
 
 } // namespace nx 
 } // namespace webcam_plugin 
-
-#endif  //ILP_DISCOVERY_MANAGER_H

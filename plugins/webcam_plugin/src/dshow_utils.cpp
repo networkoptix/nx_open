@@ -19,7 +19,7 @@ namespace dshow {
 void FreeMediaType(AM_MEDIA_TYPE& mt);
 void DeleteMediaType(AM_MEDIA_TYPE *pmt);
 
-HRESULT getPin(IBaseFilter *pFilter, PIN_DIRECTION PinDir, IPin **ppPin);
+HRESULT getPin(IBaseFilter *pFilter, PIN_DIRECTION pinDirection, IPin **ppPin);
 HRESULT getDeviceProperty(IMoniker * pMoniker, LPCOLESTR propName, VARIANT * outVar);
 HRESULT enumerateDevices(REFGUID category, IEnumMoniker **ppEnum);
 HRESULT findDevice(REFGUID category, const char * devicePath, IMoniker ** outMoniker);
@@ -35,11 +35,13 @@ nxcip::CompressionType toNxCodecID(DWORD biCompression);
 HRESULT getDeviceName(IMoniker *pMoniker, DeviceData *outDeviceInfo);
 HRESULT getDevicePath(IMoniker *pMoniker, DeviceData *outDeviceInfo);
 
-// initializes dshow for the thread that calls the public util functions
-// https://msdn.microsoft.com/en-us/library/windows/desktop/ms695279(v=vs.85).aspx
-// note: only use this from the public api functions listed in "dshow_utils.h"
-// todo: This is a work around, we shouldn't have to init and deinit every time the util 
-//       functions are called.
+/**
+ * initializes dshow for the thread that calls the public util functions
+ * https://msdn.microsoft.com/en-us/library/windows/desktop/ms695279(v=vs.85).aspx
+ * note: only use this from the public api functions listed in "dshow_utils.h"
+ * todo: This is a work around, we shouldn't have to init and deinit every time the util 
+ *      functions are called.
+ */
 class DShowInitializer
 {
 public:
@@ -115,30 +117,30 @@ void DeleteMediaType(AM_MEDIA_TYPE *pmt)
     }
 }
 
-HRESULT getPin(IBaseFilter *pFilter, PIN_DIRECTION PinDir, IPin **ppPin)
+HRESULT getPin(IBaseFilter *pFilter, PIN_DIRECTION pinDirection, IPin **ppPin)
 {
-    IEnumPins  *pEnum = NULL;
-    IPin       *pPin = NULL;
-    HRESULT    hr;
+    IEnumPins* pEnum = NULL;
+    IPin* pPin = NULL;
+    HRESULT resultCode;
 
     if (ppPin == NULL)
         return E_POINTER;
 
-    hr = pFilter->EnumPins(&pEnum);
-    if (FAILED(hr))
-        return hr;
+    resultCode = pFilter->EnumPins(&pEnum);
+    if (FAILED(resultCode))
+        return resultCode;
 
-    while(pEnum->Next(1, &pPin, 0) == S_OK)
+    while (pEnum->Next(1, &pPin, 0) == S_OK)
     {
-        PIN_DIRECTION PinDirThis;
-        hr = pPin->QueryDirection(&PinDirThis);
-        if (FAILED(hr))
+        PIN_DIRECTION pinDirectionThis;
+        resultCode = pPin->QueryDirection(&pinDirectionThis);
+        if (FAILED(resultCode))
         {
             pPin->Release();
             pEnum->Release();
-            return hr;
+            return resultCode;
         }
-        if (PinDir == PinDirThis)
+        if (pinDirection == pinDirectionThis)
         {
             // Found a match. Return the IPin pointer to the caller.
             *ppPin = pPin;
@@ -155,15 +157,15 @@ HRESULT getPin(IBaseFilter *pFilter, PIN_DIRECTION PinDir, IPin **ppPin)
 
 HRESULT getDeviceProperty(IMoniker * pMoniker, LPCOLESTR propName, VARIANT * outVar)
 {
-    IPropertyBag *pPropBag;
-    HRESULT hr = pMoniker->BindToStorage(0, 0, IID_IPropertyBag, (void**) &pPropBag);
-    if (FAILED(hr))
-        return hr;
+    IPropertyBag *pPropBag = NULL;
+    HRESULT resultCode = pMoniker->BindToStorage(0, 0, IID_IPropertyBag, (void**) &pPropBag);
+    if (FAILED(resultCode))
+        return resultCode;
 
     VariantInit(outVar);
-    hr = pPropBag->Read(propName, outVar, 0);
+    resultCode = pPropBag->Read(propName, outVar, 0);
     pPropBag->Release();
-    return hr;
+    return resultCode;
 }
 
 HRESULT enumerateMediaTypes(IMoniker* pMoniker, IEnumMediaTypes ** outEnumMediaTypes)
@@ -171,55 +173,55 @@ HRESULT enumerateMediaTypes(IMoniker* pMoniker, IEnumMediaTypes ** outEnumMediaT
     *outEnumMediaTypes = NULL;
 
     IBaseFilter * baseFilter = NULL;
-    HRESULT hr = pMoniker->BindToObject(NULL, NULL, IID_IBaseFilter, (void **) &baseFilter);
-    if (FAILED(hr))
-        return hr;
+    HRESULT resultCode = pMoniker->BindToObject(NULL, NULL, IID_IBaseFilter, (void **) &baseFilter);
+    if (FAILED(resultCode))
+        return resultCode;
 
     IPin * pin = NULL;
     //todo find out if there are multiple output pins for a device. For now we assume only one
-    hr = getPin(baseFilter, PINDIR_OUTPUT, &pin);
-    if (SUCCEEDED(hr))
+    resultCode = getPin(baseFilter, PINDIR_OUTPUT, &pin);
+    if (SUCCEEDED(resultCode))
     {
         IEnumMediaTypes * enumMediaTypes = NULL;
-        hr = pin->EnumMediaTypes(&enumMediaTypes);
-        if (SUCCEEDED(hr))
+        resultCode = pin->EnumMediaTypes(&enumMediaTypes);
+        if (SUCCEEDED(resultCode))
             *outEnumMediaTypes = enumMediaTypes;
         pin->Release();
     }
     baseFilter->Release();
-    return hr;
+    return resultCode;
 }
 
 HRESULT enumerateDevices(REFGUID category, IEnumMoniker ** ppEnum)
 {
     // Create the System Device Enumerator.
     ICreateDevEnum *pDevEnum;
-    HRESULT hr = CoCreateInstance(CLSID_SystemDeviceEnum, NULL,  
+    HRESULT resultCode = CoCreateInstance(CLSID_SystemDeviceEnum, NULL,  
         CLSCTX_INPROC_SERVER, IID_PPV_ARGS(&pDevEnum));
 
-    if (SUCCEEDED(hr))
+    if (SUCCEEDED(resultCode))
     {
         // Create an enumerator for the category.
-        hr = pDevEnum->CreateClassEnumerator(category, ppEnum, 0);
-        if (hr == S_FALSE)
-            hr = VFW_E_NOT_FOUND;  // The category is empty. Treat as an error.
+        resultCode = pDevEnum->CreateClassEnumerator(category, ppEnum, 0);
+        if (resultCode == S_FALSE)
+            resultCode = VFW_E_NOT_FOUND;  // The category is empty. Treat as an error.
 
         pDevEnum->Release();
     }
-    return hr;
+    return resultCode;
 }
 
 HRESULT findDevice(REFGUID category, const char * devicePath, IMoniker ** outMoniker)
 {
     IEnumMoniker * pEnum;
-    HRESULT hr = enumerateDevices(category, &pEnum);
-    if (FAILED(hr))
-        return hr;
+    HRESULT resultCode = enumerateDevices(category, &pEnum);
+    if (FAILED(resultCode))
+        return resultCode;
 
     CComBSTR devPathBstr(devicePath);
    
     IMoniker *pMoniker = NULL;
-    while (S_OK == (hr = pEnum->Next(1, &pMoniker, NULL)))
+    while (S_OK == (resultCode = pEnum->Next(1, &pMoniker, NULL)))
     {
         VARIANT var;    
         getDeviceProperty(pMoniker, L"DevicePath", &var);
@@ -229,22 +231,22 @@ HRESULT findDevice(REFGUID category, const char * devicePath, IMoniker ** outMon
         {
             pEnum->Release();
             *outMoniker = pMoniker;
-            return hr;
+            return resultCode;
         }
         pMoniker->Release();
     }
 
     pEnum->Release();
     *outMoniker = NULL;
-    return hr;
+    return resultCode;
 }
 
 HRESULT getSupportedCodecs(IMoniker *pMoniker, std::vector<nxcip::CompressionType> *outCodecList)
 {
     IEnumMediaTypes * enumMediaTypes = NULL;
-    HRESULT hr = enumerateMediaTypes(pMoniker, &enumMediaTypes);
-    if (FAILED(hr))
-        return hr;
+    HRESULT resultCode = enumerateMediaTypes(pMoniker, &enumMediaTypes);
+    if (FAILED(resultCode))
+        return resultCode;
 
     std::vector<nxcip::CompressionType> codecList;
 
@@ -268,7 +270,7 @@ HRESULT getSupportedCodecs(IMoniker *pMoniker, std::vector<nxcip::CompressionTyp
 
     *outCodecList = codecList;
     enumMediaTypes->Release();
-    return hr;
+    return resultCode;
 }
 
 HRESULT getResolutionList(IMoniker *pMoniker,
@@ -276,9 +278,9 @@ HRESULT getResolutionList(IMoniker *pMoniker,
     nxcip::CompressionType targetCodecID)
 {
     IEnumMediaTypes * enumMediaTypes = NULL;
-    HRESULT hr = enumerateMediaTypes(pMoniker, &enumMediaTypes);
-    if (FAILED(hr))
-        return hr;
+    HRESULT resultCode = enumerateMediaTypes(pMoniker, &enumMediaTypes);
+    if (FAILED(resultCode))
+        return resultCode;
 
     std::vector<ResolutionData> resolutionList;
 
@@ -311,31 +313,31 @@ HRESULT getResolutionList(IMoniker *pMoniker,
     *outResolutionList = resolutionList;
 
     enumMediaTypes->Release();
-    return hr;
+    return resultCode;
 }
 
 HRESULT getDeviceName(IMoniker *pMoniker, DeviceData *outDeviceInfo)
 {
     VARIANT var;
-    HRESULT hr = getDeviceProperty(pMoniker, L"FriendlyName", &var);
-    if (FAILED(hr))
-        return hr;
+    HRESULT resultCode = getDeviceProperty(pMoniker, L"FriendlyName", &var);
+    if (FAILED(resultCode))
+        return resultCode;
 
     outDeviceInfo->setDeviceName(toStdString(var.bstrVal));
 
-    return hr;
+    return resultCode;
 }
 
 HRESULT getDevicePath(IMoniker *pMoniker, DeviceData *outDeviceInfo)
 {
     VARIANT var;
-    HRESULT hr = getDeviceProperty(pMoniker, L"DevicePath", &var);
-    if (FAILED(hr))
-        return hr;
+    HRESULT resultCode = getDeviceProperty(pMoniker, L"DevicePath", &var);
+    if (FAILED(resultCode))
+        return resultCode;
 
     outDeviceInfo->setDevicePath(toStdString(var.bstrVal));
 
-    return hr;
+    return resultCode;
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -348,8 +350,8 @@ std::vector<DeviceData> getDeviceList()
 
     std::vector<DeviceData> deviceNames;
     IEnumMoniker * pEnum;
-    HRESULT hr = enumerateDevices(CLSID_VideoInputDeviceCategory, &pEnum);
-    if (FAILED(hr))
+    HRESULT resultCode = enumerateDevices(CLSID_VideoInputDeviceCategory, &pEnum);
+    if (FAILED(resultCode))
         return deviceNames;
 
     IMoniker *pMoniker = NULL;
@@ -373,8 +375,8 @@ std::vector<nxcip::CompressionType> getSupportedCodecs(const char * devicePath)
     std::vector<nxcip::CompressionType> codecList;
 
     IMoniker * pMoniker = NULL;
-    HRESULT hr = findDevice(CLSID_VideoInputDeviceCategory, devicePath, &pMoniker);
-    if (SUCCEEDED(hr) && pMoniker)
+    HRESULT resultCode = findDevice(CLSID_VideoInputDeviceCategory, devicePath, &pMoniker);
+    if (SUCCEEDED(resultCode) && pMoniker)
         getSupportedCodecs(pMoniker, &codecList);
 
     if (pMoniker)
@@ -391,8 +393,8 @@ std::vector<ResolutionData> getResolutionList(const char * devicePath, nxcip::Co
     std::vector<ResolutionData> resolutionList;
 
     IMoniker * pMoniker = NULL;
-    HRESULT hr = findDevice(CLSID_VideoInputDeviceCategory, devicePath, &pMoniker);
-    if (FAILED(hr))
+    HRESULT resultCode = findDevice(CLSID_VideoInputDeviceCategory, devicePath, &pMoniker);
+    if (FAILED(resultCode))
         return resolutionList;
 
     if (pMoniker)
@@ -408,4 +410,5 @@ std::vector<ResolutionData> getResolutionList(const char * devicePath, nxcip::Co
 } // namespace utils
 } // namespace webcam_plugin
 } // namespace nx
+
 #endif

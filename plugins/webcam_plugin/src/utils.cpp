@@ -17,10 +17,10 @@ std::vector<DeviceData> getDeviceList()
         dshow::getDeviceList();
 #elif __linux__
         //todo
-        std::vector<DeviceInfo>();
+        std::vector<DeviceData>();
 #elif __APPLE__
         //todo
-        std::vector<DeviceInfo>();
+        std::vector<DeviceData>();
 #endif
     std::vector<DeviceData>();
 }
@@ -32,12 +32,12 @@ std::vector<nxcip::CompressionType> getSupportedCodecs(const char *devicePath)
         dshow::getSupportedCodecs(devicePath);
 #elif __linux__
         //todo
-        std::vector<DeviceInfo>();
+        std::vector<nxcip::CompressionType>();
 #elif __APPLE__
         //todo
-        std::vector<DeviceInfo>();
+        std::vector<nxcip>();
 #endif
-    std::vector<DeviceData>();
+    std::vector<nxcip::CompressionType>();
 }
 
 std::vector<ResolutionData> getResolutionList(
@@ -49,12 +49,12 @@ std::vector<ResolutionData> getResolutionList(
         dshow::getResolutionList(devicePath, targetCodecID);
 #elif __linux__
         //todo
-        std::vector<DeviceInfo>();
+        std::vector<ResolutionData>();
 #elif __APPLE__
         //todo
         std::vector<DeviceInfo>();
 #endif
-    std::vector<nxcip::Resolution>();
+    std::vector<ResolutionData>();
 }
 
 } // namespace utils

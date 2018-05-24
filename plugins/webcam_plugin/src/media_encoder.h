@@ -1,14 +1,6 @@
-/**********************************************************
-* 03 sep 2013
-* akolesnikov@networkoptix.com
-***********************************************************/
-
-#ifndef ILP_MEDIA_ENCODER_H
-#define ILP_MEDIA_ENCODER_H
+#pragma once
 
 #include <memory>
-
-#include <QtCore/QSize>
 
 #include <camera/camera_plugin.h>
 #include <plugins/plugin_tools.h>
@@ -78,5 +70,3 @@ private:
 
 } // namespace nx 
 } // namespace webcam_plugin 
-
-#endif  //ILP_MEDIA_ENCODER_H

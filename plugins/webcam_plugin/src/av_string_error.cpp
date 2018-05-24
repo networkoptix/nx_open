@@ -1,12 +1,8 @@
-#include "StdAfx.h"
-
 #include "av_string_error.h"
 
-extern "C"
-{
+extern "C" {
 #include <libavutil/error.h>
-}
-
+} // extern "C"
 
 AVStringError::AVStringError () : m_errorCode(0)
 {

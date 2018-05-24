@@ -1,27 +1,17 @@
-/**********************************************************
-* 03 sep 2013
-* akolesnikov
-***********************************************************/
-
-#ifndef ILP_CAMERA_MANAGER_H
-#define ILP_CAMERA_MANAGER_H
+#pragma once
 
 #include <camera/camera_plugin.h>
 #include <plugins/plugin_tools.h>
-
 #include <plugins/plugin_tools.h>
-#include "plugin.h"
+
 #include "video_codec_priority.h"
 #include "codec_context.h"
+#include "plugin.h"
 
 namespace nx {
 namespace webcam_plugin {
 
 class MediaEncoder;
-
-//struct AVFormatContext;
-//struct AVInputFormat;
-//struct AVDictionary;
 
 class CameraManager
 :
@@ -101,6 +91,4 @@ private:
 };
 
 } // namespace nx 
-} // namespace webcam_plugin 
-
-#endif  //ILP_CAMERA_MANAGER_H
+} // namespace webcam_plugin
