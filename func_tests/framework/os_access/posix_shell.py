@@ -58,8 +58,10 @@ class SSH(PosixShell):
                 str(self._hostname), port=self._port,
                 username=self._username, key_filename=str(self._key_path),
                 look_for_keys=False, allow_agent=False)
-        except paramiko.ssh_exception.NoValidConnectionsError:
-            raise SSHNotConnected("Cannot connect with {}.".format(self))
+        except paramiko.ssh_exception.NoValidConnectionsError as e:
+            raise SSHNotConnected("Cannot connect to {}: {} (is port opened?)".format(self, e))
+        except paramiko.ssh_exception.SSHException as e:
+            raise SSHNotConnected("Cannot connect to {}: {} (is service started? using VirtualBox?)".format(self, e))
         return client
 
     def __del__(self):
