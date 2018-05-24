@@ -38,7 +38,7 @@ file(COPY "${CMAKE_CURRENT_SOURCE_DIR}/scripts/signtool_interface.py"
 set(config_file "${CMAKE_CURRENT_BINARY_DIR}/config.yaml")
 nx_configure_file("${CMAKE_CURRENT_SOURCE_DIR}/config.yaml" "${config_file}")
 
-message("Generating license...")
+message(STATUS "Generating license")
 execute_process(
     COMMAND pandoc -s ${customization.dir}/license.html -o ${CMAKE_CURRENT_BINARY_DIR}/license.rtf
     WORKING_DIRECTORY ${pandoc_directory}/bin

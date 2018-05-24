@@ -9,7 +9,7 @@ elseif(arch STREQUAL "x86")
 endif()
 set(target.arch "${os.arch}")
 
-message("Generating license...")
+message(STATUS "Generating license")
 execute_process(
     COMMAND ${PYTHON_EXECUTABLE} ${CMAKE_SOURCE_DIR}/build_utils/html2txt.py
     INPUT_FILE ${customization_dir}/license.html
