@@ -4,6 +4,7 @@
 
 #include <nx/network/cloud/tunnel/relay/relay_connection_acceptor.h>
 #include <nx/network/http/http_async_client.h>
+#include <nx/network/http/test_http_server.h>
 #include <nx/network/address_resolver.h>
 #include <nx/network/socket_global.h>
 #include <nx/network/url/url_builder.h>
@@ -21,6 +22,10 @@ namespace test {
 
 using RelayConnectionAcceptor = nx::network::cloud::relay::ConnectionAcceptor;
 
+constexpr char kTestPath[] = "/HttpProxy";
+constexpr char kTestMessage[] = "Hello, world";
+constexpr char kTestMessageMimeType[] = "text/plain";
+
 class HttpProxy:
     public ::testing::Test,
     public BasicComponentTest
@@ -28,21 +33,13 @@ class HttpProxy:
 public:
     ~HttpProxy()
     {
-        if (m_acceptor)
-        {
-            m_acceptor->pleaseStopSync();
-            m_acceptor.reset();
-        }
+        m_peerServer.reset();
 
         if (m_httpClient)
         {
             m_httpClient->pleaseStopSync();
             m_httpClient.reset();
         }
-
-        for (auto& connection: m_acceptedConnections)
-            connection->pleaseStopSync();
-        m_acceptedConnections.clear();
 
         for (const auto& hostName: m_registeredHostNames)
             nx::network::SocketGlobals::addressResolver().removeFixedAddress(hostName);
@@ -57,9 +54,15 @@ protected:
         m_listeningPeerHostName = QnUuid::createUuid().toSimpleString();
         url.setUserName(m_listeningPeerHostName);
 
-        m_acceptor = std::make_unique<RelayConnectionAcceptor>(url);
-        m_acceptor->acceptAsync(std::bind(
-            &HttpProxy::saveAcceptedConnection, this, _1, _2));
+        auto acceptor = std::make_unique<RelayConnectionAcceptor>(url);
+        m_peerServer = std::make_unique<nx::network::http::TestHttpServer>(
+            std::move(acceptor));
+        m_peerServer->registerStaticProcessor(
+            kTestPath,
+            kTestMessage,
+            kTestMessageMimeType,
+            nx::network::http::Method::get);
+        m_peerServer->server().start();
 
         while (!moduleInstance()->listeningPeerPool().isPeerOnline(
             m_listeningPeerHostName.toStdString()))
@@ -73,13 +76,16 @@ protected:
         m_httpClient = std::make_unique<nx::network::http::AsyncClient>();
         m_httpClient->doGet(
             nx::network::url::Builder(proxyUrlForHost(m_listeningPeerHostName))
-                .setPath("/api/moduleInformation"),
+                .setPath(kTestPath),
             std::bind(&HttpProxy::saveResponse, this));
     }
 
-    void thenRequestIsReceived()
+    void thenResponseFromPeerIsReceived()
     {
-        ASSERT_NE(nullptr, m_receivedHttpRequests.pop());
+        auto response = m_httpResponseQueue.pop();
+        ASSERT_NE(nullptr, response);
+        ASSERT_EQ(nx::network::http::StatusCode::ok, response->statusLine.statusCode);
+        ASSERT_EQ(kTestMessage, response->messageBody);
     }
 
     nx::utils::Url proxyUrlForHost(const QString& hostName)
@@ -97,14 +103,10 @@ protected:
 
 private:
     QString m_listeningPeerHostName;
-    std::unique_ptr<RelayConnectionAcceptor> m_acceptor;
-    std::vector<std::unique_ptr<nx::network::http::AsyncMessagePipeline>>
-        m_acceptedConnections;
+    std::unique_ptr<nx::network::http::TestHttpServer> m_peerServer;
     std::unique_ptr<nx::network::http::AsyncClient> m_httpClient;
     nx::utils::SyncQueue<std::unique_ptr<nx::network::http::Response>>
         m_httpResponseQueue;
-    nx::utils::SyncQueue<std::unique_ptr<nx::network::http::Request>>
-        m_receivedHttpRequests;
     std::vector<QString> m_registeredHostNames;
 
     virtual void SetUp() override
@@ -112,43 +114,14 @@ private:
         ASSERT_TRUE(startAndWaitUntilStarted());
     }
 
-    void saveAcceptedConnection(
-        SystemError::ErrorCode systemErrorCode,
-        std::unique_ptr<network::AbstractStreamSocket> connection)
-    {
-        using namespace std::placeholders;
-
-        if (systemErrorCode != SystemError::noError)
-            return;
-
-        auto httpConnection = std::make_unique<nx::network::http::AsyncMessagePipeline>(
-            nullptr, std::move(connection));
-        httpConnection->setMessageHandler(
-            std::bind(&HttpProxy::saveHttpRequest, this, _1));
-        httpConnection->startReadingConnection();
-        m_acceptedConnections.push_back(std::move(httpConnection));
-    }
-
-    void saveHttpRequest(nx::network::http::Message requestMsg)
-    {
-        if (requestMsg.type != nx::network::http::MessageType::request)
-        {
-            m_receivedHttpRequests.push(nullptr);
-        }
-        else
-        {
-            m_receivedHttpRequests.push(
-                std::make_unique<nx::network::http::Request>(*requestMsg.request));
-        }
-    }
-
     void saveResponse()
     {
         if (m_httpClient->response())
         {
-            m_httpResponseQueue.push(
-                std::make_unique<nx::network::http::Response>(
-                    *m_httpClient->response()));
+            auto response = std::make_unique<nx::network::http::Response>(
+                *m_httpClient->response());
+            response->messageBody = m_httpClient->fetchMessageBodyBuffer();
+            m_httpResponseQueue.push(std::move(response));
         }
         else
         {
@@ -161,12 +134,10 @@ TEST_F(HttpProxy, request_is_passed_to_listening_peer)
 {
     givenListeningPeer();
     whenSendHttpRequestToPeer();
-    thenRequestIsReceived();
+    thenResponseFromPeerIsReceived();
 }
 
 // TEST_F(HttpProxy, works_for_peer_with_complex_name)
-
-// TEST_F(HttpProxy, m3u_playlist_url_host_gets_rewritten)
 
 } // namespace test
 } // namespace relay
