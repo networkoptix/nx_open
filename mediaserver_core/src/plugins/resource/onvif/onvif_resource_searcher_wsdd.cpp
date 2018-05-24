@@ -18,6 +18,8 @@
 #include <core/resource/resource_data.h>
 #include <core/resource_management/resource_data_pool.h>
 
+#include <nx/fusion/model_functions.h>
+
 //static const int SOAP_DISCOVERY_TIMEOUT = 1; // "+" in seconds, "-" in mseconds
 static const int SOAP_DISCOVERY_TIMEOUT = -500; // "+" in seconds, "-" in mseconds
 static const int SOAP_HELLO_CHECK_TIMEOUT = -1; // "+" in seconds, "-" in mseconds
@@ -169,6 +171,9 @@ OnvifResourceSearcherWsdd::OnvifResourceSearcherWsdd(OnvifResourceInformationFet
     m_mutex()*/
 {
     //updateInterfacesListenSockets();
+    qRegisterMetaType<OnvifResourceSearcherWsdd::ObtainMacFromMulticast>();
+    QnJsonSerializer::registerSerializer<OnvifResourceSearcherWsdd::ObtainMacFromMulticast>();
+
 }
 
 OnvifResourceSearcherWsdd::~OnvifResourceSearcherWsdd()
@@ -467,12 +472,12 @@ QString OnvifResourceSearcherWsdd::getMac(const T* source, const SOAP_ENV__Heade
         QString manufacturer = getManufacturer(source, name);
 
         const QnResourceData resourceData = qnStaticCommon->dataPool()->data(manufacturer, name);
-        const bool ignoreMacFromMulticast =
-            resourceData.value<bool>(Qn::IGNORE_MAC_FROM_MULTICAST_PARAM_NAME);
-        const bool useMacFromMulticast = (macFromEndpoint == macFromMessageId
-            || resourceData.value<bool>(Qn::MAC_FROM_MULTICAST_PARAM_NAME));
+        ObtainMacFromMulticast obtainMacFromMulticast = ObtainMacFromMulticast::Auto;
+        resourceData.value(Qn::OBTAIN_MAC_FROM_MULTICAST_PARAM_NAME, &obtainMacFromMulticast);
 
-        if (!ignoreMacFromMulticast && useMacFromMulticast)
+        if ((obtainMacFromMulticast == ObtainMacFromMulticast::Always)
+            || (obtainMacFromMulticast == ObtainMacFromMulticast::Auto
+                && macFromEndpoint == macFromMessageId))
         {
             QString result;
             for (int i = 1; i < kMacAddressLength; i += 2)
@@ -918,5 +923,10 @@ bool OnvifResourceSearcherWsdd::readProbeMatches( const QnInterfaceAndAddr& ifac
         ctx.soapWsddProxy.reset();
     }
 }
+
+QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(OnvifResourceSearcherWsdd, ObtainMacFromMulticast,
+(OnvifResourceSearcherWsdd::Auto, "Auto")
+(OnvifResourceSearcherWsdd::Always, "Always")
+(OnvifResourceSearcherWsdd::Never, "Never"))
 
 #endif //ENABLE_ONVIF
