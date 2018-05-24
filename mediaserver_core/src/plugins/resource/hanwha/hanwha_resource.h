@@ -103,6 +103,8 @@ public:
         int* totalProfileNumber,
         std::set<int>* profilesToRemoveIfProfilesExhausted);
 
+    CameraDiagnostics::Result fetchProfiles(HanwhaProfileMap* outProfiles);
+
     CameraDiagnostics::Result removeProfile(int profileNumber);
 
     CameraDiagnostics::Result createProfile(int* outProfileNumber, Qn::ConnectionRole role);
