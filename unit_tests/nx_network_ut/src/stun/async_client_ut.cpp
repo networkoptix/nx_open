@@ -239,7 +239,9 @@ private:
 
     void startServer()
     {
-        m_server = std::make_unique<stun::SocketServer>(&m_dispatcher, false);
+        m_server = std::make_unique<stun::SocketServer>(
+            &m_dispatcher,
+            /*SSL support enabled*/ true);
 
         ASSERT_TRUE(m_server->bind(SocketAddress::anyPrivateAddress))
             << SystemError::getLastOSErrorText().toStdString();

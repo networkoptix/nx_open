@@ -493,6 +493,14 @@ protected:
         m_synchronousServerReceivedData.write(readBuf.data(), m_sentData.size());
     }
 
+    void startReadingConnectionAsync()
+    {
+        ASSERT_TRUE(m_connection->setNonBlockingMode(true));
+
+        m_waitForSingleRecvResult = false;
+        continueReceiving();
+    }
+
     void continueReceiving()
     {
         using namespace std::placeholders;
@@ -503,17 +511,88 @@ protected:
             std::bind(&StreamSocketAcceptance::saveReadResult, this, _1, _2));
     }
 
+    void waitForConnectionRecvTimeout()
+    {
+        for (;;)
+        {
+            if (std::get<0>(m_recvResultQueue.pop()) == SystemError::timedOut)
+                break;
+        }
+    }
+
     void whenCancelAllSocketOperations()
     {
         m_connection->pleaseStopSync();
     }
 
+    void whenClientSentPing()
+    {
+        whenClientSendsPing();
+        thenSendSucceeded();
+    }
+
     void whenClientSendsPing()
     {
-        ASSERT_EQ(
-            m_clientMessage.size(),
-            m_connection->send(m_clientMessage.constData(), m_clientMessage.size()))
-            << SystemError::getLastOSErrorText().toStdString();
+        const auto bytesSent =
+            m_connection->send(m_clientMessage.constData(), m_clientMessage.size());
+
+        m_sendResultQueue.push(
+            bytesSent == m_clientMessage.size()
+            ? SystemError::noError
+            : SystemError::getLastOSErrorCode());
+    }
+
+    void whenClientSentPingAsync()
+    {
+        whenClientSendsPingAsync();
+        thenSendSucceeded();
+    }
+
+    void whenClientSendsPingAsync()
+    {
+        m_connection->sendAsync(
+            m_clientMessage,
+            [this](SystemError::ErrorCode systemErrorCode, std::size_t /*bytesSent*/)
+            {
+                m_sendResultQueue.push(systemErrorCode);
+            });
+    }
+
+    void thenSendSucceeded()
+    {
+        ASSERT_EQ(SystemError::noError, m_sendResultQueue.pop());
+    }
+
+    void thenSendFailedWith(SystemError::ErrorCode systemErrorCode)
+    {
+        ASSERT_EQ(systemErrorCode, m_sendResultQueue.pop());
+    }
+
+    void thenSendFailedUnrecoverableError()
+    {
+        const auto errorCode = m_sendResultQueue.pop();
+        ASSERT_NE(SystemError::noError, errorCode);
+        ASSERT_TRUE(socketCannotRecoverFromError(errorCode));
+    }
+
+    void whenClientSendsRandomDataAsyncNonStop()
+    {
+        ASSERT_TRUE(m_connection->setNonBlockingMode(true));
+        if (m_randomDataBuffer.isEmpty())
+            m_randomDataBuffer = nx::utils::generateRandomName(64*1024);
+
+        m_connection->sendAsync(
+            m_randomDataBuffer,
+            [this](SystemError::ErrorCode systemErrorCode, std::size_t /*bytesSent*/)
+            {
+                if (systemErrorCode == SystemError::noError)
+                {
+                    whenClientSendsRandomDataAsyncNonStop();
+                    return;
+                }
+
+                m_sendResultQueue.push(systemErrorCode);
+            });
     }
 
     void whenSendMultiplePingsViaMultipleConnections(int connectionCount)
@@ -624,7 +703,7 @@ protected:
     {
         this->givenConnectedSocket();
         // E.g., for socket with encryption auto-detection
-        this->whenClientSendsPing();
+        this->whenClientSentPing();
 
         this->waitUntilConnectionIsAccepted();
     }
@@ -700,11 +779,23 @@ protected:
         ASSERT_TRUE(m_connection->setRecvTimeout(timeout.count()));
     }
 
+    void setClientSocketSendTimeout(std::chrono::milliseconds timeout)
+    {
+        ASSERT_TRUE(m_connection->setSendTimeout(timeout.count()));
+    }
+
     void thenServerMessageIsReceived()
     {
-        const auto prevRecvResult = m_recvResultQueue.pop();
-        ASSERT_EQ(SystemError::noError, std::get<0>(prevRecvResult));
-        ASSERT_EQ(m_serverMessage, std::get<1>(prevRecvResult));
+        for (;;)
+        {
+            const auto prevRecvResult = m_recvResultQueue.pop();
+            if (std::get<0>(prevRecvResult) != SystemError::noError)
+                continue;
+
+            ASSERT_EQ(SystemError::noError, std::get<0>(prevRecvResult));
+            ASSERT_EQ(m_serverMessage, std::get<1>(prevRecvResult));
+            break;
+        }
     }
 
     void thenClientSocketReported(SystemError::ErrorCode expected)
@@ -716,6 +807,11 @@ protected:
     void thenClientSocketReportedTimedout()
     {
         thenClientSocketReported(SystemError::timedOut);
+    }
+
+    void thenClientSendTimesOutEventually()
+    {
+        ASSERT_EQ(SystemError::timedOut, m_sendResultQueue.pop());
     }
 
     void thenClientSocketReportedFailure()
@@ -791,7 +887,7 @@ protected:
     SocketAddress serverEndpoint() const
     {
         if (m_server)
-            return SocketAddress(m_server->address()/*.toString()*/);
+            return SocketAddress(m_server->address());
         else if (m_serverSocket)
             return m_serverSocket->getLocalAddress();
         else if (m_synchronousServer)
@@ -808,6 +904,11 @@ protected:
     typename SocketTypeSet::ServerSocket* serverSocket()
     {
         return m_serverSocket.get();
+    }
+
+    AbstractStreamSocket* lastAcceptedSocket()
+    {
+        return std::get<1>(m_prevAcceptResult).get();
     }
 
 private:
@@ -828,6 +929,8 @@ private:
     const nx::Buffer m_serverMessage;
     nx::Buffer m_readBuffer;
     nx::utils::SyncQueue<RecvResult> m_recvResultQueue;
+    nx::utils::SyncQueue<SystemError::ErrorCode> m_sendResultQueue;
+    nx::Buffer m_randomDataBuffer;
     std::unique_ptr<typename SocketTypeSet::ServerSocket> m_serverSocket;
     std::unique_ptr<typename SocketTypeSet::ClientSocket> m_connection;
     std::unique_ptr<server::SimpleMessageServer> m_server;
@@ -835,6 +938,7 @@ private:
     std::vector<std::unique_ptr<ClientConnectionContext>> m_clientConnections;
     nx::utils::SyncQueue<AcceptResult> m_acceptedConnections;
     AcceptResult m_prevAcceptResult;
+    bool m_waitForSingleRecvResult = true;
 
     //---------------------------------------------------------------------------------------------
     // Concurrent I/O.
@@ -897,6 +1001,9 @@ private:
 
         if (m_auxiliaryRecvHandler)
             nx::utils::swapAndCall(m_auxiliaryRecvHandler);
+
+        if (!m_waitForSingleRecvResult)
+            continueReceiving();
     }
 
     void startAcceptingConnections()
@@ -1013,7 +1120,7 @@ TYPED_TEST_P(StreamSocketAcceptance, receive_timeout_change_is_not_ignored)
     this->givenPingPongServer();
     this->givenConnectedSocket();
 
-    this->whenClientSendsPing();
+    this->whenClientSentPing();
     this->whenReceivedMessageFromServerAsync(
         [this]()
         {
@@ -1021,8 +1128,8 @@ TYPED_TEST_P(StreamSocketAcceptance, receive_timeout_change_is_not_ignored)
             this->continueReceiving();
         });
 
-    //this->thenClientSocketReportedTimedout();
-    this->thenClientSocketReportedFailure();
+    this->thenClientSocketReportedTimedout();
+    //this->thenClientSocketReportedFailure();
 }
 
 // TODO: #ak Modify and uncomment this test.
@@ -1075,8 +1182,9 @@ TYPED_TEST_P(StreamSocketAcceptance, recv_timeout_is_reported)
     this->setClientSocketRecvTimeout(std::chrono::milliseconds(1));
 
     this->whenReadSocketInBlockingWay();
-    //this->thenClientSocketReportedTimedout();
-    this->thenClientSocketReportedFailure();
+
+    this->thenClientSocketReportedTimedout();
+    //this->thenClientSocketReportedFailure();
 }
 
 TYPED_TEST_P(StreamSocketAcceptance, msg_dont_wait_flag_makes_recv_call_nonblocking)
@@ -1118,7 +1226,7 @@ TYPED_TEST_P(StreamSocketAcceptance, nonblocking_accept_actually_accepts_connect
     this->givenListeningServerSocket();
     this->givenConnectedSocket();
     // E.g., for socket with encryption auto-detection
-    this->whenClientSendsPing();
+    this->whenClientSentPing();
 
     this->waitUntilConnectionIsAcceptedInNonBlockingMode();
 }
@@ -1153,7 +1261,9 @@ TYPED_TEST_P(
 }
 
 #if 0
-// TODO: #ak Following test is not relevant for Macosx. Adapt for Mac or erase.
+// TODO: #ak Following test is not relevant for Macosx since server socket there
+// has a queue of connect requests, not connections with fulfilled handshake.
+// Adapt for Mac or erase.
 TYPED_TEST_P(StreamSocketAcceptance, server_socket_listen_queue_size_is_used)
 {
     constexpr int listenQueueSize =
@@ -1165,7 +1275,43 @@ TYPED_TEST_P(StreamSocketAcceptance, server_socket_listen_queue_size_is_used)
 }
 #endif
 
-//TYPED_TEST_P(StreamSocketAcceptance, socket_is_reusable_after_recv_timeout)
+TYPED_TEST_P(StreamSocketAcceptance, socket_is_reusable_after_recv_timeout)
+{
+    this->givenPingPongServer();
+
+    this->givenConnectedSocket();
+    this->setClientSocketRecvTimeout(std::chrono::milliseconds(1));
+
+    this->startReadingConnectionAsync();
+    this->waitForConnectionRecvTimeout();
+
+    this->whenClientSentPingAsync();
+    this->thenServerMessageIsReceived();
+}
+
+TYPED_TEST_P(StreamSocketAcceptance, socket_reports_send_timeout)
+{
+    this->givenAcceptingServerSocket();
+    this->givenConnectedSocket();
+    this->setClientSocketSendTimeout(std::chrono::milliseconds(1));
+
+    this->whenClientSendsRandomDataAsyncNonStop();
+
+    this->thenClientSendTimesOutEventually();
+}
+
+TYPED_TEST_P(StreamSocketAcceptance, cancel_io)
+{
+    this->givenPingPongServer();
+    this->givenConnectedSocket();
+
+    this->whenClientSentPing();
+    this->whenReceivedMessageFromServerAsync(
+        [this]()
+        {
+            this->connection()->cancelIOSync(aio::etNone);
+        });
+}
 
 REGISTER_TYPED_TEST_CASE_P(StreamSocketAcceptance,
     DISABLED_receiveDelay,
@@ -1186,7 +1332,10 @@ REGISTER_TYPED_TEST_CASE_P(StreamSocketAcceptance,
     nonblocking_accept_actually_accepts_connections,
     accepted_socket_is_in_blocking_mode_when_server_socket_is_nonblocking,
     accepted_socket_is_in_blocking_mode_when_server_socket_is_blocking,
-    server_socket_accepts_many_connections_in_a_row);
+    server_socket_accepts_many_connections_in_a_row,
+    socket_is_reusable_after_recv_timeout,
+    socket_reports_send_timeout,
+    cancel_io);
 
 } // namespace test
 } // namespace network

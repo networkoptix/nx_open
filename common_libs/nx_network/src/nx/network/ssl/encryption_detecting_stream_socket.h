@@ -18,12 +18,14 @@ class StreamSocket;
  * Protocol selection on client side MUST be done explicitly by using appropriate socket class.
  */
 class NX_NETWORK_API EncryptionDetectingStreamSocket:
-    public ProtocolDetectingStreamSocket
+    public ProtocolDetectingStreamSocket<AbstractEncryptedStreamSocket>
 {
-    using base_type = ProtocolDetectingStreamSocket;
+    using base_type = ProtocolDetectingStreamSocket<AbstractEncryptedStreamSocket>;
 
 public:
     EncryptionDetectingStreamSocket(std::unique_ptr<AbstractStreamSocket> source);
+
+    virtual bool isEncryptionEnabled() const override;
 
     /**
      * Reads connection until protocol is detected.

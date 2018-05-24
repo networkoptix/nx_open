@@ -83,8 +83,19 @@ set(cloudFrontendModules cloud_portal cloud_portal_nginx nxcloud_host_agent)
 
 nx_define_cloud_group_targets(backend ${cloudBackendModules})
 nx_define_cloud_group_targets(frontend ${cloudFrontendModules})
+add_subdirectory(deployment_verification_tests)
 
-add_custom_target(cloud-docker-build DEPENDS cloud-backend-docker-build cloud-frontend-docker-build)
-add_custom_target(cloud-docker-push DEPENDS cloud-docker-build cloud-backend-docker-push cloud-frontend-docker-push)
+add_custom_target(
+    cloud-docker-build 
+    DEPENDS cloud-backend-docker-build 
+        cloud-frontend-docker-build
+        deployment_verification_tests-docker-build)
+
+add_custom_target(
+    cloud-docker-push
+    DEPENDS cloud-docker-build 
+        cloud-backend-docker-push 
+        cloud-frontend-docker-push 
+        deployment_verification_tests-docker-push)
 
 add_subdirectory(cloud_connect_test_util)

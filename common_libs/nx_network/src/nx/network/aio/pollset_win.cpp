@@ -91,7 +91,8 @@ public:
     my_fd_set* readfdsOriginal;
     my_fd_set* writefdsOriginal;
     my_fd_set* exceptfdsOriginal;
-    std::unique_ptr<UDPSocket> dummySocket;
+    std::unique_ptr<Pollable> dummyPollable;
+    sockaddr_in dummySocketAddress;
     bool modified;
 
     PollSetImpl():
@@ -112,7 +113,9 @@ public:
         writefdsOriginal->fd_count = 0;
         exceptfdsOriginal->fd_count = 0;
 
-        dummySocket.reset(new UDPSocket(AF_INET));
+        dummyPollable = std::make_unique<Pollable>(
+            ::socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP));
+        memset(&dummySocketAddress, 0, sizeof(dummySocketAddress));
     }
 
     ~PollSetImpl()
@@ -360,10 +363,20 @@ PollSet::PollSet():
     m_impl(new PollSetImpl())
 {
     m_impl->sockets.emplace(
-        m_impl->dummySocket->handle(),
-        PollSetImpl::SockCtx(m_impl->dummySocket.get(), aio::etRead));
-    m_impl->dummySocket->setNonBlockingMode(true);
-    m_impl->dummySocket->bind(SocketAddress(HostAddress::localhost, 0));
+        m_impl->dummyPollable->handle(),
+        PollSetImpl::SockCtx(m_impl->dummyPollable.get(), aio::etRead));
+
+    u_long nonBlockingOnFlag = 1;
+    ioctlsocket(m_impl->dummyPollable->handle(), FIONBIO, &nonBlockingOnFlag);
+
+    struct sockaddr_in localAddress;
+    memset(&localAddress, 0, sizeof(localAddress));
+    localAddress.sin_family = AF_INET;
+    localAddress.sin_addr = in4addr_loopback;
+    ::bind(
+        m_impl->dummyPollable->handle(),
+        (struct sockaddr*) &localAddress,
+        sizeof(localAddress));
 
     m_impl->modified = true;
 }
@@ -376,14 +389,26 @@ PollSet::~PollSet()
 
 bool PollSet::isValid() const
 {
-    return m_impl->dummySocket->handle() > 0;
+    return m_impl->dummyPollable->handle() > 0;
 }
 
 void PollSet::interrupt()
 {
     // TODO: #ak Introduce overlapped I/O.
-    quint8 buf[128];
-    m_impl->dummySocket->sendTo(buf, sizeof(buf), m_impl->dummySocket->getLocalAddress());
+    char buf[128];
+
+    if (m_impl->dummySocketAddress.sin_port == 0)
+    {
+        socklen_t addrLen = sizeof(m_impl->dummySocketAddress);
+        ::getsockname(
+            m_impl->dummyPollable->handle(),
+            (sockaddr*) &m_impl->dummySocketAddress,
+            &addrLen);
+    }
+
+    sendto(
+        m_impl->dummyPollable->handle(), buf, sizeof(buf), 0,
+        (sockaddr*) &m_impl->dummySocketAddress, sizeof(m_impl->dummySocketAddress));
 }
 
 bool PollSet::add(
@@ -464,11 +489,11 @@ int PollSet::poll(int millisToWait)
 
     for (size_t i = 0; i < m_impl->readfds->fd_count; ++i)
     {
-        if (m_impl->readfds->fd_array[i] == m_impl->dummySocket->handle())
+        if (m_impl->readfds->fd_array[i] == m_impl->dummyPollable->handle())
         {
             //reading dummy socket
-            quint8 buf[128];
-            m_impl->dummySocket->recv(buf, sizeof(buf), 0);   //ignoring result and data...
+            char buf[128];
+            ::recv(m_impl->dummyPollable->handle(), buf, sizeof(buf), 0);
             --result;
             m_impl->readfds->fd_array[i] = INVALID_SOCKET;
             break;

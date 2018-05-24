@@ -99,8 +99,7 @@ angular.module('cloudApp')
         }
 
         function reloadSystems(){
-            systemsProvider.forceUpdateSystems();
-            $location.path('/systems');
+            systemsProvider.forceUpdateSystems().then(function(){$location.path('/systems')});
         }
 
         $scope.disconnect = function(){

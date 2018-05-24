@@ -563,6 +563,14 @@ bool UdtStreamSocket::setRendezvous(bool val)
         m_impl->udtHandle, 0, UDT_RENDEZVOUS, &val, sizeof(bool)) == 0;
 }
 
+void UdtStreamSocket::bindToAioThread(
+    nx::network::aio::AbstractAioThread* aioThread)
+{
+    base_type::bindToAioThread(aioThread);
+
+    m_aioHelper->bindToAioThread(aioThread);
+}
+
 bool UdtStreamSocket::connect(
     const SocketAddress& remoteAddress,
     std::chrono::milliseconds timeout)

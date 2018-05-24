@@ -136,12 +136,12 @@ protected:
         using namespace std::placeholders;
 
         m_targetPeerConnector = std::make_unique<gateway::TargetPeerConnector>(
-            m_listeningPeerPool.get(),
-            m_targetEndpoint);
+            m_listeningPeerPool.get());
         if (m_connectTimeout)
             m_targetPeerConnector->setTimeout(*m_connectTimeout);
 
         m_targetPeerConnector->connectAsync(
+            m_targetEndpoint,
             std::bind(&TargetPeerConnector::saveConnectionResult, this, _1, _2));
     }
 
