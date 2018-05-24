@@ -159,16 +159,19 @@ void HanwhaResourceSearcher::addResourcesViaSunApi(QnResourceList& upnpResults)
 
 void HanwhaResourceSearcher::updateSocketList()
 {
+    if (!m_sunapiReceiveSocket)
+    {
+        m_sunapiReceiveSocket = SocketFactory::createDatagramSocket();
+        if (!m_sunapiReceiveSocket->setReuseAddrFlag(true) ||
+            !m_sunapiReceiveSocket->bind(BROADCAST_ADDRESS, kSunApiProbeSrcPort))
+        {
+            return;
+        }
+    }
+
     const auto interfaceList = getAllIPv4Interfaces();
     if (m_lastInterfaceList == interfaceList)
         return;
-
-    m_sunapiReceiveSocket = SocketFactory::createDatagramSocket();
-    if (!m_sunapiReceiveSocket->setReuseAddrFlag(true) ||
-        !m_sunapiReceiveSocket->bind(BROADCAST_ADDRESS, kSunApiProbeSrcPort))
-    {
-        return;
-    }
 
     m_lastInterfaceList = interfaceList;
     m_sunApiSocketList.clear();
