@@ -14,6 +14,7 @@ namespace desktop {
 
 struct CameraSettingsDialogState;
 class CameraSettingsDialogStore;
+class AbstractTextProvider;
 
 class CameraScheduleWidget: public QWidget
 {
@@ -22,13 +23,12 @@ class CameraScheduleWidget: public QWidget
 
 public:
     explicit CameraScheduleWidget(
+        AbstractTextProvider* licenseUsageTextProvider,
         CameraSettingsDialogStore* store,
         QWidget* parent = nullptr);
     virtual ~CameraScheduleWidget() override;
 
     //void overrideMotionType(Qn::MotionType motionTypeOverride = Qn::MotionType::MT_Default);
-
-    void setStore(CameraSettingsDialogStore* store);
 
 private:
     void setupUi();

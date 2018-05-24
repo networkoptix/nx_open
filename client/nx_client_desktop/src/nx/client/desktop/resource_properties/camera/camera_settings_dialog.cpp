@@ -27,6 +27,7 @@
 #include "redux/camera_settings_dialog_state.h"
 #include "redux/camera_settings_dialog_store.h"
 
+#include "watchers/camera_settings_license_watcher.h"
 #include "watchers/camera_settings_readonly_watcher.h"
 #include "watchers/camera_settings_wearable_state_watcher.h"
 #include "watchers/camera_settings_global_settings_watcher.h"
@@ -44,6 +45,7 @@ namespace desktop {
 struct CameraSettingsDialog::Private
 {
     QPointer<CameraSettingsDialogStore> store;
+    QPointer<CameraSettingsLicenseWatcher> licenseWatcher;
     QPointer<CameraSettingsReadOnlyWatcher> readOnlyWatcher;
     QPointer<CameraSettingsWearableStateWatcher> wearableStateWatcher;
     QnVirtualCameraResourceList cameras;
@@ -141,6 +143,7 @@ CameraSettingsDialog::CameraSettingsDialog(QWidget* parent):
     connect(d->store, &CameraSettingsDialogStore::stateChanged, this,
         &CameraSettingsDialog::loadState);
 
+    d->licenseWatcher = new CameraSettingsLicenseWatcher(d->store, this);
     d->readOnlyWatcher = new CameraSettingsReadOnlyWatcher(d->store, this);
     d->wearableStateWatcher = new CameraSettingsWearableStateWatcher(d->store, this);
 
@@ -160,7 +163,8 @@ CameraSettingsDialog::CameraSettingsDialog(QWidget* parent):
 
     addPage(
         int(CameraSettingsTab::recording),
-        new CameraScheduleWidget(d->store, ui->tabWidget),
+        new CameraScheduleWidget(d->licenseWatcher->licenseUsageTextProvider(),
+            d->store, ui->tabWidget),
         tr("Recording"));
 
     addPage(
@@ -221,7 +225,9 @@ CameraSettingsDialog::CameraSettingsDialog(QWidget* parent):
         });
 }
 
-CameraSettingsDialog::~CameraSettingsDialog() = default;
+CameraSettingsDialog::~CameraSettingsDialog()
+{
+}
 
 bool CameraSettingsDialog::tryClose(bool force)
 {
@@ -263,6 +269,7 @@ bool CameraSettingsDialog::setCameras(const QnVirtualCameraResourceList& cameras
 
     d->cameras = cameras;
     d->resetChanges();
+    d->licenseWatcher->setCameras(cameras);
     d->readOnlyWatcher->setCameras(cameras);
     d->wearableStateWatcher->setCameras(cameras);
     d->previewManager->selectCamera(cameras.size() == 1
