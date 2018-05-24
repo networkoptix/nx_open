@@ -10,7 +10,7 @@
 #include <QtCore/QFileInfo>
 
 #include <nx/network/url/url_parse_helper.h>
-#include <nx/utils/settings.h>
+#include <nx/utils/deprecated_settings.h>
 #include <nx/utils/timer_manager.h>
 
 #include <utils/common/app_info.h>

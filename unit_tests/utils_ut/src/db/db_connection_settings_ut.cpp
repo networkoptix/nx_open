@@ -1,7 +1,7 @@
 #include <gtest/gtest.h>
 
 #include <nx/utils/random.h>
-#include <nx/utils/settings.h>
+#include <nx/utils/deprecated_settings.h>
 #include <nx/utils/uuid.h>
 
 #include <nx/utils/db/types.h>

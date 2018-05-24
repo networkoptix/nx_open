@@ -1,4 +1,4 @@
-#include "settings.h"
+#include "deprecated_settings.h"
 
 #include <QtCore/QDir>
 

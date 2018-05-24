@@ -1,6 +1,6 @@
 #include "log_settings.h"
 
-#include <nx/utils/settings.h>
+#include <nx/utils/deprecated_settings.h>
 #include <nx/utils/string.h>
 
 namespace nx {
