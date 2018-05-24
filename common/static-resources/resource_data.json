@@ -21,7 +21,7 @@
             "keys": [
                 "N8Fx-OLAH4|IP-Camera"
             ],
-            "macFromMulticast": true
+            "obtainMacFromMulticast": "Always"
         },
         {
             "_comment1": "Autodiscovery response contains scopes like onvif://www.onvif.org/hardware/DWC-MTT4Wi36 and onvif://www.onvif.org/name/ONVIF",
@@ -31,7 +31,7 @@
                 "DWC-MTT4Wi*|ONVIF",
                 "DWC-MVT4Wi*|ONVIF"
             ],
-            "ignoreMacFromMulticast": true
+            "obtainMacFromMulticast": "Never"
         },
         {
             "keys": [
