@@ -124,6 +124,10 @@ public:
         Qn::ConnectionRole role,
         boost::optional<int> forcedProfileNameLength = boost::none) const;
 
+    bool needToReplaceProfile(
+        const boost::optional<HanwhaVideoProfile>& nxProfileToReplace,
+        Qn::ConnectionRole role) const;
+
     std::shared_ptr<HanwhaSharedResourceContext> sharedContext() const;
 
     virtual bool setCameraCredentialsSync(const QAuthenticator& auth, QString* outErrorString = nullptr) override;
