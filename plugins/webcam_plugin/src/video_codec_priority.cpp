@@ -1,5 +1,5 @@
-#include "StdAfx.h"
 #include "video_codec_priority.h"
+#include <algorithm>
 
 namespace nx {
 namespace webcam_plugin {
