@@ -71,34 +71,6 @@ void QnConnectToCurrentSystemTool::start(const QnUuid& targetId, const QString& 
         return;
 
     auto server = resourcePool()->getIncompatibleServerById(targetId, true);
-
-} // namespace
-
-QnConnectToCurrentSystemTool::QnConnectToCurrentSystemTool(QObject* parent):
-    base_type(parent),
-    QnSessionAwareDelegate(parent)
-{
-}
-
-QnConnectToCurrentSystemTool::~QnConnectToCurrentSystemTool() {}
-
-bool QnConnectToCurrentSystemTool::tryClose(bool /*force*/)
-{
-    cancel();
-    return true;
-}
-
-void QnConnectToCurrentSystemTool::forcedUpdate()
-{
-}
-
-void QnConnectToCurrentSystemTool::start(const QnUuid& targetId, const QString& password)
-{
-    NX_ASSERT(!targetId.isNull());
-    if (targetId.isNull())
-        return;
-
-    auto server = resourcePool()->getIncompatibleServerById(targetId, true);
     NX_ASSERT(server);
     if (!server)
         return;
