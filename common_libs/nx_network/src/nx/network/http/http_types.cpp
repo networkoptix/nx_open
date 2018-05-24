@@ -230,6 +230,8 @@ StringType toString(Value val)
             return StringType("Internal Server Error");
         case notImplemented:
             return StringType("Not Implemented");
+        case badGateway:
+            return StringType("Bad Gateway");
         case serviceUnavailable:
             return StringType("Service Unavailable");
         default:

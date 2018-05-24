@@ -12,8 +12,10 @@
 #include <nx/cloud/relaying/http_view/begin_listening_http_handler.h>
 
 #include "http_handlers.h"
+#include "proxy_handler.h"
 #include "../controller/connect_session_manager.h"
 #include "../controller/controller.h"
+#include "../model/model.h"
 #include "../settings.h"
 #include "../statistics_provider.h"
 
@@ -50,10 +52,11 @@ private:
 
 View::View(
     const conf::Settings& settings,
-    const Model& /*model*/,
+    Model* model,
     Controller* controller)
     :
     m_settings(settings),
+    m_model(model),
     m_controller(controller),
     m_authenticationManager(m_authRestrictionList)
 {
@@ -126,6 +129,14 @@ void View::registerApiHandlers()
     // TODO: #ak Following handlers are here for compatibility with 3.1-beta.
     // Keep until 3.2 release just in case.
     registerCompatibilityHandlers();
+
+    m_httpMessageDispatcher.registerRequestProcessor<view::ProxyHandler>(
+        network::http::kAnyPath,
+        [this]() -> std::unique_ptr<view::ProxyHandler>
+        {
+            return std::make_unique<view::ProxyHandler>(
+                &m_model->listeningPeerPool());
+        });
 }
 
 void View::registerCompatibilityHandlers()
