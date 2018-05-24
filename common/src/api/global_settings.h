@@ -50,6 +50,7 @@ const QString kNameFrom(lit("emailFrom"));
 const QString kNameSignature(lit("emailSignature"));
 const QString kNameSupportEmail(lit("emailSupportEmail"));
 const QString kNameUpdateNotificationsEnabled(lit("updateNotificationsEnabled"));
+
 const QString kNameTimeSynchronizationEnabled(lit("timeSynchronizationEnabled"));
 const QString kNameSynchronizeTimeWithInternet(lit("synchronizeTimeWithInternet"));
 const QString kNamePrimaryTimeServer(lit("primaryTimeServer"));
@@ -57,6 +58,7 @@ const QString kMaxDifferenceBetweenSynchronizedAndInternetTime(
     lit("maxDifferenceBetweenSynchronizedAndInternetTime"));
 const QString kMaxDifferenceBetweenSynchronizedAndLocalTime(
     lit("maxDifferenceBetweenSynchronizedAndLocalTimeMs"));
+
 const QString kOsTimeChangeCheckPeriod(lit("osTimeChangeCheckPeriodMs"));
 const QString kSyncTimeExchangePeriod(lit("syncTimeExchangePeriod"));
 const QString kNameAutoDiscoveryEnabled(lit("autoDiscoveryEnabled"));

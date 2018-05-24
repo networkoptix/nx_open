@@ -21,7 +21,6 @@ class QnResourceCommandProcessor;
 
 namespace nx {
 
-namespace vms { namespace network { class ReverseConnectionManager; } }
 namespace analytics { namespace storage { class AbstractEventsStorage; } }
 namespace time_sync { class TimeSyncManager; }
 
@@ -91,8 +90,6 @@ public:
     QnResourceCommandProcessor* resourceCommandProcessor() const;
 
     nx::mediaserver::RootTool* rootTool() const;
-
-    nx::vms::network::ReverseConnectionManager* reverseConnectionManager() const;
 
 private:
     void registerResourceDataProviders();

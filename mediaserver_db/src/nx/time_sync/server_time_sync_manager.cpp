@@ -140,7 +140,7 @@ bool ServerTimeSyncManager::loadTimeFromInternet()
         return false; //< Sync already in progress.
 
     m_internetTimeSynchronizer->getTimeAsync(
-        [this](const qint64 newValue, SystemError::ErrorCode errorCode)
+        [this](const qint64 newValue, SystemError::ErrorCode errorCode, std::chrono::milliseconds rtt)
         {
             if (errorCode)
             {
@@ -149,7 +149,17 @@ bool ServerTimeSyncManager::loadTimeFromInternet()
                 m_lastNetworkSyncTime.invalidate();
                 return;
             }
-            setSyncTime(std::chrono::milliseconds(newValue));
+            const auto minDeltaToSync =
+                commonModule()->globalSettings()->maxDifferenceBetweenSynchronizedAndInternetTime();
+            if (rtt > minDeltaToSync)
+            {
+                NX_WARNING(this, lm("Failed to get time from the internet. To big rtt value %1 > %2.")
+                    .args(rtt, minDeltaToSync));
+                m_lastNetworkSyncTime.invalidate();
+                return;
+            }
+
+            setSyncTime(std::chrono::milliseconds(newValue), minDeltaToSync);
             NX_DEBUG(this, lm("Received time %1 from the internet").
                 arg(QDateTime::fromMSecsSinceEpoch(newValue).toString(Qt::ISODate)));
             m_internetSyncInProgress = false;
@@ -204,7 +214,7 @@ void ServerTimeSyncManager::updateTime()
             success = loadTimeFromServer(route);
         if (success)
         {
-            m_timeLoadFromServer == route.id;
+            m_timeLoadFromServer = route.id;
             m_lastNetworkSyncTime.restart();
         }
     }

@@ -38,7 +38,11 @@ struct QnModuleInformation;
 struct QnPeerRuntimeInfo;
 class QnLdapManager;
 struct BeforeRestoreDbData;
-namespace ec2 { class CrashReporter; }
+namespace ec2 { 
+
+class CrashReporter; 
+class LocalConnectionFactory;
+}
 
 namespace nx { namespace vms { namespace cloud_integration { struct CloudManagerGroup; } } }
 
@@ -163,7 +167,7 @@ private:
 
     bool initTcpListener(
         nx::vms::cloud_integration::CloudManagerGroup* const cloudManagerGroup,
-        ec2::TransactionMessageBusAdapter* messageBus);
+        ec2::LocalConnectionFactory* ec2ConnectionFactory);
     void initializeCloudConnect();
     void prepareOsResources();
 
@@ -203,7 +207,6 @@ private:
 
     std::unique_ptr<QnAutoRequestForwarder> m_autoRequestForwarder;
     QnUniversalTcpListener* m_universalTcpListener;
-    std::unique_ptr<nx::vms::network::ReverseConnectionManager> m_reverseConnectionManager;
     QnMediaServerResourcePtr m_mediaServer;
     QSet<QnUuid> m_updateUserRequests;
     std::map<nx::network::HostAddress, quint16> m_forwardedAddresses;

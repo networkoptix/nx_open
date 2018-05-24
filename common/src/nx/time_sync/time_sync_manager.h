@@ -92,7 +92,8 @@ protected:
 
     virtual void updateTime() = 0;
     virtual AbstractStreamSocketPtr connectToRemoteHost(const QnRoute& route);
-    virtual bool setSyncTime(std::chrono::milliseconds value);
+    virtual bool setSyncTime(
+        std::chrono::milliseconds value, std::chrono::milliseconds minDeltaToSync);
     void setSyncTimeInternal(std::chrono::milliseconds value);
 private:
     using AbstractStreamSocketPtr = std::unique_ptr<nx::network::AbstractStreamSocket>;

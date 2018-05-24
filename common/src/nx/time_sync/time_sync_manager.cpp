@@ -90,7 +90,10 @@ std::unique_ptr<nx::network::AbstractStreamSocket> TimeSyncManager::connectToRem
 void TimeSyncManager::loadTimeFromLocalClock()
 {
     auto newValue = m_systemClock->millisSinceEpoch();
-    setSyncTime(newValue);
+    const auto minDeltaToSync =
+        commonModule()->globalSettings()->maxDifferenceBetweenSynchronizedAndLocalTime();
+
+    setSyncTime(newValue, minDeltaToSync);
     NX_DEBUG(this, lm("Set time %1 from the local clock").
         arg(QDateTime::fromMSecsSinceEpoch(newValue.count()).toString(Qt::ISODate)));
 }
@@ -153,17 +156,17 @@ bool TimeSyncManager::loadTimeFromServer(const QnRoute& route)
     bool syncWithInternel = commonModule()->globalSettings()->isSynchronizingTimeWithInternet();
     if (syncWithInternel && !timeData.isTakenFromInternet)
         return false; //< Target server is not ready yet. Time is not taken from internet yet. Repeat later.
-    setSyncTime(newTime);
+    const auto minDeltaToSync =
+        commonModule()->globalSettings()->maxDifferenceBetweenSynchronizedAndLocalTime();
+    setSyncTime(newTime, minDeltaToSync);
     NX_DEBUG(this, lm("Got time %1 from the neighbor server %2")
         .args(QDateTime::fromMSecsSinceEpoch(newTime.count()).toString(Qt::ISODate),
         route.id.toString()));
     return true;
 }
 
-bool TimeSyncManager::setSyncTime(std::chrono::milliseconds value)
+bool TimeSyncManager::setSyncTime(std::chrono::milliseconds value, std::chrono::milliseconds minDeltaToSync)
 {
-    const auto minDeltaToSync = 
-        commonModule()->globalSettings()->maxDifferenceBetweenSynchronizedAndInternetTime();
     const auto syncTime = getSyncTime();
     const auto timeDelta = value < syncTime ? syncTime - value : value - syncTime;
     if (timeDelta < minDeltaToSync)

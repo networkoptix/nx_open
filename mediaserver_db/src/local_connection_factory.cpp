@@ -1969,4 +1969,9 @@ nx::time_sync::TimeSyncManager* LocalConnectionFactory::timeSyncManager() const
 	return m_timeSynchronizationManager.get();
 }
 
+nx::vms::network::ReverseConnectionManager* LocalConnectionFactory::serverConnector() const
+{
+    return m_serverConnector.get();
+}
+
 } // namespace ec2

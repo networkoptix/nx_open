@@ -67,7 +67,7 @@ public:
 	QnJsonTransactionSerializer* jsonTranSerializer() const;
 	QnUbjsonTransactionSerializer* ubjsonTranSerializer() const;
 	virtual void shutdown() override;
-
+    nx::vms::network::ReverseConnectionManager* serverConnector() const;
 private:
 	QnMutex m_mutex;
 	Settings m_settingsInstance;

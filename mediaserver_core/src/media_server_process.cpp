@@ -1229,7 +1229,6 @@ void MediaServerProcess::stopObjects()
     if (m_universalTcpListener) 
     {
         m_universalTcpListener->stop();
-        m_reverseConnectionManager.reset();
         delete m_universalTcpListener;
         m_universalTcpListener = 0;
     }
@@ -2684,8 +2683,11 @@ void MediaServerProcess::regTcp(
 
 bool MediaServerProcess::initTcpListener(
     nx::vms::cloud_integration::CloudManagerGroup* const cloudManagerGroup,
-    ec2::TransactionMessageBusAdapter* messageBus)
+    ec2::LocalConnectionFactory* ec2ConnectionFactory)
 {
+    auto messageBus = ec2ConnectionFactory->messageBus();
+    m_universalTcpListener->setCloudConnectionManager(cloudManagerGroup->connectionManager);
+
     m_autoRequestForwarder.reset( new QnAutoRequestForwarder(commonModule()));
     m_autoRequestForwarder->addPathToIgnore(lit("/ec2/*"));
 
@@ -2698,14 +2700,6 @@ bool MediaServerProcess::initTcpListener(
     int maxConnections = serverModule()->roSettings()->value(
         "maxConnections", QnTcpListener::DEFAULT_MAX_CONNECTIONS).toInt();
     NX_INFO(this) << lit("Using maxConnections = %1.").arg(maxConnections);
-
-    m_universalTcpListener = new QnUniversalTcpListener(
-        commonModule(),
-        cloudManagerGroup->connectionManager,
-        QHostAddress::Any,
-        rtspPort,
-        maxConnections,
-        acceptSslConnections);
 
     m_universalTcpListener->httpModManager()->addCustomRequestMod(std::bind(
         &QnAutoRequestForwarder::processRequest,
@@ -2759,7 +2753,7 @@ bool MediaServerProcess::initTcpListener(
 
     //regTcp<QnDefaultTcpConnectionProcessor>("HTTP", "*");
 
-    regTcp<QnProxyConnectionProcessor>("*", "proxy", serverModule()->reverseConnectionManager());
+    regTcp<QnProxyConnectionProcessor>("*", "proxy", ec2ConnectionFactory->serverConnector());
     regTcp<QnAudioProxyReceiver>("HTTP", "proxy-2wayaudio");
 
     if( !serverModule()->roSettings()->value("authenticationEnabled", "true").toBool())
@@ -3441,12 +3435,30 @@ void MediaServerProcess::run()
     runtimeData.hardwareIds = m_hardwareGuidList;
     commonModule()->runtimeInfoManager()->updateLocalItem(runtimeData);    // initializing localInfo
 
+
+    const int rtspPort = serverModule->roSettings()->value(
+        nx_ms_conf::SERVER_PORT, nx_ms_conf::DEFAULT_SERVER_PORT).toInt();
+
+    // Accept SSL connections in all cases as it is always in use by cloud modules and old clients,
+    // config value only affects server preference listed in moduleInformation.
+    bool acceptSslConnections = true;
+    int maxConnections = serverModule->roSettings()->value(
+        "maxConnections", QnTcpListener::DEFAULT_MAX_CONNECTIONS).toInt();
+    NX_INFO(this) << lit("Using maxConnections = %1.").arg(maxConnections);
+
+    m_universalTcpListener = new QnUniversalTcpListener(
+        commonModule(),
+        QHostAddress::Any,
+        rtspPort,
+        maxConnections,
+        acceptSslConnections);
+
     std::unique_ptr<ec2::LocalConnectionFactory> ec2ConnectionFactory(
         new ec2::LocalConnectionFactory(
             commonModule(),
             Qn::PT_Server,
             settings->value(nx_ms_conf::P2P_MODE_FLAG).toBool(),
-            serverModule->reverseConnectionManager()));
+            m_universalTcpListener));
 
     TimeBasedNonceProvider timeBasedNonceProvider;
 
@@ -3620,15 +3632,13 @@ void MediaServerProcess::run()
     auto hlsSessionPool = std::make_unique<nx::mediaserver::hls::SessionPool>();
 
     if (!initTcpListener(
-        &cloudIntegrationManager->cloudManagerGroup(), 
-        ec2ConnectionFactory->messageBus()))
+        &cloudIntegrationManager->cloudManagerGroup(),
+        ec2ConnectionFactory.get()))
     {
         qCritical() << "Failed to bind to local port. Terminating...";
         QCoreApplication::quit();
         return;
     }
-    m_reverseConnectionManager.reset(
-        new nx::vms::network::ReverseConnectionManager(m_universalTcpListener));
 
     if (appServerUrl.scheme().toLower() == lit("file"))
         ec2ConnectionFactory->registerRestHandlers(m_universalTcpListener->processorPool());
@@ -3638,7 +3648,7 @@ void MediaServerProcess::run()
     using namespace std::placeholders;
     m_universalTcpListener->setProxyHandler<QnProxyConnectionProcessor>(
         &QnUniversalRequestProcessor::isProxy,
-        serverModule->reverseConnectionManager());
+        ec2ConnectionFactory->serverConnector());
     auto processor = dynamic_cast<QnServerMessageProcessor*> (commonModule()->messageProcessor());
     processor->registerProxySender(m_universalTcpListener);
 

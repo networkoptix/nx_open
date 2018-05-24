@@ -35,7 +35,16 @@ QnRoute QnRouter::routeTo(const QnUuid &id)
     if (!connection)
         return result; // no connection to the server, can't route
 
-    bool isknownServer = commonModule()->resourcePool()->getResourceById<QnMediaServerResource>(id) != 0;
+    auto server = commonModule()->resourcePool()->getResourceById<QnMediaServerResource>(id);
+    if (server && server->getId() == commonModule()->moduleGUID())
+    {
+        // Route to himself
+        result.addr.address = server->getApiUrl().host();
+        result.addr.port = server->getApiUrl().port();
+        return result;
+    }
+
+    bool isknownServer = server != 0;
     bool isClient = !commonModule()->remoteGUID().isNull()
         && commonModule()->remoteGUID() != commonModule()->moduleGUID();
     if (!isknownServer && isClient) 

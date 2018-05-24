@@ -19,7 +19,6 @@
 
 QnUniversalTcpListener::QnUniversalTcpListener(
     QnCommonModule* commonModule,
-    const nx::vms::cloud_integration::CloudConnectionManager& cloudConnectionManager,
     const QHostAddress& address,
     int port,
     int maxConnections,
@@ -31,18 +30,22 @@ QnUniversalTcpListener::QnUniversalTcpListener(
         port,
         maxConnections,
         useSsl),
-    m_cloudConnectionManager(cloudConnectionManager),
     m_boundToCloud(false),
     m_httpModManager(new nx::network::http::HttpModManager())
 {
     m_cloudCredentials.serverId = commonModule->moduleGUID().toByteArray();
+}
+
+void QnUniversalTcpListener::setCloudConnectionManager(
+    const nx::vms::cloud_integration::CloudConnectionManager& cloudConnectionManager)
+{
     Qn::directConnect(
         &cloudConnectionManager, &nx::vms::cloud_integration::CloudConnectionManager::cloudBindingStatusChanged,
         this,
         [this, &cloudConnectionManager](bool /*boundToCloud*/)
-        {
-            onCloudBindingStatusChanged(cloudConnectionManager.getSystemCredentials());
-        });
+    {
+        onCloudBindingStatusChanged(cloudConnectionManager.getSystemCredentials());
+    });
     onCloudBindingStatusChanged(cloudConnectionManager.getSystemCredentials());
 }
 

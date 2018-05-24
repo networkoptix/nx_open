@@ -24,12 +24,14 @@ class QnUniversalTcpListener:
 public:
     QnUniversalTcpListener(
         QnCommonModule* commonModule,
-        const nx::vms::cloud_integration::CloudConnectionManager& cloudConnectionManager,
         const QHostAddress& address,
         int port,
         int maxConnections,
         bool useSsl);
     ~QnUniversalTcpListener();
+
+    void setCloudConnectionManager(
+        const nx::vms::cloud_integration::CloudConnectionManager& cloudConnectionManager);
 
     void addProxySenderConnections(const nx::network::SocketAddress& proxyUrl, int size);
     nx::network::http::HttpModManager* httpModManager() const;
@@ -51,7 +53,6 @@ protected:
     virtual void destroyServerSocket(nx::network::AbstractStreamServerSocket* serverSocket) override;
 
 private:
-    const nx::vms::cloud_integration::CloudConnectionManager& m_cloudConnectionManager;
     nx::network::MultipleServerSocket* m_multipleServerSocket;
     std::unique_ptr<nx::network::AbstractStreamServerSocket> m_serverSocket;
     QnMutex m_mutex;
