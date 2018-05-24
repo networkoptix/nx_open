@@ -128,6 +128,7 @@ def sync_dependencies(syncher):
         sync("vmaxproxy-2.1")
         sync("windows/wix-3.11", path_variable="wix_directory")
         sync("windows/signtool", path_variable="signtool_directory")
+        sync("windows/pandoc-2.2.1", path_variable="pandoc_directory")
 
     if box == "edge1":
         sync("cpro-1.0.0-2")
@@ -172,7 +173,7 @@ def sync_dependencies(syncher):
         #sync("additional-fonts")
         #sync("read-edid-3.0.2")
         #sync("a10-display")
-        
+
         # Hardware video decoding in Lite Client on Debian 7; kernel upgrade.
         #sync("libvdpau-sunxi-1.0-deb7")
         #sync("proxy-decoder-deb7")

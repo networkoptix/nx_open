@@ -17,7 +17,7 @@
         <util:ProductSearchRef Id='ClientMsiSearch' />
 
         <BootstrapperApplicationRef Id="WixStandardBootstrapperApplication.HyperlinkLicense">
-            <Payload SourceFile="$(var.CustomizationDir)/wixsetup/License.html" />
+            <Payload SourceFile="$(var.CustomizationDir)/license.html" />
             <Payload SourceFile="$(var.CustomizationDir)/icons/windows/installer_bg.png" />
             <Payload SourceFile="$(var.CustomizationDir)/icons/windows/logo-102x102.png" />
             <Payload SourceFile="$(var.CustomizationDir)/icons/windows/logo-64x64.png" />
@@ -29,7 +29,7 @@
                 SuppressDowngradeFailure="yes"
                 ThemeFile="OptixTheme.xml"
                 LocalizationFile="theme_$(var.installerLanguage).wxl"
-                LicenseUrl="License.html"
+                LicenseUrl="license.html"
                 LaunchTarget="$(var.clientInstallFullPath)\$(var.releaseVersionFull)\$(var.minilauncherBinaryName)"
             />
         </BootstrapperApplicationRef>

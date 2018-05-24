@@ -14,14 +14,14 @@
         <util:RegistrySearchRef Id='ArchRegistrySearch' />
 
         <BootstrapperApplicationRef Id="WixStandardBootstrapperApplication.HyperlinkLicense">
-            <Payload SourceFile="$(var.CustomizationDir)/wixsetup/License.html" />
+            <Payload SourceFile="$(var.CustomizationDir)/license.html" />
             <Payload SourceFile="$(var.CustomizationDir)/icons/windows/installer_bg.png" />
             <Payload SourceFile="$(var.CustomizationDir)/icons/windows/logo-102x102.png" />
             <Payload SourceFile="$(var.CustomizationDir)/icons/windows/logo-64x64.png" />
 
             <bal:WixStandardBootstrapperApplication
                 SuppressOptionsUI="yes"
-                LicenseUrl="License.html"
+                LicenseUrl="license.html"
                 ShowFilesInUse="yes"
                 SuppressRepair="yes"
                 ThemeFile="OptixTheme.xml"
