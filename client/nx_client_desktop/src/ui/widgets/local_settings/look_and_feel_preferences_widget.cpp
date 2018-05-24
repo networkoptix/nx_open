@@ -63,7 +63,7 @@ QnLookAndFeelPreferencesWidget::QnLookAndFeelPreferencesWidget(QWidget *parent) 
 
     ui->showIpInTreeCheckBoxHint->setHint(tr("Displays IP addresses for cameras and servers and roles for users."));
     ui->timeModeLabel->setHint(tr("Sets the time to use in the client (timeline, timestamps, etc.) when client and server machines are in different time zones."));
-    ui->tourCycleTimeLabel->setHint(tr("Length of time each camera on layout will be displayed if you start a Showreel."));
+    ui->tourCycleTimeLabel->setHint(tr("Length of time each camera on layout will be displayed if you start a Tour."));
     setHelpTopic(ui->tourCycleTimeLabel, Qn::SystemSettings_General_TourCycleTime_Help);
 
     auto aligner = new QnAligner(this);
