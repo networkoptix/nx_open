@@ -54,7 +54,7 @@ int RelayService::serviceMain(const utils::AbstractServiceSettings& abstractSett
         return -1;
     }
 
-    View view(settings, model, &controller);
+    View view(settings, &model, &controller);
     m_view = &view;
 
     auto statisticsProvider = StatisticsProviderFactory::instance().create(

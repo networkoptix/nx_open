@@ -28,7 +28,7 @@ public:
 
     View(
         const conf::Settings& settings,
-        const Model& model,
+        Model* model,
         Controller* controller);
     ~View();
 
@@ -42,6 +42,7 @@ public:
 
 private:
     const conf::Settings& m_settings;
+    Model* m_model;
     Controller* m_controller;
     nx::network::http::server::rest::MessageDispatcher m_httpMessageDispatcher;
     nx::network::http::AuthMethodRestrictionList m_authRestrictionList;
