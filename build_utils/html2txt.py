@@ -7,7 +7,7 @@ import re
 
 def html2txt(infile, outfile):
     source = infile.read()
-    outfile.write(re.sub('<.*?>', '', source, flags=re.MULTILINE))
+    outfile.write(re.sub('<.*?>', '', source, flags=re.MULTILINE|re.DOTALL))
     return True
 
 
