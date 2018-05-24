@@ -21,9 +21,9 @@
   <String Id="HelpHeader">วิธีใช้การตั้งค่า</String>
   <String Id="HelpCloseButton">ปิด</String>
   <String Id="InstallOptionsButton">ตัวเลือก</String>
-  <String Id="InstallInstallButton">Install</String>
+  <String Id="InstallInstallButton">ติดตั้ง</String>
   <String Id="InstallCloseButton">ปิด</String>
-  <String Id="InstallAcceptCheckbox">I agree to the</String>
+  <String Id="InstallAcceptCheckbox">ฉันยอมรับข้อกำหนดในการให้บริการ</String>
   <String Id="InstallLicenseLinkText">ข้อตกลงของผู้ใช้บริการ</String>
   <String Id="OptionsHeader">ตัวเลือกการตั้งค่า</String>
   <String Id="OptionsLocationLabel">ตำแหน่งการติดตั้ง:</String>

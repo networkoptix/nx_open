@@ -4528,8 +4528,8 @@ to %1</source>
       <translation type="unfinished">Displays IP addresses for cameras and servers and roles for users.</translation>
     </message>
     <message>
-      <source>Length of time each camera on layout will be displayed if you start a Showreel.</source>
-      <translation type="unfinished">Length of time each camera on layout will be displayed if you start a Showreel.</translation>
+      <source>Length of time each camera on layout will be displayed if you start a Tour.</source>
+      <translation type="unfinished">Length of time each camera on layout will be displayed if you start a Tour.</translation>
     </message>
   </context>
   <context>

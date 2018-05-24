@@ -1423,15 +1423,15 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Archive can be deleted in case if there are no space for new recording.</source>
-      <translation type="unfinished">Archive can be deleted in case if there are no space for new recording.</translation>
+      <translation>Het archief kan worden verwijderd voor het geval er geen ruimte is voor nieuwe opnamen.</translation>
     </message>
     <message>
       <source>Min and Max settings determine the age of archive which should be kept for this camera.</source>
-      <translation type="unfinished">Min and Max settings determine the age of archive which should be kept for this camera.</translation>
+      <translation>De instellingen Min en Max bepalen de duur dat het archief voor deze camera moet worden bewaard.</translation>
     </message>
     <message>
       <source>If &quot;Auto&quot; option is enabled, the oldest footage among all cameras will be deleted first.</source>
-      <translation type="unfinished">If &quot;Auto&quot; option is enabled, the oldest footage among all cameras will be deleted first.</translation>
+      <translation>Als de optie &quot;Auto&quot; is ingeschakeld, worden de oudste opnames van alle camera's eerst verwijderd.</translation>
     </message>
   </context>
   <context>
@@ -4525,8 +4525,8 @@ to %1</source>
       <translation type="unfinished">Displays IP addresses for cameras and servers and roles for users.</translation>
     </message>
     <message>
-      <source>Length of time each camera on layout will be displayed if you start a Showreel.</source>
-      <translation type="unfinished">Length of time each camera on layout will be displayed if you start a Showreel.</translation>
+      <source>Length of time each camera on layout will be displayed if you start a Tour.</source>
+      <translation type="unfinished">Length of time each camera on layout will be displayed if you start a Tour.</translation>
     </message>
   </context>
   <context>

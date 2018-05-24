@@ -1437,15 +1437,15 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Archive can be deleted in case if there are no space for new recording.</source>
-      <translation type="unfinished">Archive can be deleted in case if there are no space for new recording.</translation>
+      <translation>Nagrania archiwalne mogą być usuwane w przypadku, gdy nie ma miejsca na nowe nagrania.</translation>
     </message>
     <message>
       <source>Min and Max settings determine the age of archive which should be kept for this camera.</source>
-      <translation type="unfinished">Min and Max settings determine the age of archive which should be kept for this camera.</translation>
+      <translation>Ustawienia Min i Max określają zakres archiwum, który należy przechowywać dla danej kamery.</translation>
     </message>
     <message>
       <source>If &quot;Auto&quot; option is enabled, the oldest footage among all cameras will be deleted first.</source>
-      <translation type="unfinished">If &quot;Auto&quot; option is enabled, the oldest footage among all cameras will be deleted first.</translation>
+      <translation>Jeśli opcja &quot;Auto&quot; jest włączona, najstarsze nagrania z kamer zostaną usunięte jako pierwsze.</translation>
     </message>
   </context>
   <context>
@@ -3216,15 +3216,15 @@ to %1</source>
     </message>
     <message>
       <source>Event will trigger only if there are matches in the source with any of the entered keywords.</source>
-      <translation type="unfinished">Event will trigger only if there are matches in the source with any of the entered keywords.</translation>
+      <translation>Zdarzenie uruchomi się tylko wtedy, gdy w polu źródła zdarzenia znajdują się dowolne z wprowadzonych słów kluczowych.</translation>
     </message>
     <message>
       <source>Event will trigger only if there are matches in the caption with any of the entered keywords.</source>
-      <translation type="unfinished">Event will trigger only if there are matches in the caption with any of the entered keywords.</translation>
+      <translation>Zdarzenie uruchomi się tylko wtedy, gdy w polu tytułu zdarzenia znajdują się dowolne z wprowadzonych słów kluczowych.</translation>
     </message>
     <message>
       <source>Event will trigger only if there are matches in the description with any of the entered keywords.</source>
-      <translation type="unfinished">Event will trigger only if there are matches in the description with any of the entered keywords.</translation>
+      <translation>Zdarzenie uruchomi się tylko wtedy, gdy w polu opisu zdarzenia znajdują się dowolne z wprowadzonych słów kluczowych.</translation>
     </message>
   </context>
   <context>
@@ -3442,7 +3442,7 @@ to %1</source>
     <name>QnEmptyBusinessActionWidget</name>
     <message>
       <source>Panic Recording mode switches recording settings for all cameras to maximum FPS and quality.</source>
-      <translation type="unfinished">Panic Recording mode switches recording settings for all cameras to maximum FPS and quality.</translation>
+      <translation>Nagrywanie w trybie paniki zmienia ustawienia nagrywania dla wszystkich kamer na maksymalną jakość i liczbę klatek FPS.</translation>
     </message>
   </context>
   <context>
@@ -4628,11 +4628,11 @@ to %1</source>
     </message>
     <message>
       <source>Displays IP addresses for cameras and servers and roles for users.</source>
-      <translation type="unfinished">Displays IP addresses for cameras and servers and roles for users.</translation>
+      <translation>Wyświetla adresy IP kamer, serwerów i grupy użytkowników.</translation>
     </message>
     <message>
-      <source>Length of time each camera on layout will be displayed if you start a Showreel.</source>
-      <translation type="unfinished">Length of time each camera on layout will be displayed if you start a Showreel.</translation>
+      <source>Length of time each camera on layout will be displayed if you start a Tour.</source>
+      <translation type="unfinished">Length of time each camera on layout will be displayed if you start a Tour.</translation>
     </message>
   </context>
   <context>
@@ -6849,11 +6849,11 @@ to %1</source>
     </message>
     <message>
       <source>Includes information about system, such as cameras models and firmware versions, number of servers, etc.</source>
-      <translation type="unfinished">Includes information about system, such as cameras models and firmware versions, number of servers, etc.</translation>
+      <translation>Zawiera informacje o systemie, takie jak modele kamer i wersje firmware, liczbę serwerów itp.</translation>
     </message>
     <message>
       <source>Does not include any personal information and is completely anonymous.</source>
-      <translation type="unfinished">Does not include any personal information and is completely anonymous.</translation>
+      <translation>Nie zawiera informacji osobistych i jest całkowicie anonimowe.</translation>
     </message>
   </context>
   <context>
@@ -8740,7 +8740,7 @@ to %1</source>
     </message>
     <message>
       <source>Event will trigger only if there are matches in the caption with any of the entered keywords.</source>
-      <translation type="unfinished">Event will trigger only if there are matches in the caption with any of the entered keywords.</translation>
+      <translation>Zdarzenie uruchomi się tylko wtedy, gdy w polu tytułu zdarzenia znajdują się dowolne z wprowadzonych słów kluczowych.</translation>
     </message>
   </context>
   <context>

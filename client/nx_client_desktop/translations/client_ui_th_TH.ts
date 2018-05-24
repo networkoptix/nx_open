@@ -1740,7 +1740,7 @@
     <message>
       <location/>
       <source>IP addresses for cameras, and servers, groups for users, etc.</source>
-      <translation type="unfinished">IP addresses for cameras, and servers, groups for users, etc.</translation>
+      <translation>แสดงที่อยู่ IP สำหรับกล้องและเซิร์ฟเวอร์และกลุ่มสำหรับผู้ใช้</translation>
     </message>
   </context>
   <context>
