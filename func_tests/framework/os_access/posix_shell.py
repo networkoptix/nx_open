@@ -131,7 +131,9 @@ class SSH(PosixShell):
                     except UnicodeDecodeError:
                         output_logger.debug("Binary: %d bytes", len(output_chunk))
             if not subprocess_responded:
+                subprocess_logger.debug("Exit status: %r.", channel.exit_status)
                 if channel.exit_status != -1:
+                    assert 0 <= channel.exit_status <= 255
                     subprocess_logger.error("Remote process exited but streams left open (child forked?)")
                     break  # Leave
                 if not wait_for_data.again():
