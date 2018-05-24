@@ -1,8 +1,10 @@
-This is functional tests for nx witness server.
+This is functional tests for Network Optix Media Server and its customizations.
 
 See
 https://networkoptix.atlassian.net/wiki/display/SD/Functional+test+environment
 for HOWTO use them
+
+Run `bootstrap.sh` to prepare environment.
 
 To run these functional tests following requirements must be met:
 * python-opencv, virtualbox and vagrant >= 1.8 packages are installed:
