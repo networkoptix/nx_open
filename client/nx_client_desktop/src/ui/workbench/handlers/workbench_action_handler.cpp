@@ -17,6 +17,8 @@
 #include <QtWidgets/QPushButton>
 #include <QtWidgets/QWhatsThis>
 
+#include <QtWebKitWidgets/QWebView>
+
 #include <api/network_proxy_factory.h>
 #include <api/global_settings.h>
 #include <api/server_rest_connection.h>
@@ -180,6 +182,7 @@
 #include "network/authutil.h"
 #include <core/resource/fake_media_server.h>
 #include <client/client_app_info.h>
+#include <ui/style/webview_style.h>
 
 namespace {
 
@@ -692,19 +695,37 @@ void ActionHandler::showMultipleCamerasErrorMessage(
 
 void ActionHandler::showEula()
 {
-    QFile eula(lit(":/license.txt"));
+    const QString eulaHtmlStyle = QString::fromLatin1(R"(
+    <style media="screen" type="text/css">
+    p {
+        color: %1;
+        font-family: 'Roboto-Regular', 'Roboto';
+        font-weight: 400;
+        font-style: normal;
+        font-size: 13px;
+        line-height: 16px;
+    }
+    </style>)").arg(qApp->palette().color(QPalette::WindowText).name());
+
+    QFile eula(lit(":/license.html"));
     eula.open(QIODevice::ReadOnly);
-    const QString eulaText = QString::fromUtf8(eula.readAll());
+    QString eulaText = QString::fromUtf8(eula.readAll());
+    eulaText = eulaText.replace(
+        lit("<head>"),
+        lit("<head>%1").arg(eulaHtmlStyle)
+    );
 
     QnMessageBox eulaDialog(context()->mainWindow());
     eulaDialog.setIcon(QnMessageBoxIcon::Warning);
     eulaDialog.setText(tr("To use the software you must accept the end user license agreement"));
 
-    auto textEdit = new QPlainTextEdit(&eulaDialog);
-    textEdit->setPlainText(eulaText);
-    textEdit->setReadOnly(true);
-    textEdit->setFixedSize(740, 560);
-    eulaDialog.addCustomWidget(textEdit, QnMessageBox::Layout::Content, 1);
+    auto view = new QWebView(&eulaDialog);
+    NxUi::setupWebViewStyle(view, NxUi::WebViewStyle::eula);
+    view->setHtml(eulaText);
+    view->setFixedSize(740, 560);
+    view->show();
+    eulaDialog.addCustomWidget(view);
+
     eulaDialog.addButton(tr("Accept"), QDialogButtonBox::AcceptRole, Qn::ButtonAccent::Standard);
     eulaDialog.addButton(tr("Decline"), QDialogButtonBox::RejectRole);
 
@@ -714,7 +735,7 @@ void ActionHandler::showEula()
     }
     else
     {
-        menu()->trigger(action::DelayedForcedExitAction);
+        executeLater([this] { closeApplication(true); }, this);
     }
 }
 
