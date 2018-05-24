@@ -56,7 +56,7 @@ Accessing the account page from a direct link while logged out asks for login, o
     Validate Log In
     Verify in account page
 
-Subscribe check box is automatically checked when registering
+Subscribe check box is automatically checked after registering
     [tags]    email
     ${random email}    Get Random Email    ${BASE EMAIL}
     Go To    ${url}/register
