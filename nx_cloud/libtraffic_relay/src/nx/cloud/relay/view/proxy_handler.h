@@ -27,6 +27,8 @@ protected:
 
 private:
     relaying::AbstractListeningPeerPool* m_listeningPeerPool;
+
+    std::string extractOnlineHostName(const std::string& hostHeader);
 };
 
 } // namespace view

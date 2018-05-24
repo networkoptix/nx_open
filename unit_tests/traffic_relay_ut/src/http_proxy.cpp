@@ -51,8 +51,12 @@ protected:
         using namespace std::placeholders;
 
         auto url = basicUrl();
-        m_listeningPeerHostName = QnUuid::createUuid().toSimpleString();
-        url.setUserName(m_listeningPeerHostName);
+        if (m_listeningPeerHostName.empty())
+        {
+            m_listeningPeerHostName =
+                QnUuid::createUuid().toSimpleByteArray().toStdString();
+        }
+        url.setUserName(m_listeningPeerHostName.c_str());
 
         auto acceptor = std::make_unique<RelayConnectionAcceptor>(url);
         m_peerServer = std::make_unique<nx::network::http::TestHttpServer>(
@@ -64,50 +68,57 @@ protected:
             nx::network::http::Method::get);
         m_peerServer->server().start();
 
-        while (!moduleInstance()->listeningPeerPool().isPeerOnline(
-            m_listeningPeerHostName.toStdString()))
-        {
+        while (!moduleInstance()->listeningPeerPool().isPeerOnline(m_listeningPeerHostName))
             std::this_thread::sleep_for(std::chrono::milliseconds(1));
-        }
+    }
+
+    void givenListeningPeerWithCompositeName()
+    {
+        m_listeningPeerHostName =
+            QnUuid::createUuid().toSimpleByteArray().toStdString() +
+            "." +
+            QnUuid::createUuid().toSimpleByteArray().toStdString();
+
+        givenListeningPeer();
     }
 
     void whenSendHttpRequestToPeer()
     {
-        m_httpClient = std::make_unique<nx::network::http::AsyncClient>();
-        m_httpClient->doGet(
-            nx::network::url::Builder(proxyUrlForHost(m_listeningPeerHostName))
-                .setPath(kTestPath),
-            std::bind(&HttpProxy::saveResponse, this));
+        sendHttpRequestToPeer(m_listeningPeerHostName);
+    }
+
+    void whenSendHttpRequestToUnknownPeer()
+    {
+        sendHttpRequestToPeer(nx::utils::generateRandomName(7).toStdString());
+    }
+
+    void thenResponseIsReceived()
+    {
+        m_lastResponse = m_httpResponseQueue.pop();
+        ASSERT_NE(nullptr, m_lastResponse);
     }
 
     void thenResponseFromPeerIsReceived()
     {
-        auto response = m_httpResponseQueue.pop();
-        ASSERT_NE(nullptr, response);
-        ASSERT_EQ(nx::network::http::StatusCode::ok, response->statusLine.statusCode);
-        ASSERT_EQ(kTestMessage, response->messageBody);
+        thenResponseIsReceived();
+        andResponseStatusCodeIs(nx::network::http::StatusCode::ok);
+
+        ASSERT_EQ(kTestMessage, m_lastResponse->messageBody);
     }
 
-    nx::utils::Url proxyUrlForHost(const QString& hostName)
+    void andResponseStatusCodeIs(nx::network::http::StatusCode::Value expected)
     {
-        auto url = basicUrl();
-
-        auto host = lm("%1.gw.%2").args(hostName, url.host()).toQString();
-        nx::network::SocketGlobals::addressResolver().addFixedAddress(
-            host, network::SocketAddress(network::HostAddress::localhost, url.port()));
-        m_registeredHostNames.push_back(host);
-        url.setHost(host);
-
-        return url;
+        ASSERT_EQ(expected, m_lastResponse->statusLine.statusCode);
     }
 
 private:
-    QString m_listeningPeerHostName;
+    std::string m_listeningPeerHostName;
     std::unique_ptr<nx::network::http::TestHttpServer> m_peerServer;
     std::unique_ptr<nx::network::http::AsyncClient> m_httpClient;
     nx::utils::SyncQueue<std::unique_ptr<nx::network::http::Response>>
         m_httpResponseQueue;
-    std::vector<QString> m_registeredHostNames;
+    std::vector<std::string> m_registeredHostNames;
+    std::unique_ptr<nx::network::http::Response> m_lastResponse;
 
     virtual void SetUp() override
     {
@@ -128,6 +139,28 @@ private:
             m_httpResponseQueue.push(nullptr);
         }
     }
+
+    void sendHttpRequestToPeer(const std::string& hostName)
+    {
+        m_httpClient = std::make_unique<nx::network::http::AsyncClient>();
+        m_httpClient->doGet(
+            nx::network::url::Builder(proxyUrlForHost(hostName))
+                .setPath(kTestPath),
+            std::bind(&HttpProxy::saveResponse, this));
+    }
+
+    nx::utils::Url proxyUrlForHost(const std::string& hostName)
+    {
+        auto url = basicUrl();
+
+        auto host = lm("%1.gw.%2").args(hostName, url.host()).toStdString();
+        nx::network::SocketGlobals::addressResolver().addFixedAddress(
+            host, network::SocketAddress(network::HostAddress::localhost, url.port()));
+        m_registeredHostNames.push_back(host);
+        url.setHost(host.c_str());
+
+        return url;
+    }
 };
 
 TEST_F(HttpProxy, request_is_passed_to_listening_peer)
@@ -137,7 +170,21 @@ TEST_F(HttpProxy, request_is_passed_to_listening_peer)
     thenResponseFromPeerIsReceived();
 }
 
-// TEST_F(HttpProxy, works_for_peer_with_complex_name)
+TEST_F(HttpProxy, proxy_to_unknown_host_produces_bad_gateway_error)
+{
+    givenListeningPeer();
+    whenSendHttpRequestToUnknownPeer();
+
+    thenResponseIsReceived();
+    andResponseStatusCodeIs(nx::network::http::StatusCode::badGateway);
+}
+
+TEST_F(HttpProxy, works_for_peer_with_composite_name)
+{
+    givenListeningPeerWithCompositeName();
+    whenSendHttpRequestToPeer();
+    thenResponseFromPeerIsReceived();
+}
 
 } // namespace test
 } // namespace relay

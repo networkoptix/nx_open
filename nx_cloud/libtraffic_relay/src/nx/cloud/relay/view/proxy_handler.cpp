@@ -19,6 +19,7 @@ ProxyHandler::TargetHost ProxyHandler::cutTargetFromRequest(
     nx::network::http::Request* const request)
 {
     ProxyHandler::TargetHost result;
+    result.sslMode = network::http::server::proxy::SslMode::followIncomingConnection;
 
     auto hostHeaderIter = request->headers.find("Host");
     if (hostHeaderIter == request->headers.end())
@@ -27,11 +28,16 @@ ProxyHandler::TargetHost ProxyHandler::cutTargetFromRequest(
         return result;
     }
 
-    // TODO: #ak Following check is not valid.
-    const auto host = hostHeaderIter->second.split('.').front();
+    const auto host = extractOnlineHostName(
+        hostHeaderIter->second.toStdString());
+    if (host.empty())
+    {
+        result.status = network::http::StatusCode::badGateway;
+        return result;
+    }
 
     result.target = network::SocketAddress(
-        host.constData(), network::http::DEFAULT_HTTP_PORT);
+        host, network::http::DEFAULT_HTTP_PORT);
     result.status = network::http::StatusCode::ok;
     return result;
 }
@@ -41,6 +47,26 @@ std::unique_ptr<network::aio::AbstractAsyncConnector>
 {
     return std::make_unique<relaying::ListeningPeerConnector>(
         m_listeningPeerPool);
+}
+
+std::string ProxyHandler::extractOnlineHostName(
+    const std::string& hostHeader)
+{
+    constexpr int kMaxHostDepth = 2;
+
+    int pos = -1;
+    for (int i = 0; i < kMaxHostDepth; ++i)
+    {
+        pos = hostHeader.find('.', pos + 1);
+        if (pos == -1)
+            break;
+
+        const auto host = hostHeader.substr(0, pos);
+        if (m_listeningPeerPool->isPeerOnline(host))
+            return host;
+    }
+
+    return std::string();
 }
 
 } // namespace view
