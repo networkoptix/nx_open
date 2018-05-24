@@ -125,9 +125,10 @@ namespace detail {
 class AsyncUpdateCheckerImpl: private detail::data_provider::AbstractAsyncRawDataProviderHandler
 {
 public:
-    void check(const QString& baseUrl, UpdateCheckCallback callback)
+    void check(UpdateCheckCallback callback, const QnUuid& selfPeerId, const QString& baseUrl)
     {
         m_baseUrl = baseUrl;
+        m_peerId = selfPeerId;
         m_rawDataParser = RawDataParserFactory::create();
         m_rawDataProvider = RawDataProviderFactory::create(baseUrl, this);
         m_updateCallback = std::move(callback);
@@ -136,6 +137,7 @@ public:
 
 private:
     QString m_baseUrl;
+    QnUuid m_peerId;
     AbstractAsyncRawDataProviderPtr m_rawDataProvider;
     AbstractRawDataParserPtr m_rawDataParser;
     UpdateCheckCallback m_updateCallback;
@@ -184,6 +186,7 @@ private:
         m_updateCallback(
             resultCode,
             UpdateRegistryFactory::create(
+                m_peerId,
                 m_baseUrl,
                 std::move(m_updatesMetaData),
                 m_specificUpdatesFetcher->take()));
@@ -199,9 +202,12 @@ AsyncUpdateChecker::AsyncUpdateChecker(): m_impl(new detail::AsyncUpdateCheckerI
 
 AsyncUpdateChecker::~AsyncUpdateChecker() = default;
 
-void AsyncUpdateChecker::check(UpdateCheckCallback callback, const QString& baseUrl)
+void AsyncUpdateChecker::check(
+    UpdateCheckCallback callback,
+    const QnUuid& selfPeerId,
+    const QString& baseUrl)
 {
-    m_impl->check(baseUrl, std::move(callback));
+    m_impl->check(std::move(callback), selfPeerId, baseUrl);
 }
 
 QString toString(ResultCode resultCode)

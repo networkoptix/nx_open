@@ -1,7 +1,7 @@
 #pragma once
 
 #include <QtWidgets/QWidget>
-#include <QTimer>
+#include <QtCore/QTimer>
 #include "ui/style/generic_palette.h"
 #include <array>
 
@@ -12,48 +12,58 @@ namespace desktop {
 /**
  * Magic circle to control PTZ+rotation.
  * It consists of central joystick for pan/tilt control, and circle slider to control rotation.
- * TODO: Make proper events for changed pan/tilt and rotation
- * TODO: Fix handler for rotation. Now it starts at the center
- * TODO: Fix logic for arrow buttons
+ * TODO: Fix logic for arrow buttons.
  */
 class LensPtzControl: public QWidget
 {
-    Q_OBJECT;
+    Q_OBJECT
     using base_type = QWidget;
 
 public:
     LensPtzControl(QWidget* parent);
-    virtual ~LensPtzControl();
+    virtual ~LensPtzControl() override;
 
     virtual QSize sizeHint() const override;
 
+    // Set if rotation control is enabled.
+    void setRotationEnabled(bool value);
+    bool rotationEnabled() const;
+
+    // Set if pan/tilt control is enabled.
+    void setPanTiltEnabled(bool value);
+    bool panTiltEnabled() const;
+
     struct Value
     {
-        float rotation;
-        float horisontal;
-        float vertical;
+        float rotation = 0;
+        float horizontal = 0;
+        float vertical = 0;
     };
 
+    Value value() const;
+    void setValue(const Value& val);
+
 signals:
-    void onUpdateValue(const Value& value);
+    void valueChanged(const Value& value);
 
 protected:
     virtual void paintEvent(QPaintEvent* event) override;
-    virtual void changeEvent(QEvent* event) override;
     virtual void resizeEvent(QResizeEvent* event) override;
     virtual void mousePressEvent(QMouseEvent* event) override;
     virtual void mouseReleaseEvent(QMouseEvent* event) override;
-    virtual void mouseMoveEvent(QMouseEvent *event) override;
+    virtual void mouseMoveEvent(QMouseEvent* event) override;
 
 protected:
-    // Works like button, but without soul of Qt widget
+    // Works like button, but without soul of a Qt widget.
     struct Button
     {
         QRect rect;
         bool isHovered = false;
         bool isClicked = false;
 
+        // Changes 'clicked' state. Returns true if state has been changed.
         bool setClicked(bool value);
+        // Changes 'hovered' state. Returns true if state has been changed.
         bool setHover(bool value);
         bool picks(const QPointF& point) const;
 
@@ -72,17 +82,18 @@ protected:
 
     std::array<Button, ButtonMax> m_buttons;
 
-    // Joystick handler
+    // Joystick handler.
+    // Another soulless widget.
     struct Handler
     {
         QPointF position;
         bool picked = false;
         bool hover = false;
-        // Radius of the handler
+        // Radius of the handler.
         float radius;
-        // Max distance the handler can be dragged from the center
+        // Max distance the handler can be dragged from the center.
         float maxDistance = -1;
-        // Min distance the handler can be dragged from the center
+        // Min distance the handler can be dragged from the center.
         float minDistance = -1;
 
         bool dragTo(const QPointF& point);
@@ -93,11 +104,14 @@ protected:
 
     void updateState();
 
-    void drawRotationCircle(QPainter& painter, const QRectF& rect, float rotation) const;
-    void drawHandler(QPainter& painter, const Handler& handler) const;
-    void drawButton(QPainter& painter, const Button& button) const;
+    void onButtonClicked(ButtonType button);
 
-    // Converts screen cordinates to local coordinates, relative to control's center
+    void drawRotationCircle(QPainter* painter, const QRectF& rect) const;
+    void drawRotationValue(QPainter* painter, const QRectF& rect, float rotation) const;
+    void drawHandler(QPainter* painter, const Handler& handler) const;
+    void drawButton(QPainter* painter, const Button& button) const;
+
+    // Converts screen cordinates to local coordinates, relative to control's center.
     QPointF screenToLocal(const QPointF& pos) const;
 
     enum State
@@ -105,16 +119,25 @@ protected:
         StateInitial,
         StateHandlePtz,
         StateHandleRotation,
+        StateHoldButton,
     };
 
     State m_state = StateInitial;
-    // Radius for the control
+    // Radius for the control.
+    // It is updated every time widget was resized.
     float m_radius;
-    // Current state for rotation
-    float m_rotation = 0.0;
+
+    // Current state of control.
+    Value m_current;
+    // Increment for horizontal or vertical axis.
+    // It is applied when you press arrow buttons on the widget.
+    float m_increment = 0.1f;
 
     Handler m_ptzHandler;
     Handler m_rotationHandler;
+
+    bool m_rotationEnabled = true;
+    bool m_panTiltEnabled = true;
 
     QnGenericPalette m_palette;
 

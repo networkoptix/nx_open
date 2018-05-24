@@ -4,6 +4,8 @@
 #include <QtWidgets/QHBoxLayout>
 #include <QtWidgets/QVBoxLayout>
 #include <QtWidgets/QToolButton>
+#include <QtWidgets/QMenu>
+#include <QtGui/QMouseEvent>
 
 #include <business/business_resource_validation.h>
 #include <client/client_settings.h>
@@ -13,6 +15,7 @@
 #include <nx/client/desktop/common/utils/custom_painted.h>
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
+#include <ui/workaround/hidpi_workarounds.h>
 #include <ui/models/sort_filter_list_model.h>
 #include <ui/statistics/modules/controls_statistics_module.h>
 #include <ui/style/skin.h>
@@ -51,6 +54,7 @@ public:
     }
 };
 
+static constexpr int kPlaceholderFontPixelSize = 15;
 } // namespace
 
 
@@ -62,18 +66,32 @@ NotificationListWidget::Private::Private(NotificationListWidget* q) :
     m_systemHealthModel(new SystemHealthListModel(this)),
     m_notificationsModel(new NotificationListModel(this))
 {
-    auto headerWidget = new QWidget(q);
-    auto headerLayout = new QHBoxLayout(headerWidget);
-    headerLayout->addStretch();
-    headerLayout->addWidget(newActionButton(ui::action::OpenBusinessLogAction,
-        Qn::MainWindow_Notifications_EventLog_Help));
-    headerLayout->addWidget(newActionButton(ui::action::BusinessEventsAction, -1));
-    headerLayout->addWidget(newActionButton(ui::action::PreferencesNotificationTabAction, -1));
+    m_placeholder = new QWidget(q);
+    m_placeholder->setMinimumSize(QSize(0, 100));
 
     auto layout = new QVBoxLayout(q);
     layout->setSpacing(0);
-    layout->addWidget(headerWidget);
+    layout->addWidget(m_placeholder);
     layout->addWidget(m_eventRibbon);
+
+    const auto verticalLayout = new QVBoxLayout(m_placeholder);
+    verticalLayout->setSpacing(16);
+    verticalLayout->setContentsMargins(24, 64, 24, 24);
+    const auto placeholderIcon = new QLabel(m_placeholder);
+    placeholderIcon->setFixedSize(QSize(64, 64));
+    placeholderIcon->setPixmap(qnSkin->pixmap(lit("events/placeholders/notifications.png")));
+    verticalLayout->addWidget(placeholderIcon, 0, Qt::AlignHCenter);
+    const auto placeholderText = new QLabel(m_placeholder);
+    QFont font;
+    font.setPixelSize(kPlaceholderFontPixelSize);
+    placeholderText->setProperty(style::Properties::kDontPolishFontProperty, true);
+    placeholderText->setFont(font);
+    placeholderText->setForegroundRole(QPalette::Mid);
+    placeholderText->setText(tr("No new notifications."));
+    placeholderText->setAlignment(Qt::AlignCenter);
+    placeholderText->setWordWrap(true);
+    verticalLayout->addWidget(placeholderText);
+    verticalLayout->addStretch(1);
 
     m_eventRibbon->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 
@@ -92,11 +110,19 @@ NotificationListWidget::Private::Private(NotificationListWidget* q) :
 
     connect(m_eventRibbon, &EventRibbon::unreadCountChanged,
         q, &NotificationListWidget::unreadCountChanged);
+
+    connect(m_eventRibbon, &EventRibbon::countChanged,
+        this, [this](int count)
+        {
+            m_placeholder->setVisible(count < 1);
+        });
+
+    q->setContextMenuPolicy(Qt::CustomContextMenu);
+    connect(q, &NotificationListWidget::customContextMenuRequested,
+        this, &NotificationListWidget::Private::showContextMenu);
 }
 
-NotificationListWidget::Private::~Private()
-{
-}
+NotificationListWidget::Private::~Private() = default;
 
 QToolButton* NotificationListWidget::Private::newActionButton(
     ui::action::IDType actionId,
@@ -141,6 +167,17 @@ QToolButton* NotificationListWidget::Private::newActionButton(
 
     context()->statisticsModule()->registerButton(statAlias, button);
     return button;
+}
+
+void NotificationListWidget::Private::showContextMenu(const QPoint& pos)
+{
+    QMenu contextMenu;
+    contextMenu.addAction(action(ui::action::OpenBusinessLogAction));
+    contextMenu.addAction(action(ui::action::BusinessEventsAction));
+    contextMenu.addAction(action(ui::action::PreferencesNotificationTabAction));
+    contextMenu.addSeparator();
+    contextMenu.addAction(action(ui::action::PinNotificationsAction));
+    contextMenu.exec(QnHiDpiWorkarounds::safeMapToGlobal(q, pos));
 }
 
 } // namespace desktop

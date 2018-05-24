@@ -33,7 +33,7 @@ class FileSystemPath(PurePath):
 
     @abstractmethod
     def glob(self, pattern):
-        yield self.__class__()
+        return [FileSystemPath()]
 
     @abstractmethod
     def mkdir(self, parents=False, exist_ok=True):

@@ -1,12 +1,17 @@
 import logging
 
-from framework.dpkg_installation import install_mediaserver
+import pytest
+
+from framework.installation.make_installation import make_installation
 
 _logger = logging.getLogger(__name__)
 
 
-def test_install(linux_vm, mediaserver_deb):
-    installation = install_mediaserver(linux_vm.os_access, mediaserver_deb, reinstall=True)
-    assert installation.is_valid()
-    installation = install_mediaserver(linux_vm.os_access, mediaserver_deb, reinstall=False)
+@pytest.fixture()
+def installation(one_vm, mediaserver_installers):
+    return make_installation(mediaserver_installers, one_vm.type, one_vm.os_access)
+
+
+def test_install(installation):
+    installation.install()
     assert installation.is_valid()

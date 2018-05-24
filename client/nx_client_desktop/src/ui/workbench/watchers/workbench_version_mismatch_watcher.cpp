@@ -31,7 +31,7 @@ QnWorkbenchVersionMismatchWatcher::QnWorkbenchVersionMismatchWatcher(QObject *pa
         QnMediaServerResourcePtr server = resource.dynamicCast<QnMediaServerResource>();
         if (!server)
             return;
-        disconnect(server, NULL, this, NULL);
+        server->disconnect(this);
         updateMismatchData();
     });
 

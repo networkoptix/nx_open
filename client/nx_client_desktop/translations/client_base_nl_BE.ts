@@ -1408,7 +1408,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Adjust to smallest value that does not degrade live view. Bigger buffer makes playback smoother but increases delay between real time and live view; smaller buffer decreases delay but can cause stutters.</source>
-      <translation>Aanpassen aan de kleinste waarde die de liveweergave niet verslechtert. Een grotere buffer maakt het afspelen soepeler, maar vergroot de vertraging tussen de werkelijkheid en de weergave; een kleinere buffer verlaagt de vertraging maar kan stotteren gedurende de weergave veroorzaken.</translation>
+      <translation>Aanpassen aan de kleinste waarde die de liveweergave niet verslechtert. Een grotere buffer maakt het afspelen soepeler, maar vergroot de vertraging tussen de werkelijkheid en de weergave; een kleinere buffer verlaagt de vertraging maar kan schokkende beelden gedurende de weergave veroorzaken.</translation>
     </message>
   </context>
   <context>
@@ -4510,7 +4510,7 @@ to %1</source>
     </message>
     <message>
       <source>Length of time each camera on layout will be displayed if you start a Layout Tour.</source>
-      <translation>Lengte van de weergave voor elke apparaat in de schermindeling als u een tour cyclus start.</translation>
+      <translation>Lengte van de weergave voor elke camera in de schermindeling als u een tour cyclus start.</translation>
     </message>
     <message>
       <source>Displays IP addresses for cameras and servers and groups for users.</source>
@@ -8482,7 +8482,7 @@ to %1</source>
     <name>nx::client::desktop::ui::AnalyticsSdkEventWidget</name>
     <message>
       <source>Analytics events can be set up on a certain cameras.</source>
-      <translation>Analytics-gebeurtenissen kunnen op bepaalde camera's worden ingesteld.</translation>
+      <translation>Analytics gebeurtenissen kunnen op bepaalde camera's worden ingesteld.</translation>
     </message>
     <message>
       <source>Choose cameras using the button above to see the list of supported events.</source>

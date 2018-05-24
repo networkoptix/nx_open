@@ -4,6 +4,7 @@
 #include <core/resource/resource_display_info.h>
 #include <core/resource/camera_resource.h>
 
+#include <nx/client/core/motion/motion_grid.h>
 #include <nx/fusion/model_functions.h>
 #include <nx/vms/api/types/rtp_types.h>
 #include <nx/vms/api/types/motion_types.h>
@@ -218,6 +219,35 @@ void setMotionStreamType(vms::api::MotionStreamType value, const Cameras& camera
     }
 }
 
+void setWearableMotionEnabled(bool value, const Cameras& cameras)
+{
+    for (const auto& camera: cameras)
+    {
+        if (!camera->hasFlags(Qn::wearable_camera))
+            continue;
+
+        NX_ASSERT(camera->getDefaultMotionType() == Qn::MotionType::MT_SoftwareGrid);
+        camera->setMotionType(value
+            ? Qn::MotionType::MT_SoftwareGrid
+            : Qn::MotionType::MT_NoMotion);
+    }
+}
+
+void setWearableMotionSensitivity(int value, const Cameras& cameras)
+{
+    QnMotionRegion region;
+    region.addRect(value, QRect(0, 0, core::MotionGrid::kWidth, core::MotionGrid::kHeight));
+
+    for (const auto& camera: cameras)
+    {
+        if (!camera->hasFlags(Qn::wearable_camera))
+            continue;
+
+        NX_ASSERT(camera->getVideoLayout()->channelCount() == 1);
+        camera->setMotionRegion(region, 0);
+    }
+}
+
 } // namespace
 
 void CameraSettingsDialogStateConversionFunctions::applyStateToCameras(
@@ -250,6 +280,17 @@ void CameraSettingsDialogStateConversionFunctions::applyStateToCameras(
             const auto ioPortDataList = state.singleIoModuleSettings.ioPortsData();
             if (!ioPortDataList.empty()) //< Can happen if it's just discovered unauthorized module.
                 camera->setIOPorts(ioPortDataList);
+        }
+    }
+
+    if (state.devicesDescription.isWearable == State::CombinedValue::All)
+    {
+        if (state.wearableMotion.enabled.hasValue())
+        {
+            setWearableMotionEnabled(state.wearableMotion.enabled(), cameras);
+
+            if (state.wearableMotion.enabled() && state.wearableMotion.sensitivity.hasValue())
+                setWearableMotionSensitivity(state.wearableMotion.sensitivity(), cameras);
         }
     }
 

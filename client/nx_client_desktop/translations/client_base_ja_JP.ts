@@ -2367,7 +2367,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Server will not change any cameras settings, it will receive and use camera stream as-is.</source>
-      <translation type="unfinished">Server will not change any cameras settings, it will receive and use camera stream as-is.</translation>
+      <translation>サーバーはカメラ設定を変更しません。そのままカメラストリームを受信して​​使用します</translation>
     </message>
   </context>
   <context>
@@ -3643,11 +3643,11 @@ to %1</source>
     </message>
     <message>
       <source>Backup includes servers and cameras settings, users, webpages, event rules, etc. Video is not saved.</source>
-      <translation type="unfinished">Backup includes servers and cameras settings, users, webpages, event rules, etc. Video is not saved.</translation>
+      <translation>バックアップには、サーバーとカメラの設定、ユーザー、Webページ、イベントルールなどが含まれます。ビデオは保存されません</translation>
     </message>
     <message>
       <source>Creates a backup of System configuration that can be restored in case of failure.</source>
-      <translation type="unfinished">Creates a backup of System configuration that can be restored in case of failure.</translation>
+      <translation>障害発生時に復元可能なシステム構成のバックアップを作成します</translation>
     </message>
   </context>
   <context>
@@ -4461,7 +4461,7 @@ to %1</source>
     </message>
     <message>
       <source>Displays IP addresses for cameras and servers and groups for users.</source>
-      <translation type="unfinished">Displays IP addresses for cameras and servers and groups for users.</translation>
+      <translation>カメラとサーバーのIPアドレスとユーザーグループを表示</translation>
     </message>
   </context>
   <context>
@@ -5835,11 +5835,11 @@ to %1</source>
     </message>
     <message>
       <source>Validating the update...</source>
-      <translation type="unfinished">Validating the update...</translation>
+      <translation>更新の検証中...</translation>
     </message>
     <message>
       <source>Checking for free space...</source>
-      <translation type="unfinished">Checking for free space...</translation>
+      <translation>空き容量を確認しています...</translation>
     </message>
   </context>
   <context>
@@ -6323,11 +6323,11 @@ to %1</source>
     </message>
     <message>
       <source>Backup includes servers and cameras settings, users, webpages, event rules, etc. Video is not saved.</source>
-      <translation type="unfinished">Backup includes servers and cameras settings, users, webpages, event rules, etc. Video is not saved.</translation>
+      <translation>バックアップには、サーバーとカメラの設定、ユーザー、Webページ、イベントルールなどが含まれます。ビデオは保存されません</translation>
     </message>
     <message>
       <source>Creates a backup of System configuration that can be restored in case of failure.</source>
-      <translation type="unfinished">Creates a backup of System configuration that can be restored in case of failure.</translation>
+      <translation>障害発生時に復元可能なシステム構成のバックアップを作成します</translation>
     </message>
   </context>
   <context>
@@ -6623,11 +6623,11 @@ to %1</source>
     </message>
     <message>
       <source>Sends anonymous System information (firmware, codecs, streams, etc.).</source>
-      <translation type="unfinished">Sends anonymous System information (firmware, codecs, streams, etc.).</translation>
+      <translation>匿名のシステム情報（ファームウェア、コーデック、ストリームなど）を送信します</translation>
     </message>
     <message>
       <source>Tracks and logs all user actions.</source>
-      <translation type="unfinished">Tracks and logs all user actions.</translation>
+      <translation>すべてのユーザーアクションを追跡して記録する</translation>
     </message>
   </context>
   <context>
@@ -7120,22 +7120,22 @@ to %1</source>
     </message>
     <message>
       <source>Local users</source>
-      <translation type="unfinished">Local users</translation>
+      <translation>ローカル ユーザー</translation>
     </message>
     <message>
       <source>%1 users</source>
       <comment>%1 is the short cloud name (like Cloud)</comment>
-      <translation type="unfinished">%1 users</translation>
+      <translation>ユーザー %1</translation>
     </message>
     <message>
       <source>%1 belong to this system only and are fully managed by system administrators.</source>
       <comment>%1 is local users definition, e.g. &apos;Local users&apos;</comment>
-      <translation type="unfinished">%1 belong to this system only and are fully managed by system administrators.</translation>
+      <translation>%1 はこのシステムに属し、システム管理者によって完全に管理されます</translation>
     </message>
     <message>
       <source>%1 can have access to many Systems. Administrators can manage their rights only.</source>
       <comment>%1 is cloud users definition, e.g. &apos;Cloud users&apos;</comment>
-      <translation type="unfinished">%1 can have access to many Systems. Administrators can manage their rights only.</translation>
+      <translation>%1 は、多くのシステムへアクセスできます。管理者は、自分の権利のみを管理できます</translation>
     </message>
   </context>
   <context>
@@ -8732,15 +8732,15 @@ to %1</source>
     </message>
     <message>
       <source>To use the software you must accept the end user license agreement</source>
-      <translation type="unfinished">To use the software you must accept the end user license agreement</translation>
+      <translation>ソフトウェアを使用するには、エンドユーザー使用許諾契約書に同意する必要があります</translation>
     </message>
     <message>
       <source>Accept</source>
-      <translation type="unfinished">Accept</translation>
+      <translation>同意</translation>
     </message>
     <message>
       <source>Decline</source>
-      <translation type="unfinished">Decline</translation>
+      <translation>同意しない</translation>
     </message>
   </context>
   <context>

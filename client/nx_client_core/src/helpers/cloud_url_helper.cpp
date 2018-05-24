@@ -70,7 +70,7 @@ QUrl QnCloudUrlHelper::makeUrl(const QString& path, bool auth) const
     SystemUri uri(nx::network::AppInfo::defaultCloudPortalUrl(
         nx::network::SocketGlobals::cloud().cloudHost()));
 
-    if (auth)
+    if (auth && qnCloudStatusWatcher->status() == QnCloudStatusWatcher::Status::Online)
     {
         auto credentials = qnCloudStatusWatcher->createTemporaryCredentials();
         uri.setAuthenticator(credentials.user, credentials.password.value());

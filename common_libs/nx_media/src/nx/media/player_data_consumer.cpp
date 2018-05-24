@@ -268,26 +268,26 @@ bool PlayerDataConsumer::processVideoFrame(const QnCompressedVideoDataPtr& video
     QnCompressedVideoDataPtr data = queueVideoFrame(videoFrame);
     if (!data)
     {
-        //NX_LOG(lit("PlayerDataConsumer::processVideoFrame(): queueVideoFrame() -> null"), cl_logDEBUG2);
+        //NX_LOG(lm("PlayerDataConsumer::processVideoFrame(): queueVideoFrame() -> null"), cl_logDEBUG2);
         return true; //< The frame is processed.
     }
 
     QVideoFramePtr decodedFrame;
     if (!videoDecoder->decode(data, &decodedFrame))
     {
-        NX_LOG(lit("Cannot decode the video frame. The frame is skipped."), cl_logWARNING);
+        NX_LOG(lm("Cannot decode the video frame. The frame is skipped."), cl_logWARNING);
         // False result means we want to repeat this frame later, thus, returning true.
     }
     else
     {
         if (decodedFrame)
         {
-            //NX_LOG(lit("PlayerDataConsumer::processVideoFrame(): enqueueVideoFrame()"), cl_logDEBUG2);
+            //NX_LOG(lm("PlayerDataConsumer::processVideoFrame(): enqueueVideoFrame()"), cl_logDEBUG2);
             enqueueVideoFrame(std::move(decodedFrame));
         }
         else
         {
-            //NX_LOG(lit("PlayerDataConsumer::processVideoFrame(): decodedFrame is null"), cl_logDEBUG2);
+            //NX_LOG(lm("PlayerDataConsumer::processVideoFrame(): decodedFrame is null"), cl_logDEBUG2);
         }
     }
 
@@ -299,7 +299,7 @@ bool PlayerDataConsumer::checkSequence(int sequence)
     m_sequence = std::max(m_sequence, sequence);
     if (sequence && m_sequence && sequence != m_sequence)
     {
-        //NX_LOG(lit("PlayerDataConsumer::checkSequence(%1): expected %2").arg(sequence).arg(m_sequence), cl_logDEBUG2);
+        //NX_LOG(lm("PlayerDataConsumer::checkSequence(%1): expected %2").arg(sequence).arg(m_sequence), cl_logDEBUG2);
         return false;
     }
     return true;

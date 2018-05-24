@@ -45,14 +45,13 @@ MimeInlineFile::~MimeInlineFile()
 
 void MimeInlineFile::prepare()
 {       
-    this->header += lit("Content-Disposition: inline; filename=\"%1\"\r\n").arg(this->cName);
-    this->header += lit("Content-ID: <%1>\r\n").arg(this->cName);
+    this->header +=
+        QStringLiteral("Content-Disposition: inline; filename=\"%1\"\r\n").arg(this->cName);
+    this->header +=
+        QStringLiteral("Content-ID: <%1>\r\n").arg(this->cName);
 
     /* !!! IMPORTANT !!! */
     MimeFile::prepare();
 }
 
 /* [3] --- */
-
-
-

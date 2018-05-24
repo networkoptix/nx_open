@@ -41,7 +41,7 @@ function(nx_add_target name type)
 
     set(resources ${NX_ADDITIONAL_RESOURCES})
     if(IS_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/static-resources")
-        list(INSERT resources 0 "${CMAKE_CURRENT_SOURCE_DIR}/static-resources" ${resources})
+        list(INSERT resources 0 "${CMAKE_CURRENT_SOURCE_DIR}/static-resources")
     endif()
 
     if(IS_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/translations")

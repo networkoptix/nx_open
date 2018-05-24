@@ -81,7 +81,7 @@ void CompatibilityVersionInstallationDialog::at_compatibilityTool_statusChanged(
 
     /* Prevent final status jumping */
     if (status != QnCompatibilityVersionInstallationTool::Installing && status != QnCompatibilityVersionInstallationTool::Canceling) {
-        disconnect(m_compatibilityTool, NULL, this, NULL);
+        m_compatibilityTool->disconnect(this);
         m_ui->progressBar->setValue(100);
     }
 
@@ -92,7 +92,7 @@ void CompatibilityVersionInstallationDialog::at_compatibilityTool_statusChanged(
 
 void CompatibilityVersionInstallationDialog::at_updateTool_updateFinished(QnUpdateResult result) {
     /* Prevent final status jumping */
-    disconnect(m_updateTool, NULL, this, NULL);
+    m_updateTool->disconnect(this);
     m_ui->progressBar->setValue(100);
 
     QDialogButtonBox::StandardButton button = QDialogButtonBox::Close;

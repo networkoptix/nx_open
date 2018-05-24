@@ -138,7 +138,7 @@ bool setRootPasswordDigest( const QByteArray& userName, const QByteArray& digest
     if( geteuid() != 0 )
         return false;   //we are not root
 
-    QFile shadowFile( lit("/etc/shadow") );
+    QFile shadowFile("/etc/shadow");
     if( !shadowFile.open( QIODevice::ReadOnly ) )
         return false;
 

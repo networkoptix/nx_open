@@ -11,23 +11,26 @@ EmptyUpdateRegistryFactoryFunction UpdateRegistryFactory::m_emptyFactoryFunction
 
 namespace {
 AbstractUpdateRegistryPtr createCommonUpdateRegistry(
+    const QnUuid& peerId,
     const QString& baseUrl,
     detail::data_parser::UpdatesMetaData metaData,
     detail::CustomizationVersionToUpdate customizationVersionToUpdate)
 {
     return std::make_unique<impl::CommonUpdateRegistry>(
+        peerId,
         baseUrl,
         std::move(metaData),
         std::move(customizationVersionToUpdate));
 }
 
-AbstractUpdateRegistryPtr createEmptyCommonUpdateRegistry()
+AbstractUpdateRegistryPtr createEmptyCommonUpdateRegistry(const QnUuid& selfPeerId)
 {
-    return std::make_unique<impl::CommonUpdateRegistry>();
+    return std::make_unique<impl::CommonUpdateRegistry>(selfPeerId);
 }
 } // namespace
 
 AbstractUpdateRegistryPtr UpdateRegistryFactory::create(
+    const QnUuid& peerId,
     const QString& baseUrl,
     detail::data_parser::UpdatesMetaData metaData,
     detail::CustomizationVersionToUpdate customizationVersionToUpdate)
@@ -35,23 +38,25 @@ AbstractUpdateRegistryPtr UpdateRegistryFactory::create(
     if (m_factoryFunction)
     {
         return m_factoryFunction(
+            peerId,
             baseUrl,
             std::move(metaData),
             std::move(customizationVersionToUpdate));
     }
 
     return createCommonUpdateRegistry(
+        peerId,
         baseUrl,
         std::move(metaData),
         std::move(customizationVersionToUpdate));
 }
 
-AbstractUpdateRegistryPtr UpdateRegistryFactory::create()
+AbstractUpdateRegistryPtr UpdateRegistryFactory::create( const QnUuid& selfPeerId)
 {
     if (m_emptyFactoryFunction)
-        return m_emptyFactoryFunction();
+        return m_emptyFactoryFunction(selfPeerId);
 
-    return createEmptyCommonUpdateRegistry();
+    return createEmptyCommonUpdateRegistry(selfPeerId);
 }
 
 void UpdateRegistryFactory::setFactoryFunction(UpdateRegistryFactoryFunction factoryFunction)

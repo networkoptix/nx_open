@@ -27,7 +27,7 @@ def _create_vm(name):
 
 @pytest.fixture(scope='session')
 def template():
-    """Create VM without tested class."""
+    """Create Machine without tested class."""
     vm = name_format.format('template')
     _create_vm(vm)
     vm_snapshot = 'test template'
@@ -80,9 +80,9 @@ def test_clone(hypervisor, clone_name, clone_configuration):
 
 def test_power(hypervisor, dummy):
     hypervisor.power_on(dummy)
-    wait_for_true(lambda: hypervisor.find(dummy).is_running, 'VM {} is running'.format(dummy))
+    wait_for_true(lambda: hypervisor.find(dummy).is_running, 'Machine {} is running'.format(dummy))
     hypervisor.power_off(dummy)
-    wait_for_true(lambda: not hypervisor.find(dummy).is_running, 'VM {} is not running'.format(dummy))
+    wait_for_true(lambda: not hypervisor.find(dummy).is_running, 'Machine {} is not running'.format(dummy))
 
 
 def test_list(hypervisor):

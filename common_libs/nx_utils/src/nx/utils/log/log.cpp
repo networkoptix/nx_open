@@ -1,11 +1,11 @@
 #include "log.h"
 
 static QString kMainLogName("MAIN");
-const nx::utils::log::Tag QnLog::MAIN_LOG_ID(lit(""));
-const nx::utils::log::Tag QnLog::HTTP_LOG_INDEX(lit("HTTP"));
-const nx::utils::log::Tag QnLog::EC2_TRAN_LOG(lit("EC2_TRAN"));
-const nx::utils::log::Tag QnLog::HWID_LOG(lit("HWID"));
-const nx::utils::log::Tag QnLog::PERMISSIONS_LOG(lit("PERMISSIONS"));
+const nx::utils::log::Tag QnLog::MAIN_LOG_ID(QLatin1String(""));
+const nx::utils::log::Tag QnLog::HTTP_LOG_INDEX(QLatin1String("HTTP"));
+const nx::utils::log::Tag QnLog::EC2_TRAN_LOG(QLatin1String("EC2_TRAN"));
+const nx::utils::log::Tag QnLog::HWID_LOG(QLatin1String("HWID"));
+const nx::utils::log::Tag QnLog::PERMISSIONS_LOG(QLatin1String("PERMISSIONS"));
 
 void QnLog::initLog(QnLog* /*log*/)
 {

@@ -1,0 +1,77 @@
+#include "wearable_camera_motion_widget.h"
+#include "ui_wearable_camera_motion_widget.h"
+#include "../redux/camera_settings_dialog_state.h"
+#include "../redux/camera_settings_dialog_store.h"
+
+#include <ui/common/read_only.h>
+#include <ui/workaround/widgets_signals_workaround.h>
+
+#include <nx/client/core/motion/motion_grid.h>
+#include <nx/client/desktop/common/utils/aligner.h>
+#include <nx/client/desktop/common/utils/checkbox_utils.h>
+#include <nx/client/desktop/common/utils/combo_box_utils.h>
+#include <nx/utils/disconnect_helper.h>
+
+namespace nx {
+namespace client {
+namespace desktop {
+
+WearableCameraMotionWidget::WearableCameraMotionWidget(QWidget* parent):
+    QWidget(parent),
+    ui(new Ui::WearableCameraMotionWidget),
+    m_aligner(new Aligner(this))
+{
+    ui->setupUi(this);
+    m_aligner->addWidget(ui->sensitivityLabel);
+    CheckboxUtils::autoClearTristate(ui->motionDetectionCheckBox);
+
+    ComboBoxUtils::insertMultipleValuesItem(ui->sensitivityComboBox);
+
+    for (int i = 1; i < QnMotionRegion::kSensitivityLevelCount; i++)
+        ui->sensitivityComboBox->addItem(QString::number(i));
+}
+
+WearableCameraMotionWidget::~WearableCameraMotionWidget()
+{
+    // Required here for forward-declared scoped pointer destruction.
+}
+
+Aligner* WearableCameraMotionWidget::aligner() const
+{
+    return m_aligner;
+}
+
+void WearableCameraMotionWidget::setStore(CameraSettingsDialogStore* store)
+{
+    m_storeConnections.reset(new QnDisconnectHelper());
+
+    *m_storeConnections << connect(store, &CameraSettingsDialogStore::stateChanged,
+        this, &WearableCameraMotionWidget::loadState);
+
+    *m_storeConnections << connect(ui->motionDetectionCheckBox, &QCheckBox::clicked,
+        store, &CameraSettingsDialogStore::setWearableMotionDetectionEnabled);
+
+    *m_storeConnections << connect(ui->sensitivityComboBox, QnComboboxCurrentIndexChanged,
+        store, &CameraSettingsDialogStore::setWearableMotionSensitivity);
+}
+
+void WearableCameraMotionWidget::loadState(const CameraSettingsDialogState& state)
+{
+    setReadOnly(ui->motionDetectionCheckBox, state.readOnly);
+    setReadOnly(ui->sensitivityComboBox, state.readOnly);
+
+    CheckboxUtils::setupTristateCheckbox(
+        ui->motionDetectionCheckBox,
+        state.wearableMotion.enabled.hasValue(),
+        state.wearableMotion.enabled.valueOr(false));
+
+    ui->sensitivityWidget->setVisible(ui->motionDetectionCheckBox->checkState() == Qt::Checked);
+    ui->sensitivityComboBox->setCurrentIndex(state.wearableMotion.sensitivity.valueOr(0));
+
+    ui->groupBox->layout()->activate();
+    layout()->activate();
+}
+
+} // namespace desktop
+} // namespace client
+} // namespace nx

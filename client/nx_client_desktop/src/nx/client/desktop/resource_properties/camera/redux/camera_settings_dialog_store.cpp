@@ -67,6 +67,12 @@ void CameraSettingsDialogStore::setSettingsOptimizationEnabled(bool value)
         });
 }
 
+void CameraSettingsDialogStore::setSingleWearableState(const WearableState& value)
+{
+    d->executeAction(
+        [&](State state) { return Reducer::setSingleWearableState(std::move(state), value); });
+}
+
 void CameraSettingsDialogStore::loadCameras(const QnVirtualCameraResourceList& cameras)
 {
     d->executeAction([&](State state) { return Reducer::loadCameras(std::move(state), cameras); });
@@ -306,6 +312,21 @@ void CameraSettingsDialogStore::resetExpertSettings()
 {
     d->executeAction(
         [&](State state) { return Reducer::resetExpertSettings(std::move(state)); });
+}
+
+void CameraSettingsDialogStore::setWearableMotionDetectionEnabled(bool value)
+{
+    d->executeAction(
+        [&](State state)
+        {
+            return Reducer::setWearableMotionDetectionEnabled(std::move(state), value);
+        });
+}
+
+void CameraSettingsDialogStore::setWearableMotionSensitivity(int value)
+{
+    d->executeAction(
+        [&](State state) { return Reducer::setWearableMotionSensitivity(std::move(state), value); });
 }
 
 } // namespace desktop

@@ -182,8 +182,7 @@ void MediatorConnector::fetchEndpoint()
 
             if (status != nx::network::http::StatusCode::ok)
             {
-                NX_LOGX(lit("Can not fetch mediator address: HTTP %1")
-                    .arg(status), cl_logDEBUG1);
+                NX_DEBUG(this, lm("Can not fetch mediator address: HTTP %1").arg((int) status));
 
                 if (!isReady(*m_future))
                     m_promise->set_value(false);

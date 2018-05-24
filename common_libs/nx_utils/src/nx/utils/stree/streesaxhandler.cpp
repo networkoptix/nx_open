@@ -17,20 +17,19 @@ namespace stree {
 namespace MatchType {
     Value fromString(const QString& str)
     {
-        if (str == lit("equal"))
+        if (str == "equal")
             return equal;
-        else if (str == lit("greater"))
+        if (str == "greater")
             return greater;
-        else if (str == lit("less"))
+        if (str == "less")
             return less;
-        else if (str == lit("wildcard"))
+        if (str == "wildcard")
             return wildcard;
-        else if (str == lit("presence"))
+        if (str == "presence")
             return presence;
-        else if (str == lit("range"))
+        if (str == "range")
             return range;
-        else
-            return unknown;
+        return unknown;
     }
 } // namespace MatchType
 
@@ -69,7 +68,7 @@ bool SaxHandler::startElement(
         return false;
     auto newNodePtr = newNode.get();
 
-    int valuePos = atts.index(lit("value"));
+    int valuePos = atts.index("value");
     if (m_nodes.empty())
     {
         m_root = std::move(newNode);
@@ -117,14 +116,14 @@ QString SaxHandler::errorString() const
 
 bool SaxHandler::error(const QXmlParseException& exception)
 {
-    m_errorDescription = lit("Parse error. line %1, col %2, parser message: %3")
+    m_errorDescription = QString("Parse error. line %1, col %2, parser message: %3")
         .arg(exception.lineNumber()).arg(exception.columnNumber()).arg(exception.message());
     return false;
 }
 
 bool SaxHandler::fatalError(const QXmlParseException& exception)
 {
-    m_errorDescription = lit("Fatal parse error. line %1, col %2, parser message: %3")
+    m_errorDescription = QString("Fatal parse error. line %1, col %2, parser message: %3")
         .arg(exception.lineNumber()).arg(exception.columnNumber()).arg(exception.message());
     return false;
 }
@@ -143,34 +142,33 @@ std::unique_ptr<AbstractNode> SaxHandler::createNode(
     const QString& nodeName,
     const QXmlAttributes& atts) const
 {
-    if (nodeName == lit("condition"))
+    if (nodeName == "condition")
     {
         //resName, matchType
-        int resNamePos = atts.index(lit("resName"));
+        int resNamePos = atts.index("resName");
         if (resNamePos == -1)
         {
-            m_errorDescription = 
-                lit("No required attribute \"resName\" in ConditionNode");
+            m_errorDescription = "No required attribute \"resName\" in ConditionNode";
             return NULL;
         }
         const QString& resName = atts.value(resNamePos);
         const ResourceNameSet::ResourceDescription& res = m_resourceNameSet.findResourceByName(resName);
         if (res.id == -1)
         {
-            m_errorDescription = 
-                lit("Unknown resource %1 found as \"resName\" attribute of ConditionNode").arg(resName);
+            m_errorDescription =
+                QString("Unknown resource %1 found as \"resName\" attribute of ConditionNode").arg(resName);
             return NULL;
         }
 
         MatchType::Value matchType = MatchType::equal;
-        int matchTypePos = atts.index(lit("matchType"));
+        int matchTypePos = atts.index("matchType");
         if (matchTypePos >= 0)
         {
             const QString& matchTypeStr = atts.value(matchTypePos);
             matchType = MatchType::fromString(matchTypeStr);
             if (matchType == MatchType::unknown)
             {
-                m_errorDescription = lit("ConditionNode does not support match type %1").arg(matchTypeStr);
+                m_errorDescription = QString("ConditionNode does not support match type %1").arg(matchTypeStr);
                 return NULL;
             }
         }
@@ -193,28 +191,27 @@ std::unique_ptr<AbstractNode> SaxHandler::createNode(
                 m_errorDescription =
                     lm("ConditionNode currently does not support resource of type %1 "
                         "(resource name %2). Only %3 types are supported")
-                        .arg(res.type).arg(resName).arg(lit("int, double, string"));
+                        .arg(res.type).arg(resName).arg("int, double, string");
                 return NULL;
         }
     }
-    else if (nodeName == lit("sequence"))
+    else if (nodeName == "sequence")
     {
         return std::make_unique<SequenceNode>();
     }
-    else if (nodeName == lit("set"))
+    else if (nodeName == "set")
     {
-        int resNamePos = atts.index(lit("resName"));
+        int resNamePos = atts.index("resName");
         if (resNamePos == -1)
         {
-            m_errorDescription = lit("No required attribute \"resName\" in SetNode");
+            m_errorDescription = QString("No required attribute \"resName\" in SetNode");
             return NULL;
         }
         const QString& resName = atts.value(resNamePos);
-        int resValuePos = atts.index(lit("resValue"));
+        int resValuePos = atts.index("resValue");
         if (resValuePos == -1)
         {
-            m_errorDescription =
-                lit("No required attribute \"resValue\" in SetNode");
+            m_errorDescription = "No required attribute \"resValue\" in SetNode";
             return NULL;
         }
 
@@ -222,7 +219,8 @@ std::unique_ptr<AbstractNode> SaxHandler::createNode(
         if (res.id == -1)
         {
             m_errorDescription =
-                lit("Unknown resource %1 found as \"resName\" attribute of SetNode").arg(resName);
+                QString("Unknown resource %1 found as \"resName\" attribute of SetNode")
+                    .arg(resName);
             return NULL;
         }
 
@@ -232,7 +230,7 @@ std::unique_ptr<AbstractNode> SaxHandler::createNode(
         if (!resValue.convert(res.type))
         {
             m_errorDescription =
-                lit("Could not convert value %1 of resource %2 to type %3")
+                QString("Could not convert value %1 of resource %2 to type %3")
                     .arg(resValueStr).arg(resName).arg(res.type);
             return NULL;
         }

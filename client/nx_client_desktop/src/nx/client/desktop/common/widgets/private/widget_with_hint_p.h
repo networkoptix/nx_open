@@ -22,7 +22,6 @@ public:
     QString hint() const;
     void setHint(const QString& value);
     void addHintLine(const QString& value);
-    void setHelpTopic(int topicId);
 
     int spacing() const;
     void setSpacing(int value);

@@ -4457,11 +4457,11 @@ to %1</source>
     </message>
     <message>
       <source>Length of time each camera on layout will be displayed if you start a Layout Tour.</source>
-      <translation type="unfinished">Length of time each camera on layout will be displayed if you start a Layout Tour.</translation>
+      <translation>ระยะเวลาที่กล้องแต่ละรูปแบบจะปรากฏขึ้นหากคุณเริ่มทัวร์เค้าโครง</translation>
     </message>
     <message>
       <source>Displays IP addresses for cameras and servers and groups for users.</source>
-      <translation type="unfinished">Displays IP addresses for cameras and servers and groups for users.</translation>
+      <translation>แสดงที่อยู่ IP สำหรับกล้องและเซิร์ฟเวอร์และกลุ่มสำหรับผู้ใช้</translation>
     </message>
   </context>
   <context>
@@ -5626,7 +5626,7 @@ to %1</source>
     </message>
     <message>
       <source>Servers with failover enabled will automatically take cameras from offline servers.</source>
-      <translation type="unfinished">Servers with failover enabled will automatically take cameras from offline servers.</translation>
+      <translation>เซิร์ฟเวอร์ที่เปิดใช้งาน failover จะใช้กล้องจากเซิร์ฟเวอร์ออฟไลน์โดยอัตโนมัติ</translation>
     </message>
   </context>
   <context>
@@ -5831,15 +5831,15 @@ to %1</source>
     </message>
     <message>
       <source>Update Files</source>
-      <translation type="unfinished">Update Files</translation>
+      <translation>อัปเดตไฟล์</translation>
     </message>
     <message>
       <source>Validating the update...</source>
-      <translation type="unfinished">Validating the update...</translation>
+      <translation>กำลังตรวจสอบการอัปเดต ...</translation>
     </message>
     <message>
       <source>Checking for free space...</source>
-      <translation type="unfinished">Checking for free space...</translation>
+      <translation>กำลังตรวจสอบพื้นที่ว่าง ...</translation>
     </message>
   </context>
   <context>
@@ -6322,11 +6322,11 @@ to %1</source>
     </message>
     <message>
       <source>Backup includes servers and cameras settings, users, webpages, event rules, etc. Video is not saved.</source>
-      <translation type="unfinished">Backup includes servers and cameras settings, users, webpages, event rules, etc. Video is not saved.</translation>
+      <translation>การสำรองข้อมูลประกอบด้วยเซิร์ฟเวอร์และการตั้งค่ากล้อง,ผู้ใช้เว็บเพจ,กิจกรรม ฯลฯ ไม่ได้บันทึกวิดีโอ</translation>
     </message>
     <message>
       <source>Creates a backup of System configuration that can be restored in case of failure.</source>
-      <translation type="unfinished">Creates a backup of System configuration that can be restored in case of failure.</translation>
+      <translation>สร้างการสำรองข้อมูลของการกำหนดค่าระบบที่สามารถเรียกคืนได้ในกรณีที่เกิดความล้มเหลว</translation>
     </message>
   </context>
   <context>
@@ -6622,11 +6622,11 @@ to %1</source>
     </message>
     <message>
       <source>Sends anonymous System information (firmware, codecs, streams, etc.).</source>
-      <translation type="unfinished">Sends anonymous System information (firmware, codecs, streams, etc.).</translation>
+      <translation>ส่งข้อมูลระบบที่ไม่ระบุตัวตน (เฟิร์มแวร์ตัวแปลงสัญญาณสตรีม ฯลฯ )</translation>
     </message>
     <message>
       <source>Tracks and logs all user actions.</source>
-      <translation type="unfinished">Tracks and logs all user actions.</translation>
+      <translation>ติดตามและบันทึกการทำงานของผู้ใช้ทั้งหมด</translation>
     </message>
   </context>
   <context>
@@ -6875,7 +6875,7 @@ to %1</source>
     <message>
       <source>%1 user</source>
       <comment>%1 is the short cloud name (like Cloud)</comment>
-      <translation type="unfinished">%1 user</translation>
+      <translation>%1 ผู้ใช้งาน</translation>
     </message>
   </context>
   <context>
@@ -6925,7 +6925,7 @@ to %1</source>
     </message>
     <message>
       <source>Users can be imported from an LDAP server. They will be able to log in only if LDAP server is online and their accounts are active on it.</source>
-      <translation type="unfinished">Users can be imported from an LDAP server. They will be able to log in only if LDAP server is online and their accounts are active on it.</translation>
+      <translation>ผู้ใช้สามารถนำเข้าจากเซิร์ฟเวอร์ LDAP พวกเขาจะสามารถเข้าสู่ระบบได้เฉพาะเมื่อเซิร์ฟเวอร์ LDAP ออนไลน์และบัญชีของพวกเขาใช้งานได้</translation>
     </message>
   </context>
   <context>
@@ -7115,26 +7115,26 @@ to %1</source>
     <message>
       <source>%1 user with specified email already exists.</source>
       <comment>%1 is the short cloud name (like Cloud)</comment>
-      <translation type="unfinished">%1 user with specified email already exists.</translation>
+      <translation>%1 มีอีเมลผู้ใช้ที่ระบุอยู่แล้ว</translation>
     </message>
     <message>
       <source>Local users</source>
-      <translation type="unfinished">Local users</translation>
+      <translation>ผู้ใช้ท้องถิ่น</translation>
     </message>
     <message>
       <source>%1 users</source>
       <comment>%1 is the short cloud name (like Cloud)</comment>
-      <translation type="unfinished">%1 users</translation>
+      <translation>%1 ผู้ใช้</translation>
     </message>
     <message>
       <source>%1 belong to this system only and are fully managed by system administrators.</source>
       <comment>%1 is local users definition, e.g. &apos;Local users&apos;</comment>
-      <translation type="unfinished">%1 belong to this system only and are fully managed by system administrators.</translation>
+      <translation>%1 อยู่ในระบบนี้เท่านั้นและได้รับการจัดการอย่างเต็มที่จากผู้ดูแลระบบ</translation>
     </message>
     <message>
       <source>%1 can have access to many Systems. Administrators can manage their rights only.</source>
       <comment>%1 is cloud users definition, e.g. &apos;Cloud users&apos;</comment>
-      <translation type="unfinished">%1 can have access to many Systems. Administrators can manage their rights only.</translation>
+      <translation>%1 สามารถเข้าถึงระบบได้หลายระบบ ผู้ดูแลระบบสามารถจัดการสิทธิ์ได้เท่านั้น</translation>
     </message>
   </context>
   <context>
@@ -7377,7 +7377,7 @@ to %1</source>
     <message>
       <source>%1 Systems cannot be merged</source>
       <comment>%1 is the short cloud name (like Cloud)</comment>
-      <translation type="unfinished">%1 Systems cannot be merged</translation>
+      <translation>%1 ไม่สามารถผสานรวมระบบได้</translation>
     </message>
   </context>
   <context>
@@ -8117,7 +8117,7 @@ to %1</source>
     <name>nx::client::desktop::HintButton</name>
     <message>
       <source>Click to read more</source>
-      <translation type="unfinished">Click to read more</translation>
+      <translation>คลิกเพื่ออ่านรายละเอียดเพิ่มเติม</translation>
     </message>
   </context>
   <context>
@@ -8368,19 +8368,19 @@ to %1</source>
     <name>nx::client::desktop::ui::AnalyticsSdkEventWidget</name>
     <message>
       <source>Analytics events can be set up on a certain cameras.</source>
-      <translation type="unfinished">Analytics events can be set up on a certain cameras.</translation>
+      <translation>คุณสามารถตั้งค่าเหตุการณ์ Analytics ได้ในกล้องบางเครื่อง</translation>
     </message>
     <message>
       <source>Choose cameras using the button above to see the list of supported events.</source>
-      <translation type="unfinished">Choose cameras using the button above to see the list of supported events.</translation>
+      <translation>เลือกกล้องโดยใช้ปุ่มด้านบนเพื่อดูรายการกิจกรรมที่สนับสนุน</translation>
     </message>
     <message>
       <source>Event will trigger only if there are matches in caption with any of entered keywords.</source>
-      <translation type="unfinished">Event will trigger only if there are matches in caption with any of entered keywords.</translation>
+      <translation>เหตุการณ์จะเรียกเฉพาะเมื่อมีคำหลักที่ตรงกับคำหลักที่ป้อนเท่านั้น</translation>
     </message>
     <message>
       <source>If the field is empty, event will always trigger.</source>
-      <translation type="unfinished">If the field is empty, event will always trigger.</translation>
+      <translation>หากช่องว่างกิจกรรมจะเรียกใช้เสมอ</translation>
     </message>
     <message>
       <source>Event will trigger only if there are matches in the description field with any of the entered keywords.</source>

@@ -101,9 +101,9 @@ const QLatin1String kDbMaxPeriodQueryWaitsForAvailableConnection(
 
 ConnectionOptions::ConnectionOptions():
     driverType(RdbmsDriverType::sqlite),
-    hostName(lit("127.0.0.1")),
+    hostName("127.0.0.1"),
     port(3306),
-    encoding(lit("utf8")),
+    encoding("utf8"),
     maxConnectionCount(1),
     inactivityTimeout(std::chrono::minutes(10)),
     maxPeriodQueryWaitsForAvailableConnection(std::chrono::minutes(1)),

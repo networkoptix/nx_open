@@ -1,10 +1,11 @@
 -s
 --work-dir=~/Development/func_tests_dir/
 --bin-dir=~/Development/func_tests_dir/bin/
---mediaserver-dist-path=~/Downloads/wave-server-4.0.0.569-linux64-beta-test.deb
+--mediaserver-installers-dir=/home/george/Downloads/
+--mediaserver-dist-path=IGNORED
 --cloud-group=test
 --customization=hanwha
---timeout=600
+--timeout=3600
 --vm-port-base=IGNORED
 --vm-name-prefix=IGNORED
 --log-level=DEBUG

@@ -157,11 +157,11 @@ CameraExpertSettingsWidget::CameraExpertSettingsWidget(
     setHelpTopic(ui->checkBoxSecondaryRecorder, Qn::CameraSettings_Expert_DisableArchivePrimary_Help);
     setHelpTopic(ui->groupBoxRTP, Qn::CameraSettings_Expert_Rtp_Help);
 
-    ui->settingsDisableControlHint->setHelpTopic(Qn::CameraSettings_Expert_SettingsControl_Help);
+    setHelpTopic(ui->settingsDisableControlHint, Qn::CameraSettings_Expert_SettingsControl_Help);
     ui->settingsDisableControlHint->setHint(tr("Server will not change any cameras settings, "
         "it will receive and use camera stream as-is. "));
 
-    ui->bitratePerGopHint->setHelpTopic(Qn::CameraSettings_Expert_SettingsControl_Help);
+    setHelpTopic(ui->bitratePerGopHint, Qn::CameraSettings_Expert_SettingsControl_Help);
     ui->bitratePerGopHint->setHint(tr("Helps fix image quality issues on some cameras; "
         "for others will cause significant bitrate increase."));
 

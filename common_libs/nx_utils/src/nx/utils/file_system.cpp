@@ -301,7 +301,7 @@ bool isUsb(const QString& devName)
 
 bool isRelativePathSafe(const QString& path)
 {
-    if (path.contains(lit("..")))
+    if (path.contains(".."))
         return false; //< May be a path traversal attempt.
 
     if (path.startsWith('/'))

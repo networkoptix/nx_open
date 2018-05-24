@@ -42,7 +42,7 @@ bool DbConnectionHolder::open()
     m_dbConnection.setPort(connectionOptions().port);
     if (!m_dbConnection.open())
     {
-        NX_LOG(lit("Failed to establish connection to DB %1 at %2:%3. %4").
+        NX_LOG(lm("Failed to establish connection to DB %1 at %2:%3. %4").
             arg(connectionOptions().dbName).arg(connectionOptions().hostName).
             arg(connectionOptions().port).arg(m_dbConnection.lastError().text()),
             cl_logWARNING);
@@ -91,7 +91,7 @@ bool DbConnectionHolder::tuneMySqlConnection()
     if (!connectionOptions().encoding.isEmpty())
     {
         QSqlQuery query(m_dbConnection);
-        query.prepare(lit("SET NAMES '%1'").arg(connectionOptions().encoding));
+        query.prepare(QString("SET NAMES '%1'").arg(connectionOptions().encoding));
         if (!query.exec())
         {
             NX_LOGX(lm("Failed to set connection character set to \"%1\". %2")

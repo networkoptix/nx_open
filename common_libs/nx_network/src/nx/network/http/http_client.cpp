@@ -372,10 +372,10 @@ void HttpClient::onResponseReceived()
     m_msgBodyBuffer += m_asyncHttpClient->fetchMessageBodyBuffer();
     if ((std::size_t)m_msgBodyBuffer.size() > m_maxInternalBufferSize)
     {
-        NX_LOG(
-            lit("Sync HttpClient: internal buffer overflow. Max buffer size: %1, current buffer size: %2, requested url: %3.")
-                .arg(m_maxInternalBufferSize).arg(m_msgBodyBuffer.size()).arg(url().toString()),
-            cl_logWARNING);
+        NX_WARNING(this,
+            lm("Internal buffer overflow. "
+                "Max buffer size: %1, current buffer size: %2, requested url: %3.")
+                    .args(m_maxInternalBufferSize, m_msgBodyBuffer.size(), url()));
         m_done = true;
         m_error = true;
         m_asyncHttpClient->pleaseStopSync(!m_ignoreMutexAnalyzer);
@@ -389,10 +389,10 @@ void HttpClient::onSomeMessageBodyAvailable()
     m_msgBodyBuffer += m_asyncHttpClient->fetchMessageBodyBuffer();
     if ((std::size_t)m_msgBodyBuffer.size() > m_maxInternalBufferSize)
     {
-        NX_LOG(
-            lit("Sync HttpClient: internal buffer overflow. Max buffer size: %1, current buffer size: %2, requested url: %3.")
-                .arg(m_maxInternalBufferSize).arg(m_msgBodyBuffer.size()).arg(url().toString()),
-            cl_logWARNING);
+        NX_WARNING(this,
+            lm("Internal buffer overflow. "
+                "Max buffer size: %1, current buffer size: %2, requested url: %3.")
+                    .args(m_maxInternalBufferSize, m_msgBodyBuffer.size(), url()));
         m_done = true;
         m_error = true;
         m_asyncHttpClient->pleaseStopSync(!m_ignoreMutexAnalyzer);

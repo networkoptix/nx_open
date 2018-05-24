@@ -16,6 +16,7 @@ namespace peer_selection {
 using PeerSelectorFactoryFactoryFunc =
     utils::MoveOnlyFunc<AbstractPeerSelectorPtr(
         FileInformation::PeerSelectionPolicy,
+        const QList<QnUuid>& additionalPeers,
         QnCommonModule* commonModule)>;
 
 class PeerSelectorFactory
@@ -23,8 +24,11 @@ class PeerSelectorFactory
 public:
     static AbstractPeerSelectorPtr create(
         FileInformation::PeerSelectionPolicy peerPolicy,
+        const QList<QnUuid>& additionalPeers,
         QnCommonModule* commonModule);
+
     static void setFactoryFunc(PeerSelectorFactoryFactoryFunc peerSelectorFactoryFactoryFunc);
+
 private:
     static PeerSelectorFactoryFactoryFunc m_peerSelectorFactoryFactoryFunc;
 };

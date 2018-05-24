@@ -38,15 +38,15 @@ def setup_networks(machines, hypervisor, networks_tree, reachability):
                 except KeyError:
                     allocated_machines[alias] = machine = machines.get(alias)
                 mac = hypervisor.plug(machine.name, network_uuid)
-                machine.networking.setup_ip(mac, ip, network_ip.prefixlen)
+                machine.os_access.networking.setup_ip(mac, ip, network_ip.prefixlen)
                 if alias != router_alias:
                     # Routes on router was set up when it was interpreted as host.
                     for reachable_network in reachable_networks:
-                        machine.networking.route(reachable_network, mac, router_ip_address)
+                        machine.os_access.networking.route(reachable_network, mac, router_ip_address)
                     # Default gateway can be specified explicitly.
                     subtree = tree[network_name][alias]
                     if subtree is not None:
-                        machine.networking.setup_nat(mac)
+                        machine.os_access.networking.setup_nat(mac)
                         setup_tree(subtree, alias, reachable_networks + [network_ip])
             for alias, ip in nodes.items():
                 nodes_ips.setdefault(alias, {})[network_ip] = ip
@@ -56,7 +56,7 @@ def setup_networks(machines, hypervisor, networks_tree, reachability):
     for alias, ips in nodes_ips.items():
         for ip in ips.values():
             wait_for_true(
-                lambda: allocated_machines[alias].networking.can_reach(ip, timeout_sec=1),
+                lambda: allocated_machines[alias].os_access.networking.can_reach(ip, timeout_sec=1),
                 "machine {} can reach itself by {}".format(alias, ip),
                 timeout_sec=20)
     for destination_net in reachability:
@@ -64,7 +64,7 @@ def setup_networks(machines, hypervisor, networks_tree, reachability):
             for source_alias in reachability[destination_net][destination_alias]:
                 destination_ip = nodes_ips[destination_alias][IPNetwork(destination_net)]
                 wait_for_true(
-                    lambda: allocated_machines[source_alias].networking.can_reach(destination_ip, timeout_sec=1),
+                    lambda: allocated_machines[source_alias].os_access.networking.can_reach(destination_ip, timeout_sec=1),
                     "machine {} can reach {} by {}".format(source_alias, destination_alias, destination_ip),
                     timeout_sec=60)
 
@@ -78,5 +78,5 @@ def setup_flat_network(machines, network_ip, hypervisor):  # TODO: Use in setup 
     host_ips = dict(zip((machine.alias for machine in machines), iter_ips))
     for machine in machines:
         mac = hypervisor.plug(machine.name, network_uuid)
-        machine.networking.setup_ip(mac, host_ips[machine.alias], network_ip.prefixlen)
+        machine.os_access.networking.setup_ip(mac, host_ips[machine.alias], network_ip.prefixlen)
     return host_ips

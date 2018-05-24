@@ -747,13 +747,13 @@
   <customwidget>
    <class>QnWearableUploadWidget</class>
    <extends>QWidget</extends>
-   <header location="global">ui/widgets/properties/wearable_upload_widget.h</header>
+   <header location="global">ui/widgets/properties/legacy_wearable_upload_widget.h</header>
    <container>1</container>
   </customwidget>
   <customwidget>
    <class>QnWearableProgressWidget</class>
    <extends>QWidget</extends>
-   <header location="global">ui/widgets/properties/wearable_progress_widget.h</header>
+   <header location="global">ui/widgets/properties/legacy_wearable_progress_widget.h</header>
    <container>1</container>
   </customwidget>
   <customwidget>

@@ -119,7 +119,7 @@ Stream makeStream(Level level, const Tag& tag)
  * Can be used to redirect NX_PRINT to log as following:
  * <pre><code>
  *     #define NX_PRINT NX_UTILS_LOG_STREAM_NO_SPACE( \
- *     nx::utils::log::Level::debug, nx::utils::log::Tag(lit("vca_metadata_plugin"))) \
+ *     nx::utils::log::Level::debug, nx::utils::log::Tag(QStringLiteral("vca_metadata_plugin"))) \
  *     << NX_PRINT_PREFIX
  * </code></pre>
  */

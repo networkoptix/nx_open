@@ -414,6 +414,7 @@ protected:
     void setMaxChannels(int value);
 
     virtual std::vector<Camera::AdvancedParametersProvider*> advancedParametersProviders() override;
+    virtual QnAudioTransmitterPtr initializeTwoWayAudio();
 
 private slots:
     void onRenewSubscriptionTimer( quint64 timerID );
@@ -591,7 +592,6 @@ private:
     void fillFullUrlInfo( const CapabilitiesResp& response );
     CameraDiagnostics::Result getVideoEncoderTokens(MediaSoapWrapper& soapWrapper, QStringList* result, VideoConfigsResp *confResponse);
     QString getInputPortNumberFromString(const QString& portName);
-    virtual QnAudioTransmitterPtr initializeTwoWayAudio();
     QnAudioTransmitterPtr initializeTwoWayAudioByResourceData();
 
     mutable QnMutex m_physicalParamsMutex;

@@ -53,11 +53,19 @@ class SMBPath(FileSystemPath, PureWindowsPath):
         with closing(NetBIOS(broadcast=False)) as client:
             server_name = client.queryIPForName(
                 str(cls._name_service_address), port=cls._name_service_port)
+            # TODO: Check and retry when got None.
         return server_name[0]
 
     @classmethod
     @lrudecorator(1)
     def _connection(cls):
+        # TODO: Use connection pooling with keep-alive: connections can be closed from server side.
+        # See: http://pysmb.readthedocs.io/en/latest/api/smb_SMBConnection.html (Caveats section)
+        # Do not keep a SMBConnection instance "idle" for too long,
+        # i.e. keeping a SMBConnection instance but not using it.
+        # Most SMB/CIFS servers have some sort of keepalive mechanism and
+        # impose a timeout limit. If the clients fail to respond within
+        # the timeout limit, the SMB/CIFS server may disconnect the client.
         client_name = u'FUNC_TESTS_EXECUTION'.encode('ascii')  # Arbitrary ASCII string.
         server_name = cls._net_bios_name()
         connection = SMBConnection(

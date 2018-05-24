@@ -224,10 +224,10 @@ void PortMapper::addNewDevice(
             ensureMapping(newDevice, map.first.port, map.first.protocol);
     }
 
-    NX_LOGX(lit("New device %1 ( %2 ) has been found on %3")
-        .arg(url.toString(QUrl::RemovePassword))
-        .arg(serial).arg(localAddress.toString()),
-        cl_logDEBUG2);
+    NX_VERBOSE(this, lm("New device %1 (%2) has been found on %3").args(
+        url.toString(QUrl::RemovePassword),
+        serial,
+        localAddress));
 }
 
 void PortMapper::removeMapping(PortId portId)
@@ -272,9 +272,8 @@ void PortMapper::updateExternalIp(Device& device)
         std::list<Guard> callbackGuards;
 
         QnMutexLocker lock(&m_mutex);
-        NX_LOGX(lit("externalIp='%1' on device %2")
-            .arg(externalIp.toString())
-            .arg(device.url.toString(QUrl::RemovePassword)), cl_logDEBUG1);
+        NX_DEBUG(this, lm("externalIp='%1' on device %2").args(
+            externalIp, device.url.toString(QUrl::RemovePassword)));
 
         // All mappings with old IPs are not valid.
         if (device.externalIp != externalIp && device.externalIp != HostAddress())
@@ -376,8 +375,7 @@ void PortMapper::ensureMapping(Device& device, quint16 inPort, Protocol protocol
                 mapping.protocol == protocol &&
                 (mapping.duration == 0 || mapping.duration > m_checkMappingsInterval))
             {
-                NX_LOGX(lit("Already mapped %1").arg(mapping.toString()),
-                    cl_logDEBUG1);
+                NX_DEBUG(this, lm("Already mapped %1").arg(mapping.toString()));
 
                 if (deviceMap == device.mapped.end() ||
                     deviceMap->second != mapping.externalPort)
@@ -447,9 +445,8 @@ void PortMapper::makeMapping(
             }
             else
             {
-                NX_LOGX(lit("Cound not forward any port on %1")
-                    .arg(device.url.toString(QUrl::RemovePassword)),
-                    cl_logERROR);
+                NX_ERROR(this, lm("Cound not forward any port on %1")
+                    .arg(device.url.toString(QUrl::RemovePassword)));
             }
 
             return;

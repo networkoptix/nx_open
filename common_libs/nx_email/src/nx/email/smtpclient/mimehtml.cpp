@@ -22,7 +22,7 @@
 
 MimeHtml::MimeHtml(const QString &html) : MimeText(html)
 {
-    this->cType = lit("text/html");
+    this->cType = "text/html";
 	this->cEncoding = Base64;
 }
 

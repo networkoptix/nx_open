@@ -30,12 +30,15 @@ public:
 
 private:
     QToolButton* newActionButton(ui::action::IDType actionId, int helpTopicId);
+    void showContextMenu(const QPoint& pos);
 
 private:
     NotificationListWidget* q = nullptr;
     EventRibbon* const m_eventRibbon = nullptr;
     AbstractEventListModel* m_systemHealthModel = nullptr;
     AbstractEventListModel* m_notificationsModel = nullptr;
+
+    QWidget* m_placeholder = nullptr;
 };
 
 } // namespace desktop

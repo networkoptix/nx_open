@@ -85,7 +85,9 @@ QString ResourceContainer::toString(const nx::utils::stree::ResourceNameSet& rns
     {
         if (!str.isEmpty())
             str += QLatin1String(", ");
-        str += lit("%1:%2").arg(rns.findResourceByID(resPair.first).name).arg(resPair.second.toString());
+        str += QString("%1:%2")
+            .arg(rns.findResourceByID(resPair.first).name)
+            .arg(resPair.second.toString());
     }
     return str;
 }

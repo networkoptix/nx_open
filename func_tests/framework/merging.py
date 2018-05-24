@@ -80,10 +80,7 @@ def merge_systems(local, remote, accessible_ip_net=IPNetwork('10.254.0.0/16'), t
             raise MergeUnauthorized(local, remote, e.error, e.error_string)
         raise ExplicitMergeError(local, remote, e.error, e.error_string)
     servant.api = servant.api.with_credentials(master.api.user, master.api.password)
-    wait_for_true(
-        servant.api.credentials_work,
-        "{} accepts new credentials from {}".format(servant, master),
-        timeout_sec=30)
+    wait_for_true(servant.api.credentials_work, timeout_sec=30)
     wait_for_true(
         lambda: get_local_system_id(servant.api) == master_system_id,
         "{} responds with system id {}".format(servant, master_system_id),

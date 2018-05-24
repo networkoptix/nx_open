@@ -20,6 +20,7 @@
 #include <ui/workaround/sharp_pixmap_painting.h>
 
 #include <nx/utils/log/log.h>
+#include <nx/fusion/serialization/lexical.h>
 #include <ini.h>
 
 using nx::client::core::Geometry;
@@ -38,25 +39,6 @@ static const QSize kBackgroundPreviewSize(200, 200);
 static inline bool isOdd(int value)
 {
     return (value & 1) != 0;
-}
-
-static const char * statusToString(Qn::ThumbnailStatus status)
-{
-    switch (status)
-    {
-    case Qn::ThumbnailStatus::Invalid:
-        return "Invalid";
-    case Qn::ThumbnailStatus::Loading:
-        return "Loading";
-    case Qn::ThumbnailStatus::Loaded:
-        return "Loaded";
-    case Qn::ThumbnailStatus::NoData:
-        return "NoData";
-    case Qn::ThumbnailStatus::Refreshing:
-        return "Refreshing";
-    default:
-        return "UnknownStatus";
-    }
 }
 
 } // namespace
@@ -201,7 +183,7 @@ struct LayoutThumbnailLoader::Private
         ItemPtr item)
     {
         bool loaderIsComplete = false;
-        QString strStatus = QString::fromLocal8Bit(statusToString(status));
+        QString strStatus = QnLexical::serialized(status);
 
         NX_VERBOSE(this) << "LayoutThumbnailLoader(" << layoutName << ") item ="
             << item->name
@@ -552,7 +534,7 @@ void LayoutThumbnailLoader::doLoadAsync()
     // Pretty name for debug output
     d->layoutName = d->layout->getName();
     if (d->layoutName.isEmpty())
-        d->layoutName = lit("Nameless");
+        d->layoutName = lit("<Layout>");
 
     QSize outputSize(bounding.width() * xscale, bounding.height() * yscale);
     d->outputImage = QImage(outputSize, QImage::Format_ARGB32_Premultiplied);

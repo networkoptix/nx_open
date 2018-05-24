@@ -1398,11 +1398,11 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Helps avoid problems with OpenGL drawing which result in 100% CPU load.</source>
-      <translation type="unfinished">Helps avoid problems with OpenGL drawing which result in 100% CPU load.</translation>
+      <translation>使用OpenGL绘图有助于避免产生100％CPU负载的问题。</translation>
     </message>
     <message>
       <source>Adjust to smallest value that does not degrade live view. Bigger buffer makes playback smoother but increases delay between real time and live view; smaller buffer decreases delay but can cause stutters.</source>
-      <translation type="unfinished">Adjust to smallest value that does not degrade live view. Bigger buffer makes playback smoother but increases delay between real time and live view; smaller buffer decreases delay but can cause stutters.</translation>
+      <translation>调整到最小值不影响即时预览。缓冲区越大会使回放更平顺, 但会延迟即时播放; 缓冲区越小可以减少延迟，但可能会导致播放停顿。</translation>
     </message>
   </context>
   <context>
@@ -1417,11 +1417,11 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Sets when camera archive will be deleted or saved when there is no space for new recordings.</source>
-      <translation type="unfinished">Sets when camera archive will be deleted or saved when there is no space for new recordings.</translation>
+      <translation>当录影空间不够时, 请设定摄像机存档应被删除或储存。</translation>
     </message>
     <message>
       <source>&quot;Auto&quot; deletes the oldest footage first, regardless of the source.</source>
-      <translation type="unfinished">&quot;Auto&quot; deletes the oldest footage first, regardless of the source.</translation>
+      <translation>&quot;自动&quot; 优先删除最早的视频, 不考虑来源。</translation>
     </message>
   </context>
   <context>
@@ -2354,21 +2354,21 @@ to view more bookmarks</source>
     </message>
     <message numerus="yes">
       <source>This ID is already used on the following %n cameras: %1</source>
-      <translation type="unfinished">
-        <numerusform>This ID is already used on the following %n cameras: %1</numerusform>
+      <translation>
+        <numerusform>此ID已被以下 %n 支摄像机使用: %1</numerusform>
       </translation>
     </message>
     <message>
       <source>Helps fix image quality issues on some cameras; for others will cause significant bitrate increase.</source>
-      <translation type="unfinished">Helps fix image quality issues on some cameras; for others will cause significant bitrate increase.</translation>
+      <translation>此配置有助于改善摄像机的影像质量问题, 但摄像机比特率将会显著增加。</translation>
     </message>
     <message>
       <source>Custom number that can be assigned to a camera for quick identification and access</source>
-      <translation type="unfinished">Custom number that can be assigned to a camera for quick identification and access</translation>
+      <translation>请分配自订编号给摄影机，以便快速识别和连结</translation>
     </message>
     <message>
       <source>Server will not change any cameras settings, it will receive and use camera stream as-is.</source>
-      <translation type="unfinished">Server will not change any cameras settings, it will receive and use camera stream as-is.</translation>
+      <translation>伺服器不更动任何摄像机码流配置, 将直接使用摄像机所提供之码流并保留码流默认配置。</translation>
     </message>
   </context>
   <context>
@@ -2486,7 +2486,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>ID</source>
-      <translation type="unfinished">ID</translation>
+      <translation>ID</translation>
     </message>
   </context>
   <context>
@@ -2649,11 +2649,11 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Quality setting determines the compression rate only, and does not affect resolution. Low, Medium, High and Best are preset bitrate values.</source>
-      <translation type="unfinished">Quality setting determines the compression rate only, and does not affect resolution. Low, Medium, High and Best are preset bitrate values.</translation>
+      <translation>质量配置仅决定压缩率，不影响像素。低，中，高和最佳是默认比特率。</translation>
     </message>
     <message>
       <source>First choose a recording option, then apply it to day and time blocks on the recording schedule. (0 block is 12:00am to 1:00am, 23 block is 11:00pm to 12:00am.)</source>
-      <translation type="unfinished">First choose a recording option, then apply it to day and time blocks on the recording schedule. (0 block is 12:00am to 1:00am, 23 block is 11:00pm to 12:00am.)</translation>
+      <translation>首先选择一种录影排程, 将录影排程套用于欲选择之星期和时间区段。 (0 表示为12:00am 到 1:00am, 23 表示为 11:00pm 12:00am.)</translation>
     </message>
   </context>
   <context>
@@ -2844,20 +2844,20 @@ to %1</source>
     <name>QnCloudResultMessages</name>
     <message>
       <source>Account not found</source>
-      <translation type="unfinished">Account not found</translation>
+      <translation>未找到该用户</translation>
     </message>
     <message>
       <source>Account is not activated.</source>
-      <translation type="unfinished">Account is not activated.</translation>
+      <translation>用户未啟用</translation>
     </message>
     <message>
       <source>Please log in to %1 and follow the provided instructions.</source>
       <comment>%1 is a cloud site name like &quot;Nx Cloud&quot;</comment>
-      <translation type="unfinished">Please log in to %1 and follow the provided instructions.</translation>
+      <translation>请登录到 %1 , 并依照提供的指示进行操作。</translation>
     </message>
     <message>
       <source>Invalid password</source>
-      <translation type="unfinished">Invalid password</translation>
+      <translation>密码错误</translation>
     </message>
   </context>
   <context>
@@ -3113,11 +3113,11 @@ to %1</source>
     <name>QnCustomBusinessEventWidget</name>
     <message>
       <source>Event will trigger only if there are matches in caption with any of entered keywords.</source>
-      <translation type="unfinished">Event will trigger only if there are matches in caption with any of entered keywords.</translation>
+      <translation>只有当标题中的文字与任何输入的关键字相符时, 事件才会触发。</translation>
     </message>
     <message>
       <source>If the field is empty, event will always trigger.</source>
-      <translation type="unfinished">If the field is empty, event will always trigger.</translation>
+      <translation>如果该栏位为空白, 事件将维持在触发状态。</translation>
     </message>
   </context>
   <context>
@@ -3188,7 +3188,7 @@ to %1</source>
     </message>
     <message>
       <source>Database Backup Files</source>
-      <translation type="unfinished">Database Backup Files</translation>
+      <translation>数据库备份文件</translation>
     </message>
   </context>
   <context>
@@ -3323,7 +3323,7 @@ to %1</source>
     <message>
       <source>All %1 users will be deleted.</source>
       <comment>%1 is the short cloud name (like Cloud)</comment>
-      <translation type="unfinished">All %1 users will be deleted.</translation>
+      <translation>将删除所有 %1 用户</translation>
     </message>
     <message>
       <source>You will not be able to connect to this System with your %1 account after you disconnect this System from %1.</source>
@@ -3335,7 +3335,7 @@ to %1</source>
     <name>QnEmptyBusinessActionWidget</name>
     <message>
       <source>Panic Recording mode switches recording settings for all Cameras to maximum FPS and Quality</source>
-      <translation type="unfinished">Panic Recording mode switches recording settings for all Cameras to maximum FPS and Quality</translation>
+      <translation>紧急錄影模式將切換全部攝像機的錄影配置至最大帪數和質量</translation>
     </message>
   </context>
   <context>
@@ -3570,7 +3570,7 @@ to %1</source>
     <name>QnFisheyeSettingsWidget</name>
     <message>
       <source>Use this setting to compensate for distortion if camera is not mounted exactly vertically or horizontally.</source>
-      <translation type="unfinished">Use this setting to compensate for distortion if camera is not mounted exactly vertically or horizontally.</translation>
+      <translation>当客户端和服务器电脑处于不同时区时, 设定依循客户端使用的时间 (时间表、时间戳记等)。</translation>
     </message>
   </context>
   <context>
@@ -3644,11 +3644,11 @@ to %1</source>
     </message>
     <message>
       <source>Backup includes servers and cameras settings, users, webpages, event rules, etc. Video is not saved.</source>
-      <translation type="unfinished">Backup includes servers and cameras settings, users, webpages, event rules, etc. Video is not saved.</translation>
+      <translation>备份包括服务器和摄像机设置，用户，网页，事件规则等。视频不保存。</translation>
     </message>
     <message>
       <source>Creates a backup of System configuration that can be restored in case of failure.</source>
-      <translation type="unfinished">Creates a backup of System configuration that can be restored in case of failure.</translation>
+      <translation>创建系统配置备份档可在系统毁损后还原.</translation>
     </message>
   </context>
   <context>
@@ -4454,15 +4454,15 @@ to %1</source>
     </message>
     <message>
       <source>Sets the time to use in the client (timeline, timestamps, etc.) when client and server machines are in different time zones.</source>
-      <translation type="unfinished">Sets the time to use in the client (timeline, timestamps, etc.) when client and server machines are in different time zones.</translation>
+      <translation>当客户端和服务器电脑处于不同时区时, 配置依循客户端使用的时间 (时间表、时间戳等)。</translation>
     </message>
     <message>
       <source>Length of time each camera on layout will be displayed if you start a Layout Tour.</source>
-      <translation type="unfinished">Length of time each camera on layout will be displayed if you start a Layout Tour.</translation>
+      <translation>当启动布局巡航, 调整影像在屏幕上显示的时间长度。</translation>
     </message>
     <message>
       <source>Displays IP addresses for cameras and servers and groups for users.</source>
-      <translation type="unfinished">Displays IP addresses for cameras and servers and groups for users.</translation>
+      <translation>提示额外讯息, 包含摄像机和服务器的IP地址以及用户所属之角色。</translation>
     </message>
   </context>
   <context>
@@ -5627,7 +5627,7 @@ to %1</source>
     </message>
     <message>
       <source>Servers with failover enabled will automatically take cameras from offline servers.</source>
-      <translation type="unfinished">Servers with failover enabled will automatically take cameras from offline servers.</translation>
+      <translation>已启用备援移转的服务器将自动接管离线服务器中的摄像机</translation>
     </message>
   </context>
   <context>
@@ -5832,15 +5832,15 @@ to %1</source>
     </message>
     <message>
       <source>Update Files</source>
-      <translation type="unfinished">Update Files</translation>
+      <translation>更新文件</translation>
     </message>
     <message>
       <source>Validating the update...</source>
-      <translation type="unfinished">Validating the update...</translation>
+      <translation>正在验证更新...</translation>
     </message>
     <message>
       <source>Checking for free space...</source>
-      <translation type="unfinished">Checking for free space...</translation>
+      <translation>正在检查可用空间...</translation>
     </message>
   </context>
   <context>
@@ -6324,11 +6324,11 @@ to %1</source>
     </message>
     <message>
       <source>Backup includes servers and cameras settings, users, webpages, event rules, etc. Video is not saved.</source>
-      <translation type="unfinished">Backup includes servers and cameras settings, users, webpages, event rules, etc. Video is not saved.</translation>
+      <translation>备份包括服务器和摄像机设置，用户，网页，事件规则等。视频不保存。</translation>
     </message>
     <message>
       <source>Creates a backup of System configuration that can be restored in case of failure.</source>
-      <translation type="unfinished">Creates a backup of System configuration that can be restored in case of failure.</translation>
+      <translation>创建系统配置备份档可在系统毁损后还原.</translation>
     </message>
   </context>
   <context>
@@ -6624,11 +6624,11 @@ to %1</source>
     </message>
     <message>
       <source>Sends anonymous System information (firmware, codecs, streams, etc.).</source>
-      <translation type="unfinished">Sends anonymous System information (firmware, codecs, streams, etc.).</translation>
+      <translation>发送匿名系统信息 (固件、编解码器、碼流等)。</translation>
     </message>
     <message>
       <source>Tracks and logs all user actions.</source>
-      <translation type="unfinished">Tracks and logs all user actions.</translation>
+      <translation>跟踪和记录所有用户操作</translation>
     </message>
   </context>
   <context>
@@ -6927,7 +6927,7 @@ to %1</source>
     </message>
     <message>
       <source>Users can be imported from an LDAP server. They will be able to log in only if LDAP server is online and their accounts are active on it.</source>
-      <translation type="unfinished">Users can be imported from an LDAP server. They will be able to log in only if LDAP server is online and their accounts are active on it.</translation>
+      <translation>用户讯息可由 LDAP 服务器汇入。但 LDAP 服务器必须保持连线并且该用户状态为启用中, 才能够登录。</translation>
     </message>
   </context>
   <context>
@@ -7117,26 +7117,26 @@ to %1</source>
     <message>
       <source>%1 user with specified email already exists.</source>
       <comment>%1 is the short cloud name (like Cloud)</comment>
-      <translation type="unfinished">%1 user with specified email already exists.</translation>
+      <translation>%1该邮箱地址已被注册过</translation>
     </message>
     <message>
       <source>Local users</source>
-      <translation type="unfinished">Local users</translation>
+      <translation>本地用户</translation>
     </message>
     <message>
       <source>%1 users</source>
       <comment>%1 is the short cloud name (like Cloud)</comment>
-      <translation type="unfinished">%1 users</translation>
+      <translation>%1 用户</translation>
     </message>
     <message>
       <source>%1 belong to this system only and are fully managed by system administrators.</source>
       <comment>%1 is local users definition, e.g. &apos;Local users&apos;</comment>
-      <translation type="unfinished">%1 belong to this system only and are fully managed by system administrators.</translation>
+      <translation>%1 仅属于此系统，并由系统管理员完全管理。</translation>
     </message>
     <message>
       <source>%1 can have access to many Systems. Administrators can manage their rights only.</source>
       <comment>%1 is cloud users definition, e.g. &apos;Cloud users&apos;</comment>
-      <translation type="unfinished">%1 can have access to many Systems. Administrators can manage their rights only.</translation>
+      <translation>%1 拥有可登录许多系统的权限。系统管理员只能管理其许可权</translation>
     </message>
   </context>
   <context>
@@ -7331,7 +7331,7 @@ to %1</source>
     </message>
     <message>
       <source>Video Wall is removed on the server and will be closed.</source>
-      <translation type="unfinished">Video Wall is removed on the server and will be closed.</translation>
+      <translation>将在服务器上删除视频墙, 并将其关闭</translation>
     </message>
   </context>
   <context>
@@ -7379,7 +7379,7 @@ to %1</source>
     <message>
       <source>%1 Systems cannot be merged</source>
       <comment>%1 is the short cloud name (like Cloud)</comment>
-      <translation type="unfinished">%1 Systems cannot be merged</translation>
+      <translation>%1 系统不能合并</translation>
     </message>
   </context>
   <context>
@@ -8119,7 +8119,7 @@ to %1</source>
     <name>nx::client::desktop::HintButton</name>
     <message>
       <source>Click to read more</source>
-      <translation type="unfinished">Click to read more</translation>
+      <translation>点击了解更多</translation>
     </message>
   </context>
   <context>
@@ -8370,23 +8370,23 @@ to %1</source>
     <name>nx::client::desktop::ui::AnalyticsSdkEventWidget</name>
     <message>
       <source>Analytics events can be set up on a certain cameras.</source>
-      <translation type="unfinished">Analytics events can be set up on a certain cameras.</translation>
+      <translation>分析事件功能可被安装于某些摄像机</translation>
     </message>
     <message>
       <source>Choose cameras using the button above to see the list of supported events.</source>
-      <translation type="unfinished">Choose cameras using the button above to see the list of supported events.</translation>
+      <translation>选择摄像机并点击上方的按钮以查看支援的事件清单</translation>
     </message>
     <message>
       <source>Event will trigger only if there are matches in caption with any of entered keywords.</source>
-      <translation type="unfinished">Event will trigger only if there are matches in caption with any of entered keywords.</translation>
+      <translation>只有当标题栏位中的文字与输入的任何关键字相符时，事件才会触发。</translation>
     </message>
     <message>
       <source>If the field is empty, event will always trigger.</source>
-      <translation type="unfinished">If the field is empty, event will always trigger.</translation>
+      <translation>如果该栏位为空白，事件将维持在触发状态</translation>
     </message>
     <message>
       <source>Event will trigger only if there are matches in the description field with any of the entered keywords.</source>
-      <translation type="unfinished">Event will trigger only if there are matches in the description field with any of the entered keywords.</translation>
+      <translation>如果该栏位为空白，事件将维持在触发状态。只有当叙述栏位中的文字与输入的任何关键字相符时，事件才会触发</translation>
     </message>
   </context>
   <context>
@@ -8733,15 +8733,15 @@ to %1</source>
     </message>
     <message>
       <source>To use the software you must accept the end user license agreement</source>
-      <translation type="unfinished">To use the software you must accept the end user license agreement</translation>
+      <translation>使用该软件前，您必须同意用户许可协议</translation>
     </message>
     <message>
       <source>Accept</source>
-      <translation type="unfinished">Accept</translation>
+      <translation>同意</translation>
     </message>
     <message>
       <source>Decline</source>
-      <translation type="unfinished">Decline</translation>
+      <translation>拒绝</translation>
     </message>
   </context>
   <context>

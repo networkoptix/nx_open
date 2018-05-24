@@ -58,11 +58,11 @@ void DownloaderPrivate::createWorker(const QString& fileName)
     if (status != FileInformation::Status::downloaded
         && status != FileInformation::Status::uploading)
     {
-        auto peerPolicy = storage->fileInformation(fileName).peerPolicy;
+        const auto fi = storage->fileInformation(fileName);
         auto worker = std::make_shared<Worker>(
             fileName,
             storage.data(),
-            peerManagerFactory->createPeerManager(peerPolicy));
+            peerManagerFactory->createPeerManager(fi.peerPolicy, fi.additionalPeers));
         workers[fileName] = worker;
 
         connect(worker.get(), &Worker::finished, this, &DownloaderPrivate::at_workerFinished);

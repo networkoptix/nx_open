@@ -133,7 +133,7 @@ QnGeneralSystemAdministrationWidget::QnGeneralSystemAdministrationWidget(QWidget
     auto backupHint = nx::client::desktop::HintButton::hintThat(ui->backupGroupBox);
     backupHint->addHintLine(tr("Creates a backup of System configuration that can be restored in case of failure."));
     backupHint->addHintLine(tr("Backup includes servers and cameras settings, users, webpages, event rules, etc. Video is not saved."));
-    backupHint->setHelpTopic(Qn::SystemSettings_Server_Backup_Help);
+    setHelpTopic(backupHint, Qn::SystemSettings_Server_Backup_Help);
 
     connect(m_buttons[kBusinessRulesButton], &QPushButton::clicked, this,
         [this] { menu()->trigger(ui::action::OpenBusinessRulesAction); });

@@ -15,7 +15,7 @@ CloudModuleUrlFetcher::CloudModuleUrlFetcher(const QString& moduleName):
     NX_ASSERT(
         m_moduleAttrName != nx::utils::stree::INVALID_RES_ID,
         Q_FUNC_INFO,
-        lit("Given bad cloud module name %1").arg(moduleName));
+        lm("Given bad cloud module name %1").arg(moduleName));
 }
 
 void CloudModuleUrlFetcher::setUrl(nx::utils::Url url)

@@ -5,8 +5,7 @@
     #include <syscall.h>
     #include <unistd.h>
 #elif defined(_WIN32)
-    #define _CRT_RAND_S
-    #include <stdlib.h> 
+    #include <stdlib.h>
 #else
 // Fallback to QtDevice
 #endif // _WIN32
