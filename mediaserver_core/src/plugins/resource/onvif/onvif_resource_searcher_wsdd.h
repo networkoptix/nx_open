@@ -44,12 +44,6 @@ struct CameraInfo: public EndpointAdditionalInfo
     }
 };
 
-///** Dummy class to force moc to parse this file */
-//class Dummy: QObject
-//{
-//    Q_OBJECT
-//};
-
 class OnvifResourceSearcherWsdd
 {
     static QString LOCAL_ADDR;
@@ -129,7 +123,6 @@ private:
     bool sendProbe( const QnInterfaceAndAddr& iface );
     bool readProbeMatches( const QnInterfaceAndAddr& iface, EndpointInfoHash& result );
 };
-//Q_DECLARE_METATYPE(OnvifResourceSearcherWsdd::ObtainMacFromMulticast)
 QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(OnvifResourceSearcherWsdd::ObtainMacFromMulticast)
 QN_FUSION_DECLARE_FUNCTIONS(OnvifResourceSearcherWsdd::ObtainMacFromMulticast, (metatype)(numeric)(lexical))
 
