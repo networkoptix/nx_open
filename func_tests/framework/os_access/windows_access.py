@@ -32,6 +32,7 @@ class WindowsAccess(OSAccess):
         return self._forwarded_ports
 
     @property
+    @lrudecorator(100)
     def Path(self):
         winrm = self.winrm
 

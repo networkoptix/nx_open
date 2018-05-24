@@ -48,7 +48,7 @@ class SMBPath(FileSystemPath, PureWindowsPath):
     _session_service_address, _session_service_port = abstractproperty(), abstractproperty()
 
     @classmethod
-    @lrudecorator(1)
+    @lrudecorator(100)
     def _net_bios_name(cls):
         with closing(NetBIOS(broadcast=False)) as client:
             server_name = client.queryIPForName(
@@ -57,7 +57,7 @@ class SMBPath(FileSystemPath, PureWindowsPath):
         return server_name[0]
 
     @classmethod
-    @lrudecorator(1)
+    @lrudecorator(100)
     def _connection(cls):
         # TODO: Use connection pooling with keep-alive: connections can be closed from server side.
         # See: http://pysmb.readthedocs.io/en/latest/api/smb_SMBConnection.html (Caveats section)
