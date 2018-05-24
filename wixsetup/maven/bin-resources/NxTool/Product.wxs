@@ -51,7 +51,7 @@
             <![CDATA[ NXTOOL_DIRECTORY_REG = "" ]]>
         </SetProperty>
 
-        <WixVariable Id="WixUILicenseRtf" Value="$(var.CustomizationDir)/wixsetup/License.rtf" />
+        <WixVariable Id="WixUILicenseRtf" Value="license.rtf" />
         <WixVariable Id="WixUIBannerBmp" Value="$(var.CustomizationDir)/wixsetup/nxtool/logo_493x58.bmp" />
         <WixVariable Id="WixUIDialogBmp" Value="$(var.CustomizationDir)/wixsetup/nxtool/logo_493x312.bmp" />
 

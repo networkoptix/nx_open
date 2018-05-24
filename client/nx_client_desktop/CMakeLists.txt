@@ -36,7 +36,7 @@ nx_add_target(nx_client_desktop LIBRARY
         "${CMAKE_CURRENT_LIST_DIR}/skins/${defaultSkin}"
         "${customization_dir}/nx_client_desktop/resources"
         "${customization_dir}/icons/all/logo.png"
-        "${customization_dir}/license.txt"
+        "${customization_dir}/license.html"
         "${CMAKE_CURRENT_BINARY_DIR}/globals.json"
         "${nov_file_launcher_executable}"
     OTHER_SOURCES
