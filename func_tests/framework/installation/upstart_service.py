@@ -13,25 +13,25 @@ class UpstartService(Service):
     These tests are running mostly on Ubuntu 14.04, that is stated as requirement.
     """
 
-    def __init__(self, os_access, service_name):
-        self.os_access = os_access
+    def __init__(self, ssh, service_name):
+        self._ssh = ssh
         self._service_name = service_name
 
     def is_running(self):
-        output = self.os_access.run_command(['status', self._service_name])
+        output = self._ssh.run_command(['status', self._service_name])
         return output.split()[1].split('/')[0] == 'start'
 
     def start(self):
-        self.os_access.run_command(['start', self._service_name])
+        self._ssh.ssh.run_command(['start', self._service_name])
 
     def stop(self):
-        self.os_access.run_command(['stop', self._service_name])
+        self._ssh.run_command(['stop', self._service_name])
 
     def make_core_dump(self):
         try:
-            self.os_access.run_command(['killall', '--signal', 'SIGTRAP', 'mediaserver-bin'])
+            self._ssh.run_command(['killall', '--signal', 'SIGTRAP', 'mediaserver-bin'])
         except NonZeroExitStatus:
-            _logger.error("Cannot make core dump of process of %s service on %r.", self._service_name, self.os_access)
+            _logger.error("Cannot make core dump of process of %s service on %r.", self._service_name, self._ssh)
 
 
 class AdHocService(Service):
