@@ -12,8 +12,6 @@
 #include <nx/network/udt/udt_socket.h>
 #include <nx/utils/std/cpp14.h>
 
-#define USE_NEW_SSL_SOCKET
-
 namespace nx {
 namespace network {
 
