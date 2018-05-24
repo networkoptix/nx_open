@@ -517,24 +517,32 @@ select {
     }
   }
 
-  .input-group-addon {
-    height: 32px;
-    padding: 5px 16px;
-    font-size: 14px;
-    font-weight: 400;
-    line-height: 1;
-    color: #121517;
-    text-align: center;
-    background-color: $light3;
-    border: 1px solid $light5;
-    border-left: none;
-    border-radius: 2px;
-    display: flex;
-    align-items: center;
-    justify-items: center;
+  .input-group {
+    &.has-addon {
+      input {
+        border-right: none !important;
+      }
+    }
 
-    .glyphicon {
-      margin: 0;
+    &-addon {
+      height: 32px;
+      padding: 5px 16px;
+      font-size: 14px;
+      font-weight: 400;
+      line-height: 1;
+      color: #121517;
+      text-align: center;
+      background-color: white !important;
+      border: 1px solid $light5;
+      border-left: none;
+      border-radius: 2px;
+      display: flex;
+      align-items: center;
+      justify-items: center;
+
+      .glyphicon {
+        margin: 0;
+      }
     }
   }
 

@@ -62,22 +62,25 @@
 
         <password-input ng-model="account.password" id="'registerPassword'" label="$root.L.regActions.passwordLabel"></password-input>
 
-        <div class="form-group" validate-field>
-            <div class="offset-sm-4 col-md-4">
-                <div class="checkbox">
-                    <label>
-                        <input type="checkbox" ng-model="account.accept" name="accept" id="accept" required>
-                        I agree to the <a href="/content/eula" target="_blank">Terms and Conditions</a> and
-                        <a href="%PRIVACY_LINK%" target="_blank">Privacy policy</a>
-                    </label>
-                    <p class="form-control-static" ng-if="registerForm.accept.$touched && registerForm.accept.$error.required">
-                        Please review and agree to the Terms and Conditions and Privacy policy in order to proceed
-                    </p>
+        <div class="form-group row" validate-field>
+            <div class="offset-md-4 col-md-4">
+                <label class="checkbox mt-3 mb-3">I agree to the <a href="/content/eula" target="_blank">Terms & Conditions</a>
+                    and <a href="%PRIVACY_LINK%" target="_blank">Privacy policy</a>
+                    <input type="checkbox" checked="checked"
+                           ng-model="account.accept"
+                           name="accept" id="accept" required>
+                    <span class="checkmark"></span>
+                </label>
+            </div>
+            <div class="col-md-4">
+                <div>
+                    <span class="help-block input-error" ng-if="registerForm.accept.$touched && registerForm.accept.$error.required">
+                    Please review and agree to the Terms and Conditions and Privacy policy in order to proceed</span>
                 </div>
             </div>
         </div>
         <div class="form-group">
-            <div class="offset-md-4 col-md-8">
+            <div class="offset-md-4 col-md-8 p-0 pl-md-2">
                 <process-button process="register"
                                 form="registerForm"
                                 class="float-left"

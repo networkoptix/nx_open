@@ -1,3 +1,5 @@
+@import './theme_variables';
+
 /* Customize the label (the container) */
 .checkbox {
     display: block;
@@ -22,7 +24,7 @@
 
     /* On mouse-over, add a grey background color */
     &:hover input ~ .checkmark {
-        background-color: #ccc;
+        background-color: $light3;
     }
 
     /* When the checkbox is checked, add a blue background */
@@ -33,6 +35,11 @@
     /* Show the checkmark when checked */
     & input:checked ~ .checkmark:after {
         display: block;
+    }
+
+    /* If not valid, change border color */
+    & input:invalid:not(.ng-untouched) ~ .checkmark {
+        border-color: $error;
     }
 
     /* Style the checkmark/indicator */
