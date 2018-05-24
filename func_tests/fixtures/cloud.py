@@ -19,7 +19,7 @@ def pytest_addoption(parser):
 
 @pytest.fixture(scope='session')
 def customization(mediaserver_installers):
-    customizations = set(installer.customization for installer in mediaserver_installers)
+    customizations = set(installer.customization for installer in mediaserver_installers.values())
     customization, = customizations  # This should be checked in mediaserver_installers fixture.
     return customization
 
