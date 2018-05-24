@@ -30,6 +30,7 @@ export class LoginModalContent implements OnInit, AfterViewInit {
     @ViewChild('loginForm') loginForm: HTMLFormElement;
 
     constructor(public activeModal: NgbActiveModal,
+                @Inject('configService') private configService: any,
                 @Inject('account') private account: any,
                 @Inject('process') private process: any,
                 @Inject('cloudApiService') private cloudApi: any,

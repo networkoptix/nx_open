@@ -14,7 +14,7 @@
             <input type="email" class="form-control"
                    id="email" name="email" #email="ngModel"
                    [(ngModel)]="auth.email"
-                   email maxlength="255"
+                   pattern="{{ configService.config.emailRegex }}" maxlength="255"
                    required autofocus>
             <div *ngIf="email.invalid && email.errors.no_user">
                 <label class="input-error" translate>Account not found</label>

@@ -48,7 +48,7 @@
                 <input ng-hide="lockEmail" type="email" class="form-control"
                        ng-model="account.email" id="registerEmail" maxlength="255"
                        name="registerEmail" required autocomplete="off"  validate-email
-                        ng-change="hideAlreadyExists()">
+                       ng-change="hideAlreadyExists()">
 
                 <input type="text" ng-if="lockEmail"
                        class="form-control" ng-model="account.email" readonly>
