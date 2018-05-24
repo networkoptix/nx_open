@@ -34,7 +34,7 @@ class UpstartService(Service):
             _logger.error("Cannot make core dump of process of %s service on %r.", self._service_name, self._ssh)
 
 
-class AdHocService(Service):
+class LinuxAdHocService(Service):
     """Run multiple mediaservers on single machine
 
     Service of any kind doesn't can only run one instance.
@@ -46,22 +46,22 @@ class AdHocService(Service):
     Its interface mimic a `service` command.
     """
 
-    def __init__(self, os_access, dir):
-        self._os_access = os_access
+    def __init__(self, ssh, dir):
+        self._ssh = ssh
         self._service_script_path = dir / 'server_ctl.sh'
 
     def is_running(self):
         # TODO: Make a script.
         if not self._service_script_path.exists():
             return False  # not even installed
-        output = self._os_access.run_command([self._service_script_path, 'is_active'])
+        output = self._ssh.run_command([self._service_script_path, 'is_active'])
         return output.strip() == 'active'
 
     def start(self):
-        return self._os_access.run_command([self._service_script_path, 'start'])
+        return self._ssh.run_command([self._service_script_path, 'start'])
 
     def stop(self):
-        return self._os_access.run_command([self._service_script_path, 'stop'])
+        return self._ssh.run_command([self._service_script_path, 'stop'])
 
     def make_core_dump(self):
-        self._os_access.run_command([self._service_script_path, 'make_core_dump'])
+        self._ssh.run_command([self._service_script_path, 'make_core_dump'])

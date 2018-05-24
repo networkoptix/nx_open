@@ -11,7 +11,7 @@ from framework.installation.mediaserver_factory import (
     SERVER_LOG_ARTIFACT_TYPE,
     TRACEBACK_ARTIFACT_TYPE,
     )
-from framework.installation.upstart_service import AdHocService
+from framework.installation.upstart_service import LinuxAdHocService
 from framework.os_access.path import copy_file
 from framework.rest_api import RestApi
 from framework.waiting import wait_for_true
@@ -152,7 +152,7 @@ class LightweightServersHost(object):
             self._os_access, physical_installation_host.root_dir / 'lws', self._ca)
         self._template_renderer = TemplateRenderer()
         self._lws_dir = self._installation.dir
-        self.service = AdHocService(self._os_access, self._lws_dir)
+        self.service = LinuxAdHocService(self._os_access.ssh, self._lws_dir)
         self._allocated = False
         self._first_server = None
         self._init()

@@ -5,7 +5,7 @@ import uuid
 
 from framework.installation.deb_installation import DebInstallation
 from framework.installation.mediaserver import Mediaserver
-from framework.installation.upstart_service import AdHocService
+from framework.installation.upstart_service import LinuxAdHocService
 from framework.os_access.path import FileSystemPath, copy_file
 from framework.rest_api import RestApi
 from .template_renderer import TemplateRenderer
@@ -149,7 +149,7 @@ class PhysicalInstallationHost(object):
                 return None
         server_port = self._installation_server_port(self._installations.index(installation))
         api = RestApi(config.name, config.http_schema, server_port)
-        service = AdHocService(self.os_access, installation.dir)
+        service = LinuxAdHocService(self.os_access.ssh, installation.dir)
         server = Mediaserver(config.name, service, installation, api, self, port=server_port)
         self._allocated_server_list.append(server)
         return server
@@ -193,7 +193,7 @@ class PhysicalInstallationHost(object):
 
     def _ensure_servers_are_stopped(self):
         for installation in self._installations:
-            service = AdHocService(self.os_access, installation.dir)
+            service = LinuxAdHocService(self.os_access.ssh, installation.dir)
             if service.is_running():
                 service.stop()
 
