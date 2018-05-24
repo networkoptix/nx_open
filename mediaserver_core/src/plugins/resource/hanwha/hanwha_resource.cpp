@@ -137,27 +137,6 @@ static const std::map<QString, PtzTraitDescriptor> kHanwhaPtzTraitDescriptors = 
             lit("ptzcontrol/continuous/control/3AxisPTZ"),
             {kHanwhaTrue}
         }
-    },
-    {
-        QnLexical::serialized(Ptz::ManualAutoFocusPtzTrait),
-        {
-            lit("image/focus/control/Mode"),
-            {lit("SimpleFocus"), lit("AutoFocus")}
-        }
-    },
-    {
-        kHanwhaSimpleFocusTrait,
-        {
-            lit("image/focus/control/Mode"),
-            {lit("SimpleFocus")}
-        }
-    },
-    {
-        kHanwhaAutoFocusTrait,
-        {
-            lit("image/focus/control/Mode"),
-            {lit("AutoFocus")}
-        }
     }
 };
 
@@ -193,32 +172,6 @@ Ptz::Capabilities calculateSupportedPtzCapabilities(
     }
 
     return ptzCapabilities;
-};
-
-QnPtzAuxilaryTraitList calculatePtzTraits(const HanwhaCgiParameters& parameters)
-{
-    QnPtzAuxilaryTraitList ptzTraits;
-    for (const auto& item: kHanwhaPtzTraitDescriptors)
-    {
-        const auto trait = QnPtzAuxilaryTrait(item.first);
-        const auto& descriptor = item.second;
-        const auto& parameter = parameters.parameter(descriptor.parameterName);
-
-        if (parameter == boost::none)
-            continue;
-
-        const auto& possibleValues = parameter->possibleValues();
-        for (const auto& value: descriptor.positiveValues)
-        {
-            if (possibleValues.contains(value))
-            {
-                ptzTraits.push_back(trait);
-                break;
-            }
-        }
-    }
-
-    return ptzTraits;
 };
 
 QnPtzLimits calculatePtzLimits(
@@ -1290,7 +1243,7 @@ CameraDiagnostics::Result HanwhaResource::initPtz()
         initAlternativePtz();
 
     m_ptzLimits = calculatePtzLimits(m_attributes, m_cgiParameters, getChannel());
-    m_ptzTraits.append(calculatePtzTraits(m_cgiParameters));
+    m_ptzTraits.append(calculatePtzTraits());
 
     if (m_ptzTraits.contains(Ptz::ManualAutoFocusPtzTrait))
         m_ptzCapabilities |= Ptz::AuxilaryPtzCapability;
@@ -1346,6 +1299,77 @@ CameraDiagnostics::Result HanwhaResource::initAlternativePtz()
     NX_VERBOSE(this, lm("%1: Supported PTZ capabilities alternative: %2")
         .args(getPhysicalId(), ptzCapabilityBits(m_ptzCapabilities)));
     return CameraDiagnostics::NoErrorResult();
+}
+
+QnPtzAuxilaryTraitList HanwhaResource::calculatePtzTraits() const
+{
+    QnPtzAuxilaryTraitList ptzTraits;
+    for (const auto& item: kHanwhaPtzTraitDescriptors)
+    {
+        const auto trait = QnPtzAuxilaryTrait(item.first);
+        const auto& descriptor = item.second;
+        const auto& parameter = cgiParameters().parameter(descriptor.parameterName);
+
+        if (parameter == boost::none)
+            continue;
+
+        const auto& possibleValues = parameter->possibleValues();
+        for (const auto& value : descriptor.positiveValues)
+        {
+            if (possibleValues.contains(value))
+            {
+                ptzTraits.push_back(trait);
+                break;
+            }
+        }
+    }
+
+    calculateAutoFocusSupport(&ptzTraits);
+    return ptzTraits;
+}
+void HanwhaResource::calculateAutoFocusSupport(QnPtzAuxilaryTraitList* outTraitList) const
+{
+    const auto parameter = cgiParameters().parameter(lit("image/focus/control/Mode"));
+    if (!parameter)
+        return;
+
+    bool gotAutoFocus = false;
+    const auto possibleValues = parameter->possibleValues();
+
+    if (!isNvr() || isBypassSupported())
+    {
+        static const std::map<QString, QString> kAutoFocusModes = {
+            {kHanwhaSimpleFocusTrait, lit("SimpleFocus")},
+            {kHanwhaAutoFocusTrait, lit("AutoFocus")}
+        };
+
+        for (const auto& entry: kAutoFocusModes)
+        {
+            const auto& traitName = entry.first;
+            const auto& mode = entry.second;
+
+            if (possibleValues.contains(mode))
+            {
+                outTraitList->push_back(QnPtzAuxilaryTrait(traitName));
+                gotAutoFocus = true;
+            }
+        }
+    }
+    else
+    {
+        // NVR without bypass.
+        const auto attribute = attributes().attribute<bool>(
+            lm("Image/%1/SimpleFocus").arg(getChannel()));
+
+        if (attribute != boost::none && attribute.get())
+        {
+            outTraitList->push_back(QnPtzAuxilaryTrait(kHanwhaSimpleFocusTrait));
+            gotAutoFocus = true;
+        }
+    }
+
+    if (gotAutoFocus)
+        outTraitList->push_back(QnPtzAuxilaryTrait(Ptz::ManualAutoFocusPtzTrait));
 }
 
 CameraDiagnostics::Result HanwhaResource::initAdvancedParameters()
