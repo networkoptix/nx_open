@@ -1049,7 +1049,7 @@ void MediaServerProcess::parseCommandLineParameters(int argc, char* argv[])
         + toString(nx::utils::log::Settings::kDefaultLevel));
     commandLineParser.addParameter(&m_cmdLineArguments.exceptionFilters, "--exception-filters", NULL, "Log filters.");
     commandLineParser.addParameter(&m_cmdLineArguments.httpLogLevel, "--http-log-level", NULL, "Log value for http_log.log.");
-    commandLineParser.addParameter(&m_cmdLineArguments.hwLogLevel, "--hw-log-level", NULL, "Log value for hw_log.log.");
+    commandLineParser.addParameter(&m_cmdLineArguments.systemLogLevel, "--system-log-level", NULL, "Log value for hw_log.log.");
     commandLineParser.addParameter(&m_cmdLineArguments.ec2TranLogLevel, "--ec2-tran-log-level", NULL, "Log value for ec2_tran.log.");
     commandLineParser.addParameter(&m_cmdLineArguments.permissionsLogLevel, "--permissions-log-level", NULL,"Log value for permissions.log.");
 
@@ -3332,11 +3332,15 @@ void MediaServerProcess::initializeLogging()
         logSettings, qApp->applicationName(), binaryPath,
         QLatin1String("http_log"), nx::utils::log::addLogger({QnLog::HTTP_LOG_INDEX}));
 
-    logSettings = makeLogSettings(cmdLineArguments().hwLogLevel,
-        "hwLoglevel", toString(nx::utils::log::Level::info));
+    logSettings = makeLogSettings(cmdLineArguments().systemLogLevel,
+        "systemLoglevel", toString(nx::utils::log::Level::info));
     nx::utils::log::initialize(
         logSettings, qApp->applicationName(), binaryPath,
-        QLatin1String("hw_log"), nx::utils::log::addLogger({QnLog::HWID_LOG}));
+        QLatin1String("system_log"), nx::utils::log::addLogger(
+            {
+                QnLog::HWID_LOG, 
+                toString(typeid(nx::mediaserver::LicenseWatcher))
+            }));
 
     logSettings = makeLogSettings(cmdLineArguments().ec2TranLogLevel,
         "tranLogLevel", toString(nx::utils::log::Level::none));
@@ -3357,7 +3361,7 @@ void MediaServerProcess::initializeHardwareId()
 {
     const auto binaryPath = QFile::decodeName(m_argv[0]);
 
-    auto logSettings = makeLogSettings(cmdLineArguments().hwLogLevel, "hwLoglevel", "info");
+    auto logSettings = makeLogSettings(cmdLineArguments().systemLogLevel, "systemLoglevel", "info");
     nx::utils::log::initialize(
         logSettings, qApp->applicationName(), binaryPath,
         QLatin1String("hw_log"), nx::utils::log::addLogger({QnLog::HWID_LOG}));
