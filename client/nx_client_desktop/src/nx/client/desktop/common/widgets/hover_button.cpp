@@ -44,10 +44,10 @@ void HoverButton::paintEvent(QPaintEvent* event)
 {
     QPainter painter(this);
 
-    QPixmap& pixmap = m_normal;
+    QPixmap pixmap = m_normal;
     if (m_hasPressedState && isDown())
         pixmap = m_pressed;
-    if(m_isHovered & !isDown())
+    if (m_isHovered && !isDown())
         pixmap = m_highlighted;
 
     if (!pixmap.isNull())
