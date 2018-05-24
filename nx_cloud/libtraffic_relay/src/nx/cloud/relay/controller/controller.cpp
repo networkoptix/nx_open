@@ -32,7 +32,10 @@ Controller::Controller(
 Controller::~Controller()
 {
     for (const auto& subscriptionId: m_listeningPeerPoolSubscriptions)
-        m_model->listeningPeerPool().peerConnectedSubscription().removeSubscription(subscriptionId);
+    {
+        m_model->listeningPeerPool().peerConnectedSubscription()
+            .removeSubscription(subscriptionId);
+    }
 }
 
 controller::AbstractTrafficRelay& Controller::trafficRelay()
@@ -56,7 +59,9 @@ bool Controller::discoverPublicAddress()
     if (!(bool)publicHostAddress)
         return false;
 
-    network::SocketAddress publicSocketAddress(*publicHostAddress, m_settings->http().endpoints.front().port);
+    network::SocketAddress publicSocketAddress(
+        *publicHostAddress,
+        m_settings->http().endpoints.front().port);
     m_model->remoteRelayPeerPool().setNodeId(publicSocketAddress.toStdString());
 
     nx::utils::SubscriptionId subscriptionId;
