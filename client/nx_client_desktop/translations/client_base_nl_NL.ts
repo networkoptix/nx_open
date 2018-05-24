@@ -1422,12 +1422,16 @@ to view more bookmarks</source>
       <translation>Hoge minimumwaarde kan ertoe leiden dat archieflengte afneemt op andere apparaten.</translation>
     </message>
     <message>
-      <source>Sets when camera archive will be deleted or saved when there is no space for new recordings.</source>
-      <translation>Stelt in wanneer het camera-archief wordt verwijderd of opgeslagen wanneer er geen ruimte is voor nieuwe opnames.</translation>
+      <source>Archive can be deleted in case if there are no space for new recording.</source>
+      <translation>Het archief kan worden verwijderd voor het geval er geen ruimte is voor nieuwe opnamen.</translation>
     </message>
     <message>
-      <source>&quot;Auto&quot; deletes the oldest footage first, regardless of the source.</source>
-      <translation>&quot;Auto&quot; wist eerst de oudste beelden, ongeacht de bron.</translation>
+      <source>Min and Max settings determine the age of archive which should be kept for this camera.</source>
+      <translation>De instellingen Min en Max bepalen de duur dat het archief voor deze camera moet worden bewaard.</translation>
+    </message>
+    <message>
+      <source>If &quot;Auto&quot; option is enabled, the oldest footage among all cameras will be deleted first.</source>
+      <translation>Als de optie &quot;Auto&quot; is ingeschakeld, worden de oudste opnames van alle camera's eerst verwijderd.</translation>
     </message>
   </context>
   <context>
@@ -3143,12 +3147,20 @@ to %1</source>
   <context>
     <name>QnCustomBusinessEventWidget</name>
     <message>
-      <source>Event will trigger only if there are matches in caption with any of entered keywords.</source>
-      <translation>Gebeurtenis wordt alleen geactiveerd als er overeenkomsten zijn in de Caption met een van de gekozen trefwoorden.</translation>
-    </message>
-    <message>
       <source>If the field is empty, event will always trigger.</source>
       <translation>Als het veld leeg is, wordt het event altijd geactiveerd.</translation>
+    </message>
+    <message>
+      <source>Event will trigger only if there are matches in the source with any of the entered keywords.</source>
+      <translation type="unfinished">Event will trigger only if there are matches in the source with any of the entered keywords.</translation>
+    </message>
+    <message>
+      <source>Event will trigger only if there are matches in the caption with any of the entered keywords.</source>
+      <translation type="unfinished">Event will trigger only if there are matches in the caption with any of the entered keywords.</translation>
+    </message>
+    <message>
+      <source>Event will trigger only if there are matches in the description with any of the entered keywords.</source>
+      <translation type="unfinished">Event will trigger only if there are matches in the description with any of the entered keywords.</translation>
     </message>
   </context>
   <context>
@@ -3365,8 +3377,8 @@ to %1</source>
   <context>
     <name>QnEmptyBusinessActionWidget</name>
     <message>
-      <source>Panic Recording mode switches recording settings for all Cameras to maximum FPS and Quality</source>
-      <translation>Paniekopname schakelt opname-instellingen voor alle camera's naar maximale FPS en kwaliteit</translation>
+      <source>Panic Recording mode switches recording settings for all cameras to maximum FPS and quality.</source>
+      <translation type="unfinished">Panic Recording mode switches recording settings for all cameras to maximum FPS and quality.</translation>
     </message>
   </context>
   <context>
@@ -4509,12 +4521,12 @@ to %1</source>
       <translation>Stelt de tijd in die moet worden gebruikt in de client (tijdlijn, tijdstempels, enz.) wanneer client- en servermachines zich in verschillende tijdzones bevinden.</translation>
     </message>
     <message>
-      <source>Length of time each camera on layout will be displayed if you start a Layout Tour.</source>
-      <translation>Lengte van de weergave voor elke apparaat in de schermindeling als u een tour cyclus start.</translation>
+      <source>Displays IP addresses for cameras and servers and roles for users.</source>
+      <translation type="unfinished">Displays IP addresses for cameras and servers and roles for users.</translation>
     </message>
     <message>
-      <source>Displays IP addresses for cameras and servers and groups for users.</source>
-      <translation>Geeft IP-adressen weer voor camera's en servers en groepen voor gebruikers.</translation>
+      <source>Length of time each camera on layout will be displayed if you start a Tour.</source>
+      <translation type="unfinished">Length of time each camera on layout will be displayed if you start a Tour.</translation>
     </message>
   </context>
   <context>
@@ -6692,12 +6704,16 @@ to %1</source>
       <translation>Laat het systeem toe om de camera-instellingen te optimaliseren</translation>
     </message>
     <message>
-      <source>Sends anonymous System information (firmware, codecs, streams, etc.).</source>
-      <translation>Verzendt anonieme systeeminformatie (firmware, codecs, streams, enz.).</translation>
-    </message>
-    <message>
       <source>Tracks and logs all user actions.</source>
       <translation>Traceert en logt alle gebruikersacties.</translation>
+    </message>
+    <message>
+      <source>Includes information about system, such as cameras models and firmware versions, number of servers, etc.</source>
+      <translation type="unfinished">Includes information about system, such as cameras models and firmware versions, number of servers, etc.</translation>
+    </message>
+    <message>
+      <source>Does not include any personal information and is completely anonymous.</source>
+      <translation type="unfinished">Does not include any personal information and is completely anonymous.</translation>
     </message>
   </context>
   <context>
@@ -8489,16 +8505,16 @@ to %1</source>
       <translation>Kies camera's met de knop hierboven om de lijst met ondersteunde gebeurtenissen te bekijken.</translation>
     </message>
     <message>
-      <source>Event will trigger only if there are matches in caption with any of entered keywords.</source>
-      <translation>Een gebeurtenis wordt alleen geactiveerd als er overeenkomsten zijn in de Caption met een van de gekozen trefwoorden.</translation>
-    </message>
-    <message>
       <source>If the field is empty, event will always trigger.</source>
       <translation>Als het veld leeg is, wordt de gebeurtenis altijd geactiveerd.</translation>
     </message>
     <message>
       <source>Event will trigger only if there are matches in the description field with any of the entered keywords.</source>
       <translation>De gebeurtenis wordt alleen geactiveerd als er overeenkomsten zijn in de Omschrijving met een van de gekozen trefwoorden.</translation>
+    </message>
+    <message>
+      <source>Event will trigger only if there are matches in the caption with any of the entered keywords.</source>
+      <translation type="unfinished">Event will trigger only if there are matches in the caption with any of the entered keywords.</translation>
     </message>
   </context>
   <context>

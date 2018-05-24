@@ -1162,7 +1162,6 @@ CameraDiagnostics::Result HanwhaResource::initIo()
 
         if (gotNetworkAlarmInput)
         {
-
             QnIOPortData inputPortData;
             inputPortData.portType = Qn::PT_Input;
             inputPortData.id = lit("Channel.%1.NetworkAlarmInput").arg(getChannel());
@@ -1723,6 +1722,9 @@ CameraDiagnostics::Result HanwhaResource::findProfiles(
     for (const auto& entry: currentChannelProfiles->second)
     {
         const auto& profile = entry.second;
+        bool gotBetterPrimaryProfile = false;
+        bool gotBetterSecondaryProfile = false;
+
         const bool isPrimaryProfile =
             profile.name == nxProfileName(Qn::ConnectionRole::CR_LiveVideo)
             || profile.name == nxProfileName( //< Obsolete profile name caused by wrong length.
@@ -1735,9 +1737,24 @@ CameraDiagnostics::Result HanwhaResource::findProfiles(
                 Qn::ConnectionRole::CR_SecondaryLiveVideo,
                 kHanwhaProfileNameDefaultMaxLength);
 
-        if (isPrimaryProfile && outPrimaryProfile)
+        if (isPrimaryProfile)
+        {
+            gotBetterPrimaryProfile = isPrimaryProfile
+                && outPrimaryProfile
+                && needToReplaceProfile(*outPrimaryProfile, Qn::ConnectionRole::CR_LiveVideo);
+        }
+        else if (isSecondaryProfile)
+        {
+            gotBetterSecondaryProfile = isSecondaryProfile
+                && outSecondaryProfile
+                && needToReplaceProfile(
+                    *outSecondaryProfile,
+                    Qn::ConnectionRole::CR_SecondaryLiveVideo);
+        }
+
+        if (gotBetterPrimaryProfile)
             *outPrimaryProfile = profile;
-        else if (isSecondaryProfile && outSecondaryProfile)
+        else if (gotBetterSecondaryProfile)
             *outSecondaryProfile = profile;
         else if (!profile.isBuiltinProfile() && profilesToRemoveIfProfilesExhausted)
             profilesToRemoveIfProfilesExhausted->insert(profile.number);
@@ -3220,6 +3237,21 @@ QString HanwhaResource::nxProfileName(
         .remove(QRegExp("[^a-zA-Z]")).left(maxLength - suffix.length());
 
     return appName + suffix;
+}
+
+bool HanwhaResource::needToReplaceProfile(
+    const boost::optional<HanwhaVideoProfile>& nxProfileToReplace,
+    Qn::ConnectionRole role) const
+{
+    // If we have no profile yet.
+    if (nxProfileToReplace == boost::none)
+        return true;
+
+    // We want to use new profile instead of obsolete (e.g. WAVESecondary instead of WAVSecondary).
+    if (nxProfileToReplace->name == nxProfileName(role, kHanwhaProfileNameDefaultMaxLength))
+        return true;
+
+    return false;
 }
 
 std::shared_ptr<HanwhaSharedResourceContext> HanwhaResource::sharedContext() const

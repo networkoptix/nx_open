@@ -93,16 +93,16 @@ QnUserSettingsWidget::QnUserSettingsWidget(QnUserSettingsModel* model, QWidget* 
     const QString cloudUsers = htmlBold(tr("%1 users", "%1 is the short cloud name (like Cloud)")
         .arg(nx::network::AppInfo::shortCloudName()));
 
-    ui->userTypeHint->addHintLine(
+    ui->userTypeLabel->addHintLine(
         tr("%1 belong to this system only and are fully managed by system administrators.",
             "%1 is local users definition, e.g. 'Local users'")
         .arg(localUsers));
-    ui->userTypeHint->addHintLine(
+    ui->userTypeLabel->addHintLine(
         tr("%1 can have access to many Systems. Administrators can manage their rights only.",
             "%1 is cloud users definition, e.g. 'Cloud users'")
         .arg(cloudUsers));
 
-    setHelpTopic(ui->userTypeHint, Qn::NewUser_Help);
+    setHelpTopic(ui->userTypeLabel, Qn::NewUser_Help);
 
     ui->roleComboBox->setModel(m_rolesModel);
 

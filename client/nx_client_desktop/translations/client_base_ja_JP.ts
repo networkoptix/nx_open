@@ -1415,12 +1415,16 @@ to view more bookmarks</source>
       <translation>高い最小値は、他のカメラのアーカイブ期間を減少させる可能性があります</translation>
     </message>
     <message>
-      <source>Sets when camera archive will be deleted or saved when there is no space for new recordings.</source>
-      <translation>新しい録画のためのスペースがない場合に、カメラのアーカイブを削除または保存するかどうかを設定します</translation>
+      <source>Archive can be deleted in case if there are no space for new recording.</source>
+      <translation type="unfinished">Archive can be deleted in case if there are no space for new recording.</translation>
     </message>
     <message>
-      <source>&quot;Auto&quot; deletes the oldest footage first, regardless of the source.</source>
-      <translation>&quot;自動&quot; は、ソースに関係なく、最も古い記録データを最初に削除します</translation>
+      <source>Min and Max settings determine the age of archive which should be kept for this camera.</source>
+      <translation type="unfinished">Min and Max settings determine the age of archive which should be kept for this camera.</translation>
+    </message>
+    <message>
+      <source>If &quot;Auto&quot; option is enabled, the oldest footage among all cameras will be deleted first.</source>
+      <translation type="unfinished">If &quot;Auto&quot; option is enabled, the oldest footage among all cameras will be deleted first.</translation>
     </message>
   </context>
   <context>
@@ -3111,12 +3115,20 @@ to %1</source>
   <context>
     <name>QnCustomBusinessEventWidget</name>
     <message>
-      <source>Event will trigger only if there are matches in caption with any of entered keywords.</source>
-      <translation>入力したキーワードとキャプションが一致している場合にのみ、イベントがトリガーされます</translation>
-    </message>
-    <message>
       <source>If the field is empty, event will always trigger.</source>
       <translation>フィールドが空の場合は、常にイベントがトリガーされます</translation>
+    </message>
+    <message>
+      <source>Event will trigger only if there are matches in the source with any of the entered keywords.</source>
+      <translation type="unfinished">Event will trigger only if there are matches in the source with any of the entered keywords.</translation>
+    </message>
+    <message>
+      <source>Event will trigger only if there are matches in the caption with any of the entered keywords.</source>
+      <translation type="unfinished">Event will trigger only if there are matches in the caption with any of the entered keywords.</translation>
+    </message>
+    <message>
+      <source>Event will trigger only if there are matches in the description with any of the entered keywords.</source>
+      <translation type="unfinished">Event will trigger only if there are matches in the description with any of the entered keywords.</translation>
     </message>
   </context>
   <context>
@@ -3333,8 +3345,8 @@ to %1</source>
   <context>
     <name>QnEmptyBusinessActionWidget</name>
     <message>
-      <source>Panic Recording mode switches recording settings for all Cameras to maximum FPS and Quality</source>
-      <translation>パニック録画モードは、すべてのカメラの録画設定を最大FPSと品質に切り替えます</translation>
+      <source>Panic Recording mode switches recording settings for all cameras to maximum FPS and quality.</source>
+      <translation type="unfinished">Panic Recording mode switches recording settings for all cameras to maximum FPS and quality.</translation>
     </message>
   </context>
   <context>
@@ -4456,12 +4468,12 @@ to %1</source>
       <translation>クライアントとサーバーが異なるタイムゾーンにある場合に、クライアントで使用する時間（タイムライン、タイムスタンプなど）を設定します</translation>
     </message>
     <message>
-      <source>Length of time each camera on layout will be displayed if you start a Layout Tour.</source>
-      <translation>レイアウトツアー開始後にレイアウトに表示された各カメラの時間</translation>
+      <source>Displays IP addresses for cameras and servers and roles for users.</source>
+      <translation type="unfinished">Displays IP addresses for cameras and servers and roles for users.</translation>
     </message>
     <message>
-      <source>Displays IP addresses for cameras and servers and groups for users.</source>
-      <translation>カメラとサーバーのIPアドレスとユーザーグループを表示</translation>
+      <source>Length of time each camera on layout will be displayed if you start a Tour.</source>
+      <translation type="unfinished">Length of time each camera on layout will be displayed if you start a Tour.</translation>
     </message>
   </context>
   <context>
@@ -6622,12 +6634,16 @@ to %1</source>
       <translation>カメラ設定の最適化有効</translation>
     </message>
     <message>
-      <source>Sends anonymous System information (firmware, codecs, streams, etc.).</source>
-      <translation>匿名のシステム情報（ファームウェア、コーデック、ストリームなど）を送信します</translation>
-    </message>
-    <message>
       <source>Tracks and logs all user actions.</source>
       <translation>すべてのユーザーアクションを追跡して記録する</translation>
+    </message>
+    <message>
+      <source>Includes information about system, such as cameras models and firmware versions, number of servers, etc.</source>
+      <translation type="unfinished">Includes information about system, such as cameras models and firmware versions, number of servers, etc.</translation>
+    </message>
+    <message>
+      <source>Does not include any personal information and is completely anonymous.</source>
+      <translation type="unfinished">Does not include any personal information and is completely anonymous.</translation>
     </message>
   </context>
   <context>
@@ -8376,16 +8392,16 @@ to %1</source>
       <translation>上のボタンを使用して、サポートされるイベントの一覧を表示するカメラを選択します</translation>
     </message>
     <message>
-      <source>Event will trigger only if there are matches in caption with any of entered keywords.</source>
-      <translation>入力したキーワードとキャプションが一致している場合にのみ、イベントがトリガーされます</translation>
-    </message>
-    <message>
       <source>If the field is empty, event will always trigger.</source>
       <translation>フィールドが空の場合は、常にイベントがトリガーされます</translation>
     </message>
     <message>
       <source>Event will trigger only if there are matches in the description field with any of the entered keywords.</source>
       <translation>説明フィールドに入力したキーワードのいずれかと一致するものがある場合にのみ、イベントが発生します</translation>
+    </message>
+    <message>
+      <source>Event will trigger only if there are matches in the caption with any of the entered keywords.</source>
+      <translation type="unfinished">Event will trigger only if there are matches in the caption with any of the entered keywords.</translation>
     </message>
   </context>
   <context>

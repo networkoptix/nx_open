@@ -1422,12 +1422,16 @@ to view more bookmarks</source>
       <translation>Alto valor mínimo puede llevar a archivo longitud disminución en otros dispositivos.</translation>
     </message>
     <message>
-      <source>Sets when camera archive will be deleted or saved when there is no space for new recordings.</source>
-      <translation>Establece cuándo se borrará o guardará el archivo de la cámara cuando no haya espacio para nuevas grabaciones.</translation>
+      <source>Archive can be deleted in case if there are no space for new recording.</source>
+      <translation type="unfinished">Archive can be deleted in case if there are no space for new recording.</translation>
     </message>
     <message>
-      <source>&quot;Auto&quot; deletes the oldest footage first, regardless of the source.</source>
-      <translation>&quot;Auto&quot; elimina primero el material de archivo más antiguo, independientemente de la fuente.</translation>
+      <source>Min and Max settings determine the age of archive which should be kept for this camera.</source>
+      <translation type="unfinished">Min and Max settings determine the age of archive which should be kept for this camera.</translation>
+    </message>
+    <message>
+      <source>If &quot;Auto&quot; option is enabled, the oldest footage among all cameras will be deleted first.</source>
+      <translation type="unfinished">If &quot;Auto&quot; option is enabled, the oldest footage among all cameras will be deleted first.</translation>
     </message>
   </context>
   <context>
@@ -3146,12 +3150,20 @@ a %1</translation>
   <context>
     <name>QnCustomBusinessEventWidget</name>
     <message>
-      <source>Event will trigger only if there are matches in caption with any of entered keywords.</source>
-      <translation>El evento se activará solo si hay correspondencia en el título con cualquiera de las palabras clave introducidas.</translation>
-    </message>
-    <message>
       <source>If the field is empty, event will always trigger.</source>
       <translation>Si el campo está vacío, el evento siempre se disparará.</translation>
+    </message>
+    <message>
+      <source>Event will trigger only if there are matches in the source with any of the entered keywords.</source>
+      <translation type="unfinished">Event will trigger only if there are matches in the source with any of the entered keywords.</translation>
+    </message>
+    <message>
+      <source>Event will trigger only if there are matches in the caption with any of the entered keywords.</source>
+      <translation type="unfinished">Event will trigger only if there are matches in the caption with any of the entered keywords.</translation>
+    </message>
+    <message>
+      <source>Event will trigger only if there are matches in the description with any of the entered keywords.</source>
+      <translation type="unfinished">Event will trigger only if there are matches in the description with any of the entered keywords.</translation>
     </message>
   </context>
   <context>
@@ -3368,8 +3380,8 @@ a %1</translation>
   <context>
     <name>QnEmptyBusinessActionWidget</name>
     <message>
-      <source>Panic Recording mode switches recording settings for all Cameras to maximum FPS and Quality</source>
-      <translation>El modo de grabación de pánico cambia la configuración de grabación para todas las cámaras al máximo de FPS y calidad</translation>
+      <source>Panic Recording mode switches recording settings for all cameras to maximum FPS and quality.</source>
+      <translation type="unfinished">Panic Recording mode switches recording settings for all cameras to maximum FPS and quality.</translation>
     </message>
   </context>
   <context>
@@ -4512,12 +4524,12 @@ a %1</translation>
       <translation>Establece el tiempo para usar en el cliente (línea de tiempo, marcas de tiempo, etc.) cuando las máquinas cliente y servidor se encuentran en diferentes zonas horarias.</translation>
     </message>
     <message>
-      <source>Length of time each camera on layout will be displayed if you start a Layout Tour.</source>
-      <translation>Periodo de tiempo que se mostrará cada cámara en el diseño si inicia un Tour de diseño.</translation>
+      <source>Displays IP addresses for cameras and servers and roles for users.</source>
+      <translation type="unfinished">Displays IP addresses for cameras and servers and roles for users.</translation>
     </message>
     <message>
-      <source>Displays IP addresses for cameras and servers and groups for users.</source>
-      <translation>Muestra direcciones IP para cámaras y servidores y grupos para usuarios.</translation>
+      <source>Length of time each camera on layout will be displayed if you start a Tour.</source>
+      <translation type="unfinished">Length of time each camera on layout will be displayed if you start a Tour.</translation>
     </message>
   </context>
   <context>
@@ -6694,12 +6706,16 @@ a %1</translation>
       <translation>Permitir el sistema optimizar la configuración de las cámaras</translation>
     </message>
     <message>
-      <source>Sends anonymous System information (firmware, codecs, streams, etc.).</source>
-      <translation>Envía información anónima del sistema (firmware, códecs, secuencias, etc.).</translation>
-    </message>
-    <message>
       <source>Tracks and logs all user actions.</source>
       <translation>Rastrea y registra todas las acciones del usuario.</translation>
+    </message>
+    <message>
+      <source>Includes information about system, such as cameras models and firmware versions, number of servers, etc.</source>
+      <translation type="unfinished">Includes information about system, such as cameras models and firmware versions, number of servers, etc.</translation>
+    </message>
+    <message>
+      <source>Does not include any personal information and is completely anonymous.</source>
+      <translation type="unfinished">Does not include any personal information and is completely anonymous.</translation>
     </message>
   </context>
   <context>
@@ -8491,16 +8507,16 @@ a %1</translation>
       <translation>Elija cámaras usando el botón de arriba para ver la lista de eventos compatibles.</translation>
     </message>
     <message>
-      <source>Event will trigger only if there are matches in caption with any of entered keywords.</source>
-      <translation>El evento se activará solo si hay coincidencias en el título con cualquiera de las palabras clave introducidas.</translation>
-    </message>
-    <message>
       <source>If the field is empty, event will always trigger.</source>
       <translation>Si el campo está vacío, el evento siempre se disparará.</translation>
     </message>
     <message>
       <source>Event will trigger only if there are matches in the description field with any of the entered keywords.</source>
       <translation>El evento se activará solo si hay coincidencias en el campo de descripción con cualquiera de las palabras clave ingresadas.</translation>
+    </message>
+    <message>
+      <source>Event will trigger only if there are matches in the caption with any of the entered keywords.</source>
+      <translation type="unfinished">Event will trigger only if there are matches in the caption with any of the entered keywords.</translation>
     </message>
   </context>
   <context>
