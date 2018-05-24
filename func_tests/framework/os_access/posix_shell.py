@@ -73,7 +73,7 @@ class SSH(PosixShell):
     @staticmethod
     def _send_input(channel, input):
         if input is not None:
-            channel.settimeout(10)  # Must never time out.
+            channel.settimeout(10)  # Must never time out assuming process always open stdin and read from it.
             input_offset = 0
             while True:
                 assert 0 <= input_offset <= len(input)
