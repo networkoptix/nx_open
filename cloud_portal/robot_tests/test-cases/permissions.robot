@@ -30,7 +30,6 @@ Check Log In
     Validate Log In
 
 Restart
-    Go To    ${url}
     ${status}    Run Keyword And Return Status    Validate Log In
     Run Keyword If    ${status}    Log Out
 

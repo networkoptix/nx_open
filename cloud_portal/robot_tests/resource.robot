@@ -50,9 +50,9 @@ Validate Log In
 
 Log Out
     Wait Until Page Does Not Contain Element    ${BACKDROP}
+    Wait Until Page Contains Element    ${LOG OUT BUTTON}
     Wait Until Element Is Visible    ${ACCOUNT DROPDOWN}
-    Wait Until Element Is Enabled    ${ACCOUNT DROPDOWN}
-    Click Element    ${ACCOUNT DROPDOWN}/..
+    Click Link    ${ACCOUNT DROPDOWN}
     Wait Until Element Is Visible    ${LOG OUT BUTTON}
     Click Link    ${LOG OUT BUTTON}
     Validate Log Out
