@@ -139,6 +139,9 @@ public:
         const QnLiveStreamParams& parameters,
         HanwhaProfileParameterFlags flags) const;
 
+    bool isBypassSupported() const;
+    boost::optional<int> bypassChannel() const;
+
 protected:
     virtual nx::mediaserver::resource::StreamCapabilityMap getStreamCapabilityMapFromDrives(
         Qn::StreamIndex streamIndex) override;
@@ -185,6 +188,9 @@ private:
     CameraDiagnostics::Result fetchCodecInfo(HanwhaCodecInfo* outCodecInfo);
 
     void cleanUpOnProxiedDeviceChange();
+
+    QnPtzAuxilaryTraitList calculatePtzTraits() const;
+    void calculateAutoFocusSupport(QnPtzAuxilaryTraitList* outTraitList) const;
 
     AVCodecID defaultCodecForStream(Qn::ConnectionRole role) const;
     QSize defaultResolutionForStream(Qn::ConnectionRole role) const;
@@ -301,13 +307,11 @@ private:
 
     const HanwhaAttributes& attributes() const;
     const HanwhaCgiParameters& cgiParameters() const;
-    boost::optional<int> bypassChannel() const;
 
     // Proxied id is an id of a device connected to some proxy (e.g. NVR)
     virtual QString proxiedId() const;
     virtual void setProxiedId(const QString& proxiedId);
 
-    bool isBypassSupported() const;
     bool isProxiedMultisensorCamera() const;
 
 private:
