@@ -60,7 +60,6 @@ class SSH(PosixShell):
                 look_for_keys=False, allow_agent=False)
         except paramiko.ssh_exception.NoValidConnectionsError:
             raise SSHNotConnected("Cannot connect with {}.".format(self))
-        channel = client.get_transport().open_session()
         return client
 
     def __del__(self):
