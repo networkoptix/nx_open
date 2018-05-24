@@ -1,6 +1,8 @@
 #include "event_panel.h"
 #include "private/event_panel_p.h"
 
+#include <QtGui/QMouseEvent>
+
 namespace nx {
 namespace client {
 namespace desktop {
@@ -22,6 +24,13 @@ EventPanel::EventPanel(QnWorkbenchContext* context, QWidget* parent):
 EventPanel::~EventPanel()
 {
 }
+
+void EventPanel::mousePressEvent(QMouseEvent* event)
+{
+    if (event->type() == QEvent::MouseButtonPress && event->button() == Qt::RightButton)
+        event->accept();
+}
+
 
 } // namespace desktop
 } // namespace client

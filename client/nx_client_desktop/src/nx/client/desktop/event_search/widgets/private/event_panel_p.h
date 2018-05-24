@@ -56,6 +56,8 @@ private:
 
     void connectToRowCountChanges(QAbstractItemModel* model, std::function<void()> handler);
 
+    void showContextMenu(const QPoint& pos);
+
     void at_motionSearchToggled(bool on);
     void at_bookmarksToggled(bool on);
 
