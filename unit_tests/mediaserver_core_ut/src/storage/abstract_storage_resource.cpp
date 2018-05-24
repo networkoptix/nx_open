@@ -137,6 +137,7 @@ TEST_F(AbstractStorageResourceTest, Capabilities)
 
 TEST_F(AbstractStorageResourceTest, StorageCommonOperations)
 {
+    // #TODO #akulikov Lessen iterations count.
     const size_t fileCount = 500;
     std::vector<QString> fileNames;
     const char *dummyData = "abcdefgh";

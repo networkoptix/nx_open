@@ -314,13 +314,15 @@ api::Updates2StatusData Updates2ManagerBase::download()
 
 void Updates2ManagerBase::setStatus(
     api::Updates2StatusData::StatusCode code,
-    const QString& message)
+    const QString& message,
+    double progress)
 {
     detail::Updates2StatusDataEx newStatusData(
         QDateTime::currentMSecsSinceEpoch(),
         moduleGuid(),
         code,
-        message);
+        message,
+        progress);
 
     writeStatusToFile(newStatusData);
 
@@ -498,9 +500,19 @@ void Updates2ManagerBase::onFileDeleted(const QString& fileName)
     checkForRemoteUpdate(utils::TimerId(), /* forced */ true);
 }
 
-void Updates2ManagerBase::onFileInformationChanged(const FileInformation& /*fileInformation*/)
+void Updates2ManagerBase::onFileInformationChanged(const FileInformation& fileInformation)
 {
-    // #TODO #akulikov Implement this.
+    QnMutexLocker lock(&m_mutex);
+    if (m_currentStatus.file != fileInformation.name)
+        return;
+
+    if (fileInformation.status == FileInformation::Status::downloading)
+    {
+        setStatus(
+            api::Updates2StatusData::StatusCode::downloading,
+            lit("Downloading update file: %1").arg(fileInformation.name),
+            (double) fileInformation.downloadedChunks.count(true) / fileInformation.downloadedChunks.size());
+    }
 }
 
 void Updates2ManagerBase::onFileInformationStatusChanged(const FileInformation& fileInformation)
@@ -545,6 +557,20 @@ api::Updates2StatusData Updates2ManagerBase::install()
 api::Updates2StatusData Updates2ManagerBase::cancel()
 {
     QnMutexLocker lock(&m_mutex);
+    auto clearInternals =
+        [this]()
+        {
+            if (!m_currentStatus.file.isEmpty())
+            {
+                m_updateRegistry->removeFileData(m_currentStatus.file);
+                downloader()->deleteFile(m_currentStatus.file);
+                m_currentStatus.file.clear();
+            }
+            setStatus(
+                api::Updates2StatusData::StatusCode::notAvailable,
+                "Update is unavailable");
+        };
+
     switch (m_currentStatus.state)
     {
     case api::Updates2StatusData::StatusCode::notAvailable:
@@ -552,23 +578,16 @@ api::Updates2StatusData Updates2ManagerBase::cancel()
     case api::Updates2StatusData::StatusCode::available:
     case api::Updates2StatusData::StatusCode::error:
     case api::Updates2StatusData::StatusCode::checking:
-        setStatus(
-            api::Updates2StatusData::StatusCode::notAvailable,
-            "Update is unavailable");
+        clearInternals();
         break;
     case api::Updates2StatusData::StatusCode::downloading:
         NX_ASSERT(!m_currentStatus.file.isEmpty());
-        downloader()->deleteFile(m_currentStatus.file);
-        m_updateRegistry->removeFileData(m_currentStatus.file);
-        setStatus(
-            api::Updates2StatusData::StatusCode::notAvailable,
-            "Update is unavailable");
+        clearInternals();
         break;
     case api::Updates2StatusData::StatusCode::readyToInstall:
+        clearInternals();
+        break;
     case api::Updates2StatusData::StatusCode::preparing:
-        setStatus(
-            api::Updates2StatusData::StatusCode::available,
-            "Update is unavailable");
         break;
     case api::Updates2StatusData::StatusCode::installing:
         break;

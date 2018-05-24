@@ -24,7 +24,7 @@ using namespace vms::common::p2p::downloader;
 
 namespace {
 
-static const qint64 kRefreshTimeoutMs = 24 * 60 * 60 * 1000; //< 1 day
+static const qint64 kRefreshTimeoutMs = 10 * 60 * 1000; //< 10 min
 static const QString kFileName = "update.status";
 
 } // namespace

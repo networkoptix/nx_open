@@ -40,7 +40,11 @@ protected:
     void checkForRemoteUpdate(utils::TimerId timerId, bool forced);
     void checkForGlobalDictionaryUpdate();
     void refreshStatusAfterCheck();
-    void setStatus(api::Updates2StatusData::StatusCode code, const QString& message);
+    void setStatus(
+        api::Updates2StatusData::StatusCode code,
+        const QString& message,
+        double progress = 0.0f);
+
     void startPreparing(const QString& updateFilePath);
 
     void onDownloadFinished(const QString& fileName);
