@@ -2,7 +2,7 @@
     "YOU HAVE NO SYSTEMS TEXT": "Non hai Sistemi collegati a {{PRODUCT_NAME}}",
     "LOG OUT BUTTON TEXT": "Disconnetti",
     "ACCOUNT SETTINGS BUTTON TEXT": "Impostazioni dell'account",
-    "RESET EMAIL SENT MESSAGE TEXT": "Le istruzioni per il ripristino della password sono inviate all' e-mail %email%",
+    "RESET EMAIL SENT MESSAGE TEXT": "Le istruzioni per il ripristino della password sono state inviate all' e-mail %email%",
     "CREATE ACCOUNT BUTTON TEXT": "Creare un account",
     "TERMS AND CONDITIONS LINK TEXT": "Termini e condizioni",
     "RESEND ACTIVATION LINK BUTTON TEXT": "Rinvia il link di attivazione",

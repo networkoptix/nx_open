@@ -51,13 +51,13 @@ Validate Log In
 Log Out
     Wait Until Page Does Not Contain Element    ${BACKDROP}
     Wait Until Element Is Visible    ${ACCOUNT DROPDOWN}
-    Click Element    ${ACCOUNT DROPDOWN}
+    Wait Until Element Is Enabled    ${ACCOUNT DROPDOWN}
+    Click Element    ${ACCOUNT DROPDOWN}/..
     Wait Until Element Is Visible    ${LOG OUT BUTTON}
     Click Link    ${LOG OUT BUTTON}
     Validate Log Out
 
 Validate Log Out
-    Go To    ${url}
     Wait Until Element Is Not Visible    ${BACKDROP}
     Wait Until Element Is Visible    ${ANONYMOUS BODY}
 
@@ -194,7 +194,7 @@ Find and remove emails
     \  Click Element    //tr[@ng-repeat='user in system.users']//td[contains(text(), '${email}')]/following-sibling::td/a[@ng-click='unshare(user)']/span['&nbsp&nbspDelete']
     \  Wait Until Element Is Visible    ${DELETE USER BUTTON}
     \  Click Button    ${DELETE USER BUTTON}
-    \  ${PERMISSIONS WERE REMOVED FROM EMAIL}    Replace String    ${PERMISSIONS WERE REMOVED FROM}    {{email}}    ${email}
+    \  ${PERMISSIONS WERE REMOVED FROM EMAIL}    Replace String    ${PERMISSIONS WERE REMOVED FROM}    %email%    ${email}
     \  Check For Alert    ${PERMISSIONS WERE REMOVED FROM EMAIL}
     \  Wait Until Element Is Not Visible    //tr[@ng-repeat='user in system.users']//td[contains(text(), '${email}')]
 
