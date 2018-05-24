@@ -1,6 +1,6 @@
 #pragma once
 
-#include <QtCore/Qstring>
+#include <QtCore/QString>
 extern "C" {
 #include <libavcodec/avcodec.h>
 #include <libavformat/avformat.h>
