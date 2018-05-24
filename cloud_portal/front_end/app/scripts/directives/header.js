@@ -26,7 +26,7 @@
                 }
 
                 scope.login = function () {
-                    nxDialogsService.login();
+                    nxDialogsService.login(false);
                 };
                 scope.logout = function () {
                     account.logout();

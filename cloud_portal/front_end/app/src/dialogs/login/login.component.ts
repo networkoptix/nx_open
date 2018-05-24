@@ -24,6 +24,7 @@ export class LoginModalContent implements OnInit, AfterViewInit {
     @Input() cancellable;
     @Input() closable;
     @Input() location;
+    @Input() keepPage;
 
     nx_wrong_password: boolean;
 
@@ -53,13 +54,13 @@ export class LoginModalContent implements OnInit, AfterViewInit {
             holdAlerts: true,
             errorPrefix: this.language.lang.errorCodes.cantSendConfirmationPrefix
         })
-        .run()
-        .then(() => {
-            this.generalModal.openConfirm(
-                'Check your inbox and visit provided link to activate account',
-                'Activation email sent',
-                'OK');
-        });
+            .run()
+            .then(() => {
+                this.generalModal.openConfirm(
+                    'Check your inbox and visit provided link to activate account',
+                    'Activation email sent',
+                    'OK');
+            });
     }
 
     gotoRegister() {
@@ -107,13 +108,13 @@ export class LoginModalContent implements OnInit, AfterViewInit {
                 portalError: this.language.lang.errorCodes.brokenAccount
             }
         }).then(() => {
-            // TODO: soon
-            // if (dialogSettings.params.redirect) {
-            //     $location.path($routeParams.next ? $routeParams.next : Config.redirectAuthorised);
-            // }
-            setTimeout(function () {
-                document.location.reload();
-            });
+            if (this.keepPage) {
+                document.location.href = (this.location.path() !== '') ? this.location.path() : this.configService.config.redirectAuthorised;
+            } else {
+                setTimeout(() => {
+                    document.location.href = this.configService.config.redirectAuthorised;
+                });
+            }
         });
     }
 
@@ -153,6 +154,7 @@ export class NxModalLoginComponent implements OnInit {
         this.modalRef.componentInstance.cancellable = !keepPage || false;
         this.modalRef.componentInstance.closable = true;
         this.modalRef.componentInstance.location = this.location;
+        this.modalRef.componentInstance.keepPage = keepPage;
 
         return this.modalRef;
     }

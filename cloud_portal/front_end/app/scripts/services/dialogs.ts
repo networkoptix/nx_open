@@ -126,7 +126,7 @@
                         //     buttonType : actionType
                         // }).result;
                     },
-                    login: function (keepPage) {
+                    login: function (keepPage?) {
                         return nxDialogsService.login(keepPage);
                         // return openDialog({
                         //     title: L.dialogs.loginTitle,

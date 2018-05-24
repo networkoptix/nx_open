@@ -180,6 +180,14 @@ label {
   border-color: $input-border;
 }
 
+.form-control:focus {
+  border-color: $input-border-focus;
+}
+
+.form-control:focus + .input-group-addon {
+    border-color: $input-border-focus;
+}
+
 
 select.form-control{
   -webkit-appearance: none;

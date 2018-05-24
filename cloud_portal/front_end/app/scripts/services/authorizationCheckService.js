@@ -113,7 +113,6 @@
                 // logoutAuthorisedLogoutButton
                 nxDialogsService
                     .confirm(languageService.lang.dialogs.logoutAuthorisedText, languageService.lang.dialogs.logoutAuthorisedTitle, languageService.lang.dialogs.logoutAuthorisedContinueButton, 'btn-primary', languageService.lang.dialogs.logoutAuthorisedLogoutButton)
-                    .result
                     .then((result) => {
                     if ('OK' === result) {
                         redirectAuthorised();
