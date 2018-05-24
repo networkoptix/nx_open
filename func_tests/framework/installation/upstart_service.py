@@ -2,6 +2,7 @@ import logging
 
 from framework.installation.service import Service
 from framework.os_access.exceptions import NonZeroExitStatus
+from framework.os_access.posix_shell import SSH
 
 _logger = logging.getLogger(__name__)
 
@@ -14,7 +15,7 @@ class UpstartService(Service):
     """
 
     def __init__(self, ssh, service_name):
-        self._ssh = ssh
+        self._ssh = ssh  # type: SSH
         self._service_name = service_name
 
     def is_running(self):
