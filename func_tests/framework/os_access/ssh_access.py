@@ -23,6 +23,7 @@ class SSHAccess(OSAccess):
         return self._forwarded_ports
 
     @property
+    @lrudecorator(100)
     def Path(self):
         return make_ssh_path_cls(self.ssh)
 
