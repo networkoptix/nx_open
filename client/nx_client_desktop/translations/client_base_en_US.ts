@@ -4525,7 +4525,7 @@ to %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Length of time each camera on layout will be displayed if you start a Showreel.</source>
+        <source>Length of time each camera on layout will be displayed if you start a Tour.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
