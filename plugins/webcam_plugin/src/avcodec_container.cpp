@@ -3,26 +3,9 @@
 namespace nx {
 namespace webcam_plugin {
 
-AVCodecContainer::AVCodecContainer()
-    :
-    m_codecContext(nullptr),
-    m_codec(nullptr),
-    m_options(nullptr),
-    m_open(false)
-{
-}
-
 AVCodecContainer::~AVCodecContainer()
 {
     close();
-    if (m_options)
-        av_dict_free(&m_options);
-}
-
-void AVCodecContainer::setBitrate(int bitrate)
-{
-    std::string bitrateStr = std::to_string(bitrate / 1000).append("K");
-    av_dict_set(&m_options, "b", bitrateStr.c_str(), 0);
 }
 
 int AVCodecContainer::open()
@@ -33,7 +16,7 @@ int AVCodecContainer::open()
     if (!isValid())
         return m_lastError.errorCode();
 
-    int codecOpenCode = avcodec_open2(m_codecContext, m_codec, &m_options);
+    int codecOpenCode = avcodec_open2(m_codecContext, m_codec, nullptr);
     if (m_lastError.updateIfError(codecOpenCode))
     {
         close();
@@ -166,12 +149,6 @@ AVCodecContext * AVCodecContainer::codecContext() const
 AVCodec * AVCodecContainer::codec() const
 {
     return m_codec;
-}
-
-
-AVDictionary * AVCodecContainer::options() const
-{
-    return m_options;
 }
 
 AVCodecID AVCodecContainer::codecID() const

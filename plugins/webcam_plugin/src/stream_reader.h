@@ -29,7 +29,7 @@ namespace webcam_plugin {
 class CodecContext;
 class AVCodecContainer;
 
-//!Reads picture files from specified directory as video-stream
+//!Transfers or transcodes packets from USB based webcameras and streams them
 class StreamReader
 :
     public nxcip::StreamReader
@@ -42,16 +42,11 @@ public:
         const CodecContext& codecContext);
     virtual ~StreamReader();
 
-    //!Implementation of nxpl::PluginInterface::queryInterface
     virtual void* queryInterface( const nxpl::NX_GUID& interfaceID ) override;
-    //!Implementation of nxpl::PluginInterface::addRef
     virtual unsigned int addRef() override;
-    //!Implementation of nxpl::PluginInterface::releaseRef
     virtual unsigned int releaseRef() override;
 
-    //!Implementation nxcip::StreamReader::getNextData
     virtual int getNextData( nxcip::MediaDataPacket** packet ) override;
-    //!Implementation nxcip::StreamReader::interrupt
     virtual void interrupt() override;
 
     void setFps( float fps );

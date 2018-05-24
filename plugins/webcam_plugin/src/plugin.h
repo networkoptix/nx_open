@@ -1,5 +1,4 @@
-#ifndef IMAGE_LIBRARY_PLUGIN_H
-#define IMAGE_LIBRARY_PLUGIN_H
+#pragma once
 
 #include <memory>
 
@@ -21,26 +20,16 @@ public:
     Plugin();
     virtual ~Plugin();
 
-    //!Implementation of nxpl::PluginInterface::queryInterface
-    /*!
-        Supports cast to nxcip::CameraDiscoveryManager interface
-    */
     virtual void* queryInterface( const nxpl::NX_GUID& interfaceID ) override;
-    //!Implementation of nxpl::PluginInterface::addRef
     virtual unsigned int addRef() override;
-    //!Implementation of nxpl::PluginInterface::releaseRef
     virtual unsigned int releaseRef() override;
 
-    //!Implementation of nxpl::Plugin::name
     virtual const char* name() const override;
-    //!Implementation of nxpl::Plugin::setSettings
     virtual void setSettings(const nxpl::Setting* settings, int count) override;
 
-    //!Implementation of nxpl::Plugin2::setPluginContainer
     virtual void setPluginContainer(nxpl::PluginInterface* pluginContainer) override;
 
     nxpt::CommonRefManager* refManager();
-
     static Plugin* instance();
 
 private:
@@ -51,5 +40,3 @@ private:
 
 } // namespace nx 
 } // namespace webcam_plugin 
-
-#endif  //IMAGE_LIBRARY_PLUGIN_H

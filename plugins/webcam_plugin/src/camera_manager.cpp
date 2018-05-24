@@ -54,14 +54,12 @@ unsigned int CameraManager::releaseRef()
     return m_refManager.releaseRef();
 }
 
-//!Implementation of nxcip::BaseCameraManager::getEncoderCount
 int CameraManager::getEncoderCount( int* encoderCount ) const
 {
     *encoderCount = 1;
     return nxcip::NX_NO_ERROR;
 }
 
-//!Implementation of nxcip::BaseCameraManager::getEncoder
 int CameraManager::getEncoder( int encoderIndex, nxcip::CameraMediaEncoder** encoderPtr )
 {
     if( encoderIndex > 0 )
@@ -82,21 +80,18 @@ int CameraManager::getEncoder( int encoderIndex, nxcip::CameraMediaEncoder** enc
     return nxcip::NX_NO_ERROR;
 }
 
-//!Implementation of nxcip::BaseCameraManager::getCameraInfo
 int CameraManager::getCameraInfo( nxcip::CameraInfo* info ) const
 {
     memcpy( info, &m_info, sizeof(m_info) );
     return nxcip::NX_NO_ERROR;
 }
 
-//!Implementation of nxcip::BaseCameraManager::getCameraCapabilities
 int CameraManager::getCameraCapabilities( unsigned int* capabilitiesMask ) const
 {
     *capabilitiesMask = m_capabilities;
     return nxcip::NX_NO_ERROR;
 }
 
-//!Implementation of nxcip::BaseCameraManager::setCredentials
 void CameraManager::setCredentials( const char* username, const char* password )
 {
     strncpy( m_info.defaultLogin, username, sizeof(m_info.defaultLogin)-1 );
@@ -105,31 +100,26 @@ void CameraManager::setCredentials( const char* username, const char* password )
         m_encoder->updateCameraInfo( m_info );
 }
 
-//!Implementation of nxcip::BaseCameraManager::setAudioEnabled
 int CameraManager::setAudioEnabled( int /*audioEnabled*/ )
 {
     return nxcip::NX_NO_ERROR;
 }
 
-//!Implementation of nxcip::BaseCameraManager::getPTZManager
 nxcip::CameraPtzManager* CameraManager::getPtzManager() const
 {
     return NULL;
 }
 
-//!Implementation of nxcip::BaseCameraManager::getCameraMotionDataProvider
 nxcip::CameraMotionDataProvider* CameraManager::getCameraMotionDataProvider() const
 {
     return NULL;
 }
 
-//!Implementation of nxcip::BaseCameraManager::getCameraRelayIOManager
 nxcip::CameraRelayIOManager* CameraManager::getCameraRelayIOManager() const
 {
     return NULL;
 }
 
-//!Implementation of nxcip::BaseCameraManager::getLastErrorString
 void CameraManager::getLastErrorString( char* errorString ) const
 {
     errorString[0] = '\0';

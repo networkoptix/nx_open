@@ -132,7 +132,7 @@ int MediaEncoder::setFps( const float& fps, float* selectedFps )
 
 int MediaEncoder::setBitrate( int bitrateKbps, int* selectedBitrateKbps )
 {
-    // convert everything to bits per second first
+    // the plugin uses bits per second internally, so convert to that first
     int bitratebps = bitrateKbps * 1000;
     int maxBitrate;
     int ret = getMaxBitrate(&maxBitrate);

@@ -40,7 +40,6 @@ ILPVideoPacket::~ILPVideoPacket()
     }
 }
 
-//!Implementation of nxpl::PluginInterface::queryInterface
 void* ILPVideoPacket::queryInterface( const nxpl::NX_GUID& interfaceID )
 {
     if( memcmp( &interfaceID, &nxcip::IID_VideoDataPacket, sizeof(nxcip::IID_VideoDataPacket) ) == 0 )
@@ -61,49 +60,41 @@ void* ILPVideoPacket::queryInterface( const nxpl::NX_GUID& interfaceID )
     return NULL;
 }
 
-//!Implementation of nxpl::PluginInterface::addRef
 unsigned int ILPVideoPacket::addRef()
 {
     return m_refManager.addRef();
 }
 
-//!Implementation of nxpl::PluginInterface::releaseRef
 unsigned int ILPVideoPacket::releaseRef()
 {
     return m_refManager.releaseRef();
 }
 
-//!Implementation of nxpl::MediaDataPacket::isKeyFrame
 nxcip::UsecUTCTimestamp ILPVideoPacket::timestamp() const
 {
     return m_timestamp;
 }
 
-//!Implementation of nxpl::MediaDataPacket::type
 nxcip::DataPacketType ILPVideoPacket::type() const
 {
     return nxcip::dptVideo;
 }
 
-//!Implementation of nxpl::MediaDataPacket::data
 const void* ILPVideoPacket::data() const
 {
     return m_buffer;
 }
 
-//!Implementation of nxpl::MediaDataPacket::dataSize
 unsigned int ILPVideoPacket::dataSize() const
 {
     return m_bufSize;
 }
 
-//!Implementation of nxpl::MediaDataPacket::channelNumber
 unsigned int ILPVideoPacket::channelNumber() const
 {
     return m_channelNumber;
 }
 
-//!Implementation of nxpl::MediaDataPacket::codecType
 nxcip::CompressionType ILPVideoPacket::codecType() const
 {
     return m_codecType;
@@ -119,7 +110,6 @@ unsigned int ILPVideoPacket::cSeq() const
     return m_cSeq;
 }
 
-//!Implementation of nxpl::VideoDataPacket::getMotionData
 nxcip::Picture* ILPVideoPacket::getMotionData() const
 {
     return NULL;

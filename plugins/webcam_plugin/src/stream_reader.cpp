@@ -442,7 +442,6 @@ void StreamReader::setEncoderOptions() const
     AVCodecContext * decoderContext = m_videoDecoder->codecContext();
 
     float fps = m_codecContext.fps();
-    //todo unhardcode these
     encoderContext->width = decoderContext->width;
     encoderContext->height = decoderContext->height;
     encoderContext->pix_fmt = utils::av::suggestPixelFormat(encoderContext->codec_id);

@@ -7,12 +7,12 @@ extern "C" {
 
 extern "C" {
 #ifdef _WIN32
-    __declspec(dllexport)
+__declspec(dllexport)
 #endif
-        nxpl::PluginInterface* createNXPluginInstance()
-    {
-        return new nx::webcam_plugin::Plugin();
-    }
+nxpl::PluginInterface* createNXPluginInstance()
+{
+    return new nx::webcam_plugin::Plugin();
+}
 } // extern "C"
 
 namespace nx {
@@ -38,10 +38,6 @@ Plugin::~Plugin()
     webCameraPluginInstance = NULL;
 }
 
-//!Implementation of nxpl::PluginInterface::queryInterface
-/*!
-    Supports cast to nxcip::CameraDiscoveryManager interface
-*/
 void* Plugin::queryInterface( const nxpl::NX_GUID& interfaceID )
 {
     if( memcmp( &interfaceID, &nxcip::IID_CameraDiscoveryManager, sizeof(nxcip::IID_CameraDiscoveryManager) ) == 0 )

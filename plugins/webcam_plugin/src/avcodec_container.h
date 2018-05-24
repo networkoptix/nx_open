@@ -13,14 +13,7 @@ namespace webcam_plugin {
 class AVCodecContainer
 {
 public:
-    AVCodecContainer();
     ~AVCodecContainer();
-
-    /*!
-    * Convenience function for setting the bitrate in bits/s before callings open()
-    * @param[in] bitrate - the bitrate in bits/s.
-    */
-    void setBitrate(int bitrate);
 
     int open();
     int close();
@@ -43,18 +36,15 @@ public:
     AVCodecContext* codecContext() const;
     AVCodec* codec() const;
     AVCodecID codecID() const;
-    AVDictionary* options() const;
 
     QString avErrorString() const;
 
 private:
-    AVCodecContext * m_codecContext;
-    AVCodec * m_codec;
-    AVDictionary* m_options;
+    AVCodecContext * m_codecContext = nullptr;
+    AVCodec * m_codec = nullptr;
+    bool m_open = false;
 
     AVStringError m_lastError;
-
-    bool m_open;
 };
 
 } // namespace webcam_plugin
