@@ -896,6 +896,14 @@
     </message>
 </context>
 <context>
+    <name>CameraStreamsDialog</name>
+    <message>
+        <location filename="../src/nx/client/desktop/resource_properties/camera/dialogs/camera_streams_dialog.ui"/>
+        <source>Streams Addresses</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>ChangeUserPasswordDialog</name>
     <message>
         <location filename="../src/ui/dialogs/resource_properties/change_user_password_dialog.ui"/>
@@ -1477,6 +1485,14 @@
         <location/>
         <source>Disable imported users</source>
         <translation></translation>
+    </message>
+</context>
+<context>
+    <name>LegacyCameraSettingsStreamsPanel</name>
+    <message>
+        <location filename="../src/nx/client/desktop/resource_properties/camera/widgets/legacy_camera_settings_streams_panel.ui"/>
+        <source>Edit Streams...</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -3118,8 +3134,8 @@
     <name>WebpageDialog</name>
     <message>
         <location filename="../src/ui/dialogs/webpage_dialog.ui"/>
-        <source>Web Page</source>
-        <translation></translation>
+        <source>Integration</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>

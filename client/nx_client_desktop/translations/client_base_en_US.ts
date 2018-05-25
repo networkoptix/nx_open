@@ -2231,42 +2231,6 @@ to view more bookmarks</source>
         <source>No settings</source>
         <translation></translation>
     </message>
-    <message>
-        <source>Secondary Stream</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>I/O Module ID</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Camera ID</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Audio Stream</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Primary Stream</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>URL is not available. Open stream and try again.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>URL is not available. Open video stream and try again.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>I/O module has no audio stream</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Camera has no secondary stream</source>
-        <translation type="unfinished"></translation>
-    </message>
 </context>
 <context>
     <name>QnCameraAnalyticsPolicy</name>
@@ -3944,21 +3908,6 @@ to %1</source>
     </message>
 </context>
 <context>
-    <name>QnLensCameraAdvancedParamWidget</name>
-    <message>
-        <source>Zoom</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Rotation:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Focus</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
     <name>QnLicenseDetailsDialog</name>
     <message>
         <source>Screens Allowed:</source>
@@ -4867,6 +4816,13 @@ to %1</source>
     <message>
         <source>Set Passwords</source>
         <translation></translation>
+    </message>
+</context>
+<context>
+    <name>QnPanTiltRotationCameraAdvancedParamWidget</name>
+    <message>
+        <source>Rotation: </source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -7360,6 +7316,14 @@ to %1</source>
         <source>Web Page</source>
         <translation></translation>
     </message>
+    <message>
+        <source>None</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Advanced</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QnWorkbenchAlarmLayoutHandler</name>
@@ -8121,6 +8085,21 @@ to %1</source>
     </message>
 </context>
 <context>
+    <name>nx::client::desktop::CameraStreamsDialog</name>
+    <message>
+        <source>Primary Stream</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Secondary Stream</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>No secondary stream</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>nx::client::desktop::ExportProcess</name>
     <message>
         <source>Unsupported media for data export.</source>
@@ -8276,6 +8255,45 @@ to %1</source>
     <message>
         <source>NOT A CAMERA</source>
         <translation></translation>
+    </message>
+</context>
+<context>
+    <name>nx::client::desktop::LegacyCameraSettingsStreamsPanel</name>
+    <message>
+        <source>Secondary Stream</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>I/O Module ID</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Camera ID</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Audio Stream</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Primary Stream</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>URL is not available. Open stream and try again.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>URL is not available. Open video stream and try again.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>I/O module has no audio stream</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Camera has no secondary stream</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -8834,10 +8852,6 @@ to %1</source>
         <translation></translation>
     </message>
     <message>
-        <source>Some functionality may be unavailable or not working properly.</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>System sends anonymous usage statistics</source>
         <translation></translation>
     </message>
@@ -8856,6 +8870,10 @@ to %1</source>
     <message>
         <source>Wearable Cameras cannot be moved between servers</source>
         <translation></translation>
+    </message>
+    <message>
+        <source>Warning! This build is for testing purposes only! Please upgrade to a next available patch or release version once available.</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Failed to change password</source>
