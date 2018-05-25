@@ -5,7 +5,7 @@
     <name>ActionButtonsPanel</name>
     <message>
       <source>Press and hold to</source>
-      <translation type="unfinished">Press and hold to</translation>
+      <translation>Bas ve bırakma</translation>
     </message>
   </context>
   <context>
@@ -24,11 +24,11 @@
     </message>
     <message>
       <source>Password required</source>
-      <translation type="unfinished">Password required</translation>
+      <translation>Şifre gerekli</translation>
     </message>
     <message>
       <source>Unsupported firmware version</source>
-      <translation type="unfinished">Unsupported firmware version</translation>
+      <translation>Desteklenmeyen yazılım versiyonu</translation>
     </message>
   </context>
   <context>
@@ -43,7 +43,7 @@
     <message>
       <source>%1 Account</source>
       <comment>%1 is the short cloud name (like &apos;Cloud&apos;)</comment>
-      <translation type="unfinished">%1 Account</translation>
+      <translation>%1 Hesap</translation>
     </message>
   </context>
   <context>
@@ -89,43 +89,43 @@
     </message>
     <message>
       <source>Resend activation email</source>
-      <translation type="unfinished">Resend activation email</translation>
+      <translation>Doğrulama e-postasını yeniden gönder</translation>
     </message>
     <message>
       <source>Activation email sent</source>
-      <translation type="unfinished">Activation email sent</translation>
+      <translation>Yeni aktivasyon e-postası gönderildi</translation>
     </message>
     <message>
       <source>Cannot send activation email</source>
-      <translation type="unfinished">Cannot send activation email</translation>
+      <translation>Onay e-posta gönderemezsiniz</translation>
     </message>
     <message>
       <source>Check your inbox and visit provided link to activate account</source>
-      <translation type="unfinished">Check your inbox and visit provided link to activate account</translation>
+      <translation>Hesabı etkinleştirmek için gelen kutunuzu kontrol edin ve verilen bağlantıyı ziyaret edin</translation>
     </message>
     <message>
       <source>Check your internet connection or try again later</source>
-      <translation type="unfinished">Check your internet connection or try again later</translation>
+      <translation>Internet bağlantınızı kontrol edin veya daha sonra yeniden deneyin</translation>
     </message>
     <message>
       <source>Account not found</source>
-      <translation type="unfinished">Account not found</translation>
+      <translation>Hesap bulunamadı</translation>
     </message>
     <message>
       <source>Wrong password</source>
-      <translation type="unfinished">Wrong password</translation>
+      <translation>Hatalı parola</translation>
     </message>
     <message>
       <source>Account not activated</source>
-      <translation type="unfinished">Account not activated</translation>
+      <translation>Hesap etkin değil</translation>
     </message>
     <message>
       <source>Email cannot be empty</source>
-      <translation type="unfinished">Email cannot be empty</translation>
+      <translation>Eposta boş bırakılamaz</translation>
     </message>
     <message>
       <source>Password cannot be empty</source>
-      <translation type="unfinished">Password cannot be empty</translation>
+      <translation>Parola boş olamaz</translation>
     </message>
   </context>
   <context>
@@ -569,11 +569,11 @@
     </message>
     <message>
       <source>What to do with currently saved passwords?</source>
-      <translation type="unfinished">What to do with currently saved passwords?</translation>
+      <translation>Kayıtlı şifreler ne yapılsın?</translation>
     </message>
     <message>
       <source>Delete</source>
-      <translation type="unfinished">Delete</translation>
+      <translation>Sil</translation>
     </message>
   </context>
   <context>
@@ -704,35 +704,35 @@
     </message>
     <message>
       <source>Not enough licenses</source>
-      <translation type="unfinished">Not enough licenses</translation>
+      <translation>Yeterli lisans yok</translation>
     </message>
     <message>
       <source>Password required</source>
-      <translation type="unfinished">Password required</translation>
+      <translation>Şifre gerekli</translation>
     </message>
     <message>
       <source>Set password on this camera using Wisenet WAVE client or camera web-page to view video</source>
-      <translation type="unfinished">Set password on this camera using Wisenet WAVE client or camera web-page to view video</translation>
+      <translation>Videoyu izlemek için Wisenet WAVE istemcisini veya kamera web sayfasını kullanarak bu kamerada şifre ayarlayın</translation>
     </message>
     <message>
       <source>Unsupported firmware version</source>
-      <translation type="unfinished">Unsupported firmware version</translation>
+      <translation>Desteklenmeyen yazılım versiyonu</translation>
     </message>
     <message>
       <source>Please update firmware</source>
-      <translation type="unfinished">Please update firmware</translation>
+      <translation>Lütfen firmware'i güncelleyin</translation>
     </message>
     <message>
       <source>Too many connections</source>
-      <translation type="unfinished">Too many connections</translation>
+      <translation>Çok sayıda oturum</translation>
     </message>
     <message>
       <source>I/O interface not supported yet</source>
-      <translation type="unfinished">I/O interface not supported yet</translation>
+      <translation>G / Ç arayüzü henüz desteklenmiyor</translation>
     </message>
     <message>
       <source>In this app I/O module can be used as a sound input device only. To use it as a control module, please use desktop version of %1</source>
-      <translation type="unfinished">In this app I/O module can be used as a sound input device only. To use it as a control module, please use desktop version of %1</translation>
+      <translation>Bu uygulamada I / O modülü sadece bir ses girişi aygıtı olarak kullanılabilir. Bir kontrol modülü olarak kullanmak için lütfen %1masaüstü sürümünü kullanın</translation>
     </message>
   </context>
   <context>
@@ -768,11 +768,11 @@
     <name>main</name>
     <message>
       <source>Server offline. Reconnecting...</source>
-      <translation type="unfinished">Server offline. Reconnecting...</translation>
+      <translation>Sunucu çevrimdışı. Yeniden bağlanıyor ...</translation>
     </message>
     <message>
       <source>Cannot connect to %1</source>
-      <translation type="unfinished">Cannot connect to %1</translation>
+      <translation>%1 e bağlanılamıyor</translation>
     </message>
   </context>
 </TS>

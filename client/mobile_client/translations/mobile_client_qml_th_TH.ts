@@ -5,7 +5,7 @@
     <name>ActionButtonsPanel</name>
     <message>
       <source>Press and hold to</source>
-      <translation type="unfinished">Press and hold to</translation>
+      <translation>กดค้างไว้</translation>
     </message>
   </context>
   <context>
@@ -105,27 +105,27 @@
     </message>
     <message>
       <source>Check your internet connection or try again later</source>
-      <translation type="unfinished">Check your internet connection or try again later</translation>
+      <translation>ตรวจสอบการเชื่อมต่ออินเทอร์เน็ตของคุณหรือลองอีกครั้งในภายหลัง</translation>
     </message>
     <message>
       <source>Account not found</source>
-      <translation type="unfinished">Account not found</translation>
+      <translation>ไม่พบบัญชีนี้</translation>
     </message>
     <message>
       <source>Wrong password</source>
-      <translation type="unfinished">Wrong password</translation>
+      <translation>รหัสผ่านไม่ถูกต้อง</translation>
     </message>
     <message>
       <source>Account not activated</source>
-      <translation type="unfinished">Account not activated</translation>
+      <translation>บัญชีไม่เปิดใช้งาน</translation>
     </message>
     <message>
       <source>Email cannot be empty</source>
-      <translation type="unfinished">Email cannot be empty</translation>
+      <translation>อีเมลต้องไม่ว่างเปล่า</translation>
     </message>
     <message>
       <source>Password cannot be empty</source>
-      <translation type="unfinished">Password cannot be empty</translation>
+      <translation>รหัสผ่านต้องไม่ปล่อยว่าง.</translation>
     </message>
   </context>
   <context>
@@ -569,11 +569,11 @@
     </message>
     <message>
       <source>What to do with currently saved passwords?</source>
-      <translation type="unfinished">What to do with currently saved passwords?</translation>
+      <translation>จะทำอย่างไรกับรหัสผ่านที่บันทึกไว้ในปัจจุบัน</translation>
     </message>
     <message>
       <source>Delete</source>
-      <translation type="unfinished">Delete</translation>
+      <translation>ลบ</translation>
     </message>
   </context>
   <context>
@@ -704,35 +704,35 @@
     </message>
     <message>
       <source>Not enough licenses</source>
-      <translation type="unfinished">Not enough licenses</translation>
+      <translation>ใบอนุญาตไม่เพียงพอ</translation>
     </message>
     <message>
       <source>Password required</source>
-      <translation type="unfinished">Password required</translation>
+      <translation>กรุณาใส่รหัสผ่าน</translation>
     </message>
     <message>
       <source>Set password on this camera using Wisenet WAVE client or camera web-page to view video</source>
-      <translation type="unfinished">Set password on this camera using Wisenet WAVE client or camera web-page to view video</translation>
+      <translation>ตั้งรหัสผ่านในกล้องนี้โดยใช้ไคลเอ็นต์ Wisenet WAVE หรือเว็บเพจของกล้องเพื่อดูวิดีโอ</translation>
     </message>
     <message>
       <source>Unsupported firmware version</source>
-      <translation type="unfinished">Unsupported firmware version</translation>
+      <translation>เวอร์ชันเฟิร์มแวร์ที่ไม่สนับสนุน</translation>
     </message>
     <message>
       <source>Please update firmware</source>
-      <translation type="unfinished">Please update firmware</translation>
+      <translation>กรุณาอัพเดทเฟิร์มแวร์</translation>
     </message>
     <message>
       <source>Too many connections</source>
-      <translation type="unfinished">Too many connections</translation>
+      <translation>การเชื่อมต่อมากเกินไป</translation>
     </message>
     <message>
       <source>I/O interface not supported yet</source>
-      <translation type="unfinished">I/O interface not supported yet</translation>
+      <translation>ส่วนติดต่อ I / O ไม่ได้รับการสนับสนุน</translation>
     </message>
     <message>
       <source>In this app I/O module can be used as a sound input device only. To use it as a control module, please use desktop version of %1</source>
-      <translation type="unfinished">In this app I/O module can be used as a sound input device only. To use it as a control module, please use desktop version of %1</translation>
+      <translation>ใน app นี้ สามารถใช้โมดูล I/O เป็นอุปกรณ์อินพุตเสียงเท่านั้น เพื่อใช้เป็นควบคุมโมดูล โปรดใช้เดสก์ท็อปรุ่นของ %1</translation>
     </message>
   </context>
   <context>
@@ -768,11 +768,11 @@
     <name>main</name>
     <message>
       <source>Server offline. Reconnecting...</source>
-      <translation type="unfinished">Server offline. Reconnecting...</translation>
+      <translation>เซิร์ฟเวอร์ออฟไลน์ เชื่อมต่อใหม่ ...</translation>
     </message>
     <message>
       <source>Cannot connect to %1</source>
-      <translation type="unfinished">Cannot connect to %1</translation>
+      <translation>ไม่สามารถเชื่อมต่อกับ %1</translation>
     </message>
   </context>
 </TS>
