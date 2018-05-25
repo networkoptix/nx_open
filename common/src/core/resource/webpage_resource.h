@@ -26,7 +26,6 @@ class QnWebPageResource : public QnResource
 
 public:
     QnWebPageResource(QnCommonModule* commonModule = nullptr);
-    QnWebPageResource(const QUrl& url, QnCommonModule* commonModule = nullptr);
 
     virtual ~QnWebPageResource();
 
@@ -41,6 +40,9 @@ public:
     /** Check if the page is the special integration page. */
     nx::vms::api::WebPageSubtype subtype() const;
     void setSubtype(nx::vms::api::WebPageSubtype value);
+
+signals:
+    void subtypeChanged(const QnWebPageResourcePtr& webPage);
 
 private:
     // This class must not store its status on server side

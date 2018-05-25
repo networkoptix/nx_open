@@ -20,14 +20,13 @@ QnWebPageResource::QnWebPageResource(QnCommonModule* commonModule):
 {
     setTypeId(qnResTypePool->getFixedResourceTypeId(QnResourceTypePool::kWebPageTypeId));
     addFlags(Qn::web_page);
-}
 
-QnWebPageResource::QnWebPageResource(const QUrl& url, QnCommonModule* commonModule):
-    QnWebPageResource(commonModule)
-{
-    setId(QnUuid::createUuid());
-    setName(nameForUrl(url));
-    setUrl(url.toString());
+    connect(this, &QnResource::propertyChanged, this,
+        [this](const QnResourcePtr& /*resource*/, const QString& key)
+        {
+            if (key == kSubtypePropertyName)
+                emit subtypeChanged(toSharedPointer(this));
+        });
 }
 
 QnWebPageResource::~QnWebPageResource()
