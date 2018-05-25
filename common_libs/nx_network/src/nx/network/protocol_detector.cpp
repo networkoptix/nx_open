@@ -5,15 +5,15 @@
 namespace nx {
 namespace network {
 
-std::string toString(DetectionResult detectionResult)
+std::string toString(ProtocolMatchResult detectionResult)
 {
     switch (detectionResult)
     {
-        case DetectionResult::detected:
+        case ProtocolMatchResult::detected:
             return "detected";
-        case DetectionResult::needMoreData:
+        case ProtocolMatchResult::needMoreData:
             return "needMoreData";
-        case DetectionResult::unknownProtocol:
+        case ProtocolMatchResult::unknownProtocol:
             return "unknownProtocol";
     }
 
