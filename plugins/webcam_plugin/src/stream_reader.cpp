@@ -21,7 +21,6 @@ extern "C" {
 } // extern "C"
 
 #include <nx/utils/log/log.h>
-//#include <nx/utils/log/log_main.h>
 #include <nx/utils/thread/mutex.h>
 
 #include "av_utils.h"
@@ -95,19 +94,12 @@ unsigned int StreamReader::releaseRef()
 int StreamReader::getNextData(nxcip::MediaDataPacket** lpPacket)
 {
     QnMutexLocker lock(&m_mutex);
-    printf("\nIN GET NEXT DATA ------- ");
 
     if (!ensureInitialized())
-    {
-        printf("TRY AGAIN\n");
         return nxcip::NX_TRY_AGAIN;
-    }
 
     if (!isValid())
-    {
-        printf("IO ERROR\n");
         return nxcip::NX_IO_ERROR;
-    }
 
     int nxErrorCode;
     std::unique_ptr<ILPVideoPacket> nxVideoPacket;
@@ -132,10 +124,6 @@ int StreamReader::getNextData(nxcip::MediaDataPacket** lpPacket)
     
     av_packet_unref(m_avDecodePacket);
     *lpPacket = nxErrorCode == nxcip::NX_NO_ERROR ? nxVideoPacket.release() : nullptr;
-    
-    std::string errorCode = nxErrorCode == nxcip::NX_NO_ERROR ? "NO ERROR" : "SOME ERROR";
-    printf(errorCode.c_str());
-
     return nxErrorCode;
 }
 
