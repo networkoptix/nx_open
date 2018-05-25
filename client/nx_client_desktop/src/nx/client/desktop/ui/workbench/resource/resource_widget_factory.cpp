@@ -4,6 +4,7 @@
 
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/resource.h>
+#include <core/resource/webpage_resource.h>
 
 #include <ui/graphics/items/resource/server_resource_widget.h>
 #include <ui/graphics/items/resource/media_resource_widget.h>
@@ -71,7 +72,9 @@ QnResourceWidget* ResourceWidgetFactory::createWidget(QnWorkbenchContext* contex
 
     if (resource->hasFlags(Qn::web_page))
     {
-        if (resource->getName().toLower().startsWith(lit("c2p")))
+        auto webPage = resource.dynamicCast<QnWebPageResource>();
+        NX_ASSERT(webPage);
+        if (webPage && webPage->subtype() == nx::vms::api::WebPageSubtype::c2p)
             return new C2pResourceWidget(context, item);
         return new QnWebResourceWidget(context, item);
     }
