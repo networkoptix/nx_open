@@ -9,8 +9,7 @@
 #include <nx/utils/thread/mutex.h>
 
 namespace nx {
-namespace cdb {
-namespace ec2 {
+namespace data_sync_engine {
 
 typedef ::ec2::Timestamp Timestamp;
 
@@ -37,6 +36,5 @@ private:
     mutable QnMutex m_timeMutex;
 };
 
-} // namespace ec2
-} // namespace cdb
+} // namespace data_sync_engine
 } // namespace nx

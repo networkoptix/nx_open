@@ -18,18 +18,24 @@ bool WearableState::isRunning() const
 {
     switch (status)
     {
-    case Locked:
-    case Uploading:
-    case Consuming:
-        return true;
-    default:
-        return false;
+        case Locked:
+        case Uploading:
+        case Consuming:
+            return true;
+
+        default:
+            return false;
     }
 }
 
 bool WearableState::isDone() const
 {
     return currentIndex >= queue.size();
+}
+
+bool WearableState::isCancellable() const
+{
+    return isRunning() && !isDone() && (status != Consuming || currentIndex + 1 < queue.size());
 }
 
 int WearableState::progress() const
@@ -40,17 +46,19 @@ int WearableState::progress() const
     int filePercent = 0;
     switch (status)
     {
-    case Uploading:
-        if (currentUpload.size == 0)
-            filePercent = 0;
-        else
-            filePercent = 90 * currentUpload.uploaded / currentUpload.size;
-        break;
-    case Consuming:
-        filePercent = 90 + 10 * consumeProgress / 100;
-        break;
-    default:
-        break;
+        case Uploading:
+            if (currentUpload.size == 0)
+                filePercent = 0;
+            else
+                filePercent = 90 * currentUpload.uploaded / currentUpload.size;
+            break;
+
+        case Consuming:
+            filePercent = 90 + 10 * consumeProgress / 100;
+            break;
+
+        default:
+            break;
     }
 
     return (100 * currentIndex + filePercent) / queue.size();

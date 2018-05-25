@@ -15,9 +15,10 @@ bool operator==(const in6_addr& left, const in6_addr& right)
 }
 
 #if !defined(_WIN32)
-#   if defined(__arm__)
+#   if defined(__arm__) && !defined(Q_OS_ANDROID) && !defined(Q_OS_IOS)
 #       undef htonl
 #   endif
+
     const in_addr in4addr_loopback{ htonl(INADDR_LOOPBACK) };
 #endif
 
@@ -51,7 +52,7 @@ HostAddress::HostAddress(
 const HostAddress HostAddress::localhost(
     QString("localhost"), in4addr_loopback, in6addr_loopback);
 
-const HostAddress HostAddress::anyHost(*ipV4from(lit("0.0.0.0")));
+const HostAddress HostAddress::anyHost(*ipV4from("0.0.0.0"));
 
 HostAddress::HostAddress(const in_addr& addr):
     m_ipV4(addr)

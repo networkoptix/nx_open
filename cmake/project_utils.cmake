@@ -23,7 +23,7 @@ function(nx_target_enable_werror target werror_condition)
 endfunction()
 
 function(nx_add_target name type)
-    set(options NO_MOC WERROR NO_WERROR)
+    set(options NO_MOC WERROR NO_WERROR SIGNED)
     set(oneValueArgs LIBRARY_TYPE)
     set(multiValueArgs
         ADDITIONAL_SOURCES ADDITIONAL_RESOURCES
@@ -41,7 +41,7 @@ function(nx_add_target name type)
 
     set(resources ${NX_ADDITIONAL_RESOURCES})
     if(IS_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/static-resources")
-        list(INSERT resources 0 "${CMAKE_CURRENT_SOURCE_DIR}/static-resources" ${resources})
+        list(INSERT resources 0 "${CMAKE_CURRENT_SOURCE_DIR}/static-resources")
     endif()
 
     if(IS_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/translations")
@@ -120,7 +120,7 @@ function(nx_add_target name type)
                     ${CMAKE_CURRENT_BINARY_DIR})
             endif()
 
-            if(codeSigning)
+            if(codeSigning AND NX_SIGNED)
                 nx_sign_windows_executable(${name})
             endif()
 

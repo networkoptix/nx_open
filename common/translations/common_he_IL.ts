@@ -569,7 +569,7 @@
       <translation>שגיאה לא מוכרת</translation>
     </message>
     <message>
-      <source>Server with matching Hardware Id not found</source>
+      <source>Server with matching Hardware ID not found</source>
       <translation>לא נמצא שרת עם מזהה חומרה תואם</translation>
     </message>
   </context>
@@ -704,12 +704,12 @@
       <translation>סימן מים: %1</translation>
     </message>
     <message>
-      <source>Hardware Id: %1</source>
-      <translation>מזהה חומרה: %1</translation>
-    </message>
-    <message>
       <source>Time License</source>
       <translation>רישיון זמני</translation>
+    </message>
+    <message>
+      <source>Hardware ID: %1</source>
+      <translation>מזהה חומרה: %1</translation>
     </message>
   </context>
   <context>

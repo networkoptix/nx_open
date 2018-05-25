@@ -1,3 +1,4 @@
 {
-    "{{PRODUCT_NAME}}" : "Nx Cloud"
+    "%PRODUCT_NAME%" : "Nx Cloud",
+    "%VMS_NAME%"     : "Nx Witness"
 }

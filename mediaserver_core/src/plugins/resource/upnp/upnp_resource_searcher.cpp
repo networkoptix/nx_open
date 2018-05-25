@@ -305,17 +305,24 @@ QnResourceList QnUpnpResourceSearcher::findResources(void)
 //// class QnUpnpResourceSearcherAsync
 ////////////////////////////////////////////////////////////
 
-QnUpnpResourceSearcherAsync::QnUpnpResourceSearcherAsync(QnCommonModule* commonModule) :
+QnUpnpResourceSearcherAsync::QnUpnpResourceSearcherAsync(
+    QnCommonModule* commonModule,
+    const QString& deviceType)
+    :
     QnAbstractResourceSearcher(commonModule),
-    QnAbstractNetworkResourceSearcher(commonModule)
+    QnAbstractNetworkResourceSearcher(commonModule),
+    SearchAutoHandler(deviceType)
 {
 }
 
 QnResourceList QnUpnpResourceSearcherAsync::findResources()
 {
-    m_resList.clear();
-    nx::network::upnp::DeviceSearcher::instance()->processDiscoveredDevices( this );
-    return m_resList;
+    QnResourceList result;
+    {
+        QnMutexLocker lock(&m_mutex);
+        std::swap(m_resList, result);
+    }
+    return result;
 }
 
 bool QnUpnpResourceSearcherAsync::processPacket(
@@ -324,14 +331,18 @@ bool QnUpnpResourceSearcherAsync::processPacket(
     const nx::network::upnp::DeviceInfo& devInfo,
     const QByteArray& xmlDevInfo )
 {
-    const int resListSizeBak = m_resList.size();
+    QnResourceList result;
     processPacket(
         localInterfaceAddress,
         discoveredDevAddress,
         devInfo,
         xmlDevInfo,
-        m_resList );
-    return resListSizeBak > m_resList.size();   //device recognized, no need to process this upnp data futher
+        result);
+    {
+        QnMutexLocker lock(&m_mutex);
+        m_resList << result;
+    }
+    return !result.isEmpty();
 }
 
 bool QnUpnpResourceSearcherAsync::isEnabled() const

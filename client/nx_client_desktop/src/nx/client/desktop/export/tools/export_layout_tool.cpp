@@ -35,7 +35,7 @@
 #include <nx/client/desktop/utils/local_file_cache.h>
 
 #include <nx/utils/app_info.h>
-#include "ui/workbench/watchers/workbench_server_time_watcher.h"
+#include <nx/client/core/watchers/server_time_watcher.h>
 
 #ifdef Q_OS_WIN
 #   include <launcher/nov_launcher_win.h>
@@ -215,7 +215,7 @@ ExportLayoutTool::ItemInfoList ExportLayoutTool::prepareLayout()
         items.insert(localItem.uuid, localItem);
 
         ItemInfo info(resource->getName(), Qn::InvalidUtcOffset);
-        info.timezone = QnWorkbenchServerTimeWatcher::utcOffset(mediaResource,
+        info.timezone = nx::client::core::ServerTimeWatcher::utcOffset(mediaResource,
             Qn::InvalidUtcOffset);
         result.append(info);
     }
@@ -475,16 +475,14 @@ bool ExportLayoutTool::exportMediaResource(const QnMediaResourcePtr& resource)
     uniqId = uniqId.mid(uniqId.indexOf(L'?') + 1); // simplify name if export from existing layout
     auto role = StreamRecorderRole::fileExport;
 
-    qint64 serverTimeZone = QnWorkbenchServerTimeWatcher::utcOffset(resource, Qn::InvalidUtcOffset);
+    qint64 serverTimeZone = client::core::ServerTimeWatcher::utcOffset(resource, Qn::InvalidUtcOffset);
 
     m_currentCamera->exportMediaPeriodToFile(d->settings.period,
         uniqId,
         lit("mkv"),
         d->storage,
         role,
-        serverTimeZone,
-        0,
-        nx::core::transcoding::FilterChain());
+        serverTimeZone);
 
     return true;
 }

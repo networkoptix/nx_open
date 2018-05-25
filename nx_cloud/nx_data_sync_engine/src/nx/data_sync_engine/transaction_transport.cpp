@@ -7,8 +7,7 @@
 #include "compatible_ec2_protocol_version.h"
 
 namespace nx {
-namespace cdb {
-namespace ec2 {
+namespace data_sync_engine {
 
 constexpr static const std::chrono::seconds kTcpKeepAliveTimeout = std::chrono::seconds(5);
 constexpr static const int kKeepAliveProbeCount = 3;
@@ -205,7 +204,7 @@ void TransactionTransport::startOutgoingChannel()
         cl_logDEBUG1);
 
     //sending tranSyncRequest
-    ::ec2::QnTransaction<::ec2::ApiSyncRequestData> requestTran(
+    Command<::ec2::ApiSyncRequestData> requestTran(
         ::ec2::ApiCommand::tranSyncRequest,
         m_baseTransactionTransport.localPeer().id);
     requestTran.params.persistentState = m_transactionLogReader->getCurrentState();
@@ -223,7 +222,7 @@ void TransactionTransport::startOutgoingChannel()
 
 void TransactionTransport::processSpecialTransaction(
     const TransactionTransportHeader& /*transportHeader*/,
-    ::ec2::QnTransaction<::ec2::ApiSyncRequestData> data,
+    Command<::ec2::ApiSyncRequestData> data,
     TransactionProcessedHandler handler)
 {
     m_baseTransactionTransport.setWriteSync(true);
@@ -232,7 +231,7 @@ void TransactionTransport::processSpecialTransaction(
     m_remotePeerTranState = std::move(data.params.persistentState);
 
     //sending sync response
-    ::ec2::QnTransaction<::ec2::QnTranStateResponse> tranSyncResponse(
+    Command<::ec2::QnTranStateResponse> tranSyncResponse(
         ::ec2::ApiCommand::tranSyncResponse,
         m_baseTransactionTransport.localPeer().id);
     tranSyncResponse.params.result = 0;
@@ -259,7 +258,7 @@ void TransactionTransport::processSpecialTransaction(
 
 void TransactionTransport::processSpecialTransaction(
     const TransactionTransportHeader& /*transportHeader*/,
-    ::ec2::QnTransaction<::ec2::QnTranStateResponse> /*data*/,
+    Command<::ec2::QnTranStateResponse> /*data*/,
     TransactionProcessedHandler /*handler*/)
 {
     // TODO: no need to do anything?
@@ -268,7 +267,7 @@ void TransactionTransport::processSpecialTransaction(
 
 void TransactionTransport::processSpecialTransaction(
     const TransactionTransportHeader& /*transportHeader*/,
-    ::ec2::QnTransaction<::ec2::ApiTranSyncDoneData> /*data*/,
+    Command<::ec2::ApiTranSyncDoneData> /*data*/,
     TransactionProcessedHandler /*handler*/)
 {
     // TODO: no need to do anything?
@@ -285,7 +284,7 @@ int TransactionTransport::highestProtocolVersionCompatibleWithRemotePeer() const
 void TransactionTransport::onGotTransaction(
     Qn::SerializationFormat tranFormat,
     QByteArray data,
-    ::ec2::QnTransactionTransportHeader transportHeader)
+    CommandTransportHeader transportHeader)
 {
     NX_CRITICAL(isInSelfAioThread());
 
@@ -308,7 +307,7 @@ void TransactionTransport::onGotTransaction(
 void TransactionTransport::forwardTransactionToProcessor(
     Qn::SerializationFormat tranFormat,
     QByteArray data,
-    ::ec2::QnTransactionTransportHeader transportHeader)
+    CommandTransportHeader transportHeader)
 {
     NX_CRITICAL(isInSelfAioThread());
 
@@ -451,7 +450,7 @@ void TransactionTransport::enableOutputChannel()
     {
         m_haveToSendSyncDone = false;
 
-        ::ec2::QnTransaction<::ec2::ApiTranSyncDoneData>
+        Command<::ec2::ApiTranSyncDoneData>
             tranSyncDone(::ec2::ApiCommand::tranSyncDone, m_baseTransactionTransport.localPeer().id);
         tranSyncDone.params.result = 0;
 
@@ -483,7 +482,7 @@ void TransactionTransport::onInactivityTimeout()
 
 template<class T>
 void TransactionTransport::sendTransaction(
-    ::ec2::QnTransaction<T> transaction,
+    Command<T> transaction,
     TransactionTransportHeader transportHeader)
 {
     NX_LOGX(
@@ -524,6 +523,5 @@ void TransactionTransport::sendTransaction(
         transactionSerializer);
 }
 
-} // namespace ec2
-} // namespace cdb
+} // namespace data_sync_engine
 } // namespace nx

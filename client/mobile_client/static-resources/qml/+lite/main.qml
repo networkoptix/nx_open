@@ -55,13 +55,13 @@ ApplicationWindow
             var url = getInitialUrl()
             var systemName = ""
 
-            if (url == "")
+            if (url.isEmpty())
             {
                 url = getLastUsedUrl()
                 systemName = getLastUsedSystemName()
             }
 
-            if (url != "")
+            if (!url.isEmpty())
             {
                 Workflow.openResourcesScreen(systemName)
                 connectionManager.connectToServer(url)

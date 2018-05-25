@@ -277,18 +277,17 @@ void loadResourcesFromEcs(
     }
 
     {
-        //loading business rules
-        nx::vms::event::RuleList rules;
-        while ((rez = ec2Connection->getBusinessEventManager(Qn::kSystemAccess)->getBusinessRulesSync(&rules)) != ec2::ErrorCode::ok)
+        //Loading event rules.
+        nx::vms::api::EventRuleDataList rules;
+        while ((rez = ec2Connection->getEventRulesManager(Qn::kSystemAccess)->getEventRulesSync(
+            &rules)) != ec2::ErrorCode::ok)
         {
-            qDebug() << "QnMain::run(): Can't get business rules. Reason: " << ec2::toString(rez);
+            qDebug() << "QnMain::run(): Can't get event rules. Reason: " << ec2::toString(rez);
             std::this_thread::sleep_for(kAppServerRequestErrorTimeout);
             if (needToStop())
                 return;
         }
-
-        for (const auto& rule : rules)
-            messageProcessor->on_businessEventAddedOrUpdated(rule);
+        messageProcessor->resetEventRules(rules);
     }
 
     {

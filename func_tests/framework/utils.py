@@ -124,7 +124,7 @@ class RunningTime(object):
         return '{} +/- {}'.format(self.current.strftime('%Y-%m-%d %H:%M:%S.%f %Z'), self.error.total_seconds())
 
     def __repr__(self):
-        return '{self.__class__.__name__}({self:s})'.format(self=self)
+        return 'RunningTime({}, {})'.format(self.current, self.error * 2)
 
 
 @lrudecorator(1)

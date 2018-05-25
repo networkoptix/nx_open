@@ -28,18 +28,18 @@ mysite = MyAdminSite()
 
 def get_context_and_language(request, context_id, language_code, customization):
     context = Context.objects.get(id=context_id) if context_id else None
-    language = Language.objects.get(code=language_code) if language_code else None
+    language = Language.by_code(language_code)
 
     if request.method == "POST":
         if not context and 'context' in request.POST and request.POST['context']:
             context = Context.objects.get(id=request.POST['context'])
 
         if not language and 'language' in request.POST and request.POST['language']:
-            language = Language.objects.get(code=request.POST['language'])
+            language = Language.by_code(request.POST['language'])
 
     if not language:
         if 'language' in request.session:
-            language = Language.objects.get(code=request.session['language'])
+            language = Language.by_code(request.session['language'])
         else:
             language = customization.default_language
 
@@ -102,8 +102,7 @@ def context_editor_action(request, context_id, language_code):
         raise PermissionDenied
 
     if 'languageChanged' in request_data and 'currentLanguage' in request_data and request_data['currentLanguage']:
-        last_language = Language.objects.get(
-            code=request_data['currentLanguage'])
+        last_language = Language.by_code(request_data['currentLanguage'])
 
         upload_errors = save_unrevisioned_records(context, customization, last_language,
                                                   context.datastructure_set.all(), request_data,

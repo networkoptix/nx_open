@@ -1,6 +1,0 @@
-Nuovo messaggio
-
-Digitare: {{message.type}}
-Dati: {{{message.data}}}
-
-Non esiste un modello specifico per questo tipo di messaggio

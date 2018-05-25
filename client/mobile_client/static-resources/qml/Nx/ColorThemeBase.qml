@@ -88,6 +88,8 @@ QtObject
 
     property color windowBackground: base5
     property color windowText: contrast1
+    property color brightText: contrast1
+    property color highlight: brand_main
 
     function transparent(color, alpha)
     {

@@ -64,20 +64,7 @@ QnSetupWizardDialog::~QnSetupWizardDialog()
 
 int QnSetupWizardDialog::exec()
 {
-    Q_D(QnSetupWizardDialog);
-
-    QUrl url = constructUrl(d->url, commonModule());
-
-#ifdef _DEBUG
-    if (auto lineEdit = findChild<QLineEdit*>())
-        lineEdit->setText(url.toString());
-#endif
-
-    NX_LOG(lit("QnSetupWizardDialog: Opening setup URL: %1")
-           .arg(url.toString(QUrl::RemovePassword)), cl_logDEBUG1);
-
-    d->webView->load(url);
-
+    loadPage();
     return base_type::exec();
 }
 
@@ -91,6 +78,22 @@ void QnSetupWizardDialog::setUrl(const QUrl& url)
 {
     Q_D(QnSetupWizardDialog);
     d->url = url;
+}
+
+void QnSetupWizardDialog::loadPage()
+{
+    Q_D(QnSetupWizardDialog);
+
+    const auto url = constructUrl(d->url, commonModule());
+
+    #if defined(_DEBUG)
+        if (const auto lineEdit = findChild<QLineEdit*>())
+            lineEdit->setText(url.toString());
+    #endif
+
+    NX_DEBUG(this, lm("Opening setup URL: %1").arg(url.toString(QUrl::RemovePassword)));
+
+    d->webView->load(url);
 }
 
 QnEncodedCredentials QnSetupWizardDialog::localCredentials() const

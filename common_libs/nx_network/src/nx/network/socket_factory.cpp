@@ -5,9 +5,13 @@
 #include <nx/network/cloud/cloud_connect_controller.h>
 #include <nx/network/cloud/cloud_stream_socket.h>
 #include <nx/network/ssl_socket.h>
+#include <nx/network/ssl/ssl_stream_server_socket.h>
+#include <nx/network/ssl/ssl_stream_socket.h>
 #include <nx/network/system_socket.h>
 #include <nx/network/udt/udt_socket.h>
 #include <nx/utils/std/cpp14.h>
+
+//#define USE_NEW_SSL_SOCKET
 
 namespace nx {
 namespace network {
@@ -47,10 +51,20 @@ std::unique_ptr<AbstractStreamSocket> SocketFactory::createStreamSocket(
 
 #ifdef ENABLE_SSL
     if (sslRequired || s_isSslEnforced)
-        result.reset(new deprecated::SslSocket(std::move(result), false));
+        return createSslAdapter(std::move(result));
 #endif // ENABLE_SSL
 
     return result;
+}
+
+std::unique_ptr<nx::network::AbstractStreamSocket> SocketFactory::createSslAdapter(
+    std::unique_ptr<nx::network::AbstractStreamSocket> connection)
+{
+#ifdef USE_NEW_SSL_SOCKET
+    return std::make_unique<ssl::ClientStreamSocket>(std::move(connection));
+#else
+    return std::make_unique<deprecated::SslSocket>(std::move(connection), false);
+#endif // USE_NEW_SSL_SOCKET
 }
 
 std::unique_ptr< AbstractStreamServerSocket > SocketFactory::createStreamServerSocket(
@@ -70,12 +84,34 @@ std::unique_ptr< AbstractStreamServerSocket > SocketFactory::createStreamServerS
         return std::unique_ptr<AbstractStreamServerSocket>();
 
 #ifdef ENABLE_SSL
-    if (s_isSslEnforced)
-        result.reset(new deprecated::SslServerSocket(std::move(result), false));
-    else
-        if (sslRequired)
-            result.reset(new deprecated::SslServerSocket(std::move(result), true));
+    if (s_isSslEnforced || sslRequired)
+    {
+        return createSslAdapter(
+            std::move(result),
+            s_isSslEnforced
+                ? ssl::EncryptionUse::always
+                : ssl::EncryptionUse::autoDetectByReceivedData);
+    }
 #endif // ENABLE_SSL
+
+    return result;
+}
+
+std::unique_ptr<nx::network::AbstractStreamServerSocket> SocketFactory::createSslAdapter(
+    std::unique_ptr<nx::network::AbstractStreamServerSocket> serverSocket,
+    ssl::EncryptionUse encryptionUse)
+{
+    std::unique_ptr<nx::network::AbstractStreamServerSocket> result;
+
+#ifdef USE_NEW_SSL_SOCKET
+    result.reset(new ssl::StreamServerSocket(
+        std::move(serverSocket),
+        encryptionUse));
+#else
+    result.reset(new deprecated::SslServerSocket(
+        std::move(serverSocket),
+        encryptionUse == ssl::EncryptionUse::autoDetectByReceivedData));
+#endif // USE_NEW_SSL_SOCKET
 
     return result;
 }
@@ -85,11 +121,11 @@ QString SocketFactory::toString(SocketType type)
     switch (type)
     {
         case SocketType::cloud:
-            return lit("cloud");
+            return "cloud";
         case SocketType::tcp:
-            return lit("tcp");
+            return "tcp";
         case SocketType::udt:
-            return lit("udt");
+            return "udt";
     }
 
     NX_ASSERT(false, lm("Unrecognized socket type: ").arg(static_cast<int>(type)));
@@ -98,11 +134,11 @@ QString SocketFactory::toString(SocketType type)
 
 SocketFactory::SocketType SocketFactory::stringToSocketType(QString type)
 {
-    if (type.toLower() == lit("cloud"))
+    if (type.toLower() == "cloud")
         return SocketType::cloud;
-    if (type.toLower() == lit("tcp"))
+    if (type.toLower() == "tcp")
         return SocketType::tcp;
-    if (type.toLower() == lit("udt"))
+    if (type.toLower() == "udt")
         return SocketType::udt;
 
     NX_ASSERT(false, lm("Unrecognized socket type: ").arg(type));
@@ -160,7 +196,7 @@ void SocketFactory::setIpVersion(const QString& ipVersion)
     if (ipVersion.isEmpty())
         return;
 
-    NX_LOG(lit("SocketFactory::setIpVersion( %1 )").arg(ipVersion), cl_logALWAYS);
+    NX_LOG(lm("SocketFactory::setIpVersion(%1)").arg(ipVersion), cl_logALWAYS);
 
     if (ipVersion == QLatin1String("4"))
     {

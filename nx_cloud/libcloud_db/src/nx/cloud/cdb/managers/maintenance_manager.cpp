@@ -10,7 +10,7 @@ namespace cdb {
 
 MaintenanceManager::MaintenanceManager(
     const QnUuid& moduleGuid,
-    ec2::SyncronizationEngine* const syncronizationEngine,
+    data_sync_engine::SyncronizationEngine* const syncronizationEngine,
     const nx::utils::db::InstanceController& dbInstanceController)
     :
     m_moduleGuid(moduleGuid),
@@ -36,9 +36,17 @@ void MaintenanceManager::getVmsConnections(
             lock = m_startedAsyncCallsCounter.getScopedIncrement(),
             completionHandler = std::move(completionHandler)]()
         {
-            completionHandler(
-                api::ResultCode::ok,
-                m_syncronizationEngine->connectionManager().getVmsConnections());
+            const auto ec2Connections =
+                m_syncronizationEngine->connectionManager().getConnections();
+            api::VmsConnectionDataList result;
+            result.connections.reserve(ec2Connections.size());
+            for (const auto& connection: ec2Connections)
+            {
+                result.connections.push_back(
+                    {connection.systemId, connection.peerEndpoint.toStdString()});
+            }
+
+            completionHandler(api::ResultCode::ok, std::move(result));
         });
 }
 
@@ -73,7 +81,7 @@ void MaintenanceManager::getStatistics(
         {
             data::Statistics statistics;
             statistics.onlineServerCount =
-                (int)m_syncronizationEngine->connectionManager().getVmsConnectionCount();
+                (int)m_syncronizationEngine->connectionManager().getConnectionCount();
             statistics.dbQueryStatistics =
                 m_dbInstanceController.statisticsCollector().getQueryStatistics();
             statistics.pendingSqlQueryCount =
@@ -86,8 +94,8 @@ void MaintenanceManager::getStatistics(
 void MaintenanceManager::onTransactionLogRead(
     nx::utils::Counter::ScopedIncrement /*asyncCallLocker*/,
     const std::string& systemId,
-    ec2::ResultCode ec2ResultCode,
-    std::vector<ec2::dao::TransactionLogRecord> serializedTransactions,
+    data_sync_engine::ResultCode ec2ResultCode,
+    std::vector<data_sync_engine::dao::TransactionLogRecord> serializedTransactions,
     ::ec2::QnTranState /*readedUpTo*/,
     std::function<void(
         api::ResultCode,

@@ -1,16 +1,16 @@
 #include "archive_length_widget.h"
 #include "ui_archive_length_widget.h"
-
-#include <nx/client/desktop/common/utils/aligner.h>
-#include <ui/help/help_topic_accessor.h>
-#include <ui/help/help_topics.h>
-
-#include <ui/workaround/widgets_signals_workaround.h>
-#include <nx/client/desktop/common/utils/checkbox_utils.h>
-
 #include "../redux/camera_settings_dialog_state.h"
 #include "../redux/camera_settings_dialog_store.h"
+
 #include <ui/common/read_only.h>
+#include <ui/help/help_topic_accessor.h>
+#include <ui/help/help_topics.h>
+#include <ui/workaround/widgets_signals_workaround.h>
+
+#include <nx/client/desktop/common/utils/aligner.h>
+#include <nx/client/desktop/common/utils/checkbox_utils.h>
+#include <nx/utils/disconnect_helper.h>
 
 namespace {
 
@@ -24,21 +24,24 @@ namespace desktop {
 
 ArchiveLengthWidget::ArchiveLengthWidget(QWidget* parent):
     base_type(parent),
-    ui(new Ui::ArchiveLengthWidget)
+    ui(new Ui::ArchiveLengthWidget),
+    m_aligner(new Aligner(this))
 {
     ui->setupUi(this);
-
     setHelpTopic(this, Qn::CameraSettings_Recording_ArchiveLength_Help);
 
-    m_aligner = new Aligner(this);
-    m_aligner->addWidgets(
-        {
-            ui->labelMinDays,
-            ui->labelMaxDays
-        });
+    CheckboxUtils::autoClearTristate(ui->checkBoxMinArchive);
+    CheckboxUtils::autoClearTristate(ui->checkBoxMaxArchive);
+
+    m_aligner->addWidgets({
+        ui->labelMinDays,
+        ui->labelMaxDays});
 }
 
-ArchiveLengthWidget::~ArchiveLengthWidget() = default;
+ArchiveLengthWidget::~ArchiveLengthWidget()
+{
+    // Required here for forward-declared scoped pointer destruction.
+}
 
 Aligner* ArchiveLengthWidget::aligner() const
 {
@@ -47,32 +50,22 @@ Aligner* ArchiveLengthWidget::aligner() const
 
 void ArchiveLengthWidget::setStore(CameraSettingsDialogStore* store)
 {
-    connect(store, &CameraSettingsDialogStore::stateChanged, this,
-        &ArchiveLengthWidget::loadState);
+    m_storeConnections.reset(new QnDisconnectHelper());
 
-    connect(ui->checkBoxMinArchive, &QCheckBox::stateChanged, store,
-        [store](int state)
-        {
-            store->setMinRecordingDaysAutomatic(state == Qt::Checked);
-        });
+    *m_storeConnections << connect(store, &CameraSettingsDialogStore::stateChanged,
+        this, &ArchiveLengthWidget::loadState);
 
-    connect(ui->spinBoxMinDays, QnSpinboxIntValueChanged, store,
-        [store](int value)
-        {
-            store->setMinRecordingDaysValue(value);
-        });
+    *m_storeConnections << connect(ui->checkBoxMinArchive, &QCheckBox::clicked,
+        store, &CameraSettingsDialogStore::setMinRecordingDaysAutomatic);
 
-    connect(ui->checkBoxMaxArchive, &QCheckBox::stateChanged, store,
-        [store](int state)
-        {
-            store->setMaxRecordingDaysAutomatic(state == Qt::Checked);
-        });
+    *m_storeConnections << connect(ui->spinBoxMinDays, QnSpinboxIntValueChanged,
+        store, &CameraSettingsDialogStore::setMinRecordingDaysValue);
 
-    connect(ui->spinBoxMaxDays, QnSpinboxIntValueChanged, store,
-        [store](int value)
-        {
-            store->setMaxRecordingDaysValue(value);
-        });
+    *m_storeConnections << connect(ui->checkBoxMaxArchive, &QCheckBox::clicked,
+        store, &CameraSettingsDialogStore::setMaxRecordingDaysAutomatic);
+
+    *m_storeConnections << connect(ui->spinBoxMaxDays, QnSpinboxIntValueChanged,
+        store, &CameraSettingsDialogStore::setMaxRecordingDaysValue);
 }
 
 void ArchiveLengthWidget::loadState(const CameraSettingsDialogState& state)

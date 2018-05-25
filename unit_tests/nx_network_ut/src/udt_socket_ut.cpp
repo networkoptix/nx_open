@@ -448,7 +448,7 @@ private:
 
         m_udtSocketServerStarted.set_value();
 
-        std::unique_ptr<AbstractStreamSocket> acceptedSocket(m_serverSocket.accept());
+        auto acceptedSocket = m_serverSocket.accept();
         ASSERT_NE(nullptr, acceptedSocket);
 
         for (;;)
@@ -592,7 +592,7 @@ protected:
 
     std::unique_ptr<AbstractStreamSocket> accept() const
     {
-        std::unique_ptr<AbstractStreamSocket> socket(server->accept());
+        auto socket = server->accept();
         EXPECT_NE(nullptr, socket);
         socketConfig(socket.get());
         return socket;

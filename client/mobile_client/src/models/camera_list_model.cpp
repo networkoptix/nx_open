@@ -20,6 +20,7 @@ public:
 
 public:
     QnAvailableCameraListModel* model;
+    QSet<QnUuid> filterIds;
 };
 
 QnCameraListModel::QnCameraListModel(QObject* parent) :
@@ -103,6 +104,19 @@ void QnCameraListModel::setLayoutId(const QString& layoutId)
 
     d->model->setLayout(layout);
     emit layoutIdChanged();
+}
+
+QVariant QnCameraListModel::filterIds() const
+{
+    Q_D(const QnCameraListModel);
+    return QVariant::fromValue(d->filterIds.toList());
+}
+
+void QnCameraListModel::setFilterIds(const QVariant &ids)
+{
+    Q_D(QnCameraListModel);
+    d->filterIds = ids.value<QList<QnUuid>>().toSet();
+    invalidateFilter();
 }
 
 int QnCameraListModel::count() const
@@ -226,7 +240,16 @@ bool QnCameraListModel::filterAcceptsRow(int sourceRow, const QModelIndex& sourc
 {
     const auto index = sourceModel()->index(sourceRow, 0, sourceParent);
     const auto name = index.data(Qn::ResourceNameRole).toString();
-    return name.contains(filterRegExp());
+    if (!name.contains(filterRegExp()))
+        return false;
+
+    Q_D(const QnCameraListModel);
+
+    if (d->filterIds.isEmpty())
+        return true;
+
+    const auto id = index.data(Qn::UuidRole).toUuid();
+    return d->filterIds.contains(id);
 }
 
 QnCameraListModelPrivate::QnCameraListModelPrivate() :

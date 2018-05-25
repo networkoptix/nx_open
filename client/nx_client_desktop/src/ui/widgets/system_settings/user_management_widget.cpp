@@ -282,6 +282,9 @@ QnUserManagementWidget::QnUserManagementWidget(QWidget* parent) :
     setHelpTopic(ui->ldapSettingsButton,                                Qn::UserSettings_LdapIntegration_Help);
     setHelpTopic(ui->fetchButton,                                       Qn::UserSettings_LdapFetch_Help);
 
+    ui->ldapTooltip->setHint(tr("Users can be imported from an LDAP server. They will be able to log in only if LDAP server is online and their accounts are active on it."));
+    setHelpTopic(ui->ldapTooltip, Qn::UserSettings_LdapAdd_Help);
+
     /* Cursor changes with hover: */
     connect(hoverTracker, &ItemViewHoverTracker::itemEnter, this,
         [this](const QModelIndex& index)

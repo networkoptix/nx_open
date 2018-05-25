@@ -188,35 +188,28 @@ void LegacyImageControlWidget::updateAspectRatioFromResources(
 void LegacyImageControlWidget::updateRotationFromResources(
         const QnVirtualCameraResourceList &cameras)
 {
-    QString rotationString = cameras.isEmpty()
-            ? QString()
-            : cameras.first()->getProperty(QnMediaResource::rotationKey());
+    int rotation = cameras.isEmpty()
+            ? 0
+            : cameras.first()->getProperty(QnMediaResource::rotationKey()).toInt();
 
     bool sameRotation = std::all_of(cameras.cbegin(), cameras.cend(),
-        [rotationString](const QnVirtualCameraResourcePtr &camera)
+        [rotation](const QnVirtualCameraResourcePtr &camera)
         {
-            return rotationString == camera->getProperty(QnMediaResource::rotationKey());
+            return rotation == camera->getProperty(QnMediaResource::rotationKey()).toInt();
         }
     );
 
     ui->rotationComboBox->clear();
 
-    ui->rotationComboBox->addItem(tr("Auto"), kAutoRotation);
     for (int degrees = 0; degrees < rotationDegreesMax; degrees += rotationDegreesStep)
         ui->rotationComboBox->addItem(tr("%1 degrees").arg(degrees), degrees);
+    ui->rotationComboBox->setCurrentIndex(0);
 
     if (sameRotation)
     {
-        if (rotationString.isEmpty())
-        {
-            ui->rotationComboBox->setCurrentIndex(0);
-        }
-        else
-        {
-            int index = ui->rotationComboBox->findData(rotationString.toInt());
-            if (index != -1)
-                ui->rotationComboBox->setCurrentIndex(index);
-        }
+        int index = ui->rotationComboBox->findData(rotation);
+        if (index != -1)
+            ui->rotationComboBox->setCurrentIndex(index);
     }
     else
     {

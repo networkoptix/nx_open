@@ -14,8 +14,7 @@
 #include "transaction_log_reader.h"
 
 namespace nx {
-namespace cdb {
-namespace ec2 {
+namespace data_sync_engine {
 
 class TransactionLog;
 
@@ -73,6 +72,5 @@ private:
     QnUuid m_connectionGuid;
 };
 
-} // namespace ec2
-} // namespace cdb
+} // namespace data_sync_engine
 } // namespace nx

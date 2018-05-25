@@ -1,9 +1,10 @@
 *** Settings ***
 Resource          ../resource.robot
 Resource          ../variables.robot
-Test Teardown     Close Browser
-Suite Teardown    Run Keyword If Any Tests Failed    Clean up noperm first/last name
-
+Test Setup        Restart
+Test Teardown     Run Keyword If Test Failed    Reset DB and Open New Browser On Failure
+Suite Setup       Open Browser and go to URL    ${url}
+Suite Teardown    Close Browser
 *** Variables ***
 ${password}    ${BASE PASSWORD}
 ${url}         ${ENV}
@@ -13,11 +14,22 @@ ${LAST NAME IS REQUIRED}       //span[@ng-if='accountForm.lastName.$touched && a
 *** Keywords ***
 Verify In Account Page
     Location Should Be    ${url}/account
-    Wait Until Elements Are Visible    ${ACCOUNT EMAIL}    ${ACCOUNT FIRST NAME}    ${ACCOUNT LAST NAME}    ${ACCOUNT SAVE}    ${ACCOUNT SUBSCRIBE CHECKBOX}    ${ACCOUNT LANGUAGE DROPDOWN}
+    Wait Until Elements Are Visible    ${ACCOUNT EMAIL}    ${ACCOUNT FIRST NAME}    ${ACCOUNT LAST NAME}    ${ACCOUNT SAVE}    ${ACCOUNT LANGUAGE DROPDOWN}    ${ACCOUNT SUBSCRIBE CHECKBOX}    ${ACCOUNT DROPDOWN}
+    sleep    .5
+
+Restart
+    ${status}    Run Keyword And Return Status    Validate Log In
+    Run Keyword If    ${status}    Log Out
+    Validate Log Out
+    Go To    ${url}
+
+Reset DB and Open New Browser On Failure
+    Close Browser
+    Reset user noperm first/last name
+    Open Browser and go to URL    ${url}
 
 *** Test Cases ***
 Can access the account page from dropdown
-    Open Browser and go to URL    ${url}
     Log In    ${EMAIL NOPERM}    ${password}
     Validate Log In
     Wait Until Element Is Visible    ${ACCOUNT DROPDOWN}
@@ -27,20 +39,19 @@ Can access the account page from dropdown
     Verify in account page
 
 Can access the account page from direct link while logged in
-    Open Browser and go to URL    ${url}
     Log In    ${EMAIL NOPERM}    ${password}
     Validate Log In
     Go To    ${url}/account
     Verify in account page
 
 Accessing the account page from a direct link while logged out asks for login, closing log in takes you to main page
-    Open Browser and go to URL    ${url}/account
+    Go To    ${url}/account
     Wait Until Element Is Visible    ${LOG IN CLOSE BUTTON}
     Click Button    ${LOG IN CLOSE BUTTON}
     Location Should Be    ${url}/
 
 Accessing the account page from a direct link while logged out asks for login, on valid login takes you to account page
-    Open Browser and go to URL    ${url}/account
+    Go To    ${url}/account
     Log In    ${EMAIL NOPERM}    ${password}    button=None
     Validate Log In
     Verify in account page
@@ -48,7 +59,7 @@ Accessing the account page from a direct link while logged out asks for login, o
 Check box is checked when registering with it checked
     [tags]    email
     ${random email}    Get Random Email    ${BASE EMAIL}
-    Open Browser and go to URL    ${url}/register
+    Go To    ${url}/register
     Register    mark    hamill    ${random email}    ${password}
     Activate    ${random email}
     Log In    ${random email}    ${password}
@@ -61,7 +72,7 @@ Check box is checked when registering with it checked
 Check box is not checked when registering with it not checked
     [tags]    email
     ${random email}    Get Random Email    ${BASE EMAIL}
-    Open Browser and go to URL    ${url}/register
+    Go To    ${url}/register
     Register    mark    hamill    ${random email}    ${password}    false
     Activate    ${random email}
     Log In    ${random email}    ${password}
@@ -74,13 +85,14 @@ Check box is not checked when registering with it not checked
 Unchecking check box and saving maintains that setting
     [tags]    email
     ${random email}    Get Random Email    ${BASE EMAIL}
-    Open Browser and go to URL    ${url}/register
+    Go To    ${url}/register
     Register    mark    hamill    ${random email}    ${password}
     Activate    ${random email}
     Log In    ${random email}    ${password}
     Validate Log In
     Go To    ${url}/account
     Verify In Account Page
+
     Click Element    ${ACCOUNT SUBSCRIBE CHECKBOX}
     Click Button    ${ACCOUNT SAVE}
     Check For Alert    ${YOUR ACCOUNT IS SUCCESSFULLY SAVED}
@@ -89,13 +101,12 @@ Unchecking check box and saving maintains that setting
     Log In    ${random email}    ${password}    button=None
     Validate Log In
     ${checked}    Get Element Attribute    ${ACCOUNT SUBSCRIBE CHECKBOX}    checked
-    Should Not Be True    ${checked}
-
+    Should Not Be True    "${checked}"=="true"
 
 Checking check box and saving maintains that setting
     [tags]    email
     ${random email}    Get Random Email    ${BASE EMAIL}
-    Open Browser and go to URL    ${url}/register
+    Go To    ${url}/register
     Register    mark    hamill    ${random email}    ${password}    false
     Activate    ${random email}
     Log In    ${random email}    ${password}
@@ -113,7 +124,7 @@ Checking check box and saving maintains that setting
     Should Be True    "${checked}"
 
 Changing first name and saving maintains that setting
-    Open Browser and go to URL    ${url}/account
+    Go To    ${url}/account
     Log In    ${EMAIL NOPERM}    ${password}    button=None
     Validate Log In
     Verify In Account Page
@@ -134,7 +145,7 @@ Changing first name and saving maintains that setting
 
 
 Changing last name and saving maintains that setting
-    Open Browser and go to URL    ${url}/account
+    Go To    ${url}/account
     Log In    ${EMAIL NOPERM}    ${password}    button=None
     Validate Log In
     Verify In Account Page
@@ -152,7 +163,7 @@ Changing last name and saving maintains that setting
     Check For Alert    ${YOUR ACCOUNT IS SUCCESSFULLY SAVED}
 
 First name is required
-    Open Browser and go to URL    ${url}/account
+    Go To    ${url}/account
     Log In    ${EMAIL NOPERM}    ${password}    button=None
     Validate Log In
     Verify In Account Page
@@ -162,7 +173,7 @@ First name is required
     Element Should Be Visible    ${FIRST NAME IS REQUIRED}
 
 Last name is required
-    Open Browser and go to URL    ${url}/account
+    Go To    ${url}/account
     Log In    ${EMAIL NOPERM}    ${password}    button=None
     Validate Log In
     Verify In Account Page
@@ -172,7 +183,7 @@ Last name is required
     Element Should Be Visible    ${LAST NAME IS REQUIRED}
 
 SPACE for first name is not valid
-    Open Browser and go to URL    ${url}/account
+    Go To    ${url}/account
     Log In    ${EMAIL NOPERM}    ${password}    button=None
     Validate Log In
     Verify In Account Page
@@ -182,7 +193,7 @@ SPACE for first name is not valid
     Element Should Be Visible    ${FIRST NAME IS REQUIRED}
 
 SPACE for last name is not valid
-    Open Browser and go to URL    ${url}/account
+    Go To    ${url}/account
     Log In    ${EMAIL NOPERM}    ${password}    button=None
     Validate Log In
     Verify In Account Page
@@ -192,7 +203,7 @@ SPACE for last name is not valid
     Element Should Be Visible    ${LAST NAME IS REQUIRED}
 
 Email field is un-editable
-    Open Browser and go to URL    ${url}/account
+    Go To    ${url}/account
     Log In    ${EMAIL NOPERM}    ${password}    button=None
     Validate Log In
     Verify In Account Page
@@ -200,8 +211,9 @@ Email field is un-editable
     Should Be True    "${read only}"
 
 Langauge is changeable on the account page
-    Open Browser and go to URL    ${url}/account
+    Go To    ${url}/account
     Log In    ${EMAIL NOPERM}    ${password}    button=None
+    Validate Log In
     :FOR    ${lang}    ${account}   IN ZIP    ${LANGUAGES LIST}    ${LANGUAGES ACCOUNT TEXT LIST}
     \  Sleep    1
     \  Verify In Account Page

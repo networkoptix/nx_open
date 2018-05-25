@@ -17,17 +17,24 @@ def pytest_addoption(parser):
         'Used for activation cloud accounts for different cloud groups and customizations.'))
 
 
+@pytest.fixture(scope='session')
+def customization(mediaserver_installers):
+    customizations = set(installer.customization for installer in mediaserver_installers.values())
+    customization, = customizations  # This should be checked in mediaserver_installers fixture.
+    return customization
+
+
 @pytest.fixture()
-def cloud_host(request, mediaserver_deb):
+def cloud_host(request, customization):
     cloud_group = request.config.getoption('--cloud-group')
-    return resolve_cloud_host_from_registry(cloud_group, mediaserver_deb.customization.name)
+    return resolve_cloud_host_from_registry(cloud_group, customization.customization_name)
 
 
 @pytest.fixture()
-def cloud_account_factory(request, mediaserver_deb, cloud_host):
+def cloud_account_factory(request, customization, cloud_host):
     return CloudAccountFactory(
         request.config.getoption('--cloud-group'),
-        mediaserver_deb.customization.company,
+        customization.company_name,
         cloud_host,
         request.config.getoption('--autotest-email-password') or os.environ.get('AUTOTEST_EMAIL_PASSWORD'))
 

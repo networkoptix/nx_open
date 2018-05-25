@@ -4,8 +4,9 @@
 #include <memory>
 #include <tuple>
 
-#include <nx/utils/object_destruction_flag.h>
 #include <nx/utils/byte_stream/pipeline.h>
+#include <nx/utils/object_destruction_flag.h>
+#include <nx/utils/std/optional.h>
 
 #include "abstract_async_channel.h"
 
@@ -20,6 +21,7 @@ using UserIoHandler = IoCompletionHandler;
  *   moving data through utils::bstream::Converter first.
  * WARNING: Converter MUST NOT generate wouldBlock error by itself before
  *   invoking underlying input/output. Otherwise, behavior is undefined.
+ *   Effectively, that means conversion cannot change size of data.
  */
 class NX_NETWORK_API StreamTransformingAsyncChannel:
     public AbstractAsyncChannel
@@ -36,7 +38,9 @@ public:
 
     virtual void readSomeAsync(nx::Buffer* const buffer, UserIoHandler handler) override;
     virtual void sendAsync(const nx::Buffer& buffer, UserIoHandler handler) override;
-    virtual void cancelIOSync(aio::EventType eventType) override;
+
+protected:
+    virtual void cancelIoInAioThread(aio::EventType eventType) override;
 
 private:
     enum class UserTaskType
@@ -49,6 +53,12 @@ private:
     {
         inProgress,
         done,
+    };
+
+    enum class UserHandlerResult
+    {
+        proceed,
+        thisDeleted,
     };
 
     struct UserTask
@@ -87,6 +97,13 @@ private:
         }
     };
 
+    struct RawSendContext
+    {
+        nx::Buffer data;
+        int userByteCount = 0;
+        UserIoHandler userHandler;
+    };
+
     std::unique_ptr<AbstractAsyncChannel> m_rawDataChannel;
     nx::utils::bstream::Converter* m_converter;
     nx::Buffer m_readBuffer;
@@ -95,12 +112,13 @@ private:
     std::function<void(SystemError::ErrorCode, size_t)> m_userWriteHandler;
     std::unique_ptr<utils::bstream::AbstractInput> m_inputPipeline;
     std::unique_ptr<utils::bstream::AbstractOutput> m_outputPipeline;
-    std::deque<std::unique_ptr<UserTask>> m_userTaskQueue;
+    std::deque<std::shared_ptr<UserTask>> m_userTaskQueue;
     nx::Buffer m_rawDataReadBuffer;
     std::deque<nx::Buffer> m_readRawData;
-    std::deque<nx::Buffer> m_rawWriteQueue;
+    std::deque<RawSendContext> m_rawWriteQueue;
     bool m_asyncReadInProgress;
     nx::utils::ObjectDestructionFlag m_destructionFlag;
+    bool m_sendShutdown = false;
 
     virtual void stopWhileInAioThread() override;
 
@@ -117,11 +135,20 @@ private:
     void readRawChannelAsync();
     void onSomeRawDataRead(SystemError::ErrorCode, std::size_t);
     int writeRawBytes(const void* data, size_t count);
+
     void onRawDataWritten(SystemError::ErrorCode, std::size_t);
-    void handleIoError(SystemError::ErrorCode sysErrorCode);
+    template<typename Range>
+        UserHandlerResult completeRawSendTasks(
+            Range completedIoRange,
+            SystemError::ErrorCode sysErrorCode);
+    void scheduleNextRawSendTaskIfAny();
+
+    void reportFailureOfEveryUserTask(SystemError::ErrorCode sysErrorCode);
+    void reportFailureToTasksFilteredByType(
+        SystemError::ErrorCode sysErrorCode,
+        std::optional<UserTaskType> userTypeFilter);
 
     void removeUserTask(UserTask* task);
-    void cancelIoWhileInAioThread(aio::EventType eventType);
 };
 
 } // namespace aio

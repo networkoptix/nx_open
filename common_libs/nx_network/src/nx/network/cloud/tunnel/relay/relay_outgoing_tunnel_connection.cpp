@@ -196,11 +196,11 @@ void OutgoingTunnelConnection::onInactivityTimeout()
 // OutgoingConnection
 
 OutgoingConnection::OutgoingConnection(
-    std::unique_ptr<AbstractStreamSocket> delegatee,
+    std::unique_ptr<AbstractStreamSocket> delegate,
     std::shared_ptr<int> usageCounter)
     :
-    StreamSocketDelegate(delegatee.get()),
-    m_delegatee(std::move(delegatee)),
+    StreamSocketDelegate(delegate.get()),
+    m_delegate(std::move(delegate)),
     m_usageCounter(std::move(usageCounter))
 {
     ++(*m_usageCounter);

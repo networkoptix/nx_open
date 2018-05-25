@@ -55,11 +55,12 @@ void TemporaryAccountPasswordManager::authenticateByName(
 {
     QnMutexLocker lk(&m_mutex);
 
+    auto authResultCode = api::ResultCode::notAuthorized;
     boost::optional<const TemporaryAccountCredentialsEx&> credentials =
-        findMatchingCredentials(lk, username.toStdString(), checkPasswordHash);
+        findMatchingCredentials(lk, username.toStdString(), checkPasswordHash, &authResultCode);
 
     if (!credentials)
-        return completionHandler(api::ResultCode::notAuthorized);
+        return completionHandler(authResultCode);
 
     authProperties->put(cdb::attr::credentialsId, QString::fromStdString(credentials->id));
 
@@ -462,8 +463,11 @@ boost::optional<const TemporaryAccountCredentialsEx&>
     TemporaryAccountPasswordManager::findMatchingCredentials(
         const QnMutexLockerBase& /*lk*/,
         const std::string& username,
-        std::function<bool(const nx::Buffer&)> checkPasswordHash)
+        std::function<bool(const nx::Buffer&)> checkPasswordHash,
+        api::ResultCode* authResultCode)
 {
+    *authResultCode = api::ResultCode::badUsername;
+
     auto& temporaryCredentialsByLogin = m_temporaryCredentials.get<kIndexByLogin>();
     auto tmpPasswordsRange = temporaryCredentialsByLogin.equal_range(username);
     if (tmpPasswordsRange.first == temporaryCredentialsByLogin.end())
@@ -480,9 +484,12 @@ boost::optional<const TemporaryAccountCredentialsEx&>
             continue;
         }
 
+        *authResultCode = api::ResultCode::notAuthorized;
+
         if (!checkPasswordHash(curIt->passwordHa1.c_str()))
             continue;
 
+        *authResultCode = api::ResultCode::ok;
         return *curIt;
     }
 

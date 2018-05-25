@@ -4,7 +4,8 @@ set(enable_hanwha true)
 
 # Components Namings
 set(display.product.name "Wisenet WAVE")
-set(display.mobile.name "WAVE Mobile")
+set(display_mobile_name "WAVE Mobile")
+set(mobile_bundle_name "WaveMobile")
 set(product.name "Wisenet WAVE")
 set(product.name.short "hanwha")
 set(product.appName "wave")

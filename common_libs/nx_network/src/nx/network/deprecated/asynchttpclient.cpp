@@ -18,8 +18,6 @@
 #include "nx/network/http/buffer_source.h"
 #include "nx/network/http/custom_headers.h"
 
-#include <nx/fusion/model_functions.h>
-
 using std::make_pair;
 
 namespace nx {

@@ -9,8 +9,7 @@
 #include <nx/utils/log/log.h>
 
 namespace nx {
-namespace cdb {
-namespace ec2 {
+namespace data_sync_engine {
 namespace migration {
 namespace detail {
 
@@ -114,6 +113,5 @@ nx::utils::db::DBResult upgradeSerializedTransactions(
 
 } // namespace detail
 } // namespace migration
-} // namespace ec2
-} // namespace cdb
+} // namespace data_sync_engine
 } // namespace nx

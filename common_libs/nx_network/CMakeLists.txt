@@ -4,11 +4,11 @@ if(WINDOWS)
 endif()
 
 nx_configure_file(
-    maven/filter-resources/app_info_impl.cpp
+    app_info_impl.cpp
     ${CMAKE_CURRENT_BINARY_DIR})
 
 nx_add_target(nx_network LIBRARY ${library_type}
-    WERROR_IF NOT WINDOWS
+    WERROR_IF NOT WINDOWS AND NOT ANDROID AND NOT IOS
     ADDITIONAL_SOURCES
         "${CMAKE_CURRENT_BINARY_DIR}/app_info_impl.cpp"
     PUBLIC_LIBS

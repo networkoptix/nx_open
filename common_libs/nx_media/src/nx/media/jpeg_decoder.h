@@ -28,6 +28,7 @@ public:
     virtual int decode(
         const QnConstCompressedVideoDataPtr& frame, QVideoFramePtr* result = nullptr) override;
 
+    virtual Capabilities capabilities() const override;
 private:
     QScopedPointer<JpegDecoderPrivate> d_ptr;
     Q_DECLARE_PRIVATE(JpegDecoder);

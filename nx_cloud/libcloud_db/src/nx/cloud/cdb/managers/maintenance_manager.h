@@ -14,23 +14,19 @@
 #include "../data/statistics_data.h"
 #include "../data/system_data.h"
 
+namespace nx { namespace data_sync_engine { class SyncronizationEngine; } }
+
 namespace nx {
 namespace cdb {
 
 class AuthorizationInfo;
-
-namespace ec2 {
-
-class SyncronizationEngine;
-
-} // namespace ec2
 
 class MaintenanceManager
 {
 public:
     MaintenanceManager(
         const QnUuid& moduleGuid,
-        ec2::SyncronizationEngine* const syncronizationEngine,
+        data_sync_engine::SyncronizationEngine* const syncronizationEngine,
         const nx::utils::db::InstanceController& dbInstanceController);
     ~MaintenanceManager();
 
@@ -55,7 +51,7 @@ public:
 
 private:
     const QnUuid m_moduleGuid;
-    ec2::SyncronizationEngine* const m_syncronizationEngine;
+    data_sync_engine::SyncronizationEngine* const m_syncronizationEngine;
     const nx::utils::db::InstanceController& m_dbInstanceController;
     nx::network::aio::Timer m_timer;
     nx::utils::Counter m_startedAsyncCallsCounter;
@@ -63,8 +59,8 @@ private:
     void onTransactionLogRead(
         nx::utils::Counter::ScopedIncrement /*asyncCallLocker*/,
         const std::string& systemId,
-        ec2::ResultCode resultCode,
-        std::vector<ec2::dao::TransactionLogRecord> serializedTransactions,
+        data_sync_engine::ResultCode resultCode,
+        std::vector<data_sync_engine::dao::TransactionLogRecord> serializedTransactions,
         ::ec2::QnTranState readedUpTo,
         std::function<void(
             api::ResultCode,

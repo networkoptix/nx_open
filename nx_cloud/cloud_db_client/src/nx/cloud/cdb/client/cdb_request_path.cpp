@@ -38,6 +38,7 @@ const char* const kMaintenanceGetTransactionLog = "/cdb/maintenance/transactionL
 const char* const kMaintenanceGetStatistics = "/cdb/maintenance/statistics";
 
 const char* const kDeprecatedCloudModuleXmlPath = "/cdb/cloud_modules.xml";
+const char* const kAnotherDeprecatedCloudModuleXmlPath = "/api/cloud_modules.xml";
 
 const char* const kDiscoveryCloudModuleXmlPath = "/discovery/v1/cloud_modules.xml";
 

@@ -3,8 +3,7 @@
 #include "transaction_log.h"
 
 namespace nx {
-namespace cdb {
-namespace ec2 {
+namespace data_sync_engine {
 
 TransactionLogReader::TransactionLogReader(
     TransactionLog* const transactionLog,
@@ -97,6 +96,5 @@ nx::String TransactionLogReader::systemId() const
     return m_systemId;
 }
 
-} // namespace ec2
-} // namespace cdb
+} // namespace data_sync_engine
 } // namespace nx

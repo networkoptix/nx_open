@@ -78,8 +78,6 @@ function(nx_copy)
     foreach(src ${COPY_UNPARSED_ARGUMENTS})
         nx_get_copy_full_destination_name(dst ${src} ${COPY_DESTINATION})
 
-        set(need_copy FALSE)
-
         if(COPY_IF_NEWER)
             file(TIMESTAMP "${src}" src_ts)
             file(TIMESTAMP "${dst}" dst_ts)
@@ -97,6 +95,9 @@ function(nx_copy)
             endif()
         else()
             message(STATUS "Copying ${src} to ${dst}")
+            # CMake skips copying if source and destination timestamps are equal. We have to remove
+            # the existing destination file to ensure the file is updated.
+            file(REMOVE ${dst})
             file(COPY "${src}" DESTINATION "${COPY_DESTINATION}")
         endif()
 

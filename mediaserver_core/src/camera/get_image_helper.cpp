@@ -88,7 +88,7 @@ QSize QnGetImageHelper::updateDstSize(
     dstSize.setWidth(qMin(dstSize.width(), qMax(kMaxSize, outFrame->width) * sar));
     dstSize.setHeight(qMin(dstSize.height(), qMax(kMaxSize, outFrame->height)));
 
-    if (aspectRatio == nx::api::ImageRequest::AspectRatio::custom)
+    if (aspectRatio == nx::api::ImageRequest::AspectRatio::auto_)
     {
         const auto customAr = camera->customAspectRatio();
         if (customAr.isValid())

@@ -25,8 +25,13 @@ public:
     enum Capability
     {
         noCapabilities = 0,
-        needDeepCopyOfVideoFrames = 1 << 0,
-        needUncompressedVideoFrames = 1 << 1,
+        needUncompressedVideoFrames_yuv420 = 1 << 0,
+        needUncompressedVideoFrames_argb = 1 << 1,
+        needUncompressedVideoFrames_abgr = 1 << 2,
+        needUncompressedVideoFrames_rgba = 1 << 3,
+        needUncompressedVideoFrames_bgra = 1 << 4,
+        needUncompressedVideoFrames_rgb = 1 << 5,
+        needUncompressedVideoFrames_bgr = 1 << 6,
     };
     Q_DECLARE_FLAGS(Capabilities, Capability)
 
@@ -59,10 +64,11 @@ struct AnalyticsDriverManifest: AnalyticsDriverManifestBase
     QList<Analytics::EventType> outputEventTypes;
     QList<Analytics::EventType> outputObjectTypes;
     QList<AnalyticsManifestObjectAction> objectActions;
+    QList<Analytics::Group> groups;
     // TODO: #mike: Add other fields, see stub_metadata_plugin.
 };
 #define AnalyticsDriverManifest_Fields AnalyticsDriverManifestBase_Fields \
-    (outputEventTypes)(outputObjectTypes)(objectActions)
+    (outputEventTypes)(outputObjectTypes)(objectActions)(groups)
 
 QN_FUSION_DECLARE_FUNCTIONS(AnalyticsDriverManifest, (json))
 

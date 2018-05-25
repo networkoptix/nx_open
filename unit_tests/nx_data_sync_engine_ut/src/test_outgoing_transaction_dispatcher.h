@@ -10,8 +10,7 @@
 #include <nx/data_sync_engine/outgoing_transaction_dispatcher.h>
 
 namespace nx {
-namespace cdb {
-namespace ec2 {
+namespace data_sync_engine {
 namespace test {
 
 class TestOutgoingTransactionDispatcher:
@@ -45,7 +44,7 @@ public:
     }
 
     void assertIfCouldNotFindTransactionWithHeader(
-        const ::ec2::QnAbstractTransaction& transactionHeader);
+        const CommandHeader& transactionHeader);
 
 private:
     OnNewTransactionHandler m_onNewTransactionHandler;
@@ -55,6 +54,5 @@ private:
 };
 
 } // namespace test
-} // namespace ec2
-} // namespace cdb
+} // namespace data_sync_engine
 } // namespace nx

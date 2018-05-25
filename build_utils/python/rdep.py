@@ -16,6 +16,12 @@ OS_IS_WINDOWS = sys.platform.startswith("win32") or sys.platform.startswith("cyg
 
 TIMESTAMPS_FILE = "timestamps.dat"
 
+ADDITIONAL_SYNC_ARGS = []
+ADDITIONAL_UPLOAD_ARGS = []
+if OS_IS_WINDOWS:
+    ADDITIONAL_SYNC_ARGS = ["--chmod=ugo=rwx"]
+    ADDITIONAL_UPLOAD_ARGS = ["--chmod=ugo=rwX"]
+
 # Workaround against rsync bug:
 # all paths with semicolon are counted as remote,
 # so 'rsync rsync://server/path c:\test\path' won't work on windows
@@ -107,15 +113,19 @@ class Rdep:
             self,
             source,
             destination,
-            show_progress = True,
-            additional_args = []):
+            show_progress=True,
+            additional_args=[]):
 
-        command = [ self._config.get_rsync("rsync") ]
-        command.append("--archive")
-        command.append("--delete")
+        command = [
+            self._config.get_rsync("rsync"),
+            "--recursive",
+            "--delete",
+            "--links",
+            "--times"
+        ]
 
-        if OS_IS_WINDOWS:
-            command.append("--chmod=ugo=rwx")
+        if not OS_IS_WINDOWS:
+            command.append("--perms")
 
         if show_progress:
             command.append("--progress")
@@ -182,9 +192,10 @@ class Rdep:
 
         config_file = tempfile.mktemp()
         command = self._get_rsync_command(
-                posixpath.join(src, PackageConfig.FILE_NAME),
-                _cygwin_path(config_file),
-                show_progress = False)
+            posixpath.join(src, PackageConfig.FILE_NAME),
+            _cygwin_path(config_file),
+            show_progress=False,
+            additional_args=ADDITIONAL_SYNC_ARGS)
         self._verbose_rsync(command)
         with open(os.devnull, "w") as fnull:
             if subprocess.call(command, stderr = fnull) != 0:
@@ -204,9 +215,9 @@ class Rdep:
             os.makedirs(dst)
 
         command = self._get_rsync_command(
-                src + "/",
-                _cygwin_path(dst),
-                additional_args = [ "--exclude", PackageConfig.FILE_NAME]
+            src + "/",
+            _cygwin_path(dst),
+            additional_args=ADDITIONAL_SYNC_ARGS + ["--exclude", PackageConfig.FILE_NAME]
         )
         self._verbose_rsync(command)
 
@@ -217,7 +228,8 @@ class Rdep:
         dst_config_file = os.path.join(dst, PackageConfig.FILE_NAME)
         self._verbose_message("Moving {0} to {1}".format(
                 config_file, dst_config_file))
-        shutil.move(config_file, dst_config_file)
+        shutil.copy(config_file, dst_config_file)
+        os.remove(config_file)
 
         return self.SYNC_SUCCESS
 
@@ -282,9 +294,11 @@ class Rdep:
 
         config_file = tempfile.mktemp()
         command = self._get_rsync_command(
-                posixpath.join(remote, PackageConfig.FILE_NAME),
-                _cygwin_path(config_file),
-                show_progress = False)
+            posixpath.join(remote, PackageConfig.FILE_NAME),
+            _cygwin_path(config_file),
+            show_progress=False,
+            additional_args=ADDITIONAL_UPLOAD_ARGS)
+
         self._verbose_rsync(command)
         with open(os.devnull, "w") as fnull:
             if subprocess.call(command, stderr = fnull) == 0:
@@ -305,10 +319,13 @@ class Rdep:
         config.set_uploader(uploader_name)
 
         command = self._get_rsync_command(
-                _cygwin_path(local) + "/",
-                remote,
-                additional_args = [ "--exclude", PackageConfig.FILE_NAME]
+            _cygwin_path(local) + "/",
+            remote,
+            additional_args=ADDITIONAL_UPLOAD_ARGS + ["--exclude", PackageConfig.FILE_NAME]
         )
+
+        if OS_IS_WINDOWS:
+            command.append("--chmod=ugo=rwX")
 
         self._verbose_rsync(command)
 
@@ -317,9 +334,10 @@ class Rdep:
             return False
 
         command = self._get_rsync_command(
-                _cygwin_path(os.path.join(local, PackageConfig.FILE_NAME)),
-                remote,
-                show_progress = False
+            _cygwin_path(os.path.join(local, PackageConfig.FILE_NAME)),
+            remote,
+            show_progress=False,
+            additional_args=ADDITIONAL_UPLOAD_ARGS
         )
 
         self._verbose_rsync(command)

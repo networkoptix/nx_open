@@ -6,8 +6,7 @@
 #include <nx/utils/log/log.h>
 
 namespace nx {
-namespace cdb {
-namespace ec2 {
+namespace data_sync_engine {
 namespace dao {
 namespace rdb {
 
@@ -117,6 +116,5 @@ nx::utils::db::DBResult TransactionDataObject::fetchTransactionsOfAPeerQuery(
 
 } // namespace rdb
 } // namespace dao
-} // namespace ec2
-} // namespace cdb
+} // namespace data_sync_engine
 } // namespace nx

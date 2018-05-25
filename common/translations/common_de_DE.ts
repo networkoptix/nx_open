@@ -561,8 +561,8 @@
       <translation>Unbekannter Fehler</translation>
     </message>
     <message>
-      <source>Server with matching Hardware Id not found</source>
-      <translation>Server mit passender Hardware-Id wurde nicht gefunden</translation>
+      <source>Server with matching Hardware ID not found</source>
+      <translation>Server mit passender Hardware-ID wurde nicht gefunden</translation>
     </message>
   </context>
   <context>
@@ -684,12 +684,12 @@
       <translation>Wasserzeichen: %1</translation>
     </message>
     <message>
-      <source>Hardware Id: %1</source>
-      <translation>Hardware-Id: %1</translation>
-    </message>
-    <message>
       <source>Time License</source>
       <translation>Zeitlizenz</translation>
+    </message>
+    <message>
+      <source>Hardware ID: %1</source>
+      <translation>Hardware-ID: %1</translation>
     </message>
   </context>
   <context>

@@ -978,8 +978,8 @@ to view more bookmarks</source>
       <translation>Anzahl der Deaktivierungen für diese Lizenz überschritten.</translation>
     </message>
     <message>
-      <source>Hardware Id of Server with this license does not match Hardware Id on which license was activated.</source>
-      <translation>Hardware-Id vom Server mit dieser Lizenz stimmt nicht mit der Hardware-Id überein auf der die Lizenz aktiviert wurde.</translation>
+      <source>Hardware ID of Server with this license does not match Hardware ID on which license was activated.</source>
+      <translation>Hardware-ID vom Server mit dieser Lizenz stimmt nicht mit der Hardware-ID überein auf der die Lizenz aktiviert wurde.</translation>
     </message>
   </context>
   <context>
@@ -1402,6 +1402,14 @@ to view more bookmarks</source>
       <source>Folder not found</source>
       <translation>Ordner nicht gefunden</translation>
     </message>
+    <message>
+      <source>Helps avoid problems with OpenGL drawing which result in 100% CPU load.</source>
+      <translation>Hilft, Probleme mit der OpenGL-Zeichnung zu vermeiden, die zu einer 100%-igen CPU-Auslastung führen.</translation>
+    </message>
+    <message>
+      <source>Adjust to smallest value that does not degrade live view. Bigger buffer makes playback smoother but increases delay between real time and live view; smaller buffer decreases delay but can cause stutters.</source>
+      <translation>Stellen Sie den kleinsten Wert ein, der die Live-Ansicht nicht beeinträchtigt. Größerer Puffer macht die Wiedergabe flüssiger, erhöht aber die Verzögerung zwischen Echtzeit- und Live-Ansicht; kleinerer Puffer verringert die Verzögerung, kann aber zu Stocken führen.</translation>
+    </message>
   </context>
   <context>
     <name>QnArchiveLengthWidget</name>
@@ -1412,6 +1420,14 @@ to view more bookmarks</source>
     <message>
       <source>High minimum value can lead to archive length decrease on other cameras.</source>
       <translation>Hoher Minimumwert kann die Archivlänge von anderen Kameras beeinflussen.</translation>
+    </message>
+    <message>
+      <source>Sets when camera archive will be deleted or saved when there is no space for new recordings.</source>
+      <translation>Legt fest, wann das Kameraarchiv gelöscht oder gespeichert wird, wenn kein Platz für neue Aufnahmen vorhanden ist.</translation>
+    </message>
+    <message>
+      <source>&quot;Auto&quot; deletes the oldest footage first, regardless of the source.</source>
+      <translation>&quot;Auto&quot; löscht zuerst das älteste Material, unabhängig von der Quelle.</translation>
     </message>
   </context>
   <context>
@@ -2192,18 +2208,6 @@ to view more bookmarks</source>
       <translation>Lade...</translation>
     </message>
     <message>
-      <source>Primary Stream</source>
-      <translation>Primärer Stream</translation>
-    </message>
-    <message>
-      <source>Secondary Stream</source>
-      <translation>Sekundärer Stream</translation>
-    </message>
-    <message>
-      <source>Camera has no secondary stream</source>
-      <translation>Die Kamera hat keinen sekundären Stream</translation>
-    </message>
-    <message>
       <source>This I/O module has no advanced settings</source>
       <translation>Dieses I/O-Modul hat keine erweiterten Einstellungen</translation>
     </message>
@@ -2212,8 +2216,36 @@ to view more bookmarks</source>
       <translation>Diese Kamera verfügt über keine erweiterten Einstellungen</translation>
     </message>
     <message>
+      <source>Settings</source>
+      <translation>Einstellungen</translation>
+    </message>
+    <message>
+      <source>Web</source>
+      <translation>Web</translation>
+    </message>
+    <message>
+      <source>No settings</source>
+      <translation>Keine Einstellung</translation>
+    </message>
+    <message>
+      <source>Secondary Stream</source>
+      <translation>Sekundärer Stream</translation>
+    </message>
+    <message>
+      <source>I/O Module ID</source>
+      <translation>I/O-Modul-ID</translation>
+    </message>
+    <message>
+      <source>Camera ID</source>
+      <translation>Kamera-ID</translation>
+    </message>
+    <message>
       <source>Audio Stream</source>
       <translation>Audio-Stream</translation>
+    </message>
+    <message>
+      <source>Primary Stream</source>
+      <translation>Primärer Stream</translation>
     </message>
     <message>
       <source>URL is not available. Open stream and try again.</source>
@@ -2228,24 +2260,8 @@ to view more bookmarks</source>
       <translation>I/O-Modul hat keinen Audiostream</translation>
     </message>
     <message>
-      <source>I/O Module Id</source>
-      <translation>I/O-Modul-Id</translation>
-    </message>
-    <message>
-      <source>Camera Id</source>
-      <translation>Kamera-Id</translation>
-    </message>
-    <message>
-      <source>Settings</source>
-      <translation>Einstellungen</translation>
-    </message>
-    <message>
-      <source>Web</source>
-      <translation>Web</translation>
-    </message>
-    <message>
-      <source>No settings</source>
-      <translation>Keine Einstellung</translation>
+      <source>Camera has no secondary stream</source>
+      <translation>Die Kamera hat keinen sekundären Stream</translation>
     </message>
   </context>
   <context>
@@ -2359,11 +2375,23 @@ to view more bookmarks</source>
       <translation>Kante</translation>
     </message>
     <message numerus="yes">
-      <source>This Id is already used on the following %n cameras: %1</source>
-      <translation type="unfinished">
-        <numerusform>Diese Id wird bereits für die folgende %n Kamera verwendet: %1</numerusform>
+      <source>This ID is already used on the following %n cameras: %1</source>
+      <translation>
+        <numerusform>Diese ID wird bereits für die folgende %n Kamera verwendet: %1</numerusform>
         <numerusform>Diese ID wird bereits für folgende %n Kameras verwendet: %1</numerusform>
       </translation>
+    </message>
+    <message>
+      <source>Helps fix image quality issues on some cameras; for others will cause significant bitrate increase.</source>
+      <translation>Hilft, Probleme mit der Bildqualität bei einigen Kameras zu beheben; bei anderen wird die Bitrate deutlich erhöht.</translation>
+    </message>
+    <message>
+      <source>Custom number that can be assigned to a camera for quick identification and access</source>
+      <translation>Benutzerdefinierte Nummer, die einer Kamera zur schnellen Identifizierung und zum schnellen Zugriff zugewiesen werden kann</translation>
+    </message>
+    <message>
+      <source>Server will not change any cameras settings, it will receive and use camera stream as-is.</source>
+      <translation>Der Server ändert keine Kameraeinstellungen, er empfängt und verwendet den Kamerastream wie er ist.</translation>
     </message>
   </context>
   <context>
@@ -2484,8 +2512,8 @@ to view more bookmarks</source>
       <translation>Server</translation>
     </message>
     <message>
-      <source>Id</source>
-      <translation>Id</translation>
+      <source>ID</source>
+      <translation>ID</translation>
     </message>
   </context>
   <context>
@@ -2646,6 +2674,14 @@ to view more bookmarks</source>
     <message>
       <source>More Settings</source>
       <translation>Weitere Einstellungen</translation>
+    </message>
+    <message>
+      <source>Quality setting determines the compression rate only, and does not affect resolution. Low, Medium, High and Best are preset bitrate values.</source>
+      <translation>Die Qualitätseinstellung bestimmt nur die Kompressionsrate und hat keinen Einfluss auf die Auflösung. Low, Medium, High und Best sind voreingestellte Bitratenwerte.</translation>
+    </message>
+    <message>
+      <source>First choose a recording option, then apply it to day and time blocks on the recording schedule. (0 block is 12:00am to 1:00am, 23 block is 11:00pm to 12:00am.)</source>
+      <translation>Wählen Sie zuerst eine Aufnahmeoption und wenden Sie sie dann auf die Tages- und Zeitblöcke im Aufnahmeplan an. (0 Block ist 12:00 Uhr bis 1:00 Uhr, 23 Block ist 23:00 Uhr bis 12:00 Uhr.)</translation>
     </message>
   </context>
   <context>
@@ -3107,16 +3143,12 @@ to %1</source>
   <context>
     <name>QnCustomBusinessEventWidget</name>
     <message>
-      <source>Server API</source>
-      <translation>Server-API</translation>
+      <source>Event will trigger only if there are matches in caption with any of entered keywords.</source>
+      <translation>Das Ereignis wird nur ausgelöst, wenn es Übereinstimmungen mit einem der eingegebenen Schlüsselwörter gibt.</translation>
     </message>
     <message>
-      <source>To generate Generic Event, please refer to %1.</source>
-      <translation>Um ein Event zu generien, befolgen Sie bitte %1.</translation>
-    </message>
-    <message>
-      <source>Event will trigger only if Generic Event meets all the above conditions. If a keyword field is empty, condition is always met. If not, condition is met if the corresponding field of Generic Event contains any keyword.</source>
-      <translation>Das Ereignis wird nur dann ausgelöst, wenn alle oben gennanten Bedingungen erfüllt sind. Wenn das Passwortfeld leer ist, ist die Bedingung immer erfüllt. Wenn das nicht der Fall ist, dann ist die Bedingung erst erfüllt, wenn das entsprechende Feld des Ereignisses ein Passwort enthält.</translation>
+      <source>If the field is empty, event will always trigger.</source>
+      <translation>Wenn das Feld leer ist, wird immer ein Ereignis ausgelöst.</translation>
     </message>
   </context>
   <context>
@@ -3184,10 +3216,6 @@ to %1</source>
     <message>
       <source>System configuration will be restored from backup, Server application will be restarted.</source>
       <translation>Systemkonfigurationen werden aus einer Sicherung wiederhergestellt, Serveranwendung wird neu gestartet.</translation>
-    </message>
-    <message>
-      <source>You can create a backup for System configurations that can be restored in case of failure.</source>
-      <translation>Sie können eine Sicherung für Systemkonfigurationen erstellen, die bei einem Ausfall wiederhergestellt werden können.</translation>
     </message>
     <message>
       <source>Database Backup Files</source>
@@ -3332,6 +3360,13 @@ to %1</source>
       <source>You will not be able to connect to this System with your %1 account after you disconnect this System from %1.</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
       <translation>Sie werden nicht in der Lage sein, dieses System mit Ihrem %1-Account zu verbinden, nachdem Sie dieses System von %1 getrennt haben.</translation>
+    </message>
+  </context>
+  <context>
+    <name>QnEmptyBusinessActionWidget</name>
+    <message>
+      <source>Panic Recording mode switches recording settings for all Cameras to maximum FPS and Quality</source>
+      <translation>Panikaufnahme schaltet die Aufnahmeeinstellungen für alle Kameras auf maximale FPS und Qualität</translation>
     </message>
   </context>
   <context>
@@ -3569,6 +3604,13 @@ to %1</source>
     </message>
   </context>
   <context>
+    <name>QnFisheyeSettingsWidget</name>
+    <message>
+      <source>Use this setting to compensate for distortion if camera is not mounted exactly vertically or horizontally.</source>
+      <translation>Verwenden Sie diese Einstellung, um Verzerrungen auszugleichen, wenn die Kamera nicht exakt vertikal oder horizontal montiert ist.</translation>
+    </message>
+  </context>
+  <context>
     <name>QnGeneralPreferencesWidget</name>
     <message>
       <source>Select folder...</source>
@@ -3636,6 +3678,14 @@ to %1</source>
     <message>
       <source>Open Camera List</source>
       <translation>Öffne Kameraliste</translation>
+    </message>
+    <message>
+      <source>Backup includes servers and cameras settings, users, webpages, event rules, etc. Video is not saved.</source>
+      <translation>Backup beinhaltet Server- und Kameraeinstellungen, Benutzer, Webseiten, Ereignisregeln, etc. Video wird nicht gespeichert.</translation>
+    </message>
+    <message>
+      <source>Creates a backup of System configuration that can be restored in case of failure.</source>
+      <translation>Erstellt ein Backup der Systemkonfiguration, das im Fehlerfall wiederhergestellt werden kann.</translation>
     </message>
   </context>
   <context>
@@ -3729,8 +3779,8 @@ to %1</source>
       <translation>Impuls</translation>
     </message>
     <message>
-      <source>Id</source>
-      <translation>Id</translation>
+      <source>ID</source>
+      <translation>ID</translation>
     </message>
   </context>
   <context>
@@ -3882,6 +3932,21 @@ to %1</source>
     </message>
   </context>
   <context>
+    <name>QnLensCameraAdvancedParamWidget</name>
+    <message>
+      <source>Zoom</source>
+      <translation>Zoom</translation>
+    </message>
+    <message>
+      <source>Rotation:</source>
+      <translation>Rotation:</translation>
+    </message>
+    <message>
+      <source>Focus</source>
+      <translation>Fokus</translation>
+    </message>
+  </context>
+  <context>
     <name>QnLicenseDetailsDialog</name>
     <message>
       <source>Screens Allowed:</source>
@@ -3912,8 +3977,8 @@ to %1</source>
       <translation>Funktionen:</translation>
     </message>
     <message>
-      <source>Locked to Hardware Id</source>
-      <translation>Gebunden an Hardware-Id</translation>
+      <source>Locked to Hardware ID</source>
+      <translation>Gebunden an Hardware-ID</translation>
     </message>
   </context>
   <context>
@@ -4188,16 +4253,16 @@ to %1</source>
       <translation>Kontaktieren Sie bitte den Kundensupport, um einen gültigen Lizenzschlüssel zu erhalten.</translation>
     </message>
     <message>
-      <source>This license is already activated and linked to Hardware Id %1</source>
-      <translation>Diese Lizenz ist bereits aktiviert und mit Hardware-Id %1 verbunden</translation>
-    </message>
-    <message>
-      <source>This license is already activated and linked to Hardware Id %1 on %2</source>
-      <translation>Diese Lizenz ist bereits aktiviert und mit Hardware-Id %1 auf %2 verbunden</translation>
-    </message>
-    <message>
       <source>If the problem persists please contact Customer Support.</source>
       <translation>Wenn das Problem weiterhin besteht, kontaktieren Sie den Kundensupport.</translation>
+    </message>
+    <message>
+      <source>This license is already activated and linked to Hardware ID %1</source>
+      <translation>Diese Lizenz ist bereits aktiviert und mit Hardware-ID %1 verbunden</translation>
+    </message>
+    <message>
+      <source>This license is already activated and linked to Hardware ID %1 on %2</source>
+      <translation>Diese Lizenz ist bereits aktiviert und mit Hardware-ID %1 auf %2 verbunden</translation>
     </message>
   </context>
   <context>
@@ -4219,16 +4284,16 @@ to %1</source>
       <translation>Datei konnte nicht geöffnet</translation>
     </message>
     <message>
-      <source>Please send email with License Key and Hardware Id provided to %1 to obtain an Activation Key file.</source>
-      <translation>Senden Sie eine Email mit dem Lizenzschlüssel und der Hardware-Id an %1, um einen Aktivierungsschlüssel zu erhalten.</translation>
-    </message>
-    <message>
-      <source>Please send License Key and Hardware Id provided to %1 to obtain an Activation Key file.</source>
-      <translation>Senden Sie den Lizenzschlüssel und die Hardware-Id an %1, um einen Aktivierungsschlüssel zu erhalten.</translation>
-    </message>
-    <message>
       <source>All files</source>
       <translation>Alle Dateien</translation>
+    </message>
+    <message>
+      <source>Please send email with License Key and Hardware ID provided to %1 to obtain an Activation Key file.</source>
+      <translation>Senden Sie eine Email mit dem Lizenzschlüssel und der Hardware-ID an %1, um einen Aktivierungsschlüssel zu erhalten.</translation>
+    </message>
+    <message>
+      <source>Please send License Key and Hardware ID provided to %1 to obtain an Activation Key file.</source>
+      <translation>Senden Sie den Lizenzschlüssel und die Hardware-ID an %1, um einen Aktivierungsschlüssel zu erhalten.</translation>
     </message>
   </context>
   <context>
@@ -4438,6 +4503,18 @@ to %1</source>
     <message>
       <source>No image</source>
       <translation>Kein Bild</translation>
+    </message>
+    <message>
+      <source>Sets the time to use in the client (timeline, timestamps, etc.) when client and server machines are in different time zones.</source>
+      <translation>Legt die Zeit fest, die im Client verwendet werden soll (Zeitleiste, Zeitstempel usw.), wenn sich Client- und Servercomputer in unterschiedlichen Zeitzonen befinden.</translation>
+    </message>
+    <message>
+      <source>Length of time each camera on layout will be displayed if you start a Layout Tour.</source>
+      <translation>Die Länge der Zeit, die jede Kamera im Layout angezeigt wird, wenn Sie eine Layout-Tour starten.</translation>
+    </message>
+    <message>
+      <source>Displays IP addresses for cameras and servers and groups for users.</source>
+      <translation>Zeigt IP-Adressen für Kameras, Server und Gruppen für Benutzer an.</translation>
     </message>
   </context>
   <context>
@@ -5612,16 +5689,12 @@ to %1</source>
       <translation>Um Probleme zu vermeiden, passen Sie die maximale Anzahl der Kameras an</translation>
     </message>
     <message>
-      <source>server will take devices automatically from offline servers</source>
-      <translation>Server nimmt automatisch Geräte vom Offlineserver</translation>
-    </message>
-    <message>
-      <source>server will take cameras automatically from offline servers</source>
-      <translation>Server nimmt automatisch Kameras vom Offlineserver</translation>
-    </message>
-    <message>
       <source>Failover</source>
       <translation>Failover</translation>
+    </message>
+    <message>
+      <source>Servers with failover enabled will automatically take cameras from offline servers.</source>
+      <translation>Server mit aktiviertem Failover übernehmen automatisch Kameras von Offline-Servern.</translation>
     </message>
   </context>
   <context>
@@ -5828,6 +5901,14 @@ to %1</source>
     <message>
       <source>Update Files</source>
       <translation>Update-Dateien</translation>
+    </message>
+    <message>
+      <source>Validating the update...</source>
+      <translation>Validierung des Updates...</translation>
+    </message>
+    <message>
+      <source>Checking for free space...</source>
+      <translation>Auf freien Platz prüfen...</translation>
     </message>
   </context>
   <context>
@@ -6310,6 +6391,14 @@ to %1</source>
       <source>Recording was enabled on the USB storage</source>
       <translation>Die Aufnahme wurde auf dem USB-Speicher aktiviert</translation>
     </message>
+    <message>
+      <source>Backup includes servers and cameras settings, users, webpages, event rules, etc. Video is not saved.</source>
+      <translation>Backup beinhaltet Server- und Kameraeinstellungen, Benutzer, Webseiten, Ereignisregeln, etc. Video wird nicht gespeichert.</translation>
+    </message>
+    <message>
+      <source>Creates a backup of System configuration that can be restored in case of failure.</source>
+      <translation>Erstellt ein Backup der Systemkonfiguration, das im Fehlerfall wiederhergestellt werden kann.</translation>
+    </message>
   </context>
   <context>
     <name>QnStorageListModel</name>
@@ -6602,6 +6691,14 @@ to %1</source>
       <source>Allow System to optimize camera settings</source>
       <translation>Erlauben Sie dem System die Kameraeinstellungen zu optimieren</translation>
     </message>
+    <message>
+      <source>Sends anonymous System information (firmware, codecs, streams, etc.).</source>
+      <translation>Sendet anonyme Systeminformationen (Firmware, Codecs, Streams, etc.).</translation>
+    </message>
+    <message>
+      <source>Tracks and logs all user actions.</source>
+      <translation>Verfolgt und protokolliert alle Benutzeraktionen.</translation>
+    </message>
   </context>
   <context>
     <name>QnTableExportHelper</name>
@@ -6667,16 +6764,6 @@ to %1</source>
       <translation>Keine Miniaturansichten verfügbar</translation>
     </message>
     <message>
-      <source>hh:mm</source>
-      <comment>Format for displaying hours and minutes on timeline.</comment>
-      <translation>hh:mm</translation>
-    </message>
-    <message>
-      <source>h ap</source>
-      <comment>Format for displaying hours on timeline, with am/pm indicator.</comment>
-      <translation>h ap</translation>
-    </message>
-    <message>
       <source>dd</source>
       <comment>Format for displaying days on timeline.</comment>
       <translation>dd</translation>
@@ -6720,11 +6807,6 @@ to %1</source>
       <source>yyyy</source>
       <comment>Format for displaying year caption in timeline&apos;s header</comment>
       <translation>yyyy</translation>
-    </message>
-    <message>
-      <source>h:mm ap</source>
-      <comment>Format for displaying hours and minutes on timeline, with am/pm indicator.</comment>
-      <translation>h:mm ap</translation>
     </message>
     <message>
       <source>dd MMMM yyyy h:mm ap</source>
@@ -6917,6 +6999,10 @@ to %1</source>
       <source>Edit</source>
       <translation>Bearbeiten</translation>
     </message>
+    <message>
+      <source>Users can be imported from an LDAP server. They will be able to log in only if LDAP server is online and their accounts are active on it.</source>
+      <translation>Benutzer können von einem LDAP-Server importiert werden. Sie können sich nur einloggen, wenn der LDAP-Server online ist und ihre Konten darauf aktiv sind.</translation>
+    </message>
   </context>
   <context>
     <name>QnUserProfileWidget</name>
@@ -7107,6 +7193,25 @@ to %1</source>
       <source>%1 user with specified email already exists.</source>
       <comment>%1 is the short cloud name (like Cloud)</comment>
       <translation>%1benutzer mit angegebener Email existiert bereits.</translation>
+    </message>
+    <message>
+      <source>Local users</source>
+      <translation>Lokaler Benutzer</translation>
+    </message>
+    <message>
+      <source>%1 users</source>
+      <comment>%1 is the short cloud name (like Cloud)</comment>
+      <translation>%1 Benutzer</translation>
+    </message>
+    <message>
+      <source>%1 belong to this system only and are fully managed by system administrators.</source>
+      <comment>%1 is local users definition, e.g. &apos;Local users&apos;</comment>
+      <translation>%1 gehören nur zu diesem System und werden vollständig von Systemadministratoren verwaltet.</translation>
+    </message>
+    <message>
+      <source>%1 can have access to many Systems. Administrators can manage their rights only.</source>
+      <comment>%1 is cloud users definition, e.g. &apos;Cloud users&apos;</comment>
+      <translation>%1 kann auf viele Systeme zugreifen. Administratoren können nur ihre Rechte verwalten.</translation>
     </message>
   </context>
   <context>
@@ -8122,6 +8227,13 @@ to %1</source>
     </message>
   </context>
   <context>
+    <name>nx::client::desktop::HintButton</name>
+    <message>
+      <source>Click to read more</source>
+      <translation>Klicken Sie hier, um mehr zu erfahren</translation>
+    </message>
+  </context>
+  <context>
     <name>nx::client::desktop::ImageOverlaySettingsWidget</name>
     <message>
       <source>Select file...</source>
@@ -8367,17 +8479,26 @@ to %1</source>
     </message>
   </context>
   <context>
-    <name>nx::client::desktop::ui::AnalyticsSdkEventModel</name>
-    <message>
-      <source>No event types supported</source>
-      <translation>Keine Ereignistypen unterstützt</translation>
-    </message>
-  </context>
-  <context>
     <name>nx::client::desktop::ui::AnalyticsSdkEventWidget</name>
     <message>
-      <source>Event will trigger only if Analytics Event meets all the above conditions. If a keyword field is empty, condition is always met. If not, condition is met if the corresponding field of Analytics Event contains any keyword.</source>
-      <translation>Das Ereignis wird nur dann ausgelöst, wenn alle oben gennanten Bedingungen erfüllt sind. Wenn das Passwortfeld leer ist, ist die Bedingung immer erfüllt. Wenn das nicht der Fall ist, dann ist die Bedingung erst erfüllt, wenn das entsprechende Feld des Ereignisses ein Passwort enthält.</translation>
+      <source>Analytics events can be set up on a certain cameras.</source>
+      <translation>Analytik-Ereignisse können auf einer bestimmten Kamera eingerichtet werden.</translation>
+    </message>
+    <message>
+      <source>Choose cameras using the button above to see the list of supported events.</source>
+      <translation>Wählen Sie Kameras über die Schaltfläche oben aus, um die Liste der unterstützten Ereignisse anzuzeigen.</translation>
+    </message>
+    <message>
+      <source>Event will trigger only if there are matches in caption with any of entered keywords.</source>
+      <translation>Das Ereignis wird nur ausgelöst, wenn es Übereinstimmungen mit einem der eingegebenen Schlüsselwörter gibt.</translation>
+    </message>
+    <message>
+      <source>If the field is empty, event will always trigger.</source>
+      <translation>Wenn das Feld leer ist, wird immer ein Ereignis ausgelöst.</translation>
+    </message>
+    <message>
+      <source>Event will trigger only if there are matches in the description field with any of the entered keywords.</source>
+      <translation>Das Ereignis wird nur ausgelöst, wenn im Beschreibungsfeld Übereinstimmungen mit einem der eingegebenen Schlüsselwörter vorhanden sind.</translation>
     </message>
   </context>
   <context>
@@ -8728,6 +8849,18 @@ to %1</source>
     <message>
       <source>Failed to change password on %1 of %2 cameras</source>
       <translation>Passwörter auf %1 von %2 Kameras konnten nicht geändert werden</translation>
+    </message>
+    <message>
+      <source>To use the software you must accept the end user license agreement</source>
+      <translation>Um die Software nutzen zu können, müssen Sie die Endbenutzer-Lizenzvereinbarung akzeptieren</translation>
+    </message>
+    <message>
+      <source>Accept</source>
+      <translation>Akzeptieren</translation>
+    </message>
+    <message>
+      <source>Decline</source>
+      <translation>Ablehnen</translation>
     </message>
   </context>
   <context>

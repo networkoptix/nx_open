@@ -90,7 +90,8 @@ def common_signtool_options():
 def common_sign_command(signtool_directory, timestamp_server):
     command = [signtool_executable(signtool_directory), 'sign']
     command += common_signtool_options()
-    command += timestamp_options(timestamp_server)
+    if timestamp_server:
+        command += timestamp_options(timestamp_server)
     return command
 
 

@@ -3,7 +3,7 @@
 #include <chrono>
 
 #include <nx/network/abstract_socket.h>
-#include <nx/utils/settings.h>
+#include <nx/utils/deprecated_settings.h>
 
 class QnSettings;
 

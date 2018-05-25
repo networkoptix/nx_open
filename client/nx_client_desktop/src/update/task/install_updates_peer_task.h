@@ -38,7 +38,8 @@ protected:
     virtual void doStart() override;
 
 private slots:
-    void at_resourceChanged(const QnResourcePtr& resource);
+    void at_resourceStatusChanged(const QnResourcePtr& resource);
+    void at_serverVersionChanged(const QnResourcePtr& resource);
     void at_checkTimer_timeout();
     void at_pingTimer_timeout();
     void at_gotModuleInformation(

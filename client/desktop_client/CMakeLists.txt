@@ -1,4 +1,4 @@
-nx_add_target(desktop_client EXECUTABLE
+nx_add_target(desktop_client EXECUTABLE SIGNED
     PUBLIC_LIBS qtsingleapplication nx_kit nx_client_desktop)
 
 if(LINUX)

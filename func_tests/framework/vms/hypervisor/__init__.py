@@ -9,6 +9,10 @@ class VMNotFound(Exception):
     pass
 
 
+class TemplateVMNotFound(Exception):
+    pass
+
+
 class VMAllAdaptersBusy(Exception):
     def __init__(self, vm_name, vm_networks):
         super(VMAllAdaptersBusy, self).__init__(

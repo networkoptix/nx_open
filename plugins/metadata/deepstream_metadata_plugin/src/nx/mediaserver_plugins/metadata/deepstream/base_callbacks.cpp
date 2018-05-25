@@ -5,7 +5,7 @@
 #define NX_PRINT_PREFIX "deepstream::baseCallbacks::"
 #include <nx/kit/debug.h>
 
-#include <nx/sdk/metadata/common_compressed_video_packet.h>
+#include <nx/sdk/metadata/compressed_video_packet.h>
 
 namespace nx{
 namespace mediaserver_plugins {

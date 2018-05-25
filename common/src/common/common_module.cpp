@@ -481,3 +481,19 @@ void QnCommonModule::setResourceDiscoveryManager(QnResourceDiscoveryManager* dis
         delete m_resourceDiscoveryManager;
     m_resourceDiscoveryManager = discoveryManager;
 }
+
+void QnCommonModule::setStandAloneMode(bool value)
+{
+    QnMutexLocker lock(&m_mutex);
+    if (m_standaloneMode != value)
+    {
+        m_standaloneMode = value;
+        lock.unlock();
+        emit standAloneModeChanged(value);
+    }
+}
+
+bool QnCommonModule::isStandAloneMode() const
+{
+    return m_standaloneMode;
+}

@@ -1,8 +1,0 @@
-[Unit]
-Description=Run vanyas_tests.service every 5 minutes
-
-[Timer]
-OnCalendar=*:0/5
-
-[Install]
-WantedBy=multi-user.target

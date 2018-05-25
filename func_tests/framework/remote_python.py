@@ -13,7 +13,7 @@ class RemotePython(object):
         return True
 
     def install(self):
-        # In Ubuntu 14.04 Vagrant box, Python 3.4 is installed but venv isn't.
+        # In trusty template Python 3.4 is installed but venv isn't.
         self._ssh_access.run_command([
             'if', '!', 'dpkg-query', '--show', 'python3.4-venv',
             '||', '!', 'dpkg-query', '--show', 'python3.4-dev', ';', 'then',

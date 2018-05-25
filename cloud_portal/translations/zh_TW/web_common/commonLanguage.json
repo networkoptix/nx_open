@@ -15,7 +15,7 @@
     "unauthorized": "需要身份驗證",
     "noData": "無資料",
     "iosVideoTooLarge": "iOS不支援大於 fullHD (2MP：1920x1080) 的影像。",
-    "flashRequired": "Please <a href='https://get.adobe.com/flashplayer/' target='_blank'>install Adobe Flash</a> for playing videos.",
+    "flashRequired": "請<a href='https://get.adobe.com/flashplayer/' target='_blank'> 安裝Adobe Flash </a>來播放影像.",
     "flashOrWebmRequired": "要在 Internet Explorer 上播放影像, 請 <a href='https://get.adobe.com/flashplayer/' target='_blank'>安裝 Adobe Flash</a> 或 <a href='https://tools.google.com/dlpage/webmmf/' target='_blank'>WebM codec</a>.",
     "noArmSupport": "此瀏覽器或設備不支援從 ARM 伺服器上回放影像。",
     "noFormat": "此瀏覽器不支援從此攝影機回放影像.",
@@ -29,19 +29,19 @@
     "high": "高 (H)",
     "low": "低 (L)"
   },
-  "chromeCastWarning": "Chromecast is resource intensive and may cause issues on your server.",
+  "chromeCastWarning": "Chromecast佔用過多資源, 可能會導致您的伺服器出現問題.",
   "voiceCommands": {
     "play": "播放",
     "pause": "暫停",
     "live": "go to live | show me live",
     "view": "view + [camera name]",
     "search": "find + [text for searchbar]",
-    "clear search": "clear search",
+    "clear search": "清除搜尋",
     "expand server": "expand server + [server name]",
     "collapse server": "collapse server + [server name]",
-    "expand all servers": "expand all servers",
-    "collapse all servers": "collapse all servers",
-    "stop listening": "stop listening",
+    "expand all servers": "展開所有伺服器",
+    "collapse all servers": "隱藏所有伺服器",
+    "stop listening": "停止聽取",
     "help": "help | show commands"
   }
 }

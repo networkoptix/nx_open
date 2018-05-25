@@ -11,7 +11,7 @@
 #include "plugin.h"
 
 #include <nx/mediaserver_plugins/metadata/tegra_video/naive_object_tracker.h>
-#include <nx/sdk/metadata/common_compressed_video_packet.h>
+#include <nx/sdk/metadata/compressed_video_packet.h>
 
 namespace nx {
 namespace mediaserver_plugins {
@@ -28,14 +28,14 @@ protected:
     virtual std::string capabilitiesManifest() override;
 
     virtual bool pushCompressedVideoFrame(
-        const nx::sdk::metadata::CommonCompressedVideoPacket* videoFrame) override;
+        const nx::sdk::metadata::CompressedVideoPacket* videoFrame) override;
 
     virtual bool pullMetadataPackets(
         std::vector<nx::sdk::metadata::MetadataPacket*>* metadataPackets) override;
 
 private:
     bool pushCompressedFrame(
-        const nx::sdk::metadata::CommonCompressedVideoPacket* videoPacket);
+        const nx::sdk::metadata::CompressedVideoPacket* videoPacket);
 
     bool pullRectsForFrame(std::vector<TegraVideo::Rect>* rects, int64_t* outPtsUs);
 

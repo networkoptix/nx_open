@@ -8,9 +8,9 @@ namespace system_commands {
 namespace domain_socket {
 namespace detail {
 
-bool sendFd(int fd);
-bool sendInt64(int64_t value);
-bool sendBuffer(const void* data, ssize_t size);
+bool sendFd(int socketPostfix, int fd);
+bool sendInt64(int socketPostfix, int64_t value);
+bool sendBuffer(int socketPostfix, const void* data, ssize_t size);
 
 } // namespace detail
 } // domain_socket

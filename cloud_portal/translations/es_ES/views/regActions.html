@@ -51,9 +51,9 @@
             <div class="col-sm-4">
                 <div><span class="help-block" ng-if="registerForm.registerEmail.$touched && registerForm.registerEmail.$error.required">Correo electrónico es necesario</span></div>
 
-                <div><span class="help-block" ng-if="registerForm.registerEmail.$touched && registerForm.registerEmail.$error.email">Por favor ingrese un correo electrónico válido</span></div>
+                <div><span class="help-block" ng-if="registerForm.registerEmail.$touched && registerForm.registerEmail.$error.email">Por favor, introduce una dirección de email válida</span></div>
 
-                <div><span class="help-block" ng-if="registerForm.registerEmail.$error.alreadyExists">Este correo electrónico ya se ha registrado en {{PRODUCT_NAME}}</span></div>
+                <div><span class="help-block" ng-if="registerForm.registerEmail.$error.alreadyExists">Este correo electrónico ya se ha registrado en %PRODUCT_NAME%</span></div>
             </div>
         </div>
         <password-input ng-model="account.password" id="'registerPassword'" label="$root.L.regActions.passwordLabel"></password-input>

@@ -52,7 +52,8 @@ namespace {
         { "xsl",  "applicaton/xslt+xml" },
         { "zip",  "application/zip" },
         { "swf",  "application/x-shockwave-flash" },
-        { "txt",  "text/plain" }
+        { "txt",  "text/plain" },
+        { "ico", "image/x-icon"}
     };
 
     const QByteArray kDefaultContentType = "text/html; charset=utf-8";
@@ -69,7 +70,7 @@ namespace {
         }
 
         /* Check internal resources. */
-        QString fileName = ":" + relativePath;
+        const QString fileName = ":" + relativePath;
         QIODevicePtr result(new QFile(fileName));
         if (result->open(QFile::ReadOnly))
             return result;

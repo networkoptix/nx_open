@@ -89,11 +89,6 @@
     </message>
     <message>
       <location/>
-      <source>Disable only if the client takes too much CPU</source>
-      <translation>Wyłącz, jeśli klient zbyt mocno obciąża procesor</translation>
-    </message>
-    <message>
-      <location/>
       <source>Maximum Live Buffer Length</source>
       <translation>Maksymalna długość bufora na żywo</translation>
     </message>
@@ -764,15 +759,15 @@
     </message>
     <message>
       <location/>
-      <source>Logical Id</source>
-      <translation>Identyfikator logiczny</translation>
+      <source>Logical ID</source>
+      <translation>ID logiczny</translation>
     </message>
   </context>
   <context>
     <name>CameraInputBusinessEventWidget</name>
     <message>
       <location filename="../src/ui/widgets/business/camera_input_business_event_widget.ui"/>
-      <source>Input Id</source>
+      <source>Input ID</source>
       <translation>ID wejścia</translation>
     </message>
   </context>
@@ -798,7 +793,7 @@
     </message>
     <message>
       <location/>
-      <source>Output Id:</source>
+      <source>Output ID:</source>
       <translation>ID wyjściowe:</translation>
     </message>
   </context>
@@ -1513,7 +1508,7 @@
     </message>
     <message>
       <location/>
-      <source>Locked to Hardware Id:</source>
+      <source>Locked to Hardware ID:</source>
       <translation>Przypisane trwale do ID sprzętu:</translation>
     </message>
   </context>
@@ -1612,7 +1607,7 @@
     </message>
     <message>
       <location/>
-      <source>Hardware Id</source>
+      <source>Hardware ID</source>
       <translation>ID sprzętu</translation>
     </message>
   </context>
@@ -1741,6 +1736,11 @@
       <location/>
       <source>Tour cycle</source>
       <translation>Cykl trasy</translation>
+    </message>
+    <message>
+      <location/>
+      <source>IP addresses for cameras, and servers, groups for users, etc.</source>
+      <translation>Adresy IP kamer i serwerów, grupy użytkowników itp.</translation>
     </message>
   </context>
   <context>

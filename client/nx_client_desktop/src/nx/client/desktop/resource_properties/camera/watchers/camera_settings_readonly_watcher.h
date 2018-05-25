@@ -20,15 +20,14 @@ class CameraSettingsReadOnlyWatcher:
     using base_type = QObject;
 
 public:
-    explicit CameraSettingsReadOnlyWatcher(QObject* parent = nullptr);
+    explicit CameraSettingsReadOnlyWatcher(CameraSettingsDialogStore* store,
+        QObject* parent = nullptr);
 
     QnVirtualCameraResourceList cameras() const;
     void setCameras(const QnVirtualCameraResourceList& value);
 
-    void setStore(CameraSettingsDialogStore* store);
-
 signals:
-    void readOnlyChanged(bool value);
+    void readOnlyChanged(bool value, QPrivateSignal);
 
 protected:
     virtual void afterContextInitialized() override;

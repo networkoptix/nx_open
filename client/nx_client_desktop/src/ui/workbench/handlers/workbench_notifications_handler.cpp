@@ -38,7 +38,10 @@
 #include <nx/vms/event/actions/common_action.h>
 #include <ui/dialogs/camera_bookmark_dialog.h>
 #include <camera/camera_bookmarks_manager.h>
+
 #include <nx_ec/ec_api.h>
+#include <nx_ec/data/api_conversion_functions.h>
+
 
 using namespace nx;
 using namespace nx::client::desktop;
@@ -152,8 +155,10 @@ void QnWorkbenchNotificationsHandler::handleAcknowledgeEventAction()
             {
                 static const auto fakeHandler = [](int /*handle*/, ec2::ErrorCode /*errorCode*/){};
 
-                const auto manager = connection->getBusinessEventManager(Qn::kSystemAccess);
-                manager->broadcastBusinessAction(action, this, fakeHandler);
+                const auto manager = connection->getEventRulesManager(Qn::kSystemAccess);
+                nx::vms::api::EventActionData actionData;
+                ec2::fromResourceToApi(action, actionData);
+                manager->broadcastEventAction(actionData, this, fakeHandler);
             }
         };
 

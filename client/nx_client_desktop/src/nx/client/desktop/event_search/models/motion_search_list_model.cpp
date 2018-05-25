@@ -7,11 +7,12 @@
 #include <ui/help/business_help.h>
 #include <ui/style/skin.h>
 #include <ui/workbench/workbench_context.h>
-#include <ui/workbench/watchers/workbench_server_time_watcher.h>
 
 #include <nx/client/core/utils/human_readable.h>
 #include <nx/utils/log/assert.h>
 #include <nx/vms/event/event_fwd.h>
+
+#include <nx/client/core/watchers/server_time_watcher.h>
 
 namespace nx {
 namespace client {
@@ -78,7 +79,7 @@ QVariant MotionSearchListModel::data(const QModelIndex& index, int role) const
         case Qn::DescriptionTextRole:
         {
             const auto& period = d->period(index.row());
-            const auto timeWatcher = context()->instance<QnWorkbenchServerTimeWatcher>();
+            const auto timeWatcher = context()->instance<core::ServerTimeWatcher>();
             const auto start = timeWatcher->displayTime(period.startTimeMs);
             return lit("%1: %2<br>%3: %4")
                 .arg(tr("Start"))

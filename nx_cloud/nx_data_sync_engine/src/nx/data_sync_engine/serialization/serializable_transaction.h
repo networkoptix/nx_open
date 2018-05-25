@@ -2,17 +2,17 @@
 
 #include <transaction/transaction.h>
 
+#include "../command.h"
 #include "transaction_serializer.h"
 
 namespace nx {
-namespace cdb {
-namespace ec2 {
+namespace data_sync_engine {
 
 class SerializableAbstractTransaction:
     public TransactionSerializer
 {
 public:
-    virtual const ::ec2::QnAbstractTransaction& transactionHeader() const = 0;
+    virtual const CommandHeader& transactionHeader() const = 0;
 };
 
 template<typename TransactionDataType>
@@ -20,7 +20,7 @@ class SerializableTransaction:
     public SerializableAbstractTransaction
 {
 public:
-    SerializableTransaction(::ec2::QnTransaction<TransactionDataType> transaction):
+    SerializableTransaction(Command<TransactionDataType> transaction):
         m_transaction(std::move(transaction))
     {
     }
@@ -61,25 +61,24 @@ public:
         }
     }
 
-    virtual const ::ec2::QnAbstractTransaction& transactionHeader() const override
+    virtual const CommandHeader& transactionHeader() const override
     {
         return m_transaction;
     }
 
-    const ::ec2::QnTransaction<TransactionDataType>& get() const
+    const Command<TransactionDataType>& get() const
     {
         return m_transaction;
     }
 
-    ::ec2::QnTransaction<TransactionDataType> take()
+    Command<TransactionDataType> take()
     {
         return std::move(m_transaction);
     }
 
 private:
-    ::ec2::QnTransaction<TransactionDataType> m_transaction;
+    Command<TransactionDataType> m_transaction;
 };
 
-} // namespace ec2
-} // namespace cdb
+} // namespace data_sync_engine
 } // namespace nx

@@ -447,11 +447,11 @@
     </message>
     <message>
       <source>UNREACHABLE</source>
-      <translation type="unfinished">UNREACHABLE</translation>
+      <translation>NICHT ERREICHBAR</translation>
     </message>
     <message>
       <source>Connect to this server from web browser or through desktop client to set it up</source>
-      <translation type="unfinished">Connect to this server from web browser or through desktop client to set it up</translation>
+      <translation>Verbinden Sie diesen Server mit dem Webbrowser oder über den Desktopclient, um ihn einzurichten</translation>
     </message>
   </context>
   <context>
@@ -553,7 +553,7 @@
     </message>
     <message>
       <source>New Server</source>
-      <translation type="unfinished">New Server</translation>
+      <translation>Neuer Server</translation>
     </message>
   </context>
   <context>
@@ -648,7 +648,7 @@
     <message>
       <source>d MMMM yyyy</source>
       <comment>DO NOT TRANSLATE THIS STRING!</comment>
-      <translation>d MMMM yyyy</translation>
+      <translation type="unfinished">d MMMM yyyy</translation>
     </message>
   </context>
   <context>

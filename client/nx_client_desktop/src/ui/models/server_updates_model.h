@@ -89,7 +89,16 @@ private:
 
     QnMediaServerUpdateTool* m_updateTool;
     QList<Item*> m_items;
-    QSet<QnUuid> m_targets;
+
+    /**
+     * When a system is updated to an incompatible version (e.g. another protocol version) some
+     * servers may finish updating before the current server is shut down. In this case they can
+     * be detected (and then displayed by this model) as incompatible servers. This behavior
+     * confuses users and should be avoided. This black-list avoids appearance of fake server
+     * resources corresponding to servers which are online (and thus will be updated) at the moment
+     * of update start.
+     */
+    QSet<QnUuid> m_incompatibleServersBlackList;
 
     QnSoftwareVersion m_latestVersion;
     QnSoftwareVersion m_lowestInstalledVersion;

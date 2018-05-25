@@ -24,7 +24,7 @@ using namespace vms::common::p2p::downloader;
 
 namespace {
 
-static const qint64 kRefreshTimeoutMs = 24 * 60 * 60 * 1000; //< 1 day
+static const qint64 kRefreshTimeoutMs = 10 * 60 * 1000; //< 10 min
 static const QString kFileName = "update.status";
 
 } // namespace
@@ -57,7 +57,7 @@ update::info::AbstractUpdateRegistryPtr ServerUpdates2Manager::getRemoteRegistry
         qnServerModule->roSettings()->value(nx_ms_conf::CHECK_FOR_UPDATE_URL).toString();
     updateUrl = updateUrl.isNull() ? update::info::kDefaultUrl : updateUrl;
 
-    return update::info::checkSync(updateUrl);
+    return update::info::checkSync(peerId(), updateUrl);
 }
 
 QString ServerUpdates2Manager::filePath() const

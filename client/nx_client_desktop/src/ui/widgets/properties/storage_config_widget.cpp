@@ -13,6 +13,7 @@
 #include <api/model/rebuild_archive_reply.h>
 
 #include <common/common_module.h>
+#include <translation/datetime_formatter.h>
 
 #include <camera/camera_data_manager.h>
 #include <core/resource/client_storage_resource.h>
@@ -255,7 +256,11 @@ QnStorageConfigWidget::QnStorageConfigWidget(QWidget* parent) :
     m_storagePoolMenu->addAction(tr("Backup"))->setData(true);
 
     setHelpTopic(this, Qn::ServerSettings_Storages_Help);
-    setHelpTopic(ui->backupGroupBox, Qn::ServerSettings_StoragesBackup_Help);
+    setHelpTopic(ui->backupGroupBox, Qn::ServerSettings_ArchiveRestoring_Help);
+
+    ui->rebuildBackupButtonHint->addHintLine(tr("Creates a backup of System configuration that can be restored in case of failure."));
+    ui->rebuildBackupButtonHint->addHintLine(tr("Backup includes servers and cameras settings, users, webpages, event rules, etc. Video is not saved."));
+    setHelpTopic(ui->rebuildBackupButtonHint, Qn::SystemSettings_Server_Backup_Help);
 
     auto hoverTracker = new ItemViewHoverTracker(ui->storageView);
     hoverTracker->setMouseCursorRole(Qn::ItemMouseCursorRole);
@@ -858,10 +863,7 @@ quint64 QnStorageConfigWidget::nextScheduledBackupTimeMs() const
 
 QString QnStorageConfigWidget::backupPositionToString(qint64 backupTimeMs)
 {
-    const QDateTime backupDateTime = QDateTime::fromMSecsSinceEpoch(backupTimeMs);
-    return lit("%1 %2").arg(
-        backupDateTime.date().toString(Qt::DefaultLocaleLongDate)).arg(
-        backupDateTime.time().toString(Qt::DefaultLocaleShortDate));
+    return datetime::toString(backupTimeMs);
 }
 
 QString QnStorageConfigWidget::intervalToString(qint64 backupTimeMs)

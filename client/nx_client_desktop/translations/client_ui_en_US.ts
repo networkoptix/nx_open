@@ -89,11 +89,6 @@
     </message>
     <message>
         <location/>
-        <source>Disable only if the client takes too much CPU</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location/>
         <source>Maximum Live Buffer Length</source>
         <translation></translation>
     </message>
@@ -172,12 +167,7 @@
 <context>
     <name>ArchiveLengthWidget</name>
     <message>
-        <location filename="../src/ui/widgets/properties/archive_length_widget.ui"/>
-        <source>Fixed Archive Length</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location/>
+        <location filename="../src/nx/client/desktop/resource_properties/camera/widgets/archive_length_widget.ui"/>
         <source>Min. Days</source>
         <translation></translation>
     </message>
@@ -771,7 +761,7 @@
 <context>
     <name>CameraInfoWidget</name>
     <message>
-        <location filename="../src/nx/client/desktop/resource_properties/camera/camera_info_widget.ui"/>
+        <location filename="../src/nx/client/desktop/resource_properties/camera/widgets/camera_info_widget.ui"/>
         <source>Model</source>
         <translation type="unfinished"></translation>
     </message>
@@ -868,48 +858,8 @@
 <context>
     <name>CameraScheduleWidget</name>
     <message>
-        <location filename="../src/nx/client/desktop/resource_properties/camera/camera_schedule_widget.ui"/>
-        <source>Schedule Settings</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location/>
-        <source>FPS</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Quality</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Record Always</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Motion Only</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Do Not Record</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location/>
+        <location filename="../src/nx/client/desktop/resource_properties/camera/widgets/camera_schedule_widget.ui"/>
         <source>Motion Recording</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Pre-Recording</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Post-Recording</source>
         <translation></translation>
     </message>
     <message>
@@ -924,16 +874,6 @@
     </message>
     <message>
         <location/>
-        <source>Show Quality</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Show FPS</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location/>
         <source>Copying Schedule</source>
         <translation></translation>
     </message>
@@ -944,29 +884,19 @@
     </message>
     <message>
         <location/>
-        <source>Panic Mode:</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Motion + Lo-Res</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Bitrate</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location/>
         <source>Copy Schedule to...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Fixed Archive Length</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
     <name>CameraSettingsGeneralTabWidget</name>
     <message>
-        <location filename="../src/nx/client/desktop/resource_properties/camera/camera_settings_general_tab_widget.ui"/>
+        <location filename="../src/nx/client/desktop/resource_properties/camera/widgets/camera_settings_general_tab_widget.ui"/>
         <source>Audio</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1448,7 +1378,7 @@
 <context>
     <name>ImageControlWidget</name>
     <message>
-        <location filename="../src/nx/client/desktop/resource_properties/camera/image_control_widget.ui"/>
+        <location filename="../src/nx/client/desktop/resource_properties/camera/widgets/image_control_widget.ui"/>
         <source>Image Control</source>
         <translation></translation>
     </message>
@@ -1524,6 +1454,24 @@
     <message>
         <location/>
         <source>Enable tile interface</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>LayoutSelectionDialog</name>
+    <message>
+        <location filename="../src/nx/client/desktop/ui/event_rules/layout_selection_dialog.ui"/>
+        <source>Select layout</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Shared layouts</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Select some single user in &quot;Show to&quot; line to display his local layouts in this list</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -1669,6 +1617,145 @@
         <location/>
         <source>Disable imported users</source>
         <translation></translation>
+    </message>
+</context>
+<context>
+    <name>LegacyArchiveLengthWidget</name>
+    <message>
+        <location filename="../src/ui/widgets/properties/legacy_archive_length_widget.ui"/>
+        <source>Fixed Archive Length</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Min. Days</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Auto</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Max. Days</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>LegacyCameraScheduleWidget</name>
+    <message>
+        <location filename="../src/nx/client/desktop/resource_properties/camera/legacy_camera_schedule_widget.ui"/>
+        <source>Recording</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Activate License...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Schedule Settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>FPS</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Quality</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Record Always</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Motion Only</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Motion + Lo-Res</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Do Not Record</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Bitrate</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Show Quality</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Show FPS</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Panic Mode:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Motion Recording</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Pre-Recording</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Post-Recording</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Copying Schedule</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Copy Schedule to...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Apply changes before copying schedule.</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>LegacyImageControlWidget</name>
+    <message>
+        <location filename="../src/nx/client/desktop/resource_properties/camera/legacy_image_control_widget.ui"/>
+        <source>Image Control</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Aspect Ratio</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Rotation</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -1929,6 +2016,11 @@
         <source>Tour cycle</source>
         <translation></translation>
     </message>
+    <message>
+        <location/>
+        <source>IP addresses for cameras, and servers, groups for users, etc.</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>MediaFileSettingsDialog</name>
@@ -2011,7 +2103,22 @@
     </message>
     <message>
         <location/>
-        <source>for</source>
+        <source>Show to</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Select layout...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Warning label for users</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Warning label for layouts</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -2593,6 +2700,19 @@
     </message>
 </context>
 <context>
+    <name>RecordingThresholdWidget</name>
+    <message>
+        <location filename="../src/nx/client/desktop/resource_properties/camera/widgets/recording_threshold_widget.ui"/>
+        <source>Pre-Recording</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Post-Recording</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>ResourceBrowserWidget</name>
     <message>
         <location filename="../src/ui/widgets/resource_browser_widget.ui"/>
@@ -2631,6 +2751,64 @@
         <location/>
         <source>Speak to users</source>
         <translation></translation>
+    </message>
+</context>
+<context>
+    <name>ScheduleSettingsWidget</name>
+    <message>
+        <location filename="../src/nx/client/desktop/resource_properties/camera/widgets/schedule_settings_widget.ui"/>
+        <source>Schedule Settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>FPS</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Quality</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Record Always</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Motion Only</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Motion + Lo-Res</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Do Not Record</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Bitrate</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Show Quality</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Show FPS</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Panic Mode:</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>

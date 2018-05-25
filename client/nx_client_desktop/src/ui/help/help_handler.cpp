@@ -35,25 +35,37 @@ QnHelpHandler::QnHelpHandler(QObject* parent):
     QObject(parent),
     m_topic(Qn::Empty_Help)
 {
-    m_helpSearchPaths.append(qApp->applicationDirPath() + relativeHelpRootPath);
-    m_helpSearchPaths.append(qApp->applicationDirPath() + lit("/..") + relativeHelpRootPath);
 }
 
 QnHelpHandler::~QnHelpHandler()
 {
 }
 
-void QnHelpHandler::setHelpTopic(int topic) {
+void QnHelpHandler::setHelpTopic(int topic)
+{
     m_topic = topic;
 
+    openHelpTopic(topic);
+}
+
+void QnHelpHandler::openHelpTopic(int topic)
+{
     QDesktopServices::openUrl(urlForTopic(topic));
 }
 
-QUrl QnHelpHandler::urlForTopic(int topic) const
+QUrl QnHelpHandler::urlForTopic(int topic)
 {
     QString topicPath = QLatin1String(relativeUrlForTopic(topic));
 
-    for (const QString& helpRoot: m_helpSearchPaths)
+    auto appDirPath = qApp->applicationDirPath();
+
+    auto paths =
+    {
+        appDirPath + relativeHelpRootPath,
+        appDirPath + lit("/..") + relativeHelpRootPath,
+    };
+
+    for (const QString& helpRoot: paths)
     {
         QString filePath = helpRoot + topicPath;
         if (QFile::exists(filePath))
@@ -104,6 +116,3 @@ bool QnHelpHandler::eventFilter(QObject *watched, QEvent *event) {
         return false;
     }
 }
-
-
-

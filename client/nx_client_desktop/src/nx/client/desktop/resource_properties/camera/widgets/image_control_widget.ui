@@ -36,7 +36,7 @@
       <item row="1" column="0">
        <widget class="QLabel" name="rotationLabel">
         <property name="text">
-         <string>Rotation</string>
+         <string>Default Rotation</string>
         </property>
         <property name="alignment">
          <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>

@@ -35,13 +35,21 @@ def target_file(file_name, customization, language_code, preview):
 
 
 def process_context_structure(customization, context, content,
-                              language, version_id, preview):
+                              language, version_id, preview, force_global_files):
     for datastructure in context.datastructure_set.order_by('order').all():
         content_value = datastructure.find_actual_value(customization, language, version_id)
         # replace marker with value
         if datastructure.type not in (DataStructure.DATA_TYPES.image, DataStructure.DATA_TYPES.file):
             content = content.replace(datastructure.name, content_value)
         elif content_value or datastructure.optional:
+            if context.is_global and not force_global_files:
+                # do not update files from global contexts all the time
+                continue
+
+            if not datastructure.translatable and language != customization.default_language:
+                # if file itself is not translatable - update it only for default language
+                continue
+
             image_storage = os.path.join('static', customization.name)
             if preview:
                 image_storage = os.path.join(image_storage, 'preview')
@@ -50,6 +58,7 @@ def process_context_structure(customization, context, content,
             if language:
                 file_name = file_name.replace("{{language}}", language.code)
 
+            # print "Save file from DB: " + file_name, context, language, context.is_global
             save_b64_to_file(content_value, file_name, image_storage)
     return content
 
@@ -61,18 +70,16 @@ def save_content(filename, content):
 
 
 def process_context(context, language_code, customization, preview, version_id, global_contexts):
-    language = None
-    if language_code:
-        language = Language.objects.filter(code=language_code)
-        if not language.exists():
-            return
-        language = customization.default_language
-
-    content = process_context_structure(customization, context, context.template, language, version_id, preview)
+    language = Language.by_code(language_code, customization.default_language)
+    context_template_text = context.template_for_language(language, customization.default_language)
+    if not context_template_text:
+        context_template_text = ''
+    content = process_context_structure(customization, context, context_template_text, language,
+                                        version_id, preview, context.is_global)  # if context is global - process it
     if not context.is_global:  # if current context is global - do not apply other contexts
         for global_context in global_contexts.all():
             content = process_context_structure(
-                customization, global_context, content, None, version_id, preview)
+                customization, global_context, content, None, version_id, preview, False)
 
     return content
 
@@ -95,7 +102,7 @@ def read_customized_file(filename, customization_name, language_code=None, versi
         # success -> return actual value
         data_structure = data_structure.first()
         value = data_structure.find_actual_value(customization,
-                                                 Language.objects.get(code=language_code) if language_code else None,
+                                                 Language.by_code(language_code),
                                                  version_id)
         return base64.b64decode(value)
 
@@ -117,8 +124,10 @@ def read_customized_file(filename, customization_name, language_code=None, versi
 
 def save_context(context, context_path, language_code, customization, preview, version_id, global_contexts):
     content = process_context(context, language_code, customization, preview, version_id, global_contexts)
-    if context.template:
+    language = Language.by_code(language_code, customization.default_language)
+    if context.template_for_language(language, customization.default_language):  # if we have template - save context to file
         target_file_name = target_file(context_path, customization, language_code, preview)
+        # print "save file: " + target_file_name
         save_content(target_file_name, content)
 
 
@@ -258,14 +267,19 @@ def fill_content(customization_name='default', product_name='cloud_portal',
                 changed_languages = customization.languages_list
 
         # update affected languages
-        for language_code in changed_languages:
-            save_context(context, context.file_path, language_code, customization, preview, version_id, global_contexts)
+        if context.translatable:
+            for language_code in changed_languages:
+                save_context(context, context.file_path, language_code, customization, preview, version_id, global_contexts)
+        else:
+            save_context(context, context.file_path, None, customization, preview, version_id, global_contexts)
 
     generate_languages_json(customization, preview)
 
 
 def zip_context(zip_file, context, customization, language_code, preview, version_id, global_contexts, add_root):
-    if context.template:
+    language = Language.by_code(language_code, customization.default_language)
+
+    if context.template_for_language(language, customization.default_language):  # if we have template - save context to file
         data = process_context(context, language_code, customization, preview, version_id, global_contexts)
         name = context.file_path.replace("{{language}}", language_code) if language_code else context.file_path
         if add_root:
@@ -275,7 +289,7 @@ def zip_context(zip_file, context, customization, language_code, preview, versio
                                                                  DataStructure.DATA_TYPES.file))
     for file_structure in file_structures:
         data = file_structure.find_actual_value(customization,
-                                                Language.objects.get(code=language_code) if language_code else None,
+                                                Language.by_code(language_code),
                                                 version_id)
         data = base64.b64decode(data)
         name = file_structure.name.replace("{{language}}", language_code) if language_code else file_structure.name

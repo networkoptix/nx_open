@@ -41,15 +41,6 @@ inline QString replaceNonFileNameCharacters(const QString &string, const QChar &
     return replaceCharacters(string, "\\/:*?\"<>|", replacement);
 }
 
-/**
-* \param dt                            dateTime
-* \returns                             Return string dateTime suggestion for saving dialogs
-*/
-inline QString datetimeSaveDialogSuggestion(const QDateTime& dt) {
-    return dt.toString(lit("yyyy-MMM-dd_hh_mm_ss"));
-}
-
-
 /*!
 \param dateTime Can be one of following:\n
 - usec or millis since since 1971-01-01 (not supporting 1970 to be able to distinguish millis and usec)
@@ -89,7 +80,8 @@ NX_UTILS_API QString generateUniqueString(const QStringList &usedStrings, const 
 
 NX_UTILS_API void trimInPlace( QString* const str, const QString& symbols = QLatin1String(" ") );
 
-NX_UTILS_API QString elideString(const QString &source, int maxLength, const QString &tail = lit("..."));
+NX_UTILS_API QString elideString(
+    const QString& source, int maxLength, const QString& tail = QLatin1String("..."));
 
 //!Generates random string containing only letters and digits
 NX_UTILS_API QByteArray generateRandomName(int length);

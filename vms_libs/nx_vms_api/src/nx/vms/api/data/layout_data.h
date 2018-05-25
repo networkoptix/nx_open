@@ -27,7 +27,6 @@ struct LayoutItemData: IdData
     QnLatin1Array dewarpingParams; //< TODO: #API Expand this one.
     bool displayInfo = false; /**< Should info be displayed on the item. */
 };
-
 #define LayoutItemData_Fields IdData_Fields (flags)(left)(top)(right)(bottom)(rotation) \
     (resourceId)(resourcePath)(zoomLeft)(zoomTop)(zoomRight)(zoomBottom)(zoomTargetId) \
     (contrastParams)(dewarpingParams)(displayInfo)
@@ -44,7 +43,6 @@ struct LayoutData: ResourceData
     qint32 backgroundHeight = 0;
     float backgroundOpacity = 0;
 };
-
 #define LayoutData_Fields ResourceData_Fields (cellAspectRatio)(horizontalSpacing) \
     (verticalSpacing)(items)(locked)(backgroundImageFilename)(backgroundWidth) \
     (backgroundHeight)(backgroundOpacity)

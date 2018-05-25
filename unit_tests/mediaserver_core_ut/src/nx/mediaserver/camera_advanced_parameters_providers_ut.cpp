@@ -20,6 +20,74 @@ std::set<T> toStdSet(const QSet<T> data)
     return result;
 }
 
+std::vector<QSize> parseRange(const QString& rangeString)
+{
+    std::vector<QSize> result;
+    const auto split = rangeString.splitRef(L',');
+    for (const auto& resString : split)
+    {
+        const auto resSplit = resString.split(L'x');
+        if (resSplit.size() != 2)
+            continue;
+
+        const auto width = resSplit[0].toInt();
+        if (width == 0)
+            continue;
+
+        const auto height = resSplit[1].toInt();
+        if (height == 0)
+            continue;
+
+        result.emplace_back(width, height);
+    }
+
+    std::sort(
+        result.begin(),
+        result.end(),
+        [](const QSize& f, const QSize& s)
+        {
+            return f.width() * f.height() < s.width() * s.height();
+        });
+
+    return result;
+}
+
+boost::optional<double> aspectRatio(const QString& resolutionString)
+{
+    const auto split = resolutionString.splitRef(L'x');
+    if (split.size() != 2)
+        return boost::none;
+
+    bool ok = false;
+    const auto width = split[0].toInt(&ok);
+    if (!ok)
+        return boost::none;
+
+    const auto height = split[1].toInt(&ok);
+    if (!ok || height == 0)
+        return boost::none;
+
+    return width / (double) height;
+}
+
+std::vector<double> parseAspectRatioFromRange(const QString& rangeString)
+{
+    const auto resolutionStrings = rangeString.split(L',');
+    std::vector<double> result;
+
+    for (const auto& resolutionString: resolutionStrings)
+    {
+        const auto aspect = aspectRatio(resolutionString);
+        if (aspect == boost::none)
+            continue;
+
+        result.push_back(*aspect);
+    }
+
+    std::sort(result.begin(), result.end());
+    return result;
+}
+
 class CameraAdvancedParametersProviders: public CameraTest
 {
 public:
@@ -238,6 +306,117 @@ TEST_F(CameraAdvancedParametersProviders, MixedUpParameters)
     EXPECT_EQ(testGroup2.groups.size(), 0);
     ASSERT_EQ(testGroup2.params.size(), 1);
     EXPECT_EQ(testGroup2.params[0].name, lit("testGroup2.testParam3"));
+}
+
+TEST_F(CameraAdvancedParametersProviders, SameAspectRatioRestrictions)
+{
+    const auto camera = newCamera(
+        [](CameraMock* camera)
+        {
+            camera->setMediaTraits({{lit("aspectRatioDependent"), {}}});
+            camera->setStreamCapabilityMaps(
+                {
+                    {{lit("H264"), QSize(1920, 1080)}, nx::media::CameraStreamCapability()},
+                    {{lit("H264"), QSize(1280, 960)}, nx::media::CameraStreamCapability()},
+                    {{lit("H264"), QSize(1280, 720)}, nx::media::CameraStreamCapability()},
+                    {{lit("H264"), QSize(800, 600)}, nx::media::CameraStreamCapability()},
+                    {{lit("H264"), QSize(640, 480)}, nx::media::CameraStreamCapability()},
+                    {{lit("H264"), QSize(640, 360)}, nx::media::CameraStreamCapability()},
+
+                    {{lit("H265"), QSize(1920, 1080)}, nx::media::CameraStreamCapability()},
+                    {{lit("H265"), QSize(1280, 960)}, nx::media::CameraStreamCapability()},
+                    {{lit("H265"), QSize(1280, 720)}, nx::media::CameraStreamCapability()},
+                    {{lit("H265"), QSize(800, 600)}, nx::media::CameraStreamCapability()},
+                    {{lit("H265"), QSize(640, 480)}, nx::media::CameraStreamCapability()},
+                    {{lit("H265"), QSize(640, 360)}, nx::media::CameraStreamCapability()}
+                },
+                {
+                    {{lit("H264"), QSize(1920, 1080)}, nx::media::CameraStreamCapability()},
+                    {{lit("H264"), QSize(1280, 960)}, nx::media::CameraStreamCapability()},
+                    {{lit("H264"), QSize(1280, 720)}, nx::media::CameraStreamCapability()},
+                    {{lit("H264"), QSize(800, 600)}, nx::media::CameraStreamCapability()},
+                    {{lit("H264"), QSize(640, 480)}, nx::media::CameraStreamCapability()},
+                    {{lit("H264"), QSize(640, 360)}, nx::media::CameraStreamCapability()},
+
+                    {{lit("H265"), QSize(1920, 1080)}, nx::media::CameraStreamCapability()},
+                    {{lit("H265"), QSize(1280, 960)}, nx::media::CameraStreamCapability()},
+                    {{lit("H265"), QSize(1280, 720)}, nx::media::CameraStreamCapability()},
+                    {{lit("H265"), QSize(800, 600)}, nx::media::CameraStreamCapability()},
+                    {{lit("H265"), QSize(640, 480)}, nx::media::CameraStreamCapability()},
+                    {{lit("H265"), QSize(640, 360)}, nx::media::CameraStreamCapability()},
+                });
+        });
+    NX_ASSERT(camera);
+
+    // Advanced parameters descriptions.
+    const auto descriptions = QnCameraAdvancedParamsReader::paramsFromResource(camera);
+    auto resolutionParameter = descriptions.getParameterById("secondaryStream.resolution");
+
+    ASSERT_TRUE(resolutionParameter.isValid());
+    bool gotAspectRatioDependencies = false;
+    for (const auto& dependency: resolutionParameter.dependencies)
+    {
+        if (!dependency.id.startsWith(lit("aspectRatio")))
+            continue;
+
+        gotAspectRatioDependencies = true;
+        bool gotAspectRatioConditions = false;
+        const auto secondaryResolutionList = parseRange(dependency.range);
+        ASSERT_FALSE(secondaryResolutionList.empty());
+        const auto secondaryAspectRatio = parseAspectRatioFromRange(dependency.range);
+        ASSERT_FALSE(secondaryAspectRatio.empty());
+        ASSERT_EQ(secondaryResolutionList.size(), secondaryAspectRatio.size());
+        ASSERT_DOUBLE_EQ(*secondaryAspectRatio.begin(), *secondaryAspectRatio.rbegin());
+
+        for (const auto& condition: dependency.conditions)
+        {
+            if (condition.paramId != lit("primaryStream.resolution"))
+                continue;
+
+            ASSERT_EQ(
+                condition.type, QnCameraAdvancedParameterCondition::ConditionType::inRange);
+
+            const auto primaryResolutionList = parseRange(condition.value);
+            const auto primaryAspectRatio = parseAspectRatioFromRange(condition.value);
+            gotAspectRatioConditions = true;
+
+            ASSERT_TRUE(
+                std::equal(
+                    primaryResolutionList.begin(),
+                    primaryResolutionList.end(),
+                    secondaryResolutionList.begin()));
+        }
+
+        ASSERT_TRUE(gotAspectRatioConditions);
+    }
+    ASSERT_TRUE(gotAspectRatioDependencies);
+}
+
+// TODO: #dmishin add more test cases for aspect ratio dependent resolutions.
+
+TEST_F(CameraAdvancedParametersProviders, AdvancedParametersEquality)
+{
+    auto camera = newCamera([](CameraMock* camera) {});
+    auto parameters = QnCameraAdvancedParamsReader::paramsFromResource(camera);
+    ASSERT_EQ(parameters, QnCameraAdvancedParams());
+
+    QnCameraAdvancedParamsReader::setParamsToResource(camera, QnCameraAdvancedParams());
+    parameters = QnCameraAdvancedParamsReader::paramsFromResource(camera);
+    ASSERT_EQ(parameters, QnCameraAdvancedParams());
+
+    QnCameraAdvancedParams testParameters;
+    testParameters.name = lit("Some name");
+    testParameters.version = lit("0");
+    testParameters.unique_id = lit("Some id");
+    testParameters.packet_mode = false;
+
+    QnCameraAdvancedParamsReader::setParamsToResource(camera, testParameters);
+    parameters = QnCameraAdvancedParamsReader::paramsFromResource(camera);
+    ASSERT_EQ(parameters, testParameters);
+
+    QnCameraAdvancedParamsReader::setParamsToResource(camera, QnCameraAdvancedParams());
+    parameters = QnCameraAdvancedParamsReader::paramsFromResource(camera);
+    ASSERT_EQ(parameters, QnCameraAdvancedParams());
 }
 
 } // namespace test

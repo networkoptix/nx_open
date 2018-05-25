@@ -5,7 +5,7 @@ nx_configure_file(maven/filter-resources/nxtool_app_info_impl.cpp
 
 file(GLOB_RECURSE QML_FILES static-resources/src/qml/*.qml)
 
-nx_add_target(nxtool EXECUTABLE
+nx_add_target(nxtool EXECUTABLE SIGNED
     ADDITIONAL_SOURCES
         "${CMAKE_CURRENT_BINARY_DIR}/nxtool_app_info_impl.cpp"
     OTHER_SOURCES

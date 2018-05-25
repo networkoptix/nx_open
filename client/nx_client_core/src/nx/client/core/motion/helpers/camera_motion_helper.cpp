@@ -48,9 +48,7 @@ void CameraMotionHelper::restoreDefaults()
 void CameraMotionHelper::addRect(int channel, int sensitivity, const QRect& rect)
 {
     NX_ASSERT(sensitivity >= 0 && sensitivity < QnMotionRegion::kSensitivityLevelCount);
-
-    if (channel >= m_motionRegionList.size())
-        return; //< TODO: #vkutin Error or not?
+    NX_ASSERT(channel >= 0 && channel < m_motionRegionList.size());
 
     m_motionRegionList[channel].addRect(sensitivity, rect);
     emit motionRegionListChanged(channel);
@@ -59,9 +57,7 @@ void CameraMotionHelper::addRect(int channel, int sensitivity, const QRect& rect
 void CameraMotionHelper::fillRegion(int channel, int sensitivity, const QPoint& at)
 {
     NX_ASSERT(sensitivity >= 0 && sensitivity < QnMotionRegion::kSensitivityLevelCount);
-
-    if (channel >= m_motionRegionList.size())
-        return; //< TODO: #vkutin Error or not?
+    NX_ASSERT(channel >= 0 && channel < m_motionRegionList.size());
 
     if (m_motionRegionList[channel].updateSensitivityAt(at, sensitivity))
         emit motionRegionListChanged(channel);

@@ -22,7 +22,6 @@ namespace ec2
     {
         // todo: #singletone. Only one connection for each connection factory allowed now
         m_isInitialized = queryProcessor->getDb()->init(dbUrl);
-        m_db = queryProcessor->getDb();
 
         connectionFactory->messageBus()->setHandler(notificationManager());
 
@@ -31,6 +30,8 @@ namespace ec2
         {
             m_staticticsReporter = std::make_unique<Ec2StaticticsReporter>(this);
         }
+
+        m_orphanCameraWatcher = std::make_unique<nx::appserver::OrphanCameraWatcher>(commonModule());
     }
 
     Ec2DirectConnection::~Ec2DirectConnection()
@@ -40,7 +41,7 @@ namespace ec2
 
     ec2::detail::QnDbManager* Ec2DirectConnection::getDb() const
     {
-        return m_db;
+        return m_queryProcessor->getDb();
     }
 
     QnConnectionInfo Ec2DirectConnection::connectionInfo() const
@@ -61,6 +62,11 @@ namespace ec2
     Ec2StaticticsReporter* Ec2DirectConnection::getStaticticsReporter()
     {
         return m_staticticsReporter.get();
+    }
+
+    nx::appserver::OrphanCameraWatcher* Ec2DirectConnection::orphanCameraWatcher()
+    {
+        return m_orphanCameraWatcher.get();
     }
 
     Timestamp Ec2DirectConnection::getTransactionLogTime() const

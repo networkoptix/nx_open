@@ -25,8 +25,7 @@
 #include "test_outgoing_transaction_dispatcher.h"
 
 namespace nx {
-namespace cdb {
-namespace ec2 {
+namespace data_sync_engine {
 namespace test {
 
 class TransactionLog:
@@ -41,14 +40,14 @@ public:
         dbConnectionOptions().maxConnectionCount = 100;
         initializeDatabase();
 
-        ec2::dao::TransactionDataObjectFactory::setDataObjectType(dataObjectType);
+        data_sync_engine::dao::TransactionDataObjectFactory::setDataObjectType(dataObjectType);
 
         initializeTransactionLog();
     }
 
     ~TransactionLog()
     {
-        ec2::dao::TransactionDataObjectFactory::resetToDefaultFactory();
+        data_sync_engine::dao::TransactionDataObjectFactory::resetToDefaultFactory();
     }
 
     void givenRandomSystem()
@@ -65,13 +64,13 @@ public:
         // Initializing system's transaction log.
         const nx::String systemId = getSystem(0).id.c_str();
         const auto dbResult = executeUpdateQuerySync(
-            std::bind(&ec2::TransactionLog::updateTimestampHiForSystem,
+            std::bind(&data_sync_engine::TransactionLog::updateTimestampHiForSystem,
                 m_transactionLog.get(), _1, systemId, getSystem(0).systemSequence));
         ASSERT_EQ(nx::utils::db::DBResult::ok, dbResult);
     }
 
 protected:
-    const std::unique_ptr<ec2::TransactionLog>& transactionLog()
+    const std::unique_ptr<data_sync_engine::TransactionLog>& transactionLog()
     {
         return m_transactionLog;
     }
@@ -94,12 +93,12 @@ protected:
 
 private:
     TestOutgoingTransactionDispatcher m_outgoingTransactionDispatcher;
-    std::unique_ptr<ec2::TransactionLog> m_transactionLog;
+    std::unique_ptr<data_sync_engine::TransactionLog> m_transactionLog;
     const QnUuid m_peerId;
 
     void initializeTransactionLog()
     {
-        m_transactionLog = std::make_unique<ec2::TransactionLog>(
+        m_transactionLog = std::make_unique<data_sync_engine::TransactionLog>(
             m_peerId,
             &persistentDbManager()->queryExecutor(),
             &m_outgoingTransactionDispatcher);
@@ -176,7 +175,7 @@ protected:
         const std::vector<dao::TransactionLogRecord> allTransactions = readAllTransactions();
         ASSERT_EQ(1U, allTransactions.size());
 
-        boost::optional<::ec2::QnTransaction<::ec2::ApiUserData>> transaction =
+        boost::optional<Command<::ec2::ApiUserData>> transaction =
             findTransaction(allTransactions, m_transactionData);
         ASSERT_TRUE(static_cast<bool>(transaction));
     }
@@ -235,7 +234,7 @@ protected:
         const auto resultCode = transactionLog()->checkIfNeededAndSaveToLog(
             queryContext.get(),
             m_systemId.c_str(),
-            cdb::ec2::SerializableTransaction<::ec2::ApiUserData>(std::move(transaction)));
+            data_sync_engine::SerializableTransaction<::ec2::ApiUserData>(std::move(transaction)));
         ASSERT_EQ(nx::utils::db::DBResult::cancelled, resultCode);
     }
 
@@ -253,7 +252,7 @@ private:
     ::ec2::ApiUserData m_transactionData;
     std::shared_ptr<nx::utils::db::QueryContext> m_activeQuery;
     nx::utils::db::DbConnectionHolder m_dbConnectionHolder;
-    boost::optional<::ec2::QnTransaction<::ec2::ApiUserData>> m_initialTransaction;
+    boost::optional<Command<::ec2::ApiUserData>> m_initialTransaction;
     std::uint64_t m_lastUsedSequence = 0;
 
     void init()
@@ -262,7 +261,7 @@ private:
             cdb::test::BusinessDataGenerator::generateRandomSharing(
                 cdb::test::BusinessDataGenerator::generateRandomAccount(),
                 m_systemId);
-        ec2::convert(sharing, &m_transactionData);
+        cdb::ec2::convert(sharing, &m_transactionData);
         ASSERT_TRUE(m_dbConnectionHolder.open());
 
         // Moving local peer sequence.
@@ -299,7 +298,7 @@ private:
     }
 
     template<typename TransactionDataType>
-    boost::optional<::ec2::QnTransaction<TransactionDataType>> findTransaction(
+    boost::optional<Command<TransactionDataType>> findTransaction(
         const std::vector<dao::TransactionLogRecord>& allTransactions,
         const TransactionDataType& transactionData)
     {
@@ -308,7 +307,7 @@ private:
             const auto serializedTransactionFromLog =
                 logRecord.serializer->serialize(Qn::UbjsonFormat, nx_ec::EC2_PROTO_VERSION);
 
-            ::ec2::QnTransaction<::ec2::ApiUserData> transaction(peerId());
+            Command<::ec2::ApiUserData> transaction(peerId());
             QnUbjsonReader<QByteArray> ubjsonStream(&serializedTransactionFromLog);
             const bool isDeserialized = QnUbjson::deserialize(&ubjsonStream, &transaction);
             NX_GTEST_ASSERT_TRUE(isDeserialized);
@@ -349,10 +348,10 @@ private:
             prepareFromOtherPeerWithTimestampDiff(timestampDiff));
     }
 
-    ::ec2::QnTransaction<::ec2::ApiUserData> prepareFromOtherPeerWithTimestampDiff(
+    Command<::ec2::ApiUserData> prepareFromOtherPeerWithTimestampDiff(
         int timestampDiff)
     {
-        ::ec2::QnTransaction<::ec2::ApiUserData> transaction(m_otherPeerId);
+        Command<::ec2::ApiUserData> transaction(m_otherPeerId);
         transaction.command = ::ec2::ApiCommand::saveUser;
         transaction.persistentInfo.dbID = m_otherPeerDbId;
         transaction.transactionType = ::ec2::TransactionType::Cloud;
@@ -369,23 +368,23 @@ private:
         return transaction;
     }
 
-    void saveTransaction(::ec2::QnTransaction<::ec2::ApiUserData> transaction)
+    void saveTransaction(Command<::ec2::ApiUserData> transaction)
     {
         auto queryContext = getQueryContext();
         const auto dbResult = transactionLog()->checkIfNeededAndSaveToLog(
             queryContext.get(),
             m_systemId.c_str(),
-            cdb::ec2::UbjsonSerializedTransaction<::ec2::ApiUserData>(std::move(transaction)));
+            data_sync_engine::UbjsonSerializedTransaction<::ec2::ApiUserData>(std::move(transaction)));
         ASSERT_TRUE(dbResult == nx::utils::db::DBResult::ok || dbResult == nx::utils::db::DBResult::cancelled)
             << "Got " << toString(dbResult);
     }
 
-    ::ec2::QnTransaction<::ec2::ApiUserData> getTransactionFromLog()
+    Command<::ec2::ApiUserData> getTransactionFromLog()
     {
         const std::vector<dao::TransactionLogRecord> allTransactions = readAllTransactions();
         NX_GTEST_ASSERT_EQ(1U, allTransactions.size());
 
-        boost::optional<::ec2::QnTransaction<::ec2::ApiUserData>> transaction =
+        boost::optional<Command<::ec2::ApiUserData>> transaction =
             findTransaction(allTransactions, m_transactionData);
         NX_GTEST_ASSERT_TRUE(static_cast<bool>(transaction));
 
@@ -397,7 +396,7 @@ private:
     //    const std::vector<dao::TransactionLogRecord> allTransactions = readAllTransactions();
     //    ASSERT_EQ(1U, allTransactions.size());
 
-    //    boost::optional<::ec2::QnTransaction<::ec2::ApiUserData>> transaction =
+    //    boost::optional<Command<::ec2::ApiUserData>> transaction =
     //        findTransaction(allTransactions, m_transactionData);
     //    ASSERT_TRUE(static_cast<bool>(transaction));
 
@@ -482,9 +481,9 @@ public:
     };
 
     TestTransactionController(
-        const std::unique_ptr<ec2::TransactionLog>& transactionLog,
-        const api::SystemData& system,
-        const api::AccountData& accountToShareWith)
+        const std::unique_ptr<data_sync_engine::TransactionLog>& transactionLog,
+        const cdb::api::SystemData& system,
+        const cdb::api::AccountData& accountToShareWith)
         :
         m_transactionLog(transactionLog),
         m_system(system),
@@ -527,12 +526,12 @@ public:
     }
 
 private:
-    const std::unique_ptr<ec2::TransactionLog>& m_transactionLog;
-    const api::SystemData m_system;
-    const api::AccountData m_accountToShareWith;
+    const std::unique_ptr<data_sync_engine::TransactionLog>& m_transactionLog;
+    const cdb::api::SystemData m_system;
+    const cdb::api::AccountData m_accountToShareWith;
     State m_completedState;
     State m_desiredState;
-    api::SystemSharingEx m_sharing;
+    cdb::api::SystemSharingEx m_sharing;
     QnMutex m_mutex;
     QnWaitCondition m_cond;
     nx::utils::Counter m_startedAsyncCallsCounter;
@@ -592,7 +591,7 @@ private:
         m_sharing.systemId = m_system.id;
         m_sharing.accountId = m_accountToShareWith.id;
         m_sharing.accountEmail = m_accountToShareWith.email;
-        m_sharing.accessRole = api::SystemAccessRole::advancedViewer;
+        m_sharing.accessRole = cdb::api::SystemAccessRole::advancedViewer;
         m_sharing.vmsUserId =
             guidFromArbitraryData(m_sharing.accountEmail).toSimpleString().toStdString();
     }
@@ -609,7 +608,7 @@ private:
     void addTransactionToLog(nx::utils::db::QueryContext* queryContext)
     {
         ::ec2::ApiUserData userData;
-        convert(m_sharing, &userData);
+        cdb::ec2::convert(m_sharing, &userData);
         userData.isCloud = true;
         userData.fullName = QString::fromStdString(m_accountToShareWith.fullName);
         auto dbResult = m_transactionLog->generateTransactionAndSaveToLog(
@@ -756,13 +755,13 @@ private:
         nx::utils::db::QueryContext* queryContext,
         int originalTransactionIndex)
     {
-        api::SystemSharingEx sharing;
+        cdb::api::SystemSharingEx sharing;
         sharing.systemId = getSystem(0).id;
         const auto& accountToShareWith =
             accounts().at(nx::utils::random::number<std::size_t>(1, accounts().size() - 1));
         sharing.accountId = accountToShareWith.id;
         sharing.accountEmail = accountToShareWith.email;
-        sharing.accessRole = api::SystemAccessRole::advancedViewer;
+        sharing.accessRole = cdb::api::SystemAccessRole::advancedViewer;
 
         // It does not matter for transaction log whether we save application data or not.
         // TODO #ak But, it is still better to mockup data access object here.
@@ -771,7 +770,7 @@ private:
         //    systemSharingController().insertOrReplaceSharing(queryContext, sharing));
 
         ::ec2::ApiUserData userData;
-        convert(sharing, &userData);
+        cdb::ec2::convert(sharing, &userData);
         userData.isCloud = true;
         userData.fullName = QString::fromStdString(accountToShareWith.fullName);
         auto dbResult = transactionLog()->generateTransactionAndSaveToLog(
@@ -834,6 +833,5 @@ TEST_F(FtTransactionLogOverlappingTransactions, multiple_simultaneous_transactio
 }
 
 } // namespace test
-} // namespace ec2
-} // namespace cdb
+} // namespace data_sync_engine
 } // namespace nx

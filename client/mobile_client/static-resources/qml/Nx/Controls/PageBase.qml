@@ -11,8 +11,14 @@ Page
     property int pageStatus: StackView.status
     property bool sideNavigationEnabled: true
     property var screenOrientation: Qt.PrimaryOrientation
+    property alias backgroundColor: backgroundRectangle.color
 
-    background: Rectangle { color: ColorTheme.windowBackground }
+    background: Rectangle
+    {
+        id: backgroundRectangle
+
+        color: ColorTheme.windowBackground
+    }
 
     onSideNavigationEnabledChanged: updateSideNavigation()
     onActivePageChanged:

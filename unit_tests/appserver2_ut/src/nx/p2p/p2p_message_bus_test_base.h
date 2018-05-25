@@ -26,6 +26,7 @@ class P2pMessageBusTestBase: public testing::Test
 public:
 protected:
     static void connectServers(const Appserver2Ptr& srcServer, const Appserver2Ptr& dstServer);
+    static void disconnectServers(const Appserver2Ptr& srcServer, const Appserver2Ptr& dstServer);
 
     static void sequenceConnect(std::vector<Appserver2Ptr>& servers);
     static void circleConnect(std::vector<Appserver2Ptr>& servers);

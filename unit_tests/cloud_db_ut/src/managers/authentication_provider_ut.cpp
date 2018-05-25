@@ -91,6 +91,21 @@ protected:
         whenSharingSystem();
     }
 
+    AccountWithPassword addUserWithoutPassword()
+    {
+        auto account = BusinessDataGenerator::generateRandomAccount();
+        account.statusCode = api::AccountStatus::invited;
+        account.passwordHa1.clear();
+        account.passwordHa1Sha256.clear();
+        account.password.clear();
+
+        m_accountManager.addAccount(account);
+
+        shareSystem(m_systems[0].id, account.email, api::SystemAccessRole::cloudAdmin);
+
+        return account;
+    }
+
     AccountWithPassword addUserWithShortAuthInfoExpirationPeriod()
     {
         return addUserWithAuthInfoExpirationPeriod(std::chrono::seconds(1));
@@ -268,6 +283,13 @@ protected:
 
             std::this_thread::sleep_for(std::chrono::milliseconds(1));
         }
+    }
+
+    void assertUserDoesNotHaveAuthRecord(const AccountWithPassword& userAccount)
+    {
+        const auto userAuthInfo = m_userAuthenticationDao->fetchUserAuthRecords(
+            nullptr, m_systems[0].id, userAccount.id);
+        ASSERT_TRUE(userAuthInfo.records.empty());
     }
 
 private:
@@ -456,6 +478,19 @@ TEST_F(AuthenticationProvider, expired_auth_record_is_updated_eventually)
 
     waitForUserAuthRecordToBeUpdated(user1);
     waitForUserAuthRecordToBeUpdated(user2);
+}
+
+// E.g., invited but not yet activated account does not have password.
+TEST_F(AuthenticationProvider, does_not_try_to_calculate_auth_record_for_user_without_password)
+{
+    givenSystemWithNonce();
+
+    const auto userWithoutPassword = addUserWithoutPassword();
+    const auto userWithShortAuthInfoExpirationPeriod =
+        addUserWithShortAuthInfoExpirationPeriod();
+
+    waitForUserAuthRecordToBeUpdated(userWithShortAuthInfoExpirationPeriod);
+    assertUserDoesNotHaveAuthRecord(userWithoutPassword);
 }
 
 } // namespace test

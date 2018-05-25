@@ -51,5 +51,5 @@ QnAbstractBusinessParamsWidget* QnBusinessActionWidgetFactory::createWidget(
             break;
     }
 
-    return new QnEmptyBusinessActionWidget(parent);
+    return new QnEmptyBusinessActionWidget(actionType, parent);
 }

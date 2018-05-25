@@ -372,11 +372,12 @@ ResourcePoolPeerManagerFactory::ResourcePoolPeerManagerFactory(QnCommonModule* c
 }
 
 AbstractPeerManager* ResourcePoolPeerManagerFactory::createPeerManager(
-    FileInformation::PeerSelectionPolicy peerPolicy)
+    FileInformation::PeerSelectionPolicy peerPolicy,
+    const QList<QnUuid>& additionalPeers)
 {
     return new ResourcePoolPeerManager(
         commonModule(),
-        PeerSelectorFactory::create(peerPolicy, commonModule()));
+        PeerSelectorFactory::create(peerPolicy, additionalPeers, commonModule()));
 }
 
 } // namespace downloader

@@ -47,9 +47,14 @@ NxGlobalsObject::NxGlobalsObject(QObject* parent):
 {
 }
 
-QnUrlHelper NxGlobalsObject::url(const nx::utils::Url& url) const
+utils::Url NxGlobalsObject::url(const QString& url) const
 {
-    return QnUrlHelper(url);
+    return utils::Url(url);
+}
+
+utils::Url NxGlobalsObject::url(const QUrl& url) const
+{
+    return utils::Url::fromQUrl(url);
 }
 
 QnSoftwareVersion NxGlobalsObject::softwareVersion(const QString& version) const

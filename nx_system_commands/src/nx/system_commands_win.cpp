@@ -1,20 +1,25 @@
 #include "system_commands.h"
+#include <utils/common/util.h>
+#include <utils/fs/file.h>
+#include <QtCore/QDir>
 
 namespace nx {
-
 
 SystemCommands::MountCode SystemCommands::mount(
     const std::string& /*url*/,
     const std::string& /*directory*/,
     const boost::optional<std::string>& /*username*/,
     const boost::optional<std::string>& /*password*/,
-    bool /*reportViaSocket*/)
+    bool /*reportViaSocket*/,
+    int /*socketPostfix*/)
 {
     return MountCode::otherError;
 }
 
 SystemCommands::UnmountCode SystemCommands::unmount(
-    const std::string& /*directory*/, bool /*reportViaSocket*/)
+    const std::string& /*directory*/,
+    bool /*reportViaSocket*/,
+    int /*socketPostfix*/)
 {
     return UnmountCode::noPermissions;
 }
@@ -24,14 +29,9 @@ bool SystemCommands::changeOwner(const std::string& /*path*/)
     return false;
 }
 
-bool SystemCommands::touchFile(const std::string& /*filePath*/)
+bool SystemCommands::makeDirectory(const std::string& directoryPath)
 {
-    return false;
-}
-
-bool SystemCommands::makeDirectory(const std::string& /*directoryPath*/)
-{
-    return false;
+    return QDir().mkpath(QString::fromStdString(directoryPath));
 }
 
 bool SystemCommands::install(const std::string& /*debPackage*/)
@@ -55,65 +55,89 @@ std::string SystemCommands::lastError() const
 
 bool SystemCommands::checkMountPermissions(const std::string& /*directory*/)
 {
-    return false;
+    return true;
 }
 
 bool SystemCommands::checkOwnerPermissions(const std::string& /*path*/)
 {
-    return false;
+    return true;
 }
 
-bool SystemCommands::execute(const std::string& /*command*/)
+bool SystemCommands::execute(
+    const std::string& /*command*/,
+    std::function<void(const char*)> /*outputAction*/)
 {
     return false;
-}
-
-SystemCommands::CheckOwnerResult SystemCommands::checkCurrentOwner(const std::string& /*url*/)
-{
-    return CheckOwnerResult::failed;
 }
 
 bool SystemCommands::removePath(const std::string& path)
 {
-    return false;
+    return QDir(QString::fromStdString(path)).removeRecursively();
 }
 
-int SystemCommands::open(const std::string& path, int mode, bool usePipe)
+int SystemCommands::open(
+    const std::string& /*path*/,
+    int /*mode*/,
+    bool /*usePipe*/,
+    int /*socketPostfix*/)
 {
     return -1;
 }
 
-bool SystemCommands::rename(const std::string& /*oldPath*/, const std::string& /*newPath*/)
+bool SystemCommands::rename(const std::string& oldPath, const std::string& newPath)
 {
-    return false;
+    return QFile::rename(QString::fromStdString(oldPath), QString::fromStdString(newPath));
 }
 
-int64_t SystemCommands::freeSpace(const std::string& /*path*/, bool /*reportViaSocket*/)
+int64_t SystemCommands::freeSpace(
+    const std::string& path,
+    bool /*reportViaSocket*/,
+    int /*socketPostfix*/)
 {
-    return -1;
+    return getDiskFreeSpace(QString::fromStdString(path));
 }
 
-int64_t SystemCommands::totalSpace(const std::string& /*path*/, bool /*reportViaSocket*/)
+int64_t SystemCommands::totalSpace(
+    const std::string& path,
+    bool /*reportViaSocket*/,
+    int /*socketPostfix*/)
 {
-    return -1;
+    return getDiskTotalSpace(QString::fromStdString(path));
 }
 
-bool SystemCommands::isPathExists(const std::string& path, bool reportViaSocket)
+bool SystemCommands::isPathExists(
+    const std::string& path,
+    bool /*reportViaSocket*/,
+    int /*socketPostfix*/)
 {
-    return false;
+    return QFileInfo::exists(QString::fromStdString(path));
 }
 
-std::string SystemCommands::serializedFileList(const std::string& path, bool reportViaSocket)
+std::string SystemCommands::serializedFileList(
+    const std::string& /*path*/,
+    bool /*reportViaSocket*/,
+    int /*socketPostfix*/)
 {
     return "";
 }
 
-int64_t SystemCommands::fileSize(const std::string& path, bool reportViaSocket)
+int64_t SystemCommands::fileSize(
+    const std::string& path,
+    bool /*reportViaSocket*/,
+    int /*socketPostfix*/)
 {
-    return -1;
+    return QnFile::getFileSize(QString::fromStdString(path));
 }
 
-std::string SystemCommands::devicePath(const std::string& path, bool reportViaSocket)
+std::string SystemCommands::devicePath(
+    const std::string& path,
+    bool /*reportViaSocket*/,
+    int /*socketPostfix*/)
+{
+    return path;
+}
+
+std::string SystemCommands::serializedDmiInfo(bool /*reportViaSocket*/, int /*socketPostfix*/)
 {
     return "";
 }

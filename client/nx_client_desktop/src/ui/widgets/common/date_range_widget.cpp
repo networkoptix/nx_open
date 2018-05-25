@@ -10,7 +10,7 @@
 #include <core/resource/media_server_resource.h>
 
 #include <ui/workbench/workbench_context.h>
-#include <ui/workbench/watchers/workbench_server_time_watcher.h>
+#include <nx/client/core/watchers/server_time_watcher.h>
 
 namespace {
 
@@ -133,5 +133,6 @@ QDateTime QnDateRangeWidget::actualDateTime(const QDate& userDate) const
 
 QDate QnDateRangeWidget::displayDate(qint64 timestampMs) const
 {
-    return context()->instance<QnWorkbenchServerTimeWatcher>()->displayTime(timestampMs).date();
+    const auto timeWatcher = context()->instance<nx::client::core::ServerTimeWatcher>();
+    return timeWatcher->displayTime(timestampMs).date();
 }

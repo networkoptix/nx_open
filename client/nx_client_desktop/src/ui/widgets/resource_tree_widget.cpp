@@ -618,7 +618,7 @@ void QnResourceTreeWidget::expandNodeIfNeeded(const QModelIndex& index)
 {
     bool needExpand = m_autoExpandPolicy
         ? m_autoExpandPolicy(index)
-        : true;
+        : false;
 
     if (needExpand)
         ui->resourcesTreeView->expand(index);

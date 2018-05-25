@@ -6,8 +6,7 @@
 #include <nx/network/http/server/abstract_http_request_handler.h>
 
 namespace nx {
-namespace cdb {
-namespace ec2 {
+namespace data_sync_engine {
 
 template<typename ManagerType>
 class SyncConnectionRequestHandler:
@@ -68,6 +67,5 @@ private:
     }
 };
 
-} // namespace ec2
-} // namespace cdb
+} // namespace data_sync_engine
 } // namespace nx

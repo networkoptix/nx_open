@@ -80,6 +80,18 @@ private:
     friend NX_UTILS_API QDataStream& operator>>(QDataStream& s, QnUuid& id);
 };
 
+/**
+ * Wrapper to be used for overloading as a distinct type for camera-related API requests.
+ * Flexible camera id string is converted to QnUuid from the HTTP request parameter during
+ * deserialization.
+ */
+class QnCameraUuid: public QnUuid
+{
+public:
+    QnCameraUuid() = default;
+    QnCameraUuid(const QnUuid& id): QnUuid(id) {}
+};
+
 namespace std
 {
     template<>

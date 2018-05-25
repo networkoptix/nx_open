@@ -11,6 +11,7 @@
 #include <utils/math/math.h>
 #include <utils/media/frame_info.h>
 #include <utils/color_space/yuvconvert.h>
+#include <translation/datetime_formatter.h>
 
 #include "core/resource/resource_media_layout.h"
 
@@ -121,9 +122,9 @@ CLVideoDecoderOutputPtr QnTimeImageFilter::updateImage(const CLVideoDecoderOutpu
     displayTime += m_params.displayOffset;
 
     if (displayTime * 1000 >= UTC_TIME_DETECTION_THRESHOLD)
-        timeStr = QDateTime::fromMSecsSinceEpoch(displayTime).toString(QLatin1String("yyyy-MMM-dd hh:mm:ss"));
+        timeStr = datetime::toString(displayTime);
     else
-        timeStr = QTime(0, 0, 0, 0).addMSecs(displayTime).toString(QLatin1String("hh:mm:ss.zzz"));
+        timeStr = datetime::toString(displayTime, datetime::Format::hh_mm_ss_zzz);
 
     initTimeDrawing(frame, timeStr);
 

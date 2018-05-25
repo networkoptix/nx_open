@@ -1,3 +1,4 @@
+import getpass
 import logging
 import subprocess
 from collections import namedtuple
@@ -11,8 +12,8 @@ from cryptography.hazmat.primitives.asymmetric import rsa
 from netaddr.ip import IPAddress
 from pathlib2 import Path
 
-from framework.os_access.args import sh_command_to_script
-from framework.os_access.ssh_access import SSHAccess
+from framework.os_access.posix_shell import SSH
+from framework.os_access.posix_shell_utils import sh_command_to_script
 from framework.waiting import wait_for_true
 
 _logger = logging.getLogger(__name__)
@@ -27,7 +28,7 @@ def _generate_keys():
         )
     private_key = key.private_bytes(
         crypto_serialization.Encoding.PEM,
-        crypto_serialization.PrivateFormat.PKCS8,
+        crypto_serialization.PrivateFormat.TraditionalOpenSSL,  # Paramiko accepts '-----BEGIN RSA PRIVATE KEY-----".
         crypto_serialization.NoEncryption())
     public_key = key.public_key().public_bytes(
         crypto_serialization.Encoding.OpenSSH,
@@ -47,7 +48,7 @@ def _write_config(config, path):
 @pytest.fixture(scope='session')
 def ad_hoc_ssh_dir():
     path = Path.home() / '.func_tests/ad_hoc_ssh'
-    rmtree(str(path))
+    rmtree(str(path), ignore_errors=True)
     path.mkdir(exist_ok=True)
     return path
 
@@ -78,7 +79,7 @@ def ad_hoc_client_private_key(ad_hoc_client_key_pair):
 _SSHHost = namedtuple('SSHHost', ['hostname', 'port'])
 
 
-@pytest.fixture(scope='session')
+@pytest.fixture()
 def ad_hoc_ssh_server(ad_hoc_ssh_dir, ad_hoc_client_public_key, ad_hoc_host_key):
     ip = IPAddress('127.0.0.1')
     port = 60022
@@ -102,7 +103,7 @@ def ad_hoc_ssh_server(ad_hoc_ssh_dir, ad_hoc_client_public_key, ad_hoc_host_key)
         }
     host_config_path = ad_hoc_ssh_dir / 'host_config'
     _write_config(host_config, host_config_path)
-    sshd_command = ['/usr/sbin/sshd', '-D', '-ddd', '-f', str(host_config_path), '-p', str(port)]
+    sshd_command = ['/usr/sbin/sshd', '-D', '-d', '-f', str(host_config_path), '-p', str(port)]
     _logger.info('RUN: %s', sh_command_to_script(sshd_command))
     process = subprocess.Popen(sshd_command, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 
@@ -118,31 +119,12 @@ def ad_hoc_ssh_server(ad_hoc_ssh_dir, ad_hoc_client_public_key, ad_hoc_host_key)
     process.terminate()  # Hangs because of SSH client connection pool.
 
 
-@pytest.fixture(scope='session')
-def ad_hoc_ssh_client_config(ad_hoc_ssh_dir, ad_hoc_client_private_key):
-    client_private_key_path = ad_hoc_ssh_dir / 'ad_hoc_client_private_key'
-    client_private_key_path.write_bytes(ad_hoc_client_private_key)
-    client_private_key_path.chmod(0o600)
-    connections_dir = ad_hoc_ssh_dir / 'connections'  # Required, debug SSH server supports only one connection.
-    connections_dir.mkdir()
-    client_config = {
-        'IdentityFile': client_private_key_path,
-        'BatchMode': 'yes',
-        'EscapeChar': 'none',
-        'LogLevel': 'VERBOSE',
-        'StrictHostKeyChecking': 'no',
-        'UserKnownHostsFile': '/dev/null',
-        'ControlMaster': 'auto',
-        'ControlPersist': '10m',
-        'ControlPath': connections_dir / '%r@%h:%p.ssh.sock',
-        }
-    client_config_path = ad_hoc_ssh_dir / 'client_config'
-    _write_config(client_config, client_config_path)
-    return client_config_path
-
-
-@pytest.fixture(scope='session')
-def ad_hoc_ssh_access(ad_hoc_ssh_server, ad_hoc_ssh_client_config):
-    ssh_access = SSHAccess(ad_hoc_ssh_server.hostname, ad_hoc_ssh_server.port, config_path=ad_hoc_ssh_client_config)
-    wait_for_true(ssh_access.is_working, "SSH access to ad-hoc server is working")
-    return ssh_access
+@pytest.fixture()
+def ad_hoc_ssh(ad_hoc_ssh_dir, ad_hoc_ssh_server, ad_hoc_client_private_key):
+    client_key_path = ad_hoc_ssh_dir / 'client_key'
+    client_key_path.write_bytes(ad_hoc_client_private_key)
+    client_key_path.chmod(0o600)
+    ssh = SSH(ad_hoc_ssh_server.hostname, ad_hoc_ssh_server.port, getpass.getuser(), client_key_path)
+    _logger.debug(ssh)
+    wait_for_true(ssh.is_working)
+    return ssh

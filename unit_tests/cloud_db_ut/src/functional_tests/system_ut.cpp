@@ -679,7 +679,7 @@ TEST_F(FtSystemNotification, notification_of_system_removal)
             ASSERT_EQ(
                 timePassedSinceSystemRemoval < kSystemGoneForeverPeriod
                     ? api::ResultCode::credentialsRemovedPermanently
-                    : api::ResultCode::notAuthorized,
+                    : api::ResultCode::badUsername,
                 getCdbNonce(system1.id, system1.authKey, &nonceData));
 
             // Checking HTTP status code.

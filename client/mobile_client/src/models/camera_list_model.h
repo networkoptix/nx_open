@@ -1,8 +1,9 @@
 #pragma once
 
-#include <client_core/connection_context_aware.h>
-
 #include <QtCore/QSortFilterProxyModel>
+
+#include <client_core/connection_context_aware.h>
+#include <nx/utils/uuid.h>
 
 class QnCameraListModelPrivate;
 
@@ -10,6 +11,8 @@ class QnCameraListModel: public QSortFilterProxyModel, public QnConnectionContex
 {
     Q_OBJECT
 
+    Q_PROPERTY(QVariant filterIds READ filterIds WRITE setFilterIds
+        NOTIFY filterIdsChanged)
     Q_PROPERTY(QString layoutId READ layoutId WRITE setLayoutId NOTIFY layoutIdChanged)
     Q_PROPERTY(int count READ count NOTIFY countChanged)
 
@@ -27,6 +30,9 @@ public:
     QString layoutId() const;
     void setLayoutId(const QString& layoutId);
 
+    QVariant filterIds() const;
+    void setFilterIds(const QVariant& ids);
+
     int count() const;
 
     Q_INVOKABLE int rowByResourceId(const QString& resourceId) const;
@@ -42,6 +48,7 @@ public slots:
 signals:
     void layoutIdChanged();
     void countChanged();
+    void filterIdsChanged();
 
 protected:
     virtual bool lessThan(const QModelIndex& left, const QModelIndex& right) const override;

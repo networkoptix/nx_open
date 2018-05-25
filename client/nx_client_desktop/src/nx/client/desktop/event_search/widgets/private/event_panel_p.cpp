@@ -13,6 +13,7 @@
 #include <ui/style/custom_style.h>
 #include <ui/style/skin.h>
 #include <nx/client/desktop/common/widgets/search_line_edit.h>
+#include <ui/workaround/hidpi_workarounds.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_display.h>
 #include <ui/workbench/workbench_navigator.h>
@@ -96,9 +97,9 @@ EventPanel::Private::Private(EventPanel* q):
     connect(q->context()->display(), &QnWorkbenchDisplay::widgetChanged,
         this, &Private::currentWorkbenchWidgetChanged, Qt::QueuedConnection);
 
-    setupEventSearch();
     setupMotionSearch();
     setupBookmarkSearch();
+    setupEventSearch();
     setupAnalyticsSearch();
 
     connect(m_notificationsTab, &NotificationListWidget::tileHovered, q, &EventPanel::tileHovered);
@@ -107,33 +108,104 @@ EventPanel::Private::Private(EventPanel* q):
         connect(tab, &UnifiedSearchWidget::tileHovered, q, &EventPanel::tileHovered);
 
     setupTabsSyncWithNavigator();
+
+    q->setContextMenuPolicy(Qt::CustomContextMenu);
+    connect(q, &EventPanel::customContextMenuRequested,
+        this, &EventPanel::Private::showContextMenu);
+
 }
 
-EventPanel::Private::~Private()
-{
-}
+EventPanel::Private::~Private() = default;
 
-void EventPanel::Private::addCameraTabs()
+void EventPanel::Private::updateTabs()
 {
-    NX_ASSERT(m_tabs->count() == kPermanentTabCount);
+    const bool hasVideo = m_camera && m_camera->hasVideo();
+    const bool hasMotion = hasVideo && m_camera->hasFlags(Qn::motion);
 
-    if (m_camera->hasFlags(Qn::motion))
-    {
-        m_tabs->addTab(m_motionTab, qnSkin->icon(lit("events/tabs/motion.png")),
-            tr("Motion", "Motion tab title"));
-    }
-    m_tabs->addTab(m_bookmarksTab, qnSkin->icon(lit("events/tabs/bookmarks.png")),
+    int nextTabIndex = kPermanentTabCount;
+
+    const auto updateTab =
+        [this, &nextTabIndex](QWidget* tab, bool visible, const QIcon& icon, const QString& text)
+        {
+            const int index = m_tabs->indexOf(tab);
+            if (visible)
+            {
+                if (index < 0)
+                    m_tabs->insertTab(nextTabIndex, tab, icon, text);
+                else
+                    NX_ASSERT(index == nextTabIndex);
+
+                ++nextTabIndex;
+            }
+            else
+            {
+                if (index >= 0)
+                {
+                    NX_ASSERT(index == nextTabIndex);
+                    m_tabs->removeTab(index);
+                }
+            }
+        };
+
+    updateTab(m_motionTab, hasMotion, qnSkin->icon(lit("events/tabs/motion.png")),
+        tr("Motion", "Motion tab title"));
+
+    updateTab(m_bookmarksTab, m_camera != nullptr, qnSkin->icon(lit("events/tabs/bookmarks.png")),
         tr("Bookmarks", "Bookmarks tab title"));
-    m_tabs->addTab(m_eventsTab, qnSkin->icon(lit("events/tabs/events.png")),
+
+    updateTab(m_eventsTab, m_camera != nullptr, qnSkin->icon(lit("events/tabs/events.png")),
         tr("Events", "Events tab title"));
-    m_tabs->addTab(m_analyticsTab, qnSkin->icon(lit("events/tabs/analytics.png")),
+
+    updateTab(m_analyticsTab, hasVideo, qnSkin->icon(lit("events/tabs/analytics.png")),
         tr("Objects", "Analytics tab title"));
 }
 
-void EventPanel::Private::removeCameraTabs()
+void EventPanel::Private::setupMotionSearch()
 {
-    while (m_tabs->count() > kPermanentTabCount)
-        m_tabs->removeTab(kPermanentTabCount);
+    auto model = new UnifiedAsyncSearchListModel(m_motionModel, this);
+    m_motionTab->setModel(model);
+    m_motionTab->setPlaceholderIcon(qnSkin->pixmap(lit("events/placeholders/motion.png")));
+
+    m_motionTab->filterEdit()->hide();
+    m_motionTab->showPreviewsButton()->show();
+
+    connect(m_motionModel, &MotionSearchListModel::totalCountChanged, this,
+        [this](int totalCount)
+        {
+            m_motionTab->counterLabel()->setText(totalCount
+                ? tr("%n motion events", "", totalCount)
+                : QString());
+        });
+}
+
+void EventPanel::Private::setupBookmarkSearch()
+{
+    static const QString kHtmlPlaceholder =
+        lit("<center><p>%1</p><p><font size='-3'>%2</font></p></center>")
+            .arg(tr("No bookmarks"))
+            .arg(tr("Select some period on timeline and click "
+                "with right mouse button on it to create a bookmark."));
+    m_bookmarksTab->setModel(new UnifiedAsyncSearchListModel(m_bookmarksModel, this));
+    m_bookmarksTab->setPlaceholderTexts(tr("No bookmarks"), kHtmlPlaceholder);
+    m_bookmarksTab->setPlaceholderIcon(qnSkin->pixmap(lit("events/placeholders/bookmarks.png")));
+    m_bookmarksTab->showPreviewsButton()->show();
+
+    connect(m_bookmarksTab->filterEdit(), &SearchLineEdit::textChanged, m_bookmarksModel,
+        [this](const QString& text)
+        {
+            m_bookmarksModel->setFilterText(text);
+            m_bookmarksTab->requestFetch();
+        });
+
+    m_bookmarksTab->counterLabel()->setText(QString());
+    connectToRowCountChanges(m_bookmarksModel,
+        [this]()
+        {
+            const auto count = m_bookmarksModel->rowCount();
+            m_bookmarksTab->counterLabel()->setText(count > 0
+                ? (count > 99 ? tr(">99 bookmarks") : tr("%n bookmarks", "", count))
+                : QString());
+        });
 }
 
 void EventPanel::Private::setupEventSearch()
@@ -197,55 +269,6 @@ void EventPanel::Private::setupEventSearch()
             const auto count = m_eventsModel->rowCount();
             m_eventsTab->counterLabel()->setText(count
                 ? (count > 99 ? tr(">99 events") : tr("%n events", "", count))
-                : QString());
-        });
-}
-
-void EventPanel::Private::setupMotionSearch()
-{
-    auto model = new UnifiedAsyncSearchListModel(m_motionModel, this);
-    m_motionTab->setModel(model);
-    //m_motionTab->setPlaceholderTexts(tr("No events"), tr("No events occured"));
-    m_motionTab->setPlaceholderIcon(qnSkin->pixmap(lit("events/placeholders/motion.png")));
-
-    m_motionTab->filterEdit()->hide();
-    m_motionTab->showPreviewsButton()->show();
-
-    connect(m_motionModel, &MotionSearchListModel::totalCountChanged, this,
-        [this](int totalCount)
-        {
-            m_motionTab->counterLabel()->setText(totalCount
-                ? tr("%n motion events", "", totalCount)
-                : QString());
-        });
-}
-
-void EventPanel::Private::setupBookmarkSearch()
-{
-    static const QString kHtmlPlaceholder =
-        lit("<center><p>%1</p><p><font size='-3'>%2</font></p></center>")
-            .arg(tr("No bookmarks"))
-            .arg(tr("Select some period on timeline and click "
-                "with right mouse button on it to create a bookmark."));
-    m_bookmarksTab->setModel(new UnifiedAsyncSearchListModel(m_bookmarksModel, this));
-    m_bookmarksTab->setPlaceholderTexts(tr("No bookmarks"), kHtmlPlaceholder);
-    m_bookmarksTab->setPlaceholderIcon(qnSkin->pixmap(lit("events/placeholders/bookmarks.png")));
-    m_bookmarksTab->showPreviewsButton()->show();
-
-    connect(m_bookmarksTab->filterEdit(), &SearchLineEdit::textChanged, m_bookmarksModel,
-        [this](const QString& text)
-        {
-            m_bookmarksModel->setFilterText(text);
-            m_bookmarksTab->requestFetch();
-        });
-
-    m_bookmarksTab->counterLabel()->setText(QString());
-    connectToRowCountChanges(m_bookmarksModel,
-        [this]()
-        {
-            const auto count = m_bookmarksModel->rowCount();
-            m_bookmarksTab->counterLabel()->setText(count
-                ? (count > 99 ? tr(">99 bookmarks") : tr("%n bookmarks", "", count))
                 : QString());
         });
 }
@@ -315,15 +338,7 @@ void EventPanel::Private::setCamera(const QnVirtualCameraResourcePtr& camera)
     m_bookmarksModel->setCamera(camera);
     m_analyticsModel->setCamera(camera);
 
-    if (camera)
-    {
-        if (m_tabs->count() == kPermanentTabCount)
-            addCameraTabs();
-    }
-    else
-    {
-        removeCameraTabs();
-    }
+    updateTabs();
 }
 
 void EventPanel::Private::currentWorkbenchWidgetChanged(Qn::ItemRole role)
@@ -472,6 +487,17 @@ void EventPanel::Private::connectToRowCountChanges(QAbstractItemModel* model,
     connect(model, &QAbstractItemModel::modelReset, this, handler);
     connect(model, &QAbstractItemModel::rowsInserted, this, handler);
     connect(model, &QAbstractItemModel::rowsRemoved, this, handler);
+}
+
+void EventPanel::Private::showContextMenu(const QPoint& pos)
+{
+    QMenu contextMenu;
+    contextMenu.addAction(q->action(ui::action::OpenBusinessLogAction));
+    contextMenu.addAction(q->action(ui::action::BusinessEventsAction));
+    contextMenu.addAction(q->action(ui::action::PreferencesNotificationTabAction));
+    contextMenu.addSeparator();
+    contextMenu.addAction(q->action(ui::action::PinNotificationsAction));
+    contextMenu.exec(QnHiDpiWorkarounds::safeMapToGlobal(q, pos));
 }
 
 } // namespace desktop

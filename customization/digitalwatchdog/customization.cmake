@@ -4,7 +4,8 @@ set(defaultSkin "dark_orange")
 
 # Components Namings
 set(display.product.name "DW Spectrum")
-set(display.mobile.name "DW Spectrum")
+set(display_mobile_name "DW Spectrum")
+set(mobile_bundle_name "DWSpectrum")
 set(product.name "DW Spectrum")
 set(product.name.short "dwspectrum")
 set(product.appName "dwspectrum")

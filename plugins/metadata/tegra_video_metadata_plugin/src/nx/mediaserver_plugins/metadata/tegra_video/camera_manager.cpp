@@ -97,7 +97,7 @@ std::string CameraManager::capabilitiesManifest()
     )manifest";
 }
 
-bool CameraManager::pushCompressedFrame(const CommonCompressedVideoPacket* videoPacket)
+bool CameraManager::pushCompressedFrame(const CompressedVideoPacket* videoPacket)
 {
     TegraVideo::CompressedFrame compressedFrame;
     compressedFrame.dataSize = videoPacket->dataSize();
@@ -131,7 +131,7 @@ bool CameraManager::pullRectsForFrame(std::vector<TegraVideo::Rect>* rects, int6
     return true;
 }
 
-bool CameraManager::pushCompressedVideoFrame(const CommonCompressedVideoPacket* videoFrame)
+bool CameraManager::pushCompressedVideoFrame(const CompressedVideoPacket* videoFrame)
 {
     if (!pushCompressedFrame(videoFrame))
         return false;

@@ -2,8 +2,8 @@
 
 #include <plugins/plugin_tools.h>
 
+#include <nx/sdk/metadata/compressed_video_packet.h>
 #include <nx/sdk/metadata/common_metadata_packet.h>
-#include <nx/sdk/metadata/common_compressed_video_packet.h>
 
 #include <nx/mediaserver_plugins/metadata/deepstream/deepstream_common.h>
 #include <nx/mediaserver_plugins/metadata/deepstream/openalpr_common.h>

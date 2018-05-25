@@ -63,11 +63,11 @@ private:
         HandlerPtr handler,
         const nx::api::AnalyticsDriverManifest& manifest);
     void clearManagers();
-    void setVideoFrameDataReceptor(const QSharedPointer<VideoDataReceptor>& receptor);
+    void setVideoDataReceptor(const QSharedPointer<VideoDataReceptor>& receptor);
     void setMetadataDataReceptor(QWeakPointer<QnAbstractDataReceptor> receptor);
 
     ManagerList& managers();
-    QSharedPointer<VideoDataReceptor> videoFrameDataReceptor() const;
+    QSharedPointer<VideoDataReceptor> videoDataReceptor() const;
     QWeakPointer<QnAbstractDataReceptor> metadataDataReceptor() const;
 
     void setManagersInitialized(bool value);
@@ -79,7 +79,7 @@ protected:
 private:
     ManagerList m_managers;
 
-    QSharedPointer<VideoDataReceptor> m_videoFrameDataReceptor;
+    QSharedPointer<VideoDataReceptor> m_videoDataReceptor;
     QWeakPointer<QnAbstractDataReceptor> m_metadataReceptor;
     nx::api::AnalyticsDriverManifest m_pluginManifest;
     bool m_isManagerInitialized = false;

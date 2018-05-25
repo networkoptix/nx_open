@@ -13,6 +13,7 @@ def create_mediaserver_debug_file(binaries_dir, output_filename):
         'plugins/generic_multicast_plugin.pdb',
         'plugins/genericrtspplugin.pdb',
         'plugins/hanwha_metadata_plugin.pdb',
+        'plugins/dw_mtt_metadata_plugin.pdb',
         'plugins/hikvision_metadata_plugin.pdb',
         'plugins/axis_metadata_plugin.pdb',
         'plugins/vca_metadata_plugin.pdb',

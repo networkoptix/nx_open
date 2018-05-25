@@ -11,8 +11,9 @@ import framework.utils as utils
 import server_api_data_generators as generator
 from framework.api_shortcuts import get_server_id
 from framework.merging import setup_local_system
-from framework.os_access.args import sh_quote_arg
 from framework.os_access.exceptions import NonZeroExitStatus
+from framework.os_access.posix_shell_utils import sh_quote_arg
+from framework.waiting import wait_for_true
 
 log = logging.getLogger(__name__)
 
@@ -20,6 +21,7 @@ log = logging.getLogger(__name__)
 BACKUP_STORAGE_PATH = Path('/mnt/backup')
 BACKUP_STORAGE_READY_TIMEOUT_SEC = 60  # seconds
 BACKUP_SCHEDULE_TIMEOUT_SEC = 60       # seconds
+BACKUP_STORAGE_APPEARS_TIMEOUT_SEC = 60
 
 # Camera backup types
 BACKUP_DISABLED = 0  # backup disabled
@@ -52,7 +54,7 @@ DF_SIZE_REGEX = re.compile(r'^.*\s+([0-9\.]+)G$', re.MULTILINE)
 
 class LinuxVMVolume(object):
     def __init__(self, ssh_access):
-        self._ssh_access = ssh_access  # SSHAccess
+        self._ssh_access = ssh_access  # SSH
 
     def _need_create(self, mount_point, size_gb):
         try:
@@ -113,20 +115,20 @@ def second_camera_backup_type(request):
 
 
 @pytest.fixture
-def linux_vm_volume(linux_mediaserver):
-    return LinuxVMVolume(linux_mediaserver.machine.os_access)
+def linux_vm_volume(one_mediaserver):
+    return LinuxVMVolume(one_mediaserver.machine.os_access)
 
 
 @pytest.fixture
-def server(linux_mediaserver, linux_vm_volume, system_backup_type):
+def server(one_mediaserver, linux_vm_volume, system_backup_type):
     config_file_params = dict(minStorageSpace=1024*1024)  # 1M
-    linux_mediaserver.installation.update_mediaserver_conf(config_file_params)
+    one_mediaserver.installation.update_mediaserver_conf(config_file_params)
     linux_vm_volume.ensure_volume_exists(BACKUP_STORAGE_PATH)
-    linux_mediaserver.machine.os_access.run_sh_script('rm -rfv {}/*'.format(sh_quote_arg(str(BACKUP_STORAGE_PATH))))
-    linux_mediaserver.start()
-    setup_local_system(linux_mediaserver, {})
-    linux_mediaserver.api.api.systemSettings.GET(backupQualities=system_backup_type)
-    return linux_mediaserver
+    one_mediaserver.machine.os_access.run_sh_script('rm -rfv {}/*'.format(sh_quote_arg(str(BACKUP_STORAGE_PATH))))
+    one_mediaserver.start()
+    setup_local_system(one_mediaserver, {})
+    one_mediaserver.api.api.systemSettings.GET(backupQualities=system_backup_type)
+    return one_mediaserver
 
 
 def wait_storage_ready(server, storage_guid):
@@ -155,13 +157,23 @@ def change_and_assert_server_backup_type(server, expected_backup_type):
     assert (expected_backup_type and attributes[0]['backupType'] == expected_backup_type)
 
 
-def add_backup_storage(server):
+def get_storage(server, storage_path):
     storage_list = [s for s in server.api.ec2.getStorages.GET()
-                    if str(BACKUP_STORAGE_PATH) in s['url'] and s['usedForWriting']]
-    assert len(storage_list) == 1, 'Mediaserver did not accept storage %r' % BACKUP_STORAGE_PATH
-    storage = storage_list[0]
+                    if str(storage_path) in s['url'] and s['usedForWriting']]
+    if storage_list:
+        assert len(storage_list) == 1
+        return storage_list[0]
+    else:
+        return None
+
+def add_backup_storage(server):
+    storage = wait_for_true(
+        lambda: get_storage(server, BACKUP_STORAGE_PATH),
+        BACKUP_STORAGE_APPEARS_TIMEOUT_SEC)
+    assert storage, 'Mediaserver did not accept storage %r in %r seconds' % (
+        BACKUP_STORAGE_PATH, BACKUP_STORAGE_APPEARS_TIMEOUT_SEC)
     storage['isBackup'] = True
-    server.api.ec2.saveStorage.POST(**storage)
+    server.rest_api.ec2.saveStorage.POST(**storage)
     wait_storage_ready(server, storage['id'])
     change_and_assert_server_backup_type(server, 'BackupManual')
     return Path(storage['url'])

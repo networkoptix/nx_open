@@ -13,6 +13,8 @@
 #include "managers/managers_types.h"
 #include "stree/cdb_ns.h"
 
+namespace nx { namespace data_sync_engine { class SyncronizationEngine; } }
+
 namespace nx {
 namespace cdb {
 
@@ -27,7 +29,6 @@ class SystemManager;
 class AbstractSystemHealthInfoProvider;
 
 namespace conf { class Settings; }
-namespace ec2{ class SyncronizationEngine; }
 
 class HttpView
 {
@@ -55,7 +56,7 @@ private:
         AbstractSystemHealthInfoProvider* const systemHealthInfoProvider,
         AuthenticationProvider* const authProvider,
         EventManager* const eventManager,
-        ec2::SyncronizationEngine* const ec2SyncronizationEngine,
+        data_sync_engine::SyncronizationEngine* const ec2SyncronizationEngine,
         MaintenanceManager* const maintenanceManager,
         const CloudModuleUrlProvider& cloudModuleUrlProviderDeprecated,
         const CloudModuleUrlProvider& cloudModuleUrlProvider);

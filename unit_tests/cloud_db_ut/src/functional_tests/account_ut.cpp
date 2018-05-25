@@ -16,6 +16,7 @@
 #include <nx/utils/app_info.h>
 #include <nx/utils/test_support/utils.h>
 #include <nx/utils/time.h>
+#include <nx/utils/std/optional.h>
 #include <nx/utils/sync_call.h>
 
 #include <nx/cloud/cdb/api/cloud_nonce.h>
@@ -356,8 +357,6 @@ TEST_F(Account, request_query_decode)
     //waiting for cloud_db initialization
     ASSERT_TRUE(startAndWaitUntilStarted());
 
-    api::ResultCode result = api::ResultCode::ok;
-
     std::string account1Password = "12352";
     api::AccountData account1;
     account1.email = "test%40yandex.ru";
@@ -382,25 +381,19 @@ TEST_F(Account, request_query_decode)
     activationCode = QJson::deserialized<api::AccountConfirmationCode>(responseBody);
     ASSERT_TRUE(!activationCode.code.empty());
 
-    //api::AccountConfirmationCode activationCode;
-    //result = addAccount(&account1, &account1Password, &activationCode);
-    //ASSERT_EQ(result, api::ResultCode::ok);
-    //ASSERT_EQ(account1.customization, nx::utils::AppInfo::customizationName().toStdString());
-    //ASSERT_TRUE(!activationCode.code.empty());
-
     std::string activatedAccountEmail;
-    result = activateAccount(activationCode, &activatedAccountEmail);
-    ASSERT_EQ(result, api::ResultCode::ok);
+    ASSERT_EQ(api::ResultCode::ok, activateAccount(activationCode, &activatedAccountEmail));
     ASSERT_EQ(
         nx::utils::Url::fromPercentEncoding(account1.email.c_str()).toStdString(),
         activatedAccountEmail);
 
-    result = getAccount(account1.email, account1Password, &account1);
-    ASSERT_EQ(result, api::ResultCode::notAuthorized);  //test%40yandex.ru MUST be unknown email
+    // test%40yandex.ru MUST be unknown email.
+    ASSERT_EQ(
+        api::ResultCode::badUsername,
+        getAccount(account1.email, account1Password, &account1));
 
     account1.email = "test@yandex.ru";
-    result = getAccount(account1.email, account1Password, &account1);
-    ASSERT_EQ(result, api::ResultCode::ok);
+    ASSERT_EQ(api::ResultCode::ok, getAccount(account1.email, account1Password, &account1));
     ASSERT_EQ(account1.customization, nx::utils::AppInfo::customizationName().toStdString());
     ASSERT_EQ(account1.statusCode, api::AccountStatus::activated);
     ASSERT_EQ(account1.email, "test@yandex.ru");
@@ -488,7 +481,7 @@ TEST_F(Account, reset_password_general)
         result = getAccount(account1.email, account1Password, &account1);
         ASSERT_EQ(api::ResultCode::ok, result);
 
-        if (i == 1)
+        if (i > 0)
         {
             ASSERT_TRUE(restart());  //checking that code is valid after cloud_db restart
         }
@@ -566,7 +559,7 @@ TEST_F(Account, reset_password_expiration)
 
     for (int i = 0; i < 2; ++i)
     {
-        if (i == 1)
+        if (i > 0)
         {
             ASSERT_TRUE(restart());
         }
@@ -682,7 +675,7 @@ TEST_F(Account, reset_password_authorization)
 
     for (int i = 0; i < 2; ++i)
     {
-        if (i == 1)
+        if (i > 0)
         {
             ASSERT_TRUE(restart());
         }
@@ -743,53 +736,6 @@ TEST_F(Account, reset_password_authorization)
     ASSERT_EQ(api::ResultCode::notAuthorized, result);  //tmpPassword is removed
 }
 
-TEST_F(Account, reset_password_activates_account)
-{
-    ASSERT_TRUE(startAndWaitUntilStarted());
-
-    //adding account
-    api::AccountData account1;
-    std::string account1Password;
-    api::AccountConfirmationCode activationCode;
-    api::ResultCode result = addAccount(&account1, &account1Password, &activationCode);
-    ASSERT_EQ(result, api::ResultCode::ok);
-    ASSERT_EQ(account1.customization, nx::utils::AppInfo::customizationName().toStdString());
-    ASSERT_TRUE(!activationCode.code.empty());
-
-    //user did not activate account and forgot password
-
-    //resetting password
-    std::string confirmationCode;
-    result = resetAccountPassword(account1.email, &confirmationCode);
-    ASSERT_EQ(api::ResultCode::ok, result);
-
-    //confirmation code has format base64(tmp_password:email)
-    const auto tmpPasswordAndEmail = QByteArray::fromBase64(
-        QByteArray::fromRawData(confirmationCode.data(), confirmationCode.size()));
-    const std::string tmpPassword = tmpPasswordAndEmail.mid(0, tmpPasswordAndEmail.indexOf(':')).constData();
-
-    //setting new password
-    std::string account1NewPassword = "new_password";
-
-    api::AccountUpdateData update;
-    update.passwordHa1 = nx::network::http::calcHa1(
-        account1.email.c_str(),
-        moduleInfo().realm.c_str(),
-        account1NewPassword.c_str()).constData();
-    result = updateAccount(account1.email, tmpPassword, update);
-    ASSERT_EQ(api::ResultCode::ok, result);
-
-    result = getAccount(account1.email, account1NewPassword, &account1);
-    ASSERT_EQ(api::ResultCode::ok, result);
-    ASSERT_EQ(api::AccountStatus::activated, account1.statusCode);
-
-    ASSERT_TRUE(restart());
-
-    result = getAccount(account1.email, account1NewPassword, &account1);
-    ASSERT_EQ(api::ResultCode::ok, result);
-    ASSERT_EQ(api::AccountStatus::activated, account1.statusCode);
-}
-
 TEST_F(Account, created_while_sharing)
 {
     EmailManagerMocked mockedEmailManager;
@@ -837,7 +783,7 @@ TEST_F(Account, created_while_sharing)
 
     for (int i = 0; i < 2; ++i)
     {
-        if (i == 1)
+        if (i > 0)
         {
             ASSERT_TRUE(restart());
         }
@@ -872,10 +818,31 @@ public:
     {
     }
 
+    ~AccountNewTest()
+    {
+        if (m_emailManagerFactoryBak)
+            EMailManagerFactory::setFactory(std::move(*m_emailManagerFactoryBak));
+    }
+
 protected:
     virtual void SetUp() override
     {
+        using namespace std::placeholders;
+
+        m_emailManager.setOnReceivedNotification(
+            std::bind(&AccountNewTest::notificationReceived, this, _1));
+
+        m_emailManagerFactoryBak = EMailManagerFactory::setFactory(
+            [this](const conf::Settings& /*settings*/)
+            {
+                return std::make_unique<EmailManagerStub>(&m_emailManager);
+            });
+
         ASSERT_TRUE(startAndWaitUntilStarted());
+    }
+
+    virtual void notificationReceived(const nx::cdb::AbstractNotification& /*notification*/)
+    {
     }
 
     void givenNotActivatedAccount()
@@ -887,6 +854,22 @@ protected:
         ASSERT_TRUE(!m_activationCode.code.empty());
         m_registrationTimeRange.second =
             nx::utils::floor<std::chrono::milliseconds>(nx::utils::utcTime());
+    }
+
+    void givenActivatedAccount()
+    {
+        givenNotActivatedAccount();
+        whenActivateAccount();
+    }
+
+    void useWrongAccountPassword()
+    {
+        m_passwordToUse = nx::utils::generateRandomName(7).toStdString();
+    }
+
+    void useUnknownAccountLogin()
+    {
+        m_usernameToUse = BusinessDataGenerator::generateRandomEmailAddress();
     }
 
     void whenShiftedSystemTime()
@@ -905,6 +888,32 @@ protected:
             nx::utils::floor<std::chrono::milliseconds>(nx::utils::utcTime());
     }
 
+    void whenRestoreAccountPassword()
+    {
+        std::string confirmationCode;
+        ASSERT_EQ(
+            api::ResultCode::ok,
+            resetAccountPassword(m_account.email, &confirmationCode));
+
+        // Confirmation code has format base64(tmp_password:email).
+        const auto tmpPasswordAndEmail = QByteArray::fromBase64(
+            QByteArray::fromRawData(confirmationCode.data(), confirmationCode.size()));
+        const std::string tmpPassword =
+            tmpPasswordAndEmail.mid(0, tmpPasswordAndEmail.indexOf(':')).constData();
+
+        const std::string newPassword = nx::utils::generateRandomName(7).toStdString();
+
+        api::AccountUpdateData update;
+        update.passwordHa1 = nx::network::http::calcHa1(
+            m_account.email.c_str(),
+            moduleInfo().realm.c_str(),
+            newPassword.c_str()).constData();
+        ASSERT_EQ(api::ResultCode::ok, updateAccount(m_account.email, tmpPassword, update));
+
+        m_account.password = newPassword;
+        m_account.passwordHa1 = *update.passwordHa1;
+    }
+
     void whenRestartedCloudDb()
     {
         ASSERT_TRUE(restart());
@@ -913,7 +922,10 @@ protected:
     void whenRequestAccountInfo()
     {
         api::AccountData accountData;
-        m_prevResultCode = getAccount(m_account.email, m_account.password, &accountData);
+        m_prevResultCode = getAccount(
+            m_usernameToUse ? *m_usernameToUse : m_account.email,
+            m_passwordToUse ? *m_passwordToUse : m_account.password,
+            &accountData);
     }
 
     void whenRequestSystemList()
@@ -978,7 +990,11 @@ private:
     api::AccountConfirmationCode m_activationCode;
     TimeRange m_registrationTimeRange;
     TimeRange m_activationTimeRange;
-    boost::optional<api::ResultCode> m_prevResultCode;
+    std::optional<api::ResultCode> m_prevResultCode;
+    std::optional<std::string> m_usernameToUse;
+    std::optional<std::string> m_passwordToUse;
+    TestEmailManager m_emailManager;
+    std::optional<EMailManagerFactory::FactoryFunc> m_emailManagerFactoryBak;
 
     api::AccountData getFreshAccountCopy()
     {
@@ -1008,7 +1024,16 @@ TEST_F(AccountNewTest, account_timestamps)
     assertActivationTimestampIsCorrect();
 }
 
-TEST_F(AccountNewTest, proper_error_code_is_reported_when_using_not_activated_account)
+//-------------------------------------------------------------------------------------------------
+
+class AccountFailedAuthenticationResultCodes:
+    public AccountNewTest
+{
+};
+
+TEST_F(
+    AccountFailedAuthenticationResultCodes,
+    proper_error_code_is_reported_when_using_not_activated_account)
 {
     givenNotActivatedAccount();
 
@@ -1017,6 +1042,27 @@ TEST_F(AccountNewTest, proper_error_code_is_reported_when_using_not_activated_ac
 
     whenRequestSystemList();
     thenResultCodeIs(api::ResultCode::accountNotActivated);
+}
+
+TEST_F(
+    AccountFailedAuthenticationResultCodes,
+    unauthorized_is_reported_when_existing_user_uses_wrong_password)
+{
+    givenActivatedAccount();
+
+    useWrongAccountPassword();
+    whenRequestAccountInfo();
+
+    thenResultCodeIs(api::ResultCode::notAuthorized);
+}
+
+TEST_F(
+    AccountFailedAuthenticationResultCodes,
+    badUsername_is_reported_when_using_unknown_username)
+{
+    useUnknownAccountLogin();
+    whenRequestAccountInfo();
+    thenResultCodeIs(api::ResultCode::badUsername);
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -1058,11 +1104,40 @@ protected:
 
     void thenAccountIsActivated()
     {
-        api::AccountData accountData;
+        for (int i = 0; i < 2; ++i)
+        {
+            if (i > 0)
+                whenRestartedCloudDb();
+
+            api::AccountData accountData;
+            ASSERT_EQ(
+                api::ResultCode::ok,
+                getAccount(account().email, account().password, &accountData));
+            ASSERT_EQ(api::AccountStatus::activated, accountData.statusCode);
+
+            constexpr auto maxAllowedDiff = std::chrono::hours(1);
+            ASSERT_GT(accountData.activationTime, nx::utils::utcTime() - maxAllowedDiff);
+            ASSERT_LT(accountData.activationTime, nx::utils::utcTime() + maxAllowedDiff);
+        }
+    }
+
+    void assertNotificationContainsFullName()
+    {
         ASSERT_EQ(
-            api::ResultCode::ok,
-            getAccount(account().email, account().password, &accountData));
-        ASSERT_EQ(api::AccountStatus::activated, accountData.statusCode);
+            account().fullName,
+            m_activateNotifications.back().message.userFullName);
+    }
+
+private:
+    std::vector<ActivateAccountNotification> m_activateNotifications;
+
+    virtual void notificationReceived(
+        const nx::cdb::AbstractNotification& notification) override
+    {
+        const auto activateNotification =
+            dynamic_cast<const ActivateAccountNotification*>(&notification);
+        if (activateNotification)
+            m_activateNotifications.push_back(*activateNotification);
     }
 };
 
@@ -1083,6 +1158,19 @@ TEST_F(
     thenAccountIsActivated();
 }
 
+TEST_F(AccountActivation, account_can_be_activated_by_password_reset)
+{
+    givenNotActivatedAccount();
+    whenRestoreAccountPassword();
+    thenAccountIsActivated();
+}
+
+TEST_F(AccountActivation, activate_notification_contains_full_name)
+{
+    givenNotActivatedAccount();
+    assertNotificationContainsFullName();
+}
+
 //-------------------------------------------------------------------------------------------------
 
 class AccountInvite:
@@ -1094,11 +1182,6 @@ public:
     AccountInvite():
         m_timeShift(nx::utils::test::ClockType::system)
     {
-    }
-
-    ~AccountInvite()
-    {
-        EMailManagerFactory::setFactory(std::move(m_emailManagerFactoryBak));
     }
 
 protected:
@@ -1178,27 +1261,14 @@ protected:
     }
 
 private:
-    TestEmailManager m_emailManager;
     std::string m_newAccountEmail;
     std::vector<api::SystemData> m_systems;
-    EMailManagerFactory::FactoryFunc m_emailManagerFactoryBak;
     std::vector<InviteUserNotification> m_inviteNotifications;
     nx::utils::test::ScopedTimeShift m_timeShift;
 
     virtual void SetUp() override
     {
-        using namespace std::placeholders;
-
         constexpr const std::size_t kSystemCount = 7;
-
-        m_emailManager.setOnReceivedNotification(
-            std::bind(&AccountInvite::notificationReceived, this, _1));
-
-        m_emailManagerFactoryBak = EMailManagerFactory::setFactory(
-            [this](const conf::Settings& /*settings*/)
-            {
-                return std::make_unique<EmailManagerStub>(&m_emailManager);
-            });
 
         base_type::SetUp();
 
@@ -1212,7 +1282,8 @@ private:
             system = addRandomSystemToAccount(account());
     }
 
-    void notificationReceived(const nx::cdb::AbstractNotification& notification)
+    virtual void notificationReceived(
+        const nx::cdb::AbstractNotification& notification) override
     {
         const auto inviteNotification =
             dynamic_cast<const InviteUserNotification*>(&notification);
@@ -1227,13 +1298,13 @@ TEST_F(AccountInvite, invite_code_contains_email)
     assertInviteCodeContainsEmail();
 }
 
-TEST_F(AccountInvite, invite_code_from_multiple_systems_match)
+TEST_F(AccountInvite, inviting_same_user_to_different_systems_produce_same_invite_link)
 {
     whenInvitedSameNotRegisteredUserToMultipleSystems();
     thenSameInviteCodeHasBeenDelivered();
 }
 
-TEST_F(AccountInvite, repeated_invite_after_last_invite_link_expiration)
+TEST_F(AccountInvite, repeating_invite_after_previous_invite_link_has_expired_is_ok)
 {
     inviteUser();
     waitForInviteLinkToExpire();

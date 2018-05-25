@@ -126,7 +126,7 @@ bool SqlQueryExecutionHelper::execSQLFile(
 
     if (!execSQLScript(data, database))
     {
-        NX_LOG(lit("Error while executing SQL file %1").arg(fileName), cl_logERROR);
+        NX_LOG(lm("Error while executing SQL file %1").arg(fileName), cl_logERROR);
         return false;
     }
     return true;

@@ -8,8 +8,7 @@ namespace nx {
 
 class TestResourceFactory:
     public QObject,
-    public QnResourceFactory,
-    public Singleton<TestResourceFactory>
+    public QnResourceFactory
 {
     Q_OBJECT
 public:

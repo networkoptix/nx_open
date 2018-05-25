@@ -2,15 +2,16 @@
 
 #include <string>
 #include <map>
+#include <vector>
 
 #include <plugins/plugin_tools.h>
 #include <nx/sdk/utils.h>
 
 #include "plugin.h"
 #include "consuming_camera_manager.h"
-#include "common_compressed_video_packet.h"
-#include "common_uncompressed_video_frame.h"
 #include "objects_metadata_packet.h"
+#include "compressed_video_packet.h"
+#include "uncompressed_video_frame.h"
 
 namespace nx {
 namespace sdk {
@@ -50,26 +51,22 @@ protected:
     /**
      * Override to accept next compressed video frame for processing. Should not block the caller
      * thread for long.
-     * @param videoFrame Contains a pointer to the compressed video frame raw bytes. If the plugin
-     *     manifest declares "needDeepCopyOfVideoFrames" in "capabilities", the lifetime (validity)
-     *     of this pointer is the same as of videoFrame. Otherwise, the pointer is valid only until
-     *     and during the subsequent call to pullMetadataPackets(), even if the lifetime of
-     *     videoFrame is extended by addRef() or queryInterface() inside this method.
+     * @param videoFrame Contains a pointer to the compressed video frame raw bytes. The lifetime
+     *     (validity) of this pointer is the same as of videoFrame. Thus, it can be extended by
+     *     addRef() or queryInterface() inside this method.
      */
-    virtual bool pushCompressedVideoFrame(const CommonCompressedVideoPacket* /*videoFrame*/)
+    virtual bool pushCompressedVideoFrame(const CompressedVideoPacket* /*videoFrame*/)
     {
         return true;
     }
 
     /**
      * Override to accept next uncompressed video frame for processing.
-     * @param videoFrame Contains a pointer to the uncompressed video frame raw bytes. If the plugin
-     *     manifest declares "needDeepCopyOfVideoFrames" in "capabilities", the lifetime (validity)
-     *     of this pointer is the same as of videoFrame. Otherwise, the pointer is valid only until
-     *     and during the subsequent call to pullMetadataPackets(), even if the lifetime of
-     *     videoFrame is extended by addRef() or queryInterface() inside this method.
+     * @param videoFrame Contains a pointer to the compressed video frame raw bytes. The lifetime
+     *     (validity) of this pointer is the same as of videoFrame. Thus, it can be extended by
+     *     addRef() or queryInterface() inside this method.
      */
-    virtual bool pushUncompressedVideoFrame(const CommonUncompressedVideoFrame* /*videoFrame*/)
+    virtual bool pushUncompressedVideoFrame(const UncompressedVideoFrame* /*videoFrame*/)
     {
         return true;
     }

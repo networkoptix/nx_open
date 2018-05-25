@@ -79,7 +79,7 @@ nx::mediaserver::resource::StreamCapabilityMap HikvisionResource::getStreamCapab
 
 CameraDiagnostics::Result HikvisionResource::initializeCameraDriver()
 {
-    tryToEnableIntegrationProtocols(getDeviceOnvifUrl(), getAuth());
+    m_isIsapiSupported = tryToEnableIntegrationProtocols(getDeviceOnvifUrl(), getAuth());
     return QnPlOnvifResource::initializeCameraDriver();
 }
 
@@ -94,14 +94,20 @@ CameraDiagnostics::Result HikvisionResource::initializeMedia(
     auto resourceData = qnStaticCommon->dataPool()->data(toSharedPointer(this));
     bool hevcIsDisabled = resourceData.value<bool>(Qn::DISABLE_HEVC_PARAMETER_NAME, false);
 
-    if (!hevcIsDisabled)
+    if (!hevcIsDisabled && m_isIsapiSupported)
     {
         for (const auto& role: kRoles)
         {
             hikvision::ChannelCapabilities channelCapabilities;
             auto result = fetchChannelCapabilities(role, &channelCapabilities);
             if (!result)
-                return result;
+            {
+                NX_DEBUG(this, 
+                    lm("Unable to fetch channel capabilities on %1 by ISAPI, fallback to ONVIF")
+                    .args(getUrl()));
+
+                return base_type::initializeMedia(onvifCapabilities);
+            }
 
             m_channelCapabilitiesByRole[role] = channelCapabilities;
             m_hevcSupported = hikvision::codecSupported(
@@ -177,6 +183,9 @@ CameraDiagnostics::Result HikvisionResource::fetchChannelCapabilities(
 
 QnAudioTransmitterPtr HikvisionResource::initializeTwoWayAudio()
 {
+    if (!m_isIsapiSupported)
+        return QnPlOnvifResource::initializeTwoWayAudio();
+
     auto httpClient = getHttpClient();
 
     nx::utils::Url requestUrl(getUrl());

@@ -21,7 +21,7 @@ reload(sys)
 sys.setdefaultencoding("utf-8")
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-LOCAL_ENVIRONMENT = False
+LOCAL_ENVIRONMENT = 'runserver' in sys.argv
 conf = get_config()
 
 CUSTOMIZATION = os.getenv('CUSTOMIZATION')
@@ -35,7 +35,7 @@ if not CUSTOMIZATION:
 SECRET_KEY = '03-b9bxxpjxsga(qln0@3szw3+xnu%6ph_l*sz-xr_4^xxrj!_'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = 'debug' in conf and conf['debug']
+DEBUG = 'debug' in conf and conf['debug'] or LOCAL_ENVIRONMENT
 
 ALLOWED_HOSTS = ['*']
 
@@ -163,7 +163,7 @@ CACHES = {
 PRIMARY_PRODUCT = "cloud_portal"
 
 if LOCAL_ENVIRONMENT:
-    conf["cloud_db"]["url"] = 'https://cloud-dev.hdw.mx/cdb'
+    conf["cloud_db"]["url"] = 'https://cloud-dev2.hdw.mx/cdb'
     CACHES["global"] = {
         'BACKEND': 'django.core.cache.backends.db.DatabaseCache',
         'LOCATION': 'portal_cache',
@@ -325,8 +325,8 @@ AUTHENTICATION_BACKENDS = ('api.account_backend.AccountBackend', )
 CORS_ORIGIN_ALLOW_ALL = True  # TODO: Change this value on production!
 CORS_ALLOW_CREDENTIALS = True
 
-SESSION_COOKIE_SECURE = True
-CSRF_COOKIE_SECURE = True
+SESSION_COOKIE_SECURE = not LOCAL_ENVIRONMENT
+CSRF_COOKIE_SECURE = not LOCAL_ENVIRONMENT
 
 USE_ASYNC_QUEUE = True
 
@@ -387,6 +387,7 @@ DOWNLOADS_JSON = 'http://updates.hdwitness.com.s3.amazonaws.com/{{customization}
 DOWNLOADS_VERSION_JSON = 'http://updates.hdwitness.com.s3.amazonaws.com/{{customization}}/{{build}}/downloads.json'
 
 MAX_RETRIES = conf['max_retries']
+CLEAR_HISTORY_RECORDS_OLDER_THAN_X_DAYS = 30
 
 SUPERUSER_DOMAIN = '@networkoptix.com'  # Only user from this domain can have superuser permissions
 

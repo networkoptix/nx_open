@@ -64,12 +64,12 @@
     </message>
     <message>
       <source>New System</source>
-      <translation type="unfinished">New System</translation>
+      <translation>Nuovo sistema</translation>
     </message>
     <message>
       <source>The discovered System %1 is incompatible with the current System.</source>
       <comment>%1 is name of System</comment>
-      <translation type="unfinished">The discovered System %1 is incompatible with the current System.</translation>
+      <translation>Il sistema scoperto %1 è incompatibile con il sistema attuale.</translation>
     </message>
     <message>
       <source>Cannot connect to the other System because current System is already connected to %1.</source>
@@ -79,7 +79,7 @@
     <message>
       <source>%1 System can only be merged with non-%1. System name and password are taken from %1 System.</source>
       <comment>%1 is the short cloud name (like Cloud)</comment>
-      <translation type="unfinished">%1 System can only be merged with non-%1. System name and password are taken from %1 System.</translation>
+      <translation>%1 Il sistema può essere unito solo a quelli non%1. Il nome del sistema e la password sono presi da %1 Sistema.</translation>
     </message>
     <message>
       <source>Both Systems are connected to %1. Merge is not allowed.</source>
@@ -304,19 +304,19 @@
     </message>
     <message>
       <source>First, try to turn on recording (if it is off) and decrease fps in device settings (error &quot;%1&quot;).</source>
-      <translation type="unfinished">First, try to turn on recording (if it is off) and decrease fps in device settings (error &quot;%1&quot;).</translation>
+      <translation>Innanzitutto, provare ad attivare la registrazione (se è disattivata) e ridurre l'impostazione fps del dispositivo).</translation>
     </message>
     <message>
       <source>First, try to turn on recording (if it is off) and decrease fps in camera settings (error &quot;%1&quot;).</source>
-      <translation type="unfinished">First, try to turn on recording (if it is off) and decrease fps in camera settings (error &quot;%1&quot;).</translation>
+      <translation>Innanzitutto, provare ad attivare la registrazione (se è disattivata) e ridurre l'impostazione fps del dispositivo).</translation>
     </message>
     <message>
       <source>First, try to turn on recording (if it is off) and decrease fps in I/O module settings (error &quot;%1&quot;).</source>
-      <translation type="unfinished">First, try to turn on recording (if it is off) and decrease fps in I/O module settings (error &quot;%1&quot;).</translation>
+      <translation>Innanzitutto, provare ad attivare la registrazione (se è disattivata) e ridurre i fps nelle impostazioni del modulo I / O (errore &quot;%1&quot;).</translation>
     </message>
     <message>
       <source>Please update firmware. Minimal supported version is %1. Current version is %2</source>
-      <translation type="unfinished">Please update firmware. Minimal supported version is %1. Current version is %2</translation>
+      <translation>Si prega di aggiornare il firmware. La versione minima supportata è %1. La versione corrente è %2</translation>
     </message>
   </context>
   <context>
@@ -561,8 +561,8 @@
       <translation>Errore sconosciuto</translation>
     </message>
     <message>
-      <source>Server with matching Hardware Id not found</source>
-      <translation>Server con Id hardware corrispondente non trovato</translation>
+      <source>Server with matching Hardware ID not found</source>
+      <translation>Server con ID Hardware corrispondente non trovato</translation>
     </message>
   </context>
   <context>
@@ -684,12 +684,12 @@
       <translation>Filigrana: %1</translation>
     </message>
     <message>
-      <source>Hardware Id: %1</source>
-      <translation>Id hardware: %1</translation>
-    </message>
-    <message>
       <source>Time License</source>
       <translation>Licenza a tempo</translation>
+    </message>
+    <message>
+      <source>Hardware ID: %1</source>
+      <translation>ID Hardware: %1</translation>
     </message>
   </context>
   <context>

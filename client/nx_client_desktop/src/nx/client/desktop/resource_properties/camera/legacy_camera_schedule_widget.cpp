@@ -21,6 +21,7 @@
 
 #include <nx/client/desktop/ui/actions/action_manager.h>
 #include <nx/client/desktop/common/utils/checkbox_utils.h>
+#include <nx/client/desktop/common/widgets/hint_button.h>
 #include <nx/client/desktop/common/utils/aligner.h>
 #include <nx/client/desktop/common/utils/stream_quality_strings.h>
 
@@ -35,7 +36,6 @@
 #include <ui/workaround/widgets_signals_workaround.h>
 #include <ui/widgets/common/snapped_scrollbar.h>
 #include <ui/widgets/properties/legacy_archive_length_widget.h>
-#include <ui/workbench/watchers/workbench_panic_watcher.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_access_controller.h>
 
@@ -135,6 +135,10 @@ LegacyCameraScheduleWidget::LegacyCameraScheduleWidget(QWidget* parent, bool sna
     ui->qualityComboBox->setCurrentIndex(ui->qualityComboBox->findData((int)Qn::StreamQuality::high));
 
     setHelpTopic(ui->exportScheduleButton, Qn::CameraSettings_Recording_Export_Help);
+
+    ui->qualityLabel->setHint(tr("Quality setting determines the compression rate only, and does not affect resolution. Low, Medium, High and Best are preset bitrate values."));
+    auto settingsHint = nx::client::desktop::HintButton::hintThat(ui->settingsGroupBox);
+    settingsHint->addHintLine(tr("First choose a recording option, then apply it to day and time blocks on the recording schedule. (0 block is 12:00am to 1:00am, 23 block is 11:00pm to 12:00am.)"));
 
     // init buttons
     updateColors();
@@ -381,17 +385,14 @@ void LegacyCameraScheduleWidget::retranslateUi()
     ui->scheduleGridGroupBox->setTitle(lit("%1\t(%2)").arg(
         tr("Recording Schedule")).arg(
         tr("based on server time")));
+
+    // Adding some spaces to the caption, to allocate some space for hint button.
+    // Otherwise hint button will intersect the frame border
+    ui->settingsGroupBox->setTitle(ui->settingsGroupBox->title() + lit("      "));
 }
 
 void LegacyCameraScheduleWidget::afterContextInitialized()
 {
-    connect(
-        context()->instance<QnWorkbenchPanicWatcher>(),
-        &QnWorkbenchPanicWatcher::panicModeChanged,
-        this,
-        &LegacyCameraScheduleWidget::updatePanicLabelText);
-    updatePanicLabelText();
-
     connect(
         context(),
         &QnWorkbenchContext::userChanged,
@@ -550,7 +551,6 @@ void LegacyCameraScheduleWidget::loadDataToUi()
     ui->archiveLengthWidget->updateFromResources(m_cameras);
 
     updateScheduleEnabled();
-    updatePanicLabelText();
     updateMotionButtons();
     updateLicensesLabelText();
     updateGridParams();
@@ -721,23 +721,6 @@ void LegacyCameraScheduleWidget::setExportScheduleButtonEnabled(bool enabled)
 {
     ui->exportScheduleButton->setEnabled(enabled);
     ui->exportWarningLabel->setVisible(!enabled);
-}
-
-void LegacyCameraScheduleWidget::updatePanicLabelText()
-{
-    ui->panicModeLabel->setText(tr("Off"));
-    ui->panicModeLabel->setPalette(this->palette());
-
-    if (!context())
-        return;
-
-    if (context()->instance<QnWorkbenchPanicWatcher>()->isPanicMode())
-    {
-        QPalette palette = this->palette();
-        palette.setColor(QPalette::WindowText, QColor(255, 0, 0));
-        ui->panicModeLabel->setPalette(palette);
-        ui->panicModeLabel->setText(tr("On"));
-    }
 }
 
 QnScheduleTaskList LegacyCameraScheduleWidget::scheduleTasks() const
@@ -1063,6 +1046,7 @@ void LegacyCameraScheduleWidget::updateRecordingParamsAvailable()
         [](const QnVirtualCameraResourcePtr& camera)
         {
             return camera->hasVideo(0)
+                && camera->getVendor() != lit("GENERIC_RTSP")
                 && !camera->hasParam(Qn::NO_RECORDING_PARAMS_PARAM_NAME);
         });
 

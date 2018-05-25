@@ -4,8 +4,9 @@
 #include <list>
 #include <map>
 
-#include <nx/network/socket_common.h>
 #include <nx/network/abstract_socket.h>
+#include <nx/network/http/server/proxy/proxy_handler.h>
+#include <nx/network/socket_common.h>
 #include <nx/utils/basic_service_settings.h>
 #include <nx/utils/log/log_initializer.h>
 #include <nx/utils/log/log_settings.h>
@@ -49,15 +50,17 @@ public:
     bool allowTargetEndpointInUrl;
     bool sslSupport;
     QString sslCertPath;
+    std::chrono::milliseconds connectionInactivityTimeout;
 
     Http();
 };
 
-enum class SslMode
+class Proxy
 {
-    followIncomingConnection,
-    enabled,
-    disabled,
+public:
+    std::chrono::milliseconds targetConnectionInactivityTimeout;
+
+    Proxy();
 };
 
 struct TcpReverseOptions
@@ -76,7 +79,8 @@ public:
     QString fetchPublicIpUrl;
     QString publicIpAddress;
     TcpReverseOptions tcpReverse;
-    SslMode preferedSslMode = SslMode::followIncomingConnection;
+    nx::network::http::server::proxy::SslMode preferedSslMode =
+        nx::network::http::server::proxy::SslMode::followIncomingConnection;
 };
 
 /**
@@ -100,6 +104,7 @@ public:
     const Auth& auth() const;
     const Tcp& tcp() const;
     const Http& http() const;
+    const Proxy& proxy() const;
     const CloudConnect& cloudConnect() const;
     const relaying::Settings& listeningPeer() const;
 
@@ -112,6 +117,7 @@ private:
     Auth m_auth;
     Tcp m_tcp;
     Http m_http;
+    Proxy m_proxy;
     CloudConnect m_cloudConnect;
     relaying::Settings m_listeningPeer;
 };

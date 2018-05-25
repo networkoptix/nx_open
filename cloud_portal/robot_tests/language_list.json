@@ -1,0 +1,19 @@
+{
+    "en_US"    :    "EnglishUS",
+    "en_GB"    :    "EnglishGB",
+    "ru_RU"    :    "Russian",
+    "fr_FR"    :    "French",
+    "de_DE"    :    "German",
+    "es_ES"    :    "Spanish",
+    "hu_HU"    :    "Hungarian",
+    "zh_CN"    :    "Chinese",
+    "zh_TW"    :    "Taiwanese",
+    "ja_JP"    :    "Japanese",
+    "ko_KR"    :    "Korean",
+    "tr_TR"    :    "Turkish",
+    "th_TH"    :    "Thai",
+    "nl_NL"    :    "Dutch",
+    "he_IL"    :    "Hebrew",
+    "pl_PL"    :    "Polish",
+    "vi_VN"    :    "Vietnamese"
+}

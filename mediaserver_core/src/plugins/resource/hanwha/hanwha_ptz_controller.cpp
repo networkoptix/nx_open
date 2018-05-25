@@ -162,8 +162,6 @@ bool HanwhaPtzController::getPosition(Qn::PtzCoordinateSpace space, QVector3D* p
         return false;
 
     HanwhaRequestHelper helper(m_hanwhaResource->sharedContext());
-    helper.setIgnoreMutexAnalyzer(true);
-
     const auto response = helper.view(
         lit("ptzcontrol/query"),
         {

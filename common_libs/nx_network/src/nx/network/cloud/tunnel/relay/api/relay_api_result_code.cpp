@@ -92,6 +92,11 @@ SystemError::ErrorCode toSystemError(ResultCode resultCode)
     }
 }
 
+std::string toString(ResultCode resultCode)
+{
+    return QnLexical::serialized(resultCode).toStdString();
+}
+
 //-------------------------------------------------------------------------------------------------
 // Support of nx::network::http::FusionRequestResult
 

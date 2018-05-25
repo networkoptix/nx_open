@@ -47,10 +47,10 @@ public:
     {
         InputData inputData;
         QString command = path.split(L'/').last();
-        parseHttpRequestParams(command, params, &inputData);
+        parseHttpRequestParams(owner->commonModule(), command, params, &inputData);
 
         Qn::SerializationFormat format = Qn::JsonFormat;
-        parseHttpRequestParams(command, params, &format);
+        parseHttpRequestParams(owner->commonModule(), command, params, &format);
 
         ErrorCode errorCode = ErrorCode::ok;
         bool finished = false;

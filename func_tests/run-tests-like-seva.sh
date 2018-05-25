@@ -8,7 +8,6 @@ fi
 
 shift
 
-# export VAGRANT_LOG=debug
 export PYTHONPATH=$HOME/Development/devtools/ci/junk_shop
 export PYTEST_PLUGINS=junk_shop.pytest_plugin
 

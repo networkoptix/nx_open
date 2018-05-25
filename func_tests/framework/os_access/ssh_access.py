@@ -1,74 +1,54 @@
 import datetime
-import logging
+import timeit
 
 import pytz
-from pathlib2 import Path
+from pylru import lrudecorator
 
-from framework.os_access.args import sh_augment_script, sh_command_to_script
-from framework.os_access.exceptions import exit_status_error_cls
-from framework.os_access.local_access import LocalAccess
-from framework.os_access.ssh_path import SSHPath
+from framework.networking.linux import LinuxNetworking
+from framework.os_access.os_access_interface import OSAccess
+from framework.os_access.posix_shell import SSH
+from framework.os_access.ssh_path import make_ssh_path_cls
 from framework.utils import RunningTime
 
-_logger = logging.getLogger(__name__)
 
+class SSHAccess(OSAccess):
+    def __init__(self, forwarded_ports, macs, username, key_path):
+        self._macs = macs
+        ssh_hostname, ssh_port = forwarded_ports['tcp', 22]
+        self.ssh = SSH(ssh_hostname, ssh_port, username, key_path)
+        self._forwarded_ports = forwarded_ports
 
-class SSHAccess(object):
-    def __init__(self, hostname, port, config_path=Path(__file__).with_name('ssh_config')):
-        self.hostname = hostname
-        self.config_path = config_path
-        self.port = port
-        self.ssh_command = ['ssh', '-F', config_path, '-p', port]
+    @property
+    def forwarded_ports(self):
+        return self._forwarded_ports
 
-        class _SSHPath(SSHPath):
-            """SSHPath type for this connection. isinstance should be supported."""
+    @property
+    @lrudecorator(100)
+    def Path(self):
+        return make_ssh_path_cls(self.ssh)
 
-            @staticmethod
-            def _ssh_access():
-                # TODO: Use weak ref to avoid circular dependencies.
-                return self
+    def run_command(self, command, input=None):
+        return self.ssh.run_command(command, input=input)
 
-        self.Path = _SSHPath
+    def is_accessible(self):
+        return self.ssh.is_working()
 
-    def __repr__(self):
-        return '<SSHAccess {} {}>'.format(sh_command_to_script(self.ssh_command), self.hostname)
+    @property
+    @lrudecorator(1)
+    def networking(self):
+        return LinuxNetworking(self.ssh, self._macs)
 
-    def run_command(self, command, input=None, cwd=None, timeout_sec=60, env=None):
-        script = sh_command_to_script(command)
-        output = self.run_sh_script(script, input=input, cwd=cwd, timeout_sec=timeout_sec, env=env)
-        return output
+    def get_time(self):
+        started_at = timeit.default_timer()
+        timestamp_output = self.run_command(['date', '+%s'])
+        delay_sec = timeit.default_timer() - started_at
+        timestamp = int(timestamp_output.rstrip())
+        timezone_name = self.Path('/etc/timezone').read_text().rstrip()
+        timezone = pytz.timezone(timezone_name)
+        local_time = datetime.datetime.fromtimestamp(timestamp, tz=timezone)
+        return RunningTime(local_time, datetime.timedelta(seconds=delay_sec))
 
-    def run_sh_script(self, script, input=None, cwd=None, timeout_sec=60, env=None):
-        augmented_script = sh_augment_script(script, cwd, env)
-        _logger.debug("Run on %r:\n%s", self, augmented_script)
-        output = LocalAccess().run_command(
-            self.ssh_command + [self.hostname] + ['\n' + augmented_script + '\n'],
-            input=input,
-            timeout_sec=timeout_sec)
-        return output
-
-    def is_working(self):
-        try:
-            self.run_sh_script(':')
-        except exit_status_error_cls(255):
-            return False
-        return True
-
-    def set_time(self, new_time):  # type: (SSHAccess, datetime.datetime) -> RunningTime
-        # TODO: Make a separate Time class.
+    def set_time(self, new_time):
         started_at = datetime.datetime.now(pytz.utc)
         self.run_command(['date', '--set', new_time.isoformat()])
         return RunningTime(new_time, datetime.datetime.now(pytz.utc) - started_at)
-
-    def first_setup(self):
-        """Run once when VM is just created."""
-        self.run_sh_script(
-            # language=Bash
-            '''
-                # Mediaserver may crash several times during one test, all cores are kept.
-                CORE_PATTERN_FILE='/etc/sysctl.d/60-core-pattern.conf'
-                echo 'kernel.core_pattern=core.%t.%p' > "$CORE_PATTERN_FILE"  # %t is timestamp, %p is pid.
-                sysctl -p "$CORE_PATTERN_FILE"  # See: https://superuser.com/questions/
-                apt-get update
-                apt-get --assume-yes install gdb # Required to create stack traces from core dumps.
-                ''')

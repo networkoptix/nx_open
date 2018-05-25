@@ -979,7 +979,7 @@ to view more bookmarks</source>
       <translation>重置次數已達此授權的上限.</translation>
     </message>
     <message>
-      <source>Hardware Id of Server with this license does not match Hardware Id on which license was activated.</source>
+      <source>Hardware ID of Server with this license does not match Hardware ID on which license was activated.</source>
       <translation>此硬體ID與前次啟動本授權的硬體ID不符合</translation>
     </message>
   </context>
@@ -1123,13 +1123,13 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>File name &quot;%1&quot; is reserved by operating system. Please try another name.</source>
-      <translation type="unfinished">File name &quot;%1&quot; is reserved by operating system. Please try another name.</translation>
+      <translation>檔案 &quot;%1&quot; 正被使用中. 請嘗試另一個名稱.</translation>
     </message>
     <message numerus="yes">
       <source>File name must not contain the following reserved characters:</source>
       <comment>Plural relates to the word _characters_ here, not _file name_.</comment>
-      <translation type="unfinished">
-        <numerusform>File name must not contain the following reserved characters:</numerusform>
+      <translation>
+        <numerusform>檔名不可包含以下字元:</numerusform>
       </translation>
     </message>
   </context>
@@ -1396,6 +1396,14 @@ to view more bookmarks</source>
       <source>Folder not found</source>
       <translation>找不到資料夾</translation>
     </message>
+    <message>
+      <source>Helps avoid problems with OpenGL drawing which result in 100% CPU load.</source>
+      <translation>使用 OpenGL 繪圖有助於避免產生 100% CPU 負載的問題。</translation>
+    </message>
+    <message>
+      <source>Adjust to smallest value that does not degrade live view. Bigger buffer makes playback smoother but increases delay between real time and live view; smaller buffer decreases delay but can cause stutters.</source>
+      <translation>調整到最小值不影響即時預覽。緩衝區越大會使迴放更平順, 但會延遲即時播放; 緩衝區越小可以減少延遲，但可能會導致播放停頓。</translation>
+    </message>
   </context>
   <context>
     <name>QnArchiveLengthWidget</name>
@@ -1406,6 +1414,14 @@ to view more bookmarks</source>
     <message>
       <source>High minimum value can lead to archive length decrease on other cameras.</source>
       <translation>過高的最小值可能會導致其它攝影機上的錄影天數減少.</translation>
+    </message>
+    <message>
+      <source>Sets when camera archive will be deleted or saved when there is no space for new recordings.</source>
+      <translation>當錄影空間不夠時, 請設定攝影機存檔應被刪除或儲存。</translation>
+    </message>
+    <message>
+      <source>&quot;Auto&quot; deletes the oldest footage first, regardless of the source.</source>
+      <translation>&quot;自動&quot; 優先刪除最早的錄影, 不考慮來源。</translation>
     </message>
   </context>
   <context>
@@ -2171,18 +2187,6 @@ to view more bookmarks</source>
       <translation>載入...</translation>
     </message>
     <message>
-      <source>Primary Stream</source>
-      <translation>主串流</translation>
-    </message>
-    <message>
-      <source>Secondary Stream</source>
-      <translation>次串流</translation>
-    </message>
-    <message>
-      <source>Camera has no secondary stream</source>
-      <translation>攝影機沒有次串流</translation>
-    </message>
-    <message>
       <source>This I/O module has no advanced settings</source>
       <translation>此 I/O 模組未提供進階設定</translation>
     </message>
@@ -2191,8 +2195,36 @@ to view more bookmarks</source>
       <translation>此攝影機未提供進階設定</translation>
     </message>
     <message>
+      <source>Settings</source>
+      <translation>設定</translation>
+    </message>
+    <message>
+      <source>Web</source>
+      <translation type="unfinished">Web</translation>
+    </message>
+    <message>
+      <source>No settings</source>
+      <translation>無設定</translation>
+    </message>
+    <message>
+      <source>Secondary Stream</source>
+      <translation>次串流</translation>
+    </message>
+    <message>
+      <source>I/O Module ID</source>
+      <translation>I/O 模組 ID</translation>
+    </message>
+    <message>
+      <source>Camera ID</source>
+      <translation>攝影機 ID</translation>
+    </message>
+    <message>
       <source>Audio Stream</source>
       <translation>聲音串流</translation>
+    </message>
+    <message>
+      <source>Primary Stream</source>
+      <translation>主串流</translation>
     </message>
     <message>
       <source>URL is not available. Open stream and try again.</source>
@@ -2207,24 +2239,8 @@ to view more bookmarks</source>
       <translation>I/O 模組無聲音串流</translation>
     </message>
     <message>
-      <source>I/O Module Id</source>
-      <translation>I/O 模組 Id</translation>
-    </message>
-    <message>
-      <source>Camera Id</source>
-      <translation>攝影機 Id</translation>
-    </message>
-    <message>
-      <source>Settings</source>
-      <translation>設定</translation>
-    </message>
-    <message>
-      <source>Web</source>
-      <translation type="unfinished">Web</translation>
-    </message>
-    <message>
-      <source>No settings</source>
-      <translation>無設定</translation>
+      <source>Camera has no secondary stream</source>
+      <translation>攝影機沒有次串流</translation>
     </message>
   </context>
   <context>
@@ -2337,10 +2353,22 @@ to view more bookmarks</source>
       <translation>Edge</translation>
     </message>
     <message numerus="yes">
-      <source>This Id is already used on the following %n cameras: %1</source>
-      <translation type="unfinished">
-        <numerusform>This Id is already used on the following %n cameras: %1</numerusform>
+      <source>This ID is already used on the following %n cameras: %1</source>
+      <translation>
+        <numerusform>此ID已被以下 %n 支攝影機使用: %1</numerusform>
       </translation>
+    </message>
+    <message>
+      <source>Helps fix image quality issues on some cameras; for others will cause significant bitrate increase.</source>
+      <translation>有助於修正一些攝影機的圖像質量問題 ; 但對於其他攝影機會導致明顯增加的位元速率。</translation>
+    </message>
+    <message>
+      <source>Custom number that can be assigned to a camera for quick identification and access</source>
+      <translation>請分配自訂編號給攝影機，以便快速識別和連結</translation>
+    </message>
+    <message>
+      <source>Server will not change any cameras settings, it will receive and use camera stream as-is.</source>
+      <translation>伺服器不更動任何攝影機串流設定, 將直接使用攝影機所提供之串流並保留串流原始設定。</translation>
     </message>
   </context>
   <context>
@@ -2457,8 +2485,8 @@ to view more bookmarks</source>
       <translation>伺服器</translation>
     </message>
     <message>
-      <source>Id</source>
-      <translation>Id</translation>
+      <source>ID</source>
+      <translation>ID</translation>
     </message>
   </context>
   <context>
@@ -2535,7 +2563,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Password should not be equal to camera&apos;s user name</source>
-      <translation type="unfinished">Password should not be equal to camera&apos;s user name</translation>
+      <translation>密碼不可和攝影機使用者名稱&apos;相同</translation>
     </message>
   </context>
   <context>
@@ -2618,6 +2646,14 @@ to view more bookmarks</source>
     <message>
       <source>More Settings</source>
       <translation>更多設定</translation>
+    </message>
+    <message>
+      <source>Quality setting determines the compression rate only, and does not affect resolution. Low, Medium, High and Best are preset bitrate values.</source>
+      <translation>畫質設定僅決定壓縮率，不影響解析度。低，中，高和最佳是預設位元率。</translation>
+    </message>
+    <message>
+      <source>First choose a recording option, then apply it to day and time blocks on the recording schedule. (0 block is 12:00am to 1:00am, 23 block is 11:00pm to 12:00am.)</source>
+      <translation>首先選擇一種錄影排程, 將排程套用於欲錄影的星期和時間區段。(0 表示為12:00am 到 1:00am, 23 表示為 11:00pm 12:00am.)</translation>
     </message>
   </context>
   <context>
@@ -2812,20 +2848,20 @@ to %1</source>
     <name>QnCloudResultMessages</name>
     <message>
       <source>Account not found</source>
-      <translation type="unfinished">Account not found</translation>
+      <translation>未找到該帳戶</translation>
     </message>
     <message>
       <source>Account is not activated.</source>
-      <translation type="unfinished">Account is not activated.</translation>
+      <translation>帳號未啟用</translation>
     </message>
     <message>
       <source>Please log in to %1 and follow the provided instructions.</source>
       <comment>%1 is a cloud site name like &quot;Nx Cloud&quot;</comment>
-      <translation type="unfinished">Please log in to %1 and follow the provided instructions.</translation>
+      <translation>請登入到 %1 , 並依照提供的指示進行操作。</translation>
     </message>
     <message>
       <source>Invalid password</source>
-      <translation type="unfinished">Invalid password</translation>
+      <translation>密碼錯誤</translation>
     </message>
   </context>
   <context>
@@ -3080,16 +3116,12 @@ to %1</source>
   <context>
     <name>QnCustomBusinessEventWidget</name>
     <message>
-      <source>Server API</source>
-      <translation>伺服器 API</translation>
+      <source>Event will trigger only if there are matches in caption with any of entered keywords.</source>
+      <translation>只有當標題欄位中的文字與輸入的任何關鍵字相符時, 事件才會觸發。</translation>
     </message>
     <message>
-      <source>To generate Generic Event, please refer to %1.</source>
-      <translation>要產生通用事件, 請參考 %1.</translation>
-    </message>
-    <message>
-      <source>Event will trigger only if Generic Event meets all the above conditions. If a keyword field is empty, condition is always met. If not, condition is met if the corresponding field of Generic Event contains any keyword.</source>
-      <translation>當通用事件符合所有條件時事件才會觸發. 如果關鍵字欄位為空, 條件將永遠符合. 如果關鍵字欄位非為空, 通用事件對應欄位須包含任何關鍵字條件才符合.</translation>
+      <source>If the field is empty, event will always trigger.</source>
+      <translation>如果該欄位為空白, 事件將維持在觸發狀態</translation>
     </message>
   </context>
   <context>
@@ -3159,12 +3191,8 @@ to %1</source>
       <translation>將從備份中還原系統設定, 伺服器應用程式將重新啟動.</translation>
     </message>
     <message>
-      <source>You can create a backup for System configurations that can be restored in case of failure.</source>
-      <translation>您可將系統的設定建立成備份檔, 可在系統故障後還原.</translation>
-    </message>
-    <message>
       <source>Database Backup Files</source>
-      <translation type="unfinished">Database Backup Files</translation>
+      <translation>資料庫備份檔案</translation>
     </message>
   </context>
   <context>
@@ -3299,12 +3327,19 @@ to %1</source>
     <message>
       <source>All %1 users will be deleted.</source>
       <comment>%1 is the short cloud name (like Cloud)</comment>
-      <translation type="unfinished">All %1 users will be deleted.</translation>
+      <translation>將刪除所有 %1 帳號資料</translation>
     </message>
     <message>
       <source>You will not be able to connect to this System with your %1 account after you disconnect this System from %1.</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
       <translation>在您從 %1 斷開系統連線後你將不能使用 %1 帳號連接到此系統.</translation>
+    </message>
+  </context>
+  <context>
+    <name>QnEmptyBusinessActionWidget</name>
+    <message>
+      <source>Panic Recording mode switches recording settings for all Cameras to maximum FPS and Quality</source>
+      <translation>緊急錄影模式將切換全部攝影機的錄影設定至最大帪數和畫素</translation>
     </message>
   </context>
   <context>
@@ -3536,6 +3571,13 @@ to %1</source>
     </message>
   </context>
   <context>
+    <name>QnFisheyeSettingsWidget</name>
+    <message>
+      <source>Use this setting to compensate for distortion if camera is not mounted exactly vertically or horizontally.</source>
+      <translation>如果相機未完全垂直或水平安裝，請使用此設置來補償失真。</translation>
+    </message>
+  </context>
+  <context>
     <name>QnGeneralPreferencesWidget</name>
     <message>
       <source>Select folder...</source>
@@ -3603,6 +3645,14 @@ to %1</source>
     <message>
       <source>Open Camera List</source>
       <translation>開啟攝影機列表</translation>
+    </message>
+    <message>
+      <source>Backup includes servers and cameras settings, users, webpages, event rules, etc. Video is not saved.</source>
+      <translation>備份包括伺服器和攝影機設定，使用者，網頁，事件規則等。錄影資料不保存。</translation>
+    </message>
+    <message>
+      <source>Creates a backup of System configuration that can be restored in case of failure.</source>
+      <translation>建立系統備份檔可在系統故障後還原.</translation>
     </message>
   </context>
   <context>
@@ -3696,8 +3746,8 @@ to %1</source>
       <translation>脈衝</translation>
     </message>
     <message>
-      <source>Id</source>
-      <translation>Id</translation>
+      <source>ID</source>
+      <translation>ID</translation>
     </message>
   </context>
   <context>
@@ -3848,6 +3898,21 @@ to %1</source>
     </message>
   </context>
   <context>
+    <name>QnLensCameraAdvancedParamWidget</name>
+    <message>
+      <source>Zoom</source>
+      <translation>縮放</translation>
+    </message>
+    <message>
+      <source>Rotation:</source>
+      <translation>旋轉:</translation>
+    </message>
+    <message>
+      <source>Focus</source>
+      <translation>焦距</translation>
+    </message>
+  </context>
+  <context>
     <name>QnLicenseDetailsDialog</name>
     <message>
       <source>Screens Allowed:</source>
@@ -3878,8 +3943,8 @@ to %1</source>
       <translation>功能:</translation>
     </message>
     <message>
-      <source>Locked to Hardware Id</source>
-      <translation>已鎖定至硬體 Id</translation>
+      <source>Locked to Hardware ID</source>
+      <translation>已鎖定至硬體 ID</translation>
     </message>
   </context>
   <context>
@@ -4144,16 +4209,16 @@ to %1</source>
       <translation>請連絡客戶支援以取得有效的授權.</translation>
     </message>
     <message>
-      <source>This license is already activated and linked to Hardware Id %1</source>
-      <translation>這授權已啟動且綁定在硬體 Id %1 上</translation>
-    </message>
-    <message>
-      <source>This license is already activated and linked to Hardware Id %1 on %2</source>
-      <translation>這授權已啟動且綁定在硬體 Id %1 上於 %2</translation>
-    </message>
-    <message>
       <source>If the problem persists please contact Customer Support.</source>
       <translation>如果問題仍然存在, 請與客戶支援連絡.</translation>
+    </message>
+    <message>
+      <source>This license is already activated and linked to Hardware ID %1</source>
+      <translation>這授權已啟動且綁定在硬體 ID %1 上</translation>
+    </message>
+    <message>
+      <source>This license is already activated and linked to Hardware ID %1 on %2</source>
+      <translation>這授權已啟動且綁定在硬體 ID %1 上於 %2</translation>
     </message>
   </context>
   <context>
@@ -4175,16 +4240,16 @@ to %1</source>
       <translation>開啟檔案失敗</translation>
     </message>
     <message>
-      <source>Please send email with License Key and Hardware Id provided to %1 to obtain an Activation Key file.</source>
-      <translation>請將授權及硬體 Id 透過 Email 提供到 %1 以取得離線授權檔.</translation>
-    </message>
-    <message>
-      <source>Please send License Key and Hardware Id provided to %1 to obtain an Activation Key file.</source>
-      <translation>請將授權及硬體 Id 提供到 %1 以取得離線授權檔.</translation>
-    </message>
-    <message>
       <source>All files</source>
-      <translation type="unfinished">All files</translation>
+      <translation>所有檔案</translation>
+    </message>
+    <message>
+      <source>Please send email with License Key and Hardware ID provided to %1 to obtain an Activation Key file.</source>
+      <translation>請將授權及硬體 ID 透過 Email 提供到 %1 以取得離線授權檔.</translation>
+    </message>
+    <message>
+      <source>Please send License Key and Hardware ID provided to %1 to obtain an Activation Key file.</source>
+      <translation>請將授權及硬體 ID 提供到 %1 以取得離線授權檔.</translation>
     </message>
   </context>
   <context>
@@ -4390,6 +4455,18 @@ to %1</source>
     <message>
       <source>No image</source>
       <translation>無影像</translation>
+    </message>
+    <message>
+      <source>Sets the time to use in the client (timeline, timestamps, etc.) when client and server machines are in different time zones.</source>
+      <translation>當客戶端和伺服器電腦處於不同時區時, 設定依循客戶端使用的時間 (時間表、時間戳記等)。</translation>
+    </message>
+    <message>
+      <source>Length of time each camera on layout will be displayed if you start a Layout Tour.</source>
+      <translation>當啟動佈局巡航, 調整影像在螢幕上顯示的時間長度。</translation>
+    </message>
+    <message>
+      <source>Displays IP addresses for cameras and servers and groups for users.</source>
+      <translation>顯示額外資訊, 包含攝影機和伺服器的IP位址以及使用者所屬之角色。</translation>
     </message>
   </context>
   <context>
@@ -5549,16 +5626,12 @@ to %1</source>
       <translation>調整最大攝影機數量以避免問題發生</translation>
     </message>
     <message>
-      <source>server will take devices automatically from offline servers</source>
-      <translation>伺服器將從離線伺服器中接手設備</translation>
-    </message>
-    <message>
-      <source>server will take cameras automatically from offline servers</source>
-      <translation>伺服器將從離線伺服器中接手攝影機</translation>
-    </message>
-    <message>
       <source>Failover</source>
       <translation>備援</translation>
+    </message>
+    <message>
+      <source>Servers with failover enabled will automatically take cameras from offline servers.</source>
+      <translation>已啟用備援移轉的伺服器將自動接手離線伺服器中的攝影機</translation>
     </message>
   </context>
   <context>
@@ -5763,7 +5836,15 @@ to %1</source>
     </message>
     <message>
       <source>Update Files</source>
-      <translation type="unfinished">Update Files</translation>
+      <translation>更新檔案</translation>
+    </message>
+    <message>
+      <source>Validating the update...</source>
+      <translation>正在驗證更新...</translation>
+    </message>
+    <message>
+      <source>Checking for free space...</source>
+      <translation>正在檢查可用的儲存空間...</translation>
     </message>
   </context>
   <context>
@@ -5867,7 +5948,7 @@ to %1</source>
     </message>
     <message>
       <source>Uploaded archive can be deleted automatically, if there is no free space on a server storage. The oldest footage among all cameras on the server will be deleted first.</source>
-      <translation type="unfinished">Uploaded archive can be deleted automatically, if there is no free space on a server storage. The oldest footage among all cameras on the server will be deleted first.</translation>
+      <translation>如果伺服器沒有可用空間, 則已上傳的檔案會自動被刪除. 將優先刪除伺服器中最早的檔案.</translation>
     </message>
   </context>
   <context>
@@ -6093,7 +6174,7 @@ to %1</source>
     </message>
     <message>
       <source>NOT ENOUGH LICENSES</source>
-      <translation type="unfinished">NOT ENOUGH LICENSES</translation>
+      <translation>沒有足夠的授權</translation>
     </message>
   </context>
   <context>
@@ -6244,6 +6325,14 @@ to %1</source>
     <message>
       <source>Recording was enabled on the USB storage</source>
       <translation>在 USB 儲存設備上啟用錄影</translation>
+    </message>
+    <message>
+      <source>Backup includes servers and cameras settings, users, webpages, event rules, etc. Video is not saved.</source>
+      <translation>備份包括伺服器和攝影機設定，使用者，網頁，事件規則等。錄影資料不保存。</translation>
+    </message>
+    <message>
+      <source>Creates a backup of System configuration that can be restored in case of failure.</source>
+      <translation>建立系統備份檔可在系統故障後還原.</translation>
     </message>
   </context>
   <context>
@@ -6537,6 +6626,14 @@ to %1</source>
       <source>Allow System to optimize camera settings</source>
       <translation>允許系統優化攝影機設定</translation>
     </message>
+    <message>
+      <source>Sends anonymous System information (firmware, codecs, streams, etc.).</source>
+      <translation>發送匿名系統訊息（韌體，編解碼器，串流等）。</translation>
+    </message>
+    <message>
+      <source>Tracks and logs all user actions.</source>
+      <translation>追蹤和記錄所有使用者操作</translation>
+    </message>
   </context>
   <context>
     <name>QnTableExportHelper</name>
@@ -6602,16 +6699,6 @@ to %1</source>
       <translation>沒有可用的縮圖</translation>
     </message>
     <message>
-      <source>hh:mm</source>
-      <comment>Format for displaying hours and minutes on timeline.</comment>
-      <translation>hh:mm</translation>
-    </message>
-    <message>
-      <source>h ap</source>
-      <comment>Format for displaying hours on timeline, with am/pm indicator.</comment>
-      <translation>h點 ap</translation>
-    </message>
-    <message>
       <source>dd</source>
       <comment>Format for displaying days on timeline.</comment>
       <translation>dd日</translation>
@@ -6655,11 +6742,6 @@ to %1</source>
       <source>yyyy</source>
       <comment>Format for displaying year caption in timeline&apos;s header</comment>
       <translation>yyyy</translation>
-    </message>
-    <message>
-      <source>h:mm ap</source>
-      <comment>Format for displaying hours and minutes on timeline, with am/pm indicator.</comment>
-      <translation>h: mm ap</translation>
     </message>
     <message>
       <source>dd MMMM yyyy h:mm ap</source>
@@ -6799,7 +6881,7 @@ to %1</source>
     <message>
       <source>%1 user</source>
       <comment>%1 is the short cloud name (like Cloud)</comment>
-      <translation type="unfinished">%1 user</translation>
+      <translation>%1 使用者</translation>
     </message>
   </context>
   <context>
@@ -6846,6 +6928,10 @@ to %1</source>
     <message>
       <source>Edit</source>
       <translation>編輯</translation>
+    </message>
+    <message>
+      <source>Users can be imported from an LDAP server. They will be able to log in only if LDAP server is online and their accounts are active on it.</source>
+      <translation>使用者資訊可由 LDAP 伺服器匯入。但 LDAP 伺服器必須保持連線並且該帳戶狀態為啟用中, 才能夠登錄。</translation>
     </message>
   </context>
   <context>
@@ -7035,7 +7121,26 @@ to %1</source>
     <message>
       <source>%1 user with specified email already exists.</source>
       <comment>%1 is the short cloud name (like Cloud)</comment>
-      <translation type="unfinished">%1 user with specified email already exists.</translation>
+      <translation>%1使用該電子郵件用戶已經存在</translation>
+    </message>
+    <message>
+      <source>Local users</source>
+      <translation>本地用户</translation>
+    </message>
+    <message>
+      <source>%1 users</source>
+      <comment>%1 is the short cloud name (like Cloud)</comment>
+      <translation>%1 使用者</translation>
+    </message>
+    <message>
+      <source>%1 belong to this system only and are fully managed by system administrators.</source>
+      <comment>%1 is local users definition, e.g. &apos;Local users&apos;</comment>
+      <translation>%1 僅屬於此系統，並由系統管理員完全管理</translation>
+    </message>
+    <message>
+      <source>%1 can have access to many Systems. Administrators can manage their rights only.</source>
+      <comment>%1 is cloud users definition, e.g. &apos;Cloud users&apos;</comment>
+      <translation>%1 擁有可登入許多系統的權限。系統管理員只能管理其許可權</translation>
     </message>
   </context>
   <context>
@@ -7121,11 +7226,11 @@ to %1</source>
     </message>
     <message>
       <source>Uploading %1...</source>
-      <translation type="unfinished">Uploading %1...</translation>
+      <translation>正在上傳 %1...  </translation>
     </message>
     <message>
       <source>Finalizing %1...</source>
-      <translation type="unfinished">Finalizing %1...</translation>
+      <translation>正在完成 %1...  </translation>
     </message>
   </context>
   <context>
@@ -7230,7 +7335,7 @@ to %1</source>
     </message>
     <message>
       <source>Video Wall is removed on the server and will be closed.</source>
-      <translation type="unfinished">Video Wall is removed on the server and will be closed.</translation>
+      <translation>電視牆將從伺服器中移除, 並將其關閉。</translation>
     </message>
   </context>
   <context>
@@ -7278,7 +7383,7 @@ to %1</source>
     <message>
       <source>%1 Systems cannot be merged</source>
       <comment>%1 is the short cloud name (like Cloud)</comment>
-      <translation type="unfinished">%1 Systems cannot be merged</translation>
+      <translation>%1 系統無法被合併</translation>
     </message>
   </context>
   <context>
@@ -7645,23 +7750,23 @@ to %1</source>
     </message>
     <message>
       <source>%1 has unsupported format.</source>
-      <translation type="unfinished">%1 has unsupported format.</translation>
+      <translation>%1 的格式不受支援</translation>
     </message>
     <message>
       <source>%1 does not have timestamp.</source>
-      <translation type="unfinished">%1 does not have timestamp.</translation>
+      <translation>%1 沒有時間戳記</translation>
     </message>
     <message>
       <source>%1 is older than allowed in camera archive settings.</source>
-      <translation type="unfinished">%1 is older than allowed in camera archive settings.</translation>
+      <translation>%1 比攝影機錄影設定參數還舊</translation>
     </message>
     <message>
       <source>%1 covers period for which video has already been uploaded.</source>
-      <translation type="unfinished">%1 covers period for which video has already been uploaded.</translation>
+      <translation>%1  包含了已上傳過的影像</translation>
     </message>
     <message>
       <source>%1 covers period for which video is being uploaded.</source>
-      <translation type="unfinished">%1 covers period for which video is being uploaded.</translation>
+      <translation>%1 包含了正在上傳的影像</translation>
     </message>
   </context>
   <context>
@@ -8015,6 +8120,13 @@ to %1</source>
     </message>
   </context>
   <context>
+    <name>nx::client::desktop::HintButton</name>
+    <message>
+      <source>Click to read more</source>
+      <translation>點擊以瞭解更多</translation>
+    </message>
+  </context>
+  <context>
     <name>nx::client::desktop::ImageOverlaySettingsWidget</name>
     <message>
       <source>Select file...</source>
@@ -8259,17 +8371,26 @@ to %1</source>
     </message>
   </context>
   <context>
-    <name>nx::client::desktop::ui::AnalyticsSdkEventModel</name>
-    <message>
-      <source>No event types supported</source>
-      <translation>沒有支援的事件類型</translation>
-    </message>
-  </context>
-  <context>
     <name>nx::client::desktop::ui::AnalyticsSdkEventWidget</name>
     <message>
-      <source>Event will trigger only if Analytics Event meets all the above conditions. If a keyword field is empty, condition is always met. If not, condition is met if the corresponding field of Analytics Event contains any keyword.</source>
-      <translation>當分析事件符合所有條件時事件才會觸發. 如果關鍵字欄位為空, 條件將永遠符合. 如果關鍵字欄位非為空, 分析事件對應欄位須包含任何關鍵字條件才符合.</translation>
+      <source>Analytics events can be set up on a certain cameras.</source>
+      <translation>分析事件功能可被設定於某些攝影機</translation>
+    </message>
+    <message>
+      <source>Choose cameras using the button above to see the list of supported events.</source>
+      <translation>選擇攝影機並點擊上方的按鈕以查看支援的事件清單</translation>
+    </message>
+    <message>
+      <source>Event will trigger only if there are matches in caption with any of entered keywords.</source>
+      <translation>只有當標題欄位中的文字與輸入的任何關鍵字相符時, 事件才會觸發</translation>
+    </message>
+    <message>
+      <source>If the field is empty, event will always trigger.</source>
+      <translation>如果該欄位為空白, 事件將維持在觸發狀態</translation>
+    </message>
+    <message>
+      <source>Event will trigger only if there are matches in the description field with any of the entered keywords.</source>
+      <translation>只有當敘述欄位中的文字與輸入的任何關鍵字相符時, 事件才會觸發。</translation>
     </message>
   </context>
   <context>
@@ -8613,6 +8734,18 @@ to %1</source>
     <message>
       <source>Failed to change password on %1 of %2 cameras</source>
       <translation>變更 %2 支攝影機中的 %1 支攝影機密碼失敗</translation>
+    </message>
+    <message>
+      <source>To use the software you must accept the end user license agreement</source>
+      <translation>使用該軟體前, 您必須同意使用者授權合約</translation>
+    </message>
+    <message>
+      <source>Accept</source>
+      <translation>同意</translation>
+    </message>
+    <message>
+      <source>Decline</source>
+      <translation>拒絕</translation>
     </message>
   </context>
   <context>

@@ -106,9 +106,16 @@ static int sendData(int transportFd, const void* context)
     return total;
 }
 
-static bool sendImpl(const void* context, int (*action)(int, const void*))
+static bool sendImpl(int socketPostfix, const void* context, int (*action)(int, const void*))
 {
-    int transportFd = createConnectedSocket(SystemCommands::kDomainSocket);
+    assert(socketPostfix != -1);
+    static const int baseLen = strlen(SystemCommands::kDomainSocket);
+    char buf[512];
+
+    strncpy(buf, SystemCommands::kDomainSocket, sizeof(buf));
+    snprintf(buf + baseLen, sizeof(buf) - baseLen, "%d", socketPostfix);
+
+    int transportFd = createConnectedSocket(buf);
     if (transportFd < 0)
         return false;
 
@@ -118,21 +125,21 @@ static bool sendImpl(const void* context, int (*action)(int, const void*))
     return result;
 }
 
-bool sendFd(int fd)
+bool sendFd(int socketPostfix, int fd)
 {
-    return sendImpl((const void*) fd, &sendFdImpl) > 0;
+    return sendImpl(socketPostfix, (const void*) fd, &sendFdImpl) > 0;
 }
 
-bool sendInt64(int64_t value)
+bool sendInt64(int socketPostfix, int64_t value)
 {
     struct DataContext context = {&value, sizeof(value)};
-    return sendImpl(&context, &sendData) > 0;
+    return sendImpl(socketPostfix, &context, &sendData) > 0;
 }
 
-bool sendBuffer(const void* data, ssize_t size)
+bool sendBuffer(int socketPostfix, const void* data, ssize_t size)
 {
     struct DataContext context = {(void*) data, size};
-    return sendImpl(&context, &sendData) > 0;
+    return sendImpl(socketPostfix, &context, &sendData) > 0;
 }
 
 } // namespace detail

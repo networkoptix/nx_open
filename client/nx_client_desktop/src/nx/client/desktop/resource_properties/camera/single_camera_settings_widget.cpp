@@ -176,7 +176,7 @@ SingleCameraSettingsWidget::SingleCameraSettingsWidget(QWidget *parent) :
             ui->cameraScheduleWidget->setScheduleEnabled(ui->licensingWidget->state() == Qt::Checked);
         });
 
-    connect(ui->expertSettingsWidget, &CameraExpertSettingsWidget::dataChanged,
+    connect(ui->expertSettingsWidget, &LegacyExpertSettingsWidget::dataChanged,
         this, &SingleCameraSettingsWidget::at_dbDataChanged);
 
     connect(ui->fisheyeSettingsWidget, &FisheyeSettingsWidget::dataChanged,
@@ -185,7 +185,7 @@ SingleCameraSettingsWidget::SingleCameraSettingsWidget(QWidget *parent) :
     connect(ui->imageControlWidget, &LegacyImageControlWidget::changed,
         this, &SingleCameraSettingsWidget::at_dbDataChanged);
 
-    connect(ui->ioPortSettingsWidget, &IoPortSettingsWidget::dataChanged,
+    connect(ui->ioPortSettingsWidget, &LegacyIoPortSettingsWidget::dataChanged,
         this, &SingleCameraSettingsWidget::at_dbDataChanged);
 
     connect(ui->advancedSettingsWidget, &CameraAdvancedSettingsWidget::hasChangesChanged,
@@ -252,9 +252,7 @@ void SingleCameraSettingsWidget::setCamera(const QnVirtualCameraResourcePtr &cam
         return;
 
     if (m_camera)
-    {
-        disconnect(m_camera, NULL, this, NULL);
-    }
+        m_camera->disconnect(this);
 
     m_camera = camera;
     QnVirtualCameraResourceList cameras;
@@ -411,10 +409,15 @@ void SingleCameraSettingsWidget::submitToResource()
         loginEditAuth.setPassword(ui->passwordEdit->text().trimmed());
         if (m_camera->getAuth() != loginEditAuth)
         {
-            if (m_camera->isMultiSensorCamera() || m_camera->isNvr())
+            if ((m_camera->isMultiSensorCamera() || m_camera->isNvr())
+                && !m_camera->getGroupId().isEmpty())
+            {
                 QnClientCameraResource::setAuthToCameraGroup(m_camera, loginEditAuth);
+            }
             else
+            {
                 m_camera->setAuth(loginEditAuth);
+            }
         }
 
         ui->cameraScheduleWidget->applyChanges();
@@ -678,8 +681,7 @@ void SingleCameraSettingsWidget::setHasDbChanges(bool hasChanges)
 void SingleCameraSettingsWidget::disconnectFromMotionWidget()
 {
     NX_ASSERT(m_motionWidget);
-
-    disconnect(m_motionWidget, NULL, this, NULL);
+    m_motionWidget->disconnect(this);
 }
 
 void SingleCameraSettingsWidget::connectToMotionWidget()

@@ -17,8 +17,7 @@
 #include "transaction_transport_header.h"
 
 namespace nx {
-namespace cdb {
-namespace ec2 {
+namespace data_sync_engine {
 
 class TransactionLog;
 
@@ -73,17 +72,17 @@ public:
 
     void processSpecialTransaction(
         const TransactionTransportHeader& transportHeader,
-        ::ec2::QnTransaction<::ec2::ApiSyncRequestData> data,
+        Command<::ec2::ApiSyncRequestData> data,
         TransactionProcessedHandler handler);
 
     void processSpecialTransaction(
         const TransactionTransportHeader& transportHeader,
-        ::ec2::QnTransaction<::ec2::QnTranStateResponse> data,
+        Command<::ec2::QnTranStateResponse> data,
         TransactionProcessedHandler handler);
 
     void processSpecialTransaction(
         const TransactionTransportHeader& transportHeader,
-        ::ec2::QnTransaction<::ec2::ApiTranSyncDoneData> data,
+        Command<::ec2::ApiTranSyncDoneData> data,
         TransactionProcessedHandler handler);
 
 private:
@@ -112,12 +111,12 @@ private:
     void onGotTransaction(
         Qn::SerializationFormat tranFormat,
         QByteArray data,
-        ::ec2::QnTransactionTransportHeader transportHeader);
+        CommandTransportHeader transportHeader);
 
     void forwardTransactionToProcessor(
         Qn::SerializationFormat tranFormat,
         QByteArray data,
-        ::ec2::QnTransactionTransportHeader transportHeader);
+        CommandTransportHeader transportHeader);
 
     void onStateChanged(::ec2::QnTransactionTransportBase::State newState);
 
@@ -136,10 +135,9 @@ private:
 
     template<class T>
     void sendTransaction(
-        ::ec2::QnTransaction<T> transaction,
+        Command<T> transaction,
         TransactionTransportHeader transportHeader);
 };
 
-} // namespace ec2
-} // namespace cdb
+} // namespace data_sync_engine
 } // namespace nx

@@ -636,6 +636,12 @@ ConditionWrapper isEntropixCamera();
 /** Playback sync is forced. */
 ConditionWrapper syncIsForced();
 
+/** Whether wearable camera upload is enabled. */
+ConditionWrapper wearableCameraUploadEnabled();
+
+/** Whether wearable camera upload can be cancelled. */
+ConditionWrapper canCancelWearableCameraUpload();
+
 } // namespace condition
 
 } // namespace action

@@ -6,8 +6,7 @@
 #include "memory/transaction_data_object_in_memory.h"
 
 namespace nx {
-namespace cdb {
-namespace ec2 {
+namespace data_sync_engine {
 namespace dao {
 
 static TransactionDataObjectFactory::FactoryFunc factoryFunc;
@@ -49,6 +48,5 @@ void TransactionDataObjectFactory::resetToDefaultFactory()
 }
 
 } // namespace dao
-} // namespace ec2
-} // namespace cdb
+} // namespace data_sync_engine
 } // namespace nx

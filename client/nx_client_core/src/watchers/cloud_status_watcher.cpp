@@ -29,6 +29,7 @@
 #include <nx/fusion/model_functions.h>
 
 #include <network/cloud_system_data.h>
+#include <utils/common/guarded_callback.h>
 
 using namespace nx::cdb;
 
@@ -116,6 +117,7 @@ public:
 
     std::unique_ptr<api::Connection> cloudConnection;
     std::unique_ptr<api::Connection> temporaryConnection;
+    std::unique_ptr<api::Connection> resendActivationConnection;
 
     QnCloudStatusWatcher::Status status;
 
@@ -276,7 +278,7 @@ void QnCloudStatusWatcher::resetCredentials()
     setCredentials(QnEncodedCredentials());
 }
 
-void QnCloudStatusWatcher::setCredentials(const QnEncodedCredentials& credentials, bool initial)
+bool QnCloudStatusWatcher::setCredentials(const QnEncodedCredentials& credentials, bool initial)
 {
     Q_D(QnCloudStatusWatcher);
 
@@ -284,7 +286,7 @@ void QnCloudStatusWatcher::setCredentials(const QnEncodedCredentials& credential
         QnEncodedCredentials(credentials.user.toLower(), credentials.password.value());
 
     if (d->credentials == loweredCredentials)
-        return;
+        return false;
 
     const bool userChanged = (d->credentials.user != loweredCredentials.user);
     const bool passwordChanged = (d->credentials.password != loweredCredentials.password);
@@ -299,6 +301,8 @@ void QnCloudStatusWatcher::setCredentials(const QnEncodedCredentials& credential
         emit this->loginChanged();
     if (passwordChanged)
         emit this->passwordChanged();
+
+    return true;
 }
 
 QnEncodedCredentials QnCloudStatusWatcher::createTemporaryCredentials()
@@ -391,6 +395,26 @@ void QnCloudStatusWatcher::updateSystems()
             executeDelayed(handler, 0, guard->thread());
         }
     );
+}
+
+void QnCloudStatusWatcher::resendActivationEmail(const QString& email)
+{
+    Q_D(QnCloudStatusWatcher);
+    if (!d->resendActivationConnection)
+        d->resendActivationConnection = qnCloudConnectionProvider->createConnection();
+
+    const auto callback =
+        [this](api::ResultCode result, api::AccountConfirmationCode code)
+        {
+            const bool success =
+                result == api::ResultCode::ok || result == api::ResultCode::partialContent;
+
+            emit activationEmailResent(success);
+        };
+
+    const api::AccountEmail account{email.toStdString()};
+    const auto accountManager = d->resendActivationConnection->accountManager();
+    accountManager->reactivateAccount(account, guarded(this, callback));
 }
 
 QnCloudSystemList QnCloudStatusWatcher::cloudSystems() const
@@ -696,3 +720,4 @@ void QnCloudStatusWatcherPrivate::prolongTemporaryCredentials()
 
     temporaryConnection->ping(completionHandler);
 }
+

@@ -264,7 +264,7 @@ private:
     boost::optional<nx::network::http::StatusCode::Value> m_vmsApiResult;
 
     std::unique_ptr<AbstractSystemHealthInfoProvider> createSystemHealthInfoProvider(
-        ec2::ConnectionManager*,
+        data_sync_engine::ConnectionManager*,
         nx::utils::db::AsyncSqlQueryExecutor*)
     {
         auto systemHealthInfoProvider = std::make_unique<SystemHealthInfoProviderStub>();

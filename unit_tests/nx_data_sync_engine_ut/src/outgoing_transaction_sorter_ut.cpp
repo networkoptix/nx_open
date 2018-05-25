@@ -11,12 +11,11 @@
 #include "test_outgoing_transaction_dispatcher.h"
 
 namespace nx {
-namespace cdb {
-namespace ec2 {
+namespace data_sync_engine {
 namespace test {
 
 class TestOutgoingTransactionSorter:
-    public ec2::OutgoingTransactionSorter
+    public OutgoingTransactionSorter
 {
 public:
     TestOutgoingTransactionSorter(
@@ -24,7 +23,7 @@ public:
         VmsTransactionLogCache* vmsTransactionLogCache,
         AbstractOutgoingTransactionDispatcher* const outgoingTransactionDispatcher)
     :
-        ec2::OutgoingTransactionSorter(
+        OutgoingTransactionSorter(
             systemId,
             vmsTransactionLogCache,
             outgoingTransactionDispatcher)
@@ -63,12 +62,12 @@ public:
         return nx::Buffer();
     }
 
-    virtual const ::ec2::QnAbstractTransaction& transactionHeader() const override
+    virtual const CommandHeader& transactionHeader() const override
     {
         return m_header;
     }
 
-    ::ec2::QnAbstractTransaction& transactionHeader()
+    CommandHeader& transactionHeader()
     {
         return m_header;
     }
@@ -79,7 +78,7 @@ public:
     }
 
 private:
-    ::ec2::QnAbstractTransaction m_header;
+    CommandHeader m_header;
     VmsTransactionLogCache::TranId m_tranId;
 };
 
@@ -108,7 +107,7 @@ public:
             targetFormat, transportHeader, transactionFormatVersion);
     }
 
-    virtual const ::ec2::QnAbstractTransaction& transactionHeader() const override
+    virtual const CommandHeader& transactionHeader() const override
     {
         return m_sharedTransaction->transactionHeader();
     }
@@ -359,6 +358,5 @@ TEST_F(FtOutgoingTransactionSorter, concurrent_transactions)
 }
 
 } // namespace test
-} // namespace ec2
-} // namespace cdb
+} // namespace data_sync_engine
 } // namespace nx

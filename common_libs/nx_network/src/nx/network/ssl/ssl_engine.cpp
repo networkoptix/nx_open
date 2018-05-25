@@ -198,7 +198,7 @@ void Engine::useOrCreateCertificate(
         NX_ASSERT(!certData.isEmpty());
         if (!filePath.isEmpty())
         {
-            QDir(filePath).mkpath(lit(".."));
+            QDir(filePath).mkpath("..");
             if (!file.open(QIODevice::WriteOnly) ||
                 file.write(certData) != certData.size())
             {

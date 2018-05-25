@@ -261,7 +261,7 @@
             "internalName": "BlackList",
             "description": "Black list",
             "dependedEvent": "lpr,otherlist",
-            "forcedEvent": "lpr"
+            "groupId": "{E5500F45-39AA-4A31-868C-33B5E1E880C3}"
         },
         {
             "eventTypeId": "{F61119D1-BA55-4731-A541-232CB611DB1E}",
@@ -273,7 +273,7 @@
             "internalName": "WhiteList",
             "description": "White list",
             "dependedEvent": "lpr,otherlist",
-            "forcedEvent": "lpr"
+            "groupId": "{E5500F45-39AA-4A31-868C-33B5E1E880C3}"
         },
         {
             "eventTypeId": "{71004AC7-D190-444E-888A-EA61997B6CD2}",
@@ -285,17 +285,7 @@
             "internalName": "otherlist",
             "description": "Other list",
             "dependedEvent": "lpr",
-            "forcedEvent": "lpr"
-        },
-        {
-            "eventTypeId": "{E5500F45-39AA-4A31-868C-33B5E1E880C3}",
-            "eventName": {
-                "value": "LPR - Any",
-                "localization": {
-                }
-            },
-            "internalName": "lpr",
-            "description": "LPR"
+            "groupId": "{E5500F45-39AA-4A31-868C-33B5E1E880C3}"
         },
         {
             "eventTypeId": "{4DAE9597-7A81-4A48-AEDC-37D5B184DB11}",
@@ -307,6 +297,16 @@
             "internalName": "Vehicle",
             "description": "Vehicle detected",
             "flags": "stateDependent"
+        }
+    ],
+    "groups": [
+        {
+            "id": "{E5500F45-39AA-4A31-868C-33B5E1E880C3}",
+            "name": {
+                "value": "LPR",
+                "localization": {
+                }
+            }
         }
     ]
 }

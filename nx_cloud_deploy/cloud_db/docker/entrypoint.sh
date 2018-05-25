@@ -2,7 +2,8 @@
 
 mkdir -p /tmp/core
 
-export INSTANCE_IP=$(LD_LIBRARY_PATH= dig +short $CLOUD_DB_HOST)
+export INSTANCE_IP=$CONNECTION_MEDIATOR_PUBLIC_IP
+[ -n "$INSTANCE_IP" ] || INSTANCE_IP=$(LD_LIBRARY_PATH= wget -q -O- networkoptix.com/myip)
 
 tmp=$(tempfile)
 envsubst < /opt/networkoptix/cloud_db/etc/cloud_db.conf > $tmp

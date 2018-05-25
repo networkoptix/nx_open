@@ -6,6 +6,7 @@ from cms.admin import CMSAdmin
 from django_csv_exports.admin import CSVExportAdmin
 
 
+@admin.register(Account)
 class AccountAdmin(CMSAdmin, CSVExportAdmin):
     list_display = ('short_email', 'short_first_name', 'short_last_name', 'created_date', 'last_login',
                     'subscribe', 'is_staff', 'language', 'customization')
@@ -16,7 +17,8 @@ class AccountAdmin(CMSAdmin, CSVExportAdmin):
     list_filter = ('subscribe', 'is_staff', 'created_date', 'last_login',)
     search_fields = ('email', 'first_name', 'last_name', 'customization', 'language',)
 
-    csv_fields = list_display
+    csv_fields = ('email', 'first_name', 'last_name', 'created_date', 'last_login',
+                    'subscribe', 'is_staff', 'language', 'customization')
 
     def save_model(self, request, obj, form, change):
         # forbid creating superusers outside specific domain
@@ -41,4 +43,19 @@ class AccountAdmin(CMSAdmin, CSVExportAdmin):
     def has_delete_permission(self, request, obj=None):  # No deleting users at all
         return False
 
-admin.site.register(Account, AccountAdmin)
+
+@admin.register(AccountLoginHistory)
+class AccountLoginHistoryAdmin(admin.ModelAdmin):
+    list_display = ('action', 'email', 'ip', 'date')
+    list_filter = ('action', 'date')
+    search_fields = ('email', 'ip', 'date')
+
+    actions = ['clean_old_records']
+
+    def clean_old_records(self, request, queryset):
+        from datetime import datetime, timedelta
+        cutoff_date = datetime.now() - timedelta(days=settings.CLEAR_HISTORY_RECORDS_OLDER_THAN_X_DAYS)
+        AccountLoginHistory.objects.filter(date__lt=cutoff_date).delete()
+
+    clean_old_records.short_description = "Remove messages older than {} days".format(
+        settings.CLEAR_HISTORY_RECORDS_OLDER_THAN_X_DAYS)

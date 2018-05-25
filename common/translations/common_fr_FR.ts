@@ -79,7 +79,7 @@
     <message>
       <source>%1 System can only be merged with non-%1. System name and password are taken from %1 System.</source>
       <comment>%1 is the short cloud name (like Cloud)</comment>
-      <translation type="unfinished">%1 System can only be merged with non-%1. System name and password are taken from %1 System.</translation>
+      <translation>Système %1 peut seulement être fusionné avec non-%1. Nom Système et mot de passe sont pris du Système %1.</translation>
     </message>
     <message>
       <source>Both Systems are connected to %1. Merge is not allowed.</source>
@@ -561,8 +561,8 @@
       <translation>Erreur inconnue</translation>
     </message>
     <message>
-      <source>Server with matching Hardware Id not found</source>
-      <translation>Aucun Serveur avec Id Matériel correspondant trouvé</translation>
+      <source>Server with matching Hardware ID not found</source>
+      <translation>Aucun Serveur avec ID Matériel correspondant trouvé</translation>
     </message>
   </context>
   <context>
@@ -684,12 +684,12 @@
       <translation>Filigrane: %1</translation>
     </message>
     <message>
-      <source>Hardware Id: %1</source>
-      <translation>Id Matériel: %1</translation>
-    </message>
-    <message>
       <source>Time License</source>
       <translation>Licence Temps</translation>
+    </message>
+    <message>
+      <source>Hardware ID: %1</source>
+      <translation>ID Matériel: %1</translation>
     </message>
   </context>
   <context>

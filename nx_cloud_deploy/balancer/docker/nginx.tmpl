@@ -96,6 +96,8 @@ server {
 {{ $upstream_name := sha1 $host }}
 # {{ $host }}
 upstream {{ $upstream_name }} {
+    keepalive 100;
+
 {{ range $container := $containers }}
 	{{ $addrLen := len $container.Addresses }}
 

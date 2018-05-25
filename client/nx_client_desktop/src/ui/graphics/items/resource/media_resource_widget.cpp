@@ -33,6 +33,8 @@
 #include <client_core/client_core_module.h>
 
 #include <common/common_module.h>
+#include <translation/datetime_formatter.h>
+
 
 #include <core/resource/media_resource.h>
 #include <core/resource/media_server_resource.h>
@@ -101,7 +103,6 @@
 #include <ui/workbench/workbench_navigator.h>
 #include <ui/workbench/workbench_item.h>
 #include <ui/workbench/workbench_layout.h>
-#include <ui/workbench/watchers/workbench_server_time_watcher.h>
 #include <ui/workbench/watchers/workbench_render_watcher.h>
 #include <ui/workbench/watchers/default_password_cameras_watcher.h>
 
@@ -116,6 +117,7 @@
 #include <utils/media/sse_helper.h>
 #include <core/resource/avi/avi_resource.h>
 #include <core/resource_management/resource_runtime_data.h>
+#include <nx/client/core/watchers/server_time_watcher.h>
 #include <ini.h>
 
 using namespace std::chrono;
@@ -530,12 +532,13 @@ void QnMediaResourceWidget::initAreaSelectOverlay()
 
 QRectF QnMediaResourceWidget::analyticsSearchRect() const
 {
-    return m_areaSelectOverlayWidget->selectedArea();
+    return m_areaSelectOverlayWidget ? m_areaSelectOverlayWidget->selectedArea() : QRectF();
 }
 
 void QnMediaResourceWidget::setAnalyticsSearchRect(const QRectF& value)
 {
-    m_areaSelectOverlayWidget->setSelectedArea(value);
+    if (m_areaSelectOverlayWidget)
+        m_areaSelectOverlayWidget->setSelectedArea(value);
 }
 
 void QnMediaResourceWidget::initAreaHighlightOverlay()
@@ -598,6 +601,9 @@ void QnMediaResourceWidget::initStatusOverlayController()
 
 void QnMediaResourceWidget::setAnalyticsSearchModeEnabled(bool enabled)
 {
+    if (!m_areaSelectOverlayWidget)
+        return;
+
     m_areaSelectOverlayWidget->setActive(enabled);
     if (enabled)
     {
@@ -631,7 +637,12 @@ void QnMediaResourceWidget::updateTriggerAvailability(const vms::event::RulePtr&
 {
     const auto ruleId = rule->id();
     const auto triggerIt = lowerBoundbyTriggerRuleId(ruleId);
-    if (triggerIt == m_triggers.end() || triggerIt->ruleId == ruleId)
+
+    if (triggerIt == m_triggers.end())
+        return;
+
+    // Do not update data for the same rule, until we force it
+    if (triggerIt->ruleId != ruleId)
         return;
 
     const auto button = qobject_cast<QnSoftwareTriggerButton*>(
@@ -1438,21 +1449,13 @@ void QnMediaResourceWidget::updateIconButton()
         const auto iconButton = buttonsBar->button(Qn::RecordingStatusIconButton);
         iconButton->setIcon(qnSkin->icon("item/zoom_window_hovered.png"));
         iconButton->setToolTip(tr("Zoom Window"));
-
-        buttonsBar->setButtonsVisible(Qn::RecordingStatusIconButton, true);
         return;
     }
 
     if (!d->camera || d->camera->hasFlags(Qn::wearable_camera))
-    {
-        buttonsBar->setButtonsVisible(Qn::RecordingStatusIconButton, false);
         return;
-    }
 
     const auto icon = m_recordingStatusHelper->icon();
-
-    buttonsBar->setButtonsVisible(Qn::RecordingStatusIconButton, !icon.isNull());
-
     const auto iconButton = buttonsBar->button(Qn::RecordingStatusIconButton);
     iconButton->setIcon(icon);
     iconButton->setToolTip(m_recordingStatusHelper->tooltip());
@@ -1913,9 +1916,6 @@ QString QnMediaResourceWidget::calculateDetailsText() const
         mbps += statistics->getBitrateMbps();
     }
 
-    QSize size = d->display()->camDisplay()->getRawDataSize();
-    size.setWidth(size.width() * d->display()->camDisplay()->channelsCount());
-
     QString codecString;
     if (QnConstMediaContextPtr codecContext = d->display()->mediaProvider()->getCodecContext())
         codecString = codecContext->getCodecName();
@@ -1930,7 +1930,15 @@ QString QnMediaResourceWidget::calculateDetailsText() const
     QString result;
     if (hasVideo())
     {
-        result.append(htmlFormattedParagraph(lit("%1x%2").arg(size.width()).arg(size.height()), kDetailsTextPixelSize, true));
+        const QSize channelResolution = d->display()->camDisplay()->getRawDataSize();
+        const QSize videoLayout = d->mediaResource->getVideoLayout()->size();
+        const QSize actualResolution = Geometry::cwiseMul(channelResolution, videoLayout);
+
+        result.append(
+            htmlFormattedParagraph(
+                lit("%1x%2").arg(actualResolution.width()).arg(actualResolution.height()),
+                kDetailsTextPixelSize,
+                true));
         result.append(htmlFormattedParagraph(lit("%1fps").arg(fps, 0, 'f', 2), kDetailsTextPixelSize, true));
     }
     result.append(htmlFormattedParagraph(lit("%1Mbps").arg(mbps, 0, 'f', 2), kDetailsTextPixelSize, true));
@@ -1966,10 +1974,8 @@ QString QnMediaResourceWidget::calculatePositionText() const
             if (isSpecialDateTimeValueUsec(dateTimeUsec))
                 return QString();
 
-            static const auto kOutputFormat = lit("yyyy-MM-dd hh:mm:ss");
-
             const auto dateTimeMs = dateTimeUsec / kMicroInMilliSeconds;
-            const auto result = QDateTime::fromMSecsSinceEpoch(dateTimeMs).toString(kOutputFormat);
+            const QString result = datetime::toString(dateTimeMs);
 
             return ini().showPreciseItemTimestamps
                 ? lit("%1<br>%2 us").arg(result).arg(dateTimeUsec)
@@ -2041,6 +2047,7 @@ int QnMediaResourceWidget::calculateButtonsVisibility() const
         {
             result |= Qn::EntropixEnhancementButton;
         }
+        result |= Qn::RecordingStatusIconButton;
 
         return result;
     }
@@ -2092,6 +2099,9 @@ int QnMediaResourceWidget::calculateButtonsVisibility() const
 
     if (d->analyticsMetadataProvider)
         result |= Qn::AnalyticsButton;
+
+    if (d->camera && (!d->camera->hasFlags(Qn::wearable_camera)))
+        result |= Qn::RecordingStatusIconButton;
 
     return result;
 }
@@ -2631,8 +2641,8 @@ qint64 QnMediaResourceWidget::getDisplayTimeUsec() const
     qint64 result = getUtcCurrentTimeUsec();
     if (!isSpecialDateTimeValueUsec(result))
     {
-        result += context()->instance<QnWorkbenchServerTimeWatcher>()->displayOffset(
-            d->mediaResource) * 1000ll;
+        const auto timeWatcher = context()->instance<nx::client::core::ServerTimeWatcher>();
+        result += timeWatcher->displayOffset(d->mediaResource) * 1000ll;
     }
     return result;
 }
@@ -2677,7 +2687,9 @@ void QnMediaResourceWidget::setMotionSearchModeEnabled(bool enabled)
         titleBar()->rightButtonsBar()->setButtonsChecked(
             Qn::PtzButton | Qn::FishEyeButton | Qn::ZoomWindowButton, false);
         action(action::ToggleTimelineAction)->setChecked(true);
-        m_areaSelectOverlayWidget->setActive(false);
+
+        if (m_areaSelectOverlayWidget)
+            m_areaSelectOverlayWidget->setActive(false);
     }
 
     setOption(WindowResizingForbidden, enabled);
@@ -3018,6 +3030,7 @@ void QnMediaResourceWidget::at_eventRuleAddedOrUpdated(const vms::event::RulePtr
         createTriggerIfRelevant(rule);
     }
 
+    // Forcing update of trigger button
     updateTriggerAvailability(rule);
 };
 

@@ -77,7 +77,7 @@
     </message>
     <message>
       <source>Incorrect email or password</source>
-      <translation type="unfinished">Incorrect email or password</translation>
+      <translation>사용자 이름과 암호가 일치하지 않습니다.</translation>
     </message>
   </context>
   <context>
@@ -96,7 +96,7 @@
     </message>
     <message>
       <source>Delete login &quot;%1&quot;?</source>
-      <translation type="unfinished">Delete login &quot;%1&quot;?</translation>
+      <translation>로그인 &quot;%1&quot; 을 삭제 하시겠습니까?</translation>
     </message>
     <message>
       <source>Server addresses and other logins will remain saved. To delete all connection information you should delete all saved logins.</source>
@@ -266,7 +266,7 @@
     </message>
     <message>
       <source>Software image rotation is not supported in fullscreen mode</source>
-      <translation type="unfinished">Software image rotation is not supported in fullscreen mode</translation>
+      <translation>소프트웨어 이미지 회전은 전체 화면 모드에서 지원되지 않습니다.</translation>
     </message>
   </context>
   <context>
@@ -287,11 +287,11 @@
     <name>MoveOnTapOverlay</name>
     <message>
       <source>Tap on the image to position your camera</source>
-      <translation type="unfinished">Tap on the image to position your camera</translation>
+      <translation>이미지를 눌러 카메라를 배치하십시오.</translation>
     </message>
     <message>
       <source>CANCEL</source>
-      <translation type="unfinished">CANCEL</translation>
+      <translation>취소</translation>
     </message>
   </context>
   <context>
@@ -319,14 +319,14 @@
     <name>PresetsButton</name>
     <message>
       <source>PRESETS</source>
-      <translation type="unfinished">PRESETS</translation>
+      <translation>프리셋</translation>
     </message>
   </context>
   <context>
     <name>PresetsDialog</name>
     <message>
       <source>PTZ Presets</source>
-      <translation type="unfinished">PTZ Presets</translation>
+      <translation>PTZ 프리셋</translation>
     </message>
   </context>
   <context>
@@ -394,11 +394,11 @@
     <name>SelectCameraDummy</name>
     <message>
       <source>Select camera</source>
-      <translation type="unfinished">Select camera</translation>
+      <translation>카메라 선택</translation>
     </message>
     <message>
       <source>Press Ctrl + Arrow or use mouse wheel</source>
-      <translation type="unfinished">Press Ctrl + Arrow or use mouse wheel</translation>
+      <translation>Ctrl + 화살표를 누르거나 마우스 휠을 사용 하십시요</translation>
     </message>
   </context>
   <context>
@@ -447,11 +447,11 @@
     </message>
     <message>
       <source>UNREACHABLE</source>
-      <translation type="unfinished">UNREACHABLE</translation>
+      <translation>연결할 수 없는</translation>
     </message>
     <message>
       <source>Connect to this server from web browser or through desktop client to set it up</source>
-      <translation type="unfinished">Connect to this server from web browser or through desktop client to set it up</translation>
+      <translation>웹 브라우저 또는 데스크톱 클라이언트를 통해 이 서버에 연결하여 설정하십시오.</translation>
     </message>
   </context>
   <context>
@@ -466,7 +466,7 @@
     </message>
     <message>
       <source>Check your network connection or press &quot;%1&quot; button to enter a known server address.</source>
-      <translation type="unfinished">Check your network connection or press &quot;%1&quot; button to enter a known server address.</translation>
+      <translation>네트워크 연결을 확인하거나 &quot;%1&quot; 버튼을 눌러 알려진 서버 주소를 입력하십시오.</translation>
     </message>
     <message>
       <source>Check your network connection or contact a system administrator</source>
@@ -486,7 +486,7 @@
     </message>
     <message>
       <source>Cannot connect to System &quot;%1&quot;</source>
-      <translation type="unfinished">Cannot connect to System &quot;%1&quot;</translation>
+      <translation>&quot;%1&quot; 시스템에 연결할 수 없습니다.</translation>
     </message>
     <message>
       <source>Cannot connect to Server</source>
@@ -553,7 +553,7 @@
     </message>
     <message>
       <source>New Server</source>
-      <translation type="unfinished">New Server</translation>
+      <translation>새 서버</translation>
     </message>
   </context>
   <context>
@@ -586,15 +586,15 @@
     <name>TransformationsNotSupportedWarning</name>
     <message>
       <source>Software image rotation is not supported in fullscreen mode</source>
-      <translation type="unfinished">Software image rotation is not supported in fullscreen mode</translation>
+      <translation>소프트웨어 이미지 회전은 전체 화면 모드에서 지원되지 않습니다.</translation>
     </message>
     <message>
       <source>Show as is</source>
-      <translation type="unfinished">Show as is</translation>
+      <translation>현재 상태로 표시</translation>
     </message>
     <message>
       <source>(Space)</source>
-      <translation type="unfinished">(Space)</translation>
+      <translation>(space)</translation>
     </message>
   </context>
   <context>
@@ -624,15 +624,15 @@
     </message>
     <message>
       <source>Offline</source>
-      <translation type="unfinished">Offline</translation>
+      <translation>오프라인</translation>
     </message>
     <message>
       <source>Unauthorized</source>
-      <translation type="unfinished">Unauthorized</translation>
+      <translation>허용되지 않음</translation>
     </message>
     <message>
       <source>Cannot play any video stream</source>
-      <translation type="unfinished">Cannot play any video stream</translation>
+      <translation>비디오 스트림을 재생할 수 없습니다.</translation>
     </message>
   </context>
   <context>

@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.9.0 FATAL_ERROR)
+cmake_minimum_required(VERSION 3.10.0 FATAL_ERROR)
 set(CMAKE_SUPPRESS_REGENERATION true)
 include(cmake/option.cmake)
 include(cmake/default_target.cmake)
@@ -49,7 +49,7 @@ set(releaseVersion ${PROJECT_VERSION})
 set(releaseVersion.short ${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR})
 set(releaseVersion.full ${releaseVersion}.${buildNumber})
 
-set(mobileClientVersion 17.3)
+set(mobileClientVersion 18.1)
 set(mobileClientVersion.full ${mobileClientVersion}.${buildNumber})
 
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
@@ -84,10 +84,6 @@ include(compiler_options)
 include(output_directories)
 include(distribution_names)
 
-if(MACOSX OR IOS)
-    include(macosx_keychain)
-endif()
-
 if(WINDOWS)
     include(windows_signing)
 endif()
@@ -103,6 +99,11 @@ endif()
 include(dependencies)
 include(maven_compatibility)
 include(generate_current_config)
+
+if(MACOSX OR IOS)
+    include(macosx_keychain)
+endif()
+
 include(project_utils)
 include(test_utils)
 
@@ -209,6 +210,10 @@ if(withMediaServer)
         add_subdirectory(nx_metadata_sdk)
     endif()
 
+    if(withMediaDbUtil)
+        add_subdirectory(media_db_util)
+    endif()
+
     if(LINUX AND box MATCHES "none|tx1")
         add_subdirectory(root_tool)
     endif()
@@ -268,8 +273,17 @@ if(beta)
 else()
     set(beta_bool "false")
 endif()
-nx_configure_file(
-    build_variables/maven/filter-resources/build_info.txt
-    ${CMAKE_CURRENT_BINARY_DIR})
 
 nx_save_known_files()
+
+if(withClouds)
+    add_custom_target(cloud DEPENDS cloud-backend)
+
+    if(LINUX)
+        add_subdirectory(cloud_portal)
+        add_custom_target(cloud-frontend DEPENDS cloud_portal)
+        add_dependencies(cloud cloud-frontend)
+
+        add_subdirectory(nx_cloud_deploy)
+    endif()
+endif()

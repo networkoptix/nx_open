@@ -27,7 +27,30 @@ namespace {
     }
 }
 
-int QnHelpTopicAccessor::helpTopic(QObject *object) {
+int QnHelpTopicAccessor::helpTopic(const QWidget* object)
+{
+    if (!object)
+    {
+        qnNullWarning(object);
+        return Qn::Empty_Help;
+    }
+
+    // Iterating through all the hierarchy to get a proper help topic
+    for (auto widget = object; widget; widget = widget->parentWidget())
+    {
+        const auto property = widget->property(qn_helpTopicPropertyName);
+        const auto topicId = qAbs(qvariant_cast<int>(property, Qn::Empty_Help));
+        if (topicId == Qn::Forced_Empty_Help)
+            break;
+        if (topicId != Qn::Empty_Help)
+            return topicId;
+    }
+
+    return Qn::Empty_Help;
+}
+
+int QnHelpTopicAccessor::helpTopic(QObject *object)
+{
     if(!object) {
         qnNullWarning(object);
         return Qn::Empty_Help;

@@ -46,6 +46,7 @@ public:
         AbstractResponseSender* responseSender,
         std::unique_ptr<AbstractStreamSocket> connectionToTheTargetPeer);
 
+    void setTargetHostConnectionInactivityTimeout(std::chrono::milliseconds timeout);
     /** MUST be called to start actual activity. */
     void start();
 

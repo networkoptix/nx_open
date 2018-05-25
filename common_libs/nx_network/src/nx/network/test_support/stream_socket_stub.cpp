@@ -7,7 +7,7 @@ namespace network {
 namespace test {
 
 StreamSocketStub::StreamSocketStub():
-    base_type(&m_delegatee)
+    base_type(&m_delegate)
 {
     setNonBlockingMode(true);
 
@@ -79,11 +79,11 @@ bool StreamSocketStub::getKeepAlive(boost::optional<KeepAliveOptions>* result) c
     return true;
 }
 
-void StreamSocketStub::cancelIOSync(nx::network::aio::EventType eventType)
+void StreamSocketStub::cancelIoInAioThread(nx::network::aio::EventType eventType)
 {
     if (eventType & nx::network::aio::EventType::etRead)
         m_readBuffer = nullptr;
-    base_type::cancelIOSync(eventType);
+    base_type::cancelIoInAioThread(eventType);
 }
 
 QByteArray StreamSocketStub::read()

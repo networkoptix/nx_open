@@ -47,7 +47,7 @@ SystemManager::SystemManager(
     const AbstractSystemHealthInfoProvider& systemHealthInfoProvider,
     nx::utils::db::AsyncSqlQueryExecutor* const dbManager,
     AbstractEmailManager* const emailManager,
-    ec2::SyncronizationEngine* const ec2SyncronizationEngine) noexcept(false)
+    data_sync_engine::SyncronizationEngine* const ec2SyncronizationEngine) noexcept(false)
 :
     m_settings(settings),
     m_timerManager(timerManager),
@@ -136,10 +136,12 @@ void SystemManager::authenticateByName(
     QnMutexLocker lock(&m_mutex);
 
     auto& systemByIdIndex = m_systems.get<kSystemByIdIndex>();
-    const auto systemIter = systemByIdIndex.find(
-        std::string(username.constData(), username.size()));
+    const auto systemIter = systemByIdIndex.find(username.toStdString());
     if (systemIter == systemByIdIndex.end())
+    {
+        result = api::ResultCode::badUsername;
         return;
+    }
 
     if (systemIter->status == api::SystemStatus::deleted_)
     {
@@ -1901,7 +1903,7 @@ void SystemManager::expiredSystemsDeletedFromDb(
 nx::utils::db::DBResult SystemManager::processEc2SaveUser(
     nx::utils::db::QueryContext* queryContext,
     const nx::String& systemId,
-    ::ec2::QnTransaction<::ec2::ApiUserData> transaction,
+    data_sync_engine::Command<::ec2::ApiUserData> transaction,
     data::SystemSharing* const systemSharingData)
 {
     const auto& vmsUser = transaction.params;
@@ -1977,7 +1979,7 @@ void SystemManager::onEc2SaveUserDone(
 nx::utils::db::DBResult SystemManager::processEc2RemoveUser(
     nx::utils::db::QueryContext* queryContext,
     const nx::String& systemId,
-    ::ec2::QnTransaction<nx::vms::api::IdData> transaction,
+    data_sync_engine::Command<nx::vms::api::IdData> transaction,
     data::SystemSharing* const systemSharingData)
 {
     const auto& data = transaction.params;
@@ -2029,7 +2031,7 @@ void SystemManager::onEc2RemoveUserDone(
 nx::utils::db::DBResult SystemManager::processSetResourceParam(
     nx::utils::db::QueryContext* queryContext,
     const nx::String& systemId,
-    ::ec2::QnTransaction<nx::vms::api::ResourceParamWithRefData> transaction,
+    data_sync_engine::Command<nx::vms::api::ResourceParamWithRefData> transaction,
     data::SystemAttributesUpdate* const systemNameUpdate)
 {
     const auto& data = transaction.params;
@@ -2065,7 +2067,7 @@ void SystemManager::onEc2SetResourceParamDone(
 nx::utils::db::DBResult SystemManager::processRemoveResourceParam(
     nx::utils::db::QueryContext* /*queryContext*/,
     const nx::String& systemId,
-    ::ec2::QnTransaction<nx::vms::api::ResourceParamWithRefData> data)
+    data_sync_engine::Command<nx::vms::api::ResourceParamWithRefData> data)
 {
     // This can only be removal of already-removed user attribute.
     NX_LOGX(

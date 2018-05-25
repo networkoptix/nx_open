@@ -744,6 +744,7 @@ bool ServerMessageBus::handlePushImpersistentBroadcastTransaction(
 	const QByteArray& payload)
 {
 	return handleTransactionWithHeader(
+        this,
 		connection,
 		payload,
 		GotTransactionFuction());

@@ -30,7 +30,6 @@ void QnCommonModuleAware::init(QObject* parent)
     }
 
     m_initialized = (m_commonModule != nullptr);
-    NX_ASSERT(m_initialized);
 }
 
 void QnCommonModuleAware::initializeContext(QObject *parent)
@@ -51,7 +50,6 @@ void QnCommonModuleAware::deinitializeContext()
 
 QnCommonModule* QnCommonModuleAware::commonModule() const
 {
-    NX_ASSERT(m_initialized);
     return m_commonModule;
 }
 

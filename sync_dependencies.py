@@ -29,6 +29,7 @@ def determine_package_versions():
 
     if platform == "windows":
         v["qt"] = "5.6.1-1"
+        v["ffmpeg"] = "3.1.9"
 
     if platform == "linux" and box == "none":
         v["qt"] = "5.6.2-2"
@@ -100,11 +101,6 @@ def sync_dependencies(syncher):
         sync("openssl")
 
     sync("ffmpeg")
-
-    if platform in ("linux", "macosx") and arch in ("x64", "x86"):
-        sync("libmp3lame-3.100")
-        sync("libvpx-1.7.0")
-        sync("vorbis-1.3.5")
 
     if platform == "linux" and box in ("bpi", "bananapi", "rpi", "tx1", "none"):
         sync("sysroot", path_variable="sysroot_directory")
@@ -182,21 +178,27 @@ def sync_dependencies(syncher):
         sync("linux/doxygen", path_variable="doxygen_directory")
 
     if box == "bpi":
-        sync("libvdpau-sunxi-1.0-deb7")
-        sync("proxy-decoder-deb7")
-        sync("ldpreloadhook-1.0-deb7")
-        sync("libpixman-0.34.0-deb7")
-        sync("libcedrus-1.0-deb7")
+        # Lite Client dependencies.
+        #sync("fontconfig-2.11.0")
+        #sync("additional-fonts")
+        #sync("read-edid-3.0.2")
+        #sync("a10-display")
+        
+        # Hardware video decoding in Lite Client on Debian 7; kernel upgrade.
+        #sync("libvdpau-sunxi-1.0-deb7")
+        #sync("ldpreloadhook-1.0-deb7")
+        #sync("libpixman-0.34.0-deb7")
+        #sync("libcedrus-1.0-deb7")
+        #sync("uboot-2014.04-10733-gbb5691c-dirty-vanilla")
 
-        sync("fontconfig-2.11.0")
-        sync("additional-fonts")
+        # Required to build Lite Client with proxy-decoder support.
+        sync("proxy-decoder-deb7")
+
+        # Required for ffmpeg.
         sync("libvdpau-1.0.4.1")
 
-        sync("read-edid-3.0.2")
-        sync("a10-display")
-        sync("uboot-2014.04-10733-gbb5691c-dirty-vanilla")
-
     sync("any/certificates-" + customization, path_variable="certificates_path")
+    sync("any/root-certificates", path_variable="root_certificates_path")
 
 
 def main():

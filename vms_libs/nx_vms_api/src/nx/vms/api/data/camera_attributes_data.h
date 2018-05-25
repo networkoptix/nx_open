@@ -2,6 +2,7 @@
 
 #include "data.h"
 
+#include <nx/vms/api/types/motion_types.h>
 #include <nx/vms/api/types/resource_types.h>
 
 #include <nx/utils/uuid.h>

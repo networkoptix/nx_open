@@ -1,11 +1,10 @@
 import logging
 import string
-from abc import ABCMeta
+from abc import ABCMeta, abstractproperty
 from contextlib import closing
 from functools import wraps
 from io import BytesIO
 
-from netaddr.ip import IPAddress
 from nmb.NetBIOS import NetBIOS
 from pathlib2 import PureWindowsPath
 from pylru import lrudecorator
@@ -44,21 +43,29 @@ def _reraising_on_operation_failure(status_to_error_cls):
 
 class SMBPath(FileSystemPath, PureWindowsPath):
     __metaclass__ = ABCMeta
-    _username, _password = '', ''
-    _name_service_address, _name_service_port = IPAddress('0.0.0.0'), 0
-    _session_service_address, _session_service_port = IPAddress('0.0.0.0'), 0
+    _username, _password = abstractproperty(), abstractproperty()
+    _name_service_address, _name_service_port = abstractproperty(), abstractproperty()
+    _session_service_address, _session_service_port = abstractproperty(), abstractproperty()
 
     @classmethod
-    @lrudecorator(1)
+    @lrudecorator(100)
     def _net_bios_name(cls):
         with closing(NetBIOS(broadcast=False)) as client:
             server_name = client.queryIPForName(
                 str(cls._name_service_address), port=cls._name_service_port)
+            # TODO: Check and retry when got None.
         return server_name[0]
 
     @classmethod
-    @lrudecorator(1)
+    @lrudecorator(100)
     def _connection(cls):
+        # TODO: Use connection pooling with keep-alive: connections can be closed from server side.
+        # See: http://pysmb.readthedocs.io/en/latest/api/smb_SMBConnection.html (Caveats section)
+        # Do not keep a SMBConnection instance "idle" for too long,
+        # i.e. keeping a SMBConnection instance but not using it.
+        # Most SMB/CIFS servers have some sort of keepalive mechanism and
+        # impose a timeout limit. If the clients fail to respond within
+        # the timeout limit, the SMB/CIFS server may disconnect the client.
         client_name = u'FUNC_TESTS_EXECUTION'.encode('ascii')  # Arbitrary ASCII string.
         server_name = cls._net_bios_name()
         connection = SMBConnection(
@@ -104,9 +111,6 @@ class SMBPath(FileSystemPath, PureWindowsPath):
         if '*' in str(self):
             raise ValueError("{!r} contains '*', but files can be deleted only by one")
         self._connection().deleteFiles(self._service_name, self._relative_path)
-
-    def iterdir(self):
-        return self.glob('*')
 
     def expanduser(self):
         """Don't do any expansion on Windows"""
@@ -166,7 +170,7 @@ class SMBPath(FileSystemPath, PureWindowsPath):
 
     def rmtree(self, ignore_errors=False):
         try:
-            iter_entries = self.iterdir()
+            iter_entries = self.glob('*')
         except DoesNotExist:
             if ignore_errors:
                 pass

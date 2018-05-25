@@ -1,6 +1,5 @@
 #include "cloud_tunnel_connector_executor.h"
 
-#include <nx/fusion/serialization/lexical.h>
 #include <nx/utils/log/log.h>
 
 namespace nx {
@@ -122,7 +121,7 @@ void ConnectorExecutor::onConnectorFinished(
     std::unique_ptr<AbstractOutgoingTunnelConnection> connection)
 {
     NX_LOGX(lm("cross-nat %1. Connector has finished with result: %2, %3")
-        .arg(m_connectSessionId).arg(QnLexical::serialized(resultCode))
+        .arg(m_connectSessionId).arg(api::toString(resultCode))
         .arg(SystemError::toString(sysErrorCode)),
         cl_logDEBUG2);
 

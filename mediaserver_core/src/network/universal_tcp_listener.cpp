@@ -84,14 +84,13 @@ nx::network::AbstractStreamServerSocket* QnUniversalTcpListener::createAndPrepar
     const nx::network::SocketAddress& localAddress)
 {
     QnMutexLocker lk(&m_mutex);
-    if (m_preparedTcpSockets.empty())
-        m_preparedTcpSockets = createAndPrepareTcpSockets(localAddress);
+    auto tcpSockets = createAndPrepareTcpSockets(localAddress);
 
-    if (m_preparedTcpSockets.empty())
+    if (tcpSockets.empty())
         return nullptr;
 
     auto multipleServerSocket = std::make_unique<nx::network::MultipleServerSocket>();
-    for (auto& socket: m_preparedTcpSockets)
+    for (auto& socket: tcpSockets)
     {
         if (!multipleServerSocket->addSocket(std::move(socket)))
         {
@@ -103,7 +102,6 @@ nx::network::AbstractStreamServerSocket* QnUniversalTcpListener::createAndPrepar
         ++m_cloudSocketIndex;
     }
 
-    m_preparedTcpSockets.clear();
 
     #ifdef LISTEN_ON_UDT_SOCKET
         auto udtServerSocket = std::make_unique<nx::network::UdtStreamServerSocket>();
@@ -126,9 +124,9 @@ nx::network::AbstractStreamServerSocket* QnUniversalTcpListener::createAndPrepar
     #ifdef ENABLE_SSL
         if (sslNeeded)
         {
-            m_serverSocket = std::make_unique<nx::network::deprecated::SslServerSocket>(
-                std::move(m_serverSocket),
-                true);
+            m_serverSocket = nx::network::SocketFactory::createSslAdapter(
+                std::exchange(m_serverSocket, nullptr),
+                nx::network::ssl::EncryptionUse::autoDetectByReceivedData);
         }
     #endif
 
@@ -242,13 +240,8 @@ void QnUniversalTcpListener::enableUnauthorizedForwarding(const QString& path)
     m_unauthorizedForwardingPaths.insert(lit("/") + path + lit("/"));
 }
 
-void QnUniversalTcpListener::setPreparedTcpSockets(
-    std::vector<std::unique_ptr<nx::network::AbstractStreamServerSocket>> sockets)
-{
-    m_preparedTcpSockets = std::move(sockets);
-}
 
-std::vector<std::unique_ptr<nx::network::AbstractStreamServerSocket>> 
+std::vector<std::unique_ptr<nx::network::AbstractStreamServerSocket>>
     QnUniversalTcpListener::createAndPrepareTcpSockets(const nx::network::SocketAddress& localAddress)
 {
     uint16_t assignedPort = 0;

@@ -3,9 +3,12 @@
 #include <memory>
 #include <tuple>
 
+#include <libavutil/pixfmt.h>
+
 #include <nx/kit/debug.h>
 #include <common/common_module.h>
 #include <media_server/media_server_module.h>
+#include <nx/utils/file_system.h>
 
 #include <plugins/plugin_manager.h>
 #include <plugins/plugin_tools.h>
@@ -29,8 +32,12 @@
 #include <nx/utils/log/log_main.h>
 #include <mediaserver_ini.h>
 #include <plugins/plugins_ini.h>
+#include <nx/sdk/metadata/pixel_format.h>
 
 #include "video_data_receptor.h"
+#include "yuv420_uncompressed_video_frame.h"
+#include "generic_uncompressed_video_frame.h"
+#include "wrapping_compressed_video_packet.h"
 
 namespace nx {
 namespace api {
@@ -50,6 +57,7 @@ namespace metadata {
 using namespace nx::sdk;
 using namespace nx::sdk::metadata;
 using namespace nx::debugging;
+using PixelFormat = UncompressedVideoFrame::PixelFormat;
 
 ManagerPool::ManagerPool(QnMediaServerModule* serverModule):
     m_serverModule(serverModule),
@@ -242,13 +250,68 @@ std::vector<nxpl::Setting> ManagerPool::loadSettingsFromFile(
     return settings;
 }
 
+/** @return Dir ending with "/", intended to receive manifest files. */
+static QString manifestFileDir()
+{
+    QString dir = QDir::cleanPath( //< Normalize to use forward slashes, as required by QFile.
+        QString::fromUtf8(pluginsIni().metadataPluginManifestOutputPath));
+
+    if (QFileInfo(dir).isRelative())
+    {
+        dir.insert(0,
+            // NOTE: QDir::cleanPath() removes trailing '/'.
+            QDir::cleanPath(QString::fromUtf8(nx::kit::IniConfig::iniFilesDir())) + lit("/"));
+    }
+
+    if (!dir.isEmpty() && dir.at(dir.size() - 1) != '/')
+        dir.append('/');
+
+    return dir;
+}
+
+/**
+ * Intended for debug. On error, just log the error message.
+ */
+void ManagerPool::saveManifestToFile(
+    const char* const manifest,
+    const QString& fileDescription,
+    const QString& pluginLibName,
+    const QString& filenameExtraSuffix)
+{
+    const QString dir = manifestFileDir();
+    const QString filename = dir + pluginLibName + filenameExtraSuffix + lit("_manifest.json");
+
+    using nx::utils::log::Level;
+    auto log = //< Can be used to return after logging: return log(...).
+        [&](Level level, const QString& message)
+        {
+            NX_UTILS_LOG(level, this) << lm("Metadata %1 manifest: %2: [%3]")
+                .args(fileDescription, message, filename);
+        };
+
+    log(Level::info, lit("Saving to file"));
+
+    if (!nx::utils::file_system::ensureDir(dir))
+        return log(Level::error, lit("Unable to create directory for file"));
+
+    QFile f(filename);
+    if (!f.open(QFile::WriteOnly))
+        return log(Level::error, lit("Unable to (re)create file"));
+
+    const int len = strlen(manifest);
+    if (f.write(manifest, len) != len)
+        return log(Level::error, lit("Unable to write to file"));
+}
+
 /** If path is empty, the path to ini_config .ini files is used. */
 static QString settingsFilename(
     const char* const path, const QString& pluginLibName, const QString& extraSuffix = "")
 {
-    return QDir::cleanPath( //< Normalize to use forward slashes, as required by QFile.
-        QString::fromUtf8(path[0] ? path : nx::kit::IniConfig::iniFilesDir()) + lit("/")
-        + pluginLibName + extraSuffix + lit(".json"));
+    QString dir = QDir::cleanPath( //< Normalize to use forward slashes, as required by QFile.
+        QString::fromUtf8(path[0] ? path : nx::kit::IniConfig::iniFilesDir()));
+    if (!dir.isEmpty() && dir.at(dir.size() - 1) != '/')
+        dir.append('/');
+    return dir + pluginLibName + extraSuffix + lit(".json");
 }
 
 void ManagerPool::setCameraManagerDeclaredSettings(
@@ -317,7 +380,7 @@ void ManagerPool::createCameraManagersForResourceUnsafe(const QnSecurityCamResou
         boost::optional<nx::api::AnalyticsDeviceManifest> managerManifest;
         boost::optional<nx::api::AnalyticsDriverManifest> auxiliaryPluginManifest;
         std::tie(managerManifest, auxiliaryPluginManifest) =
-            loadManagerManifest(manager.get(), camera);
+            loadManagerManifest(plugin, manager.get(), camera);
         if (managerManifest)
         {
             addManifestToCamera(*managerManifest, camera);
@@ -529,25 +592,29 @@ boost::optional<nx::api::AnalyticsDriverManifest> ManagerPool::loadPluginManifes
     const char* const manifestStr = plugin->capabilitiesManifest(&error);
     if (error != Error::noError)
     {
-        NX_ERROR(this) << lm("Unable to receive Plugin manifest for \"%1\": %2.")
+        NX_ERROR(this) << lm("Unable to receive Plugin manifest for plugin \"%1\": %2.")
             .args(plugin->name(), error);
         return boost::none;
     }
     if (manifestStr == nullptr)
     {
-        NX_ERROR(this) << lm("Received null Plugin manifest for \"%1\".")
+        NX_ERROR(this) << lm("Received null Plugin manifest for plugin \"%1\".")
             .arg(plugin->name());
         return boost::none;
     }
 
-    auto pluginManifest = deserializeManifest<nx::api::AnalyticsDriverManifest>(
-        manifestStr);
+    if (pluginsIni().metadataPluginManifestOutputPath[0])
+    {
+        saveManifestToFile(
+            manifestStr, "Plugin", qnServerModule->pluginManager()->pluginLibName(plugin));
+    }
+
+    auto pluginManifest = deserializeManifest<nx::api::AnalyticsDriverManifest>(manifestStr);
 
     if (!pluginManifest)
     {
-        NX_ERROR(
-            this,
-            lm("Cannot deserialize plugin manifest from plugin %1").arg(plugin->name()));
+        NX_ERROR(this) << lm(
+            "Cannot deserialize Plugin manifest from plugin \"%1\"").arg(plugin->name());
         return boost::none; //< Error already logged.
     }
     return pluginManifest;
@@ -617,6 +684,7 @@ std::pair<
     boost::optional<nx::api::AnalyticsDriverManifest>
 >
 ManagerPool::loadManagerManifest(
+    const Plugin* plugin,
     CameraManager* manager,
     const QnSecurityCamResourcePtr& camera)
 {
@@ -628,8 +696,8 @@ ManagerPool::loadManagerManifest(
     // "managerManifest" contains const char* representation of camera manifest.
     // unique_ptr allows us to automatically ask manager to release it when memory is not needed more.
     auto deleter = [manager](const char* ptr) { manager->freeManifest(ptr); };
-    std::unique_ptr<const char, decltype(deleter)> managerManifest(
-        manager->capabilitiesManifest(&error), deleter);
+    std::unique_ptr<const char, decltype(deleter)> managerManifest{
+        manager->capabilitiesManifest(&error), deleter};
 
     if (error != Error::noError)
     {
@@ -638,6 +706,22 @@ ManagerPool::loadManagerManifest(
             lm("Can not fetch manifest for resource %1 (%2), plugin returned error.")
             .args(camera->getUserDefinedName(), camera->getId()));
         return std::make_pair(boost::none, boost::none);
+    }
+
+    if (!managerManifest.get())
+    {
+        NX_ERROR(this) << lm("Received null Plugin Camera Manager manifest for plugin \"%1\".")
+            .arg(plugin->name());
+        return std::make_pair(boost::none, boost::none);
+    }
+
+    if (pluginsIni().metadataPluginManifestOutputPath[0])
+    {
+        saveManifestToFile(
+            managerManifest.get(),
+            "Plugin Camera Manager",
+            qnServerModule->pluginManager()->pluginLibName(plugin),
+            lit("_camera_manager"));
     }
 
     // Manager::capabilitiesManifest can return data in two json formats: either
@@ -760,10 +844,13 @@ void ManagerPool::putVideoFrame(
         compressedFrame ? "compressedFrame" : "/*compressedFrame*/ nullptr",
         uncompressedFrame ? "uncompressedFrame" : "/*uncompressedFrame*/ nullptr");
 
-    if (compressedFrame)
-        m_visualMetadataDebugger->push(compressedFrame);
-    else
+    if (uncompressedFrame)
         m_visualMetadataDebugger->push(uncompressedFrame);
+    else
+        m_visualMetadataDebugger->push(compressedFrame);
+
+    std::map<PixelFormat, nxpt::ScopedRef<UncompressedVideoFrame>> rgbFrames;
+    nxpt::ScopedRef<Yuv420UncompressedVideoFrame> yuv420Frame; //< Will be created on first need.
 
     QnMutexLocker lock(&m_contextMutex);
     for (auto& managerData: m_contexts[id].managers())
@@ -772,35 +859,53 @@ void ManagerPool::putVideoFrame(
             managerData.manager->queryInterface(IID_ConsumingCameraManager));
         if (!manager)
             continue;
-        const bool needDeepCopy = managerData.manifest.capabilities.testFlag(
-            nx::api::AnalyticsDriverManifestBase::needDeepCopyOfVideoFrames);
-        const bool needUncompressedVideoFrames = managerData.manifest.capabilities.testFlag(
-            nx::api::AnalyticsDriverManifestBase::needUncompressedVideoFrames);
+
         DataPacket* dataPacket = nullptr;
-        if (needUncompressedVideoFrames)
-        {
-            if (uncompressedFrame)
-            {
-                dataPacket = VideoDataReceptor::videoDecoderOutputToPlugin(
-                    uncompressedFrame, needDeepCopy);
-            }
-            else
-            {
-                warnOnce(&m_uncompressedFrameWarningIssued,
-                    lm("Uncompressed frame requested but not received."));
-            }
-        }
-        else
+
+        const auto pixelFormat = pixelFormatFromManifest(managerData.manifest);
+        if (!pixelFormat)
         {
             if (compressedFrame)
             {
-                dataPacket = VideoDataReceptor::compressedVideoDataToPlugin(
-                    compressedFrame, needDeepCopy);
+                dataPacket = new WrappingCompressedVideoPacket(compressedFrame);
             }
             else
             {
                 warnOnce(&m_compressedFrameWarningIssued,
                     lm("Compressed frame requested but not received."));
+            }
+        }
+        else
+        {
+            if (uncompressedFrame)
+            {
+                if (pixelFormat.get() == PixelFormat::yuv420)
+                {
+                    if (yuv420Frame.get() == nullptr)
+                        yuv420Frame.reset(new Yuv420UncompressedVideoFrame(uncompressedFrame));
+                    yuv420Frame->addRef();
+                    dataPacket = yuv420Frame.get();
+                }
+                else
+                {
+                    auto it = rgbFrames.find(pixelFormat.get());
+                    if (it == rgbFrames.cend())
+                    {
+                        auto insertResult = rgbFrames.insert(std::make_pair(pixelFormat.get(),
+                            nxpt::ScopedRef<UncompressedVideoFrame>(
+                                videoDecoderOutputToUncompressedVideoFrame(
+                                    uncompressedFrame, pixelFormat.get()))));
+                        NX_ASSERT(insertResult.second);
+                        it = insertResult.first;
+                    }
+                    it->second->addRef();
+                    dataPacket = it->second.get();
+                }
+            }
+            else
+            {
+                warnOnce(&m_uncompressedFrameWarningIssued,
+                    lm("Uncompressed frame requested but not received."));
             }
         }
 
@@ -816,49 +921,148 @@ void ManagerPool::putVideoFrame(
     }
 }
 
-QWeakPointer<VideoDataReceptor> ManagerPool::mediaDataReceptor(const QnUuid& id)
+boost::optional<PixelFormat> ManagerPool::pixelFormatFromManifest(
+    const nx::api::AnalyticsDriverManifest& manifest)
+{
+    using Capability = api::AnalyticsDriverManifestBase::Capability;
+
+    int uncompressedFrameCapabilityCount = 0; //< To check there is 0 or 1 of such capabilities.
+    PixelFormat pixelFormat = PixelFormat::yuv420;
+    auto pixelFormats = getAllPixelFormats(); //< To assert that all pixel formats are tested.
+
+    auto checkCapability =
+        [&](Capability value, PixelFormat correspondingPixelFormat)
+        {
+            if (manifest.capabilities.testFlag(value))
+            {
+                ++uncompressedFrameCapabilityCount;
+                pixelFormat = correspondingPixelFormat;
+            }
+
+            // Delete the pixel format which has been tested.
+            auto it = std::find(pixelFormats.begin(), pixelFormats.end(), correspondingPixelFormat);
+            NX_ASSERT(it != pixelFormats.end());
+            pixelFormats.erase(it);
+        };
+
+    checkCapability(Capability::needUncompressedVideoFrames_yuv420, PixelFormat::yuv420);
+    checkCapability(Capability::needUncompressedVideoFrames_argb, PixelFormat::argb);
+    checkCapability(Capability::needUncompressedVideoFrames_abgr, PixelFormat::abgr);
+    checkCapability(Capability::needUncompressedVideoFrames_rgba, PixelFormat::rgba);
+    checkCapability(Capability::needUncompressedVideoFrames_bgra, PixelFormat::bgra);
+    checkCapability(Capability::needUncompressedVideoFrames_rgb, PixelFormat::rgb);
+    checkCapability(Capability::needUncompressedVideoFrames_bgr, PixelFormat::bgr);
+
+    NX_ASSERT(pixelFormats.empty());
+
+    NX_ASSERT(uncompressedFrameCapabilityCount >= 0);
+    if (uncompressedFrameCapabilityCount > 1)
+    {
+        NX_ERROR(this) << lm(
+            "More than one needUncompressedVideoFrames_... capability found in manifest of \"%1\"")
+            .arg(manifest.driverId);
+    }
+    if (uncompressedFrameCapabilityCount != 1)
+        return boost::optional<PixelFormat>{};
+
+    return boost::optional<PixelFormat>(pixelFormat);
+}
+
+QWeakPointer<VideoDataReceptor> ManagerPool::createVideoDataReceptor(const QnUuid& id)
 {
     QnMutexLocker lock(&m_contextMutex);
     auto& context = m_contexts[id];
 
-    // Check whether at least one CameraManager requires uncompressedFrames.
-    bool uncompressedFramesNeeded = false;
+    // Collect pixel formats required by at least one CameraManager.
+    VideoDataReceptor::NeededUncompressedPixelFormats neededUncompressedPixelFormats;
+    bool needsCompressedFrames = false;
     for (auto& managerData: m_contexts[id].managers())
     {
         nxpt::ScopedRef<ConsumingCameraManager> manager(
             managerData.manager->queryInterface(IID_ConsumingCameraManager));
         if (!manager)
             continue;
-        uncompressedFramesNeeded = managerData.manifest.capabilities.testFlag(
-            nx::api::AnalyticsDriverManifestBase::needUncompressedVideoFrames);
-        if (uncompressedFramesNeeded)
-            break;
+
+        boost::optional<PixelFormat> pixelFormat =
+            pixelFormatFromManifest(managerData.manifest);
+        if (!pixelFormat)
+            needsCompressedFrames = true;
+        else
+            neededUncompressedPixelFormats.insert(pixelFormat.get());
     }
 
-    auto dataReceptor = VideoDataReceptorPtr(new VideoDataReceptor(
+    auto videoDataReceptor = VideoDataReceptorPtr(new VideoDataReceptor(
         [this, id](
             const QnConstCompressedVideoDataPtr& compressedFrame,
             const CLConstVideoDecoderOutputPtr& uncompressedFrame)
         {
             putVideoFrame(id, compressedFrame, uncompressedFrame);
         },
-        uncompressedFramesNeeded
-            ? VideoDataReceptor::AcceptedFrameKind::uncompressed
-            : VideoDataReceptor::AcceptedFrameKind::compressed));
+        needsCompressedFrames,
+        neededUncompressedPixelFormats));
 
-    context.setVideoFrameDataReceptor(dataReceptor);
-    return dataReceptor.toWeakRef();
+    context.setVideoDataReceptor(videoDataReceptor);
+    return videoDataReceptor.toWeakRef();
 }
 
 void ManagerPool::registerDataReceptor(
     const QnResourcePtr& resource,
-    QWeakPointer<QnAbstractDataReceptor> metadaReceptor)
+    QWeakPointer<QnAbstractDataReceptor> dataReceptor)
 {
     QnMutexLocker lock(&m_contextMutex);
     const auto& id = resource->getId();
 
     auto& context = m_contexts[id];
-    context.setMetadataDataReceptor(metadaReceptor);
+    context.setMetadataDataReceptor(dataReceptor);
+}
+
+/**
+ * Converts rgb-like pixel formats. Asserts that pixelFormat is a supported RGB-based format.
+ */
+/*static*/ AVPixelFormat ManagerPool::rgbToAVPixelFormat(PixelFormat pixelFormat)
+{
+    switch (pixelFormat)
+    {
+        case PixelFormat::argb: return AV_PIX_FMT_ARGB;
+        case PixelFormat::abgr: return AV_PIX_FMT_ABGR;
+        case PixelFormat::rgba: return AV_PIX_FMT_RGBA;
+        case PixelFormat::bgra: return AV_PIX_FMT_BGRA;
+        case PixelFormat::rgb: return AV_PIX_FMT_RGB24;
+        case PixelFormat::bgr: return AV_PIX_FMT_BGR24;
+
+        default:
+            NX_ASSERT(false, lm(
+                "Unsupported nx::sdk::metadata::UncompressedVideoFrame::PixelFormat \"%1\" = %2")
+                .args(pixelFormatToStdString(pixelFormat), (int) pixelFormat));
+            return AV_PIX_FMT_NONE;
+    }
+}
+
+/*static*/ UncompressedVideoFrame* ManagerPool::videoDecoderOutputToUncompressedVideoFrame(
+    const CLConstVideoDecoderOutputPtr& frame, PixelFormat pixelFormat)
+{
+    // TODO: Consider supporting other decoded video frame formats.
+    const auto expectedFormat = AV_PIX_FMT_YUV420P;
+    if (frame->format != expectedFormat)
+    {
+        NX_ERROR(typeid(VideoDataReceptor)) << lm(
+            "Decoded frame has AVPixelFormat %1 instead of %2; ignoring")
+            .args(frame->format, expectedFormat);
+        return nullptr;
+    }
+
+    if (pixelFormat == PixelFormat::yuv420)
+        return new Yuv420UncompressedVideoFrame(frame);
+
+    const AVPixelFormat avPixelFormat = rgbToAVPixelFormat(pixelFormat);
+
+    std::vector<std::vector<char>> data(1);
+    std::vector<int> lineSize(1);
+    data[0] = frame->toRgb(&lineSize[0], avPixelFormat);
+
+    return new GenericUncompressedVideoFrame(
+        frame->pkt_dts, frame->width, frame->height, pixelFormat,
+        std::move(data), std::move(lineSize));
 }
 
 } // namespace metadata

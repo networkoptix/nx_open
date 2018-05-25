@@ -1,5 +1,4 @@
-#!/bin/python2
-# -*- coding: utf-8 -*-
+#!/usr/bin/env python
 
 import sys
 import argparse
@@ -51,11 +50,11 @@ def is_background(file):
 
 
 def get_files_list(path):
-    for dirname, dirnames, filenames in os.walk(path):
-        cut = len(path) + 1
-        for filename in filenames:
-            if not filename.startswith('.'):
-                yield os.path.join(dirname, filename)[cut:].replace("\\", "/")
+    for dir, _, files in os.walk(path):
+        dir = os.path.relpath(dir, path)
+        for file in files:
+            if not file.startswith("."):
+                yield os.path.normpath(os.path.join(dir, file)).replace("\\", "/")
 
 
 # TODO: #GDM Method looks crappy
@@ -79,7 +78,7 @@ def validate_project(customized, project, mandatory_files, skipped_modules, skin
             icon = file[len('resources/skin/'):]
             if icon in skin_files:
                 continue
-        warn('File {0}/{1} is suspicious.'.format(project, file))
+        warn('File {0}/{1} is suspicious'.format(project, file))
 
     for file in customized_files:
         if detect_module(file) in skipped_modules:
@@ -92,7 +91,7 @@ def validate_project(customized, project, mandatory_files, skipped_modules, skin
             continue
         if is_background(file):
             continue
-        err('File {0}/{1} is missing!.'.format(project, file))
+        err('File {0}/{1} is missing'.format(project, file))
 
 
 def validate_config(customized, mandatory_keys, all_keys, skipped_modules):
@@ -107,7 +106,7 @@ def validate_config(customized, mandatory_keys, all_keys, skipped_modules):
     mandatory_keys = frozenset(
         x for x in mandatory_keys if detect_module(x) not in skipped_modules)
     for key in mandatory_keys - customization_keys:
-        err('Key {} is missing!'.format(key))
+        err('Key {} is missing'.format(key))
 
     return True
 
@@ -115,9 +114,8 @@ def validate_config(customized, mandatory_keys, all_keys, skipped_modules):
 def read_customizations(customizations_dir):
     for entry in os.listdir(customizations_dir):
         path = os.path.join(customizations_dir, entry)
-        if (not os.path.isdir(path)):
-            continue
-        yield Customization(entry, path)
+        if os.path.isdir(path):
+            yield Customization(entry, path)
 
 
 def validate_skins(root_dir):
@@ -226,7 +224,7 @@ def validate_customizations(root_dir):
         if verbose:
             separator()
 
-    return True
+    return 0
 
 
 def main():

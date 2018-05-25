@@ -5,11 +5,10 @@
 #include <nx/network/socket_common.h>
 #include <nx/utils/log/log_message.h>
 
-#include <transaction/transaction_transport_header.h>
+#include "command.h"
 
 namespace nx {
-namespace cdb {
-namespace ec2 {
+namespace data_sync_engine {
 
 class TransactionTransportHeader
 {
@@ -17,7 +16,7 @@ public:
     nx::String systemId;
     network::SocketAddress endpoint;
     nx::String connectionId;
-    ::ec2::QnTransactionTransportHeader vmsTransportHeader;
+    CommandTransportHeader vmsTransportHeader;
     int transactionFormatVersion;
 
     TransactionTransportHeader():
@@ -31,6 +30,5 @@ public:
     }
 };
 
-} // namespace ec2
-} // namespace cdb
+} // namespace data_sync_engine
 } // namespace nx

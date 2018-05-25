@@ -28,7 +28,16 @@ Object
             else
                 Workflow.openSessionsScreen()
         }
-        onResourcesScreenRequested: Workflow.openResourcesScreen(connectionManager.systemName)
-        onVideoScreenRequested: Workflow.openVideoScreen(resourceId)
+
+        onConnectToServerScreenRequested:
+            Workflow.openConnectToServerScreen(host, user, password)
+        onResourcesScreenRequested:
+            Workflow.openResourcesScreen(connectionManager.systemName, filterIds)
+        onVideoScreenRequested:
+        {
+            Workflow.openVideoScreen(cameraId, undefined, undefined, undefined, timestamp)
+        }
+        onLoginToCloudScreenRequested:
+            Workflow.openCloudScreen(user, password, connectOperationId)
     }
 }

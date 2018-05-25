@@ -67,6 +67,14 @@ void QnTransactionTcpProcessor::run()
     }
     parseRequest();
 
+
+    if (commonModule()->isStandAloneMode())
+    {
+        NX_DEBUG(this, "Incoming messageBus connections are temporary disabled. Ignore new incoming connection.");
+        sendResponse(nx::network::http::StatusCode::forbidden, nx::network::http::StringType());
+        return;
+    }
+
     QUrlQuery query = QUrlQuery(d->request.requestLine.url.query());
 
     QnUuid remoteGuid = QnUuid(query.queryItemValue("guid"));

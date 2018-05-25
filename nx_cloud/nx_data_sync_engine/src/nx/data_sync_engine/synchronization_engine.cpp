@@ -3,8 +3,7 @@
 #include <nx/network/url/url_parse_helper.h>
 
 namespace nx {
-namespace cdb {
-namespace ec2 {
+namespace data_sync_engine {
 
 SyncronizationEngine::SyncronizationEngine(
     const QnUuid& moduleGuid,
@@ -68,12 +67,12 @@ const IncomingTransactionDispatcher&
     return m_incomingTransactionDispatcher;
 }
 
-ec2::ConnectionManager& SyncronizationEngine::connectionManager()
+ConnectionManager& SyncronizationEngine::connectionManager()
 {
     return m_connectionManager;
 }
 
-const ec2::ConnectionManager& SyncronizationEngine::connectionManager() const
+const ConnectionManager& SyncronizationEngine::connectionManager() const
 {
     return m_connectionManager;
 }
@@ -104,20 +103,20 @@ void SyncronizationEngine::registerHttpApi(
 {
     registerHttpHandler(
         nx::network::url::joinPath(pathPrefix, kEstablishEc2TransactionConnectionPath),
-        &ec2::ConnectionManager::createTransactionConnection,
+        &ConnectionManager::createTransactionConnection,
         &m_connectionManager,
         dispatcher);
 
     registerHttpHandler(
         nx::network::http::Method::get,
         nx::network::url::joinPath(pathPrefix, kEstablishEc2P2pTransactionConnectionPath),
-        &ec2::ConnectionManager::createWebsocketTransactionConnection,
+        &ConnectionManager::createWebsocketTransactionConnection,
         &m_connectionManager,
         dispatcher);
 
     registerHttpHandler(
         nx::network::url::joinPath(pathPrefix, kPushEc2TransactionPath),
-        &ec2::ConnectionManager::pushTransaction,
+        &ConnectionManager::pushTransaction,
         &m_connectionManager,
         dispatcher);
 }
@@ -170,6 +169,5 @@ void SyncronizationEngine::onSystemDeleted(const std::string& systemId)
         });
 }
 
-} // namespace ec2
-} // namespace cdb
+} // namespace data_sync_engine
 } // namespace nx

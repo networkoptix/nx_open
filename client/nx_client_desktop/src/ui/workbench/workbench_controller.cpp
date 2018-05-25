@@ -1320,8 +1320,7 @@ void QnWorkbenchController::at_display_widgetAboutToBeRemoved(QnResourceWidget *
         m_replacedWorkbenchItems.removeOne(item);
 
     widget->removeEventFilter(this);
-
-    disconnect(widget, NULL, this, NULL);
+    widget->disconnect(this);
 }
 
 void QnWorkbenchController::at_widget_rotationStartRequested(QnResourceWidget *widget) {

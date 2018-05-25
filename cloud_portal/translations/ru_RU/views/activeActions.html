@@ -23,7 +23,7 @@
     
     <div ng-if="reactivating" class="text-center">
         <div ng-if='data.email'>
-            <h1>Вы зарегистрировались в {{PRODUCT_NAME}}</h1>
+            <h1>Вы зарегистрировались в %PRODUCT_NAME%</h1>
             <p>Мы отправили вам письмо с ссылкой активации на адрес {{data.email}}.<br>
             Пожалуйста, активируйте свою учетную запись, перейдя по этой ссылке.</p>
         </div>
@@ -40,7 +40,7 @@
                 </div>
                 <div class="col-sm-4">
                     <span class="help-block" ng-if="reactivateAccount.email.$touched && reactivateAccount.email.$error.required">Требуется Email</span>
-                     <span class="help-block" ng-if="reactivateAccount.email.$touched && reactivateAccount.email.$error.email">Пожалуйста, введите действительный адрес электронной почты</span>
+                     <span class="help-block" ng-if="reactivateAccount.email.$touched && reactivateAccount.email.$error.email">Пожалуйста, введите действительный Email</span>
                 </div>
             </div>
             <div class="form-group">
@@ -73,7 +73,7 @@
                 </div>
                 <div class="col-sm-4">
                     <span class="help-block" ng-if="restorePassword.email.$touched && restorePassword.email.$error.required">Email обязателен для заполнения</span>
-                     <span class="help-block" ng-if="restorePassword.email.$touched && restorePassword.email.$error.email">Пожалуйста введите действительный адрес электронной почты</span>
+                     <span class="help-block" ng-if="restorePassword.email.$touched && restorePassword.email.$error.email">Пожалуйста введите действительный Email</span>
                 </div>
             </div>
             <div class="form-group">

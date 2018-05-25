@@ -98,17 +98,14 @@ namespace ec2
             outData->licenses.push_back(std::move(statLicense));
         }
 
-        nx::vms::event::RuleList bRules;
-        errCode = m_ec2Connection->getBusinessEventManager(Qn::kSystemAccess)->getBusinessRulesSync(&bRules);
+        nx::vms::api::EventRuleDataList eventRules;
+        errCode = m_ec2Connection->getEventRulesManager(Qn::kSystemAccess)->getEventRulesSync(
+            &eventRules);
         if (errCode != ErrorCode::ok)
             return errCode;
 
-        for (auto& br: bRules)
-        {
-            nx::vms::api::EventRuleData apiData;
-            fromResourceToApi(br, apiData);
-            outData->businessRules.push_back(std::move(apiData));
-        }
+        for (auto& rule: eventRules)
+            outData->businessRules.emplace_back(std::move(rule));
 
         errCode = m_ec2Connection->getLayoutManager(Qn::kSystemAccess)->getLayoutsSync(&outData->layouts);
         if (errCode != ErrorCode::ok)

@@ -79,7 +79,7 @@ Error CommonVideoFrameProcessingCameraManager::pushDataPacket(DataPacket* dataPa
         return Error::unknownError;
     }
 
-    if (auto videoFrame = nxpt::ScopedRef<CommonCompressedVideoPacket>(
+    if (auto videoFrame = nxpt::ScopedRef<CompressedVideoPacket>(
         dataPacket->queryInterface(IID_CompressedVideoPacket)))
     {
         if (!pushCompressedVideoFrame(videoFrame.get()))
@@ -88,7 +88,7 @@ Error CommonVideoFrameProcessingCameraManager::pushDataPacket(DataPacket* dataPa
             return Error::unknownError;
         }
     }
-    else if (auto videoFrame = nxpt::ScopedRef<CommonUncompressedVideoFrame>(
+    else if (auto videoFrame = nxpt::ScopedRef<UncompressedVideoFrame>(
         dataPacket->queryInterface(IID_UncompressedVideoFrame)))
     {
         if (!pushUncompressedVideoFrame(videoFrame.get()))

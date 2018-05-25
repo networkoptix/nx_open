@@ -4,12 +4,11 @@ from django.db import models
 from django.conf import settings
 from jsonfield import JSONField
 from model_utils import Choices
-from django.core.cache import cache
+from django.core.cache import cache, caches
 from util.config import get_config
 
+from django.contrib.auth.models import Group
 from django.template.defaultfilters import truncatechars
-
-from django.core.cache import caches
 
 
 def update_global_cache(customization, version_id):
@@ -40,7 +39,12 @@ def customization_cache(customization_name, value=None, force=False):
             'default_language': customization.default_language.code,
             'mail_from_name': customization.read_global_value('%MAIL_FROM_NAME%'),
             'mail_from_email': customization.read_global_value('%MAIL_FROM_EMAIL%'),
-            'portal_url': custom_config['cloud_portal']['url']
+            'portal_url': custom_config['cloud_portal']['url'],
+            'smtp_host': customization.read_global_value('%SMTP_HOST%'),
+            'smtp_port': customization.read_global_value('%SMTP_PORT%'),
+            'smtp_user': customization.read_global_value('%SMTP_USER%'),
+            'smtp_password': customization.read_global_value('%SMTP_PASSWORD%'),
+            'smtp_tls': customization.read_global_value('%SMTP_TLS%')
         }
         cache.set(customization_name, data)
         update_global_cache(customization, data['version_id'])
@@ -76,13 +80,57 @@ class Context(models.Model):
     translatable = models.BooleanField(default=True)
     is_global = models.BooleanField(default=False)
     hidden = models.BooleanField(default=False)
-    template = models.TextField(blank=True, default="")
 
     file_path = models.CharField(max_length=1024, blank=True, default='')
     url = models.CharField(max_length=1024, blank=True, default='')
 
     def __str__(self):
         return self.name
+
+    def template_for_language(self, language, default_language):
+        context_template = self.contexttemplate_set.filter(language=language)
+        if not context_template.exists():  # No template for language - try to get default language
+            context_template = self.contexttemplate_set.filter(language=default_language)
+
+        if not context_template.exists():  # No template for default language - try to get default template
+            context_template = self.contexttemplate_set.filter(language=None)
+
+        if context_template.exists():
+            return context_template.first().template
+
+        # No template at all
+        return None
+
+
+class Language(models.Model):
+    name = models.CharField(max_length=255, unique=True)
+    code = models.CharField(max_length=8, unique=True)
+
+    def __str__(self):
+        return self.code
+
+    @staticmethod
+    def by_code(language_code, default_language=None):
+        if language_code:
+            language = Language.objects.filter(code=language_code)
+            if language.exists():
+                return language.first()
+        return default_language
+
+
+class ContextTemplate(models.Model):
+    class Meta:
+        unique_together = ('context', 'language')
+
+    context = models.ForeignKey(Context)
+    language = models.ForeignKey(Language, null=True)
+    template = models.TextField()
+    def __str__(self):
+        if not self.language:
+            return self.context.name
+        if self.context.file_path:
+            return self.context.file_path.replace("{{language}}", self.language.code)
+        return self.context.name + "-" + self.language.name
 
 
 class DataStructure(models.Model):
@@ -96,7 +144,7 @@ class DataStructure(models.Model):
     context = models.ForeignKey(Context)
     name = models.CharField(max_length=1024)
     description = models.TextField()
-    label = models.CharField(max_length=1024, blank=True)
+    label = models.CharField(max_length=1024, blank=True, default='')
 
     DATA_TYPES = Choices((0, 'text', 'Text'),
                          (1, 'image', 'Image'),
@@ -157,7 +205,7 @@ class DataStructure(models.Model):
                     content_value = content_record.latest('version_id').value
 
         # if no value or optional and type file - use default value from structure
-        if not content_value and (not self.optional or self.optional and self.type == DataStructure.DATA_TYPES.file):
+        if not content_value and (not self.optional or self.optional and self.type in [DataStructure.DATA_TYPES.file, DataStructure.DATA_TYPES.image]):
             content_value = self.default
 
         return content_value
@@ -165,19 +213,12 @@ class DataStructure(models.Model):
 # CMS settings. Release engineer can change that
 
 
-class Language(models.Model):
-    name = models.CharField(max_length=255, unique=True)
-    code = models.CharField(max_length=8, unique=True)
-
-    def __str__(self):
-        return self.code
-
-
 class Customization(models.Model):
     name = models.CharField(max_length=255, unique=True)
     default_language = models.ForeignKey(
         Language, related_name='default_in_%(class)s')
     languages = models.ManyToManyField(Language)
+    filter_horizontal = ('languages',)
 
     PREVIEW_STATUS = Choices((0, 'draft', 'draft'), (1, 'review', 'review'))
     preview_status = models.IntegerField(choices=PREVIEW_STATUS, default=PREVIEW_STATUS.draft)
@@ -224,8 +265,23 @@ class Customization(models.Model):
             return None
         return data_structure.find_actual_value(self, version_id=self.version_id(product.name))
 
-# CMS data. Partners can change that
 
+class UserGroupsToCustomizationPermissions(models.Model):
+    group = models.ForeignKey(Group)
+    customization = models.ForeignKey(Customization)
+
+    @staticmethod
+    def check_permission(user, customization_name, permission=None):
+        if user.is_superuser:
+            return True
+        if permission and not user.has_perm(permission):
+            return False
+
+        return UserGroupsToCustomizationPermissions.objects.filter(group_id__in=user.groups.all(),
+                                                                   customization__name=customization_name).exists()
+
+
+# CMS data. Partners can change that
 
 class ContentVersion(models.Model):
 

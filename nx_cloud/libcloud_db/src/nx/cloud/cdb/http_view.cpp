@@ -96,7 +96,7 @@ void HttpView::registerApiHandlers(
     AbstractSystemHealthInfoProvider* const systemHealthInfoProvider,
     AuthenticationProvider* const authProvider,
     EventManager* const /*eventManager*/,
-    ec2::SyncronizationEngine* const ec2SyncronizationEngine,
+    data_sync_engine::SyncronizationEngine* const ec2SyncronizationEngine,
     MaintenanceManager* const maintenanceManager,
     const CloudModuleUrlProvider& cloudModuleUrlProviderDeprecated,
     const CloudModuleUrlProvider& cloudModuleUrlProvider)
@@ -258,6 +258,15 @@ void HttpView::registerApiHandlers(
 
     m_httpMessageDispatcher.registerRequestProcessor<http_handler::GetCloudModulesXml>(
         kDeprecatedCloudModuleXmlPath,
+        [&authorizationManager, &cloudModuleUrlProviderDeprecated]()
+            -> std::unique_ptr<http_handler::GetCloudModulesXml>
+        {
+            return std::make_unique<http_handler::GetCloudModulesXml>(
+                std::bind(&CloudModuleUrlProvider::getCloudModulesXml, cloudModuleUrlProviderDeprecated, _1));
+        });
+
+    m_httpMessageDispatcher.registerRequestProcessor<http_handler::GetCloudModulesXml>(
+        kAnotherDeprecatedCloudModuleXmlPath,
         [&authorizationManager, &cloudModuleUrlProviderDeprecated]()
             -> std::unique_ptr<http_handler::GetCloudModulesXml>
         {

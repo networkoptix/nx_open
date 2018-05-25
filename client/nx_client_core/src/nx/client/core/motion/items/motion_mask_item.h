@@ -22,6 +22,7 @@ public:
     virtual ~MotionMaskItem() override;
 
     static constexpr int kMotionMaskSizeBytes = MotionGrid::kCellCount / 8;
+    static_assert(MotionGrid::kCellCount % 8 == 0);
 
     // Unaligned binary motion mask, MotionGrid::kGridSize bits, each byte MSB first.
     QByteArray motionMask() const;

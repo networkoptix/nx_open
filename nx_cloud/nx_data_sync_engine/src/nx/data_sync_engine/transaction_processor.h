@@ -1,22 +1,16 @@
 #pragma once
 
 #include <nx/network/aio/timer.h>
+#include <nx/utils/db/async_sql_query_executor.h>
 #include <nx/utils/move_only_func.h>
 #include <nx/utils/log/log.h>
-
-#include <transaction/transaction_transport_header.h>
-#include <transaction/transaction.h>
-#include <nx/utils/db/async_sql_query_executor.h>
 
 #include "serialization/transaction_deserializer.h"
 #include "transaction_log.h"
 #include "transaction_transport_header.h"
 
-namespace ec2 { class QnAbstractTransaction; }
-
 namespace nx {
-namespace cdb {
-namespace ec2 {
+namespace data_sync_engine {
 
 class TransactionLog;
 
@@ -32,7 +26,7 @@ public:
      */
     virtual void processTransaction(
         TransactionTransportHeader transportHeader,
-        ::ec2::QnAbstractTransaction transaction,
+        CommandHeader transaction,
         std::unique_ptr<TransactionUbjsonDataSource> dataSource,
         TransactionProcessedHandler completionHandler) = 0;
     /**
@@ -40,7 +34,7 @@ public:
      */
     virtual void processTransaction(
         TransactionTransportHeader transportHeader,
-        ::ec2::QnAbstractTransaction transaction,
+        CommandHeader transaction,
         QJsonObject serializedTransactionData,
         TransactionProcessedHandler completionHandler) = 0;
 };
@@ -54,7 +48,7 @@ class BaseTransactionProcessor:
     public AbstractTransactionProcessor
 {
 public:
-    typedef ::ec2::QnTransaction<TransactionDataType> Ec2Transaction;
+    typedef Command<TransactionDataType> Ec2Transaction;
 
     virtual ~BaseTransactionProcessor()
     {
@@ -63,7 +57,7 @@ public:
 
     virtual void processTransaction(
         TransactionTransportHeader transportHeader,
-        ::ec2::QnAbstractTransaction transactionHeader,
+        CommandHeader transactionHeader,
         std::unique_ptr<TransactionUbjsonDataSource> dataSource,
         TransactionProcessedHandler completionHandler) override
     {
@@ -91,7 +85,7 @@ public:
 
     virtual void processTransaction(
         TransactionTransportHeader transportHeader,
-        ::ec2::QnAbstractTransaction transactionHeader,
+        CommandHeader transactionHeader,
         QJsonObject serializedTransactionData,
         TransactionProcessedHandler completionHandler) override
     {
@@ -125,7 +119,7 @@ private:
     void processTransactionInternal(
         DeserializeTransactionDataFunc deserializeTransactionDataFunc,
         TransactionTransportHeader transportHeader,
-        ::ec2::QnAbstractTransaction transactionHeader,
+        CommandHeader transactionHeader,
         TransactionProcessedHandler completionHandler)
     {
         auto transaction = Ec2Transaction(std::move(transactionHeader));
@@ -180,7 +174,7 @@ public:
     typedef nx::utils::MoveOnlyFunc<void(
         const nx::String& /*systemId*/,
         TransactionTransportHeader /*transportHeader*/,
-        ::ec2::QnTransaction<TransactionDataType> /*data*/,
+        Command<TransactionDataType> /*data*/,
         TransactionProcessedHandler /*handler*/)> ProcessorFunc;
 
     SpecialCommandProcessor(ProcessorFunc processorFunc)
@@ -215,7 +209,7 @@ class TransactionProcessor:
     public BaseTransactionProcessor<TransactionCommandValue, TransactionDataType>
 {
 public:
-    typedef ::ec2::QnTransaction<TransactionDataType> Ec2Transaction;
+    typedef Command<TransactionDataType> Ec2Transaction;
 
     typedef nx::utils::MoveOnlyFunc<
         nx::utils::db::DBResult(
@@ -364,6 +358,5 @@ private:
     }
 };
 
-} // namespace ec2
-} // namespace cdb
+} // namespace data_sync_engine
 } // namespace nx

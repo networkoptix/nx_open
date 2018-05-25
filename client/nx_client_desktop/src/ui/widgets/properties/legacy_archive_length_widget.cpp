@@ -12,6 +12,7 @@
 
 #include <ui/workaround/widgets_signals_workaround.h>
 #include <nx/client/desktop/common/utils/checkbox_utils.h>
+#include <nx/client/desktop/common/widgets/hint_button.h>
 #include <core/resource/device_dependent_strings.h>
 #include <nx/vms/api/data/camera_attributes_data.h>
 
@@ -31,6 +32,11 @@ QnArchiveLengthWidget::QnArchiveLengthWidget(QWidget* parent):
     ui->setupUi(this);
 
     setHelpTopic(this, Qn::CameraSettings_Recording_ArchiveLength_Help);
+    auto archiveGroupHint = nx::client::desktop::HintButton::hintThat(ui->archiveGroupBox);
+
+    archiveGroupHint->addHintLine(tr("Sets when camera archive will be deleted or saved when there is no space for new recordings."));
+    archiveGroupHint->addHintLine(tr("\"Auto\" deletes the oldest footage first, regardless of the source."));
+    setHelpTopic(archiveGroupHint, Qn::CameraSettings_Recording_ArchiveLength_Help);
 
     CheckboxUtils::autoClearTristate(ui->checkBoxMinArchive);
     CheckboxUtils::autoClearTristate(ui->checkBoxMaxArchive);

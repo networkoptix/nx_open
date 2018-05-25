@@ -1,6 +1,6 @@
 from abc import ABCMeta, abstractmethod
 
-from pathlib2 import Path, PurePath
+from pathlib2 import PurePath
 
 
 class FileSystemPath(PurePath):
@@ -28,16 +28,12 @@ class FileSystemPath(PurePath):
         pass
 
     @abstractmethod
-    def iterdir(self):
-        yield self.__class__()
-
-    @abstractmethod
     def expanduser(self):
         return self.__class__()
 
     @abstractmethod
     def glob(self, pattern):
-        yield self.__class__()
+        return [FileSystemPath()]
 
     @abstractmethod
     def mkdir(self, parents=False, exist_ok=True):

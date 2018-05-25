@@ -5,12 +5,9 @@
 
 #include <utils/common/connective.h>
 
-namespace Ui {
-class FisheyeCalibrationWidget;
-}
-
 class QTimer;
 class QnFisheyeCalibrator;
+namespace Ui { class FisheyeCalibrationWidget; }
 
 namespace nx {
 namespace client {

@@ -5,6 +5,8 @@
 #include <QtWidgets/QApplication>
 #include <QtWidgets/QAbstractScrollArea>
 
+#include <translation/datetime_formatter.h>
+
 #include <core/resource/camera_resource.h>
 #include <core/resource/device_dependent_strings.h>
 #include <core/resource_management/resource_pool.h>
@@ -14,11 +16,12 @@
 
 #include <ui/models/audit/audit_log_model.h>
 #include <ui/style/helper.h>
-#include <ui/workbench/watchers/workbench_server_time_watcher.h>
 #include <ui/workbench/workbench_context.h>
 
 #include <utils/common/scoped_painter_rollback.h>
 #include <utils/math/color_transformations.h>
+
+#include <nx/client/core/watchers/server_time_watcher.h>
 
 namespace
 {
@@ -145,9 +148,9 @@ QSize QnAuditItemDelegate::defaultSizeHint(const QStyleOptionViewItem& option, c
 QSize QnAuditItemDelegate::sizeHint(const QStyleOptionViewItem& option, const QModelIndex& index) const
 {
     static const QDateTime dateTimePattern = QDateTime::fromString(lit("2015-12-12T23:59:59"), Qt::ISODate);
-    static const QString dateTimeStr = dateTimePattern.toString(Qt::DefaultLocaleShortDate);
-    static const QString timeStr = dateTimePattern.time().toString(Qt::DefaultLocaleShortDate);
-    static const QString dateStr = dateTimePattern.date().toString(Qt::DefaultLocaleShortDate);
+    static const QString dateTimeStr = datetime::toString(dateTimePattern);
+    static const QString timeStr = datetime::toString(dateTimePattern.time());
+    static const QString dateStr = datetime::toString(dateTimePattern.date());
     static const QString dateStrWithSpace = dateStr + lit(" ");
 
     QSize result(0, kRowHeight);
@@ -428,9 +431,10 @@ void QnAuditItemDelegate::paintDateTime(const QStyle* style, QPainter* painter, 
         return;
 
     /* Get date and time strings: */
-    QDateTime dateTime = context()->instance<QnWorkbenchServerTimeWatcher>()->displayTime(dateTimeSecs * 1000ll);
-    QString dateStr = dateTime.date().toString(Qt::DefaultLocaleShortDate) + lit(" ");
-    QString timeStr = dateTime.time().toString(Qt::DefaultLocaleShortDate);
+    const auto serverTimeWatcher = context()->instance<nx::client::core::ServerTimeWatcher>();
+    QDateTime dateTime = serverTimeWatcher->displayTime(dateTimeSecs * 1000ll);
+    QString dateStr = datetime::toString(dateTime.date()) + lit(" ");
+    QString timeStr = datetime::toString(dateTime.time());
 
     /* Calculate time offset: */
     int timeXOffset = textWidth(option.font, dateStr);
@@ -466,14 +470,17 @@ void QnAuditItemDelegate::paintDescription(const QStyle* style, QPainter* painte
         case Qn::AR_ViewLive:
         case Qn::AR_ViewArchive:
         case Qn::AR_ExportVideo:
-            mainText = lit("%1 - %2").arg(
-                context()->instance<QnWorkbenchServerTimeWatcher>()->
-                    displayTime(record->rangeStartSec * 1000ll).toString(Qt::DefaultLocaleShortDate)).arg(
-                context()->instance<QnWorkbenchServerTimeWatcher>()->
-                    displayTime(record->rangeEndSec * 1000ll).toString(Qt::DefaultLocaleShortDate));
+        {
+            const auto serverTimeWatcher =
+                context()->instance<nx::client::core::ServerTimeWatcher>();
+            const auto rangeStartTime = datetime::toString(serverTimeWatcher->displayTime(
+                record->rangeStartSec * 1000ll));
+            const auto rangeEndTime = datetime::toString(serverTimeWatcher->displayTime(
+                record->rangeEndSec * 1000ll));
+            mainText = lit("%1 - %2").arg(rangeStartTime, rangeEndTime);
             cameras = QnAuditLogModel::getCameras(record);
             break;
-
+        }
         case Qn::AR_CameraUpdate:
         case Qn::AR_CameraInsert:
             cameras = QnAuditLogModel::getCameras(record);

@@ -561,8 +561,8 @@
       <translation>Ismeretlen hiba</translation>
     </message>
     <message>
-      <source>Server with matching Hardware Id not found</source>
-      <translation>Nem található szerver egyező Hardver Id-vel</translation>
+      <source>Server with matching Hardware ID not found</source>
+      <translation>Nem található szerver egyező Hardver ID-vel</translation>
     </message>
   </context>
   <context>
@@ -684,12 +684,12 @@
       <translation>Vízjel: %1</translation>
     </message>
     <message>
-      <source>Hardware Id: %1</source>
-      <translation>Hardver Id: %1</translation>
-    </message>
-    <message>
       <source>Time License</source>
       <translation>Idő licenc</translation>
+    </message>
+    <message>
+      <source>Hardware ID: %1</source>
+      <translation>Hardver ID: %1</translation>
     </message>
   </context>
   <context>

@@ -44,7 +44,7 @@ public:
     int unreadCount() const;
 
 signals:
-    void countChanged(int count, QPrivateSignal);
+    void countChanged(int count);
     void unreadCountChanged(int unreadCount, QnNotificationLevel::Value importance, QPrivateSignal);
     void tileHovered(const QModelIndex& index, const EventTile* tile);
 

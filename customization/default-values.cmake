@@ -5,7 +5,6 @@ set(windows.skip.sign "false")
 set(help.language "english")
 set(quicksync "false")
 set(dynamic.customization "false")
-set(display.mobile.name "${display.product.name} Mobile")
 set(liteDeviceName "microserver")
 set(shortCloudName "Cloud")
 
@@ -22,6 +21,7 @@ set(defaultSkin "dark_blue")
 
 set(freeLicenseCount "4")
 set(freeLicenseIsTrial "true")
+set(eulaVersion 1)
 
 # Update parameters
 set(update.generator.url "http://updates.hdw.mx/upcombiner/upcombine")
@@ -47,7 +47,7 @@ set(dynamic.customization false)
 
 # Localization
 set(additionalTranslations "")
-set(installer.language "en_US")
+set(installerLanguage "en_US")
 set(installer.cultures "en-us")
 
 set(customization.defines "")

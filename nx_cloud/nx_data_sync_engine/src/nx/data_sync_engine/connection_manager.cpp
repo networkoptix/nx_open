@@ -21,8 +21,7 @@
 #include "websocket_transaction_transport.h"
 
 namespace nx {
-namespace cdb {
-namespace ec2 {
+namespace data_sync_engine {
 
 ConnectionManager::ConnectionManager(
     const QnUuid& moduleGuid,
@@ -329,23 +328,23 @@ void ConnectionManager::dispatchTransaction(
     }
 }
 
-api::VmsConnectionDataList ConnectionManager::getVmsConnections() const
+std::vector<SystemConnectionInfo> ConnectionManager::getConnections() const
 {
     QnMutexLocker lk(&m_mutex);
-    api::VmsConnectionDataList result;
+
+    std::vector<SystemConnectionInfo> result;
+    result.reserve(m_connections.size());
     for (auto it = m_connections.begin(); it != m_connections.end(); ++it)
     {
-        api::VmsConnectionData connectionData;
-        connectionData.systemId = it->fullPeerName.systemId.toStdString();
-        connectionData.mediaserverEndpoint =
-            it->connection->remoteSocketAddr().toString().toStdString();
-        result.connections.push_back(std::move(connectionData));
+        result.push_back({
+            it->fullPeerName.systemId.toStdString(),
+            it->connection->remoteSocketAddr()});
     }
 
     return result;
 }
 
-std::size_t ConnectionManager::getVmsConnectionCount() const
+std::size_t ConnectionManager::getConnectionCount() const
 {
     QnMutexLocker lk(&m_mutex);
     return m_connections.size();
@@ -525,7 +524,7 @@ void ConnectionManager::removeConnectionByIter(
         connectionIterator,
         [&existingConnection](ConnectionContext& data)
         {
-            existingConnection = std::move(data.connection);
+            existingConnection.swap(data.connection);
         });
     connectionIndex.erase(connectionIterator);
 
@@ -671,20 +670,26 @@ template<typename TransactionDataType>
 void ConnectionManager::processSpecialTransaction(
     const nx::String& /*systemId*/,
     const TransactionTransportHeader& transportHeader,
-    ::ec2::QnTransaction<TransactionDataType> data,
+    Command<TransactionDataType> data,
     TransactionProcessedHandler handler)
 {
     QnMutexLocker lk(&m_mutex);
+
     const auto& connectionByIdIndex = m_connections.get<kConnectionByIdIndex>();
     auto connectionIter = connectionByIdIndex.find(transportHeader.connectionId);
     if (connectionIter == connectionByIdIndex.end())
         return; //< This can happen since connection destruction happens with some
                 //  delay after connection has been removed from m_connections.
-    lk.unlock();
 
     // TODO: #ak Get rid of dynamic_cast.
     auto transactionTransport =
         dynamic_cast<TransactionTransport*>(connectionIter->connection.get());
+
+    // NOTE: transactionTransport variable can safely be used within its own AIO thread.
+    NX_ASSERT(transactionTransport->isInSelfAioThread());
+
+    lk.unlock();
+
     if (transactionTransport)
     {
         transactionTransport->processSpecialTransaction(
@@ -722,14 +727,15 @@ nx::network::http::RequestResult ConnectionManager::prepareOkResponseToCreateTra
 
             const auto& connectionByIdIndex = m_connections.get<kConnectionByIdIndex>();
             auto connectionIter = connectionByIdIndex.find(connectionId);
-            NX_ASSERT(connectionIter != connectionByIdIndex.end());
+            if (connectionIter == connectionByIdIndex.end())
+                return; //< Connection can be removed at any moment while accepting another connection.
 
             auto transactionTransport =
                 dynamic_cast<TransactionTransport*>(connectionIter->connection.get());
             if (transactionTransport)
             {
                 transactionTransport->setOutgoingConnection(
-                    QSharedPointer<network::AbstractCommunicatingSocket>(\
+                    QSharedPointer<network::AbstractCommunicatingSocket>(
                         connection->takeSocket().release()));
                 transactionTransport->startOutgoingChannel();
             }
@@ -778,6 +784,5 @@ void ConnectionManager::onHttpConnectionUpgraded(
     }
 }
 
-} // namespace ec2
-} // namespace cdb
+} // namespace data_sync_engine
 } // namespace nx

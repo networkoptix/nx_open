@@ -213,6 +213,9 @@ static AtomicLong dec(AtomicLong* val)
 class CommonRefManager
 {
 public:
+    CommonRefManager(const CommonRefManager&) = delete;
+    CommonRefManager& operator=(const CommonRefManager&) = delete;
+
     /**
      * Use this constructor to delete objToWatch when the reference counter drops to zero.
      * NOTE: After creation, the reference counter is 1.
@@ -266,6 +269,9 @@ template <typename T>
 class CommonRefCounter: public T
 {
 public:
+    CommonRefCounter(const CommonRefCounter&) = delete;
+    CommonRefCounter& operator=(const CommonRefCounter&) = delete;
+
     virtual unsigned int addRef() override { return m_refManager.addRef(); }
     virtual unsigned int releaseRef() override { return m_refManager.releaseRef(); }
 

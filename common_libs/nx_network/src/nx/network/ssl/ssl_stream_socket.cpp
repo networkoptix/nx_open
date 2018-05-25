@@ -68,12 +68,12 @@ int StreamSocketToTwoWayPipelineAdapter::bytesTransferredToPipelineReturnCode(
 //-------------------------------------------------------------------------------------------------
 
 StreamSocket::StreamSocket(
-    std::unique_ptr<AbstractStreamSocket> delegatee,
+    std::unique_ptr<AbstractStreamSocket> delegate,
     bool isServerSide)
     :
-    base_type(delegatee.get()),
-    m_delegatee(std::move(delegatee)),
-    m_socketToPipelineAdapter(m_delegatee.get()),
+    base_type(delegate.get()),
+    m_delegate(std::move(delegate)),
+    m_socketToPipelineAdapter(m_delegate.get()),
     m_proxyConverter(nullptr)
 {
     if (isServerSide)
@@ -81,25 +81,81 @@ StreamSocket::StreamSocket(
     else
         m_sslPipeline = std::make_unique<ssl::ConnectingPipeline>();
 
-    m_proxyConverter.setDelegatee(m_sslPipeline.get());
+    m_proxyConverter.setDelegate(m_sslPipeline.get());
     m_asyncTransformingChannel = std::make_unique<aio::StreamTransformingAsyncChannel>(
-        aio::makeAsyncChannelAdapter(m_delegatee.get()),
+        aio::makeAsyncChannelAdapter(m_delegate.get()),
         &m_proxyConverter);
 
-    base_type::bindToAioThread(m_delegatee->getAioThread());
+    base_type::bindToAioThread(m_delegate->getAioThread());
 }
 
 StreamSocket::~StreamSocket()
 {
+}
+
+void StreamSocket::pleaseStop(nx::utils::MoveOnlyFunc<void()> completionHandler)
+{
+    post(
+        [this, completionHandler = std::move(completionHandler)]()
+        {
+            stopWhileInAioThread();
+            completionHandler();
+        });
+}
+
+void StreamSocket::pleaseStopSync(bool /*checkForLocks*/)
+{
+    if (!m_delegate)
+        return;
+
     if (isInSelfAioThread())
+    {
         stopWhileInAioThread();
+    }
+    else
+    {
+        std::promise<void> stopped;
+        pleaseStop(
+            [&stopped]()
+            {
+                stopped.set_value();
+            });
+        stopped.get_future().wait();
+    }
 }
 
 void StreamSocket::bindToAioThread(aio::AbstractAioThread* aioThread)
 {
     base_type::bindToAioThread(aioThread);
     m_asyncTransformingChannel->bindToAioThread(aioThread);
-    m_delegatee->bindToAioThread(aioThread);
+    m_delegate->bindToAioThread(aioThread);
+}
+
+bool StreamSocket::connect(
+    const SocketAddress& remoteSocketAddress,
+    std::chrono::milliseconds timeout)
+{
+    if (!base_type::connect(remoteSocketAddress, timeout))
+        return false;
+
+    switchToSyncModeIfNeeded();
+    return m_sslPipeline->performHandshake();
+}
+
+void StreamSocket::connectAsync(
+    const SocketAddress& address,
+    nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode)> handler)
+{
+    base_type::connectAsync(
+        address,
+        [this, handler = std::move(handler)](
+            SystemError::ErrorCode connectResultCode) mutable
+        {
+            if (connectResultCode != SystemError::noError)
+                return handler(connectResultCode);
+
+            handshakeAsync(std::move(handler));
+        });
 }
 
 int StreamSocket::recv(void* buffer, unsigned int bufferLen, int flags)
@@ -144,42 +200,44 @@ void StreamSocket::sendAsync(
     m_asyncTransformingChannel->sendAsync(buffer, std::move(handler));
 }
 
-void StreamSocket::cancelIOAsync(
-    nx::network::aio::EventType eventType,
-    nx::utils::MoveOnlyFunc<void()> handler)
+bool StreamSocket::isEncryptionEnabled() const
 {
-    post(
-        [this, eventType, handler = std::move(handler)]()
+    return true;
+}
+
+void StreamSocket::handshakeAsync(
+    nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode)> handler)
+{
+    switchToAsyncModeIfNeeded();
+
+    m_asyncTransformingChannel->sendAsync(
+        m_emptyBuffer,
+        [handler = std::move(handler)](
+            SystemError::ErrorCode systemErrorCode,
+            std::size_t /*bytesSent*/)
         {
-            cancelIOSync(eventType);
-            handler();
+            handler(systemErrorCode);
         });
 }
 
-void StreamSocket::cancelIOSync(nx::network::aio::EventType eventType)
+void StreamSocket::cancelIoInAioThread(nx::network::aio::EventType eventType)
 {
-    if (isInSelfAioThread())
+    // Performing handshake (part of connect) and cancellation of connect has been requested?
+    if (eventType == aio::EventType::etWrite && !m_sslPipeline->isHandshakeCompleted())
     {
-        m_delegatee->cancelIOSync(eventType);
-        m_asyncTransformingChannel->cancelIOSync(eventType);
+        // Then we cancel all I/O since handshake invokes both send & recv.
+        eventType = aio::EventType::etNone;
+        m_asyncTransformingChannel->cancelPostedCallsSync();
     }
-    else
-    {
-        std::promise<void> cancelled;
-        post(
-            [this, eventType, &cancelled]()
-            {
-                cancelIOSync(eventType);
-                cancelled.set_value();
-            });
-        cancelled.get_future().wait();
-    }
+
+    m_delegate->cancelIOSync(eventType);
+    m_asyncTransformingChannel->cancelIOSync(eventType);
 }
 
 void StreamSocket::stopWhileInAioThread()
 {
-    m_asyncTransformingChannel.reset();
-    m_delegatee.reset();
+    m_asyncTransformingChannel->pleaseStopSync();
+    m_delegate->pleaseStopSync();
 }
 
 void StreamSocket::switchToSyncModeIfNeeded()
@@ -190,7 +248,7 @@ void StreamSocket::switchToSyncModeIfNeeded()
 
 void StreamSocket::switchToAsyncModeIfNeeded()
 {
-    m_proxyConverter.setDelegatee(m_sslPipeline.get());
+    m_proxyConverter.setDelegate(m_sslPipeline.get());
 }
 
 void StreamSocket::handleSslError(int sslPipelineResultCode)
@@ -204,6 +262,22 @@ void StreamSocket::handleSslError(int sslPipelineResultCode)
     {
         SystemError::setLastErrorCode(SystemError::invalidData);
     }
+}
+
+//-------------------------------------------------------------------------------------------------
+
+ClientStreamSocket::ClientStreamSocket(
+    std::unique_ptr<AbstractStreamSocket> delegate)
+    :
+    base_type(std::move(delegate), false)
+{
+}
+
+ServerSideStreamSocket::ServerSideStreamSocket(
+    std::unique_ptr<AbstractStreamSocket> delegate)
+    :
+    base_type(std::move(delegate), true)
+{
 }
 
 } // namespace ssl

@@ -23,7 +23,7 @@ class SyncSslSocket:
 
 public:
     SyncSslSocket(
-        std::unique_ptr<AbstractStreamSocket> delegatee,
+        std::unique_ptr<AbstractStreamSocket> delegate,
         bool isServerSide);
     virtual ~SyncSslSocket();
 
@@ -49,7 +49,7 @@ protected:
     int sendInternal(const void* buffer, unsigned int bufferLen);
 
 private:
-    std::unique_ptr<AbstractStreamSocket> m_delegatee;
+    std::unique_ptr<AbstractStreamSocket> m_delegate;
     SSL* m_ssl;
     bool m_isServerSide;
 

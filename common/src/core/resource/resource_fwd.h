@@ -48,7 +48,6 @@ typedef QSharedPointer<QnMediaServerConnection> QnMediaServerConnectionPtr;
 
 // -->
 
-
 class QnResourceFactory;
 class QnResourcePool;
 
@@ -88,6 +87,10 @@ typedef QnSharedResourcePointerList<QnNetworkResource> QnNetworkResourceList;
 class QnSecurityCamResource;
 typedef QnSharedResourcePointer<QnSecurityCamResource> QnSecurityCamResourcePtr;
 typedef QnSharedResourcePointerList<QnSecurityCamResource> QnSecurityCamResourceList;
+
+class QnC2pCameraResource;
+typedef QnSharedResourcePointer<QnC2pCameraResource> QnC2pCameraResourcePtr;
+typedef QnSharedResourcePointerList<QnC2pCameraResource> QnC2pCameraResourceList;
 
 class QnCameraUserAttributes;
 typedef QSharedPointer<QnCameraUserAttributes> QnCameraUserAttributesPtr;

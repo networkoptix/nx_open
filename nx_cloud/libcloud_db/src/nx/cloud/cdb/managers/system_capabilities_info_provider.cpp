@@ -7,7 +7,7 @@ constexpr int kMinEc2ProtocolVersionWithCloudMergeSupport = 3041;
 
 SystemCapabilitiesProvider::SystemCapabilitiesProvider(
     AbstractSystemManager* systemManager,
-    ec2::ConnectionManager* ec2ConnectionManager)
+    data_sync_engine::ConnectionManager* ec2ConnectionManager)
     :
     m_systemManager(systemManager),
     m_ec2ConnectionManager(ec2ConnectionManager)
@@ -44,7 +44,7 @@ void SystemCapabilitiesProvider::modifySystemBeforeProviding(
 
 void SystemCapabilitiesProvider::onSystemStatusChanged(
     const std::string& systemId,
-    ec2::SystemStatusDescriptor statusDescription)
+    data_sync_engine::SystemStatusDescriptor statusDescription)
 {
     QnMutexLocker lock(&m_mutex);
 

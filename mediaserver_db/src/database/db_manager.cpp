@@ -614,7 +614,7 @@ bool QnDbManager::init(const nx::utils::Url& dbUrl)
             if (m_resyncFlags.testFlag(ResyncLicences))
             {
                 if (!fillTransactionLogInternal<
-                    nullptr_t,
+                    std::nullptr_t,
                     ApiLicenseData,
                     ApiLicenseDataList>(ApiCommand::addLicense))
                 {
@@ -624,7 +624,7 @@ bool QnDbManager::init(const nx::utils::Url& dbUrl)
             if (m_resyncFlags.testFlag(ResyncFiles))
             {
                 if (!fillTransactionLogInternal<
-                    nullptr_t,
+                    std::nullptr_t,
                     StoredFileData,
                     StoredFileDataList>(ApiCommand::addStoredFile))
                 {
@@ -726,7 +726,7 @@ bool QnDbManager::init(const nx::utils::Url& dbUrl)
                     return false;
 
                 if (!fillTransactionLogInternal<
-                    nullptr_t,
+                    std::nullptr_t,
                     ApiAccessRightsData,
                     ApiAccessRightsDataList>(ApiCommand::setAccessRights))
                 {
@@ -740,7 +740,7 @@ bool QnDbManager::init(const nx::utils::Url& dbUrl)
                     return false;
 
                 if (!fillTransactionLogInternal<
-                    nullptr_t,
+                    std::nullptr_t,
                     ApiAccessRightsData,
                     ApiAccessRightsDataList>(ApiCommand::setAccessRights))
                 {
@@ -939,6 +939,46 @@ bool QnDbManager::fillTransactionLogInternal(ApiCommand::Value command, std::fun
     return true;
 }
 
+bool QnDbManager::updateBusinessRulesTransactions()
+{
+    if (!fillTransactionLogInternal<QnUuid, EventRuleData, EventRuleDataList>(
+            ApiCommand::saveEventRule, businessRuleObjectUpdater))
+    {
+        return false;
+    }
+    auto defaultRules = nx::vms::event::Rule::getDefaultRules();
+    EventRuleDataList currentBusinessRulesList;
+    if (doQueryNoLock(QnUuid(), currentBusinessRulesList) != ErrorCode::ok)
+        return false;
+    for (const auto& rulePtr: defaultRules)
+    {
+        if (std::find_if(currentBusinessRulesList.cbegin(), currentBusinessRulesList.cend(),
+                [&rulePtr](const EventRuleData& ruleData)
+                {
+                    return ruleData.id == rulePtr->id();
+                }) == currentBusinessRulesList.cend())
+        {
+            IdData ruleData;
+            ruleData.id = rulePtr->id();
+            QnTransaction<IdData> removeRuleTransaction(ApiCommand::removeEventRule,
+                commonModule()->moduleGUID(), ruleData);
+            m_tranLog->fillPersistentInfo(removeRuleTransaction);
+            if (removeBusinessRule(ruleData.id) != ErrorCode::ok)
+            {
+                NX_WARNING(this, lm("Failed to remove auto added event rule %1").args(ruleData.id));
+                return false;
+            }
+            if (m_tranLog->saveTransaction(removeRuleTransaction) != ErrorCode::ok)
+            {
+                NX_WARNING(this, lm("Failed to save remove event rule transaction to the log %1")
+                    .args(ruleData.id));
+                return false;
+            }
+        }
+    }
+    return true;
+}
+
 bool QnDbManager::resyncTransactionLog()
 {
     if (!fillTransactionLogInternal<
@@ -989,13 +1029,8 @@ bool QnDbManager::resyncTransactionLog()
         return false;
     }
 
-    if (!fillTransactionLogInternal<
-        QnUuid,
-        EventRuleData,
-        EventRuleDataList>(ApiCommand::saveEventRule, businessRuleObjectUpdater))
-    {
+    if (!updateBusinessRulesTransactions())
         return false;
-    }
 
     if (!fillTransactionLogInternal<
         QnUuid,
@@ -1014,7 +1049,7 @@ bool QnDbManager::resyncTransactionLog()
     }
 
     if (!fillTransactionLogInternal<
-        nullptr_t,
+        std::nullptr_t,
         ApiLicenseData,
         ApiLicenseDataList>(ApiCommand::addLicense))
     {
@@ -1022,7 +1057,7 @@ bool QnDbManager::resyncTransactionLog()
     }
 
     if (!fillTransactionLogInternal<
-            nullptr_t,
+            std::nullptr_t,
             StoredFileData,
             StoredFileDataList>(ApiCommand::addStoredFile))
     {
@@ -1046,7 +1081,7 @@ bool QnDbManager::resyncTransactionLog()
     }
 
     if (!fillTransactionLogInternal<
-        nullptr_t,
+        std::nullptr_t,
         ApiAccessRightsData,
         ApiAccessRightsDataList>(ApiCommand::setAccessRights))
     {
@@ -1085,7 +1120,7 @@ bool QnDbManager::resyncTransactionLog()
     }
 
     if (!fillTransactionLogInternal<
-        nullptr_t,
+        std::nullptr_t,
         ServerFootageData,
         ServerFootageDataList>(ApiCommand::addCameraHistoryItem))
     {
@@ -1812,10 +1847,16 @@ bool QnDbManager::afterInstallUpdate(const QString& updateName)
     }
 
     if (updateName.endsWith(lit("/99_20170926_refactor_user_access_rights.sql")))
-        return ec2::db::migrateAccessRightsToUbjsonFormat(m_sdb, this) && resyncIfNeeded(ResyncUserAccessRights);
+    {
+        return ec2::db::migrateAccessRightsToUbjsonFormat(m_sdb, this)
+            && resyncIfNeeded(ResyncUserAccessRights);
+    }
 
     if (updateName.endsWith(lit("/99_20171214_update_http_action_enum_values.sql")))
-        return updateDefaultRules(vms::event::Rule::getDefaultRules()) && resyncIfNeeded(ResyncRules);
+    {
+        return updateDefaultRules(vms::event::Rule::getDefaultRules())
+            && resyncIfNeeded(ResyncRules);
+    }
 
     if (updateName.endsWith(lit("/99_20180122_remove_secondary_stream_quality.sql")))
         return resyncIfNeeded(ResyncCameraAttributes);
@@ -3422,12 +3463,12 @@ ErrorCode QnDbManager::doQueryNoLock(
     return ErrorCode::ok;
 }
 
-ErrorCode QnDbManager::doQueryNoLock(nullptr_t /*dummy*/, ResourceParamDataList& data)
+ErrorCode QnDbManager::doQueryNoLock(std::nullptr_t /*dummy*/, ResourceParamDataList& data)
 {
     return readSettings(data);
 }
 
-ErrorCode QnDbManager::doQueryNoLock(const nullptr_t& /*dummy*/, ResourceTypeDataList& data)
+ErrorCode QnDbManager::doQueryNoLock(const std::nullptr_t& /*dummy*/, ResourceTypeDataList& data)
 {
     if (!m_cachedResTypes.empty())
     {
@@ -3935,7 +3976,7 @@ ErrorCode QnDbManager::doQueryNoLock(const QnUuid& mServerId, ApiMediaServerUser
 }
 
 //getCameraHistoryItems
-ErrorCode QnDbManager::doQueryNoLock(const nullptr_t& /*dummy*/, ServerFootageDataList& historyList)
+ErrorCode QnDbManager::doQueryNoLock(const std::nullptr_t& /*dummy*/, ServerFootageDataList& historyList)
 {
     QSqlQuery query(m_sdb);
     query.setForwardOnly(true);
@@ -4013,13 +4054,13 @@ ErrorCode QnDbManager::doQueryNoLock(const QnUuid& id, ApiUserRoleDataList& resu
     return ErrorCode::ok;
 }
 
-ErrorCode QnDbManager::doQueryNoLock(const nullptr_t& /*dummy*/, ApiPredefinedRoleDataList& result)
+ErrorCode QnDbManager::doQueryNoLock(const std::nullptr_t& /*dummy*/, ApiPredefinedRoleDataList& result)
 {
     result = QnUserRolesManager::getPredefinedRoles();
     return ErrorCode::ok;
 }
 
-ec2::ErrorCode QnDbManager::doQueryNoLock(const nullptr_t& /*dummy*/, ApiAccessRightsDataList& accessRightsList)
+ec2::ErrorCode QnDbManager::doQueryNoLock(const std::nullptr_t& /*dummy*/, ApiAccessRightsDataList& accessRightsList)
 {
     QSqlQuery query(m_sdb);
     query.setForwardOnly(true);
@@ -4256,14 +4297,14 @@ ErrorCode QnDbManager::doQueryNoLock(const QnUuid& resourceId, ResourceParamWith
 }
 
 // getCurrentTime
-ErrorCode QnDbManager::doQuery(const nullptr_t& /*dummy*/, ApiTimeData& currentTime)
+ErrorCode QnDbManager::doQuery(const std::nullptr_t& /*dummy*/, ApiTimeData& currentTime)
 {
     currentTime = m_timeSyncManager->getTimeInfo();
     return ErrorCode::ok;
 }
 
 // dumpDatabase
-ErrorCode QnDbManager::doQuery(const nullptr_t& /*dummy*/, DatabaseDumpData& data)
+ErrorCode QnDbManager::doQuery(const std::nullptr_t& /*dummy*/, DatabaseDumpData& data)
 {
     QnWriteLocker lock(&m_mutex);
 
@@ -4568,7 +4609,7 @@ ErrorCode QnDbManager::executeTransactionInternal(const QnTransaction<ApiLicense
     return ErrorCode::ok;
 }
 
-ErrorCode QnDbManager::doQueryNoLock(const nullptr_t& /*dummy*/, ec2::ApiLicenseDataList& data)
+ErrorCode QnDbManager::doQueryNoLock(const std::nullptr_t& /*dummy*/, ec2::ApiLicenseDataList& data)
 {
     return getLicenses(data, m_sdb);
 }

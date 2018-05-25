@@ -89,11 +89,6 @@
     </message>
     <message>
       <location/>
-      <source>Disable only if the client takes too much CPU</source>
-      <translation>Deshabilitar sólo si el cliente toma demasiado CPU</translation>
-    </message>
-    <message>
-      <location/>
       <source>Maximum Live Buffer Length</source>
       <translation>Longitud máxima del búfer en vivo</translation>
     </message>
@@ -764,16 +759,16 @@
     </message>
     <message>
       <location/>
-      <source>Logical Id</source>
-      <translation>Id Lógico</translation>
+      <source>Logical ID</source>
+      <translation>ID Lógico</translation>
     </message>
   </context>
   <context>
     <name>CameraInputBusinessEventWidget</name>
     <message>
       <location filename="../src/ui/widgets/business/camera_input_business_event_widget.ui"/>
-      <source>Input Id</source>
-      <translation>Entrada Id</translation>
+      <source>Input ID</source>
+      <translation>Entrada ID</translation>
     </message>
   </context>
   <context>
@@ -798,8 +793,8 @@
     </message>
     <message>
       <location/>
-      <source>Output Id:</source>
-      <translation>Salida Id:</translation>
+      <source>Output ID:</source>
+      <translation>Salida ID:</translation>
     </message>
   </context>
   <context>
@@ -1513,8 +1508,8 @@
     </message>
     <message>
       <location/>
-      <source>Locked to Hardware Id:</source>
-      <translation>Enlazado al Hardware Id:</translation>
+      <source>Locked to Hardware ID:</source>
+      <translation>Enlazado al Hardware ID:</translation>
     </message>
   </context>
   <context>
@@ -1612,8 +1607,8 @@
     </message>
     <message>
       <location/>
-      <source>Hardware Id</source>
-      <translation>Hardware Id</translation>
+      <source>Hardware ID</source>
+      <translation>ID de hardware</translation>
     </message>
   </context>
   <context>
@@ -1741,6 +1736,11 @@
       <location/>
       <source>Tour cycle</source>
       <translation>Tour cycle</translation>
+    </message>
+    <message>
+      <location/>
+      <source>IP addresses for cameras, and servers, groups for users, etc.</source>
+      <translation>Direcciones IP para cámaras y servidores, grupos para usuarios, etc.</translation>
     </message>
   </context>
   <context>

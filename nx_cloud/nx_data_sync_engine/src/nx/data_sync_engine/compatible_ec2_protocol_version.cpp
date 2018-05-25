@@ -1,8 +1,7 @@
 #include "compatible_ec2_protocol_version.h"
 
 namespace nx {
-namespace cdb {
-namespace ec2 {
+namespace data_sync_engine {
 
 bool isProtocolVersionCompatible(int version)
 {
@@ -10,6 +9,5 @@ bool isProtocolVersionCompatible(int version)
         && (version <= kMaxSupportedProtocolVersion);
 }
 
-} // namespace ec2
-} // namespace cdb
+} // namespace data_sync_engine
 } // namespace nx

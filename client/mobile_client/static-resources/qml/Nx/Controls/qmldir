@@ -24,3 +24,5 @@ WarningPanel 1.0 WarningPanel.qml
 FieldWarning 1.0 FieldWarning.qml
 ZoomableFlickable 1.0 ZoomableFlickable.qml
 WheelSwitchArea 1.0 WheelSwitchArea.qml
+ActionButtonsPanel 1.0 ActionButtonsPanel.qml
+ActivityPreloader 1.0 ActivityPreloader.qml

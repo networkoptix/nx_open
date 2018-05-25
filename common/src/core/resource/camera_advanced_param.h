@@ -32,6 +32,8 @@ public:
     /** Get all values from this map that differs from corresponding values from other map. */
     QnCameraAdvancedParamValueList difference(const QnCameraAdvancedParamValueMap &other) const;
 
+    QnCameraAdvancedParamValueMap differenceMap(const QnCameraAdvancedParamValueMap &other) const;
+
     bool differsFrom(const QnCameraAdvancedParamValueMap &other) const;
 };
 
@@ -40,6 +42,7 @@ struct QnCameraAdvancedParameterCondition
     enum class ConditionType
     {
         equal, //< Watched value strictly equals to condition value
+        notEqual,
         inRange, //< Watched value is in condition value range
         notInRange,
         present, //< Watched parameter is present in parameter list
@@ -47,6 +50,13 @@ struct QnCameraAdvancedParameterCondition
         valueChanged,
         unknown
     };
+
+    QnCameraAdvancedParameterCondition() = default;
+
+    QnCameraAdvancedParameterCondition(
+        QnCameraAdvancedParameterCondition::ConditionType type,
+        const QString& paramId,
+        const QString& value);
 
     ConditionType type = ConditionType::unknown;
     QString paramId;
@@ -72,16 +82,24 @@ struct QnCameraAdvancedParameterDependency
     QString id;
     DependencyType type = DependencyType::unknown;
     QString range;
+    QStringList valuesToAddToRange;
+    QStringList valuesToRemoveFromRange;
     QString internalRange;
     std::vector<QnCameraAdvancedParameterCondition> conditions;
 
     /** Auto fill id field as a hash of depended ids and values */
-    void autoFillId();
+    void autoFillId(const QString& prefix = QString());
 };
 
 QN_FUSION_DECLARE_FUNCTIONS(QnCameraAdvancedParameterDependency::DependencyType, (lexical))
 
-#define QnCameraAdvancedParameterDependency_Fields (id)(type)(range)(internalRange)(conditions)
+#define QnCameraAdvancedParameterDependency_Fields (id)\
+    (type)\
+    (range)\
+    (valuesToAddToRange)\
+    (valuesToRemoveFromRange)\
+    (internalRange)\
+    (conditions)\
 
 struct QnCameraAdvancedParameter
 {
@@ -94,7 +112,8 @@ struct QnCameraAdvancedParameter
         Button,
         String,
         Separator,
-        LensControl,
+        SliderControl,
+        PtrControl,
     };
 
     QString id;
@@ -111,11 +130,16 @@ struct QnCameraAdvancedParameter
     QString aux; //< Auxiliary driver dependent data.
     std::vector<QnCameraAdvancedParameterDependency> dependencies;
     bool showRange = false; //< Show range near parameter's label
+    // If control can be packed with another such control in the same line.
+    bool compact = false;
     QString unit;
     QString notes;
     bool resync = false;
     bool shouldKeepInitialValue = false;
     bool bindDefaultToMinimum = false;
+    // Parameters with the same group must be sent together
+    // even if some of their values have not been changed.
+    QString group;
 
     bool isValid() const;
     bool isValueValid(const QString& value) const;
@@ -132,6 +156,8 @@ struct QnCameraAdvancedParameter
     static DataType stringToDataType(const QString &value);
 
     static bool dataTypeHasValue(DataType value);
+    // Returns true if specified DataType is instant value and should be sent immediately
+    static bool dataTypeIsInstant(DataType value);
 };
 
 QN_FUSION_DECLARE_FUNCTIONS(QnCameraAdvancedParameter::DataType, (lexical))
@@ -149,11 +175,13 @@ QN_FUSION_DECLARE_FUNCTIONS(QnCameraAdvancedParameter::DataType, (lexical))
     (aux)\
     (dependencies)\
     (showRange)\
+    (compact)\
     (unit)\
     (notes)\
     (shouldKeepInitialValue)\
     (bindDefaultToMinimum)\
-    (resync)
+    (resync)\
+    (group)
 
 struct QnCameraAdvancedParamGroup
 {
@@ -210,7 +238,7 @@ struct QnCameraAdvancedParams
 
 QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
     QnCameraAdvancedParameterTypes,
-    (json)(metatype)
+    (json)(metatype)(eq)
 )
 
 Q_DECLARE_METATYPE(QnCameraAdvancedParamValueList)

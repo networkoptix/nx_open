@@ -12,8 +12,7 @@
 #include "transaction_log_cache.h"
 
 namespace nx {
-namespace cdb {
-namespace ec2 {
+namespace data_sync_engine {
 
 class AbstractOutgoingTransactionDispatcher;
 
@@ -24,7 +23,7 @@ class AbstractOutgoingTransactionDispatcher;
 class NX_DATA_SYNC_ENGINE_API OutgoingTransactionSorter
 {
 public:
-    using TransactionSequence = decltype(::ec2::QnAbstractTransaction::PersistentInfo::sequence);
+    using TransactionSequence = decltype(CommandHeader::PersistentInfo::sequence);
 
     OutgoingTransactionSorter(
         const nx::String& systemId,
@@ -88,6 +87,5 @@ private:
         TransactionSequence transactionSequence);
 };
 
-} // namespace ec2
-} // namespace cdb
+} // namespace data_sync_engine
 } // namespace nx

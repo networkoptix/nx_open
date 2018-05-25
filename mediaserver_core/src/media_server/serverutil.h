@@ -99,4 +99,4 @@ void dropConnectionsToRemotePeers(ec2::AbstractTransactionMessageBus* messageBus
 /**
  * Resume connection listening
  */
-void resumeConnectionsToRemotePeers();
+void resumeConnectionsToRemotePeers(ec2::AbstractTransactionMessageBus* messageBus);

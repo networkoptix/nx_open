@@ -7,7 +7,7 @@
 #include <nx/network/socket_common.h>
 #include <nx/utils/log/log_initializer.h>
 #include <nx/utils/log/log_settings.h>
-#include <nx/utils/settings.h>
+#include <nx/utils/deprecated_settings.h>
 #include <nx/utils/basic_service_settings.h>
 #include <nx/utils/db/types.h>
 
@@ -140,7 +140,7 @@ public:
     const AccountManager& accountManager() const;
     const SystemManager& systemManager() const;
     const EventManager& eventManager() const;
-    const ec2::Settings& p2pDb() const;
+    const data_sync_engine::Settings& p2pDb() const;
     const QString& changeUser() const;
     const ModuleFinder& moduleFinder() const;
     const Http& http() const;
@@ -157,7 +157,7 @@ private:
     AccountManager m_accountManager;
     SystemManager m_systemManager;
     EventManager m_eventManager;
-    ec2::Settings m_p2pDb;
+    data_sync_engine::Settings m_p2pDb;
     QString m_changeUser;
     ModuleFinder m_moduleFinder;
     Http m_http;

@@ -2,11 +2,10 @@
 
 #include <nx/fusion/serialization/ubjson_reader.h>
 
-#include <transaction/transaction.h>
+#include "../command.h"
 
 namespace nx {
-namespace cdb {
-namespace ec2 {
+namespace data_sync_engine {
 
 /**
  * This class is to encapsulate transaction versioning support when relevant.
@@ -16,7 +15,7 @@ class TransactionDeserializer
 public:
     static bool deserialize(
         QnUbjsonReader<QByteArray>* const stream,
-        ::ec2::QnAbstractTransaction* const transactionHeader,
+        CommandHeader* const transactionHeader,
         int transactionFormatVersion);
 
     template<typename TransactionData>
@@ -29,6 +28,5 @@ public:
     }
 };
 
-} // namespace ec2
-} // namespace cdb
+} // namespace data_sync_engine
 } // namespace nx

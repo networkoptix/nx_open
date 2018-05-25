@@ -9,8 +9,6 @@
 #include <nx/utils/thread/sync_queue.h>
 #include <nx/utils/test_support/test_options.h>
 
-#include <transaction/transaction.h>
-
 #include <api/global_settings.h>
 #include <nx/cloud/cdb/client/cdb_request_path.h>
 #include <utils/common/app_info.h>

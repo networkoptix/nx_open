@@ -337,7 +337,7 @@ QPixmap BookmarkSearchListModel::Private::pixmap()
 
 QColor BookmarkSearchListModel::Private::color()
 {
-    return QPalette().color(QPalette::LinkVisited);
+    return QPalette().color(QPalette::Light);
 }
 
 } // namespace desktop

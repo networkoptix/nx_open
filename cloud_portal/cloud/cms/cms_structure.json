@@ -148,6 +148,48 @@
         ]
       },
       {
+        "name": "Cloud maintenance page (503)",
+        "old_name": "Service unavailable page (503)",
+        "file_path": "static/503.html",
+        "description": "This page is visible if Cloud service is unavailable",
+        "url": "/503.html",
+        "translatable": false,
+        "values": [
+          {
+            "label": "Content",
+            "name": "%CONTENT%",
+            "old_name": "%BLOCK_CONTENT%",
+            "value": "<h1>%PRODUCT_NAME% is under maintenance</h1><p>New better version will be online soon!</p><p>Your %VMS_NAME% system is still recording and<br> you can connect there using <a href=\"%DOWNLOAD_LINK%\">our apps</a></p>",
+            "description": "Message to show on Cloud maintenance page (503)"
+          },
+          {
+            "label": "Download Link",
+            "name": "%DOWNLOAD_LINK%",
+            "old_name": "{{downloadLink}}",
+            "value": "http://www.networkoptix.com/live-demo#fulltrial",
+            "description": "Emergency link for downloading applications (in case if cloud is down)"
+          },
+          {
+            "label": "Service maintenance image",
+            "name": "static/images/503.png",
+            "type": "image",
+            "description": "Image for page. Image goes above text on page",
+            "meta": {
+              "format": "png"
+            }
+          },
+          {
+            "label": "Service maintenance image",
+            "name": "static/images/503@2x.png",
+            "type": "image",
+            "description": "High res image for page. Image goes above text on page",
+            "meta": {
+              "format": "png"
+            }
+          }
+        ]
+      },
+      {
         "name": "Landing page",
         "file_path": "static/lang_{{language}}/views/static/landing.html",
         "url": "/content/about",
@@ -212,48 +254,6 @@
         ]
       },
       {
-        "name": "Cloud maintenance page (503)",
-        "old_name": "Service unavailable page (503)",
-        "file_path": "static/503.html",
-        "description": "This page is visible if Cloud service is unavailable",
-        "url": "/503.html",
-        "translatable": false,
-        "values": [
-          {
-            "label": "Content",
-            "name": "%CONTENT%",
-            "old_name": "%BLOCK_CONTENT%",
-            "value": "<h1>{{PRODUCT_NAME}} is under maintenance</h1><p>New better version will be online soon!</p><p>Your {{VMS_NAME}} system is still recording and<br> you can connect there using <a href=\"%DOWNLOAD_LINK%\">our apps</a></p>",
-            "description": "Message to show on Cloud maintenance page (503)"
-          },
-          {
-            "label": "Download Link",
-            "name": "%DOWNLOAD_LINK%",
-            "old_name": "{{downloadLink}}",
-            "value": "http://www.networkoptix.com/live-demo#fulltrial",
-            "description": "Emergency link for downloading applications (in case if cloud is down)"
-          },
-          {
-            "label": "Service maintenance image",
-            "name": "static/images/503.png",
-            "type": "image",
-            "description": "Image for page. Image goes above text on page",
-            "meta": {
-              "format": "png"
-            }
-          },
-          {
-            "label": "Service maintenance image",
-            "name": "static/images/503@2x.png",
-            "type": "image",
-            "description": "High res image for page. Image goes above text on page",
-            "meta": {
-              "format": "png"
-            }
-          }
-        ]
-      },
-      {
         "name": "License Agreement",
         "old_name": "Eula",
         "description":"End User License Agreement",
@@ -273,6 +273,50 @@
           ["Legal Company Location", "%LEGAL_COMPANY_LOCATION%", "California", "Location of the company (for EULA)"],
           ["Legal Company Jurisdiction", "%LEGAL_COMPANY_JURISDICTION%", "State of California", "Company's jurisdiction (for EULA)"],
           ["Legal Company Court", "%LEGAL_COMPANY_COURT%", "state and federal courts located in Los Angeles County, California", "Court to handle disputes (for EULA)"]
+        ]
+      },
+      {
+        "name": "SMTP Config",
+        "is_global": true,
+        "description": "Holds settings for smtp server",
+        "translatable": false,
+        "hidden": true,
+        "values":[
+          {
+            "label": "Host",
+            "name": "%SMTP_HOST%",
+            "value": "email-smtp.us-east-1.amazonaws.com",
+            "description": "Host url for smtp server",
+            "advanced": true
+          },
+          {
+            "label": "User",
+            "name": "%SMTP_USER%",
+            "value": "AKIAJ3DYMIZMDABS43UA",
+            "description": "User for smtp server",
+            "advanced": true
+          },
+          {
+            "label": "Password",
+            "name": "%SMTP_PASSWORD%",
+            "value": "AnC4VkpbBKXPCbik/gBru508QaG8L86uu2cTzTg5yDkI",
+            "description": "Password smtp server",
+            "advanced": true
+          },
+          {
+            "label": "Port",
+            "name": "%SMTP_PORT%",
+            "value": "587",
+            "description": "Port for smtp server",
+            "advanced": true
+          },
+          {
+            "label": "Tls",
+            "name": "%SMTP_TLS%",
+            "value": true,
+            "description": "Tls for smtp server",
+            "advanced": true
+          }
         ]
       }
     ]

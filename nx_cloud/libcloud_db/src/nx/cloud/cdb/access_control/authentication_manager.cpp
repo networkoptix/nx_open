@@ -1,5 +1,6 @@
 #include "authentication_manager.h"
 
+#include <algorithm>
 #include <future>
 #include <limits>
 
@@ -205,6 +206,8 @@ api::ResultCode AuthenticationManager::authenticateInDataManagers(
 {
     // TODO: #ak AuthenticationManager has to become async some time...
 
+    std::vector<api::ResultCode> authDataProvidersResults;
+    authDataProvidersResults.reserve(m_authDataProviders.size());
     for (AbstractAuthenticationDataProvider* authDataProvider: m_authDataProviders)
     {
         nx::utils::promise<api::ResultCode> authPromise;
@@ -220,8 +223,20 @@ api::ResultCode AuthenticationManager::authenticateInDataManagers(
             });
         authFuture.wait();
         const auto result = authFuture.get();
-        if (result != api::ResultCode::notAuthorized)
-            return result;  //< "ok" or "credentialsRemovedPermanently".
+        if (result == api::ResultCode::ok ||
+            result == api::ResultCode::credentialsRemovedPermanently)
+        {
+            return result;
+        }
+        authDataProvidersResults.push_back(result);
+    }
+
+    if (std::all_of(
+            authDataProvidersResults.begin(),
+            authDataProvidersResults.end(),
+            [](auto result) { return result == api::ResultCode::badUsername; }))
+    {
+        return api::ResultCode::badUsername;
     }
 
     return api::ResultCode::notAuthorized;

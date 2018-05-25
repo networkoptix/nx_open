@@ -1,6 +1,6 @@
 #include "upnp_device_description.h"
 
-static const QString urnTemplate = lit("urn:schemas-upnp-org:%1:%2:%3");
+static const QString urnTemplate = "urn:schemas-upnp-org:%1:%2:%3";
 
 namespace nx {
 namespace network {
@@ -13,10 +13,10 @@ QString toUpnpUrn(const QString& id, const QString& suffix, int version)
 
 QString fromUpnpUrn(const QString& urn, const QString& suffix, int version)
 {
-    const auto split = urn.split(lit(":"));
+    const auto split = urn.split(":");
     if (split.size() == 5
-        && split[0] == lit("urn")
-        && split[1] == lit("schemas-upnp-org")
+        && split[0] == "urn"
+        && split[1] == "schemas-upnp-org"
         && split[2] == suffix
         && split[4] == QString::number(version))
         return split[3];
@@ -28,7 +28,7 @@ bool DeviceDescriptionHandler::startDocument()
 {
     m_deviceInfo = DeviceInfo();
     m_paramElement.clear();
-    m_lastService = 0;
+    m_lastService = nullptr;
     return true;
 }
 
@@ -41,7 +41,7 @@ bool DeviceDescriptionHandler::startElement(
     const QString& /*namespaceURI*/, const QString& /*localName*/,
     const QString& qName, const QXmlAttributes& /*atts*/)
 {
-    if (qName == lit("device"))
+    if (qName == "device")
     {
         if (m_deviceStack.empty())
             m_deviceStack.push_back(&m_deviceInfo);
@@ -53,7 +53,7 @@ bool DeviceDescriptionHandler::startElement(
         }
     }
     else
-        if (qName == lit("service"))
+        if (qName == "service")
         {
             if (m_deviceStack.empty()) return false;
             auto& servs = m_deviceStack.back()->serviceList;
@@ -68,11 +68,11 @@ bool DeviceDescriptionHandler::startElement(
 bool DeviceDescriptionHandler::endElement(
     const QString& /*namespaceURI*/, const QString& /*localName*/, const QString& qName)
 {
-    if (qName == lit("device"))
+    if (qName == "device")
         m_deviceStack.pop_back();
     else
-        if (qName == lit("service"))
-            m_lastService = 0;
+        if (qName == "service")
+            m_lastService = nullptr;
         else
             m_paramElement.clear();
     return true;
@@ -93,22 +93,22 @@ bool DeviceDescriptionHandler::charactersInDevice(const QString& ch)
 {
     auto& lastDev = *m_deviceStack.back();
 
-    if (m_paramElement == lit("deviceType"))
-        lastDev.deviceType = fromUpnpUrn(ch, lit("device"));
-    else if (m_paramElement == lit("friendlyName"))
+    if (m_paramElement == "deviceType")
+        lastDev.deviceType = fromUpnpUrn(ch, "device");
+    else if (m_paramElement == "friendlyName")
         lastDev.friendlyName = ch;
-    else if (m_paramElement == lit("manufacturer"))
+    else if (m_paramElement == "manufacturer")
         lastDev.manufacturer = ch;
-    else if (m_paramElement == lit("manufacturerURL"))
+    else if (m_paramElement == "manufacturerURL")
         lastDev.manufacturerUrl = ch;
-    else if (m_paramElement == lit("modelName"))
+    else if (m_paramElement == "modelName")
         lastDev.modelName = ch;
-    else if (m_paramElement == lit("serialNumber"))
+    else if (m_paramElement == "serialNumber")
         lastDev.serialNumber = ch;
-    else if (m_paramElement == lit("UDN"))
+    else if (m_paramElement == "UDN")
         lastDev.udn = ch;
-    else if (m_paramElement == lit("presentationURL"))
-        lastDev.presentationUrl = ch.endsWith(lit("/")) ? ch.left(ch.length() - 1) : ch;
+    else if (m_paramElement == "presentationURL")
+        lastDev.presentationUrl = ch.endsWith("/") ? ch.left(ch.length() - 1) : ch;
     else
         return false; // was not useful
 
@@ -118,7 +118,7 @@ bool DeviceDescriptionHandler::charactersInDevice(const QString& ch)
 bool DeviceDescriptionHandler::charactersInService(const QString& ch)
 {
     if (m_paramElement == QLatin1String("serviceType"))
-        m_lastService->serviceType = fromUpnpUrn(ch, lit("service"));
+        m_lastService->serviceType = fromUpnpUrn(ch, "service");
     else if (m_paramElement == QLatin1String("serviceId"))
         m_lastService->serviceId = ch;
     else if (m_paramElement == QLatin1String("controlURL"))

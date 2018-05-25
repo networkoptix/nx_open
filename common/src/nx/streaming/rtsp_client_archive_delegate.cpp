@@ -827,7 +827,8 @@ void QnRtspClientArchiveDelegate::setSpeed(qint64 displayTime, double value)
     bool newReverseMode = value < 0;
     m_rtspSession->setScale(value);
 
-    bool needSendRequest = !m_rtspSession->isOpened() || oldReverseMode != newReverseMode ||  m_camera->isDtsBased();
+    bool needSendRequest = !m_rtspSession->isOpened() || oldReverseMode != newReverseMode
+        || m_camera->getCameraCapabilities().testFlag(Qn::isPlaybackSpeedSupported);
     if (!needSendRequest)
         return;
 

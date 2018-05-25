@@ -33,7 +33,7 @@ void Updates2StatusDataEx::fromBase(const api::Updates2StatusData& other)
 void Updates2StatusDataEx::clone(const Updates2StatusDataEx& other)
 {
     lastRefreshTime = other.lastRefreshTime;
-    files = other.files;
+    file = other.file;
     static_cast<Updates2StatusData&>(*this) = other;
 }
 

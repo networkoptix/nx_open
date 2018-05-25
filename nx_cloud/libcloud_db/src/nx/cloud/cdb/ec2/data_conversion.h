@@ -7,10 +7,10 @@
 #include <common/common_globals.h>
 
 namespace nx {
+namespace cdb {
 
 namespace api { class SystemSharing; }
 
-namespace cdb {
 namespace ec2 {
 
 api::SystemAccessRole permissionsToAccessRole(Qn::GlobalPermissions permissions);

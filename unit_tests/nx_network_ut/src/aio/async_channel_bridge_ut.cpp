@@ -301,7 +301,8 @@ public:
     {
     }
 
-    virtual void cancelIOSync(EventType /*eventType*/) override
+protected:
+    virtual void cancelIoInAioThread(EventType /*eventType*/) override
     {
     }
 

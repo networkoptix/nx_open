@@ -77,6 +77,9 @@ bool ReverseAcceptor::start(
         },
         nx::network::http::StringType("OPTIONS"));
 
+    if (m_httpConnectionInactivityTimeout)
+        m_httpServer->setConnectionInactivityTimeout(*m_httpConnectionInactivityTimeout);
+
     NX_CRITICAL(registration);
     return m_httpServer->bind(address) && m_httpServer->listen();
 }
@@ -95,6 +98,13 @@ void ReverseAcceptor::setPoolSize(boost::optional<size_t> value)
 {
     QnMutexLocker lk(&m_dataMutex);
     m_poolSize = value;
+}
+
+void ReverseAcceptor::setHttpConnectionInactivityTimeout(
+    std::chrono::milliseconds inactivityTimeout)
+{
+    QnMutexLocker lk(&m_dataMutex);
+    m_httpConnectionInactivityTimeout = inactivityTimeout;
 }
 
 void ReverseAcceptor::setKeepAliveOptions(boost::optional<KeepAliveOptions> value)

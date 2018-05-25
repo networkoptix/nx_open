@@ -127,18 +127,17 @@ protected:
         const nx::utils::Url url(lit("%1://%2/%3")
             .arg(scheme).arg(m_testHttpServer->serverAddress().toString()).arg(path));
 
-        nx::utils::promise<void> promise;
         NX_LOGX(lm("httpsTest: %1").arg(url), cl_logINFO);
 
         const auto client = nx::network::http::AsyncHttpClient::create();
+        std::promise<bool /*hasRequestSucceeded*/> promise;
         client->doGet(url,
             [&promise](AsyncHttpClientPtr ptr)
             {
-                 EXPECT_TRUE(ptr->hasRequestSucceeded());
-                 promise.set_value();
+                 promise.set_value(ptr->hasRequestSucceeded());
             });
 
-        promise.get_future().wait();
+        ASSERT_TRUE(promise.get_future().get());
     }
 
     void testResult(const QString& path, const nx::network::http::BufferType& expectedResult)
@@ -534,7 +533,7 @@ protected:
                 NX_LOGX(lm("Server address: %1").arg(server->getLocalAddress()), cl_logINFO);
                 address.set_value(server->getLocalAddress());
 
-                std::unique_ptr<AbstractStreamSocket> client(server->accept());
+                auto client = server->accept();
                 ASSERT_TRUE((bool)client);
 
                 do
@@ -1195,7 +1194,7 @@ protected:
         m_serverSocket.setRecvTimeout(acceptTimeout.count());
         while (!m_terminated)
         {
-            std::unique_ptr<AbstractStreamSocket> connection(m_serverSocket.accept());
+            auto connection = m_serverSocket.accept();
             if (!connection)
                 continue;
 

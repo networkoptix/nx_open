@@ -60,12 +60,11 @@ nx::utils::db::DBResult AccountDataObject::update(
     return nx::utils::db::DBResult::ok;
 }
 
-nx::utils::db::DBResult AccountDataObject::fetchAccountByEmail(
+std::optional<api::AccountData> AccountDataObject::fetchAccountByEmail(
     nx::utils::db::QueryContext* queryContext,
-    const std::string& accountEmail,
-    data::AccountData* const accountData)
+    const std::string& accountEmail)
 {
-    QSqlQuery fetchAccountQuery(*queryContext->connection());
+    nx::utils::db::SqlQuery fetchAccountQuery(*queryContext->connection());
     fetchAccountQuery.setForwardOnly(true);
     fetchAccountQuery.prepare(
         R"sql(
@@ -75,28 +74,32 @@ nx::utils::db::DBResult AccountDataObject::fetchAccountByEmail(
         WHERE email=:email
         )sql");
     fetchAccountQuery.bindValue(":email", QnSql::serialized_field(accountEmail));
-    if (!fetchAccountQuery.exec())
+
+    try
     {
-        NX_LOGX(lm("Error fetching account %1 from DB. %2")
-            .arg(accountEmail).arg(fetchAccountQuery.lastError().text()),
-            cl_logDEBUG1);
-        return nx::utils::db::DBResult::ioError;
+        fetchAccountQuery.exec();
+        if (!fetchAccountQuery.next())
+            return std::nullopt;
+    }
+    catch (nx::utils::db::Exception e)
+    {
+        NX_DEBUG(this, lm("Error fetching account %1 from DB. %2")
+            .args(accountEmail, e.what()));
+        throw;
     }
 
-    if (!fetchAccountQuery.next())
-        return nx::utils::db::DBResult::notFound;
-
+    api::AccountData account;
     // Account exists.
     QnSql::fetch(
-        QnSql::mapping<data::AccountData>(fetchAccountQuery),
+        QnSql::mapping<api::AccountData>(fetchAccountQuery.impl()),
         fetchAccountQuery.record(),
-        accountData);
-    return nx::utils::db::DBResult::ok;
+        &account);
+    return account;
 }
 
 nx::utils::db::DBResult AccountDataObject::fetchAccounts(
     nx::utils::db::QueryContext* queryContext,
-    std::vector<data::AccountData>* accounts)
+    std::vector<api::AccountData>* accounts)
 {
     QSqlQuery readAccountsQuery(*queryContext->connection());
     readAccountsQuery.setForwardOnly(true);
@@ -149,7 +152,7 @@ void AccountDataObject::insertEmailVerificationCode(
     }
 }
 
-boost::optional<std::string> AccountDataObject::getVerificationCodeByAccountEmail(
+std::optional<std::string> AccountDataObject::getVerificationCodeByAccountEmail(
     nx::utils::db::QueryContext* queryContext,
     const std::string& accountEmail)
 {
@@ -175,7 +178,7 @@ boost::optional<std::string> AccountDataObject::getVerificationCodeByAccountEmai
     }
 
     if (!fetchActivationCodesQuery.next())
-        return boost::none;
+        return std::nullopt;
 
     return fetchActivationCodesQuery.value(lit("verification_code")).toString().toStdString();
 }
@@ -254,11 +257,10 @@ nx::utils::db::DBResult AccountDataObject::updateAccountToActiveStatus(
 void AccountDataObject::updateAccount(
     nx::utils::db::QueryContext* queryContext,
     const std::string& accountEmail,
-    const api::AccountUpdateData& accountUpdateData,
-    bool activateAccountIfNotActive)
+    const api::AccountUpdateData& accountUpdateData)
 {
     std::vector<nx::utils::db::SqlFilterField> fieldsToSet =
-        prepareAccountFieldsToUpdate(accountUpdateData, activateAccountIfNotActive);
+        prepareAccountFieldsToUpdate(accountUpdateData);
 
     NX_ASSERT(!fieldsToSet.empty());
 
@@ -269,8 +271,7 @@ void AccountDataObject::updateAccount(
 }
 
 std::vector<nx::utils::db::SqlFilterField> AccountDataObject::prepareAccountFieldsToUpdate(
-    const api::AccountUpdateData& accountData,
-    bool activateAccountIfNotActive)
+    const api::AccountUpdateData& accountData)
 {
     using namespace nx::utils::db;
 
@@ -302,13 +303,6 @@ std::vector<nx::utils::db::SqlFilterField> AccountDataObject::prepareAccountFiel
         fieldsToSet.push_back(SqlFilterFieldEqual(
             "customization", ":customization",
             QnSql::serialized_field(accountData.customization.get())));
-    }
-
-    if (activateAccountIfNotActive)
-    {
-        fieldsToSet.push_back(SqlFilterFieldEqual(
-            "status_code", ":status_code",
-            QnSql::serialized_field(static_cast<int>(api::AccountStatus::activated))));
     }
 
     return fieldsToSet;

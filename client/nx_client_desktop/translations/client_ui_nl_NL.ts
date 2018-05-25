@@ -89,11 +89,6 @@
     </message>
     <message>
       <location/>
-      <source>Disable only if the client takes too much CPU</source>
-      <translation>Alleen uitschakelen als de cliëntapplicatie te veel CPU gebruikt</translation>
-    </message>
-    <message>
-      <location/>
       <source>Maximum Live Buffer Length</source>
       <translation>Maximale live bufferlengte</translation>
     </message>
@@ -394,7 +389,7 @@
     <message>
       <location/>
       <source>Area Width</source>
-      <translation>Breedte van het tekstvak</translation>
+      <translation>Breedte van het veld</translation>
     </message>
     <message>
       <location/>
@@ -404,7 +399,7 @@
     <message>
       <location/>
       <source>Include description</source>
-      <translation>Voeg beschrijving toe</translation>
+      <translation>Voeg een beschrijving toe</translation>
     </message>
   </context>
   <context>
@@ -710,7 +705,7 @@
     <message>
       <location/>
       <source>Quality and frame rate (FPS) settings in the Recording Schedule will become irrelevant.</source>
-      <translation>Instellingen voor kwaliteit en beeldsnelheid (FPS) in het opnameschema worden niet meer relevant.</translation>
+      <translation>Instellingen voor de kwaliteit en beeldsnelheid (FPS) in het opnameschema worden niet meer relevant.</translation>
     </message>
     <message>
       <location/>
@@ -725,7 +720,7 @@
     <message>
       <location/>
       <source>Secondary Stream</source>
-      <translation>Secundair stream</translation>
+      <translation>Secundaire stream</translation>
     </message>
     <message>
       <location/>
@@ -764,7 +759,7 @@
     </message>
     <message>
       <location/>
-      <source>Logical Id</source>
+      <source>Logical ID</source>
       <translation>Logische ID</translation>
     </message>
   </context>
@@ -772,8 +767,8 @@
     <name>CameraInputBusinessEventWidget</name>
     <message>
       <location filename="../src/ui/widgets/business/camera_input_business_event_widget.ui"/>
-      <source>Input Id</source>
-      <translation>Input Id</translation>
+      <source>Input ID</source>
+      <translation>Input ID</translation>
     </message>
   </context>
   <context>
@@ -798,8 +793,8 @@
     </message>
     <message>
       <location/>
-      <source>Output Id:</source>
-      <translation>Uitgang Id:</translation>
+      <source>Output ID:</source>
+      <translation>Uitgang ID:</translation>
     </message>
   </context>
   <context>
@@ -1108,7 +1103,7 @@
     <message>
       <location/>
       <source>Applying filters and adding overlays require transcoding which will increase CPU usage and may take significant time.</source>
-      <translation>Gekozen instellingen vereisen transcodering. Het verhoogt het CPU-gebruik en kan veel tijd in beslag nemen.</translation>
+      <translation>Het toepassen van filters en het toevoegen vereist transcoderen en zal de CPU belasting verhogen en ken veel tijd in beslag nemen.</translation>
     </message>
   </context>
   <context>
@@ -1513,8 +1508,8 @@
     </message>
     <message>
       <location/>
-      <source>Locked to Hardware Id:</source>
-      <translation>Gelieerd aan Hardware Id:</translation>
+      <source>Locked to Hardware ID:</source>
+      <translation>Gekoppeld aan Hardware ID:</translation>
     </message>
   </context>
   <context>
@@ -1612,8 +1607,8 @@
     </message>
     <message>
       <location/>
-      <source>Hardware Id</source>
-      <translation>Hardware Id</translation>
+      <source>Hardware ID</source>
+      <translation>Hardware ID</translation>
     </message>
   </context>
   <context>
@@ -1742,6 +1737,11 @@
       <source>Tour cycle</source>
       <translation>Tour cyclus</translation>
     </message>
+    <message>
+      <location/>
+      <source>IP addresses for cameras, and servers, groups for users, etc.</source>
+      <translation>IP-adressen voor camera's en servers, groepen voor gebruikers, etc.</translation>
+    </message>
   </context>
   <context>
     <name>MessageBox</name>
@@ -1804,7 +1804,7 @@
     <message>
       <location/>
       <source>&quot;Wearable Camera&quot; is a virtual storage for video files, which could be uploaded to any server on your System and be accessed by any user.</source>
-      <translation>&quot;Draagbare camera&quot; is een virtuele opslag voor videobestanden, die kan worden geüpload naar elke server binnen uw systeem en toegankelijk is voor elke gebruiker.</translation>
+      <translation>&quot;Draagbare camera&quot; is een virtuele opslag voor videobestanden, die kan worden geüpload naar elke server binnen uw systeem en is toegankelijk voor elke gebruiker.</translation>
     </message>
   </context>
   <context>
@@ -2293,7 +2293,7 @@
     <message>
       <location/>
       <source>Reset Speed</source>
-      <translation>Reset snelheid</translation>
+      <translation>Herstel de snelheid</translation>
     </message>
   </context>
   <context>
@@ -2964,7 +2964,7 @@
     <message>
       <location/>
       <source>Area Width</source>
-      <translation>Breedte van het tekstvak</translation>
+      <translation>Breedte van het veld</translation>
     </message>
   </context>
   <context>
@@ -3049,7 +3049,7 @@
     <message>
       <location/>
       <source>Click &quot;New role&quot; button to create one.</source>
-      <translation>Klik op de &quot;Nieuw profiel&quot; -knop om er een te maken.</translation>
+      <translation>Klik op de &quot;Nieuw profiel&quot; -knop om een nieuw profiel aan te maken.</translation>
     </message>
   </context>
   <context>

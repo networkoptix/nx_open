@@ -7,10 +7,9 @@
 #include "outgoing_transaction_dispatcher.h"
 
 namespace nx {
-namespace cdb {
-namespace ec2 {
+namespace data_sync_engine {
 
-QString toString(const ::ec2::QnAbstractTransaction& tran)
+QString toString(const CommandHeader& tran)
 {
     return lm("seq %1, ts %2")
         .arg(tran.persistentInfo.sequence).arg(tran.persistentInfo.timestamp);
@@ -281,7 +280,7 @@ nx::utils::db::DBResult TransactionLog::fetchTransactions(
 bool TransactionLog::isShouldBeIgnored(
     nx::utils::db::QueryContext* /*queryContext*/,
     const nx::String& systemId,
-    const ::ec2::QnAbstractTransaction& tran,
+    const CommandHeader& tran,
     const QByteArray& hash)
 {
     TransactionLogContext* vmsTransactionLog = nullptr;
@@ -296,7 +295,7 @@ bool TransactionLog::isShouldBeIgnored(
 nx::utils::db::DBResult TransactionLog::saveToDb(
     nx::utils::db::QueryContext* queryContext,
     const nx::String& systemId,
-    const ::ec2::QnAbstractTransaction& transaction,
+    const CommandHeader& transaction,
     const QByteArray& transactionHash,
     const QByteArray& ubjsonData)
 {
@@ -460,6 +459,5 @@ ResultCode TransactionLog::dbResultToApiResult(
     }
 }
 
-} // namespace ec2
-} // namespace cdb
+} // namespace data_sync_engine
 } // namespace nx

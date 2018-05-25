@@ -1,5 +1,7 @@
 #include "p2p_message_bus.h"
 
+#include <nx/network/url/url_parse_helper.h>
+
 #include <nx/utils/std/cmath.h>
 #include <common/common_module.h>
 #include <utils/media/bitStream.h>
@@ -14,6 +16,7 @@
 #include <utils/math/math.h>
 #include <api/runtime_info_manager.h>
 #include <managers/time_manager.h>
+#include <nx/cloud/cdb/api/ec2_request_paths.h>
 
 namespace nx {
 namespace p2p {
@@ -107,32 +110,29 @@ void MessageBus::printTran(
     const ec2::QnAbstractTransaction& tran,
     Connection::Direction direction) const
 {
-
     auto localPeerName = qnStaticCommon->moduleDisplayName(commonModule()->moduleGUID());
     auto remotePeerName = qnStaticCommon->moduleDisplayName(connection->remotePeer().id);
     QString msgName;
     QString directionName;
     if (direction == Connection::Direction::outgoing)
     {
-        msgName = lm("Send");
-        directionName = lm("--->");
+        msgName = lit("Send");
+        directionName = lit("--->");
     }
     else
     {
-        msgName = lm("Got");
-        directionName = lm("<---");
+        msgName = lit("Got");
+        directionName = lit("<---");
     }
 
-    NX_VERBOSE(
-        this,
-        lit("%1 tran:\t %2 %3 %4. Command: %5. Seq=%6. Created by %7")
-        .arg(msgName)
-        .arg(localPeerName)
-        .arg(directionName)
-        .arg(remotePeerName)
-        .arg(toString(tran.command))
-        .arg(tran.persistentInfo.sequence)
-        .arg(qnStaticCommon->moduleDisplayName(tran.peerID)));
+    NX_VERBOSE(this, lm("%1 tran:\t %2 %3 %4. Command: %5. Seq=%6. Created by %7").args(
+        msgName,
+        localPeerName,
+        directionName,
+        remotePeerName,
+        toString(tran.command),
+        tran.persistentInfo.sequence,
+        qnStaticCommon->moduleDisplayName(tran.peerID)));
 }
 
 void MessageBus::start()
@@ -161,10 +161,15 @@ void MessageBus::addOutgoingConnectionToPeer(const QnUuid& peer, const utils::Ur
     deleteRemoveUrlById(peer);
 
     nx::utils::Url url(_url);
-    if (peer == kCloudPeerId)
-        url.setPath(kCloudPathPrefix + kUrlPath);
+    if (peer == ::ec2::kCloudPeerId)
+    {
+        url.setPath(nx::network::url::joinPath(
+            kCloudPathPrefix.toStdString(), kUrlPath.toStdString()).c_str());
+    }
     else
+    {
         url.setPath(kUrlPath);
+    }
 
     int pos = nx::utils::random::number((int) 0, (int) m_remoteUrls.size());
     m_remoteUrls.insert(m_remoteUrls.begin() + pos, RemoteConnection(peer, url));
@@ -557,6 +562,7 @@ void MessageBus::at_gotMessage(
         break;
     case MessageType::pushImpersistentUnicastTransaction:
         result = handleTransactionWithHeader(
+            this,
             connection,
             payload,
             GotUnicastTransactionFuction());
@@ -573,11 +579,12 @@ void MessageBus::at_gotMessage(
 }
 
 bool MessageBus::handlePushImpersistentBroadcastTransaction(
-	const P2pConnectionPtr& connection, 
+	const P2pConnectionPtr& connection,
 	const QByteArray& payload)
 {
 	return handleTransactionWithHeader(
-		connection,
+        this,
+        connection,
 		payload,
 		GotTransactionFuction());
 }
@@ -849,37 +856,6 @@ void MessageBus::processRuntimeInfo(
 }
 
 template <class T>
-bool MessageBus::processSpecialTransaction(
-    const QnTransaction<T>& tran,
-    const P2pConnectionPtr& connection,
-    const TransportHeader& transportHeader)
-{
-    if (nx::utils::log::isToBeLogged(cl_logDEBUG2, this))
-        printTran(connection, tran, Connection::Direction::incoming);
-
-    ApiPersistentIdData peerId(tran.peerID, tran.persistentInfo.dbID);
-
-    // process special cases
-    switch (tran.command)
-    {
-        // TODO: move it to the global setting param or emit this data via NotificationManager
-    case ApiCommand::forcePrimaryTimeServer:
-        m_timeSyncManager->onGotPrimariTimeServerTran(tran);
-        if (localPeer().isServer())
-            sendTransaction(tran, transportHeader); //< Proxy
-        return true;
-    case ApiCommand::broadcastPeerSyncTime:
-        m_timeSyncManager->resyncTimeWithPeer(tran.peerID);
-        return true;
-    case ApiCommand::runtimeInfoChanged:
-        processRuntimeInfo(tran, connection, transportHeader);
-        return true;
-    default:
-        return false;; //< Not a special case
-    }
-}
-
-template <class T>
 void MessageBus::gotTransaction(
     const QnTransaction<T>& tran,
     const P2pConnectionPtr& connection,
@@ -951,29 +927,6 @@ bool MessageBus::handlePushTransactionList(const P2pConnectionPtr& connection, c
         if (!handlePushTransactionData(connection, transaction, TransportHeader()))
             return false;
     }
-    return true;
-}
-
-template <typename Function>
-bool MessageBus::handleTransactionWithHeader(
-    const P2pConnectionPtr& connection,
-    const QByteArray& data,
-    Function function)
-{
-    int headerSize = 0;
-    TransportHeader header;
-    if (connection->remotePeer().dataFormat == Qn::UbjsonFormat)
-        header = deserializeTransportHeader(data, &headerSize);
-    else
-        header.dstPeers.push_back(localPeer().id);
-    using namespace std::placeholders;
-    return handleTransaction(
-        this,
-        connection->remotePeer().dataFormat,
-        data.mid(headerSize),
-        std::bind(function, this, _1, connection, header),
-        [](Qn::SerializationFormat, const QByteArray&) { return false; });
-
     return true;
 }
 

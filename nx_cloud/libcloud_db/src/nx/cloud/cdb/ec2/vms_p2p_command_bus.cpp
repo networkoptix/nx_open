@@ -6,7 +6,9 @@ namespace nx {
 namespace cdb {
 namespace ec2 {
 
-VmsP2pCommandBus::VmsP2pCommandBus(SyncronizationEngine* syncronizationEngine):
+VmsP2pCommandBus::VmsP2pCommandBus(
+    data_sync_engine::SyncronizationEngine* syncronizationEngine)
+    :
     m_syncronizationEngine(syncronizationEngine)
 {
 }

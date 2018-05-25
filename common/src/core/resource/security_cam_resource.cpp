@@ -38,6 +38,16 @@ static const int kSharePixelsDefaultReservedSecondStreamFps = 0;
 static const Qn::StreamFpsSharingMethod kDefaultStreamFpsSharingMethod = Qn::PixelsFpsSharing;
 //static const Qn::MotionType defaultMotionType = Qn::MotionType::MT_MotionWindow;
 
+bool isStringEmpty(const QString& value)
+{
+    return value.isEmpty();
+};
+
+bool isDeviceTypeEmpty(nx::core::resource::DeviceType value)
+{
+    return value == nx::core::resource::DeviceType::unknown;
+};
+
 } // namespace
 
 const int QnSecurityCamResource::kDefaultSecondStreamFpsLow = 2;
@@ -97,6 +107,14 @@ QnSecurityCamResource::QnSecurityCamResource(QnCommonModule* commonModule):
             return QJson::deserialized<nx::media::CameraMediaCapability>(
                 getProperty(nx::media::kCameraMediaCapabilityParamName).toUtf8());
         },
+        &m_mutex),
+    m_cachedDeviceType(
+        [this]()
+        {
+            return QnLexical::deserialized<nx::core::resource::DeviceType>(
+                getProperty(Qn::kDeviceType),
+                nx::core::resource::DeviceType::unknown);
+        },
         &m_mutex)
 {
     addFlags(Qn::live_cam);
@@ -119,6 +137,12 @@ QnSecurityCamResource::QnSecurityCamResource(QnCommonModule* commonModule):
         {
             if (key == Qn::CAMERA_CAPABILITIES_PARAM_NAME)
                 emit capabilitiesChanged(toSharedPointer());
+
+            if (key == Qn::DTS_PARAM_NAME)
+                emit licenseTypeChanged(toSharedPointer(this));
+
+            if (key == Qn::kDeviceType)
+                emit licenseTypeChanged(toSharedPointer(this));
         });
 
     QnMediaResource::initMediaResource();
@@ -424,8 +448,9 @@ bool QnSecurityCamResource::hasDualStreamingInternal() const
     return val.toInt() > 0;
 }
 
-bool QnSecurityCamResource::isDtsBased() const {
-    return m_cachedIsDtsBased.get();
+bool QnSecurityCamResource::isDtsBased() const
+{
+    return m_cachedIsDtsBased.get() || deviceType() == nx::core::resource::DeviceType::nvr;
 }
 
 bool QnSecurityCamResource::canConfigureRecording() const
@@ -474,6 +499,11 @@ bool QnSecurityCamResource::isSharingLicenseInGroup() const
         return false; //< Not a multichannel device. Nothing to share
     if (!QnLicense::licenseTypeInfo(licenseType()).allowedToShareChannel)
         return false; //< Don't allow sharing for encoders e.t.c
+
+    const auto resourceData = qnStaticCommon->dataPool()->data(toSharedPointer(this));
+    if (resourceData.value<bool>(Qn::kCanShareLicenseGroup), false)
+        return true;
+
     QnResourceTypePtr resType = qnResTypePool->getResourceType(getTypeId());
     if (!resType)
         return false;
@@ -482,9 +512,7 @@ bool QnSecurityCamResource::isSharingLicenseInGroup() const
 
 bool QnSecurityCamResource::isNvr() const
 {
-    const auto result = isDtsBased();
-    NX_EXPECT(!result || !getGroupId().isEmpty());
-    return result;
+    return isDtsBased();
 }
 
 bool QnSecurityCamResource::isMultiSensorCamera() const
@@ -492,7 +520,20 @@ bool QnSecurityCamResource::isMultiSensorCamera() const
     return !getGroupId().isEmpty()
         && !isDtsBased()
         && !isAnalogEncoder()
-        && !isAnalog();
+        && !isAnalog()
+        && !nx::core::resource::isProxyDeviceType(deviceType());
+}
+
+nx::core::resource::DeviceType QnSecurityCamResource::deviceType() const
+{
+    return m_cachedDeviceType.get();
+}
+
+void QnSecurityCamResource::setDeviceType(nx::core::resource::DeviceType deviceType)
+{
+    m_cachedDeviceType.reset();
+    m_cachedLicenseType.reset();
+    setProperty(Qn::kDeviceType, QnLexical::serialized(deviceType));
 }
 
 Qn::LicenseType QnSecurityCamResource::licenseType() const
@@ -824,16 +865,6 @@ QString QnSecurityCamResource::getSharedId() const
     }
 
     return getUniqueId();
-}
-
-QString QnSecurityCamResource::getProxiedId() const
-{
-    return getProperty(Qn::kProxiedIdParamName);
-}
-
-void QnSecurityCamResource::setProxiedId(const QString& proxiedId)
-{
-    setProperty(Qn::kProxiedIdParamName, proxiedId);
 }
 
 QString QnSecurityCamResource::getModel() const
@@ -1210,10 +1241,10 @@ bool QnSecurityCamResource::mergeResourcesIfNeeded(const QnNetworkResourcePtr &s
 
     bool result = base_type::mergeResourcesIfNeeded(source);
     const auto mergeValue =
-        [&](auto getter, auto setter)
+        [&](auto getter, auto setter, auto emptinessChecker)
         {
             const auto newValue = (camera->*getter)();
-            if (!newValue.isEmpty())
+            if (!emptinessChecker(newValue))
             {
                 const auto currentValue = (this->*getter)();
                 if (currentValue != newValue)
@@ -1226,10 +1257,26 @@ bool QnSecurityCamResource::mergeResourcesIfNeeded(const QnNetworkResourcePtr &s
 
     // Group id and name can be changed for any resource because if we unable to authorize,
     // number of channels is not accessible.
-    mergeValue(&QnSecurityCamResource::getGroupId, &QnSecurityCamResource::setGroupId);
-    mergeValue(&QnSecurityCamResource::getGroupName, &QnSecurityCamResource::setGroupName);
-    mergeValue(&QnSecurityCamResource::getModel, &QnSecurityCamResource::setModel);
-    mergeValue(&QnSecurityCamResource::getVendor, &QnSecurityCamResource::setVendor);
+    mergeValue(
+        &QnSecurityCamResource::getGroupId,
+        &QnSecurityCamResource::setGroupId,
+        isStringEmpty);
+    mergeValue(
+        &QnSecurityCamResource::getGroupName,
+        &QnSecurityCamResource::setGroupName,
+        isStringEmpty);
+    mergeValue(
+        &QnSecurityCamResource::getModel,
+        &QnSecurityCamResource::setModel,
+        isStringEmpty);
+    mergeValue(
+        &QnSecurityCamResource::getVendor,
+        &QnSecurityCamResource::setVendor,
+        isStringEmpty);
+    mergeValue(
+        &QnSecurityCamResource::deviceType,
+        &QnSecurityCamResource::setDeviceType,
+        isDeviceTypeEmpty);
     return result;
 }
 
@@ -1273,6 +1320,7 @@ void QnSecurityCamResource::resetCachedValues()
     m_cachedAnalyticsSupportedEvents.reset();
     m_cachedCameraMediaCapabilities.reset();
     m_cachedLicenseType.reset();
+    m_cachedDeviceType.reset();
 }
 
 Qn::BitratePerGopType QnSecurityCamResource::bitratePerGopType() const

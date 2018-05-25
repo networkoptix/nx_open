@@ -49,7 +49,7 @@
     </message>
     <message>
       <source>Password</source>
-      <translation>סיסמא</translation>
+      <translation>סיסמה</translation>
     </message>
     <message>
       <source>Learn more about %1</source>
@@ -61,7 +61,7 @@
     </message>
     <message>
       <source>Forgot your password?</source>
-      <translation>שכחת סיסמא?</translation>
+      <translation>שכחת סיסמה?</translation>
     </message>
     <message>
       <source>Cannot connect to %1</source>
@@ -69,7 +69,7 @@
     </message>
     <message>
       <source>Email and password cannot be empty</source>
-      <translation>כתובת האימייל והסיסמא אינם יכולים להיות ריקים</translation>
+      <translation>כתובת האימייל והסיסמה אינם יכולים להיות ריקים</translation>
     </message>
     <message>
       <source>Log in</source>
@@ -77,7 +77,7 @@
     </message>
     <message>
       <source>Incorrect email or password</source>
-      <translation>דוא"ל או סיסמא שגויים</translation>
+      <translation>דוא"ל או סיסמה שגויים</translation>
     </message>
   </context>
   <context>
@@ -266,7 +266,7 @@
     </message>
     <message>
       <source>Software image rotation is not supported in fullscreen mode</source>
-      <translation type="unfinished">Software image rotation is not supported in fullscreen mode</translation>
+      <translation>סיבוב תמונות אינו נתמך במצב מסך מלא</translation>
     </message>
   </context>
   <context>
@@ -394,11 +394,11 @@
     <name>SelectCameraDummy</name>
     <message>
       <source>Select camera</source>
-      <translation type="unfinished">Select camera</translation>
+      <translation>בחר מצלמה</translation>
     </message>
     <message>
       <source>Press Ctrl + Arrow or use mouse wheel</source>
-      <translation type="unfinished">Press Ctrl + Arrow or use mouse wheel</translation>
+      <translation>הקש Ctrl + חץ או השתמש בגלגל העכבר</translation>
     </message>
   </context>
   <context>
@@ -420,7 +420,7 @@
     </message>
     <message>
       <source>Password</source>
-      <translation>סיסמא</translation>
+      <translation>סיסמה</translation>
     </message>
     <message>
       <source>Hosts</source>
@@ -447,11 +447,11 @@
     </message>
     <message>
       <source>UNREACHABLE</source>
-      <translation type="unfinished">UNREACHABLE</translation>
+      <translation>לא זמין</translation>
     </message>
     <message>
       <source>Connect to this server from web browser or through desktop client to set it up</source>
-      <translation type="unfinished">Connect to this server from web browser or through desktop client to set it up</translation>
+      <translation>התחבר לשרת זה מדפדפן אינטרנט או דרך תוכנת הלקוח כדי להגדיר אותו</translation>
     </message>
   </context>
   <context>
@@ -553,7 +553,7 @@
     </message>
     <message>
       <source>New Server</source>
-      <translation type="unfinished">New Server</translation>
+      <translation>שרת חדש</translation>
     </message>
   </context>
   <context>
@@ -586,15 +586,15 @@
     <name>TransformationsNotSupportedWarning</name>
     <message>
       <source>Software image rotation is not supported in fullscreen mode</source>
-      <translation type="unfinished">Software image rotation is not supported in fullscreen mode</translation>
+      <translation>סיבוב תמונות אינו נתמך במצב מסך מלא</translation>
     </message>
     <message>
       <source>Show as is</source>
-      <translation type="unfinished">Show as is</translation>
+      <translation>הצג כמו שהוא</translation>
     </message>
     <message>
       <source>(Space)</source>
-      <translation type="unfinished">(Space)</translation>
+      <translation>(שטח)</translation>
     </message>
   </context>
   <context>
@@ -624,15 +624,15 @@
     </message>
     <message>
       <source>Offline</source>
-      <translation type="unfinished">Offline</translation>
+      <translation>לא מקוון</translation>
     </message>
     <message>
       <source>Unauthorized</source>
-      <translation type="unfinished">Unauthorized</translation>
+      <translation>לא מורשה</translation>
     </message>
     <message>
       <source>Cannot play any video stream</source>
-      <translation type="unfinished">Cannot play any video stream</translation>
+      <translation>לא ניתן להציג אף זרם וידאו</translation>
     </message>
   </context>
   <context>
@@ -648,7 +648,7 @@
     <message>
       <source>d MMMM yyyy</source>
       <comment>DO NOT TRANSLATE THIS STRING!</comment>
-      <translation>d MMMM yyyy</translation>
+      <translation type="unfinished">d MMMM yyyy</translation>
     </message>
   </context>
   <context>

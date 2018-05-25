@@ -14,6 +14,17 @@ AbstractButton
     implicitWidth: Math.max(48, background.implicitWidth, label.implicitWidth)
     implicitHeight: Math.max(48, background.implicitHeight, label.implicitHeight)
 
+    onPressAndHold: { d.pressedAndHeld = true }
+    onCanceled: { d.pressedAndHeld = false }
+    onReleased:
+    {
+        if (!d.pressedAndHeld)
+            return
+
+        d.pressedAndHeld = false
+        clicked()
+    }
+
     label: Image
     {
         anchors.centerIn: parent
@@ -35,5 +46,12 @@ AbstractButton
             rippleColor: "transparent"
             alwaysCompleteHighlightAnimation: control.alwaysCompleteHighlightAnimation
         }
+    }
+
+    QtObject
+    {
+        id: d
+
+        property bool pressedAndHeld: false
     }
 }

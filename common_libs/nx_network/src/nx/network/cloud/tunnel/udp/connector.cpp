@@ -1,6 +1,5 @@
 #include "connector.h"
 
-#include <nx/fusion/serialization/lexical.h>
 #include <nx/network/cloud/cloud_connect_controller.h>
 #include <nx/network/cloud/data/udp_hole_punching_connection_initiation_data.h>
 #include <nx/network/cloud/mediator_connector.h>
@@ -228,7 +227,7 @@ void TunnelConnector::holePunchingDone(
     SystemError::ErrorCode sysErrorCode)
 {
     NX_LOGX(lm("cross-nat %1. Udp hole punching result: %2, system result code: %3")
-        .arg(m_connectSessionId).arg(QnLexical::serialized(resultCode))
+        .arg(m_connectSessionId).arg(api::toString(resultCode))
         .arg(SystemError::toString(sysErrorCode)),
         cl_logDEBUG2);
 

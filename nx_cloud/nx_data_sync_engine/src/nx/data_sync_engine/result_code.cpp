@@ -1,8 +1,7 @@
 #include "result_code.h"
 
 namespace nx {
-namespace cdb {
-namespace ec2 {
+namespace data_sync_engine {
 
 std::string toString(ResultCode resultCode)
 {
@@ -25,6 +24,5 @@ std::string toString(ResultCode resultCode)
     }
 }
 
-} // namespace ec2
-} // namespace cdb
+} // namespace data_sync_engine
 } // namespace nx

@@ -79,7 +79,7 @@
     <message>
       <source>%1 System can only be merged with non-%1. System name and password are taken from %1 System.</source>
       <comment>%1 is the short cloud name (like Cloud)</comment>
-      <translation type="unfinished">%1 System can only be merged with non-%1. System name and password are taken from %1 System.</translation>
+      <translation>%1 Sistem yalnızca %1 olmayan biriyle birleştirilebilir. Sistem adı ve şifre %1 Sisteminden alınmıştır.</translation>
     </message>
     <message>
       <source>Both Systems are connected to %1. Merge is not allowed.</source>
@@ -561,8 +561,8 @@
       <translation>Bilinmeyen Hata</translation>
     </message>
     <message>
-      <source>Server with matching Hardware Id not found</source>
-      <translation>Sunucu İle Eşleşen Donanım Id'si Bulunamadı</translation>
+      <source>Server with matching Hardware ID not found</source>
+      <translation>Sunucu İle Eşleşen Donanım ID'si Bulunamadı</translation>
     </message>
   </context>
   <context>
@@ -684,12 +684,12 @@
       <translation>Watermark: %1</translation>
     </message>
     <message>
-      <source>Hardware Id: %1</source>
-      <translation>Donanım Kimliği: %1</translation>
-    </message>
-    <message>
       <source>Time License</source>
       <translation>Deneme Lisansı</translation>
+    </message>
+    <message>
+      <source>Hardware ID: %1</source>
+      <translation>Donanım Kimliği: %1</translation>
     </message>
   </context>
   <context>

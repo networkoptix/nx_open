@@ -8,6 +8,8 @@ namespace nx {
 namespace client {
 namespace mobile {
 
+class PtzAvailabilityWatcher;
+
 class ResourcePtzController: public QnProxyPtzController
 {
     Q_OBJECT
@@ -22,6 +24,8 @@ class ResourcePtzController: public QnProxyPtzController
 
 public:
     ResourcePtzController(QObject* parent = nullptr);
+
+    virtual ~ResourcePtzController() override;
 
 public: // Properties section
     QString resourceId() const;
@@ -51,6 +55,7 @@ signals:
     void activePresetIndexChanged();
 
 private:
+    QScopedPointer<PtzAvailabilityWatcher> m_availabilityWatcher;
     QnUuid m_resourceId;
 };
 

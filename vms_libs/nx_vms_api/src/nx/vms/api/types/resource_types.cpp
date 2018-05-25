@@ -11,7 +11,6 @@ QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(nx::vms::api, ResourceStatus,
     (nx::vms::api::ResourceStatus::undefined, "NotDefined")
     (nx::vms::api::ResourceStatus::incompatible, "Incompatible"))
 
-
 QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(nx::vms::api, CameraStatusFlag,
     (nx::vms::api::CSF_NoFlags, "CSF_NoFlags")
     (nx::vms::api::CSF_HasIssuesFlag, "CSF_HasIssuesFlag"))
@@ -37,20 +36,6 @@ QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(nx::vms::api, StreamQuality,
     (nx::vms::api::StreamQuality::highest, "highest")
     (nx::vms::api::StreamQuality::preset, "preset"))
 
-QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(nx::vms::api, MotionType,
-    (nx::vms::api::MT_Default, "MT_Default")
-    (nx::vms::api::MT_HardwareGrid, "MT_HardwareGrid")
-    (nx::vms::api::MT_SoftwareGrid, "MT_SoftwareGrid")
-    (nx::vms::api::MT_MotionWindow, "MT_MotionWindow")
-    (nx::vms::api::MT_NoMotion, "MT_NoMotion"))
-
-QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(nx::vms::api, MotionTypes,
-    (nx::vms::api::MT_Default, "MT_Default")
-    (nx::vms::api::MT_HardwareGrid, "MT_HardwareGrid")
-    (nx::vms::api::MT_SoftwareGrid, "MT_SoftwareGrid")
-    (nx::vms::api::MT_MotionWindow, "MT_MotionWindow")
-    (nx::vms::api::MT_NoMotion, "MT_NoMotion"))
-
 QN_FUSION_DEFINE_FUNCTIONS(nx::vms::api::FailoverPriority, (numeric))
 QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(nx::vms::api, FailoverPriority,
     (nx::vms::api::FailoverPriority::never, "Never")
@@ -71,3 +56,7 @@ QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(nx::vms::api, CameraBackupQuality,
     (nx::vms::api::CameraBackup_LowQuality, "CameraBackupLowQuality")
     (nx::vms::api::CameraBackup_Both, "CameraBackupBoth")
     (nx::vms::api::CameraBackup_Default, "CameraBackupDefault"))
+
+QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(nx::vms::api, IoModuleVisualStyle,
+    (nx::vms::api::IoModuleVisualStyle::form, "Form")
+    (nx::vms::api::IoModuleVisualStyle::tile, "Tile"))

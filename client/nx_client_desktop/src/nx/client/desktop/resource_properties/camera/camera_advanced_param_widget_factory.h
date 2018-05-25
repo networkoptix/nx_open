@@ -1,5 +1,7 @@
 #pragma once
 
+#include <QtWidgets/QWidget>
+
 #include <core/resource/camera_advanced_param.h>
 #include <nx/utils/log/assert.h>
 
@@ -18,6 +20,7 @@ public:
 
     virtual QString value() const = 0;
     virtual void setValue(const QString &newValue) = 0;
+    virtual QStringList range() const;
     virtual void setRange(const QString& range);
 
 signals:

@@ -562,8 +562,8 @@
       <translation>Error desconocido</translation>
     </message>
     <message>
-      <source>Server with matching Hardware Id not found</source>
-      <translation>Servidor correspondiente al Hardware Id no encontrado</translation>
+      <source>Server with matching Hardware ID not found</source>
+      <translation>Servidor correspondiente al Hardware ID no encontrado</translation>
     </message>
   </context>
   <context>
@@ -685,12 +685,12 @@
       <translation>Marca de agua: %1</translation>
     </message>
     <message>
-      <source>Hardware Id: %1</source>
-      <translation>Id del hardware: %1</translation>
-    </message>
-    <message>
       <source>Time License</source>
       <translation>Licencias de tiempo</translation>
+    </message>
+    <message>
+      <source>Hardware ID: %1</source>
+      <translation>ID del hardware: %1</translation>
     </message>
   </context>
   <context>
@@ -913,7 +913,7 @@
       <source>milliseconds</source>
       <comment>Full suffix for displaying milliseconds</comment>
       <translation>
-        <numerusform>milisegundo</numerusform>
+        <numerusform>milisegundos</numerusform>
         <numerusform>milisegundos</numerusform>
       </translation>
     </message>

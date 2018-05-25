@@ -18,7 +18,8 @@ set(resources)
 
 if(IOS)
     if(NOT mobile_client_ios_launch_screen)
-        set(mobile_client_ios_launch_screen "${CMAKE_CURRENT_LIST_DIR}/maven/bin-resources/ios/Launch.xib")
+        set(mobile_client_ios_launch_screen
+            ${CMAKE_CURRENT_LIST_DIR}/maven/bin-resources/ios/Launch.xib)
     endif()
 
     set(ios_sources
@@ -27,19 +28,20 @@ if(IOS)
         src/utils/app_delegate.mm
     )
 
-    set(icons_dir "${customization_dir}/icons/ios/ios/images")
-    file(GLOB resources "${icons_dir}/icon_*.png" "${icons_dir}/logo*.png")
+    set(icons_dir ${customization_dir}/icons/ios/ios/images)
 
+    file(GLOB resources ${icons_dir}/logo*.png)
     list(APPEND resources ${mobile_client_ios_launch_screen})
-    list(APPEND resources "${CMAKE_CURRENT_LIST_DIR}/ios/qt.conf")
+    list(APPEND resources ${CMAKE_CURRENT_LIST_DIR}/ios/qt.conf)
+
+    nx_copy(${CMAKE_CURRENT_SOURCE_DIR}/ios/mobile_client.xcassets
+        DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
+    file(GLOB icons ${icons_dir}/icon_*.png)
+    nx_copy(${icons}
+        DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/mobile_client.xcassets/AppIcon.appiconset)
+    list(APPEND resources ${CMAKE_CURRENT_BINARY_DIR}/mobile_client.xcassets)
 else()
     set(ios_sources)
-endif()
-
-set(additional_resources)
-set(customization_resources "${customization_dir}/mobile_client/resources")
-if(EXISTS ${customization_resources})
-    list(APPEND additional_resources ${customization_resources})
 endif()
 
 set(target_args
@@ -47,7 +49,7 @@ set(target_args
         "${CMAKE_CURRENT_BINARY_DIR}/mobile_client_app_info_impl.cpp"
         ${ios_sources}
     ADDITIONAL_RESOURCES
-        ${additional_resources}
+        ${CMAKE_CURRENT_SOURCE_DIR}/skins/${defaultSkin}
     OTHER_SOURCES
         ${QML_FILES}
         ${resources}
@@ -72,12 +74,13 @@ if(box STREQUAL "bpi")
 endif()
 
 if(ANDROID)
-    file(COPY "maven/bin-resources/android" DESTINATION "${CMAKE_CURRENT_BINARY_DIR}")
-    file(COPY "${customization_dir}/icons/android/android"
-        DESTINATION "${CMAKE_CURRENT_BINARY_DIR}")
-    configure_file("maven/filter-resources/android/AndroidManifest.xml"
+    nx_copy(${CMAKE_CURRENT_SOURCE_DIR}/maven/bin-resources/android
+        DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
+    nx_copy(${customization_dir}/icons/android/android
+        DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
+    nx_configure_file("maven/filter-resources/android/AndroidManifest.xml"
         "${CMAKE_CURRENT_BINARY_DIR}/android/AndroidManifest.xml")
-    configure_file("./maven/filter-resources/android/res/values/strings.xml"
+    nx_configure_file("maven/filter-resources/android/res/values/strings.xml"
         "${CMAKE_CURRENT_BINARY_DIR}/android/res/values/strings.xml")
 
     get_target_property(OPENSSL_LIBS openssl INTERFACE_LINK_LIBRARIES)
@@ -101,21 +104,26 @@ if(ANDROID)
         FILE_NAME ${apk_file_name}
         PACKAGE_SOURCE "${CMAKE_CURRENT_BINARY_DIR}/android"
         QML_ROOT_PATH "${CMAKE_CURRENT_LIST_DIR}/static-resources/qml"
+        VERSION "${mobileClientVersion.full}"
         EXTRA_LIBS ${OPENSSL_LIBS} ${FFMPEG_LIBS} ${OPENAL_LIBS}
         ${code_signing_parameters}
     )
 endif()
 
 if(IOS)
+    if(mobile_bundle_name STREQUAL display_mobile_name)
+        message(FATAL_ERROR "mobile_bundle_name cannot be equal to display_mobile_name.")
+    endif()
+
     set(provisioning_profiles_dir "${certificates_path}/mobile_client/ios/provisioning_profiles")
 
-    if(beta)
-        configure_file("maven/filter-resources/mobile_client-beta.entitlements"
-            "${CMAKE_CURRENT_BINARY_DIR}/mobile_client.entitlements")
+    if(developerBuild)
+        nx_configure_file(maven/filter-resources/mobile_client-beta.entitlements
+            ${CMAKE_CURRENT_BINARY_DIR}/mobile_client.entitlements)
         set(provisioning_profile "${provisioning_profiles_dir}/testing.mobileprovision")
     else()
-        configure_file("maven/filter-resources/mobile_client-release.entitlements"
-            "${CMAKE_CURRENT_BINARY_DIR}/mobile_client.entitlements")
+        nx_configure_file(maven/filter-resources/mobile_client-beta.entitlements
+            ${CMAKE_CURRENT_BINARY_DIR}/mobile_client.entitlements)
         set(provisioning_profile "${provisioning_profiles_dir}/production.mobileprovision")
     endif()
 
@@ -129,15 +137,43 @@ if(IOS)
         message(FATAL_ERROR "Cannot get provisioning profile id from \"${provisioning_profile}\"")
     endif()
 
+    set(system_provisioning_profiles_dir "$ENV{HOME}/Library/MobileDevice/Provisioning Profiles")
+    execute_process(
+        COMMAND ${CMAKE_COMMAND} -E copy "${provisioning_profile}"
+            "${system_provisioning_profiles_dir}/${provisioning_profile_id}.mobileprovision"
+        RESULT_VARIABLE result
+    )
+    if(NOT result EQUAL 0)
+        message(FATAL_ERROR "Cannot install provisioning profile \"${provisioning_profile}\"")
+    endif()
+
     set_target_properties(mobile_client PROPERTIES
         MACOSX_BUNDLE TRUE
         MACOSX_BUNDLE_INFO_PLIST "${CMAKE_CURRENT_LIST_DIR}/maven/filter-resources/Info.plist"
-        RESOURCE "${resources}"
-        XCODE_ATTRIBUTE_CODE_SIGN_IDENTITY "${ios.sign.identity}"
-        XCODE_ATTRIBUTE_CODE_SIGN_ENTITLEMENTS "${CMAKE_CURRENT_BINARY_DIR}/mobile_client.entitlements"
-        XCODE_ATTRIBUTE_PROVISIONING_PROFILE "${provisioning_profile_id}"
+        RESOURCE "${resources}" #";${CMAKE_CURRENT_BINARY_DIR}/mobile_client.xcassets"
         XCODE_ATTRIBUTE_COMBINE_HIDPI_IMAGES FALSE
+        XCODE_ATTRIBUTE_TARGETED_DEVICE_FAMILY "1,2"
+        XCODE_ATTRIBUTE_ASSETCATALOG_COMPILER_APPICON_NAME "AppIcon"
     )
+
+    if(NOT codeSigning)
+        set_target_properties(mobile_client PROPERTIES
+            XCODE_ATTRIBUTE_CODE_SIGN_IDENTITY ""
+            XCODE_ATTRIBUTE_CODE_SIGNING_REQUIRED "NO"
+        )
+    elseif(developerBuild)
+        set_target_properties(mobile_client PROPERTIES
+            XCODE_ATTRIBUTE_CODE_SIGN_IDENTITY "iPhone Developer"
+            XCODE_ATTRIBUTE_DEVELOPMENT_TEAM "${apple_team_id}"
+        )
+    else()
+        set_target_properties(mobile_client PROPERTIES
+            XCODE_ATTRIBUTE_CODE_SIGN_IDENTITY "${ios.sign.identity}"
+            XCODE_ATTRIBUTE_CODE_SIGN_ENTITLEMENTS "${CMAKE_CURRENT_BINARY_DIR}/mobile_client.entitlements"
+            XCODE_ATTRIBUTE_OTHER_CODE_SIGN_FLAGS "--keychain ${codeSigningKeychainName}"
+            XCODE_ATTRIBUTE_PROVISIONING_PROFILE "${provisioning_profile_id}"
+        )
+    endif()
 
     setup_ios_application(mobile_client
         ADDITIONAL_PLUGINS qtmedia_audioengine qtaudio_coreaudio
@@ -154,6 +190,11 @@ if(IOS)
         Qt5WebView
     )
 
-    add_ios_ipa(mobile_client_ipa TARGET mobile_client
-        FILE_NAME "${CMAKE_BINARY_DIR}/${mobile_client_distribution_name}.ipa")
+    if(NOT ios.skip.sign)
+        prepare_mac_keychain(mobile_client)
+    endif()
+
+    set(ipa_file_name "${distribution_output_dir}/${mobile_client_distribution_name}.ipa")
+
+    add_ios_ipa(mobile_client_ipa TARGET mobile_client FILE_NAME ${ipa_file_name})
 endif()

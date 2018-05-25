@@ -557,8 +557,8 @@
       <translation>Lỗi không xác định</translation>
     </message>
     <message>
-      <source>Server with matching Hardware Id not found</source>
-      <translation>Không tìm thấy Máy chủ với Id phần cứng phù hợp</translation>
+      <source>Server with matching Hardware ID not found</source>
+      <translation>Không tìm thấy Máy chủ với ID phần cứng phù hợp</translation>
     </message>
   </context>
   <context>
@@ -674,12 +674,12 @@
       <translation>Hình mờ: %1</translation>
     </message>
     <message>
-      <source>Hardware Id: %1</source>
-      <translation>Id Phần cứng: %1</translation>
-    </message>
-    <message>
       <source>Time License</source>
       <translation>Bản quyền theo thời gian</translation>
+    </message>
+    <message>
+      <source>Hardware ID: %1</source>
+      <translation>ID Phần cứng: %1</translation>
     </message>
   </context>
   <context>

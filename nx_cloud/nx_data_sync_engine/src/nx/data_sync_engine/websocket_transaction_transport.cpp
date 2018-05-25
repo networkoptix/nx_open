@@ -8,8 +8,7 @@
 #include "transaction_log.h"
 
 namespace nx {
-namespace cdb {
-namespace ec2 {
+namespace data_sync_engine {
 
 constexpr static const int kMaxTransactionsPerIteration = 17;
 
@@ -217,6 +216,5 @@ void WebSocketTransactionTransport::fillAuthInfo(
     NX_ASSERT(0, "This method is used for outgoing connections only. Not implemented");
 }
 
-} // namespace ec2
-} // namespace cdb
+} // namespace data_sync_engine
 } // namespace nx

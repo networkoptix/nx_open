@@ -43,13 +43,11 @@ public:
 
 private:
     void currentWorkbenchWidgetChanged(Qn::ItemRole role);
+    void updateTabs();
 
-    void addCameraTabs();
-    void removeCameraTabs();
-
-    void setupEventSearch();
     void setupMotionSearch();
     void setupBookmarkSearch();
+    void setupEventSearch();
     void setupAnalyticsSearch();
 
     void updateUnreadCounter(int count, QnNotificationLevel::Value importance);
@@ -57,6 +55,8 @@ private:
     void setupTabsSyncWithNavigator();
 
     void connectToRowCountChanges(QAbstractItemModel* model, std::function<void()> handler);
+
+    void showContextMenu(const QPoint& pos);
 
     void at_motionSearchToggled(bool on);
     void at_bookmarksToggled(bool on);

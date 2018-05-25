@@ -118,6 +118,7 @@ QN_HELP_TOPIC(NewUser_Help,                                     "creating_a_new_
 QN_HELP_TOPIC(UserSettings_DisableUser_Help,                    "disabling_user.htm")
 QN_HELP_TOPIC(UserSettings_LdapIntegration_Help,                "setting_up_ldap_integration.htm")
 QN_HELP_TOPIC(UserSettings_LdapFetch_Help,                      "importing_users_from_ldap_serv.htm")
+QN_HELP_TOPIC(UserSettings_LdapAdd_Help,                        "Adding_Users_from_LDAP_Server.htm")
 
 QN_HELP_TOPIC(UserRoles_Help,                                   "roles_management.htm")
 

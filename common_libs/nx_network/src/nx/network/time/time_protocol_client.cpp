@@ -1,6 +1,5 @@
 #include "time_protocol_client.h"
 
-#include <sys/timeb.h>
 #include <sys/types.h>
 
 #include <chrono>

@@ -79,7 +79,7 @@
     <message>
       <source>%1 System can only be merged with non-%1. System name and password are taken from %1 System.</source>
       <comment>%1 is the short cloud name (like Cloud)</comment>
-      <translation type="unfinished">%1 System can only be merged with non-%1. System name and password are taken from %1 System.</translation>
+      <translation>%1系統只能與非%1系統合併. 系統名稱和密碼將取自%1系統.</translation>
     </message>
     <message>
       <source>Both Systems are connected to %1. Merge is not allowed.</source>
@@ -557,7 +557,7 @@
       <translation>未知的錯誤</translation>
     </message>
     <message>
-      <source>Server with matching Hardware Id not found</source>
+      <source>Server with matching Hardware ID not found</source>
       <translation>找不到符合硬體ID的伺服器</translation>
     </message>
   </context>
@@ -674,12 +674,12 @@
       <translation>浮水印: %1</translation>
     </message>
     <message>
-      <source>Hardware Id: %1</source>
-      <translation>硬體 Id: %1</translation>
-    </message>
-    <message>
       <source>Time License</source>
       <translation>時效性授權</translation>
+    </message>
+    <message>
+      <source>Hardware ID: %1</source>
+      <translation>硬體 ID: %1</translation>
     </message>
   </context>
   <context>

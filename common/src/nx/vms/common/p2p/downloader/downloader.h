@@ -48,7 +48,6 @@ signals:
     void fileStatusChanged(
         const nx::vms::common::p2p::downloader::FileInformation& fileInformation);
     void chunkDownloadFailed(const QString& fileName);
-
 };
 
 class DownloaderPrivate;

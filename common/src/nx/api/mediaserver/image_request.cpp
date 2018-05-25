@@ -18,21 +18,20 @@ bool CameraImageRequest::isSpecialTimeValue(qint64 value)
 QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(nx::api::ImageRequest, RoundMethod,
     (nx::api::ImageRequest::RoundMethod::iFrameBefore, "before")
     (nx::api::ImageRequest::RoundMethod::precise, "precise")
-    (nx::api::ImageRequest::RoundMethod::precise, "exact")
+    (nx::api::ImageRequest::RoundMethod::precise, "exact") //< deprecated
     (nx::api::ImageRequest::RoundMethod::iFrameAfter, "after")
 )
 
 QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(nx::api::ImageRequest, ThumbnailFormat,
-    (nx::api::ImageRequest::ThumbnailFormat::jpg, "jpeg")
     (nx::api::ImageRequest::ThumbnailFormat::jpg, "jpg")
-    (nx::api::ImageRequest::ThumbnailFormat::tiff, "tiff")
-    (nx::api::ImageRequest::ThumbnailFormat::tiff, "tif")
+    (nx::api::ImageRequest::ThumbnailFormat::jpg, "jpeg") //< deprecated
+    (nx::api::ImageRequest::ThumbnailFormat::tif, "tif")
+    (nx::api::ImageRequest::ThumbnailFormat::tif, "tiff") //< deprecated
     (nx::api::ImageRequest::ThumbnailFormat::png, "png")
     (nx::api::ImageRequest::ThumbnailFormat::raw, "raw")
 )
 
 QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(nx::api::ImageRequest, AspectRatio,
-    (nx::api::ImageRequest::AspectRatio::custom, "auto")
-    (nx::api::ImageRequest::AspectRatio::custom, "custom")
+    (nx::api::ImageRequest::AspectRatio::auto_, "auto")
     (nx::api::ImageRequest::AspectRatio::source, "source")
 )

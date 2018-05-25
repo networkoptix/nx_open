@@ -1,5 +1,6 @@
 import QtQuick 2.6
 import Nx 1.0
+import Nx.Core 1.0
 import com.networkoptix.qml 1.0
 
 GridView
@@ -10,6 +11,7 @@ GridView
     property alias layoutId: camerasModel.layoutId
     property bool keepStatuses: false
     property bool active: false
+    property alias filterIds: camerasModel.filterIds
 
     cellWidth: (width - leftMargin - rightMargin) / d.thumbnailsInRow
     cellHeight: cellWidth * 9 / 16 + 24 + 16

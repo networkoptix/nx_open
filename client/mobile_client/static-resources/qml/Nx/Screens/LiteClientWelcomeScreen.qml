@@ -17,9 +17,7 @@ PageBase
 
     Component.onCompleted:
     {
-        var baseUrl = NxGlobals.url(getInitialUrl())
-
-        var url = "http://" + baseUrl.address()
+        var url = "http://" + getInitialUrl().displayAddress()
             + "/static/index.html"
             + "?clientWebSocket=" + encodeURIComponent(getWebSocketUrl())
 
