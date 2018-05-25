@@ -66,7 +66,6 @@ private:
     bool m_initialized;
     bool m_modified;
     bool m_terminated;
-    //QnWaitCondition m_cond;
     QnMutex m_mutex;
 
     bool m_transcodingNeeded;
