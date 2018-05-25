@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 
+from __future__ import print_function
 import os
 import sys
 import time
@@ -12,9 +13,6 @@ SYNC_URL = "rsync://enk.me/buildenv/rdep/packages"
 if time.timezone == 28800:
     SYNC_URL = "rsync://la.hdw.mx/buildenv/rdep/packages"
 PUSH_URL = "rsync@enk.me:buildenv/rdep/packages"
-
-def print_no_rsync():
-    print >> sys.stderr, "Cannot find rsync executable. Please install it or specify in .rderc."
 
 def configure(print_summary = False):
     if not os.path.isdir(REPOSITORY_PATH):
@@ -33,13 +31,11 @@ def configure(print_summary = False):
         rsync = distutils.spawn.find_executable("rsync")
         if not rsync:
             if not OS_IS_WINDOWS:
-                print_no_rsync()
+                print(
+                    "Cannot find rsync executable. Please install it or specify in .rderc",
+                    file=sys.stderr)
                 return False
 
-            rsync = os.path.join(os.getenv("environment"), "rsync-win32", "rsync.exe")
-            if not os.path.isfile(rsync):
-                print_no_rsync()
-                return False
             global_config.set_rsync(rsync)
 
     if not global_config.get_name():
