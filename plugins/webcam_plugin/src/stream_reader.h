@@ -90,13 +90,13 @@ private:
     void initializeAV();
     int openInputFormat();
     int openVideoDecoder();
-     void setEncoderOptions(AVCodecContext* encoderContext);
+    void setEncoderOptions(AVCodecContext* encoderContext);
     int openVideoEncoder();
     void setFormatContextOptions();
     void uninitializeAV();
     bool ensureInitialized();
 
-    void setAVErrorCode(int avErrorCode);
+    void setAVError(int avErrorCode);
     bool updateIfAVError(int avErrorCode);
 
     const char * getAVInputFormat();
