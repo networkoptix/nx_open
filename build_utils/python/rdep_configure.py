@@ -8,7 +8,12 @@ import distutils.spawn
 import rdep_config
 
 OS_IS_WINDOWS = sys.platform.startswith("win32") or sys.platform.startswith("cygwin")
-REPOSITORY_PATH = os.path.join(os.getenv("environment"), "packages")
+REPOSITORY_PATH = os.getenv("RDEP_PACKAGES_DIR")
+if not REPOSITORY_PATH:
+    # TODO: This block is for backward compatibility. Remove it when CI is re-configured.
+    REPOSITORY_PATH = os.getenv("environment")
+    if REPOSITORY_PATH:
+        REPOSITORY_PATH = os.path.join(REPOSITORY_PATH, "packages")
 SYNC_URL = "rsync://enk.me/buildenv/rdep/packages"
 if time.timezone == 28800:
     SYNC_URL = "rsync://la.hdw.mx/buildenv/rdep/packages"
@@ -50,11 +55,11 @@ def configure(print_summary = False):
                 global_config.set_name(username)
 
     if print_summary:
-        print "Rdep repository is ready."
-        print "  Path =", REPOSITORY_PATH
-        print "  Sync URL =", SYNC_URL
-        print "  Push URL =", PUSH_URL
-        print "  Rsync =", rsync
+        print("Rdep repository is ready.")
+        print("  Path =", REPOSITORY_PATH)
+        print("  Sync URL =", SYNC_URL)
+        print("  Push URL =", PUSH_URL)
+        print("  Rsync =", rsync)
 
     return True
 
