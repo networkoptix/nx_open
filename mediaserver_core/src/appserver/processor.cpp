@@ -255,6 +255,12 @@ void QnAppserverResourceProcessor::addNewCameraInternal(const QnVirtualCameraRes
 void QnAppserverResourceProcessor::at_mutexTimeout()
 {
     QnMutexLocker lock( &m_mutex );
+    if (!sender())
+    {
+        NX_WARNING(this, lm("at_mutexTimeout: Sender is NULL"));
+        return;
+    }
+
     ec2::QnDistributedMutex* mutex = (ec2::QnDistributedMutex*) sender();
     m_lockInProgress.remove(mutex->name());
     mutex->deleteLater();
