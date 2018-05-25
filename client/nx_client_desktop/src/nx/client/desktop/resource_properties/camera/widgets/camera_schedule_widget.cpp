@@ -80,13 +80,13 @@ CameraScheduleWidget::CameraScheduleWidget(
         store, &CameraSettingsDialogStore::setRecordingEnabled);
 
     // Called when a cell is Alt-clicked. Fetches cell settings as current.
-    connect(ui->gridWidget, &QnScheduleGridWidget::cellActivated, store,
+    connect(ui->gridWidget, &ScheduleGridWidget::cellActivated, store,
         [this, store](const QPoint& pos)
         {
             store->setScheduleBrush(ui->gridWidget->cellValue(pos));
         });
 
-    connect(ui->gridWidget, &QnScheduleGridWidget::cellValuesChanged, store,
+    connect(ui->gridWidget, &ScheduleGridWidget::cellValuesChanged, store,
         [this, store]()
         {
             store->setSchedule(calculateScheduleTasks());
@@ -214,7 +214,7 @@ void CameraScheduleWidget::loadState(const CameraSettingsDialogState& state)
             for (int col = task.startTime / 3600; col < task.endTime / 3600; ++col)
             {
                 const QPoint cell(col, row);
-                QnScheduleGridWidget::CellParams params;
+                ScheduleGridWidget::CellParams params;
                 params.recordingType = task.recordingType;
                 params.quality = quality;
                 params.fps = task.fps;
@@ -242,7 +242,7 @@ ScheduleTasks CameraScheduleWidget::calculateScheduleTasks() const
         for (int col = 0; col < ui->gridWidget->columnCount();)
         {
             const QPoint cell(col, row);
-            const QnScheduleGridWidget::CellParams params = ui->gridWidget->cellValue(cell);
+            const ScheduleGridWidget::CellParams params = ui->gridWidget->cellValue(cell);
 
             const auto recordingType = params.recordingType;
             Qn::StreamQuality streamQuality = Qn::StreamQuality::highest;

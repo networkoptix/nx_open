@@ -1,5 +1,5 @@
-#include "wearable_motion_widget.h"
-#include "ui_wearable_motion_widget.h"
+#include "legacy_wearable_motion_widget.h"
+#include "ui_legacy_wearable_motion_widget.h"
 
 #include <core/resource/camera_resource.h>
 #include <ui/common/read_only.h>

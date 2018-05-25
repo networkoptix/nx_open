@@ -10,7 +10,7 @@
     <height>343</height>
    </rect>
   </property>
-  <layout class="QVBoxLayout" name="verticalLayout_4" stretch="0,0,0,0,1">
+  <layout class="QVBoxLayout" name="verticalLayout_4" stretch="0,0,0,1">
    <property name="spacing">
     <number>0</number>
    </property>
@@ -38,9 +38,6 @@
       <enum>Qt::Horizontal</enum>
      </property>
     </widget>
-   </item>
-   <item>
-    <widget class="QnLicensesProposeWidget" name="licensingWidget" native="true"/>
    </item>
    <item>
     <widget class="Line" name="overGridLine">
@@ -222,12 +219,6 @@
    <class>nx::client::desktop::ImageControlWidget</class>
    <extends>QWidget</extends>
    <header location="global">nx/client/desktop/resource_properties/camera/widgets/image_control_widget.h</header>
-   <container>1</container>
-  </customwidget>
-  <customwidget>
-   <class>QnLicensesProposeWidget</class>
-   <extends>QWidget</extends>
-   <header location="global">ui/widgets/licensing/licenses_propose_widget.h</header>
    <container>1</container>
   </customwidget>
   <customwidget>

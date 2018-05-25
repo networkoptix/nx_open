@@ -3,17 +3,14 @@
 #include <QtWidgets/QWidget>
 
 #include <common/common_globals.h>
-
 #include <core/resource/resource_fwd.h>
 #include <ui/workbench/workbench_context_aware.h>
 #include <utils/common/connective.h>
 #include <nx/utils/uuid.h>
 
-#include "camera_settings_tab.h"
+#include <nx/client/desktop/resource_properties/camera/camera_settings_tab.h>
 
-namespace Ui {
-class SingleCameraSettingsWidget;
-}
+namespace Ui { class SingleCameraSettingsWidget; }
 
 class QVBoxLayout;
 

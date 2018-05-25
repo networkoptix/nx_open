@@ -1,10 +1,11 @@
 #include "multiple_camera_settings_widget.h"
 #include "ui_multiple_camera_settings_widget.h"
+#include "legacy_camera_schedule_widget.h"
+#include "licenses_propose_widget.h"
 
 #include <limits>
 
 #include <QtCore/QScopedValueRollback>
-
 #include <QtWidgets/QPushButton>
 
 #include <core/resource_management/resource_pool.h>
@@ -12,17 +13,14 @@
 #include <core/resource/camera_resource.h>
 #include <core/resource/client_camera.h>
 #include <core/misc/schedule_task.h>
-
-#include <nx/client/desktop/common/utils/checkbox_utils.h>
 #include <ui/common/read_only.h>
 #include <ui/graphics/items/resource/resource_widget.h>
 #include <ui/help/help_topics.h>
 #include <ui/help/help_topic_accessor.h>
 #include <ui/style/custom_style.h>
-#include <ui/widgets/licensing/licenses_propose_widget.h>
 #include <ui/workbench/workbench_context.h>
 
-#include "legacy_camera_schedule_widget.h"
+#include <nx/client/desktop/common/utils/checkbox_utils.h>
 
 namespace nx {
 namespace client {

@@ -84,7 +84,7 @@
   <customwidget>
    <class>QnLicensesUsageWidget</class>
    <extends>QWidget</extends>
-   <header location="global">ui/widgets/licensing/licenses_usage_widget.h</header>
+   <header location="global">nx/client/desktop/resource_properties/camera/legacy/licenses_usage_widget.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

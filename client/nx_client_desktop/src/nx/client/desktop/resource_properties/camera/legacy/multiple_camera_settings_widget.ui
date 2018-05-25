@@ -169,25 +169,25 @@
   <customwidget>
    <class>nx::client::desktop::LegacyExpertSettingsWidget</class>
    <extends>QWidget</extends>
-   <header location="global">nx/client/desktop/resource_properties/camera/legacy_expert_settings_widget.h</header>
+   <header location="global">nx/client/desktop/resource_properties/camera/legacy/legacy_expert_settings_widget.h</header>
    <container>1</container>
   </customwidget>
   <customwidget>
    <class>nx::client::desktop::LegacyImageControlWidget</class>
    <extends>QWidget</extends>
-   <header location="global">nx/client/desktop/resource_properties/camera/legacy_image_control_widget.h</header>
+   <header location="global">nx/client/desktop/resource_properties/camera/legacy/legacy_image_control_widget.h</header>
    <container>1</container>
   </customwidget>
   <customwidget>
    <class>QnLicensesProposeWidget</class>
    <extends>QWidget</extends>
-   <header location="global">ui/widgets/licensing/licenses_propose_widget.h</header>
+   <header location="global">nx/client/desktop/resource_properties/camera/legacy/licenses_propose_widget.h</header>
    <container>1</container>
   </customwidget>
   <customwidget>
    <class>nx::client::desktop::LegacyCameraScheduleWidget</class>
    <extends>QWidget</extends>
-   <header location="global">nx/client/desktop/resource_properties/camera/legacy_camera_schedule_widget.h</header>
+   <header location="global">nx/client/desktop/resource_properties/camera/legacy/legacy_camera_schedule_widget.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>
