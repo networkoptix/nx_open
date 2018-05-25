@@ -31,7 +31,7 @@ def registry(hypervisor):
 def vm_type_configuration():
     return {
         'os_family': 'linux',
-        'power_on_timeout_sec': 60,
+        'power_on_timeout_sec': 120,
         'vm': {
             'mac_address_format': '0A-00-00-FF-{vm_index:02X}-0{nic_index:01X}',
             'port_forwarding': {
