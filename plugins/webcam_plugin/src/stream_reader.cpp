@@ -47,8 +47,8 @@ StreamReader::StreamReader(
     m_info( cameraInfo ),
     m_encoderNumber( encoderNumber ),
     m_codecContext(codecContext),
-    m_modified(false),
     m_initialized(false),
+    m_modified(false),
     m_terminated( false ),
     m_formatContext(nullptr),
     m_inputFormat(nullptr),
@@ -143,7 +143,6 @@ void StreamReader::interrupt()
 {
     QnMutexLocker lk(&m_mutex);
     m_terminated = true;
-    //m_cond.wakeAll();
 }
 
 void StreamReader::setFps( float fps )

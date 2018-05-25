@@ -2,6 +2,7 @@
 #ifdef _WIN32
 #include "dshow_utils.h"
 #elif __linux__
+#include "v4l2_utils.h"
 #elif __APPLE__
 #endif
 
@@ -17,7 +18,7 @@ std::vector<DeviceData> getDeviceList()
         dshow::getDeviceList();
 #elif __linux__
         //todo
-        std::vector<DeviceData>();
+        v4l2::getDeviceList();
 #elif __APPLE__
         //todo
         std::vector<DeviceData>();
@@ -31,8 +32,7 @@ std::vector<nxcip::CompressionType> getSupportedCodecs(const char *devicePath)
 #ifdef _WIN32
         dshow::getSupportedCodecs(devicePath);
 #elif __linux__
-        //todo
-        std::vector<nxcip::CompressionType>();
+        v4l2::getSupportedCodecs(devicePath);
 #elif __APPLE__
         //todo
         std::vector<nxcip>();
@@ -48,8 +48,7 @@ std::vector<ResolutionData> getResolutionList(
 #ifdef _WIN32
         dshow::getResolutionList(devicePath, targetCodecID);
 #elif __linux__
-        //todo
-        std::vector<ResolutionData>();
+        v4l2::getResolutionList(devicePath, targetCodecID);
 #elif __APPLE__
         //todo
         std::vector<DeviceInfo>();
