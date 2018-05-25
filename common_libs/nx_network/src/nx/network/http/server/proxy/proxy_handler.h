@@ -42,20 +42,26 @@ public:
 protected:
     struct NX_NETWORK_API TargetHost
     {
-        nx::network::http::StatusCode::Value status =
-            nx::network::http::StatusCode::notImplemented;
         network::SocketAddress target;
         SslMode sslMode = SslMode::followIncomingConnection;
 
         TargetHost() = default;
-        TargetHost(
-            nx::network::http::StatusCode::Value status,
-            network::SocketAddress target = {});
+        TargetHost(network::SocketAddress target);
     };
 
-    virtual TargetHost cutTargetFromRequest(
+    using ProxyTargetDetectedHandler = nx::utils::MoveOnlyFunc<void(
+        nx::network::http::StatusCode::Value resultCode,
+        TargetHost proxyTarget)>;
+
+    /**
+     * NOTE: It is allowed to invoke handler right within this function.
+     * There must not be any activity after invoking handler since
+     * AbstractProxyHandler can be freed.
+     */
+    virtual void detectProxyTarget(
         const nx::network::http::HttpServerConnection& connection,
-        nx::network::http::Request* const request) = 0;
+        nx::network::http::Request* const request,
+        ProxyTargetDetectedHandler handler) = 0;
 
     virtual std::unique_ptr<aio::AbstractAsyncConnector>
         createTargetConnector() = 0;
@@ -63,11 +69,17 @@ protected:
 private:
     nx::network::http::Request m_request;
     nx::network::http::RequestProcessedHandler m_requestCompletionHandler;
+    SocketAddress m_requestSourceEndpoint;
+    aio::AbstractAioThread* m_httpConnectionAioThread = nullptr;
     std::unique_ptr<nx::network::http::server::proxy::ProxyWorker> m_requestProxyWorker;
     TargetHost m_targetHost;
     bool m_sslConnectionRequired = false;
     std::unique_ptr<aio::AbstractAsyncConnector> m_targetPeerConnector;
     std::optional<std::chrono::milliseconds> m_targetConnectionInactivityTimeout;
+
+    void startProxying(
+        nx::network::http::StatusCode::Value resultCode,
+        TargetHost proxyTarget);
 
     void onConnected(
         const network::SocketAddress& targetAddress,

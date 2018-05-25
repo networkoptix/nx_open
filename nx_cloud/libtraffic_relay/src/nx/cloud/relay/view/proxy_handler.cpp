@@ -14,9 +14,10 @@ ProxyHandler::ProxyHandler(
 {
 }
 
-ProxyHandler::TargetHost ProxyHandler::cutTargetFromRequest(
+void ProxyHandler::detectProxyTarget(
     const nx::network::http::HttpServerConnection& /*connection*/,
-    nx::network::http::Request* const request)
+    nx::network::http::Request* const request,
+    ProxyTargetDetectedHandler handler)
 {
     ProxyHandler::TargetHost result;
     result.sslMode = network::http::server::proxy::SslMode::followIncomingConnection;
@@ -24,22 +25,21 @@ ProxyHandler::TargetHost ProxyHandler::cutTargetFromRequest(
     auto hostHeaderIter = request->headers.find("Host");
     if (hostHeaderIter == request->headers.end())
     {
-        result.status = network::http::StatusCode::badRequest;
-        return result;
+        handler(network::http::StatusCode::badRequest, TargetHost());
+        return;
     }
 
     const auto host = extractOnlineHostName(
         hostHeaderIter->second.toStdString());
     if (host.empty())
     {
-        result.status = network::http::StatusCode::badGateway;
-        return result;
+        handler(network::http::StatusCode::badGateway, TargetHost());
+        return;
     }
 
     result.target = network::SocketAddress(
         host, network::http::DEFAULT_HTTP_PORT);
-    result.status = network::http::StatusCode::ok;
-    return result;
+    handler(network::http::StatusCode::ok, std::move(result));
 }
 
 std::unique_ptr<network::aio::AbstractAsyncConnector>

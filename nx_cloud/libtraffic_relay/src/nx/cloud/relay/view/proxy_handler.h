@@ -18,9 +18,10 @@ public:
     ProxyHandler(relaying::AbstractListeningPeerPool* listeningPeerPool);
 
 protected:
-    virtual TargetHost cutTargetFromRequest(
+    virtual void detectProxyTarget(
         const nx::network::http::HttpServerConnection& connection,
-        nx::network::http::Request* const request) override;
+        nx::network::http::Request* const request,
+        ProxyTargetDetectedHandler handler) override;
 
     virtual std::unique_ptr<network::aio::AbstractAsyncConnector>
         createTargetConnector() override;
