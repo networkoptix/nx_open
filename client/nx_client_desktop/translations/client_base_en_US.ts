@@ -8895,6 +8895,10 @@ to %1</source>
         <source>Decline</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Warning! This build is for testing purposes only! Please upgrade to a next available patch or release version once available.</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>nx::client::desktop::ui::workbench::LayoutTourExecutor</name>
