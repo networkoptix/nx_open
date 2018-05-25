@@ -251,9 +251,18 @@ def parse_overrides(overrides_list):
                 versions[package] = value
         except ValueError:
             print("Invalid override item \"%s\"" % item, file=sys.stderr)
-            raise
+            exit(1)
 
     return versions, locations
+
+
+def short_release_version(version):
+    components = version.split(".")
+    try:
+        return components[0] + "." + components[1]
+    except IndexError:
+        print("Invalid release version \"%s\"" % version, file=sys.stderr)
+        exit(1)
 
 
 def main():
@@ -274,17 +283,15 @@ def main():
 
     platform, arch, box = parse_target(args.target)
 
-    try:
-        version_overrides, location_overrides = parse_overrides(args.overrides)
-    except ValueError:
-        exit(1)
+    version_overrides, location_overrides = parse_overrides(args.overrides)
+    release_version = short_release_version(args.release_version)
 
     syncher = RdepSyncher(args.packages_dir)
     syncher.rdep_target = args.target
     syncher.versions = determine_package_versions(
         platform,
         box,
-        args.release_version,
+        release_version,
         customization=args.customization,
         debug=args.debug
     )
@@ -292,7 +299,7 @@ def main():
     syncher.locations = location_overrides
     syncher.use_local = args.use_local
 
-    sync_dependencies(syncher, platform, arch, box, args.release_version)
+    sync_dependencies(syncher, platform, arch, box, release_version)
 
     syncher.generate_cmake_include(args.cmake_include_file)
 

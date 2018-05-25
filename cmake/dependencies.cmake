@@ -8,10 +8,15 @@ mark_as_advanced(customWebAdminPackageDirectory)
 
 set(cmake_include_file ${CMAKE_BINARY_DIR}/dependencies.cmake)
 
+set(sync_target ${targetDevice})
+if(NOT sync_target)
+    set(sync_target ${default_target_device})
+endif()
+
 set(sync_command ${PYTHON_EXECUTABLE} ${CMAKE_SOURCE_DIR}/sync_dependencies.py
     --packages-dir=${PACKAGES_DIR}
-    --target=${rdep_target}
-    --release-version=${releaseVersion.short}
+    --target=${sync_target}
+    --release-version=${releaseVersion}
     --cmake-include-file=${cmake_include_file}
 )
 
@@ -36,20 +41,6 @@ if(NOT sync_result STREQUAL "0")
     message(FATAL_ERROR "error: Packages sync failed")
 endif()
 
-if(WIN32)
-    set(nxKitLibraryType "SHARED" CACHE STRING "" FORCE)
-endif()
-
-include(${cmake_include_file})
-
-foreach(package_dir ${synched_package_dirs})
-    if(NOT EXISTS ${package_dir}/.nocopy)
-        nx_copy_package(${package_dir})
-    endif()
-endforeach()
-
-file(TO_CMAKE_PATH "${QT_DIR}" QT_DIR)
-
 function(copy_linux_cpp_runtime)
     execute_process(COMMAND
         ${PYTHON_EXECUTABLE} ${CMAKE_SOURCE_DIR}/build_utils/linux/copy_system_library.py
@@ -70,16 +61,32 @@ function(copy_linux_cpp_runtime)
     nx_store_known_files(${files})
 endfunction()
 
-if(LINUX)
-    set(cpp_runtime_libs libstdc++.so.6 libatomic.so.1 libgcc_s.so.1)
-
-    if(arch MATCHES "x64|x86")
-        if(arch STREQUAL "x64")
-            list(APPEND cpp_runtime_libs libmvec.so.1)
-        endif()
-
-        copy_linux_cpp_runtime()
+macro(load_dependencies)
+    if(WIN32)
+        set(nxKitLibraryType "SHARED" CACHE STRING "" FORCE)
     endif()
 
-    string(REPLACE ";" " " cpp_runtime_libs_string "${cpp_runtime_libs}")
-endif()
+    include(${cmake_include_file})
+
+    foreach(package_dir ${synched_package_dirs})
+        if(NOT EXISTS ${package_dir}/.nocopy)
+            nx_copy_package(${package_dir})
+        endif()
+    endforeach()
+
+    file(TO_CMAKE_PATH "${QT_DIR}" QT_DIR)
+
+    if(LINUX)
+        set(cpp_runtime_libs libstdc++.so.6 libatomic.so.1 libgcc_s.so.1)
+
+        if(arch MATCHES "x64|x86")
+            if(arch STREQUAL "x64")
+                list(APPEND cpp_runtime_libs libmvec.so.1)
+            endif()
+
+            copy_linux_cpp_runtime()
+        endif()
+
+        string(REPLACE ";" " " cpp_runtime_libs_string "${cpp_runtime_libs}")
+    endif()
+endmacro()

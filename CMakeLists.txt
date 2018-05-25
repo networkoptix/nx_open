@@ -7,6 +7,8 @@ set(customization "default" CACHE STRING "Product customization")
 nx_option(beta "Is this build is beta build" ON)
 set(buildNumber "0" CACHE STRING "Build number")
 
+set(releaseVersion 4.0.0)
+
 nx_option(developerBuild
     "Disable this option for production builds (Jenkins)"
     ON)
@@ -34,18 +36,23 @@ include(cmake/find_python.cmake)
 include(cmake/rdep.cmake)
 nx_rdep_configure()
 
+include(cmake/mercurial.cmake)
+hg_changeset(${CMAKE_CURRENT_LIST_DIR} changeSet)
+hg_branch(${CMAKE_CURRENT_LIST_DIR} branch)
+
+include(cmake/dependencies.cmake)
+
 if(targetDevice AND NOT targetDevice STREQUAL "ios")
     set(CMAKE_TOOLCHAIN_FILE "${CMAKE_CURRENT_LIST_DIR}/cmake/toolchain/${targetDevice}.cmake")
     include(cmake/sync_toolchain.cmake)
 endif()
 
-project(vms VERSION 4.0.0)
+project(vms VERSION ${releaseVersion})
 
 if(targetDevice STREQUAL "ios")
     include(cmake/ios.cmake)
 endif()
 
-set(releaseVersion ${PROJECT_VERSION})
 set(releaseVersion.short ${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR})
 set(releaseVersion.full ${releaseVersion}.${buildNumber})
 
@@ -70,7 +77,6 @@ include(moc_utils)
 include(qrc_utils)
 include(precompiled_header)
 include(strip_target)
-include(mercurial)
 include(ec_protocol)
 
 set(customization_dir "${PROJECT_SOURCE_DIR}/customization/${customization}")
@@ -96,7 +102,7 @@ else()
     set(BUILD_SHARED_LIBS ON CACHE INTERNAL "")
 endif()
 
-include(dependencies)
+load_dependencies()
 include(maven_compatibility)
 include(generate_current_config)
 
