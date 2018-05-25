@@ -47,7 +47,7 @@ void QnWorkbenchWebPageHandler::at_newWebPageAction_triggered()
     if (!dialog->exec())
         return;
 
-    QnWebPageResourcePtr webPage(new QnWebPageResource());
+    QnWebPageResourcePtr webPage(new QnWebPageResource(commonModule()));
     webPage->setId(QnUuid::createUuid());
     webPage->setUrl(dialog->url().toString());
     webPage->setName(dialog->name());

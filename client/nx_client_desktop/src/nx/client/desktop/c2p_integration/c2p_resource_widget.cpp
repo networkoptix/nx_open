@@ -11,6 +11,11 @@
 #include <nx/client/desktop/ui/actions/actions.h>
 #include <nx/client/desktop/ui/actions/action_manager.h>
 
+#include <ui/workbench/workbench.h>
+#include <ui/workbench/workbench_layout.h>
+#include <ui/workbench/workbench_item.h>
+#include <core/resource/layout_resource.h>
+
 namespace nx {
 namespace client {
 namespace desktop {
@@ -48,7 +53,46 @@ void C2pResourceWidget::c2pplayback(const QString& cameraNames, int timestamp)
         }
     }
     if (!cameras.empty())
-        menu()->trigger(ui::action::DropResourcesAction, cameras);
+        resetC2pLayout(cameras);
+}
+
+void C2pResourceWidget::resetC2pLayout(const QnVirtualCameraResourceList& cameras)
+{
+    const auto currentItemId = this->item()->uuid();
+    auto currentLayout = item()->layout()->resource();
+    auto existingItems = currentLayout->getItems();
+
+    QnLayoutItemDataList items;
+
+    auto currentItem = this->item()->data();
+    currentItem.combinedGeometry = QRectF(0, 0, 3, 3);
+    items.push_back(currentItem);
+
+    int y = 0;
+    for (const auto& camera: cameras)
+    {
+        QnLayoutItemData item;
+        item.resource.id = camera->getId();
+        item.resource.uniqueId = camera->getUniqueId();
+
+        for (const auto& existingItem: existingItems)
+        {
+            if (existingItem.resource.id == item.resource.id)
+            {
+                item = existingItem;
+                break;
+            }
+        }
+
+        item.flags = Qn::Pinned;
+        item.combinedGeometry = QRectF(3, y, 1, 1);
+        y++;
+
+        items.push_back(item);
+    }
+
+    currentLayout->setItems(items);
+    currentLayout->setCellSpacing(0);
 }
 
 } // namespace desktop
