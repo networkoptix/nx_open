@@ -196,9 +196,10 @@ if(withMediaServer)
         add_subdirectory(media_db_util)
     endif()
 
-    if(LINUX AND box MATCHES "none|tx1")
-        add_subdirectory(root_tool)
-    endif()
+    # This will be uncommented when all root_tool related tasks are finished.
+    # if(LINUX AND box MATCHES "none|tx1")
+    #     add_subdirectory(root_tool)
+    # endif()
 endif()
 
 #add_subdirectory(_axis_controller)
