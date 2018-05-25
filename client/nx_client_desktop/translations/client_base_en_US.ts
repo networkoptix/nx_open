@@ -8834,10 +8834,6 @@ to %1</source>
         <translation></translation>
     </message>
     <message>
-        <source>Some functionality may be unavailable or not working properly.</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>System sends anonymous usage statistics</source>
         <translation></translation>
     </message>
@@ -8875,6 +8871,10 @@ to %1</source>
     </message>
     <message>
         <source>Decline</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Warning! This build is for testing purposes only! Please upgrade to a next available patch or release version once available.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
