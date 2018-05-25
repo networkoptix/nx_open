@@ -6,7 +6,7 @@ angular.module('cloudApp')
         $scope.buttonText = L.sharing.shareConfirmButton;
         $scope.model = {
             password:''
-        }
+        };
 
         var dialogSettings = dialogs.getSettings($scope);
 
@@ -14,7 +14,7 @@ angular.module('cloudApp')
 
         $scope.close = function(){
             dialogs.closeMe($scope);
-        }
+        };
 
         $scope.disconnecting = process.init(function(){
             return cloudApi.disconnect(systemId, $scope.model.password);
