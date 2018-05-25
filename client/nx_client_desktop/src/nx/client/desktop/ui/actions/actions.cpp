@@ -1300,7 +1300,7 @@ void initialize(Manager* manager, Action* root)
         .requiredGlobalPermission(Qn::GlobalEditCamerasPermission)
         .text(ContextMenu::tr("Cancel Upload..."))
         .condition(condition::isTrue(ini().enableWearableCameras)
-            && condition::wearableCameraUploadCancellable());
+            && condition::canCancelWearableCameraUpload());
 
     factory(CameraIssuesAction)
         .mode(DesktopMode)

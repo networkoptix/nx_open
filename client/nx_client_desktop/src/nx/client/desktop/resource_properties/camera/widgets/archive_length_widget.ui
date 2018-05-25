@@ -118,13 +118,6 @@
        </spacer>
       </item>
      </layout>
-     <zorder>checkBoxMaxArchive</zorder>
-     <zorder>labelMaxDays</zorder>
-     <zorder>spinBoxMinDays</zorder>
-     <zorder>labelMinDays</zorder>
-     <zorder>checkBoxMinArchive</zorder>
-     <zorder>spinBoxMaxDays</zorder>
-     <zorder>horizontalSpacer</zorder>
     </widget>
    </item>
   </layout>
