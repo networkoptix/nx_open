@@ -982,7 +982,7 @@ CameraDiagnostics::Result HanwhaResource::initSystem()
         if (!bypassSupportResult)
             return bypassSupportResult.diagnostics;
 
-        m_isBypassSupported = bypassSupportResult.value;
+        m_isBypassSupported = bypassSupportResult.value && !ini().disableBypass;
 
         m_isChannelConnectedViaSunapi = sunapiSupportAttribute != boost::none
             && sunapiSupportAttribute.get();
