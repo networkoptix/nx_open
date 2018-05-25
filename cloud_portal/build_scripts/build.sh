@@ -41,9 +41,6 @@ then
 
     mkdir -p webadmin
     pushd webadmin
-        [ -d 'app/web_common' ] && rm -rf app/web_common
-        mkdir -p app/web_common && cp -pr $NX_VMS/webadmin/app/web_common/* "$_"
-
         [ -d 'app/styles' ] && rm -rf app/styles
         mkdir -p app/styles && cp -pr $NX_VMS/webadmin/app/styles/* "$_"
 
