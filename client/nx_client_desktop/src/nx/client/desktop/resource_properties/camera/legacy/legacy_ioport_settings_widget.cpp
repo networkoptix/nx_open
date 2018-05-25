@@ -1,10 +1,8 @@
 #include "legacy_ioport_settings_widget.h"
-#include "widgets/private/io_ports_sort_model.h"
 #include "ui_legacy_ioport_settings_widget.h"
+#include "../widgets/private/io_ports_sort_model.h"
 
 #include <core/resource/param.h>
-#include <nx/fusion/model_functions.h>
-
 #include <ui/delegates/ioport_item_delegate.h>
 #include <ui/graphics/items/overlays/io_module_overlay_widget.h>
 #include <ui/help/help_topic_accessor.h>
@@ -12,6 +10,8 @@
 #include <ui/models/ioports_view_model.h>
 #include <ui/widgets/common/snapped_scrollbar.h>
 #include <ui/widgets/common/widget_table.h>
+
+#include <nx/fusion/model_functions.h>
 
 namespace nx {
 namespace client {
