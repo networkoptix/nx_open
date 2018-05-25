@@ -7,7 +7,15 @@ namespace webcam_plugin {
 namespace utils{
 namespace av{
 
-AVStream* getAVStream(AVFormatContext * context, int * streamIndex, AVMediaType mediaType)
+std::string avStrError(int errorCode)
+{
+    const int length = AV_ERROR_MAX_STRING_SIZE;
+    char errorBuffer[length];
+    av_strerror(errorCode, errorBuffer, length);
+    return std::string(errorBuffer);
+}
+
+AVStream* getAVStream(AVFormatContext * context, AVMediaType mediaType, int * streamIndex)
 {
     if(!context)
         return nullptr;
@@ -19,7 +27,8 @@ AVStream* getAVStream(AVFormatContext * context, int * streamIndex, AVMediaType 
 
         if (context->streams[i]->codecpar->codec_type == mediaType)
         {
-            *streamIndex = i;
+            if(streamIndex)
+                *streamIndex = i;
             return context->streams[i];
         }
     }

@@ -19,7 +19,6 @@ extern "C" {
 #include <utils/memory/cyclic_allocator.h>
 
 #include "ilp_video_packet.h"
-#include "av_string_error.h"
 #include "codec_context.h"
 #include "libav_forward_declarations.h"
 
@@ -54,6 +53,7 @@ public:
     void setBitrate(int64_t bitrate);
     void updateCameraInfo( const nxcip::CameraInfo& info );
 
+    bool isNative() const;
 private:
     nxpt::CommonRefManager m_refManager;
     nxpl::TimeProvider* const m_timeProvider;
@@ -63,35 +63,42 @@ private:
     int m_encoderNumber;
     
     CodecContext m_codecContext;
-    bool m_modified;
     bool m_initialized;
-   
+    bool m_modified;
     bool m_terminated;
-    QnWaitCondition m_cond;
+    //QnWaitCondition m_cond;
     QnMutex m_mutex;
 
+    bool m_transcodingNeeded;
     AVFormatContext * m_formatContext;
     AVInputFormat * m_inputFormat;
     AVDictionary * m_formatContextOptions;
     AVPacket* m_avDecodePacket;
     std::unique_ptr<AVCodecContainer> m_videoEncoder;
     std::unique_ptr<AVCodecContainer> m_videoDecoder;
-    AVStringError m_lastError;
+    int m_lastAVError = 0;
 
 private:
     std::unique_ptr<ILPVideoPacket> toNxVideoPacket(AVPacket *packet, AVCodecID codecID);
     std::unique_ptr<ILPVideoPacket> transcodeVideo(int *nxcipErrorCode, AVPacket * decodePacket);
     
     int decodeVideoFrame(AVFrame** outFrame, AVPacket* decodePacket);
+    AVFrame* toEncodableFrame(AVFrame* frame) const;
     QString decodeCameraInfoUrl() const;
 
+
     bool isValid() const;
-    void initializeAv();
-    void unInitializeAv();
-    bool ensureInitialized();
+    void initializeAV();
+    int openInputFormat();
+    int openVideoDecoder();
+     void setEncoderOptions(AVCodecContext* encoderContext) const;
+    int openVideoEncoder();
     void setFormatContextOptions();
-    void setEncoderOptions() const;
-    AVFrame* toEncodableFrame(AVFrame* frame) const;
+    void uninitializeAV();
+    bool ensureInitialized();
+
+    void setAVErrorCode(int avErrorCode);
+    bool updateIfAVError(int avErrorCode);
 
     const char * getAVInputFormat();
     std::string getAVCameraUrl();

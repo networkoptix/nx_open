@@ -13,11 +13,8 @@ int AVCodecContainer::open()
     if (m_open)
         return 0;
 
-    if (!isValid())
-        return m_lastError.errorCode();
-
     int codecOpenCode = avcodec_open2(m_codecContext, m_codec, nullptr);
-    if (m_lastError.updateIfError(codecOpenCode))
+    if (codecOpenCode < 0)
     {
         close();
         return codecOpenCode;
@@ -69,77 +66,31 @@ int AVCodecContainer::decodeAudio(AVFrame * frame, int* outGotFrame, const AVPac
     return avcodec_decode_audio4(m_codecContext, frame, outGotFrame, packet);
 }
 
-void AVCodecContainer::initializeEncoder(AVCodecID codecID)
+int AVCodecContainer::initializeEncoder(AVCodecID codecID)
 {
     m_codec = avcodec_find_encoder(codecID);
     if (!m_codec)
-    {
-        m_lastError.setAvError("couldn't find the encoder");
-        return;
-    }
+        return AVERROR_ENCODER_NOT_FOUND;
 
     m_codecContext = avcodec_alloc_context3(m_codec);
     if (!m_codecContext)
-    {
-        m_lastError.setAvError("couldn't allocate codec context");
-        return;
-    }
+        return AVERROR(ENOMEM);
+
+    return 0;
 }
 
-void AVCodecContainer::initializeDecoder(AVCodecParameters * codecParameters)
+int AVCodecContainer::initializeDecoder(AVCodecParameters * codecParameters)
 {
     m_codec = avcodec_find_decoder(codecParameters->codec_id);
     if (!m_codec)
-    {
-        m_lastError.setAvError("couldn't find the decoder");
-        return;
-    }
+        return AVERROR_DECODER_NOT_FOUND;
 
     m_codecContext = avcodec_alloc_context3(m_codec);
-    if (!m_codecContext)
-    {
-        m_lastError.setAvError("couldn't allocate codec context");
-        return;
-    }
-
-    int paramToCodecContextCode = avcodec_parameters_to_context(m_codecContext, codecParameters);
-    if (m_lastError.updateIfError(paramToCodecContextCode))
-        return;
+    if(!m_codecContext)
+        return AVERROR(ENOMEM);
+    
+    return avcodec_parameters_to_context(m_codecContext, codecParameters);
 }
-
-void AVCodecContainer::initializeDecoder(AVCodecID codecID)
-{
-    m_codec = avcodec_find_decoder(codecID);
-    if (!m_codec)
-    {
-        m_lastError.setAvError("couldn't find the decoder");
-        return;
-    }
-
-    m_codecContext = avcodec_alloc_context3(m_codec);
-    if (!m_codecContext)
-    {
-        m_lastError.setAvError("couldn't allocate codec context");
-        return;
-    }
-
-    //int paramToCodecContextCode = avcodec_parameters_to_context(m_codecContext, codecParameters);
-    //if (m_lastError.updateIfError(paramToCodecContextCode))
-    //    return;
-}
-
-bool AVCodecContainer::isValid() const
-{
-    return m_codecContext != nullptr
-        && m_codec != nullptr
-        && !m_lastError.hasError();
-}
-
-AVStringError AVCodecContainer::lastError () const
-{
-    return m_lastError;
-}
-
 
 AVCodecContext * AVCodecContainer::codecContext() const
 {
@@ -154,11 +105,6 @@ AVCodec * AVCodecContainer::codec() const
 AVCodecID AVCodecContainer::codecID() const
 {
     return m_codecContext->codec_id;
-}
-
-    QString AVCodecContainer::avErrorString() const
-{
-    return m_lastError.avErrorString();
 }
 
 } // namespace webcam_plugin

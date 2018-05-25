@@ -1,5 +1,7 @@
 #pragma once
 
+#include <string>
+
 extern "C" {
 #include <libavdevice/avdevice.h>
 } // extern "C"
@@ -11,7 +13,8 @@ namespace webcam_plugin {
 namespace utils {
 namespace av {
 
-AVStream* getAVStream(AVFormatContext * context, int * streamIndex, AVMediaType mediaType);
+std::string avStrError(int errorCode);
+AVStream* getAVStream(AVFormatContext * context, AVMediaType mediaType, int * streamIndex = nullptr);
 AVPixelFormat suggestPixelFormat(AVCodecID codecID);
 AVPixelFormat unDeprecatePixelFormat(AVPixelFormat pixelFormat);
 nxcip::CompressionType toNxCompressionType(AVCodecID codecID);

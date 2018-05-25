@@ -21,6 +21,7 @@ extern "C" {
 } // extern "C"
 
 #include <nx/utils/log/log.h>
+//#include <nx/utils/log/log_main.h>
 #include <nx/utils/thread/mutex.h>
 
 #include "av_utils.h"
@@ -28,9 +29,8 @@ extern "C" {
 #include "plugin.h"
 
 namespace {
-static const nxcip::UsecUTCTimestamp USEC_IN_MS = 1000;
+static constexpr nxcip::UsecUTCTimestamp USEC_IN_MS = 1000;
 }
-
 
 namespace nx {
 namespace webcam_plugin {
@@ -58,15 +58,15 @@ StreamReader::StreamReader(
     m_videoDecoder(nullptr)
 {
     NX_ASSERT(m_timeProvider);
+    m_transcodingNeeded = m_codecContext.codecID() == nxcip::AV_CODEC_ID_NONE;
 }
 
 StreamReader::~StreamReader()
 {
     m_timeProvider->releaseRef();
-    unInitializeAv();
+    uninitializeAV();
 }
 
-//!Implementation of nxpl::PluginInterface::queryInterface
 void* StreamReader::queryInterface( const nxpl::NX_GUID& interfaceID )
 {
     if( memcmp( &interfaceID, &nxcip::IID_StreamReader, sizeof(nxcip::IID_StreamReader) ) == 0 )
@@ -82,13 +82,11 @@ void* StreamReader::queryInterface( const nxpl::NX_GUID& interfaceID )
     return NULL;
 }
 
-//!Implementation of nxpl::PluginInterface::addRef
 unsigned int StreamReader::addRef()
 {
     return m_refManager.addRef();
 }
 
-//!Implementation of nxpl::PluginInterface::releaseRef
 unsigned int StreamReader::releaseRef()
 {
     return m_refManager.releaseRef();
@@ -96,47 +94,56 @@ unsigned int StreamReader::releaseRef()
 
 int StreamReader::getNextData(nxcip::MediaDataPacket** lpPacket)
 {
+    QnMutexLocker lock(&m_mutex);
+    printf("\nIN GET NEXT DATA ------- ");
+
     if (!ensureInitialized())
+    {
+        printf("TRY AGAIN\n");
         return nxcip::NX_TRY_AGAIN;
+    }
 
     if (!isValid())
+    {
+        printf("IO ERROR\n");
         return nxcip::NX_IO_ERROR;
+    }
 
     int nxErrorCode;
     std::unique_ptr<ILPVideoPacket> nxVideoPacket;
 
-    switch(m_codecContext.codecID())
+    if(m_transcodingNeeded)
     {
-        case nxcip::AV_CODEC_ID_NONE:
-            nxVideoPacket = transcodeVideo(&nxErrorCode, m_avDecodePacket);
-            break;
-        default:
-            int readCode = AVCodecContainer::readFrame(m_formatContext, m_avDecodePacket);
-            if (m_lastError.updateIfError(readCode))
-            {
-                nxErrorCode = nxcip::NX_TRY_AGAIN;
-            }
-            else // no error
-            {
-                nxVideoPacket = toNxVideoPacket(m_avDecodePacket, m_videoDecoder->codecID());
-                nxErrorCode = nxcip::NX_NO_ERROR;
-            }
-            break;
+        nxVideoPacket = transcodeVideo(&nxErrorCode, m_avDecodePacket);
+    }
+    else
+    {
+        int readCode = AVCodecContainer::readFrame(m_formatContext, m_avDecodePacket);
+        if (updateIfAVError(readCode))
+        {
+            nxErrorCode = nxcip::NX_TRY_AGAIN;
+        }
+        else // no errors
+        {
+            nxVideoPacket = toNxVideoPacket(m_avDecodePacket, m_videoDecoder->codecID());
+            nxErrorCode = nxcip::NX_NO_ERROR;
+        }
     }
     
     av_packet_unref(m_avDecodePacket);
     *lpPacket = nxErrorCode == nxcip::NX_NO_ERROR ? nxVideoPacket.release() : nullptr;
+    
+    std::string errorCode = nxErrorCode == nxcip::NX_NO_ERROR ? "NO ERROR" : "SOME ERROR";
+    printf(errorCode.c_str());
+
     return nxErrorCode;
 }
 
 void StreamReader::interrupt()
 {
-    std::shared_ptr<nx::network::http::HttpClient> client;
-    {
-        QnMutexLocker lk(&m_mutex);
-        m_terminated = true;
-        m_cond.wakeAll();
-    }
+    QnMutexLocker lk(&m_mutex);
+    m_terminated = true;
+    //m_cond.wakeAll();
 }
 
 void StreamReader::setFps( float fps )
@@ -171,6 +178,11 @@ void StreamReader::setBitrate(int64_t bitrate)
 void StreamReader::updateCameraInfo( const nxcip::CameraInfo& info )
 {
     m_info = info;
+}
+
+bool StreamReader::isNative() const
+{
+    return !m_transcodingNeeded;
 }
 
 std::unique_ptr<ILPVideoPacket> StreamReader::toNxVideoPacket(AVPacket *packet, AVCodecID codecID)
@@ -209,7 +221,7 @@ std::unique_ptr<ILPVideoPacket> StreamReader::transcodeVideo(
     std::unique_ptr<ILPVideoPacket> nxVideoPacket = nullptr;
     int gotPacket;
     int encodeCode = m_videoEncoder->encodeVideo(encodedPacket, convertedFrame, &gotPacket);
-    if (m_lastError.updateIfError(encodeCode))
+    if (updateIfAVError(encodeCode))
     {
         *nxcipErrorCode = nxcip::NX_IO_ERROR;
     }
@@ -238,7 +250,7 @@ int StreamReader::decodeVideoFrame(AVFrame**outFrame, AVPacket * decodePacket)
     {
         decodeCode = 
             m_videoDecoder->decodeVideo(m_formatContext, decodedFrame, &gotPicture, decodePacket);
-        if (m_lastError.updateIfError(decodeCode))
+        if (updateIfAVError(decodeCode))
             break;
     }
 
@@ -264,10 +276,7 @@ QString StreamReader::decodeCameraInfoUrl() const
 
 bool StreamReader::isValid() const
 {
-    return m_formatContext != nullptr
-        && m_inputFormat != nullptr
-        && m_videoDecoder != nullptr
-        && m_videoEncoder != nullptr;
+    return m_lastAVError >= 0;
 }
 
 AVFrame * StreamReader::toEncodableFrame(AVFrame * frame) const
@@ -303,87 +312,129 @@ AVFrame * StreamReader::toEncodableFrame(AVFrame * frame) const
     return resultFrame;
 }
 
-void StreamReader::initializeAv()
+void StreamReader::initializeAV()
 {  
     if (m_initialized)
         return;
 
-    m_inputFormat = av_find_input_format(getAVInputFormat());
-    if (!m_inputFormat)
+    if(openInputFormat() < 0)
+        return;
+
+    if(openVideoDecoder() < 0)
+        return;
+
+    if(m_transcodingNeeded)
+        if(openVideoEncoder() < 0)
+            return;if(m_transcodingNeeded)
+        if(openVideoEncoder() < 0)
+            return;
+    
+    m_avDecodePacket = av_packet_alloc();
+    if(!m_avDecodePacket)
     {
-        m_lastError.setAvError("could not find input format.");
+        setAVErrorCode(AVERROR(ENOMEM));
         return;
     }
 
-    m_formatContext = avformat_alloc_context();
-    if(!m_formatContext)
+    m_initialized = true;
+}
+
+int StreamReader::openInputFormat()
+{
+    m_inputFormat = av_find_input_format(getAVInputFormat());
+    if (!m_inputFormat)
     {
-        m_lastError.setAvError("could not allocate AVFormatContext");
-        return;
+        // there is no error code for Format not found
+        setAVErrorCode(AVERROR_PROTOCOL_NOT_FOUND);
+        return AVERROR_PROTOCOL_NOT_FOUND;
+    }
+
+    m_formatContext = avformat_alloc_context();
+    if (!m_formatContext)
+    {
+        setAVErrorCode(AVERROR(ENOMEM));
+        return AVERROR(ENOMEM);
     }
     setFormatContextOptions();
 
     std::string url = getAVCameraUrl();
     int formatOpenCode = avformat_open_input(
         &m_formatContext, url.c_str(), m_inputFormat, &m_formatContextOptions);
-    if (m_lastError.updateIfError(formatOpenCode))
-        return;
-
-    /*int findStreamCode = avformat_find_stream_info(m_formatContext, nullptr);
-    if (m_lastError.updateIfError(findStreamCode))
-        return;*/
-
-    int videoStreamIndex;
-    AVStream * videoStream = 
-        utils::av::getAVStream(m_formatContext, &videoStreamIndex, AVMEDIA_TYPE_VIDEO);
-    if (!videoStream)
-    {
-        m_lastError.setAvError("could not find a video stream");
-        return;
-    }
-
-    m_videoDecoder.reset(new AVCodecContainer());
-    m_videoDecoder->initializeDecoder(videoStream->codecpar);
-    if (!m_videoDecoder->isValid())
-    {
-        m_lastError.setAvError(m_videoDecoder->avErrorString());
-        m_videoDecoder.reset(nullptr);
-        return;
-    }
-    int openCode = m_videoDecoder->open();
-    if(m_lastError.updateIfError(openCode))
-    {
-        m_videoDecoder.reset(nullptr);
-        return;
-    }
-
-    m_videoEncoder.reset(new AVCodecContainer());
-    //todo compile ffmpeg with h264 support for encoding
-    m_videoEncoder->initializeEncoder(AV_CODEC_ID_H263P);
-    if (!m_videoEncoder->isValid())
-    {
-        m_lastError = m_videoEncoder->lastError();
-        m_videoEncoder.reset(nullptr);
-        return;
-    }
-    setEncoderOptions();
-    openCode = m_videoEncoder->open();
-    if(m_lastError.updateIfError(openCode))
-    {
-        m_videoEncoder.reset(nullptr);
-        return;
-    }
     
-    m_avDecodePacket = av_packet_alloc();
-    m_initialized = true;
+    updateIfAVError(formatOpenCode);
+    return formatOpenCode;
 }
 
-void StreamReader::unInitializeAv()
+int StreamReader::openVideoDecoder()
+{
+    AVStream * videoStream = utils::av::getAVStream(m_formatContext, AVMEDIA_TYPE_VIDEO);
+    if (!videoStream)
+    {
+        setAVErrorCode(AVERROR_STREAM_NOT_FOUND);
+        return AVERROR_STREAM_NOT_FOUND;
+    }
+
+    auto decoder = std::make_unique<AVCodecContainer>();
+    int initCode = decoder->initializeDecoder(videoStream->codecpar);
+    if (updateIfAVError(initCode))
+        return initCode;
+
+    int openCode = decoder->open();
+    if (updateIfAVError(openCode))
+        return openCode;
+
+    m_videoDecoder = std::move(decoder);
+    return 0;
+}
+
+void StreamReader::setEncoderOptions(AVCodecContext* encoderContext) const
+{
+    NX_ASSERT(m_videoDecoder);
+    if(m_videoDecoder)
+    {
+        AVCodecContext * decoderContext = m_videoDecoder->codecContext();
+        encoderContext->width = decoderContext->width;
+        encoderContext->height = decoderContext->height;
+    }
+
+    encoderContext->pix_fmt = utils::av::suggestPixelFormat(encoderContext->codec_id);
+    
+    float fps = m_codecContext.fps();
+    encoderContext->time_base = { 1, (int) fps }; // 30 is default framerateset
+    
+    encoderContext->flags = AV_CODEC_FLAG_GLOBAL_HEADER;
+    encoderContext->global_quality = encoderContext->qmin * FF_QP2LAMBDA;
+
+    int bitrate = m_codecContext.bitrate();
+    if (bitrate)
+    { 
+        encoderContext->bit_rate = bitrate;
+    }
+}
+
+int StreamReader::openVideoEncoder()
+{
+    auto encoder = std::make_unique<AVCodecContainer>();
+    //todo compile ffmpeg with h264 support for encoding
+    int initCode = encoder->initializeEncoder(AV_CODEC_ID_H263P);
+    if (updateIfAVError(initCode))
+        return initCode;
+
+    setEncoderOptions(encoder->codecContext());
+    int openCode = encoder->open();
+    if (updateIfAVError(openCode))
+        return openCode;
+
+    m_videoEncoder = std::move(encoder);
+    return 0;
+}
+
+void StreamReader::uninitializeAV()
 {
    if (m_avDecodePacket)
         av_packet_free(&m_avDecodePacket);
     
-    //close the codecs before we close_input() below
+    //close the codecs before we close_input below
     m_videoDecoder.reset(nullptr);
     m_videoEncoder.reset(nullptr);
 
@@ -393,19 +444,19 @@ void StreamReader::unInitializeAv()
     if (m_formatContext)
         avformat_close_input(&m_formatContext);
 
-   m_initialized = false;
+    m_initialized = false;
 }
 
 bool StreamReader::ensureInitialized()
 {
     if(!m_initialized)
     {
-        initializeAv();
+        initializeAV();
     }
     else if(m_modified)
     {
-        unInitializeAv();
-        initializeAv();
+        uninitializeAV();
+        initializeAV();
         m_modified = false;
     }
     return m_initialized;
@@ -436,24 +487,18 @@ void StreamReader::setFormatContextOptions()
     }
 }
 
-void StreamReader::setEncoderOptions() const
+void StreamReader::setAVErrorCode(int errorCode)
 {
-    AVCodecContext * encoderContext = m_videoEncoder->codecContext();
-    AVCodecContext * decoderContext = m_videoDecoder->codecContext();
+    m_lastAVError = errorCode;
+    printf(utils::av::avStrError(errorCode).c_str());
+}
 
-    float fps = m_codecContext.fps();
-    encoderContext->width = decoderContext->width;
-    encoderContext->height = decoderContext->height;
-    encoderContext->pix_fmt = utils::av::suggestPixelFormat(encoderContext->codec_id);
-    encoderContext->time_base = { 1, (int) fps }; // 30 is default framerateset
-    encoderContext->flags = AV_CODEC_FLAG_GLOBAL_HEADER;
-    encoderContext->global_quality = encoderContext->qmin * FF_QP2LAMBDA;
-
-    int bitrate = m_codecContext.bitrate();
-    if (bitrate)
-    { 
-        encoderContext->bit_rate = bitrate;
-    }
+bool StreamReader::updateIfAVError(int errorCode)
+{
+    bool error = errorCode < 0;
+    if(error)
+        setAVErrorCode(errorCode);
+    return error;
 }
 
 const char * StreamReader::getAVInputFormat()
@@ -477,7 +522,7 @@ std::string StreamReader::getAVCameraUrl()
 #ifdef _WIN32
         std::string("video=@device_pnp_").append(s.toLatin1().data());
 #elif __linux__ 
-        "Linux not implemented";
+        std::string(s.toLatin1().data());
 #elif __APPLE__
         "Apple not implemented";
 #else

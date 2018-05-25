@@ -132,17 +132,15 @@ int MediaEncoder::setFps( const float& fps, float* selectedFps )
 
 int MediaEncoder::setBitrate( int bitrateKbps, int* selectedBitrateKbps )
 {
+    //todo get the actual bitrate from the stream reader if it is actively being used.
+
     // the plugin uses bits per second internally, so convert to that first
     int bitratebps = bitrateKbps * 1000;
-    int maxBitrate;
-    int ret = getMaxBitrate(&maxBitrate);
-    maxBitrate *= 1000;
-    int bitrateClamped = std::min<int>(std::max<int>(bitratebps, 0), maxBitrate);
-    m_videoCodecContext.setBitrate(bitrateClamped);
+    m_videoCodecContext.setBitrate(bitratebps);
     if (m_streamReader)
-        m_streamReader->setBitrate(bitrateClamped);
-    *selectedBitrateKbps = bitrateClamped / 1000;
-    return ret;
+        m_streamReader->setBitrate(bitratebps);
+    *selectedBitrateKbps = bitrateKbps;
+    return nxcip::NX_NO_ERROR;
 }
 
 nxcip::StreamReader* MediaEncoder::getLiveStreamReader()
