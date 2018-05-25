@@ -988,15 +988,11 @@ nx::network::http::StatusCode::Value HttpLiveStreamingProcessor::createSession(
     }
 
     const auto& chunkAuthenticationKey = QnAuthHelper::instance()->createAuthenticationQueryItemForPath(
-        accessRights,
-            HLS_PREFIX + camResource->getUniqueId() + ".ts",
-        QnAuthHelper::MAX_AUTHENTICATION_KEY_LIFE_TIME_MS );
+        accessRights, HLS_PREFIX + camResource->getUniqueId() + ".ts");
     newHlsSession->setChunkAuthenticationQueryItem( chunkAuthenticationKey );
 
     const auto& playlistAuthenticationKey = QnAuthHelper::instance()->createAuthenticationQueryItemForPath(
-        accessRights,
-        requestedPlaylistPath,
-        QnAuthHelper::MAX_AUTHENTICATION_KEY_LIFE_TIME_MS );
+        accessRights, requestedPlaylistPath);
     newHlsSession->setPlaylistAuthenticationQueryItem( playlistAuthenticationKey );
 
     *session = newHlsSession.release();

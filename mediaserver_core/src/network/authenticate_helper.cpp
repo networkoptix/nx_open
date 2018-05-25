@@ -66,8 +66,6 @@ static const qint64 LDAP_TIMEOUT = 1000000ll * 60 * 5;
 static const QString COOKIE_DIGEST_AUTH(lit("Authorization=Digest"));
 static const QString TEMP_AUTH_KEY_NAME = lit("authKey");
 
-const unsigned int QnAuthHelper::MAX_AUTHENTICATION_KEY_LIFE_TIME_MS = 60 * 60 * 1000;
-
 QnAuthHelper::QnAuthHelper(
     QnCommonModule* commonModule,
     TimeBasedNonceProvider* timeBasedNonceProvider,
@@ -79,6 +77,7 @@ QnAuthHelper::QnAuthHelper(
     m_userDataProvider(&cloudManagerGroup->userAuthenticator),
     m_ldap(new QnLdapManager(commonModule))
 {
+    setClenupTimer();
 }
 
 QnAuthHelper::~QnAuthHelper()
@@ -409,7 +408,7 @@ nx::network::http::AuthMethodRestrictionList* QnAuthHelper::restrictionList()
 QPair<QString, QString> QnAuthHelper::createAuthenticationQueryItemForPath(
     const Qn::UserAccessData& accessRights,
     const QString& path,
-    unsigned int periodMillis)
+    std::chrono::milliseconds timeout)
 {
     QString authKey = QnUuid::createUuid().toString();
     if (authKey.isEmpty())
@@ -425,7 +424,7 @@ QPair<QString, QString> QnAuthHelper::createAuthenticationQueryItemForPath(
         nx::utils::TimerManager::instance(),
         nx::utils::TimerManager::instance()->addTimer(
             std::bind(&QnAuthHelper::authenticationExpired, this, authKey, std::placeholders::_1),
-            std::chrono::milliseconds(std::min(periodMillis, MAX_AUTHENTICATION_KEY_LIFE_TIME_MS))));
+            std::min(timeout, kMaxKeyLifeTime)));
 
     TempAuthenticationKeyCtx ctx;
     ctx.timeGuard = std::move(timerGuard);
@@ -580,12 +579,14 @@ Qn::AuthResult QnAuthHelper::doCookieAuthorization(
 
     if (csrfToken)
     {
+        if (!isCsrfTokenValid(*csrfToken))
+            return Qn::Auth_InvalidCsrfToken;
+
         const auto csrfParam = params.value(Qn::CSRF_TOKEN_COOKIE_NAME);
         if (csrfParam.isEmpty() || csrfParam != *csrfToken)
             return Qn::Auth_InvalidCsrfToken;
     }
 
-    // TODO: Verify UUID and CSRF token against some cache as well.
     return authenticateByUrl(
         nx::utils::Url::fromPercentEncoding(auth).toUtf8(),
         kCookieAuthMethod,
@@ -694,4 +695,60 @@ void QnAuthHelper::updateUserHashes(const QnUserResourcePtr& userResource, const
 QnLdapManager* QnAuthHelper::ldapManager() const
 {
     return m_ldap.get();
+}
+
+void QnAuthHelper::setClenupTimer()
+{
+    m_clenupTimer = nx::utils::TimerManager::instance()->addTimerEx(
+        [this](nx::utils::TimerId)
+        {
+            cleanupExpiredCsrfs();
+            setClenupTimer();
+        },
+        kMaxKeyLifeTime);
+}
+
+nx::Buffer QnAuthHelper::newCsrfToken()
+{
+    const auto token = QnUuid::createUuid().toSimpleByteArray();
+    QnMutexLocker lock(&m_mutex);
+    m_csrfTokens[token] = std::chrono::steady_clock::now() + kMaxKeyLifeTime;
+    return token;
+}
+
+void QnAuthHelper::removeCsrfToken(const nx::Buffer& token)
+{
+    QnMutexLocker lock(&m_mutex);
+    m_csrfTokens.erase(token);
+}
+
+bool QnAuthHelper::isCsrfTokenValid(const nx::Buffer& token)
+{
+    QnMutexLocker lock(&m_mutex);
+    const auto it = m_csrfTokens.find(token);
+    if (it == m_csrfTokens.end())
+        return false;
+
+    const auto now = std::chrono::steady_clock::now();
+    if (it->second < now)
+    {
+        m_csrfTokens.erase(it);
+        return false;
+    }
+
+    it->second = now + kMaxKeyLifeTime;
+    return true;
+}
+
+void QnAuthHelper::cleanupExpiredCsrfs()
+{
+    QnMutexLocker lock(&m_mutex);
+    const auto now = std::chrono::steady_clock::now();
+    for (auto it = m_csrfTokens.begin(); it != m_csrfTokens.end(); )
+    {
+        if (it->second < now)
+            it = m_csrfTokens.erase(it);
+        else
+            ++it;
+    }
 }

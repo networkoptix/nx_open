@@ -335,6 +335,7 @@ public:
         const ConstBufferRefType& boundary) const;
     StringType toString() const;
     StringType toMultipartString(const ConstBufferRefType& boundary) const;
+    std::map<StringType, StringType> getCookies() const;
 };
 
 NX_NETWORK_API bool isMessageBodyPresent(const Response& response);

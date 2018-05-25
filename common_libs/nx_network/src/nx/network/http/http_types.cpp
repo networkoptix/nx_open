@@ -671,6 +671,33 @@ StringType Response::toMultipartString(const ConstBufferRefType& boundary) const
     return buf;
 }
 
+std::map<StringType, StringType> Response::getCookies() const
+{
+    std::map<StringType, StringType> cookies;
+    for (const auto header: headers)
+    {
+        if (header.first != "Set-Cookie")
+            continue;
+
+        if (header.second.contains("=deleted"))
+            continue;
+
+        const auto nameEnd = header.second.indexOf('=');
+        if (nameEnd == -1)
+            continue;
+
+        const auto valueBegin = nameEnd + 1;
+        auto valueEnd = header.second.indexOf("; ", nameEnd);
+        if (valueEnd == -1)
+            valueEnd = header.second.length();
+
+        cookies.emplace(
+            header.second.left(nameEnd),
+            header.second.mid(valueBegin, valueEnd - valueBegin));
+    }
+
+    return cookies;
+}
 
 namespace MessageType {
 

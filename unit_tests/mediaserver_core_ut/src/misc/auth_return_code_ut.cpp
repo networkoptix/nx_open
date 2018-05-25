@@ -73,6 +73,13 @@ public:
         settings->synchronizeNowSync();
     }
 
+    nx::utils::Url serverUrl(const QString& path) const
+    {
+        nx::utils::Url url = mediaServerLauncher->apiUrl();
+        url.setPath(path);
+        return url;
+    }
+
     void addLocalUser(QString userName, QString password, bool isEnabled = true)
     {
         auto ec2Connection = mediaServerLauncher->commonModule()->ec2Connection();
@@ -123,18 +130,43 @@ public:
             nx::network::http::Method::get,
             QnAuthHelper::instance()->generateNonce());
 
-        auto msgBody = QJson::serialized(cookieLogin);
-        nx::utils::Url url = mediaServerLauncher->apiUrl();
-        url.setPath("/api/cookieLogin");
-        nx::network::http::HttpClient httpClient;
-        httpClient.doPost(url, "application/json", msgBody);
-        ASSERT_TRUE(httpClient.response());
+        nx::network::http::HttpClient client;
+        client.doPost(serverUrl("/api/cookieLogin"), "application/json", QJson::serialized(cookieLogin));
+        ASSERT_TRUE(client.response());
 
-        QByteArray response;
-        while (!httpClient.eof())
-            response += httpClient.fetchMessageBodyBuffer();
-        QnJsonRestResult jsonResult = QJson::deserialized<QnJsonRestResult>(response);
-        ASSERT_EQ(expectedError, jsonResult.error);
+        const auto result = QJson::deserialized<QnJsonRestResult>(*client.fetchEntireMessageBody());
+        ASSERT_EQ(expectedError, result.error);
+        if (result.error != QnRestResult::Error::NoError)
+            return;
+
+        // Set cookies manually, client does not support it.
+        auto cookieMap = client.response()->getCookies();
+        QStringList cookieList;
+        for (const auto& it: cookieMap)
+            cookieList << lm("%1=%2").args(it.first, it.second);
+
+        const auto cookie = cookieList.join("; ").toUtf8();
+        const auto csrf = cookieMap["nx-vms-csrf-token"];
+        const auto doGet =
+            [&](QString path, std::map<nx::String, nx::String> headers)
+            {
+                nx::network::http::HttpClient client;
+                for (const auto& it: headers)
+                    client.addAdditionalHeader(it.first, it.second);
+
+                if (!client.doGet(serverUrl(path)) || !client.response())
+                    return 0;
+
+                return client.response()->statusLine.statusCode;
+            };
+
+        // Cookie works only with CSRF.
+        ASSERT_EQ(401, doGet("/ec2/getUsers", {{"Cookie", cookie}}));
+        ASSERT_EQ(200, doGet("/ec2/getUsers", {{"Cookie", cookie}, {"Nx-Vms-Csrf-Token", csrf}}));
+
+        // Cookies does not work after logout.
+        ASSERT_EQ(200, doGet("api/cookieLogout", {{"Cookie", cookie}, {"Nx-Vms-Csrf-Token", csrf}}));
+        ASSERT_EQ(401, doGet("/ec2/getUsers", {{"Cookie", cookie}, {"Nx-Vms-Csrf-Token", csrf}}));
     }
 
     ec2::ApiUserData userData;
@@ -172,9 +204,7 @@ public:
                 std::this_thread::sleep_for(std::chrono::milliseconds(1));
                 continue;
             }
-            nx::utils::Url url = mediaServerLauncher->apiUrl();
-            url.setPath("/ec2/getUsers");
-            if (httpClient->doGet(url))
+            if (httpClient->doGet(serverUrl("/ec2/getUsers")))
                 break;  //< Server is alive
         }
         ASSERT_TRUE(httpClient->response());

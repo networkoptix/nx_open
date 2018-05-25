@@ -15,6 +15,7 @@
 #include <nx/network/http/http_types.h>
 #include <nx/utils/thread/mutex.h>
 #include <nx/network/http/auth_restriction_list.h>
+#include <nx/network/aio/timer.h>
 
 #include <nx/vms/auth/abstract_nonce_provider.h>
 #include <nx/vms/auth/abstract_user_data_provider.h>
@@ -38,7 +39,7 @@ class QnAuthHelper:
     Q_OBJECT
 
 public:
-    static const unsigned int MAX_AUTHENTICATION_KEY_LIFE_TIME_MS;
+    static const constexpr std::chrono::milliseconds kMaxKeyLifeTime = std::chrono::hours(1);
 
     QnAuthHelper(
         QnCommonModule* commonModule,
@@ -72,7 +73,7 @@ public:
     QPair<QString, QString> createAuthenticationQueryItemForPath(
         const Qn::UserAccessData& accessRights,
         const QString& path,
-        unsigned int periodMillis);
+        std::chrono::milliseconds timeout = kMaxKeyLifeTime);
 
     enum class NonceProvider { automatic, local };
     QByteArray generateNonce(NonceProvider provider = NonceProvider::automatic) const;
@@ -92,6 +93,10 @@ public:
         Qn::UserAccessData* accessRights = nullptr) const;
 
     QnLdapManager* ldapManager() const;
+
+    nx::Buffer newCsrfToken();
+    void removeCsrfToken(const nx::Buffer& token);
+    bool isCsrfTokenValid(const nx::Buffer& token);
 
 signals:
     void emptyDigestDetected(const QnUserResourcePtr& user, const QString& login, const QString& password);
@@ -157,13 +162,6 @@ private:
         nx::network::http::Response& responseHeaders,
         Qn::UserAccessData* accessRights);
 
-    mutable QnMutex m_mutex;
-    nx::network::http::AuthMethodRestrictionList m_authMethodRestrictionList;
-    std::map<QString, TempAuthenticationKeyCtx> m_authenticatedPaths;
-    nx::vms::auth::AbstractNonceProvider* m_timeBasedNonceProvider;
-    nx::vms::auth::AbstractNonceProvider* m_nonceProvider;
-    nx::vms::auth::AbstractUserDataProvider* m_userDataProvider;
-    std::unique_ptr<QnLdapManager> m_ldap;
 
     void authenticationExpired( const QString& path, quint64 timerID );
     QnUserResourcePtr findUserByName( const QByteArray& nxUserName ) const;
@@ -177,6 +175,20 @@ private:
     */
     //!Check \a digest validity with external authentication service (LDAP currently)
     Qn::AuthResult checkDigestValidity(QnUserResourcePtr userResource, const QByteArray& digest );
+
+    void setClenupTimer();
+    void cleanupExpiredCsrfs();
+
+private:
+    mutable QnMutex m_mutex;
+    nx::utils::TimerManager::TimerGuard m_clenupTimer;
+    nx::network::http::AuthMethodRestrictionList m_authMethodRestrictionList;
+    std::map<QString, TempAuthenticationKeyCtx> m_authenticatedPaths;
+    nx::vms::auth::AbstractNonceProvider* m_timeBasedNonceProvider;
+    nx::vms::auth::AbstractNonceProvider* m_nonceProvider;
+    nx::vms::auth::AbstractUserDataProvider* m_userDataProvider;
+    std::unique_ptr<QnLdapManager> m_ldap;
+    std::map<nx::Buffer, std::chrono::steady_clock::time_point> m_csrfTokens;
 };
 
 #define qnAuthHelper QnAuthHelper::instance()

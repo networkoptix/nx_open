@@ -84,11 +84,9 @@ int QnCookieLoginRestHandler::executePost(
             nx::network::http::HttpHeader("Set-Cookie", data));
     };
 
-    // TODO: Save ganegated UUID and CSRF tocken for verification in
-    // QnAuthHelper::doCookieAuthorization.
     setCookie(Qn::URL_QUERY_AUTH_KEY_NAME, cookieData.auth, "HttpOnly");
     setCookie(Qn::EC2_RUNTIME_GUID_HEADER_NAME, QnUuid::createUuid().toByteArray(), "HttpOnly");
-    setCookie(Qn::CSRF_TOKEN_COOKIE_NAME, QnUuid::createUuid().toSimpleByteArray(), "");
+    setCookie(Qn::CSRF_TOKEN_COOKIE_NAME, QnAuthHelper::instance()->newCsrfToken(), "");
 
     QnCurrentUserRestHandler currentUser;
     return currentUser.executeGet(QString(), QnRequestParams(), result, owner);
