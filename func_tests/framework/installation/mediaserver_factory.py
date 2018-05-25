@@ -111,9 +111,14 @@ class MediaserverFactory(object):
         self._ca = ca
 
     @contextmanager
-    def allocated_mediaserver(self, vm):
+    def allocated_mediaserver(self, name, vm):
+        # While it's tempting to take vm.alias as name and, moreover, it might be a good decision,
+        # existing client code structure (ClosingPool class) requires this function to have name parameter.
+        # It's wrong but requires human-hours of thinking.
+        # TODO: Refactor client code so this method doesn't rely on it.
         installation = make_installation(self._mediaserver_installers, vm.type, vm.os_access)
-        mediaserver = setup_clean_mediaserver(vm.alias, installation, self._ca)
+        log.info("Mediaserver name %s is not same as VM alias %s. Not a mistake?", name, vm.alias)
+        mediaserver = setup_clean_mediaserver(name, installation, self._ca)
         yield mediaserver
         examine_mediaserver(mediaserver)
         collect_artifacts_from_mediaserver(mediaserver, self._artifact_factory)
