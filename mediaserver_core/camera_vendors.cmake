@@ -91,7 +91,7 @@ foreach(vendor ${camera_vendors})
     elseif(vendor IN_LIST _enabled_camera_vendors_old)
         continue()
     else()
-        list(APPEND vendor_source_exclusions src/plugins/resource/${vendor}/)
+        list(APPEND vendor_source_exclusions plugins/resource/${vendor}/)
     endif()
 endforeach()
 
