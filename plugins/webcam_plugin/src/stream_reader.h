@@ -90,7 +90,7 @@ private:
     void initializeAV();
     int openInputFormat();
     int openVideoDecoder();
-     void setEncoderOptions(AVCodecContext* encoderContext) const;
+     void setEncoderOptions(AVCodecContext* encoderContext);
     int openVideoEncoder();
     void setFormatContextOptions();
     void uninitializeAV();

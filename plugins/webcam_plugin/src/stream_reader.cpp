@@ -374,7 +374,7 @@ int StreamReader::openVideoDecoder()
     return 0;
 }
 
-void StreamReader::setEncoderOptions(AVCodecContext* encoderContext) const
+void StreamReader::setEncoderOptions(AVCodecContext* encoderContext)
 {
     NX_ASSERT(m_videoDecoder);
     if(m_videoDecoder)
