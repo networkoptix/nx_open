@@ -33,9 +33,15 @@ const char OnvifResourceSearcherWsdd::SCOPES_NAME_PREFIX[] = "onvif://www.onvif.
 const char OnvifResourceSearcherWsdd::SCOPES_HARDWARE_PREFIX[] = "onvif://www.onvif.org/hardware/";
 const char OnvifResourceSearcherWsdd::SCOPES_LOCATION_PREFIX[] = "onvif://www.onvif.org/location/";
 const char OnvifResourceSearcherWsdd::PROBE_TYPE[] = "onvifDiscovery:NetworkVideoTransmitter";
-const char OnvifResourceSearcherWsdd::WSA_ADDRESS[] = "http://schemas.xmlsoap.org/ws/2004/08/addressing/role/anonymous";
-const char OnvifResourceSearcherWsdd::WSDD_ADDRESS[] = "urn:schemas-xmlsoap-org:ws:2005:04:discovery";
-const char OnvifResourceSearcherWsdd::WSDD_ACTION[] = "http://schemas.xmlsoap.org/ws/2005/04/discovery/Probe";
+const char OnvifResourceSearcherWsdd::WSA_ADDRESS[] =
+    "http://schemas.xmlsoap.org/ws/2004/08/addressing/role/anonymous";
+const char OnvifResourceSearcherWsdd::WSDD_ADDRESS[] =
+    "urn:schemas-xmlsoap-org:ws:2005:04:discovery";
+const char OnvifResourceSearcherWsdd::WSDD_ACTION[] =
+    "http://schemas.xmlsoap.org/ws/2005/04/discovery/Probe";
+
+const QString  OnvifResourceSearcherWsdd::OBTAIN_MAC_FROM_MULTICAST_PARAM_NAME =
+    lit("obtainMacFromMulticast");
 
 static const std::vector<QString> kManufacturerScopePrefixes
     = {lit("onvif://www.onvif.org/manufacturer/")};
@@ -44,7 +50,7 @@ const char OnvifResourceSearcherWsdd::WSDD_GSOAP_MULTICAST_ADDRESS[] = "soap.udp
 
 static const int WSDD_MULTICAST_PORT = 3702;
 static const char WSDD_MULTICAST_ADDRESS[] = "239.255.255.250";
-static const SocketAddress WSDD_MULTICAST_ENDPOINT( WSDD_MULTICAST_ADDRESS, WSDD_MULTICAST_PORT );
+static const SocketAddress WSDD_MULTICAST_ENDPOINT(WSDD_MULTICAST_ADDRESS, WSDD_MULTICAST_PORT);
 
 namespace
 {
@@ -473,7 +479,7 @@ QString OnvifResourceSearcherWsdd::getMac(const T* source, const SOAP_ENV__Heade
 
         const QnResourceData resourceData = qnStaticCommon->dataPool()->data(manufacturer, name);
         ObtainMacFromMulticast obtainMacFromMulticast = ObtainMacFromMulticast::Auto;
-        resourceData.value(Qn::OBTAIN_MAC_FROM_MULTICAST_PARAM_NAME, &obtainMacFromMulticast);
+        resourceData.value(OBTAIN_MAC_FROM_MULTICAST_PARAM_NAME, &obtainMacFromMulticast);
 
         if ((obtainMacFromMulticast == ObtainMacFromMulticast::Always)
             || (obtainMacFromMulticast == ObtainMacFromMulticast::Auto

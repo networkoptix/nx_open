@@ -56,6 +56,8 @@ class OnvifResourceSearcherWsdd
     static const char WSDD_ACTION[];
     static const char WSDD_GSOAP_MULTICAST_ADDRESS[];
 
+    static const QString OBTAIN_MAC_FROM_MULTICAST_PARAM_NAME;
+
     OnvifResourceInformationFetcher* m_onvifFetcher;
     //mutable QHash<QString, QUdpSocketPtr> m_recvSocketList;
     //mutable QnMutex m_mutex;
