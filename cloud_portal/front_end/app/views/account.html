@@ -54,7 +54,7 @@
             <div class="offset-md-4 col-md-4">
                 <process-button process="save"
                                 form="accountForm"
-                                button-text="$root.L.account.saveChanges"></process-button>
+                                button-text="lang.account.saveChanges"></process-button>
             </div>
         </div>
     </form>
@@ -66,7 +66,8 @@
         <div class="form-group row" validate-field>
             <label for="password"  class="col-md-4 text-left text-md-right control-label">Current password</label>
             <div class="col-md-4">
-                <input type="password" class="form-control" ng-model="pass.password"
+                <input type="password" class="form-control"
+                       ng-model="pass.password"
                        name="password"
                        id="password" required>
             </div>
@@ -75,13 +76,18 @@
             </div>
         </div>
 
-        <password-input ng-model="pass.newPassword" id="'newPassword'" label="$root.L.account.newPasswordLabel"></password-input>
+        <password-input ng-model="pass.newPassword"
+                        id="'newPassword'"
+                        form="passwordForm"
+                        label="lang.account.newPasswordLabel">
+        </password-input>
 
         <div class="form-group row">
             <div class="offset-md-4 col-md-4">
                 <process-button process="changePassword"
                                 form="passwordForm"
-                                button-text="$root.L.account.changePassword"></process-button>
+                                button-text="lang.account.changePassword">
+                </process-button>
             </div>
         </div>
     </form>

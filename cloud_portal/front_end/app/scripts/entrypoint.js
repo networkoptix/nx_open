@@ -37,6 +37,8 @@ require('./directives/process.js');
 require('./directives/setTitle.js');
 require('./directives/validateEmail.js');
 require('./directives/validateField.js');
+require('./directives/validateCommonPassword.js');
+require('./directives/validateWeakPassword.js');
 
 //Filters
 require('./filters/escape.js');

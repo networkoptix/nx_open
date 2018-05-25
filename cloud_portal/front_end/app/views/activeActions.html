@@ -101,8 +101,12 @@
         <form name="restorePasswordWithCode" class="form-horizontal" ng-if="!change.success && !changeSuccess"
               novalidate>
             <h1>Set New Password</h1>
-            <password-input ng-model="data.newPassword" id="'newPassword'"
-                            label="$root.L.activeActions.setNewPasswordLabel"></password-input>
+
+            <password-input ng-model="data.newPassword"
+                            id="'newPassword'"
+                            form="restorePasswordWithCode"
+                            label="$root.L.activeActions.setNewPasswordLabel">
+            </password-input>
 
             <div class="form-group">
                 <div class="offset-sm-4 col-sm-8">

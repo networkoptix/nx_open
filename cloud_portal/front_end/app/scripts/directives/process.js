@@ -17,15 +17,23 @@ angular.module('cloudApp').directive('processButton', ['$timeout',function ($tim
                     scope.buttonClass = 'btn-' + scope.actionType;
                 }
                 function touchForm(form){
-                    angular.forEach(form.$error, function (field) {
-                        angular.forEach(field, function(errorField){
-                            if(typeof(errorField.$touched) != 'undefined'){
-                                errorField.$setTouched();
-                            }else{
-                                touchForm(errorField); // Embedded form - go recursive
+
+                    if (!angular.isObject(form)) {
+                        form = scope[form] || null;
+                    }
+
+                    if (form) {
+                        for (var control in form) {
+                            if (form.hasOwnProperty(control) && control.indexOf('$') < 0) {
+                                if (form[control].$submitted !== undefined) {  // Embedded form
+                                    touchForm(form[control]);
+                                } else {
+                                    form[control].$setDirty();
+                                    form[control].$setTouched();
+                                }
                             }
-                        })
-                    });
+                        }
+                    }
                 }
 
                 function setFocusToInvalid(form){
@@ -36,14 +44,17 @@ angular.module('cloudApp').directive('processButton', ['$timeout',function ($tim
 
                 scope.attrs = attrs;
                 scope.checkForm = function(){
-                    if(scope.form && !scope.form.$valid){
-                        //Set the form touched
-                        touchForm(scope.form);
-                        setFocusToInvalid(scope.form);
-                        return false;
-                    }else{
-                        scope.process.run();
-                    }
+                    //Set the form touched
+                    touchForm(scope.form);
+
+                    $timeout(function () {
+                        if(scope.form && scope.form.$invalid || scope.form.$invalid === undefined){
+                            setFocusToInvalid(scope.form);
+                            return false;
+                        } else {
+                            scope.process.run();
+                        }
+                    }, 0);
                 }
 
             }

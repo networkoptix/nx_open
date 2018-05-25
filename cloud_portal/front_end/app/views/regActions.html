@@ -60,7 +60,11 @@
             </div>
         </div>
 
-        <password-input ng-model="account.password" id="'registerPassword'" label="$root.L.regActions.passwordLabel"></password-input>
+        <password-input ng-model="account.password"
+                        id="'registerPassword'"
+                        form="registerForm"
+                        label="$root.L.regActions.passwordLabel">
+        </password-input>
 
         <div class="form-group row" validate-field>
             <div class="offset-md-4 col-md-4">
