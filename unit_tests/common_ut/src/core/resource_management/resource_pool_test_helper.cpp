@@ -10,8 +10,8 @@
 #include <core/resource/webpage_resource.h>
 #include <core/resource/videowall_resource.h>
 
-QString QnResourcePoolTestHelper::kTestUserName = QStringLiteral("user");
-QString QnResourcePoolTestHelper::kTestUserName2 = QStringLiteral("user_2");
+QString QnResourcePoolTestHelper::kTestUserName = "user";
+QString QnResourcePoolTestHelper::kTestUserName2 = "user_2";
 
 QnResourcePoolTestHelper::QnResourcePoolTestHelper():
     QnCommonModuleAware(nullptr, true),
@@ -62,7 +62,7 @@ QnLayoutResourcePtr QnResourcePoolTestHelper::addLayout()
 nx::CameraResourceStubPtr QnResourcePoolTestHelper::createCamera(Qn::LicenseType licenseType)
 {
     nx::CameraResourceStubPtr camera(new nx::CameraResourceStub(licenseType));
-    camera->setName(QStringLiteral("camera"));
+    camera->setName("camera");
     return camera;
 }
 
@@ -75,7 +75,10 @@ nx::CameraResourceStubPtr QnResourcePoolTestHelper::addCamera(Qn::LicenseType li
 
 QnWebPageResourcePtr QnResourcePoolTestHelper::addWebPage()
 {
-    QnWebPageResourcePtr webPage(new QnWebPageResource(QStringLiteral("http://www.ru")));
+    QnWebPageResourcePtr webPage(new QnWebPageResource());
+    webPage->setId(QnUuid::createUuid());
+    webPage->setUrl("http://www.ru");
+    webPage->setName(QnWebPageResource::nameForUrl(webPage->getUrl()));
     resourcePool()->addResource(webPage);
     return webPage;
 }
@@ -126,6 +129,5 @@ QnStorageResourcePtr QnResourcePoolTestHelper::addStorage(const QnMediaServerRes
 
 ec2::ApiUserRoleData QnResourcePoolTestHelper::createRole(Qn::GlobalPermissions permissions)
 {
-    return ec2::ApiUserRoleData(QnUuid::createUuid(), QStringLiteral("test_role"),
-        permissions);
+    return ec2::ApiUserRoleData(QnUuid::createUuid(), "test_role", permissions);
 }
