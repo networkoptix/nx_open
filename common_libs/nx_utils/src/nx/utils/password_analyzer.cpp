@@ -1,6 +1,8 @@
 #include "password_analyzer.h"
 #include "password_analyzer_p.h"
 
+#include <nx/utils/literal.h>
+
 #include <numeric>
 #include <string>
 #include <array>
