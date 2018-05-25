@@ -987,13 +987,10 @@ void UdtStreamServerSocket::acceptAsync(AcceptCompletionHandler handler)
             std::unique_ptr<AbstractStreamSocket> socket)
         {
             // Every accepted socket MUST be in blocking mode!
-            if (socket)
+            if (socket && !socket->setNonBlockingMode(false))
             {
-                if (!socket->setNonBlockingMode(false))
-                {
-                    socket.reset();
-                    errorCode = SystemError::getLastOSErrorCode();
-                }
+                errorCode = SystemError::getLastOSErrorCode();
+                socket.reset();
             }
             handler(errorCode, std::move(socket));
         });
