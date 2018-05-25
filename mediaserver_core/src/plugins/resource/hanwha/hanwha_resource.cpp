@@ -8,6 +8,7 @@
 #include "hanwha_shared_resource_context.h"
 #include "hanwha_archive_delegate.h"
 #include "hanwha_chunk_reader.h"
+#include "hanwha_firmware.h"
 #include "hanwha_ini_config.h"
 
 #include <QtCore/QMap>
@@ -978,14 +979,10 @@ CameraDiagnostics::Result HanwhaResource::initSystem()
         const auto sunapiSupportAttribute = m_attributes.attribute<bool>(
             lit("Media/Protocol.SUNAPI/%1").arg(getChannel()));
 
-        const auto bypassSupportResult = sharedContext()->isBypassSupported();
-        if (!bypassSupportResult)
-            return bypassSupportResult.diagnostics;
-
-        m_isBypassSupported = bypassSupportResult.value && !ini().disableBypass;
-
         m_isChannelConnectedViaSunapi = sunapiSupportAttribute != boost::none
             && sunapiSupportAttribute.get();
+
+        initBypass();
 
         if (isBypassSupported())
         {
@@ -1020,6 +1017,42 @@ CameraDiagnostics::Result HanwhaResource::initSystem()
             handleProxiedDeviceInfo(proxiedDeviceInfo);
         }
     }
+
+    return CameraDiagnostics::NoErrorResult();
+}
+
+CameraDiagnostics::Result HanwhaResource::initBypass()
+{
+    if (ini().disableBypass)
+    {
+        NX_WARNING(this, lit("Bypass is disabled via hanwha.ini config"));
+        m_isBypassSupported = false;
+        return CameraDiagnostics::NoErrorResult();
+    }
+
+    const auto resData = qnStaticCommon->dataPool()->data(toSharedPointer(this));
+    const auto bypassOverride = resData.value<HanwhaBypassSupportType>(
+        kHanwhaBypassOverrideParameterName,
+        HanwhaBypassSupportType::normal);
+
+    if (bypassOverride == HanwhaBypassSupportType::forced)
+    {
+        m_isBypassSupported = true;
+        return CameraDiagnostics::NoErrorResult();
+    }
+    else if (bypassOverride == HanwhaBypassSupportType::disabled)
+    {
+        m_isBypassSupported = false;
+        return CameraDiagnostics::NoErrorResult();
+    }
+
+    const auto bypassSupportResult = sharedContext()->isBypassSupported();
+    if (!bypassSupportResult)
+        return bypassSupportResult.diagnostics;
+
+    const HanwhaFirmware firmware(getFirmware());
+    m_isBypassSupported = bypassSupportResult.value
+        && firmware > HanwhaFirmware(kHanwhaMinimalBypassFirmware);
 
     return CameraDiagnostics::NoErrorResult();
 }

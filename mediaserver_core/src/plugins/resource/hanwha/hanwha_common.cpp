@@ -11,3 +11,9 @@ QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(nx::mediaserver_core::plugins, HanwhaD
     (nx::mediaserver_core::plugins::HanwhaDeviceType::decoder, "Decoder")
     (nx::mediaserver_core::plugins::HanwhaDeviceType::hybrid, "Hybrid")
 );
+
+QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(nx::mediaserver_core::plugins, HanwhaBypassSupportType,
+    (nx::mediaserver_core::plugins::HanwhaBypassSupportType::normal, "normal")
+    (nx::mediaserver_core::plugins::HanwhaBypassSupportType::forced, "forced")
+    (nx::mediaserver_core::plugins::HanwhaBypassSupportType::disabled, "disabled")
+);
