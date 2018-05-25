@@ -88,7 +88,6 @@ export class ShareModalContent {
 
     doShare() {
         this.user.role = this.selectedPermission;
-        console.log(this.user);
         return this.system.saveUser(this.user, this.user.role);
     }
 

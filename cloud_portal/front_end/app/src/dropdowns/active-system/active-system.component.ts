@@ -39,17 +39,10 @@ export class NxActiveSystemDropdown implements OnInit, OnDestroy, OnChanges {
     }
 
     ngOnInit(): void {
-        // this.params = this.route.queryParams.subscribe((params: Params) => {
-        //     this.routeSystemId = params['systemId'];
-        //     console.log(this.route.queryParams);
-        // });
-
-        // this.activeSystem = this.system;
         this.updateActive();
     }
 
     ngOnDestroy() {
-        // this.params.unsubscribe();
     }
 
     ngOnChanges(changes: SimpleChanges) {

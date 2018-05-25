@@ -54,7 +54,6 @@
         });
 
         $scope.changePassword = process.init(function () {
-            console.log('changePassword');
             return cloudApi.changePassword($scope.pass.newPassword, $scope.pass.password);
         }, {
             errorCodes        : {
