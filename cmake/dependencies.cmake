@@ -40,10 +40,6 @@ if(WIN32)
     set(nxKitLibraryType "SHARED" CACHE STRING "" FORCE)
 endif()
 
-if(customWebAdminPackageDirectory)
-    nx_copy_package(${customWebAdminPackageDirectory})
-endif()
-
 include(${cmake_include_file})
 
 foreach(package_dir ${synched_package_dirs})
