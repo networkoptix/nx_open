@@ -1,6 +1,6 @@
 set(depends
     mediaserver
-    root_tool
+    # root_tool
     server_plugins
     testcamera
 )

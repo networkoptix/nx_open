@@ -8,8 +8,8 @@ installDeb()
 {
     if [ "$(whoami)" == root ]; then
         dpkg -i "$1"
-    else
-        "/opt/@deb.customization.company.name@/mediaserver/bin/root_tool" install "$1"
+    # else
+    #     "/opt/@deb.customization.company.name@/mediaserver/bin/root_tool" install "$1"
     fi
 }
 

@@ -173,7 +173,7 @@ buildDistribution()
 
     echo "Copying mediaserver binaries and scripts"
     install -m 755 $SERVER_BIN_PATH/mediaserver $BINSTAGE/mediaserver-bin
-    install -m 750 $SERVER_BIN_PATH/root_tool $BINSTAGE
+    # install -m 750 $SERVER_BIN_PATH/root_tool $BINSTAGE
     install -m 755 $SERVER_BIN_PATH/testcamera $BINSTAGE
     install -m 755 $SERVER_BIN_PATH/external.dat $BINSTAGE
     install -m 755 $SCRIPTS_PATH/config_helper.py $BINSTAGE
