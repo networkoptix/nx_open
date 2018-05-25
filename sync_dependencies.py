@@ -2,6 +2,7 @@
 
 
 from __future__ import print_function
+import os
 import sys
 import argparse
 from rdep import Rdep
@@ -16,6 +17,7 @@ def determine_package_versions(
     debug=False
 ):
     v = {
+        "gcc": "7.3.0",
         "qt": "5.6.2",
         "boost": "1.66.0",
         "openssl": "1.0.2e",
@@ -47,6 +49,12 @@ def determine_package_versions(
         v["festival-vox"] = "2.4"
         v["sysroot"] = "xenial"
         v["ffmpeg"] = "3.1.9"
+
+    if platform == "linux" and box != "none":
+        if box == "tx1":
+            v["gcc"] = "7.2.0"
+        else:
+            v["gcc"] = "linaro-7.2.1"
 
     if platform == "macosx":
         v["qt"] = "5.6.3"
@@ -108,6 +116,14 @@ def sync_dependencies(syncher, platform, arch, box, release_version):
 
     sync = syncher.sync
 
+    if platform == "linux":
+        sync("linux-%s/gcc" % arch)
+    elif platform == "android":
+        if "ANDROID_HOME" not in os.environ:
+            sync("android/android-sdk")
+        if "ANDROID_NDK" not in os.environ:
+            sync("android/android-ndk-r17")
+
     sync("qt", path_variable="QT_DIR")
     sync("any/boost")
 
@@ -122,6 +138,10 @@ def sync_dependencies(syncher, platform, arch, box, release_version):
 
     if platform == "linux" and box in ("bpi", "bananapi", "rpi", "tx1", "none"):
         sync("sysroot", path_variable="sysroot_directory")
+
+    if box  == "edge1":
+        sync("linux-arm/glib-2.0")
+        sync("linux-arm/zlib-1.2")
 
     if box in ("bpi", "bananapi"):
         sync("opengl-es-mali")
