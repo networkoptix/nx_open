@@ -177,11 +177,9 @@
 #include "ui/widgets/palette_widget.h"
 #include "network/authutil.h"
 #include <core/resource/fake_media_server.h>
+#include <ini.h>
 
 namespace {
-
-/* Beta version message. */
-static const QString kBetaVersionShowOnceKey(lit("BetaVersion"));
 
 /* Asking for update all outdated servers to the last version. */
 static const QString kVersionMismatchShowOnceKey(lit("VersionMismatch"));
@@ -2225,19 +2223,16 @@ void ActionHandler::at_betaVersionMessageAction_triggered()
     if (context()->closingDown())
         return;
 
-    if (qnClientShowOnce->testFlag(kBetaVersionShowOnceKey))
+    if (ini().ignoreBetaWarning)
         return;
 
-    QnMessageBox dialog(QnMessageBoxIcon::Information,
+    QnMessageBox dialog(QnMessageBoxIcon::Warning,
         tr("Beta version %1").arg(QnAppInfo::applicationVersion()),
-        tr("Some functionality may be unavailable or not working properly."),
+        tr("Warning! This build is for testing purposes only! "
+            "Please upgrade to a next available patch or release version once available."),
         QDialogButtonBox::Ok, QDialogButtonBox::Ok, mainWindow());
 
-    dialog.setCheckBoxEnabled();
     dialog.exec();
-
-    if (dialog.isChecked())
-        qnClientShowOnce->setFlag(kBetaVersionShowOnceKey);
 }
 
 void ActionHandler::checkIfStatisticsReportAllowed() {
