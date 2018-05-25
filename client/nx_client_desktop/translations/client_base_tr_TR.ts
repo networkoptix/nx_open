@@ -4526,7 +4526,7 @@ to %1</source>
     </message>
     <message>
       <source>Length of time each camera on layout will be displayed if you start a Tour.</source>
-      <translation type="unfinished">Length of time each camera on layout will be displayed if you start a Tour.</translation>
+      <translation>Bir Tur başlatırsanız, düzen üzerindeki her kameranın uzunluğu görüntülenir.</translation>
     </message>
   </context>
   <context>

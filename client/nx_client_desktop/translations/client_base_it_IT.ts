@@ -4527,7 +4527,7 @@ to %1</source>
     </message>
     <message>
       <source>Length of time each camera on layout will be displayed if you start a Tour.</source>
-      <translation type="unfinished">Length of time each camera on layout will be displayed if you start a Tour.</translation>
+      <translation>Tempo di visualizzazione di ciascuna telecamera sul layout se si avvia un tour.</translation>
     </message>
   </context>
   <context>
