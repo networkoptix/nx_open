@@ -100,7 +100,7 @@
            </property>
            <layout class="QVBoxLayout" name="scheduleGridLayout">
             <item>
-             <widget class="QnScheduleGridWidget" name="gridWidget" native="true">
+             <widget class="nx::client::desktop::ScheduleGridWidget" name="gridWidget" native="true">
               <property name="enabled">
                <bool>true</bool>
               </property>
@@ -890,15 +890,15 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>QnScheduleGridWidget</class>
+   <class>nx::client::desktop::ScheduleGridWidget</class>
    <extends>QWidget</extends>
-   <header location="global">ui/widgets/properties/schedule_grid_widget.h</header>
+   <header location="global">nx/client/desktop/resource_properties/camera/widgets/schedule_grid_widget.h</header>
    <container>1</container>
   </customwidget>
   <customwidget>
    <class>QnLicensesUsageWidget</class>
    <extends>QWidget</extends>
-   <header location="global">ui/widgets/licensing/licenses_usage_widget.h</header>
+   <header location="global">nx/client/desktop/resource_properties/camera/legacy/licenses_usage_widget.h</header>
    <container>1</container>
   </customwidget>
   <customwidget>
@@ -909,7 +909,7 @@
   <customwidget>
    <class>QnArchiveLengthWidget</class>
    <extends>QWidget</extends>
-   <header location="global">ui/widgets/properties/legacy_archive_length_widget.h</header>
+   <header location="global">nx/client/desktop/resource_properties/camera/legacy/legacy_archive_length_widget.h</header>
    <container>1</container>
   </customwidget>
   <customwidget>

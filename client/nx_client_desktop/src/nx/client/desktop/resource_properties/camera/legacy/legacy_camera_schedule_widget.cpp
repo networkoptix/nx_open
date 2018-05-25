@@ -1,30 +1,21 @@
 #include "legacy_camera_schedule_widget.h"
 #include "ui_legacy_camera_schedule_widget.h"
+#include "legacy_archive_length_widget.h"
+#include "../export_schedule_resource_selection_dialog_delegate.h"
 
 #include <QtCore/QCoreApplication>
 #include <QtCore/QScopedValueRollback>
 #include <QtWidgets/QListView>
 
+#include <camera/fps_calculator.h>
 #include <core/resource_management/resource_pool.h>
 #include <core/resource_management/resources_changes_manager.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/device_dependent_strings.h>
 #include <core/resource/media_server_resource.h>
 #include <core/misc/schedule_task.h>
-#include <nx/vms/api/data/camera_attributes_data.h>
-
-#include <camera/fps_calculator.h>
-
 #include <licensing/license.h>
-
 #include <text/time_strings.h>
-
-#include <nx/client/desktop/ui/actions/action_manager.h>
-#include <nx/client/desktop/common/utils/checkbox_utils.h>
-#include <nx/client/desktop/common/widgets/hint_button.h>
-#include <nx/client/desktop/common/utils/aligner.h>
-#include <nx/client/desktop/common/utils/stream_quality_strings.h>
-
 #include <ui/common/palette.h>
 #include <ui/common/read_only.h>
 #include <ui/dialogs/resource_selection_dialog.h>
@@ -35,17 +26,20 @@
 #include <ui/style/skin.h>
 #include <ui/workaround/widgets_signals_workaround.h>
 #include <ui/widgets/common/snapped_scrollbar.h>
-#include <ui/widgets/properties/legacy_archive_length_widget.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_access_controller.h>
-
+#include <utils/camera/camera_bitrate_calculator.h>
 #include <utils/common/event_processors.h>
 #include <utils/math/color_transformations.h>
 #include <utils/math/math.h>
 #include <utils/license_usage_helper.h>
 
-#include "export_schedule_resource_selection_dialog_delegate.h"
-#include <utils/camera/camera_bitrate_calculator.h>
+#include <nx/vms/api/data/camera_attributes_data.h>
+#include <nx/client/desktop/ui/actions/action_manager.h>
+#include <nx/client/desktop/common/utils/checkbox_utils.h>
+#include <nx/client/desktop/common/widgets/hint_button.h>
+#include <nx/client/desktop/common/utils/aligner.h>
+#include <nx/client/desktop/common/utils/stream_quality_strings.h>
 #include <nx/utils/algorithm/same.h>
 
 using boost::algorithm::all_of;
@@ -185,7 +179,7 @@ LegacyCameraScheduleWidget::LegacyCameraScheduleWidget(QWidget* parent, bool sna
             emit hasChangesChanged();
         };
 
-    connect(ui->gridWidget, &QnScheduleGridWidget::cellValuesChanged,
+    connect(ui->gridWidget, &ScheduleGridWidget::cellValuesChanged,
         this, handleCellValuesChanged);
     connect(ui->recordAlwaysButton, &QToolButton::toggled, this,
         &LegacyCameraScheduleWidget::updateGridParams);
@@ -223,7 +217,7 @@ LegacyCameraScheduleWidget::LegacyCameraScheduleWidget(QWidget* parent, bool sna
     connect(ui->enableRecordingCheckBox, &QCheckBox::stateChanged, this,
         notifyAboutScheduleEnabledChanged);
 
-    connect(ui->gridWidget, &QnScheduleGridWidget::cellActivated, this,
+    connect(ui->gridWidget, &ScheduleGridWidget::cellActivated, this,
         &LegacyCameraScheduleWidget::at_gridWidget_cellActivated);
 
     connect(ui->exportScheduleButton, &QPushButton::clicked, this,
@@ -736,7 +730,7 @@ QnScheduleTaskList LegacyCameraScheduleWidget::scheduleTasks() const
         for (int col = 0; col < ui->gridWidget->columnCount();)
         {
             const QPoint cell(col, row);
-            const QnScheduleGridWidget::CellParams params = ui->gridWidget->cellValue(cell);
+            const ScheduleGridWidget::CellParams params = ui->gridWidget->cellValue(cell);
 
             Qn::RecordingType recordType = params.recordingType;
             Qn::StreamQuality streamQuality = Qn::StreamQuality::highest;
@@ -832,7 +826,7 @@ void LegacyCameraScheduleWidget::setScheduleTasks(const QnScheduleTaskList& valu
         for (int col = task.startTime / 3600; col < task.endTime / 3600; ++col)
         {
             const QPoint cell(col, row);
-            QnScheduleGridWidget::CellParams params;
+            ScheduleGridWidget::CellParams params;
             params.recordingType = task.recordingType;
             params.quality = quality;
             params.fps = task.fps;
@@ -892,7 +886,7 @@ void LegacyCameraScheduleWidget::updateGridParams(bool pickedFromGrid)
 
     if (!(isReadOnly() && pickedFromGrid))
     {
-        QnScheduleGridWidget::CellParams brush;
+        ScheduleGridWidget::CellParams brush;
         brush.recordingType = recordType;
 
         if (ui->noRecordButton->isChecked())

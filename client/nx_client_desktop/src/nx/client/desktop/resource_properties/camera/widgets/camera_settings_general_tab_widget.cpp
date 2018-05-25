@@ -42,7 +42,7 @@ CameraSettingsGeneralTabWidget::~CameraSettingsGeneralTabWidget()
 
 void CameraSettingsGeneralTabWidget::loadState(const CameraSettingsDialogState& state)
 {
-    ui->licensingWidget->setVisible(false);
+//    ui->licensingWidget->setVisible(false); // TODO: #vkutin Replace with a new licensing panel.
     ui->overLicensingLine->setVisible(false);
 
     const bool allWearableCameras =

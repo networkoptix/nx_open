@@ -1,5 +1,7 @@
 #include "single_camera_settings_widget.h"
 #include "ui_single_camera_settings_widget.h"
+#include "legacy_camera_schedule_widget.h"
+#include "legacy_camera_motion_mask_widget.h"
 
 #include <QtCore/QBuffer>
 #include <QtCore/QUrl>
@@ -8,11 +10,8 @@
 #include <QtCore/QScopedValueRollback>
 #include <QtGui/QDesktopServices>
 
-#include <client/client_settings.h>
-
-#include <nx/client/desktop/image_providers/camera_thumbnail_manager.h>
 #include <camera/fps_calculator.h>
-
+#include <client/client_settings.h>
 #include <core/resource/resource.h>
 #include <core/resource/device_dependent_strings.h>
 #include <core/resource/camera_resource.h>
@@ -21,38 +20,29 @@
 #include <core/resource/media_resource.h>
 #include <core/resource_management/resource_pool.h>
 #include <core/misc/schedule_task.h>
-
-#include <nx/client/desktop/ui/actions/action_parameters.h>
-#include <nx/client/desktop/ui/actions/action_manager.h>
-#include <nx/client/core/utils/geometry.h>
-#include <nx/client/desktop/common/utils/aligner.h>
 #include <ui/common/read_only.h>
-
-
 #include <ui/graphics/items/resource/resource_widget.h>
 #include <ui/graphics/items/resource/media_resource_widget.h>
-
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
 #include <ui/style/custom_style.h>
-
-#include <nx/client/desktop/common/widgets/selectable_button.h>
-
 #include <ui/workbench/workbench.h>
 #include <ui/workbench/workbench_access_controller.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_display.h>
 #include <ui/workbench/workbench_item.h>
-
 #include <ui/workaround/widgets_signals_workaround.h>
-
 #include <utils/common/scoped_painter_rollback.h>
 #include <utils/common/delayed.h>
 #include <utils/common/html.h>
 #include <utils/license_usage_helper.h>
 
-#include "legacy_camera_schedule_widget.h"
-#include "legacy_camera_motion_mask_widget.h"
+#include <nx/client/core/utils/geometry.h>
+#include <nx/client/desktop/ui/actions/action_parameters.h>
+#include <nx/client/desktop/ui/actions/action_manager.h>
+#include <nx/client/desktop/common/utils/aligner.h>
+#include <nx/client/desktop/common/widgets/selectable_button.h>
+#include <nx/client/desktop/image_providers/camera_thumbnail_manager.h>
 
 using nx::client::core::Geometry;
 

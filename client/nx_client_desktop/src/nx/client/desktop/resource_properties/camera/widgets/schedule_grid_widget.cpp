@@ -3,23 +3,21 @@
 #include <cassert>
 
 #include <QtCore/QDate>
-
 #include <QtGui/QPainter>
 #include <QtGui/QMouseEvent>
-
 #include <QtWidgets/QApplication>
 
 #include <client/client_settings.h>
-
 #include <core/resource/media_resource.h>
-
-#include <nx/client/desktop/common/utils/stream_quality_strings.h>
-
 #include <utils/common/scoped_painter_rollback.h>
 #include <ui/style/globals.h>
 #include <ui/style/helper.h>
 
-using namespace nx::client::desktop;
+#include <nx/client/desktop/common/utils/stream_quality_strings.h>
+
+namespace nx {
+namespace client {
+namespace desktop {
 
 namespace {
 
@@ -36,7 +34,7 @@ static constexpr auto kStreamQualityCount = 7;
 
 } // anonymous namespace
 
-QnScheduleGridWidget::QnScheduleGridWidget(QWidget* parent):
+ScheduleGridWidget::ScheduleGridWidget(QWidget* parent):
     QWidget(parent)
 {
     resetCellValues();
@@ -55,9 +53,9 @@ QnScheduleGridWidget::QnScheduleGridWidget(QWidget* parent):
     m_labelsFont = font();
 }
 
-QnScheduleGridWidget::~QnScheduleGridWidget() = default;
+ScheduleGridWidget::~ScheduleGridWidget() = default;
 
-int QnScheduleGridWidget::cellSize() const
+int ScheduleGridWidget::cellSize() const
 {
     if (m_cellSize < 0)
         m_cellSize = calculateCellSize(true);
@@ -65,7 +63,7 @@ int QnScheduleGridWidget::cellSize() const
     return m_cellSize;
 }
 
-int QnScheduleGridWidget::calculateCellSize(bool headersCalculated) const
+int ScheduleGridWidget::calculateCellSize(bool headersCalculated) const
 {
     if (headersCalculated)
     {
@@ -79,7 +77,7 @@ int QnScheduleGridWidget::calculateCellSize(bool headersCalculated) const
     return qMin(cellWidth, cellHeight);
 }
 
-void QnScheduleGridWidget::initMetrics()
+void ScheduleGridWidget::initMetrics()
 {
     // determine labels font size
     m_labelsFont.setPointSizeF(kMinimumLabelsFontSize);
@@ -153,7 +151,7 @@ void QnScheduleGridWidget::initMetrics()
     }
 }
 
-QSize QnScheduleGridWidget::minimumSizeHint() const
+QSize ScheduleGridWidget::minimumSizeHint() const
 {
     QSize sz;
 
@@ -170,7 +168,7 @@ QSize QnScheduleGridWidget::minimumSizeHint() const
     return sz.expandedTo(QApplication::globalStrut());
 }
 
-QRectF QnScheduleGridWidget::horizontalHeaderCell(int x) const
+QRectF ScheduleGridWidget::horizontalHeaderCell(int x) const
 {
     qreal cellSize = this->cellSize();
     return QRectF(
@@ -180,7 +178,7 @@ QRectF QnScheduleGridWidget::horizontalHeaderCell(int x) const
         m_cornerSize.height());
 }
 
-QRectF QnScheduleGridWidget::verticalHeaderCell(int y) const
+QRectF ScheduleGridWidget::verticalHeaderCell(int y) const
 {
     qreal cellSize = this->cellSize();
     return QRectF(
@@ -190,7 +188,7 @@ QRectF QnScheduleGridWidget::verticalHeaderCell(int y) const
         cellSize);
 }
 
-QRectF QnScheduleGridWidget::cornerHeaderCell() const
+QRectF ScheduleGridWidget::cornerHeaderCell() const
 {
     return QRectF(
         m_gridLeftOffset - m_cornerSize.width(),
@@ -199,7 +197,7 @@ QRectF QnScheduleGridWidget::cornerHeaderCell() const
         m_cornerSize.height());
 }
 
-void QnScheduleGridWidget::paintEvent(QPaintEvent* event)
+void ScheduleGridWidget::paintEvent(QPaintEvent* event)
 {
     Q_UNUSED(event);
     QPainter p(this);
@@ -342,13 +340,13 @@ void QnScheduleGridWidget::paintEvent(QPaintEvent* event)
         paintFunctions.paintSelection(&p, m_selectedRect);
 }
 
-void QnScheduleGridWidget::resizeEvent(QResizeEvent *event)
+void ScheduleGridWidget::resizeEvent(QResizeEvent *event)
 {
     QWidget::resizeEvent(event);
     initMetrics();
 }
 
-void QnScheduleGridWidget::leaveEvent(QEvent* event)
+void ScheduleGridWidget::leaveEvent(QEvent* event)
 {
     Q_UNUSED(event);
     m_mouseMovePos = QPoint(-1, -1);
@@ -357,7 +355,7 @@ void QnScheduleGridWidget::leaveEvent(QEvent* event)
     update();
 }
 
-void QnScheduleGridWidget::mouseMoveEvent(QMouseEvent* event)
+void ScheduleGridWidget::mouseMoveEvent(QMouseEvent* event)
 {
     m_mouseMovePos = event->pos();
     if (m_mousePressed && (event->pos() - m_mousePressPos).manhattanLength() >= QApplication::startDragDistance())
@@ -375,7 +373,7 @@ void QnScheduleGridWidget::mouseMoveEvent(QMouseEvent* event)
         updateSelectedCellsRect();
 }
 
-QPoint QnScheduleGridWidget::mapToGrid(const QPoint& pos, bool doTruncate) const
+QPoint ScheduleGridWidget::mapToGrid(const QPoint& pos, bool doTruncate) const
 {
     qreal cellSize = this->cellSize();
     int cellX = (pos.x() - m_gridLeftOffset) / cellSize;
@@ -396,7 +394,7 @@ QPoint QnScheduleGridWidget::mapToGrid(const QPoint& pos, bool doTruncate) const
     return QPoint(-2, -2);
 }
 
-void QnScheduleGridWidget::mousePressEvent(QMouseEvent* event)
+void ScheduleGridWidget::mousePressEvent(QMouseEvent* event)
 {
     QPoint cell = mapToGrid(event->pos(), false);
     if (event->modifiers() & Qt::AltModifier)
@@ -418,7 +416,7 @@ void QnScheduleGridWidget::mousePressEvent(QMouseEvent* event)
     setActive(true);
 }
 
-void QnScheduleGridWidget::mouseReleaseEvent(QMouseEvent* event)
+void ScheduleGridWidget::mouseReleaseEvent(QMouseEvent* event)
 {
     if (m_mousePressed)
     {
@@ -454,7 +452,7 @@ void QnScheduleGridWidget::mouseReleaseEvent(QMouseEvent* event)
     update();
 }
 
-void QnScheduleGridWidget::setShowFps(bool value)
+void ScheduleGridWidget::setShowFps(bool value)
 {
     if (m_showFps == value)
         return;
@@ -464,7 +462,7 @@ void QnScheduleGridWidget::setShowFps(bool value)
     update();
 }
 
-void QnScheduleGridWidget::setShowQuality(bool value)
+void ScheduleGridWidget::setShowQuality(bool value)
 {
     if (m_showQuality == value)
         return;
@@ -474,7 +472,7 @@ void QnScheduleGridWidget::setShowQuality(bool value)
     update();
 }
 
-void QnScheduleGridWidget::handleCellClicked(const QPoint& cell)
+void ScheduleGridWidget::handleCellClicked(const QPoint& cell)
 {
     if (cell.x() == -1 && cell.y() == -1)
     {
@@ -498,7 +496,7 @@ void QnScheduleGridWidget::handleCellClicked(const QPoint& cell)
     }
 }
 
-void QnScheduleGridWidget::updateCellValueInternal(const QPoint& cell)
+void ScheduleGridWidget::updateCellValueInternal(const QPoint& cell)
 {
     NX_ASSERT(isValidCell(cell));
 
@@ -506,7 +504,7 @@ void QnScheduleGridWidget::updateCellValueInternal(const QPoint& cell)
     update();
 }
 
-void QnScheduleGridWidget::setCellValue(const QPoint& cell, const CellParams& value)
+void ScheduleGridWidget::setCellValue(const QPoint& cell, const CellParams& value)
 {
     NX_ASSERT(isValidCell(cell));
 
@@ -522,17 +520,17 @@ void QnScheduleGridWidget::setCellValue(const QPoint& cell, const CellParams& va
     emit cellValueChanged(cell);
 }
 
-QnScheduleGridWidget::CellParams QnScheduleGridWidget::brush() const
+ScheduleGridWidget::CellParams ScheduleGridWidget::brush() const
 {
     return m_brushParams;
 }
 
-void QnScheduleGridWidget::setBrush(const CellParams& params)
+void ScheduleGridWidget::setBrush(const CellParams& params)
 {
     m_brushParams = params;
 }
 
-QnScheduleGridWidget::CellParams QnScheduleGridWidget::cellValue(const QPoint& cell) const
+ScheduleGridWidget::CellParams ScheduleGridWidget::cellValue(const QPoint& cell) const
 {
     NX_ASSERT(isValidCell(cell));
     if (!isValidCell(cell))
@@ -541,7 +539,7 @@ QnScheduleGridWidget::CellParams QnScheduleGridWidget::cellValue(const QPoint& c
     return m_gridParams[cell.x()][cell.y()];
 }
 
-void QnScheduleGridWidget::resetCellValues()
+void ScheduleGridWidget::resetCellValues()
 {
     CellParams emptyParams;
     emptyParams.fps = 0;
@@ -555,12 +553,12 @@ void QnScheduleGridWidget::resetCellValues()
     emit cellValuesChanged();
 }
 
-bool QnScheduleGridWidget::isReadOnly() const
+bool ScheduleGridWidget::isReadOnly() const
 {
     return m_readOnly;
 }
 
-void QnScheduleGridWidget::setReadOnly(bool readOnly)
+void ScheduleGridWidget::setReadOnly(bool readOnly)
 {
     if (m_readOnly == readOnly)
         return;
@@ -568,12 +566,12 @@ void QnScheduleGridWidget::setReadOnly(bool readOnly)
     m_readOnly = readOnly;
 }
 
-bool QnScheduleGridWidget::isActive() const
+bool ScheduleGridWidget::isActive() const
 {
     return m_active;
 }
 
-void QnScheduleGridWidget::setActive(bool value)
+void ScheduleGridWidget::setActive(bool value)
 {
     if (m_active == value)
         return;
@@ -581,22 +579,22 @@ void QnScheduleGridWidget::setActive(bool value)
     update();
 }
 
-bool QnScheduleGridWidget::isValidCell(const QPoint& cell) const
+bool ScheduleGridWidget::isValidCell(const QPoint& cell) const
 {
     return isValidColumn(cell.x()) && isValidRow(cell.y());
 }
 
-bool QnScheduleGridWidget::isValidRow(int row) const
+bool ScheduleGridWidget::isValidRow(int row) const
 {
     return row >= 0 && row < rowCount();
 }
 
-bool QnScheduleGridWidget::isValidColumn(int column) const
+bool ScheduleGridWidget::isValidColumn(int column) const
 {
     return column >= 0 && column < columnCount();
 }
 
-void QnScheduleGridWidget::setMaxFps(int maxFps, int maxDualStreamFps)
+void ScheduleGridWidget::setMaxFps(int maxFps, int maxDualStreamFps)
 {
     for (int x = 0; x < columnCount(); ++x)
     {
@@ -618,7 +616,7 @@ void QnScheduleGridWidget::setMaxFps(int maxFps, int maxDualStreamFps)
     }
 }
 
-int QnScheduleGridWidget::getMaxFps(bool motionPlusLqOnly)
+int ScheduleGridWidget::getMaxFps(bool motionPlusLqOnly)
 {
     int fps = 0;
     for (int x = 0; x < columnCount(); ++x)
@@ -639,18 +637,18 @@ int QnScheduleGridWidget::getMaxFps(bool motionPlusLqOnly)
     return fps;
 }
 
-const QnScheduleGridColors &QnScheduleGridWidget::colors() const
+const QnScheduleGridColors &ScheduleGridWidget::colors() const
 {
     return m_colors;
 }
 
-void QnScheduleGridWidget::setColors(const QnScheduleGridColors& colors)
+void ScheduleGridWidget::setColors(const QnScheduleGridColors& colors)
 {
     m_colors = colors;
     update();
 }
 
-void QnScheduleGridWidget::updateSelectedCellsRect()
+void ScheduleGridWidget::updateSelectedCellsRect()
 {
     QPoint topLeft = mapToGrid(m_mousePressPos, true);
     QPoint bottomRight = mapToGrid(m_mouseMovePos, true);
@@ -663,3 +661,7 @@ void QnScheduleGridWidget::updateSelectedCellsRect()
 
     m_selectedCellsRect = QRect(topLeft, bottomRight);
 }
+
+} // namespace desktop
+} // namespace client
+} // namespace nx

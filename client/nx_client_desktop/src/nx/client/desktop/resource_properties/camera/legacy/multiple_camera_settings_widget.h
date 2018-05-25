@@ -1,21 +1,20 @@
 #pragma once
 
 #include <QtWidgets/QWidget>
-#include "api/media_server_connection.h"
+
+#include <api/media_server_connection.h>
 #include <core/resource/resource_fwd.h>
-#include "ui/workbench/workbench_context_aware.h"
+#include <ui/workbench/workbench_context_aware.h>
 
-#include "camera_settings_tab.h"
+#include <nx/client/desktop/resource_properties/camera/camera_settings_tab.h>
 
-namespace Ui {
-class MultipleCameraSettingsWidget;
-}
+namespace Ui { class MultipleCameraSettingsWidget; }
 
 namespace nx {
 namespace client {
 namespace desktop {
 
-class MultipleCameraSettingsWidget :
+class MultipleCameraSettingsWidget:
     public QWidget,
     public QnWorkbenchContextAware
 {

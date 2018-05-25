@@ -694,7 +694,7 @@
   <customwidget>
    <class>QnArchiveLengthWidget</class>
    <extends>QWidget</extends>
-   <header location="global">ui/widgets/properties/legacy_archive_length_widget.h</header>
+   <header location="global">nx/client/desktop/resource_properties/camera/legacy/legacy_archive_length_widget.h</header>
    <container>1</container>
   </customwidget>
   <customwidget>
@@ -711,19 +711,19 @@
   <customwidget>
    <class>nx::client::desktop::LegacyExpertSettingsWidget</class>
    <extends>QWidget</extends>
-   <header location="global">nx/client/desktop/resource_properties/camera/legacy_expert_settings_widget.h</header>
+   <header location="global">nx/client/desktop/resource_properties/camera/legacy/legacy_expert_settings_widget.h</header>
    <container>1</container>
   </customwidget>
   <customwidget>
    <class>nx::client::desktop::LegacyImageControlWidget</class>
    <extends>QWidget</extends>
-   <header location="global">nx/client/desktop/resource_properties/camera/legacy_image_control_widget.h</header>
+   <header location="global">nx/client/desktop/resource_properties/camera/legacy/legacy_image_control_widget.h</header>
    <container>1</container>
   </customwidget>
   <customwidget>
    <class>nx::client::desktop::LegacyIoPortSettingsWidget</class>
    <extends>QWidget</extends>
-   <header location="global">nx/client/desktop/resource_properties/camera/legacy_ioport_settings_widget.h</header>
+   <header location="global">nx/client/desktop/resource_properties/camera/legacy/legacy_ioport_settings_widget.h</header>
    <container>1</container>
   </customwidget>
   <customwidget>
@@ -735,31 +735,31 @@
   <customwidget>
    <class>QnLicensesProposeWidget</class>
    <extends>QWidget</extends>
-   <header location="global">ui/widgets/licensing/licenses_propose_widget.h</header>
+   <header location="global">nx/client/desktop/resource_properties/camera/legacy/licenses_propose_widget.h</header>
    <container>1</container>
   </customwidget>
   <customwidget>
    <class>nx::client::desktop::LegacyCameraScheduleWidget</class>
    <extends>QWidget</extends>
-   <header location="global">nx/client/desktop/resource_properties/camera/legacy_camera_schedule_widget.h</header>
+   <header location="global">nx/client/desktop/resource_properties/camera/legacy/legacy_camera_schedule_widget.h</header>
    <container>1</container>
   </customwidget>
   <customwidget>
    <class>QnWearableUploadWidget</class>
    <extends>QWidget</extends>
-   <header location="global">ui/widgets/properties/legacy_wearable_upload_widget.h</header>
+   <header location="global">nx/client/desktop/resource_properties/camera/legacy/legacy_wearable_upload_widget.h</header>
    <container>1</container>
   </customwidget>
   <customwidget>
    <class>QnWearableProgressWidget</class>
    <extends>QWidget</extends>
-   <header location="global">ui/widgets/properties/legacy_wearable_progress_widget.h</header>
+   <header location="global">nx/client/desktop/resource_properties/camera/legacy/legacy_wearable_progress_widget.h</header>
    <container>1</container>
   </customwidget>
   <customwidget>
    <class>QnWearableMotionWidget</class>
    <extends>QWidget</extends>
-   <header location="global">ui/widgets/properties/wearable_motion_widget.h</header>
+   <header location="global">nx/client/desktop/resource_properties/camera/legacy/legacy_wearable_motion_widget.h</header>
    <container>1</container>
   </customwidget>
   <customwidget>

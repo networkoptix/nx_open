@@ -13,7 +13,11 @@
 #include <nx/client/desktop/resource_properties/camera/utils/schedule_paint_functions.h>
 #include <nx/client/desktop/resource_properties/camera/utils/schedule_cell_params.h>
 
-class QnScheduleGridWidget : public QWidget
+namespace nx {
+namespace client {
+namespace desktop {
+
+class ScheduleGridWidget: public QWidget
 {
     Q_OBJECT
     Q_PROPERTY(bool readOnly READ isReadOnly WRITE setReadOnly)
@@ -25,8 +29,8 @@ class QnScheduleGridWidget : public QWidget
 public:
     using CellParams = nx::client::desktop::ScheduleCellParams;
 
-    explicit QnScheduleGridWidget(QWidget* parent = nullptr);
-    virtual ~QnScheduleGridWidget();
+    explicit ScheduleGridWidget(QWidget* parent = nullptr);
+    virtual ~ScheduleGridWidget();
 
     void setShowFps(bool value);
     void setShowQuality(bool value);
@@ -123,3 +127,7 @@ private:
 
     mutable int m_cellSize = -1;
 };
+
+} // namespace desktop
+} // namespace client
+} // namespace nx

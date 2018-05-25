@@ -3,10 +3,9 @@
 #include <QtWidgets/QDialogButtonBox>
 
 #include <core/resource/resource_fwd.h>
-
 #include <ui/dialogs/common/session_aware_dialog.h>
 
-#include "camera_settings_tab.h"
+#include <nx/client/desktop/resource_properties/camera/camera_settings_tab.h>
 
 class QAbstractButton;
 class QnDefaultPasswordAlertBar;
