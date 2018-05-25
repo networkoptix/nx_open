@@ -1,5 +1,6 @@
 set(depends
     mediaserver
+    # The line below will be uncommented when all root_tool related tasks are finished.
     # root_tool
     server_plugins
     testcamera

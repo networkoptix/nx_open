@@ -173,6 +173,7 @@ buildDistribution()
 
     echo "Copying mediaserver binaries and scripts"
     install -m 755 $SERVER_BIN_PATH/mediaserver $BINSTAGE/mediaserver-bin
+    # The line below will be uncommented when all root_tool related tasks are finished.
     # install -m 750 $SERVER_BIN_PATH/root_tool $BINSTAGE
     install -m 755 $SERVER_BIN_PATH/testcamera $BINSTAGE
     install -m 755 $SERVER_BIN_PATH/external.dat $BINSTAGE

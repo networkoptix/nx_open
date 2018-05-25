@@ -8,6 +8,7 @@ installDeb()
 {
     if [ "$(whoami)" == root ]; then
         dpkg -i "$1"
+    # Commented part below will be uncommented when all root_tool related tasks are finished.
     # else
     #     "/opt/@deb.customization.company.name@/mediaserver/bin/root_tool" install "$1"
     fi
