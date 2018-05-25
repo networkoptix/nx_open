@@ -25,7 +25,7 @@ NX_NETWORK_API std::string toString(ProtocolMatchResult detectionResult);
 
 //-------------------------------------------------------------------------------------------------
 
-class AbstractProtocolRule
+class NX_NETWORK_API AbstractProtocolRule
 {
 public:
     virtual ~AbstractProtocolRule() = default;
@@ -33,24 +33,13 @@ public:
     virtual ProtocolMatchResult match(const nx::Buffer& buf) = 0;
 };
 
-class FixedProtocolPrefixRule:
+class NX_NETWORK_API FixedProtocolPrefixRule:
     public AbstractProtocolRule
 {
 public:
-    FixedProtocolPrefixRule(const std::string& prefix):
-        m_prefix(prefix)
-    {
-    }
+    FixedProtocolPrefixRule(const std::string& prefix);
 
-    virtual ProtocolMatchResult match(const nx::Buffer& buf) override
-    {
-        if ((std::size_t) buf.size() < m_prefix.size())
-            return ProtocolMatchResult::needMoreData;
-
-        return strncmp(m_prefix.c_str(), buf.constData(), m_prefix.size()) == 0
-            ? ProtocolMatchResult::detected
-            : ProtocolMatchResult::unknownProtocol;
-    }
+    virtual ProtocolMatchResult match(const nx::Buffer& buf) override;
 
 private:
     const std::string m_prefix;
