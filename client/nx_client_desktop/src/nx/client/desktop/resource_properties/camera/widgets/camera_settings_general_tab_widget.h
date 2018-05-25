@@ -13,6 +13,7 @@ namespace desktop {
 
 struct CameraSettingsDialogState;
 class CameraSettingsDialogStore;
+class AbstractTextProvider;
 
 class CameraSettingsGeneralTabWidget: public QWidget
 {
@@ -21,7 +22,9 @@ class CameraSettingsGeneralTabWidget: public QWidget
 
 public:
     explicit CameraSettingsGeneralTabWidget(
-        CameraSettingsDialogStore* store, QWidget* parent = nullptr);
+        AbstractTextProvider* licenseUsageTextProvider,
+        CameraSettingsDialogStore* store,
+        QWidget* parent = nullptr);
 
     virtual ~CameraSettingsGeneralTabWidget() override;
 

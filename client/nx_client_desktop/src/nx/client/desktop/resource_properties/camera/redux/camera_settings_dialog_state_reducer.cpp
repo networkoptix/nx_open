@@ -417,6 +417,13 @@ State CameraSettingsDialogStateReducer::setSettingsOptimizationEnabled(State sta
     return state;
 }
 
+State CameraSettingsDialogStateReducer::setGlobalPermissions(
+    State state, Qn::GlobalPermissions value)
+{
+    state.globalPermissions = value;
+    return state;
+}
+
 State CameraSettingsDialogStateReducer::setSingleWearableState(
     State state, const WearableState& value)
 {

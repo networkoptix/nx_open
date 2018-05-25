@@ -67,6 +67,12 @@ void CameraSettingsDialogStore::setSettingsOptimizationEnabled(bool value)
         });
 }
 
+void CameraSettingsDialogStore::setGlobalPermissions(Qn::GlobalPermissions value)
+{
+    d->executeAction(
+        [&](State state) { return Reducer::setGlobalPermissions(std::move(state), value); });
+}
+
 void CameraSettingsDialogStore::setSingleWearableState(const WearableState& value)
 {
     d->executeAction(

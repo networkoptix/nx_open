@@ -31,6 +31,7 @@
 #include "watchers/camera_settings_readonly_watcher.h"
 #include "watchers/camera_settings_wearable_state_watcher.h"
 #include "watchers/camera_settings_global_settings_watcher.h"
+#include "watchers/camera_settings_global_permissions_watcher.h"
 
 #include "utils/camera_settings_dialog_state_conversion_functions.h"
 #include <utils/license_usage_helper.h>
@@ -91,41 +92,38 @@ struct CameraSettingsDialog::Private
         store->loadCameras(cameras);
     }
 
-    CameraSettingsGeneralTabWidget* createGeneralTab(CameraSettingsDialog* q)
+    void handleAction(CameraSettingsDialog* q, ui::action::IDType action)
     {
-        auto generalTab = new CameraSettingsGeneralTabWidget(store, q->ui->tabWidget);
-        QObject::connect(generalTab, &CameraSettingsGeneralTabWidget::actionRequested, q,
-            [this, q](ui::action::IDType action)
-            {
-                switch (action)
-                {
-                    case ui::action::PingAction:
-                        NX_ASSERT(store);
-                        q->menu()->trigger(ui::action::PingAction,
-                            {Qn::TextRole, store->state().singleCameraProperties.ipAddress});
-                        break;
+        switch (action)
+        {
+            case ui::action::PingAction:
+                NX_ASSERT(store);
+                q->menu()->trigger(ui::action::PingAction,
+                    {Qn::TextRole, store->state().singleCameraProperties.ipAddress});
+                break;
 
-                    case ui::action::CameraIssuesAction:
-                    case ui::action::CameraBusinessRulesAction:
-                    case ui::action::OpenInNewTabAction:
-                        q->menu()->trigger(action, cameras);
-                        break;
+            case ui::action::CameraIssuesAction:
+            case ui::action::CameraBusinessRulesAction:
+            case ui::action::OpenInNewTabAction:
+                q->menu()->trigger(action, cameras);
+                break;
 
-                    case ui::action::UploadWearableCameraFileAction:
-                    case ui::action::UploadWearableCameraFolderAction:
-                    case ui::action::CancelWearableCameraUploadsAction:
-                        NX_ASSERT(cameras.size() == 1
-                            && cameras.front()->hasFlags(Qn::wearable_camera));
-                        if (cameras.size() == 1)
-                            q->menu()->trigger(action, cameras.front());
-                        break;
+            case ui::action::UploadWearableCameraFileAction:
+            case ui::action::UploadWearableCameraFolderAction:
+            case ui::action::CancelWearableCameraUploadsAction:
+                NX_ASSERT(cameras.size() == 1
+                    && cameras.front()->hasFlags(Qn::wearable_camera));
+                if (cameras.size() == 1)
+                    q->menu()->trigger(action, cameras.front());
+                break;
 
-                    default:
-                        NX_ASSERT(false, Q_FUNC_INFO, "Unsupported action request");
-                }
-            });
+            case ui::action::PreferencesLicensesTabAction:
+                q->menu()->trigger(action);
+                break;
 
-        return generalTab;
+            default:
+                NX_ASSERT(false, Q_FUNC_INFO, "Unsupported action request");
+        }
     }
 };
 
@@ -155,16 +153,28 @@ CameraSettingsDialog::CameraSettingsDialog(QWidget* parent):
     d->previewManager->setAutoRefresh(false);
 
     new CameraSettingsGlobalSettingsWatcher(d->store, this);
+    new CameraSettingsGlobalPermissionsWatcher(d->store, this);
+
+    auto generalTab = new CameraSettingsGeneralTabWidget(
+        d->licenseWatcher->licenseUsageTextProvider(), d->store, ui->tabWidget);
+
+    connect(generalTab, &CameraSettingsGeneralTabWidget::actionRequested, this,
+        [this](ui::action::IDType action) { d->handleAction(this, action); });
+
+    auto recordingTab = new CameraScheduleWidget(
+        d->licenseWatcher->licenseUsageTextProvider(), d->store, ui->tabWidget);
+
+    connect(recordingTab, &CameraScheduleWidget::actionRequested, this,
+        [this](ui::action::IDType action) { d->handleAction(this, action); });
 
     addPage(
         int(CameraSettingsTab::general),
-        d->createGeneralTab(this),
+        generalTab,
         tr("General"));
 
     addPage(
         int(CameraSettingsTab::recording),
-        new CameraScheduleWidget(d->licenseWatcher->licenseUsageTextProvider(),
-            d->store, ui->tabWidget),
+        recordingTab,
         tr("Recording"));
 
     addPage(

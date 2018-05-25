@@ -3,6 +3,7 @@
 #include <QtCore/QList>
 
 #include <api/model/api_ioport_data.h>
+#include <common/common_globals.h>
 #include <core/ptz/media_dewarping_params.h>
 #include <core/resource/device_dependent_strings.h>
 #include <core/resource/media_stream_capability.h>
@@ -112,6 +113,7 @@ struct CameraSettingsDialogState
     bool hasChanges = false;
     bool readOnly = true;
     bool settingsOptimizationEnabled = false;
+    Qn::GlobalPermissions globalPermissions = Qn::NoGlobalPermissions;
 
     // Generic cameras info.
 

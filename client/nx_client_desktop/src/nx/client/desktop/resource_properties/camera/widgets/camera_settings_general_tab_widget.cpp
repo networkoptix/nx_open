@@ -11,6 +11,7 @@ namespace client {
 namespace desktop {
 
 CameraSettingsGeneralTabWidget::CameraSettingsGeneralTabWidget(
+    AbstractTextProvider* licenseUsageTextProvider,
     CameraSettingsDialogStore* store,
     QWidget* parent)
     :
@@ -25,13 +26,18 @@ CameraSettingsGeneralTabWidget::CameraSettingsGeneralTabWidget(
     ui->wearableArchiveLengthWidget->setStore(store);
     ui->wearableMotionWidget->setStore(store);
 
+    ui->licensePanel->init(licenseUsageTextProvider, store);
+
     ui->wearableArchiveLengthWidget->aligner()->addAligner(
         ui->wearableMotionWidget->aligner());
 
-    connect(store, &CameraSettingsDialogStore::stateChanged, this,
-        &CameraSettingsGeneralTabWidget::loadState);
+    connect(store, &CameraSettingsDialogStore::stateChanged,
+        this, &CameraSettingsGeneralTabWidget::loadState);
 
     connect(ui->cameraInfoWidget, &CameraInfoWidget::actionRequested,
+        this, &CameraSettingsGeneralTabWidget::actionRequested);
+
+    connect(ui->licensePanel, &CameraLicensePanelWidget::actionRequested,
         this, &CameraSettingsGeneralTabWidget::actionRequested);
 }
 
@@ -42,14 +48,17 @@ CameraSettingsGeneralTabWidget::~CameraSettingsGeneralTabWidget()
 
 void CameraSettingsGeneralTabWidget::loadState(const CameraSettingsDialogState& state)
 {
-//    ui->licensingWidget->setVisible(false); // TODO: #vkutin Replace with a new licensing panel.
-    ui->overLicensingLine->setVisible(false);
+    using CombinedValue = CameraSettingsDialogState::CombinedValue;
 
-    const bool allWearableCameras =
-        state.devicesDescription.isWearable == CameraSettingsDialogState::CombinedValue::All;
-
+    const bool allWearableCameras = state.devicesDescription.isWearable == CombinedValue::All;
     ui->wearableArchiveLengthWidget->setVisible(allWearableCameras);
     ui->wearableMotionWidget->setVisible(allWearableCameras);
+
+    const bool licensePanelVisible = state.devicesDescription.isIoModule != CombinedValue::None
+        || state.devicesDescription.isDtsBased != CombinedValue::None;
+
+    ui->licensePanel->setVisible(licensePanelVisible);
+    ui->overLicensingLine->setVisible(licensePanelVisible);
 
     ui->rightWidget->layout()->activate();
     ui->horizontalLayout->activate();

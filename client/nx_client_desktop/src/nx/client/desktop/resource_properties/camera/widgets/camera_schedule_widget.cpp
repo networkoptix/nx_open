@@ -93,6 +93,9 @@ CameraScheduleWidget::CameraScheduleWidget(
             // TODO: updateAlert(ScheduleChange);
         });
 
+    connect(ui->licensesButton, &QPushButton::clicked, this,
+        [this]() { emit actionRequested(action::PreferencesLicensesTabAction); });
+
     /*
     QnCamLicenseUsageHelper helper(commonModule());
     ui->licensesUsageWidget->init(&helper);
@@ -177,6 +180,8 @@ void CameraScheduleWidget::loadState(const CameraSettingsDialogState& state)
         state.recording.enabled.hasValue(),
         recordingEnabled);
     setReadOnly(ui->enableRecordingCheckBox, state.readOnly);
+
+    ui->licensesButton->setVisible(state.globalPermissions.testFlag(Qn::GlobalAdminPermission));
 
     setReadOnly(ui->exportScheduleButton, state.readOnly);
     setReadOnly(ui->exportWarningLabel, state.readOnly);
