@@ -120,6 +120,7 @@ void ProxyHandler::findRelayInstanceToRedirectTo(
         std::string /*proxyTargetHostName*/)> handler)
 {
     m_pendingRequestCount = hostNames.size();
+    m_findRelayInstanceHandler = std::move(handler);
 
     for (const auto& domainName: hostNames)
     {
@@ -132,20 +133,19 @@ void ProxyHandler::findRelayInstanceToRedirectTo(
                     return cf::unit();
 
                 --m_pendingRequestCount;
-                if (m_hostDetected)
+                if (!m_findRelayInstanceHandler)
                     return cf::unit();
 
                 auto relayDomain = relayDomainFuture.get();
                 if (relayDomain.empty())
                 {
                     if (m_pendingRequestCount == 0)
-                        onRelayInstanceSearchCompleted(std::nullopt, std::string());
+                        nx::utils::swapAndCall(m_findRelayInstanceHandler, std::nullopt, std::string());
                     // Else, waiting for other requests to finish.
                     return cf::unit();
                 }
 
-                m_hostDetected = true;
-                onRelayInstanceSearchCompleted(relayDomain, domainName);
+                nx::utils::swapAndCall(m_findRelayInstanceHandler, relayDomain, domainName);
                 return cf::unit();
             });
     }

@@ -42,8 +42,10 @@ private:
     ProxyTargetDetectedHandler m_detectProxyTargetHandler;
     nx::utils::Url m_requestUrl;
     nx::utils::AsyncOperationGuard m_guard;
-    bool m_hostDetected = false;
     std::atomic<int> m_pendingRequestCount{0};
+    nx::utils::MoveOnlyFunc<void(
+        std::optional<std::string> /*relayHostName*/,
+        std::string /*proxyTargetHostName*/)> m_findRelayInstanceHandler;
 
     std::vector<std::string> extractTargetHostNameCandidates(
         const std::string& hostHeader) const;
