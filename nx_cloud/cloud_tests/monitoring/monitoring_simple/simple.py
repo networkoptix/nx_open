@@ -34,7 +34,8 @@ def testclass(cls):
             test_methods_dict[method.testmethod_index] = method
 
         if hasattr(method, "metric"):
-            metric_keys.append(method.metric)
+            host = method.host if hasattr(method, "host") else None
+            metric_keys.append((method.metric, host))
 
     cls._test_methods = test_methods_dict.values()
     cls._metric_keys = metric_keys
@@ -74,6 +75,7 @@ def testmethod(delay=0, host=None, continue_if_fails=False, metric=None):
 
         wrapper.testmethod_index = testmethod.counter
         wrapper.metric = metric
+        wrapper.host = host
         testmethod.counter += 1
 
         return wrapper
@@ -104,7 +106,7 @@ class CloudSession(object):
         self.vms_user_id = None
         self.system_id = None
 
-        self.collected_metrics = {k: None for k in self._metric_keys}
+        self.collected_metrics = {}
 
     def _url(self, path):
         return '{}{}'.format(self.base_url, path)
@@ -181,11 +183,17 @@ class CloudSession(object):
         }
 
     def report_metrics(self):
-        # cloudwatch = boto3.client('cloudwatch')
-        # cloudwatch.put_metric_data(
-        #     Namespace='prod__monitoring',
-        #     MetricData=self._metric_data()
-        # )
+        collected_keys = set([(metric, host) for (metric, host, timestamp) in self.collected_metrics.keys()])
+
+        for metric, host in self._metric_keys:
+            if (metric, host) not in collected_keys:
+                self.collected_metrics[(metric, host, datetime.utcnow())] = None
+
+        cloudwatch = boto3.client('cloudwatch')
+        cloudwatch.put_metric_data(
+            Namespace='prod__monitoring',
+            MetricData=self._metric_data()
+        )
 
         dynamodb = boto3.resource('dynamodb')
         table = dynamodb.Table('prod-health-records')
