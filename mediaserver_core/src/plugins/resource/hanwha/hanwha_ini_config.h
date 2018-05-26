@@ -11,6 +11,7 @@ struct HanwhaIni: public nx::kit::IniConfig
     HanwhaIni(): IniConfig("hanwha.ini") { reload(); }
 
     NX_INI_FLAG(0, enableEdge, "Enable import from SD card.");
+    NX_INI_FLAG(0, disableBypass, "Disable bypass for all NVRs");
 };
 
 inline HanwhaIni& ini()

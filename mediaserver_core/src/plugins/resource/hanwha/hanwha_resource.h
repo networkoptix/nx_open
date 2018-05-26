@@ -157,6 +157,7 @@ protected:
 private:
     CameraDiagnostics::Result initDevice();
     CameraDiagnostics::Result initSystem();
+    CameraDiagnostics::Result initBypass();
 
     CameraDiagnostics::Result initMedia();
     CameraDiagnostics::Result setProfileSessionPolicy();
