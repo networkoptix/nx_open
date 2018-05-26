@@ -40,7 +40,9 @@ class RdepSyncher:
 
                 return False
 
-            path = self.rdep.locate_package(full_package_name).replace("\\", "/")
+            path = self.rdep.locate_package(full_package_name)
+
+        path = path.replace("\\", "/")
 
         self._synched_package_dirs.append(path)
         if path_variable:
