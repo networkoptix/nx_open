@@ -32,6 +32,9 @@ public:
     ~RemoteRelayPeerPool();
 
     virtual bool connectToDb() override;
+    /**
+     * @return cf::future<Relay instance endpoint that has peer domainName listening>.
+     */
     virtual cf::future<std::string> findRelayByDomain(
         const std::string& domainName) const override;
     virtual cf::future<bool> addPeer(const std::string& domainName) override;
