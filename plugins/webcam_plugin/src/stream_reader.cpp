@@ -469,7 +469,6 @@ void StreamReader::setFormatContextOptions()
 void StreamReader::setAVError(int errorCode)
 {
     m_lastAVError = errorCode;
-    printf(utils::av::avStrError(errorCode).c_str());
 }
 
 bool StreamReader::updateIfAVError(int errorCode)

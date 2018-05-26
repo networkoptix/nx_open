@@ -7,9 +7,6 @@
 namespace nx {
 namespace webcam_plugin {
 
-static const double MIN_FPS = 1.0 / 86400.0; //once per day
-static const double MAX_FPS = 60;
-
 MediaEncoder::MediaEncoder(CameraManager* const cameraManager, 
                            nxpl::TimeProvider *const timeProvider,
                            int encoderNumber,
@@ -122,6 +119,10 @@ int MediaEncoder::setResolution( const nxcip::Resolution& resolution )
 
 int MediaEncoder::setFps( const float& fps, float* selectedFps )
 {
+    static constexpr double MIN_FPS = 1.0 / 86400.0; //once per day
+    static constexpr double MAX_FPS = 60;
+
+    
     auto newFps = std::min<float>( std::max<float>( fps, MIN_FPS ), MAX_FPS );
     m_videoCodecContext.setFps(newFps);
     if( m_streamReader)
