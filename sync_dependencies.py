@@ -117,7 +117,10 @@ def sync_dependencies(syncher, platform, arch, box, release_version):
     sync = syncher.sync
 
     if platform == "linux":
-        sync("linux-%s/gcc" % arch)
+        if box == "bpi":
+            sync("bpi/gcc")
+        else:
+            sync("linux-%s/gcc" % arch)
     elif platform == "android":
         if "ANDROID_HOME" not in os.environ:
             sync("android/android-sdk")
