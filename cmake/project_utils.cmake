@@ -20,7 +20,7 @@ endfunction()
 
 function(nx_add_target name type)
     set(options NO_MOC WERROR NO_WERROR SIGNED)
-    set(oneValueArgs LIBRARY_TYPE)
+    set(oneValueArgs LIBRARY_TYPE RC_FILE)
     set(multiValueArgs
         ADDITIONAL_SOURCES ADDITIONAL_RESOURCES
         SOURCE_EXCLUSIONS
@@ -93,9 +93,15 @@ function(nx_add_target name type)
     if("${type}" STREQUAL "EXECUTABLE")
         set(rc_file)
         if(WINDOWS)
-            set(rc_file "${CMAKE_CURRENT_BINARY_DIR}/hdwitness.rc")
+            if(NX_RC_FILE)
+                set(rc_source_file "${NX_RC_FILE}")
+                set(rc_file "${CMAKE_CURRENT_BINARY_DIR}/${NX_RC_FILE}")
+            else()
+                set(rc_source_file "${CMAKE_SOURCE_DIR}/cpp/maven/filter-resources/hdwitness.rc")
+                set(rc_file "${CMAKE_CURRENT_BINARY_DIR}/hdwitness.rc")
+            endif()
             configure_file(
-                "${CMAKE_SOURCE_DIR}/cpp/maven/filter-resources/hdwitness.rc"
+                "${rc_source_file}"
                 "${rc_file}")
         endif()
 
