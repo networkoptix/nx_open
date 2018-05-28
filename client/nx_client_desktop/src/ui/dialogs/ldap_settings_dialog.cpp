@@ -9,6 +9,8 @@
 
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/media_server_resource.h>
+#include <core/resource/user_resource.h>
+
 #include <api/app_server_connection.h>
 #include <api/global_settings.h>
 #include <common/common_module.h>
@@ -17,6 +19,7 @@
 #include <ui/style/custom_style.h>
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
+#include <ui/workbench/workbench_context.h>
 
 namespace {
     // TODO: #GDM move timeout constant to more common module
@@ -251,6 +254,12 @@ QnLdapSettingsDialog::QnLdapSettingsDialog(QWidget *parent)
 
     d->updateFromSettings();
     updateTestButton();
+
+    setWarningStyle(ui->ldapAdminWarningLabel);
+    ui->ldapAdminWarningLabel->setText(
+        tr("Changing any LDAP settings other than \"Search Filter\" will result in connectivity "
+            "loss for all LDAP fetched users."));
+    ui->ldapAdminWarningLabel->setVisible(context()->user() && context()->user()->isLdap());
 
     setHelpTopic(this, Qn::UserSettings_LdapIntegration_Help);
 }
