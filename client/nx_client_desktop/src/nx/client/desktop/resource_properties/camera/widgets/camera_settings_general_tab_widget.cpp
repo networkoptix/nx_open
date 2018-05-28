@@ -3,6 +3,7 @@
 #include "../redux/camera_settings_dialog_state.h"
 #include "../redux/camera_settings_dialog_store.h"
 
+#include <ui/common/read_only.h>
 #include <nx/client/desktop/common/utils/aligner.h>
 #include <nx/utils/log/assert.h>
 
@@ -59,6 +60,9 @@ void CameraSettingsGeneralTabWidget::loadState(const CameraSettingsDialogState& 
 
     ui->licensePanel->setVisible(licensePanelVisible);
     ui->overLicensingLine->setVisible(licensePanelVisible);
+
+    ::setReadOnly(ui->enableAudioCheckBox, state.readOnly);
+    ::setReadOnly(ui->editCredentialsButton, state.readOnly);
 
     ui->rightWidget->layout()->activate();
     ui->horizontalLayout->activate();
