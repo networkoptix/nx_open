@@ -344,6 +344,7 @@ struct CameraSettingsDialogState
         params.radius = calibration.radius;
         params.hStretch = calibration.aspectRatio;
         params.fovRot = singleCameraSettings.fisheyeFovRotation();
+        params.viewMode = singleCameraSettings.fisheyeMountingType();
         return params;
     }
 };
