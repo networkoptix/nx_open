@@ -12,6 +12,8 @@ namespace nx {
 namespace api {
 
 // TODO: Rename all classes replacing "driver" with "plugin".
+
+// TODO: Rename to MetadataPluginManifestBase.
 /**
  * Description of the analytics driver, which can generate different events.
  */

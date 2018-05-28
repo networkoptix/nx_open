@@ -687,20 +687,19 @@ void QnServerStreamRecorder::addQueueSizeUnsafe(qint64 value)
 
 bool QnServerStreamRecorder::processData(const QnAbstractDataPacketPtr& data)
 {
-    QnAbstractMediaDataPtr media = std::dynamic_pointer_cast<QnAbstractMediaData>(data);
+    const QnAbstractMediaDataPtr media = std::dynamic_pointer_cast<QnAbstractMediaData>(data);
     if (!media)
-        return true; // skip data
+        return true; //< skip data
 
     {
         QnMutexLocker lock( &m_queueSizeMutex );
-        addQueueSizeUnsafe(- (qint64) media->dataSize());
+        addQueueSizeUnsafe(-((qint64) media->dataSize()));
     }
 
-    // for empty schedule we record all time
+    // For empty schedule, we record all the time.
     beforeProcessData(media);
 
-    bool rez = QnStreamRecorder::processData(data);
-    return rez;
+    return QnStreamRecorder::processData(data);
 }
 
 void QnServerStreamRecorder::updateCamera(const QnSecurityCamResourcePtr& cameraRes)

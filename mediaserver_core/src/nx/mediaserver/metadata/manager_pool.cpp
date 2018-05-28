@@ -383,6 +383,7 @@ void ManagerPool::createCameraManagersForResourceUnsafe(const QnSecurityCamResou
             loadManagerManifest(plugin, manager.get(), camera);
         if (managerManifest)
         {
+            // TODO: Fix: Camera property should receive a union of data from all plugins.
             addManifestToCamera(*managerManifest, camera);
         }
         if (auxiliaryPluginManifest)
@@ -730,7 +731,7 @@ ManagerPool::loadManagerManifest(
     auto deviceManifest = deserializeManifest<nx::api::AnalyticsDeviceManifest>(
         managerManifest.get());
 
-    if (deviceManifest && deviceManifest->supportedEventTypes.size())
+    if (deviceManifest && !deviceManifest->supportedEventTypes.empty())
         return std::make_pair(deviceManifest, boost::none);
 
     // If manifest occurred to be not AnalyticsDeviceManifest, we try to treat it as
@@ -760,6 +761,7 @@ ManagerPool::loadManagerManifest(
     return std::make_pair(boost::none, boost::none);
 }
 
+// TODO: #mshevchenko: Rename to addDataFromCameraManagerManifestToCameraResource().
 void ManagerPool::addManifestToCamera(
     const nx::api::AnalyticsDeviceManifest& manifest,
     const QnSecurityCamResourcePtr& camera)
