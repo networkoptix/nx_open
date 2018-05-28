@@ -30,11 +30,15 @@ void setOnAssertHandler(std::function<void(const log::Message&)> handler)
 
 void crashProgram()
 {
-    #if defined(_WIN32)
-        *reinterpret_cast<volatile int*>(0) = 7;
+    #if defined(_DEBUG)
+        #if defined(_WIN32)
+            *reinterpret_cast<volatile int*>(0) = 7;
+        #else
+            const pid_t pid = getpid();
+            kill(pid, SIGTRAP);
+        #endif
     #else
-        const pid_t pid = getpid();
-        kill(pid, SIGTRAP);
+        *reinterpret_cast<volatile int*>(0) = 7;
     #endif
 }
 
