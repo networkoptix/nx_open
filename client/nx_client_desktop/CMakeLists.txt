@@ -17,9 +17,6 @@ nx_configure_file(
 nx_configure_file(
     maven/filter-resources/client_app_info_impl.cpp
     ${CMAKE_CURRENT_BINARY_DIR})
-nx_configure_file(
-    ${PROJECT_SOURCE_DIR}/cpp/maven/bin-resources/app_icons.h
-    ${CMAKE_CURRENT_BINARY_DIR})
 
 if(MACOSX)
     set(mac_sources src/ui/workaround/mac_utils.mm)

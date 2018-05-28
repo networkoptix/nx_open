@@ -1,8 +1,7 @@
 #include <windows.h>
-#include "${root.dir}/cpp/maven/bin-resources/app_icons.h"
 
+#define IDI_ICON_APPLICATION 101
 IDI_ICON_APPLICATION    ICON    DISCARDABLE     "${customization.dir}/icons/all/favicon.ico"
-IDI_ICON_VIDEOWALL      ICON    DISCARDABLE     "${customization.dir}/icons/all/videowall.ico"
 
 VS_VERSION_INFO VERSIONINFO
 FILEVERSION     ${parsedVersion.majorVersion},${parsedVersion.minorVersion},${parsedVersion.incrementalVersion},${buildNumber}
@@ -19,8 +18,8 @@ BEGIN
             VALUE "LegalCopyright",     "${nx_copyright}"
             VALUE "LegalTrademarks1",   "All Rights Reserved"
             VALUE "LegalTrademarks2",   "All Rights Reserved"
-            VALUE "OriginalFilename",   "${project.artifactId}.exe"
-            VALUE "ProductName",        "${project.artifactId}"
+            VALUE "OriginalFilename",   "${name}.exe"
+            VALUE "ProductName",        "${name}"
             VALUE "ProductVersion",     "${release.version}.${buildNumber}"
         END
     END
