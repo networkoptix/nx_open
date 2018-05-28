@@ -23,8 +23,8 @@
   <String Id="InstallOptionsButton">Параметры</String>
   <String Id="InstallInstallButton">Установить</String>
   <String Id="InstallCloseButton">Закрыть</String>
-  <String Id="InstallAcceptCheckbox">Я соглашаюсь с</String>
-  <String Id="InstallLicenseLinkText">лицензионным соглашением</String>
+  <String Id="InstallAcceptCheckbox">Я принимаю</String>
+  <String Id="InstallLicenseLinkText">Лицензионное Соглашение</String>
   <String Id="OptionsHeader">Параметры установки</String>
   <String Id="OptionsLocationLabel">Установить в:</String>
   <String Id="OptionsBrowseButton">Обзор</String>
@@ -69,7 +69,4 @@
   <String Id="WixExecFirewallExceptionsUninstall">Выполняется удаление настроек брандмауэра Windows</String>
   <String Id="Product_ArchMismatch_x86">Этот продукт предназначен для 32-разрядной ОС. Установка будет закончена.</String>
   <String Id="Product_ArchMismatch_x64">Этот продукт предназначен для 64-разрядной ОС. Установка будет закончена.</String>
-
-  <UI Dialog="BalExtension" Control="EulaAcceptCheckbox" Width="106"/>
-  <UI Dialog="BalExtension" Control="EulaHyperlink" X="120"/>
 </WixLocalization>

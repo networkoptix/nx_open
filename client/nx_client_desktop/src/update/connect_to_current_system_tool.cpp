@@ -2,6 +2,8 @@
 
 #include <chrono>
 
+#include <nx/utils/log/log.h>
+
 #include <common/static_common_module.h>
 
 #include <core/resource_management/resource_pool.h>
@@ -27,13 +29,26 @@ static const int kEmptyProgress = 0;
 static const int kUpdateProgress = 50;
 static const milliseconds kWaitTimeout = 2min;
 
+QnFakeMediaServerResourcePtr incompatibleServerForOriginalId(
+    const QnUuid& id, const QnResourcePool* resourcePool)
+{
+    for (const auto& server: resourcePool->getIncompatibleServers())
+    {
+        if (const auto& fakeServer = server.dynamicCast<QnFakeMediaServerResource>())
+        {
+            if (fakeServer->getOriginalGuid() == id)
+                return fakeServer;
+        }
+    }
+
+    return {};
+}
+
 } // namespace
 
 QnConnectToCurrentSystemTool::QnConnectToCurrentSystemTool(QObject* parent):
     base_type(parent),
-    QnSessionAwareDelegate(parent),
-    m_mergeTool(nullptr),
-    m_updateTool(nullptr)
+    QnSessionAwareDelegate(parent)
 {
 }
 
@@ -63,6 +78,9 @@ void QnConnectToCurrentSystemTool::start(const QnUuid& targetId, const QString& 
     m_targetId = targetId;
     m_adminPassword = password;
     m_originalTargetId = server->getOriginalGuid();
+
+    NX_INFO(this, lm("Start connecting server %1 (id=%2, url=%3").args(
+        server->getName(), m_originalTargetId, server->getApiUrl()));
 
     updateServer();
 }
@@ -94,11 +112,16 @@ void QnConnectToCurrentSystemTool::cancel()
     }
 
     if (m_mergeTool || m_updateTool)
-        emit finished(Canceled);
+        finish(Canceled);
 }
 
 void QnConnectToCurrentSystemTool::finish(ErrorCode errorCode)
 {
+    using nx::utils::log::Level;
+
+    NX_LOG(this, lm("Finished: %1").arg(errorCode),
+        errorCode == NoError ? Level::info : Level::error);
+
     emit finished(errorCode);
 }
 
@@ -109,7 +132,7 @@ void QnConnectToCurrentSystemTool::mergeServer()
     m_mergeError = utils::MergeSystemsStatus::ok;
     m_mergeErrorMessage.clear();
 
-    const auto server = resourcePool()->getIncompatibleServerById(m_targetId, true);
+    const auto server = incompatibleServerForOriginalId(m_originalTargetId, resourcePool());
     if (!server)
     {
         const auto compatibleServer =
@@ -133,6 +156,8 @@ void QnConnectToCurrentSystemTool::mergeServer()
     auth.setUser(helpers::kFactorySystemUser);
     auth.setPassword(m_adminPassword);
 
+    NX_INFO(this, "Start server configuration.");
+
     emit progressChanged(0);
     emit stateChanged(tr("Configuring Server"));
 
@@ -149,9 +174,14 @@ void QnConnectToCurrentSystemTool::mergeServer()
                 m_mergeError = mergeStatus;
                 m_mergeErrorMessage =
                     utils::MergeSystemsStatus::getErrorMessage(mergeStatus, moduleInformation);
+
+                NX_ERROR(this, lm("Server configuration failed: %1.").arg(m_mergeErrorMessage));
+
                 finish(MergeFailed);
                 return;
             }
+
+            NX_INFO(this, "Server configuration finished.");
 
             waitServer();
         });
@@ -182,6 +212,8 @@ void QnConnectToCurrentSystemTool::waitServer()
                 finishMerge(true);
         };
 
+    NX_INFO(this, "Start waiting server.");
+
     // Receiver object is m_mergeTool.
     // This helps us to break the connection when m_mergeTool is deleted in the cancel() method.
     connect(resourcePool(), &QnResourcePool::resourceAdded, m_mergeTool, handleResourceChanged);
@@ -209,6 +241,8 @@ void QnConnectToCurrentSystemTool::updateServer()
         return;
     }
 
+    NX_INFO(this, "Start server update.");
+
     emit stateChanged(tr("Updating Server"));
     emit progressChanged(kEmptyProgress);
 
@@ -224,9 +258,12 @@ void QnConnectToCurrentSystemTool::updateServer()
 
             if (result.result != QnUpdateResult::Successful)
             {
+                NX_ERROR(this, lm("Server update failed: %1.").arg(result.result));
                 finish(UpdateFailed);
                 return;
             }
+
+            NX_INFO(this, "Server update finished.");
 
             emit progressChanged(kUpdateProgress);
             mergeServer();

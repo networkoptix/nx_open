@@ -3,7 +3,7 @@
 //
 #include <client/client_app_info.h>
 
-#include "app_icons.h"
+#include <app_icons.h>
 
 QString QnClientAppInfo::applicationName()
 {

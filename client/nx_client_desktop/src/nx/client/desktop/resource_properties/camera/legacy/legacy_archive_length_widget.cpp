@@ -34,8 +34,9 @@ QnArchiveLengthWidget::QnArchiveLengthWidget(QWidget* parent):
     setHelpTopic(this, Qn::CameraSettings_Recording_ArchiveLength_Help);
     auto archiveGroupHint = nx::client::desktop::HintButton::hintThat(ui->archiveGroupBox);
 
-    archiveGroupHint->addHintLine(tr("Sets when camera archive will be deleted or saved when there is no space for new recordings."));
-    archiveGroupHint->addHintLine(tr("\"Auto\" deletes the oldest footage first, regardless of the source."));
+    archiveGroupHint->addHintLine(tr("Archive can be deleted in case if there are no space for new recording."));
+    archiveGroupHint->addHintLine(tr("Min and Max settings determine the age of archive which should be kept for this camera."));
+    archiveGroupHint->addHintLine(tr("If \"Auto\" option is enabled, the oldest footage among all cameras will be deleted first."));
     setHelpTopic(archiveGroupHint, Qn::CameraSettings_Recording_ArchiveLength_Help);
 
     CheckboxUtils::autoClearTristate(ui->checkBoxMinArchive);

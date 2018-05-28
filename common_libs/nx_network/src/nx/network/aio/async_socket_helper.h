@@ -435,7 +435,7 @@ private:
             }
             else
             {
-                NX_CRITICAL(false);
+                NX_CRITICAL(false, lm("Unexpected value: 0b%1").arg(static_cast<int>(eventType), 0, 2));
             }
         }
         catch (const std::exception& e)

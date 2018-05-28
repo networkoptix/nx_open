@@ -23,8 +23,8 @@
   <String Id="InstallOptionsButton">Параметры</String>
   <String Id="InstallInstallButton">Установить</String>
   <String Id="InstallCloseButton">Закрыть</String>
-  <String Id="InstallAcceptCheckbox">Я соглашаюсь с</String>
-  <String Id="InstallLicenseLinkText">лицензионным соглашением</String>
+  <String Id="InstallAcceptCheckbox">Я принимаю</String>
+  <String Id="InstallLicenseLinkText">Лицензионное Соглашение</String>
   <String Id="OptionsHeader">Параметры установки</String>
   <String Id="OptionsLocationLabel">Установить в:</String>
   <String Id="OptionsBrowseButton">Обзор</String>

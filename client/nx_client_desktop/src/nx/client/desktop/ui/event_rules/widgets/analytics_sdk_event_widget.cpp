@@ -43,7 +43,7 @@ AnalyticsSdkEventWidget::AnalyticsSdkEventWidget(QWidget* parent):
     ui->sdkEventTypeLabel->addHintLine(tr("Choose cameras using the button above to see the list of supported events."));
     setHelpTopic(ui->sdkEventTypeLabel, Qn::EventsActions_VideoAnalytics_Help);
 
-    ui->captionLabel->addHintLine(tr("Event will trigger only if there are matches in caption with any of entered keywords."));
+    ui->captionLabel->addHintLine(tr("Event will trigger only if there are matches in the caption with any of the entered keywords."));
     ui->captionLabel->addHintLine(tr("If the field is empty, event will always trigger."));
     setHelpTopic(ui->captionLabel, Qn::EventsActions_VideoAnalytics_Help);
 

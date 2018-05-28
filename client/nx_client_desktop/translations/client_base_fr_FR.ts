@@ -1423,12 +1423,16 @@ pour afficher plus de signets</translation>
       <translation>Haute valeur minimale peut conduire à la diminution de la longueur d'archive sur d'autre caméras.</translation>
     </message>
     <message>
-      <source>Sets when camera archive will be deleted or saved when there is no space for new recordings.</source>
-      <translation>Définit quand l'archive de la caméra sera supprimée ou enregistrée, lorsqu'il n'y a pas d'espace pour les nouveaux enregistrements.</translation>
+      <source>Archive can be deleted in case if there are no space for new recording.</source>
+      <translation type="unfinished">Archive can be deleted in case if there are no space for new recording.</translation>
     </message>
     <message>
-      <source>&quot;Auto&quot; deletes the oldest footage first, regardless of the source.</source>
-      <translation>&quot;Auto&quot; supprime la vidéo la plus ancienne en premier, quelle que soit la source.</translation>
+      <source>Min and Max settings determine the age of archive which should be kept for this camera.</source>
+      <translation type="unfinished">Min and Max settings determine the age of archive which should be kept for this camera.</translation>
+    </message>
+    <message>
+      <source>If &quot;Auto&quot; option is enabled, the oldest footage among all cameras will be deleted first.</source>
+      <translation type="unfinished">If &quot;Auto&quot; option is enabled, the oldest footage among all cameras will be deleted first.</translation>
     </message>
   </context>
   <context>
@@ -3148,12 +3152,20 @@ to %1</source>
   <context>
     <name>QnCustomBusinessEventWidget</name>
     <message>
-      <source>Event will trigger only if there are matches in caption with any of entered keywords.</source>
-      <translation>Événement se déclenchera uniquement s'il y a des correspondances dans la légende avec l'un des mots-clés saisis.</translation>
-    </message>
-    <message>
       <source>If the field is empty, event will always trigger.</source>
       <translation>Si le champ est vide, l'événement sera toujours déclenché.</translation>
+    </message>
+    <message>
+      <source>Event will trigger only if there are matches in the source with any of the entered keywords.</source>
+      <translation type="unfinished">Event will trigger only if there are matches in the source with any of the entered keywords.</translation>
+    </message>
+    <message>
+      <source>Event will trigger only if there are matches in the caption with any of the entered keywords.</source>
+      <translation type="unfinished">Event will trigger only if there are matches in the caption with any of the entered keywords.</translation>
+    </message>
+    <message>
+      <source>Event will trigger only if there are matches in the description with any of the entered keywords.</source>
+      <translation type="unfinished">Event will trigger only if there are matches in the description with any of the entered keywords.</translation>
     </message>
   </context>
   <context>
@@ -3370,8 +3382,8 @@ to %1</source>
   <context>
     <name>QnEmptyBusinessActionWidget</name>
     <message>
-      <source>Panic Recording mode switches recording settings for all Cameras to maximum FPS and Quality</source>
-      <translation>Mode d'enregistrement panique bascule les paramètres d'enregistrement pour toutes les caméras au maximum FPS et qualité</translation>
+      <source>Panic Recording mode switches recording settings for all cameras to maximum FPS and quality.</source>
+      <translation type="unfinished">Panic Recording mode switches recording settings for all cameras to maximum FPS and quality.</translation>
     </message>
   </context>
   <context>
@@ -3869,6 +3881,10 @@ to %1</source>
         <numerusform>Test complété avec succes: %n usager trouvé.</numerusform>
         <numerusform>Test complété avec succes: %n usagers trouvés.</numerusform>
       </translation>
+    </message>
+    <message>
+      <source>Changing any LDAP settings other than &quot;Search Filter&quot; will result in connectivity loss for all LDAP fetched users.</source>
+      <translation type="unfinished">Changing any LDAP settings other than &quot;Search Filter&quot; will result in connectivity loss for all LDAP fetched users.</translation>
     </message>
   </context>
   <context>
@@ -4514,12 +4530,12 @@ to %1</source>
       <translation>Définit l'heure à utiliser dans le client (chronologie, horodatages, etc.) lorsque les machines client et serveur se trouvent dans des fuseaux horaires différents.</translation>
     </message>
     <message>
-      <source>Length of time each camera on layout will be displayed if you start a Layout Tour.</source>
-      <translation>Durée d'affichage de chaque caméra sur la mise en page, si vous démarrez un tour de mise en page.</translation>
+      <source>Displays IP addresses for cameras and servers and roles for users.</source>
+      <translation type="unfinished">Displays IP addresses for cameras and servers and roles for users.</translation>
     </message>
     <message>
-      <source>Displays IP addresses for cameras and servers and groups for users.</source>
-      <translation>Affiche les adresses IP pour les caméras, les serveurs et les groupes pour utilisateurs.</translation>
+      <source>Length of time each camera on layout will be displayed if you start a Tour.</source>
+      <translation type="unfinished">Length of time each camera on layout will be displayed if you start a Tour.</translation>
     </message>
   </context>
   <context>
@@ -6697,12 +6713,16 @@ to %1</source>
       <translation>Laisser le système optimiser les paramètres caméra</translation>
     </message>
     <message>
-      <source>Sends anonymous System information (firmware, codecs, streams, etc.).</source>
-      <translation>Envoie des informations système anonymes (micrologiciel, codecs, flux, etc.).</translation>
-    </message>
-    <message>
       <source>Tracks and logs all user actions.</source>
       <translation>Suit et log toutes les actions de l'utilisateur.</translation>
+    </message>
+    <message>
+      <source>Includes information about system, such as cameras models and firmware versions, number of servers, etc.</source>
+      <translation type="unfinished">Includes information about system, such as cameras models and firmware versions, number of servers, etc.</translation>
+    </message>
+    <message>
+      <source>Does not include any personal information and is completely anonymous.</source>
+      <translation type="unfinished">Does not include any personal information and is completely anonymous.</translation>
     </message>
   </context>
   <context>
@@ -8494,16 +8514,16 @@ to %1</source>
       <translation>Choisissez les caméras en utilisant le bouton ci-dessus pour voir la liste des événements supportés.</translation>
     </message>
     <message>
-      <source>Event will trigger only if there are matches in caption with any of entered keywords.</source>
-      <translation>Événement se déclenchera uniquement s'il y a des correspondances dans la légende avec l'un des mots-clés saisis.</translation>
-    </message>
-    <message>
       <source>If the field is empty, event will always trigger.</source>
       <translation>Si le champ est vide, l'événement sera toujours déclenché.</translation>
     </message>
     <message>
       <source>Event will trigger only if there are matches in the description field with any of the entered keywords.</source>
       <translation>Événement ne se déclenchera que s'il y a des correspondances dans le champ de description avec l'un des mots-clés saisis.</translation>
+    </message>
+    <message>
+      <source>Event will trigger only if there are matches in the caption with any of the entered keywords.</source>
+      <translation type="unfinished">Event will trigger only if there are matches in the caption with any of the entered keywords.</translation>
     </message>
   </context>
   <context>
@@ -8824,10 +8844,6 @@ to %1</source>
       <translation>Version Beta %1</translation>
     </message>
     <message>
-      <source>Some functionality may be unavailable or not working properly.</source>
-      <translation>Certaines fonctionnalités peuvent être indisponibles ou ne fonctionne pas correctement.</translation>
-    </message>
-    <message>
       <source>System sends anonymous usage statistics</source>
       <translation>Système envoie des statistiques d’utilisation anonymes</translation>
     </message>
@@ -8866,6 +8882,10 @@ to %1</source>
     <message>
       <source>Decline</source>
       <translation>Refuser</translation>
+    </message>
+    <message>
+      <source>Warning! This build is for testing purposes only! Please upgrade to a next available patch or release version once available.</source>
+      <translation type="unfinished">Warning! This build is for testing purposes only! Please upgrade to a next available patch or release version once available.</translation>
     </message>
   </context>
   <context>

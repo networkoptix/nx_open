@@ -172,6 +172,7 @@ def sync_dependencies(syncher, platform, arch, box, release_version):
         sync("vmaxproxy-2.1")
         sync("windows/wix-3.11", path_variable="wix_directory")
         sync("windows/signtool", path_variable="signtool_directory")
+        sync("windows/pandoc-2.2.1", path_variable="pandoc_directory")
 
     if box == "edge1":
         sync("cpro-1.0.0-2")

@@ -21,7 +21,7 @@ from requests.auth import HTTPDigestAuth
 DEFAULT_API_USER = 'admin'
 DEFAULT_API_PASSWORD = 'admin'
 STANDARD_PASSWORDS = [DEFAULT_API_PASSWORD, 'qweasd123']  # do not mask these passwords in log files
-REST_API_TIMEOUT = datetime.timedelta(seconds=10)
+REST_API_TIMEOUT = datetime.timedelta(seconds=20)
 MAX_CONTENT_LEN_TO_LOG = 1000
 
 log = logging.getLogger(__name__)
