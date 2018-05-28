@@ -30,7 +30,7 @@ class DebInstallation(Installation):
         self._deb = deb
         self.dir = ssh_access.Path('/opt', self._deb.customization.linux_subdir)
         self._bin = self.dir / 'bin'
-        self._executable = self._bin / 'mediaserver-bin'
+        self.binary = self._bin / 'mediaserver-bin'
         self._config = self.dir / 'etc' / 'mediaserver.conf'
         self._config_initial = self.dir / 'etc' / 'mediaserver.conf.initial'
         self.var = self.dir / 'var'
@@ -45,7 +45,7 @@ class DebInstallation(Installation):
 
     def is_valid(self):
         paths_to_check = [
-            self.dir, self._bin / 'mediaserver', self._executable,
+            self.dir, self._bin / 'mediaserver', self.binary,
             self._config, self._config_initial]
         all_paths_exist = True
         for path in paths_to_check:

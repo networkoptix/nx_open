@@ -79,6 +79,7 @@ class Mediaserver(object):
             wait_for_true(self.is_online)
 
     def stop(self, already_stopped_ok=False):
+        log.info("Stop mediaserver %r.", self)
         if self.service.is_running():
             self.service.stop()
             wait_for_true(lambda: not self.service.is_running(), "{} stops".format(self.service))

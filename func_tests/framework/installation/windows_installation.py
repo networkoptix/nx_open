@@ -13,7 +13,7 @@ class WindowsInstallation(Installation):
         self._installer = installer
         program_files_dir = windows_access.Path(windows_access.winrm.user_env_vars()['ProgramFiles'])
         self.dir = program_files_dir / 'Hanwha' / 'Wisenet WAVE' / 'MediaServer'
-        self._executable = self.dir / 'mediaserver.exe'
+        self.binary = self.dir / 'mediaserver.exe'
         self.info = self.dir / 'build_info.txt'
         self.var = windows_access.Path(
             windows_access.winrm.system_profile_dir(),
@@ -32,8 +32,8 @@ class WindowsInstallation(Installation):
         self.os_access = windows_access  # type: WindowsAccess
 
     def is_valid(self):
-        if not self._executable.exists():
-            _logger.info("%r does not exist", self._executable)
+        if not self.binary.exists():
+            _logger.info("%r does not exist", self.binary)
             return False
         return True
 
@@ -57,7 +57,7 @@ class WindowsInstallation(Installation):
         self._backup_configuration()
 
     def list_core_dumps(self):
-        base_name = self._executable.stem
+        base_name = self.binary.stem
 
         def iterate_names(limit):
             yield '{}.DMP'.format(base_name)
