@@ -29,7 +29,11 @@ def command_args_to_str_list(command):
 
 
 class WinRM(object):
-    """Windows-specific interface"""
+    """Windows-specific interface
+
+    WinRM has only generic functions.
+    WinRM must not know of particular WMI classes and CMD and PowerShell scripts.
+    """
 
     def __init__(self, address, port, username, password):
         self._protocol = winrm.Protocol(
