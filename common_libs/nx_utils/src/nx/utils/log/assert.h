@@ -24,6 +24,8 @@ namespace utils {
 NX_UTILS_API void logAssert(const log::Message& message);
 void NX_UTILS_API setOnAssertHandler(std::function<void(const log::Message&)> handler);
 
+NX_UTILS_API void crashProgram();
+
 template<typename Reason>
 log::Message assertLog(const char* file, int line, const char* condition, const Reason& message)
 {
@@ -45,7 +47,7 @@ void assertCrash(Arguments&& ... args)
     const auto out  = assertLog(std::forward<Arguments>(args)...);
     std::cerr << std::endl << ">>>" << out.toStdString() << std::endl;
 
-    *reinterpret_cast<volatile int*>(0) = 7;
+    crashProgram();
 }
 
 class NX_UTILS_API AssertTimer
