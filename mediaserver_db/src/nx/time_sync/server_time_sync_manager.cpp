@@ -159,7 +159,7 @@ bool ServerTimeSyncManager::loadTimeFromInternet()
                 return;
             }
 
-            setSyncTime(std::chrono::milliseconds(newValue), minDeltaToSync);
+            setSyncTime(std::chrono::milliseconds(newValue));
             NX_DEBUG(this, lm("Received time %1 from the internet").
                 arg(QDateTime::fromMSecsSinceEpoch(newValue).toString(Qt::ISODate)));
             m_internetSyncInProgress = false;

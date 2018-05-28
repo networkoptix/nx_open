@@ -21,6 +21,7 @@ namespace nx {
 namespace time_sync {
 
 const QString TimeSyncManager::kTimeSyncUrlPath(lit("/api/synchronizedTime"));
+static const std::chrono::milliseconds kMinDeltaToSync(250);
 
 static const std::chrono::seconds kLoadTimeTimeout(10);
 
@@ -90,10 +91,8 @@ std::unique_ptr<nx::network::AbstractStreamSocket> TimeSyncManager::connectToRem
 void TimeSyncManager::loadTimeFromLocalClock()
 {
     auto newValue = m_systemClock->millisSinceEpoch();
-    const auto minDeltaToSync =
-        commonModule()->globalSettings()->maxDifferenceBetweenSynchronizedAndLocalTime();
 
-    setSyncTime(newValue, minDeltaToSync);
+    setSyncTime(newValue);
     NX_DEBUG(this, lm("Set time %1 from the local clock").
         arg(QDateTime::fromMSecsSinceEpoch(newValue.count()).toString(Qt::ISODate)));
 }
@@ -125,14 +124,14 @@ bool TimeSyncManager::loadTimeFromServer(const QnRoute& route)
     url.setPort(route.addr.port);
     url.setPath(kTimeSyncUrlPath);
 
-    nx::utils::ElapsedTimer timer;
+    nx::utils::ElapsedTimer rttTimer;
     // With gateway repeat request twice to make sure we have opened tunnel to the target server.
     // That way it is possible to reduce rtt.
     const int iterations = route.gatewayId.isNull() ? 1 : 2;
     boost::optional<QByteArray> response;
     for (int i = 0; i < iterations; ++i)
     {
-        timer.restart();
+        rttTimer.restart();
         bool success = httpClient->doGet(url);
         response = httpClient->fetchEntireMessageBody();
         if (!success || !response)
@@ -152,24 +151,26 @@ bool TimeSyncManager::loadTimeFromServer(const QnRoute& route)
         return false;
     }
     
-    auto newTime = std::chrono::milliseconds(timeData.utcTimeMs - timer.elapsedMs() / 2);
+    const std::chrono::milliseconds rtt = rttTimer.elapsed();
+    auto newTime = std::chrono::milliseconds(timeData.utcTimeMs - rtt.count() / 2);
     bool syncWithInternel = commonModule()->globalSettings()->isSynchronizingTimeWithInternet();
     if (syncWithInternel && !timeData.isTakenFromInternet)
         return false; //< Target server is not ready yet. Time is not taken from internet yet. Repeat later.
-    const auto minDeltaToSync =
-        commonModule()->globalSettings()->maxDifferenceBetweenSynchronizedAndLocalTime();
-    setSyncTime(newTime, minDeltaToSync);
+    auto maxRtt = commonModule()->globalSettings()->maxDifferenceBetweenSynchronizedAndLocalTime();
+    if (rtt > maxRtt)
+        return false; //< Too big rtt. Try again.
+    setSyncTime(newTime);
     NX_DEBUG(this, lm("Got time %1 from the neighbor server %2")
         .args(QDateTime::fromMSecsSinceEpoch(newTime.count()).toString(Qt::ISODate),
         route.id.toString()));
     return true;
 }
 
-bool TimeSyncManager::setSyncTime(std::chrono::milliseconds value, std::chrono::milliseconds minDeltaToSync)
+bool TimeSyncManager::setSyncTime(std::chrono::milliseconds value)
 {
     const auto syncTime = getSyncTime();
     const auto timeDelta = value < syncTime ? syncTime - value : value - syncTime;
-    if (timeDelta < minDeltaToSync)
+    if (timeDelta < kMinDeltaToSync)
         return false;
 
     setSyncTimeInternal(value);

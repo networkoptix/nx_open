@@ -729,6 +729,7 @@ namespace detail
             ResyncVideoWalls        = 0x1000,
             ResyncWebPages          = 0x2000,
             ResyncUserAccessRights  = 0x4000,
+            ResyncGlobalSettings    = 0x8000,
         };
         Q_DECLARE_FLAGS(ResyncFlags, ResyncFlag)
 
@@ -743,8 +744,11 @@ namespace detail
         bool resyncTransactionLog();
         bool addStoredFiles(const QString& baseDirectoryName, int* count = 0);
 
-        template <class FilterType, class ObjectType, class ObjectListType>
-        bool fillTransactionLogInternal(ApiCommand::Value command, std::function<bool (ObjectType& data)> updater = nullptr);
+        template <class FilterDataType, class ObjectType, class ObjectListType>
+        bool fillTransactionLogInternal(
+            ApiCommand::Value command, 
+            std::function<bool (ObjectType& data)> updater = nullptr,
+            FilterDataType filter = FilterDataType());
 
         template <class ObjectListType>
         bool queryObjects(ObjectListType& objects);
@@ -758,6 +762,7 @@ namespace detail
         void addResourceTypesFromXML(nx::vms::api::ResourceTypeDataList& data);
         void loadResourceTypeXML(const QString& fileName, nx::vms::api::ResourceTypeDataList& data);
         bool removeServerStatusFromTransactionLog();
+        bool migrateTimeManagerData();
         bool removeEmptyLayoutsFromTransactionLog();
         bool removeOldCameraHistory();
         bool migrateServerGUID(const QString& table, const QString& field);

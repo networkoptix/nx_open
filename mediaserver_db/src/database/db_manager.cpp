@@ -62,6 +62,8 @@
 #include <database/api/db_resource_api.h>
 
 #include <nx/fusion/model_functions.h>
+#include <api/global_settings.h>
+#include <nx/time_sync/legacy/time_manager.h>
 
 static const QString RES_TYPE_MSERVER = "mediaserver";
 static const QString RES_TYPE_CAMERA = "camera";
@@ -746,6 +748,16 @@ bool QnDbManager::init(const nx::utils::Url& dbUrl)
                 }
             }
 
+            if (m_resyncFlags.testFlag(ResyncGlobalSettings))
+            {
+                if (!fillTransactionLogInternal<
+                    QnUuid,
+                    ResourceParamWithRefData,
+                    ResourceParamWithRefDataList>(ApiCommand::setResourceParam, nullptr, m_adminUserID))
+                {
+                    return false;
+                }
+            }
         }
 
         // Set admin user's password
@@ -904,10 +916,13 @@ bool QnDbManager::syncLicensesBetweenDB()
 }
 
 template <typename FilterDataType, class ObjectType, class ObjectListType>
-bool QnDbManager::fillTransactionLogInternal(ApiCommand::Value command, std::function<bool (ObjectType& data)> updater)
+bool QnDbManager::fillTransactionLogInternal(
+    ApiCommand::Value command, 
+    std::function<bool (ObjectType& data)> updater, 
+    FilterDataType filter)
 {
     ObjectListType objects;
-    if (doQueryNoLock(FilterDataType(), objects) != ErrorCode::ok)
+    if (doQueryNoLock(filter, objects) != ErrorCode::ok)
         return false;
 
     for(const ObjectType& object: objects)
@@ -1872,6 +1887,11 @@ bool QnDbManager::afterInstallUpdate(const QString& updateName)
             removeBusinessRule(rule->id());
         }
         return fixDefaultBusinessRuleGuids() && resyncIfNeeded(ResyncRules);
+    }
+
+    if (updateName.endsWith(lit("/99_20180528_time_manager_refactor.sql")))
+    {
+        return migrateTimeManagerData() && resyncIfNeeded(ResyncGlobalSettings);
     }
 
     NX_LOG(lit("SQL update %1 does not require post-actions.").arg(updateName), cl_logDEBUG1);
@@ -5110,6 +5130,41 @@ bool QnDbManager::rebuildUserAccessRightsTransactions()
         if (transactionLog()->saveTransaction(transaction) != ErrorCode::ok)
             return false;
     }
+
+    return true;
+}
+
+bool QnDbManager::migrateTimeManagerData()
+{
+    const QByteArray kLegacyUsedTimePriorityKey = "used_time_priority_key";
+    ApiMiscData syncTimeKeyData;
+    if (doQueryNoLock(kLegacyUsedTimePriorityKey, syncTimeKeyData) != ErrorCode::ok)
+        return false;
+
+    using namespace nx::time_sync::legacy;
+    TimePriorityKey syncTimeKey;
+    syncTimeKey.fromUInt64(syncTimeKeyData.value.toULongLong());
+
+    QnUuid primaryTimeServerId;
+    ApiMediaServerDataList serverList;
+    if (doQueryNoLock(QnUuid(), serverList) != ErrorCode::ok)
+        return false;
+
+    for (const auto& server: serverList)
+    {
+        if (TimePriorityKey::seedFromId(server.id) == syncTimeKey.seed)
+        {
+            primaryTimeServerId = server.id;
+            break;
+        }
+    }
+
+    ResourceParamWithRefData param;
+    param.resourceId = m_adminUserID;
+    param.name = nx::settings_names::kNamePrimaryTimeServer;
+    param.value = primaryTimeServerId.toString();
+    if (insertAddParam(param) != ErrorCode::ok)
+        return false;
 
     return true;
 }
