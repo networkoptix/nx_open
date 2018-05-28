@@ -3,18 +3,22 @@ import pytest
 from framework.installation.deb_installation import DebInstallation
 from framework.installation.windows_installation import WindowsInstallation
 
+# TODO: Integrate into configuration.yaml.
+_vm_type_to_platform = {
+    'linux': 'linux64',
+    'windows': 'win64',
+    }
+
 
 def make_installation(mediaserver_installers, vm_type, os_access):
+    platform = _vm_type_to_platform[vm_type]
+    try:
+        installer = mediaserver_installers[platform]
+    except KeyError:
+        pytest.skip("Mediaserver installer for {} ({}) is not provided for tests".format(vm_type, [platform]))
+        assert False, "Skip should raise exception"
     if vm_type == 'linux':
-        if 'linux64' not in mediaserver_installers:
-            pytest.skip("Mediaserver installer %r is not provided for tests" % vm_type)
-        local_deb = mediaserver_installers['linux64']
-        linux_installation = DebInstallation(os_access, local_deb)
-        return linux_installation
+        return DebInstallation(os_access, installer)
     if vm_type == 'windows':
-        if 'win64' not in mediaserver_installers:
-            pytest.skip("Mediaserver installer %r is not provided for tests" % vm_type)
-        local_windows_installer = mediaserver_installers['win64']
-        windows_installation = WindowsInstallation(os_access, local_windows_installer)
-        return windows_installation
+        return WindowsInstallation(os_access, installer)
     raise ValueError("Unknown VM type {}".format(vm_type))
