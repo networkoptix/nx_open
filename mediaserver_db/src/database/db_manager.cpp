@@ -3296,19 +3296,6 @@ ErrorCode QnDbManager::saveMiscParam(const ApiMiscData &params)
     return ErrorCode::ok;
 }
 
-bool QnDbManager::readMiscParam( const QByteArray& name, QByteArray* value )
-{
-    QSqlQuery query(m_sdb);
-    query.setForwardOnly(true);
-    query.prepare("SELECT data from misc_data where key = ?");
-    query.addBindValue(name);
-    if( query.exec() && query.next() ) {
-        *value = query.value(0).toByteArray();
-        return true;
-    }
-    return false;
-}
-
 ErrorCode QnDbManager::readSettings(ResourceParamDataList& settings)
 {
     ResourceParamWithRefDataList params;
@@ -3454,8 +3441,15 @@ void QnDbManager::addResourceTypesFromXML(ResourceTypeDataList& data)
 
 ErrorCode QnDbManager::doQueryNoLock(const QByteArray &name, ApiMiscData& miscData)
 {
-    if (!readMiscParam(name, &miscData.value))
+    QSqlQuery query(m_sdb);
+    query.setForwardOnly(true);
+    query.prepare("SELECT data from misc_data where key = ?");
+    query.addBindValue(name);
+    if (!execSQLQuery(&query, Q_FUNC_INFO))
         return ErrorCode::dbError;
+    
+    if (query.next())
+        miscData.value = query.value(0).toByteArray();
     miscData.name = name;
     return ErrorCode::ok;
 }

@@ -82,9 +82,9 @@ namespace
     const QString kCloudConnectRelayingEnabled(lit("cloudConnectRelayingEnabled"));
     const bool kCloudConnectRelayingEnabledDefault = true;
 
-    const std::chrono::seconds kMaxDifferenceBetweenSynchronizedAndInternetDefault(2);
-    const std::chrono::milliseconds kMaxDifferenceBetweenSynchronizedAndLocalTimeDefault(500);
-    const std::chrono::seconds kOsTimeChangeCheckPeriodDefault(10);
+    const std::chrono::seconds kMaxDifferenceBetweenSynchronizedAndInternetDefault(5);
+    const std::chrono::seconds kMaxDifferenceBetweenSynchronizedAndLocalTimeDefault(5);
+    const std::chrono::seconds kOsTimeChangeCheckPeriodDefault(1);
     const std::chrono::minutes kSyncTimeExchangePeriodDefault(10);
 
     const QString kHanwhaDeleteProfilesOnInitIfNeeded(lit("hanwhaDeleteProfilesOnInitIfNeeded"));

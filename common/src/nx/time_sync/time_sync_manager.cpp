@@ -21,7 +21,6 @@ namespace nx {
 namespace time_sync {
 
 const QString TimeSyncManager::kTimeSyncUrlPath(lit("/api/synchronizedTime"));
-static const std::chrono::milliseconds kMinDeltaToSync(250);
 
 static const std::chrono::seconds kLoadTimeTimeout(10);
 
@@ -44,7 +43,9 @@ TimeSyncManager::TimeSyncManager(
                 connect(m_timer, &QTimer::timeout, this, &TimeSyncManager::doPeriodicTasks);
             }
             updateTime();
-            m_timer->start(std::chrono::milliseconds(1000).count());
+            auto globalSettings = this->commonModule()->globalSettings();
+            m_timer->start(
+                std::chrono::milliseconds(globalSettings->osTimeChangeCheckPeriod()).count());
         });
     connect(m_thread, &QThread::finished, [this]() { m_timer->stop(); });
 
@@ -91,8 +92,9 @@ std::unique_ptr<nx::network::AbstractStreamSocket> TimeSyncManager::connectToRem
 void TimeSyncManager::loadTimeFromLocalClock()
 {
     auto newValue = m_systemClock->millisSinceEpoch();
-
-    setSyncTime(newValue);
+    static const std::chrono::milliseconds kMaxJitterForLocalClock(250);
+    
+    setSyncTime(newValue, kMaxJitterForLocalClock);
     NX_DEBUG(this, lm("Set time %1 from the local clock").
         arg(QDateTime::fromMSecsSinceEpoch(newValue.count()).toString(Qt::ISODate)));
 }
@@ -159,18 +161,18 @@ bool TimeSyncManager::loadTimeFromServer(const QnRoute& route)
     auto maxRtt = commonModule()->globalSettings()->maxDifferenceBetweenSynchronizedAndLocalTime();
     if (rtt > maxRtt)
         return false; //< Too big rtt. Try again.
-    setSyncTime(newTime);
+    setSyncTime(newTime, rtt);
     NX_DEBUG(this, lm("Got time %1 from the neighbor server %2")
         .args(QDateTime::fromMSecsSinceEpoch(newTime.count()).toString(Qt::ISODate),
         route.id.toString()));
     return true;
 }
 
-bool TimeSyncManager::setSyncTime(std::chrono::milliseconds value)
+bool TimeSyncManager::setSyncTime(std::chrono::milliseconds value, std::chrono::milliseconds rtt)
 {
     const auto syncTime = getSyncTime();
     const auto timeDelta = value < syncTime ? syncTime - value : value - syncTime;
-    if (timeDelta < kMinDeltaToSync)
+    if (timeDelta < rtt / 2)
         return false;
 
     setSyncTimeInternal(value);

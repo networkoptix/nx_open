@@ -127,7 +127,7 @@ public:
                     commonModule->globalSettings()->setOsTimeChangeCheckPeriod(
                         std::chrono::milliseconds(100));
                     commonModule->globalSettings()->setSyncTimeExchangePeriod(
-                        std::chrono::seconds(1));
+                        std::chrono::milliseconds(100));
 
                 }, Qt::DirectConnection);
             }, Qt::DirectConnection);

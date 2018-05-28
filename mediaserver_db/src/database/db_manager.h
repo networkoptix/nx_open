@@ -190,8 +190,6 @@ namespace detail
         ApiObjectInfoList getNestedObjectsNoLock(const ApiObjectInfo& parentObject);
         ApiObjectInfoList getObjectsNoLock(const ApiObjectType& objectType);
 
-        bool readMiscParam( const QByteArray& name, QByteArray* value );
-
         //!Reads settings (properties of user 'admin')
 
         void setTransactionLog(QnTransactionLog* tranLog);
