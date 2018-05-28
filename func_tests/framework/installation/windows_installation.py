@@ -1,6 +1,8 @@
 import logging
 
 from framework.installation.installation import Installation
+from framework.installation.installer import Customization
+from framework.installation.installer import Installer
 from framework.installation.windows_service import WindowsService
 from framework.os_access.path import copy_file
 from framework.os_access.windows_access import WindowsAccess
@@ -10,25 +12,20 @@ _logger = logging.getLogger(__name__)
 
 class WindowsInstallation(Installation):
     def __init__(self, windows_access, installer):
-        self._installer = installer
+        self._installer = installer  # type: Installer
         program_files_dir = windows_access.Path(windows_access.winrm.user_env_vars()['ProgramFiles'])
-        self.dir = program_files_dir / 'Hanwha' / 'Wisenet WAVE' / 'MediaServer'
+        customization = installer.customization  # type: Customization
+        self.dir = program_files_dir / customization.windows_installation_subdir
         self.binary = self.dir / 'mediaserver.exe'
         self.info = self.dir / 'build_info.txt'
-        self.var = windows_access.Path(
-            windows_access.winrm.system_profile_dir(),
-            'AppData',
-            'Local',
-            'Hanwha',
-            'Hanwha Media Server',
-            )
+        system_profile_dir = windows_access.Path(windows_access.winrm.system_profile_dir())
+        local_app_data_dir = system_profile_dir / 'AppData' / 'Local'
+        self.var = local_app_data_dir / customization.windows_app_data_subdir
         self._log_file = self.var / 'log' / 'log_file.log'
         self.key_pair = self.var / 'ssl' / 'cert.pem'
-        self._config_key = windows_access.winrm.registry_key(
-            u'HKEY_LOCAL_MACHINE\\SOFTWARE\\Hanwha\\Hanwha Media Server')
-        self._config_key_backup = windows_access.winrm.registry_key(
-            u'HKEY_LOCAL_MACHINE\\SOFTWARE\\Hanwha\\FuncTests Backup\\Hanwha Media Server')
-        self.service = WindowsService(windows_access.winrm, 'hanwhaMediaServer')
+        self._config_key = windows_access.winrm.registry_key(customization.windows_registry_key)
+        self._config_key_backup = windows_access.winrm.registry_key(customization.windows_registry_key + ' Backup')
+        self.service = WindowsService(windows_access.winrm, customization.windows_service_name)
         self.os_access = windows_access  # type: WindowsAccess
 
     def is_valid(self):

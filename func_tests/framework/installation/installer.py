@@ -1,5 +1,7 @@
 from collections import namedtuple
 
+from pathlib2 import PurePosixPath, PureWindowsPath
+
 
 class Version(tuple):  # `tuple` gives `__hash__` and comparisons but requires `__new__`.
     def __new__(cls, version_str):
@@ -19,24 +21,33 @@ class PackageNameParseError(Exception):
 
 
 Customization = namedtuple('Customization', [
-    'customization_name', 'installer_name',
-    'company_name',
+    'customization_name', 'installer_name', 'company_name',
     'linux_service_name', 'linux_subdir',
-    'windows_service_name', 'windows_installation_subdir', 'windows_app_data_subdir',
+    'windows_service_name', 'windows_installation_subdir', 'windows_app_data_subdir', 'windows_registry_key',
     ])
 
 known_customizations = {
     Customization(
-        'hanwha', 'wave',
-        'Hanwha',
-        'hanwha-mediaserver', 'hanwha/mediaserver',
-        'hanwhaMediaServer', 'Hanwha\\Wisenet WAVE\\MediaServer', 'Hanwha\\Hanwha Media Server',
+        customization_name='hanwha',
+        installer_name='wave',
+        company_name='Hanwha',
+        linux_service_name='hanwha-mediaserver',
+        linux_subdir=PurePosixPath('hanwha', 'mediaserver'),
+        windows_service_name='hanwhaMediaServer',
+        windows_installation_subdir=PureWindowsPath(u'Hanwha', u'Wisenet WAVE', u'MediaServer'),
+        windows_app_data_subdir=PureWindowsPath(u'Hanwha', u'Hanwha Media Server'),
+        windows_registry_key=u'HKEY_LOCAL_MACHINE\\SOFTWARE\\Hanwha\\Hanwha Media Server',
         ),
     Customization(
-        'default', 'nxwitness',
-        'Network Optix',
-        'networkoptix-mediaserver', 'networkoptix/mediaserver',
-        'defaultMediaServer', 'Network Optix\\Nx Witness\\MediaServer', 'Network Optix\\Network Optix Media Server',
+        customization_name='default',
+        installer_name='nxwitness',
+        company_name='Network Optix',
+        linux_service_name='networkoptix-mediaserver',
+        linux_subdir=PurePosixPath('networkoptix/mediaserver'),
+        windows_service_name='defaultMediaServer',
+        windows_installation_subdir=PureWindowsPath(u'Network Optix', u'Nx Witness', u'MediaServer'),
+        windows_app_data_subdir=PureWindowsPath(u'Network Optix', u'Network Optix Media Server'),
+        windows_registry_key=u'HKEY_LOCAL_MACHINE\\SOFTWARE\\Network Optix\\Network Optix Media Server',
         ),
     }
 
