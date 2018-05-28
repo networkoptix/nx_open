@@ -7,12 +7,6 @@ from framework.os_access.windows_remoting._cmd import Shell, receive_stdout_and_
 log = logging.getLogger(__name__)
 
 
-@pytest.fixture()
-def shell(pywinrm_protocol):
-    with Shell(pywinrm_protocol) as shell:
-        yield shell
-
-
 def test_remote_process_interaction(shell):
     with shell.start('more') as command:
         for i in range(3):

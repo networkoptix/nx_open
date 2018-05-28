@@ -70,7 +70,7 @@ def test_routes(networking, macs):
 
 
 def test_ping_localhost(networking):
-    networking.ping('127.0.0.1')
+    assert networking.can_reach('127.0.0.1')
 
 
 def test_ping_invalid_address(networking):

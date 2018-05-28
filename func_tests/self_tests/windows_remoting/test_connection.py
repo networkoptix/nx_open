@@ -23,7 +23,7 @@ def test_port_open(windows_vm_info):
     client.setsockopt(socket.SOL_SOCKET, socket.SO_LINGER, struct.pack('ii', l_onoff, l_linger))
     with closing(client):
         retry_on_exception(
-            lambda: client.connect((hostname, port)),
+            lambda: client.connect((str(hostname), port)),
             socket.timeout,
             'connection to {}:{} can be established'.format(hostname, port),
             timeout_sec=300)

@@ -15,23 +15,16 @@ from framework.os_access.windows_remoting._powershell import (
 log = logging.getLogger(__name__)
 
 
-@pytest.fixture()
-def shell(pywinrm_protocol):
-    with Shell(pywinrm_protocol) as shell:
-        yield shell
-
-
-def test_start_script(pywinrm_protocol):
+def test_start_script(shell):
     # language=PowerShell
     powershell_command = '''
         $x = 1111
         $y = $x * $x
         $y | ConvertTo-Json
         '''
-    with Shell(pywinrm_protocol) as shell:
-        with start_raw_powershell_script(shell, powershell_command) as command:
-            stdout, stderr = receive_stdout_and_stderr_until_done(command)
-            assert json.loads(stdout.decode()) == 1234321
+    with start_raw_powershell_script(shell, powershell_command) as command:
+        stdout, stderr = receive_stdout_and_stderr_until_done(command)
+        assert json.loads(stdout.decode()) == 1234321
 
 
 def test_format_script():

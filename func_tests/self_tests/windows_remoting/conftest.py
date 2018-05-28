@@ -1,5 +1,4 @@
 import pytest
-import winrm
 
 from fixtures.vms import vm_types_configuration
 from framework.os_access.windows_remoting import WinRM
@@ -20,3 +19,8 @@ def winrm(windows_vm_info):
     winrm = WinRM(address, port, u'Administrator', u'qweasd123')
     wait_for_true(winrm.is_working)
     return winrm
+
+
+@pytest.fixture()
+def shell(winrm):
+    yield winrm._shell()
