@@ -232,7 +232,7 @@ public:
 
     virtual bool isSystemIdFromSystemName() const override
     {
-        return qnServerModule->roSettings()->value("systemIdFromSystemName").toInt() > 0;
+        return qnServerModule->settings().systemIdFromSystemName() > 0;
     }
 
     virtual QString getMaxServerKey() const override

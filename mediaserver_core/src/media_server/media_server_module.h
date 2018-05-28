@@ -28,6 +28,7 @@ namespace mediaserver {
 class UnusedWallpapersWatcher;
 class LicenseWatcher;
 class RootTool;
+class Settings;
 
 namespace updates2 { class ServerUpdates2Manager; }
 
@@ -74,7 +75,9 @@ public:
     std::chrono::milliseconds lastRunningTimeBeforeRestart() const;
     void setLastRunningTime(std::chrono::milliseconds value) const;
 
-    MSSettings* settings() const;
+    const nx::mediaserver::Settings& settings() const;
+    nx::mediaserver::Settings* mutableSettings();
+    void syncRoSettings() const;
     nx::mediaserver::UnusedWallpapersWatcher* unusedWallpapersWatcher() const;
     nx::mediaserver::LicenseWatcher* licenseWatcher() const;
     PluginManager* pluginManager() const;

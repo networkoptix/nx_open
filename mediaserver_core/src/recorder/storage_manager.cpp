@@ -119,7 +119,7 @@ public:
                                        .arg(QnLexical::serialized(m_catalog))
                                        .arg(m_cameraUniqueId);
         qnServerModule->roSettings()->setValue(settingName(m_role), serializedData);
-        qnServerModule->roSettings()->sync();
+        qnServerModule->syncRoSettings();
     }
 
     void load() {
@@ -141,7 +141,7 @@ public:
 
     static void reset(QnServer::StoragePool role) {
         qnServerModule->roSettings()->setValue(settingName(role), QString());
-        qnServerModule->roSettings()->sync();
+        qnServerModule->syncRoSettings();
     }
 
     bool isEmpty() const { return m_cameraUniqueId.isEmpty(); }
@@ -476,7 +476,7 @@ QnStorageManager::QnStorageManager(
     m_rebuildCancelled(false),
     m_rebuildArchiveThread(0),
     m_firstStoragesTestDone(false),
-    m_isRenameDisabled(qnServerModule->roSettings()->value("disableRename").toInt()),
+    m_isRenameDisabled(qnServerModule->settings().disableRename()),
     m_camInfoWriterHandler(this, commonModule->resourcePool()),
     m_camInfoWriter(&m_camInfoWriterHandler)
 {

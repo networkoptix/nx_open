@@ -6,7 +6,6 @@
 #include <QtConcurrent/QtConcurrentMap>
 #include <QtCore/QCoreApplication>
 #include <QtCore/QElapsedTimer>
-#include <QtCore/QSettings>
 #include <QtCore/QStringList>
 #include <QtCore/QThreadPool>
 #include <QtCore/QTime>

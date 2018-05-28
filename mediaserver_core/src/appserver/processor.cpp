@@ -147,7 +147,7 @@ void QnAppserverResourceProcessor::at_mutexLocked()
 
 void QnAppserverResourceProcessor::readDefaultUserAttrs()
 {
-    QString dir = qnServerModule->roSettings()->value("staticDataDir", getDataDirectory()).toString();
+    QString dir = qnServerModule->settings().staticDataDir();
     QFile f(closeDirPath(dir) + lit("default_rec.json"));
     if (!f.open(QFile::ReadOnly))
         return;

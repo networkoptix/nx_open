@@ -2,6 +2,7 @@
 
 #include <map>
 #include <functional>
+#include <chrono>
 
 #include <nx/utils/log/assert.h>
 
@@ -52,7 +53,7 @@ protected:
     {
         BaseOption(Settings* settings, const QString& name)
         {
-            settings->add(name, this);            
+            settings->add(name, this);
         }
 
         virtual ~BaseOption() = default;
@@ -149,6 +150,25 @@ private:
     bool m_loaded = false;
     std::map<QString, BaseOption*> m_options;
 };
+
+template<>
+inline bool Settings::Option<std::chrono::milliseconds>::load(const QVariant& value)
+{
+    if (!value.isValid() || !value.canConvert<quint64>())
+        return false;
+
+    m_value = std::chrono::milliseconds(value.value<quint64>());
+    isPresent = true;
+    return true;
+}
+
+template<>
+inline QVariant Settings::Option<std::chrono::milliseconds>::save() const
+{
+    QVariant result;
+    result.setValue(m_value.count());
+    return result;
+}
 
 } // namespace utils
 } // namespace nx

@@ -13,12 +13,12 @@ FilterConfig FilterConfig::createDefault(bool includeNonHdd)
 {
     FilterConfig result;
 
-    const auto settings = qnServerModule->roSettings();
+    const auto& settings = qnServerModule->settings();
     result.isMultipleInstancesAllowed =
-        static_cast<bool>(settings->value(nx_ms_conf::ENABLE_MULTIPLE_INSTANCES).toInt());
+        static_cast<bool>(settings.enableMultipleInstances());
     result.isRemovableDrivesAllowed = includeNonHdd
         ? true
-        : static_cast<bool>(settings->value(nx_ms_conf::ALLOW_REMOVABLE_STORAGES).toInt());
+        : static_cast<bool>(settings.allowRemovableStorages());
     result.isNetworkDrivesAllowed = includeNonHdd;
 
     result.partitions = ((QnPlatformMonitor *)qnPlatform->monitor())->totalPartitionSpaceInfo(

@@ -32,9 +32,7 @@ bool StreamingChunkProvider::get(
     StreamingChunkPtr newChunk = std::make_shared<VideoCameraStreamingChunk>(
         m_resourcePool,
         key,
-        qnServerModule->settings()->roSettings()->value(
-            nx_ms_conf::HLS_MAX_CHUNK_BUFFER_SIZE,
-            nx_ms_conf::DEFAULT_HLS_MAX_CHUNK_BUFFER_SIZE).toUInt());
+        qnServerModule->settings().hlsMaxChunkBufferSize());
     if( !m_transcoder->transcodeAsync( key, newChunk ) )
         return false;
 

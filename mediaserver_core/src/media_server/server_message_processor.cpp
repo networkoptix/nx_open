@@ -34,7 +34,7 @@
 
 QnServerMessageProcessor::QnServerMessageProcessor(QnCommonModule* commonModule):
     base_type(commonModule),
-    m_serverPort( qnServerModule->roSettings()->value(nx_ms_conf::SERVER_PORT, nx_ms_conf::DEFAULT_SERVER_PORT).toInt() )
+    m_serverPort(qnServerModule->settings().port())
 {
 }
 
