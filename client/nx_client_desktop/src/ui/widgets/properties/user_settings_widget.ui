@@ -279,18 +279,9 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>nx::client::desktop::InputField</class>
-   <extends>QWidget</extends>
-   <header location="global">nx/client/desktop/common/widgets/input_field.h</header>
    <class>nx::client::desktop::LabelWithHint</class>
    <extends>QLabel</extends>
    <header location="global">nx/client/desktop/common/widgets/widget_with_hint.h</header>
-  </customwidget>
-  <customwidget>
-   <class>QnInputField</class>
-   <extends>QWidget</extends>
-   <header location="global">ui/widgets/common/input_field.h</header>
-   <container>1</container>
   </customwidget>
   <customwidget>
    <class>QnCloudUserPanelWidget</class>
@@ -303,6 +294,11 @@
    <extends>QWidget</extends>
    <header location="global">ui/widgets/word_wrapped_label.h</header>
    <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>nx::client::desktop::InputField</class>
+   <extends>QWidget</extends>
+   <header location="global">nx/client/desktop/common/widgets/input_field.h</header>
   </customwidget>
  </customwidgets>
  <tabstops>
