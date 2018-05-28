@@ -1,7 +1,6 @@
 """Manipulate directory to which server instance is installed."""
 
 import logging
-import re
 import sys
 from io import BytesIO
 
@@ -78,28 +77,6 @@ class DebInstallation(Installation):
             return self._log_file.read_bytes()
         except DoesNotExist:
             return None
-
-    def patch_binary_set_cloud_host(self, new_host):
-        regex = re.compile(r'(?P<tag>this_is_cloud_host_name) (?P<host>[^\0]+)\0+')
-
-        # Path to .so with cloud host string. Differs among versions.
-        for lib_name in {'libnx_network.so', 'libcommon.so'}:
-            lib_path = self.dir / 'lib' / lib_name
-            try:
-                lib_bytes_original = lib_path.read_bytes()
-            except DoesNotExist:
-                _logger.warning("Lib %s doesn't exist.", lib_path)
-            else:
-                def compose_replacement(match):
-                    replacement = '{} {}'.format(match.group('tag'), new_host).ljust(len(match.group(0)), '\0')
-                    _logger.info("Replace cloud host %s with %s in %s.", match.group('host'), new_host, lib_path)
-                    assert replacement.endswith('\0'), "Host name {} is too long.".format(new_host)
-                    return replacement
-
-                lib_bytes_replaced = regex.sub(compose_replacement, lib_bytes_original)
-                if lib_bytes_replaced != lib_bytes_original:
-                    assert len(lib_bytes_replaced) == len(lib_bytes_original)
-                    lib_path.write_bytes(lib_bytes_replaced)
 
     def _can_be_reused(self):
         if not self.is_valid():

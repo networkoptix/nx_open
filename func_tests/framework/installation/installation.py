@@ -26,7 +26,3 @@ class Installation(object):
     @abstractmethod
     def read_log(self):
         return b'log file contents'
-
-    @abstractmethod
-    def patch_binary_set_cloud_host(self, new_host):  # type: (str) -> None
-        pass

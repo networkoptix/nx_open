@@ -82,6 +82,3 @@ class WindowsInstallation(Installation):
 
     def read_log(self):
         pass
-
-    def patch_binary_set_cloud_host(self, new_host):
-        pass

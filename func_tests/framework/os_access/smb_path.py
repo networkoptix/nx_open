@@ -186,6 +186,7 @@ class SMBPath(FileSystemPath, PureWindowsPath):
     @_reraising_on_operation_failure({
         _STATUS_FILE_IS_A_DIRECTORY: NotAFile,
         _STATUS_OBJECT_NAME_NOT_FOUND: DoesNotExist,
+        _STATUS_OBJECT_PATH_NOT_FOUND: DoesNotExist,
         })
     def read_bytes(self):
         ad_hoc_file_object = BytesIO()
