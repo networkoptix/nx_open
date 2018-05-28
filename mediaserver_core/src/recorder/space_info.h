@@ -10,6 +10,7 @@ namespace recorder {
 
 class SpaceInfo
 {
+public:
     struct StorageSpaceInfo
     {
         int index;
@@ -27,7 +28,13 @@ class SpaceInfo
 
     using SpaceInfoVector = std::vector<StorageSpaceInfo>;
 
-public:
+    enum RecordingReadinessState
+    {
+        ready,
+        notReady,
+        notExist
+    };
+
     SpaceInfo();
     void storageAdded(int index, int64_t totalSpace);
     void storageRemoved(int index);
@@ -37,6 +44,7 @@ public:
     * Returns optimal storage index or -1 if this index can't be determined
     */
     int getOptimalStorageIndex(const std::vector<int>& allowedIndexes) const;
+    RecordingReadinessState state(int storageIndex) const;
 
 private:
     SpaceInfoVector::iterator storageByIndex(int storageIndex);
