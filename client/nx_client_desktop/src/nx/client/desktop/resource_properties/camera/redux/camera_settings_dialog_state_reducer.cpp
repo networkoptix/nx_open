@@ -277,7 +277,7 @@ State::ImageControlSettings calculateImageControlSettings(
             cameras,
             [](const auto& camera)
             {
-                const auto rotationString = camera->getProperty(QnMediaResource::rotationKey());
+                const QString rotationString = camera->getProperty(QnMediaResource::rotationKey());
                 return rotationString.isEmpty()
                     ? Rotation()
                     : Rotation::closestStandardRotation(rotationString.toInt());
