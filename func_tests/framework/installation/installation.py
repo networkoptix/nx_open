@@ -4,6 +4,7 @@ from framework.os_access.path import FileSystemPath
 
 
 class Installation(object):
+    """Install and access installed files in uniform way"""
     __metaclass__ = ABCMeta
 
     @abstractmethod
