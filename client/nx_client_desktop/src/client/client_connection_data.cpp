@@ -35,6 +35,16 @@ bool QnConnectionData::isValid() const
 
 //////////////////////////////////////////////////////////////////////////////////////////////////
 
+QnConnectionDataList::QnConnectionDataList():
+    base_type()
+{
+}
+
+QnConnectionDataList::QnConnectionDataList(const QList<QnConnectionData>& source):
+    base_type(source)
+{
+}
+
 bool QnConnectionDataList::contains(const QString &name){
     foreach(QnConnectionData data, *this){
         if (data.name != name)
