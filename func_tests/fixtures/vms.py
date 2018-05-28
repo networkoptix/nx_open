@@ -21,6 +21,7 @@ DEFAULT_VM_HOST_DIR = '/tmp/jenkins-test'
 
 @lrudecorator(1)
 def vm_types_configuration():
+    # It's a function, not a fixture, because used when parameters are generated.
     path = Path(__file__).with_name('configuration.yaml')
     configuration = load(path.read_text())
     return configuration['vm_types']

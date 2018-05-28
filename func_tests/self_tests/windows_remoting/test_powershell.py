@@ -4,7 +4,7 @@ from textwrap import dedent
 
 import pytest
 
-from framework.os_access.windows_remoting._cmd import Shell, receive_stdout_and_stderr_until_done
+from framework.os_access.windows_remoting._cmd import receive_stdout_and_stderr_until_done
 from framework.os_access.windows_remoting._powershell import (
     PowershellError,
     format_script,
@@ -15,14 +15,14 @@ from framework.os_access.windows_remoting._powershell import (
 log = logging.getLogger(__name__)
 
 
-def test_start_script(shell):
+def test_start_script(winrm_shell):
     # language=PowerShell
     powershell_command = '''
         $x = 1111
         $y = $x * $x
         $y | ConvertTo-Json
         '''
-    with start_raw_powershell_script(shell, powershell_command) as command:
+    with start_raw_powershell_script(winrm_shell, powershell_command) as command:
         stdout, stderr = receive_stdout_and_stderr_until_done(command)
         assert json.loads(stdout.decode()) == 1234321
 
@@ -65,9 +65,9 @@ def test_format_script():
     assert format_script(body, variables) == expected_formatted_script
 
 
-def test_run_script(shell):
+def test_run_script(winrm_shell):
     result = run_powershell_script(
-        shell,
+        winrm_shell,
         # language=PowerShell
         '''
             $a = $x * $x
@@ -78,11 +78,11 @@ def test_run_script(shell):
     assert result == [9]
 
 
-def test_run_script_error(shell):
+def test_run_script_error(winrm_shell):
     non_existing_group = 'nonExistingGroup'
     with pytest.raises(PowershellError) as exception_info:
         _ = run_powershell_script(
-            shell,
+            winrm_shell,
             # language=PowerShell
             '''Get-LocalGroup -Name:$Group''',
             {'Group': non_existing_group})
