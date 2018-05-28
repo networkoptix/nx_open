@@ -695,7 +695,7 @@ void ActionHandler::showEula()
 {
     const QString eulaHtmlStyle = QString::fromLatin1(R"(
     <style media="screen" type="text/css">
-    p {
+    * {
         color: %1;
         font-family: 'Roboto-Regular', 'Roboto';
         font-weight: 400;
