@@ -31,7 +31,7 @@ bool Rotation::isValid() const
 
 qreal Rotation::value() const
 {
-    return m_degrees.value_or(0);
+    return m_degrees;
 }
 
 QString Rotation::toString() const
