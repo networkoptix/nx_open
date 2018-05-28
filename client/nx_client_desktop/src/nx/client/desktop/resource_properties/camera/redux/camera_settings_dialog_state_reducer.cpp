@@ -629,6 +629,9 @@ State CameraSettingsDialogStateReducer::loadCameras(
 
     state.imageControl = calculateImageControlSettings(cameras);
 
+    fetchFromCameras<bool>(state.audioEnabled, cameras,
+        [](const Camera& camera) { return camera->isAudioEnabled(); });
+
     fetchFromCameras<bool>(state.expert.dualStreamingDisabled, cameras,
         [](const Camera& camera) { return camera->isDualStreamingDisabled(); });
     fetchFromCameras<bool>(state.expert.cameraControlDisabled, cameras,
@@ -923,6 +926,13 @@ State CameraSettingsDialogStateReducer::setRecordingEnabled(State state, bool va
         state.recording.schedule.setUser(tasks);
     }
 
+    return state;
+}
+
+State CameraSettingsDialogStateReducer::setAudioEnabled(State state, bool value)
+{
+    state.hasChanges = true;
+    state.audioEnabled.setUser(value);
     return state;
 }
 

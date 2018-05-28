@@ -5,6 +5,7 @@
 
 #include <ui/common/read_only.h>
 #include <nx/client/desktop/common/utils/aligner.h>
+#include <nx/client/desktop/common/utils/checkbox_utils.h>
 #include <nx/utils/log/assert.h>
 
 namespace nx {
@@ -32,6 +33,8 @@ CameraSettingsGeneralTabWidget::CameraSettingsGeneralTabWidget(
     ui->wearableArchiveLengthWidget->aligner()->addAligner(
         ui->wearableMotionWidget->aligner());
 
+    CheckboxUtils::autoClearTristate(ui->enableAudioCheckBox);
+
     connect(store, &CameraSettingsDialogStore::stateChanged,
         this, &CameraSettingsGeneralTabWidget::loadState);
 
@@ -40,6 +43,12 @@ CameraSettingsGeneralTabWidget::CameraSettingsGeneralTabWidget(
 
     connect(ui->licensePanel, &CameraLicensePanelWidget::actionRequested,
         this, &CameraSettingsGeneralTabWidget::actionRequested);
+
+    connect(ui->enableAudioCheckBox, &QCheckBox::clicked,
+        store, &CameraSettingsDialogStore::setAudioEnabled);
+
+    // TODO: #vkutin #gdm Handle "Edit Credentials" button and remove the following line.
+    ui->authenticationGroupBox->hide();
 }
 
 CameraSettingsGeneralTabWidget::~CameraSettingsGeneralTabWidget()
@@ -60,6 +69,10 @@ void CameraSettingsGeneralTabWidget::loadState(const CameraSettingsDialogState& 
 
     ui->licensePanel->setVisible(licensePanelVisible);
     ui->overLicensingLine->setVisible(licensePanelVisible);
+
+    CheckboxUtils::setupTristateCheckbox(ui->enableAudioCheckBox,
+        state.audioEnabled.hasValue(),
+        state.audioEnabled.valueOr(false));
 
     ::setReadOnly(ui->enableAudioCheckBox, state.readOnly);
     ::setReadOnly(ui->editCredentialsButton, state.readOnly);

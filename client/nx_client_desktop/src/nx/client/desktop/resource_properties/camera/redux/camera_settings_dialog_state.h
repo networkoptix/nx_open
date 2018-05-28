@@ -283,6 +283,8 @@ struct CameraSettingsDialogState
     };
     RecordingSettings recording;
 
+    UserEditableMultiple<bool> audioEnabled;
+
     std::optional<Alert> alert;
 
     struct ImageControlSettings

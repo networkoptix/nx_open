@@ -225,6 +225,12 @@ void CameraSettingsDialogStore::setRecordingEnabled(bool value)
         [&](State state) { return Reducer::setRecordingEnabled(std::move(state), value); });
 }
 
+void CameraSettingsDialogStore::setAudioEnabled(bool value)
+{
+    d->executeAction(
+        [&](State state) { return Reducer::setAudioEnabled(std::move(state), value); });
+}
+
 void CameraSettingsDialogStore::setMotionDetectionEnabled(bool value)
 {
     d->executeAction(

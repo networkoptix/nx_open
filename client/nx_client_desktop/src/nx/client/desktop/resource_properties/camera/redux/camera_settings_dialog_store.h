@@ -58,6 +58,7 @@ public:
     void setCustomAspectRatio(const QnAspectRatio& value);
     void setCustomRotation(const Rotation& value);
     void setRecordingEnabled(bool value);
+    void setAudioEnabled(bool value);
     void setMotionDetectionEnabled(bool value);
     void setMotionRegionList(const QList<QnMotionRegion>& value);
     void setFisheyeSettings(const QnMediaDewarpingParams& value);

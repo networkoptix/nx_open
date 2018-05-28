@@ -233,6 +233,12 @@ void setWearableMotionEnabled(bool value, const Cameras& cameras)
     }
 }
 
+void setAudioEnabled(bool value, const Cameras& cameras)
+{
+    for (const auto& camera: cameras)
+        camera->setAudioEnabled(value);
+}
+
 void setWearableMotionSensitivity(int value, const Cameras& cameras)
 {
     QnMotionRegion region;
@@ -314,6 +320,9 @@ void CameraSettingsDialogStateConversionFunctions::applyStateToCameras(
 
     if (state.recording.thresholds.afterSec.hasValue())
         setRecordingAfterThreshold(state.recording.thresholds.afterSec(), cameras);
+
+    if (state.audioEnabled.hasValue())
+        setAudioEnabled(state.audioEnabled(), cameras);
 
     if (state.settingsOptimizationEnabled)
     {

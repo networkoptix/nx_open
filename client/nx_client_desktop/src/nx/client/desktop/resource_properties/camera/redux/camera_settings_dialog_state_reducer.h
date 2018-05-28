@@ -18,7 +18,9 @@ public:
     static State setSettingsOptimizationEnabled(State state, bool value);
     static State setGlobalPermissions(State state, Qn::GlobalPermissions value);
     static State setSingleWearableState(State state, const WearableState& value);
+
     static State loadCameras(State state, const QnVirtualCameraResourceList& cameras);
+
     static State setSingleCameraUserName(State state, const QString& text);
     static State setScheduleBrush(State state, const ScheduleCellParams& brush);
     static State setScheduleBrushRecordingType(State state, Qn::RecordingType value);
@@ -39,6 +41,7 @@ public:
     static State setCustomAspectRatio(State state, const QnAspectRatio& value);
     static State setCustomRotation(State state, const Rotation& value);
     static State setRecordingEnabled(State state, bool value);
+    static State setAudioEnabled(State state, bool value);
     static State setMotionDetectionEnabled(State state, bool value);
     static State setMotionRegionList(State state, const QList<QnMotionRegion>& value);
     static State setFisheyeSettings(State state, const QnMediaDewarpingParams& value);
