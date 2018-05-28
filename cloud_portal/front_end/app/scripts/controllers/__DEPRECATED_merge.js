@@ -11,7 +11,7 @@ angular.module('cloudApp')
 
         //Add system can merge where added to systems form api call
         function checkMergeAbility(system){
-            if(system.stateOfHealth == 'offline'){
+            if(system.stateOfHealth === 'offline'){
                 return 'offline'
             }
             if(!system.canMerge){
@@ -35,10 +35,10 @@ angular.module('cloudApp')
 
         $scope.addStatus = function(system){
             var status = "";
-            if(system.stateOfHealth == 'offline'){
+            if(system.stateOfHealth === 'offline'){
                 status = ' (offline)';
             }
-            else if(system.stateOfHealth == 'online' && system.canMerge){
+            else if(system.stateOfHealth === 'online' && system.canMerge){
                 status = ' (incompatable)';
             }
             return system.name + status;
@@ -47,7 +47,7 @@ angular.module('cloudApp')
         $scope.mergingSystems = process.init(function(){
             var masterSystemId = null;
             var slaveSystemId = null;
-            if($scope.masterSystemId == $scope.system.id){
+            if($scope.masterSystemId === $scope.system.id){
                 masterSystemId = $scope.system.id;
                 slaveSystemId = $scope.targetSystem.id;
             }
@@ -62,7 +62,7 @@ angular.module('cloudApp')
         }).then(function(){
             systemsProvider.forceUpdateSystems();
             dialogs.closeMe($scope, {"anotherSystemId":$scope.targetSystem.id,
-                                     "role": $scope.masterSystemId == $scope.system.id ? Config.systemStatuses.master
+                                     "role": $scope.masterSystemId === $scope.system.id ? Config.systemStatuses.master
                                                                                        : Config.systemStatuses.slave});
         });
 
