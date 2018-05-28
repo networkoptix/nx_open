@@ -53,7 +53,7 @@ class WindowsInstallation(Installation):
     def install(self):
         remote_installer_path = self._upload_installer()
         remote_log_path = remote_installer_path.parent / (remote_installer_path.name + '.install.log')
-        self.os_access.winrm.run_command([remote_installer_path, '/passive', '/l*x', remote_log_path])
+        self.os_access.winrm.run_command([remote_installer_path, '/passive', '/log', remote_log_path])
         self._backup_configuration()
 
     def list_core_dumps(self):
