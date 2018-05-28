@@ -67,8 +67,7 @@ void setCustomRotation(
         if (!camera->hasVideo())
             continue;
 
-        const QString rotationString = value.isValid() ? value.toString() : QString();
-        camera->setProperty(QnMediaResource::rotationKey(), rotationString);
+        camera->setProperty(QnMediaResource::rotationKey(), value.toString());
     }
 }
 

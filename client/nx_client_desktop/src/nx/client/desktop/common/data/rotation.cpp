@@ -24,11 +24,6 @@ Rotation::Rotation(qreal degrees):
 {
 }
 
-bool Rotation::isValid() const
-{
-    return static_cast<bool>(m_degrees);
-}
-
 qreal Rotation::value() const
 {
     return m_degrees;
@@ -68,8 +63,7 @@ Rotation Rotation::closestStandardRotation(qreal degrees)
 
 bool Rotation::operator==(const Rotation& other) const
 {
-    return isValid() == other.isValid()
-        && qFuzzyEquals(value(), other.value());
+    return qFuzzyEquals(value(), other.value());
 }
 
 bool Rotation::operator!=(const Rotation& other) const

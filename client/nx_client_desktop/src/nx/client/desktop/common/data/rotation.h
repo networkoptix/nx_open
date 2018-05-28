@@ -12,8 +12,6 @@ public:
     Rotation() = default;
     explicit Rotation(qreal degrees);
 
-    bool isValid() const;
-
     qreal value() const;
     QString toString() const;
 
