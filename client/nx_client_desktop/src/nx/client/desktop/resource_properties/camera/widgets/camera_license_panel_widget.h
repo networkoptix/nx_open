@@ -23,7 +23,7 @@ class CameraLicensePanelWidget: public Panel
     using base_type = Panel;
 
 public:
-    CameraLicensePanelWidget(QWidget *parent);
+    explicit CameraLicensePanelWidget(QWidget* parent = nullptr);
     virtual ~CameraLicensePanelWidget() override;
 
     void init(AbstractTextProvider* licenseUsageTextProvider, CameraSettingsDialogStore* store);
