@@ -3841,6 +3841,10 @@ to %1</source>
             <numerusform>Test completed successfully: %n users found.</numerusform>
         </translation>
     </message>
+    <message>
+        <source>Changing any LDAP settings other than &quot;Search Filter&quot; will result in connectivity loss for all LDAP fetched users.</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QnLdapSettingsDialogPrivate</name>
