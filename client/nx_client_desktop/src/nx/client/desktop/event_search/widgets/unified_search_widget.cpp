@@ -87,6 +87,11 @@ UnifiedSearchWidget::UnifiedSearchWidget(QWidget* parent):
     ui->areaButton->hide();
     ui->cameraButton->hide();
 
+    ui->timeButton->setSelectable(false);
+    ui->typeButton->setSelectable(false);
+    ui->areaButton->setSelectable(false);
+    ui->cameraButton->setSelectable(false);
+
     ui->timeButton->setDeactivatable(true);
     ui->typeButton->setDeactivatable(true);
     ui->areaButton->setDeactivatable(true);
