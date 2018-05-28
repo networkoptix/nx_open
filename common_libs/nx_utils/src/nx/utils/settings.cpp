@@ -5,11 +5,6 @@
 namespace nx {
 namespace utils {
 
-Settings::BaseOption::BaseOption(Settings* settings, const QString& name)
-{
-    settings->add(name, this);
-}
-
 void Settings::add(const QString& name, BaseOption* option)
 {
     NX_ASSERT(m_options.find(name) == m_options.end(), lit("Duplicate setting: %1.").arg(name));

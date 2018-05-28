@@ -4,7 +4,6 @@
 
 #include <nx/utils/settings.h>
 
-
 const QString kSettingsFilename = "test.conf";
 
 TEST(Settings, getSimpleOption)

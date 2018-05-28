@@ -40,7 +40,7 @@ namespace utils {
  *
  * </code></pre>
  */
-class Settings
+class NX_UTILS_API Settings
 {
 public:
     Settings() = default;
@@ -50,10 +50,15 @@ public:
 protected:
     struct BaseOption
     {
-        BaseOption(Settings* settings, const QString& name);
+        BaseOption(Settings* settings, const QString& name)
+        {
+            settings->add(name, this);            
+        }
 
-        bool present() const { return m_present; }
-        bool removed() const { return m_removed; }
+        virtual ~BaseOption() = default;
+
+        bool present() const { return isPresent; }
+        bool removed() const { return isRemoved; }
 
         virtual bool load(const QVariant& value) = 0;
         virtual QVariant save() const = 0;
@@ -62,20 +67,22 @@ protected:
         BaseOption& operator=(const BaseOption&) = delete;
 
     protected:
-        bool m_present = false;
-        bool m_removed = false;
+        bool isPresent = false;
+        bool isRemoved = false;
     };
 
-    template <typename T>
+    template<typename T>
     struct Option final: BaseOption
     {
-        using Accessor = std::function<T (const T&)>;
+        using Accessor = std::function<T(const T&)>;
+        static inline const Accessor defaultAccessor = [](const T& value) { return value; };
+
         Option(
             Settings* settings,
             const QString& name,
             const T& defaultValue,
             const QString& description,
-            const Accessor& accessor = [](const T& value) { return value; })
+            const Accessor& accessor = defaultAccessor)
             :
             BaseOption(settings, name),
             m_settings(settings),
@@ -97,14 +104,14 @@ protected:
         void set(const T& value)
         {
             m_value = value;
-            m_present = true;
-            m_removed = false;
+            isPresent = true;
+            isRemoved = false;
         }
 
         void remove()
         {
-            m_removed = true;
-            m_present = false;
+            isRemoved = true;
+            isPresent = false;
         }
 
     private:
@@ -114,7 +121,7 @@ protected:
                 return false;
 
             m_value = value.value<T>();
-            m_present = true;
+            isPresent = true;
             return true;
         }
 
