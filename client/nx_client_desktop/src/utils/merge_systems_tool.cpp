@@ -218,10 +218,10 @@ void QnMergeSystemsTool::at_mergeSystem_finished(
     {
         if (ctx.mainRequestHandle == handle)
         {
+            peerString = ctx.peerString();
             handle = ctx.nonceRequestHandle;
             m_twoStepRequests.remove(handle);
             ctxFound = true;
-            peerString = ctx.peerString();
             break;
         }
     }
