@@ -8,6 +8,7 @@ from pathlib2 import PurePath
 from pylru import lrudecorator
 from requests import RequestException
 
+from framework.os_access.exceptions import exit_status_error_cls
 from ._cim_query import CIMQuery
 from ._cmd import Shell, run_command
 from ._env_vars import EnvVars
@@ -66,6 +67,8 @@ class WinRM(object):
             exit_code,
             stdout_bytes.decode('ascii', errors='replace'),
             stderr_bytes.decode('ascii', errors='replace'))
+        if exit_code != 0:
+            raise exit_status_error_cls(exit_code)(stdout_bytes, stderr_bytes)
         return stdout_bytes
 
     def run_powershell_script(self, script, variables):
