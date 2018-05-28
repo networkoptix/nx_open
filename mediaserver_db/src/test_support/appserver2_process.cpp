@@ -58,8 +58,7 @@
 #include <local_connection_factory.h>
 #include <api/model/time_reply.h>
 #include <nx/utils/test_support/test_options.h>
-#include <nx/vms/network/reverse_connection_manager.h>
-#include <nx/vms/network/reverse_connection_listener.h>
+#include <rest/handlers/sync_time_rest_handler.h>
 
 static int registerQtResources()
 {
@@ -434,18 +433,15 @@ void Appserver2Process::registerHttpHandlers(
             return resultCode;
         });
     
-    m_tcpListener->addHandler<JsonConnectionProcessor>("HTTP", 
+    m_tcpListener->addHandler<JsonConnectionProcessor>("HTTP",
         nx::time_sync::TimeSyncManager::kTimeSyncUrlPath.mid(1), //< remove '/'
         [](const nx::network::http::Request& request, QnHttpConnectionListener* owner, QnJsonRestResult* result)
     {
         auto timeSyncManager = owner->commonModule()->ec2Connection()->timeSyncManager();
-        SyncTimeData reply;
-        reply.isTakenFromInternet = timeSyncManager->isTimeTakenFromInternet();
-        reply.utcTimeMs = timeSyncManager->getSyncTime().count();
-        result->setReply(reply);
+        result->setReply(rest::handlers::SyncTimeRestHandler::execute(timeSyncManager));
         return nx::network::http::StatusCode::ok;
     });
-    
+
     m_tcpListener->disableAuthForPath("/api/getNonce");
     m_tcpListener->disableAuthForPath("/api/moduleInformation");
 

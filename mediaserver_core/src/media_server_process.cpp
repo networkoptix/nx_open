@@ -308,6 +308,7 @@
 
 #include <local_connection_factory.h>
 #include <core/resource/resource_command_processor.h>
+#include <rest/handlers/sync_time_rest_handler.h>
 
 using namespace nx;
 using namespace nx::mediaserver;
@@ -1572,6 +1573,15 @@ void MediaServerProcess::registerRestHandlers(
     // TODO: When supported by apidoctool, the comment to these constants should be parsed.
     const auto kAdmin = Qn::GlobalAdminPermission;
     const auto kViewLogs = Qn::GlobalViewLogsPermission;
+
+    /**%apidoc GET /api/synchronizedTime
+     * This method is used for internal purpose to synchronize time between mediaservers and clients.
+     * %return:object Information about server synchronized time.
+     *     %param:integer utcTimeMs Server synchronized time.
+     *     %param:boolean isTakenFromInternet Whether the server has got the time from the internet.
+     */
+    reg(nx::time_sync::TimeSyncManager::kTimeSyncUrlPath.mid(1), 
+        new ::rest::handlers::SyncTimeRestHandler());
 
     /**%apidoc GET /api/storageStatus
      * Check if specified folder can be used as a server storage.
@@ -4387,6 +4397,7 @@ void MediaServerProcess::configureApiRestrictions(nx::network::http::AuthMethodR
     restrictions->allow(webPrefix + lit("/api/camera_event.*"), nx::network::http::AuthMethod::noAuth);
     restrictions->allow(webPrefix + lit("/api/moduleInformation"), nx::network::http::AuthMethod::noAuth);
     restrictions->allow(webPrefix + lit("/api/gettime"), nx::network::http::AuthMethod::noAuth);
+    restrictions->allow(webPrefix + nx::time_sync::TimeSyncManager::kTimeSyncUrlPath, nx::network::http::AuthMethod::noAuth);
     restrictions->allow(webPrefix + lit("/api/getTimeZones"), nx::network::http::AuthMethod::noAuth);
     restrictions->allow(webPrefix + lit("/api/getNonce"), nx::network::http::AuthMethod::noAuth);
     restrictions->allow(webPrefix + lit("/api/cookieLogin"), nx::network::http::AuthMethod::noAuth);
