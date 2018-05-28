@@ -43,7 +43,7 @@ known_customizations = {
 
 class Installer(object):
     """Information that can be extracted from package name."""
-    _extensions = {'linux64': 'deb', 'win64': 'msi'}
+    _extensions = {'linux64': 'deb', 'win64': 'exe'}
 
     def __init__(self, path):
         try:

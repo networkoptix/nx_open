@@ -14,7 +14,7 @@ def make_installation(mediaserver_installers, vm_type, os_access):
     if vm_type == 'windows':
         if 'win64' not in mediaserver_installers:
             pytest.skip("Mediaserver installer %r is not provided for tests" % vm_type)
-        local_msi = mediaserver_installers['win64']
-        windows_installation = WindowsInstallation(os_access, local_msi)
+        local_windows_installer = mediaserver_installers['win64']
+        windows_installation = WindowsInstallation(os_access, local_windows_installer)
         return windows_installation
     raise ValueError("Unknown VM type {}".format(vm_type))
