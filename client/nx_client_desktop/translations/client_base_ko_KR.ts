@@ -3838,6 +3838,10 @@ to %1</source>
         <numerusform>테스트완료:%n 사용자 검색됨.</numerusform>
       </translation>
     </message>
+    <message>
+      <source>Changing any LDAP settings other than &quot;Search Filter&quot; will result in connectivity loss for all LDAP fetched users.</source>
+      <translation type="unfinished">Changing any LDAP settings other than &quot;Search Filter&quot; will result in connectivity loss for all LDAP fetched users.</translation>
+    </message>
   </context>
   <context>
     <name>QnLdapSettingsDialogPrivate</name>
@@ -8715,10 +8719,6 @@ to %1</source>
       <translation>베타 버젼 %1</translation>
     </message>
     <message>
-      <source>Some functionality may be unavailable or not working properly.</source>
-      <translation>일부 기능은 동작하지 않거나 사용할수 없습니다.</translation>
-    </message>
-    <message>
       <source>System sends anonymous usage statistics</source>
       <translation>익명 사용 통계 수집을 사용합니다.</translation>
     </message>
@@ -8757,6 +8757,10 @@ to %1</source>
     <message>
       <source>Decline</source>
       <translation type="unfinished">Decline</translation>
+    </message>
+    <message>
+      <source>Warning! This build is for testing purposes only! Please upgrade to a next available patch or release version once available.</source>
+      <translation type="unfinished">Warning! This build is for testing purposes only! Please upgrade to a next available patch or release version once available.</translation>
     </message>
   </context>
   <context>

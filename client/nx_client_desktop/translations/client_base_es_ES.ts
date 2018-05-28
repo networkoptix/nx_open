@@ -3880,6 +3880,10 @@ a %1</translation>
         <numerusform>Prueba ha completado con éxito: %n usuarios encontrados.</numerusform>
       </translation>
     </message>
+    <message>
+      <source>Changing any LDAP settings other than &quot;Search Filter&quot; will result in connectivity loss for all LDAP fetched users.</source>
+      <translation type="unfinished">Changing any LDAP settings other than &quot;Search Filter&quot; will result in connectivity loss for all LDAP fetched users.</translation>
+    </message>
   </context>
   <context>
     <name>QnLdapSettingsDialogPrivate</name>
@@ -8837,10 +8841,6 @@ a %1</translation>
       <translation>Versión Beta %1</translation>
     </message>
     <message>
-      <source>Some functionality may be unavailable or not working properly.</source>
-      <translation>Es posible que algunas funciones no estén disponibles o no funcionen correctamente.</translation>
-    </message>
-    <message>
       <source>System sends anonymous usage statistics</source>
       <translation>El sistema envía anónimamente estadísticas de uso</translation>
     </message>
@@ -8879,6 +8879,10 @@ a %1</translation>
     <message>
       <source>Decline</source>
       <translation>Rechazar</translation>
+    </message>
+    <message>
+      <source>Warning! This build is for testing purposes only! Please upgrade to a next available patch or release version once available.</source>
+      <translation type="unfinished">Warning! This build is for testing purposes only! Please upgrade to a next available patch or release version once available.</translation>
     </message>
   </context>
   <context>
