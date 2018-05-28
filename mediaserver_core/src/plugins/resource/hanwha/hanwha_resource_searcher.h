@@ -61,7 +61,7 @@ private:
     void sendSunApiProbe();
     void readSunApiResponse(QnResourceList& resultResourceList);
     bool readSunApiResponseFromSocket(
-        AbstractDatagramSocket* socket,
+        nx::network::AbstractDatagramSocket* socket,
         QnResourceList* outResultResourceList);
     void updateSocketList();
 

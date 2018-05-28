@@ -163,7 +163,7 @@ void HanwhaResourceSearcher::updateSocketList()
     {
         m_sunapiReceiveSocket = nx::network::SocketFactory::createDatagramSocket();
         if (!m_sunapiReceiveSocket->setReuseAddrFlag(true) ||
-            !m_sunapiReceiveSocket->bind(BROADCAST_ADDRESS, kSunApiProbeSrcPort))
+            !m_sunapiReceiveSocket->bind(network::BROADCAST_ADDRESS, kSunApiProbeSrcPort))
         {
             return;
         }
@@ -256,7 +256,7 @@ void HanwhaResourceSearcher::readSunApiResponse(QnResourceList& resultResourceLi
 }
 
 bool HanwhaResourceSearcher::readSunApiResponseFromSocket(
-    AbstractDatagramSocket* socket,
+    network::AbstractDatagramSocket* socket,
     QnResourceList* resultResourceList)
 {
     NX_ASSERT(socket);
@@ -267,10 +267,10 @@ bool HanwhaResourceSearcher::readSunApiResponseFromSocket(
         return true;
 
     auto resourceAlreadyFound =
-        [](const QnResourceList& resultResourceList, const nx::network::QnMacAddress& macAddress)
+        [](const QnResourceList* resultResourceList, const nx::network::QnMacAddress& macAddress)
         {
             return std::any_of(
-                resultResourceList->begin(), resultResourceList->end(),
+                resultResourceList->cbegin(), resultResourceList->cend(),
                 [&macAddress](const QnResourcePtr& resource)
                 {
                     return nx::network::QnMacAddress(resource->getUniqueId()) == macAddress;

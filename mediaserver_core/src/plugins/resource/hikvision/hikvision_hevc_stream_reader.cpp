@@ -228,7 +228,7 @@ CameraDiagnostics::Result HikvisionHevcStreamReader::fetchChannelProperties(
     ChannelProperties* outChannelProperties) const
 {
     const auto kRequestName = lit("Fetch channel properties");
-    nx_http::StatusCode::Value statusCode = nx_http::StatusCode::undefined;
+    nx::network::http::StatusCode::Value statusCode = nx::network::http::StatusCode::undefined;
     for (const auto& path: {kChannelStreamingPathTemplate, kChannelStreamingPathForNvrTemplate})
     {
         auto url = hikvisionRequestUrlFromPath(path.arg(

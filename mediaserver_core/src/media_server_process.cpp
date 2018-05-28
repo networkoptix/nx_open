@@ -3129,25 +3129,25 @@ void MediaServerProcess::initializeLogging()
 
     logSettings.level.parse(cmdLineArguments().systemLogLevel,
         settings->value("systemLoglevel").toString(), toString(nx::utils::log::Level::info));
-    logSettings.logBaseName = "system_log";        
+    logSettings.logBaseName = "system_log";
     nx::utils::log::initialize(
         logSettings, qApp->applicationName(), binaryPath,
         nx::utils::log::addLogger(
             {
-                QnLog::HWID_LOG, 
-                toString(typeid(nx::mediaserver::LicenseWatcher))
+                QnLog::HWID_LOG,
+                nx::utils::log::Tag(toString(typeid(nx::mediaserver::LicenseWatcher)))
             }));
 
     logSettings.level.parse(cmdLineArguments().ec2TranLogLevel,
         settings->value("tranLogLevel").toString(), toString(nx::utils::log::Level::none));
-    logSettings.logBaseName = "ec2_tran";        
+    logSettings.logBaseName = "ec2_tran";
     nx::utils::log::initialize(
         logSettings, qApp->applicationName(), binaryPath,
         nx::utils::log::addLogger({QnLog::EC2_TRAN_LOG}));
 
     logSettings.level.parse(cmdLineArguments().permissionsLogLevel,
         settings->value("permissionsLogLevel").toString(), toString(nx::utils::log::Level::none));
-    logSettings.logBaseName = "permissions";        
+    logSettings.logBaseName = "permissions";
     nx::utils::log::initialize(
         logSettings, qApp->applicationName(), binaryPath,
         nx::utils::log::addLogger({QnLog::PERMISSIONS_LOG}));
@@ -3164,13 +3164,13 @@ void MediaServerProcess::initializeHardwareId()
 
     logSettings.level.parse(cmdLineArguments().systemLogLevel,
         settings->value("systemLoglevel").toString(), toString(nx::utils::log::Level::info));
-    logSettings.logBaseName = "system_log"; 
+    logSettings.logBaseName = "system_log";
     nx::utils::log::initialize(
         logSettings, qApp->applicationName(), binaryPath,
         nx::utils::log::addLogger(
             {
-                QnLog::HWID_LOG, 
-                toString(typeid(nx::mediaserver::LicenseWatcher))
+                QnLog::HWID_LOG,
+                nx::utils::log::Tag(toString(typeid(nx::mediaserver::LicenseWatcher)))
             }));
 
     LLUtil::initHardwareId(qnServerModule->roSettings());
