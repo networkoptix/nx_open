@@ -60,11 +60,13 @@ def save_unrevisioned_records(context, customization, language, data_structures,
                     request_files[data_structure_name], data_structure)
 
                 if invalid_file_type:
-                    upload_errors.append(
-                        (data_structure_name,
-                         "Invalid file type. Uploaded file is {}. It should be {}."\
-                         .format(request_files[data_structure_name].content_type,
-                                 data_structure.meta_settings['format'].replace(',', ' or '))))
+                    error_msg = "Invalid file type. Uploaded file is {}. It should be {}."\
+                             .format(request_files[data_structure_name].content_type,
+                                     data_structure.meta_settings['format'].replace(',', ' or '))
+                    if not meta:
+                        error_msg = "Image is corrupt please upload an uncorrupted version"
+                    upload_errors.append((data_structure_name, error_msg))
+
                     continue
 
                 # Gets the meta_settings form the DataStructure to check if the sizes are valid
@@ -254,12 +256,15 @@ def handle_file_upload(file, data_structure):
 
     if 'format' in data_structure.meta_settings and\
             is_not_valid_file_type(file_type.lower(), data_structure.meta_settings['format']):
-        return None, None, True
+        return None, True, True
 
     if data_structure.type == DataStructure.DATA_TYPES.image:
-        newImage = Image.open(file)
-        width, height = newImage.size
-        meta = {'width': width, 'height': height}
+        try:
+            newImage = Image.open(file)
+            width, height = newImage.size
+            meta = {'width': width, 'height': height}
+        except IOError:
+            return None, False, True
     elif data_structure.type == DataStructure.DATA_TYPES.file:
         meta = data_structure.meta_settings
 
