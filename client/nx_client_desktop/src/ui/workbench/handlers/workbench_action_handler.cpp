@@ -192,6 +192,17 @@ static const QString kVersionMismatchShowOnceKey(lit("VersionMismatch"));
 
 const char* uploadingImageARPropertyName = "_qn_uploadingImageARPropertyName";
 
+QnResourcePtr getLayoutByName(const QString& layoutName, QnResourcePool* pool)
+{
+    const auto layouts = pool->getResources<QnLayoutResource>();
+    const auto trimmed = layoutName.trimmed();
+    for (const auto layout: layouts)
+    {
+        if (layout->getName().trimmed() == trimmed)
+            return layout;
+    }
+    return QnResourcePtr();
+}
 } // namespace
 
 //!time that is given to process to exit. After that, applauncher (if present) will try to terminate it
@@ -562,6 +573,16 @@ void ActionHandler::submitDelayedDrops()
     QnResourceList resources;
     ec2::ApiLayoutTourDataList tours;
 
+    if (!m_delayedDropLayoutName.isEmpty())
+    {
+        if (const auto resource = getLayoutByName(m_delayedDropLayoutName, resourcePool()))
+            resources.append(resource);
+        else
+            NX_EXPECT(false, "Wrong layout name");
+
+        m_delayedDropLayoutName.clear();
+    }
+
     for (const auto& data: m_delayedDrops)
     {
         MimeData mimeData = MimeData::deserialized(data, resourcePool());
@@ -577,7 +598,8 @@ void ActionHandler::submitDelayedDrops()
     if (resources.empty() && tours.empty())
         return;
 
-    resourcePool()->addNewResources(resources);
+    if (!resources.isEmpty())
+        resourcePool()->addNewResources(resources);
 
     workbench()->clear();
     if (!resources.empty())
@@ -1255,9 +1277,21 @@ void ActionHandler::at_dropResourcesAction_triggered()
 
 void ActionHandler::at_delayedDropResourcesAction_triggered()
 {
-    QByteArray data = menu()->currentParameters(sender()).argument<QByteArray>(
-        Qn::SerializedDataRole);
-    m_delayedDrops.push_back(data);
+    const auto params = menu()->currentParameters(sender());
+    if (params.hasArgument(Qn::SerializedDataRole))
+    {
+        const auto data = params.argument<QByteArray>(Qn::SerializedDataRole);
+        m_delayedDrops.push_back(data);
+    }
+    else if (params.hasArgument(Qn::LayoutNameRole))
+    {
+        m_delayedDropLayoutName = params.argument<QString>(Qn::LayoutNameRole);
+    }
+    else
+    {
+        NX_EXPECT(false, "Wrong delayed drop action paramenters");
+        return;
+    }
 
     submitDelayedDrops();
 }

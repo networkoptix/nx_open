@@ -393,6 +393,11 @@ QnWorkbenchContext::StartupParametersCode
         QByteArray data = QByteArray::fromBase64(startupParams.instantDrop.toLatin1());
         menu()->trigger(action::InstantDropResourcesAction, {Qn::SerializedDataRole, data});
     }
+    else if (!startupParams.layoutName.isEmpty())
+    {
+        const auto parameters = action::Parameters(Qn::LayoutNameRole, startupParams.layoutName);
+        menu()->trigger(action::DelayedDropResourcesAction, parameters);
+    }
 
     const bool showEula = qnSettings->acceptedEulaVersion() < QnClientAppInfo::eulaVersion();
     if (showEula && !showEulaMessage())

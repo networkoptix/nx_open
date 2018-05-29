@@ -51,6 +51,7 @@ struct QnStartupParameters
     QString authenticationString;
     QString delayedDrop;
     QString instantDrop;
+    QString layoutName;
     QString logLevel;
     QString ec2TranLogLevel;
     QString exceptionFilters; //< TODO: remove in 4.0.
