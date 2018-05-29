@@ -44,7 +44,7 @@ public:
 
     enum PeerSelectionPolicy
     {
-        none, //< only provided url will be used for downloading
+        none, //< Only provided url will be used for downloading.
         all,
         byPlatform,
     };
