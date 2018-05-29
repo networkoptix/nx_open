@@ -198,7 +198,7 @@ private:
         ec2::AbstractECConnectionPtr ec2Connection,
         const QnMediaServerResourcePtr &server,
         bool isNewServerInstance);
-    nx::utils::Url appServerConnectionUrl(QSettings &settings) const;
+    nx::utils::Url appServerConnectionUrl() const;
 private:
     int m_argc;
     char** m_argv;

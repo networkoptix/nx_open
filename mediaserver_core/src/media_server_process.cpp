@@ -958,7 +958,7 @@ static void myMsgHandler(QtMsgType type, const QMessageLogContext& ctx, const QS
     qnLogMsgHandler(type, ctx, msg);
 }
 
-nx::utils::Url appServerConnectionUrl()
+nx::utils::Url MediaServerProcess::appServerConnectionUrl() const
 {
     auto settings = serverModule()->mutableSettings();
     // migrate appserverPort settings from version 2.2 if exist
@@ -3353,12 +3353,12 @@ void MediaServerProcess::run()
     if (!allowedSslVersions.isEmpty())
         nx::network::ssl::Engine::setAllowedServerVersions(allowedSslVersions.toUtf8());
 
-    const auto allowedSslCiphers = serverModule->roSettings()->value(
+    const auto allowedSslCiphers = serverModule->settings().allowedSslCiphers();
     if (!allowedSslCiphers.isEmpty())
         nx::network::ssl::Engine::setAllowedServerCiphers(allowedSslCiphers.toUtf8());
 
     nx::network::ssl::Engine::useOrCreateCertificate(
-        serverModule->roSettings()->value(
+        serverModule->settings().sslCertificatePath(),
         nx::utils::AppInfo::productName().toUtf8(), "US",
         nx::utils::AppInfo::organizationName().toUtf8());
 
@@ -3389,7 +3389,7 @@ void MediaServerProcess::run()
     commonModule()->setResourceDiscoveryManager(new QnMServerResourceDiscoveryManager(commonModule()));
     nx::utils::Url appServerUrl = appServerConnectionUrl();
 
-    QnMulticodecRtpReader::setDefaultTransport(serverModule()->settings().rtspTransport());
+    QnMulticodecRtpReader::setDefaultTransport(serverModule->settings().rtspTransport());
 
     connect(commonModule()->resourceDiscoveryManager(), &QnResourceDiscoveryManager::CameraIPConflict, this, &MediaServerProcess::at_cameraIPConflict);
     connect(qnNormalStorageMan, &QnStorageManager::noStoragesAvailable, this, &MediaServerProcess::at_storageManager_noStoragesAvailable);
@@ -3444,9 +3444,7 @@ void MediaServerProcess::run()
     runtimeData.hardwareIds = m_hardwareGuidList;
     commonModule()->runtimeInfoManager()->updateLocalItem(runtimeData);    // initializing localInfo
 
-
-    const int rtspPort = serverModule->roSettings()->value(
-        nx_ms_conf::SERVER_PORT, nx_ms_conf::DEFAULT_SERVER_PORT).toInt();
+    const int rtspPort = serverModule->settings().port();
 
     // Accept SSL connections in all cases as it is always in use by cloud modules and old clients,
     // config value only affects server preference listed in moduleInformation.
@@ -3466,7 +3464,7 @@ void MediaServerProcess::run()
         new ec2::LocalConnectionFactory(
             commonModule(),
             Qn::PT_Server,
-            serverModule()->settings().p2pMode(),
+            serverModule->settings().p2pMode(),
             m_universalTcpListener));
 
     TimeBasedNonceProvider timeBasedNonceProvider;
@@ -3745,7 +3743,7 @@ void MediaServerProcess::run()
     serverModule->mutableSettings()->obsoleteServerGuid.remove();
     serverModule->mutableSettings()->appserverPassword.set("");
 #ifdef _DEBUG
-    serverModule()->syncRoSettings();
+    serverModule->syncRoSettings();
     NX_ASSERT(serverModule->settings().appserverPassword().isEmpty(), Q_FUNC_INFO, "appserverPassword is not emptyu in registry. Restart the server as Administrator");
 #endif
 
@@ -3865,7 +3863,7 @@ void MediaServerProcess::run()
 
     nx::mserver_aux::setUpSystemIdentity(commonModule()->beforeRestoreDbData(), settingsProxy.get(), std::move(systemNameProxy));
 
-    BeforeRestoreDbData::clearSettings(serverModule()->roSettings());
+    BeforeRestoreDbData::clearSettings(serverModule->roSettings());
 
     addFakeVideowallUser(commonModule());
 
