@@ -116,7 +116,7 @@ def second_camera_backup_type(request):
 
 @pytest.fixture
 def linux_vm_volume(one_mediaserver):
-    return LinuxVMVolume(one_mediaserver.machine.os_access)
+    return LinuxVMVolume(one_mediaserver.os_access)
 
 
 @pytest.fixture
@@ -124,7 +124,10 @@ def server(one_mediaserver, linux_vm_volume, system_backup_type):
     config_file_params = dict(minStorageSpace=1024*1024)  # 1M
     one_mediaserver.installation.update_mediaserver_conf(config_file_params)
     linux_vm_volume.ensure_volume_exists(BACKUP_STORAGE_PATH)
-    one_mediaserver.machine.os_access.run_sh_script('rm -rfv {}/*'.format(sh_quote_arg(str(BACKUP_STORAGE_PATH))))
+    one_mediaserver.os_access.ssh.run_sh_script(
+        'rm -rfv "$STORAGE_PATH/*"',
+        env=dict(STORAGE_PATH=BACKUP_STORAGE_PATH),
+        )
     one_mediaserver.start()
     setup_local_system(one_mediaserver, {})
     one_mediaserver.api.api.systemSettings.GET(backupQualities=system_backup_type)
@@ -173,7 +176,7 @@ def add_backup_storage(server):
     assert storage, 'Mediaserver did not accept storage %r in %r seconds' % (
         BACKUP_STORAGE_PATH, BACKUP_STORAGE_APPEARS_TIMEOUT_SEC)
     storage['isBackup'] = True
-    server.rest_api.ec2.saveStorage.POST(**storage)
+    server.api.ec2.saveStorage.POST(**storage)
     wait_storage_ready(server, storage['id'])
     change_and_assert_server_backup_type(server, 'BackupManual')
     return Path(storage['url'])
@@ -211,12 +214,12 @@ def add_camera(camera_factory, server, camera_id, backup_type):
 def assert_path_does_not_exist(server, path):
     assert_message = "'%r': unexpected existen path '%s'" % (server, path)
     with pytest.raises(NonZeroExitStatus, message=assert_message) as x_info:
-        server.machine.os_access.run_command(['[', '-e', path, ']'])
+        server.os_access.run_command(['[', '-e', path, ']'])
     assert x_info.value.exit_status == 1, assert_message
 
 
 def assert_paths_are_equal(server, path_1, path_2):
-    server.machine.os_access.run_command(['diff', '--recursive', '--report-identical-files', path_1, path_2])
+    server.os_access.run_command(['diff', '--recursive', '--report-identical-files', path_1, path_2])
 
 
 def assert_backup_equal_to_archive(
