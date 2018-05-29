@@ -103,6 +103,16 @@ public:
             boost::none);
     }
 
+    void assertServerRejectsUserCredentials(QString userName, QString password, Qn::AuthResult error)
+    {
+        testServerReturnCode(
+            userName,
+            password,
+            nx::network::http::AuthType::authDigest,
+            nx::network::http::StatusCode::unauthorized,
+            error);
+    }
+
     void testServerReturnCodeForWrongPassword(
         const ec2::ApiUserData& userDataToUse,
         nx::network::http::AuthType authType,
@@ -218,7 +228,7 @@ public:
             ASSERT_FALSE(authResultStr.isEmpty());
 
             Qn::AuthResult authResult = QnLexical::deserialized<Qn::AuthResult>(authResultStr);
-            ASSERT_EQ(expectedAuthResult, authResult);
+            ASSERT_EQ(expectedAuthResult, authResult) << authResultStr.toStdString();
 
             if (expectedStatusCode == nx::network::http::StatusCode::unauthorized)
             {
@@ -386,4 +396,32 @@ TEST_F(AuthReturnCodeTest, manualDigestWrongMethod_onGateway)
 {
     auto client = manualDigestClient("POST", "/api/getUsers");
     testServerReturnCode(std::move(client), 401, Qn::AuthResult::Auth_WrongDigest);
+}
+
+TEST_F(AuthReturnCodeTest, lockoutTest)
+{
+    static const QnAuthHelper::LockoutOptions kLockoutOptions{
+        3, std::chrono::milliseconds(100), std::chrono::milliseconds(500)};
+
+    const auto lockoutOptons = QnAuthHelper::instance()->getLockoutOptions();
+    QnAuthHelper::instance()->setLockoutOptions(kLockoutOptions);
+    const auto lockoutGuard = makeSharedGuard(
+        [&](){ QnAuthHelper::instance()->setLockoutOptions(lockoutOptons); });
+
+    NX_ERROR(this, lm("LOCKOUT TEST"));
+
+    // Lockout does not happen on a random attemp.
+    assertServerAcceptsUserCredentials("admin", "admin");
+    assertServerRejectsUserCredentials("admin", "qweasd123", Qn::Auth_WrongPassword);
+    assertServerAcceptsUserCredentials("admin", "admin");
+
+    // Trigger lockout.
+    std::this_thread::sleep_for(kLockoutOptions.accountTime);
+    for (int i = 0; i < kLockoutOptions.maxLoginFailures; ++i)
+        assertServerRejectsUserCredentials("admin", "qweasd123", Qn::Auth_WrongPassword);
+    assertServerRejectsUserCredentials("admin", "admin", Qn::Auth_LockedOut);
+
+    // Wait for lockout to clear.
+    std::this_thread::sleep_for(kLockoutOptions.lockoutTime);
+    assertServerAcceptsUserCredentials("admin", "admin");
 }

@@ -21,11 +21,12 @@ int QnCurrentUserRestHandler::executeGet(
 {
     ec2::ApiUserData user;
 
+    const auto clientIp = owner->socket()->getForeignAddress().address;
     auto accessRights = owner->accessRights();
     if (accessRights.isNull())
     {
         QnAuthHelper::instance()->doCookieAuthorization(
-            "GET", nx::network::http::getHeaderValue(owner->request().headers, "Cookie"),
+            clientIp, "GET", nx::network::http::getHeaderValue(owner->request().headers, "Cookie"),
             nx::network::http::getHeaderValue(owner->request().headers, Qn::CSRF_TOKEN_HEADER_NAME),
             *owner->response(), &accessRights);
     }
@@ -33,7 +34,8 @@ int QnCurrentUserRestHandler::executeGet(
     {
         nx::network::http::Response response;
         QnAuthHelper::instance()->authenticateByUrl(
-            params.value(Qn::URL_QUERY_AUTH_KEY_NAME).toUtf8(), "GET", response, &accessRights);
+            clientIp, params.value(Qn::URL_QUERY_AUTH_KEY_NAME).toUtf8(),
+            "GET", response, &accessRights);
     }
     if (accessRights.isNull())
     {

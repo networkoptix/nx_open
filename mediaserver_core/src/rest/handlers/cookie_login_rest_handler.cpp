@@ -42,6 +42,7 @@ int QnCookieLoginRestHandler::executePost(
 
     Qn::UserAccessData accessRights;
     Qn::AuthResult authResult = QnAuthHelper::instance()->authenticateByUrl(
+        owner->socket()->getForeignAddress().address,
         cookieData.auth,
         QByteArray("GET"),
         *owner->response(),

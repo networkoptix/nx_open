@@ -87,7 +87,9 @@ bool QnUniversalRequestProcessor::authenticate(Qn::UserAccessData* accessRights,
         nx::network::http::AuthMethod::Value usedMethod = nx::network::http::AuthMethod::noAuth;
         Qn::AuthResult authResult;
         QnAuthSession lastUnauthorizedData;
-        while ((authResult = qnAuthHelper->authenticate(d->request, d->response, isProxy, accessRights, &usedMethod)) != Qn::Auth_OK)
+        const auto clientIp = d->socket->getForeignAddress().address;
+        while ((authResult = qnAuthHelper->authenticate(
+            clientIp, d->request, d->response, isProxy, accessRights, &usedMethod)) != Qn::Auth_OK)
         {
             lastUnauthorizedData = authSession();
 

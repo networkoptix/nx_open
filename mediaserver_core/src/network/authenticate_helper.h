@@ -16,6 +16,7 @@
 #include <nx/utils/thread/mutex.h>
 #include <nx/network/http/auth_restriction_list.h>
 #include <nx/network/aio/timer.h>
+#include <nx/network/socket_common.h>
 
 #include <nx/vms/auth/abstract_nonce_provider.h>
 #include <nx/vms/auth/abstract_user_data_provider.h>
@@ -49,6 +50,7 @@ public:
 
     //!Authenticates request on server side
     Qn::AuthResult authenticate(
+        const nx::network::HostAddress& clientIp,
         const nx::network::http::Request& request,
         nx::network::http::Response& response,
         bool isProxy = false,
@@ -56,6 +58,7 @@ public:
         nx::network::http::AuthMethod::Value* usedAuthMethod = 0);
 
     Qn::AuthResult httpAuthenticate(
+        const nx::network::HostAddress& clientIp,
         const nx::network::http::Request& request,
         nx::network::http::Response& response,
         bool isProxy,
@@ -79,6 +82,7 @@ public:
     QByteArray generateNonce(NonceProvider provider = NonceProvider::automatic) const;
 
     Qn::AuthResult doCookieAuthorization(
+        const nx::network::HostAddress& clientIp,
         const QByteArray& method, const QByteArray& authData,
         const boost::optional<QByteArray>& csrfToken,
         nx::network::http::Response& responseHeaders, Qn::UserAccessData* accessRights);
@@ -87,16 +91,27 @@ public:
     \param authDigest base64(username : nonce : MD5(ha1, nonce, MD5(METHOD :)))
     */
     Qn::AuthResult authenticateByUrl(
+        const nx::network::HostAddress& clientIp,
         const QByteArray& authRecord,
         const QByteArray& method,
         nx::network::http::Response& response,
-        Qn::UserAccessData* accessRights = nullptr) const;
+        Qn::UserAccessData* accessRights = nullptr);
 
     QnLdapManager* ldapManager() const;
 
     nx::Buffer newCsrfToken();
     void removeCsrfToken(const nx::Buffer& token);
     bool isCsrfTokenValid(const nx::Buffer& token);
+
+    struct LockoutOptions
+    {
+        size_t maxLoginFailures = 10;
+        std::chrono::milliseconds accountTime = std::chrono::minutes(1);
+        std::chrono::milliseconds lockoutTime = std::chrono::minutes(5);
+    };
+
+    std::optional<LockoutOptions> getLockoutOptions() const;
+    void setLockoutOptions(std::optional<LockoutOptions> options);
 
 signals:
     void emptyDigestDetected(const QnUserResourcePtr& user, const QString& login, const QString& password);
@@ -142,6 +157,12 @@ private:
         bool empty() const;
     };
 
+    struct AccessFailureData
+    {
+        std::optional<std::chrono::steady_clock::time_point> lockedOut{std::nullopt};
+        std::deque<std::chrono::steady_clock::time_point> failures;
+    };
+
     /*!
         \param userRes Can be NULL
     */
@@ -162,6 +183,10 @@ private:
         nx::network::http::Response& responseHeaders,
         Qn::UserAccessData* accessRights);
 
+    std::optional<std::chrono::milliseconds> isLoginLockedOut(
+        const nx::String& name, const nx::network::HostAddress& address);
+    void saveLoginResult(
+        const nx::String& name, const nx::network::HostAddress& address, Qn::AuthResult result);
 
     void authenticationExpired( const QString& path, quint64 timerID );
     QnUserResourcePtr findUserByName( const QByteArray& nxUserName ) const;
@@ -189,6 +214,8 @@ private:
     nx::vms::auth::AbstractUserDataProvider* m_userDataProvider;
     std::unique_ptr<QnLdapManager> m_ldap;
     std::map<nx::Buffer, std::chrono::steady_clock::time_point> m_csrfTokens;
+    std::map<nx::String, std::map<nx::network::HostAddress, AccessFailureData>> m_accessFailures;
+    std::optional<LockoutOptions> m_lockoutOptions = LockoutOptions();
 };
 
 #define qnAuthHelper QnAuthHelper::instance()

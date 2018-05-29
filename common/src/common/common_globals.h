@@ -516,6 +516,7 @@ using StreamQuality = nx::vms::api::StreamQuality;
         Auth_CloudConnectError,   // can't connect to the Cloud to authenticate
         Auth_DisabledUser,    // disabled user
         Auth_InvalidCsrfToken, // for cookie login
+        Auth_LockedOut, //< locked out for a period of time.
     };
     QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(AuthResult)
     QString toString(AuthResult value);

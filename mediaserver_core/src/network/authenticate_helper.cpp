@@ -61,7 +61,6 @@ bool QnAuthHelper::UserDigestData::empty() const
     return ha1Digest.isEmpty() || realm.isEmpty() || nxUserName.isEmpty() || cryptSha512Hash.isEmpty();
 }
 
-
 static const qint64 LDAP_TIMEOUT = 1000000ll * 60 * 5;
 static const QString COOKIE_DIGEST_AUTH(lit("Authorization=Digest"));
 static const QString TEMP_AUTH_KEY_NAME = lit("authKey");
@@ -85,6 +84,7 @@ QnAuthHelper::~QnAuthHelper()
 }
 
 Qn::AuthResult QnAuthHelper::authenticate(
+    const nx::network::HostAddress& clientIp,
     const nx::network::http::Request& request,
     nx::network::http::Response& response,
     bool isProxy,
@@ -171,6 +171,7 @@ Qn::AuthResult QnAuthHelper::authenticate(
                 .arg(request.requestLine));
 
             auto authResult = authenticateByUrl(
+                clientIp,
                 authQueryParam,
                 request.requestLine.version.protocol == nx_rtsp::rtsp_1_0.protocol
                 ? "PLAY"    //for rtsp always using PLAY since client software does not know
@@ -202,7 +203,7 @@ Qn::AuthResult QnAuthHelper::authenticate(
                 csrfToken = nx::network::http::getHeaderValue(request.headers, Qn::CSRF_TOKEN_HEADER_NAME);
 
             result = doCookieAuthorization(
-                request.requestLine.method, cookie, csrfToken, response, accessRights);
+                clientIp, request.requestLine.method, cookie, csrfToken, response, accessRights);
 
             NX_VERBOSE(this, lm("%1 with cookie (%2)").args(result, request.requestLine));
             if (result == Qn::Auth_OK)
@@ -215,7 +216,7 @@ Qn::AuthResult QnAuthHelper::authenticate(
         NX_VERBOSE(this, lm("Authenticating %1 with HTTP authentication")
             .arg(request.requestLine));
 
-        result = httpAuthenticate(request, response, isProxy, accessRights, usedAuthMethod);
+        result = httpAuthenticate(clientIp, request, response, isProxy, accessRights, usedAuthMethod);
         if (result == Qn::Auth_OK)
         {
             NX_VERBOSE(this, lm("Authenticated %1 with HTTP authentication").args(request.requestLine.url));
@@ -233,6 +234,7 @@ Qn::AuthResult QnAuthHelper::authenticate(
 }
 
 Qn::AuthResult QnAuthHelper::httpAuthenticate(
+    const nx::network::HostAddress& clientIp,
     const nx::network::http::Request& request,
     nx::network::http::Response& response,
     bool isProxy,
@@ -303,6 +305,10 @@ Qn::AuthResult QnAuthHelper::httpAuthenticate(
             "Error parsing Authorization header").arg(request.requestLine.url));
         return Qn::Auth_Forbidden;
     }
+
+    if (isLoginLockedOut(authorizationHeader.userid(), clientIp))
+        return Qn::Auth_LockedOut;
+
     //TODO #ak better call m_userDataProvider->authorize here
     QnUserResourcePtr userResource = findUserByName(authorizationHeader.userid());
 
@@ -343,7 +349,11 @@ Qn::AuthResult QnAuthHelper::httpAuthenticate(
         }
 
         if (authResult != Qn::Auth_OK)
+        {
+            saveLoginResult(authorizationHeader.userid(), clientIp, authResult);
             return authResult;
+        }
+
         updateUserHashes(userResource, password); //< update stored LDAP password/hash if need
         userResource->prolongatePassword();
     }
@@ -397,6 +407,8 @@ Qn::AuthResult QnAuthHelper::httpAuthenticate(
             }
         }
     }
+
+    saveLoginResult(authorizationHeader.userid(), clientIp, authResult);
     return authResult;
 }
 
@@ -435,12 +447,75 @@ QPair<QString, QString> QnAuthHelper::createAuthenticationQueryItemForPath(
     return QPair<QString, QString>(TEMP_AUTH_KEY_NAME, authKey);
 }
 
+std::optional<std::chrono::milliseconds> QnAuthHelper::isLoginLockedOut(
+    const nx::String& name, const nx::network::HostAddress& address)
+{
+    const auto now = std::chrono::steady_clock::now();
+
+    QnMutexLocker lock(&m_mutex);
+    if (!m_lockoutOptions)
+    {
+        m_accessFailures.clear();
+        return std::nullopt;
+    }
+
+    auto& userData = m_accessFailures[name];
+    for (auto it = userData.begin(); it != userData.end(); )
+    {
+        while (!it->second.failures.empty() && it->second.failures.front() + m_lockoutOptions->accountTime <= now)
+            it->second.failures.pop_front(); //< Remove outdated failures.
+
+        if (it->second.lockedOut && *it->second.lockedOut + m_lockoutOptions->lockoutTime <= now)
+            it->second.lockedOut = std::nullopt; //< Remove expired lockout.
+
+        if (!it->second.lockedOut && it->second.failures.empty())
+            it = userData.erase(it); //< Remove useless record.
+        else
+            ++it;
+    }
+
+    const auto ipIt = userData.find(address);
+    if (ipIt == userData.end() || !ipIt->second.lockedOut)
+        return std::nullopt;
+
+    return std::chrono::duration_cast<std::chrono::milliseconds>(
+        *ipIt->second.lockedOut + m_lockoutOptions->lockoutTime - now);
+}
+
+void QnAuthHelper::saveLoginResult(
+    const nx::String& name, const nx::network::HostAddress& address, Qn::AuthResult result)
+{
+    if (result != Qn::Auth_WrongPassword)
+        return; //< Only password traversal should cause lock out.
+
+    QnMutexLocker lock(&m_mutex);
+    if (!m_lockoutOptions)
+        return;
+
+    auto& data = m_accessFailures[name][address];
+    if (!data.lockedOut)
+    {
+        if (data.failures.size() + 1 == m_lockoutOptions->maxLoginFailures)
+        {
+            NX_DEBUG(this, lm("Lockout for %1 from %2 for %3")
+                .args(name, address, m_lockoutOptions->lockoutTime));
+
+            data.lockedOut = std::chrono::steady_clock::now();
+            data.failures.clear();
+        }
+        else
+        {
+            NX_VERBOSE(this, lm("Record login failure for %1 from %2").args(name, address));
+            data.failures.push_back(std::chrono::steady_clock::now());
+        }
+    }
+}
+
 void QnAuthHelper::authenticationExpired(const QString& authKey, quint64 /*timerID*/)
 {
     QnMutexLocker lk(&m_mutex);
     m_authenticatedPaths.erase(authKey);
 }
-
 
 static bool verifyDigestUri(const nx::utils::Url& requestUrl, const QByteArray& uri)
 {
@@ -564,6 +639,7 @@ Qn::AuthResult QnAuthHelper::doBasicAuth(
 }
 
 Qn::AuthResult QnAuthHelper::doCookieAuthorization(
+    const nx::network::HostAddress& clientIp,
     const QByteArray& method,
     const QByteArray& authData,
     const boost::optional<QByteArray>& csrfToken,
@@ -588,6 +664,7 @@ Qn::AuthResult QnAuthHelper::doCookieAuthorization(
     }
 
     return authenticateByUrl(
+        clientIp,
         nx::utils::Url::fromPercentEncoding(auth).toUtf8(),
         kCookieAuthMethod,
         responseHeaders, accessRights);
@@ -629,10 +706,11 @@ QByteArray QnAuthHelper::generateNonce(NonceProvider provider) const
 }
 
 Qn::AuthResult QnAuthHelper::authenticateByUrl(
+    const nx::network::HostAddress& clientIp,
     const QByteArray& authRecordBase64,
     const QByteArray& method,
     nx::network::http::Response& response,
-    Qn::UserAccessData* accessRights) const
+    Qn::UserAccessData* accessRights)
 {
     auto authRecord = QByteArray::fromBase64(authRecordBase64);
     auto authFields = authRecord.split(':');
@@ -645,6 +723,9 @@ Qn::AuthResult QnAuthHelper::authenticateByUrl(
     authorization.digest->params["nonce"] = authFields[1];
     authorization.digest->params["realm"] = nx::network::AppInfo::realm().toUtf8();
     //digestAuthParams.params["uri"];   uri is empty
+
+    if (isLoginLockedOut(authorization.digest->userid, clientIp))
+        return Qn::Auth_LockedOut;
 
     if (!m_nonceProvider->isNonceValid(authorization.digest->params["nonce"]))
         return Qn::Auth_WrongDigest;
@@ -664,6 +745,7 @@ Qn::AuthResult QnAuthHelper::authenticateByUrl(
             *accessRights = Qn::UserAccessData(user->getId());
     }
 
+    saveLoginResult(authorization.digest->userid, clientIp, errCode);
     return errCode;
 }
 
@@ -738,6 +820,18 @@ bool QnAuthHelper::isCsrfTokenValid(const nx::Buffer& token)
 
     it->second = now + kMaxKeyLifeTime;
     return true;
+}
+
+std::optional<QnAuthHelper::LockoutOptions> QnAuthHelper::getLockoutOptions() const
+{
+    QnMutexLocker lock(&m_mutex);
+    return m_lockoutOptions;
+}
+
+void QnAuthHelper::setLockoutOptions(std::optional<LockoutOptions> options)
+{
+    QnMutexLocker lock(&m_mutex);
+    m_lockoutOptions = std::move(options);
 }
 
 void QnAuthHelper::cleanupExpiredCsrfs()
