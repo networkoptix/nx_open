@@ -359,7 +359,7 @@ void QnLicenseManagerWidget::updateLicenses()
             for(Qn::LicenseType lt: helper->licenseTypes())
             {
                 if (helper->totalLicenses(lt) > 0)
-                    messages << lit("%1 %2").arg(helper->totalLicenses(lt)).arg(QnLicense::longDisplayName(lt));
+                    messages << QnLicense::displayText(lt, helper->totalLicenses(lt));
             }
         }
 
@@ -367,21 +367,21 @@ void QnLicenseManagerWidget::updateLicenses()
         {
             for (Qn::LicenseType lt: helper->licenseTypes())
             {
-                if (helper->usedLicenses(lt) == 0)
+                const int used = helper->usedLicenses(lt);
+                if (used == 0)
                     continue;
 
                 if (helper->isValid(lt))
                 {
-                    messages << tr("%n %1 are currently in use", "", helper->usedLicenses(lt))
-                        .arg(QnLicense::longDisplayName(lt));
+                    messages << tr("%1 are currently in use", "", used)
+                        .arg(QnLicense::displayText(lt, used));
                 }
                 else
                 {
-                    messages << setWarningStyleHtml(tr("At least %n %1 are required", "",
-                        helper->requiredLicenses(lt)).arg(QnLicense::longDisplayName(lt)));
+                    const int required = helper->requiredLicenses(lt);
+                    messages << setWarningStyleHtml(tr("At least %1 are required", "", required)
+                        .arg(QnLicense::displayText(lt, required)));
                 }
-
-
             }
         }
         ui->infoLabel->setText(messages.join(lit("<br/>")));

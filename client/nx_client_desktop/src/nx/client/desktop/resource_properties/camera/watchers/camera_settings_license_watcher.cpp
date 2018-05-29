@@ -6,7 +6,7 @@
 
 #include <common/common_module.h>
 #include <core/resource/camera_resource.h>
-#include <ui/style/globals.h>
+#include <ui/style/custom_style.h>
 #include <ui/workbench/workbench_access_controller.h>
 #include <ui/workbench/workbench_context.h>
 #include <utils/license_usage_helper.h>
@@ -73,8 +73,6 @@ private:
         if (m_store->state().recording.enabled.hasValue())
             helper.propose(m_cameras, m_store->state().recording.enabled());
 
-        const QString colorId = qnGlobals->errorTextColor().name();
-
         QStringList lines;
         for (auto type: helper.licenseTypes())
         {
@@ -83,21 +81,20 @@ private:
                 continue;
 
             const int total = helper.totalLicenses(type);
-            QString message =
-                CameraSettingsLicenseWatcher::tr("%n/%1 %2 licenses are used", "", used)
-                    .arg(total).arg(QnLicense::displayName(type));
+            QString message = CameraSettingsLicenseWatcher::tr("%1 are used", "", used).arg(
+                QnLicense::displayText(type, used, total));
 
             const int required = helper.requiredLicenses(type);
             if (required > 0)
             {
-                message += lit(" <font color=%1>(%2)</font>").arg(colorId,
-                    CameraSettingsLicenseWatcher::tr("%n more required", "", required));
+                message += setWarningStyleHtml(lit(" (%1)").arg(
+                    CameraSettingsLicenseWatcher::tr("%n more required", "", required)));
             }
 
             lines << message;
         }
 
-        return lines.join(lit("<br>"));
+        return lines.join(lit("<br/>"));
     }
 
 private:
