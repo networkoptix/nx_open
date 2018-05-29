@@ -1,5 +1,8 @@
 #include "workbench_context.h"
 
+#include <QtWidgets/QApplication>
+#include <QtWebKitWidgets/QWebView>
+
 #include <common/common_module.h>
 
 #include <client/client_settings.h>
@@ -27,6 +30,7 @@
 #include <ui/statistics/modules/durations_statistics_module.h>
 #include <ui/statistics/modules/controls_statistics_module.h>
 
+#include <ui/style/webview_style.h>
 #include <ui/widgets/main_window.h>
 #include <ui/workaround/fglrx_full_screen.h>
 #ifdef Q_OS_LINUX
@@ -259,6 +263,54 @@ bool QnWorkbenchContext::connectUsingCustomUri(const nx::vms::utils::SystemUri& 
     return false;
 }
 
+bool QnWorkbenchContext::showEulaMessage() const
+{
+    const bool acceptedEula =
+        [this]()
+        {
+            const QString eulaHtmlStyle = QString::fromLatin1(R"(
+            <style media="screen" type="text/css">
+            * {
+                color: %1;
+                font-family: 'Roboto-Regular', 'Roboto';
+                font-weight: 400;
+                font-style: normal;
+                font-size: 13px;
+                line-height: 16px;
+            }
+            </style>)").arg(qApp->palette().color(QPalette::WindowText).name());
+
+            QFile eula(lit(":/license.html"));
+            eula.open(QIODevice::ReadOnly);
+            QString eulaText = QString::fromUtf8(eula.readAll());
+            eulaText = eulaText.replace(
+                lit("<head>"),
+                lit("<head>%1").arg(eulaHtmlStyle)
+            );
+
+            QnMessageBox eulaDialog(workbench()->context()->mainWindow());
+            eulaDialog.setIcon(QnMessageBoxIcon::Warning);
+            eulaDialog.setText(tr("To use the software you must accept the end user license agreement"));
+
+            auto view = new QWebView(&eulaDialog);
+            NxUi::setupWebViewStyle(view, NxUi::WebViewStyle::eula);
+            view->setHtml(eulaText);
+            view->setFixedSize(740, 560);
+            view->show();
+            eulaDialog.addCustomWidget(view);
+
+            eulaDialog.addButton(tr("Accept"), QDialogButtonBox::AcceptRole, Qn::ButtonAccent::Standard);
+            eulaDialog.addButton(tr("Decline"), QDialogButtonBox::RejectRole);
+            return eulaDialog.exec() == QDialogButtonBox::AcceptRole;
+        }();
+
+    if (!acceptedEula)
+        return false;
+
+    qnSettings->setAcceptedEulaVersion(QnClientAppInfo::eulaVersion());
+    return true;
+}
+
 bool QnWorkbenchContext::connectUsingCommandLineAuth(const QnStartupParameters& startupParams)
 {
     /* Set authentication parameters from command line. */
@@ -284,7 +336,8 @@ bool QnWorkbenchContext::connectUsingCommandLineAuth(const QnStartupParameters& 
     return true;
 }
 
-bool QnWorkbenchContext::handleStartupParameters(const QnStartupParameters& startupParams)
+QnWorkbenchContext::StartupParametersCode
+    QnWorkbenchContext::handleStartupParameters(const QnStartupParameters& startupParams)
 {
     /* Process input files. */
     bool haveInputFiles = false;
@@ -319,7 +372,7 @@ bool QnWorkbenchContext::handleStartupParameters(const QnStartupParameters& star
         && !connectUsingCommandLineAuth(startupParams)
         )
     {
-        return false;
+        return wrongParameters;
     }
 
     if (!startupParams.videoWallGuid.isNull())
@@ -342,8 +395,8 @@ bool QnWorkbenchContext::handleStartupParameters(const QnStartupParameters& star
     }
 
     const bool showEula = qnSettings->acceptedEulaVersion() < QnClientAppInfo::eulaVersion();
-    if (showEula)
-        action(action::ShowEulaAction)->trigger();
+    if (showEula && !showEulaMessage())
+        return forcedExit;
 
     /* Show beta version warning message for the main instance only */
     const bool showBetaWarning = QnAppInfo::beta()
@@ -360,7 +413,7 @@ bool QnWorkbenchContext::handleStartupParameters(const QnStartupParameters& star
     menu()->trigger(action::ShowFpsAction);
 #endif
 
-    return true;
+    return success;
 }
 
 void QnWorkbenchContext::initWorkarounds()
