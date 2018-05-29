@@ -24,6 +24,8 @@ public:
     explicit CameraSettingsLicenseWatcher(CameraSettingsDialogStore* store,
         QObject* parent = nullptr);
 
+    virtual ~CameraSettingsLicenseWatcher() override;
+
     QnVirtualCameraResourceList cameras() const;
     void setCameras(const QnVirtualCameraResourceList& value);
 

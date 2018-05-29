@@ -119,6 +119,11 @@ CameraSettingsLicenseWatcher::CameraSettingsLicenseWatcher(
 {
 }
 
+CameraSettingsLicenseWatcher::~CameraSettingsLicenseWatcher()
+{
+    // Required here for forward-declared scoped pointer destruction.
+}
+
 QnVirtualCameraResourceList CameraSettingsLicenseWatcher::cameras() const
 {
     return d->cameras();
