@@ -3126,9 +3126,9 @@ void MediaServerProcess::initializeLogging()
         logSettings, qApp->applicationName(), binaryPath);
 
     if (auto path = nx::utils::log::mainLogger()->filePath())
-        qnServerModule->roSettings()->setValue("logFile", path->replace(lit(".log"), QString()));
+        serverModule()->roSettings()->setValue("logFile", path->replace(lit(".log"), QString()));
     else
-        qnServerModule->roSettings()->remove("logFile");
+        serverModule()->roSettings()->remove("logFile");
 
     logSettings.level.parse(cmdLineArguments().httpLogLevel,
         settings.httpLogLevel(), toString(nx::utils::log::Level::none));
@@ -3172,7 +3172,7 @@ void MediaServerProcess::initializeHardwareId()
     auto logSettings = makeLogSettings();
 
     logSettings.level.parse(cmdLineArguments().systemLogLevel,
-        qnServerModule->settings().systemLogLevel(), toString(nx::utils::log::Level::info));
+        serverModule()->settings().systemLogLevel(), toString(nx::utils::log::Level::info));
     logSettings.logBaseName = "system_log";
     nx::utils::log::initialize(
         logSettings, qApp->applicationName(), binaryPath,
@@ -3342,11 +3342,11 @@ void MediaServerProcess::run()
     QnFileStorageResource::removeOldDirs(); // cleanup temp folders;
 
 #ifdef _WIN32
-    win32_exception::setCreateFullCrashDump(qnServerModule->settings().createFullCrashDump());
+    win32_exception::setCreateFullCrashDump(serverModule->settings().createFullCrashDump());
 #endif
 
 #ifdef __linux__
-    linux_exception::setSignalHandlingDisabled(qnServerModule->settings().createFullCrashDump());
+    linux_exception::setSignalHandlingDisabled(serverModule->settings().createFullCrashDump());
 #endif
 
     const auto allowedSslVersions = serverModule->settings().allowedSslVersions();
@@ -3406,12 +3406,12 @@ void MediaServerProcess::run()
         std::make_unique<nx::mediaserver_core::recorder::RemoteArchiveSynchronizer>(serverModule.get());
 
     // If adminPassword is set by installer save it and create admin user with it if not exists yet
-    commonModule()->setDefaultAdminPassword(qnServerModule->settings().appserverPassword());
+    commonModule()->setDefaultAdminPassword(serverModule->settings().appserverPassword());
     commonModule()->setUseLowPriorityAdminPasswordHack(
-        qnServerModule->settings().lowPriorityPassword());
+        serverModule->settings().lowPriorityPassword());
 
     BeforeRestoreDbData beforeRestoreDbData;
-    beforeRestoreDbData.loadFromSettings(qnServerModule->roSettings());
+    beforeRestoreDbData.loadFromSettings(serverModule->roSettings());
     commonModule()->setBeforeRestoreData(beforeRestoreDbData);
 
     commonModule()->setModuleGUID(serverGuid());
@@ -3585,7 +3585,7 @@ void MediaServerProcess::run()
         return;
     }
 
-    qnServerModule->mutableSettings()->lowPriorityPassword.set(false);
+    serverModule->mutableSettings()->lowPriorityPassword.set(false);
     auto clearEc2ConnectionGuardFunc = [](MediaServerProcess*){
         QnAppServerConnectionFactory::setEc2Connection(ec2::AbstractECConnectionPtr()); };
     std::unique_ptr<MediaServerProcess, decltype(clearEc2ConnectionGuardFunc)>
