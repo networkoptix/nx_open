@@ -172,11 +172,6 @@ enum IDType
     BetaVersionMessageAction,
 
     /**
-     * Displays eula acceptance dialog.
-     */
-    ShowEulaAction,
-
-    /**
      * Displays HiDpi screens support warning dialog.
      */
     HiDpiSupportMessageAction,

@@ -204,7 +204,6 @@ private:
         int totalCameras,
         const QnVirtualCameraResourceList& camerasWithError,
         const QString& explanation = QString());
-    void showEula();
 
     void changeDefaultPasswords(
         const QString& previousPassword,
