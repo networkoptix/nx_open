@@ -227,7 +227,6 @@ button {
 }
 
 .btn{
-  @extend button;
   outline: none !important;
   outline: 0 !important;
   max-width: 278px;
@@ -240,6 +239,16 @@ button {
   font-size: 14px;
   display: flex;
   align-items: center;
+
+  &:hover,
+  &:active,
+  &.active,
+  &:focus,
+  &.focus {
+    box-shadow: none;
+    outline: none !important;
+    outline: 0 !important;
+  }
 
   &.dropdown-toggle{
     display: flex;
