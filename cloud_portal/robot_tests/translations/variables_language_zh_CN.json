@@ -56,7 +56,7 @@
     "PASSWORD TOO SHORT TEXT": "密码必须包含至少 8 个字符",
     "PASSWORD TOO COMMON TEXT": "此密码是在世界顶级最受欢迎的密码",
     "PASSWORD IS WEAK TEXT": "使用数字、 上层和小写字母和特殊字符，使您更强的密码",
-    "TERMS AND CONDITIONS ERROR TEXT": "Please review and agree to the Terms and Conditions and Privacy policy in order to proceed",
+    "TERMS AND CONDITIONS ERROR TEXT": "请审阅并同意条款及条件和隐私政策, 以便继续进行",
     "THIS LINK IS BROKEN TEXT": "此链结已断开,<br>\n            系统可能会从 %PRODUCT_NAME% 离线,<br>\n            登录权限可能会被取销,<br>\n            或您可能已用其他用户登入",
     "PAGE NOT FOUND": "找不到页面",
     "TAKE ME HOME": "带我回家",

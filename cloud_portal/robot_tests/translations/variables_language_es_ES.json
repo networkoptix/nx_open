@@ -56,7 +56,7 @@
     "PASSWORD TOO SHORT TEXT": "La contraseña debe tener al menos 8 caracteres",
     "PASSWORD TOO COMMON TEXT": "Esta contraseña se encuentra entre los más populares en el mundo",
     "PASSWORD IS WEAK TEXT": "Uso de números, letras mayúsculas y minúsculas y caracteres especiales para hacer su contraseña más fuerte",
-    "TERMS AND CONDITIONS ERROR TEXT": "Please review and agree to the Terms and Conditions and Privacy policy in order to proceed",
+    "TERMS AND CONDITIONS ERROR TEXT": "Revise y acepte los Términos y condiciones y la Política de privacidad para poder proceder",
     "THIS LINK IS BROKEN TEXT": "Este enlace está roto,<br>\n            El sistema puede estar desconectado de %PRODUCT_NAME%,<br>\n            El acceso a este sistema puede ser revocado, <br>\n            o puede haber iniciado sesión en una cuenta diferente",
     "PAGE NOT FOUND": "Página no encontrada",
     "TAKE ME HOME": "Llévame a casa",

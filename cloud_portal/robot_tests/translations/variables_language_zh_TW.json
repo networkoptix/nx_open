@@ -56,7 +56,7 @@
     "PASSWORD TOO SHORT TEXT": "密碼必須包含至少 8 個字元",
     "PASSWORD TOO COMMON TEXT": "此密碼是很常用的組合",
     "PASSWORD IS WEAK TEXT": "使用數字, 大寫和小寫字母及特殊字元使您密碼更強",
-    "TERMS AND CONDITIONS ERROR TEXT": "Please review and agree to the Terms and Conditions and Privacy policy in order to proceed",
+    "TERMS AND CONDITIONS ERROR TEXT": "請審閱並同意條款及條件和隱私政策, 以便繼續進行",
     "THIS LINK IS BROKEN TEXT": "此連結已斷開,<br>\n            系統可能會從 %PRODUCT_NAME% 離線,<br>\n            登入權限可能會被取銷,<br>\n            或您可能已用其他帳號登入",
     "PAGE NOT FOUND": "找不到頁面",
     "TAKE ME HOME": "回主頁面",
