@@ -1,7 +1,5 @@
 #pragma once
 
-#include <optional>
-
 #include <QtCore/QList>
 #include <QtCore/QObject>
 
@@ -9,6 +7,8 @@
 #include <common/common_globals.h>
 #include <core/resource/resource_fwd.h>
 #include <core/resource/motion_window.h>
+
+#include <nx/utils/std/optional.h>
 
 class QnAspectRatio;
 struct QnMediaDewarpingParams;

@@ -1,11 +1,11 @@
 #pragma once
 
-#include <optional>
-
 #include <QtWidgets/QWidget>
 
-#include <nx/client/desktop/common/utils/validators.h>
 #include <utils/common/connective.h>
+
+#include <nx/client/desktop/common/utils/validators.h>
+#include <nx/utils/std/optional.h>
 
 namespace nx {
 namespace client {
