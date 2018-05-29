@@ -1,6 +1,7 @@
 #pragma once
 
 #include <QtCore/QObject>
+#include <QtCore/QScopedPointer>
 
 #include <core/resource/resource_fwd.h>
 #include <ui/workbench/workbench_context_aware.h>
@@ -30,7 +31,7 @@ public:
 
 private:
     class Private;
-    Private* const d = nullptr;
+    const QScopedPointer<Private> d;
 };
 
 } // namespace desktop

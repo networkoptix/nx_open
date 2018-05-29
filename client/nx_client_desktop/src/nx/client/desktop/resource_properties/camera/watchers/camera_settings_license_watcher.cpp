@@ -11,7 +11,7 @@
 #include <ui/workbench/workbench_context.h>
 #include <utils/license_usage_helper.h>
 
-#include <nx/client/desktop/common/utils/abstract_text_provider.h>
+#include <nx/client/desktop/common/utils/basic_text_provider.h>
 #include <nx/utils/log/assert.h>
 
 namespace nx {
@@ -21,14 +21,15 @@ namespace desktop {
 // ------------------------------------------------------------------------------------------------
 // CameraSettingsLicenseWatcher::Private
 
-class CameraSettingsLicenseWatcher::Private: public AbstractTextProvider
+class CameraSettingsLicenseWatcher::Private: public QObject
 {
     CameraSettingsLicenseWatcher* const q = nullptr;
 
 public:
     Private(CameraSettingsLicenseWatcher* q, CameraSettingsDialogStore* store):
-        AbstractTextProvider(q),
+        QObject(),
         q(q),
+        m_textProvider(new BasicTextProvider()),
         m_store(store)
     {
         NX_ASSERT(m_store);
@@ -38,9 +39,9 @@ public:
         connect(watcher, &QnLicenseUsageWatcher::licenseUsageChanged, this, &Private::updateText);
     }
 
-    virtual QString text() const override
+    AbstractTextProvider* licenseUsageTextProvider() const
     {
-        return m_licenseMessageText;
+        return m_textProvider.data();
     }
 
     QnVirtualCameraResourceList cameras() const
@@ -60,12 +61,7 @@ public:
 private:
     void updateText()
     {
-        const auto newText = calculateText();
-        if (m_licenseMessageText == newText)
-            return;
-
-        m_licenseMessageText = newText;
-        emit textChanged(m_licenseMessageText);
+        m_textProvider->setText(calculateText());
     }
 
     QString calculateText() const
@@ -87,14 +83,15 @@ private:
                 continue;
 
             const int total = helper.totalLicenses(type);
-            QString message = tr("%n/%1 %2 licenses are used", "", used)
-                .arg(total).arg(QnLicense::displayName(type));
+            QString message =
+                CameraSettingsLicenseWatcher::tr("%n/%1 %2 licenses are used", "", used)
+                    .arg(total).arg(QnLicense::displayName(type));
 
             const int required = helper.requiredLicenses(type);
             if (required > 0)
             {
-                message += lit(" <font color=%1>(%2)</font>")
-                    .arg(colorId, tr("%n more required", "", required));
+                message += lit(" <font color=%1>(%2)</font>").arg(colorId,
+                    CameraSettingsLicenseWatcher::tr("%n more required", "", required));
             }
 
             lines << message;
@@ -104,9 +101,9 @@ private:
     }
 
 private:
+    const QScopedPointer<BasicTextProvider> m_textProvider;
     QPointer<CameraSettingsDialogStore> m_store;
     QnVirtualCameraResourceList m_cameras;
-    QString m_licenseMessageText;
 };
 
 // ------------------------------------------------------------------------------------------------
@@ -134,7 +131,7 @@ void CameraSettingsLicenseWatcher::setCameras(const QnVirtualCameraResourceList&
 
 AbstractTextProvider* CameraSettingsLicenseWatcher::licenseUsageTextProvider() const
 {
-    return d;
+    return d->licenseUsageTextProvider();
 }
 
 } // namespace desktop
