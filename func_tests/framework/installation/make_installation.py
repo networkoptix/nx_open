@@ -15,7 +15,7 @@ def make_installation(mediaserver_installers, vm_type, os_access):
     try:
         installer = mediaserver_installers[platform]
     except KeyError:
-        pytest.skip("Mediaserver installer for {} ({}) is not provided for tests".format(vm_type, [platform]))
+        pytest.skip("Mediaserver installer for {} ({}) is not provided for tests".format(vm_type, platform))
         assert False, "Skip should raise exception"
     if vm_type == 'linux':
         return DebInstallation(os_access, installer)
