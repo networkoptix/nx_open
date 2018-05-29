@@ -196,6 +196,7 @@
 #include <rest/handlers/get_hardware_ids_rest_handler.h>
 #include <rest/handlers/multiserver_get_hardware_ids_rest_handler.h>
 #include <rest/handlers/wearable_camera_rest_handler.h>
+#include <rest/handlers/set_primary_time_server_rest_handler.h>
 #ifdef _DEBUG
 #include <rest/handlers/debug_events_rest_handler.h>
 #endif
@@ -289,7 +290,6 @@
 #include <nx/mediaserver/updates2/server_updates2_manager.h>
 #include <nx/vms/common/p2p/downloader/downloader.h>
 #include <nx/mediaserver/root_tool.h>
-#include <rest/handlers/time_sync_rest_handler.h>
 
 #if !defined(EDGE_SERVER) && !defined(__aarch64__)
     #include <nx_speech_synthesizer/text_to_wav.h>
@@ -1583,6 +1583,17 @@ void MediaServerProcess::registerRestHandlers(
     reg(nx::time_sync::TimeSyncManager::kTimeSyncUrlPath.mid(1), 
         new ::rest::handlers::SyncTimeRestHandler());
 
+    /**%apidoc GET /ec2/forcePrimaryTimeServer
+    * Set primary time server. If parameter id is missing then there is no
+    * primary time server and time synchronization with internet is turned on.
+    * Otherwise synchronization with internet is turned off.
+    * %param[opt]:uuid Primary time server id. All other servers in the system will
+    * get time from this server.
+    * %return:object JSON object with error message and error code (0 means OK).
+    */
+    reg("ec2/forcePrimaryTimeServer",
+        new ::rest::handlers::SetPrimaryTimeServerRestHandler(), kAdmin);
+
     /**%apidoc GET /api/storageStatus
      * Check if specified folder can be used as a server storage.
      * %param:string path Folder to check.
@@ -2244,8 +2255,6 @@ void MediaServerProcess::registerRestHandlers(
      * %return JSON result with error code
      */
     reg("api/detachFromCloud", new QnDetachFromCloudRestHandler(cloudManagerGroup), kAdmin);
-
-    reg("api/timeSync", new QnTimeSyncRestHandler());
 
     reg("api/detachFromSystem", new QnDetachFromSystemRestHandler(
         &cloudManagerGroup->connectionManager, messageBus), kAdmin);

@@ -18,8 +18,6 @@
 namespace nx {
 namespace time_sync {
 
-static const std::chrono::seconds kMaxServerConnectionTimeout(10);
-static const std::chrono::milliseconds kMinBroadcastTimeChangedInterval(100);
 static const QByteArray kTimeDeltaParamName = "sync_time_delta";
 
 ServerTimeSyncManager::ServerTimeSyncManager(
@@ -129,8 +127,11 @@ QnUuid ServerTimeSyncManager::getPrimaryTimeServerId() const
 
 std::unique_ptr<nx::network::AbstractStreamSocket> ServerTimeSyncManager::connectToRemoteHost(const QnRoute& route)
 {
+    const auto maxRtt =
+        commonModule()->globalSettings()->maxDifferenceBetweenSynchronizedAndLocalTime();
+
     if (m_serverConnector)
-        return m_serverConnector->connectTo(route, kMaxServerConnectionTimeout);
+        return m_serverConnector->connectTo(route, maxRtt);
     return base_type::connectToRemoteHost(route);
 }
 
@@ -149,12 +150,12 @@ bool ServerTimeSyncManager::loadTimeFromInternet()
                 m_lastNetworkSyncTime.invalidate();
                 return;
             }
-            const auto minDeltaToSync =
+            const auto maxRtt =
                 commonModule()->globalSettings()->maxDifferenceBetweenSynchronizedAndInternetTime();
-            if (rtt > minDeltaToSync)
+            if (rtt > maxRtt)
             {
                 NX_WARNING(this, lm("Failed to get time from the internet. To big rtt value %1 > %2.")
-                    .args(rtt, minDeltaToSync));
+                    .args(rtt, maxRtt));
                 m_lastNetworkSyncTime.invalidate();
                 return;
             }

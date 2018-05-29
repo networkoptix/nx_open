@@ -22,8 +22,6 @@ namespace time_sync {
 
 const QString TimeSyncManager::kTimeSyncUrlPath(lit("/api/synchronizedTime"));
 
-static const std::chrono::seconds kLoadTimeTimeout(10);
-
 TimeSyncManager::TimeSyncManager(
     QnCommonModule* commonModule)
     :
@@ -109,10 +107,11 @@ bool TimeSyncManager::loadTimeFromServer(const QnRoute& route)
             lm("Can't read time from server %1. Can't establish connection to the remote host."));
         return false;
     }
+    auto maxRtt = commonModule()->globalSettings()->maxDifferenceBetweenSynchronizedAndLocalTime();
 
     auto httpClient = std::make_unique<nx::network::http::HttpClient>();
     httpClient->setSocket(std::move(socket));
-    httpClient->setResponseReadTimeoutMs(std::chrono::milliseconds(kLoadTimeTimeout).count());
+    httpClient->setResponseReadTimeoutMs(std::chrono::milliseconds(maxRtt).count());
     httpClient->addAdditionalHeader(Qn::SERVER_GUID_HEADER_NAME, route.id.toByteArray());
     auto server = commonModule()->resourcePool()->getResourceById<QnMediaServerResource>(route.id);
     if (!server)
@@ -158,7 +157,6 @@ bool TimeSyncManager::loadTimeFromServer(const QnRoute& route)
     bool syncWithInternel = commonModule()->globalSettings()->isSynchronizingTimeWithInternet();
     if (syncWithInternel && !timeData.isTakenFromInternet)
         return false; //< Target server is not ready yet. Time is not taken from internet yet. Repeat later.
-    auto maxRtt = commonModule()->globalSettings()->maxDifferenceBetweenSynchronizedAndLocalTime();
     if (rtt > maxRtt)
         return false; //< Too big rtt. Try again.
     setSyncTime(newTime, rtt);

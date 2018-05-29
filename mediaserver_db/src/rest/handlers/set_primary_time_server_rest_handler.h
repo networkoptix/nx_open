@@ -8,17 +8,18 @@ namespace nx { namespace time_sync { class TimeSyncManager; } }
 namespace rest {
 namespace handlers {
 
-class SyncTimeRestHandler: public QnJsonRestHandler
+class SetPrimaryTimeServerRestHandler: public QnJsonRestHandler
 {
 public:
-    SyncTimeRestHandler() {}
+    SetPrimaryTimeServerRestHandler() {}
     virtual int executeGet(
         const QString &path, 
         const QnRequestParams &params, 
         QnJsonRestResult &result, 
         const QnRestConnectionProcessor*) override;
-
-    static SyncTimeData execute(nx::time_sync::TimeSyncManager* timeSyncManager);
+    
+    static QnJsonRestResult execute(
+        nx::time_sync::TimeSyncManager* timeSyncManager, const QnUuid& id);
 };
 
 } // namespace handlers
