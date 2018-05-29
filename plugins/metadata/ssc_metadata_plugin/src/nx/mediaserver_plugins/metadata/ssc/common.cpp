@@ -9,7 +9,7 @@ namespace ssc {
 
 bool operator==(const AnalyticsEventType& lh, const AnalyticsEventType& rh)
 {
-    return lh.eventTypeId == rh.eventTypeId;
+    return lh.typeId == rh.typeId;
 }
 
 bool AnalyticsDriverManifest::supportsModel(const QString& model) const noexcept

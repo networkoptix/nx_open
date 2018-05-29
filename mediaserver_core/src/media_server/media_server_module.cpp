@@ -24,7 +24,6 @@
 #include <utils/media/ffmpeg_initializer.h>
 #include <utils/common/buffered_file.h>
 #include <utils/common/writer_pool.h>
-#include "settings.h"
 
 #include <utils/common/delayed.h>
 #include <plugins/storage/dts/vmax480/vmax480_tcp_server.h>
@@ -229,16 +228,6 @@ QnCommonModule* QnMediaServerModule::commonModule() const
 QSettings* QnMediaServerModule::roSettings() const
 {
     return m_settings->roSettings();
-}
-
-const nx::mediaserver::Settings& QnMediaServerModule::settings() const
-{
-    return m_settings->settings();
-}
-
-nx::mediaserver::Settings* QnMediaServerModule::mutableSettings()
-{
-    return m_settings->mutableSettings();
 }
 
 void QnMediaServerModule::syncRoSettings() const

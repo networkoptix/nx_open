@@ -6,12 +6,12 @@
 
 #include <QtSerialPort/QSerialPort>
 
-#include <plugins/plugin_tools.h>
-#include <nx/sdk/metadata/plugin.h>
 #include <nx/sdk/metadata/camera_manager.h>
+#include <nx/sdk/metadata/plugin.h>
+#include <plugins/plugin_tools.h>
 
-#include "manager.h"
 #include "common.h"
+#include "manager.h"
 
 namespace nx {
 namespace mediaserver_plugins {
@@ -20,7 +20,7 @@ namespace ssc {
 
 class Manager;
 
-/** Plugin for work with SSC-camera. */
+/** Plugin for working with SSC-camera. */
 class Plugin: public nxpt::CommonRefCounter<nx::sdk::metadata::Plugin>, public QObject
 {
 public:
@@ -37,14 +37,19 @@ public:
     virtual void setLocale(const char* locale) override;
 
     virtual nx::sdk::metadata::CameraManager* obtainCameraManager(
-        const nx::sdk::CameraInfo& cameraInfo,
-        nx::sdk::Error* outError) override;
+        const nx::sdk::CameraInfo& cameraInfo, nx::sdk::Error* outError) override;
 
-    virtual const char* capabilitiesManifest(
-        nx::sdk::Error* error) const override;
+    virtual const char* capabilitiesManifest(nx::sdk::Error* error) const override;
 
     void registerCamera(int cameraLogicalId, Manager* manager);
     void unregisterCamera(int cameraLogicalId);
+
+    virtual void setDeclaredSettings(const nxpl::Setting* /*settings*/, int /*count*/) override {}
+
+    virtual void executeAction(
+        sdk::metadata::Action* /*action*/, sdk::Error* /*outError*/) override
+    {
+    }
 
 private:
     void onSerialReceived();

@@ -36,9 +36,9 @@ nx::sdk::metadata::CommonEventMetadataPacket* createCommonEventMetadataPacket(
 
     auto packet = new nx::sdk::metadata::CommonEventMetadataPacket();
     auto commonEvent = new nx::sdk::metadata::CommonEvent();
-    commonEvent->setEventTypeId(
-        nx::mediaserver_plugins::utils::fromQnUuidToPluginGuid(event.eventTypeId));
-    commonEvent->setDescription(event.eventName.value.toStdString());
+    commonEvent->setTypeId(
+        nx::mediaserver_plugins::utils::fromQnUuidToPluginGuid(event.typeId));
+    commonEvent->setDescription(event.name.value.toStdString());
     commonEvent->setConfidence(1.0);
     commonEvent->setAuxilaryData(std::to_string(logicalId));
 
@@ -71,7 +71,7 @@ Manager::Manager(Plugin* plugin,
 
     nx::api::AnalyticsDeviceManifest typedCameraManifest;
     for (const auto& eventType: typedManifest.outputEventTypes)
-        typedCameraManifest.supportedEventTypes.push_back(eventType.eventTypeId);
+        typedCameraManifest.supportedEventTypes.push_back(eventType.typeId);
     m_cameraManifest = QJson::serialized(typedCameraManifest);
 
     NX_URL_PRINT << "SSC metadata manager created for camera " << cameraInfo.model;
@@ -107,10 +107,8 @@ void Manager::sendEventPacket(const AnalyticsEventType& event) const
         << event.internalName.toUtf8().constData() << " sent to server";
 }
 
-nx::sdk::Error Manager::startFetchingMetadata(nx::sdk::metadata::MetadataHandler* handler,
-    nxpl::NX_GUID* eventTypeList, int eventTypeListSize)
+nx::sdk::Error Manager::startFetchingMetadata(nxpl::NX_GUID* eventTypeList, int eventTypeListSize)
 {
-    m_handler = handler;
     m_plugin->registerCamera(m_cameraLogicalId, this);
     return nx::sdk::Error::noError;
 }
@@ -129,6 +127,12 @@ const char* Manager::capabilitiesManifest(nx::sdk::Error* error)
 void Manager::freeManifest(const char* /*data*/)
 {
     // Do nothing. Manifest string is stored in member-variable.
+}
+
+sdk::Error Manager::setHandler(sdk::metadata::MetadataHandler* handler)
+{
+    m_handler = handler;
+    return sdk::Error::noError;
 }
 
 } // namespace ssc

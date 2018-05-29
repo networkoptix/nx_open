@@ -21,8 +21,9 @@ namespace utils {
  * Usage example:
  * <pre><code>
  *
- *     struct Settings: nx::utils::Settings
+ *     class Settings: nx::utils::Settings
  *     {
+ *     public:
  *         Option<QString> option1{this, "option1", "defaultValue", "Option1 description"};
  *
  *         Option<int> option2{this, "option2",

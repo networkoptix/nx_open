@@ -298,7 +298,7 @@ void ManagerPool::saveManifestToFile(
     if (!f.open(QFile::WriteOnly))
         return log(Level::error, lit("Unable to (re)create file"));
 
-    const int len = strlen(manifest);
+    const qint64 len = (qint64) strlen(manifest);
     if (f.write(manifest, len) != len)
         return log(Level::error, lit("Unable to write to file"));
 }
@@ -821,7 +821,7 @@ bool ManagerPool::cameraInfoFromResource(
     outCameraInfo->channel = camera->getChannel();
 
     // If getLogicalId() returns incorrect number, logicalId is set to 0.
-    outResourceInfo->logicalId = atoi(camera->getLogicalId().toStdString().c_str());
+    outCameraInfo->logicalId = atoi(camera->getLogicalId().toStdString().c_str());
 
     return true;
 }

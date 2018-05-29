@@ -9,7 +9,7 @@
 namespace nx {
 namespace mediaserver {
 
-struct Settings: nx::utils::Settings
+class Settings: nx::utils::Settings
 {
 private:
     QString obtainDataDirectory()

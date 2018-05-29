@@ -28,10 +28,11 @@ namespace ssc {
 
 class Plugin;
 
-class Manager: public nxpt::CommonRefCounter<nx::sdk::metadata::CameraManager>
+class Manager : public nxpt::CommonRefCounter<nx::sdk::metadata::CameraManager>
 {
 public:
-    Manager(Plugin* plugin,
+    Manager(
+        Plugin* plugin,
         const nx::sdk::CameraInfo& cameraInfo,
         const AnalyticsDriverManifest& typedManifest);
 
@@ -42,15 +43,17 @@ public:
     void sendEventPacket(const AnalyticsEventType& event) const;
 
     virtual nx::sdk::Error startFetchingMetadata(
-        nx::sdk::metadata::MetadataHandler* handler,
-        nxpl::NX_GUID* eventTypeList,
-        int eventTypeListSize) override;
+        nxpl::NX_GUID* eventTypeList, int eventTypeListSize) override;
 
     virtual nx::sdk::Error stopFetchingMetadata() override;
 
     virtual const char* capabilitiesManifest(nx::sdk::Error* error) override;
 
     virtual void freeManifest(const char* data) override;
+
+    virtual sdk::Error setHandler(sdk::metadata::MetadataHandler* handler) override;
+
+    virtual void setDeclaredSettings(const nxpl::Setting* /*settings*/, int /*count*/) override {}
 
 private:
     QUrl m_url;
