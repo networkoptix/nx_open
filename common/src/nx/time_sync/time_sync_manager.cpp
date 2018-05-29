@@ -195,7 +195,9 @@ std::chrono::milliseconds TimeSyncManager::getSyncTime() const
 
 void TimeSyncManager::doPeriodicTasks()
 {
-    updateTime();
+    auto globalSettings = this->commonModule()->globalSettings();
+    if (globalSettings->isTimeSynchronizationEnabled())
+        updateTime();
 }
 
 } // namespace time_sync
