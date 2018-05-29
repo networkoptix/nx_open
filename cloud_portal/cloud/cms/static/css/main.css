@@ -36,10 +36,10 @@
     color: red !important;
 }
 
-tr {
+.results tr {
     height: 40px !important;
 }
-tr > td, tr > th{
+.results tr > td, tr > th{
     vertical-align: middle;
     padding: 8px !important;
 }
@@ -91,4 +91,8 @@ img.preview-image{
 
 .module h2{
     background: #212A2F;
+}
+
+.defaultSkin .mceStatusbar{
+    display: table-cell !important;
 }
