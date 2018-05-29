@@ -17,6 +17,8 @@
 #include <rest/server/rest_connection_processor.h>
 #include <utils/common/app_info.h>
 #include <nx/utils/log/log.h>
+#include <api/global_settings.h>
+#include <nx/network/rtsp/rtsp_types.h>
 
 namespace {
 
@@ -181,6 +183,47 @@ void QnUniversalRequestProcessor::run()
             t.restart();
             parseRequest();
             auto owner = static_cast<QnUniversalTcpListener*> (d->owner);
+
+            // TODO: Consider to move this interface into base stream socket class.
+            const auto secureSocket = dynamic_cast<nx::network::AbstractEncryptedStreamSocket*>(
+                d->socket.data());
+            if (!secureSocket || !secureSocket->isEncryptionEnabled())
+            {
+                const auto settings = commonModule()->globalSettings();
+                const auto protocol = d->request.requestLine.version.protocol.toUpper();
+                const auto redurectToScheme =
+                    [&](auto scheme)
+                    {
+                        const auto schemeString = QString::fromUtf8(scheme);
+                        nx::utils::Url url(d->request.requestLine.url);
+                        if (url.scheme() == schemeString)
+                        {
+                            QByteArray contentType;
+                            int rez = notFound(contentType);
+                            return sendResponse(rez, contentType);
+                        }
+
+                        url.setScheme(schemeString);
+                        if (url.host().isEmpty())
+                        {
+                            const auto endpoint = d->socket->getLocalAddress();
+                            url.setHost(endpoint.address.toString());
+                            url.setPort(endpoint.port);
+                        }
+
+                        QByteArray contentType;
+                        int rez = redirectTo(url.toString().toUtf8(), contentType);
+                        sendResponse(rez, contentType);
+                    };
+
+                if (protocol == "HTTP" && settings->isTrafficEncriptionForced())
+                    return redurectToScheme(nx::network::http::kSecureUrlSchemeName);
+
+                if (protocol == "RTSP" && settings->isVideoTrafficEncriptionForced())
+                    return redurectToScheme(nx_rtsp::kSecureUrlSchemeName);
+            }
+
+
             const auto redirect = owner->processorPool()->getRedirectRule(
                 d->request.requestLine.url.path());
             if (redirect)
