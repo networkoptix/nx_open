@@ -107,6 +107,7 @@ class QnMediaServerModule : public QObject,
 
   private:
     void registerResourceDataProviders();
+    QDir downloadsDirectory() const;
 
     QnCommonModule* m_commonModule;
     MSSettings* m_settings;

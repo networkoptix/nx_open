@@ -200,7 +200,7 @@ QnMediaServerModule::QnMediaServerModule(
 
 QDir QnMediaServerModule::downloadsDirectory() const
 {
-    const QDir dir(settings()->getDataDirectory() + lit("/downloads"));
+    const QDir dir(settings().dataDir() + lit("/downloads"));
     if (!dir.exists())
         QDir().mkpath(dir.absolutePath());
 
