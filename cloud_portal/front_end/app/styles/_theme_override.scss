@@ -214,7 +214,20 @@ select.form-control{
   }
 }
 
+button {
+  &:hover,
+  &:active,
+  &.active,
+  &:focus,
+  &.focus {
+    box-shadow: none;
+    outline: none !important;
+    outline: 0 !important;
+  }
+}
+
 .btn{
+  @extend button;
   outline: none !important;
   outline: 0 !important;
   max-width: 278px;
@@ -227,16 +240,6 @@ select.form-control{
   font-size: 14px;
   display: flex;
   align-items: center;
-
-  &:hover,
-  &:active,
-  &.active,
-  &:focus,
-  &.focus {
-    box-shadow: none;
-    outline: none !important;
-    outline: 0 !important;
-  }
 
   &.dropdown-toggle{
     display: flex;

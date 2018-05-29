@@ -1,8 +1,8 @@
 import { Component, Inject, OnInit, Input, ViewEncapsulation } from '@angular/core';
-import { NgbModal, NgbActiveModal, NgbModalRef }               from '@ng-bootstrap/ng-bootstrap';
-import { EmailValidator }                                      from '@angular/forms';
-import { NxModalGeneralComponent }                             from "../general/general.component";
-// import { NxPermissionsDropdown }                               from "../../dropdowns/permissions/permissions.component";
+import { NgbModal, NgbActiveModal, NgbModalRef }                                                 from '@ng-bootstrap/ng-bootstrap';
+import { EmailValidator }                                                                        from '@angular/forms';
+import { NxModalGeneralComponent }                                                               from "../general/general.component";
+// import { NxPermissionsDropdown }                                                     from "../../dropdowns/permissions/permissions.component";
 
 @Component({
     selector: 'nx-modal-share-content',
@@ -26,6 +26,7 @@ export class ShareModalContent {
         name: ''
     };
     accessDescription: string;
+    isValidPermission: boolean;
 
     constructor(public activeModal: NgbActiveModal,
                 @Inject('account') private account: any,
@@ -58,6 +59,7 @@ export class ShareModalContent {
         })[0];
 
         this.accessDescription = this.language.accessRoles[this.selectedPermission.name].description;
+        this.isValidPermission = true;
     }
 
     processAccessRoles() {
@@ -96,7 +98,8 @@ export class ShareModalContent {
         this.buttonText = this.language.sharing.shareConfirmButton;
         this.isNewShare = !this.user;
 
-        this.user = (this.user) ? {...this.user} : {email: '', isEnabled: true};
+        this.user = (this.user) ? {...this.user} : {email: '', isEnabled: true, role: {}};
+        this.isValidPermission = true;
 
         if (!this.isNewShare) {
             this.account
@@ -122,6 +125,12 @@ export class ShareModalContent {
         this.processAccessRoles();
 
         this.sharing = this.process.init(() => {
+            if (this.selectedPermission === undefined) {
+                this.isValidPermission = false;
+                return new Promise((resolve, reject) => {
+                    //resolve(); // do not reject if you don't want to see error Toast
+                });
+            }
             if (this.user.role.isOwner) {
                 return this.generalModal
                            .openConfirm(this.language.sharing.confirmOwner,

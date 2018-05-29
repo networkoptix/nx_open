@@ -1,7 +1,8 @@
 <div ngbDropdown class="d-inline-block dropdown-wide">
 
-    <button class="btn btn-dropdown-toggle"
+    <button class="form-control btn btn-dropdown-toggle"
             id="permissionsSelect"
+            [ngClass]="{'ng-invalid': !isValid}"
             ngbDropdownToggle>
         <span [innerHtml]="selection"></span>
         <div class="nav-arrow">

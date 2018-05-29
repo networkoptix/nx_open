@@ -25,9 +25,10 @@
                    class="form-control" [value]="formatUserName()" readonly>
         </div>
         <div class="form-group">
-            <label for="role" translate>Permissions</label>
+            <label for="permissionsSelect" translate>Permissions</label>
 
             <nx-permissions-select
+                    [isValid]="isValidPermission"
                     [roles]="accessRoles"
                     [selected]="user.role.name"
                     (onSelected)="setPermission($event)">

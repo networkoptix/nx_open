@@ -11,6 +11,7 @@ import { TranslateService }                                                     
 
 export class NxPermissionsDropdown implements OnInit {
     @Input() roles: any;
+    @Input() isValid: any;
     @Input() selected: any;
     @Output() onSelected = new EventEmitter<string>();
 
