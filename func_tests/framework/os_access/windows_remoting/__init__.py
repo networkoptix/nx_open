@@ -5,9 +5,9 @@ from subprocess import list2cmdline
 
 import winrm
 from pathlib2 import PurePath
-from pylru import lrudecorator
 from requests import RequestException
 
+from framework.method_caching import cached_getter
 from framework.os_access.exceptions import exit_status_error_cls
 from ._cim_query import CIMQuery
 from ._cmd import Shell, run_command
@@ -51,7 +51,7 @@ class WinRM(object):
     def __del__(self):
         self._shell().__exit__(None, None, None)
 
-    @lrudecorator(100)
+    @cached_getter
     def _shell(self):
         """Lazy shell creation"""
         shell = Shell(self._protocol)
@@ -74,7 +74,7 @@ class WinRM(object):
     def run_powershell_script(self, script, variables):
         return run_powershell_script(self._shell(), script, variables)
 
-    @lrudecorator(100)
+    @cached_getter
     def user_env_vars(self):
         # TODO: Work via Users class.
         users = Users(self._protocol)
@@ -88,7 +88,7 @@ class WinRM(object):
         env_vars = EnvVars.request(self._protocol, account[u'Caption'], default_env_vars)
         return env_vars
 
-    @lrudecorator(100)
+    @cached_getter
     def system_profile_dir(self):
         # TODO: Work via Users class.
         users = Users(self._protocol)

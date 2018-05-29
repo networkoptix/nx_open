@@ -4,11 +4,11 @@ import timeit
 import dateutil.parser
 import pytz
 import tzlocal.windows_tz
-from pylru import lrudecorator
 
+from framework.method_caching import cached_getter, cached_property
 from framework.networking.windows import WindowsNetworking
 from framework.os_access.os_access_interface import OSAccess
-from framework.os_access.smb_path import SMBPath
+from framework.os_access.smb_path import SMBConnectionPool, SMBPath
 from framework.os_access.windows_remoting import WinRM
 from framework.utils import RunningTime
 
@@ -31,16 +31,18 @@ class WindowsAccess(OSAccess):
     def forwarded_ports(self):
         return self._forwarded_ports
 
-    @property
-    @lrudecorator(100)
+    @cached_property
     def Path(self):
         winrm = self.winrm
 
         class SpecificSMBPath(SMBPath):
-            _username = self._username
-            _password = self._password
             _name_service_address, _name_service_port = self.forwarded_ports['udp', 137]
             _session_service_address, _session_service_port = self.forwarded_ports['tcp', 139]
+            _smb_connection_pool = SMBConnectionPool(
+                self._username, self._password,
+                _name_service_address, _name_service_port,
+                _session_service_address, _session_service_port,
+                )
 
             @classmethod
             def tmp(cls):
@@ -60,12 +62,11 @@ class WindowsAccess(OSAccess):
     def is_accessible(self):
         return self.winrm.is_working()
 
-    @property
-    @lrudecorator(100)
+    @cached_property
     def networking(self):
         return WindowsNetworking(self.winrm, self.macs)
 
-    @lrudecorator(100)
+    @cached_getter
     def _get_timezone(self):
         timezone_result, = self.winrm.wmi_query(u'Win32_TimeZone', {}).enumerate()  # Mind enumeration!
         windows_timezone_name = timezone_result[u'StandardName']

@@ -8,11 +8,11 @@ import time
 import pytz
 import requests.exceptions
 from pathlib2 import Path
-from pylru import lrudecorator
 
 from framework.api_shortcuts import get_server_id
 from framework.camera import Camera, SampleMediaFile, make_schedule_task
 from framework.media_stream import open_media_stream
+from framework.method_caching import cached_property
 from framework.os_access.posix_shell import local_shell
 from framework.rest_api import RestApi
 from framework.utils import datetime_utc_to_timestamp
@@ -173,8 +173,7 @@ class Storage(object):
         self.os_access = os_access
         self.dir = dir
 
-    @property
-    @lrudecorator(100)
+    @cached_property  # TODO: Use cached_getter.
     def timezone(self):
         tzname = self.os_access.Path('/etc/timezone').read_text().strip()
         return pytz.timezone(tzname)

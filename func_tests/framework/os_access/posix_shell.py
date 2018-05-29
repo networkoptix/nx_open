@@ -8,8 +8,8 @@ import subprocess
 from abc import ABCMeta, abstractmethod
 
 import paramiko
-from pylru import lrudecorator
 
+from framework.method_caching import cached_getter
 from framework.os_access.exceptions import Timeout, exit_status_error_cls
 from framework.os_access.posix_shell_utils import sh_augment_script, sh_command_to_script
 from framework.waiting import Wait
@@ -49,7 +49,7 @@ class SSH(PosixShell):
         output = self.run_sh_script(script, input=input, cwd=cwd, timeout_sec=timeout_sec, env=env)
         return output
 
-    @lrudecorator(100)
+    @cached_getter
     def _client(self):
         client = paramiko.SSHClient()
         client.set_missing_host_key_policy(paramiko.MissingHostKeyPolicy())  # Ignore completely.

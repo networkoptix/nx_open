@@ -3,8 +3,8 @@ import logging
 from pprint import pformat
 
 from netaddr import EUI
-from pylru import lrudecorator
 
+from framework.method_caching import cached_property
 from framework.networking.interface import Networking
 from framework.os_access.exceptions import NonZeroExitStatus, exit_status_error_cls
 from framework.os_access.posix_shell import SSH
@@ -19,8 +19,7 @@ class LinuxNetworking(Networking):
         self._macs = macs
         self._ssh = ssh_access  # type: SSH
 
-    @property
-    @lrudecorator(100)
+    @cached_property  # TODO: Use cached_getter.
     def interfaces(self):
         output = self._ssh.run_sh_script(
             # language=Bash
