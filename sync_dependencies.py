@@ -30,6 +30,7 @@ def determine_package_versions(
         "libjpeg-turbo": "1.4.2",
         "festival": "2.4",
         "directx": "JUN2010",
+		"pandoc": "2.2.1",
         "cassandra": "2.7.0",
         "doxygen": "1.8.14",
         "gstreamer": "1.0",
@@ -176,7 +177,9 @@ def sync_dependencies(syncher, platform, arch, box, release_version, options={})
         sync("vmaxproxy-2.1")
         sync("windows/wix-3.11", path_variable="wix_directory")
         sync("windows/signtool", path_variable="signtool_directory")
-        sync("windows/pandoc-2.2.1", path_variable="pandoc_directory")
+
+    if platform in ("windows", "linux"):
+        sync("%s/pandoc" % platform, path_variable="pandoc_directory")
 
     if box == "edge1":
         sync("cpro-1.0.0-2")

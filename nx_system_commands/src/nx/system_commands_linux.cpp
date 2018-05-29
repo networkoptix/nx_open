@@ -90,6 +90,52 @@ std::string format(const std::string& formatString, Args&&... args)
     return formatImpl(pstr, out, std::forward<Args>(args)...);
 }
 
+static bool writeKVToFile(int fd, char* buf, int len, const char* key, const char* value)
+{
+    snprintf(buf, len, "%s=%s\n", key, value);
+    if (write(fd, buf, strlen(buf)) <= 0)
+    {
+        perror("write");
+        return false;
+    }
+
+    return true;
+}
+
+static std::string writeCredentials(const std::string& userName, const std::string& password)
+{
+    char* home = getenv("HOME");
+    int fd = -1;
+    char buf[256];
+    std::string result;
+
+    if (!home)
+        goto fail;
+
+    strncpy(buf, home, sizeof(buf));
+    strncat(buf, "/.cifs.credentials", sizeof(buf) - strlen(buf));
+    result.assign(buf);
+
+    fd = open(buf, O_CREAT | O_WRONLY | O_TRUNC, S_IRUSR | S_IWUSR);
+    if (fd == -1)
+        goto fail;
+
+    if (!writeKVToFile(fd, buf, sizeof(buf), "username", userName.c_str()))
+        goto fail;
+
+    if (!writeKVToFile(fd, buf, sizeof(buf), "password", password.c_str()))
+        goto fail;
+
+    close(fd);
+    return result;
+
+fail:
+    perror("writeCredentials");
+    close(fd);
+
+    return std::string();
+}
+
 } // namespace
 
 
@@ -193,14 +239,15 @@ SystemCommands::MountCode SystemCommands::mount(
     }
 
     auto makeCommandString =
-        [&url, &directory](const std::string& username, const std::string& password,
+        [&url, &directory](
+            const std::string& credentialsFileName,
             const std::string& domain,
             const std::string& dialect)
         {
             std::ostringstream command;
             command << "mount -t cifs '" << url << "' '" << directory << "'"
                 << " -o uid=" << kRealUid << ",gid=" << kRealGid
-                << ",username=" << username << ",password=" << password;
+                << ",credentials=" << credentialsFileName;
 
             if (!domain.empty())
                 command << ",domain=" << domain;
@@ -214,6 +261,7 @@ SystemCommands::MountCode SystemCommands::mount(
     std::string passwordString = password ? *password : "";
     std::string userNameString = username ? *username : "guest";
     std::string userProvidedDomain;
+    std::string credentialsFileName;
 
     if (auto pos = userNameString.find("\\");
         pos != std::string::npos && pos != userNameString.size() - 1)
@@ -231,9 +279,13 @@ SystemCommands::MountCode SystemCommands::mount(
     {
         for (const auto& passwordCandidate: {passwordString, std::string("123")})
         {
+            credentialsFileName = writeCredentials(userNameString, passwordCandidate);
+            if (credentialsFileName.empty())
+                continue;
+
             for (const auto& dialect: {"", "2.0", "1.0"})
             {
-                if (execute(makeCommandString(userNameString, passwordCandidate, domain, dialect)))
+                if (execute(makeCommandString(credentialsFileName, domain, dialect)))
                 {
                     result = MountCode::ok;
                     break;
@@ -245,6 +297,9 @@ SystemCommands::MountCode SystemCommands::mount(
             }
         }
     }
+
+    if (unlink(credentialsFileName.c_str()))
+        perror("unlink credentials file");
 
     if (gotWrongCredentialsError && result != MountCode::ok)
         result = MountCode::wrongCredentials;

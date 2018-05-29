@@ -820,6 +820,9 @@ bool ManagerPool::cameraInfoFromResource(
 
     outCameraInfo->channel = camera->getChannel();
 
+    // If getLogicalId() returns incorrect number, logicalId is set to 0.
+    outResourceInfo->logicalId = atoi(camera->getLogicalId().toStdString().c_str());
+
     return true;
 }
 

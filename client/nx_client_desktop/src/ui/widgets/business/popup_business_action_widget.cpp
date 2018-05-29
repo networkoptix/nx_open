@@ -1,6 +1,9 @@
 #include "popup_business_action_widget.h"
 #include "ui_popup_business_action_widget.h"
 
+#include <ui/help/help_topic_accessor.h>
+#include <ui/help/help_topics.h>
+
 #include <ui/workbench/workbench_context.h>
 
 #include <business/business_resource_validation.h>
@@ -21,7 +24,10 @@ QnPopupBusinessActionWidget::QnPopupBusinessActionWidget(QWidget* parent):
 {
     ui->setupUi(this);
 
-    ui->hintLabel->setHint(tr("Notification will be shown until one of the users who see it creates bookmark with event description"));
+    setHelpTopic(this, Qn::EventsActions_ShowNotification_Help);
+
+    ui->hintLabel->setHint(tr("Notification will be shown until one of the users who see it "
+        "creates bookmark with event description"));
 
     connect(ui->settingsButton, &QPushButton::clicked,
         this, &QnPopupBusinessActionWidget::at_settingsButton_clicked);

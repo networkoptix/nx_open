@@ -145,8 +145,7 @@ LegacyExpertSettingsWidget::LegacyExpertSettingsWidget(QWidget* parent):
 
     auto logicalIdHint = nx::client::desktop::HintButton::hintThat(ui->logicalIdGroupBox);
     logicalIdHint->addHintLine(tr("Custom number that can be assigned to a camera for quick identification and access"));
-    // TODO: Fill in help topic when it is implemented
-    //logicalIdHint->setHelpTopic(Qn::)
+    setHelpTopic(logicalIdHint, Qn::CameraSettings_Expert_LogicalId_Help);
 }
 
 LegacyExpertSettingsWidget::~LegacyExpertSettingsWidget()
