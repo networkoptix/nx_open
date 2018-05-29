@@ -35,6 +35,25 @@ std::tuple<ResultType, OutArg1> makeSyncCall(
     return std::make_tuple(future.get(), std::move(result));
 }
 
+template<typename ResultType, typename OutArg1, typename OutArg2>
+std::tuple<ResultType, OutArg1, OutArg2> makeSyncCall(
+    std::function<void(std::function<void(ResultType, OutArg1, OutArg2)>)> function)
+{
+    nx::utils::promise<ResultType> promise;
+    auto future = promise.get_future();
+    OutArg1 result1;
+    OutArg2 result2;
+    function(
+        [&promise, &result1, &result2](ResultType resCode, OutArg1 outArg1, OutArg2 outArg2)
+        {
+            result1 = std::move(outArg1);
+            result2 = std::move(outArg2);
+            promise.set_value(resCode);
+        });
+    future.wait();
+    return std::make_tuple(future.get(), std::move(result1), std::move(result2));
+}
+
 template<typename ResultType, typename OutArg1, typename FuncPtr, typename Arg1, typename ... Args>
 std::tuple<ResultType, OutArg1> makeSyncCall(FuncPtr funcPtr, Arg1 arg1, Args... args)
 {
