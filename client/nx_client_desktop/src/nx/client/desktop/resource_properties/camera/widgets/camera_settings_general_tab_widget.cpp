@@ -1,5 +1,6 @@
 #include "camera_settings_general_tab_widget.h"
 #include "ui_camera_settings_general_tab_widget.h"
+#include "../dialogs/camera_credentials_dialog.h"
 #include "../redux/camera_settings_dialog_state.h"
 #include "../redux/camera_settings_dialog_store.h"
 
@@ -47,8 +48,8 @@ CameraSettingsGeneralTabWidget::CameraSettingsGeneralTabWidget(
     connect(ui->enableAudioCheckBox, &QCheckBox::clicked,
         store, &CameraSettingsDialogStore::setAudioEnabled);
 
-    // TODO: #vkutin #gdm Handle "Edit Credentials" button and remove the following line.
-    ui->authenticationGroupBox->hide();
+    connect(ui->editCredentialsButton, &QPushButton::clicked, this,
+        [this, store = QPointer<CameraSettingsDialogStore>(store)]() { editCredentials(store); });
 }
 
 CameraSettingsGeneralTabWidget::~CameraSettingsGeneralTabWidget()
@@ -80,6 +81,21 @@ void CameraSettingsGeneralTabWidget::loadState(const CameraSettingsDialogState& 
     ui->rightWidget->layout()->activate();
     ui->horizontalLayout->activate();
     layout()->activate();
+}
+
+void CameraSettingsGeneralTabWidget::editCredentials(CameraSettingsDialogStore* store)
+{
+    if (!store)
+        return;
+
+    QScopedPointer<CameraCredentialsDialog> dialog(new CameraCredentialsDialog(this));
+
+    const auto& credentials = store->state().credentials;
+    dialog->setLogin(credentials.login);
+    dialog->setPassword(credentials.password);
+
+    if (dialog->exec() == QDialog::Accepted)
+        store->setCredentials(dialog->login(), dialog->password());
 }
 
 } // namespace desktop

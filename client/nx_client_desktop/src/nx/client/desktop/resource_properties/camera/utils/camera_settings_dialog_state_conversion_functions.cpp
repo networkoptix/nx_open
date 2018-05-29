@@ -239,6 +239,42 @@ void setAudioEnabled(bool value, const Cameras& cameras)
         camera->setAudioEnabled(value);
 }
 
+void setCredentials(const State::Credentials& value, const Cameras& cameras)
+{
+    NX_ASSERT(value.login.hasValue() || value.password.hasValue());
+
+    QAuthenticator authenticator;
+    if (value.login.hasValue())
+        authenticator.setUser(value.login());
+    if (value.password.hasValue())
+        authenticator.setPassword(value.password());
+
+    if (!value.login.hasValue())
+    {
+        // Change only password, fetch logins from cameras.
+        for (const auto& camera: cameras)
+        {
+            authenticator.setUser(camera->getAuth().user());
+            camera->setAuth(authenticator);
+        }
+    }
+    else if (!value.password.hasValue())
+    {
+        // Change only login, fetch passwords from cameras.
+        for (const auto& camera : cameras)
+        {
+            authenticator.setPassword(camera->getAuth().password());
+            camera->setAuth(authenticator);
+        }
+    }
+    else
+    {
+        // Change both login and password.
+        for (const auto& camera: cameras)
+            camera->setAuth(authenticator);
+    }
+}
+
 void setWearableMotionSensitivity(int value, const Cameras& cameras)
 {
     QnMotionRegion region;
@@ -299,6 +335,9 @@ void CameraSettingsDialogStateConversionFunctions::applyStateToCameras(
                 setWearableMotionSensitivity(state.wearableMotion.sensitivity(), cameras);
         }
     }
+
+    if (state.credentials.login.hasValue() || state.credentials.password.hasValue())
+        setCredentials(state.credentials, cameras);
 
     setMinRecordingDays(state.recording.minDays, cameras);
     setMaxRecordingDays(state.recording.maxDays, cameras);

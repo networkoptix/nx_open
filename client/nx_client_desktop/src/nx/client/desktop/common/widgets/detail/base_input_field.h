@@ -1,5 +1,7 @@
 #pragma once
 
+#include <optional>
+
 #include <QtWidgets/QWidget>
 
 #include <nx/client/desktop/common/utils/validators.h>
@@ -50,6 +52,12 @@ public:
 
     QString placeholderText() const;
     void setPlaceholderText(const QString& value);
+
+    std::optional<QString> optionalText() const;
+    void setOptionalText(const std::optional<QString>& value);
+
+    QString optionalTextPlaceholder() const;
+    void setOptionalTextPlaceholder(const QString& value);
 
     bool isReadOnly() const;
     void setReadOnly(bool value);

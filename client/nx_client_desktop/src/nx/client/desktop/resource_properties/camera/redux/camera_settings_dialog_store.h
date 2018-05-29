@@ -1,5 +1,7 @@
 #pragma once
 
+#include <optional>
+
 #include <QtCore/QList>
 #include <QtCore/QObject>
 
@@ -77,6 +79,7 @@ public:
     void resetExpertSettings();
     void setWearableMotionDetectionEnabled(bool value);
     void setWearableMotionSensitivity(int value);
+    void setCredentials(const std::optional<QString>& login, const std::optional<QString>& password);
 
 signals:
     void stateChanged(const CameraSettingsDialogState& state);

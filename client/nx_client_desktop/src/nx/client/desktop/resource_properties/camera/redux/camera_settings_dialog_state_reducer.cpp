@@ -461,6 +461,7 @@ State CameraSettingsDialogStateReducer::loadCameras(
     state.singleCameraSettings = {};
     state.singleIoModuleSettings = {};
     state.devicesDescription = {};
+    state.credentials = {};
     state.expert = {};
     state.recording = {};
     state.wearableMotion = {};
@@ -636,6 +637,11 @@ State CameraSettingsDialogStateReducer::loadCameras(
 
     fetchFromCameras<bool>(state.audioEnabled, cameras,
         [](const Camera& camera) { return camera->isAudioEnabled(); });
+
+    fetchFromCameras<QString>(state.credentials.login, cameras,
+        [](const Camera& camera) { return camera->getAuth().user(); });
+    fetchFromCameras<QString>(state.credentials.password, cameras,
+        [](const Camera& camera) { return camera->getAuth().password(); });
 
     fetchFromCameras<bool>(state.expert.dualStreamingDisabled, cameras,
         [](const Camera& camera) { return camera->isDualStreamingDisabled(); });
@@ -1188,6 +1194,21 @@ State CameraSettingsDialogStateReducer::setWearableMotionSensitivity(State state
         return state;
 
     state.wearableMotion.sensitivity.setUser(value);
+    state.hasChanges = true;
+    return state;
+}
+
+State CameraSettingsDialogStateReducer::setCredentials(
+    State state, const std::optional<QString>& login, const std::optional<QString>& password)
+{
+    if (!login && !password)
+        return state;
+
+    if (login)
+        state.credentials.login.setUser(login->trimmed());
+    if (password)
+        state.credentials.password.setUser(password->trimmed());
+
     state.hasChanges = true;
     return state;
 }

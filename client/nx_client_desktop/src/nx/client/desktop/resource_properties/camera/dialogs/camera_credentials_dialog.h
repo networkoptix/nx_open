@@ -1,0 +1,36 @@
+#pragma once
+
+#include <optional>
+
+#include <ui/dialogs/common/button_box_dialog.h>
+
+namespace Ui { class CameraCredentialsDialog; }
+
+namespace nx {
+namespace client {
+namespace desktop {
+
+class CameraSettingsDialogStore;
+
+class CameraCredentialsDialog: public QnButtonBoxDialog
+{
+    Q_OBJECT
+    using base_type = QnButtonBoxDialog;
+
+public:
+    explicit CameraCredentialsDialog(QWidget* parent = nullptr);
+    virtual ~CameraCredentialsDialog() override;
+
+    std::optional<QString> login() const;
+    void setLogin(const std::optional<QString>& value);
+
+    std::optional<QString> password() const;
+    void setPassword(const std::optional<QString>& value);
+
+private:
+    const QScopedPointer<Ui::CameraCredentialsDialog> ui;
+};
+
+} // namespace desktop
+} // namespace client
+} // namespace nx

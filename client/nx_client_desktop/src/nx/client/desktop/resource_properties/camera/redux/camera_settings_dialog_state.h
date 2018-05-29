@@ -57,6 +57,7 @@ struct CameraSettingsDialogState
         void resetBase() { m_base.reset(); }
 
         T operator()() const { return get(); }
+        operator std::optional<T>() const { return m_user ? m_user : m_base; }
 
     private:
         std::optional<T> m_base;
@@ -208,6 +209,13 @@ struct CameraSettingsDialogState
         int maxDualStreamingFps = 0;
     };
     CombinedProperties devicesDescription;
+
+    struct Credentials
+    {
+        UserEditableMultiple<QString> login;
+        UserEditableMultiple<QString> password;
+    };
+    Credentials credentials;
 
     struct ExpertSettings
     {

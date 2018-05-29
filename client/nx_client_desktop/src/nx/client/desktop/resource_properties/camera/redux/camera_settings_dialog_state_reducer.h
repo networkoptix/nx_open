@@ -60,6 +60,8 @@ public:
     static State resetExpertSettings(State state);
     static State setWearableMotionDetectionEnabled(State state, bool value);
     static State setWearableMotionSensitivity(State state, int value);
+    static State setCredentials(
+        State state, const std::optional<QString>& login, const std::optional<QString>& password);
 };
 
 } // namespace desktop
