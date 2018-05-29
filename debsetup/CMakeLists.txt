@@ -11,13 +11,12 @@ set(target.arch "${os.arch}")
 
 message("Generating license...")
 execute_process(
-    COMMAND ${PYTHON_EXECUTABLE} ${CMAKE_SOURCE_DIR}/build_utils/html2txt.py
-    INPUT_FILE ${customization_dir}/license.html
-    OUTPUT_FILE ${CMAKE_CURRENT_BINARY_DIR}/license.txt
-    RESULT_VARIABLE html2txt_result
+    COMMAND pandoc -s ${customization.dir}/license.html -t plain --wrap=none -o ${CMAKE_CURRENT_BINARY_DIR}/license.txt
+    WORKING_DIRECTORY ${pandoc_directory}/bin
+    RESULT_VARIABLE pandoc_result
 )
 
-if(NOT html2txt_result STREQUAL "0")
+if(NOT pandoc_result STREQUAL "0")
     message(FATAL_ERROR "error: License generation failed")
 endif()
 
