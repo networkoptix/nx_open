@@ -6407,11 +6407,7 @@ to %1</source>
         <translation></translation>
     </message>
     <message>
-        <source>Backup includes servers and cameras settings, users, webpages, event rules, etc. Video is not saved.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Creates a backup of System configuration that can be restored in case of failure.</source>
+        <source>Reindexing can fix problems with archive or backup if they have been lost or damaged, or if some hardware has been replaced.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -8517,6 +8513,10 @@ to %1</source>
     </message>
     <message>
         <source>Event will trigger only if there are matches in the caption with any of the entered keywords.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This field is case sensitive.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
