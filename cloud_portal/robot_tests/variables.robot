@@ -150,7 +150,6 @@ ${ACCOUNT FIRST NAME}                 //form[@name='accountForm']//input[@ng-mod
 ${ACCOUNT LAST NAME}                  //form[@name='accountForm']//input[@ng-model='account.last_name']
 ${ACCOUNT LANGUAGE DROPDOWN}          //form[@name='accountForm']//language-select//button
 ${ACCOUNT SAVE}                       //form[@name='accountForm']//button[@ng-click='checkForm()']
-${ACCOUNT SUBSCRIBE CHECKBOX}         //form[@name='accountForm']//input[@ng-model='account.subscribe']
 
 #Already logged in modal
 ${LOGGED IN CONTINUE BUTTON}          //div[@uib-modal-transclude]//button[@ng-click='ok()']
