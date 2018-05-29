@@ -31,6 +31,13 @@ if(targetDevice STREQUAL "none")
     set(targetDevice "")
 endif()
 
+if(NOT CMAKE_TOOLCHAIN_FILE AND targetDevice)
+    set(CMAKE_TOOLCHAIN_FILE ${CMAKE_CURRENT_LIST_DIR}/cmake/toolchain/${targetDevice}.cmake)
+    if(NOT EXISTS ${CMAKE_TOOLCHAIN_FILE})
+        unset(CMAKE_TOOLCHAIN_FILE)
+    endif()
+endif()
+
 # Early loading rdep to download a toolchain if needed.
 include(cmake/find_python.cmake)
 include(cmake/rdep.cmake)
@@ -41,10 +48,6 @@ hg_changeset(${CMAKE_CURRENT_LIST_DIR} changeSet)
 hg_branch(${CMAKE_CURRENT_LIST_DIR} branch)
 
 include(cmake/dependencies.cmake)
-
-if(targetDevice AND NOT targetDevice STREQUAL "ios")
-    set(CMAKE_TOOLCHAIN_FILE "${CMAKE_CURRENT_LIST_DIR}/cmake/toolchain/${targetDevice}.cmake")
-endif()
 
 project(vms VERSION ${releaseVersion})
 

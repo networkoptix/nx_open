@@ -15,7 +15,7 @@ endif()
 
 set(sync_command ${PYTHON_EXECUTABLE} ${CMAKE_SOURCE_DIR}/sync_dependencies.py
     --packages-dir=${PACKAGES_DIR}
-    --target=${sync_target}
+    --target=${rdep_target}
     --release-version=${releaseVersion}
     --cmake-include-file=${cmake_include_file}
 )
@@ -32,6 +32,16 @@ endif()
 
 if(rdepOverrides)
     list(APPEND sync_command --overrides ${rdepOverrides})
+endif()
+
+set(sync_options)
+
+if(targetDevice MATCHES "-clang")
+    list(APPEND sync_options clang)
+endif()
+
+if(sync_options)
+    list(APPEND sync_command --options ${sync_options})
 endif()
 
 set(ENV{PYTHONPATH} "${CMAKE_SOURCE_DIR}/build_utils/python")

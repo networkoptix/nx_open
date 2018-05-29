@@ -18,6 +18,7 @@ def determine_package_versions(
 ):
     v = {
         "gcc": "7.3.0",
+        "clang": "6.0.0",
         "qt": "5.6.2",
         "boost": "1.66.0",
         "openssl": "1.0.2e",
@@ -108,7 +109,7 @@ def determine_package_versions(
     return v
 
 
-def sync_dependencies(syncher, platform, arch, box, release_version):
+def sync_dependencies(syncher, platform, arch, box, release_version, options={}):
     have_mediaserver = platform not in ("android", "ios")
     have_desktop_client = platform in ("windows", "macosx") \
         or (platform == "linux" and box in ("none", "tx1"))
@@ -121,6 +122,9 @@ def sync_dependencies(syncher, platform, arch, box, release_version):
             sync("bpi/gcc")
         else:
             sync("linux-%s/gcc" % arch)
+
+        if options.get("clang"):
+            sync("linux/clang")
     elif platform == "android":
         if "ANDROID_HOME" not in os.environ:
             sync("android/android-sdk")
@@ -262,20 +266,36 @@ def parse_target(target):
     return platform, arch, box
 
 
+def parse_options(options_list):
+    options = {}
+
+    for item in options_list:
+        try:
+            name, value = item.split("=")
+            if value == "True":
+                value = True
+            elif value == "False":
+                value = False
+            options[name] = value
+        except ValueError:
+            options[item] = True
+
+    return options
+
+
 def parse_overrides(overrides_list):
     versions = {}
     locations = {}
 
-    for item in overrides_list:
-        try:
-            package, value = item.split("=")
-            if "/" in value or "\\" in value:
-                locations[package] = value
-            else:
-                versions[package] = value
-        except ValueError:
-            print("Invalid override item \"%s\"" % item, file=sys.stderr)
+    for package, value in parse_options(overrides_list).items():
+        if type(value) is not str:
+            print("Invalid override item \"%s\"" % package, file=sys.stderr)
             exit(1)
+
+        if "/" in value or "\\" in value:
+            locations[package] = value
+        else:
+            versions[package] = value
 
     return versions, locations
 
@@ -302,6 +322,7 @@ def main():
     parser.add_argument("--customization", default="default", help="VMS customization")
     parser.add_argument("-o", "--overrides", nargs="*", default=[],
         help="Package version or location overrides (e.g. -o ffmpeg=4.0)")
+    parser.add_argument("-O", "--options", nargs="*", default=[], help="Additional options")
 
     args = parser.parse_args()
 
@@ -309,9 +330,13 @@ def main():
 
     version_overrides, location_overrides = parse_overrides(args.overrides)
     release_version = short_release_version(args.release_version)
+    options = parse_options(args.options)
 
     syncher = RdepSyncher(args.packages_dir)
-    syncher.rdep_target = args.target
+    if args.target == "bananapi":
+        syncher.rdep_target = "bpi"
+    else:
+        syncher.rdep_target = args.target
     syncher.versions = determine_package_versions(
         platform,
         box,
@@ -323,7 +348,7 @@ def main():
     syncher.locations = location_overrides
     syncher.use_local = args.use_local
 
-    sync_dependencies(syncher, platform, arch, box, release_version)
+    sync_dependencies(syncher, platform, arch, box, release_version, options)
 
     syncher.generate_cmake_include(args.cmake_include_file)
 
