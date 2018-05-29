@@ -356,10 +356,11 @@ void QnLicenseManagerWidget::updateLicenses()
 
         for (auto helper: helpers)
         {
-            for(Qn::LicenseType lt: helper->licenseTypes())
+            for (Qn::LicenseType lt: helper->licenseTypes())
             {
-                if (helper->totalLicenses(lt) > 0)
-                    messages << QnLicense::displayText(lt, helper->totalLicenses(lt));
+                const int total = helper->totalLicenses(lt);
+                if (total > 0)
+                    messages << QnLicense::displayText(lt, total);
             }
         }
 
@@ -384,6 +385,7 @@ void QnLicenseManagerWidget::updateLicenses()
                 }
             }
         }
+
         ui->infoLabel->setText(messages.join(lit("<br/>")));
     }
 
