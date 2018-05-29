@@ -379,9 +379,8 @@ QnProgressiveDownloadingConsumer::QnProgressiveDownloadingConsumer(QSharedPointe
         arg(d->foreignAddress).arg(d->foreignPort).
         arg(QnProgressiveDownloadingConsumer_count.fetchAndAddOrdered(1)+1), cl_logDEBUG1 );
 
-    const int sessionLiveTimeoutSec = qnServerModule->roSettings()->value(
-        nx_ms_conf::PROGRESSIVE_DOWNLOADING_SESSION_LIVE_TIME,
-        nx_ms_conf::DEFAULT_PROGRESSIVE_DOWNLOADING_SESSION_LIVE_TIME ).toUInt();
+    const int sessionLiveTimeoutSec =
+        qnServerModule->settings().progressiveDownloadSessionLiveTimeSec();
     if( sessionLiveTimeoutSec > 0 )
         d->killTimerID = nx::utils::TimerManager::instance()->addTimer(
             this,
@@ -645,7 +644,7 @@ void QnProgressiveDownloadingConsumer::run()
         const bool standFrameDuration = decodedUrlQuery.hasQueryItem(STAND_FRAME_DURATION_PARAM_NAME);
 
         const bool rtOptimization = decodedUrlQuery.hasQueryItem(RT_OPTIMIZATION_PARAM_NAME);
-        if (rtOptimization && qnServerModule->roSettings()->value(StreamingParams::FFMPEG_REALTIME_OPTIMIZATION, true).toBool())
+        if (rtOptimization && qnServerModule->settings().ffmpegRealTimeOptimization())
             d->transcoder.setUseRealTimeOptimization(true);
 
 

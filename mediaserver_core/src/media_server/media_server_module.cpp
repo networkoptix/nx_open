@@ -24,7 +24,6 @@
 #include <utils/media/ffmpeg_initializer.h>
 #include <utils/common/buffered_file.h>
 #include <utils/common/writer_pool.h>
-#include "settings.h"
 
 #include <utils/common/delayed.h>
 #include <plugins/storage/dts/vmax480/vmax480_tcp_server.h>
@@ -106,8 +105,7 @@ QnMediaServerModule::QnMediaServerModule(
 #ifdef ENABLE_ONVIF
     store<PasswordHelper>(new PasswordHelper());
 
-    const bool isDiscoveryDisabled =
-        m_settings->roSettings()->value(QnServer::kNoResourceDiscovery, false).toBool();
+    const bool isDiscoveryDisabled = m_settings->settings().noResourceDiscovery();
     QnSoapServer* soapServer = nullptr;
     if (!isDiscoveryDisabled)
     {
@@ -143,9 +141,7 @@ QnMediaServerModule::QnMediaServerModule(
         commonModule()->resourcePool(),
         streamingChunkTranscoder,
         std::chrono::seconds(
-            m_settings->roSettings()->value(
-                nx_ms_conf::HLS_CHUNK_CACHE_SIZE_SEC,
-                nx_ms_conf::DEFAULT_MAX_CACHE_COST_SEC).toUInt())));
+            m_settings->settings().hlsChunkCacheSizeSec())));
 
     // std::shared_pointer based singletones should be placed after InstanceStorage singletones
 
@@ -233,9 +229,9 @@ QSettings* QnMediaServerModule::roSettings() const
     return m_settings->roSettings();
 }
 
-MSSettings* QnMediaServerModule::settings() const
+void QnMediaServerModule::syncRoSettings() const
 {
-    return m_settings;
+    m_settings->syncRoSettings();
 }
 
 QSettings* QnMediaServerModule::runTimeSettings() const

@@ -1,10 +1,8 @@
-vm_host:
-  address: 127.0.0.1
 vm_types:
   linux:
     os_family: linux
     registry_path: ~/.func_tests/trusty-registry.yaml
-    power_on_timeout_sec: 60
+    power_on_timeout_sec: 120
     name_format: trusty-{vm_index}
     limit: 100
     vm:
@@ -26,7 +24,7 @@ vm_types:
   windows:
     os_family: windows
     registry_path: ~/.func_tests/win10-registry.yaml
-    power_on_timeout_sec: 600  # After SysPrep, first boot takes several minutes to prepare user profile.
+    power_on_timeout_sec: 1200  # After SysPrep, first boot takes several minutes to prepare user profile.
     name_format: win10-{vm_index}
     limit: 20
     vm:
@@ -45,11 +43,11 @@ vm_types:
             protocol: tcp
             guest_port: 5985
             host_port_offset: 5
-          samba-name-service:
+          smb-name-service:
             protocol: udp
             guest_port: 137
             host_port_offset: 7
-          samba-session-service:
+          smb-session-service:
             protocol: tcp
             guest_port: 139
             host_port_offset: 9

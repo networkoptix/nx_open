@@ -307,7 +307,7 @@ qint64 QnStreamRecorder::findNextIFrame(qint64 baseTime)
     return AV_NOPTS_VALUE;
 }
 
-bool QnStreamRecorder::processData(const QnAbstractDataPacketPtr& nonConstData)
+bool QnStreamRecorder::processData(const QnAbstractDataPacketPtr& data)
 {
     #define VERBOSE(S) NX_VERBOSE(this, lm("%1 %2").args(__func__, (S)))
 
@@ -318,13 +318,13 @@ bool QnStreamRecorder::processData(const QnAbstractDataPacketPtr& nonConstData)
         close();
     }
 
-    QnConstAbstractMediaDataPtr md =
-        std::dynamic_pointer_cast<const QnAbstractMediaData>(nonConstData);
+    const QnConstAbstractMediaDataPtr md =
+        std::dynamic_pointer_cast<const QnAbstractMediaData>(data);
 
     if (!md)
     {
         VERBOSE("EXIT: Unknown data");
-        return true; // skip unknown data
+        return true; //< skip unknown data
     }
     if (m_eofDateTimeUs != qint64(AV_NOPTS_VALUE) && md->timestamp > m_eofDateTimeUs)
     {
@@ -342,7 +342,8 @@ bool QnStreamRecorder::processData(const QnAbstractDataPacketPtr& nonConstData)
 
             m_recordingFinished = true;
             m_endOfData = true;
-            VERBOSE(lm("END: Stopping; m_endOfData: false; error: %1").arg(isOk ? "true" : "false"));
+            VERBOSE(
+                lm("END: Stopping; m_endOfData: false; error: %1").arg(isOk ? "true" : "false"));
         }
         else
         {

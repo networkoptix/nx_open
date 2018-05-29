@@ -13,6 +13,7 @@
 #include <ui/style/custom_style.h>
 #include <ui/style/skin.h>
 #include <nx/client/desktop/common/widgets/search_line_edit.h>
+#include <ui/workaround/hidpi_workarounds.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_display.h>
 #include <ui/workbench/workbench_navigator.h>
@@ -107,6 +108,11 @@ EventPanel::Private::Private(EventPanel* q):
         connect(tab, &UnifiedSearchWidget::tileHovered, q, &EventPanel::tileHovered);
 
     setupTabsSyncWithNavigator();
+
+    q->setContextMenuPolicy(Qt::CustomContextMenu);
+    connect(q, &EventPanel::customContextMenuRequested,
+        this, &EventPanel::Private::showContextMenu);
+
 }
 
 EventPanel::Private::~Private() = default;
@@ -158,7 +164,6 @@ void EventPanel::Private::setupMotionSearch()
 {
     auto model = new UnifiedAsyncSearchListModel(m_motionModel, this);
     m_motionTab->setModel(model);
-    //m_motionTab->setPlaceholderTexts(tr("No events"), tr("No events occured"));
     m_motionTab->setPlaceholderIcon(qnSkin->pixmap(lit("events/placeholders/motion.png")));
 
     m_motionTab->filterEdit()->hide();
@@ -197,7 +202,7 @@ void EventPanel::Private::setupBookmarkSearch()
         [this]()
         {
             const auto count = m_bookmarksModel->rowCount();
-            m_bookmarksTab->counterLabel()->setText(count
+            m_bookmarksTab->counterLabel()->setText(count > 0
                 ? (count > 99 ? tr(">99 bookmarks") : tr("%n bookmarks", "", count))
                 : QString());
         });
@@ -482,6 +487,17 @@ void EventPanel::Private::connectToRowCountChanges(QAbstractItemModel* model,
     connect(model, &QAbstractItemModel::modelReset, this, handler);
     connect(model, &QAbstractItemModel::rowsInserted, this, handler);
     connect(model, &QAbstractItemModel::rowsRemoved, this, handler);
+}
+
+void EventPanel::Private::showContextMenu(const QPoint& pos)
+{
+    QMenu contextMenu;
+    contextMenu.addAction(q->action(ui::action::OpenBusinessLogAction));
+    contextMenu.addAction(q->action(ui::action::BusinessEventsAction));
+    contextMenu.addAction(q->action(ui::action::PreferencesNotificationTabAction));
+    contextMenu.addSeparator();
+    contextMenu.addAction(q->action(ui::action::PinNotificationsAction));
+    contextMenu.exec(QnHiDpiWorkarounds::safeMapToGlobal(q, pos));
 }
 
 } // namespace desktop

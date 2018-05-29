@@ -3,6 +3,7 @@
 #include <ui/widgets/common/abstract_preferences_widget.h>
 
 #include <nx/client/desktop/common/widgets/panel.h>
+#include <nx/client/desktop/ui/actions/actions.h>
 
 class QnDisconnectHelper;
 namespace Ui { class CameraInfoWidget; }
@@ -25,16 +26,8 @@ public:
 
     void setStore(CameraSettingsDialogStore* store);
 
-    enum class Action
-    {
-        ping,
-        showOnLayout,
-        openEventLog,
-        openEventRules
-    };
-
 signals:
-    void actionRequested(nx::client::desktop::CameraInfoWidget::Action action);
+    void actionRequested(nx::client::desktop::ui::action::IDType action);
 
 private:
     void loadState(const CameraSettingsDialogState& state);
@@ -44,12 +37,10 @@ private:
     void updatePageSwitcher();
 
 private:
-    QScopedPointer<Ui::CameraInfoWidget> ui;
+    const QScopedPointer<Ui::CameraInfoWidget> ui;
     QScopedPointer<QnDisconnectHelper> m_storeConnections;
 };
 
 } // namespace desktop
 } // namespace client
 } // namespace nx
-
-Q_DECLARE_METATYPE(nx::client::desktop::CameraInfoWidget::Action)

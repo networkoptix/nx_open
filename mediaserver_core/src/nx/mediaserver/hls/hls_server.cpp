@@ -59,13 +59,15 @@ static const QLatin1String HLS_PREFIX( "/hls/" );
 static const quint64 MSEC_IN_SEC = 1000;
 static const quint64 USEC_IN_MSEC = 1000;
 static const quint64 USEC_IN_SEC = MSEC_IN_SEC * USEC_IN_MSEC;
-static const unsigned int DEFAULT_HLS_SESSION_LIVE_TIMEOUT_MS = nx_ms_conf::DEFAULT_TARGET_DURATION_MS * 7;
+static const unsigned int DEFAULT_HLS_SESSION_LIVE_TIMEOUT_MS =
+    nx::mediaserver::Settings::kDefaultHlsTargetDurationMs.count() * 7;
 static const int COMMON_KEY_FRAME_TO_NON_KEY_FRAME_RATIO = 5;
 static const int DEFAULT_PRIMARY_STREAM_BITRATE = 4*1024*1024;
 
 //static const int DEFAULT_SECONDARY_STREAM_BITRATE = 512*1024;
 
-size_t HttpLiveStreamingProcessor::m_minPlaylistSizeToStartStreaming = nx_ms_conf::DEFAULT_HLS_PLAYLIST_PRE_FILL_CHUNKS;
+size_t HttpLiveStreamingProcessor::m_minPlaylistSizeToStartStreaming =
+    nx::mediaserver::Settings::kDefaultHlsPlaylistPreFillChunks;
 
 HttpLiveStreamingProcessor::HttpLiveStreamingProcessor( QSharedPointer<nx::network::AbstractStreamSocket> socket, QnTcpListener* owner )
 :
@@ -751,7 +753,8 @@ nx::network::http::StatusCode::Value HttpLiveStreamingProcessor::getResourceChun
     if (params.startTimestamp)
         startTimestamp = *params.startTimestamp;
 
-    quint64 chunkDuration = nx_ms_conf::DEFAULT_TARGET_DURATION_MS * USEC_IN_MSEC;
+    quint64 chunkDuration =
+        nx::mediaserver::Settings::kDefaultHlsTargetDurationMs.count() * USEC_IN_MSEC;
     if (params.duration)
         chunkDuration = params.duration->count();
 
@@ -931,7 +934,7 @@ nx::network::http::StatusCode::Value HttpLiveStreamingProcessor::createSession(
     std::unique_ptr<Session> newHlsSession(
         new Session(
             sessionID,
-            duration_cast<milliseconds>(qnServerModule->settings()->hlsTargetDuration()).count(),
+            duration_cast<microseconds>(qnServerModule->settings().hlsTargetDurationMS()).count(),
             !params.startTimestamp,   //if no start date specified, providing live stream
             streamQuality,
             videoCamera,

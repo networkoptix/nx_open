@@ -291,17 +291,24 @@ void WearableWorker::handleStatusFinished(bool success, const QnWearableStatusRe
 
     if (result.locked)
     {
-        d->state.status = WearableState::LockedByOtherClient;
-        d->state.lockUserId = result.userId;
+        if (d->state.status != WearableState::LockedByOtherClient
+            || d->state.lockUserId != result.userId)
+        {
+            d->state.status = WearableState::LockedByOtherClient;
+            d->state.lockUserId = result.userId;
 
-        emit stateChanged(d->state);
+            emit stateChanged(d->state);
+        }
     }
     else
     {
-        d->state.status = WearableState::Unlocked;
-        d->state.lockUserId = QnUuid();
+        if (d->state.status == WearableState::LockedByOtherClient)
+        {
+            d->state.status = WearableState::Unlocked;
+            d->state.lockUserId = QnUuid();
 
-        emit stateChanged(d->state);
+            emit stateChanged(d->state);
+        }
     }
 }
 

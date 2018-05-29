@@ -3,7 +3,7 @@
 #include <QtCore/QScopedPointer>
 #include <QtWidgets/QWidget>
 
-#include "camera_info_widget.h"
+#include <nx/client/desktop/ui/actions/actions.h>
 
 namespace Ui { class CameraSettingsGeneralTabWidget; }
 
@@ -13,6 +13,7 @@ namespace desktop {
 
 struct CameraSettingsDialogState;
 class CameraSettingsDialogStore;
+class AbstractTextProvider;
 
 class CameraSettingsGeneralTabWidget: public QWidget
 {
@@ -21,18 +22,20 @@ class CameraSettingsGeneralTabWidget: public QWidget
 
 public:
     explicit CameraSettingsGeneralTabWidget(
-        CameraSettingsDialogStore* store, QWidget* parent = nullptr);
+        AbstractTextProvider* licenseUsageTextProvider,
+        CameraSettingsDialogStore* store,
+        QWidget* parent = nullptr);
 
     virtual ~CameraSettingsGeneralTabWidget() override;
 
 signals:
-    void actionRequested(nx::client::desktop::CameraInfoWidget::Action action);
+    void actionRequested(nx::client::desktop::ui::action::IDType action);
 
 private:
     void loadState(const CameraSettingsDialogState& state);
 
 private:
-    QScopedPointer<Ui::CameraSettingsGeneralTabWidget> ui;
+    const QScopedPointer<Ui::CameraSettingsGeneralTabWidget> ui;
 };
 
 } // namespace desktop

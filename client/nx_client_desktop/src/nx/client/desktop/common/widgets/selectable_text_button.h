@@ -29,6 +29,7 @@ class SelectableTextButton: public QPushButton
     Q_PROPERTY(State state READ state WRITE setState NOTIFY stateChanged)
     Q_PROPERTY(bool deactivatable READ deactivatable WRITE setDeactivatable)
     Q_PROPERTY(bool selectable READ selectable WRITE setSelectable)
+    Q_PROPERTY(bool blue READ blue WRITE setBlue)
     Q_PROPERTY(QString deactivatedText READ deactivatedText WRITE setDeactivatedText)
 
     using base_type = QPushButton;
@@ -52,6 +53,9 @@ public:
 
     bool deactivatable() const;
     void setDeactivatable(bool value);
+
+    bool blue() const;
+    void setBlue(bool blue);
 
     void deactivate(); //< Helper slot. Equivalent to setState(State::deactivated).
 
@@ -84,9 +88,6 @@ signals:
 protected:
     virtual void paintEvent(QPaintEvent* event) override;
     virtual bool event(QEvent* event) override;
-
-private:
-    void updateDeactivateButtonPalette();
 
 private:
     struct Private;

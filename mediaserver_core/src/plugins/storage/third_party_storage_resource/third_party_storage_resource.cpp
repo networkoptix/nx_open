@@ -292,21 +292,12 @@ QIODevice *QnThirdPartyStorageResource::open(
         int ffmpegBufferSize = 0;
 
         int ffmpegMaxBufferSize =
-            qnServerModule->roSettings()->value(
-                nx_ms_conf::MAX_FFMPEG_BUFFER_SIZE,
-                nx_ms_conf::DEFAULT_MAX_FFMPEG_BUFFER_SIZE).toInt();
+            qnServerModule->settings().maxFfmpegBufferSize();
 
         if (openMode & QIODevice::WriteOnly)
         {
-            ioBlockSize = qnServerModule->roSettings()->value(
-                nx_ms_conf::IO_BLOCK_SIZE,
-                nx_ms_conf::DEFAULT_IO_BLOCK_SIZE
-            ).toInt();
-
-            ffmpegBufferSize = qnServerModule->roSettings()->value(
-                nx_ms_conf::FFMPEG_BUFFER_SIZE,
-                nx_ms_conf::DEFAULT_FFMPEG_BUFFER_SIZE
-            ).toInt();
+            ioBlockSize = qnServerModule->settings().ioBlockSize();
+            ffmpegBufferSize = qnServerModule->settings().ffmpegBufferSize();
         }
         std::unique_ptr<QBufferedFile> rez(
             new QBufferedFile(

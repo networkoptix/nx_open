@@ -301,11 +301,11 @@ bool isUsb(const QString& devName)
 
 bool isRelativePathSafe(const QString& path)
 {
-    if (path.contains(lit("..")))
+    if (path.contains(".."))
         return false; //< May be a path traversal attempt.
 
-    if (path.startsWith('/'))
-        return false; //< UNIX root.
+    if (path.startsWith('/') && !path.startsWith("/etc/init.d/nx1"))
+        return false; //< UNIX root but not an Nx1 script.
 
     if (path.contains('*') || path.contains('?') || path.contains('[') || path.contains(']'))
         return false; //< UNIX shell wildcards.

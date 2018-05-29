@@ -11,10 +11,15 @@ namespace {
 class SyncUpdateChecker
 {
 public:
-    SyncUpdateChecker(const QString& url)
+    SyncUpdateChecker(
+        const QnUuid& selfPeerId,
+        const QString& url)
     {
         using namespace std::placeholders;
-        m_asyncUpdateChecker.check(std::bind(&SyncUpdateChecker::onUpdateDone, this, _1, _2), url);
+        m_asyncUpdateChecker.check(
+            std::bind(&SyncUpdateChecker::onUpdateDone, this, _1, _2),
+            selfPeerId,
+            url);
     }
 
     AbstractUpdateRegistryPtr take()
@@ -46,9 +51,9 @@ private:
 };
 } // namespace
 
-AbstractUpdateRegistryPtr checkSync(const QString& url)
+AbstractUpdateRegistryPtr checkSync(const QnUuid& selfPeerId, const QString& url)
 {
-    return SyncUpdateChecker(url).take();
+    return SyncUpdateChecker(selfPeerId, url).take();
 }
 
 } // namespace info

@@ -36,6 +36,9 @@ const static QString kFileUrl = "test.file.url";
 const static int kFileSize = 42;
 const static QByteArray kFileMd5 = "test.file.md5";
 
+const static QString kManualFileName = "nxwitness-server_update-4.5.0.16975-linux64.zip";
+const static QnUuid kCurrentPeerId = QnUuid::createUuid();
+
 struct UpdateRegistryCfg
 {
     bool hasUpdate = false;
@@ -51,12 +54,19 @@ public:
         const info::UpdateFileRequestData& /*updateFileRequestData*/,
         info::FileData* outFileData) const override
     {
+        if (!m_manualData.isEmpty())
+        {
+            outFileData->file = m_manualData[0].file;
+            return info::ResultCode::ok;
+        }
+
         if (m_cfg.hasUpdate)
         {
             outFileData->file = kFileName;
             outFileData->md5 = kFileMd5;
             outFileData->size = kFileSize;
             outFileData->url = kFileUrl;
+
             return info::ResultCode::ok;
         }
 
@@ -67,15 +77,20 @@ public:
         const update::info::UpdateRequestData& /*updateRequestData*/,
         QnSoftwareVersion* /*outSoftwareVersion*/) const override
     {
-        if (m_cfg.hasUpdate)
+        if (m_cfg.hasUpdate || !m_manualData.isEmpty())
             return info::ResultCode::ok;
 
         return info::ResultCode::noData;
     }
 
-    virtual void addFileData(const info::ManualFileData& /*manualFileData*/) override
+    virtual void addFileData(const info::ManualFileData& manualFileData) override
     {
+        m_manualData.append(manualFileData);
+    }
 
+    virtual void removeFileData(const QString& /*fileName*/) override
+    {
+        m_manualData.clear();
     }
 
     virtual QList<QString> alternativeServers() const override
@@ -110,16 +125,21 @@ public:
             m_cfg.hasUpdate |= (other->latestUpdate(info::UpdateRequestData(), nullptr) ==
                 info::ResultCode::ok);
         }
+        m_manualData.append(((TestUpdateRegistry*) other)->m_manualData);
     }
 
 
     virtual QList<QnUuid> additionalPeers(const QString& /*fileName*/) const override
     {
+        if (!m_manualData.isEmpty())
+            return m_manualData[0].peers;
+
         return QList<QnUuid>();
     }
 
 private:
     UpdateRegistryCfg m_cfg;
+    QList<ManualFileData> m_manualData;
 };
 
 class TestDownloader: public downloader::AbstractDownloader
@@ -132,7 +152,6 @@ public:
         m_fi.name = kFileName;
         m_fi.size = kFileSize;
         m_fi.md5 = kFileMd5;
-        m_fi.peerPolicy = downloader::FileInformation::PeerSelectionPolicy::byPlatform;
         m_fi.status = downloader::FileInformation::Status::downloaded;
     }
 
@@ -141,7 +160,6 @@ public:
         m_fi.name = kFileName;
         m_fi.size = kFileSize;
         m_fi.md5 = kFileMd5;
-        m_fi.peerPolicy = downloader::FileInformation::PeerSelectionPolicy::byPlatform;
         m_fi.status = downloader::FileInformation::Status::corrupted;
     }
 
@@ -150,13 +168,25 @@ public:
         m_fi.name = kFileName;
         m_fi.size = kFileSize;
         m_fi.md5 = kFileMd5;
-        m_fi.peerPolicy = downloader::FileInformation::PeerSelectionPolicy::byPlatform;
         m_fi.status = downloader::FileInformation::Status::downloaded;
+    }
+
+    void setExternallyAddedFileInformation(downloader::FileInformation::Status status)
+    {
+        m_fi.name = kManualFileName;
+        m_fi.size = kFileSize;
+        m_fi.md5 = kFileMd5;
+        m_fi.status = status;
     }
 
     void setAddFileCode(downloader::ResultCode addFileCode)
     {
         m_addFileCode = addFileCode;
+    }
+
+    QList<QnUuid> additionalPeers() const
+    {
+        return m_additionalPeers;
     }
 
     virtual QStringList files() const override
@@ -175,8 +205,9 @@ public:
     }
 
     virtual downloader::ResultCode addFile(
-        const downloader::FileInformation& /*fileInformation*/) override
+        const downloader::FileInformation& fileInformation) override
     {
+        m_additionalPeers.append(fileInformation.additionalPeers);
         return m_addFileCode;
     }
 
@@ -219,6 +250,7 @@ public:
 private:
     downloader::FileInformation m_fi;
     downloader::ResultCode m_addFileCode = downloader::ResultCode::ok;
+    QList<QnUuid> m_additionalPeers;
 };
 
 enum class PrepareExpectedOutcome
@@ -328,11 +360,6 @@ public:
         m_supplier(supplier)
     {}
 
-    void setStatus(const detail::Updates2StatusDataEx& status)
-    {
-        m_currentStatus.clone(status);
-    }
-
     void waitForRemoteUpdate()
     {
         QnMutexLocker lock(&m_mutex);
@@ -354,6 +381,21 @@ public:
     void emitCunkDownloadFailedSignal(const QString& fileName)
     {
         onChunkDownloadFailed(fileName);
+    }
+
+    void emitFileAddedSignal(const downloader::FileInformation& fileInformation)
+    {
+        onFileAdded(fileInformation);
+    }
+
+    void emitFileInformationChanged(const downloader::FileInformation& fileInformation)
+    {
+        onFileInformationChanged(fileInformation);
+    }
+
+    void emitFileDeletedSignal()
+    {
+        onFileDeleted(kManualFileName);
     }
 
     const detail::Updates2StatusDataEx& fileWrittenData() const
@@ -428,8 +470,7 @@ public:
 
     virtual QnUuid peerId() const override
     {
-        static QnUuid guid = QnUuid::createUuid();
-        return guid;
+        return kCurrentPeerId;
     }
 
     virtual bool isClient() const override
@@ -467,7 +508,7 @@ protected:
             });
 
         info::UpdateRegistryFactory::setEmptyFactoryFunction(
-            []()
+            [](const QnUuid& /*selfPeerId*/)
             {
                 return std::make_unique<TestUpdateRegistry>();
             });
@@ -559,6 +600,12 @@ protected:
         ASSERT_EQ(expectedResult, m_updatesManager->download().state);
     }
 
+    void whenDownloadRequestIssuedWithFinalResult(api::Updates2StatusData::StatusCode expectedResult)
+    {
+        while (m_updatesManager->download().state != expectedResult)
+            std::this_thread::sleep_for(std::chrono::milliseconds(10));
+    }
+
     void whenDownloadFinishedSuccessfully()
     {
         m_downloader.setValidFileInformation();
@@ -587,9 +634,75 @@ protected:
         m_downloader.setAddFileCode(downloader::ResultCode::fileAlreadyExists);
     }
 
+    void givenFileHasBeenAddedExternally(downloader::FileInformation::Status status)
+    {
+        m_downloader.setExternallyAddedFileInformation(status);
+        m_downloader.setAddFileCode(downloader::ResultCode::fileAlreadyExists);
+    }
+
     void givenInstallerFailsWithNoFreeSpace()
     {
         m_installer.setExpectedOutcome(PrepareExpectedOutcome::fail_noFreeSpace);
+    }
+
+    void whenDownloaderAddFileSignalWithFineInfoReceived(downloader::FileInformation::Status status)
+    {
+        downloader::FileInformation fileInformation(kManualFileName);
+        fileInformation.status = status;
+        m_updatesManager->emitFileAddedSignal(fileInformation);
+    }
+
+    void whenDownloaderDeleteFileSignalReceived()
+    {
+        m_updatesManager->emitFileDeletedSignal();
+    }
+
+    void whenDownloaderAddFileSignalWithBadInfoReceived()
+    {
+        downloader::FileInformation fileInformation(kManualFileName);
+        fileInformation.status = downloader::FileInformation::Status::corrupted;
+        m_updatesManager->emitFileAddedSignal(fileInformation);
+    }
+
+    void thenAdditionalPeersShouldHaveBeenPassedToDownloader()
+    {
+        ASSERT_TRUE(m_downloader.additionalPeers().contains(kCurrentPeerId));
+    }
+
+    void whenDownloaderSetsBadStatusForFile()
+    {
+        m_downloader.setExternallyAddedFileInformation(downloader::FileInformation::Status::corrupted);
+    }
+
+    void whenDownloaderEmittedFileInformationSignalsWithProgress()
+    {
+        downloader::FileInformation fileInformation(kFileName);
+        fileInformation.status = downloader::FileInformation::Status::downloading;
+        fileInformation.downloadedChunks = QBitArray(32);
+
+        m_progressReported.clear();
+        for (int i = 0; i < fileInformation.downloadedChunks.size(); ++i)
+        {
+            fileInformation.downloadedChunks.setBit(i);
+            m_updatesManager->emitFileInformationChanged(fileInformation);
+
+            if (m_updatesManager->status().progress > 0.0f
+                && (m_progressReported.isEmpty() ||
+                    m_progressReported.last() != m_updatesManager->status().progress))
+            {
+                m_progressReported.append(m_updatesManager->status().progress);
+            }
+        }
+    }
+
+    void thenProgressShouldBeReflectedInManagerState()
+    {
+        ASSERT_GT(m_progressReported.size(), 10);
+    }
+
+    void whenDownloadCancelled()
+    {
+        m_updatesManager->cancel();
     }
 
 private:
@@ -598,6 +711,7 @@ private:
     TestDownloader m_downloader;
     TestUpdateRegistry m_remoteRegistry;
     TestUpdateRegistry m_globalRegistry;
+    QList<double> m_progressReported;
 };
 
 TEST_F(Updates2Manager, NotAvailableStatusCheck)
@@ -635,7 +749,7 @@ TEST_F(Updates2Manager, StatusWhileCheckingForUpdate)
     thenStateShouldBe(api::Updates2StatusData::StatusCode::available);
 }
 
-TEST_F(Updates2Manager, HasRemoteUpdate_Download_successful)
+TEST_F(Updates2Manager, Download_successful)
 {
     givenUpdateRegistries(/*remoteHasUpdate*/ true, /*globalHasUpdate*/ false);
     whenServerHasBeenStarted();
@@ -647,7 +761,64 @@ TEST_F(Updates2Manager, HasRemoteUpdate_Download_successful)
     thenStateShouldFinallyBecome(api::Updates2StatusData::StatusCode::readyToInstall);
 }
 
-TEST_F(Updates2Manager, HasRemoteUpdate_Download_addFile_fail)
+TEST_F(Updates2Manager, Download_additionalPeersFromManualData)
+{
+    givenUpdateRegistries(/*remoteHasUpdate*/ false, /*globalHasUpdate*/ false);
+    givenFileHasBeenAddedExternally(downloader::FileInformation::Status::downloaded);
+    whenServerHasBeenStarted();
+    whenDownloaderAddFileSignalWithFineInfoReceived(downloader::FileInformation::Status::downloaded);
+
+    whenDownloadRequestIssuedWithFinalResult(api::Updates2StatusData::StatusCode::preparing);
+    thenAdditionalPeersShouldHaveBeenPassedToDownloader();
+    thenStateShouldFinallyBecome(api::Updates2StatusData::StatusCode::readyToInstall);
+}
+
+TEST_F(Updates2Manager, Download_externalFileAdded_wrongState)
+{
+    givenUpdateRegistries(/*remoteHasUpdate*/ false, /*globalHasUpdate*/ false);
+    givenFileHasBeenAddedExternally(downloader::FileInformation::Status::downloading);
+    whenServerHasBeenStarted();
+    whenDownloaderAddFileSignalWithBadInfoReceived();
+    whenRemoteUpdateDone();
+
+    whenDownloadRequestIssued(api::Updates2StatusData::StatusCode::notAvailable);
+    thenStateShouldFinallyBecome(api::Updates2StatusData::StatusCode::notAvailable);
+}
+
+TEST_F(Updates2Manager, Download_externalFileAdded_stateDownloading_butThenBecomesCorrupted)
+{
+    givenUpdateRegistries(/*remoteHasUpdate*/ false, /*globalHasUpdate*/ false);
+    givenFileHasBeenAddedExternally(downloader::FileInformation::Status::downloading);
+    whenServerHasBeenStarted();
+    whenDownloaderAddFileSignalWithFineInfoReceived(downloader::FileInformation::Status::downloading);
+    whenRemoteUpdateDone();
+
+    thenStateShouldFinallyBecome(api::Updates2StatusData::StatusCode::available);
+
+    whenDownloaderSetsBadStatusForFile();
+    whenDownloadRequestIssued(api::Updates2StatusData::StatusCode::error);
+    whenRemoteUpdateDone();
+
+    thenStateShouldFinallyBecome(api::Updates2StatusData::StatusCode::notAvailable);
+}
+
+TEST_F(Updates2Manager, Download_externalFileDeleted)
+{
+    givenUpdateRegistries(/*remoteHasUpdate*/ false, /*globalHasUpdate*/ false);
+    givenFileHasBeenAddedExternally(downloader::FileInformation::Status::downloaded);
+    whenServerHasBeenStarted();
+    whenDownloaderAddFileSignalWithFineInfoReceived(downloader::FileInformation::Status::downloaded);
+    whenRemoteUpdateDone();
+
+    thenStateShouldFinallyBecome(api::Updates2StatusData::StatusCode::available);
+
+    whenDownloaderDeleteFileSignalReceived();
+    whenDownloadRequestIssued(api::Updates2StatusData::StatusCode::notAvailable);
+    whenRemoteUpdateDone();
+    thenStateShouldFinallyBecome(api::Updates2StatusData::StatusCode::notAvailable);
+}
+
+TEST_F(Updates2Manager, Download_addFile_fail)
 {
     givenUpdateRegistries(/*remoteHasUpdate*/ true, /*globalHasUpdate*/ false);
     whenServerHasBeenStarted();
@@ -659,7 +830,7 @@ TEST_F(Updates2Manager, HasRemoteUpdate_Download_addFile_fail)
     thenStateShouldFinallyBecome(api::Updates2StatusData::StatusCode::available);
 }
 
-TEST_F(Updates2Manager, HasRemoteUpdate_Download_notAvailableStateBecauseNoUpdate)
+TEST_F(Updates2Manager, Download_notAvailableStateBecauseNoUpdate)
 {
     givenUpdateRegistries(/*remoteHasUpdate*/ false, /*globalHasUpdate*/ false);
     whenServerHasBeenStarted();
@@ -669,7 +840,7 @@ TEST_F(Updates2Manager, HasRemoteUpdate_Download_notAvailableStateBecauseNoUpdat
     thenStateShouldBe(api::Updates2StatusData::StatusCode::notAvailable);
 }
 
-TEST_F(Updates2Manager, HasRemoteUpdate_Download_notAvailableState_BecauseCheckHasNotFinished)
+TEST_F(Updates2Manager, Download_notAvailableState_BecauseCheckHasNotFinished)
 {
     givenUpdateRegistries(/*remoteHasUpdate*/ true, /*globalHasUpdate*/ false);
     whenRemoteUpdateTakesLongTimeToComplete();
@@ -681,7 +852,7 @@ TEST_F(Updates2Manager, HasRemoteUpdate_Download_notAvailableState_BecauseCheckH
     thenStateShouldBe(api::Updates2StatusData::StatusCode::available);
 }
 
-TEST_F(Updates2Manager, HasRemoteUpdate_Download_alreadyDownloadingState)
+TEST_F(Updates2Manager, Download_alreadyDownloadingState)
 {
     givenUpdateRegistries(/*remoteHasUpdate*/ true, /*globalHasUpdate*/ false);
     whenServerHasBeenStarted();
@@ -746,7 +917,19 @@ TEST_F(Updates2Manager, Prepare_failedNoFreeSpace)
     thenStateShouldFinallyBecome(api::Updates2StatusData::StatusCode::available);
 }
 
-// #TODO: #akulikov: Add tests regarding manual file data.
+TEST_F(Updates2Manager, Cancel_WhileDownloading)
+{
+    givenUpdateRegistries(/*remoteHasUpdate*/ true, /*globalHasUpdate*/ false);
+    whenServerHasBeenStarted();
+    whenRemoteUpdateDone();
+
+    whenDownloadRequestIssued(api::Updates2StatusData::StatusCode::downloading);
+    whenDownloaderEmittedFileInformationSignalsWithProgress();
+    thenProgressShouldBeReflectedInManagerState();
+
+    whenDownloadCancelled();
+    thenStateShouldFinallyBecome(api::Updates2StatusData::StatusCode::notAvailable);
+}
 
 } // namespace test
 } // namespace detail

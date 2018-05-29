@@ -21,6 +21,5 @@ private:
 
 };
 
-
 } // namespace mediaserver
 } // namespace nx

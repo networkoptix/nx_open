@@ -1,7 +1,6 @@
 set(depends
     desktop_client
     mediaserver
-    root_tool
     server_plugins
     testcamera
 )

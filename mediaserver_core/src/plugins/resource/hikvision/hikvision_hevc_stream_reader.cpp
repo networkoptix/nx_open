@@ -228,13 +228,13 @@ CameraDiagnostics::Result HikvisionHevcStreamReader::fetchChannelProperties(
     ChannelProperties* outChannelProperties) const
 {
     const auto kRequestName = lit("Fetch channel properties");
+    nx::network::http::StatusCode::Value statusCode = nx::network::http::StatusCode::undefined;
     for (const auto& path: {kChannelStreamingPathTemplate, kChannelStreamingPathForNvrTemplate})
     {
         auto url = hikvisionRequestUrlFromPath(path.arg(
             buildChannelNumber(getRole(), m_hikvisionResource->getChannel())));
 
         nx::Buffer response;
-        nx::network::http::StatusCode::Value statusCode;
         if (!doGetRequest(url, m_hikvisionResource->getAuth(), &response, &statusCode))
         {
             if (statusCode == nx::network::http::StatusCode::Value::unauthorized)
@@ -243,8 +243,6 @@ CameraDiagnostics::Result HikvisionHevcStreamReader::fetchChannelProperties(
             if (statusCode != nx::network::http::StatusCode::Value::ok)
                 continue;
         }
-        if (statusCode != nx::network::http::StatusCode::Value::ok)
-            return CameraDiagnostics::RequestFailedResult(kRequestName, toString(statusCode));
 
         if (!parseChannelPropertiesResponse(response, outChannelProperties))
             return CameraDiagnostics::CameraResponseParseErrorResult(url.toString(), kRequestName);
@@ -252,6 +250,8 @@ CameraDiagnostics::Result HikvisionHevcStreamReader::fetchChannelProperties(
         outChannelProperties->httpUrl = url;
         return CameraDiagnostics::NoErrorResult();
     }
+    if (statusCode != nx::network::http::StatusCode::Value::ok)
+        return CameraDiagnostics::RequestFailedResult(kRequestName, toString(statusCode));
 
     return CameraDiagnostics::RequestFailedResult(kRequestName, lit("No sutable URL"));
 }

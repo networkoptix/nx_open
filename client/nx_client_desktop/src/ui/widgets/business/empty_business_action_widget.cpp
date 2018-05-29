@@ -10,7 +10,7 @@ QnEmptyBusinessActionWidget::QnEmptyBusinessActionWidget(nx::vms::event::ActionT
     switch (actionType)
     {
     case nx::vms::event::ActionType::panicRecordingAction:
-        ui->label->setText(tr("Panic Recording mode switches recording settings for all Cameras to maximum FPS and Quality"));
+        ui->label->setText(tr("Panic Recording mode switches recording settings for all cameras to maximum FPS and quality."));
         break;
     default:
         break;

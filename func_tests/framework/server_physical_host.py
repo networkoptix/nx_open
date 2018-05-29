@@ -3,11 +3,11 @@
 import logging
 import uuid
 
+from framework.installation.deb_installation import DebInstallation
+from framework.installation.mediaserver import Mediaserver
+from framework.installation.upstart_service import LinuxAdHocService
 from framework.os_access.path import FileSystemPath, copy_file
 from framework.rest_api import RestApi
-from .dpkg_installation import DPKGInstallation, MEDIASERVER_CONFIG_PATH, MEDIASERVER_CONFIG_PATH_INITIAL
-from .mediaserver import Mediaserver
-from .service import AdHocService
 from .template_renderer import TemplateRenderer
 from .utils import is_list_inst
 
@@ -109,7 +109,7 @@ class PhysicalInstallationHost(object):
         self._template_renderer = TemplateRenderer()
         self._dist_unpacked = self.unpacked_mediaserver_dir.exists()
         self._ensure_root_dir_exists()
-        self._installations = list(self._read_installations())  # DPKGInstallation list.
+        self._installations = list(self._read_installations())  # DebInstallation list.
         self._available_installations = self._installations[:]  # Set up but not allocated yet.
         self._allocated_server_list = []
 
@@ -149,7 +149,7 @@ class PhysicalInstallationHost(object):
                 return None
         server_port = self._installation_server_port(self._installations.index(installation))
         api = RestApi(config.name, config.http_schema, server_port)
-        service = AdHocService(self.os_access, installation.dir)
+        service = LinuxAdHocService(self.os_access.ssh, installation.dir)
         server = Mediaserver(config.name, service, installation, api, self, port=server_port)
         self._allocated_server_list.append(server)
         return server
@@ -189,11 +189,11 @@ class PhysicalInstallationHost(object):
 
     def _read_installations(self):
         for dir in self.root_dir.glob('server-*'):
-            yield DPKGInstallation(self.os_access, dir)
+            yield DebInstallation(self.os_access)
 
     def _ensure_servers_are_stopped(self):
         for installation in self._installations:
-            service = AdHocService(self.os_access, installation.dir)
+            service = LinuxAdHocService(self.os_access.ssh, installation.dir)
             if service.is_running():
                 service.stop()
 
@@ -203,7 +203,7 @@ class PhysicalInstallationHost(object):
         idx = len(self._installations)
         dir = self.root_dir / ('server-%03d' % (idx + 1))
         self._prepare_installation_dir(dir, self._installation_server_port(idx))
-        installation = DPKGInstallation(self.os_access, dir)
+        installation = DebInstallation(self.os_access)
         self._installations.append(installation)
         return installation
 

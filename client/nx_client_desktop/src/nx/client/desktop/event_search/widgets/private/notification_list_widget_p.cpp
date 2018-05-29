@@ -4,6 +4,8 @@
 #include <QtWidgets/QHBoxLayout>
 #include <QtWidgets/QVBoxLayout>
 #include <QtWidgets/QToolButton>
+#include <QtWidgets/QMenu>
+#include <QtGui/QMouseEvent>
 
 #include <business/business_resource_validation.h>
 #include <client/client_settings.h>
@@ -13,6 +15,7 @@
 #include <nx/client/desktop/common/utils/custom_painted.h>
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
+#include <ui/workaround/hidpi_workarounds.h>
 #include <ui/models/sort_filter_list_model.h>
 #include <ui/statistics/modules/controls_statistics_module.h>
 #include <ui/style/skin.h>
@@ -63,32 +66,23 @@ NotificationListWidget::Private::Private(NotificationListWidget* q) :
     m_systemHealthModel(new SystemHealthListModel(this)),
     m_notificationsModel(new NotificationListModel(this))
 {
-    auto headerWidget = new QWidget(q);
-    auto headerLayout = new QHBoxLayout(headerWidget);
-    headerLayout->addStretch();
-    headerLayout->addWidget(newActionButton(ui::action::OpenBusinessLogAction,
-        Qn::MainWindow_Notifications_EventLog_Help));
-    headerLayout->addWidget(newActionButton(ui::action::BusinessEventsAction, -1));
-    headerLayout->addWidget(newActionButton(ui::action::PreferencesNotificationTabAction, -1));
-
-    placeholder = new QWidget(q);
-    placeholder->setMinimumSize(QSize(0, 100));
+    m_placeholder = new QWidget(q);
+    m_placeholder->setMinimumSize(QSize(0, 100));
 
     auto layout = new QVBoxLayout(q);
     layout->setSpacing(0);
-    layout->addWidget(headerWidget);
-    layout->addWidget(placeholder);
+    layout->addWidget(m_placeholder);
+    layout->addSpacing(8);
     layout->addWidget(m_eventRibbon);
 
-    QVBoxLayout * verticalLayout = new QVBoxLayout(placeholder);
+    const auto verticalLayout = new QVBoxLayout(m_placeholder);
     verticalLayout->setSpacing(16);
-    verticalLayout->setObjectName(QStringLiteral("verticalLayout_4"));
     verticalLayout->setContentsMargins(24, 64, 24, 24);
-    QLabel * placeholderIcon = new QLabel(placeholder);
+    const auto placeholderIcon = new QLabel(m_placeholder);
     placeholderIcon->setFixedSize(QSize(64, 64));
     placeholderIcon->setPixmap(qnSkin->pixmap(lit("events/placeholders/notifications.png")));
     verticalLayout->addWidget(placeholderIcon, 0, Qt::AlignHCenter);
-    QLabel * placeholderText = new QLabel(placeholder);
+    const auto placeholderText = new QLabel(m_placeholder);
     QFont font;
     font.setPixelSize(kPlaceholderFontPixelSize);
     placeholderText->setProperty(style::Properties::kDontPolishFontProperty, true);
@@ -98,8 +92,7 @@ NotificationListWidget::Private::Private(NotificationListWidget* q) :
     placeholderText->setAlignment(Qt::AlignCenter);
     placeholderText->setWordWrap(true);
     verticalLayout->addWidget(placeholderText);
-    QSpacerItem * verticalSpacer = new QSpacerItem(20, 159, QSizePolicy::Minimum, QSizePolicy::Expanding);
-    verticalLayout->addItem(verticalSpacer);
+    verticalLayout->addStretch(1);
 
     m_eventRibbon->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 
@@ -122,7 +115,7 @@ NotificationListWidget::Private::Private(NotificationListWidget* q) :
     connect(m_eventRibbon, &EventRibbon::countChanged,
         this, [this](int count)
         {
-            placeholder->setVisible(count < 1);
+            m_placeholder->setVisible(count < 1);
         });
 }
 

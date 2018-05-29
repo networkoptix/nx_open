@@ -57,7 +57,7 @@ void CameraSettingsReadOnlyWatcher::updateReadOnly()
         return;
 
     m_readOnly = value;
-    emit readOnlyChanged(value);
+    emit readOnlyChanged(value, {});
 }
 
 bool CameraSettingsReadOnlyWatcher::calculateReadOnly() const

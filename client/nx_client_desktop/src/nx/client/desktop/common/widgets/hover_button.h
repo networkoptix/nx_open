@@ -7,30 +7,32 @@ namespace client {
 namespace desktop {
 
 /**
- * Button with two icons, for normal state and hovered state.
- * TODO: Proper events to be implemented
+ * Button with two or three icons, for normal, hovered and optionally pressed state.
  */
-class HoverButton : public QAbstractButton
+class HoverButton: public QAbstractButton
 {
-    Q_OBJECT;
+    Q_OBJECT
     using base_type = QAbstractButton;
 
 public:
-    HoverButton(const QString& normal, const QString& highligthed, QWidget* parent);
+    // Use this one if you do NOT want the pressed state.
+    HoverButton(const QString& normal, const QString& highlighted, QWidget* parent);
+    // Use this one if you want the pressed state.
+    HoverButton(const QString& normal, const QString& highlighted,
+        const QString& pressed, QWidget* parent);
 
 protected:
-    QSize sizeHint() const override;
-    void paintEvent(QPaintEvent* event) override;
-    void mouseMoveEvent(QMouseEvent* event) override;
-    void mousePressEvent(QMouseEvent* event) override;
-    void mouseReleaseEvent(QMouseEvent* event) override;
-    void leaveEvent(QEvent * event) override;
+    virtual QSize sizeHint() const override;
+    virtual void paintEvent(QPaintEvent* event) override;
+    virtual void mouseMoveEvent(QMouseEvent* event) override;
+    virtual void leaveEvent(QEvent* event) override;
 
 private:
-    bool m_isClicked = false;
     bool m_isHovered = false;
+    bool m_hasPressedState = false;
     QPixmap m_normal;
     QPixmap m_highlighted;
+    QPixmap m_pressed;
 };
 
 } // namespace desktop

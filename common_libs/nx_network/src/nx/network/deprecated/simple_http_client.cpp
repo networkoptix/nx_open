@@ -14,22 +14,22 @@
 
 using namespace std;
 
-QString toString( CLHttpStatus status )
+QString toString(CLHttpStatus status)
 {
-    switch( status )
+    switch (status)
     {
         case CL_HTTP_SUCCESS:
-            return lit("%1 (OK)").arg(status);
+            return QStringLiteral("%1 (OK)").arg(status);
         case CL_HTTP_REDIRECT:
-            return lit("%1 (REDIRECT)").arg(status);
+            return QStringLiteral("%1 (REDIRECT)").arg(status);
         case CL_HTTP_BAD_REQUEST:
-            return lit("%1 (BAD REQUEST)").arg(status);
+            return QStringLiteral("%1 (BAD REQUEST)").arg(status);
         case CL_HTTP_AUTH_REQUIRED:
-            return lit("%1 (AUTH REQUIRED)").arg(status);
+            return QStringLiteral("%1 (AUTH REQUIRED)").arg(status);
         case CL_HTTP_NOT_FOUND:
-            return lit("%1 (NOT FOUND)").arg(status);
+            return QStringLiteral("%1 (NOT FOUND)").arg(status);
         default:
-            return lit("%1 (UNKNOWN)").arg(status);
+            return QStringLiteral("%1 (UNKNOWN)").arg(status);
     }
 }
 
@@ -70,7 +70,7 @@ CLSimpleHTTPClient::CLSimpleHTTPClient(const nx::utils::Url& url, unsigned int t
     m_dataRestLen(0),
     m_localPort(0)
 {
-    initSocket(url.scheme() == lit("https"));
+    initSocket(url.scheme() == "https");
 }
 
 CLSimpleHTTPClient::CLSimpleHTTPClient(std::unique_ptr<nx::network::AbstractStreamSocket> socket)
@@ -164,7 +164,7 @@ CLHttpStatus CLSimpleHTTPClient::doPOST(const QByteArray& requestStr, const QStr
         }
         else if (m_auth.password().length()>0 && !mNonce.isEmpty())
         {
-            request.append(digestAccess(lit("POST"), QLatin1String(requestStr)));
+            request.append(digestAccess("POST", requestStr));
         }
 
         request.append("Content-Length: ");
@@ -350,7 +350,7 @@ CLHttpStatus CLSimpleHTTPClient::doGET(const QByteArray& _requestStr, bool recur
         }
         else if (m_auth.password().length()>0 && !mNonce.isEmpty())
         {
-            request.append(digestAccess(lit("GET"), QLatin1String(requestStr)));
+            request.append(digestAccess("GET", requestStr));
         }
 
         request.append("\r\n");

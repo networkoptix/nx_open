@@ -1,6 +1,7 @@
 #include "log_settings.h"
 
-#include <nx/utils/settings.h>
+#include <nx/utils/deprecated_settings.h>
+#include <nx/utils/string.h>
 
 namespace nx {
 namespace utils {
@@ -26,7 +27,7 @@ void Settings::load(const QnSettings& settings, const QString& prefix)
 void Settings::updateDirectoryIfEmpty(const QString dataDirectory)
 {
     if (directory.isEmpty())
-        directory = dataDirectory + lit("/log");
+        directory = dataDirectory + "/log";
 }
 
 } // namespace log

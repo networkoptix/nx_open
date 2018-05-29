@@ -11,6 +11,7 @@ import csv
 import datetime
 import hashlib
 import json
+import json as json_module
 import logging
 from pprint import pformat
 
@@ -21,7 +22,7 @@ from requests.auth import HTTPDigestAuth
 DEFAULT_API_USER = 'admin'
 DEFAULT_API_PASSWORD = 'admin'
 STANDARD_PASSWORDS = [DEFAULT_API_PASSWORD, 'qweasd123']  # do not mask these passwords in log files
-REST_API_TIMEOUT = datetime.timedelta(seconds=10)
+REST_API_TIMEOUT = datetime.timedelta(seconds=20)
 MAX_CONTENT_LEN_TO_LOG = 1000
 
 log = logging.getLogger(__name__)
@@ -82,6 +83,7 @@ class _RestApiProxy(object):
     # noinspection PyPep8Naming
     def GET(self, timeout=None, headers=None, **kw):
         params = {name: _to_get_param(value) for name, value in kw.items()}
+        log.debug('GET params:\n%s', pformat(params, indent=4))
         return self._api.request('GET', self._path, timeout=timeout, headers=headers, params=params)
 
     # noinspection PyPep8Naming
@@ -89,6 +91,7 @@ class _RestApiProxy(object):
         if kw:
             assert not json, 'kw and json arguments are mutually exclusive - only one may be used at a time'
             json = kw
+        log.debug('JSON payload:\n%s', json_module.dumps(json, indent=4))
         return self._api.request('POST', self._path, timeout=timeout, headers=headers, json=json)
 
 
@@ -213,9 +216,9 @@ class RestApi(object):
         log.debug('JSON payload:\n%s', json.dumps(data, indent=4))
         return self.request('POST', path, json=data, **kwargs)
 
-    def request(self, method, path, secure=False, **kwargs):
+    def request(self, method, path, secure=False, timeout=10, **kwargs):
         url = self.url(path, secure=secure)
-        response = requests.request(method, url, auth=self._auth, verify=str(self.ca_cert), **kwargs)
+        response = requests.request(method, url, auth=self._auth, verify=str(self.ca_cert), timeout=timeout, **kwargs)
         data = self._retrieve_data(response)
         self._raise_for_status(response)
         return data

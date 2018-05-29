@@ -437,6 +437,117 @@ TEST_F(SslSocketVerifySslIsActuallyUsed, ssl_used_by_sync_io)
 }
 
 //-------------------------------------------------------------------------------------------------
+
+class SslSocketSpecific:
+    public network::test::StreamSocketAcceptance<
+        network::test::SslSocketBothEndsEncryptedAutoDetectingServerTypeSet>
+{
+    using base_type = network::test::StreamSocketAcceptance<
+        network::test::SslSocketBothEndsEncryptedAutoDetectingServerTypeSet>;
+
+protected:
+    void givenSocketTimedOutOnSendAsync()
+    {
+        givenAcceptingServerSocket();
+        givenConnectedSocket();
+        setClientSocketSendTimeout(std::chrono::milliseconds(1));
+
+        whenClientSendsRandomDataAsyncNonStop();
+
+        thenClientSendTimesOutEventually();
+    }
+
+    void givenSocketTimedOutOnSend()
+    {
+        givenAcceptingServerSocket();
+        givenConnectedSocket();
+        setClientSocketSendTimeout(std::chrono::milliseconds(1));
+
+        const auto randomData = nx::utils::generateRandomName(64*1024);
+        for (;;)
+        {
+            int bytesSent =
+                connection()->send(randomData.constData(), randomData.size());
+            if (bytesSent >= 0)
+                continue;
+
+            ASSERT_EQ(SystemError::timedOut, SystemError::getLastOSErrorCode());
+            break;
+        }
+    }
+
+    void givenNotEncryptedConnection()
+    {
+        m_notEncryptedConnection = std::make_unique<TCPSocket>(AF_INET);
+        ASSERT_TRUE(m_notEncryptedConnection->connect(serverEndpoint(), kNoTimeout));
+
+        nx::Buffer testData("Hello, world");
+        ASSERT_EQ(
+            testData.size(),
+            m_notEncryptedConnection->send(testData.constData(), testData.size()));
+    }
+
+    void assertClientConnectionReportsEncryptionEnabled()
+    {
+        ASSERT_TRUE(connection()->isEncryptionEnabled());
+    }
+
+    void assertServerConnectionReportsEncryptionEnabled()
+    {
+        thenConnectionHasBeenAccepted();
+
+        ASSERT_TRUE(
+            static_cast<AbstractEncryptedStreamSocket*>(lastAcceptedSocket())
+                ->isEncryptionEnabled());
+    }
+
+    void assertServerConnectionReportsEncryptionDisabled()
+    {
+        thenConnectionHasBeenAccepted();
+
+        ASSERT_FALSE(
+            static_cast<AbstractEncryptedStreamSocket*>(lastAcceptedSocket())
+                ->isEncryptionEnabled());
+    }
+
+private:
+    std::unique_ptr<TCPSocket> m_notEncryptedConnection;
+};
+
+TEST_F(SslSocketSpecific, socket_becomes_unusable_after_async_send_timeout)
+{
+    givenSocketTimedOutOnSendAsync();
+    whenClientSendsPingAsync();
+    thenSendFailedUnrecoverableError();
+}
+
+TEST_F(SslSocketSpecific, socket_becomes_unusable_after_sync_send_timeout)
+{
+    givenSocketTimedOutOnSend();
+    whenClientSendsPing();
+    thenSendFailedUnrecoverableError();
+}
+
+TEST_F(SslSocketSpecific, enabled_encryption_is_reported)
+{
+    givenAcceptingServerSocket();
+    givenConnectedSocket();
+
+    assertClientConnectionReportsEncryptionEnabled();
+    assertServerConnectionReportsEncryptionEnabled();
+}
+
+TEST_F(SslSocketSpecific, disabled_encryption_is_reported)
+{
+    givenAcceptingServerSocket();
+    givenNotEncryptedConnection();
+
+    assertServerConnectionReportsEncryptionDisabled();
+}
+
+// TEST_F(SslSocketSpecific, timeout_during_handshake_is_handled_properly)
+
+//-------------------------------------------------------------------------------------------------
 // Mixing sync & async mode.
 
 class SslSocketSwitchIoMode:

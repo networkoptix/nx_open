@@ -137,7 +137,7 @@ TEST_F(AbstractStorageResourceTest, Capabilities)
 
 TEST_F(AbstractStorageResourceTest, StorageCommonOperations)
 {
-    const size_t fileCount = 500;
+    const size_t fileCount = 100;
     std::vector<QString> fileNames;
     const char *dummyData = "abcdefgh";
     const size_t dummyDataLen = strlen(dummyData);

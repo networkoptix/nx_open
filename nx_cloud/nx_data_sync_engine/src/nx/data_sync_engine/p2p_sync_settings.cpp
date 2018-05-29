@@ -1,6 +1,6 @@
 #include "p2p_sync_settings.h"
 
-#include <nx/utils/settings.h>
+#include <nx/utils/deprecated_settings.h>
 
 namespace nx {
 namespace data_sync_engine {

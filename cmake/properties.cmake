@@ -38,6 +38,3 @@ else()
 endif()
 
 set(apple_team_id "L6FE34GJWM")
-
-hg_changeset(${PROJECT_SOURCE_DIR} changeSet)
-hg_branch(${PROJECT_SOURCE_DIR} branch)

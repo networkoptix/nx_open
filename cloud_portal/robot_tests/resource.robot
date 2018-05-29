@@ -1,6 +1,6 @@
 *** Settings ***
 
-Library           SeleniumLibrary    screenshot_root_directory=\Screenshots    run_on_failure=Failure Tasks
+Library           SeleniumLibrary    run_on_failure=Failure Tasks
 Library           NoptixImapLibrary/
 Library           String
 Library           NoptixLibrary/
@@ -9,10 +9,12 @@ Resource          variables.robot
 *** variables ***
 @{chrome_arguments}    --disable-infobars    --headless    --disable-gpu
 ${headless}    false
+${directory}    ${SCREENSHOTDIRECTORY}
 
 *** Keywords ***
 Open Browser and go to URL
     [Arguments]    ${url}
+    Set Screenshot Directory    ${SCREENSHOT_DIRECTORY}
     Run Keyword Unless    "${headless}"=="true" and "${BROWSER}" == "Chrome"   Open Browser    ${ENV}    ${BROWSER}
     Run Keyword If    "${headless}"=="true" and "${BROWSER}" == "Chrome"    Headless Startup
 #    Maximize Browser Window

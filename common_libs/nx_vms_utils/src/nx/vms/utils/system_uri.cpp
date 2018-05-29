@@ -263,8 +263,9 @@ public:
         const auto hostName = parseLocalHostname(systemId);
 
         nx::utils::Url result;
-        result.setScheme(
-            protocol == SystemUri::Protocol::Native ? lit("http") : protocolToString[protocol]);
+        result.setScheme(protocol == SystemUri::Protocol::Native
+            ? QString("http")
+            : protocolToString[protocol]);
         result.setHost(hostName.first);
         result.setPort(hostName.second);
         result.setUserName(authenticator.user);
@@ -332,7 +333,7 @@ private:
         switch (clientCommand)
         {
             case SystemUri::ClientCommand::Client:
-                return hasDomain && (hasSystemId ? isValidSystemId() : !hasAuth);
+                return hasDomain && !hasOnlyPassword && (hasSystemId ? isValidSystemId() : !hasAuth);
             case SystemUri::ClientCommand::LoginToCloud:
                 return hasDomain && !hasOnlyPassword;
             case SystemUri::ClientCommand::OpenOnPortal:

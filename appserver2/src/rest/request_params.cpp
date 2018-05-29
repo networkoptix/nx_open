@@ -66,7 +66,7 @@ void toUrlParams(const QByteArray& id, QUrlQuery* query)
 }
 
 bool parseHttpRequestParams(
-    QnCommonModule* commonModule,
+    QnCommonModule* /*commonModule*/,
     const QString& command, const QnRequestParamList& params, QnUuid* id)
 {
     return deserialize(params, lit("id"), id);
@@ -180,12 +180,12 @@ void toUrlParams(const ApiTranLogFilter& tranLogFilter, QUrlQuery* query)
 
 bool parseHttpRequestParams(
     QnCommonModule* /*commonModule*/,
-    const QString&, const QnRequestParamList&, nullptr_t*)
+    const QString&, const QnRequestParamList&, std::nullptr_t*)
 {
     return true;
 }
 
-void toUrlParams(const nullptr_t&, QUrlQuery*)
+void toUrlParams(const std::nullptr_t&, QUrlQuery*)
 {
 }
 

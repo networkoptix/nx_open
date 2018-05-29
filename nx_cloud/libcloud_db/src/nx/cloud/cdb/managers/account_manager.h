@@ -203,11 +203,13 @@ private:
         nx::utils::db::QueryContext* const queryContext,
         const data::AccountData& accountData,
         data::AccountConfirmationCode* const confirmationCode);
+
     nx::utils::db::DBResult issueAccountActivationCode(
         nx::utils::db::QueryContext* const queryContext,
-        const std::string& accountEmail,
+        const data::AccountData& account,
         std::unique_ptr<AbstractActivateAccountNotification> notification,
         data::AccountConfirmationCode* const resultData);
+
     std::string generateAccountActivationCode(
         nx::utils::db::QueryContext* const queryContext,
         const std::string& email,

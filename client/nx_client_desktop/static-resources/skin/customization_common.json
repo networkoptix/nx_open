@@ -753,7 +753,7 @@
         }
     },
 
-    "QnScheduleGridWidget": {
+    "nx::client::desktop::ScheduleGridWidget": {
         "colors": {
             "normalLabel": "light10",
             "weekendLabel": "red_core",
@@ -854,7 +854,10 @@
                 "shadow": "transparent",
                 "midlight": "dark11",
                 "windowText": "light14",
-                "text": "light16"
+                "text": "light16",
+                "highlightedText": "light10",
+                "highlight": "brand_core.setAlpha(102)",
+                "light": "brand_l1.setAlpha(102)"
             }
         }
     },

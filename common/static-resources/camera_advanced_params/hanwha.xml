@@ -523,6 +523,26 @@
             </group>
         </group>
         <group name="Image">
+            <group name="AGC">
+                <param id="image/camera/AGCMode"
+                        name="AGC Mode"
+                        dataType="Enumeration"
+                        aux="groupLead=agc"/>
+                <param id="image/camera/AGCLevel"
+                        name="AGC Level"
+                        dataType="Number"
+                        aux="group=agc;groupInclude=Manual">
+                    <dependencies>
+                        <dependencies-show>
+                            <conditional-show>
+                                <condition
+                                    watch="image/camera/AGCMode"
+                                    condition="value=Manual"/>
+                            </conditional-show>
+                        </dependencies-show>
+                    </dependencies>
+                </param>
+            </group>
             <group name="SSDR">
                 <param id="image/ssdr/Enable"
                         name="SSDR Enabled"
@@ -838,16 +858,27 @@
                         </dependencies-show>
                     </dependencies>
                 </param>
-                <param id="image/camera/AGCMode"
-                        name="AGC"
-                        dataType="Enumeration"
-                        range="Off,Low,Middle,High"/>
             </group>
             <group name="Day/Night">
                 <param id="image/camera/DayNightMode"
                         name="Mode"
                         dataType="Enumeration"
-                        aux="groupLead=dn"/>
+                        aux="groupLead=dn">
+                        <dependencies>
+                            <dependencies-ranges>
+                                <conditional-range id="dnRemoveAutoFromRange" remove-values-from-range="Auto">
+                                    <condition
+                                        watch="image/camera/AGCMode"
+                                        condition="value=Off"/>
+                                </conditional-range>
+                                <conditional-range id="dnAddAutoFromRange" add-values-to-range="Auto">
+                                    <condition
+                                        watch="image/camera/AGCMode"
+                                        condition="valueNe=Off"/>
+                                </conditional-range>
+                            </dependencies-ranges>
+                        </dependencies>
+                </param>
                 <param id="image/camera/DayNightSwitchingMode"
                         name="Duration"
                         dataType="Enumeration"
@@ -930,14 +961,14 @@
             </group>
         </group>
         <group name="Lens Control">
-            <param id="root.Zoom"
+            <param id="image/custom/zoom"
                 name="Zoom"
                 description="Zoom machinery"
                 range="-30,30"
                 dataType="SliderControl"
                 writeCmd="custom_zoom"
                 compact="true"/>
-            <param id="root.Ptr"
+            <param id="image/custom/Ptr"
                 name=""
                 description="Pan tilt rotation machinery"
                 dataType="PtrControl"
@@ -945,7 +976,7 @@
                 readCmd="param.cgi"
                 writeCmd="custom_ptr"
                 compact="true"/>
-            <param id="root.Focus"
+            <param id="image/custom/focus"
                 name="Focus"
                 description="Focus machinery"
                 range="-30,30"

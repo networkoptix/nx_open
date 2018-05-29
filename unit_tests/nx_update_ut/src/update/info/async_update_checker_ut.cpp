@@ -14,6 +14,7 @@ namespace info {
 namespace test {
 
 static const QString kBaseUrl = "http://updates.networkoptix.com";
+static const QnUuid kCurrentPeerId = QnUuid::createUuid();
 
 class AsyncUpdateChecker: public ::testing::Test
 {
@@ -44,6 +45,7 @@ protected:
         using namespace std::placeholders;
         m_asyncUpdateChecker.check(
             std::bind(&AsyncUpdateChecker::onCheckCompleted, this, _1, _2),
+            kCurrentPeerId,
             kBaseUrl);
 
         QnMutexLocker lock(&m_mutex);
@@ -266,7 +268,7 @@ private:
     void assertSerializability() const
     {
         const auto rawData = m_updateRegistry->toByteArray();
-        auto newUpdateRegistry = UpdateRegistryFactory::create();
+        auto newUpdateRegistry = UpdateRegistryFactory::create(kCurrentPeerId);
         ASSERT_TRUE(newUpdateRegistry->fromByteArray(rawData));
         ASSERT_TRUE(m_updateRegistry->equals(newUpdateRegistry.get()));
     }

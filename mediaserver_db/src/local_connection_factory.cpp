@@ -199,7 +199,7 @@ void LocalConnectionFactory::registerRestHandlers(QnRestProcessorPool* const p)
      * %return Object in the requested format.
      * %// AbstractResourceManager::getResourceTypes
      */
-    regGet<nullptr_t, ResourceTypeDataList>(p, ApiCommand::getResourceTypes);
+    regGet<std::nullptr_t, ResourceTypeDataList>(p, ApiCommand::getResourceTypes);
 
     // AbstractResourceManager::setResourceStatus
     regUpdate<ResourceStatusData>(p, ApiCommand::setResourceStatus);
@@ -710,7 +710,7 @@ void LocalConnectionFactory::registerRestHandlers(QnRestProcessorPool* const p)
      * %return List of camera history items in the requested format.
      * %// AbstractCameraManager::getCameraHistoryItems
      */
-    regGet<nullptr_t, ServerFootageDataList>(p, ApiCommand::getCameraHistoryItems);
+    regGet<std::nullptr_t, ServerFootageDataList>(p, ApiCommand::getCameraHistoryItems);
 
     /**%apidoc GET /ec2/getCamerasEx
      * Read camera list.
@@ -1066,7 +1066,7 @@ void LocalConnectionFactory::registerRestHandlers(QnRestProcessorPool* const p)
      * %return List of access rights data objects in the requested format.
      * %// AbstractUserManager::getAccessRights
      */
-    regGet<nullptr_t, ApiAccessRightsDataList>(p, ApiCommand::getAccessRights);
+    regGet<std::nullptr_t, ApiAccessRightsDataList>(p, ApiCommand::getAccessRights);
 
     /**%apidoc POST /ec2/setAccessRights
      * <p>
@@ -1253,7 +1253,7 @@ void LocalConnectionFactory::registerRestHandlers(QnRestProcessorPool* const p)
     * %param[default] format
     * %return List of predefined user role objects in the requested format.
     */
-    regGet<nullptr_t, ApiPredefinedRoleDataList>(p, ApiCommand::getPredefinedRoles);
+    regGet<std::nullptr_t, ApiPredefinedRoleDataList>(p, ApiCommand::getPredefinedRoles);
 
     /**%apidoc GET /ec2/getVideowalls
      * Return list of video walls
@@ -1571,16 +1571,16 @@ void LocalConnectionFactory::registerRestHandlers(QnRestProcessorPool* const p)
      * %param[default] format
      * %return Object in the requested format.
      */
-    regGet<nullptr_t, ApiFullInfoData>(p, ApiCommand::getFullInfo);
+    regGet<std::nullptr_t, ApiFullInfoData>(p, ApiCommand::getFullInfo);
 
     /**%apidoc GET /ec2/getLicenses
      * Read license list
      * %param[default] format
      * %return List of license objects in the requested format.
      */
-    regGet<nullptr_t, ApiLicenseDataList>(p, ApiCommand::getLicenses);
+    regGet<std::nullptr_t, ApiLicenseDataList>(p, ApiCommand::getLicenses);
 
-    regGet<nullptr_t, DatabaseDumpData>(p, ApiCommand::dumpDatabase);
+    regGet<std::nullptr_t, DatabaseDumpData>(p, ApiCommand::dumpDatabase);
     regGet<StoredFilePath, DatabaseDumpToFileData>(p, ApiCommand::dumpDatabaseToFile);
 
     // AbstractECConnectionFactory
@@ -1594,20 +1594,20 @@ void LocalConnectionFactory::registerRestHandlers(QnRestProcessorPool* const p)
      * %param[default] format
      * %return List of objects in the requested format.
      */
-    regFunctor<nullptr_t, ResourceParamDataList>(p, ApiCommand::getSettings,
+    regFunctor<std::nullptr_t, ResourceParamDataList>(p, ApiCommand::getSettings,
         std::bind(&LocalConnectionFactory::getSettings, this, _1, _2, _3));
 
     // Ec2StaticticsReporter
-    regFunctor<nullptr_t, ApiSystemStatistics>(p, ApiCommand::getStatisticsReport,
-        [this](nullptr_t, ApiSystemStatistics* const out, const Qn::UserAccessData&)
+    regFunctor<std::nullptr_t, ApiSystemStatistics>(p, ApiCommand::getStatisticsReport,
+        [this](std::nullptr_t, ApiSystemStatistics* const out, const Qn::UserAccessData&)
         {
             if (!m_directConnection)
                 return ErrorCode::failure;
             return m_directConnection->getStaticticsReporter()->collectReportData(
                 nullptr, out);
         });
-    regFunctor<nullptr_t, ApiStatisticsServerInfo>(p, ApiCommand::triggerStatisticsReport,
-        [this](nullptr_t, ApiStatisticsServerInfo* const out, const Qn::UserAccessData&)
+    regFunctor<std::nullptr_t, ApiStatisticsServerInfo>(p, ApiCommand::triggerStatisticsReport,
+        [this](std::nullptr_t, ApiStatisticsServerInfo* const out, const Qn::UserAccessData&)
         {
             if (!m_directConnection)
                 return ErrorCode::failure;
@@ -1880,7 +1880,7 @@ int LocalConnectionFactory::testDirectConnection(
 }
 
 ErrorCode LocalConnectionFactory::getSettings(
-    nullptr_t,
+    std::nullptr_t,
     nx::vms::api::ResourceParamDataList* const outData,
     const Qn::UserAccessData& accessData)
 {

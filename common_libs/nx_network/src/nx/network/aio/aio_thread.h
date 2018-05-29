@@ -21,6 +21,8 @@ class NX_NETWORK_API AbstractAioThread
 {
 public:
     virtual ~AbstractAioThread() = default;
+
+    virtual void cancelPostedCalls(Pollable* const sock) = 0;
 };
 
 /**
@@ -75,7 +77,7 @@ public:
     /**
      * Cancels calls scheduled with aio::AIOThread::post and aio::AIOThread::dispatch.
      */
-    void cancelPostedCalls(Pollable* const sock);
+    virtual void cancelPostedCalls(Pollable* const sock) override;
     /**
      * Returns number of sockets handled by this object.
      */

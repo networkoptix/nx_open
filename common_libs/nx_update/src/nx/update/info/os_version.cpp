@@ -1,5 +1,6 @@
-#include <utils/common/app_info.h>
 #include "os_version.h"
+
+#include <utils/common/app_info.h>
 
 namespace nx {
 namespace update {
@@ -25,7 +26,7 @@ bool OsVersion::matches(const QString& target) const
 
 QString OsVersion::serialize() const
 {
-    return lit("%1.%2.%3").arg(family).arg(architecture).arg(version);
+    return QString("%1.%2.%3").arg(family, architecture, version);
 }
 
 OsVersion OsVersion::deserialize(const QString& s)
@@ -64,6 +65,8 @@ bool operator==(const OsVersion& lhs, const OsVersion& rhs)
         && lhs.version == rhs.version;
 }
 
+namespace {
+
 static const QString kLinuxFamily = "linux";
 static const QString kWindowsFamily = "windows";
 static const QString kMacOsxFamily = "macosx";
@@ -73,6 +76,8 @@ static const QString kx64 = "x64";
 static const QString kUbuntu = "ubuntu";
 static const QString kWinxp = "winxp";
 static const QString kArm = "arm";
+
+} // namespace
 
 OsVersion ubuntuX64()
 {

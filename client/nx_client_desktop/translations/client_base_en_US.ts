@@ -1422,11 +1422,15 @@ to view more bookmarks</source>
         <translation></translation>
     </message>
     <message>
-        <source>Sets when camera archive will be deleted or saved when there is no space for new recordings.</source>
+        <source>Archive can be deleted in case if there are no space for new recording.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>&quot;Auto&quot; deletes the oldest footage first, regardless of the source.</source>
+        <source>Min and Max settings determine the age of archive which should be kept for this camera.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>If &quot;Auto&quot; option is enabled, the oldest footage among all cameras will be deleted first.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -2226,42 +2230,6 @@ to view more bookmarks</source>
     <message>
         <source>No settings</source>
         <translation></translation>
-    </message>
-    <message>
-        <source>Secondary Stream</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>I/O Module ID</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Camera ID</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Audio Stream</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Primary Stream</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>URL is not available. Open stream and try again.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>URL is not available. Open video stream and try again.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>I/O module has no audio stream</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Camera has no secondary stream</source>
-        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -3143,11 +3111,19 @@ to %1</source>
 <context>
     <name>QnCustomBusinessEventWidget</name>
     <message>
-        <source>Event will trigger only if there are matches in caption with any of entered keywords.</source>
+        <source>If the field is empty, event will always trigger.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>If the field is empty, event will always trigger.</source>
+        <source>Event will trigger only if there are matches in the source with any of the entered keywords.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Event will trigger only if there are matches in the caption with any of the entered keywords.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Event will trigger only if there are matches in the description with any of the entered keywords.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -3365,7 +3341,7 @@ to %1</source>
 <context>
     <name>QnEmptyBusinessActionWidget</name>
     <message>
-        <source>Panic Recording mode switches recording settings for all Cameras to maximum FPS and Quality</source>
+        <source>Panic Recording mode switches recording settings for all cameras to maximum FPS and quality.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -3865,6 +3841,10 @@ to %1</source>
             <numerusform>Test completed successfully: %n users found.</numerusform>
         </translation>
     </message>
+    <message>
+        <source>Changing any LDAP settings other than &quot;Search Filter&quot; will result in connectivity loss for all LDAP fetched users.</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QnLdapSettingsDialogPrivate</name>
@@ -3929,21 +3909,6 @@ to %1</source>
     <message>
         <source>Import Selected</source>
         <translation></translation>
-    </message>
-</context>
-<context>
-    <name>QnLensCameraAdvancedParamWidget</name>
-    <message>
-        <source>Zoom</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Rotation:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Focus</source>
-        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -4509,11 +4474,11 @@ to %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Length of time each camera on layout will be displayed if you start a Layout Tour.</source>
+        <source>Displays IP addresses for cameras and servers and roles for users.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Displays IP addresses for cameras and servers and groups for users.</source>
+        <source>Length of time each camera on layout will be displayed if you start a Tour.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -4855,6 +4820,13 @@ to %1</source>
     <message>
         <source>Set Passwords</source>
         <translation></translation>
+    </message>
+</context>
+<context>
+    <name>QnPanTiltRotationCameraAdvancedParamWidget</name>
+    <message>
+        <source>Rotation: </source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -6691,11 +6663,15 @@ to %1</source>
         <translation></translation>
     </message>
     <message>
-        <source>Sends anonymous System information (firmware, codecs, streams, etc.).</source>
+        <source>Tracks and logs all user actions.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Tracks and logs all user actions.</source>
+        <source>Includes information about system, such as cameras models and firmware versions, number of servers, etc.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Does not include any personal information and is completely anonymous.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -7343,6 +7319,14 @@ to %1</source>
     <message>
         <source>Web Page</source>
         <translation></translation>
+    </message>
+    <message>
+        <source>None</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Advanced</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -8105,6 +8089,21 @@ to %1</source>
     </message>
 </context>
 <context>
+    <name>nx::client::desktop::CameraStreamsDialog</name>
+    <message>
+        <source>Primary Stream</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Secondary Stream</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>No secondary stream</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>nx::client::desktop::ExportProcess</name>
     <message>
         <source>Unsupported media for data export.</source>
@@ -8260,6 +8259,45 @@ to %1</source>
     <message>
         <source>NOT A CAMERA</source>
         <translation></translation>
+    </message>
+</context>
+<context>
+    <name>nx::client::desktop::LegacyCameraSettingsStreamsPanel</name>
+    <message>
+        <source>Secondary Stream</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>I/O Module ID</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Camera ID</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Audio Stream</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Primary Stream</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>URL is not available. Open stream and try again.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>URL is not available. Open video stream and try again.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>I/O module has no audio stream</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Camera has no secondary stream</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -8488,15 +8526,15 @@ to %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Event will trigger only if there are matches in caption with any of entered keywords.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>If the field is empty, event will always trigger.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Event will trigger only if there are matches in the description field with any of the entered keywords.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Event will trigger only if there are matches in the caption with any of the entered keywords.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -8818,10 +8856,6 @@ to %1</source>
         <translation></translation>
     </message>
     <message>
-        <source>Some functionality may be unavailable or not working properly.</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>System sends anonymous usage statistics</source>
         <translation></translation>
     </message>
@@ -8842,6 +8876,10 @@ to %1</source>
         <translation></translation>
     </message>
     <message>
+        <source>Warning! This build is for testing purposes only! Please upgrade to a next available patch or release version once available.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>Failed to change password</source>
         <translation></translation>
     </message>
@@ -8859,6 +8897,10 @@ to %1</source>
     </message>
     <message>
         <source>Decline</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Warning! This build is for testing purposes only! Please upgrade to a next available patch or release version once available.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

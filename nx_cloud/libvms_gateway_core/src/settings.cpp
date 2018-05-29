@@ -173,6 +173,7 @@ const relaying::Settings& Settings::listeningPeer() const
 void Settings::loadSettings()
 {
     using namespace std::chrono;
+    using namespace nx::network::http::server;
 
     //general
     const QStringList& httpAddrToListenStrList = settings().value(
@@ -285,11 +286,11 @@ void Settings::loadSettings()
 
     auto preferedSslMode = settings().value(kPreferedSslMode, kDefaultPreferedSslMode).toString();
     if (preferedSslMode == "enabled" || preferedSslMode == "true")
-        m_cloudConnect.preferedSslMode = SslMode::enabled;
+        m_cloudConnect.preferedSslMode = proxy::SslMode::enabled;
     else if (preferedSslMode == "disabled" || preferedSslMode == "false")
-        m_cloudConnect.preferedSslMode = SslMode::disabled;
+        m_cloudConnect.preferedSslMode = proxy::SslMode::disabled;
     else
-        m_cloudConnect.preferedSslMode = SslMode::followIncomingConnection;
+        m_cloudConnect.preferedSslMode = proxy::SslMode::followIncomingConnection;
 
     m_listeningPeer.load(settings());
 }

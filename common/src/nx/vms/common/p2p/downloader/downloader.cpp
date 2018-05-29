@@ -58,11 +58,11 @@ void DownloaderPrivate::createWorker(const QString& fileName)
     if (status != FileInformation::Status::downloaded
         && status != FileInformation::Status::uploading)
     {
-        auto peerPolicy = storage->fileInformation(fileName).peerPolicy;
+        const auto fi = storage->fileInformation(fileName);
         auto worker = std::make_shared<Worker>(
             fileName,
             storage.data(),
-            peerManagerFactory->createPeerManager(peerPolicy));
+            peerManagerFactory->createPeerManager(fi.peerPolicy, fi.additionalPeers));
         workers[fileName] = worker;
 
         connect(worker.get(), &Worker::finished, this, &DownloaderPrivate::at_workerFinished);
@@ -240,9 +240,10 @@ void Downloader::validateAsync(const QString& url, int expectedSize,
                 auto response = asyncClient->response();
                 NX_WARNING(
                     typeid(Downloader),
-                    lm("[Downloader, validate] Validate %1 http request failed. Http client failed: %2, has response: %3, status code: %4")
-                    .args(url, asyncClient->failed(), (bool) response,
-                       !response ? -1 : response->statusLine.statusCode));
+                    lm("[Downloader, validate] Validate %1 http request failed. "
+                       "Http client failed: %2, has response: %3, status code: %4")
+                        .args(url, asyncClient->failed(), (bool) response,
+                            !response ? -1 : response->statusLine.statusCode));
 
                 return callback(false);
             }

@@ -107,7 +107,7 @@ private:
 
 	int testDirectConnection(const nx::utils::Url& addr, impl::TestConnectionHandlerPtr handler);
 	ErrorCode getSettings(
-	    nullptr_t,
+	    std::nullptr_t,
 	    nx::vms::api::ResourceParamDataList* const outData,
 	    const Qn::UserAccessData&);
 

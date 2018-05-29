@@ -346,7 +346,7 @@ int UnifiedPollSet::poll(int millisToWait)
     if (result < 0)
     {
         SystemError::setLastErrorCode(
-            detail::convertToSystemError(UDT::getlasterror().getErrorCode()));
+            network::detail::convertToSystemError(UDT::getlasterror().getErrorCode()));
         return -1;
     }
 
@@ -402,7 +402,7 @@ bool UnifiedPollSet::addSocket(
     {
         socketDictionary->erase(it);
         SystemError::setLastErrorCode(
-            detail::convertToSystemError(UDT::getlasterror().getErrorCode()));
+            network::detail::convertToSystemError(UDT::getlasterror().getErrorCode()));
         return false;
     }
 

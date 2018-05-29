@@ -21,9 +21,9 @@
   <String Id="HelpHeader">安装帮助</String>
   <String Id="HelpCloseButton">关闭</String>
   <String Id="InstallOptionsButton">选项</String>
-  <String Id="InstallInstallButton">Install</String>
+  <String Id="InstallInstallButton">安装</String>
   <String Id="InstallCloseButton">关闭</String>
-  <String Id="InstallAcceptCheckbox">I agree to the</String>
+  <String Id="InstallAcceptCheckbox">我同意使用条款及条件</String>
   <String Id="InstallLicenseLinkText">最终用户许可协议</String>
   <String Id="OptionsHeader">设置选项</String>
   <String Id="OptionsLocationLabel">安装路径</String>

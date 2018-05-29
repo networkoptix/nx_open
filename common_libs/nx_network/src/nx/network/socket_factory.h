@@ -5,10 +5,11 @@
 
 #include "abstract_socket.h"
 #include "socket_common.h"
+#include "ssl/ssl_stream_server_socket.h"
 
 namespace nx {
 namespace network {
-    
+
 class UDPSocket;
 
 /**
@@ -46,10 +47,17 @@ public:
         nx::network::NatTraversalSupport natTraversalRequired = nx::network::NatTraversalSupport::enabled,
         boost::optional<int> ipVersion = boost::none);
 
+    static std::unique_ptr<nx::network::AbstractStreamSocket> createSslAdapter(
+        std::unique_ptr<nx::network::AbstractStreamSocket> connection);
+
     static std::unique_ptr< AbstractStreamServerSocket > createStreamServerSocket(
         bool sslRequired = false,
         nx::network::NatTraversalSupport natTraversalRequired = nx::network::NatTraversalSupport::enabled,
         boost::optional<int> ipVersion = boost::none);
+
+    static std::unique_ptr<nx::network::AbstractStreamServerSocket> createSslAdapter(
+        std::unique_ptr<nx::network::AbstractStreamServerSocket> serverSocket,
+        ssl::EncryptionUse encryptionUse);
 
     static QString toString(SocketType type);
     static SocketType stringToSocketType(QString type);

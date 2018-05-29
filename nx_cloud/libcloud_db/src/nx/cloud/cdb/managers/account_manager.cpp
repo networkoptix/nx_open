@@ -303,14 +303,14 @@ void AccountManager::reactivateAccount(
 
     using namespace std::placeholders;
     m_dbManager->executeUpdate<std::string, data::AccountConfirmationCode>(
-        [this, notification = std::move(notification)](
+        [this, notification = std::move(notification), account = *existingAccount](
             nx::utils::db::QueryContext* const queryContext,
-            const std::string& accountEmail,
+            const std::string& /*accountEmail*/,
             data::AccountConfirmationCode* const resultData) mutable
         {
             return issueAccountActivationCode(
                 queryContext,
-                accountEmail,
+                account,
                 std::move(notification),
                 resultData);
         },
@@ -650,20 +650,20 @@ nx::utils::db::DBResult AccountManager::registerNewAccountInDb(
     notification->customization = accountData.customization;
     return issueAccountActivationCode(
         queryContext,
-        accountData.email,
+        accountData,
         std::move(notification),
         confirmationCode);
 }
 
 nx::utils::db::DBResult AccountManager::issueAccountActivationCode(
     nx::utils::db::QueryContext* const queryContext,
-    const std::string& accountEmail,
+    const data::AccountData& account,
     std::unique_ptr<AbstractActivateAccountNotification> notification,
     data::AccountConfirmationCode* const resultData)
 {
     auto verificationCode = m_dao->getVerificationCodeByAccountEmail(
         queryContext,
-        accountEmail);
+        account.email);
     if (verificationCode)
     {
         resultData->code = *verificationCode;
@@ -674,11 +674,11 @@ nx::utils::db::DBResult AccountManager::issueAccountActivationCode(
             nx::utils::timeSinceEpoch() +
                 m_settings.accountManager().accountActivationCodeExpirationTimeout;
         const auto emailVerificationCode =
-            generateAccountActivationCode(queryContext, accountEmail, codeExpirationTime);
+            generateAccountActivationCode(queryContext, account.email, codeExpirationTime);
 
         m_dao->insertEmailVerificationCode(
             queryContext,
-            accountEmail,
+            account.email,
             emailVerificationCode,
             QDateTime::fromTime_t(codeExpirationTime.count()));
 
@@ -686,7 +686,8 @@ nx::utils::db::DBResult AccountManager::issueAccountActivationCode(
     }
 
     notification->setActivationCode(resultData->code);
-    notification->setAddressee(accountEmail);
+    notification->setFullName(account.fullName);
+    notification->setAddressee(account.email);
     queryContext->transaction()->addOnSuccessfulCommitHandler(
         [this, notification = std::move(notification)]()
         {

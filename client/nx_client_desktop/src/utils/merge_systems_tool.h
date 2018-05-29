@@ -71,6 +71,8 @@ private:
         bool ignoreIncompatible = false;
         int nonceRequestHandle = -1;
         int mainRequestHandle = -1;
+
+        QString peerString() const;
     };
 
     QHash<int, TwoStepRequestCtx> m_twoStepRequests; //< getnonce/ping, getnonce/merge

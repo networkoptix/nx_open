@@ -28,7 +28,7 @@ struct FileData
 
     bool isNull() const
     {
-        return file.isNull() || size <= 0 || md5.isNull();
+        return file.isNull();
     }
 
     FileData(FileData&&) = default;

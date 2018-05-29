@@ -3,7 +3,7 @@ from subprocess import check_output
 
 import pytest
 
-from framework.os_access.args import sh_command_to_script
+from framework.os_access.posix_shell_utils import sh_command_to_script
 
 _logger = logging.getLogger(__name__)
 

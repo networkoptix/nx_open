@@ -9,10 +9,22 @@ elseif(arch STREQUAL "x86")
 endif()
 set(target.arch "${os.arch}")
 
+message(STATUS "Generating license")
+execute_process(
+    COMMAND ${pandoc_directory}/bin/pandoc
+        -s ${customization.dir}/license.html
+        -t plain --wrap none -o ${CMAKE_CURRENT_BINARY_DIR}/license.txt
+    RESULT_VARIABLE pandoc_result
+)
+
+if(NOT pandoc_result EQUAL 0)
+    message(FATAL_ERROR "error: License generation failed (${pandoc_result})")
+endif()
+
 # Read license.txt and properly format it to be included into deb templates file:
 #  - All lines but the first one must start with a space.
 #  - Empty lines must contain a single period (preceeded by a space too).
-file(READ ${customization_dir}/license.txt license.text)
+file(READ ${CMAKE_CURRENT_BINARY_DIR}/license.txt license.text)
 string(REGEX REPLACE "\n\n" "\n.\n" license.text "${license.text}")
 string(REGEX REPLACE "\n" "\n " license.text "${license.text}")
 

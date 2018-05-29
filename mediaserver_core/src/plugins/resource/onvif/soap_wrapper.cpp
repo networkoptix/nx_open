@@ -191,10 +191,7 @@ struct SoapTimeouts
 
 SoapTimeouts getSoapTimeouts()
 {
-    auto serializedTimeouts = qnServerModule->roSettings()
-        ->value(nx_ms_conf::ONVIF_TIMEOUTS, QString()).toString();
-
-    return SoapTimeouts(serializedTimeouts);
+    return SoapTimeouts(qnServerModule->settings().onvifTimeouts());
 }
 
 /*

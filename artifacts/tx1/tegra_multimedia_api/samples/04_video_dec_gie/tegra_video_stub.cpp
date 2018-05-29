@@ -7,14 +7,13 @@
 #include <string>
 #include <vector>
 #include <algorithm>
-
-#include <nx/kit/debug.h>
 #include <queue>
+
+#define NX_PRINT_PREFIX "[tegra_video_stub" << (m_id.empty() ? "" : " #" + m_id) << "] "
+#include <nx/kit/debug.h>
 
 #include "tegra_video_ini.h"
 #include "rects_serialization.h"
-
-#define NX_PRINT_PREFIX "[tegra_video_stub" << (m_id.empty() ? "" : " #" + m_id) << "] "
 
 namespace {
 

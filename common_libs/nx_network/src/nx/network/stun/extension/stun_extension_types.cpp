@@ -122,27 +122,27 @@ const char* toString(AttributeType val)
         default:
             return "unknown";
     }
+
 } // namespace attrs
 
-
-BaseStringAttribute::BaseStringAttribute( int userType, const String& value )
-    : stun::attrs::Unknown( userType, stringToBuffer( value ) )
+BaseStringAttribute::BaseStringAttribute(int userType, const String& value):
+    stun::attrs::Unknown(userType, stringToBuffer(value))
 {
 }
 
-static String endpointsToString( const std::list< SocketAddress >& endpoints )
+static String endpointsToString(const std::list<SocketAddress>& endpoints)
 {
     QStringList list;
-    for( const auto& ep : endpoints )
-        list << ep.toString();
+    for (const auto& ep: endpoints)
+        list.append(ep.toString());
 
-    return list.join( lit(",") ).toUtf8();
+    return list.join(",").toUtf8();
 }
 
 //-------------------------------------------------------------------------------------------------
 
-Endpoint::Endpoint(int type, const SocketAddress& endpoint)
-    : BaseStringAttribute(type, endpoint.toString().toUtf8())
+Endpoint::Endpoint(int type, const SocketAddress& endpoint):
+    BaseStringAttribute(type, endpoint.toString().toUtf8())
 {
 }
 
@@ -153,47 +153,47 @@ SocketAddress Endpoint::get() const
 
 //-------------------------------------------------------------------------------------------------
 
-EndpointList::EndpointList( int type, const std::list< SocketAddress >& endpoints )
-    : BaseStringAttribute( type, endpointsToString( endpoints ) )
+EndpointList::EndpointList(int type, const std::list<SocketAddress>& endpoints):
+    BaseStringAttribute(type, endpointsToString(endpoints))
 {
 }
 
-std::list< SocketAddress > EndpointList::get() const
+std::list<SocketAddress> EndpointList::get() const
 {
     const auto value = getString();
-    if( value.isEmpty() )
-        return std::list< SocketAddress >();
+    if (value.isEmpty())
+        return {};
 
-    std::list< SocketAddress > list;
-    for( const auto ep : QString::fromUtf8( value ).split( lit(",") ) )
-        list.push_back( SocketAddress( ep ) );
+    std::list<SocketAddress> list;
+    for (const auto& ep: QString::fromUtf8(value).split(","))
+        list.push_back(SocketAddress(ep));
 
     return list;
 }
 
-static String vectorToString( const std::vector< String >& vector )
+static String vectorToString(const std::vector<String>& vector)
 {
     QStringList list;
-    for( const auto& it : vector )
-        list << QString::fromUtf8( it );
+    for (const auto& it: vector)
+        list.append(QString::fromUtf8(it));
 
-    return list.join( lit(",") ).toUtf8();
+    return list.join(",").toUtf8();
 }
 
-StringList::StringList( int type, const std::vector< String >& strings )
-    : BaseStringAttribute( type, vectorToString( strings ) )
+StringList::StringList(int type, const std::vector<String>& strings):
+    BaseStringAttribute(type, vectorToString(strings))
 {
 }
 
-std::vector< String > StringList::get() const
+std::vector<String> StringList::get() const
 {
     const auto value = getString();
-    if( value.isEmpty() )
-        return std::vector< String >();
+    if (value.isEmpty())
+        return {};
 
-    std::vector< String > list;
-    for( const auto it : QString::fromUtf8( value ).split( lit(",") ) )
-        list.push_back( it.toUtf8() );
+    std::vector<String> list;
+    for (const auto& it: QString::fromUtf8(value).split(","))
+        list.push_back(it.toUtf8());
 
     return list;
 }

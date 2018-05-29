@@ -287,28 +287,28 @@ QnCodecParams::Value QnTranscoder::suggestMediaStreamParams(
 
             switch (quality)
             {
-            case Qn::StreamQuality::lowest:
-                cpuUsed = 5;
-                break;
-            case Qn::StreamQuality::low:
-                cpuUsed = 4;
-                break;
-            case Qn::StreamQuality::normal:
-                cpuUsed = 3;
-                break;
-            case Qn::StreamQuality::high:
-                cpuUsed = 1;
-                break;
-            case Qn::StreamQuality::highest:
-                cpuUsed = 0;
-                break;
-            default:
-                break;
+                case Qn::StreamQuality::lowest:
+                    cpuUsed = 5;
+                    break;
+                case Qn::StreamQuality::low:
+                    cpuUsed = 4;
+                    break;
+                case Qn::StreamQuality::normal:
+                    cpuUsed = 3;
+                    break;
+                case Qn::StreamQuality::high:
+                    cpuUsed = 1;
+                    break;
+                case Qn::StreamQuality::highest:
+                    cpuUsed = 0;
+                    break;
+                default:
+                    break;
             }
 
             if (quality <= Qn::StreamQuality::normal)
             {
-                params.insert("profile", 1); //< [0..3] Bigger numbers means less posibilities for encoder
+                params.insert("profile", 1); //< [0..3] Bigger numbers mean less posibilities for encoder.
                 staticThreshold = 1000;
             }
 

@@ -7,6 +7,8 @@
 #include <nx/utils/random.h>
 
 #include <nx/client/core/utils/geometry.h>
+#include <core/resource/media_resource.h>
+#include <core/resource/layout_item_data.h>
 #include <nx/client/desktop/ui/actions/action.h>
 #include <nx/client/desktop/ui/actions/action_manager.h>
 #include <ui/animation/opacity_animator.h>
@@ -497,7 +499,11 @@ private:
     {
         NX_EXPECT(widget);
         if (widget)
-            widget->setGeometry(Geometry::subRect(rect(), m_rectByWidget.value(widget)));
+        {
+            auto widgetRect = m_rectByWidget.value(widget);
+            auto fitted = Geometry::subRect(rect(), widgetRect);
+            widget->setGeometry(fitted);
+        }
     }
 
 private:
@@ -1214,15 +1220,17 @@ void ZoomWindowInstrument::at_resizing(
 
     QRectF zoomRect = widget->zoomRect();
     NX_EXPECT(oldTargetWidget);
-    QSizeF oldLayoutSize = oldTargetWidget->channelLayout()->size();
-    QSizeF newLayoutSize = newTargetWidget->channelLayout()->size();
-    if (oldLayoutSize != newLayoutSize)
-    {
-        QSizeF zoomSize = Geometry::cwiseDiv(
-            Geometry::cwiseMul(zoomRect.size(), oldLayoutSize), newLayoutSize);
-        zoomRect = Geometry::movedInto(
-            QRectF(zoomRect.topLeft(), zoomSize), QRectF(0.0, 0.0, 1.0, 1.0));
-    }
+    QnLayoutItemData oldLayoutData = oldTargetWidget->item()->data();
+    QnLayoutItemData newLayoutData = newTargetWidget->item()->data();
+    auto oldAbsoluteSize = oldTargetWidget->rect();
+    auto newAbsoluteSize = newTargetWidget->rect();
+
+    // This variant tries to keep real AR of a zoom window.
+    // Calculating real scene width of zoom window.
+    qreal realWidth = oldAbsoluteSize.width() * zoomRect.width();
+    qreal realHeight = oldAbsoluteSize.height() * zoomRect.height();
+    QSizeF newZoomSize(realWidth / newAbsoluteSize.width(), realHeight / newAbsoluteSize.height());
+    zoomRect.setSize(newZoomSize);
 
     emit zoomTargetChanged(widget, zoomRect, newTargetWidget);
     m_resizingInstrument->rehandle();

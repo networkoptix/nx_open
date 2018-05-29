@@ -13,7 +13,7 @@
 #include <nx/utils/db/types.h>
 #include <nx/utils/log/log_initializer.h>
 #include <nx/utils/log/log_settings.h>
-#include <nx/utils/settings.h>
+#include <nx/utils/deprecated_settings.h>
 
 #include "discovery/discovery_settings.h"
 

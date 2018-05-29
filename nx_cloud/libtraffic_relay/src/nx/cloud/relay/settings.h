@@ -6,7 +6,7 @@
 
 #include <nx/network/abstract_socket.h>
 #include <nx/network/socket_common.h>
-#include <nx/utils/settings.h>
+#include <nx/utils/deprecated_settings.h>
 #include <nx/utils/basic_service_settings.h>
 
 #include <nx/cloud/relaying/settings.h>

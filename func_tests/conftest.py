@@ -6,7 +6,6 @@ from pathlib2 import Path
 from framework.artifact import ArtifactFactory
 from framework.ca import CA
 from framework.config import SingleTestConfig, TestParameter, TestsConfig
-from framework.mediaserverdeb import MediaserverDeb
 from framework.metrics_saver import MetricsSaver
 
 pytest_plugins = ['fixtures.vms', 'fixtures.mediaservers', 'fixtures.cloud', 'fixtures.layouts', 'fixtures.media']
@@ -14,7 +13,6 @@ pytest_plugins = ['fixtures.vms', 'fixtures.mediaservers', 'fixtures.cloud', 'fi
 JUNK_SHOP_PLUGIN_NAME = 'junk-shop-db-capture'
 
 DEFAULT_WORK_DIR = '/tmp/funtest'
-DEFAULT_MEDIASERVER_DIST_NAME = 'mediaserver.deb'  # in bin dir
 DEFAULT_REST_API_FORWARDED_PORT_BASE = 17000
 
 DEFAULT_MAX_LOG_WIDTH = 500
@@ -30,8 +28,6 @@ def pytest_addoption(parser):
         'debian distributive and media sample are expected there'))
     parser.addoption('--customization', help=(
         "Manufacturer name or 'default'. Optional. Checked against customization from .deb file."))
-    parser.addoption('--mediaserver-dist-path', type=Path, default=DEFAULT_MEDIASERVER_DIST_NAME, help=(
-        'mediaserver package, relative to bin dir [%s]' % DEFAULT_MEDIASERVER_DIST_NAME))
     parser.addoption('--max-log-width', default=DEFAULT_MAX_LOG_WIDTH, type=int, help=(
         'Change maximum log message width. Default is %d' % DEFAULT_MAX_LOG_WIDTH))
     parser.addoption(
@@ -61,22 +57,6 @@ def bin_dir(request):
 @pytest.fixture(scope='session')
 def ca(work_dir):
     return CA(work_dir / 'ca')
-
-
-@pytest.fixture(scope='session')
-def mediaserver_deb(request, bin_dir):
-    deb = MediaserverDeb(bin_dir / request.config.getoption('--mediaserver-dist-path').expanduser())
-    customization_from_command_line = request.config.getoption('--customization')
-    if customization_from_command_line is not None:
-        if deb.customization.name != customization_from_command_line:
-            raise Exception(
-                "Customization {} provided by --customization option "
-                "doesn't match customization {} from .deb file. "
-                "This option is maintained for backward compatibility, "
-                "either don't use it or make sure it matches .deb file.".format(
-                    customization_from_command_line,
-                    deb.customization))
-    return deb
 
 
 @pytest.fixture(scope='session', autouse=True)

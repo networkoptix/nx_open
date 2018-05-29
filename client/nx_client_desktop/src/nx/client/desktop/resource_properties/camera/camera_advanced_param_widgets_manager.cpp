@@ -240,7 +240,7 @@ QWidget* CameraAdvancedParamWidgetsManager::createWidgetsForPage(
     auto gridLayout = new QGridLayout(scrollAreaWidgetContents);
     scrollArea->setWidget(scrollAreaWidgetContents);
 
-    // Container for a group of 'compact' widgets
+    // Container for a group of 'compact' widgets.
     QHBoxLayout* compactLayout = nullptr;
     auto checkFinishGroup = [&compactLayout]()
         {
@@ -271,14 +271,14 @@ QWidget* CameraAdvancedParamWidgetsManager::createWidgetsForPage(
         {
             if (!compactLayout)
             {
-                // Creating container for compact controls
+                // Creating container for compact controls.
                 compactLayout = new QHBoxLayout(m_contentsWidget);
                 compactLayout->addWidget(widget, 0, Qt::AlignRight);
                 gridLayout->addLayout(compactLayout, row, 0, 1, 2, Qt::AlignVCenter);
             }
             else
             {
-                // Adding a widget to existing contaner for compact control group
+                // Adding a widget to existing contaner for compact control group.
                 compactLayout->addWidget(widget, 0, Qt::AlignRight);
             }
         }
@@ -307,7 +307,7 @@ QWidget* CameraAdvancedParamWidgetsManager::createWidgetsForPage(
 
         m_paramWidgetsById[param.id] = widget;
 
-        /* Widget is disabled until it receives correct value. */
+        // Widget is disabled until it receives correct value.
         if (QnCameraAdvancedParameter::dataTypeHasValue(param.dataType))
         {
             widget->setEnabled(false);
@@ -416,19 +416,50 @@ CameraAdvancedParamWidgetsManager::DependencyHandler
                 if (!allConditionsSatisfied)
                     return false;
 
-                widget->setRange(dependency.range);
-                if (parameter.bindDefaultToMinimum)
+                if (!dependency.valuesToAddToRange.isEmpty())
                 {
-                    const auto minMax = dependency.range.split(L',');
-                    if (!minMax.isEmpty())
-                        widget->setValue(minMax.first().trimmed());
+                    auto range = widget->range();
+                    for (const auto& valueToAdd: dependency.valuesToAddToRange)
+                    {
+                        if (!range.contains(valueToAdd))
+                            range.push_back(valueToAdd);
+                    }
+
+                    widget->setRange(range.join(L','));
                 }
 
-                auto label = dynamic_cast<QLabel*>(m_paramLabelsById[paramId]);
-                if (!label)
-                    return false;
+                if (!dependency.valuesToRemoveFromRange.isEmpty())
+                {
+                    QStringList result;
+                    const auto range = widget->range();
+                    for (const auto& value: range)
+                    {
+                        if (!dependency.valuesToRemoveFromRange.contains(value))
+                            result.push_back(value);
+                    }
 
-                setLabelText(label, parameter, dependency.range);
+                    widget->setRange(result.join(L','));
+                }
+
+                if (!dependency.range.isEmpty())
+                {
+                    NX_ASSERT(dependency.valuesToAddToRange.isEmpty()
+                        && dependency.valuesToRemoveFromRange.isEmpty());
+
+                    widget->setRange(dependency.range);
+                    if (parameter.bindDefaultToMinimum)
+                    {
+                        const auto minMax = dependency.range.split(L',');
+                        if (!minMax.isEmpty())
+                            widget->setValue(minMax.first().trimmed());
+                    }
+
+                    auto label = dynamic_cast<QLabel*>(m_paramLabelsById[paramId]);
+                    if (!label)
+                        return false;
+
+                    setLabelText(label, parameter, dependency.range);
+                }
             }
             else if (dependency.type == DependencyType::trigger)
             {

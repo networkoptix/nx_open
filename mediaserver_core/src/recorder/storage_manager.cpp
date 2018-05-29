@@ -119,7 +119,7 @@ public:
                                        .arg(QnLexical::serialized(m_catalog))
                                        .arg(m_cameraUniqueId);
         qnServerModule->roSettings()->setValue(settingName(m_role), serializedData);
-        qnServerModule->roSettings()->sync();
+        qnServerModule->syncRoSettings();
     }
 
     void load() {
@@ -141,7 +141,7 @@ public:
 
     static void reset(QnServer::StoragePool role) {
         qnServerModule->roSettings()->setValue(settingName(role), QString());
-        qnServerModule->roSettings()->sync();
+        qnServerModule->syncRoSettings();
     }
 
     bool isEmpty() const { return m_cameraUniqueId.isEmpty(); }
@@ -476,7 +476,7 @@ QnStorageManager::QnStorageManager(
     m_rebuildCancelled(false),
     m_rebuildArchiveThread(0),
     m_firstStoragesTestDone(false),
-    m_isRenameDisabled(qnServerModule->roSettings()->value("disableRename").toInt()),
+    m_isRenameDisabled(qnServerModule->settings().disableRename()),
     m_camInfoWriterHandler(this, commonModule->resourcePool()),
     m_camInfoWriter(&m_camInfoWriterHandler)
 {
@@ -506,15 +506,16 @@ QnStorageManager::QnStorageManager(
             if (message == QnSystemHealth::ArchiveFastScanFinished ||
                 message == QnSystemHealth::ArchiveRebuildFinished)
             {
-                for (const auto& storage: getUsedWritableStorages())
+                for (const auto& storage: getStorages())
                 {
-                    if (!storage->hasFlags(Qn::storage_fastscan))
+                    if (storage->getStatus() == Qn::Online && !storage->hasFlags(Qn::storage_fastscan))
                     {
                         auto storageIndex = qnStorageDbPool->getStorageIndex(storage);
                         m_spaceInfo.storageChanged(
                             storageIndex,
                             storage->getFreeSpace(),
-                            calculateNxOccupiedSpace(storageIndex), storage->getSpaceLimit());
+                            calculateNxOccupiedSpace(storageIndex),
+                            storage->getSpaceLimit());
                     }
                 }
             }
@@ -2087,7 +2088,6 @@ bool QnStorageManager::clearOldestSpace(const QnStorageResourcePtr &storage, boo
         return true; // nothing to delete
 
     qint64 toDelete = targetFreeSpace - freeSpace;
-
     if (toDelete > 0)
     {
       NX_LOG(lit("Cleanup. Starting for storage %1. %2 Mb to clean")
@@ -2148,14 +2148,26 @@ bool QnStorageManager::clearOldestSpace(const QnStorageResourcePtr &storage, boo
         deletedChunk = DeviceFileCatalog::Chunk();
     }
 
-    if (toDelete > 0 && !useMinArchiveDays) {
-        if (!m_diskFullWarned[storage->getId()]) {
+    if (toDelete > 0)
+    {
+        if (!useMinArchiveDays &&!m_diskFullWarned[storage->getId()])
+        {
             emit storageFailure(storage, nx::vms::api::EventReason::storageFull);
             m_diskFullWarned[storage->getId()] = true;
         }
     }
-    else {
+    else
+    {
         m_diskFullWarned[storage->getId()] = false;
+        int storageIndex = qnStorageDbPool->getStorageIndex(storage);
+        if (m_spaceInfo.state(storageIndex) == nx::recorder::SpaceInfo::notReady)
+        {
+            m_spaceInfo.storageChanged(
+                storageIndex,
+                storage->getFreeSpace(),
+                calculateNxOccupiedSpace(storageIndex),
+                storage->getSpaceLimit());
+        }
     }
 
     return toDelete <= 0;

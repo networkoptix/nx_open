@@ -24,6 +24,7 @@ public:
         QnSoftwareVersion* outSoftwareVersion) const = 0;
 
     virtual void addFileData(const ManualFileData& manualFileData) = 0;
+    virtual void removeFileData(const QString& fileName) = 0;
     virtual QList<QString> alternativeServers() const = 0;
 
     virtual QByteArray toByteArray() const = 0;

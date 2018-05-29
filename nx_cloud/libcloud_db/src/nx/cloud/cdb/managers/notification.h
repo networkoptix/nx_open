@@ -23,8 +23,9 @@ enum class NotificationType
 struct ActivateAccountData
 {
     std::string code;
+    std::string userFullName;
 };
-#define ActivateAccountData_Fields (code)
+#define ActivateAccountData_Fields (code)(userFullName)
 
 struct SystemSharedData
 {
@@ -99,6 +100,7 @@ class AbstractActivateAccountNotification:
 {
 public:
     virtual void setActivationCode(std::string code) = 0;
+    virtual void setFullName(std::string fullName) = 0;
 };
 
 /**
@@ -129,8 +131,12 @@ class AbstractActivateAccountNotificationImplementor:
 public:
     virtual void setActivationCode(std::string code) override
     {
-        static_cast<FusionEnabledDescendantType*>(this)->message.code
-            = std::move(code);
+        static_cast<FusionEnabledDescendantType*>(this)->message.code = code;
+    }
+
+    virtual void setFullName(std::string fullName) override
+    {
+        static_cast<FusionEnabledDescendantType*>(this)->message.userFullName = fullName;
     }
 };
 

@@ -128,12 +128,10 @@ void ImageControlWidget::loadState(const CameraSettingsDialogState& state)
         setReadOnly(ui->rotationComboBox, state.readOnly);
     }
 
-    ui->formLayout->setVerticalSpacing(
-        imageControl.aspectRatioAvailable && imageControl.rotationAvailable
-        ? 8
-        : 0);
-
     setVisible(imageControl.aspectRatioAvailable || imageControl.rotationAvailable);
+
+    if (isVisible())
+        ui->formLayout->activate();
 }
 
 } // namespace desktop

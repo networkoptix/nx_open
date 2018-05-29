@@ -16,6 +16,7 @@ namespace client {
 namespace desktop {
 
 class Rotation;
+struct WearableState;
 struct ScheduleCellParams;
 struct CameraSettingsDialogState;
 
@@ -34,6 +35,8 @@ public:
     void applyChanges();
     void setReadOnly(bool value);
     void setSettingsOptimizationEnabled(bool value);
+    void setGlobalPermissions(Qn::GlobalPermissions value);
+    void setSingleWearableState(const WearableState& value);
     void loadCameras(const QnVirtualCameraResourceList& cameras);
     void setSingleCameraUserName(const QString& text);
     void setScheduleBrush(const ScheduleCellParams& brush);
@@ -55,6 +58,7 @@ public:
     void setCustomAspectRatio(const QnAspectRatio& value);
     void setCustomRotation(const Rotation& value);
     void setRecordingEnabled(bool value);
+    void setAudioEnabled(bool value);
     void setMotionDetectionEnabled(bool value);
     void setMotionRegionList(const QList<QnMotionRegion>& value);
     void setFisheyeSettings(const QnMediaDewarpingParams& value);
@@ -71,6 +75,8 @@ public:
     void setLogicalId(int value);
     void generateLogicalId();
     void resetExpertSettings();
+    void setWearableMotionDetectionEnabled(bool value);
+    void setWearableMotionSensitivity(int value);
 
 signals:
     void stateChanged(const CameraSettingsDialogState& state);

@@ -356,10 +356,11 @@ void QnLicenseManagerWidget::updateLicenses()
 
         for (auto helper: helpers)
         {
-            for(Qn::LicenseType lt: helper->licenseTypes())
+            for (Qn::LicenseType lt: helper->licenseTypes())
             {
-                if (helper->totalLicenses(lt) > 0)
-                    messages << lit("%1 %2").arg(helper->totalLicenses(lt)).arg(QnLicense::longDisplayName(lt));
+                const int total = helper->totalLicenses(lt);
+                if (total > 0)
+                    messages << QnLicense::displayText(lt, total);
             }
         }
 
@@ -367,23 +368,24 @@ void QnLicenseManagerWidget::updateLicenses()
         {
             for (Qn::LicenseType lt: helper->licenseTypes())
             {
-                if (helper->usedLicenses(lt) == 0)
+                const int used = helper->usedLicenses(lt);
+                if (used == 0)
                     continue;
 
                 if (helper->isValid(lt))
                 {
-                    messages << tr("%n %1 are currently in use", "", helper->usedLicenses(lt))
-                        .arg(QnLicense::longDisplayName(lt));
+                    messages << tr("%1 are currently in use", "", used)
+                        .arg(QnLicense::displayText(lt, used));
                 }
                 else
                 {
-                    messages << setWarningStyleHtml(tr("At least %n %1 are required", "",
-                        helper->requiredLicenses(lt)).arg(QnLicense::longDisplayName(lt)));
+                    const int required = helper->requiredLicenses(lt);
+                    messages << setWarningStyleHtml(tr("At least %1 are required", "", required)
+                        .arg(QnLicense::displayText(lt, required)));
                 }
-
-
             }
         }
+
         ui->infoLabel->setText(messages.join(lit("<br/>")));
     }
 
@@ -906,12 +908,12 @@ void QnLicenseManagerWidget::at_licensesReceived(const QByteArray& licenseKey, e
 
 void QnLicenseManagerWidget::at_downloadError()
 {
-    if (QNetworkReply *reply = qobject_cast<QNetworkReply *>(sender()))
+    if (const auto reply = qobject_cast<QNetworkReply*>(sender()))
     {
-        disconnect(reply, NULL, this, NULL); //avoid double "onError" handling
+        reply->disconnect(this); //< Avoid double "onError" handling.
         reply->deleteLater();
 
-        /* QNetworkReply slots should not start eventLoop */
+        // QNetworkReply slots should not start eventLoop.
         showMessageLater(QnMessageBoxIcon::Critical,
             networkErrorText(), networkErrorExtras(),
             CopyToClipboardButton::Hide);

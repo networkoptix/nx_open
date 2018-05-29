@@ -39,9 +39,10 @@ private:
 //-------------------------------------------------------------------------------------------------
 
 class NX_NETWORK_API StreamSocket:
-    public StreamSocketDelegate
+    public CustomStreamSocketDelegate<AbstractEncryptedStreamSocket, AbstractStreamSocket>
 {
-    using base_type = StreamSocketDelegate;
+    using base_type =
+        CustomStreamSocketDelegate<AbstractEncryptedStreamSocket, AbstractStreamSocket>;
 
 public:
     StreamSocket(
@@ -74,6 +75,8 @@ public:
     virtual void sendAsync(
         const nx::Buffer& buffer,
         IoCompletionHandler handler) override;
+
+    virtual bool isEncryptionEnabled() const override;
 
     void handshakeAsync(
         nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode)> handler);

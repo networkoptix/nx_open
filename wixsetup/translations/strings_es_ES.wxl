@@ -21,9 +21,9 @@
   <String Id="HelpHeader">Ayuda de configuración</String>
   <String Id="HelpCloseButton">Cerrar</String>
   <String Id="InstallOptionsButton">Opciones</String>
-  <String Id="InstallInstallButton">Install</String>
+  <String Id="InstallInstallButton">Instalar</String>
   <String Id="InstallCloseButton">Cerrar</String>
-  <String Id="InstallAcceptCheckbox">I agree to the</String>
+  <String Id="InstallAcceptCheckbox">Estoy de acuerdo con</String>
   <String Id="InstallLicenseLinkText">Acuerdo de licencia de usuario final</String>
   <String Id="OptionsHeader">Opciones de instalación</String>
   <String Id="OptionsLocationLabel">Ubicación de la instalación:</String>

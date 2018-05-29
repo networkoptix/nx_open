@@ -92,6 +92,8 @@ QnWorkbenchWearableHandler::QnWorkbenchWearableHandler(QObject* parent):
         &QnWorkbenchWearableHandler::at_uploadWearableCameraFileAction_triggered);
     connect(action(UploadWearableCameraFolderAction), &QAction::triggered, this,
         &QnWorkbenchWearableHandler::at_uploadWearableCameraFolderAction_triggered);
+    connect(action(CancelWearableCameraUploadsAction), &QAction::triggered, this,
+        &QnWorkbenchWearableHandler::at_cancelWearableCameraUploadsAction_triggered);
     connect(resourcePool(), &QnResourcePool::resourceAdded, this,
         &QnWorkbenchWearableHandler::at_resourcePool_resourceAdded);
     connect(context(), &QnWorkbenchContext::userChanged, this,
@@ -218,6 +220,28 @@ void QnWorkbenchWearableHandler::at_uploadWearableCameraFolderAction_triggered()
             if (fixFolderUpload(path, &upload))
                 uploadValidFiles(camera, upload.elements);
         });
+}
+
+void QnWorkbenchWearableHandler::at_cancelWearableCameraUploadsAction_triggered()
+{
+    const auto parameters = menu()->currentParameters(sender());
+    QnSecurityCamResourcePtr camera = parameters.resource().dynamicCast<QnSecurityCamResource>();
+    if (!camera || !camera->getParentServer())
+        return;
+
+    WearableState state = qnClientModule->wearableManager()->state(camera);
+    if (!state.isCancellable())
+        return;
+
+    QnMessageBox dialog(QnMessageBoxIcon::Question,
+        tr("Stop uploading?"), tr("Already uploaded files will be kept."),
+        QDialogButtonBox::Cancel, QDialogButtonBox::NoButton, mainWindowWidget());
+
+    dialog.addCustomButton(QnMessageBoxCustomButton::Stop,
+        QDialogButtonBox::AcceptRole, Qn::ButtonAccent::Warning);
+
+    if (dialog.exec() != QDialogButtonBox::Cancel)
+        qnClientModule->wearableManager()->cancelUploads(camera);
 }
 
 bool QnWorkbenchWearableHandler::fixFileUpload(

@@ -27,8 +27,11 @@
 #include "redux/camera_settings_dialog_state.h"
 #include "redux/camera_settings_dialog_store.h"
 
+#include "watchers/camera_settings_license_watcher.h"
 #include "watchers/camera_settings_readonly_watcher.h"
+#include "watchers/camera_settings_wearable_state_watcher.h"
 #include "watchers/camera_settings_global_settings_watcher.h"
+#include "watchers/camera_settings_global_permissions_watcher.h"
 
 #include "utils/camera_settings_dialog_state_conversion_functions.h"
 #include <utils/license_usage_helper.h>
@@ -43,7 +46,9 @@ namespace desktop {
 struct CameraSettingsDialog::Private
 {
     QPointer<CameraSettingsDialogStore> store;
+    QPointer<CameraSettingsLicenseWatcher> licenseWatcher;
     QPointer<CameraSettingsReadOnlyWatcher> readOnlyWatcher;
+    QPointer<CameraSettingsWearableStateWatcher> wearableStateWatcher;
     QnVirtualCameraResourceList cameras;
     QPointer<QnCamLicenseUsageHelper> licenseUsageHelper;
     QSharedPointer<CameraThumbnailManager> previewManager;
@@ -87,35 +92,38 @@ struct CameraSettingsDialog::Private
         store->loadCameras(cameras);
     }
 
-    CameraSettingsGeneralTabWidget* createGeneralTab(CameraSettingsDialog* q)
+    void handleAction(CameraSettingsDialog* q, ui::action::IDType action)
     {
-        auto generalTab = new CameraSettingsGeneralTabWidget(store, q->ui->tabWidget);
-        QObject::connect(generalTab, &CameraSettingsGeneralTabWidget::actionRequested, q,
-            [this, q](CameraInfoWidget::Action action)
-            {
-                switch (action)
-                {
-                    case CameraInfoWidget::Action::ping:
-                        NX_ASSERT(store);
-                        q->menu()->trigger(ui::action::PingAction,
-                            {Qn::TextRole, store->state().singleCameraProperties.ipAddress});
-                        break;
+        switch (action)
+        {
+            case ui::action::PingAction:
+                NX_ASSERT(store);
+                q->menu()->trigger(ui::action::PingAction,
+                    {Qn::TextRole, store->state().singleCameraProperties.ipAddress});
+                break;
 
-                    case CameraInfoWidget::Action::openEventLog:
-                        q->menu()->trigger(ui::action::CameraIssuesAction, cameras);
-                        break;
+            case ui::action::CameraIssuesAction:
+            case ui::action::CameraBusinessRulesAction:
+            case ui::action::OpenInNewTabAction:
+                q->menu()->trigger(action, cameras);
+                break;
 
-                    case CameraInfoWidget::Action::openEventRules:
-                        q->menu()->trigger(ui::action::CameraBusinessRulesAction, cameras);
-                        break;
+            case ui::action::UploadWearableCameraFileAction:
+            case ui::action::UploadWearableCameraFolderAction:
+            case ui::action::CancelWearableCameraUploadsAction:
+                NX_ASSERT(cameras.size() == 1
+                    && cameras.front()->hasFlags(Qn::wearable_camera));
+                if (cameras.size() == 1)
+                    q->menu()->trigger(action, cameras.front());
+                break;
 
-                    case CameraInfoWidget::Action::showOnLayout:
-                        q->menu()->trigger(ui::action::OpenInNewTabAction, cameras);
-                        break;
-                }
-            });
+            case ui::action::PreferencesLicensesTabAction:
+                q->menu()->trigger(action);
+                break;
 
-        return generalTab;
+            default:
+                NX_ASSERT(false, Q_FUNC_INFO, "Unsupported action request");
+        }
     }
 };
 
@@ -133,7 +141,9 @@ CameraSettingsDialog::CameraSettingsDialog(QWidget* parent):
     connect(d->store, &CameraSettingsDialogStore::stateChanged, this,
         &CameraSettingsDialog::loadState);
 
+    d->licenseWatcher = new CameraSettingsLicenseWatcher(d->store, this);
     d->readOnlyWatcher = new CameraSettingsReadOnlyWatcher(d->store, this);
+    d->wearableStateWatcher = new CameraSettingsWearableStateWatcher(d->store, this);
 
     d->licenseUsageHelper = new QnCamLicenseUsageHelper(commonModule(), this);
 
@@ -143,15 +153,28 @@ CameraSettingsDialog::CameraSettingsDialog(QWidget* parent):
     d->previewManager->setAutoRefresh(false);
 
     new CameraSettingsGlobalSettingsWatcher(d->store, this);
+    new CameraSettingsGlobalPermissionsWatcher(d->store, this);
+
+    auto generalTab = new CameraSettingsGeneralTabWidget(
+        d->licenseWatcher->licenseUsageTextProvider(), d->store, ui->tabWidget);
+
+    connect(generalTab, &CameraSettingsGeneralTabWidget::actionRequested, this,
+        [this](ui::action::IDType action) { d->handleAction(this, action); });
+
+    auto recordingTab = new CameraScheduleWidget(
+        d->licenseWatcher->licenseUsageTextProvider(), d->store, ui->tabWidget);
+
+    connect(recordingTab, &CameraScheduleWidget::actionRequested, this,
+        [this](ui::action::IDType action) { d->handleAction(this, action); });
 
     addPage(
         int(CameraSettingsTab::general),
-        d->createGeneralTab(this),
+        generalTab,
         tr("General"));
 
     addPage(
         int(CameraSettingsTab::recording),
-        new CameraScheduleWidget(d->store, ui->tabWidget),
+        recordingTab,
         tr("Recording"));
 
     addPage(
@@ -212,7 +235,9 @@ CameraSettingsDialog::CameraSettingsDialog(QWidget* parent):
         });
 }
 
-CameraSettingsDialog::~CameraSettingsDialog() = default;
+CameraSettingsDialog::~CameraSettingsDialog()
+{
+}
 
 bool CameraSettingsDialog::tryClose(bool force)
 {
@@ -254,7 +279,9 @@ bool CameraSettingsDialog::setCameras(const QnVirtualCameraResourceList& cameras
 
     d->cameras = cameras;
     d->resetChanges();
+    d->licenseWatcher->setCameras(cameras);
     d->readOnlyWatcher->setCameras(cameras);
+    d->wearableStateWatcher->setCameras(cameras);
     d->previewManager->selectCamera(cameras.size() == 1
         ? cameras.front()
         : QnVirtualCameraResourcePtr());

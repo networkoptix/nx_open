@@ -5,14 +5,18 @@ import logging
 
 from requests.exceptions import ReadTimeout
 
-from framework.mediaserver_factory import CORE_FILE_ARTIFACT_TYPE, SERVER_LOG_ARTIFACT_TYPE, TRACEBACK_ARTIFACT_TYPE
+from framework.installation.mediaserver import Mediaserver
+from framework.installation.mediaserver_factory import (
+    CORE_FILE_ARTIFACT_TYPE,
+    SERVER_LOG_ARTIFACT_TYPE,
+    TRACEBACK_ARTIFACT_TYPE,
+    )
+from framework.installation.upstart_service import LinuxAdHocService
 from framework.os_access.path import copy_file
 from framework.rest_api import RestApi
 from framework.waiting import wait_for_true
 from . import utils
 from .core_file_traceback import create_core_file_traceback
-from .mediaserver import Mediaserver
-from .service import AdHocService
 from .template_renderer import TemplateRenderer
 from .utils import GrowingSleep
 
@@ -110,9 +114,9 @@ class LightweightServersInstallation(object):
 
 
 class LightweightServer(Mediaserver):
-    def __init__(self, name, os_access, service, installation, api, port=None):
-        super(LightweightServer, self).__init__(name, service, installation, api, None, port=port)
-        self.internal_ip_address = os_access.hostname
+    def __init__(self, name, installation, api, port=None):
+        super(LightweightServer, self).__init__(name, installation, api, port=port)
+        self.internal_ip_address = installation.os_access.hostname
 
     def wait_until_synced(self, timeout):
         log.info('Waiting for lightweight servers to merge between themselves')
@@ -148,7 +152,7 @@ class LightweightServersHost(object):
             self._os_access, physical_installation_host.root_dir / 'lws', self._ca)
         self._template_renderer = TemplateRenderer()
         self._lws_dir = self._installation.dir
-        self.service = AdHocService(self._os_access, self._lws_dir)
+        self.service = LinuxAdHocService(self._os_access.ssh, self._lws_dir)
         self._allocated = False
         self._first_server = None
         self._init()
@@ -172,7 +176,7 @@ class LightweightServersHost(object):
             name = 'lws-%05d' % idx
             api = RestApi(name, self._os_access.hostname, server_port)
             server = LightweightServer(name, self._os_access, self.service, self._installation, api, port=server_port)
-            wait_for_true(server.is_online, "{} is online after allocation".format(server))
+            wait_for_true(server.is_online)
             if not self._first_server:
                 self._first_server = server
             yield server

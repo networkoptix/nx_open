@@ -48,16 +48,24 @@ class SMBPath(FileSystemPath, PureWindowsPath):
     _session_service_address, _session_service_port = abstractproperty(), abstractproperty()
 
     @classmethod
-    @lrudecorator(1)
+    @lrudecorator(100)
     def _net_bios_name(cls):
         with closing(NetBIOS(broadcast=False)) as client:
             server_name = client.queryIPForName(
                 str(cls._name_service_address), port=cls._name_service_port)
+            # TODO: Check and retry when got None.
         return server_name[0]
 
     @classmethod
-    @lrudecorator(1)
+    @lrudecorator(100)
     def _connection(cls):
+        # TODO: Use connection pooling with keep-alive: connections can be closed from server side.
+        # See: http://pysmb.readthedocs.io/en/latest/api/smb_SMBConnection.html (Caveats section)
+        # Do not keep a SMBConnection instance "idle" for too long,
+        # i.e. keeping a SMBConnection instance but not using it.
+        # Most SMB/CIFS servers have some sort of keepalive mechanism and
+        # impose a timeout limit. If the clients fail to respond within
+        # the timeout limit, the SMB/CIFS server may disconnect the client.
         client_name = u'FUNC_TESTS_EXECUTION'.encode('ascii')  # Arbitrary ASCII string.
         server_name = cls._net_bios_name()
         connection = SMBConnection(
@@ -178,6 +186,7 @@ class SMBPath(FileSystemPath, PureWindowsPath):
     @_reraising_on_operation_failure({
         _STATUS_FILE_IS_A_DIRECTORY: NotAFile,
         _STATUS_OBJECT_NAME_NOT_FOUND: DoesNotExist,
+        _STATUS_OBJECT_PATH_NOT_FOUND: DoesNotExist,
         })
     def read_bytes(self):
         ad_hoc_file_object = BytesIO()

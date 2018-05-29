@@ -270,11 +270,14 @@ bool HanwhaPtzController::runAuxilaryCommand(const QnPtzAuxilaryTrait& trait, co
             : lit("AutoFocus");
 
         HanwhaRequestHelper::Parameters parameters{
-            { lit("Mode"), focusMode },
-            { kHanwhaChannelProperty, QString::number(m_hanwhaResource->getChannel()) }
+            {lit("Mode"), focusMode},
+            {kHanwhaChannelProperty, QString::number(m_hanwhaResource->getChannel())}
         };
 
-        HanwhaRequestHelper helper(m_hanwhaResource->sharedContext());
+        HanwhaRequestHelper helper(
+            m_hanwhaResource->sharedContext(),
+            m_hanwhaResource->bypassChannel());
+
         auto response = helper.control(lit("image/focus"), parameters);
         return response.isSuccessful();
     }

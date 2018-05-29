@@ -257,7 +257,8 @@ State::ImageControlSettings calculateImageControlSettings(
         [](const auto& camera) { return camera->hasVideo(); });
 
     State::ImageControlSettings result;
-    result.aspectRatioAvailable = hasVideo;
+    result.aspectRatioAvailable = hasVideo && std::all_of(cameras.cbegin(), cameras.cend(),
+        [](const auto& camera) { return !camera->hasFlags(Qn::wearable_camera); });
 
     if (result.aspectRatioAvailable)
     {
@@ -267,8 +268,7 @@ State::ImageControlSettings calculateImageControlSettings(
             [](const auto& camera) { return camera->customAspectRatio(); });
     }
 
-    result.rotationAvailable = hasVideo && std::all_of(cameras.cbegin(), cameras.cend(),
-        [](const auto& camera) { return !camera->hasFlags(Qn::wearable_camera); });
+    result.rotationAvailable = hasVideo;
 
     if (result.rotationAvailable)
     {
@@ -277,8 +277,10 @@ State::ImageControlSettings calculateImageControlSettings(
             cameras,
             [](const auto& camera)
             {
-                const auto rotationString = camera->getProperty(QnMediaResource::rotationKey());
-                return Rotation::closestStandardRotation(rotationString.toInt());
+                const QString rotationString = camera->getProperty(QnMediaResource::rotationKey());
+                return rotationString.isEmpty()
+                    ? Rotation()
+                    : Rotation::closestStandardRotation(rotationString.toInt());
             });
     }
 
@@ -417,6 +419,31 @@ State CameraSettingsDialogStateReducer::setSettingsOptimizationEnabled(State sta
     return state;
 }
 
+State CameraSettingsDialogStateReducer::setGlobalPermissions(
+    State state, Qn::GlobalPermissions value)
+{
+    state.globalPermissions = value;
+    return state;
+}
+
+State CameraSettingsDialogStateReducer::setSingleWearableState(
+    State state, const WearableState& value)
+{
+    state.singleWearableState = value;
+    state.wearableUploaderName = QString();
+
+    if (state.singleWearableState.status == WearableState::LockedByOtherClient)
+    {
+        if (const auto user = qnClientCoreModule->commonModule()->resourcePool()->getResourceById(
+            state.singleWearableState.lockUserId))
+        {
+            state.wearableUploaderName = user->getName();
+        }
+    }
+
+    return state;
+}
+
 State CameraSettingsDialogStateReducer::loadCameras(
     State state,
     const Cameras& cameras)
@@ -432,6 +459,7 @@ State CameraSettingsDialogStateReducer::loadCameras(
     state.devicesDescription = {};
     state.expert = {};
     state.recording = {};
+    state.wearableMotion = {};
     state.devicesCount = cameras.size();
     state.alert = {};
 
@@ -601,6 +629,9 @@ State CameraSettingsDialogStateReducer::loadCameras(
 
     state.imageControl = calculateImageControlSettings(cameras);
 
+    fetchFromCameras<bool>(state.audioEnabled, cameras,
+        [](const Camera& camera) { return camera->isAudioEnabled(); });
+
     fetchFromCameras<bool>(state.expert.dualStreamingDisabled, cameras,
         [](const Camera& camera) { return camera->isDualStreamingDisabled(); });
     fetchFromCameras<bool>(state.expert.cameraControlDisabled, cameras,
@@ -650,6 +681,27 @@ State CameraSettingsDialogStateReducer::loadCameras(
     }
 
     state.isDefaultExpertSettings = isDefaultExpertSettings(state);
+
+    if (state.devicesDescription.isWearable == State::CombinedValue::All)
+    {
+        fetchFromCameras<bool>(state.wearableMotion.enabled, cameras,
+            [](const Camera& camera)
+            {
+                NX_ASSERT(camera->getDefaultMotionType() == vms::api::MT_SoftwareGrid);
+                return camera->getMotionType() == vms::api::MT_SoftwareGrid;
+            });
+
+        fetchFromCameras<int>(state.wearableMotion.sensitivity, cameras,
+            [](const Camera& camera)
+            {
+                NX_ASSERT(camera->getVideoLayout()->channelCount() == 0);
+                QnMotionRegion region = camera->getMotionRegion(0);
+                const auto rects = region.getAllMotionRects();
+                return rects.empty()
+                    ? QnMotionRegion::kDefaultSensitivity
+                    : rects.begin().key();
+            });
+    }
 
     return state;
 }
@@ -874,6 +926,13 @@ State CameraSettingsDialogStateReducer::setRecordingEnabled(State state, bool va
         state.recording.schedule.setUser(tasks);
     }
 
+    return state;
+}
+
+State CameraSettingsDialogStateReducer::setAudioEnabled(State state, bool value)
+{
+    state.hasChanges = true;
+    state.audioEnabled.setUser(value);
     return state;
 }
 
@@ -1105,6 +1164,26 @@ State CameraSettingsDialogStateReducer::resetExpertSettings(State state)
     state = setLogicalId(std::move(state), {});
 
     state.isDefaultExpertSettings = true;
+    return state;
+}
+
+State CameraSettingsDialogStateReducer::setWearableMotionDetectionEnabled(State state, bool value)
+{
+    if (state.devicesDescription.isWearable != State::CombinedValue::All)
+        return state;
+
+    state.wearableMotion.enabled.setUser(value);
+    state.hasChanges = true;
+    return state;
+}
+
+State CameraSettingsDialogStateReducer::setWearableMotionSensitivity(State state, int value)
+{
+    if (state.devicesDescription.isWearable != State::CombinedValue::All)
+        return state;
+
+    state.wearableMotion.sensitivity.setUser(value);
+    state.hasChanges = true;
     return state;
 }
 

@@ -14,8 +14,8 @@
         <label class="col-sm-2 control-label" for="{{param.name}}">
             {{param.name}}
             <small>{{param.type}}</small>
-            <small ng-if="param.optional=='false'">(required)</small>
-            <small ng-if="param.proprietary">(proprietary)</small>
+            <small ng-if="param.optional=='false'">(必填)</small>
+            <small ng-if="param.proprietary">(所有權)</small>
         </label>
         <div class="col-sm-10">
             <p class="form-control-static" ng-if="param.description.xml"
@@ -54,8 +54,8 @@
         <label class="col-sm-2 control-label" for="{{param.name}}">
             {{param.name}}
             <small>{{param.type}}</small>
-            <small ng-if="!param.optional">(required)</small>
-            <small ng-if="param.proprietary">(proprietary)</small>
+            <small ng-if="!param.optional">(必填)</small>
+            <small ng-if="param.proprietary">(所有權)</small>
         </label>
         <div class="col-sm-10">
             <div ng-switch on="param.formType">
@@ -129,7 +129,7 @@
                                id="{{param.name}}_empty"
                                ng-value="null"
                                ng-checked="true">
-                        leave empty
+                        留空
                     </label>
                 </div>
                 <div ng-switch-when="boolean" ng-if="param.optional" class="radio">
@@ -137,9 +137,9 @@
                         <input type="radio"
                                ng-model="apiMethod.params[param.name]"
                                name="{{param.name}}"
-                               id="{{param.name}}_true"
-                               ng-value="true">
-                        true
+                               id="{{param.name}}_是"
+                               ng-value="是">
+                        是
                     </label>
                 </div>
                 <div ng-switch-when="boolean" ng-if="param.optional" class="radio">
@@ -147,9 +147,9 @@
                         <input type="radio"
                                ng-model="apiMethod.params[param.name]"
                                name="{{param.name}}"
-                               id="{{param.name}}_false"
-                               ng-value="false">
-                        false
+                               id="{{param.name}}_錯"
+                               ng-value="錯">
+                        錯
                     </label>
                 </div>
 

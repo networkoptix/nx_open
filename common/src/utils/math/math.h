@@ -14,7 +14,6 @@
 #include <QtGui/QVector3D>
 #include <QtGui/QVector4D>
 
-#include <nx/utils/compiler_options.h>
 #include <nx/utils/log/assert.h>
 #include <nx/utils/math/fuzzy.h>
 
@@ -92,13 +91,14 @@ inline bool qIsPower2(T value) {
  * \param step                          Rounding step, must be power of 2.
  * \returns                             Rounded value.
  */
-inline unsigned int qPower2Ceil(unsigned int value, int step) {
-    DEBUG_CODE(NX_ASSERT(qIsPower2(step)));
+inline unsigned int qPower2Ceil(unsigned int value, int step)
+{
+    NX_EXPECT(qIsPower2(step));
     return ((value - 1) & ~(step - 1)) + step;
 }
 
 inline quint64 qPower2Ceil(quint64 value, int step) {
-    DEBUG_CODE(NX_ASSERT(qIsPower2(step)));
+    NX_EXPECT(qIsPower2(step));
     return ((value - 1) & ~(step - 1)) + step;
 }
 
@@ -108,7 +108,7 @@ inline quint64 qPower2Ceil(quint64 value, int step) {
  * \returns                             Rounded value.
  */
 inline unsigned int qPower2Floor(unsigned int value, int step) {
-    DEBUG_CODE(NX_ASSERT(qIsPower2(step)));
+    NX_EXPECT(qIsPower2(step));
     return value & ~(step - 1);
 }
 
@@ -157,8 +157,9 @@ inline double qMod(double l, double r) {
  * \returns                             Rounded value.
  */
 template<class T, class Step>
-T qCeil(T value, Step step) {
-    DEBUG_CODE(NX_ASSERT(step > 0));
+T qCeil(T value, Step step)
+{
+    NX_EXPECT(step > 0);
     T mod = qMod(value, static_cast<T>(step));
     return QnMathDetail::qFuzzyIsNull(mod) ? value : static_cast<T>(value - mod + step);
 }
@@ -169,8 +170,9 @@ T qCeil(T value, Step step) {
  * \returns                             Rounded value.
  */
 template<class T, class Step>
-T qFloor(T value, Step step) {
-    DEBUG_CODE(NX_ASSERT(step > 0));
+T qFloor(T value, Step step)
+{
+    NX_EXPECT(step > 0);
     return value - qMod(value, static_cast<T>(step));
 }
 
@@ -180,8 +182,9 @@ T qFloor(T value, Step step) {
  * \returns                             Rounded value.
  */
 template<class T, class Step>
-T qRound(T value, Step step) {
-    DEBUG_CODE(NX_ASSERT(step > 0));
+T qRound(T value, Step step)
+{
+    NX_EXPECT(step > 0);
     return qFloor(value + static_cast<T>(step) / 2, step);
 }
 
