@@ -8,13 +8,13 @@ class Users(object):
         # TODO: Work via WinRM in this class.
         self.protocol = protocol
 
-    @lrudecorator(1)
+    @lrudecorator(100)
     def all_profiles(self):
         query = CIMQuery(self.protocol, 'Win32_UserProfile', {})
         profiles = list(query.enumerate())
         return profiles
 
-    @lrudecorator(1)
+    @lrudecorator(100)
     def profile_by_sid(self, sid):
         selectors = {'SID': sid}
         query = CIMQuery(self.protocol, 'Win32_UserProfile', selectors)
@@ -26,7 +26,7 @@ class Users(object):
         system_user_sid = 'S-1-5-18'
         return self.profile_by_sid(system_user_sid)
 
-    @lrudecorator(1)
+    @lrudecorator(100)
     def all_accounts(self):
         query = CIMQuery(self.protocol, 'Win32_UserAccount', {})
         accounts = list(query.enumerate())

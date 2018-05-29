@@ -174,7 +174,7 @@ class Storage(object):
         self.dir = dir
 
     @property
-    @lrudecorator(1)
+    @lrudecorator(100)
     def timezone(self):
         tzname = self.os_access.Path('/etc/timezone').read_text().strip()
         return pytz.timezone(tzname)

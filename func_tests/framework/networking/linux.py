@@ -20,7 +20,7 @@ class LinuxNetworking(Networking):
         self._ssh = ssh_access  # type: SSH
 
     @property
-    @lrudecorator(1)
+    @lrudecorator(100)
     def interfaces(self):
         output = self._ssh.run_sh_script(
             # language=Bash

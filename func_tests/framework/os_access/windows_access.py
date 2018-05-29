@@ -61,11 +61,11 @@ class WindowsAccess(OSAccess):
         return self.winrm.is_working()
 
     @property
-    @lrudecorator(1)
+    @lrudecorator(100)
     def networking(self):
         return WindowsNetworking(self.winrm, self.macs)
 
-    @lrudecorator(1)
+    @lrudecorator(100)
     def _get_timezone(self):
         timezone_result, = self.winrm.wmi_query(u'Win32_TimeZone', {}).enumerate()  # Mind enumeration!
         windows_timezone_name = timezone_result[u'StandardName']

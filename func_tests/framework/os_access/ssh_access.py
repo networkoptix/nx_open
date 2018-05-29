@@ -34,7 +34,7 @@ class SSHAccess(OSAccess):
         return self.ssh.is_working()
 
     @property
-    @lrudecorator(1)
+    @lrudecorator(100)
     def networking(self):
         return LinuxNetworking(self.ssh, self._macs)
 

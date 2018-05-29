@@ -49,7 +49,7 @@ class SSH(PosixShell):
         output = self.run_sh_script(script, input=input, cwd=cwd, timeout_sec=timeout_sec, env=env)
         return output
 
-    @lrudecorator(1)
+    @lrudecorator(100)
     def _client(self):
         client = paramiko.SSHClient()
         client.set_missing_host_key_policy(paramiko.MissingHostKeyPolicy())  # Ignore completely.

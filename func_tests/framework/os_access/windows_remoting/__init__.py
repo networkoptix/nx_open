@@ -51,7 +51,7 @@ class WinRM(object):
     def __del__(self):
         self._shell().__exit__(None, None, None)
 
-    @lrudecorator(1)
+    @lrudecorator(100)
     def _shell(self):
         """Lazy shell creation"""
         shell = Shell(self._protocol)
@@ -74,7 +74,7 @@ class WinRM(object):
     def run_powershell_script(self, script, variables):
         return run_powershell_script(self._shell(), script, variables)
 
-    @lrudecorator(1)
+    @lrudecorator(100)
     def user_env_vars(self):
         # TODO: Work via Users class.
         users = Users(self._protocol)
@@ -88,7 +88,7 @@ class WinRM(object):
         env_vars = EnvVars.request(self._protocol, account[u'Caption'], default_env_vars)
         return env_vars
 
-    @lrudecorator(1)
+    @lrudecorator(100)
     def system_profile_dir(self):
         # TODO: Work via Users class.
         users = Users(self._protocol)

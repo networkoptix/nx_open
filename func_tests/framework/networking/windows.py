@@ -56,7 +56,7 @@ class WindowsNetworking(Networking):
                 })
 
     @property
-    @lrudecorator(1)
+    @lrudecorator(100)
     def interfaces(self):
         self.rename_interfaces(self._names)
         return self._names
