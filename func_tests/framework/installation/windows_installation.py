@@ -1,8 +1,7 @@
 import logging
 
 from framework.installation.installation import Installation
-from framework.installation.installer import Customization
-from framework.installation.installer import Installer
+from framework.installation.installer import Customization, Installer
 from framework.installation.windows_service import WindowsService
 from framework.os_access.path import copy_file
 from framework.os_access.windows_access import WindowsAccess

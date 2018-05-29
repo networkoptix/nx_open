@@ -2,8 +2,8 @@ import logging
 from pprint import pformat
 
 from netaddr import EUI, IPNetwork, mac_eui48
-from pylru import lrudecorator
 
+from framework.method_caching import cached_property
 from framework.networking.interface import Networking
 from framework.os_access.windows_remoting import WinRM
 
@@ -55,8 +55,7 @@ class WindowsNetworking(Networking):
                     for mac, new_name in mac_to_new_name.items()],
                 })
 
-    @property
-    @lrudecorator(1)
+    @cached_property  # TODO: Use cached_getter.
     def interfaces(self):
         self.rename_interfaces(self._names)
         return self._names

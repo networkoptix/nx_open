@@ -5,12 +5,13 @@ from contextlib import closing
 from functools import wraps
 from io import BytesIO
 
+from netaddr import IPAddress
 from nmb.NetBIOS import NetBIOS
 from pathlib2 import PureWindowsPath
-from pylru import lrudecorator
 from smb.SMBConnection import SMBConnection
 from smb.smb_structs import OperationFailure
 
+from framework.method_caching import cached_getter
 from framework.os_access.exceptions import AlreadyExists, BadParent, DoesNotExist, NotADir, NotAFile
 from framework.os_access.path import FileSystemPath
 
@@ -41,24 +42,30 @@ def _reraising_on_operation_failure(status_to_error_cls):
     return decorator
 
 
-class SMBPath(FileSystemPath, PureWindowsPath):
-    __metaclass__ = ABCMeta
-    _username, _password = abstractproperty(), abstractproperty()
-    _name_service_address, _name_service_port = abstractproperty(), abstractproperty()
-    _session_service_address, _session_service_port = abstractproperty(), abstractproperty()
+class SMBConnectionPool(object):
+    def __init__(
+            self,
+            username, password,
+            name_service_address, name_service_port,
+            session_service_address, session_service_port,
+            ):
+        self._username = username  # str
+        self._password = password  # str
+        self._name_service_address = name_service_address  # type: IPAddress
+        self._name_service_port = name_service_port  # type: int
+        self._session_service_address = session_service_address  # type: IPAddress
+        self._session_service_port = session_service_port  # type: int
 
-    @classmethod
-    @lrudecorator(100)
-    def _net_bios_name(cls):
+    @cached_getter
+    def _net_bios_name(self):
         with closing(NetBIOS(broadcast=False)) as client:
             server_name = client.queryIPForName(
-                str(cls._name_service_address), port=cls._name_service_port)
+                str(self._name_service_address), port=self._name_service_port)
             # TODO: Check and retry when got None.
         return server_name[0]
 
-    @classmethod
-    @lrudecorator(100)
-    def _connection(cls):
+    @cached_getter
+    def connection(self):
         # TODO: Use connection pooling with keep-alive: connections can be closed from server side.
         # See: http://pysmb.readthedocs.io/en/latest/api/smb_SMBConnection.html (Caveats section)
         # Do not keep a SMBConnection instance "idle" for too long,
@@ -67,16 +74,23 @@ class SMBPath(FileSystemPath, PureWindowsPath):
         # impose a timeout limit. If the clients fail to respond within
         # the timeout limit, the SMB/CIFS server may disconnect the client.
         client_name = u'FUNC_TESTS_EXECUTION'.encode('ascii')  # Arbitrary ASCII string.
-        server_name = cls._net_bios_name()
+        server_name = self._net_bios_name()
         connection = SMBConnection(
-            cls._username, cls._password,
+            self._username, self._password,
             client_name, server_name)
         connection_succeeded = connection.connect(
-            str(cls._session_service_address), port=cls._session_service_port)
+            str(self._session_service_address), port=self._session_service_port)
+        # SMBConnectionPool has no special closing actions;
+        # socket is closed when object is deleted.
         if not connection_succeeded:
             raise RuntimeError("Connection to {}:{} failed".format(
-                cls._session_service_address, cls._session_service_port))
+                self._session_service_address, self._session_service_port))
         return connection
+
+
+class SMBPath(FileSystemPath, PureWindowsPath):
+    __metaclass__ = ABCMeta
+    _smb_connection_pool = abstractproperty()  # type: SMBConnectionPool
 
     @property
     def _service_name(self):
@@ -96,7 +110,7 @@ class SMBPath(FileSystemPath, PureWindowsPath):
 
     def exists(self):
         try:
-            _ = self._connection().getAttributes(self._service_name, self._relative_path)
+            _ = self._smb_connection_pool.connection().getAttributes(self._service_name, self._relative_path)
         except OperationFailure as e:
             last_message_status = e.smb_messages[-1].status
             if last_message_status == _STATUS_OBJECT_NAME_NOT_FOUND:
@@ -110,7 +124,7 @@ class SMBPath(FileSystemPath, PureWindowsPath):
     def unlink(self):
         if '*' in str(self):
             raise ValueError("{!r} contains '*', but files can be deleted only by one")
-        self._connection().deleteFiles(self._service_name, self._relative_path)
+        self._smb_connection_pool.connection().deleteFiles(self._service_name, self._relative_path)
 
     def expanduser(self):
         """Don't do any expansion on Windows"""
@@ -122,7 +136,7 @@ class SMBPath(FileSystemPath, PureWindowsPath):
         _STATUS_OBJECT_PATH_NOT_FOUND: DoesNotExist,
         })
     def _glob(self, pattern):
-        return self._connection().listPath(
+        return self._smb_connection_pool.connection().listPath(
             self._service_name, self._relative_path,
             pattern=pattern)
 
@@ -145,7 +159,7 @@ class SMBPath(FileSystemPath, PureWindowsPath):
         else:
             try:
                 _logger.debug("Create directory %s on %s", self._relative_path, self._service_name)
-                self._connection().createDirectory(self._service_name, self._relative_path)
+                self._smb_connection_pool.connection().createDirectory(self._service_name, self._relative_path)
             except OperationFailure as e:
                 last_message_status = e.smb_messages[-1].status
                 # See: https://msdn.microsoft.com/en-us/library/cc704588.aspx
@@ -181,7 +195,7 @@ class SMBPath(FileSystemPath, PureWindowsPath):
         else:
             for entry in iter_entries:
                 entry.rmtree()
-            self._connection().deleteDirectory(self._service_name, self._relative_path)
+            self._smb_connection_pool.connection().deleteDirectory(self._service_name, self._relative_path)
 
     @_reraising_on_operation_failure({
         _STATUS_FILE_IS_A_DIRECTORY: NotAFile,
@@ -190,7 +204,7 @@ class SMBPath(FileSystemPath, PureWindowsPath):
         })
     def read_bytes(self):
         ad_hoc_file_object = BytesIO()
-        _attributes, bytes_read = self._connection().retrieveFile(
+        _attributes, bytes_read = self._smb_connection_pool.connection().retrieveFile(
             self._service_name, self._relative_path,
             ad_hoc_file_object)
         data = ad_hoc_file_object.getvalue()
@@ -202,7 +216,7 @@ class SMBPath(FileSystemPath, PureWindowsPath):
         _STATUS_OBJECT_PATH_NOT_FOUND: BadParent})
     def write_bytes(self, data):
         ad_hoc_file_object = BytesIO(data)
-        return self._connection().storeFile(
+        return self._smb_connection_pool.connection().storeFile(
             self._service_name, self._relative_path,
             ad_hoc_file_object)
 

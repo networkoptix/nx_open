@@ -9,6 +9,15 @@ from rdep import Rdep
 from rdep_cmake import RdepSyncher
 
 
+def short_release_version(version):
+    components = version.split(".")
+    try:
+        return components[0] + "." + components[1]
+    except IndexError:
+        print("Invalid release version \"%s\"" % version, file=sys.stderr)
+        exit(1)
+
+
 def determine_package_versions(
     platform,
     box,
@@ -36,7 +45,7 @@ def determine_package_versions(
         "gstreamer": "1.0",
         "glib": "2.0",
         "deepstream": "0.1",
-        "help": customization + "-" + release_version,
+        "help": customization + "-" + short_release_version(release_version),
         "server-external": release_version,
         "certificates": customization,
     }
@@ -303,15 +312,6 @@ def parse_overrides(overrides_list):
     return versions, locations
 
 
-def short_release_version(version):
-    components = version.split(".")
-    try:
-        return components[0] + "." + components[1]
-    except IndexError:
-        print("Invalid release version \"%s\"" % version, file=sys.stderr)
-        exit(1)
-
-
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--packages-dir", required=True, help="Packages directory")
@@ -332,7 +332,6 @@ def main():
     platform, arch, box = parse_target(args.target)
 
     version_overrides, location_overrides = parse_overrides(args.overrides)
-    release_version = short_release_version(args.release_version)
     options = parse_options(args.options)
 
     syncher = RdepSyncher(args.packages_dir)
@@ -343,7 +342,7 @@ def main():
     syncher.versions = determine_package_versions(
         platform,
         box,
-        release_version,
+        args.release_version,
         customization=args.customization,
         debug=args.debug
     )
@@ -351,7 +350,7 @@ def main():
     syncher.locations = location_overrides
     syncher.use_local = args.use_local
 
-    sync_dependencies(syncher, platform, arch, box, release_version, options)
+    sync_dependencies(syncher, platform, arch, box, args.release_version, options)
 
     syncher.generate_cmake_include(args.cmake_include_file)
 

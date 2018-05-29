@@ -1,5 +1,4 @@
-from pylru import lrudecorator
-
+from framework.method_caching import cached_getter
 from ._cim_query import CIMQuery
 
 
@@ -8,25 +7,25 @@ class Users(object):
         # TODO: Work via WinRM in this class.
         self.protocol = protocol
 
-    @lrudecorator(1)
+    @cached_getter
     def all_profiles(self):
         query = CIMQuery(self.protocol, 'Win32_UserProfile', {})
         profiles = list(query.enumerate())
         return profiles
 
-    @lrudecorator(1)
     def profile_by_sid(self, sid):
         selectors = {'SID': sid}
         query = CIMQuery(self.protocol, 'Win32_UserProfile', selectors)
         profile = query.get_one()
         return profile
 
+    @cached_getter
     def system_profile(self):
         # See: https://support.microsoft.com/en-us/help/243330
         system_user_sid = 'S-1-5-18'
         return self.profile_by_sid(system_user_sid)
 
-    @lrudecorator(1)
+    @cached_getter
     def all_accounts(self):
         query = CIMQuery(self.protocol, 'Win32_UserAccount', {})
         accounts = list(query.enumerate())

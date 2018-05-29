@@ -2,8 +2,8 @@ import datetime
 import timeit
 
 import pytz
-from pylru import lrudecorator
 
+from framework.method_caching import cached_property
 from framework.networking.linux import LinuxNetworking
 from framework.os_access.os_access_interface import OSAccess
 from framework.os_access.posix_shell import SSH
@@ -22,8 +22,7 @@ class SSHAccess(OSAccess):
     def forwarded_ports(self):
         return self._forwarded_ports
 
-    @property
-    @lrudecorator(100)
+    @cached_property
     def Path(self):
         return make_ssh_path_cls(self.ssh)
 
@@ -33,8 +32,7 @@ class SSHAccess(OSAccess):
     def is_accessible(self):
         return self.ssh.is_working()
 
-    @property
-    @lrudecorator(1)
+    @cached_property
     def networking(self):
         return LinuxNetworking(self.ssh, self._macs)
 
