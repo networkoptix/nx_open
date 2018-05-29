@@ -11,6 +11,7 @@ import csv
 import datetime
 import hashlib
 import json
+import json as json_module
 import logging
 from pprint import pformat
 
@@ -82,6 +83,7 @@ class _RestApiProxy(object):
     # noinspection PyPep8Naming
     def GET(self, timeout=None, headers=None, **kw):
         params = {name: _to_get_param(value) for name, value in kw.items()}
+        log.debug('GET params:\n%s', pformat(params, indent=4))
         return self._api.request('GET', self._path, timeout=timeout, headers=headers, params=params)
 
     # noinspection PyPep8Naming
@@ -89,6 +91,7 @@ class _RestApiProxy(object):
         if kw:
             assert not json, 'kw and json arguments are mutually exclusive - only one may be used at a time'
             json = kw
+        log.debug('JSON payload:\n%s', json_module.dumps(json, indent=4))
         return self._api.request('POST', self._path, timeout=timeout, headers=headers, json=json)
 
 
