@@ -152,7 +152,6 @@ Check For Alert Dismissable
     Click Element    ${ALERT CLOSE}
     Wait Until Page Does Not Contain Element    ${ALERT}
 
-
 Verify In System
     [arguments]    ${system name}
     Wait Until Element Is Visible    //h1[@ng-if='gettingSystem.success' and contains(text(), '${system name}')]

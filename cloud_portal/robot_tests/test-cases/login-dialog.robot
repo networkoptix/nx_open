@@ -30,23 +30,22 @@ can be opened in anonymous state
     Wait Until Element Is Visible    ${LOG IN MODAL}
 
 can be closed after clicking on background
+    [tags]    not-ready
     Wait Until Element Is Visible    ${LOG IN NAV BAR}
     Click Link    ${LOG IN NAV BAR}
-    Wait Until Elements Are Visible    ${LOG IN MODAL}    //ngb-modal-backdrop    ${LOG IN BUTTON}    ${EMAIL INPUT}    ${PASSWORD INPUT}
-    Click Element At Coordinates    //ngb-modal-backdrop    10    10
+    Wait Until Elements Are Visible    ${LOG IN MODAL}    ${BACKDROP}    ${LOG IN BUTTON}    ${EMAIL INPUT}    ${PASSWORD INPUT}
+    Click Element At Coordinates    //ngb-modal-backdrop    100    100
     Wait Until Page Does Not Contain Element    ${LOG IN MODAL}
     Page Should Not Contain Element    ${LOG IN MODAL}
 
 allows to log in with existing credentials and to log out
     Log In    ${email}    ${password}
     Validate Log In
-    Wait Until Element Is Visible    ${ACCOUNT DROPDOWN}
-    Click Element    ${ACCOUNT DROPDOWN}
-    Wait Until Element Is Visible    ${LOG OUT BUTTON}
-    Click Link    ${LOG OUT BUTTON}
-    Wait Until Element Is Visible    ${LOG IN NAV BAR}
+    Log Out
+    Validate Log Out
 
 redirects to systems after log In
+    [tags]    not-ready
     Log In    ${email}    ${password}
     Validate Log In
     Wait Until Element Is Visible    ${ACCOUNT DROPDOWN}
@@ -58,10 +57,6 @@ after log In, display user's email and menu in top right corner
     Validate Log In
     Wait Until Element Is Visible    ${ACCOUNT DROPDOWN}
     Element Text Should Be    ${ACCOUNT DROPDOWN}    ${email}
-
-valid but unregistered email shows error message
-    Log In    ${EMAIL UNREGISTERED}    ${password}
-    Wait Until Element Is Visible    ${ALERT}
 
 allows log in with existing email in uppercase
     ${email uppercase}    Convert To Uppercase    ${email}
@@ -98,7 +93,7 @@ passes email from email input to Restore password page, even without clicking 'L
     Wait Until Element Is Visible    ${RESTORE PASSWORD EMAIL INPUT}
     Textfield Should Contain    ${RESTORE PASSWORD EMAIL INPUT}    ${email}
 
-redirects to /activate and shows non-activated user message when not activated; Resend activation button sends email
+shows non-activated user message when not activated at login; Resend activation button sends email
     [tags]    email
     Go To    ${url}/register
     ${random email}    get random email    ${BASE EMAIL}
@@ -106,9 +101,8 @@ redirects to /activate and shows non-activated user message when not activated; 
     Wait Until Element Is Visible    //h1[contains(@class,'process-success')]
     Log In    ${random email}    ${BASE PASSWORD}
     Wait Until Element Is Visible    ${RESEND ACTIVATION LINK BUTTON}
-    Location Should Be    ${url}/activate
     Validate Register Email Received    ${random email}
-    Click Button    ${RESEND ACTIVATION LINK BUTTON}
+    Click Link    ${RESEND ACTIVATION LINK BUTTON}
     Validate Register Email Received    ${random email}
 
 displays password masked
@@ -210,6 +204,6 @@ handles two tabs, updates second tab state if logout is done on first
     Validate Log Out
     ${tabs}    Get Window Handles
     Select Window    @{tabs}[1]
-    Location Should Be    ${url}/systems
+    Location Should Be    ${url}/content/eula
     Reload Page
     Validate Log Out

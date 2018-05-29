@@ -5,7 +5,7 @@
     "RESET EMAIL SENT MESSAGE TEXT"        :    "Password reset instructions are sent to Email %email%",
     "CREATE ACCOUNT BUTTON TEXT"           :    "Create Account",
     "TERMS AND CONDITIONS LINK TEXT"       :    "Terms and Conditions",
-    "RESEND ACTIVATION LINK BUTTON TEXT"   :    "Resend activation link",
+    "RESEND ACTIVATION LINK BUTTON TEXT"   :    "Resend activation email",
 
     "SYSTEM NO ACCESS TEXT"                :    "Failed to access System",
     "DISCONNECT MODAL WARNING TEXT"        :    "You are about to disconnect this System from your account. You will not be able to access this System anymore. Are you sure?",
@@ -24,7 +24,7 @@
     "CANNOT SAVE PASSWORD"                 :    "Cannot save password:",
     "PASSWORD INCORRECT"                   :    "Current password is incorrect.",
     "WRONG PASSWORD"                       :    "Wrong password",
-    "ACCOUNT DOES NOT EXIST"               :    "Account does not exist.",
+    "ACCOUNT NOT FOUND TEXT"               :    "Account not found",
     "CANNOT SEND CONFIRMATION EMAIL"       :    "Cannot send confirmation Email:",
     "CODE USED/INCORRECT"                  :    "Confirmation code is already used or incorrect",
 

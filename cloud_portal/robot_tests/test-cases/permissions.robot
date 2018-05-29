@@ -2,7 +2,7 @@
 Resource          ../resource.robot
 Resource          ../variables.robot
 Test Setup        Restart
-Test Teardown     Run Keyword If Test Failed    Reset DB and Open New Browser On Failure
+#Test Teardown     Run Keyword If Test Failed    Reset DB and Open New Browser On Failure
 Suite Setup       Open Browser and go to URL    ${url}
 Suite Teardown    Close All Browsers
 Force Tags        System
@@ -88,18 +88,19 @@ After closing dialog, called by link - clear link
 
 #Check Background Click
     Go To    ${location}/share
-    Wait Until Elements Are Visible    ${SHARE MODAL}    //div[@uib-modal-window="modal-window"]
-    Click Element At Coordinates    //div[@uib-modal-window="modal-window"]    50    50
+    Wait Until Elements Are Visible    ${SHARE MODAL}    ${BACKDROP}
+    Click Element At Coordinates    ${BACKDROP}    50    50
     Wait Until Page Does Not Contain Element    ${SHARE MODAL}
     Location Should Be    ${location}
 
 Sharing roles are ordered: more access is on top of the list with options
     Log in to Auto Tests System    ${email}
     Wait Until Element Is Visible    ${SHARE BUTTON SYSTEMS}
+    Sleep    2
     Click Button    ${SHARE BUTTON SYSTEMS}
     Wait Until Element Is Visible    ${SHARE PERMISSIONS DROPDOWN}
     Click Element    ${SHARE PERMISSIONS DROPDOWN}
-    Element Text Should Be    ${SHARE PERMISSIONS DROPDOWN}    ${ADMIN TEXT}\n${ADV VIEWER TEXT}\n${VIEWER TEXT}\n${LIVE VIEWER TEXT}\n${CUSTOM TEXT}
+    Wait Until Element Is Visible    ${SHARE MODAL}//nx-permissions-select//button/span[text()='${ADMIN TEXT}']/../following-sibling::button/span[text()='${ADV VIEWER TEXT}']/../following-sibling::button/span[text()='${VIEWER TEXT}']/../following-sibling::button/span[text()='${LIVE VIEWER TEXT}']/../following-sibling::button/span[text()='${CUSTOM TEXT}']
     Click Button    ${SHARE CLOSE}
     Wait Until Page Does Not Contain Element    ${SHARE MODAL}
 

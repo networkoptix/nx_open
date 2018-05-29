@@ -14,21 +14,20 @@ ${good email unregistered}      ${EMAIL UNREGISTERED}
 ${good password}                ${BASE PASSWORD}
 ${bad password}                 adrhartjad
 
-*** Test Cases ***            EMAIL                         PASS                EXPECTED
-Invalid Email 1               noptixqagmail.com             ${good password}    outline
-Invalid Email 2               @gmail.com                    ${good password}    outline
-Invalid Email 3               noptixqa@gmail..com           ${good password}    outline
-Invalid Email 4               noptixqa@192.168.1.1.0        ${good password}    outline
-Invalid Email 5               noptixqa.@gmail.com           ${good password}    outline
-Invalid Email 6               noptixq..a@gmail.c            ${good password}    outline
-Invalid Email 7               noptixqa@-gmail.com           ${good password}    outline
-Invalid Password              ${good email}                 ${bad password}     alert
-Invalid Email and Password    noptixqagmail.com             ${bad password}     outline
-Valid Email Unregistered      ${good email unregistered}    ${good password}    alert
-Empty Email                   ${EMPTY}                      ${good password}    outline
-Empty Password                ${good email}                 ${EMPTY}            outline
-Empty Email and Password      ${EMPTY}                      ${EMPTY}            outline
-Valid Email and password      ${good email}                 ${good password}    neither
+*** Test Cases ***            EMAIL                         PASS
+Empty Email                   ${EMPTY}                      ${good password}
+Empty Password                ${good email}                 ${EMPTY}
+Empty Email and Password      ${EMPTY}                      ${EMPTY}
+Invalid Email 1               noptixqagmail.com             ${good password}
+Invalid Email 2               @gmail.com                    ${good password}
+Invalid Email 3               noptixqa@gmail..com           ${good password}
+Invalid Email 4               noptixqa@192.168.1.1.0        ${good password}
+Invalid Email 5               noptixqa.@gmail.com           ${good password}
+Invalid Email 6               noptixq..a@gmail.c            ${good password}
+Invalid Email 7               noptixqa@-gmail.com           ${good password}
+Invalid Password              ${good email}                 ${bad password}
+Invalid Email and Password    noptixqagmail.com             ${bad password}
+Valid Email Unregistered      ${good email unregistered}    ${good password}
 
 *** Keywords ***
 Restart
@@ -42,16 +41,15 @@ Open Log In Dialog
     Wait Until Elements Are Visible    ${EMAIL INPUT}    ${PASSWORD INPUT}    ${LOG IN BUTTON}
 
 Test Login Invalid
-    [Arguments]    ${email}    ${pass}    ${expected}
+    [Arguments]    ${email}    ${pass}
     Log In Form Validation    ${email}    ${pass}
-    Run Keyword If    "${expected}" == "outline"    Outline Error    ${email}    ${pass}
-    Run Keyword If    "${expected}" == "alert"    Alert Error    ${email}    ${pass}
-    Run Keyword If    "${expected}" == "neither"    Validate Login
+    Outline Error    ${email}    ${pass}
 
 Log In Form Validation
     [Arguments]    ${email}    ${pass}
     Input Text    ${EMAIL INPUT}    ${email}
     Input Text    ${PASSWORD INPUT}    ${pass}
+    Click Element    ${BACKDROP}
     click button    ${LOG IN BUTTON}
 
 Outline Error
@@ -59,15 +57,10 @@ Outline Error
     Run Keyword If    "${pass}" == "${EMPTY}"    Check Password Outline
     Run Keyword Unless    "${email}" == "${good email}" or "${email}" == "${good email unregistered}"    Check Email Outline
 
-Alert Error
-    [arguments]    ${email}    ${pass}
-    Run Keyword If    "${email}" == "${good email unregistered}"    Check For Alert    ${ACCOUNT DOES NOT EXIST}
-    Run Keyword If    "${pass}" == "${bad password}"    Check For Alert    ${WRONG PASSWORD}
-
 Check Email Outline
-    ${class}    Get Element Attribute    ${EMAIL INPUT}/..    class
-    Should Contain    ${class}    has-error
+    ${class}    Get Element Attribute    ${EMAIL INPUT}    class
+    Should Contain    ${class}    ng-invalid
 
 Check Password Outline
-    ${class}    Get Element Attribute    ${PASSWORD INPUT}/..    class
-    Should Contain    ${class}    has-error
+    ${class}    Get Element Attribute    ${PASSWORD INPUT}    class
+    Should Contain    ${class}    ng-invalid
