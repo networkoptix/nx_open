@@ -120,7 +120,7 @@ class ContentVersionAdmin(CMSAdmin):
     readonly_fields = ('created_by', 'accepted_by',)
 
     def content_version_actions(self, obj):
-        return format_html('<button class="btn btn-sm btn-info"> <a href="{}">review version</a></button>',
+        return format_html('<button class="btn btn-sm btn-info"> <a href="{}">review</a></button>',
                            reverse('version', args=[obj.id]))
 
     def get_queryset(self, request):  # show only users for current customization
