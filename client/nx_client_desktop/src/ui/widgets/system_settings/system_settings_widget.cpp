@@ -25,7 +25,9 @@ QnSystemSettingsWidget::QnSystemSettingsWidget(QWidget *parent):
     ui->statisticsReportHint->addHintLine(tr("Includes information about system, such as cameras models and firmware versions, number of servers, etc."));
     ui->statisticsReportHint->addHintLine(tr("Does not include any personal information and is completely anonymous."));
     setHelpTopic(ui->statisticsReportHint, Qn::SystemSettings_General_AnonymousUsage_Help);
+
     ui->auditTrailHint->setHint(tr("Tracks and logs all user actions."));
+    setHelpTopic(ui->auditTrailHint, Qn::AuditTrail_Help);
 
     setWarningStyle(ui->settingsWarningLabel);
 
