@@ -39,6 +39,7 @@ void fetchFromCameras(
     std::function<Data(const Camera&)> getter)
 {
     Data data;
+    value.resetBase();
     if (utils::algorithm::same(cameras.cbegin(), cameras.cend(), getter, &data))
         value.setBase(data);
 }
@@ -51,6 +52,7 @@ void fetchFromCameras(
     std::function<Data(const Intermediate&)> converter)
 {
     Intermediate data;
+    value.resetBase();
     if (utils::algorithm::same(cameras.cbegin(), cameras.cend(), getter, &data))
         value.setBase(converter(data));
 }
@@ -452,6 +454,8 @@ State CameraSettingsDialogStateReducer::loadCameras(
         ? Camera()
         : cameras.first();
 
+    // TODO: #vkutin #gdm Separate camera-dependent state from camera-independent state.
+    // Reset camera-dependent state with a single call.
     state.hasChanges = false;
     state.singleCameraProperties = {};
     state.singleCameraSettings = {};
@@ -461,6 +465,7 @@ State CameraSettingsDialogStateReducer::loadCameras(
     state.recording = {};
     state.wearableMotion = {};
     state.devicesCount = cameras.size();
+    state.audioEnabled = {};
     state.alert = {};
 
     state.deviceType = firstCamera
