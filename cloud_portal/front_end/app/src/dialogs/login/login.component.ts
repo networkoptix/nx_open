@@ -72,7 +72,6 @@ export class LoginModalContent implements OnInit, AfterViewInit {
     }
 
     ngOnInit() {
-        this.auth.email = '';
         this.auth.password = '';
 
         this.login = this.process.init(() => {
