@@ -18,7 +18,7 @@
                    [(ngModel)]="user.email"
                    id="email"
                    name="email"
-                   validate-email maxlength="255"
+                   pattern="{{ configService.config.emailRegex }}" maxlength="255"
                    required autofocus>
 
             <input type="text" *ngIf="!isNewShare" name="email" id="lockedEmail"
