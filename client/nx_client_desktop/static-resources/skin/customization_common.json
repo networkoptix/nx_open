@@ -840,17 +840,13 @@
         "palette": {
             "_1": "selected",
             "active": {
-                "window": "dark5",
                 "dark": "dark5",
-                "midlight": "dark5",
                 "shadow": "dark4",
-                "windowText": "light10",
-                "text": "light10"
+                "windowText": "light10"
             },
             "_2": "not selected",
             "inactive": {
                 "window": "dark10",
-                "dark": "dark6",
                 "shadow": "transparent",
                 "midlight": "dark11",
                 "windowText": "light14",

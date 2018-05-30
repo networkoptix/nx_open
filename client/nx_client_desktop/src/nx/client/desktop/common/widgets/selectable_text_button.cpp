@@ -300,6 +300,7 @@ void SelectableTextButton::paintEvent(QPaintEvent* /*event*/)
     auto rect = this->rect();
     const bool hovered = isEnabled() && !isDown()
         && (underMouse() || (d->deactivateButton && d->deactivateButton->underMouse()));
+
     if (d->state != State::deactivated)
     {
         if (d->state == State::selected)
@@ -345,7 +346,7 @@ void SelectableTextButton::paintEvent(QPaintEvent* /*event*/)
 
         const auto iconMode = d->state == State::deactivated
             ? (hovered ? QIcon::Active : QIcon::Normal)
-            : (d->blue ? QIcon::Selected : QIcon::Normal);
+            : ((d->blue && d->state != State::selected) ? QIcon::Selected : QIcon::Normal);
 
         const auto iconState = d->state == State::selected
             ? QIcon::On
