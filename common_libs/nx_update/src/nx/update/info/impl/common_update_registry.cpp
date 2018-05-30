@@ -1044,20 +1044,28 @@ void CommonUpdateRegistry::merge(AbstractUpdateRegistry* other)
         return;
 
     bool hasNewVersions = false;
-    for (const auto& customizationData: m_metaData.customizationDataList)
+    if (m_metaData.customizationDataList.isEmpty()
+        && !otherCommonUpdateRegistry->m_metaData.customizationDataList.isEmpty())
     {
-        for (const auto& otherCustomizationData:
-            otherCommonUpdateRegistry->m_metaData.customizationDataList)
+        hasNewVersions = true;
+    }
+    else
+    {
+        for (const auto& customizationData: m_metaData.customizationDataList)
         {
-            if (otherCustomizationData.name == customizationData.name
-                && otherCustomizationData.versions.last() > customizationData.versions.last())
+            for (const auto& otherCustomizationData:
+                otherCommonUpdateRegistry->m_metaData.customizationDataList)
             {
-                hasNewVersions = true;
-                break;
+                if (otherCustomizationData.name == customizationData.name
+                    && otherCustomizationData.versions.last() > customizationData.versions.last())
+                {
+                    hasNewVersions = true;
+                    break;
+                }
             }
+            if (hasNewVersions)
+                break;
         }
-        if (hasNewVersions)
-            break;
     }
 
     if (hasNewVersions)
