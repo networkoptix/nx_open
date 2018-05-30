@@ -147,6 +147,14 @@ void CameraScheduleWidget::setupUi()
         tr("Recording Schedule")).arg(
             tr("based on server time")));
 
+    installEventHandler(ui->scrollAreaWidgetContents, QEvent::Resize, this,
+        [this]()
+        {
+            // Since external scroll bar is used it shouldn't be added to minimum width.
+            ui->scrollArea->setMinimumWidth(
+                ui->scrollAreaWidgetContents->minimumSizeHint().width());
+        });
+
     //TODO: #dkargin Restore hints.
     /*
     auto settingsHint = nx::client::desktop::HintButton::hintThat(ui->settingsGroupBox);
