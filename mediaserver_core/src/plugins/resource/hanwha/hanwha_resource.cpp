@@ -411,6 +411,20 @@ std::set<int> findProfilesToRemove(
     return result;
 };
 
+bool isPropertyBelongsToChannel(const QString& fullPropertyName, int channel)
+{
+    const auto split = fullPropertyName.split(L'.', QString::SplitBehavior::SkipEmptyParts);
+    if (split.size() < 2 || split[0].trimmed() != kHanwhaChannelProperty)
+        return false;
+
+    bool success = false;
+    const auto propertyChannel = split[1].toInt(&success);
+    if (!success)
+        return false;
+
+    return propertyChannel == channel;
+}
+
 } // namespace
 
 HanwhaResource::~HanwhaResource()
@@ -1084,8 +1098,10 @@ CameraDiagnostics::Result HanwhaResource::initMedia()
         const auto channelPrefix = kHanwhaChannelPropertyTemplate.arg(channel);
         for (const auto& entry: videoProfiles->response())
         {
-            const bool isFixedProfile = entry.first.startsWith(channelPrefix)
-                && entry.first.endsWith(kHanwhaIsFixedProfileProperty)
+            if(!isPropertyBelongsToChannel(entry.first, channel))
+                continue;
+
+            const bool isFixedProfile = entry.first.endsWith(kHanwhaIsFixedProfileProperty)
                 && entry.second == kHanwhaTrue;
 
             if (isFixedProfile)
