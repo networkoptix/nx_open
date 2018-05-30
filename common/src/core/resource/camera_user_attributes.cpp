@@ -23,19 +23,19 @@ QnCameraUserAttributes::QnCameraUserAttributes()
 {
 }
 
-void QnCameraUserAttributes::assign( const QnCameraUserAttributes& right, QSet<QByteArray>* const modifiedFields )
+void QnCameraUserAttributes::assign(const QnCameraUserAttributes& right, QSet<QByteArray>* const modifiedFields)
 {
-    if( name != right.name )
+    if (name != right.name)
         *modifiedFields << "nameChanged";
-    if( groupName != right.groupName )
+    if (groupName != right.groupName)
         *modifiedFields << "groupNameChanged";
-    if( dewarpingParams != right.dewarpingParams )
+    if (dewarpingParams != right.dewarpingParams)
         *modifiedFields << "mediaDewarpingParamsChanged";
-    if( scheduleDisabled != right.scheduleDisabled )
+    if (scheduleDisabled != right.scheduleDisabled)
         *modifiedFields << "scheduleDisabledChanged";
-    if( scheduleTasks != right.scheduleTasks )
+    if (scheduleTasks != right.scheduleTasks)
         *modifiedFields << "scheduleTasksChanged";
-    if( motionRegions != right.motionRegions )
+    if (motionRegions != right.motionRegions)
         *modifiedFields << "motionRegionChanged";
     if (licenseUsed != right.licenseUsed)
         *modifiedFields << "licenseUsedChanged";
@@ -43,6 +43,7 @@ void QnCameraUserAttributes::assign( const QnCameraUserAttributes& right, QSet<Q
         *modifiedFields << "failoverPriorityChanged";
     if (backupQualities != right.backupQualities)
         *modifiedFields << "backupQualitiesChanged";
-
+    if (logicalId != right.logicalId)
+        *modifiedFields << "logicalIdChanged";
     *this = right;
 }

@@ -47,7 +47,7 @@ public:
     void unregisterCamera(int cameraLogicalId);
 
 private:
-    void onSerialReceived();
+    void onDataReceived();
     void tuneSerialPort();
 
 private:
@@ -57,8 +57,11 @@ private:
     AnalyticsEventType resetEventType;
 
     QSerialPort m_serialPort;
-    QMap<int, Manager*> m_managerMap;
-    QMutex m_managerMapMutex;
+    QByteArray m_receivedData;
+
+    QMap<int /*camera logical id*/, Manager*> m_cameraMap;
+    QSet<int /*camera logical id*/> m_activeCameras;
+    QMutex m_cameraMutex;
 };
 
 } // namespace ssc

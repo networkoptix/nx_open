@@ -132,6 +132,10 @@ void ManagerPool::at_resourceAdded(const QnResourcePtr& resource)
         this, &ManagerPool::handleResourceChanges);
 
     connect(
+        resource.data(), &QnResource::logicalIdChanged,
+        this, &ManagerPool::handleResourceChanges);
+
+    connect(
         resource.data(), &QnResource::propertyChanged,
         this, &ManagerPool::at_propertyChanged);
 
@@ -653,7 +657,7 @@ bool ManagerPool::cameraInfoFromResource(
     outResourceInfo->channel = camera->getChannel();
 
     // If getLogicalId() returns incorrect number, logicalId is set to 0.
-    outResourceInfo->logicalId = atoi(camera->getLogicalId().toStdString().c_str());
+    outResourceInfo->logicalId = camera->getLogicalId().toInt();
 
     return true;
 }

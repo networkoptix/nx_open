@@ -39,22 +39,22 @@ QString normalize(const QString& name)
     return result;
 }
 
-void logReceivedCommand(const QByteArray& data)
+void logReceivedCommand(const QByteArray& receivedData)
 {
-    NX_ASSERT(data.size() >= kCommandLength);
+    NX_ASSERT(receivedData.size() >= kCommandLength);
     std::stringstream tempStream;
     for (int i = 0; i < kCommandLength; ++i)
-        tempStream << std::hex << "0x" << std::setfill('0') << std::setw(2) << int(data[i]) << " ";
+        tempStream << std::hex << "0x" << std::setfill('0') << std::setw(2) << int(receivedData[i]) << " ";
     NX_PRINT << "Bytes received via serial port: "<< tempStream.str();
 }
 
-int extractLogicalId(const QByteArray& data)
+int extractLogicalId(const QByteArray& receivedData)
 {
-    return (data[1] - kMinDigitCode) * 10 + (data[2] - kMinDigitCode);
+    return (receivedData[1] - kMinDigitCode) * 10 + (receivedData[2] - kMinDigitCode);
 };
-bool isCorrectCommand(const QByteArray& data)
+bool isCorrectCommand(const QByteArray& receivedData)
 {
-    return data[0] == kSTX || data[3] == kETX;
+    return receivedData[0] == kSTX || receivedData[3] == kETX;
 };
 bool isCorrectLogicalId(int cameraLogicalId)
 {
@@ -70,8 +70,8 @@ Plugin::Plugin():m_serialPort(this)
 {
     static const char* const kResourceName=":/ssc/manifest.json";
     static const char* const kFileName = "plugins/ssc/manifest.json";
-    static const QString kCameraInternalName = "camera";
-    static const QString kResetInternalName = "reset";
+    static const QString kCameraSpecifyCommandInternalName = "camera specify command";
+    static const QString kResetCommandInternalName = "reset command";
 
     QFile f(kResourceName);
     if (f.open(QFile::ReadOnly))
@@ -93,9 +93,9 @@ Plugin::Plugin():m_serialPort(this)
 
     for (const auto& eventType: m_typedManifest.outputEventTypes)
     {
-        if (eventType.internalName == kCameraInternalName)
+        if (eventType.internalName == kCameraSpecifyCommandInternalName)
             cameraEventType = eventType;
-        else if (eventType.internalName == kResetInternalName)
+        else if (eventType.internalName == kResetCommandInternalName)
             resetEventType = eventType;
     }
 
@@ -119,7 +119,7 @@ void Plugin::tuneSerialPort()
         NX_PRINT << "Serial port. Failed to set 1 stop bit";
 
     QMetaObject::Connection connection =
-        connect(&m_serialPort, &QSerialPort::readyRead, this, &Plugin::onSerialReceived);
+        connect(&m_serialPort, &QSerialPort::readyRead, this, &Plugin::onDataReceived);
 
 }
 
@@ -174,62 +174,71 @@ void Plugin::setLocale(const char* /*locale*/)
 {
 }
 
-void Plugin::onSerialReceived()
+void Plugin::onDataReceived()
 {
     static const int kResetId = extractLogicalId(QByteArray(kResetCommand));
 
-    QByteArray data = m_serialPort.readAll();
+    m_receivedData += m_serialPort.readAll();
 
-    QMutexLocker locker(&m_managerMapMutex);
+    QMutexLocker locker(&m_cameraMutex);
 
-    while (data.size() >= kCommandLength)
+    while (m_receivedData.size() >= kCommandLength)
     {
-        logReceivedCommand(data);
-        if(!isCorrectCommand(data))
+        logReceivedCommand(m_receivedData);
+        if(!isCorrectCommand(m_receivedData))
             NX_PRINT << "bad command";
-        int cameraLogicalId = extractLogicalId(data);
+        int cameraLogicalId = extractLogicalId(m_receivedData);
         if (cameraLogicalId == kResetId)
         {
-            for (auto& manager: m_managerMap)
+            for (int cameraLogicalId: m_activeCameras)
             {
-                manager->sendEventPacket(resetEventType);
+                auto it = m_cameraMap.find(cameraLogicalId);
+                if (it != m_cameraMap.end())
+                    it.value()->sendEventPacket(resetEventType);
             }
+            m_activeCameras.clear();
         }
         else if (isCorrectLogicalId(cameraLogicalId))
         {
-            auto it = m_managerMap.find(cameraLogicalId);
-            if (it != m_managerMap.end())
+            auto it = m_cameraMap.find(cameraLogicalId);
+            if (it != m_cameraMap.end())
+            {
+                m_activeCameras << cameraLogicalId;
                 it.value()->sendEventPacket(cameraEventType);
+            }
             else
+            {
                 NX_PRINT << "corresponding manager is not fetching metadata";
+            }
         }
         else
         {
             NX_PRINT << "incorrect data in command";
         }
-        data.remove(0, kCommandLength);
+        m_receivedData.remove(0, kCommandLength);
     }
 }
 
 void Plugin::registerCamera(int cameraLogicalId, Manager* manager)
 {
-    QMutexLocker locker(&m_managerMapMutex);
-    m_managerMap.insert(cameraLogicalId, manager);
+    QMutexLocker locker(&m_cameraMutex);
+    m_cameraMap.insert(cameraLogicalId, manager);
 }
 
 void Plugin::unregisterCamera(int cameraLogicalId)
 {
-    QMutexLocker locker(&m_managerMapMutex);
-    m_managerMap.remove(cameraLogicalId);
+    QMutexLocker locker(&m_cameraMutex);
+    m_cameraMap.remove(cameraLogicalId);
 }
 
 CameraManager* Plugin::obtainCameraManager(const CameraInfo& cameraInfo, Error* outError)
 {
 #if 0
-    // This is for test purposes. Should be deleted when clien fill cameraInfo.logicalId field.
+    // This is for test purposes. Should be deleted when client fills cameraInfo.logicalId field.
     if (true)
 #else
-    if (cameraInfo.logicalId != 0)
+    // We should invent more accurate test.
+    if (cameraInfo.logicalId >= 1 && cameraInfo.logicalId <=16)
 #endif
     {
         return new Manager(this, cameraInfo, m_typedManifest);

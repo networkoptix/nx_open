@@ -39,7 +39,6 @@ nx::sdk::metadata::CommonEventMetadataPacket* createCommonEventMetadataPacket(
     commonEvent->setEventTypeId(
         nx::mediaserver_plugins::utils::fromQnUuidToPluginGuid(event.eventTypeId));
     commonEvent->setDescription(event.eventName.value.toStdString());
-    commonEvent->setConfidence(1.0);
     commonEvent->setAuxilaryData(std::to_string(logicalId));
 
     packet->addEvent(commonEvent);
@@ -62,7 +61,7 @@ Manager::Manager(Plugin* plugin,
     m_cameraLogicalId = cameraInfo.logicalId;
 
 #if 0
-    // This is for test purposes. Should be deleted when clien fill cameraInfo.logicalId field.
+    // This is for test purposes. Should be deleted when client fills cameraInfo.logicalId field.
     if (QString(cameraInfo.model) == "DWC-MF21M4TIR")
         m_cameraLogicalId = 1;
     if (QString(cameraInfo.model) == "DWC-MTT4Wi36")

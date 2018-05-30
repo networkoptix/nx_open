@@ -10,7 +10,7 @@
 namespace nx {
 namespace mediaserver_plugins {
 namespace metadata {
-namespace ssc {
+namespace ssc { //< SSC = Self Service Console
 
 /** Description of the SSC analytics event. */
 struct AnalyticsEventType: nx::api::Analytics::EventType

@@ -12,13 +12,13 @@
             "eventTypeId": "1558bdc5-3440-454e-93ed-0b34a05fedef",
             "eventName": { "value": "gas gun is picked up", "localization": {} },
             "flags": "noFlags",
-            "internalName": "camera"
+            "internalName": "camera specify command"
         },
         {
             "eventTypeId": "e7ec745c-2ea3-43b6-9ea7-8108f47563f5",
             "eventName": { "value": "gas gun is hanged down", "localization": {} },
             "flags": "noFlags",
-            "internalName": "reset"
+            "internalName": "reset command"
         }
     ]
 }
