@@ -1,0 +1,23 @@
+#!/bin/sh
+
+# https://appventure.me/2016/04/04/prevent-accidental-test-code-commits/
+
+# Add this to ./hgrc file
+# ------------------------
+# [hooks]
+# precommit = ~/develop/nx_vms/cloud_portal/hooks/pre-commit
+# ------------------------
+
+# The special marker tag to mark things which we still need to change
+marker="console.log"
+
+# Redirect output to stderr.
+exec 1>&2
+
+if test $(hg diff -S | grep -v '^-' | (! egrep '(var_dump)|(exit)|(print_r)|(console.log)') | wc -c) != 0
+then
+    cat <<\EOF
+    Error: Still has invalid debug markers in code
+EOF
+    exit 1
+fi
