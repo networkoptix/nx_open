@@ -3879,7 +3879,7 @@ to %1</source>
     </message>
     <message>
       <source>Changing any LDAP settings other than &quot;Search Filter&quot; will result in connectivity loss for all LDAP fetched users.</source>
-      <translation type="unfinished">Changing any LDAP settings other than &quot;Search Filter&quot; will result in connectivity loss for all LDAP fetched users.</translation>
+      <translation>Als u andere LDAP-instellingen dan &quot;Zoekfilter&quot; wijzigt, leidt dit tot problemen met de verbinding voor alle LDAP gebruikers.</translation>
     </message>
   </context>
   <context>
@@ -6408,12 +6408,8 @@ to %1</source>
       <translation>Opname is ingeschakeld op de USB-opslag</translation>
     </message>
     <message>
-      <source>Backup includes servers and cameras settings, users, webpages, event rules, etc. Video is not saved.</source>
-      <translation>De back-up omvat server- en camerainstellingen, gebruikers, webpagina's, gebeurtenisregels, etc. Video data wordt niet opgeslagen.</translation>
-    </message>
-    <message>
-      <source>Creates a backup of System configuration that can be restored in case of failure.</source>
-      <translation>Creëert een back-up van de systeemconfiguratie om het systeem te kunnnen herstellen in geval van een storing.</translation>
+      <source>Reindexing can fix problems with archive or backup if they have been lost or damaged, or if some hardware has been replaced.</source>
+      <translation>Door opnieuw te indexeren kunnen problemen met het archief of de back-up worden opgelost als deze verloren of beschadigd zijn geraakt of als er hardware is vervangen.</translation>
     </message>
   </context>
   <context>
@@ -8520,6 +8516,10 @@ to %1</source>
       <source>Event will trigger only if there are matches in the caption with any of the entered keywords.</source>
       <translation>De gebeurtenis wordt alleen geactiveerd als er overeenkomsten zijn in de titel met één van de gekozen trefwoorden.</translation>
     </message>
+    <message>
+      <source>This field is case sensitive.</source>
+      <translation>Dit veld is hoofdlettergevoelig.</translation>
+    </message>
   </context>
   <context>
     <name>nx::client::desktop::ui::ClipboardButton</name>
@@ -8880,7 +8880,7 @@ to %1</source>
     </message>
     <message>
       <source>Warning! This build is for testing purposes only! Please upgrade to a next available patch or release version once available.</source>
-      <translation type="unfinished">Warning! This build is for testing purposes only! Please upgrade to a next available patch or release version once available.</translation>
+      <translation>Waarschuwing! Deze build is alleen voor testdoeleinden! Voer een upgrade uit naar een volgende beschikbare patch of release-versie zodra deze beschikbaar is.</translation>
     </message>
   </context>
   <context>

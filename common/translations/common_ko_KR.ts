@@ -504,13 +504,13 @@
     <message numerus="yes">
       <source>%n %2 are used out of %1.</source>
       <translation>
-        <numerusform>%n %2 는(은) %1에서 사용됩니다.</numerusform>
+        <numerusform>%n %2은 %1에 사용됩니다.</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n %2 will be used out of %1.</source>
       <translation>
-        <numerusform>%n %2 는(은) %1에서 사용될 것입니다.</numerusform>
+        <numerusform>%n %2 은 %1에서 사용될 것입니다.</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -579,7 +579,7 @@
     <message numerus="yes">
       <source>%n camera(s)</source>
       <translation>
-        <numerusform>%n 카메라 (들)</numerusform>
+        <numerusform>%n 카메라(들)</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -591,7 +591,7 @@
     <message numerus="yes">
       <source>%n device(s)</source>
       <translation>
-        <numerusform>%n 장치</numerusform>
+        <numerusform>%n 장치(들)</numerusform>
       </translation>
     </message>
     <message>
@@ -629,13 +629,13 @@
     <message numerus="yes">
       <source>%n I/O Module(s)</source>
       <translation>
-        <numerusform>%n I/O 모듈</numerusform>
+        <numerusform>%n I/O 장치(들)</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n I/O module(s)</source>
       <translation>
-        <numerusform>%n I/O 모듈</numerusform>
+        <numerusform>%n I/O 장치(들)</numerusform>
       </translation>
     </message>
     <message>
@@ -1156,7 +1156,7 @@
     <message numerus="yes">
       <source>Devices Disconnected</source>
       <translation>
-        <numerusform>장치 연결끊김</numerusform>
+        <numerusform>장치 연결이 끊어졌습니다</numerusform>
       </translation>
     </message>
     <message numerus="yes">
