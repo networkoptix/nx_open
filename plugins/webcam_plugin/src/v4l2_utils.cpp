@@ -2,6 +2,7 @@
 
 #include "v4l2_utils.h"
 
+#include <errno.h>
 #include <dirent.h>
 #include <sys/stat.h>
 #include <cstring>
@@ -130,7 +131,6 @@ std::vector<DeviceData> getDeviceList()
             return std::string(reinterpret_cast<char*> (deviceCapability.card));
         };
 
-
     std::vector<std::string> devicePaths = getDevicePaths();
     std::vector<DeviceData> deviceList;
     if (devicePaths.empty())
@@ -148,7 +148,6 @@ std::vector<DeviceData> getDeviceList()
         d.setDevicePath(devicePath);
         deviceList.push_back(d);
     }
-
     return deviceList;
 }
 
@@ -215,6 +214,25 @@ float getHighestFrameRate(
     return highestFrameRate;
 }
 
+int getBitrate(int fileDescriptor)
+{
+    // todo calculate a better default bitrate
+    int bitrate = 200000;
+    struct v4l2_ext_controls ecs;
+    struct v4l2_ext_control ec;
+    memset(&ecs, 0, sizeof(ecs));
+    memset(&ec, 0, sizeof(ec));
+    ec.id = V4L2_CID_MPEG_VIDEO_BITRATE;
+    ec.size = sizeof(ec.value);
+    ecs.controls = &ec;
+    ecs.count = 1;
+    ecs.ctrl_class = V4L2_CTRL_CLASS_MPEG;
+    if(ioctl(fileDescriptor, VIDIOC_G_EXT_CTRLS, &ecs) == 0)
+        bitrate = ec.value;
+
+    return bitrate;
+}
+
 std::vector<ResolutionData> getResolutionList(
     const char * devicePath,
     nxcip::CompressionType targetCodecID)
@@ -250,9 +268,7 @@ std::vector<ResolutionData> getResolutionList(
         resolutionData.resolution = getResolution(frameSizeEnum);
         resolutionData.maxFps =
             getHighestFrameRate(fileDescriptor, pixelFormat, resolutionData.resolution);
-
-        //todo get bitrate somehow
-        resolutionData.bitrate = 200000;
+        resolutionData.bitrate = getBitrate(fileDescriptor);
 
         resolutionList.push_back(resolutionData);
 
