@@ -44,6 +44,11 @@ _reraising_existing_dir_errors = _reraising({
 
 
 class LocalPath(PosixPath, FileSystemPath):
+    """Access local filesystem with unified interface (incl. exceptions)
+
+    Unlike SSHPath and SMBPath, there can be only one local file system,
+    therefore, this class is not to be inherited from.
+    """
     @classmethod
     def tmp(cls):
         temp_dir = cls('/tmp/func_tests')

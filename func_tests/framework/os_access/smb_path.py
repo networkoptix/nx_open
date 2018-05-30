@@ -89,6 +89,16 @@ class SMBConnectionPool(object):
 
 
 class SMBPath(FileSystemPath, PureWindowsPath):
+    """Base class for file system access through SMB (v2) protocol
+
+    It's the simplest way to integrate with `pathlib` and `pathlib2`.
+    When manipulating with paths, `pathlib` doesn't call neither
+    `__new__` nor `__init__`. The only information preserved is type.
+    That's why `SMB` credentials, ports and address are in class class,
+    not to object. This class is not on a module level, therefore,
+    it will be referenced by `WindowsAccess` object and by path objects
+    and will live until those objects live.
+    """
     __metaclass__ = ABCMeta
     _smb_connection_pool = abstractproperty()  # type: SMBConnectionPool
 

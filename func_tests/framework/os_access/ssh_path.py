@@ -33,6 +33,16 @@ def _raising_on_exit_status(exit_status_to_error_cls):
 
 
 class SSHPath(FileSystemPath, PurePosixPath):
+    """Base class for file system access through SSH
+
+    It's the simplest way to integrate with `pathlib` and `pathlib2`.
+    When manipulating with paths, `pathlib` doesn't call neither
+    `__new__` nor `__init__`. The only information preserved is type.
+    That's why `SSH` instance is bound to class, not to object.
+    This class is not on a module level, therefore,
+    it will be referenced by `SSHAccess` object and by path objects
+    and will live until those objects live.
+    """
     __metaclass__ = ABCMeta
     _ssh = abstractproperty()  # PurePath's manipulations can preserve only the type.
 
@@ -170,7 +180,11 @@ class SSHPath(FileSystemPath, PurePosixPath):
 
 
 def make_ssh_path_cls(ssh):
-    """Separate function to be used within SSHAccess and with ad-hoc SSH"""
+    """Separate function to be used within SSHAccess and with ad-hoc SSH
+
+    Look for explanation in SSHPath.__doc__.
+    """
+
     class SpecificSSHPath(SSHPath):
         _ssh = ssh
 
