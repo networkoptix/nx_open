@@ -2,7 +2,7 @@ from __future__ import unicode_literals
 from django.contrib import admin
 from django.urls import reverse
 from django.utils.html import format_html
-from models import *
+from .models import *
 from cloud import settings
 
 
@@ -37,7 +37,7 @@ class ProductAdmin(CMSAdmin):
     list_display_links = ('name',)
 
     def context_actions(self, obj):
-        return format_html('<button class="btn btn-sm btn-info"><a href="{}">settings</a></button>',
+        return format_html('<a class="btn btn-sm btn-info" href="{}">settings</a>',
                            reverse('product_settings', args=[obj.id]))
 
     context_actions.short_description = 'Admin Options'
@@ -56,18 +56,19 @@ class ContextAdmin(CMSAdmin):
     search_fields = ('name', 'description', 'url', 'product__name')
 
     def context_actions(self, obj):
-        return format_html('<button class="btn btn-sm btn-info"><a href="{}">edit content</a></button>',
+        return format_html('<a class="btn btn-sm btn-info" href="{}">edit content</a>',
                            reverse('page_editor', args=[obj.id]))
 
     def get_queryset(self, request):  # show only users for current customization
         qs = super(ContextAdmin, self).get_queryset(request)  # Basic check from CMSAdmin
         if not request.user.is_superuser:
-            qs = qs.filter(hidden=False)  ## only superuser sees hidden contexts
+            qs = qs.filter(hidden=False)  # only superuser sees hidden contexts
         # additional filter - display only revisions from current customization
         return qs
 
     context_actions.short_description = 'Admin Options'
     context_actions.allow_tags = True
+
 
 admin.site.register(Context, ContextAdmin)
 
@@ -77,6 +78,7 @@ class ContextTemplateAdmin(CMSAdmin):
     list_filter = ('context', 'language')
     search_fields = ('context__name', 'context__file_path', 'language__code')
 
+
 admin.site.register(ContextTemplate, ContextTemplateAdmin)
 
 
@@ -85,16 +87,21 @@ class DataStructureAdmin(CMSAdmin):
     list_filter = ('context', 'translatable')
     search_fields = ('context__name', 'name', 'description', 'type')
 
+
 admin.site.register(DataStructure, DataStructureAdmin)
 
 
 class LanguageAdmin(CMSAdmin):
     list_display = ('name', 'code')
+
+
 admin.site.register(Language, LanguageAdmin)
 
 
 class CustomizationAdmin(CMSAdmin):
     list_display = ('name',)
+
+
 admin.site.register(Customization, CustomizationAdmin)
 
 
@@ -106,11 +113,12 @@ class DataRecordAdmin(CMSAdmin):
                      'data_structure__description', 'value', 'language__code')
     readonly_fields = ('created_by',)
 
+
 admin.site.register(DataRecord, DataRecordAdmin)
 
 
 class ContentVersionAdmin(CMSAdmin):
-    list_display = ('content_version_actions', 'id', 'product','customization',
+    list_display = ('content_version_actions', 'id', 'product', 'customization',
                     'created_date', 'created_by',
                     'accepted_date', 'accepted_by', 'state')
 
@@ -120,7 +128,7 @@ class ContentVersionAdmin(CMSAdmin):
     readonly_fields = ('created_by', 'accepted_by',)
 
     def content_version_actions(self, obj):
-        return format_html('<button class="btn btn-sm btn-info"> <a href="{}">review</a></button>',
+        return format_html('<a class="btn btn-sm btn-info" href="{}">review</a>',
                            reverse('version', args=[obj.id]))
 
     def get_queryset(self, request):  # show only users for current customization
@@ -132,11 +140,12 @@ class ContentVersionAdmin(CMSAdmin):
     content_version_actions.short_description = "Admin Options"
     content_version_actions.allow_tags = True
 
+
 admin.site.register(ContentVersion, ContentVersionAdmin)
 
 
 class UserGroupsToCustomizationPermissionsAdmin(CMSAdmin):
     list_display = ('id', 'group', 'customization',)
 
-admin.site.register(UserGroupsToCustomizationPermissions, UserGroupsToCustomizationPermissionsAdmin)
 
+admin.site.register(UserGroupsToCustomizationPermissions, UserGroupsToCustomizationPermissionsAdmin)

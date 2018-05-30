@@ -64,7 +64,7 @@ def save_unrevisioned_records(context, customization, language, data_structures,
                              .format(request_files[data_structure_name].content_type,
                                      data_structure.meta_settings['format'].replace(',', ' or '))
                     if not meta:
-                        error_msg = "Image is corrupt please upload an uncorrupted version"
+                        error_msg = "Image is damaged please upload an undamaged version"
                     upload_errors.append((data_structure_name, error_msg))
 
                     continue
@@ -264,6 +264,7 @@ def handle_file_upload(file, data_structure):
             width, height = newImage.size
             meta = {'width': width, 'height': height}
         except IOError:
+            # When returning false here we are saying that the file is damaged
             return None, False, True
     elif data_structure.type == DataStructure.DATA_TYPES.file:
         meta = data_structure.meta_settings
