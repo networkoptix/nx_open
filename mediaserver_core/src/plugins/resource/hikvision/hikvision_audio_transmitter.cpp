@@ -58,20 +58,20 @@ bool HikvisionAudioTransmitter::sendData(const QnAbstractMediaDataPtr& data)
 void HikvisionAudioTransmitter::prepareHttpClient(const nx_http::AsyncHttpClientPtr& httpClient)
 {
     auto auth = m_resource->getAuth();
+    m_noAuth = auth.user().isEmpty() && auth.password().isEmpty();
 
     httpClient->setUserName(auth.user());
     httpClient->setUserPassword(auth.password());
-    httpClient->setDisablePrecalculatedAuthorization(false);
-    httpClient->setAuthType(nx_http::AsyncHttpClient::AuthType::authBasic);
+    httpClient->setDisablePrecalculatedAuthorization(true);
 
     openChannelIfNeeded();
 }
 
 bool HikvisionAudioTransmitter::isReadyForTransmission(
     nx_http::AsyncHttpClientPtr /*httpClient*/,
-    bool /*isRetryAfterUnauthorizedResponse*/) const
+    bool isRetryAfterUnauthorizedResponse) const
 {
-    return true;
+    return isRetryAfterUnauthorizedResponse || m_noAuth;
 }
 
 QUrl HikvisionAudioTransmitter::transmissionUrl() const
