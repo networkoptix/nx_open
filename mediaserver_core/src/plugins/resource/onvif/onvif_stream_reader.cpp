@@ -602,6 +602,49 @@ Profile* QnOnvifStreamReader::fetchExistingProfile(
     return 0;
 }
 
+CameraDiagnostics::Result QnOnvifStreamReader::bindTwoWayAudioToProfile(
+    MediaSoapWrapper& soapWrapper, const QString& profileToken) const
+{
+    AddAudioOutputConfigurationReq addOutputRequest;
+    AddAudioOutputConfigurationResp addOutputResponse;
+
+    addOutputRequest.ProfileToken = profileToken.toStdString();
+    addOutputRequest.ConfigurationToken = m_onvifRes->audioOutputToken().toStdString();
+    int soapRes = soapWrapper.addAudioOutputConfiguration(addOutputRequest, addOutputResponse);
+    if (soapRes != SOAP_OK)
+    {
+        return CameraDiagnostics::RequestFailedResult(
+            QLatin1String("addAudioOutputConfiguration"), soapWrapper.getLastError());
+    }
+
+    GetCompatibleAudioDecoderConfigurationsReq audioDecodersRequest;
+    GetCompatibleAudioDecoderConfigurationsResp audioDecodersResponse;
+    audioDecodersRequest.ProfileToken = profileToken.toStdString();
+    soapRes = soapWrapper.getCompatibleAudioDecoderConfigurations(audioDecodersRequest, audioDecodersResponse);
+    if (soapRes != SOAP_OK)
+    {
+        return CameraDiagnostics::RequestFailedResult(
+            QLatin1String("getCompatibleAudioDecoderConfigurations"), soapWrapper.getLastError());
+    }
+    if (!audioDecodersResponse.Configurations.empty() && audioDecodersResponse.Configurations[0])
+    {
+        AddAudioDecoderConfigurationReq addDecoderRequest;
+        AddAudioDecoderConfigurationResp addDecoderResponse;
+        addDecoderRequest.ProfileToken = profileToken.toStdString();
+        auto configuration = audioDecodersResponse.Configurations[0];
+        addDecoderRequest.ConfigurationToken = configuration->token;
+
+        soapRes = soapWrapper.addAudioDecoderConfiguration(addDecoderRequest, addDecoderResponse);
+        if (soapRes != SOAP_OK)
+        {
+            return CameraDiagnostics::RequestFailedResult(
+                QLatin1String("addAudioDecoderConfiguration"), soapWrapper.getLastError());
+        }
+    }
+
+    return CameraDiagnostics::NoErrorResult();
+}
+
 CameraDiagnostics::Result QnOnvifStreamReader::sendProfileToCamera(
     CameraInfoParams& info, Profile* profile) const
 {
@@ -670,6 +713,17 @@ CameraDiagnostics::Result QnOnvifStreamReader::sendProfileToCamera(
 
     if (getRole() == Qn::CR_LiveVideo)
     {
+        if (!m_onvifRes->audioOutputToken().isEmpty())
+        {
+            auto result = bindTwoWayAudioToProfile(soapWrapper, info.profileToken);
+            if (!result)
+            {
+                NX_WARNING(this, 
+                    lm("Error binding two way audio to profile %1 for camera %2. Error: %3")
+                    .args(info.profileToken, m_onvifRes->getUrl(), result.toString(m_onvifRes->resourcePool())));
+            }
+        }
+
         if(!m_onvifRes->getPtzUrl().isEmpty() && !m_onvifRes->getPtzConfigurationToken().isEmpty())
         {
             bool ptzMatched = profile && profile->PTZConfiguration;
