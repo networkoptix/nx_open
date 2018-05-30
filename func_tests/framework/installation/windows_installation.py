@@ -11,7 +11,7 @@ _logger = logging.getLogger(__name__)
 
 class WindowsInstallation(Installation):
     def __init__(self, windows_access, installer):
-        self._installer = installer  # type: Installer
+        self.installer = installer  # type: Installer
         program_files_dir = windows_access.Path(windows_access.winrm.user_env_vars()['ProgramFiles'])
         customization = installer.customization  # type: Customization
         self.dir = program_files_dir / customization.windows_installation_subdir
@@ -34,10 +34,10 @@ class WindowsInstallation(Installation):
         return True
 
     def _upload_installer(self):
-        remote_path = self.os_access.Path.tmp() / self._installer.path.name
+        remote_path = self.os_access.Path.tmp() / self.installer.path.name
         if not remote_path.exists():
             remote_path.parent.mkdir(parents=True, exist_ok=True)
-            copy_file(self._installer.path, remote_path)
+            copy_file(self.installer.path, remote_path)
         return remote_path
 
     def _backup_configuration(self):

@@ -9,6 +9,7 @@ from framework.installation.installer import Version, known_customizations
 from framework.installation.upstart_service import UpstartService
 from framework.os_access.exceptions import DoesNotExist
 from framework.os_access.path import copy_file
+from framework.os_access.posix_shell import SSH
 
 if sys.version_info[:2] == (2, 7):
     # noinspection PyCompatibility,PyUnresolvedReferences
@@ -25,9 +26,9 @@ class DebInstallation(Installation):
 
     def __init__(self, ssh_access, deb):
         """Either valid or hypothetical (invalid or non-existent) installation."""
-        self._ssh = ssh_access.ssh
-        self._deb = deb
-        self.dir = ssh_access.Path('/opt', self._deb.customization.linux_subdir)
+        self._ssh = ssh_access.ssh  # type: SSH
+        self.installer = deb
+        self.dir = ssh_access.Path('/opt', self.installer.customization.linux_subdir)
         self._bin = self.dir / 'bin'
         self.binary = self._bin / 'mediaserver-bin'
         self._config = self.dir / 'etc' / 'mediaserver.conf'
@@ -38,7 +39,7 @@ class DebInstallation(Installation):
         self.os_access = ssh_access
         self.service = UpstartService(
             self.os_access.ssh,
-            self._deb.customization.linux_service_name,
+            self.installer.customization.linux_service_name,
             stop_timeout_sec=120 + 10,  # 120 seconds specified in upstart conf file.
             )
 
@@ -89,13 +90,13 @@ class DebInstallation(Installation):
         build_info = dict(
             line.split('=', 1)
             for line in build_info_text.splitlines(False))
-        if self._deb.version != Version(build_info['version']):
+        if self.installer.version != Version(build_info['version']):
             return False
         customization, = (
             customization
             for customization in known_customizations
             if customization.customization_name == build_info['customization'])
-        if self._deb.customization != customization:
+        if self.installer.customization != customization:
             return False
         return True
 
@@ -103,9 +104,9 @@ class DebInstallation(Installation):
         if self._can_be_reused():
             return
 
-        remote_path = self.os_access.Path.tmp() / self._deb.path.name
+        remote_path = self.os_access.Path.tmp() / self.installer.path.name
         remote_path.parent.mkdir(parents=True, exist_ok=True)
-        copy_file(self._deb.path, remote_path)
+        copy_file(self.installer.path, remote_path)
         self.os_access.ssh.run_sh_script(
             # language=Bash
             '''

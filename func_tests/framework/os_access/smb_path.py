@@ -224,11 +224,17 @@ class SMBPath(FileSystemPath, PureWindowsPath):
     @_reraising_on_operation_failure({
         _STATUS_FILE_IS_A_DIRECTORY: NotAFile,
         _STATUS_OBJECT_PATH_NOT_FOUND: BadParent})
-    def write_bytes(self, data):
+    def write_bytes(self, data, offset=None):
         ad_hoc_file_object = BytesIO(data)
-        return self._smb_connection_pool.connection().storeFile(
-            self._service_name, self._relative_path,
-            ad_hoc_file_object)
+        if offset is None:
+            return self._smb_connection_pool.connection().storeFile(
+                self._service_name, self._relative_path,
+                ad_hoc_file_object)
+        else:
+            return self._smb_connection_pool.connection().storeFileFromOffset(
+                self._service_name, self._relative_path,
+                ad_hoc_file_object,
+                offset=offset)
 
     def read_text(self, encoding='ascii', errors='strict'):
         data = self.read_bytes()

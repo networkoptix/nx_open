@@ -154,7 +154,7 @@ class SSHPath(FileSystemPath, PurePosixPath):
             env={'SELF': self})
 
     @_raising_on_exit_status({2: BadParent, 3: BadParent, 4: NotAFile})
-    def write_bytes(self, contents):
+    def write_bytes(self, contents, offset=None):
         output = self._ssh.run_sh_script(
             # language=Bash
             '''
@@ -162,10 +162,14 @@ class SSHPath(FileSystemPath, PurePosixPath):
                 test ! -e "$parent" && >&2 echo "no parent: $parent" && exit 2
                 test ! -d "$parent" && >&2 echo "parent not a dir: $parent" && exit 3
                 test -e "$SELF" -a ! -f "$SELF" && >&2 echo "not a file: $SELF" && exit 4
-                cat >"$SELF"
+                if [ -z $OFFSET ]; then
+                    cat >"$SELF"
+                else
+                    dd bs=$((1024 * 1024)) conv=notrunc of="$SELF" seek=$OFFSET oflag=seek_bytes
+                fi
                 stat --printf="%s" "$SELF"
                 ''',
-            env={'SELF': self},
+            env={'SELF': self, 'OFFSET': offset},
             input=contents)
         written = int(output)
         return written

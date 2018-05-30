@@ -48,7 +48,7 @@ class FileSystemPath(PurePath):
         return b''
 
     @abstractmethod
-    def write_bytes(self, contents):
+    def write_bytes(self, contents, offset=None):
         pass
 
     @abstractmethod

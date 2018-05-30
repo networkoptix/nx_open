@@ -31,6 +31,9 @@ def sh_convert_env_values_to_str(env):
         if isinstance(value, str):
             converted_env[name] = value
             continue
+        if value is None:
+            converted_env[name] = ''
+            continue
         raise RuntimeError("Unexpected value {!r} of type {}".format(value, type(value)))
     return converted_env
 
