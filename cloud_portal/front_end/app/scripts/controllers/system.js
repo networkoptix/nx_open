@@ -69,11 +69,13 @@ angular.module('cloudApp')
 
             function delayedUpdateSystemInfo() {
                 pollingSystemUpdate = $poll(function () {
-                    return $scope.system.update().catch(function (error) {
-                        if (error.data.resultCode === 'forbidden' || error.data.resultCode === 'notFound') {
-                            connectionLost();
-                        }
-                    });
+                    return $scope.system
+                        .update()
+                        .catch(function (error) {
+                            if (error.data.resultCode === 'forbidden' || error.data.resultCode === 'notFound') {
+                                connectionLost();
+                            }
+                        });
                 }, Config.updateInterval);
 
                 $scope.$on('$destroy', function (event) {
@@ -109,13 +111,15 @@ angular.module('cloudApp')
                     });
             }
 
-            function updateAndGoToSystems(){
+            function updateAndGoToSystems() {
                 $scope.userDisconnectSystem = true;
-                systemsProvider.forceUpdateSystems().then(function(){$location.path('/systems')});
+                systemsProvider.forceUpdateSystems().then(function () {
+                    $location.path('/systems')
+                });
             }
 
-            $scope.disconnect = function(){
-                if($scope.system.isMine){
+            $scope.disconnect = function () {
+                if ($scope.system.isMine) {
                     // User is the owner. Deleting system means unbinding it and disconnecting all accounts
                     // dialogs.confirm(L.system.confirmDisconnect, L.system.confirmDisconnectTitle, L.system.confirmDisconnectAction, 'danger').
                     dialogs.disconnect(systemId)
@@ -142,7 +146,7 @@ angular.module('cloudApp')
 
                                 $scope.deletingSystem.run();
                             }
-                    });
+                        });
                 }
             };
 
@@ -244,11 +248,11 @@ angular.module('cloudApp')
 
             var cancelSubscription = $scope.$on("unauthorized_" + $routeParams.systemId, connectionLost);
 
-            $scope.$on('$destroy', function() {
+            $scope.$on('$destroy', function () {
                 cancelSubscription();
-               if( typeof($scope.userDisconnectSystem) === 'undefined'){
-                   dialogs.dismissNotifications();
-               }
+                if (typeof($scope.userDisconnectSystem) === 'undefined') {
+                    dialogs.dismissNotifications();
+                }
             });
         }
     ]);
