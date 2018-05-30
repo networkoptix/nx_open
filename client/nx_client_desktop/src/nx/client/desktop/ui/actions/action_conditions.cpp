@@ -230,8 +230,7 @@ public:
         const Parameters& parameters, QnWorkbenchContext* /*context*/) override
     {
         const auto camera = parameters.resource().dynamicCast<QnVirtualCameraResource>();
-        NX_ASSERT(camera);
-        if (!camera)
+        if (!camera || !camera->hasFlags(Qn::wearable_camera))
             return InvisibleAction;
 
         const auto state = qnClientModule->wearableManager()->state(camera);
