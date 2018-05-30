@@ -3,6 +3,7 @@
 #include <functional>
 
 #include <nx/network/http/server/abstract_authentication_manager.h>
+#include <nx/utils/std/optional.h>
 
 #include <nx/cloud/cdb/api/result_code.h>
 
@@ -60,9 +61,24 @@ private:
         std::function<bool(const nx::Buffer&)> validateHa1Func,
         const nx::utils::stree::AbstractResourceReader& authSearchInputData,
         nx::utils::stree::ResourceContainer* const authProperties);
-    void addWWWAuthenticateHeader(
-        boost::optional<nx::network::http::header::WWWAuthenticate>* const wwwAuthenticate );
+    nx::network::http::header::WWWAuthenticate prepareWwwAuthenticateHeader();
     nx::Buffer generateNonce();
+
+    nx::network::http::server::AuthenticationResult prepareSuccessResponse(
+        std::optional<nx::utils::stree::ResourceContainer> authProperties = std::nullopt);
+
+    nx::network::http::server::AuthenticationResult prepareUnauthorizedResponse(
+        api::ResultCode authResult,
+        std::optional<nx::network::http::header::WWWAuthenticate> wwwAuthenticate = std::nullopt);
+
+    void prepareUnauthorizedResponse(
+        api::ResultCode authResult,
+        nx::network::http::server::AuthenticationResult* authResponse);
+
+    bool checkUserPasswordByAuthResult(
+        const std::function<bool(const nx::Buffer& /*ha1*/)>& validateHa1Func,
+        const nx::String& userId,
+        const nx::utils::stree::ResourceContainer& authTraversalResult);
 };
 
 } // namespace cdb

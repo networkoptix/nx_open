@@ -142,7 +142,7 @@ void HttpServerConnection::sendUnauthorizedResponse(
     {
         response.response->headers.emplace(
             header::WWWAuthenticate::NAME,
-            authenticationResult.wwwAuthenticate.get().serialized());
+            authenticationResult.wwwAuthenticate.value().serialized());
     }
 
     prepareAndSendResponse(
