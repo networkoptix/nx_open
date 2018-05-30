@@ -296,7 +296,7 @@ if service $COMPANY_NAME-mediaserver start; then
     sleep 1
     echo Start service $(ps aux | grep "mediaserver-bin -e" | grep -v grep)
 else
-    # We do not fail instalation process because in this case dpkg makes a package hard to remove.
+    # We do not fail installation process because in this case dpkg makes a package hard to remove.
     echo WARNING: Unable to start service >&2
 fi
 
