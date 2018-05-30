@@ -17,7 +17,7 @@ ${BROWSER}                            Chrome
 
 ${BACKDROP}                           //div[@uib-modal-backdrop="modal-backdrop"]
 
-${LANGUAGE DROPDOWN}                  //footer//button[@uib-dropdown-toggle]
+${LANGUAGE DROPDOWN}                  //footer//button[@uib-dropdown-toggle and @id='language-dropdown' and @aria-haspopup='true']
 ${LANGUAGE TO SELECT}                 //footer//span[@lang='${LANGUAGE}']/..
 
 @{LANGUAGES LIST}                          en_US    en_GB    ru_RU           fr_FR   de_DE    es_ES   hu_HU  zh_CN  zh_TW  ja_JP   ko_KR  tr_TR  th_TH     nl_NL    he_IL  pl_PL  vi_VN
