@@ -106,8 +106,8 @@ public:
     struct LockoutOptions
     {
         size_t maxLoginFailures = 10;
-        std::chrono::milliseconds accountTime = std::chrono::minutes(1);
-        std::chrono::milliseconds lockoutTime = std::chrono::minutes(5);
+        std::chrono::milliseconds accountTime = std::chrono::minutes(5);
+        std::chrono::milliseconds lockoutTime = std::chrono::minutes(1);
     };
 
     std::optional<LockoutOptions> getLockoutOptions() const;
@@ -159,7 +159,7 @@ private:
 
     struct AccessFailureData
     {
-        std::optional<std::chrono::steady_clock::time_point> lockedOut{std::nullopt};
+        std::optional<std::chrono::steady_clock::time_point> lockedOut;
         std::deque<std::chrono::steady_clock::time_point> failures;
     };
 
@@ -183,7 +183,7 @@ private:
         nx::network::http::Response& responseHeaders,
         Qn::UserAccessData* accessRights);
 
-    std::optional<std::chrono::milliseconds> isLoginLockedOut(
+    bool isLoginLockedOut(
         const nx::String& name, const nx::network::HostAddress& address);
     void saveLoginResult(
         const nx::String& name, const nx::network::HostAddress& address, Qn::AuthResult result);
@@ -214,7 +214,7 @@ private:
     nx::vms::auth::AbstractUserDataProvider* m_userDataProvider;
     std::unique_ptr<QnLdapManager> m_ldap;
     std::map<nx::Buffer, std::chrono::steady_clock::time_point> m_csrfTokens;
-    std::map<nx::String, std::map<nx::network::HostAddress, AccessFailureData>> m_accessFailures;
+    std::map<nx::String /*userName*/, std::map<nx::network::HostAddress, AccessFailureData>> m_accessFailures;
     std::optional<LockoutOptions> m_lockoutOptions = LockoutOptions();
 };
 

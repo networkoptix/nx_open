@@ -447,8 +447,7 @@ QPair<QString, QString> QnAuthHelper::createAuthenticationQueryItemForPath(
     return QPair<QString, QString>(TEMP_AUTH_KEY_NAME, authKey);
 }
 
-std::optional<std::chrono::milliseconds> QnAuthHelper::isLoginLockedOut(
-    const nx::String& name, const nx::network::HostAddress& address)
+bool QnAuthHelper::isLoginLockedOut(const nx::String& name, const nx::network::HostAddress& address)
 {
     const auto now = std::chrono::steady_clock::now();
 
@@ -456,19 +455,20 @@ std::optional<std::chrono::milliseconds> QnAuthHelper::isLoginLockedOut(
     if (!m_lockoutOptions)
     {
         m_accessFailures.clear();
-        return std::nullopt;
+        return false;
     }
 
     auto& userData = m_accessFailures[name];
     for (auto it = userData.begin(); it != userData.end(); )
     {
-        while (!it->second.failures.empty() && it->second.failures.front() + m_lockoutOptions->accountTime <= now)
-            it->second.failures.pop_front(); //< Remove outdated failures.
+        auto& ipData = it->second;
+        while (!ipData.failures.empty() && ipData.failures.front() + m_lockoutOptions->accountTime <= now)
+            ipData.failures.pop_front(); //< Remove outdated failures.
 
-        if (it->second.lockedOut && *it->second.lockedOut + m_lockoutOptions->lockoutTime <= now)
-            it->second.lockedOut = std::nullopt; //< Remove expired lockout.
+        if (ipData.lockedOut && *ipData.lockedOut + m_lockoutOptions->lockoutTime <= now)
+            ipData.lockedOut = std::nullopt; //< Remove expired lockout.
 
-        if (!it->second.lockedOut && it->second.failures.empty())
+        if (!ipData.lockedOut && ipData.failures.empty())
             it = userData.erase(it); //< Remove useless record.
         else
             ++it;
@@ -476,10 +476,9 @@ std::optional<std::chrono::milliseconds> QnAuthHelper::isLoginLockedOut(
 
     const auto ipIt = userData.find(address);
     if (ipIt == userData.end() || !ipIt->second.lockedOut)
-        return std::nullopt;
+        return false;
 
-    return std::chrono::duration_cast<std::chrono::milliseconds>(
-        *ipIt->second.lockedOut + m_lockoutOptions->lockoutTime - now);
+    return true;
 }
 
 void QnAuthHelper::saveLoginResult(
@@ -495,7 +494,7 @@ void QnAuthHelper::saveLoginResult(
     auto& data = m_accessFailures[name][address];
     if (!data.lockedOut)
     {
-        if (data.failures.size() + 1 == m_lockoutOptions->maxLoginFailures)
+        if (data.failures.size() + 1 >= m_lockoutOptions->maxLoginFailures)
         {
             NX_DEBUG(this, lm("Lockout for %1 from %2 for %3")
                 .args(name, address, m_lockoutOptions->lockoutTime));

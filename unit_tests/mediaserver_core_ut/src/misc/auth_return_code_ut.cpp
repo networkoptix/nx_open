@@ -401,14 +401,12 @@ TEST_F(AuthReturnCodeTest, manualDigestWrongMethod_onGateway)
 TEST_F(AuthReturnCodeTest, lockoutTest)
 {
     static const QnAuthHelper::LockoutOptions kLockoutOptions{
-        3, std::chrono::milliseconds(100), std::chrono::milliseconds(500)};
+        3, std::chrono::milliseconds(500), std::chrono::milliseconds(100)};
 
     const auto lockoutOptons = QnAuthHelper::instance()->getLockoutOptions();
     QnAuthHelper::instance()->setLockoutOptions(kLockoutOptions);
     const auto lockoutGuard = makeSharedGuard(
         [&](){ QnAuthHelper::instance()->setLockoutOptions(lockoutOptons); });
-
-    NX_ERROR(this, lm("LOCKOUT TEST"));
 
     // Lockout does not happen on a random attemp.
     assertServerAcceptsUserCredentials("admin", "admin");
