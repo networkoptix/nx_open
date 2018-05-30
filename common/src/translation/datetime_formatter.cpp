@@ -60,7 +60,6 @@ void DateTimeFormats::setFormats()
 
     formatStrings[Format::hh_mm_ss_zzz] = formatStrings[Format::hh_mm_ss] + lit(".zzz");
 
-
     formatStrings[Format::dd_MM] = tr("dd/MM"); //< Localizable
     formatStrings[Format::MMMM_yyyy] = tr("MMMM yyyy"); //< Localizable
     formatStrings[Format::dd_MM_yyyy] = locale.dateFormat(QLocale::ShortFormat);
@@ -72,36 +71,50 @@ void DateTimeFormats::setFormats()
     removeTimezone(formatStrings[Format::dddd_d_MMMM_yyyy_hh_mm_ss]);
 }
 
+bool localeEverInited = false;
+
+void checkInited()
+{
+    if (!localeEverInited)
+        initLocale();
+}
+
 } // namespace
 
 QString toString(const QDateTime& time, Format format)
 {
+    checkInited();
     return time.toString(formatStrings[format]);
 }
 
 QString toString(const QTime& time, Format format)
 {
+    checkInited();
     return time.toString(formatStrings[format]);
 }
 
 QString toString(const QDate& date, Format format)
 {
+    checkInited();
     return date.toString(formatStrings[format]);
 }
 
 QString toString(qint64 msSinceEpoch, Format format)
 {
+    checkInited();
     return QDateTime::fromMSecsSinceEpoch(msSinceEpoch).toString(formatStrings[format]);
 }
 
 QString getFormatString(Format format)
 {
+    checkInited();
     return formatStrings[format];
 }
 
 void initLocale()
 {
     DateTimeFormats::setFormats();
+    localeEverInited = true;
 }
 
 } // namespace datetime
