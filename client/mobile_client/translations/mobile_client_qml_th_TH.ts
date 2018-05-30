@@ -43,7 +43,7 @@
     <message>
       <source>%1 Account</source>
       <comment>%1 is the short cloud name (like &apos;Cloud&apos;)</comment>
-      <translation>%1 บัญชี</translation>
+      <translation>บัญชี %1</translation>
     </message>
   </context>
   <context>
@@ -113,7 +113,7 @@
     </message>
     <message>
       <source>Wrong password</source>
-      <translation>รหัสผ่านไม่ถูกต้อง</translation>
+      <translation>รหัสผ่านผิด</translation>
     </message>
     <message>
       <source>Account not activated</source>
@@ -772,7 +772,7 @@
     </message>
     <message>
       <source>Cannot connect to %1</source>
-      <translation>ไม่สามารถเชื่อมต่อกับ %1</translation>
+      <translation>เชื่อมต่อกับกล้องไม่ได้</translation>
     </message>
   </context>
 </TS>

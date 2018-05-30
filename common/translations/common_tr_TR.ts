@@ -619,7 +619,7 @@
       <source>%n device(s)</source>
       <translation>
         <numerusform>%n aygıt</numerusform>
-        <numerusform>%n aygıtlar</numerusform>
+        <numerusform>%n aygıt</numerusform>
       </translation>
     </message>
     <message>
@@ -658,14 +658,14 @@
       <source>%n I/O Module(s)</source>
       <translation>
         <numerusform>%n I/O Modül</numerusform>
-        <numerusform>%n I/O Modüller</numerusform>
+        <numerusform>%n I/O Modül</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n I/O module(s)</source>
       <translation>
         <numerusform>%n I/O modül</numerusform>
-        <numerusform>%n I/O modüller</numerusform>
+        <numerusform>%n I/O modül</numerusform>
       </translation>
     </message>
     <message>

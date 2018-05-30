@@ -43,7 +43,7 @@
     <message>
       <source>%1 Account</source>
       <comment>%1 is the short cloud name (like &apos;Cloud&apos;)</comment>
-      <translation>Compte %1</translation>
+      <translation>%1 Compte</translation>
     </message>
   </context>
   <context>

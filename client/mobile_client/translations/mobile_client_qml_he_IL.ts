@@ -43,7 +43,7 @@
     <message>
       <source>%1 Account</source>
       <comment>%1 is the short cloud name (like &apos;Cloud&apos;)</comment>
-      <translation type="unfinished">%1 Account</translation>
+      <translation>חשבון %1</translation>
     </message>
   </context>
   <context>
@@ -113,7 +113,7 @@
     </message>
     <message>
       <source>Wrong password</source>
-      <translation type="unfinished">Wrong password</translation>
+      <translation>סיסמא שגויה</translation>
     </message>
     <message>
       <source>Account not activated</source>
@@ -121,11 +121,11 @@
     </message>
     <message>
       <source>Email cannot be empty</source>
-      <translation type="unfinished">Email cannot be empty</translation>
+      <translation>דואר אלקטרוני אינו יכול להיות ריק</translation>
     </message>
     <message>
       <source>Password cannot be empty</source>
-      <translation type="unfinished">Password cannot be empty</translation>
+      <translation>לא ניתן להותיר את שדה הסיסמה ריק</translation>
     </message>
   </context>
   <context>
@@ -573,7 +573,7 @@
     </message>
     <message>
       <source>Delete</source>
-      <translation type="unfinished">Delete</translation>
+      <translation>מחק</translation>
     </message>
   </context>
   <context>
@@ -772,7 +772,7 @@
     </message>
     <message>
       <source>Cannot connect to %1</source>
-      <translation type="unfinished">Cannot connect to %1</translation>
+      <translation>אין אפשרות להתחבר אל %1</translation>
     </message>
   </context>
 </TS>

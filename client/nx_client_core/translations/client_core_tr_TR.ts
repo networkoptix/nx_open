@@ -7,8 +7,8 @@
       <source>Bytes</source>
       <comment>Full suffix for displaying bytes</comment>
       <translation>
-        <numerusform>Bytes</numerusform>
-        <numerusform>Bytes</numerusform>
+        <numerusform>Bayt</numerusform>
+        <numerusform>Bayt</numerusform>
       </translation>
     </message>
     <message>
@@ -187,7 +187,7 @@
     <name>QnDesktopAudioOnlyDataProvider</name>
     <message>
       <source>Could not find audio encoder &quot;%1&quot;.</source>
-      <translation>Ses kodlayıcı bulunamadı &quot;%1&quot;.</translation>
+      <translation>&quot;%1&quot; için ses kodlayıcı bulunumadı;.</translation>
     </message>
     <message>
       <source>Could not initialize audio encoder.</source>
@@ -241,27 +241,27 @@
     <message>
       <source>m</source>
       <comment>Suffix for displaying minutes</comment>
-      <translation>m</translation>
+      <translation>d</translation>
     </message>
     <message>
       <source>h</source>
       <comment>Suffix for displaying hours</comment>
-      <translation>h</translation>
+      <translation>sa</translation>
     </message>
     <message>
       <source>d</source>
       <comment>Suffix for displaying days</comment>
-      <translation>d</translation>
+      <translation>g</translation>
     </message>
     <message>
       <source>w</source>
       <comment>Suffix for displaying weeks</comment>
-      <translation>w</translation>
+      <translation>h</translation>
     </message>
     <message>
       <source>M</source>
       <comment>Suffix for displaying months</comment>
-      <translation>M</translation>
+      <translation>A</translation>
     </message>
     <message>
       <source>y</source>
@@ -271,12 +271,12 @@
     <message>
       <source>msec</source>
       <comment>Long suffix for displaying milliseconds</comment>
-      <translation>msec</translation>
+      <translation>ms</translation>
     </message>
     <message>
       <source>sec</source>
       <comment>Long suffix for displaying seconds</comment>
-      <translation>sn</translation>
+      <translation>saniye</translation>
     </message>
     <message>
       <source>min</source>
@@ -291,7 +291,7 @@
     <message>
       <source>days</source>
       <comment>Long suffix for displaying days</comment>
-      <translation>günler</translation>
+      <translation>gün</translation>
     </message>
     <message>
       <source>wks</source>
@@ -344,8 +344,8 @@
       <source>days</source>
       <comment>Full suffix for displaying days</comment>
       <translation>
-        <numerusform>günler</numerusform>
-        <numerusform>günler</numerusform>
+        <numerusform>gün</numerusform>
+        <numerusform>gün</numerusform>
       </translation>
     </message>
     <message numerus="yes">

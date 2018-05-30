@@ -632,10 +632,10 @@
     <message numerus="yes">
       <source>%n device(s)</source>
       <translation>
-        <numerusform>מכשיר %n</numerusform>
         <numerusform>%n מכשירים</numerusform>
-        <numerusform>%n התקנים</numerusform>
-        <numerusform>%n התקנים</numerusform>
+        <numerusform>%n מכשירים</numerusform>
+        <numerusform>%n מכשירים</numerusform>
+        <numerusform>%n מכשירים</numerusform>
       </translation>
     </message>
     <message>
@@ -674,18 +674,18 @@
       <source>%n I/O Module(s)</source>
       <translation>
         <numerusform>%n מודול קלט/פלט אחד</numerusform>
-        <numerusform>%n מודולי קלט/פלט</numerusform>
-        <numerusform>%n מודולי קלט/פלט</numerusform>
-        <numerusform>%n מודולי קלט/פלט</numerusform>
+        <numerusform>%n מודול קלט/פלט אחד</numerusform>
+        <numerusform>%n מודול קלט/פלט אחד</numerusform>
+        <numerusform>%n מודול קלט/פלט אחד</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n I/O module(s)</source>
       <translation>
         <numerusform>%n שגיאה בכתיבת קובץ. אין מספיק מקום פנוי</numerusform>
-        <numerusform>%n מודולי קלט/פלט</numerusform>
-        <numerusform>%n מודולי קלט/פלט</numerusform>
-        <numerusform>%n מודולי קלט/פלט</numerusform>
+        <numerusform>%n שגיאה בכתיבת קובץ. אין מספיק מקום פנוי</numerusform>
+        <numerusform>%n שגיאה בכתיבת קובץ. אין מספיק מקום פנוי</numerusform>
+        <numerusform>%n שגיאה בכתיבת קובץ. אין מספיק מקום פנוי</numerusform>
       </translation>
     </message>
     <message>

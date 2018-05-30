@@ -25,7 +25,7 @@
     <message>
       <source>KB</source>
       <comment>Suffix for displaying kilobytes</comment>
-      <translation type="unfinished">KB</translation>
+      <translation>KB</translation>
     </message>
     <message numerus="yes">
       <source>Megabytes</source>
@@ -37,7 +37,7 @@
     <message>
       <source>MB</source>
       <comment>Suffix for displaying megabytes</comment>
-      <translation type="unfinished">MB</translation>
+      <translation>MB</translation>
     </message>
     <message numerus="yes">
       <source>Gigabytes</source>
@@ -49,7 +49,7 @@
     <message>
       <source>GB</source>
       <comment>Suffix for displaying gigabytes</comment>
-      <translation type="unfinished">GB</translation>
+      <translation>กิกะไบต์</translation>
     </message>
     <message numerus="yes">
       <source>Terabytes</source>
@@ -61,7 +61,7 @@
     <message>
       <source>TB</source>
       <comment>Suffix for displaying terabytes</comment>
-      <translation type="unfinished">TB</translation>
+      <translation>เทราไบต์</translation>
     </message>
     <message numerus="yes">
       <source>Petabytes</source>
@@ -185,7 +185,7 @@
     </message>
     <message>
       <source>Could not initialize audio encoder.</source>
-      <translation>ไม่สามารถเริ่มต้น เข้ารหัส เสียง.</translation>
+      <translation>ไม่สามารถเริ่มต้น encoder เสียง.</translation>
     </message>
     <message>
       <source>Sample format of input device %1 is not supported.</source>
@@ -230,7 +230,7 @@
     <message>
       <source>s</source>
       <comment>Suffix for displaying seconds</comment>
-      <translation>วินาที</translation>
+      <translation>s</translation>
     </message>
     <message>
       <source>m</source>
@@ -240,12 +240,12 @@
     <message>
       <source>h</source>
       <comment>Suffix for displaying hours</comment>
-      <translation>ชม.</translation>
+      <translation>h</translation>
     </message>
     <message>
       <source>d</source>
       <comment>Suffix for displaying days</comment>
-      <translation>วัน</translation>
+      <translation>d</translation>
     </message>
     <message>
       <source>w</source>
@@ -255,12 +255,12 @@
     <message>
       <source>M</source>
       <comment>Suffix for displaying months</comment>
-      <translation>เดือน</translation>
+      <translation>M</translation>
     </message>
     <message>
       <source>y</source>
       <comment>Suffix for displaying years</comment>
-      <translation>ปี</translation>
+      <translation>y</translation>
     </message>
     <message>
       <source>msec</source>

@@ -43,7 +43,7 @@
     <message>
       <source>%1 Account</source>
       <comment>%1 is the short cloud name (like &apos;Cloud&apos;)</comment>
-      <translation type="unfinished">%1 Account</translation>
+      <translation>%1 계정</translation>
     </message>
   </context>
   <context>
@@ -109,11 +109,11 @@
     </message>
     <message>
       <source>Account not found</source>
-      <translation type="unfinished">Account not found</translation>
+      <translation>계정을 찾을 수 없습니다</translation>
     </message>
     <message>
       <source>Wrong password</source>
-      <translation type="unfinished">Wrong password</translation>
+      <translation>패스워드가 틀립니다.</translation>
     </message>
     <message>
       <source>Account not activated</source>
@@ -121,11 +121,11 @@
     </message>
     <message>
       <source>Email cannot be empty</source>
-      <translation type="unfinished">Email cannot be empty</translation>
+      <translation>이메일은 비워둘 수 없습니다</translation>
     </message>
     <message>
       <source>Password cannot be empty</source>
-      <translation type="unfinished">Password cannot be empty</translation>
+      <translation>비밀번호를 입력해야 합니다</translation>
     </message>
   </context>
   <context>
@@ -573,7 +573,7 @@
     </message>
     <message>
       <source>Delete</source>
-      <translation type="unfinished">Delete</translation>
+      <translation>삭제</translation>
     </message>
   </context>
   <context>
@@ -772,7 +772,7 @@
     </message>
     <message>
       <source>Cannot connect to %1</source>
-      <translation type="unfinished">Cannot connect to %1</translation>
+      <translation>%1에 연결할 수 없습니다.</translation>
     </message>
   </context>
 </TS>
