@@ -339,6 +339,12 @@ bool QnWorkbenchContext::connectUsingCommandLineAuth(const QnStartupParameters& 
 QnWorkbenchContext::StartupParametersCode
     QnWorkbenchContext::handleStartupParameters(const QnStartupParameters& startupParams)
 {
+    const bool showEula = qnRuntime->isDesktopMode()
+        && qnSettings->acceptedEulaVersion() < QnClientAppInfo::eulaVersion();
+
+    if (showEula && !showEulaMessage())
+        return forcedExit;
+
     /* Process input files. */
     bool haveInputFiles = false;
     {
@@ -398,10 +404,6 @@ QnWorkbenchContext::StartupParametersCode
         const auto parameters = action::Parameters(Qn::LayoutNameRole, startupParams.layoutName);
         menu()->trigger(action::DelayedDropResourcesAction, parameters);
     }
-
-    const bool showEula = qnSettings->acceptedEulaVersion() < QnClientAppInfo::eulaVersion();
-    if (showEula && !showEulaMessage())
-        return forcedExit;
 
     /* Show beta version warning message for the main instance only */
     const bool showBetaWarning = QnAppInfo::beta()

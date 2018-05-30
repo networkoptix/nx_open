@@ -17,8 +17,6 @@
 #include <QtWidgets/QPushButton>
 #include <QtWidgets/QWhatsThis>
 
-#include <QtWebKitWidgets/QWebView>
-
 #include <api/network_proxy_factory.h>
 #include <api/global_settings.h>
 #include <api/server_rest_connection.h>
@@ -182,7 +180,6 @@
 #include "network/authutil.h"
 #include <core/resource/fake_media_server.h>
 #include <client/client_app_info.h>
-#include <ui/style/webview_style.h>
 #include <ini.h>
 
 namespace {
