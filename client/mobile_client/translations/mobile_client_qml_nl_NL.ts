@@ -5,7 +5,7 @@
     <name>ActionButtonsPanel</name>
     <message>
       <source>Press and hold to</source>
-      <translation type="unfinished">Press and hold to</translation>
+      <translation>Ingedrukt houden om te</translation>
     </message>
   </context>
   <context>

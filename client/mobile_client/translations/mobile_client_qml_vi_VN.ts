@@ -43,7 +43,7 @@
     <message>
       <source>%1 Account</source>
       <comment>%1 is the short cloud name (like &apos;Cloud&apos;)</comment>
-      <translation type="unfinished">%1 Account</translation>
+      <translation>%1 Tài khoản</translation>
     </message>
   </context>
   <context>
@@ -113,7 +113,7 @@
     </message>
     <message>
       <source>Wrong password</source>
-      <translation type="unfinished">Wrong password</translation>
+      <translation>Sai mật khẩu</translation>
     </message>
     <message>
       <source>Account not activated</source>
@@ -121,11 +121,11 @@
     </message>
     <message>
       <source>Email cannot be empty</source>
-      <translation type="unfinished">Email cannot be empty</translation>
+      <translation>Trường email không thể để trống</translation>
     </message>
     <message>
       <source>Password cannot be empty</source>
-      <translation type="unfinished">Password cannot be empty</translation>
+      <translation>Mật khẩu không được để trống</translation>
     </message>
   </context>
   <context>
@@ -573,7 +573,7 @@
     </message>
     <message>
       <source>Delete</source>
-      <translation type="unfinished">Delete</translation>
+      <translation>Xóa bỏ</translation>
     </message>
   </context>
   <context>
@@ -772,7 +772,7 @@
     </message>
     <message>
       <source>Cannot connect to %1</source>
-      <translation type="unfinished">Cannot connect to %1</translation>
+      <translation>Không thể kết nối với %1</translation>
     </message>
   </context>
 </TS>

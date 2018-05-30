@@ -89,7 +89,7 @@
     <message>
       <source>%1 System can only be merged with non-%1. System name and password are taken from %1 System.</source>
       <comment>%1 is the short cloud name (like &apos;Cloud&apos;)</comment>
-      <translation type="unfinished">%1 System can only be merged with non-%1. System name and password are taken from %1 System.</translation>
+      <translation>%1 ระบบสามารถรวมเข้ากับ non-%1เท่านั้น ชื่อระบบและรหัสผ่านจะถูกนำมาจาก %1 ระบบ</translation>
     </message>
   </context>
   <context>

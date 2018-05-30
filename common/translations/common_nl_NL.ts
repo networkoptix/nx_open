@@ -1167,7 +1167,7 @@
     </message>
     <message>
       <source>Caption: %1</source>
-      <translation>Bijschrift: %1</translation>
+      <translation>Onderschrift: %1</translation>
     </message>
     <message>
       <source>Input Port: %1</source>

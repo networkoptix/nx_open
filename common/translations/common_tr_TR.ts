@@ -101,23 +101,23 @@
     </message>
     <message>
       <source>System already bound to cloud (id %1)</source>
-      <translation type="unfinished">System already bound to cloud (id %1)</translation>
+      <translation>Sistem (id %1) e çoktan bağlanmış</translation>
     </message>
     <message>
       <source>Server is not connected to the Internet.</source>
-      <translation type="unfinished">Server is not connected to the Internet.</translation>
+      <translation>Sunucu internete bağlı değil.</translation>
     </message>
     <message>
       <source>Failed to save cloud credentials to local DB</source>
-      <translation type="unfinished">Failed to save cloud credentials to local DB</translation>
+      <translation>Bulut kimlik bilgileri kaydedilemedi</translation>
     </message>
     <message>
       <source>Failed to save cloud owner to local DB</source>
-      <translation type="unfinished">Failed to save cloud owner to local DB</translation>
+      <translation>Sahiplik bilgileri kaydedilemedi</translation>
     </message>
     <message>
       <source>Could not connect to cloud: %1</source>
-      <translation type="unfinished">Could not connect to cloud: %1</translation>
+      <translation>Bulut Sunucuya bağlanılamadı: %1</translation>
     </message>
   </context>
   <context>
@@ -619,7 +619,7 @@
       <source>%n device(s)</source>
       <translation>
         <numerusform>%n aygıt</numerusform>
-        <numerusform>%n aygıtlar</numerusform>
+        <numerusform>%n aygıt</numerusform>
       </translation>
     </message>
     <message>
@@ -658,14 +658,14 @@
       <source>%n I/O Module(s)</source>
       <translation>
         <numerusform>%n I/O Modül</numerusform>
-        <numerusform>%n I/O Modüller</numerusform>
+        <numerusform>%n I/O Modül</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n I/O module(s)</source>
       <translation>
         <numerusform>%n I/O modül</numerusform>
-        <numerusform>%n I/O modüller</numerusform>
+        <numerusform>%n I/O modül</numerusform>
       </translation>
     </message>
     <message>
@@ -1405,7 +1405,7 @@
     </message>
     <message>
       <source>Open layout</source>
-      <translation type="unfinished">Open layout</translation>
+      <translation>Ekranı Aç</translation>
     </message>
   </context>
   <context>
