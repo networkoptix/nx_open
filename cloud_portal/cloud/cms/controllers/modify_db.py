@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from notifications.api import send
+from ...notifications.api import send
 from django.contrib.auth.models import Permission
 from django.db.models import Q
 from django.conf import settings
@@ -9,8 +9,8 @@ from PIL import Image
 import base64, re, uuid
 
 from .filldata import fill_content
-from api.models import Account
-from cms.models import *
+from ...api.models import Account
+from ..models import *
 
 
 def accept_latest_draft(customization, version_id, user):
@@ -224,6 +224,8 @@ def is_not_valid_file_type(file_type, meta_types):
 
 def upload_file(data_structure, file):
     file_errors = []
+    encoded_file = None
+    file_dimensions = None
     file_size = file.size / 1048576
     if file_size >= settings.CMS_MAX_FILE_SIZE:
         file_errors.append((data_structure.name, 'Its size was {}MB but must be less than {} MB'
