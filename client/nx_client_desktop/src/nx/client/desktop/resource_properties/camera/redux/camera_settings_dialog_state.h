@@ -30,7 +30,7 @@ struct CameraSettingsDialogState
         T get() const { return m_user.value_or(m_base); }
         void setUser(T value) { m_user = value; }
         void setBase(T value) { m_base = value; }
-        void resetUser() { m_user.reset(); }
+        void resetUser() { m_user = {}; }
 
         T operator()() const { return get(); }
 
@@ -53,8 +53,8 @@ struct CameraSettingsDialogState
         T valueOr(T value) const { return m_user.value_or(m_base.value_or(value)); }
         void setUser(T value) { m_user = value; }
         void setBase(T value) { m_base = value; }
-        void resetUser() { m_user.reset(); }
-        void resetBase() { m_base.reset(); }
+        void resetUser() { m_user = {}; }
+        void resetBase() { m_base = {}; }
 
         T operator()() const { return get(); }
         operator std::optional<T>() const { return m_user ? m_user : m_base; }
