@@ -163,14 +163,14 @@ bool AuthenticationManager::validateNonce(const nx::network::http::StringType& n
 }
 
 void AuthenticationManager::addWWWAuthenticateHeader(
-    boost::optional<nx::network::http::header::WWWAuthenticate>* const wwwAuthenticate)
+    std::optional<nx::network::http::header::WWWAuthenticate>* const wwwAuthenticate)
 {
     //adding WWW-Authenticate header
     *wwwAuthenticate = header::WWWAuthenticate();
-    wwwAuthenticate->get().authScheme = header::AuthScheme::digest;
-    wwwAuthenticate->get().params.insert("nonce", generateNonce());
-    wwwAuthenticate->get().params.insert("realm", realm());
-    wwwAuthenticate->get().params.insert("algorithm", "MD5");
+    wwwAuthenticate->value().authScheme = header::AuthScheme::digest;
+    wwwAuthenticate->value().params.insert("nonce", generateNonce());
+    wwwAuthenticate->value().params.insert("realm", realm());
+    wwwAuthenticate->value().params.insert("algorithm", "MD5");
 }
 
 nx::Buffer AuthenticationManager::generateNonce()

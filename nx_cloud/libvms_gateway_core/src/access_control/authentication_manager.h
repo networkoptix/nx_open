@@ -6,6 +6,7 @@
 #include <nx/network/http/server/abstract_authentication_manager.h>
 
 #include <nx/utils/stree/stree_manager.h>
+#include <nx/utils/std/optional.h>
 
 namespace nx {
 namespace network {
@@ -52,7 +53,7 @@ private:
 
     bool validateNonce(const nx::network::http::StringType& nonce);
     void addWWWAuthenticateHeader(
-        boost::optional<nx::network::http::header::WWWAuthenticate>* const wwwAuthenticate );
+        std::optional<nx::network::http::header::WWWAuthenticate>* const wwwAuthenticate );
     nx::Buffer generateNonce();
 };
 
