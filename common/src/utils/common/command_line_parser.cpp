@@ -154,7 +154,7 @@ bool QnCommandLineParser::parse(int &argc, const char **argv, QTextStream *error
 
         const auto paramInfo = isSingleUri
             ? argument.split(kUriDelimiter)
-            : argument.split(L'=');
+            : argument.split(kParamDelimiter);
         QString name = paramInfo[0];
         if (isSingleUri)
             name += kUriDelimiter;   /* So the registering code looks much better. */
