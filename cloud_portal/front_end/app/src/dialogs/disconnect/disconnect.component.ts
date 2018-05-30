@@ -38,6 +38,7 @@ export class DisconnectModalContent {
     }
 
     close() {
+        console.log('TEST123');
         this.activeModal.close('CLOSE');
     }
 }
