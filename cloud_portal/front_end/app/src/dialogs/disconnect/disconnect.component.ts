@@ -20,12 +20,12 @@ export class DisconnectModalContent {
                 @Inject('account') private account: any,
                 @Inject('process') private process: any,
                 @Inject('cloudApiService') private cloudApi: any,) {
-
     }
 
     ngOnInit() {
         this.disconnect = this.process.init(() => {
-            return this.cloudApi.disconnect(this.systemId, this.password);
+            console.log('run');
+            // return this.cloudApi.disconnect(this.systemId, this.password);
         }, {
             ignoreUnauthorized: true,
             errorCodes: {
@@ -34,11 +34,13 @@ export class DisconnectModalContent {
             successMessage: this.language.system.successDisconnected,
             errorPrefix: this.language.errorCodes.cantDisconnectSystemPrefix
         }).then(() => {
+            console.log('close after run');
             this.activeModal.close('CLOSE');
         });
     }
 
     close() {
+        console.log('close');
         this.activeModal.close('CLOSE');
     }
 }

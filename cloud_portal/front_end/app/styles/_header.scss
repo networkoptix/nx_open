@@ -159,64 +159,6 @@ $header-collapsing-width-1: 1px;
         }
     }
 
-    //.dropdown-menu {
-    //    background-clip: border-box;
-    //    min-width: 100%;
-    //    padding: $vertical-spacing/2 0;
-    //    border-radius: 0;
-    //
-    //    margin-top: 2px !important;
-    //    border: 1px solid $navbar-default-bg;
-    //
-    //    &:before {
-    //        content: " ";
-    //        position: absolute;
-    //        z-index: -1;
-    //        top: 0px;
-    //        left: -2px;
-    //        right: -2px;
-    //        bottom: -2px;
-    //        border: 1px solid $navbar-default-border;
-    //        border-top: none;
-    //
-    //        @include box-shadow(0 2px 4px transparentize($dark15,0.8));
-    //    }
-    //
-    //    & > li > a{
-    //        line-height: 32px !important;
-    //        padding: 0 $horizontal-spacing !important;
-    //        font-size: $font-size-base;
-    //
-    //        text-overflow: ellipsis;
-    //        overflow: hidden;
-    //        max-width: $max-dropdown-width;
-    //        margin: 0 -1px;
-    //
-    //        &:hover{
-    //            background-color: $light2 !important;
-    //        }
-    //
-    //        .system-owner{
-    //            color:$light10;
-    //        }
-    //    }
-    //
-    //    & > li.active > a{
-    //        margin-left: -1px;
-    //        border-left: $active-border-width solid $brand_core !important;
-    //        padding-left: $horizontal-spacing - $active-border-width !important;
-    //        &:hover{
-    //            background-color: transparent !important;
-    //            margin-right: 0px;
-    //            border: none;
-    //        }
-    //    }
-    //
-    //    .nav-divider{
-    //        margin: $vertical-spacing/2 $horizontal-spacing;
-    //    }
-    //}
-
     /* This is to prevent top menu from collapsing */
     & > div > .navbar-nav > li {
         float: left;

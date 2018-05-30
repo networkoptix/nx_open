@@ -1,12 +1,13 @@
 <div class="container auth-visible" process-loading="gettingSystem">
     <div ng-if="systemNoAccess" class="text-center">
         <h1>Failed to access System</h1>
-        <p>This link is broken,<br>
+        <h3>This link is broken,<br>
             System may be disconnected from %PRODUCT_NAME%,<br>
             Access to this System may be revoked, <br>
-            or you may be logged into a different account</p>
-        <p>
-            <a href="/systems" class="btn btn-default">Available Systems list</a>
+            or you may be logged into a different account
+        </h3>
+        <p class="mt-4 d-flex justify-content-center">
+            <a href="/systems" class="btn btn-primary">Available Systems list</a>
         </p>
     </div>
 

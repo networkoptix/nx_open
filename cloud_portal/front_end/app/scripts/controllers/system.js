@@ -118,22 +118,30 @@ angular.module('cloudApp')
                 if($scope.system.isMine){
                     // User is the owner. Deleting system means unbinding it and disconnecting all accounts
                     // dialogs.confirm(L.system.confirmDisconnect, L.system.confirmDisconnectTitle, L.system.confirmDisconnectAction, 'danger').
-                    dialogs.disconnect(systemId).then(updateAndGoToSystems);
+                    dialogs.disconnect(systemId)
+                        .then(function (result) {
+                            if (result === 'OK') {
+                                updateAndGoToSystems();
+                            }
+                        });
                 }
             };
 
             $scope.delete = function () {
                 if (!$scope.system.isMine) {
                     // User is not owner. Deleting means he'll lose access to it
-                    dialogs.confirm(L.system.confirmUnshareFromMe, L.system.confirmUnshareFromMeTitle, L.system.confirmUnshareFromMeAction, 'danger').then(function () {
-                        $scope.deletingSystem = process.init(function () {
-                            return $scope.system.deleteFromCurrentAccount();
-                        }, {
-                            successMessage: L.system.successDeleted.replace('{{systemName}}', $scope.system.info.name),
-                            errorPrefix   : L.errorCodes.cantUnshareWithMeSystemPrefix
-                        }).then(updateAndGoToSystems);
+                    dialogs.confirm(L.system.confirmUnshareFromMe, L.system.confirmUnshareFromMeTitle, L.system.confirmUnshareFromMeAction, 'btn-danger', 'Cancel')
+                        .then(function (result) {
+                            if (result === 'OK') {
+                                $scope.deletingSystem = process.init(function () {
+                                    return $scope.system.deleteFromCurrentAccount();
+                                }, {
+                                    successMessage: L.system.successDeleted.replace('{{systemName}}', $scope.system.info.name),
+                                    errorPrefix   : L.errorCodes.cantUnshareWithMeSystemPrefix
+                                }).then(updateAndGoToSystems);
 
-                        $scope.deletingSystem.run();
+                                $scope.deletingSystem.run();
+                            }
                     });
                 }
             };

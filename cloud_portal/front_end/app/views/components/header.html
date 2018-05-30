@@ -39,10 +39,10 @@
 
                 <ul class="nav navbar-nav navbar-right auth-visible">
                     <li ng-if="singleSystem" class="no-hover collapse-second hidden-collapse">
-                        <button class="btn btn-dropdown-toggle">
+                        <a href="/systems" class="m-0 border-0">
                             <span class="glyphicon glyphicon-home"></span>
                             <span class="ellipsis">{{activeSystem.name}}</span>
-                        </button>
+                        </a>
                     </li>
 
                     <li ng-if="systemCounter && !singleSystem" class="collapse-second">
