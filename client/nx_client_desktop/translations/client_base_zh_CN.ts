@@ -6340,7 +6340,7 @@ to %1</source>
     </message>
     <message>
       <source>Reindexing can fix problems with archive or backup if they have been lost or damaged, or if some hardware has been replaced.</source>
-      <translation type="unfinished">Reindexing can fix problems with archive or backup if they have been lost or damaged, or if some hardware has been replaced.</translation>
+      <translation>当资料遗失、损坏或更新硬件时，重新索引可以协助归档或备份</translation>
     </message>
   </context>
   <context>
@@ -8406,7 +8406,7 @@ to %1</source>
     </message>
     <message>
       <source>This field is case sensitive.</source>
-      <translation type="unfinished">This field is case sensitive.</translation>
+      <translation>此栏位有大小写之区分</translation>
     </message>
   </context>
   <context>
