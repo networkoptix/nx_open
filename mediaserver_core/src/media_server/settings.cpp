@@ -39,7 +39,8 @@ MSSettings::MSSettings(
     else
         initializeRunTimeSettings();
 
-    loadSettings();
+    m_settings.load(*m_roSettings);
+    loadAnalyticEventsStorageSettings();
 }
 
 QString MSSettings::defaultROSettingsFilePath()
@@ -51,9 +52,9 @@ QString MSSettings::defaultROSettingsFilePath()
 #endif
 }
 
-void MSSettings::initializeROSettingsFromConfFile( const QString& fileName )
+void MSSettings::initializeROSettingsFromConfFile(const QString& fileName)
 {
-    m_roSettings.reset( new QSettings( fileName, QSettings::IniFormat ) );
+    m_roSettings.reset(new QSettings(fileName, QSettings::IniFormat));
 }
 
 void MSSettings::initializeROSettings()
@@ -81,6 +82,16 @@ void MSSettings::initializeROSettings()
     ));
 }
 
+nx::mediaserver::Settings* MSSettings::mutableSettings()
+{
+    return &m_settings;
+}
+
+const nx::mediaserver::Settings& MSSettings::settings() const
+{
+    return m_settings;
+}
+
 QSettings* MSSettings::roSettings()
 {
     return m_roSettings.get();
@@ -101,29 +112,10 @@ const QSettings* MSSettings::runTimeSettings() const
     return m_rwSettings.get();
 }
 
-QString MSSettings::getDataDirectory() const
+void MSSettings::syncRoSettings() const
 {
-    return m_dataDirectory;
-}
-
-std::chrono::milliseconds MSSettings::hlsTargetDuration() const
-{
-    const auto value =
-        std::chrono::milliseconds(m_roSettings->value(
-            nx_ms_conf::HLS_TARGET_DURATION_MS,
-            nx_ms_conf::DEFAULT_TARGET_DURATION_MS).toUInt());
-
-    return value > std::chrono::milliseconds::zero()
-        ? value
-        : std::chrono::milliseconds(nx_ms_conf::DEFAULT_TARGET_DURATION_MS);
-}
-
-std::chrono::milliseconds MSSettings::delayBeforeSettingMasterFlag() const
-{
-    return nx::utils::parseTimerDuration(
-        m_roSettings->value(
-            nx_ms_conf::DELAY_BEFORE_SETTING_MASTER_FLAG,
-            nx_ms_conf::DEFAULT_DELAY_BEFORE_SETTING_MASTER_FLAG).toString());
+    m_settings.save(*m_roSettings);
+    m_roSettings->sync();
 }
 
 nx::analytics::storage::Settings MSSettings::analyticEventsStorage() const
@@ -133,17 +125,8 @@ nx::analytics::storage::Settings MSSettings::analyticEventsStorage() const
 
 void MSSettings::close()
 {
+    syncRoSettings();
     m_rwSettings->sync();
-    m_roSettings->sync();
-}
-
-void MSSettings::reopen(const QString& roFile, const QString& rwFile)
-{
-    if (!roFile.isEmpty())
-        m_roSettings.reset(new QSettings(roFile, QSettings::IniFormat));
-
-    if (!rwFile.isEmpty())
-        m_rwSettings.reset(new QSettings(rwFile, QSettings::IniFormat));
 }
 
 QString MSSettings::defaultRunTimeSettingsFilePath()
@@ -164,9 +147,9 @@ QString MSSettings::defaultConfigDirectory()
     #endif
 }
 
-void MSSettings::initializeRunTimeSettingsFromConfFile( const QString& fileName )
+void MSSettings::initializeRunTimeSettingsFromConfFile(const QString& fileName)
 {
-    m_rwSettings.reset( new QSettings( fileName, QSettings::IniFormat ) );
+    m_rwSettings.reset(new QSettings(fileName, QSettings::IniFormat));
 }
 
 void MSSettings::initializeRunTimeSettings()
@@ -180,33 +163,6 @@ void MSSettings::initializeRunTimeSettings()
     ));
 }
 
-void MSSettings::loadSettings()
-{
-    loadGeneralSettings();
-    loadAnalyticEventsStorageSettings();
-}
-
-void MSSettings::loadGeneralSettings()
-{
-    m_dataDirectory = loadDataDirectory();
-}
-
-QString MSSettings::loadDataDirectory()
-{
-    const QString& dataDirFromSettings = m_roSettings->value("dataDir").toString();
-    if (!dataDirFromSettings.isEmpty())
-        return dataDirFromSettings;
-
-#ifdef Q_OS_LINUX
-    QString defVarDirName = QString("/opt/%1/mediaserver/var").arg(QnAppInfo::linuxOrganizationName());
-    QString varDirName = m_roSettings->value("varDir", defVarDirName).toString();
-    return varDirName;
-#else
-    const QStringList& dataDirList = QStandardPaths::standardLocations(QStandardPaths::DataLocation);
-    return dataDirList.isEmpty() ? QString() : dataDirList[0];
-#endif
-}
-
 void MSSettings::loadAnalyticEventsStorageSettings()
 {
     QnSettings settings(m_roSettings.get());
@@ -217,7 +173,7 @@ void MSSettings::loadAnalyticEventsStorageSettings()
     if (m_analyticEventsStorage.dbConnectionOptions.dbName.isEmpty())
     {
         m_analyticEventsStorage.dbConnectionOptions.dbName =
-            nx::network::url::normalizePath(getDataDirectory() + "/object_detection.sqlite");
+            nx::network::url::normalizePath(m_settings.dataDir() + "/object_detection.sqlite");
     }
     m_roSettings->endGroup();
 }

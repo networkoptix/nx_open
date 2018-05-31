@@ -103,6 +103,8 @@ public:
         int* totalProfileNumber,
         std::set<int>* profilesToRemoveIfProfilesExhausted);
 
+    CameraDiagnostics::Result fetchProfiles(HanwhaProfileMap* outProfiles);
+
     CameraDiagnostics::Result removeProfile(int profileNumber);
 
     CameraDiagnostics::Result createProfile(int* outProfileNumber, Qn::ConnectionRole role);
@@ -124,6 +126,10 @@ public:
         Qn::ConnectionRole role,
         boost::optional<int> forcedProfileNameLength = boost::none) const;
 
+    bool needToReplaceProfile(
+        const boost::optional<HanwhaVideoProfile>& nxProfileToReplace,
+        Qn::ConnectionRole role) const;
+
     std::shared_ptr<HanwhaSharedResourceContext> sharedContext() const;
 
     virtual bool setCameraCredentialsSync(const QAuthenticator& auth, QString* outErrorString = nullptr) override;
@@ -134,6 +140,9 @@ public:
         Qn::ConnectionRole role,
         const QnLiveStreamParams& parameters,
         HanwhaProfileParameterFlags flags) const;
+
+    bool isBypassSupported() const;
+    boost::optional<int> bypassChannel() const;
 
 protected:
     virtual nx::mediaserver::resource::StreamCapabilityMap getStreamCapabilityMapFromDrives(
@@ -148,6 +157,7 @@ protected:
 private:
     CameraDiagnostics::Result initDevice();
     CameraDiagnostics::Result initSystem();
+    CameraDiagnostics::Result initBypass();
 
     CameraDiagnostics::Result initMedia();
     CameraDiagnostics::Result setProfileSessionPolicy();
@@ -181,6 +191,9 @@ private:
     CameraDiagnostics::Result fetchCodecInfo(HanwhaCodecInfo* outCodecInfo);
 
     void cleanUpOnProxiedDeviceChange();
+
+    QnPtzAuxilaryTraitList calculatePtzTraits() const;
+    void calculateAutoFocusSupport(QnPtzAuxilaryTraitList* outTraitList) const;
 
     AVCodecID defaultCodecForStream(Qn::ConnectionRole role) const;
     QSize defaultResolutionForStream(Qn::ConnectionRole role) const;
@@ -297,13 +310,11 @@ private:
 
     const HanwhaAttributes& attributes() const;
     const HanwhaCgiParameters& cgiParameters() const;
-    boost::optional<int> bypassChannel() const;
 
     // Proxied id is an id of a device connected to some proxy (e.g. NVR)
     virtual QString proxiedId() const;
     virtual void setProxiedId(const QString& proxiedId);
 
-    bool isBypassSupported() const;
     bool isProxiedMultisensorCamera() const;
 
 private:

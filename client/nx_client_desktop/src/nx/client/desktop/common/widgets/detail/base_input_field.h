@@ -2,8 +2,10 @@
 
 #include <QtWidgets/QWidget>
 
-#include <nx/client/desktop/common/utils/validators.h>
 #include <utils/common/connective.h>
+
+#include <nx/client/desktop/common/utils/validators.h>
+#include <nx/utils/std/optional.h>
 
 namespace nx {
 namespace client {
@@ -50,6 +52,12 @@ public:
 
     QString placeholderText() const;
     void setPlaceholderText(const QString& value);
+
+    std::optional<QString> optionalText() const;
+    void setOptionalText(const std::optional<QString>& value);
+
+    QString optionalTextPlaceholder() const;
+    void setOptionalTextPlaceholder(const QString& value);
 
     bool isReadOnly() const;
     void setReadOnly(bool value);

@@ -1,7 +1,4 @@
-"""Manipulate directory to which server instance is installed."""
-
 import logging
-import re
 import sys
 from io import BytesIO
 
@@ -10,6 +7,7 @@ from framework.installation.installer import Version, known_customizations
 from framework.installation.upstart_service import UpstartService
 from framework.os_access.exceptions import DoesNotExist
 from framework.os_access.path import copy_file
+from framework.os_access.posix_shell import SSH
 
 if sys.version_info[:2] == (2, 7):
     # noinspection PyCompatibility,PyUnresolvedReferences
@@ -22,15 +20,14 @@ _logger = logging.getLogger(__name__)
 
 
 class DebInstallation(Installation):
-    """Either installed via dpkg or unpacked"""
+    """Manage installation via dpkg"""
 
     def __init__(self, ssh_access, deb):
-        """Either valid or hypothetical (invalid or non-existent) installation."""
-        self._ssh = ssh_access.ssh
-        self._deb = deb
-        self.dir = ssh_access.Path('/opt', self._deb.customization.linux_subdir)
+        self._ssh = ssh_access.ssh  # type: SSH
+        self.installer = deb
+        self.dir = ssh_access.Path('/opt', self.installer.customization.linux_subdir)
         self._bin = self.dir / 'bin'
-        self._executable = self._bin / 'mediaserver-bin'
+        self.binary = self._bin / 'mediaserver-bin'
         self._config = self.dir / 'etc' / 'mediaserver.conf'
         self._config_initial = self.dir / 'etc' / 'mediaserver.conf.initial'
         self.var = self.dir / 'var'
@@ -39,13 +36,13 @@ class DebInstallation(Installation):
         self.os_access = ssh_access
         self.service = UpstartService(
             self.os_access.ssh,
-            self._deb.customization.linux_service_name,
+            self.installer.customization.linux_service_name,
             stop_timeout_sec=120 + 10,  # 120 seconds specified in upstart conf file.
             )
 
     def is_valid(self):
         paths_to_check = [
-            self.dir, self._bin / 'mediaserver', self._executable,
+            self.dir, self._bin / 'mediaserver', self.binary,
             self._config, self._config_initial]
         all_paths_exist = True
         for path in paths_to_check:
@@ -79,28 +76,6 @@ class DebInstallation(Installation):
         except DoesNotExist:
             return None
 
-    def patch_binary_set_cloud_host(self, new_host):
-        regex = re.compile(r'(?P<tag>this_is_cloud_host_name) (?P<host>[^\0]+)\0+')
-
-        # Path to .so with cloud host string. Differs among versions.
-        for lib_name in {'libnx_network.so', 'libcommon.so'}:
-            lib_path = self.dir / 'lib' / lib_name
-            try:
-                lib_bytes_original = lib_path.read_bytes()
-            except DoesNotExist:
-                _logger.warning("Lib %s doesn't exist.", lib_path)
-            else:
-                def compose_replacement(match):
-                    replacement = '{} {}'.format(match.group('tag'), new_host).ljust(len(match.group(0)), '\0')
-                    _logger.info("Replace cloud host %s with %s in %s.", match.group('host'), new_host, lib_path)
-                    assert replacement.endswith('\0'), "Host name {} is too long.".format(new_host)
-                    return replacement
-
-                lib_bytes_replaced = regex.sub(compose_replacement, lib_bytes_original)
-                if lib_bytes_replaced != lib_bytes_original:
-                    assert len(lib_bytes_replaced) == len(lib_bytes_original)
-                    lib_path.write_bytes(lib_bytes_replaced)
-
     def _can_be_reused(self):
         if not self.is_valid():
             return False
@@ -112,13 +87,13 @@ class DebInstallation(Installation):
         build_info = dict(
             line.split('=', 1)
             for line in build_info_text.splitlines(False))
-        if self._deb.version != Version(build_info['version']):
+        if self.installer.version != Version(build_info['version']):
             return False
         customization, = (
             customization
             for customization in known_customizations
             if customization.customization_name == build_info['customization'])
-        if self._deb.customization != customization:
+        if self.installer.customization != customization:
             return False
         return True
 
@@ -126,9 +101,9 @@ class DebInstallation(Installation):
         if self._can_be_reused():
             return
 
-        remote_path = self.os_access.Path.tmp() / self._deb.path.name
+        remote_path = self.os_access.Path.tmp() / self.installer.path.name
         remote_path.parent.mkdir(parents=True, exist_ok=True)
-        copy_file(self._deb.path, remote_path)
+        copy_file(self.installer.path, remote_path)
         self.os_access.ssh.run_sh_script(
             # language=Bash
             '''

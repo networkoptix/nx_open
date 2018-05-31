@@ -8,6 +8,8 @@
 #include <core/resource/resource_fwd.h>
 #include <core/resource/motion_window.h>
 
+#include <nx/utils/std/optional.h>
+
 class QnAspectRatio;
 struct QnMediaDewarpingParams;
 
@@ -35,6 +37,7 @@ public:
     void applyChanges();
     void setReadOnly(bool value);
     void setSettingsOptimizationEnabled(bool value);
+    void setGlobalPermissions(Qn::GlobalPermissions value);
     void setSingleWearableState(const WearableState& value);
     void loadCameras(const QnVirtualCameraResourceList& cameras);
     void setSingleCameraUserName(const QString& text);
@@ -57,6 +60,7 @@ public:
     void setCustomAspectRatio(const QnAspectRatio& value);
     void setCustomRotation(const Rotation& value);
     void setRecordingEnabled(bool value);
+    void setAudioEnabled(bool value);
     void setMotionDetectionEnabled(bool value);
     void setMotionRegionList(const QList<QnMotionRegion>& value);
     void setFisheyeSettings(const QnMediaDewarpingParams& value);
@@ -75,6 +79,7 @@ public:
     void resetExpertSettings();
     void setWearableMotionDetectionEnabled(bool value);
     void setWearableMotionSensitivity(int value);
+    void setCredentials(const std::optional<QString>& login, const std::optional<QString>& password);
 
 signals:
     void stateChanged(const CameraSettingsDialogState& state);

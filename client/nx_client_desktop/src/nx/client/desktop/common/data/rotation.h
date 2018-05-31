@@ -2,8 +2,6 @@
 
 #include <QtCore/QMetaType>
 
-#include <nx/utils/std/optional.h>
-
 namespace nx {
 namespace client {
 namespace desktop {
@@ -13,8 +11,6 @@ class Rotation
 public:
     Rotation() = default;
     explicit Rotation(qreal degrees);
-
-    bool isValid() const;
 
     qreal value() const;
     QString toString() const;
@@ -26,7 +22,7 @@ public:
     bool operator!=(const Rotation& other) const;
 
 private:
-    std::optional<qreal> m_degrees;
+    qreal m_degrees = 0;
 };
 
 } // namespace desktop

@@ -31,6 +31,12 @@
    </item>
    <item>
     <widget class="Line" name="overLicensingLine">
+     <property name="maximumSize">
+      <size>
+       <width>16777215</width>
+       <height>1</height>
+      </size>
+     </property>
      <property name="frameShadow">
       <enum>QFrame::Plain</enum>
      </property>
@@ -40,10 +46,19 @@
     </widget>
    </item>
    <item>
-    <widget class="QnLicensesProposeWidget" name="licensingWidget" native="true"/>
+    <widget class="nx::client::desktop::CameraLicensePanelWidget" name="licensePanel" native="true">
+     <zorder>overLicensingLine</zorder>
+     <zorder>overGridLine</zorder>
+    </widget>
    </item>
    <item>
     <widget class="Line" name="overGridLine">
+     <property name="maximumSize">
+      <size>
+       <width>16777215</width>
+       <height>1</height>
+      </size>
+     </property>
      <property name="frameShadow">
       <enum>QFrame::Plain</enum>
      </property>
@@ -225,12 +240,6 @@
    <container>1</container>
   </customwidget>
   <customwidget>
-   <class>QnLicensesProposeWidget</class>
-   <extends>QWidget</extends>
-   <header location="global">ui/widgets/licensing/licenses_propose_widget.h</header>
-   <container>1</container>
-  </customwidget>
-  <customwidget>
    <class>nx::client::desktop::CameraInfoWidget</class>
    <extends>QWidget</extends>
    <header location="global">nx/client/desktop/resource_properties/camera/widgets/camera_info_widget.h</header>
@@ -240,6 +249,12 @@
    <class>nx::client::desktop::WearableCameraMotionWidget</class>
    <extends>QWidget</extends>
    <header location="global">nx/client/desktop/resource_properties/camera/widgets/wearable_camera_motion_widget.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>nx::client::desktop::CameraLicensePanelWidget</class>
+   <extends>QWidget</extends>
+   <header location="global">nx/client/desktop/resource_properties/camera/widgets/camera_license_panel_widget.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

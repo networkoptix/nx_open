@@ -45,6 +45,9 @@ bool Sps::decodeFromVideoFrame(const QnConstCompressedVideoDataPtr& videoData)
 
 bool Sps::decode(const uint8_t* payload, int payloadLength)
 {
+    if (payloadLength <= NalUnitHeader::kTotalLength)
+        return false;
+
     payload += NalUnitHeader::kTotalLength;
     payloadLength -= NalUnitHeader::kTotalLength;
 

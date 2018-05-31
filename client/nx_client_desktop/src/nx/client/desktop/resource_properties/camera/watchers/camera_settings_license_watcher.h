@@ -1,6 +1,7 @@
 #pragma once
 
 #include <QtCore/QObject>
+#include <QtCore/QScopedPointer>
 
 #include <core/resource/resource_fwd.h>
 #include <ui/workbench/workbench_context_aware.h>
@@ -23,6 +24,8 @@ public:
     explicit CameraSettingsLicenseWatcher(CameraSettingsDialogStore* store,
         QObject* parent = nullptr);
 
+    virtual ~CameraSettingsLicenseWatcher() override;
+
     QnVirtualCameraResourceList cameras() const;
     void setCameras(const QnVirtualCameraResourceList& value);
 
@@ -30,7 +33,7 @@ public:
 
 private:
     class Private;
-    Private* const d = nullptr;
+    const QScopedPointer<Private> d;
 };
 
 } // namespace desktop

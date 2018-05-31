@@ -33,7 +33,6 @@ namespace StreamingParams
     static const QLatin1String SESSION_ID_PARAM_NAME( "sessionID" );
     static const QLatin1String HI_QUALITY_PARAM_NAME( "hi" );
     static const QLatin1String LO_QUALITY_PARAM_NAME( "lo" );
-    static const QLatin1String FFMPEG_REALTIME_OPTIMIZATION("ffmpegRealTimeOptimization");
 }
 
 #endif  //STREAMING_PARAMS_H

@@ -66,7 +66,7 @@ void toUrlParams(const QByteArray& id, QUrlQuery* query)
 }
 
 bool parseHttpRequestParams(
-    QnCommonModule* commonModule,
+    QnCommonModule* /*commonModule*/,
     const QString& command, const QnRequestParamList& params, QnUuid* id)
 {
     return deserialize(params, lit("id"), id);

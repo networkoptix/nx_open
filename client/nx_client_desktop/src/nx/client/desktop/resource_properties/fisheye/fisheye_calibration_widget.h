@@ -36,6 +36,9 @@ public:
     void setImageProvider(ImageProvider *provider);
     ImageProvider* imageProvider() const;
 
+    bool isReadOnly() const;
+    void setReadOnly(bool value);
+
     void init();
 
     void autoCalibrate();
@@ -54,8 +57,7 @@ private:
     QScopedPointer<Ui::FisheyeCalibrationWidget> ui;
     QScopedPointer<QnFisheyeCalibrator> m_calibrator;
     QPointer<ImageProvider> m_imageProvider;
-
-    int m_lastError;
+    int m_lastError = 0;
 };
 
 } // namespace desktop

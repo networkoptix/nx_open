@@ -25,14 +25,18 @@ def make_dirty_mediaserver(name, installation):
 def cleanup_mediaserver(mediaserver, ca):
     """Stop and remove everything produced by previous runs. Make installation "fresh"."""
     mediaserver.stop(already_stopped_ok=True)
+    log.info("Remove old core dumps.")
     for core_dump_path in mediaserver.installation.list_core_dumps():
         core_dump_path.unlink()
     try:
+        log.info("Remove var directory %s.", mediaserver.installation.var)
         mediaserver.installation.var.rmtree()
     except DoesNotExist:
         pass
+    log.info("Put key pair to %s.", mediaserver.installation.key_pair)
     mediaserver.installation.key_pair.parent.mkdir(parents=True, exist_ok=True)
     mediaserver.installation.key_pair.write_text(ca.generate_key_and_cert())
+    log.info("Update conf file.")
     mediaserver.installation.restore_mediaserver_conf()
     mediaserver.installation.update_mediaserver_conf({
         'logLevel': 'DEBUG2',
@@ -96,7 +100,7 @@ def collect_core_dumps_from_mediaserver(mediaserver, root_artifact_factory):
         local_traceback_path.write_bytes(traceback)
         log.warning(
             'Core dump on %r: %s, %s.',
-            mediaserver.name, mediaserver, local_core_dump_path, local_traceback_path)
+            mediaserver, local_core_dump_path, local_traceback_path)
 
 
 def collect_artifacts_from_mediaserver(mediaserver, root_artifact_factory):
@@ -111,9 +115,14 @@ class MediaserverFactory(object):
         self._ca = ca
 
     @contextmanager
-    def allocated_mediaserver(self, vm):
+    def allocated_mediaserver(self, name, vm):
+        # While it's tempting to take vm.alias as name and, moreover, it might be a good decision,
+        # existing client code structure (ClosingPool class) requires this function to have name parameter.
+        # It's wrong but requires human-hours of thinking.
+        # TODO: Refactor client code so this method doesn't rely on it.
         installation = make_installation(self._mediaserver_installers, vm.type, vm.os_access)
-        mediaserver = setup_clean_mediaserver(vm.alias, installation, self._ca)
+        log.info("Mediaserver name %s is not same as VM alias %s. Not a mistake?", name, vm.alias)
+        mediaserver = setup_clean_mediaserver(name, installation, self._ca)
         yield mediaserver
         examine_mediaserver(mediaserver)
         collect_artifacts_from_mediaserver(mediaserver, self._artifact_factory)

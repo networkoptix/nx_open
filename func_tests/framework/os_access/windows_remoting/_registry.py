@@ -7,6 +7,8 @@ from framework.os_access.windows_remoting import CIMQuery
 _logger = logging.getLogger(__name__)
 
 _keys = {
+    # Look for constants in documentation of methods of the StdRegProv class. E.g. of EnumValues method.
+    # See: https://msdn.microsoft.com/en-us/library/aa390388(v=vs.85).aspx
     u'HKEY_CLASSES_ROOT': 2147483648,
     u'HKEY_CURRENT_USER': 2147483649,
     u'HKEY_LOCAL_MACHINE': 2147483650,

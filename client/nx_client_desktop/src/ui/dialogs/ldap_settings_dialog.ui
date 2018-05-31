@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>463</width>
-    <height>278</height>
+    <height>331</height>
    </rect>
   </property>
   <property name="minimumSize">
@@ -36,7 +36,7 @@
     <number>0</number>
    </property>
    <item>
-    <layout class="QVBoxLayout" name="verticalLayout_3" stretch="0,1,0,1">
+    <layout class="QVBoxLayout" name="verticalLayout_3" stretch="0,1,0,1,0">
      <property name="spacing">
       <number>16</number>
      </property>
@@ -223,6 +223,9 @@
        </property>
       </spacer>
      </item>
+     <item>
+      <widget class="QnWordWrappedLabel" name="ldapAdminWarningLabel" native="true"/>
+     </item>
     </layout>
    </item>
    <item>
@@ -241,6 +244,14 @@
    </item>
   </layout>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>QnWordWrappedLabel</class>
+   <extends>QWidget</extends>
+   <header location="global">ui/widgets/word_wrapped_label.h</header>
+   <container>1</container>
+  </customwidget>
+ </customwidgets>
  <resources/>
  <connections/>
 </ui>

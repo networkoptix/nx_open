@@ -34,6 +34,8 @@ public:
 
     void clear();
 
+    void setGlassVisible(bool visible);
+
 signals:
     void textChanged(const QString& text);
     void escKeyPressed();
@@ -53,6 +55,7 @@ protected:
     void initStyleOption(QStyleOptionFrameV2* option) const;
 
 private:
+    QAction * m_glassIcon = nullptr;
     QLineEdit* const m_lineEdit = nullptr;
     const QScopedPointer<utils::PendingOperation> m_emitTextChanged;
 };

@@ -64,8 +64,15 @@ enum class HanwhaDeviceType
     decoder,
     hybrid
 };
-
 QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(HanwhaDeviceType);
+
+enum class HanwhaBypassSupportType
+{
+    normal,
+    forced,
+    disabled
+};
+QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(HanwhaBypassSupportType);
 
 static const int kHanwhaBlockedHttpCode = 490;
 static const int kHanwhaInvalidParameterHttpCode = 602;
@@ -220,6 +227,9 @@ static const int kMaxPossibleFps = 1000;
 
 static const QString kHanwhaProxiedIdParamName = lit("proxiedId");
 
+static const QString kHanwhaMinimalBypassFirmware = lit("2.10");
+static const QString kHanwhaBypassOverrideParameterName = lit("bypassOverride");
+
 // TODO: #dmishin get rid of the properties below and move Hanwha driver to the standard
 // profile configuration mechanism.
 static const QString kPrimaryStreamResolutionParamName = lit("primaryStreamResolution");
@@ -245,3 +255,6 @@ static const QString kSecondaryStreamFpsParamName = lit("secondaryStreamFps");
 } // namespace nx
 
 QN_FUSION_DECLARE_FUNCTIONS(nx::mediaserver_core::plugins::HanwhaDeviceType, (lexical));
+QN_FUSION_DECLARE_FUNCTIONS(
+    nx::mediaserver_core::plugins::HanwhaBypassSupportType,
+    (metatype)(numeric)(lexical));

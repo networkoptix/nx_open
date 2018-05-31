@@ -133,9 +133,6 @@ int Appserver2Process::exec()
             nx::utils::TimerManager::instance(),
             settings.isP2pMode()));
 
-    std::map<QString, QVariant> confParams;
-    ec2ConnectionFactory->setConfParams(std::move(confParams));
-
     const nx::utils::Url dbUrl = nx::utils::Url::fromLocalFile(settings.dbFilePath());
 
     ec2::AbstractECConnectionPtr ec2Connection;

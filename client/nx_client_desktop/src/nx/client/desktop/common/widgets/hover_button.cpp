@@ -1,80 +1,61 @@
 #include "hover_button.h"
 
-#include <QtWidgets/QVBoxLayout>
-#include <QtGui/QMouseEvent>
 #include <QtGui/QPainter>
+#include <QtWidgets/QStyle>
 
-#include <ui/style/globals.h>
 #include <ui/style/skin.h>
-#include <ui/style/nx_style.h>
-#include <ui/style/helper.h>
 
 namespace nx {
 namespace client {
 namespace desktop {
 
-
-HoverButton::HoverButton(const QString& normal, const QString& highlighted, QWidget* parent) :
-    HoverButton(normal, highlighted, QString(), parent)
+HoverButton::HoverButton(const QString& normalPixmap, const QString& hoveredPixmap, QWidget* parent):
+    HoverButton(normalPixmap, hoveredPixmap, QString(), parent)
 {
 }
 
-HoverButton::HoverButton(const QString& normal, const QString& highlighted, const QString& pressed,
-    QWidget* parent) : QAbstractButton(parent)
+HoverButton::HoverButton(
+    const QString& normalPixmap,
+    const QString& hoveredPixmap,
+    const QString& pressedPixmap,
+    QWidget* parent)
+    :
+    base_type(parent),
+    m_normal(normalPixmap.isEmpty() ? QPixmap() : qnSkin->pixmap(normalPixmap)),
+    m_hovered(hoveredPixmap.isEmpty() ? QPixmap() : qnSkin->pixmap(hoveredPixmap)),
+    m_pressed(pressedPixmap.isEmpty() ? QPixmap() : qnSkin->pixmap(pressedPixmap))
 {
-    m_normal = qnSkin->pixmap(normal, true);
-    m_highlighted = qnSkin->pixmap(highlighted, true);
-    m_hasPressedState = !pressed.isEmpty();
-    if (m_hasPressedState)
-        m_pressed = qnSkin->pixmap(pressed, true);
-
-    installEventFilter(this);
-
     setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
-    // For hovering stuff
     setMouseTracking(true);
+    setAttribute(Qt::WA_Hover);
 }
 
 QSize HoverButton::sizeHint() const
 {
-    return m_normal.size();
+    return m_normal.size() / m_normal.devicePixelRatio();
 }
 
 void HoverButton::paintEvent(QPaintEvent* event)
 {
+    QPixmap pixmap;
+    if (isDown())
+        pixmap = m_pressed.isNull() ? m_normal : m_pressed;
+    else if (underMouse())
+        pixmap = m_hovered.isNull() ? m_normal : m_hovered;
+    else
+        pixmap = m_normal;
+
+    if (pixmap.isNull())
+        return;
+
+    const auto pixmapRect = QStyle::alignedRect(
+        Qt::LeftToRight,
+        Qt::AlignCenter,
+        pixmap.size() / pixmap.devicePixelRatio(),
+        rect());
+
     QPainter painter(this);
-
-    QPixmap pixmap = m_normal;
-    if (m_hasPressedState && isDown())
-        pixmap = m_pressed;
-    if (m_isHovered && !isDown())
-        pixmap = m_highlighted;
-
-    if (!pixmap.isNull())
-    {
-        auto icon = pixmap.rect();
-        QPointF centeredCorner = rect().center() - icon.center();
-        painter.drawPixmap(centeredCorner * 0.5, pixmap);
-    }
-}
-
-void HoverButton::mouseMoveEvent(QMouseEvent* event)
-{
-    bool hovered = rect().contains(event->pos());
-    if (hovered != m_isHovered)
-    {
-        m_isHovered = hovered;
-        update();
-    }
-}
-
-void HoverButton::leaveEvent(QEvent* event)
-{
-    if (m_isHovered)
-    {
-        m_isHovered = false;
-        update();
-    }
+    painter.drawPixmap(pixmapRect, pixmap);
 }
 
 } // namespace desktop

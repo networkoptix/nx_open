@@ -39,6 +39,7 @@ void fetchFromCameras(
     std::function<Data(const Camera&)> getter)
 {
     Data data;
+    value.resetBase();
     if (utils::algorithm::same(cameras.cbegin(), cameras.cend(), getter, &data))
         value.setBase(data);
 }
@@ -51,6 +52,7 @@ void fetchFromCameras(
     std::function<Data(const Intermediate&)> converter)
 {
     Intermediate data;
+    value.resetBase();
     if (utils::algorithm::same(cameras.cbegin(), cameras.cend(), getter, &data))
         value.setBase(converter(data));
 }
@@ -277,8 +279,10 @@ State::ImageControlSettings calculateImageControlSettings(
             cameras,
             [](const auto& camera)
             {
-                const auto rotationString = camera->getProperty(QnMediaResource::rotationKey());
-                return Rotation::closestStandardRotation(rotationString.toInt());
+                const QString rotationString = camera->getProperty(QnMediaResource::rotationKey());
+                return rotationString.isEmpty()
+                    ? Rotation()
+                    : Rotation::closestStandardRotation(rotationString.toInt());
             });
     }
 
@@ -417,6 +421,13 @@ State CameraSettingsDialogStateReducer::setSettingsOptimizationEnabled(State sta
     return state;
 }
 
+State CameraSettingsDialogStateReducer::setGlobalPermissions(
+    State state, Qn::GlobalPermissions value)
+{
+    state.globalPermissions = value;
+    return state;
+}
+
 State CameraSettingsDialogStateReducer::setSingleWearableState(
     State state, const WearableState& value)
 {
@@ -443,15 +454,19 @@ State CameraSettingsDialogStateReducer::loadCameras(
         ? Camera()
         : cameras.first();
 
+    // TODO: #vkutin #gdm Separate camera-dependent state from camera-independent state.
+    // Reset camera-dependent state with a single call.
     state.hasChanges = false;
     state.singleCameraProperties = {};
     state.singleCameraSettings = {};
     state.singleIoModuleSettings = {};
     state.devicesDescription = {};
+    state.credentials = {};
     state.expert = {};
     state.recording = {};
     state.wearableMotion = {};
     state.devicesCount = cameras.size();
+    state.audioEnabled = {};
     state.alert = {};
 
     state.deviceType = firstCamera
@@ -619,6 +634,14 @@ State CameraSettingsDialogStateReducer::loadCameras(
     state.recording.maxDays = calculateMaxRecordingDays(cameras);
 
     state.imageControl = calculateImageControlSettings(cameras);
+
+    fetchFromCameras<bool>(state.audioEnabled, cameras,
+        [](const Camera& camera) { return camera->isAudioEnabled(); });
+
+    fetchFromCameras<QString>(state.credentials.login, cameras,
+        [](const Camera& camera) { return camera->getAuth().user(); });
+    fetchFromCameras<QString>(state.credentials.password, cameras,
+        [](const Camera& camera) { return camera->getAuth().password(); });
 
     fetchFromCameras<bool>(state.expert.dualStreamingDisabled, cameras,
         [](const Camera& camera) { return camera->isDualStreamingDisabled(); });
@@ -917,6 +940,13 @@ State CameraSettingsDialogStateReducer::setRecordingEnabled(State state, bool va
     return state;
 }
 
+State CameraSettingsDialogStateReducer::setAudioEnabled(State state, bool value)
+{
+    state.hasChanges = true;
+    state.audioEnabled.setUser(value);
+    return state;
+}
+
 State CameraSettingsDialogStateReducer::setMotionDetectionEnabled(State state, bool value)
 {
     state.hasChanges = true;
@@ -1164,6 +1194,21 @@ State CameraSettingsDialogStateReducer::setWearableMotionSensitivity(State state
         return state;
 
     state.wearableMotion.sensitivity.setUser(value);
+    state.hasChanges = true;
+    return state;
+}
+
+State CameraSettingsDialogStateReducer::setCredentials(
+    State state, const std::optional<QString>& login, const std::optional<QString>& password)
+{
+    if (!login && !password)
+        return state;
+
+    if (login)
+        state.credentials.login.setUser(login->trimmed());
+    if (password)
+        state.credentials.password.setUser(password->trimmed());
+
     state.hasChanges = true;
     return state;
 }

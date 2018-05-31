@@ -31,15 +31,15 @@ QnCustomBusinessEventWidget::QnCustomBusinessEventWidget(QWidget* parent):
 
     connect(ui->omitLogging, SIGNAL(toggled(bool)), this, SLOT(setOmitLogging(bool)));
 
-    ui->sourceLabel->addHintLine(tr("Event will trigger only if there are matches in caption with any of entered keywords."));
+    ui->sourceLabel->addHintLine(tr("Event will trigger only if there are matches in the source with any of the entered keywords."));
     ui->sourceLabel->addHintLine(tr("If the field is empty, event will always trigger."));
     setHelpTopic(ui->sourceLabel, Qn::EventsActions_Generic_Help);
 
-    ui->captionLabel->addHintLine(tr("Event will trigger only if there are matches in caption with any of entered keywords."));
+    ui->captionLabel->addHintLine(tr("Event will trigger only if there are matches in the caption with any of the entered keywords."));
     ui->captionLabel->addHintLine(tr("If the field is empty, event will always trigger."));
     setHelpTopic(ui->captionLabel, Qn::EventsActions_Generic_Help);
 
-    ui->descriptionLabel->addHintLine(tr("Event will trigger only if there are matches in caption with any of entered keywords."));
+    ui->descriptionLabel->addHintLine(tr("Event will trigger only if there are matches in the description with any of the entered keywords."));
     ui->descriptionLabel->addHintLine(tr("If the field is empty, event will always trigger."));
     setHelpTopic(ui->descriptionLabel, Qn::EventsActions_Generic_Help);
 }

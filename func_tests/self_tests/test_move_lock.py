@@ -54,7 +54,7 @@ def test_already_acquired_wait_successfully(lock, same_path_lock):
         thread.start()
     for thread in threads:
         thread.join(timeout=5)
-    for exception in exceptions:
+    for exception in exceptions.values():
         raise exception
 
 

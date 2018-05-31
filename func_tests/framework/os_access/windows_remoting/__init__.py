@@ -5,9 +5,10 @@ from subprocess import list2cmdline
 
 import winrm
 from pathlib2 import PurePath
-from pylru import lrudecorator
 from requests import RequestException
 
+from framework.method_caching import cached_getter
+from framework.os_access.exceptions import exit_status_error_cls
 from ._cim_query import CIMQuery
 from ._cmd import Shell, run_command
 from ._env_vars import EnvVars
@@ -29,13 +30,18 @@ def command_args_to_str_list(command):
 
 
 class WinRM(object):
-    """Windows-specific interface"""
+    """Windows-specific interface
+
+    WinRM has only generic functions.
+    WinRM must not know of particular WMI classes and CMD and PowerShell scripts.
+    """
 
     def __init__(self, address, port, username, password):
         self._protocol = winrm.Protocol(
             'http://{}:{}/wsman'.format(address, port),
             username=username, password=password,
-            transport='ntlm',  # 'ntlm' works fast, 'plaintext' is easier to debug.
+            transport='ntlm',  # 'plaintext' is easier to debug but, for some obscure reason, is slower.
+            message_encryption='never',  # Any value except 'always' and 'auto'.
             operation_timeout_sec=120, read_timeout_sec=240)
         self._username = username
         self._repr = 'WinRM({!r}, {!r}, {!r}, {!r})'.format(address, port, username, password)
@@ -46,7 +52,7 @@ class WinRM(object):
     def __del__(self):
         self._shell().__exit__(None, None, None)
 
-    @lrudecorator(1)
+    @cached_getter
     def _shell(self):
         """Lazy shell creation"""
         shell = Shell(self._protocol)
@@ -62,12 +68,14 @@ class WinRM(object):
             exit_code,
             stdout_bytes.decode('ascii', errors='replace'),
             stderr_bytes.decode('ascii', errors='replace'))
+        if exit_code != 0:
+            raise exit_status_error_cls(exit_code)(stdout_bytes, stderr_bytes)
         return stdout_bytes
 
     def run_powershell_script(self, script, variables):
         return run_powershell_script(self._shell(), script, variables)
 
-    @lrudecorator(1)
+    @cached_getter
     def user_env_vars(self):
         # TODO: Work via Users class.
         users = Users(self._protocol)
@@ -81,7 +89,7 @@ class WinRM(object):
         env_vars = EnvVars.request(self._protocol, account[u'Caption'], default_env_vars)
         return env_vars
 
-    @lrudecorator(1)
+    @cached_getter
     def system_profile_dir(self):
         # TODO: Work via Users class.
         users = Users(self._protocol)

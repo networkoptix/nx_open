@@ -1,8 +1,8 @@
 import csv
 import logging
+import re
 from pprint import pformat
 from uuid import UUID
-import re
 
 from netaddr import EUI, IPAddress
 from netaddr.strategy.eui48 import mac_bare
@@ -10,7 +10,7 @@ from pylru import lrudecorator
 
 from framework.os_access.exceptions import exit_status_error_cls
 from framework.os_access.os_access_interface import OSAccess
-from framework.vms.hypervisor import VMAllAdaptersBusy, VMInfo, VMNotFound, TemplateVMNotFound
+from framework.vms.hypervisor import TemplateVMNotFound, VMAllAdaptersBusy, VMInfo, VMNotFound
 from framework.vms.port_forwarding import calculate_forwarded_ports
 from framework.waiting import wait_for_true
 

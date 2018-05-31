@@ -158,17 +158,22 @@ QVariant QnClientSettings::readValueFromSettings(QSettings* settings, int id,
         }
         case CUSTOM_CONNECTIONS:
         {
-            QnConnectionDataList result;
-            const int size = settings->beginReadArray(QLatin1String("AppServerConnections"));
-            for (int index = 0; index < size; ++index)
-            {
-                settings->setArrayIndex(index);
-                QnConnectionData connection = readConnectionData(settings);
-                if (connection.isValid())
-                    result.append(connection);
-            }
-            settings->endArray();
+            QMap<int, QnConnectionData> savedConnections;
 
+            settings->beginGroup(QLatin1String("AppServerConnections"));
+            for (const auto& group: settings->childGroups())
+            {
+                settings->beginGroup(group);
+                QnConnectionData connection = readConnectionData(settings);
+                settings->endGroup();
+
+                int index = group.toInt();
+                if (index > 0 && connection.isValid())
+                    savedConnections.insert(index, connection);
+            }
+            settings->endGroup();
+
+            const QnConnectionDataList result = savedConnections.values();
             return QVariant::fromValue<QnConnectionDataList>(result);
         }
         case AUDIO_VOLUME:

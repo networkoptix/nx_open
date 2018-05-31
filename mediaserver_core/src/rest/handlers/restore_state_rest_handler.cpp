@@ -47,7 +47,7 @@ void QnRestoreStateRestHandler::afterExecute(
     QnJsonRestResult reply;
     if (QJson::deserialize(body, &reply) && reply.error == QnJsonRestResult::NoError)
     {
-        qnServerModule->roSettings()->setValue(QnServer::kRemoveDbParamName, "1");
+        qnServerModule->mutableSettings()->removeDbOnStartup.set(true);
         restartServer(0);
     }
 }

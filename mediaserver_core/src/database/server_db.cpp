@@ -312,9 +312,7 @@ QnServerDb::QnServerDb(QnCommonModule* commonModule):
     m_runtimeActionsTotalRecords(0),
     m_tran(m_sdb, m_mutex)
 {
-    const QString fileName =
-        closeDirPath(
-            qnServerModule->roSettings()->value("eventsDBFilePath", getDataDirectory()).toString())
+    const QString fileName = closeDirPath(qnServerModule->settings().eventsDBFilePath())
         + QString(lit("mserver.sqlite"));
     addDatabase(fileName, "QnServerDb");
     if (m_sdb.open())

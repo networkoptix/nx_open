@@ -4,6 +4,7 @@
 #include "../redux/camera_settings_dialog_state.h"
 #include "../redux/camera_settings_dialog_store.h"
 
+#include <ui/common/read_only.h>
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
 #include <ui/style/skin.h>
@@ -214,6 +215,9 @@ void CameraExpertSettingsWidget::loadState(const CameraSettingsDialogState& stat
     ui->bitrateIncreaseWarningLabel->setVisible(ui->bitratePerGopCheckBox->isEnabled()
         && ui->bitratePerGopCheckBox->isChecked());
 
+    ::setReadOnly(ui->settingsDisableControlCheckBox, state.readOnly);
+    ::setReadOnly(ui->bitratePerGopCheckBox, state.readOnly);
+
     // Secondary Stream.
 
     const bool dualStreamingDisabledForAll = state.settingsOptimizationEnabled
@@ -229,6 +233,8 @@ void CameraExpertSettingsWidget::loadState(const CameraSettingsDialogState& stat
             state.expert.dualStreamingDisabled.hasValue() || !state.settingsOptimizationEnabled,
             dualStreamingDisabledForAll);
     }
+
+    ::setReadOnly(ui->secondStreamDisableCheckBox, state.readOnly);
 
     // Motion override.
 
@@ -281,6 +287,9 @@ void CameraExpertSettingsWidget::loadState(const CameraSettingsDialogState& stat
 
     ui->comboBoxForcedMotionStream->adjustSize();
 
+    ::setReadOnly(ui->checkBoxForceMotionDetection, state.readOnly);
+    ::setReadOnly(ui->comboBoxForcedMotionStream, state.readOnly);
+
     // Archive.
 
     CheckboxUtils::setupTristateCheckbox(
@@ -294,6 +303,9 @@ void CameraExpertSettingsWidget::loadState(const CameraSettingsDialogState& stat
         state.expert.secondaryRecordingDisabled.valueOr(false));
 
     ui->checkBoxSecondaryRecorder->setVisible(hasDualStreaming && !dualStreamingDisabledForAll);
+
+    ::setReadOnly(ui->checkBoxPrimaryRecorder, state.readOnly);
+    ::setReadOnly(ui->checkBoxSecondaryRecorder, state.readOnly);
 
     // Media Streaming.
 
@@ -309,6 +321,8 @@ void CameraExpertSettingsWidget::loadState(const CameraSettingsDialogState& stat
     {
         ui->comboBoxTransport->setCurrentIndex(0/*multiple values*/);
     }
+
+    ::setReadOnly(ui->comboBoxTransport, state.readOnly);
 
     // PTZ.
 
@@ -329,6 +343,8 @@ void CameraExpertSettingsWidget::loadState(const CameraSettingsDialogState& stat
         ui->checkBoxDisableNativePtzPresets,
         state.expert.nativePtzPresetsDisabled.hasValue() || !canDisableNativePtzPresets,
         state.expert.nativePtzPresetsDisabled.valueOr(false) && canDisableNativePtzPresets);
+
+    ::setReadOnly(ui->checkBoxDisableNativePtzPresets, state.readOnly);
 
     // Logical ID.
 
@@ -353,9 +369,14 @@ void CameraExpertSettingsWidget::loadState(const CameraSettingsDialogState& stat
         ui->logicalIdWarningLabel->setText(errorMessage);
     }
 
+    ::setReadOnly(ui->logicalIdSpinBox, state.readOnly);
+    ::setReadOnly(ui->generateLogicalIdButton, state.readOnly);
+    ::setReadOnly(ui->resetLogicalIdButton, state.readOnly);
+
     // Reset to defaults.
 
     ui->restoreDefaultsButton->setEnabled(!state.isDefaultExpertSettings);
+    ::setReadOnly(ui->restoreDefaultsButton, state.readOnly);
 
     // Force important layout change propagation.
 

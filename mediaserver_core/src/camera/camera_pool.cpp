@@ -41,7 +41,7 @@ void QnVideoCameraPool::stop()
 }
 
 QnVideoCameraPool::QnVideoCameraPool(
-    const MSSettings& settings,
+    const nx::mediaserver::Settings& settings,
     QnResourcePool* resourcePool)
     :
     m_settings(settings),
@@ -75,7 +75,8 @@ QnVideoCameraPtr QnVideoCameraPool::addVideoCamera(const QnResourcePtr& res)
     if (!dynamic_cast<const QnSecurityCamResource*>(res.data()))
         return QnVideoCameraPtr();
     QnMutexLocker lock(&m_mutex);
-    return m_cameras.insert(res, QnVideoCameraPtr(new QnVideoCamera(m_settings, res))).value();
+    return m_cameras.insert(
+        res, QnVideoCameraPtr(new QnVideoCamera(m_settings, res))).value();
 }
 
 bool QnVideoCameraPool::addVideoCamera(const QnResourcePtr& res, QnVideoCameraPtr camera)

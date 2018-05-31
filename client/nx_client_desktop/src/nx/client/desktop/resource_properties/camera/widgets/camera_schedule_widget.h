@@ -1,10 +1,11 @@
 #pragma once
 
 #include <QtCore/QScopedPointer>
-
 #include <QtWidgets/QWidget>
 
 #include <core/resource/resource_fwd.h>
+
+#include <nx/client/desktop/ui/actions/actions.h>
 
 namespace Ui { class CameraScheduleWidget; }
 
@@ -29,6 +30,9 @@ public:
     virtual ~CameraScheduleWidget() override;
 
     //void overrideMotionType(Qn::MotionType motionTypeOverride = Qn::MotionType::MT_Default);
+
+signals:
+    void actionRequested(nx::client::desktop::ui::action::IDType action);
 
 private:
     void setupUi();

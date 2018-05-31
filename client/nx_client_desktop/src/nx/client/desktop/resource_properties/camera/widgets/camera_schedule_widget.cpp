@@ -80,18 +80,21 @@ CameraScheduleWidget::CameraScheduleWidget(
         store, &CameraSettingsDialogStore::setRecordingEnabled);
 
     // Called when a cell is Alt-clicked. Fetches cell settings as current.
-    connect(ui->gridWidget, &QnScheduleGridWidget::cellActivated, store,
+    connect(ui->gridWidget, &ScheduleGridWidget::cellActivated, store,
         [this, store](const QPoint& pos)
         {
             store->setScheduleBrush(ui->gridWidget->cellValue(pos));
         });
 
-    connect(ui->gridWidget, &QnScheduleGridWidget::cellValuesChanged, store,
+    connect(ui->gridWidget, &ScheduleGridWidget::cellValuesChanged, store,
         [this, store]()
         {
             store->setSchedule(calculateScheduleTasks());
             // TODO: updateAlert(ScheduleChange);
         });
+
+    connect(ui->licensesButton, &QPushButton::clicked, this,
+        [this]() { emit actionRequested(action::PreferencesLicensesTabAction); });
 
     /*
     QnCamLicenseUsageHelper helper(commonModule());
@@ -144,6 +147,14 @@ void CameraScheduleWidget::setupUi()
         tr("Recording Schedule")).arg(
             tr("based on server time")));
 
+    installEventHandler(ui->scrollAreaWidgetContents, QEvent::Resize, this,
+        [this]()
+        {
+            // Since external scroll bar is used it shouldn't be added to minimum width.
+            ui->scrollArea->setMinimumWidth(
+                ui->scrollAreaWidgetContents->minimumSizeHint().width());
+        });
+
     //TODO: #dkargin Restore hints.
     /*
     auto settingsHint = nx::client::desktop::HintButton::hintThat(ui->settingsGroupBox);
@@ -177,6 +188,8 @@ void CameraScheduleWidget::loadState(const CameraSettingsDialogState& state)
         state.recording.enabled.hasValue(),
         recordingEnabled);
     setReadOnly(ui->enableRecordingCheckBox, state.readOnly);
+
+    ui->licensesButton->setVisible(state.globalPermissions.testFlag(Qn::GlobalAdminPermission));
 
     setReadOnly(ui->exportScheduleButton, state.readOnly);
     setReadOnly(ui->exportWarningLabel, state.readOnly);
@@ -214,7 +227,7 @@ void CameraScheduleWidget::loadState(const CameraSettingsDialogState& state)
             for (int col = task.startTime / 3600; col < task.endTime / 3600; ++col)
             {
                 const QPoint cell(col, row);
-                QnScheduleGridWidget::CellParams params;
+                ScheduleGridWidget::CellParams params;
                 params.recordingType = task.recordingType;
                 params.quality = quality;
                 params.fps = task.fps;
@@ -242,7 +255,7 @@ ScheduleTasks CameraScheduleWidget::calculateScheduleTasks() const
         for (int col = 0; col < ui->gridWidget->columnCount();)
         {
             const QPoint cell(col, row);
-            const QnScheduleGridWidget::CellParams params = ui->gridWidget->cellValue(cell);
+            const ScheduleGridWidget::CellParams params = ui->gridWidget->cellValue(cell);
 
             const auto recordingType = params.recordingType;
             Qn::StreamQuality streamQuality = Qn::StreamQuality::highest;

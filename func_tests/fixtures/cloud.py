@@ -34,7 +34,7 @@ def cloud_host(request, customization):
 def cloud_account_factory(request, customization, cloud_host):
     return CloudAccountFactory(
         request.config.getoption('--cloud-group'),
-        customization.company_name,
+        customization.customization_name,
         cloud_host,
         request.config.getoption('--autotest-email-password') or os.environ.get('AUTOTEST_EMAIL_PASSWORD'))
 

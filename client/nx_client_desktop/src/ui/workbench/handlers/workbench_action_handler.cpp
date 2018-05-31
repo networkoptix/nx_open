@@ -19,6 +19,8 @@
 #include <QtWidgets/QWhatsThis>
 #include <QtWidgets/QHeaderView>
 
+#include <QtWebKitWidgets/QWebView>
+
 #include <api/network_proxy_factory.h>
 #include <api/global_settings.h>
 #include <api/server_rest_connection.h>
@@ -188,6 +190,8 @@
 #include "network/authutil.h"
 #include <core/resource/fake_media_server.h>
 #include <client/client_app_info.h>
+#include <ui/style/webview_style.h>
+#include <ini.h>
 
 #include <nx/client/desktop/ui/main_window.h>
 #include <ui/models/resource/resource_list_model.h>
@@ -195,9 +199,6 @@
 using nx::client::core::Geometry;
 
 namespace {
-
-/* Beta version message. */
-static const QString kBetaVersionShowOnceKey(lit("BetaVersion"));
 
 /* Asking for update all outdated servers to the last version. */
 static const QString kVersionMismatchShowOnceKey(lit("VersionMismatch"));
@@ -716,19 +717,37 @@ void ActionHandler::showMultipleCamerasErrorMessage(
 
 void ActionHandler::showEula()
 {
-    QFile eula(lit(":/license.txt"));
+    const QString eulaHtmlStyle = QString::fromLatin1(R"(
+    <style media="screen" type="text/css">
+    * {
+        color: %1;
+        font-family: 'Roboto-Regular', 'Roboto';
+        font-weight: 400;
+        font-style: normal;
+        font-size: 13px;
+        line-height: 16px;
+    }
+    </style>)").arg(qApp->palette().color(QPalette::WindowText).name());
+
+    QFile eula(lit(":/license.html"));
     eula.open(QIODevice::ReadOnly);
-    const QString eulaText = QString::fromUtf8(eula.readAll());
+    QString eulaText = QString::fromUtf8(eula.readAll());
+    eulaText = eulaText.replace(
+        lit("<head>"),
+        lit("<head>%1").arg(eulaHtmlStyle)
+    );
 
     QnMessageBox eulaDialog(mainWindowWidget());
     eulaDialog.setIcon(QnMessageBoxIcon::Warning);
     eulaDialog.setText(tr("To use the software you must accept the end user license agreement"));
 
-    auto textEdit = new QPlainTextEdit(&eulaDialog);
-    textEdit->setPlainText(eulaText);
-    textEdit->setReadOnly(true);
-    textEdit->setFixedSize(740, 560);
-    eulaDialog.addCustomWidget(textEdit);
+    auto view = new QWebView(&eulaDialog);
+    NxUi::setupWebViewStyle(view, NxUi::WebViewStyle::eula);
+    view->setHtml(eulaText);
+    view->setFixedSize(740, 560);
+    view->show();
+    eulaDialog.addCustomWidget(view);
+
     eulaDialog.addButton(tr("Accept"), QDialogButtonBox::AcceptRole, Qn::ButtonAccent::Standard);
     eulaDialog.addButton(tr("Decline"), QDialogButtonBox::RejectRole);
 
@@ -738,7 +757,7 @@ void ActionHandler::showEula()
     }
     else
     {
-        menu()->trigger(action::DelayedForcedExitAction);
+        executeLater([this] { closeApplication(true); }, this);
     }
 }
 
@@ -2488,19 +2507,16 @@ void ActionHandler::at_betaVersionMessageAction_triggered()
     if (context()->closingDown())
         return;
 
-    if (qnClientShowOnce->testFlag(kBetaVersionShowOnceKey))
+    if (ini().ignoreBetaWarning)
         return;
 
-    QnMessageBox dialog(QnMessageBoxIcon::Information,
+    QnMessageBox dialog(QnMessageBoxIcon::Warning,
         tr("Beta version %1").arg(QnAppInfo::applicationVersion()),
-        tr("Some functionality may be unavailable or not working properly."),
+        tr("Warning! This build is for testing purposes only! "
+            "Please upgrade to a next available patch or release version once available."),
         QDialogButtonBox::Ok, QDialogButtonBox::Ok, mainWindowWidget());
 
-    dialog.setCheckBoxEnabled();
     dialog.exec();
-
-    if (dialog.isChecked())
-        qnClientShowOnce->setFlag(kBetaVersionShowOnceKey);
 }
 
 void ActionHandler::checkIfStatisticsReportAllowed() {

@@ -2,6 +2,7 @@ import base64
 import logging
 
 import xmltodict
+from winrm.exceptions import WinRMTransportError
 
 log = logging.getLogger(__name__)
 
@@ -45,7 +46,11 @@ class _Command(object):
         return self
 
     def __exit__(self, exc_type, exc_val, exc_tb):
-        self._protocol.cleanup_command(self._shell_id, self._command_id)
+        try:
+            self._protocol.cleanup_command(self._shell_id, self._command_id)
+        except WinRMTransportError as e:
+            log.exception("XML:\n%s", e.response_text)
+            raise
         self._command_id = None
 
     def send_stdin(self, stdin_bytes, end=False):

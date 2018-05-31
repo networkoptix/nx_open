@@ -35,7 +35,7 @@ nx::utils::Url getServerApiUrl(
 
 qint64 freeSpaceForUpdate()
 {
-    auto updatesDir = qnServerModule->roSettings()->value("dataDir").toString();
+    auto updatesDir = qnServerModule->settings().dataDir();
     if (updatesDir.isEmpty())
         updatesDir = QDir::tempPath();
 
