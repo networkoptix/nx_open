@@ -18,6 +18,9 @@ class SSHAccess(OSAccess):
         self.ssh = SSH(ssh_hostname, ssh_port, username, key_path)
         self._forwarded_ports = forwarded_ports
 
+    def __repr__(self):
+        return '<SSHAccess via {!r}>'.format(self.ssh)
+
     @property
     def forwarded_ports(self):
         return self._forwarded_ports
