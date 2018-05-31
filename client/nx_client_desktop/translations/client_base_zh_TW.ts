@@ -7242,11 +7242,11 @@ to %1</source>
     </message>
     <message>
       <source>Uploading %1...</source>
-      <translation>正在上傳 %1...  </translation>
+      <translation>正在上傳 %1...</translation>
     </message>
     <message>
       <source>Finalizing %1...</source>
-      <translation>正在完成 %1...  </translation>
+      <translation>正在完成 %1...</translation>
     </message>
   </context>
   <context>
@@ -7778,7 +7778,7 @@ to %1</source>
     </message>
     <message>
       <source>%1 covers period for which video has already been uploaded.</source>
-      <translation>%1  包含了已上傳過的影像</translation>
+      <translation>%1 包含了已上傳過的影像</translation>
     </message>
     <message>
       <source>%1 covers period for which video is being uploaded.</source>

@@ -7761,7 +7761,7 @@ to %1</source>
     </message>
     <message>
       <source>%1 has unsupported format.</source>
-      <translation>định dạng không được hỗ trợ.</translation>
+      <translation>%1 định dạng không được hỗ trợ.</translation>
     </message>
     <message>
       <source>%1 does not have timestamp.</source>
@@ -7773,11 +7773,11 @@ to %1</source>
     </message>
     <message>
       <source>%1 covers period for which video has already been uploaded.</source>
-      <translation>Các tệp đã chọn bao gồm các khoảng thời gian mà các video đang được tải lên.</translation>
+      <translation>%1 Các tệp đã chọn bao gồm các khoảng thời gian mà các video đang được tải lên.</translation>
     </message>
     <message>
       <source>%1 covers period for which video is being uploaded.</source>
-      <translation>Các tệp đã chọn bao gồm các khoảng thời gian mà các video đang được tải lên.</translation>
+      <translation>%1 Các tệp đã chọn bao gồm các khoảng thời gian mà các video đang được tải lên.</translation>
     </message>
   </context>
   <context>

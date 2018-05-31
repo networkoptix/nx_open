@@ -2935,7 +2935,7 @@ to %1</source>
     </message>
     <message>
       <source>Forgot password?</source>
-      <translation> Password dimenticata? </translation>
+      <translation>Password dimenticata?</translation>
     </message>
     <message>
       <source>Connect to %1</source>
@@ -3082,7 +3082,7 @@ to %1</source>
     </message>
     <message>
       <source>Please close %1 and start it again using the shortcut in the start menu.</source>
-      <translation>Chiudi l'applicazione e riavviala utilizzando il collegamento nel menu di avvio.</translation>
+      <translation>Chiudi %1 e riavviala utilizzando il collegamento nel menu di avvio.</translation>
     </message>
     <message>
       <source>You have to download another version of %1 to connect to this Server.</source>
@@ -4458,7 +4458,7 @@ to %1</source>
     </message>
     <message>
       <source>Forgot password?</source>
-      <translation> Password dimenticata? </translation>
+      <translation>Password dimenticata?</translation>
     </message>
     <message>
       <source>Learn more about</source>
@@ -4780,7 +4780,7 @@ to %1</source>
     </message>
     <message>
       <source>Wearable Camera %1</source>
-      <translation>Telecamera indossabile</translation>
+      <translation>Telecamera indossabile %1</translation>
     </message>
     <message>
       <source>Name</source>

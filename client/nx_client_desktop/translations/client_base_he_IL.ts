@@ -7480,7 +7480,7 @@ to %1</source>
     <name>QnWearableUploadWidget</name>
     <message>
       <source>User &quot;%1&quot; is currently uploading footage to this camera.</source>
-      <translation>משתמש אחר מעלה כעת צילומים למצלמה זו.</translation>
+      <translation>משתמש %1 מעלה כעת צילומים למצלמה הזו.</translation>
     </message>
     <message>
       <source>Another user is currently uploading footage to this camera.</source>
@@ -7629,7 +7629,7 @@ to %1</source>
     <message>
       <source>%1 Systems cannot be merged</source>
       <comment>%1 is the short cloud name (like Cloud)</comment>
-      <translation>אין אפשרות למזג את המערכות</translation>
+      <translation>%1 לא ניתן למזג מערכות</translation>
     </message>
   </context>
   <context>
@@ -7961,7 +7961,7 @@ to %1</source>
       <source>Selected files cover periods for which videos have already been uploaded</source>
       <translation type="unfinished">
         <numerusform>מכסה את הזמן שבו הסרטון כבר הועלה</numerusform>
-        <numerusform>%1 נמצא באותו זמן שבו הסרטון כבר הועלה</numerusform>
+        <numerusform>מכסה את הזמן שבו הסרטון כבר הועלה</numerusform>
         <numerusform>Selected files cover periods for which videos have already been uploaded</numerusform>
         <numerusform>Selected files cover periods for which videos have already been uploaded</numerusform>
       </translation>

@@ -1129,10 +1129,10 @@ to view more bookmarks</source>
       <source>File name must not contain the following reserved characters:</source>
       <comment>Plural relates to the word _characters_ here, not _file name_.</comment>
       <translation>
-        <numerusform>Имя файла не должно содержать следующий зарезервированный символ: </numerusform>
-        <numerusform>Имя файла не должно содержать следующие зарезервированные символы: </numerusform>
-        <numerusform>Имя файла не должно содержать следующие зарезервированные символы: </numerusform>
-        <numerusform>Имя файла не должно содержать следующие зарезервированные символы: </numerusform>
+        <numerusform>Имя файла не должно содержать следующий зарезервированный символ:</numerusform>
+        <numerusform>Имя файла не должно содержать следующие зарезервированные символы:</numerusform>
+        <numerusform>Имя файла не должно содержать следующие зарезервированные символы:</numerusform>
+        <numerusform>Имя файла не должно содержать следующие зарезервированные символы:</numerusform>
       </translation>
     </message>
   </context>

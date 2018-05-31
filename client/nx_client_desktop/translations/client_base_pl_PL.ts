@@ -1128,10 +1128,10 @@ to view more bookmarks</source>
       <source>File name must not contain the following reserved characters:</source>
       <comment>Plural relates to the word _characters_ here, not _file name_.</comment>
       <translation>
-        <numerusform>Nazwa pliku nie może zawierać znaku: </numerusform>
-        <numerusform>Nazwa pliku nie może zawierać następujących zarezerwowanych znaków: </numerusform>
-        <numerusform>Nazwa pliku nie może zawierać następujących zarezerwowanych znaków: </numerusform>
-        <numerusform>Nazwa pliku nie może zawierać następujących zarezerwowanych znaków: </numerusform>
+        <numerusform>Nazwa pliku nie może zawierać znaku:</numerusform>
+        <numerusform>Nazwa pliku nie może zawierać następujących zarezerwowanych znaków:</numerusform>
+        <numerusform>Nazwa pliku nie może zawierać następujących zarezerwowanych znaków:</numerusform>
+        <numerusform>Nazwa pliku nie może zawierać następujących zarezerwowanych znaków:</numerusform>
       </translation>
     </message>
   </context>
