@@ -146,38 +146,10 @@ bool AuthenticationHelper::authenticatedByStaticRules() const
     return false;
 }
 
-void AuthenticationHelper::updateUserLockoutState(
-    network::server::UserLocker::AuthResult authResult)
-{
-    if (m_userLocker)
-        m_userLocker->updateLockoutState(m_userLockKey, authResult);
-}
-
-const std::function<bool(const nx::Buffer& /*ha1*/)>& AuthenticationHelper::validateHa1Func() const
+const std::function<bool(const nx::Buffer& /*ha1*/)>&
+    AuthenticationHelper::validateHa1Func() const
 {
     return m_validateHa1Func;
-}
-
-bool AuthenticationHelper::streeQueryFoundPasswordMatchesRequestDigest()
-{
-    if (auto foundHa1 = m_authTraversalResult.get(attr::ha1))
-    {
-        if (m_validateHa1Func(foundHa1.get().toString().toLatin1()))
-            return true;
-    }
-
-    if (auto password = m_authTraversalResult.get(attr::userPassword))
-    {
-        if (m_validateHa1Func(calcHa1(
-                m_username.c_str(),
-                nx::network::AppInfo::realm().toUtf8(),
-                password.get().toString())))
-        {
-            return true;
-        }
-    }
-
-    return false;
 }
 
 bool AuthenticationHelper::requestContainsValidDigest() const
@@ -191,6 +163,32 @@ bool AuthenticationHelper::requestContainsValidDigest() const
     }
 
     return true;
+}
+
+api::ResultCode AuthenticationHelper::authenticateRequestDigest(
+    const std::vector<AbstractAuthenticationDataProvider*>& authDataProviders,
+    nx::utils::stree::ResourceContainer* const authProperties)
+{
+    using AuthResult = nx::network::server::UserLocker::AuthResult;
+
+    api::ResultCode authResultCode = api::ResultCode::notAuthorized;
+    if (streeQueryFoundPasswordMatchesRequestDigest())
+    {
+        authResultCode = api::ResultCode::ok;
+    }
+    else
+    {
+        authResultCode = authenticateInDataManagers(
+            authDataProviders,
+            authProperties);
+    }
+
+    if (authResultCode == api::ResultCode::ok)
+        updateUserLockoutState(AuthResult::success);
+    else if (authResultCode == api::ResultCode::notAuthorized) //< I.e., wrong digest.
+        updateUserLockoutState(AuthResult::failure);
+
+    return authResultCode;
 }
 
 void AuthenticationHelper::loadAuthorizationHeader()
@@ -254,97 +252,44 @@ bool AuthenticationHelper::validateNonce(
     return nonce.size() < 31;
 }
 
-} // namespace detail
 
-//-------------------------------------------------------------------------------------------------
-
-AuthenticationManager::AuthenticationManager(
-    const conf::Settings& settings,
-    std::vector<AbstractAuthenticationDataProvider*> authDataProviders,
-    const nx::network::http::AuthMethodRestrictionList& authRestrictionList,
-    const StreeManager& stree)
-:
-    m_authRestrictionList(authRestrictionList),
-    m_stree(stree),
-    m_authDataProviders(std::move(authDataProviders))
+bool AuthenticationHelper::streeQueryFoundPasswordMatchesRequestDigest()
 {
-    if (auto userLockerSettings = settings.loginLockout())
-        m_userLocker = std::make_unique<network::server::UserLocker>(*userLockerSettings);
-}
-
-void AuthenticationManager::authenticate(
-    const nx::network::http::HttpServerConnection& connection,
-    const nx::network::http::Request& request,
-    nx::network::http::server::AuthenticationCompletionHandler handler)
-{
-    using AuthResult = nx::network::server::UserLocker::AuthResult;
-
-    detail::AuthenticationHelper authenticatorHelper(
-        m_authRestrictionList,
-        m_userLocker.get(),
-        connection,
-        request,
-        std::move(handler));
-
-    if (authenticatorHelper.userLocked())
-        return authenticatorHelper.reportFailure(api::ResultCode::accountBlocked);
-
-    authenticatorHelper.queryStaticAuthenticationRulesTree(m_stree);
-    if (authenticatorHelper.authenticatedByStaticRules())
-        return authenticatorHelper.reportSuccess();
-
-    if (!authenticatorHelper.requestContainsValidDigest())
+    if (auto foundHa1 = m_authTraversalResult.get(attr::ha1))
     {
-        return authenticatorHelper.reportFailure(
-            api::ResultCode::notAuthorized,
-            prepareWwwAuthenticateHeader());
+        if (m_validateHa1Func(foundHa1.get().toString().toLatin1()))
+            return true;
     }
 
-    if (authenticatorHelper.streeQueryFoundPasswordMatchesRequestDigest())
+    if (auto password = m_authTraversalResult.get(attr::userPassword))
     {
-        authenticatorHelper.updateUserLockoutState(AuthResult::success);
-        return authenticatorHelper.reportSuccess();
+        if (m_validateHa1Func(calcHa1(
+                m_username.c_str(),
+                nx::network::AppInfo::realm().toUtf8(),
+                password.get().toString())))
+        {
+            return true;
+        }
     }
 
-    nx::utils::stree::ResourceContainer authProperties;
-    const auto authResultCode = authenticateInDataManagers(
-        authenticatorHelper.username(),
-        authenticatorHelper.validateHa1Func(),
-        &authProperties);
-
-    if (authResultCode == api::ResultCode::ok)
-    {
-        authenticatorHelper.updateUserLockoutState(AuthResult::success);
-        return authenticatorHelper.reportSuccess(std::move(authProperties));
-    }
-
-    if (authResultCode == api::ResultCode::notAuthorized) //< I.e., wrong digest.
-        authenticatorHelper.updateUserLockoutState(AuthResult::failure);
-
-    return authenticatorHelper.reportFailure(authResultCode);
+    return false;
 }
 
-nx::String AuthenticationManager::realm()
-{
-    return nx::network::AppInfo::realm().toUtf8();
-}
-
-api::ResultCode AuthenticationManager::authenticateInDataManagers(
-    const std::string& username,
-    const std::function<bool(const nx::Buffer&)>& validateHa1Func,
+api::ResultCode AuthenticationHelper::authenticateInDataManagers(
+    const std::vector<AbstractAuthenticationDataProvider*>& authDataProviders,
     nx::utils::stree::ResourceContainer* const authProperties)
 {
     // TODO: #ak AuthenticationManager has to become async some time...
 
     std::vector<api::ResultCode> authDataProvidersResults;
-    authDataProvidersResults.reserve(m_authDataProviders.size());
-    for (AbstractAuthenticationDataProvider* authDataProvider: m_authDataProviders)
+    authDataProvidersResults.reserve(authDataProviders.size());
+    for (AbstractAuthenticationDataProvider* authDataProvider: authDataProviders)
     {
         nx::utils::promise<api::ResultCode> authPromise;
         auto authFuture = authPromise.get_future();
         authDataProvider->authenticateByName(
-            username.c_str(),
-            validateHa1Func,
+            m_username.c_str(),
+            m_validateHa1Func,
             authProperties,
             [&authPromise](api::ResultCode authResult)
             {
@@ -369,6 +314,73 @@ api::ResultCode AuthenticationManager::authenticateInDataManagers(
     }
 
     return api::ResultCode::notAuthorized;
+}
+
+void AuthenticationHelper::updateUserLockoutState(
+    network::server::UserLocker::AuthResult authResult)
+{
+    if (m_userLocker)
+        m_userLocker->updateLockoutState(m_userLockKey, authResult);
+}
+
+} // namespace detail
+
+//-------------------------------------------------------------------------------------------------
+
+AuthenticationManager::AuthenticationManager(
+    const conf::Settings& settings,
+    std::vector<AbstractAuthenticationDataProvider*> authDataProviders,
+    const nx::network::http::AuthMethodRestrictionList& authRestrictionList,
+    const StreeManager& stree)
+:
+    m_authRestrictionList(authRestrictionList),
+    m_stree(stree),
+    m_authDataProviders(std::move(authDataProviders))
+{
+    if (auto userLockerSettings = settings.loginLockout())
+        m_userLocker = std::make_unique<network::server::UserLocker>(*userLockerSettings);
+}
+
+void AuthenticationManager::authenticate(
+    const nx::network::http::HttpServerConnection& connection,
+    const nx::network::http::Request& request,
+    nx::network::http::server::AuthenticationCompletionHandler handler)
+{
+    detail::AuthenticationHelper authenticatorHelper(
+        m_authRestrictionList,
+        m_userLocker.get(),
+        connection,
+        request,
+        std::move(handler));
+
+    if (authenticatorHelper.userLocked())
+        return authenticatorHelper.reportFailure(api::ResultCode::accountBlocked);
+
+    authenticatorHelper.queryStaticAuthenticationRulesTree(m_stree);
+    if (authenticatorHelper.authenticatedByStaticRules())
+        return authenticatorHelper.reportSuccess();
+
+    if (!authenticatorHelper.requestContainsValidDigest())
+    {
+        return authenticatorHelper.reportFailure(
+            api::ResultCode::notAuthorized,
+            prepareWwwAuthenticateHeader());
+    }
+
+    nx::utils::stree::ResourceContainer authProperties;
+    const auto authResultCode = authenticatorHelper.authenticateRequestDigest(
+        m_authDataProviders,
+        &authProperties);
+
+    if (authResultCode == api::ResultCode::ok)
+        return authenticatorHelper.reportSuccess(std::move(authProperties));
+    else
+        return authenticatorHelper.reportFailure(authResultCode);
+}
+
+nx::String AuthenticationManager::realm()
+{
+    return nx::network::AppInfo::realm().toUtf8();
 }
 
 nx::network::http::header::WWWAuthenticate

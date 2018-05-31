@@ -60,13 +60,13 @@ public:
 
     bool authenticatedByStaticRules() const;
 
-    void updateUserLockoutState(network::server::UserLocker::AuthResult authResult);
-
     const std::function<bool(const nx::Buffer& /*ha1*/)>& validateHa1Func() const;
 
-    bool streeQueryFoundPasswordMatchesRequestDigest();
-
     bool requestContainsValidDigest() const;
+
+    api::ResultCode authenticateRequestDigest(
+        const std::vector<AbstractAuthenticationDataProvider*>& authDataProviders,
+        nx::utils::stree::ResourceContainer* const authProperties);
 
 private:
     const nx::network::http::AuthMethodRestrictionList& m_authRestrictionList;
@@ -94,6 +94,14 @@ private:
         nx::network::http::server::AuthenticationResult* authResponse);
 
     bool validateNonce(const nx::network::http::StringType& nonce) const;
+
+    bool streeQueryFoundPasswordMatchesRequestDigest();
+
+    api::ResultCode authenticateInDataManagers(
+        const std::vector<AbstractAuthenticationDataProvider*>& authDataProviders,
+        nx::utils::stree::ResourceContainer* const authProperties);
+
+    void updateUserLockoutState(network::server::UserLocker::AuthResult authResult);
 };
 
 } // namespace detail
@@ -128,10 +136,6 @@ private:
     std::vector<AbstractAuthenticationDataProvider*> m_authDataProviders;
     std::unique_ptr<network::server::UserLocker> m_userLocker;
 
-    api::ResultCode authenticateInDataManagers(
-        const std::string& username,
-        const std::function<bool(const nx::Buffer&)>& validateHa1Func,
-        nx::utils::stree::ResourceContainer* const authProperties);
     nx::network::http::header::WWWAuthenticate prepareWwwAuthenticateHeader();
     nx::Buffer generateNonce();
 
