@@ -21,9 +21,9 @@
   <String Id="HelpHeader">セットアップのヘルプ</String>
   <String Id="HelpCloseButton">閉じる</String>
   <String Id="InstallOptionsButton">オプション</String>
-  <String Id="InstallInstallButton">Install</String>
+  <String Id="InstallInstallButton">インストール</String>
   <String Id="InstallCloseButton">閉じる</String>
-  <String Id="InstallAcceptCheckbox">I agree to the</String>
+  <String Id="InstallAcceptCheckbox">同意します</String>
   <String Id="InstallLicenseLinkText">エンドユーザーライセンス契約</String>
   <String Id="OptionsHeader">セットアップオプション</String>
   <String Id="OptionsLocationLabel">インストール場所:</String>
