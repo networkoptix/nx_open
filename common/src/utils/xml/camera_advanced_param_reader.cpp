@@ -189,7 +189,7 @@ namespace QnXmlTag {
     const QString paramUnit             = lit("unit");
     const QString paramResync           = lit("resync");
     const QString paramDefaultValue     = lit("defaultValue");
-    const QString paramShouldKeepInitialValue = lit("shouldKeepInitialValue");
+    const QString paramShouldKeepInitialValue = lit("keepInitialValue");
     const QString paramBindDefaultToMinimum = lit("bindDefaultToMinimum");
     const QString parameterGroup = lit("group");
 
@@ -297,7 +297,7 @@ bool QnCameraAdvacedParamsXmlParser::parseElementXml(const QDomElement& elementX
     param.notes = elementXml.attribute(QnXmlTag::paramNotes);
     param.unit = elementXml.attribute(QnXmlTag::paramUnit);
     param.resync = parseBooleanXmlValue(elementXml.attribute(QnXmlTag::paramResync));
-    param.shouldKeepInitialValue = parseBooleanXmlValue(
+    param.keepInitialValue = parseBooleanXmlValue(
         elementXml.attribute(QnXmlTag::paramShouldKeepInitialValue));
 
     param.bindDefaultToMinimum = parseBooleanXmlValue(

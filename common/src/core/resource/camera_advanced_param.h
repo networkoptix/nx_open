@@ -132,7 +132,7 @@ struct QnCameraAdvancedParameter
     QString unit;
     QString notes;
     bool resync = false;
-    bool shouldKeepInitialValue = false;
+    bool keepInitialValue = false;
     bool bindDefaultToMinimum = false;
     // Parameters with the same group must be sent together
     // even if some of their values have not been changed.
@@ -172,7 +172,7 @@ QN_FUSION_DECLARE_FUNCTIONS(QnCameraAdvancedParameter::DataType, (lexical))
     (showRange)\
     (unit)\
     (notes)\
-    (shouldKeepInitialValue)\
+    (keepInitialValue)\
     (bindDefaultToMinimum)\
     (resync)\
     (group)
