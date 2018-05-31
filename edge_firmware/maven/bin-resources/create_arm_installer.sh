@@ -99,12 +99,14 @@ copyBuildLibs()
         libcloud_db_client
         libcommon
         libmediaserver_core
+        libmediaserver_db
         libnx_email
         libnx_fusion
         libnx_kit
         libnx_network
         libnx_update
         libnx_utils
+        libnx_vms_api
         libnx_sdk
         libnx_plugin_utils
 
