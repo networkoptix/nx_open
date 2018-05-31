@@ -29,11 +29,11 @@ export class GeneralModalContent implements OnInit {
     }
 
     ok() {
-        this.activeModal.close('OK');
+        this.activeModal.close(true);
     }
 
-    close(result?) {
-        this.activeModal.close(result || 'CLOSE');
+    close() {
+        this.activeModal.close();
     }
 }
 
@@ -77,7 +77,8 @@ export class NxModalGeneralComponent implements OnInit {
             cancelLabel,
             true,
             false,
-            true).result;
+            true)
+            .result;
     }
 
     openAlert(message, title) {
@@ -87,7 +88,8 @@ export class NxModalGeneralComponent implements OnInit {
             this.language.lang.dialogs.cancelButton,
             true,
             true,
-            true).result;
+            true)
+            .result;
 
     }
 

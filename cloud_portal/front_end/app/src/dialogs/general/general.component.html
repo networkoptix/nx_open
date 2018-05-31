@@ -18,10 +18,10 @@
     </button>
     <button type="button" class="btn"
             [ngClass]="buttonClass" *ngIf="!cancellable"
-            (click)="ok('OK')">{{actionLabel}}
+            (click)="ok()">{{actionLabel}}
     </button>
     <button type="button" class="btn btn-default"
             *ngIf="!cancellable && cancelLabel"
-            (click)="close('CLOSE')">{{cancelLabel}}
+            (click)="close()">{{cancelLabel}}
     </button>
 </div>

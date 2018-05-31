@@ -33,12 +33,12 @@ export class DisconnectModalContent {
             successMessage: this.language.system.successDisconnected,
             errorPrefix: this.language.errorCodes.cantDisconnectSystemPrefix
         }).then(() => {
-            this.activeModal.close('OK');
+            this.activeModal.close(true);
         });
     }
 
     close() {
-        this.activeModal.close('CLOSE');
+        this.activeModal.close();
     }
 }
 

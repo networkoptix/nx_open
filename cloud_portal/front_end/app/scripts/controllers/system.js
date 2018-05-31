@@ -124,7 +124,7 @@ angular.module('cloudApp')
                     // dialogs.confirm(L.system.confirmDisconnect, L.system.confirmDisconnectTitle, L.system.confirmDisconnectAction, 'danger').
                     dialogs.disconnect(systemId)
                         .then(function (result) {
-                            if (result === 'OK') {
+                            if (result) {
                                 updateAndGoToSystems();
                             }
                         });
@@ -136,7 +136,7 @@ angular.module('cloudApp')
                     // User is not owner. Deleting means he'll lose access to it
                     dialogs.confirm(L.system.confirmUnshareFromMe, L.system.confirmUnshareFromMeTitle, L.system.confirmUnshareFromMeAction, 'btn-danger', 'Cancel')
                         .then(function (result) {
-                            if (result === 'OK') {
+                            if (result) {
                                 $scope.deletingSystem = process.init(function () {
                                     return $scope.system.deleteFromCurrentAccount();
                                 }, {
@@ -151,9 +151,11 @@ angular.module('cloudApp')
             };
 
             $scope.rename = function () {
-                return dialogs.rename(systemId, $scope.system.info.name).then(function (finalName) {
-                    $scope.system.info.name = finalName;
-                });
+                return dialogs
+                    .rename(systemId, $scope.system.info.name)
+                    .then(function (finalName) {
+                        $scope.system.info.name = finalName;
+                    });
             };
 
             $scope.mergeSystems = function () {
@@ -164,7 +166,13 @@ angular.module('cloudApp')
 
             $scope.share = function () {
                 // Call share dialog, run process inside
-                return dialogs.share($scope.system).then(loadUsers);
+                return dialogs
+                    .share($scope.system)
+                    .then(function (result) {
+                        if (result) {
+                            loadUsers();
+                        }
+                    });
             };
             $scope.locked = {};
             $scope.editShare = function (user) {
@@ -195,7 +203,7 @@ angular.module('cloudApp')
                     L.system.confirmUnshareAction,
                     'btn-danger', 'Cancel')
                     .then(function (result) {
-                        if (result === 'OK') {
+                        if (result) {
                             // Run a process of sharing
                             $poll.cancel(pollingSystemUpdate);
                             $scope.unsharing = process.init(function () {

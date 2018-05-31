@@ -139,7 +139,7 @@ export class ShareModalContent {
                                null,
                                this.language.dialogs.cancelButton)
                            .then((result) => {
-                               if (result === 'OK') {
+                               if (result) {
                                    this.doShare();
                                }
                            });
@@ -149,7 +149,7 @@ export class ShareModalContent {
         }, {
             successMessage: this.language.sharing.permissionsSaved
         }).then(() => {
-            this.activeModal.close();
+            this.activeModal.close(true);
         });
     }
 }
