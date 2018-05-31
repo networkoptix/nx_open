@@ -13,7 +13,7 @@ UserLocker::UserLocker(
 }
 
 void UserLocker::updateLockoutState(
-    const Key& key,
+    const Key& /*key*/,
     AuthResult authResult)
 {
     const auto now = std::chrono::steady_clock::now();
@@ -37,7 +37,7 @@ void UserLocker::updateLockoutState(
     }
 }
 
-bool UserLocker::isLocked(const Key& key) const
+bool UserLocker::isLocked(const Key& /*key*/) const
 {
     return m_userLockedUntil && (*m_userLockedUntil > std::chrono::steady_clock::now());
 }

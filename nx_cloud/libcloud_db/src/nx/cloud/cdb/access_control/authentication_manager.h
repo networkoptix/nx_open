@@ -69,6 +69,7 @@ public:
     bool requestContainsValidDigest() const;
 
 private:
+    const nx::network::http::AuthMethodRestrictionList& m_authRestrictionList;
     network::server::UserLocker* m_userLocker;
     const nx::network::http::HttpServerConnection& m_connection;
     const nx::network::http::Request& m_request;
@@ -78,7 +79,6 @@ private:
     std::tuple<network::HostAddress, std::string> m_userLockKey;
     std::function<bool(const nx::Buffer& /*ha1*/)> m_validateHa1Func;
     nx::utils::stree::ResourceContainer m_authTraversalResult;
-    const nx::network::http::AuthMethodRestrictionList& m_authRestrictionList;
 
     void loadAuthorizationHeader();
 
