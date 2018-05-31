@@ -519,7 +519,7 @@ QnCameraAdvancedParamValueMap HanwhaResource::getApiParameters(const QSet<QStrin
                             isBypassSupported() ? 0 : getChannel());
                     }
 
-                    auto profile = profileByRole(info->profileDependency());
+                    auto profile = profileByRole(info->profileDependency(), isBypassSupported());
                     if (profile != kHanwhaInvalidProfile)
                         parameterString += lit(".Profile.%1").arg(profile);
 
@@ -601,7 +601,7 @@ QSet<QString> HanwhaResource::setApiParameters(const QnCameraAdvancedParamValueM
         updateInfo.submenu = info->submenu();
         updateInfo.action = info->updateAction();
         updateInfo.channelIndependent = info->isChannelIndependent();
-        updateInfo.profile = profileByRole(info->profileDependency());
+        updateInfo.profile = profileByRole(info->profileDependency(), isBypassSupported());
 
         const auto streamsToReopen = info->streamsToReopen();
 
@@ -1648,14 +1648,55 @@ CameraDiagnostics::Result HanwhaResource::createNxProfiles()
         }
     }
 
-    m_profileByRole[Qn::ConnectionRole::CR_LiveVideo]
-        = profilesByRole[Qn::ConnectionRole::CR_LiveVideo]->number;
+    setDirectProfile(
+        Qn::ConnectionRole::CR_LiveVideo,
+        profilesByRole[Qn::ConnectionRole::CR_LiveVideo]->number);
 
-    m_profileByRole[Qn::ConnectionRole::CR_Archive]
-        = profilesByRole[Qn::ConnectionRole::CR_LiveVideo]->number;
+    setDirectProfile(
+        Qn::ConnectionRole::CR_Archive,
+        profilesByRole[Qn::ConnectionRole::CR_LiveVideo]->number);
 
-    m_profileByRole[Qn::ConnectionRole::CR_SecondaryLiveVideo]
-        = profilesByRole[Qn::ConnectionRole::CR_SecondaryLiveVideo]->number;
+    setDirectProfile(
+        Qn::ConnectionRole::CR_SecondaryLiveVideo,
+        profilesByRole[Qn::ConnectionRole::CR_SecondaryLiveVideo]->number);
+
+    if (isBypassSupported())
+    {
+        result = findProfiles(
+            &profilesByRole[Qn::ConnectionRole::CR_LiveVideo],
+            &profilesByRole[Qn::ConnectionRole::CR_SecondaryLiveVideo],
+            &totalProfileNumber,
+            &profilesToRemove,
+            /*useBypass*/ true);
+
+        if (!result)
+            return result;
+
+        for (const auto& entry: profilesByRole)
+        {
+            const auto role = entry.first;
+            const auto& profile = entry.second;
+
+            if (profile == boost::none)
+            {
+                return CameraDiagnostics::CameraInvalidParams(
+                    lit("Can't fetch profile number via bypass."));
+            }
+
+            setBypassProfile(role, profile->number);
+            if (role == Qn::ConnectionRole::CR_LiveVideo)
+                setBypassProfile(Qn::ConnectionRole::CR_Archive, profile->number);
+        }
+    }
+
+#if 1
+    for (const auto& entry: m_profileByRole)
+    {
+        qDebug() << "<<<<<<<<<< PROFILES!: (role)" << entry.first
+            << "(Direct)" << entry.second.directNumber
+            << "(Bypass)" << entry.second.bypassNumber;
+    }
+#endif
 
     return CameraDiagnostics::NoErrorResult();
 }
@@ -1693,12 +1734,12 @@ CameraDiagnostics::Result HanwhaResource::fetchExistingProfiles()
         // See: http://git.wisenetdev.com/HanwhaTechwinAmerica/WAVE/issues/290
         if (profile.first.endsWith(lit("RecordProfile")))
         {
-              m_profileByRole[Qn::ConnectionRole::CR_LiveVideo] = profileNumber;
-              m_profileByRole[Qn::ConnectionRole::CR_Archive] = profileNumber;
+            setDirectProfile(Qn::ConnectionRole::CR_LiveVideo, profileNumber);
+            setDirectProfile(Qn::ConnectionRole::CR_Archive, profileNumber);
         }
         else if (profile.first.endsWith(lit("LiveProfile")))
         {
-              m_profileByRole[Qn::ConnectionRole::CR_SecondaryLiveVideo] = profileNumber;
+            setDirectProfile(Qn::ConnectionRole::CR_SecondaryLiveVideo, profileNumber);
         }
     }
 
@@ -1737,8 +1778,8 @@ CameraDiagnostics::Result HanwhaResource::fetchExistingProfiles()
 
         if (bestProfile != kHanwhaInvalidProfile)
         {
-            m_profileByRole[Qn::ConnectionRole::CR_LiveVideo] = bestProfile;
-            m_profileByRole[Qn::ConnectionRole::CR_Archive] = bestProfile;
+            setDirectProfile(Qn::ConnectionRole::CR_LiveVideo, bestProfile);
+            setDirectProfile(Qn::ConnectionRole::CR_Archive, bestProfile);
         }
     }
 
@@ -1811,7 +1852,8 @@ CameraDiagnostics::Result HanwhaResource::findProfiles(
     boost::optional<HanwhaVideoProfile>* outPrimaryProfile,
     boost::optional<HanwhaVideoProfile>* outSecondaryProfile,
     int* totalProfileNumber,
-    std::set<int>* profilesToRemoveIfProfilesExhausted)
+    std::set<int>* profilesToRemoveIfProfilesExhausted,
+    bool useBypass)
 {
     if (profilesToRemoveIfProfilesExhausted)
         profilesToRemoveIfProfilesExhausted->clear();
@@ -1823,7 +1865,7 @@ CameraDiagnostics::Result HanwhaResource::findProfiles(
         *outSecondaryProfile = boost::none;
 
     HanwhaProfileMap profiles;
-    const auto result = fetchProfiles(&profiles);
+    const auto result = fetchProfiles(&profiles, useBypass);
 
     if (!result)
         return result;
@@ -1865,23 +1907,30 @@ CameraDiagnostics::Result HanwhaResource::findProfiles(
     return CameraDiagnostics::NoErrorResult();
 }
 
-CameraDiagnostics::Result HanwhaResource::fetchProfiles(HanwhaProfileMap* outProfiles)
+CameraDiagnostics::Result HanwhaResource::fetchProfiles(
+    HanwhaProfileMap* outProfiles,
+    bool useBypass)
 {
     NX_ASSERT(outProfiles);
     if (!outProfiles)
         return CameraDiagnostics::CameraPluginErrorResult("Output profiles isn't profvided");
 
-    HanwhaRequestHelper helper(sharedContext());
+    HanwhaRequestHelper helper(sharedContext(), useBypass ? bypassChannel() : boost::none);
     const auto response = helper.view(lit("media/videoprofile"));
 
     if (!response.isSuccessful())
     {
         return error(
             response,
-            CameraDiagnostics::RequestFailedResult(response.requestUrl(), response.errorString()));
+            CameraDiagnostics::RequestFailedResult(
+                response.requestUrl(),
+                response.errorString()));
     }
 
-    const auto profileByChannel = parseProfiles(response);
+    const auto profileByChannel = parseProfiles(
+        response,
+        useBypass ? bypassChannel() : boost::none);
+
     const auto currentChannelProfiles = profileByChannel.find(getChannel());
     if (currentChannelProfiles == profileByChannel.cend())
         *outProfiles = HanwhaProfileMap();
@@ -2318,11 +2367,16 @@ int HanwhaResource::closestFrameRate(Qn::ConnectionRole role, int desiredFrameRa
     return qBound(1, desiredFrameRate, limits->maxFps);
 }
 
-int HanwhaResource::profileByRole(Qn::ConnectionRole role) const
+int HanwhaResource::profileByRole(Qn::ConnectionRole role, bool isBypassProfile) const
 {
     auto itr = m_profileByRole.find(role);
     if (itr != m_profileByRole.cend())
-        return itr->second;
+    {
+        const auto& profileNumbers = itr->second;
+        return isBypassProfile
+            ? profileNumbers.bypassNumber
+            : profileNumbers.directNumber;
+    }
 
     return kHanwhaInvalidProfile;
 }
@@ -3559,6 +3613,16 @@ bool HanwhaResource::isBypassSupported() const
 bool HanwhaResource::isProxiedMultisensorCamera() const
 {
     return m_proxiedDeviceChannelCount > 1;
+}
+
+void HanwhaResource::setDirectProfile(Qn::ConnectionRole role, int profileNumber)
+{
+    m_profileByRole[role].directNumber = profileNumber;
+}
+
+void HanwhaResource::setBypassProfile(Qn::ConnectionRole role, int profileNumber)
+{
+    m_profileByRole[role].bypassNumber = profileNumber;
 }
 
 } // namespace plugins
