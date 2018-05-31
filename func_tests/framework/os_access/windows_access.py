@@ -57,7 +57,7 @@ class WindowsAccess(OSAccess):
         return SpecificSMBPath
 
     def run_command(self, command, input=None):
-        self.winrm.run_command(command, input=input)
+        return self.winrm.run_command(command, input=input)
 
     def is_accessible(self):
         return self.winrm.is_working()
