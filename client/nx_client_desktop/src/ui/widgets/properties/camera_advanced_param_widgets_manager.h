@@ -1,10 +1,11 @@
 #pragma once
 
-#include <boost/optional.hpp>
-
 #include <QtWidgets/QTreeWidget>
 #include <QtWidgets/QStackedWidget>
 #include <QtWidgets/QLabel>
+
+#include <nx/utils/std/optional.h>
+#include <nx/utils/disconnect_helper.h>
 
 #include <core/resource/camera_advanced_param.h>
 
@@ -21,7 +22,7 @@ public:
 
     void displayParams(const QnCameraAdvancedParams &params);
     void loadValues(const QnCameraAdvancedParamValueList &params);
-    boost::optional<QString> parameterValue(const QString& parameterId) const;
+    std::optional<QString> parameterValue(const QString& parameterId) const;
 
 
     void clear();
@@ -65,5 +66,5 @@ private:
     QHash<QString, QWidget*> m_paramLabelsById;
     QMap<QString, QVector<std::function<void()>>> m_handlerChains;
     QHash<QString, QnCameraAdvancedParameter> m_parametersById;
-    QVector<QMetaObject::Connection> m_handlerChainConnections;
+    QnDisconnectHelperPtr m_handlerChainConnections;
 };

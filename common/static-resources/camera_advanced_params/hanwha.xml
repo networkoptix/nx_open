@@ -95,7 +95,7 @@
                         writeCmd="update"
                         unit="Kbit/s"
                         aux="range=media/videoprofile/add_update/Bitrate;profile=primary;resourceProperty=primaryStreamBitrate;specific=true;deviceTypes=nvr"
-                        shouldKeepInitialValue="true"
+                        keepInitialValue="true"
                         bindDefaultToMinimum="true">
                 </param>
                 <!-- NVR only properties -->
@@ -323,7 +323,7 @@
                         writeCmd="update"
                         unit="Kbit/s"
                         aux="range=media/videoprofile/add_update/Bitrate;profile=secondary;resourceProperty=secondaryStreamBitrate;specific=true"
-                        shouldKeepInitialValue="true"
+                        keepInitialValue="true"
                         bindDefaultToMinimum="true">
                 </param>
 

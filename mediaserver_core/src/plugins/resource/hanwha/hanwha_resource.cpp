@@ -1648,17 +1648,22 @@ CameraDiagnostics::Result HanwhaResource::createNxProfiles()
         }
     }
 
-    setDirectProfile(
-        Qn::ConnectionRole::CR_LiveVideo,
-        profilesByRole[Qn::ConnectionRole::CR_LiveVideo]->number);
+    for (const auto& entry: profilesByRole)
+    {
+        const auto role = entry.first;
+        const auto& profile = entry.second;
 
-    setDirectProfile(
-        Qn::ConnectionRole::CR_Archive,
-        profilesByRole[Qn::ConnectionRole::CR_LiveVideo]->number);
+        NX_VERBOSE(
+            this,
+            lm("Direct profile %1 has been selected for role %2 for %3 (%4)")
+                .args(profile->number, role, getName(), getId()));
 
-    setDirectProfile(
-        Qn::ConnectionRole::CR_SecondaryLiveVideo,
-        profilesByRole[Qn::ConnectionRole::CR_SecondaryLiveVideo]->number);
+        setDirectProfile(role, profile->number);
+        // We set 'Record' profile policy to the primary profile and use
+        // this profile for an archive connection.
+        if (role == Qn::ConnectionRole::CR_LiveVideo)
+            setDirectProfile(Qn::ConnectionRole::CR_Archive, profile->number);
+    }
 
     if (isBypassSupported())
     {
@@ -1683,20 +1688,16 @@ CameraDiagnostics::Result HanwhaResource::createNxProfiles()
                     lit("Can't fetch profile number via bypass."));
             }
 
+            NX_VERBOSE(
+                this,
+                lm("Bypass profile %1 has been selected for role %2 for %3 (%4)")
+                    .args(profile->number, role, getName(), getId()));
+
             setBypassProfile(role, profile->number);
             if (role == Qn::ConnectionRole::CR_LiveVideo)
                 setBypassProfile(Qn::ConnectionRole::CR_Archive, profile->number);
         }
     }
-
-#if 1
-    for (const auto& entry: m_profileByRole)
-    {
-        qDebug() << "<<<<<<<<<< PROFILES!: (role)" << entry.first
-            << "(Direct)" << entry.second.directNumber
-            << "(Bypass)" << entry.second.bypassNumber;
-    }
-#endif
 
     return CameraDiagnostics::NoErrorResult();
 }
@@ -2340,7 +2341,15 @@ int HanwhaResource::streamBitrate(
     int bitrateKbps = bitrateString.toInt();
     streamParams.resolution = streamResolution(role);
     if (bitrateKbps == 0)
+    {
+        // Since we can't fully control bitrate on the NVRs that don't have bypass
+        // we use default bitrate with 1.0 (QualityNormal) coefficient.
+        if (isNvr() && !isBypassSupported())
+            streamParams.quality = Qn::StreamQuality::QualityNormal;
+
         bitrateKbps = nx::mediaserver::resource::Camera::suggestBitrateKbps(streamParams, role);
+    }
+
     auto streamCapability = cameraMediaCapability()
         .streamCapabilities
         .value(role == Qn::ConnectionRole::CR_LiveVideo
@@ -2603,7 +2612,7 @@ QnCameraAdvancedParams HanwhaResource::filterParameters(
         if (needToCheck && parameter.range.isEmpty())
             continue;
 
-        if (!info->parameterName().isEmpty())
+        if (info->hasParameter())
         {
             const auto& cgiParams = cgiParameters();
             boost::optional<HanwhaCgiParameter> cgiParameter;

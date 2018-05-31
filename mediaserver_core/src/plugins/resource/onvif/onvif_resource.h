@@ -311,7 +311,7 @@ public:
         Qn::StreamIndex streamIndex,
         const QnLiveStreamParams& streamParams);
 
-    QString audioOutputToken() const;
+    QString audioOutputConfigurationToken() const;
 signals:
     void advancedParameterChanged(const QString &id, const QString &value);
 
@@ -392,7 +392,7 @@ private:
 
     bool checkResultAndSetStatus(const CameraDiagnostics::Result& result);
 
-    void setAudioOutputToken(const QString& value);
+    void setAudioOutputConfigurationToken(const QString& value);
 protected:
     std::unique_ptr<onvifXsd__EventCapabilities> m_eventCapabilities;
     VideoOptionsLocal m_primaryStreamCapabilities;
@@ -609,7 +609,7 @@ protected:
     nx::mediaserver::resource::ApiMultiAdvancedParametersProvider<QnPlOnvifResource> m_advancedParametersProvider;
     int m_onvifRecieveTimeout;
     int m_onvifSendTimeout;
-    QString m_audioOutputToken;
+    QString m_audioOutputConfigurationToken;
 };
 
 #endif //ENABLE_ONVIF
