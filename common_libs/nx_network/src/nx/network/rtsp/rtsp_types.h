@@ -8,6 +8,7 @@ NX_NETWORK_API extern const char* const kUrlSchemeName;
 NX_NETWORK_API extern const char* const kSecureUrlSchemeName;
 
 QString NX_NETWORK_API urlSheme(bool isSecure);
+bool NX_NETWORK_API isUrlSheme(const QString& scheme);
 
 const int DEFAULT_RTSP_PORT = 554;
 

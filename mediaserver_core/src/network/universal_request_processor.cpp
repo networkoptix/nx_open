@@ -213,8 +213,8 @@ void QnUniversalRequestProcessor::run()
                 if (!processRequest(noAuth))
                 {
                     QByteArray contentType;
-                    int rez = notFound(contentType);
-                    sendResponse(rez, contentType);
+                    int code = notFound(contentType);
+                    sendResponse(code, contentType);
                 }
             }
         }
@@ -241,13 +241,17 @@ bool QnUniversalRequestProcessor::hasSecurityIssue()
         const auto settings = commonModule()->globalSettings();
         const auto protocol = d->request.requestLine.version.protocol.toUpper();
 
-        if (protocol == "HTTP" && settings->isTrafficEncriptionForced())
-            return redicrectToScheme(nx::network::http::kSecureUrlSchemeName);
-
-        if (protocol == "RTSP" && settings->isVideoTrafficEncriptionForced())
-            return redicrectToScheme(nx_rtsp::kSecureUrlSchemeName);
-
-        if (settings->isTrafficEncriptionForced())
+        if (protocol == "HTTP")
+        {
+            if (settings->isTrafficEncriptionForced())
+                return redicrectToScheme(nx::network::http::kSecureUrlSchemeName);
+        }
+        else if (protocol == "RTSP")
+        {
+            if (settings->isVideoTrafficEncriptionForced())
+                return redicrectToScheme(nx_rtsp::kSecureUrlSchemeName);
+        }
+        else if (settings->isTrafficEncriptionForced())
         {
             NX_ASSERT(false, lm("Unable to redirect protocol to secure version: %1").arg(protocol));
             d->response.messageBody = STATIC_FORBIDDEN_HTML;

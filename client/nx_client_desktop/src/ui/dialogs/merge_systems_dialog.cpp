@@ -28,6 +28,7 @@
 
 #include <nx/utils/string.h>
 #include <network/system_helpers.h>
+#include <nx/network/http/http_types.h>
 
 using namespace nx::client::desktop::ui;
 
@@ -175,7 +176,7 @@ void QnMergeSystemsDialog::at_testConnectionButton_clicked()
     QString login = ui->loginEdit->text();
     QString password = ui->passwordEdit->text();
 
-    if ((url.scheme() != lit("http") && url.scheme() != lit("https")) || url.host().isEmpty()) {
+    if (!nx::network::http::isUrlSheme(url.scheme()) || url.host().isEmpty()) {
         updateErrorLabel(tr("URL is invalid."));
         updateConfigurationBlock();
         return;

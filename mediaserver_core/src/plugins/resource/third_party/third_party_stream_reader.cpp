@@ -12,6 +12,7 @@
 #include <nx/streaming/av_codec_media_context.h>
 #include <nx/utils/app_info.h>
 #include <nx/utils/log/log.h>
+#include <nx/network/rtsp/rtsp_types.h>
 #include <plugins/resource/third_party/motion_data_picture.h>
 #include <streaming/mjpeg_stream_reader.h>
 #include <network/multicodec_rtp_reader.h>
@@ -289,7 +290,7 @@ CameraDiagnostics::Result ThirdPartyStreamReader::openStreamInternal(bool isCame
         //checking url type and creating corresponding data provider
 
         QUrl mediaUrl( mediaUrlStr );
-        if( mediaUrl.scheme().toLower() == lit("rtsp") )
+        if( nx_rtsp::isUrlSheme(mediaUrl.scheme().toLower()) )
         {
             QnMulticodecRtpReader* rtspStreamReader = new QnMulticodecRtpReader( m_resource );
             rtspStreamReader->setUserAgent(nx::utils::AppInfo::productName());
@@ -299,7 +300,7 @@ CameraDiagnostics::Result ThirdPartyStreamReader::openStreamInternal(bool isCame
             QnMutexLocker lock(&m_streamReaderMutex);
             m_builtinStreamReader.reset( rtspStreamReader );
         }
-        else if( mediaUrl.scheme().toLower() == lit("http") )
+        else if( nx::network::http::isUrlSheme(mediaUrl.scheme().toLower()) )
         {
             QnMutexLocker lock(&m_streamReaderMutex);
             m_builtinStreamReader.reset(new MJPEGStreamReader(

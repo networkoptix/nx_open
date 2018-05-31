@@ -15,9 +15,7 @@ bool isValidUrl(const QUrl& url)
     if (!url.isValid())
         return false;
 
-    const auto scheme = url.scheme().toUtf8();
-    return scheme == nx::network::http::kUrlSchemeName
-        || scheme == nx::network::http::kSecureUrlSchemeName;
+    return nx::network::http::isUrlSheme(url.scheme());
 }
 
 } // namespace

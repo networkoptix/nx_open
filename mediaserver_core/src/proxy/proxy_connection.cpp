@@ -77,11 +77,8 @@ QnProxyConnectionProcessor::~QnProxyConnectionProcessor()
 
 bool QnProxyConnectionProcessor::isProtocol(const QString& protocol) const
 {
-    const auto protocolName = protocol.toUtf8();
-    return protocolName == nx::network::http::kUrlSchemeName
-        || protocolName == nx::network::http::kSecureUrlSchemeName
-        || protocolName == nx_rtsp::kUrlSchemeName
-        || protocolName == nx_rtsp::kSecureUrlSchemeName;
+    return nx::network::http::isUrlSheme(protocol)
+        || nx_rtsp::isUrlSheme(protocol);
 }
 
 int QnProxyConnectionProcessor::getDefaultPortByProtocol(const QString& protocol)
@@ -515,7 +512,7 @@ void QnProxyConnectionProcessor::run()
         return;
 
     bool isWebSocket = nx::network::http::getHeaderValue( d->request.headers, "Upgrade").toLower() == lit("websocket");
-    if (!isWebSocket && (d->protocol.toLower() == "http" || d->protocol.toLower() == "https"))
+    if (!isWebSocket && nx::network::http::isUrlSheme(d->protocol.toLower()))
     {
         NX_VERBOSE(this, lm("Smart proxy for %1").arg(d->request.requestLine));
         doSmartProxy();

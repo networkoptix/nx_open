@@ -7,9 +7,15 @@ namespace nx_rtsp {
 const char* const kUrlSchemeName = "rtsp";
 const char* const kSecureUrlSchemeName = "rtsps";
 
-QString NX_NETWORK_API urlSheme(bool isSecure)
+QString urlSheme(bool isSecure)
 {
     return QString::fromUtf8(isSecure ? kSecureUrlSchemeName : kUrlSchemeName);
+}
+
+bool isUrlSheme(const QString& scheme)
+{
+    const auto schemeUtf8 = scheme.toUtf8();
+    return schemeUtf8 == kUrlSchemeName || schemeUtf8 == kSecureUrlSchemeName;
 }
 
 namespace {
