@@ -72,5 +72,7 @@
 
     "PAGE NOT FOUND"                       :    "Page not found",
     "TAKE ME HOME"                         :    "Take me home",
-    "OPEN NX WITNESS BUTTON TEXT"          :    "Open %VMS_NAME%"
+    "OPEN NX WITNESS BUTTON TEXT"          :    "Open %VMS_NAME%",
+
+    "RESEND ACTVIATION EMAIL"              :    "Resend activation email"
 }

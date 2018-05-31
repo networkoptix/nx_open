@@ -38,6 +38,7 @@ ${REMEMBER ME CHECKBOX}               //form[@name='loginForm']//input[@id='reme
 ${FORGOT PASSWORD}                    //form[@name='loginForm']//a[@href='/restore_password']
 ${LOG IN CLOSE BUTTON}                //button[@data-dismiss='modal']
 ${ACCOUNT NOT FOUND}                  //form[@name='loginForm']//label[contains(text(), '${ACCOUNT NOT FOUND TEXT}')]
+${RESEND ACTIVATION EMAIL LINK}       //form[@name='loginForm']//a[text()='${RESEND ACTVIATION EMAIL}']
 
 ${LOG IN NAV BAR}                     //nav//a[contains(@ng-click, 'login()')]
 ${YOU HAVE NO SYSTEMS}                //span[contains(text(),'${YOU HAVE NO SYSTEMS TEXT}')]
@@ -151,8 +152,8 @@ ${ACCOUNT LANGUAGE DROPDOWN}          //form[@name='accountForm']//nx-language-s
 ${ACCOUNT SAVE}                       //form[@name='accountForm']//button[@ng-click='checkForm()']
 ${ACCOUNT SUBSCRIBE CHECKBOX}         //form[@name='accountForm']//input[@ng-model='account.subscribe']/following-sibling::span[contains(@class, 'checkmark')]
 #Already logged in modal
-${LOGGED IN CONTINUE BUTTON}          //div[@uib-modal-transclude]//button[@ng-click='ok()']
-${LOGGED IN LOG OUT BUTTON}           //div[@uib-modal-transclude]//button[@ng-click='cancel()']
+${LOGGED IN CONTINUE BUTTON}          //ngb-modal-window//button[text()='Continue ']
+${LOGGED IN LOG OUT BUTTON}           //ngb-modal-window//button[text()='Log Out ']
 
 ${CONTINUE BUTTON}                    //ngb-modal-window//button[contains(text(), 'Continue')]
 ${CONTINUE MODAL}                     //ngb-modal-window

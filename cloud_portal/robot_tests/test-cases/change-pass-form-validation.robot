@@ -74,7 +74,7 @@ Check Old Password Alert
 
 Check New Password Outline
     [Arguments]    ${new pw}
-    Wait Until Element Is Visible    ${NEW PASSWORD INPUT}/parent::div/parent::div/parent::div[contains(@class,'has-error')]
+    Wait Until Element Is Visible    //form[@name='passwordForm']//password-input[@ng-model='pass.newPassword']//input[contains(@class, 'ng-invalid') and @type='password']
     Run Keyword If    "${new pw}"=="${EMPTY}" or "${new pw}"=="${SPACE}"    Element Should Be Visible    ${PASSWORD IS REQUIRED}
     Run Keyword If    "${new pw}"=="${7char password}"    Element Should Be Visible    ${PASSWORD TOO SHORT}
     Run Keyword If    "${new pw}"=="${CYRILLIC TEXT}" or "${new pw}"=="${SMILEY TEXT}" or "${new pw}"=="${GLYPH TEXT}" or "${new pw}"=="${TM TEXT}" or "${new pw}"=="${SPACE}${BASE PASSWORD}" or "${new pw}"=="${BASE PASSWORD}${SPACE}"    Element Should Be Visible    ${PASSWORD SPECIAL CHARS}
