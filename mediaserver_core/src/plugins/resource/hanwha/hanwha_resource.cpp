@@ -2340,7 +2340,15 @@ int HanwhaResource::streamBitrate(
     int bitrateKbps = bitrateString.toInt();
     streamParams.resolution = streamResolution(role);
     if (bitrateKbps == 0)
+    {
+        // Since we can't fully control bitrate on the NVRs that don't have bypass
+        // we use default bitrate with 1.0 (QualityNormal) coefficient.
+        if (isNvr() && !isBypassSupported())
+            streamParams.quality = Qn::StreamQuality::QualityNormal;
+
         bitrateKbps = nx::mediaserver::resource::Camera::suggestBitrateKbps(streamParams, role);
+    }
+
     auto streamCapability = cameraMediaCapability()
         .streamCapabilities
         .value(role == Qn::ConnectionRole::CR_LiveVideo
