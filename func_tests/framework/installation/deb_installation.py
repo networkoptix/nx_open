@@ -1,5 +1,3 @@
-"""Manipulate directory to which server instance is installed."""
-
 import logging
 import sys
 from io import BytesIO
@@ -22,10 +20,9 @@ _logger = logging.getLogger(__name__)
 
 
 class DebInstallation(Installation):
-    """Either installed via dpkg or unpacked"""
+    """Manage installation via dpkg"""
 
     def __init__(self, ssh_access, deb):
-        """Either valid or hypothetical (invalid or non-existent) installation."""
         self._ssh = ssh_access.ssh  # type: SSH
         self.installer = deb
         self.dir = ssh_access.Path('/opt', self.installer.customization.linux_subdir)
