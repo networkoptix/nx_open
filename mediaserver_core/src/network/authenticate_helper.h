@@ -2,6 +2,7 @@
 #define __QN_AUTH_HELPER__
 
 #include <map>
+#include <optional>
 #include <tuple>
 
 #include <QtNetwork/QAuthenticator>
