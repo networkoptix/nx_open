@@ -163,10 +163,7 @@ public:
 
         void chunkAdded(int storageIndex)
         {
-            if (auto it = m_archivePresenceMap.find(storageIndex); it == m_archivePresenceMap.cend())
-                m_archivePresenceMap[storageIndex] = 1;
-            else
-                it->second++;
+            m_archivePresenceMap[storageIndex]++;
         }
 
         void chunkRemoved(int storageIndex)
