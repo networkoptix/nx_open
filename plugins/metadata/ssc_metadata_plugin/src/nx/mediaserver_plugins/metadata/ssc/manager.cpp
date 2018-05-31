@@ -1,15 +1,8 @@
 #include "manager.h"
 
-#include <chrono>
-#include <mutex>
-
 #include <QtCore/QString>
 
-#include <nx/utils/std/cppnx.h>
-#include <nx/utils/std/future.h>
-#include <nx/utils/unused.h>
-
-#include <nx/fusion/serialization/json.h>
+#include <nx/fusion/model_functions.h>
 
 #include <nx/api/analytics/device_manifest.h>
 
@@ -53,21 +46,11 @@ nx::sdk::metadata::CommonEventMetadataPacket* createCommonEventMetadataPacket(
 Manager::Manager(Plugin* plugin,
     const nx::sdk::CameraInfo& cameraInfo,
     const AnalyticsDriverManifest& typedManifest)
+    :
+    m_plugin(plugin),
+    m_url(cameraInfo.url),
+    m_cameraLogicalId(cameraInfo.logicalId)
 {
-    m_url = cameraInfo.url;
-    m_auth.setUser(cameraInfo.login);
-    m_auth.setPassword(cameraInfo.password);
-    m_plugin = plugin;
-    m_cameraLogicalId = cameraInfo.logicalId;
-
-#if 0
-    // This is for test purposes. Should be deleted when client fills cameraInfo.logicalId field.
-    if (QString(cameraInfo.model) == "DWC-MF21M4TIR")
-        m_cameraLogicalId = 1;
-    if (QString(cameraInfo.model) == "DWC-MTT4Wi36")
-        m_cameraLogicalId = 2;
-#endif
-
     nx::api::AnalyticsDeviceManifest typedCameraManifest;
     for (const auto& eventType: typedManifest.outputEventTypes)
         typedCameraManifest.supportedEventTypes.push_back(eventType.eventTypeId);

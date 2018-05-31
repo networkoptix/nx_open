@@ -114,29 +114,33 @@ void ManagerPool::initExistingResources()
 
 void ManagerPool::at_resourceAdded(const QnResourcePtr& resource)
 {
+    auto camera = resource.dynamicCast<QnSecurityCamResource>();
+    if (!camera)
+        return;
+
     NX_VERBOSE(
         this,
         lm("Resource %1 (%2) has been added.")
             .args(resource->getName(), resource->getId()));
 
     connect(
-        resource.data(), &QnResource::statusChanged,
+        resource, &QnResource::statusChanged,
         this, &ManagerPool::handleResourceChanges);
 
     connect(
-        resource.data(), &QnResource::parentIdChanged,
+        resource, &QnResource::parentIdChanged,
         this, &ManagerPool::handleResourceChanges);
 
     connect(
-        resource.data(), &QnResource::urlChanged,
+        resource, &QnResource::urlChanged,
         this, &ManagerPool::handleResourceChanges);
 
     connect(
-        resource.data(), &QnResource::logicalIdChanged,
+        camera, &QnSecurityCamResource::logicalIdChanged,
         this, &ManagerPool::handleResourceChanges);
 
     connect(
-        resource.data(), &QnResource::propertyChanged,
+        resource, &QnResource::propertyChanged,
         this, &ManagerPool::at_propertyChanged);
 
     handleResourceChanges(resource);
@@ -165,6 +169,12 @@ void ManagerPool::at_resourceRemoved(const QnResourcePtr& resource)
     auto camera = resource.dynamicCast<QnSecurityCamResource>();
     if (!camera)
         return;
+
+    disconnect(camera, &QnResource::statusChanged, this, &ManagerPool::handleResourceChanges);
+    disconnect(camera, &QnResource::parentIdChanged, this, &ManagerPool::handleResourceChanges);
+    disconnect(camera, &QnResource::urlChanged, this, &ManagerPool::handleResourceChanges);
+    disconnect(camera, &QnSecurityCamResource::logicalIdChanged, this, &ManagerPool::handleResourceChanges);
+    disconnect(camera, &QnResource::propertyChanged, this, &ManagerPool::at_propertyChanged);
 
     releaseResourceMetadataManagers(camera);
 }

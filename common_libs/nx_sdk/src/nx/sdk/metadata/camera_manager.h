@@ -70,9 +70,9 @@ public:
      * First contains only event guids. Valid example:
      * {
      *     "supportedEventTypes":
-	 *     [
-	 *         "{b37730fe-3e2d-9eb7-bee0-7732877ec61f}",
-	 *         "{f83daede-7fae-6a51-2e90-69017dadfd62}",
+     *     [
+     *         "{b37730fe-3e2d-9eb7-bee0-7732877ec61f}",
+     *         "{f83daede-7fae-6a51-2e90-69017dadfd62}",
      *     ]
      * }
      * Second contains guids and descriptions. Valid example:

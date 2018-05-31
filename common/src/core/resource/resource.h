@@ -219,7 +219,6 @@ signals:
     void propertyChanged(const QnResourcePtr &resource, const QString &key);
     void initializedChanged(const QnResourcePtr &resource);
     void videoLayoutChanged(const QnResourcePtr &resource);
-    void logicalIdChanged(const QnResourcePtr &resource);
 
 public:
 #ifdef ENABLE_DATA_PROVIDERS

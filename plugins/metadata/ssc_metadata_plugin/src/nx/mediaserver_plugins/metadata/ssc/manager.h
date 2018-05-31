@@ -3,16 +3,7 @@
 #include <memory>
 
 #include <QtCore/QUrl>
-#include <QtNetwork/QAuthenticator>
-/*
-Add
-D:\develop\packages\windows-x64\qt-5.6.1-1\
-    include\QtSerialBus
-    include\QtSerialPort
-
-    lib\cmake\QtSerialBus
-    lib\QtSerialPort
-*/
+#include <QtCore/QByteArray>
 
 #include <plugins/plugin_tools.h>
 
@@ -53,10 +44,9 @@ public:
     virtual void freeManifest(const char* data) override;
 
 private:
-    QUrl m_url;
-    QAuthenticator m_auth;
-    int m_cameraLogicalId;
-    Plugin* m_plugin;
+    Plugin * const m_plugin;
+    const QUrl m_url;
+    const int m_cameraLogicalId;
     QByteArray m_cameraManifest;
     nx::sdk::metadata::MetadataHandler* m_handler = nullptr;
     mutable uint64_t m_packetId = 0; //< autoincrement packet number for log and debug

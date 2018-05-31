@@ -970,7 +970,6 @@ void QnSecurityCamResource::setLogicalId(const QString& value)
     }
 
     emit logicalIdChanged(::toSharedPointer(this));
-
 }
 
 void QnSecurityCamResource::setMaxDays(int value)

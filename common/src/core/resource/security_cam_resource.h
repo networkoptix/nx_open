@@ -35,6 +35,7 @@ class QnSecurityCamResource : public QnNetworkResource, public QnMediaResource
 {
     typedef QnNetworkResource base_type;
     Q_OBJECT
+    Q_PROPERTY(QString LogicalId READ getLogicalId WRITE setLogicalId)
 
 public:
     static const int kDefaultSecondStreamFpsLow;
@@ -369,6 +370,7 @@ signals:
     void capabilitiesChanged(const QnResourcePtr& resource);
     void disableDualStreamingChanged(const QnResourcePtr& resource);
     void audioEnabledChanged(const QnResourcePtr &resource);
+    void logicalIdChanged(const QnResourcePtr &resource);
 
     void networkIssue(const QnResourcePtr&, qint64 timeStamp, nx::vms::event::EventReason reasonCode, const QString& reasonParamsEncoded);
 
