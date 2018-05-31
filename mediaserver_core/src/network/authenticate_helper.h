@@ -1,6 +1,7 @@
 #ifndef __QN_AUTH_HELPER__
 #define __QN_AUTH_HELPER__
 
+#include <deque>
 #include <map>
 #include <optional>
 #include <tuple>
