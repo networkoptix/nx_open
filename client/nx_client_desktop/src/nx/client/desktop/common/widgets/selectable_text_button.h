@@ -12,7 +12,7 @@ namespace desktop {
  * It also can be deactivatable and have a clickable [x] control which puts the button
  * into deactivated state with flat appearance and optionally different text and icon.
  * Clicking the button in either deactivated or unselected state puts it into selected state.
- * Unselected state has optional highlighted accented appearance.
+ * Unselected state has optional accented appearance.
  *
  * Palette and icons used in button states:
  *      deactivated: QPalette::Inactive, QIcon::Off
