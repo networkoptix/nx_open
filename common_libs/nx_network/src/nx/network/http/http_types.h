@@ -41,6 +41,8 @@ const int DEFAULT_HTTPS_PORT = 443;
 NX_NETWORK_API extern const char* const kUrlSchemeName;
 NX_NETWORK_API extern const char* const kSecureUrlSchemeName;
 
+QString NX_NETWORK_API urlSheme(bool isSecure);
+
 /**
  * TODO: #ak Consider using another container.
  * Need some buffer with:

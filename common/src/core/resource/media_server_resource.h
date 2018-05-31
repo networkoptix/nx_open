@@ -141,10 +141,6 @@ public:
 
     static constexpr qint64 kMinFailoverTimeoutMs = 1000 * 3;
 
-protected:
-    static QString apiUrlScheme(bool isSecure);
-    static QString mediaUrlScheme(bool isSecure);
-
 private slots:
     void onNewResource(const QnResourcePtr &resource);
     void onRemoveResource(const QnResourcePtr &resource);

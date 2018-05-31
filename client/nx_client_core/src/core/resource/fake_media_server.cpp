@@ -38,7 +38,7 @@ void QnFakeMediaServerResource::setFakeServerModuleInformation(const ec2::ApiDis
     {
         const nx::network::SocketAddress endpoint(addressList.first().toString(), serverData.port);
         const auto url = nx::network::url::Builder()
-            .setScheme(apiUrlScheme(serverData.sslAllowed))
+            .setScheme(nx::network::http::urlSheme(serverData.sslAllowed))
             .setEndpoint(endpoint);
         setUrl(url.toString());
     }

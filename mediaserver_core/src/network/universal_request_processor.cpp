@@ -249,7 +249,7 @@ bool QnUniversalRequestProcessor::hasSecurityIssue()
 
         if (settings->isTrafficEncriptionForced())
         {
-            NX_ASSERT(false, protocol);
+            NX_ASSERT(false, lm("Unable to redirect protocol to secure version: %1").arg(protocol));
             d->response.messageBody = STATIC_FORBIDDEN_HTML;
             sendResponse(CODE_FORBIDDEN, "text/html; charset=utf-8");
             return true;
@@ -266,19 +266,22 @@ bool QnUniversalRequestProcessor::redicrectToScheme(const char* scheme)
     nx::utils::Url url(d->request.requestLine.url);
     if (url.scheme() == schemeString)
     {
-        NX_ASSERT(false, schemeString);
+        NX_ASSERT(false, lm("Unable to insecure connection on sheme: %1").arg(schemeString));
         d->response.messageBody = STATIC_BAD_REQUEST_HTML;
         sendResponse(CODE_FORBIDDEN, "text/html; charset=utf-8");
         return true;
     }
 
-    url.setScheme(schemeString);
-    if (url.host().isEmpty())
-    {
-        const auto endpoint = d->socket->getLocalAddress();
-        url.setHost(endpoint.address.toString());
-        url.setPort(endpoint.port);
-    }
+    const auto host = nx::network::http::getHeaderValue(d->request.headers, "Host");
+    const auto endpoint(host.isEmpty()
+        ? d->socket->getLocalAddress()
+        : nx::network::SocketAddress(host));
+
+    url.setHost(endpoint.address.toString());
+    url.setPort(endpoint.port);
+    url.setScheme(scheme);
+    NX_VERBOSE(this, lm("Redirecting '%1' from '%2' to '%3'").args(
+        d->request.requestLine.url, d->socket->getLocalAddress(), url));
 
     QByteArray contentType;
     int code = redirectTo(url.toString().toUtf8(), contentType);

@@ -7,6 +7,11 @@ namespace nx_rtsp {
 const char* const kUrlSchemeName = "rtsp";
 const char* const kSecureUrlSchemeName = "rtsps";
 
+QString NX_NETWORK_API urlSheme(bool isSecure)
+{
+    return QString::fromUtf8(isSecure ? kSecureUrlSchemeName : kUrlSchemeName);
+}
+
 namespace {
 
 void extractNptTime(const nx::network::http::StringType& strValue, qint64* dst)

@@ -24,6 +24,7 @@
 #include <utils/applauncher_utils.h>
 #include <utils/common/software_version.h>
 #include <utils/common/app_info.h>
+#include <nx/network/http/http_types.h>
 
 namespace {
 
@@ -392,11 +393,7 @@ Qn::ConnectionResult QnConnectionDiagnosticsHelper::handleCompatibilityMode(
 
         nx::utils::Url serverUrl = connectionInfo.ecUrl;
         if (serverUrl.scheme().isEmpty())
-        {
-            serverUrl.setScheme(connectionInfo.allowSslConnections
-                ? lit("https")
-                : lit("http"));
-        }
+            serverUrl.setScheme(nx::network::http::urlSheme(connectionInfo.allowSslConnections));
 
         QString authString = QnStartupParameters::createAuthenticationString(serverUrl,
             connectionInfo.version);

@@ -2585,7 +2585,6 @@ void ActionHandler::openInBrowserDirectly(const QnMediaServerResourcePtr& server
     nx::utils::Url url(server->getApiUrl());
     url.setUserName(QString());
     url.setPassword(QString());
-    url.setScheme(lit("http"));
     url.setPath(path);
     url.setFragment(fragment);
     url = qnClientModule->networkProxyFactory()->urlToResource(url, server, lit("proxy"));

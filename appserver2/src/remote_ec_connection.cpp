@@ -54,7 +54,7 @@ namespace ec2
         base_type::startReceivingNotifications();
 
         nx::utils::Url url(m_queryProcessor->getUrl());
-        url.setScheme( m_connectionInfo.allowSslConnections ? lit("https") : lit("http") );
+        url.setScheme(nx::network::http::urlSheme(m_connectionInfo.allowSslConnections));
         //url.setPath("ec2/events");
         url = nx::utils::Url( url.toString( QUrl::RemovePath | QUrl::RemoveQuery ) + lit("/ec2/events") );
         QUrlQuery q;

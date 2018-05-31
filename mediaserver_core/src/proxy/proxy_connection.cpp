@@ -31,6 +31,7 @@
 #include "api/global_settings.h"
 #include <nx/network/http/auth_tools.h>
 #include <nx/network/aio/unified_pollset.h>
+#include <nx/network/rtsp/rtsp_types.h>
 
 #include <utils/common/app_info.h>
 #include <core/resource/user_resource.h>
@@ -76,7 +77,11 @@ QnProxyConnectionProcessor::~QnProxyConnectionProcessor()
 
 bool QnProxyConnectionProcessor::isProtocol(const QString& protocol) const
 {
-    return protocol == "http" || protocol == "https" || protocol == "rtsp";
+    const auto protocolName = protocol.toUtf8();
+    return protocolName == nx::network::http::kUrlSchemeName
+        || protocolName == nx::network::http::kSecureUrlSchemeName
+        || protocolName == nx_rtsp::kUrlSchemeName
+        || protocolName == nx_rtsp::kSecureUrlSchemeName;
 }
 
 int QnProxyConnectionProcessor::getDefaultPortByProtocol(const QString& protocol)

@@ -21,6 +21,11 @@ namespace http {
 const char* const kUrlSchemeName = "http";
 const char* const kSecureUrlSchemeName = "https";
 
+QString NX_NETWORK_API urlSheme(bool isSecure)
+{
+    return QString::fromUtf8(isSecure ? kSecureUrlSchemeName : kUrlSchemeName);
+}
+
 int strcasecmp(const StringType& one, const StringType& two)
 {
     if (one.size() < two.size())

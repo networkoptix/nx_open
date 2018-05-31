@@ -4,6 +4,7 @@
 #include <QtCore/QUrl>
 
 #include <nx/client/desktop/common/utils/aligner.h>
+#include <nx/network/http/http_types.h>
 
 using namespace nx::client::desktop;
 
@@ -14,10 +15,9 @@ bool isValidUrl(const QUrl& url)
     if (!url.isValid())
         return false;
 
-    const static QString kHttp(lit("http"));
-    const static QString kHttps(lit("https"));
-
-    return url.scheme() == kHttp || url.scheme() == kHttps;
+    const auto scheme = url.scheme().toUtf8();
+    return scheme == nx::network::http::kUrlSchemeName
+        || scheme == nx::network::http::kSecureUrlSchemeName;
 }
 
 } // namespace

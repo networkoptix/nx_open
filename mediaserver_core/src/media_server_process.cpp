@@ -980,8 +980,11 @@ nx::utils::Url appServerConnectionUrl(QSettings &settings)
     {
         appServerUrl = nx::utils::Url::fromLocalFile( closeDirPath( getDataDirectory() ) );
     }
-    else {
-        appServerUrl.setScheme(settings.value("secureAppserverConnection", true).toBool() ? QLatin1String("https") : QLatin1String("http"));
+    else
+    {
+        const auto isSslRequired = settings.value("secureAppserverConnection", true).toBool();
+        appServerUrl.setScheme(nx::network::http::urlSheme(isSslRequired));
+
         int port = settings.value("port", DEFAULT_APPSERVER_PORT).toInt();
         appServerUrl.setHost(host);
         appServerUrl.setPort(port);

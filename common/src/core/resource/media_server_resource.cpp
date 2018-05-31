@@ -45,20 +45,6 @@ const QString safeModePropertyName = lit("ecDbReadOnly");
 
 } // namespace
 
-QString QnMediaServerResource::apiUrlScheme(bool isSecure)
-{
-    return QString::fromUtf8(isSecure
-        ? nx::network::http::kSecureUrlSchemeName
-        : nx::network::http::kUrlSchemeName);
-}
-
-QString QnMediaServerResource::mediaUrlScheme(bool isSecure)
-{
-    return QString::fromUtf8(isSecure
-        ? nx_rtsp::kSecureUrlSchemeName
-        : nx_rtsp::kUrlSchemeName);
-}
-
 QnMediaServerResource::QnMediaServerResource(QnCommonModule* commonModule):
     base_type(commonModule),
     m_serverFlags(Qn::SF_None),
@@ -329,7 +315,7 @@ void QnMediaServerResource::setUrl(const QString& url)
 nx::utils::Url QnMediaServerResource::getApiUrl() const
 {
     return nx::network::url::Builder()
-        .setScheme(apiUrlScheme(isSslAllowed()))
+        .setScheme(nx::network::http::urlSheme(isSslAllowed()))
         .setEndpoint(getPrimaryAddress()).toUrl();
 }
 
@@ -337,7 +323,7 @@ QString QnMediaServerResource::getUrl() const
 {
     const auto isSecure = commonModule()->globalSettings()->isVideoTrafficEncriptionForced();
     return nx::network::url::Builder()
-        .setScheme(mediaUrlScheme(isSslAllowed() && isSecure))
+        .setScheme(nx_rtsp::urlSheme(isSslAllowed() && isSecure))
         .setEndpoint(getPrimaryAddress()).toUrl().toString();
 }
 
@@ -719,12 +705,12 @@ nx::utils::Url QnMediaServerResource::buildApiUrl() const
     if (m_primaryAddress.isNull())
     {
         url = m_apiConnection->url();
-        url.setScheme(apiUrlScheme(m_sslAllowed));
+        url.setScheme(nx::network::http::urlSheme(m_sslAllowed));
     }
     else
     {
         url = nx::network::url::Builder()
-            .setScheme(apiUrlScheme(m_sslAllowed))
+            .setScheme(nx::network::http::urlSheme(m_sslAllowed))
             .setEndpoint(m_primaryAddress).toUrl();
     }
 
