@@ -4,7 +4,7 @@
 #include <deque>
 #include <numeric>
 
-#include <boost/optional.hpp>
+#include <nx/utils/std/optional.h>
 
 #include "../time.h"
 
@@ -20,8 +20,9 @@ class SumPerPeriod
 {
 public:
     SumPerPeriod(std::chrono::milliseconds period):
-        m_subPeriodCount(5),
-        m_subperiod(period / m_subPeriodCount)
+        m_subPeriodCount(20),
+        m_subperiod(
+            std::chrono::duration_cast<std::chrono::microseconds>(period) / m_subPeriodCount)
     {
         m_sumPerSubperiod.resize(m_subPeriodCount);
     }
@@ -51,7 +52,7 @@ public:
             const auto currentPeriodLength =
                 periodIndex == 0
                 ? duration_cast<microseconds>(now - *m_currentPeriodStart)
-                : duration_cast<microseconds>(m_subperiod);
+                : m_subperiod;
             if (currentPeriodLength >= valuePeriod)
             {
                 m_sumPerSubperiod[periodIndex] += value;
@@ -80,11 +81,17 @@ public:
         return 1.0 / m_subPeriodCount;
     }
 
+    void reset()
+    {
+        m_sumPerSubperiod = std::deque<Value>(m_subPeriodCount);
+        m_currentPeriodStart = std::nullopt;
+    }
+
 private:
     const int m_subPeriodCount;
-    const std::chrono::milliseconds m_subperiod;
+    const std::chrono::microseconds m_subperiod;
     std::deque<Value> m_sumPerSubperiod;
-    boost::optional<std::chrono::steady_clock::time_point> m_currentPeriodStart;
+    std::optional<std::chrono::steady_clock::time_point> m_currentPeriodStart;
 
     void closeExpiredPeriods(
         std::chrono::steady_clock::time_point now)
