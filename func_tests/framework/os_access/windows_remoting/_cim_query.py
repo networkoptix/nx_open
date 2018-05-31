@@ -2,6 +2,7 @@ import logging
 from pprint import pformat
 
 import xmltodict
+from winrm.exceptions import WinRMTransportError
 
 _logger = logging.getLogger(__name__)
 
@@ -59,7 +60,11 @@ class _CimAction(object):
                 for selector_name, selector_value in self.selectors.items()
                 ]
             }
-        response = protocol.send_message(xmltodict.unparse(rq))
+        try:
+            response = protocol.send_message(xmltodict.unparse(rq))
+        except WinRMTransportError as e:
+            _logger.exception("XML:\n%s", e.response_text)
+            raise
 
         response_dict = xmltodict.parse(
             response,
