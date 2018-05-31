@@ -1,6 +1,7 @@
 import pytest
 
 from framework.os_access.exceptions import DoesNotExist
+from framework.os_access.ssh_path import make_ssh_path_cls
 from framework.registry import Registry, RegistryError
 
 pytest_plugins = ['fixtures.ad_hoc_ssh']
@@ -8,7 +9,7 @@ pytest_plugins = ['fixtures.ad_hoc_ssh']
 
 @pytest.fixture()
 def registry_path(ad_hoc_ssh):
-    path = ad_hoc_ssh.Path.tmp() / 'test_registry.yaml'
+    path = make_ssh_path_cls(ad_hoc_ssh).tmp() / 'test_registry.yaml'
     path.parent.mkdir(exist_ok=True, parents=True)
     try:
         path.unlink()
