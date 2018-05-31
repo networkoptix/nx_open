@@ -65,6 +65,7 @@ public:
     AuthorizationManager& authorizationManager();
 
 private:
+    const conf::Settings& m_settings;
     dao::rdb::DbInstanceController m_dbInstanceController;
     std::unique_ptr<AbstractEmailManager> m_emailManager;
     StreeManager m_streeManager;

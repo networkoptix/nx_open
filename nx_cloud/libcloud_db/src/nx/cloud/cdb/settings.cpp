@@ -218,6 +218,12 @@ const Auth& Settings::auth() const
     return m_auth;
 }
 
+std::optional<network::server::UserLockerSettings> Settings::loginLockout() const
+{
+    // TODO
+    return std::nullopt;
+}
+
 const Notification& Settings::notification() const
 {
     return m_notification;

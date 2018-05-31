@@ -4,12 +4,14 @@
 #include <list>
 #include <map>
 
+#include <nx/network/connection_server/user_locker.h>
 #include <nx/network/socket_common.h>
 #include <nx/utils/log/log_initializer.h>
 #include <nx/utils/log/log_settings.h>
 #include <nx/utils/settings.h>
 #include <nx/utils/basic_service_settings.h>
 #include <nx/utils/db/types.h>
+#include <nx/utils/std/optional.h>
 
 #include <nx/data_sync_engine/p2p_sync_settings.h>
 
@@ -136,6 +138,7 @@ public:
     const nx::utils::log::Settings& vmsSynchronizationLogging() const;
     const nx::utils::db::ConnectionOptions& dbConnectionOptions() const;
     const Auth& auth() const;
+    std::optional<network::server::UserLockerSettings> loginLockout() const;
     const Notification& notification() const;
     const AccountManager& accountManager() const;
     const SystemManager& systemManager() const;
