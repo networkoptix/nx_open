@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from ...notifications.api import send
+from notifications.api import send
 from django.contrib.auth.models import Permission
 from django.db.models import Q
 from django.conf import settings
@@ -9,7 +9,7 @@ from PIL import Image
 import base64, re, uuid
 
 from .filldata import fill_content
-from ...api.models import Account
+from api.models import Account
 from ..models import *
 
 
