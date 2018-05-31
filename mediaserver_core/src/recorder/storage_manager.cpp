@@ -2173,7 +2173,7 @@ bool QnStorageManager::clearOldestSpace(const QnStorageResourcePtr &storage, boo
 
     if (toDelete > 0)
     {
-        if (!useMinArchiveDays &&!m_diskFullWarned[storage->getId()])
+        if (!useMinArchiveDays && !m_diskFullWarned[storage->getId()])
         {
             emit storageFailure(storage, nx::vms::api::EventReason::storageFull);
             m_diskFullWarned[storage->getId()] = true;
@@ -2181,8 +2181,7 @@ bool QnStorageManager::clearOldestSpace(const QnStorageResourcePtr &storage, boo
     }
     else
     {
-        m_diskFullWarned[storage->getId()] = false;
-        if (m_spaceInfo.state(storageIndex) == nx::recorder::SpaceInfo::notReady)
+        if (m_spaceInfo.state(storageIndex) == nx::recorder::SpaceInfo::notEnoughSpace)
         {
             m_spaceInfo.storageChanged(
                 storageIndex,
@@ -2191,6 +2190,9 @@ bool QnStorageManager::clearOldestSpace(const QnStorageResourcePtr &storage, boo
                 storage->getSpaceLimit());
         }
     }
+
+    if (toDelete <= 0 || useMinArchiveDays)
+        m_diskFullWarned[storage->getId()] = false;
 
     return toDelete <= 0;
 }
