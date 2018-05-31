@@ -1932,10 +1932,10 @@ CameraDiagnostics::Result HanwhaResource::fetchProfiles(
         useBypass ? bypassChannel() : boost::none);
 
     const auto currentChannelProfiles = profileByChannel.find(getChannel());
-    if (currentChannelProfiles == profileByChannel.cend())
-        *outProfiles = HanwhaProfileMap();
+    *outProfiles = currentChannelProfiles == profileByChannel.cend()
+        ? HanwhaProfileMap()
+        : currentChannelProfiles->second;
 
-    *outProfiles = currentChannelProfiles->second;
     return CameraDiagnostics::NoErrorResult();
 }
 
