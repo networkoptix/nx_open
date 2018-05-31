@@ -14,13 +14,23 @@ namespace math {
 
 /**
  * Given stream of values returns sum of values per specified period.
+ * Every operation has constant-time complexity against number of values provided.
+ * It is achieved by calculating sums for a number of subperiods
+ * and summing them up when needed.
+ * Such approach results in calculation error of 1.0 / {sub period count}.
+ * So, this class is effective for cases with a very large number of values.
+ * E.g., calculating traffic per period.
+ * Max error can be retrieved with SumPerPeriod::maxError().
  */
 template<typename Value>
 class SumPerPeriod
 {
 public:
-    SumPerPeriod(std::chrono::milliseconds period):
-        m_subPeriodCount(20),
+    SumPerPeriod(
+        std::chrono::milliseconds period,
+        int subPeriodCount = 20)
+        :
+        m_subPeriodCount(subPeriodCount),
         m_subperiod(
             std::chrono::duration_cast<std::chrono::microseconds>(period) / m_subPeriodCount)
     {
