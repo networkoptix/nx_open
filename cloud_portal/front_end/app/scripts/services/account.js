@@ -81,7 +81,8 @@
             login: function (email, password, remember) {
                 this.setEmail(email);
                 let self = this;
-                return cloudApi.login(email, password, remember).then(function (result) {
+                return cloudApi.login(email, password, remember)
+                    .then((result) => {
                     if (cloudApi.checkResponseHasError(result)) {
                         return $q.reject(result);
                     }
