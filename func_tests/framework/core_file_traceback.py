@@ -1,4 +1,3 @@
-import datetime
 import os
 
 from pathlib2 import Path

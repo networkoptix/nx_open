@@ -2,7 +2,7 @@ import logging
 import re
 
 from framework.os_access.exceptions import DoesNotExist
-from framework.serialize import load, dump
+from framework.serialize import dump, load
 
 _logger = logging.getLogger(__name__)
 
