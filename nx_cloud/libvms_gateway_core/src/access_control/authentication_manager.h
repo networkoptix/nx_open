@@ -52,8 +52,7 @@ private:
     std::uniform_int_distribution<size_t> m_dist;
 
     bool validateNonce(const nx::network::http::StringType& nonce);
-    void addWWWAuthenticateHeader(
-        std::optional<nx::network::http::header::WWWAuthenticate>* const wwwAuthenticate );
+    nx::network::http::header::WWWAuthenticate prepareWWWAuthenticateHeader();
     nx::Buffer generateNonce();
 };
 

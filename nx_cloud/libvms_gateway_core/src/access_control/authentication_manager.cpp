@@ -103,16 +103,10 @@ void AuthenticationManager::authenticate(
 
     if (!authzHeader ||
         (authzHeader->authScheme != header::AuthScheme::digest) ||
-        (authzHeader->userid().isEmpty()))
+        (authzHeader->userid().isEmpty()) ||
+        !validateNonce(authzHeader->digest->params["nonce"]))
     {
-        addWWWAuthenticateHeader(&authenticationResult.wwwAuthenticate);
-        authenticationResult.isSucceeded = false;
-        return;
-    }
-
-    if (!validateNonce(authzHeader->digest->params["nonce"]))
-    {
-        addWWWAuthenticateHeader(&authenticationResult.wwwAuthenticate);
+        authenticationResult.wwwAuthenticate = prepareWWWAuthenticateHeader();
         authenticationResult.isSucceeded = false;
         return;
     }
@@ -162,15 +156,15 @@ bool AuthenticationManager::validateNonce(const nx::network::http::StringType& n
     return nonce.size() < 31;
 }
 
-void AuthenticationManager::addWWWAuthenticateHeader(
-    std::optional<nx::network::http::header::WWWAuthenticate>* const wwwAuthenticate)
+nx::network::http::header::WWWAuthenticate AuthenticationManager::prepareWWWAuthenticateHeader()
 {
     //adding WWW-Authenticate header
-    *wwwAuthenticate = header::WWWAuthenticate();
-    wwwAuthenticate->value().authScheme = header::AuthScheme::digest;
-    wwwAuthenticate->value().params.insert("nonce", generateNonce());
-    wwwAuthenticate->value().params.insert("realm", realm());
-    wwwAuthenticate->value().params.insert("algorithm", "MD5");
+    header::WWWAuthenticate wwwAuthenticate;
+    wwwAuthenticate.authScheme = header::AuthScheme::digest;
+    wwwAuthenticate.params.insert("nonce", generateNonce());
+    wwwAuthenticate.params.insert("realm", realm());
+    wwwAuthenticate.params.insert("algorithm", "MD5");
+    return wwwAuthenticate;
 }
 
 nx::Buffer AuthenticationManager::generateNonce()

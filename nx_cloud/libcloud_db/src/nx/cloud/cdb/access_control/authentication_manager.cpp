@@ -66,7 +66,7 @@ AuthenticationHelper::AuthenticationHelper(
             m_username.c_str(),
             boost::none,
             std::placeholders::_1,
-            m_authzHeader.value());
+            *m_authzHeader);
     }
 }
 
@@ -198,7 +198,7 @@ void AuthenticationHelper::loadAuthorizationHeader()
     {
         m_authzHeader.emplace(header::DigestAuthorization());
         if (!m_authzHeader->parse(authHeaderIter->second))
-            m_authzHeader.reset();
+            m_authzHeader = std::nullopt;
     }
 }
 
