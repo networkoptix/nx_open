@@ -23,6 +23,17 @@ namespace plugins {
 
 class HanwhaSharedResourceContext;
 
+struct HanwhaChunkLoaderSettings
+{
+    HanwhaChunkLoaderSettings() = default;
+    HanwhaChunkLoaderSettings(
+        const std::chrono::seconds& responseTimeout,
+        const std::chrono::seconds& messageBodyReadTimeout);
+
+    std::chrono::seconds responseTimeout = std::chrono::minutes(5);
+    std::chrono::seconds messageBodyReadTimeout = std::chrono::minutes(30);
+};
+
 class HanwhaChunkLoader: public QObject
 {
     Q_OBJECT
@@ -53,7 +64,10 @@ class HanwhaChunkLoader: public QObject
     using OverlappedChunks = std::map<int, ChunksByChannel>;
 
 public:
-    HanwhaChunkLoader(HanwhaSharedResourceContext* resourceContext);
+    HanwhaChunkLoader(
+        HanwhaSharedResourceContext* resourceContext,
+        const HanwhaChunkLoaderSettings& settings);
+
     virtual ~HanwhaChunkLoader();
 
     void start(bool isNvr);
@@ -163,7 +177,9 @@ private:
     bool m_isSearchRecordingPeriodRetrievalEnabled = true;
     bool m_isUtcEnabled = true;
 
-    std::chrono::milliseconds m_lastTimelineUpdate;
+    std::chrono::milliseconds m_lastTimelineUpdate{0};
+
+    HanwhaChunkLoaderSettings m_settings;
 };
 
 } // namespace plugins

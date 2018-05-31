@@ -6,7 +6,7 @@
 #ifndef ILP_VIDEO_PACKET_H
 #define ILP_VIDEO_PACKET_H
 
-#include <plugins/camera_plugin.h>
+#include <camera/camera_plugin.h>
 
 #include <plugins/plugin_tools.h>
 

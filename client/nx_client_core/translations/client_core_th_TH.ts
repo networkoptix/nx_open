@@ -151,17 +151,17 @@
     </message>
     <message>
       <source>Internal %1 error. Please contact support team.</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
       <translation>ข้อผิดพลาดภายใน %1 โปรดติดต่อทีมสนับสนุน</translation>
     </message>
     <message>
       <source>Sorry, %1 Service is temporary unavailable. We are doing our best to restore it. Please try again later.</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
       <translation>ขออภัย %1 บริการไม่สามารถใช้งานได้ชั่วคราว เรากำลังพยายามอย่างเต็มที่เพื่อคืนค่า กรุณาลองใหม่อีกครั้งในภายหลัง.</translation>
     </message>
     <message>
       <source>Sorry, %1 Service could not process your request. Please try again in a few moments.</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
       <translation>ขออภัย %1 บริการไม่สามารถประมวลผลคำขอของคุณได้ โปรดลองอีกครั้งในอีกสักครู่.</translation>
     </message>
   </context>

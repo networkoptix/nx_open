@@ -1,8 +1,7 @@
 #include <gtest/gtest.h>
 
 #include <nx/cloud/cdb/dao/rdb/system_sharing_data_object.h>
-
-#include "base_persistent_data_test.h"
+#include <nx/cloud/cdb/test_support/base_persistent_data_test.h>
 
 namespace nx {
 namespace cdb {

@@ -6,7 +6,7 @@
 #include <core/resource_management/resource_properties.h>
 #include <core/resource/param.h>
 
-#include <nx_ec/data/api_camera_data.h>
+#include <nx/vms/api/data/camera_data.h>
 #include <nx_ec/data/api_conversion_functions.h>
 #include <nx_ec/managers/abstract_camera_manager.h>
 
@@ -70,7 +70,7 @@ bool QnVirtualCameraResource::isForcedAudioSupported() const {
 
 void QnVirtualCameraResource::forceEnableAudio()
 {
-	if (isForcedAudioSupported())
+    if (isForcedAudioSupported())
         return;
     setProperty(Qn::FORCED_IS_AUDIO_SUPPORTED_PARAM_NAME, 1);
     saveParams();
@@ -106,7 +106,9 @@ QString QnVirtualCameraResource::sourceUrl(Qn::ConnectionRole role) const
     return streamUrls[roleStr].toString();
 }
 
-void QnVirtualCameraResource::updateSourceUrl(const QString& url, Qn::ConnectionRole role)
+void QnVirtualCameraResource::updateSourceUrl(const QString& url,
+    Qn::ConnectionRole role,
+    bool save)
 {
     if (!storeUrlForRole(role) || url.isEmpty())
         return;
@@ -127,13 +129,17 @@ void QnVirtualCameraResource::updateSourceUrl(const QString& url, Qn::Connection
         };
 
     if (updateProperty(Qn::CAMERA_STREAM_URLS, urlUpdater))
-        saveParams();
+    {
+        //TODO: #rvasilenko Setter and saving must be split.
+        if (save)
+            saveParams();
+    }
 }
 
 int QnVirtualCameraResource::saveAsync()
 {
-    ec2::ApiCameraData apiCamera;
-    fromResourceToApi(toSharedPointer(this), apiCamera);
+    nx::vms::api::CameraData apiCamera;
+    ec2::fromResourceToApi(toSharedPointer(this), apiCamera);
 
     ec2::AbstractECConnectionPtr conn = commonModule()->ec2Connection();
     return conn->getCameraManager(Qn::kSystemAccess)->addCamera(apiCamera, this, []{});
@@ -148,8 +154,8 @@ void QnVirtualCameraResource::issueOccured() {
         tooManyIssues = m_issueCounter >= MAX_ISSUE_CNT;
         m_lastIssueTimer.restart();
     }
-    if (tooManyIssues && !hasStatusFlags(Qn::CSF_HasIssuesFlag)) {
-        addStatusFlags(Qn::CSF_HasIssuesFlag);
+    if (tooManyIssues && !hasStatusFlags(Qn::CameraStatusFlag::CSF_HasIssuesFlag)) {
+        addStatusFlags(Qn::CameraStatusFlag::CSF_HasIssuesFlag);
         saveAsync();
     }
 }
@@ -162,8 +168,8 @@ void QnVirtualCameraResource::cleanCameraIssues() {
             return;
         m_issueCounter = 0;
     }
-    if (hasStatusFlags(Qn::CSF_HasIssuesFlag)) {
-        removeStatusFlags(Qn::CSF_HasIssuesFlag);
+    if (hasStatusFlags(Qn::CameraStatusFlag::CSF_HasIssuesFlag)) {
+        removeStatusFlags(Qn::CameraStatusFlag::CSF_HasIssuesFlag);
         saveAsync();
     }
 }
@@ -403,6 +409,13 @@ bool QnVirtualCameraResource::saveBitrateIfNeeded( const CameraBitrateInfo& bitr
                 QString::fromUtf8(QJson::serialized(bitrateInfos)));
 
     return true;
+}
+
+void QnVirtualCameraResource::emitPropertyChanged(const QString& key)
+{
+    if (key == Qn::PTZ_CAPABILITIES_PARAM_NAME)
+        emit ptzCapabilitiesChanged(::toSharedPointer(this));
+    base_type::emitPropertyChanged(key);
 }
 
 void QnVirtualCameraResource::saveResolutionList( const CameraMediaStreams& supportedNativeStreams )

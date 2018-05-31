@@ -2,8 +2,9 @@
 
 #include <nx/utils/db/query_context.h>
 
-#include <nx_ec/data/api_resource_data.h>
-#include <transaction/transaction.h>
+#include <nx/vms/api/data/resource_data.h>
+
+namespace nx { namespace data_sync_engine { class SyncronizationEngine; } }
 
 namespace nx {
 namespace cdb {
@@ -17,26 +18,24 @@ public:
     virtual nx::utils::db::DBResult saveResourceAttribute(
         nx::utils::db::QueryContext* queryContext,
         const std::string& systemId,
-        ::ec2::ApiResourceParamWithRefData data) = 0;
+        nx::vms::api::ResourceParamWithRefData data) = 0;
 };
 
 //-------------------------------------------------------------------------------------------------
-
-class SyncronizationEngine;
 
 class VmsP2pCommandBus:
     public AbstractVmsP2pCommandBus
 {
 public:
-    VmsP2pCommandBus(SyncronizationEngine* syncronizationEngine);
+    VmsP2pCommandBus(data_sync_engine::SyncronizationEngine* syncronizationEngine);
 
     virtual nx::utils::db::DBResult saveResourceAttribute(
         nx::utils::db::QueryContext* queryContext,
         const std::string& systemId,
-        ::ec2::ApiResourceParamWithRefData data) override;
+        nx::vms::api::ResourceParamWithRefData data) override;
 
 private:
-    SyncronizationEngine* m_syncronizationEngine;
+    data_sync_engine::SyncronizationEngine* m_syncronizationEngine;
 };
 
 } // namespace ec2

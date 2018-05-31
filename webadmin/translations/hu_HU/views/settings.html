@@ -46,7 +46,7 @@ Kérjük csatlakozzon a hálózatra, vagy állítsa be a helyes IP-címet.
                     <div ng-if="user.isOwner">
                         <h3>Szerver leválasztása a rendszerről</h3>
                         <p>This action will detach server from the system keeping database, local users and configuration.
-                            A videóarchívum sértetlen marad. <b>Cloud users will be deleted.</b></p>
+                            A videóarchívum sértetlen marad. <b>felhő felhasználó törlésre kerül</b></p>
                         <p><button class="btn btn-default" ng-click="disconnectFromSystem()">Leválasztása a rendszerről</button></p>
                     </div>
                     <div>
@@ -128,9 +128,9 @@ Kérjük csatlakozzon a hálózatra, vagy állítsa be a helyes IP-címet.
 
                 <uib-tab heading="{{L.settings.tabs.device}}" active="active.device" ng-if="controlDevice">
                     <div ng-if="settings.flags.canSetupNetwork">
-                        <h3>Device Network Settings</h3>
+                        <h3>Eszköz hálózati beállítások</h3>
                         <network-settings settings="networkSettings[0]" ng-if="networkSettings"></network-settings>
-                        <button class="btn btn-default" ng-click="saveNetworkSettings()">Save settings and reboot the device</button>
+                        <button class="btn btn-default" ng-click="saveNetworkSettings()">Beállítások mentése és a készülék újraindítása</button>
                     </div>
                     <div ng-if="settings.flags.canSetupTime">
                         <h3>Dátum és idő</h3>

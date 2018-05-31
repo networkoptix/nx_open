@@ -9,22 +9,23 @@
 
 #include <nx/fusion/model_functions_fwd.h>
 #include <nx/fusion/serialization_format.h>
+#include <nx/vms/api/types/motion_types.h>
+#include <nx/vms/api/types/resource_types.h>
 
 #ifdef THIS_BLOCK_IS_REQUIRED_TO_MAKE_FILE_BE_PROCESSED_BY_MOC_DO_NOT_DELETE
 Q_OBJECT
 #endif
 QN_DECLARE_METAOBJECT_HEADER(Qn,
     ExtrapolationMode CameraCapability PtzObjectType PtzCommand PtzDataField PtzCoordinateSpace
-    StreamFpsSharingMethod MotionType TimePeriodContent SystemComponent
+    StreamFpsSharingMethod TimePeriodContent SystemComponent
     ConnectionRole ResourceStatus BitratePerGopType
-    StreamQuality PanicMode RebuildState BackupState RecordingType PeerType StatisticsDeviceType
-    ServerFlag BackupType StorageInitResult CameraBackupQuality CameraStatusFlag IOPortType IODefaultState AuditRecordType AuthResult
-    RebuildAction BackupAction FailoverPriority MediaStreamEvent StreamIndex
+    PanicMode RebuildState BackupState PeerType StatisticsDeviceType
+    ServerFlag BackupType StorageInitResult IOPortType IODefaultState AuditRecordType AuthResult
+    RebuildAction BackupAction MediaStreamEvent StreamIndex
     Permission GlobalPermission UserRole ConnectionResult
     ,
     Borders Corners ResourceFlags CameraCapabilities PtzDataFields
-    MotionTypes
-    ServerFlags CameraBackupQualities TimeFlags CameraStatusFlags IOPortTypes
+    ServerFlags TimeFlags IOPortTypes
     Permissions GlobalPermissions
     )
 
@@ -45,6 +46,8 @@ QN_DECLARE_METAOBJECT_HEADER(Qn,
         SetUserPasswordCapability           = 0x200, //< Can change password on a camera.
         isDefaultPasswordCapability         = 0x400, //< Camera has default password now.
         isOldFirmwareCapability             = 0x800, //< Camera has too old firmware.
+        CanEditStreamsCapability            = 0x1000, //< Camera's streams are editable.
+        isPlaybackSpeedSupported            = 0x2000, //< For NVR which support playback speed 1,2,4 e.t.c natively.
     };
     Q_DECLARE_FLAGS(CameraCapabilities, CameraCapability)
     Q_DECLARE_OPERATORS_FOR_FLAGS(CameraCapabilities)
@@ -148,19 +151,8 @@ QN_DECLARE_METAOBJECT_HEADER(Qn,
         NoFpsSharing
     };
 
-
-    enum MotionType {
-        MT_Default      = 0x0,
-        MT_HardwareGrid = 0x1,
-        MT_SoftwareGrid = 0x2,
-        MT_MotionWindow = 0x4,
-        MT_NoMotion     = 0x8
-    };
-    QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(MotionType)
-
-    Q_DECLARE_FLAGS(MotionTypes, MotionType)
-    Q_DECLARE_OPERATORS_FOR_FLAGS(MotionTypes)
-
+    using MotionType = nx::vms::api::MotionType;
+    using MotionTypes = nx::vms::api::MotionTypes;
 
     enum PanicMode {
         PM_None = 0,
@@ -276,7 +268,6 @@ QN_DECLARE_METAOBJECT_HEADER(Qn,
 
         AnyStatus
     };
-    QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(ResourceStatus)
 
     /** Level of detail for displaying resource info. */
     enum ResourceInfoLevel
@@ -397,20 +388,7 @@ QN_DECLARE_METAOBJECT_HEADER(Qn,
         AnyComponent
     };
 
-    // TODO: #Elric #EC2 rename
-    enum StreamQuality {
-        QualityLowest = 0,
-        QualityLow = 1,
-        QualityNormal = 2,
-        QualityHigh = 3,
-        QualityHighest = 4,
-        QualityPreSet = 5,
-        QualityNotDefined = 6,
-
-        StreamQualityCount
-    };
-    QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(StreamQuality)
-
+using StreamQuality = nx::vms::api::StreamQuality;
 
     enum class BitrateControl {
         undefined,
@@ -438,32 +416,10 @@ QN_DECLARE_METAOBJECT_HEADER(Qn,
     };
     QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(StatisticsDeviceType)
 
+    using CameraStatusFlag = nx::vms::api::CameraStatusFlag;
+    using CameraStatusFlags = nx::vms::api::CameraStatusFlags;
 
-    enum CameraStatusFlag {
-        CSF_NoFlags = 0x0,
-        CSF_HasIssuesFlag = 0x1
-    };
-    Q_DECLARE_FLAGS(CameraStatusFlags, CameraStatusFlag)
-    Q_DECLARE_OPERATORS_FOR_FLAGS(CameraStatusFlags)
-    QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(CameraStatusFlag)
-
-    // TODO: #Elric #EC2 rename
-    enum RecordingType {
-        /** Record always. */
-        RT_Always = 0,
-
-        /** Record only when motion was detected. */
-        RT_MotionOnly = 1,
-
-        /** Don't record. */
-        RT_Never = 2,
-
-        /** Record LQ stream always and HQ stream only on motion. */
-        RT_MotionAndLowQuality = 3,
-
-        RT_Count
-    };
-    QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(RecordingType)
+    using RecordingType = nx::vms::api::RecordingType;
 
     enum PeerType {
         PT_NotDefined = -1,
@@ -564,18 +520,7 @@ QN_DECLARE_METAOBJECT_HEADER(Qn,
     QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(AuthResult)
     QString toString(AuthResult value);
 
-
-    enum FailoverPriority
-    {
-        FP_Never,
-        FP_Low,
-        FP_Medium,
-        FP_High,
-
-        FP_Count
-    };
-    QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(FailoverPriority)
-    static_assert(FP_Medium == 2, "Value is hardcoded in SQL migration script.");
+    using FailoverPriority = nx::vms::api::FailoverPriority;
 
     // TODO: #MSAPI move to api/model or even to common_globals,
     // add lexical serialization (see QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS)
@@ -610,17 +555,8 @@ QN_DECLARE_METAOBJECT_HEADER(Qn,
     };
     QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(BackupType)
 
-    enum CameraBackupQuality
-    {
-        CameraBackup_Disabled       = 0,
-        CameraBackup_HighQuality    = 1,
-        CameraBackup_LowQuality     = 2,
-        CameraBackup_Both           = CameraBackup_HighQuality | CameraBackup_LowQuality,
-        CameraBackup_Default        = 4 // backup type didn't configured so far. Default value will be used
-    };
-    QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(CameraBackupQuality)
-    Q_DECLARE_FLAGS(CameraBackupQualities, CameraBackupQuality)
-    Q_DECLARE_OPERATORS_FOR_FLAGS(CameraBackupQualities)
+using CameraBackupQuality = nx::vms::api::CameraBackupQuality;
+using CameraBackupQualities = nx::vms::api::CameraBackupQualities;
 
     enum StorageInitResult
     {
@@ -908,6 +844,7 @@ QN_DECLARE_METAOBJECT_HEADER(Qn,
 
 Q_DECLARE_METATYPE(Qn::StatusChangeReason)
 Q_DECLARE_METATYPE(Qn::ResourceFlags)
+Q_DECLARE_METATYPE(Qn::ResourceStatus)
 
 // TODO: #Elric #enum
 
@@ -917,22 +854,22 @@ QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
 )
 
 QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
-    (Qn::PtzObjectType)(Qn::PtzCommand)(Qn::PtzCoordinateSpace)(Qn::MotionType)
-    (Qn::StreamQuality)(Qn::StatisticsDeviceType)
-    (Qn::ServerFlag)(Qn::BackupType)(Qn::CameraBackupQuality)(Qn::StorageInitResult)
-    (Qn::PanicMode)(Qn::RecordingType)
-    (Qn::ConnectionRole)(Qn::ResourceStatus)(Qn::BitratePerGopType)
+    (Qn::PtzObjectType)(Qn::PtzCommand)(Qn::PtzCoordinateSpace)
+    (Qn::StatisticsDeviceType)
+    (Qn::ServerFlag)(Qn::BackupType)(Qn::StorageInitResult)
+    (Qn::PanicMode)
+    (Qn::ConnectionRole)(Qn::BitratePerGopType)
     (Qn::PeerType)(Qn::RebuildState)(Qn::BackupState)
     (Qn::BookmarkSortField)(Qt::SortOrder)
     (Qn::RebuildAction)(Qn::BackupAction)
     (Qn::TTHeaderFlag)(Qn::IOPortType)(Qn::IODefaultState)(Qn::AuditRecordType)(Qn::AuthResult)
-    (Qn::FailoverPriority)(Qn::MediaStreamEvent)(Qn::StreamIndex)
+    (Qn::MediaStreamEvent)(Qn::StreamIndex)
     ,
     (metatype)(lexical)
 )
 
 QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
-    (Qn::ServerFlags)(Qn::CameraBackupQualities)(Qn::TimeFlags)(Qn::CameraStatusFlags)
+    (Qn::ServerFlags)(Qn::TimeFlags)
     (Qn::Permission)(Qn::GlobalPermission)(Qn::Permissions)(Qn::GlobalPermissions)(Qn::IOPortTypes)
     ,
     (metatype)(numeric)(lexical)

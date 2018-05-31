@@ -4,12 +4,11 @@ from django.db import models
 from django.conf import settings
 from jsonfield import JSONField
 from model_utils import Choices
-from django.core.cache import cache
+from django.core.cache import cache, caches
 from util.config import get_config
 
+from django.contrib.auth.models import Group
 from django.template.defaultfilters import truncatechars
-
-from django.core.cache import caches
 
 
 def update_global_cache(customization, version_id):
@@ -21,29 +20,31 @@ def check_update_cache(customization, version_id):
     global_cache = caches['global']
     global_id = global_cache.get(customization)
 
-    if version_id != global_id:
-        return True, global_id
-    else:
-        return False, 0
+    return version_id != global_id, global_id
 
 
 def customization_cache(customization_name, value=None, force=False):
     data = cache.get(customization_name)
 
     if data and 'version_id' in data and not force:
-        force = check_update_cache(customization_name,data['version_id'])[0]
+        force = check_update_cache(customization_name, data['version_id'])[0]
 
     if not data or force:
         customization = Customization.objects.get(name=customization_name)
         custom_config = get_config(customization.name)
 
         data = {
-            'version_id': customization.version_id,
+            'version_id': customization.version_id(),
             'languages': customization.languages_list,
             'default_language': customization.default_language.code,
             'mail_from_name': customization.read_global_value('%MAIL_FROM_NAME%'),
             'mail_from_email': customization.read_global_value('%MAIL_FROM_EMAIL%'),
-            'portal_url': custom_config['cloud_portal']['url']
+            'portal_url': custom_config['cloud_portal']['url'],
+            'smtp_host': customization.read_global_value('%SMTP_HOST%'),
+            'smtp_port': customization.read_global_value('%SMTP_PORT%'),
+            'smtp_user': customization.read_global_value('%SMTP_USER%'),
+            'smtp_password': customization.read_global_value('%SMTP_PASSWORD%'),
+            'smtp_tls': customization.read_global_value('%SMTP_TLS%')
         }
         cache.set(customization_name, data)
         update_global_cache(customization, data['version_id'])
@@ -79,13 +80,57 @@ class Context(models.Model):
     translatable = models.BooleanField(default=True)
     is_global = models.BooleanField(default=False)
     hidden = models.BooleanField(default=False)
-    template = models.TextField(blank=True, default="")
 
     file_path = models.CharField(max_length=1024, blank=True, default='')
     url = models.CharField(max_length=1024, blank=True, default='')
 
     def __str__(self):
         return self.name
+
+    def template_for_language(self, language, default_language):
+        context_template = self.contexttemplate_set.filter(language=language)
+        if not context_template.exists():  # No template for language - try to get default language
+            context_template = self.contexttemplate_set.filter(language=default_language)
+
+        if not context_template.exists():  # No template for default language - try to get default template
+            context_template = self.contexttemplate_set.filter(language=None)
+
+        if context_template.exists():
+            return context_template.first().template
+
+        # No template at all
+        return None
+
+
+class Language(models.Model):
+    name = models.CharField(max_length=255, unique=True)
+    code = models.CharField(max_length=8, unique=True)
+
+    def __str__(self):
+        return self.code
+
+    @staticmethod
+    def by_code(language_code, default_language=None):
+        if language_code:
+            language = Language.objects.filter(code=language_code)
+            if language.exists():
+                return language.first()
+        return default_language
+
+
+class ContextTemplate(models.Model):
+    class Meta:
+        unique_together = ('context', 'language')
+
+    context = models.ForeignKey(Context)
+    language = models.ForeignKey(Language, null=True)
+    template = models.TextField()
+    def __str__(self):
+        if not self.language:
+            return self.context.name
+        if self.context.file_path:
+            return self.context.file_path.replace("{{language}}", self.language.code)
+        return self.context.name + "-" + self.language.name
 
 
 class DataStructure(models.Model):
@@ -99,7 +144,7 @@ class DataStructure(models.Model):
     context = models.ForeignKey(Context)
     name = models.CharField(max_length=1024)
     description = models.TextField()
-    label = models.CharField(max_length=1024, blank=True)
+    label = models.CharField(max_length=1024, blank=True, default='')
 
     DATA_TYPES = Choices((0, 'text', 'Text'),
                          (1, 'image', 'Image'),
@@ -122,6 +167,7 @@ class DataStructure(models.Model):
     @staticmethod
     def get_type(name):
         return getattr(DataStructure.DATA_TYPES, name, DataStructure.DATA_TYPES.text)
+
 
     def find_actual_value(self, customization, language=None, version_id=None):
         content_value = ""
@@ -158,7 +204,8 @@ class DataStructure(models.Model):
                 if content_record.exists():
                     content_value = content_record.latest('version_id').value
 
-        if not content_value and not self.optional:  # if no value - use default value from structure
+        # if no value or optional and type file - use default value from structure
+        if not content_value and (not self.optional or self.optional and self.type in [DataStructure.DATA_TYPES.file, DataStructure.DATA_TYPES.image]):
             content_value = self.default
 
         return content_value
@@ -166,19 +213,12 @@ class DataStructure(models.Model):
 # CMS settings. Release engineer can change that
 
 
-class Language(models.Model):
-    name = models.CharField(max_length=255, unique=True)
-    code = models.CharField(max_length=8, unique=True)
-
-    def __str__(self):
-        return self.code
-
-
 class Customization(models.Model):
     name = models.CharField(max_length=255, unique=True)
     default_language = models.ForeignKey(
         Language, related_name='default_in_%(class)s')
     languages = models.ManyToManyField(Language)
+    filter_horizontal = ('languages',)
 
     PREVIEW_STATUS = Choices((0, 'draft', 'draft'), (1, 'review', 'review'))
     preview_status = models.IntegerField(choices=PREVIEW_STATUS, default=PREVIEW_STATUS.draft)
@@ -186,9 +226,9 @@ class Customization(models.Model):
     def __str__(self):
         return self.name
 
-    @property
-    def version_id(self):
-        return self.contentversion_set.latest('accepted_date').id if self.contentversion_set.exists() else 0
+    def version_id(self, product_name=settings.PRIMARY_PRODUCT):
+        versions = ContentVersion.objects.filter(product__name=product_name)
+        return versions.latest('accepted_date').id if versions.exists() else 0
 
     @property
     def languages_list(self):
@@ -212,7 +252,7 @@ class Customization(models.Model):
             # TODO: need to update all static right here
 
     def read_global_value(self, record_name):
-        product = Product.objects.get(name='cloud_portal')
+        product = Product.objects.get(name=settings.PRIMARY_PRODUCT)
         global_contexts = product.context_set.filter(is_global=True)
         data_structure = None
         for context in global_contexts:
@@ -223,10 +263,25 @@ class Customization(models.Model):
 
         if not data_structure:
             return None
-        return data_structure.find_actual_value(self, version_id=self.version_id)
+        return data_structure.find_actual_value(self, version_id=self.version_id(product.name))
+
+
+class UserGroupsToCustomizationPermissions(models.Model):
+    group = models.ForeignKey(Group)
+    customization = models.ForeignKey(Customization)
+
+    @staticmethod
+    def check_permission(user, customization_name, permission=None):
+        if user.is_superuser:
+            return True
+        if permission and not user.has_perm(permission):
+            return False
+
+        return UserGroupsToCustomizationPermissions.objects.filter(group_id__in=user.groups.all(),
+                                                                   customization__name=customization_name).exists()
+
 
 # CMS data. Partners can change that
-
 
 class ContentVersion(models.Model):
 
@@ -239,6 +294,7 @@ class ContentVersion(models.Model):
         )
 
     customization = models.ForeignKey(Customization)
+    product = models.ForeignKey(Product, default=1)
     name = models.CharField(max_length=1024)
 
     created_date = models.DateTimeField(auto_now_add=True)
@@ -259,10 +315,10 @@ class ContentVersion(models.Model):
         if self.accepted_by == None:
             return 'in review'
 
-        version_id = customization_cache(self.customization.name, 'version_id')
+        version_id = self.customization.version_id(self.product.name)
 
         if version_id > self.id:
-                return 'old'
+            return 'old'
 
         return 'current'
 

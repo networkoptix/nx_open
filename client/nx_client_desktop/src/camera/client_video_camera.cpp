@@ -1,8 +1,13 @@
 #include "client_video_camera.h"
 
+#include <client_core/client_core_module.h>
+
 #include <nx/utils/log/log.h>
 
 #include <nx/streaming/abstract_media_stream_data_provider.h>
+#include <nx/streaming/rtsp_client_archive_delegate.h>
+#include <nx/streaming/archive_stream_reader.h>
+
 #include <core/resource/media_resource.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/security_cam_resource.h>
@@ -10,7 +15,7 @@
 #include <nx/streaming/rtsp_client_archive_delegate.h>
 #include <nx/streaming/archive_stream_reader.h>
 #include <nx/network/http/custom_headers.h>
-#include <nx/client/desktop/export/tools/export_timelapse_recorder.h>
+#include <core/dataprovider/data_provider_factory.h>
 
 #include <recording/time_period.h>
 #include <core/resource/avi/thumbnails_stream_reader.h>
@@ -133,11 +138,8 @@ void QnClientVideoCamera::exportMediaPeriodToFile(const QnTimePeriod &timePeriod
     const QString& format,
     QnStorageResourcePtr storage,
     StreamRecorderRole role,
-    qint64 serverTimeZoneMs,
-    qint64 timelapseFrameStepMs,
-    const nx::core::transcoding::FilterChain& filters)
+    qint64 serverTimeZoneMs)
 {
-    qint64 timelapseFrameStepUs = timelapseFrameStepMs * 1000;
     qint64 startTimeUs = timePeriod.startTimeMs * 1000ll;
     NX_ASSERT(timePeriod.durationMs > 0, Q_FUNC_INFO, "Invalid time period, possibly LIVE is exported");
     qint64 endTimeUs = timePeriod.durationMs > 0
@@ -147,83 +149,65 @@ void QnClientVideoCamera::exportMediaPeriodToFile(const QnTimePeriod &timePeriod
     QnMutexLocker lock( &m_exportMutex );
     if (!m_exportRecorder)
     {
-        if (m_resource->toResource()->hasFlags(Qn::local) && timelapseFrameStepUs > 0)
+
+        auto tmpReader = qnClientCoreModule->dataProviderFactory()->createDataProvider(
+            m_resource->toResourcePtr());
+        QnAbstractArchiveStreamReader* archiveReader = dynamic_cast<QnAbstractArchiveStreamReader*> (tmpReader);
+        if (!archiveReader)
         {
-            auto thumbnailsReader = new QnThumbnailsStreamReader(m_resource->toResourcePtr(), new QnAviArchiveDelegate());
-            thumbnailsReader->setRange(startTimeUs, endTimeUs, timelapseFrameStepUs, 0);
-            m_exportReader = thumbnailsReader;
+            delete tmpReader;
+
+            const auto errorStruct = StreamRecorderErrorStruct(
+                StreamRecorderError::invalidResourceType, QnStorageResourcePtr());
+            emit exportFinished(errorStruct, fileName);
+            return;
         }
-        else
+        archiveReader->setCycleMode(false);
+        if (role == StreamRecorderRole::fileExport)
         {
-            auto tmpReader = m_resource->toResource()->createDataProvider(Qn::CR_Default);
-            QnAbstractArchiveStreamReader* archiveReader = dynamic_cast<QnAbstractArchiveStreamReader*> (tmpReader);
-            if (!archiveReader)
-            {
-                delete tmpReader;
-
-                const auto errorStruct = StreamRecorderErrorStruct(
-                    StreamRecorderError::invalidResourceType, QnStorageResourcePtr());
-                emit exportFinished(errorStruct, fileName);
-                return;
-            }
-            archiveReader->setCycleMode(false);
-            if (role == StreamRecorderRole::fileExport)
-            {
-                archiveReader->setQuality(MEDIA_Quality_ForceHigh, true); // for 'mkv' and 'avi' files
-                // Additing filtering is required in case of.AVI export.
-                 archiveReader->addMediaFilter(std::make_shared<H264Mp4ToAnnexB>());
-            }
-
-            QnRtspClientArchiveDelegate* rtspClient = dynamic_cast<QnRtspClientArchiveDelegate*> (archiveReader->getArchiveDelegate());
-            if (rtspClient) {
-                // 'slow' open mode. send DESCRIBE and SETUP to server.
-                // it is required for av_streams in output file - we should know all codec context immediately
-                QnVirtualCameraResourcePtr camera = m_resource->toResourcePtr().dynamicCast<QnVirtualCameraResource>();
-                rtspClient->setCamera(camera);
-                rtspClient->setPlayNowModeAllowed(false);
-                rtspClient->setAdditionalAttribute(Qn::EC2_MEDIA_ROLE, "export");
-                if (timelapseFrameStepUs > 0)
-                    rtspClient->setRange(startTimeUs, endTimeUs, timelapseFrameStepUs);
-            }
-
-            m_exportReader = archiveReader;
+            archiveReader->setQuality(MEDIA_Quality_ForceHigh, true); // for 'mkv' and 'avi' files
+            // Additing filtering is required in case of.AVI export.
+                archiveReader->addMediaFilter(std::make_shared<H264Mp4ToAnnexB>());
         }
 
-        connect(m_exportReader, &QnAbstractArchiveStreamReader::finished, this, [this]()
-        {
-            {
-                QnMutexLocker lock(&m_exportMutex);
-                m_exportReader.clear();
-            }
-
-            sender()->deleteLater();
-        });
-
-        if (timelapseFrameStepUs > 0)
-        {
-            m_exportRecorder = new nx::client::desktop::ExportTimelapseRecorder(
-                m_resource->toResourcePtr(), timelapseFrameStepUs);
-        }
-        else
-        {
-            m_exportRecorder = new QnStreamRecorder(m_resource->toResourcePtr());
+        QnRtspClientArchiveDelegate* rtspClient = dynamic_cast<QnRtspClientArchiveDelegate*> (archiveReader->getArchiveDelegate());
+        if (rtspClient) {
+            // 'slow' open mode. send DESCRIBE and SETUP to server.
+            // it is required for av_streams in output file - we should know all codec context immediately
+            QnVirtualCameraResourcePtr camera = m_resource->toResourcePtr().dynamicCast<QnVirtualCameraResource>();
+            rtspClient->setCamera(camera);
+            rtspClient->setPlayNowModeAllowed(false);
+            rtspClient->setAdditionalAttribute(Qn::EC2_MEDIA_ROLE, "export");
         }
 
+        m_exportReader = archiveReader;
 
-        connect(m_exportRecorder, &QnStreamRecorder::finished, this, [this]()
-        {
+
+        connect(m_exportReader, &QnAbstractArchiveStreamReader::finished, this,
+            [this]()
             {
-                QnMutexLocker lock(&m_exportMutex);
-                if (m_exportReader && m_exportRecorder)
-                    m_exportReader->removeDataProcessor(m_exportRecorder);
-                m_exportRecorder.clear();
-            }
+                {
+                    QnMutexLocker lock(&m_exportMutex);
+                    m_exportReader.clear();
+                }
 
-            /* There is a possibility we have already cleared the smart pointer, e.g. in stopExport() method. */
-            sender()->deleteLater();
-        });
+                sender()->deleteLater();
+            });
 
-        m_exportRecorder->setTranscodeFilters(filters);
+        m_exportRecorder = new QnStreamRecorder(m_resource->toResourcePtr());
+        connect(m_exportRecorder, &QnStreamRecorder::finished, this,
+            [this]
+            {
+                {
+                    QnMutexLocker lock(&m_exportMutex);
+                    if (m_exportReader && m_exportRecorder)
+                        m_exportReader->removeDataProcessor(m_exportRecorder);
+                    m_exportRecorder.clear();
+                }
+
+                /* There is a possibility we have already cleared the smart pointer, e.g. in stopExport() method. */
+                sender()->deleteLater();
+            });
 
         connect(m_exportRecorder,   &QnStreamRecorder::recordingFinished, this,   &QnClientVideoCamera::stopExport);
         connect(m_exportRecorder,   &QnStreamRecorder::recordingProgress, this,   &QnClientVideoCamera::exportProgress);
@@ -246,16 +230,12 @@ void QnClientVideoCamera::exportMediaPeriodToFile(const QnTimePeriod &timePeriod
     m_exportRecorder->setProgressBounds(startTimeUs, endTimeUs);
 
     if (storage)
-        m_exportRecorder->addRecordingContext(
-            fileName,
-            storage
-        );
+        m_exportRecorder->addRecordingContext(fileName, storage);
     else
         m_exportRecorder->addRecordingContext(fileName);
 
     m_exportRecorder->setRole(role);
-    if (!timelapseFrameStepUs)
-        m_exportRecorder->setServerTimeZoneMs(serverTimeZoneMs);
+    m_exportRecorder->setServerTimeZoneMs(serverTimeZoneMs);
     m_exportRecorder->setContainer(format);
     m_exportRecorder->setNeedCalcSignature(true);
 

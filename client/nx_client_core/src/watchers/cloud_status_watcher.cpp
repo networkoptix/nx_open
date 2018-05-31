@@ -375,7 +375,7 @@ void QnCloudStatusWatcher::updateSystems()
                             break;
                         case api::ResultCode::badUsername:
                             d->setStatus(QnCloudStatusWatcher::LoggedOut,
-                                QnCloudStatusWatcher::InvalidUser);
+                                QnCloudStatusWatcher::InvalidEmail);
                             break;
                         case api::ResultCode::notAuthorized:
                             d->setStatus(QnCloudStatusWatcher::LoggedOut,
@@ -490,7 +490,9 @@ void QnCloudStatusWatcherPrivate::updateConnection(bool initial)
     {
         const auto error = (initial || credentials.isEmpty())
             ? QnCloudStatusWatcher::NoError
-            : QnCloudStatusWatcher::InvalidUser;
+            : credentials.user.isEmpty()
+              ? QnCloudStatusWatcher::InvalidEmail
+              : QnCloudStatusWatcher::InvalidPassword;
         setStatus(QnCloudStatusWatcher::LoggedOut, error);
         setCloudSystems(QnCloudSystemList());
         q->setEffectiveUserName(QString());

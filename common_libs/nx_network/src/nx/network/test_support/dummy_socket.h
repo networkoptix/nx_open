@@ -2,6 +2,8 @@
 
 #include <nx/network/abstract_socket.h>
 
+#include "../aio/basic_pollable.h"
+
 namespace nx {
 namespace network {
 
@@ -11,6 +13,8 @@ namespace network {
 class NX_NETWORK_API DummySocket:
     public AbstractStreamSocket
 {
+    using base_type = AbstractStreamSocket;
+
 public:
     DummySocket();
 
@@ -41,10 +45,6 @@ public:
         std::chrono::milliseconds timeout) override;
 
     virtual SocketAddress getForeignAddress() const override;
-    virtual void cancelIOAsync(
-        aio::EventType eventType,
-        nx::utils::MoveOnlyFunc<void()> cancellationDoneHandler) override;
-    virtual void cancelIOSync(aio::EventType eventType) override;
 
     virtual bool setNoDelay( bool value ) override;
     virtual bool getNoDelay( bool* value ) const override;
@@ -75,9 +75,13 @@ public:
     virtual aio::AbstractAioThread* getAioThread() const override;
     virtual void bindToAioThread(aio::AbstractAioThread* aioThread) override;
 
+protected:
+    virtual void cancelIoInAioThread(aio::EventType eventType) override;
+
 private:
     SocketAddress m_localAddress;
     SocketAddress m_remotePeerAddress;
+    aio::BasicPollable m_basicPollable;
 };
 
 } // namespace network

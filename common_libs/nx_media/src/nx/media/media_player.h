@@ -1,12 +1,14 @@
 #pragma once
 
 #include <QtCore/QObject>
+#include <QtCore/QRect>
+#include <QtCore/QSize>
 #include <QtCore/QUrl>
 #include <QtMultimedia/QMediaPlayer>
-#include <QtCore/QSize>
-#include <QtCore/QRect>
 
 #include <nx/fusion/model_functions_fwd.h>
+#include <nx/media/abstract_metadata_consumer.h>
+#include <nx/media/media_fwd.h>
 
 class QAbstractVideoSurface;
 
@@ -225,6 +227,21 @@ public:
 
     bool isAudioEnabled() const;
     void setAudioEnabled(bool value);
+
+    RenderContextSynchronizerPtr renderContextSynchronizer() const;
+    void setRenderContextSynchronizer(RenderContextSynchronizerPtr value);
+
+    /**
+     * Add new metadata consumer.
+     * @return True if success, false if specified consumer already exists.
+     */
+    bool addMetadataConsumer(const AbstractMetadataConsumerPtr& metadataConsumer);
+
+    /**
+     * Remove metadata consumer.
+     * @return True if success, false if specified consumer is not found.
+     */
+    bool removeMetadataConsumer(const AbstractMetadataConsumerPtr& metadataConsumer);
 
     bool tooManyConnectionsError() const;
 

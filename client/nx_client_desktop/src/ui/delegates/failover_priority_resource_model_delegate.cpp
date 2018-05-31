@@ -35,13 +35,13 @@ QVariant QnFailoverPriorityResourceModelDelegate::data(const QModelIndex &index,
         return QnFailoverPriorityDialog::priorityToString(priority);
     case Qt::ForegroundRole:
         switch (priority) {
-        case Qn::FP_High:
+        case Qn::FailoverPriority::high:
             return m_colors.high;
-        case Qn::FP_Medium:
+        case Qn::FailoverPriority::medium:
             return m_colors.medium;
-        case Qn::FP_Low:
+        case Qn::FailoverPriority::low:
             return m_colors.low;
-        case Qn::FP_Never:
+        case Qn::FailoverPriority::never:
             return m_colors.never;
         default:
             break;

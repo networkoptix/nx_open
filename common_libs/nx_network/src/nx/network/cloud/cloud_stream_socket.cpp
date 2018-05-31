@@ -219,32 +219,28 @@ bool CloudStreamSocket::isConnected() const
     return false;
 }
 
-void CloudStreamSocket::cancelIOAsync(
-    aio::EventType eventType,
-    nx::utils::MoveOnlyFunc<void()> handler)
+void CloudStreamSocket::cancelIoInAioThread(aio::EventType eventType)
 {
-    post(
-        [this, eventType, handler = std::move(handler)]()
-        {
-            cancelIoWhileInAioThread(eventType);
-            handler();
-        });
-}
+    if (eventType == aio::etWrite || eventType == aio::etNone)
+    {
+        m_asyncConnectGuard->terminate(); //< Breaks outgoing connects.
+        nx::network::SocketGlobals::addressResolver().cancel(this);
+    }
 
-void CloudStreamSocket::cancelIOSync(aio::EventType eventType)
-{
-    if (isInSelfAioThread())
+    if (eventType == aio::etNone || eventType == aio::etTimedOut)
+        m_timer.cancelSync();
+
+    if (eventType == aio::etNone || eventType == aio::etRead)
+        m_readIoBinder.pleaseStopSync();
+
+    if (eventType == aio::etNone || eventType == aio::etWrite)
     {
-        cancelIoWhileInAioThread(eventType);
+        m_writeIoBinder.pleaseStopSync();
+        m_multipleAddressConnector.reset(); //< Cancelling connect.
     }
-    else
-    {
-        nx::utils::promise<void> ioCancelled;
-        cancelIOAsync(
-            eventType,
-            [&ioCancelled]() { ioCancelled.set_value(); });
-        ioCancelled.get_future().wait();
-    }
+
+    if (m_socketDelegate)
+        m_socketDelegate->cancelIOSync(eventType);
 }
 
 void CloudStreamSocket::post(nx::utils::MoveOnlyFunc<void()> handler)
@@ -344,7 +340,6 @@ void CloudStreamSocket::pleaseStop(nx::utils::MoveOnlyFunc<void()> handler)
         [this, handler = std::move(handler)]()
         {
             stopWhileInAioThread();
-            m_aioThreadBinder.pleaseStopSync();
             handler();
         });
 }
@@ -354,7 +349,6 @@ void CloudStreamSocket::pleaseStopSync(bool /*checkForLocks*/)
     if (isInSelfAioThread())
     {
         stopWhileInAioThread();
-        m_aioThreadBinder.pleaseStopSync();
     }
     else
     {
@@ -476,33 +470,6 @@ void CloudStreamSocket::onConnectDone(
     nx::utils::swapAndCall(m_connectHandler, errorCode);
 }
 
-void CloudStreamSocket::cancelIoWhileInAioThread(aio::EventType eventType)
-{
-    if (eventType == aio::etWrite || eventType == aio::etNone)
-    {
-        m_asyncConnectGuard->terminate(); //< Breaks outgoing connects.
-        nx::network::SocketGlobals::addressResolver().cancel(this);
-    }
-
-    if (eventType == aio::etNone)   //< It means we need to cancel all I/O.
-        m_aioThreadBinder.pleaseStopSync();
-
-    if (eventType == aio::etNone || eventType == aio::etTimedOut)
-        m_timer.cancelSync();
-
-    if (eventType == aio::etNone || eventType == aio::etRead)
-        m_readIoBinder.pleaseStopSync();
-
-    if (eventType == aio::etNone || eventType == aio::etWrite)
-    {
-        m_writeIoBinder.pleaseStopSync();
-        m_multipleAddressConnector.reset(); //< Cancelling connect.
-    }
-
-    if (m_socketDelegate)
-        m_socketDelegate->cancelIOSync(eventType);
-}
-
 void CloudStreamSocket::stopWhileInAioThread()
 {
     m_asyncConnectGuard->terminate(); //< Breaks outgoing connects.
@@ -517,6 +484,8 @@ void CloudStreamSocket::stopWhileInAioThread()
         setDelegate(nullptr);
     }
     m_multipleAddressConnector.reset();
+
+    m_aioThreadBinder.pleaseStopSync();
 }
 
 } // namespace cloud

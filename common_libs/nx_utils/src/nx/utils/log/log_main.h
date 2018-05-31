@@ -112,11 +112,20 @@ Stream makeStream(Level level, const Tag& tag)
 } while (0)
 
 #define NX_UTILS_LOG_STREAM(LEVEL, TAG) \
-    if (auto stream = nx::utils::log::detail::makeStream((LEVEL), (TAG))) {} else stream /* <<...*/
+    if (auto stream = nx::utils::log::detail::makeStream((LEVEL), (TAG))) {} \
+    else stream /* <<... */
 
+/**
+ * Can be used to redirect NX_PRINT to log as following:
+ * <pre><code>
+ *     #define NX_PRINT NX_UTILS_LOG_STREAM_NO_SPACE( \
+ *     nx::utils::log::Level::debug, nx::utils::log::Tag(QStringLiteral("vca_metadata_plugin"))) \
+ *     << NX_PRINT_PREFIX
+ * </code></pre>
+ */
 #define NX_UTILS_LOG_STREAM_NO_SPACE(LEVEL, TAG) \
     if (auto stream = nx::utils::log::detail::makeStream((LEVEL), (TAG))) {} \
-    else stream.setDelimiter(QString()) << /*...*/
+    else stream.setDelimiter(QString()) /* <<... */
 
 #define NX_UTILS_LOG(...) \
     NX_MSVC_EXPAND(NX_GET_4TH_ARG(__VA_ARGS__, \

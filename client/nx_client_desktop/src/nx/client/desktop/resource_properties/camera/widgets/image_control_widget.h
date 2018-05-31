@@ -3,9 +3,6 @@
 #include <QtGui/QImage>
 #include <QtWidgets/QWidget>
 
-
-class QnAligner;
-
 namespace Ui { class ImageControlWidget; }
 
 namespace nx {
@@ -14,6 +11,7 @@ namespace desktop {
 
 struct CameraSettingsDialogState;
 class CameraSettingsDialogStore;
+class Aligner;
 
 class ImageControlWidget: public QWidget
 {
@@ -23,9 +21,9 @@ class ImageControlWidget: public QWidget
 
 public:
     explicit ImageControlWidget(QWidget* parent = nullptr);
-    virtual ~ImageControlWidget();
+    virtual ~ImageControlWidget() override;
 
-    QnAligner* aligner() const;
+    Aligner* aligner() const;
 
     void setStore(CameraSettingsDialogStore* store);
 
@@ -34,7 +32,7 @@ private:
 
 private:
     QScopedPointer<Ui::ImageControlWidget> ui;
-    QnAligner* m_aligner = nullptr;
+    Aligner* m_aligner = nullptr;
 };
 
 } // namespace desktop

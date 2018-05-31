@@ -33,7 +33,7 @@
     <number>0</number>
    </property>
    <item>
-    <widget class="QnPanel" name="serverChoosePanel" native="true">
+    <widget class="nx::client::desktop::Panel" name="serverChoosePanel" native="true">
      <layout class="QHBoxLayout" name="horizontalLayout">
       <property name="leftMargin">
        <number>16</number>
@@ -84,7 +84,7 @@
     <widget class="nx::client::desktop::AlertBar" name="serverOfflineAlertBar" native="true"/>
    </item>
    <item>
-    <widget class="QnPanel" name="searchPanel" native="true">
+    <widget class="nx::client::desktop::Panel" name="searchPanel" native="true">
      <layout class="QVBoxLayout" name="verticalLayout_3">
       <property name="leftMargin">
        <number>16</number>
@@ -268,7 +268,7 @@
           </item>
          </layout>
         </widget>
-        <widget class="QnPanel" name="subnetScanPage">
+        <widget class="nx::client::desktop::Panel" name="subnetScanPage">
          <attribute name="title">
           <string>Subnet Scan</string>
          </attribute>
@@ -627,9 +627,9 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>QnPanel</class>
+   <class>nx::client::desktop::Panel</class>
    <extends>QWidget</extends>
-   <header location="global">ui/widgets/common/panel.h</header>
+   <header location="global">nx/client/desktop/common/widgets/panel.h</header>
    <container>1</container>
   </customwidget>
   <customwidget>

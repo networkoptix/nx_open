@@ -155,8 +155,8 @@ void QnLiteClientController::startLiteClient()
     }
 
     auto handleReply =
-        [this, d, guard = QPointer<QnLiteClientController>(this)]
-        (bool success, rest::Handle handle, const QnJsonRestResult& result)
+        [this, d, guard = QPointer<QnLiteClientController>(this)](
+            bool success, rest::Handle handle, const QnJsonRestResult& result)
         {
             if (!guard)
                 return;
@@ -184,7 +184,7 @@ void QnLiteClientController::stopLiteClient()
 
     d->setClientState(State::Stopping);
 
-    ec2::ApiVideowallControlMessageData message;
+    nx::vms::api::VideowallControlMessageData message;
     message.operation = QnVideoWallControlMessage::Exit;
     message.videowallGuid = d->serverId;
 

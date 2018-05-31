@@ -18,8 +18,6 @@
 #include "nx/network/http/buffer_source.h"
 #include "nx/network/http/custom_headers.h"
 
-#include <nx/fusion/model_functions.h>
-
 using std::make_pair;
 
 namespace nx {
@@ -332,6 +330,11 @@ void AsyncHttpClient::setProxyUserCredentials(const Credentials& userCredentials
 void AsyncHttpClient::setProxyVia(const SocketAddress& proxyEndpoint)
 {
     m_delegate.setProxyVia(proxyEndpoint);
+}
+
+void AsyncHttpClient::setMaxNumberOfRedirects(int maxNumberOfRedirects)
+{
+    m_delegate.setMaxNumberOfRedirects(maxNumberOfRedirects);
 }
 
 void AsyncHttpClient::setDisablePrecalculatedAuthorization(bool val)

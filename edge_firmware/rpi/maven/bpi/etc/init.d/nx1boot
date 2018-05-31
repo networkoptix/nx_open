@@ -60,6 +60,8 @@ export HDDBOOTFLUSH=/etc/init.d/$HDDBOOTFLUSHSCRIPT
 export HDDBOOT_INDICATOR=$MNTUBOOTENVPART/hddboot
 export TOOLS_DIR=/root/tools/$CUSTOMIZATION
 
+LITE_CLIENT_STARTUP_SCRIPT="/etc/init.d/$CUSTOMIZATION-lite-client"
+
 setup_hdd_environment() {
     if [ -f /tmp/hdd_native ]; then rm /tmp/hdd_native; fi
     if [ -f /tmp/archive ]; then rm /tmp/archive; fi
@@ -107,11 +109,15 @@ start_server() {
 }
 
 start_lite_client() {
-    /etc/init.d/$CUSTOMIZATION-lite-client start
+    if [ -f "$LITE_CLIENT_STARTUP_SCRIPT" ]; then
+        "$LITE_CLIENT_STARTUP_SCRIPT" start
+    fi
 }
 
 stop_lite_client() {
-    /etc/init.d/$CUSTOMIZATION-lite-client stop
+    if [ -f "$LITE_CLIENT_STARTUP_SCRIPT" ]; then
+        "$LITE_CLIENT_STARTUP_SCRIPT" stop
+    fi
 }
 
 tweak_charger() {

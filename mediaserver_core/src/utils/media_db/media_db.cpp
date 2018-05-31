@@ -257,7 +257,6 @@ DbHelper::DbHelper(DbHelperHandler *const handler)
 : m_device(nullptr),
   m_handler(handler),
   m_stream(m_device),
-  m_needStop(false),
   m_mode(Mode::Read)
 {
     m_stream.setByteOrder(QDataStream::LittleEndian);
@@ -266,10 +265,10 @@ DbHelper::DbHelper(DbHelperHandler *const handler)
 
 void DbHelper::run()
 {
-    while (!m_needStop)
+    while (!needToStop())
     {
         QnMutexLocker lk(&m_mutex);
-        while ((m_writeQueue.empty() || m_mode == Mode::Read) && !m_needStop)
+        while ((m_writeQueue.empty() || m_mode == Mode::Read) && !needToStop())
         {
             NX_LOG(lit("media_db: run is going to sleep. Write queue size: %1. Mode = %2. Need to stop = %3")
                     .arg(m_writeQueue.size())
@@ -278,13 +277,15 @@ void DbHelper::run()
             m_cond.wait(lk.mutex());
         }
 
-        if (m_needStop)
+        if (needToStop())
             return;
 
         auto record = m_writeQueue.front();
 
         Error error = Error::NoError;
         RecordVisitor vis(&m_stream, &error);
+
+        NX_ASSERT(m_mode == Mode::Write);
 
         lk.unlock();
         boost::apply_visitor(vis, record);
@@ -311,20 +312,14 @@ void DbHelper::run()
     }
 }
 
-void DbHelper::stop()
-{
-    {
-        QnMutexLocker lk(&m_mutex);
-        m_needStop = true;
-    }
-    m_cond.wakeAll();
-
-    wait();
-}
-
 DbHelper::~DbHelper()
 {
-    stop();
+    {
+        QnMutexLocker lock(&m_mutex);
+        m_needStop = true;
+        m_cond.wakeOne();
+    }
+    wait();
 }
 
 QIODevice *DbHelper::getDevice() const

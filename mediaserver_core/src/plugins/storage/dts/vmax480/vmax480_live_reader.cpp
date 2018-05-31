@@ -21,12 +21,10 @@ static const QByteArray GROUP_ID("{347E1C92-4627-405d-99B3-5C7EF78B0055}");
 
 // ----------------------------------- QnVMax480LiveProvider -----------------------
 
-QnVMax480LiveProvider::QnVMax480LiveProvider(const QnResourcePtr& dev ):
+QnVMax480LiveProvider::QnVMax480LiveProvider(const QnPlVmax480ResourcePtr& dev ):
     CLServerPushStreamReader(dev),
-    m_maxStream(0),
-    m_opened(false)
+    m_networkRes(dev)
 {
-    m_networkRes = dev.dynamicCast<QnNetworkResource>();
 }
 
 QnVMax480LiveProvider::~QnVMax480LiveProvider()
@@ -129,7 +127,7 @@ void QnVMax480LiveProvider::afterRun()
 
 int QnVMax480LiveProvider::getChannel() const
 {
-    return m_resource.dynamicCast<nx::mediaserver::resource::Camera>()->getChannel();
+    return m_networkRes->getChannel();
 }
 
 #endif // #ifdef ENABLE_VMAX

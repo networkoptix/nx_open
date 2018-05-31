@@ -38,7 +38,7 @@ namespace {
         if (!camera)
             return false;
 
-        return camera->getActualBackupQualities() != Qn::CameraBackup_Disabled
+        return camera->getActualBackupQualities() != Qn::CameraBackupQuality::CameraBackup_Disabled
             || isValidServer(camera->getParentServer());
     }
 

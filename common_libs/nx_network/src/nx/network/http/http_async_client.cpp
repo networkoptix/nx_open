@@ -41,8 +41,6 @@ constexpr const std::chrono::milliseconds AsyncClient::Timeouts::kDefaultSendTim
 constexpr const std::chrono::milliseconds AsyncClient::Timeouts::kDefaultResponseReadTimeout;
 constexpr const std::chrono::milliseconds AsyncClient::Timeouts::kDefaultMessageBodyReadTimeout;
 
-constexpr int kMaxNumberOfRedirects = 5;
-
 AsyncClient::Timeouts::Timeouts(
     std::chrono::milliseconds send,
     std::chrono::milliseconds recv,
@@ -110,11 +108,11 @@ std::unique_ptr<AbstractStreamSocket> AsyncClient::takeSocket()
     result->cancelIOSync(nx::network::aio::etNone);
     if (!m_receivedBytesLeft.isEmpty())
     {
-        auto bufferedStreamSocket =
-            std::make_unique<nx::network::BufferedStreamSocket>(std::move(result));
-        BufferType buf;
-        buf.swap(m_receivedBytesLeft);
-        bufferedStreamSocket->injectRecvData(std::move(buf));
+        decltype(m_receivedBytesLeft) receivedBytesLeft;
+        receivedBytesLeft.swap(m_receivedBytesLeft);
+        auto bufferedStreamSocket = std::make_unique<nx::network::BufferedStreamSocket>(
+            std::move(result),
+            std::move(receivedBytesLeft));
         result = std::move(bufferedStreamSocket);
     }
     return result;
@@ -1092,7 +1090,7 @@ bool AsyncClient::repeatRequestIfNeeded(const Response& response)
 
 bool AsyncClient::sendRequestToNewLocation(const Response& response)
 {
-    if (m_numberOfRedirectsTried >= kMaxNumberOfRedirects)
+    if (m_numberOfRedirectsTried >= m_maxNumberOfRedirects)
         return false;
     ++m_numberOfRedirectsTried;
 
@@ -1533,6 +1531,11 @@ AsyncClient::Result AsyncClient::emitResponseReceived()
 AsyncClient::Result AsyncClient::emitSomeMessageBodyAvailable()
 {
     return invokeHandler(m_onSomeMessageBodyAvailable);
+}
+
+void AsyncClient::setMaxNumberOfRedirects(int maxNumberOfRedirects)
+{
+    m_maxNumberOfRedirects = maxNumberOfRedirects;
 }
 
 template<typename ... Args>

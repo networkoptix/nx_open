@@ -19,7 +19,7 @@
 #include <QAndroidJniObject>
 #include <QAndroidJniEnvironment>
 
-#include "abstract_resource_allocator.h"
+#include "abstract_render_context_synchronizer.h"
 
 namespace nx {
 namespace media {
@@ -31,16 +31,16 @@ namespace {
         switch(codecId)
         {
             case AV_CODEC_ID_AAC:
-                return lit("audio/mp4a-latm");
+                return "audio/mp4a-latm";
             case AV_CODEC_ID_PCM_ALAW:
-                return lit("audio/g711-alaw");
+                return "audio/g711-alaw";
             case AV_CODEC_ID_PCM_MULAW:
-                return lit("audio/g711-mlaw");
+                return "audio/g711-mlaw";
             case AV_CODEC_ID_MP2:
             case AV_CODEC_ID_MP3:
-                return lit("audio/mpeg");
+                return "audio/mpeg";
             case AV_CODEC_ID_VORBIS:
-                return lit("audio/vorbis");
+                return "audio/vorbis";
             default:
                 return QString();
         }

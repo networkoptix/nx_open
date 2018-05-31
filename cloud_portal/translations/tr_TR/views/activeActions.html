@@ -1,7 +1,7 @@
 <div class="container" >
     <div ng-if="data.activateCode" process-loading="activate">
         <h1 class="process-success" ng-if="activate.success">
-            Your account is successfully activated
+            Hesabın başarıyla aktif edildi
         </h1>
         <h1 class="process-success" ng-if="activate.success">
             <a class="btn btn-default" href="/login">Oturum Aç</a>
@@ -14,7 +14,7 @@
 
     <div ng-if="!data.activateCode && activationSuccess">
         <h1 class="process-success">
-            Your account is successfully activated
+            Hesabın başarıyla aktif edildi
         </h1>
         <h1 class="process-success">
             <a class="btn btn-default" href="/login">Oturum Aç</a>
@@ -23,7 +23,7 @@
     
     <div ng-if="reactivating" class="text-center">
         <div ng-if='data.email'>
-            <h1>{{PRODUCT_NAME}} içinde kayıtlı</h1>
+            <h1>%PRODUCT_NAME% içinde kayıtlı</h1>
             <p>{{data.email}} adresine bir aktivasyon linki gönderdik<br>
             Lütfen bu bağlantıya tıklayıp hesabınızı etkinleştirin.</p>
         </div>
@@ -55,7 +55,7 @@
 
     <div ng-if="restoringSuccess">
         <h1 class="process-success">
-            Şifre sıfırlama talimatları E-posta adresine gönderilir <br> {{data.email}}
+            Şifre sıfırlama talimatları E-posta adresine gönderilir <br>{{data.email}}
         </h1>
     </div>
 
@@ -87,7 +87,7 @@
     </div>
     <div ng-if="data.restoreCode">
         <h1 class="process-success" ng-if="change.success || changeSuccess">
-            Password successfully saved
+            Parola başarıyla kaydedildi
         </h1>
         <h1 class="process-success" ng-if="change.success || changeSuccess">
             <a class="btn btn-default" href="/login">Oturum Aç</a>

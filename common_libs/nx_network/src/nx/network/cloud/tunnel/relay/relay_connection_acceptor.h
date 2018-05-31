@@ -30,7 +30,7 @@ class NX_NETWORK_API ReverseConnection:
     using base_type = aio::BasicPollable;
 
 public:
-    ReverseConnection(const utils::Url &relayUrl);
+    ReverseConnection(const utils::Url& relayUrl);
 
     virtual void bindToAioThread(aio::AbstractAioThread* aioThread) override;
 
@@ -76,7 +76,7 @@ class NX_NETWORK_API ConnectionAcceptor:
     using base_type = AbstractConnectionAcceptor;
 
 public:
-    ConnectionAcceptor(const utils::Url &relayUrl);
+    ConnectionAcceptor(const utils::Url& relayUrl);
 
     virtual void bindToAioThread(aio::AbstractAioThread* aioThread) override;
 

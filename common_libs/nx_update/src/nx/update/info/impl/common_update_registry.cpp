@@ -165,10 +165,8 @@ private:
             return;
 
         m_fileData = fileData;
-        auto filePath = lit("/%1/%2/%3")
-            .arg(m_customizationData.name)
-            .arg(QString::number(version.build()))
-            .arg(fileData.file);
+        const auto filePath = QString("/%1/%2/%3").arg(
+            m_customizationData.name, QString::number(version.build()), fileData.file);
         m_fileData.url = m_baseUrl + filePath;
         m_found = true;
     }
@@ -176,6 +174,7 @@ private:
 
 static const QString kUrlKey = "url";
 static const QString kManualDataKey = "manualData";
+static const QString kRemovedDataKey = "removedData";
 static const QString kMetaDataKey = "metaData";
 static const QString kPeersKey = "peers";
 static const QString kIsClientKey = "isClient";
@@ -207,7 +206,8 @@ public:
         const QString& url,
         const UpdatesMetaData& metaData,
         const CustomizationVersionToUpdate& customizationVersionToUpdate,
-        const QList<ManualFileData>& manualData)
+        const QList<ManualFileData>& manualData,
+        const QMap<QString, QList<QnUuid>>& removedData)
         :
         m_url(url),
         m_metaData(metaData),
@@ -216,6 +216,7 @@ public:
         serializeUrl();
         serializeMetaData();
         serializeManualData(manualData);
+        serializeRemovedData(removedData);
         serializeCustomizationVersionToUpdate();
     }
 
@@ -239,7 +240,7 @@ private:
             QJsonObject arrayObject;
             arrayObject[kFileKey] = data.file;
             arrayObject[kIsClientKey] = data.isClient;
-            arrayObject[kOsVersionKey] = data.osVersion.toString();
+            arrayObject[kOsVersionKey] = data.osVersion.serialize();
             arrayObject[kNxVersionKey] = data.nxVersion.toString();
 
             QJsonArray peerArray;
@@ -251,6 +252,21 @@ private:
         }
 
         m_jsonObject[kManualDataKey] = manualDataArray;
+    }
+
+    void serializeRemovedData(const QMap<QString, QList<QnUuid>>& removedData)
+    {
+        QJsonObject removedDataMap;
+        for (auto removedIt = removedData.cbegin(); removedIt != removedData.cend(); ++removedIt)
+        {
+            QJsonArray peerArray;
+            for (const auto& peer: removedIt.value())
+                peerArray.append(peer.toString());
+
+            removedDataMap[removedIt.key()] = peerArray;
+        }
+
+        m_jsonObject[kRemovedDataKey] = removedDataMap;
     }
 
     void serializeMetaData()
@@ -362,6 +378,7 @@ public:
         deserializeUrl();
         deserializeMetaData();
         deserializeManualData();
+        deserializeRemovedData();
         deserializeCustomizationVersionToUpdate();
 
         if (!m_ok)
@@ -375,6 +392,7 @@ public:
         return m_customizationVersionToUpdate;
     }
     QList<ManualFileData> manualData() const { return m_manualData; }
+    QMap<QString, QList<QnUuid>> removedData() const { return m_removedData; }
     bool ok() const { return m_ok; }
 
 private:
@@ -383,6 +401,7 @@ private:
     UpdatesMetaData m_metaData;
     CustomizationVersionToUpdate m_customizationVersionToUpdate;
     QList<ManualFileData> m_manualData;
+    QMap<QString, QList<QnUuid>> m_removedData;
     bool m_ok = true;
     QJsonObject m_rootObject;
 
@@ -416,13 +435,36 @@ private:
             manualFileData.file = arrayObj[kFileKey].toString();
             manualFileData.isClient = arrayObj[kIsClientKey].toBool();
             manualFileData.nxVersion = QnSoftwareVersion(arrayObj[kNxVersionKey].toString());
-            manualFileData.osVersion = OsVersion::fromString(arrayObj[kOsVersionKey].toString());
+            manualFileData.osVersion = OsVersion::deserialize(arrayObj[kOsVersionKey].toString());
 
             auto peersArrayObj = arrayObj[kPeersKey].toArray();
             for (int j = 0; j < peersArrayObj.size(); ++j)
                 manualFileData.peers.append(QnUuid::fromStringSafe(peersArrayObj[j].toString()));
 
             m_manualData.append(manualFileData);
+        }
+    }
+
+    void deserializeRemovedData()
+    {
+        if (!m_ok)
+            return;
+
+        if (!m_rootObject.contains(kRemovedDataKey) || !m_rootObject[kRemovedDataKey].isObject())
+        {
+            m_ok = false;
+            return;
+        }
+
+        auto removedDataObject = m_rootObject[kRemovedDataKey].toObject();
+        for (const auto& key: removedDataObject.keys())
+        {
+            QList<QnUuid> peers;
+            auto peerArray = removedDataObject[key].toArray();
+            for (int i = 0; i < peerArray.size(); ++i)
+                peers.append(QnUuid::fromStringSafe(peerArray[i].toString()));
+
+            m_removedData.insert(key, peers);
         }
     }
 
@@ -734,20 +776,36 @@ private:
 } // namespace
 
 CommonUpdateRegistry::CommonUpdateRegistry(
+    const QnUuid& selfPeerId,
     const QString& baseUrl,
     detail::data_parser::UpdatesMetaData metaData,
     detail::CustomizationVersionToUpdate customizationVersionToUpdate)
     :
+    m_peerId(selfPeerId),
     m_baseUrl(baseUrl),
     m_metaData(std::move(metaData)),
     m_customizationVersionToUpdate(std::move(customizationVersionToUpdate))
 {}
+
+CommonUpdateRegistry::CommonUpdateRegistry(const QnUuid& selfPeerId): m_peerId(selfPeerId) {}
 
 ResultCode CommonUpdateRegistry::findUpdateFile(
     const UpdateFileRequestData& updateRequestData,
     FileData* outFileData) const
 {
     NX_VERBOSE(this, lm("Requested update for %1").args(updateRequestData.toString()));
+
+    for (const auto& manualDataEntry: m_manualData)
+    {
+        if (manualDataEntry.isClient == updateRequestData.isClient
+            && manualDataEntry.nxVersion > updateRequestData.currentNxVersion
+            && manualDataEntry.osVersion == updateRequestData.osVersion)
+        {
+            if (outFileData)
+                *outFileData = FileData(manualDataEntry.file, QString(), -1, QByteArray());
+            return ResultCode::ok;
+        }
+    }
 
     CustomizationData customizationData;
     if (!hasUpdateForCustomizationAndVersion(updateRequestData, &customizationData))
@@ -805,7 +863,12 @@ bool CommonUpdateRegistry::hasUpdateForCustomizationAndVersion(
 
 QByteArray CommonUpdateRegistry::toByteArray() const
 {
-    return Serializer(m_baseUrl, m_metaData, m_customizationVersionToUpdate, m_manualData).json();
+    return Serializer(
+        m_baseUrl,
+        m_metaData,
+        m_customizationVersionToUpdate,
+        m_manualData,
+        m_removedData).json();
 }
 
 bool CommonUpdateRegistry::fromByteArray(const QByteArray& rawData)
@@ -818,6 +881,7 @@ bool CommonUpdateRegistry::fromByteArray(const QByteArray& rawData)
     m_metaData = deserializer.metaData();
     m_customizationVersionToUpdate = deserializer.customizationVersionToUpdate();
     m_manualData = deserializer.manualData();
+    m_removedData = deserializer.removedData();
 
     return true;
 }
@@ -831,13 +895,24 @@ bool CommonUpdateRegistry::equals(AbstractUpdateRegistry* other) const
     return otherCommonUpdateRegistry->m_baseUrl == m_baseUrl
         && otherCommonUpdateRegistry->m_metaData == m_metaData
         && otherCommonUpdateRegistry->m_customizationVersionToUpdate == m_customizationVersionToUpdate
-        && otherCommonUpdateRegistry->m_manualData == m_manualData;
+        && otherCommonUpdateRegistry->m_manualData == m_manualData
+        && otherCommonUpdateRegistry->m_removedData == m_removedData;
 }
 
 ResultCode CommonUpdateRegistry::latestUpdate(
     const UpdateRequestData& updateRequestData,
     QnSoftwareVersion* outSoftwareVersion) const
 {
+    for (const auto& md: m_manualData)
+    {
+        if (updateRequestData.currentNxVersion < md.nxVersion)
+        {
+            if (outSoftwareVersion)
+                *outSoftwareVersion = md.nxVersion;
+            return ResultCode::ok;
+        }
+    }
+
     CustomizationData customizationData;
     if (!hasUpdateForCustomizationAndVersion(updateRequestData, &customizationData))
         return ResultCode::noData;
@@ -860,17 +935,110 @@ ResultCode CommonUpdateRegistry::latestUpdate(
 
 void CommonUpdateRegistry::addFileData(const ManualFileData& manualFileData)
 {
-    if (m_manualData.contains(manualFileData))
+    for (const auto& selfManualFileData: m_manualData)
+    {
+        if (selfManualFileData.file == manualFileData.file)
+        {
+            if (selfManualFileData.peers.contains(m_peerId))
+                return;
+        }
+    }
+
+    if (m_removedData.contains(manualFileData.file))
+        m_removedData[manualFileData.file].removeAll(m_peerId);
+
+    addFileDataImpl(manualFileData, QList<QnUuid>() << m_peerId);
+}
+
+void CommonUpdateRegistry::addFileDataImpl(
+    const ManualFileData& manualFileData,
+    const QList<QnUuid>& peers)
+{
+    bool sameFileFound = false;
+    for (auto& selfManualFileData: m_manualData)
+    {
+        if (selfManualFileData.file == manualFileData.file)
+        {
+
+            for (int j = 0; j < peers.size(); ++j)
+            {
+                if (!selfManualFileData.peers.contains(peers[j]))
+                    selfManualFileData.peers.append(peers[j]);
+            }
+
+            sameFileFound = true;
+            break;
+        }
+    }
+
+    if (!sameFileFound)
+    {
+        auto manualFileDataCopy = manualFileData;
+        manualFileDataCopy.peers = peers;
+        m_manualData.append(manualFileDataCopy);
+    }
+
+    for (auto& selfManualFileData: m_manualData)
+    {
+        if (selfManualFileData.file == manualFileData.file)
+        {
+            std::sort(
+                selfManualFileData.peers.begin(),
+                selfManualFileData.peers.end(),
+                [](const QnUuid& l, const QnUuid& r) { return l < r; });
+        }
+    }
+
+    std::sort(
+        m_manualData.begin(),
+        m_manualData.end(),
+        [](const ManualFileData& l, const ManualFileData& r) { return l.file < r.file; });
+}
+
+void CommonUpdateRegistry::removeFileData(const QString& fileName)
+{
+    if (!removeFileDataImpl(fileName, QList<QnUuid>() << m_peerId))
         return;
 
-    m_manualData.append(manualFileData);
+    if (m_removedData.contains(fileName))
+    {
+        if (!m_removedData[fileName].contains(m_peerId))
+            m_removedData[fileName].append(m_peerId);
+    }
+    else
+    {
+        m_removedData.insert(fileName, QList<QnUuid>() << m_peerId);
+    }
+}
+
+bool CommonUpdateRegistry::removeFileDataImpl(const QString& fileName, const QList<QnUuid>& peers)
+{
+    bool result = false;
+    for (int i = 0; i < m_manualData.size(); ++i)
+    {
+        if (m_manualData[i].file == fileName)
+        {
+            for (int j = 0; j < m_manualData[i].peers.size(); ++j)
+            {
+                if (peers.contains(m_manualData[i].peers[j]))
+                {
+                    result = true;
+                    m_manualData[i].peers.removeAt(j);
+                }
+            }
+
+            if (m_manualData[i].peers.isEmpty())
+                m_manualData.removeAt(i);
+
+            return result;
+        }
+    }
+
+    return result;
 }
 
 void CommonUpdateRegistry::merge(AbstractUpdateRegistry* other)
 {
-    if (!other)
-        return;
-
     auto otherCommonUpdateRegistry = dynamic_cast<CommonUpdateRegistry*>(other);
     if (!otherCommonUpdateRegistry)
         return;
@@ -896,13 +1064,48 @@ void CommonUpdateRegistry::merge(AbstractUpdateRegistry* other)
     {
         m_metaData = otherCommonUpdateRegistry->m_metaData;
         m_customizationVersionToUpdate = otherCommonUpdateRegistry->m_customizationVersionToUpdate;
+        m_baseUrl = otherCommonUpdateRegistry->m_baseUrl;
     }
 
     for (const auto& otherManualData: otherCommonUpdateRegistry->m_manualData)
+        addFileDataImpl(otherManualData, otherManualData.peers);
+
+    for (auto removedIt = otherCommonUpdateRegistry->m_removedData.cbegin();
+         removedIt != otherCommonUpdateRegistry->m_removedData.cend();
+         ++removedIt)
     {
-        if (!m_manualData.contains(otherManualData))
-            m_manualData.append(otherManualData);
+        auto peers = removedIt.value();
+        peers.removeAll(m_peerId);
+        removeFileDataImpl(removedIt.key(), peers);
+        mergeToRemovedData(removedIt.key(), peers);
     }
+}
+
+void CommonUpdateRegistry::mergeToRemovedData(const QString& fileName, const QList<QnUuid>& peers)
+{
+    if (m_removedData.contains(fileName))
+    {
+        for (const auto& peer: peers)
+        {
+            if (!m_removedData[fileName].contains(peer))
+                m_removedData[fileName].append(peer);
+        }
+    }
+    else
+    {
+        m_removedData.insert(fileName, peers);
+    }
+}
+
+QList<QnUuid> CommonUpdateRegistry::additionalPeers(const QString& fileName) const
+{
+    for (const auto& md: m_manualData)
+    {
+        if (md.file == fileName)
+            return md.peers;
+    }
+
+    return QList<QnUuid>();
 }
 
 } // namespace impl

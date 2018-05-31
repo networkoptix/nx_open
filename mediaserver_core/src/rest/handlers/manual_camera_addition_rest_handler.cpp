@@ -1,6 +1,6 @@
 #include "manual_camera_addition_rest_handler.h"
 
-#include <boost/bind.hpp>
+#include <functional>
 
 #include <QtCore/QThreadPool>
 #include <QtNetwork/QAuthenticator>
@@ -73,7 +73,7 @@ int QnManualCameraAdditionRestHandler::searchStartAction(
         // number of arguments.
         const auto threadPool = owner->commonModule()->resourceDiscoveryManager()->threadPool();
         m_searchProcessRuns.insert(processUuid,
-            nx::utils::concurrent::run(threadPool, boost::bind(
+            nx::utils::concurrent::run(threadPool, std::bind(
                 &QnManualCameraSearcher::run, searcher, threadPool, addr1, addr2, auth, port)));
     }
 
@@ -139,7 +139,6 @@ int QnManualCameraAdditionRestHandler::searchStopAction(
 
     return CODE_OK;
 }
-
 
 int QnManualCameraAdditionRestHandler::addCamerasAction(
     const QnRequestParams& params,

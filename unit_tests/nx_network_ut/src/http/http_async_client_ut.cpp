@@ -19,7 +19,7 @@ static const nx::network::http::StringType kUpgradeTo("NXRELAY/0.1");
 static const nx::Buffer kNewProtocolMessage("Hello, Http Client!");
 
 class UpgradableHttpServer:
-    public nx::network::test::SynchronousTcpServer
+    public nx::network::test::SynchronousStreamSocketServer
 {
 protected:
     virtual void processConnection(AbstractStreamSocket* connection) override

@@ -53,11 +53,6 @@
       <translation>Найденная система %1 несовместима с версией %2.</translation>
     </message>
     <message>
-      <source>Cannot connect to the other System because current System is already connected to %1.</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-      <translation>Не удаётся подключиться к другой системе, поскольку текущая система уже подключена к %1.</translation>
-    </message>
-    <message>
       <source>The discovered System %1 is in safe mode.</source>
       <comment>%1 is name of System</comment>
       <translation>Найденная система %1 находится в безопасном режиме.</translation>
@@ -66,16 +61,6 @@
       <source>Could not configure the remote System %1.</source>
       <comment>%1 is name of System</comment>
       <translation>Не удалось настроить удаленную систему %1.</translation>
-    </message>
-    <message>
-      <source>Both Systems are connected to %1. Merge is not allowed.</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-      <translation>Обе системы подключены к %1. Объединение не допускается.</translation>
-    </message>
-    <message>
-      <source>These Systems are built with different %1 URL. Merge is not allowed.</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-      <translation>Эти системы построены с различными %1 URL. Объединение не допускается.</translation>
     </message>
     <message>
       <source>New System</source>
@@ -87,9 +72,24 @@
       <translation>Обнаружкнная система %1 несовместима с текущей.</translation>
     </message>
     <message>
+      <source>Cannot connect to the other System because current System is already connected to %1.</source>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
+      <translation>Не удаётся подключиться к другой системе, поскольку текущая система уже подключена к %1.</translation>
+    </message>
+    <message>
       <source>%1 System can only be merged with non-%1. System name and password are taken from %1 System.</source>
-      <comment>%1 is the short cloud name (like &apos;Cloud&apos;)</comment>
+      <comment>%1 is the short cloud name (like Cloud)</comment>
       <translation>%1 система может быть объединена только с не-%1. Системное имя и пароль берутся из %1 системы.</translation>
+    </message>
+    <message>
+      <source>Both Systems are connected to %1. Merge is not allowed.</source>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
+      <translation>Обе системы подключены к %1. Объединение не допускается.</translation>
+    </message>
+    <message>
+      <translation type="unfinished">%1 System can only be merged with non-%1. System name and password are taken from %1 System.</translation>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
+      <translation>Эти системы построены с различными %1 URL. Объединение не допускается.</translation>
     </message>
   </context>
   <context>
@@ -589,8 +589,8 @@
       <translation>Неизвестная ошибка</translation>
     </message>
     <message>
-      <source>Server with matching Hardware Id not found</source>
-      <translation>Сервер с соответствующим аппаратным Id не найден</translation>
+      <source>Server with matching Hardware ID not found</source>
+      <translation>Сервер с соответствующим аппаратным ID не найден</translation>
     </message>
   </context>
   <context>
@@ -724,12 +724,12 @@
       <translation>Водяной знак: %1</translation>
     </message>
     <message>
-      <source>Hardware Id: %1</source>
-      <translation>Аппаратный Id: %1</translation>
-    </message>
-    <message>
       <source>Time License</source>
       <translation>Возобновляемая лицензия</translation>
+    </message>
+    <message>
+      <source>Hardware ID: %1</source>
+      <translation>Аппаратный ID: %1</translation>
     </message>
   </context>
   <context>
@@ -1266,6 +1266,7 @@
     <message numerus="yes">
       <source>No data received during last %n seconds.</source>
       <translation>
+        <numerusform>Нет данных в течение %n секунды.</numerusform>
         <numerusform>Нет данных в течение %n секунд.</numerusform>
         <numerusform>Нет данных в течение %n секунд.</numerusform>
         <numerusform>Нет данных в течение %n секунд.</numerusform>

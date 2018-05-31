@@ -116,27 +116,6 @@ TEST_F(SocketUdt, cancelConnect)
     serverSocket.pleaseStopSync();
 }
 
-#if 0
-TEST(SocketUdt_UdtPollSet, general)
-{
-    UdtPollSet pollset;
-    ASSERT_TRUE(pollset.isValid());
-
-    UdtStreamSocket sock;
-
-    ASSERT_TRUE(pollset.add(&sock, aio::etRead, (void*)1));
-    ASSERT_TRUE(pollset.add(&sock, aio::etWrite, (void*)2));
-
-    pollset.remove(&sock, aio::etRead);
-    pollset.remove(&sock, aio::etWrite);
-    ASSERT_TRUE(pollset.add(&sock, aio::etRead));
-    pollset.remove(&sock, aio::etRead);
-
-    auto result = pollset.poll(100);
-    ASSERT_EQ(0, result);
-}
-#endif
-
 NX_NETWORK_BOTH_SOCKET_TEST_CASE(
     TEST_F, SocketUdt,
     [](){ return std::make_unique<UdtStreamServerSocket>(AF_INET); },
@@ -469,7 +448,7 @@ private:
 
         m_udtSocketServerStarted.set_value();
 
-        std::unique_ptr<AbstractStreamSocket> acceptedSocket(m_serverSocket.accept());
+        auto acceptedSocket = m_serverSocket.accept();
         ASSERT_NE(nullptr, acceptedSocket);
 
         for (;;)
@@ -482,29 +461,6 @@ private:
         }
     }
 };
-
-TEST_F(SocketUdtNew, simpleTest)
-{
-    listenOnServerSocket();
-
-    for (int i = 0; i < 17; ++i)
-    {
-        connectToUdtServer();
-
-        std::unique_ptr<AbstractStreamSocket> acceptedSocket(m_serverSocket.accept());
-        ASSERT_NE(nullptr, acceptedSocket);
-
-        std::array<char, 128> testBuf;
-        ASSERT_EQ((int)testBuf.size(), m_clientSock->send(testBuf.data(), testBuf.size()))
-            << SystemError::getLastOSErrorText().toStdString();
-
-        std::array<char, testBuf.size()> readBuf;
-        ASSERT_EQ((int)readBuf.size(), acceptedSocket->recv(readBuf.data(), readBuf.size(), 0))
-            << SystemError::getLastOSErrorText().toStdString();
-
-        closeConnection();
-    }
-}
 
 TEST_F(SocketUdtNew, connectionProperlyClosed)
 {
@@ -636,7 +592,7 @@ protected:
 
     std::unique_ptr<AbstractStreamSocket> accept() const
     {
-        std::unique_ptr<AbstractStreamSocket> socket(server->accept());
+        auto socket = server->accept();
         EXPECT_NE(nullptr, socket);
         socketConfig(socket.get());
         return socket;

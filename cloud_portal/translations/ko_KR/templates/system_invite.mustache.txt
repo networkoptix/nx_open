@@ -1,11 +1,11 @@
-{{PRODUCT_NAME}} 에 오신 것을 환영합니다
+%PRODUCT_NAME%에 오신 것을 환영합니다.
 
 {{#message.sharer_name}}
-{{message.sharer_name}} ({{message.sharer_email}})이 (가) {{PRODUCT_NAME}}에 가입하도록 초대했으며 자신의 시스템 {{message.system_name}}을 (와) 공유했습니다.
+{{message.sharer_name}} ({{message.sharer_email}})이 (가) %PRODUCT_NAME%에 가입하도록 초대했으며 자신의 시스템 {{message.system_name}}을 (와) 공유했습니다.
 {{/message.sharer_name}}
 
 {{^message.sharer_name}}
-{{PRODUCT_NAME}} 에 가입하도록 초대되었습니다.
+%PRODUCT_NAME%에 가입하도록 초대되었습니다.
 {{message.system_name}}에 대한 액세스 권한이 부여되었습니다.
 {{/message.sharer_name}}
 

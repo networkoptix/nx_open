@@ -6,7 +6,7 @@
 #include <QtMultimedia/QVideoFrame>
 #include <QtGui/QOpenGLContext>
 
-#include "abstract_resource_allocator.h"
+#include "abstract_render_context_synchronizer.h"
 #include <nx/streaming/video_data_packet.h>
 
 #include "media_fwd.h"
@@ -17,7 +17,7 @@ namespace media {
 /**
  * Interface for video decoder implementation. Each derived class should provide a constructor with
  * the following signature:
- * <pre> ...VideoDecoder(const ResourceAllocatorPtr& allocator, const QSize& resolution); </pre>
+ * <pre> ...VideoDecoder(const RenderContextSynchronizerPtr& synchronizer, const QSize& resolution); </pre>
  *
  */
 class AbstractVideoDecoder: public QObject

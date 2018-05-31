@@ -20,6 +20,7 @@ endif()
 if(withClouds)
     set(nx_enable_werror ON)
 
+    add_subdirectory(nx_data_sync_engine_ut)
     add_subdirectory(vms_gateway_ut)
     add_subdirectory(cloud_connectivity_ut)
     add_subdirectory(cloud_db_ut)

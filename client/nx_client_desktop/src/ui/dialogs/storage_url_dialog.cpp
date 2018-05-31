@@ -14,7 +14,7 @@
 #include <nx/client/desktop/common/widgets/busy_indicator_button.h>
 #include <ui/workaround/widgets_signals_workaround.h>
 
-#include <ui/common/scoped_cursor_rollback.h>
+#include <nx/client/desktop/common/utils/scoped_cursor_rollback.h>
 #include <utils/common/scoped_value_rollback.h>
 
 using namespace nx::client::desktop;
@@ -182,7 +182,7 @@ void QnStorageUrlDialog::accept()
 
     // Scoped event loop:
     {
-        QnScopedCursorRollback cursorRollback(this, Qt::WaitCursor);
+        ScopedCursorRollback cursorRollback(this, Qt::WaitCursor);
         QnScopedTypedPropertyRollback<bool, QWidget> inputsEnabledRollback(ui->inputsWidget,
             &QWidget::setEnabled, &QWidget::isEnabled, false);
         QnScopedTypedPropertyRollback<bool, QWidget> buttonEnabledRollback(m_okButton,

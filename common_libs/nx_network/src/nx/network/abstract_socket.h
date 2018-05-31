@@ -348,7 +348,7 @@ public:
      */
     virtual void cancelIOAsync(
         nx::network::aio::EventType eventType,
-        nx::utils::MoveOnlyFunc<void()> handler) = 0;
+        nx::utils::MoveOnlyFunc<void()> handler) final;
 
     /**
      * Cancels async operation and blocks until cancellation is stopped.
@@ -356,12 +356,15 @@ public:
      *   or will be called after return of this method.
      * NOTE: If invoked within socket's aio thread, cancels immediately, without blocking.
      */
-    virtual void cancelIOSync(nx::network::aio::EventType eventType) = 0;
+    virtual void cancelIOSync(nx::network::aio::EventType eventType) final;
 
     virtual void pleaseStop(nx::utils::MoveOnlyFunc<void()> handler) override;
     virtual void pleaseStopSync(bool checkForLocks = true) override;
 
     virtual QString idForToStringFromPtr() const; //< Used by toString(const T*).
+
+protected:
+    virtual void cancelIoInAioThread(nx::network::aio::EventType eventType) = 0;
 
 private:
     void readAsyncAtLeastImpl(
@@ -457,7 +460,7 @@ public:
 
     /**
      * Start listening for incoming connections.
-     * @param queueLen Size of queue of fully established connections
+     * @param backlog Size of queue of fully established connections
      *   waiting for AbstractStreamServerSocket::accept().
      *   If queue is full and new connection arrives, it receives ECONNREFUSED error.
      * @return false on error.
@@ -469,7 +472,7 @@ public:
      * @return NULL in case of error (use SystemError::getLastOSErrorCode() to get error description).
      * NOTE: Uses read timeout.
      */
-    virtual AbstractStreamSocket* accept() = 0;
+    virtual std::unique_ptr<AbstractStreamSocket> accept() = 0;
     /**
      * Starts async accept operation.
      * @param handler functor with following signature:
@@ -483,14 +486,17 @@ public:
     /**
      * Cancel active AbstractStreamServerSocket::acceptAsync.
      */
-    virtual void cancelIOAsync(nx::utils::MoveOnlyFunc<void()> handler) = 0;
+    virtual void cancelIOAsync(nx::utils::MoveOnlyFunc<void()> handler) final;
     /**
      * Cancel active AbstractStreamServerSocket::acceptAsync waiting for completion.
      * NOTE: If called within socket's aio thread, then does not block.
      */
-    virtual void cancelIOSync() = 0;
+    virtual void cancelIOSync() final;
 
     virtual QString idForToStringFromPtr() const; //< Used by toString(const T*).
+
+protected:
+    virtual void cancelIoInAioThread() = 0;
 };
 
 static const QString BROADCAST_ADDRESS(QLatin1String("255.255.255.255"));

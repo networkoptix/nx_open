@@ -355,7 +355,7 @@ bool QnConnectionManagerPrivate::doConnect(bool restoringConnection)
     auto result = new QnEc2ConnectionRequestResult(this);
     connectionHandle = qnClientCoreModule->connectionFactory()->connect(
         connectUrl,
-        ec2::ApiClientInfoData(),
+        nx::vms::api::ClientInfoData(),
         result,
         &QnEc2ConnectionRequestResult::processEc2Reply);
 

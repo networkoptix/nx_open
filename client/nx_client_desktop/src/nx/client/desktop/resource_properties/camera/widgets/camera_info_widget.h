@@ -1,8 +1,11 @@
 #pragma once
 
-#include <ui/widgets/common/panel.h>
 #include <ui/widgets/common/abstract_preferences_widget.h>
 
+#include <nx/client/desktop/common/widgets/panel.h>
+#include <nx/client/desktop/ui/actions/actions.h>
+
+class QnDisconnectHelper;
 namespace Ui { class CameraInfoWidget; }
 
 namespace nx {
@@ -12,16 +15,19 @@ namespace desktop {
 struct CameraSettingsDialogState;
 class CameraSettingsDialogStore;
 
-class CameraInfoWidget: public QnPanel
+class CameraInfoWidget: public Panel
 {
     Q_OBJECT
-    using base_type = QnPanel;
+    using base_type = Panel;
 
 public:
     explicit CameraInfoWidget(QWidget* parent = nullptr);
     virtual ~CameraInfoWidget() override;
 
     void setStore(CameraSettingsDialogStore* store);
+
+signals:
+    void actionRequested(nx::client::desktop::ui::action::IDType action);
 
 private:
     void loadState(const CameraSettingsDialogState& state);
@@ -31,7 +37,8 @@ private:
     void updatePageSwitcher();
 
 private:
-    QScopedPointer<Ui::CameraInfoWidget> ui;
+    const QScopedPointer<Ui::CameraInfoWidget> ui;
+    QScopedPointer<QnDisconnectHelper> m_storeConnections;
 };
 
 } // namespace desktop

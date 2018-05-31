@@ -442,20 +442,33 @@ void QnAuthHelper::authenticationExpired(const QString& authKey, quint64 /*timer
     m_authenticatedPaths.erase(authKey);
 }
 
+
 static bool verifyDigestUri(const nx::utils::Url& requestUrl, const QByteArray& uri)
 {
+    static const auto isEqual =
+        [](const QString& request, const QString& digest)
+        {
+            if (request == digest)
+                return true;
+
+            // TODO: #ak Remove in 4.0 and fix another way on cloud side.
+            // Currently VmsGateway proxies queries like /gateway/<SYSTEM_ID>/<QUERY> to mediaserver
+            // as is with just just /<QUERY>, see VMS-9360.
+            static const auto kGatewayPrefix = lit("/gateway/");
+            if (digest.startsWith(kGatewayPrefix))
+            {
+                const auto proxiedPathStart = digest.indexOf('/', kGatewayPrefix.size());
+                if (proxiedPathStart > 0 && request == digest.mid(proxiedPathStart))
+                    return true;
+            }
+
+            return false;
+        };
+
     const nx::utils::Url digestUrl(QString::fromUtf8(uri));
-    const auto requestPath = requestUrl.path();
-    const auto digsetPath = digestUrl.path();
-    if (requestUrl.path() != digestUrl.path())
-        return false;
-
-    const auto requestQuery = requestUrl.query();
-    const auto digestQuery = digestUrl.query();
-    if (kVerifyDigestUriWithParams && requestUrl.query() != digestUrl.query())
-        return false;
-
-    return true;
+    return kVerifyDigestUriWithParams
+        ? isEqual(requestUrl.query(), digestUrl.query())
+        : isEqual(requestUrl.path(), digestUrl.path());
 }
 
 Qn::AuthResult QnAuthHelper::doDigestAuth(

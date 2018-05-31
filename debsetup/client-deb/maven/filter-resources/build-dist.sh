@@ -171,7 +171,7 @@ buildDistribution()
         cp -P @qt.dir@/lib/$qtlib* $LIBSTAGE
     done
 
-    cp_sys_lib "$LIBSTAGE" libstdc++.so.6 libgcc_s.so.1
+    cp_sys_lib "$LIBSTAGE" @cpp_runtime_libs_string@
 
     if [ '@arch@' != 'arm' ]
     then

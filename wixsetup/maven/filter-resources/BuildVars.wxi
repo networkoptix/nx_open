@@ -2,7 +2,7 @@
     <?ifndef includeGuard?>
         <?define includeGuard="BuildWars.wxi"?>
 
-        <?define installerLanguage="${installer.language}"?>
+        <?define installerLanguage="${installerLanguage}"?>
         <?define companyName="${company.name}"?>
         <?define ServerRegPath="Software\${company.name}\${mediaserver.name}"?>
         <?define ProductTitle="${product.title}"?>
@@ -95,5 +95,7 @@
         <?define VC14RedistPath="${VC14RedistPath}"?>
         <?define paxtonDirId = "$(var.customization)_$(var.releaseVersionFull)_Paxton"?>
         <?define enable_hanwha = "${enable_hanwha}"?>
+
+        <?define eulaVersion = "${eulaVersion}"?>
      <?endif?>
 </Include>

@@ -29,16 +29,18 @@ def determine_package_versions():
 
     if platform == "windows":
         v["qt"] = "5.6.1-1"
+        v["ffmpeg"] = "3.1.9"
 
     if platform == "linux" and box == "none":
         v["qt"] = "5.6.2-2"
         v["festival"] = "2.4-1"
         v["festival-vox"] = "2.4"
         v["sysroot"] = "xenial"
+        v["ffmpeg"] = "3.1.9"
 
     if platform == "macosx":
         v["qt"] = "5.6.3"
-        v["ffmpeg"] = "3.1.1-2"
+        v["ffmpeg"] = "3.1.9"
         v["openssl"] = "1.0.2e-2"
         v["festival"] = "2.1"
 
@@ -86,7 +88,7 @@ def determine_package_versions():
 
 def sync_dependencies(syncher):
     def sync(package, **kwargs):
-        return syncher.sync(package, **kwargs)
+        return syncher.sync(package, use_local=not rdepSync, **kwargs)
 
     sync("qt", path_variable="QT_DIR")
     sync("any/boost")
@@ -131,7 +133,7 @@ def sync_dependencies(syncher):
         sync("windows/signtool", path_variable="signtool_directory")
 
     if box == "edge1":
-        sync("cpro-1.0.0-1")
+        sync("cpro-1.0.0-2")
         sync("gdb")
 
     if arch == "x64":
@@ -156,7 +158,7 @@ def sync_dependencies(syncher):
         sync("any/nx_storage_sdk-1.7.1")
         sync("sigar")
 
-        sync("any/apidoctool", path_variable="APIDOCTOOL_PATH")
+        sync("any/apidoctool-2.0", path_variable="APIDOCTOOL_PATH")
 
         if customWebAdminPackageDirectory:
             pass
@@ -176,19 +178,24 @@ def sync_dependencies(syncher):
         sync("linux/doxygen", path_variable="doxygen_directory")
 
     if box == "bpi":
-        sync("libvdpau-sunxi-1.0-deb7")
+        # Lite Client dependencies.
+        #sync("fontconfig-2.11.0")
+        #sync("additional-fonts")
+        #sync("read-edid-3.0.2")
+        #sync("a10-display")
+        
+        # Hardware video decoding in Lite Client on Debian 7; kernel upgrade.
+        #sync("libvdpau-sunxi-1.0-deb7")
+        #sync("ldpreloadhook-1.0-deb7")
+        #sync("libpixman-0.34.0-deb7")
+        #sync("libcedrus-1.0-deb7")
+        #sync("uboot-2014.04-10733-gbb5691c-dirty-vanilla")
+
+        # Required to build Lite Client with proxy-decoder support.
         sync("proxy-decoder-deb7")
-        sync("ldpreloadhook-1.0-deb7")
-        sync("libpixman-0.34.0-deb7")
-        sync("libcedrus-1.0-deb7")
 
-        sync("fontconfig-2.11.0")
-        sync("additional-fonts")
+        # Required for ffmpeg.
         sync("libvdpau-1.0.4.1")
-
-        sync("read-edid-3.0.2")
-        sync("a10-display")
-        sync("uboot-2014.04-10733-gbb5691c-dirty-vanilla")
 
     sync("any/certificates-" + customization, path_variable="certificates_path")
     sync("any/root-certificates", path_variable="root_certificates_path")

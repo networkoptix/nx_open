@@ -31,16 +31,16 @@ class Rule(object):
 
 # https://networkoptix.atlassian.net/browse/UT-46
 # https://networkoptix.atlassian.net/wiki/spaces/SD/pages/85204446/Cloud+test
-def test_events_reset(running_linux_server):
-    rule_dict_list = running_linux_server.api.ec2.getEventRules.GET()
+def test_events_reset(one_running_mediaserver):
+    rule_dict_list = one_running_mediaserver.api.ec2.getEventRules.GET()
     log.info('Initially server has %d event rules:', len(rule_dict_list))
     initial_rule_list = {
         rule.id: rule for rule in map(Rule.from_dict, rule_dict_list)}
     for rule in initial_rule_list:
         log.info('\t%s' % rule)
     log.info('Resetting rules...')
-    running_linux_server.api.ec2.resetEventRules.POST(json={})
-    rule_dict_list = running_linux_server.api.ec2.getEventRules.GET()
+    one_running_mediaserver.api.ec2.resetEventRules.POST(json={})
+    rule_dict_list = one_running_mediaserver.api.ec2.getEventRules.GET()
     log.info('After reset server has %d event rules:', len(rule_dict_list))
     final_rule_list = {
         rule.id: rule for rule in map(Rule.from_dict, rule_dict_list)}
@@ -49,4 +49,4 @@ def test_events_reset(running_linux_server):
     assert sorted(initial_rule_list.keys()) == sorted(final_rule_list)
     for id, initial_rule in initial_rule_list.items():
         assert final_rule_list[id] == initial_rule
-    assert not running_linux_server.installation.list_core_dumps()
+    assert not one_running_mediaserver.installation.list_core_dumps()

@@ -53,11 +53,6 @@
       <translation>למערכת %1 שהתגלתה יש גרסה שאינה תואמת %2.</translation>
     </message>
     <message>
-      <source>Cannot connect to the other System because current System is already connected to %1.</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-      <translation>אין אפשרות להתחבר למערכת השנייה מפני שהמערכת הנוכחית כבר מחוברת ל- %1.</translation>
-    </message>
-    <message>
       <source>The discovered System %1 is in safe mode.</source>
       <comment>%1 is name of System</comment>
       <translation>המערכת %1 שהתגלתה נמצאת במצב בטוח.</translation>
@@ -66,16 +61,6 @@
       <source>Could not configure the remote System %1.</source>
       <comment>%1 is name of System</comment>
       <translation>לא ניתן להגדיר את המערכת מרחוק %1.</translation>
-    </message>
-    <message>
-      <source>Both Systems are connected to %1. Merge is not allowed.</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-      <translation>שתי המערכות מחוברות ל- %1. המיזוג אסור.</translation>
-    </message>
-    <message>
-      <source>These Systems are built with different %1 URL. Merge is not allowed.</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-      <translation>מערכות אלה בנויות עם כתובת אתר שונה של %1. המיזוג אסור.</translation>
     </message>
     <message>
       <source>New System</source>
@@ -87,9 +72,24 @@
       <translation>מערכת %1 שהתגלתה אינה תואמת למערכת הנוכחית.</translation>
     </message>
     <message>
+      <source>Cannot connect to the other System because current System is already connected to %1.</source>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
+      <translation>אין אפשרות להתחבר למערכת השנייה מפני שהמערכת הנוכחית כבר מחוברת ל- %1.</translation>
+    </message>
+    <message>
       <source>%1 System can only be merged with non-%1. System name and password are taken from %1 System.</source>
-      <comment>%1 is the short cloud name (like &apos;Cloud&apos;)</comment>
+      <comment>%1 is the short cloud name (like Cloud)</comment>
       <translation>%1 המערכת יכולה להיות ממוזגת רק עם לא%1. שם המערכת והסיסמה נלקחים מתוך %1 מערכת.</translation>
+    </message>
+    <message>
+      <source>Both Systems are connected to %1. Merge is not allowed.</source>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
+      <translation>שתי המערכות מחוברות ל- %1. המיזוג אסור.</translation>
+    </message>
+    <message>
+      <source>These Systems are built with different %1 URL. Merge is not allowed.</source>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
+      <translation>מערכות אלה בנויות עם כתובת אתר שונה של %1. המיזוג אסור.</translation>
     </message>
   </context>
   <context>
@@ -589,7 +589,7 @@
       <translation>שגיאה לא מוכרת</translation>
     </message>
     <message>
-      <source>Server with matching Hardware Id not found</source>
+      <source>Server with matching Hardware ID not found</source>
       <translation>לא נמצא שרת עם מזהה חומרה תואם</translation>
     </message>
   </context>
@@ -724,12 +724,12 @@
       <translation>סימן מים: %1</translation>
     </message>
     <message>
-      <source>Hardware Id: %1</source>
-      <translation>מזהה חומרה: %1</translation>
-    </message>
-    <message>
       <source>Time License</source>
       <translation>רישיון זמני</translation>
+    </message>
+    <message>
+      <source>Hardware ID: %1</source>
+      <translation>מזהה חומרה: %1</translation>
     </message>
   </context>
   <context>

@@ -3,15 +3,15 @@
 #include <iostream>
 #include <chrono>
 
-#define NX_PRINT_PREFIX (std::string("[") + this->plugin()->name() + " CameraManager] ")
+#define NX_PRINT_PREFIX (this->utils.printPrefix)
 #include <nx/kit/debug.h>
 
 #include <nx/sdk/metadata/common_metadata_packet.h>
 #include <nx/sdk/metadata/common_object.h>
+#include <nx/mediaserver_plugins/utils/uuid.h>
 
 #include "tegra_video_metadata_plugin_ini.h"
 #include "attribute_options.h"
-#include <nx/mediaserver_plugins/utils/uuid.h>
 
 namespace nx {
 namespace mediaserver_plugins {
@@ -32,12 +32,12 @@ static const QnUuid kHumanUuid("{58AE392F-8516-4B27-AEE1-311139B5A37A}");
 using namespace nx::sdk;
 using namespace nx::sdk::metadata;
 
-CameraManager::CameraManager(Plugin* plugin): CommonVideoFrameProcessingCameraManager(plugin)
+CameraManager::CameraManager(Plugin* plugin):
+    CommonVideoFrameProcessingCameraManager(plugin, NX_DEBUG_ENABLE_OUTPUT)
 {
     NX_PRINT << __func__ << "() BEGIN -> " << this;
 
     ini().reload();
-    setEnableOutput(NX_DEBUG_ENABLE_OUTPUT); //< Base class is verbose when this descendant is.
 
     m_tegraVideo.reset(tegraVideoCreate());
     if (!m_tegraVideo)
@@ -97,7 +97,7 @@ std::string CameraManager::capabilitiesManifest()
     )manifest";
 }
 
-bool CameraManager::pushCompressedFrame(const CommonCompressedVideoPacket* videoPacket)
+bool CameraManager::pushCompressedFrame(const CompressedVideoPacket* videoPacket)
 {
     TegraVideo::CompressedFrame compressedFrame;
     compressedFrame.dataSize = videoPacket->dataSize();
@@ -131,7 +131,7 @@ bool CameraManager::pullRectsForFrame(std::vector<TegraVideo::Rect>* rects, int6
     return true;
 }
 
-bool CameraManager::pushCompressedVideoFrame(const CommonCompressedVideoPacket* videoFrame)
+bool CameraManager::pushCompressedVideoFrame(const CompressedVideoPacket* videoFrame)
 {
     if (!pushCompressedFrame(videoFrame))
         return false;

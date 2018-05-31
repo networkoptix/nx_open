@@ -73,6 +73,9 @@ using namespace nx;
 using namespace nx::client::desktop;
 using namespace nx::client::desktop::ui;
 
+using nx::vms::api::EventType;
+using nx::vms::api::ActionType;
+
 namespace {
 
 static const QSize kDefaultThumbnailSize(224, 0);
@@ -286,7 +289,7 @@ void QnNotificationsCollectionWidget::loadThumbnailForItem(
         ? Qn::ViewLivePermission
         : Qn::ViewFootagePermission;
 
-    QnMultiImageProvider::Providers providers;
+    MultiImageProvider::Providers providers;
     for (const auto& camera: cameraList)
     {
         NX_ASSERT(accessController()->hasPermissions(camera, Qn::ViewContentPermission));
@@ -299,7 +302,7 @@ void QnNotificationsCollectionWidget::loadThumbnailForItem(
         request.camera = camera;
         request.usecSinceEpoch = microseconds(milliseconds(msecSinceEpoch)).count();
         request.size = kDefaultThumbnailSize;
-        std::unique_ptr<QnImageProvider> provider(new CameraThumbnailProvider(request));
+        std::unique_ptr<ImageProvider> provider(new CameraThumbnailProvider(request));
 
         providers.push_back(std::move(provider));
     }
@@ -307,7 +310,7 @@ void QnNotificationsCollectionWidget::loadThumbnailForItem(
     if (providers.empty())
         return;
 
-    item->setImageProvider(new QnMultiImageProvider(std::move(providers), Qt::Vertical, kMultiThumbnailSpacing, item));
+    item->setImageProvider(new MultiImageProvider(std::move(providers), Qt::Vertical, kMultiThumbnailSpacing, item));
 }
 
 void QnNotificationsCollectionWidget::addAcknoledgeButtonIfNeeded(
@@ -315,7 +318,7 @@ void QnNotificationsCollectionWidget::addAcknoledgeButtonIfNeeded(
     const QnVirtualCameraResourcePtr& camera,
     const nx::vms::event::AbstractActionPtr& action)
 {
-    if (action->actionType() != vms::event::ActionType::showPopupAction)
+    if (action->actionType() != vms::api::ActionType::showPopupAction)
     {
         NX_ASSERT(false, "Invalid action type.");
         return;
@@ -409,7 +412,7 @@ void QnNotificationsCollectionWidget::showEventAction(const vms::event::Abstract
     vms::event::EventParameters params = action->getRuntimeParams();
     NX_ASSERT(QnBusiness::hasAccessToSource(params, context()->user())); //< Checked already.
 
-    vms::event::EventType eventType = params.eventType;
+    vms::api::EventType eventType = params.eventType;
     QnUuid ruleId = action->getRuleId();
     QString title = m_helper->eventAtResource(params, qnSettings->extraInfoInTree());
     qint64 timestampMs = params.eventTimestampUsec / 1000;
@@ -426,7 +429,7 @@ void QnNotificationsCollectionWidget::showEventAction(const vms::event::Abstract
     const bool hasViewPermission = resource && accessController()->hasPermissions(resource,
         Qn::ViewContentPermission);
 
-    if (action->actionType() == vms::event::showOnAlarmLayoutAction)
+    if (action->actionType() == ActionType::showOnAlarmLayoutAction)
     {
         if (alarmCameras.isEmpty())
             return;
@@ -434,7 +437,7 @@ void QnNotificationsCollectionWidget::showEventAction(const vms::event::Abstract
         auto findItemPredicate =
             [timestampMs](QnNotificationWidget* item)
             {
-                return item->property(kItemActionTypePropertyName) == vms::event::showOnAlarmLayoutAction
+                return item->property(kItemActionTypePropertyName) == ActionType::showOnAlarmLayoutAction
                     && item->property(kItemTimeStampPropertyName) == timestampMs;
             };
 
@@ -448,8 +451,8 @@ void QnNotificationsCollectionWidget::showEventAction(const vms::event::Abstract
         vms::event::AggregationInfo(), qnSettings->extraInfoInTree());
 
     // TODO: #GDM #3.1 move this code to ::eventDetails()
-    if (eventType == vms::event::licenseIssueEvent
-        && params.reasonCode == vms::event::EventReason::licenseRemoved)
+    if (eventType == EventType::licenseIssueEvent
+        && params.reasonCode == vms::api::EventReason::licenseRemoved)
     {
         QStringList disabledCameras;
         for (const QString& stringId: params.description.split(L';'))
@@ -476,7 +479,7 @@ void QnNotificationsCollectionWidget::showEventAction(const vms::event::Abstract
     switch (action->actionType())
     {
         // TODO: #GDM not the best place for it.
-        case vms::event::playSoundAction:
+        case ActionType::playSoundAction:
         {
             QString soundUrl = action->getParams().url;
             m_itemsByLoadingSound.insert(soundUrl, item);
@@ -489,7 +492,7 @@ void QnNotificationsCollectionWidget::showEventAction(const vms::event::Abstract
 
     QIcon icon = iconForAction(action);
 
-    if (action->actionType() == vms::event::showOnAlarmLayoutAction)
+    if (action->actionType() == ActionType::showOnAlarmLayoutAction)
     {
         item->addActionButton(
             icon,
@@ -502,9 +505,9 @@ void QnNotificationsCollectionWidget::showEventAction(const vms::event::Abstract
     {
         switch (eventType)
         {
-            case vms::event::cameraMotionEvent:
-            case vms::event::softwareTriggerEvent:
-            case vms::event::analyticsSdkEvent:
+            case EventType::cameraMotionEvent:
+            case EventType::softwareTriggerEvent:
+            case EventType::analyticsSdkEvent:
             {
                 NX_ASSERT(hasViewPermission);
                 item->addActionButton(
@@ -516,7 +519,7 @@ void QnNotificationsCollectionWidget::showEventAction(const vms::event::Abstract
                 break;
             }
 
-            case vms::event::cameraInputEvent:
+            case EventType::cameraInputEvent:
             {
                 NX_ASSERT(hasViewPermission);
                 item->addActionButton(
@@ -528,8 +531,8 @@ void QnNotificationsCollectionWidget::showEventAction(const vms::event::Abstract
                 break;
             }
 
-            case vms::event::cameraDisconnectEvent:
-            case vms::event::networkIssueEvent:
+            case EventType::cameraDisconnectEvent:
+            case EventType::networkIssueEvent:
             {
                 NX_ASSERT(hasViewPermission);
                 item->addActionButton(
@@ -541,10 +544,10 @@ void QnNotificationsCollectionWidget::showEventAction(const vms::event::Abstract
                 break;
             }
 
-            case vms::event::storageFailureEvent:
-            case vms::event::backupFinishedEvent:
-            case vms::event::serverStartEvent:
-            case vms::event::serverFailureEvent:
+            case EventType::storageFailureEvent:
+            case EventType::backupFinishedEvent:
+            case EventType::serverStartEvent:
+            case EventType::serverFailureEvent:
             {
                 NX_ASSERT(hasViewPermission);
                 item->addActionButton(
@@ -554,7 +557,7 @@ void QnNotificationsCollectionWidget::showEventAction(const vms::event::Abstract
                 break;
             }
 
-            case vms::event::cameraIpConflictEvent:
+            case EventType::cameraIpConflictEvent:
             {
                 QString webPageAddress = params.caption;
                 item->addActionButton(
@@ -564,13 +567,13 @@ void QnNotificationsCollectionWidget::showEventAction(const vms::event::Abstract
                 break;
             }
 
-            case vms::event::serverConflictEvent:
+            case EventType::serverConflictEvent:
             {
                 item->addActionButton(icon);
                 break;
             }
 
-            case vms::event::licenseIssueEvent:
+            case EventType::licenseIssueEvent:
             {
                 item->addActionButton(
                     icon,
@@ -578,7 +581,7 @@ void QnNotificationsCollectionWidget::showEventAction(const vms::event::Abstract
                 break;
             }
 
-            case vms::event::userDefinedEvent:
+            case EventType::userDefinedEvent:
             {
                 auto sourceCameras = resourcePool()->getResourcesByIds<QnVirtualCameraResource>(
                     params.metadata.cameraRefs);
@@ -601,7 +604,7 @@ void QnNotificationsCollectionWidget::showEventAction(const vms::event::Abstract
         }
     }
 
-    if (action->actionType() == vms::event::showPopupAction && camera)
+    if (action->actionType() == ActionType::showPopupAction && camera)
         addAcknoledgeButtonIfNeeded(item, camera, action);
 
     m_itemsByEventRuleId.insert(ruleId, item);
@@ -616,7 +619,7 @@ void QnNotificationsCollectionWidget::showEventAction(const vms::event::Abstract
     connect(item, &QnNotificationWidget::actionTriggered, this,
         &QnNotificationsCollectionWidget::at_item_actionTriggered, Qt::QueuedConnection);
 
-    const bool isPlaySoundAction = action->actionType() == vms::event::playSoundAction;
+    const bool isPlaySoundAction = action->actionType() == ActionType::playSoundAction;
 
     const bool isLockedItem = isPlaySoundAction || !item->isCloseButtonAvailable();
     m_list->addItem(item, isLockedItem);
@@ -634,7 +637,7 @@ void QnNotificationsCollectionWidget::hideEventAction(const vms::event::Abstract
 
     QnUuid ruleId = action->getRuleId();
 
-    if (action->actionType() == vms::event::playSoundAction)
+    if (action->actionType() == ActionType::playSoundAction)
     {
         for (QnNotificationWidget* item: m_itemsByEventRuleId.values(ruleId))
             cleanUpItem(item);
@@ -680,16 +683,16 @@ QnNotificationWidget* QnNotificationsCollectionWidget::findItem(const QnUuid& Ru
 
 QIcon QnNotificationsCollectionWidget::iconForAction(const vms::event::AbstractActionPtr& action) const
 {
-    if (action->actionType() == vms::event::playSoundAction)
+    if (action->actionType() == ActionType::playSoundAction)
         return qnSkin->icon("events/sound.png");
 
-    if (action->actionType() == vms::event::showOnAlarmLayoutAction)
+    if (action->actionType() == ActionType::showOnAlarmLayoutAction)
         return qnSkin->icon("events/alarm.png");
 
     auto params = action->getRuntimeParams();
-    vms::event::EventType eventType = params.eventType;
+    vms::api::EventType eventType = params.eventType;
 
-    if (eventType >= vms::event::userDefinedEvent)
+    if (eventType >= EventType::userDefinedEvent)
     {
         auto camList = resourcePool()->getResourcesByIds<QnVirtualCameraResource>(
             params.metadata.cameraRefs);
@@ -701,12 +704,12 @@ QIcon QnNotificationsCollectionWidget::iconForAction(const vms::event::AbstractA
 
     switch (eventType)
     {
-        case vms::event::cameraMotionEvent:
-        case vms::event::cameraInputEvent:
-        case vms::event::cameraDisconnectEvent:
-        case vms::event::cameraIpConflictEvent:
-        case vms::event::networkIssueEvent:
-        case vms::event::analyticsSdkEvent:
+        case EventType::cameraMotionEvent:
+        case EventType::cameraInputEvent:
+        case EventType::cameraDisconnectEvent:
+        case EventType::cameraIpConflictEvent:
+        case EventType::networkIssueEvent:
+        case EventType::analyticsSdkEvent:
         {
             auto resource = resourcePool()->getResourceById(params.eventResourceId);
             return resource
@@ -714,23 +717,23 @@ QIcon QnNotificationsCollectionWidget::iconForAction(const vms::event::AbstractA
                 : qnResIconCache->icon(QnResourceIconCache::Camera);
         }
 
-        case vms::event::softwareTriggerEvent:
+        case EventType::softwareTriggerEvent:
         {
             return QnSoftwareTriggerPixmaps::colorizedPixmap(
                 action->getRuntimeParams().description,
                 palette().color(QPalette::WindowText));
         }
 
-        case vms::event::storageFailureEvent:
+        case EventType::storageFailureEvent:
             return qnSkin->icon("events/storage.png");
 
-        case vms::event::serverStartEvent:
-        case vms::event::serverFailureEvent:
-        case vms::event::serverConflictEvent:
-        case vms::event::backupFinishedEvent:
+        case EventType::serverStartEvent:
+        case EventType::serverFailureEvent:
+        case EventType::serverConflictEvent:
+        case EventType::backupFinishedEvent:
             return qnResIconCache->icon(QnResourceIconCache::Server);
 
-        case vms::event::licenseIssueEvent:
+        case EventType::licenseIssueEvent:
             return qnSkin->icon("events/license.png");
 
         default:

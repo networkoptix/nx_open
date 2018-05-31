@@ -1,8 +1,0 @@
-Hello,
-
-  Please open the link below to confirm your email address and activate the account.
-
-{{config.portal_url}}/activate/{{message.code}}
-
-Se si non registra {{PRODUCT_NAME}}, basta ignorare questa email.
-Do not share the message or the link with anyone.

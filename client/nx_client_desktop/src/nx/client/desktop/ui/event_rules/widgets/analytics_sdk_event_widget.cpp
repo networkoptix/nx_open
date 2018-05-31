@@ -12,6 +12,8 @@
 #include <ui/workaround/widgets_signals_workaround.h>
 
 #include <utils/common/scoped_value_rollback.h>
+#include <ui/help/help_topics.h>
+#include <ui/help/help_topic_accessor.h>
 
 namespace nx {
 namespace client {
@@ -37,11 +39,17 @@ AnalyticsSdkEventWidget::AnalyticsSdkEventWidget(QWidget* parent):
     connect(ui->sdkEventTypeComboBox, QnComboboxCurrentIndexChanged, this,
         &AnalyticsSdkEventWidget::paramsChanged);
 
-    const QString description = tr("Event will trigger only if Analytics Event meets all the above conditions. "
-        "If a keyword field is empty, condition is always met. "
-        "If not, condition is met if the corresponding field of Analytics Event contains any keyword.");
+    ui->sdkEventTypeLabel->addHintLine(tr("Analytics events can be set up on a certain cameras."));
+    ui->sdkEventTypeLabel->addHintLine(tr("Choose cameras using the button above to see the list of supported events."));
+    setHelpTopic(ui->sdkEventTypeLabel, Qn::EventsActions_VideoAnalytics_Help);
 
-    ui->hintLabel->setText(description);
+    ui->captionLabel->addHintLine(tr("Event will trigger only if there are matches in caption with any of entered keywords."));
+    ui->captionLabel->addHintLine(tr("If the field is empty, event will always trigger."));
+    setHelpTopic(ui->captionLabel, Qn::EventsActions_VideoAnalytics_Help);
+
+    ui->descriptionLabel->addHintLine(tr("Event will trigger only if there are matches in the description field with any of the entered keywords."));
+    ui->descriptionLabel->addHintLine(tr("If the field is empty, event will always trigger."));
+    setHelpTopic(ui->descriptionLabel, Qn::EventsActions_VideoAnalytics_Help);
 }
 
 AnalyticsSdkEventWidget::~AnalyticsSdkEventWidget()
@@ -117,25 +125,17 @@ void AnalyticsSdkEventWidget::updateSelectedEventType()
         model()->setEventParams(createEventParameters(driverId, eventTypeId));
     }
 
-    int index = 0;
-    for (int i = 0; i < ui->sdkEventTypeComboBox->count(); ++i)
-    {
-        auto itemDriverId = ui->sdkEventTypeComboBox->itemData(i,
-            AnalyticsSdkEventModel::DriverIdRole).value<QnUuid>();
+    auto analyticsModel = ui->sdkEventTypeComboBox->model();
 
-        if (itemDriverId != driverId)
-            continue;
+    auto items = analyticsModel->match(
+        analyticsModel->index(0, 0),
+        AnalyticsSdkEventModel::EventTypeIdRole,
+        /*value*/ qVariantFromValue(eventTypeId),
+        /*hits*/ 1,
+        Qt::MatchExactly | Qt::MatchRecursive);
 
-        auto itemEventTypeId = ui->sdkEventTypeComboBox->itemData(i,
-            AnalyticsSdkEventModel::EventTypeIdRole).value<QnUuid>();
-        if (itemEventTypeId != eventTypeId)
-            continue;
-
-        index = i;
-        break;
-    }
-
-    ui->sdkEventTypeComboBox->setCurrentIndex(index);
+    if (items.size() == 1)
+        ui->sdkEventTypeComboBox->setCurrentIndex(items.front());
 }
 
 nx::vms::event::EventParameters AnalyticsSdkEventWidget::createEventParameters(

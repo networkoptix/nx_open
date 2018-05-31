@@ -16,9 +16,9 @@ LOG_LEVELS = {
 
 
 @pytest.mark.parametrize('level', LOG_LEVELS.keys())
-def test_set_level_in_configuration(running_linux_server, level):
-    running_linux_server.stop()
-    running_linux_server.installation.update_mediaserver_conf({'logLevel': level})
-    running_linux_server.start()
-    assert running_linux_server.api.get('api/logLevel', params={'id': 0}) == LOG_LEVELS[level].api_request
-    assert not running_linux_server.installation.list_core_dumps()
+def test_set_level_in_configuration(one_running_mediaserver, level):
+    one_running_mediaserver.stop()
+    one_running_mediaserver.installation.update_mediaserver_conf({'logLevel': level})
+    one_running_mediaserver.start()
+    assert one_running_mediaserver.api.get('api/logLevel', params={'id': 0}) == LOG_LEVELS[level].api_request
+    assert not one_running_mediaserver.installation.list_core_dumps()

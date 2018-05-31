@@ -11,7 +11,7 @@
 
 static const int TESTCAM_TIMEOUT = 5 * 1000;
 
-QnTestCameraStreamReader::QnTestCameraStreamReader(const QnResourcePtr& res):
+QnTestCameraStreamReader::QnTestCameraStreamReader(const QnTestCameraResourcePtr& res):
     CLServerPushStreamReader(res)
 {
     m_tcpSock = nx::network::SocketFactory::createStreamSocket();

@@ -343,19 +343,17 @@ QString QnUserResource::fullName() const
     return result.isNull() ? m_fullName : result;
 }
 
-ec2::ApiResourceParamWithRefDataList QnUserResource::params() const
+nx::vms::api::ResourceParamWithRefDataList QnUserResource::params() const
 {
-    ec2::ApiResourceParamWithRefDataList result;
+    nx::vms::api::ResourceParamWithRefDataList result;
     QString value;
     if (commonModule())
         value = commonModule()->propertyDictionary()->value(getId(), Qn::USER_FULL_NAME);
     if (value.isEmpty() && !fullName().isEmpty() && isCloud())
         value = fullName(); //< move fullName to property dictionary to sync data with cloud correctly
     if (!value.isEmpty())
-    {
-        ec2::ApiResourceParamWithRefData param(getId(), Qn::USER_FULL_NAME, value);
-        result.push_back(param);
-    }
+        result.emplace_back(getId(), Qn::USER_FULL_NAME, value);
+
     return result;
 }
 

@@ -12,10 +12,10 @@ namespace nx {
 namespace client {
 namespace desktop {
 
-class CameraThumbnailProvider: public QnImageProvider, public QnConnectionContextAware
+class CameraThumbnailProvider: public ImageProvider, public QnConnectionContextAware
 {
     Q_OBJECT
-    using base_type = QnImageProvider;
+    using base_type = ImageProvider;
 
 public:
     explicit CameraThumbnailProvider(const api::CameraImageRequest& request,

@@ -141,12 +141,6 @@ ConnectionGuardSharedState* TransactionMessageBusStub::connectionGuardSharedStat
     return nullptr;
 }
 
-detail::QnDbManager* TransactionMessageBusStub::getDb() const
-{
-    // TODO
-    return nullptr;
-}
-
 void TransactionMessageBusStub::setTimeSyncManager(
     TimeSynchronizationManager* /*timeSyncManager*/)
 {

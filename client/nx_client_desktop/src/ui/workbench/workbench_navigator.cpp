@@ -79,6 +79,7 @@ extern "C"
 #include "workbench_item.h"
 #include "workbench_layout.h"
 
+using namespace nx::client::desktop;
 using namespace nx::client::desktop::ui;
 
 namespace {
@@ -109,30 +110,7 @@ QnWorkbenchNavigator::QnWorkbenchNavigator(QObject *parent):
     base_type(parent),
     QnWorkbenchContextAware(parent),
     m_streamSynchronizer(context()->instance<QnWorkbenchStreamSynchronizer>()),
-    m_timeSlider(NULL),
-    m_timeScrollBar(NULL),
-    m_calendar(NULL),
-    m_dayTimeWidget(NULL),
-    m_centralWidget(NULL),
-    m_currentWidget(NULL),
-    m_currentMediaWidget(NULL),
-    m_currentWidgetFlags(0),
-    m_currentWidgetLoaded(false),
-    m_sliderDataInvalid(false),
-    m_updatingSliderFromReader(false),
-    m_updatingSliderFromScrollBar(false),
-    m_updatingScrollBarFromSlider(false),
-    m_lastLive(false),
-    m_lastLiveSupported(false),
-    m_lastPlaying(false),
-    m_lastPlayingSupported(false),
-    m_pausedOverride(false),
-    m_preciseNextSeek(false),
-    m_autoPaused(false),
-    m_lastSpeed(0.0),
     m_lastSpeedRange(0.0, 0.0),
-    m_lastAdjustTimelineToPosition(false),
-    m_timelineRelevant(false),
     m_startSelectionAction(new QAction(this)),
     m_endSelectionAction(new QAction(this)),
     m_clearSelectionAction(new QAction(this)),
@@ -140,16 +118,7 @@ QnWorkbenchNavigator::QnWorkbenchNavigator(QObject *parent):
         new nx::utils::PendingOperation(
             [this]{ updateSliderBookmarks(); },
             kUpdateBookmarksInterval,
-            this)),
-    m_cameraDataManager(NULL),
-    m_chunkMergingProcessHandle(0),
-    m_hasArchive(false),
-    m_isRecording(false),
-    m_recordingStartUtcMs(0),
-    m_animatedPosition(0),
-    m_previousMediaPosition(0),
-    m_positionAnimator(nullptr),
-    m_mergedTimePeriods()
+            this))
 {
     m_updateSliderTimer.restart();
 

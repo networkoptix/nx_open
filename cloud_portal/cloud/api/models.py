@@ -60,3 +60,17 @@ class Account(PermissionsMixin):
     short_email.short_description = "email"
     short_first_name.short_description = "first name"
     short_last_name.short_description = "last name"
+
+
+class AccountLoginHistory(models.Model):
+    action = models.CharField(max_length=64)
+    ip = models.GenericIPAddressField(null=True)
+    email = models.CharField(max_length=256, null=True)
+    date = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        verbose_name = 'Authentication log record'
+        verbose_name_plural = 'Authentication log'
+
+    def __unicode__(self):
+        return '{0} - {1} - {2}'.format(self.action, self.username, self.ip)

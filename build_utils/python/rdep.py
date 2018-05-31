@@ -110,12 +110,16 @@ class Rdep:
             show_progress = True,
             additional_args = []):
 
-        command = [ self._config.get_rsync("rsync") ]
-        command.append("--archive")
-        command.append("--delete")
+        command = [
+            self._config.get_rsync("rsync"),
+            "--recursive",
+            "--delete",
+            "--links",
+            "--times"
+        ]
 
-        if OS_IS_WINDOWS:
-            command.append("--chmod=ugo=rwx")
+        if not OS_IS_WINDOWS:
+            command.append("--perms")
 
         if show_progress:
             command.append("--progress")
@@ -217,7 +221,8 @@ class Rdep:
         dst_config_file = os.path.join(dst, PackageConfig.FILE_NAME)
         self._verbose_message("Moving {0} to {1}".format(
                 config_file, dst_config_file))
-        shutil.move(config_file, dst_config_file)
+        shutil.copy(config_file, dst_config_file)
+        os.remove(config_file)
 
         return self.SYNC_SUCCESS
 

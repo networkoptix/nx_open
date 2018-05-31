@@ -354,7 +354,7 @@ a.disabled {
 }
 td{
     &.user-name{
-      max-width: 200px;
+      max-width: 175px;
     }
     &.user-email{
       @include ellipsis;
@@ -626,7 +626,6 @@ h1.process-success{
     margin-bottom:8px;
     margin-top:0;
     .installer-name{
-        display:block;
         font-weight: normal;
     }
     .media-body{

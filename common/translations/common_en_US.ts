@@ -2,6 +2,17 @@
 <!DOCTYPE TS>
 <TS version="2.1" language="en_US" sourcelanguage="en">
 <context>
+    <name>DateTimeFormats</name>
+    <message>
+        <source>dd/MM</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>MMMM yyyy</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>Language</name>
     <message>
         <source>Language Name</source>
@@ -53,11 +64,6 @@
         <translation></translation>
     </message>
     <message>
-        <source>Cannot connect to the other System because current System is already connected to %1.</source>
-        <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-        <translation></translation>
-    </message>
-    <message>
         <source>The discovered System %1 is in safe mode.</source>
         <comment>%1 is name of System</comment>
         <translation></translation>
@@ -65,16 +71,6 @@
     <message>
         <source>Could not configure the remote System %1.</source>
         <comment>%1 is name of System</comment>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Both Systems are connected to %1. Merge is not allowed.</source>
-        <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-        <translation></translation>
-    </message>
-    <message>
-        <source>These Systems are built with different %1 URL. Merge is not allowed.</source>
-        <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
         <translation></translation>
     </message>
     <message>
@@ -87,8 +83,23 @@
         <translation></translation>
     </message>
     <message>
+        <source>Cannot connect to the other System because current System is already connected to %1.</source>
+        <comment>%1 is the cloud name (like Nx Cloud)</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>%1 System can only be merged with non-%1. System name and password are taken from %1 System.</source>
-        <comment>%1 is the short cloud name (like &apos;Cloud&apos;)</comment>
+        <comment>%1 is the short cloud name (like Cloud)</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Both Systems are connected to %1. Merge is not allowed.</source>
+        <comment>%1 is the cloud name (like Nx Cloud)</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>These Systems are built with different %1 URL. Merge is not allowed.</source>
+        <comment>%1 is the cloud name (like Nx Cloud)</comment>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -581,8 +592,8 @@
         <translation></translation>
     </message>
     <message>
-        <source>Server with matching Hardware Id not found</source>
-        <translation></translation>
+        <source>Server with matching Hardware ID not found</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -704,73 +715,12 @@
         <translation></translation>
     </message>
     <message>
-        <source>Hardware Id: %1</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>Time License</source>
         <translation></translation>
     </message>
-</context>
-<context>
-    <name>QnStreamQualityStrings</name>
     <message>
-        <source>Lowest</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Low</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Medium</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>High</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Best</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Preset</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Undefined</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Lst</source>
-        <extracomment>Short for &apos;Lowest&apos;</extracomment>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Lo</source>
-        <extracomment>Short for &apos;Low&apos;</extracomment>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Me</source>
-        <extracomment>Short for &apos;Medium&apos;</extracomment>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Hi</source>
-        <extracomment>Short for &apos;High&apos;</extracomment>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Bst</source>
-        <extracomment>Short for &apos;Best&apos;</extracomment>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Ps</source>
-        <extracomment>Short for &apos;Preset&apos;</extracomment>
-        <translation></translation>
+        <source>Hardware ID: %1</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -998,10 +948,6 @@
         </translation>
     </message>
     <message>
-        <source>Storage Failure</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>Network Issue</source>
         <translation></translation>
     </message>
@@ -1105,10 +1051,6 @@
     </message>
     <message>
         <source>Motion on %1</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Storage Failure at %1</source>
         <translation></translation>
     </message>
     <message>
@@ -1405,6 +1347,14 @@
     </message>
     <message>
         <source>Open layout</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Storage Issue</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Storage Issue at %1</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

@@ -10,7 +10,7 @@
 class QnAxisStreamReader: public CLServerPushStreamReader
 {
 public:
-    QnAxisStreamReader(const QnResourcePtr& res);
+    QnAxisStreamReader(const QnPlAxisResourcePtr& res);
     virtual ~QnAxisStreamReader();
 
     virtual QnConstResourceAudioLayoutPtr getDPAudioLayout() const override;
@@ -39,7 +39,7 @@ private:
     QnMulticodecRtpReader m_rtpStreamParser;
     QnPlAxisResourcePtr m_axisRes;
 
-    bool m_oldFirmwareWarned;
+    bool m_oldFirmwareWarned = false;
 };
 
 #endif // #ifdef ENABLE_AXIS

@@ -23,7 +23,6 @@
 #include <ui/workbench/workbench_context.h>
 
 #include "legacy_camera_schedule_widget.h"
-#include "camera_motion_mask_widget.h"
 
 namespace nx {
 namespace client {
@@ -74,7 +73,7 @@ MultipleCameraSettingsWidget::MultipleCameraSettingsWidget(QWidget *parent):
 
     connect(ui->imageControlWidget, &LegacyImageControlWidget::changed, this,
         &MultipleCameraSettingsWidget::at_dbDataChanged);
-    connect(ui->expertSettingsWidget, &CameraExpertSettingsWidget::dataChanged, this,
+    connect(ui->expertSettingsWidget, &LegacyExpertSettingsWidget::dataChanged, this,
         &MultipleCameraSettingsWidget::at_dbDataChanged);
 
 
@@ -186,10 +185,15 @@ void MultipleCameraSettingsWidget::submitToResources()
         if (!password.isEmpty() || !m_passwordWasEmpty)
             auth.setPassword(password);
 
-        if (camera->isMultiSensorCamera() || camera->isNvr())
+        if ((camera->isMultiSensorCamera() || camera->isNvr())
+             && !camera->getGroupId().isEmpty())
+        {
             QnClientCameraResource::setAuthToCameraGroup(camera, auth);
+        }
         else
+        {
             camera->setAuth(auth);
+        }
 
         if (ui->enableAudioCheckBox->checkState() != Qt::PartiallyChecked && camera->isAudioSupported())
             camera->setAudioEnabled(ui->enableAudioCheckBox->isChecked());
@@ -212,10 +216,10 @@ bool MultipleCameraSettingsWidget::isValidSecondStream()
     bool usesSecondStream = false;
     for (auto& task : filteredTasks)
     {
-        if (task.recordingType == Qn::RT_MotionAndLowQuality)
+        if (task.recordingType == Qn::RecordingType::motionAndLow)
         {
             usesSecondStream = true;
-            task.recordingType = Qn::RT_Always;
+            task.recordingType = Qn::RecordingType::always;
         }
     }
 

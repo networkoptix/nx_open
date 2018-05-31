@@ -3,7 +3,7 @@
 
 #include <QtCore/QUrl>
 
-#include <ui/common/aligner.h>
+#include <nx/client/desktop/common/utils/aligner.h>
 
 using namespace nx::client::desktop;
 
@@ -51,7 +51,7 @@ QnWebpageDialog::QnWebpageDialog(QWidget* parent) :
 
     ui->urlInputField->setPlaceholderText(lit("example.org"));
 
-    auto aligner = new QnAligner(this);
+    auto aligner = new Aligner(this);
     aligner->registerTypeAccessor<InputField>(InputField::createLabelWidthAccessor());
     aligner->addWidgets({
         ui->nameInputField,

@@ -13,13 +13,15 @@
 class QModelIndex;
 class QPushButton;
 class QnElidedLabel;
-class QnImageProvider;
 
 namespace Ui { class EventTile; }
 
 namespace nx {
 namespace client {
 namespace desktop {
+
+class ImageProvider;
+class CloseButton;
 
 class EventTile: public Customized<QWidget>
 {
@@ -71,8 +73,8 @@ public:
     void setIcon(const QPixmap& value);
 
     // Does not take ownership.
-    QnImageProvider* preview() const;
-    void setPreview(QnImageProvider* value);
+    ImageProvider* preview() const;
+    void setPreview(ImageProvider* value);
 
     QRectF previewCropRect() const;
     void setPreviewCropRect(const QRectF& relativeRect);
@@ -133,7 +135,7 @@ private:
 
 private:
     QScopedPointer<Ui::EventTile> ui;
-    QPushButton* const m_closeButton = nullptr;
+    CloseButton* const m_closeButton = nullptr;
     bool m_closeable = false;
     CommandActionPtr m_action; //< Button action.
     QnElidedLabel* const m_progressLabel = nullptr;

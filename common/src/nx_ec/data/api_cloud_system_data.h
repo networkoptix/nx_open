@@ -6,7 +6,7 @@
 
 namespace ec2 {
 
-struct ApiCloudSystemData: ApiData
+struct ApiCloudSystemData: nx::vms::api::Data
 {
     QnUuid localSystemId;
 };

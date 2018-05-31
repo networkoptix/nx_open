@@ -53,13 +53,13 @@ void FisheyeCalibrationWidget::init()
     updatePage();
 }
 
-QnImageProvider* FisheyeCalibrationWidget::imageProvider() const
+ImageProvider* FisheyeCalibrationWidget::imageProvider() const
 {
     return m_imageProvider.data();
 }
 
-// TODO: #GDM change to QnCameraThumbnailManager
-void FisheyeCalibrationWidget::setImageProvider(QnImageProvider* provider)
+// TODO: #GDM change to CameraThumbnailManager
+void FisheyeCalibrationWidget::setImageProvider(ImageProvider* provider)
 {
     if (m_imageProvider)
     {
@@ -72,11 +72,11 @@ void FisheyeCalibrationWidget::setImageProvider(QnImageProvider* provider)
     if (!m_imageProvider)
         return;
 
-    connect(m_imageProvider, &QnImageProvider::imageChanged, ui->imageWidget,
+    connect(m_imageProvider, &ImageProvider::imageChanged, ui->imageWidget,
         &FisheyeCalibrationImageWidget::setImage);
-    connect(m_imageProvider, &QnImageProvider::statusChanged, this,
+    connect(m_imageProvider, &ImageProvider::statusChanged, this,
         &FisheyeCalibrationWidget::updatePage);
-    connect(m_imageProvider, &QnImageProvider::imageChanged, this,
+    connect(m_imageProvider, &ImageProvider::imageChanged, this,
         &FisheyeCalibrationWidget::updatePage);
 
     updatePage();

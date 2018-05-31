@@ -45,6 +45,7 @@ private:
     QDialogButtonBox::StandardButton showConfirmationDialog();
 
     void loadState(const CameraSettingsDialogState& state);
+    static QString getAlertText(const CameraSettingsDialogState& state);
 
 private:
     Q_DISABLE_COPY(CameraSettingsDialog)

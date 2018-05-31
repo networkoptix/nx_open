@@ -315,18 +315,20 @@ static QnResourceList CheckHostAddrAsync(const QnManualCameraInfo& input)
     }
     catch (const std::exception& e)
     {
+        const auto resType = input.resType ? input.resType->getName() : lit("Unknown");
         qWarning()
             << "CheckHostAddrAsync exception ("<<e.what()<<") caught\n"
-            << "\t\tresource type:" << input.resType->getName() << "\n"
+            << "\t\tresource type:" << resType << "\n"
             << "\t\tresource url:" << input.url.toString() << "\n";
 
         return QnResourceList();
     }
     catch (...)
     {
+        const auto resType = input.resType ? input.resType->getName() : lit("Unknown");
         qWarning()
             << "CheckHostAddrAsync exception caught\n"
-            << "\t\tresource type:" << input.resType->getName() << "\n"
+            << "\t\tresource type:" << resType << "\n"
             << "\t\tresource url:" << input.url.toString() << "\n";
 
         return QnResourceList();
@@ -338,7 +340,7 @@ bool QnResourceDiscoveryManager::canTakeForeignCamera(const QnSecurityCamResourc
     if (!camera)
         return false;
 
-    if (camera->failoverPriority() == Qn::FP_Never)
+    if (camera->failoverPriority() == Qn::FailoverPriority::never)
         return false;
 
     QnUuid ownGuid = commonModule()->moduleGUID();
@@ -626,12 +628,18 @@ bool QnResourceDiscoveryManager::processDiscoveredResources(QnResourceList& reso
 
 QnManualCameraInfo QnResourceDiscoveryManager::manualCameraInfo(const QnSecurityCamResourcePtr& camera)
 {
-    QnResourceTypePtr resourceType = qnResTypePool->getResourceType(camera->getTypeId());
+    const auto resourceTypeId = camera->getTypeId();
+    QnResourceTypePtr resourceType = qnResTypePool->getResourceType(resourceTypeId);
+    NX_ASSERT(resourceType, lit("Resource type %1 was not found").arg(resourceTypeId.toString()));
+
+    const auto model = resourceType
+        ? resourceType->getName()
+        : camera->getModel();
     QnManualCameraInfo info(
-        nx::utils::Url(camera->getUrl()), camera->getAuth(), resourceType->getName(), camera->getUniqueId());
+        nx::utils::Url(camera->getUrl()), camera->getAuth(), model, camera->getUniqueId());
     for (const auto& searcher: m_searchersList)
     {
-        if (resourceType && searcher->isResourceTypeSupported(resourceType->getId()))
+        if (searcher->isResourceTypeSupported(resourceTypeId))
             info.searcher = searcher;
     }
 

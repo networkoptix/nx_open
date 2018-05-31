@@ -11,6 +11,7 @@ def create_libs_debug_file(binaries_dir, output_filename):
     pdb_filenames = [
         'nx_network.pdb',
         'nx_utils.pdb',
+        'nx_vms_api.pdb',
         'nx_vms_utils.pdb',
         'udt.pdb']
     zip_files(pdb_filenames, binaries_dir, output_filename)

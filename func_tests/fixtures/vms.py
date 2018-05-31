@@ -1,22 +1,29 @@
 from collections import namedtuple
-from contextlib import closing
+from itertools import combinations_with_replacement
 
 import pytest
 from netaddr import IPAddress
+from netaddr.ip import IPNetwork
 from pathlib2 import Path
+from pylru import lrudecorator
 
-from framework.merging import setup_system
-from framework.networking import setup_networks
-from framework.os_access.local import LocalAccess
-from framework.pool import Pool
+from framework.networking import setup_flat_network
+from framework.os_access.local_access import local_access
+from framework.os_access.posix_shell import local_shell
 from framework.registry import Registry
 from framework.serialize import load
 from framework.vms.factory import VMFactory
 from framework.vms.hypervisor.virtual_box import VirtualBox
-from network_layouts import get_layout
 
 DEFAULT_VM_HOST_USER = 'root'
 DEFAULT_VM_HOST_DIR = '/tmp/jenkins-test'
+
+
+@lrudecorator(1)
+def vm_types_configuration():
+    path = Path(__file__).with_name('configuration.yaml')
+    configuration = load(path.read_text())
+    return configuration['vm_types']
 
 
 def pytest_addoption(parser):
@@ -58,75 +65,65 @@ def vm_host(request):
 
 
 @pytest.fixture(scope='session')
-def configuration():
-    return load(Path(__file__).with_name('configuration.yaml').read_text())
+def host_posix_shell():
+    return local_shell
 
 
 @pytest.fixture(scope='session')
 def host_os_access():
-    return LocalAccess()
+    return local_access
 
 
 @pytest.fixture(scope='session')
-def hypervisor(configuration, host_os_access):
-    return VirtualBox(host_os_access, configuration['vm_host']['address'])
+def hypervisor(host_os_access):
+    return VirtualBox(host_os_access)
 
 
 @pytest.fixture(scope='session')
-def vm_registries(configuration, host_os_access):
+def vm_registries(host_posix_shell, host_os_access):
     return {
-        vm_type: Registry(host_os_access, vm_configuration['registry_path'])
-        for vm_type, vm_configuration in configuration['vm_types'].items()
-        }
+        vm_type: Registry(
+            host_posix_shell,
+            host_os_access.Path(vm_type_configuration['registry_path']).expanduser(),
+            vm_type_configuration['name_format'].format(vm_index='{index}'),  # Registry doesn't know about VMs.
+            vm_type_configuration['limit'],
+            )
+        for vm_type, vm_type_configuration in vm_types_configuration().items()}
 
 
 @pytest.fixture(scope='session')
-def vm_factories(request, configuration, hypervisor, vm_registries):
-    factories = {
-        vm_type: VMFactory(vm_configuration, hypervisor, vm_registries[vm_type])
-        for vm_type, vm_configuration in configuration['vm_types'].items()
-        }
+def vm_factory(request, hypervisor, vm_registries):
+    factory = VMFactory(vm_types_configuration(), hypervisor, vm_registries)
     if request.config.getoption('--clean'):
-        for vm_factory in factories.values():
-            vm_factory.cleanup()
-    return factories
+        factory.cleanup()
+    return factory
 
 
-@pytest.fixture()
-def vm_pools(vm_factories):
-    pools = {
-        vm_type: Pool(vm_factory)
-        for vm_type, vm_factory in vm_factories.items()
-        }
-    yield pools
-    for pool in pools.values():
-        pool.close()
+@pytest.fixture(
+    scope='session',
+    params=vm_types_configuration().keys())
+def one_vm_type(request):
+    return request.param
 
 
-@pytest.fixture()
-def linux_vm_pool(vm_factories):
-    with closing(Pool(vm_factories['linux'])) as pool:
-        yield pool
-
-
-@pytest.fixture()
-def network(vm_pools, hypervisor, linux_servers_pool, layout_file):
-    layout = get_layout(layout_file)
-    vms, _ = setup_networks(vm_pools, hypervisor, layout.networks, {})
-    servers = setup_system(linux_servers_pool, layout.mergers)
-    return vms, servers
+@pytest.fixture(
+    scope='session',
+    params=combinations_with_replacement(vm_types_configuration().keys(), 2),
+    ids='-'.join)
+def two_vm_types(request):
+    return request.param
 
 
 @pytest.fixture(scope='session')
-def two_linux_vms(vm_factories, hypervisor):
-    structure = {'10.254.0.0/29': {'first': None, 'second': None}}
-    reachability = {'10.254.0.0/29': {'first': {'second': None}, 'second': {'first': None}}}
-    with closing(Pool(vm_factories['linux'])) as pool:
-        vms, _ = setup_networks({'linux': pool}, hypervisor, structure, reachability)
-        yield vms
+def one_vm(one_vm_type, vm_factory):
+    with vm_factory.allocated_vm('single-{}'.format(one_vm_type), vm_type=one_vm_type) as vm:
+        yield vm
 
 
 @pytest.fixture(scope='session')
-def linux_vm(vm_factories):
-    with closing(Pool(vm_factories['linux'])) as pool:
-        yield pool.get('single')
+def two_vms(two_vm_types, hypervisor, vm_factory):
+    first_vm_type, second_vm_type = two_vm_types
+    with vm_factory.allocated_vm('first-{}'.format(first_vm_type), vm_type=first_vm_type) as first_vm:
+        with vm_factory.allocated_vm('second-{}'.format(second_vm_type), vm_type=second_vm_type) as second_vm:
+            setup_flat_network([first_vm, second_vm], IPNetwork('10.254.254.0/28'), hypervisor)
+            yield first_vm, second_vm

@@ -51,11 +51,17 @@ static QString qSizeToString(const QSize& size)
 class MockVideoDecoder: public AbstractVideoDecoder
 {
 public:
-    MockVideoDecoder(const ResourceAllocatorPtr& /*allocator*/, const QSize& /*resolution*/)
+    MockVideoDecoder(
+        const RenderContextSynchronizerPtr& /*synchronizer*/, const QSize& /*resolution*/)
     {
     }
 
     virtual ~MockVideoDecoder() {}
+
+    virtual Capabilities capabilities() const override
+    {
+        return Capability::noCapability;
+    }
 
     static bool isCompatible(
         const AVCodecID codec, const QSize& resolution, bool /*allowOverlay*/)

@@ -274,10 +274,10 @@ bool QnMultiserverBookmarksRestHandlerPrivate::addBookmark(
 
     runtimeParams.eventType = rule
         ? rule->eventType()
-        : nx::vms::event::EventType::undefinedEvent;
+        : nx::vms::api::EventType::undefinedEvent;
 
     const auto action = nx::vms::event::CommonAction::create(
-        nx::vms::event::ActionType::acknowledgeAction, runtimeParams);
+        nx::vms::api::ActionType::acknowledgeAction, runtimeParams);
 
     action->setRuleId(ruleId);
 

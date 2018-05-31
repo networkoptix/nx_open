@@ -38,19 +38,19 @@ function stop() {
 		echo "Sending SIGTERM to server PID $PID..."
 		kill -SIGTERM $PID
 		if wait_until_process_is_dead $PID $STOP_TIMEOUT_SEC; then
-			echo "Server is dead now"
+			echo "Mediaserver is dead now"
 		else
-			echo "Server still alive after $STOP_TIMEOUT_SEC seconds, sending SIGKILL..."
+			echo "Mediaserver still alive after $STOP_TIMEOUT_SEC seconds, sending SIGKILL..."
 			kill -SIGKILL $PID
 			if wait_until_process_is_dead $PID $STOP_TIMEOUT_SEC; then
-				echo "Server is dead now"
+				echo "Mediaserver is dead now"
 			else
 				echo "Unable to kill server, it still alive after $STOP_TIMEOUT_SEC seconds; bailing out."
 				return 1;
 			fi
 		fi
 	else
-		echo "Server with PID $PID is already dead."
+		echo "Mediaserver with PID $PID is already dead."
 	fi
 	echo "Removing PID file: $PID_PATH"
 	rm $PID_PATH
@@ -67,13 +67,13 @@ function make_core_dump() {
 		echo "Sending SIGTRAP to server PID $PID..."
 		kill -SIGTRAP $PID
 		if wait_until_process_is_dead $PID $CORE_DUMP_TIMEOUT_SEC; then
-			echo "Server is dead now."
+			echo "Mediaserver is dead now."
 		else
-			echo "Server still alive after $CORE_DUMP_TIMEOUT_SEC seconds, bailing out."
+			echo "Mediaserver still alive after $CORE_DUMP_TIMEOUT_SEC seconds, bailing out."
 			return 1;
 		fi
 	else
-		echo "Server with PID $PID is already dead."
+		echo "Mediaserver with PID $PID is already dead."
 	fi
 	echo "Removing PID file: $PID_PATH"
 	rm $PID_PATH

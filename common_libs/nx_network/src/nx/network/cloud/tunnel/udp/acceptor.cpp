@@ -1,6 +1,5 @@
 #include "acceptor.h"
 
-#include <nx/fusion/serialization/lexical.h>
 #include <nx/network/socket_global.h>
 
 #include "incoming_tunnel_connection.h"
@@ -102,7 +101,7 @@ void TunnelAcceptor::connectionAckResult(
     if (code != hpm::api::ResultCode::ok)
     {
         NX_LOGX(lm("connectionAck error: %1")
-            .arg(QnLexical::serialized(code)), cl_logWARNING);
+            .arg(nx::hpm::api::toString(code)), cl_logWARNING);
 
         // TODO: #mux code translation
         return executeAcceptHandler(SystemError::connectionAbort);

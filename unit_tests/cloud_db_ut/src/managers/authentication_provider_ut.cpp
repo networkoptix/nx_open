@@ -10,19 +10,18 @@
 #include <nx/utils/time.h>
 #include <nx/utils/test_support/settings_loader.h>
 
+#include <nx/data_sync_engine/synchronization_engine.h>
 #include <nx/cloud/cdb/api/cloud_nonce.h>
-
 #include <nx/cloud/cdb/client/data/auth_data.h>
 #include <nx/cloud/cdb/dao/user_authentication_data_object_factory.h>
 #include <nx/cloud/cdb/dao/memory/dao_memory_user_authentication.h>
-#include <nx/cloud/cdb/ec2/synchronization_engine.h>
 #include <nx/cloud/cdb/managers/authentication_provider.h>
 #include <nx/cloud/cdb/settings.h>
 #include <nx/cloud/cdb/stree/cdb_ns.h>
+#include <nx/cloud/cdb/test_support/base_persistent_data_test.h>
 #include <nx/cloud/cdb/test_support/business_data_generator.h>
 
 #include "account_manager_stub.h"
-#include "base_persistent_data_test.h"
 #include "system_sharing_manager_stub.h"
 #include "temporary_account_password_manager_stub.h"
 #include "vms_p2p_command_bus_stub.h"
@@ -90,6 +89,21 @@ protected:
     {
         // Nonce is created for sure while sharing.
         whenSharingSystem();
+    }
+
+    AccountWithPassword addUserWithoutPassword()
+    {
+        auto account = BusinessDataGenerator::generateRandomAccount();
+        account.statusCode = api::AccountStatus::invited;
+        account.passwordHa1.clear();
+        account.passwordHa1Sha256.clear();
+        account.password.clear();
+
+        m_accountManager.addAccount(account);
+
+        shareSystem(m_systems[0].id, account.email, api::SystemAccessRole::cloudAdmin);
+
+        return account;
     }
 
     AccountWithPassword addUserWithShortAuthInfoExpirationPeriod()
@@ -271,6 +285,13 @@ protected:
         }
     }
 
+    void assertUserDoesNotHaveAuthRecord(const AccountWithPassword& userAccount)
+    {
+        const auto userAuthInfo = m_userAuthenticationDao->fetchUserAuthRecords(
+            nullptr, m_systems[0].id, userAccount.id);
+        ASSERT_TRUE(userAuthInfo.records.empty());
+    }
+
 private:
     nx::utils::test::SettingsLoader<conf::Settings> m_settingsLoader;
     AccountManagerStub m_accountManager;
@@ -340,7 +361,7 @@ private:
 
     nx::utils::db::DBResult onSaveResourceAttribute(
         const std::string& systemId,
-        const ::ec2::ApiResourceParamWithRefData& data)
+        const nx::vms::api::ResourceParamWithRefData& data)
     {
         if (data.name == api::kVmsUserAuthInfoAttributeName)
         {
@@ -457,6 +478,19 @@ TEST_F(AuthenticationProvider, expired_auth_record_is_updated_eventually)
 
     waitForUserAuthRecordToBeUpdated(user1);
     waitForUserAuthRecordToBeUpdated(user2);
+}
+
+// E.g., invited but not yet activated account does not have password.
+TEST_F(AuthenticationProvider, does_not_try_to_calculate_auth_record_for_user_without_password)
+{
+    givenSystemWithNonce();
+
+    const auto userWithoutPassword = addUserWithoutPassword();
+    const auto userWithShortAuthInfoExpirationPeriod =
+        addUserWithShortAuthInfoExpirationPeriod();
+
+    waitForUserAuthRecordToBeUpdated(userWithShortAuthInfoExpirationPeriod);
+    assertUserDoesNotHaveAuthRecord(userWithoutPassword);
 }
 
 } // namespace test

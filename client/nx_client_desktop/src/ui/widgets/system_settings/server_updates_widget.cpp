@@ -295,8 +295,9 @@ void QnServerUpdatesWidget::initDropdownActions()
         {
             m_localFileName = QnFileDialog::getOpenFileName(this,
                 tr("Select Update File..."),
-                QString(), tr("Update Files (*.zip)"),
-                0,
+                QString(),
+                tr("Update Files") + lit(" (*.zip)"),
+                nullptr,
                 QnCustomFileDialog::fileDialogOptions());
 
             if (m_localFileName.isEmpty())
@@ -770,6 +771,10 @@ void QnServerUpdatesWidget::at_tool_stageProgressChanged(QnFullUpdateStage stage
             status = tr("Checking for updates...");
             break;
 
+        case QnFullUpdateStage::Validate:
+            status = tr("Validating the update...");
+            break;
+
         case QnFullUpdateStage::Download:
             status = tr("Downloading updates...");
             break;
@@ -778,12 +783,16 @@ void QnServerUpdatesWidget::at_tool_stageProgressChanged(QnFullUpdateStage stage
             status = tr("Installing client update...");
             break;
 
-        case QnFullUpdateStage::Incompatible:
-            status = tr("Installing updates to incompatible servers...");
+        case QnFullUpdateStage::CheckFreeSpace:
+            status = tr("Checking for free space...");
             break;
 
         case QnFullUpdateStage::Push:
             status = tr("Pushing updates to servers...");
+            break;
+
+        case QnFullUpdateStage::Incompatible:
+            status = tr("Installing updates to incompatible servers...");
             break;
 
         case QnFullUpdateStage::Servers:

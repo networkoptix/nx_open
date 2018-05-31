@@ -177,12 +177,9 @@ LayoutsHandler::LayoutsHandler(QObject *parent):
     connect(qnCommonMessageProcessor, &QnCommonMessageProcessor::businessActionReceived, this,
         [this](const vms::event::AbstractActionPtr& businessAction)
         {
-            if (businessAction->actionType() != vms::event::openLayoutAction)
+            if (businessAction->actionType() != vms::api::ActionType::openLayoutAction)
                 return;
             const auto &actionParams = businessAction->getParams();
-
-            if (actionParams.additionalResources.empty())
-                return;
 
             QnResourcePool* pool = this->resourcePool();
             QnLayoutResourcePtr layout =
@@ -190,7 +187,19 @@ LayoutsHandler::LayoutsHandler(QObject *parent):
             if (!layout)
                 return;
 
-            menu()->trigger(action::OpenInNewTabAction, layout);
+            auto currentUser = context()->user();
+            NX_ASSERT(currentUser);
+
+            auto accessManager = commonModule()->resourceAccessManager();
+            NX_ASSERT(accessManager);
+            // TODO: Is it better to a add additional permission flags to the place
+            // where all menu actions are registered?
+            if (accessManager->hasPermission(currentUser, layout, Qn::ReadPermission))
+                menu()->trigger(action::OpenInNewTabAction, layout);
+            else
+            {
+                qDebug() << "User does " << currentUser->getName() << " does not have permission to view layout " << layout->getName();
+            }
         });
 }
 

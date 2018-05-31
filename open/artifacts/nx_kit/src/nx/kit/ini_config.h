@@ -129,7 +129,7 @@ protected: // Used by macros.
         const char* paramName, const char* description);
 
 private:
-    struct Impl;
+    class Impl;
     Impl* const d;
 };
 

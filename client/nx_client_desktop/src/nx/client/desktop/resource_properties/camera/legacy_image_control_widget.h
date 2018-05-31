@@ -4,16 +4,15 @@
 #include <QtWidgets/QWidget>
 
 #include <core/resource/resource_fwd.h>
-
 #include <utils/common/updatable.h>
-
-class QnAligner;
 
 namespace Ui { class LegacyImageControlWidget; }
 
 namespace nx {
 namespace client {
 namespace desktop {
+
+class Aligner;
 
 class LegacyImageControlWidget: public QWidget, public QnUpdatable
 {
@@ -26,7 +25,7 @@ public:
     LegacyImageControlWidget(QWidget *parent = nullptr);
     virtual ~LegacyImageControlWidget();
 
-    QnAligner* aligner() const;
+    Aligner* aligner() const;
 
     void updateFromResources(const QnVirtualCameraResourceList &cameras);
     void submitToResources(const QnVirtualCameraResourceList &cameras);
@@ -43,7 +42,7 @@ signals:
 
 private:
     QScopedPointer<Ui::LegacyImageControlWidget> ui;
-    QnAligner* m_aligner = nullptr;
+    Aligner* m_aligner = nullptr;
     bool m_readOnly;
 };
 

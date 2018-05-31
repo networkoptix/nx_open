@@ -1,5 +1,4 @@
-#ifndef __API_TIME_DATA_H_
-#define __API_TIME_DATA_H_
+#pragma once
 
 #include "api_globals.h"
 #include "api_data.h"
@@ -7,31 +6,20 @@
 #include "nx/fusion/model_functions_fwd.h"
 #include <nx/utils/uuid.h>
 
+namespace ec2 {
 
-namespace ec2
+struct ApiTimeData: nx::vms::api::Data
 {
-    struct ApiTimeData: ApiData 
-    {
-        ApiTimeData():
-            value(0),
-            isPrimaryTimeServer(false),
-            syncTimeFlags(Qn::TF_none)
-        {}
-        ApiTimeData(qint64 value):
-            value(value),
-            isPrimaryTimeServer(false),
-            syncTimeFlags(Qn::TF_none)
-        {}
+    ApiTimeData() = default;
 
-        /** MSec value. */ 
-        qint64 value;
-        bool isPrimaryTimeServer;
-        QnUuid primaryTimeServerGuid;
-        Qn::TimeFlags syncTimeFlags;
-    };
+    ApiTimeData(qint64 value): value(value) {}
 
+    /** MSec value. */
+    qint64 value = 0;
+    bool isPrimaryTimeServer = false;
+    QnUuid primaryTimeServerGuid;
+    Qn::TimeFlags syncTimeFlags = Qn::TF_none;
+};
 #define ApiTimeData_Fields (value)(isPrimaryTimeServer)(primaryTimeServerGuid)(syncTimeFlags)
 
-}
-
-#endif // __API_TIME_DATA_H_
+} // namespace ec2

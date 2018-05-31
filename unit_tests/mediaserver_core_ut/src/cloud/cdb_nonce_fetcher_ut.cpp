@@ -17,8 +17,6 @@ namespace test {
 
 namespace {
 
-using namespace nx::cdb;
-
 //-------------------------------------------------------------------------------------------------
 
 class CloudData
@@ -37,14 +35,14 @@ public:
     {
         QnMutexLocker lock(&m_mutex);
 
-        m_nonce = api::NonceData();
-        m_nonce->nonce = api::generateCloudNonceBase(systemId);
+        m_nonce = cdb::api::NonceData();
+        m_nonce->nonce = cdb::api::generateCloudNonceBase(systemId);
         m_nonce->validPeriod = expirationTime;
 
         return m_nonce->nonce;
     }
 
-    boost::optional<api::NonceData> getNonce() const
+    boost::optional<cdb::api::NonceData> getNonce() const
     {
         QnMutexLocker lock(&m_mutex);
         if (m_nonce && m_fetchedNonceEventReceiver)
@@ -53,7 +51,7 @@ public:
     }
 
 private:
-    boost::optional<api::NonceData> m_nonce;
+    boost::optional<cdb::api::NonceData> m_nonce;
     nx::utils::SyncQueue<std::string>* m_fetchedNonceEventReceiver = nullptr;
     mutable QnMutex m_mutex;
 };
@@ -61,7 +59,7 @@ private:
 //-------------------------------------------------------------------------------------------------
 
 class DummyAuthProvider:
-    public api::AuthProvider
+    public cdb::api::AuthProvider
 {
 public:
     DummyAuthProvider(CloudData* cloudData):
@@ -75,34 +73,34 @@ public:
     }
 
     virtual void getCdbNonce(
-        std::function<void(api::ResultCode, api::NonceData)> completionHandler) override
+        std::function<void(cdb::api::ResultCode, cdb::api::NonceData)> completionHandler) override
     {
         const auto nonce = m_cloudData->getNonce();
         if (nonce)
         {
             m_aioObject.post(std::bind(completionHandler,
-                api::ResultCode::ok, *nonce));
+                cdb::api::ResultCode::ok, *nonce));
         }
         else
         {
             m_aioObject.post(std::bind(completionHandler,
-                api::ResultCode::forbidden, api::NonceData()));
+                cdb::api::ResultCode::forbidden, cdb::api::NonceData()));
         }
     }
 
     virtual void getCdbNonce(
         const std::string& /*systemId*/,
-        std::function<void(api::ResultCode, api::NonceData)> completionHandler) override
+        std::function<void(cdb::api::ResultCode, cdb::api::NonceData)> completionHandler) override
     {
-        m_aioObject.post(std::bind(completionHandler, api::ResultCode::ok, api::NonceData()));
+        m_aioObject.post(std::bind(completionHandler, cdb::api::ResultCode::ok, cdb::api::NonceData()));
     }
 
     virtual void getAuthenticationResponse(
-        const api::AuthRequest& /*authRequest*/,
-        std::function<void(api::ResultCode, api::AuthResponse)> completionHandler) override
+        const cdb::api::AuthRequest& /*authRequest*/,
+        std::function<void(cdb::api::ResultCode, cdb::api::AuthResponse)> completionHandler) override
     {
         m_aioObject.post(std::bind(completionHandler,
-            api::ResultCode::notImplemented, api::AuthResponse()));
+            cdb::api::ResultCode::notImplemented, cdb::api::AuthResponse()));
     }
 
     void bindToAioThread(network::aio::AbstractAioThread* aioThread)
@@ -118,7 +116,7 @@ private:
 //-------------------------------------------------------------------------------------------------
 
 class DummyCloudConnection:
-    public api::Connection
+    public cdb::api::Connection
 {
 public:
     DummyCloudConnection(CloudData* cloudData):
@@ -162,18 +160,18 @@ public:
         return std::chrono::milliseconds::zero();
     }
 
-    virtual api::AccountManager* accountManager() override { return nullptr; }
+    virtual cdb::api::AccountManager* accountManager() override { return nullptr; }
 
-    virtual api::SystemManager* systemManager() override { return nullptr; }
+    virtual cdb::api::SystemManager* systemManager() override { return nullptr; }
 
-    virtual api::AuthProvider* authProvider() override { return &m_authProvider; }
+    virtual cdb::api::AuthProvider* authProvider() override { return &m_authProvider; }
 
-    virtual api::MaintenanceManager* maintenanceManager() override { return nullptr; }
+    virtual cdb::api::MaintenanceManager* maintenanceManager() override { return nullptr; }
 
     virtual void ping(
-        std::function<void(api::ResultCode, api::ModuleInfo)> completionHandler) override
+        std::function<void(cdb::api::ResultCode, cdb::api::ModuleInfo)> completionHandler) override
     {
-        m_aioObject.post(std::bind(completionHandler, api::ResultCode::ok, api::ModuleInfo()));
+        m_aioObject.post(std::bind(completionHandler, cdb::api::ResultCode::ok, cdb::api::ModuleInfo()));
     }
 
 private:

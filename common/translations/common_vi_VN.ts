@@ -53,11 +53,6 @@
       <translation>Hệ thống đã phát hiện %1 có phiên bản không tương thích %2.</translation>
     </message>
     <message>
-      <source>Cannot connect to the other System because current System is already connected to %1.</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-      <translation>Không thể kết nối với Hệ thống khác vì hiện tại Hệ thống đã được kết nối với %1.</translation>
-    </message>
-    <message>
       <source>The discovered System %1 is in safe mode.</source>
       <comment>%1 is name of System</comment>
       <translation>Hệ thống đã phát hiện %1 đang ở chế độ an toàn.</translation>
@@ -66,16 +61,6 @@
       <source>Could not configure the remote System %1.</source>
       <comment>%1 is name of System</comment>
       <translation>Không thể định cấu hình Hệ thống từ xa %1.</translation>
-    </message>
-    <message>
-      <source>Both Systems are connected to %1. Merge is not allowed.</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-      <translation>Cả hai Hệ thống đều được kết nối với %1. Hợp nhất không được phép.</translation>
-    </message>
-    <message>
-      <source>These Systems are built with different %1 URL. Merge is not allowed.</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-      <translation>Các Hệ thống này được xây dựng với URL %1 khác nhau. Hợp nhất không được phép.</translation>
     </message>
     <message>
       <source>New System</source>
@@ -87,9 +72,24 @@
       <translation>Phát hiện %1 lỗi không tương thích với hệ thống hiện tại.</translation>
     </message>
     <message>
+      <source>Cannot connect to the other System because current System is already connected to %1.</source>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
+      <translation>Không thể kết nối với Hệ thống khác vì hiện tại Hệ thống đã được kết nối với %1.</translation>
+    </message>
+    <message>
       <source>%1 System can only be merged with non-%1. System name and password are taken from %1 System.</source>
-      <comment>%1 is the short cloud name (like &apos;Cloud&apos;)</comment>
+      <comment>%1 is the short cloud name (like Cloud)</comment>
       <translation type="unfinished">%1 System can only be merged with non-%1. System name and password are taken from %1 System.</translation>
+    </message>
+    <message>
+      <source>Both Systems are connected to %1. Merge is not allowed.</source>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
+      <translation>Cả hai Hệ thống đều được kết nối với %1. Hợp nhất không được phép.</translation>
+    </message>
+    <message>
+      <source>These Systems are built with different %1 URL. Merge is not allowed.</source>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
+      <translation>Các Hệ thống này được xây dựng với URL %1 khác nhau. Hợp nhất không được phép.</translation>
     </message>
   </context>
   <context>
@@ -577,8 +577,8 @@
       <translation>Lỗi không xác định</translation>
     </message>
     <message>
-      <source>Server with matching Hardware Id not found</source>
-      <translation>Không tìm thấy Máy chủ với Id phần cứng phù hợp</translation>
+      <source>Server with matching Hardware ID not found</source>
+      <translation>Không tìm thấy Máy chủ với ID phần cứng phù hợp</translation>
     </message>
   </context>
   <context>
@@ -694,12 +694,12 @@
       <translation>Hình mờ: %1</translation>
     </message>
     <message>
-      <source>Hardware Id: %1</source>
-      <translation>Id Phần cứng: %1</translation>
-    </message>
-    <message>
       <source>Time License</source>
       <translation>Bản quyền theo thời gian</translation>
+    </message>
+    <message>
+      <source>Hardware ID: %1</source>
+      <translation>ID Phần cứng: %1</translation>
     </message>
   </context>
   <context>

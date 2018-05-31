@@ -168,7 +168,7 @@
        </widget>
       </item>
       <item>
-       <widget class="QnTableView" name="serversTable">
+       <widget class="nx::client::desktop::TableView" name="serversTable">
         <property name="sizePolicy">
          <sizepolicy hsizetype="Expanding" vsizetype="Maximum">
           <horstretch>0</horstretch>
@@ -247,9 +247,9 @@
    <container>1</container>
   </customwidget>
   <customwidget>
-   <class>QnTableView</class>
+   <class>nx::client::desktop::TableView</class>
    <extends>QTableView</extends>
-   <header location="global">ui/widgets/common/table_view.h</header>
+   <header location="global">nx/client/desktop/common/widgets/table_view.h</header>
   </customwidget>
   <customwidget>
    <class>nx::client::desktop::AlertBar</class>

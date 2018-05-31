@@ -14,16 +14,15 @@ def layout_file():
     return 'direct-merge_toward_requested.yaml'
 
 
+# TODO: Rewrite with simpler fixtures.
 @pytest.fixture()
-def proxy(network):
-    _, servers = network
-    return servers['first']
+def proxy(system):
+    return system['first']
 
 
 @pytest.fixture()
-def proxy_headers(network):
-    _, servers = network
-    target_guid = get_server_id(servers['second'].api)
+def proxy_headers(system):
+    target_guid = get_server_id(system['second'].api)
     return {'X-server-guid': target_guid}
 
 
@@ -37,6 +36,8 @@ def test_ping(iterations, proxy, proxy_headers):
 
 @pytest.mark.parametrize('iterations', [1, 2, 10])
 def test_ping_alternate_addressee(proxy, proxy_headers, iterations):
+    # When doing non-proxy request after proxy request,
+    # connection sometimes is closed by MediaServer.
     with Session() as session:
         for _ in range(iterations):
             session.get(proxy.api.url('api/ping')).raise_for_status()

@@ -1,5 +1,6 @@
-#ifndef QnExternalTimeSource_h_1919
-#define QnExternalTimeSource_h_1919
+#pragma once
+
+#include <QtCore/QtGlobal>
 
 class QnlTimeSource
 {
@@ -38,5 +39,3 @@ public:
 
     virtual bool isBuffering() const { return false; }
 };
-
-#endif //QnExternalTimeSource_h_1919

@@ -1,52 +1,28 @@
 #include "message_bus_adapter.h"
 #include <nx/p2p/p2p_message_bus.h>
 #include "transaction_message_bus.h"
-#include <database/db_manager.h>
 
 namespace ec2 {
 
 TransactionMessageBusAdapter::TransactionMessageBusAdapter(
-    detail::QnDbManager* db,
-    Qn::PeerType peerType,
     QnCommonModule* commonModule,
     QnJsonTransactionSerializer* jsonTranSerializer,
     QnUbjsonTransactionSerializer* ubjsonTranSerializer)
     :
     AbstractTransactionMessageBus(commonModule),
-    m_db(db),
-    m_peerType(peerType),
     m_jsonTranSerializer(jsonTranSerializer),
     m_ubjsonTranSerializer(ubjsonTranSerializer),
     m_timeSyncManager(nullptr)
 {
 }
 
-void TransactionMessageBusAdapter::init(MessageBusType value)
+void TransactionMessageBusAdapter::reset()
 {
     m_bus.reset();
+}
 
-    if (value == MessageBusType::None)
-        return;
-
-    if (value == MessageBusType::P2pMode)
-    {
-        m_bus.reset(new nx::p2p::MessageBus(
-            m_db,
-            m_peerType,
-            commonModule(),
-            m_jsonTranSerializer,
-            m_ubjsonTranSerializer));
-    }
-    else
-    {
-        m_bus.reset(new QnTransactionMessageBus(
-            m_db,
-            m_peerType,
-            commonModule(),
-            m_jsonTranSerializer,
-            m_ubjsonTranSerializer));
-    }
-
+void TransactionMessageBusAdapter::initInternal(Qn::PeerType peerType)
+{
     m_bus->setTimeSyncManager(m_timeSyncManager);
     connect(m_bus.get(), &AbstractTransactionMessageBus::peerFound,
         this, &AbstractTransactionMessageBus::peerFound, Qt::DirectConnection);
@@ -133,10 +109,12 @@ ConnectionGuardSharedState* TransactionMessageBusAdapter::connectionGuardSharedS
     return m_bus->connectionGuardSharedState();
 }
 
+#if 0
 detail::QnDbManager* TransactionMessageBusAdapter::getDb() const
 {
     return m_bus->getDb();
 }
+#endif
 
 void TransactionMessageBusAdapter::setTimeSyncManager(TimeSynchronizationManager* timeSyncManager)
 {

@@ -45,8 +45,8 @@
 #include <nx/client/desktop/utils/widget_utils.h>
 
 #include <ui/common/indents.h>
-#include <ui/common/popup_shadow.h>
-#include <ui/common/link_hover_processor.h>
+#include <nx/client/desktop/common/utils/popup_shadow.h>
+#include <nx/client/desktop/common/utils/link_hover_processor.h>
 #include <ui/delegates/styled_combo_box_delegate.h>
 #include <ui/widgets/common/abstract_preferences_widget.h>
 #include <nx/client/desktop/common/widgets/input_field.h>
@@ -55,7 +55,7 @@
 
 #include <utils/common/delayed.h>
 #include <utils/common/event_processors.h>
-#include <utils/common/object_companion.h>
+#include <nx/client/desktop/common/utils/object_companion.h>
 #include <utils/common/property_backup.h>
 #include <utils/common/scoped_painter_rollback.h>
 
@@ -3917,10 +3917,10 @@ void QnNxStyle::polish(QWidget *widget)
                     widget->setFont(font);
                 }
 
-                if (!QnObjectCompanionManager::companion(calendar, kCalendarDelegateCompanion)
+                if (!ObjectCompanionManager::companion(calendar, kCalendarDelegateCompanion)
                     && !qobject_cast<QnCalendarWidget*>(calendar))
                 {
-                    QnObjectCompanionManager::attach(calendar,
+                    ObjectCompanionManager::attach(calendar,
                         new CalendarDelegateReplacement(view, calendar),
                         kCalendarDelegateCompanion);
                 }
@@ -3957,12 +3957,12 @@ void QnNxStyle::polish(QWidget *widget)
         d->polishInputDialog(inputDialog);
 
     if (auto label = qobject_cast<QLabel*>(widget))
-        QnObjectCompanion<QnLinkHoverProcessor>::install(label, kLinkHoverProcessorCompanion, true);
+        ObjectCompanion<LinkHoverProcessor>::install(label, kLinkHoverProcessorCompanion, true);
 
     if (kCustomizePopupShadows && popupToCustomizeShadow)
     {
         /* Create customized shadow: */
-        if (auto shadow = QnObjectCompanion<QnPopupShadow>::install(popupToCustomizeShadow, kPopupShadowCompanion, true))
+        if (auto shadow = ObjectCompanion<PopupShadow>::install(popupToCustomizeShadow, kPopupShadowCompanion, true))
         {
             QnPaletteColor shadowColor = mainColor(Colors::kBase).darker(3);
             shadowColor.setAlphaF(0.5);
@@ -4025,13 +4025,13 @@ void QnNxStyle::unpolish(QWidget* widget)
     }
 
     if (auto calendar = qobject_cast<QCalendarWidget*>(widget))
-        QnObjectCompanionManager::uninstall(calendar, kCalendarDelegateCompanion);
+        ObjectCompanionManager::uninstall(calendar, kCalendarDelegateCompanion);
 
     if (kCustomizePopupShadows && popupWithCustomizedShadow)
-        QnObjectCompanionManager::uninstall(popupWithCustomizedShadow, kPopupShadowCompanion);
+        ObjectCompanionManager::uninstall(popupWithCustomizedShadow, kPopupShadowCompanion);
 
     if (auto label = qobject_cast<QLabel*>(widget))
-        QnObjectCompanionManager::uninstall(label, kLinkHoverProcessorCompanion);
+        ObjectCompanionManager::uninstall(label, kLinkHoverProcessorCompanion);
 
     if (auto tabBar = qobject_cast<QTabBar*>(widget))
     {

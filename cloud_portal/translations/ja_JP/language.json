@@ -1,19 +1,19 @@
 {
   "language_name": "日本語",
-  "productName": "{{PRODUCT_NAME}}",
-  "clientProtocol": "{{CLIENT_PROTOCOL}}:",
+  "productName": "%PRODUCT_NAME%",
+  "clientProtocol": "%CLIENT_PROTOCOL%:",
   "dialogs": {
     "okButton": "Ok",
     "cancelButton": "キャンセル",
-    "loginTitle": "{{PRODUCT_NAME}} にログイン",
+    "loginTitle": "%PRODUCT_NAME% にログイン",
     "loginButton": "ログイン",
     "logoutAuthorisedTitle": "すでにログインしています",
     "logoutAuthorisedContinueButton": "続行",
     "logoutAuthorisedLogoutButton": "ログアウト"
   },
   "pageTitles": {
-    "template": "{{title}} {{PRODUCT_NAME}}",
-    "default": "{{PRODUCT_NAME}}",
+    "template": "{{title}} %PRODUCT_NAME%",
+    "default": "%PRODUCT_NAME%",
     "registerSuccess": "ようこそ",
     "register": "アカウントを作成",
     "changePassword": "パスワードを変更 -",
@@ -31,8 +31,8 @@
     "view": "カメラを表示 - ",
     "debug": "デバッグ",
     "login": "ログイン -",
-    "download": "{{VMS_NAME}} をダウンロード",
-    "downloadPlatform": "{{VMS_NAME}} をダウンロード ",
+    "download": "%VMS_NAME% をダウンロード",
+    "downloadPlatform": "%VMS_NAME% をダウンロード ",
     "pageNotFound": "ページが見つかりません"
   },
   "systemStatuses": {
@@ -69,7 +69,7 @@
     },
     "Custom": {
       "label": "カスタム",
-      "description": "{{PRODUCT_NAME}} クライアント アプリケーションを使用してカスタム権限を設定する"
+      "description": "%PRODUCT_NAME% クライアント アプリケーションを使用してカスタム権限を設定する"
     },
     "cloudAdmin": {
       "label": "アドミニストレーター",
@@ -97,7 +97,7 @@
     },
     "custom": {
       "label": "カスタム",
-      "description": "{{PRODUCT_NAME}} クライアント アプリケーションを使用してカスタム権限を設定する"
+      "description": "%PRODUCT_NAME% クライアント アプリケーションを使用してカスタム権限を設定する"
     }
   },
   "errorCodes": {
@@ -116,8 +116,8 @@
     "cantSendConfirmationPrefix": "確認メールを送信できません",
     "cloudInvalidResponse": "クラウド DB が予期しない応答を返しました",
     "notAuthorized": "間違ったパスワード",
-    "wrongParameters": "フォーム上のいくつかのパラメーターが正しくありません",
     "brokenAccount": "次のアカウントで予期しない問題 <a href=\"/restore_password\"> アカウントの復元</a>",
+    "wrongParameters": "フォーム上のいくつかのパラメーターが正しくありません",
     "wrongCode": "アカウントは既にアクティブ済か確認コードが正しくありません",
     "wrongCodeRestore": "確認コードは既に使用されているかまたは不正です",
     "forbidden": "この操作を実行するアクセス権限がありません",
@@ -133,7 +133,7 @@
     "passwordMismatch": "間違ったパスワード",
     "cantEditYourself": "自分のアクセス権限を変更することはできません",
     "cantEditAdmin": "このユーザーは管理者権限を持っています",
-    "cantOpenClient": "{{VMS_NAME}} アプリケーションが検出されません<a href=\"/download\"> ダウンロード</a>",
+    "cantOpenClient": "%VMS_NAME% アプリケーションが検出されません<a href=\"/download\"> ダウンロード</a>",
     "lostConnection": "{{systemName}} への接続が失われました",
     "thisSystem": "システム"
   },
@@ -142,7 +142,8 @@
     "requiredMessage": "英数字とキーボードの記号のみを使用して、先頭と末尾の空白を避けます",
     "weakMessage": "大文字と小文字の文字、特殊記号を使用して、強固なパスワードを作る",
     "strongMessage": "強力なパスワード!",
-    "commonMessage": "このパスワードは、世界で最も人気のあるパスワード"
+    "commonMessage": "このパスワードは、世界で最も人気のあるパスワード",
+    "missingMessage": "パスワードが必要"
   },
   "sharing": {
     "confirmOwner": "システムオーナーを変更すると現在のアカウントから所有権を失効します　この操作は元に戻せません　宜しいですか？",
@@ -157,12 +158,14 @@
     "mySystemSearch": "IMeMyMine",
     "unavailable": "システムに到達できません",
     "offline": "システムはオフライン",
-    "openClient": "{{VMS_NAME}} で開く",
-    "openClientNoSystem": "{{VMS_NAME}} を開く",
+    "openClient": "%VMS_NAME% で開く",
+    "openClientNoSystem": "%VMS_NAME% を開く",
+    "confirmMergeAction": "Merge",
+    "mergeSystemTitle": "システム統合",
     "confirmRenameTitle": "システム名",
     "confirmRenameAction": "保存",
     "successRename": "システム名は保存されました",
-    "confirmDisconnectTitle": "{{PRODUCT_NAME}} からシステムを切断しますか？",
+    "confirmDisconnectTitle": "%PRODUCT_NAME% からシステムを切断しますか？",
     "confirmDisconnectAction": "切断",
     "confirmUnshareFromMe": "あなたのアカウントからこのシステムを切断しようとしています　もうこのシステムにアクセスすることはできません\n切断しますか？",
     "confirmUnshareFromMeTitle": "システムを切断しますか？",
@@ -170,7 +173,7 @@
     "confirmUnshare": "このユーザはシステムにアクセスすることができません　宜しいですか？",
     "confirmUnshareTitle": "ユーザーを削除しますか？",
     "confirmUnshareAction": "削除",
-    "successDisconnected": "システムが正常に {{PRODUCT_NAME}} から切断されました",
+    "successDisconnected": "システムが正常に %PRODUCT_NAME% から切断されました",
     "successDeleted": "システム {{systemName}} はあなたのアカウントから正常に削除されました",
     "permissionsRemoved": "{{email}} からアクセス権限が削除されました"
   },
@@ -183,14 +186,14 @@
     "saveChanges": "保存"
   },
   "downloads": {
-    "noClientDetectedTitle": "システムを表示するには {{VMS_NAME}} をインストールします",
-    "action": "{{VMS_NAME}} をダウンロード",
+    "noClientDetectedTitle": "システムを表示するには %VMS_NAME% をインストールします",
+    "action": "%VMS_NAME% をダウンロード",
     "mobile": {
       "ios": {
-        "link": "{{IOS_APP_LINK}}"
+        "link": "%IOS_APPLICATION_LINK%"
       },
       "android": {
-        "link": "{{ANDROID_APP_LINK}}"
+        "link": "%ANDROID_APPLICATION_LINK%"
       }
     },
     "groups": {

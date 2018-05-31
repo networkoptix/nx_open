@@ -12,9 +12,9 @@
 #include <nx/utils/thread/sync_queue.h>
 
 #include <nx/cloud/cdb/dao/rdb/system_data_object.h>
+#include <nx/cloud/cdb/test_support/base_persistent_data_test.h>
 
 #include "test_setup.h"
-#include "../base_persistent_data_test.h"
 
 namespace nx {
 namespace cdb {
@@ -679,7 +679,7 @@ TEST_F(FtSystemNotification, notification_of_system_removal)
             ASSERT_EQ(
                 timePassedSinceSystemRemoval < kSystemGoneForeverPeriod
                     ? api::ResultCode::credentialsRemovedPermanently
-                    : api::ResultCode::notAuthorized,
+                    : api::ResultCode::badUsername,
                 getCdbNonce(system1.id, system1.authKey, &nonceData));
 
             // Checking HTTP status code.

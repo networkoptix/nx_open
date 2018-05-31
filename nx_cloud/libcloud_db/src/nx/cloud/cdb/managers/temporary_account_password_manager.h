@@ -209,7 +209,8 @@ private:
     boost::optional<const TemporaryAccountCredentialsEx&> findMatchingCredentials(
         const QnMutexLockerBase& lk,
         const std::string& username,
-        std::function<bool(const nx::Buffer&)> checkPasswordHash);
+        std::function<bool(const nx::Buffer&)> checkPasswordHash,
+        api::ResultCode* authResultCode);
     void runExpirationRulesOnSuccessfulLogin(
         const QnMutexLockerBase& lk,
         const TemporaryAccountCredentialsEx& temporaryCredentials);

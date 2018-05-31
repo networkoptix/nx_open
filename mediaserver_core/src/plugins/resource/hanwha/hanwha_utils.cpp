@@ -117,6 +117,22 @@ HanwhaChannelProfiles parseProfiles(const HanwhaResponse& response)
     return profiles;
 }
 
+nx::core::resource::DeviceType fromHanwhaToNxDeviceType(HanwhaDeviceType hanwhaDeviceType)
+{
+    using namespace nx::core::resource;
+    switch (hanwhaDeviceType)
+    {
+        case HanwhaDeviceType::nvr:
+            return DeviceType::nvr;
+        case HanwhaDeviceType::encoder:
+            return DeviceType::encoder;
+        case HanwhaDeviceType::nwc:
+            return DeviceType::camera;
+        default:
+            return nx::core::resource::DeviceType::unknown;
+    }
+}
+
 template<>
 int fromHanwhaString<int>(const QString& str, bool* outSuccess)
 {

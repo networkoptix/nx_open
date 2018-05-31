@@ -61,19 +61,19 @@ QnCloudManagementWidget::QnCloudManagementWidget(QWidget *parent):
     // TODO: #help Set help topic
 
     ui->unlinkButton->setText(tr("Disconnect System from %1",
-        "%1 is the cloud name (like 'Nx Cloud')").arg(nx::network::AppInfo::cloudName()));
+        "%1 is the cloud name (like Nx Cloud)").arg(nx::network::AppInfo::cloudName()));
     ui->goToCloudButton->setText(tr("Open %1 Portal",
-        "%1 is the cloud name (like 'Nx Cloud')").arg(nx::network::AppInfo::cloudName()));
+        "%1 is the cloud name (like Nx Cloud)").arg(nx::network::AppInfo::cloudName()));
 
     ui->createAccountButton->setText(tr("Create %1 Account",
-        "%1 is the cloud name (like 'Nx Cloud')").arg(nx::network::AppInfo::cloudName()));
+        "%1 is the cloud name (like Nx Cloud)").arg(nx::network::AppInfo::cloudName()));
     ui->linkButton->setText(tr("Connect System to %1...",
-        "%1 is the cloud name (like 'Nx Cloud')").arg(nx::network::AppInfo::cloudName()));
+        "%1 is the cloud name (like Nx Cloud)").arg(nx::network::AppInfo::cloudName()));
 
     ui->promo1TextLabel->setText(tr("Create %1\naccount",
-        "%1 is the cloud name (like 'Nx Cloud')").arg(nx::network::AppInfo::cloudName()));
+        "%1 is the cloud name (like Nx Cloud)").arg(nx::network::AppInfo::cloudName()));
     ui->promo2TextLabel->setText(tr("Connect System\nto %1",
-        "%1 is the cloud name (like 'Nx Cloud')").arg(nx::network::AppInfo::cloudName()));
+        "%1 is the cloud name (like Nx Cloud)").arg(nx::network::AppInfo::cloudName()));
     ui->promo3TextLabel->setText(tr("Connect to your Systems\nfrom anywhere with any\ndevices"));
 
     using nx::vms::utils::SystemUri;
@@ -82,7 +82,7 @@ QnCloudManagementWidget::QnCloudManagementWidget(QWidget *parent):
         SystemUri::ReferralContext::SettingsDialog);
 
     ui->learnMoreLabel->setText(
-        makeHref(tr("Learn more about %1", "%1 is the cloud name (like 'Nx Cloud')").arg(
+        makeHref(tr("Learn more about %1", "%1 is the cloud name (like Nx Cloud)").arg(
             nx::network::AppInfo::cloudName()), urlHelper.aboutUrl()));
 
     connect(ui->goToCloudButton, &QPushButton::clicked, this,

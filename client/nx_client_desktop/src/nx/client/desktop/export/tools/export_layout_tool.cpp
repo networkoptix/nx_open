@@ -22,7 +22,7 @@
 #include <core/resource/camera_resource.h>
 #include <core/resource_management/resource_pool.h>
 
-#include <nx_ec/data/api_layout_data.h>
+#include <nx/vms/api/data/layout_data.h>
 #include <nx_ec/data/api_conversion_functions.h>
 
 #include <core/storage/file_storage/layout_storage_resource.h>
@@ -254,8 +254,8 @@ bool ExportLayoutTool::exportMetadata(const ItemInfoList &items)
     /* Layout items. */
     {
         QByteArray layoutData;
-        ec2::ApiLayoutData layoutObject;
-        fromResourceToApi(m_layout, layoutObject);
+        nx::vms::api::LayoutData layoutObject;
+        ec2::fromResourceToApi(m_layout, layoutObject);
         QJson::serialize(layoutObject, &layoutData);
         /* Old name for compatibility issues. */
         if (!writeData(lit("layout.pb"), layoutData))
@@ -482,9 +482,7 @@ bool ExportLayoutTool::exportMediaResource(const QnMediaResourcePtr& resource)
         lit("mkv"),
         d->storage,
         role,
-        serverTimeZone,
-        0,
-        nx::core::transcoding::FilterChain());
+        serverTimeZone);
 
     return true;
 }

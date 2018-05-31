@@ -4,7 +4,7 @@
 {{message.sharer_name}} ({{message.sharer_email}}) があなたとビデオマネージメントシステム "{{message.system_name}}"へのアクセスを共有しています
 {{/message.sharer_name}}
 
-{{message.sharer_name}}
+{{^message.sharer_name}}
 ビデオマネジメントシステム "{{message.system_name}}"へのアクセスが許可されました
 {{/message.sharer_name}}
 

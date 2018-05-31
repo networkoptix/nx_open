@@ -4,39 +4,42 @@
 
 #include <utils/common/delayed.h>
 
-QnImageProvider::QnImageProvider(QObject* parent):
+namespace nx {
+namespace client {
+namespace desktop {
+
+ImageProvider::ImageProvider(QObject* parent):
     QObject(parent)
 {
-
 }
 
-void QnImageProvider::loadAsync()
+void ImageProvider::loadAsync()
 {
     doLoadAsync();
 }
 
-QnBasicImageProvider::QnBasicImageProvider(const QImage& image, QObject* parent):
-    QnImageProvider(parent),
+BasicImageProvider::BasicImageProvider(const QImage& image, QObject* parent):
+    ImageProvider(parent),
     m_image(image)
 {
 }
 
-QImage QnBasicImageProvider::image() const
+QImage BasicImageProvider::image() const
 {
     return m_image;
 }
 
-QSize QnBasicImageProvider::sizeHint() const
+QSize BasicImageProvider::sizeHint() const
 {
     return m_image.size() / m_image.devicePixelRatio();
 }
 
-Qn::ThumbnailStatus QnBasicImageProvider::status() const
+Qn::ThumbnailStatus BasicImageProvider::status() const
 {
     return Qn::ThumbnailStatus::Loaded;
 }
 
-void QnBasicImageProvider::doLoadAsync()
+void BasicImageProvider::doLoadAsync()
 {
     executeDelayedParented(
         [this]
@@ -45,3 +48,7 @@ void QnBasicImageProvider::doLoadAsync()
             emit statusChanged(Qn::ThumbnailStatus::Loaded);
         }, this);
 }
+
+} // namespace desktop
+} // namespace client
+} // namespace nx

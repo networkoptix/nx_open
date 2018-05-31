@@ -29,7 +29,7 @@ mv "$APP_DIR"/Contents/MacOS/protocol_handler.app "$APP_DIR"/Contents/MacOS/"$PR
 mkdir -p "$APP_DIR/Contents/Resources"
 cp logo.icns "$APP_DIR/Contents/Resources/appIcon.icns"
 cp logo.icns $SRC/.VolumeIcon.icns
-cp -R "@packages.dir@/any/roboto-fonts/bin/fonts" "$APP_DIR/Contents/MacOS/"
+cp -R "@packages.dir@/any/roboto-fonts/bin/fonts" "$APP_DIR/Contents/Resources/"
 
 function hexify
 {
@@ -74,7 +74,7 @@ then
 fi
 
 SetFile -c icnC $SRC/.VolumeIcon.icns
-hdiutil create -srcfolder $SRC -volname "$VOLUME_NAME" -format UDRW -ov "raw-$DMG_FILE"
+hdiutil create -srcfolder $SRC -volname "$VOLUME_NAME" -fs "HFS+" -format UDRW -ov "raw-$DMG_FILE"
 
 [ "$1" == "rwonly" ] && exit 0
 

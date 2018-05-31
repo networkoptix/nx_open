@@ -23,7 +23,7 @@ public:
      */
     static void setMaxResolutions(const QMap<int, QSize>& maxResolutions);
 
-    FfmpegVideoDecoder(const ResourceAllocatorPtr& allocator, const QSize& resolution);
+    FfmpegVideoDecoder(const RenderContextSynchronizerPtr& synchronizer, const QSize& resolution);
     virtual ~FfmpegVideoDecoder();
 
     static bool isCompatible(

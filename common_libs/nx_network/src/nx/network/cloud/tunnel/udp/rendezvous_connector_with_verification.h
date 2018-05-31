@@ -41,7 +41,7 @@ public:
     void notifyAboutChoosingConnection(ConnectCompletionHandler completionHandler);
 
 private:
-    std::chrono::milliseconds m_timeout;
+    std::chrono::milliseconds m_timeout{0};
     ConnectCompletionHandler m_connectCompletionHandler;
     std::unique_ptr<stun::MessagePipeline> m_requestPipeline;
     std::unique_ptr<nx::network::UdtStreamSocket> m_udtConnection;

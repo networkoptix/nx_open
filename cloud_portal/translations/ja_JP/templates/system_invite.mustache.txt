@@ -1,11 +1,11 @@
-{{PRODUCT_NAME}} へようこそ
+%PRODUCT_NAME% へようこそ
 
 {{#message.sharer_name}}
-{{message.sharer_name}} ({{message.sharer_email}}) は、{{PRODUCT_NAME}} に招待し、システム {{message.system_name}} が共有されます
+{{message.sharer_name}} ({{message.sharer_email}}) は、%PRODUCT_NAME% に招待し、システム {{message.system_name}} が共有されます
 {{/message.sharer_name}}
 
 {{/message.sharer_name}}
-招待されて {{PRODUCT_NAME}} に参加します
+招待されて %PRODUCT_NAME% に参加します
 {{message.system_name}}へのアクセスが許可されています
 {{/message.sharer_name}}
 

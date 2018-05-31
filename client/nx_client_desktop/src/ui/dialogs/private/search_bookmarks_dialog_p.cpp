@@ -37,6 +37,7 @@
 #include <utils/common/synctime.h>
 #include <utils/common/scoped_value_rollback.h>
 
+using namespace nx::client::desktop;
 using namespace nx::client::desktop::ui;
 
 QnSearchBookmarksDialogPrivate::QnSearchBookmarksDialogPrivate(const QString &filterText
@@ -82,10 +83,10 @@ QnSearchBookmarksDialogPrivate::QnSearchBookmarksDialogPrivate(const QString &fi
     enum { kUpdateFilterDelayMs = 200 };
     m_ui->filterLineEdit->setTextChangedSignalFilterMs(kUpdateFilterDelayMs);
 
-    connect(m_ui->filterLineEdit, &QnSearchLineEdit::enterKeyPressed, this, updateFilterText);
-    connect(m_ui->filterLineEdit, &QnSearchLineEdit::textChanged, this, updateFilterText);
+    connect(m_ui->filterLineEdit, &SearchLineEdit::enterKeyPressed, this, updateFilterText);
+    connect(m_ui->filterLineEdit, &SearchLineEdit::textChanged, this, updateFilterText);
 
-    connect(m_ui->filterLineEdit, &QnSearchLineEdit::escKeyPressed, this, [this]()
+    connect(m_ui->filterLineEdit, &SearchLineEdit::escKeyPressed, this, [this]()
     {
         m_ui->filterLineEdit->lineEdit()->setText(QString());
         m_model->setFilterText(QString());

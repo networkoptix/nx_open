@@ -5,9 +5,6 @@ VMS_DIR=$(dirname $(dirname "${BASH_SOURCE[0]}"))
 EXE="$VMS_DIR/bin/mediaserver-bin"
 ARGS="-e"
 
-export LD_LIBRARY_PATH="$VMS_DIR/lib"
-#export VMS_PLUGIN_DIR="$VMS_DIR/lib"
-
 # Switch off rp_filter for all interfaces to allow
 # discover/install cameras with invalid ip addresses
 for interface in /proc/sys/net/ipv4/conf/*/rp_filter; do
@@ -36,3 +33,8 @@ ulimit -a
 echo
 echo --- Starting: $EXE $ARGS
 exec start-stop-daemon --start -d "$VMS_DIR/bin" --exec $EXE -- $ARGS
+
+# root_tool enabled version
+# exec start-stop-daemon --start \
+#     --chuid @deb.customization.company.name@:@deb.customization.company.name@ \
+#     -d "$VMS_DIR/bin" --exec $EXE -- $ARGS

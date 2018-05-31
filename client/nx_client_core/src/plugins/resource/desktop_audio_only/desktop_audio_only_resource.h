@@ -12,8 +12,7 @@ public:
     virtual QnConstResourceAudioLayoutPtr getAudioLayout(
             const QnAbstractStreamDataProvider *dataProvider) const override;
 
-protected:
-    virtual QnAbstractStreamDataProvider* createDataProviderInternal(
-        Qn::ConnectionRole role) override;
-
+    static QnAbstractStreamDataProvider* createDataProvider(
+        const QnResourcePtr& resource,
+        Qn::ConnectionRole role);
 };

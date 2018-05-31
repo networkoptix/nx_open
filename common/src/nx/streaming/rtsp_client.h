@@ -25,6 +25,7 @@ extern "C"
 #include <utils/common/byte_array.h>
 #include <utils/camera/camera_diagnostics.h>
 #include <network/client_authenticate_helper.h>
+#include <nx/utils/elapsed_timer.h>
 
 //#define DEBUG_TIMINGS
 //#define _DUMP_STREAM
@@ -87,7 +88,7 @@ public:
 private:
     double cameraTimeToLocalTime(double cameraSecondsSinceEpoch, double currentSecondsSinceEpoch);
     bool isLocalTimeChanged();
-    bool isCameraTimeChanged(const QnRtspStatistic& statistics);
+    bool isCameraTimeChanged(const QnRtspStatistic& statistics, double* outCameraTimeDriftSeconds);
     void reset();
 private:
     quint32 m_prevRtpTime = 0;
@@ -95,7 +96,8 @@ private:
     QElapsedTimer m_timer;
     qint64 m_localStartTime;
     //qint64 m_cameraTimeDrift;
-    double m_rtcpReportTimeDiff;
+    boost::optional<double> m_rtcpReportTimeDiff;
+    nx::utils::ElapsedTimer m_rtcpJitterTimer;
 
     struct CamSyncInfo {
         CamSyncInfo(): timeDiff(INT_MAX) {}
@@ -110,6 +112,7 @@ private:
     static QMap<QString, QPair<QSharedPointer<QnRtspTimeHelper::CamSyncInfo>, int> > m_camClock;
     qint64 m_lastWarnTime;
     TimePolicy m_timePolicy = TimePolicy::bindCameraTimeToLocalTime;
+    QnRtspStatistic m_statistics;
 
 #ifdef DEBUG_TIMINGS
     void printTime(double jitter);

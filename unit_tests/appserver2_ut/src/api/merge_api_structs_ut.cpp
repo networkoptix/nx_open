@@ -4,11 +4,13 @@
 #include <nx/fusion/model_functions.h>
 #include <nx/utils/std/cpp14.h>
 
-#include <rest/ec2_update_http_handler.h>
+#include <rest/handlers/ec2_update_http_handler.h>
 
 #include <nx/core/access/access_types.h>
 #include <core/resource_access/user_access_data.h>
 #include <api/model/audit/auth_session.h>
+
+#include <nx_ec/data/api_fwd.h>
 #include <nx_ec/data/api_data.h>
 
 #include "mock_stream_socket.h"
@@ -54,14 +56,14 @@ struct ApiMockInnerData
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES((ApiMockInnerData), (ubjson)(json), _Fields)
 typedef std::vector<ApiMockInnerData> ApiMockInnerDataList;
 
-struct ApiMockData: ApiIdData
+struct ApiMockData: nx::vms::api::IdData
 {
-    ApiMockData(): ApiIdData(), i(666) {}
+    ApiMockData(): nx::vms::api::IdData(), i(666) {}
 
     ApiMockData(
         QnUuid _id, int _i, const ApiMockInnerData& _inner, const ApiMockInnerDataList& _array)
         :
-        ApiIdData(_id), i(_i), inner(_inner), array(_array)
+        nx::vms::api::IdData(_id), i(_i), inner(_inner), array(_array)
     {
     }
 
@@ -78,7 +80,7 @@ struct ApiMockData: ApiIdData
     ApiMockInnerData inner;
     ApiMockInnerDataList array;
 };
-#define ApiMockData_Fields ApiIdData_Fields (i)(array)(inner)
+#define ApiMockData_Fields IdData_Fields (i)(array)(inner)
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES((ApiMockData), (ubjson)(json), _Fields)
 typedef std::vector<ApiMockData> ApiMockDataList;
 
@@ -135,7 +137,7 @@ struct ApiMockDataJson
 class MockConnection
 {
 public:
-    typedef std::function<void(ErrorCode, ApiMockDataList)> QueryHandler;
+    typedef std::function<void(ec2::ErrorCode, ApiMockDataList)> QueryHandler;
     typedef std::function<void(
         ApiCommand::Value cmdCode, QnUuid input, QueryHandler handler)> QueryCallback;
 
@@ -220,7 +222,7 @@ public:
         ASSERT_EQ(nx::network::http::StatusCode::ok, httpStatusCode);
 
         bool success = false;
-        ApiIdData apiIdData = QJson::deserialized(resultBody, ApiIdData(), &success);
+        nx::vms::api::IdData apiIdData = QJson::deserialized(resultBody, nx::vms::api::IdData(), &success);
         ASSERT_TRUE(success) << resultBody.toStdString();
         ASSERT_EQ(expectedData.id, apiIdData.id);
 

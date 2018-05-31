@@ -14,16 +14,18 @@ log = logging.getLogger(__name__)
 
 TIMEDELTA_REGEXP = re.compile(r'^((?P<days>\d+?)d)?((?P<hours>\d+?)h)?((?P<minutes>\d+?)m)?((?P<seconds>\d+?)s)?$')
 
+
 def timedelta_constructor(loader, node):
     value = loader.construct_scalar(node)
     return str_to_timedelta(value)
 
+
 def str_to_timedelta(duration_str):
     match = TIMEDELTA_REGEXP.match(duration_str)
     try:
-        if not match: return datetime.timedelta(seconds=int(duration_str))
-        timedelta_params = {k: int(v)
-                            for (k, v) in match.groupdict().items() if v}
+        if not match:
+            return datetime.timedelta(seconds=int(duration_str))
+        timedelta_params = {k: int(v) for (k, v) in match.groupdict().items() if v}
         if not timedelta_params:
             return datetime.timedelta(seconds=int(duration_str))
         return datetime.timedelta(**timedelta_params)
@@ -68,7 +70,7 @@ class TestsConfig(object):
 
     @classmethod
     def from_yaml_file(cls, file_path):
-        full_path = Path(file_path).expanduser()  # Accepts option value.
+        full_path = Path(file_path)  # Accepts option value.
         if not full_path.exists():
             raise argparse.ArgumentTypeError('file does not exist: %s' % full_path)
         with full_path.open() as f:
@@ -96,7 +98,8 @@ class TestsConfig(object):
         return config
 
     def __init__(self, physical_installation_host_list=None, tests=None):
-        self.physical_installation_host_list = physical_installation_host_list or []  # PhysicalInstallationHostConfig list
+        # PhysicalInstallationHostConfig list
+        self.physical_installation_host_list = physical_installation_host_list or []
         self.tests = tests or {}  # {}, full test name -> {}
 
     def _update_with_tests_params(self, test_params):
@@ -118,7 +121,8 @@ class TestsConfig(object):
             node_id = self._parent_node_id(node_id)
         return SingleTestConfig()  # no config in file - all test defaults will be used then
 
-    def _parent_node_id(self, node_id):
+    @staticmethod
+    def _parent_node_id(node_id):
         if '[' in node_id:
             return node_id.split('[')[0]
         if '::' in node_id:
@@ -145,7 +149,8 @@ class SingleTestConfig(object):
             log.info('Test config: %s = %r', name, config[name])
         return SimpleNamespace(**config)
 
-    def _cast_value(self, value, t):
+    @staticmethod
+    def _cast_value(value, t):
         if not isinstance(value, (str, unicode)):
             return value
         if t is int:

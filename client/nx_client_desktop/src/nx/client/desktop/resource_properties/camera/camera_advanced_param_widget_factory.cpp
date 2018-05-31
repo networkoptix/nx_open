@@ -2,6 +2,7 @@
 
 #include <QtCore/QObject>
 
+#include <QtWidgets/QApplication>
 #include <QtWidgets/QBoxLayout>
 #include <QtWidgets/QCheckBox>
 #include <QtWidgets/QComboBox>
@@ -11,6 +12,7 @@
 #include <QtWidgets/QPushButton>
 #include <QtWidgets/QSpinBox>
 #include <QtWidgets/QWidget>
+#include <qcoreapplication.h>   // for Q_DECLARE_TR_FUNCTIONS
 
 #include <ui/common/read_only.h>
 #include <ui/style/custom_style.h>
@@ -18,6 +20,9 @@
 #include <ui/workaround/widgets_signals_workaround.h>
 
 #include <nx/utils/math/fuzzy.h>
+#include <nx/client/desktop/common/widgets/lens_ptz_control.h>
+#include <nx/client/desktop/common/widgets/button_slider.h>
+#include <nx/client/desktop/common/widgets/hover_button.h>
 
 namespace nx {
 namespace client {
@@ -32,15 +37,21 @@ AbstractCameraAdvancedParamWidget::AbstractCameraAdvancedParamWidget(const QnCam
     setLayout(m_layout);
 }
 
+QStringList AbstractCameraAdvancedParamWidget::range() const
+{
+    NX_ASSERT(false, lit("range allowed to be called only for Enumeration widget."));
+    return QStringList();
+}
+
 void AbstractCameraAdvancedParamWidget::setRange(const QString& /*range*/)
 {
     NX_ASSERT(false, lit("setRange allowed to be called only for Enumeration widget."));
 }
 
-class BoolCameraAdvancedParamWidget: public AbstractCameraAdvancedParamWidget
+class QnBoolCameraAdvancedParamWidget: public AbstractCameraAdvancedParamWidget
 {
 public:
-    BoolCameraAdvancedParamWidget(const QnCameraAdvancedParameter &parameter, QWidget* parent):
+    QnBoolCameraAdvancedParamWidget(const QnCameraAdvancedParameter &parameter, QWidget* parent):
         AbstractCameraAdvancedParamWidget(parameter, parent),
         m_checkBox(new QCheckBox(this))
     {
@@ -66,10 +77,10 @@ private:
     QCheckBox* m_checkBox;
 };
 
-class MinMaxStepCameraAdvancedParamWidget: public AbstractCameraAdvancedParamWidget
+class QnMinMaxStepCameraAdvancedParamWidget: public AbstractCameraAdvancedParamWidget
 {
 public:
-    MinMaxStepCameraAdvancedParamWidget(const QnCameraAdvancedParameter& parameter, QWidget* parent):
+    QnMinMaxStepCameraAdvancedParamWidget(const QnCameraAdvancedParameter& parameter, QWidget* parent):
         AbstractCameraAdvancedParamWidget(parameter, parent),
         m_spinBox(new QSpinBox(this))
     {
@@ -163,10 +174,10 @@ private:
     bool m_isInteger = false;
 };
 
-class EnumerationCameraAdvancedParamWidget: public AbstractCameraAdvancedParamWidget
+class QnEnumerationCameraAdvancedParamWidget: public AbstractCameraAdvancedParamWidget
 {
 public:
-    EnumerationCameraAdvancedParamWidget(const QnCameraAdvancedParameter& parameter, QWidget* parent):
+    QnEnumerationCameraAdvancedParamWidget(const QnCameraAdvancedParameter& parameter, QWidget* parent):
         AbstractCameraAdvancedParamWidget(parameter, parent),
         m_comboBox(new QComboBox(this))
     {
@@ -182,10 +193,19 @@ public:
             });
     }
 
-    virtual void setRange(const QString& range)
+    virtual void setRange(const QString& range) override
     {
         auto rangeToSet = range.split(L',');
         setRange(rangeToSet);
+    }
+
+    virtual QStringList range() const override
+    {
+        QStringList result;
+        for (auto i = 0; i < m_comboBox->count(); ++i)
+            result << m_comboBox->itemText(i);
+
+        return result;
     }
 
     void setRange(const QStringList& range)
@@ -205,7 +225,7 @@ public:
     virtual void setValue(const QString& newValue) override
     {
         if (m_comboBox->findText(newValue) == -1)
-            m_comboBox->addItem(newValue);
+            return;
         m_comboBox->setCurrentText(newValue);
     }
 
@@ -213,9 +233,10 @@ private:
     QComboBox* const m_comboBox = nullptr;
 };
 
-class ButtonCameraAdvancedParamWidget: public AbstractCameraAdvancedParamWidget {
+class QnButtonCameraAdvancedParamWidget: public AbstractCameraAdvancedParamWidget
+{
 public:
-    ButtonCameraAdvancedParamWidget(const QnCameraAdvancedParameter &parameter, QWidget* parent):
+    QnButtonCameraAdvancedParamWidget(const QnCameraAdvancedParameter &parameter, QWidget* parent):
         AbstractCameraAdvancedParamWidget(parameter, parent)
     {
         QPushButton *button = new QPushButton(this);
@@ -247,9 +268,10 @@ public:
     virtual void setValue(const QString &newValue) override	{ Q_UNUSED(newValue); }
 };
 
-class StringCameraAdvancedParamWidget: public AbstractCameraAdvancedParamWidget {
+class QnStringCameraAdvancedParamWidget: public AbstractCameraAdvancedParamWidget
+{
 public:
-    StringCameraAdvancedParamWidget(const QnCameraAdvancedParameter &parameter, QWidget* parent):
+    QnStringCameraAdvancedParamWidget(const QnCameraAdvancedParameter &parameter, QWidget* parent):
         AbstractCameraAdvancedParamWidget(parameter, parent),
         m_lineEdit(new QLineEdit(this))
     {
@@ -281,10 +303,146 @@ private:
     QLineEdit* m_lineEdit;
 };
 
-class SeparatorCameraAdvancedParamWidget: public AbstractCameraAdvancedParamWidget
+
+// Wrapper for a vertical slider.
+class QnVSliderCameraAdvancedParamWidget: public AbstractCameraAdvancedParamWidget
+{
+    Q_DECLARE_TR_FUNCTIONS(QnVSliderCameraAdvancedParamWidget)
+
+public:
+    QnVSliderCameraAdvancedParamWidget(const QnCameraAdvancedParameter& parameter, QWidget* parent) :
+        AbstractCameraAdvancedParamWidget(parameter, parent)
+    {
+        m_slider = new nx::client::desktop::VButtonSlider(this);
+        m_slider->setText(parameter.name);
+        m_slider->setMaximumWidth(80);
+        m_layout->insertWidget(0, m_slider);
+
+        connect(m_slider, &nx::client::desktop::VButtonSlider::valueChanged, this,
+            [this](int val)
+            {
+                emit valueChanged(m_id, value());
+            });
+        // Hardcoding its position and range for now.
+        m_slider->setMaximum(100);
+        m_slider->setMinimum(-100);
+        m_slider->setButtonIncrement(50);
+        m_slider->setSliderPosition(0);
+    }
+
+    virtual QString value() const override
+    {
+        int innerValue = m_slider->sliderPosition();
+        return QString::number(innerValue);
+    }
+
+    virtual void setValue(const QString &newValue) override
+    {
+        int intValue = newValue.toInt();
+        m_slider->setSliderPosition(intValue);
+    }
+
+    virtual void setRange(const QString& range) override
+    {
+        QStringList minMax = range.split(L',');
+        if (minMax.size() != 2)
+            return;
+
+        bool success = false;
+        int min = minMax[0].toInt(&success);
+        if (!success)
+            return;
+
+        int max = minMax[1].toInt(&success);
+        if (!success)
+            return;
+
+        m_slider->setMinimum(min);
+        m_slider->setMaximum(max);
+    }
+
+    virtual QSize sizeHint() const override
+    {
+        return m_slider->sizeHint();
+    }
+
+    nx::client::desktop::VButtonSlider* m_slider = nullptr;
+};
+
+class QnPanTiltRotationCameraAdvancedParamWidget : public AbstractCameraAdvancedParamWidget
+{
+    Q_DECLARE_TR_FUNCTIONS(QnPanTiltRotationCameraAdvancedParamWidget)
+    using LensPtzControl = nx::client::desktop::LensPtzControl;
+
+public:
+    QnPanTiltRotationCameraAdvancedParamWidget(const QnCameraAdvancedParameter& parameter, QWidget* parent):
+        AbstractCameraAdvancedParamWidget(parameter, parent),
+        m_ptrWidget(new LensPtzControl(this))
+    {
+        QSize buttonSize(30, 30);
+
+        const QString kIconCw(lit("buttons/rotate_cw.png"));
+        const QString kIconCwHovered(lit("buttons/rotate_cw_hovered.png"));
+        const QString kIconCcw(lit("buttons/rotate_ccw.png"));
+        const QString kIconCcwHovered(lit("buttons/rotate_ccw_hovered.png"));
+
+        // Central widget is here.
+        const auto ptzrContainer = new QVBoxLayout();
+        ptzrContainer->addWidget(m_ptrWidget);
+
+        const auto ptzrInfoContainer = new QHBoxLayout();
+
+        m_rotationAdd = new nx::client::desktop::HoverButton(kIconCw, kIconCwHovered, this);
+        m_rotationDec = new nx::client::desktop::HoverButton(kIconCcw, kIconCcwHovered, this);
+        m_rotationLabel = new QLabel();
+        m_rotationLabel->setText(rotationText(0));
+        ptzrInfoContainer->addWidget(m_rotationAdd);
+        ptzrInfoContainer->addWidget(m_rotationLabel);
+        ptzrInfoContainer->addWidget(m_rotationDec);
+        ptzrContainer->addLayout(ptzrInfoContainer);
+        ptzrContainer->setAlignment(ptzrInfoContainer, Qt::AlignCenter);
+
+        m_layout->addLayout(ptzrContainer);
+
+        connect(m_ptrWidget, &LensPtzControl::valueChanged, this,
+            [this](const LensPtzControl::Value& v)
+            {
+                m_rotationLabel->setText(rotationText(v.rotation));
+                emit valueChanged(m_id, value());
+            });
+    }
+
+    QString rotationText(int rotation)
+    {
+        return tr("Rotation: ") + QString::number(int(rotation)) + lit("\xB0");
+    }
+
+    virtual QString value() const override
+    {
+        auto val = m_ptrWidget->value();
+        return lit("%1,%2,%3").arg(val.horizontal).arg(val.vertical).arg(val.rotation);
+    }
+
+    virtual void setValue(const QString &range) override
+    {
+        // Expecting 6 numbers, like "-40,40,-30,30,-40,40";
+        QStringList minMax = range.split(L',');
+        if (minMax.size() != 6)
+            return;
+        // TODO: Impelemt it, when a proper value infrastructure implemented for this case.
+    }
+
+protected:
+    nx::client::desktop::LensPtzControl* m_ptrWidget = nullptr;
+    QAbstractButton* m_rotationAdd = nullptr;
+    QAbstractButton* m_rotationDec = nullptr;
+    QLabel* m_rotationLabel = nullptr;
+};
+
+class QnSeparatorCameraAdvancedParamWidget: public AbstractCameraAdvancedParamWidget
 {
 public:
-    SeparatorCameraAdvancedParamWidget(const QnCameraAdvancedParameter& parameter, QWidget* parent):
+    QnSeparatorCameraAdvancedParamWidget(const QnCameraAdvancedParameter& parameter, QWidget* parent):
         AbstractCameraAdvancedParamWidget(parameter, parent),
         m_line(new QFrame(this))
     {
@@ -308,29 +466,37 @@ AbstractCameraAdvancedParamWidget* QnCameraAdvancedParamWidgetFactory::createWid
 
     switch (parameter.dataType)
     {
-        /* CheckBox */
+        // CheckBox.
         case QnCameraAdvancedParameter::DataType::Bool:
-            return new BoolCameraAdvancedParamWidget(parameter, parent);
+            return new QnBoolCameraAdvancedParamWidget(parameter, parent);
 
-        /* Slider */
+        // Slider.
         case QnCameraAdvancedParameter::DataType::Number:
-            return new MinMaxStepCameraAdvancedParamWidget(parameter, parent);
+            return new QnMinMaxStepCameraAdvancedParamWidget(parameter, parent);
 
-        /* Drop-down box. */
+        // Drop-down box.
         case QnCameraAdvancedParameter::DataType::Enumeration:
-            return new EnumerationCameraAdvancedParamWidget(parameter, parent);
+            return new QnEnumerationCameraAdvancedParamWidget(parameter, parent);
 
-        /* Button */
+        // Button
         case QnCameraAdvancedParameter::DataType::Button:
-            return new ButtonCameraAdvancedParamWidget(parameter, parent);
+            return new QnButtonCameraAdvancedParamWidget(parameter, parent);
 
-        /* LineEdit  */
+        // LineEdit.
         case QnCameraAdvancedParameter::DataType::String:
-            return new StringCameraAdvancedParamWidget(parameter, parent);
+            return new QnStringCameraAdvancedParamWidget(parameter, parent);
 
-        /* Separator */
+        // Separator.
         case QnCameraAdvancedParameter::DataType::Separator:
-            return new SeparatorCameraAdvancedParamWidget(parameter, parent);
+            return new QnSeparatorCameraAdvancedParamWidget(parameter, parent);
+
+        // Vertical slider.
+        case QnCameraAdvancedParameter::DataType::SliderControl:
+            return new QnVSliderCameraAdvancedParamWidget(parameter, parent);
+
+        // Round ptr control.
+        case QnCameraAdvancedParameter::DataType::PtrControl:
+            return new QnPanTiltRotationCameraAdvancedParamWidget(parameter, parent);
 
         default:
             return nullptr;

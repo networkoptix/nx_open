@@ -978,8 +978,8 @@ to view more bookmarks</source>
       <translation>El número de desactivaciones excedió el límite para esta licencia.</translation>
     </message>
     <message>
-      <source>Hardware Id of Server with this license does not match Hardware Id on which license was activated.</source>
-      <translation>El Id de hardware del servidor con esta licencia no coincide con el Id de hardware en el que se activó la licencia.</translation>
+      <source>Hardware ID of Server with this license does not match Hardware ID on which license was activated.</source>
+      <translation>El ID de Hardware del servidor con esta licencia no coincide con el ID de Hardware en el que se activó la licencia.</translation>
     </message>
   </context>
   <context>
@@ -1120,17 +1120,17 @@ to view more bookmarks</source>
       <source>File &quot;%1&quot; cannot be written. Please try another name.</source>
       <translation>El archivo &quot;%1&quot; no puede escribirse. Intenta otro nombre.</translation>
     </message>
-    <message numerus="yes">
-      <source>Filename should not contain the following reserved characters:
-%1</source>
-      <translation>
-        <numerusform>El nombre de archivo no debe contener los siguientes caracteres reservados: %1</numerusform>
-        <numerusform>El nombre de archivo no debe contener los siguientes caracteres reservados: %1</numerusform>
-      </translation>
-    </message>
     <message>
-      <source>Filename &quot;%1&quot; is reserved by operating system. Please try another name.</source>
-      <translation>El nombre de archivo &quot;%1&quot; está reservado por el sistema operativo. Intenta otro nombre.</translation>
+      <source>File name &quot;%1&quot; is reserved by operating system. Please try another name.</source>
+      <translation>El nombre del archivo &quot;%1&quot; está reservado por el sistema operativo. Por favor prueba con otro nombre.</translation>
+    </message>
+    <message numerus="yes">
+      <source>File name must not contain the following reserved characters:</source>
+      <comment>Plural relates to the word _characters_ here, not _file name_.</comment>
+      <translation>
+        <numerusform>El nombre de archivo no debe contener los siguientes caracteres reservados:</numerusform>
+        <numerusform>El nombre de archivo no debe contener los siguientes caracteres reservados:</numerusform>
+      </translation>
     </message>
   </context>
   <context>
@@ -1402,6 +1402,14 @@ to view more bookmarks</source>
       <source>Folder not found</source>
       <translation>Carpeta no encontrada</translation>
     </message>
+    <message>
+      <source>Helps avoid problems with OpenGL drawing which result in 100% CPU load.</source>
+      <translation>Ayuda a evitar problemas con el dibujo de OpenGL que da como resultado una carga de CPU del 100%.</translation>
+    </message>
+    <message>
+      <source>Adjust to smallest value that does not degrade live view. Bigger buffer makes playback smoother but increases delay between real time and live view; smaller buffer decreases delay but can cause stutters.</source>
+      <translation>Ajuste al valor más pequeño que no degrade la vista en vivo. Un buffer más grande hace que la reproducción sea más fluida, pero aumenta la demora entre el tiempo real y la visualización en vivo; un buffer más pequeño disminuye la demora pero puede causar el video entrecotado.</translation>
+    </message>
   </context>
   <context>
     <name>QnArchiveLengthWidget</name>
@@ -1412,6 +1420,14 @@ to view more bookmarks</source>
     <message>
       <source>High minimum value can lead to archive length decrease on other cameras.</source>
       <translation>Alto valor mínimo puede llevar a archivo longitud disminución en otros dispositivos.</translation>
+    </message>
+    <message>
+      <source>Sets when camera archive will be deleted or saved when there is no space for new recordings.</source>
+      <translation>Establece cuándo se borrará o guardará el archivo de la cámara cuando no haya espacio para nuevas grabaciones.</translation>
+    </message>
+    <message>
+      <source>&quot;Auto&quot; deletes the oldest footage first, regardless of the source.</source>
+      <translation>&quot;Auto&quot; elimina primero el material de archivo más antiguo, independientemente de la fuente.</translation>
     </message>
   </context>
   <context>
@@ -2192,18 +2208,6 @@ to view more bookmarks</source>
       <translation>Cargando...</translation>
     </message>
     <message>
-      <source>Primary Stream</source>
-      <translation>Corriente primaria</translation>
-    </message>
-    <message>
-      <source>Secondary Stream</source>
-      <translation>Corriente secundaria</translation>
-    </message>
-    <message>
-      <source>Camera has no secondary stream</source>
-      <translation>Cámara no tiene ninguna corriente secundaria</translation>
-    </message>
-    <message>
       <source>This I/O module has no advanced settings</source>
       <translation>Este módulo no tiene ninguna configuración avanzada</translation>
     </message>
@@ -2212,8 +2216,36 @@ to view more bookmarks</source>
       <translation>Esta cámara no tiene ninguna configuración avanzada</translation>
     </message>
     <message>
+      <source>Settings</source>
+      <translation>Ajustes</translation>
+    </message>
+    <message>
+      <source>Web</source>
+      <translation>Red</translation>
+    </message>
+    <message>
+      <source>No settings</source>
+      <translation>Sin configuraciones</translation>
+    </message>
+    <message>
+      <source>Secondary Stream</source>
+      <translation>Corriente secundaria</translation>
+    </message>
+    <message>
+      <source>I/O Module ID</source>
+      <translation>ID del módulo de E/S</translation>
+    </message>
+    <message>
+      <source>Camera ID</source>
+      <translation>ID de la cámara</translation>
+    </message>
+    <message>
       <source>Audio Stream</source>
       <translation>Flujo de audio</translation>
+    </message>
+    <message>
+      <source>Primary Stream</source>
+      <translation>Corriente primaria</translation>
     </message>
     <message>
       <source>URL is not available. Open stream and try again.</source>
@@ -2228,24 +2260,8 @@ to view more bookmarks</source>
       <translation>Módulo de la entrada-salida no tiene ninguna reproducción de audio</translation>
     </message>
     <message>
-      <source>I/O Module Id</source>
-      <translation>Id del módulo de E/S</translation>
-    </message>
-    <message>
-      <source>Camera Id</source>
-      <translation>Id de la cámara</translation>
-    </message>
-    <message>
-      <source>Settings</source>
-      <translation>Ajustes</translation>
-    </message>
-    <message>
-      <source>Web</source>
-      <translation>Red</translation>
-    </message>
-    <message>
-      <source>No settings</source>
-      <translation>Sin configuraciones</translation>
+      <source>Camera has no secondary stream</source>
+      <translation>Cámara no tiene ninguna corriente secundaria</translation>
     </message>
   </context>
   <context>
@@ -2359,11 +2375,23 @@ to view more bookmarks</source>
       <translation>Edge</translation>
     </message>
     <message numerus="yes">
-      <source>This Id is already used on the following %n cameras: %1</source>
+      <source>This ID is already used on the following %n cameras: %1</source>
       <translation>
         <numerusform>Esta identificación ya se usa en las siguientes cámaras %n: %1</numerusform>
         <numerusform>Esta identificación ya se usa en las siguientes cámaras %n: %1</numerusform>
       </translation>
+    </message>
+    <message>
+      <source>Helps fix image quality issues on some cameras; for others will cause significant bitrate increase.</source>
+      <translation>Ayuda a solucionar problemas de calidad de imagen en algunas cámaras; para otros causará un aumento significativo en la velocidad de bits.</translation>
+    </message>
+    <message>
+      <source>Custom number that can be assigned to a camera for quick identification and access</source>
+      <translation>Número personalizado que se puede asignar a una cámara para una rápida identificación y acceso</translation>
+    </message>
+    <message>
+      <source>Server will not change any cameras settings, it will receive and use camera stream as-is.</source>
+      <translation>El servidor no cambiará las configuraciones de las cámaras, recibirá y usará la transmisión de la cámara tal como está.</translation>
     </message>
   </context>
   <context>
@@ -2484,8 +2512,8 @@ to view more bookmarks</source>
       <translation>Servidor</translation>
     </message>
     <message>
-      <source>Id</source>
-      <translation>Id</translation>
+      <source>ID</source>
+      <translation>ID</translation>
     </message>
   </context>
   <context>
@@ -2647,6 +2675,14 @@ to view more bookmarks</source>
       <source>More Settings</source>
       <translation>Más configuraciones</translation>
     </message>
+    <message>
+      <source>Quality setting determines the compression rate only, and does not affect resolution. Low, Medium, High and Best are preset bitrate values.</source>
+      <translation>La configuración de calidad determina la tasa de compresión solamente y no afecta la resolución. Bajo, Medio, Alto y Mejor son valores preestablecidos de tasa de bits.</translation>
+    </message>
+    <message>
+      <source>First choose a recording option, then apply it to day and time blocks on the recording schedule. (0 block is 12:00am to 1:00am, 23 block is 11:00pm to 12:00am.)</source>
+      <translation>Primero elija una opción de grabación, luego aplíquela a los bloques de día y hora en el horario de grabación. (El bloque 0 es de 12:00 a.m. a 1:00 a.m., el de 23 p.m. es de 11:00 p.m. a 12:00 a.m.)</translation>
+    </message>
   </context>
   <context>
     <name>QnCameraSettingsDialog</name>
@@ -2801,52 +2837,61 @@ dispositivos</translation>
     </message>
     <message>
       <source>Disconnect System from %1</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
       <translation>¿Desconectar el Sistema de %1</translation>
     </message>
     <message>
       <source>Open %1 Portal</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
       <translation>Abrir el %1 Portal</translation>
     </message>
     <message>
       <source>Create %1 Account</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
       <translation>Crear cuenta %1</translation>
     </message>
     <message>
       <source>Connect System to %1...</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
       <translation>Conectar el sistema a %1...</translation>
     </message>
     <message>
       <source>Create %1
 account</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
       <translation>Crear %1</translation>
     </message>
     <message>
       <source>Connect System
 to %1</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
       <translation>Conectar el sistema
 a %1</translation>
     </message>
     <message>
       <source>Learn more about %1</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
       <translation>Más información acerca de %1</translation>
     </message>
   </context>
   <context>
     <name>QnCloudResultMessages</name>
     <message>
-      <source>Incorrect email or password</source>
-      <translation>Correo electrónico o contraseña incorrecta</translation>
+      <source>Account not found</source>
+      <translation>Cuenta no encontrada</translation>
     </message>
     <message>
-      <source>Account is not activated. Please check your email and follow provided instructions</source>
-      <translation>La cuenta no está activada Por favor revise su correo electrónico y siga las instrucciones proporcionadas</translation>
+      <source>Account is not activated.</source>
+      <translation>La cuenta no está activa.</translation>
+    </message>
+    <message>
+      <source>Please log in to %1 and follow the provided instructions.</source>
+      <comment>%1 is a cloud site name like &quot;Nx Cloud&quot;</comment>
+      <translation>Inicie sesión en %1 y siga las instrucciones proporcionadas.</translation>
+    </message>
+    <message>
+      <source>Invalid password</source>
+      <translation>Invalid password</translation>
     </message>
   </context>
   <context>
@@ -2861,7 +2906,7 @@ a %1</translation>
     </message>
     <message>
       <source>Cannot connect to %1</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
       <translation>No se puede conectar a %1</translation>
     </message>
   </context>
@@ -2892,12 +2937,12 @@ a %1</translation>
     </message>
     <message>
       <source>Connect to %1</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
       <translation>Conectarse a %1</translation>
     </message>
     <message>
       <source>Enter %1 Account</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
       <translation>Ingrese la cuenta %1</translation>
     </message>
   </context>
@@ -2909,12 +2954,12 @@ a %1</translation>
     </message>
     <message>
       <source>System connected to %1</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
       <translation>Sistema conectado a %1</translation>
     </message>
     <message>
       <source>Failed to connect System to %1</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
       <translation>Error al conectar el sistema a %1</translation>
     </message>
   </context>
@@ -3066,17 +3111,17 @@ a %1</translation>
       <translation>Operación no se permite ahora. Puede ocurrir debido al reinicio del servidor. Por favor Inténtelo más tarde.</translation>
     </message>
     <message>
-      <source>Connection to %1 is not ready yet. Check server Internet connection or try again later.</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-      <translation>La conexión con %1 aún no está lista. Compruebe la conexión a internet del servidor o intente otra vez más tarde.</translation>
-    </message>
-    <message>
       <source>Connection to Server could not be established.</source>
       <translation>Conexión con el servidor no pudo ser establecida.</translation>
     </message>
     <message>
       <source>This user is disabled by system administrator.</source>
       <translation>Este usuario está deshabilitado por el administrador del sistema.</translation>
+    </message>
+    <message>
+      <source>Connection to %1 is not ready yet. Check server Internet connection or try again later.</source>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
+      <translation>La conexión con %1 aún no está lista. Compruebe la conexión a internet del servidor o intente otra vez más tarde.</translation>
     </message>
   </context>
   <context>
@@ -3101,16 +3146,12 @@ a %1</translation>
   <context>
     <name>QnCustomBusinessEventWidget</name>
     <message>
-      <source>Server API</source>
-      <translation>Servidor API</translation>
+      <source>Event will trigger only if there are matches in caption with any of entered keywords.</source>
+      <translation>El evento se activará solo si hay correspondencia en el título con cualquiera de las palabras clave introducidas.</translation>
     </message>
     <message>
-      <source>To generate Generic Event, please refer to %1.</source>
-      <translation>Para generar el evento genérico, consulte %1.</translation>
-    </message>
-    <message>
-      <source>Event will trigger only if Generic Event meets all the above conditions. If a keyword field is empty, condition is always met. If not, condition is met if the corresponding field of Generic Event contains any keyword.</source>
-      <translation>Evento se activará sólo si evento genérico cumple todas las condiciones arriba. Si un campo de palabra clave está vacío, siempre se cumple la condición. Si no es así, se cumple la condición si el campo correspondiente de evento genérico contiene cualquier palabra clave.</translation>
+      <source>If the field is empty, event will always trigger.</source>
+      <translation>Si el campo está vacío, el evento siempre se disparará.</translation>
     </message>
   </context>
   <context>
@@ -3180,8 +3221,8 @@ a %1</translation>
       <translation>La configuración del sistema se restaurará de la copia de seguridad, la aplicación del servidor se reiniciará.</translation>
     </message>
     <message>
-      <source>You can create a backup for System configurations that can be restored in case of failure.</source>
-      <translation>Puede crear una copia de seguridad de las configuraciones del sistema que pueden ser restaurados en caso de fallo.</translation>
+      <source>Database Backup Files</source>
+      <translation>Archivos de copia de seguridad</translation>
     </message>
   </context>
   <context>
@@ -3300,28 +3341,35 @@ a %1</translation>
       <translation>Desconectar</translation>
     </message>
     <message>
-      <source>Failed to disconnect System from %1</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-      <translation>Error al desconectar el sistema de %1</translation>
-    </message>
-    <message>
-      <source>Disconnect System from %1?</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-      <translation>¿Desconectar el Sistema de %1?</translation>
-    </message>
-    <message>
       <source>You will be disconnected from this System and able to login again through local network with local account</source>
       <translation>Se desconectará del sistema y podrá acceder otra vez a través de red local con cuenta local</translation>
     </message>
     <message>
-      <source>You will not be able to connect to this System with your %1 account after you disconnect this System from %1.</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-      <translation>Usted no será capaz de conectarse a este sistema con su cuenta %1 después de desconectar este sistema de %1.</translation>
+      <source>Failed to disconnect System from %1</source>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
+      <translation>Error al desconectar el sistema de %1</translation>
+    </message>
+    <message>
+      <source>Disconnect System from %1?</source>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
+      <translation>¿Desconectar el Sistema de %1?</translation>
     </message>
     <message>
       <source>All %1 users will be deleted.</source>
-      <comment>%1 is the short cloud name (like &apos;Cloud&apos;)</comment>
-      <translation type="unfinished">All %1 users will be deleted.</translation>
+      <comment>%1 is the short cloud name (like Cloud)</comment>
+      <translation>Todos los %1 usuarios serán eliminados.</translation>
+    </message>
+    <message>
+      <source>You will not be able to connect to this System with your %1 account after you disconnect this System from %1.</source>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
+      <translation>Usted no será capaz de conectarse a este sistema con su cuenta %1 después de desconectar este sistema de %1.</translation>
+    </message>
+  </context>
+  <context>
+    <name>QnEmptyBusinessActionWidget</name>
+    <message>
+      <source>Panic Recording mode switches recording settings for all Cameras to maximum FPS and Quality</source>
+      <translation>El modo de grabación de pánico cambia la configuración de grabación para todas las cámaras al máximo de FPS y calidad</translation>
     </message>
   </context>
   <context>
@@ -3559,6 +3607,13 @@ a %1</translation>
     </message>
   </context>
   <context>
+    <name>QnFisheyeSettingsWidget</name>
+    <message>
+      <source>Use this setting to compensate for distortion if camera is not mounted exactly vertically or horizontally.</source>
+      <translation>Utilice esta configuración para compensar la distorsión si la cámara no está montada exactamente vertical u horizontalmente.</translation>
+    </message>
+  </context>
+  <context>
     <name>QnGeneralPreferencesWidget</name>
     <message>
       <source>Select folder...</source>
@@ -3626,6 +3681,14 @@ a %1</translation>
     <message>
       <source>Open Camera List</source>
       <translation>Abrir Lista de Cámaras</translation>
+    </message>
+    <message>
+      <source>Backup includes servers and cameras settings, users, webpages, event rules, etc. Video is not saved.</source>
+      <translation>La copia de seguridad incluye configuraciones de servidores y cámaras, usuarios, páginas web, reglas de eventos, etc. El video no se guarda.</translation>
+    </message>
+    <message>
+      <source>Creates a backup of System configuration that can be restored in case of failure.</source>
+      <translation>Crea una copia de seguridad de la configuración del sistema que se puede restaurar en caso de error.</translation>
     </message>
   </context>
   <context>
@@ -3719,8 +3782,8 @@ a %1</translation>
       <translation>Impulso</translation>
     </message>
     <message>
-      <source>Id</source>
-      <translation>Id</translation>
+      <source>ID</source>
+      <translation>ID</translation>
     </message>
   </context>
   <context>
@@ -3872,6 +3935,21 @@ a %1</translation>
     </message>
   </context>
   <context>
+    <name>QnLensCameraAdvancedParamWidget</name>
+    <message>
+      <source>Zoom</source>
+      <translation>Zoom</translation>
+    </message>
+    <message>
+      <source>Rotation:</source>
+      <translation>Rotación:</translation>
+    </message>
+    <message>
+      <source>Focus</source>
+      <translation>Enfoque</translation>
+    </message>
+  </context>
+  <context>
     <name>QnLicenseDetailsDialog</name>
     <message>
       <source>Screens Allowed:</source>
@@ -3902,8 +3980,8 @@ a %1</translation>
       <translation>Características:</translation>
     </message>
     <message>
-      <source>Locked to Hardware Id</source>
-      <translation>Enlazado al Id de Hardware</translation>
+      <source>Locked to Hardware ID</source>
+      <translation>Enlazado al ID de Hardware</translation>
     </message>
   </context>
   <context>
@@ -4178,16 +4256,16 @@ a %1</translation>
       <translation>Póngase en contacto con Servicio al Cliente para activar la Clave de Licencia manualmente.</translation>
     </message>
     <message>
-      <source>This license is already activated and linked to Hardware Id %1</source>
-      <translation>Esta licencia ya está activada y enlazada al Id de hardware %1</translation>
-    </message>
-    <message>
-      <source>This license is already activated and linked to Hardware Id %1 on %2</source>
-      <translation>Esta licencia ya está activada y enlazada al Id de hardware %1 en %2</translation>
-    </message>
-    <message>
       <source>If the problem persists please contact Customer Support.</source>
       <translation>Si el problema persiste, póngase en contacto con Servicio al Cliente.</translation>
+    </message>
+    <message>
+      <source>This license is already activated and linked to Hardware ID %1</source>
+      <translation>Esta licencia ya está activada y enlazada al ID de Hardware %1</translation>
+    </message>
+    <message>
+      <source>This license is already activated and linked to Hardware ID %1 on %2</source>
+      <translation>Esta licencia ya está activada y enlazada al ID de Hardware %1 en %2</translation>
     </message>
   </context>
   <context>
@@ -4205,20 +4283,20 @@ a %1</translation>
       <translation>Abrir el archivo de licencia</translation>
     </message>
     <message>
-      <source>All files (*.*)</source>
-      <translation>Todos los archivos (*. *)</translation>
-    </message>
-    <message>
       <source>Failed to open file</source>
       <translation>Fallo al abrir el archivo</translation>
     </message>
     <message>
-      <source>Please send email with License Key and Hardware Id provided to %1 to obtain an Activation Key file.</source>
-      <translation>Envíe un correo electrónico con la clave de licencia y el Id de hardware proporcionados a %1 para obtener un archivo de Clave de Activación.</translation>
+      <source>All files</source>
+      <translation>Todos los archivos</translation>
     </message>
     <message>
-      <source>Please send License Key and Hardware Id provided to %1 to obtain an Activation Key file.</source>
-      <translation>Envíe la Clave de Licencia y el Id de hardware proporcionados a %1 para obtener un archivo de Clave de Activación.</translation>
+      <source>Please send email with License Key and Hardware ID provided to %1 to obtain an Activation Key file.</source>
+      <translation>Envíe un correo electrónico con la clave de licencia y el ID de Hardware proporcionados a %1 para obtener un archivo de Clave de Activación.</translation>
+    </message>
+    <message>
+      <source>Please send License Key and Hardware ID provided to %1 to obtain an Activation Key file.</source>
+      <translation>Envíe la Clave de Licencia y el ID de Hardware proporcionados a %1 para obtener un archivo de Clave de Activación.</translation>
     </message>
   </context>
   <context>
@@ -4256,7 +4334,7 @@ a %1</translation>
     <name>QnLinkToCloudDialogPrivate</name>
     <message>
       <source>Failed to login to %1</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
       <translation>Error al iniciar sesión en %1</translation>
     </message>
   </context>
@@ -4374,12 +4452,12 @@ a %1</translation>
     </message>
     <message>
       <source>Log in to %1</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
       <translation>Iniciando sesión en %1</translation>
     </message>
     <message>
       <source>Welcome to %1!</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
       <translation>Bienvenido/a a %1!</translation>
     </message>
   </context>
@@ -4428,6 +4506,18 @@ a %1</translation>
     <message>
       <source>No image</source>
       <translation>No hay imagen</translation>
+    </message>
+    <message>
+      <source>Sets the time to use in the client (timeline, timestamps, etc.) when client and server machines are in different time zones.</source>
+      <translation>Establece el tiempo para usar en el cliente (línea de tiempo, marcas de tiempo, etc.) cuando las máquinas cliente y servidor se encuentran en diferentes zonas horarias.</translation>
+    </message>
+    <message>
+      <source>Length of time each camera on layout will be displayed if you start a Layout Tour.</source>
+      <translation>Periodo de tiempo que se mostrará cada cámara en el diseño si inicia un Tour de diseño.</translation>
+    </message>
+    <message>
+      <source>Displays IP addresses for cameras and servers and groups for users.</source>
+      <translation>Muestra direcciones IP para cámaras y servidores y grupos para usuarios.</translation>
     </message>
   </context>
   <context>
@@ -5602,16 +5692,12 @@ a %1</translation>
       <translation>Para evitar problemas, ajusten el número máximo de cámaras</translation>
     </message>
     <message>
-      <source>server will take devices automatically from offline servers</source>
-      <translation>servidor tomará dispositivos automáticamente de servidores fuera de línea</translation>
-    </message>
-    <message>
-      <source>server will take cameras automatically from offline servers</source>
-      <translation>servidor tomará automáticamente las cámaras de servidores fuera de línea</translation>
-    </message>
-    <message>
       <source>Failover</source>
       <translation>Conmutación por error</translation>
+    </message>
+    <message>
+      <source>Servers with failover enabled will automatically take cameras from offline servers.</source>
+      <translation>Los servidores con conmutación por error habilitados tomarán automáticamente las cámaras de los servidores fuera de línea.</translation>
     </message>
   </context>
   <context>
@@ -5630,10 +5716,6 @@ a %1</translation>
     <message>
       <source>Select Update File...</source>
       <translation>Seleccione Archivo de actualización...</translation>
-    </message>
-    <message>
-      <source>Update Files (*.zip)</source>
-      <translation>Actualizar los archivos (* zip)</translation>
     </message>
     <message>
       <source>Release notes</source>
@@ -5818,6 +5900,18 @@ a %1</translation>
       <source>Incompatible %1 instance. To update disconnect System from %1 first.</source>
       <comment>%1 here will be substituted with cloud name e.g. &apos;Nx Cloud&apos;.</comment>
       <translation>Instancia %1 incompatible. Para actualizar, desconecte primero el sistema de %1.</translation>
+    </message>
+    <message>
+      <source>Update Files</source>
+      <translation>Actualizar archivos</translation>
+    </message>
+    <message>
+      <source>Validating the update...</source>
+      <translation>Validar la actualización...</translation>
+    </message>
+    <message>
+      <source>Checking for free space...</source>
+      <translation>Comprobando espacio libre...</translation>
     </message>
   </context>
   <context>
@@ -6299,6 +6393,14 @@ a %1</translation>
       <source>Recording was enabled on the USB storage</source>
       <translation>La grabación fue habilitada en el almacenamiento USB</translation>
     </message>
+    <message>
+      <source>Backup includes servers and cameras settings, users, webpages, event rules, etc. Video is not saved.</source>
+      <translation>La copia de seguridad incluye configuraciones de servidores y cámaras, usuarios, páginas web, reglas de eventos, etc. El video no se guarda.</translation>
+    </message>
+    <message>
+      <source>Creates a backup of System configuration that can be restored in case of failure.</source>
+      <translation>Crea una copia de seguridad de la configuración del sistema que se puede restaurar en caso de error.</translation>
+    </message>
   </context>
   <context>
     <name>QnStorageListModel</name>
@@ -6511,16 +6613,6 @@ a %1</translation>
       <translation>Conexión</translation>
     </message>
     <message>
-      <source>Connect your System to %1 &amp;mdash; make it accessible from anywhere!</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-      <translation>Conecta tu sistema a %1 &amp;mdash; ¡hazlo accesible desde cualquier lugar!</translation>
-    </message>
-    <message>
-      <source>Check out %1 &amp;mdash; connect to your System from anywhere!</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-      <translation>Echa un vistazo a %1 &amp;mdash; !Conecte su sistema desde cualquier lugar!</translation>
-    </message>
-    <message>
       <source>Some users have not set their email addresses</source>
       <translation>Algunos usuarios no han establecido sus direcciones de correo</translation>
     </message>
@@ -6572,6 +6664,16 @@ a %1</translation>
       <source>Archive integrity problem detected</source>
       <translation>Problema de integridad del archivo</translation>
     </message>
+    <message>
+      <source>Connect your System to %1 &amp;mdash; make it accessible from anywhere!</source>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
+      <translation>Conecta tu sistema a %1 &amp;mdash; ¡hazlo accesible desde cualquier lugar!</translation>
+    </message>
+    <message>
+      <source>Check out %1 &amp;mdash; connect to your System from anywhere!</source>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
+      <translation>Echa un vistazo a %1 &amp;mdash; !Conecte su sistema desde cualquier lugar!</translation>
+    </message>
   </context>
   <context>
     <name>QnSystemSettingsWidget</name>
@@ -6590,6 +6692,14 @@ a %1</translation>
     <message>
       <source>Allow System to optimize camera settings</source>
       <translation>Permitir el sistema optimizar la configuración de las cámaras</translation>
+    </message>
+    <message>
+      <source>Sends anonymous System information (firmware, codecs, streams, etc.).</source>
+      <translation>Envía información anónima del sistema (firmware, códecs, secuencias, etc.).</translation>
+    </message>
+    <message>
+      <source>Tracks and logs all user actions.</source>
+      <translation>Rastrea y registra todas las acciones del usuario.</translation>
     </message>
   </context>
   <context>
@@ -6656,16 +6766,6 @@ a %1</translation>
       <translation>No hay miniaturas disponibles</translation>
     </message>
     <message>
-      <source>hh:mm</source>
-      <comment>Format for displaying hours and minutes on timeline.</comment>
-      <translation>hh: mm</translation>
-    </message>
-    <message>
-      <source>h ap</source>
-      <comment>Format for displaying hours on timeline, with am/pm indicator.</comment>
-      <translation>h ap</translation>
-    </message>
-    <message>
       <source>dd</source>
       <comment>Format for displaying days on timeline.</comment>
       <translation>dd</translation>
@@ -6678,47 +6778,42 @@ a %1</translation>
     <message>
       <source>yyyy</source>
       <comment>Format for displaying years on timeline</comment>
-      <translation>aaaa</translation>
+      <translation>yyyy</translation>
     </message>
     <message>
       <source>dd MMMM yyyy hh:mm</source>
       <comment>Format for displaying minute caption in timeline&apos;s header, without am/pm indicator.</comment>
-      <translation>dd MMMM aaaa hh: mm</translation>
+      <translation>dd MMMM yyyy hh:mm</translation>
     </message>
     <message>
       <source>dd MMMM yyyy hh:mm</source>
       <comment>Format for displaying hour caption in timeline&apos;s header, without am/pm indicator.</comment>
-      <translation>dd MMMM aaaa hh: mm</translation>
+      <translation>dd MMMM yyyy hh:mm</translation>
     </message>
     <message>
       <source>dd MMMM yyyy h ap</source>
       <comment>Format for displaying hour caption in timeline&apos;s header, with am/pm indicator.</comment>
-      <translation>dd MMMM aaaa h ap</translation>
+      <translation>dd MMMM yyyy h ap</translation>
     </message>
     <message>
       <source>dd MMMM yyyy</source>
       <comment>Format for displaying day caption in timeline&apos;s header.</comment>
-      <translation>dd MMMM aaaa</translation>
+      <translation>dd MMMM yyyy</translation>
     </message>
     <message>
       <source>MMMM yyyy</source>
       <comment>Format for displaying month caption in timeline&apos;s header.</comment>
-      <translation>MMMM aaaa</translation>
+      <translation>MMMM yyyy</translation>
     </message>
     <message>
       <source>yyyy</source>
       <comment>Format for displaying year caption in timeline&apos;s header</comment>
-      <translation>aaaa</translation>
-    </message>
-    <message>
-      <source>h:mm ap</source>
-      <comment>Format for displaying hours and minutes on timeline, with am/pm indicator.</comment>
-      <translation>h:mm ap</translation>
+      <translation>yyyy</translation>
     </message>
     <message>
       <source>dd MMMM yyyy h:mm ap</source>
       <comment>Format for displaying minute caption in timeline&apos;s header, with am/pm indicator.</comment>
-      <translation>dd MMMM aaaa h:mm ap</translation>
+      <translation>dd MMMM yyyy h:mm ap</translation>
     </message>
   </context>
   <context>
@@ -6857,8 +6952,8 @@ a %1</translation>
     </message>
     <message>
       <source>%1 user</source>
-      <comment>%1 is the short cloud name (like &apos;Cloud&apos;)</comment>
-      <translation type="unfinished">%1 user</translation>
+      <comment>%1 is the short cloud name (like Cloud)</comment>
+      <translation>%1 usuario</translation>
     </message>
   </context>
   <context>
@@ -6905,6 +7000,10 @@ a %1</translation>
     <message>
       <source>Edit</source>
       <translation>Editar</translation>
+    </message>
+    <message>
+      <source>Users can be imported from an LDAP server. They will be able to log in only if LDAP server is online and their accounts are active on it.</source>
+      <translation>Los usuarios pueden importarse desde un servidor LDAP. Podrán iniciar sesión solo si el servidor LDAP está en línea y sus cuentas están activas en él.</translation>
     </message>
   </context>
   <context>
@@ -7042,7 +7141,7 @@ a %1</translation>
     </message>
     <message>
       <source>This user has not yet signed up for %1</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
       <translation>Este usuario aún no está registrado en %1</translation>
     </message>
   </context>
@@ -7094,8 +7193,27 @@ a %1</translation>
     </message>
     <message>
       <source>%1 user with specified email already exists.</source>
-      <comment>%1 is the short cloud name (like &apos;Cloud&apos;)</comment>
-      <translation type="unfinished">%1 user with specified email already exists.</translation>
+      <comment>%1 is the short cloud name (like Cloud)</comment>
+      <translation>%1 usuario con el correo electrónico especificado ya existe.</translation>
+    </message>
+    <message>
+      <source>Local users</source>
+      <translation>Usuarios locales</translation>
+    </message>
+    <message>
+      <source>%1 users</source>
+      <comment>%1 is the short cloud name (like Cloud)</comment>
+      <translation>%1 usuarios</translation>
+    </message>
+    <message>
+      <source>%1 belong to this system only and are fully managed by system administrators.</source>
+      <comment>%1 is local users definition, e.g. &apos;Local users&apos;</comment>
+      <translation>%1 pertenecen solo a este sistema y los administradores del sistema los administran completamente.</translation>
+    </message>
+    <message>
+      <source>%1 can have access to many Systems. Administrators can manage their rights only.</source>
+      <comment>%1 is cloud users definition, e.g. &apos;Cloud users&apos;</comment>
+      <translation>%1 puede tener acceso a muchos sistemas. Los administradores solo pueden administrar sus derechos.</translation>
     </message>
   </context>
   <context>
@@ -7339,8 +7457,8 @@ a %1</translation>
     </message>
     <message>
       <source>%1 Systems cannot be merged</source>
-      <comment>%1 is the short cloud name (like &apos;Cloud&apos;)</comment>
-      <translation type="unfinished">%1 Systems cannot be merged</translation>
+      <comment>%1 is the short cloud name (like Cloud)</comment>
+      <translation>%1 Sistemas no se pueden fusionar</translation>
     </message>
   </context>
   <context>
@@ -8111,6 +8229,13 @@ a %1</translation>
     </message>
   </context>
   <context>
+    <name>nx::client::desktop::HintButton</name>
+    <message>
+      <source>Click to read more</source>
+      <translation>Haga clic para leer más</translation>
+    </message>
+  </context>
+  <context>
     <name>nx::client::desktop::ImageOverlaySettingsWidget</name>
     <message>
       <source>Select file...</source>
@@ -8356,17 +8481,26 @@ a %1</translation>
     </message>
   </context>
   <context>
-    <name>nx::client::desktop::ui::AnalyticsSdkEventModel</name>
-    <message>
-      <source>No event types supported</source>
-      <translation>Ningún tipo de evento soportado</translation>
-    </message>
-  </context>
-  <context>
     <name>nx::client::desktop::ui::AnalyticsSdkEventWidget</name>
     <message>
-      <source>Event will trigger only if Analytics Event meets all the above conditions. If a keyword field is empty, condition is always met. If not, condition is met if the corresponding field of Analytics Event contains any keyword.</source>
-      <translation>Evento se activará sólo si la Analítica de Eventos cumple todas las condiciones anteriores. Si un campo de palabra clave está vacío, siempre se cumple la condición. Si no es así, se cumple la condición si el campo correspondiente de análisis contiene las claves.</translation>
+      <source>Analytics events can be set up on a certain cameras.</source>
+      <translation>Los eventos de Analytics se pueden configurar en ciertas cámaras.</translation>
+    </message>
+    <message>
+      <source>Choose cameras using the button above to see the list of supported events.</source>
+      <translation>Elija cámaras usando el botón de arriba para ver la lista de eventos compatibles.</translation>
+    </message>
+    <message>
+      <source>Event will trigger only if there are matches in caption with any of entered keywords.</source>
+      <translation>El evento se activará solo si hay coincidencias en el título con cualquiera de las palabras clave introducidas.</translation>
+    </message>
+    <message>
+      <source>If the field is empty, event will always trigger.</source>
+      <translation>Si el campo está vacío, el evento siempre se disparará.</translation>
+    </message>
+    <message>
+      <source>Event will trigger only if there are matches in the description field with any of the entered keywords.</source>
+      <translation>El evento se activará solo si hay coincidencias en el campo de descripción con cualquiera de las palabras clave ingresadas.</translation>
     </message>
   </context>
   <context>
@@ -8717,6 +8851,18 @@ a %1</translation>
     <message>
       <source>Failed to change password on %1 of %2 cameras</source>
       <translation>Error al cambiar la contraseña en %1 de %2 cámaras</translation>
+    </message>
+    <message>
+      <source>To use the software you must accept the end user license agreement</source>
+      <translation>Para usar el software debe aceptar el acuerdo de licencia del usuario final</translation>
+    </message>
+    <message>
+      <source>Accept</source>
+      <translation>Aceptar</translation>
+    </message>
+    <message>
+      <source>Decline</source>
+      <translation>Rechazar</translation>
     </message>
   </context>
   <context>

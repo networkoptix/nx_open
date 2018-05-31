@@ -20,7 +20,7 @@
 #include <ui/graphics/opengl/gl_context_data.h>
 #include <ui/graphics/opengl/gl_shortcuts.h>
 #include <ui/graphics/opengl/gl_buffer_stream.h>
-#include <ui/common/accessor.h>
+#include <nx/client/desktop/common/utils/accessor.h>
 #include <ui/common/palette.h>
 
 #include <nx/client/core/utils/geometry.h>
@@ -33,6 +33,8 @@
 #include "opengl_renderer.h"
 
 //#define QN_IMAGE_BUTTON_WIDGET_DEBUG
+
+using namespace nx::client::desktop;
 
 namespace {
     bool checkPixmapGroupRole(QnImageButtonWidget::StateFlags *flags)

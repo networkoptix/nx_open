@@ -1,17 +1,11 @@
 #pragma once
 
-#include <vector>
-
-#include <boost/optional/optional.hpp>
-
 #include <QtCore/QByteArray>
-#include <QtCore/QUrl>
-#include <QtNetwork/QAuthenticator>
 
 #include <plugins/plugin_tools.h>
+
 #include <nx/sdk/metadata/plugin.h>
 #include <nx/sdk/metadata/camera_manager.h>
-#include <nx/network/socket_global.h>
 
 #include "common.h"
 

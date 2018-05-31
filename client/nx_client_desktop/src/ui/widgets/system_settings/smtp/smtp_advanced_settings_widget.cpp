@@ -4,7 +4,7 @@
 #include <QtCore/QScopedValueRollback>
 
 #include <ui/common/read_only.h>
-#include <ui/common/aligner.h>
+#include <nx/client/desktop/common/utils/aligner.h>
 #include <nx/client/desktop/common/utils/validators.h>
 
 #include <ui/workaround/widgets_signals_workaround.h>
@@ -19,9 +19,9 @@ namespace {
 QList<QnEmail::ConnectionType> connectionTypesAllowed()
 {
     return QList<QnEmail::ConnectionType>()
-        << QnEmail::Unsecure
-        << QnEmail::Ssl
-        << QnEmail::Tls;
+        << QnEmail::ConnectionType::unsecure
+        << QnEmail::ConnectionType::ssl
+        << QnEmail::ConnectionType::tls;
 }
 
 class QnPortNumberValidator : public QIntValidator
@@ -92,7 +92,7 @@ QnSmtpAdvancedSettingsWidget::QnSmtpAdvancedSettingsWidget(QWidget* parent /*= n
     }
     ui->portComboBox->setValidator(new QnPortNumberValidator(autoPort, this));
 
-    QnAligner* aligner = new QnAligner(this);
+    Aligner* aligner = new Aligner(this);
     aligner->registerTypeAccessor<InputField>(InputField::createLabelWidthAccessor());
 
     for (auto field : {
@@ -127,10 +127,10 @@ QnEmailSettings QnSmtpAdvancedSettingsWidget::settings() const
     result.user = ui->userInputField->text();
     result.password = ui->passwordInputField->text();
     result.connectionType = ui->tlsRadioButton->isChecked()
-        ? QnEmail::Tls
+        ? QnEmail::ConnectionType::tls
         : ui->sslRadioButton->isChecked()
-        ? QnEmail::Ssl
-        : QnEmail::Unsecure;
+        ? QnEmail::ConnectionType::ssl
+        : QnEmail::ConnectionType::unsecure;
     result.simple = false;
     result.signature = ui->signatureInputField->text();
     result.supportEmail = ui->supportInputField->text();
@@ -191,10 +191,10 @@ void QnSmtpAdvancedSettingsWidget::setConnectionType(QnEmail::ConnectionType con
 
     switch (connectionType)
     {
-        case QnEmail::Tls:
+        case QnEmail::ConnectionType::tls:
             ui->tlsRadioButton->setChecked(true);
             break;
-        case QnEmail::Ssl:
+        case QnEmail::ConnectionType::ssl:
             ui->sslRadioButton->setChecked(true);
             break;
         default:
@@ -209,7 +209,7 @@ void QnSmtpAdvancedSettingsWidget::at_portComboBox_currentIndexChanged(int index
         return;
 
     int port = ui->portComboBox->itemData(index).toInt();
-    if (port == QnEmailSettings::defaultPort(QnEmail::Ssl))
+    if (port == QnEmailSettings::defaultPort(QnEmail::ConnectionType::ssl))
     {
         ui->tlsRecommendedLabel->hide();
         ui->sslRecommendedLabel->show();

@@ -62,22 +62,9 @@ namespace Qn
     static const QString kCombinedSensorsDescriptionParamName = lit("combinedSensorsDescription");
     static const QString kAnalyticsDriversParamName = lit("analyticsDrivers");
     static const QString kGroupPlayParamName = lit("groupplay");
-
-    static const QString kPrimaryStreamResolutionParamName = lit("primaryStreamResolution");
-    static const QString kSecondaryStreamResolutionParamName = lit("secondaryStreamResolution");
-    static const QString kPrimaryStreamCodecParamName = lit("primaryStreamCodec");
-    static const QString kPrimaryStreamCodecProfileParamName = lit("primaryStreamCodecProfile");
-    static const QString kSecondaryStreamCodecParamName = lit("secondaryStreamCodec");
-    static const QString kSecondaryStreamCodecProfileParamName = lit("secondaryStreamCodecProfile");
-    static const QString kPrimaryStreamGovLengthParamName = lit("primaryStreamGovLength");
-    static const QString kSecondaryStreamGovLengthParamName = lit("secondaryStreamGovLength");
-    static const QString kPrimaryStreamBitrateControlParamName = lit("primaryStreamBitrateControl");
-    static const QString kSecondaryStreamBitrateControlParamName = lit("secondaryStreamBitrateControl");
-    static const QString kPrimaryStreamBitrateParamName = lit("primaryStreamBitrate");
-    static const QString kSecondaryStreamBitrateParamName = lit("secondaryStreamBitrate");
-    static const QString kPrimaryStreamEntropyCodingParamName = lit("primaryStreamEntropyCoding");
-    static const QString kSecondaryStreamEntropyCodingParamName = lit("secondaryStreamEntropyCoding");
-    static const QString kSecondaryStreamFpsParamName = lit("secondaryStreamFps");
+    static const QString kCanShareLicenseGroup = lit("canShareLicenseGroup");
+    static const QString kMediaTraits = lit("mediaTraits");
+    static const QString kDeviceType = lit("deviceType");
 
     static const QString ADVANCED_PARAMETER_OVERLOADS_PARAM_NAME = lit("advancedParameterOverloads");
 
@@ -98,12 +85,13 @@ namespace Qn
     static const QString IO_OVERLAY_STYLE_PARAM_NAME = lit("ioOverlayStyle");
     static const QString FORCE_ONVIF_PARAM_NAME = lit("forceONVIF");
     static const QString MAC_FROM_MULTICAST_PARAM_NAME = lit("macFromMulticast");
+    static const QString IGNORE_MAC_FROM_MULTICAST_PARAM_NAME = lit("ignoreMacFromMulticast");
     static const QString IGNORE_ONVIF_PARAM_NAME = lit("ignoreONVIF");
     static const QString PTZ_CAPABILITIES_PARAM_NAME = lit("ptzCapabilities");
     static const QString PTZ_CAPABILITIES_TO_ADD_PARAM_NAME = lit("ptzCapabilitiesToAdd");
     static const QString PTZ_CAPABILITIES_TO_REMOVE_PARAM_NAME = lit("ptzCapabilitiesToRemove");
     static const QString DISABLE_NATIVE_PTZ_PRESETS_PARAM_NAME = lit("disableNativePtzPresets");
-	static const QString DW_REBRANDED_TO_ISD_MODEL = lit("isdDwCam");
+    static const QString DW_REBRANDED_TO_ISD_MODEL = lit("isdDwCam");
     static const QString ONVIF_VENDOR_SUBTYPE = lit("onvifVendorSubtype");
     static const QString DO_NOT_ADD_VENDOR_TO_DEVICE_NAME = lit("doNotAddVendorToDeviceName");
     static const QString VIDEO_MULTIRESOURCE_CHANNEL_MAPPING_PARAM_NAME = lit("multiresourceVideoChannelMapping");

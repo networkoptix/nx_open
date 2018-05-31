@@ -126,9 +126,18 @@ void Plugin::setSettings(const nxpl::Setting* settings, int count)
     NX_OUTPUT << "}";
 }
 
-void Plugin::setPluginContainer(nxpl::PluginInterface* /*pluginContainer*/)
+void Plugin::setPluginContainer(nxpl::PluginInterface* pluginContainer)
 {
     NX_OUTPUT << __func__ << " Setting plugin container";
+    nxpt::ScopedRef<nxpl::TimeProvider> timeProvider(
+        pluginContainer->queryInterface(nxpl::IID_TimeProvider));
+
+    if (timeProvider)
+    {
+        m_timeProvider = decltype(m_timeProvider)(
+            timeProvider.release(),
+            [](nxpl::TimeProvider* provider) { provider->releaseRef(); });
+    }
 }
 
 void Plugin::setLocale(const char* locale)
@@ -157,7 +166,7 @@ const char* Plugin::capabilitiesManifest(Error* error) const
 
     static const std::string kManifestPostfix = (R"json(
             ],
-            "capabilities": "needDeepCopyForMediaFrame"
+            "capabilities": ""
         })json");
 
     m_manifest = kManifestPrefix;
@@ -207,6 +216,11 @@ void Plugin::executeAction(nx::sdk::metadata::Action*, nx::sdk::Error*)
 std::vector<ObjectClassDescription> Plugin::objectClassDescritions() const
 {
     return m_objectClassDescritions;
+}
+
+std::chrono::microseconds Plugin::currentTimeUs() const
+{
+    return std::chrono::microseconds(m_timeProvider->millisSinceEpoch() * 1000);
 }
 
 std::vector<ObjectClassDescription> Plugin::loadObjectClasses() const
@@ -300,7 +314,7 @@ std::string Plugin::buildManifestObectTypeString(const ObjectClassDescription& d
     })json");
 
     return kObjectTypeStringPrefix
-        + nxpt::NxGuidHelper::toStdString(description.guid)
+        + nxpt::toStdString(description.guid)
         + kObjectTypeStringMiddle
         + description.name
         + kObjectTypeStringPostfix;

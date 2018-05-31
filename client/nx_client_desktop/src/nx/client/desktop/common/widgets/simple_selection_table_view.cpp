@@ -2,7 +2,7 @@
 
 #include <QtGui/QKeyEvent>
 
-#include <ui/widgets/views/checkboxed_header_view.h>
+#include <nx/client/desktop/common/widgets/checkable_header_view.h>
 
 namespace nx {
 namespace client {
@@ -30,7 +30,7 @@ void SimpleSelectionTableView::setCheckboxColumn(int column, bool checkboxInHead
     }
     else
     {
-        m_checkableHeader = new QnCheckBoxedHeaderView(column, this);
+        m_checkableHeader = new CheckableHeaderView(column, this);
         setHorizontalHeader(m_checkableHeader);
         setupHeader();
     }
@@ -60,7 +60,7 @@ void SimpleSelectionTableView::setupHeader()
     if (!currentModel || !m_checkableHeader)
         return;
 
-    connect(m_checkableHeader, &QnCheckBoxedHeaderView::checkStateChanged,
+    connect(m_checkableHeader, &CheckableHeaderView::checkStateChanged,
         this, &SimpleSelectionTableView::handleHeaderCheckedStateChanged);
 
     const auto dataChangedHandler =

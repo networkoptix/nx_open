@@ -32,8 +32,6 @@ public:
 
     virtual bool isReverseMode() const { return false;}
 
-    bool isConnectedToTheResource() const;
-
     void setNeedSleep(bool sleep);
 
     double getSpeed() const;
@@ -55,7 +53,7 @@ signals:
     void videoLayoutChanged();
 protected:
     virtual void putData(const QnAbstractDataPacketPtr& data);
-    void beforeDisconnectFromResource();
+    virtual void beforeDisconnectFromResource() override;
 
 protected:
     QList<QnAbstractMediaDataReceptor*> m_dataprocessors;

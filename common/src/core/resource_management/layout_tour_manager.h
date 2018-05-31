@@ -1,6 +1,6 @@
 #pragma once
 
-#include <nx_ec/data/api_layout_tour_data.h>
+#include <nx/vms/api/data/layout_tour_data.h>
 
 #include <nx/utils/thread/mutex.h>
 #include <nx/utils/uuid.h>
@@ -13,21 +13,21 @@ public:
     QnLayoutTourManager(QObject* parent = nullptr);
     virtual ~QnLayoutTourManager() override;
 
-    const ec2::ApiLayoutTourDataList& tours() const;
-    void resetTours(const ec2::ApiLayoutTourDataList& tours = ec2::ApiLayoutTourDataList());
+    const nx::vms::api::LayoutTourDataList& tours() const;
+    void resetTours(const nx::vms::api::LayoutTourDataList& tours = {});
 
-    ec2::ApiLayoutTourData tour(const QnUuid& id) const;
-    ec2::ApiLayoutTourDataList tours(const QList<QnUuid>& ids) const;
+    nx::vms::api::LayoutTourData tour(const QnUuid& id) const;
+    nx::vms::api::LayoutTourDataList tours(const QList<QnUuid>& ids) const;
 
-    void addOrUpdateTour(const ec2::ApiLayoutTourData& tour);
+    void addOrUpdateTour(const nx::vms::api::LayoutTourData& tour);
     void removeTour(const QnUuid& tourId);
 
 signals:
-    void tourAdded(const ec2::ApiLayoutTourData& tour);
-    void tourChanged(const ec2::ApiLayoutTourData& tour);
+    void tourAdded(const nx::vms::api::LayoutTourData& tour);
+    void tourChanged(const nx::vms::api::LayoutTourData& tour);
     void tourRemoved(const QnUuid& tourId);
 
 private:
     mutable QnMutex m_mutex;
-    ec2::ApiLayoutTourDataList m_tours;
+    nx::vms::api::LayoutTourDataList m_tours;
 };

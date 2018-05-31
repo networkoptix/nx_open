@@ -75,7 +75,7 @@
           <number>16</number>
          </property>
          <item row="0" column="0" colspan="4">
-          <widget class="QnTreeView" name="gridLicenses">
+          <widget class="nx::client::desktop::TreeView" name="gridLicenses">
            <property name="minimumSize">
             <size>
              <width>400</width>
@@ -234,9 +234,9 @@
    <container>1</container>
   </customwidget>
   <customwidget>
-   <class>QnTreeView</class>
+   <class>nx::client::desktop::TreeView</class>
    <extends>QTreeView</extends>
-   <header location="global">ui/widgets/common/tree_view.h</header>
+   <header location="global">nx/client/desktop/common/widgets/tree_view.h</header>
   </customwidget>
   <customwidget>
    <class>nx::client::desktop::AlertBar</class>

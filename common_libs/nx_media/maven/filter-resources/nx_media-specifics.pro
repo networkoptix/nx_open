@@ -1,3 +1,0 @@
-android {
-    QT += androidextras
-}

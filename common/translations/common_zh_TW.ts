@@ -53,11 +53,6 @@
       <translation>找到的系統 %1 為不相容的版本 %2.</translation>
     </message>
     <message>
-      <source>Cannot connect to the other System because current System is already connected to %1.</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-      <translation>無法連接到另一個系統, 因為目前的系統已連接到 %1.</translation>
-    </message>
-    <message>
       <source>The discovered System %1 is in safe mode.</source>
       <comment>%1 is name of System</comment>
       <translation>找到的系統 %1 在安全模式下.</translation>
@@ -66,16 +61,6 @@
       <source>Could not configure the remote System %1.</source>
       <comment>%1 is name of System</comment>
       <translation>無法配置遠端系統 %1.</translation>
-    </message>
-    <message>
-      <source>Both Systems are connected to %1. Merge is not allowed.</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-      <translation>這兩個系統都連接到 %1. 不允許合併.</translation>
-    </message>
-    <message>
-      <source>These Systems are built with different %1 URL. Merge is not allowed.</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-      <translation>這些系統用了不同的 %1 URL建立. 不允許合併.</translation>
     </message>
     <message>
       <source>New System</source>
@@ -577,7 +562,7 @@
       <translation>未知的錯誤</translation>
     </message>
     <message>
-      <source>Server with matching Hardware Id not found</source>
+      <source>Server with matching Hardware ID not found</source>
       <translation>找不到符合硬體ID的伺服器</translation>
     </message>
   </context>
@@ -694,12 +679,12 @@
       <translation>浮水印: %1</translation>
     </message>
     <message>
-      <source>Hardware Id: %1</source>
-      <translation>硬體 Id: %1</translation>
-    </message>
-    <message>
       <source>Time License</source>
       <translation>時效性授權</translation>
+    </message>
+    <message>
+      <source>Hardware ID: %1</source>
+      <translation>硬體 ID: %1</translation>
     </message>
   </context>
   <context>

@@ -24,6 +24,16 @@
             "macFromMulticast": true
         },
         {
+            "_comment1": "Autodiscovery response contains scopes like onvif://www.onvif.org/hardware/DWC-MTT4Wi36 and onvif://www.onvif.org/name/ONVIF",
+            "_comment2": "thereby manufacture is detected as DWC-MTT4Wi36 and name - as ONVIF.",
+            "keys": [
+                "DWC-MBT4Wi*|ONVIF",
+                "DWC-MTT4Wi*|ONVIF",
+                "DWC-MVT4Wi*|ONVIF"
+            ],
+            "ignoreMacFromMulticast": true
+        },
+        {
             "keys": [
                 "Hanwha|PRN-4011"
             ],
@@ -124,7 +134,9 @@
                 "Sony|SNC-EM642R",
                 "Sony|SNC-VM642R",
                 "Sony|SNC-WR632R",
-                "Sony|SNC-WR602C"
+                "Sony|SNC-WR602C",
+                "Sony|SNC-WR630",
+                "Sony|SNC-EM641"
             ],
 
             "2WayAudio":
@@ -335,7 +347,7 @@
             "ignoreONVIF": true
         },
         {
-            "__comment": "Onvif probe matches for Flir FC-Series cameras has such manufacturers",
+            "_comment": "Onvif probe matches for Flir FC-Series cameras has such manufacturers",
             "keys":[
                 "FC-Series-R|*", "FC-Series-S|*"
             ],
@@ -344,6 +356,12 @@
         {
             "keys":[
                 "Axis|P7216*"
+            ],
+            "ignoreONVIF": true
+        },
+        {
+            "keys":[
+                "Axis|Axis F44 Dual Audio*"
             ],
             "ignoreONVIF": true
         },
@@ -486,6 +504,7 @@
                 "*|DW-CP04", "*|DW-CP16",
                 "Avigilon|ENC-*",
                 "ACTI|V32", "ACTi Corporation|V32",
+                "ACTI|V23", "ACTi Corporation|V23",
                 "BOSCH|VIP-X1600-XFM4",
                 "Axis|AXISM7014*",
                 "Axis|AXISM7016*",
@@ -529,6 +548,8 @@
                 "BOSCH|VJT-X40XF-E",
                 "CAP|NVN4100",
                 "DS-6701HWI|Embedded Net DVS",
+                "DS-6716HQHI-SATA|Embedded_Net_DVR",
+                "Hangzhou Hikvision Digital Technology Co., Ltd|DS-6716HQHI-SATA",
                 "GrandStream|GXV3504",
                 "Hikvision|DS-6701*",
                 "Hikvision|DS-6704*",
@@ -567,9 +588,14 @@
                 "UNIVIEW|NVR302-08E-P8",
                 "Samsung Techwin|SPE-400*",
                 "VIVOTEK|VS8102",
-                "TCS-300|TCAM"
+                "TCS-300|TCAM",
+                "UNIVEW|NVR302-16S-P16*"
             ],
             "analogEncoder": true
+        },
+        {
+            "keys": ["UNIVIEW|DVS4116"],
+            "enableAdditionalManufacturerNormalization": true
         },
 
         {
@@ -685,14 +711,17 @@
                 "*|DW-CP04", "*|DW-CP16",
                 "ACTI|I96","ACTI|I98",
                 "UNIVIEW|IPC6242SR-X22",
-                "Milesight*|MS-C2961-EB"
+                "Milesight*|MS-C2961-EB",
+                "Dahua|DH-SD22404T-GN"
             ],
             "ptzTraits": "EightWayPtz"
         },
         {
             "keys": [
                 "ACTI|V32",
-                "ACTi Corporation|V32"
+                "ACTi Corporation|V32",
+                "ACTI|V23",
+                "ACTi Corporation|V23"
             ],
             "forceONVIF": true
         },
@@ -752,7 +781,6 @@
                 "VISTA|VK2-ENCODER",
                 "VISTA|VK2-1080PTZ",
                 "VISTA|VK2-600PTZ",
-                "VISTA|VK2-HD30LRIR-PM",
                 "*|DW-CP04",
                 "Cellinx|STH795",
                 "Honeywell Security Group|HISD-2201WE", "MESSOA|SPD970",
@@ -771,7 +799,7 @@
         },
         {
             "keys": [
-                "ACTi|V32"
+                "ACTi|V32", "ACTi|V23"
             ],
             "defaultAR": "16x9",
             "ptzTraits": "EightWayPtz"
@@ -888,7 +916,9 @@
                 "Hikvision|DS-2CD4A26FWD-IZS",
                 "Hikvision|DS-2CD63C2F-IS",
                 "Hikvision|DS-2DE4A220IW-DE",
-                "HIKVISION|DS-2CD4032FWD*"
+                "HIKVISION|DS-2CD4032FWD*",
+                "HIKVISION|DS-2CD2142FWD*",
+                "hikvision|DS-2CD2142FWD*"
             ],
             "parseOnvifNotificationsWithHttpReader": true
         },
@@ -909,12 +939,28 @@
                 "Hikvision|DS-2CD2522FWD*",
                 "HIKVISION|DS-2CD2522FWD*",
                 "HIKVISION|DS-2CD4032FWD*",
+                "HIKVISION|DS-2CD2142FWD-IWS",
                 "ONVIF|H47",
                 "ONVIF|IP-2CD4B26FWD-IZS",
-                "*|NC304-WDA"
+                "*|NC304-WDA",
+                "HIKVISION|DS-2CD2142FWD*",
+                "hikvision|DS-2CD2142FWD*"
             ],
             "relayOutputInversed": true,
             "portNamePrefixToIgnore": "AlarmOut"
+        },
+    {
+            "keys": ["DW|DWC-PF5M1TIR"],
+      "fixWrongInputPortNumber": true
+    },
+        {
+            "keys": [
+                "DW|DWC-PF5M1TIR",
+                "DW|DWC-MB45DiA",
+                "DW|DWC-MV85DiA",
+                "DW|DWC-PB6M4T"
+            ],
+            "fixWrongInputPortNumber": true
         },
         {
             "keys": [
@@ -2195,7 +2241,7 @@
                     "VideoEncoderToken_301,VideoEncoderToken_302"
                 ]
             }
-        },        
+        },
         {
             "keys": [
                 "IQA*|IQEYE*"
@@ -2216,7 +2262,7 @@
         },
         {
             "keys": [
-                "UNIVIEW|IPC6253SR-X33*", "Securicorp|SCL-SDM03MVIR-WD3533X"
+                "UNIVIEW|IPC6253SR-X33*", "Securicorp|SCL-SDM03MVIR-WD3533X", "NONE|SCL-SDM03MVIR-WD3533X"
             ],
             "ptzMapper": {
                 "fromCamera": {
@@ -2337,7 +2383,7 @@
             "ignoreMultisensors": true,
             "shouldAppearAsSingleChannel": true,
             "videoLayout": "width=4;height=1;sensors=0,1,2,3"
-        },   
+        },
         {
             "keys":[
             "Axis|AXISQ6000*","AXIS|AXISQ6000*","Axis|Q6000*","AXIS|Q6000*"
@@ -2384,9 +2430,9 @@
             "ignoreMultisensors": true,
             "shouldAppearAsSingleChannel": true,
             "videoLayout": "width=2;height=2;sensors=0,1,2,3"
-        },             
+        },
         {
-            "keys": ["*|CMD-C244","COMMANDCO|*"],
+            "keys": ["*|CMD-C244","COMMANDCO|*","ONVIF|NTH-IP4T"],
             "onvifManufacturerReplacement": "Hikvision"
         },
         {
@@ -2467,7 +2513,7 @@
                     "VideoEncoderConfigurationToken016,VideoEncoderConfigurationToken034"
                 ]
             }
-        },        
+        },
         {
             "keys": [
                 "HIKVISION|DS-2DE4A220IW*", "Hikvision|DS-2DE4A220IW*"
@@ -2493,6 +2539,139 @@
                     }
                 }
             }
-        }        
+        },
+        {
+            "keys": [
+                "DS-6716HQHI-SATA|Embedded_Net_DVR", "Hangzhou Hikvision Digital Technology Co., Ltd|DS-6716HQHI-SATA"
+            ],
+            "forcedOnvifParams":
+            {
+                "videoEncoders":
+                [
+                    "VideoEncoderConfigurationToken001,VideoEncoderConfigurationToken017",
+                    "VideoEncoderConfigurationToken002,VideoEncoderConfigurationToken018",
+                    "VideoEncoderConfigurationToken003,VideoEncoderConfigurationToken019",
+                    "VideoEncoderConfigurationToken004,VideoEncoderConfigurationToken020",
+                    "VideoEncoderConfigurationToken005,VideoEncoderConfigurationToken021",
+                    "VideoEncoderConfigurationToken006,VideoEncoderConfigurationToken022",
+                    "VideoEncoderConfigurationToken007,VideoEncoderConfigurationToken023",
+                    "VideoEncoderConfigurationToken008,VideoEncoderConfigurationToken024",
+                    "VideoEncoderConfigurationToken009,VideoEncoderConfigurationToken025",
+                    "VideoEncoderConfigurationToken010,VideoEncoderConfigurationToken026",
+                    "VideoEncoderConfigurationToken011,VideoEncoderConfigurationToken027",
+                    "VideoEncoderConfigurationToken012,VideoEncoderConfigurationToken028",
+                    "VideoEncoderConfigurationToken013,VideoEncoderConfigurationToken029",
+                    "VideoEncoderConfigurationToken014,VideoEncoderConfigurationToken030",
+                    "VideoEncoderConfigurationToken015,VideoEncoderConfigurationToken031",
+                    "VideoEncoderConfigurationToken016,VideoEncoderConfigurationToken032"
+                ]
+            }
+        },
+        {
+            "keys": [
+                "HIKVISION|DS-2DP1636ZIX-D*", "Hikvision|DS-2DP1636ZIX-D*"
+            ],
+            "ptzMapper": {
+                "fromCamera": {
+                    "x": {
+                        "extrapolationMode": "PeriodicExtrapolation",
+                        "device":  [  -1,1],
+                        "logical": [-180, 180]
+                    },
+                    "y": {
+                        "extrapolationMode": "ConstantExtrapolation",
+                        "device":  [-1, 1],
+                        "logical": [-15, -90]
+                    },
+                    "z": {
+                        "extrapolationMode": "ConstantExtrapolation",
+                        "device":  [0, 0.06, 0.1, 0.13, 0.15, 0.2, 0.3, 0.4, 0.5, 0.7, 1],
+                        "logical": [1, 2, 2.5, 3.0, 3.3, 3.7, 4.0, 5.5, 6.5, 7.5, 8],
+                        "logicalMultiplier": 37,
+                        "space": "35MmEquiv"
+                    }
+                }
+            }
+        },
+        {
+            "keys": ["DW|DWC-MPZ20XFM"],
+            "mediaTraits": {
+                "aspectRatioDependent": {
+                    "allowedAspectRatioDiff": "0.1"
+                }
+            }
+        },
+        {
+            "keys": [
+                "UNIVIEW|NVR302-08S-P8*"
+            ],
+            "forcedOnvifParams":
+            {
+                "videoEncoders":
+                [
+                    "00100,00101",
+                    "00200,00201",
+                    "00300,00301",
+                    "00400,00401",
+                    "00500,00501",
+                    "00600,00601",
+                    "00700,00701",
+                    "00800,00801"
+                ]
+            }
+        },
+        {
+            "keys": [
+                "UNIVIEW|NVR302-16S-P16*"
+            ],
+            "forcedOnvifParams":
+            {
+                "videoEncoders":
+                [
+                    "00100,00101",
+                    "00200,00201",
+                    "00300,00301",
+                    "00400,00401",
+                    "00500,00501",
+                    "00600,00601",
+                    "00700,00701",
+                    "00800,00801",
+                    "00900,00901",
+                    "01000,01001",
+                    "01100,01101",
+                    "01200,01201",
+                    "01300,01301",
+                    "01400,01401",
+                    "01500,01501",
+                    "01600,01601"
+                ]
+            }
+        },
+        {
+            "keys": [
+                "HIKVISION|DS-2DE7330IW-*", "Hikvision|DS-2DE7330IW-*"
+            ],
+            "ptzMapper": {
+                "fromCamera": {
+                    "x": {
+                        "extrapolationMode": "PeriodicExtrapolation",
+                        "device":  [  -1,1],
+                        "logical": [-180, 180]
+                    },
+                    "y": {
+                        "extrapolationMode": "ConstantExtrapolation",
+                        "device":  [1, -1],
+                        "logical": [-90, -15]
+                    },
+                    "z": {
+                        "extrapolationMode": "ConstantExtrapolation",
+                        "device":  [0, 0.06, 0.1, 0.13, 0.15, 0.2, 0.3, 0.4, 0.5, 0.7, 1],
+                        "logical": [1, 2, 2.5, 3.0, 3.3, 3.7, 4.0, 5.5, 6.5, 7.5, 8],
+                        "logicalMultiplier": 40,
+                        "space": "35MmEquiv"
+                    }
+                }
+            }
+        }
     ]
 }

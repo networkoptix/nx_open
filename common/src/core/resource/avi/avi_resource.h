@@ -18,7 +18,10 @@ public:
     QnAviResource(const QString& file);
     ~QnAviResource();
 
-    virtual QnAbstractStreamDataProvider* createDataProviderInternal(Qn::ConnectionRole role);
+    static QnAbstractStreamDataProvider* createDataProvider(
+        const QnResourcePtr& resource,
+        Qn::ConnectionRole role);
+
     virtual QString toString() const;
 
     virtual QnConstResourceVideoLayoutPtr getVideoLayout(const QnAbstractStreamDataProvider* dataProvider = 0) const override;
@@ -35,7 +38,7 @@ public:
 
     /* Return item time zone offset in ms */
     qint64 timeZoneOffset() const;
-    QnAviArchiveDelegate* createArchiveDelegate() const;
+    virtual QnAviArchiveDelegate* createArchiveDelegate() const;
     virtual bool hasVideo(const QnAbstractStreamDataProvider* dataProvider) const override;
 
     /**

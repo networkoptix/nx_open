@@ -8,7 +8,7 @@
 
 #include <client/client_globals.h>
 #include <ui/style/helper.h>
-#include <ui/widgets/common/tree_view.h>
+#include <nx/client/desktop/common/widgets/tree_view.h>
 
 namespace {
 
@@ -153,11 +153,11 @@ private:
 
 struct CheckableLineWidget::PrivateData
 {
-    QnTreeView* view = nullptr;
+    TreeView* view = nullptr;
     CheckableLineWidget::Model* model = nullptr;
 
     explicit PrivateData(CheckableLineWidget* parent):
-        view(new QnTreeView(parent)),
+        view(new TreeView(parent)),
         model(new CheckableLineWidget::Model(
             [parent](Qt::CheckState newState) { emit parent->checkStateChanged(newState); },
             view))
@@ -196,7 +196,7 @@ CheckableLineWidget::~CheckableLineWidget()
 {
 }
 
-QnTreeView* CheckableLineWidget::view() const
+TreeView* CheckableLineWidget::view() const
 {
     return m_data->view;
 }

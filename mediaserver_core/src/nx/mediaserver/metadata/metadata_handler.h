@@ -45,9 +45,9 @@ signals:
     void sdkEventTriggered(const nx::vms::event::AnalyticsSdkEventPtr& event);
 
 private:
-    nx::vms::event::EventState lastEventState(const QnUuid& eventId) const;
+    nx::vms::api::EventState lastEventState(const QnUuid& eventId) const;
 
-    void setLastEventState(const QnUuid& eventId, nx::vms::event::EventState eventState);
+    void setLastEventState(const QnUuid& eventId, nx::vms::api::EventState eventState);
     nx::api::Analytics::EventType eventDescriptor(const QnUuid& eventId) const;
     void handleEventsPacket(
         nxpt::ScopedRef<nx::sdk::metadata::EventsMetadataPacket> packet);
@@ -62,7 +62,7 @@ private:
 private:
     QnSecurityCamResourcePtr m_resource;
     nx::api::AnalyticsDriverManifest m_manifest;
-    QMap<QnUuid, nx::vms::event::EventState> m_eventStateMap;
+    QMap<QnUuid, nx::vms::api::EventState> m_eventStateMap;
     QnAbstractDataReceptor* m_dataReceptor = nullptr;
     nx::debugging::AbstractVisualMetadataDebugger* m_visualDebugger = nullptr;
 };

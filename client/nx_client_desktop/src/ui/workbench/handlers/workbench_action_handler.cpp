@@ -14,6 +14,7 @@
 #include <QtWidgets/QCheckBox>
 #include <QtWidgets/QDesktopWidget>
 #include <QtWidgets/QLineEdit>
+#include <QtWidgets/QPlainTextEdit>
 #include <QtWidgets/QPushButton>
 #include <QtWidgets/QWhatsThis>
 #include <QtWidgets/QHeaderView>
@@ -69,6 +70,7 @@
 #include <nx/client/desktop/ui/messages/videowall_messages.h>
 #include <nx/client/desktop/ui/messages/local_files_messages.h>
 #include <nx/client/desktop/resource_views/functional_delegate_utilities.h>
+#include <nx/client/desktop/resource_views/data/node_type.h>
 
 #include <nx/network/http/http_types.h>
 #include <nx/network/socket_global.h>
@@ -185,6 +187,7 @@
 #include "ui/widgets/palette_widget.h"
 #include "network/authutil.h"
 #include <core/resource/fake_media_server.h>
+#include <client/client_app_info.h>
 
 #include <nx/client/desktop/ui/main_window.h>
 #include <ui/models/resource/resource_list_model.h>
@@ -356,6 +359,7 @@ ActionHandler::ActionHandler(QObject *parent) :
     connect(action(action::BrowseUrlAction), SIGNAL(triggered()), this, SLOT(at_browseUrlAction_triggered()));
     connect(action(action::VersionMismatchMessageAction), &QAction::triggered, this, &ActionHandler::at_versionMismatchMessageAction_triggered);
     connect(action(action::BetaVersionMessageAction), SIGNAL(triggered()), this, SLOT(at_betaVersionMessageAction_triggered()));
+    connect(action(action::ShowEulaAction), &QAction::triggered, this, &ActionHandler::showEula);
     connect(action(action::AllowStatisticsReportMessageAction), &QAction::triggered, this, [this] { checkIfStatisticsReportAllowed(); });
 
     connect(action(action::QueueAppRestartAction), SIGNAL(triggered()), this, SLOT(at_queueAppRestartAction_triggered()));
@@ -580,7 +584,7 @@ void ActionHandler::submitDelayedDrops()
     QScopedValueRollback<bool> guard(m_delayedDropGuard, true);
 
     QnResourceList resources;
-    ec2::ApiLayoutTourDataList tours;
+    nx::vms::api::LayoutTourDataList tours;
 
     for (const auto& data: m_delayedDrops)
     {
@@ -708,6 +712,34 @@ void ActionHandler::showMultipleCamerasErrorMessage(
 
     messageBox.setStandardButtons(QDialogButtonBox::Ok);
     messageBox.exec();
+}
+
+void ActionHandler::showEula()
+{
+    QFile eula(lit(":/license.txt"));
+    eula.open(QIODevice::ReadOnly);
+    const QString eulaText = QString::fromUtf8(eula.readAll());
+
+    QnMessageBox eulaDialog(mainWindowWidget());
+    eulaDialog.setIcon(QnMessageBoxIcon::Warning);
+    eulaDialog.setText(tr("To use the software you must accept the end user license agreement"));
+
+    auto textEdit = new QPlainTextEdit(&eulaDialog);
+    textEdit->setPlainText(eulaText);
+    textEdit->setReadOnly(true);
+    textEdit->setFixedSize(740, 560);
+    eulaDialog.addCustomWidget(textEdit);
+    eulaDialog.addButton(tr("Accept"), QDialogButtonBox::AcceptRole, Qn::ButtonAccent::Standard);
+    eulaDialog.addButton(tr("Decline"), QDialogButtonBox::RejectRole);
+
+    if (eulaDialog.exec() == QDialogButtonBox::AcceptRole)
+    {
+        qnSettings->setAcceptedEulaVersion(QnClientAppInfo::eulaVersion());
+    }
+    else
+    {
+        menu()->trigger(action::DelayedForcedExitAction);
+    }
 }
 
 void ActionHandler::changeDefaultPasswords(
@@ -1565,18 +1597,18 @@ void ActionHandler::at_openBusinessLogAction_triggered() {
 
     const auto parameters = menu()->currentParameters(sender());
 
-    vms::event::EventType eventType = parameters.argument(Qn::EventTypeRole, vms::event::anyEvent);
+    vms::api::EventType eventType = parameters.argument(Qn::EventTypeRole, vms::api::EventType::anyEvent);
     auto cameras = parameters.resources().filtered<QnVirtualCameraResource>();
     QSet<QnUuid> ids;
     for (auto camera: cameras)
         ids << camera->getId();
 
     // show diagnostics if Issues action was triggered
-    if (eventType != vms::event::anyEvent || !ids.isEmpty())
+    if (eventType != vms::api::EventType::anyEvent || !ids.isEmpty())
     {
         businessEventsLogDialog()->disableUpdateData();
         businessEventsLogDialog()->setEventType(eventType);
-        businessEventsLogDialog()->setActionType(vms::event::diagnosticsAction);
+        businessEventsLogDialog()->setActionType(vms::api::ActionType::diagnosticsAction);
         auto now = QDateTime::currentMSecsSinceEpoch();
         businessEventsLogDialog()->setDateRange(now, now);
         businessEventsLogDialog()->setCameraList(ids);
@@ -1852,7 +1884,7 @@ void ActionHandler::at_cameraIssuesAction_triggered()
 {
     menu()->trigger(action::OpenBusinessLogAction,
         menu()->currentParameters(sender())
-        .withArgument(Qn::EventTypeRole, vms::event::anyCameraEvent));
+        .withArgument(Qn::EventTypeRole, vms::api::EventType::anyCameraEvent));
 }
 
 void ActionHandler::at_cameraBusinessRulesAction_triggered() {
@@ -1910,7 +1942,7 @@ void ActionHandler::at_serverLogsAction_triggered()
 void ActionHandler::at_serverIssuesAction_triggered()
 {
     menu()->trigger(action::OpenBusinessLogAction,
-        {Qn::EventTypeRole, vms::event::anyServerEvent});
+        {Qn::EventTypeRole, vms::api::EventType::anyServerEvent});
 }
 
 void ActionHandler::at_pingAction_triggered()
@@ -2012,18 +2044,21 @@ bool ActionHandler::validateResourceName(const QnResourcePtr& resource, const QS
 
 void ActionHandler::at_renameAction_triggered()
 {
+    using NodeType = ResourceTreeNodeType;
+
     const auto parameters = menu()->currentParameters(sender());
+
+    const auto nodeType = parameters.argument<NodeType>(Qn::NodeTypeRole, NodeType::resource);
 
     QnResourcePtr resource;
 
-    Qn::NodeType nodeType = parameters.argument<Qn::NodeType>(Qn::NodeTypeRole, Qn::ResourceNode);
     switch (nodeType)
     {
-        case Qn::ResourceNode:
-        case Qn::EdgeNode:
-        case Qn::RecorderNode:
-        case Qn::SharedLayoutNode:
-        case Qn::SharedResourceNode:
+        case NodeType::resource:
+        case NodeType::edge:
+        case NodeType::recorder:
+        case NodeType::sharedLayout:
+        case NodeType::sharedResource:
             resource = parameters.resource();
             break;
         default:
@@ -2033,7 +2068,7 @@ void ActionHandler::at_renameAction_triggered()
         return;
 
     QnVirtualCameraResourcePtr camera;
-    if (nodeType == Qn::RecorderNode)
+    if (nodeType == NodeType::recorder)
     {
         camera = resource.dynamicCast<QnVirtualCameraResource>();
         if (!camera)
@@ -2041,7 +2076,7 @@ void ActionHandler::at_renameAction_triggered()
     }
 
     QString name = parameters.argument<QString>(Qn::ResourceNameRole).trimmed();
-    QString oldName = nodeType == Qn::RecorderNode
+    QString oldName = nodeType == NodeType::recorder
         ? camera->getGroupName()
         : resource->getName();
 
@@ -2075,7 +2110,7 @@ void ActionHandler::at_renameAction_triggered()
         else
             context()->instance<LayoutsHandler>()->renameLayout(layout, name);
     }
-    else if (nodeType == Qn::RecorderNode)
+    else if (nodeType == NodeType::recorder)
     {
         /* Recorder name should not be validated. */
         QString groupId = camera->getGroupId();

@@ -119,16 +119,13 @@ bool backupDatabase(std::shared_ptr<ec2::AbstractECConnection> connection)
 
 void dropConnectionsToRemotePeers(ec2::AbstractTransactionMessageBus* messageBus)
 {
-    if (QnServerConnector::instance())
-        QnServerConnector::instance()->stop();
-
+    messageBus->commonModule()->setStandAloneMode(true);
     messageBus->dropConnections();
 }
 
-void resumeConnectionsToRemotePeers()
+void resumeConnectionsToRemotePeers(ec2::AbstractTransactionMessageBus* messageBus)
 {
-    if (QnServerConnector::instance())
-        QnServerConnector::instance()->start();
+    messageBus->commonModule()->setStandAloneMode(false);
 }
 
 bool configureLocalSystem(
@@ -145,7 +142,7 @@ bool configureLocalSystem(
     if (!data.wholeSystem)
     {
         dropConnectionsToRemotePeers(messageBus);
-        guard = Guard([&data]() { resumeConnectionsToRemotePeers(); });
+        guard = Guard([&data, messageBus]() { resumeConnectionsToRemotePeers(messageBus); });
     }
 
     if (!nx::vms::utils::configureLocalPeerAsPartOfASystem(commonModule, data))

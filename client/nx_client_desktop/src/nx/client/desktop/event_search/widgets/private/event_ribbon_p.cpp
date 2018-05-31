@@ -14,9 +14,9 @@
 #include <client/client_globals.h>
 #include <core/resource/camera_resource.h>
 #include <utils/common/event_processors.h>
-#include <ui/common/custom_painted.h>
+#include <nx/client/desktop/common/utils/custom_painted.h>
 #include <ui/common/notification_levels.h>
-#include <ui/common/widget_anchor.h>
+#include <nx/client/desktop/common/utils/widget_anchor.h>
 #include <ui/help/help_topic_accessor.h>
 #include <ui/style/helper.h>
 #include <ui/style/nx_style_p.h>
@@ -74,10 +74,10 @@ EventRibbon::Private::Private(EventRibbon* q):
     m_scrollBar->setSingleStep(kScrollBarStep);
     m_scrollBar->setFixedWidth(m_scrollBar->sizeHint().width());
 
-    auto scrollBarAnchor = new QnWidgetAnchor(m_scrollBar);
+    auto scrollBarAnchor = new WidgetAnchor(m_scrollBar);
     scrollBarAnchor->setEdges(Qt::RightEdge | Qt::TopEdge | Qt::BottomEdge);
 
-    auto viewportAnchor = new QnWidgetAnchor(m_viewport);
+    auto viewportAnchor = new WidgetAnchor(m_viewport);
     viewportAnchor->setEdges(Qt::LeftEdge | Qt::RightEdge | Qt::TopEdge | Qt::BottomEdge);
 
     const int mainPadding = q->style()->pixelMetric(QStyle::PM_ScrollBarExtent);
@@ -323,7 +323,7 @@ void EventRibbon::Private::updateTile(EventTile* tile, const QModelIndex& index)
 
         if (ini().showDebugTimeInformationInRibbon)
         {
-            connect(provider, &QnImageProvider::statusChanged, tile,
+            connect(provider, &ImageProvider::statusChanged, tile,
                 [showPreviewTimestamp, provider]() { showPreviewTimestamp(provider); });
         }
 
@@ -474,7 +474,7 @@ void EventRibbon::Private::insertNewTiles(int index, int count, UpdateMode updat
     if (unreadCount() != oldUnreadCount)
         emit q->unreadCountChanged(unreadCount(), highestUnreadImportance(), PrivateSignal());
 
-    emit q->countChanged(m_tiles.size(), PrivateSignal());
+    emit q->countChanged(m_tiles.size());
 }
 
 void EventRibbon::Private::removeTiles(int first, int count, UpdateMode updateMode)
@@ -538,7 +538,7 @@ void EventRibbon::Private::removeTiles(int first, int count, UpdateMode updateMo
     if (unreadCount() != oldUnreadCount)
         emit q->unreadCountChanged(unreadCount(), highestUnreadImportance(), PrivateSignal());
 
-    emit q->countChanged(m_tiles.size(), PrivateSignal());
+    emit q->countChanged(m_tiles.size());
 }
 
 void EventRibbon::Private::clear()
@@ -564,7 +564,7 @@ void EventRibbon::Private::clear()
     if (hadUnreadTiles)
         emit q->unreadCountChanged(0, QnNotificationLevel::Value::NoNotification, PrivateSignal());
 
-    emit q->countChanged(m_tiles.size(), PrivateSignal());
+    emit q->countChanged(m_tiles.size());
 }
 
 void EventRibbon::Private::clearShiftAnimations()
@@ -819,7 +819,7 @@ void EventRibbon::Private::highlightAppearance(EventTile* tile)
     animation->setEasingCurve(QEasingCurve::InCubic);
 
     auto curtain = new CustomPainted<QWidget>(tile);
-    new QnWidgetAnchor(curtain);
+    new WidgetAnchor(curtain);
 
     curtain->setCustomPaintFunction(
         [animation, curtain, guard = QPointer<QVariantAnimation>(animation)]

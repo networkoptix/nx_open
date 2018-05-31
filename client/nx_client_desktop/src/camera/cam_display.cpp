@@ -689,7 +689,7 @@ bool QnCamDisplay::display(QnCompressedVideoDataPtr vd, bool sleep, float speed)
             bool ignoreVideo = vd->flags & QnAbstractMediaData::MediaFlags_Ignore;
             bool draw = !ignoreVideo && (sleep || (m_displayLasts * 1000 < needToSleep)); // do not draw if computer is very slow and we still wanna sync with audio
 
-            if (draw)
+            if (draw && !nx::client::desktop::ini().allowOsScreenSaver)
                 updateActivity();
 
             if (!(vd->flags & QnAbstractMediaData::MediaFlags_Ignore))
@@ -1271,7 +1271,7 @@ void QnCamDisplay::processMetadata(const QnAbstractCompressedMetadataPtr& metada
     int consumersCount = 0;
     for (const auto& value: consumers.values(metadata->metadataType))
     {
-        if (const auto& consumer = value.lock())
+        if (auto consumer = value.lock())
         {
             ++consumersCount;
             consumer->processMetadata(metadata);
@@ -1551,7 +1551,7 @@ bool QnCamDisplay::processData(const QnAbstractDataPacketPtr& data)
                 }
             }
 
-            if (isForcedBufferingEnabled() && !isDataQueueFull())
+            if (m_isRealTimeSource && (isForcedBufferingEnabled() && !isDataQueueFull()))
                 return false;
 
             m_lastVideoPacketTime = vd->timestamp;

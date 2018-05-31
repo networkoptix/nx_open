@@ -136,7 +136,8 @@ private slots:
         const QnVideoWallItem& item);
     void at_videoWall_itemRemoved_activeMode(const QnVideoWallResourcePtr &videoWall, const QnVideoWallItem &item);
 
-    void at_eventManager_controlMessageReceived(const ec2::ApiVideowallControlMessageData& message);
+    void at_eventManager_controlMessageReceived(
+        const nx::vms::api::VideowallControlMessageData& message);
 
     void at_display_widgetAdded(QnResourceWidget* widget);
     void at_display_widgetAboutToBeRemoved(QnResourceWidget* widget);

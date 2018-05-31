@@ -138,7 +138,7 @@ protected:
         {
             api::AccountData accountData;
             ASSERT_EQ(
-                api::ResultCode::notAuthorized,
+                api::ResultCode::badUsername,
                 getAccount(
                     credentials.login,
                     credentials.password,

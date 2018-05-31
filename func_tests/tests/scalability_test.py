@@ -12,15 +12,15 @@ from multiprocessing.dummy import Pool as ThreadPool
 import pytest
 from requests.exceptions import ReadTimeout
 
+import framework.utils as utils
 import resource_synchronization_test as resource_test
 import server_api_data_generators as generator
-import framework.utils as utils
 import transaction_log
-from memory_usage_metrics import load_host_memory_usage
 from framework.api_shortcuts import get_server_id, get_system_settings
 from framework.compare import compare_values
-from framework.server import MEDIASERVER_MERGE_TIMEOUT
+from framework.installation.mediaserver import MEDIASERVER_MERGE_TIMEOUT
 from framework.utils import GrowingSleep
+from memory_usage_metrics import load_host_memory_usage
 
 log = logging.getLogger(__name__)
 
@@ -42,6 +42,7 @@ def config(test_config):
         REST_API_TIMEOUT=datetime.timedelta(minutes=1),
         )
 
+
 @pytest.fixture
 def lightweight_servers(metrics_saver, lightweight_servers_factory, config):
     assert config.SERVER_COUNT > 1, repr(config.SERVER_COUNT)  # Must be at least 2 servers
@@ -62,8 +63,9 @@ def lightweight_servers(metrics_saver, lightweight_servers_factory, config):
     assert lws_list, 'No lightweight servers were created'
     return lws_list
 
+
 @pytest.fixture
-def servers(metrics_saver, linux_servers_pool, lightweight_servers, config):
+def servers(metrics_saver, linux_mediaservers_pool, lightweight_servers, config):
     server_count = config.SERVER_COUNT - len(lightweight_servers)
     log.info('Creating %d servers:', server_count)
     setup_settings = dict(systemSettings=dict(
@@ -71,9 +73,11 @@ def servers(metrics_saver, linux_servers_pool, lightweight_servers, config):
         synchronizeTimeWithInternet=utils.bool_to_str(False),
         ))
     start_time = utils.datetime_utc_now()
-    server_list = [linux_servers_pool.get('server_%04d' % (idx + 1),
-                                           setup_settings=setup_settings)
-                       for idx in range(server_count)]
+    server_list = [
+        linux_mediaservers_pool.get(
+            'server_%04d' % (idx + 1),
+            setup_settings=setup_settings)
+        for idx in range(server_count)]
     metrics_saver.save('server_init_duration', utils.datetime_utc_now() - start_time)
     return server_list
 
@@ -122,23 +126,34 @@ def with_traceback(fn):
             raise
     return wrapper
 
+
 @with_traceback
 def create_test_data_on_server((config, server, index)):
     resource_generators = dict(
-        saveCamera=resource_test.SeedResourceWithParentGenerator(generator.generate_camera_data, index * config.CAMERAS_PER_SERVER),
-        saveCameraUserAttributes=resource_test.ResourceGenerator(generator.generate_camera_user_attributes_data),
-        setResourceParams=resource_test.SeedResourceList(generator.generate_resource_params_data_list, config.PROPERTIES_PER_CAMERA),
-        saveUser=resource_test.SeedResourceGenerator(generator.generate_user_data, index * config.USERS_PER_SERVER),
-        saveStorage=resource_test.SeedResourceWithParentGenerator(generator.generate_storage_data, index * config.STORAGES_PER_SERVER),
-        saveLayout=resource_test.LayoutGenerator(index * (config.USERS_PER_SERVER + 1)))
+        saveCamera=resource_test.SeedResourceWithParentGenerator(
+            generator.generate_camera_data,
+            index * config.CAMERAS_PER_SERVER),
+        saveCameraUserAttributes=resource_test.ResourceGenerator(
+            generator.generate_camera_user_attributes_data),
+        setResourceParams=resource_test.SeedResourceList(
+            generator.generate_resource_params_data_list,
+            config.PROPERTIES_PER_CAMERA),
+        saveUser=resource_test.SeedResourceGenerator(
+            generator.generate_user_data,
+            index * config.USERS_PER_SERVER),
+        saveStorage=resource_test.SeedResourceWithParentGenerator(
+            generator.generate_storage_data,
+            index * config.STORAGES_PER_SERVER),
+        saveLayout=resource_test.LayoutGenerator(
+            index * (config.USERS_PER_SERVER + 1)))
     servers_with_guids = [(server, get_server_id(server.api))]
     users = create_resources_on_server_by_size(
         server, 'saveUser',  resource_generators, config.USERS_PER_SERVER)
     users.append(get_server_admin(server))
-    cameras = create_resources_on_server(server, 'saveCamera',
-                                         resource_generators, servers_with_guids * config.CAMERAS_PER_SERVER)
-    create_resources_on_server(server, 'saveStorage',
-                               resource_generators, servers_with_guids * config.STORAGES_PER_SERVER)
+    cameras = create_resources_on_server(
+        server, 'saveCamera', resource_generators, servers_with_guids * config.CAMERAS_PER_SERVER)
+    create_resources_on_server(
+        server, 'saveStorage', resource_generators, servers_with_guids * config.STORAGES_PER_SERVER)
     layout_items_generator = resource_generators['saveLayout'].items_generator
     layout_items_generator.set_resources(cameras)
     create_resources_on_server(server, 'saveLayout', resource_generators, users)
@@ -147,10 +162,9 @@ def create_test_data_on_server((config, server, index)):
 
 
 def create_test_data(config, servers):
-    server_tupples = [(config, server, i)
-                      for i, server in enumerate(servers)]
+    server_tuples = [(config, server, i) for i, server in enumerate(servers)]
     pool = ThreadPool(len(servers))
-    pool.map(create_test_data_on_server, server_tupples)
+    pool.map(create_test_data_on_server, server_tuples)
     pool.close()
     pool.join()
 
@@ -170,6 +184,7 @@ def get_response(server, method, api_object, api_method):
     server.service.make_core_dump()
     raise  # reraise last exception
 
+
 def clean_transaction_log(json):
     # We have to filter 'setResourceStatus' transactions due to VMS-5969
     def is_not_set_resource_status(transaction):
@@ -177,9 +192,11 @@ def clean_transaction_log(json):
 
     return filter(is_not_set_resource_status, transaction_log.transactions_from_json(json))
 
+
 def clean_full_info(json):
     # We have to not check 'resStatusList' section due to VMS-5969
-    return {k: v for k, v in json.items() if k !='resStatusList'}
+    return {k: v for k, v in json.items() if k != 'resStatusList'}
+
 
 def clean_json(api_method, json):
     cleaners = dict(
@@ -201,6 +218,7 @@ def log_diffs(x, y):
     else:
         log.warning('Strange, no diffs are found...')
 
+
 def save_json_artifact(artifact_factory, api_method, side_name, server, value):
     artifact = artifact_factory(['result', api_method, side_name], name='%s-%s' % (api_method, side_name))
     file_path = artifact.save_as_json(value, encoder=transaction_log.TransactionJsonEncoder)
@@ -215,6 +233,7 @@ def make_dumps_and_fail(message, servers, merge_timeout, api_method, api_call_st
     for server in servers:
         server.service.make_core_dump()
     pytest.fail(full_message)
+
 
 def wait_for_method_matched(artifact_factory, servers, method, api_object, api_method, start_time, merge_timeout):
     growing_delay = GrowingSleep()
@@ -242,7 +261,9 @@ def wait_for_method_matched(artifact_factory, servers, method, api_object, api_m
                                                    utils.datetime_utc_now() - api_call_start_time))
             return
         if utils.datetime_utc_now() - start_time >= merge_timeout:
-            log.info('Servers %s and %s still has unmatched results for method %r:', servers[0], first_unsynced_server, api_method)
+            log.info(
+                'Servers %s and %s still has unmatched results for method %r:',
+                servers[0], first_unsynced_server, api_method)
             log_diffs(expected_result, unmatched_result)
             save_json_artifact(artifact_factory, api_method, 'x', servers[0], expected_result)
             save_json_artifact(artifact_factory, api_method, 'y', first_unsynced_server, unmatched_result)
@@ -252,15 +273,16 @@ def wait_for_method_matched(artifact_factory, servers, method, api_object, api_m
 
 
 def wait_for_data_merged(artifact_factory, servers, merge_timeout, start_time):
-    for api_method in [
-#            'getMediaServersEx',  # the only method to debug/check if servers are actually able to merge
-            'getUsers',
-            'getStorages',
-            'getLayouts',
-            'getCamerasEx',
-            'getFullInfo',
-            'getTransactionLog',
-            ]:
+    api_methods_to_check = [
+        # 'getMediaServersEx',  # The only method to debug/check if servers are actually able to merge.
+        'getUsers',
+        'getStorages',
+        'getLayouts',
+        'getCamerasEx',
+        'getFullInfo',
+        'getTransactionLog',
+        ]
+    for api_method in api_methods_to_check:
         wait_for_method_matched(artifact_factory, servers, 'GET', 'ec2', api_method, start_time, merge_timeout)
 
 
@@ -280,7 +302,8 @@ def collect_additional_metrics(metrics_saver, servers, lightweight_servers):
             metrics_saver.save(metric_name, metric_value)
 
 
-def test_scalability(artifact_factory, metrics_saver, config, lightweight_servers, lightweight_servers_factory, servers):
+def test_scalability(
+        artifact_factory, metrics_saver, config, lightweight_servers, lightweight_servers_factory, servers):
     assert isinstance(config.MERGE_TIMEOUT, datetime.timedelta)
 
     # lightweight servers create data themselves
@@ -305,7 +328,7 @@ def test_scalability(artifact_factory, metrics_saver, config, lightweight_server
     finally:
         if servers[0].is_online():
             get_system_settings(servers[0].api)  # log final settings
-    assert utils.str_to_bool(servers[0].settings['autoDiscoveryEnabled']) == False
+    assert utils.str_to_bool(servers[0].settings['autoDiscoveryEnabled']) is False
 
     for server in servers:
         assert not server.installation.list_core_dumps()

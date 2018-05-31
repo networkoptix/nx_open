@@ -37,6 +37,27 @@ api::ResultCode dbResultToApiResult(nx::utils::db::DBResult dbResult)
     return api::ResultCode::dbError;
 }
 
+api::ResultCode ec2ResultToResult(data_sync_engine::ResultCode resultCode)
+{
+    switch (resultCode)
+    {
+        case data_sync_engine::ResultCode::ok:
+            return api::ResultCode::ok;
+        case data_sync_engine::ResultCode::partialContent:
+            return api::ResultCode::partialContent;
+        case data_sync_engine::ResultCode::dbError:
+            return api::ResultCode::dbError;
+        case data_sync_engine::ResultCode::retryLater:
+            return api::ResultCode::retryLater;
+        case data_sync_engine::ResultCode::notFound:
+            return api::ResultCode::notFound;
+        case data_sync_engine::ResultCode::badRequest:
+            return api::ResultCode::badRequest;
+        default:
+            return api::ResultCode::unknownError;
+    }
+}
+
 } // namespace cdb
 } // namespace nx
 

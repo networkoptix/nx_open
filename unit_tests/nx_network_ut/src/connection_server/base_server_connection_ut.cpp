@@ -67,7 +67,7 @@ protected:
         ASSERT_TRUE(clientConnection->connect(m_serverSocket.getLocalAddress(), nx::network::kNoTimeout));
         m_clientConnections.push_back(std::move(clientConnection));
 
-        std::unique_ptr<AbstractStreamSocket> acceptedConnection(m_serverSocket.accept());
+        auto acceptedConnection = m_serverSocket.accept();
         ASSERT_NE(nullptr, acceptedConnection);
         ASSERT_TRUE(acceptedConnection->setNonBlockingMode(true));
 

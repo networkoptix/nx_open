@@ -21,6 +21,7 @@
 				<xs:attribute type="xs:string" name="range" use="optional"/>
 				<xs:attribute type="xs:string" name="tag" use="optional"/>
 				<xs:attribute type="xs:boolean" name="readOnly" use="optional" default="false"/>
+				<xs:attribute type="xs:boolean" name="compact" use="optional" default="false"/>
             </xs:extension>
 		</xs:simpleContent>
 	</xs:complexType>

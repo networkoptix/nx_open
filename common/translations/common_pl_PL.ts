@@ -53,11 +53,6 @@
       <translation>Wykryty System %1 ma niezgodną wersję %2.</translation>
     </message>
     <message>
-      <source>Cannot connect to the other System because current System is already connected to %1.</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-      <translation>Nie można połączyć bieżącego Systemu z innym, ponieważ jest już połączony z %1.</translation>
-    </message>
-    <message>
       <source>The discovered System %1 is in safe mode.</source>
       <comment>%1 is name of System</comment>
       <translation>Wykryty System %1 działa w trybie awaryjnym.</translation>
@@ -66,16 +61,6 @@
       <source>Could not configure the remote System %1.</source>
       <comment>%1 is name of System</comment>
       <translation>Nie można skonfigurować zdalnego Systemu %1.</translation>
-    </message>
-    <message>
-      <source>Both Systems are connected to %1. Merge is not allowed.</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-      <translation>Oba Systemy są połączone z %1. Operacja złączenia nie jest dozwolona.</translation>
-    </message>
-    <message>
-      <source>These Systems are built with different %1 URL. Merge is not allowed.</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-      <translation>Te Systemy są zbudowane z różnych adresów URL %1. Operacja złączenia nie jest dozwolona.</translation>
     </message>
     <message>
       <source>New System</source>
@@ -87,9 +72,24 @@
       <translation>Wykryty system %1 jest niezgodny z bieżącym systemem.</translation>
     </message>
     <message>
+      <source>Cannot connect to the other System because current System is already connected to %1.</source>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
+      <translation>Nie można połączyć bieżącego Systemu z innym, ponieważ jest już połączony z %1.</translation>
+    </message>
+    <message>
       <source>%1 System can only be merged with non-%1. System name and password are taken from %1 System.</source>
-      <comment>%1 is the short cloud name (like &apos;Cloud&apos;)</comment>
+      <comment>%1 is the short cloud name (like Cloud)</comment>
       <translation>System w chmurze %1 można złączyć tylko z systemem spoza chmury %1. Nazwa systemu i hasło zostaną pobrane z systemu w chmurze %1.</translation>
+    </message>
+    <message>
+      <source>Both Systems are connected to %1. Merge is not allowed.</source>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
+      <translation>Oba Systemy są połączone z %1. Operacja złączenia nie jest dozwolona.</translation>
+    </message>
+    <message>
+      <source>These Systems are built with different %1 URL. Merge is not allowed.</source>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
+      <translation>Te Systemy są zbudowane z różnych adresów URL %1. Operacja złączenia nie jest dozwolona.</translation>
     </message>
   </context>
   <context>
@@ -589,8 +589,8 @@
       <translation>Nieznany błąd</translation>
     </message>
     <message>
-      <source>Server with matching Hardware Id not found</source>
-      <translation>Nie znaleziono serwera o zgodnym Id sprzętu</translation>
+      <source>Server with matching Hardware ID not found</source>
+      <translation>Nie znaleziono serwera o zgodnym ID sprzętu</translation>
     </message>
   </context>
   <context>
@@ -724,12 +724,12 @@
       <translation>Znak wodny: %1</translation>
     </message>
     <message>
-      <source>Hardware Id: %1</source>
-      <translation>ID sprzętu: %1</translation>
-    </message>
-    <message>
       <source>Time License</source>
       <translation>Licencja okresowa</translation>
+    </message>
+    <message>
+      <source>Hardware ID: %1</source>
+      <translation>ID sprzętu: %1</translation>
     </message>
   </context>
   <context>

@@ -98,7 +98,7 @@ bool MutexLockKey::operator!=( const MutexLockKey& rhs ) const
 
 QString MutexLockKey::toString() const
 {
-    return lit( "%1:%2. mutex %3, relock number %4" ).
+    return QString( "%1:%2. mutex %3, relock number %4" ).
         arg(QLatin1String(sourceFile)).arg(line).arg((size_t)mutexPtr, 0, 16).arg(lockID);
 }
 
@@ -294,8 +294,8 @@ void MutexLockAnalyzer::afterMutexLocked( const MutexLockKey& mutexLockPosition 
             "    %1\n").
             arg(pathToString(threadContext->currentLockPath.crbegin(), threadContext->currentLockPath.crend()));
 
-        NX_LOG( deadLockMsg, cl_logALWAYS );
         std::cerr << deadLockMsg.toStdString() << std::endl;
+        NX_ALWAYS(this, deadLockMsg);
         return;
     }
 
@@ -364,6 +364,7 @@ void MutexLockAnalyzer::afterMutexLocked( const MutexLockKey& mutexLockPosition 
             readLock.unlock();
 
             std::cerr << deadLockMsg.toStdString() << std::endl;
+            NX_ALWAYS(this, deadLockMsg);
 
             #if defined(_WIN32)
                 DebugBreak();
@@ -454,11 +455,11 @@ QString MutexLockAnalyzer::pathToString( const std::list<LockGraphEdgeData>& edg
         }
 
         if( lockStackChanged )
-            pathStr += lit("----------------\n");
+            pathStr += "----------------\n";
         if( lockStackChanged || (it == edgesTravelled.cbegin()) )
-            pathStr += lockData.firstLocked.toString() + QLatin1String("\n");
+            pathStr += lockData.firstLocked.toString() + "\n";
         pathStr += QString::fromLatin1("    thread %1\n").arg(lockData.threadID, 0, 16);
-        pathStr += lockData.secondLocked.toString() + QLatin1String("\n");
+        pathStr += lockData.secondLocked.toString() + "\n";
 
         prevSecondLock = lockData.secondLocked;
         prevLockThreadID = lockData.threadID;

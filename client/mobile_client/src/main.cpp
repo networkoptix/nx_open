@@ -35,15 +35,17 @@
 #include <ui/window_utils.h>
 #include <ui/texture_size_helper.h>
 #include <camera/camera_thumbnail_cache.h>
-#include <ui/helpers/font_loader.h>
+#include <nx/client/core/utils/font_loader.h>
 #include <utils/intent_listener_android.h>
 #include <handlers/lite_client_handler.h>
 
-#include <nx/media/decoder_registrar.h>
-#include <resource_allocator.h>
+#include <gl_context_synchronizer.h>
 #include <nx/utils/timer_manager.h>
 #include <nx/utils/std/cpp14.h>
 
+#include <nx/media/media_fwd.h>
+#include <nx/media/decoder_registrar.h>
+#include <nx/media/video_decoder_registry.h>
 #include <nx/mobile_client/webchannel/web_channel_server.h>
 #include <nx/mobile_client/controllers/web_admin_controller.h>
 #include <nx/mobile_client/helpers/inter_client_message.h>
@@ -72,7 +74,7 @@ int runUi(QtSingleGuiApplication* application)
 
     // TODO: #dklychkov Detect fonts dir for iOS.
     QString fontsDir = QDir(qApp->applicationDirPath()).absoluteFilePath(lit("fonts"));
-    QnFontLoader::loadFonts(fontsDir);
+    nx::client::core::FontLoader::loadFonts(fontsDir);
 
     QFont font;
     font.setFamily(lit("Roboto"));
@@ -161,8 +163,6 @@ int runUi(QtSingleGuiApplication* application)
     QObject::connect(engine, &QQmlEngine::quit, application, &QGuiApplication::quit);
 
     prepareWindow();
-    std::shared_ptr<nx::media::AbstractResourceAllocator> allocator(new ResourceAllocator(
-        mainWindow));
 
     QSize maxFfmpegResolution = qnSettings->maxFfmpegResolution();
     QSize maxFfmpegHevcResolution = maxFfmpegResolution;
@@ -190,7 +190,7 @@ int runUi(QtSingleGuiApplication* application)
     maxFfmpegResolutions[(int) AV_CODEC_ID_H265] = maxFfmpegHevcResolution;
 
     nx::media::DecoderRegistrar::registerDecoders(
-        allocator, maxFfmpegResolutions, /*isTranscodingEnabled*/ !context->liteMode());
+        maxFfmpegResolutions, /*isTranscodingEnabled*/ !context->liteMode());
 
     #if defined(Q_OS_ANDROID)
         QUrl initialIntentData = getInitialIntentData();
@@ -286,20 +286,17 @@ void initLog(const QString& logLevel)
 
     logSettings.maxFileSize = 10 * 1024 * 1024;
     logSettings.maxBackupCount = 5;
+    logSettings.logBaseName = *ini().logFile
+        ? QString::fromUtf8(ini().logFile)
+        : QnAppInfo::isAndroid()
+            ? lit("-")
+            : (QString::fromUtf8(nx::kit::IniConfig::iniFilesDir()) + lit("mobile_client"));
 
     if (ini().enableLog)
     {
         nx::utils::log::initialize(
             logSettings,
-            /*applicationName*/ lit("mobile_client"),
-            /*binaryPath*/ QString(),
-            /*baseName*/
-                *ini().logFile
-                ? QString::fromUtf8(ini().logFile)
-                : QnAppInfo::isAndroid()
-                    ? lit("-")
-                    : (QString::fromUtf8(nx::kit::IniConfig::iniFilesDir())
-                        + lit("mobile_client")));
+            /*applicationName*/ lit("mobile_client"));
         const QString tcpLogAddress(QLatin1String(ini().tcpLogAddress));
         if (!tcpLogAddress.isEmpty())
         {
@@ -316,14 +313,13 @@ void initLog(const QString& logLevel)
     const auto ec2logger = nx::utils::log::addLogger({QnLog::EC2_TRAN_LOG});
     if (ini().enableEc2TranLog)
     {
+        logSettings.logBaseName = QnAppInfo::isAndroid()
+            ? lit("-")
+            : (QString::fromUtf8(nx::kit::IniConfig::iniFilesDir()) + lit("ec2_tran"));
         nx::utils::log::initialize(
             logSettings,
             /*applicationName*/ lit("mobile_client"),
             /*binaryPath*/ QString(),
-            /*baseName*/
-                QnAppInfo::isAndroid()
-                ? lit("-")
-                : (QString::fromUtf8(nx::kit::IniConfig::iniFilesDir()) + lit("ec2_tran")),
             ec2logger);
     }
 }

@@ -109,7 +109,6 @@ void initialize(Manager* manager, Action* root)
 
     factory(PreferencesNotificationTabAction)
         .flags(NoTarget)
-        .icon(qnSkin->icon("events/filter.png"))
         .text(ContextMenu::tr("Filter...")); //< To be displayed on button tooltip
 
     factory(PreferencesCloudTabAction)
@@ -122,7 +121,7 @@ void initialize(Manager* manager, Action* root)
     factory(ConnectToCloudSystemAction)
         .flags(Tree | NoTarget)
         .text(ContextMenu::tr("Connect to System"))
-        .condition(condition::treeNodeType(Qn::CloudSystemNode));
+        .condition(condition::treeNodeType(ResourceTreeNodeType::cloudSystem));
 
     factory(ReconnectAction)
         .flags(NoTarget);
@@ -150,7 +149,6 @@ void initialize(Manager* manager, Action* root)
             | LayoutItemTarget | WidgetTarget | GlobalHotkey)
         .mode(DesktopMode)
         .requiredGlobalPermission(Qn::GlobalViewLogsPermission)
-        .icon(qnSkin->icon("events/log.png"))
         .shortcut(lit("Ctrl+L"))
         .condition(!condition::tourIsRunning())
         .text(ContextMenu::tr("Event Log...")); //< To be displayed on button tooltip
@@ -308,7 +306,7 @@ void initialize(Manager* manager, Action* root)
             .text(ContextMenu::tr("User..."))
             .pulledText(ContextMenu::tr("New User..."))
             .condition(
-                condition::treeNodeType(Qn::UsersNode)
+                condition::treeNodeType(ResourceTreeNodeType::users)
                 && !condition::isSafeMode()
             )
             .autoRepeat(false);
@@ -327,7 +325,7 @@ void initialize(Manager* manager, Action* root)
             .text(ContextMenu::tr("Web Page..."))
             .pulledText(ContextMenu::tr("New Web Page..."))
             .condition(
-                condition::treeNodeType(Qn::WebPagesNode)
+                condition::treeNodeType(ResourceTreeNodeType::webPages)
                 && !condition::isSafeMode()
             )
             .autoRepeat(false);
@@ -337,7 +335,7 @@ void initialize(Manager* manager, Action* root)
             .text(ContextMenu::tr("Showreel..."))
             .pulledText(ContextMenu::tr("New Showreel..."))
             .condition(condition::isLoggedIn()
-                && condition::treeNodeType({Qn::LayoutToursNode})
+                && condition::treeNodeType({ResourceTreeNodeType::layoutTours})
                 && !condition::isSafeMode()
             )
             .autoRepeat(false);
@@ -411,7 +409,8 @@ void initialize(Manager* manager, Action* root)
             .pulledText(ContextMenu::tr("Open Web Client..."))
             .autoRepeat(false)
             .condition(condition::isLoggedIn()
-                && condition::treeNodeType({Qn::CurrentSystemNode, Qn::ServersNode}));
+                && condition::treeNodeType(
+                    {ResourceTreeNodeType::currentSystem, ResourceTreeNodeType::servers}));
 
     } factory.endSubMenu();
 
@@ -555,6 +554,10 @@ void initialize(Manager* manager, Action* root)
         .flags(NoTarget)
         .mode(DesktopMode);
 
+    factory(ShowEulaAction)
+        .flags(NoTarget)
+        .mode(DesktopMode);
+
     factory(AllowStatisticsReportMessageAction)
         .flags(NoTarget)
         .mode(DesktopMode)
@@ -571,7 +574,9 @@ void initialize(Manager* manager, Action* root)
         .text(ContextMenu::tr("System Administration..."))
         .shortcut(lit("Ctrl+Alt+A"))
         .requiredGlobalPermission(Qn::GlobalAdminPermission)
-        .condition(condition::treeNodeType({Qn::CurrentSystemNode, Qn::ServersNode})
+        .condition(
+            condition::treeNodeType(
+                {ResourceTreeNodeType::currentSystem, ResourceTreeNodeType::servers})
             && !condition::tourIsRunning());
 
     factory(SystemUpdateAction)
@@ -583,7 +588,7 @@ void initialize(Manager* manager, Action* root)
         .flags(Main | Tree)
         .requiredGlobalPermission(Qn::GlobalAdminPermission)
         .text(ContextMenu::tr("User Management..."))
-        .condition(condition::treeNodeType(Qn::UsersNode));
+        .condition(condition::treeNodeType(ResourceTreeNodeType::users));
 
     factory(UpdateLocalFilesAction)
         .flags(NoTarget);
@@ -650,7 +655,6 @@ void initialize(Manager* manager, Action* root)
         .mode(DesktopMode)
         .requiredGlobalPermission(Qn::GlobalAdminPermission)
         .text(ContextMenu::tr("Event Rules..."))
-        .icon(qnSkin->icon("events/settings.png"))
         .shortcut(lit("Ctrl+E"))
         .condition(!condition::tourIsRunning())
         .autoRepeat(false);
@@ -681,7 +685,8 @@ void initialize(Manager* manager, Action* root)
         .flags(Main | Tree)
         .text(ContextMenu::tr("Merge Systems..."))
         .condition(
-            condition::treeNodeType({Qn::CurrentSystemNode, Qn::ServersNode})
+            condition::treeNodeType(
+                {ResourceTreeNodeType::currentSystem, ResourceTreeNodeType::servers})
             && !condition::isSafeMode()
             && ConditionWrapper(new RequiresOwnerCondition())
         );
@@ -810,7 +815,7 @@ void initialize(Manager* manager, Action* root)
         .flags(Tree | SingleTarget | ResourceTarget)
         .childFactory(new EdgeNodeFactory(manager))
         .text(ContextMenu::tr("Server..."))
-        .condition(condition::treeNodeType(Qn::EdgeNode));
+        .condition(condition::treeNodeType(ResourceTreeNodeType::edge));
 
     factory()
         .flags(Scene | Tree)
@@ -1265,25 +1270,37 @@ void initialize(Manager* manager, Action* root)
     factory(UserRolesAction)
         .flags(Tree | NoTarget)
         .text(ContextMenu::tr("User Roles..."))
-        .conditionalText(ContextMenu::tr("Role Settings..."), condition::treeNodeType(Qn::RoleNode))
+        .conditionalText(
+            ContextMenu::tr("Role Settings..."),
+            condition::treeNodeType(ResourceTreeNodeType::role))
         .requiredGlobalPermission(Qn::GlobalAdminPermission)
-        .condition(condition::treeNodeType({Qn::UsersNode, Qn::RoleNode}));
+        .condition(
+            condition::treeNodeType(
+                {ResourceTreeNodeType::users, ResourceTreeNodeType::role}));
 
     factory(UploadWearableCameraFileAction)
         .mode(DesktopMode)
         .flags(Scene | Tree | SingleTarget | ResourceTarget)
         .requiredGlobalPermission(Qn::GlobalEditCamerasPermission)
         .text(ContextMenu::tr("Upload File..."))
-        .condition(condition::hasFlags(Qn::wearable_camera, MatchMode::All)
-            && condition::isTrue(ini().enableWearableCameras));
+        .condition(condition::isTrue(ini().enableWearableCameras)
+            && condition::wearableCameraUploadEnabled());
 
     factory(UploadWearableCameraFolderAction)
         .mode(DesktopMode)
         .flags(Scene | Tree | SingleTarget | ResourceTarget)
         .requiredGlobalPermission(Qn::GlobalEditCamerasPermission)
         .text(ContextMenu::tr("Upload Folder..."))
-        .condition(condition::hasFlags(Qn::wearable_camera, MatchMode::All)
-            && condition::isTrue(ini().enableWearableCameras));
+        .condition(condition::isTrue(ini().enableWearableCameras)
+            && condition::wearableCameraUploadEnabled());
+
+    factory(CancelWearableCameraUploadsAction)
+        .mode(DesktopMode)
+        .flags(Scene | Tree | SingleTarget | ResourceTarget)
+        .requiredGlobalPermission(Qn::GlobalEditCamerasPermission)
+        .text(ContextMenu::tr("Cancel Upload..."))
+        .condition(condition::isTrue(ini().enableWearableCameras)
+            && condition::wearableCameraUploadCancellable());
 
     factory(CameraIssuesAction)
         .mode(DesktopMode)
@@ -1331,6 +1348,23 @@ void initialize(Manager* manager, Action* root)
         .requiredGlobalPermission(Qn::GlobalEditCamerasPermission)
         .condition(condition::hasFlags(Qn::live_cam, MatchMode::Any)
             && !condition::tourIsRunning()
+            && condition::scoped(SceneScope,
+                !condition::isLayoutTourReviewMode()
+                && !condition::isPreviewSearchMode()));
+
+    factory(CameraSettingsActionNew)
+        .mode(DesktopMode)
+        .flags(Scene | Tree | SingleTarget | MultiTarget | ResourceTarget | LayoutItemTarget)
+        .dynamicText(new DevicesNameTextFactory(
+            QnCameraDeviceStringSet(
+                ContextMenu::tr("Device Settings (new)..."), ContextMenu::tr("Devices Settings (new)..."),
+                ContextMenu::tr("Camera Settings (new)..."), ContextMenu::tr("Cameras Settings (new)..."),
+                ContextMenu::tr("I/O Module Settings (new)..."), ContextMenu::tr("I/O Modules Settings (new)...")
+            ), manager))
+        .requiredGlobalPermission(Qn::GlobalEditCamerasPermission)
+        .condition(condition::hasFlags(Qn::live_cam, MatchMode::Any)
+            && !condition::tourIsRunning()
+            && condition::isTrue(ini().redesignedCameraSettingsDialog)
             && condition::scoped(SceneScope,
                 !condition::isLayoutTourReviewMode()
                 && !condition::isPreviewSearchMode()));
@@ -1456,7 +1490,7 @@ void initialize(Manager* manager, Action* root)
         .flags(Tree | SingleTarget | MultiTarget | ResourceTarget)
         .text(ContextMenu::tr("Merge to Currently Connected System..."))
         .condition(
-            condition::treeNodeType(Qn::ResourceNode)
+            condition::treeNodeType(ResourceTreeNodeType::resource)
             && !condition::isSafeMode()
             && ConditionWrapper(new MergeToCurrentSystemCondition())
             && ConditionWrapper(new RequiresOwnerCondition())
@@ -1529,17 +1563,18 @@ void initialize(Manager* manager, Action* root)
         .flags(Tree | NoTarget)
         .mode(DesktopMode)
         .text(ContextMenu::tr("Open in New Tab"))
-        .condition(condition::treeNodeType(Qn::LayoutTourNode))
+        .condition(condition::treeNodeType(ResourceTreeNodeType::layoutTour))
         .autoRepeat(false);
 
     factory(ReviewLayoutTourInNewWindowAction)
         .flags(Tree | NoTarget)
         .mode(DesktopMode)
         .text(ContextMenu::tr("Open in New Window"))
-        .condition(condition::treeNodeType(Qn::LayoutTourNode))
+        .condition(condition::treeNodeType(ResourceTreeNodeType::layoutTour))
         .autoRepeat(false);
 
-    factory().flags(Tree).separator().condition(condition::treeNodeType(Qn::LayoutTourNode));
+    factory().flags(Tree).separator().condition(
+        condition::treeNodeType(ResourceTreeNodeType::layoutTour));
 
     factory(ToggleLayoutTourModeAction)
         .flags(Scene | Tree | NoTarget | GlobalHotkey)
@@ -1548,8 +1583,10 @@ void initialize(Manager* manager, Action* root)
         .shortcut(lit("Alt+T"))
         .checkable()
         .autoRepeat(false)
-        .condition(condition::tourIsRunning()
-            || (condition::treeNodeType(Qn::LayoutTourNode) && condition::canStartTour()));
+        .condition(
+            condition::tourIsRunning()
+            || (condition::treeNodeType(ResourceTreeNodeType::layoutTour) && condition::
+                canStartTour()));
 
     factory(StartCurrentLayoutTourAction)
         .flags(NoTarget)
@@ -1563,7 +1600,8 @@ void initialize(Manager* manager, Action* root)
         )
         .autoRepeat(false);
 
-    factory().flags(Tree).separator().condition(condition::treeNodeType(Qn::LayoutTourNode));
+    factory().flags(Tree).separator().condition(
+        condition::treeNodeType(ResourceTreeNodeType::layoutTour));
 
     factory(RemoveLayoutTourAction)
         .flags(Tree | NoTarget | IntentionallyAmbiguous)
@@ -1571,15 +1609,17 @@ void initialize(Manager* manager, Action* root)
         .text(ContextMenu::tr("Delete"))
         .shortcut(lit("Del"))
         .shortcut(Qt::Key_Backspace, Builder::Mac, true)
-        .condition(condition::treeNodeType(Qn::LayoutTourNode));
+        .condition(condition::treeNodeType(ResourceTreeNodeType::layoutTour));
 
-    factory().flags(Tree).separator().condition(condition::treeNodeType(Qn::LayoutTourNode));
+    factory().flags(Tree).separator().condition(
+        condition::treeNodeType(ResourceTreeNodeType::layoutTour));
 
     factory(RenameLayoutTourAction)
         .flags(Tree | NoTarget | IntentionallyAmbiguous)
         .text(ContextMenu::tr("Rename"))
         .shortcut(lit("F2"))
-        .condition(condition::treeNodeType(Qn::LayoutTourNode)
+        .condition(
+            condition::treeNodeType(ResourceTreeNodeType::layoutTour)
             && !condition::isSafeMode())
         .autoRepeat(false);
 
@@ -1593,12 +1633,14 @@ void initialize(Manager* manager, Action* root)
         .condition(condition::isLayoutTourReviewMode())
         .autoRepeat(false);
 
-    factory().flags(Tree).separator().condition(condition::treeNodeType(Qn::LayoutTourNode));
+    factory().flags(Tree).separator().condition(
+        condition::treeNodeType(ResourceTreeNodeType::layoutTour));
 
     factory(LayoutTourSettingsAction)
         .flags(Tree | NoTarget)
         .text(ContextMenu::tr("Settings"))
-        .condition(condition::treeNodeType(Qn::LayoutTourNode)
+        .condition(
+            condition::treeNodeType(ResourceTreeNodeType::layoutTour)
             && !condition::isSafeMode())
         .childFactory(new LayoutTourSettingsFactory(manager))
         .autoRepeat(false);
@@ -1765,7 +1807,7 @@ void initialize(Manager* manager, Action* root)
         .flags(Tree | NoTarget)
         .text(ContextMenu::tr("Pin Tree")) //< To be displayed on button tooltip
         .toggledText(ContextMenu::tr("Unpin Tree"))
-        .condition(condition::treeNodeType(Qn::RootNode));
+        .condition(condition::treeNodeType(ResourceTreeNodeType::root));
 
     factory(PinCalendarAction)
         .flags(NoTarget)
@@ -1779,7 +1821,7 @@ void initialize(Manager* manager, Action* root)
         .flags(NoTarget)
         .text(ContextMenu::tr("Show Tree")) //< To be displayed on button tooltip
         .toggledText(ContextMenu::tr("Hide Tree"))
-        .condition(condition::treeNodeType(Qn::RootNode));
+        .condition(condition::treeNodeType(ResourceTreeNodeType::root));
 
     factory(ToggleTimelineAction)
         .flags(NoTarget)
@@ -1793,8 +1835,8 @@ void initialize(Manager* manager, Action* root)
 
     factory(PinNotificationsAction)
         .flags(Notifications | NoTarget)
-        .text(ContextMenu::tr("Pin Notifications")) //< To be displayed on button tooltip
-        .toggledText(ContextMenu::tr("Unpin Notifications"));
+        .text(ContextMenu::tr("Pin Panel")) //< To be displayed on button tooltip
+        .toggledText(ContextMenu::tr("Unpin Panel"));
 
     factory(GoToNextItemAction)
         .flags(NoTarget);

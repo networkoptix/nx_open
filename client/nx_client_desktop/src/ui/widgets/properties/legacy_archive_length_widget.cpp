@@ -6,14 +6,15 @@
 #include <core/resource/camera_resource.h>
 
 #include <ui/common/read_only.h>
-#include <ui/common/aligner.h>
+#include <nx/client/desktop/common/utils/aligner.h>
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
 
 #include <ui/workaround/widgets_signals_workaround.h>
 #include <nx/client/desktop/common/utils/checkbox_utils.h>
+#include <nx/client/desktop/common/widgets/hint_button.h>
 #include <core/resource/device_dependent_strings.h>
-#include <nx_ec/data/api_camera_attributes_data.h>
+#include <nx/vms/api/data/camera_attributes_data.h>
 
 namespace {
 static const int kDangerousMinArchiveDays = 5;
@@ -31,6 +32,11 @@ QnArchiveLengthWidget::QnArchiveLengthWidget(QWidget* parent):
     ui->setupUi(this);
 
     setHelpTopic(this, Qn::CameraSettings_Recording_ArchiveLength_Help);
+    auto archiveGroupHint = nx::client::desktop::HintButton::hintThat(ui->archiveGroupBox);
+
+    archiveGroupHint->addHintLine(tr("Sets when camera archive will be deleted or saved when there is no space for new recordings."));
+    archiveGroupHint->addHintLine(tr("\"Auto\" deletes the oldest footage first, regardless of the source."));
+    setHelpTopic(archiveGroupHint, Qn::CameraSettings_Recording_ArchiveLength_Help);
 
     CheckboxUtils::autoClearTristate(ui->checkBoxMinArchive);
     CheckboxUtils::autoClearTristate(ui->checkBoxMaxArchive);
@@ -80,7 +86,7 @@ QnArchiveLengthWidget::QnArchiveLengthWidget(QWidget* parent):
 
     updateArchiveRangeEnabledState();
 
-    m_aligner = new QnAligner(this);
+    m_aligner = new Aligner(this);
     m_aligner->addWidgets({
         ui->labelMinDays,
         ui->labelMaxDays });
@@ -90,7 +96,7 @@ QnArchiveLengthWidget::~QnArchiveLengthWidget()
 {
 }
 
-QnAligner* QnArchiveLengthWidget::aligner() const
+Aligner* QnArchiveLengthWidget::aligner() const
 {
     return m_aligner;
 }
@@ -212,7 +218,7 @@ void QnArchiveLengthWidget::updateMinDays(const QnVirtualCameraResourceList& cam
         return;
 
     /* Any negative min days value means 'auto'. Storing absolute value to keep previous one. */
-    auto calcMinDays = [](int d) { return d == 0 ? ec2::kDefaultMinArchiveDays : qAbs(d); };
+    auto calcMinDays = [](int d) { return d == 0 ? nx::vms::api::kDefaultMinArchiveDays : qAbs(d); };
 
     const int minDays = (*std::min_element(cameras.cbegin(), cameras.cend(),
         [calcMinDays](const QnVirtualCameraResourcePtr& l,
@@ -242,7 +248,7 @@ void QnArchiveLengthWidget::updateMaxDays(const QnVirtualCameraResourceList& cam
         return;
 
     /* Any negative max days value means 'auto'. Storing absolute value to keep previous one. */
-    auto calcMaxDays = [](int d) { return d == 0 ? ec2::kDefaultMaxArchiveDays : qAbs(d); };
+    auto calcMaxDays = [](int d) { return d == 0 ? nx::vms::api::kDefaultMaxArchiveDays : qAbs(d); };
 
     const int maxDays = (*std::max_element(cameras.cbegin(),
         cameras.cend(),

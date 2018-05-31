@@ -11,9 +11,10 @@ from requests.auth import HTTPDigestAuth
 
 import server_api_data_generators as generator
 from framework.api_shortcuts import get_time
+from framework.installation.mediaserver import TimePeriod
 from framework.rest_api import HttpError
-from framework.server import TimePeriod
-from framework.utils import log_list, wait_until
+from framework.utils import log_list
+from framework.waiting import wait_for_true
 
 log = logging.getLogger(__name__)
 
@@ -22,9 +23,9 @@ UNEXISTENT_USER_ROLE_GUIID = '44e4161e-158e-2201-e000-000000000001'
 
 
 # https://networkoptix.atlassian.net/browse/VMS-3911
-def test_server_should_pick_archive_file_with_time_after_db_time(running_linux_server, camera, sample_media_file):
-    running_linux_server.add_camera(camera)
-    storage = running_linux_server.storage
+def test_server_should_pick_archive_file_with_time_after_db_time(one_running_mediaserver, camera, sample_media_file):
+    one_running_mediaserver.add_camera(camera)
+    storage = one_running_mediaserver.storage
     sample = sample_media_file
 
     start_times_1 = []
@@ -48,22 +49,22 @@ def test_server_should_pick_archive_file_with_time_after_db_time(running_linux_s
 
     for st in start_times_1:
         storage.save_media_sample(camera, st, sample)
-    running_linux_server.rebuild_archive()
-    assert expected_periods_1 == running_linux_server.get_recorded_time_periods(camera)
+    one_running_mediaserver.rebuild_archive()
+    assert expected_periods_1 == one_running_mediaserver.get_recorded_time_periods(camera)
 
     # stop service and add more media files to archive:
-    running_linux_server.stop()
+    one_running_mediaserver.stop()
     for st in start_times_2:
         storage.save_media_sample(camera, st, sample)
-    running_linux_server.start()
+    one_running_mediaserver.start()
 
     time.sleep(10)  # servers still need some time to settle down; hope this time will be enough
     # after restart new periods must be picked:
-    recorded_periods = running_linux_server.get_recorded_time_periods(camera)
-    assert recorded_periods != expected_periods_1, 'Server did not pick up new media archive files'
+    recorded_periods = one_running_mediaserver.get_recorded_time_periods(camera)
+    assert recorded_periods != expected_periods_1, 'Mediaserver did not pick up new media archive files'
     assert expected_periods_1 + expected_periods_2 == recorded_periods
 
-    assert not running_linux_server.installation.list_core_dumps()
+    assert not one_running_mediaserver.installation.list_core_dumps()
 
 
 def assert_server_has_resource(server, method, **kw):
@@ -88,45 +89,47 @@ def assert_post_forbidden(server, method, **kw):
 
 
 # https://networkoptix.atlassian.net/browse/VMS-2246
-def test_create_and_remove_user_with_resource(running_linux_server):
+def test_create_and_remove_user_with_resource(one_running_mediaserver):
     user = generator.generate_user_data(
         user_id=1,  name="user1", email="user1@example.com",
         permissions="2432", cryptSha512Hash="", digest="",
         hash="", isAdmin=False, isEnabled=True, isLdap=False, realm="")
-    running_linux_server.api.ec2.saveUser.POST(**user)
+    one_running_mediaserver.api.ec2.saveUser.POST(**user)
     expected_permissions = "GlobalViewArchivePermission|GlobalManageBookmarksPermission|0x80"
     user_resource = [generator.generate_resource_params_data(id=1, resource=user)]
-    running_linux_server.api.ec2.setResourceParams.POST(json=user_resource)
-    assert_server_has_resource(running_linux_server, 'getUsers', id=user['id'], permissions=expected_permissions)
-    assert_server_has_resource(running_linux_server, 'getResourceParams', resourceId=user['id'], name=user_resource[0]['name'])
-    running_linux_server.api.ec2.removeUser.POST(id=user['id'])
-    assert_server_does_not_have_resource(running_linux_server, 'getUsers', user['id'])
-    assert_server_does_not_have_resource(running_linux_server, 'getResourceParams', user['id'])
-    assert not running_linux_server.installation.list_core_dumps()
+    one_running_mediaserver.api.ec2.setResourceParams.POST(json=user_resource)
+    assert_server_has_resource(one_running_mediaserver, 'getUsers', id=user['id'], permissions=expected_permissions)
+    assert_server_has_resource(
+        one_running_mediaserver,
+        'getResourceParams', resourceId=user['id'], name=user_resource[0]['name'])
+    one_running_mediaserver.api.ec2.removeUser.POST(id=user['id'])
+    assert_server_does_not_have_resource(one_running_mediaserver, 'getUsers', user['id'])
+    assert_server_does_not_have_resource(one_running_mediaserver, 'getResourceParams', user['id'])
+    assert not one_running_mediaserver.installation.list_core_dumps()
 
 
 # https://networkoptix.atlassian.net/browse/VMS-3052
-def test_missing_user_role(running_linux_server):
+def test_missing_user_role(one_running_mediaserver):
     user_1 = generator.generate_user_data(user_id=1, name="user1", email="user1@example.com")
     user_2 = generator.generate_user_data(user_id=2, name="user2", email="user2@example.com",
                                           userRoleId=UNEXISTENT_USER_ROLE_GUIID)
     # Try link existing user to a missing role
-    running_linux_server.api.ec2.saveUser.POST(**user_1)
-    assert_server_has_resource(running_linux_server, 'getUsers', id=user_1['id'])
+    one_running_mediaserver.api.ec2.saveUser.POST(**user_1)
+    assert_server_has_resource(one_running_mediaserver, 'getUsers', id=user_1['id'])
     user_1_with_unexpected_role = dict(user_1, userRoleId=UNEXISTENT_USER_ROLE_GUIID)
-    assert_post_forbidden(running_linux_server, 'saveUser', **user_1_with_unexpected_role)
+    assert_post_forbidden(one_running_mediaserver, 'saveUser', **user_1_with_unexpected_role)
 
     # Try create new user to non-existent role
-    assert_post_forbidden(running_linux_server, 'saveUser', **user_2)
+    assert_post_forbidden(one_running_mediaserver, 'saveUser', **user_2)
 
-    assert_server_has_resource(running_linux_server, 'getUsers', id=user_1['id'], userRoleId=user_1['userRoleId'])
-    assert_server_does_not_have_resource(running_linux_server, 'getUsers', user_2['id'])
+    assert_server_has_resource(one_running_mediaserver, 'getUsers', id=user_1['id'], userRoleId=user_1['userRoleId'])
+    assert_server_does_not_have_resource(one_running_mediaserver, 'getUsers', user_2['id'])
 
-    assert not running_linux_server.installation.list_core_dumps()
+    assert not one_running_mediaserver.installation.list_core_dumps()
 
 
 # https://networkoptix.atlassian.net/browse/VMS-2904
-def test_remove_child_resources(running_linux_server):
+def test_remove_child_resources(one_running_mediaserver):
     server_data = generator.generate_mediaserver_data(server_id=1)
     storage = generator.generate_storage_data(storage_id=1, parentId=server_data['id'])
     camera_1 = generator.generate_camera_data(camera_id=1, parentId=server_data['id'])
@@ -137,46 +140,49 @@ def test_remove_child_resources(running_linux_server):
         ('saveCamera', 'getCameras', camera_1),
         ('saveCamera', 'getCameras', camera_2)]
     for post_method, get_method, data in tested_calls:
-        running_linux_server.api.get_api_fn('POST', 'ec2', post_method)(**data)
+        one_running_mediaserver.api.get_api_fn('POST', 'ec2', post_method)(**data)
         resource_params = [generator.generate_resource_params_data(id=1, resource=data)]
-        running_linux_server.api.ec2.setResourceParams.POST(json=resource_params)
-        assert_server_has_resource(running_linux_server, get_method, id=data['id'])
-        assert_server_has_resource(running_linux_server, 'getResourceParams', resourceId=data['id'])
+        one_running_mediaserver.api.ec2.setResourceParams.POST(json=resource_params)
+        assert_server_has_resource(one_running_mediaserver, get_method, id=data['id'])
+        assert_server_has_resource(one_running_mediaserver, 'getResourceParams', resourceId=data['id'])
     # Remove camera_2
-    running_linux_server.api.ec2.removeResource.POST(id=camera_1['id'])
-    assert_server_does_not_have_resource(running_linux_server, 'getCameras', camera_1['id'])
+    one_running_mediaserver.api.ec2.removeResource.POST(id=camera_1['id'])
+    assert_server_does_not_have_resource(one_running_mediaserver, 'getCameras', camera_1['id'])
     # Remove running_linux_server and check that all running_linux_server child resources have been removed
-    running_linux_server.api.ec2.removeResource.POST(id=server_data['id'])
+    one_running_mediaserver.api.ec2.removeResource.POST(id=server_data['id'])
     for _, get_method, data in tested_calls:
-        assert_server_does_not_have_resource(running_linux_server, get_method, data['id'])
-        assert_server_does_not_have_resource(running_linux_server, 'getResourceParams', data['id'])
+        assert_server_does_not_have_resource(one_running_mediaserver, get_method, data['id'])
+        assert_server_does_not_have_resource(one_running_mediaserver, 'getResourceParams', data['id'])
 
-    assert not running_linux_server.installation.list_core_dumps()
+    assert not one_running_mediaserver.installation.list_core_dumps()
 
 
 # https://networkoptix.atlassian.net/browse/VMS-3068
-def test_http_header_server(running_linux_server):
-    url = running_linux_server.api.url('ec2/testConnection')
-    response = requests.get(url, auth=HTTPDigestAuth(running_linux_server.api.user, running_linux_server.api.password))
-    log.debug('%r headers: %s', running_linux_server, response.headers)
+def test_http_header_server(one_running_mediaserver):
+    url = one_running_mediaserver.api.url('ec2/testConnection')
+    valid_auth = HTTPDigestAuth(one_running_mediaserver.api.user, one_running_mediaserver.api.password)
+    response = requests.get(url, auth=valid_auth)
+    log.debug('%r headers: %s', one_running_mediaserver, response.headers)
     assert response.status_code == 200
     assert 'Server' in response.headers.keys(), "HTTP header 'Server' is expected"
-    response = requests.get(url, auth=HTTPDigestAuth('invalid', 'invalid'))
-    log.debug('%r headers: %s', running_linux_server, response.headers)
+    invalid_auth = HTTPDigestAuth('invalid', 'invalid')
+    response = requests.get(url, auth=invalid_auth)
+    log.debug('%r headers: %s', one_running_mediaserver, response.headers)
     assert response.status_code == 401
     assert 'WWW-Authenticate' in response.headers.keys(), "HTTP header 'WWW-Authenticate' is expected"
     assert 'Server' not in response.headers.keys(), "Unexpected HTTP header 'Server'"
-    assert not running_linux_server.installation.list_core_dumps()
+    assert not one_running_mediaserver.installation.list_core_dumps()
 
 
 # https://networkoptix.atlassian.net/browse/VMS-3069
-def test_static_vulnerability(running_linux_server):
-    filepath = running_linux_server.installation.dir / 'var' / 'web' / 'static' / 'test.file'
-    running_linux_server.machine.os_access.write_file(filepath, 'This is just a test file')
-    url = running_linux_server.api.url('') + 'static/../../test.file'
+def test_static_vulnerability(one_running_mediaserver):
+    filepath = one_running_mediaserver.installation.dir / 'var' / 'web' / 'static' / 'test.file'
+    filepath.parent.mkdir(parents=True, exist_ok=True)
+    filepath.write_text("This is just a test file.")
+    url = one_running_mediaserver.api.url('') + 'static/../../test.file'
     response = requests.get(url)
     assert response.status_code == 403
-    assert not running_linux_server.installation.list_core_dumps()
+    assert not one_running_mediaserver.installation.list_core_dumps()
 
 
 # https://networkoptix.atlassian.net/browse/VMS-7775
@@ -184,7 +190,9 @@ def test_auth_with_time_changed(timeless_server):
     url = timeless_server.api.url('ec2/getCurrentTime')
 
     timeless_server.os_access.set_time(datetime.now(pytz.utc))
-    assert wait_until(lambda: get_time(timeless_server.api).is_close_to(datetime.now(pytz.utc)))
+    wait_for_true(
+        lambda: get_time(timeless_server.api).is_close_to(datetime.now(pytz.utc)),
+        "time on {} is close to now".format(timeless_server))
 
     shift = timedelta(days=3)
 
@@ -195,7 +203,9 @@ def test_auth_with_time_changed(timeless_server):
     response.raise_for_status()
 
     timeless_server.os_access.set_time(datetime.now(pytz.utc) + shift)
-    assert wait_until(lambda: get_time(timeless_server.api).is_close_to(datetime.now(pytz.utc) + shift))
+    wait_for_true(
+        lambda: get_time(timeless_server.api).is_close_to(datetime.now(pytz.utc) + shift),
+        "time on {} is close to now + {}".format(timeless_server, shift))
 
     response = requests.get(url, headers={'Authorization': authorization_header_value})
     assert response.status_code != 401, "Cannot authenticate after time changed on server"
@@ -210,7 +220,9 @@ def test_uptime_is_monotonic(timeless_server):
     if not isinstance(first_uptime, (int, float)):
         log.warning("Type of uptimeMs is %s but expected to be numeric.", type(first_uptime).__name__)
     new_time = timeless_server.os_access.set_time(datetime.now(pytz.utc) - timedelta(minutes=1))
-    assert wait_until(lambda: get_time(timeless_server.api).is_close_to(new_time))
+    wait_for_true(
+        lambda: get_time(timeless_server.api).is_close_to(new_time),
+        "time on {} is close to {}".format(timeless_server, new_time))
     second_uptime = timeless_server.api.api.statistics.GET()['uptimeMs']
     if not isinstance(first_uptime, (int, float)):
         log.warning("Type of uptimeMs is %s but expected to be numeric.", type(second_uptime).__name__)
@@ -218,13 +230,13 @@ def test_uptime_is_monotonic(timeless_server):
     assert not timeless_server.installation.list_core_dumps()
 
 
-def test_frequent_restarts(running_linux_server):
+def test_frequent_restarts(one_running_mediaserver):
     """Test for running_linux_server restart REST api and functional test wrapper for it."""
     # Loop is unfolded here so that we can see which exact line is failed.
-    running_linux_server.restart_via_api(timeout=timedelta(seconds=10))
-    running_linux_server.restart_via_api(timeout=timedelta(seconds=10))
-    running_linux_server.restart_via_api(timeout=timedelta(seconds=10))
-    assert not running_linux_server.installation.list_core_dumps()
+    one_running_mediaserver.restart_via_api(timeout=timedelta(seconds=10))
+    one_running_mediaserver.restart_via_api(timeout=timedelta(seconds=10))
+    one_running_mediaserver.restart_via_api(timeout=timedelta(seconds=10))
+    assert not one_running_mediaserver.installation.list_core_dumps()
 
 
 @pytest.mark.xfail(reason="https://networkoptix.atlassian.net/browse/VMS-7808")
@@ -232,18 +244,18 @@ def test_frequent_restarts(running_linux_server):
 @pytest.mark.parametrize('path', [
     '/ec2/getFullInfoExtraSuffix', '/api/pingExtraSuffix',  # VMS-7809: Matches by prefix and returns 200.
     '/api/nonExistent', '/ec2/nonExistent'])  # VMS-7809: Redirects with 301 but not returns 404.
-def test_non_existent_api_endpoints(running_linux_server, path):
-    auth = HTTPDigestAuth(running_linux_server.api.user, running_linux_server.api.password)
-    response = requests.get(running_linux_server.api.url(path), auth=auth, allow_redirects=False)
+def test_non_existent_api_endpoints(one_running_mediaserver, path):
+    auth = HTTPDigestAuth(one_running_mediaserver.api.user, one_running_mediaserver.api.password)
+    response = requests.get(one_running_mediaserver.api.url(path), auth=auth, allow_redirects=False)
     assert response.status_code == 404, "Expected 404 but got %r"
-    assert not running_linux_server.installation.list_core_dumps()
+    assert not one_running_mediaserver.installation.list_core_dumps()
 
 
-def test_https_verification(running_linux_server):
-    url = running_linux_server.api.url('/api/ping', secure=True)
+def test_https_verification(one_running_mediaserver):
+    url = one_running_mediaserver.api.url('/api/ping', secure=True)
     assert url.startswith('https://')
     with warnings.catch_warnings(record=True) as warning_list:
-        response = requests.get(url, verify=str(running_linux_server.api.ca_cert))
+        response = requests.get(url, verify=str(one_running_mediaserver.api.ca_cert))
     assert response.status_code == 200
     for warning in warning_list:
         log.warning("Warning collected: %s.", warning)

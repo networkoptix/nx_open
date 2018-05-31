@@ -74,7 +74,6 @@ QVector<QRect> QnRegion::rects() const
 
 QnMotionRegion::QnMotionRegion()
 {
-    m_dirty = false;
     addRect(kDefaultSensitivity, QRect(0,0,Qn::kMotionGridWidth, Qn::kMotionGridHeight));
 }
 
@@ -127,13 +126,13 @@ QMultiMap<int, QRect> QnMotionRegion::getAllMotionRects() const
     return result;
 }
 
-QPainterPath QnMotionRegion::getMotionMaskPath() {
+QPainterPath QnMotionRegion::getMotionMaskPath() const {
     if (m_dirty)
         updatePathCache();
     return m_pathCache[0];
 }
 
-QPainterPath QnMotionRegion::getRegionBySensPath(int value) {
+QPainterPath QnMotionRegion::getRegionBySensPath(int value) const {
     if (m_dirty)
         updatePathCache();
     return m_pathCache[value];
@@ -305,7 +304,7 @@ int QnMotionRegion::getMotionSensCount() const
     return sens_count;
 }
 
-void QnMotionRegion::updatePathCache()
+void QnMotionRegion::updatePathCache() const
 {
     for (int sens = 0; sens < QnMotionRegion::kSensitivityLevelCount; ++sens){
         QnRegion region = m_data[sens];

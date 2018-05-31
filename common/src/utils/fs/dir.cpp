@@ -7,6 +7,7 @@
 
 #include <map>
 #include <memory>
+#include <QtCore>
 
 #if defined(Q_OS_LINUX) && !defined(Q_OS_ANDROID)
 #include <time.h>
@@ -15,101 +16,87 @@
 #include <net/if_arp.h>
 #include <sys/statvfs.h>
 #include <nx/utils/app_info.h>
+#include <nx/utils/literal.h>
 #include <nx/utils/file_system.h>
 #else
 #include <nx/utils/unused.h>
 #endif
-
 static const size_t MAX_LINE_LENGTH = 512;
 
 SystemError::ErrorCode readPartitions(
+    AbstractSystemInfoProvider* systemInfoProvider,
     std::list<PartitionInfo>* const partitionInfoList)
 {
-#if defined(Q_OS_LINUX) && !defined(Q_OS_ANDROID)
-    std::string mountsFile("/proc/mounts");
-    bool scanfLongPattern = false;
-    if (nx::utils::AppInfo::isRaspberryPi())
+#if defined (Q_OS_LINUX)
+    struct PathInfo
     {
-        // On Rapberry Pi 2+ "/proc/mounts" contains unexisting "/dev/root" on "/", while mount
-        // reports a valid mounted device.
-        if (system("mount > /root/mounts") == 0)
-        {
-            // Some devices have /tmp related problems, while root can always access /root.
-            mountsFile = "/root/mounts";
-            scanfLongPattern = true;
-        }
-        else if (system("mount > /tmp/mounts") == 0)
-        {
-            // Temporary directory /tmp is a fallback for non-root users.
-            mountsFile = "/tmp/mounts";
-            scanfLongPattern = true;
-        }
-    }
+        QByteArray fsPath;
+        QByteArray fsType;
 
-    std::map<QString, std::pair<QString, QString>> deviceToPath;
-    std::unique_ptr<FILE, decltype(&fclose)> file(fopen(mountsFile.c_str(), "r"), fclose);
-    if (!file)
-        return SystemError::getLastOSErrorCode();
+        PathInfo(const QByteArray& fsPath, const QByteArray& fsType):
+            fsPath(fsPath), fsType(fsType)
+        {}
 
-    char line[MAX_LINE_LENGTH];
-    for (int i = 0; fgets(line, MAX_LINE_LENGTH, file.get()) != NULL; ++i)
+        PathInfo() = default;
+    };
+
+    QByteArray fileContent = systemInfoProvider->fileContent();
+    if (fileContent.isNull())
+        return SystemError::fileNotFound;
+
+    QBuffer file(&fileContent);
+    file.open(QIODevice::ReadOnly);
+    if (!systemInfoProvider->scanfLongPattern())
+        file.readLine();
+
+    QMap<QByteArray, PathInfo> deviceToPath;
+    QByteArray line;
+
+    for (line = file.readLine(); !line.isNull(); line = file.readLine())
     {
-        if (i == 0 && !scanfLongPattern)
-            continue; /* Skip header. */
-
         char cDevName[MAX_LINE_LENGTH];
         char cPath[MAX_LINE_LENGTH];
         char cFSName[MAX_LINE_LENGTH];
-        if (scanfLongPattern)
+        if (systemInfoProvider->scanfLongPattern())
         {
             char cTmp[MAX_LINE_LENGTH];
-            if (sscanf(line, "%s %s %s %s %s ", cDevName, cTmp, cPath, cTmp, cFSName) != 5)
+            if (sscanf(line.constData(), "%s %s %s %s %s ", cDevName, cTmp, cPath, cTmp, cFSName) != 5)
                 continue; /* Skip unrecognized lines. */
         }
         else
         {
-            if (sscanf(line, "%s %s %s ", cDevName, cPath, cFSName) != 3)
+            if (sscanf(line.constData(), "%s %s %s ", cDevName, cPath, cFSName) != 3)
                 continue; /* Skip unrecognized lines. */
         }
 
         decodeOctalEncodedPath(cPath);
 
-        const QString& devName = QString::fromUtf8(cDevName);
-        const QString& path = QString::fromUtf8(cPath);
-        const QString& fsName = QString::fromUtf8(cFSName);
-
-        auto p = deviceToPath.emplace(devName, std::make_pair(path, fsName));
-        if (!p.second)
-        {
-            //device has mutiple mount points
-            if (path.length() < p.first->second.first.length())
-            {
-                p.first->second.first = path; //selecting shortest mount point
-                p.first->second.second = fsName;
-            }
-        }
+        if (!deviceToPath.contains(cDevName) || strlen(cPath) < deviceToPath[cDevName].fsPath.size())
+            deviceToPath.insert(cDevName, PathInfo(cPath, cFSName));
     }
 
-    for (auto deviceAndPath: deviceToPath)
+    for (auto deviceKey: deviceToPath.keys())
     {
-        struct statvfs64 vfsInfo;
-        memset(&vfsInfo, 0, sizeof(vfsInfo));
-        if (statvfs64(deviceAndPath.second.first.toUtf8().constData(), &vfsInfo) == -1)
+        const PathInfo& pathInfo = deviceToPath[deviceKey];
+        PartitionInfo partitionInfo;
+
+        partitionInfo.isUsb = nx::utils::file_system::isUsb(QString::fromLatin1(deviceKey));
+        partitionInfo.devName = QString::fromLatin1(deviceKey);
+        partitionInfo.path = QString::fromLatin1(pathInfo.fsPath);
+        partitionInfo.fsName = QString::fromLatin1(pathInfo.fsType);
+        partitionInfo.sizeBytes = systemInfoProvider->totalSpace(pathInfo.fsPath);
+        if (partitionInfo.sizeBytes == -1)
             continue;
 
-        PartitionInfo partitionInfo;
-        partitionInfo.isUsb = nx::utils::file_system::isUsb(deviceAndPath.first);
-        partitionInfo.devName = deviceAndPath.first;
-        partitionInfo.path = deviceAndPath.second.first;
-        partitionInfo.fsName = deviceAndPath.second.second;
-        partitionInfo.sizeBytes = (int64_t)vfsInfo.f_blocks * vfsInfo.f_frsize;
-        partitionInfo.freeBytes = (int64_t)vfsInfo.f_bfree * vfsInfo.f_bsize;
+        partitionInfo.freeBytes = systemInfoProvider->freeSpace(pathInfo.fsPath);
+        if (partitionInfo.freeBytes == -1)
+            continue;
+
         partitionInfoList->emplace_back(std::move(partitionInfo));
     }
 
     return SystemError::noError;
 #else
-    nx::utils::unused(partitionInfoList);
     return SystemError::notImplemented;
 #endif
 }
@@ -135,3 +122,66 @@ void decodeOctalEncodedPath(char* path)
         }
     }
 }
+
+#if defined (Q_OS_LINUX)
+
+CommonSystemInfoProvider::CommonSystemInfoProvider()
+{
+    m_fileName = lit("/proc/mounts");
+    if (nx::utils::AppInfo::isRaspberryPi())
+    {
+        // On Rapberry Pi 2+ "/proc/mounts" contains unexisting "/dev/root" on "/", while mount
+        // reports a valid mounted device.
+        if (system("mount > /root/mounts") == 0)
+        {
+            // Some devices have /tmp related problems, while root can always access /root.
+            m_fileName = lit("/root/mounts");
+            m_scanfLongPattern = true;
+        }
+        else if (system("mount > /tmp/mounts") == 0)
+        {
+            // Temporary directory /tmp is a fallback for non-root users.
+            m_fileName = lit("/tmp/mounts");
+            m_scanfLongPattern = true;
+        }
+    }
+}
+
+QByteArray CommonSystemInfoProvider::fileContent() const
+{
+    QFile mountsFile(m_fileName);
+    if (!mountsFile.open(QIODevice::ReadOnly))
+        return QByteArray();
+
+    return mountsFile.readAll();
+}
+
+bool CommonSystemInfoProvider::scanfLongPattern() const
+{
+    return m_scanfLongPattern;
+}
+
+qint64 CommonSystemInfoProvider::totalSpace(const QByteArray& fsPath) const
+{
+    struct statvfs64 stat;
+    if (statvfs64(fsPath.constData(), &stat) == 0)
+       return stat.f_blocks * (qint64) stat.f_frsize;
+
+    return -1LL;
+}
+
+qint64 CommonSystemInfoProvider::freeSpace(const QByteArray& fsPath) const
+{
+    struct statvfs64 stat;
+    if (statvfs64(fsPath.constData(), &stat) == 0)
+        return stat.f_bavail * (int64_t) stat.f_bsize;
+
+    return -1LL;
+}
+
+QString CommonSystemInfoProvider::fileName() const
+{
+    return m_fileName;
+}
+
+#endif

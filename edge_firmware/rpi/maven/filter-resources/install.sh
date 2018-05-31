@@ -14,9 +14,10 @@ configure()
     LOG_FILE="$LOGS_DIR/vms-upgrade.log"
     DISTRIB="@artifact.name.server@"
     STARTUP_SCRIPT="/etc/init.d/$CUSTOMIZATION-mediaserver"
-	INSTALLER_DIR="$(dirname "$0")"
+    LITE_CLIENT_STARTUP_SCRIPT="/etc/init.d/$CUSTOMIZATION-lite-client"
+    INSTALLER_DIR="$(dirname "$0")"
     TAR_FILE="$INSTALLER_DIR/$DISTRIB.tar.gz"
-	ZIP_FILE="$INSTALLER_DIR/../$DISTRIB.zip"
+    ZIP_FILE="$INSTALLER_DIR/../$DISTRIB.zip"
     TOOLS_DIR="/root/tools/$CUSTOMIZATION"
 }
 
@@ -83,7 +84,9 @@ copyToDataPartition()
 {
     # Clean up sdcard from potentially unwanted files from previous installations.
     rm -rf "$MNT/$INSTALL_PATH" || true
-    rm -rf "$MNT/opt/deb"
+    rm -rf "$MNT/opt/deb" || true
+    rm -rf "$MNT$LITE_CLIENT_STARTUP_SCRIPT" || true
+    rm -rf "$MNT/$MEDIASERVER_PATH/var/scripts" || true
 
     # Unpack the distro to sdcard.
     tar xfv "$TAR_FILE" -C "$MNT/" || return $?
@@ -125,9 +128,10 @@ upgradeVms()
     rm -rf "$ZIP_FILE" || true  #< Already unzipped, so remove .zip to save space in "/tmp".
 
     # Clean up potentially unwanted files from previous installations.
-    rm -rf "/$MEDIASERVER_PATH/lib" "/$MEDIASERVER_PATH/bin" || true
-    rm -rf "/opt/deb"
-    rm -rf "/$LITE_CLIENT_PATH"
+    rm -rf "/$INSTALL_PATH/lib" "/$MEDIASERVER_PATH/lib" "/$MEDIASERVER_PATH/bin" || true
+    rm -rf "/opt/deb" || true
+    rm -rf "/$LITE_CLIENT_PATH" "$LITE_CLIENT_STARTUP_SCRIPT" || true
+    rm -rf "/$MEDIASERVER_PATH/var/scripts" || true
 
     tar xfv "$TAR_FILE" -C / #< Extract the distro to the root.
 
@@ -142,17 +146,20 @@ upgradeVms()
 
         callMounted vfat "/dev/mmcblk0p1" "/mnt/boot" copyToBootPartition
 
-        installDebs libvdpau 0.4.1
         installDebs fontconfig 2.11
         installDebs fonts-takao-mincho
         installDebs fonts-baekmuk
         installDebs fonts-arphic-ukai
         installDebs fonts-thai-tlwg
 
-        touch "/dev/cedar_dev"
-        chmod 777 "/dev/disp"
-        chmod 777 "/dev/cedar_dev"
-        usermod -aG video root
+        if [ -d "/opt/deb/libvdpau" ]; then
+            installDebs libvdpau 0.4.1
+
+            touch "/dev/cedar_dev"
+            chmod 777 "/dev/disp"
+            chmod 777 "/dev/cedar_dev"
+            usermod -aG video root
+        fi
 
         callMounted ext4 "/dev/mmcblk0p2" "/mnt/data" copyToDataPartition
 
@@ -160,6 +167,16 @@ upgradeVms()
     fi
 
     rm -rf "/opt/deb" #< Delete deb packages to free some space.
+
+    # Register autostart for rc.d, if it is supported and not yet registered.
+    if [ -f "/etc/init.d/.depend.stop" ]; then
+        if grep -- "$CUSTOMIZATION-mediaserver" /etc/init.d/.depend.stop >/dev/null 2>&1; then
+            echo "Mediaserver autostart already enabled."
+        else
+            echo "Enabling mediaserver autostart via update-rc.d"
+            update-rc.d -f "$CUSTOMIZATION-mediaserver" defaults
+        fi
+    fi
 }
 
 getPidWhichUsesPort() # port
@@ -185,7 +202,7 @@ restartMediaserver()
         "$STARTUP_SCRIPT" start || true #< If not started, the loop will try again.
         sleep 3
 
-		# NOTE: mediaserver.conf may not exist before "start", thus, checking the port after it.
+        # NOTE: mediaserver.conf may not exist before "start", thus, checking the port after it.
         local MEDIASERVER_PORT=$(cat "/$MEDIASERVER_PATH/etc/mediaserver.conf" \
             |grep '^port=[0-9]\+$' |sed 's/port=//')
 

@@ -47,7 +47,7 @@
 
 #include <recording/time_period.h>
 
-#include <nx_ec/data/api_videowall_data.h>
+#include <nx/vms/api/data/videowall_data.h>
 #include <nx_ec/data/api_conversion_functions.h>
 #include <nx_ec/managers/abstract_videowall_manager.h>
 
@@ -80,6 +80,7 @@
 
 #include <nx/client/desktop/ui/messages/resources_messages.h>
 #include <nx/client/desktop/ui/messages/videowall_messages.h>
+#include <nx/client/desktop/resource_views/data/node_type.h>
 
 #include <nx/fusion/serialization/json.h>
 #include <nx/fusion/serialization/json_functions.h>
@@ -726,8 +727,8 @@ void QnWorkbenchVideoWallHandler::sendMessage(const QnVideoWallControlMessage& m
     localMessage[sequenceKey] = QString::number(m_controlMode.sequence++);
     localMessage[pcUuidKey] = m_controlMode.pcUuid;
 
-    ec2::ApiVideowallControlMessageData apiMessage;
-    fromResourceToApi(localMessage, apiMessage);
+    nx::vms::api::VideowallControlMessageData apiMessage;
+    ec2::fromResourceToApi(localMessage, apiMessage);
 
 #ifdef SENDER_DEBUG
     qDebug() << "SENDER: sending message" << message;
@@ -1646,7 +1647,7 @@ void QnWorkbenchVideoWallHandler::at_stopVideoWallAction_triggered()
     if (dialog.exec() == QDialogButtonBox::Cancel)
         return;
 
-    ec2::ApiVideowallControlMessageData message;
+    nx::vms::api::VideowallControlMessageData message;
     message.operation = QnVideoWallControlMessage::Exit;
     message.videowallGuid = videoWall->getId();
 
@@ -1667,18 +1668,20 @@ void QnWorkbenchVideoWallHandler::at_delayedOpenVideoWallItemAction_triggered()
 
 void QnWorkbenchVideoWallHandler::at_renameAction_triggered()
 {
+    using NodeType = ResourceTreeNodeType;
+
     const auto parameters = menu()->currentParameters(sender());
 
-    Qn::NodeType nodeType = parameters.argument<Qn::NodeType>(Qn::NodeTypeRole, Qn::ResourceNode);
+    const auto nodeType = parameters.argument<NodeType>(Qn::NodeTypeRole, NodeType::resource);
     QString name = parameters.argument<QString>(Qn::ResourceNameRole).trimmed();
 
     bool valid = false;
     switch (nodeType)
     {
-        case Qn::VideoWallItemNode:
+        case NodeType::videoWallItem:
             valid = parameters.videoWallItems().size() == 1 && parameters.videoWallItems().first().isValid();
             break;
-        case Qn::VideoWallMatrixNode:
+        case NodeType::videoWallMatrix:
             valid = parameters.videoWallMatrices().size() == 1 && parameters.videoWallMatrices().first().isValid();
             break;
         default:
@@ -1693,10 +1696,10 @@ void QnWorkbenchVideoWallHandler::at_renameAction_triggered()
     QString oldName;
     switch (nodeType)
     {
-        case Qn::VideoWallItemNode:
+        case NodeType::videoWallItem:
             oldName = parameters.videoWallItems().first().item().name;
             break;
-        case Qn::VideoWallMatrixNode:
+        case NodeType::videoWallMatrix:
             oldName = parameters.videoWallMatrices().first().matrix().name;
             break;
         default:
@@ -1709,7 +1712,7 @@ void QnWorkbenchVideoWallHandler::at_renameAction_triggered()
 
     switch (nodeType)
     {
-        case Qn::VideoWallItemNode:
+        case NodeType::videoWallItem:
         {
             QnVideoWallItemIndex index = parameters.videoWallItems().first();
             QnVideoWallItem existingItem = index.item();
@@ -1719,7 +1722,7 @@ void QnWorkbenchVideoWallHandler::at_renameAction_triggered()
         }
         break;
 
-        case Qn::VideoWallMatrixNode:
+        case NodeType::videoWallMatrix:
         {
             QnVideoWallMatrixIndex index = parameters.videoWallMatrices().first();
             QnVideoWallMatrix existingMatrix = index.matrix();
@@ -1754,7 +1757,7 @@ void QnWorkbenchVideoWallHandler::at_identifyVideoWallAction_triggered()
         }
     }
 
-    ec2::ApiVideowallControlMessageData message;
+    nx::vms::api::VideowallControlMessageData message;
     message.operation = QnVideoWallControlMessage::Identify;
     for (const QnVideoWallItemIndex &item : indices)
     {
@@ -2377,13 +2380,14 @@ void QnWorkbenchVideoWallHandler::at_videoWall_itemRemoved_activeMode(const QnVi
     closeInstanceDelayed();
 }
 
-void QnWorkbenchVideoWallHandler::at_eventManager_controlMessageReceived(const ec2::ApiVideowallControlMessageData& apiMessage)
+void QnWorkbenchVideoWallHandler::at_eventManager_controlMessageReceived(
+    const nx::vms::api::VideowallControlMessageData& apiMessage)
 {
     if (apiMessage.instanceGuid != m_videoWallMode.instanceGuid)
         return;
 
     QnVideoWallControlMessage message;
-    fromApiToResource(apiMessage, message);
+    ec2::fromApiToResource(apiMessage, message);
 
     // Ignore order for broadcast messages such as Exit or Identify
     if (!message.params.contains(sequenceKey))
@@ -2446,7 +2450,7 @@ void QnWorkbenchVideoWallHandler::at_display_widgetAdded(QnResourceWidget* widge
 
 void QnWorkbenchVideoWallHandler::at_display_widgetAboutToBeRemoved(QnResourceWidget* widget)
 {
-    disconnect(widget, NULL, this, NULL);
+    widget->disconnect(this);
 }
 
 void QnWorkbenchVideoWallHandler::at_widget_motionSelectionChanged()
@@ -2481,7 +2485,7 @@ void QnWorkbenchVideoWallHandler::at_widget_dewarpingParamsChanged()
 
 void QnWorkbenchVideoWallHandler::at_workbench_currentLayoutAboutToBeChanged()
 {
-    disconnect(workbench()->currentLayout(), NULL, this, NULL);
+    workbench()->currentLayout()->disconnect(this);
     setControlMode(false);
 }
 
@@ -2843,8 +2847,8 @@ bool QnWorkbenchVideoWallHandler::saveReviewLayout(QnWorkbenchLayout *layout, st
     // TODO: #GDM SafeMode
     for (const QnVideoWallResourcePtr &videowall : videowalls)
     {
-        ec2::ApiVideowallData apiVideowall;
-        fromResourceToApi(videowall, apiVideowall);
+        nx::vms::api::VideowallData apiVideowall;
+        ec2::fromResourceToApi(videowall, apiVideowall);
         connection2()->getVideowallManager(Qn::kSystemAccess)->save(apiVideowall, this,
             [this, callback](int reqID, ec2::ErrorCode errorCode)
         {

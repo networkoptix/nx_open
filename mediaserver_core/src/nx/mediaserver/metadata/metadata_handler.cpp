@@ -125,7 +125,7 @@ void MetadataHandler::handleMetadataEvent(
     nxpt::ScopedRef<Event> eventData,
     qint64 timestampUsec)
 {
-    auto eventState = nx::vms::event::EventState::undefined;
+    auto eventState = nx::vms::api::EventState::undefined;
 
     const auto eventTypeId =
         nx::mediaserver_plugins::utils::fromPluginGuidToQnUuid(eventData->typeId());
@@ -135,11 +135,11 @@ void MetadataHandler::handleMetadataEvent(
     if (descriptor.flags.testFlag(nx::api::Analytics::EventTypeFlag::stateDependent))
     {
         eventState = eventData->isActive()
-            ? nx::vms::event::EventState::active
-            : nx::vms::event::EventState::inactive;
+            ? nx::vms::api::EventState::active
+            : nx::vms::api::EventState::inactive;
 
-        const bool isDublicate = eventState == nx::vms::event::EventState::inactive
-            && lastEventState(eventTypeId) == nx::vms::event::EventState::inactive;
+        const bool isDublicate = eventState == nx::vms::api::EventState::inactive
+            && lastEventState(eventTypeId) == nx::vms::api::EventState::inactive;
 
         if (isDublicate)
         {
@@ -166,7 +166,7 @@ void MetadataHandler::handleMetadataEvent(
         return;
     }
 
-    qnEventRuleConnector->at_analyticsSdkEvent(sdkEvent);
+    emit sdkEventTriggered(sdkEvent);
 }
 
 void MetadataHandler::setResource(const QnSecurityCamResourcePtr& resource)
@@ -195,15 +195,15 @@ void MetadataHandler::setVisualDebugger(
     m_visualDebugger = visualDebugger;
 }
 
-nx::vms::event::EventState MetadataHandler::lastEventState(const QnUuid& eventId) const
+nx::vms::api::EventState MetadataHandler::lastEventState(const QnUuid& eventId) const
 {
     if (m_eventStateMap.contains(eventId))
         return m_eventStateMap[eventId];
 
-    return nx::vms::event::EventState::inactive;
+    return nx::vms::api::EventState::inactive;
 }
 
-void MetadataHandler::setLastEventState(const QnUuid& eventId, nx::vms::event::EventState eventState)
+void MetadataHandler::setLastEventState(const QnUuid& eventId, nx::vms::api::EventState eventState)
 {
     m_eventStateMap[eventId] = eventState;
 }

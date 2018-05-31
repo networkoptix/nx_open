@@ -8,57 +8,60 @@
 
 using namespace nx;
 
+using nx::vms::api::EventType;
+using nx::vms::api::ActionType;
+
 QnNotificationLevel::Value QnNotificationLevel::valueOf(const vms::event::AbstractActionPtr &businessAction)
 {
-    if (businessAction->actionType() == vms::event::playSoundAction)
+    if (businessAction->actionType() == ActionType::playSoundAction)
         return Value::CommonNotification;
 
-    if (businessAction->actionType() == vms::event::showOnAlarmLayoutAction)
+    if (businessAction->actionType() == ActionType::showOnAlarmLayoutAction)
         return Value::CriticalNotification;
 
     auto params = businessAction->getRuntimeParams();
-    vms::event::EventType eventType = params.eventType;
+    EventType eventType = params.eventType;
 
-    if (eventType >= vms::event::userDefinedEvent)
+    if (eventType >= EventType::userDefinedEvent)
         return Value::CommonNotification;
 
     switch (eventType)
     {
         // Gray notifications.
-        case vms::event::cameraMotionEvent:
-        case vms::event::cameraInputEvent:
-        case vms::event::serverStartEvent:
-        case vms::event::softwareTriggerEvent:
-        case vms::event::analyticsSdkEvent:
+        case EventType::cameraMotionEvent:
+        case EventType::cameraInputEvent:
+        case EventType::serverStartEvent:
+        case EventType::softwareTriggerEvent:
+        case EventType::analyticsSdkEvent:
             return Value::CommonNotification;
 
         // Yellow notifications.
-        case vms::event::networkIssueEvent:
-        case vms::event::cameraIpConflictEvent:
-        case vms::event::serverConflictEvent:
+        case EventType::networkIssueEvent:
+        case EventType::cameraIpConflictEvent:
+        case EventType::serverConflictEvent:
             return Value::ImportantNotification;
 
         // Red notifications.
-        case vms::event::cameraDisconnectEvent:
-        case vms::event::storageFailureEvent:
-        case vms::event::serverFailureEvent:
-        case vms::event::licenseIssueEvent:
+        case EventType::cameraDisconnectEvent:
+        case EventType::storageFailureEvent:
+        case EventType::serverFailureEvent:
+        case EventType::licenseIssueEvent:
             return Value::CriticalNotification;
 
-        case vms::event::backupFinishedEvent:
+        case EventType::backupFinishedEvent:
         {
-            vms::event::EventReason reason = static_cast<vms::event::EventReason>(params.reasonCode);
+            vms::api::EventReason reason = static_cast<vms::api::EventReason>(params.reasonCode);
             const bool failure =
-                reason == vms::event::EventReason::backupFailedChunkError ||
-                reason == vms::event::EventReason::backupFailedNoBackupStorageError ||
-                reason == vms::event::EventReason::backupFailedSourceFileError ||
-                reason == vms::event::EventReason::backupFailedSourceStorageError ||
-                reason == vms::event::EventReason::backupFailedTargetFileError;
+                reason == vms::api::EventReason::backupFailedChunkError ||
+                reason == vms::api::EventReason::backupFailedNoBackupStorageError ||
+                reason == vms::api::EventReason::backupFailedSourceFileError ||
+                reason == vms::api::EventReason::backupFailedSourceStorageError ||
+                reason == vms::api::EventReason::backupFailedTargetFileError;
 
             if (failure)
                 return Value::CriticalNotification;
 
-            const bool success = reason == vms::event::EventReason::backupDone;
+            const bool success = reason == vms::api::EventReason::backupDone;
             return success ? Value::SuccessNotification : Value::CommonNotification;
         }
 

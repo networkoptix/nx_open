@@ -65,10 +65,8 @@ public:
     //---------------------------------------------------------------------------------------------
     // Implementation of AbstractStreamServerSocket::*
     virtual bool listen(int queueLen) override;
-    virtual AbstractStreamSocket* accept() override;
+    virtual std::unique_ptr<AbstractStreamSocket> accept() override;
     virtual void acceptAsync(AcceptCompletionHandler handler) override;
-    virtual void cancelIOAsync(nx::utils::MoveOnlyFunc<void()> handler) override;
-    virtual void cancelIOSync() override;
 
     /**
      * These methods can be called concurrently with MultipleServerSocket::accept.
@@ -88,7 +86,7 @@ protected:
     AcceptCompletionHandler m_acceptHandler;
     AggregateAcceptor m_aggregateAcceptor;
 
-    void cancelIoFromAioThread();
+    virtual void cancelIoInAioThread() override;
 
 private:
     void stopWhileInAioThread();

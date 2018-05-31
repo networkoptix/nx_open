@@ -52,9 +52,7 @@ public:
         const QString& fileName, const QString& format,
         QnStorageResourcePtr storage,
         StreamRecorderRole role,
-        qint64 serverTimeZoneMs,
-        qint64 timelapseFrameStepMs, /* Default value is 0 (timelapse disabled) */
-        const nx::core::transcoding::FilterChain& filters);
+        qint64 serverTimeZoneMs);
 
     void setResource(QnMediaResourcePtr resource);
     QString exportedFileName() const;

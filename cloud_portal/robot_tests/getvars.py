@@ -10,8 +10,8 @@ def get_variables(lang="en_US"):
             translation_variables = translation_variables.read()
             for x in customization_json:
                 p = re.compile(x)
-                target_content = p.sub(customization_json[x], translation_variables)
+                translation_variables = p.sub(customization_json[x], translation_variables)
 
-            target_content =  json.loads(target_content, encoding='utf-8-sig')
-            target_content['LANGUAGE']=lang
-            return target_content
+            translation_variables =  json.loads(translation_variables, encoding='utf-8-sig')
+            translation_variables['LANGUAGE']=lang
+            return translation_variables

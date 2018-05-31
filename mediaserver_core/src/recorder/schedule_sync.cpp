@@ -124,7 +124,7 @@ QnScheduleSync::getOldestChunk(qint64 fromTimeMs) const
 
         ChunkKey tmp;
 
-        if (cameraBackupQualities.testFlag(Qn::CameraBackup_HighQuality))
+        if (cameraBackupQualities.testFlag(Qn::CameraBackupQuality::CameraBackup_HighQuality))
             tmp = getOldestChunk(camera->getUniqueId(), QnServer::HiQualityCatalog, fromTimeMs);
 
         if (tmp.chunk.durationMs != -1 && tmp.chunk.startTimeMs != -1)
@@ -141,7 +141,7 @@ QnScheduleSync::getOldestChunk(qint64 fromTimeMs) const
             }
         }
 
-        if (cameraBackupQualities.testFlag(Qn::CameraBackup_LowQuality))
+        if (cameraBackupQualities.testFlag(Qn::CameraBackupQuality::CameraBackup_LowQuality))
             tmp = getOldestChunk(camera->getUniqueId(), QnServer::LowQualityCatalog, fromTimeMs);
 
         if (tmp.chunk.durationMs != -1 && tmp.chunk.startTimeMs != -1)
@@ -361,21 +361,21 @@ void QnScheduleSync::initSyncData()
         Qn::CameraBackupQualities cameraBackupQualities =
             camera->getActualBackupQualities();
 
-        if (cameraBackupQualities.testFlag(Qn::CameraBackup_HighQuality))
+        if (cameraBackupQualities.testFlag(Qn::CameraBackupQuality::CameraBackup_HighQuality))
             addSyncDataKey(QnServer::HiQualityCatalog, camera->getUniqueId());
 
-        if (cameraBackupQualities.testFlag(Qn::CameraBackup_LowQuality))
+        if (cameraBackupQualities.testFlag(Qn::CameraBackupQuality::CameraBackup_LowQuality))
             addSyncDataKey(QnServer::LowQualityCatalog, camera->getUniqueId());
     }
 }
 
 template<typename NeedMoveOnCB>
-vms::event::EventReason QnScheduleSync::synchronize(NeedMoveOnCB needMoveOn)
+vms::api::EventReason QnScheduleSync::synchronize(NeedMoveOnCB needMoveOn)
 {
     // Let's check if at least one target backup storage is available first.
     if (!qnBackupStorageMan->getOptimalStorageRoot()) {
         NX_LOG("[Backup] No approprirate storages found. Bailing out.", cl_logDEBUG1);
-        return vms::event::EventReason::backupFailedNoBackupStorageError;
+        return vms::api::EventReason::backupFailedNoBackupStorageError;
     }
 
     NX_LOG("[Backup] Starting...", cl_logDEBUG2);
@@ -411,15 +411,15 @@ vms::event::EventReason QnScheduleSync::synchronize(NeedMoveOnCB needMoveOn)
                 switch (err) {
                 case CopyError::NoBackupStorageError:
                 case CopyError::GetCatalogError:
-                    return vms::event::EventReason::backupFailedNoBackupStorageError;
+                    return vms::api::EventReason::backupFailedNoBackupStorageError;
                 case CopyError::FromStorageError:
-                    return vms::event::EventReason::backupFailedSourceStorageError;
+                    return vms::api::EventReason::backupFailedSourceStorageError;
                 case CopyError::TargetFileError:
-                    return vms::event::EventReason::backupFailedTargetFileError;
+                    return vms::api::EventReason::backupFailedTargetFileError;
                 case CopyError::ChunkError:
-                    return vms::event::EventReason::backupFailedChunkError;
+                    return vms::api::EventReason::backupFailedChunkError;
                 case CopyError::Interrupted:
-                    return vms::event::EventReason::backupCancelled;
+                    return vms::api::EventReason::backupCancelled;
                 }
             }
         }
@@ -427,16 +427,16 @@ vms::event::EventReason QnScheduleSync::synchronize(NeedMoveOnCB needMoveOn)
         bool needStop = needMoveOnCode != SyncCode::Ok;
         if (needStop) {
             if (needMoveOnCode == SyncCode::OutOfTime) {
-                return vms::event::EventReason::backupEndOfPeriod;
+                return vms::api::EventReason::backupEndOfPeriod;
             } else if (needMoveOnCode == SyncCode::WrongBackupType ||
                        needMoveOnCode == SyncCode::Interrupted) {
-                return vms::event::EventReason::backupCancelled;
+                return vms::api::EventReason::backupCancelled;
             }
             break;
         }
     }
     m_interrupted = true; // we are done till the next backup period
-    return vms::event::EventReason::backupDone;
+    return vms::api::EventReason::backupDone;
 }
 
 void QnScheduleSync::stop()
@@ -639,9 +639,9 @@ void QnScheduleSync::run()
             m_forced = false;
             m_syncing = false;
 
-            bool backupFailed = result != vms::event::EventReason::backupDone &&
-                                result != vms::event::EventReason::backupCancelled &&
-                                result != vms::event::EventReason::backupEndOfPeriod;
+            bool backupFailed = result != vms::api::EventReason::backupDone &&
+                                result != vms::api::EventReason::backupCancelled &&
+                                result != vms::api::EventReason::backupEndOfPeriod;
 
             if (backupFailed && !m_failReported) {
                 emit backupFinished(syncEndTimePointLocal, result);

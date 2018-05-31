@@ -11,10 +11,10 @@
 
 namespace Ui { class UserSettingsWidget; }
 namespace nx { namespace client { namespace desktop { class InputField; }}}
+namespace nx { namespace client { namespace desktop { class Aligner; }}}
 
 class QnUserSettingsModel;
 class QnUserRolesModel;
-class QnAligner;
 
 class QnUserSettingsWidget : public Connective<QnAbstractPreferencesWidget>, public QnWorkbenchContextAware
 {
@@ -59,6 +59,6 @@ private:
     QnUserRolesModel* const m_rolesModel;
     QList<nx::client::desktop::InputField*> m_localInputFields;
     QList<nx::client::desktop::InputField*> m_cloudInputFields;
-    QnAligner* const m_aligner;
+    nx::client::desktop::Aligner* const m_aligner;
     int m_lastUserTypeIndex;
 };

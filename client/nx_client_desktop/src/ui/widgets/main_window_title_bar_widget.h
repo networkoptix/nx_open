@@ -6,8 +6,8 @@
 #include <ui/workbench/workbench_context_aware.h>
 
 class QnLayoutTabBar;
-class QnToolButton;
 class QnMainWindowTitleBarWidgetPrivate;
+namespace nx { namespace client { namespace desktop { class ToolButton; }}}
 
 class QnMainWindowTitleBarWidget: public QWidget, public QnWorkbenchContextAware
 {
@@ -37,12 +37,12 @@ protected:
     virtual void dropEvent(QDropEvent* event) override;
 
 private:
-    QnToolButton* newActionButton(
+    nx::client::desktop::ToolButton* newActionButton(
         nx::client::desktop::ui::action::IDType actionId,
         int helpTopicId = Qn::Empty_Help,
         const QSize& fixedSize = QSize());
 
-    QnToolButton* newActionButton(
+    nx::client::desktop::ToolButton* newActionButton(
         nx::client::desktop::ui::action::IDType actionId,
         const QSize& fixedSize = QSize());
 

@@ -19,7 +19,7 @@
 #include <nx/mediaserver/event/event_message_bus.h>
 #include "settings.h"
 #include "nx_ec/data/api_conversion_functions.h"
-#include "nx_ec/data/api_connection_data.h"
+#include <nx/vms/api/data/connection_data.h>
 #include <nx_ec/managers/abstract_server_manager.h>
 #include "api/app_server_connection.h"
 #include "network/router.h"

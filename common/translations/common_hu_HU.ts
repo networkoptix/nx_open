@@ -53,11 +53,6 @@
       <translation>A megtalált %1 rendszer, inkompatibilis %2 verzióval üzemel.</translation>
     </message>
     <message>
-      <source>Cannot connect to the other System because current System is already connected to %1.</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-      <translation>Nem lehet csatlakozni a másik rendszerhez, mivel az jelenleg ide csatlakozik: %1.</translation>
-    </message>
-    <message>
       <source>The discovered System %1 is in safe mode.</source>
       <comment>%1 is name of System</comment>
       <translation>A megtalált rendszer: %1 csökkentett módban üzemel.</translation>
@@ -66,16 +61,6 @@
       <source>Could not configure the remote System %1.</source>
       <comment>%1 is name of System</comment>
       <translation>A távoli rendszer %1 nem konfigurálható.</translation>
-    </message>
-    <message>
-      <source>Both Systems are connected to %1. Merge is not allowed.</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-      <translation>Mindkét rendszer %1 rendszerhez kapcsolódik. Összevonás nem engedélyezett.</translation>
-    </message>
-    <message>
-      <source>These Systems are built with different %1 URL. Merge is not allowed.</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-      <translation>Ezek a rendszerek különböző %1 URL- használnak. Összevonás nem engedélyezett.</translation>
     </message>
     <message>
       <source>New System</source>
@@ -87,9 +72,24 @@
       <translation>A felfedezett %1 rendszer nem kompatibilis az aktuális rendszerrel.</translation>
     </message>
     <message>
+      <source>Cannot connect to the other System because current System is already connected to %1.</source>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
+      <translation>Nem lehet csatlakozni a másik rendszerhez, mivel az jelenleg ide csatlakozik: %1.</translation>
+    </message>
+    <message>
       <source>%1 System can only be merged with non-%1. System name and password are taken from %1 System.</source>
-      <comment>%1 is the short cloud name (like &apos;Cloud&apos;)</comment>
+      <comment>%1 is the short cloud name (like Cloud)</comment>
       <translation type="unfinished">%1 System can only be merged with non-%1. System name and password are taken from %1 System.</translation>
+    </message>
+    <message>
+      <source>Both Systems are connected to %1. Merge is not allowed.</source>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
+      <translation>Mindkét rendszer %1 rendszerhez kapcsolódik. Összevonás nem engedélyezett.</translation>
+    </message>
+    <message>
+      <source>These Systems are built with different %1 URL. Merge is not allowed.</source>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
+      <translation>Ezek a rendszerek különböző %1 URL- használnak. Összevonás nem engedélyezett.</translation>
     </message>
   </context>
   <context>
@@ -581,8 +581,8 @@
       <translation>Ismeretlen hiba</translation>
     </message>
     <message>
-      <source>Server with matching Hardware Id not found</source>
-      <translation>Nem található szerver egyező Hardver Id-vel</translation>
+      <source>Server with matching Hardware ID not found</source>
+      <translation>Nem található szerver egyező Hardver ID-vel</translation>
     </message>
   </context>
   <context>
@@ -704,12 +704,12 @@
       <translation>Vízjel: %1</translation>
     </message>
     <message>
-      <source>Hardware Id: %1</source>
-      <translation>Hardver Id: %1</translation>
-    </message>
-    <message>
       <source>Time License</source>
       <translation>Idő licenc</translation>
+    </message>
+    <message>
+      <source>Hardware ID: %1</source>
+      <translation>Hardver ID: %1</translation>
     </message>
   </context>
   <context>

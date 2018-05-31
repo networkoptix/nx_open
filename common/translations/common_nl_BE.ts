@@ -53,11 +53,6 @@
       <translation>Het ontdekte systeem %1 heeft een incompatibele versie %2.</translation>
     </message>
     <message>
-      <source>Cannot connect to the other System because current System is already connected to %1.</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-      <translation>Kan niet verbinden met het andere systeem omdat het huidige systeem al is aangesloten op %1.</translation>
-    </message>
-    <message>
       <source>The discovered System %1 is in safe mode.</source>
       <comment>%1 is name of System</comment>
       <translation>Het ontdekte systeem %1 staat in de veilige modus.</translation>
@@ -66,16 +61,6 @@
       <source>Could not configure the remote System %1.</source>
       <comment>%1 is name of System</comment>
       <translation>Kon het externe systeem %1 niet configureren.</translation>
-    </message>
-    <message>
-      <source>Both Systems are connected to %1. Merge is not allowed.</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-      <translation>Beide systemen zijn verbonden met %1. Samenvoegen is niet toegestaan.</translation>
-    </message>
-    <message>
-      <source>These Systems are built with different %1 URL. Merge is not allowed.</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-      <translation>Deze systemen zijn gebouwd met een andere %1 URL. Samenvoegen is niet toegestaan.</translation>
     </message>
     <message>
       <source>New System</source>
@@ -87,9 +72,24 @@
       <translation>Het gevonden systeem %1 is niet samen te voegen met het huidige systeem.</translation>
     </message>
     <message>
+      <source>Cannot connect to the other System because current System is already connected to %1.</source>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
+      <translation>Kan niet verbinden met het andere systeem omdat het huidige systeem al is aangesloten op %1.</translation>
+    </message>
+    <message>
       <source>%1 System can only be merged with non-%1. System name and password are taken from %1 System.</source>
-      <comment>%1 is the short cloud name (like &apos;Cloud&apos;)</comment>
+      <comment>%1 is the short cloud name (like Cloud)</comment>
       <translation>%1 Systeem kan alleen worden samengevoegd met niet-%1. Systeemnaam en wachtwoord zijn overgenomen van %1 Systeem.</translation>
+    </message>
+    <message>
+      <source>Both Systems are connected to %1. Merge is not allowed.</source>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
+      <translation>Beide systemen zijn verbonden met %1. Samenvoegen is niet toegestaan.</translation>
+    </message>
+    <message>
+      <source>These Systems are built with different %1 URL. Merge is not allowed.</source>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
+      <translation>Deze systemen zijn gebouwd met een andere %1 URL. Samenvoegen is niet toegestaan.</translation>
     </message>
   </context>
   <context>
@@ -581,8 +581,8 @@
       <translation>Onbekende fout</translation>
     </message>
     <message>
-      <source>Server with matching Hardware Id not found</source>
-      <translation>Server met bijpassende Hardware-Id niet gevonden</translation>
+      <source>Server with matching Hardware ID not found</source>
+      <translation>Server met bijpassende Hardware-ID niet gevonden</translation>
     </message>
   </context>
   <context>
@@ -704,12 +704,12 @@
       <translation>Watermerk: %1</translation>
     </message>
     <message>
-      <source>Hardware Id: %1</source>
-      <translation>Hardware Id: %1</translation>
-    </message>
-    <message>
       <source>Time License</source>
       <translation>Tijdlicentie</translation>
+    </message>
+    <message>
+      <source>Hardware ID: %1</source>
+      <translation>Hardware ID: %1</translation>
     </message>
   </context>
   <context>

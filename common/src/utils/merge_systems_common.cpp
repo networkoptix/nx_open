@@ -66,7 +66,7 @@ public:
             case notLocalOwner:
                 return tr("Cannot connect to the other System "
                     "because current System is already connected to %1.",
-                    "%1 is the cloud name (like 'Nx Cloud')")
+                    "%1 is the cloud name (like Nx Cloud)")
                         .arg(nx::network::AppInfo::cloudName());
             case backupFailed:
                 return tr("Cannot create database backup.");
@@ -86,15 +86,15 @@ public:
             case dependentSystemBoundToCloud:
                 return tr("%1 System can only be merged with non-%1. "
                     "System name and password are taken from %1 System.",
-                    "%1 is the short cloud name (like 'Cloud')")
+                    "%1 is the short cloud name (like Cloud)")
                     .arg(nx::network::AppInfo::shortCloudName());
             case bothSystemBoundToCloud:
                 return tr("Both Systems are connected to %1. Merge is not allowed.",
-                    "%1 is the cloud name (like 'Nx Cloud')")
+                    "%1 is the cloud name (like Nx Cloud)")
                     .arg(nx::network::AppInfo::cloudName());
             case differentCloudHost:
                 return tr("These Systems are built with different %1 URL. Merge is not allowed.",
-                    "%1 is the cloud name (like 'Nx Cloud')")
+                    "%1 is the cloud name (like Nx Cloud)")
                     .arg(nx::network::AppInfo::cloudName());
             case unconfiguredSystem:
                 return tr("System name is not configured yet.");

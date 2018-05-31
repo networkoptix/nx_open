@@ -1,6 +1,7 @@
 #include "storage_analytics_widget.h"
 #include "ui_storage_analytics_widget.h"
 
+#include <set>
 #include <chrono>
 
 #include <QtCore/QMimeData>
@@ -19,7 +20,8 @@
 
 #include <nx/client/desktop/ui/actions/action_manager.h>
 #include <nx/client/desktop/ui/actions/actions.h>
-#include <ui/common/widget_anchor.h>
+#include <nx/client/desktop/common/utils/widget_anchor.h>
+#include <nx/client/desktop/resource_views/data/node_type.h>
 #include <ui/customization/customized.h>
 #include <ui/delegates/recording_stats_item_delegate.h>
 #include <ui/dialogs/common/custom_file_dialog.h>
@@ -38,8 +40,8 @@
 #include <utils/common/event_processors.h>
 #include <utils/common/scoped_value_rollback.h>
 #include <utils/common/synctime.h>
-#include <set>
 
+using namespace nx::client::desktop;
 using namespace nx::client::desktop::ui;
 
 namespace {
@@ -199,7 +201,7 @@ QnStorageAnalyticsWidget::QnStorageAnalyticsWidget(QWidget* parent):
     refreshButton->setIcon(qnSkin->icon(lit("text_buttons/refresh.png")));
     refreshButton->resize(refreshButton->sizeHint());
 
-    auto anchor = new QnWidgetAnchor(refreshButton);
+    auto anchor = new WidgetAnchor(refreshButton);
     anchor->setEdges(Qt::RightEdge | Qt::TopEdge);
 
     ui->tabWidget->tabBar()->setProperty(style::Properties::kTabShape,
@@ -238,14 +240,14 @@ QnStorageAnalyticsWidget::~QnStorageAnalyticsWidget()
 {
 }
 
-QnTableView* QnStorageAnalyticsWidget::currentTable() const
+TableView* QnStorageAnalyticsWidget::currentTable() const
 {
     return ui->tabWidget->currentWidget() == ui->statsTab
         ? ui->statsTable
         : ui->forecastTable;
 }
 
-void QnStorageAnalyticsWidget::setupTableView(QnTableView* table, QAbstractItemModel* model)
+void QnStorageAnalyticsWidget::setupTableView(TableView* table, QAbstractItemModel* model)
 {
     auto sortModel = new QnSortedRecordingStatsModel(this);
     sortModel->setSourceModel(model);
@@ -456,7 +458,7 @@ void QnStorageAnalyticsWidget::at_eventsGrid_customContextMenuRequested(const QP
         if (resource)
         {
             action::Parameters parameters(resource);
-            parameters.setArgument(Qn::NodeTypeRole, Qn::ResourceNode);
+            parameters.setArgument(Qn::NodeTypeRole, ResourceTreeNodeType::resource);
 
             menu.reset(manager->newMenu(action::TreeScope, nullptr, parameters));
             foreach(QAction* action, menu->actions())

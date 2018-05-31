@@ -69,7 +69,7 @@ void P2pMessageBusTestBase::createData(
         messageProcessor->updateResource(mediaServer, ec2::NotificationSource::Local);
 
     //read camera list
-    ec2::ApiCameraDataList cameraList;
+    nx::vms::api::CameraDataList cameraList;
     ASSERT_EQ(
         ec2::ErrorCode::ok,
         connection->getCameraManager(Qn::kSystemAccess)->getCamerasSync(&cameraList));
@@ -103,30 +103,36 @@ void P2pMessageBusTestBase::createData(
         users.push_back(userData);
     }
 
-    std::vector<ec2::ApiCameraData> cameras;
-    std::vector<ec2::ApiCameraAttributesData> userAttrs;
-    ec2::ApiResourceParamWithRefDataList cameraParams;
+    std::vector<nx::vms::api::CameraData> cameras;
+    std::vector<nx::vms::api::CameraAttributesData> userAttrs;
+    nx::vms::api::ResourceParamWithRefDataList cameraParams;
     cameras.reserve(camerasCount);
     const auto& moduleGuid = server->moduleInstance()->commonModule()->moduleGUID();
     auto resTypePtr = qnResTypePool->getResourceTypeByName("Camera");
     ASSERT_TRUE(!resTypePtr.isNull());
     for (int i = 0; i < camerasCount; ++i)
     {
-        ec2::ApiCameraData cameraData;
+        nx::vms::api::CameraData cameraData;
         cameraData.typeId = resTypePtr->getId();
         cameraData.parentId = moduleGuid;
         cameraData.vendor = "Invalid camera";
         cameraData.physicalId = QnUuid::createUuid().toString();
         cameraData.name = server->moduleInstance()->endpoint().toString();
-        cameraData.id = ec2::ApiCameraData::physicalIdToId(cameraData.physicalId);
+        cameraData.id = nx::vms::api::CameraData::physicalIdToId(cameraData.physicalId);
         cameras.push_back(std::move(cameraData));
 
-        ec2::ApiCameraAttributesData userAttr;
+        nx::vms::api::CameraAttributesData userAttr;
         userAttr.cameraId = cameraData.id;
         userAttrs.push_back(userAttr);
 
         for (int j = 0; j < propertiesPerCamera; ++j)
-            cameraParams.push_back(ec2::ApiResourceParamWithRefData(cameraData.id, lit("property%1").arg(j), lit("value%1").arg(j)));
+        {
+            cameraParams.push_back(
+                nx::vms::api::ResourceParamWithRefData(
+                    cameraData.id,
+                    lit("property%1").arg(j),
+                    lit("value%1").arg(j)));
+        }
     }
     auto userManager = connection->getUserManager(Qn::kSystemAccess);
     auto cameraManager = connection->getCameraManager(Qn::kSystemAccess);
@@ -204,6 +210,15 @@ void P2pMessageBusTestBase::connectServers(const Appserver2Ptr& srcServer, const
     nx::utils::Url url = lit("http://%1:%2/ec2/messageBus").arg(addr.address.toString()).arg(addr.port);
     srcServer->moduleInstance()->ecConnection()->messageBus()->
         addOutgoingConnectionToPeer(peerId, url);
+}
+
+void P2pMessageBusTestBase::disconnectServers(const Appserver2Ptr& srcServer, const Appserver2Ptr& dstServer)
+{
+    const auto addr = dstServer->moduleInstance()->endpoint();
+    auto peerId = dstServer->moduleInstance()->commonModule()->moduleGUID();
+
+    srcServer->moduleInstance()->ecConnection()->messageBus()->
+        removeOutgoingConnectionFromPeer(peerId);
 }
 
 // connect servers: 0 --> 1 -->2 --> N

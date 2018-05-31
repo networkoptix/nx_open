@@ -100,7 +100,10 @@ public:
     * @param targetThread execute callback in a target thread if specified. It convenient for UI purpose.
     * By default callback is called in IO thread.
     */
-    Handle cameraHistoryAsync(const QnChunksRequestData &request, Result<ec2::ApiCameraHistoryDataList>::type callback, QThread* targetThread = 0);
+    Handle cameraHistoryAsync(
+        const QnChunksRequestData& request,
+        Result<nx::vms::api::CameraHistoryDataList>::type callback,
+        QThread* targetThread = 0);
 
     Handle getServerLocalTime(Result<QnJsonRestResult>::type callback, QThread* targetThread = nullptr);
 
@@ -125,7 +128,7 @@ public:
         QThread* targetThread = nullptr);
 
     Handle softwareTriggerCommand(const QnUuid& cameraId, const QString& triggerId,
-            nx::vms::event::EventState toggleState, GetCallback callback, QThread* targetThread = nullptr);
+            nx::vms::api::EventState toggleState, GetCallback callback, QThread* targetThread = nullptr);
 
     Handle getStatisticsSettingsAsync(Result<QByteArray>::type callback
         , QThread *targetThread = nullptr);
@@ -246,7 +249,7 @@ public:
         Result<MultiServerTimeData>::type callback,
         QThread *targetThread = nullptr);
 
-    Handle testEventRule(const QnUuid& ruleId, nx::vms::event::EventState toggleState,
+    Handle testEventRule(const QnUuid& ruleId, nx::vms::api::EventState toggleState,
         GetCallback callback, QThread* targetThread = nullptr);
 
     Handle getEvents(QnEventLogRequestData request,

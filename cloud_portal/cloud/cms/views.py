@@ -28,18 +28,18 @@ mysite = MyAdminSite()
 
 def get_context_and_language(request, context_id, language_code, customization):
     context = Context.objects.get(id=context_id) if context_id else None
-    language = Language.objects.get(code=language_code) if language_code else None
+    language = Language.by_code(language_code)
 
     if request.method == "POST":
         if not context and 'context' in request.POST and request.POST['context']:
             context = Context.objects.get(id=request.POST['context'])
 
         if not language and 'language' in request.POST and request.POST['language']:
-            language = Language.objects.get(code=request.POST['language'])
+            language = Language.by_code(request.POST['language'])
 
     if not language:
         if 'language' in request.session:
-            language = Language.objects.get(code=request.session['language'])
+            language = Language.by_code(request.session['language'])
         else:
             language = customization.default_language
 
@@ -102,8 +102,7 @@ def context_editor_action(request, context_id, language_code):
         raise PermissionDenied
 
     if 'languageChanged' in request_data and 'currentLanguage' in request_data and request_data['currentLanguage']:
-        last_language = Language.objects.get(
-            code=request_data['currentLanguage'])
+        last_language = Language.by_code(request_data['currentLanguage'])
 
         upload_errors = save_unrevisioned_records(context, customization, last_language,
                                                   context.datastructure_set.all(), request_data,
@@ -173,7 +172,7 @@ def version_action(request, version_id=None):
         defaults.bad_request("Version does not exist")
 
     if "Preview" in request.POST:
-        generate_preview(send_to_review=True)
+        generate_preview(version_id=version_id, send_to_review=True)
         preview_flag = "?preview"
 
     elif "Publish" in request.POST:
@@ -258,8 +257,10 @@ def product_settings(request, product_id):
             if not file.name.endswith('zip'):
                 return HttpResponseBadRequest('zip archive is expected')
             if generate_json:
-                data = generate_structure.from_zip(file, product)
+                data, log_messages = generate_structure.from_zip(file, product)
                 content = json.dumps(data, ensure_ascii=False, indent=4, separators=(',', ': '))
+                for error in log_messages:
+                    messages.error(request, "Error with {} problem with {}".format(error['file'], error['extension']))
                 return response_attachment(content, 'structure.json', 'application/json')
             log_messages = structure.process_zip(file, request.user, update_structure, update_content)
             for item in log_messages:

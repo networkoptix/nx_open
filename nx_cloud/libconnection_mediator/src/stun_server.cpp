@@ -66,6 +66,11 @@ network::stun::MessageDispatcher& StunServer::dispatcher()
     return m_stunMessageDispatcher;
 }
 
+const StunServer::MultiAddressStunServer& StunServer::server() const
+{
+    return *m_tcpStunServer;
+}
+
 void StunServer::initializeHttpTunnelling(http::Server* httpServer)
 {
     m_stunOverHttpServer.setupHttpTunneling(
@@ -81,18 +86,19 @@ bool StunServer::bind()
         return false;
     }
 
-    m_tcpStunServer->forEachListener(
-        [this](network::stun::SocketServer* server)
-        {
-            server->setConnectionInactivityTimeout(m_settings.stun().connectionInactivityTimeout);
-        });
-
     if (!m_tcpStunServer->bind(m_settings.stun().addrToListenList))
     {
         NX_LOGX(lit("Can not bind to TCP addresses: %1")
             .arg(containerString(m_settings.stun().addrToListenList)), cl_logERROR);
         return false;
     }
+
+    m_tcpStunServer->forEachListener(
+        [this](network::stun::SocketServer* server)
+        {
+            server->setConnectionInactivityTimeout(
+                m_settings.stun().connectionInactivityTimeout);
+        });
 
     m_endpoints = m_tcpStunServer->endpoints();
 

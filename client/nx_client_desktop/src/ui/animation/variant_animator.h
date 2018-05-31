@@ -7,16 +7,15 @@
 #include <QtCore/QEasingCurve>
 #include <QtCore/QMetaType>
 
-#include <ui/common/accessor.h>
+#include <nx/client/desktop/common/utils/accessor.h>
 #include <ui/common/converter.h>
 
 #include "abstract_animator.h"
 
 class MagnitudeCalculator;
 class LinearCombinator;
-
-class AbstractAccessor;
 class AbstractConverter;
+namespace nx { namespace client { namespace desktop { class AbstractAccessor; }}}
 
 /**
  * Animator that animates QObject's parameters. Parameters do not need to
@@ -30,7 +29,7 @@ class VariantAnimator: public AbstractAnimator {
 public:
     /**
      * Constructor.
-     * 
+     *
      * \param parent                    Parent object.
      */
     VariantAnimator(QObject *parent = NULL);
@@ -48,8 +47,8 @@ public:
     }
 
     /**
-     * Note that animation's speed is measured in units of type used for 
-     * intermediate computations, which may differ from the type of the parameter 
+     * Note that animation's speed is measured in units of type used for
+     * intermediate computations, which may differ from the type of the parameter
      * being animated if converter is set.
      *
      * \param speed                     New speed of this animator, in the units of a type used for intermediate computations.
@@ -59,14 +58,12 @@ public:
     /**
      * \returns                         Accessor used by this animator, of NULL if none.
      */
-    AbstractAccessor *accessor() const {
-        return m_accessor.data();
-    }
+    nx::client::desktop::AbstractAccessor *accessor() const { return m_accessor.data(); }
 
     /**
      * \param accessor                  Accessor to use. Animator will take ownership of the given accessor.
      */
-    void setAccessor(AbstractAccessor *accessor);
+    void setAccessor(nx::client::desktop::AbstractAccessor *accessor);
 
     /**
      * \returns                         Converter used by this animator, or NULL if none.
@@ -77,15 +74,15 @@ public:
 
     /**
      * Sets the converter for this animator.
-     * 
+     *
      * All internal computations will be performed in converter's target type.
-     * Values of converter's source type will be fed to the setter and accepted 
+     * Values of converter's source type will be fed to the setter and accepted
      * from the outside world.
      *
      * This may be useful when animating integer or bounded types.
      * The drawback is that speed must be specified in terms of type used for
      * internal computations (converter's target type).
-     * 
+     *
      * \param converter                 Converter to use.
      */
     void setConverter(AbstractConverter *converter);
@@ -132,7 +129,7 @@ public:
     /**
      * Convenience function that sets animator's target value and starts it if
      * it is not running.
-     * 
+     *
      * \param value                     Target value.
      */
     void animateTo(const QVariant &value) {
@@ -199,7 +196,7 @@ private:
     qreal easingCurveValue(qreal progress) const;
 
 private:
-    QScopedPointer<AbstractAccessor> m_accessor;
+    QScopedPointer<nx::client::desktop::AbstractAccessor> m_accessor;
     QScopedPointer<AbstractConverter> m_converter;
     QEasingCurve m_easingCurve;
     qreal m_easingCurveCorrection;

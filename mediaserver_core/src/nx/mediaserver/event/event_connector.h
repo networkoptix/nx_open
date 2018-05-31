@@ -48,14 +48,14 @@ public slots:
     /*! Some problem with storage
     */
     void at_storageFailure(const QnResourcePtr& server, qint64 timeStamp,
-        vms::event::EventReason reasonCode, const QnResourcePtr& storage);
+        vms::api::EventReason reasonCode, const QnResourcePtr& storage);
     void at_storageFailure(const QnResourcePtr& server, qint64 timeStamp,
-        vms::event::EventReason reasonCode, const QString &storageUrl);
+        vms::api::EventReason reasonCode, const QString &storageUrl);
 
     /*! Some problem with network
     */
     void at_networkIssue(const QnResourcePtr& resource, qint64 timeStamp,
-        vms::event::EventReason reasonCode, const QString& reasonParamsEncoded);
+        vms::api::EventReason reasonCode, const QString& reasonParamsEncoded);
 
     /*!
         \param inputPortID device-specific ID of input port
@@ -80,18 +80,18 @@ public slots:
 
     void at_customEvent(const QString& resourceName, const QString& caption,
         const QString& description, const vms::event::EventMetaData& metadata,
-        vms::event::EventState eventState, qint64 timeStamp);
+        vms::api::EventState eventState, qint64 timeStamp);
 
     /*!
         \param timeStamp microseconds from 1970-01-01 (UTC)
     */
     void at_serverFailure(const QnResourcePtr& resource, qint64 timeStamp,
-        vms::event::EventReason reasonCode, const QString& reasonText);
+        vms::api::EventReason reasonCode, const QString& reasonText);
 
     void at_serverStarted(const QnResourcePtr& resource, qint64 timeStamp);
 
     void at_licenseIssueEvent(const QnResourcePtr& resource, qint64 timeStamp,
-        vms::event::EventReason reasonCode, const QString& reasonText);
+        vms::api::EventReason reasonCode, const QString& reasonText);
 
     void at_cameraIPConflict(const QnResourcePtr& resource, const QHostAddress& hostAddress,
         const QStringList& macAddrList, qint64 timeStamp);
@@ -108,7 +108,7 @@ public slots:
         QnSystemHealth::MessageType msgType);
 
     void at_archiveBackupFinished(const QnResourcePtr& resource, qint64 timeStamp,
-        vms::event::EventReason reasonCode, const QString& reasonText);
+        vms::api::EventReason reasonCode, const QString& reasonText);
 
     void at_remoteArchiveSyncStarted(const QnResourcePtr& resource);
 
@@ -119,14 +119,14 @@ public slots:
     void at_remoteArchiveSyncProgress(const QnResourcePtr &resource, double progress);
 
     void at_softwareTrigger(const QnResourcePtr& resource, const QString& triggerId,
-        const QnUuid& userId, qint64 timeStamp, vms::event::EventState toggleState);
+        const QnUuid& userId, qint64 timeStamp, vms::api::EventState toggleState);
 
     void at_analyticsSdkEvent(const nx::vms::event::AnalyticsSdkEventPtr& event);
 
     void at_fileIntegrityCheckFailed(const QnResourcePtr& resource);
 
     bool createEventFromParams(const nx::vms::event::EventParameters& params,
-        vms::event::EventState eventState, const QnUuid& userId = QnUuid(),
+        vms::api::EventState eventState, const QnUuid& userId = QnUuid(),
         QString* errorMessage = nullptr);
 
 private slots:

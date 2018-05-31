@@ -14,11 +14,11 @@ namespace client {
 namespace desktop {
 
 class LayoutThumbnailLoader:
-    public QnImageProvider,
+    public ImageProvider,
     public QnConnectionContextAware
 {
     Q_OBJECT
-    using base_type = QnImageProvider;
+    using base_type = ImageProvider;
 
 public:
     explicit LayoutThumbnailLoader(

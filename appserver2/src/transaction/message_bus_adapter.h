@@ -8,13 +8,6 @@
 
 namespace ec2 {
 
-    enum class MessageBusType
-    {
-        None,
-        LegacyMode,
-        P2pMode
-    };
-
     class TransactionMessageBusAdapter:
         public AbstractTransactionMessageBus
     {
@@ -22,14 +15,26 @@ namespace ec2 {
 
     public:
         TransactionMessageBusAdapter(
-            detail::QnDbManager* db,
-            Qn::PeerType peerType,
             QnCommonModule* commonModule,
             QnJsonTransactionSerializer* jsonTranSerializer,
             QnUbjsonTransactionSerializer* ubjsonTranSerializer
         );
 
-        void init(MessageBusType value);
+        template <typename MessageBusType>
+		MessageBusType* init(Qn::PeerType peerType)
+		{
+			reset();
+			m_bus.reset(new MessageBusType(
+				peerType,
+				commonModule(),
+				m_jsonTranSerializer,
+				m_ubjsonTranSerializer));
+
+			initInternal(peerType);
+			return dynamic_cast<MessageBusType*> (m_bus.get());
+		}
+
+        void reset();
 
         template <typename T> T dynamicCast() { return dynamic_cast<T> (m_bus.get()); }
 
@@ -58,7 +63,7 @@ namespace ec2 {
         virtual QnUbjsonTransactionSerializer* ubjsonTranSerializer() const override;
 
         virtual ConnectionGuardSharedState* connectionGuardSharedState() override;
-        virtual detail::QnDbManager* getDb() const override;
+        //detail::QnDbManager* getDb() const;
 
         virtual void setTimeSyncManager(TimeSynchronizationManager* timeSyncManager) override;
 
@@ -96,12 +101,11 @@ namespace ec2 {
             else
                 NX_CRITICAL(false, "Not implemented");
         }
-
+	private:
+		void initInternal(Qn::PeerType peerType);
     private:
         std::unique_ptr<TransactionMessageBusBase> m_bus;
 
-        detail::QnDbManager* m_db;
-        Qn::PeerType m_peerType;
         QnJsonTransactionSerializer* m_jsonTranSerializer;
         QnUbjsonTransactionSerializer* m_ubjsonTranSerializer;
         TimeSynchronizationManager* m_timeSyncManager;

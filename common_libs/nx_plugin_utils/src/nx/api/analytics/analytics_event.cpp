@@ -19,5 +19,11 @@ QN_FUSION_ADAPT_STRUCT_FUNCTIONS(
     AnalyticsEventType_Fields,
     (brief, true))
 
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS(
+    Analytics::Group,
+    (json),
+    AnalyticsEventGroup_Fields,
+    (brief, true))
+
 } // namespace api
 } // namespace nx

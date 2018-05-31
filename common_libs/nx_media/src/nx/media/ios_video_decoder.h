@@ -20,7 +20,7 @@ class IOSVideoDecoderPrivate;
 class IOSVideoDecoder: public AbstractVideoDecoder
 {
 public:
-    IOSVideoDecoder(const ResourceAllocatorPtr& allocator, const QSize& resolution);
+    IOSVideoDecoder(const RenderContextSynchronizerPtr& synchronizer, const QSize& resolution);
     virtual ~IOSVideoDecoder();
 
     static bool isCompatible(

@@ -110,7 +110,6 @@ boost::optional<HikvisionEvent> AttributesParser::parseEventXml(
         }
     }
 
-    result.caption = buildCaption(manifest, result);
     result.description = buildDescription(manifest, result);
 
     if (reader.error() != QXmlStreamReader::NoError)
@@ -144,12 +143,6 @@ std::vector<HikvisionEvent> AttributesParser::parseLprXml(
 
             addEvent(hikvisionEvent);
             const auto descriptor = manifest.eventDescriptorById(hikvisionEvent.typeId);
-            for (const auto& dependedName: descriptor.forcedEvent.split(','))
-            {
-                const auto childDescriptor = manifest.eventDescriptorByInternalName(dependedName);
-                hikvisionEvent.typeId = childDescriptor.typeId;
-                addEvent(hikvisionEvent);
-            }
         }
     }
     return result;

@@ -30,7 +30,7 @@
      </property>
      <layout class="QVBoxLayout" name="verticalLayout" stretch="1,0,0">
       <item>
-       <widget class="QnTreeView" name="storageView">
+       <widget class="nx::client::desktop::TreeView" name="storageView">
         <property name="sizePolicy">
          <sizepolicy hsizetype="Expanding" vsizetype="Maximum">
           <horstretch>0</horstretch>
@@ -80,7 +80,7 @@
        </widget>
       </item>
       <item>
-       <layout class="QHBoxLayout" name="horizontalLayout" stretch="0,0,0,0,0,0">
+       <layout class="QHBoxLayout" name="horizontalLayout" stretch="0,0,0,0,0,0,0">
         <item>
          <widget class="QPushButton" name="addExtStorageToMainBtn">
           <property name="text">
@@ -109,6 +109,19 @@
          <widget class="QPushButton" name="rebuildBackupButton">
           <property name="text">
            <string>Reindex Backup</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="nx::client::desktop::HintButton" name="rebuildBackupButtonHint" native="true">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="autoFillBackground">
+           <bool>false</bool>
           </property>
          </widget>
         </item>
@@ -517,15 +530,20 @@
  </widget>
  <customwidgets>
   <customwidget>
+   <class>nx::client::desktop::HintButton</class>
+   <extends>QWidget</extends>
+   <header location="global">nx/client/desktop/common/widgets/hint_button.h</header>
+  </customwidget>
+  <customwidget>
    <class>QnStorageRebuildWidget</class>
    <extends>QWidget</extends>
    <header location="global">ui/widgets/properties/storage_rebuild_widget.h</header>
    <container>1</container>
   </customwidget>
   <customwidget>
-   <class>QnTreeView</class>
+   <class>nx::client::desktop::TreeView</class>
    <extends>QTreeView</extends>
-   <header location="global">ui/widgets/common/tree_view.h</header>
+   <header location="global">nx/client/desktop/common/widgets/tree_view.h</header>
   </customwidget>
  </customwidgets>
  <resources/>

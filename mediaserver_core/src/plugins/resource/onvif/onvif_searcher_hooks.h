@@ -16,6 +16,8 @@ void manufacturerReplacementByModel(EndpointAdditionalInfo* outInfo);
 
 void pelcoModelNormalization(EndpointAdditionalInfo* outInfo);
 
+void additionalManufacturerNormalization(EndpointAdditionalInfo* outInfo);
+
 } // namespace searcher_hooks
 } // namespace onvif
 } // namespace plugins

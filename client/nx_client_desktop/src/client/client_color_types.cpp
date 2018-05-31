@@ -84,16 +84,9 @@ QnScheduleGridColors::QnScheduleGridColors() :
     weekendLabel(255, 0, 0),
     gridLabel(0, 0, 0),
     allLabel(127, 127, 127),
-    recordNever(64, 64, 64),
-    recordAlways(0, 100, 0),
-    recordMotion(100, 0, 0),
-    recordNeverHovered(96, 96, 96),
-    recordAlwaysHovered(0, 160, 0),
-    recordMotionHovered(160, 0, 0),
     hoveredBackground(0, 0, 0, 0),
     pressedBackground(0, 0, 0, 0),
-    gridLine(255, 255, 255),
-    border(0, 0, 0)
+    gridLine(255, 255, 255)
 {
 }
 

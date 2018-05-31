@@ -3,8 +3,8 @@
 namespace nx {
 namespace utils {
 
-/*
- * Function unused allows to avoid compiler warnings about unused variables.
+/**
+ * Allows to avoid compiler warnings about unused variables.
  */
 template<typename ...Ts>
 void unused(Ts&&...)

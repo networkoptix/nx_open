@@ -266,6 +266,7 @@ void LegacyCameraSettingsDialog::buttonBoxClicked(QDialogButtonBox::StandardButt
         case QDialogButtonBox::Ok:
         case QDialogButtonBox::Apply:
             submitToResources();
+            at_settingsWidget_hasChangesChanged();
             break;
         case QDialogButtonBox::Cancel:
             m_settingsWidget->reject();

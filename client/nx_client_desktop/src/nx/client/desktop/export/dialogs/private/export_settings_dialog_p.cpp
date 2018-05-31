@@ -236,7 +236,7 @@ void ExportSettingsDialog::Private::refreshMediaPreview()
             new ProxyImageProvider(m_mediaRawImageProvider.get()));
         provider->setImageProcessor(m_mediaPreviewProcessor.data());
         m_mediaPreviewProvider = std::move(provider);
-        connect(m_mediaPreviewProvider.get(), &QnImageProvider::sizeHintChanged, this, &Private::setFrameSize);
+        connect(m_mediaPreviewProvider.get(), &ImageProvider::sizeHintChanged, this, &Private::setFrameSize);
     }
 
     m_mediaPreviewProcessor->setTranscodingSettings(settings, m_exportMediaSettings.mediaResource);

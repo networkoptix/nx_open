@@ -4,5 +4,5 @@ Sistem: {{systemName}} {{systemSignature}}
 
 {{>body}}
 
-{{companyUrl}}
-Destek: {{supportLink}}
+%COMPANY_LINK%
+Destek: %SUPPORT_LINK%

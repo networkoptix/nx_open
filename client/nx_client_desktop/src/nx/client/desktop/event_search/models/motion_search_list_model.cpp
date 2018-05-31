@@ -58,7 +58,7 @@ QVariant MotionSearchListModel::data(const QModelIndex& index, int role) const
             return qnSkin->pixmap(lit("tree/camera.png"));
 
         case Qn::HelpTopicIdRole:
-            return QnBusiness::eventHelpId(vms::event::cameraMotionEvent);
+            return QnBusiness::eventHelpId(vms::api::EventType::cameraMotionEvent);
 
         case Qn::TimestampRole:
         case Qn::PreviewTimeRole:

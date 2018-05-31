@@ -172,6 +172,8 @@ QnStorageSpaceDataList QnStorageSpaceRestHandler::getOptionalStorages(QnCommonMo
                 if (storage->getId().isNull())
                     storage->setId(QnUuid::createUuid());
                 storage->setStatus(Qn::Online);
+                if (auto fileStorage = storage.dynamicCast<QnFileStorageResource>())
+                    storage->setSpaceLimit(fileStorage->calcInitialSpaceLimit());
             }
 
             QnStorageResourceList additionalStorages;

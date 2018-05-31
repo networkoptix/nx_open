@@ -1,5 +1,7 @@
 #pragma once
 
+#include <boost/optional.hpp>
+
 #include <core/ptz/ptz_limits.h>
 
 #include <plugins/resource/hanwha/hanwha_advanced_parameter_info.h>
@@ -23,6 +25,14 @@ extern "C" {
 namespace nx {
 namespace mediaserver_core {
 namespace plugins {
+
+enum class HanwhaProfileParameterFlag
+{
+    newProfile = 1,
+    audioSupported = 1 << 1
+};
+
+Q_DECLARE_FLAGS(HanwhaProfileParameterFlags, HanwhaProfileParameterFlag);
 
 class HanwhaResource: public QnPlOnvifResource
 {
@@ -57,7 +67,7 @@ public:
 
     virtual bool captureEvent(const nx::vms::event::AbstractEventPtr& event) override;
 
-    virtual bool doesEventComeFromAnalyticsDriver(nx::vms::event::EventType eventType) const override;
+    virtual bool doesEventComeFromAnalyticsDriver(nx::vms::api::EventType eventType) const override;
 
     virtual QnTimePeriodList getDtsTimePeriods(qint64 startTimeMs, qint64 endTimeMs, int detailLevel) override;
 
@@ -88,8 +98,8 @@ public:
     int profileByRole(Qn::ConnectionRole role) const;
 
     CameraDiagnostics::Result findProfiles(
-        int* outPrimaryProfileNumber,
-        int* outSecondaryProfileNumber,
+        boost::optional<HanwhaVideoProfile>* outPrimaryProfileNumber,
+        boost::optional<HanwhaVideoProfile>* outSecondaryProfileNumber,
         int* totalProfileNumber,
         std::set<int>* profilesToRemoveIfProfilesExhausted);
 
@@ -97,16 +107,33 @@ public:
 
     CameraDiagnostics::Result createProfile(int* outProfileNumber, Qn::ConnectionRole role);
 
+    // Returns profile number for role if profile was found and has been considered as correct,
+    // otherwise returns boost::none.
+    boost::optional<int> verifyProfile(Qn::ConnectionRole role);
+
+    CameraDiagnostics::Result updateProfileNameIfNeeded(
+        Qn::ConnectionRole role,
+        const HanwhaVideoProfile& profile);
+
     void updateToChannel(int value);
 
     bool isNvr() const;
-    QString nxProfileName(Qn::ConnectionRole role) const;
+    HanwhaDeviceType deviceType() const;
+
+    QString nxProfileName(
+        Qn::ConnectionRole role,
+        boost::optional<int> forcedProfileNameLength = boost::none) const;
 
     std::shared_ptr<HanwhaSharedResourceContext> sharedContext() const;
 
     virtual bool setCameraCredentialsSync(const QAuthenticator& auth, QString* outErrorString = nullptr) override;
 
     bool isConnectedViaSunapi() const;
+
+    HanwhaProfileParameters makeProfileParameters(
+        Qn::ConnectionRole role,
+        const QnLiveStreamParams& parameters,
+        HanwhaProfileParameterFlags flags) const;
 
 protected:
     virtual nx::mediaserver::resource::StreamCapabilityMap getStreamCapabilityMapFromDrives(
@@ -121,7 +148,10 @@ protected:
 private:
     CameraDiagnostics::Result initDevice();
     CameraDiagnostics::Result initSystem();
+
     CameraDiagnostics::Result initMedia();
+    CameraDiagnostics::Result setProfileSessionPolicy();
+
     CameraDiagnostics::Result initIo();
     CameraDiagnostics::Result initPtz();
     CameraDiagnostics::Result initAlternativePtz();
@@ -129,6 +159,7 @@ private:
     CameraDiagnostics::Result initTwoWayAudio();
     CameraDiagnostics::Result initRemoteArchive();
 
+    CameraDiagnostics::Result handleProxiedDeviceInfo(const HanwhaResponse& deviceInfoResponse);
     CameraDiagnostics::Result createNxProfiles();
     CameraDiagnostics::Result fetchExistingProfiles();
     CameraDiagnostics::Result createNxProfile(
@@ -146,6 +177,10 @@ private:
         int secondaryProfile);
 
     CameraDiagnostics::Result fetchPtzLimits(QnPtzLimits* outPtzLimits);
+
+    CameraDiagnostics::Result fetchCodecInfo(HanwhaCodecInfo* outCodecInfo);
+
+    void cleanUpOnProxiedDeviceChange();
 
     AVCodecID defaultCodecForStream(Qn::ConnectionRole role) const;
     QSize defaultResolutionForStream(Qn::ConnectionRole role) const;
@@ -224,6 +259,9 @@ private:
     QnCameraAdvancedParamValueList filterGroupParameters(
         const QnCameraAdvancedParamValueList& values);
 
+    QnCameraAdvancedParamValueList addAssociatedParameters(
+        const QnCameraAdvancedParamValueList& values);
+
     QString groupLead(const QString& groupName) const;
 
     boost::optional<QnCameraAdvancedParamValue> findButtonParameter(
@@ -259,7 +297,14 @@ private:
 
     const HanwhaAttributes& attributes() const;
     const HanwhaCgiParameters& cgiParameters() const;
-    int bypassChannel() const;
+    boost::optional<int> bypassChannel() const;
+
+    // Proxied id is an id of a device connected to some proxy (e.g. NVR)
+    virtual QString proxiedId() const;
+    virtual void setProxiedId(const QString& proxiedId);
+
+    bool isBypassSupported() const;
+    bool isProxiedMultisensorCamera() const;
 
 private:
     using AdvancedParameterId = QString;
@@ -276,13 +321,16 @@ private:
 
     std::map<AdvancedParameterId, HanwhaAdavancedParameterInfo> m_advancedParameterInfos;
 
+    bool m_isBypassSupported = false;
+    int m_proxiedDeviceChannelCount = 1;
+
     HanwhaAttributes m_attributes;
     HanwhaAttributes m_bypassDeviceAttributes;
 
     HanwhaCgiParameters m_cgiParameters;
     HanwhaCgiParameters m_bypassDeviceCgiParameters;
 
-    bool m_isNvr = false;
+    HanwhaDeviceType m_deviceType = HanwhaDeviceType::unknown;
     bool m_isChannelConnectedViaSunapi = false;
 
     nx::media::CameraMediaCapability m_capabilities;

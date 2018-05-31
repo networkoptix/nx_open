@@ -23,6 +23,8 @@
 #include <media_server/settings.h>
 
 #include "mediaserver_ini.h"
+#include <media_server/media_server_module.h>
+#include <core/dataprovider/data_provider_factory.h>
 
 using nx::api::ImageRequest;
 
@@ -100,8 +102,6 @@ QnVideoCameraGopKeeper::QnVideoCameraGopKeeper(QnVideoCamera* camera, const QnRe
     m_catalog(catalog),
     m_nextMinTryTime(0)
 {
-    QnConstResourceVideoLayoutPtr layout = (qSharedPointerDynamicCast<QnMediaResource>(resource))->getVideoLayout();
-    m_allChannelsMask = (1 << layout->channelCount()) - 1;
 }
 
 QnVideoCameraGopKeeper::~QnVideoCameraGopKeeper()
@@ -131,6 +131,12 @@ static QnAbstractAllocator* getAllocator(size_t frameSize)
 
 void QnVideoCameraGopKeeper::putData(const QnAbstractDataPacketPtr& nonConstData)
 {
+    if (m_allChannelsMask == 0)
+    {
+        auto layout = qSharedPointerDynamicCast<QnMediaResource>(m_resource)->getVideoLayout();
+        m_allChannelsMask = (1 << layout->channelCount()) - 1;
+    }
+
     QnMutexLocker lock(&m_queueMtx);
     if (QnConstCompressedVideoDataPtr video =
         std::dynamic_pointer_cast<const QnCompressedVideoData>(nonConstData))
@@ -546,7 +552,7 @@ void QnVideoCamera::createReader(QnServer::ChunksCatalog catalog)
     {
         QnAbstractStreamDataProvider* dataProvider = NULL;
         if ( primaryLiveStream || (cameraResource && cameraResource->hasDualStreaming()) )
-            dataProvider = m_resource->createDataProvider(role);
+            dataProvider = qnServerModule->dataProviderFactory()->createDataProvider(m_resource, role);
 
         if ( dataProvider )
         {
@@ -557,6 +563,7 @@ void QnVideoCamera::createReader(QnServer::ChunksCatalog catalog)
             } else
             {
                 reader->setOwner(toSharedPointer());
+                // TODO: make at_camera_resourceChanged async (queued connection e.t.c)
                 if ( role ==  Qn::CR_LiveVideo )
                     connect(reader->getResource().data(), SIGNAL(resourceChanged(const QnResourcePtr &)), this, SLOT(at_camera_resourceChanged()), Qt::DirectConnection);
 

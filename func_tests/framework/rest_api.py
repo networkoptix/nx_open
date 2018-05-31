@@ -55,7 +55,9 @@ class RestApiError(Exception):
 
     def __init__(self, server_name, url, error, error_string):
         super(RestApiError, self).__init__(
-            self, 'Server %s at %s REST API request returned error: %s %s' % (server_name, url, error, error_string))
+            self,
+            'Mediaserver {} at {} REST API request returned error: {} {}'.format(
+                server_name, url, error, error_string))
         self.error = error
         self.error_string = error_string
 
@@ -152,7 +154,6 @@ class RestApi(object):
         ha2 = hashlib.md5(':'.join([method, path]).encode()).hexdigest()  # Empty path.
         digest = hashlib.md5(':'.join([ha1, nonce, ha2]).encode()).hexdigest()
         key = base64.b64encode(':'.join([self.user.lower(), nonce, digest]))
-        assert requests.get(self.url('api/getCurrentUser'), params={'auth': key}).status_code == 200
         return key
 
     def get_api_fn(self, method, api_object, api_method):
@@ -212,9 +213,9 @@ class RestApi(object):
         log.debug('JSON payload:\n%s', json.dumps(data, indent=4))
         return self.request('POST', path, json=data, **kwargs)
 
-    def request(self, method, path, secure=False, **kwargs):
+    def request(self, method, path, secure=False, timeout=10, **kwargs):
         url = self.url(path, secure=secure)
-        response = requests.request(method, url, auth=self._auth, verify=str(self.ca_cert), **kwargs)
+        response = requests.request(method, url, auth=self._auth, verify=str(self.ca_cert), timeout=timeout, **kwargs)
         data = self._retrieve_data(response)
         self._raise_for_status(response)
         return data

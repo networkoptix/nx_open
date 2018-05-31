@@ -4,7 +4,7 @@ Merhaba, {{message.fullName}}
 {{message.sharer_name}}({{message.sharer_email}})video yönetim sistemini sizinle paylaştı {{message.system_name}}.
 {{/message.sharer_name}}
 
-{{#message.sharer_name}}
+{{^message.sharer_name}}
 Video yönetim sistemine "{{message.system_name}}" erişim izni verildi.
 {{/message.sharer_name}}
 

@@ -8,7 +8,7 @@ import pytest
 import server_api_data_generators as generator
 import transaction_log
 from framework.api_shortcuts import get_server_id
-from framework.server import MEDIASERVER_MERGE_TIMEOUT
+from framework.installation.mediaserver import MEDIASERVER_MERGE_TIMEOUT
 from framework.utils import SimpleNamespace, datetime_utc_now
 
 log = logging.getLogger(__name__)
@@ -209,7 +209,7 @@ def get_servers_admins(env):
 
 
 def get_server_by_index(env, i):
-    """Return Server object."""
+    """Return Mediaserver object."""
     server_i = i % len(env.servers)
     return env.servers[server_i]
 

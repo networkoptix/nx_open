@@ -169,17 +169,17 @@
     </message>
     <message>
       <source>Internal %1 error. Please contact support team.</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
       <translation>שגיאה פנימית %1. צור קשר עם צוות התמיכה.</translation>
     </message>
     <message>
       <source>Sorry, %1 Service is temporary unavailable. We are doing our best to restore it. Please try again later.</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
       <translation>מצטערים, השירות %1 אינו זמין באופן זמני. אנו עושים כמיטב יכולתנו כדי לשחזר אותו. בבקשה נסה שוב מאוחר יותר.</translation>
     </message>
     <message>
       <source>Sorry, %1 Service could not process your request. Please try again in a few moments.</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
       <translation>מצטער, לשירות %1 לא היתה אפשרות לעבד את בקשתך. אנא נסה שוב בעוד מספר רגעים.</translation>
     </message>
   </context>

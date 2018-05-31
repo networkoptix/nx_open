@@ -80,21 +80,6 @@ protected:
         m_resourceServer->registerUserCredentials(userName.toUtf8(), password.toUtf8());
     }
 
-    void givenResourceServer()
-    {
-        ASSERT_TRUE(m_resourceServer->bindAndListen());
-        m_actualUrl = QUrl(lm("http://%1%2")
-            .arg(m_resourceServer->serverAddress().toString()).arg(testPath));
-    }
-
-    void givenRedirectServer()
-    {
-        ASSERT_TRUE(m_redirector->bindAndListen());
-        m_redirectUrl = QUrl(lm("http://%1%2")
-            .arg(m_redirector->serverAddress().toString()).arg(testPath));
-        ASSERT_TRUE(m_redirector->registerRedirectHandler(testPath, m_actualUrl));
-    }
-
     void whenRequestingRedirectedResource()
     {
         ASSERT_TRUE(m_httpClient.doGet(m_redirectUrl));

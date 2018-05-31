@@ -10,8 +10,10 @@ option(rdepSync
 
 function(nx_rdep_configure)
     execute_process(COMMAND ${PYTHON_EXECUTABLE} ${RDEP_DIR}/rdep_configure.py)
-    execute_process(
-        COMMAND ${PYTHON_EXECUTABLE} ${RDEP_DIR}/rdep.py --sync-timestamps --root ${PACKAGES_DIR})
+    if(rdepSync)
+        execute_process(COMMAND
+            ${PYTHON_EXECUTABLE} ${RDEP_DIR}/rdep.py --sync-timestamps --root ${PACKAGES_DIR})
+    endif()
 endfunction()
 
 function(_rdep_get_full_package_name package var)

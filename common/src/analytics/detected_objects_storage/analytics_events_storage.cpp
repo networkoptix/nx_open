@@ -262,25 +262,35 @@ void EventsStorage::prepareLookupQuery(
     if (filter.maxObjectsToSelect > 0)
         sqlLimitStr = lm("LIMIT %1").args(filter.maxObjectsToSelect).toQString();
 
+    // NOTE: Limiting filtered_events subquery to make query
+    // CPU/memory requirements much less dependent of DB size.
+    // Assuming that objects tracks are whether interleaved or quite short.
+    // So, in situation, when there is a single 100,000 - records long object track
+    // selected by filter less objects than requested filter.maxObjectsToSelect would be returned.
+    constexpr int kMaxFilterEventsResultSize = 100000;
+
     query->prepare(lm(R"sql(
         WITH filtered_events AS
-        (SELECT timestamp_usec_utc, object_id, rowid as r
+        (SELECT timestamp_usec_utc, object_id
          FROM %1
          %2
-         ORDER BY timestamp_usec_utc DESC)
+         ORDER BY timestamp_usec_utc DESC
+         LIMIT %3)
         SELECT timestamp_usec_utc, duration_usec, device_guid,
-            object_type_id, object_id, attributes,
+            object_type_id, e.object_id, attributes,
             box_top_left_x, box_top_left_y, box_bottom_right_x, box_bottom_right_y
         FROM event e,
-            ( SELECT timestamp_usec_utc AS matching_track_start_time, r
-              FROM filtered_events AS t
-              WHERE timestamp_usec_utc=(SELECT MIN(timestamp_usec_utc) FROM event WHERE object_id=t.object_id)
-              %3) objects
-        WHERE e.rowid=objects.r
-        ORDER BY timestamp_usec_utc %4
+            (SELECT object_id, MIN(timestamp_usec_utc) AS min_timestamp_usec_utc
+             FROM filtered_events
+             GROUP BY object_id
+             ORDER BY MIN(timestamp_usec_utc) %5
+             %4) objects
+        WHERE e.timestamp_usec_utc=objects.min_timestamp_usec_utc AND e.object_id=objects.object_id
+        ORDER BY e.timestamp_usec_utc %5
     )sql").args(
         eventsFilteredByFreeTextSubQuery,
         sqlQueryFilterStr,
+        kMaxFilterEventsResultSize,
         sqlLimitStr,
         filter.sortOrder == Qt::SortOrder::AscendingOrder ? "ASC" : "DESC").toQString());
     nx::utils::db::bindFields(query, sqlQueryFilter);

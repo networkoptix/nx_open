@@ -5,19 +5,16 @@ from datetime import datetime, timedelta
 import pytz
 
 from framework.api_shortcuts import get_local_system_id, set_local_system_id
-from framework.merging import merge_systems
-from framework.server import TimePeriod
+from framework.installation.mediaserver import TimePeriod
 from framework.utils import log_list
 
 log = logging.getLogger(__name__)
 
 
-def test_merged_archive(linux_servers_pool, camera, sample_media_file):
+def test_merged_archive(two_merged_mediaservers, camera, sample_media_file):
     log.debug('camera: %r, sample media file: %r', camera, sample_media_file)
 
-    one = linux_servers_pool.get('one')
-    two = linux_servers_pool.get('two')
-    merge_systems(one, two)
+    one, two = two_merged_mediaservers
 
     one.add_camera(camera)
 
@@ -34,8 +31,12 @@ def test_merged_archive(linux_servers_pool, camera, sample_media_file):
     log_list('Start times for server one', start_times_one)
     log_list('Start times for server two', start_times_two)
     expected_periods_one = [
-        TimePeriod(start_times_one[0], sample.duration * 2 - timedelta(seconds=10)),  # overlapped must be joined together
-        TimePeriod(start_times_one[2], sample.duration),
+        TimePeriod(
+            start_times_one[0],
+            sample.duration * 2 - timedelta(seconds=10)),  # overlapped must be joined together
+        TimePeriod(
+            start_times_one[2],
+            sample.duration),
         ]
     expected_periods_two = [
         TimePeriod(start_times_two[0], sample.duration * 2),  # adjacent must be joined together
@@ -55,11 +56,12 @@ def test_merged_archive(linux_servers_pool, camera, sample_media_file):
     return one, two, expected_periods_one, expected_periods_two
 
 
-def test_separated_archive(linux_servers_pool, camera, sample_media_file):
-    one, two, expected_periods_one, expected_periods_two = test_merged_archive(linux_servers_pool, camera, sample_media_file)
-    new_id = '{%s}' % uuid.uuid4()
+def test_separated_archive(two_merged_mediaservers, camera, sample_media_file):
+    one, two, expected_periods_one, expected_periods_two = test_merged_archive(
+        two_merged_mediaservers, camera, sample_media_file)
+    new_id = uuid.uuid4()
     set_local_system_id(one.api, new_id)
-    assert get_local_system_id(one) == new_id
+    assert get_local_system_id(one.api) == new_id
     assert expected_periods_one == one.get_recorded_time_periods(camera)
     assert expected_periods_two == two.get_recorded_time_periods(camera)
     assert not one.installation.list_core_dumps()

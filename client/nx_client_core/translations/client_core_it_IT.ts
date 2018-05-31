@@ -157,17 +157,17 @@
     </message>
     <message>
       <source>Internal %1 error. Please contact support team.</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
       <translation>Errore interno %1. Si prega di contattare il team di supporto.</translation>
     </message>
     <message>
       <source>Sorry, %1 Service is temporary unavailable. We are doing our best to restore it. Please try again later.</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
       <translation>Siamo spiacenti, %1 Il servizio è temporaneamente non disponibile. Stiamo facendo del nostro meglio per ripristinarlo. Per favore riprovare più tardi.</translation>
     </message>
     <message>
       <source>Sorry, %1 Service could not process your request. Please try again in a few moments.</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
       <translation>Spiacenti, il servizio %1 non è stato in grado di elaborare la sua richiesta. Riprovare tra qualche istante.</translation>
     </message>
   </context>

@@ -30,11 +30,9 @@
         <div class="form-row">
             {% is_optional field.name context as optional %}
             {% has_value field.name context customization language as record_exists %}
-            {% if not optional and not record_exists %}
-            <label class="text-danger" for="id_{{ field.name }}">{{ field.label }}</label>
-            {% else %}
-            <label for="id_{{ field.name }}">{{ field.label }}</label>
-            {% endif %}
+            <label {% if not optional and not record_exists %} class="text-danger" {% endif %}
+                   for="id_{{ field.name }}">{{ field.label }}<p class="help">{{field.name}}</p>
+            </label>
             <div id="{{field.name}}" style="display:inline-block;">
                 {% if field|is_ImageField and field.value %}
                     <div>
@@ -149,8 +147,8 @@
         menubar: false,
         resize: 'both',
         theme:'advanced',
-        plugins: 'preview,-visualblocks,-advcode,paste,link',
-        theme_advanced_buttons1: 'undo,redo,separator,formatselect,link,bold,italic,underline,separator,bullist,numlist,separator,outdent,indent,separator,code,removeformat,pasteword',
+        plugins: 'preview,-visualblocks,-advcode,paste',
+        theme_advanced_buttons1: 'undo,redo,separator,formatselect,link,bold,italic,underline,separator,bullist,numlist,separator,outdent,indent,separator,code,removeformat,pasteword,preview',
         theme_advanced_toolbar_location: 'top',
         theme_advanced_toolbar_align: 'left',
         theme_advanced_resizing: true

@@ -78,7 +78,6 @@ utils::Url HikvisionAudioTransmitter::transmissionUrl() const
 {
     nx::utils::Url url(m_resource->getUrl());
     url.setPath(kTwoWayAudioPrefix + kTransmitTwoWayAudioUrlTemplate.arg(m_channelId));
-
     return url;
 }
 

@@ -13,11 +13,9 @@
                 <include>avformat*.dll</include>
                 <include>avutil*.dll</include>
                 <include>testcamera.exe</include>
-                <include>libmp3lame*.dll</include>
-                <include>libogg*.dll</include>
-                <include>libvorbis*.dll</include>
                 <include>nx_network.dll</include>
                 <include>nx_utils.dll</include>
+                <include>nx_vms_api.dll</include>
                 <include>nx_kit.dll</include>
                 <include>vms_gateway_core.dll</include>
 

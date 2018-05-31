@@ -11,7 +11,7 @@ namespace vms {
 namespace event {
 
 SendMailAction::SendMailAction(const EventParameters& runtimeParams):
-    base_type(sendMailAction, runtimeParams)
+    base_type(ActionType::sendMailAction, runtimeParams)
 {
 }
 
@@ -29,7 +29,7 @@ void SendMailAction::assign(const AbstractAction& other)
 {
     base_type::assign(other);
 
-    if (other.actionType() != sendMailAction)
+    if (other.actionType() != ActionType::sendMailAction)
         return;
 
     const auto otherSendMail = dynamic_cast<const SendMailAction*>(&other);

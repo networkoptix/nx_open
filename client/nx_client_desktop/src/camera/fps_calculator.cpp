@@ -12,6 +12,11 @@ void calculateMaxFps(
     int* maxDualStreamFps,
     bool motionDetectionAllowed)
 {
+    if (maxFps)
+        *maxFps = std::numeric_limits<int>::max();
+    if (maxDualStreamFps)
+        *maxDualStreamFps = std::numeric_limits<int>::max();
+
     for (const auto& camera: cameras)
     {
         int cameraFps = camera->getMaxFps();
@@ -19,15 +24,15 @@ void calculateMaxFps(
         const bool shareFps = camera->streamFpsSharingMethod() == Qn::BasicFpsSharing;
         const auto motionType = motionDetectionAllowed
             ? camera->getMotionType()
-            : Qn::MT_NoMotion;
+            : Qn::MotionType::MT_NoMotion;
 
         switch (motionType)
         {
-            case Qn::MT_HardwareGrid:
+            case Qn::MotionType::MT_HardwareGrid:
                 if (shareFps)
                     cameraDualStreamingFps -= QnLiveStreamParams::kMinSecondStreamFps;
                 break;
-            case Qn::MT_SoftwareGrid:
+            case Qn::MotionType::MT_SoftwareGrid:
                 if (shareFps)
                 {
                     cameraFps -= QnLiveStreamParams::kMinSecondStreamFps;

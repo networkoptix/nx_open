@@ -16,7 +16,12 @@ qt_libraries = [
     'Concurrent',
     'Sql']
 
-nx_libraries = ['nx_utils', 'nx_network', 'nx_kit', 'udt']
+nx_libraries = [
+    'nx_utils',
+    'nx_network',
+    'nx_kit',
+    'nx_vms_api',
+    'udt']
 
 
 def generate_testcamera_package(

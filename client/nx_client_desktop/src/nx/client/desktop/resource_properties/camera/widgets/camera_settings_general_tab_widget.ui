@@ -7,10 +7,10 @@
     <x>0</x>
     <y>0</y>
     <width>748</width>
-    <height>390</height>
+    <height>343</height>
    </rect>
   </property>
-  <layout class="QVBoxLayout" name="verticalLayout" stretch="0,0,0,0,0,1">
+  <layout class="QVBoxLayout" name="verticalLayout_4" stretch="0,0,0,0,1">
    <property name="spacing">
     <number>0</number>
    </property>
@@ -53,7 +53,10 @@
     </widget>
    </item>
    <item>
-    <layout class="QGridLayout" name="generalGridLayout" columnstretch="1,1">
+    <layout class="QHBoxLayout" name="horizontalLayout" stretch="1,1">
+     <property name="spacing">
+      <number>24</number>
+     </property>
      <property name="leftMargin">
       <number>16</number>
      </property>
@@ -66,37 +69,65 @@
      <property name="bottomMargin">
       <number>16</number>
      </property>
-     <property name="horizontalSpacing">
-      <number>24</number>
-     </property>
-     <property name="verticalSpacing">
-      <number>20</number>
-     </property>
-     <item row="0" column="1">
-      <widget class="QGroupBox" name="audioGroupBox">
-       <property name="title">
-        <string>Audio</string>
-       </property>
-       <property name="flat">
-        <bool>true</bool>
-       </property>
-       <layout class="QVBoxLayout" name="audioVerticalLayout">
+     <item>
+      <widget class="QWidget" name="leftWidget" native="true">
+       <layout class="QVBoxLayout" name="verticalLayout" stretch="0,0,1">
+        <property name="spacing">
+         <number>20</number>
+        </property>
+        <property name="leftMargin">
+         <number>0</number>
+        </property>
+        <property name="topMargin">
+         <number>0</number>
+        </property>
+        <property name="rightMargin">
+         <number>0</number>
+        </property>
+        <property name="bottomMargin">
+         <number>0</number>
+        </property>
         <item>
-         <widget class="QCheckBox" name="enableAudioCheckBox">
-          <property name="text">
-           <string>Enable Audio</string>
+         <widget class="nx::client::desktop::ImageControlWidget" name="imageControlWidget" native="true">
+          <property name="focusPolicy">
+           <enum>Qt::TabFocus</enum>
           </property>
          </widget>
         </item>
         <item>
-         <spacer name="verticalSpacer_2">
+         <widget class="QGroupBox" name="authenticationGroupBox">
+          <property name="title">
+           <string>Authentication</string>
+          </property>
+          <property name="flat">
+           <bool>true</bool>
+          </property>
+          <layout class="QVBoxLayout" name="verticalLayout_2">
+           <item>
+            <widget class="QPushButton" name="editCredentialsButton">
+             <property name="sizePolicy">
+              <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+               <horstretch>0</horstretch>
+               <verstretch>0</verstretch>
+              </sizepolicy>
+             </property>
+             <property name="text">
+              <string>Edit Credentials</string>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </widget>
+        </item>
+        <item>
+         <spacer name="verticalSpacer_3">
           <property name="orientation">
            <enum>Qt::Vertical</enum>
           </property>
           <property name="sizeHint" stdset="0">
            <size>
-            <width>20</width>
-            <height>0</height>
+            <width>17</width>
+            <height>37</height>
            </size>
           </property>
          </spacer>
@@ -104,56 +135,89 @@
        </layout>
       </widget>
      </item>
-     <item row="0" column="0">
-      <widget class="nx::client::desktop::ImageControlWidget" name="imageControlWidget" native="true">
-       <property name="focusPolicy">
-        <enum>Qt::TabFocus</enum>
-       </property>
-      </widget>
-     </item>
-     <item row="1" column="0">
-      <widget class="QGroupBox" name="authenticationGroupBox">
-       <property name="title">
-        <string>Authentication</string>
-       </property>
-       <property name="flat">
-        <bool>true</bool>
-       </property>
-       <layout class="QVBoxLayout" name="verticalLayout_2">
+     <item>
+      <widget class="QWidget" name="rightWidget" native="true">
+       <layout class="QVBoxLayout" name="verticalLayout_3" stretch="0,0,0,1">
+        <property name="spacing">
+         <number>20</number>
+        </property>
+        <property name="leftMargin">
+         <number>0</number>
+        </property>
+        <property name="topMargin">
+         <number>0</number>
+        </property>
+        <property name="rightMargin">
+         <number>0</number>
+        </property>
+        <property name="bottomMargin">
+         <number>0</number>
+        </property>
         <item>
-         <widget class="QPushButton" name="editCredentialsButton">
-          <property name="sizePolicy">
-           <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-            <horstretch>0</horstretch>
-            <verstretch>0</verstretch>
-           </sizepolicy>
+         <widget class="QGroupBox" name="audioGroupBox">
+          <property name="title">
+           <string>Audio</string>
           </property>
-          <property name="text">
-           <string>Edit Credentials</string>
+          <property name="flat">
+           <bool>true</bool>
           </property>
+          <layout class="QVBoxLayout" name="audioVerticalLayout">
+           <item>
+            <widget class="QCheckBox" name="enableAudioCheckBox">
+             <property name="text">
+              <string>Enable Audio</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <spacer name="verticalSpacer_2">
+             <property name="orientation">
+              <enum>Qt::Vertical</enum>
+             </property>
+             <property name="sizeHint" stdset="0">
+              <size>
+               <width>20</width>
+               <height>0</height>
+              </size>
+             </property>
+            </spacer>
+           </item>
+          </layout>
          </widget>
+        </item>
+        <item>
+         <widget class="nx::client::desktop::ArchiveLengthWidget" name="wearableArchiveLengthWidget" native="true"/>
+        </item>
+        <item>
+         <widget class="nx::client::desktop::WearableCameraMotionWidget" name="wearableMotionWidget" native="true"/>
+        </item>
+        <item>
+         <spacer name="verticalSpacer">
+          <property name="orientation">
+           <enum>Qt::Vertical</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>20</width>
+            <height>40</height>
+           </size>
+          </property>
+         </spacer>
         </item>
        </layout>
       </widget>
      </item>
     </layout>
    </item>
-   <item>
-    <spacer name="verticalSpacer">
-     <property name="orientation">
-      <enum>Qt::Vertical</enum>
-     </property>
-     <property name="sizeHint" stdset="0">
-      <size>
-       <width>20</width>
-       <height>40</height>
-      </size>
-     </property>
-    </spacer>
-   </item>
   </layout>
  </widget>
  <customwidgets>
+  <customwidget>
+   <class>nx::client::desktop::ArchiveLengthWidget</class>
+   <extends>QWidget</extends>
+   <header location="global">nx/client/desktop/resource_properties/camera/widgets/archive_length_widget.h</header>
+   <container>1</container>
+  </customwidget>
   <customwidget>
    <class>nx::client::desktop::ImageControlWidget</class>
    <extends>QWidget</extends>
@@ -170,6 +234,12 @@
    <class>nx::client::desktop::CameraInfoWidget</class>
    <extends>QWidget</extends>
    <header location="global">nx/client/desktop/resource_properties/camera/widgets/camera_info_widget.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>nx::client::desktop::WearableCameraMotionWidget</class>
+   <extends>QWidget</extends>
+   <header location="global">nx/client/desktop/resource_properties/camera/widgets/wearable_camera_motion_widget.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

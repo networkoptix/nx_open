@@ -8,7 +8,7 @@
 #include <core/resource_management/user_roles_manager.h>
 #include <core/resource_access/resource_access_manager.h>
 #include <core/resource/user_resource.h>
-#include <ui/common/aligner.h>
+#include <nx/client/desktop/common/utils/aligner.h>
 #include <ui/help/help_topics.h>
 #include <ui/help/help_topic_accessor.h>
 #include <ui/models/resource_properties/user_settings_model.h>
@@ -24,6 +24,7 @@
 #include <nx/network/app_info.h>
 #include <nx/utils/string.h>
 
+#include <utils/common/html.h>
 using namespace nx::client::desktop;
 
 namespace {
@@ -56,7 +57,7 @@ QnUserSettingsWidget::QnUserSettingsWidget(QnUserSettingsModel* model, QWidget* 
     ui(new Ui::UserSettingsWidget()),
     m_model(model),
     m_rolesModel(new QnUserRolesModel(this, QnUserRolesModel::DefaultRoleFlags)),
-    m_aligner(new QnAligner(this)),
+    m_aligner(new Aligner(this)),
     m_lastUserTypeIndex(kCloudIndex) //< actual only for cloud systems (when selector is visible)
 {
     ui->setupUi(this);
@@ -80,6 +81,21 @@ QnUserSettingsWidget::QnUserSettingsWidget(QnUserSettingsModel* model, QWidget* 
 
     setHelpTopic(ui->roleLabel, ui->roleComboBox, Qn::UserSettings_UserRoles_Help);
     setHelpTopic(ui->roleComboBox, Qn::UserSettings_UserRoles_Help);
+
+    const QString localUsers = htmlBold(tr("Local users"));
+    const QString cloudUsers = htmlBold(tr("%1 users", "%1 is the short cloud name (like Cloud)")
+        .arg(nx::network::AppInfo::shortCloudName()));
+
+    ui->userTypeHint->addHintLine(
+        tr("%1 belong to this system only and are fully managed by system administrators.",
+            "%1 is local users definition, e.g. 'Local users'")
+        .arg(localUsers));
+    ui->userTypeHint->addHintLine(
+        tr("%1 can have access to many Systems. Administrators can manage their rights only.",
+            "%1 is cloud users definition, e.g. 'Cloud users'")
+        .arg(cloudUsers));
+
+    setHelpTopic(ui->userTypeHint, Qn::NewUser_Help);
 
     ui->roleComboBox->setModel(m_rolesModel);
 
@@ -457,7 +473,7 @@ void QnUserSettingsWidget::setupInputFields()
 
                 return ValidationResult(
                     tr("%1 user with specified email already exists.",
-                        "%1 is the short cloud name (like 'Cloud')")
+                        "%1 is the short cloud name (like Cloud)")
                     .arg(nx::network::AppInfo::shortCloudName()));
             }
 

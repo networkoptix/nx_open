@@ -63,14 +63,14 @@ void CameraAdvancedParamWidgetsManager::displayParams(const QnCameraAdvancedPara
 
     const auto currentItemChanged =
         [this](QTreeWidgetItem* current)
-    {
-        if (!current)
-            return;
+        {
+            if (!current)
+                return;
 
-        const auto target = current->data(0, Qt::UserRole).value<QWidget*>();
-        if (target && m_contentsWidget->children().contains(target))
-            m_contentsWidget->setCurrentWidget(target);
-    };
+            const auto target = current->data(0, Qt::UserRole).value<QWidget*>();
+            if (target && m_contentsWidget->children().contains(target))
+                m_contentsWidget->setCurrentWidget(target);
+        };
 
     connect(m_groupWidget, &QTreeWidget::currentItemChanged, this, currentItemChanged);
     currentItemChanged(m_groupWidget->currentItem());
@@ -142,6 +142,16 @@ void CameraAdvancedParamWidgetsManager::loadValues(const QnCameraAdvancedParamVa
             &CameraAdvancedParamWidgetsManager::paramValueChanged);
     }
 }
+
+boost::optional<QString> CameraAdvancedParamWidgetsManager::parameterValue(
+    const QString & parameterId) const
+{
+    if (!m_paramWidgetsById.contains(parameterId))
+        return boost::none;
+
+    return m_paramWidgetsById[parameterId]->value();
+}
+
 
 bool CameraAdvancedParamWidgetsManager::hasValidValues(const QnCameraAdvancedParamGroup& group) const
 {
@@ -230,6 +240,17 @@ QWidget* CameraAdvancedParamWidgetsManager::createWidgetsForPage(
     auto gridLayout = new QGridLayout(scrollAreaWidgetContents);
     scrollArea->setWidget(scrollAreaWidgetContents);
 
+    // Container for a group of 'compact' widgets.
+    QHBoxLayout* compactLayout = nullptr;
+    auto checkFinishGroup = [&compactLayout]()
+        {
+            if (compactLayout)
+            {
+                compactLayout->addStretch(1);
+                compactLayout = nullptr;
+            }
+        };
+
     for (const auto& param : params)
     {
         m_parametersById[param.id] = param;
@@ -241,27 +262,52 @@ QWidget* CameraAdvancedParamWidgetsManager::createWidgetsForPage(
 
         if (param.dataType == QnCameraAdvancedParameter::DataType::Separator)
         {
+            checkFinishGroup();
             gridLayout->addWidget(widget, row, 0, 1, 2);
             continue;
         }
 
-        if (param.dataType != QnCameraAdvancedParameter::DataType::Button)
+        if (param.compact)
         {
-            auto label = new QLabel(scrollAreaWidgetContents);
-            label->setToolTip(param.description);
-            setLabelText(label, param, param.range);
-            label->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
-            label->setBuddy(widget);
-            gridLayout->addWidget(label, row, 0);
-            m_paramLabelsById[param.id] = label;
-            label->setFixedWidth(kParameterLabelWidth);
-            label->setWordWrap(true);
+            if (!compactLayout)
+            {
+                // Creating container for compact controls.
+                compactLayout = new QHBoxLayout(m_contentsWidget);
+                compactLayout->addWidget(widget, 0, Qt::AlignRight);
+                gridLayout->addLayout(compactLayout, row, 0, 1, 2, Qt::AlignVCenter);
+            }
+            else
+            {
+                // Adding a widget to existing contaner for compact control group.
+                compactLayout->addWidget(widget, 0, Qt::AlignRight);
+            }
+        }
+        else
+        {
+            checkFinishGroup();
+
+            if (param.dataType == QnCameraAdvancedParameter::DataType::Button)
+            {
+                gridLayout->addWidget(widget, row, 0, 2, 1, Qt::AlignVCenter);
+            }
+            else
+            {
+                auto label = new QLabel(scrollAreaWidgetContents);
+                label->setToolTip(param.description);
+                setLabelText(label, param, param.range);
+                label->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
+                label->setBuddy(widget);
+                gridLayout->addWidget(label, row, 0);
+                m_paramLabelsById[param.id] = label;
+                label->setFixedWidth(kParameterLabelWidth);
+                label->setWordWrap(true);
+                gridLayout->addWidget(widget, row, 1, 1, 1, Qt::AlignVCenter);
+            }
         }
 
-        gridLayout->addWidget(widget, row, 1, Qt::AlignVCenter);
         m_paramWidgetsById[param.id] = widget;
 
-        /* Widget is disabled until it receives correct value. */
+        // Widget is disabled until it receives correct value.
         if (QnCameraAdvancedParameter::dataTypeHasValue(param.dataType))
         {
             widget->setEnabled(false);
@@ -272,7 +318,7 @@ QWidget* CameraAdvancedParamWidgetsManager::createWidgetsForPage(
                 &CameraAdvancedParamWidgetsManager::paramValueChanged);
         }
 
-        if (!param.notes.isEmpty())
+        if (!param.notes.isEmpty() && !param.compact)
         {
             auto label = new QLabel(scrollAreaWidgetContents);
             label->setWordWrap(true);
@@ -280,6 +326,7 @@ QWidget* CameraAdvancedParamWidgetsManager::createWidgetsForPage(
             gridLayout->addWidget(label, row + 1, 1);
         }
     }
+    checkFinishGroup();
 
     gridLayout->setColumnStretch(1, 1);
 
@@ -369,19 +416,50 @@ CameraAdvancedParamWidgetsManager::DependencyHandler
                 if (!allConditionsSatisfied)
                     return false;
 
-                widget->setRange(dependency.range);
-                if (parameter.bindDefaultToMinimum)
+                if (!dependency.valuesToAddToRange.isEmpty())
                 {
-                    const auto minMax = dependency.range.split(L',');
-                    if (!minMax.isEmpty())
-                        widget->setValue(minMax.first().trimmed());
+                    auto range = widget->range();
+                    for (const auto& valueToAdd: dependency.valuesToAddToRange)
+                    {
+                        if (!range.contains(valueToAdd))
+                            range.push_back(valueToAdd);
+                    }
+
+                    widget->setRange(range.join(L','));
                 }
 
-                auto label = dynamic_cast<QLabel*>(m_paramLabelsById[paramId]);
-                if (!label)
-                    return false;
+                if (!dependency.valuesToRemoveFromRange.isEmpty())
+                {
+                    QStringList result;
+                    const auto range = widget->range();
+                    for (const auto& value: range)
+                    {
+                        if (!dependency.valuesToRemoveFromRange.contains(value))
+                            result.push_back(value);
+                    }
 
-                setLabelText(label, parameter, dependency.range);
+                    widget->setRange(result.join(L','));
+                }
+
+                if (!dependency.range.isEmpty())
+                {
+                    NX_ASSERT(dependency.valuesToAddToRange.isEmpty()
+                        && dependency.valuesToRemoveFromRange.isEmpty());
+
+                    widget->setRange(dependency.range);
+                    if (parameter.bindDefaultToMinimum)
+                    {
+                        const auto minMax = dependency.range.split(L',');
+                        if (!minMax.isEmpty())
+                            widget->setValue(minMax.first().trimmed());
+                    }
+
+                    auto label = dynamic_cast<QLabel*>(m_paramLabelsById[paramId]);
+                    if (!label)
+                        return false;
+
+                    setLabelText(label, parameter, dependency.range);
+                }
             }
             else if (dependency.type == DependencyType::trigger)
             {

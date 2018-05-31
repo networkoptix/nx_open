@@ -45,10 +45,13 @@ add_definitions(
     -DENABLE_SENDMAIL
     -DENABLE_DATA_PROVIDERS
     -DENABLE_SOFTWARE_MOTION_DETECTION
+
+    -DBOOST_BIND_NO_PLACEHOLDERS
 )
 
 if(WINDOWS)
     add_definitions(
+        -D_CRT_RAND_S
         -D_WINSOCKAPI_=
     )
 endif()
@@ -99,13 +102,31 @@ if(WINDOWS)
     add_compile_options(
         /MP
         /bigobj
+
         /wd4290
         /wd4661
         /wd4100
+
         /we4717
+        # Deletion of pointer to incomplete type 'X'; no destructor called.
+        /we4150
+        # Not all control paths return a value.
+        /we4715
+        # Macro redefinition.
+        /we4005
+        # Unsafe operation: no value of type 'INTEGRAL' promoted to type 'ENUM' can equal the given
+        # constant.
+        /we4806
     )
     add_definitions(-D_SILENCE_CXX17_OLD_ALLOCATOR_MEMBERS_DEPRECATION_WARNING)
     add_definitions(-D_SILENCE_CXX17_ALLOCATOR_VOID_DEPRECATION_WARNING)
+
+    # Get rid of useless MSVC warnings.
+    add_definitions(
+        -D_CRT_SECURE_NO_WARNINGS #< Don't warn for deprecated 'unsecure' CRT functions.
+        -D_CRT_NONSTDC_NO_DEPRECATE #< Don't warn for deprecated POSIX functions.
+        -D_SCL_SECURE_NO_WARNINGS #< Don't warn for 'unsafe' STL functions.
+    )
 
     if(CMAKE_BUILD_TYPE STREQUAL "Debug")
         add_compile_options(/wd4250)
@@ -160,10 +181,10 @@ if(LINUX)
     set(CMAKE_BUILD_WITH_INSTALL_RPATH ON)
     set(CMAKE_INSTALL_RPATH "$ORIGIN/../lib")
 
-    set(CMAKE_EXE_LINKER_FLAGS
-        "${CMAKE_EXE_LINKER_FLAGS} -Wl,--disable-new-dtags")
-    set(CMAKE_SHARED_LINKER_FLAGS
-        "${CMAKE_SHARED_LINKER_FLAGS} -rdynamic -Wl,--no-undefined")
+    string(APPEND CMAKE_EXE_LINKER_FLAGS " -Wl,--disable-new-dtags")
+    string(APPEND CMAKE_SHARED_LINKER_FLAGS " -rdynamic -Wl,--no-undefined")
+    string(APPEND CMAKE_EXE_LINKER_FLAGS " -Wl,--as-needed")
+    string(APPEND CMAKE_SHARED_LINKER_FLAGS " -Wl,--as-needed")
 
     if(NOT ANDROID AND CMAKE_BUILD_TYPE STREQUAL "Release")
         add_compile_options(-ggdb1 -fno-omit-frame-pointer)

@@ -5,7 +5,6 @@
 #include <core/ptz/abstract_ptz_controller.h>
 #include <core/resource/camera_advanced_param.h>
 #include <core/resource_management/resource_data_pool.h>
-#include <core/resource/resource_command.h>
 #include <providers/live_stream_provider.h>
 
 #include <nx/utils/log/log.h>
@@ -15,86 +14,14 @@
 #include <nx/fusion/serialization/json.h>
 
 #include "camera_advanced_parameters_providers.h"
+#include <plugins/resource/server_archive/server_archive_delegate.h>
+#include <media_server/media_server_module.h>
+#include <nx/streaming/archive_stream_reader.h>
 
 namespace nx {
 namespace mediaserver {
 namespace resource {
 
-namespace {
-
-class GetAdvancedParametersCommand: public QnResourceCommand
-{
-public:
-    GetAdvancedParametersCommand(
-        const QnResourcePtr& resource,
-        const QSet<QString>& ids,
-        std::function<void(const QnCameraAdvancedParamValueMap&)> handler)
-    :
-        QnResourceCommand(resource),
-        m_ids(ids),
-        m_handler(std::move(handler))
-    {
-    }
-
-    bool execute() override
-    {
-        const auto camera = m_resource.dynamicCast<Camera>();
-        NX_CRITICAL(camera);
-
-        QnCameraAdvancedParamValueMap values;
-        if (isConnectedToTheResource())
-            values = camera->getAdvancedParameters(m_ids);
-
-        m_handler(values);
-        return true;
-    }
-
-    void beforeDisconnectFromResource() override
-    {
-    }
-
-private:
-    QSet<QString> m_ids;
-    std::function<void(const QnCameraAdvancedParamValueMap&)> m_handler;
-};
-
-class SetAdvancedParametersCommand: public QnResourceCommand
-{
-public:
-    SetAdvancedParametersCommand(
-        const QnResourcePtr& resource,
-        const QnCameraAdvancedParamValueMap& values,
-        std::function<void(const QSet<QString>&)> handler)
-    :
-        QnResourceCommand(resource),
-        m_values(values),
-        m_handler(std::move(handler))
-    {
-    }
-
-    bool execute() override
-    {
-        const auto camera = m_resource.dynamicCast<Camera>();
-        NX_CRITICAL(camera);
-
-        QSet<QString> ids;
-        if (isConnectedToTheResource())
-            ids = camera->setAdvancedParameters(m_values);
-
-        m_handler(ids);
-        return true;
-    }
-
-    void beforeDisconnectFromResource() override
-    {
-    }
-
-private:
-    QnCameraAdvancedParamValueMap m_values;
-    std::function<void(const QSet<QString>&)> m_handler;
-};
-
-} // namespace
 
 const float Camera::kMaxEps = 0.01f;
 
@@ -109,6 +36,15 @@ Camera::Camera(QnCommonModule* commonModule):
 Camera::~Camera()
 {
     // Needed because of the forward declaration.
+}
+
+void Camera::blockingInit()
+{
+    if (!init())
+    {
+        //init is running in another thread, waiting for it to complete...
+        QnMutexLocker lk(&m_initMutex);
+    }
 }
 
 int Camera::getChannel() const
@@ -273,22 +209,6 @@ bool Camera::setAdvancedParameter(const QString& id, const QString& value)
     return setAdvancedParameters(parameters).contains(id);
 }
 
-void Camera::getAdvancedParametersAsync(
-    const QSet<QString>& ids,
-    std::function<void(const QnCameraAdvancedParamValueMap&)> handler)
-{
-    addCommandToProc(std::make_shared<GetAdvancedParametersCommand>(
-        toSharedPointer(this), ids, std::move(handler)));
-}
-
-void Camera::setAdvancedParametersAsync(
-    const QnCameraAdvancedParamValueMap& values,
-    std::function<void(const QSet<QString>&)> handler)
-{
-    addCommandToProc(std::make_shared<SetAdvancedParametersCommand>(
-        toSharedPointer(this), values, std::move(handler)));
-}
-
 QnAdvancedStreamParams Camera::advancedLiveStreamParams() const
 {
     const auto getStreamParameters =
@@ -333,32 +253,35 @@ QSize Camera::getNearestResolution(
         *coeff = INT_MAX;
 
     double requestSquare = resolution.width() * resolution.height();
-    if (requestSquare < kMaxEps || requestSquare > maxResolutionArea) return EMPTY_RESOLUTION_PAIR;
+    if (requestSquare < kMaxEps || requestSquare > maxResolutionArea)
+        return EMPTY_RESOLUTION_PAIR;
 
     int bestIndex = -1;
-    double bestMatchCoeff = maxResolutionArea > kMaxEps ? (maxResolutionArea / requestSquare) : INT_MAX;
+    double bestMatchCoeff =
+        maxResolutionArea > kMaxEps ? (maxResolutionArea / requestSquare) : INT_MAX;
 
-    for (int i = 0; i < resolutionList.size(); ++i) {
+    for (int i = 0; i < resolutionList.size(); ++i)
+    {
         QSize tmp;
 
         tmp.setWidth(qPower2Ceil(static_cast<unsigned int>(resolutionList[i].width() + 1), 8));
         tmp.setHeight(qPower2Floor(static_cast<unsigned int>(resolutionList[i].height() - 1), 8));
-        float ar1 = getResolutionAspectRatio(tmp);
+        const float ar1 = getResolutionAspectRatio(tmp);
 
         tmp.setWidth(qPower2Floor(static_cast<unsigned int>(resolutionList[i].width() - 1), 8));
         tmp.setHeight(qPower2Ceil(static_cast<unsigned int>(resolutionList[i].height() + 1), 8));
-        float ar2 = getResolutionAspectRatio(tmp);
+        const float ar2 = getResolutionAspectRatio(tmp);
 
         if (aspectRatio != 0 && !qBetween(qMin(ar1,ar2), aspectRatio, qMax(ar1,ar2)))
-        {
             continue;
-        }
 
-        double square = resolutionList[i].width() * resolutionList[i].height();
-        if (square < kMaxEps) continue;
+        const double square = resolutionList[i].width() * resolutionList[i].height();
+        if (square < kMaxEps)
+            continue;
 
-        double matchCoeff = qMax(requestSquare, square) / qMin(requestSquare, square);
-        if (matchCoeff <= bestMatchCoeff + kMaxEps) {
+        const double matchCoeff = qMax(requestSquare, square) / qMin(requestSquare, square);
+        if (matchCoeff <= bestMatchCoeff + kMaxEps)
+        {
             bestIndex = i;
             bestMatchCoeff = matchCoeff;
             if (coeff)
@@ -416,6 +339,10 @@ CameraDiagnostics::Result Camera::initInternal()
 
         m_lastInitTime.restart();
         m_lastCredentials = credentials;
+
+        m_mediaTraits = resData.value<nx::media::CameraTraits>(
+            Qn::kMediaTraits,
+            nx::media::CameraTraits());
     }
 
     m_streamCapabilityAdvancedProviders.clear();
@@ -429,6 +356,11 @@ CameraDiagnostics::Result Camera::initInternal()
     return initializeAdvancedParametersProviders();
 }
 
+nx::media::CameraTraits Camera::mediaTraits() const
+{
+    return m_mediaTraits;
+}
+
 QnAbstractPtzController* Camera::createPtzControllerInternal() const
 {
     return nullptr;
@@ -438,13 +370,22 @@ CameraDiagnostics::Result Camera::initializeAdvancedParametersProviders()
 {
     std::vector<Camera::AdvancedParametersProvider*> allProviders;
     boost::optional<QSize> baseResolution;
+    const StreamCapabilityMaps streamCapabilityMaps = {
+        {Qn::StreamIndex::primary, getStreamCapabilityMap(Qn::StreamIndex::primary)},
+        {Qn::StreamIndex::secondary, getStreamCapabilityMap(Qn::StreamIndex::secondary)}
+    };
+
+    const auto traits = mediaTraits();
     for (const auto streamType: {Qn::StreamIndex::primary, Qn::StreamIndex::secondary})
     {
-        auto streamCapabilities = getStreamCapabilityMap(streamType);
-        if (!streamCapabilities.isEmpty())
+        //auto streamCapabilities = getStreamCapabilityMap(streamType);
+        if (!streamCapabilityMaps[streamType].isEmpty())
         {
             auto provider = std::make_unique<StreamCapabilityAdvancedParametersProvider>(
-                this, streamCapabilities, streamType,
+                this,
+                streamCapabilityMaps,
+                traits,
+                streamType,
                 baseResolution ? *baseResolution : QSize());
 
             if (!baseResolution)
@@ -478,8 +419,7 @@ CameraDiagnostics::Result Camera::initializeAdvancedParametersProviders()
         m_defaultAdvancedParametersProvider,
         containerString(m_advancedParametersProvidersByParameterId)));
 
-    if (!advancedParameters.groups.empty())
-        QnCameraAdvancedParamsReader::setParamsToResource(this->toSharedPointer(), advancedParameters);
+    QnCameraAdvancedParamsReader::setParamsToResource(this->toSharedPointer(), advancedParameters);
     return CameraDiagnostics::NoErrorResult();
 }
 
@@ -488,8 +428,8 @@ StreamCapabilityMap Camera::getStreamCapabilityMap(Qn::StreamIndex streamIndex)
     auto defaultStreamCapability = [this](const StreamCapabilityKey& key)
     {
         nx::media::CameraStreamCapability result;
-        result.minBitrateKbps = rawSuggestBitrateKbps(Qn::QualityLowest, key.resolution, 1);
-        result.maxBitrateKbps = rawSuggestBitrateKbps(Qn::QualityHighest, key.resolution, getMaxFps());
+        result.minBitrateKbps = rawSuggestBitrateKbps(Qn::StreamQuality::lowest, key.resolution, 1);
+        result.maxBitrateKbps = rawSuggestBitrateKbps(Qn::StreamQuality::highest, key.resolution, getMaxFps());
         result.maxFps = getMaxFps();
         return result;
     };
@@ -541,6 +481,63 @@ QnAudioTransmitterPtr Camera::getAudioTransmitter()
     return m_audioTransmitter;
 }
 
+void Camera::setLastMediaIssue(const CameraDiagnostics::Result& issue)
+{
+    QnMutexLocker lk(&m_mutex);
+    m_lastMediaIssue = issue;
+}
+
+CameraDiagnostics::Result Camera::getLastMediaIssue() const
+{
+    QnMutexLocker lk(&m_mutex);
+    return m_lastMediaIssue;
+}
+
+QnAbstractStreamDataProvider* Camera::createDataProvider(
+    const QnResourcePtr& resource,
+    Qn::ConnectionRole role)
+{
+    const auto camera = resource.dynamicCast<Camera>();
+    NX_EXPECT(camera);
+    if (!camera)
+        return nullptr;
+
+    if (role == Qn::CR_SecondaryLiveVideo && !camera->hasDualStreaming())
+        return nullptr;
+
+    switch (role)
+    {
+        case Qn::CR_SecondaryLiveVideo:
+        case Qn::CR_Default:
+        case Qn::CR_LiveVideo:
+        {
+            QnAbstractStreamDataProvider* result = camera->createLiveDataProvider();
+            if (result)
+                result->setRole(role);
+            return result;
+        }
+        case Qn::CR_Archive:
+        {
+            if (QnAbstractStreamDataProvider* result = camera->createArchiveDataProvider())
+                return result;
+
+            QnAbstractArchiveDelegate* archiveDelegate = camera->createArchiveDelegate();
+            if (!archiveDelegate)
+                archiveDelegate = new QnServerArchiveDelegate(qnServerModule); // default value
+            if (!archiveDelegate)
+                return nullptr;
+
+            auto archiveReader = new QnArchiveStreamReader(camera);
+            archiveReader->setCycleMode(false);
+            archiveReader->setArchiveDelegate(archiveDelegate);
+            return archiveReader;
+        }
+        default:
+            NX_ASSERT(false, "There are no other roles");
+            break;
+    }
+    return nullptr;
+}
 
 } // namespace resource
 } // namespace mediaserver

@@ -114,7 +114,7 @@ LayoutSelectionDialog::LayoutSelectionDialog(bool singlePick, QWidget* parent, Q
     // Lambda will keep the reference to filterLocalLayouts and filterSharedLayouts
 
     auto setupTreeView =
-        [this, radioButtonDelegate](QnTreeView* treeView)
+        [this, radioButtonDelegate](TreeView* treeView)
         {
             const QnIndents kIndents(1, 0);
             treeView->header()->setStretchLastSection(false);
@@ -145,9 +145,9 @@ LayoutSelectionDialog::LayoutSelectionDialog(bool singlePick, QWidget* parent, Q
             filterSharedLayouts->setFilterFixedString(filter);
         };
 
-    connect(ui->searchLineEdit, &QnSearchLineEdit::textChanged, this, updateFilter);
-    connect(ui->searchLineEdit, &QnSearchLineEdit::enterKeyPressed, this, updateFilter);
-    connect(ui->searchLineEdit, &QnSearchLineEdit::escKeyPressed, this,
+    connect(ui->searchLineEdit, &SearchLineEdit::textChanged, this, updateFilter);
+    connect(ui->searchLineEdit, &SearchLineEdit::enterKeyPressed, this, updateFilter);
+    connect(ui->searchLineEdit, &SearchLineEdit::escKeyPressed, this,
         [this, updateFilter]()
         {
             ui->searchLineEdit->clear();

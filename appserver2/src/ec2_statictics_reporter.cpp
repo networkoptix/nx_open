@@ -14,8 +14,10 @@
 #include <utils/common/app_info.h>
 #include <network/system_helpers.h>
 
-#include "ec2_connection.h"
 #include <licensing/license_validator.h>
+#include <nx_ec/data/api_conversion_functions.h>
+#include <common/common_module.h>
+#include <nx/fusion/serialization/json.h>
 
 static const std::chrono::hours kDefaultSendCycleTime(30 * 24); //< About a month.
 static const std::chrono::hours kSendAfterUpdateTime(3);
@@ -70,14 +72,16 @@ namespace ec2
         for (auto& ms : mediaServers) outData->mediaservers.push_back(std::move(ms));
 
 
-        ApiCameraDataExList cameras;
+        nx::vms::api::CameraDataExList cameras;
         errCode = m_ec2Connection->getCameraManager(Qn::kSystemAccess)->getCamerasExSync(&cameras);
         if (errCode != ErrorCode::ok)
             return errCode;
 
-        for (ApiCameraDataEx& cam: cameras)
+        for (auto& cam: cameras)
+        {
             if (cam.typeId != QnResourceTypePool::kDesktopCameraTypeUuid)
                 outData->cameras.push_back(std::move(cam));
+        }
 
         QnLicenseList licenses;
         errCode = m_ec2Connection->getLicenseManager(Qn::kSystemAccess)->getLicensesSync(&licenses);
@@ -94,17 +98,14 @@ namespace ec2
             outData->licenses.push_back(std::move(statLicense));
         }
 
-        nx::vms::event::RuleList bRules;
-        errCode = m_ec2Connection->getBusinessEventManager(Qn::kSystemAccess)->getBusinessRulesSync(&bRules);
+        nx::vms::api::EventRuleDataList eventRules;
+        errCode = m_ec2Connection->getEventRulesManager(Qn::kSystemAccess)->getEventRulesSync(
+            &eventRules);
         if (errCode != ErrorCode::ok)
             return errCode;
 
-        for (auto& br: bRules)
-        {
-            ApiBusinessRuleData apiData;
-            fromResourceToApi(br, apiData);
-            outData->businessRules.push_back(std::move(apiData));
-        }
+        for (auto& rule: eventRules)
+            outData->businessRules.emplace_back(std::move(rule));
 
         errCode = m_ec2Connection->getLayoutManager(Qn::kSystemAccess)->getLayoutsSync(&outData->layouts);
         if (errCode != ErrorCode::ok)

@@ -18,7 +18,7 @@
 QnResourceTreeModelLayoutNode::QnResourceTreeModelLayoutNode(
     QnResourceTreeModel* model,
     const QnResourcePtr& resource,
-    Qn::NodeType nodeType)
+    NodeType nodeType)
     :
     base_type(model, resource, nodeType)
 {
@@ -66,11 +66,11 @@ void QnResourceTreeModelLayoutNode::deinitialize()
 
 QnResourceAccessSubject QnResourceTreeModelLayoutNode::getOwner() const
 {
-    if (type() == Qn::ResourceNode)
+    if (type() == NodeType::resource)
         return context()->user();
 
     auto owner = parent();
-    if (owner && owner->type() == Qn::SharedLayoutsNode)
+    if (owner && owner->type() == NodeType::sharedLayouts)
         owner = owner->parent();
 
     NX_ASSERT(owner);
@@ -79,10 +79,10 @@ QnResourceAccessSubject QnResourceTreeModelLayoutNode::getOwner() const
         switch (owner->type())
         {
             /* Layout under user. */
-            case Qn::ResourceNode:
+            case NodeType::resource:
                 return owner->resource().dynamicCast<QnUserResource>();
 
-            case Qn::RoleNode:
+            case NodeType::role:
                 return userRolesManager()->userRole(owner->uuid());
 
             default:
@@ -122,7 +122,7 @@ void QnResourceTreeModelLayoutNode::itemAdded(const QnLayoutItemData& item)
         return;
 
     QnResourceTreeModelNodePtr node(new QnResourceTreeModelNode(model(), item.uuid,
-        Qn::LayoutItemNode));
+        NodeType::layoutItem));
     node->initialize();
     node->setParent(toSharedPointer());
 

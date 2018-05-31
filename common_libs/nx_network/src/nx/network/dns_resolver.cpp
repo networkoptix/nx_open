@@ -100,6 +100,9 @@ SystemError::ErrorCode DnsResolver::resolveSync(
     int ipVersion,
     std::deque<HostAddress>* resolvedAddresses)
 {
+    if (m_blockedHosts.count(hostName) > 0)
+        return SystemError::hostNotFound;
+
     for (const auto& resolver: m_resolversByPriority)
     {
         std::deque<AddressEntry> resolvedAddressesEntries;
@@ -152,6 +155,18 @@ void DnsResolver::addEtcHost(const QString& name, std::vector<HostAddress> addre
 void DnsResolver::removeEtcHost(const QString& name)
 {
     m_predefinedHostResolver->removeMapping(name.toStdString());
+}
+
+void DnsResolver::blockHost(const QString& hostName)
+{
+    QnMutexLocker lock(&m_mutex);
+    m_blockedHosts.insert(hostName);
+}
+
+void DnsResolver::unblockHost(const QString& hostName)
+{
+    QnMutexLocker lock(&m_mutex);
+    m_blockedHosts.erase(hostName);
 }
 
 void DnsResolver::registerResolver(std::unique_ptr<AbstractResolver> resolver, int priority)

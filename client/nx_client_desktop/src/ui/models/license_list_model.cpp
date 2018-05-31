@@ -2,6 +2,8 @@
 
 #include <cassert>
 
+#include <translation/datetime_formatter.h>
+
 #include <core/resource/media_server_resource.h>
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/resource_display_info.h>
@@ -115,8 +117,7 @@ QVariant QnLicenseListModel::textData(const QModelIndex& index, bool fullText) c
         case ExpirationDateColumn:
             return license->neverExpire()
                 ? tr("Never")
-                : QDateTime::fromMSecsSinceEpoch(license->expirationTime()).
-                        toString(Qt::DefaultLocaleShortDate);
+                : datetime::toString(QDateTime::fromMSecsSinceEpoch(license->expirationTime()));
 
         case LicenseStatusColumn:
         {

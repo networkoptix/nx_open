@@ -360,46 +360,46 @@ void makeFakeData(const QString& fakeDataString,
         users.push_back(userData);
     }
 
-    std::vector<ec2::ApiCameraData> cameras;
-    std::vector<ec2::ApiCameraAttributesData> userAttrs;
-    ec2::ApiResourceParamWithRefDataList cameraParams;
+    nx::vms::api::CameraDataList cameras;
+    nx::vms::api::CameraAttributesDataList userAttrs;
+    nx::vms::api::ResourceParamWithRefDataList cameraParams;
     auto resTypePtr = qnResTypePool->getResourceTypeByName("Camera");
     NX_ASSERT(!resTypePtr.isNull());
     for (int i = 0; i < camerasCount; ++i)
     {
-        ec2::ApiCameraData cameraData;
+        nx::vms::api::CameraData cameraData;
         cameraData.typeId = resTypePtr->getId();
         cameraData.parentId = serverId;
         cameraData.vendor = "Invalid camera";
         cameraData.physicalId = QnUuid::createUuid().toString();
-        cameraData.id = ec2::ApiCameraData::physicalIdToId(cameraData.physicalId);
+        cameraData.id = nx::vms::api::CameraData::physicalIdToId(cameraData.physicalId);
         cameraData.name = lm("Camera %1").arg(cameraData.id);
         cameras.push_back(std::move(cameraData));
 
-        ec2::ApiCameraAttributesData userAttr;
+        nx::vms::api::CameraAttributesData userAttr;
         userAttr.cameraId = cameraData.id;
         userAttrs.push_back(userAttr);
 
         for (int j = 0; j < propertiesPerCamera; ++j)
         {
-            cameraParams.push_back(ec2::ApiResourceParamWithRefData(
-                cameraData.id, lit("property%1").arg(j), lit("value%1").arg(j)));
+            cameraParams.emplace_back(
+                cameraData.id, lit("property%1").arg(j), lit("value%1").arg(j));
         }
     }
 
-    std::vector<ec2::ApiLayoutData> layouts;
+    std::vector<nx::vms::api::LayoutData> layouts;
     if (camerasPerLayout)
     {
         for (int minCameraOnLayout = 0; minCameraOnLayout < camerasCount;
              minCameraOnLayout += camerasPerLayout)
         {
-            ec2::ApiLayoutData layout;
+            nx::vms::api::LayoutData layout;
             layout.id = QnUuid::createUuid();
             for (int cameraIndex = minCameraOnLayout;
                  cameraIndex < minCameraOnLayout + camerasPerLayout && cameraIndex < camerasCount;
                  ++cameraIndex)
             {
-                ec2::ApiLayoutItemData item;
+                nx::vms::api::LayoutItemData item;
                 item.id = cameras[cameraIndex].id;
                 layout.items.push_back(item);
             }

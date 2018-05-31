@@ -210,7 +210,18 @@ QStringList HanwhaCodecInfo::codecProfiles(AVCodecID codec) const
 
 bool HanwhaCodecInfo::isValid() const
 {
-    return m_isValid;
+    return m_isValid && !m_channelInfo.empty();
+}
+
+void HanwhaCodecInfo::updateToChannel(int channel)
+{
+    NX_ASSERT(!m_channelInfo.empty());
+    if (m_channelInfo.empty())
+        return;
+
+    ChannelInfo channelInfo;
+    channelInfo.emplace(QString::number(channel), std::move(m_channelInfo.begin()->second));
+    m_channelInfo = std::move(channelInfo);
 }
 
 bool HanwhaCodecInfo::parseResponse(const HanwhaResponse& response)

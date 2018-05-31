@@ -2,11 +2,10 @@
 
 #include <chrono>
 
-#include <boost/optional.hpp>
-
 #include <nx/utils/basic_factory.h>
 #include <nx/utils/db/types.h>
 #include <nx/utils/db/query_context.h>
+#include <nx/utils/std/optional.h>
 
 #include "../data/account_data.h"
 
@@ -29,14 +28,13 @@ public:
         nx::utils::db::QueryContext* queryContext,
         const api::AccountData& account) = 0;
 
-    virtual nx::utils::db::DBResult fetchAccountByEmail(
+    virtual std::optional<api::AccountData> fetchAccountByEmail(
         nx::utils::db::QueryContext* queryContext,
-        const std::string& accountEmail,
-        data::AccountData* const accountData) = 0;
+        const std::string& accountEmail) = 0;
 
     virtual nx::utils::db::DBResult fetchAccounts(
         nx::utils::db::QueryContext* queryContext,
-        std::vector<data::AccountData>* accounts) = 0;
+        std::vector<api::AccountData>* accounts) = 0;
 
     // TODO: #ak Replace QDateTime with std::chrono::steady_clock::time_point
     virtual void insertEmailVerificationCode(
@@ -45,7 +43,7 @@ public:
         const std::string& emailVerificationCode,
         const QDateTime& codeExpirationTime) = 0;
 
-    virtual boost::optional<std::string> getVerificationCodeByAccountEmail(
+    virtual std::optional<std::string> getVerificationCodeByAccountEmail(
         nx::utils::db::QueryContext* queryContext,
         const std::string& accountEmail) = 0;
 
@@ -63,14 +61,10 @@ public:
         const std::string& accountEmail,
         std::chrono::system_clock::time_point activationTime) = 0;
 
-    /**
-     * @param activateAccountIfNotActive TODO: #ak Remove this argument.
-     */
     virtual void updateAccount(
         nx::utils::db::QueryContext* queryContext,
         const std::string& accountEmail,
-        const api::AccountUpdateData& accountUpdateData,
-        bool activateAccountIfNotActive) = 0;
+        const api::AccountUpdateData& accountUpdateData) = 0;
 };
 
 //-------------------------------------------------------------------------------------------------

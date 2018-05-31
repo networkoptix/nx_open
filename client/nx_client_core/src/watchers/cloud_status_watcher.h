@@ -32,7 +32,7 @@ public:
     enum ErrorCode
     {
         NoError,
-        InvalidUser,
+        InvalidEmail,
         InvalidPassword,
         AccountNotActivated,
         UnknownError

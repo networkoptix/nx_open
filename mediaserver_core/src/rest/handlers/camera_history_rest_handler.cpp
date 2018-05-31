@@ -8,6 +8,8 @@
 #include <core/resource/camera_history.h>
 #include <rest/server/rest_connection_processor.h>
 
+#include <nx/vms/api/data/camera_history_data.h>
+
 namespace {
 
 static const int kHistoryCacheTimeoutMs = 1000 * 60 * 10;
@@ -70,10 +72,10 @@ LoadDataContext* getContext(const QnUuid& id)
 
 } // namespace
 
-ec2::ApiCameraHistoryItemDataList QnCameraHistoryRestHandler::buildHistoryData(
+nx::vms::api::CameraHistoryItemDataList QnCameraHistoryRestHandler::buildHistoryData(
     const MultiServerPeriodDataList& chunks)
 {
-    ec2::ApiCameraHistoryItemDataList result;
+    nx::vms::api::CameraHistoryItemDataList result;
     std::vector<int> scanPos(chunks.size());
     TimePeriodEx prevPeriod;
 
@@ -84,8 +86,7 @@ ec2::ApiCameraHistoryItemDataList QnCameraHistoryRestHandler::buildHistoryData(
             continue; //< no time advance
         if (prevPeriod.index != period.index)
         {
-            result.push_back(
-                ec2::ApiCameraHistoryItemData(chunks[period.index].guid, period.startTimeMs));
+            result.emplace_back(chunks[period.index].guid, period.startTimeMs);
         }
         prevPeriod = period;
     }
@@ -110,10 +111,10 @@ int QnCameraHistoryRestHandler::executeGet(
     int requestNum = ++staticRequestNum;
     qDebug() << " In progress request QnCameraHistoryRestHandler::executeGet #" << requestNum << "started";
 
-    ec2::ApiCameraHistoryDataList outputData;
+    nx::vms::api::CameraHistoryDataList outputData;
     for (const auto& camera: request.resList)
     {
-        ec2::ApiCameraHistoryData outputRecord;
+        nx::vms::api::CameraHistoryData outputRecord;
         outputRecord.cameraId = camera->getId();
 
         bool isValid = false;
@@ -140,10 +141,10 @@ int QnCameraHistoryRestHandler::executeGet(
 
         // filter time range
         auto comparator = [](
-            const ec2::ApiCameraHistoryItemData& data, qint64 value) -> bool
-        {
-            return data.timestampMs < value;
-        };
+            const auto& data, qint64 value) -> bool
+            {
+                return data.timestampMs < value;
+            };
 
         auto& items = outputRecord.items;
         if (!items.empty())

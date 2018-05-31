@@ -1,5 +1,7 @@
 #include "http_server.h"
 
+#include <memory>
+
 #include <nx/network/cloud/mediator/api/mediator_api_http_paths.h>
 #include <nx/network/url/url_parse_helper.h>
 #include <nx/utils/log/log.h>
@@ -7,10 +9,39 @@
 
 #include "get_listening_peer_list_handler.h"
 #include "../controller.h"
+#include "../statistics/statistics_provider.h"
 
 namespace nx {
 namespace hpm {
 namespace http {
+
+// TODO: #ak Consider moving this class to some common location.
+template<typename ResultType>
+class GetHandler:
+    public nx::network::http::AbstractFusionRequestHandler<void, ResultType>
+{
+public:
+    using FunctorType = nx::utils::MoveOnlyFunc<ResultType()>;
+
+    GetHandler(FunctorType func):
+        m_func(std::move(func))
+    {
+    }
+
+private:
+    FunctorType m_func;
+
+    virtual void processRequest(
+        nx::network::http::HttpServerConnection* const /*connection*/,
+        const nx::network::http::Request& /*request*/,
+        nx::utils::stree::ResourceContainer /*authInfo*/) override
+    {
+        auto data = m_func();
+        this->requestCompleted(nx::network::http::FusionRequestResult(), std::move(data));
+    }
+};
+
+//-------------------------------------------------------------------------------------------------
 
 Server::Server(
     const conf::Settings& settings,
@@ -55,6 +86,21 @@ std::vector<network::SocketAddress> Server::endpoints() const
     return m_endpoints;
 }
 
+const Server::MultiAddressHttpServer& Server::server() const
+{
+    return *m_multiAddressHttpServer;
+}
+
+void Server::registerStatisticsApiHandlers(const stats::Provider& provider)
+{
+    using GetAllStatisticsHandler = GetHandler<stats::Statistics>;
+
+    registerApiHandler<GetAllStatisticsHandler>(
+        network::url::joinPath(api::kMediatorApiPrefix, api::kStatisticsMetricsPath).c_str(),
+        nx::network::http::Method::get,
+        std::bind(&stats::Provider::getAllStatistics, &provider));
+}
+
 bool Server::launchHttpServerIfNeeded(
     const conf::Settings& settings,
     const PeerRegistrator& peerRegistrator,
@@ -96,6 +142,21 @@ bool Server::launchHttpServerIfNeeded(
         registeredPeerPool);
 
     return true;
+}
+
+template<typename Handler, typename Arg>
+void Server::registerApiHandler(
+    const char* path,
+    const nx::network::http::StringType& method,
+    Arg arg)
+{
+    m_httpMessageDispatcher->registerRequestProcessor<Handler>(
+        path,
+        [this, arg]() -> std::unique_ptr<Handler>
+        {
+            return std::make_unique<Handler>(arg);
+        },
+        method);
 }
 
 } // namespace http

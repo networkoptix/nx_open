@@ -45,7 +45,6 @@
 
 #include <helpers/system_weight_helper.h>
 #include <nx_ec/ec_proto_version.h>
-#include <llutil/hardware_id.h>
 
 #include <platform/hardware_information.h>
 
@@ -215,9 +214,9 @@ void storeLocalSystemConnection(
     qnSettings->save();
 }
 
-ec2::ApiClientInfoData clientInfo()
+nx::vms::api::ClientInfoData clientInfo()
 {
-    ec2::ApiClientInfoData clientData;
+    nx::vms::api::ClientInfoData clientData;
     clientData.id = qnSettings->pcUuid();
     clientData.fullVersion = nx::utils::AppInfo::applicationFullVersion();
     clientData.systemInfo = QnSystemInformation::currentSystemInformation().toString();
@@ -595,7 +594,6 @@ void QnWorkbenchConnectHandler::establishConnection(ec2::AbstractECConnectionPtr
     qnClientMessageProcessor->init(connection);
 
     commonModule()->sessionManager()->start();
-    QnResource::startCommandProc();
 
     context()->setUserName(
         connectionInfo.effectiveUserName.isEmpty()
@@ -1155,8 +1153,6 @@ void QnWorkbenchConnectHandler::clearConnection()
     QnAppServerConnectionFactory::setEc2Connection(nullptr);
 
     commonModule()->sessionManager()->stop();
-    QnResource::stopCommandProc();
-
     context()->setUserName(QString());
 
     /* Get ready for the next connection. */

@@ -8,8 +8,8 @@ import requests
 import requests.auth
 
 from framework.api_shortcuts import get_server_id
-from framework.server import TimePeriod
-from framework.utils import Wait
+from framework.installation.mediaserver import TimePeriod
+from framework.waiting import Wait
 
 log = logging.getLogger(__name__)
 
@@ -32,17 +32,16 @@ log = logging.getLogger(__name__)
     'ec2/getCamerasEx',
     'ec2/getUsers',
     ])
-def test_responses_are_equal(network, target_alias, proxy_alias, api_endpoint):
-    _, servers = network
+def test_responses_are_equal(system, target_alias, proxy_alias, api_endpoint):
     wait = Wait("until responses become equal")
-    target_guid = get_server_id(servers[target_alias].api)
+    target_guid = get_server_id(system[target_alias].api)
     while True:
         response_direct = requests.get(
-            servers[target_alias].api.url(api_endpoint),
-            auth=requests.auth.HTTPDigestAuth(servers[target_alias].api.user, servers[target_alias].api.password))
+            system[target_alias].api.url(api_endpoint),
+            auth=requests.auth.HTTPDigestAuth(system[target_alias].api.user, system[target_alias].api.password))
         response_via_proxy = requests.get(
-            servers[proxy_alias].api.url(api_endpoint),
-            auth=requests.auth.HTTPDigestAuth(servers[proxy_alias].api.user, servers[proxy_alias].api.password),
+            system[proxy_alias].api.url(api_endpoint),
+            auth=requests.auth.HTTPDigestAuth(system[proxy_alias].api.user, system[proxy_alias].api.password),
             headers={'X-server-guid': target_guid})
         diff = datadiff.diff(
             response_via_proxy.json(), response_direct.json(),
@@ -50,11 +49,12 @@ def test_responses_are_equal(network, target_alias, proxy_alias, api_endpoint):
             context=100)
         if not diff:
             break
-        if not wait.sleep_and_continue():
+        if not wait.again():
             assert not diff, 'Found difference:\n{}'.format(diff)
+        wait.sleep()
 
-    assert not servers[target_alias].installation.list_core_dumps()
-    assert not servers[proxy_alias].installation.list_core_dumps()
+    assert not system[target_alias].installation.list_core_dumps()
+    assert not system[proxy_alias].installation.list_core_dumps()
 
 
 def assert_server_stream(server, camera, sample_media_file, stream_type, artifact_factory, start_time):
@@ -71,23 +71,22 @@ def assert_server_stream(server, camera, sample_media_file, stream_type, artifac
 # https://networkoptix.atlassian.net/wiki/spaces/SD/pages/23920653/Connection+behind+NAT#ConnectionbehindNAT-test_get_streams
 @pytest.mark.slow
 @pytest.mark.parametrize('layout_file', ['nat-merge_toward_inner.yaml'])
-def test_get_streams(artifact_factory, network, camera, sample_media_file, stream_type):
-    _, servers = network
-    servers['second'].add_camera(camera)
+def test_get_streams(artifact_factory, system, camera, sample_media_file, stream_type):
+    system['inner'].add_camera(camera)
     start_time_1 = datetime(2017, 1, 27, tzinfo=pytz.utc)
-    servers['first'].storage.save_media_sample(camera, start_time_1, sample_media_file)
-    servers['first'].rebuild_archive()
+    system['outer'].storage.save_media_sample(camera, start_time_1, sample_media_file)
+    system['outer'].rebuild_archive()
     start_time_2 = datetime(2017, 2, 27, tzinfo=pytz.utc)
-    servers['second'].storage.save_media_sample(camera, start_time_2, sample_media_file)
-    servers['second'].rebuild_archive()
+    system['inner'].storage.save_media_sample(camera, start_time_2, sample_media_file)
+    system['inner'].rebuild_archive()
     assert_server_stream(
-        servers['second'], camera, sample_media_file, stream_type, artifact_factory, start_time_1)
+        system['inner'], camera, sample_media_file, stream_type, artifact_factory, start_time_1)
     assert_server_stream(
-        servers['first'], camera, sample_media_file, stream_type, artifact_factory, start_time_1)
+        system['outer'], camera, sample_media_file, stream_type, artifact_factory, start_time_1)
     assert_server_stream(
-        servers['second'], camera, sample_media_file, stream_type, artifact_factory, start_time_2)
+        system['inner'], camera, sample_media_file, stream_type, artifact_factory, start_time_2)
     assert_server_stream(
-        servers['first'], camera, sample_media_file, stream_type, artifact_factory, start_time_2)
+        system['outer'], camera, sample_media_file, stream_type, artifact_factory, start_time_2)
 
-    assert not servers['first'].installation.list_core_dumps()
-    assert not servers['second'].installation.list_core_dumps()
+    assert not system['outer'].installation.list_core_dumps()
+    assert not system['inner'].installation.list_core_dumps()

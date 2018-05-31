@@ -25,6 +25,7 @@ namespace ec2
 
     public:
         RemoteEC2Connection(
+            Qn::PeerType peerType,
             const AbstractECConnectionFactory* connectionFactory,
             const QnUuid& remotePeerId,
             const FixedUrlClientQueryProcessorPtr& queryProcessor,
@@ -41,6 +42,7 @@ namespace ec2
         virtual void setTransactionLogTime(Timestamp value) override;
 
     private:
+        Qn::PeerType m_peerType;
         FixedUrlClientQueryProcessorPtr m_queryProcessor;
         QnConnectionInfo m_connectionInfo;
         QnUuid m_remotePeerId;

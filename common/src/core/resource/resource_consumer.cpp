@@ -21,10 +21,7 @@ const QnResourcePtr &QnResourceConsumer::getResource() const
 
 bool QnResourceConsumer::isConnectedToTheResource() const
 {
-    if (m_resource)
-        return m_resource->hasConsumer(const_cast<QnResourceConsumer*>(this));
-    else
-        return false;
+    return m_resource && m_resource->hasConsumer(const_cast<QnResourceConsumer*>(this));
 }
 
 void QnResourceConsumer::disconnectFromResource()

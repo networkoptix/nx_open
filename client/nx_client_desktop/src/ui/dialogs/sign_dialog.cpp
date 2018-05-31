@@ -1,7 +1,10 @@
 #include "sign_dialog.h"
 #include "ui_sign_dialog.h"
 
+#include <client_core/client_core_module.h>
+
 #include "core/resource/avi/avi_resource.h"
+#include <core/dataprovider/data_provider_factory.h>
 #include "nx/streaming/abstract_archive_stream_reader.h"
 
 #include "camera/gl_renderer.h"
@@ -95,8 +98,10 @@ SignDialog::SignDialog(QnResourcePtr checkResource, QWidget* parent):
     m_srcVideoInfo = new QnSignInfo();
 
     m_resource = QnAviResourcePtr(new QnAviResource(checkResource->getUrl()));
-    m_reader.reset(static_cast<QnAbstractArchiveStreamReader*> (
-        m_resource->createDataProvider(Qn::CR_Default)));
+
+    m_reader.reset(qobject_cast<QnAbstractArchiveStreamReader*> (
+        qnClientCoreModule->dataProviderFactory()->createDataProvider(m_resource)));
+
     m_reader->setCycleMode(false);
 
     m_camDispay.reset(new QnSignDialogDisplay(m_resource));

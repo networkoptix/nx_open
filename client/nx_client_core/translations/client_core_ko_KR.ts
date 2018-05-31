@@ -151,17 +151,17 @@
     </message>
     <message>
       <source>Internal %1 error. Please contact support team.</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
       <translation>%1 내부 오류가 발생 했습니다. 지원 팀에 문의 하십시오.</translation>
     </message>
     <message>
       <source>Sorry, %1 Service is temporary unavailable. We are doing our best to restore it. Please try again later.</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
       <translation>%1 서비스는 임시 사용할 수 없습니다. 그것을 복원 위해 최선을 다하고 있습니다. 나중에 다시 시도 하십시오.</translation>
     </message>
     <message>
       <source>Sorry, %1 Service could not process your request. Please try again in a few moments.</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
       <translation>죄송 합니다, %1 서비스 요청을 처리 할수 없습니다. 잠시후 다시 시도 하십시오.</translation>
     </message>
   </context>

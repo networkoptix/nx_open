@@ -60,13 +60,7 @@ public:
     {
     }
 
-    virtual void cancelIOAsync(
-        nx::network::aio::EventType /*eventType*/,
-        nx::utils::MoveOnlyFunc<void()> /*handler*/) override
-    {
-    }
-
-    virtual void cancelIOSync(nx::network::aio::EventType /*eventType*/) override {}
+    virtual void cancelIoInAioThread(nx::network::aio::EventType /*eventType*/) override {}
 
     virtual void pleaseStop(nx::utils::MoveOnlyFunc<void()> /*handler*/) override {}
 

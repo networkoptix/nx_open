@@ -10,6 +10,7 @@
 #include <nx/network/rtsp/rtsp_types.h>
 #include <plugins/resource/hikvision/hikvision_resource.h>
 #include <utils/media/av_codec_helper.h>
+#include <nx/utils/log/log.h>
 
 namespace nx {
 namespace mediaserver_core {
@@ -17,10 +18,10 @@ namespace plugins {
 
 using namespace nx::mediaserver_core::plugins::hikvision;
 
-HikvisionHevcStreamReader::HikvisionHevcStreamReader(const QnResourcePtr& resource):
-    QnRtpStreamReader(resource)
+HikvisionHevcStreamReader::HikvisionHevcStreamReader(const HikvisionResourcePtr& resource):
+    QnRtpStreamReader(resource),
+    m_hikvisionResource(resource)
 {
-    m_hikvisionResource = resource.dynamicCast<HikvisionResource>();
 }
 
 CameraDiagnostics::Result HikvisionHevcStreamReader::openStreamInternal(
@@ -188,7 +189,7 @@ boost::optional<int> HikvisionHevcStreamReader::chooseQuality(
     const ChannelCapabilities& channelCapabilities) const
 {
     const int kStreamQualityCount = 5;
-    if (quality > Qn::StreamQuality::QualityHighest)
+    if (quality > Qn::StreamQuality::highest)
         return boost::none;
 
     return rescaleQuality(
@@ -239,11 +240,11 @@ CameraDiagnostics::Result HikvisionHevcStreamReader::fetchChannelProperties(
             if (statusCode == nx::network::http::StatusCode::Value::unauthorized)
                 return CameraDiagnostics::NotAuthorisedResult(url.toString());
 
-            if (statusCode == nx::network::http::StatusCode::Value::notFound)
+            if (statusCode != nx::network::http::StatusCode::Value::ok)
                 continue;
-
-            return CameraDiagnostics::RequestFailedResult(kRequestName, toString(statusCode));
         }
+        if (statusCode != nx::network::http::StatusCode::Value::ok)
+            return CameraDiagnostics::RequestFailedResult(kRequestName, toString(statusCode));
 
         if (!parseChannelPropertiesResponse(response, outChannelProperties))
             return CameraDiagnostics::CameraResponseParseErrorResult(url.toString(), kRequestName);
@@ -300,7 +301,8 @@ CameraDiagnostics::Result HikvisionHevcStreamReader::configureChannel(
     const bool execTwice = m_previousCodecValue != codec;
     m_previousCodecValue = codec;
 
-    qWarning() << videoChannelConfiguration.toString().toUtf8();
+    NX_VERBOSE(this, lm("video configuration for resource %1: %2")
+        .args(m_resource->getUniqueId(), videoChannelConfiguration.toString().toUtf8()));
     result = doPutRequest(
         channelProperties.httpUrl,
         m_hikvisionResource->getAuth(),

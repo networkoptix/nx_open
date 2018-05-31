@@ -54,7 +54,7 @@ int QnDebugEventsRestHandler::testNetworkIssue(
         vms::event::NetworkIssueEventPtr networkEvent(new vms::event::NetworkIssueEvent(
             camera,
             qnSyncTime->currentUSecsSinceEpoch(),
-            vms::event::EventReason::networkNoFrame,
+            vms::api::EventReason::networkNoFrame,
             param));
 
         qnEventRuleProcessor->processEvent(networkEvent);
@@ -68,7 +68,7 @@ int QnDebugEventsRestHandler::testNetworkIssue(
         vms::event::NetworkIssueEventPtr networkEvent(new vms::event::NetworkIssueEvent(
             camera,
             qnSyncTime->currentUSecsSinceEpoch(),
-            vms::event::EventReason::networkConnectionClosed,
+            vms::api::EventReason::networkConnectionClosed,
             param));
 
         qnEventRuleProcessor->processEvent(networkEvent);
@@ -82,7 +82,7 @@ int QnDebugEventsRestHandler::testNetworkIssue(
         vms::event::NetworkIssueEventPtr networkEvent(new vms::event::NetworkIssueEvent(
             camera,
             qnSyncTime->currentUSecsSinceEpoch(),
-            vms::event::EventReason::networkRtpPacketLoss,
+            vms::api::EventReason::networkRtpPacketLoss,
             param));
 
         qnEventRuleProcessor->processEvent(networkEvent);

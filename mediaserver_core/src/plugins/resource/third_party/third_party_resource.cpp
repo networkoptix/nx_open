@@ -155,16 +155,18 @@ bool QnThirdPartyResource::mergeResourcesIfNeeded( const QnNetworkResourcePtr& n
     //TODO #ak antipattern: calling virtual function from base class
     bool mergedSomething = base_type::mergeResourcesIfNeeded( newResource );
 
-    QString localParams = QnCameraAdvancedParamsReader::encodedParamsFromResource(this->toSharedPointer());
-    QString sourceParams = QnCameraAdvancedParamsReader::encodedParamsFromResource(newResource);
-    if (!sourceParams.isEmpty() && localParams != sourceParams) {
-        QnCameraAdvancedParamsReader::setEncodedParamsToResource(this->toSharedPointer(), sourceParams);
+    const auto localParams = QnCameraAdvancedParamsReader::paramsFromResource(
+        this->toSharedPointer());
+    const auto sourceParams = QnCameraAdvancedParamsReader::paramsFromResource(newResource);
+
+    if (sourceParams != localParams)
+    {
+        QnCameraAdvancedParamsReader::setParamsToResource(this->toSharedPointer(), sourceParams);
         mergedSomething = true;
     }
-    //TODO #ak to make minimal influence on existing code, merging only few properties.
 
-        //But, perharps, other properties should be processed too (in QnResource)
-
+    // TODO: #ak to make minimal influence on existing code, merging only few properties.
+    // But, perharps, other properties should be processed too (in QnResource)
     for( const auto propertyName: PROPERTIES_TO_MERGE )
     {
         const auto newVal = newResource->getProperty( propertyName );
@@ -193,7 +195,7 @@ QnAbstractStreamDataProvider* QnThirdPartyResource::createLiveDataProvider()
     if( !m_camManager )
         return nullptr;
     m_camManager->getRef()->addRef();
-    auto result = new ThirdPartyStreamReader( toSharedPointer(), m_camManager->getRef() );
+    auto result = new ThirdPartyStreamReader( toSharedPointer(this), m_camManager->getRef() );
     unsigned int camCapabilities = 0;
     if (m_camManager->getCameraCapabilities(&camCapabilities) == nxcip::NX_NO_ERROR)
         result->setNeedCorrectTime(camCapabilities & nxcip::BaseCameraManager::relativeTimestampCapability);
@@ -592,7 +594,7 @@ CameraDiagnostics::Result QnThirdPartyResource::initializeCameraDriver()
     }
     if( cameraCapabilities & nxcip::BaseCameraManager::hardwareMotionCapability )
     {
-        //setMotionType( Qn::MT_HardwareGrid );
+        //setMotionType( Qn::MotionType::MT_HardwareGrid );
         setProperty( Qn::MOTION_WINDOW_CNT_PARAM_NAME, 100);
         setProperty( Qn::MOTION_MASK_WINDOW_CNT_PARAM_NAME, 100);
         setProperty( Qn::MOTION_SENS_WINDOW_CNT_PARAM_NAME, 100);
@@ -604,7 +606,7 @@ CameraDiagnostics::Result QnThirdPartyResource::initializeCameraDriver()
     }
     else
     {
-        //setMotionType( Qn::MT_SoftwareGrid );
+        //setMotionType( Qn::MotionType::MT_SoftwareGrid );
         setProperty( Qn::SUPPORTED_MOTION_PARAM_NAME, QStringLiteral("softwaregrid"));
     }
     if( cameraCapabilities & nxcip::BaseCameraManager::shareFpsCapability )

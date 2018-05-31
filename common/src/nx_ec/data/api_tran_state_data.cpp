@@ -6,7 +6,7 @@ namespace ec2 {
 
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(
     (QnTranState)(QnTranStateResponse)(ApiTranSyncDoneData)(ApiSyncRequestData),
-    (ubjson)(xml)(json)(sql_record)(csv_record),
+    (ubjson)(json),
     _Fields)
 
 bool operator<(const QnTranState& left, const QnTranState& right)

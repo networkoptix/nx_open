@@ -2,7 +2,7 @@
 
 #include <ui/workbench/workbench_context_aware.h>
 #include <utils/common/connective.h>
-#include <core/resource/resource_fwd.h>
+#include <core/resource/client_resource_fwd.h>
 #include <nx/utils/uuid.h>
 
 class QnConnectToCurrentSystemTool;

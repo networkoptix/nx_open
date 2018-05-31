@@ -247,7 +247,7 @@ protected:
 
     rest::Handle invokeTrigger(const QString& id,
         std::function<void(bool, rest::Handle)> resultHandler,
-        nx::vms::event::EventState toggleState = nx::vms::event::EventState::undefined);
+        nx::vms::api::EventState toggleState = nx::vms::api::EventState::undefined);
 
 private slots:
     void at_resource_propertyChanged(const QnResourcePtr &resource, const QString &key);

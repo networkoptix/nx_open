@@ -3,11 +3,12 @@
 #include <QtCore/QModelIndex>
 
 class QAbstractItemView;
-class QnTreeView;
 
 namespace nx {
 namespace client {
 namespace desktop {
+
+class TreeView;
 
 enum class BatchToggleMode
 {
@@ -33,16 +34,16 @@ public:
         Qt::KeyboardModifiers prohibitedKeyboardModifiers = Qt::NoModifier);
 
     /* Sets up automatic toggle of check boxes at selected rows when Space key is pressed. */
-    static void autoToggleOnSpaceKey(QnTreeView* view, int checkBoxColumn,
+    static void autoToggleOnSpaceKey(TreeView* view, int checkBoxColumn,
         BatchToggleMode toggleMode = BatchToggleMode::unify);
 
     // Sets up automatic toggle of check boxes when shift-click selection is performed:
     // check boxes in all affected rows are set to the state of originating row check box.
-    static void autoToggleOnShiftClick(QnTreeView* view, int checkBoxColumn);
+    static void autoToggleOnShiftClick(TreeView* view, int checkBoxColumn);
 
     // Default setup for automatic check box toggle.
     // Takes view's selection mode into consideration.
-    static void setupDefaultAutoToggle(QnTreeView* view, int checkBoxColumn);
+    static void setupDefaultAutoToggle(TreeView* view, int checkBoxColumn);
 
 private:
     ItemViewUtils() = default;

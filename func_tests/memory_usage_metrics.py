@@ -46,13 +46,17 @@ def _load_host_free_memory(os_access):
         used_swap=int(used_swap),
         )
 
+
 def _load_server_memory_usage(os_access):
     lines = os_access.run_command(['ps', 'xl']).splitlines()
     idx2column = dict(enumerate(lines[0].split()))
     mediaserver_usage = 0
     lws_usage = 0
     for line in lines[1:]:
-        column2value = {idx2column[idx].lower(): value for idx, value in enumerate(line.split(None, len(idx2column) - 1))}
+        column2value = {
+            idx2column[idx].lower(): value
+            for idx, value
+            in enumerate(line.split(None, len(idx2column) - 1))}
         cmdline = column2value['command']
         rss = int(column2value['rss']) * 1024  # ps output is in kilobytes
         if MEDIASERVER_BINARY_NAME in cmdline:
@@ -63,6 +67,7 @@ def _load_server_memory_usage(os_access):
         mediaserver=mediaserver_usage,
         lws=lws_usage,
         )
+
 
 def load_host_memory_usage(os_access):
     free_memory = _load_host_free_memory(os_access)

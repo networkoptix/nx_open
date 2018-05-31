@@ -7,13 +7,11 @@ set(depends
 
 # Variables used by build-dist.sh.
 set(common_depends
-    "libstdc++6 (>= 4.1.1)"
     "zlib1g (>= 1:1.1.4)"
     "debconf (>= 0.5) | debconf-2.0"
     "python"
-    "upstart-job"
     "psmisc"
-    "upstart (>= 0.6.5-8)"
+    "systemd | upstart (>= 0.6.5-8)"
     "libsm6"
     "libice6"
     "libaudio2"

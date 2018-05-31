@@ -1,7 +1,7 @@
 #pragma once
 
 #include <nx_ec/ec_api_fwd.h>
-#include <nx_ec/data/api_layout_tour_data.h>
+#include <nx/vms/api/data/layout_tour_data.h>
 #include <nx_ec/impl/ec_api_impl.h>
 #include <nx_ec/impl/sync_handler.h>
 
@@ -11,7 +11,9 @@ class AbstractLayoutTourNotificationManager: public QObject
 {
     Q_OBJECT
 signals:
-    void addedOrUpdated(const ec2::ApiLayoutTourData& layout, ec2::NotificationSource source);
+    void addedOrUpdated(
+        const nx::vms::api::LayoutTourData& tour,
+        ec2::NotificationSource source);
     void removed(const QnUuid& id);
 };
 
@@ -26,7 +28,7 @@ public:
     virtual ~AbstractLayoutTourManager() {}
 
     /*!
-    \param handler Functor with params: (ErrorCode, const ApiLayoutTourDataList&)
+    \param handler Functor with params: (ErrorCode, const LayoutTourDataList&)
     */
     template<class TargetType, class HandlerType>
     int getLayoutTours(TargetType* target, HandlerType handler)
@@ -36,22 +38,25 @@ public:
                 target, handler)));
     }
 
-    ErrorCode getLayoutToursSync(ec2::ApiLayoutTourDataList* const layoutsList)
+    ErrorCode getLayoutToursSync(nx::vms::api::LayoutTourDataList* const toursList)
     {
         return impl::doSyncCall<impl::GetLayoutToursHandler>(
             [this](impl::GetLayoutToursHandlerPtr handler)
             {
                 this->getLayoutTours(handler);
-            }, layoutsList);
+            }, toursList);
     }
 
     /*!
     \param handler Functor with params: (ErrorCode)
     */
     template<class TargetType, class HandlerType>
-    int save(const ec2::ApiLayoutTourData& layout, TargetType* target, HandlerType handler)
+    int save(
+        const nx::vms::api::LayoutTourData& tour,
+        TargetType* target,
+        HandlerType handler)
     {
-        return save(layout, std::static_pointer_cast<impl::SimpleHandler>(
+        return save(tour, std::static_pointer_cast<impl::SimpleHandler>(
             std::make_shared<impl::CustomSimpleHandler<TargetType, HandlerType>>(
                 target, handler)));
     }
@@ -69,7 +74,7 @@ public:
 
 protected:
     virtual int getLayoutTours(impl::GetLayoutToursHandlerPtr handler) = 0;
-    virtual int save(const ec2::ApiLayoutTourData& tour, impl::SimpleHandlerPtr handler) = 0;
+    virtual int save(const nx::vms::api::LayoutTourData& tour, impl::SimpleHandlerPtr handler) = 0;
     virtual int remove(const QnUuid& tourId, impl::SimpleHandlerPtr handler) = 0;
 };
 

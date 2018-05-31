@@ -53,11 +53,6 @@
       <translation>ระบบ %1 ที่ค้นพบมีเวอร์ชันที่เข้ากันไม่ได้ %2</translation>
     </message>
     <message>
-      <source>Cannot connect to the other System because current System is already connected to %1.</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-      <translation>ไม่สามารถเชื่อมต่อกับระบบอื่นได้เนื่องจากระบบปัจจุบันได้เชื่อมต่อกับ %1 แล้ว</translation>
-    </message>
-    <message>
       <source>The discovered System %1 is in safe mode.</source>
       <comment>%1 is name of System</comment>
       <translation>ระบบที่ค้นพบ %1 อยู่ในเซฟโหมด</translation>
@@ -66,16 +61,6 @@
       <source>Could not configure the remote System %1.</source>
       <comment>%1 is name of System</comment>
       <translation>ไม่สามารถกำหนดค่าระบบจากระยะไกล %1</translation>
-    </message>
-    <message>
-      <source>Both Systems are connected to %1. Merge is not allowed.</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-      <translation>ทั้งสองระบบเชื่อมต่อกับ %1 ไม่รวม Merge</translation>
-    </message>
-    <message>
-      <source>These Systems are built with different %1 URL. Merge is not allowed.</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-      <translation>ระบบเหล่านี้สร้างขึ้นด้วย URL %1 ต่างกัน ไม่รวม Merge</translation>
     </message>
     <message>
       <source>New System</source>
@@ -87,9 +72,24 @@
       <translation>ระบบค้นพบ %1 ไม่สามารถทำงานร่วมกับระบบปัจจุบันได้</translation>
     </message>
     <message>
+      <source>Cannot connect to the other System because current System is already connected to %1.</source>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
+      <translation>ไม่สามารถเชื่อมต่อกับระบบอื่นได้เนื่องจากระบบปัจจุบันได้เชื่อมต่อกับ %1 แล้ว</translation>
+    </message>
+    <message>
       <source>%1 System can only be merged with non-%1. System name and password are taken from %1 System.</source>
-      <comment>%1 is the short cloud name (like &apos;Cloud&apos;)</comment>
-      <translation>%1 ระบบสามารถรวมเข้ากับ non-%1เท่านั้น ชื่อระบบและรหัสผ่านจะถูกนำมาจาก %1 ระบบ</translation>
+      <comment>%1 is the short cloud name (like Cloud)</comment>
+      <translation type="unfinished">%1 System can only be merged with non-%1. System name and password are taken from %1 System.</translation>
+    </message>
+    <message>
+      <source>Both Systems are connected to %1. Merge is not allowed.</source>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
+      <translation>ทั้งสองระบบเชื่อมต่อกับ %1 ไม่รวม Merge</translation>
+    </message>
+    <message>
+      <source>These Systems are built with different %1 URL. Merge is not allowed.</source>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
+      <translation>ระบบเหล่านี้สร้างขึ้นด้วย URL %1 ต่างกัน ไม่รวม Merge</translation>
     </message>
   </context>
   <context>
@@ -577,8 +577,8 @@
       <translation>ข้อผิดพลาดที่ไม่รู้จัก</translation>
     </message>
     <message>
-      <source>Server with matching Hardware Id not found</source>
-      <translation>ไม่พบเซิร์ฟเวอร์ที่มี Id ฮาร์ดแวร์ที่ตรงกัน</translation>
+      <source>Server with matching Hardware ID not found</source>
+      <translation>ไม่พบเซิร์ฟเวอร์ที่มี ID ฮาร์ดแวร์ที่ตรงกัน</translation>
     </message>
   </context>
   <context>
@@ -694,12 +694,12 @@
       <translation>ลายน้ำ: %1</translation>
     </message>
     <message>
-      <source>Hardware Id: %1</source>
-      <translation>รหัสฮาร์ดแวร์: %1</translation>
-    </message>
-    <message>
       <source>Time License</source>
       <translation>เวลาใบอนุญาต</translation>
+    </message>
+    <message>
+      <source>Hardware ID: %1</source>
+      <translation>รหัสฮาร์ดแวร์: %1</translation>
     </message>
   </context>
   <context>

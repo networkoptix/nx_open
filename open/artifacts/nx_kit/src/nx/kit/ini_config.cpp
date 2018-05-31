@@ -11,6 +11,7 @@
 #include <string>
 #include <cstdlib>
 #include <cerrno>
+#include <algorithm>
 
 #if !defined(NX_INI_CONFIG_DEFAULT_OUTPUT)
     #define NX_INI_CONFIG_DEFAULT_OUTPUT &std::cerr
@@ -51,6 +52,21 @@ std::string toString(const T& value)
     std::ostringstream os;
     os << value;
     return os.str();
+}
+
+static void stringReplaceAllChars(std::string* s, char sample, char replacement)
+{
+    std::transform(s->cbegin(), s->cend(), s->begin(),
+        [=](char c) { return c == sample ? replacement : c; });
+}
+
+static void stringInsertAfterAll(std::string* s, char sample, const char* const insertion)
+{
+    for (int i = (int) s->size() - 1; i >= 0; --i)
+    {
+        if ((*s)[i] == sample)
+            s->insert((size_t) (i + 1), insertion);
+    }
 }
 
 /**
@@ -167,10 +183,14 @@ struct AbstractParam
         if (output)
         {
             const char* const prefix = (error[0] != '\0') ? "!!! " : (eqDefault ? "    " : "  * ");
-            const char* const descriptionPrefix = (description[0] == '\0') ? "" : " # ";
-
-            *output << prefix << value << valueNameSeparator << name << error
-                << descriptionPrefix << description << std::endl;
+            std::string descriptionStr;
+            if (description[0])
+            {
+                descriptionStr = std::string(" # ") + description;
+                stringReplaceAllChars(&descriptionStr, '\n', ' ');
+            }
+            *output << prefix << value << valueNameSeparator << name << error << descriptionStr
+                << std::endl;
         }
     }
 };
@@ -506,8 +526,12 @@ void IniConfig::Impl::createDefaultIniFile(std::ostream* output)
     for (const auto& param: params)
     {
         std::string description = param->description;
-        if (description.size() > 0)
+        if (!description.empty())
+        {
             description += " ";
+            stringInsertAfterAll(&description, '\n', "# ");
+        }
+
         file << "# " << description << "Default: " << param->defaultValueStr() << "\n";
         file << param->name << "=" << param->defaultValueStr() << "\n";
         file << "\n";
@@ -542,34 +566,34 @@ void IniConfig::Impl::reload()
         return;
 
     std::ostringstream outputString;
-    std::ostream* s = output() ? &outputString : nullptr;
+    std::ostream* out = output() ? &outputString : nullptr;
 
     bool outputIsNeeded = firstTimeReload;
 
     if (iniFileExists)
     {
-        if (s)
-            *s << iniFile << " [" << iniFilePath << "]" << std::endl;
-        if (!parseIniFile(s, &outputIsNeeded))
+        if (out)
+            *out << iniFile << " [" << iniFilePath << "]" << std::endl;
+        if (!parseIniFile(out, &outputIsNeeded))
         {
-            if (s)
+            if (out)
             {
-                *s << "    ATTENTION: .ini file is empty; filling in defaults." << std::endl;
+                *out << "    ATTENTION: .ini file is empty; filling in defaults." << std::endl;
                 outputIsNeeded = true;
             }
-            createDefaultIniFile(s);
+            createDefaultIniFile(out);
         }
     }
     else
     {
-        if (s)
-            *s << iniFile << " (absent) To fill in defaults, touch " << iniFilePath << std::endl;
+        if (out)
+            *out << iniFile << " (absent) To fill in defaults, touch " << iniFilePath << std::endl;
         iniMap.clear();
     }
 
-    reloadParams(iniFileExists ? s : nullptr, &outputIsNeeded);
+    reloadParams(iniFileExists ? out : nullptr, &outputIsNeeded);
 
-    if (s && outputIsNeeded)
+    if (out && outputIsNeeded)
         *Impl::output() << outputString.str();
 
     if (firstTimeReload)

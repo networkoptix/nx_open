@@ -69,9 +69,9 @@ public:
         auto streamSocket = base_type::takeSocket();
         if (!m_dataToParse.isEmpty())
         {
-            auto bufferedSocket =
-                std::make_unique<nx::network::BufferedStreamSocket>(std::move(streamSocket));
-            bufferedSocket->injectRecvData(m_dataToParse);
+            auto bufferedSocket = std::make_unique<nx::network::BufferedStreamSocket>(
+                std::move(streamSocket),
+                m_dataToParse);
             streamSocket = std::move(bufferedSocket);
         }
         return streamSocket;

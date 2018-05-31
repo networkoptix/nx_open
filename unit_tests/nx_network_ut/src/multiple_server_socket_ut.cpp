@@ -272,7 +272,6 @@ protected:
             auto clientSocket = m_serverSocket->accept();
             if (clientSocket)
                 ++m_socketsAccepted;
-            delete clientSocket;
         }
         const auto endTime = system_clock::now();
         m_testRunDuration = duration_cast<milliseconds>(endTime - startTime);

@@ -53,11 +53,6 @@
       <translation>%1 sistemi %2 sistemi ile uyumsuzdur.</translation>
     </message>
     <message>
-      <source>Cannot connect to the other System because current System is already connected to %1.</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-      <translation>Sistem zaten %1 e bağlı olduğundan başka sisteme bağlanılamıyor.</translation>
-    </message>
-    <message>
       <source>The discovered System %1 is in safe mode.</source>
       <comment>%1 is name of System</comment>
       <translation>%1 güvenli modda çalışıyor.</translation>
@@ -66,16 +61,6 @@
       <source>Could not configure the remote System %1.</source>
       <comment>%1 is name of System</comment>
       <translation>%1 sistemi yapılandırılamadı.</translation>
-    </message>
-    <message>
-      <source>Both Systems are connected to %1. Merge is not allowed.</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-      <translation>Iki sistem birden %1 e bağlı. Birleştirme mümkün değil.</translation>
-    </message>
-    <message>
-      <source>These Systems are built with different %1 URL. Merge is not allowed.</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-      <translation>%1 sisteminin URL i bu sistemlerden farklı. Birleştirme mümkün değil.</translation>
     </message>
     <message>
       <source>New System</source>
@@ -87,9 +72,24 @@
       <translation>Bulunan %1 Sistemi geçerli sistemi ile uyuşmuyor.</translation>
     </message>
     <message>
+      <source>Cannot connect to the other System because current System is already connected to %1.</source>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
+      <translation>Sistem zaten %1 e bağlı olduğundan başka sisteme bağlanılamıyor.</translation>
+    </message>
+    <message>
       <source>%1 System can only be merged with non-%1. System name and password are taken from %1 System.</source>
-      <comment>%1 is the short cloud name (like &apos;Cloud&apos;)</comment>
+      <comment>%1 is the short cloud name (like Cloud)</comment>
       <translation>%1 Sistem yalnızca %1 olmayan biriyle birleştirilebilir. Sistem adı ve şifre %1 Sisteminden alınmıştır.</translation>
+    </message>
+    <message>
+      <source>Both Systems are connected to %1. Merge is not allowed.</source>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
+      <translation>Iki sistem birden %1 e bağlı. Birleştirme mümkün değil.</translation>
+    </message>
+    <message>
+      <source>These Systems are built with different %1 URL. Merge is not allowed.</source>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
+      <translation>%1 sisteminin URL i bu sistemlerden farklı. Birleştirme mümkün değil.</translation>
     </message>
   </context>
   <context>
@@ -581,8 +581,8 @@
       <translation>Bilinmeyen Hata</translation>
     </message>
     <message>
-      <source>Server with matching Hardware Id not found</source>
-      <translation>Sunucu İle Eşleşen Donanım Id'si Bulunamadı</translation>
+      <source>Server with matching Hardware ID not found</source>
+      <translation>Sunucu İle Eşleşen Donanım ID'si Bulunamadı</translation>
     </message>
   </context>
   <context>
@@ -704,12 +704,12 @@
       <translation>Watermark: %1</translation>
     </message>
     <message>
-      <source>Hardware Id: %1</source>
-      <translation>Donanım Kimliği: %1</translation>
-    </message>
-    <message>
       <source>Time License</source>
       <translation>Deneme Lisansı</translation>
+    </message>
+    <message>
+      <source>Hardware ID: %1</source>
+      <translation>Donanım Kimliği: %1</translation>
     </message>
   </context>
   <context>

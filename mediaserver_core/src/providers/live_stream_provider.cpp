@@ -147,7 +147,7 @@ void QnLiveStreamProvider::setRole(Qn::ConnectionRole role)
     if (role == roleForAnalytics && qnServerModule)
     {
         auto pool = qnServerModule->metadataManagerPool();
-        m_videoDataReceptor = pool->mediaDataReceptor(m_cameraRes->getId());
+        m_videoDataReceptor = pool->createVideoDataReceptor(m_cameraRes->getId());
     }
 }
 
@@ -196,8 +196,8 @@ QnLiveStreamParams QnLiveStreamProvider::mergeWithAdvancedParams(const QnLiveStr
     if (params.bitrateKbps == 0)
     {
         const bool isSecondary = m_role == Qn::CR_SecondaryLiveVideo;
-        if (params.quality == Qn::QualityNotDefined)
-            params.quality = isSecondary ? Qn::QualityLow : Qn::QualityNormal;
+        if (params.quality == Qn::StreamQuality::undefined)
+            params.quality = isSecondary ? Qn::StreamQuality::low : Qn::StreamQuality::normal;
 
         params.bitrateKbps = m_cameraRes->suggestBitrateForQualityKbps(
             params.quality, params.resolution, params.fps, m_role);
@@ -258,7 +258,7 @@ void QnLiveStreamProvider::onStreamResolutionChanged( int /*channelNumber*/, con
 void QnLiveStreamProvider::updateSoftwareMotion()
 {
 #ifdef ENABLE_SOFTWARE_MOTION_DETECTION
-    if (m_cameraRes->getMotionType() == Qn::MT_SoftwareGrid && getRole() == roleForMotionEstimation())
+    if (m_cameraRes->getMotionType() == Qn::MotionType::MT_SoftwareGrid && getRole() == roleForMotionEstimation())
     {
         for (int i = 0; i < m_videoChannels; ++i)
         {
@@ -315,7 +315,7 @@ float QnLiveStreamProvider::getDefaultFps() const
 bool QnLiveStreamProvider::needAnalyzeMotion(Qn::ConnectionRole /*role*/)
 {
     return m_role == roleForMotionEstimation()
-        && m_cameraRes->getMotionType() == Qn::MT_SoftwareGrid;
+        && m_cameraRes->getMotionType() == Qn::MotionType::MT_SoftwareGrid;
 }
 
 bool QnLiveStreamProvider::isMaxFps() const
@@ -331,10 +331,10 @@ bool QnLiveStreamProvider::needMetadata()
         return true;
 
     bool needHardwareMotion = getRole() == Qn::CR_LiveVideo
-        && (m_cameraRes->getMotionType() == Qn::MT_HardwareGrid
-            || m_cameraRes->getMotionType() == Qn::MT_MotionWindow);
+        && (m_cameraRes->getMotionType() == Qn::MotionType::MT_HardwareGrid
+            || m_cameraRes->getMotionType() == Qn::MotionType::MT_MotionWindow);
 
-    if (m_cameraRes->getMotionType() == Qn::MT_SoftwareGrid)
+    if (m_cameraRes->getMotionType() == Qn::MotionType::MT_SoftwareGrid)
     {
 #ifdef ENABLE_SOFTWARE_MOTION_DETECTION
         if (needAnalyzeMotion(getRole()))
@@ -399,16 +399,9 @@ VideoDataReceptorPtr QnLiveStreamProvider::getVideoDataReceptorForMetadataPlugin
         if (needToAnalyzeFrame && needToAnalyzeStream)
             videoDataReceptor = m_videoDataReceptor.toStrongRef();
     }
-    if (!videoDataReceptor)
-    {
-        *outNeedUncompressedFrame = false;
-    }
-    else
-    {
-        *outNeedUncompressedFrame =
-           videoDataReceptor->acceptedFrameKind() ==
-               VideoDataReceptor::AcceptedFrameKind::uncompressed;
-    }
+
+    *outNeedUncompressedFrame =
+        videoDataReceptor && !videoDataReceptor->neededUncompressedPixelFormats().empty();
 
     return videoDataReceptor;
 }
@@ -486,12 +479,7 @@ void QnLiveStreamProvider::onGotVideoFrame(
     if (videoDataReceptor)
     {
         NX_VERBOSE(this) << "Pushing to receptor, timestamp:" << compressedFrame->timestamp;
-
-        // NOTE: In case uncompressedFrame is passed, compressedFrame is not passed to avoid its
-        // potential deep-copying.
-        videoDataReceptor->putFrame(
-            uncompressedFrame ? nullptr : compressedFrame,
-            uncompressedFrame);
+        videoDataReceptor->putFrame(compressedFrame, uncompressedFrame);
     }
 
 #endif // ENABLE_SOFTWARE_MOTION_DETECTION
@@ -536,7 +524,7 @@ QnAbstractCompressedMetadataPtr QnLiveStreamProvider::getMetadata()
     }
 
 #ifdef ENABLE_SOFTWARE_MOTION_DETECTION
-    if (m_cameraRes->getMotionType() == Qn::MT_SoftwareGrid)
+    if (m_cameraRes->getMotionType() == Qn::MotionType::MT_SoftwareGrid)
         return m_motionEstimation[m_softMotionLastChannel].getMotion();
     else
 #endif

@@ -48,7 +48,7 @@
        <number>0</number>
       </property>
       <item>
-       <widget class="QnSearchLineEdit" name="searchLineEdit" native="true"/>
+       <widget class="nx::client::desktop::SearchLineEdit" name="searchLineEdit" native="true"/>
       </item>
       <item>
        <widget class="QScrollArea" name="scrollArea">
@@ -114,7 +114,7 @@
               <number>0</number>
              </property>
              <item>
-              <widget class="QnTreeView" name="sharedTreeView">
+              <widget class="nx::client::desktop::TreeView" name="sharedTreeView">
                <property name="sizePolicy">
                 <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
                  <horstretch>0</horstretch>
@@ -181,7 +181,7 @@
               <number>0</number>
              </property>
              <item>
-              <widget class="QnTreeView" name="localTreeView">
+              <widget class="nx::client::desktop::TreeView" name="localTreeView">
                <property name="sizePolicy">
                 <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
                  <horstretch>0</horstretch>
@@ -290,15 +290,15 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>QnSearchLineEdit</class>
+   <class>nx::client::desktop::SearchLineEdit</class>
    <extends>QWidget</extends>
-   <header location="global">ui/widgets/common/search_line_edit.h</header>
+   <header location="global">nx/client/desktop/common/widgets/search_line_edit.h</header>
    <container>1</container>
   </customwidget>
   <customwidget>
-   <class>QnTreeView</class>
+   <class>nx::client::desktop::TreeView</class>
    <extends>QTreeView</extends>
-   <header location="global">ui/widgets/common/tree_view.h</header>
+   <header location="global">nx/client/desktop/common/widgets/tree_view.h</header>
   </customwidget>
   <customwidget>
    <class>nx::client::desktop::AlertBar</class>

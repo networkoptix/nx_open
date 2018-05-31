@@ -13,6 +13,9 @@ class NX_UPDATE_API CommonUpdates2Manager:
 public:
     CommonUpdates2Manager(QnCommonModule* commonModule);
 
+protected:
+    virtual QnUuid peerId() const override;
+
 private:
     virtual void loadStatusFromFile() override;
     virtual update::info::AbstractUpdateRegistryPtr getGlobalRegistry() override;
@@ -21,7 +24,6 @@ private:
     virtual void writeStatusToFile(const manager::detail::Updates2StatusDataEx& statusData) override;
     virtual void remoteUpdateCompleted() override {}
     virtual bool isClient() const override;
-    virtual QnUuid peerId() const override;
 
     void connectToSignals();
 };

@@ -124,7 +124,9 @@ class CloudAccountFactory(object):
 
     def create_cloud_account(self, account_idx):
         cloud_email = CloudEmail(self._cloud_group, self._customization, account_idx)
-        cloud_account = CloudAccount(self._cloud_group, self._customization, self._cloud_host, cloud_email.email, CLOUD_ACCOUNT_PASSWORD)
+        cloud_account = CloudAccount(
+            self._cloud_group, self._customization, self._cloud_host,
+            cloud_email.email, CLOUD_ACCOUNT_PASSWORD)
         self.ensure_email_exists(cloud_account, cloud_email)
         return cloud_account
 
@@ -135,7 +137,9 @@ class CloudAccountFactory(object):
         except HttpError as x:
             result_code = x.json.get('resultCode')
             assert result_code in ['notAuthorized', 'accountNotActivated'], repr(result_code)
-            assert self._autotest_email_password, '--autotest-email-password must be provided to activate %r' % cloud_email.email
+            if not self._autotest_email_password:
+                raise RuntimeError(
+                    '--autotest-email-password must be provided to activate {!r}'.format(cloud_email.email))
             with IMAPConnection(IMAP_HOST, AUTOTEST_LOGIN_EMAIL, self._autotest_email_password) as imap_connection:
                 imap_connection.delete_old_activation_messages(cloud_email.email)
                 if result_code == 'notAuthorized':
@@ -143,7 +147,10 @@ class CloudAccountFactory(object):
                     cloud_account.register_user(cloud_email.first_name, cloud_email.last_name)
                 else:
                     cloud_account.resend_activation_code()
-                code = imap_connection.fetch_activation_code(cloud_account.host, cloud_email.email, FETCH_ACTIVATION_EMAIL_TIMEOUT)
+                code = imap_connection.fetch_activation_code(
+                    cloud_account.hostname,
+                    cloud_email.email,
+                    FETCH_ACTIVATION_EMAIL_TIMEOUT)
             cloud_account.activate_user(code)
             user_info = cloud_account.get_user_info()
         assert user_info.get('statusCode') == 'activated'
@@ -152,12 +159,15 @@ class CloudAccountFactory(object):
             cloud_account.set_user_customization(self._customization)
             user_info = cloud_account.get_user_info()
             assert user_info['customization'] == self._customization, repr(user_info)
-        log.info('Email %r for cloud group %r is valid and belongs to customization %r',
+        log.info(
+            'Email %r for cloud group %r is valid and belongs to customization %r',
             cloud_email.email, self._cloud_group, self._customization)
 
 
 def resolve_cloud_host_from_registry(cloud_group, customization):
-    log.info('Resolving cloud host for cloud group %r, customization %r on %r:', cloud_group, customization, CLOUD_HOST_REGISTRY_URL)
+    log.info(
+        'Resolving cloud host for cloud group %r, customization %r on %r:',
+        cloud_group, customization, CLOUD_HOST_REGISTRY_URL)
     response = requests.get(
         CLOUD_HOST_REGISTRY_URL,
         params=dict(group=cloud_group, vms_customization=customization),

@@ -70,18 +70,18 @@ static QString codecToString(AVCodecID codecId)
     switch(codecId)
     {
         case AV_CODEC_ID_H265:
-            return lit("video/hevc");
+            return "video/hevc";
         case AV_CODEC_ID_H264:
-            return lit("video/avc");
+            return "video/avc";
         case AV_CODEC_ID_H263:
         case AV_CODEC_ID_H263P:
-            return lit("video/3gpp");
+            return "video/3gpp";
         case AV_CODEC_ID_MPEG4:
-            return lit("video/mp4v-es");
+            return "video/mp4v-es";
         case AV_CODEC_ID_MPEG2VIDEO:
-            return lit("video/mpeg2");
+            return "video/mpeg2";
         case AV_CODEC_ID_VP8:
-            return lit("video/x-vnd.on2.vp8");
+            return "video/x-vnd.on2.vp8";
         default:
             return QString();
     }
@@ -99,7 +99,7 @@ static void fillInputBuffer(
 
 #define CHECK_GL_ERROR \
     if (const auto error = funcs->glGetError()) \
-        qDebug() << lit("gl error %1").arg(error); \
+        qDebug() << QString("gl error %1").arg(error); \
 
 } // namespace
 
@@ -183,11 +183,11 @@ class AndroidVideoDecoderPrivate: public QObject
     AndroidVideoDecoder *q_ptr;
 
 public:
-    AndroidVideoDecoderPrivate(const ResourceAllocatorPtr& allocator):
+    AndroidVideoDecoderPrivate(const RenderContextSynchronizerPtr& synchronizer):
         frameNumber(0),
         initialized(false),
         javaDecoder("com/networkoptix/nxwitness/media/QnVideoDecoder"),
-        allocator(allocator),
+        synchronizer(synchronizer),
         program(nullptr)
     {
         registerNativeMethods();
@@ -244,7 +244,7 @@ private:
     qint64 frameNumber;
     bool initialized;
     QAndroidJniObject javaDecoder;
-    ResourceAllocatorPtr allocator;
+    RenderContextSynchronizerPtr synchronizer;
     QSize frameSize;
 
     std::unique_ptr<FboManager> fboManager;
@@ -394,10 +394,11 @@ void AndroidVideoDecoderPrivate::createGlResources()
 // AndroidVideoDecoder
 
 AndroidVideoDecoder::AndroidVideoDecoder(
-    const ResourceAllocatorPtr& allocator, const QSize& /*resolution*/)
+    const RenderContextSynchronizerPtr& synchronizer,
+    const QSize& /*resolution*/)
     :
     AbstractVideoDecoder(),
-    d(new AndroidVideoDecoderPrivate(allocator))
+    d(new AndroidVideoDecoderPrivate(synchronizer))
 {
     #if defined(USE_SHARED_CTX) && !defined(USE_GUI_RENDERING)
         QOpenGLContext* sharedContext = QOpenGLContext::globalShareContext();
@@ -409,7 +410,7 @@ AndroidVideoDecoder::AndroidVideoDecoder(
 
             if (d->threadGlCtx->create() && d->threadGlCtx->shareContext())
             {
-                NX_DEBUG(this, lit("Using shared openGL ctx"));
+                NX_DEBUG(this, "Using shared openGL ctx");
                 d->offscreenSurface.reset(new QOffscreenSurface());
                 d->offscreenSurface->setFormat(d->threadGlCtx->format());
                 d->offscreenSurface->create();
@@ -576,7 +577,7 @@ int AndroidVideoDecoder::decode(const QnConstCompressedVideoDataPtr& frame, QVid
         }
         else
         {
-            d->allocator->execAtGlThread(
+            d->synchronizer->execInRenderContext(
                 [&fboToRender, this](void*)
                 {
                     fboToRender = d->renderFrameToFbo();
@@ -585,7 +586,8 @@ int AndroidVideoDecoder::decode(const QnConstCompressedVideoDataPtr& frame, QVid
         }
     #endif
 
-    NX_VERBOSE(this, lit("got frame num %1 decode time1=%2 time2=%3").arg(outFrameNum).arg(time1).arg(tm.elapsed()));
+    NX_VERBOSE(this, lm("got frame num %1 decode time1=%2 time2=%3").args(
+        outFrameNum, time1, tm.elapsed()));
 
     QAbstractVideoBuffer* buffer = new TextureBuffer (std::move(fboToRender), d);
     QVideoFrame* videoFrame = new QVideoFrame(buffer, d->frameSize, QVideoFrame::Format_BGR32);

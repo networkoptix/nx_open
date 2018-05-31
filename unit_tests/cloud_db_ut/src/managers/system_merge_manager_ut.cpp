@@ -9,13 +9,13 @@
 #include <nx/utils/std/cpp14.h>
 #include <nx/utils/thread/sync_queue.h>
 
-#include <nx/cloud/cdb/ec2/synchronization_engine.h>
+#include <nx/data_sync_engine/synchronization_engine.h>
 #include <nx/cloud/cdb/managers/system_merge_manager.h>
 #include <nx/cloud/cdb/settings.h>
 #include <nx/cloud/cdb/stree/cdb_ns.h>
+#include <nx/cloud/cdb/test_support/base_persistent_data_test.h>
 #include <nx/cloud/cdb/test_support/business_data_generator.h>
 
-#include "base_persistent_data_test.h"
 #include "system_health_info_provider_stub.h"
 #include "system_manager_stub.h"
 #include "vms_gateway_stub.h"
@@ -184,7 +184,7 @@ private:
     SystemManagerStub m_systemManagerStub;
     SystemHealthInfoProviderStub m_systemHealthInfoProviderStub;
     VmsGatewayStub m_vmsGatewayStub;
-    std::unique_ptr<ec2::SyncronizationEngine> m_syncronizationEngine;
+    std::unique_ptr<data_sync_engine::SyncronizationEngine> m_syncronizationEngine;
     std::unique_ptr<cdb::SystemMergeManager> m_systemMergeManager;
     nx::utils::SyncQueue<api::ResultCode> m_mergeResults;
     boost::optional<std::future<void>> m_systemMergeManagerDestroyed;
@@ -199,7 +199,7 @@ private:
 
         m_ownerAccount = insertRandomAccount();
 
-        m_syncronizationEngine = std::make_unique<ec2::SyncronizationEngine>(
+        m_syncronizationEngine = std::make_unique<data_sync_engine::SyncronizationEngine>(
             QnUuid::createUuid(),
             m_settings.p2pDb(),
             &queryExecutor());

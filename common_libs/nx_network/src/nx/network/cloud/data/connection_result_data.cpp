@@ -38,6 +38,11 @@ SystemError::ErrorCode toSystemErrorCode(NatTraversalResultCode resultCode)
     }
 }
 
+std::string toString(NatTraversalResultCode code)
+{
+    return QnLexical::serialized(code).toStdString();
+}
+
 //-------------------------------------------------------------------------------------------------
 
 ConnectionResultRequest::ConnectionResultRequest():

@@ -20,6 +20,7 @@
 #include <ui/workaround/sharp_pixmap_painting.h>
 
 #include <nx/utils/log/log.h>
+#include <nx/fusion/serialization/lexical.h>
 #include <ini.h>
 
 using nx::client::core::Geometry;
@@ -40,29 +41,10 @@ static inline bool isOdd(int value)
     return (value & 1) != 0;
 }
 
-static const char * statusToString(Qn::ThumbnailStatus status)
-{
-    switch (status)
-    {
-    case Qn::ThumbnailStatus::Invalid:
-        return "Invalid";
-    case Qn::ThumbnailStatus::Loading:
-        return "Loading";
-    case Qn::ThumbnailStatus::Loaded:
-        return "Loaded";
-    case Qn::ThumbnailStatus::NoData:
-        return "NoData";
-    case Qn::ThumbnailStatus::Refreshing:
-        return "Refreshing";
-    default:
-        return "UnknownStatus";
-    }
-}
-
 } // namespace
 
 using ResourceThumbnailProviderPtr = QSharedPointer<ResourceThumbnailProvider>;
-using QnImageProviderPtr = QSharedPointer<QnImageProvider>;
+using ImageProviderPtr = QSharedPointer<ImageProvider>;
 
 struct LayoutThumbnailLoader::Private
 {
@@ -81,7 +63,7 @@ struct LayoutThumbnailLoader::Private
         // Resource to be loaded. Can be empty when we load a background
         QnResourcePtr resource;
         // Image provider that deals with loading process
-        QnImageProviderPtr provider;
+        ImageProviderPtr provider;
         // Last status for an item
         Qn::ThumbnailStatus status;
         // Desired rotation for a tile.
@@ -122,7 +104,7 @@ struct LayoutThumbnailLoader::Private
         setPaletteColor(nonCameraWidget.data(), QPalette::WindowText, qnGlobals->errorTextColor());
     }
 
-    //ItemPtr trackLoader(const QnResourcePtr& resource, QnImageProviderPtr loader)
+    //ItemPtr trackLoader(const QnResourcePtr& resource, ImageProviderPtr loader)
     // Allocate a new item to be tracked.
     ItemPtr newItem()
     {
@@ -201,7 +183,7 @@ struct LayoutThumbnailLoader::Private
         ItemPtr item)
     {
         bool loaderIsComplete = false;
-        QString strStatus = QString::fromLocal8Bit(statusToString(status));
+        QString strStatus = QnLexical::serialized(status);
 
         NX_VERBOSE(this) << "LayoutThumbnailLoader(" << layoutName << ") item ="
             << item->name
@@ -552,7 +534,7 @@ void LayoutThumbnailLoader::doLoadAsync()
     // Pretty name for debug output
     d->layoutName = d->layout->getName();
     if (d->layoutName.isEmpty())
-        d->layoutName = lit("Nameless");
+        d->layoutName = lit("<Layout>");
 
     QSize outputSize(bounding.width() * xscale, bounding.height() * yscale);
     d->outputImage = QImage(outputSize, QImage::Format_ARGB32_Premultiplied);
@@ -587,7 +569,7 @@ void LayoutThumbnailLoader::doLoadAsync()
         // We connect only to statusChanged event.
         // We expect that provider sends signals in a proper order
         // and it already has generated image.
-        connect(item->provider.data(), &QnImageProvider::statusChanged, this,
+        connect(item->provider.data(), &ImageProvider::statusChanged, this,
             [this, item](Qn::ThumbnailStatus status)
             {
                 if (status == Qn::ThumbnailStatus::Loaded)
@@ -640,7 +622,7 @@ void LayoutThumbnailLoader::doLoadAsync()
         // We connect only to statusChanged event.
         // We expect that provider sends signals in a proper order
         // and it already has generated image.
-        connect(thumbnailItem->provider.data(), &QnImageProvider::statusChanged, this,
+        connect(thumbnailItem->provider.data(), &ImageProvider::statusChanged, this,
             [this, thumbnailItem, zoomRect](Qn::ThumbnailStatus status)
             {
                 QnAspectRatio sourceAr(thumbnailItem->provider->sizeHint());

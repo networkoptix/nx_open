@@ -416,7 +416,7 @@ void QnVideowallItemWidget::updateLayout()
         m_layoutThumbnailProvider.reset(
             new LayoutThumbnailLoader(m_layout, previewSize, nx::api::ImageRequest::kLatestThumbnail));
 
-        connect(m_layoutThumbnailProvider.get(), &QnImageProvider::statusChanged,
+        connect(m_layoutThumbnailProvider.get(), &ImageProvider::statusChanged,
             this, &QnVideowallItemWidget::at_updateThumbnailStatus);
 
         m_layoutThumbnailProvider->setResourcePool(resourcePool());

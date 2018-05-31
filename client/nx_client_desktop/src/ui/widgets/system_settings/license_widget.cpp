@@ -79,7 +79,7 @@ QnLicenseWidget::QnLicenseWidget(QWidget *parent) :
     {
         const QString emailLink = makeMailHref(licensingAddress, licensingAddress);
         activationText =
-            tr("Please send email with License Key and Hardware Id provided to %1 to obtain an Activation Key file.")
+            tr("Please send email with License Key and Hardware ID provided to %1 to obtain an Activation Key file.")
             .arg(emailLink);
     }
     else
@@ -90,7 +90,7 @@ QnLicenseWidget::QnLicenseWidget(QWidget *parent) :
             + makeHref(licensingAddress, licensingAddress)
             + kLineBreak;
         activationText =
-            tr("Please send License Key and Hardware Id provided to %1 to obtain an Activation Key file.")
+            tr("Please send License Key and Hardware ID provided to %1 to obtain an Activation Key file.")
             .arg(siteLink);
     }
 
@@ -236,7 +236,7 @@ void QnLicenseWidget::at_browseLicenseFileButton_clicked()
     QString fileName = QnFileDialog::getOpenFileName(this,
                                                      tr("Open License File"),
                                                      QString(),
-                                                     tr("All files (*.*)"),
+                                                     tr("All files") + lit(" (*.*)"),
                                                      0,
                                                      QnCustomFileDialog::fileDialogOptions());
     if (fileName.isEmpty())

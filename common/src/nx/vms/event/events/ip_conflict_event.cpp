@@ -13,7 +13,8 @@ IpConflictEvent::IpConflictEvent(
     const QStringList& macAddrList,
     qint64 timeStamp)
     :
-    base_type(cameraIpConflictEvent, resource, timeStamp,
+    base_type(
+        EventType::cameraIpConflictEvent, resource, timeStamp,
         address.toString(), macAddrList.join(delimiter()))
 {
 }

@@ -16,10 +16,10 @@ import time
 
 import pytest
 
+from framework.installation.mediaserver import MEDIASERVER_MERGE_TIMEOUT
 from framework.merging import merge_systems, setup_local_system
-from framework.server import MEDIASERVER_MERGE_TIMEOUT
-from framework.utils import SimpleNamespace, datetime_utc_now, bool_to_str
-
+from framework.os_access.path import copy_file
+from framework.utils import SimpleNamespace, bool_to_str, datetime_utc_now
 
 SERVER_CONFIG = dict(
     one=SimpleNamespace(
@@ -43,40 +43,43 @@ def db_version(request):
 
 
 @pytest.fixture
-def one(linux_servers_pool, bin_dir, db_version):
-    return server('one', linux_servers_pool, bin_dir, db_version)
+def one(two_stopped_mediaservers, bin_dir, db_version):
+    one, _ = two_stopped_mediaservers
+    yield server('one', one, bin_dir, db_version)
+
 
 @pytest.fixture
-def two(linux_servers_pool, bin_dir, db_version):
-    return server('two', linux_servers_pool, bin_dir, db_version)
+def two(two_stopped_mediaservers, bin_dir, db_version):
+    _, two = two_stopped_mediaservers
+    yield server('two', two, bin_dir, db_version)
 
 
-def server(name, linux_servers_pool, bin_dir, db_version):
+def server(name, mediaserver, bin_dir, db_version):
     server_config = SERVER_CONFIG[name]
     if db_version == '2.4':
         config_file_params = dict(
             guidIsHWID='no',
             serverGuid=server_config.SERVER_GUID,
             minStorageSpace=1024*1024,  # 1M
-            )
-        server = linux_servers_pool.get(name, config_file_params=config_file_params)
-        copy_database_file(server, bin_dir, server_config.DATABASE_FILE_V_2_4)
-    else:
-        server = linux_servers_pool.get(name)
-    server.start()
+        )
+        mediaserver.installation.update_mediaserver_conf(config_file_params)
+        copy_database_file(mediaserver, bin_dir, server_config.DATABASE_FILE_V_2_4)
+    mediaserver.start()
     system_settings = dict(autoDiscoveryEnabled=bool_to_str(False))
-    setup_local_system(server, {'systemSettings': system_settings})
-    server.api.api.systemSettings.GET(statisticsAllowed=False)
+    setup_local_system(mediaserver, system_settings)
+    mediaserver.api.api.systemSettings.GET(statisticsAllowed=False)
     if db_version == '2.4':
-        check_camera(server, server_config.CAMERA_GUID)
-    return server
+        check_camera(mediaserver, server_config.CAMERA_GUID)
+    return mediaserver
+
 
 def copy_database_file(server, bin_dir, backup_db_filename):
     backup_db_path = bin_dir / backup_db_filename
     assert backup_db_path.exists(), (
         "Binary artifact required for this test (database file) '%s' does not exist." % backup_db_path)
     server_db_path = server.installation.dir / MEDIASERVER_DATABASE_PATH
-    server.machine.os_access.put_file(backup_db_path, server_db_path)
+    copy_file(backup_db_path, server.machine.Path(server_db_path))
+
 
 def check_camera(server, camera_guid):
     cameras = [c for c in server.api.ec2.getCameras.GET() if c['id'] == camera_guid]

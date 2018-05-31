@@ -31,7 +31,7 @@ public:
     static const char* NETOPTIX_SECONDARY_TOKEN;
     */
 
-    QnOnvifStreamReader(const QnResourcePtr& res);
+    QnOnvifStreamReader(const QnPlOnvifResourcePtr& res);
     virtual ~QnOnvifStreamReader();
     virtual QnConstResourceAudioLayoutPtr getDPAudioLayout() const override;
     virtual void pleaseStop() override;
@@ -40,7 +40,8 @@ public:
     void setMustNotConfigureResource(bool mustNotConfigureResource);
 protected:
     virtual QnAbstractMediaDataPtr getNextData() override;
-    virtual CameraDiagnostics::Result openStreamInternal(bool isCameraControlRequired, const QnLiveStreamParams& params) override;
+    virtual CameraDiagnostics::Result openStreamInternal(bool isCameraControlRequired,
+        const QnLiveStreamParams& params) override;
     virtual void preStreamConfigureHook() {}
     virtual void postStreamConfigureHook() {}
 
@@ -56,20 +57,29 @@ private:
 
     bool isGotFrame(QnCompressedVideoDataPtr videoData);
 
-    CameraDiagnostics::Result updateCameraAndFetchStreamUrl( QString* const streamUrl, bool isCameraControlRequired, const QnLiveStreamParams& params);
-    CameraDiagnostics::Result updateCameraAndFetchStreamUrl( bool isPrimary, QString* const streamUrl, bool isCameraControlRequired, const QnLiveStreamParams& params ) const;
+    CameraDiagnostics::Result updateCameraAndFetchStreamUrl(QString* const streamUrl,
+        bool isCameraControlRequired, const QnLiveStreamParams& params);
+    CameraDiagnostics::Result updateCameraAndFetchStreamUrl(
+        bool isPrimary, QString* const streamUrl, bool isCameraControlRequired,
+        const QnLiveStreamParams& params) const;
 
-    //Returned pointers are valid while response object is living. (For all functions in the following block)
-    CameraDiagnostics::Result fetchUpdateVideoEncoder(MediaSoapWrapper& soapWrapper, CameraInfoParams& info, bool isPrimary, bool isCameraControlRequired, const QnLiveStreamParams& params) const;
-    CameraDiagnostics::Result fetchUpdateAudioEncoder(MediaSoapWrapper& soapWrapper, CameraInfoParams& info, bool isPrimary, bool isCameraControlRequired) const;
+    // Returned pointers are valid while response object is living.
+    // (For all functions in the following block.)
+    CameraDiagnostics::Result fetchUpdateVideoEncoder( MediaSoapWrapper& soapWrapper,
+        CameraInfoParams& info, bool isPrimary, bool isCameraControlRequired,
+        const QnLiveStreamParams& params) const;
+    CameraDiagnostics::Result fetchUpdateAudioEncoder(MediaSoapWrapper& soapWrapper,
+        CameraInfoParams& info, bool isPrimary, bool isCameraControlRequired) const;
 
-    CameraDiagnostics::Result fetchUpdateProfile(MediaSoapWrapper& soapWrapper, CameraInfoParams& info, bool isPrimary, bool isCameraControlRequired) const;
-    Profile* fetchExistingProfile(const ProfilesResp& response, bool isPrimary, CameraInfoParams& info) const;
+    CameraDiagnostics::Result fetchUpdateProfile(MediaSoapWrapper& soapWrapper,
+        CameraInfoParams& info, bool isPrimary, bool isCameraControlRequired) const;
+    Profile* fetchExistingProfile(
+        const ProfilesResp& response, bool isPrimary, CameraInfoParams& info) const;
     CameraDiagnostics::Result sendProfileToCamera(CameraInfoParams& info, Profile* profile) const;
     CameraDiagnostics::Result createNewProfile(const QString& name, const QString& token) const;
 
-
-    //Returned pointers are valid while response object is living. (For all functions in the following block)
+    // Returned pointers are valid while response object is living.
+    // (For all functions in the following block.)
     VideoEncoder* fetchVideoEncoder(VideoConfigsResp& response, bool isPrimary) const;
     AudioEncoder* fetchAudioEncoder(AudioConfigsResp& response, bool isPrimary) const;
     void fetchProfile(ProfilesResp& response, ProfilePair& profiles, bool isPrimary) const;
@@ -77,13 +87,16 @@ private:
 
     void updateAudioEncoder(AudioEncoder& encoder, bool isPrimary) const;
 
-    CameraDiagnostics::Result sendProfileToCamera(CameraInfoParams& info, Profile& profile, bool create = false) const;
+    CameraDiagnostics::Result sendProfileToCamera(
+        CameraInfoParams& info, Profile& profile, bool create = false) const;
     CameraDiagnostics::Result sendVideoSourceToCamera(VideoSource& source) const;
     CameraDiagnostics::Result sendAudioEncoderToCamera(AudioEncoder& encoder) const;
 
-    CameraDiagnostics::Result fetchStreamUrl(MediaSoapWrapper& soapWrapper, const QString& profileToken, bool isPrimary, QString* const mediaUrl) const;
+    CameraDiagnostics::Result fetchStreamUrl(MediaSoapWrapper& soapWrapper,
+        const QString& profileToken, bool isPrimary, QString* const mediaUrl) const;
 
-    void updateVideoEncoderParams(onvifXsd__VideoEncoderConfiguration* config, bool isPrimary) const;
+    void updateVideoEncoderParams(
+        onvifXsd__VideoEncoderConfiguration* config, bool isPrimary) const;
 
     void printProfile(const Profile& profile, bool isPrimary) const;
 
@@ -102,7 +115,7 @@ private:
     QString m_streamUrl;
     QElapsedTimer m_cachedTimer;
     QnLiveStreamParams m_previousStreamParams;
-    bool m_mustNotConfigureResource;
+    bool m_mustNotConfigureResource = false;
 };
 
 #endif //ENABLE_ONVIF

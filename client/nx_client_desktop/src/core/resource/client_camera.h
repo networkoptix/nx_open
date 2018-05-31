@@ -23,6 +23,10 @@ public:
         const QnVirtualCameraResourcePtr& camera,
         const QAuthenticator& authenticator);
 
+    static QnAbstractStreamDataProvider* createDataProvider(
+        const QnResourcePtr& resource,
+        Qn::ConnectionRole role);
+
 signals:
     void dataDropped(QnArchiveStreamReader* reader);
 

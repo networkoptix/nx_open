@@ -21,7 +21,7 @@ QnWorkbenchPanicWatcher::~QnWorkbenchPanicWatcher() {
     foreach(const QnResourcePtr &resource, resourcePool()->getResources())
         at_resourcePool_resourceRemoved(resource);
 
-    disconnect(resourcePool(), NULL, this, NULL);
+    resourcePool()->disconnect(this);
 }
 
 void QnWorkbenchPanicWatcher::updatePanicMode() {
@@ -52,10 +52,12 @@ void QnWorkbenchPanicWatcher::at_resourcePool_resourceAdded(const QnResourcePtr 
     updatePanicMode();
 }
 
-void QnWorkbenchPanicWatcher::at_resourcePool_resourceRemoved(const QnResourcePtr &resource) {
-    QnMediaServerResourcePtr server = resource.dynamicCast<QnMediaServerResource>();
-    if(!server)
+void QnWorkbenchPanicWatcher::at_resourcePool_resourceRemoved(const QnResourcePtr& resource)
+{
+    const auto server = resource.dynamicCast<QnMediaServerResource>();
+    if (!server)
         return;
-    disconnect(server.data(), NULL, this, NULL);
+
+    server->disconnect(this);
     updatePanicMode();
 }

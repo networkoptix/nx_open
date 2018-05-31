@@ -14,7 +14,7 @@
 #include <client/client_settings.h>
 
 #include <nx/client/desktop/ui/actions/action_manager.h>
-#include <ui/common/aligner.h>
+#include <nx/client/desktop/common/utils/aligner.h>
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
 #include <ui/style/custom_style.h>
@@ -225,7 +225,7 @@ void QnDisconnectFromCloudDialogPrivate::showFailure(const QString &message)
     Q_Q(QnDisconnectFromCloudDialog);
 
     QnMessageBox::critical(q,
-        tr("Failed to disconnect System from %1", "%1 is the cloud name (like 'Nx Cloud')")
+        tr("Failed to disconnect System from %1", "%1 is the cloud name (like Nx Cloud)")
             .arg(nx::network::AppInfo::cloudName()),
         message);
 
@@ -321,13 +321,13 @@ bool QnDisconnectFromCloudDialogPrivate::validateAuth()
 QString QnDisconnectFromCloudDialogPrivate::disconnectQuestionMessage() const
 {
     return tr("Disconnect System from %1?",
-        "%1 is the cloud name (like 'Nx Cloud')").arg(nx::network::AppInfo::cloudName());
+        "%1 is the cloud name (like Nx Cloud)").arg(nx::network::AppInfo::cloudName());
 }
 
 QString QnDisconnectFromCloudDialogPrivate::allUsersDisabledMessage() const
 {
     return setWarningStyleHtml(tr("All %1 users will be deleted.",
-        "%1 is the short cloud name (like 'Cloud')")
+        "%1 is the short cloud name (like Cloud)")
         .arg(nx::network::AppInfo::shortCloudName()));
 }
 
@@ -398,7 +398,7 @@ void QnDisconnectFromCloudDialogPrivate::setupResetPasswordPage()
     q->setText(tr("Set local owner password"));
     q->setInformativeText(
         tr("You will not be able to connect to this System with your %1 account after you disconnect this System from %1.",
-            "%1 is the cloud name (like 'Nx Cloud')")
+            "%1 is the cloud name (like Nx Cloud)")
             .arg(nx::network::AppInfo::cloudName()));
 
     authorizeWidget->hide(); /*< we are still parent of this widget to make sure it won't leak */
@@ -495,7 +495,7 @@ void QnDisconnectFromCloudDialogPrivate::createAuthorizeWidget()
 
     layout->addWidget(authorizePasswordField);
 
-    QnAligner* aligner = new QnAligner(authorizeWidget);
+    Aligner* aligner = new Aligner(authorizeWidget);
     aligner->registerTypeAccessor<InputField>(InputField::createLabelWidthAccessor());
     aligner->addWidget(loginField);
     aligner->addWidget(authorizePasswordField);
@@ -545,7 +545,7 @@ void QnDisconnectFromCloudDialogPrivate::createResetPasswordWidget()
     resetPasswordWidget->setFocusPolicy(Qt::TabFocus);
     resetPasswordWidget->setFocusProxy(resetPasswordField);
 
-    QnAligner* aligner = new QnAligner(resetPasswordWidget);
+    Aligner* aligner = new Aligner(resetPasswordWidget);
     aligner->registerTypeAccessor<InputField>(InputField::createLabelWidthAccessor());
     aligner->addWidgets({
         loginField,

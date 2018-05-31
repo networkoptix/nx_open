@@ -24,10 +24,10 @@ const QByteArray Rule::kGuidPostfix("vms_businessrule");
 
 Rule::Rule() :
     m_id(),
-    m_eventType(undefinedEvent),
+    m_eventType(EventType::undefinedEvent),
     m_eventState(EventState::active), //< By default, rule triggers on toggle event start.
                                //< For example, if motion starts/stops, send alert on start only.
-    m_actionType(undefinedAction),
+    m_actionType(ActionType::undefinedAction),
     m_aggregationPeriod(0),
     m_disabled(false),
     m_system(false)
@@ -292,22 +292,22 @@ RuleList Rule::getDefaultRules()
 {
     RuleList result;
     //                         Id     period   isSystem  actionType       eventType              subjects   allUsers
-    result << RulePtr(new Rule(1,     30,      false,    showPopupAction, cameraDisconnectEvent, {},        true));
-    result << RulePtr(new Rule(2,     30,      false,    showPopupAction, storageFailureEvent,   {},        true));
-    result << RulePtr(new Rule(3,     30,      false,    showPopupAction, networkIssueEvent,     {},        true));
-    result << RulePtr(new Rule(4,     30,      false,    showPopupAction, cameraIpConflictEvent, {},        true));
-    result << RulePtr(new Rule(5,     30,      false,    showPopupAction, serverFailureEvent,    {},        true));
-    result << RulePtr(new Rule(6,     30,      false,    showPopupAction, serverConflictEvent,   {},        true));
-    result << RulePtr(new Rule(7,     21600,   false,    sendMailAction,  cameraDisconnectEvent, kOwnerRoleIds));
-    result << RulePtr(new Rule(8,     24*3600, false,    sendMailAction,  storageFailureEvent,   kOwnerRoleIds));
-    result << RulePtr(new Rule(9,     21600,   false,    sendMailAction,  networkIssueEvent,     kOwnerRoleIds));
-    result << RulePtr(new Rule(10,    21600,   false,    sendMailAction,  cameraIpConflictEvent, kOwnerRoleIds));
-    result << RulePtr(new Rule(11,    21600,   false,    sendMailAction,  serverFailureEvent,    kOwnerRoleIds));
-    result << RulePtr(new Rule(12,    21600,   false,    sendMailAction,  serverConflictEvent,   kOwnerRoleIds));
-    result << RulePtr(new Rule(10020, 21600,   false,    sendMailAction,  serverStartEvent,      kOwnerRoleIds));
+    result << RulePtr(new Rule(1,     30,      false, ActionType::showPopupAction, EventType::cameraDisconnectEvent, {},        true));
+    result << RulePtr(new Rule(2,     30,      false, ActionType::showPopupAction, EventType::storageFailureEvent,   {},        true));
+    result << RulePtr(new Rule(3,     30,      false, ActionType::showPopupAction, EventType::networkIssueEvent,     {},        true));
+    result << RulePtr(new Rule(4,     30,      false, ActionType::showPopupAction, EventType::cameraIpConflictEvent, {},        true));
+    result << RulePtr(new Rule(5,     30,      false, ActionType::showPopupAction, EventType::serverFailureEvent,    {},        true));
+    result << RulePtr(new Rule(6,     30,      false, ActionType::showPopupAction, EventType::serverConflictEvent,   {},        true));
+    result << RulePtr(new Rule(7,     21600,   false, ActionType::sendMailAction,  EventType::cameraDisconnectEvent, kOwnerRoleIds));
+    result << RulePtr(new Rule(8,     24*3600, false, ActionType::sendMailAction, EventType::storageFailureEvent,   kOwnerRoleIds));
+    result << RulePtr(new Rule(9,     21600,   false, ActionType::sendMailAction, EventType::networkIssueEvent,     kOwnerRoleIds));
+    result << RulePtr(new Rule(10,    21600,   false, ActionType::sendMailAction, EventType::cameraIpConflictEvent, kOwnerRoleIds));
+    result << RulePtr(new Rule(11,    21600,   false, ActionType::sendMailAction, EventType::serverFailureEvent,    kOwnerRoleIds));
+    result << RulePtr(new Rule(12,    21600,   false, ActionType::sendMailAction, EventType::serverConflictEvent,   kOwnerRoleIds));
+    result << RulePtr(new Rule(10020, 21600,   false, ActionType::sendMailAction, EventType::serverStartEvent,      kOwnerRoleIds));
 
-    result << RulePtr(new Rule(10022, 21600,   false,    sendMailAction,  licenseIssueEvent,     kOwnerRoleIds));
-    result << RulePtr(new Rule(10023, 30,      false,    showPopupAction, licenseIssueEvent,     {},        true));
+    result << RulePtr(new Rule(10022, 21600,   false, ActionType::sendMailAction, EventType::licenseIssueEvent,     kOwnerRoleIds));
+    result << RulePtr(new Rule(10023, 30,      false, ActionType::showPopupAction, EventType::licenseIssueEvent,     {},        true));
 
     result << getSystemRules() << getRulesUpd43() << getRulesUpd48();
     return result;
@@ -316,39 +316,39 @@ RuleList Rule::getDefaultRules()
 RuleList Rule::getSystemRules()
 {
     return { //          Id      period isSystem  actionType         eventType
-        RulePtr(new Rule(900013, 30,    true,     diagnosticsAction, cameraDisconnectEvent)),
-        RulePtr(new Rule(900014, 30,    true,     diagnosticsAction, storageFailureEvent)),
-        RulePtr(new Rule(900015, 30,    true,     diagnosticsAction, networkIssueEvent)),
-        RulePtr(new Rule(900016, 30,    true,     diagnosticsAction, cameraIpConflictEvent)),
-        RulePtr(new Rule(900017, 30,    true,     diagnosticsAction, serverFailureEvent)),
-        RulePtr(new Rule(900018, 30,    true,     diagnosticsAction, serverConflictEvent)),
-        RulePtr(new Rule(900019, 0,     true,     diagnosticsAction, serverStartEvent)),
-        RulePtr(new Rule(900021, 30,    true,     diagnosticsAction, licenseIssueEvent))
+        RulePtr(new Rule(900013, 30,    true, ActionType::diagnosticsAction, EventType::cameraDisconnectEvent)),
+        RulePtr(new Rule(900014, 30,    true, ActionType::diagnosticsAction, EventType::storageFailureEvent)),
+        RulePtr(new Rule(900015, 30,    true, ActionType::diagnosticsAction, EventType::networkIssueEvent)),
+        RulePtr(new Rule(900016, 30,    true, ActionType::diagnosticsAction, EventType::cameraIpConflictEvent)),
+        RulePtr(new Rule(900017, 30,    true, ActionType::diagnosticsAction, EventType::serverFailureEvent)),
+        RulePtr(new Rule(900018, 30,    true, ActionType::diagnosticsAction, EventType::serverConflictEvent)),
+        RulePtr(new Rule(900019, 0,     true, ActionType::diagnosticsAction, EventType::serverStartEvent)),
+        RulePtr(new Rule(900021, 30,    true, ActionType::diagnosticsAction, EventType::licenseIssueEvent))
     };
 }
 
 RuleList Rule::getRulesUpd43()
 {
     return {//           Id      period isSystem actionType         eventType         subjects allUsers
-        RulePtr(new Rule(24,     0,     false,   showPopupAction,   userDefinedEvent, {},      true)),
-        RulePtr(new Rule(900022, 0,     true,    diagnosticsAction, userDefinedEvent))
+        RulePtr(new Rule(24,     0,     false, ActionType::showPopupAction, EventType::userDefinedEvent, {},      true)),
+        RulePtr(new Rule(900022, 0,     true, ActionType::diagnosticsAction, EventType::userDefinedEvent))
     };
 }
 
 RuleList Rule::getRulesUpd48()
 {
     return {//           Id      period isSystem actionType         eventType            subjects allUsers
-        RulePtr(new Rule(900023, 0,     false,   showPopupAction,   backupFinishedEvent, {},      true)),
-        RulePtr(new Rule(900024, 0,     true,    diagnosticsAction, backupFinishedEvent))
+        RulePtr(new Rule(900023, 0,     false, ActionType::showPopupAction, EventType::backupFinishedEvent, {},      true)),
+        RulePtr(new Rule(900024, 0,     true, ActionType::diagnosticsAction, EventType::backupFinishedEvent))
     };
 }
 
-RuleList Rule::getDisabledRulesUpd48()
+RuleList Rule::getDisabledRulesUpd43()
 {
-    // Removing extra business rule, that was added through Rule::getRulesUpd48()
+    // Removing extra business rule, that was added through Rule::getRulesUpd43()
     // Required to implement 'Omit db logging' feature.
     return {//           Id      period isSystem actionType         eventType            subjects allUsers
-        RulePtr(new Rule(900024, 0,     true,    diagnosticsAction, backupFinishedEvent))
+        RulePtr(new Rule(900022, 0,     true,    ActionType::diagnosticsAction, EventType::userDefinedEvent))
     };
 }
 

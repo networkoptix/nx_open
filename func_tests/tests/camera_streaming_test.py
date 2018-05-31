@@ -5,7 +5,6 @@ import time
 import pytest
 
 from framework.api_shortcuts import get_server_id
-from framework.merging import merge_systems
 
 log = logging.getLogger(__name__)
 
@@ -38,6 +37,7 @@ def wait_for_and_check_camera_history(camera, server_list, expected_servers_orde
     ts_seq = [item['timestampMs'] for item in camera_history_responses[0][0]['items']]
     assert ts_seq == sorted(ts_seq)  # timestamps must be in sorted order
 
+
 # https://networkoptix.atlassian.net/browse/TEST-181
 # transport check part (3):
 def check_media_stream_transports(server):
@@ -50,20 +50,19 @@ def check_media_stream_transports(server):
                 transports = set()
                 for codec_rec in value['streams']:
                     transports |= set(codec_rec['transports'])
-                log.info('Server %s returned following transports for camera %s: %s',
+                log.info('Mediaserver %s returned following transports for camera %s: %s',
                          server, camera_info['physicalId'], ', '.join(sorted(transports)))
                 assert transports == EXPECTED_TRANSPORT_LIST, repr(transports)
                 break
         else:
             pytest.fail('ec2/getCamerasEx addParams element does not have "mediaStreams" record')
 
+
 # https://networkoptix.atlassian.net/browse/TEST-178
 # https://networkoptix.atlassian.net/wiki/spaces/SD/pages/77234376/Camera+history+test
 @pytest.mark.testcam
-def test_camera_switching_should_be_represented_in_history(artifact_factory, linux_servers_pool, camera):
-    one = linux_servers_pool.get('one')
-    two = linux_servers_pool.get('two')
-    merge_systems(one, two)
+def test_camera_switching_should_be_represented_in_history(artifact_factory, two_merged_mediaservers, camera):
+    one, two = two_merged_mediaservers
 
     camera.start_streaming()
     camera.wait_until_discovered_by_server([one, two])
@@ -87,4 +86,3 @@ def test_camera_switching_should_be_represented_in_history(artifact_factory, lin
 
     assert not one.installation.list_core_dumps()
     assert not two.installation.list_core_dumps()
-

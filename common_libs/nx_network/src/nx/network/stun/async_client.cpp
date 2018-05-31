@@ -124,8 +124,8 @@ void AsyncClient::sendRequest(
             return;
 
         default:
-            NX_ASSERT(false, lit("m_state has invalid value: %1")
-                .arg(static_cast< int >(m_state)));
+            NX_ASSERT(false, lm("m_state has invalid value: %1")
+                .arg(static_cast<int>(m_state)));
             return;
     };
 }
@@ -239,7 +239,7 @@ void AsyncClient::closeConnection(
     {
         baseConnection->pleaseStopSync(false);
 
-        // Reporting connection close only if actually closed some connection.
+        // Reporting "connection closed" only if there was a connection to close.
         if (m_onConnectionClosedHandler)
             m_onConnectionClosedHandler(errorCode);
     }
@@ -294,7 +294,7 @@ void AsyncClient::openConnectionImpl(QnMutexLockerBase* lock)
             return;
 
         default:
-            NX_ASSERT(false, lit("m_state has invalid value: %1").arg(static_cast<int>(m_state)));
+            NX_ASSERT(false, lm("m_state has invalid value: %1").arg(static_cast<int>(m_state)));
             return;
     }
 }
@@ -478,14 +478,14 @@ void AsyncClient::processMessage(Message message)
             }
             else
             {
-                NX_LOGX(lit("Unexpected/unsupported indication: %2")
+                NX_LOGX(lm("Unexpected/unsupported indication: %2")
                     .arg(message.header.method), cl_logWARNING);
             }
             return;
         }
 
         default:
-            NX_ASSERT(false, lit("messageClass has invalid value: %1")
+            NX_ASSERT(false, lm("messageClass has invalid value: %1")
                 .arg(static_cast< int >(message.header.messageClass)));
             return;
     }

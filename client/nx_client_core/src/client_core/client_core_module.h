@@ -10,6 +10,7 @@ class QQmlEngine;
 class QnCommonModule;
 class QnPtzControllerPool;
 class QnLayoutTourStateManager;
+class QnDataProviderFactory;
 
 class QnClientCoreModule: public QObject, public Singleton<QnClientCoreModule>
 {
@@ -23,13 +24,18 @@ public:
     ec2::AbstractECConnectionFactory* connectionFactory() const;
     QnPtzControllerPool* ptzControllerPool() const;
     QnLayoutTourStateManager* layoutTourStateManager() const;
+    QnDataProviderFactory* dataProviderFactory() const;
 
     QQmlEngine* mainQmlEngine();
 
 private:
+    void registerResourceDataProviders();
+
+private:
     QnCommonModule* m_commonModule;
-    std::unique_ptr<ec2::AbstractECConnectionFactory> m_connectionFactory;
+    std::unique_ptr<ec2::RemoteConnectionFactory> m_connectionFactory;
     QQmlEngine* m_qmlEngine = nullptr;
+    QScopedPointer<QnDataProviderFactory> m_resourceDataProviderFactory;
 };
 
 #define qnClientCoreModule QnClientCoreModule::instance()

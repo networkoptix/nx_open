@@ -13,10 +13,10 @@ namespace nx {
 namespace client {
 namespace desktop {
 
-class ResourceThumbnailProvider: public QnImageProvider
+class ResourceThumbnailProvider: public ImageProvider
 {
     Q_OBJECT
-    using base_type = QnImageProvider;
+    using base_type = ImageProvider;
 
 public:
     explicit ResourceThumbnailProvider(const api::ResourceImageRequest& request,

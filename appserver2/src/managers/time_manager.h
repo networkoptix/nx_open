@@ -54,9 +54,8 @@
 
 namespace ec2 {
 
-class Ec2DirectConnection;
-class Settings;
 class AbstractTransactionMessageBus;
+class Settings;
 
 // TODO: #ak This class should be removed when we can use m_miscManager to save parameters.
 class AbstractWorkAroundMiscDataSaver
@@ -176,6 +175,7 @@ public:
  */
 class TimeSynchronizationManager:
     public QObject,
+    public QnCommonModuleAware,
     public QnStoppable,
     public EnableMultiThreadDirectConnection<TimeSynchronizationManager>,
     public Qn::EnableSafeDirectConnection
@@ -183,13 +183,17 @@ class TimeSynchronizationManager:
     Q_OBJECT
 
 public:
+
+    static const QString kTimeSyncUrlPath;
+    static const QByteArray TIME_SYNC_HEADER_NAME;
+
     /**
      * TimeSynchronizationManager::start MUST be called before using class instance.
      */
     TimeSynchronizationManager(
-        Qn::PeerType peerType,
+		QnCommonModule* commonModule,
+		Qn::PeerType peerType,
         nx::utils::StandaloneTimerManager* const timerManager,
-        AbstractTransactionMessageBus* messageBus,
         Settings* settings,
         std::shared_ptr<AbstractWorkAroundMiscDataSaver> workAroundMiscDataSaver = nullptr,
         const std::shared_ptr<AbstractSystemClock>& systemClock = nullptr,
@@ -204,14 +208,16 @@ public:
      * @note Cannot do it in constructor to keep valid object destruction order.
      * TODO #ak look like incapsulation failure. Better remove this method.
      */
-    void start(const std::shared_ptr<AbstractMiscManager>& miscManager);
+    void start(
+        AbstractTransactionMessageBus* messageBus,
+        const std::shared_ptr<AbstractMiscManager>& miscManager);
 
     /** Returns synchronized time (millis from epoch, UTC). */
     qint64 getSyncTime() const;
     ApiTimeData getTimeInfo() const;
     /** Called when primary time server has been changed by user. */
-    void onGotPrimariTimeServerTran(const QnTransaction<ApiIdData>& tran);
-    void primaryTimeServerChanged(const ApiIdData& serverId);
+    void onGotPrimariTimeServerTran(const QnTransaction<nx::vms::api::IdData>& tran);
+    void primaryTimeServerChanged(const nx::vms::api::IdData& serverId);
     /** Returns synchronized time with time priority key (not local, but the one used). */
     TimeSyncInfo getTimeSyncInfo() const;
     /** Returns value of internal monotonic clock. */
@@ -301,7 +307,6 @@ private:
     boost::optional<qint64> m_prevMonotonicClock;
     bool m_terminated;
     std::shared_ptr<AbstractMiscManager> m_miscManager;
-    AbstractTransactionMessageBus* m_messageBus;
     const Qn::PeerType m_peerType;
     nx::utils::StandaloneTimerManager* const m_timerManager;
     std::unique_ptr<AbstractAccurateTimeFetcher> m_timeSynchronizer;
@@ -312,7 +317,6 @@ private:
     Settings* m_settings;
     std::atomic<size_t> m_asyncOperationsInProgress;
     QnWaitCondition m_asyncOperationsWaitCondition;
-    std::shared_ptr<AbstractWorkAroundMiscDataSaver> m_workAroundMiscDataSaver;
     std::shared_ptr<AbstractSystemClock> m_systemClock;
     std::shared_ptr<AbstractSteadyClock> m_steadyClock;
     /** Using monotonic clock to be proof to local system time change. */

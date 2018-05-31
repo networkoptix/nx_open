@@ -8,7 +8,6 @@
 
 #include <core/resource_access/resource_access_manager.h>
 
-#include <core/resource/device_dependent_strings.h>
 #include <core/resource/resource_display_info.h>
 #include <core/resource/layout_resource.h>
 #include <core/resource/media_server_resource.h>
@@ -24,6 +23,7 @@
 #include <api/global_settings.h>
 
 #include <nx/client/desktop/ui/actions/action_manager.h>
+
 #include <ui/help/help_topics.h>
 #include <ui/models/resource/resource_tree_model.h>
 #include <ui/models/resource/tree/resource_tree_model_node_manager.h>
@@ -31,40 +31,41 @@
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_access_controller.h>
 
+
 using namespace nx::client::desktop;
 using namespace nx::client::desktop::ui;
 
 namespace {
 
 /* Set of node types, that are require children to be visible. */
-bool nodeRequiresChildren(Qn::NodeType nodeType)
+bool nodeRequiresChildren(ResourceTreeNodeType nodeType)
 {
-    static QSet<Qn::NodeType> result;
-    if (result.isEmpty())
-        result
-        << Qn::OtherSystemsNode
-        << Qn::ServersNode
-        << Qn::FilteredServersNode
-        << Qn::FilteredCamerasNode
-        << Qn::FilteredVideowallsNode
-        << Qn::FilteredLayoutsNode
-        << Qn::FilteredUsersNode
-        << Qn::UserResourcesNode
-        << Qn::RecorderNode
-        << Qn::SystemNode
-        << Qn::RoleUsersNode
-        << Qn::LayoutsNode
-        << Qn::LayoutToursNode
-        << Qn::SharedLayoutsNode
-        << Qn::SharedResourcesNode
-        ;
-    return result.contains(nodeType);
+    switch (nodeType)
+    {
+        case ResourceTreeNodeType::otherSystems:
+        case ResourceTreeNodeType::servers:
+        case ResourceTreeNodeType::filteredServers:
+        case ResourceTreeNodeType::filteredCameras:
+        case ResourceTreeNodeType::filteredLayouts:
+        case ResourceTreeNodeType::filteredUsers:
+        case ResourceTreeNodeType::filteredVideowalls:
+        case ResourceTreeNodeType::userResources:
+        case ResourceTreeNodeType::recorder:
+        case ResourceTreeNodeType::localSystem:
+        case ResourceTreeNodeType::roleUsers:
+        case ResourceTreeNodeType::layouts:
+        case ResourceTreeNodeType::sharedResources:
+        case ResourceTreeNodeType::sharedLayouts:
+        case ResourceTreeNodeType::layoutTours:
+            return true;
+        default:
+            return false;
+    }
 }
 
 } // namespace
 
-QnResourceTreeModelNode::QnResourceTreeModelNode(QnResourceTreeModel* model, Qn::NodeType nodeType, const QnUuid& uuid) :
-    base_type(),
+QnResourceTreeModelNode::QnResourceTreeModelNode(QnResourceTreeModel* model, NodeType nodeType, const QnUuid& uuid) :
     QnWorkbenchContextAware(model),
     m_initialized(false),
     m_model(model),
@@ -84,82 +85,82 @@ QnResourceTreeModelNode::QnResourceTreeModelNode(QnResourceTreeModel* model, Qn:
     m_icon = calculateIcon();
 }
 
-QnResourceTreeModelNode::QnResourceTreeModelNode(QnResourceTreeModel* model, Qn::NodeType nodeType):
+QnResourceTreeModelNode::QnResourceTreeModelNode(QnResourceTreeModel* model, NodeType nodeType):
     QnResourceTreeModelNode(model, nodeType, QnUuid())
 {
     switch(nodeType)
     {
-    case Qn::RootNode:
+    case NodeType::root:
         setNameInternal(lit("Root"));   /* This node is not visible directly. */
         break;
-    case Qn::BastardNode:
+    case NodeType::bastard:
         setNameInternal(lit("Invalid Resources"));
         m_bastard = true; /* This node is always hidden. */
         m_state = Invalid;
         break;
-    case Qn::LocalResourcesNode:
+    case NodeType::localResources:
         setNameInternal(tr("Local Files"));
         break;
-    case Qn::CurrentSystemNode:
+    case NodeType::currentSystem:
         break;
-    case Qn::CurrentUserNode:
+    case NodeType::currentUser:
         m_flags = Qn::user;
         break;
-    case Qn::SeparatorNode:
-    case Qn::LocalSeparatorNode:
+    case NodeType::separator:
+    case NodeType::localSeparator:
         m_displayName = QString();
         m_name = lit("-");
         break;
-    case Qn::FilteredServersNode:
-    case Qn::ServersNode:
+    case NodeType::filteredServers:
+    case NodeType::servers:
         setNameInternal(tr("Servers"));
         break;
-    case Qn::OtherSystemsNode:
+    case NodeType::otherSystems:
         setNameInternal(tr("Other Systems"));
         m_state = Invalid;
         break;
-    case Qn::FilteredUsersNode:
-    case Qn::UsersNode:
+    case NodeType::filteredUsers:
+    case NodeType::users:
         setNameInternal(tr("Users"));
         break;
-    case Qn::WebPagesNode:
+    case NodeType::webPages:
         setNameInternal(tr("Web Pages"));
         break;
-    case Qn::FilteredCamerasNode:
+    case NodeType::filteredCameras:
         setNameInternal(tr("Cameras & Devices"));
         break;
-    case Qn::UserResourcesNode:
+    case NodeType::userResources:
         setNameInternal(tr("Cameras & Resources"));
         break;
-    case Qn::FilteredLayoutsNode:
-    case Qn::LayoutsNode:
+    case NodeType::filteredLayouts:
+    case NodeType::layouts:
         setNameInternal(tr("Layouts"));
         break;
-    case Qn::FilteredVideowallsNode:
+    case NodeType::filteredVideowalls:
         setNameInternal(tr("Videowalls"));
         break;
-    case Qn::LayoutToursNode:
+    case NodeType::layoutTours:
         setNameInternal(tr("Showreels"));
         break;
-    case Qn::RecorderNode:
+    case NodeType::recorder:
         m_state = Invalid;
         break;
-    case Qn::SystemNode:
+    case NodeType::localSystem:
         m_state = Invalid;
         break;
-    case Qn::AllCamerasAccessNode:
+    case NodeType::allCamerasAccess:
         setNameInternal(tr("All Cameras & Resources"));
         m_state = Invalid;
         break;
-    case Qn::AllLayoutsAccessNode:
+    case NodeType::allLayoutsAccess:
         setNameInternal(tr("All Shared Layouts"));
         m_state = Invalid;
         break;
-    case Qn::SharedResourcesNode:
+    case NodeType::sharedResources:
         setNameInternal(tr("Cameras & Resources"));
         m_state = Invalid;
         break;
-    case Qn::RoleUsersNode:
+    case NodeType::roleUsers:
         setNameInternal(tr("Users"));
         m_state = Invalid;
         break;
@@ -174,13 +175,13 @@ QnResourceTreeModelNode::QnResourceTreeModelNode(QnResourceTreeModel* model, Qn:
 /**
 * Constructor for other virtual group nodes (recorders, other systems).
 */
-QnResourceTreeModelNode::QnResourceTreeModelNode(QnResourceTreeModel* model, Qn::NodeType nodeType, const QString &name) :
+QnResourceTreeModelNode::QnResourceTreeModelNode(QnResourceTreeModel* model, NodeType nodeType, const QString &name) :
     QnResourceTreeModelNode(model, nodeType)
 {
     NX_ASSERT(
-        nodeType == Qn::SystemNode
-        || nodeType == Qn::RecorderNode
-        || nodeType == Qn::CloudSystemNode
+        nodeType == NodeType::localSystem
+        || nodeType == NodeType::recorder
+        || nodeType == NodeType::cloudSystem
     );
     setName(name);
     m_state = Invalid;
@@ -189,13 +190,13 @@ QnResourceTreeModelNode::QnResourceTreeModelNode(QnResourceTreeModel* model, Qn:
 /**
  * Constructor for resource nodes.
  */
-QnResourceTreeModelNode::QnResourceTreeModelNode(QnResourceTreeModel* model, const QnResourcePtr &resource, Qn::NodeType nodeType):
+QnResourceTreeModelNode::QnResourceTreeModelNode(QnResourceTreeModel* model, const QnResourcePtr &resource, NodeType nodeType):
     QnResourceTreeModelNode(model, nodeType)
 {
-    NX_ASSERT(nodeType == Qn::ResourceNode
-        || nodeType == Qn::EdgeNode
-        || nodeType == Qn::SharedLayoutNode
-        || nodeType == Qn::SharedResourceNode
+    NX_ASSERT(nodeType == NodeType::resource
+        || nodeType == NodeType::edge
+        || nodeType == NodeType::sharedLayout
+        || nodeType == NodeType::sharedResource
     );
     m_state = Invalid;
     m_status = Qn::Offline;
@@ -205,14 +206,14 @@ QnResourceTreeModelNode::QnResourceTreeModelNode(QnResourceTreeModel* model, con
 /**
  * Constructor for item nodes.
  */
-QnResourceTreeModelNode::QnResourceTreeModelNode(QnResourceTreeModel* model, const QnUuid &uuid, Qn::NodeType nodeType):
+QnResourceTreeModelNode::QnResourceTreeModelNode(QnResourceTreeModel* model, const QnUuid &uuid, NodeType nodeType):
     QnResourceTreeModelNode(model, nodeType, uuid)
 {
-    NX_ASSERT(nodeType == Qn::LayoutItemNode
-        || nodeType == Qn::VideoWallItemNode
-        || nodeType == Qn::VideoWallMatrixNode
-        || nodeType == Qn::RoleNode
-        || nodeType == Qn::LayoutTourNode
+    NX_ASSERT(nodeType == NodeType::layoutItem
+        || nodeType == NodeType::videoWallItem
+        || nodeType == NodeType::videoWallMatrix
+        || nodeType == NodeType::role
+        || nodeType == NodeType::layoutTour
     );
 
     m_state = Invalid;
@@ -220,13 +221,13 @@ QnResourceTreeModelNode::QnResourceTreeModelNode(QnResourceTreeModel* model, con
 
     switch (nodeType)
     {
-        case Qn::RoleNode:
+        case NodeType::role:
         {
             auto role = userRolesManager()->userRole(m_uuid);
             setNameInternal(role.name);
             break;
         }
-        case Qn::LayoutTourNode:
+        case NodeType::layoutTour:
         {
             auto tour = layoutTourManager()->tour(m_uuid);
             setNameInternal(tour.name);
@@ -247,13 +248,13 @@ void QnResourceTreeModelNode::setResource(const QnResourcePtr& resource)
     if (m_resource == resource)
         return;
 
-    NX_ASSERT(m_type == Qn::LayoutItemNode
-           || m_type == Qn::ResourceNode
-           || m_type == Qn::VideoWallItemNode
-           || m_type == Qn::EdgeNode
-           || m_type == Qn::SharedLayoutNode
-           || m_type == Qn::SharedResourceNode
-           || m_type == Qn::CurrentUserNode);
+    NX_ASSERT(m_type == NodeType::layoutItem
+        || m_type == NodeType::resource
+        || m_type == NodeType::videoWallItem
+        || m_type == NodeType::edge
+        || m_type == NodeType::sharedLayout
+        || m_type == NodeType::sharedResource
+        || m_type == NodeType::currentUser);
 
     if (m_initialized)
     {
@@ -284,11 +285,11 @@ void QnResourceTreeModelNode::update()
     /* Update stored fields. */
     switch (m_type)
     {
-        case Qn::ResourceNode:
-        case Qn::LayoutItemNode:
-        case Qn::EdgeNode:
-        case Qn::SharedLayoutNode:
-        case Qn::SharedResourceNode:
+        case NodeType::resource:
+        case NodeType::layoutItem:
+        case NodeType::edge:
+        case NodeType::sharedLayout:
+        case NodeType::sharedResource:
         {
             if (!m_resource)
             {
@@ -309,7 +310,7 @@ void QnResourceTreeModelNode::update()
             }
             break;
         }
-        case Qn::VideoWallItemNode:
+        case NodeType::videoWallItem:
         {
             m_status = Qn::Offline;
 
@@ -336,7 +337,7 @@ void QnResourceTreeModelNode::update()
             }
             break;
         }
-        case Qn::VideoWallMatrixNode:
+        case NodeType::videoWallMatrix:
         {
             for (const auto& videowall : resourcePool()->getResources<QnVideoWallResource>())
             {
@@ -347,32 +348,32 @@ void QnResourceTreeModelNode::update()
             }
             break;
         }
-        case Qn::LayoutTourNode:
+        case NodeType::layoutTour:
         {
             auto tour = layoutTourManager()->tour(m_uuid);
             setNameInternal(tour.name.isEmpty() ? tr("Showreel") : tour.name);
             break;
         }
-        case Qn::CurrentSystemNode:
+        case NodeType::currentSystem:
         {
             setNameInternal(qnGlobalSettings->systemName());
             break;
         }
-        case Qn::CurrentUserNode:
+        case NodeType::currentUser:
         {
             auto user = context()->user();
             setNameInternal(user ? user->getName() : QString());
             break;
         }
-        case Qn::RoleNode:
+        case NodeType::role:
         {
             auto role = userRolesManager()->userRole(m_uuid);
             setNameInternal(role.name);
             break;
         }
-        case Qn::SharedLayoutsNode:
+        case NodeType::sharedLayouts:
         {
-            if (m_parent && m_parent->type() == Qn::RoleNode)
+            if (m_parent && m_parent->type() == NodeType::role)
                 setNameInternal(tr("Shared Layouts"));
             else
                 setNameInternal(tr("Layouts"));
@@ -424,7 +425,7 @@ void QnResourceTreeModelNode::deinitialize()
     m_initialized = false;
 }
 
-Qn::NodeType QnResourceTreeModelNode::type() const
+ResourceTreeNodeType QnResourceTreeModelNode::type() const
 {
     return m_type;
 }
@@ -477,47 +478,47 @@ bool QnResourceTreeModelNode::calculateBastard() const
     switch (m_type)
     {
         /* Always hidden. */
-        case Qn::BastardNode:
+        case NodeType::bastard:
             return true;
 
         /* Always visible. */
-        case Qn::RootNode:
-        case Qn::LocalResourcesNode:
-        case Qn::SeparatorNode:
-        case Qn::LocalSeparatorNode:
-        case Qn::OtherSystemsNode:
+        case NodeType::root:
+        case NodeType::localResources:
+        case NodeType::separator:
+        case NodeType::localSeparator:
+        case NodeType::otherSystems:
 
-        case Qn::FilteredServersNode:
-        case Qn::FilteredCamerasNode:
-        case Qn::FilteredLayoutsNode:
-        case Qn::FilteredUsersNode:
-        case Qn::FilteredVideowallsNode:
+        case NodeType::filteredServers:
+        case NodeType::filteredCameras:
+        case NodeType::filteredLayouts:
+        case NodeType::filteredUsers:
+        case NodeType::filteredVideowalls:
 
 
         /* These will be hidden or displayed together with their parent. */
-        case Qn::VideoWallItemNode:
-        case Qn::VideoWallMatrixNode:
-        case Qn::AllCamerasAccessNode:
-        case Qn::AllLayoutsAccessNode:
-        case Qn::SharedResourcesNode:
-        case Qn::SharedLayoutsNode:
-        case Qn::WebPagesNode:
-        case Qn::RoleUsersNode:
-        case Qn::SharedResourceNode:
-        case Qn::RoleNode:
-        case Qn::LayoutTourNode:
-        case Qn::SharedLayoutNode:
-        case Qn::RecorderNode:
-        case Qn::SystemNode:
-        case Qn::CloudSystemNode:
+        case NodeType::videoWallItem:
+        case NodeType::videoWallMatrix:
+        case NodeType::allCamerasAccess:
+        case NodeType::allLayoutsAccess:
+        case NodeType::sharedResources:
+        case NodeType::sharedLayouts:
+        case NodeType::webPages:
+        case NodeType::roleUsers:
+        case NodeType::sharedResource:
+        case NodeType::role:
+        case NodeType::layoutTour:
+        case NodeType::sharedLayout:
+        case NodeType::recorder:
+        case NodeType::localSystem:
+        case NodeType::cloudSystem:
             return false;
 
-        case Qn::CurrentSystemNode:
-        case Qn::CurrentUserNode:
+        case NodeType::currentSystem:
+        case NodeType::currentUser:
             return !isLoggedIn;
 
     /* Hide non-readable resources. */
-    case Qn::LayoutItemNode:
+    case NodeType::layoutItem:
     {
         /* Hide resource nodes without resource. */
         if (!m_resource)
@@ -526,18 +527,18 @@ bool QnResourceTreeModelNode::calculateBastard() const
         return !accessController()->hasPermissions(m_resource, Qn::ViewContentPermission);
     }
 
-    case Qn::UsersNode:
-    case Qn::ServersNode:
+    case NodeType::users:
+    case NodeType::servers:
         return !isAdmin;
 
-    case Qn::UserResourcesNode:
+    case NodeType::userResources:
         return !isLoggedIn || isAdmin;
 
-    case Qn::LayoutsNode:
-    case Qn::LayoutToursNode:
+    case NodeType::layouts:
+    case NodeType::layoutTours:
         return !isLoggedIn;
 
-    case Qn::EdgeNode:
+    case NodeType::edge:
         /* Hide resource nodes without resource. */
         if (!m_resource)
             return true;
@@ -545,7 +546,7 @@ bool QnResourceTreeModelNode::calculateBastard() const
         /* Only admins can see edge nodes. */
         return !isAdmin;
 
-    case Qn::ResourceNode:
+    case NodeType::resource:
         /* Hide resource nodes without resource. */
         if (!m_resource)
             return true;
@@ -664,7 +665,7 @@ void QnResourceTreeModelNode::setParent(const QnResourceTreeModelNodePtr& parent
         {
             m_parent->addChildInternal(toSharedPointer());
 
-            if (m_type == Qn::VideoWallItemNode)
+            if (m_type == NodeType::videoWallItem)
                 update();
         }
     }
@@ -697,9 +698,9 @@ QModelIndex QnResourceTreeModelNode::createIndex(int col)
 
 Qt::ItemFlags QnResourceTreeModelNode::flags(int column) const
 {
-    if (Qn::isSeparatorNode(m_type)
-        || m_type == Qn::AllCamerasAccessNode
-        || m_type == Qn::AllLayoutsAccessNode)
+    if (isSeparatorNode(m_type)
+        || m_type == NodeType::allCamerasAccess
+        || m_type == NodeType::allLayoutsAccess)
     {
         /* No Editable/Selectable flags. */
         return Qt::ItemNeverHasChildren;
@@ -714,20 +715,20 @@ Qt::ItemFlags QnResourceTreeModelNode::flags(int column) const
     {
         switch(m_type)
         {
-        case Qn::SharedResourceNode:
-        case Qn::SharedLayoutNode:
-        case Qn::ResourceNode:
-        case Qn::EdgeNode:
+        case NodeType::sharedResource:
+        case NodeType::sharedLayout:
+        case NodeType::resource:
+        case NodeType::edge:
             m_editable.value = menu()->canTrigger(action::RenameResourceAction, m_resource);
             break;
-        case Qn::VideoWallItemNode:
-        case Qn::VideoWallMatrixNode:
+        case NodeType::videoWallItem:
+        case NodeType::videoWallMatrix:
             m_editable.value = accessController()->hasGlobalPermission(Qn::GlobalControlVideoWallPermission);
             break;
-        case Qn::LayoutTourNode:
+        case NodeType::layoutTour:
             m_editable.value = menu()->canTrigger(action::RenameLayoutTourAction);
             break;
-        case Qn::RecorderNode:
+        case NodeType::recorder:
             m_editable.value = true;
             break;
         default:
@@ -742,11 +743,11 @@ Qt::ItemFlags QnResourceTreeModelNode::flags(int column) const
 
     switch(m_type)
     {
-    case Qn::ResourceNode:
-    case Qn::EdgeNode:
-    case Qn::LayoutItemNode:
-    case Qn::SharedLayoutNode:
-    case Qn::SharedResourceNode:
+    case NodeType::resource:
+    case NodeType::edge:
+    case NodeType::layoutItem:
+    case NodeType::sharedLayout:
+    case NodeType::sharedResource:
     {
         // Any of flags is sufficient.
         if (m_flags & (Qn::media | Qn::layout | Qn::server | Qn::videowall))
@@ -757,9 +758,9 @@ Qt::ItemFlags QnResourceTreeModelNode::flags(int column) const
             result |= Qt::ItemIsDragEnabled;
         break;
     }
-    case Qn::VideoWallItemNode: // TODO: #GDM #VW drag of empty item on scene should create new layout
-    case Qn::RecorderNode:
-    case Qn::LayoutTourNode:
+    case NodeType::videoWallItem: // TODO: #GDM #VW drag of empty item on scene should create new layout
+    case NodeType::recorder:
+    case NodeType::layoutTour:
         result |= Qt::ItemIsDragEnabled;
         break;
     default:
@@ -814,9 +815,9 @@ QVariant QnResourceTreeModelNode::data(int role, int column) const
             break;
 
         case Qn::ItemUuidRole:
-            if (m_type == Qn::LayoutItemNode
-                || m_type == Qn::VideoWallItemNode
-                || m_type == Qn::VideoWallMatrixNode)
+            if (m_type == NodeType::layoutItem
+                || m_type == NodeType::videoWallItem
+                || m_type == NodeType::videoWallMatrix)
             {
                 return QVariant::fromValue<QnUuid>(m_uuid);
             }
@@ -853,19 +854,19 @@ int QnResourceTreeModelNode::helpTopicId() const
 {
     switch (m_type)
     {
-        case Qn::UsersNode:
+        case NodeType::users:
             return Qn::MainWindow_Tree_Users_Help;
 
-        case Qn::LocalResourcesNode:
+        case NodeType::localResources:
             return Qn::MainWindow_Tree_Local_Help;
 
-        case Qn::RecorderNode:
+        case NodeType::recorder:
             return Qn::MainWindow_Tree_Recorder_Help;
 
-        case Qn::VideoWallItemNode:
+        case NodeType::videoWallItem:
             return Qn::Videowall_Display_Help;
 
-        case Qn::VideoWallMatrixNode:
+        case NodeType::videoWallMatrix:
             return Qn::Videowall_Matrix_Help;
 
         default:
@@ -932,7 +933,7 @@ bool QnResourceTreeModelNode::setData(const QVariant& value, int role, int colum
 
     action::Parameters parameters;
     bool isVideoWallEntity = false;
-    if (m_type == Qn::VideoWallItemNode)
+    if (m_type == NodeType::videoWallItem)
     {
         // TODO: #GDM #3.1 get rid of all this logic, just pass uuid
         QnVideoWallItemIndex index = resourcePool()->getVideoWallItemByUuid(m_uuid);
@@ -941,7 +942,7 @@ bool QnResourceTreeModelNode::setData(const QVariant& value, int role, int colum
         parameters = (QnVideoWallItemIndexList() << index);
         isVideoWallEntity = true;
     }
-    else if (m_type == Qn::VideoWallMatrixNode)
+    else if (m_type == NodeType::videoWallMatrix)
     {
         QnVideoWallMatrixIndex index = resourcePool()->getVideoWallMatrixByUuid(m_uuid);
         if (index.isNull())
@@ -949,7 +950,7 @@ bool QnResourceTreeModelNode::setData(const QVariant& value, int role, int colum
         parameters = (QnVideoWallMatrixIndexList() << index);
         isVideoWallEntity = true;
     }
-    else if (m_type == Qn::RecorderNode)
+    else if (m_type == NodeType::recorder)
     {
         //sending first camera to get groupId and check WriteName permission
         if (children().isEmpty())
@@ -968,7 +969,7 @@ bool QnResourceTreeModelNode::setData(const QVariant& value, int role, int colum
     parameters.setArgument(Qn::NodeTypeRole, m_type);
     parameters.setArgument(Qn::UuidRole, m_uuid);
 
-    if (m_type == Qn::LayoutTourNode)
+    if (m_type == NodeType::layoutTour)
         menu()->trigger(action::RenameLayoutTourAction, parameters);
     else if (isVideoWallEntity)
         menu()->trigger(action::RenameVideowallEntityAction, parameters);
@@ -1103,8 +1104,8 @@ void QnResourceTreeModelNode::setName(const QString& name)
     {
         switch (m_type)
         {
-            case Qn::SystemNode:
-            case Qn::CloudSystemNode:
+            case NodeType::localSystem:
+            case NodeType::cloudSystem:
                 m_displayName = QnSystemDescription::extractSystemName(m_displayName);
                 changed = true;
                 break;
@@ -1143,66 +1144,66 @@ QIcon QnResourceTreeModelNode::calculateIcon() const
 {
     switch (m_type)
     {
-        case Qn::RootNode:
-        case Qn::BastardNode:
-        case Qn::SeparatorNode:
-        case Qn::LocalSeparatorNode:
+        case NodeType::root:
+        case NodeType::bastard:
+        case NodeType::separator:
+        case NodeType::localSeparator:
             return QIcon();
 
-        case Qn::LocalResourcesNode:
+        case NodeType::localResources:
             return qnResIconCache->icon(QnResourceIconCache::LocalResources);
 
-        case Qn::CurrentSystemNode:
+        case NodeType::currentSystem:
             return qnResIconCache->icon(QnResourceIconCache::CurrentSystem);
 
-        case Qn::CurrentUserNode:
+        case NodeType::currentUser:
             return qnResIconCache->icon(QnResourceIconCache::User);
 
-        case Qn::FilteredServersNode:
-        case Qn::ServersNode:
+        case NodeType::filteredServers:
+        case NodeType::servers:
             return qnResIconCache->icon(QnResourceIconCache::Servers);
 
-        case Qn::UsersNode:
-        case Qn::RoleNode:
-        case Qn::RoleUsersNode:
-        case Qn::FilteredUsersNode:
+        case NodeType::users:
+        case NodeType::role:
+        case NodeType::roleUsers:
+        case NodeType::filteredUsers:
             return qnResIconCache->icon(QnResourceIconCache::Users);
 
-        case Qn::WebPagesNode:
+        case NodeType::webPages:
             return qnResIconCache->icon(QnResourceIconCache::WebPages);
 
-        case Qn::FilteredVideowallsNode:
+        case NodeType::filteredVideowalls:
             return qnResIconCache->icon(QnResourceIconCache::VideoWall); //< Fix me: change to videowallS icon
 
-        case Qn::FilteredCamerasNode:
-        case Qn::UserResourcesNode:
-        case Qn::AllCamerasAccessNode:
-        case Qn::SharedResourcesNode:
+        case NodeType::filteredCameras:
+        case NodeType::userResources:
+        case NodeType::allCamerasAccess:
+        case NodeType::sharedResources:
             return qnResIconCache->icon(QnResourceIconCache::Cameras);
 
-        case Qn::FilteredLayoutsNode:
-        case Qn::LayoutsNode:
+        case NodeType::filteredLayouts:
+        case NodeType::layouts:
             return qnResIconCache->icon(QnResourceIconCache::Layouts);
 
-        case Qn::LayoutTourNode:
+        case NodeType::layoutTour:
             return qnResIconCache->icon(QnResourceIconCache::LayoutTour);
 
-        case Qn::LayoutToursNode:
+        case NodeType::layoutTours:
             return qnResIconCache->icon(QnResourceIconCache::LayoutTours);
 
-        case Qn::AllLayoutsAccessNode:
+        case NodeType::allLayoutsAccess:
             return qnResIconCache->icon(QnResourceIconCache::SharedLayouts);
 
-        case Qn::SystemNode:
+        case NodeType::localSystem:
             return qnResIconCache->icon(QnResourceIconCache::OtherSystem);
 
-        case Qn::ResourceNode:
-        case Qn::EdgeNode:
-        case Qn::SharedLayoutNode:
+        case NodeType::resource:
+        case NodeType::edge:
+        case NodeType::sharedLayout:
             return m_resource ? qnResIconCache->icon(m_resource) : QIcon();
 
-        case Qn::LayoutItemNode:
-        case Qn::SharedResourceNode:
+        case NodeType::layoutItem:
+        case NodeType::sharedResource:
         {
             if (!m_resource)
                 return QIcon();
@@ -1215,18 +1216,18 @@ QIcon QnResourceTreeModelNode::calculateIcon() const
                 : qnResIconCache->icon(QnResourceIconCache::HealthMonitor);
         }
 
-        case Qn::SharedLayoutsNode:
+        case NodeType::sharedLayouts:
         {
-            if (m_parent && m_parent->type() == Qn::RoleNode)
+            if (m_parent && m_parent->type() == NodeType::role)
                 return qnResIconCache->icon(QnResourceIconCache::SharedLayout);
 
             return qnResIconCache->icon(QnResourceIconCache::Layouts);
         }
 
-        case Qn::VideoWallMatrixNode:
+        case NodeType::videoWallMatrix:
             return qnResIconCache->icon(QnResourceIconCache::VideoWallMatrix);
 
-        case Qn::VideoWallItemNode:
+        case NodeType::videoWallItem:
         {
             QnVideoWallItemIndex index = resourcePool()->getVideoWallItemByUuid(m_uuid);
             if (!index.isNull())
@@ -1272,7 +1273,7 @@ CameraExtraStatus QnResourceTreeModelNode::calculateCameraExtraStatus() const
     if (camera->isLicenseUsed())
         result |= CameraExtraStatusFlag::scheduled;
 
-    if (camera->statusFlags().testFlag(Qn::CSF_HasIssuesFlag))
+    if (camera->statusFlags().testFlag(Qn::CameraStatusFlag::CSF_HasIssuesFlag))
         result |= CameraExtraStatusFlag::buggy;
 
     return result;
@@ -1361,7 +1362,7 @@ void QnResourceTreeModelNode::updateResourceStatus()
     m_icon = calculateIcon();
     changeInternal();
 
-    if (m_parent && m_parent->type() == Qn::RecorderNode)
+    if (m_parent && m_parent->type() == NodeType::recorder)
         m_parent->updateCameraExtraStatus();
 }
 
@@ -1370,7 +1371,7 @@ void QnResourceTreeModelNode::updateCameraExtraStatus()
     m_cameraExtraStatus = calculateCameraExtraStatus();
     changeInternal();
 
-    if (m_parent && m_parent->type() == Qn::RecorderNode)
+    if (m_parent && m_parent->type() == NodeType::recorder)
         m_parent->updateCameraExtraStatus();
 }
 
@@ -1394,7 +1395,12 @@ QDebug operator<<(QDebug dbg, QnResourceTreeModelNode* node)
     }
 
     /* Print name. */
-    dbg.nospace() << node->data(Qt::EditRole, Qn::NameColumn).toString() << " (" << node->type() << ")";
+    dbg.nospace()
+        << node->data(Qt::EditRole, Qn::NameColumn).toString()
+        << " ("
+        << (int)node->type()
+        << ")";
+
     bool bastard = node->parent()
         && !node->parent()->children().contains(node->toSharedPointer());
     if (bastard)

@@ -79,15 +79,20 @@ QnAviArchiveDelegate* QnAviResource::createArchiveDelegate() const
     return aviDelegate;
 }
 
-QnAbstractStreamDataProvider* QnAviResource::createDataProviderInternal(Qn::ConnectionRole /*role*/)
+QnAbstractStreamDataProvider* QnAviResource::createDataProvider(
+    const QnResourcePtr& resource,
+    Qn::ConnectionRole /*role*/)
 {
-    if (FileTypeSupport::isImageFileExt(getUrl())) {
-        return new QnSingleShotFileStreamreader(toSharedPointer());
-    }
+    if (FileTypeSupport::isImageFileExt(resource->getUrl()))
+        return new QnSingleShotFileStreamreader(resource);
 
-    QnArchiveStreamReader* result = new QnArchiveStreamReader(toSharedPointer());
+    const auto aviResource = resource.dynamicCast<QnAviResource>();
+    NX_EXPECT(aviResource);
+    if (!aviResource)
+        return nullptr;
 
-    result->setArchiveDelegate(createArchiveDelegate());
+    QnArchiveStreamReader* result = new QnArchiveStreamReader(aviResource);
+    result->setArchiveDelegate(aviResource->createArchiveDelegate());
     return result;
 }
 
@@ -186,7 +191,7 @@ void QnAviResource::setDewarpingParams(const QnMediaDewarpingParams& params)
 QnAspectRatio QnAviResource::customAspectRatio() const
 {
     QnMutexLocker lock(&m_mutex);
-    return m_aviMetadata
+    return m_aviMetadata && !qFuzzyIsNull(m_aviMetadata->overridenAr)
         ? QnAspectRatio::closestStandardRatio(m_aviMetadata->overridenAr)
         : base_type::customAspectRatio();
 }

@@ -24,7 +24,6 @@ public:
 
     CLHttpStatus getRegister(int page, int num, int& val);
     CLHttpStatus setRegister(int page, int num, int val);
-    CLHttpStatus setRegister_asynch(int page, int num, int val);
 
     bool isPanoramic() const;
     bool isDualSensor() const;
@@ -118,7 +117,5 @@ private:
     bool getParamPhysical2(int channel, const QString& name, QString &val);
     void inputPortStateRequestDone(nx::network::http::AsyncHttpClientPtr client);
 };
-
-typedef QnSharedResourcePointer<QnPlAreconVisionResource> QnPlAreconVisionResourcePtr;
 
 #endif

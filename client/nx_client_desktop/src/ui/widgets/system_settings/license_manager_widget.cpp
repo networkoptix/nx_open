@@ -32,12 +32,11 @@
 
 #include <licensing/license.h>
 #include <licensing/license_validator.h>
-
-#include <llutil/hardware_id.h>
+#include <licensing/hardware_id_version.h>
 
 #include <nx/fusion/serialization/json_functions.h>
 
-#include <ui/common/widget_anchor.h>
+#include <nx/client/desktop/common/utils/widget_anchor.h>
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
 #include <ui/style/custom_style.h>
@@ -54,6 +53,7 @@
 #include <utils/common/event_processors.h>
 #include <utils/common/delayed.h>
 #include <nx/utils/log/log.h>
+#include <nx/utils/license/util.h>
 
 #include <nx/client/desktop/license/license_helpers.h>
 #include <nx/client/desktop/ui/dialogs/license_deactivation_reason.h>
@@ -183,7 +183,6 @@ protected:
 
 } // namespace
 
-
 QnLicenseManagerWidget::QnLicenseManagerWidget(QWidget *parent) :
     base_type(parent),
     QnWorkbenchContextAware(parent),
@@ -202,7 +201,7 @@ QnLicenseManagerWidget::QnLicenseManagerWidget(QWidget *parent) :
     ui->alertBar->setVisible(false);
 
     m_exportLicensesButton = new QPushButton(ui->licensesGroupBox);
-    auto anchor = new QnWidgetAnchor(m_exportLicensesButton);
+    auto anchor = new WidgetAnchor(m_exportLicensesButton);
     anchor->setEdges(Qt::TopEdge | Qt::RightEdge);
     static const int kButtonTopAdjustment = -4;
     anchor->setMargins(0, kButtonTopAdjustment, 0, 0);
@@ -403,7 +402,7 @@ void QnLicenseManagerWidget::showMessageLater(
             showMessage(icon, text, extras, button);
         };
 
-    executeDelayedParented(showThisMessage, 0, this);
+    executeLater(showThisMessage, this);
 }
 
 void QnLicenseManagerWidget::showMessage(
@@ -462,7 +461,7 @@ void QnLicenseManagerWidget::updateFromServer(const QByteArray &licenseKey, bool
 
     for (const QString& hwid: hardwareIds)
     {
-        int version = LLUtil::hardwareIdVersion(hwid);
+        int version = nx::utils::license::hardwareIdVersion(hwid);
 
         QString name;
         if (version == 0)
@@ -907,12 +906,12 @@ void QnLicenseManagerWidget::at_licensesReceived(const QByteArray& licenseKey, e
 
 void QnLicenseManagerWidget::at_downloadError()
 {
-    if (QNetworkReply *reply = qobject_cast<QNetworkReply *>(sender()))
+    if (const auto reply = qobject_cast<QNetworkReply*>(sender()))
     {
-        disconnect(reply, NULL, this, NULL); //avoid double "onError" handling
+        reply->disconnect(this); //< Avoid double "onError" handling.
         reply->deleteLater();
 
-        /* QNetworkReply slots should not start eventLoop */
+        // QNetworkReply slots should not start eventLoop.
         showMessageLater(QnMessageBoxIcon::Critical,
             networkErrorText(), networkErrorExtras(),
             CopyToClipboardButton::Hide);
@@ -1126,8 +1125,8 @@ void QnLicenseManagerWidget::showAlreadyActivatedLater(
     const QString& time)
 {
     auto extras = (time.isEmpty()
-        ? tr("This license is already activated and linked to Hardware Id %1").arg(hwid)
-        : tr("This license is already activated and linked to Hardware Id %1 on %2")
+        ? tr("This license is already activated and linked to Hardware ID %1").arg(hwid)
+        : tr("This license is already activated and linked to Hardware ID %1 on %2")
             .arg(hwid).arg(time));
 
     extras += L'\n' + getContactSupportMessage();

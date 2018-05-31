@@ -89,11 +89,6 @@
     </message>
     <message>
         <location/>
-        <source>Disable only if the client takes too much CPU</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location/>
         <source>Maximum Live Buffer Length</source>
         <translation></translation>
     </message>
@@ -2020,6 +2015,11 @@
         <location/>
         <source>Tour cycle</source>
         <translation></translation>
+    </message>
+    <message>
+        <location/>
+        <source>IP addresses for cameras, and servers, groups for users, etc.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>

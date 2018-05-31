@@ -3,6 +3,9 @@
 #include <gtest/gtest.h>
 #include <nx/mediaserver/resource/camera.h>
 #include <nx/utils/std/cpp14.h>
+#include <core/dataprovider/data_provider_factory.h>
+
+class QnDataProviderFactory;
 
 namespace nx {
 namespace mediaserver {
@@ -22,6 +25,7 @@ public:
     QSet<QString> setApiParameters(const QnCameraAdvancedParamValueMap& values);
 
     void setStreamCapabilityMaps(StreamCapabilityMap primary, StreamCapabilityMap secondary);
+    void setMediaTraits(nx::media::CameraTraits traits);
     void enableSetProperty(bool isEnabled);
 
     static QnCameraAdvancedParams makeParameterDescriptions(const std::vector<QString>& parameters);
@@ -40,12 +44,14 @@ protected:
     virtual CameraDiagnostics::Result initializeCameraDriver() override;
     virtual std::vector<AdvancedParametersProvider*> advancedParametersProviders() override;
     virtual StreamCapabilityMap getStreamCapabilityMapFromDrives(Qn::StreamIndex streamIndex) override;
+    virtual nx::media::CameraTraits mediaTraits() const override;
 
 private:
     friend class CameraTest;
     std::map<QString, QString> m_apiAadvancedParameters;
     std::vector<std::unique_ptr<AdvancedParametersProvider>> m_advancedParametersProviders;
-    QMap<Qn::StreamIndex, StreamCapabilityMap> m_streamCapabilityMaps;
+    StreamCapabilityMaps m_streamCapabilityMaps;
+    nx::media::CameraTraits m_mediaTraits;
     bool isSetProprtyEnabled = true;
     mutable std::map<QString, QString> m_properties;
 };
@@ -54,6 +60,14 @@ class CameraTest: public testing::Test
 {
 public:
     static QnSharedResourcePointer<CameraMock> newCamera(std::function<void(CameraMock*)> setup);
+
+protected:
+    virtual void SetUp() override;
+    virtual void TearDown() override;
+    QnDataProviderFactory* dataProviderFactory() const;
+
+private:
+    QScopedPointer<QnDataProviderFactory> m_dataProviderFactory;
 };
 
 // -------------------------------------------------------------------------------------------------

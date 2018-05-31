@@ -181,6 +181,7 @@ public:
 
     void setProxyVia(const SocketAddress& proxyEndpoint);
 
+    void setMaxNumberOfRedirects(int maxNumberOfRedirects);
     /**
      * If set to true client will not try to add Authorization header to the first request.
      * false by default.

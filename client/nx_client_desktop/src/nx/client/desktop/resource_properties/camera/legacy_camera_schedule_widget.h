@@ -18,6 +18,8 @@ namespace nx {
 namespace client {
 namespace desktop {
 
+struct SchedulePaintFunctions;
+
 class LegacyCameraScheduleWidget: public Connective<QnAbstractPreferencesWidget>,
     public QnWorkbenchContextAware
 {
@@ -73,7 +75,6 @@ private:
     void updateGridEnabledState();
     void updateLicensesLabelText();
     void updateMotionButtons();
-    void updatePanicLabelText();
     void updateLicensesButtonVisible();
     void updateRecordSpinboxes();
     void updateMaxFpsValue(bool motionPlusLqToggled);
@@ -118,7 +119,7 @@ private:
     bool isCurrentBitrateCustom() const;
     Qn::StreamQuality currentQualityApproximation() const;
 
-    QPair<Qn::StreamQuality, bool> qualityForBitrate(qreal bitrateMbps) const;
+    QPair<int, bool> qualityForBitrate(qreal bitrateMbps) const;
     qreal bitrateForQuality(Qn::StreamQuality quality) const;
 
     virtual void retranslateUi() override;
@@ -136,6 +137,7 @@ private:
     Q_DISABLE_COPY(LegacyCameraScheduleWidget)
 
     QScopedPointer<Ui::LegacyCameraScheduleWidget> ui;
+    QScopedPointer<SchedulePaintFunctions> paintFunctions;
 
     QnVirtualCameraResourceList m_cameras;
     bool m_disableUpdateGridParams = false;

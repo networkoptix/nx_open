@@ -9,6 +9,8 @@
 #include <QtWidgets/QAction>
 #include <QtWidgets/QComboBox>
 
+#include <translation/datetime_formatter.h>
+
 #include <camera/cam_display.h>
 #include <camera/resource_display.h>
 #include <nx/client/desktop/image_providers/camera_thumbnail_provider.h>
@@ -43,6 +45,7 @@
 #include <nx/core/transcoding/filters/legacy_transcoding_settings.h>
 #include <nx/client/core/watchers/server_time_watcher.h>
 
+using namespace nx::client::desktop;
 using namespace nx::client::desktop::ui;
 
 namespace {
@@ -59,14 +62,13 @@ QnScreenshotParameters::QnScreenshotParameters()
     timestampParams.corner = Qt::BottomRightCorner;
 }
 
-QString QnScreenshotParameters::timeString() const {
+QString QnScreenshotParameters::timeString() const 
+{
     if (utcTimestampMsec == latestScreenshotTime)
-        return QDateTime::currentDateTime().toString(lit("hh.mm.ss"));
-
-    qint64 timeMSecs = displayTimeMsec;
+        return datetime::toString(QTime::currentTime());
     if (isUtc)
-        return nx::utils::datetimeSaveDialogSuggestion(QDateTime::fromMSecsSinceEpoch(timeMSecs));
-    return QTime(0, 0, 0, 0).addMSecs(timeMSecs).toString(lit("hh.mm.ss"));
+        return datetime::toString(displayTimeMsec);
+    return datetime::toString(displayTimeMsec, datetime::Format::hh_mm_ss);
 }
 
 
@@ -74,7 +76,7 @@ QString QnScreenshotParameters::timeString() const {
 // QnScreenshotLoader
 // -------------------------------------------------------------------------- //
 QnScreenshotLoader::QnScreenshotLoader(const QnScreenshotParameters& parameters, QObject *parent):
-    QnImageProvider(parent),
+    ImageProvider(parent),
     m_parameters(parameters),
     m_isReady(false)
 {
@@ -84,13 +86,13 @@ QnScreenshotLoader::~QnScreenshotLoader()
 {
 }
 
-void QnScreenshotLoader::setBaseProvider(QnImageProvider *imageProvider)
+void QnScreenshotLoader::setBaseProvider(ImageProvider *imageProvider)
 {
     m_baseProvider.reset(imageProvider);
     if (!imageProvider)
         return;
 
-    connect(imageProvider, &QnImageProvider::imageChanged, this, &QnScreenshotLoader::at_imageLoaded);
+    connect(imageProvider, &ImageProvider::imageChanged, this, &QnScreenshotLoader::at_imageLoaded);
     imageProvider->loadAsync();
 }
 
@@ -159,7 +161,7 @@ QnWorkbenchScreenshotHandler::QnWorkbenchScreenshotHandler(QObject *parent):
     connect(action(action::TakeScreenshotAction), &QAction::triggered, this, &QnWorkbenchScreenshotHandler::at_takeScreenshotAction_triggered);
 }
 
-QnImageProvider* QnWorkbenchScreenshotHandler::getLocalScreenshotProvider(QnMediaResourceWidget *widget, const QnScreenshotParameters &parameters, bool forced) const {
+ImageProvider* QnWorkbenchScreenshotHandler::getLocalScreenshotProvider(QnMediaResourceWidget *widget, const QnScreenshotParameters &parameters, bool forced) const {
     QnResourceDisplayPtr display = widget->display();
 
     QnConstResourceVideoLayoutPtr layout = display->videoLayout();
@@ -183,7 +185,7 @@ QnImageProvider* QnWorkbenchScreenshotHandler::getLocalScreenshotProvider(QnMedi
     if (screenshot.isNull())
         return NULL;
 
-    return new QnBasicImageProvider(screenshot);
+    return new BasicImageProvider(screenshot);
 }
 
 qint64 QnWorkbenchScreenshotHandler::screenshotTimeMSec(QnMediaResourceWidget *widget, bool adjust) {
@@ -380,8 +382,9 @@ bool QnWorkbenchScreenshotHandler::updateParametersFromDialog(QnScreenshotParame
     QString previousDir = qnSettings->lastScreenshotDir();
     if (previousDir.isEmpty())
         previousDir = qnSettings->mediaFolder();
-    QString suggestion = nx::utils::replaceNonFileNameCharacters(parameters.filename, QLatin1Char('_'))
-        + QLatin1Char('_') + parameters.timeString();
+    QString suggestion = nx::utils::replaceNonFileNameCharacters(parameters.filename
+        + QLatin1Char('_') + parameters.timeString(), QLatin1Char('_')).
+        replace(QChar::Space, QLatin1Char('_'));
     suggestion = QnEnvironment::getUniqueFileName(previousDir, suggestion);
 
     QString filterSeparator = lit(";;");
@@ -608,7 +611,7 @@ void QnWorkbenchScreenshotHandler::takeScreenshot(QnMediaResourceWidget *widget,
     }
 
     QnResourceDisplayPtr display = widget->display();
-    QnImageProvider* imageProvider = getLocalScreenshotProvider(widget, localParameters);
+    ImageProvider* imageProvider = getLocalScreenshotProvider(widget, localParameters);
     if (imageProvider) {
         // avoiding post-processing duplication
         localParameters.imageCorrectionParams.enabled = false;
@@ -641,7 +644,7 @@ void QnWorkbenchScreenshotHandler::takeScreenshot(QnMediaResourceWidget *widget,
     }
 
     QScopedPointer<QnScreenshotLoader> loader(new QnScreenshotLoader(localParameters, this));
-    connect(loader, &QnImageProvider::imageChanged, this,   &QnWorkbenchScreenshotHandler::at_imageLoaded);
+    connect(loader, &ImageProvider::imageChanged, this,   &QnWorkbenchScreenshotHandler::at_imageLoaded);
     loader->setBaseProvider(imageProvider); // preload screenshot here
 
     /* Check if name is already given - that usually means silent mode. */

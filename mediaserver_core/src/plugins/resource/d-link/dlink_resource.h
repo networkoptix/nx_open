@@ -72,11 +72,8 @@ protected:
     virtual void setCroppingPhysical(QRect cropping);
 
 
-
 protected:
     QnDlink_cam_info  m_camInfo;
 };
-
-typedef QnSharedResourcePointer<QnPlDlinkResource> QnPlDlinkResourcePtr;
 
 #endif // ENABLE_DLINK

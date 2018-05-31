@@ -115,7 +115,6 @@ namespace nx_ms_conf
     static const QString DEFAULT_DELAY_BEFORE_SETTING_MASTER_FLAG("30s");
 	static const QString P2P_MODE_FLAG("p2pMode");
 
-    static const QString SYSTEM_USER("systemUser");
     static const QString ALLOW_REMOVABLE_STORAGES("allowRemovableStorages");
     static const QString CHECK_FOR_UPDATE_TIMEOUT("checkForUpdateTimeout");
     static const QString CHECK_FOR_UPDATE_URL("checkForUpdateUrl");

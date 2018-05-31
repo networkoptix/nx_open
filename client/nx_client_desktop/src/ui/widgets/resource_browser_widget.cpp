@@ -57,7 +57,7 @@
 #include <ui/style/custom_style.h>
 #include <ui/style/helper.h>
 #include <nx/client/desktop/common/widgets/busy_indicator.h>
-#include <ui/widgets/common/text_edit_label.h>
+#include <nx/client/desktop/common/widgets/text_edit_label.h>
 #include <ui/widgets/resource_tree_widget.h>
 #include <ui/workbench/workbench.h>
 #include <ui/workbench/workbench_item.h>
@@ -76,7 +76,10 @@
 
 #include <ini.h>
 
+using namespace nx::client::desktop;
 using namespace nx::client::desktop::ui;
+
+using NodeType = ResourceTreeNodeType;
 
 namespace {
 
@@ -116,7 +119,7 @@ QnResourceBrowserWidget::QnResourceBrowserWidget(QWidget* parent, QnWorkbenchCon
     m_tooltipWidget(nullptr),
     m_hoverProcessor(nullptr),
     m_disconnectHelper(new QnDisconnectHelper()),
-    m_thumbnailManager(new QnCameraThumbnailManager())
+    m_thumbnailManager(new CameraThumbnailManager())
 {
     ui->setupUi(this);
 
@@ -140,21 +143,21 @@ QnResourceBrowserWidget::QnResourceBrowserWidget(QWidget* parent, QnWorkbenchCon
     ui->resourceTreeWidget->setAutoExpandPolicy(
         [](const QModelIndex& index)
         {
-            switch (index.data(Qn::NodeTypeRole).value<Qn::NodeType>())
+            switch (index.data(Qn::NodeTypeRole).value<NodeType>())
             {
-                case Qn::ResourceNode:
+                case NodeType::resource:
                 {
                     const auto resource = index.data(Qn::ResourceRole).value<QnResourcePtr>();
                     return resource && resource->hasFlags(Qn::server);
                 }
-                case Qn::ServersNode:
-                case Qn::UserResourcesNode:
+                case NodeType::servers:
+                case NodeType::userResources:
 
-                case Qn::FilteredServersNode:
-                case Qn::FilteredCamerasNode:
-                case Qn::FilteredLayoutsNode:
-                case Qn::FilteredUsersNode:
-                case Qn::FilteredVideowallsNode:
+                case NodeType::filteredServers:
+                case NodeType::filteredCameras:
+                case NodeType::filteredLayouts:
+                case NodeType::filteredUsers:
+                case NodeType::filteredVideowalls:
                     return true;
                 default:
                     break;
@@ -179,7 +182,7 @@ QnResourceBrowserWidget::QnResourceBrowserWidget(QWidget* parent, QnWorkbenchCon
 
     *m_disconnectHelper << connect(ui->typeComboBox, QnComboboxCurrentIndexChanged,
         this, [this]() { updateFilter(false); });
-    *m_disconnectHelper << connect(ui->filterLineEdit, &QnSearchLineEdit::textChanged,
+    *m_disconnectHelper << connect(ui->filterLineEdit, &SearchLineEdit::textChanged,
         this, [this]() { updateFilter(false); });
     *m_disconnectHelper << connect(ui->filterLineEdit->lineEdit(), &QLineEdit::editingFinished,
         this, [this]() { updateFilter(true); });
@@ -400,7 +403,7 @@ void QnResourceBrowserWidget::showContextMenuAt(const QPoint& pos, bool ignoreSe
     auto manager = context()->menu();
 
     QScopedPointer<QMenu> menu(manager->newMenu(action::TreeScope, nullptr, ignoreSelection
-        ? action::Parameters{Qn::NodeTypeRole, Qn::RootNode}
+        ? action::Parameters{Qn::NodeTypeRole, NodeType::root}
         : currentParameters(action::TreeScope)));
 
     if (currentTreeWidget() == ui->searchTreeWidget)
@@ -458,11 +461,11 @@ QnResourceList QnResourceBrowserWidget::selectedResources() const
 
     for (const QModelIndex& index : currentSelectionModel()->selectedRows())
     {
-        Qn::NodeType nodeType = index.data(Qn::NodeTypeRole).value<Qn::NodeType>();
+        const auto nodeType = index.data(Qn::NodeTypeRole).value<NodeType>();
 
         switch (nodeType)
         {
-            case Qn::RecorderNode:
+            case NodeType::recorder:
             {
                 for (int i = 0; i < index.model()->rowCount(index); i++)
                 {
@@ -473,11 +476,11 @@ QnResourceList QnResourceBrowserWidget::selectedResources() const
                 }
             }
             break;
-            case Qn::ResourceNode:
-            case Qn::SharedLayoutNode:
-            case Qn::SharedResourceNode:
-            case Qn::EdgeNode:
-            case Qn::CurrentUserNode:
+            case NodeType::resource:
+            case NodeType::sharedLayout:
+            case NodeType::sharedResource:
+            case NodeType::edge:
+            case NodeType::currentUser:
             {
                 QnResourcePtr resource = index.data(Qn::ResourceRole).value<QnResourcePtr>();
                 if (resource && !result.contains(resource))
@@ -657,7 +660,7 @@ action::Parameters QnResourceBrowserWidget::currentParameters(action::ActionScop
     QItemSelectionModel* selectionModel = currentSelectionModel();
     QModelIndex index = selectionModel->currentIndex();
 
-    Qn::NodeType nodeType = index.data(Qn::NodeTypeRole).value<Qn::NodeType>();
+    const auto nodeType = index.data(Qn::NodeTypeRole).value<NodeType>();
 
     auto withNodeType = [nodeType](action::Parameters parameters)
         {
@@ -666,17 +669,17 @@ action::Parameters QnResourceBrowserWidget::currentParameters(action::ActionScop
 
     switch (nodeType)
     {
-        case Qn::VideoWallItemNode:
+        case NodeType::videoWallItem:
             return withNodeType(selectedVideoWallItems());
-        case Qn::VideoWallMatrixNode:
+        case NodeType::videoWallMatrix:
             return withNodeType(selectedVideoWallMatrices());
-        case Qn::CloudSystemNode:
+        case NodeType::cloudSystem:
         {
             action::Parameters result{Qn::CloudSystemIdRole,
                 index.data(Qn::CloudSystemIdRole).toString()};
             return withNodeType(result);
         }
-        case Qn::LayoutItemNode:
+        case NodeType::layoutItem:
             return withNodeType(selectedLayoutItems());
 
         default:
@@ -687,7 +690,7 @@ action::Parameters QnResourceBrowserWidget::currentParameters(action::ActionScop
 
     /* For working with shared layout links we must know owning user resource. */
     QModelIndex parentIndex = index.parent();
-    Qn::NodeType parentNodeType = parentIndex.data(Qn::NodeTypeRole).value<Qn::NodeType>();
+    const auto parentNodeType = parentIndex.data(Qn::NodeTypeRole).value<NodeType>();
 
     /* We can select several layouts and some other resources in any part of tree - in this case just do not set anything. */
     QnUserResourcePtr user;
@@ -695,7 +698,7 @@ action::Parameters QnResourceBrowserWidget::currentParameters(action::ActionScop
 
     switch (nodeType)
     {
-        case Qn::SharedLayoutsNode:
+        case NodeType::sharedLayouts:
             user = parentIndex.data(Qn::ResourceRole).value<QnResourcePtr>().dynamicCast<QnUserResource>();
             uuid = parentIndex.data(Qn::UuidRole).value<QnUuid>();
             break;
@@ -705,15 +708,15 @@ action::Parameters QnResourceBrowserWidget::currentParameters(action::ActionScop
 
     switch (parentNodeType)
     {
-        case Qn::LayoutsNode:
+        case NodeType::layouts:
             user = context()->user();
             break;
-        case Qn::SharedResourcesNode:
-        case Qn::SharedLayoutsNode:
+        case NodeType::sharedResources:
+        case NodeType::sharedLayouts:
             user = parentIndex.parent().data(Qn::ResourceRole).value<QnResourcePtr>().dynamicCast<QnUserResource>();
             uuid = parentIndex.parent().data(Qn::UuidRole).value<QnUuid>();
             break;
-        case Qn::ResourceNode:
+        case NodeType::resource:
             user = parentIndex.data(Qn::ResourceRole).value<QnResourcePtr>().dynamicCast<QnUserResource>();
             break;
         default:
@@ -1004,16 +1007,16 @@ void QnResourceBrowserWidget::at_thumbnailClicked()
 
 void QnResourceBrowserWidget::handleItemActivated(const QModelIndex& index, bool withMouse)
 {
-    Qn::NodeType nodeType = index.data(Qn::NodeTypeRole).value<Qn::NodeType>();
+    const auto nodeType = index.data(Qn::NodeTypeRole).value<NodeType>();
 
-    if (nodeType == Qn::CloudSystemNode)
+    if (nodeType == NodeType::cloudSystem)
     {
         menu()->trigger(action::ConnectToCloudSystemAction,
             {Qn::CloudSystemIdRole, index.data(Qn::CloudSystemIdRole).toString()});
         return;
     }
 
-    if (nodeType == Qn::VideoWallItemNode)
+    if (nodeType == NodeType::videoWallItem)
     {
         auto item = resourcePool()->getVideoWallItemByUuid(index.data(Qn::UuidRole).value<QnUuid>());
         menu()->triggerIfPossible(action::StartVideoWallControlAction,
@@ -1021,7 +1024,7 @@ void QnResourceBrowserWidget::handleItemActivated(const QModelIndex& index, bool
         return;
     }
 
-    if (nodeType == Qn::LayoutTourNode)
+    if (nodeType == NodeType::layoutTour)
     {
         menu()->triggerIfPossible(action::ReviewLayoutTourAction,
             {Qn::UuidRole, index.data(Qn::UuidRole).value<QnUuid>()});
@@ -1034,7 +1037,7 @@ void QnResourceBrowserWidget::handleItemActivated(const QModelIndex& index, bool
         return;
 
     /* Do not open servers of admin.  */
-    if (nodeType == Qn::ResourceNode && resource->hasFlags(Qn::server) && withMouse)
+    if (nodeType == NodeType::resource && resource->hasFlags(Qn::server) && withMouse)
         return;
 
     const bool isLayoutTourReviewMode = workbench()->currentLayout()->isLayoutTourReview();

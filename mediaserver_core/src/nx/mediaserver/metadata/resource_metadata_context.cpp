@@ -24,7 +24,7 @@ ResourceMetadataContext::ResourceMetadataContext()
 
 ResourceMetadataContext::~ResourceMetadataContext()
 {
-    m_videoFrameDataReceptor.clear();
+    m_videoDataReceptor.clear();
 }
 
 bool ResourceMetadataContext::canAcceptData() const
@@ -69,12 +69,14 @@ void ResourceMetadataContext::addManager(
     m_managers.push_back(std::move(context));
 }
 
-void ResourceMetadataContext::setVideoFrameDataReceptor(const QSharedPointer<VideoDataReceptor>& receptor)
+void ResourceMetadataContext::setVideoDataReceptor(
+    const QSharedPointer<VideoDataReceptor>& receptor)
 {
-    m_videoFrameDataReceptor = receptor;
+    m_videoDataReceptor = receptor;
 }
 
-void ResourceMetadataContext::setMetadataDataReceptor(QWeakPointer<QnAbstractDataReceptor> receptor)
+void ResourceMetadataContext::setMetadataDataReceptor(
+    QWeakPointer<QnAbstractDataReceptor> receptor)
 {
     m_metadataReceptor = receptor;
 }
@@ -84,9 +86,9 @@ ManagerList& ResourceMetadataContext::managers()
     return m_managers;
 }
 
-QSharedPointer<VideoDataReceptor> ResourceMetadataContext::videoFrameDataReceptor() const
+QSharedPointer<VideoDataReceptor> ResourceMetadataContext::videoDataReceptor() const
 {
-    return m_videoFrameDataReceptor;
+    return m_videoDataReceptor;
 }
 
 QWeakPointer<QnAbstractDataReceptor> ResourceMetadataContext::metadataDataReceptor() const

@@ -5,6 +5,7 @@
 #include <deque>
 #include <functional>
 #include <memory>
+#include <set>
 
 #include <nx/utils/move_only_func.h>
 #include <nx/utils/singleton.h>
@@ -63,6 +64,12 @@ public:
     void removeEtcHost(const QString& name);
 
     /**
+     * Every attempt to resolve hostName will fails with SystemError::hostNotFound.
+     */
+    void blockHost(const QString& hostName);
+    void unblockHost(const QString& hostName);
+
+    /**
      * @param priority Greater value increases priority.
      */
     void registerResolver(std::unique_ptr<AbstractResolver> resolver, int priority);
@@ -97,6 +104,7 @@ private:
     std::chrono::milliseconds m_resolveTimeout;
     PredefinedHostResolver* m_predefinedHostResolver;
     std::multimap<int, std::unique_ptr<AbstractResolver>, std::greater<int>> m_resolversByPriority;
+    std::set<QString> m_blockedHosts;
 
     bool isExpired(const ResolveTask& task) const;
 };

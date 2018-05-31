@@ -36,7 +36,7 @@ namespace ec2
             //QJson::serialize(tran.params, &jsonParams);
 
             QJsonObject tranObject;
-            tranObject["tran"] = jsonTran;
+            tranObject[QStringLiteral("tran")] = jsonTran;
 
             QByteArray* result = new QByteArray();
             QJson::serialize(tranObject, result);
@@ -58,8 +58,8 @@ namespace ec2
             QJson::serialize(header, &jsonHeader);
 
             QJsonObject tranObject;
-            tranObject["tran"] = jsonTran;
-            tranObject["header"] = jsonHeader;
+            tranObject[QStringLiteral("tran")] = jsonTran;
+            tranObject[QStringLiteral("header")] = jsonHeader;
 
             return QJson::serialized(tranObject);
         }

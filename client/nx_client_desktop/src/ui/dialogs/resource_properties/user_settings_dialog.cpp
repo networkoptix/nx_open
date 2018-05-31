@@ -427,7 +427,7 @@ void QnUserSettingsDialog::loadDataToUi()
         if (auth.isEmpty())
         {
             ui->alertBar->setText(tr("This user has not yet signed up for %1",
-                "%1 is the cloud name (like 'Nx Cloud')").arg(nx::network::AppInfo::cloudName()));
+                "%1 is the cloud name (like Nx Cloud)").arg(nx::network::AppInfo::cloudName()));
             return;
         }
     }

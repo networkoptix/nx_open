@@ -10,7 +10,7 @@ QnResourceTreeModelRecorderNode::QnResourceTreeModelRecorderNode(
     QnResourceTreeModel* model,
     const QnVirtualCameraResourcePtr& camera)
     :
-    base_type(model, Qn::RecorderNode, QString())
+    base_type(model, NodeType::recorder, QString())
 {
     updateName(camera);
 }
@@ -40,7 +40,11 @@ void QnResourceTreeModelRecorderNode::addChildInternal(const QnResourceTreeModel
         connect(camera, &QnVirtualCameraResource::propertyChanged, this,
             [this, camera](const QnResourcePtr& /*resource*/, const QString& name)
             {
-                if (name == Qn::DTS_PARAM_NAME || name == Qn::ANALOG_PARAM_NAME)
+                const bool hasDeviceTypeBeenChanged = name == Qn::DTS_PARAM_NAME
+                    || name == Qn::ANALOG_PARAM_NAME
+                    || name == Qn::kDeviceType;
+
+                if (hasDeviceTypeBeenChanged)
                     updateIcon();
             });
 

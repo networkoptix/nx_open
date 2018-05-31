@@ -8,8 +8,7 @@
 #include <ui/workbench/workbench_context_aware.h>
 
 namespace Ui { class LegacyArchiveLengthWidget; }
-
-class QnAligner;
+namespace nx { namespace client { namespace desktop { class Aligner; }}}
 
 class QnArchiveLengthWidget: public QWidget, public QnUpdatable, public QnWorkbenchContextAware
 {
@@ -22,7 +21,7 @@ public:
     explicit QnArchiveLengthWidget(QWidget* parent = nullptr);
     virtual ~QnArchiveLengthWidget();
 
-    QnAligner* aligner() const;
+    nx::client::desktop::Aligner* aligner() const;
 
     void updateFromResources(const QnVirtualCameraResourceList& cameras);
     void submitToResources(const QnVirtualCameraResourceList& cameras);
@@ -50,5 +49,5 @@ private:
     QScopedPointer<Ui::LegacyArchiveLengthWidget> ui;
     bool m_readOnly = false;
     QString m_alert;
-    QnAligner* m_aligner = nullptr;
+    nx::client::desktop::Aligner* m_aligner = nullptr;
 };

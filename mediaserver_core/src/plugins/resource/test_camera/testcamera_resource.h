@@ -31,6 +31,4 @@ protected:
 private:
 };
 
-typedef QnSharedResourcePointer<QnTestCameraResource> QnTestCameraResourcePtr;
-
 #endif // #ifdef ENABLE_TEST_CAMERA

@@ -37,8 +37,8 @@ struct ConfigureSystemData: public PasswordData
     int port;
     ec2::ApiMediaServerData foreignServer;
     std::vector<ec2::ApiUserData> foreignUsers;
-    ec2::ApiResourceParamDataList foreignSettings;
-    ec2::ApiResourceParamWithRefDataList additionParams;
+    nx::vms::api::ResourceParamDataList foreignSettings;
+    nx::vms::api::ResourceParamWithRefDataList additionParams;
     bool rewriteLocalSettings;
     QString systemName; //added for compatibility with NxTool
 };

@@ -16,16 +16,16 @@ class SingleCameraSettingsWidget;
 }
 
 class QVBoxLayout;
-class QnCameraThumbnailManager;
 
 namespace nx {
 namespace client {
 namespace desktop {
 
-class CameraMotionMaskWidget;
 class CameraAdvancedSettingsWebPage;
+class LegacyCameraMotionMaskWidget;
+class CameraThumbnailManager;
 
-class SingleCameraSettingsWidget : public Connective<QWidget>, public QnWorkbenchContextAware
+class SingleCameraSettingsWidget: public Connective<QWidget>, public QnWorkbenchContextAware
 {
     Q_OBJECT
     Q_PROPERTY(bool readOnly READ isReadOnly WRITE setReadOnly)
@@ -111,7 +111,7 @@ private:
     Q_DISABLE_COPY(SingleCameraSettingsWidget)
 
     QScopedPointer<Ui::SingleCameraSettingsWidget> ui;
-    QScopedPointer<QnCameraThumbnailManager> m_cameraThumbnailManager;
+    QScopedPointer<CameraThumbnailManager> m_cameraThumbnailManager;
     QnVirtualCameraResourcePtr m_camera;
 
     bool m_cameraSupportsMotion = false;
@@ -121,7 +121,7 @@ private:
     bool m_readOnly = false;
     bool m_updating = false;
 
-    CameraMotionMaskWidget* m_motionWidget = nullptr;
+    LegacyCameraMotionMaskWidget* m_motionWidget = nullptr;
     QVBoxLayout* m_motionLayout = nullptr;
     QButtonGroup* m_sensitivityButtons;
 

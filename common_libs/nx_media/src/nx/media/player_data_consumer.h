@@ -4,14 +4,13 @@
 #include <atomic>
 #include <functional>
 
+#include <utils/media/externaltimesource.h>
 #include <common/common_globals.h>
 #include <nx/streaming/abstract_data_consumer.h>
 #include <nx/streaming/video_data_packet.h>
 #include <nx/streaming/audio_data_packet.h>
-
-#include "media_fwd.h"
-#include "audio_output.h"
-#include <utils/media/externaltimesource.h>
+#include <nx/media/media_fwd.h>
+#include <nx/media/audio_output.h>
 
 class QnArchiveStreamReader;
 
@@ -36,7 +35,8 @@ public:
     typedef std::function<QRect()> VideoGeometryAccessor;
 
 public:
-    PlayerDataConsumer(const std::unique_ptr<QnArchiveStreamReader>& archiveReader);
+    PlayerDataConsumer(const std::unique_ptr<QnArchiveStreamReader>& archiveReader,
+        RenderContextSynchronizerPtr renderContextSynchronizer);
     virtual ~PlayerDataConsumer();
 
     QVideoFramePtr dequeueVideoFrame();
@@ -103,6 +103,8 @@ signals:
 
     void mediaEventChanged();
 
+    /** Got metadata in the media stream. */
+    void gotMetadata(QnAbstractCompressedMetadataPtr data);
 private slots:
     void onBeforeJump(qint64 timeUsec);
     void onJumpCanceled(qint64 timeUsec);
@@ -196,6 +198,7 @@ private:
     std::atomic<bool> m_needToResetAudio;
     std::atomic<bool> m_allowOverlay;
     Qn::MediaStreamEvent m_mediaEvent = Qn::MediaStreamEvent::NoEvent;
+    RenderContextSynchronizerPtr m_renderContextSynchronizer;
 };
 
 } // namespace media

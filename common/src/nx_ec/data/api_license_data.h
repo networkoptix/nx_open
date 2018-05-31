@@ -5,7 +5,7 @@
 
 namespace ec2 {
 
-struct ApiLicenseData: ApiData
+struct ApiLicenseData: nx::vms::api::Data
 {
     QnLatin1Array key;
     QnLatin1Array licenseBlock;
@@ -14,7 +14,7 @@ struct ApiLicenseData: ApiData
 };
 #define ApiLicenseData_Fields (key)(licenseBlock)
 
-struct ApiDetailedLicenseData: ApiData
+struct ApiDetailedLicenseData: nx::vms::api::Data
 {
     QnLatin1Array key;
     QString name;

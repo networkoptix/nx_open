@@ -74,12 +74,11 @@
                                     <p>{{activeFunction.result.caption}}</p>
                                     <ul ng-if="activeFunction.result.params">
                                         <li ng-repeat="param in activeFunction.result.params">
-                                            <div class="label label-danger" ng-if="param.proprietary">merkgebonden</div>
-                                            <div class="label label-danger" ng-if="!param.optional">vereist</div>
-                                            <b>{{param.name}}</b>
+                                            <div class="label label-danger" ng-if="param.proprietary">proprietary</div>
+                                            <b>{{param.name}}</b> ({{param.type}})
                                             <span ng-if="param.description.xml" ng-bind-html="param.description.xml"></span>
                                             <span ng-if="param.values">
-                                                Waarden:
+                                                Values:
                                                 <ul>
                                                     <li ng-repeat="value in param.values">
                                                         <b>{{value.name}}</b>

@@ -22,7 +22,7 @@ int QnGetAnalyticsActionsRestHandler::executeGet(
     QnJsonRestResult& result,
     const QnRestConnectionProcessor* owner)
 {
-    const auto objectTypeId = QnUuid(params.value("objectTypeId"));
+    const QnUuid objectTypeId(params.value("objectTypeId"));
     if (objectTypeId.isNull())
     {
         result.setError(QnRestResult::InvalidParameter, "Parameter objectTypeId is missing or invalid");

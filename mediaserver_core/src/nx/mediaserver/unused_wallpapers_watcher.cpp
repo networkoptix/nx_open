@@ -36,7 +36,7 @@ void UnusedWallpapersWatcher::update()
     std::sort(fileList.begin(), fileList.end());
 
     auto layoutManager = connection->getLayoutManager(Qn::kSystemAccess);
-    ec2::ApiLayoutDataList layoutList;
+    nx::vms::api::LayoutDataList layoutList;
     result = layoutManager->getLayoutsSync(&layoutList);
     if (result != ec2::ErrorCode::ok)
         return;

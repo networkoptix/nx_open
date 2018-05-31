@@ -53,11 +53,6 @@
       <translation>検出されたシステム %1 は互換性のないバージョン %2 です</translation>
     </message>
     <message>
-      <source>Cannot connect to the other System because current System is already connected to %1.</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-      <translation>現在のシステムは既に %1 に接続されているために他のシステムに接続できません</translation>
-    </message>
-    <message>
       <source>The discovered System %1 is in safe mode.</source>
       <comment>%1 is name of System</comment>
       <translation>検出されたシステム %1 はセーフモードです</translation>
@@ -66,16 +61,6 @@
       <source>Could not configure the remote System %1.</source>
       <comment>%1 is name of System</comment>
       <translation>リモート システム %1 を構成できませんでした</translation>
-    </message>
-    <message>
-      <source>Both Systems are connected to %1. Merge is not allowed.</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-      <translation>両方のシステムは %1 に接続しています　統合は許可されていません</translation>
-    </message>
-    <message>
-      <source>These Systems are built with different %1 URL. Merge is not allowed.</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-      <translation>これらのシステムは異なる %1 の URL で構築されています　統合は許可されていません</translation>
     </message>
     <message>
       <source>New System</source>
@@ -87,9 +72,24 @@
       <translation>検出されたシステム%1は、現在のシステムと互換性がありません</translation>
     </message>
     <message>
+      <source>Cannot connect to the other System because current System is already connected to %1.</source>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
+      <translation>現在のシステムは既に %1 に接続されているために他のシステムに接続できません</translation>
+    </message>
+    <message>
       <source>%1 System can only be merged with non-%1. System name and password are taken from %1 System.</source>
-      <comment>%1 is the short cloud name (like &apos;Cloud&apos;)</comment>
+      <comment>%1 is the short cloud name (like Cloud)</comment>
       <translation>%1 システムはクラウドに接続されていない-%1 システムとのみ結合できます　システム名とパスワードは %1 システムから取得されます</translation>
+    </message>
+    <message>
+      <source>Both Systems are connected to %1. Merge is not allowed.</source>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
+      <translation>両方のシステムは %1 に接続しています　統合は許可されていません</translation>
+    </message>
+    <message>
+      <source>These Systems are built with different %1 URL. Merge is not allowed.</source>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
+      <translation>これらのシステムは異なる %1 の URL で構築されています　統合は許可されていません</translation>
     </message>
   </context>
   <context>
@@ -577,7 +577,7 @@
       <translation>不明なエラー</translation>
     </message>
     <message>
-      <source>Server with matching Hardware Id not found</source>
+      <source>Server with matching Hardware ID not found</source>
       <translation>サーバーのハードウェアIDが見つかりません</translation>
     </message>
   </context>
@@ -694,12 +694,12 @@
       <translation>透かし: %1</translation>
     </message>
     <message>
-      <source>Hardware Id: %1</source>
-      <translation>ハードウェア Id: %1</translation>
-    </message>
-    <message>
       <source>Time License</source>
       <translation>タイムライセンス</translation>
+    </message>
+    <message>
+      <source>Hardware ID: %1</source>
+      <translation>ハードウェア ID: %1</translation>
     </message>
   </context>
   <context>

@@ -452,7 +452,7 @@ QString QnConnectionDiagnosticsHelper::getErrorString(ErrorStrings id)
         case ErrorStrings::CloudIsNotReady:
             return tr("Connection to %1 is not ready yet. "
                 "Check server Internet connection or try again later.",
-                "%1 is the cloud name (like 'Nx Cloud')").arg(nx::network::AppInfo::cloudName());
+                "%1 is the cloud name (like Nx Cloud)").arg(nx::network::AppInfo::cloudName());
         default:
             NX_ASSERT(false, Q_FUNC_INFO, "Should never get here");
             break;

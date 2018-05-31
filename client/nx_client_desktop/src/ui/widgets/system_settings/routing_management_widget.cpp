@@ -30,6 +30,8 @@
 #include <utils/common/event_processors.h>
 #include <utils/common/util.h>
 
+using namespace nx::client::desktop;
+
 namespace {
 
     class SortedServersProxyModel : public QSortFilterProxyModel {
@@ -222,7 +224,7 @@ QnRoutingManagementWidget::QnRoutingManagementWidget(QWidget *parent) :
     ui->addressesView->header()->setSectionsMovable(false);
 
     ui->addressesView->setIgnoreDefaultSpace(true);
-    connect(ui->addressesView, &QnTreeView::spacePressed, this,
+    connect(ui->addressesView, &TreeView::spacePressed, this,
         [this](const QModelIndex& index)
         {
             auto checkIndex = index.sibling(index.row(), QnServerAddressesModel::InUseColumn);

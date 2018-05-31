@@ -347,6 +347,18 @@ public:
     Q_INVOKABLE static bool contains(const QSize& size, const QSize& otherSize);
 
     /**
+    * @return true if specified rectangle contains given point.
+    */
+    Q_INVOKABLE static bool contains(const QRect& rect, const QPoint& point);
+    Q_INVOKABLE static bool contains(const QRectF& rect, const QPointF& point);
+
+    /**
+    * @return intersection of two rectangles.
+    */
+    Q_INVOKABLE static QRect intersection(const QRect& r1, const QRect& r2);
+    Q_INVOKABLE static QRectF intersection(const QRectF& r1, const QRectF& r2);
+
+    /**
      * @return Area of the provided rectangle or 0 if it is not valid.
      */
     Q_INVOKABLE static qint64 area(const QRect& rect);

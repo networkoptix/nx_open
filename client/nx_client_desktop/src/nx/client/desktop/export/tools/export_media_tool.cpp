@@ -2,8 +2,11 @@
 
 #include <QtCore/QFileInfo>
 
+#include <client_core/client_core_module.h>
+
 #include <core/resource/media_resource.h>
 #include <core/resource/camera_resource.h>
+#include <core/dataprovider/data_provider_factory.h>
 
 #include <nx/client/desktop/export/data/export_media_settings.h>
 #include <nx/client/desktop/export/tools/export_timelapse_recorder.h>
@@ -170,8 +173,9 @@ private:
             return true;
         }
 
-        const auto tmpReader = settings.mediaResource->toResource()->createDataProvider(
-            Qn::CR_Default);
+        const auto tmpReader = qnClientCoreModule->dataProviderFactory()->createDataProvider(
+                settings.mediaResource->toResourcePtr());
+
         auto archiveReader = dynamic_cast<QnAbstractArchiveStreamReader*>(tmpReader);
         if (!archiveReader)
         {

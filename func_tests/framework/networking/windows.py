@@ -1,91 +1,208 @@
-#!/usr/bin/env python
 import logging
-from subprocess import check_output
+from pprint import pformat
 
-from framework.windows_cmd_path import make_windows_cmd_path
+from netaddr import EUI, IPNetwork, mac_eui48
+from pylru import lrudecorator
 
-log = logging.getLogger(__name__)
+from framework.networking.interface import Networking
+from framework.os_access.windows_remoting import WinRM
 
-
-class VBox(object):
-    def __init__(self, name, credentials):
-        self._name = name
-        self._credentials = credentials
-
-    def _ps_commands(self):
-        """
-        ConvertTo-Json
-        Get-NetConnectionProfile
-        Get-WmiObject -Class Win32_NetworkAdapter
-        Get-WmiObject -Class Win32_NetworkAdapterConfiguration
-        Get-NetIPAddress
-        Get-NetAdapter
-        Get-NetAdapterAdvancedProperty
-        Test-WSMan -ComputerName 10.5.0.10
-        Winrm enumerate windows_remoting/config/listener
-        winrs -r:10.5.0.10 -u:Administrator –p:qweasd123 ipconfig
-        windows_remoting set windows_remoting/config/service/auth '@{Basic="true"}'
-        windows_remoting set windows_remoting/config/service '@{AllowUnencrypted="true"}'
-        """
-        pass
-
-    def get_property(self, property_name):
-        output = check_output(['VBoxManage', 'guestproperty', 'get', self._name, property_name])
-        for line in output.strip().splitlines():
-            name, value = line.split(b': ', 1)
-            if name == b'Value':
-                return value.decode()
-        assert False, "No 'Value' key in output:\n" + output.decode('ascii')
+_logger = logging.getLogger(__name__)
 
 
-def assign_static_ip(connection, static_adapter_mac, static_address, prefix_length):
-    adapters = connection.ps('gwmi', 'Win32_NetworkAdapter')  # Win32_NetworkAdapterConfiguration is OK too.
-    static_adapter, = (
-        adapter for adapter in adapters
-        if adapter['MACAddress'] and adapter['MACAddress'].replace(':', '') == static_adapter_mac)
-    connection.ps(
-        'Remove-NetIPAddress',
-        '-InterfaceIndex', str(static_adapter['InterfaceIndex']),
-        '-Confirm:$false')
-    connection.ps(
-        'New-NetIPAddress',
-        '-InterfaceIndex', str(static_adapter['InterfaceIndex']),
-        '-IPAddress', static_address, '-PrefixLength', str(prefix_length))
+class PingError(Exception):
+    def __init__(self, ip, message):
+        super(PingError, self).__init__(message)
+        self.ip = ip
 
 
-def get_system_profile_path(connection):
-    system_accounts = connection.ps('gwmi', 'Win32_SystemAccount')
-    local_system, = (account for account in system_accounts if account['Name'] == 'SYSTEM')
-    user_profiles = connection.ps('gwmi', 'Win32_UserProfile')
-    local_system_profile, = (profile for profile in user_profiles if profile['SID'] == local_system['SID'])
-    return local_system_profile['LocalPath']
+class WindowsNetworking(Networking):
+    _firewall_rule_name = 'NX-TestStandNetwork'
+    _firewall_rule_display_name = 'NX Test Stand Network'
 
+    def __init__(self, winrm, macs):
+        super(WindowsNetworking, self).__init__()
+        self._names = {mac: 'Plugable {}'.format(slot) for slot, mac in macs.items()}
+        self._winrm = winrm  # type: WinRM
+        self.__repr__ = lambda: '<WindowsNetworking on {}>'.format(winrm)
 
-def main():
-    logging.basicConfig(level=logging.DEBUG)
-    credentials = 'Administrator', 'qweasd123'
-    vbox = VBox('wr', credentials)
-    dynamic_ip = vbox.get_property('/VirtualBox/GuestInfo/Net/0/V4/IP')
-    # temporary_connection = PowerShellConnection(dynamic_ip, credentials)
-    # static_address = '10.6.0.100'
-    # prefix_length = 24
-    # static_adapter_mac = vbox.get_property('/VirtualBox/GuestInfo/Net/1/MAC')
-    # assign_static_ip(temporary_connection, static_adapter_mac, static_address, prefix_length)
-    # connection = PowerShellConnection(static_address, credentials)
-    connection = WinRM(dynamic_ip, credentials)
-    package_path = r'C:\Users\Administrator\Downloads\nxwitness-server-3.2.0.43-none-beta-test.exe'
-    install_log_path = package_path + '.install.log'
-    uninstall_log_path = package_path + '.uninstall.log'
-    downloads = r'C:\Users\Administrator\Downloads'
-    path = make_windows_cmd_path(connection.cmd, downloads)
-    (path / 'oi.txt').write_text('hi\nhi\n\n\n\nwerwqerqwrwqr')
-    print((path / 'oi.txt').read_text())
+    def rename_interfaces(self, mac_to_new_name):
+        self._winrm.run_powershell_script(
+            # language=PowerShell
+            '''
+                $adapters = @( Get-NetAdapter )
+                foreach ( $macAndNewName in $macToNewName ) {
+                    $mac = $macAndNewName[0]
+                    $newName = $macAndNewName[1]
+                    $renamed = $false
+                    foreach ( $adapter in $adapters ) {
+                        if ( $adapter.MacAddress -eq $mac ) {
+                            Rename-NetAdapter -Name:$adapter.Name -NewName:$newName
+                            $renamed = $true
+                            [Console]::Error.WriteLine("Renamed adapter with MAC $mac to $newName")
+                        }
+                    }
+                    if ( -not $renamed ) {
+                        [Console]::Error.WriteLine("No adapter with MAC $mac")
+                    }
+                }
+                [Console]::Error.WriteLine("Name and InterfaceAlias are synonyms")
+                [Console]::Error.WriteLine("InterfaceIndex may chane after reboot, don't rely on it!")
+                ''',
+            {
+                'macToNewName': [
+                    (str(EUI(mac, dialect=mac_eui48)), new_name)
+                    for mac, new_name in mac_to_new_name.items()],
+                })
 
-    # connection.cmd(package_path, '/uninstall', '/passive', '/l*x', install_log_path)
-    # connection.cmd('type', install_log_path)
-    # connection.cmd(package_path, '/passive', '/l*x', uninstall_log_path)
-    # connection.cmd('type', uninstall_log_path)
+    @property
+    @lrudecorator(1)
+    def interfaces(self):
+        self.rename_interfaces(self._names)
+        return self._names
 
+    def firewall_rule_exists(self):
+        rules = self._winrm.run_powershell_script(
+            # language=PowerShell
+            '''
+                Get-NetFirewallRule -Name:$Name -ErrorAction:SilentlyContinue |
+                    select Name,DisplayName,Direction,RemoteAddress,Action
+                ''',
+            {'name': self._firewall_rule_name})
+        return bool(rules)
 
-if __name__ == '__main__':
-    main()
+    def create_firewall_rule(self):
+        self._winrm.run_powershell_script(
+            # language=PowerShell
+            '''
+                if ( -not ( Get-NetFirewallRule -Name:$Name -ErrorAction:SilentlyContinue ) ) {
+                    $newRule = New-NetFirewallRule `
+                        -Name:$Name `
+                        -DisplayName:$DisplayName `
+                        -Direction:Outbound `
+                        -RemoteAddress:@('10.0.0.0/8', '192.168.0.0/16') `
+                        -Action:Allow
+                }
+                ''',
+            {'Name': self._firewall_rule_name, 'DisplayName': self._firewall_rule_display_name})
+
+    def remove_firewall_rule(self):
+        self._winrm.run_powershell_script(
+            # language=PowerShell
+            '''
+                Remove-NetFirewallRule `
+                    -Name:$Name `
+                    -ErrorAction:SilentlyContinue `
+                    -Confirm:$false
+                ''',
+            {'Name': self._firewall_rule_name})
+
+    def disable_internet(self):
+        self._winrm.run_powershell_script(
+            # language=PowerShell
+            '''Set-NetFirewallProfile -DefaultOutboundAction:Block''',
+            {})
+
+    def enable_internet(self):
+        self._winrm.run_powershell_script(
+            # language=PowerShell
+            '''Set-NetFirewallProfile -DefaultOutboundAction:Allow''',
+            {})
+
+    def internet_is_enabled(self):
+        all_profiles = self._winrm.run_powershell_script(
+            # language=PowerShell
+            '''Get-NetFirewallProfile | select DefaultOutboundAction | ConvertTo-Json''',
+            {})
+        return not all(profile['DefaultOutboundAction'] == 'Block' for profile in all_profiles)
+
+    def setup_ip(self, mac, ip, prefix_length):
+        all_configurations = self._winrm.wmi_query(u'Win32_NetworkAdapterConfiguration', {}).enumerate()
+        requested_configuration, = [
+            configuration for configuration in all_configurations
+            if configuration[u'MACAddress'] != {u'@xsi:nil': u'true'} and EUI(configuration[u'MACAddress']) == mac]
+        invoke_selectors = {u'Index': requested_configuration[u'Index']}
+        invoke_query = self._winrm.wmi_query(u'Win32_NetworkAdapterConfiguration', invoke_selectors)
+        subnet_mask = IPNetwork('{}/{}'.format(ip, prefix_length)).netmask
+        invoke_arguments = {u'IPAddress': [str(ip)], u'SubnetMask': [str(subnet_mask)]}
+        invoke_result = invoke_query.invoke_method(u'EnableStatic', invoke_arguments)
+        if invoke_result[u'ReturnValue'] != u'0':
+            raise RuntimeError('EnableStatic returned {}'.format(pformat(invoke_result)))
+
+    def list_ips(self):
+        result = self._winrm.run_powershell_script(
+            # language=PowerShell
+            '''
+                Get-NetIPAddress -PolicyStore:PersistentStore -AddressFamily:IPv4 -ErrorAction:SilentlyContinue |
+                    select InterfaceAlias,IPAddress
+                    ''',
+            {})
+        return result
+
+    def remove_ips(self):
+        self._winrm.run_powershell_script(
+            # language=PowerShell
+            ''' 
+                # Get addresses from PersistentStore and delete them and their ActiveStore counterparts.
+                $ipAddresses = (Get-NetIPAddress -PolicyStore:PersistentStore)
+                foreach ( $ipAddress in $ipAddresses ) {
+                    Remove-NetIPAddress `
+                        -InterfaceAlias:$ipAddress.InterfaceAlias `
+                        -IPAddress:$ipAddress.IPAddress `
+                        -Confirm:$false
+                }
+                ''',
+            {})
+
+    def route(self, destination_ip_net, gateway_bound_mac, gateway_ip):
+        self._winrm.run_powershell_script(
+            # language=PowerShell
+            '''
+                $newRoute = New-NetRoute `
+                    -DestinationPrefix:$destinationPrefix `
+                    -InterfaceAlias:$interfaceAlias `
+                    -NextHop:$nextHop
+                ''',
+            {
+                'destinationPrefix': destination_ip_net,
+                'nextHop': gateway_ip,
+                'interfaceAlias': self.interfaces[gateway_bound_mac],
+                })
+
+    def list_routes(self):
+        result = self._winrm.run_powershell_script(
+            # language=PowerShell
+            '''
+                Get-NetRoute -PolicyStore:PersistentStore -AddressFamily:IPv4 -ErrorAction:SilentlyContinue |
+                    select DestinationPrefix,InterfaceAlias,NextHop
+                    ''',
+            {})
+        return result
+
+    def remove_routes(self):
+        self._winrm.run_powershell_script(
+            # language=PowerShell
+            '''
+                $persistentRules = (Get-NetRoute -PolicyStore:PersistentStore -ErrorAction:SilentlyContinue)
+                if ( $persistentRules ) {
+                    Remove-NetRoute `
+                        -DestinationPrefix:$persistentRules.DestinationPrefix `
+                        -InterfaceAlias:$persistentRules.InterfaceAlias `
+                        -NextHop:$persistentRules.NextHop `
+                        -Confirm:$false
+                }
+                ''',
+            {})
+
+    def can_reach(self, ip, timeout_sec=4):
+        query = self._winrm.wmi_query(u'Win32_PingStatus', {u'Address': str(ip)})
+        status = query.get_one()
+        return status[u'StatusCode'] == u'0'
+
+    def reset(self):
+        self.remove_routes()
+        self.remove_ips()
+        self.create_firewall_rule()
+
+    def setup_nat(self, outer_mac):
+        raise NotImplementedError("Windows 10 cannot be set up as router out-of-the-box")

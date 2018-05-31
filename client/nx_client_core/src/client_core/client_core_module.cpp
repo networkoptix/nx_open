@@ -12,14 +12,16 @@
 
 #include <core/resource_management/resources_changes_manager.h>
 #include <core/resource_management/layout_tour_state_manager.h>
+#include <core/dataprovider/data_provider_factory.h>
 
 #include <utils/media/ffmpeg_initializer.h>
 
-#include <nx_ec/ec2_lib.h>
 #include <nx/utils/log/assert.h>
 #include <nx/utils/timer_manager.h>
 #include <nx/client/core/watchers/known_server_connections.h>
+#include <ec2/remote_connection_factory.h>
 #include <nx/client/core/utils/operation_manager.h>
+#include <plugins/resource/desktop_audio_only/desktop_audio_only_resource.h>
 
 using namespace nx::client::core;
 
@@ -34,8 +36,9 @@ QnClientCoreModule::QnClientCoreModule(QObject* parent):
     m_commonModule->store(new QnFfmpegInitializer());
 
     NX_ASSERT(nx::utils::TimerManager::instance());
-    m_connectionFactory.reset(getConnectionFactory(qnStaticCommon->localPeerType(),
-        nx::utils::TimerManager::instance(), m_commonModule, false));
+    m_connectionFactory.reset(new ec2::RemoteConnectionFactory(
+        m_commonModule, qnStaticCommon->localPeerType(),
+        nx::utils::TimerManager::instance(), false));
 
     m_commonModule->instance<QnResourcesChangesManager>();
     m_commonModule->instance<QnClientPtzControllerPool>();
@@ -44,7 +47,11 @@ QnClientCoreModule::QnClientCoreModule(QObject* parent):
     m_commonModule->store(new watchers::KnownServerConnections(m_commonModule));
     m_commonModule->store(new OperationManager());
 
+    m_resourceDataProviderFactory.reset(new QnDataProviderFactory());
+
     m_qmlEngine = new QQmlEngine(this);
+
+    registerResourceDataProviders();
 }
 
 QnClientCoreModule::~QnClientCoreModule()
@@ -72,7 +79,17 @@ QnLayoutTourStateManager* QnClientCoreModule::layoutTourStateManager() const
     return m_commonModule->instance<QnLayoutTourStateManager>();
 }
 
+QnDataProviderFactory* QnClientCoreModule::dataProviderFactory() const
+{
+    return m_resourceDataProviderFactory.data();
+}
+
 QQmlEngine*QnClientCoreModule::mainQmlEngine()
 {
     return m_qmlEngine;
+}
+
+void QnClientCoreModule::registerResourceDataProviders()
+{
+    m_resourceDataProviderFactory->registerResourceType<QnDesktopAudioOnlyResource>();
 }

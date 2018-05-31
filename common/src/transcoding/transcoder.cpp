@@ -28,7 +28,7 @@ static const int kHeightRoundingFactor = 4;
 QnCodecTranscoder::QnCodecTranscoder(AVCodecID codecId)
 :
     m_bitrate(-1),
-    m_quality(Qn::QualityNormal)
+    m_quality(Qn::StreamQuality::normal)
 {
     m_codecId = codecId;
 }
@@ -209,8 +209,8 @@ int QnTranscoder::suggestBitrate(
     QSize resolution,
     Qn::StreamQuality quality)
 {
-    // I assume for a Qn::QualityHighest quality 30 fps for 1080 we need 10 mbps
-    // I assume for a Qn::QualityLowest quality 30 fps for 1080 we need 1 mbps
+    // I assume for a Qn::StreamQuality::highest quality 30 fps for 1080 we need 10 mbps
+    // I assume for a Qn::StreamQuality::lowest quality 30 fps for 1080 we need 1 mbps
 
     if (resolution.width() == 0)
         resolution.setWidth(resolution.height() * 4 / 3);
@@ -218,19 +218,19 @@ int QnTranscoder::suggestBitrate(
     int hiEnd;
     switch (quality)
     {
-        case Qn::QualityLowest:
+        case Qn::StreamQuality::lowest:
             hiEnd = 1024;
             break;
-        case Qn::QualityLow:
+        case Qn::StreamQuality::low:
             hiEnd = 1024 + 512;
             break;
-        case Qn::QualityNormal:
+        case Qn::StreamQuality::normal:
             hiEnd = 1024 * 2;
             break;
-        case Qn::QualityHigh:
+        case Qn::StreamQuality::high:
             hiEnd = 1024 * 3;
             break;
-        case Qn::QualityHighest:
+        case Qn::StreamQuality::highest:
         default:
             hiEnd = 1024 * 5;
             break;
@@ -257,19 +257,19 @@ QnCodecParams::Value QnTranscoder::suggestMediaStreamParams(
             int qVal = 1;
             switch( quality )
             {
-                case Qn::QualityLowest:
+                case Qn::StreamQuality::lowest:
                     qVal = 100;
                     break;
-                case Qn::QualityLow:
+                case Qn::StreamQuality::low:
                     qVal = 50;
                     break;
-                case Qn::QualityNormal:
+                case Qn::StreamQuality::normal:
                     qVal = 20;
                     break;
-                case Qn::QualityHigh:
+                case Qn::StreamQuality::high:
                     qVal = 5;
                     break;
-                case Qn::QualityHighest:
+                case Qn::StreamQuality::highest:
                     qVal = 1;
                     break;
                 default:
@@ -287,26 +287,26 @@ QnCodecParams::Value QnTranscoder::suggestMediaStreamParams(
 
             switch (quality)
             {
-            case Qn::QualityLowest:
+            case Qn::StreamQuality::lowest:
                 cpuUsed = 5;
                 break;
-            case Qn::QualityLow:
+            case Qn::StreamQuality::low:
                 cpuUsed = 4;
                 break;
-            case Qn::QualityNormal:
+            case Qn::StreamQuality::normal:
                 cpuUsed = 3;
                 break;
-            case Qn::QualityHigh:
+            case Qn::StreamQuality::high:
                 cpuUsed = 1;
                 break;
-            case Qn::QualityHighest:
+            case Qn::StreamQuality::highest:
                 cpuUsed = 0;
                 break;
             default:
                 break;
             }
 
-            if (quality <= Qn::QualityNormal)
+            if (quality <= Qn::StreamQuality::normal)
             {
                 params.insert("profile", 1); //< [0..3] Bigger numbers means less posibilities for encoder
                 staticThreshold = 1000;

@@ -89,11 +89,6 @@
     </message>
     <message>
       <location/>
-      <source>Disable only if the client takes too much CPU</source>
-      <translation>Alleen uitschakelen als de cliëntapplicatie te veel CPU gebruikt</translation>
-    </message>
-    <message>
-      <location/>
       <source>Maximum Live Buffer Length</source>
       <translation>Maximale live bufferlengte</translation>
     </message>
@@ -764,7 +759,7 @@
     </message>
     <message>
       <location/>
-      <source>Logical Id</source>
+      <source>Logical ID</source>
       <translation>Logische ID</translation>
     </message>
   </context>
@@ -772,8 +767,8 @@
     <name>CameraInputBusinessEventWidget</name>
     <message>
       <location filename="../src/ui/widgets/business/camera_input_business_event_widget.ui"/>
-      <source>Input Id</source>
-      <translation>Input ID</translation>
+      <source>Input ID</source>
+      <translation>Ingang ID</translation>
     </message>
   </context>
   <context>
@@ -798,7 +793,7 @@
     </message>
     <message>
       <location/>
-      <source>Output Id:</source>
+      <source>Output ID:</source>
       <translation>Uitgang ID:</translation>
     </message>
   </context>
@@ -1513,8 +1508,8 @@
     </message>
     <message>
       <location/>
-      <source>Locked to Hardware Id:</source>
-      <translation>Gelieerd aan hardware Id:</translation>
+      <source>Locked to Hardware ID:</source>
+      <translation>Gelieerd aan Hardware ID:</translation>
     </message>
   </context>
   <context>
@@ -1612,8 +1607,8 @@
     </message>
     <message>
       <location/>
-      <source>Hardware Id</source>
-      <translation>Hardware Id</translation>
+      <source>Hardware ID</source>
+      <translation>Hardware ID</translation>
     </message>
   </context>
   <context>
@@ -1741,6 +1736,11 @@
       <location/>
       <source>Tour cycle</source>
       <translation>Toer cyclus</translation>
+    </message>
+    <message>
+      <location/>
+      <source>IP addresses for cameras, and servers, groups for users, etc.</source>
+      <translation>IP-adressen voor camera's en servers, groepen voor gebruikers, etc.</translation>
     </message>
   </context>
   <context>

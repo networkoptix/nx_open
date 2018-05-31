@@ -166,6 +166,7 @@ if(withDesktopClient OR withMediaServer OR withTestCamera)
             nx_network
             nx_utils
             nx_vms_utils
+            nx_vms_api
             udt
         WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/wixsetup/scripts
         COMMAND ${PYTHON_EXECUTABLE} generate_libs_debug_package.py

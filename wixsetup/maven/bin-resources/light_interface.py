@@ -85,7 +85,7 @@ import environment
 
 wix_pdb = 'wixsetup.wixpdb'
 light_cultures = '-cultures:{}'.format(environment.installer_cultures)
-light_locale = 'OptixTheme_{}.wxl'.format(environment.installer_language)
+light_locale = 'theme_{}.wxl'.format(environment.installer_language)
 light_cache_path = 'cab'
 
 def light_executable():

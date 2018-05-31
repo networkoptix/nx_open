@@ -9,9 +9,13 @@ static const int kRecvBufferCapacity = 1024 * 4;
 namespace nx {
 namespace network {
 
-BufferedStreamSocket::BufferedStreamSocket(std::unique_ptr<AbstractStreamSocket> socket):
+BufferedStreamSocket::BufferedStreamSocket(
+    std::unique_ptr<AbstractStreamSocket> socket,
+    nx::Buffer preReadData)
+    :
     StreamSocketDelegate(socket.get()),
-    m_socket(std::move(socket))
+    m_socket(std::move(socket)),
+    m_internalRecvBuffer(std::move(preReadData))
 {
 }
 
@@ -41,31 +45,6 @@ void BufferedStreamSocket::catchRecvEvent(
             // Make socket ready for blocking mode:
             triggerCatchRecvEvent(code);
         });
-}
-
-void BufferedStreamSocket::injectRecvData(Buffer buffer, Inject injectType)
-{
-    NX_LOGX(lm("injectRecvData size=%1, injectType=%2")
-        .arg(buffer.size()).arg(static_cast<int>(injectType)), cl_logDEBUG2);
-
-    switch (injectType)
-    {
-        case Inject::only:
-            NX_ASSERT(m_internalRecvBuffer.isEmpty());
-            /* fall through */
-        case Inject::replace:
-            m_internalRecvBuffer = std::move(buffer);
-            return;
-
-        case Inject::begin:
-            std::swap(m_internalRecvBuffer, buffer);
-            /* fall through */
-        case Inject::end:
-            m_internalRecvBuffer.append(buffer);
-            return;
-    }
-
-    NX_ASSERT(false, lm("Unexpected enum value: %1").arg((int)injectType));
 }
 
 int BufferedStreamSocket::recv(void* buffer, unsigned int bufferLen, int flags)

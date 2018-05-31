@@ -6,8 +6,8 @@
 // TODO: #vkutin Think of a proper namespace
 namespace QnBusiness {
 
-int eventHelpId(nx::vms::event::EventType type);
-int actionHelpId(nx::vms::event::ActionType type);
+int eventHelpId(nx::vms::api::EventType type);
+int actionHelpId(nx::vms::api::ActionType type);
 int healthHelpId(QnSystemHealth::MessageType type);
 
 } // namespace QnBusiness

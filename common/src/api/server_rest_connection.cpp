@@ -77,7 +77,10 @@ ServerConnection::~ServerConnection()
         httpPool->terminate(handle);
 }
 
-rest::Handle ServerConnection::cameraHistoryAsync(const QnChunksRequestData &request, Result<ec2::ApiCameraHistoryDataList>::type callback, QThread* targetThread)
+rest::Handle ServerConnection::cameraHistoryAsync(
+    const QnChunksRequestData& request,
+    Result<nx::vms::api::CameraHistoryDataList>::type callback,
+    QThread* targetThread)
 {
     return executeGet(lit("/ec2/cameraHistory"), request.toParams(), callback, targetThread);
 }
@@ -114,14 +117,14 @@ rest::Handle ServerConnection::twoWayAudioCommand(const QString& sourceId,
 }
 
 rest::Handle ServerConnection::softwareTriggerCommand(const QnUuid& cameraId, const QString& triggerId,
-    nx::vms::event::EventState toggleState, GetCallback callback, QThread* targetThread)
+    nx::vms::api::EventState toggleState, GetCallback callback, QThread* targetThread)
 {
     QnRequestParamList params;
     params.insert(lit("timestamp"), lit("%1").arg(qnSyncTime->currentMSecsSinceEpoch()));
-    params.insert(lit("event_type"), QnLexical::serialized(nx::vms::event::softwareTriggerEvent));
+    params.insert(lit("event_type"), QnLexical::serialized(nx::vms::api::EventType::softwareTriggerEvent));
     params.insert(lit("inputPortId"), triggerId);
     params.insert(lit("eventResourceId"), cameraId.toString());
-    if (toggleState != nx::vms::event::EventState::undefined)
+    if (toggleState != nx::vms::api::EventState::undefined)
         params.insert(lit("state"), QnLexical::serialized(toggleState));
     return executeGet(lit("/api/createEvent"), params, callback, targetThread);
 }
@@ -509,7 +512,7 @@ Handle ServerConnection::getTimeOfServersAsync(
 }
 
 rest::Handle ServerConnection::testEventRule(const QnUuid& ruleId,
-    nx::vms::event::EventState toggleState,
+    nx::vms::api::EventState toggleState,
     GetCallback callback,
     QThread* targetThread)
 {
@@ -529,7 +532,7 @@ rest::Handle ServerConnection::testEventRule(const QnUuid& ruleId,
         params.insert(lit("eventResourceId"), randomResource.toString());
     }
     else if (nx::vms::event::isSourceCameraRequired(rule->eventType())
-        || rule->eventType() >= nx::vms::event::userDefinedEvent)
+        || rule->eventType() >= nx::vms::api::EventType::userDefinedEvent)
     {
         auto randomCamera = nx::utils::random::choice(
             commonModule()->resourcePool()->getAllCameras(QnResourcePtr(), true));
@@ -542,7 +545,7 @@ rest::Handle ServerConnection::testEventRule(const QnUuid& ruleId,
         params.insert(lit("eventResourceId"), randomServer->getId().toString());
     }
 
-    if (toggleState != nx::vms::event::EventState::undefined)
+    if (toggleState != nx::vms::api::EventState::undefined)
         params.insert(lit("state"), QnLexical::serialized(toggleState));
 
     params.insert(lit("inputPortId"), rule->eventParams().inputPortId);

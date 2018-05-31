@@ -1,5 +1,4 @@
-#ifndef API_REVERSE_CONNECTION_DATA_H
-#define API_REVERSE_CONNECTION_DATA_H
+#pragma once
 
 #include "api_data.h"
 
@@ -9,19 +8,14 @@
 
 namespace ec2 {
 
-    //! Request to open @var count proxy connections to @var target server.
-    struct ApiReverseConnectionData: ApiData
-    {
-        ApiReverseConnectionData(): socketCount(0) {}
-
-        QnUuid targetServer;
-        int socketCount;
-    };
-
-    #define ApiReverseConnectionData_Fields (targetServer)(socketCount)
+/** Request to open count proxy connections to @var target server. */
+struct ApiReverseConnectionData: nx::vms::api::Data
+{
+    QnUuid targetServer;
+    int socketCount = 0;
+};
+#define ApiReverseConnectionData_Fields (targetServer)(socketCount)
 
 } // namespace ec2
 
 Q_DECLARE_METATYPE(ec2::ApiReverseConnectionData);
-
-#endif // API_REVERSE_CONNECTION_DATA_H

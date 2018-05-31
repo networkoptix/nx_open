@@ -20,12 +20,12 @@
 
 namespace {
 
-    using namespace std::chrono;
+using namespace std::chrono;
+using namespace std::chrono_literals;
 
-    static const int kEmptyProgress = 0;
-    static const int kUpdateProgress = 50;
-    static const int kCompleteProgress = 100;
-    static const milliseconds kWaitTimeout = seconds(2);
+static const int kEmptyProgress = 0;
+static const int kUpdateProgress = 50;
+static const milliseconds kWaitTimeout = 2min;
 
 } // namespace
 
@@ -188,7 +188,7 @@ void QnConnectToCurrentSystemTool::waitServer()
     connect(resourcePool(), &QnResourcePool::statusChanged, m_mergeTool, handleResourceChanged);
 
     executeDelayedParented(
-        [this, finishMerge]()
+        [finishMerge]()
         {
             finishMerge(false);
         }, kWaitTimeout.count(), m_mergeTool);

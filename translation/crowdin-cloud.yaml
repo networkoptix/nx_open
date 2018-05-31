@@ -33,6 +33,7 @@ files:
   -
     source: '/webadmin/app/web_common/views/**/*.*'
     translation: '/cloud_portal/translations/%locale_with_underscore%/web_common/views/**/%original_file_name%'
+
   -
     source: '/cloud_portal/cloud/notifications/static/templates/container.mustache.template'
     dest: '/cloud_portal/cloud/notifications/static/templates/container.mustache.template.html'
@@ -48,8 +49,14 @@ files:
       - /webadmin/app/views/debug.html
       - /webadmin/app/views/viewdebug.html
   -
+    source: '/webadmin/app/web_common/views/components/*.*'
+    translation: '/webadmin/translations/%locale_with_underscore%/views/components/%original_file_name%'
+  -
     source: '/webadmin/app/web_common/commonLanguage.json'
     translation: '/webadmin/translations/%locale_with_underscore%/web_common/commonLanguage.json'
   -
     source: '/webadmin/app/web_common/views/**/*.*'
     translation: '/webadmin/translations/%locale_with_underscore%/web_common/views/**/%original_file_name%'
+  -
+    source: '/cloud_portal/robot_tests/variables_language.json'
+    translation: '/cloud_portal/robot_tests/translations/variables_language_%locale_with_underscore%.json'

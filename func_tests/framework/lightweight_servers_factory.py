@@ -5,15 +5,20 @@ import logging
 
 from requests.exceptions import ReadTimeout
 
+from framework.installation.mediaserver import Mediaserver
+from framework.installation.mediaserver_factory import (
+    CORE_FILE_ARTIFACT_TYPE,
+    SERVER_LOG_ARTIFACT_TYPE,
+    TRACEBACK_ARTIFACT_TYPE,
+    )
+from framework.installation.upstart_service import AdHocService
+from framework.os_access.path import copy_file
 from framework.rest_api import RestApi
-from framework.server_factory import SERVER_LOG_ARTIFACT_TYPE, CORE_FILE_ARTIFACT_TYPE, TRACEBACK_ARTIFACT_TYPE
-from framework.utils import wait_until
+from framework.waiting import wait_for_true
 from . import utils
-from .utils import GrowingSleep
 from .core_file_traceback import create_core_file_traceback
-from .server import Server
-from .service import AdHocService
 from .template_renderer import TemplateRenderer
+from .utils import GrowingSleep
 
 log = logging.getLogger(__name__)
 
@@ -32,7 +37,11 @@ class LightweightServersFactory(object):
         self._test_binary_path = test_binary_path
         physical_installation_host = self._pick_server()
         if physical_installation_host:
-            self._lws_host = LightweightServersHost(self._artifact_factory, self._test_binary_path, physical_installation_host, ca)
+            self._lws_host = LightweightServersHost(
+                self._artifact_factory,
+                self._test_binary_path,
+                physical_installation_host,
+                ca)
         else:
             self._lws_host = None
 
@@ -50,8 +59,9 @@ class LightweightServersFactory(object):
     def _pick_server(self):
         if not self._physical_installation_ctl:
             return None
-        for config, host in zip(self._physical_installation_ctl.config_list,
-                                     self._physical_installation_ctl.installations_access):
+        config_list = self._physical_installation_ctl.config_list
+        installations_access = self._physical_installation_ctl.installations_access
+        for config, host in zip(config_list, installations_access):
             if config.lightweight_servers_limit:
                 log.info('Lightweight host: %s %s', config, host)
                 return host
@@ -80,7 +90,7 @@ class LightweightServersInstallation(object):
         self._not_supported()
 
     def list_core_files(self):
-        return self.os_access.expand_glob(self.dir / '*core*')
+        return self.dir.glob('*core*')
 
     def cleanup_core_files(self):
         # When filename contain space, it's interpreted as several arguments.
@@ -91,11 +101,11 @@ class LightweightServersInstallation(object):
             self.dir / '*core*'])
 
     def cleanup_test_tmp_dir(self):
-        self.os_access.rm_tree(self.test_tmp_dir, ignore_errors=True)
+        self.test_tmp_dir.rmtree(ignore_errors=True)
 
     def get_log_file(self):
-        if self.os_access.file_exists(self.log_path_base):
-            return self.os_access.read_file(self.log_path_base + '.log')
+        if self.log_path_base.exists():
+            return self.log_path_base.with_suffix('.log').read_bytes()
         else:
             return None
 
@@ -103,10 +113,10 @@ class LightweightServersInstallation(object):
         assert False, 'This operation is not supported by lightweight server'
 
 
-class LightweightServer(Server):
-    def __init__(self, name, os_access, service, installation, api, port=None):
-        super(LightweightServer, self).__init__(name, service, installation, api, None, port=port)
-        self.internal_ip_address = os_access.hostname
+class LightweightServer(Mediaserver):
+    def __init__(self, name, installation, api, port=None):
+        super(LightweightServer, self).__init__(name, installation, api, port=port)
+        self.internal_ip_address = installation.os_access.hostname
 
     def wait_until_synced(self, timeout):
         log.info('Waiting for lightweight servers to merge between themselves')
@@ -117,11 +127,13 @@ class LightweightServer(Server):
                 # calling api/moduleInformation to check for SF_P2pSyncDone flag
                 response = self.api.api.moduleInformation.GET(timeout=60)
             except ReadTimeout:
-                #log.error('ReadTimeout when waiting for lws api/moduleInformation; will make core dump')
-                #self.service.make_core_dump()
+                # log.error('ReadTimeout when waiting for lws api/moduleInformation; will make core dump')
+                # self.service.make_core_dump()
                 raise
             if response['serverFlags'] == 'SF_P2pSyncDone':
-                log.info('Lightweight servers merged between themselves in %s' % (utils.datetime_utc_now() - start_time))
+                log.info(
+                    'Lightweight servers merged between themselves in %s',
+                    (utils.datetime_utc_now() - start_time))
                 return
             growing_delay.sleep()
         assert False, 'Lightweight servers did not merge between themselves in %s' % timeout
@@ -135,7 +147,6 @@ class LightweightServersHost(object):
         self._physical_installation_host = physical_installation_host
         self._os_access = physical_installation_host.os_access
         self._host_name = physical_installation_host.name
-        self._timezone = physical_installation_host.timezone
         self._ca = ca
         self._installation = LightweightServersInstallation(
             self._os_access, physical_installation_host.root_dir / 'lws', self._ca)
@@ -152,19 +163,20 @@ class LightweightServersHost(object):
         pih = self._physical_installation_host
         server_dir = pih.unpacked_mediaserver_dir
         pih.ensure_mediaserver_is_unpacked()
-        self._os_access.mk_dir(self._lws_dir)
+        self._lws_dir.mkdir(exist_ok=True)
         self._cleanup_log_files()
-        self._os_access.put_file(self._test_binary_path, self._lws_dir)
+        copy_file(self._test_binary_path, self._lws_dir)
         self._write_lws_ctl(server_dir, server_count, lws_params)
         self.service.start()
-        # must be set before cycle following it so failure in that cycle won't prevent from artifacts collection from 'release' method
+        # must be set before loop following it
+        # so failure in that loop won't prevent artifacts collection from 'release' method
         self._allocated = True
         for idx in range(server_count):
             server_port = LWS_PORT_BASE + idx
             name = 'lws-%05d' % idx
             api = RestApi(name, self._os_access.hostname, server_port)
             server = LightweightServer(name, self._os_access, self.service, self._installation, api, port=server_port)
-            wait_until(server.is_online)
+            wait_for_true(server.is_online)
             if not self._first_server:
                 self._first_server = server
             yield server
@@ -182,9 +194,8 @@ class LightweightServersHost(object):
         self._installation.cleanup_test_tmp_dir()
 
     def _cleanup_log_files(self):
-        file_list = self._os_access.expand_glob(self._installation.dir / 'lws*.log')
-        if file_list:
-            self._os_access.run_command(['rm'] + file_list)
+        for log_file_path in self._installation.dir.glob('lws*.log'):
+            log_file_path.unlink()
 
     def _write_lws_ctl(self, server_dist_dir, server_count, lws_params):
         contents = self._template_renderer.render(
@@ -197,7 +208,7 @@ class LightweightServersHost(object):
             TEST_TMP_DIR=self._installation.test_tmp_dir,
             **lws_params)
         lws_ctl_path = self._lws_dir / 'server_ctl.sh'
-        self._os_access.write_file(lws_ctl_path, contents)
+        lws_ctl_path.write_text(contents)
         self._os_access.run_command(['chmod', '+x', lws_ctl_path])
 
     def _save_lws_artifacts(self):
@@ -206,9 +217,12 @@ class LightweightServersHost(object):
         self._save_lws_core_files()
 
     def _save_lws_log(self):
-        log_contents = self._os_access.read_file(self._installation.log_path_base + '.log').strip()
+        log_contents = self._installation.log_path_base.with_suffix('.log').read_text().strip()
         if log_contents:
-            artifact_factory = self._artifact_factory(['lws', self._host_name], name='lws', artifact_type=SERVER_LOG_ARTIFACT_TYPE)
+            artifact_factory = self._artifact_factory(
+                ['lws', self._host_name],
+                name='lws',
+                artifact_type=SERVER_LOG_ARTIFACT_TYPE)
             log_path = artifact_factory.produce_file_path().write_bytes(log_contents)
             log.debug('log file for lws at %s is stored to %s', self._host_name, log_path)
 
@@ -218,7 +232,7 @@ class LightweightServersHost(object):
             artifact_factory = self._artifact_factory(
                 ['lws', self._host_name, fname], name=fname, is_error=True, artifact_type=CORE_FILE_ARTIFACT_TYPE)
             local_core_path = artifact_factory.produce_file_path()
-            self._os_access.get_file(remote_core_path, local_core_path)
+            copy_file(remote_core_path, local_core_path)
             log.debug('core file for lws at %s is stored to %s', self._host_name, local_core_path)
             traceback = create_core_file_traceback(
                 self._os_access, self._installation.dir / LWS_BINARY_NAME,
@@ -237,8 +251,10 @@ class LightweightServersHost(object):
             self._first_server.service.make_core_dump()
 
     def perform_post_checks(self):
-        log.info('----- performing post-test checks for lightweight servers at %s'
-                     '---------------------->8 ---------------------------', self._host_name)
+        log.info(
+            '----- performing post-test checks for lightweight servers at %s'
+            '---------------------->8 ---------------------------',
+            self._host_name)
         self._check_if_server_is_online()
         core_file_list = self._installation.list_core_files()
         assert not core_file_list, ('Lightweight server at %s left %d core dump(s): %s' %

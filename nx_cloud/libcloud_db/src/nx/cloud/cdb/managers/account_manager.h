@@ -203,11 +203,13 @@ private:
         nx::utils::db::QueryContext* const queryContext,
         const data::AccountData& accountData,
         data::AccountConfirmationCode* const confirmationCode);
+
     nx::utils::db::DBResult issueAccountActivationCode(
         nx::utils::db::QueryContext* const queryContext,
-        const std::string& accountEmail,
+        const data::AccountData& account,
         std::unique_ptr<AbstractActivateAccountNotification> notification,
         data::AccountConfirmationCode* const resultData);
+
     std::string generateAccountActivationCode(
         nx::utils::db::QueryContext* const queryContext,
         const std::string& email,
@@ -242,9 +244,7 @@ private:
         nx::utils::db::QueryContext* const tran,
         const data::AccountUpdateDataWithEmail& accountData);
     bool isValidInput(const data::AccountUpdateDataWithEmail& accountData) const;
-    void updateAccountCache(
-        bool activateAccountIfNotActive,
-        data::AccountUpdateDataWithEmail accountData);
+    void updateAccountCache(data::AccountUpdateDataWithEmail accountData);
 
     nx::utils::db::DBResult issueRestorePasswordCode(
         nx::utils::db::QueryContext* const queryContext,

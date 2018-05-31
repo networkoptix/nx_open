@@ -72,6 +72,14 @@ QnSecurityCamResourcePtr findCameraByFlexibleIds(
     return camera;
 }
 
+QnUuid flexibleIdToId(
+    QnResourcePool* resourcePool,
+    const QString& flexibleId)
+{
+    auto camera = findCameraByFlexibleId(resourcePool, flexibleId);
+    return camera ? camera->getId() : QnUuid();
+}
+
 QnSecurityCamResourcePtr findCameraByFlexibleId(
     QnResourcePool* resourcePool,
     const QString& flexibleId)

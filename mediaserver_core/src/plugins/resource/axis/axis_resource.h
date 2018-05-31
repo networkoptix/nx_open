@@ -69,7 +69,6 @@ public:
 
     virtual QnIOStateDataList ioStates() const override;
 
-
     QString resolutionToString(const QSize& resolution);
     static QString toAxisCodecString(AVCodecID codecId);
 public slots:
@@ -232,7 +231,6 @@ private:
     QString getAdvancedParametersTemplate() const;
     bool loadAdvancedParametersTemplateFromFile(QnCameraAdvancedParams& params, const QString& filename);
     QSet<QString> calculateSupportedAdvancedParameters(const QnCameraAdvancedParams& allParams);
-
 
     QString getParamCmd(const QnCameraAdvancedParameter& param) const;
     QSet<QString> buildGetParamsQueries(const QList<QnCameraAdvancedParameter>& params) const;

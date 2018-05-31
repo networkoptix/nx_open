@@ -13,6 +13,7 @@
 #include <api/model/rebuild_archive_reply.h>
 
 #include <common/common_module.h>
+#include <translation/datetime_formatter.h>
 
 #include <camera/camera_data_manager.h>
 #include <core/resource/client_storage_resource.h>
@@ -27,7 +28,7 @@
 
 #include <server/server_storage_manager.h>
 #include <nx/client/desktop/ui/actions/action_manager.h>
-#include <ui/common/item_view_hover_tracker.h>
+#include <nx/client/desktop/common/utils/item_view_hover_tracker.h>
 #include <ui/delegates/switch_item_delegate.h>
 #include <ui/dialogs/storage_url_dialog.h>
 #include <ui/dialogs/backup_settings_dialog.h>
@@ -54,6 +55,8 @@
 #include <utils/math/color_transformations.h>
 
 #include <common/common_globals.h>
+
+using namespace nx::client::desktop;
 
 namespace
 {
@@ -87,7 +90,7 @@ namespace
         typedef QStyledItemDelegate base_type;
 
     public:
-        explicit StorageTableItemDelegate(QnItemViewHoverTracker* hoverTracker, QObject* parent = nullptr) :
+        explicit StorageTableItemDelegate(ItemViewHoverTracker* hoverTracker, QObject* parent = nullptr) :
             base_type(parent),
             m_hoverTracker(hoverTracker),
             m_editedRow(-1)
@@ -178,7 +181,7 @@ namespace
         }
 
     private:
-        QPointer<QnItemViewHoverTracker> m_hoverTracker;
+        QPointer<ItemViewHoverTracker> m_hoverTracker;
         int m_editedRow;
     };
 
@@ -186,7 +189,7 @@ namespace
     {
         const auto isSelectedForBackup = [](const QnVirtualCameraResourcePtr& camera)
         {
-            return camera->getActualBackupQualities() != Qn::CameraBackup_Disabled;
+            return camera->getActualBackupQualities() != Qn::CameraBackupQuality::CameraBackup_Disabled;
         };
 
         QnVirtualCameraResourceList serverCameras = resourcePool->getAllCameras(QnResourcePtr(), true);
@@ -253,10 +256,14 @@ QnStorageConfigWidget::QnStorageConfigWidget(QWidget* parent) :
     m_storagePoolMenu->addAction(tr("Backup"))->setData(true);
 
     setHelpTopic(this, Qn::ServerSettings_Storages_Help);
-    setHelpTopic(ui->backupGroupBox, Qn::ServerSettings_StoragesBackup_Help);
+    setHelpTopic(ui->backupGroupBox, Qn::ServerSettings_ArchiveRestoring_Help);
 
-    auto hoverTracker = new QnItemViewHoverTracker(ui->storageView);
-    hoverTracker->setAutomaticMouseCursor(true);
+    ui->rebuildBackupButtonHint->addHintLine(tr("Creates a backup of System configuration that can be restored in case of failure."));
+    ui->rebuildBackupButtonHint->addHintLine(tr("Backup includes servers and cameras settings, users, webpages, event rules, etc. Video is not saved."));
+    setHelpTopic(ui->rebuildBackupButtonHint, Qn::SystemSettings_Server_Backup_Help);
+
+    auto hoverTracker = new ItemViewHoverTracker(ui->storageView);
+    hoverTracker->setMouseCursorRole(Qn::ItemMouseCursorRole);
 
     auto itemDelegate = new StorageTableItemDelegate(hoverTracker, this);
     ui->storageView->setItemDelegate(itemDelegate);
@@ -284,7 +291,7 @@ QnStorageConfigWidget::QnStorageConfigWidget(QWidget* parent) :
         ui->storageView->update(index);
     };
 
-    connect(ui->storageView, &QnTreeView::clicked, this, itemClicked);
+    connect(ui->storageView, &TreeView::clicked, this, itemClicked);
 
     connect(ui->backupPages, &QStackedWidget::currentChanged,
         this, &QnStorageConfigWidget::updateRealtimeBackupMovieStatus);
@@ -653,7 +660,7 @@ void QnStorageConfigWidget::applyChanges()
         return;
 
     QnStorageResourceList storagesToUpdate;
-    ec2::ApiIdDataList storagesToRemove;
+    nx::vms::api::IdDataList storagesToRemove;
 
     applyCamerasToBackup(m_camerasToBackup, m_quality);
     applyStoragesChanges(storagesToUpdate, m_model->storages());
@@ -856,10 +863,7 @@ quint64 QnStorageConfigWidget::nextScheduledBackupTimeMs() const
 
 QString QnStorageConfigWidget::backupPositionToString(qint64 backupTimeMs)
 {
-    const QDateTime backupDateTime = QDateTime::fromMSecsSinceEpoch(backupTimeMs);
-    return lit("%1 %2").arg(
-        backupDateTime.date().toString(Qt::DefaultLocaleLongDate)).arg(
-        backupDateTime.time().toString(Qt::DefaultLocaleShortDate));
+    return datetime::toString(backupTimeMs);
 }
 
 QString QnStorageConfigWidget::intervalToString(qint64 backupTimeMs)
@@ -1045,7 +1049,7 @@ void QnStorageConfigWidget::applyCamerasToBackup(const QnVirtualCameraResourceLi
 
     const auto qualityForCamera = [cameras, quality](const QnVirtualCameraResourcePtr& camera)
     {
-        return (cameras.contains(camera) ? quality : Qn::CameraBackup_Disabled);
+        return (cameras.contains(camera) ? quality : Qn::CameraBackupQuality::CameraBackup_Disabled);
     };
 
     /* Update all default cameras and all cameras that we have changed. */

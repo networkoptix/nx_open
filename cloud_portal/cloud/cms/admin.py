@@ -6,6 +6,7 @@ from models import *
 from cloud import settings
 from django.contrib import admin
 
+
 admin.site.site_header = 'Cloud Administration'
 admin.site.site_title = 'Cloud Administration'
 admin.site.index_title = 'Cloud Administration'
@@ -30,8 +31,7 @@ class CMSAdmin(admin.ModelAdmin):
 
     def get_queryset(self, request):
         qs = super(CMSAdmin, self).get_queryset(request)
-        if not request.user.is_superuser and \
-           request.user.customization != settings.CUSTOMIZATION:
+        if not UserGroupsToCustomizationPermissions.check_permission(request.user, settings.CUSTOMIZATION):
             # return empty dataset, only superuser can watch content in other
             # customizations
             return qs.filter(pk=-1)
@@ -58,6 +58,7 @@ class ContextAdmin(CMSAdmin):
                     'url', 'translatable', 'is_global')
 
     list_display_links = ('name', )
+    list_filter = ('product',)
     search_fields = ('name', 'description', 'url', 'product__name')
 
     def context_actions(self, obj):
@@ -75,6 +76,14 @@ class ContextAdmin(CMSAdmin):
     context_actions.allow_tags = True
 
 admin.site.register(Context, ContextAdmin)
+
+
+class ContextTemplateAdmin(CMSAdmin):
+    list_display = ('context', 'language')
+    list_filter = ('context', 'language')
+    search_fields = ('context__name', 'context__file_path', 'language__code')
+
+admin.site.register(ContextTemplate, ContextTemplateAdmin)
 
 
 class DataStructureAdmin(CMSAdmin):
@@ -106,11 +115,13 @@ admin.site.register(DataRecord, DataRecordAdmin)
 
 
 class ContentVersionAdmin(CMSAdmin):
-    list_display = ('content_version_actions', 'id', 'customization', 'name',
+    list_display = ('content_version_actions', 'id', 'product','customization',
                     'created_date', 'created_by',
                     'accepted_date', 'accepted_by', 'state')
 
     list_display_links = ('id', )
+    list_filter = ('product', 'customization')
+    search_fields = ('accepted_by__email', 'created_by__email')
 
     def content_version_actions(self, obj):
         return format_html('<button class="btn btn-sm btn-info"> <a href="{}">review version</a></button>',
@@ -126,3 +137,10 @@ class ContentVersionAdmin(CMSAdmin):
     content_version_actions.allow_tags = True
 
 admin.site.register(ContentVersion, ContentVersionAdmin)
+
+
+class UserGroupsToCustomizationPermissionsAdmin(CMSAdmin):
+    list_display = ('id', 'group', 'customization',)
+
+admin.site.register(UserGroupsToCustomizationPermissions, UserGroupsToCustomizationPermissionsAdmin)
+

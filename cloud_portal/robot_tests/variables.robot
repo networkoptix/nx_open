@@ -11,6 +11,7 @@ ${CLOUD DEV}                          https://cloud-dev2.hdw.mx
 ${CLOUD TEST REGISTER}                https://cloud-test.hdw.mx/register
 ${CLOUD STAGE}                        https://cloud-stage.hdw.mx
 ${ENV}                                ${CLOUD TEST}
+${SCREENSHOTDIRECTORY}               \Screenshots
 
 ${BROWSER}                            Chrome
 
@@ -69,11 +70,15 @@ ${PASSWORD IS REQUIRED}               //span[@ng-if='passwordInput.password.$err
 ${REGISTER FIRST NAME INPUT}          //form[@name= 'registerForm']//input[@ng-model='account.firstName']
 ${REGISTER LAST NAME INPUT}           //form[@name= 'registerForm']//input[@ng-model='account.lastName']
 ${REGISTER EMAIL INPUT}               //form[@name= 'registerForm']//input[@ng-model='account.email']
+${REGISTER EMAIL INPUT LOCKED}        //form[@name= 'registerForm']//input['readOnly' and @ng-if='lockEmail']
 ${REGISTER PASSWORD INPUT}            //form[@name= 'registerForm']//password-input[@ng-model='account.password']//input[@type='password']
 ${REGISTER SUBSCRIBE CHECKBOX}        //form[@name= 'registerForm']//input[@ng-model='account.subscribe']
 ${CREATE ACCOUNT BUTTON}              //form[@name= 'registerForm']//button[contains(text(), '${CREATE ACCOUNT BUTTON TEXT}')]
 ${TERMS AND CONDITIONS LINK}          //form[@name= 'registerForm']//a[@href='/content/eula' and contains(text(), '${TERMS AND CONDITIONS LINK TEXT}')]
-${RESEND ACTIVATION LINK BUTTON}      //form[@name= 'reactivateAccount']//button[contains(text(), '${RESEND ACTIVATION LINK BUTTON TEXT}')]
+${RESEND ACTIVATION LINK BUTTON}      //form[@name= 'reactivateAccount']//button[contains(text(), "${RESEND ACTIVATION LINK BUTTON TEXT}")]
+
+#targets the open nx witness button presented when logging in after activating with from=mobile or client
+${OPEN NX WITNESS BUTTON FROM =}      //button[text()='${OPEN NX WITNESS BUTTON TEXT}']
 
 ${EMAIL ALREADY REGISTERED}           //span[@ng-if="registerForm.registerEmail.$error.alreadyExists"]
 
@@ -102,6 +107,7 @@ ${SYSTEM NO ACCESS}                   //div[@ng-if='systemNoAccess']/h1[contains
 
 #Disconnect from cloud portal
 ${DISCONNECT FORM}                    //form[@name='disconnectForm']
+${DISCONNECT FORM CANCEL}             //form[@name='disconnectForm']//button[@ng-click='close()']
 ${DISCONNECT FORM HEADER}             //h1['${DISCONNECT FORM HEADER TEXT}']
 
 #Disconnect from my account
@@ -120,11 +126,6 @@ ${SHARE PERMISSIONS DROPDOWN}         //form[@name='shareForm']//select[@ng-mode
 ${SHARE BUTTON MODAL}                 //form[@name='shareForm']//button[@ng-click='checkForm()']
 ${SHARE CANCEL}                       //form[@name='shareForm']//button[@ng-click='close()']
 ${SHARE CLOSE}                        //div[@uib-modal-transclude]//div[@ng-if='settings.title']//button[@ng-click='close()']
-${SHARE PERMISSIONS ADMINISTRATOR}    //form[@name='shareForm']//select[@ng-model='user.role']//option[@label='${ADMIN TEXT}']
-${SHARE PERMISSIONS ADVANCED VIEWER}  //form[@name='shareForm']//select[@ng-model='user.role']//option[@label='${ADV VIEWER TEXT}']
-${SHARE PERMISSIONS VIEWER}           //form[@name='shareForm']//select[@ng-model='user.role']//option[@label='${VIEWER TEXT}']
-${SHARE PERMISSIONS LIVE VIEWER}      //form[@name='shareForm']//select[@ng-model='user.role']//option[@label='${LIVE VIEWER TEXT}']
-${SHARE PERMISSIONS CUSTOM}           //form[@name='shareForm']//select[@ng-model='user.role']//option[@label='${CUSTOM TEXT}']
 ${SHARE PERMISSIONS HINT}             //form[@name='shareForm']//span[contains(@class,'help-block')]
 
 ${EDIT PERMISSIONS EMAIL}             //form[@name='shareForm']//input[@ng-model='user.email']
@@ -158,16 +159,22 @@ ${300CHARS}                           QWErtyuiopasdfghhkljzxcvbnmqwertyuiopasdfg
 ${255CHARS}                           QWErtyuiopasdfghhkljzxcvbnmqwertyuiopasdfghhkljzxcvbnmqwertyuiopasdfghhkljzxcvbnmqwertyuiopasdfghhkljzxcvbnmqwertyuiopasdfghhkljzxcvbnmqwertyuiopasdfghhkljzxcvbnmqwertyuiopasdfghhkljzxcvbnmqwertyuiopasdfghhkljzxcvbnmqwertyuiopasdfghhkljzxcvbnmqwertyuiopas
 
 #Emails
-${EMAIL VIEWER}                       noptixqa+viewer@gmail.com
-${EMAIL ADV VIEWER}                   noptixqa+advviewer@gmail.com
-${EMAIL LIVE VIEWER}                  noptixqa+liveviewer@gmail.com
-${EMAIL OWNER}                        noptixqa+owner@gmail.com
-${EMAIL NOT OWNER}                    noptixqa+notowner@gmail.com
-${EMAIL ADMIN}                        noptixqa+admin@gmail.com
+${BASE EMAIL}                         noptixautoqa@gmail.com
+${BASE EMAIL PASSWORD}                qweasd!@#$%
+${BASE HOST}                          imap.gmail.com
+${BASE PORT}                          993
+${EMAIL VIEWER}                       noptixautoqa+viewer@gmail.com
+${EMAIL ADV VIEWER}                   noptixautoqa+advviewer@gmail.com
+${EMAIL LIVE VIEWER}                  noptixautoqa+liveviewer@gmail.com
+${EMAIL OWNER}                        noptixautoqa+owner@gmail.com
+${EMAIL NOT OWNER}                    noptixautoqa+notowner@gmail.com
+${EMAIL ADMIN}                        noptixautoqa+admin@gmail.com
+${EMAIL CUSTOM}                       noptixautoqa+custom@gmail.com
+@{EMAILS LIST}                        ${EMAIL VIEWER}    ${EMAIL ADV VIEWER}    ${EMAIL LIVE VIEWER}    ${EMAIL OWNER}    ${EMAIL ADMIN}    ${EMAIL CUSTOM}
 ${ADMIN FIRST NAME}                   asdasasd
 ${ADMIN LAST NAME}                    asdasasdas
-${EMAIL UNREGISTERED}                 noptixqa+unregistered@gmail.com
-${EMAIL NOPERM}                       noptixqa+noperm@gmail.com
+${EMAIL UNREGISTERED}                 noptixautoqa+unregistered@gmail.com
+${EMAIL NOPERM}                       noptixautoqa+noperm@gmail.com
 ${BASE PASSWORD}                      qweasd123
 ${ALT PASSWORD}                       qweasd1234
 
@@ -175,17 +182,19 @@ ${TEST FIRST NAME}                    testFirstName
 ${TEST LAST NAME}                     testLastName
 
 #Related to Auto Tests system
-${AUTO_TESTS SYSTEM ID}                     97b27ae5-1d36-4ddf-8a1c-ab0f3e244e97
-${AUTO TESTS TITLE}                   //div[@ng-repeat='system in systems | filter:searchSystems as filtered']//h2[contains(text(),'Auto Tests')]
-${AUTO TESTS USER}                    //div[@ng-repeat='system in systems | filter:searchSystems as filtered']//h2[contains(text(),'Auto Tests')]/following-sibling::span[contains(@class,'user-name')]
-${AUTO TESTS OPEN NX}                 //div[@ng-repeat='system in systems | filter:searchSystems as filtered']//h2[contains(text(),'Auto Tests')]/..//button[@ng-click='checkForm()']
+${AUTO TESTS}                         Auto Tests
+${AUTO_TESTS SYSTEM ID}                     262d629d-144c-4402-bfa9-c490d9f6dbe9
+${AUTO TESTS TITLE}                   //div[@ng-repeat='system in systems | filter:searchSystems as filtered']//h2[text()='Auto Tests']
+${AUTO TESTS USER}                    //div[@ng-repeat='system in systems | filter:searchSystems as filtered']//h2[text()='Auto Tests']/following-sibling::span[contains(@class,'user-name')]
+${AUTO TESTS OPEN NX}                 //div[@ng-repeat='system in systems | filter:searchSystems as filtered']//h2[text()='Auto Tests']/..//button[@ng-click='checkForm()']
 ${SYSTEMS SEARCH INPUT}               //input[@ng-model='search.value']
 ${SYSTEMS TILE}                       //div[@ng-repeat="system in systems | filter:searchSystems as filtered"]
+${NOT OWNER IN SYSTEM}                //div[@process-loading='gettingSystemUsers']//tbody//tr//td[contains(text(), '${EMAIL NOT OWNER}')]
 
-#AUTOTESTS (with no space) is an offline system used for testing offline status on the systems page
-${AUTOTESTS OFFLINE}                  //div[@ng-repeat='system in systems | filter:searchSystems as filtered']//h2[contains(text(),'Autotests')]/following-sibling::span[contains(text(), '${AUTOTESTS OFFLINE TEXT}')]
-${AUTOTESTS OFFLINE OPEN NX}          //div[@ng-repeat='system in systems | filter:searchSystems as filtered']//h2[contains(text(),'Autotests')]/..//button[@ng-click='checkForm()']
-${AUTOTESTS OFFLINE SYSTEM ID}                dd06f8bf-f7ea-49b3-96fc-fbc6742a2ad4
+#AUTO TESTS 2 is an offline system used for testing offline status on the systems page and offline status on the system page
+${AUTOTESTS OFFLINE}                  //div[@ng-repeat='system in systems | filter:searchSystems as filtered']//h2[contains(text(),'Auto Tests 2')]/following-sibling::span[contains(text(), '${AUTOTESTS OFFLINE TEXT}')]
+${AUTOTESTS OFFLINE OPEN NX}          //div[@ng-repeat='system in systems | filter:searchSystems as filtered']//h2[contains(text(),'Auto Tests 2')]/..//button[@ng-click='checkForm()']
+${AUTOTESTS OFFLINE SYSTEM ID}                aee1df1e-ea9d-43c8-9c04-0463758d3616
 
 #ASCII
 ${ESCAPE}                             \\27

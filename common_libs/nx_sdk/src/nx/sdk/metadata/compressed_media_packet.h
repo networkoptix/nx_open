@@ -11,6 +11,12 @@ namespace nx {
 namespace sdk {
 namespace metadata {
 
+using MediaFlags = uint64_t;
+
+enum class MediaFlag: MediaFlags {
+    keyFrame = 0x01
+};
+
 /**
  * Each class that implements CompressedMediaPacket interface should properly handle this GUID in
  * its queryInterface method.
@@ -46,6 +52,11 @@ public:
      * @return pointer to the codec context.
      */
     virtual const MediaContext* context() const = 0;
+
+    /**
+     * @return packet media flags.
+     */
+    virtual MediaFlags flags() const = 0;
 };
 
 } // namespace metadata

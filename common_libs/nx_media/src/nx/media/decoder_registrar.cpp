@@ -19,12 +19,9 @@ namespace nx {
 namespace media {
 
 void DecoderRegistrar::registerDecoders(
-    std::shared_ptr<AbstractResourceAllocator> allocator,
     const QMap<int, QSize>& maxFfmpegResolutions,
     bool isTranscodingEnabled)
 {
-    NX_ASSERT(allocator);
-
     VideoDecoderRegistry::instance()->setTranscodingEnabled(isTranscodingEnabled);
 
     // ATTENTION: Order of registration defines the priority of choosing: first comes first.
@@ -32,8 +29,7 @@ void DecoderRegistrar::registerDecoders(
     #if defined(Q_OS_ANDROID)
     {
         static const int kHardwareDecodersCount = 1;
-        VideoDecoderRegistry::instance()->addPlugin<AndroidVideoDecoder>(allocator,
-            kHardwareDecodersCount);
+        VideoDecoderRegistry::instance()->addPlugin<AndroidVideoDecoder>(kHardwareDecodersCount);
         // HW audio decoder crashes in readOutputBuffer() for some reason. So far, disabling it.
         //AudioDecoderRegistry::instance()->addPlugin<AndroidAudioDecoder>();
     }
@@ -42,16 +38,14 @@ void DecoderRegistrar::registerDecoders(
     #if defined(Q_OS_IOS)
     {
         static const int kHardwareDecodersCount = 1;
-        VideoDecoderRegistry::instance()->addPlugin<IOSVideoDecoder>(allocator,
-            kHardwareDecodersCount);
+        VideoDecoderRegistry::instance()->addPlugin<IOSVideoDecoder>(kHardwareDecodersCount);
     }
     #endif
 
     #if defined(ENABLE_PROXY_DECODER)
     {
         static const int kHardwareDecodersCount = 1;
-        VideoDecoderRegistry::instance()->addPlugin<ProxyVideoDecoder>(allocator,
-            kHardwareDecodersCount);
+        VideoDecoderRegistry::instance()->addPlugin<ProxyVideoDecoder>(kHardwareDecodersCount);
     }
     #endif
 

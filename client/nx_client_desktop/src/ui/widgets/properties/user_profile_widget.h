@@ -9,13 +9,9 @@
 
 #include <utils/common/connective.h>
 
-namespace Ui
-{
-    class UserProfileWidget;
-}
-
+namespace Ui { class UserProfileWidget; }
+namespace nx { namespace client { namespace desktop { class Aligner; }}}
 class QnUserSettingsModel;
-class QnAligner;
 
 class QnUserProfileWidget : public Connective<QnAbstractPreferencesWidget>, public QnWorkbenchContextAware
 {
@@ -42,5 +38,5 @@ private:
     QScopedPointer<Ui::UserProfileWidget> ui;
     QnUserSettingsModel* const m_model;
     QString m_newPassword;
-    QnAligner* m_aligner;
+    nx::client::desktop::Aligner* m_aligner;
 };

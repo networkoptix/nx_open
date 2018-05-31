@@ -8,63 +8,6 @@
 namespace Qn
 {
     /**
-     * Type of a node in resource tree displayed to the user. Ordered as it should be displayed on the screen.
-     */
-    enum NodeType
-    {
-        // Single-occurrence nodes
-        RootNode,               /**< Root node for the tree (current system node). */
-        CurrentSystemNode,      /**< Root node, displaying current system name. */
-        CurrentUserNode,        /**< Root node, displaying current user. */
-        SeparatorNode,          /**< Root node for spacing between header and main part of the tree. */
-        ServersNode,            /**< Root node for servers for admin user. */
-        UserResourcesNode,      /**< Root node for cameras, i/o modules and statistics for non-admin user. */
-        LayoutsNode,            /**< Root node for current user's layouts and shared layouts. */
-        LayoutToursNode,        /**< Root node for the layout tours. */
-        WebPagesNode,           /**< Root node for web pages. */
-        UsersNode,              /**< Root node for user resources. */
-        OtherSystemsNode,       /**< Root node for remote systems. */
-        LocalResourcesNode,     /**< Root node for local resources. */
-        LocalSeparatorNode,     /**< Root node for spacing between local resources header and resources. */
-
-        FilteredServersNode,    /**< Root node for filtered servers */
-        FilteredCamerasNode,    /**< Root node for filtered cameras, i/o modules and other devices. Used for filtering purposes. */
-        FilteredLayoutsNode,    /**< Root node for filtered layouts */
-        FilteredUsersNode,      /**< Root node for filtered users */
-        FilteredVideowallsNode, /**< Root node for filtered videowalls */
-
-        BastardNode,            /**< Root node for hidden resources. */
-
-        // Per-user placeholder nodes
-        RoleUsersNode,          /**< Node that represents 'Users' node, displayed under roles. */
-        AllCamerasAccessNode,   /**< Node that represents 'All Cameras' placeholder, displayed under users and roles with full access. */
-        AllLayoutsAccessNode,   /**< Node that represents 'All Shared Layouts' placeholder, displayed under admins. */
-        SharedResourcesNode,    /**< Node that represents 'Cameras & Resources' node, displayed under users and roles with custom access. */
-        SharedLayoutsNode,      /**< Node that represents 'Layouts' node, displayed under users and roles with custom access. */
-
-        // Repeating nodes
-        RoleNode,               /**< Node that represents custom role. */
-        SharedLayoutNode,       /**< Node that represents shared layout link, displayed under user. Has only resource - shared layout. */
-        RecorderNode,           /**< Node that represents a recorder (VMAX, etc). Has both guid and resource (parent server). */
-        SharedResourceNode,     /**< Node that represents accessible resource link, displayed under user. Has only resource - camera or web page. */
-        ResourceNode,           /**< Node that represents a resource. Has only resource. */
-        LayoutItemNode,         /**< Node that represents a layout item. Has both guid and resource. */
-        EdgeNode,               /**< Node that represents an EDGE server with a camera. Has only resource - server's only camera. */
-
-        LayoutTourNode,         /**< Node that represents a layout tour. Has a guid. */
-
-        VideoWallItemNode,      /**< Node that represents a videowall item. Has a guid and can have resource. */
-        VideoWallMatrixNode,    /**< Node that represents a videowall saved matrix. Has a guid. */
-
-        CloudSystemNode,        /**< Node that represents available cloud system. */
-        SystemNode,             /**< Node that represents systems but the current. */
-
-        NodeTypeCount
-    };
-
-    bool isSeparatorNode(NodeType t);
-
-    /**
      * Role of an item on the scene.
      *
      * Note that at any time there may exist no more than one item for each role.
@@ -103,7 +46,8 @@ namespace Qn
         FirstItemDataRole = Qt::UserRole,
 
         /* Tree-based. */
-        NodeTypeRole,                               /**< Role for node type, see <tt>Qn::NodeType</tt>. */
+        NodeTypeRole,  /**< Role for node type, see <tt>ResourceTreeNodeType</tt>. */
+        ResourceTreeScopeRole, //< Role for ResourceTreeScope.
 
         /* Resource-based. */
         ResourceRole,                               /**< Role for QnResourcePtr. */
@@ -246,9 +190,9 @@ namespace Qn
         ShortTextRole,                              /**< Role for short text. Value of type QString. */
         PriorityRole,                               /**< Role for priority value. Value of type quint64. */
 
-        EventTypeRole,                              /**< Role for business event type. Value of type nx::vms::event::EventType. */
+        EventTypeRole,                              /**< Role for business event type. Value of type nx::vms::api::EventType. */
         EventResourcesRole,                         /**< Role for business event resources list. Value of type QSet<QnUuid>. */
-        ActionTypeRole,                             /**< Role for business action type. Value of type nx::vms::event::ActionType. */
+        ActionTypeRole,                             /**< Role for business action type. Value of type nx::vms::api::ActionType. */
         ActionResourcesRole,                        /**< Role for business action resources list. Value of type QSet<QnUuid>. */
         ActionDataRole,                             /**< Role for business action. Value of type vms::event::AbstractActionPtr. */
         RuleModelRole, /* #deprecate #3.2 */        /**< Role for business rule caching model. Value of type QnBusinessRuleViewModelPtr. */
@@ -492,7 +436,7 @@ namespace Qn
 Q_DECLARE_METATYPE(QValidator::State) //< For Qn::ValidationStateRole QVariant conversion.
 
 QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
-    (Qn::ItemRole)(Qn::TimeMode)(Qn::NodeType)(Qn::ThumbnailStatus),
+    (Qn::ItemRole)(Qn::TimeMode)(Qn::ThumbnailStatus),
     (metatype)
     )
 
@@ -510,3 +454,5 @@ QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
     (Qn::LightModeFlags),
     (metatype)(numeric)
     )
+
+QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES((Qn::ThumbnailStatus), (lexical))

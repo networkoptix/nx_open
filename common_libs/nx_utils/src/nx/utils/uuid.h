@@ -66,10 +66,30 @@ public:
     static QnUuid fromStringSafe(const char* uuid);
     static QnUuid fromStringSafe(const std::string& uuid);
 
+    /**
+     * Create fixed QnUuid from any data. As a value of uuid the MD5 hash is taken so created uuids
+     * will be equal for equal strings given. Also there is a collision possibility.
+     */
+    static QnUuid fromArbitraryData(const QByteArray& data);
+    static QnUuid fromArbitraryData(const QString& data);
+    static QnUuid fromArbitraryData(const std::string& data);
+
 private:
     QUuid m_uuid;
 
     friend NX_UTILS_API QDataStream& operator>>(QDataStream& s, QnUuid& id);
+};
+
+/**
+ * Wrapper to be used for overloading as a distinct type for camera-related API requests.
+ * Flexible camera id string is converted to QnUuid from the HTTP request parameter during
+ * deserialization.
+ */
+class QnCameraUuid: public QnUuid
+{
+public:
+    QnCameraUuid() = default;
+    QnCameraUuid(const QnUuid& id): QnUuid(id) {}
 };
 
 namespace std

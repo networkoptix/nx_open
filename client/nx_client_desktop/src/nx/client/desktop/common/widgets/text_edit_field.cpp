@@ -2,7 +2,7 @@
 
 #include <QtWidgets/QTextEdit>
 
-#include <ui/common/accessor.h>
+#include <nx/client/desktop/common/utils/accessor.h>
 
 namespace nx {
 namespace client {

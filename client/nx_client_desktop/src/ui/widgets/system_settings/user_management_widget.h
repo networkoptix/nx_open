@@ -11,14 +11,11 @@
 
 #include <utils/common/connective.h>
 
-namespace Ui
-{
-    class QnUserManagementWidget;
-}
+namespace Ui { class QnUserManagementWidget; }
+namespace nx { namespace client { namespace desktop { class CheckableHeaderView; }}}
 
 class QnUserListModel;
 class QnSortedUserListModel;
-class QnCheckBoxedHeaderView;
 
 class QnUserManagementWidget : public Connective<QnAbstractPreferencesWidget>, public QnWorkbenchContextAware
 {
@@ -61,5 +58,5 @@ private:
     QScopedPointer<Ui::QnUserManagementWidget> ui;
     QnUserListModel* m_usersModel;
     QnSortedUserListModel* m_sortModel;
-    QnCheckBoxedHeaderView* m_header;
+    nx::client::desktop::CheckableHeaderView* m_header = nullptr;
 };

@@ -6,7 +6,7 @@
 #ifndef GENERIC_RTSP_MEDIA_ENCODER_H
 #define GENERIC_RTSP_MEDIA_ENCODER_H
 
-#include <plugins/camera_plugin.h>
+#include <camera/camera_plugin.h>
 
 #include <plugins/plugin_tools.h>
 

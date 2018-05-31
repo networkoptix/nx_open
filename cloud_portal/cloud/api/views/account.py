@@ -203,7 +203,7 @@ def restore_password(request):
         email = Account.extract_temp_credentials(code)[1]
         Account.restore_password(code, new_password)
 
-        account = Account.objects.get(email=email)
+        account = api.models.Account.objects.get(email=email)
         if not account.activated_date:
             account.activated_date = timezone.now()
             account.save()

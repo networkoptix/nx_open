@@ -10,6 +10,7 @@ namespace desktop {
 
 struct CameraSettingsDialogState;
 class CameraSettingsDialogStore;
+struct SchedulePaintFunctions;
 
 class ScheduleSettingsWidget: public QWidget
 {
@@ -23,10 +24,14 @@ public:
     void setStore(CameraSettingsDialogStore* store);
 
 private:
+    void setupUi();
     void loadState(const CameraSettingsDialogState& state);
+
+    static QString motionOptionHint(const CameraSettingsDialogState& state);
 
 private:
     QScopedPointer<Ui::ScheduleSettingsWidget> ui;
+    QScopedPointer<SchedulePaintFunctions> paintFunctions;
 };
 
 } // namespace desktop

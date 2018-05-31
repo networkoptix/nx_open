@@ -82,12 +82,12 @@ int main(int argc, char** argv)
     QApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
     QApplication::setAttribute(Qt::AA_UseHighDpiPixmaps);
 
-    QScopedPointer<QApplication> application(new QApplication(argc, argv));
+    QApplication application(argc, argv);
 
     // Adding exe dir to plugin search path.
     QStringList pluginDirs = QCoreApplication::libraryPaths();
     pluginDirs << QCoreApplication::applicationDirPath();
     QCoreApplication::setLibraryPaths(pluginDirs);
 
-    return runApplication(application.data());
+    return runApplication(&application);
 }

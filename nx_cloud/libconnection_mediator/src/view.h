@@ -26,8 +26,10 @@ public:
     void start();
     void stop();
 
-    std::vector<network::SocketAddress> httpEndpoints() const;
-    std::vector<network::SocketAddress> stunEndpoints() const;
+    const http::Server& httpServer() const;
+    http::Server& httpServer();
+
+    const StunServer& stunServer() const;
 
     // TODO: #ak Make these private non-static after refactoring stun_ut.cpp.
     static void registerStunApiHandlers(

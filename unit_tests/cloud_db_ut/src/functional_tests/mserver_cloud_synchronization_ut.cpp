@@ -376,11 +376,11 @@ TEST_P(FtEc2MserverCloudSynchronization, rename_system)
         }
         else
         {
-            ::ec2::ApiResourceParamWithRefData param;
+            nx::vms::api::ResourceParamWithRefData param;
             param.resourceId = QnUserResource::kAdminGuid;
             param.name = nx::settings_names::kNameSystemName;
             param.value = QString::fromStdString(newSystemName);
-            ::ec2::ApiResourceParamWithRefDataList paramList;
+            nx::vms::api::ResourceParamWithRefDataList paramList;
             paramList.push_back(std::move(param));
 
             ASSERT_EQ(

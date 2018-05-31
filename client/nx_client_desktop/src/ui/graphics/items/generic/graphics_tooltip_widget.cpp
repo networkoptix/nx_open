@@ -6,9 +6,11 @@
 #include <ui/graphics/items/generic/masked_proxy_widget.h>
 #include <ui/processors/clickable.h>
 #include <ui/style/helper.h>
-#include <ui/widgets/common/text_edit_label.h>
+#include <nx/client/desktop/common/widgets/text_edit_label.h>
 #include <nx/client/desktop/common/widgets/busy_indicator.h>
 #include <nx/client/desktop/common/widgets/async_image_widget.h>
+
+using namespace nx::client::desktop;
 
 namespace {
 
@@ -21,7 +23,7 @@ QnGraphicsToolTipWidget::QnGraphicsToolTipWidget(QGraphicsItem* parent):
     base_type(parent),
     m_proxyWidget(new Clickable<QnMaskedProxyWidget>(this)),
     m_embeddedWidget(new QWidget()),
-    m_textLabel(new QnTextEditLabel(m_embeddedWidget)),
+    m_textLabel(new TextEditLabel(m_embeddedWidget)),
     m_previewWidget(new nx::client::desktop::AsyncImageWidget(m_embeddedWidget))
 {
     m_proxyWidget->setVisible(false);
@@ -102,7 +104,7 @@ void QnGraphicsToolTipWidget::setThumbnailVisible(bool visible)
     updateTailPos();
 }
 
-void QnGraphicsToolTipWidget::setImageProvider(QnImageProvider* provider)
+void QnGraphicsToolTipWidget::setImageProvider(ImageProvider* provider)
 {
     if (m_previewWidget->imageProvider() == provider)
         return;

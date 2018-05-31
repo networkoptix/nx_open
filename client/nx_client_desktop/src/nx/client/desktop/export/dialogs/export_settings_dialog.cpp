@@ -4,6 +4,7 @@
 
 #include <limits>
 
+#include <translation/datetime_formatter.h>
 #include <client/client_runtime_settings.h>
 #include <core/resource/layout_item_data.h>
 #include <core/resource/layout_resource.h>
@@ -560,13 +561,12 @@ void ExportSettingsDialog::setMediaParams(
     QString timePart;
     if (resource->hasFlags(Qn::utc))
     {
-        QDateTime time = QDateTime::fromMSecsSinceEpoch(startTimeMs + timestampOffsetMs);
-        timePart = time.toString(lit("yyyy_MMM_dd_hh_mm_ss"));
+        timePart = datetime::toString(startTimeMs + timestampOffsetMs,
+            datetime::Format::filename_date);
     }
     else
     {
-        QTime time = QTime(0, 0, 0, 0).addMSecs(startTimeMs);
-        timePart = time.toString(lit("hh_mm_ss"));
+        timePart = datetime::toString(startTimeMs, datetime::Format::filename_time);
     }
 
     Filename baseFileName = currentSettings.fileName;

@@ -5,12 +5,7 @@
 namespace ec2 {
 
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(
-    (ApiPeerAliveData), (ubjson)(xml)(json)(sql_record)(csv_record), _Fields)
+    (ApiPeerAliveData), (ubjson)(json), _Fields)
 
 } // namespace ec2
 
-void serialize_field(const ec2::ApiPeerAliveData &, QVariant *) { return; }
-void deserialize_field(const QVariant &, ec2::ApiPeerAliveData *) { return; }
-
-void serialize_field(const ec2::ApiPeerData &, QVariant *) { return; }
-void deserialize_field(const QVariant &, ec2::ApiPeerData *) { return; }

@@ -21,10 +21,13 @@ public:
 
     virtual QStringList searchFilters() const override;
 
-protected:
-    virtual QnAbstractStreamDataProvider *createDataProviderInternal(Qn::ConnectionRole role) override;
+    static QnAbstractStreamDataProvider* createDataProvider(
+        const QnResourcePtr& resource,
+        Qn::ConnectionRole role);
 
 private:
+    QnAbstractStreamDataProvider* createDataProviderInternal();
+
     void createSharedDataProvider();
 
     friend class QnDesktopDataProviderWrapper;

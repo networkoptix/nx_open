@@ -89,11 +89,6 @@
     </message>
     <message>
       <location/>
-      <source>Disable only if the client takes too much CPU</source>
-      <translation>클라이언트 SW가 CPU를 많이 사용할 경우 해지 해주세요</translation>
-    </message>
-    <message>
-      <location/>
       <source>Maximum Live Buffer Length</source>
       <translation>최대 라이브 버퍼 길이</translation>
     </message>
@@ -764,16 +759,16 @@
     </message>
     <message>
       <location/>
-      <source>Logical Id</source>
-      <translation>논리 Id</translation>
+      <source>Logical ID</source>
+      <translation>논리 ID</translation>
     </message>
   </context>
   <context>
     <name>CameraInputBusinessEventWidget</name>
     <message>
       <location filename="../src/ui/widgets/business/camera_input_business_event_widget.ui"/>
-      <source>Input Id</source>
-      <translation>입력 Id</translation>
+      <source>Input ID</source>
+      <translation>입력 ID</translation>
     </message>
   </context>
   <context>
@@ -798,8 +793,8 @@
     </message>
     <message>
       <location/>
-      <source>Output Id:</source>
-      <translation>출력 Id:</translation>
+      <source>Output ID:</source>
+      <translation>출력 ID:</translation>
     </message>
   </context>
   <context>
@@ -1513,8 +1508,8 @@
     </message>
     <message>
       <location/>
-      <source>Locked to Hardware Id:</source>
-      <translation>하드웨어 Id에 잠김:</translation>
+      <source>Locked to Hardware ID:</source>
+      <translation>하드웨어 ID에 잠김:</translation>
     </message>
   </context>
   <context>
@@ -1612,8 +1607,8 @@
     </message>
     <message>
       <location/>
-      <source>Hardware Id</source>
-      <translation>하드웨어 Id:</translation>
+      <source>Hardware ID</source>
+      <translation>하드웨어 ID:</translation>
     </message>
   </context>
   <context>
@@ -1741,6 +1736,11 @@
       <location/>
       <source>Tour cycle</source>
       <translation>Tour cycle</translation>
+    </message>
+    <message>
+      <location/>
+      <source>IP addresses for cameras, and servers, groups for users, etc.</source>
+      <translation type="unfinished">IP addresses for cameras, and servers, groups for users, etc.</translation>
     </message>
   </context>
   <context>

@@ -978,8 +978,8 @@ to view more bookmarks</source>
       <translation>Aantal deactiveringen overschreden voor deze licentie.</translation>
     </message>
     <message>
-      <source>Hardware Id of Server with this license does not match Hardware Id on which license was activated.</source>
-      <translation>Hardware-Id van server met deze licentie komt niet overeen met hardware-id waarop de licentie is geactiveerd.</translation>
+      <source>Hardware ID of Server with this license does not match Hardware ID on which license was activated.</source>
+      <translation>Hardware-ID van server met deze licentie komt niet overeen met Hardware-ID waarop de licentie is geactiveerd.</translation>
     </message>
   </context>
   <context>
@@ -1120,17 +1120,17 @@ to view more bookmarks</source>
       <source>File &quot;%1&quot; cannot be written. Please try another name.</source>
       <translation>Bestand &quot;%1&quot; kan niet worden weggeschreven. Probeer een andere naam.</translation>
     </message>
-    <message numerus="yes">
-      <source>Filename should not contain the following reserved characters:
-%1</source>
-      <translation>
-        <numerusform>De bestandsnaam mag de volgende tekens niet bevatten: %1</numerusform>
-        <numerusform>De bestandsnaam mag de volgende tekens niet bevatten: %1</numerusform>
-      </translation>
-    </message>
     <message>
-      <source>Filename &quot;%1&quot; is reserved by operating system. Please try another name.</source>
+      <source>File name &quot;%1&quot; is reserved by operating system. Please try another name.</source>
       <translation>De bestandsnaam &quot;%1&quot; is gereserveerd door het besturingssysteem. Probeer een andere naam.</translation>
+    </message>
+    <message numerus="yes">
+      <source>File name must not contain the following reserved characters:</source>
+      <comment>Plural relates to the word _characters_ here, not _file name_.</comment>
+      <translation>
+        <numerusform>De bestandsnaam mag de volgende tekens niet bevatten:</numerusform>
+        <numerusform>De bestandsnaam mag de volgende tekens niet bevatten:</numerusform>
+      </translation>
     </message>
   </context>
   <context>
@@ -1402,6 +1402,14 @@ to view more bookmarks</source>
       <source>Folder not found</source>
       <translation>Map niet gevonden</translation>
     </message>
+    <message>
+      <source>Helps avoid problems with OpenGL drawing which result in 100% CPU load.</source>
+      <translation>Helpt problemen met OpenGL te voorkomen, wat resulteert in een 100% CPU-belasting.</translation>
+    </message>
+    <message>
+      <source>Adjust to smallest value that does not degrade live view. Bigger buffer makes playback smoother but increases delay between real time and live view; smaller buffer decreases delay but can cause stutters.</source>
+      <translation>Aanpassen aan de kleinste waarde die de liveweergave niet verslechtert. Een grotere buffer maakt het afspelen soepeler, maar vergroot de vertraging tussen de werkelijkheid en de weergave; een kleinere buffer verlaagt de vertraging maar kan schokkende beelden gedurende de weergave veroorzaken.</translation>
+    </message>
   </context>
   <context>
     <name>QnArchiveLengthWidget</name>
@@ -1412,6 +1420,14 @@ to view more bookmarks</source>
     <message>
       <source>High minimum value can lead to archive length decrease on other cameras.</source>
       <translation>Hoge minimumwaarde kan ertoe leiden dat archieflengte afneemt op andere apparaten.</translation>
+    </message>
+    <message>
+      <source>Sets when camera archive will be deleted or saved when there is no space for new recordings.</source>
+      <translation>Stelt in wanneer het camera-archief wordt verwijderd of opgeslagen wanneer er geen ruimte is voor nieuwe opnames.</translation>
+    </message>
+    <message>
+      <source>&quot;Auto&quot; deletes the oldest footage first, regardless of the source.</source>
+      <translation>&quot;Auto&quot; wist eerst de oudste beelden, ongeacht de bron.</translation>
     </message>
   </context>
   <context>
@@ -2192,18 +2208,6 @@ to view more bookmarks</source>
       <translation>Laden...</translation>
     </message>
     <message>
-      <source>Primary Stream</source>
-      <translation>Hoofd stream</translation>
-    </message>
-    <message>
-      <source>Secondary Stream</source>
-      <translation>Secundair stream</translation>
-    </message>
-    <message>
-      <source>Camera has no secondary stream</source>
-      <translation>Camera heeft geen secundaire stream</translation>
-    </message>
-    <message>
       <source>This I/O module has no advanced settings</source>
       <translation>Deze I/O module heeft geen geavanceerde instellingen</translation>
     </message>
@@ -2212,8 +2216,36 @@ to view more bookmarks</source>
       <translation>Deze camera heeft geen geavanceerde instellingen</translation>
     </message>
     <message>
+      <source>Settings</source>
+      <translation>Instellingen</translation>
+    </message>
+    <message>
+      <source>Web</source>
+      <translation>Web</translation>
+    </message>
+    <message>
+      <source>No settings</source>
+      <translation>Geen instellingen</translation>
+    </message>
+    <message>
+      <source>Secondary Stream</source>
+      <translation>Secundair stream</translation>
+    </message>
+    <message>
+      <source>I/O Module ID</source>
+      <translation>I/O Module ID</translation>
+    </message>
+    <message>
+      <source>Camera ID</source>
+      <translation>Camera ID</translation>
+    </message>
+    <message>
       <source>Audio Stream</source>
       <translation>Audio stream</translation>
+    </message>
+    <message>
+      <source>Primary Stream</source>
+      <translation>Hoofd stream</translation>
     </message>
     <message>
       <source>URL is not available. Open stream and try again.</source>
@@ -2228,24 +2260,8 @@ to view more bookmarks</source>
       <translation>I/O module heeft geen audio stream</translation>
     </message>
     <message>
-      <source>I/O Module Id</source>
-      <translation>I/O Module Id</translation>
-    </message>
-    <message>
-      <source>Camera Id</source>
-      <translation>Camera Id</translation>
-    </message>
-    <message>
-      <source>Settings</source>
-      <translation>Instellingen</translation>
-    </message>
-    <message>
-      <source>Web</source>
-      <translation>Web</translation>
-    </message>
-    <message>
-      <source>No settings</source>
-      <translation>Geen instellingen</translation>
+      <source>Camera has no secondary stream</source>
+      <translation>Camera heeft geen secundaire stream</translation>
     </message>
   </context>
   <context>
@@ -2359,11 +2375,23 @@ to view more bookmarks</source>
       <translation>Edge</translation>
     </message>
     <message numerus="yes">
-      <source>This Id is already used on the following %n cameras: %1</source>
+      <source>This ID is already used on the following %n cameras: %1</source>
       <translation>
-        <numerusform>Deze Id wordt al gebruikt op de volgende %n camera's: %1</numerusform>
-        <numerusform>Deze Id wordt al gebruikt op de volgende %n camera's: %1</numerusform>
+        <numerusform>Deze ID wordt al gebruikt op de volgende camera: %1</numerusform>
+        <numerusform>Deze ID wordt al gebruikt op de volgende %n camera's: %1</numerusform>
       </translation>
+    </message>
+    <message>
+      <source>Helps fix image quality issues on some cameras; for others will cause significant bitrate increase.</source>
+      <translation>Helpt beeldkwaliteitsproblemen bij sommige camera's oplossen; voor anderen veroorzaakt kan het een toename van de bitrate veroorzaken.</translation>
+    </message>
+    <message>
+      <source>Custom number that can be assigned to a camera for quick identification and access</source>
+      <translation>Aangepast nummer dat kan worden toegewezen aan een camera voor snelle identificatie en toegang</translation>
+    </message>
+    <message>
+      <source>Server will not change any cameras settings, it will receive and use camera stream as-is.</source>
+      <translation>De server zal geen camera-instellingen veranderen, deze zal de camerastream zoals aangeleverd ontvangen en gebruiken.</translation>
     </message>
   </context>
   <context>
@@ -2484,8 +2512,8 @@ to view more bookmarks</source>
       <translation>Server</translation>
     </message>
     <message>
-      <source>Id</source>
-      <translation>Id</translation>
+      <source>ID</source>
+      <translation>ID</translation>
     </message>
   </context>
   <context>
@@ -2647,6 +2675,14 @@ to view more bookmarks</source>
       <source>More Settings</source>
       <translation>Meer instellingen</translation>
     </message>
+    <message>
+      <source>Quality setting determines the compression rate only, and does not affect resolution. Low, Medium, High and Best are preset bitrate values.</source>
+      <translation>De kwaliteitsinstelling bepaalt alleen de compressiesnelheid en heeft geen invloed op de resolutie. Laag, Gemiddeld, Hoog en Beste zijn vooraf ingestelde bitrate-waarden.</translation>
+    </message>
+    <message>
+      <source>First choose a recording option, then apply it to day and time blocks on the recording schedule. (0 block is 12:00am to 1:00am, 23 block is 11:00pm to 12:00am.)</source>
+      <translation>Kies eerst een opnameoptie en pas deze vervolgens toe op dag- en tijdblokken in het opnameschema. (0 blok is 12:00 uur tot 01:00 uur, 23 blok is 11:00 uur tot 12:00 uur.)</translation>
+    </message>
   </context>
   <context>
     <name>QnCameraSettingsDialog</name>
@@ -2799,51 +2835,60 @@ devices</source>
     </message>
     <message>
       <source>Disconnect System from %1</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
       <translation>Ontkoppel het systeem van %1</translation>
     </message>
     <message>
       <source>Open %1 Portal</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
       <translation>Open %1 Portal</translation>
     </message>
     <message>
       <source>Create %1 Account</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
       <translation>Maak een %1 account aan</translation>
     </message>
     <message>
       <source>Connect System to %1...</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
       <translation>Systeem verbinden met %1...</translation>
     </message>
     <message>
       <source>Create %1
 account</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
       <translation>Maak %1</translation>
     </message>
     <message>
       <source>Connect System
 to %1</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
       <translation>Verbind systeem met %1</translation>
     </message>
     <message>
       <source>Learn more about %1</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
       <translation>Meer informatie over %1</translation>
     </message>
   </context>
   <context>
     <name>QnCloudResultMessages</name>
     <message>
-      <source>Incorrect email or password</source>
-      <translation>Incorrecte email of wachtwoord</translation>
+      <source>Account not found</source>
+      <translation>Account niet gevonden</translation>
     </message>
     <message>
-      <source>Account is not activated. Please check your email and follow provided instructions</source>
-      <translation>Het account is niet geactiveerd. Controleer uw e-mail en volg de instructies</translation>
+      <source>Account is not activated.</source>
+      <translation>Account is niet geactiveerd.</translation>
+    </message>
+    <message>
+      <source>Please log in to %1 and follow the provided instructions.</source>
+      <comment>%1 is a cloud site name like &quot;Nx Cloud&quot;</comment>
+      <translation>Meld u aan bij %1 en volg de instructies.</translation>
+    </message>
+    <message>
+      <source>Invalid password</source>
+      <translation>Ongeldig wachtwoord</translation>
     </message>
   </context>
   <context>
@@ -2858,7 +2903,7 @@ to %1</source>
     </message>
     <message>
       <source>Cannot connect to %1</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
       <translation>Kan niet verbinden met %1</translation>
     </message>
   </context>
@@ -2889,12 +2934,12 @@ to %1</source>
     </message>
     <message>
       <source>Connect to %1</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
       <translation>Verbind met %1</translation>
     </message>
     <message>
       <source>Enter %1 Account</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
       <translation>Voer %1 account in</translation>
     </message>
   </context>
@@ -2906,12 +2951,12 @@ to %1</source>
     </message>
     <message>
       <source>System connected to %1</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
       <translation>Systeem verbonden met %1</translation>
     </message>
     <message>
       <source>Failed to connect System to %1</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
       <translation>Kan het systeem niet verbinden met %1</translation>
     </message>
   </context>
@@ -3063,17 +3108,17 @@ to %1</source>
       <translation>Gebruik is nu niet toegestaan. Mogelijkerwijs, omdat de server nu opnieuw opstart. Probeer het later nogmaals.</translation>
     </message>
     <message>
-      <source>Connection to %1 is not ready yet. Check server Internet connection or try again later.</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-      <translation>Verbinding met %1 is nog niet klaar. Controleer de internetverbinding van de server of probeer het later nogmaals.</translation>
-    </message>
-    <message>
       <source>Connection to Server could not be established.</source>
       <translation>Verbinding met de server kon niet worden vastgesteld.</translation>
     </message>
     <message>
       <source>This user is disabled by system administrator.</source>
       <translation>Deze gebruiker is uitgeschakeld door systeembeheerder.</translation>
+    </message>
+    <message>
+      <source>Connection to %1 is not ready yet. Check server Internet connection or try again later.</source>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
+      <translation>Verbinding met %1 is nog niet klaar. Controleer de internetverbinding van de server of probeer het later nogmaals.</translation>
     </message>
   </context>
   <context>
@@ -3098,16 +3143,12 @@ to %1</source>
   <context>
     <name>QnCustomBusinessEventWidget</name>
     <message>
-      <source>Server API</source>
-      <translation>Server API</translation>
+      <source>Event will trigger only if there are matches in caption with any of entered keywords.</source>
+      <translation>Gebeurtenis wordt alleen geactiveerd als er overeenkomsten zijn in de Caption met een van de gekozen trefwoorden.</translation>
     </message>
     <message>
-      <source>To generate Generic Event, please refer to %1.</source>
-      <translation>Als u Generic Event wilt genereren, raadpleegt u %1.</translation>
-    </message>
-    <message>
-      <source>Event will trigger only if Generic Event meets all the above conditions. If a keyword field is empty, condition is always met. If not, condition is met if the corresponding field of Generic Event contains any keyword.</source>
-      <translation>Een event wordt alleen geactiveerd als het generic event voldoet aan alle bovenstaande voorwaarden. Als een trefwoordveld leeg is, is er automatisch aan deze voorwaarde voldaan. Is het trefwoordveld niet leeg is, dan wordt aan deze voorwaarde voldaan als het generic event voldoet aan één van de trefwoorden.</translation>
+      <source>If the field is empty, event will always trigger.</source>
+      <translation>Als het veld leeg is, wordt het event altijd geactiveerd.</translation>
     </message>
   </context>
   <context>
@@ -3177,8 +3218,8 @@ to %1</source>
       <translation>De systeemconfiguratie zal worden hersteld van de backup, de server applicatie wordt opnieuw gestart.</translation>
     </message>
     <message>
-      <source>You can create a backup for System configurations that can be restored in case of failure.</source>
-      <translation>U kunt een backup maken voor de systeemconfiguraties die kunnen worden hersteld bij storingen.</translation>
+      <source>Database Backup Files</source>
+      <translation>Database Backup Bestanden</translation>
     </message>
   </context>
   <context>
@@ -3297,28 +3338,35 @@ to %1</source>
       <translation>Verbinding verbreken</translation>
     </message>
     <message>
-      <source>Failed to disconnect System from %1</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-      <translation>Kon het verbinding met het systeem niet verbreken vanaf %1</translation>
-    </message>
-    <message>
-      <source>Disconnect System from %1?</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-      <translation>Ontkoppel het systeem van %1?</translation>
-    </message>
-    <message>
       <source>You will be disconnected from this System and able to login again through local network with local account</source>
       <translation>U wordt losgekoppeld van dit systeem en kan opnieuw inloggen via het lokale netwerk met een lokaal account</translation>
     </message>
     <message>
-      <source>You will not be able to connect to this System with your %1 account after you disconnect this System from %1.</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-      <translation>U kunt niet verbinden met dit systeem met uw %1 account nadat u dit systeem hebt verbroken van %1.</translation>
+      <source>Failed to disconnect System from %1</source>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
+      <translation>Kon het verbinding met het systeem niet verbreken vanaf %1</translation>
+    </message>
+    <message>
+      <source>Disconnect System from %1?</source>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
+      <translation>Ontkoppel het systeem van %1?</translation>
     </message>
     <message>
       <source>All %1 users will be deleted.</source>
-      <comment>%1 is the short cloud name (like &apos;Cloud&apos;)</comment>
-      <translation type="unfinished">All %1 users will be deleted.</translation>
+      <comment>%1 is the short cloud name (like Cloud)</comment>
+      <translation>Alle %1 gebruikers zullen worden verwijderd.</translation>
+    </message>
+    <message>
+      <source>You will not be able to connect to this System with your %1 account after you disconnect this System from %1.</source>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
+      <translation>U kunt niet verbinden met dit systeem met uw %1 account nadat u dit systeem hebt verbroken van %1.</translation>
+    </message>
+  </context>
+  <context>
+    <name>QnEmptyBusinessActionWidget</name>
+    <message>
+      <source>Panic Recording mode switches recording settings for all Cameras to maximum FPS and Quality</source>
+      <translation>Paniekopname schakelt opname-instellingen voor alle camera's naar maximale FPS en kwaliteit</translation>
     </message>
   </context>
   <context>
@@ -3556,6 +3604,13 @@ to %1</source>
     </message>
   </context>
   <context>
+    <name>QnFisheyeSettingsWidget</name>
+    <message>
+      <source>Use this setting to compensate for distortion if camera is not mounted exactly vertically or horizontally.</source>
+      <translation>Gebruik deze instelling om vervorming te compenseren als de camera niet exact verticaal of horizontaal is gemonteerd.</translation>
+    </message>
+  </context>
+  <context>
     <name>QnGeneralPreferencesWidget</name>
     <message>
       <source>Select folder...</source>
@@ -3623,6 +3678,14 @@ to %1</source>
     <message>
       <source>Open Camera List</source>
       <translation>Open cameralijst</translation>
+    </message>
+    <message>
+      <source>Backup includes servers and cameras settings, users, webpages, event rules, etc. Video is not saved.</source>
+      <translation>De back-up omvat server- en camerainstellingen, gebruikers, webpagina's, gebeurtenisregels, etc. Video data wordt niet opgeslagen.</translation>
+    </message>
+    <message>
+      <source>Creates a backup of System configuration that can be restored in case of failure.</source>
+      <translation>Creëert een back-up van de systeemconfiguratie om het systeem te kunnnen herstellen in geval van een storing.</translation>
     </message>
   </context>
   <context>
@@ -3716,8 +3779,8 @@ to %1</source>
       <translation>Impuls</translation>
     </message>
     <message>
-      <source>Id</source>
-      <translation>Id</translation>
+      <source>ID</source>
+      <translation>ID</translation>
     </message>
   </context>
   <context>
@@ -3869,6 +3932,21 @@ to %1</source>
     </message>
   </context>
   <context>
+    <name>QnLensCameraAdvancedParamWidget</name>
+    <message>
+      <source>Zoom</source>
+      <translation>Zoom</translation>
+    </message>
+    <message>
+      <source>Rotation:</source>
+      <translation>Rotatie:</translation>
+    </message>
+    <message>
+      <source>Focus</source>
+      <translation>Focus</translation>
+    </message>
+  </context>
+  <context>
     <name>QnLicenseDetailsDialog</name>
     <message>
       <source>Screens Allowed:</source>
@@ -3899,8 +3977,8 @@ to %1</source>
       <translation>Functies:</translation>
     </message>
     <message>
-      <source>Locked to Hardware Id</source>
-      <translation>Gelieerd aan Hardware Id</translation>
+      <source>Locked to Hardware ID</source>
+      <translation>Gelieerd aan Hardware ID</translation>
     </message>
   </context>
   <context>
@@ -4175,16 +4253,16 @@ to %1</source>
       <translation>Neem contact op met customer support om een ​​geldige licentiecode te verkrijgen.</translation>
     </message>
     <message>
-      <source>This license is already activated and linked to Hardware Id %1</source>
-      <translation>Deze licentie is al geactiveerd en gekoppeld aan Hardware Id %1</translation>
-    </message>
-    <message>
-      <source>This license is already activated and linked to Hardware Id %1 on %2</source>
-      <translation>Deze licentie is al geactiveerd en gekoppeld aan Hardware Id %1 op %2</translation>
-    </message>
-    <message>
       <source>If the problem persists please contact Customer Support.</source>
       <translation>Als het probleem aanhoudt, neem dan contact op met customer support.</translation>
+    </message>
+    <message>
+      <source>This license is already activated and linked to Hardware ID %1</source>
+      <translation>Deze licentie is al geactiveerd en gekoppeld aan Hardware ID %1</translation>
+    </message>
+    <message>
+      <source>This license is already activated and linked to Hardware ID %1 on %2</source>
+      <translation>Deze licentie is al geactiveerd en gekoppeld aan Hardware ID %1 op %2</translation>
     </message>
   </context>
   <context>
@@ -4202,20 +4280,20 @@ to %1</source>
       <translation>Open Licentiebestand</translation>
     </message>
     <message>
-      <source>All files (*.*)</source>
-      <translation>Alle bestanden (*.*)</translation>
-    </message>
-    <message>
       <source>Failed to open file</source>
       <translation>Kan het bestand niet openen</translation>
     </message>
     <message>
-      <source>Please send email with License Key and Hardware Id provided to %1 to obtain an Activation Key file.</source>
-      <translation>Stuur alsjeblieft een e-mail met de licentiecode en het Hardware-Id dat is verstrekt aan %1 om een ​​activatie bestand te verkrijgen.</translation>
+      <source>All files</source>
+      <translation>Alle bestanden</translation>
     </message>
     <message>
-      <source>Please send License Key and Hardware Id provided to %1 to obtain an Activation Key file.</source>
-      <translation>Stuur alsjeblieft een e-mail met de licentiecode en het Hardware-Id dat is verstrekt aan %1 om een ​​activatie bestand te verkrijgen.</translation>
+      <source>Please send email with License Key and Hardware ID provided to %1 to obtain an Activation Key file.</source>
+      <translation>Stuur alsjeblieft een e-mail met de licentiecode en het Hardware-ID dat is verstrekt aan %1 om een ​​activatie bestand te verkrijgen.</translation>
+    </message>
+    <message>
+      <source>Please send License Key and Hardware ID provided to %1 to obtain an Activation Key file.</source>
+      <translation>Stuur alsjeblieft een e-mail met de licentiecode en het Hardware-ID dat is verstrekt aan %1 om een ​​activatie bestand te verkrijgen.</translation>
     </message>
   </context>
   <context>
@@ -4253,7 +4331,7 @@ to %1</source>
     <name>QnLinkToCloudDialogPrivate</name>
     <message>
       <source>Failed to login to %1</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
       <translation>Inloggen mislukt op %1</translation>
     </message>
   </context>
@@ -4371,12 +4449,12 @@ to %1</source>
     </message>
     <message>
       <source>Log in to %1</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
       <translation>Inloggen op %1</translation>
     </message>
     <message>
       <source>Welcome to %1!</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
       <translation>Welkom bij %1!</translation>
     </message>
   </context>
@@ -4425,6 +4503,18 @@ to %1</source>
     <message>
       <source>No image</source>
       <translation>Geen afbeelding</translation>
+    </message>
+    <message>
+      <source>Sets the time to use in the client (timeline, timestamps, etc.) when client and server machines are in different time zones.</source>
+      <translation>Stelt de tijd in die moet worden gebruikt in de client (tijdlijn, tijdstempels, enz.) wanneer client- en servermachines zich in verschillende tijdzones bevinden.</translation>
+    </message>
+    <message>
+      <source>Length of time each camera on layout will be displayed if you start a Layout Tour.</source>
+      <translation>Lengte van de weergave voor elke camera in de schermindeling als u een tour cyclus start.</translation>
+    </message>
+    <message>
+      <source>Displays IP addresses for cameras and servers and groups for users.</source>
+      <translation>Geeft IP-adressen weer voor camera's en servers en groepen voor gebruikers.</translation>
     </message>
   </context>
   <context>
@@ -5599,16 +5689,12 @@ to %1</source>
       <translation>Om problemen te vermijden, moet u het maximale aantal camera's aanpassen</translation>
     </message>
     <message>
-      <source>server will take devices automatically from offline servers</source>
-      <translation>server zal automatisch apparaten van offline servers overnemen</translation>
-    </message>
-    <message>
-      <source>server will take cameras automatically from offline servers</source>
-      <translation>server zal automatisch camera's van offline servers overnemen</translation>
-    </message>
-    <message>
       <source>Failover</source>
       <translation>Failover</translation>
+    </message>
+    <message>
+      <source>Servers with failover enabled will automatically take cameras from offline servers.</source>
+      <translation>Servers met geactiveerde failover nemen automatisch camera's over van offline servers.</translation>
     </message>
   </context>
   <context>
@@ -5627,10 +5713,6 @@ to %1</source>
     <message>
       <source>Select Update File...</source>
       <translation>Selecteer Update bestand...</translation>
-    </message>
-    <message>
-      <source>Update Files (*.zip)</source>
-      <translation>Updatebestanden (*.zip)</translation>
     </message>
     <message>
       <source>Release notes</source>
@@ -5815,6 +5897,18 @@ to %1</source>
       <source>Incompatible %1 instance. To update disconnect System from %1 first.</source>
       <comment>%1 here will be substituted with cloud name e.g. &apos;Nx Cloud&apos;.</comment>
       <translation>Incompatibele %1 versie. Voor het updaten eerst de verbinding verbreken vanaf %1.</translation>
+    </message>
+    <message>
+      <source>Update Files</source>
+      <translation>Bestanden bijwerken</translation>
+    </message>
+    <message>
+      <source>Validating the update...</source>
+      <translation>De update valideren...</translation>
+    </message>
+    <message>
+      <source>Checking for free space...</source>
+      <translation>Controleren op vrije ruimte...</translation>
     </message>
   </context>
   <context>
@@ -6297,6 +6391,14 @@ to %1</source>
       <source>Recording was enabled on the USB storage</source>
       <translation>Opname is ingeschakeld op de USB-opslag</translation>
     </message>
+    <message>
+      <source>Backup includes servers and cameras settings, users, webpages, event rules, etc. Video is not saved.</source>
+      <translation>De back-up omvat server- en camerainstellingen, gebruikers, webpagina's, gebeurtenisregels, etc. Video data wordt niet opgeslagen.</translation>
+    </message>
+    <message>
+      <source>Creates a backup of System configuration that can be restored in case of failure.</source>
+      <translation>Creëert een back-up van de systeemconfiguratie om het systeem te kunnnen herstellen in geval van een storing.</translation>
+    </message>
   </context>
   <context>
     <name>QnStorageListModel</name>
@@ -6509,16 +6611,6 @@ to %1</source>
       <translation>Verbind</translation>
     </message>
     <message>
-      <source>Connect your System to %1 &amp;mdash; make it accessible from anywhere!</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-      <translation>Sluit uw systeem aan op %1 &amp;mdash; en maak het overal toegankelijk!</translation>
-    </message>
-    <message>
-      <source>Check out %1 &amp;mdash; connect to your System from anywhere!</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-      <translation>Bekijk %1 &amp;mdash; en verbind met uw systeem vanaf elke locatie!</translation>
-    </message>
-    <message>
       <source>Some users have not set their email addresses</source>
       <translation>Sommige gebruikers hebben hun e-mailadressen niet ingesteld</translation>
     </message>
@@ -6570,6 +6662,16 @@ to %1</source>
       <source>Archive integrity problem detected</source>
       <translation>Archief integriteit probleem gedetecteerd</translation>
     </message>
+    <message>
+      <source>Connect your System to %1 &amp;mdash; make it accessible from anywhere!</source>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
+      <translation>Sluit uw systeem aan op %1 &amp;mdash; en maak het overal toegankelijk!</translation>
+    </message>
+    <message>
+      <source>Check out %1 &amp;mdash; connect to your System from anywhere!</source>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
+      <translation>Bekijk %1 &amp;mdash; en verbind met uw systeem vanaf elke locatie!</translation>
+    </message>
   </context>
   <context>
     <name>QnSystemSettingsWidget</name>
@@ -6588,6 +6690,14 @@ to %1</source>
     <message>
       <source>Allow System to optimize camera settings</source>
       <translation>Laat het systeem toe om de camera-instellingen te optimaliseren</translation>
+    </message>
+    <message>
+      <source>Sends anonymous System information (firmware, codecs, streams, etc.).</source>
+      <translation>Verzendt anonieme systeeminformatie (firmware, codecs, streams, enz.).</translation>
+    </message>
+    <message>
+      <source>Tracks and logs all user actions.</source>
+      <translation>Traceert en logt alle gebruikersacties.</translation>
     </message>
   </context>
   <context>
@@ -6654,16 +6764,6 @@ to %1</source>
       <translation>Er zijn geen miniaturen beschikbaar</translation>
     </message>
     <message>
-      <source>hh:mm</source>
-      <comment>Format for displaying hours and minutes on timeline.</comment>
-      <translation>uu:mm</translation>
-    </message>
-    <message>
-      <source>h ap</source>
-      <comment>Format for displaying hours on timeline, with am/pm indicator.</comment>
-      <translation>u ap</translation>
-    </message>
-    <message>
       <source>dd</source>
       <comment>Format for displaying days on timeline.</comment>
       <translation>dd</translation>
@@ -6707,11 +6807,6 @@ to %1</source>
       <source>yyyy</source>
       <comment>Format for displaying year caption in timeline&apos;s header</comment>
       <translation>jjjj</translation>
-    </message>
-    <message>
-      <source>h:mm ap</source>
-      <comment>Format for displaying hours and minutes on timeline, with am/pm indicator.</comment>
-      <translation>u:mm ap</translation>
     </message>
     <message>
       <source>dd MMMM yyyy h:mm ap</source>
@@ -6855,8 +6950,8 @@ to %1</source>
     </message>
     <message>
       <source>%1 user</source>
-      <comment>%1 is the short cloud name (like &apos;Cloud&apos;)</comment>
-      <translation type="unfinished">%1 user</translation>
+      <comment>%1 is the short cloud name (like Cloud)</comment>
+      <translation>%1 gebruikers</translation>
     </message>
   </context>
   <context>
@@ -6903,6 +6998,10 @@ to %1</source>
     <message>
       <source>Edit</source>
       <translation>Aanpassen</translation>
+    </message>
+    <message>
+      <source>Users can be imported from an LDAP server. They will be able to log in only if LDAP server is online and their accounts are active on it.</source>
+      <translation>Gebruikers kunnen vanaf een LDAP-server worden geïmporteerd. Ze kunnen alleen inloggen als de LDAP-server online is en hun accounts actief zijn.</translation>
     </message>
   </context>
   <context>
@@ -7040,7 +7139,7 @@ to %1</source>
     </message>
     <message>
       <source>This user has not yet signed up for %1</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
       <translation>Deze gebruiker heeft zich nog niet aangemeld voor %1</translation>
     </message>
   </context>
@@ -7092,8 +7191,27 @@ to %1</source>
     </message>
     <message>
       <source>%1 user with specified email already exists.</source>
-      <comment>%1 is the short cloud name (like &apos;Cloud&apos;)</comment>
-      <translation type="unfinished">%1 user with specified email already exists.</translation>
+      <comment>%1 is the short cloud name (like Cloud)</comment>
+      <translation>%1 gebruiker met opgegeven email bestaat al.</translation>
+    </message>
+    <message>
+      <source>Local users</source>
+      <translation>Lokale Gebruikers</translation>
+    </message>
+    <message>
+      <source>%1 users</source>
+      <comment>%1 is the short cloud name (like Cloud)</comment>
+      <translation>%1 gebruikers</translation>
+    </message>
+    <message>
+      <source>%1 belong to this system only and are fully managed by system administrators.</source>
+      <comment>%1 is local users definition, e.g. &apos;Local users&apos;</comment>
+      <translation>%1 behoren alleen tot dit systeem en worden volledig beheerd door de systeembeheerders.</translation>
+    </message>
+    <message>
+      <source>%1 can have access to many Systems. Administrators can manage their rights only.</source>
+      <comment>%1 is cloud users definition, e.g. &apos;Cloud users&apos;</comment>
+      <translation>%1 kunnen toegang hebben tot verschillende systemen. Alleen beheerders kunnen hun rechten beheren.</translation>
     </message>
   </context>
   <context>
@@ -7337,8 +7455,8 @@ to %1</source>
     </message>
     <message>
       <source>%1 Systems cannot be merged</source>
-      <comment>%1 is the short cloud name (like &apos;Cloud&apos;)</comment>
-      <translation type="unfinished">%1 Systems cannot be merged</translation>
+      <comment>%1 is the short cloud name (like Cloud)</comment>
+      <translation>%1 Systemen kunnen niet worden samengevoegd</translation>
     </message>
   </context>
   <context>
@@ -8109,6 +8227,13 @@ to %1</source>
     </message>
   </context>
   <context>
+    <name>nx::client::desktop::HintButton</name>
+    <message>
+      <source>Click to read more</source>
+      <translation>Klik om meer te lezen</translation>
+    </message>
+  </context>
+  <context>
     <name>nx::client::desktop::ImageOverlaySettingsWidget</name>
     <message>
       <source>Select file...</source>
@@ -8354,17 +8479,26 @@ to %1</source>
     </message>
   </context>
   <context>
-    <name>nx::client::desktop::ui::AnalyticsSdkEventModel</name>
-    <message>
-      <source>No event types supported</source>
-      <translation>Geen gebeurtenistypen ondersteund</translation>
-    </message>
-  </context>
-  <context>
     <name>nx::client::desktop::ui::AnalyticsSdkEventWidget</name>
     <message>
-      <source>Event will trigger only if Analytics Event meets all the above conditions. If a keyword field is empty, condition is always met. If not, condition is met if the corresponding field of Analytics Event contains any keyword.</source>
-      <translation>Evenement wordt alleen geactiveerd als Analytics-evenement aan alle bovenstaande voorwaarden voldoet. Als een trefwoordveld leeg is, is aan de voorwaarde altijd voldaan. Als dat niet het geval is, wordt aan de voorwaarde voldaan als het overeenkomstige veld van Analytics-evenement een zoekwoord bevat.</translation>
+      <source>Analytics events can be set up on a certain cameras.</source>
+      <translation>Analytics gebeurtenissen kunnen op bepaalde camera's worden ingesteld.</translation>
+    </message>
+    <message>
+      <source>Choose cameras using the button above to see the list of supported events.</source>
+      <translation>Kies camera's met de knop hierboven om de lijst met ondersteunde gebeurtenissen te bekijken.</translation>
+    </message>
+    <message>
+      <source>Event will trigger only if there are matches in caption with any of entered keywords.</source>
+      <translation>Een gebeurtenis wordt alleen geactiveerd als er overeenkomsten zijn in de Caption met een van de gekozen trefwoorden.</translation>
+    </message>
+    <message>
+      <source>If the field is empty, event will always trigger.</source>
+      <translation>Als het veld leeg is, wordt de gebeurtenis altijd geactiveerd.</translation>
+    </message>
+    <message>
+      <source>Event will trigger only if there are matches in the description field with any of the entered keywords.</source>
+      <translation>De gebeurtenis wordt alleen geactiveerd als er overeenkomsten zijn in de Omschrijving met een van de gekozen trefwoorden.</translation>
     </message>
   </context>
   <context>
@@ -8715,6 +8849,18 @@ to %1</source>
     <message>
       <source>Failed to change password on %1 of %2 cameras</source>
       <translation>Wijzigen van wachtwoorden op %1 van %2 camera's mislukt</translation>
+    </message>
+    <message>
+      <source>To use the software you must accept the end user license agreement</source>
+      <translation>Om de software te kunnen gebruiken dient u eerst de gebruiksrechtovereenkomst accepteren</translation>
+    </message>
+    <message>
+      <source>Accept</source>
+      <translation>Accepteren</translation>
+    </message>
+    <message>
+      <source>Decline</source>
+      <translation>Afwijzen</translation>
     </message>
   </context>
   <context>

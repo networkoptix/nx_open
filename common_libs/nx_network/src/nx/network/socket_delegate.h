@@ -11,7 +11,8 @@ namespace network {
  * Base for some class that wants to extend socket functionality a bit
  * and delegate rest of API calls to existing implementation.
  */
-template<typename SocketInterfaceToImplement>
+template<typename SocketInterfaceToImplement, typename TargetType>
+// requires std::is_base_of<AbstractSocket, SocketInterfaceToImplement>::value
 class SocketDelegate:
     public SocketInterfaceToImplement
 {
@@ -20,7 +21,7 @@ class SocketDelegate:
         "You MUST use class derived of AbstractSocket as a template argument");
 
 public:
-    SocketDelegate(SocketInterfaceToImplement* target):
+    SocketDelegate(TargetType* target):
         m_target(target)
     {
     }
@@ -171,21 +172,21 @@ public:
     }
 
 protected:
-    SocketInterfaceToImplement* m_target;
+    TargetType* m_target;
 };
 
-template<typename SocketInterfaceToImplement>
+template<typename SocketInterfaceToImplement, typename TargetType>
 class CommunicatingSocketDelegate:
-    public SocketDelegate<SocketInterfaceToImplement>
+    public SocketDelegate<SocketInterfaceToImplement, TargetType>
 {
     static_assert(
         std::is_base_of<AbstractCommunicatingSocket, SocketInterfaceToImplement>::value,
         "You MUST use class derived of AbstractCommunicatingSocket as a template argument");
 
-    using base_type = SocketDelegate<SocketInterfaceToImplement>;
+    using base_type = SocketDelegate<SocketInterfaceToImplement, TargetType>;
 
 public:
-    CommunicatingSocketDelegate(SocketInterfaceToImplement* target):
+    CommunicatingSocketDelegate(TargetType* target):
         base_type(target)
     {
     }
@@ -236,6 +237,10 @@ public:
         return this->m_target->readSomeAsync(buffer, std::move(handler));
     }
 
+    /*
+     * Warning! Buffer should live at least till asynchronous send occurres, so
+     * do not use buffers with local scope here.
+     */
     virtual void sendAsync(
         const nx::Buffer& buffer,
         IoCompletionHandler handler) override
@@ -250,14 +255,8 @@ public:
         return this->m_target->registerTimer(timeout, std::move(handler));
     }
 
-    virtual void cancelIOAsync(
-        nx::network::aio::EventType eventType,
-        nx::utils::MoveOnlyFunc<void()> handler) override
-    {
-        return this->m_target->cancelIOAsync(eventType, std::move(handler));
-    }
-
-    virtual void cancelIOSync(nx::network::aio::EventType eventType) override
+protected:
+    virtual void cancelIoInAioThread(nx::network::aio::EventType eventType) override
     {
         return this->m_target->cancelIOSync(eventType);
     }
@@ -266,26 +265,63 @@ public:
 /**
  * Does not takes ownership.
  */
-class NX_NETWORK_API StreamSocketDelegate:
-    public CommunicatingSocketDelegate<AbstractStreamSocket>
+template<typename SocketInterfaceToImplement, typename TargetType>
+class CustomStreamSocketDelegate:
+    public CommunicatingSocketDelegate<SocketInterfaceToImplement, TargetType>
 {
-    using base_type = CommunicatingSocketDelegate<AbstractStreamSocket>;
+    using base_type = CommunicatingSocketDelegate<SocketInterfaceToImplement, TargetType>;
+
+public:
+    CustomStreamSocketDelegate(TargetType* target):
+        base_type(target)
+    {
+    }
+
+    virtual bool setNoDelay(bool value) override
+    {
+        return this->m_target->setNoDelay(value);
+    }
+
+    virtual bool getNoDelay(bool* value) const override
+    {
+        return this->m_target->getNoDelay(value);
+    }
+
+    virtual bool toggleStatisticsCollection(bool value) override
+    {
+        return this->m_target->toggleStatisticsCollection(value);
+    }
+
+    virtual bool getConnectionStatistics(StreamSocketInfo* info) override
+    {
+        return this->m_target->getConnectionStatistics(info);
+    }
+
+    virtual bool setKeepAlive(boost::optional< KeepAliveOptions > info) override
+    {
+        return this->m_target->setKeepAlive(info);
+    }
+
+    virtual bool getKeepAlive(boost::optional< KeepAliveOptions >* result) const override
+    {
+        return this->m_target->getKeepAlive(result);
+    }
+};
+
+class NX_NETWORK_API StreamSocketDelegate:
+    public CustomStreamSocketDelegate<AbstractStreamSocket, AbstractStreamSocket>
+{
+    using base_type =
+        CustomStreamSocketDelegate<AbstractStreamSocket, AbstractStreamSocket>;
 
 public:
     StreamSocketDelegate(AbstractStreamSocket* target);
-
-    virtual bool setNoDelay(bool value) override;
-    virtual bool getNoDelay(bool* value) const override;
-    virtual bool toggleStatisticsCollection(bool val) override;
-    virtual bool getConnectionStatistics(StreamSocketInfo* info) override;
-    virtual bool setKeepAlive(boost::optional< KeepAliveOptions > info) override;
-    virtual bool getKeepAlive(boost::optional< KeepAliveOptions >* result) const override;
 };
 
 class NX_NETWORK_API StreamServerSocketDelegate:
-    public SocketDelegate<AbstractStreamServerSocket>
+    public SocketDelegate<AbstractStreamServerSocket, AbstractStreamServerSocket>
 {
-    using base_type = SocketDelegate<AbstractStreamServerSocket>;
+    using base_type = SocketDelegate<AbstractStreamServerSocket, AbstractStreamServerSocket>;
 
 public:
     StreamServerSocketDelegate(AbstractStreamServerSocket* target);
@@ -293,10 +329,11 @@ public:
     virtual void pleaseStop(nx::utils::MoveOnlyFunc<void()> handler) override;
     virtual void pleaseStopSync(bool assertIfCalledUnderLock = true) override;
     virtual bool listen(int backlog = kDefaultBacklogSize) override;
-    virtual AbstractStreamSocket* accept() override;
+    virtual std::unique_ptr<AbstractStreamSocket> accept() override;
     virtual void acceptAsync(AcceptCompletionHandler handler) override;
-    virtual void cancelIOAsync(nx::utils::MoveOnlyFunc<void()> handler) override;
-    virtual void cancelIOSync() override;
+
+protected:
+    virtual void cancelIoInAioThread() override;
 };
 
 } // namespace network

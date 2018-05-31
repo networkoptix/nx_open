@@ -12,8 +12,8 @@ namespace QnProto {
         T data;
     };
 
-    bool deserialize(const QByteArray &value, Message<ec2::ApiLayoutData> *target);
-    bool deserialize(const QnProtoValue &value, Message<ec2::ApiLayoutData> *target);
-} 
+    bool deserialize(const QByteArray &value, Message<nx::vms::api::LayoutData> *target);
+    bool deserialize(const QnProtoValue &value, Message<nx::vms::api::LayoutData> *target);
+}
 
 #endif // QN_WORKAROUND_LAYOUT_PROTO_H

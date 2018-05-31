@@ -7,7 +7,7 @@
 
 #include <nx/utils/string.h>
 #include <ui/models/resource/resource_list_model.h>
-#include <ui/common/aligner.h>
+#include <nx/client/desktop/common/utils/aligner.h>
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource/camera_resource.h>
@@ -58,7 +58,7 @@ QnNewWearableCameraDialog::QnNewWearableCameraDialog(QWidget* parent):
     ui->nameField->setText(name);
     ui->nameField->setValidator(defaultNonEmptyValidator(tr("Name cannot be empty")));
 
-    QnAligner* aligner = new QnAligner(this);
+    Aligner* aligner = new Aligner(this);
     aligner->registerTypeAccessor<InputField>(InputField::createLabelWidthAccessor());
     aligner->addWidget(ui->serverLabel);
     aligner->addWidget(ui->nameField);

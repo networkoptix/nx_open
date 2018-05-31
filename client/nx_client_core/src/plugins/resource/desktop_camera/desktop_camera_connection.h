@@ -4,13 +4,13 @@
 
 #include <client_core/connection_context_aware.h>
 
+#include <core/resource/client_core_resource_fwd.h>
+
 #include <nx/utils/thread/long_runnable.h>
-#include "core/resource/resource_fwd.h"
 #include <nx/network/deprecated/simple_http_client.h>
 #include "network/tcp_connection_processor.h"
 #include <nx/network/http/http_client.h>
 
-class QnDesktopResource;
 class QnTCPConnectionProcessor;
 class QnDesktopCameraConnectionProcessorPrivate;
 class QnDesktopCameraConnectionProcessor;
@@ -24,7 +24,7 @@ class QnDesktopCameraConnection: public QnLongRunnable, public QnConnectionConte
 public:
     typedef QnLongRunnable base_type;
 
-    QnDesktopCameraConnection(QnDesktopResource* owner,
+    QnDesktopCameraConnection(QnDesktopResourcePtr owner,
         const QnMediaServerResourcePtr& server,
         const QnUuid& userId);
     virtual ~QnDesktopCameraConnection();
@@ -37,7 +37,7 @@ private:
     QSharedPointer<nx::network::AbstractStreamSocket> takeSocketFromHttpClient(
         std::unique_ptr<nx::network::http::HttpClient>& httpClient);
 private:
-    QnDesktopResource* m_owner;
+    QnDesktopResourcePtr m_owner;
     QnMediaServerResourcePtr m_server;
     QnUuid m_userId;
     std::shared_ptr<QnDesktopCameraConnectionProcessor> processor;
@@ -54,7 +54,7 @@ public:
     QnDesktopCameraConnectionProcessor(
         QSharedPointer<nx::network::AbstractStreamSocket> socket,
         void* sslContext,
-        QnDesktopResource* desktop);
+        QnDesktopResourcePtr desktop);
     virtual ~QnDesktopCameraConnectionProcessor();
     void processRequest();
     void sendData(const QnByteArray& data);

@@ -75,6 +75,8 @@ public:
 
     void expectConnect(const QnUuid& id, const nx::network::SocketAddress& endpoint)
     {
+        NX_INFO(this, lm("Excpecting connect to %1 on %2").args(id, endpoint));
+
         QnMutexLocker lock(&m_mutex);
         const auto start = std::chrono::steady_clock::now();
         while (m_knownServers.count(id) == 0 || m_knownServers[id].toString() != endpoint.toString())
@@ -86,6 +88,8 @@ public:
 
     void expectDisconnect(const QnUuid& id)
     {
+        NX_INFO(this, lm("Excpecting disconnect of %1").arg(id));
+
         QnMutexLocker lock(&m_mutex);
         const auto start = std::chrono::steady_clock::now();
         while (m_knownServers.count(id) != 0)
@@ -97,8 +101,18 @@ public:
 
     void expectNoChanges()
     {
+        NX_INFO(this, "Excpecting no changes");
+
         QnMutexLocker lock(&m_mutex);
         ASSERT_FALSE(waitCondition(kExpectNoChanesDelay)) << "Unexpected event";
+    }
+
+    void expectPossibleChange()
+    {
+        NX_INFO(this, "Excpecting possible address change");
+
+        QnMutexLocker lock(&m_mutex);
+        waitCondition(kExpectNoChanesDelay);
     }
 
     nx::network::SocketAddress addMediaserver(QnUuid id, nx::network::HostAddress ip = nx::network::HostAddress::localhost)
@@ -168,7 +182,7 @@ TEST_F(DiscoveryModuleConnector, AddEndpoints)
 
     const auto endpoint1replace = addMediaserver(id1);
     connector.newEndpoints({endpoint1replace}, id1);
-    expectNoChanges();
+    expectPossibleChange(); //< Endpoint will be changed if works faster.
 
     removeMediaserver(endpoint1);
     expectConnect(id1, endpoint1replace);
@@ -206,6 +220,9 @@ TEST_F(DiscoveryModuleConnector, ActivateDiactivate)
 
 TEST_F(DiscoveryModuleConnector, EndpointPriority)
 {
+    NX_DEBUG(this) << "Remove this line and change line blow to true in 4.0:";
+    static bool kIsEndpointPrioritizedSwitchSupported = false;
+
     nx::network::HostAddress interfaceIp;
     const auto interfaceIpsV4 = nx::network::getLocalIpV4AddressList();
     if (interfaceIpsV4.empty())
@@ -226,7 +243,8 @@ TEST_F(DiscoveryModuleConnector, EndpointPriority)
 
     const auto newLocalEndpoint = addMediaserver(id);
     connector.newEndpoints({newLocalEndpoint}, id);
-    expectConnect(id, newLocalEndpoint);  //< Expected switch to a new local endpoint.
+    if (kIsEndpointPrioritizedSwitchSupported)
+        expectConnect(id, newLocalEndpoint);  //< Expected switch to a new local endpoint.
 
     const auto dnsRealEndpoint = addMediaserver(id);
     const auto cloudRealEndpoint = addMediaserver(id);
@@ -235,7 +253,10 @@ TEST_F(DiscoveryModuleConnector, EndpointPriority)
     connector.newEndpoints({dnsEndpoint, cloudEndpoint}, id);
 
     removeMediaserver(networkEndpoint);
-    expectNoChanges(); // Not any reconnects are expected.
+    if (kIsEndpointPrioritizedSwitchSupported)
+        expectNoChanges(); //< Not any reconnects are expected.
+    else
+        expectConnect(id, newLocalEndpoint); //< The switch that did not happen erlier.
 
     removeMediaserver(newLocalEndpoint);
     expectConnect(id, dnsEndpoint);  //< DNS is the most prioritized now.
@@ -246,7 +267,9 @@ TEST_F(DiscoveryModuleConnector, EndpointPriority)
     const auto newDnsRealEndpoint = addMediaserver(id);
     const nx::network::SocketAddress newDnsEndpoint(kLocalDnsHost, newDnsRealEndpoint.port);
     connector.newEndpoints({newDnsEndpoint}, id);
-    expectConnect(id, newDnsEndpoint);  //< Expected switch to DNS as better choise than cloud.
+    NX_DEBUG(this) << "Remove this line and uncomment line below in 4.0:";
+    if (kIsEndpointPrioritizedSwitchSupported)
+        expectConnect(id, newDnsEndpoint); //< Expected switch to DNS as better choise than cloud.
 
     removeMediaserver(cloudRealEndpoint);
     removeMediaserver(newDnsRealEndpoint);
@@ -277,6 +300,11 @@ TEST_F(DiscoveryModuleConnector, IgnoredEndpoints)
 
     connector.setForbiddenEndpoints({}, id);
     expectConnect(id, endpoint3); //< The last one is unblocked now.
+
+    const auto endpoint4 = addMediaserver(id);
+    connector.newEndpoints({endpoint4}, id);
+    connector.setForbiddenEndpoints({endpoint3}, id);
+    expectConnect(id, endpoint4); //< Automatic switch from blocked endpoint.
 }
 
 // This unit test is just for easy debug agains real mediaserver.

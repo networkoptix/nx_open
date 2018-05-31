@@ -48,6 +48,7 @@
 #include <client/client_startup_parameters.h>
 #include <client/self_updater.h>
 
+#include <nx/media/decoder_registrar.h>
 #include <nx/network/app_info.h>
 #include <nx/network/cloud/cloud_connect_controller.h>
 #include <nx/network/socket_global.h>
@@ -171,6 +172,8 @@ int runApplication(QtSingleApplication* application, const QnStartupParameters& 
     #if defined(Q_OS_LINUX)
         qunsetenv("RESOURCE_NAME");
     #endif
+
+    nx::media::DecoderRegistrar::registerDecoders({}, true);
 
     QDesktopWidget *desktop = qApp->desktop();
     bool customScreen = startupParams.screen != QnStartupParameters::kInvalidScreen

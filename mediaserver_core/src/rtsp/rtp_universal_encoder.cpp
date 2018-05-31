@@ -643,7 +643,7 @@ QnUniversalRtpEncoder::QnUniversalRtpEncoder(
 
     if (media->dataType == QnAbstractMediaData::VIDEO) {
         m_transcoder.setTranscodingSettings(extraTranscodeParams);
-        m_transcoder.setVideoCodec(m_codec, method, Qn::QualityNormal, videoSize);
+        m_transcoder.setVideoCodec(m_codec, method, Qn::StreamQuality::normal, videoSize);
     }
     else {
         m_transcoder.setAudioCodec(m_codec, method);

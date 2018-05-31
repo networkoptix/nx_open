@@ -3,11 +3,11 @@
 #include <QtCore/QScopedPointer>
 #include <QtWidgets/QWidget>
 
-class QnTreeView;
-
 namespace nx {
 namespace client {
 namespace desktop {
+
+class TreeView;
 
 // One-row, two-column tree view that displays a text item and a checkbox.
 // Intended to be used as a table-like "All Items" selector above a table of actual items.
@@ -47,7 +47,7 @@ public:
         ColumnCount
     };
 
-    QnTreeView* view() const;
+    TreeView* view() const;
 
 signals:
     void checkStateChanged(Qt::CheckState newCheckState);

@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.9.0 FATAL_ERROR)
+cmake_minimum_required(VERSION 3.10.0 FATAL_ERROR)
 set(CMAKE_SUPPRESS_REGENERATION true)
 include(cmake/option.cmake)
 include(cmake/default_target.cmake)
@@ -189,9 +189,14 @@ add_subdirectory(dependencies)
 
 if (withMediaServer OR withTestCamera OR withTrayTool OR withDesktopClient OR withMobileClient OR withClouds)
     add_subdirectory(common_libs)
+    add_subdirectory(vms_libs)
     add_subdirectory(common)
     add_subdirectory(appserver2)
     add_subdirectory(nx_cloud)
+endif()
+
+if(withMediaServer OR withClouds)
+    add_subdirectory(mediaserver_db)
 endif()
 
 if(withMediaServer)
@@ -204,6 +209,10 @@ if(withMediaServer)
     if(withDistributions)
         # TODO: Combine all SDKs (nx_storage_sdk, nx_sdk, nx_metadata_sdk) into one like this.
         add_subdirectory(nx_metadata_sdk)
+    endif()
+
+    if(withMediaDbUtil)
+        add_subdirectory(media_db_util)
     endif()
 
     if(LINUX AND box MATCHES "none|tx1")
@@ -265,8 +274,17 @@ if(beta)
 else()
     set(beta_bool "false")
 endif()
-nx_configure_file(
-    build_variables/maven/filter-resources/build_info.txt
-    ${CMAKE_CURRENT_BINARY_DIR})
 
 nx_save_known_files()
+
+if(withClouds)
+    add_custom_target(cloud DEPENDS cloud-backend)
+
+    if(LINUX)
+        add_subdirectory(cloud_portal)
+        add_custom_target(cloud-frontend DEPENDS cloud_portal)
+        add_dependencies(cloud cloud-frontend)
+
+        add_subdirectory(nx_cloud_deploy)
+    endif()
+endif()

@@ -6,12 +6,12 @@
 #include <QtWidgets/QMenu>
 #include <QtWidgets/QScrollBar>
 
-#include <ui/common/custom_painted.h>
+#include <nx/client/desktop/common/utils/custom_painted.h>
 #include <ui/common/palette.h>
-#include <ui/common/widget_anchor.h>
+#include <nx/client/desktop/common/utils/widget_anchor.h>
 #include <ui/style/helper.h>
 #include <ui/style/skin.h>
-#include <ui/widgets/common/search_line_edit.h>
+#include <nx/client/desktop/common/widgets/search_line_edit.h>
 #include <ui/workbench/workbench_navigator.h>
 #include <utils/common/event_processors.h>
 #include <utils/common/delayed.h>
@@ -32,7 +32,7 @@ static constexpr int kQueuedFetchMoreDelayMs = 50;
 static constexpr int kTimeSelectionDelayMs = 250;
 static constexpr int kTextFilterDelayMs = 250;
 
-QnSearchLineEdit* createSearchLineEdit(QWidget* parent)
+SearchLineEdit* createSearchLineEdit(QWidget* parent)
 {
     const auto paintFunction =
         [](QPainter* painter, const QStyleOption* option, const QWidget* widget) -> bool
@@ -47,7 +47,7 @@ QnSearchLineEdit* createSearchLineEdit(QWidget* parent)
             return false;
         };
 
-    auto result = new CustomPainted<QnSearchLineEdit>(parent);
+    auto result = new CustomPainted<SearchLineEdit>(parent);
     result->setCustomPaintFunction(paintFunction);
     result->setAttribute(Qt::WA_TranslucentBackground);
     result->setAttribute(Qt::WA_Hover);
@@ -75,7 +75,7 @@ UnifiedSearchWidget::UnifiedSearchWidget(QWidget* parent):
 
     ui->placeholder->setParent(ui->ribbonContainer);
     ui->placeholder->hide();
-    new QnWidgetAnchor(ui->placeholder);
+    new WidgetAnchor(ui->placeholder);
 
     QFont font;
     font.setPixelSize(kPlaceholderFontPixelSize);
@@ -132,8 +132,8 @@ UnifiedSearchWidget::UnifiedSearchWidget(QWidget* parent):
     ui->showPreviewsButton->hide();
     ui->showInfoButton->setChecked(ui->ribbon->footersEnabled());
     ui->showPreviewsButton->setChecked(ui->ribbon->previewsEnabled());
-    ui->showInfoButton->setDrawnBackgrounds(QnToolButton::ActiveBackgrounds);
-    ui->showPreviewsButton->setDrawnBackgrounds(QnToolButton::ActiveBackgrounds);
+    ui->showInfoButton->setDrawnBackgrounds(ToolButton::ActiveBackgrounds);
+    ui->showPreviewsButton->setDrawnBackgrounds(ToolButton::ActiveBackgrounds);
     ui->showInfoButton->setIcon(qnSkin->icon(lit("events/show_information.png")));
     ui->showPreviewsButton->setIcon(qnSkin->icon(lit("events/show_preview.png")));
 
@@ -187,7 +187,7 @@ void UnifiedSearchWidget::setModel(UnifiedAsyncSearchListModel* value)
     fetchMoreIfNeeded();
 }
 
-QnSearchLineEdit* UnifiedSearchWidget::filterEdit() const
+SearchLineEdit* UnifiedSearchWidget::filterEdit() const
 {
     return m_searchLineEdit;
 }

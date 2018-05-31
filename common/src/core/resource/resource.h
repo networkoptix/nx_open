@@ -14,15 +14,11 @@
 #include <utils/common/id.h>
 #include <utils/common/functional.h>
 
-#include <core/ptz/ptz_fwd.h>
-#include <core/ptz/ptz_constants.h>
-
 #include <common/common_globals.h>
 #include "shared_resource_pointer.h"
 #include "resource_fwd.h"
 #include "resource_type.h"
 
-class QnAbstractStreamDataProvider;
 class QnResourceConsumer;
 class QnResourcePool;
 class QnCommonModule;
@@ -36,8 +32,6 @@ class QnResource: public QObject, public QnFromThisToShared<QnResource>
 {
     Q_OBJECT
     Q_FLAGS(Qn::ResourceFlags)
-    Q_FLAGS(Ptz::Capabilities)
-    Q_FLAGS(Qn::ResourceFlags)
     Q_PROPERTY(QnUuid id READ getId CONSTANT)
     Q_PROPERTY(QnUuid typeId READ getTypeId CONSTANT)
     Q_PROPERTY(QString uniqueId READ getUniqueId CONSTANT)
@@ -46,8 +40,6 @@ class QnResource: public QObject, public QnFromThisToShared<QnResource>
     Q_PROPERTY(QnUuid parentId READ getParentId WRITE setParentId NOTIFY parentIdChanged)
     Q_PROPERTY(Qn::ResourceFlags flags READ flags WRITE setFlags NOTIFY flagsChanged)
     Q_PROPERTY(QString url READ getUrl WRITE setUrl NOTIFY urlChanged)
-    Q_PROPERTY(Ptz::Capabilities ptzCapabilities
-        READ getPtzCapabilities WRITE setPtzCapabilities NOTIFY ptzCapabilitiesChanged)
 public:
 
     QnResource(QnCommonModule* commonModule = nullptr);
@@ -80,14 +72,6 @@ public:
         \return true, if initialization attempt is done (with success or failure). false, if \a QnResource::init is already running in other thread
     */
     bool init();
-
-    void setLastMediaIssue(const CameraDiagnostics::Result& issue);
-    CameraDiagnostics::Result getLastMediaIssue() const;
-
-    /*!
-        Calls \a QnResource::init. If \a QnResource::init is already running in another thread, this method waits for it to complete
-    */
-    void blockingInit();
 
     /**
      * Initialize camera sync. This function can omit initialization if recently call was failed.
@@ -135,33 +119,15 @@ public:
 
     bool hasParam(const QString &name) const;
 
-#ifdef ENABLE_DATA_PROVIDERS
-    QnAbstractStreamDataProvider* createDataProvider(Qn::ConnectionRole role);
-#endif
-
     virtual QString getUrl() const;
     virtual void setUrl(const QString &url);
 
     bool hasConsumer(QnResourceConsumer *consumer) const;
-#ifdef ENABLE_DATA_PROVIDERS
-    bool hasUnprocessedCommands() const;
-#endif
 
     virtual bool isInitialized() const;
 
     static void stopAsyncTasks();
     static void pleaseStopAsyncTasks();
-
-    /**
-        Control PTZ flags. Better place is mediaResource but no signals allowed in MediaResource
-    */
-    Ptz::Capabilities getPtzCapabilities() const;
-
-    /** Check if camera has any of provided capabilities. */
-    bool hasAnyOfPtzCapabilities(Ptz::Capabilities capabilities) const;
-    void setPtzCapabilities(Ptz::Capabilities capabilities);
-    void setPtzCapability(Ptz::Capabilities capability, bool value);
-
 
     /* Note that these functions hide property API inherited from QObject.
      * This is intended as this API cannot be used with QnResource anyway
@@ -175,8 +141,8 @@ public:
         const QnUuid &resourceId,
         const QnUuid &resourceTypeId);
 
-    ec2::ApiResourceParamDataList getRuntimeProperties() const;
-    ec2::ApiResourceParamDataList getAllProperties() const;
+    nx::vms::api::ResourceParamDataList getRuntimeProperties() const;
+    nx::vms::api::ResourceParamDataList getAllProperties() const;
 
     enum PropertyOptions
     {
@@ -219,21 +185,12 @@ signals:
     void flagsChanged(const QnResourcePtr &resource);
     void urlChanged(const QnResourcePtr &resource);
     void resourceChanged(const QnResourcePtr &resource);
-    void ptzCapabilitiesChanged(const QnResourcePtr &resource);
     void mediaDewarpingParamsChanged(const QnResourcePtr &resource);
     void propertyChanged(const QnResourcePtr &resource, const QString &key);
     void initializedChanged(const QnResourcePtr &resource);
     void videoLayoutChanged(const QnResourcePtr &resource);
 
 public:
-#ifdef ENABLE_DATA_PROVIDERS
-    // this is thread to process commands like setparam
-    static void startCommandProc();
-    static void stopCommandProc();
-    static void addCommandToProc(const QnResourceCommandPtr &command);
-    static int commandProcQueueSize();
-#endif
-
     void update(const QnResourcePtr& other);
 
     // Need use lock/unlock consumers before this call!
@@ -251,16 +208,14 @@ public:
 protected:
     virtual void updateInternal(const QnResourcePtr &other, Qn::NotifierList& notifiers);
 
-#ifdef ENABLE_DATA_PROVIDERS
-    virtual QnAbstractStreamDataProvider* createDataProviderInternal(Qn::ConnectionRole role);
-#endif
-
     virtual CameraDiagnostics::Result initInternal();
     //!Called just after successful \a initInternal()
     /*!
         Inherited class implementation MUST call base class method first
     */
     virtual void initializationDone();
+
+    virtual void emitPropertyChanged(const QString& key);
 private:
     /* The following consumer-related API is private as it is supposed to be used from QnResourceConsumer instances only.
      * Using it from other places may break invariants. */
@@ -269,11 +224,9 @@ private:
     void addConsumer(QnResourceConsumer *consumer);
     void removeConsumer(QnResourceConsumer *consumer);
     void disconnectAllConsumers();
-    void initAndEmit();
 
     bool emitDynamicSignal(const char *signal, void **arguments);
 
-    void emitPropertyChanged(const QString& key);
     void doStatusChanged(Qn::ResourceStatus oldStatus, Qn::ResourceStatus newStatus, Qn::StatusChangeReason reason);
 
     bool useLocalProperties() const;
@@ -345,7 +298,7 @@ private:
     qint64 m_lastInitTime = 0;
     CameraDiagnostics::Result m_prevInitializationResult = CameraDiagnostics::Result(
         CameraDiagnostics::ErrorCode::unknown);
-    CameraDiagnostics::Result m_lastMediaIssue = CameraDiagnostics::NoErrorResult();
+
     QAtomicInt m_initializationAttemptCount;
     //!map<key, <value, isDirty>>
     std::map<QString, LocalPropertyValue> m_locallySavedProperties;

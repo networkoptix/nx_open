@@ -58,19 +58,13 @@
             <Component>
                 <File Id="swresample.dll" Name="swresample-2.dll" Source="$(var.SourceDir)/swresample-2.dll" DiskId="3"/>
             </Component>
-            <Component>
-                <File Id="libogg.dll" Name="libogg.dll" Source="$(var.SourceDir)/libogg.dll" DiskId="3"/>
-            </Component>
-            <Component>
-                <File Id="libvorbis.dll" Name="libvorbis.dll" Source="$(var.SourceDir)/libvorbis.dll" DiskId="3"/>
-            </Component>
-            <Component>
-                <File Id="libmp3lame.dll" Name="libmp3lame.dll" Source="$(var.SourceDir)/libmp3lame.dll" DiskId="3"/>
-            </Component>
         </ComponentGroup>
         <ComponentGroup Id="ClientLibs" Directory="$(var.paxtonDirId)">
             <Component>
                 <File Id="nx_utils.dll" Name="nx_utils.dll" Source="$(var.SourceDir)/nx_utils.dll" DiskId="4" />
+            </Component>
+            <Component>
+                <File Id="nx_vms_api.dll" Name="nx_vms_api.dll" Source="$(var.SourceDir)/nx_vms_api.dll" DiskId="4" />
             </Component>
             <Component>
                 <File Id="nx_vms_utils.dll" Name="nx_vms_utils.dll" Source="$(var.SourceDir)/nx_vms_utils.dll" DiskId="13" />

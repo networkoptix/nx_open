@@ -53,7 +53,6 @@ public:
     QString permissionsLogLevel;
 
     QString rebuildArchive;
-    QString devModeKey;
     QString allowedDiscoveryPeers;
     QString ifListFilter;
     bool cleanupDb;
@@ -124,9 +123,9 @@ private slots:
     void at_cameraIPConflict(const QHostAddress& host, const QStringList& macAddrList);
     void at_storageManager_noStoragesAvailable();
     void at_storageManager_storageFailure(const QnResourcePtr& storage,
-        nx::vms::event::EventReason reason);
+        nx::vms::api::EventReason reason);
     void at_storageManager_rebuildFinished(QnSystemHealth::MessageType msgType);
-    void at_archiveBackupFinished(qint64 backedUpToMs, nx::vms::event::EventReason code);
+    void at_archiveBackupFinished(qint64 backedUpToMs, nx::vms::api::EventReason code);
     void at_timer();
     void at_connectionOpened();
     void at_serverModuleConflict(nx::vms::discovery::ModuleEndpoint module);
@@ -158,7 +157,7 @@ private:
         nx::vms::cloud_integration::CloudManagerGroup* const cloudManagerGroup,
         ec2::TransactionMessageBusAdapter* messageBus);
     void initializeCloudConnect();
-    void changeSystemUser(const QString& userName);
+    void prepareOsResources();
 
     std::unique_ptr<nx::network::upnp::PortMapper> initializeUpnpPortMapper();
     Qn::ServerFlags calcServerFlags();
@@ -190,7 +189,6 @@ private:
     bool m_startMessageSent;
     qint64 m_firstRunningTime;
 
-    std::vector<std::unique_ptr<nx::network::AbstractStreamServerSocket>> m_preparedTcpServerSockets;
     std::unique_ptr<QnAutoRequestForwarder> m_autoRequestForwarder;
     QnUniversalTcpListener* m_universalTcpListener;
     QnMediaServerResourcePtr m_mediaServer;

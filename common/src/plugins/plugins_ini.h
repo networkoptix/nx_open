@@ -11,10 +11,16 @@ struct PluginsIniConfig: public nx::kit::IniConfig
     NX_INI_STRING("", disabledNxPlugins,
         "Comma-separated list of Nx plugins to skip, without extension and 'lib' prefix.");
 
-    NX_INI_STRING("", metadataPluginSettingsFilenamePrefix,
-        "Prefix to {plugin without extention and 'lib' prefix}.json - array with name and value (string) objects.");
-    NX_INI_STRING("", metadataPluginCameraManagerSettingsFilenamePrefix,
-        "Prefix to {plugin without extention and 'lib' prefix}_camera_manager.json - array with name and value (string) objects.");
+    NX_INI_STRING("", metadataPluginSettingsPath,
+        "Path to {plugin_name}.json: array of objects with name and value strings.\n"
+        "Empty means .ini path.");
+
+    NX_INI_STRING("", metadataPluginCameraManagerSettingsPath,
+        "Path to {plugin_name}_camera_manager.json: array of objects with name and value strings.\n"
+        "Empty means .ini path.");
+
+    NX_INI_STRING("", metadataPluginManifestOutputPath,
+        "Path (absolute or relative to .ini path) to dir for saving metadata plugin manifests.");
 };
 
 inline PluginsIniConfig& pluginsIni()

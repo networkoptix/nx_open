@@ -26,6 +26,13 @@ public:
     virtual bool hasChanges() const override;
     virtual void retranslateUi() override;
 
+signals:
+    void forceVideoTrafficEncryptionChanged(bool value);
+
+private slots:
+    void at_forceTrafficEncryptionCheckBoxClicked(bool value);
+    void at_forceVideoTrafficEncryptionCheckBoxClicked(bool value);
+
 protected:
     virtual void setReadOnlyInternal(bool readOnly) override;
 

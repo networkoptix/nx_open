@@ -1,86 +1,59 @@
 import logging
 from collections import namedtuple
+from contextlib import contextmanager
 
-from framework.networking.linux import LinuxNetworking
-from framework.os_access.ssh import SSHAccess
-from framework.os_access.windows_remoting.winrm_access import WinRMAccess
-from framework.utils import wait_until
-from framework.vms.hypervisor import VMNotFound
+from framework.os_access.local_path import LocalPath
+from framework.os_access.ssh_access import SSHAccess
+from framework.os_access.windows_access import WindowsAccess
+from framework.vms.hypervisor import VMNotFound, obtain_running_vm
+from framework.waiting import wait_for_true
 
 logger = logging.getLogger(__name__)
 
+SSH_PRIVATE_KEY_PATH = LocalPath.home() / '.func_tests' / 'ssh' / 'private_key'  # Get from VM's description.
 
-class VMNotResponding(Exception):
-    def __init__(self, alias, name):
-        super(VMNotResponding, self).__init__("Machine {} ({}) is not responding".format(name, alias))
-        self.alias = alias
-        self.name = name
+VM = namedtuple('VM', ['alias', 'index', 'type', 'name', 'ports', 'os_access'])
 
 
-VM = namedtuple('VM', ['alias', 'index', 'name', 'ports', 'networking', 'os_access'])
-
-
-class AccessTypeUnknown(Exception):
+class UnknownOsFamily(Exception):
     pass
 
 
-def make_os_access(access_type, vm_ports):
-    if access_type == 'ssh':
-        hostname, port = vm_ports['tcp', 22]
-        return SSHAccess(hostname, port)
-    if access_type == 'winrm':
-        hostname, port = vm_ports['tcp', 5985]
-        return WinRMAccess(hostname, port)
-    raise AccessTypeUnknown("Access must be 'ssh' or 'winrm' but is {}".format(access_type))
-
-
 class VMFactory(object):
-    def __init__(self, vm_configuration, hypervisor, registry):
+    def __init__(self, vm_configuration, hypervisor, registries):
         self._vm_configuration = vm_configuration
         self._hypervisor = hypervisor
-        self._registry = registry
+        self._registries = registries
 
-    def find_or_clone(self, vm_index):
-        name = self._vm_configuration['name_format'].format(vm_index=vm_index)
-        try:
-            info = self._hypervisor.find(name)
-        except VMNotFound:
-            info = self._hypervisor.clone(name, vm_index, self._vm_configuration['vm'])
-        assert info.name == name
-        if not info.is_running:
-            self._hypervisor.power_on(info.name)
-        return info
-
-    def allocate(self, alias):
-        index = self._registry.reserve(alias)
-        info = self.find_or_clone(index)
-        os_access = make_os_access(self._vm_configuration['access_type'], info.ports)
-        if not wait_until(
-                os_access.is_working,
-                name='until {} ({}) can be accesses via {!r}'.format(alias, info.name, os_access),
-                timeout_sec=self._vm_configuration['power_on_timeout_sec']):
-            raise VMNotResponding(alias, info.name)
-        networking = LinuxNetworking(os_access, info.macs.values())
-        vm = VM(alias, index, info.name, info.ports, networking, os_access)
-        self._hypervisor.unplug_all(vm.name)
-        vm.networking.reset()
-        vm.networking.enable_internet()
-        return vm
-
-    def release(self, vm):
-        self._registry.relinquish(vm.index)
+    @contextmanager
+    def allocated_vm(self, alias, vm_type='linux'):
+        with self._registries[vm_type].taken(alias) as (vm_index, name):
+            vm_type_configuration = self._vm_configuration[vm_type]
+            info = obtain_running_vm(self._hypervisor, name, vm_index, vm_type_configuration['vm'])
+            if vm_type_configuration['os_family'] == 'linux':
+                os_access = SSHAccess(info.ports, info.macs, 'root', SSH_PRIVATE_KEY_PATH)
+            elif vm_type_configuration['os_family'] == 'windows':
+                os_access = WindowsAccess(info.ports, info.macs, u'Administrator', u'qweasd123')
+            else:
+                raise UnknownOsFamily("Expected 'linux' or 'windows', got %r", vm_type_configuration['os_family'])
+            wait_for_true(os_access.is_accessible, timeout_sec=vm_type_configuration['power_on_timeout_sec'])
+            # TODO: Consider unplug and reset only before network setup: that will make tests much faster.
+            self._hypervisor.unplug_all(info.name)
+            os_access.networking.reset()
+            vm = VM(alias, vm_index, vm_type, info.name, info.ports, os_access)
+            yield vm
 
     def cleanup(self):
-        def destroy(vm_index, vm_alias):
-            name = self._vm_configuration['name_format'].format(vm_index=vm_index)
+        def destroy(name, vm_alias):
             if vm_alias is None:
                 try:
                     self._hypervisor.destroy(name)
                 except VMNotFound:
-                    logger.info("VM %s not found.", name)
+                    logger.info("Machine %s not found.", name)
                 else:
-                    logger.info("VM %s destroyed.", name)
+                    logger.info("Machine %s destroyed.", name)
             else:
-                logger.warning("VM %s reserved now.", name)
+                logger.warning("Machine %s reserved now.", name)
 
-        self._registry.for_each(destroy)
+        for registry in self._registries.values():
+            registry.for_each(destroy)

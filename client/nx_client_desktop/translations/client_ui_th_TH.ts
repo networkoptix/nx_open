@@ -89,11 +89,6 @@
     </message>
     <message>
       <location/>
-      <source>Disable only if the client takes too much CPU</source>
-      <translation>ปิดใช้งานเฉพาะเมื่อไคลเอ็นต์ใช้ CPU มากเกินไป</translation>
-    </message>
-    <message>
-      <location/>
       <source>Maximum Live Buffer Length</source>
       <translation>ความยาวบัฟเฟอร์สดสูงสุด</translation>
     </message>
@@ -764,7 +759,7 @@
     </message>
     <message>
       <location/>
-      <source>Logical Id</source>
+      <source>Logical ID</source>
       <translation>รหัสตรรกะ</translation>
     </message>
   </context>
@@ -772,8 +767,8 @@
     <name>CameraInputBusinessEventWidget</name>
     <message>
       <location filename="../src/ui/widgets/business/camera_input_business_event_widget.ui"/>
-      <source>Input Id</source>
-      <translation>หมายเลข Id:</translation>
+      <source>Input ID</source>
+      <translation>หมายเลข ID:</translation>
     </message>
   </context>
   <context>
@@ -798,7 +793,7 @@
     </message>
     <message>
       <location/>
-      <source>Output Id:</source>
+      <source>Output ID:</source>
       <translation>รหัสการแสดงผล:</translation>
     </message>
   </context>
@@ -1513,7 +1508,7 @@
     </message>
     <message>
       <location/>
-      <source>Locked to Hardware Id:</source>
+      <source>Locked to Hardware ID:</source>
       <translation>ล็อคไปยังรหัสฮาร์ดแวร์:</translation>
     </message>
   </context>
@@ -1612,7 +1607,7 @@
     </message>
     <message>
       <location/>
-      <source>Hardware Id</source>
+      <source>Hardware ID</source>
       <translation>รหัสฮาร์ดแวร์</translation>
     </message>
   </context>
@@ -1741,6 +1736,11 @@
       <location/>
       <source>Tour cycle</source>
       <translation>Tour cycle</translation>
+    </message>
+    <message>
+      <location/>
+      <source>IP addresses for cameras, and servers, groups for users, etc.</source>
+      <translation type="unfinished">IP addresses for cameras, and servers, groups for users, etc.</translation>
     </message>
   </context>
   <context>

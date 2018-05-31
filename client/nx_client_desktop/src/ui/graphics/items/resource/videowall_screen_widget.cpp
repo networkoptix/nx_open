@@ -32,6 +32,8 @@
 #include <nx/utils/collection.h>
 #include <utils/screen_utils.h>
 
+using namespace nx::client::desktop;
+
 namespace {
 
 static const qreal kMargin = 3.0;
@@ -48,7 +50,7 @@ QnVideowallScreenWidget::QnVideowallScreenWidget(
     m_videowall(base_type::resource().dynamicCast<QnVideoWallResource>()),
     m_mainOverlayWidget(new QnViewportBoundWidget(this)),
     m_layout(new QGraphicsAnchorLayout()),
-    m_thumbnailManager(context->instance<QnCameraThumbnailManager>())
+    m_thumbnailManager(context->instance<CameraThumbnailManager>())
 {
     NX_ASSERT(m_videowall, "QnVideowallScreenWidget was created with a non-videowall resource.");
     m_thumbnailManager->setAutoRotate(false); //< TODO: VMS-6759
@@ -73,7 +75,7 @@ QnVideowallScreenWidget::QnVideowallScreenWidget(
     connect(m_videowall, &QnVideoWallResource::itemChanged, this,
         &QnVideowallScreenWidget::at_videoWall_itemChanged);
 
-    connect(m_thumbnailManager, &QnCameraThumbnailManager::thumbnailReady, this,
+    connect(m_thumbnailManager, &CameraThumbnailManager::thumbnailReady, this,
         &QnVideowallScreenWidget::at_thumbnailReady);
 
 }

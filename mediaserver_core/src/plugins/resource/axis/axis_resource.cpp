@@ -201,7 +201,7 @@ void QnPlAxisResource::setIframeDistance(int /*frames*/, int /*timems*/)
 
 QnAbstractStreamDataProvider* QnPlAxisResource::createLiveDataProvider()
 {
-    return new QnAxisStreamReader(toSharedPointer());
+    return new QnAxisStreamReader(toSharedPointer(this));
 }
 
 void QnPlAxisResource::setCroppingPhysical(QRect /*cropping*/)
@@ -530,6 +530,10 @@ CameraDiagnostics::Result QnPlAxisResource::initializeCameraDriver()
                 setStatus(Qn::Unauthorized);
             return CameraDiagnostics::UnknownErrorResult();
         }
+    }
+    else
+    {
+        setProperty(Qn::HAS_DUAL_STREAMING_PARAM_NAME, QString("0"));
     }
 
     {

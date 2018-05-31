@@ -1,6 +1,9 @@
 #pragma once
 
 #include "api_data.h"
+
+#include <nx/vms/api/types/resource_types.h>
+
 #include <network/module_information.h>
 
 namespace nx { namespace vms { namespace discovery { class Manager; } } }
@@ -8,36 +11,38 @@ namespace nx { namespace vms { namespace discovery { struct ModuleEndpoint; } } 
 
 namespace ec2 {
 
-    struct ApiDiscoveryData : ApiIdData
-    {
-        ApiDiscoveryData(): ignore(false) {}
+struct ApiDiscoveryData: nx::vms::api::IdData
+{
+    ApiDiscoveryData(): ignore(false) {}
 
-        QString url;
-        bool ignore;
-    };
+    QString url;
+    bool ignore;
+};
+#define ApiDiscoveryData_Fields IdData_Fields(url)(ignore)(id)
 
-#define ApiDiscoveryData_Fields ApiIdData_Fields(url)(ignore)(id)
-
-    struct ApiDiscoverPeerData : ApiData
-    {
-        QString url;
-        QnUuid id;
-    };
+struct ApiDiscoverPeerData: nx::vms::api::Data
+{
+    QString url;
+    QnUuid id;
+};
 #define ApiDiscoverPeerData_Fields (url)(id)
 
-    struct ApiDiscoveredServerData : QnModuleInformationWithAddresses
+struct ApiDiscoveredServerData: QnModuleInformationWithAddresses
+{
+    ApiDiscoveredServerData() = default;
+
+    ApiDiscoveredServerData(const QnModuleInformation& other):
+        QnModuleInformationWithAddresses(other)
     {
-        ApiDiscoveredServerData() : status(Qn::Online) {}
-        ApiDiscoveredServerData(const QnModuleInformation &other) :
-            QnModuleInformationWithAddresses(other),
-            status(Qn::Online)
-        {}
-        // Should be only Online, Incompatible or Unauthorized
-        Qn::ResourceStatus status;
-    };
+    }
+
+    // Should be only Online, Incompatible or Unauthorized
+    nx::vms::api::ResourceStatus status = nx::vms::api::ResourceStatus::online;
+};
 #define ApiDiscoveredServerData_Fields QnModuleInformationWithAddresses_Fields(status)
 
 std::vector<ApiDiscoveredServerData> getServers(nx::vms::discovery::Manager* manager);
+
 ApiDiscoveredServerData makeServer(
     const nx::vms::discovery::ModuleEndpoint& module, const QnUuid& localSystemId);
 

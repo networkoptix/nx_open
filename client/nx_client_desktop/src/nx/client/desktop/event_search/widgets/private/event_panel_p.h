@@ -43,13 +43,11 @@ public:
 
 private:
     void currentWorkbenchWidgetChanged(Qn::ItemRole role);
+    void updateTabs();
 
-    void addCameraTabs();
-    void removeCameraTabs();
-
-    void setupEventSearch();
     void setupMotionSearch();
     void setupBookmarkSearch();
+    void setupEventSearch();
     void setupAnalyticsSearch();
 
     void updateUnreadCounter(int count, QnNotificationLevel::Value importance);

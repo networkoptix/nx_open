@@ -6,7 +6,6 @@
 #include <nx_ec/data/api_data.h>
 #include <nx_ec/data/api_resource_data.h>
 #include <nx_ec/data/api_user_data.h>
-#include <transaction/transaction.h>
 
 namespace nx {
 namespace cdb {
@@ -141,13 +140,13 @@ TEST_F(TransactionVersioning, ApiUserData_relevance)
 
 TEST_F(TransactionVersioning, ApiIdData_relevance)
 {
-    testTwoWayStructureRelevance<::ec2::ApiIdData, compatibility::ApiIdData>();
+    testTwoWayStructureRelevance<nx::vms::api::IdData, compatibility::ApiIdData>();
 }
 
 TEST_F(TransactionVersioning, ApiResourceParamWithRefData_relevance)
 {
     testTwoWayStructureRelevance<
-        ::ec2::ApiResourceParamWithRefData,
+        nx::vms::api::ResourceParamWithRefData,
         compatibility::ApiResourceParamWithRefData>();
 }
 

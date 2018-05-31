@@ -2,8 +2,8 @@
 
 {{#message.sharer_name}}
 <p><a href="mailto:{{message.sharer_email}}"> {{message.sharer_name}} </a> שיתף את מערכת {{message.system_name}} איתך.</p>
-{{/message.sharer_name}} {{^message.sharer_name}}
-<p>ניתנה לך גישה למערכת ניהול וידאו "{{message.system_name}}".</p>
 {{/message.sharer_name}}
 
-<a class="btn" href="{{config.portal_url}}/systems/{{message.system_id}}">View in {{PRODUCT_NAME}} Portal</a>
+{{^message.sharer_name}}
+<p>ניתנה לך גישה למערכת ניהול וידאו "{{message.system_name}}".</p>
+{{/message.sharer_name}} <;0>; הצג ב {{PRODUCT_NAME}} פורטל <;/0>;

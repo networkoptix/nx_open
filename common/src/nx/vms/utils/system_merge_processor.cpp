@@ -166,7 +166,7 @@ nx::network::http::StatusCode::Value SystemMergeProcessor::checkWhetherMergeIsPo
     {
         MediaServerClient remoteMediaServerClient(url);
         remoteMediaServerClient.setAuthenticationKey(data.getKey);
-        ::ec2::ApiResourceParamDataList remoteSettings;
+        nx::vms::api::ResourceParamDataList remoteSettings;
         const auto resultCode = remoteMediaServerClient.ec2GetSettings(&remoteSettings);
         if (resultCode != ::ec2::ErrorCode::ok)
         {
@@ -385,7 +385,7 @@ bool SystemMergeProcessor::applyCurrentSettings(
     const auto& settings = m_commonModule->globalSettings()->allSettings();
     for (QnAbstractResourcePropertyAdaptor* setting: settings)
     {
-        ec2::ApiResourceParamData param(setting->key(), setting->serializedValue());
+        nx::vms::api::ResourceParamData param(setting->key(), setting->serializedValue());
         data.foreignSettings.push_back(param);
     }
 

@@ -7,6 +7,7 @@
 #include <QtCore/QTextStream>
 #include <QtCore/QDebug>
 #include <QtCore/QBuffer>
+#include <core/dataprovider/data_provider_factory.h>
 
 extern "C"
 {
@@ -1138,7 +1139,11 @@ void QnRtspConnectionProcessor::createDataProvider()
     if (!d->archiveDP)
     {
         QnMutexLocker lock(&d->archiveDpMutex);
-        d->archiveDP = QSharedPointer<QnArchiveStreamReader> (dynamic_cast<QnArchiveStreamReader*> (d->mediaRes->toResource()->createDataProvider(Qn::CR_Archive)));
+        d->archiveDP = QSharedPointer<QnArchiveStreamReader>(
+            dynamic_cast<QnArchiveStreamReader*>(qnServerModule->dataProviderFactory()->
+                createDataProvider(
+                    d->mediaRes->toResourcePtr(),
+                    Qn::CR_Archive)));
         if (d->archiveDP)
         {
             d->archiveDP->setGroupId(clientGuid);

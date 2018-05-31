@@ -6,7 +6,7 @@
 #ifndef ILP_DISCOVERY_MANAGER_H
 #define ILP_DISCOVERY_MANAGER_H
 
-#include <plugins/camera_plugin.h>
+#include <camera/camera_plugin.h>
 
 #include <plugins/plugin_tools.h>
 

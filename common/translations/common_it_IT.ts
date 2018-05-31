@@ -53,11 +53,6 @@
       <translation>Il sistema trovato %1 ha una versione incompatibile %2.</translation>
     </message>
     <message>
-      <source>Cannot connect to the other System because current System is already connected to %1.</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-      <translation>Impossibile collegarsi ad altro sistema, perché il sistema attuale è già collegato %1.</translation>
-    </message>
-    <message>
       <source>The discovered System %1 is in safe mode.</source>
       <comment>%1 is name of System</comment>
       <translation>Il sistema trovato %1 è in modalità provvisoria.</translation>
@@ -66,16 +61,6 @@
       <source>Could not configure the remote System %1.</source>
       <comment>%1 is name of System</comment>
       <translation>Impossibile configurare il %1 sistema remoto.</translation>
-    </message>
-    <message>
-      <source>Both Systems are connected to %1. Merge is not allowed.</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-      <translation>Entrambi i sistemi sono collegati a %1. L'unione non è consentita.</translation>
-    </message>
-    <message>
-      <source>These Systems are built with different %1 URL. Merge is not allowed.</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-      <translation>Questi sistemi sono costruiti con diverse %1 URL. L'unione non è consentita.</translation>
     </message>
     <message>
       <source>New System</source>
@@ -87,9 +72,24 @@
       <translation>Il sistema scoperto %1 è incompatibile con il sistema attuale.</translation>
     </message>
     <message>
+      <source>Cannot connect to the other System because current System is already connected to %1.</source>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
+      <translation>Impossibile collegarsi ad altro sistema, perché il sistema attuale è già collegato %1.</translation>
+    </message>
+    <message>
       <source>%1 System can only be merged with non-%1. System name and password are taken from %1 System.</source>
-      <comment>%1 is the short cloud name (like &apos;Cloud&apos;)</comment>
+      <comment>%1 is the short cloud name (like Cloud)</comment>
       <translation>%1 Il sistema può essere unito solo a quelli non%1. Il nome del sistema e la password sono presi da %1 Sistema.</translation>
+    </message>
+    <message>
+      <source>Both Systems are connected to %1. Merge is not allowed.</source>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
+      <translation>Entrambi i sistemi sono collegati a %1. L'unione non è consentita.</translation>
+    </message>
+    <message>
+      <source>These Systems are built with different %1 URL. Merge is not allowed.</source>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
+      <translation>Questi sistemi sono costruiti con diverse %1 URL. L'unione non è consentita.</translation>
     </message>
   </context>
   <context>
@@ -324,11 +324,11 @@
     </message>
     <message>
       <source>First, try to turn on recording (if it is off) and decrease fps in device settings (error &quot;%1&quot;).</source>
-      <translation>Innanzitutto, provare ad attivare la registrazione (se è disattivata) e ridurre l'impostazione fps del dispositivo (errore &quot;%1&quot;).</translation>
+      <translation>Innanzitutto, provare ad attivare la registrazione (se è disattivata) e ridurre l'impostazione fps del dispositivo).</translation>
     </message>
     <message>
       <source>First, try to turn on recording (if it is off) and decrease fps in camera settings (error &quot;%1&quot;).</source>
-      <translation>Innanzitutto, provare ad attivare la registrazione (se è disattivata) e ridurre l'impostazione fps del dispositivo) (errore &quot;%1&quot;).</translation>
+      <translation>Innanzitutto, provare ad attivare la registrazione (se è disattivata) e ridurre l'impostazione fps del dispositivo).</translation>
     </message>
     <message>
       <source>First, try to turn on recording (if it is off) and decrease fps in I/O module settings (error &quot;%1&quot;).</source>
@@ -581,8 +581,8 @@
       <translation>Errore sconosciuto</translation>
     </message>
     <message>
-      <source>Server with matching Hardware Id not found</source>
-      <translation>Server con Id hardware corrispondente non trovato</translation>
+      <source>Server with matching Hardware ID not found</source>
+      <translation>Server con ID Hardware corrispondente non trovato</translation>
     </message>
   </context>
   <context>
@@ -704,12 +704,12 @@
       <translation>Filigrana: %1</translation>
     </message>
     <message>
-      <source>Hardware Id: %1</source>
-      <translation>Id hardware: %1</translation>
-    </message>
-    <message>
       <source>Time License</source>
       <translation>Licenza a tempo</translation>
+    </message>
+    <message>
+      <source>Hardware ID: %1</source>
+      <translation>ID Hardware: %1</translation>
     </message>
   </context>
   <context>

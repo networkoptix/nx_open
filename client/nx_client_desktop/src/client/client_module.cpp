@@ -42,6 +42,8 @@
 
 #include <cloud/cloud_connection.h>
 
+#include <core/resource/client_camera.h>
+#include <core/resource/avi/avi_resource.h>
 #include <core/resource/client_camera_factory.h>
 #include <core/resource/storage_plugin_factory.h>
 #include <core/resource/resource_directory_browser.h>
@@ -49,6 +51,7 @@
 #include <core/resource_management/resource_pool.h>
 #include <core/resource_management/resource_runtime_data.h>
 #include <core/resource_management/layout_tour_manager.h>
+#include <core/dataprovider/data_provider_factory.h>
 
 #include <decoders/video/abstract_video_decoder.h>
 
@@ -62,12 +65,18 @@
 #include <nx/network/http/http_mod_manager.h>
 #include <vms_gateway_embeddable.h>
 #include <nx/utils/log/log_initializer.h>
+#include <nx/utils/app_info.h>
 #include <nx_ec/dummy_handler.h>
 
 #include <platform/platform_abstraction.h>
 
 #include <plugins/plugin_manager.h>
 #include <plugins/resource/desktop_camera/desktop_resource_searcher.h>
+#include <plugins/resource/desktop_audio_only/desktop_audio_only_resource.h>
+#if defined(Q_OS_WIN)
+    #include <plugins/resource/desktop_win/desktop_resource.h>
+#endif
+
 #include <core/storage/file_storage/qtfile_storage_resource.h>
 #include <core/storage/file_storage/layout_storage_resource.h>
 
@@ -77,6 +86,7 @@
 #include <server/server_storage_manager.h>
 
 #include <translation/translation_manager.h>
+#include <translation/datetime_formatter.h>
 
 #include <utils/common/app_info.h>
 #include <utils/common/command_line_parser.h>
@@ -85,6 +95,7 @@
 #include <nx/client/desktop/utils/performance_test.h>
 #include <watchers/server_interface_watcher.h>
 #include <nx/client/core/watchers/known_server_connections.h>
+#include <nx/client/core/utils/font_loader.h>
 #include <nx/client/desktop/utils/applauncher_guard.h>
 #include <nx/client/desktop/utils/resource_widget_pixmap_cache.h>
 #include <nx/client/desktop/layout_templates/layout_template_manager.h>
@@ -97,7 +108,6 @@
 #include <statistics/storage/statistics_file_storage.h>
 #include <statistics/settings/statistics_settings_watcher.h>
 
-#include <ui/helpers/font_loader.h>
 #include <ui/customization/customization.h>
 #include <ui/customization/customizer.h>
 #include <ui/style/globals.h>
@@ -121,6 +131,7 @@
 #endif
 
 #include <ini.h>
+
 
 using namespace nx::client::desktop;
 
@@ -146,40 +157,77 @@ static void myMsgHandler(QtMsgType type, const QMessageLogContext& ctx, const QS
     qnLogMsgHandler(type, ctx, msg);
 }
 
+namespace {
 
-namespace
+typedef std::unique_ptr<QnTranslationManager> QnTranslationManagerPtr;
+
+QnTranslationManagerPtr initializeTranslations(QnClientSettings* settings)
 {
-    typedef std::unique_ptr<QnTranslationManager> QnTranslationManagerPtr;
+    QnTranslationManagerPtr translationManager(new QnTranslationManager());
+    translationManager->addPrefix(lit("client_base"));
+    translationManager->addPrefix(lit("client_ui"));
+    translationManager->addPrefix(lit("client_core"));
+    translationManager->addPrefix(lit("client_qml"));
 
-    QnTranslationManagerPtr initializeTranslations(QnClientSettings* settings)
-    {
-        QnTranslationManagerPtr translationManager(new QnTranslationManager());
-        translationManager->addPrefix(lit("client_base"));
-        translationManager->addPrefix(lit("client_ui"));
-        translationManager->addPrefix(lit("client_core"));
-        translationManager->addPrefix(lit("client_qml"));
+    QnTranslation translation;
+    if (translation.isEmpty()) /* By path. */
+        translation = translationManager->loadTranslation(settings->locale());
 
-        QnTranslation translation;
-        if (translation.isEmpty()) /* By path. */
-            translation = translationManager->loadTranslation(settings->locale());
+    /* Check if qnSettings value is invalid. */
+    if (translation.isEmpty())
+        translation = translationManager->defaultTranslation();
 
-        /* Check if qnSettings value is invalid. */
-        if (translation.isEmpty())
-            translation = translationManager->defaultTranslation();
+    translationManager->installTranslation(translation);
 
-        translationManager->installTranslation(translation);
-        return translationManager;
-    }
+    // It is now safe to localize time and date formats. Mind the dot.
+    datetime::initLocale();
 
-    void initializeStatisticsManager(QnCommonModule *commonModule)
-    {
-        const auto statManager = commonModule->instance<QnStatisticsManager>();
-
-        statManager->setClientId(qnSettings->pcUuid());
-        statManager->setStorage(QnStatisticsStoragePtr(new QnStatisticsFileStorage()));
-        statManager->setSettings(QnStatisticsLoaderPtr(new QnStatisticsSettingsWatcher()));
-    }
+    return translationManager;
 }
+
+void initializeStatisticsManager(QnCommonModule* commonModule)
+{
+    const auto statManager = commonModule->instance<QnStatisticsManager>();
+
+    statManager->setClientId(qnSettings->pcUuid());
+    statManager->setStorage(QnStatisticsStoragePtr(new QnStatisticsFileStorage()));
+    statManager->setSettings(QnStatisticsLoaderPtr(new QnStatisticsSettingsWatcher()));
+}
+
+QString calculateLogNameSuffix(const QnStartupParameters& startupParams)
+{
+    if (!startupParams.videoWallGuid.isNull())
+    {
+        QString result = startupParams.videoWallItemGuid.isNull()
+            ? startupParams.videoWallGuid.toString()
+            : startupParams.videoWallItemGuid.toString();
+        result.replace(QRegExp(QLatin1String("[{}]")), QLatin1String("_"));
+        return result;
+    }
+
+    if (startupParams.selfUpdateMode)
+    {
+        // we hope self-updater will run only once per time and will not overflow log-file
+        // qnClientInstanceManager is not initialized in self-update mode
+        return lit("self_update");
+    }
+
+    if (qnRuntime->isActiveXMode())
+    {
+        return lit("ax");
+    }
+
+    if (qnClientInstanceManager && qnClientInstanceManager->isValid())
+    {
+        int idx = qnClientInstanceManager->instanceIndex();
+        if (idx > 0)
+            return L'_' + QString::number(idx);
+    }
+
+    return QString();
+}
+
+} // namespace
 
 QnClientModule::QnClientModule(const QnStartupParameters& startupParams, QObject* parent):
     QObject(parent),
@@ -205,8 +253,13 @@ QnClientModule::QnClientModule(const QnStartupParameters& startupParams, QObject
     static bool isWebKitInitialized = false;
     if (!isWebKitInitialized)
     {
-        QWebSettings::globalSettings()->setAttribute(QWebSettings::PluginsEnabled, true);
-        QWebSettings::globalSettings()->enablePersistentStorage();
+        const auto settings = QWebSettings::globalSettings();
+        settings->setAttribute(QWebSettings::PluginsEnabled, true);
+        settings->enablePersistentStorage();
+
+        if (ini().enableWebKitDeveloperExtras)
+            settings->setAttribute(QWebSettings::DeveloperExtrasEnabled, true);
+
         isWebKitInitialized = true;
     }
 }
@@ -398,6 +451,7 @@ void QnClientModule::initSingletons(const QnStartupParameters& startupParams)
 #endif
 
     commonModule->store(new QnQtbugWorkaround());
+
     commonModule->store(new nx::cloud::gateway::VmsGatewayEmbeddable(true));
 
     m_cameraDataManager = commonModule->store(new QnCameraDataManager(commonModule));
@@ -409,6 +463,8 @@ void QnClientModule::initSingletons(const QnStartupParameters& startupParams)
 
     m_analyticsMetadataProviderFactory.reset(new AnalyticsMetadataProviderFactory());
     m_analyticsMetadataProviderFactory->registerMetadataProviders();
+
+    registerResourceDataProviders();
 }
 
 void QnClientModule::initRuntimeParams(const QnStartupParameters& startupParams)
@@ -476,30 +532,7 @@ void QnClientModule::initLog(const QnStartupParameters& startupParams)
     auto logFile = startupParams.logFile;
     auto ec2TranLogLevel = startupParams.ec2TranLogLevel;
 
-    QString logFileNameSuffix;
-    if (!startupParams.videoWallGuid.isNull())
-    {
-        logFileNameSuffix = startupParams.videoWallItemGuid.isNull()
-            ? startupParams.videoWallGuid.toString()
-            : startupParams.videoWallItemGuid.toString();
-        logFileNameSuffix.replace(QRegExp(QLatin1String("[{}]")), QLatin1String("_"));
-    }
-    else if (startupParams.selfUpdateMode)
-    {
-        // we hope self-updater will run only once per time and will not overflow log file
-        // qnClientInstanceManager is not initialized in self-update mode
-        logFileNameSuffix = lit("self_update");
-    }
-    else if (qnRuntime->isActiveXMode())
-    {
-        logFileNameSuffix = lit("ax");
-    }
-    else if (qnClientInstanceManager && qnClientInstanceManager->isValid())
-    {
-        int idx = qnClientInstanceManager->instanceIndex();
-        if (idx > 0)
-            logFileNameSuffix = L'_' + QString::number(idx);
-    }
+    const QString logFileNameSuffix = calculateLogNameSuffix(startupParams);
 
     if (logLevel.isEmpty())
         logLevel = qnSettings->logLevel();
@@ -510,21 +543,24 @@ void QnClientModule::initLog(const QnStartupParameters& startupParams)
     logSettings.updateDirectoryIfEmpty(QStandardPaths::writableLocation(QStandardPaths::DataLocation));
 
     logSettings.level.parse(logLevel);
+    logSettings.logBaseName = logFile.isEmpty()
+        ? lit("client_log") + logFileNameSuffix
+        : logFile;
+
     nx::utils::log::initialize(
         logSettings,
         qApp->applicationName(),
-        qApp->applicationFilePath(),
-        !logFile.isEmpty() ? logFile : (lit("log_file") + logFileNameSuffix));
+        qApp->applicationFilePath());
 
     const auto ec2logger = nx::utils::log::addLogger({QnLog::EC2_TRAN_LOG});
     if (ec2TranLogLevel != lit("none"))
     {
         logSettings.level.parse(ec2TranLogLevel);
+        logSettings.logBaseName = lit("ec2_tran") + logFileNameSuffix;
         nx::utils::log::initialize(
             logSettings,
             qApp->applicationName(),
             qApp->applicationFilePath(),
-            lit("ec2_tran") + logFileNameSuffix,
             ec2logger);
     }
 
@@ -603,10 +639,11 @@ void QnClientModule::initSkin(const QnStartupParameters& startupParams)
     /* Initialize application UI. Skip if run in console (e.g. unit-tests). */
     if (qApp)
     {
-        QnFontLoader::loadFonts(QDir(QApplication::applicationDirPath()).absoluteFilePath(lit("fonts")));
+        nx::client::core::FontLoader::loadFonts(
+            QDir(QApplication::applicationDirPath()).absoluteFilePath(
+                nx::utils::AppInfo::isMacOsX() ? lit("../Resources/fonts") : lit("fonts")));
 
-        // Window icon is taken from 'icons' customization project. Suppress check.
-        QApplication::setWindowIcon(qnSkin->icon(":/logo.png")); // _IGNORE_VALIDATION_
+        QApplication::setWindowIcon(qnSkin->icon(":/logo.png"));
         QApplication::setStyle(skin->newStyle(customizer->genericPalette()));
     }
 
@@ -696,4 +733,14 @@ void QnClientModule::initLocalInfo(const QnStartupParameters& startupParams)
     runtimeData.customization = qnRuntime->isDevMode() ? QString() : QnAppInfo::customizationName();
     runtimeData.videoWallInstanceGuid = startupParams.videoWallItemGuid;
     commonModule->runtimeInfoManager()->updateLocalItem(runtimeData); // initializing localInfo
+}
+
+void QnClientModule::registerResourceDataProviders()
+{
+    auto factory = qnClientCoreModule->dataProviderFactory();
+    factory->registerResourceType<QnAviResource>();
+    factory->registerResourceType<QnClientCameraResource>();
+    #if defined(Q_OS_WIN)
+        factory->registerResourceType<QnWinDesktopResource>();
+    #endif
 }

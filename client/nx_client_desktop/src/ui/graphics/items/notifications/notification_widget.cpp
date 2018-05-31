@@ -23,6 +23,7 @@
 
 #include <nx/fusion/model_functions.h>
 
+using namespace nx::client::desktop;
 using namespace nx::client::desktop::ui;
 
 namespace {
@@ -235,7 +236,7 @@ void QnNotificationWidget::setNotificationLevel(QnNotificationLevel::Value notif
     emit notificationLevelChanged();
 }
 
-void QnNotificationWidget::setImageProvider(QnImageProvider* provider)
+void QnNotificationWidget::setImageProvider(ImageProvider* provider)
 {
     m_imageProvider = provider;
     m_tooltipWidget->setImageProvider(provider);

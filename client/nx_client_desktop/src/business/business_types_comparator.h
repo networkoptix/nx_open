@@ -21,26 +21,26 @@ public:
 
     explicit QnBusinessTypesComparator(bool onlyUserAvailableActions, QObject *parent = nullptr);
 
-    bool lexicographicalLessThan(nx::vms::event::EventType left, nx::vms::event::EventType right) const;
-    bool lexicographicalLessThan(nx::vms::event::ActionType left, nx::vms::event::ActionType right) const;
+    bool lexicographicalLessThan(nx::vms::api::EventType left, nx::vms::api::EventType right) const;
+    bool lexicographicalLessThan(nx::vms::api::ActionType left, nx::vms::api::ActionType right) const;
 
     /*
      * Reorder event types to lexicographical order (for sorting)
      */
-    int toLexEventType(nx::vms::event::EventType eventType) const;
+    int toLexEventType(nx::vms::api::EventType eventType) const;
 
     /*
      * Reorder actions types to lexicographical order (for sorting)
      */
-    int toLexActionType(nx::vms::event::ActionType actionType) const;
+    int toLexActionType(nx::vms::api::ActionType actionType) const;
 
-    QList<nx::vms::event::EventType> lexSortedEvents(EventSubType subtype = EventSubType::any) const;
-    QList<nx::vms::event::ActionType> lexSortedActions() const;
+    QList<nx::vms::api::EventType> lexSortedEvents(EventSubType subtype = EventSubType::any) const;
+    QList<nx::vms::api::ActionType> lexSortedActions() const;
 
 private:
     void initLexOrdering();
 
-    QList<nx::vms::event::ActionType> getAllActions() const;
+    QList<nx::vms::api::ActionType> getAllActions() const;
 
 private:
     QVector<int> m_eventTypeToLexOrder;

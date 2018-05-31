@@ -1088,14 +1088,15 @@ void QnStorageManager::addStorage(const QnStorageResourcePtr &storage)
         QnMutexLocker lk(&m_mutexStorages);
         m_storageRoots.insert(storageIndex, storage);
     }
-    connect(storage.data(), SIGNAL(archiveRangeChanged(const QnStorageResourcePtr &, qint64, qint64)),
-            this, SLOT(at_archiveRangeChanged(const QnStorageResourcePtr &, qint64, qint64)), Qt::DirectConnection);
-    connect(storage.data(), &QnStorageResource::isUsedForWritingChanged,
-        this, [this]()
-        {
-            m_warnSended = false;
-        });
-    connect(storage.data(), &QnStorageResource::spaceLimitChanged, this,
+    connect(
+        storage.data(), SIGNAL(archiveRangeChanged(const QnStorageResourcePtr &, qint64, qint64)),
+        this, SLOT(at_archiveRangeChanged(const QnStorageResourcePtr &, qint64, qint64)),
+        Qt::DirectConnection);
+    connect(
+        storage.data(), &QnStorageResource::isUsedForWritingChanged,
+        this, [this]() { m_warnSended = false; });
+    connect
+        (storage.data(), &QnStorageResource::spaceLimitChanged, this,
         [this, storageIndex](const QnResourcePtr& storageResource)
         {
             auto storage = storageResource.dynamicCast<QnStorageResource>();
@@ -1105,6 +1106,9 @@ void QnStorageManager::addStorage(const QnStorageResourcePtr &storage)
             m_spaceInfo.storageChanged(storageIndex, storage->getFreeSpace(),
                 calculateNxOccupiedSpace(storageIndex), storage->getSpaceLimit());
         });
+    connect(
+        storage.data(), &QnStorageResource::isBackupChanged,
+        this, &QnStorageManager::at_storageRoleChanged);
 
     m_warnSended = false;
 }
@@ -1129,7 +1133,6 @@ void QnStorageManager::onNewResource(const QnResourcePtr &resource)
             fileStorage->setMounted(false);
 
         m_warnSended = false;
-        connect(storage.data(), &QnStorageResource::isBackupChanged, this, &QnStorageManager::at_storageChanged);
         if (checkIfMyStorage(storage))
             addStorage(storage);
     }
@@ -1197,7 +1200,7 @@ void QnStorageManager::removeStorage(const QnStorageResourcePtr &storage)
     disconnect(storage.data(), nullptr, this, nullptr);
 }
 
-void QnStorageManager::at_storageChanged(const QnResourcePtr &resource)
+void QnStorageManager::at_storageRoleChanged(const QnResourcePtr &resource)
 {
     QnStorageResourcePtr storage = qSharedPointerDynamicCast<QnStorageResource>(resource);
     if (!storage)
@@ -1208,13 +1211,15 @@ void QnStorageManager::at_storageChanged(const QnResourcePtr &resource)
             .arg(m_role == QnServer::StoragePool::Normal ? "Main" : "Backup")
             .arg(storage->isBackup() ? "Backup" : "Main"), cl_logDEBUG1);
 
-    if (checkIfMyStorage(storage)) {
-        if (!hasStorage(storage))
-            addStorage(storage);
-    }
-    else {
-        if (hasStorage(storage))
-            removeStorage(storage);
+    if (hasStorage(storage))
+    {
+        NX_ASSERT(!checkIfMyStorage(storage));
+        removeStorage(storage);
+        QnStorageManager* other = m_role == QnServer::StoragePool::Backup
+            ? qnNormalStorageMan : qnBackupStorageMan;
+        NX_ASSERT(other);
+        if (other)
+            other->addStorage(storage);
     }
 }
 
@@ -1615,7 +1620,7 @@ void QnStorageManager::checkSystemStorageSpace()
         if (storage->getStatus() == Qn::Online && storage->isSystem()
             && storage->getFreeSpace() < kMinSystemStorageFreeSpace)
         {
-            emit storageFailure(storage, nx::vms::event::EventReason::systemStorageFull);
+            emit storageFailure(storage, nx::vms::api::EventReason::systemStorageFull);
         }
     }
 }
@@ -1632,9 +1637,6 @@ void QnStorageManager::clearSpace(bool forced)
                                      Qn::BackupState::BackupState_InProgress;
     if (backupOnAndTimerTriggered)
         return;
-
-    if (m_firstStoragesTestDone)
-        testOfflineStorages();
 
     // 1. delete old data if cameras have max duration limit
     clearMaxDaysData();
@@ -2148,7 +2150,7 @@ bool QnStorageManager::clearOldestSpace(const QnStorageResourcePtr &storage, boo
 
     if (toDelete > 0 && !useMinArchiveDays) {
         if (!m_diskFullWarned[storage->getId()]) {
-            emit storageFailure(storage, nx::vms::event::EventReason::storageFull);
+            emit storageFailure(storage, nx::vms::api::EventReason::storageFull);
             m_diskFullWarned[storage->getId()] = true;
         }
     }
@@ -2333,7 +2335,7 @@ void QnStorageManager::changeStorageStatus(const QnStorageResourcePtr &fileStora
 
     fileStorage->setStatus(status);
     if (status == Qn::Offline)
-        emit storageFailure(fileStorage, nx::vms::event::EventReason::storageIoError);
+        emit storageFailure(fileStorage, nx::vms::api::EventReason::storageIoError);
 }
 
 void QnStorageManager::startAuxTimerTasks()
@@ -2363,6 +2365,17 @@ void QnStorageManager::startAuxTimerTasks()
         },
         kRemoveEmptyDirsInterval,
         kRemoveEmptyDirsInterval);
+
+
+    static const std::chrono::seconds kTestStorageInterval(40);
+    m_auxTasksTimerManager.addNonStopTimer(
+        [this](nx::utils::TimerId)
+        {
+            if (m_firstStoragesTestDone)
+                testOfflineStorages();
+        },
+        kTestStorageInterval,
+        kTestStorageInterval);
 }
 
 void QnStorageManager::testOfflineStorages()

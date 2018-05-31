@@ -89,11 +89,6 @@
     </message>
     <message>
       <location/>
-      <source>Disable only if the client takes too much CPU</source>
-      <translation>Nur deaktivieren, wenn der Client zu viel CPU verwendet</translation>
-    </message>
-    <message>
-      <location/>
       <source>Maximum Live Buffer Length</source>
       <translation>Maximale Live-Pufferlänge</translation>
     </message>
@@ -764,15 +759,15 @@
     </message>
     <message>
       <location/>
-      <source>Logical Id</source>
-      <translation>Logical-Id</translation>
+      <source>Logical ID</source>
+      <translation>Logical-ID</translation>
     </message>
   </context>
   <context>
     <name>CameraInputBusinessEventWidget</name>
     <message>
       <location filename="../src/ui/widgets/business/camera_input_business_event_widget.ui"/>
-      <source>Input Id</source>
+      <source>Input ID</source>
       <translation>Input-ID</translation>
     </message>
   </context>
@@ -798,7 +793,7 @@
     </message>
     <message>
       <location/>
-      <source>Output Id:</source>
+      <source>Output ID:</source>
       <translation>Output-ID:</translation>
     </message>
   </context>
@@ -1513,8 +1508,8 @@
     </message>
     <message>
       <location/>
-      <source>Locked to Hardware Id:</source>
-      <translation>Gebunden an Hardware-Id:</translation>
+      <source>Locked to Hardware ID:</source>
+      <translation>Gebunden an Hardware-ID:</translation>
     </message>
   </context>
   <context>
@@ -1612,8 +1607,8 @@
     </message>
     <message>
       <location/>
-      <source>Hardware Id</source>
-      <translation>Hardware-Id</translation>
+      <source>Hardware ID</source>
+      <translation>Hardware-ID</translation>
     </message>
   </context>
   <context>
@@ -1741,6 +1736,11 @@
       <location/>
       <source>Tour cycle</source>
       <translation>Tourzyklus</translation>
+    </message>
+    <message>
+      <location/>
+      <source>IP addresses for cameras, and servers, groups for users, etc.</source>
+      <translation>IP-Adressen für Kameras und Server, Gruppen für Benutzer, etc.</translation>
     </message>
   </context>
   <context>

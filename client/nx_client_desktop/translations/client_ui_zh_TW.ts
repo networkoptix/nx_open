@@ -89,11 +89,6 @@
     </message>
     <message>
       <location/>
-      <source>Disable only if the client takes too much CPU</source>
-      <translation>若用戶端耗費太多 CPU 時再停用它</translation>
-    </message>
-    <message>
-      <location/>
       <source>Maximum Live Buffer Length</source>
       <translation>最大緩衝長度</translation>
     </message>
@@ -764,15 +759,15 @@
     </message>
     <message>
       <location/>
-      <source>Logical Id</source>
-      <translation type="unfinished">Logical Id</translation>
+      <source>Logical ID</source>
+      <translation>邏輯 ID</translation>
     </message>
   </context>
   <context>
     <name>CameraInputBusinessEventWidget</name>
     <message>
       <location filename="../src/ui/widgets/business/camera_input_business_event_widget.ui"/>
-      <source>Input Id</source>
+      <source>Input ID</source>
       <translation>輸入ID</translation>
     </message>
   </context>
@@ -798,8 +793,8 @@
     </message>
     <message>
       <location/>
-      <source>Output Id:</source>
-      <translation>輸出 Id:</translation>
+      <source>Output ID:</source>
+      <translation>輸出 ID:</translation>
     </message>
   </context>
   <context>
@@ -1513,8 +1508,8 @@
     </message>
     <message>
       <location/>
-      <source>Locked to Hardware Id:</source>
-      <translation>已鎖定至硬體 Id:</translation>
+      <source>Locked to Hardware ID:</source>
+      <translation>已鎖定至硬體 ID:</translation>
     </message>
   </context>
   <context>
@@ -1612,8 +1607,8 @@
     </message>
     <message>
       <location/>
-      <source>Hardware Id</source>
-      <translation>硬體 Id</translation>
+      <source>Hardware ID</source>
+      <translation>硬體 ID</translation>
     </message>
   </context>
   <context>
@@ -1742,6 +1737,11 @@
       <source>Tour cycle</source>
       <translation>Tour cycle</translation>
     </message>
+    <message>
+      <location/>
+      <source>IP addresses for cameras, and servers, groups for users, etc.</source>
+      <translation>攝影機的IP位址, 伺服器和使用者所屬之角色等等...。</translation>
+    </message>
   </context>
   <context>
     <name>MessageBox</name>
@@ -1804,7 +1804,7 @@
     <message>
       <location/>
       <source>&quot;Wearable Camera&quot; is a virtual storage for video files, which could be uploaded to any server on your System and be accessed by any user.</source>
-      <translation type="unfinished">&quot;Wearable Camera&quot; is a virtual storage for video files, which could be uploaded to any server on your System and be accessed by any user.</translation>
+      <translation>&quot;穿戴式攝影機&quot; 是一個影像資料專用的虛擬空間, 可以上傳到系統中的任何伺服器並讓所有使用者存取.</translation>
     </message>
   </context>
   <context>
@@ -3044,12 +3044,12 @@
     <message>
       <location/>
       <source>There are no custom user roles yet.</source>
-      <translation type="unfinished">There are no custom user roles yet.</translation>
+      <translation>目前還沒有自訂使用者角色</translation>
     </message>
     <message>
       <location/>
       <source>Click &quot;New role&quot; button to create one.</source>
-      <translation type="unfinished">Click &quot;New role&quot; button to create one.</translation>
+      <translation>點擊 &quot;新角色&quot; 按鈕新建一個</translation>
     </message>
   </context>
   <context>

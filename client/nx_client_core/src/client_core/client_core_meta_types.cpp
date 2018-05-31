@@ -17,7 +17,14 @@
 #include <client/forgotten_systems_manager.h>
 #include <utils/common/app_info.h>
 #include <helpers/nx_globals_object.h>
+
 #include <nx/client/core/animation/kinetic_animation.h>
+#include <nx/client/core/media/media_player.h>
+#include <nx/client/core/resource/resource_helper.h>
+#include <nx/client/core/resource/media_resource_helper.h>
+#include <nx/client/core/motion/helpers/media_player_motion_provider.h>
+#include <nx/client/core/motion/helpers/camera_motion_helper.h>
+#include <nx/client/core/motion/items/motion_mask_item.h>
 #include <nx/client/core/ui/frame_section.h>
 #include <nx/client/core/utils/geometry.h>
 #include <nx/client/core/utils/quick_item_mouse_tracker.h>
@@ -47,10 +54,14 @@ void initializeMetaTypes()
     qRegisterMetaType<QnStringSet>();
     qRegisterMetaTypeStreamOperators<QnStringSet>();
 
+    qRegisterMetaType<nx::media::PlayerStatistics>();
+
     qmlRegisterType<QnQmlTestHelper>("Nx.Test", 1, 0, "QmlTestHelper");
     qmlRegisterType<QnScenePositionListener>("com.networkoptix.qml", 1, 0, "QnScenePositionListener");
     qmlRegisterType<QnAppInfo>("com.networkoptix.qml", 1, 0, "QnAppInfo");
     qmlRegisterType<QnVideoOutput>("Nx.Media", 1, 0, "VideoOutput");
+    qmlRegisterType<ResourceHelper>("Nx.Core", 1, 0, "ResourceHelper");
+    qmlRegisterType<MediaResourceHelper>("Nx.Core", 1, 0, "MediaResourceHelper");
 
     qmlRegisterType<AuthenticationDataModel>("Nx.Models", 1, 0, "AuthenticationDataModel");
     qmlRegisterType<QnSystemHostsModel>("Nx.Models", 1, 0, "SystemHostsModel");
@@ -75,6 +86,14 @@ void initializeMetaTypes()
     FrameSection::registedQmlType();
     Geometry::registerQmlType();
     QuickItemMouseTracker::registerQmlType();
+    CameraMotionHelper::registerQmlType();
+    MediaPlayerMotionProvider::registerQmlType();
+    MotionMaskItem::registerQmlType();
+
+    /* NxMediaPlayer should not be used.
+    It is here only to allow assignments of MediaPlayer to properties of this type. */
+    qmlRegisterType<MediaPlayer>("Nx.Media", 1, 0, "MediaPlayer");
+    qmlRegisterUncreatableType<nx::media::Player>("Nx.Media", 1, 0, "NxMediaPlayer", lit("Cannot create an instance of abstract class."));
 
     qmlRegisterUncreatableType<QnMediaDewarpingParams>("Nx.Media", 1, 0, "MediaDewarpingParams",
         QLatin1String("Cannot create an instance of QnMediaDewarpingParams."));

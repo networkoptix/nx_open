@@ -29,7 +29,7 @@ class ThirdPartyStreamReader
 
 public:
     ThirdPartyStreamReader(
-        QnResourcePtr res,
+        QnThirdPartyResourcePtr res,
         nxcip::BaseCameraManager* camManager );
     virtual ~ThirdPartyStreamReader();
 
@@ -77,7 +77,7 @@ private:
     QnConstMediaContextPtr m_audioContext;
     std::shared_ptr<nxcip::CameraMediaEncoder2> m_mediaEncoder2;
     QnResourceCustomAudioLayoutPtr m_audioLayout;
-    unsigned int m_cameraCapabilities;
+    unsigned int m_cameraCapabilities = 0;
 
     bool m_needCorrectTime = false;
     using TimeHelperPtr = std::unique_ptr<nx::utils::TimeHelper>;

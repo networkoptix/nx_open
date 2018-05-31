@@ -18,6 +18,9 @@ namespace http { class Server; };
 class StunServer
 {
 public:
+    using MultiAddressStunServer =
+        network::server::MultiAddressServer<network::stun::SocketServer>;
+
     StunServer(
         const conf::Settings& settings,
         http::Server* httpServer);
@@ -27,6 +30,7 @@ public:
 
     const std::vector<network::SocketAddress>& endpoints() const;
     nx::network::stun::MessageDispatcher& dispatcher();
+    const MultiAddressStunServer& server() const;
 
 private:
     const conf::Settings& m_settings;

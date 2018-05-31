@@ -847,6 +847,19 @@ CREATE TABLE system_merge_info(
 
 )sql";
 
+/**
+ * CLOUD-587. Moving data syncronization logic to a separate module.
+ * cloud_db already has all necessary structure.
+ * Skipping structure update .
+ */
+static const char kSetDataSyncModuleDbStructureVersion[] =
+R"sql(
+
+INSERT INTO db_version_data(schema_name, db_version)
+VALUES ('cloud_sync_engine_{C4105732-0097-48FB-AB9B-039A3C057F57}', 2);
+
+)sql";
+
 } // namespace db
 } // namespace cdb
 } // namespace nx

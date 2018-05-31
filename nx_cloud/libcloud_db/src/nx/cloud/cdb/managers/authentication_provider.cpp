@@ -12,13 +12,13 @@
 #include <nx/utils/uuid.h>
 
 #include <nx/cloud/cdb/client/data/auth_data.h>
+#include <nx/data_sync_engine/transaction_log.h>
 
 #include "temporary_account_password_manager.h"
 #include "../dao/user_authentication_data_object_factory.h"
 #include "../settings.h"
 #include "../stree/cdb_ns.h"
 #include "../access_control/authentication_manager.h"
-#include "../ec2/transaction_log.h"
 #include "../ec2/vms_p2p_command_bus.h"
 
 namespace nx {
@@ -337,7 +337,7 @@ void AuthenticationProvider::generateUpdateUserAuthInfoTransaction(
     const std::string& vmsUserId,
     const api::AuthInfo& userAuthenticationRecords)
 {
-    ::ec2::ApiResourceParamWithRefData userAuthenticationInfoAttribute;
+    nx::vms::api::ResourceParamWithRefData userAuthenticationInfoAttribute;
     userAuthenticationInfoAttribute.name = api::kVmsUserAuthInfoAttributeName;
     userAuthenticationInfoAttribute.resourceId =
         QnUuid::fromStringSafe(vmsUserId.c_str());
@@ -435,6 +435,12 @@ void AuthenticationProvider::updateUserAuthInSystem(
         queryContext, userSharing.accountEmail, &account);
     if (dbResult != utils::db::DBResult::ok)
         throw utils::db::Exception(dbResult);
+    if (account.passwordHa1.empty() && account.passwordHa1Sha256.empty())
+    {
+        NX_VERBOSE(this, lm("Skipping user %1, system %2. User does not have password")
+            .args(userSharing.accountEmail, systemId));
+        return;
+    }
 
     addUserAuthRecord(
         queryContext,

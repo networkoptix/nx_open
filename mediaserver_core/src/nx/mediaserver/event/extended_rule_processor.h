@@ -43,15 +43,15 @@ private:
     class SendEmailAggregationKey
     {
     public:
-        vms::event::EventType eventType;
+        vms::api::EventType eventType;
         QString recipients;
 
         SendEmailAggregationKey():
-            eventType(vms::event::undefinedEvent)
+            eventType(vms::api::EventType::undefinedEvent)
         {
         }
 
-        SendEmailAggregationKey(vms::event::EventType _eventType, QString _recipients):
+        SendEmailAggregationKey(vms::api::EventType _eventType, QString _recipients):
             eventType(_eventType),
             recipients(_recipients)
         {

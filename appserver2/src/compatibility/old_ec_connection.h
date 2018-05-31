@@ -18,7 +18,7 @@ public:
     virtual AbstractMediaServerManagerPtr getMediaServerManager(const Qn::UserAccessData &) override;
     virtual AbstractCameraManagerPtr getCameraManager(const Qn::UserAccessData &) override;
     virtual AbstractLicenseManagerPtr getLicenseManager(const Qn::UserAccessData &) override;
-    virtual AbstractBusinessEventManagerPtr getBusinessEventManager(const Qn::UserAccessData &) override;
+    virtual AbstractEventRulesManagerPtr getEventRulesManager(const Qn::UserAccessData &) override;
     virtual AbstractUserManagerPtr getUserManager(const Qn::UserAccessData &) override;
     virtual AbstractLayoutManagerPtr getLayoutManager(const Qn::UserAccessData &) override;
     virtual AbstractLayoutTourManagerPtr getLayoutTourManager(const Qn::UserAccessData& userAccessData) override;
@@ -60,8 +60,12 @@ public:
     virtual QnCommonModule* commonModule() const override { return nullptr; }
 protected:
     virtual int dumpDatabaseAsync(impl::DumpDatabaseHandlerPtr handler) override;
-    virtual int dumpDatabaseToFileAsync(const QString& dumpFilePath, ec2::impl::SimpleHandlerPtr) override;
-    virtual int restoreDatabaseAsync(const ApiDatabaseDumpData& dbFile, impl::SimpleHandlerPtr handler) override;
+    virtual int dumpDatabaseToFileAsync(
+        const QString& dumpFilePath,
+        ec2::impl::SimpleHandlerPtr) override;
+    virtual int restoreDatabaseAsync(
+        const nx::vms::api::DatabaseDumpData& dbFile,
+        impl::SimpleHandlerPtr handler) override;
 private:
     QnConnectionInfo m_connectionInfo;
 };

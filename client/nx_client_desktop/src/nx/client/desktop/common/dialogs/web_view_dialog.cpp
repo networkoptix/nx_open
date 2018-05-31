@@ -10,7 +10,7 @@
 #include <ui/style/webview_style.h>
 #include <ui/widgets/common/web_page.h>
 #include <nx/client/desktop/common/widgets/busy_indicator.h>
-#include <ui/common/widget_anchor.h>
+#include <nx/client/desktop/common/utils/widget_anchor.h>
 
 namespace nx {
 namespace client {
@@ -22,8 +22,8 @@ WebViewDialog::WebViewDialog(QWidget* parent):
     m_indicator(new BusyIndicatorWidget(m_webView)),
     m_errorLabel(new QLabel(m_webView))
 {
-    new QnWidgetAnchor(m_indicator);
-    new QnWidgetAnchor(m_errorLabel);
+    new WidgetAnchor(m_indicator);
+    new WidgetAnchor(m_errorLabel);
 
     m_errorLabel->hide();
     m_errorLabel->setText(lit("<h1>%1</h1>").arg(tr("Failed to load page")));

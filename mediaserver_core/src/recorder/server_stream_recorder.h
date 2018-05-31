@@ -63,7 +63,7 @@ signals:
     void fpsChanged(QnServerStreamRecorder* recorder, float value);
     void motionDetected(QnResourcePtr resource, bool value, qint64 time, QnConstAbstractDataPacketPtr motion);
 
-    void storageFailure(QnResourcePtr mServerRes, qint64 timestamp, nx::vms::event::EventReason reasonCode, QnResourcePtr storageRes);
+    void storageFailure(QnResourcePtr mServerRes, qint64 timestamp, nx::vms::api::EventReason reasonCode, QnResourcePtr storageRes);
 protected:
     virtual bool processData(const QnAbstractDataPacketPtr& data);
 

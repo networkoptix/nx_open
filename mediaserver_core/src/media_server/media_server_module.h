@@ -16,6 +16,8 @@ class PluginManager;
 class CommonPluginContainer;
 class QThread;
 class AbstractArchiveIntegrityWatcher;
+class QnDataProviderFactory;
+class QnResourceCommandProcessor;
 
 namespace nx {
 
@@ -82,10 +84,14 @@ public:
     AbstractArchiveIntegrityWatcher* archiveIntegrityWatcher() const;
     nx::analytics::storage::AbstractEventsStorage* analyticsEventsStorage() const;
     nx::mediaserver::updates2::ServerUpdates2Manager* updates2Manager() const;
+    QnDataProviderFactory* dataProviderFactory() const;
+    QnResourceCommandProcessor* resourceCommandProcessor() const;
 
     nx::mediaserver::RootTool* rootTool() const;
 
 private:
+    void registerResourceDataProviders();
+
     QnCommonModule* m_commonModule;
     MSSettings* m_settings;
     StreamingChunkCache* m_streamingChunkCache;
@@ -103,7 +109,6 @@ private:
     nx::mediaserver::LicenseWatcher* m_licenseWatcher = nullptr;
     nx::mediaserver::metadata::ManagerPool* m_metadataManagerPool = nullptr;
     nx::mediaserver::metadata::EventRuleWatcher* m_metadataRuleWatcher = nullptr;
-    QThread* m_metadataManagerPoolThread = nullptr;
     nx::mediaserver::resource::SharedContextPool* m_sharedContextPool = nullptr;
     AbstractArchiveIntegrityWatcher* m_archiveIntegrityWatcher;
     mutable boost::optional<std::chrono::milliseconds> m_lastRunningTimeBeforeRestart;
@@ -111,6 +116,8 @@ private:
         m_analyticsEventsStorage;
     std::unique_ptr<nx::mediaserver::RootTool> m_rootTool;
     nx::mediaserver::updates2::ServerUpdates2Manager* m_updates2Manager;
+    QScopedPointer<QnDataProviderFactory> m_resourceDataProviderFactory;
+    QScopedPointer<QnResourceCommandProcessor> m_resourceCommandProcessor;
 };
 
 #define qnServerModule QnMediaServerModule::instance()

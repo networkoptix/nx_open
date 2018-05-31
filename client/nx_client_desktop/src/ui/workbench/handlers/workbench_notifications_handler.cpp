@@ -38,7 +38,10 @@
 #include <nx/vms/event/actions/common_action.h>
 #include <ui/dialogs/camera_bookmark_dialog.h>
 #include <camera/camera_bookmarks_manager.h>
+
 #include <nx_ec/ec_api.h>
+#include <nx_ec/data/api_conversion_functions.h>
+
 
 using namespace nx;
 using namespace nx::client::desktop;
@@ -146,14 +149,16 @@ void QnWorkbenchNotificationsHandler::handleAcknowledgeEventAction()
 
             const auto action = CommonAction::createBroadcastAction(
                 ActionType::showPopupAction, businessAction->getParams());
-            action->setToggleState(nx::vms::event::EventState::inactive);
+            action->setToggleState(nx::vms::api::EventState::inactive);
 
             if (const auto connection = commonModule()->ec2Connection())
             {
                 static const auto fakeHandler = [](int /*handle*/, ec2::ErrorCode /*errorCode*/){};
 
-                const auto manager = connection->getBusinessEventManager(Qn::kSystemAccess);
-                manager->broadcastBusinessAction(action, this, fakeHandler);
+                const auto manager = connection->getEventRulesManager(Qn::kSystemAccess);
+                nx::vms::api::EventActionData actionData;
+                ec2::fromResourceToApi(action, actionData);
+                manager->broadcastEventAction(actionData, this, fakeHandler);
             }
         };
 
@@ -179,11 +184,11 @@ void QnWorkbenchNotificationsHandler::clear()
 void QnWorkbenchNotificationsHandler::addNotification(const vms::event::AbstractActionPtr &action)
 {
     vms::event::EventParameters params = action->getRuntimeParams();
-    vms::event::EventType eventType = params.eventType;
+    vms::api::EventType eventType = params.eventType;
 
-    if (eventType >= vms::event::systemHealthEvent && eventType <= vms::event::maxSystemHealthEvent)
+    if (eventType >= vms::api::EventType::systemHealthEvent && eventType <= vms::api::EventType::maxSystemHealthEvent)
     {
-        int healthMessage = eventType - vms::event::systemHealthEvent;
+        int healthMessage = eventType - vms::api::EventType::systemHealthEvent;
         addSystemHealthEvent(QnSystemHealth::MessageType(healthMessage), action);
         return;
     }
@@ -191,7 +196,7 @@ void QnWorkbenchNotificationsHandler::addNotification(const vms::event::Abstract
     if (!context()->user())
         return;
 
-    if (action->actionType() == vms::event::showOnAlarmLayoutAction)
+    if (action->actionType() == vms::api::ActionType::showOnAlarmLayoutAction)
     {
         /* Skip action if it contains list of users, and we are not on the list. */
         if (!QnBusiness::actionAllowedForUser(action->getParams(), context()->user()))
@@ -201,8 +206,8 @@ void QnWorkbenchNotificationsHandler::addNotification(const vms::event::Abstract
     bool alwaysNotify = false;
     switch (action->actionType())
     {
-        case vms::event::showOnAlarmLayoutAction:
-        case vms::event::playSoundAction:
+        case vms::api::ActionType::showOnAlarmLayoutAction:
+        case vms::api::ActionType::playSoundAction:
             //case vms::event::playSoundOnceAction: -- handled outside without notification
             alwaysNotify = true;
             break;
@@ -431,10 +436,10 @@ void QnWorkbenchNotificationsHandler::at_eventManager_actionReceived(
 
     switch (action->actionType())
     {
-        case vms::event::showOnAlarmLayoutAction:
+        case vms::api::ActionType::showOnAlarmLayoutAction:
             addNotification(action);
             break;
-        case vms::event::playSoundOnceAction:
+        case vms::api::ActionType::playSoundOnceAction:
         {
             QString filename = action->getParams().url;
             QString filePath = context()->instance<ServerNotificationCache>()->getFullPath(filename);
@@ -444,17 +449,17 @@ void QnWorkbenchNotificationsHandler::at_eventManager_actionReceived(
             break;
         }
 
-        case vms::event::showPopupAction: //< Fallthrough
-        case vms::event::playSoundAction:
+        case vms::api::ActionType::showPopupAction: //< Fallthrough
+        case vms::api::ActionType::playSoundAction:
         {
             switch (action->getToggleState())
             {
-                case vms::event::EventState::undefined:
-                case vms::event::EventState::active:
+                case vms::api::EventState::undefined:
+                case vms::api::EventState::active:
                     addNotification(action);
                     break;
 
-                case vms::event::EventState::inactive:
+                case vms::api::EventState::inactive:
                     emit notificationRemoved(action);
                     break;
 
@@ -464,7 +469,7 @@ void QnWorkbenchNotificationsHandler::at_eventManager_actionReceived(
             break;
         }
 
-        case vms::event::sayTextAction:
+        case vms::api::ActionType::sayTextAction:
         {
             AudioPlayer::sayTextAsync(action->getParams().sayText);
             break;

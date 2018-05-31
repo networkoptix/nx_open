@@ -106,7 +106,7 @@ int QnWearableCameraRestHandler::executeAdd(
     if (!requireParameter(params, lit("name"), result, &name))
         return nx::network::http::StatusCode::invalidParameter;
 
-    ec2::ApiCameraData apiCamera;
+    nx::vms::api::CameraData apiCamera;
     apiCamera.physicalId = QnUuid::createUuid().toSimpleString();
     apiCamera.fillId();
     apiCamera.manuallyAdded = true;
@@ -125,13 +125,13 @@ int QnWearableCameraRestHandler::executeAdd(
         return nx::network::http::StatusCode::internalServerError;
     }
 
-    ec2::ApiCameraAttributesData apiAttributes;
+    nx::vms::api::CameraAttributesData apiAttributes;
     {
         QnCameraUserAttributePool::ScopedLock attributesLock(
             owner->commonModule()->cameraUserAttributesPool(), apiCamera.id);
         (*attributesLock)->audioEnabled = true;
-        (*attributesLock)->motionType = Qn::MT_NoMotion;
-        fromResourceToApi(*attributesLock, apiAttributes);
+        (*attributesLock)->motionType = Qn::MotionType::MT_NoMotion;
+        ec2::fromResourceToApi(*attributesLock, apiAttributes);
     }
 
     owner->commonModule()->ec2Connection()

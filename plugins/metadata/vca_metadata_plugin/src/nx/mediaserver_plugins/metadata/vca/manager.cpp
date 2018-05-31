@@ -2,17 +2,20 @@
 
 #include <chrono>
 
-#include <QtCore/QUrl>
+#include <QtCore/QString>
 
 #define NX_PRINT_PREFIX "[metadata::vca::Manager] "
 #include <nx/kit/debug.h>
 
-#include <nx/mediaserver_plugins/utils/uuid.h>
+#include <nx/fusion/serialization/json.h>
 
 #include <nx/sdk/metadata/common_event.h>
 #include <nx/sdk/metadata/common_metadata_packet.h>
+
 #include <nx/api/analytics/device_manifest.h>
-#include <nx/fusion/serialization/json.h>
+
+#include <nx/mediaserver_plugins/utils/uuid.h>
+
 #include <nx/utils/std/cppnx.h>
 
 #include "nx/vca/camera_controller.h"
@@ -24,8 +27,11 @@ namespace vca {
 
 namespace {
 
-static const std::chrono::seconds kConnectTimeout(5);
-static const std::chrono::seconds kReceiveTimeout(30);
+static const std::chrono::seconds kReconnectTimeout(30);
+static const std::chrono::seconds kSendTimeout(15);
+static const std::chrono::seconds kReceiveTimeout(15);
+
+const QString heartbeatEventName("heartbeat");
 
 static const std::chrono::milliseconds kMinTimeBetweenEvents = std::chrono::seconds(3);
 
@@ -41,7 +47,6 @@ nx::sdk::metadata::CommonEvent* createCommonEvent(
     auto commonEvent = new nx::sdk::metadata::CommonEvent();
     commonEvent->setTypeId(
         nx::mediaserver_plugins::utils::fromQnUuidToPluginGuid(event.typeId));
-    commonEvent->setCaption(event.name.value.toStdString());
     commonEvent->setDescription(event.name.value.toStdString());
     commonEvent->setIsActive(active);
     commonEvent->setConfidence(1.0);
@@ -172,6 +177,8 @@ Manager::Manager(Plugin* plugin,
     const nx::sdk::CameraInfo& cameraInfo,
     const AnalyticsDriverManifest& typedManifest)
 {
+    m_reconnectTimer.bindToAioThread(m_stopEventTimer.getAioThread());
+
     m_url = cameraInfo.url;
     m_auth.setUser(cameraInfo.login);
     m_auth.setPassword(cameraInfo.password);
@@ -235,11 +242,12 @@ void Manager::treatMessage(int size)
         if (it->type.isStateful())
         {
             it->timer.start();
-            m_timer.start(timeTillCheck(), [this](){ onTimer(); });
+            m_stopEventTimer.start(timeTillCheck(), [this](){ onTimer(); });
         }
     }
-    else
+    else if (internalName != heartbeatEventName)
     {
+
         NX_PRINT << "Packed with undefined event type received. Uuid = "
             << internalName.toStdString();
     }
@@ -247,8 +255,16 @@ void Manager::treatMessage(int size)
     cleanBuffer(m_buffer, size);
 }
 
-void Manager::onReceive(SystemError::ErrorCode, size_t)
+void Manager::onReceive(SystemError::ErrorCode code , size_t size)
 {
+    if (code != SystemError::noError || size == 0) //< connection broken or closed
+    {
+        NX_PRINT << "Receive failed. Connection broken or closed. Next connection attempt in"
+            << std::chrono::seconds(kReconnectTimeout).count() << " seconds.";
+        m_reconnectTimer.start(kReconnectTimeout, [this]() { reconnectSocket(); });
+        return;
+    }
+
     static const int kPrefixSize = 8;
     static const int kSizeSize = 8;
     static const int kPostfixSize = 12;
@@ -355,7 +371,7 @@ void Manager::onTimer()
     }
 
     if (isTimerNeeded())
-        m_timer.start(timeTillCheck(), [this](){ onTimer(); });
+        m_stopEventTimer.start(timeTillCheck(), [this](){ onTimer(); });
 }
 
 /*
@@ -370,6 +386,49 @@ bool Manager::isTimerNeeded() const
             return true;
     }
     return false;
+}
+
+void Manager::onConnect(SystemError::ErrorCode code)
+{
+    if (code != SystemError::noError)
+    {
+        NX_PRINT << "Failed to connect to VCA camera notification server. Next connection attempt in"
+            << std::chrono::seconds(kReconnectTimeout).count() << " seconds.";
+        m_reconnectTimer.start(kReconnectTimeout, [this]() { reconnectSocket(); });
+        return;
+    }
+    NX_PRINT << "Connection to VCA camera notification server established";
+
+    cleanBuffer(m_buffer, m_buffer.size());
+
+    m_tcpSocket->readSomeAsync(
+        &m_buffer,
+        [this](SystemError::ErrorCode errorCode, size_t size)
+        {
+            this->onReceive(errorCode, size);
+        });
+}
+
+void Manager::reconnectSocket()
+{
+    m_reconnectTimer.pleaseStop(
+        [this]()
+    {
+        using namespace std::chrono;
+        m_tcpSocket.reset();
+        m_tcpSocket = std::make_unique<nx::network::TCPSocket>();
+        m_tcpSocket->setNonBlockingMode(true);
+        m_tcpSocket->bindToAioThread(m_reconnectTimer.getAioThread());
+        m_tcpSocket->setSendTimeout(duration_cast<milliseconds>(kSendTimeout).count());
+        m_tcpSocket->setRecvTimeout(duration_cast<milliseconds>(kReceiveTimeout).count());
+
+        m_tcpSocket->connectAsync(
+            m_cameraAddress,
+            [this](SystemError::ErrorCode code)
+        {
+            return this->onConnect(code);
+        });
+    });
 }
 
 nx::sdk::Error Manager::setHandler(nx::sdk::metadata::MetadataHandler* handler)
@@ -397,6 +456,13 @@ nx::sdk::Error Manager::startFetchingMetadata(nxpl::NX_GUID* typeList, int typeL
             m_eventsToCatch.emplace_back(*eventType);
     }
 
+    QByteArray eventNames;
+    for (const auto& event : m_eventsToCatch)
+    {
+        eventNames = eventNames + event.type.internalName.toUtf8() + " ";
+    }
+    NX_PRINT << "Server demanded to start fetching event(s): " << eventNames.toStdString();
+
     if (!vcaCameraConrtoller.readTcpServerPort())
     {
         NX_PRINT << "Failed to get VCA-camera tcp notification server port.";
@@ -407,24 +473,9 @@ nx::sdk::Error Manager::startFetchingMetadata(nxpl::NX_GUID* typeList, int typeL
     QString ipPort = kAddressPattern.arg(
         m_url.host(), QString::number(vcaCameraConrtoller.tcpServerPort()));
 
-    nx::network::SocketAddress vcaAddress(ipPort);
-    m_tcpSocket = new nx::network::TCPSocket;
-    if (!m_tcpSocket->connect(vcaAddress, kConnectTimeout))
-    {
-        NX_PRINT << "Failed to connect to camera tcp notification server";
-        return nx::sdk::Error::networkError;
-    }
-    m_tcpSocket->bindToAioThread(m_timer.getAioThread());
-    m_tcpSocket->setNonBlockingMode(true);
-    m_tcpSocket->setRecvTimeout(kReceiveTimeout.count() * 1000);
-    NX_PRINT << "Connection to camera tcp notification server established";
+    m_cameraAddress = nx::network::SocketAddress(ipPort);
 
-    m_tcpSocket->readSomeAsync(
-        &m_buffer,
-        [this](SystemError::ErrorCode errorCode, size_t size)
-        {
-            this->onReceive(errorCode, size);
-        });
+    reconnectSocket();
 
     return nx::sdk::Error::noError;
 }
@@ -434,16 +485,15 @@ nx::sdk::Error Manager::stopFetchingMetadata()
     if (m_tcpSocket)
     {
         nx::utils::promise<void> promise;
-        m_timer.pleaseStop(
+        m_reconnectTimer.pleaseStop(
             [&]()
             {
-                m_tcpSocket->pleaseStopSync();
+                m_stopEventTimer.pleaseStopSync();
+                m_tcpSocket.reset();
+                m_eventsToCatch.clear();
                 promise.set_value();
             });
         promise.get_future().wait();
-        delete m_tcpSocket;
-        m_tcpSocket = nullptr;
-        m_eventsToCatch.clear();
     }
     return nx::sdk::Error::noError;
 }

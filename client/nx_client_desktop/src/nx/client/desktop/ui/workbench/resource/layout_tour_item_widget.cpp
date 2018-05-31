@@ -93,7 +93,7 @@ LayoutTourItemWidget::LayoutTourItemWidget(
     base_type(context, item, parent),
     m_previewPainter(new LayoutPreviewPainter(context->resourcePool()))
 {
-    context->instance<QnCameraThumbnailManager>()->setAutoRotate(false); //< TODO: VMS-6759
+    context->instance<CameraThumbnailManager>()->setAutoRotate(false); //< TODO: VMS-6759
 
     setOption(QnResourceWidget::InfoOverlaysForbidden);
     setOption(QnResourceWidget::WindowRotationForbidden);

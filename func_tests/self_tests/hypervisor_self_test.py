@@ -4,18 +4,22 @@ from subprocess import call, check_call
 
 import pytest
 
-from framework.utils import wait_until
 from framework.vms.hypervisor import VMInfo
+from framework.waiting import wait_for_true
 
 logger = logging.getLogger(__name__)
 
 name_format = 'func_tests-temp-dummy-{}'
 
 
-def _create_vm(name):
+def _remove_vm(name):
     logger.debug("Delete %s if exists.", name)
     call(['VBoxManage', 'controlvm', name, 'poweroff'])
     call(['VBoxManage', 'unregistervm', name, '--delete'])
+
+
+def _create_vm(name):
+    _remove_vm(name)
     logger.debug("Create template %s.", name)
     check_call(['VBoxManage', 'createvm', '--name', name, '--register'])
     check_call(['VBoxManage', 'modifyvm', name, '--description', 'For testing purposes. Can be deleted.'])
@@ -23,7 +27,7 @@ def _create_vm(name):
 
 @pytest.fixture(scope='session')
 def template():
-    """Create VM without tested class."""
+    """Create Machine without tested class."""
     vm = name_format.format('template')
     _create_vm(vm)
     vm_snapshot = 'test template'
@@ -76,6 +80,18 @@ def test_clone(hypervisor, clone_name, clone_configuration):
 
 def test_power(hypervisor, dummy):
     hypervisor.power_on(dummy)
-    assert wait_until(lambda: hypervisor.find(dummy).is_running, name='until VM get started')
+    wait_for_true(lambda: hypervisor.find(dummy).is_running, 'Machine {} is running'.format(dummy))
     hypervisor.power_off(dummy)
-    assert wait_until(lambda: not hypervisor.find(dummy).is_running, name='until VM get shut down')
+    wait_for_true(lambda: not hypervisor.find(dummy).is_running, 'Machine {} is not running'.format(dummy))
+
+
+def test_list(hypervisor):
+    names = [
+        name_format.format('test_list-{}'.format(index))
+        for index in range(3)]
+    for name in names:
+        _create_vm(name)
+    assert set(names) <= set(hypervisor.list_vm_names())
+    for name in names:
+        _remove_vm(name)
+    assert not set(names) & set(hypervisor.list_vm_names())

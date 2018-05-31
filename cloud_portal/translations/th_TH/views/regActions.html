@@ -1,7 +1,7 @@
 <ng-include ng-if="!register.success && !registerSuccess && session.fromClient" src="$root.C.viewsDir + 'static/register-intro.html'"></ng-include>
 <div class="container auth-hidden">
     <h1 class="process-success" ng-if="(register.success || registerSuccess) && !activated">
-        Account is created. <br>Confirmation message is sent to <br>{{account.email}}
+        สร้างบัญชีแล้ว <br> ข้อความยืนยันจะถูกส่งไปที่ <br>{{account.email}}
     </h1>
 
     <h1 class="process-success" ng-if="(register.success || registerSuccess) && activated">
@@ -24,7 +24,7 @@
  name="firstName" autocomplete="off" autofocus>
             </div>
             <div class="col-sm-4">
-                <span class="help-block" ng-if="registerForm.firstName.$touched && registerForm.firstName.$error.required">First name is required</span>
+                <span class="help-block" ng-if="registerForm.firstName.$touched && registerForm.firstName.$error.required">ต้องระบุชื่อ</span>
             </div>
         </div>
         <div class="form-group" validate-field>
@@ -35,7 +35,7 @@
  name="lastName" autocomplete="off">
             </div>
             <div class="col-sm-4">
-                <span class="help-block" ng-if="registerForm.lastName.$touched && registerForm.lastName.$error.required">Last name is required</span>
+                <span class="help-block" ng-if="registerForm.lastName.$touched && registerForm.lastName.$error.required">ต้องระบุนามสกุล</span>
             </div>
         </div>
         <div class="form-group" validate-field>
@@ -49,11 +49,11 @@
                        class="form-control" ng-model="account.email" readonly>
             </div>
             <div class="col-sm-4">
-                <div><span class="help-block" ng-if="registerForm.registerEmail.$touched && registerForm.registerEmail.$error.required">Email is required</span></div>
+                <div><span class="help-block" ng-if="registerForm.registerEmail.$touched && registerForm.registerEmail.$error.required">กรุณาป้อนอีเมล</span></div>
 
-                <div><span class="help-block" ng-if="registerForm.registerEmail.$touched && registerForm.registerEmail.$error.email">Please, enter a valid Email</span></div>
+                <div><span class="help-block" ng-if="registerForm.registerEmail.$touched && registerForm.registerEmail.$error.email">โปรดป้อนอีเมลที่ถูกต้อง</span></div>
 
-                <div><span class="help-block" ng-if="registerForm.registerEmail.$error.alreadyExists">This Email has been already registered in {{PRODUCT_NAME}}</span></div>
+                <div><span class="help-block" ng-if="registerForm.registerEmail.$error.alreadyExists">อีเมลนี้ได้รับการลงทะเบียนไว้แล้วใน %PRODUCT_NAME%</span></div>
             </div>
         </div>
         <password-input ng-model="account.password" id="'registerPassword'" label="$root.L.regActions.passwordLabel"></password-input>
@@ -71,8 +71,8 @@
                                 class="pull-left"
                                 button-text="$root.L.regActions.createAccount"></process-button>
                 <div class="small conditions-note">
-                    By clicking "Create Account", you agree to
-                    <div><a href="/content/eula" target="_blank">Terms and Conditions</a></div>
+                    การคลิก "สร้างบัญชี" หมายความว่าคุณยอมรับ
+                    <div><a href="/content/eula" target="_blank">ข้อกำหนดและเงื่อนไข</a></div>
                 </div>
             </div>
         </div>

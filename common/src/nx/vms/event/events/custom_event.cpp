@@ -16,7 +16,7 @@ CustomEvent::CustomEvent(
     const QString& description,
     EventMetaData metadata)
     :
-    base_type(userDefinedEvent, QnResourcePtr(), toggleState, timeStamp),
+    base_type(EventType::userDefinedEvent, QnResourcePtr(), toggleState, timeStamp),
     m_resourceName(resourceName),
     m_caption(caption),
     m_description(description),

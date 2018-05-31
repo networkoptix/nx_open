@@ -346,7 +346,7 @@ void WidgetAnalyticsController::Private::updateObjectAreas(qint64 timestamp)
                 {
                     item.zoomRect = zoomWindowRectangle(areaInfo.rectangle);
                     qnResourceRuntimeDataManager->setLayoutItemData(
-                        item.uuid, Qn::ItemAnalyticsModeSourceRegionRole, objectInfo.rectangle);
+                        item.uuid, Qn::ItemAnalyticsModeSourceRegionRole, areaInfo.rectangle);
                     layout->updateItem(item);
                 }
             }

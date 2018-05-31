@@ -5,8 +5,6 @@
 #include <QtCore/QSize>
 #include <QtCore/QMap>
 
-#include "abstract_resource_allocator.h"
-
 namespace nx {
 namespace media {
 
@@ -21,7 +19,6 @@ public:
      * @param liteMode Whether the library is used in Mobile Client in Lite mode.
      */
     static void registerDecoders(
-        std::shared_ptr<AbstractResourceAllocator> allocator,
         const QMap<int, QSize>& maxFfmpegResolutions,
         bool isTranscodingEnabled);
 };

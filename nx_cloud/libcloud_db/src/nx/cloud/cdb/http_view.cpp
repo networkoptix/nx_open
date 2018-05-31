@@ -35,7 +35,7 @@ HttpView::HttpView(
         &controller->systemHealthInfoProvider(),
         &controller->authProvider(),
         &controller->eventManager(),
-        &controller->ec2SyncronizationEngine().connectionManager(),
+        &controller->ec2SyncronizationEngine(),
         &controller->maintenanceManager(),
         controller->cloudModuleUrlProviderDeprecated(),
         controller->cloudModuleUrlProvider());
@@ -96,7 +96,7 @@ void HttpView::registerApiHandlers(
     AbstractSystemHealthInfoProvider* const systemHealthInfoProvider,
     AuthenticationProvider* const authProvider,
     EventManager* const /*eventManager*/,
-    ec2::ConnectionManager* const ec2ConnectionManager,
+    data_sync_engine::SyncronizationEngine* const ec2SyncronizationEngine,
     MaintenanceManager* const maintenanceManager,
     const CloudModuleUrlProvider& cloudModuleUrlProviderDeprecated,
     const CloudModuleUrlProvider& cloudModuleUrlProvider)
@@ -230,29 +230,11 @@ void HttpView::registerApiHandlers(
         EntityType::account, DataActionType::fetch);
 
     //---------------------------------------------------------------------------------------------
-    // ec2::ConnectionManager
-    // TODO: #ak remove after 3.0 release.
-    registerHttpHandler(
-        kDeprecatedEstablishEc2TransactionConnectionPath,
-        &ec2::ConnectionManager::createTransactionConnection,
-        ec2ConnectionManager);
+    ec2SyncronizationEngine->registerHttpApi(
+        kEc2TransactionConnectionPathPrefix, &m_httpMessageDispatcher);
 
-    registerHttpHandler(
-        kEstablishEc2TransactionConnectionPath,
-        &ec2::ConnectionManager::createTransactionConnection,
-        ec2ConnectionManager);
-
-    registerHttpHandler(
-        nx::network::http::Method::get,
-        kEstablishEc2P2pTransactionConnectionPath,
-        &ec2::ConnectionManager::createWebsocketTransactionConnection,
-        ec2ConnectionManager);
-
-    registerHttpHandler(
-        //api::kPushEc2TransactionPath,
-        nx::network::http::kAnyPath.toStdString().c_str(), //< Dispatcher does not support max prefix by now.
-        &ec2::ConnectionManager::pushTransaction,
-        ec2ConnectionManager);
+    ec2SyncronizationEngine->registerHttpApi(
+        kDeprecatedEc2TransactionConnectionPathPrefix, &m_httpMessageDispatcher);
 
     //---------------------------------------------------------------------------------------------
     // MaintenanceManager
@@ -276,6 +258,15 @@ void HttpView::registerApiHandlers(
 
     m_httpMessageDispatcher.registerRequestProcessor<http_handler::GetCloudModulesXml>(
         kDeprecatedCloudModuleXmlPath,
+        [&authorizationManager, &cloudModuleUrlProviderDeprecated]()
+            -> std::unique_ptr<http_handler::GetCloudModulesXml>
+        {
+            return std::make_unique<http_handler::GetCloudModulesXml>(
+                std::bind(&CloudModuleUrlProvider::getCloudModulesXml, cloudModuleUrlProviderDeprecated, _1));
+        });
+
+    m_httpMessageDispatcher.registerRequestProcessor<http_handler::GetCloudModulesXml>(
+        kAnotherDeprecatedCloudModuleXmlPath,
         [&authorizationManager, &cloudModuleUrlProviderDeprecated]()
             -> std::unique_ptr<http_handler::GetCloudModulesXml>
         {
@@ -352,40 +343,6 @@ void HttpView::registerHttpHandler(
                 m_controller->authorizationManager(),
                 std::bind(managerFunc, manager, _1, _2));
         });
-}
-
-template<typename ManagerType>
-void HttpView::registerHttpHandler(
-    const char* handlerPath,
-    typename CustomHttpHandler<ManagerType>::ManagerFuncType managerFuncPtr,
-    ManagerType* manager)
-{
-    typedef CustomHttpHandler<ManagerType> RequestHandlerType;
-
-    m_httpMessageDispatcher.registerRequestProcessor<RequestHandlerType>(
-        handlerPath,
-        [managerFuncPtr, manager]() -> std::unique_ptr<RequestHandlerType>
-        {
-            return std::make_unique<RequestHandlerType>(manager, managerFuncPtr);
-        });
-}
-
-template<typename ManagerType>
-void HttpView::registerHttpHandler(
-    nx::network::http::Method::ValueType method,
-    const char* handlerPath,
-    typename CustomHttpHandler<ManagerType>::ManagerFuncType managerFuncPtr,
-    ManagerType* manager)
-{
-    typedef CustomHttpHandler<ManagerType> RequestHandlerType;
-
-    m_httpMessageDispatcher.registerRequestProcessor<RequestHandlerType>(
-        handlerPath,
-        [managerFuncPtr, manager]() -> std::unique_ptr<RequestHandlerType>
-        {
-            return std::make_unique<RequestHandlerType>(manager, managerFuncPtr);
-        },
-        method);
 }
 
 namespace {

@@ -61,11 +61,17 @@ void AccountManager::authenticateByName(
     nx::utils::stree::ResourceContainer* const authProperties,
     nx::utils::MoveOnlyFunc<void(api::ResultCode)> completionHandler)
 {
+    api::ResultCode accountAuthResult = api::ResultCode::notAuthorized;
+
     {
         QnMutexLocker lk(&m_mutex);
 
-        auto account = m_cache.find(toStdString(username));
-        if (account && validateHa1Func(account->passwordHa1.c_str()))
+        const auto account = m_cache.find(toStdString(username));
+        if (!account)
+        {
+            accountAuthResult = api::ResultCode::badUsername;
+        }
+        else if (validateHa1Func(account->passwordHa1.c_str()))
         {
             authProperties->put(
                 cdb::attr::authAccountEmail,
@@ -84,10 +90,11 @@ void AccountManager::authenticateByName(
         std::move(validateHa1Func),
         authSearchInputData,
         authProperties,
-        [username, authProperties, completionHandler = std::move(completionHandler), this](
-            api::ResultCode authResult) mutable
+        [this, username, authProperties, accountAuthResult,
+            completionHandler = std::move(completionHandler)](
+                api::ResultCode tempPwdAuthResult) mutable
         {
-            if (authResult == api::ResultCode::ok)
+            if (tempPwdAuthResult == api::ResultCode::ok)
             {
                 const auto authenticatedByEmailCode =
                     authProperties->get<bool>(attr::authenticatedByEmailCode);
@@ -105,7 +112,16 @@ void AccountManager::authenticateByName(
                         });
                 }
             }
-            completionHandler(authResult);
+
+            if (tempPwdAuthResult == api::ResultCode::badUsername)
+            {
+                return completionHandler(
+                    accountAuthResult == api::ResultCode::badUsername
+                    ? api::ResultCode::badUsername
+                    : api::ResultCode::notAuthorized);
+            }
+
+            completionHandler(tempPwdAuthResult);
         });
 }
 
@@ -204,7 +220,7 @@ void AccountManager::updateAccount(
                 data::AccountUpdateDataWithEmail accountData)
         {
             if (resultCode == nx::utils::db::DBResult::ok)
-                updateAccountCache(authenticatedByEmailCode, std::move(accountData));
+                updateAccountCache(std::move(accountData));
             completionHandler(dbResultToApiResult(resultCode));
         };
 
@@ -287,14 +303,14 @@ void AccountManager::reactivateAccount(
 
     using namespace std::placeholders;
     m_dbManager->executeUpdate<std::string, data::AccountConfirmationCode>(
-        [this, notification = std::move(notification)](
+        [this, notification = std::move(notification), account = *existingAccount](
             nx::utils::db::QueryContext* const queryContext,
-            const std::string& accountEmail,
+            const std::string& /*accountEmail*/,
             data::AccountConfirmationCode* const resultData) mutable
         {
             return issueAccountActivationCode(
                 queryContext,
-                accountEmail,
+                account,
                 std::move(notification),
                 resultData);
         },
@@ -455,10 +471,21 @@ nx::utils::db::DBResult AccountManager::fetchAccountByEmail(
     const std::string& accountEmail,
     data::AccountData* const accountData)
 {
-    return m_dao->fetchAccountByEmail(
-        queryContext,
-        accountEmail,
-        accountData);
+    try
+    {
+        auto account = m_dao->fetchAccountByEmail(
+            queryContext,
+            accountEmail);
+        if (!account)
+            return nx::utils::db::DBResult::notFound;
+
+        *accountData = *account;
+        return nx::utils::db::DBResult::ok;
+    }
+    catch (nx::utils::db::Exception e)
+    {
+        return e.dbResult();
+    }
 }
 
 nx::utils::db::DBResult AccountManager::createPasswordResetCode(
@@ -558,7 +585,7 @@ nx::utils::db::DBResult AccountManager::fillCache()
 nx::utils::db::DBResult AccountManager::fetchAccounts(
     nx::utils::db::QueryContext* queryContext)
 {
-    std::vector<data::AccountData> accounts;
+    std::vector<api::AccountData> accounts;
     auto dbResult = m_dao->fetchAccounts(queryContext, &accounts);
     if (dbResult != nx::utils::db::DBResult::ok)
         return dbResult;
@@ -580,45 +607,37 @@ nx::utils::db::DBResult AccountManager::registerNewAccountInDb(
     const data::AccountData& accountData,
     data::AccountConfirmationCode* const confirmationCode)
 {
-    data::AccountData existingAccount;
-    auto dbResult = fetchAccountByEmail(
+    auto existingAccount = m_dao->fetchAccountByEmail(
         queryContext,
-        accountData.email,
-        &existingAccount);
-    if (dbResult != nx::utils::db::DBResult::ok &&
-        dbResult != nx::utils::db::DBResult::notFound)
-    {
-        NX_LOGX(lm("Failed to fetch account by email %1").arg(accountData.email), cl_logDEBUG1);
-        return dbResult;
-    }
+        accountData.email);
 
-    if (dbResult == nx::utils::db::DBResult::ok)
+    if (existingAccount)
     {
-        if (existingAccount.statusCode != api::AccountStatus::invited)
+        if (existingAccount->statusCode != api::AccountStatus::invited)
         {
             NX_LOG(lm("Failed to add account with already used email %1, status %2").
-                arg(accountData.email).arg(QnLexical::serialized(existingAccount.statusCode)),
+                arg(accountData.email).arg(QnLexical::serialized(existingAccount->statusCode)),
                 cl_logDEBUG1);
             return nx::utils::db::DBResult::uniqueConstraintViolation;
         }
 
-        existingAccount.statusCode = api::AccountStatus::awaitingActivation;
+        existingAccount->statusCode = api::AccountStatus::awaitingActivation;
         // Merging existing account with new one.
-        auto accountIdBak = std::move(existingAccount.id);
+        auto accountIdBak = std::move(existingAccount->id);
         existingAccount = accountData;
-        existingAccount.id = std::move(accountIdBak);
+        existingAccount->id = std::move(accountIdBak);
 
-        dbResult = updateAccount(queryContext, std::move(existingAccount));
+        auto dbResult = updateAccount(queryContext, std::move(*existingAccount));
         if (dbResult != nx::utils::db::DBResult::ok)
         {
             NX_LOGX(lm("Failed to update existing account %1")
-                .arg(existingAccount.email), cl_logDEBUG1);
+                .arg(accountData.email), cl_logDEBUG1);
             return dbResult;
         }
     }
-    else if (dbResult == nx::utils::db::DBResult::notFound)
+    else //< !existingAccount
     {
-        dbResult = insertAccount(queryContext, accountData);
+        auto dbResult = insertAccount(queryContext, accountData);
         if (dbResult != nx::utils::db::DBResult::ok)
         {
             NX_LOGX(lm("Failed to insert new account. Email %1")
@@ -626,30 +645,25 @@ nx::utils::db::DBResult AccountManager::registerNewAccountInDb(
             return dbResult;
         }
     }
-    else
-    {
-        NX_ASSERT(false);
-        return nx::utils::db::DBResult::ioError;
-    }
 
     auto notification = std::make_unique<ActivateAccountNotification>();
     notification->customization = accountData.customization;
     return issueAccountActivationCode(
         queryContext,
-        accountData.email,
+        accountData,
         std::move(notification),
         confirmationCode);
 }
 
 nx::utils::db::DBResult AccountManager::issueAccountActivationCode(
     nx::utils::db::QueryContext* const queryContext,
-    const std::string& accountEmail,
+    const data::AccountData& account,
     std::unique_ptr<AbstractActivateAccountNotification> notification,
     data::AccountConfirmationCode* const resultData)
 {
     auto verificationCode = m_dao->getVerificationCodeByAccountEmail(
         queryContext,
-        accountEmail);
+        account.email);
     if (verificationCode)
     {
         resultData->code = *verificationCode;
@@ -660,11 +674,11 @@ nx::utils::db::DBResult AccountManager::issueAccountActivationCode(
             nx::utils::timeSinceEpoch() +
                 m_settings.accountManager().accountActivationCodeExpirationTimeout;
         const auto emailVerificationCode =
-            generateAccountActivationCode(queryContext, accountEmail, codeExpirationTime);
+            generateAccountActivationCode(queryContext, account.email, codeExpirationTime);
 
         m_dao->insertEmailVerificationCode(
             queryContext,
-            accountEmail,
+            account.email,
             emailVerificationCode,
             QDateTime::fromTime_t(codeExpirationTime.count()));
 
@@ -672,7 +686,8 @@ nx::utils::db::DBResult AccountManager::issueAccountActivationCode(
     }
 
     notification->setActivationCode(resultData->code);
-    notification->setAddressee(accountEmail);
+    notification->setFullName(account.fullName);
+    notification->setAddressee(account.email);
     queryContext->transaction()->addOnSuccessfulCommitHandler(
         [this, notification = std::move(notification)]()
         {
@@ -764,17 +779,16 @@ nx::utils::db::DBResult AccountManager::verifyAccount(
     if (dbResult != nx::utils::db::DBResult::ok)
         return dbResult;
 
-    data::AccountData account;
-    dbResult = m_dao->fetchAccountByEmail(queryContext, accountEmail, &account);
-    if (dbResult != nx::utils::db::DBResult::ok)
-        return dbResult;
+    auto account = m_dao->fetchAccountByEmail(queryContext, accountEmail);
+    if (!account)
+        return nx::utils::db::DBResult::ok;
 
     // TODO: #ak Have to call some method like afterChangingAccountStatus -
     // will do it in default branch to minimize this change.
     m_extensions.invoke(
         &AbstractAccountManagerExtension::afterUpdatingAccountPassword,
         queryContext,
-        account);
+        *account);
 
     queryContext->transaction()->addOnSuccessfulCommitHandler(
         std::bind(&AccountManager::activateAccountInCache, this,
@@ -818,8 +832,29 @@ nx::utils::db::DBResult AccountManager::updateAccountInDb(
     m_dao->updateAccount(
         queryContext,
         accountUpdateData.email,
-        accountUpdateData,
-        activateAccountIfNotActive);
+        accountUpdateData);
+
+    if (activateAccountIfNotActive)
+    {
+        auto account = m_dao->fetchAccountByEmail(queryContext, accountUpdateData.email);
+        if (!account)
+            return nx::utils::db::DBResult::notFound;
+
+        if (account->statusCode != api::AccountStatus::activated)
+        {
+            const auto activationTime = nx::utils::utcTime();
+            const auto dbResult = m_dao->updateAccountToActiveStatus(
+                queryContext,
+                accountUpdateData.email,
+                activationTime);
+            if (dbResult != nx::utils::db::DBResult::ok)
+                return dbResult;
+
+            queryContext->transaction()->addOnSuccessfulCommitHandler(
+                std::bind(&AccountManager::activateAccountInCache, this,
+                    accountUpdateData.email, activationTime));
+        }
+    }
 
     if (accountUpdateData.passwordHa1 || accountUpdateData.passwordHa1Sha256)
     {
@@ -829,15 +864,14 @@ nx::utils::db::DBResult AccountManager::updateAccountInDb(
         if (dbResult != nx::utils::db::DBResult::ok)
             return dbResult;
 
-        data::AccountData account;
-        dbResult = m_dao->fetchAccountByEmail(queryContext, accountUpdateData.email, &account);
-        if (dbResult != nx::utils::db::DBResult::ok)
-            return dbResult;
+        auto account = m_dao->fetchAccountByEmail(queryContext, accountUpdateData.email);
+        if (!account)
+            return nx::utils::db::DBResult::notFound;
 
         m_extensions.invoke(
             &AbstractAccountManagerExtension::afterUpdatingAccountPassword,
             queryContext,
-            account);
+            *account);
     }
 
     m_extensions.invoke(
@@ -867,12 +901,11 @@ bool AccountManager::isValidInput(const data::AccountUpdateDataWithEmail& accoun
 }
 
 void AccountManager::updateAccountCache(
-    bool activateAccountIfNotActive,
     data::AccountUpdateDataWithEmail accountData)
 {
     m_cache.atomicUpdate(
         accountData.email,
-        [&accountData, activateAccountIfNotActive](api::AccountData& account)
+        [&accountData](api::AccountData& account)
         {
             if (accountData.passwordHa1)
                 account.passwordHa1 = accountData.passwordHa1.get();
@@ -882,8 +915,6 @@ void AccountManager::updateAccountCache(
                 account.fullName = accountData.fullName.get();
             if (accountData.customization)
                 account.customization = accountData.customization.get();
-            if (activateAccountIfNotActive)
-                account.statusCode = api::AccountStatus::activated;
         });
 
     if (accountData.passwordHa1 || accountData.passwordHa1Sha256)

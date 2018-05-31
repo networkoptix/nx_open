@@ -14,6 +14,7 @@ function(_nx_create_vms_configuration)
 
     set(content "def cmake_to_bool(value): return value.lower() in ('on', 'true')\n\n")
     string(APPEND content "PACKAGES_DIR = '${PACKAGES_DIR}'\n")
+    string(APPEND content "rdepSync = cmake_to_bool('${rdepSync}')\n")
     string(APPEND content "prefer_debug_packages = ${prefer_debug_packages}\n")
     string(APPEND content "cmake_include_file = '${CMAKE_BINARY_DIR}/dependencies.cmake'\n")
     string(APPEND content "platform = '${platform}'\n")
@@ -74,3 +75,37 @@ foreach(package_dir ${synched_package_dirs})
 endforeach()
 
 file(TO_CMAKE_PATH "${QT_DIR}" QT_DIR)
+
+function(copy_linux_cpp_runtime)
+    execute_process(COMMAND
+        ${PYTHON_EXECUTABLE} ${CMAKE_SOURCE_DIR}/build_utils/linux/copy_system_library.py
+            --compiler ${CMAKE_CXX_COMPILER}
+            --flags "${CMAKE_CXX_FLAGS}"
+            --dest-dir ${CMAKE_LIBRARY_OUTPUT_DIRECTORY}
+            --list
+            ${cpp_runtime_libs}
+        RESULT_VARIABLE result
+        OUTPUT_VARIABLE output
+    )
+
+    if(NOT result EQUAL 0)
+        message(FATAL_ERROR "Cannot copy C++ runtime libraries.")
+    endif()
+
+    nx_split_string(files "${output}")
+    nx_store_known_files(${files})
+endfunction()
+
+if(LINUX)
+    set(cpp_runtime_libs libstdc++.so.6 libatomic.so.1 libgcc_s.so.1)
+
+    if(arch MATCHES "x64|x86")
+        if(arch STREQUAL "x64")
+            list(APPEND cpp_runtime_libs libmvec.so.1)
+        endif()
+
+        copy_linux_cpp_runtime()
+    endif()
+
+    string(REPLACE ";" " " cpp_runtime_libs_string "${cpp_runtime_libs}")
+endif()

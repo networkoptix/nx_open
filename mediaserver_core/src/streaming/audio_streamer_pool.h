@@ -41,7 +41,7 @@ private:
     QString calcActionUniqueKey(const nx::vms::event::AbstractActionPtr& action) const;
 
     QnVideoCameraPtr getTransmitSource(const QString& sourceId) const;
-    QSharedPointer<nx::mediaserver::resource::Camera> getTransmitDestination(const QnUuid& resourceId) const;
+    nx::mediaserver::resource::CameraPtr getTransmitDestination(const QnUuid& resourceId) const;
 private:
     QnMutex m_prolongedProvidersMutex;
     QMap<QString, QnAbstractStreamDataProviderPtr> m_actionDataProviders;

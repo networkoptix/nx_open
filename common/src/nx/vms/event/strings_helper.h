@@ -76,7 +76,7 @@ public:
 	QString eventTimestampTime(const EventParameters &params) const;
 	QString eventTimestampDate(const EventParameters &params) const;
 
-    QString eventTimestampShort(const EventParameters &params, int aggregationCount) const;
+    QString eventTimestampInHtml(const EventParameters &params, int aggregationCount) const;
 
 
 	QString getResoureNameFromParams(const EventParameters& params,
