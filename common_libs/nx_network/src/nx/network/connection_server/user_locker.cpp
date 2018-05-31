@@ -1,5 +1,7 @@
 #include "user_locker.h"
 
+#include <nx/utils/time.h>
+
 namespace nx {
 namespace network {
 namespace server {
@@ -14,7 +16,7 @@ UserLocker::UserLocker(
 
 void UserLocker::updateLockoutState(AuthResult authResult)
 {
-    const auto now = std::chrono::steady_clock::now();
+    const auto now = nx::utils::monotonicTime();
 
     // If there is an expired lock, resetting.
     if (m_userLockedUntil && *m_userLockedUntil <= now)
@@ -37,7 +39,8 @@ void UserLocker::updateLockoutState(AuthResult authResult)
 
 bool UserLocker::isLocked() const
 {
-    return m_userLockedUntil && (*m_userLockedUntil > std::chrono::steady_clock::now());
+    return m_userLockedUntil
+        && (*m_userLockedUntil > nx::utils::monotonicTime());
 }
 
 //-------------------------------------------------------------------------------------------------
