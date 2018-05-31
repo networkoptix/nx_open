@@ -10,6 +10,8 @@ _logger = logging.getLogger(__name__)
 
 
 class WindowsInstallation(Installation):
+    """Manage installation on Windows"""
+
     def __init__(self, windows_access, installer):
         self.installer = installer  # type: Installer
         program_files_dir = windows_access.Path(windows_access.winrm.user_env_vars()['ProgramFiles'])
