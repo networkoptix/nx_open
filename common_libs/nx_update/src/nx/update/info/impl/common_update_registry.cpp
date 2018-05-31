@@ -1056,6 +1056,9 @@ void CommonUpdateRegistry::merge(AbstractUpdateRegistry* other)
             for (const auto& otherCustomizationData:
                 otherCommonUpdateRegistry->m_metaData.customizationDataList)
             {
+                if (otherCustomizationData.versions.isEmpty() || customizationData.versions.isEmpty())
+                    continue;
+
                 if (otherCustomizationData.name == customizationData.name
                     && otherCustomizationData.versions.last() > customizationData.versions.last())
                 {
