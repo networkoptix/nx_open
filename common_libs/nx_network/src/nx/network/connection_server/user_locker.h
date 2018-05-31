@@ -14,9 +14,9 @@ namespace server {
 
 struct UserLockerSettings
 {
-    std::chrono::milliseconds checkPeriod;
-    int authFailureCount = 0;
-    std::chrono::milliseconds lockPeriod;
+    std::chrono::milliseconds checkPeriod = std::chrono::minutes(5);
+    int authFailureCount = 10;
+    std::chrono::milliseconds lockPeriod = std::chrono::minutes(1);
 };
 
 /**

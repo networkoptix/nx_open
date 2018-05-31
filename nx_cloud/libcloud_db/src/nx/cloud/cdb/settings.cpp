@@ -113,17 +113,18 @@ const QLatin1String kLoginLockoutEnabled("loginLockout/enabled");
 constexpr bool kDefaultLoginLockoutEnabled = false;
 
 const QLatin1String kLoginLockoutCheckPeriod("loginLockout/checkPeriod");
-constexpr std::chrono::milliseconds kDefaultLoginLockoutCheckPeriod = std::chrono::minutes(5);
+const std::chrono::milliseconds kDefaultLoginLockoutCheckPeriod =
+    nx::network::server::UserLockerSettings().checkPeriod;
 
 const QLatin1String kLoginLockoutAuthFailureCount("loginLockout/authFailureCount");
-constexpr int kDefaultLoginLockoutAuthFailureCount = 10;
+constexpr int kDefaultLoginLockoutAuthFailureCount =
+    nx::network::server::UserLockerSettings().authFailureCount;
 
 const QLatin1String kLoginLockoutLockPeriod("loginLockout/lockPeriod");
-constexpr std::chrono::milliseconds kDefaultLoginLockoutLockPeriod = std::chrono::minutes(1);
-
+constexpr std::chrono::milliseconds kDefaultLoginLockoutLockPeriod =
+    nx::network::server::UserLockerSettings().lockPeriod;
 
 } // namespace
-
 
 namespace nx {
 namespace cdb {
