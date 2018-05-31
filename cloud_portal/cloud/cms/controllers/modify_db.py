@@ -1,15 +1,16 @@
 from datetime import datetime
 
-from notifications.api import send
+from ...notifications.api import send
 from django.contrib.auth.models import Permission
 from django.db.models import Q
+from django.conf import settings
 
 from PIL import Image
 import base64, re, uuid
 
 from .filldata import fill_content
-from api.models import Account
-from cms.models import *
+from ...api.models import Account
+from ..models import *
 
 
 def accept_latest_draft(customization, version_id, user):
@@ -56,38 +57,11 @@ def save_unrevisioned_records(context, customization, language, data_structures,
                 or data_structure.type == DataStructure.DATA_TYPES.file:
             # If a file has been uploaded try to save it
             if data_structure_name in request_files and request_files[data_structure_name]:
-                new_record_value, meta, invalid_file_type = handle_file_upload(
-                    request_files[data_structure_name], data_structure)
-
-                if invalid_file_type:
-                    error_msg = "Invalid file type. Uploaded file is {}. It should be {}."\
-                             .format(request_files[data_structure_name].content_type,
-                                     data_structure.meta_settings['format'].replace(',', ' or '))
-                    if not meta:
-                        error_msg = "Image is damaged please upload an undamaged version"
-                    upload_errors.append((data_structure_name, error_msg))
-
+                new_record_value, file_errors = upload_file(data_structure, request_files[data_structure_name])
+                if file_errors:
+                    upload_errors.extend(file_errors)
                     continue
 
-                # Gets the meta_settings form the DataStructure to check if the sizes are valid
-                # if the length is zero then there is no meta settings
-                if len(data_structure.meta_settings):
-                    size_errors = None
-                    if data_structure.type == DataStructure.DATA_TYPES.image:
-                        size_errors = check_image_dimensions(
-                            data_structure_name,
-                            data_structure.meta_settings,
-                            meta)
-
-                    elif data_structure.type == DataStructure.DATA_TYPES.file:
-                        if 'file_size' in meta\
-                                and request_files[data_structure_name].size/1048576 > meta['file_size']:
-                            size_errors = (data_structure_name, 'File size is {} it should be less than {}'\
-                                           .format(request_data[data_structure_name].size,
-                                                   meta['file_size']))
-                    if size_errors:
-                        upload_errors.extend(size_errors)
-                        continue
             # If neither case do nothing for this record
             elif not data_structure.optional or 'delete_' + data_structure_name not in request_data:
                 continue
@@ -101,16 +75,15 @@ def save_unrevisioned_records(context, customization, language, data_structures,
 
             # if its option and not a valid guid set error message and go to next DataStructure
             if new_record_value and not is_guid:
-                upload_errors.append((data_structure_name, 'Invalid GUID {} it should formatted like {}'\
-                                           .format(new_record_value,
-                                                   "{XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXX}")))
+                upload_errors.append((data_structure_name, 'Invalid GUID {} it should formatted like {}'
+                                      .format(new_record_value, "{XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXX}")))
                 continue
 
             # no guid submitted or default value and is not optional generate a guid
-            elif not data_structure.optional and not new_record_value: # and not data_structure.default:
+            elif not data_structure.optional and not new_record_value:  # and not data_structure.default:
                 new_record_value = '{' + str(uuid.uuid4()) + '}'
                 upload_errors.append((data_structure_name,
-                                      'No submitted GUID or default value. GUID has been generated.' \
+                                      'No submitted GUID or default value. GUID has been generated.'
                                       .format(new_record_value)))
 
         elif data_structure_name in request_data:
@@ -218,9 +191,8 @@ def send_version_for_review(context, customization, language, data_structures,
                              product=product, created_by=user)
     version.save()
 
-    upload_errors = save_unrevisioned_records(context,
-        customization, language, data_structures,
-        request_data, request_files, user, version_id=version.id)
+    upload_errors = save_unrevisioned_records(context, customization, language, data_structures,
+                                              request_data, request_files, user, version_id=version.id)
 
     update_records_to_version(Context.objects.filter(
         product=product), customization, version)
@@ -250,26 +222,61 @@ def is_not_valid_file_type(file_type, meta_types):
     return True
 
 
-def handle_file_upload(file, data_structure):
+def upload_file(data_structure, file):
+    file_errors = []
+    encoded_file = None
+    file_dimensions = None
+    file_size = file.size / 1048576
+    if file_size >= settings.CMS_MAX_FILE_SIZE:
+        file_errors.append((data_structure.name, 'Its size was {}MB but must be less than {} MB'
+                            .format(file_size, settings.CMS_MAX_FILE_SIZE)))
+        return None, file_errors
+
+    try:
+        formats = []
+        if 'format' in data_structure.meta_settings:
+            formats = data_structure.meta_settings['format']
+        encoded_file, file_dimensions = encode_file(file, data_structure.type, formats)
+    except (IOError, TypeError):
+        file_errors.append((data_structure.name, "Image is damaged please upload an valid version"))
+
+    if not encoded_file:
+        error_msg = "Invalid file type. Uploaded file is {}. It should be {}." \
+            .format(file.content_type,
+                    data_structure.meta_settings['format'].replace(',', ' or '))
+        file_errors.append((data_structure.name, error_msg))
+
+    # Gets the meta_settings form the DataStructure to check if the sizes are valid
+    # if the length is zero then there is no meta settings
+    if encoded_file and len(data_structure.meta_settings):
+        if data_structure.type == DataStructure.DATA_TYPES.image:
+            file_errors = check_image_dimensions(data_structure.name, data_structure.meta_settings, file_dimensions)
+
+        elif data_structure.type == DataStructure.DATA_TYPES.file:
+            if 'file_size' in data_structure.meta_settings \
+                    and file_size > data_structure.meta_settings['file_size']:
+                file_errors.append((data_structure.name, 'File size is {} it should be less than {}'
+                                    .format(file_size, data_structure.meta_settings['file_size'])))
+    if file_errors:
+        return None, file_errors
+
+    return encoded_file, []
+
+
+def encode_file(file, data_structure_type, valid_formats):
     encoded_string = base64.b64encode(file.read())
     file_type = file.content_type
+    file_dimensions = None
 
-    if 'format' in data_structure.meta_settings and\
-            is_not_valid_file_type(file_type.lower(), data_structure.meta_settings['format']):
-        return None, True, True
+    if valid_formats and is_not_valid_file_type(file_type.lower(), valid_formats):
+        return None, None
 
-    if data_structure.type == DataStructure.DATA_TYPES.image:
-        try:
-            newImage = Image.open(file)
-            width, height = newImage.size
-            meta = {'width': width, 'height': height}
-        except IOError:
-            # When returning false here we are saying that the file is damaged
-            return None, False, True
-    elif data_structure.type == DataStructure.DATA_TYPES.file:
-        meta = data_structure.meta_settings
+    if data_structure_type == DataStructure.DATA_TYPES.image:
+        new_image = Image.open(file)
+        width, height = new_image.size
+        file_dimensions = {'width': width, 'height': height}
 
-    return encoded_string, meta, False
+    return encoded_string, file_dimensions
 
 
 def check_image_dimensions(data_structure_name,
@@ -278,45 +285,33 @@ def check_image_dimensions(data_structure_name,
     if not meta_dimensions:
         return size_error_msgs
 
-    if 'height' in meta_dimensions and \
-                    meta_dimensions['height'] != image_dimensions['height']:
-        error_msg = "Image height must be equal to {}." \
-                    "Uploaded image's height is {}."\
+    if 'height' in meta_dimensions and meta_dimensions['height'] != image_dimensions['height']:
+        error_msg = "Image height must be equal to {}. Uploaded image's height is {}."\
             .format(meta_dimensions['height'], image_dimensions['height'])
         size_error_msgs.append((data_structure_name, error_msg))
 
-    if 'width' in meta_dimensions and \
-                    meta_dimensions['width'] != image_dimensions['width']:
-        error_msg = "Image width must be equal to {}." \
-                    "Uploaded image's width is {}."\
+    if 'width' in meta_dimensions and meta_dimensions['width'] != image_dimensions['width']:
+        error_msg = "Image width must be equal to {}. Uploaded image's width is {}."\
             .format(meta_dimensions['width'], image_dimensions['width'])
         size_error_msgs.append((data_structure_name, error_msg))
 
-    if 'height_le' in meta_dimensions and \
-                    meta_dimensions['height_le'] < image_dimensions['height']:
-        error_msg = "Image height must be equal to or less than {}." \
-                    "Uploaded image's height is {}."\
+    if 'height_le' in meta_dimensions and meta_dimensions['height_le'] < image_dimensions['height']:
+        error_msg = "Image height must be equal to or less than {}. Uploaded image's height is {}."\
             .format(meta_dimensions['height_le'], image_dimensions['height'])
         size_error_msgs.append((data_structure_name, error_msg))
 
-    if 'width_le' in meta_dimensions and \
-                    meta_dimensions['width_le'] < image_dimensions['width']:
-        error_msg = "Image width must be equal to or less than {}." \
-                    "Uploaded image's width is {}."\
+    if 'width_le' in meta_dimensions and meta_dimensions['width_le'] < image_dimensions['width']:
+        error_msg = "Image width must be equal to or less than {}. Uploaded image's width is {}."\
             .format(meta_dimensions['width_le'], image_dimensions['width'])
         size_error_msgs.append((data_structure_name, error_msg))
 
-    if 'height_ge' in meta_dimensions and \
-                    meta_dimensions['height_ge'] > image_dimensions['height']:
-        error_msg = "Image height must be equal to or more than {}." \
-                    "Uploaded image's height is {}."\
+    if 'height_ge' in meta_dimensions and meta_dimensions['height_ge'] > image_dimensions['height']:
+        error_msg = "Image height must be equal to or more than {}. Uploaded image's height is {}."\
             .format(meta_dimensions['height_ge'], image_dimensions['height'])
         size_error_msgs.append((data_structure_name, error_msg))
 
-    if 'width_ge' in meta_dimensions and \
-                    meta_dimensions['width_ge'] > image_dimensions['width']:
-        error_msg = "Image width must be equal to or more than {}." \
-                    "Uploaded image's width is {}." \
+    if 'width_ge' in meta_dimensions and meta_dimensions['width_ge'] > image_dimensions['width']:
+        error_msg = "Image width must be equal to or more than {}. Uploaded image's width is {}." \
             .format(meta_dimensions['width_ge'], image_dimensions['width'])
         size_error_msgs.append((data_structure_name, error_msg))
 
