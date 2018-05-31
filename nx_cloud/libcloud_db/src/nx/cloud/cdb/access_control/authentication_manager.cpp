@@ -37,7 +37,7 @@ namespace detail {
 
 AuthenticationHelper::AuthenticationHelper(
     const nx::network::http::AuthMethodRestrictionList& authRestrictionList,
-    network::server::UserLocker* userLocker,
+    network::server::UserLockerPool* userLocker,
     const nx::network::http::HttpServerConnection& connection,
     const nx::network::http::Request& request,
     nx::network::http::server::AuthenticationCompletionHandler handler)
@@ -338,7 +338,7 @@ AuthenticationManager::AuthenticationManager(
     m_authDataProviders(std::move(authDataProviders))
 {
     if (auto userLockerSettings = settings.loginLockout())
-        m_userLocker = std::make_unique<network::server::UserLocker>(*userLockerSettings);
+        m_userLocker = std::make_unique<network::server::UserLockerPool>(*userLockerSettings);
 }
 
 void AuthenticationManager::authenticate(

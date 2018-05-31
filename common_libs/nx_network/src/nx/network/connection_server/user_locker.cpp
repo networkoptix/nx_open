@@ -12,9 +12,7 @@ UserLocker::UserLocker(
 {
 }
 
-void UserLocker::updateLockoutState(
-    const Key& /*key*/,
-    AuthResult authResult)
+void UserLocker::updateLockoutState(AuthResult authResult)
 {
     const auto now = std::chrono::steady_clock::now();
 
@@ -37,9 +35,32 @@ void UserLocker::updateLockoutState(
     }
 }
 
-bool UserLocker::isLocked(const Key& /*key*/) const
+bool UserLocker::isLocked() const
 {
     return m_userLockedUntil && (*m_userLockedUntil > std::chrono::steady_clock::now());
+}
+
+//-------------------------------------------------------------------------------------------------
+
+UserLockerPool::UserLockerPool(const UserLockerSettings& settings):
+    m_settings(settings)
+{
+}
+
+void UserLockerPool::updateLockoutState(
+    const Key& key,
+    UserLocker::AuthResult authResult)
+{
+    QnMutexLocker lock(&m_mutex);
+    const auto iterAndInsertedFlag = m_userLockers.try_emplace(key, m_settings);
+    iterAndInsertedFlag.first->second.updateLockoutState(authResult);
+}
+
+bool UserLockerPool::isLocked(const Key& key) const
+{
+    QnMutexLocker lock(&m_mutex);
+    auto it = m_userLockers.find(key);
+    return it == m_userLockers.end() ? false : it->second.isLocked();
 }
 
 } // namespace server

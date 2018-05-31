@@ -39,7 +39,7 @@ class AuthenticationHelper
 public:
     AuthenticationHelper(
         const nx::network::http::AuthMethodRestrictionList& authRestrictionList,
-        network::server::UserLocker* userLocker,
+        network::server::UserLockerPool* userLocker,
         const nx::network::http::HttpServerConnection& connection,
         const nx::network::http::Request& request,
         nx::network::http::server::AuthenticationCompletionHandler handler);
@@ -70,7 +70,7 @@ public:
 
 private:
     const nx::network::http::AuthMethodRestrictionList& m_authRestrictionList;
-    network::server::UserLocker* m_userLocker;
+    network::server::UserLockerPool* m_userLocker;
     const nx::network::http::HttpServerConnection& m_connection;
     const nx::network::http::Request& m_request;
     nx::network::http::server::AuthenticationCompletionHandler m_handler;
@@ -134,15 +134,10 @@ private:
     const nx::network::http::AuthMethodRestrictionList& m_authRestrictionList;
     const StreeManager& m_stree;
     std::vector<AbstractAuthenticationDataProvider*> m_authDataProviders;
-    std::unique_ptr<network::server::UserLocker> m_userLocker;
+    std::unique_ptr<network::server::UserLockerPool> m_userLocker;
 
     nx::network::http::header::WWWAuthenticate prepareWwwAuthenticateHeader();
     nx::Buffer generateNonce();
-
-    void reportAuthResult(
-        nx::network::http::server::AuthenticationCompletionHandler handler,
-        const nx::String& userId,
-        nx::network::http::server::AuthenticationResult authResult);
 };
 
 } // namespace cdb
