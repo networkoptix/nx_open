@@ -12,6 +12,8 @@
 #include <ui/widgets/business/show_on_alarm_layout_action_widget.h>
 #include <ui/widgets/business/ptz_preset_business_action_widget.h>
 #include <ui/widgets/business/exec_http_request_action_widget.h>
+#include <ui/widgets/business/fullscreen_camera_action_widget.h>
+#include <ui/widgets/business/exit_fullscreen_action_widget.h>
 
 using namespace nx;
 
@@ -44,6 +46,10 @@ QnAbstractBusinessParamsWidget* QnBusinessActionWidgetFactory::createWidget(
             return new QnShowOnAlarmLayoutActionWidget(parent);
         case vms::event::execHttpRequestAction:
             return new QnExecHttpRequestActionWidget(parent);
+        case vms::event::ActionType::fullscreenCameraAction:
+            return new QnFullscreenCameraActionWidget(parent);
+        case vms::event::ActionType::exitFullscreenAction:
+            return new QnExitFullscreenActionWidget(parent);
         default:
             break;
     }

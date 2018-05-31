@@ -204,6 +204,7 @@ void RuleProcessor::executeAction(const vms::event::AbstractActionPtr& action)
     {
         case vms::event::showTextOverlayAction:
         case vms::event::showOnAlarmLayoutAction:
+        case vms::event::ActionType::fullscreenCameraAction:
         {
             if (action->getParams().useSource)
                 resources << resourcePool()->getResourcesByIds<QnNetworkResource>(action->getSourceResources());
@@ -284,6 +285,8 @@ bool RuleProcessor::executeActionInternal(const vms::event::AbstractActionPtr& a
             /*fallthrough*/
         case vms::event::showOnAlarmLayoutAction:
         case vms::event::showTextOverlayAction:
+        case vms::event::ActionType::fullscreenCameraAction:
+        case vms::event::ActionType::exitFullscreenAction:
             return broadcastAction(action);
         default:
             break;
