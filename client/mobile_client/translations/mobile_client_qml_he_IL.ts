@@ -5,7 +5,7 @@
     <name>ActionButtonsPanel</name>
     <message>
       <source>Press and hold to</source>
-      <translation type="unfinished">Press and hold to</translation>
+      <translation>לחץ והחזק את המקש</translation>
     </message>
   </context>
   <context>
@@ -24,18 +24,18 @@
     </message>
     <message>
       <source>Password required</source>
-      <translation type="unfinished">Password required</translation>
+      <translation>נדרשת סיסמה</translation>
     </message>
     <message>
       <source>Unsupported firmware version</source>
-      <translation type="unfinished">Unsupported firmware version</translation>
+      <translation>גרסת קושחה לא נתמכת</translation>
     </message>
   </context>
   <context>
     <name>CloudPanel</name>
     <message>
       <source>Log in to %1</source>
-      <translation>התחבר אל %1</translation>
+      <translation>התחבר ל %1</translation>
     </message>
   </context>
   <context>
@@ -43,14 +43,14 @@
     <message>
       <source>%1 Account</source>
       <comment>%1 is the short cloud name (like &apos;Cloud&apos;)</comment>
-      <translation>חשבון %1</translation>
+      <translation>%1 חשבון</translation>
     </message>
   </context>
   <context>
     <name>CloudSummary</name>
     <message>
       <source>Log out</source>
-      <translation>התנתק</translation>
+      <translation>להתנתק</translation>
     </message>
     <message>
       <source>Go to %1</source>
@@ -69,7 +69,7 @@
     </message>
     <message>
       <source>Learn more about %1</source>
-      <translation>למד עוד אודות %1</translation>
+      <translation>למידע נוסף על %1</translation>
     </message>
     <message>
       <source>Create account</source>
@@ -77,55 +77,55 @@
     </message>
     <message>
       <source>Forgot your password?</source>
-      <translation>שכחת סיסמא?</translation>
+      <translation>שכחת ססמה?</translation>
     </message>
     <message>
       <source>Cannot connect to %1</source>
-      <translation>אין אפשרות להתחבר אל %1</translation>
+      <translation>לא ניתן להתחבר ל %1</translation>
     </message>
     <message>
       <source>Log in</source>
-      <translation>התחבר</translation>
+      <translation>התחברות</translation>
     </message>
     <message>
       <source>Resend activation email</source>
-      <translation type="unfinished">Resend activation email</translation>
+      <translation>שלח שוב הודעת אימייל להפעלה</translation>
     </message>
     <message>
       <source>Activation email sent</source>
-      <translation type="unfinished">Activation email sent</translation>
+      <translation>הודעת האימייל נשלחה</translation>
     </message>
     <message>
       <source>Cannot send activation email</source>
-      <translation type="unfinished">Cannot send activation email</translation>
+      <translation>לא ניתן לשלוח דוא"ל הפעלה</translation>
     </message>
     <message>
       <source>Check your inbox and visit provided link to activate account</source>
-      <translation type="unfinished">Check your inbox and visit provided link to activate account</translation>
+      <translation>בדוק את תיבת הדואר הנכנס שלך ובקר הקישור המצורף כדי להפעיל את החשבון</translation>
     </message>
     <message>
       <source>Check your internet connection or try again later</source>
-      <translation type="unfinished">Check your internet connection or try again later</translation>
+      <translation>בדוק את החיבור לאינטרנט או נסה שוב מאוחר יותר</translation>
     </message>
     <message>
       <source>Account not found</source>
-      <translation type="unfinished">Account not found</translation>
+      <translation>החשבון לא נמצא</translation>
     </message>
     <message>
       <source>Wrong password</source>
-      <translation>סיסמא שגויה</translation>
+      <translation>סיסמה שגויה</translation>
     </message>
     <message>
       <source>Account not activated</source>
-      <translation type="unfinished">Account not activated</translation>
+      <translation>חשבון לא הופעל</translation>
     </message>
     <message>
       <source>Email cannot be empty</source>
-      <translation>דואר אלקטרוני אינו יכול להיות ריק</translation>
+      <translation>אימייל לא יכול להיות ריק</translation>
     </message>
     <message>
       <source>Password cannot be empty</source>
-      <translation>לא ניתן להותיר את שדה הסיסמה ריק</translation>
+      <translation>הסיסמה לא יכולה להיות ריקה</translation>
     </message>
   </context>
   <context>
@@ -569,7 +569,7 @@
     </message>
     <message>
       <source>What to do with currently saved passwords?</source>
-      <translation type="unfinished">What to do with currently saved passwords?</translation>
+      <translation>מה לעשות עם הסיסמאות שנשמרו כרגע?</translation>
     </message>
     <message>
       <source>Delete</source>
@@ -704,35 +704,35 @@
     </message>
     <message>
       <source>Not enough licenses</source>
-      <translation type="unfinished">Not enough licenses</translation>
+      <translation>אין מספיק רישיונות</translation>
     </message>
     <message>
       <source>Password required</source>
-      <translation type="unfinished">Password required</translation>
+      <translation>נדרשת סיסמה</translation>
     </message>
     <message>
       <source>Set password on this camera using Wisenet WAVE client or camera web-page to view video</source>
-      <translation type="unfinished">Set password on this camera using Wisenet WAVE client or camera web-page to view video</translation>
+      <translation>הגדר סיסמה על מצלמה זו באמצעות Wisenet WAVE לקוח או מצלמת אינטרנט בדף כדי להציג וידאו</translation>
     </message>
     <message>
       <source>Unsupported firmware version</source>
-      <translation type="unfinished">Unsupported firmware version</translation>
+      <translation>גרסת קושחה לא נתמכת</translation>
     </message>
     <message>
       <source>Please update firmware</source>
-      <translation type="unfinished">Please update firmware</translation>
+      <translation>אנא עדכן קושחה</translation>
     </message>
     <message>
       <source>Too many connections</source>
-      <translation type="unfinished">Too many connections</translation>
+      <translation>חיבורים רבים מדי</translation>
     </message>
     <message>
       <source>I/O interface not supported yet</source>
-      <translation type="unfinished">I/O interface not supported yet</translation>
+      <translation>עדיין לא נתמך ממשק קלט / פלט</translation>
     </message>
     <message>
       <source>In this app I/O module can be used as a sound input device only. To use it as a control module, please use desktop version of %1</source>
-      <translation type="unfinished">In this app I/O module can be used as a sound input device only. To use it as a control module, please use desktop version of %1</translation>
+      <translation>ניתן להשתמש במודול קלט / פלט של אפליקציה זו כמכשיר קלט קול בלבד. כדי להשתמש בו כמודול בקרה, אנא השתמש בגירסת שולחן העבודה של %1</translation>
     </message>
   </context>
   <context>
@@ -768,7 +768,7 @@
     <name>main</name>
     <message>
       <source>Server offline. Reconnecting...</source>
-      <translation type="unfinished">Server offline. Reconnecting...</translation>
+      <translation>שרת במצב לא מקוון. מתחבר מחדש ...</translation>
     </message>
     <message>
       <source>Cannot connect to %1</source>

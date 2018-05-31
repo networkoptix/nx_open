@@ -16,15 +16,15 @@
     <message>
       <source>B</source>
       <comment>Suffix for displaying bytes</comment>
-      <translation type="unfinished">B</translation>
+      <translation>B</translation>
     </message>
     <message numerus="yes">
       <source>Kilobytes</source>
       <comment>Full suffix for displaying kilobytes</comment>
       <translation type="unfinished">
-        <numerusform>Kilobytes</numerusform>
-        <numerusform>Kilobytes</numerusform>
-        <numerusform>Kilobytes</numerusform>
+        <numerusform>קילובייט</numerusform>
+        <numerusform>קילובייט</numerusform>
+        <numerusform>קילובייט</numerusform>
         <numerusform>Kilobytes</numerusform>
       </translation>
     </message>
@@ -37,8 +37,8 @@
       <source>Megabytes</source>
       <comment>Full suffix for displaying megabytes</comment>
       <translation type="unfinished">
-        <numerusform>Megabytes</numerusform>
-        <numerusform>Megabytes</numerusform>
+        <numerusform>מגה בייט</numerusform>
+        <numerusform>מגה בייט</numerusform>
         <numerusform>Megabytes</numerusform>
         <numerusform>Megabytes</numerusform>
       </translation>
@@ -52,7 +52,7 @@
       <source>Gigabytes</source>
       <comment>Full suffix for displaying gigabytes</comment>
       <translation type="unfinished">
-        <numerusform>Gigabytes</numerusform>
+        <numerusform>ג 'יגה בייט</numerusform>
         <numerusform>Gigabytes</numerusform>
         <numerusform>Gigabytes</numerusform>
         <numerusform>Gigabytes</numerusform>
@@ -67,7 +67,7 @@
       <source>Terabytes</source>
       <comment>Full suffix for displaying terabytes</comment>
       <translation type="unfinished">
-        <numerusform>Terabytes</numerusform>
+        <numerusform>טרה-בתים</numerusform>
         <numerusform>Terabytes</numerusform>
         <numerusform>Terabytes</numerusform>
         <numerusform>Terabytes</numerusform>
@@ -82,7 +82,7 @@
       <source>Petabytes</source>
       <comment>Full suffix for displaying petabytes</comment>
       <translation type="unfinished">
-        <numerusform>Petabytes</numerusform>
+        <numerusform>פטאביטים</numerusform>
         <numerusform>Petabytes</numerusform>
         <numerusform>Petabytes</numerusform>
         <numerusform>Petabytes</numerusform>
@@ -91,7 +91,7 @@
     <message>
       <source>PB</source>
       <comment>Suffix for displaying petabytes</comment>
-      <translation type="unfinished">PB</translation>
+      <translation>PB</translation>
     </message>
   </context>
   <context>

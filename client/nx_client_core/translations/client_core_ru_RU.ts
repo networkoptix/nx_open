@@ -16,16 +16,16 @@
     <message>
       <source>B</source>
       <comment>Suffix for displaying bytes</comment>
-      <translation type="unfinished">B</translation>
+      <translation>Б</translation>
     </message>
     <message numerus="yes">
       <source>Kilobytes</source>
       <comment>Full suffix for displaying kilobytes</comment>
-      <translation type="unfinished">
-        <numerusform>Kilobytes</numerusform>
-        <numerusform>Kilobytes</numerusform>
-        <numerusform>Kilobytes</numerusform>
-        <numerusform>Kilobytes</numerusform>
+      <translation>
+        <numerusform>Килобайт</numerusform>
+        <numerusform>Килобайта</numerusform>
+        <numerusform>Килобайт</numerusform>
+        <numerusform>Килобайт</numerusform>
       </translation>
     </message>
     <message>
@@ -36,11 +36,11 @@
     <message numerus="yes">
       <source>Megabytes</source>
       <comment>Full suffix for displaying megabytes</comment>
-      <translation type="unfinished">
-        <numerusform>Megabytes</numerusform>
-        <numerusform>Megabytes</numerusform>
-        <numerusform>Megabytes</numerusform>
-        <numerusform>Megabytes</numerusform>
+      <translation>
+        <numerusform>Мегабайт</numerusform>
+        <numerusform>Мегабайта</numerusform>
+        <numerusform>Мегабайт</numerusform>
+        <numerusform>Мегабайт</numerusform>
       </translation>
     </message>
     <message>
@@ -51,11 +51,11 @@
     <message numerus="yes">
       <source>Gigabytes</source>
       <comment>Full suffix for displaying gigabytes</comment>
-      <translation type="unfinished">
-        <numerusform>Gigabytes</numerusform>
-        <numerusform>Gigabytes</numerusform>
-        <numerusform>Gigabytes</numerusform>
-        <numerusform>Gigabytes</numerusform>
+      <translation>
+        <numerusform>Гигабайт</numerusform>
+        <numerusform>Гигабайта</numerusform>
+        <numerusform>Гигабайт</numerusform>
+        <numerusform>Гигабайт</numerusform>
       </translation>
     </message>
     <message>
@@ -66,11 +66,11 @@
     <message numerus="yes">
       <source>Terabytes</source>
       <comment>Full suffix for displaying terabytes</comment>
-      <translation type="unfinished">
-        <numerusform>Terabytes</numerusform>
-        <numerusform>Terabytes</numerusform>
-        <numerusform>Terabytes</numerusform>
-        <numerusform>Terabytes</numerusform>
+      <translation>
+        <numerusform>Терабайт</numerusform>
+        <numerusform>Терабайта</numerusform>
+        <numerusform>Терабайт</numerusform>
+        <numerusform>Терабайт</numerusform>
       </translation>
     </message>
     <message>
@@ -81,17 +81,17 @@
     <message numerus="yes">
       <source>Petabytes</source>
       <comment>Full suffix for displaying petabytes</comment>
-      <translation type="unfinished">
-        <numerusform>Petabytes</numerusform>
-        <numerusform>Petabytes</numerusform>
-        <numerusform>Petabytes</numerusform>
-        <numerusform>Petabytes</numerusform>
+      <translation>
+        <numerusform>Петабайт</numerusform>
+        <numerusform>Петабайта</numerusform>
+        <numerusform>Петабайт</numerusform>
+        <numerusform>Петабайт</numerusform>
       </translation>
     </message>
     <message>
       <source>PB</source>
       <comment>Suffix for displaying petabytes</comment>
-      <translation type="unfinished">PB</translation>
+      <translation>ПБ</translation>
     </message>
   </context>
   <context>

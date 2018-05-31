@@ -89,7 +89,7 @@
     <message>
       <source>%1 System can only be merged with non-%1. System name and password are taken from %1 System.</source>
       <comment>%1 is the short cloud name (like &apos;Cloud&apos;)</comment>
-      <translation type="unfinished">%1 System can only be merged with non-%1. System name and password are taken from %1 System.</translation>
+      <translation>%1 המערכת יכולה להיות ממוזגת רק עם לא%1. שם המערכת והסיסמה נלקחים מתוך %1 מערכת.</translation>
     </message>
   </context>
   <context>
@@ -101,23 +101,23 @@
     </message>
     <message>
       <source>System already bound to cloud (id %1)</source>
-      <translation type="unfinished">System already bound to cloud (id %1)</translation>
+      <translation>המערכת כבר קשורה לענן (id %1)</translation>
     </message>
     <message>
       <source>Server is not connected to the Internet.</source>
-      <translation type="unfinished">Server is not connected to the Internet.</translation>
+      <translation>השרת אינו מחובר לאינטרנט.</translation>
     </message>
     <message>
       <source>Failed to save cloud credentials to local DB</source>
-      <translation type="unfinished">Failed to save cloud credentials to local DB</translation>
+      <translation>נכשלה שמירת אישורי ענן ל- DB המקומי</translation>
     </message>
     <message>
       <source>Failed to save cloud owner to local DB</source>
-      <translation type="unfinished">Failed to save cloud owner to local DB</translation>
+      <translation>שמירת הענן בעלים ל- DB המקומי נכשלה</translation>
     </message>
     <message>
       <source>Could not connect to cloud: %1</source>
-      <translation type="unfinished">Could not connect to cloud: %1</translation>
+      <translation>לא ניתן להתחבר לענן: %1</translation>
     </message>
   </context>
   <context>
@@ -1449,7 +1449,7 @@
     </message>
     <message>
       <source>Open layout</source>
-      <translation type="unfinished">Open layout</translation>
+      <translation>פתח את הפריסה</translation>
     </message>
   </context>
   <context>
