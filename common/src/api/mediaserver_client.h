@@ -47,7 +47,7 @@ public:
     MediaServerClient(MediaServerClient&&) = default;
     MediaServerClient& operator=(MediaServerClient&&) = default;
 
-    virtual void bindToAioThread(nx::network::aio::AbstractAioThread* aioThread);
+    virtual void bindToAioThread(nx::network::aio::AbstractAioThread* aioThread) override;
 
     void setUserCredentials(const nx::network::http::Credentials& userCredentials);
     /**
