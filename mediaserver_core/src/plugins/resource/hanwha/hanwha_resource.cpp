@@ -2598,7 +2598,7 @@ QnCameraAdvancedParams HanwhaResource::filterParameters(
         if (needToCheck && parameter.range.isEmpty())
             continue;
 
-        if (!info->parameterName().isEmpty())
+        if (info->hasParameter())
         {
             const auto& cgiParams = cgiParameters();
             boost::optional<HanwhaCgiParameter> cgiParameter;

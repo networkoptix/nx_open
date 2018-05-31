@@ -201,7 +201,7 @@ void HanwhaCgiParameter::addPossibleValues(const QString& value)
     m_possibleValues.push_back(value);
 }
 
-bool HanwhaCgiParameter::isValueSupported(const QString & parameterValue) const
+bool HanwhaCgiParameter::isValueSupported(const QString& parameterValue) const
 {
     return m_possibleValues.contains(parameterValue);
 }

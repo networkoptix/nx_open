@@ -37,6 +37,8 @@ public:
 
     QString cgi() const;
     QString submenu() const;
+
+    bool hasParameter() const;
     QString parameterName() const;
     QString parameterValue() const;
     bool shouldAffectAllChannels() const;
