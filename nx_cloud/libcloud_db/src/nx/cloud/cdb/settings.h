@@ -156,6 +156,7 @@ private:
     nx::utils::log::Settings m_vmsSynchronizationLogging;
     nx::utils::db::ConnectionOptions m_dbConnectionOptions;
     Auth m_auth;
+    std::optional<network::server::UserLockerSettings> m_loginLockout;
     Notification m_notification;
     AccountManager m_accountManager;
     SystemManager m_systemManager;
@@ -169,6 +170,7 @@ private:
     virtual void loadSettings() override;
 
     void loadAuth();
+    void loadLoginLockout();
 };
 
 } // namespace conf
