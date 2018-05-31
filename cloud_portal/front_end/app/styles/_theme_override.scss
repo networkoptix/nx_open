@@ -166,7 +166,7 @@ label {
     opacity: 0.3;
   }
 
-  &.ng-invalid:not(.ng-untouched) {
+  &:invalid:not(.ng-untouched) {
     border-color: $error;
 
     + .input-group-addon {
@@ -175,6 +175,15 @@ label {
     }
   }
 }
+
+//input[class*="ng-invalid" && class!="ng-untouched"] {
+//  border-color: $error;
+//
+//  + .input-group-addon {
+//    border-color: $error;
+//    background-color: $red2;
+//  }
+//}
 
 .form-control:read-only:focus {
   border-color: $input-border;
