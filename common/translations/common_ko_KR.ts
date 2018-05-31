@@ -101,23 +101,23 @@
     </message>
     <message>
       <source>System already bound to cloud (id %1)</source>
-      <translation type="unfinished">System already bound to cloud (id %1)</translation>
+      <translation>이미 클라우드 (id %1) 에 바인딩된 시스템</translation>
     </message>
     <message>
       <source>Server is not connected to the Internet.</source>
-      <translation type="unfinished">Server is not connected to the Internet.</translation>
+      <translation>서버가 인터넷에 연결되어 있지 않습니다.</translation>
     </message>
     <message>
       <source>Failed to save cloud credentials to local DB</source>
-      <translation type="unfinished">Failed to save cloud credentials to local DB</translation>
+      <translation>로컬 DB에 클라우드 인증정보를 저장하지 못했습니다.</translation>
     </message>
     <message>
       <source>Failed to save cloud owner to local DB</source>
-      <translation type="unfinished">Failed to save cloud owner to local DB</translation>
+      <translation>클라우드 소유자를 로컬 DB에 저장하지 못했습니다.</translation>
     </message>
     <message>
       <source>Could not connect to cloud: %1</source>
-      <translation type="unfinished">Could not connect to cloud: %1</translation>
+      <translation>클라우드: %1 에 연결할 수 없습니다</translation>
     </message>
   </context>
   <context>
@@ -1383,7 +1383,7 @@
     </message>
     <message>
       <source>Open layout</source>
-      <translation type="unfinished">Open layout</translation>
+      <translation>레이아웃 열기...</translation>
     </message>
   </context>
   <context>

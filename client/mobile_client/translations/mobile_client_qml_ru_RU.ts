@@ -5,7 +5,7 @@
     <name>ActionButtonsPanel</name>
     <message>
       <source>Press and hold to</source>
-      <translation type="unfinished">Press and hold to</translation>
+      <translation>Нажмите и удерживайте, чтобы</translation>
     </message>
   </context>
   <context>
@@ -24,11 +24,11 @@
     </message>
     <message>
       <source>Password required</source>
-      <translation type="unfinished">Password required</translation>
+      <translation>Требуется пароль</translation>
     </message>
     <message>
       <source>Unsupported firmware version</source>
-      <translation type="unfinished">Unsupported firmware version</translation>
+      <translation>Неподдерживаемая версия прошивки</translation>
     </message>
   </context>
   <context>
@@ -89,27 +89,27 @@
     </message>
     <message>
       <source>Resend activation email</source>
-      <translation type="unfinished">Resend activation email</translation>
+      <translation>Повторно выслать письмо с активацией</translation>
     </message>
     <message>
       <source>Activation email sent</source>
-      <translation type="unfinished">Activation email sent</translation>
+      <translation>Письмо с активацией отправлено</translation>
     </message>
     <message>
       <source>Cannot send activation email</source>
-      <translation type="unfinished">Cannot send activation email</translation>
+      <translation>Не удается отправить письмо с активацией</translation>
     </message>
     <message>
       <source>Check your inbox and visit provided link to activate account</source>
-      <translation type="unfinished">Check your inbox and visit provided link to activate account</translation>
+      <translation>Проверьте свой почтовый ящик и пройдите ао этой ссылке чтобы активировать учетную запись</translation>
     </message>
     <message>
       <source>Check your internet connection or try again later</source>
-      <translation type="unfinished">Check your internet connection or try again later</translation>
+      <translation>Проверьте подключение к Интернету или повторите попытку позже</translation>
     </message>
     <message>
       <source>Account not found</source>
-      <translation type="unfinished">Account not found</translation>
+      <translation>Учетная запись не найдена</translation>
     </message>
     <message>
       <source>Wrong password</source>
@@ -117,7 +117,7 @@
     </message>
     <message>
       <source>Account not activated</source>
-      <translation type="unfinished">Account not activated</translation>
+      <translation>Учетная запись еще не активирована</translation>
     </message>
     <message>
       <source>Email cannot be empty</source>
@@ -569,7 +569,7 @@
     </message>
     <message>
       <source>What to do with currently saved passwords?</source>
-      <translation type="unfinished">What to do with currently saved passwords?</translation>
+      <translation>Что делать с сохраненными паролями?</translation>
     </message>
     <message>
       <source>Delete</source>
@@ -704,35 +704,35 @@
     </message>
     <message>
       <source>Not enough licenses</source>
-      <translation type="unfinished">Not enough licenses</translation>
+      <translation>Недостаточно лицензий</translation>
     </message>
     <message>
       <source>Password required</source>
-      <translation type="unfinished">Password required</translation>
+      <translation>Требуется пароль</translation>
     </message>
     <message>
       <source>Set password on this camera using Wisenet WAVE client or camera web-page to view video</source>
-      <translation type="unfinished">Set password on this camera using Wisenet WAVE client or camera web-page to view video</translation>
+      <translation>Для просмотра видео требуется установить пароль на этой камере на её веб странице или из клиентского приложения</translation>
     </message>
     <message>
       <source>Unsupported firmware version</source>
-      <translation type="unfinished">Unsupported firmware version</translation>
+      <translation>Неподдерживаемая версия прошивки</translation>
     </message>
     <message>
       <source>Please update firmware</source>
-      <translation type="unfinished">Please update firmware</translation>
+      <translation>Пожалуйста, обновите прошивку</translation>
     </message>
     <message>
       <source>Too many connections</source>
-      <translation type="unfinished">Too many connections</translation>
+      <translation>Слишком много соединений</translation>
     </message>
     <message>
       <source>I/O interface not supported yet</source>
-      <translation type="unfinished">I/O interface not supported yet</translation>
+      <translation>Интерфейс ввода-вывода еще не поддерживается</translation>
     </message>
     <message>
       <source>In this app I/O module can be used as a sound input device only. To use it as a control module, please use desktop version of %1</source>
-      <translation type="unfinished">In this app I/O module can be used as a sound input device only. To use it as a control module, please use desktop version of %1</translation>
+      <translation>В этом приложении модуль ввода/вывода может использоваться только как устройство ввода звука. Чтобы использовать его в качестве модуля управления, используйте клиентское приложение %1</translation>
     </message>
   </context>
   <context>
@@ -768,7 +768,7 @@
     <name>main</name>
     <message>
       <source>Server offline. Reconnecting...</source>
-      <translation type="unfinished">Server offline. Reconnecting...</translation>
+      <translation>Сервер отключен. Повторное подключение...</translation>
     </message>
     <message>
       <source>Cannot connect to %1</source>
