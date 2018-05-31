@@ -605,12 +605,14 @@ Profile* QnOnvifStreamReader::fetchExistingProfile(
 CameraDiagnostics::Result QnOnvifStreamReader::bindTwoWayAudioToProfile(
     MediaSoapWrapper& soapWrapper, const QString& profileToken) const
 {
-    AddAudioOutputConfigurationReq addOutputRequest;
-    AddAudioOutputConfigurationResp addOutputResponse;
+    AddAudioOutputConfigurationReq addAudioOutputConfigurationRequest;
+    AddAudioOutputConfigurationResp addAudioOutputConfigurationResponse;
 
-    addOutputRequest.ProfileToken = profileToken.toStdString();
-    addOutputRequest.ConfigurationToken = m_onvifRes->audioOutputToken().toStdString();
-    int soapRes = soapWrapper.addAudioOutputConfiguration(addOutputRequest, addOutputResponse);
+    addAudioOutputConfigurationRequest.ProfileToken = profileToken.toStdString();
+    addAudioOutputConfigurationRequest.ConfigurationToken = 
+        m_onvifRes->audioOutputConfigurationToken().toStdString();
+    int soapRes = soapWrapper.addAudioOutputConfiguration(
+        addAudioOutputConfigurationRequest, addAudioOutputConfigurationResponse);
     if (soapRes != SOAP_OK)
     {
         return CameraDiagnostics::RequestFailedResult(
@@ -713,14 +715,15 @@ CameraDiagnostics::Result QnOnvifStreamReader::sendProfileToCamera(
 
     if (getRole() == Qn::CR_LiveVideo)
     {
-        if (!m_onvifRes->audioOutputToken().isEmpty())
+        if (!m_onvifRes->audioOutputConfigurationToken().isEmpty())
         {
             auto result = bindTwoWayAudioToProfile(soapWrapper, info.profileToken);
             if (!result)
             {
+                const auto errorMessage = result.toString(m_onvifRes->resourcePool());
                 NX_WARNING(this, 
                     lm("Error binding two way audio to profile %1 for camera %2. Error: %3")
-                    .args(info.profileToken, m_onvifRes->getUrl(), result.toString(m_onvifRes->resourcePool())));
+                    .args(info.profileToken, m_onvifRes->getUrl(), errorMessage));
             }
         }
 

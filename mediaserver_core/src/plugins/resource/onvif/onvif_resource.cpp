@@ -4033,6 +4033,7 @@ QnAudioTransmitterPtr QnPlOnvifResource::initializeTwoWayAudio()
     MediaSoapWrapper soapWrapper(getMediaUrl().toStdString(),
         getAuth().user(), getAuth().password(), m_timeDrift);
 
+    //TODO: consider to move it to streamReader and change it to GetCompatibleAudioOutputConfigurations
     GetAudioOutputConfigurationsReq request;
     GetAudioOutputConfigurationsResp response;
     const int result = soapWrapper.getAudioOutputConfigurations(request, response);
@@ -4044,10 +4045,10 @@ QnAudioTransmitterPtr QnPlOnvifResource::initializeTwoWayAudio()
 
     if (!response.Configurations.empty())
     {
-        setAudioOutputToken(QString::fromStdString(
+        setAudioOutputConfigurationToken(QString::fromStdString(
             response.Configurations.front()->token));
         NX_VERBOSE(this, lm("Detected audio output %1 on %2").args(
-            audioOutputToken(), soapWrapper.endpoint()));
+            audioOutputConfigurationToken(), soapWrapper.endpoint()));
 
         return std::make_shared<nx::mediaserver_core::plugins::OnvifAudioTransmitter>(this);
     }
@@ -4056,16 +4057,16 @@ QnAudioTransmitterPtr QnPlOnvifResource::initializeTwoWayAudio()
     return QnAudioTransmitterPtr();
 }
 
-QString QnPlOnvifResource::audioOutputToken() const
+QString QnPlOnvifResource::audioOutputConfigurationToken() const
 {
     QnMutexLocker lock(&m_mutex);
-    return m_audioOutputToken;
+    return m_audioOutputConfigurationToken;
 }
 
-void QnPlOnvifResource::setAudioOutputToken(const QString& value)
+void QnPlOnvifResource::setAudioOutputConfigurationToken(const QString& value)
 {
     QnMutexLocker lock(&m_mutex);
-    m_audioOutputToken = value;
+    m_audioOutputConfigurationToken = value;
 }
 
 QnAudioTransmitterPtr QnPlOnvifResource::initializeTwoWayAudioByResourceData()
