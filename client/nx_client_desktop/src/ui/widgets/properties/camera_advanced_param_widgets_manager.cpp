@@ -139,11 +139,11 @@ void QnCameraAdvancedParamWidgetsManager::loadValues(
     }
 }
 
-boost::optional<QString> QnCameraAdvancedParamWidgetsManager::parameterValue(
+std::optional<QString> QnCameraAdvancedParamWidgetsManager::parameterValue(
     const QString & parameterId) const
 {
     if (!m_paramWidgetsById.contains(parameterId))
-        return boost::none;
+        return std::nullopt;
 
     return m_paramWidgetsById[parameterId]->value();
 }

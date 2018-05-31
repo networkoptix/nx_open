@@ -1,10 +1,10 @@
 #pragma once
 
-#include <boost/optional.hpp>
-
 #include <QtWidgets/QTreeWidget>
 #include <QtWidgets/QStackedWidget>
 #include <QtWidgets/QLabel>
+
+#include <nx/utils/std/optional.h>
 
 #include <core/resource/camera_advanced_param.h>
 
@@ -21,7 +21,7 @@ public:
 
     void displayParams(const QnCameraAdvancedParams &params);
     void loadValues(const QnCameraAdvancedParamValueList &params);
-    boost::optional<QString> parameterValue(const QString& parameterId) const;
+    std::optional<QString> parameterValue(const QString& parameterId) const;
 
 
     void clear();
