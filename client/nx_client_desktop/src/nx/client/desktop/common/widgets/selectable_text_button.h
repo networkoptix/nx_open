@@ -12,7 +12,7 @@ namespace desktop {
  * It also can be deactivatable and have a clickable [x] control which puts the button
  * into deactivated state with flat appearance and optionally different text and icon.
  * Clicking the button in either deactivated or unselected state puts it into selected state.
- * Unselected state has optional highlighted blue appearance.
+ * Unselected state has optional highlighted accented appearance.
  *
  * Palette and icons used in button states:
  *      deactivated: QPalette::Inactive, QIcon::Off
@@ -29,7 +29,7 @@ namespace desktop {
  *          text: QPalette::WindowText
  *          icon: QIcon::Normal
  *
- *      unselected (blue): QPalette::Inactive, QIcon::Off
+ *      unselected (accented): QPalette::Inactive, QIcon::Off
  *          background (normal, pressed): QPalette::Highlight
  *          background (hovered): QPalette::Light
  *          frame: none
@@ -51,7 +51,7 @@ class SelectableTextButton: public QPushButton
     Q_PROPERTY(State state READ state WRITE setState NOTIFY stateChanged)
     Q_PROPERTY(bool deactivatable READ deactivatable WRITE setDeactivatable)
     Q_PROPERTY(bool selectable READ selectable WRITE setSelectable)
-    Q_PROPERTY(bool blue READ blue WRITE setBlue)
+    Q_PROPERTY(bool accented READ accented WRITE setAccented)
     Q_PROPERTY(QString deactivatedText READ deactivatedText WRITE setDeactivatedText)
 
     using base_type = QPushButton;
@@ -79,8 +79,8 @@ public:
     void setDeactivatable(bool value);
 
     // Alternative highlighted appearance for unselected state.
-    bool blue() const;
-    void setBlue(bool blue);
+    bool accented() const;
+    void setAccented(bool accented);
 
     void deactivate(); //< Helper slot. Equivalent to setState(State::deactivated).
 

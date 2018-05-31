@@ -43,7 +43,7 @@ struct SelectableTextButton::Private
     QIcon deactivatedIcon;
     bool deactivatedIconSet = false;
     bool selectable = true;
-    bool blue = false;
+    bool accented = false;
 };
 
 SelectableTextButton::SelectableTextButton(QWidget* parent):
@@ -142,14 +142,14 @@ void SelectableTextButton::setDeactivatable(bool value)
     updateGeometry();
 }
 
-bool SelectableTextButton::blue() const
+bool SelectableTextButton::accented() const
 {
-    return d->blue;
+    return d->accented;
 }
 
-void SelectableTextButton::setBlue(bool blue)
+void SelectableTextButton::setAccented(bool accented)
 {
-    d->blue = blue;
+    d->accented = accented;
     update();
 }
 
@@ -313,7 +313,7 @@ void SelectableTextButton::paintEvent(QPaintEvent* /*event*/)
             NX_EXPECT(d->state == State::unselected);
             painter.setPen(Qt::NoPen);
 
-            if (d->blue)
+            if (d->accented)
                 painter.setBrush(hovered ? palette.light() : palette.highlight());
             else
                 painter.setBrush(hovered ? palette.midlight() : palette.window());
@@ -346,7 +346,7 @@ void SelectableTextButton::paintEvent(QPaintEvent* /*event*/)
 
         const auto iconMode = d->state == State::deactivated
             ? (hovered ? QIcon::Active : QIcon::Normal)
-            : ((d->blue && d->state != State::selected) ? QIcon::Selected : QIcon::Normal);
+            : ((d->accented && d->state != State::selected) ? QIcon::Selected : QIcon::Normal);
 
         const auto iconState = d->state == State::selected
             ? QIcon::On
@@ -371,7 +371,9 @@ void SelectableTextButton::paintEvent(QPaintEvent* /*event*/)
             break;
 
         case State::unselected:
-            painter.setPen(palette.color(d->blue ? QPalette::HighlightedText : QPalette::WindowText));
+            painter.setPen(palette.color(d->accented
+                ? QPalette::HighlightedText
+                : QPalette::WindowText));
             break;
 
         case State::selected:
