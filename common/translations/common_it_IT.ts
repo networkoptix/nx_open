@@ -328,7 +328,7 @@
     </message>
     <message>
       <source>First, try to turn on recording (if it is off) and decrease fps in camera settings (error &quot;%1&quot;).</source>
-      <translation>Innanzitutto, provare ad attivare la registrazione (se è disattivata) e ridurre l'impostazione fps del dispositivo) (errore &quot;%1&quot;).</translation>
+      <translation>Innanzitutto, provare ad attivare la registrazione (se è disattivata) e ridurre i valori fps nelle impostazioni della telecamera (errore &quot;%1&quot;).</translation>
     </message>
     <message>
       <source>First, try to turn on recording (if it is off) and decrease fps in I/O module settings (error &quot;%1&quot;).</source>
