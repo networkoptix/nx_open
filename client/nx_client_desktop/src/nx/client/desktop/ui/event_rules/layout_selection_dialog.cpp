@@ -21,7 +21,7 @@
 #include <core/resource/layout_resource.h>
 #include <core/resource_management/resource_pool.h>
 
-#include <nx/client/desktop/ui/common/item_view_utils.h>
+#include <nx/client/desktop/common/utils/item_view_utils.h>
 
 namespace nx {
 namespace client {
@@ -114,7 +114,7 @@ LayoutSelectionDialog::LayoutSelectionDialog(
     ui->sharedTreeView->setModel(filterSharedLayouts.get());
 
     const auto setupTreeView =
-        [singlePick, radioButtonDelegate](QnTreeView* treeView)
+        [singlePick, radioButtonDelegate](TreeView* treeView)
         {
             const QnIndents kIndents(1, 0);
             treeView->header()->setStretchLastSection(false);
@@ -124,7 +124,7 @@ LayoutSelectionDialog::LayoutSelectionDialog(
             treeView->setProperty(style::Properties::kSideIndentation,
                 QVariant::fromValue(kIndents));
             treeView->setIgnoreDefaultSpace(true);
-            ui::ItemViewUtils::autoToggleOnRowClick(treeView, QnResourceListModel::CheckColumn);
+            ItemViewUtils::autoToggleOnRowClick(treeView, QnResourceListModel::CheckColumn);
             if (singlePick)
             {
                 treeView->setItemDelegateForColumn(
@@ -150,9 +150,9 @@ LayoutSelectionDialog::LayoutSelectionDialog(
             filterSharedLayouts->setFilterFixedString(filter);
         };
 
-    connect(ui->searchLineEdit, &QnSearchLineEdit::textChanged, this, updateFilter);
-    connect(ui->searchLineEdit, &QnSearchLineEdit::enterKeyPressed, this, updateFilter);
-    connect(ui->searchLineEdit, &QnSearchLineEdit::escKeyPressed, this,
+    connect(ui->searchLineEdit, &SearchLineEdit::textChanged, this, updateFilter);
+    connect(ui->searchLineEdit, &SearchLineEdit::enterKeyPressed, this, updateFilter);
+    connect(ui->searchLineEdit, &SearchLineEdit::escKeyPressed, this,
         [this, updateFilter]()
         {
             ui->searchLineEdit->clear();

@@ -19,6 +19,7 @@
 #include <client_core/client_core_module.h>
 #include <client/client_settings.h>
 
+#include <nx/vms/api/types/event_rule_types.h>
 #include <nx/vms/event/action_parameters.h>
 #include <nx/vms/event/strings_helper.h>
 #include <nx/vms/event/events/events.h>
@@ -840,7 +841,8 @@ void QnBusinessRuleViewModel::setDisabled(const bool value)
 
 bool QnBusinessRuleViewModel::canUseSourceCamera() const
 {
-    return m_eventType >= vms::event::userDefinedEvent || requiresCameraResource(m_eventType);
+    return m_eventType >= vms::api::userDefinedEvent
+        || vms::event::requiresCameraResource(m_eventType);
 }
 
 bool QnBusinessRuleViewModel::isUsingSourceCamera() const
@@ -1120,8 +1122,8 @@ bool QnBusinessRuleViewModel::isValid(Column column) const
                         resourcePool()->getResourcesByIds<QnExecPtzPresetPolicy::resource_type>(filtered))
                         && m_actionResources.size() == 1
                         && !m_actionParams.presetId.isEmpty();
-                case vms::event::showTextOverlayAction:
-                case vms::event::showOnAlarmLayoutAction:
+                case vms::api::showTextOverlayAction:
+                case vms::api::showOnAlarmLayoutAction:
                 {
                     if (isUsingSourceCamera())
                         return true;

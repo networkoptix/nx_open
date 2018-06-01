@@ -3,16 +3,16 @@
 
 #include <QtCore/QScopedValueRollback>
 
+#include <business/business_resource_validation.h>
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/layout_resource.h>
 #include <core/resource/camera_resource.h>
+#include <ui/dialogs/resource_selection_dialog.h>
 
+#include <nx/vms/api/types/event_rule_types.h>
 #include <nx/vms/event/action_parameters.h>
 #include <nx/client/desktop/event_rules/helpers/fullscreen_action_helper.h>
-
 #include <nx/client/desktop/ui/event_rules/layout_selection_dialog.h>
-#include <ui/dialogs/resource_selection_dialog.h>
-#include <business/business_resource_validation.h>
 
 using namespace nx::client::desktop;
 
@@ -81,8 +81,8 @@ void QnFullscreenCameraActionWidget::updateCameraButton()
 {
     using Column = QnBusinessRuleViewModel::Column;
 
-    const bool canUseSource = ((model()->eventType() >= nx::vms::event::userDefinedEvent)
-            || (requiresCameraResource(model()->eventType())));
+    const bool canUseSource = ((model()->eventType() >= nx::vms::api::userDefinedEvent)
+            || (nx::vms::event::requiresCameraResource(model()->eventType())));
     const bool showCamera = !canUseSource || !model()->actionParams().useSource;
 
     ui->cameraLabel->setVisible(showCamera);

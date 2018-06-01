@@ -8,7 +8,8 @@
 #include <QtGui/QImage>
 #include <QtGui/QImageWriter>
 
-#include <QtWidgets/qgroupbox.h>
+#include <QtWidgets/QGroupBox>
+#include <QtWidgets/QHeaderView>
 #include <QtWidgets/QAction>
 #include <QtWidgets/QApplication>
 #include <QtWidgets/QCheckBox>
