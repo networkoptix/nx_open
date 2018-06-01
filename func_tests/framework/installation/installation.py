@@ -8,6 +8,10 @@ class Installation(object):
     __metaclass__ = ABCMeta
 
     @abstractmethod
+    def install(self):
+        pass
+
+    @abstractmethod
     def is_valid(self):
         return False
 
