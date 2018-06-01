@@ -92,3 +92,10 @@ img.preview-image{
 .module h2{
     background: #212A2F;
 }
+
+.show-html{
+    overflow-y: scroll;
+    max-height: 350px;
+    padding: 5px;
+    border: 1px solid silver;
+}

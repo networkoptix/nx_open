@@ -20,7 +20,8 @@
             "label": "Skin",
             "name": "%SKIN%",
             "value": "blue",
-            "description": "Skin. Supported values: blue, orange, green. Changing skin requires forcing update."
+            "description": "Skin. Supported values: blue, orange, green. Changing skin requires forcing update.",
+            "advanced": true
           },
           {
             "label": "VMS Name",
@@ -278,7 +279,8 @@
             "name": "%CONTENT%",
             "value": "<p>ALL YOUR BASE BELONG TO US</p>",
             "description": "Content for privacy policy",
-            "type": "html"
+            "type": "html",
+            "advanced": true
           }
         ]
       },
