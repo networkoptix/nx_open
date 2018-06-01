@@ -49,7 +49,7 @@
 						{% elif data_structure_type == "File" %}
 							<a href="{% url 'download_file' data_structure.name %}?version_id={{version.id}}&lang={{language.code}}&draft" download>Download</a>
 						{% else %}
-							<div style="overflow-y: scroll; max-height: 350px; padding: 5px; border: 1px solid silver">{{record|safe}}</div>
+							<div class="show-html">{{record|safe}}</div>
 						{% endif %}
 						<a
 						{% if language %}

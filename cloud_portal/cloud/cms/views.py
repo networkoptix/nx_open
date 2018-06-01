@@ -46,10 +46,7 @@ def get_context_and_language(request, context_id, language_code, customization):
     return context, language
 
 
-def initialize_context_editor(request, context_id, language_code):
-    customization = Customization.objects.get(name=settings.CUSTOMIZATION)
-    context, language = get_context_and_language(request, context_id, language_code, customization)
-
+def initialize_form(context, customization, language, user):
     form_initialization = {'language': language.code}
 
     if context:
@@ -59,9 +56,16 @@ def initialize_context_editor(request, context_id, language_code):
         initial=form_initialization)
 
     if context:
-        form.add_fields(context, customization, language, request.user)
+        form.add_fields(context, customization, language, user)
 
-    return context, customization, language, form
+    return form
+
+
+def get_info_for_context_editor(request, context_id, language_code):
+    customization = Customization.objects.get(name=settings.CUSTOMIZATION)
+    context, language = get_context_and_language(request, context_id, language_code, customization)
+
+    return context, customization, language
 
 
 def add_upload_error_messages(request, errors):
@@ -88,7 +92,7 @@ def advanced_touched_without_permission(request_data, customization, data_struct
 
 
 def context_editor_action(request, context_id, language_code):
-    context, customization, language, form = initialize_context_editor(request, context_id, language_code)
+    context, customization, language = get_info_for_context_editor(request, context_id, language_code)
     request_data = request.POST
     request_files = request.FILES
 
@@ -130,6 +134,8 @@ def context_editor_action(request, context_id, language_code):
         messages.success(request, saved_msg)
         preview_link = generate_preview_link(context)
 
+    form = initialize_form(context, customization, language, request.user)
+
     return context, customization, language, form, preview_link
 
 
@@ -138,7 +144,8 @@ def context_editor_action(request, context_id, language_code):
 @permission_required('cms.edit_content')
 def page_editor(request, context_id=None, language_code=None):
     if request.method == "GET":
-        context, customization, language, form = initialize_context_editor(request, context_id, language_code)
+        context, customization, language = get_info_for_context_editor(request, context_id, language_code)
+        form = initialize_form(context, customization, language, request.user)
         preview_link = ""
 
     else:
