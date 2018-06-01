@@ -70,6 +70,8 @@ void CameraSettingsGeneralTabWidget::loadState(const CameraSettingsDialogState& 
 
     ui->licensePanel->setVisible(licensePanelVisible);
     ui->overLicensingLine->setVisible(licensePanelVisible);
+    ui->authenticationGroupBox->setVisible(
+        state.devicesDescription.isWearable == CombinedValue::None);
 
     CheckboxUtils::setupTristateCheckbox(ui->enableAudioCheckBox, state.audioEnabled);
 
