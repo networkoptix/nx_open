@@ -215,7 +215,7 @@ QnPtzLimits calculatePtzLimits(
 struct HanwhaAlternativePtzTrait
 {
     QString supportAttribute;
-    QString valueAttribute;
+    QString valueParameter;
     Ptz::Capabilities capabilities;
 };
 
@@ -236,6 +236,30 @@ static const std::map<QString, HanwhaAlternativePtzTrait>
                 lit("Image/ZoomAdjust"),
                 lit("image/focus/control/Zoom"),
                 Ptz::ContinuousZoomCapability
+            }
+        },
+        {
+            kHanwhaAlternativePanTrait,
+            {
+                QString(), //< No attribute is available for PTR.
+                lit("image/ptr/control/pan"),
+                Ptz::ContinuousPanCapability
+            }
+        },
+        {
+            kHanwhaAlternativeTiltTrait,
+            {
+                QString(),
+                lit("image/ptr/control/tilt"),
+                Ptz::ContinuousTiltCapability
+            }
+        },
+        {
+            kHanwhaAlternativeRotateTrait,
+            {
+                QString(),
+                lit("image/ptr/control/rotate"),
+                Ptz::NoPtzCapabilities
             }
         }
     };
@@ -1353,44 +1377,32 @@ CameraDiagnostics::Result HanwhaResource::initPtz()
 CameraDiagnostics::Result HanwhaResource::initAlternativePtz()
 {
     const auto channel = getChannel();
-
     for (const auto& item: kHanwhaAlternativePtzTraits)
     {
-        bool success = false;
-        std::set<int> possibleValues;
-        const auto& traitName = item.first;
         const auto& trait = item.second;
+        const auto& traitName = item.first;
 
-        const auto hasTrait = m_attributes
-            .attribute<bool>(lit("%1/%2").arg(trait.supportAttribute).arg(channel));
-
-        if (hasTrait == boost::none || !hasTrait.get())
-            continue;
-
-        const auto valuesParameter = m_cgiParameters.parameter(trait.valueAttribute);
-        if (valuesParameter == boost::none || !valuesParameter->isValid())
-            continue;
-
-        for (const auto& value: valuesParameter->possibleValues())
+        bool hasTrait = true;
+        if (trait.supportAttribute.isEmpty())
         {
-            possibleValues.insert(value.toInt(&success));
-            if (!success)
-                break;
+            const auto attribute = m_attributes
+                .attribute<bool>(lit("%1/%2").arg(trait.supportAttribute).arg(channel));
+
+            hasTrait = attribute != boost::none && *attribute;
         }
 
-        if (!success)
+        if (!hasTrait)
             continue;
 
-        const auto split = trait.valueAttribute.split('/');
-        NX_ASSERT(!split.isEmpty());
-        if (split.isEmpty())
+        const auto parameter = m_cgiParameters.parameter(trait.valueParameter);
+        if (parameter == boost::none || !parameter->isValid())
             continue;
 
         m_ptzTraits.append(traitName);
         if (qnGlobalSettings->showHanwhaAlternativePtzControlsOnTile())
             m_ptzCapabilities |= trait.capabilities;
 
-        m_alternativePtzRanges[split.last()] = std::move(possibleValues);
+        m_alternativePtzRanges[parameter->name()] = HanwhaRange(*parameter);
     }
 
     NX_VERBOSE(this, lm("%1: Supported PTZ capabilities alternative: %2")
