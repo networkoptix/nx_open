@@ -279,8 +279,7 @@
             "name": "%CONTENT%",
             "value": "<p>ALL YOUR BASE BELONG TO US</p>",
             "description": "Content for privacy policy",
-            "type": "html",
-            "advanced": true
+            "type": "html"
           }
         ]
       },
