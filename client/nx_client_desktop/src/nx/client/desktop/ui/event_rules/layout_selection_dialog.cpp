@@ -106,7 +106,6 @@ LayoutSelectionDialog::LayoutSelectionDialog(
     filterLocalLayouts->setFilterKeyColumn(QnResourceListModel::NameColumn);
     filterLocalLayouts->setSourceModel(m_localLayoutsModel);
     ui->localTreeView->setModel(filterLocalLayouts.get());
-    ui->localTreeView->setItemDelegateForColumn(QnResourceListModel::CheckColumn, radioButtonDelegate);
 
     // Making a filtered model for shared layouts.
     auto filterSharedLayouts = std::make_shared<QSortFilterProxyModel>(m_sharedLayoutsModel);

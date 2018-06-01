@@ -2,8 +2,6 @@
 
 #include <QtWidgets/QWidget>
 
-#include <core/resource/resource_fwd.h>
-
 #include <ui/widgets/business/abstract_business_params_widget.h>
 
 namespace Ui { class FullscreenCameraActionWidget; }

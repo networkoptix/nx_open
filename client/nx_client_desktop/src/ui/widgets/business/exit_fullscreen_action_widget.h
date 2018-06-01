@@ -21,7 +21,8 @@ protected:
     virtual void at_model_dataChanged(Fields fields) override;
 
 private:
-    void paramsChanged();
+    void updateLayoutButton();
+    void openLayoutSelectionDialog();
 
 private:
     QScopedPointer<Ui::ExitFullscreenActionWidget> ui;

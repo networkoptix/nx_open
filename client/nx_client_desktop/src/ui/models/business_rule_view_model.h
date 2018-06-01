@@ -61,7 +61,7 @@ public:
     QVariant data(Column column, const int role = Qt::DisplayRole) const;
     bool setData(Column column, const QVariant& value, int role);
 
-    void loadFromRule(nx::vms::event::RulePtr businessRule);
+    void loadFromRule(const nx::vms::event::RulePtr& businessRule);
     nx::vms::event::RulePtr createRule() const;
 
     QString getText(Column column, const bool detailed = true) const;
@@ -94,6 +94,9 @@ public:
 
     QSet<QnUuid> actionResources() const;
     void setActionResources(const QSet<QnUuid>& value);
+
+    QSet<QnUuid> actionResourcesRaw() const;
+    void setActionResourcesRaw(const QSet<QnUuid>& value);
 
     bool isActionProlonged() const;
 

@@ -123,7 +123,7 @@ void QnFullscreenCameraActionWidget::openCameraSelectionDialog()
     if (dialog.exec() != QDialog::Accepted)
         return;
 
-    model()->setActionResources(
+    model()->setActionResourcesRaw(
         FullscreenActionHelper::setCameraIds(model().data(), dialog.selectedResources()));
     updateCameraButton();
 }
@@ -159,7 +159,7 @@ void QnFullscreenCameraActionWidget::openLayoutSelectionDialog()
     if (dialog.exec() != QDialog::Accepted)
         return;
 
-    model()->setActionResources(
+    model()->setActionResourcesRaw(
         FullscreenActionHelper::setLayoutIds(model().data(), dialog.checkedLayouts()));
 
     // checkWarnings();

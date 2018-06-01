@@ -26,7 +26,7 @@ QnVirtualCameraResourcePtr getCameraInternal(const QnBusinessRuleViewModel* mode
     if (model->isUsingSourceCamera())
         return QnVirtualCameraResourcePtr();
 
-    const auto resourceIds = model->actionResources();
+    const auto resourceIds = model->actionResourcesRaw();
     const auto resourcePool = model->resourcePool();
 
     for (const auto& id: resourceIds)
@@ -39,7 +39,7 @@ QnVirtualCameraResourcePtr getCameraInternal(const QnBusinessRuleViewModel* mode
 
 QnLayoutResourceList getLayoutsInternal(const QnBusinessRuleViewModel* model)
 {
-    return model->resourcePool()->getResourcesByIds<QnLayoutResource>(model->actionResources());
+    return model->resourcePool()->getResourcesByIds<QnLayoutResource>(model->actionResourcesRaw());
 }
 
 QSet<QnUuid> toIds(const QnResourceList& resources)

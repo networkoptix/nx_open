@@ -24,6 +24,7 @@
 #include <nx/vms/event/events/events.h>
 #include <nx/vms/event/actions/actions.h>
 #include <nx/client/desktop/event_rules/helpers/fullscreen_action_helper.h>
+#include <nx/client/desktop/event_rules/helpers/exit_fullscreen_action_helper.h>
 
 #include <ui/help/help_topics.h>
 #include <ui/help/business_help.h>
@@ -40,6 +41,7 @@
 #include <utils/media/audio_player.h>
 
 using namespace nx;
+using namespace nx::client::desktop;
 
 namespace {
 
@@ -101,11 +103,20 @@ QSet<QnUuid> filterSubjectIds(const IDList& ids)
     return toIds(users).unite(roles.toSet());
 }
 
-QSet<QnUuid> filterActionResources(const QSet<QnUuid>& ids, vms::event::ActionType actionType)
+QSet<QnUuid> filterActionResources(
+    const QnBusinessRuleViewModel* model,
+    const QSet<QnUuid>& ids,
+    vms::event::ActionType actionType)
 {
-    // TODO: Correctly filter cameras and layouts together here.
     if (actionType == vms::event::ActionType::fullscreenCameraAction)
-        return ids;
+    {
+        return FullscreenActionHelper::layoutIds(model) | FullscreenActionHelper::cameraIds(model);
+    }
+    if (actionType == vms::event::ActionType::exitFullscreenAction)
+    {
+        return ExitFullscreenActionHelper::layoutIds(model);
+    }
+
 
     auto resourcePool = qnClientCoreModule->commonModule()->resourcePool();
 
@@ -287,7 +298,7 @@ QVariant QnBusinessRuleViewModel::data(Column column, const int role) const
         case Qn::ActionResourcesRole:
         {
             auto ids = m_actionType != vms::event::showPopupAction
-                ? filterActionResources(m_actionResources, m_actionType)
+                ? filterActionResources(this, m_actionResources, m_actionType)
                 : filterSubjectIds(m_actionParams.additionalResources);
 
             if (m_actionParams.allUsers)
@@ -371,7 +382,7 @@ bool QnBusinessRuleViewModel::setData(Column column, const QVariant& value, int 
 }
 
 
-void QnBusinessRuleViewModel::loadFromRule(vms::event::RulePtr businessRule)
+void QnBusinessRuleViewModel::loadFromRule(const vms::event::RulePtr& businessRule)
 {
     m_id = businessRule->id();
     m_modified = false;
@@ -390,8 +401,7 @@ void QnBusinessRuleViewModel::loadFromRule(vms::event::RulePtr businessRule)
 
     m_actionType = businessRule->actionType();
 
-    m_actionResources = filterActionResources(toIdSet(businessRule->actionResources()),
-        m_actionType);
+    m_actionResources = toIdSet(businessRule->actionResources());
 
     m_actionParams = businessRule->actionParams();
 
@@ -415,7 +425,7 @@ vms::event::RulePtr QnBusinessRuleViewModel::createRule() const
     rule->setEventState(m_eventState);   // TODO: #GDM #Business check
     rule->setEventParams(m_eventParams); // TODO: #GDM #Business filtered
     rule->setActionType(m_actionType);
-    rule->setActionResources(toIdList(filterActionResources(m_actionResources, m_actionType)));
+    rule->setActionResources(toIdList(filterActionResources(this, m_actionResources, m_actionType)));
     rule->setActionParams(filterActionParams(m_actionType, m_actionParams));
     rule->setAggregationPeriod(m_aggregationPeriodSec);
     rule->setDisabled(m_disabled);
@@ -571,7 +581,12 @@ QIcon QnBusinessRuleViewModel::iconForAction() const
 
         case vms::event::ActionType::fullscreenCameraAction:
         {
-            return nx::client::desktop::FullscreenActionHelper::tableCellIcon(this);
+            return FullscreenActionHelper::tableCellIcon(this);
+        }
+
+        case vms::event::ActionType::exitFullscreenAction:
+        {
+            return ExitFullscreenActionHelper::tableCellIcon(this);
         }
 
         default:
@@ -737,17 +752,27 @@ void QnBusinessRuleViewModel::setActionType(const vms::event::ActionType value)
 
 QSet<QnUuid> QnBusinessRuleViewModel::actionResources() const
 {
-    return filterActionResources(m_actionResources, m_actionType);
+    return filterActionResources(this, m_actionResources, m_actionType);
 }
 
 void QnBusinessRuleViewModel::setActionResources(const QSet<QnUuid>& value)
 {
-    auto filtered = filterActionResources(value, m_actionType);
-    auto oldFiltered = filterActionResources(m_actionResources, m_actionType);
+    auto filtered = filterActionResources(this, value, m_actionType);
+    auto oldFiltered = filterActionResources(this, m_actionResources, m_actionType);
 
     if (filtered == oldFiltered)
         return;
 
+    setActionResourcesRaw(value);
+}
+
+QSet<QnUuid> QnBusinessRuleViewModel::actionResourcesRaw() const
+{
+    return m_actionResources;
+}
+
+void QnBusinessRuleViewModel::setActionResourcesRaw(const QSet<QnUuid>& value)
+{
     m_actionResources = value;
     m_modified = true;
 
@@ -1041,7 +1066,7 @@ bool QnBusinessRuleViewModel::isValid(Column column) const
         }
         case Column::target:
         {
-            auto filtered = filterActionResources(m_actionResources, m_actionType);
+            auto filtered = filterActionResources(this, m_actionResources, m_actionType);
             switch (m_actionType)
             {
                 case vms::event::sendMailAction:
@@ -1246,8 +1271,13 @@ QString QnBusinessRuleViewModel::getTargetText(const bool detailed) const
         case vms::event::ActionType::fullscreenCameraAction:
         {
             return detailed
-                ? nx::client::desktop::FullscreenActionHelper::tableCellText(this)
-                : nx::client::desktop::FullscreenActionHelper::cameraText(this);
+                ? FullscreenActionHelper::tableCellText(this)
+                : FullscreenActionHelper::cameraText(this);
+        }
+
+        case vms::event::ActionType::exitFullscreenAction:
+        {
+            return ExitFullscreenActionHelper::tableCellText(this);
         }
 
         case vms::event::execHttpRequestAction:
