@@ -1416,7 +1416,9 @@ void QnTransactionTransportBase::at_httpClientDone( const nx_http::AsyncHttpClie
         arg((int)client->state()), cl_logDEBUG2 );
 
     nx_http::AsyncHttpClient::State state = client->state();
-    if( state == nx_http::AsyncHttpClient::sFailed ) {
+    if( state == nx_http::AsyncHttpClient::sFailed ) 
+    {
+        NX_WARNING(this, lm("Http request failed %1").arg(client->lastSysErrorCode()));
         cancelConnecting();
     }
 }
