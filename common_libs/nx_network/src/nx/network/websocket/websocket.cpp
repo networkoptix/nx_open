@@ -107,7 +107,7 @@ void WebSocket::handleSocketRead(SystemError::ErrorCode ecode, size_t bytesRead)
     reportErrorIfAny(
         ecode,
         bytesRead,
-        [this, bytesRead, ecode](bool errorOccured)
+        [this, bytesRead](bool errorOccured)
         {
             if (errorOccured)
                 return;
