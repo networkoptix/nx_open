@@ -32,7 +32,7 @@ CameraSettingsGeneralTabWidget::CameraSettingsGeneralTabWidget(
     ui->licensePanel->init(licenseUsageTextProvider, store);
 
     ui->wearableArchiveLengthWidget->aligner()->addAligner(
-        ui->wearableMotionWidget->aligner());
+        ui->imageControlWidget->aligner());
 
     CheckboxUtils::autoClearTristate(ui->enableAudioCheckBox);
 

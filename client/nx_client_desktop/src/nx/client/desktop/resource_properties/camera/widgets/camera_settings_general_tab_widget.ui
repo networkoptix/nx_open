@@ -83,7 +83,7 @@
      </property>
      <item>
       <widget class="QWidget" name="leftWidget" native="true">
-       <layout class="QVBoxLayout" name="verticalLayout" stretch="0,0,1">
+       <layout class="QVBoxLayout" name="verticalLayout" stretch="0,0,0,1">
         <property name="spacing">
          <number>20</number>
         </property>
@@ -105,6 +105,9 @@
            <enum>Qt::TabFocus</enum>
           </property>
          </widget>
+        </item>
+        <item>
+         <widget class="nx::client::desktop::ArchiveLengthWidget" name="wearableArchiveLengthWidget" native="true"/>
         </item>
         <item>
          <widget class="QGroupBox" name="authenticationGroupBox">
@@ -149,7 +152,7 @@
      </item>
      <item>
       <widget class="QWidget" name="rightWidget" native="true">
-       <layout class="QVBoxLayout" name="verticalLayout_3" stretch="0,0,0,1">
+       <layout class="QVBoxLayout" name="verticalLayout_3" stretch="0,0,1">
         <property name="spacing">
          <number>20</number>
         </property>
@@ -196,9 +199,6 @@
            </item>
           </layout>
          </widget>
-        </item>
-        <item>
-         <widget class="nx::client::desktop::ArchiveLengthWidget" name="wearableArchiveLengthWidget" native="true"/>
         </item>
         <item>
          <widget class="nx::client::desktop::WearableCameraMotionWidget" name="wearableMotionWidget" native="true"/>
