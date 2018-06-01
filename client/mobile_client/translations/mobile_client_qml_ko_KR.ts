@@ -339,7 +339,7 @@
     </message>
     <message>
       <source>LDAP Server connection timed out</source>
-      <translation type="unfinished">LDAP Server connection timed out</translation>
+      <translation>LDAP 서버 연결 타임아웃</translation>
     </message>
     <message>
       <source>Server or network is not available</source>

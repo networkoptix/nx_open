@@ -335,11 +335,11 @@
     <name>LoginUtils</name>
     <message>
       <source>Invalid login or password</source>
-      <translation type="unfinished">Invalid login or password</translation>
+      <translation>無效的帳號或密碼</translation>
     </message>
     <message>
       <source>LDAP Server connection timed out</source>
-      <translation type="unfinished">LDAP Server connection timed out</translation>
+      <translation>LDAP伺服器連線逾時</translation>
     </message>
     <message>
       <source>Server or network is not available</source>

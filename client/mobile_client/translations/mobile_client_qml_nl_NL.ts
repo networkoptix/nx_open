@@ -335,11 +335,11 @@
     <name>LoginUtils</name>
     <message>
       <source>Invalid login or password</source>
-      <translation type="unfinished">Invalid login or password</translation>
+      <translation>Ongeldige gebruikersnaam of wachtwoord</translation>
     </message>
     <message>
       <source>LDAP Server connection timed out</source>
-      <translation type="unfinished">LDAP Server connection timed out</translation>
+      <translation>LDAP-serververbinding heeft een time-out</translation>
     </message>
     <message>
       <source>Server or network is not available</source>

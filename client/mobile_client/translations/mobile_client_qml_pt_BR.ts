@@ -121,11 +121,11 @@
     </message>
     <message>
       <source>Email cannot be empty</source>
-      <translation type="unfinished">Email cannot be empty</translation>
+      <translation>Email cannot be empty</translation>
     </message>
     <message>
       <source>Password cannot be empty</source>
-      <translation type="unfinished">Password cannot be empty</translation>
+      <translation>A password não pode estar vazia</translation>
     </message>
   </context>
   <context>
@@ -339,7 +339,7 @@
     </message>
     <message>
       <source>LDAP Server connection timed out</source>
-      <translation type="unfinished">LDAP Server connection timed out</translation>
+      <translation>Timeout da ligação ao Servidor LDAP</translation>
     </message>
     <message>
       <source>Server or network is not available</source>
@@ -596,7 +596,7 @@
     </message>
     <message>
       <source>Delete</source>
-      <translation type="unfinished">Delete</translation>
+      <translation>Apagar</translation>
     </message>
   </context>
   <context>
@@ -795,7 +795,7 @@
     </message>
     <message>
       <source>Cannot connect to %1</source>
-      <translation type="unfinished">Cannot connect to %1</translation>
+      <translation>Cannot connect to %1</translation>
     </message>
   </context>
 </TS>

@@ -335,11 +335,11 @@
     <name>LoginUtils</name>
     <message>
       <source>Invalid login or password</source>
-      <translation type="unfinished">Invalid login or password</translation>
+      <translation>Đăng nhập hoặc mật khẩu không hợp lệ</translation>
     </message>
     <message>
       <source>LDAP Server connection timed out</source>
-      <translation type="unfinished">LDAP Server connection timed out</translation>
+      <translation>Kết nối LDAP Server time out</translation>
     </message>
     <message>
       <source>Server or network is not available</source>
