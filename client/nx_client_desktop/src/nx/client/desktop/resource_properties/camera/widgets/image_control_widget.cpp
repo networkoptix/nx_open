@@ -130,8 +130,11 @@ void ImageControlWidget::loadState(const CameraSettingsDialogState& state)
 
     setVisible(imageControl.aspectRatioAvailable || imageControl.rotationAvailable);
 
-    if (isVisible())
-        ui->formLayout->activate();
+    if (!isVisible())
+        return;
+
+    ui->imageControlGroupBox->layout()->activate();
+    layout()->activate();
 }
 
 } // namespace desktop
