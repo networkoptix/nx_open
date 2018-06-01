@@ -46,10 +46,7 @@
     </widget>
    </item>
    <item>
-    <widget class="nx::client::desktop::CameraLicensePanelWidget" name="licensePanel" native="true">
-     <zorder>overLicensingLine</zorder>
-     <zorder>overGridLine</zorder>
-    </widget>
+    <widget class="nx::client::desktop::CameraLicensePanelWidget" name="licensePanel" native="true"/>
    </item>
    <item>
     <widget class="Line" name="overGridLine">

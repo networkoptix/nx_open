@@ -261,7 +261,7 @@ void setCredentials(const State::Credentials& value, const Cameras& cameras)
     else if (!value.password.hasValue())
     {
         // Change only login, fetch passwords from cameras.
-        for (const auto& camera : cameras)
+        for (const auto& camera: cameras)
         {
             authenticator.setPassword(camera->getAuth().password());
             camera->setAuth(authenticator);

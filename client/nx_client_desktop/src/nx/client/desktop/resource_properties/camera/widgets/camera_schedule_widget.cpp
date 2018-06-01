@@ -184,9 +184,7 @@ void CameraScheduleWidget::loadState(const CameraSettingsDialogState& state)
     ui->gridWidget->setBrush(actualBrush);
 
     const bool recordingEnabled = recording.enabled.valueOr(false);
-    CheckboxUtils::setupTristateCheckbox(ui->enableRecordingCheckBox,
-        state.recording.enabled.hasValue(),
-        recordingEnabled);
+    CheckboxUtils::setupTristateCheckbox(ui->enableRecordingCheckBox, state.recording.enabled);
     setReadOnly(ui->enableRecordingCheckBox, state.readOnly);
 
     ui->licensesButton->setVisible(state.globalPermissions.testFlag(Qn::GlobalAdminPermission));

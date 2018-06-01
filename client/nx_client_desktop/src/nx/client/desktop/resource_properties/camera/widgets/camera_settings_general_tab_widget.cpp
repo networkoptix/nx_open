@@ -71,9 +71,7 @@ void CameraSettingsGeneralTabWidget::loadState(const CameraSettingsDialogState& 
     ui->licensePanel->setVisible(licensePanelVisible);
     ui->overLicensingLine->setVisible(licensePanelVisible);
 
-    CheckboxUtils::setupTristateCheckbox(ui->enableAudioCheckBox,
-        state.audioEnabled.hasValue(),
-        state.audioEnabled.valueOr(false));
+    CheckboxUtils::setupTristateCheckbox(ui->enableAudioCheckBox, state.audioEnabled);
 
     ::setReadOnly(ui->enableAudioCheckBox, state.readOnly);
     ::setReadOnly(ui->editCredentialsButton, state.readOnly);

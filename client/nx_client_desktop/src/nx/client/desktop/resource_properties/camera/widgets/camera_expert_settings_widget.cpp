@@ -203,10 +203,7 @@ void CameraExpertSettingsWidget::loadState(const CameraSettingsDialogState& stat
             controlDisabledForAll);
     }
 
-    CheckboxUtils::setupTristateCheckbox(
-        ui->bitratePerGopCheckBox,
-        state.expert.useBitratePerGOP.hasValue(),
-        state.expert.useBitratePerGOP.valueOr(false));
+    CheckboxUtils::setupTristateCheckbox(ui->bitratePerGopCheckBox, state.expert.useBitratePerGOP);
 
     // TODO: #vkutin #gdm Should we disable it too when camera control is disabled?
     ui->bitratePerGopCheckBox->setEnabled(state.settingsOptimizationEnabled
@@ -293,14 +290,10 @@ void CameraExpertSettingsWidget::loadState(const CameraSettingsDialogState& stat
     // Archive.
 
     CheckboxUtils::setupTristateCheckbox(
-        ui->checkBoxPrimaryRecorder,
-        state.expert.primaryRecordingDisabled.hasValue(),
-        state.expert.primaryRecordingDisabled.valueOr(false));
+        ui->checkBoxPrimaryRecorder, state.expert.primaryRecordingDisabled);
 
     CheckboxUtils::setupTristateCheckbox(
-        ui->checkBoxSecondaryRecorder,
-        state.expert.secondaryRecordingDisabled.hasValue(),
-        state.expert.secondaryRecordingDisabled.valueOr(false));
+        ui->checkBoxSecondaryRecorder, state.expert.secondaryRecordingDisabled);
 
     ui->checkBoxSecondaryRecorder->setVisible(hasDualStreaming && !dualStreamingDisabledForAll);
 
