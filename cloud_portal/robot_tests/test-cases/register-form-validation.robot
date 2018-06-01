@@ -92,7 +92,7 @@ Check Email Outline
 
 Check Password Outline
     [Arguments]    ${pass}
-    Wait Until Element Is Visible    ${REGISTER PASSWORD INPUT}/parent::div/parent::div/parent::div[contains(@class,'has-error')]
+    Wait Until Element Is Visible    ${REGISTER PASSWORD INPUT}/../input[contains(@class,'ng-invalid')]
     Run Keyword If    "${pass}"=="${EMPTY}" or "${pass}"=="${SPACE}"    Element Should Be Visible    ${PASSWORD IS REQUIRED}
     Run Keyword If    "${pass}"=="${7char password}"    Element Should Be Visible    ${PASSWORD TOO SHORT}
     Run Keyword If    "${pass}"=="${CYRILLIC TEXT}" or "${pass}"=="${SMILEY TEXT}" or "${pass}"=="${GLYPH TEXT}" or "${pass}"=="${TM TEXT}" or "${pass}"=="${SPACE}${BASE PASSWORD}" or "${pass}"=="${BASE PASSWORD}${SPACE}"    Element Should Be Visible    ${PASSWORD SPECIAL CHARS}
