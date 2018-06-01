@@ -43,8 +43,12 @@ private slots:
 
 private:
     QString calculateExtendedErrorMessage(const nx::client::desktop::WearablePayload& upload);
+    QnSecurityCamResourcePtr cameraByProgressId(const QnUuid& progressId) const;
+    QnUuid ensureProgress(const QnUuid& cameraId);
+    void removeProgress(const QnUuid& cameraId);
 
 private:
     QnUuid m_currentCameraUuid;
+    QHash<QnUuid, QnUuid> m_currentProgresses; //< Camera id -> progress id.
 };
 
