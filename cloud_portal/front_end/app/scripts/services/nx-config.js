@@ -10,7 +10,7 @@
             // previewPath: '',
             // viewsDirCommon: 'static/web_common/views/',
             // ***************************************************************
-            gatewayUrl: '/gateway',
+            gatewayHost: '{host}/gateway/{systemId}',
             googleTagsCode: 'GTM-5MRNWP',
             apiBase: '/api',
             realm: 'VMS',
