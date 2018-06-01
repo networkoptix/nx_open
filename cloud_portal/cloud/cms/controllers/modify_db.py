@@ -239,12 +239,14 @@ def upload_file(data_structure, file):
         encoded_file, file_dimensions = encode_file(file, data_structure.type, formats)
     except (IOError, TypeError):
         file_errors.append((data_structure.name, "Image is damaged please upload an valid version"))
+        return None, file_errors
 
     if not encoded_file and file_size > 0:
         error_msg = "Invalid file type. Uploaded file is {}. It should be {}." \
             .format(file.content_type,
                     data_structure.meta_settings['format'].replace(',', ' or '))
         file_errors.append((data_structure.name, error_msg))
+        return None, file_errors
 
     # Gets the meta_settings form the DataStructure to check if the sizes are valid
     # if the length is zero then there is no meta settings
