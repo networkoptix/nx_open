@@ -180,7 +180,7 @@
            <item>
             <widget class="QCheckBox" name="enableAudioCheckBox">
              <property name="text">
-              <string>Enable Audio</string>
+              <string>Enable audio</string>
              </property>
             </widget>
            </item>

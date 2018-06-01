@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>340</width>
-    <height>132</height>
+    <width>351</width>
+    <height>173</height>
    </rect>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
@@ -23,7 +23,7 @@
       <item row="0" column="0">
        <widget class="QLabel" name="aspectRatioLabel">
         <property name="text">
-         <string>Aspect Ratio</string>
+         <string>Aspect ratio</string>
         </property>
         <property name="alignment">
          <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
@@ -36,7 +36,7 @@
       <item row="1" column="0">
        <widget class="QLabel" name="rotationLabel">
         <property name="text">
-         <string>Default Rotation</string>
+         <string>Default rotation</string>
         </property>
         <property name="alignment">
          <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
