@@ -27,12 +27,6 @@ CameraInfoWidget::CameraInfoWidget(QWidget* parent):
     ui->eventLogButton->setIcon(qnSkin->icon("text_buttons/text.png"));
     ui->cameraRulesButton->setIcon(qnSkin->icon("text_buttons/event_rules.png"));
 
-    ui->wearableControlsPage->setContentsMargins(
-        style::Metrics::kDefaultTopLevelMargin - layout()->contentsMargins().left(),
-        0,
-        style::Metrics::kDefaultTopLevelMargin,
-        0);
-
     autoResizePagesToContents(ui->stackedWidget,
         {QSizePolicy::Preferred, QSizePolicy::Fixed},
         true);
@@ -69,9 +63,6 @@ CameraInfoWidget::CameraInfoWidget(QWidget* parent):
 
     connect(ui->showOnLayoutButton, &QPushButton::clicked, this,
         [this]() { emit actionRequested(ui::action::OpenInNewTabAction); });
-
-    connect(ui->wearableControlsPage, &WearableCameraUploadWidget::actionRequested,
-        this, &CameraInfoWidget::actionRequested);
 }
 
 CameraInfoWidget::~CameraInfoWidget()
@@ -80,8 +71,6 @@ CameraInfoWidget::~CameraInfoWidget()
 
 void CameraInfoWidget::setStore(CameraSettingsDialogStore* store)
 {
-    ui->wearableControlsPage->setStore(store);
-
     m_storeConnections.reset(new QnDisconnectHelper());
     NX_ASSERT(store);
     if (!store)
@@ -102,16 +91,15 @@ void CameraInfoWidget::loadState(const CameraSettingsDialogState& state)
 
     ui->nameLabel->setVisible(singleCamera);
 
-    if (state.isSingleWearableCamera())
-        ui->controlsStackedWidget->setCurrentWidget(ui->wearableControlsPage);
-    else if (singleCamera)
-        ui->controlsStackedWidget->setCurrentWidget(ui->toggleInfoPage);
-    else
-        ui->controlsStackedWidget->setCurrentWidget(ui->multipleCamerasNamePage);
+    ui->controlsStackedWidget->setCurrentWidget(singleCamera
+        ? ui->toggleInfoPage
+        : ui->multipleCamerasNamePage);
 
     ui->stackedWidget->setVisible(singleNonWearableCamera);
     ui->toggleInfoButton->setVisible(singleNonWearableCamera);
     ui->cameraRulesButton->setVisible(singleNonWearableCamera);
+    ui->eventLogButton->setVisible(singleNonWearableCamera);
+    ui->controlsStackedWidget->setHidden(state.isSingleWearableCamera());
 
     const QString rulesTitle = QnCameraDeviceStringSet(
         tr("Device Rules"),tr("Camera Rules"),tr("I/O Module Rules")).getString(state.deviceType);
