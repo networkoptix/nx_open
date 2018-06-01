@@ -173,7 +173,7 @@ QnBusinessRuleViewModel::QnBusinessRuleViewModel(QObject* parent):
     m_actionTypesModel(new QStandardItemModel(this)),
     m_helper(new vms::event::StringsHelper(commonModule()))
 {
-    auto addEventItem =
+    const auto addEventItem =
         [this](vms::event::EventType eventType)
         {
             auto item = new QStandardItem(m_helper->eventName(eventType));
@@ -181,7 +181,16 @@ QnBusinessRuleViewModel::QnBusinessRuleViewModel(QObject* parent):
             m_eventTypesModel->appendRow(item);
         };
 
-    auto addSeparator =
+    const auto addActionItem =
+        [this](vms::event::ActionType actionType)
+        {
+            QStandardItem *item = new QStandardItem(m_helper->actionName(actionType));
+            item->setData(actionType);
+            item->setData(!vms::event::canBeInstant(actionType), ProlongedActionRole);
+            m_actionTypesModel->appendRow(item);
+        };
+
+    const auto addSeparator =
         [](QStandardItemModel* model)
         {
             auto item = new QStandardItem(lit("-"));
@@ -201,16 +210,12 @@ QnBusinessRuleViewModel::QnBusinessRuleViewModel(QObject* parent):
     for (const auto eventType: lexComparator.lexSortedEvents(EventSubType::success))
         addEventItem(eventType);
 
-    for (vms::event::ActionType actionType : lexComparator.lexSortedActions())
-    {
-        QStandardItem *item = new QStandardItem(m_helper->actionName(actionType));
-        item->setData(actionType);
-        item->setData(!vms::event::canBeInstant(actionType), ProlongedActionRole);
-
-        QList<QStandardItem *> row;
-        row << item;
-        m_actionTypesModel->appendRow(row);
-    }
+    using ActionSubType = QnBusinessTypesComparator::ActionSubType;
+    for (const auto actionType: lexComparator.lexSortedActions(ActionSubType::server))
+        addActionItem(actionType);
+    addSeparator(m_actionTypesModel);
+    for (const auto actionType: lexComparator.lexSortedActions(ActionSubType::client))
+        addActionItem(actionType);
 
     m_actionParams.additionalResources = userRolesManager()->adminRoleIds().toVector().toStdVector();
 
