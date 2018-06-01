@@ -45,15 +45,15 @@ export class LoginModalContent implements OnInit, AfterViewInit {
         this.activeModal.close();
 
         this.process.init(() => {
-            return this.cloudApi.reactivate(email);
-        }, {
-            errorCodes: {
-                forbidden: this.language.lang.errorCodes.accountAlreadyActivated,
-                notFound: this.language.lang.errorCodes.emailNotFound
-            },
-            holdAlerts: true,
-            errorPrefix: this.language.lang.errorCodes.cantSendConfirmationPrefix
-        })
+                return this.cloudApi.reactivate(email);
+            }, {
+                errorCodes: {
+                    forbidden: this.language.lang.errorCodes.accountAlreadyActivated,
+                    notFound: this.language.lang.errorCodes.emailNotFound
+                },
+                holdAlerts: true,
+                errorPrefix: this.language.lang.errorCodes.cantSendConfirmationPrefix
+            })
             .run()
             .then(() => {
                 this.generalModal.openConfirm(

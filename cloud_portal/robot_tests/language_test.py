@@ -17,7 +17,7 @@ def allLanguages():
         runTest(key, langList)
         mergableOutputs = (path.join('outputs', lang, 'output.xml')
                            for lang in langList if path.isfile(path.join('outputs', lang, 'output.xml')))
-        system('rebot --suitestatlevel 4 -o allLanguages.xml -l allLanguagesLog.html -r allLanguagesReport.html ' +
+        system('rebot --suitestatlevel 2 -o allLanguages.xml -l allLanguagesLog.html -r allLanguagesReport.html ' +
                ' '.join(mergableOutputs))
 
 

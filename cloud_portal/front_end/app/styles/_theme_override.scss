@@ -38,67 +38,49 @@ body{
   }
 }
 
-
-h1{
-  margin-top: $line-height-computed;
-  margin-bottom: $line-height-computed;
-  padding: 0 8px;
-  font-size: $h1-font-size;
-  display: flex;
-  align-items: center;
+h1, h2 {
+  margin-top    : $line-height-computed;
+  margin-bottom : $line-height-computed;
+  padding       : 0 8px;
+  font-size     : $h1-font-size;
+  display       : flex;
+  align-items   : center;
+  font-family   : $font-family-regular;
 }
 
-h2{
-  margin:0;
-  font-size: $h2-font-size;
+h2 {
+  margin      : 0;
+  padding     : 0;
+  font-size   : $h2-font-size;
+  font-family : $font-family-regular;
 }
 
-h3{
-  margin-top: ( $line-height-computed / 2 );
-  margin-bottom: ( $line-height-computed / 4 );
-  font-weight: normal;
-  font-size: $h3-font-size;
+h3 {
+  margin-top    : ($line-height-computed / 2);
+  margin-bottom : ($line-height-computed / 4);
+  font-size     : $h3-font-size;
+  font-family   : $font-family-medium;
 }
 
 h4 {
-  font-size: $h4-font-size;
+  font-size   : $h4-font-size;
+  font-family : $font-family-medium;
 }
 
 h5 {
-  font-size: $h5-font-size;
+  font-size   : $h5-font-size;
+  font-family : $font-family-medium;
 }
 
 h6 {
-  font-size: $h6-font-size;
+  font-size   : $h6-font-size;
+  font-family : $font-family-medium;
 }
 
 h1>.label{
   font-size:60%;
   vertical-align: 33%;
 }
-
-//.modal-open {
-//  overflow: auto;
-//}
-//
-//
-//@media (min-width: $dialog-sm-float-breakpoint) {
-//  .modal-sm {
-//    width: $modal-sm;
-//    margin: 108px auto;
-//  }
-//}
-//
-//@include media-breakpoint-up(sm) {
-//  /* Automatically set modal's width for larger viewports */
-//  .modal-dialog {
-//    margin: 108px auto;
-//  }
-//
-//  .modal-content {
-//    @include box-shadow(0px 20px 50px 0px transparentize($dark15,0.85));
-//  }
-//}
 
 .card > .table, .card > .table-responsive {
   margin-bottom: 16px;
@@ -166,7 +148,7 @@ label {
     opacity: 0.3;
   }
 
-  &.ng-invalid:not(.ng-untouched) {
+  &:invalid:not(.ng-untouched) {
     border-color: $error;
 
     + .input-group-addon {

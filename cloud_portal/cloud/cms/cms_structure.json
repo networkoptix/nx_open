@@ -20,7 +20,8 @@
             "label": "Skin",
             "name": "%SKIN%",
             "value": "blue",
-            "description": "Skin. Supported values: blue, orange, green. Changing skin requires forcing update."
+            "description": "Skin. Supported values: blue, orange, green. Changing skin requires forcing update.",
+            "advanced": true
           },
           {
             "label": "VMS Name",
