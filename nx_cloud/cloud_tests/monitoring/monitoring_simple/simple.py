@@ -33,8 +33,8 @@ def testclass(cls):
         if hasattr(method, "testmethod_index"):
             test_methods_dict[method.testmethod_index] = method
 
-        if hasattr(method, "metric"):
-            host = method.host if hasattr(method, "host") else None
+        if hasattr(method, "metric") and method.metric:
+            host = method.host if hasattr(method, "host") and method.host else None
             metric_keys.append((method.metric, host))
 
     cls._test_methods = test_methods_dict.values()
@@ -66,7 +66,8 @@ def testmethod(delay=0, host=None, continue_if_fails=False, metric=None):
                 traceback.print_exc(file=io)
                 log.error(io.getvalue())
 
-                self.collected_metrics[(metric, host, datetime.utcnow())] = 1
+                if metric:
+                    self.collected_metrics[(metric, host, datetime.utcnow())] = 1
 
                 if continue_if_fails:
                     return 1
@@ -177,17 +178,21 @@ class CloudSession(object):
 
             metric_items.append(metric_item)
 
+        timestamp = datetime.utcnow()
         return {
-            'timestamp': datetime.utcnow().isoformat(),
+            'year': timestamp.year,
+            'timestamp': timestamp.isoformat(),
             'metrics': metric_items
         }
 
     def report_metrics(self):
         collected_keys = set([(metric, host) for (metric, host, timestamp) in self.collected_metrics.keys()])
 
+        timestamp = datetime.utcnow()
+
         for metric, host in self._metric_keys:
             if (metric, host) not in collected_keys:
-                self.collected_metrics[(metric, host, datetime.utcnow())] = None
+                self.collected_metrics[(metric, host, timestamp)] = None
 
         cloudwatch = boto3.client('cloudwatch')
         cloudwatch.put_metric_data(
@@ -281,7 +286,7 @@ class CloudSession(object):
         log.info('Stderr:\n{}'.format(stderr.decode('utf-8')))
         container.remove()
 
-        assert b'HTTP/1.1 200 OK' in stdout, 'Received invalid output from cloud connect (extra_args: {})}'.format(
+        assert b'HTTP/1.1 200 OK' in stdout, 'Received invalid output from cloud connect (extra_args: {})'.format(
             extra_args)
         assert status == 0, 'Cloud connect test util exited with non-zero status {}'.format(status)
 
