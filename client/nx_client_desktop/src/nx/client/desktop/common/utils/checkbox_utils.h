@@ -12,7 +12,7 @@ struct CheckboxUtils
 {
     static void autoClearTristate(QCheckBox* checkbox);
     static void setupTristateCheckbox(QCheckBox* checkbox, bool sameValue, bool checked);
-    static void setupTristateCheckbox(QCheckBox* checkbox, std::optional<bool> checkState);
+    static void setupTristateCheckbox(QCheckBox* checkbox, std::optional<bool> checked);
 };
 
 } // namespace desktop
