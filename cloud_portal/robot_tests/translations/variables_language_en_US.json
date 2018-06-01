@@ -26,6 +26,7 @@
     "WRONG PASSWORD"                       :    "Wrong password",
     "ACCOUNT NOT FOUND TEXT"               :    "Account not found",
     "CANNOT SEND CONFIRMATION EMAIL"       :    "Cannot send confirmation Email:",
+    "ACCOUNT DOES NOT EXIST"               :    "Account does not exist.",
     "CODE USED/INCORRECT"                  :    "Confirmation code is already used or incorrect",
 
     "SHARE PERMISSIONS HINT ADMIN"         :    "Unrestricted access including the ability to share",

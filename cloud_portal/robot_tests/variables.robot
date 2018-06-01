@@ -2,7 +2,7 @@
 Variables    getvars.py
 
 *** Variables ***
-${ALERT}                              //div[contains(@class, 'ng-toast')]//span[@ng-bind-html='message.content']
+${ALERT}                              //span[@ng-if='!message.compileContent']
 ${ALERT CLOSE}                        //div[contains(@class, 'ng-toast')]//span[@ng-bind-html='message.content']/../preceding-sibling::button[@ng-click='!message.dismissOnClick && dismiss()']
 
 ${LOCAL}                              https://localhost:9000/
@@ -102,7 +102,7 @@ ${SHARE BUTTON DISABLED}              //div[@process-loading='gettingSystem']//b
 ${OPEN IN NX BUTTON}                  //div[@process-loading='gettingSystem']//button[@ng-click='checkForm()']
 ${OPEN IN NX BUTTON DISABLED}         //div[@process-loading='gettingSystem']//button[@ng-click='checkForm()' and @ng-disabled='buttonDisabled']
 ${DELETE USER MODAL}                  //div[@uib-modal-transclude]
-${DELETE USER BUTTON}                 //button[@ng-click='ok()' and contains(text(), '${DELETE USER BUTTON TEXT}')]
+${DELETE USER BUTTON}                 //button[contains(text(), '${DELETE USER BUTTON TEXT}')]
 ${DELETE USER CANCEL BUTTON}          //button[@ng-click='cancel()' and contains(text(), '${DELETE USER CANCEL BUTTON TEXT}')]
 ${SYSTEM NAME OFFLINE}                //span[@ng-if='!system.isOnline']
 ${USERS LIST}                         //div[@process-loading='gettingSystemUsers']
@@ -125,16 +125,16 @@ ${ALREADY ACTIVATED}                  //h1[@ng-if='!activate.success' and contai
 
 #Share Elements (Note: Share and Permissions are the same form so these are the same variables.  Making two just in case they do diverge at some point.)
 ${SHARE MODAL}                        //form[@name='shareForm']
-${SHARE EMAIL}                        //form[@name='shareForm']//input[@ng-model='user.email']
+${SHARE EMAIL}                        //form[@name='shareForm']//input[@id='email']
 ${SHARE PERMISSIONS DROPDOWN}         //form[@name='shareForm']//nx-permissions-select//button[@id='permissionsSelect']
-${SHARE BUTTON MODAL}                 //form[@name='shareForm']//button[@ng-click='checkForm()']
+${SHARE BUTTON MODAL}                 //form[@name='shareForm']//button[text()='Share']
 ${SHARE CANCEL}                       //form[@name='shareForm']//button[text()='Cancel']
 ${SHARE CLOSE}                        //form[@name='shareForm']//button[@data-dismiss='modal']
 ${SHARE PERMISSIONS HINT}             //form[@name='shareForm']//span[contains(@class,'help-block')]
 
 ${EDIT PERMISSIONS EMAIL}             //form[@name='shareForm']//input[@ng-model='user.email']
 ${EDIT PERMISSIONS DROPDOWN}          //form[@name='shareForm']//select[@ng-model='user.role']
-${EDIT PERMISSIONS SAVE}              //form[@name='shareForm']//button[@ng-click='checkForm()']
+${EDIT PERMISSIONS SAVE}              //form[@name='shareForm']//button[text()='Save']
 ${EDIT PERMISSIONS CANCEL}            //form[@name='shareForm']//button[@ng-click='close()']
 ${EDIT PERMISSIONS CLOSE}             //div[@uib-modal-transclude]//div[@ng-if='settings.title']//button[@ng-click='close()']
 ${EDIT PERMISSIONS ADMINISTRATOR}     //form[@name='shareForm']//select[@ng-model='user.role']//option[@label='Administrator']
