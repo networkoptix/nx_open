@@ -46,6 +46,7 @@ def get_context_and_language(request, context_id, language_code, customization):
     return context, language
 
 
+# This builds the custom 'edit page' form
 def initialize_form(context, customization, language, user):
     form_initialization = {'language': language.code}
 
@@ -61,6 +62,7 @@ def initialize_form(context, customization, language, user):
     return form
 
 
+# This is used to get the context, customization and language from request information
 def get_info_for_context_editor(request, context_id, language_code):
     customization = Customization.objects.get(name=settings.CUSTOMIZATION)
     context, language = get_context_and_language(request, context_id, language_code, customization)
