@@ -77,12 +77,25 @@ private:
         QString sessionKey;
         QnMutex lock;
     };
+
+    struct BaseDeviceInfo
+    {
+        int numberOfChannels = 0;
+        nx::core::resource::DeviceType deviceType = nx::core::resource::DeviceType::unknown;
+
+        bool isValid() const
+        {
+            return numberOfChannels != 0
+                && deviceType != nx::core::resource::DeviceType::unknown;
+        };
+    };
+
     using SessionKeyPtr = std::shared_ptr<SessionKeyData>;
 
     mutable QnMutex m_mutex;
     QnResourceList m_foundUpnpResources;
     std::set<QString> m_alreadyFoundMacAddresses;
-    QMap<QString, int> m_channelsByCamera;
+    std::map<QString, BaseDeviceInfo> m_baseDeviceInfos;
 
     // TODO: #dmishin make different session keys for different session types
     // There is only one session key per group now.
@@ -93,7 +106,6 @@ private:
     std::vector<std::unique_ptr<nx::network::AbstractDatagramSocket>> m_sunApiSocketList;
     QList<nx::network::QnInterfaceAndAddr> m_lastInterfaceList;
     QMap<nx::network::QnMacAddress, SunApiData> m_sunapiDiscoveredDevices;
-    QMap<QString, std::shared_ptr<HanwhaSharedResourceContext>> m_sharedContexts;
 };
 
 } // namespace plugins

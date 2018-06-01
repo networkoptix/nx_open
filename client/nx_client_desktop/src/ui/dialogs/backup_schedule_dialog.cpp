@@ -6,6 +6,8 @@
 
 #include <QtWidgets/QComboBox>
 
+#include <translation/datetime_formatter.h>
+
 #include <core/resource/server_backup_schedule.h>
 
 #include <nx_ec/data/api_media_server_data.h>
@@ -20,9 +22,6 @@ namespace {
     const int daysPerWeek = 7;
     const int bitsPerMegabit = 1024*1024;
     const int bitsPerByte = 8;
-
-    /** Default format used all over the app. */
-    const QString defaultTimeFormat = lit("hh:mm");
 
     Qt::DayOfWeek nextDay(Qt::DayOfWeek day) {
         static_assert(Qt::Sunday == 7, "Make sure Sunday is the last day");
@@ -57,10 +56,11 @@ QnBackupScheduleDialog::QnBackupScheduleDialog(QWidget *parent):
     initDayOfWeekCheckboxes();
 
     ui->comboBoxTimeTo->addItem(tr("Until finished"), -1);
-    for (int i = 0; i < 24; ++i) {
-        QTime t(i, 0, 0);
-        ui->comboBoxTimeStart->addItem(t.toString(defaultTimeFormat), i * 3600);
-        ui->comboBoxTimeTo->addItem(t.toString(defaultTimeFormat), i * 3600);
+    for (int i = 0; i < 24; ++i) 
+    {
+        QString hour = datetime::toString(QTime(i, 0, 0), datetime::Format::hh);
+        ui->comboBoxTimeStart->addItem(hour, i * 3600);
+        ui->comboBoxTimeTo->addItem(hour, i * 3600);
     }
 
     auto updateLimitControls = [this]

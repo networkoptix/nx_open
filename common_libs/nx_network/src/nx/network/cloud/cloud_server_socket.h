@@ -53,7 +53,7 @@ public:
     AbstractSocket::SOCKET_HANDLE handle() const override;
 
     bool listen(int queueLen) override;
-    AbstractStreamSocket* accept() override;
+    std::unique_ptr<AbstractStreamSocket> accept() override;
 
     void pleaseStop(nx::utils::MoveOnlyFunc<void()> handler) override;
     void pleaseStopSync(bool assertIfCalledUnderLock = true) override;
@@ -100,8 +100,8 @@ protected:
     void initializeCustomAcceptors(const hpm::api::ListenResponse& response);
     void retryRegistration();
     void reportResult(SystemError::ErrorCode systemErrorCode);
-    AbstractStreamSocket* acceptNonBlocking();
-    AbstractStreamSocket* acceptBlocking();
+    std::unique_ptr<AbstractStreamSocket> acceptNonBlocking();
+    std::unique_ptr<AbstractStreamSocket> acceptBlocking();
     void acceptAsyncInternal(AcceptCompletionHandler handler);
     void onNewConnectionHasBeenAccepted(
         SystemError::ErrorCode sysErrorCode,

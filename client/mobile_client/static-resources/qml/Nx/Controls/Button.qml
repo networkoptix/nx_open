@@ -33,6 +33,17 @@ Button
     font.pixelSize: 16
     font.weight: Font.DemiBold
 
+    onPressAndHold: { d.pressedAndHeld = true }
+    onCanceled: { d.pressedAndHeld = false }
+    onReleased:
+    {
+        if (!d.pressedAndHeld)
+            return
+
+        d.pressedAndHeld = false
+        clicked()
+    }
+
     label: Row
     {
         anchors.centerIn: parent
@@ -103,5 +114,12 @@ Button
 
         item: control
         hoverEventsEnabled: true
+    }
+
+    QtObject
+    {
+        id: d
+
+        property bool pressedAndHeld: false
     }
 }

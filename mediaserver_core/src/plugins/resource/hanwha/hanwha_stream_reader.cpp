@@ -121,8 +121,6 @@ CameraDiagnostics::Result HanwhaStreamReader::updateProfile(const QnLiveStreamPa
     }
 
     HanwhaRequestHelper helper(m_hanwhaResource->sharedContext());
-    helper.setIgnoreMutexAnalyzer(true);
-
     HanwhaProfileParameterFlags profileParameterFlags;
     if (m_hanwhaResource->isAudioSupported())
         profileParameterFlags |= HanwhaProfileParameterFlag::audioSupported;
@@ -215,9 +213,7 @@ CameraDiagnostics::Result HanwhaStreamReader::streamUri(QString* outUrl)
         params.emplace(kHanwhaProfileNumberProperty, QString::number(profileNumber));
 
     HanwhaRequestHelper helper(m_hanwhaResource->sharedContext());
-    helper.setIgnoreMutexAnalyzer(true);
     const auto response = helper.view(lit("media/streamuri"), params);
-
     if (!response.isSuccessful())
     {
         return error(

@@ -13,14 +13,10 @@ struct StoredFileData: Data
 };
 #define StoredFileData_Fields (path)(data)
 
-struct StoredFilePath: nx::vms::api::Data
+struct StoredFilePath: Data
 {
     StoredFilePath() = default;
-
-    StoredFilePath(const QString& path):
-        path(path)
-    {
-    }
+    StoredFilePath(const QString& path): path(path) {}
 
     bool operator<(const StoredFilePath& other) const
     {

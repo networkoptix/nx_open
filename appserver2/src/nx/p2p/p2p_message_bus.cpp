@@ -1,5 +1,7 @@
 #include "p2p_message_bus.h"
 
+#include <nx/network/url/url_parse_helper.h>
+
 #include <nx/utils/std/cmath.h>
 #include <common/common_module.h>
 #include <utils/media/bitStream.h>
@@ -160,9 +162,14 @@ void MessageBus::addOutgoingConnectionToPeer(const QnUuid& peer, const utils::Ur
 
     nx::utils::Url url(_url);
     if (peer == ::ec2::kCloudPeerId)
-        url.setPath(nx::cdb::api::kEc2EventsPath);
+    {
+        url.setPath(nx::network::url::joinPath(
+            kCloudPathPrefix.toStdString(), kUrlPath.toStdString()).c_str());
+    }
     else
+    {
         url.setPath(kUrlPath);
+    }
 
     int pos = nx::utils::random::number((int) 0, (int) m_remoteUrls.size());
     m_remoteUrls.insert(m_remoteUrls.begin() + pos, RemoteConnection(peer, url));
@@ -572,7 +579,7 @@ void MessageBus::at_gotMessage(
 }
 
 bool MessageBus::handlePushImpersistentBroadcastTransaction(
-	const P2pConnectionPtr& connection, 
+	const P2pConnectionPtr& connection,
 	const QByteArray& payload)
 {
 	return handleTransactionWithHeader(

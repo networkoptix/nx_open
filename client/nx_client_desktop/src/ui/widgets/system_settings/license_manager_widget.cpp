@@ -183,7 +183,6 @@ protected:
 
 } // namespace
 
-
 QnLicenseManagerWidget::QnLicenseManagerWidget(QWidget *parent) :
     base_type(parent),
     QnWorkbenchContextAware(parent),
@@ -403,7 +402,7 @@ void QnLicenseManagerWidget::showMessageLater(
             showMessage(icon, text, extras, button);
         };
 
-    executeDelayedParented(showThisMessage, 0, this);
+    executeLater(showThisMessage, this);
 }
 
 void QnLicenseManagerWidget::showMessage(
@@ -907,12 +906,12 @@ void QnLicenseManagerWidget::at_licensesReceived(const QByteArray& licenseKey, e
 
 void QnLicenseManagerWidget::at_downloadError()
 {
-    if (QNetworkReply *reply = qobject_cast<QNetworkReply *>(sender()))
+    if (const auto reply = qobject_cast<QNetworkReply*>(sender()))
     {
-        disconnect(reply, NULL, this, NULL); //avoid double "onError" handling
+        reply->disconnect(this); //< Avoid double "onError" handling.
         reply->deleteLater();
 
-        /* QNetworkReply slots should not start eventLoop */
+        // QNetworkReply slots should not start eventLoop.
         showMessageLater(QnMessageBoxIcon::Critical,
             networkErrorText(), networkErrorExtras(),
             CopyToClipboardButton::Hide);

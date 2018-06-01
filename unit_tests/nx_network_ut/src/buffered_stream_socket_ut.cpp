@@ -43,7 +43,7 @@ protected:
         ASSERT_TRUE(client->setSendTimeout(500));
         ASSERT_TRUE(client->connect(serverAddress, nx::network::kNoTimeout));
 
-        std::unique_ptr<AbstractStreamSocket> acceptedRaw(server->accept());
+        auto acceptedRaw = server->accept();
         ASSERT_NE(acceptedRaw, nullptr) << SystemError::getLastOSErrorText().toStdString();
 
         accepted = std::make_unique<BufferedStreamSocket>(

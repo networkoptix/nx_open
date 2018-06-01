@@ -185,7 +185,7 @@ namespace ec2
             void onGetCamerasHistoryDone        (int reqID, const ec2::ErrorCode, const nx::vms::api::ServerFootageDataList&);
             void onGetUsersDone                 (int reqID, const ec2::ErrorCode, const ec2::ApiUserDataList&);
             void onGetUserRolesDone             (int reqID, const ec2::ErrorCode, const ec2::ApiUserRoleDataList&);
-            void onGetBusinessRulesDone         (int reqID, const ec2::ErrorCode, const nx::vms::event::RuleList&);
+            void onGetEventRulesDone(int, ec2::ErrorCode, const nx::vms::api::EventRuleDataList&);
             void onGetLicensesDone              (int reqID, const ec2::ErrorCode, const QnLicenseList&);
             void onGetLayoutsDone               (int reqID, const ec2::ErrorCode, const nx::vms::api::LayoutDataList&);
             void onGetLayoutToursDone           (int reqID, const ec2::ErrorCode, const nx::vms::api::LayoutTourDataList&);
@@ -271,10 +271,9 @@ namespace ec2
         DEFINE_TWO_ARG_HANDLER(GetAccessRights,             ec2::ErrorCode, ec2::ApiAccessRightsDataList)
 
         //////////////////////////////////////////////////////////
-        ///////// Handlers for AbstractBusinessEventManager
+        ///////// Handlers for AbstractEventRulesManager
         //////////////////////////////////////////////////////////
-        DEFINE_TWO_ARG_HANDLER(GetBusinessRules, ec2::ErrorCode, nx::vms::event::RuleList)
-        DEFINE_TWO_ARG_HANDLER(SaveBusinessRule, ec2::ErrorCode, nx::vms::event::RulePtr)
+        DEFINE_TWO_ARG_HANDLER(GetEventRules, ec2::ErrorCode, nx::vms::api::EventRuleDataList)
 
         //////////////////////////////////////////////////////////
         ///////// Handlers for AbstractLicenseManager

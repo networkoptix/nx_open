@@ -150,6 +150,10 @@ void CameraScheduleWidget::setupUi()
     ui->enableRecordingCheckBox->setProperty(style::Properties::kCheckBoxAsButton, true);
     ui->enableRecordingCheckBox->setForegroundRole(QPalette::ButtonText);
 
+    ui->scheduleGridGroupBox->setTitle(lit("%1\t(%2)").arg(
+        tr("Recording Schedule")).arg(
+            tr("based on server time")));
+
     //TODO: #dkargin Restore hints.
     /*
     auto settingsHint = nx::client::desktop::HintButton::hintThat(ui->settingsGroupBox);

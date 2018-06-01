@@ -13,18 +13,21 @@
 
 #include "core/resource_management/resource_pool.h"
 #include "../../vmaxproxy/src/vmax480_helper.h"
+namespace {
 
 static const int VMAX_API_PORT = 9010;
 static const int TCP_TIMEOUT = 3000;
 static const QString NAME_PREFIX(QLatin1String("VMAX-"));
+static const QString kUpnpDeviceType("dvrdevice");
+
+} // namespace
 
 // ====================================================================
 QnPlVmax480ResourceSearcher::QnPlVmax480ResourceSearcher(QnCommonModule* commonModule):
     QnAbstractResourceSearcher(commonModule),
     QnAbstractNetworkResourceSearcher(commonModule),
-    QnUpnpResourceSearcherAsync(commonModule)
+    QnUpnpResourceSearcherAsync(commonModule, kUpnpDeviceType)
 {
-
 }
 
 QnPlVmax480ResourceSearcher::~QnPlVmax480ResourceSearcher()

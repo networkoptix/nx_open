@@ -89,11 +89,6 @@
     </message>
     <message>
       <location/>
-      <source>Disable only if the client takes too much CPU</source>
-      <translation>클라이언트 SW가 CPU를 많이 사용할 경우 해지 해주세요</translation>
-    </message>
-    <message>
-      <location/>
       <source>Maximum Live Buffer Length</source>
       <translation>최대 라이브 버퍼 길이</translation>
     </message>
@@ -1741,6 +1736,11 @@
       <location/>
       <source>Tour cycle</source>
       <translation>Tour cycle</translation>
+    </message>
+    <message>
+      <location/>
+      <source>IP addresses for cameras, and servers, groups for users, etc.</source>
+      <translation type="unfinished">IP addresses for cameras, and servers, groups for users, etc.</translation>
     </message>
   </context>
   <context>

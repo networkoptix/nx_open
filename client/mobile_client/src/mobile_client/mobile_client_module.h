@@ -5,6 +5,7 @@
 #include <nx_ec/ec_api_fwd.h>
 #include <nx/utils/singleton.h>
 
+class QnContext;
 class QnClientCoreModule;
 class QnCloudStatusWatcher;
 struct QnMobileClientStartupParameters;
@@ -16,10 +17,18 @@ public:
         const QnMobileClientStartupParameters& startupParameters,
         QObject* parent = nullptr);
     QnCloudStatusWatcher* cloudStatusWatcher() const;
-    ~QnMobileClientModule();
+    virtual ~QnMobileClientModule() override;
+
+    QnContext* context() const;
+
+    void initDesktopCamera();
+
+    void startLocalSearches();
+
 private:
     std::unique_ptr<QnClientCoreModule> m_clientCoreModule;
-    QnCloudStatusWatcher* m_cloudStatusWatcher;
+    QnCloudStatusWatcher* m_cloudStatusWatcher = nullptr;
+    QScopedPointer<QnContext> m_context;
 };
 
 #define qnMobileClientModule QnMobileClientModule::instance()

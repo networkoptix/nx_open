@@ -689,7 +689,7 @@
     </message>
     <message>
       <source>Hardware ID: %1</source>
-      <translation type="unfinished">Hardware ID: %1</translation>
+      <translation>Hardware ID: %1</translation>
     </message>
   </context>
   <context>

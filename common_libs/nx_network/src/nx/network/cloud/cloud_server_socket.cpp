@@ -101,7 +101,7 @@ bool CloudServerSocket::listen(int queueLen)
     return true;
 }
 
-AbstractStreamSocket* CloudServerSocket::accept()
+std::unique_ptr<AbstractStreamSocket> CloudServerSocket::accept()
 {
     NX_CRITICAL(!SocketGlobals::aioService().isInAnyAioThread());
 
@@ -418,21 +418,21 @@ void CloudServerSocket::acceptAsyncInternal(AcceptCompletionHandler handler)
         std::bind(&CloudServerSocket::onNewConnectionHasBeenAccepted, this, _1, _2));
 }
 
-AbstractStreamSocket* CloudServerSocket::acceptNonBlocking()
+std::unique_ptr<AbstractStreamSocket> CloudServerSocket::acceptNonBlocking()
 {
     if (auto socket = m_tunnelPool->getNextSocketIfAny())
-        return socket.release();
+        return socket;
     for (auto& acceptor: m_customConnectionAcceptors)
     {
         if (auto socket = acceptor->getNextSocketIfAny())
-            return socket.release();
+            return socket;
     }
 
     SystemError::setLastErrorCode(SystemError::wouldBlock);
     return nullptr;
 }
 
-AbstractStreamSocket* CloudServerSocket::acceptBlocking()
+std::unique_ptr<AbstractStreamSocket> CloudServerSocket::acceptBlocking()
 {
     nx::utils::promise<SystemError::ErrorCode> promise;
     std::unique_ptr<AbstractStreamSocket> acceptedSocket;
@@ -450,7 +450,7 @@ AbstractStreamSocket* CloudServerSocket::acceptBlocking()
         return nullptr;
     }
 
-    return acceptedSocket.release();
+    return acceptedSocket;
 }
 
 void CloudServerSocket::onNewConnectionHasBeenAccepted(

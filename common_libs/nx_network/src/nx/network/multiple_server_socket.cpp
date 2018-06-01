@@ -188,7 +188,7 @@ bool MultipleServerSocket::isInSelfAioThread() const
 
 MultipleServerSocket_FORWARD_SET(listen, int);
 
-AbstractStreamSocket* MultipleServerSocket::accept()
+std::unique_ptr<AbstractStreamSocket> MultipleServerSocket::accept()
 {
     NX_VERBOSE(this, lm("accept()"));
     if (m_nonBlockingMode)
@@ -229,7 +229,7 @@ AbstractStreamSocket* MultipleServerSocket::accept()
         result.second->setNonBlockingMode(false);
     }
 
-    return result.second.release();
+    return std::move(result.second);
 }
 
 void MultipleServerSocket::pleaseStop(nx::utils::MoveOnlyFunc<void()> handler)

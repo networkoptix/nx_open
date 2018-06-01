@@ -328,7 +328,7 @@ void QnCommonMessageProcessor::connectToConnection(const ec2::AbstractECConnecti
         eventManager,
         &ec2::AbstractBusinessEventNotificationManager::addedOrUpdated,
         this,
-        &QnCommonMessageProcessor::on_businessEventAddedOrUpdated,
+        &QnCommonMessageProcessor::on_eventRuleAddedOrUpdated,
         connectionType);
     connect(
         eventManager,
@@ -346,7 +346,7 @@ void QnCommonMessageProcessor::connectToConnection(const ec2::AbstractECConnecti
         eventManager,
         &ec2::AbstractBusinessEventNotificationManager::businessRuleReset,
         this,
-        &QnCommonMessageProcessor::on_businessRuleReset,
+        &QnCommonMessageProcessor::resetEventRules,
         connectionType);
     connect(
         eventManager,
@@ -442,7 +442,7 @@ void QnCommonMessageProcessor::on_gotInitialNotification(const ec2::ApiFullInfoD
     onGotInitialNotification(fullData);
 
     // TODO: #GDM #3.1 logic is not perfect, who will clean them on disconnect?
-    on_businessRuleReset(fullData.rules);
+    resetEventRules(fullData.rules);
 }
 
 void QnCommonMessageProcessor::on_gotDiscoveryData(const ec2::ApiDiscoveryData &data, bool addInformation)
@@ -673,9 +673,11 @@ void QnCommonMessageProcessor::on_licenseRemoved(const QnLicensePtr &license) {
     licensePool()->removeLicense(license);
 }
 
-void QnCommonMessageProcessor::on_businessEventAddedOrUpdated(const vms::event::RulePtr& rule)
+void QnCommonMessageProcessor::on_eventRuleAddedOrUpdated(const nx::vms::api::EventRuleData& data)
 {
-    eventRuleManager()->addOrUpdateRule(rule);
+    nx::vms::event::RulePtr eventRule(new nx::vms::event::Rule());
+    ec2::fromApiToResource(data, eventRule);
+    eventRuleManager()->addOrUpdateRule(eventRule);
 }
 
 void QnCommonMessageProcessor::on_businessEventRemoved(const QnUuid& id)
@@ -686,13 +688,6 @@ void QnCommonMessageProcessor::on_businessEventRemoved(const QnUuid& id)
 void QnCommonMessageProcessor::on_businessActionBroadcasted( const vms::event::AbstractActionPtr& /* businessAction */ )
 {
     // nothing to do for a while
-}
-
-void QnCommonMessageProcessor::on_businessRuleReset(const EventRuleDataList& rules)
-{
-    vms::event::RuleList ruleList;
-    ec2::fromApiToResourceList(rules, ruleList);
-    eventRuleManager()->resetRules(ruleList);
 }
 
 void QnCommonMessageProcessor::on_broadcastBusinessAction( const vms::event::AbstractActionPtr& action )
@@ -778,6 +773,13 @@ void QnCommonMessageProcessor::resetTime()
 
         emit syncTimeChanged(syncTime);
     });
+}
+
+void QnCommonMessageProcessor::resetEventRules(const nx::vms::api::EventRuleDataList& eventRules)
+{
+    vms::event::RuleList ruleList;
+    ec2::fromApiToResourceList(eventRules, ruleList);
+    eventRuleManager()->resetRules(ruleList);
 }
 
 void QnCommonMessageProcessor::resetAccessRights(const ec2::ApiAccessRightsDataList& accessRights)

@@ -41,9 +41,6 @@ public:
     /** Changes path ownership to real UID and GID. */
     bool changeOwner(const std::string& path);
 
-    /** Touches a file and gives ownership to real UID and GID. */
-    bool touchFile(const std::string& filePath);
-
     /** Creates directory and gives ownership to real UID and GID. */
     bool makeDirectory(const std::string& directoryPath);
 
@@ -117,20 +114,12 @@ public:
 
 
 private:
-    enum class CheckOwnerResult
-    {
-        real,
-        other,
-        failed,
-    };
-
     std::string m_lastError;
 
     bool checkMountPermissions(const std::string& directory);
     bool checkOwnerPermissions(const std::string& path);
     bool execute(
         const std::string& command, std::function<void(const char*)> outputAction = nullptr);
-    CheckOwnerResult checkCurrentOwner(const std::string& url);
 };
 
 } // namespace nx

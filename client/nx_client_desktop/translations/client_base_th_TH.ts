@@ -1395,6 +1395,14 @@ to view more bookmarks</source>
       <source>Folder not found</source>
       <translation>ไม่พบโฟลเดอร์</translation>
     </message>
+    <message>
+      <source>Helps avoid problems with OpenGL drawing which result in 100% CPU load.</source>
+      <translation type="unfinished">Helps avoid problems with OpenGL drawing which result in 100% CPU load.</translation>
+    </message>
+    <message>
+      <source>Adjust to smallest value that does not degrade live view. Bigger buffer makes playback smoother but increases delay between real time and live view; smaller buffer decreases delay but can cause stutters.</source>
+      <translation type="unfinished">Adjust to smallest value that does not degrade live view. Bigger buffer makes playback smoother but increases delay between real time and live view; smaller buffer decreases delay but can cause stutters.</translation>
+    </message>
   </context>
   <context>
     <name>QnArchiveLengthWidget</name>
@@ -1405,6 +1413,14 @@ to view more bookmarks</source>
     <message>
       <source>High minimum value can lead to archive length decrease on other cameras.</source>
       <translation>ค่าต่ำสุดที่สูงสามารถนำไปสู่เก็บลดลงบนกล้องอื่น ๆ</translation>
+    </message>
+    <message>
+      <source>Sets when camera archive will be deleted or saved when there is no space for new recordings.</source>
+      <translation type="unfinished">Sets when camera archive will be deleted or saved when there is no space for new recordings.</translation>
+    </message>
+    <message>
+      <source>&quot;Auto&quot; deletes the oldest footage first, regardless of the source.</source>
+      <translation type="unfinished">&quot;Auto&quot; deletes the oldest footage first, regardless of the source.</translation>
     </message>
   </context>
   <context>
@@ -2170,40 +2186,12 @@ to view more bookmarks</source>
       <translation>กำลังโหลด...</translation>
     </message>
     <message>
-      <source>Primary Stream</source>
-      <translation>สตรีมหลัก</translation>
-    </message>
-    <message>
-      <source>Secondary Stream</source>
-      <translation>สตรีมรอง</translation>
-    </message>
-    <message>
-      <source>Camera has no secondary stream</source>
-      <translation>กล้องไม่มีสตรีมรอง</translation>
-    </message>
-    <message>
       <source>This I/O module has no advanced settings</source>
       <translation>โมดูล I / O นี้ไม่มีการตั้งค่าขั้นสูง</translation>
     </message>
     <message>
       <source>This camera has no advanced settings</source>
       <translation>กล้องนี้ไม่มีการตั้งค่าขั้นสูง</translation>
-    </message>
-    <message>
-      <source>Audio Stream</source>
-      <translation>สตรีมเสียง</translation>
-    </message>
-    <message>
-      <source>URL is not available. Open stream and try again.</source>
-      <translation>URL ไม่พร้อมใช้งาน เปิดสตรีมแล้วลองอีกครั้ง</translation>
-    </message>
-    <message>
-      <source>URL is not available. Open video stream and try again.</source>
-      <translation>URL ไม่พร้อมใช้งาน เปิดสตรีมวิดีโอและลองอีกครั้ง</translation>
-    </message>
-    <message>
-      <source>I/O module has no audio stream</source>
-      <translation>โมดูล I/O มีสตรีมไม่มีเสียง</translation>
     </message>
     <message>
       <source>Settings</source>
@@ -2218,12 +2206,40 @@ to view more bookmarks</source>
       <translation>ไม่มีการตั้งค่า</translation>
     </message>
     <message>
+      <source>Secondary Stream</source>
+      <translation>สตรีมรอง</translation>
+    </message>
+    <message>
       <source>I/O Module ID</source>
       <translation>รหัสโมดูล I / O</translation>
     </message>
     <message>
       <source>Camera ID</source>
       <translation>รหัสกล้อง</translation>
+    </message>
+    <message>
+      <source>Audio Stream</source>
+      <translation>สตรีมเสียง</translation>
+    </message>
+    <message>
+      <source>Primary Stream</source>
+      <translation>สตรีมหลัก</translation>
+    </message>
+    <message>
+      <source>URL is not available. Open stream and try again.</source>
+      <translation>URL ไม่พร้อมใช้งาน เปิดสตรีมแล้วลองอีกครั้ง</translation>
+    </message>
+    <message>
+      <source>URL is not available. Open video stream and try again.</source>
+      <translation>URL ไม่พร้อมใช้งาน เปิดสตรีมวิดีโอและลองอีกครั้ง</translation>
+    </message>
+    <message>
+      <source>I/O module has no audio stream</source>
+      <translation>โมดูล I/O มีสตรีมไม่มีเสียง</translation>
+    </message>
+    <message>
+      <source>Camera has no secondary stream</source>
+      <translation>กล้องไม่มีสตรีมรอง</translation>
     </message>
   </context>
   <context>
@@ -2340,6 +2356,18 @@ to view more bookmarks</source>
       <translation>
         <numerusform>รหัสนี้ใช้กับกล้อง %n ต่อไปนี้: %1</numerusform>
       </translation>
+    </message>
+    <message>
+      <source>Helps fix image quality issues on some cameras; for others will cause significant bitrate increase.</source>
+      <translation type="unfinished">Helps fix image quality issues on some cameras; for others will cause significant bitrate increase.</translation>
+    </message>
+    <message>
+      <source>Custom number that can be assigned to a camera for quick identification and access</source>
+      <translation type="unfinished">Custom number that can be assigned to a camera for quick identification and access</translation>
+    </message>
+    <message>
+      <source>Server will not change any cameras settings, it will receive and use camera stream as-is.</source>
+      <translation type="unfinished">Server will not change any cameras settings, it will receive and use camera stream as-is.</translation>
     </message>
   </context>
   <context>
@@ -2617,6 +2645,14 @@ to view more bookmarks</source>
     <message>
       <source>More Settings</source>
       <translation>การตั้งค่าเพิ่มเติม</translation>
+    </message>
+    <message>
+      <source>Quality setting determines the compression rate only, and does not affect resolution. Low, Medium, High and Best are preset bitrate values.</source>
+      <translation type="unfinished">Quality setting determines the compression rate only, and does not affect resolution. Low, Medium, High and Best are preset bitrate values.</translation>
+    </message>
+    <message>
+      <source>First choose a recording option, then apply it to day and time blocks on the recording schedule. (0 block is 12:00am to 1:00am, 23 block is 11:00pm to 12:00am.)</source>
+      <translation type="unfinished">First choose a recording option, then apply it to day and time blocks on the recording schedule. (0 block is 12:00am to 1:00am, 23 block is 11:00pm to 12:00am.)</translation>
     </message>
   </context>
   <context>
@@ -3075,16 +3111,12 @@ to %1</source>
   <context>
     <name>QnCustomBusinessEventWidget</name>
     <message>
-      <source>Server API</source>
-      <translation>เซิร์ฟเวอร์ API</translation>
+      <source>Event will trigger only if there are matches in caption with any of entered keywords.</source>
+      <translation type="unfinished">Event will trigger only if there are matches in caption with any of entered keywords.</translation>
     </message>
     <message>
-      <source>To generate Generic Event, please refer to %1.</source>
-      <translation>เพื่อสร้างเหตุการณ์ทั่วไปโปรดดูที่%1.</translation>
-    </message>
-    <message>
-      <source>Event will trigger only if Generic Event meets all the above conditions. If a keyword field is empty, condition is always met. If not, condition is met if the corresponding field of Generic Event contains any keyword.</source>
-      <translation>เหตุการณ์นี้จะถูกเรียกเฉพาะในกรณีที่กิจกรรมตรงตามเงื่อนไขข้างต้น หากมีข้อมูลตรงตามเงื่อนไขจะพบเสมอ ถ้าไม่ได้สภาพจะพบว่าข้อมูลที่สอดคล้องกันของเหตุการณ์ทั่วไปมีคำหลัก.</translation>
+      <source>If the field is empty, event will always trigger.</source>
+      <translation type="unfinished">If the field is empty, event will always trigger.</translation>
     </message>
   </context>
   <context>
@@ -3152,10 +3184,6 @@ to %1</source>
     <message>
       <source>System configuration will be restored from backup, Server application will be restarted.</source>
       <translation>การกำหนดค่าระบบจะถูกเรียกคืนจากการสำรองข้อมูลแอพพลิเคชันเซิร์ฟเวอร์จะเริ่มใหม่</translation>
-    </message>
-    <message>
-      <source>You can create a backup for System configurations that can be restored in case of failure.</source>
-      <translation>คุณสามารถสร้างการสำรองข้อมูลสำหรับการกำหนดค่าระบบที่สามารถเรียกคืนได้ในกรณีของความล้มเหลว.</translation>
     </message>
     <message>
       <source>Database Backup Files</source>
@@ -3300,6 +3328,13 @@ to %1</source>
       <source>You will not be able to connect to this System with your %1 account after you disconnect this System from %1.</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
       <translation>คุณจะไม่สามารถเชื่อมต่อกับระบบนี้กับบัญชี %1 หลังจากที่คุณยกเลิกการเชื่อมต่อระบบนี้จาก %1</translation>
+    </message>
+  </context>
+  <context>
+    <name>QnEmptyBusinessActionWidget</name>
+    <message>
+      <source>Panic Recording mode switches recording settings for all Cameras to maximum FPS and Quality</source>
+      <translation type="unfinished">Panic Recording mode switches recording settings for all Cameras to maximum FPS and Quality</translation>
     </message>
   </context>
   <context>
@@ -3531,6 +3566,13 @@ to %1</source>
     </message>
   </context>
   <context>
+    <name>QnFisheyeSettingsWidget</name>
+    <message>
+      <source>Use this setting to compensate for distortion if camera is not mounted exactly vertically or horizontally.</source>
+      <translation type="unfinished">Use this setting to compensate for distortion if camera is not mounted exactly vertically or horizontally.</translation>
+    </message>
+  </context>
+  <context>
     <name>QnGeneralPreferencesWidget</name>
     <message>
       <source>Select folder...</source>
@@ -3598,6 +3640,14 @@ to %1</source>
     <message>
       <source>Open Camera List</source>
       <translation>เปิดรายการกล้อง</translation>
+    </message>
+    <message>
+      <source>Backup includes servers and cameras settings, users, webpages, event rules, etc. Video is not saved.</source>
+      <translation type="unfinished">Backup includes servers and cameras settings, users, webpages, event rules, etc. Video is not saved.</translation>
+    </message>
+    <message>
+      <source>Creates a backup of System configuration that can be restored in case of failure.</source>
+      <translation type="unfinished">Creates a backup of System configuration that can be restored in case of failure.</translation>
     </message>
   </context>
   <context>
@@ -3849,12 +3899,12 @@ to %1</source>
       <translation type="unfinished">Zoom</translation>
     </message>
     <message>
-      <source>Focus</source>
-      <translation type="unfinished">Focus</translation>
-    </message>
-    <message>
       <source>Rotation:</source>
       <translation type="unfinished">Rotation:</translation>
+    </message>
+    <message>
+      <source>Focus</source>
+      <translation type="unfinished">Focus</translation>
     </message>
   </context>
   <context>
@@ -4400,6 +4450,18 @@ to %1</source>
     <message>
       <source>No image</source>
       <translation>ไม่มีภาพ</translation>
+    </message>
+    <message>
+      <source>Sets the time to use in the client (timeline, timestamps, etc.) when client and server machines are in different time zones.</source>
+      <translation type="unfinished">Sets the time to use in the client (timeline, timestamps, etc.) when client and server machines are in different time zones.</translation>
+    </message>
+    <message>
+      <source>Length of time each camera on layout will be displayed if you start a Layout Tour.</source>
+      <translation>ระยะเวลาที่กล้องแต่ละรูปแบบจะปรากฏขึ้นหากคุณเริ่มทัวร์เค้าโครง</translation>
+    </message>
+    <message>
+      <source>Displays IP addresses for cameras and servers and groups for users.</source>
+      <translation>แสดงที่อยู่ IP สำหรับกล้องและเซิร์ฟเวอร์และกลุ่มสำหรับผู้ใช้</translation>
     </message>
   </context>
   <context>
@@ -5559,16 +5621,12 @@ to %1</source>
       <translation>เพื่อหลีกเลี่ยงปัญหาปรับจำนวนสูงสุดของกล้อง</translation>
     </message>
     <message>
-      <source>server will take devices automatically from offline servers</source>
-      <translation>เซิร์ฟเวอร์จะรับอุปกรณ์จากเซิร์ฟเวอร์ออฟไลน์โดยอัตโนมัติ</translation>
-    </message>
-    <message>
-      <source>server will take cameras automatically from offline servers</source>
-      <translation>เซิร์ฟเวอร์จะรับกล้องโดยอัตโนมัติจากเซิร์ฟเวอร์ออฟไลน์</translation>
-    </message>
-    <message>
       <source>Failover</source>
       <translation>ล้มเหลว</translation>
+    </message>
+    <message>
+      <source>Servers with failover enabled will automatically take cameras from offline servers.</source>
+      <translation>เซิร์ฟเวอร์ที่เปิดใช้งาน failover จะใช้กล้องจากเซิร์ฟเวอร์ออฟไลน์โดยอัตโนมัติ</translation>
     </message>
   </context>
   <context>
@@ -5773,7 +5831,15 @@ to %1</source>
     </message>
     <message>
       <source>Update Files</source>
-      <translation type="unfinished">Update Files</translation>
+      <translation>อัปเดตไฟล์</translation>
+    </message>
+    <message>
+      <source>Validating the update...</source>
+      <translation>กำลังตรวจสอบการอัปเดต ...</translation>
+    </message>
+    <message>
+      <source>Checking for free space...</source>
+      <translation>กำลังตรวจสอบพื้นที่ว่าง ...</translation>
     </message>
   </context>
   <context>
@@ -6254,6 +6320,14 @@ to %1</source>
       <source>Recording was enabled on the USB storage</source>
       <translation>มีการเปิดใช้การบันทึกในที่จัดเก็บข้อมูล USB</translation>
     </message>
+    <message>
+      <source>Backup includes servers and cameras settings, users, webpages, event rules, etc. Video is not saved.</source>
+      <translation>การสำรองข้อมูลประกอบด้วยเซิร์ฟเวอร์และการตั้งค่ากล้อง,ผู้ใช้เว็บเพจ,กิจกรรม ฯลฯ ไม่ได้บันทึกวิดีโอ</translation>
+    </message>
+    <message>
+      <source>Creates a backup of System configuration that can be restored in case of failure.</source>
+      <translation>สร้างการสำรองข้อมูลของการกำหนดค่าระบบที่สามารถเรียกคืนได้ในกรณีที่เกิดความล้มเหลว</translation>
+    </message>
   </context>
   <context>
     <name>QnStorageListModel</name>
@@ -6546,6 +6620,14 @@ to %1</source>
       <source>Allow System to optimize camera settings</source>
       <translation>อนุญาตให้ระบบเพิ่มประสิทธิภาพการตั้งค่ากล้อง</translation>
     </message>
+    <message>
+      <source>Sends anonymous System information (firmware, codecs, streams, etc.).</source>
+      <translation>ส่งข้อมูลระบบที่ไม่ระบุตัวตน (เฟิร์มแวร์ตัวแปลงสัญญาณสตรีม ฯลฯ )</translation>
+    </message>
+    <message>
+      <source>Tracks and logs all user actions.</source>
+      <translation>ติดตามและบันทึกการทำงานของผู้ใช้ทั้งหมด</translation>
+    </message>
   </context>
   <context>
     <name>QnTableExportHelper</name>
@@ -6611,16 +6693,6 @@ to %1</source>
       <translation>ไม่มีภาพขนาดย่อ</translation>
     </message>
     <message>
-      <source>hh:mm</source>
-      <comment>Format for displaying hours and minutes on timeline.</comment>
-      <translation>hh:mm</translation>
-    </message>
-    <message>
-      <source>h ap</source>
-      <comment>Format for displaying hours on timeline, with am/pm indicator.</comment>
-      <translation>h ap</translation>
-    </message>
-    <message>
       <source>dd</source>
       <comment>Format for displaying days on timeline.</comment>
       <translation>dd</translation>
@@ -6638,12 +6710,12 @@ to %1</source>
     <message>
       <source>dd MMMM yyyy hh:mm</source>
       <comment>Format for displaying minute caption in timeline&apos;s header, without am/pm indicator.</comment>
-      <translation>dd MMMM yyyy hh: mm</translation>
+      <translation>dd MMMM yyyy hh:mm</translation>
     </message>
     <message>
       <source>dd MMMM yyyy hh:mm</source>
       <comment>Format for displaying hour caption in timeline&apos;s header, without am/pm indicator.</comment>
-      <translation>dd MMMM yyyy hh: mm</translation>
+      <translation>dd MMMM yyyy hh:mm</translation>
     </message>
     <message>
       <source>dd MMMM yyyy h ap</source>
@@ -6658,7 +6730,7 @@ to %1</source>
     <message>
       <source>MMMM yyyy</source>
       <comment>Format for displaying month caption in timeline&apos;s header.</comment>
-      <translation>MMMM d, yyyy</translation>
+      <translation>MMMM yyyy</translation>
     </message>
     <message>
       <source>yyyy</source>
@@ -6666,14 +6738,9 @@ to %1</source>
       <translation>yyyy</translation>
     </message>
     <message>
-      <source>h:mm ap</source>
-      <comment>Format for displaying hours and minutes on timeline, with am/pm indicator.</comment>
-      <translation>h: mm ap</translation>
-    </message>
-    <message>
       <source>dd MMMM yyyy h:mm ap</source>
       <comment>Format for displaying minute caption in timeline&apos;s header, with am/pm indicator.</comment>
-      <translation>dd MMMM yyyy h: mm ap</translation>
+      <translation>dd MMMM yyyy h:mm ap</translation>
     </message>
   </context>
   <context>
@@ -6808,7 +6875,7 @@ to %1</source>
     <message>
       <source>%1 user</source>
       <comment>%1 is the short cloud name (like Cloud)</comment>
-      <translation type="unfinished">%1 user</translation>
+      <translation>%1 ผู้ใช้งาน</translation>
     </message>
   </context>
   <context>
@@ -6855,6 +6922,10 @@ to %1</source>
     <message>
       <source>Edit</source>
       <translation>แก้ไข</translation>
+    </message>
+    <message>
+      <source>Users can be imported from an LDAP server. They will be able to log in only if LDAP server is online and their accounts are active on it.</source>
+      <translation>ผู้ใช้สามารถนำเข้าจากเซิร์ฟเวอร์ LDAP พวกเขาจะสามารถเข้าสู่ระบบได้เฉพาะเมื่อเซิร์ฟเวอร์ LDAP ออนไลน์และบัญชีของพวกเขาใช้งานได้</translation>
     </message>
   </context>
   <context>
@@ -7044,7 +7115,26 @@ to %1</source>
     <message>
       <source>%1 user with specified email already exists.</source>
       <comment>%1 is the short cloud name (like Cloud)</comment>
-      <translation type="unfinished">%1 user with specified email already exists.</translation>
+      <translation>%1 มีอีเมลผู้ใช้ที่ระบุอยู่แล้ว</translation>
+    </message>
+    <message>
+      <source>Local users</source>
+      <translation>ผู้ใช้ท้องถิ่น</translation>
+    </message>
+    <message>
+      <source>%1 users</source>
+      <comment>%1 is the short cloud name (like Cloud)</comment>
+      <translation>%1 ผู้ใช้</translation>
+    </message>
+    <message>
+      <source>%1 belong to this system only and are fully managed by system administrators.</source>
+      <comment>%1 is local users definition, e.g. &apos;Local users&apos;</comment>
+      <translation>%1 อยู่ในระบบนี้เท่านั้นและได้รับการจัดการอย่างเต็มที่จากผู้ดูแลระบบ</translation>
+    </message>
+    <message>
+      <source>%1 can have access to many Systems. Administrators can manage their rights only.</source>
+      <comment>%1 is cloud users definition, e.g. &apos;Cloud users&apos;</comment>
+      <translation>%1 สามารถเข้าถึงระบบได้หลายระบบ ผู้ดูแลระบบสามารถจัดการสิทธิ์ได้เท่านั้น</translation>
     </message>
   </context>
   <context>
@@ -7287,7 +7377,7 @@ to %1</source>
     <message>
       <source>%1 Systems cannot be merged</source>
       <comment>%1 is the short cloud name (like Cloud)</comment>
-      <translation type="unfinished">%1 Systems cannot be merged</translation>
+      <translation>%1 ไม่สามารถผสานรวมระบบได้</translation>
     </message>
   </context>
   <context>
@@ -8024,6 +8114,13 @@ to %1</source>
     </message>
   </context>
   <context>
+    <name>nx::client::desktop::HintButton</name>
+    <message>
+      <source>Click to read more</source>
+      <translation>คลิกเพื่ออ่านรายละเอียดเพิ่มเติม</translation>
+    </message>
+  </context>
+  <context>
     <name>nx::client::desktop::ImageOverlaySettingsWidget</name>
     <message>
       <source>Select file...</source>
@@ -8268,17 +8365,26 @@ to %1</source>
     </message>
   </context>
   <context>
-    <name>nx::client::desktop::ui::AnalyticsSdkEventModel</name>
-    <message>
-      <source>No event types supported</source>
-      <translation>ไม่มีประเภทเหตุการณ์ที่สนับสนุน</translation>
-    </message>
-  </context>
-  <context>
     <name>nx::client::desktop::ui::AnalyticsSdkEventWidget</name>
     <message>
-      <source>Event will trigger only if Analytics Event meets all the above conditions. If a keyword field is empty, condition is always met. If not, condition is met if the corresponding field of Analytics Event contains any keyword.</source>
-      <translation>เหตุการณ์นี้จะถูกเรียกเฉพาะในกรณีที่กิจกรรมตรงตามเงื่อนไขข้างต้น หากมีข้อมูลตรงตามเงื่อนไขจะพบเสมอ ถ้าไม่ได้สภาพจะพบว่าข้อมูลที่สอดคล้องกันของเหตุการณ์ทั่วไปมีคำหลัก</translation>
+      <source>Analytics events can be set up on a certain cameras.</source>
+      <translation>คุณสามารถตั้งค่าเหตุการณ์ Analytics ได้ในกล้องบางเครื่อง</translation>
+    </message>
+    <message>
+      <source>Choose cameras using the button above to see the list of supported events.</source>
+      <translation>เลือกกล้องโดยใช้ปุ่มด้านบนเพื่อดูรายการกิจกรรมที่สนับสนุน</translation>
+    </message>
+    <message>
+      <source>Event will trigger only if there are matches in caption with any of entered keywords.</source>
+      <translation>เหตุการณ์จะเรียกเฉพาะเมื่อมีคำหลักที่ตรงกับคำหลักที่ป้อนเท่านั้น</translation>
+    </message>
+    <message>
+      <source>If the field is empty, event will always trigger.</source>
+      <translation>หากช่องว่างกิจกรรมจะเรียกใช้เสมอ</translation>
+    </message>
+    <message>
+      <source>Event will trigger only if there are matches in the description field with any of the entered keywords.</source>
+      <translation type="unfinished">Event will trigger only if there are matches in the description field with any of the entered keywords.</translation>
     </message>
   </context>
   <context>
@@ -8622,6 +8728,18 @@ to %1</source>
     <message>
       <source>Failed to change password on %1 of %2 cameras</source>
       <translation>ไม่สามารถเปลี่ยนรหัสผ่านได้ที่ %1 จาก %2 กล้อง</translation>
+    </message>
+    <message>
+      <source>To use the software you must accept the end user license agreement</source>
+      <translation type="unfinished">To use the software you must accept the end user license agreement</translation>
+    </message>
+    <message>
+      <source>Accept</source>
+      <translation type="unfinished">Accept</translation>
+    </message>
+    <message>
+      <source>Decline</source>
+      <translation type="unfinished">Decline</translation>
     </message>
   </context>
   <context>

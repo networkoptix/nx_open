@@ -6,7 +6,7 @@
     <message>
       <source>Language Name</source>
       <extracomment>Language name that will be displayed to user. Must not be empty.</extracomment>
-      <translation>Dutch</translation>
+      <translation>Nederlands</translation>
     </message>
   </context>
   <context>
@@ -79,7 +79,7 @@
     <message>
       <source>%1 System can only be merged with non-%1. System name and password are taken from %1 System.</source>
       <comment>%1 is the short cloud name (like Cloud)</comment>
-      <translation>%1 Systeem kan alleen worden samengevoegd met niet-%1. Systeemnaam en wachtwoord zijn overgenomen van %1 Systeem.</translation>
+      <translation>%1 Systeem kan alleen worden samengevoegd met niet-%1. De systeemnaam en het wachtwoord zijn overgenomen van %1 Systeem.</translation>
     </message>
     <message>
       <source>Both Systems are connected to %1. Merge is not allowed.</source>
@@ -496,7 +496,7 @@
     </message>
     <message>
       <source>Bridge Licenses</source>
-      <translation>Recorder licentie</translation>
+      <translation>Recorder licenties</translation>
     </message>
   </context>
   <context>
@@ -504,15 +504,15 @@
     <message numerus="yes">
       <source>%n %2 are used out of %1.</source>
       <translation>
-        <numerusform>%n %2 worden gebruikt van %1.</numerusform>
+        <numerusform>%n %2 word gebruikt van %1.</numerusform>
         <numerusform>%n %2 worden gebruikt van %1.</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n %2 will be used out of %1.</source>
       <translation>
-        <numerusform>%n %2 zullen worden gebruikt van %1.</numerusform>
-        <numerusform>%n %2 zullen worden gebruikt van %1.</numerusform>
+        <numerusform>%n %2 zal worden gebruikt van de %1.</numerusform>
+        <numerusform>%n %2 zullen worden gebruikt van de %1.</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -525,7 +525,7 @@
     <message numerus="yes">
       <source>%n more %1 will be used.</source>
       <translation>
-        <numerusform>%n meer %1 worden gebruikt.</numerusform>
+        <numerusform>%n meer %1 word gebruikt.</numerusform>
         <numerusform>%n meer %1 worden gebruikt.</numerusform>
       </translation>
     </message>
@@ -591,8 +591,8 @@
     <message numerus="yes">
       <source>%n Device(s)</source>
       <translation>
-        <numerusform>%n Apparaat (en)</numerusform>
-        <numerusform>%n Apparaat (en)</numerusform>
+        <numerusform>%n Apparaat</numerusform>
+        <numerusform>%n Apparaten</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -637,15 +637,15 @@
     <message numerus="yes">
       <source>%n I/O Module(s)</source>
       <translation>
-        <numerusform>%n I/O Module(s)</numerusform>
-        <numerusform>%n I/O Module(s)</numerusform>
+        <numerusform>%n I/O Module</numerusform>
+        <numerusform>%n I/O Modules</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n I/O module(s)</source>
       <translation>
-        <numerusform>%n I/O module(s)</numerusform>
-        <numerusform>%n I/O module(s)</numerusform>
+        <numerusform>%n I/O module</numerusform>
+        <numerusform>%n I/O modules</numerusform>
       </translation>
     </message>
     <message>
@@ -689,7 +689,7 @@
     </message>
     <message>
       <source>Hardware ID: %1</source>
-      <translation type="unfinished">Hardware ID: %1</translation>
+      <translation>Hardware ID: %1</translation>
     </message>
   </context>
   <context>
@@ -912,8 +912,8 @@
       <source>milliseconds</source>
       <comment>Full suffix for displaying milliseconds</comment>
       <translation>
-        <numerusform>milliseconden</numerusform>
-        <numerusform>milliseconden</numerusform>
+        <numerusform>milliseconde</numerusform>
+        <numerusform>millisecondes</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -928,7 +928,7 @@
       <source>minutes</source>
       <comment>Full suffix for displaying minutes</comment>
       <translation>
-        <numerusform>minuten</numerusform>
+        <numerusform>minuut</numerusform>
         <numerusform>minuten</numerusform>
       </translation>
     </message>
@@ -936,7 +936,7 @@
       <source>hours</source>
       <comment>Full suffix for displaying hours</comment>
       <translation>
-        <numerusform>uren</numerusform>
+        <numerusform>uur</numerusform>
         <numerusform>uren</numerusform>
       </translation>
     </message>
@@ -951,8 +951,8 @@
     <message numerus="yes">
       <source>weeks</source>
       <comment>Full suffix for displaying weeks</comment>
-      <translation>
-        <numerusform>weken</numerusform>
+      <translation type="unfinished">
+        <numerusform>week</numerusform>
         <numerusform>weken</numerusform>
       </translation>
     </message>
@@ -960,7 +960,7 @@
       <source>months</source>
       <comment>Full suffix for displaying months</comment>
       <translation>
-        <numerusform>maanden</numerusform>
+        <numerusform>maand</numerusform>
         <numerusform>maanden</numerusform>
       </translation>
     </message>
@@ -968,7 +968,7 @@
       <source>years</source>
       <comment>Full suffix for displaying years</comment>
       <translation>
-        <numerusform>jaren</numerusform>
+        <numerusform>jaar</numerusform>
         <numerusform>jaren</numerusform>
       </translation>
     </message>

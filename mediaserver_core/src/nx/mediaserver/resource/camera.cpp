@@ -253,32 +253,35 @@ QSize Camera::getNearestResolution(
         *coeff = INT_MAX;
 
     double requestSquare = resolution.width() * resolution.height();
-    if (requestSquare < kMaxEps || requestSquare > maxResolutionArea) return EMPTY_RESOLUTION_PAIR;
+    if (requestSquare < kMaxEps || requestSquare > maxResolutionArea)
+        return EMPTY_RESOLUTION_PAIR;
 
     int bestIndex = -1;
-    double bestMatchCoeff = maxResolutionArea > kMaxEps ? (maxResolutionArea / requestSquare) : INT_MAX;
+    double bestMatchCoeff =
+        maxResolutionArea > kMaxEps ? (maxResolutionArea / requestSquare) : INT_MAX;
 
-    for (int i = 0; i < resolutionList.size(); ++i) {
+    for (int i = 0; i < resolutionList.size(); ++i)
+    {
         QSize tmp;
 
         tmp.setWidth(qPower2Ceil(static_cast<unsigned int>(resolutionList[i].width() + 1), 8));
         tmp.setHeight(qPower2Floor(static_cast<unsigned int>(resolutionList[i].height() - 1), 8));
-        float ar1 = getResolutionAspectRatio(tmp);
+        const float ar1 = getResolutionAspectRatio(tmp);
 
         tmp.setWidth(qPower2Floor(static_cast<unsigned int>(resolutionList[i].width() - 1), 8));
         tmp.setHeight(qPower2Ceil(static_cast<unsigned int>(resolutionList[i].height() + 1), 8));
-        float ar2 = getResolutionAspectRatio(tmp);
+        const float ar2 = getResolutionAspectRatio(tmp);
 
         if (aspectRatio != 0 && !qBetween(qMin(ar1,ar2), aspectRatio, qMax(ar1,ar2)))
-        {
             continue;
-        }
 
-        double square = resolutionList[i].width() * resolutionList[i].height();
-        if (square < kMaxEps) continue;
+        const double square = resolutionList[i].width() * resolutionList[i].height();
+        if (square < kMaxEps)
+            continue;
 
-        double matchCoeff = qMax(requestSquare, square) / qMin(requestSquare, square);
-        if (matchCoeff <= bestMatchCoeff + kMaxEps) {
+        const double matchCoeff = qMax(requestSquare, square) / qMin(requestSquare, square);
+        if (matchCoeff <= bestMatchCoeff + kMaxEps)
+        {
             bestIndex = i;
             bestMatchCoeff = matchCoeff;
             if (coeff)
@@ -416,8 +419,7 @@ CameraDiagnostics::Result Camera::initializeAdvancedParametersProviders()
         m_defaultAdvancedParametersProvider,
         containerString(m_advancedParametersProvidersByParameterId)));
 
-    if (!advancedParameters.groups.empty())
-        QnCameraAdvancedParamsReader::setParamsToResource(this->toSharedPointer(), advancedParameters);
+    QnCameraAdvancedParamsReader::setParamsToResource(this->toSharedPointer(), advancedParameters);
     return CameraDiagnostics::NoErrorResult();
 }
 

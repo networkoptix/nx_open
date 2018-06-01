@@ -9,26 +9,34 @@
 
 #include "camera_user_attribute_pool.h"
 #include "resource_media_layout.h"
-#include "nx/streaming/abstract_stream_data_provider.h"
 #include <common/common_module.h>
+#include <common/static_common_module.h>
+#include <core/resource/security_cam_resource.h>
+#include <core/resource_management/resource_data_pool.h>
+
+#include <nx/vms/api/types/motion_types.h>
+#include <nx/streaming/abstract_stream_data_provider.h>
 
 namespace {
-    const QString customAspectRatioKey          = lit("overrideAr");
-    const QString dontRecordPrimaryStreamKey    = lit("dontRecordPrimaryStream");
-    const QString dontRecordSecondaryStreamKey  = lit("dontRecordSecondaryStream");
-    const QString rtpTransportKey               = lit("rtpTransport");
-    const QString dynamicVideoLayoutKey         = lit("dynamicVideoLayout");
-    const QString motionStreamKey               = lit("motionStream");
-    const QString rotationKey                   = lit("rotation");
-    const QString panicRecordingKey             = lit("panic_mode");
 
-    const QString primaryStreamValue            = lit("primary");
-    const QString secondaryStreamValue          = lit("secondary");
-    const QString edgeStreamValue               = lit("edge");
+static const QString customAspectRatioKey = lit("overrideAr");
+static const QString dontRecordPrimaryStreamKey = lit("dontRecordPrimaryStream");
+static const QString dontRecordSecondaryStreamKey = lit("dontRecordSecondaryStream");
+static const QString rtpTransportKey = lit("rtpTransport");
+static const QString dynamicVideoLayoutKey = lit("dynamicVideoLayout");
+static const QString motionStreamKey = lit("motionStream");
+static const QString rotationKey = lit("rotation");
+static const QString panicRecordingKey = lit("panic_mode");
 
-    /** Special value for absent custom aspect ratio. Should not be changed without a reason because a lot of modules check it as qFuzzyIsNull. */
-    const qreal noCustomAspectRatio = 0.0;
-}
+using nx::vms::api::MotionStreamType;
+static const QString primaryStreamValue = QnLexical::serialized(MotionStreamType::primary);
+static const QString secondaryStreamValue = QnLexical::serialized(MotionStreamType::secondary);
+static const QString edgeStreamValue = QnLexical::serialized(MotionStreamType::edge);
+
+/** Special value for absent custom aspect ratio. Should not be changed without a reason because a lot of modules check it as qFuzzyIsNull. */
+static constexpr qreal noCustomAspectRatio = 0.0;
+
+} // namespace
 
 // -------------------------------------------------------------------------- //
 // QnMediaResource
@@ -92,8 +100,15 @@ QnConstResourceAudioLayoutPtr QnMediaResource::getAudioLayout(const QnAbstractSt
 
 bool QnMediaResource::hasVideo(const QnAbstractStreamDataProvider* /*dataProvider*/) const
 {
+    const auto cameraResource = toResourcePtr().dynamicCast<QnSecurityCamResource>();
+    if (!cameraResource)
+        return false;
+
     if (!m_hasVideo.is_initialized())
-        m_hasVideo = toResource()->getProperty(Qn::VIDEO_DISABLED_PARAM_NAME).toInt() == 0;
+    {
+        const auto data = qnStaticCommon->dataPool()->data(cameraResource);
+        m_hasVideo = !data.value(Qn::VIDEO_DISABLED_PARAM_NAME, false);
+    }
     return *m_hasVideo;
 }
 
@@ -172,6 +187,13 @@ void QnMediaResource::setPtzCapability(Ptz::Capabilities capability, bool value)
     setPtzCapabilities(value
         ? (getPtzCapabilities() | capability)
         : (getPtzCapabilities() & ~capability));
+}
+
+bool QnMediaResource::canDisableNativePtzPresets() const
+{
+    const auto caps = getPtzCapabilities();
+    return caps.testFlag(Ptz::NativePresetsPtzCapability)
+        && !caps.testFlag(Ptz::NoNxPresetsPtzCapability);
 }
 
 QString QnMediaResource::customAspectRatioKey()

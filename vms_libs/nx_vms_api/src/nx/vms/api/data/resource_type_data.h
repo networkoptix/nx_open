@@ -14,7 +14,6 @@ struct PropertyTypeData: Data
     QString name;
     QString defaultValue;
 };
-
 #define PropertyTypeData_Fields (resourceTypeId)(name)(defaultValue)
 
 struct ResourceTypeData: IdData

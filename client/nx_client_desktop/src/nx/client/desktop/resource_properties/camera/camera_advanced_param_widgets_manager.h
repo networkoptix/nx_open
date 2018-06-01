@@ -1,5 +1,7 @@
 #pragma once
 
+#include <boost/optional.hpp>
+
 #include <QtWidgets/QTreeWidget>
 #include <QtWidgets/QStackedWidget>
 #include <QtWidgets/QLabel>
@@ -24,6 +26,8 @@ public:
 
     void displayParams(const QnCameraAdvancedParams &params);
     void loadValues(const QnCameraAdvancedParamValueList &params);
+    boost::optional<QString> parameterValue(const QString& parameterId) const;
+
 
     void clear();
 

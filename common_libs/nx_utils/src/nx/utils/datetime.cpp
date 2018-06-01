@@ -8,7 +8,7 @@ namespace utils {
 QString timestampToRfc2822(qint64 timestampMs)
 {
     return timestampMs == DATETIME_NOW
-        ? lit("LIVE")
+        ? "LIVE"
         : QDateTime::fromMSecsSinceEpoch(timestampMs).toString(Qt::RFC2822Date);
 }
 

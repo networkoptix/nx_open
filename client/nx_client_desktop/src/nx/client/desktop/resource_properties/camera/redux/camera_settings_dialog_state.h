@@ -12,6 +12,7 @@
 
 #include <nx/client/desktop/common/data/rotation.h>
 #include <nx/client/desktop/resource_properties/camera/utils/schedule_cell_params.h>
+#include <nx/client/desktop/utils/wearable_state.h>
 #include <nx/utils/std/optional.h>
 #include <nx/vms/api/data/camera_attributes_data.h>
 #include <nx/vms/api/types_fwd.h>
@@ -110,7 +111,7 @@ struct CameraSettingsDialogState
 
     bool hasChanges = false;
     bool readOnly = true;
-    bool panicMode = false;
+    bool settingsOptimizationEnabled = false;
 
     // Generic cameras info.
 
@@ -136,13 +137,16 @@ struct CameraSettingsDialogState
         QString webPage;
         std::optional<QString> primaryStream;
         std::optional<QString> secondaryStream;
-        bool hasVideo = false;
+        bool hasVideo = true;
 
         int maxFpsWithoutMotion = 0;
 
         std::optional<MotionConstraints> motionConstraints;
     };
     SingleCameraProperties singleCameraProperties;
+
+    WearableState singleWearableState;
+    QString wearableUploaderName; //< Name of user currently uploading footage to wearable camera.
 
     struct FisheyeCalibrationSettings
     {
@@ -171,6 +175,9 @@ struct CameraSettingsDialogState
         UserEditable<QnMediaDewarpingParams::ViewMode> fisheyeMountingType;
         UserEditable<FisheyeCalibrationSettings> fisheyeCalibrationSettings;
         UserEditable<qreal> fisheyeFovRotation;
+
+        UserEditable<int> logicalId;
+        QStringList sameLogicalIdCameraNames; //< Read-only informational value.
     };
     SingleCameraSettings singleCameraSettings;
 
@@ -186,13 +193,34 @@ struct CameraSettingsDialogState
         CombinedValue isDtsBased;
         CombinedValue isWearable;
         CombinedValue isIoModule;
+        CombinedValue isArecontCamera;
         CombinedValue hasMotion;
-        CombinedValue hasDualStreaming;
+        CombinedValue hasDualStreamingCapability;
+        CombinedValue hasRemoteArchiveCapability;
+        CombinedValue hasPredefinedBitratePerGOP;
+        CombinedValue hasPtzPresets;
+        CombinedValue canDisableNativePtzPresets;
+        CombinedValue supportsMotionStreamOverride;
 
         int maxFps = 0;
         int maxDualStreamingFps = 0;
     };
     CombinedProperties devicesDescription;
+
+    struct ExpertSettings
+    {
+        UserEditableMultiple<bool> dualStreamingDisabled;
+        UserEditableMultiple<bool> cameraControlDisabled;
+        UserEditableMultiple<bool> useBitratePerGOP;
+        UserEditableMultiple<bool> primaryRecordingDisabled;
+        UserEditableMultiple<bool> secondaryRecordingDisabled;
+        UserEditableMultiple<bool> nativePtzPresetsDisabled;
+        UserEditableMultiple<vms::api::RtpTransportType> rtpTransportType;
+        UserEditableMultiple<vms::api::MotionStreamType> motionStreamType;
+        CombinedValue motionStreamOverridden; //< Read-only informational value.
+    };
+    ExpertSettings expert;
+    bool isDefaultExpertSettings = false;
 
     struct RecordingDays
     {
@@ -264,9 +292,21 @@ struct CameraSettingsDialogState
     };
     ImageControlSettings imageControl;
 
+    struct WearableCameraMotionDetection
+    {
+        UserEditableMultiple<bool> enabled;
+        UserEditableMultiple<int> sensitivity;
+    };
+    WearableCameraMotionDetection wearableMotion;
+
     // Helper methods.
 
     bool isSingleCamera() const { return devicesCount == 1; }
+
+    bool isSingleWearableCamera() const
+    {
+        return isSingleCamera() && devicesDescription.isWearable == CombinedValue::All;
+    }
 
     int maxRecordingBrushFps() const
     {
@@ -284,11 +324,6 @@ struct CameraSettingsDialogState
         if (isSingleCamera())
             result &= singleCameraSettings.enableMotionDetection();
         return result;
-    }
-
-    bool hasDualStreaming() const
-    {
-        return hasMotion() && devicesDescription.hasDualStreaming == CombinedValue::All;
     }
 
     bool supportsSchedule() const

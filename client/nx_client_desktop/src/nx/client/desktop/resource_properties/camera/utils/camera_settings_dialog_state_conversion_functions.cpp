@@ -4,7 +4,10 @@
 #include <core/resource/resource_display_info.h>
 #include <core/resource/camera_resource.h>
 
+#include <nx/client/core/motion/motion_grid.h>
 #include <nx/fusion/model_functions.h>
+#include <nx/vms/api/types/rtp_types.h>
+#include <nx/vms/api/types/motion_types.h>
 
 namespace nx {
 namespace client {
@@ -14,6 +17,11 @@ namespace {
 
 using State = CameraSettingsDialogState;
 using Cameras = QnVirtualCameraResourceList;
+
+QString boolToPropertyStr(bool value)
+{
+    return value ? lit("1") : lit("0");
+}
 
 void setMinRecordingDays(
     const State::RecordingDays& value,
@@ -119,6 +127,127 @@ void setRecordingEnabled(bool value, const Cameras& cameras)
         camera->setLicenseUsed(value);
 }
 
+void setDualStreamingDisabled(bool value, const Cameras& cameras)
+{
+    for (const auto& camera: cameras)
+    {
+        if (camera->hasDualStreamingInternal())
+            camera->setDisableDualStreaming(value);
+    }
+}
+
+void setCameraControlDisabled(bool value, const Cameras& cameras)
+{
+    for (const auto& camera: cameras)
+        camera->setCameraControlDisabled(value);
+}
+
+void setUseBitratePerGOP(bool value, const Cameras& cameras)
+{
+    const auto valueStr = boolToPropertyStr(value);
+    for (const auto& camera: cameras)
+    {
+        if (camera->bitratePerGopType() != Qn::BPG_Predefined)
+            camera->setProperty(Qn::FORCE_BITRATE_PER_GOP, valueStr);
+    }
+}
+
+void setPrimaryRecordingDisabled(bool value, const Cameras& cameras)
+{
+    const auto valueStr = boolToPropertyStr(value);
+
+    for (const auto& camera: cameras)
+        camera->setProperty(QnMediaResource::dontRecordPrimaryStreamKey(), valueStr);
+}
+
+void setSecondaryRecordingDisabled(bool value, const Cameras& cameras)
+{
+    const auto valueStr = boolToPropertyStr(value);
+    for (const auto& camera: cameras)
+    {
+        if (camera->hasDualStreamingInternal())
+            camera->setProperty(QnMediaResource::dontRecordSecondaryStreamKey(), valueStr);
+    }
+}
+
+void setNativePtzPresetsDisabled(bool value, const Cameras& cameras)
+{
+    for (const auto& camera: cameras)
+    {
+        if (camera->canDisableNativePtzPresets())
+        {
+            camera->setProperty(Qn::DISABLE_NATIVE_PTZ_PRESETS_PARAM_NAME,
+                value ? lit("true") : QString());
+        }
+    }
+}
+
+void setRtpTransportType(vms::api::RtpTransportType value, const Cameras& cameras)
+{
+    const auto valueStr = value == vms::api::RtpTransportType::automatic
+        ? QString()
+        : QnLexical::serialized(value);
+
+    for (const auto& camera: cameras)
+        camera->setProperty(QnMediaResource::rtpTransportKey(), valueStr);
+}
+
+void setMotionStreamType(vms::api::MotionStreamType value, const Cameras& cameras)
+{
+    const auto isValueSupported =
+        [value](const QnVirtualCameraResourcePtr& camera) -> bool
+        {
+            switch (value)
+            {
+                case vms::api::MotionStreamType::secondary:
+                    return camera->hasDualStreamingInternal();
+                case vms::api::MotionStreamType::edge:
+                    return camera->hasCameraCapabilities(Qn::RemoteArchiveCapability);
+                default:
+                    return true;
+            }
+        };
+
+    const auto valueStr = value == vms::api::MotionStreamType::automatic
+        ? QString()
+        : QnLexical::serialized(value);
+
+    for (const auto& camera: cameras)
+    {
+        if (isValueSupported(camera))
+            camera->setProperty(QnMediaResource::motionStreamKey(), valueStr);
+    }
+}
+
+void setWearableMotionEnabled(bool value, const Cameras& cameras)
+{
+    for (const auto& camera: cameras)
+    {
+        if (!camera->hasFlags(Qn::wearable_camera))
+            continue;
+
+        NX_ASSERT(camera->getDefaultMotionType() == Qn::MotionType::MT_SoftwareGrid);
+        camera->setMotionType(value
+            ? Qn::MotionType::MT_SoftwareGrid
+            : Qn::MotionType::MT_NoMotion);
+    }
+}
+
+void setWearableMotionSensitivity(int value, const Cameras& cameras)
+{
+    QnMotionRegion region;
+    region.addRect(value, QRect(0, 0, core::MotionGrid::kWidth, core::MotionGrid::kHeight));
+
+    for (const auto& camera: cameras)
+    {
+        if (!camera->hasFlags(Qn::wearable_camera))
+            continue;
+
+        NX_ASSERT(camera->getVideoLayout()->channelCount() == 1);
+        camera->setMotionRegion(region, 0);
+    }
+}
+
 } // namespace
 
 void CameraSettingsDialogStateConversionFunctions::applyStateToCameras(
@@ -130,6 +259,9 @@ void CameraSettingsDialogStateConversionFunctions::applyStateToCameras(
         camera->setName(state.singleCameraProperties.name());
 
         camera->setDewarpingParams(state.fisheyeSettings());
+
+        const int logicalId = state.singleCameraSettings.logicalId();
+        camera->setLogicalId((logicalId > 0) ? QString::number(logicalId) : QString());
 
         if (state.devicesDescription.hasMotion == State::CombinedValue::All)
         {
@@ -148,6 +280,17 @@ void CameraSettingsDialogStateConversionFunctions::applyStateToCameras(
             const auto ioPortDataList = state.singleIoModuleSettings.ioPortsData();
             if (!ioPortDataList.empty()) //< Can happen if it's just discovered unauthorized module.
                 camera->setIOPorts(ioPortDataList);
+        }
+    }
+
+    if (state.devicesDescription.isWearable == State::CombinedValue::All)
+    {
+        if (state.wearableMotion.enabled.hasValue())
+        {
+            setWearableMotionEnabled(state.wearableMotion.enabled(), cameras);
+
+            if (state.wearableMotion.enabled() && state.wearableMotion.sensitivity.hasValue())
+                setWearableMotionSensitivity(state.wearableMotion.sensitivity(), cameras);
         }
     }
 
@@ -171,6 +314,46 @@ void CameraSettingsDialogStateConversionFunctions::applyStateToCameras(
 
     if (state.recording.thresholds.afterSec.hasValue())
         setRecordingAfterThreshold(state.recording.thresholds.afterSec(), cameras);
+
+    if (state.settingsOptimizationEnabled)
+    {
+        if (state.expert.dualStreamingDisabled.hasValue())
+            setDualStreamingDisabled(state.expert.dualStreamingDisabled(), cameras);
+
+        if (state.expert.useBitratePerGOP.hasValue()
+            && state.devicesDescription.hasPredefinedBitratePerGOP == State::CombinedValue::None
+            && !state.expert.cameraControlDisabled.valueOr(false))
+        {
+            setUseBitratePerGOP(state.expert.useBitratePerGOP(), cameras);
+        }
+
+        if (state.devicesDescription.isArecontCamera == State::CombinedValue::None
+            && state.expert.cameraControlDisabled.hasValue())
+        {
+            setCameraControlDisabled(state.expert.cameraControlDisabled(), cameras);
+        }
+    }
+
+    if (state.expert.primaryRecordingDisabled.hasValue())
+        setPrimaryRecordingDisabled(state.expert.primaryRecordingDisabled(), cameras);
+
+    if (state.expert.secondaryRecordingDisabled.hasValue())
+        setSecondaryRecordingDisabled(state.expert.secondaryRecordingDisabled(), cameras);
+
+    if (state.devicesDescription.supportsMotionStreamOverride == State::CombinedValue::All
+        && state.expert.motionStreamType.hasValue())
+    {
+        setMotionStreamType(state.expert.motionStreamType(), cameras);
+    }
+
+    if (state.devicesDescription.canDisableNativePtzPresets != State::CombinedValue::None
+        && state.expert.nativePtzPresetsDisabled.hasValue())
+    {
+        setNativePtzPresetsDisabled(state.expert.nativePtzPresetsDisabled(), cameras);
+    }
+
+    if (state.expert.rtpTransportType.hasValue())
+        setRtpTransportType(state.expert.rtpTransportType(), cameras);
 }
 
 } // namespace desktop

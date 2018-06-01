@@ -144,9 +144,7 @@ QnGlobalSettings::QnGlobalSettings(QObject *parent):
     initialize();
 }
 
-QnGlobalSettings::~QnGlobalSettings()
-{
-}
+QnGlobalSettings::~QnGlobalSettings() = default;
 
 void QnGlobalSettings::initialize()
 {
@@ -404,6 +402,11 @@ QnGlobalSettings::AdaptorList QnGlobalSettings::initMiscAdaptors()
         kEventLogPeriodDaysDefault,
         this);
 
+    m_trafficEncryptionForcedAdaptor = new QnLexicalResourcePropertyAdaptor<bool>(
+        kNameTrafficEncryptionForced, false, this);
+    m_videoTrafficEncryptionForcedAdaptor = new QnLexicalResourcePropertyAdaptor<bool>(
+        kNameVideoTrafficEncryptionForced, false, this);
+
     m_autoDiscoveryEnabledAdaptor = new QnLexicalResourcePropertyAdaptor<bool>(kNameAutoDiscoveryEnabled, true, this);
     m_updateNotificationsEnabledAdaptor = new QnLexicalResourcePropertyAdaptor<bool>(kNameUpdateNotificationsEnabled, true, this);
     m_backupQualitiesAdaptor = new QnLexicalResourcePropertyAdaptor<Qn::CameraBackupQualities>(
@@ -516,6 +519,8 @@ QnGlobalSettings::AdaptorList QnGlobalSettings::initMiscAdaptors()
     connect(m_disabledVendorsAdaptor,               &QnAbstractResourcePropertyAdaptor::valueChanged,   this,   &QnGlobalSettings::disabledVendorsChanged,              Qt::QueuedConnection);
     connect(m_auditTrailEnabledAdaptor,             &QnAbstractResourcePropertyAdaptor::valueChanged,   this,   &QnGlobalSettings::auditTrailEnableChanged,             Qt::QueuedConnection);
     connect(m_auditTrailPeriodDaysAdaptor,          &QnAbstractResourcePropertyAdaptor::valueChanged,   this,   &QnGlobalSettings::auditTrailPeriodDaysChanged,         Qt::QueuedConnection);
+    connect(m_trafficEncryptionForcedAdaptor,       &QnAbstractResourcePropertyAdaptor::valueChanged,   this,   &QnGlobalSettings::trafficEncryptionForcedChanged,      Qt::QueuedConnection);
+    connect(m_videoTrafficEncryptionForcedAdaptor,  &QnAbstractResourcePropertyAdaptor::valueChanged,   this,   &QnGlobalSettings::videoTrafficEncryptionForcedChanged, Qt::QueuedConnection);
     connect(m_eventLogPeriodDaysAdaptor,            &QnAbstractResourcePropertyAdaptor::valueChanged,   this,   &QnGlobalSettings::eventLogPeriodDaysChanged,           Qt::QueuedConnection);
     connect(m_cameraSettingsOptimizationAdaptor,    &QnAbstractResourcePropertyAdaptor::valueChanged,   this,   &QnGlobalSettings::cameraSettingsOptimizationChanged,   Qt::QueuedConnection);
     connect(m_autoUpdateThumbnailsAdaptor,          &QnAbstractResourcePropertyAdaptor::valueChanged,   this,   &QnGlobalSettings::autoUpdateThumbnailsChanged,         Qt::QueuedConnection);
@@ -549,6 +554,8 @@ QnGlobalSettings::AdaptorList QnGlobalSettings::initMiscAdaptors()
         << m_useTextEmailFormatAdaptor
         << m_auditTrailEnabledAdaptor
         << m_auditTrailPeriodDaysAdaptor
+        << m_trafficEncryptionForcedAdaptor
+        << m_videoTrafficEncryptionForcedAdaptor
         << m_eventLogPeriodDaysAdaptor
         << m_autoDiscoveryEnabledAdaptor
         << m_updateNotificationsEnabledAdaptor
@@ -654,6 +661,26 @@ int QnGlobalSettings::auditTrailPeriodDays() const
 int QnGlobalSettings::eventLogPeriodDays() const
 {
     return m_eventLogPeriodDaysAdaptor->value();
+}
+
+bool QnGlobalSettings::isTrafficEncriptionForced() const
+{
+    return m_trafficEncryptionForcedAdaptor->value();
+}
+
+void QnGlobalSettings::setTrafficEncriptionForced(bool value)
+{
+    m_trafficEncryptionForcedAdaptor->setValue(value);
+}
+
+bool QnGlobalSettings::isVideoTrafficEncriptionForced() const
+{
+    return m_videoTrafficEncryptionForcedAdaptor->value();
+}
+
+void QnGlobalSettings::setVideoTrafficEncryptionForced(bool value)
+{
+    m_videoTrafficEncryptionForcedAdaptor->setValue(value);
 }
 
 bool QnGlobalSettings::isAutoDiscoveryEnabled() const {

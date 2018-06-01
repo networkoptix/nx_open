@@ -13,7 +13,7 @@ SoftwareVersion::SoftwareVersion()
 }
 
 SoftwareVersion::SoftwareVersion(int major, int minor, int bugfix /* = 0*/, int build /* = 0*/) :
-    m_data({major, minor, bugfix, build })
+    m_data{{major, minor, bugfix, build}}
 {
 }
 

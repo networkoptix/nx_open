@@ -43,6 +43,7 @@
     "ACTIVATE YOUR ACCOUNT EMAIL SUBJECT": "Активируйте учетную запись",
     "RESET PASSWORD EMAIL SUBJECT": "Восстановление пароля",
     "INVITED TO SYSTEM EMAIL SUBJECT": "Вам открыт доступ к системе {{message.system_name}}",
+    "INVITED TO SYSTEM EMAIL SUBJECT UNREGISTERED": "{{message.sharer_name}} invites you to %PRODUCT_NAME%",
     "DISCONNECT FORM HEADER TEXT": "Отключить систему от %PRODUCT_NAME%?",
     "FIRST NAME IS REQUIRED TEXT": "Имя обязательно для заполнения",
     "LAST NAME IS REQUIRED TEXT": "Фамилия обязательна для заполнения",
@@ -57,5 +58,6 @@
     "PASSWORD IS WEAK TEXT": "Для надежности пароля используйте цифры, буквы верхнего и нижнего регистра и специальные символы",
     "THIS LINK IS BROKEN TEXT": "This link is broken,<br>\n            System may be disconnected from %PRODUCT_NAME%,<br>\n            Access to this System may be revoked, <br>\n            or you may be logged into a different account",
     "PAGE NOT FOUND": "Страница не найдена",
-    "TAKE ME HOME": "Перейти на домашнюю страницу"
+    "TAKE ME HOME": "Перейти на домашнюю страницу",
+    "OPEN NX WITNESS BUTTON TEXT": "Open %VMS_NAME%"
 }

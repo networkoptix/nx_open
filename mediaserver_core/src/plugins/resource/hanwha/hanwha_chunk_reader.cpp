@@ -813,7 +813,7 @@ void HanwhaChunkLoader::setUpThreadUnsafe()
     if (searchRecordingPeriodAttribute != boost::none)
         m_hasSearchRecordingPeriodSubmenu = searchRecordingPeriodAttribute.get();
 
-    m_isNvr = information->deviceType == kHanwhaNvrDeviceType;
+    m_isNvr = information->deviceType == HanwhaDeviceType::nvr;
     m_maxChannels = information->channelCount;
 }
 

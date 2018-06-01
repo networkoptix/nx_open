@@ -4,8 +4,9 @@ from string import whitespace
 
 import pytest
 
-from framework.os_access.exceptions import BadParent, DoesNotExist, NotAFile, NotADir
+from framework.os_access.exceptions import BadParent, DoesNotExist, NotADir, NotAFile
 from framework.os_access.local_path import LocalPath
+from framework.os_access.ssh_path import make_ssh_path_cls
 
 pytest_plugins = ['fixtures.ad_hoc_ssh']
 
@@ -16,8 +17,14 @@ def local_path():
 
 
 @pytest.fixture()
-def ssh_path(ad_hoc_ssh_access):
-    return ad_hoc_ssh_access.Path.tmp() / 'test_path-remote'
+def ssh_path(ad_hoc_ssh):
+    return make_ssh_path_cls(ad_hoc_ssh).tmp() / 'test_path-remote'
+
+
+@pytest.fixture(scope='session')
+def windows_vm(vm_factory):
+    with vm_factory.allocated_vm('paths-test', vm_type='windows') as windows_vm:
+        yield windows_vm
 
 
 @pytest.fixture()
@@ -33,10 +40,16 @@ def dirty_remote_test_dir(request):
     return base_remote_dir / request.node.name
 
 
+def _cleanup_dir(dir):
+    # To avoid duplication but makes setup and test distinct.
+    dir.rmtree(ignore_errors=True)
+    dir.mkdir(parents=True)  # Its parents may not exist.
+    return dir
+
+
 @pytest.fixture()
 def remote_test_dir(dirty_remote_test_dir):
-    dirty_remote_test_dir.rmtree(ignore_errors=True)
-    dirty_remote_test_dir.mkdir()
+    _cleanup_dir(dirty_remote_test_dir)
     return dirty_remote_test_dir
 
 
@@ -62,8 +75,7 @@ def existing_remote_dir(remote_test_dir):
 
 
 def test_rmtree_write_exists(dirty_remote_test_dir):
-    dirty_remote_test_dir.rmtree(ignore_errors=True)
-    dirty_remote_test_dir.mkdir()
+    _cleanup_dir(dirty_remote_test_dir)
     touched_file = dirty_remote_test_dir / 'touched.empty'
     assert not touched_file.exists()
     touched_file.write_bytes(b'')
@@ -72,8 +84,7 @@ def test_rmtree_write_exists(dirty_remote_test_dir):
 
 @pytest.mark.parametrize('depth', [1, 2, 3, 4], ids='depth_{}'.format)
 def test_rmtree_mkdir_exists(dirty_remote_test_dir, depth):
-    dirty_remote_test_dir.rmtree(ignore_errors=True)
-    dirty_remote_test_dir.mkdir()
+    _cleanup_dir(dirty_remote_test_dir)
     root_dir = dirty_remote_test_dir / 'root'
     root_dir.mkdir()
     target_dir = root_dir.joinpath(*['level_{}'.format(level) for level in range(1, depth + 1)])
@@ -188,3 +199,15 @@ def test_glob_on_non_existent(existing_remote_dir):
     non_existent_path = existing_remote_dir / 'non_existent'
     with pytest.raises(DoesNotExist):
         _ = list(non_existent_path.glob('*'))
+
+
+@pytest.mark.parametrize('iterations', [2, 10], ids='{}iterations'.format)
+@pytest.mark.parametrize('depth', [2, 10], ids='depth{}'.format)
+def test_many_mkdir_rmtree(remote_test_dir, iterations, depth):
+    """Sometimes mkdir after rmtree fails because of pending delete operations"""
+    top_path = remote_test_dir / 'top'
+    deep_path = top_path.joinpath(*('level{}'.format(level) for level in range(depth)))
+    for _ in range(iterations):
+        deep_path.mkdir(parents=True)
+        deep_path.joinpath('treasure').write_bytes(b'\0' * 1000000)
+        top_path.rmtree()

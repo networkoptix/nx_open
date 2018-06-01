@@ -169,7 +169,7 @@ public:
         bool allowNonSecureConnect);
 
     virtual bool listen(int backlog = kDefaultBacklogSize) override;
-    virtual AbstractStreamSocket* accept() override;
+    virtual std::unique_ptr<AbstractStreamSocket> accept() override;
     virtual void pleaseStop(nx::utils::MoveOnlyFunc<void()> handler) override;
     virtual void pleaseStopSync(bool assertIfCalledUnderLock = true) override;
 

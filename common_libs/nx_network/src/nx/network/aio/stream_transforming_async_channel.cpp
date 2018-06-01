@@ -1,5 +1,7 @@
 #include "stream_transforming_async_channel.h"
 
+#include <nx/utils/std/algorithm.h>
+
 namespace nx {
 namespace network {
 namespace aio {
@@ -46,7 +48,7 @@ void StreamTransformingAsyncChannel::readSomeAsync(
         [this, buffer, handler = std::move(handler)]() mutable
         {
             m_userTaskQueue.push_back(
-                std::make_unique<ReadTask>(buffer, std::move(handler)));
+                std::make_shared<ReadTask>(buffer, std::move(handler)));
             tryToCompleteUserTasks();
         });
 }
@@ -61,7 +63,7 @@ void StreamTransformingAsyncChannel::sendAsync(
         [this, &buffer, handler = std::move(handler)]() mutable
         {
             m_userTaskQueue.push_back(
-                std::make_unique<WriteTask>(buffer, std::move(handler)));
+                std::make_shared<WriteTask>(buffer, std::move(handler)));
             tryToCompleteUserTasks();
         });
 }
@@ -73,22 +75,22 @@ void StreamTransformingAsyncChannel::stopWhileInAioThread()
 
 void StreamTransformingAsyncChannel::tryToCompleteUserTasks()
 {
-    std::vector<UserTask*> tasksToProcess;
+    std::vector<std::shared_ptr<UserTask>> tasksToProcess;
     tasksToProcess.reserve(m_userTaskQueue.size());
-    for (auto& task: m_userTaskQueue)
-        tasksToProcess.push_back(task.get());
+    for (const auto& task: m_userTaskQueue)
+        tasksToProcess.push_back(task);
 
     // m_userTaskQueue can be changed during processing.
 
-    for (UserTask* task: tasksToProcess)
+    for (const std::shared_ptr<UserTask>& task: tasksToProcess)
     {
         utils::ObjectDestructionFlag::Watcher watcher(&m_destructionFlag);
-        processTask(task);
+        processTask(task.get());
         if (watcher.objectDestroyed())
             return;
 
         if (task->status == UserTaskStatus::done)
-            removeUserTask(task);
+            removeUserTask(task.get());
     }
 }
 
@@ -131,16 +133,31 @@ void StreamTransformingAsyncChannel::processWriteTask(WriteTask* task)
 {
     SystemError::ErrorCode sysErrorCode = SystemError::noError;
     int bytesWritten = 0;
+
+    const auto rawWriteQueueSizeBak = m_rawWriteQueue.size();
+
     std::tie(sysErrorCode, bytesWritten) = invokeConverter(
         std::bind(&utils::bstream::Converter::write, m_converter,
             task->buffer.data(),
             task->buffer.size()));
     if (sysErrorCode == SystemError::wouldBlock)
-        return;
+        return; //< Could not schedule user data send.
 
     task->status = UserTaskStatus::done;
-    auto userHandler = std::move(task->handler);
-    userHandler(sysErrorCode, bytesWritten);
+
+    if (m_rawWriteQueue.size() > rawWriteQueueSizeBak)
+    {
+        // User data send has been scheduled.
+        // Reporting result only after send completion on underlying raw channel.
+        NX_ASSERT(!m_rawWriteQueue.empty());
+        m_rawWriteQueue.back().userHandler =
+            std::exchange(task->handler, nullptr);
+        m_rawWriteQueue.back().userByteCount = task->buffer.size();
+    }
+    else
+    {
+        nx::utils::swapAndCall(task->handler, sysErrorCode, 0);
+    }
 }
 
 template<typename TransformerFunc>
@@ -149,7 +166,7 @@ std::tuple<SystemError::ErrorCode, int /*bytesTransferred*/>
         TransformerFunc func)
 {
     const int result = func();
-    if (result > 0)
+    if (result >= 0)
         return std::make_tuple(SystemError::noError, result);
 
     if (m_converter->failed())
@@ -234,23 +251,32 @@ void StreamTransformingAsyncChannel::onSomeRawDataRead(
         return;
     }
 
-    handleIoError(sysErrorCode);
+    if (nx::network::socketCannotRecoverFromError(sysErrorCode))
+        return reportFailureOfEveryUserTask(sysErrorCode);
+
+    // Reporting failure to user task(s) that depend on this read.
+    reportFailureToTasksFilteredByType(sysErrorCode, UserTaskType::read);
 }
 
 int StreamTransformingAsyncChannel::writeRawBytes(const void* data, size_t count)
 {
-    using namespace std::placeholders;
-
     NX_ASSERT(isInSelfAioThread());
 
     // TODO: #ak Put a limit on send queue size.
 
-    m_rawWriteQueue.push_back(nx::Buffer((const char*)data, (int)count));
+    m_rawWriteQueue.push_back(RawSendContext());
+    m_rawWriteQueue.back().data = nx::Buffer((const char*)data, (int)count);
     if (m_rawWriteQueue.size() == 1)
     {
-        m_rawDataChannel->sendAsync(
-            m_rawWriteQueue.front(),
-            std::bind(&StreamTransformingAsyncChannel::onRawDataWritten, this, _1, _2));
+        if (m_sendShutdown)
+        {
+            post(std::bind(&StreamTransformingAsyncChannel::onRawDataWritten, this,
+                SystemError::connectionReset, (size_t) -1));
+        }
+        else
+        {
+            scheduleNextRawSendTaskIfAny();
+        }
     }
 
     return (int)count;
@@ -258,38 +284,96 @@ int StreamTransformingAsyncChannel::writeRawBytes(const void* data, size_t count
 
 void StreamTransformingAsyncChannel::onRawDataWritten(
     SystemError::ErrorCode sysErrorCode,
-    std::size_t bytesTransferred)
+    std::size_t /*bytesTransferred*/)
 {
-    using namespace std::placeholders;
+    auto completedIoRange =
+        std::make_tuple(m_rawWriteQueue.begin(), std::next(m_rawWriteQueue.begin()));
+    if (sysErrorCode != SystemError::noError)
+    {
+        // Marking socket unusable since we cannot throw away bytes out of SSL stream.
+        m_sendShutdown = true;
+
+        // Considering every queue raw write failed since send has been shut down.
+        std::get<1>(completedIoRange) = m_rawWriteQueue.end();
+    }
+
+    if (completeRawSendTasks(completedIoRange, sysErrorCode) == UserHandlerResult::thisDeleted)
+        return;
 
     if (sysErrorCode == SystemError::noError)
     {
-        NX_ASSERT(bytesTransferred == static_cast<std::size_t>(m_rawWriteQueue.front().size()));
-        m_rawWriteQueue.pop_front();
-        if (!m_rawWriteQueue.empty())
-        {
-            m_rawDataChannel->sendAsync(
-                m_rawWriteQueue.front(),
-                std::bind(&StreamTransformingAsyncChannel::onRawDataWritten, this, _1, _2));
-        }
-
-        return tryToCompleteUserTasks();
+        scheduleNextRawSendTaskIfAny();
+        tryToCompleteUserTasks();
+        return;
     }
 
-    if (nx::network::socketCannotRecoverFromError(sysErrorCode))
-        return handleIoError(sysErrorCode);
-
-    // Retrying I/O.
-    m_rawDataChannel->sendAsync(
-        m_rawWriteQueue.front(),
-        std::bind(&StreamTransformingAsyncChannel::onRawDataWritten, this, _1, _2));
+    if (socketCannotRecoverFromError(sysErrorCode))
+        reportFailureOfEveryUserTask(sysErrorCode);
+    else
+        reportFailureToTasksFilteredByType(sysErrorCode, UserTaskType::write);
 }
 
-void StreamTransformingAsyncChannel::handleIoError(SystemError::ErrorCode sysErrorCode)
+template<typename Range>
+StreamTransformingAsyncChannel::UserHandlerResult
+    StreamTransformingAsyncChannel::completeRawSendTasks(
+        Range completedIoRange,
+        SystemError::ErrorCode sysErrorCode)
+{
+    for (auto it = std::get<0>(completedIoRange); it != std::get<1>(completedIoRange); ++it)
+    {
+        if (!it->userHandler)
+            continue;
+
+        utils::ObjectDestructionFlag::Watcher thisDestructionWatcher(&m_destructionFlag);
+        nx::utils::swapAndCall(
+            it->userHandler,
+            sysErrorCode,
+            sysErrorCode == SystemError::noError ? it->userByteCount : (size_t) -1);
+        if (thisDestructionWatcher.objectDestroyed())
+            return UserHandlerResult::thisDeleted;
+    }
+
+    m_rawWriteQueue.erase(std::get<0>(completedIoRange), std::get<1>(completedIoRange));
+    return UserHandlerResult::proceed;
+}
+
+void StreamTransformingAsyncChannel::scheduleNextRawSendTaskIfAny()
+{
+    using namespace std::placeholders;
+
+    if (!m_rawWriteQueue.empty())
+    {
+        m_rawDataChannel->sendAsync(
+            m_rawWriteQueue.front().data,
+            std::bind(&StreamTransformingAsyncChannel::onRawDataWritten, this, _1, _2));
+    }
+}
+
+void StreamTransformingAsyncChannel::reportFailureOfEveryUserTask(
+    SystemError::ErrorCode sysErrorCode)
+{
+    reportFailureToTasksFilteredByType(sysErrorCode, std::nullopt);
+}
+
+void StreamTransformingAsyncChannel::reportFailureToTasksFilteredByType(
+    SystemError::ErrorCode sysErrorCode,
+    std::optional<UserTaskType> userTypeFilter)
 {
     // We can have SystemError::noError here in case of a connection closure.
     decltype(m_userTaskQueue) userTaskQueue;
-    userTaskQueue.swap(m_userTaskQueue);
+    if (!userTypeFilter)
+    {
+        userTaskQueue.swap(m_userTaskQueue);
+    }
+    else
+    {
+        auto movedTaskRangeIter = nx::utils::move_if(
+            m_userTaskQueue.begin(), m_userTaskQueue.end(),
+            std::back_inserter(userTaskQueue),
+            [&userTypeFilter](const auto& userTask) { return userTask->type == *userTypeFilter; });
+        m_userTaskQueue.erase(movedTaskRangeIter, m_userTaskQueue.end());
+    }
+
     for (auto& userTask: userTaskQueue)
     {
         auto handler = std::move(userTask->handler);

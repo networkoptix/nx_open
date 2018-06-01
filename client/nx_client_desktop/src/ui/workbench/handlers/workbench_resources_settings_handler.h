@@ -22,6 +22,7 @@ public:
     virtual ~QnWorkbenchResourcesSettingsHandler();
 
 private:
+    void at_legacyCameraSettingsAction_triggered();
     void at_cameraSettingsAction_triggered();
     void at_serverSettingsAction_triggered();
     void at_newUserAction_triggered();

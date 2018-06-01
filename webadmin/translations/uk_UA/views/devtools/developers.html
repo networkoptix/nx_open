@@ -1,0 +1,74 @@
+<div class="container">
+    <ng-include src="Config.viewsDir + 'devtools/feedback.html'"></ng-include>
+    <div ng-if="developersFeedbackForm">
+        <h2>Developer Tools</h2>
+        <p>
+            Have an idea on how to improve our developer tools or just want to start a conversation?
+        </p>
+        <p ng-if="developersFeedbackForm"><a ng-href="{{developersFeedbackForm}}" target="_blank">Leave feedback</a></p>
+    </div>
+
+    <div>
+        <h3>Generic Events Generator</h3>
+        <p>
+            A Generic Event is a method of sending events from 3rd party systems to a System,
+            which can be used to trigger System actions in the Events & Rules engine.
+            The Generic Event Generator is a tool which helps build HTTP Generic Event calls.
+        </p>
+        <p><a href="#/developers/events">Generic Events Generator</a></p>
+    </div>
+    <div>
+        <h3>Server API</h3>
+        <p>
+            Server API provides a standard set of API calls for 3rd party systems. It gives developers the ability to
+            access almost every system feature available in the regular client: query/manage system resources (servers,
+            cameras, users, permissions), pull live or recorded video out of System, generate events, create rules,
+            control PTZ cameras, and more.
+        </p>
+        <p>
+            <a href="#/developers/api"><b>API Testing Tool (new)</b></a>
+            - interactive documentation with tools for testing API calls<br>
+            <a href="#/developers/changelog">API Changelog</a>
+            - list of breaking changes in API<br>
+            <a id="api-doc" href="api.xml" target="_blank">API Documentation</a>
+        </p>
+
+    </div>
+    <div>
+        <h3>Camera Details Panel</h3>
+        <p>
+            Displays additional developer-friendly information for cameras in the Web Admin interface:
+        </p>
+        <ul>
+            <li>Camera ID</li>
+            <li>Links for all available video-streams</li>
+            <li>Direct export video from browser</li>
+        </ul>
+        <p>
+            To open the Camera Details Panel - navigate to the Web Admin interface, choose <a href="#/view">View</a>,
+            select the target camera, click on the settings icon (gear), then choose "Camera Details"
+        </p>
+        <p><a href="#/view/?cameraLinks">open Camera Details Panel</a></p>
+    </div>
+    <div>
+        <h3>Video Source Integration SDK</h3>
+        <p>
+            Video Source Integration SDK provides the ability to integrate virtually any live or recorded video source
+            (IP Cameras, NVRs, DVRs, etc) into System. SDK makes possible to create methods for discovering,
+            displaying, analyzing and recording video. It also allows integrating device I/O ports and motion detection
+            information.
+        </p>
+        <p><a id="sdk-video" ng-href="#/sdkeula/sdk" >get SDK</a></p>
+    </div>
+
+    <div>
+        <h3>Storage SDK</h3>
+        <p>
+            Storage SDK provides the ability to integrate potential storage  into System. It allows developers to
+            read from or write to any storage location: local, remote, and even cloud one. Creating a storage
+            plugin requires implementing standard functions such as: I/O stream, if file exist, delete file, list of
+            files in the folder, etc.Storage SDK also contains an example for using an FTP server as a storage location.
+        </p>
+        <p><a id="sdk-storage" ng-href="#/sdkeula/storage_sdk" >get SDK</a></p>
+    </div>
+</div>

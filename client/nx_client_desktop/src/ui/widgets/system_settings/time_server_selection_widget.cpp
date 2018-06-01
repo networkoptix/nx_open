@@ -9,6 +9,7 @@
 #include <api/runtime_info_manager.h>
 
 #include <common/common_module.h>
+#include <translation/datetime_formatter.h>
 
 #include <nx_ec/data/api_runtime_data.h>
 
@@ -270,8 +271,8 @@ void QnTimeServerSelectionWidget::updateTime()
     syncTime.setTimeSpec(Qt::OffsetFromUTC);
     syncTime.setOffsetFromUtc(offsetFromUtc);
 
-    ui->timeLabel->setText(syncTime.toString(lit("HH:mm:ss")));
-    ui->dateLabel->setText(syncTime.toString(lit("dd/MM/yyyy")));
+    ui->timeLabel->setText(datetime::toString(syncTime.time()));
+    ui->dateLabel->setText(datetime::toString(syncTime.date()));
     ui->zoneLabel->setText(syncTime.timeZoneAbbreviation());
 
     ui->stackedWidget->setCurrentWidget(ui->timePage);

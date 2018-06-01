@@ -118,7 +118,8 @@ class CommunicatingSocket:
         std::is_base_of<AbstractCommunicatingSocket, SocketInterfaceToImplement>::value,
         "You MUST use class derived of AbstractCommunicatingSocket as a template argument");
 
-    typedef CommunicatingSocket<SocketInterfaceToImplement> SelfType;
+    using base_type = Socket<SocketInterfaceToImplement>;
+    using self_type = CommunicatingSocket<SocketInterfaceToImplement>;
 
 public:
     CommunicatingSocket(
@@ -133,6 +134,8 @@ public:
         CommonSocketImpl* sockImpl = nullptr);
 
     virtual ~CommunicatingSocket();
+
+    virtual void bindToAioThread(nx::network::aio::AbstractAioThread* aioThread) override;
 
     virtual bool connect(
         const SocketAddress& remoteAddress,
@@ -165,7 +168,7 @@ protected:
         const SocketAddress& remoteAddress,
         std::chrono::milliseconds timeout);
 
-    std::unique_ptr<aio::AsyncSocketImplHelper<SelfType>> m_aioHelper;
+    std::unique_ptr<aio::AsyncSocketImplHelper<self_type>> m_aioHelper;
     bool m_connected;
 #ifdef WIN32
     WSAEVENT m_eventObject;
@@ -229,14 +232,14 @@ public:
      */
     static int accept(int sockDesc);
 
-    virtual bool listen(int queueLen = 128) override;
-    virtual AbstractStreamSocket* accept() override;
+    virtual bool listen(int queueLen = AbstractStreamServerSocket::kDefaultBacklogSize) override;
+    virtual std::unique_ptr<AbstractStreamSocket> accept() override;
     virtual void pleaseStop(nx::utils::MoveOnlyFunc< void() > handler) override;
     virtual void pleaseStopSync(bool assertIfCalledUnderLock = true) override;
 
     virtual void acceptAsync(AcceptCompletionHandler handler) override;
 
-    AbstractStreamSocket* systemAccept();
+    std::unique_ptr<AbstractStreamSocket> systemAccept();
 
 protected:
     virtual void cancelIoInAioThread() override;

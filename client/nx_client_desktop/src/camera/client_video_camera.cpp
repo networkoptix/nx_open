@@ -1,6 +1,6 @@
 #include "client_video_camera.h"
 
-#include <client/client_module.h>
+#include <client_core/client_core_module.h>
 
 #include <nx/utils/log/log.h>
 
@@ -150,7 +150,7 @@ void QnClientVideoCamera::exportMediaPeriodToFile(const QnTimePeriod &timePeriod
     if (!m_exportRecorder)
     {
 
-        auto tmpReader = qnClientModule->dataProviderFactory()->createDataProvider(
+        auto tmpReader = qnClientCoreModule->dataProviderFactory()->createDataProvider(
             m_resource->toResourcePtr());
         QnAbstractArchiveStreamReader* archiveReader = dynamic_cast<QnAbstractArchiveStreamReader*> (tmpReader);
         if (!archiveReader)

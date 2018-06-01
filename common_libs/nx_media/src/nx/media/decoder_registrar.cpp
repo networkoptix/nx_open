@@ -19,7 +19,8 @@ namespace nx {
 namespace media {
 
 void DecoderRegistrar::registerDecoders(
-    const QSize& maxFfmpegResolution, bool isTranscodingEnabled)
+    const QMap<int, QSize>& maxFfmpegResolutions,
+    bool isTranscodingEnabled)
 {
     VideoDecoderRegistry::instance()->setTranscodingEnabled(isTranscodingEnabled);
 
@@ -49,7 +50,7 @@ void DecoderRegistrar::registerDecoders(
     #endif
 
     {
-        FfmpegVideoDecoder::setMaxResolution(maxFfmpegResolution);
+        FfmpegVideoDecoder::setMaxResolutions(maxFfmpegResolutions);
 
         VideoDecoderRegistry::instance()->addPlugin<FfmpegVideoDecoder>();
         AudioDecoderRegistry::instance()->addPlugin<FfmpegAudioDecoder>();

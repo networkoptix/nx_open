@@ -35,8 +35,11 @@ Item
                 if (stackView.currentItem.objectName !== "videoScreen")
                 {
                     var item = Workflow.openVideoScreen(singleCameraId)
-                    item.layoutHelper = gridLayoutHelper
-                    item.camerasModel = camerasModel
+                    if (item)
+                    {
+                        item.layoutHelper = gridLayoutHelper
+                        item.camerasModel = camerasModel
+                    }
                 }
             }
             else

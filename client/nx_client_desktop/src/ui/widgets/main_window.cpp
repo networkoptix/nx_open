@@ -41,6 +41,7 @@
 #include <nx/client/desktop/ui/workbench/workbench_animations.h>
 #include <nx/client/desktop/ui/workbench/handlers/layout_tours_handler.h>
 #include <nx/client/desktop/ui/workbench/extensions/workbench_progress_manager.h>
+#include <nx/client/core/watchers/server_time_watcher.h>
 
 #include <ui/workbench/workbench_welcome_screen.h>
 #include <ui/workbench/handlers/workbench_action_handler.h>
@@ -288,8 +289,18 @@ MainWindow::MainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::WindowF
 
     /* Set up watchers. */
     context->instance<QnWorkbenchUserInactivityWatcher>()->setMainWindow(this);
-
     context->instance<WorkbenchProgressManager>();
+
+    const auto timeWatcher = context->instance<nx::client::core::ServerTimeWatcher>();
+    const auto timeModeNotifier = qnSettings->notifier(QnClientSettings::TIME_MODE);
+    connect(timeModeNotifier, &QnPropertyNotifier::valueChanged, timeWatcher,
+        [timeWatcher]()
+        {
+            const auto newMode = qnSettings->timeMode() == Qn::ClientTimeMode
+                ? nx::client::core::ServerTimeWatcher::clientTimeMode
+                : nx::client::core::ServerTimeWatcher::serverTimeMode;
+            timeWatcher->setTimeMode(newMode);
+        });
 
     /* Set up actions. Only these actions will be available through hotkeys. */
     addAction(action(action::NextLayoutAction));

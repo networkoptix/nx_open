@@ -1,7 +1,8 @@
 #pragma once
-#if defined(TARGET_OS_IPHONE)
 
 #include <QtCore/QString>
+
+#if defined (Q_OS_IOS)
 
 namespace nx {
 namespace media {
@@ -25,5 +26,4 @@ IosDeviceInformation iosDeviceInformation();
 } // namespace media
 } // namespace nx
 
- #endif // defined(TARGET_OS_IPHONE)
- 
+#endif // if defined (Q_OS_IOS)

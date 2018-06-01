@@ -65,6 +65,7 @@ public:
     void resetStatusList(const nx::vms::api::ResourceStatusDataList& params);
     void resetAccessRights(const ec2::ApiAccessRightsDataList& accessRights);
     void resetUserRoles(const ec2::ApiUserRoleDataList& roles);
+    void resetEventRules(const nx::vms::api::EventRuleDataList& eventRules);
 
 signals:
     void connectionOpened();
@@ -120,7 +121,7 @@ protected:
     virtual QnResourceFactory* getResourceFactory() const = 0;
 
 public slots:
-    void on_businessEventAddedOrUpdated(const nx::vms::event::RulePtr &rule);
+
     void on_licenseChanged(const QnLicensePtr &license);
     void on_licenseRemoved(const QnLicensePtr &license);
 
@@ -153,10 +154,10 @@ private slots:
 
     void on_businessEventRemoved(const QnUuid &id);
     void on_businessActionBroadcasted(const nx::vms::event::AbstractActionPtr& businessAction);
-    void on_businessRuleReset(const nx::vms::api::EventRuleDataList& rules);
     void on_broadcastBusinessAction(const nx::vms::event::AbstractActionPtr& action);
     void on_execBusinessAction( const nx::vms::event::AbstractActionPtr& action );
 
+    void on_eventRuleAddedOrUpdated(const nx::vms::api::EventRuleData& data);
 protected:
     ec2::AbstractECConnectionPtr m_connection;
 };

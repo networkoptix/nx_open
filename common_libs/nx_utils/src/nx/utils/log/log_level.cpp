@@ -5,8 +5,6 @@
 #include "assert.h"
 #include "log_message.h"
 
-#include <nx/utils/literal.h>
-
 namespace nx {
 namespace utils {
 namespace log {
@@ -14,28 +12,28 @@ namespace log {
 Level levelFromString(const QString& levelString)
 {
     const auto level = levelString.toLower();
-    if (level == lit("none") || level == lit("n"))
+    if (level == "none" || level == "n")
         return Level::none;
 
-    if (level == lit("always") || level == lit("a"))
+    if (level == "always" || level == "a")
         return Level::always;
 
-    if (level == lit("error") || level == lit("e"))
+    if (level == "error" || level == "e")
         return Level::error;
 
-    if (level == lit("warning") || level == lit("w"))
+    if (level == "warning" || level == "w")
         return Level::warning;
 
-    if (level == lit("info") || level == lit("i"))
+    if (level == "info" || level == "i")
         return Level::info;
 
-    if (level == lit("debug") || level == lit("debug1") || level == lit("d"))
+    if (level == "debug" || level == "debug1" || level == "d")
         return Level::debug;
 
-    if (level == lit("verbose") || level == lit("debug2") || level == lit("v"))
+    if (level == "verbose" || level == "debug2" || level == "v")
         return Level::verbose;
 
-    if (level == lit("notconfigured") || level == lit("not_configured"))
+    if (level == "notconfigured" || level == "not_configured")
         return Level::notConfigured;
 
     return Level::undefined;
@@ -46,31 +44,31 @@ QString toString(Level level)
     switch (level)
     {
         case Level::undefined:
-            return lit("undefined");
+            return "undefined";
 
         case Level::none:
-            return lit("none");
+            return "none";
 
         case Level::always:
-            return lit("always");
+            return "always";
 
         case Level::error:
-            return lit("error");
+            return "error";
 
         case Level::warning:
-            return lit("warning");
+            return "warning";
 
         case Level::info:
-            return lit("info");
+            return "info";
 
         case Level::debug:
-            return lit("debug");
+            return "debug";
 
         case Level::verbose:
-            return lit("verbose");
+            return "verbose";
 
         case Level::notConfigured:
-            return lit("notConfigured");
+            return "notConfigured";
     };
 
     NX_ASSERT(false, lm("Unknown level: %1").arg(static_cast<int>(level)));
@@ -154,7 +152,7 @@ QString LevelSettings::toString() const
         levelList << (level + kOpenBracket + filters + kCloseBracket);
     }
 
-    return levelList.join(kSeparator + lit(" "));
+    return levelList.join(kSeparator + QString(" "));
 }
 
 static bool isSeparator(const QChar& c)

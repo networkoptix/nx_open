@@ -51,7 +51,7 @@ protected:
 
 private:
     int m_prevAssignedProtocolNumber = 0;
-    std::unique_ptr<network::ProtocolDetectingStreamSocket> m_detector;
+    std::unique_ptr<network::ProtocolDetectingStreamSocket<AbstractStreamSocket>> m_detector;
     std::map<int /*protocolId*/, std::string> m_protocols;
     std::unique_ptr<AbstractStreamSocket> m_rawDataSource;
     nx::utils::SyncQueue<int> m_selectedProtocolEventQueue;
@@ -72,8 +72,9 @@ private:
     {
         auto& selectedProtocol = *m_protocols.begin();
         auto source = std::make_unique<BufferSocket>(selectedProtocol.second);
-        m_detector = std::make_unique<network::ProtocolDetectingStreamSocket>(
-            std::move(source));
+        m_detector =
+            std::make_unique<network::ProtocolDetectingStreamSocket<AbstractStreamSocket>>(
+                std::move(source));
         m_selectedProtocolId = selectedProtocol.first;
 
         registerProtocols();

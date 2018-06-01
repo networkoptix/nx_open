@@ -4,6 +4,7 @@
 #include <api/common_message_processor.h>
 #include <api/runtime_info_manager.h>
 
+#include <translation/datetime_formatter.h>
 #include <common/common_module.h>
 
 #include <core/resource_management/resource_changes_listener.h>
@@ -17,8 +18,7 @@
 
 #include <ui/style/resource_icon_cache.h>
 #include <ui/workbench/workbench_context.h>
-#include <ui/workbench/watchers/workbench_server_time_watcher.h>
-
+#include <nx/client/core/watchers/server_time_watcher.h>
 #include <nx/client/core/utils/human_readable.h>
 #include <utils/common/synctime.h>
 
@@ -174,7 +174,8 @@ QnTimeServerSelectionModel::QnTimeServerSelectionModel(QObject* parent):
                 kTextRoles);
         });
 
-    connect(context()->instance<QnWorkbenchServerTimeWatcher>(), &QnWorkbenchServerTimeWatcher::displayOffsetsChanged, this,
+    const auto timeWatcher = context()->instance<nx::client::core::ServerTimeWatcher>();
+    connect(timeWatcher, &nx::client::core::ServerTimeWatcher::displayOffsetsChanged, this,
         [this]
         {
             m_sameTimezoneValid = false;
@@ -334,8 +335,10 @@ QVariant QnTimeServerSelectionModel::data(const QModelIndex& index, int role) co
                     }
                     else
                     {
-                        dateTime = context()->instance<QnWorkbenchServerTimeWatcher>()->
-                            serverTime(server, sinceEpochMs);
+                        const auto timeWatcher =
+                            context()->instance<nx::client::core::ServerTimeWatcher>();
+
+                        dateTime = timeWatcher->serverTime(server, sinceEpochMs);
                     }
 
                     auto offsetFromUtc = dateTime.offsetFromUtc();
@@ -345,11 +348,11 @@ QVariant QnTimeServerSelectionModel::data(const QModelIndex& index, int role) co
                     switch (column)
                     {
                         case Columns::DateColumn:
-                            return dateTime.toString(lit("dd/MM/yyyy"));
+                            return datetime::toString(dateTime.date());
                         case Columns::ZoneColumn:
                             return dateTime.timeZoneAbbreviation();
                         case Columns::TimeColumn:
-                            return dateTime.toString(lit("HH:mm:ss"));
+                            return datetime::toString(dateTime.time());
                     }
                 }
 

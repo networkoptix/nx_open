@@ -43,6 +43,7 @@ public:
 
     // Parameter can be applied only to certain device types.
     bool isDeviceTypeSupported(HanwhaDeviceType deviceType) const;
+    QSet<QString> associatedParameters() const;
 
     bool isValid() const;
 
@@ -76,6 +77,8 @@ private:
     QString m_submenu;
     QString m_parameterName;
     QString m_parameterValue;
+
+    QSet<QString> m_associatedParameters;
 
     static const std::map<QString, QString HanwhaAdavancedParameterInfo::*> m_stringAuxes;
     static const std::map<QString, bool HanwhaAdavancedParameterInfo::*> m_boolAuxes;

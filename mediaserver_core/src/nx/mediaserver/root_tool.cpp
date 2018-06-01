@@ -268,22 +268,11 @@ bool RootTool::changeOwner(const QString& path)
     return execAndWait({"chown", path});
 }
 
-bool RootTool::touchFile(const QString& path)
-{
-    if (m_toolPath.isEmpty())
-    {
-        SystemCommands commands;
-        if (!commands.touchFile(path.toStdString()))
-            return false;
-
-        return true;
-    }
-
-    return execAndWait({"touch", path});
-}
-
 bool RootTool::makeDirectory(const QString& path)
 {
+    // #TODO #akulikov remove line below when SystemCommands function is implemented without fork.
+    return QDir().mkpath(path);
+
     if (m_toolPath.isEmpty())
     {
         SystemCommands commands;
@@ -298,6 +287,18 @@ bool RootTool::makeDirectory(const QString& path)
 
 bool RootTool::removePath(const QString& path)
 {
+    // #TODO #akulikov remove line below when SystemCommands function is implemented without fork.
+    auto fileInfo = QFileInfo(path);
+    if (fileInfo.isDir())
+        return QDir(path).removeRecursively();
+
+    if (fileInfo.isFile())
+        return QFile(path).remove();
+
+    return false;
+
+
+
     if (m_toolPath.isEmpty())
     {
         SystemCommands commands;
@@ -339,12 +340,12 @@ template<typename DefaultAction>
 qint64 RootTool::int64SingleArgCommandHelper(
     const QString& path, const char* command, DefaultAction defaultAction)
 {
-#if defined (Q_OS_LINUX)
     return commandHelper(
         -1LL, path, command, defaultAction,
         [command, path, this]()
         {
             int64_t result = -1;
+#if defined (Q_OS_LINUX)
             int socketPostfix = m_idHelper.take();
             execAndReadResult(
                 socketPostfix,
@@ -353,12 +354,9 @@ qint64 RootTool::int64SingleArgCommandHelper(
                 {
                     return system_commands::domain_socket::readInt64(socketPostfix, &result);
                 });
-
+#endif
             return result;
         });
-#else
-    return -1;
-#endif
 }
 
 int RootTool::open(const QString& path, QIODevice::OpenMode mode)
@@ -404,13 +402,13 @@ qint64 RootTool::totalSpace(const QString& path)
 
 bool RootTool::isPathExists(const QString& path)
 {
-#if defined (Q_OS_LINUX)
     return commandHelper(
         false, path, "exists",
         [path]() { return SystemCommands().isPathExists(path.toStdString(), /*reportViaSocket*/ false); },
         [path, this]()
         {
             int64_t result = (int64_t) false;
+#if defined (Q_OS_LINUX)
             int socketPostfix = m_idHelper.take();
             execAndReadResult(
                 socketPostfix,
@@ -419,12 +417,9 @@ bool RootTool::isPathExists(const QString& path)
                 {
                     return system_commands::domain_socket::readInt64(socketPostfix, &result);
                 });
-
+#endif
             return result;
         });
-#else
-    return false;
-#endif
 }
 
 static void* readBufferReallocCallback(void* context, ssize_t size)
@@ -490,10 +485,10 @@ static QnAbstractStorageResource::FileInfoList fileListFromSerialized(const std:
 template<typename DefaultAction, typename... Args>
 std::string RootTool::stringCommandHelper(const char* command, DefaultAction action, Args&&... args)
 {
-#if defined (Q_OS_LINUX)
     if (m_toolPath.isEmpty())
         return action();
 
+#if defined(Q_OS_LINUX)
     std::string buf;
     int socketPostfix = m_idHelper.take();
     execAndReadResult(

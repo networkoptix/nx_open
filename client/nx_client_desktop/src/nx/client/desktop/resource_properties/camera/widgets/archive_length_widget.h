@@ -3,6 +3,7 @@
 #include <QtWidgets/QWidget>
 
 namespace Ui { class ArchiveLengthWidget; }
+class QnDisconnectHelper;
 
 namespace nx {
 namespace client {
@@ -29,8 +30,9 @@ private:
     void loadState(const CameraSettingsDialogState& state);
 
 private:
-    QScopedPointer<Ui::ArchiveLengthWidget> ui;
-    Aligner* m_aligner = nullptr;
+    const QScopedPointer<Ui::ArchiveLengthWidget> ui;
+    QScopedPointer<QnDisconnectHelper> m_storeConnections;
+    Aligner* const m_aligner = nullptr;
 };
 
 } // namespace desktop

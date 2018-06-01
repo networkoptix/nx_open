@@ -41,6 +41,7 @@
 #include <nx_ec/managers/abstract_layout_tour_manager.h>
 #include "nx_ec/managers/abstract_webpage_manager.h"
 #include "nx_ec/managers/abstract_videowall_manager.h"
+#include <nx_ec/managers/abstract_event_rules_manager.h>
 
 #include "ec_api_fwd.h"
 #include "transaction_timestamp.h"
@@ -405,143 +406,7 @@ protected:
     virtual int removeLicense(const QnLicensePtr& license, impl::SimpleHandlerPtr handler) = 0;
 };
 
-class AbstractBusinessEventNotificationManager: public QObject
-{
-Q_OBJECT
-public:
-signals :
-    void addedOrUpdated(nx::vms::event::RulePtr businessRule, ec2::NotificationSource source);
-    void removed(QnUuid id);
-    void businessActionBroadcasted(const nx::vms::event::AbstractActionPtr& businessAction);
-    void businessRuleReset(const nx::vms::api::EventRuleDataList& rules);
-    void gotBroadcastAction(const nx::vms::event::AbstractActionPtr& action);
-    void execBusinessAction(const nx::vms::event::AbstractActionPtr& action);
-};
 
-typedef std::shared_ptr<AbstractBusinessEventNotificationManager>
-AbstractBusinessEventNotificationManagerPtr;
-
-/*!
-    \note All methods are asynchronous if other not specified
-*/
-class AbstractBusinessEventManager
-{
-public:
-    virtual ~AbstractBusinessEventManager()
-    {
-    }
-
-    /*!
-        \param handler Functor with params: (ErrorCode, const nx::vms::event::RuleList&)
-    */
-    template<class TargetType, class HandlerType>
-    int getBusinessRules(TargetType* target, HandlerType handler)
-    {
-        return getBusinessRules(
-            std::static_pointer_cast<impl::GetBusinessRulesHandler>(
-                std::make_shared<impl::CustomGetBusinessRulesHandler<TargetType, HandlerType>>(
-                    target,
-                    handler)));
-    }
-
-    ErrorCode getBusinessRulesSync(nx::vms::event::RuleList* const businessEventList)
-    {
-        int (AbstractBusinessEventManager::*fn)(impl::GetBusinessRulesHandlerPtr) = &
-            AbstractBusinessEventManager::getBusinessRules;
-        return impl::doSyncCall<impl::GetBusinessRulesHandler>(
-            std::bind(fn, this, std::placeholders::_1),
-            businessEventList);
-    }
-
-    /*!
-        \param handler Functor with params: (ErrorCode)
-    */
-    template<class TargetType, class HandlerType>
-    int save(const nx::vms::event::RulePtr& rule, TargetType* target, HandlerType handler)
-    {
-        return save(
-            rule,
-            std::static_pointer_cast<impl::SaveBusinessRuleHandler>(
-                std::make_shared<impl::CustomSaveBusinessRuleHandler<TargetType, HandlerType>>(
-                    target,
-                    handler)));
-    }
-
-    /*!
-        \param handler Functor with params: (ErrorCode)
-    */
-    template<class TargetType, class HandlerType>
-    int deleteRule(QnUuid ruleId, TargetType* target, HandlerType handler)
-    {
-        return deleteRule(
-            ruleId,
-            std::static_pointer_cast<impl::SimpleHandler>(
-                std::make_shared<impl::CustomSimpleHandler<TargetType, HandlerType>>(
-                    target,
-                    handler)));
-    }
-
-    /*!
-        \param handler Functor with params: (ErrorCode)
-    */
-    template<class TargetType, class HandlerType>
-    int broadcastBusinessAction(
-        const nx::vms::event::AbstractActionPtr& businessAction,
-        TargetType* target,
-        HandlerType handler)
-    {
-        return broadcastBusinessAction(
-            businessAction,
-            std::static_pointer_cast<impl::SimpleHandler>(
-                std::make_shared<impl::CustomSimpleHandler<TargetType, HandlerType>>(
-                    target,
-                    handler)));
-    }
-
-    template<class TargetType, class HandlerType>
-    int sendBusinessAction(
-        const nx::vms::event::AbstractActionPtr& businessAction,
-        const QnUuid& dstPeer,
-        TargetType* target,
-        HandlerType handler)
-    {
-        return sendBusinessAction(
-            businessAction,
-            dstPeer,
-            std::static_pointer_cast<impl::SimpleHandler>(
-                std::make_shared<impl::CustomSimpleHandler<TargetType, HandlerType>>(
-                    target,
-                    handler)));
-    }
-
-    /*!
-        \param handler Functor with params: (ErrorCode)
-    */
-    template<class TargetType, class HandlerType>
-    int resetBusinessRules(TargetType* target, HandlerType handler)
-    {
-        return resetBusinessRules(
-            std::static_pointer_cast<impl::SimpleHandler>(
-                std::make_shared<impl::CustomSimpleHandler<TargetType, HandlerType>>(
-                    target,
-                    handler)));
-    }
-
-private:
-    virtual int getBusinessRules(impl::GetBusinessRulesHandlerPtr handler) = 0;
-    virtual int save(
-        const nx::vms::event::RulePtr& rule,
-        impl::SaveBusinessRuleHandlerPtr handler) = 0;
-    virtual int deleteRule(QnUuid ruleId, impl::SimpleHandlerPtr handler) = 0;
-    virtual int broadcastBusinessAction(
-        const nx::vms::event::AbstractActionPtr& businessAction,
-        impl::SimpleHandlerPtr handler) = 0;
-    virtual int sendBusinessAction(
-        const nx::vms::event::AbstractActionPtr& businessAction,
-        const QnUuid& id,
-        impl::SimpleHandlerPtr handler) = 0;
-    virtual int resetBusinessRules(impl::SimpleHandlerPtr handler) = 0;
-};
 
 class AbstractStoredFileNotificationManager: public QObject
 {
@@ -1155,7 +1020,7 @@ public:
         const Qn::UserAccessData& userAccessData) = 0;
     virtual AbstractLicenseManagerPtr getLicenseManager(
         const Qn::UserAccessData& userAccessData) = 0;
-    virtual AbstractBusinessEventManagerPtr getBusinessEventManager(
+    virtual AbstractEventRulesManagerPtr getEventRulesManager(
         const Qn::UserAccessData& userAccessData) = 0;
     virtual AbstractUserManagerPtr getUserManager(const Qn::UserAccessData& userAccessData) = 0;
     virtual AbstractLayoutManagerPtr getLayoutManager(

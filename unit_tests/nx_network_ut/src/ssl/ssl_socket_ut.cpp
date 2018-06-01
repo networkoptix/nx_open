@@ -17,16 +17,30 @@ namespace test {
 
 namespace {
 
-class SslOverTcpServerSocket:
+class EnforcedSslOverTcpServerSocket:
     public ssl::StreamServerSocket
 {
     using base_type = ssl::StreamServerSocket;
 
 public:
-    SslOverTcpServerSocket(int ipVersion = AF_INET):
+    EnforcedSslOverTcpServerSocket(int ipVersion = AF_INET):
         base_type(
             std::make_unique<TCPServerSocket>(ipVersion),
             ssl::EncryptionUse::always)
+    {
+    }
+};
+
+class AutoDetectedSslOverTcpServerSocket:
+    public ssl::StreamServerSocket
+{
+    using base_type = ssl::StreamServerSocket;
+
+public:
+    AutoDetectedSslOverTcpServerSocket(int ipVersion = AF_INET):
+        base_type(
+            std::make_unique<TCPServerSocket>(ipVersion),
+            ssl::EncryptionUse::autoDetectByReceivedData)
     {
     }
 };
@@ -43,18 +57,40 @@ public:
     }
 };
 
-struct SslSocketTypeSet
+struct SslSocketBothEndsEncryptedTypeSet
 {
     using ClientSocket = SslOverTcpStreamSocket;
-    using ServerSocket = SslOverTcpServerSocket;
+    using ServerSocket = EnforcedSslOverTcpServerSocket;
+};
+
+struct SslSocketBothEndsEncryptedAutoDetectingServerTypeSet
+{
+    using ClientSocket = SslOverTcpStreamSocket;
+    using ServerSocket = AutoDetectedSslOverTcpServerSocket;
+};
+
+struct SslSocketClientNotEncryptedTypeSet
+{
+    using ClientSocket = TCPSocket;
+    using ServerSocket = AutoDetectedSslOverTcpServerSocket;
 };
 
 } // namespace
 
 INSTANTIATE_TYPED_TEST_CASE_P(
-    SslStreamSocket,
+    SslSocketBothEndsEncrypted,
     StreamSocketAcceptance,
-    SslSocketTypeSet);
+    SslSocketBothEndsEncryptedTypeSet);
+
+INSTANTIATE_TYPED_TEST_CASE_P(
+    SslSocketBothEndsEncryptedAutoDetectingServer,
+    StreamSocketAcceptance,
+    SslSocketBothEndsEncryptedAutoDetectingServerTypeSet);
+
+INSTANTIATE_TYPED_TEST_CASE_P(
+    SslSocketClientNotEncrypted,
+    StreamSocketAcceptance,
+    SslSocketClientNotEncryptedTypeSet);
 
 } // namespace test
 
@@ -401,6 +437,117 @@ TEST_F(SslSocketVerifySslIsActuallyUsed, ssl_used_by_sync_io)
 }
 
 //-------------------------------------------------------------------------------------------------
+
+class SslSocketSpecific:
+    public network::test::StreamSocketAcceptance<
+        network::test::SslSocketBothEndsEncryptedAutoDetectingServerTypeSet>
+{
+    using base_type = network::test::StreamSocketAcceptance<
+        network::test::SslSocketBothEndsEncryptedAutoDetectingServerTypeSet>;
+
+protected:
+    void givenSocketTimedOutOnSendAsync()
+    {
+        givenAcceptingServerSocket();
+        givenConnectedSocket();
+        setClientSocketSendTimeout(std::chrono::milliseconds(1));
+
+        whenClientSendsRandomDataAsyncNonStop();
+
+        thenClientSendTimesOutEventually();
+    }
+
+    void givenSocketTimedOutOnSend()
+    {
+        givenAcceptingServerSocket();
+        givenConnectedSocket();
+        setClientSocketSendTimeout(std::chrono::milliseconds(1));
+
+        const auto randomData = nx::utils::generateRandomName(64*1024);
+        for (;;)
+        {
+            int bytesSent =
+                connection()->send(randomData.constData(), randomData.size());
+            if (bytesSent >= 0)
+                continue;
+
+            ASSERT_EQ(SystemError::timedOut, SystemError::getLastOSErrorCode());
+            break;
+        }
+    }
+
+    void givenNotEncryptedConnection()
+    {
+        m_notEncryptedConnection = std::make_unique<TCPSocket>(AF_INET);
+        ASSERT_TRUE(m_notEncryptedConnection->connect(serverEndpoint(), kNoTimeout));
+
+        nx::Buffer testData("Hello, world");
+        ASSERT_EQ(
+            testData.size(),
+            m_notEncryptedConnection->send(testData.constData(), testData.size()));
+    }
+
+    void assertClientConnectionReportsEncryptionEnabled()
+    {
+        ASSERT_TRUE(connection()->isEncryptionEnabled());
+    }
+
+    void assertServerConnectionReportsEncryptionEnabled()
+    {
+        thenConnectionHasBeenAccepted();
+
+        ASSERT_TRUE(
+            static_cast<AbstractEncryptedStreamSocket*>(lastAcceptedSocket())
+                ->isEncryptionEnabled());
+    }
+
+    void assertServerConnectionReportsEncryptionDisabled()
+    {
+        thenConnectionHasBeenAccepted();
+
+        ASSERT_FALSE(
+            static_cast<AbstractEncryptedStreamSocket*>(lastAcceptedSocket())
+                ->isEncryptionEnabled());
+    }
+
+private:
+    std::unique_ptr<TCPSocket> m_notEncryptedConnection;
+};
+
+TEST_F(SslSocketSpecific, socket_becomes_unusable_after_async_send_timeout)
+{
+    givenSocketTimedOutOnSendAsync();
+    whenClientSendsPingAsync();
+    thenSendFailedUnrecoverableError();
+}
+
+TEST_F(SslSocketSpecific, socket_becomes_unusable_after_sync_send_timeout)
+{
+    givenSocketTimedOutOnSend();
+    whenClientSendsPing();
+    thenSendFailedUnrecoverableError();
+}
+
+TEST_F(SslSocketSpecific, enabled_encryption_is_reported)
+{
+    givenAcceptingServerSocket();
+    givenConnectedSocket();
+
+    assertClientConnectionReportsEncryptionEnabled();
+    assertServerConnectionReportsEncryptionEnabled();
+}
+
+TEST_F(SslSocketSpecific, disabled_encryption_is_reported)
+{
+    givenAcceptingServerSocket();
+    givenNotEncryptedConnection();
+
+    assertServerConnectionReportsEncryptionDisabled();
+}
+
+// TEST_F(SslSocketSpecific, timeout_during_handshake_is_handled_properly)
+
+//-------------------------------------------------------------------------------------------------
 // Mixing sync & async mode.
 
 class SslSocketSwitchIoMode:
@@ -450,6 +597,7 @@ TEST_F(SslSocketSwitchIoMode, from_sync_to_async)
 //-------------------------------------------------------------------------------------------------
 // Common socket tests. These are not enough since they do not even check ssl is actually used.
 
+#if 0
 NX_NETWORK_BOTH_SOCKET_TEST_CASE(
     TEST, SslSocketNotEncryptedConnectionAutoDetected,
     []()
@@ -459,6 +607,7 @@ NX_NETWORK_BOTH_SOCKET_TEST_CASE(
             EncryptionUse::autoDetectByReceivedData);
     },
     []() { return std::make_unique<TCPSocket>(AF_INET); });
+#endif
 
 NX_NETWORK_BOTH_SOCKET_TEST_CASE(
     TEST, SslSocketEncryptedConnection,

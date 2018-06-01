@@ -16,20 +16,20 @@ then
     if [ -e "cloud_portal" ]
     then
         pushd cloud_portal
-            for entry in $(ls -A .)
+            for entry in $(ls -A $VMS_REPOSITORY/cloud_portal/)
             do
                 if [ "$entry" = "front_end" ]
                 then
                     pushd $entry
-                    for element in $(ls -A .)
+                    for element in $(ls -A $VMS_REPOSITORY/cloud_portal/$entry/)
                     do
-                        [ "$element" = "node_modules" ] && continue
+                        echo "copy $entry/$element"
                         [ -e "$element" ] && rm -rf "$element"
                         cp -pr "$VMS_REPOSITORY/cloud_portal/$entry/$element" "$element"
                     done
                     popd
                 else
-                    [[ "$entry" = "env" ]] && continue
+                    echo "copy $entry"
                     [ -e "$entry" ] && rm -rf "$entry"
                     cp -pr "$VMS_REPOSITORY/cloud_portal/$entry" "$entry"
                 fi
@@ -64,7 +64,6 @@ pip install -r build_scripts/requirements.txt
 pushd front_end
     echo "npm install cloud portal"
     npm install
-    npm rebuild node-sass
 popd
 pushd ../webadmin
     echo "npm install webadmin"

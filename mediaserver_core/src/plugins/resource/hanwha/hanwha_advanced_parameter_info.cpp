@@ -23,6 +23,7 @@ static const QString kGropupIncludeAux = lit("groupInclude");
 static const QString kStreamsToReopenAux = lit("streamsToReopen");
 static const QString kShouldAffectAllChannels = lit("shouldAffectAllChannels");
 static const QString kDeviceTypesAux = lit("deviceTypes");
+static const QString kAssociatedParametersAux = lit("associatedWith");
 
 static const QString kPrimaryProfile = lit("primary");
 static const QString kSecondaryProfile = lit("secondary");
@@ -199,11 +200,15 @@ bool HanwhaAdavancedParameterInfo::isDeviceTypeSupported(HanwhaDeviceType device
     return m_deviceTypes.find(deviceType) != m_deviceTypes.cend();
 }
 
+QSet<QString> HanwhaAdavancedParameterInfo::associatedParameters() const
+{
+    return m_associatedParameters;
+}
+
 bool HanwhaAdavancedParameterInfo::isValid() const
 {
     return (!m_cgi.isEmpty()
-        && !m_submenu.isEmpty()
-        && !m_parameterName.isEmpty())
+        && !m_submenu.isEmpty())
         || m_isService;
 }
 
@@ -267,11 +272,18 @@ void HanwhaAdavancedParameterInfo::parseAux(const QString& auxString)
             for (const auto& deviceTypeString: split)
             {
                 const auto deviceType = QnLexical::deserialized<HanwhaDeviceType>(
-                    deviceTypeString,
+                    deviceTypeString.trimmed(),
                     HanwhaDeviceType::unknown);
 
                 m_deviceTypes.insert(deviceType);
             }
+        }
+        if (auxName == kAssociatedParametersAux)
+        {
+            m_associatedParameters.clear();
+            const auto split = auxValue.split(L',');
+            for (const auto& parameterId: split)
+                m_associatedParameters.insert(parameterId.trimmed());
         }
     }
 }
@@ -279,7 +291,6 @@ void HanwhaAdavancedParameterInfo::parseAux(const QString& auxString)
 void HanwhaAdavancedParameterInfo::parseId(const QString& idString)
 {
     m_id = idString;
-
     if (m_id.contains(lit("SERVICE%")))
     {
         m_isService = true;
@@ -294,19 +305,22 @@ void HanwhaAdavancedParameterInfo::parseId(const QString& idString)
         idInfoPart = split[0];
 
     split = idInfoPart.split(L'/');
-    if (split.size() != 3)
+    if (split.size() != 2 && split.size() != 3)
         return;
 
     m_cgi = split[0];
     m_submenu = split[1];
 
-    const auto nameAndValue = split[2].split(L'=');
-    if (nameAndValue.isEmpty())
-        return;
+    if (split.size() == 3)
+    {
+        const auto nameAndValue = split[2].split(L'=');
+        if (nameAndValue.isEmpty())
+            return;
 
-    m_parameterName = nameAndValue[0];
-    if (nameAndValue.size() == 2)
-        m_parameterValue = nameAndValue[1];
+        m_parameterName = nameAndValue[0];
+        if (nameAndValue.size() == 2)
+            m_parameterValue = nameAndValue[1];
+    }
 }
 
 } // namespace plugins

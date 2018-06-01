@@ -1,3 +1,5 @@
+#include "system_commands.h"
+#include "system_commands/domain_socket/detail/send_linux.h"
 #include <string>
 #include <sstream>
 #include <iomanip>
@@ -22,8 +24,7 @@
 #include <unistd.h>
 #include <fcntl.h>
 #include <dirent.h>
-#include "system_commands.h"
-#include "system_commands/domain_socket/detail/send_linux.h"
+#include <sys/time.h>
 
 namespace nx {
 
@@ -167,27 +168,6 @@ bool SystemCommands::execute(
     return true;
 }
 
-SystemCommands::CheckOwnerResult SystemCommands::checkCurrentOwner(const std::string& url)
-{
-    struct stat info;
-    if (stat(url.c_str(), &info))
-    {
-        m_lastError = format("stat() failed for %", url);
-        return CheckOwnerResult::failed;
-    }
-
-    struct passwd* pw = getpwuid(info.st_uid);
-    if (!pw)
-    {
-        m_lastError = format("getpwuid failed for %", url);
-        return CheckOwnerResult::failed;
-    }
-
-    if (pw->pw_uid == kRealUid && pw->pw_gid == kRealGid)
-        return CheckOwnerResult::real;
-
-    return CheckOwnerResult::other;
-}
 
 SystemCommands::MountCode SystemCommands::mount(
     const std::string& url, const std::string& directory,
@@ -324,14 +304,6 @@ bool SystemCommands::changeOwner(const std::string& path)
     return execute(command.str());
 }
 
-bool SystemCommands::touchFile(const std::string& filePath)
-{
-    if (!checkOwnerPermissions(filePath) || !execute("touch '" + filePath + "'"))
-        return false;
-
-    return true;
-}
-
 bool SystemCommands::makeDirectory(const std::string& directoryPath)
 {
     if (!checkOwnerPermissions(directoryPath) || !execute("mkdir -p '" + directoryPath + "'"))
@@ -358,15 +330,6 @@ bool SystemCommands::rename(const std::string& oldPath, const std::string& newPa
 
 int SystemCommands::open(const std::string& path, int mode, bool reportViaSocket, int socketPostfix)
 {
-    auto lastSep = path.rfind('/');
-    auto dirPath = path.substr(0, lastSep);
-
-    if ((mode & O_CREAT) && !isPathExists(dirPath, false)
-        && lastSep != std::string::npos && lastSep != 0)
-    {
-        makeDirectory(dirPath);
-    }
-
     int fd = ::open(path.c_str(), mode, 0660);
     if (fd < 0)
         perror("open");

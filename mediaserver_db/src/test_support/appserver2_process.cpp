@@ -215,7 +215,7 @@ int Appserver2Process::exec()
     m_eventLoop.exec();
 
     m_tcpListener = nullptr;
-    tcpListener.pleaseStop();
+    tcpListener.stop();
 
     m_commonModule->moduleDiscoveryManager()->stop();
     ec2Connection->stopReceivingNotifications();

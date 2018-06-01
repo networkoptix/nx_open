@@ -7,8 +7,6 @@
 #define USE_GMOCK
 #include <nx/network/test_support/run_test.h>
 
-#include "relay_test_setup.h"
-
 int main(int argc, char** argv)
 {
     QCoreApplication application(argc, argv);

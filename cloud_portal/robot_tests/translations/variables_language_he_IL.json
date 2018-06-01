@@ -43,6 +43,7 @@
     "ACTIVATE YOUR ACCOUNT EMAIL SUBJECT": "הפעל את חשבונך",
     "RESET PASSWORD EMAIL SUBJECT": "אפס את סיסמתך",
     "INVITED TO SYSTEM EMAIL SUBJECT": "מערכת הווידאו {{message.system_name}} שותפה איתך",
+    "INVITED TO SYSTEM EMAIL SUBJECT UNREGISTERED": "{{message.sharer_name}} invites you to %PRODUCT_NAME%",
     "DISCONNECT FORM HEADER TEXT": "נתק את מערכת מ %PRODUCT_NAME%?",
     "FIRST NAME IS REQUIRED TEXT": "נדרש שם פרטי",
     "LAST NAME IS REQUIRED TEXT": "נדרש שם משפחה",
@@ -57,5 +58,6 @@
     "PASSWORD IS WEAK TEXT": "השתמש במספרים, אותיות גדולות וקטנות ותווים מיוחדים כדי להפוך את הסיסמה שלך חזקה יותר",
     "THIS LINK IS BROKEN TEXT": "This link is broken,<br>\n            System may be disconnected from %PRODUCT_NAME%,<br>\n            Access to this System may be revoked, <br>\n            or you may be logged into a different account",
     "PAGE NOT FOUND": "דף לא נמצא",
-    "TAKE ME HOME": "קח אותי לדף הבית"
+    "TAKE ME HOME": "קח אותי לדף הבית",
+    "OPEN NX WITNESS BUTTON TEXT": "Open %VMS_NAME%"
 }

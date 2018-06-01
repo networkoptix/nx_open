@@ -1,17 +1,16 @@
 #include "camera_info_widget.h"
 #include "ui_camera_info_widget.h"
+#include "../redux/camera_settings_dialog_state.h"
+#include "../redux/camera_settings_dialog_store.h"
 
 #include <core/resource/camera_resource.h>
 #include <core/resource/device_dependent_strings.h>
-
-#include <nx/utils/log/assert.h>
-
 #include <ui/style/custom_style.h>
 #include <ui/style/skin.h>
-#include <nx/client/desktop/common/utils/aligner.h>
 
-#include "../redux/camera_settings_dialog_state.h"
-#include "../redux/camera_settings_dialog_store.h"
+#include <nx/client/desktop/common/utils/aligner.h>
+#include <nx/utils/disconnect_helper.h>
+#include <nx/utils/log/assert.h>
 
 namespace nx {
 namespace client {
@@ -25,15 +24,21 @@ CameraInfoWidget::CameraInfoWidget(QWidget* parent):
 
     ui->multipleNameLabel->setReadOnly(true);
     ui->showOnLayoutButton->setIcon(qnSkin->icon("text_buttons/video.png"));
-    ui->eventLogButton->setIcon(qnSkin->icon("buttons/event_log.png"));
+    ui->eventLogButton->setIcon(qnSkin->icon("text_buttons/text.png"));
     ui->cameraRulesButton->setIcon(qnSkin->icon("text_buttons/event_rules.png"));
 
+    ui->wearableControlsPage->setContentsMargins(
+        style::Metrics::kDefaultTopLevelMargin - layout()->contentsMargins().left(),
+        0,
+        style::Metrics::kDefaultTopLevelMargin,
+        0);
+
     autoResizePagesToContents(ui->stackedWidget,
-        { QSizePolicy::Preferred, QSizePolicy::Fixed },
+        {QSizePolicy::Preferred, QSizePolicy::Fixed},
         true);
 
     autoResizePagesToContents(ui->controlsStackedWidget,
-        { QSizePolicy::Fixed, QSizePolicy::Preferred},
+        {QSizePolicy::MinimumExpanding, QSizePolicy::Preferred},
         true);
 
     alignLabels();
@@ -41,81 +46,75 @@ CameraInfoWidget::CameraInfoWidget(QWidget* parent):
     updatePalette();
 
     connect(ui->toggleInfoButton, &QPushButton::clicked, this,
-        [this]
+        [this]()
         {
             ui->stackedWidget->setCurrentIndex(1 - ui->stackedWidget->currentIndex());
             updatePageSwitcher();
         });
 
     connect(ui->primaryStreamCopyButton, &ClipboardButton::clicked, this,
-        [this] { ClipboardButton::setClipboardText(ui->primaryStreamLabel->text()); });
+        [this]() { ClipboardButton::setClipboardText(ui->primaryStreamLabel->text()); });
+
     connect(ui->secondaryStreamCopyButton, &ClipboardButton::clicked, this,
-        [this] { ClipboardButton::setClipboardText(ui->secondaryStreamLabel->text()); });
+        [this]() { ClipboardButton::setClipboardText(ui->secondaryStreamLabel->text()); });
 
+    connect(ui->pingButton, &QPushButton::clicked, this,
+        [this]() { emit actionRequested(ui::action::PingAction); });
 
+    connect(ui->eventLogButton, &QPushButton::clicked, this,
+        [this]() { emit actionRequested(ui::action::CameraIssuesAction); });
 
+    connect(ui->cameraRulesButton, &QPushButton::clicked, this,
+        [this]() { emit actionRequested(ui::action::CameraBusinessRulesAction); });
 
-    /*
-            connect(ui->pingButton, &QPushButton::clicked, m_model,
-            &CameraSettingsModel::pingCamera);
-        connect(ui->showOnLayoutButton, &QPushButton::clicked, m_model,
-            &CameraSettingsModel::showCamerasOnLayout);
-        connect(ui->eventLogButton, &QPushButton::clicked, m_model,
-            &CameraSettingsModel::openEventLog);
-        connect(ui->cameraRulesButton, &QPushButton::clicked, m_model,
-            &CameraSettingsModel::openCameraRules);
-            void CameraSettingsModel::pingCamera()
+    connect(ui->showOnLayoutButton, &QPushButton::clicked, this,
+        [this]() { emit actionRequested(ui::action::OpenInNewTabAction); });
+
+    connect(ui->wearableControlsPage, &WearableCameraUploadWidget::actionRequested,
+        this, &CameraInfoWidget::actionRequested);
+}
+
+CameraInfoWidget::~CameraInfoWidget()
 {
-    menu()->trigger(ui::action::PingAction, {Qn::TextRole, d->networkInfo.ipAddress});
 }
-
-void CameraSettingsModel::showCamerasOnLayout()
-{
-    menu()->trigger(ui::action::OpenInNewTabAction, d->adaptor.cameras());
-}
-
-void CameraSettingsModel::openEventLog()
-{
-    menu()->trigger(ui::action::CameraIssuesAction, d->adaptor.cameras());
-}
-
-void CameraSettingsModel::openCameraRules()
-{
-    menu()->trigger(ui::action::CameraBusinessRulesAction, d->adaptor.cameras());
-}
-
-    */
-}
-
-CameraInfoWidget::~CameraInfoWidget() = default;
 
 void CameraInfoWidget::setStore(CameraSettingsDialogStore* store)
 {
-    connect(store, &CameraSettingsDialogStore::stateChanged, this, &CameraInfoWidget::loadState);
+    ui->wearableControlsPage->setStore(store);
 
-    connect(ui->nameLabel, &EditableLabel::textChanged, store,
-        [store](const QString& text)
-        {
-            store->setSingleCameraUserName(text);
-        });
+    m_storeConnections.reset(new QnDisconnectHelper());
+    NX_ASSERT(store);
+    if (!store)
+        return;
+
+    *m_storeConnections << connect(store, &CameraSettingsDialogStore::stateChanged,
+        this, &CameraInfoWidget::loadState);
+
+    *m_storeConnections << connect(ui->nameLabel, &EditableLabel::textChanged,
+        store, &CameraSettingsDialogStore::setSingleCameraUserName);
 }
 
 void CameraInfoWidget::loadState(const CameraSettingsDialogState& state)
 {
     const bool singleCamera = state.isSingleCamera();
-    ui->nameLabel->setVisible(singleCamera);
-    ui->controlsStackedWidget->setCurrentWidget(singleCamera
-        ? ui->toggleInfoPage
-        : ui->multipleCamerasNamePage);
+    const bool singleNonWearableCamera = singleCamera
+        && state.devicesDescription.isWearable == CameraSettingsDialogState::CombinedValue::None;
 
-    ui->stackedWidget->setVisible(singleCamera);
-    ui->cameraRulesButton->setVisible(singleCamera);
+    ui->nameLabel->setVisible(singleCamera);
+
+    if (state.isSingleWearableCamera())
+        ui->controlsStackedWidget->setCurrentWidget(ui->wearableControlsPage);
+    else if (singleCamera)
+        ui->controlsStackedWidget->setCurrentWidget(ui->toggleInfoPage);
+    else
+        ui->controlsStackedWidget->setCurrentWidget(ui->multipleCamerasNamePage);
+
+    ui->stackedWidget->setVisible(singleNonWearableCamera);
+    ui->toggleInfoButton->setVisible(singleNonWearableCamera);
+    ui->cameraRulesButton->setVisible(singleNonWearableCamera);
 
     const QString rulesTitle = QnCameraDeviceStringSet(
-        tr("Device Rules..."),
-        tr("Camera Rules..."),
-        tr("I/O Module Rules...")
-    ).getString(state.deviceType);
+        tr("Device Rules"),tr("Camera Rules"),tr("I/O Module Rules")).getString(state.deviceType);
 
     ui->cameraRulesButton->setText(rulesTitle);
 
@@ -140,21 +139,23 @@ void CameraInfoWidget::loadState(const CameraSettingsDialogState& state)
     const QString noPrimaryStreamText = QnCameraDeviceStringSet(
         tr("Device has no primary stream"),
         tr("Camera has no primary stream"),
-        tr("I/O module has no audio stream")
-    ).getString(state.deviceType);
+        tr("I/O module has no audio stream")).getString(state.deviceType);
+
     ui->primaryStreamLabel->setText(single.primaryStream
         ? *single.primaryStream
         : noPrimaryStreamText);
+
     ui->primaryStreamCopyButton->setVisible(static_cast<bool>(single.primaryStream));
 
     const QString noSecondaryStreamText = QnCameraDeviceStringSet(
         tr("Device has no secondary stream"),
         tr("Camera has no secondary stream"),
-        tr("I/O module has no secondary stream")
-    ).getString(state.deviceType);
+        tr("I/O module has no secondary stream")).getString(state.deviceType);
+
     ui->secondaryStreamLabel->setText(single.secondaryStream
         ? *single.secondaryStream
         : noSecondaryStreamText);
+
     ui->secondaryStreamCopyButton->setVisible(static_cast<bool>(single.secondaryStream));
 }
 
@@ -170,13 +171,12 @@ void CameraInfoWidget::alignLabels()
         ui->macAddressTitleLabel,
         ui->cameraIdTitleLabel,
         ui->primaryStreamTitleLabel,
-        ui->secondaryStreamTitleLabel
-    });
+        ui->secondaryStreamTitleLabel});
 }
 
 void CameraInfoWidget::updatePalette()
 {
-    for (auto control: {
+    const std::initializer_list<QWidget*> lightBackgroundControls{
         ui->modelLabel,
         ui->modelDetailLabel,
         ui->vendorLabel,
@@ -188,11 +188,10 @@ void CameraInfoWidget::updatePalette()
         ui->ipAddressDetailLabel,
         ui->webPageLabel,
         ui->primaryStreamLabel,
-        ui->secondaryStreamLabel
-    })
-    {
+        ui->secondaryStreamLabel};
+
+    for (auto control: lightBackgroundControls)
         control->setForegroundRole(QPalette::Light);
-    }
 }
 
 void CameraInfoWidget::updatePageSwitcher()

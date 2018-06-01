@@ -29,6 +29,7 @@
 #include <nx/utils/log/log.h>
 
 namespace {
+
     const QString buildInformationSuffix = lit("update.json");
     const QString updateInformationFileName = (lit("update.json"));
 
@@ -91,6 +92,20 @@ namespace {
 
         return *std::max_element(versions.begin(), versions.end());
     }
+
+    QnUpdateFileInformationPtr createFileInformation(
+        const QString& fileName, const QnSoftwareVersion& version)
+    {
+        QFile file(fileName);
+
+        QnUpdateFileInformationPtr updateFileInformation(
+            new QnUpdateFileInformation(version, fileName));
+        updateFileInformation->fileSize = file.size();
+        updateFileInformation->md5 = makeMd5(&file);
+
+        return updateFileInformation;
+    }
+
 } // namespace
 
 QnCheckForUpdatesPeerTask::QnCheckForUpdatesPeerTask(const QnUpdateTarget &target, QObject *parent) :
@@ -497,13 +512,11 @@ void QnCheckForUpdatesPeerTask::at_zipExtractor_finished(int error)
         if (!verifyUpdatePackage(fileName, &version, &sysInfo, &cloudHost, &isClient))
             continue;
 
-        if (m_updateFiles.contains(sysInfo))
-            continue;
-
         if (m_target.version.isNull())
+        {
             m_target.version = version;
-
-        if (m_target.version != version)
+        }
+        else if (m_target.version != version)
         {
             finishTask(QnCheckForUpdateResult::BadUpdateFile);
             return;
@@ -513,34 +526,21 @@ void QnCheckForUpdatesPeerTask::at_zipExtractor_finished(int error)
 
         if (isClient)
         {
-            if (m_target.denyClientUpdates)
-                continue;
-
-            if (sysInfo != QnSystemInformation::currentSystemInformation())
-                continue;
-        }
-
-        QFile file(fileName);
-
-        QnUpdateFileInformationPtr updateFileInformation(
-            new QnUpdateFileInformation(version, fileName));
-        updateFileInformation->fileSize = file.size();
-        updateFileInformation->md5 = makeMd5(&file);
-
-        if (isClient)
-        {
-            if (!m_target.denyClientUpdates)
+            if (m_target.denyClientUpdates || m_clientUpdateFile
+                || sysInfo != QnSystemInformation::currentSystemInformation())
             {
-                m_clientUpdateFile = updateFileInformation;
-                const auto minimalVersion =
-                    minimalVersionForUpdatePackage(updateFileInformation->fileName);
-                m_clientRequiresInstaller =
-                    !minimalVersion.isNull() && minimalVersion > maximumAvailableVersion();
+                continue;
             }
+
+            m_clientUpdateFile = createFileInformation(fileName, version);
+            const auto minimalVersion =
+                minimalVersionForUpdatePackage(m_clientUpdateFile->fileName);
+            m_clientRequiresInstaller =
+                !minimalVersion.isNull() && minimalVersion > maximumAvailableVersion();
         }
-        else
+        else if (!m_updateFiles.contains(sysInfo))
         {
-            m_updateFiles.insert(sysInfo, updateFileInformation);
+            m_updateFiles.insert(sysInfo, createFileInformation(fileName, version));
         }
     }
 

@@ -55,6 +55,5 @@ private:
     qint64 m_currentTime;
     QnDayTimeItemDelegate *m_delegate;
     QnDayTimeTableWidget *m_tableWidget;
-    QString m_timeFormat;
     qint64 m_localOffset;
 };

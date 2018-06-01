@@ -7,7 +7,7 @@
 #include <managers/media_server_notification_manager.h>
 #include <managers/camera_notification_manager.h>
 #include <managers/user_notification_manager.h>
-#include <managers/business_event_notification_manager.h>
+#include <managers/event_rules_notification_manager.h>
 #include <managers/layout_notification_manager.h>
 #include <managers/layout_tour_notification_manager.h>
 #include <managers/videowall_notification_manager.h>

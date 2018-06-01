@@ -2450,7 +2450,7 @@ void QnWorkbenchVideoWallHandler::at_display_widgetAdded(QnResourceWidget* widge
 
 void QnWorkbenchVideoWallHandler::at_display_widgetAboutToBeRemoved(QnResourceWidget* widget)
 {
-    disconnect(widget, NULL, this, NULL);
+    widget->disconnect(this);
 }
 
 void QnWorkbenchVideoWallHandler::at_widget_motionSelectionChanged()
@@ -2485,7 +2485,7 @@ void QnWorkbenchVideoWallHandler::at_widget_dewarpingParamsChanged()
 
 void QnWorkbenchVideoWallHandler::at_workbench_currentLayoutAboutToBeChanged()
 {
-    disconnect(workbench()->currentLayout(), NULL, this, NULL);
+    workbench()->currentLayout()->disconnect(this);
     setControlMode(false);
 }
 

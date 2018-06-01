@@ -18,8 +18,7 @@ class QnTimeline: public QQuickItem
     Q_PROPERTY(qint64 windowStart READ windowStart WRITE setWindowStart NOTIFY windowStartChanged)
     Q_PROPERTY(qint64 windowEnd READ windowEnd WRITE setWindowEnd NOTIFY windowEndChanged)
     Q_PROPERTY(qint64 position READ position WRITE setPosition NOTIFY positionChanged)
-    Q_PROPERTY(QDateTime positionDate
-        READ positionDate WRITE setPositionDate NOTIFY positionDateChanged)
+    Q_PROPERTY(QDateTime positionDate READ positionDate NOTIFY positionDateChanged)
     Q_PROPERTY(qint64 startBound READ startBound WRITE setStartBound NOTIFY startBoundChanged)
     Q_PROPERTY(bool stickToEnd READ stickToEnd WRITE setStickToEnd NOTIFY stickToEndChanged)
     Q_PROPERTY(bool autoPlay READ autoPlay WRITE setAutoPlay NOTIFY autoPlayChanged)
@@ -28,12 +27,24 @@ class QnTimeline: public QQuickItem
         NOTIFY autoReturnToBoundsEnabledChanged)
     Q_PROPERTY(int timeZoneShift
         READ timeZoneShift WRITE setTimeZoneShift NOTIFY timeZoneShiftChanged)
+    Q_PROPERTY(int serverTimeZoneShift
+        READ serverTimeZoneShift WRITE setServerTimeZoneShift NOTIFY serverTimeZoneShiftChanged)
 
     Q_PROPERTY(QColor textColor READ textColor WRITE setTextColor NOTIFY textColorChanged)
     Q_PROPERTY(QColor chunkBarColor
         READ chunkBarColor WRITE setChunkBarColor NOTIFY chunkBarColorChanged)
     Q_PROPERTY(QColor chunkColor READ chunkColor WRITE setChunkColor NOTIFY chunkColorChanged)
     Q_PROPERTY(QFont font READ font WRITE setFont NOTIFY fontChanged)
+
+    Q_PROPERTY(QColor activeLiveColorLight READ activeLiveColorLight
+        WRITE setActiveLiveColorLight NOTIFY activeLiveColorLightChanged)
+    Q_PROPERTY(QColor activeLiveColorDark READ activeLiveColorDark
+        WRITE setActiveLiveColorDark NOTIFY activeLiveColorDarkChanged)
+
+    Q_PROPERTY(QColor inactiveLiveColorLight READ inactiveLiveColorLight
+        WRITE setInactiveLiveColorLight NOTIFY inactiveLiveColorLightChanged)
+    Q_PROPERTY(QColor inactiveLiveColorDark READ inactiveLiveColorDark
+        WRITE setInactiveLiveColorDark NOTIFY inactiveLiveColorDarkChanged)
 
     Q_PROPERTY(int chunkBarHeight
         READ chunkBarHeight WRITE setChunkBarHeight NOTIFY chunkBarHeightChanged)
@@ -61,6 +72,18 @@ public:
     QColor chunkBarColor() const;
     void setChunkBarColor(const QColor& color);
 
+    QColor activeLiveColorLight() const;
+    void setActiveLiveColorLight(const QColor& color);
+
+    QColor activeLiveColorDark() const;
+    void setActiveLiveColorDark(const QColor& color);
+
+    QColor inactiveLiveColorLight() const;
+    void setInactiveLiveColorLight(const QColor& color);
+
+    QColor inactiveLiveColorDark() const;
+    void setInactiveLiveColorDark(const QColor& color);
+
     int chunkBarHeight() const;
     void setChunkBarHeight(int chunkBarHeight);
 
@@ -87,7 +110,6 @@ public:
     Q_INVOKABLE void setPositionImmediately(qint64 position);
 
     QDateTime positionDate() const;
-    void setPositionDate(const QDateTime &dateTime);
 
     QnTimePeriodList timePeriods(Qn::TimePeriodContent type) const;
     void setTimePeriods(Qn::TimePeriodContent type, const QnTimePeriodList& timePeriods);
@@ -106,6 +128,9 @@ public:
 
     int timeZoneShift() const;
     void setTimeZoneShift(int timeZoneShift);
+
+    int serverTimeZoneShift() const;
+    void setServerTimeZoneShift(int timeZoneShift);
 
     Q_INVOKABLE void zoomIn();
     Q_INVOKABLE void zoomOut();
@@ -140,11 +165,17 @@ signals:
     void autoReturnToBoundsEnabledChanged();
 
     void timeZoneShiftChanged();
+    void serverTimeZoneShiftChanged();
 
     void textColorChanged();
     void chunkColorChanged();
     void chunkBarColorChanged();
     void fontChanged();
+
+    void activeLiveColorDarkChanged();
+    void activeLiveColorLightChanged();
+    void inactiveLiveColorDarkChanged();
+    void inactiveLiveColorLightChanged();
 
     void chunkBarHeightChanged();
     void textYChanged();

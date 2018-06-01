@@ -35,11 +35,6 @@ void BasicServiceSettings::printCmdLineArgsHelp()
     // TODO
 }
 
-QString BasicServiceSettings::logBaseName() const
-{
-    return QString();
-}
-
 const QnSettings& BasicServiceSettings::settings() const
 {
     return m_settings;

@@ -7,7 +7,7 @@ namespace network {
 namespace test {
 
 StreamSocketStub::StreamSocketStub():
-    base_type(&m_delegatee)
+    base_type(&m_delegate)
 {
     setNonBlockingMode(true);
 

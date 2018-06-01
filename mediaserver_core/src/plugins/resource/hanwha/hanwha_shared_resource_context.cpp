@@ -8,6 +8,7 @@
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/abstract_remote_archive_manager.h>
 #include <nx/utils/log/log.h>
+#include <nx/fusion/serialization/lexical.h>
 
 namespace nx {
 namespace mediaserver_core {
@@ -42,8 +43,9 @@ HanwhaSharedResourceContext::HanwhaSharedResourceContext(
     videoSources([this]() { return loadVideoSources(); }, kCacheDataTimeout),
     videoProfiles([this]() { return loadVideoProfiles(); }, kCacheDataTimeout),
     videoCodecInfo([this]() { return loadVideoCodecInfo(); }, kCacheDataTimeout),
+    isBypassSupported([this]() { return checkBypassSupport(); }, kCacheDataTimeout),
     m_sharedId(sharedId),
-    m_requestSemaphore(kMaxConcurrentRequestNumber)
+    m_requestLock(kMaxConcurrentRequestNumber)
 {
 }
 
@@ -92,9 +94,9 @@ QAuthenticator HanwhaSharedResourceContext::authenticator() const
     return m_resourceAuthenticator;
 }
 
-QnSemaphore* HanwhaSharedResourceContext::requestSemaphore()
+nx::utils::RwLock* HanwhaSharedResourceContext::requestLock()
 {
-    return &m_requestSemaphore;
+    return &m_requestLock;
 }
 
 void HanwhaSharedResourceContext::startServices(bool hasVideoArchive, bool isNvr)
@@ -166,7 +168,6 @@ SessionContextPtr HanwhaSharedResourceContext::session(
         return strongSessionCtx;
 
     HanwhaRequestHelper helper(shared_from_this());
-    helper.setIgnoreMutexAnalyzer(true);
     const auto response = helper.view(lit("media/sessionkey"));
     if (!response.isSuccessful())
         return SessionContextPtr();
@@ -231,10 +232,7 @@ qint64 HanwhaSharedResourceContext::timelineEndUs(int channelNumber) const
 HanwhaResult<HanwhaInformation> HanwhaSharedResourceContext::loadInformation()
 {
     HanwhaInformation info;
-
     HanwhaRequestHelper helper(shared_from_this());
-    helper.setIgnoreMutexAnalyzer(true);
-
     info.attributes = helper.fetchAttributes(lit("attributes"));
     if (!info.attributes.isValid())
     {
@@ -304,7 +302,11 @@ HanwhaResult<HanwhaInformation> HanwhaSharedResourceContext::loadInformation()
         info.model = *value;
 
     if (const auto value = deviceinfo.parameter<QString>(lit("DeviceType")))
-        info.deviceType = value->trimmed();
+    {
+        info.deviceType = QnLexical::deserialized<HanwhaDeviceType>(
+            value->trimmed(),
+            HanwhaDeviceType::unknown);
+    }
 
     if (const auto value = deviceinfo.parameter<QString>(lit("FirmwareVersion")))
         info.firmware = value->trimmed();
@@ -318,8 +320,6 @@ HanwhaResult<HanwhaInformation> HanwhaSharedResourceContext::loadInformation()
 HanwhaResult<HanwhaResponse> HanwhaSharedResourceContext::loadEventStatuses()
 {
     HanwhaRequestHelper helper(shared_from_this());
-    helper.setIgnoreMutexAnalyzer(true);
-
     auto eventStatuses = helper.check(lit("eventstatus/eventstatus"));
     if (!eventStatuses.isSuccessful())
     {
@@ -335,8 +335,6 @@ HanwhaResult<HanwhaResponse> HanwhaSharedResourceContext::loadEventStatuses()
 HanwhaResult<HanwhaResponse> HanwhaSharedResourceContext::loadVideoSources()
 {
     HanwhaRequestHelper helper(shared_from_this());
-    helper.setIgnoreMutexAnalyzer(true);
-
     auto videoSources = helper.view(lit("media/videosource"));
     if (!videoSources.isSuccessful())
     {
@@ -353,8 +351,6 @@ HanwhaResult<HanwhaResponse> HanwhaSharedResourceContext::loadVideoSources()
 HanwhaResult<HanwhaResponse> HanwhaSharedResourceContext::loadVideoProfiles()
 {
     HanwhaRequestHelper helper(shared_from_this());
-    helper.setIgnoreMutexAnalyzer(true);
-
     auto videoProfiles = helper.view(lit("media/videoprofile"));
     if (!videoProfiles.isSuccessful()
         && videoProfiles.errorCode() != kHanwhaConfigurationNotFoundError)
@@ -393,11 +389,10 @@ void HanwhaSharedResourceContext::setChunkLoaderSettings(const HanwhaChunkLoader
 HanwhaResult<HanwhaCodecInfo> HanwhaSharedResourceContext::loadVideoCodecInfo()
 {
     HanwhaRequestHelper helper(shared_from_this());
-    helper.setIgnoreMutexAnalyzer(true);
+    helper.setGroupBy(kHanwhaChannelProperty);
     auto response = helper.view(
         lit("media/videocodecinfo"),
-        HanwhaRequestHelper::Parameters(),
-        kHanwhaChannelProperty);
+        HanwhaRequestHelper::Parameters());
 
     if (!response.isSuccessful())
     {
@@ -419,12 +414,26 @@ HanwhaResult<HanwhaCodecInfo> HanwhaSharedResourceContext::loadVideoCodecInfo()
 
     HanwhaCodecInfo codecInfo(response, parameters);
     if (!codecInfo.isValid())
-    {
-        return {CameraDiagnostics::CameraInvalidParams(
-            lit("Video codec info is invalid"))};
-    }
+        return {CameraDiagnostics::CameraInvalidParams(lit("Video codec info is invalid"))};
 
     return {CameraDiagnostics::NoErrorResult(), codecInfo};
+}
+
+HanwhaResult<bool> HanwhaSharedResourceContext::checkBypassSupport()
+{
+    const auto& info = information();
+    if (!info)
+        return {info.diagnostics, false};
+
+    const auto& parameters = info->cgiParameters;
+    if (!parameters.isValid())
+    {
+        return {CameraDiagnostics::CameraInvalidParams(
+            lit("Camera CGI parameters are not valid."))};
+    }
+
+    const auto bypassParameter = parameters.parameter(lit("bypass/bypass/control/BypassURI"));
+    return {CameraDiagnostics::NoErrorResult(), bypassParameter != boost::none};
 }
 
 } // namespace plugins

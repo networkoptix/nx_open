@@ -27,9 +27,6 @@ const QLatin1String kGeneralChangeUser("general/changeUser");
 
 const QLatin1String kGeneralMediatorEndpoint("general/mediatorEndpoint");
 
-// log
-const QLatin1String kLogBaseName("log/baseName");
-
 //auth
 const QLatin1String kAuthXmlPath("auth/rulesXmlPath");
 const QLatin1String kDefaultAuthXmlPath(":/authorization_rules.xml");
@@ -138,13 +135,6 @@ nx::utils::log::Settings Settings::logging() const
     return m_logging;
 }
 
-QString Settings::logBaseName() const
-{
-    return m_logBaseName.isEmpty()
-        ? "vms_gateway"
-        : m_logBaseName;
-}
-
 const General& Settings::general() const
 {
     return m_general;
@@ -183,6 +173,7 @@ const relaying::Settings& Settings::listeningPeer() const
 void Settings::loadSettings()
 {
     using namespace std::chrono;
+    using namespace nx::network::http::server;
 
     //general
     const QStringList& httpAddrToListenStrList = settings().value(
@@ -218,7 +209,6 @@ void Settings::loadSettings()
 
     //log
     m_logging.load(settings());
-    m_logBaseName = settings().value(kLogBaseName).toString();
 
     //auth
     m_auth.rulesXmlPath = settings().value(kAuthXmlPath, kDefaultAuthXmlPath).toString();
@@ -296,11 +286,11 @@ void Settings::loadSettings()
 
     auto preferedSslMode = settings().value(kPreferedSslMode, kDefaultPreferedSslMode).toString();
     if (preferedSslMode == "enabled" || preferedSslMode == "true")
-        m_cloudConnect.preferedSslMode = SslMode::enabled;
+        m_cloudConnect.preferedSslMode = proxy::SslMode::enabled;
     else if (preferedSslMode == "disabled" || preferedSslMode == "false")
-        m_cloudConnect.preferedSslMode = SslMode::disabled;
+        m_cloudConnect.preferedSslMode = proxy::SslMode::disabled;
     else
-        m_cloudConnect.preferedSslMode = SslMode::followIncomingConnection;
+        m_cloudConnect.preferedSslMode = proxy::SslMode::followIncomingConnection;
 
     m_listeningPeer.load(settings());
 }

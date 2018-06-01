@@ -65,7 +65,7 @@ public:
     //---------------------------------------------------------------------------------------------
     // Implementation of AbstractStreamServerSocket::*
     virtual bool listen(int queueLen) override;
-    virtual AbstractStreamSocket* accept() override;
+    virtual std::unique_ptr<AbstractStreamSocket> accept() override;
     virtual void acceptAsync(AcceptCompletionHandler handler) override;
 
     /**

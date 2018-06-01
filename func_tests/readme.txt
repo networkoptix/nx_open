@@ -13,4 +13,4 @@ To run these functional tests following requirements must be met:
   $ pip install -r requirements.txt
 
 See also devtools/ci/linux-x64/setup-build-box-linux.sh
-This script can be used to prepare vagrant VM for running functional tests on it.
+This script can be used to prepare vagrant Machine for running functional tests on it.

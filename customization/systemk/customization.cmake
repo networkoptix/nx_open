@@ -1,6 +1,7 @@
 # Components Namings
 set(display.product.name "SK VMS")
-set(display.mobile.name "SK VMS")
+set(display_mobile_name "SK VMS")
+set(mobile_bundle_name "SK")
 set(product.name "SK VMS")
 set(product.name.short "systemk")
 set(company.name "SystemK Corporation")
@@ -71,7 +72,7 @@ set(freeLicenseCount "4")
 set(freeLicenseKey "0000-0000-0000-0026")
 
 # Installer Customizations
-set(installer.language "ja_JP")
+set(installerLanguage "ja_JP")
 set(installer.cultures "ja-jp")
 set(sign.password "qweasd123")
 set(sign.cer "app.p12")

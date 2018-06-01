@@ -22,6 +22,8 @@ QnAbstractStreamDataProvider* CameraResourceStub::createLiveDataProvider()
 
 Qn::LicenseType CameraResourceStub::calculateLicenseType() const
 {
+    if (m_licenseType == Qn::LC_Count)
+        return base_type::calculateLicenseType();
     return m_licenseType;
 }
 
@@ -46,16 +48,14 @@ void CameraResourceStub::setHasDualStreaming(bool value)
 
 void CameraResourceStub::markCameraAsNvr()
 {
-    m_licenseType = Qn::LC_Bridge;
-    setProperty(Qn::DTS_PARAM_NAME, 1); //< to reset cached values;
-    emit initializedChanged(toSharedPointer());
+    setDeviceType(nx::core::resource::DeviceType::nvr);
 }
 
 void CameraResourceStub::markCameraAsVMax()
 {
     m_licenseType = Qn::LC_VMAX;
     setProperty(Qn::DTS_PARAM_NAME, 1); //< to reset cached values;
-    emit initializedChanged(toSharedPointer());
+    emit licenseTypeChanged(toSharedPointer(this));
 }
 
 } // namespace nx

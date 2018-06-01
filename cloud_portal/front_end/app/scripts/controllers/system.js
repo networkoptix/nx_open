@@ -14,6 +14,11 @@ angular.module('cloudApp')
             $scope.account = account;
             $scope.system = system(systemId, account.email);
             $scope.gettingSystem.run();
+
+            $scope.$watch('system.info.name',function(value){
+                page.title(value ? value + ' -' : '');
+                systemsProvider.forceUpdateSystems();
+            });
         });
 
         function getMergeTarget(targetSystemId){
@@ -94,8 +99,7 @@ angular.module('cloudApp')
         }
 
         function reloadSystems(){
-            systemsProvider.forceUpdateSystems();
-            $location.path('/systems');
+            systemsProvider.forceUpdateSystems().then(function(){$location.path('/systems')});
         }
 
         $scope.disconnect = function(){
@@ -182,11 +186,6 @@ angular.module('cloudApp')
                     delayedUpdateSystemInfo();
                 });
         };
-
-        $scope.$watch('system.info.name',function(value){
-            page.title(value ? value + ' -' : '');
-            systemsProvider.forceUpdateSystems();
-        });
 
         function normalizePermissionString(permissions){
             return permissions.split('|').sort().join('|');

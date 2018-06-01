@@ -8,6 +8,7 @@
 #include <nx/kit/debug.h>
 #include <common/common_module.h>
 #include <media_server/media_server_module.h>
+#include <nx/utils/file_system.h>
 
 #include <plugins/plugin_manager.h>
 #include <plugins/plugin_tools.h>
@@ -249,13 +250,68 @@ std::vector<nxpl::Setting> ManagerPool::loadSettingsFromFile(
     return settings;
 }
 
+/** @return Dir ending with "/", intended to receive manifest files. */
+static QString manifestFileDir()
+{
+    QString dir = QDir::cleanPath( //< Normalize to use forward slashes, as required by QFile.
+        QString::fromUtf8(pluginsIni().metadataPluginManifestOutputPath));
+
+    if (QFileInfo(dir).isRelative())
+    {
+        dir.insert(0,
+            // NOTE: QDir::cleanPath() removes trailing '/'.
+            QDir::cleanPath(QString::fromUtf8(nx::kit::IniConfig::iniFilesDir())) + lit("/"));
+    }
+
+    if (!dir.isEmpty() && dir.at(dir.size() - 1) != '/')
+        dir.append('/');
+
+    return dir;
+}
+
+/**
+ * Intended for debug. On error, just log the error message.
+ */
+void ManagerPool::saveManifestToFile(
+    const char* const manifest,
+    const QString& fileDescription,
+    const QString& pluginLibName,
+    const QString& filenameExtraSuffix)
+{
+    const QString dir = manifestFileDir();
+    const QString filename = dir + pluginLibName + filenameExtraSuffix + lit("_manifest.json");
+
+    using nx::utils::log::Level;
+    auto log = //< Can be used to return after logging: return log(...).
+        [&](Level level, const QString& message)
+        {
+            NX_UTILS_LOG(level, this) << lm("Metadata %1 manifest: %2: [%3]")
+                .args(fileDescription, message, filename);
+        };
+
+    log(Level::info, lit("Saving to file"));
+
+    if (!nx::utils::file_system::ensureDir(dir))
+        return log(Level::error, lit("Unable to create directory for file"));
+
+    QFile f(filename);
+    if (!f.open(QFile::WriteOnly))
+        return log(Level::error, lit("Unable to (re)create file"));
+
+    const int len = strlen(manifest);
+    if (f.write(manifest, len) != len)
+        return log(Level::error, lit("Unable to write to file"));
+}
+
 /** If path is empty, the path to ini_config .ini files is used. */
 static QString settingsFilename(
     const char* const path, const QString& pluginLibName, const QString& extraSuffix = "")
 {
-    return QDir::cleanPath( //< Normalize to use forward slashes, as required by QFile.
-        QString::fromUtf8(path[0] ? path : nx::kit::IniConfig::iniFilesDir()) + lit("/")
-        + pluginLibName + extraSuffix + lit(".json"));
+    QString dir = QDir::cleanPath( //< Normalize to use forward slashes, as required by QFile.
+        QString::fromUtf8(path[0] ? path : nx::kit::IniConfig::iniFilesDir()));
+    if (!dir.isEmpty() && dir.at(dir.size() - 1) != '/')
+        dir.append('/');
+    return dir + pluginLibName + extraSuffix + lit(".json");
 }
 
 void ManagerPool::setCameraManagerDeclaredSettings(
@@ -324,7 +380,7 @@ void ManagerPool::createCameraManagersForResourceUnsafe(const QnSecurityCamResou
         boost::optional<nx::api::AnalyticsDeviceManifest> managerManifest;
         boost::optional<nx::api::AnalyticsDriverManifest> auxiliaryPluginManifest;
         std::tie(managerManifest, auxiliaryPluginManifest) =
-            loadManagerManifest(manager.get(), camera);
+            loadManagerManifest(plugin, manager.get(), camera);
         if (managerManifest)
         {
             addManifestToCamera(*managerManifest, camera);
@@ -547,6 +603,12 @@ boost::optional<nx::api::AnalyticsDriverManifest> ManagerPool::loadPluginManifes
         return boost::none;
     }
 
+    if (pluginsIni().metadataPluginManifestOutputPath[0])
+    {
+        saveManifestToFile(
+            manifestStr, "Plugin", qnServerModule->pluginManager()->pluginLibName(plugin));
+    }
+
     auto pluginManifest = deserializeManifest<nx::api::AnalyticsDriverManifest>(manifestStr);
 
     if (!pluginManifest)
@@ -622,6 +684,7 @@ std::pair<
     boost::optional<nx::api::AnalyticsDriverManifest>
 >
 ManagerPool::loadManagerManifest(
+    const Plugin* plugin,
     CameraManager* manager,
     const QnSecurityCamResourcePtr& camera)
 {
@@ -633,8 +696,8 @@ ManagerPool::loadManagerManifest(
     // "managerManifest" contains const char* representation of camera manifest.
     // unique_ptr allows us to automatically ask manager to release it when memory is not needed more.
     auto deleter = [manager](const char* ptr) { manager->freeManifest(ptr); };
-    std::unique_ptr<const char, decltype(deleter)> managerManifest(
-        manager->capabilitiesManifest(&error), deleter);
+    std::unique_ptr<const char, decltype(deleter)> managerManifest{
+        manager->capabilitiesManifest(&error), deleter};
 
     if (error != Error::noError)
     {
@@ -643,6 +706,22 @@ ManagerPool::loadManagerManifest(
             lm("Can not fetch manifest for resource %1 (%2), plugin returned error.")
             .args(camera->getUserDefinedName(), camera->getId()));
         return std::make_pair(boost::none, boost::none);
+    }
+
+    if (!managerManifest.get())
+    {
+        NX_ERROR(this) << lm("Received null Plugin Camera Manager manifest for plugin \"%1\".")
+            .arg(plugin->name());
+        return std::make_pair(boost::none, boost::none);
+    }
+
+    if (pluginsIni().metadataPluginManifestOutputPath[0])
+    {
+        saveManifestToFile(
+            managerManifest.get(),
+            "Plugin Camera Manager",
+            qnServerModule->pluginManager()->pluginLibName(plugin),
+            lit("_camera_manager"));
     }
 
     // Manager::capabilitiesManifest can return data in two json formats: either

@@ -3,6 +3,7 @@
 #include <common/common_module.h>
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/media_server_resource.h>
+#include <core/resource/fake_media_server.h>
 #include <core/resource/resource_display_info.h>
 
 #include <client/client_settings.h>
@@ -59,12 +60,41 @@ QnServerUpdatesModel::Item::Item(const QnMediaServerResourcePtr &server) :
 {
 }
 
-QnServerUpdatesModel::QnServerUpdatesModel(QnMediaServerUpdateTool* tool, QObject *parent) :
+QnServerUpdatesModel::QnServerUpdatesModel(QnMediaServerUpdateTool* tool, QObject* parent):
     base_type(parent),
     QnWorkbenchContextAware(parent),
     m_updateTool(tool),
     m_checkResult(QnCheckForUpdateResult::BadUpdateFile)
 {
+    connect(m_updateTool, &QnMediaServerUpdateTool::stageChanged, this,
+        [this](QnFullUpdateStage stage)
+        {
+            if (stage != QnFullUpdateStage::Check)
+                return;
+
+            m_incompatibleServersBlackList.clear();
+            for (const auto& server: resourcePool()->getAllServers(Qn::Online))
+            {
+                const auto& id = server->getId();
+                if (resourcePool()->getIncompatibleServerById(id).isNull())
+                    m_incompatibleServersBlackList.insert(id);
+            }
+        });
+
+    connect(m_updateTool, &QnMediaServerUpdateTool::updateFinished, this,
+        [this]()
+        {
+            if (commonModule()->currentServer()->getStatus() == Qn::Online)
+                resetResourses();
+        });
+
+    connect(m_updateTool, &QnMediaServerUpdateTool::checkForUpdatesFinished, this,
+        [this]()
+        {
+            if (!m_incompatibleServersBlackList.isEmpty())
+                resetResourses();
+        });
+
     connect(m_updateTool,  &QnMediaServerUpdateTool::peerStageChanged,  this, [this](const QnUuid &peerId, QnPeerUpdateStage stage) {
         QModelIndex idx = index(peerId);
         if (!idx.isValid())
@@ -171,6 +201,7 @@ void QnServerUpdatesModel::resetResourses() {
 
     qDeleteAll(m_items);
     m_items.clear();
+    m_incompatibleServersBlackList.clear();
 
     const auto allServers = resourcePool()->getAllServers(Qn::AnyStatus);
     for (const QnMediaServerResourcePtr &server: allServers)
@@ -231,8 +262,10 @@ void QnServerUpdatesModel::at_resourceAdded(const QnResourcePtr &resource)
     if (!server)
         return;
 
-    if (server->hasFlags(Qn::fake_server)
-        && !helpers::serverBelongsToCurrentSystem(server))
+    const auto& fakeServer = server.dynamicCast<QnFakeMediaServerResource>();
+    if (fakeServer
+        && (!helpers::serverBelongsToCurrentSystem(server)
+            || m_incompatibleServersBlackList.contains(server->getOriginalGuid())))
     {
         return;
     }

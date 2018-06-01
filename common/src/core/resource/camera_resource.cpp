@@ -106,7 +106,9 @@ QString QnVirtualCameraResource::sourceUrl(Qn::ConnectionRole role) const
     return streamUrls[roleStr].toString();
 }
 
-void QnVirtualCameraResource::updateSourceUrl(const QString& url, Qn::ConnectionRole role)
+void QnVirtualCameraResource::updateSourceUrl(const QString& url,
+    Qn::ConnectionRole role,
+    bool save)
 {
     if (!storeUrlForRole(role) || url.isEmpty())
         return;
@@ -127,7 +129,11 @@ void QnVirtualCameraResource::updateSourceUrl(const QString& url, Qn::Connection
         };
 
     if (updateProperty(Qn::CAMERA_STREAM_URLS, urlUpdater))
-        saveParams();
+    {
+        //TODO: #rvasilenko Setter and saving must be split.
+        if (save)
+            saveParams();
+    }
 }
 
 int QnVirtualCameraResource::saveAsync()

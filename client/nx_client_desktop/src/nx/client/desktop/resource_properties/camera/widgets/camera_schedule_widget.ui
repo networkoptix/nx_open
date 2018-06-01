@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>761</width>
+    <width>958</width>
     <height>755</height>
    </rect>
   </property>
@@ -39,8 +39,8 @@
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>741</width>
-        <height>735</height>
+        <width>924</width>
+        <height>753</height>
        </rect>
       </property>
       <layout class="QVBoxLayout" name="verticalLayout_7" stretch="0,0,0,0,0,1">
@@ -137,42 +137,7 @@
           <number>0</number>
          </property>
          <item>
-          <widget class="QGroupBox" name="archiveGroupBox">
-           <property name="title">
-            <string>Fixed Archive Length</string>
-           </property>
-           <property name="flat">
-            <bool>true</bool>
-           </property>
-           <layout class="QVBoxLayout" name="verticalLayout_2">
-            <property name="spacing">
-             <number>16</number>
-            </property>
-            <item>
-             <widget class="nx::client::desktop::ArchiveLengthWidget" name="archiveLengthWidget" native="true">
-              <property name="minimumSize">
-               <size>
-                <width>50</width>
-                <height>0</height>
-               </size>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <spacer name="verticalSpacer_2">
-              <property name="orientation">
-               <enum>Qt::Vertical</enum>
-              </property>
-              <property name="sizeHint" stdset="0">
-               <size>
-                <width>0</width>
-                <height>0</height>
-               </size>
-              </property>
-             </spacer>
-            </item>
-           </layout>
-          </widget>
+          <widget class="nx::client::desktop::ArchiveLengthWidget" name="archiveLengthWidget" native="true"/>
          </item>
          <item>
           <widget class="QGroupBox" name="recordingThresholdGroupBox">
@@ -285,9 +250,10 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>nx::client::desktop::HintButton</class>
+   <class>nx::client::desktop::ArchiveLengthWidget</class>
    <extends>QWidget</extends>
-   <header location="global">nx/client/desktop/common/widgets/hint_button.h</header>
+   <header location="global">nx/client/desktop/resource_properties/camera/widgets/archive_length_widget.h</header>
+   <container>1</container>
   </customwidget>
   <customwidget>
    <class>QnScheduleGridWidget</class>
@@ -299,12 +265,6 @@
    <class>QnLicensesUsageWidget</class>
    <extends>QWidget</extends>
    <header location="global">ui/widgets/licensing/licenses_usage_widget.h</header>
-   <container>1</container>
-  </customwidget>
-  <customwidget>
-   <class>nx::client::desktop::ArchiveLengthWidget</class>
-   <extends>QWidget</extends>
-   <header location="global">nx/client/desktop/resource_properties/camera/widgets/archive_length_widget.h</header>
    <container>1</container>
   </customwidget>
   <customwidget>

@@ -122,7 +122,7 @@ void QnCameraAdditionDialog::setServer(const QnMediaServerResourcePtr &server) {
         return;
 
     if (m_server)
-        disconnect(m_server, NULL, this, NULL);
+        m_server->disconnect(this);
 
     m_server = server;
     if (server) {

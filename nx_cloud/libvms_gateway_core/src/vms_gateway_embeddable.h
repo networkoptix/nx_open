@@ -21,12 +21,14 @@ class NX_VMS_GATEWAY_API VmsGatewayEmbeddable:
 public:
     VmsGatewayEmbeddable(
         bool isSslEnabled,
-        const QString& certPath = {},
-        const QString& logBaseName = {});
+        const QString& certPath = {});
 
     bool isSslEnabled() const;
     network::SocketAddress endpoint() const;
     void enforceSslFor(const network::SocketAddress& targetAddress, bool enabled = true);
+
+protected:
+    virtual void beforeModuleStart() override;
 
 private:
     const bool m_isSslEnabled;

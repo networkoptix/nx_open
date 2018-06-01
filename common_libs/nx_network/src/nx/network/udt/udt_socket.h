@@ -8,7 +8,6 @@
 #include "../aio/event_type.h"
 #include "../socket_common.h"
 #include "../system_socket.h"
-#include "../aio/event_type.h"
 
 namespace nx {
 namespace network {
@@ -20,10 +19,6 @@ template<class SocketType> class AsyncServerSocketHelper;
 
 } // namespace aio
 
-  // I put the implementator inside of detail namespace to avoid namespace pollution.
-  // The reason is that I see many of the class prefer using Implementator , maybe
-  // we want binary compatible of our source code. Anyway, this is not a bad thing
-  // but some sacrifice on inline function.
 namespace detail {
 
 class UdtSocketImpl;
@@ -46,13 +41,13 @@ public:
     virtual ~UdtSocket();
 
     /**
-    * Binds UDT socket to an existing UDP socket.
-    * NOTE: This method can be called just after UdtSocket creation.
-    * NOTE: if method have failed UdtSocket instance MUST be destroyed!
-    */
+     * Binds UDT socket to an existing UDP socket.
+     * NOTE: This method can be called just after UdtSocket creation.
+     * NOTE: if method have failed UdtSocket instance MUST be destroyed!
+     */
     bool bindToUdpSocket(UDPSocket&& udpSocket);
 
-    // AbstractSocket --------------- interface
+    // AbstractSocket.
     virtual bool bind(const SocketAddress& localAddress) override;
     virtual SocketAddress getLocalAddress() const override;
     virtual bool close() override;
@@ -115,25 +110,26 @@ public:
         int ipVersion,
         detail::UdtSocketImpl* impl,
         detail::SocketState state);
-    // We must declare this trivial constructor even it is trivial.
-    // Since this will make std::unique_ptr call correct destructor for our
-    // partial, forward declaration of class UdtSocketImp;
     virtual ~UdtStreamSocket();
+
+    UdtStreamSocket(const UdtStreamSocket&) = delete;
+    UdtStreamSocket& operator=(const UdtStreamSocket&) = delete;
 
     bool setRendezvous(bool val);
 
-    // AbstractCommunicatingSocket ------- interface
+    virtual void bindToAioThread(nx::network::aio::AbstractAioThread* aioThread) override;
+
+    // AbstractCommunicatingSocket.
     virtual bool connect(
         const SocketAddress& remoteAddress,
         std::chrono::milliseconds timeout) override;
 
     virtual int recv(void* buffer, unsigned int bufferLen, int flags = 0) override;
     virtual int send(const void* buffer, unsigned int bufferLen) override;
-    //  What's difference between foreign address with peer address
     virtual SocketAddress getForeignAddress() const override;
     virtual bool isConnected() const override;
 
-    // AbstractStreamSocket ------ interface
+    // AbstractStreamSocket.
     virtual bool setNoDelay(bool value) override;
     virtual bool getNoDelay(bool* /*value*/) const override;
     virtual bool toggleStatisticsCollection(bool val) override;
@@ -162,8 +158,8 @@ private:
         const SocketAddress& remoteAddress,
         std::chrono::milliseconds timeout);
     /**
-    * @return false if failed to read socket options.
-    */
+     * @return false if failed to read socket options.
+     */
     bool checkIfRecvModeSwitchIsRequired(int flags, boost::optional<bool>* requiredRecvMode);
     bool setRecvMode(bool isRecvSync);
     int handleRecvResult(int recvResult);
@@ -171,9 +167,6 @@ private:
     std::unique_ptr<aio::AsyncSocketImplHelper<UdtStreamSocket>> m_aioHelper;
     bool m_noDelay = false;
     bool m_isInternetConnection = false;
-
-private:
-    Q_DISABLE_COPY(UdtStreamSocket)
 };
 
 class NX_NETWORK_API UdtStreamServerSocket:
@@ -185,16 +178,22 @@ public:
     explicit UdtStreamServerSocket(int ipVersion = AF_INET);
     virtual ~UdtStreamServerSocket();
 
+    UdtStreamServerSocket(const UdtStreamServerSocket&) = delete;
+    UdtStreamServerSocket& operator=(const UdtStreamServerSocket&) = delete;
+
     virtual void pleaseStop(nx::utils::MoveOnlyFunc<void()> handler) override;
     virtual void pleaseStopSync(bool assertIfCalledUnderLock = true) override;
 
-    // AbstractStreamServerSocket -------------- interface
+    // AbstractStreamServerSocket.
     virtual bool listen(int queueLen = 128) override;
-    virtual AbstractStreamSocket* accept() override;
+    virtual std::unique_ptr<AbstractStreamSocket> accept() override;
     virtual void acceptAsync(AcceptCompletionHandler handler) override;
 
-    /** This method is for use by AsyncServerSocketHelper only. It just calls system call accept */
-    AbstractStreamSocket* systemAccept();
+    /**
+     * For use by AsyncServerSocketHelper only.
+     * It just calls system call accept.
+     */
+    std::unique_ptr<AbstractStreamSocket> systemAccept();
 
 protected:
     virtual void cancelIoInAioThread() override;
@@ -203,8 +202,6 @@ private:
     std::unique_ptr<aio::AsyncServerSocketHelper<UdtStreamServerSocket>> m_aioHelper;
 
     void stopWhileInAioThread();
-
-    Q_DISABLE_COPY(UdtStreamServerSocket)
 };
 
 class NX_NETWORK_API UdtStatistics

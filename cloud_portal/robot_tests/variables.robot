@@ -11,6 +11,7 @@ ${CLOUD DEV}                          https://cloud-dev2.hdw.mx
 ${CLOUD TEST REGISTER}                https://cloud-test.hdw.mx/register
 ${CLOUD STAGE}                        https://cloud-stage.hdw.mx
 ${ENV}                                ${CLOUD TEST}
+${SCREENSHOTDIRECTORY}               \Screenshots
 
 ${BROWSER}                            Chrome
 

@@ -134,12 +134,15 @@ void QnCameraThumbnailCache::refreshThumbnail(const QnUuid &id)
         return;
 
     const auto handleReply =
-        [this, id](
+        [this, id, guard = QPointer<QnCameraThumbnailCache>(this)](
             bool success,
             rest::Handle /*requestId*/,
             QByteArray imageData,
             const nx::network::http::HttpHeaders& /*headers*/)
         {
+            if (!guard)
+                return;
+
             bool thumbnailLoaded = false;
             QString thumbnailId;
 

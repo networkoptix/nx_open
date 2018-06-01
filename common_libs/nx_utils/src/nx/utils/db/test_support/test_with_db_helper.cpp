@@ -26,7 +26,7 @@ TestWithDbHelper::TestWithDbHelper(QString moduleName, QString tmpDir):
     if (m_dbConnectionOptions.dbName.isEmpty() && m_dbConnectionOptions.driverType == RdbmsDriverType::sqlite)
     {
         m_dbConnectionOptions.dbName =
-            lit("%1/%2").arg(testDataDir()).arg(lit("%1_ut.sqlite").arg(moduleName));
+            QString("%1/%2").arg(testDataDir()).arg(QString("%1_ut.sqlite").arg(moduleName));
     }
 
     cleanDatabase();

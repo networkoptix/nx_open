@@ -109,7 +109,6 @@ void initialize(Manager* manager, Action* root)
 
     factory(PreferencesNotificationTabAction)
         .flags(NoTarget)
-        .icon(qnSkin->icon("events/filter.png"))
         .text(ContextMenu::tr("Filter...")); //< To be displayed on button tooltip
 
     factory(PreferencesCloudTabAction)
@@ -150,7 +149,6 @@ void initialize(Manager* manager, Action* root)
             | LayoutItemTarget | WidgetTarget | GlobalHotkey)
         .mode(DesktopMode)
         .requiredGlobalPermission(Qn::GlobalViewLogsPermission)
-        .icon(qnSkin->icon("events/log.png"))
         .shortcut(lit("Ctrl+L"))
         .condition(!condition::tourIsRunning())
         .text(ContextMenu::tr("Event Log...")); //< To be displayed on button tooltip
@@ -556,6 +554,10 @@ void initialize(Manager* manager, Action* root)
         .flags(NoTarget)
         .mode(DesktopMode);
 
+    factory(ShowEulaAction)
+        .flags(NoTarget)
+        .mode(DesktopMode);
+
     factory(AllowStatisticsReportMessageAction)
         .flags(NoTarget)
         .mode(DesktopMode)
@@ -653,7 +655,6 @@ void initialize(Manager* manager, Action* root)
         .mode(DesktopMode)
         .requiredGlobalPermission(Qn::GlobalAdminPermission)
         .text(ContextMenu::tr("Event Rules..."))
-        .icon(qnSkin->icon("events/settings.png"))
         .shortcut(lit("Ctrl+E"))
         .condition(!condition::tourIsRunning())
         .autoRepeat(false);
@@ -1282,16 +1283,24 @@ void initialize(Manager* manager, Action* root)
         .flags(Scene | Tree | SingleTarget | ResourceTarget)
         .requiredGlobalPermission(Qn::GlobalEditCamerasPermission)
         .text(ContextMenu::tr("Upload File..."))
-        .condition(condition::hasFlags(Qn::wearable_camera, MatchMode::All)
-            && condition::isTrue(ini().enableWearableCameras));
+        .condition(condition::isTrue(ini().enableWearableCameras)
+            && condition::wearableCameraUploadEnabled());
 
     factory(UploadWearableCameraFolderAction)
         .mode(DesktopMode)
         .flags(Scene | Tree | SingleTarget | ResourceTarget)
         .requiredGlobalPermission(Qn::GlobalEditCamerasPermission)
         .text(ContextMenu::tr("Upload Folder..."))
-        .condition(condition::hasFlags(Qn::wearable_camera, MatchMode::All)
-            && condition::isTrue(ini().enableWearableCameras));
+        .condition(condition::isTrue(ini().enableWearableCameras)
+            && condition::wearableCameraUploadEnabled());
+
+    factory(CancelWearableCameraUploadsAction)
+        .mode(DesktopMode)
+        .flags(Scene | Tree | SingleTarget | ResourceTarget)
+        .requiredGlobalPermission(Qn::GlobalEditCamerasPermission)
+        .text(ContextMenu::tr("Cancel Upload..."))
+        .condition(condition::isTrue(ini().enableWearableCameras)
+            && condition::wearableCameraUploadCancellable());
 
     factory(CameraIssuesAction)
         .mode(DesktopMode)
@@ -1339,6 +1348,23 @@ void initialize(Manager* manager, Action* root)
         .requiredGlobalPermission(Qn::GlobalEditCamerasPermission)
         .condition(condition::hasFlags(Qn::live_cam, MatchMode::Any)
             && !condition::tourIsRunning()
+            && condition::scoped(SceneScope,
+                !condition::isLayoutTourReviewMode()
+                && !condition::isPreviewSearchMode()));
+
+    factory(CameraSettingsActionNew)
+        .mode(DesktopMode)
+        .flags(Scene | Tree | SingleTarget | MultiTarget | ResourceTarget | LayoutItemTarget)
+        .dynamicText(new DevicesNameTextFactory(
+            QnCameraDeviceStringSet(
+                ContextMenu::tr("Device Settings (new)..."), ContextMenu::tr("Devices Settings (new)..."),
+                ContextMenu::tr("Camera Settings (new)..."), ContextMenu::tr("Cameras Settings (new)..."),
+                ContextMenu::tr("I/O Module Settings (new)..."), ContextMenu::tr("I/O Modules Settings (new)...")
+            ), manager))
+        .requiredGlobalPermission(Qn::GlobalEditCamerasPermission)
+        .condition(condition::hasFlags(Qn::live_cam, MatchMode::Any)
+            && !condition::tourIsRunning()
+            && condition::isTrue(ini().redesignedCameraSettingsDialog)
             && condition::scoped(SceneScope,
                 !condition::isLayoutTourReviewMode()
                 && !condition::isPreviewSearchMode()));
@@ -1809,8 +1835,8 @@ void initialize(Manager* manager, Action* root)
 
     factory(PinNotificationsAction)
         .flags(Notifications | NoTarget)
-        .text(ContextMenu::tr("Pin Notifications")) //< To be displayed on button tooltip
-        .toggledText(ContextMenu::tr("Unpin Notifications"));
+        .text(ContextMenu::tr("Pin Panel")) //< To be displayed on button tooltip
+        .toggledText(ContextMenu::tr("Unpin Panel"));
 
     factory(GoToNextItemAction)
         .flags(NoTarget);

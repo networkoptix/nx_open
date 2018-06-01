@@ -24,6 +24,7 @@
 #include <nx/network/app_info.h>
 #include <nx/utils/string.h>
 
+#include <utils/common/html.h>
 using namespace nx::client::desktop;
 
 namespace {
@@ -81,9 +82,20 @@ QnUserSettingsWidget::QnUserSettingsWidget(QnUserSettingsModel* model, QWidget* 
     setHelpTopic(ui->roleLabel, ui->roleComboBox, Qn::UserSettings_UserRoles_Help);
     setHelpTopic(ui->roleComboBox, Qn::UserSettings_UserRoles_Help);
 
-    ui->userTypeHint->addHintLine(tr("<b>Local users</b> belong to this system only and are fully managed by system administrators."));
-    ui->userTypeHint->addHintLine(tr("<b>Cloud users</b> can have access to many systems. Administrators can manage their rights only."));
-    ui->userTypeHint->setHelpTopic(Qn::NewUser_Help);
+    const QString localUsers = htmlBold(tr("Local users"));
+    const QString cloudUsers = htmlBold(tr("%1 users", "%1 is the short cloud name (like Cloud)")
+        .arg(nx::network::AppInfo::shortCloudName()));
+
+    ui->userTypeHint->addHintLine(
+        tr("%1 belong to this system only and are fully managed by system administrators.",
+            "%1 is local users definition, e.g. 'Local users'")
+        .arg(localUsers));
+    ui->userTypeHint->addHintLine(
+        tr("%1 can have access to many Systems. Administrators can manage their rights only.",
+            "%1 is cloud users definition, e.g. 'Cloud users'")
+        .arg(cloudUsers));
+
+    setHelpTopic(ui->userTypeHint, Qn::NewUser_Help);
 
     ui->roleComboBox->setModel(m_rolesModel);
 

@@ -14,6 +14,7 @@ namespace info {
 namespace test {
 
 static const QString kBaseUrl = "http://updates.networkoptix.com";
+static const QnUuid kCurrentPeerId = QnUuid::createUuid();
 
 class AsyncUpdateChecker: public ::testing::Test
 {
@@ -44,6 +45,7 @@ protected:
         using namespace std::placeholders;
         m_asyncUpdateChecker.check(
             std::bind(&AsyncUpdateChecker::onCheckCompleted, this, _1, _2),
+            kCurrentPeerId,
             kBaseUrl);
 
         QnMutexLocker lock(&m_mutex);
@@ -62,6 +64,24 @@ protected:
         ASSERT_EQ(ResultCode::ok, m_resultCode);
         ASSERT_TRUE((bool) m_updateRegistry);
         assertUpdateRegistryContent();
+    }
+
+    void thenManuallyAddedDataShouldBeFoundCorrectly()
+    {
+        FileData fileData;
+        auto resultCode = m_updateRegistry->findUpdateFile(
+            UpdateFileRequestData(
+                "any_cloud_host", "any_customization",
+                QnSoftwareVersion(3, 0, 0, 9872), macosx(), false),
+            &fileData);
+        assertFoundWithManualData(resultCode, fileData, m_manualData1);
+
+        resultCode = m_updateRegistry->findUpdateFile(
+            UpdateFileRequestData(
+                "any_cloud_host", "any_customization",
+                QnSoftwareVersion(3, 0, 0, 9872), ubuntuX64(), true),
+            &fileData);
+        assertFoundWithManualData(resultCode, fileData, m_manualData2);
     }
 
 private:
@@ -219,20 +239,6 @@ private:
                 QnSoftwareVersion(3, 0, 0, 9872), armRpi(), false),
             &fileData);
         assertFindResult(resultCode, fileData, false);
-
-        resultCode = m_updateRegistry->findUpdateFile(
-            UpdateFileRequestData(
-                "any_cloud_host", "any_customization",
-                QnSoftwareVersion(3, 0, 0, 9872), macosx(), false),
-            &fileData);
-        assertFoundWithManualData(resultCode, fileData, m_manualData1);
-
-        resultCode = m_updateRegistry->findUpdateFile(
-            UpdateFileRequestData(
-                "any_cloud_host", "any_customization",
-                QnSoftwareVersion(3, 0, 0, 9872), ubuntuX64(), true),
-            &fileData);
-        assertFoundWithManualData(resultCode, fileData, m_manualData2);
     }
 
     void assertFoundWithManualData(
@@ -262,7 +268,7 @@ private:
     void assertSerializability() const
     {
         const auto rawData = m_updateRegistry->toByteArray();
-        auto newUpdateRegistry = UpdateRegistryFactory::create();
+        auto newUpdateRegistry = UpdateRegistryFactory::create(kCurrentPeerId);
         ASSERT_TRUE(newUpdateRegistry->fromByteArray(rawData));
         ASSERT_TRUE(m_updateRegistry->equals(newUpdateRegistry.get()));
     }
@@ -272,8 +278,9 @@ TEST_F(AsyncUpdateChecker, CorrectUpdateRegistryProvided)
 {
     whenMockupDataProviderHasBeenSetUp();
     whenAsyncCheckRequestHasBeenIssued();
-    whenSomeManualDataHasBeenAdded();
     thenCorrectUpdateRegistryShouldBeReturned();
+    whenSomeManualDataHasBeenAdded();
+    thenManuallyAddedDataShouldBeFoundCorrectly();
 }
 
 } // namespace test

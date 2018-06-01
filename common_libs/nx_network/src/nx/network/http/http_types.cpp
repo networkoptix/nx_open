@@ -230,6 +230,8 @@ StringType toString(Value val)
             return StringType("Internal Server Error");
         case notImplemented:
             return StringType("Not Implemented");
+        case badGateway:
+            return StringType("Bad Gateway");
         case serviceUnavailable:
             return StringType("Service Unavailable");
         default:
@@ -1852,7 +1854,7 @@ int ChunkHeader::serialize(BufferType* const /*dstBuffer*/) const
 }
 
 
-static const StringType defaultUserAgentString = lit("%1%2/%3 (%4) %5").arg(
+static const StringType defaultUserAgentString = QString("%1%2/%3 (%4) %5").arg(
     nx::utils::AppInfo::productNameLong(),
     PRODUCT_NAME_SUFFIX,
     nx::utils::AppInfo::applicationVersion(),
@@ -1865,7 +1867,7 @@ StringType userAgentString()
     return defaultUserAgentString;
 }
 
-static const StringType defaultServerString = lit("%1/%2 (%3) %4").arg(
+static const StringType defaultServerString = QString("%1/%2 (%3) %4").arg(
     nx::utils::AppInfo::productNameLong(),
     nx::utils::AppInfo::applicationVersion(),
     nx::utils::AppInfo::organizationName(),

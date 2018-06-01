@@ -45,6 +45,7 @@ namespace
     const QString kEncodedLocalSystemId("localhost%3A7001");
     const QString kInvalidSystemId("_invalid_system_id_");
 
+    const QString kEmptyUser("");
     const QString kUser("user");
     const QString kPassword("password");
     const QString kEncodedAuthKey("dXNlcjpwYXNzd29yZA%3D%3D");  /**< Url-encoded key for 'user:password' string in base64 encoding. */
@@ -230,15 +231,15 @@ TEST_F(SystemUriTest, genericCloudValidDomain)
     ASSERT_TRUE(m_uri.isValid());
 }
 
-/** Generic cloud command. Auth is required. */
+/** Generic cloud command. Only password is not acceptable. */
 TEST_F(SystemUriTest, genericCloudValidAuth)
 {
     m_uri.setClientCommand(SystemUri::ClientCommand::LoginToCloud);
     m_uri.setDomain(kCloudDomain);
-    ASSERT_FALSE(m_uri.isValid());
-
-    m_uri.setAuthenticator(kUser, kPassword);
     ASSERT_TRUE(m_uri.isValid());
+
+    m_uri.setAuthenticator(kEmptyUser, kPassword);
+    ASSERT_FALSE(m_uri.isValid());
 }
 
 /** Generic system command. Domain is required. */
@@ -253,16 +254,16 @@ TEST_F(SystemUriTest, genericSystemValidDomain)
     ASSERT_TRUE(m_uri.isValid());
 }
 
-/** Generic system command. Auth is required if system id is present. */
+/** Generic system command. Only password is not acceptable if system id is present. */
 TEST_F(SystemUriTest, genericSystemValidAuth)
 {
     m_uri.setClientCommand(SystemUri::ClientCommand::Client);
     m_uri.setDomain(kCloudDomain);
     m_uri.setSystemId(kLocalSystemId);
-    ASSERT_FALSE(m_uri.isValid());
-
-    m_uri.setAuthenticator(kUser, kPassword);
     ASSERT_TRUE(m_uri.isValid());
+
+    m_uri.setAuthenticator(kEmptyUser, kPassword);
+    ASSERT_FALSE(m_uri.isValid());
 }
 
 /** Generic system command. System Id is required if auth is present. */

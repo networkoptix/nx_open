@@ -1,5 +1,4 @@
-#ifndef sequrity_cam_resource_h_1239
-#define sequrity_cam_resource_h_1239
+#pragma once
 
 #include <mutex>
 #include <map>
@@ -449,4 +448,16 @@ private slots:
 Q_DECLARE_METATYPE(QnSecurityCamResourcePtr)
 Q_DECLARE_METATYPE(QnSecurityCamResourceList)
 
-#endif //sequrity_cam_resource_h_1239
+class QnC2pCameraResource: public QnSecurityCamResource
+{
+public:
+    QnC2pCameraResource(QnCommonModule* commonModule = nullptr):
+        QnSecurityCamResource(commonModule)
+    {
+    }
+    virtual QString getDriverName() const override {return QnResourceTypePool::kC2pCameraTypeId;}
+    virtual QnAbstractStreamDataProvider* createLiveDataProvider() override {return nullptr;}
+};
+
+Q_DECLARE_METATYPE(QnC2pCameraResourcePtr)
+Q_DECLARE_METATYPE(QnC2pCameraResourceList)

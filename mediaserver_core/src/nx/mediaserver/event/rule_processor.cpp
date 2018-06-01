@@ -650,8 +650,13 @@ void RuleProcessor::at_broadcastActionFinished(int handle, ec2::ErrorCode errorC
 
 bool RuleProcessor::broadcastAction(const vms::event::AbstractActionPtr& action)
 {
-    commonModule()->ec2Connection()->getBusinessEventManager(Qn::kSystemAccess)->broadcastBusinessAction(
-        action, this, &RuleProcessor::at_broadcastActionFinished);
+    nx::vms::api::EventActionData actionData;
+    ec2::fromResourceToApi(action, actionData);
+    commonModule()->ec2Connection()->getEventRulesManager(Qn::kSystemAccess)->
+        broadcastEventAction(
+            actionData,
+            this,
+            &RuleProcessor::at_broadcastActionFinished);
     return true;
 }
 

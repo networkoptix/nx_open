@@ -14,6 +14,8 @@ enum class StreamQuality;
 enum class FailoverPriority;
 enum class IoModuleVisualStyle;
 enum class ConnectionType;
+enum class RtpTransportType;
+enum class MotionStreamType;
 
 } // namespace api
 } // namespace vms
@@ -27,3 +29,5 @@ QN_FUSION_DECLARE_FUNCTIONS(nx::vms::api::StreamQuality, (metatype)(lexical), NX
 QN_FUSION_DECLARE_FUNCTIONS(nx::vms::api::FailoverPriority, (metatype)(lexical), NX_VMS_API)
 QN_FUSION_DECLARE_FUNCTIONS(nx::vms::api::IoModuleVisualStyle, (metatype)(lexical), NX_VMS_API)
 QN_FUSION_DECLARE_FUNCTIONS(nx::vms::api::ConnectionType, (metatype)(lexical), NX_VMS_API)
+QN_FUSION_DECLARE_FUNCTIONS(nx::vms::api::RtpTransportType, (metatype)(lexical), NX_VMS_API)
+QN_FUSION_DECLARE_FUNCTIONS(nx::vms::api::MotionStreamType, (metatype)(lexical), NX_VMS_API)

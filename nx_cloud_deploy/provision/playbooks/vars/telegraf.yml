@@ -1,3 +1,4 @@
+telegraf_agent_version: 1.6.3
 telegraf_agent_logfile: "/var/log/telegraf/telegraf.log"
 
 telegraf_agent_output:

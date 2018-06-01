@@ -50,6 +50,8 @@ QnGeneralSystemAdministrationWidget::QnGeneralSystemAdministrationWidget(QWidget
 {
     ui->setupUi(this);
 
+    ui->forceVideoEncryptionWarning->setVisible(false);
+
     ui->systemNameLabel->setMaximumWidth(kMaxSystemNameLabelWidth);
     ui->systemNameLabel->setValidator(
         [this](QString& text) -> bool
@@ -129,9 +131,9 @@ QnGeneralSystemAdministrationWidget::QnGeneralSystemAdministrationWidget(QWidget
     setHelpTopic(m_buttons[kBookmarksButton    ], Qn::Bookmarks_Usage_Help);
 
     auto backupHint = nx::client::desktop::HintButton::hintThat(ui->backupGroupBox);
-    backupHint->addHintLine(tr("Creates a backup of local System configurations that can be restored in case of failure."));
-    backupHint->addHintLine(tr("Backup includes registry flags, file systems, and server settings related to archive, events, and audit trail logs. Does not backup archives."));
-    backupHint->setHelpTopic(Qn::SystemSettings_Server_Backup_Help);
+    backupHint->addHintLine(tr("Creates a backup of System configuration that can be restored in case of failure."));
+    backupHint->addHintLine(tr("Backup includes servers and cameras settings, users, webpages, event rules, etc. Video is not saved."));
+    setHelpTopic(backupHint, Qn::SystemSettings_Server_Backup_Help);
 
     connect(m_buttons[kBusinessRulesButton], &QPushButton::clicked, this,
         [this] { menu()->trigger(ui::action::OpenBusinessRulesAction); });
@@ -153,6 +155,9 @@ QnGeneralSystemAdministrationWidget::QnGeneralSystemAdministrationWidget(QWidget
 
     connect(ui->systemSettingsWidget, &QnAbstractPreferencesWidget::hasChangesChanged,
         this, &QnAbstractPreferencesWidget::hasChangesChanged);
+
+    connect(ui->systemSettingsWidget, &QnSystemSettingsWidget::forceVideoTrafficEncryptionChanged,
+        ui->forceVideoEncryptionWarning, &QWidget::setVisible);
 }
 
 void QnGeneralSystemAdministrationWidget::loadDataToUi()
@@ -166,6 +171,8 @@ void QnGeneralSystemAdministrationWidget::applyChanges()
 {
     ui->systemSettingsWidget->applyChanges();
     ui->systemNameLabel->setEditing(false);
+    ui->forceVideoEncryptionWarning->setVisible(false);
+
     qnGlobalSettings->setSystemName(ui->systemNameLabel->text().trimmed());
     qnGlobalSettings->synchronizeNow();
 }

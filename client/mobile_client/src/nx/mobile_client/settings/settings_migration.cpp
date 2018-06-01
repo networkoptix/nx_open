@@ -6,7 +6,6 @@
 #include <nx/utils/log/log.h>
 #include <mobile_client/mobile_client_settings.h>
 #include <client_core/client_core_settings.h>
-#include <helpers/url_helper.h>
 #include <helpers/system_helpers.h>
 
 #include "login_session.h"

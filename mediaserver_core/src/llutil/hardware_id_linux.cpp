@@ -58,19 +58,7 @@ QString readFile(const char* path)
     }
 
     auto content = file.readAll();
-    return QString::fromUtf8(content);
-}
-
-void trim2(std::string& str) {
-    std::string::size_type pos = str.find_last_not_of(" \n\t");
-
-    if(pos != std::string::npos) {
-        str.erase(pos + 1);
-        pos = str.find_first_not_of(' ');
-        if(pos != std::string::npos) str.erase(0, pos);
-    } else {
-        str.erase(str.begin(), str.end());
-    }
+    return QString::fromLatin1(content).trimmed();
 }
 
 void getMemoryInfo(QString &partNumber, QString &serialNumber)

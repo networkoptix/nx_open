@@ -41,6 +41,11 @@ Service::Service(int argc, char **argv, const QString& applicationDisplayName):
 {
 }
 
+void Service::setEnableLoggingInitialization(bool value)
+{
+    m_isLoggingInitializationRequired = value;
+}
+
 void Service::pleaseStop()
 {
     m_isTerminated = true;
@@ -78,7 +83,8 @@ int Service::exec()
             return 0;
         }
 
-        initializeLog(*settings);
+        if (m_isLoggingInitializationRequired)
+            initializeLog(*settings);
 
         m_startInfoFilePath = lm("%1/%2")
             .args(settings->dataDir(), m_applicationDisplayName.toUtf8().toBase64());
@@ -117,7 +123,7 @@ void Service::initializeLog(const AbstractServiceSettings& settings)
 {
     auto logSettings = settings.logging();
     logSettings.updateDirectoryIfEmpty(settings.dataDir());
-    utils::log::initialize(logSettings, m_applicationDisplayName, {}, settings.logBaseName());
+    utils::log::initialize(logSettings, m_applicationDisplayName);
 }
 
 void Service::reportStartupResult(bool result)

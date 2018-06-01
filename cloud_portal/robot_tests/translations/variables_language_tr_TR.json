@@ -43,6 +43,7 @@
     "ACTIVATE YOUR ACCOUNT EMAIL SUBJECT": "Hesabınızı Aktifleştirin",
     "RESET PASSWORD EMAIL SUBJECT": "Parolanızı sıfırlayın",
     "INVITED TO SYSTEM EMAIL SUBJECT": "Video sistemi {{message.system_name}} sizinle paylaşılan yapıldı",
+    "INVITED TO SYSTEM EMAIL SUBJECT UNREGISTERED": "{{message.sharer_name}} invites you to %PRODUCT_NAME%",
     "DISCONNECT FORM HEADER TEXT": "%PRODUCT_NAME% den bağlantıyı kesmek istiyor musunuz?",
     "FIRST NAME IS REQUIRED TEXT": "Ad girmek zorunludur",
     "LAST NAME IS REQUIRED TEXT": "Soyad girmek zorunludur",
@@ -57,5 +58,6 @@
     "PASSWORD IS WEAK TEXT": "Parolanın güçlü olması için \nküçük büyük harf ve özel karakterler kullanın",
     "THIS LINK IS BROKEN TEXT": "This link is broken,<br>\n            System may be disconnected from %PRODUCT_NAME%,<br>\n            Access to this System may be revoked, <br>\n            or you may be logged into a different account",
     "PAGE NOT FOUND": "Sayfa bulunamadı",
-    "TAKE ME HOME": "Geri Dön"
+    "TAKE ME HOME": "Geri Dön",
+    "OPEN NX WITNESS BUTTON TEXT": "Open %VMS_NAME%"
 }

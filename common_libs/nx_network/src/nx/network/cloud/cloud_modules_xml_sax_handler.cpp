@@ -28,7 +28,7 @@ bool CloudModulesXmlHandler::startElement(
     switch (m_state)
     {
         case init:
-            if (qName == lit("modules"))
+            if (qName == "modules")
                 m_state = readingModules;
             else
                 return false;
@@ -40,7 +40,7 @@ bool CloudModulesXmlHandler::startElement(
             return true;
 
         case readingModuleEndpoints:
-            if (qName != lit("endpoint"))
+            if (qName != "endpoint")
                 return false;
             m_state = readingModuleEndpoint;
             return true;
@@ -90,15 +90,15 @@ QString CloudModulesXmlHandler::errorString() const
 
 bool CloudModulesXmlHandler::error(const QXmlParseException& exception)
 {
-    m_errorDescription = lit("Parse error. line %1, col %2, parser message: %3").
-        arg(exception.lineNumber()).arg(exception.columnNumber()).arg(exception.message());
+    m_errorDescription = QString("Parse error. line %1, col %2, parser message: %3")
+        .arg(exception.lineNumber()).arg(exception.columnNumber()).arg(exception.message());
     return false;
 }
 
 bool CloudModulesXmlHandler::fatalError(const QXmlParseException& exception)
 {
-    m_errorDescription = lit("Parse error. line %1, col %2, parser message: %3").
-        arg(exception.lineNumber()).arg(exception.columnNumber()).arg(exception.message());
+    m_errorDescription = QString("Parse error. line %1, col %2, parser message: %3")
+        .arg(exception.lineNumber()).arg(exception.columnNumber()).arg(exception.message());
     return false;
 }
 

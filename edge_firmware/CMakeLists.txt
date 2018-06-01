@@ -44,7 +44,7 @@ set(script ${CMAKE_CURRENT_SOURCE_DIR}/maven/bin-resources/create_arm_installer.
 
 add_custom_command(
     OUTPUT ${installer_output_list}
-    COMMAND ${script}
+    COMMAND ${script} --no-client
     DEPENDS ${script} ${depends} ${filtered1} ${filtered2}
     COMMENT "Creating ARM installer archives"
 )

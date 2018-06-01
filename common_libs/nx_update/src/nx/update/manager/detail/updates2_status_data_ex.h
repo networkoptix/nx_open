@@ -10,7 +10,7 @@ namespace detail {
 struct NX_UPDATE_API Updates2StatusDataEx: api::Updates2StatusData
 {
     qint64 lastRefreshTime = 0;
-    QSet<QString> files;
+    QString file;
 
     const api::Updates2StatusData& base() const;
     Updates2StatusDataEx(
@@ -29,7 +29,7 @@ struct NX_UPDATE_API Updates2StatusDataEx: api::Updates2StatusData
     void clone(const Updates2StatusDataEx& other);
 };
 
-#define Updates2StatusDataEx_Fields Updates2StatusData_Fields (lastRefreshTime)(files)
+#define Updates2StatusDataEx_Fields Updates2StatusData_Fields (lastRefreshTime)(file)
 QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES((Updates2StatusDataEx), (json)(eq))
 
 } // namespace detail

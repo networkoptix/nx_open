@@ -49,9 +49,9 @@ namespace ec2
         return AbstractLicenseManagerPtr();
     }
 
-    AbstractBusinessEventManagerPtr OldEcConnection::getBusinessEventManager(const Qn::UserAccessData &)
+    AbstractEventRulesManagerPtr OldEcConnection::getEventRulesManager(const Qn::UserAccessData &)
     {
-        return AbstractBusinessEventManagerPtr();
+        return {};
     }
 
     AbstractUserManagerPtr OldEcConnection::getUserManager(const Qn::UserAccessData &)

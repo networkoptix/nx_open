@@ -48,7 +48,7 @@ std::unique_ptr<nx::utils::stree::AbstractNode> StreeManager::loadStree(
     QXmlInputSource input(dataSource);
     if (!reader.parse(&input))
     {
-        NX_LOG(lit("Failed to parse stree xml: %1").arg(xmlHandler.errorString()), cl_logWARNING);
+        NX_LOG(lm("Failed to parse stree xml: %1").arg(xmlHandler.errorString()), cl_logWARNING);
         return nullptr;
     }
 
@@ -61,7 +61,7 @@ void StreeManager::loadStree() noexcept(false)
     if (!xmlFile.open(QIODevice::ReadOnly))
         throw std::runtime_error("Failed to open stree xml file " +
             m_xmlFilePath.toStdString() + ": " + xmlFile.errorString().toStdString());
-    NX_LOG(lit("Parsing stree xml file (%1)").arg(m_xmlFilePath), cl_logDEBUG1);
+    NX_LOG(lm("Parsing stree xml file (%1)").arg(m_xmlFilePath), cl_logDEBUG1);
     m_stree = loadStree(&xmlFile, m_attrNameSet);
     if (!m_stree)
         throw std::runtime_error("Failed to parse stree xml file " + m_xmlFilePath.toStdString());

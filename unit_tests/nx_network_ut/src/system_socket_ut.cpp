@@ -38,7 +38,7 @@ protected:
                 connected.set_value(resultCode);
             });
 
-         m_acceptedSocket.reset(m_tcpServerSocket.accept());
+         m_acceptedSocket = m_tcpServerSocket.accept();
          ASSERT_EQ(SystemError::noError, connected.get_future().get());
     }
 
@@ -167,7 +167,7 @@ TEST_F(TcpSocket, DISABLED_KeepAliveOptionsServer)
     ASSERT_TRUE(server->listen(testClientCount()));
     NX_LOGX(lm("Server address: %1").arg(server->getLocalAddress()), cl_logINFO);
 
-    std::unique_ptr<AbstractStreamSocket> client(server->accept());
+    auto client = server->accept();
     ASSERT_TRUE(client != nullptr);
     waitForKeepAliveDisconnect(client.get());
 }

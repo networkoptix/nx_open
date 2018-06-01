@@ -73,7 +73,7 @@ MultipleCameraSettingsWidget::MultipleCameraSettingsWidget(QWidget *parent):
 
     connect(ui->imageControlWidget, &LegacyImageControlWidget::changed, this,
         &MultipleCameraSettingsWidget::at_dbDataChanged);
-    connect(ui->expertSettingsWidget, &CameraExpertSettingsWidget::dataChanged, this,
+    connect(ui->expertSettingsWidget, &LegacyExpertSettingsWidget::dataChanged, this,
         &MultipleCameraSettingsWidget::at_dbDataChanged);
 
 
@@ -185,10 +185,15 @@ void MultipleCameraSettingsWidget::submitToResources()
         if (!password.isEmpty() || !m_passwordWasEmpty)
             auth.setPassword(password);
 
-        if (camera->isMultiSensorCamera() || camera->isNvr())
+        if ((camera->isMultiSensorCamera() || camera->isNvr())
+             && !camera->getGroupId().isEmpty())
+        {
             QnClientCameraResource::setAuthToCameraGroup(camera, auth);
+        }
         else
+        {
             camera->setAuth(auth);
+        }
 
         if (ui->enableAudioCheckBox->checkState() != Qt::PartiallyChecked && camera->isAudioSupported())
             camera->setAudioEnabled(ui->enableAudioCheckBox->isChecked());

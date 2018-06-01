@@ -89,11 +89,6 @@
     </message>
     <message>
       <location/>
-      <source>Disable only if the client takes too much CPU</source>
-      <translation>クライアントの CPU 負荷が余りにも高い場合にのみ無効にします</translation>
-    </message>
-    <message>
-      <location/>
       <source>Maximum Live Buffer Length</source>
       <translation>最大ライブ バッファーの長さ</translation>
     </message>
@@ -1741,6 +1736,11 @@
       <location/>
       <source>Tour cycle</source>
       <translation>Tour cycle</translation>
+    </message>
+    <message>
+      <location/>
+      <source>IP addresses for cameras, and servers, groups for users, etc.</source>
+      <translation>カメラのIPアドレス、サーバー、ユーザーのグループなど</translation>
     </message>
   </context>
   <context>

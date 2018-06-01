@@ -460,7 +460,7 @@ public:
 
     /**
      * Start listening for incoming connections.
-     * @param queueLen Size of queue of fully established connections
+     * @param backlog Size of queue of fully established connections
      *   waiting for AbstractStreamServerSocket::accept().
      *   If queue is full and new connection arrives, it receives ECONNREFUSED error.
      * @return false on error.
@@ -472,7 +472,7 @@ public:
      * @return NULL in case of error (use SystemError::getLastOSErrorCode() to get error description).
      * NOTE: Uses read timeout.
      */
-    virtual AbstractStreamSocket* accept() = 0;
+    virtual std::unique_ptr<AbstractStreamSocket> accept() = 0;
     /**
      * Starts async accept operation.
      * @param handler functor with following signature:

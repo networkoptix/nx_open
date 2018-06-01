@@ -209,8 +209,6 @@ static const QString kHanwhaMaxLengthAttribute = lit("maxlen");
 
 static const int kHanwhaConfigurationNotFoundError = 612;
 
-static const QString kHanwhaNvrDeviceType = lit("NVR");
-
 static const QString kHanwhaNormalizedSpeedPtzTrait("NormalizedSpeed");
 static const QString kHanwhaHas3AxisPtz("3AxisPTZ");
 static const QString kHanwhaSimpleFocusTrait("SimpleFocusTrait");

@@ -45,9 +45,9 @@ private:
     void currentWorkbenchWidgetChanged(Qn::ItemRole role);
     void updateTabs();
 
-    void setupEventSearch();
     void setupMotionSearch();
     void setupBookmarkSearch();
+    void setupEventSearch();
     void setupAnalyticsSearch();
 
     void updateUnreadCounter(int count, QnNotificationLevel::Value importance);

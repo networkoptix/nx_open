@@ -53,8 +53,8 @@ void toUrlParams(const ApiTranLogFilter&, QUrlQuery* query);
 
 bool parseHttpRequestParams(
     QnCommonModule* commonModule,
-    const QString& command, const QnRequestParamList& params, nullptr_t*);
-void toUrlParams(const nullptr_t&, QUrlQuery* query);
+    const QString& command, const QnRequestParamList& params, std::nullptr_t*);
+void toUrlParams(const std::nullptr_t&, QUrlQuery* query);
 
 bool parseHttpRequestParams(
     QnCommonModule* commonModule,

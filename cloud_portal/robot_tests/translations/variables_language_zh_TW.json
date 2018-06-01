@@ -43,6 +43,7 @@
     "ACTIVATE YOUR ACCOUNT EMAIL SUBJECT": "啟動您的帳號",
     "RESET PASSWORD EMAIL SUBJECT": "重設您的密碼",
     "INVITED TO SYSTEM EMAIL SUBJECT": "有人分享影像 {{message.system_name}} 給您",
+    "INVITED TO SYSTEM EMAIL SUBJECT UNREGISTERED": "{{message.sharer_name}} invites you to %PRODUCT_NAME%",
     "DISCONNECT FORM HEADER TEXT": "是否從 %PRODUCT_NAME% 中斷開系統?",
     "FIRST NAME IS REQUIRED TEXT": "名為必填欄位",
     "LAST NAME IS REQUIRED TEXT": "姓為必填欄位",
@@ -57,5 +58,6 @@
     "PASSWORD IS WEAK TEXT": "使用數字, 大寫和小寫字母及特殊字元使您密碼更強",
     "THIS LINK IS BROKEN TEXT": "This link is broken,<br>\n            System may be disconnected from %PRODUCT_NAME%,<br>\n            Access to this System may be revoked, <br>\n            or you may be logged into a different account",
     "PAGE NOT FOUND": "找不到頁面",
-    "TAKE ME HOME": "回主頁面"
+    "TAKE ME HOME": "回主頁面",
+    "OPEN NX WITNESS BUTTON TEXT": "Open %VMS_NAME%"
 }

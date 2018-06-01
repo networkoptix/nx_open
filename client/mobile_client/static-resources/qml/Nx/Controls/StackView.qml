@@ -7,6 +7,28 @@ StackView
 
     property int transitionDuration: 200
 
+    function safePush(url, properties, operation)
+    {
+        var item = d.safeCreatePageComponent(url, properties)
+        return item
+            ? push(item, properties, d.safeOperation(operation))
+            : undefined
+    }
+
+    function safeReplace(target, url, properties, operation)
+    {
+        var item = d.safeCreatePageComponent(url, properties)
+        return item
+            ? replace(target, item, properties, d.safeOperation(operation))
+            : undefined
+    }
+
+    onBusyChanged:
+    {
+        if (!busy && currentItem)
+            currentItem.forceActiveFocus()
+    }
+
     QtObject
     {
         id: d
@@ -42,6 +64,32 @@ StackView
             var dy = scaleInYHint - stackView.height / 2
             var normalized = Math.max(Math.abs(dy), maxShift)
             return dy > 0 ? normalized : -normalized
+        }
+
+        function safeOperation(operation)
+        {
+            return busy ? StackView.Immediate : operation
+        }
+
+        function safeCreatePageComponent(url, properties)
+        {
+            var component = Qt.createComponent(url)
+            var item = properties
+                ? component.createObject(null, properties)
+                : component.createObject(null)
+
+            var error = component.errorString();
+            if (error.length)
+            {
+                console.log(error);
+            }
+
+            if (currentItem && currentItem.objectName == item.objectName)
+            {
+                item.destroy()
+                return undefined
+            }
+            return item
         }
     }
 

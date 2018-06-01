@@ -990,7 +990,7 @@ void QnResourceTreeModel::at_resPool_resourceRemoved(const QnResourcePtr& resour
     if (!resource)
         return;
 
-    disconnect(resource, NULL, this, NULL);
+    resource->disconnect(this);
 
     QList<QnResourceTreeModelNodePtr> nodesToDelete;
     for (auto node: m_allNodes)

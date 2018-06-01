@@ -334,7 +334,7 @@
         }
     },
 
-    "QnPanel": {
+    "nx::client::desktop::Panel": {
         "palette": {
             "default": {
                 "window": "dark8",
@@ -343,7 +343,7 @@
         }
     },
 
-    "QnMainWindow": {
+    "nx::client::desktop::ui::MainWindow": {
         "palette": { "default": {
             "window": "dark4"
         }}
@@ -828,7 +828,7 @@
         ]
     },
 
-    "QnFisheyeCalibrationWidget": {
+    "nx::client::desktop::FisheyeCalibrationWidget": {
         "palette": { "default": { "window": "dark4" } }
     },
 

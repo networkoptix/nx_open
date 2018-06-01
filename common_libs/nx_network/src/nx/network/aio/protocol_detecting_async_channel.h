@@ -55,6 +55,9 @@ public:
         std::unique_ptr<AbstractProtocolRule> detectionRule,
         ProtocolProcessorFactoryFunc delegateFactoryFunc);
 
+    void detectProtocol(
+        nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode)> completionHandler);
+
 protected:
     /**
      * NOTE: setDataSource call MUST follow this initilizer.
@@ -88,11 +91,15 @@ private:
     std::tuple<nx::Buffer*, IoCompletionHandler> m_pendingAsyncRead;
     nx::Buffer m_readBuffer;
     nx::Buffer m_readDataCache;
+    nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode)>
+        m_protocolDetectionCompletionHandler;
+
+    void completePendingAsyncRead(SystemError::ErrorCode protocolDetectionResultCode);
 
     std::unique_ptr<AsyncChannelInterface> useDataSourceDirectly(
         std::unique_ptr<AsyncChannelInterface> dataSource);
 
-    void detectProtocol();
+    void readProtocolHeaderAsync();
 
     void analyzeReadResult(
         SystemError::ErrorCode systemErrorCode,
@@ -153,6 +160,8 @@ void BaseProtocolDetectingAsyncChannel<Base, AsyncChannelInterface>::readSomeAsy
     nx::Buffer* const buffer,
     IoCompletionHandler handler)
 {
+    using namespace std::placeholders;
+
     if (m_delegate)
         return m_delegate->readSomeAsync(buffer, std::move(handler));
 
@@ -163,7 +172,9 @@ void BaseProtocolDetectingAsyncChannel<Base, AsyncChannelInterface>::readSomeAsy
                 return m_delegate->readSomeAsync(buffer, std::move(handler));
 
             m_pendingAsyncRead = std::make_tuple(buffer, std::move(handler));
-            detectProtocol();
+            detectProtocol(
+                std::bind(&BaseProtocolDetectingAsyncChannel::completePendingAsyncRead,
+                    this, _1));
         });
 }
 
@@ -203,6 +214,36 @@ void BaseProtocolDetectingAsyncChannel<Base, AsyncChannelInterface>::registerPro
 }
 
 template<typename Base, typename AsyncChannelInterface>
+void BaseProtocolDetectingAsyncChannel<Base, AsyncChannelInterface>::detectProtocol(
+    nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode)> completionHandler)
+{
+    this->post(
+        [this, completionHandler = std::move(completionHandler)]() mutable
+        {
+            NX_ASSERT(!m_delegate);
+            m_protocolDetectionCompletionHandler = std::move(completionHandler);
+            readProtocolHeaderAsync();
+        });
+}
+
+template<typename Base, typename AsyncChannelInterface>
+void BaseProtocolDetectingAsyncChannel<Base, AsyncChannelInterface>::completePendingAsyncRead(
+    SystemError::ErrorCode protocolDetectionResultCode)
+{
+    if (protocolDetectionResultCode != SystemError::noError)
+    {
+        return nx::utils::swapAndCall(
+            std::get<1>(m_pendingAsyncRead), protocolDetectionResultCode, -1);
+    }
+
+    NX_ASSERT(m_delegate);
+
+    m_delegate->readSomeAsync(
+        std::get<0>(m_pendingAsyncRead),
+        std::move(std::get<1>(m_pendingAsyncRead)));
+}
+
+template<typename Base, typename AsyncChannelInterface>
 void BaseProtocolDetectingAsyncChannel<Base, AsyncChannelInterface>::cleanUp()
 {
     m_dataSource.reset();
@@ -234,7 +275,7 @@ std::unique_ptr<AsyncChannelInterface>
 }
 
 template<typename Base, typename AsyncChannelInterface>
-void BaseProtocolDetectingAsyncChannel<Base, AsyncChannelInterface>::detectProtocol()
+void BaseProtocolDetectingAsyncChannel<Base, AsyncChannelInterface>::readProtocolHeaderAsync()
 {
     using namespace std::placeholders;
 
@@ -249,12 +290,14 @@ void BaseProtocolDetectingAsyncChannel<Base, AsyncChannelInterface>::detectProto
 template<typename Base, typename AsyncChannelInterface>
 void BaseProtocolDetectingAsyncChannel<Base, AsyncChannelInterface>::analyzeReadResult(
     SystemError::ErrorCode osErrorCode,
-    std::size_t bytesRead)
+    std::size_t /*bytesRead*/)
 {
     if (osErrorCode != SystemError::noError)
     {
-        return nx::utils::swapAndCall(
-            std::get<1>(m_pendingAsyncRead), osErrorCode, bytesRead);
+        nx::utils::swapAndCall(
+            m_protocolDetectionCompletionHandler,
+            osErrorCode);
+        return;
     }
 
     decltype(m_readBuffer) readBuffer;
@@ -262,16 +305,13 @@ void BaseProtocolDetectingAsyncChannel<Base, AsyncChannelInterface>::analyzeRead
 
     if (!analyzeMoreData(std::move(readBuffer)))
     {
-        detectProtocol();
+        readProtocolHeaderAsync();
         return;
     }
 
-    if (m_delegate)
-    {
-        m_delegate->readSomeAsync(
-            std::get<0>(m_pendingAsyncRead),
-            std::move(std::get<1>(m_pendingAsyncRead)));
-    }
+    nx::utils::swapAndCall(
+        m_protocolDetectionCompletionHandler,
+        SystemError::noError);
 }
 
 template<typename Base, typename AsyncChannelInterface>

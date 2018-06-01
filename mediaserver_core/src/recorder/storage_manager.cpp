@@ -1638,9 +1638,6 @@ void QnStorageManager::clearSpace(bool forced)
     if (backupOnAndTimerTriggered)
         return;
 
-    if (m_firstStoragesTestDone)
-        testOfflineStorages();
-
     // 1. delete old data if cameras have max duration limit
     clearMaxDaysData();
 
@@ -2368,6 +2365,17 @@ void QnStorageManager::startAuxTimerTasks()
         },
         kRemoveEmptyDirsInterval,
         kRemoveEmptyDirsInterval);
+
+
+    static const std::chrono::seconds kTestStorageInterval(40);
+    m_auxTasksTimerManager.addNonStopTimer(
+        [this](nx::utils::TimerId)
+        {
+            if (m_firstStoragesTestDone)
+                testOfflineStorages();
+        },
+        kTestStorageInterval,
+        kTestStorageInterval);
 }
 
 void QnStorageManager::testOfflineStorages()

@@ -80,7 +80,7 @@ should trim leading and trailing spaces
 should display Open Nx Witness button after activation, if user is registered by link /register/?from=client
     [tags]    email
     ${email}    Get Random Email    ${BASE EMAIL}
-    Go To    ${url}/register
+    Go To    ${url}/register?from=client
     Register    ${SPACE}mark${SPACE}    ${SPACE}hamill${SPACE}    ${email}    ${password}
     Activate    ${email}
     Log In    ${email}    ${password}    button=${SUCCESS LOG IN BUTTON}
@@ -91,7 +91,7 @@ should display Open Nx Witness button after activation, if user is registered by
 should display Open Nx Witness button after activation, if user is registered by link /register/?from=mobile
     [tags]    email
     ${email}    Get Random Email    ${BASE EMAIL}
-    Go To    ${url}/register
+    Go To    ${url}/register?from=mobile
     Register    ${SPACE}mark${SPACE}    ${SPACE}hamill${SPACE}    ${email}    ${password}
     Activate    ${email}
     Log In    ${email}    ${password}    button=${SUCCESS LOG IN BUTTON}

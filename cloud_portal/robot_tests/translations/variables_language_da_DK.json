@@ -43,6 +43,7 @@
     "ACTIVATE YOUR ACCOUNT EMAIL SUBJECT": "Aktivér din konto",
     "RESET PASSWORD EMAIL SUBJECT": "Nulstil din adgangskode",
     "INVITED TO SYSTEM EMAIL SUBJECT": "Video system {{message.system_name}} was shared with you",
+    "INVITED TO SYSTEM EMAIL SUBJECT UNREGISTERED": "{{message.sharer_name}} invites you to %PRODUCT_NAME%",
     "DISCONNECT FORM HEADER TEXT": "Disconnect System from %PRODUCT_NAME%?",
     "FIRST NAME IS REQUIRED TEXT": "Fornavn er påkrævet",
     "LAST NAME IS REQUIRED TEXT": "Efternavn er påkrævet",
@@ -57,5 +58,6 @@
     "PASSWORD IS WEAK TEXT": "Use numbers, upper and lower case letters and special characters to make your password stronger",
     "THIS LINK IS BROKEN TEXT": "This link is broken,<br>\n            System may be disconnected from %PRODUCT_NAME%,<br>\n            Access to this System may be revoked, <br>\n            or you may be logged into a different account",
     "PAGE NOT FOUND": "Page not found",
-    "TAKE ME HOME": "Take me home"
+    "TAKE ME HOME": "Take me home",
+    "OPEN NX WITNESS BUTTON TEXT": "Open %VMS_NAME%"
 }
