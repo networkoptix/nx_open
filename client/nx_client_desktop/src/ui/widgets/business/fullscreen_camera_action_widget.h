@@ -23,6 +23,7 @@ protected:
 private:
     void updateCameraButton();
     void updateLayoutButton();
+    void updateWarningLabel();
     void openCameraSelectionDialog();
     void openLayoutSelectionDialog();
 

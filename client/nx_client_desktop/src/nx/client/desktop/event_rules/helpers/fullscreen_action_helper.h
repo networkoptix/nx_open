@@ -40,6 +40,8 @@ public:
         const QnLayoutResourceList& layouts);
     static QSet<QnUuid> setLayoutIds(const QnBusinessRuleViewModel* model,
         const QSet<QnUuid>& layoutIds);
+
+    static bool cameraExistOnLayouts(const QnBusinessRuleViewModel* model);
 };
 
 } // namespace desktop

@@ -201,6 +201,20 @@ QSet<QnUuid> FullscreenActionHelper::setLayoutIds(
     return result;
 }
 
+bool FullscreenActionHelper::cameraExistOnLayouts(const QnBusinessRuleViewModel* model)
+{
+    const auto camera = getCameraInternal(model);
+    if (!camera)
+        return true;
+
+    const auto layouts = getLayoutsInternal(model);
+    return std::all_of(layouts.cbegin(), layouts.cend(),
+        [id = camera->getId()](const auto& layout)
+        {
+            return layout->layoutResourceIds().contains(id);
+        });
+}
+
 } // namespace desktop
 } // namespace client
 } // namespace nx

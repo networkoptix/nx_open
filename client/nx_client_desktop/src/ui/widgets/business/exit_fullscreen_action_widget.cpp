@@ -95,7 +95,6 @@ void QnExitFullscreenActionWidget::openLayoutSelectionDialog()
     model()->setActionResourcesRaw(
         ExitFullscreenActionHelper::setLayoutIds(model().data(), dialog.checkedLayouts()));
 
-    // checkWarnings();
     updateLayoutButton();
 }
 

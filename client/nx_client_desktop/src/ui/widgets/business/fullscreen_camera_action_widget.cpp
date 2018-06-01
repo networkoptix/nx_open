@@ -22,6 +22,7 @@ QnFullscreenCameraActionWidget::QnFullscreenCameraActionWidget(QWidget* parent):
 {
     ui->setupUi(this);
     ui->layoutWarningWidget->setVisible(false);
+    setWarningStyle(ui->layoutWarningWidget);
 
     connect(
         ui->useSourceCheckBox,
@@ -109,6 +110,21 @@ void QnFullscreenCameraActionWidget::updateLayoutButton()
     button->setIcon(FullscreenActionHelper::layoutIcon(model().data()));
 }
 
+void QnFullscreenCameraActionWidget::updateWarningLabel()
+{
+    const bool valid = FullscreenActionHelper::cameraExistOnLayouts(model().data());
+    ui->layoutWarningWidget->setHidden(valid);
+
+    if (!valid)
+    {
+        const auto layoutCount = FullscreenActionHelper::layoutIds(model().data()).size();
+        ui->layoutWarningWidget->setText(
+            tr("This camera is not currently on some of the selected layouts. "
+                "Action will work if camera will be added before action triggers.",
+                "", layoutCount));
+    }
+}
+
 void QnFullscreenCameraActionWidget::openCameraSelectionDialog()
 {
     if (!model() || m_updating)
@@ -126,6 +142,7 @@ void QnFullscreenCameraActionWidget::openCameraSelectionDialog()
     model()->setActionResourcesRaw(
         FullscreenActionHelper::setCameraIds(model().data(), dialog.selectedResources()));
     updateCameraButton();
+    updateWarningLabel();
 }
 
 void QnFullscreenCameraActionWidget::openLayoutSelectionDialog()
@@ -162,7 +179,7 @@ void QnFullscreenCameraActionWidget::openLayoutSelectionDialog()
     model()->setActionResourcesRaw(
         FullscreenActionHelper::setLayoutIds(model().data(), dialog.checkedLayouts()));
 
-    // checkWarnings();
+    updateWarningLabel();
     updateLayoutButton();
 }
 
@@ -178,4 +195,5 @@ void QnFullscreenCameraActionWidget::paramsChanged()
     model()->setActionParams(params);
 
     updateCameraButton();
+    updateWarningLabel();
 }
