@@ -1,6 +1,9 @@
-$font-family-base:        "Roboto", "Helvetica Neue", Helvetica, Arial, sans-serif;
+$font-family-base : "Roboto", "Helvetica Neue", Helvetica, Arial, sans-serif;
+$font-family-regular : "robotoregular", "Helvetica Neue", Helvetica, Arial, sans-serif;
+$font-family-medium : "robotomedium", "Helvetica Neue", Helvetica, Arial, sans-serif;
+$font-family-light : "robotolight", "Helvetica Neue", Helvetica, Arial, sans-serif;
 
-
+@import '~sass-rem/rem';
 @import '_theme_palette';
 
 // Brand colors
@@ -51,25 +54,33 @@ $modal-header-border-color:   transparent;
 $modal-content-border-color:  transparent;
 $panel-default-heading-bg:    transparent;
 
+// Fonts
 $rem-baseline: 13px;
 
-$font-size-base : 1rem; // Assumes the browser default, typically `16px`
+$font-size-base : rem($rem-baseline); // Assumes the browser default, typically `16px`
 $font-size-lg : $font-size-base * 1.25;
 $font-size-sm : $font-size-base * .785;
 
-$h1-font-size : rem(22px); //$font-size-base * 1.4;
-$h2-font-size : rem(20px); //$font-size-base * 1.3;
-$h3-font-size : $font-size-base * 1.2;
-$h4-font-size : $font-size-base * 1;
-$h5-font-size : $font-size-base;
-$h6-font-size : rem(12px); //$font-size-base * .875;
+$h1-font-size : rem(22px); // $font-size-base * 1.4;
+$h2-font-size : rem(22px); // $font-size-base * 1.3;
+$h3-font-size : rem(18px); // $font-size-base * 1.2;
+$h4-font-size : rem(15px); // $font-size-base * 1;
+$h5-font-size : rem(14px); // $font-size-base;
+$h6-font-size : rem(14px); // $font-size-base * .875;
+
+// Font colors
+$font-color-medium : $dark9;
+$font-color-regular : $dark9;
+$font-color-light : $light16;
+$font-color-disabled : $light10;
+$font-color-error : $red_l2;
 
 $btn-font-weight:         bold;
 $headings-font-weight:    lighter;
 
 $border-radius-base:      2px;
 $border-radius-large:     4px;
-$border-radius-small:     2px;
+$border-radius-small:     $border-radius-base;
 
 // Variables from Bootstrap 3 ****************************
 $line-height-base : 1.5 !default;
