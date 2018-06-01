@@ -122,11 +122,7 @@ void WebSocket::handleSocketRead(SystemError::ErrorCode ecode, size_t bytesRead)
                 [this](bool errorOccured)
                 {
                     if (errorOccured)
-                    {
-                        NX_DEBUG(this,
-                            lm("Handle while parsing read data error: %1").arg(m_lastError));
                         return;
-                    }
 
                     processReadData();
                 });
