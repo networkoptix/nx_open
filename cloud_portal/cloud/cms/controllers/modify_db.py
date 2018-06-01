@@ -226,7 +226,7 @@ def upload_file(data_structure, file):
     file_errors = []
     encoded_file = None
     file_dimensions = None
-    file_size = file.size / 1048576
+    file_size = file.size / 1048576.0
     if file_size >= settings.CMS_MAX_FILE_SIZE:
         file_errors.append((data_structure.name, 'Its size was {}MB but must be less than {} MB'
                             .format(file_size, settings.CMS_MAX_FILE_SIZE)))
@@ -240,7 +240,7 @@ def upload_file(data_structure, file):
     except (IOError, TypeError):
         file_errors.append((data_structure.name, "Image is damaged please upload an valid version"))
 
-    if not encoded_file:
+    if not encoded_file and file_size > 0:
         error_msg = "Invalid file type. Uploaded file is {}. It should be {}." \
             .format(file.content_type,
                     data_structure.meta_settings['format'].replace(',', ' or '))
