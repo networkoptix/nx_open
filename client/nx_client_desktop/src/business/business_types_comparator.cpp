@@ -127,9 +127,28 @@ QList<ActionType> QnBusinessTypesComparator::getAllActions() const
         : allActions();
 }
 
-QList<ActionType> QnBusinessTypesComparator::lexSortedActions() const
+QList<ActionType> QnBusinessTypesComparator::lexSortedActions(ActionSubType subtype) const
 {
-    auto actions = getAllActions();
+    static QSet<ActionType> clientsideActions{
+        ActionType::showOnAlarmLayoutAction,
+        ActionType::fullscreenCameraAction,
+        ActionType::exitFullscreenAction
+    };
+
+    auto allowedActions = getAllActions().toSet();
+    switch (subtype)
+    {
+        case ActionSubType::server:
+            allowedActions -= clientsideActions;
+            break;
+        case ActionSubType::client:
+            allowedActions.intersect(clientsideActions);
+            break;
+        default:
+            break;
+    }
+
+    QList<ActionType> actions = allowedActions.toList();
     std::sort(actions.begin(), actions.end(),
         [this](ActionType l, ActionType r)
         {

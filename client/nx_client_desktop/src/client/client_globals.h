@@ -145,6 +145,7 @@ namespace Qn
 
         /* Arguments. */
         ActionIdRole,
+        LayoutNameRole,                             /**< Role for layout delayed drop */
         SerializedDataRole,
         ConnectionInfoRole,
         FocusElementRole,

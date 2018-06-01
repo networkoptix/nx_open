@@ -120,25 +120,33 @@ void ManagerPool::initExistingResources()
 
 void ManagerPool::at_resourceAdded(const QnResourcePtr& resource)
 {
+    auto camera = resource.dynamicCast<QnSecurityCamResource>();
+    if (!camera)
+        return;
+
     NX_VERBOSE(
         this,
         lm("Resource %1 (%2) has been added.")
             .args(resource->getName(), resource->getId()));
 
     connect(
-        resource.data(), &QnResource::statusChanged,
+        resource, &QnResource::statusChanged,
         this, &ManagerPool::handleResourceChanges);
 
     connect(
-        resource.data(), &QnResource::parentIdChanged,
+        resource, &QnResource::parentIdChanged,
         this, &ManagerPool::handleResourceChanges);
 
     connect(
-        resource.data(), &QnResource::urlChanged,
+        resource, &QnResource::urlChanged,
         this, &ManagerPool::handleResourceChanges);
 
     connect(
-        resource.data(), &QnResource::propertyChanged,
+        camera, &QnSecurityCamResource::logicalIdChanged,
+        this, &ManagerPool::handleResourceChanges);
+
+    connect(
+        resource, &QnResource::propertyChanged,
         this, &ManagerPool::at_propertyChanged);
 
     handleResourceChanges(resource);
@@ -167,6 +175,8 @@ void ManagerPool::at_resourceRemoved(const QnResourcePtr& resource)
     auto camera = resource.dynamicCast<QnSecurityCamResource>();
     if (!camera)
         return;
+
+    camera->disconnect(this);
 
     QnMutexLocker lock(&m_contextMutex);
     m_contexts.erase(resource->getId());
@@ -821,7 +831,7 @@ bool ManagerPool::cameraInfoFromResource(
     outCameraInfo->channel = camera->getChannel();
 
     // If getLogicalId() returns incorrect number, logicalId is set to 0.
-    outCameraInfo->logicalId = atoi(camera->getLogicalId().toStdString().c_str());
+    outCameraInfo->logicalId = camera->getLogicalId().toInt();
 
     return true;
 }

@@ -61,6 +61,7 @@ QnStartupParameters QnStartupParameters::fromCommandLineArg(int argc, char** arg
     addParserParam(commandLineParser, &result.screen, kScreenKey);
     addParserParam(commandLineParser, &result.delayedDrop, "--delayed-drop");
     addParserParam(commandLineParser, &result.instantDrop, "--instant-drop");
+    addParserParam(commandLineParser, &result.layoutName, "--layout-name");
 
     /* Development options */
     addParserParam(commandLineParser, &result.dynamicCustomizationPath,"--customization");

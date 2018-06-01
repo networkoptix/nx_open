@@ -98,6 +98,8 @@ QString StringsHelper::actionName(ActionType value) const
         case ActionType::execHttpRequestAction:   return tr("Do HTTP request");
         case ActionType::acknowledgeAction:       return tr("Acknowledge");
         case ActionType::openLayoutAction:        return tr("Open layout");
+        case ActionType::fullscreenCameraAction:  return tr("Set to fullscreen");
+        case ActionType::exitFullscreenAction:    return tr("Exit fullscreen");
 
         case ActionType::cameraOutputAction:
             return QnDeviceDependentStrings::getDefaultNameFromSet(
