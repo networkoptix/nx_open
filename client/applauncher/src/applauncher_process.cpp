@@ -378,7 +378,8 @@ bool ApplauncherProcess::startApplication(
     const QString binPath = installation->executableFilePath();
     QStringList environment = QProcess::systemEnvironment();
 
-    QStringList arguments = task->appArgs.split(QLatin1String(" "), QString::SkipEmptyParts);
+
+    auto arguments = task->appArgs;
     if (!m_devModeKey.isEmpty())
         arguments.append(QString::fromLatin1("--dev-mode-key=%1").arg(devModeKey()));
 

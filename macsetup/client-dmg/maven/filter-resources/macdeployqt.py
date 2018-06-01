@@ -69,13 +69,6 @@ def prepare(binary, sbindir, tlibdir):
     yield binary
     yield applauncher_binary
 
-    handler_bin_dir = join(tbindir, '@protocol_handler_app_name@/Contents/MacOS')
-    handler_binary = join(handler_bin_dir, 'applet')
-    handler_script = join(handler_bin_dir, 'run')
-
-    os.chmod(handler_binary, 0755)
-    os.chmod(handler_script, 0755)
-
     ignore = shutil.ignore_patterns('*debug*', '.*')
     for subfolder in 'platforms', 'imageformats', 'audio', 'mediaservice':
         tfolder = join(tbindir, subfolder)

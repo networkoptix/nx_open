@@ -42,7 +42,8 @@ int QnClientAppInfo::videoWallIconId()
 
 QString QnClientAppInfo::protocolHandlerBundleName()
 {
-    return QStringLiteral("${protocol_handler_app_name}");
+    //TODO: remove this variable before review
+    return QString();
 }
 
 QString QnClientAppInfo::protocolHandlerBundleIdBase()
