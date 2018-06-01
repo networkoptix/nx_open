@@ -36,7 +36,7 @@ QString commandToParameterName(HanwhaConfigurationalPtzCommandType command)
             return lit("Zoom");
         default:
             NX_ASSERT(false, lit("Wrong command type. We should never be here."));
-            QString();
+            return QString();
     }
 }
 
