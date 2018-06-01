@@ -170,12 +170,7 @@ void ManagerPool::at_resourceRemoved(const QnResourcePtr& resource)
     if (!camera)
         return;
 
-    disconnect(camera, &QnResource::statusChanged, this, &ManagerPool::handleResourceChanges);
-    disconnect(camera, &QnResource::parentIdChanged, this, &ManagerPool::handleResourceChanges);
-    disconnect(camera, &QnResource::urlChanged, this, &ManagerPool::handleResourceChanges);
-    disconnect(camera, &QnSecurityCamResource::logicalIdChanged, this, &ManagerPool::handleResourceChanges);
-    disconnect(camera, &QnResource::propertyChanged, this, &ManagerPool::at_propertyChanged);
-
+    camera->disconnect(this);
     releaseResourceMetadataManagers(camera);
 }
 
