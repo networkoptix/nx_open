@@ -1356,12 +1356,7 @@ CameraDiagnostics::Result HanwhaResource::initPtz()
     if ((m_ptzCapabilities & Ptz::AbsolutePtzCapabilities) == Ptz::AbsolutePtzCapabilities)
         m_ptzCapabilities |= Ptz::DevicePositioningPtzCapability;
 
-    const bool needToInitAlternativePtz =
-        !m_ptzCapabilities.testFlag(Ptz::ContinuousFocusCapability)
-        && !m_ptzCapabilities.testFlag(Ptz::ContinuousZoomCapability);
-
-    if (needToInitAlternativePtz)
-        initAlternativePtz();
+    initAlternativePtz();
 
     m_ptzLimits = calculatePtzLimits(m_attributes, m_cgiParameters, getChannel());
     m_ptzTraits.append(calculatePtzTraits());
@@ -1381,6 +1376,13 @@ CameraDiagnostics::Result HanwhaResource::initAlternativePtz()
     {
         const auto& trait = item.second;
         const auto& traitName = item.first;
+
+        if (ini().forceLensControl)
+        {
+            // Add all possible traits.
+            m_ptzTraits.push_back(traitName);
+            continue;
+        }
 
         bool hasTrait = true;
         if (trait.supportAttribute.isEmpty())
@@ -2593,32 +2595,35 @@ QnCameraAdvancedParams HanwhaResource::filterParameters(
     for (const auto& id: allParameters.allParameterIds())
     {
         const auto parameter = allParameters.getParameterById(id);
-        #if 1 //< TODO: #dmishin properly handle lens control parameters
-        static const std::set<QString> kLensControlParameters = {
-            lit("custom_ptr"),
-            lit("custom_zoom"),
-            lit("custom_focus")
-        };
-
-        if (kLensControlParameters.find(parameter.writeCmd) != kLensControlParameters.cend())
-        {
-            supportedIds.insert(parameter.id);
-            continue;
-        }
-        #endif
-
         const auto info = advancedParameterInfo(parameter.id);
-
         if (!info)
             continue;
 
-        if (info->isService())
+        if (info->isService()) //< E.g, "Reset profiles to default" button.
         {
             supportedIds.insert(id);
             continue;
         }
 
-        bool needToCheck = parameter.dataType == QnCameraAdvancedParameter::DataType::Number
+        const auto ptzTraits = info->ptzTraits();
+        if (!ptzTraits.isEmpty())
+        {
+            bool supported = true;
+            for (const auto& trait: ptzTraits)
+            {
+                // All PTZ traits declared by control must be supported.
+                supported = m_ptzTraits.contains(trait);
+                if (!supported)
+                    break;
+            }
+
+            if (supported)
+                supportedIds.insert(id);
+
+            continue;
+        }
+
+        const bool needToCheck = parameter.dataType == QnCameraAdvancedParameter::DataType::Number
             || parameter.dataType == QnCameraAdvancedParameter::DataType::Enumeration;
 
         if (needToCheck && parameter.range.isEmpty())
