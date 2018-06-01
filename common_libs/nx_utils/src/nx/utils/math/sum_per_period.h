@@ -98,8 +98,8 @@ public:
     }
 
 private:
-    const int m_subPeriodCount;
-    const std::chrono::microseconds m_subperiod;
+    int m_subPeriodCount;
+    std::chrono::microseconds m_subperiod;
     std::deque<Value> m_sumPerSubperiod;
     std::optional<std::chrono::steady_clock::time_point> m_currentPeriodStart;
 
@@ -117,7 +117,8 @@ private:
         {
             const auto lastPeriodStart =
                 *m_currentPeriodStart - (m_subPeriodCount - 1) * m_subperiod;
-            if (lastPeriodStart > deadline)
+            const auto lastPeriodEnd = lastPeriodStart + m_subperiod;
+            if (lastPeriodEnd > deadline)
             {
                 break;
             }
