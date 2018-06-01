@@ -34,12 +34,19 @@ public:
     /** Get list of all supported analytics events in the system. */
     QList<EventDescriptor> systemSupportedAnalyticsEvents() const;
 
+    /** Get list of all camera-independent analytics events in the system. */
+    QList<EventDescriptor> systemCameraIndependentAnalyticsEvents() const;
+
     EventDescriptor eventDescriptor(const QnUuid& eventId) const;
     nx::api::Analytics::Group groupDescriptor(const QnUuid& groupId) const;
 
     /** Get list of all supported analytics events for the given cameras. */
     static QList<EventDescriptor> supportedAnalyticsEvents(
         const QnVirtualCameraResourceList& cameras);
+
+    /** Get list of all camera-independent analytics events from given servers. */
+    static QList<EventDescriptor> cameraIndependentAnalyticsEvents(
+        const QnMediaServerResourceList& servers);
 
     static bool hasDifferentDrivers(const QList<EventDescriptor>& events);
 

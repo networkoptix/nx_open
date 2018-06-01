@@ -137,6 +137,12 @@ QList<AnalyticsHelper::EventDescriptor> AnalyticsHelper::systemSupportedAnalytic
     return result;
 }
 
+QList<AnalyticsHelper::EventDescriptor> AnalyticsHelper::systemCameraIndependentAnalyticsEvents()
+    const
+{
+    return cameraIndependentAnalyticsEvents(resourcePool()->getAllServers(Qn::AnyStatus));
+}
+
 QList<AnalyticsHelper::EventDescriptor> AnalyticsHelper::supportedAnalyticsEvents(
     const QnVirtualCameraResourceList& cameras)
 {
@@ -163,6 +169,28 @@ QList<AnalyticsHelper::EventDescriptor> AnalyticsHelper::supportedAnalyticsEvent
             }
         }
     }
+    return result;
+}
+
+QList<AnalyticsHelper::EventDescriptor> AnalyticsHelper::cameraIndependentAnalyticsEvents(
+    const QnMediaServerResourceList& servers)
+{
+    QList<EventDescriptor> result;
+    AnalyticsEventTypeWithRefStorage storage(&result);
+
+    for (const auto& server: servers)
+    {
+        for (const auto& manifest: server->analyticsDrivers())
+        {
+            if (manifest.capabilities.testFlag(
+                nx::api::AnalyticsDriverManifestBase::Capability::cameraModelIndependent))
+            {
+                for (const auto& eventType: manifest.outputEventTypes)
+                    storage.addUnique(manifest, eventType);
+            }
+        }
+    }
+
     return result;
 }
 
