@@ -1,6 +1,8 @@
-import { Component } from '@angular/core';
-import { TranslateService }  from "@ngx-translate/core";
-import { CookieService }     from "ngx-cookie-service";
+import { Location }              from '@angular/common';
+import { Component }             from '@angular/core';
+import { TranslateService }      from "@ngx-translate/core";
+import { CookieService }         from "ngx-cookie-service";
+import { DeviceDetectorService } from "ngx-device-detector";
 
 @Component({
     selector: 'nx-app',
@@ -11,9 +13,46 @@ import { CookieService }     from "ngx-cookie-service";
 })
 
 export class AppComponent {
+    deviceInfo: any;
+    allowedDevices: {};
 
     constructor(private cookieService: CookieService,
+                private deviceService: DeviceDetectorService,
+                private location: Location,
                 translate: TranslateService) {
+
+        // TODO: Componetize this
+        this.allowedDevices = {
+            windows: {
+                ie: 10,
+                safari: 10,
+                chrome: 64,
+                firefox: 60
+            },
+            mac: {
+                safari: 10,
+                chrome: 64,
+                firefox: 60
+            },
+            linux: {
+                chrome: 64,
+                firefox: 60
+            }
+        };
+
+        this.deviceInfo = this.deviceService.getDeviceInfo();
+
+        let allowedDevice = this.allowedDevices[this.deviceInfo.os];
+
+        if (allowedDevice !== undefined) {
+            let allowedVersion = allowedDevice[this.deviceInfo.browser] || 0;
+            let majorVersion = this.deviceInfo.browser_version.split('.')[0];
+
+            if (majorVersion < allowedVersion) {
+                // redirect
+                this.location.go('/browser');
+            }
+        } // else -> unknown platform or device ... cross fingers and hope for the best
 
         let langCookie = this.cookieService.get('language'),
             lang = langCookie || translate.getBrowserCultureLang().replace('-', '_');

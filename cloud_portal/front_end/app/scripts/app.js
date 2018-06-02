@@ -99,13 +99,11 @@ window.L = {};
                         // detect preview mode
                         var preview = window.location.href.indexOf('preview') >= 0;
                         if (preview) {
-                            console.log('preview mode');
                             appState.viewsDir = 'preview/' + appState.viewsDir;
                             appState.previewPath = 'preview';
                         }
                     })
                     .fail(function (error) {
-                        //console.log(error);
                         // Fallback to default language
 
                         // if request to api/utils/language fails then
@@ -309,6 +307,9 @@ window.L = {};
                                 template: ''
                             })
                             .when('/download/:platform', {
+                                template: ''
+                            })
+                            .when('/browser', {
                                 template: ''
                             })
                             .when('/', {

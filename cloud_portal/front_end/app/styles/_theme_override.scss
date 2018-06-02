@@ -41,7 +41,7 @@ body{
 h1, h2 {
   margin-top    : $line-height-computed;
   margin-bottom : $line-height-computed;
-  padding       : 0 8px;
+  padding       : 0;
   font-size     : $h1-font-size;
   display       : flex;
   align-items   : center;
@@ -562,7 +562,7 @@ select {
   padding: rem(12px 16px 14px 16px);
 
   .user-name {
-    height: 16px;
+    height: 20px;
   }
 }
 
