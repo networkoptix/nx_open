@@ -48,8 +48,7 @@ TemporaryAccountPasswordManager::~TemporaryAccountPasswordManager()
 
 void TemporaryAccountPasswordManager::authenticateByName(
     const nx::network::http::StringType& username,
-    std::function<bool(const nx::Buffer&)> checkPasswordHash,
-    const nx::utils::stree::AbstractResourceReader& /*authSearchInputData*/,
+    const std::function<bool(const nx::Buffer&)>& checkPasswordHash,
     nx::utils::stree::ResourceContainer* const authProperties,
     nx::utils::MoveOnlyFunc<void(api::ResultCode)> completionHandler)
 {

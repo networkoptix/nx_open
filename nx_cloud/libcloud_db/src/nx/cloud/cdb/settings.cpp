@@ -106,8 +106,25 @@ const QLatin1String kVmsGatewayUrl("vmsGateway/url");
 const QLatin1String kVmsGatewayRequestTimeout("vmsGateway/requestTimeout");
 const std::chrono::milliseconds kDefaultVmsGatewayRequestTimeout(std::chrono::seconds(21));
 
-} // namespace
+//-------------------------------------------------------------------------------------------------
+// LoginLockout
 
+const QLatin1String kLoginLockoutEnabled("loginLockout/enabled");
+constexpr bool kDefaultLoginLockoutEnabled = false;
+
+const QLatin1String kLoginLockoutCheckPeriod("loginLockout/checkPeriod");
+const std::chrono::milliseconds kDefaultLoginLockoutCheckPeriod =
+    nx::network::server::UserLockerSettings().checkPeriod;
+
+const QLatin1String kLoginLockoutAuthFailureCount("loginLockout/authFailureCount");
+constexpr int kDefaultLoginLockoutAuthFailureCount =
+    nx::network::server::UserLockerSettings().authFailureCount;
+
+const QLatin1String kLoginLockoutLockPeriod("loginLockout/lockPeriod");
+constexpr std::chrono::milliseconds kDefaultLoginLockoutLockPeriod =
+    nx::network::server::UserLockerSettings().lockPeriod;
+
+} // namespace
 
 namespace nx {
 namespace cdb {
@@ -216,6 +233,11 @@ const nx::utils::db::ConnectionOptions& Settings::dbConnectionOptions() const
 const Auth& Settings::auth() const
 {
     return m_auth;
+}
+
+std::optional<network::server::UserLockerSettings> Settings::loginLockout() const
+{
+    return m_loginLockout;
 }
 
 const Notification& Settings::notification() const
@@ -338,6 +360,8 @@ void Settings::loadSettings()
 
     loadAuth();
 
+    loadLoginLockout();
+
     //event manager
     m_eventManager.mediaServerConnectionIdlePeriod = duration_cast<seconds>(
         nx::utils::parseTimerDuration(
@@ -400,6 +424,30 @@ void Settings::loadAuth()
 
     m_auth.maxSystemsToUpdateAtATime = settings().value(
         kMaxSystemsToUpdateAtATime, kDefaultMaxSystemsToUpdateAtATime).toInt();
+}
+
+void Settings::loadLoginLockout()
+{
+    const auto loginLockoutEnabled = settings().value(
+        kLoginLockoutEnabled,
+        kDefaultLoginLockoutEnabled ? "true" : "false").toString() == "true";
+
+    if (!loginLockoutEnabled)
+        return;
+
+    m_loginLockout.emplace(network::server::UserLockerSettings());
+
+    m_loginLockout->checkPeriod = nx::utils::parseTimerDuration(
+        settings().value(kLoginLockoutCheckPeriod).toString(),
+        kDefaultLoginLockoutCheckPeriod);
+
+    m_loginLockout->authFailureCount = settings().value(
+        kLoginLockoutAuthFailureCount,
+        kDefaultLoginLockoutAuthFailureCount).toInt();
+
+    m_loginLockout->lockPeriod = nx::utils::parseTimerDuration(
+        settings().value(kLoginLockoutLockPeriod).toString(),
+        kDefaultLoginLockoutLockPeriod);
 }
 
 } // namespace conf

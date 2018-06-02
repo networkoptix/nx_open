@@ -15,7 +15,7 @@ namespace nx {
 namespace cassandra {
 class AbstractAsyncConnection;
 class Query;
-}
+} // namespace cassandra
 
 namespace cloud {
 namespace relay {
@@ -24,15 +24,20 @@ namespace conf { class Settings; }
 
 namespace model {
 
-class RemoteRelayPeerPool: public AbstractRemoteRelayPeerPool
+class RemoteRelayPeerPool:
+    public AbstractRemoteRelayPeerPool
 {
 public:
     RemoteRelayPeerPool(const conf::Settings& settings);
     ~RemoteRelayPeerPool();
 
     virtual bool connectToDb() override;
-    virtual cf::future<std::string> findRelayByDomain( const std::string& domainName) const override;
-    virtual cf::future<bool> addPeer( const std::string& domainName) override;
+    /**
+     * @return cf::future<Relay instance endpoint that has peer domainName listening>.
+     */
+    virtual cf::future<std::string> findRelayByDomain(
+        const std::string& domainName) const override;
+    virtual cf::future<bool> addPeer(const std::string& domainName) override;
     virtual cf::future<bool> removePeer(const std::string& domainName) override;
     virtual void setNodeId(const std::string& nodeId) override;
 
@@ -65,8 +70,10 @@ class RemoteRelayPeerPoolFactory
 public:
     using FactoryFunc = nx::utils::MoveOnlyFunc<
         std::unique_ptr<model::AbstractRemoteRelayPeerPool>(const conf::Settings&)>;
+
     static std::unique_ptr<model::AbstractRemoteRelayPeerPool> create(
         const conf::Settings& settings);
+
     static void setFactoryFunc(FactoryFunc func);
 };
 
