@@ -14,11 +14,13 @@ class AccountAdmin(CMSAdmin, CSVExportAdmin):
     readonly_fields = ('email', 'first_name', 'last_name', 'created_date', 'activated_date', 'last_login',
                        'subscribe', 'language', 'customization')
 
+    exclude = ("user_permissions",)
+
     list_filter = ('subscribe', 'is_staff', 'created_date', 'last_login',)
     search_fields = ('email', 'first_name', 'last_name', 'customization', 'language',)
 
     csv_fields = ('email', 'first_name', 'last_name', 'created_date', 'last_login',
-                    'subscribe', 'is_staff', 'language', 'customization')
+                  'subscribe', 'is_staff', 'language', 'customization')
 
     def save_model(self, request, obj, form, change):
         # forbid creating superusers outside specific domain
