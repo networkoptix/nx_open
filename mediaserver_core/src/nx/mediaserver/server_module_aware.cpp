@@ -43,5 +43,20 @@ QnCommonModule* ServerModuleAware::commonModule() const
     return m_serverModule->commonModule();
 }
 
+QnResourcePool* ServerModuleAware::resourcePool() const
+{
+    return m_serverModule ? m_serverModule->resourcePool() : nullptr;
+}
+
+QnResourcePropertyDictionary* ServerModuleAware::propertyDictionary() const
+{
+    return m_serverModule ? m_serverModule->propertyDictionary() : nullptr;
+}
+
+QnCameraHistoryPool* ServerModuleAware::cameraHistoryPool() const
+{
+    return m_serverModule ? m_serverModule->cameraHistoryPool() : nullptr;
+}
+
 } // namespace mediaserver
 } // namespace nx

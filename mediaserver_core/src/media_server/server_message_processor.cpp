@@ -33,8 +33,7 @@
 #include "nx_ec/ec_api.h"
 
 QnServerMessageProcessor::QnServerMessageProcessor(QnCommonModule* commonModule):
-    base_type(commonModule),
-    m_serverPort(qnServerModule->settings().port())
+    base_type(commonModule)
 {
 }
 

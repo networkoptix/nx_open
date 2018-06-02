@@ -2,6 +2,9 @@
 
 class QnMediaServerModule;
 class QnCommonModule;
+class QnResourcePool;
+class QnResourcePropertyDictionary;
+class QnCameraHistoryPool;
 
 namespace nx {
 namespace mediaserver {
@@ -15,6 +18,10 @@ public:
     QnMediaServerModule* serverModule() const;
 
     QnCommonModule* commonModule() const;
+
+    QnResourcePool* resourcePool() const;
+    QnResourcePropertyDictionary* propertyDictionary() const;
+    QnCameraHistoryPool* cameraHistoryPool() const;
 
 private:
     QnMediaServerModule* m_serverModule;

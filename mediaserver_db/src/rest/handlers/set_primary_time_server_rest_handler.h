@@ -11,12 +11,11 @@ namespace handlers {
 class SetPrimaryTimeServerRestHandler: public QnJsonRestHandler
 {
 public:
-    SetPrimaryTimeServerRestHandler() {}
     virtual int executeGet(
-        const QString &path, 
-        const QnRequestParams &params, 
-        QnJsonRestResult &result, 
-        const QnRestConnectionProcessor*) override;
+        const QString& path, 
+        const QnRequestParams& params, 
+        QnJsonRestResult& result, 
+        const QnRestConnectionProcessor* owner) override;
     
     static QnJsonRestResult execute(
         nx::time_sync::TimeSyncManager* timeSyncManager, const QnUuid& id);

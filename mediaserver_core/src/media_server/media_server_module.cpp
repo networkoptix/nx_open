@@ -153,14 +153,14 @@ QnMediaServerModule::QnMediaServerModule(
 
     m_context->normalStorageManager.reset(
         new QnStorageManager(
-            commonModule(),
+            this,
             m_analyticsEventsStorage.get(),
             QnServer::StoragePool::Normal
         ));
 
     m_context->backupStorageManager.reset(
         new QnStorageManager(
-            commonModule(),
+            this,
             nullptr,
             QnServer::StoragePool::Backup
         ));
@@ -325,4 +325,19 @@ QnDataProviderFactory* QnMediaServerModule::dataProviderFactory() const
 QnResourceCommandProcessor* QnMediaServerModule::resourceCommandProcessor() const
 {
     return m_resourceCommandProcessor.data();
+}
+
+QnResourcePool* QnMediaServerModule::resourcePool() const
+{
+    return commonModule()->resourcePool();
+}
+
+QnResourcePropertyDictionary* QnMediaServerModule::propertyDictionary() const
+{
+    return commonModule()->propertyDictionary();
+}
+
+QnCameraHistoryPool* QnMediaServerModule::cameraHistoryPool() const
+{
+    return commonModule()->cameraHistoryPool();
 }

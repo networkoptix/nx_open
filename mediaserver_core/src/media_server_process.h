@@ -38,11 +38,13 @@ struct QnModuleInformation;
 struct QnPeerRuntimeInfo;
 class QnLdapManager;
 struct BeforeRestoreDbData;
+
 namespace ec2 { 
 
 class CrashReporter; 
 class LocalConnectionFactory;
-}
+
+} // namespace ec2
 
 namespace nx { namespace vms { namespace cloud_integration { struct CloudManagerGroup; } } }
 

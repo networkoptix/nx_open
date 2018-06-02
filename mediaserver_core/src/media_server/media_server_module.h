@@ -20,6 +20,9 @@ class QThread;
 class AbstractArchiveIntegrityWatcher;
 class QnDataProviderFactory;
 class QnResourceCommandProcessor;
+class QnResourcePool;
+class QnResourcePropertyDictionary;
+class QnCameraHistoryPool;
 
 namespace nx {
 
@@ -102,6 +105,10 @@ class QnMediaServerModule : public QObject,
     nx::mediaserver::updates2::ServerUpdates2Manager* updates2Manager() const;
     QnDataProviderFactory* dataProviderFactory() const;
     QnResourceCommandProcessor* resourceCommandProcessor() const;
+
+    QnResourcePool* resourcePool() const;
+    QnResourcePropertyDictionary* propertyDictionary() const;
+    QnCameraHistoryPool* cameraHistoryPool() const;
 
     nx::mediaserver::RootTool* rootTool() const;
 

@@ -62,7 +62,6 @@ private slots:
 
 private:
     mutable QnMutex m_mutexAddrList;
-    const int m_serverPort;
     QnUniversalTcpListener* m_universalTcpListener;
     mutable QnMediaServerResourcePtr m_mServer;
     QSet<QnUuid> m_delayedOnlineStatus;

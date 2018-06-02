@@ -165,12 +165,12 @@ void TimeProtocolClient::onSomeBytesRead(
 }
 
 void TimeProtocolClient::reportResult(
-    qint64 timeMillis,
+    qint64 timeMs,
     SystemError::ErrorCode sysErrorCode,
     std::chrono::milliseconds rtt)
 {
     m_tcpSock.reset();
-    m_completionHandler(timeMillis, sysErrorCode, rtt);
+    m_completionHandler(timeMs, sysErrorCode, rtt);
 }
 
 } // namespace network

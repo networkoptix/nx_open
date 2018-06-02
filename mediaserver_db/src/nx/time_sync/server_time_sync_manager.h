@@ -22,9 +22,6 @@ class ServerTimeSyncManager:
     using base_type = nx::time_sync::TimeSyncManager;
 public:
 
-    /**
-     * TimeSynchronizationManager::start MUST be called before using class instance.
-     */
     ServerTimeSyncManager(
         QnCommonModule* commonModule,
         nx::vms::network::AbstractServerConnector* serverConnector);
@@ -43,7 +40,7 @@ private:
     QnUuid getPrimaryTimeServerId() const;
     void initializeTimeFetcher();
     void broadcastSystemTime();
-    QnRoute getNearestServerWithInternet();
+    QnRoute routeToNearestServerWithInternet();
 private:
     std::unique_ptr<AbstractAccurateTimeFetcher> m_internetTimeSynchronizer;
     std::atomic<bool> m_internetSyncInProgress {false};

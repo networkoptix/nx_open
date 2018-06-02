@@ -21,7 +21,6 @@ namespace ec2 {
 struct ServerQueryProcessorAccess;
 class QnDistributedMutexManager;
 
-// TODO: #2.4 remove Ec2 prefix to avoid ec2::LocalConnectionFactory
 class LocalConnectionFactory:
 	public AbstractECConnectionFactory,
 	public QnStoppable,

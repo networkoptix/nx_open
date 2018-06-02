@@ -37,12 +37,14 @@ ServerTimeSyncManager::ServerTimeSyncManager(
                 kTimeDeltaParamName,
                 QByteArray::number(systemTimeDeltaMs));
 
+            // Avoid passing this to async callback.
+            auto logTag = nx::utils::log::Tag(toString(typeid(this)));
             connection->getMiscManager(Qn::kSystemAccess)->saveMiscParam(
                 deltaData, this,
-                [this](int /*reqID*/, ec2::ErrorCode errCode)
+                [logTag](int /*reqID*/, ec2::ErrorCode errorCode)
             {
-                if (errCode != ec2::ErrorCode::ok)
-                    NX_WARNING(this, lm("Failed to save time delta data to the database"));
+                if (errorCode != ec2::ErrorCode::ok)
+                    NX_WARNING(logTag, lm("Failed to save time delta data to the database"));
             });
 
             auto primaryTimeServerId = getPrimaryTimeServerId();
@@ -65,6 +67,7 @@ void ServerTimeSyncManager::broadcastSystemTime()
 
 ServerTimeSyncManager::~ServerTimeSyncManager()
 {
+    disconnect(commonModule()->ec2Connection()->getTimeNotificationManager().get());
     stop();
 }
 
@@ -74,7 +77,7 @@ void ServerTimeSyncManager::start()
     auto connection = commonModule()->ec2Connection();
     auto miscManager = connection->getMiscManager(Qn::kSystemAccess);
     auto dbResult = miscManager->getMiscParamSync(kTimeDeltaParamName, &deltaData);
-    if (dbResult  != ec2::ErrorCode::ok)
+    if (dbResult != ec2::ErrorCode::ok)
     {
         NX_WARNING(this, "Failed to load time delta parameter from the database");
     }
@@ -169,7 +172,7 @@ bool ServerTimeSyncManager::loadTimeFromInternet()
     return true;
 }
 
-QnRoute ServerTimeSyncManager::getNearestServerWithInternet()
+QnRoute ServerTimeSyncManager::routeToNearestServerWithInternet()
 {
     auto servers = commonModule()->resourcePool()->getAllServers(Qn::Online);
     int minDistance = std::numeric_limits<int>::max();
@@ -200,7 +203,7 @@ void ServerTimeSyncManager::updateTime()
 
     if (syncWithInternel)
     {
-        QnRoute route = getNearestServerWithInternet();
+        QnRoute route = routeToNearestServerWithInternet();
         if (!route.isValid() && !route.reverseConnect)
             return;
         if (isTimeRecentlySync && m_timeLoadFromServer == route.id)

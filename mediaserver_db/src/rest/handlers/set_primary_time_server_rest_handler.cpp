@@ -12,7 +12,7 @@ namespace rest {
 namespace handlers {
 
 int SetPrimaryTimeServerRestHandler::executeGet(
-    const QString& /*path*/,
+    const QString& path,
     const QnRequestParams& params,
     QnJsonRestResult& result,
     const QnRestConnectionProcessor* owner)
