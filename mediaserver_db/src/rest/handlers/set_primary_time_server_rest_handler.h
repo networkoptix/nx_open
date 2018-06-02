@@ -12,9 +12,9 @@ class SetPrimaryTimeServerRestHandler: public QnJsonRestHandler
 {
 public:
     virtual int executeGet(
-        const QString& path, 
-        const QnRequestParams& params, 
-        QnJsonRestResult& result, 
+        const QString& path,
+        const QnRequestParams& params,
+        QnJsonRestResult& result,
         const QnRestConnectionProcessor* owner) override;
     
     static QnJsonRestResult execute(
