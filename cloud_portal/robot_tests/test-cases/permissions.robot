@@ -33,10 +33,6 @@ Share with Adminstrator
     Click Button    ${SHARE PERMISSIONS DROPDOWN}
     Wait Until Element Is Visible    ${SHARE PERMISSIONS DROPDOWN}/following-sibling::div/button/span[text()='${ADMIN TEXT}']
     Click Button    ${SHARE PERMISSIONS DROPDOWN}/following-sibling::div/button/span[text()='${ADMIN TEXT}']/..
-    Wait Until Element Is Visible    ${SHARE PERMISSIONS DROPDOWN}
-    Click Button    ${SHARE PERMISSIONS DROPDOWN}
-    Wait Until Element Is Visible    ${SHARE PERMISSIONS DROPDOWN}/following-sibling::div/button/span[text()='${ADMIN TEXT}']
-    Click Button    ${SHARE PERMISSIONS DROPDOWN}/following-sibling::div/button/span[text()='${ADMIN TEXT}']/..
     Click Button    ${SHARE BUTTON MODAL}
 
 Check Log In
@@ -160,7 +156,7 @@ When user selects role - special hint appears
 Sharing works
     ${random email}    Get Random Email    ${BASE EMAIL}
     Log in to Auto Tests System    ${email}
-    Share with Adminstrator    ${random email}
+    Share To    ${random email}    ${ADMIN TEXT}
     Check For Alert    ${NEW PERMISSIONS SAVED}
     Check User Permissions    ${random email}    ${CUSTOM TEXT}
     Remove User Permissions    ${random email}
@@ -169,7 +165,7 @@ displays pencil and cross links for each user only on hover
     ${random email}    Get Random Email    ${BASE EMAIL}
     Maximize Browser Window
     Log in to Auto Tests System    ${email}
-    Share with Adminstrator    ${random email}
+    Share To    ${random email}    ${ADMIN TEXT}
     Click Button    ${SHARE BUTTON MODAL}
     Check For Alert    ${NEW PERMISSIONS SAVED}
     Element Should Not Be Visible    //tr[@ng-repeat='user in system.users']//td[contains(text(), '${random email}')]/following-sibling::td/a[@ng-click='unshare(user)']/span['&nbsp&nbspDelete']
@@ -183,7 +179,7 @@ Edit permission works
     ${random email}    Get Random Email    ${BASE EMAIL}
     Maximize Browser Window
     Log in to Auto Tests System    ${email}
-    Share with Adminstrator    ${random email}
+    Share To    ${random email}    ${ADMIN TEXT}
     Check For Alert    ${NEW PERMISSIONS SAVED}
     Edit User Permissions In Systems    ${random email}    ${CUSTOM TEXT}
     Check User Permissions    ${random email}    ${CUSTOM TEXT}
@@ -198,7 +194,7 @@ Delete user works
     Register    mark    harmill    ${random email}    ${password}
     Activate    ${random email}
     Log in to Auto Tests System    ${email}
-    Share with Adminstrator    ${random email}
+    Share To    ${random email}    ${ADMIN TEXT}
     Check For Alert    ${NEW PERMISSIONS SAVED}
     Check User Permissions    ${random email}    ${CUSTOM TEXT}
     Log Out
@@ -217,7 +213,7 @@ Share with registered user - sends him notification
     [tags]    email
     Log in to Auto Tests System    ${email}
     Verify In System    Auto Tests
-    Share with Adminstrator    ${EMAIL NO PERM}
+    Share To    ${EMAIL NO PERM}    ${ADMIN TEXT}
     Check For Alert    ${NEW PERMISSIONS SAVED}
     Check User Permissions    ${EMAIL NOPERM}    ${ADMIN TEXT}
     Open Mailbox    host=${BASE HOST}    password=${BASE EMAIL PASSWORD}    port=${BASE PORT}    user=${BASE EMAIL}    is_secure=True
@@ -231,7 +227,7 @@ Share with unregistered user - brings them to registration page with code with c
     ${random email}    Get Random Email    ${BASE EMAIL}
     Log in to Auto Tests System    ${email}
     Verify In System    Auto Tests
-    Share with Adminstrator    ${random email}
+    Share To    ${random email}    ${ADMIN TEXT}
     Check For Alert    ${NEW PERMISSIONS SAVED}
     Check User Permissions    ${random email}    ${CUSTOM TEXT}
     Log Out

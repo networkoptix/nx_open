@@ -43,7 +43,7 @@ Restart
 systems dropdown should allow you to go back to the systems page
     Log in to Auto Tests System    ${EMAIL OWNER}
     Wait Until Element Is Visible    ${SYSTEMS DROPDOWN}
-    Click Link    ${SYSTEMS DROPDOWN}
+    Click Button    ${SYSTEMS DROPDOWN}
     Wait Until Element Is Visible    ${ALL SYSTEMS}
     Click Link    ${ALL SYSTEMS}
     Location Should Be    ${url}/systems
@@ -194,13 +194,7 @@ should display same user data as user provided during registration (stress to cy
     Activate    ${email}
 #share system with new user
     Log in to Auto Tests System    ${EMAIL OWNER}
-    Wait Until Element Is Visible    ${SHARE BUTTON SYSTEMS}
-    Click Button    ${SHARE BUTTON SYSTEMS}
-    Wait Until Elements Are Visible    ${SHARE EMAIL}    ${SHARE PERMISSIONS DROPDOWN}
-    Input Text    ${SHARE EMAIL}    ${email}
-    Select From List By Label    ${SHARE PERMISSIONS DROPDOWN}    ${ADMIN TEXT}
-    Wait Until Element Is Visible    ${SHARE BUTTON MODAL}
-    Click Button    ${SHARE BUTTON MODAL}
+    Share To    ${email}    ${VIEWER TEXT}
     Check For Alert    ${NEW PERMISSIONS SAVED}
     Log Out
 
@@ -222,12 +216,7 @@ should display same user data as showed in user account (stress to cyrillic)
     Activate    ${email}
 #share system with new user
     Log in to Auto Tests System    ${EMAIL OWNER}
-    Click Button    ${SHARE BUTTON SYSTEMS}
-    Wait Until Elements Are Visible    ${SHARE EMAIL}    ${SHARE PERMISSIONS DROPDOWN}
-    Input Text    ${SHARE EMAIL}    ${email}
-    Select From List By Label    ${SHARE PERMISSIONS DROPDOWN}    ${ADMIN TEXT}
-    Wait Until Element Is Visible    ${SHARE BUTTON MODAL}
-    Click Button    ${SHARE BUTTON MODAL}
+    Share To    ${email}    ${VIEWER TEXT}
     Check For Alert    ${NEW PERMISSIONS SAVED}
     Log Out
 

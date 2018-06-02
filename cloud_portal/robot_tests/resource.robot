@@ -108,6 +108,18 @@ Activate
     Element Should Be Visible    ${ACTIVATION SUCCESS}
     Location Should Be    ${url}/activate/success
 
+Share To
+    [arguments]    ${random email}    ${permissions}
+    Wait Until Element Is Visible    ${SHARE BUTTON SYSTEMS}
+    Click Button    ${SHARE BUTTON SYSTEMS}
+    Wait Until Elements Are Visible    ${SHARE EMAIL}    ${SHARE BUTTON MODAL}
+    Input Text    ${SHARE EMAIL}    ${random email}
+    Wait Until Element Is Visible    ${SHARE PERMISSIONS DROPDOWN}
+    Click Button    ${SHARE PERMISSIONS DROPDOWN}
+    Wait Until Element Is Visible    ${SHARE PERMISSIONS DROPDOWN}/following-sibling::div/button/span[text()='${permissions}']
+    Click Button    ${SHARE PERMISSIONS DROPDOWN}/following-sibling::div/button/span[text()='${permissions}']/..
+    Click Button    ${SHARE BUTTON MODAL}
+
 Edit User Permissions In Systems
     [arguments]    ${user email}    ${permissions}
     Wait Until Element Is Not Visible    ${SHARE MODAL}

@@ -46,8 +46,8 @@ ${YOU HAVE NO SYSTEMS}                //span[contains(text(),'${YOU HAVE NO SYST
 ${ACCOUNT DROPDOWN}                   //button[@id = 'accountSettingsSelect']
 ${LOG OUT BUTTON}                     //li[contains(@class, 'collapse-first')]//a[contains(text(), '${LOG OUT BUTTON TEXT}')]
 ${ACCOUNT SETTINGS BUTTON}            //li//a[(@href = '/account/')]
-${SYSTEMS DROPDOWN}                   //li[contains(@class, 'collapse-second')]//a['uib-dropdown-toggle']
-${ALL SYSTEMS}                        //li[contains(@class, 'collapse-second')]//a[@ng-href='/systems']
+${SYSTEMS DROPDOWN}                   //li[contains(@class, 'collapse-second')]//button['btn-dropdown-toggle']
+${ALL SYSTEMS}                        //li[contains(@class, 'collapse-second')]//a[@href='/systems']
 ${AUTHORIZED BODY}                    //body[contains(@class, 'authorized')]
 ${ANONYMOUS BODY}                     //body[contains(@class,'anonymous')]
 ${CREATE ACCOUNT HEADER}              //header//a[@href='/register']
@@ -93,8 +93,8 @@ ${SUCCESS LOG IN BUTTON}              //h1[@ng-if='activate.success' and contain
 ${FIRST USER OWNER}                   //table[@ng-if='system.users.length']/tbody/tr/td[3]/span[contains(text(),'${OWNER TEXT}')]
 ${DISCONNECT FROM NX}                 //button[@ng-click='disconnect()']
 ${RENAME SYSTEM}                      //button[@ng-click='rename()']
-${RENAME CANCEL}                      //form[@name='renameForm']//button[@ng-click='close()']
-${RENAME SAVE}                        //form[@name='renameForm']//button[@ng-click='checkForm()']
+${RENAME CANCEL}                      //form[@name='renameForm']//button[text()='Cancel']
+${RENAME SAVE}                        //form[@name='renameForm']//button[text()='Save']
 ${RENAME INPUT}                       //form[@name='renameForm']//input[@ng-model='model.systemName']
 ${DISCONNECT FROM MY ACCOUNT}         //button[@ng-click='delete()']
 ${SHARE BUTTON SYSTEMS}               //div[@process-loading='gettingSystem']//button[@ng-click='share()']
@@ -111,13 +111,14 @@ ${SYSTEM NO ACCESS}                   //div[@ng-if='systemNoAccess']/h1[contains
 
 #Disconnect from cloud portal
 ${DISCONNECT FORM}                    //form[@name='disconnectForm']
-${DISCONNECT FORM CANCEL}             //form[@name='disconnectForm']//button[@ng-click='close()']
+${DISCONNECT FORM CANCEL}             //form[@name='disconnectForm']//button[text()='Cancel']
 ${DISCONNECT FORM HEADER}             //h1['${DISCONNECT FORM HEADER TEXT}']
 
 #Disconnect from my account
 ${DISCONNECT MODAL WARNING}              //p[contains(text(), '${DISCONNECT MODAL WARNING TEXT}')]
-${DISCONNECT MODAL CANCEL}               //button[@ng-click='cancel()']
-${DISCONNECT MODAL DISCONNECT BUTTON}    //button[@ng-click='ok()']
+# extra spaces here temporarily
+${DISCONNECT MODAL CANCEL}               //button[text()='Cancel ']
+${DISCONNECT MODAL DISCONNECT BUTTON}    //button[text()='Disconnect ']
 
 ${JUMBOTRON}                          //div[@class='jumbotron']
 ${PROMO BLOCK}                        //div[contains(@class,'promo-block') and not(contains(@class, 'col-sm-4'))]
@@ -152,6 +153,7 @@ ${ACCOUNT LANGUAGE DROPDOWN}          //form[@name='accountForm']//nx-language-s
 ${ACCOUNT SAVE}                       //form[@name='accountForm']//button[@ng-click='checkForm()']
 ${ACCOUNT SUBSCRIBE CHECKBOX}         //form[@name='accountForm']//input[@ng-model='account.subscribe']/following-sibling::span[contains(@class, 'checkmark')]
 #Already logged in modal
+#extra spaces here temporarily
 ${LOGGED IN CONTINUE BUTTON}          //ngb-modal-window//button[text()='Continue ']
 ${LOGGED IN LOG OUT BUTTON}           //ngb-modal-window//button[text()='Log Out ']
 
