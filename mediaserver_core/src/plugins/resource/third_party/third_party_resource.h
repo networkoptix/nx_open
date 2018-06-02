@@ -79,7 +79,6 @@ public:
         unsigned long int timestamp ) override;
 
     const QList<nxcip::Resolution>& getEncoderResolutionList(Qn::StreamIndex encoderNumber) const;
-    virtual bool hasDualStreaming() const override;
 
     nxcip::Resolution getSelectedResolutionForEncoder(Qn::StreamIndex encoderIndex ) const;
 

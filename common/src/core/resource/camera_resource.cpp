@@ -110,7 +110,7 @@ void QnVirtualCameraResource::updateSourceUrl(const QString& url,
     Qn::ConnectionRole role,
     bool save)
 {
-    if (!storeUrlForRole(role) || url.isEmpty())
+    if (!storeUrlForRole(role))
         return;
 
     auto cachedUrl = m_cachedStreamUrls.find(role);

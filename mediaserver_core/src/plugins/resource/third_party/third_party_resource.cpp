@@ -419,11 +419,6 @@ const QList<nxcip::Resolution>& QnThirdPartyResource::getEncoderResolutionList(Q
 }
 
 
-bool QnThirdPartyResource::hasDualStreaming() const
-{
-    return m_encoderCount > 1;
-}
-
 nxcip::Resolution QnThirdPartyResource::getSelectedResolutionForEncoder(Qn::StreamIndex encoderIndex) const
 {
     QnMutexLocker lk( &m_mutex );
@@ -534,8 +529,6 @@ CameraDiagnostics::Result QnThirdPartyResource::initializeCameraDriver()
     //we support only two streams from camera
     m_encoderCount = m_encoderCount > 2 ? 2 : m_encoderCount;
 
-    setProperty( Qn::HAS_DUAL_STREAMING_PARAM_NAME, (m_encoderCount > 1) ? 1 : 0);
-
     //setting camera capabilities
     unsigned int cameraCapabilities = 0;
     result = m_camManager->getCameraCapabilities( &cameraCapabilities );
@@ -547,14 +540,15 @@ CameraDiagnostics::Result QnThirdPartyResource::initializeCameraDriver()
         setStatus( result == nxcip::NX_NOT_AUTHORIZED ? Qn::Unauthorized : Qn::Offline );
         return CameraDiagnostics::UnknownErrorResult();
     }
-    if( cameraCapabilities & nxcip::BaseCameraManager::relayInputCapability )
+
+    if(cameraCapabilities & nxcip::BaseCameraManager::relayInputCapability)
         setCameraCapability( Qn::RelayInputCapability, true );
-    if( cameraCapabilities & nxcip::BaseCameraManager::relayOutputCapability )
+    if(cameraCapabilities & nxcip::BaseCameraManager::relayOutputCapability)
         setCameraCapability( Qn::RelayOutputCapability, true );
-    if( cameraCapabilities & nxcip::BaseCameraManager::shareIpCapability )
+    if(cameraCapabilities & nxcip::BaseCameraManager::shareIpCapability)
         setCameraCapability( Qn::ShareIpCapability, true );
-    //if( cameraCapabilities & nxcip::BaseCameraManager::primaryStreamSoftMotionCapability )
-    //    setCameraCapability( Qn::PrimaryStreamSoftMotionCapability, true );
+    if(cameraCapabilities & nxcip::BaseCameraManager::customMediaUrlCapability)
+        setCameraCapability( Qn::customMediaUrlCapability, true );
     if( cameraCapabilities & nxcip::BaseCameraManager::ptzCapability )
     {
         nxcip::CameraPtzManager* ptzManager = m_camManager->getPtzManager();
@@ -584,6 +578,15 @@ CameraDiagnostics::Result QnThirdPartyResource::initializeCameraDriver()
         }
         ptzManager->releaseRef();
     }
+	
+    bool hasDualStreaming = m_encoderCount > 1;
+    if ((cameraCapabilities & nxcip::BaseCameraManager::customMediaUrlCapability)
+        && sourceUrl(Qn::CR_SecondaryLiveVideo).isEmpty())
+    {
+        hasDualStreaming = false;
+    }
+    setProperty(Qn::HAS_DUAL_STREAMING_PARAM_NAME, hasDualStreaming ? 1 : 0);
+	
     setProperty(
         Qn::IS_AUDIO_SUPPORTED_PARAM_NAME,
         (cameraCapabilities & nxcip::BaseCameraManager::audioCapability) ? 1 : 0);

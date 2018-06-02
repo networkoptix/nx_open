@@ -10,11 +10,14 @@
 #include "generic_rtsp_camera_manager.h"
 
 
-GenericRTSPMediaEncoder::GenericRTSPMediaEncoder( GenericRTSPCameraManager* const cameraManager )
+GenericRTSPMediaEncoder::GenericRTSPMediaEncoder(
+    GenericRTSPCameraManager* const cameraManager, int encoderIndex)
 :
-    m_refManager( cameraManager->refManager() ),
-    m_cameraManager( cameraManager )
+    m_refManager(cameraManager->refManager()),
+    m_cameraManager(cameraManager),
+    m_encoderIndex(encoderIndex)
 {
+    memset(m_mediaUrl, 0, sizeof(m_mediaUrl));
 }
 
 GenericRTSPMediaEncoder::~GenericRTSPMediaEncoder()
@@ -46,9 +49,21 @@ unsigned int GenericRTSPMediaEncoder::releaseRef()
     return m_refManager.releaseRef();
 }
 
-int GenericRTSPMediaEncoder::getMediaUrl( char* urlBuf ) const
+int GenericRTSPMediaEncoder::getMediaUrl(char* urlBuf) const
 {
-    strcpy( urlBuf, m_cameraManager->info().url );
+    urlBuf[0] = 0;
+    if (m_mediaUrl[0])
+        strcpy(urlBuf, m_mediaUrl);
+    else if (m_encoderIndex == 0)
+        strcpy(urlBuf, m_cameraManager->info().url);
+    
+    return nxcip::NX_NO_ERROR;
+}
+
+int GenericRTSPMediaEncoder::setMediaUrl(const char url[nxcip::MAX_TEXT_LEN])
+{
+    memset(m_mediaUrl, 0, nxcip::MAX_TEXT_LEN);
+    strcpy_s(m_mediaUrl, nxcip::MAX_TEXT_LEN, url);
     return nxcip::NX_NO_ERROR;
 }
 
