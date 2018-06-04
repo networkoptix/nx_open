@@ -3,13 +3,13 @@ from framework.installation.service import Service, ServiceStatus
 
 class WindowsService(Service):
     def __init__(self, winrm, name):
-        self.query = winrm.wmi_query('Win32_Service', {'Name': name})
+        self.query = winrm.wmi_query(u'Win32_Service', {u'Name': name})
 
     def stop(self):
-        self.query.invoke_method('StopService', {})
+        self.query.invoke_method(u'StopService', {})
 
     def start(self):
-        self.query.invoke_method('StartService', {})
+        self.query.invoke_method(u'StartService', {})
 
     def status(self):
         instance = self.query.get_one()
