@@ -2670,6 +2670,32 @@
                     "01600,01601"
                 ]
             }
+        },
+        {
+            "keys": [
+                "Bosch|AUTODOME IP starlight 7000 HD"
+            ],
+            "ptzMapper": {
+                "fromCamera": {
+                    "x": {
+                        "extrapolationMode": "PeriodicExtrapolation",
+                        "device":  [  -1,1],
+                        "logical": [-180, 180]
+                    },
+                    "y": {
+                        "extrapolationMode": "ConstantExtrapolation",
+                        "device":  [1, -1],
+                        "logical": [18, -90]
+                    },
+                    "z": {
+                        "extrapolationMode": "ConstantExtrapolation",
+                        "device":  [0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1],
+                        "logical": [1, 3.5, 5.25, 6.125, 6.56, 6.78, 6.89, 6.95, 6.97, 6.99, 7],
+                        "logicalMultiplier": 30,
+                        "space": "35MmEquiv"
+                    }
+                }
+            }
         }
     ]
 }
