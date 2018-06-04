@@ -93,7 +93,6 @@ class WindowsAccess(OSAccess):
 
     def set_time(self, new_time):  # type: (datetime.datetime) -> RunningTime
         localized = new_time.astimezone(self._get_timezone())
-        timestamp = (new_time - datetime.datetime(1970, 1, 1, tzinfo=pytz.utc)).total_seconds()
         started_at = timeit.default_timer()
         # TODO: Do that with Win32_OperatingSystem.SetDateTime WMI method.
         # See: https://superuser.com/q/1323610/174311
