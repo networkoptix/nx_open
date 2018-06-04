@@ -305,6 +305,31 @@ TEST_F(DiscoveryModuleConnector, IgnoredEndpoints)
     expectConnect(id, endpoint4); //< Automatic switch from blocked endpoint.
 }
 
+TEST_F(DiscoveryModuleConnector, IgnoredEndpointsByStrings)
+{
+    const auto firstId = QnUuid::createUuid();
+    const auto firstEndpoint1 = addMediaserver(firstId);
+    const auto firstEndpoint2 = addMediaserver(firstId);
+
+    connector.newEndpoints({firstEndpoint1}, firstId);
+    expectConnect(firstId, firstEndpoint1); //< Only have one.
+
+    connector.newEndpoints({firstEndpoint2}, firstId);
+    connector.setForbiddenEndpoints({firstEndpoint1.toString()}, firstId);
+    expectConnect(firstId, firstEndpoint2); //< Switch to a single avaliable.
+
+    const auto secondId = QnUuid::createUuid();
+    const auto secondEndpoint1 = addMediaserver(secondId);
+    const auto secondEndpoint2 = addMediaserver(secondId);
+
+    connector.newEndpoints({secondEndpoint1});
+    expectConnect(secondId, secondEndpoint1); //< Detect correct serverId.
+
+    connector.newEndpoints({secondEndpoint2}, secondId);
+    connector.setForbiddenEndpoints({secondEndpoint1.toString()}, secondId);
+    expectConnect(secondId, secondEndpoint2); //< Switch to a single avaliable.
+}
+
 } // namespace test
 } // namespace discovery
 } // namespace vms
