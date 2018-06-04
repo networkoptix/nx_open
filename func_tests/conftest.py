@@ -76,6 +76,7 @@ def init_logging(request, work_dir):
     for level in {logging.DEBUG, logging.INFO}:
         file_name = logging.getLevelName(level).lower() + '.log'
         file_handler = logging.FileHandler(str(work_dir / file_name), mode='w')
+        file_handler.setLevel(level)
         file_handler.setFormatter(file_formatter)
         root_logger.addHandler(file_handler)
 
