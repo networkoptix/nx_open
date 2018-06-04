@@ -11,6 +11,24 @@ namespace nx {
 namespace network {
 namespace test {
 
+namespace {
+
+class FailingTcpServerSocket:
+    public TCPServerSocket
+{
+public:
+    virtual void acceptAsync(AcceptCompletionHandler handler) override
+    {
+        post(
+            [handler = std::move(handler)]()
+            {
+                handler(SystemError::ioError, nullptr);
+            });
+    }
+};
+
+} // namespace
+
 class CustomHandshakeConnectionAcceptor:
     public ::testing::Test
 {
@@ -27,26 +45,13 @@ public:
 protected:
     virtual void SetUp() override
     {
-        using namespace std::placeholders;
-
         auto tcpServer = std::make_unique<TCPServerSocket>(AF_INET);
         ASSERT_TRUE(tcpServer->bind(SocketAddress::anyPrivateAddressV4));
         ASSERT_TRUE(tcpServer->listen());
         ASSERT_TRUE(tcpServer->setNonBlockingMode(true));
         m_tcpServer = tcpServer.get();
 
-        m_acceptor = std::make_unique<Acceptor>(
-            std::move(tcpServer),
-            [](std::unique_ptr<AbstractStreamSocket> streamSocket)
-            {
-                return std::make_unique<ssl::ServerSideStreamSocket>(std::move(streamSocket));
-            });
-        // Using very large timeout by default to make test reliable to various delays.
-        m_acceptor->setHandshakeTimeout(std::chrono::hours(1));
-
-        m_acceptor->start();
-        m_acceptor->acceptAsync(
-            std::bind(&CustomHandshakeConnectionAcceptor::saveAcceptedConnection, this, _1, _2));
+        initializeAcceptor(std::move(tcpServer));
     }
 
     Acceptor& acceptor()
@@ -78,6 +83,14 @@ protected:
         m_silentConnections.pop_front();
     }
 
+    void whenRawServerConnectionReportsError()
+    {
+        m_acceptor->pleaseStopSync();
+        m_acceptor.reset();
+
+        initializeAcceptor(std::make_unique<FailingTcpServerSocket>());
+    }
+
     void thenConnectionIsAccepted()
     {
         ASSERT_NE(nullptr, m_acceptedConnections.pop().connection);
@@ -95,6 +108,11 @@ protected:
         ASSERT_TRUE(m_acceptedConnections.empty());
     }
 
+    void thenCorrespondingErrorIsReported()
+    {
+        ASSERT_NE(SystemError::noError, m_acceptedConnections.pop().resultCode);
+    }
+
 private:
     struct AcceptResult
     {
@@ -109,6 +127,25 @@ private:
     TCPServerSocket* m_tcpServer = nullptr;
     std::unique_ptr<AbstractStreamSocket> m_clientConnection;
     std::deque<std::unique_ptr<AbstractStreamSocket>> m_silentConnections;
+
+    void initializeAcceptor(
+        std::unique_ptr<AbstractStreamServerSocket> rawConnectionSocket)
+    {
+        using namespace std::placeholders;
+
+        m_acceptor = std::make_unique<Acceptor>(
+            std::move(rawConnectionSocket),
+            [](std::unique_ptr<AbstractStreamSocket> streamSocket)
+            {
+                return std::make_unique<ssl::ServerSideStreamSocket>(std::move(streamSocket));
+            });
+        // Using very large timeout by default to make test reliable to various delays.
+        m_acceptor->setHandshakeTimeout(std::chrono::hours(1));
+
+        m_acceptor->start();
+        m_acceptor->acceptAsync(
+            std::bind(&CustomHandshakeConnectionAcceptor::saveAcceptedConnection, this, _1, _2));
+    }
 
     void saveAcceptedConnection(
         SystemError::ErrorCode systemErrorCode,
@@ -153,9 +190,10 @@ TEST_F(CustomHandshakeConnectionAcceptor, connections_are_accepted)
     thenConnectionIsAccepted();
 }
 
-TEST_F(CustomHandshakeConnectionAcceptor, underlying_socket_accept_error_is_reported)
+TEST_F(CustomHandshakeConnectionAcceptor, underlying_socket_accept_error_is_forwarded)
 {
-    // TODO
+    whenRawServerConnectionReportsError();
+    thenCorrespondingErrorIsReported();
 }
 
 TEST_F(CustomHandshakeConnectionAcceptor, silent_connection_is_closed_by_server)
