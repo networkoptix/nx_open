@@ -359,7 +359,7 @@ QnWorkbenchContext::StartupParametersCode
         for (const auto& arg : qApp->arguments())
         {
             if (!skipArg)
-                haveInputFiles |= window && window->handleMessage(arg);
+                haveInputFiles |= window && window->handleOpenFile(arg);
             skipArg = false;
         }
     }
