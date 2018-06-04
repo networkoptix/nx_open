@@ -11,7 +11,7 @@ function(nx_add_test target)
 
     add_test(NAME ${target}
         COMMAND
-            ${target} --tmp ${testTempDirectory}
+            ${target}
     )
 
     if(WINDOWS)

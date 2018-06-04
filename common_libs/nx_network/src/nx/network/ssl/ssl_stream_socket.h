@@ -14,6 +14,8 @@ namespace nx {
 namespace network {
 namespace ssl {
 
+namespace detail {
+
 class NX_NETWORK_API StreamSocketToTwoWayPipelineAdapter:
     public utils::bstream::AbstractInput,
     public utils::bstream::AbstractOutput
@@ -35,6 +37,8 @@ private:
     int bytesTransferredToPipelineReturnCode(int bytesTransferred);
     int getFlagsForCurrentThread() const;
 };
+
+} // namespace detail
 
 //-------------------------------------------------------------------------------------------------
 
@@ -88,7 +92,7 @@ private:
     std::unique_ptr<aio::StreamTransformingAsyncChannel> m_asyncTransformingChannel;
     std::unique_ptr<AbstractStreamSocket> m_delegate;
     std::unique_ptr<ssl::Pipeline> m_sslPipeline;
-    StreamSocketToTwoWayPipelineAdapter m_socketToPipelineAdapter;
+    detail::StreamSocketToTwoWayPipelineAdapter m_socketToPipelineAdapter;
     utils::bstream::ProxyConverter m_proxyConverter;
     nx::Buffer m_emptyBuffer;
 

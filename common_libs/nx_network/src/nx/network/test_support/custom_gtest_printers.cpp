@@ -19,7 +19,7 @@ void PrintTo(const SocketAddress& val, ::std::ostream* os)
     *os << val.toString().toStdString();
 }
 
-void PrintTo(const DetectionResult& val, ::std::ostream* os)
+void PrintTo(const ProtocolMatchResult& val, ::std::ostream* os)
 {
     *os << toString(val);
 }

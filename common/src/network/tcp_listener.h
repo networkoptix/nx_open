@@ -77,7 +77,7 @@ public slots:
     virtual void pleaseStop() override;
 
 protected:
-    virtual void run();
+    virtual void run() override;
     virtual QnTCPConnectionProcessor* createRequestProcessor(QSharedPointer<nx::network::AbstractStreamSocket> clientSocket) = 0;
     virtual void doPeriodicTasks();
     /** Called to create server socket.
