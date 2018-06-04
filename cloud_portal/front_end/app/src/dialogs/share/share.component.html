@@ -28,7 +28,6 @@
             <label for="permissionsSelect" translate>Permissions</label>
 
             <nx-permissions-select
-                    [isValid]="isValidPermission"
                     [roles]="accessRoles"
                     [selected]="user.role.name"
                     (onSelected)="setPermission($event)">

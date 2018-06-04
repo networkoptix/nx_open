@@ -26,7 +26,6 @@ export class ShareModalContent {
         name: ''
     };
     accessDescription: string;
-    isValidPermission: boolean;
 
     constructor(public activeModal: NgbActiveModal,
                 @Inject('account') private account: any,
@@ -58,8 +57,7 @@ export class ShareModalContent {
             }
         })[0];
 
-        this.accessDescription = this.language.accessRoles[this.selectedPermission.name].description;
-        this.isValidPermission = true;
+        this.accessDescription = this.language.accessRoles[this.user.role.name].description;
     }
 
     processAccessRoles() {
@@ -98,8 +96,7 @@ export class ShareModalContent {
         this.buttonText = this.language.sharing.shareConfirmButton;
         this.isNewShare = !this.user;
 
-        this.user = (this.user) ? {...this.user} : {email: '', isEnabled: true, role: {}};
-        this.isValidPermission = true;
+        this.user = (this.user) ? {...this.user} : {email: '', isEnabled: true, role: {name: "Live Viewer"}};
 
         if (!this.isNewShare) {
             this.account
@@ -125,12 +122,6 @@ export class ShareModalContent {
         this.processAccessRoles();
 
         this.sharing = this.process.init(() => {
-            if (this.selectedPermission === undefined) {
-                this.isValidPermission = false;
-                return new Promise((resolve, reject) => {
-                    //resolve(); // do not reject if you don't want to see error Toast
-                });
-            }
             if (this.user.role.isOwner) {
                 return this.generalModal
                            .openConfirm(this.language.sharing.confirmOwner,
