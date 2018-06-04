@@ -17,7 +17,7 @@ from framework.merging import merge_systems, setup_local_system
 from framework.utils import RunningTime, get_internet_time
 from framework.waiting import ensure_persistence, wait_for_true
 
-log = logging.getLogger(__name__)
+_logger = logging.getLogger(__name__)
 
 BASE_TIME = RunningTime(datetime(2017, 3, 14, 15, 0, 0, tzinfo=utc))  # Tue Mar 14 15:00:00 UTC 2017
 

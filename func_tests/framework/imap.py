@@ -8,7 +8,7 @@ import pytest
 
 from .utils import datetime_utc_now
 
-log = logging.getLogger(__name__)
+_logger = logging.getLogger(__name__)
 
 
 ACTIVATION_EMAIL_SUBJECT = 'Activate your account'
@@ -18,7 +18,7 @@ class IMAPConnection(object):
 
     def __init__(self, hostname, email, password):
         assert email and password, repr((email, password))
-        log.debug('\tIMAP: connecting to %r', hostname)
+        _logger.debug('\tIMAP: connecting to %r', hostname)
         self._connection = imaplib.IMAP4_SSL(hostname)
         self._call('login', email, password)
         self._call('select')
@@ -49,7 +49,7 @@ class IMAPConnection(object):
         if fn_name == 'login':
             login, password = args
             args = (login, '***')  # mask password
-        log.debug('\tIMAP: %s -> %r %r', ' '.join(str(arg) for arg in (fn_name,) + args), typ, dat)
+        _logger.debug('\tIMAP: %s -> %r %r', ' '.join(str(arg) for arg in (fn_name,) + args), typ, dat)
         assert typ == 'OK', repr((typ, dat))
         return dat
 
@@ -86,10 +86,10 @@ class IMAPConnection(object):
         start_time = datetime_utc_now()
         while datetime_utc_now() < start_time + timeout:
             for message in self.search_for_activation_emails(cloud_email):
-                log.info('Found new message: %r', message)
+                _logger.info('Found new message: %r', message)
                 code = message.fetch_activation_code(cloud_host)
                 if code:
-                    log.info('Found activation code: %s', code)
+                    _logger.info('Found activation code: %s', code)
                     message.delete()
                     self.expunge()
                     return code
@@ -118,7 +118,7 @@ class Message(object):
         return self._message
 
     def delete(self):
-        log.info('Deleting message %s', self)
+        _logger.info('Deleting message %s', self)
         self._connection._call('uid', 'store', self._uid, '+FLAGS', r'(\Deleted)')
 
     def fetch_activation_code(self, cloud_host):

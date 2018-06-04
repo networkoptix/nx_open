@@ -4,7 +4,7 @@ from framework.os_access.exceptions import exit_status_error_cls
 from framework.os_access.posix_shell import SSH
 from framework.os_access.ssh_path import SSHPath
 
-logger = logging.getLogger(__name__)
+_logger = logging.getLogger(__name__)
 
 
 class MoveLockAlreadyAcquired(Exception):
@@ -26,7 +26,7 @@ class MoveLock(object):
 
     def __enter__(self):
         # Implemented as single bash script to speedup locking.
-        logger.info("Acquire lock at %r", self._path)
+        _logger.info("Acquire lock at %r", self._path)
         try:
             self._ssh_access.run_sh_script(
                 # language=Bash
@@ -55,7 +55,7 @@ class MoveLock(object):
 
     def __exit__(self, exc_type, exc_val, exc_tb):
         # Implemented as single bash script to speedup locking.
-        logger.info("Release lock at %r", self._path)
+        _logger.info("Release lock at %r", self._path)
         try:
             self._ssh_access.run_sh_script(
                 # language=Bash

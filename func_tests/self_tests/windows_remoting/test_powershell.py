@@ -12,7 +12,7 @@ from framework.os_access.windows_remoting._powershell import (
     start_raw_powershell_script,
     )
 
-log = logging.getLogger(__name__)
+_logger = logging.getLogger(__name__)
 
 
 def test_start_script(winrm_shell):

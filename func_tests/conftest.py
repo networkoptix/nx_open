@@ -17,7 +17,7 @@ DEFAULT_REST_API_FORWARDED_PORT_BASE = 17000
 
 DEFAULT_MAX_LOG_WIDTH = 500
 
-log = logging.getLogger(__name__)
+_logger = logging.getLogger(__name__)
 
 
 def pytest_addoption(parser):
@@ -125,5 +125,5 @@ def artifact_factory(request, work_dir, junk_shop_repository):
 def metrics_saver(junk_shop_repository):
     db_capture_repository, current_test_run = junk_shop_repository
     if not db_capture_repository:
-        log.warning('Junk shop plugin is not available; No metrics will be saved')
+        _logger.warning('Junk shop plugin is not available; No metrics will be saved')
     return MetricsSaver(db_capture_repository, current_test_run)

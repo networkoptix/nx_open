@@ -6,7 +6,7 @@ import requests
 from framework.imap import IMAPConnection
 from framework.rest_api import HttpError, RestApi
 
-log = logging.getLogger(__name__)
+_logger = logging.getLogger(__name__)
 
 
 CLOUD_HOST_REGISTRY_URL = 'https://ireg.hdw.mx/api/v1/cloudhostfinder/'
@@ -79,11 +79,11 @@ class CloudAccount(object):
         assert user_data.get('statusCode') == 'activated'
 
     def check_is_ready_for_tests(self):
-        log.debug('Checking cloud host %r...', self)
+        _logger.debug('Checking cloud host %r...', self)
         self.ping()
-        log.debug('Cloud host %r is up', self)
+        _logger.debug('Cloud host %r is up', self)
         self.check_user_is_valid()
-        log.info('Cloud host %r is up and test user is valid', self)
+        _logger.info('Cloud host %r is up and test user is valid', self)
 
     def bind_system(self, system_name):
         response = self.api.cdb.system.bind.GET(
@@ -131,7 +131,7 @@ class CloudAccountFactory(object):
         return cloud_account
 
     def ensure_email_exists(self, cloud_account, cloud_email):
-        log.info('Checking cloud account %r', cloud_email.email)
+        _logger.info('Checking cloud account %r', cloud_email.email)
         try:
             user_info = cloud_account.get_user_info()
         except HttpError as x:
@@ -143,7 +143,7 @@ class CloudAccountFactory(object):
             with IMAPConnection(IMAP_HOST, AUTOTEST_LOGIN_EMAIL, self._autotest_email_password) as imap_connection:
                 imap_connection.delete_old_activation_messages(cloud_email.email)
                 if result_code == 'badUsername':
-                    log.info('Account %r is missing, creating new one', cloud_email.email)
+                    _logger.info('Account %r is missing, creating new one', cloud_email.email)
                     cloud_account.register_user(cloud_email.first_name, cloud_email.last_name)
                 else:
                     cloud_account.resend_activation_code()
@@ -155,17 +155,17 @@ class CloudAccountFactory(object):
             user_info = cloud_account.get_user_info()
         assert user_info.get('statusCode') == 'activated'
         if user_info['customization'] != self._customization_name:
-            log.info('Account %r has wrong customization: %r; updating', cloud_email.email, user_info['customization'])
+            _logger.info('Account %r has wrong customization: %r; updating', cloud_email.email, user_info['customization'])
             cloud_account.set_user_customization(self._customization_name)
             user_info = cloud_account.get_user_info()
             assert user_info['customization'] == self._customization_name, repr(user_info)
-        log.info(
+        _logger.info(
             'Email %r for cloud group %r is valid and belongs to customization %r',
             cloud_email.email, self._cloud_group, self._customization_name)
 
 
 def resolve_cloud_host_from_registry(cloud_group, customization):
-    log.info(
+    _logger.info(
         'Resolving cloud host for cloud group %r, customization %r on %r:',
         cloud_group, customization, CLOUD_HOST_REGISTRY_URL)
     response = requests.get(
@@ -174,5 +174,5 @@ def resolve_cloud_host_from_registry(cloud_group, customization):
         timeout=120)
     response.raise_for_status()
     cloud_host = response.content
-    log.info('Resolved cloud host for cloud group %r, customization %r: %r', cloud_group, customization, cloud_host)
+    _logger.info('Resolved cloud host for cloud group %r, customization %r: %r', cloud_group, customization, cloud_host)
     return cloud_host

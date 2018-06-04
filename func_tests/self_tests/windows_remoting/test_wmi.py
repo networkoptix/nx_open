@@ -4,7 +4,7 @@ import pytest
 
 from framework.os_access.windows_remoting import Users
 
-log = logging.getLogger(__name__)
+_logger = logging.getLogger(__name__)
 
 
 @pytest.fixture(scope='session')

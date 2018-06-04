@@ -9,7 +9,7 @@ from framework.rest_api import HttpError
 
 pytest_plugins = ['fixtures.cloud']
 
-log = logging.getLogger(__name__)
+_logger = logging.getLogger(__name__)
 
 
 def check_user_exists(server, is_cloud):

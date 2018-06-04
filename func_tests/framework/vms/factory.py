@@ -8,7 +8,7 @@ from framework.os_access.windows_access import WindowsAccess
 from framework.vms.hypervisor import VMNotFound, obtain_running_vm
 from framework.waiting import wait_for_true
 
-logger = logging.getLogger(__name__)
+_logger = logging.getLogger(__name__)
 
 SSH_PRIVATE_KEY_PATH = LocalPath.home() / '.func_tests' / 'ssh' / 'private_key'  # Get from VM's description.
 
@@ -49,11 +49,11 @@ class VMFactory(object):
                 try:
                     self._hypervisor.destroy(name)
                 except VMNotFound:
-                    logger.info("Machine %s not found.", name)
+                    _logger.info("Machine %s not found.", name)
                 else:
-                    logger.info("Machine %s destroyed.", name)
+                    _logger.info("Machine %s destroyed.", name)
             else:
-                logger.warning("Machine %s reserved now.", name)
+                _logger.warning("Machine %s reserved now.", name)
 
         for registry in self._registries.values():
             registry.for_each(destroy)
