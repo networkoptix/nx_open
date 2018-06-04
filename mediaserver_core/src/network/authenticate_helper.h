@@ -3,7 +3,6 @@
 
 #include <deque>
 #include <map>
-#include <optional>
 #include <tuple>
 
 #include <QtNetwork/QAuthenticator>
@@ -11,6 +10,7 @@
 #include <QElapsedTimer>
 #include <QCache>
 
+#include <nx/utils/std/optional.h>
 #include <nx/utils/timer_manager.h>
 #include <nx/utils/uuid.h>
 #include <nx/utils/singleton.h>
