@@ -181,6 +181,7 @@ enum Value
 
     internalServerError = 500,
     notImplemented = 501,
+    badGateway = 502,
     serviceUnavailable = 503
 };
 

@@ -28,11 +28,12 @@ CameraSettingsGeneralTabWidget::CameraSettingsGeneralTabWidget(
     ui->imageControlWidget->setStore(store);
     ui->wearableArchiveLengthWidget->setStore(store);
     ui->wearableMotionWidget->setStore(store);
+    ui->wearableUploadWidget->setStore(store);
 
     ui->licensePanel->init(licenseUsageTextProvider, store);
 
     ui->wearableArchiveLengthWidget->aligner()->addAligner(
-        ui->wearableMotionWidget->aligner());
+        ui->imageControlWidget->aligner());
 
     CheckboxUtils::autoClearTristate(ui->enableAudioCheckBox);
 
@@ -47,6 +48,9 @@ CameraSettingsGeneralTabWidget::CameraSettingsGeneralTabWidget(
 
     connect(ui->enableAudioCheckBox, &QCheckBox::clicked,
         store, &CameraSettingsDialogStore::setAudioEnabled);
+
+    connect(ui->wearableUploadWidget, &WearableCameraUploadWidget::actionRequested,
+        this, &CameraSettingsGeneralTabWidget::actionRequested);
 
     connect(ui->editCredentialsButton, &QPushButton::clicked, this,
         [this, store = QPointer<CameraSettingsDialogStore>(store)]() { editCredentials(store); });
@@ -64,16 +68,17 @@ void CameraSettingsGeneralTabWidget::loadState(const CameraSettingsDialogState& 
     const bool allWearableCameras = state.devicesDescription.isWearable == CombinedValue::All;
     ui->wearableArchiveLengthWidget->setVisible(allWearableCameras);
     ui->wearableMotionWidget->setVisible(allWearableCameras);
+    ui->wearableUploadWidget->setVisible(state.isSingleWearableCamera());
 
     const bool licensePanelVisible = state.devicesDescription.isIoModule != CombinedValue::None
         || state.devicesDescription.isDtsBased != CombinedValue::None;
 
     ui->licensePanel->setVisible(licensePanelVisible);
     ui->overLicensingLine->setVisible(licensePanelVisible);
+    ui->authenticationGroupBox->setVisible(
+        state.devicesDescription.isWearable == CombinedValue::None);
 
-    CheckboxUtils::setupTristateCheckbox(ui->enableAudioCheckBox,
-        state.audioEnabled.hasValue(),
-        state.audioEnabled.valueOr(false));
+    CheckboxUtils::setupTristateCheckbox(ui->enableAudioCheckBox, state.audioEnabled);
 
     ::setReadOnly(ui->enableAudioCheckBox, state.readOnly);
     ::setReadOnly(ui->editCredentialsButton, state.readOnly);

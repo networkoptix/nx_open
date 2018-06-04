@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 
 if [[ ! -d /hostssh ]]; then
     echo "Must mount the host SSH directory at /hostssh, e.g. 'docker run --net host -v /root/.ssh:/hostssh nathanleclaire/ansible"

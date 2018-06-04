@@ -51,9 +51,7 @@ void CameraLicensePanelWidget::init(
 
 void CameraLicensePanelWidget::loadState(const CameraSettingsDialogState& state)
 {
-    CheckboxUtils::setupTristateCheckbox(ui->useLicenseCheckBox,
-        state.recording.enabled.hasValue(),
-        state.recording.enabled.valueOr(false));
+    CheckboxUtils::setupTristateCheckbox(ui->useLicenseCheckBox, state.recording.enabled);
 
     ui->moreLicensesButton->setVisible(state.globalPermissions.testFlag(Qn::GlobalAdminPermission));
 

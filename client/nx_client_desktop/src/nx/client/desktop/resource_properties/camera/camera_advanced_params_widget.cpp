@@ -352,7 +352,7 @@ QnCameraAdvancedParamValueMap CameraAdvancedParamsWidget::groupParameters(
         if (groups.contains(parameter.group))
         {
             const auto parameterValue = m_advancedParamWidgetsManager->parameterValue(parameter.id);
-            if (parameterValue != boost::none)
+            if (parameterValue != std::nullopt)
                 result[parameter.id] = *parameterValue;
         }
     }

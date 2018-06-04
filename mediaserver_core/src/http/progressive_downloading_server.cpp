@@ -226,7 +226,8 @@ private:
         //Preparing output packet. Have to do everything right here to avoid additional frame copying
         //TODO shared chunked buffer and socket::writev is wanted very much here
         QByteArray outPacket;
-        if (m_owner->getTranscoder()->getVideoCodecContext()->codec_id == AV_CODEC_ID_MJPEG)
+        const auto context = m_owner->getTranscoder()->getVideoCodecContext();
+        if (context && context->codec_id == AV_CODEC_ID_MJPEG)
         {
             //preparing timestamp header
             QByteArray timestampHeader;

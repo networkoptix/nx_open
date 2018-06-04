@@ -1,9 +1,11 @@
 #pragma once
 
 #include <QtCore/QByteArray>
+#include <QtCore/QString>
+#include <QtCore/QList>
 #include <QtCore/QMap>
+#include <QtCore/QSet>
 #include <QtCore/QMutex>
-
 #include <QtSerialPort/QSerialPort>
 
 #include <nx/sdk/metadata/camera_manager.h>
@@ -11,7 +13,6 @@
 #include <plugins/plugin_tools.h>
 
 #include "common.h"
-#include "manager.h"
 
 namespace nx {
 namespace mediaserver_plugins {
@@ -21,7 +22,7 @@ namespace ssc {
 class Manager;
 
 /** Plugin for working with SSC-camera. */
-class Plugin: public nxpt::CommonRefCounter<nx::sdk::metadata::Plugin>, public QObject
+class Plugin: public nxpt::CommonRefCounter<nx::sdk::metadata::Plugin>
 {
 public:
     Plugin();
@@ -52,8 +53,8 @@ public:
     }
 
 private:
-    void onSerialReceived();
-    void tuneSerialPort();
+    void onDataReceived(int index);
+    void configureSerialPort(QSerialPort* portToTune, const QString& name, int index);
 
 private:
     QByteArray m_manifest;
@@ -61,9 +62,12 @@ private:
     AnalyticsEventType cameraEventType;
     AnalyticsEventType resetEventType;
 
-    QSerialPort m_serialPort;
-    QMap<int, Manager*> m_managerMap;
-    QMutex m_managerMapMutex;
+    QList<QSerialPort*> m_serialPortList;
+    QList<QByteArray> m_receivedDataList;
+
+    QMap<int /*camera logical id*/, Manager*> m_cameraMap;
+    QSet<int /*camera logical id*/> m_activeCameras;
+    QMutex m_cameraMutex;
 };
 
 } // namespace ssc

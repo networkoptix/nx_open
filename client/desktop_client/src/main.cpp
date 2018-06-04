@@ -229,8 +229,9 @@ int runApplication(QtSingleApplication* application, const QnStartupParameters& 
     client.initDesktopCamera(dynamic_cast<QGLWidget*>(mainWindow->viewport()));
     client.startLocalSearchers();
 
-    if (!context->handleStartupParameters(startupParams))
-        return kInvalidParametersCode;  /* For now it is only if starting videowall failed. */
+    const auto code = context->handleStartupParameters(startupParams);
+    if (code != QnWorkbenchContext::success)
+        return code == QnWorkbenchContext::forcedExit ? kSuccessCode : kInvalidParametersCode;
 
     int result = application->exec();
 

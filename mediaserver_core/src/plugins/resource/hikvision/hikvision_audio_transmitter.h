@@ -38,6 +38,7 @@ private:
 
 private:
     QString m_channelId;
+    bool m_noAuth = false;
 };
 
 } // namespace plugins

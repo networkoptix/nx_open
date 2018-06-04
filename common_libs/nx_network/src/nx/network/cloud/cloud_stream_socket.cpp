@@ -227,9 +227,6 @@ void CloudStreamSocket::cancelIoInAioThread(aio::EventType eventType)
         nx::network::SocketGlobals::addressResolver().cancel(this);
     }
 
-    if (eventType == aio::etNone)   //< It means we need to cancel all I/O.
-        m_aioThreadBinder.pleaseStopSync();
-
     if (eventType == aio::etNone || eventType == aio::etTimedOut)
         m_timer.cancelSync();
 
@@ -343,7 +340,6 @@ void CloudStreamSocket::pleaseStop(nx::utils::MoveOnlyFunc<void()> handler)
         [this, handler = std::move(handler)]()
         {
             stopWhileInAioThread();
-            m_aioThreadBinder.pleaseStopSync();
             handler();
         });
 }
@@ -353,7 +349,6 @@ void CloudStreamSocket::pleaseStopSync(bool /*checkForLocks*/)
     if (isInSelfAioThread())
     {
         stopWhileInAioThread();
-        m_aioThreadBinder.pleaseStopSync();
     }
     else
     {
@@ -489,6 +484,8 @@ void CloudStreamSocket::stopWhileInAioThread()
         setDelegate(nullptr);
     }
     m_multipleAddressConnector.reset();
+
+    m_aioThreadBinder.pleaseStopSync();
 }
 
 } // namespace cloud

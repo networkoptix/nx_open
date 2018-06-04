@@ -6,6 +6,8 @@ namespace nx {
 namespace network {
 namespace ssl {
 
+namespace detail {
+
 StreamSocketToTwoWayPipelineAdapter::StreamSocketToTwoWayPipelineAdapter(
     AbstractStreamSocket* streamSocket)
     :
@@ -64,6 +66,8 @@ int StreamSocketToTwoWayPipelineAdapter::bytesTransferredToPipelineReturnCode(
             return utils::bstream::StreamIoError::osError;
     }
 }
+
+} // namespace detail
 
 //-------------------------------------------------------------------------------------------------
 

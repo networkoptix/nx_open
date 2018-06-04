@@ -3,6 +3,7 @@
 #include <deque>
 
 #include <nx/network/aio/aio_service.h>
+#include <nx/network/aio/timer.h>
 #include <nx/network/socket_global.h>
 #include <nx/utils/thread/mutex.h>
 
@@ -34,13 +35,17 @@ public:
             std::unique_ptr<AbstractStreamSocket>)>;
 
     constexpr static std::size_t kDefaultMaxReadyConnectionCount = 32;
+    // 24 seconds is a default TCP handshake timeout in Linux.
+    constexpr static std::chrono::seconds kDefaultHandshakeTimeout =
+        std::chrono::seconds(24);
 
     CustomHandshakeConnectionAcceptor(
         std::unique_ptr<AcceptorDelegate> delegate,
-        CustomHandshakeConnectionFactory customHandshakeConnection)
+        CustomHandshakeConnectionFactory customHandshakeConnectionFactory)
         :
         m_delegate(std::move(delegate)),
-        m_customHandshakeConnection(std::move(customHandshakeConnection))
+        m_customHandshakeConnectionFactory(
+            std::move(customHandshakeConnectionFactory))
     {
         bindToAioThread(m_delegate->getAioThread());
     }
@@ -52,8 +57,11 @@ public:
         m_delegate->bindToAioThread(aioThread);
         m_acceptCallScheduler.bindToAioThread(aioThread);
 
-        for (auto& connection: m_connections)
-            connection->bindToAioThread(aioThread);
+        for (auto& connectionCtx: m_connections)
+        {
+            connectionCtx.connection->bindToAioThread(aioThread);
+            connectionCtx.handshakeTimer.bindToAioThread(aioThread);
+        }
         for (auto& connection: m_acceptedConnections)
             connection->bindToAioThread(aioThread);
     }
@@ -70,6 +78,16 @@ public:
     std::size_t readyConnectionQueueSize() const
     {
         return m_maxReadyConnectionCount;
+    }
+
+    void setHandshakeTimeout(std::chrono::milliseconds timeout)
+    {
+        m_handshakeTimeout = timeout;
+    }
+
+    std::chrono::milliseconds handshakeTimeout() const
+    {
+        return m_handshakeTimeout;
     }
 
     void start()
@@ -153,17 +171,31 @@ protected:
     }
 
 private:
-    using Connections = std::list<std::unique_ptr<CustomHandshakeConnection>>;
+    struct ConnectionContext
+    {
+        std::unique_ptr<CustomHandshakeConnection> connection;
+        aio::Timer handshakeTimer;
+
+        ConnectionContext(
+            std::unique_ptr<CustomHandshakeConnection> connection)
+            :
+            connection(std::move(connection))
+        {
+        }
+    };
+
+    using Connections = std::list<ConnectionContext>;
 
     std::unique_ptr<AcceptorDelegate> m_delegate;
     Connections m_connections;
     AcceptCompletionHandler m_acceptHandler;
     std::deque<std::unique_ptr<CustomHandshakeConnection>> m_acceptedConnections;
     std::size_t m_maxReadyConnectionCount = kDefaultMaxReadyConnectionCount;
+    std::chrono::milliseconds m_handshakeTimeout = kDefaultHandshakeTimeout;
     aio::BasicPollable m_acceptCallScheduler;
     mutable QnMutex m_mutex;
     bool m_isDelegateAccepting = false;
-    CustomHandshakeConnectionFactory m_customHandshakeConnection;
+    CustomHandshakeConnectionFactory m_customHandshakeConnectionFactory;
 
     void openConnections(const QnMutexLockerBase& /*lock*/)
     {
@@ -199,11 +231,18 @@ private:
         {
             connection->bindToAioThread(getAioThread());
 
-            m_connections.push_back(
-                m_customHandshakeConnection(std::move(connection)));
-            m_connections.back()->handshakeAsync(
+            m_connections.emplace_back(
+                m_customHandshakeConnectionFactory(std::move(connection)));
+            m_connections.back().handshakeTimer.bindToAioThread(getAioThread());
+
+            auto handshakeDone =
                 std::bind(&CustomHandshakeConnectionAcceptor::onHandshakeDone, this,
-                    std::prev(m_connections.end()), _1));
+                    std::prev(m_connections.end()), _1);
+
+            m_connections.back().handshakeTimer.start(
+                m_handshakeTimeout,
+                std::bind(handshakeDone, SystemError::timedOut));
+            m_connections.back().connection->handshakeAsync(handshakeDone);
         }
 
         openConnections(lock);
@@ -215,7 +254,7 @@ private:
     {
         QnMutexLocker lock(&m_mutex);
 
-        auto connection = std::move(*connectionIter);
+        auto connection = std::move(connectionIter->connection);
         m_connections.erase(connectionIter);
         if (handshakeResult != SystemError::noError)
         {

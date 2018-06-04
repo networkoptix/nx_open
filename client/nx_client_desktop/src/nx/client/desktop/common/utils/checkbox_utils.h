@@ -1,5 +1,7 @@
 #pragma once
 
+#include <nx/utils/std/optional.h>
+
 class QCheckBox;
 
 namespace nx {
@@ -10,6 +12,7 @@ struct CheckboxUtils
 {
     static void autoClearTristate(QCheckBox* checkbox);
     static void setupTristateCheckbox(QCheckBox* checkbox, bool sameValue, bool checked);
+    static void setupTristateCheckbox(QCheckBox* checkbox, std::optional<bool> checked);
 };
 
 } // namespace desktop

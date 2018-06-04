@@ -111,17 +111,12 @@ class DebInstallation(Installation):
                 CORE_PATTERN_FILE='/etc/sysctl.d/60-core-pattern.conf'
                 echo 'kernel.core_pattern=core.%t.%p' > "$CORE_PATTERN_FILE"  # %t is timestamp, %p is pid.
                 sysctl -p "$CORE_PATTERN_FILE"  # See: https://superuser.com/questions/625840
-                POINT=/mnt/trusty-packages
-                mkdir -p "$POINT"
-                mount -t nfs -o ro "$SHARE" "$POINT"
-                DEBIAN_FRONTEND=noninteractive dpkg -i "$DEB" "$POINT"/*  # GDB (to parse core dumps) and deps.
-                umount "$POINT"
+                DEBIAN_FRONTEND=noninteractive dpkg -i "$DEB"
                 cp "$CONFIG" "$CONFIG_INITIAL"
                 ''',
             env={
                 'DEB': remote_path,
                 'CONFIG': self._config,
                 'CONFIG_INITIAL': self._config_initial,
-                'SHARE': '10.0.2.107:/data/QA/func_tests/trusty-packages',
                 })
         assert self.is_valid()

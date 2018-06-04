@@ -177,6 +177,11 @@ QString HanwhaAdavancedParameterInfo::submenu() const
     return m_submenu;
 }
 
+bool HanwhaAdavancedParameterInfo::hasParameter() const
+{
+    return !m_parameterName.isEmpty();
+}
+
 QString HanwhaAdavancedParameterInfo::parameterName() const
 {
     return m_parameterName;
@@ -306,7 +311,10 @@ void HanwhaAdavancedParameterInfo::parseId(const QString& idString)
 
     split = idInfoPart.split(L'/');
     if (split.size() != 2 && split.size() != 3)
+    {
+        NX_ASSERT(false, lm("Wrong parameter id: %1").args(idString));
         return;
+    }
 
     m_cgi = split[0];
     m_submenu = split[1];

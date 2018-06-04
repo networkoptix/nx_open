@@ -35,7 +35,7 @@ public:
     QnMediaServerResource(QnCommonModule* commonModule);
     virtual ~QnMediaServerResource();
 
-    virtual QString getUniqueId() const;
+    virtual QString getUniqueId() const override;
 
     //!Overrides \a QnResource::getName. Returns camera name from \a QnMediaServerUserAttributes
     virtual QString getName() const override;

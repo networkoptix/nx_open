@@ -27,12 +27,18 @@ def setup_logging():
 
 def testclass(cls):
     test_methods_dict = {}
+    metric_keys = []
 
     for name, method in cls.__dict__.items():
         if hasattr(method, "testmethod_index"):
             test_methods_dict[method.testmethod_index] = method
 
+        if hasattr(method, "metric") and method.metric:
+            host = method.host if hasattr(method, "host") and method.host else None
+            metric_keys.append((method.metric, host))
+
     cls._test_methods = test_methods_dict.values()
+    cls._metric_keys = metric_keys
 
     return cls
 
@@ -50,7 +56,7 @@ def testmethod(delay=0, host=None, continue_if_fails=False, metric=None):
                 log.info('Test {}: success'.format(f.__name__))
 
                 if metric:
-                    self.collected_metrics[(metric, host)] = 0
+                    self.collected_metrics[(metric, host, datetime.utcnow())] = 0
 
                 return 0
             except Exception:
@@ -60,7 +66,8 @@ def testmethod(delay=0, host=None, continue_if_fails=False, metric=None):
                 traceback.print_exc(file=io)
                 log.error(io.getvalue())
 
-                self.collected_metrics[(metric, host)] = 1
+                if metric:
+                    self.collected_metrics[(metric, host, datetime.utcnow())] = 1
 
                 if continue_if_fails:
                     return 1
@@ -68,6 +75,8 @@ def testmethod(delay=0, host=None, continue_if_fails=False, metric=None):
                 raise
 
         wrapper.testmethod_index = testmethod.counter
+        wrapper.metric = metric
+        wrapper.host = host
         testmethod.counter += 1
 
         return wrapper
@@ -126,33 +135,74 @@ class CloudSession(object):
     def close(self):
         self.session.close()
 
-    def report_metrics(self):
-        cw = boto3.client('cloudwatch')
-
+    def _metric_data(self):
         metric_data = []
 
-        for (metric, host), value in self.collected_metrics.items():
-            item = {
+        for (metric, host, timestamp), value in self.collected_metrics.items():
+            if value is None:
+                continue
+
+            metric_data_item = {
                 'MetricName': metric,
-                'Timestamp': datetime.now(),
+                'Timestamp': timestamp,
                 'Value': value,
                 'Unit': 'Count',
             }
 
             if host:
-                item['Dimensions'] = [
+                metric_data_item['Dimensions'] = [
                     {
                         'Name': 'host',
                         'Value': host
                     }
                 ]
 
-            metric_data.append(item)
+            metric_data.append(metric_data_item)
 
-        cw.put_metric_data(
+        return metric_data
+
+    def _dynamodb_item(self):
+        metric_items = []
+
+        for (metric, host, timestamp), value in self.collected_metrics.items():
+            metric_item = {
+                'name': metric,
+                'timestamp': timestamp.isoformat(),
+                'value': value
+            }
+
+            if host:
+                metric_item['dimensions'] = {
+                    'host': host
+                }
+
+            metric_items.append(metric_item)
+
+        timestamp = datetime.utcnow()
+        return {
+            'year': timestamp.year,
+            'timestamp': timestamp.isoformat(),
+            'metrics': metric_items
+        }
+
+    def report_metrics(self):
+        collected_keys = set([(metric, host) for (metric, host, timestamp) in self.collected_metrics.keys()])
+
+        timestamp = datetime.utcnow()
+
+        for metric, host in self._metric_keys:
+            if (metric, host) not in collected_keys:
+                self.collected_metrics[(metric, host, timestamp)] = None
+
+        cloudwatch = boto3.client('cloudwatch')
+        cloudwatch.put_metric_data(
             Namespace='prod__monitoring',
-            MetricData=metric_data
+            MetricData=self._metric_data()
         )
+
+        dynamodb = boto3.resource('dynamodb')
+        table = dynamodb.Table('prod-health-records')
+        table.put_item(Item=self._dynamodb_item())
 
     def run_tests(self):
         status = 0
@@ -201,6 +251,19 @@ class CloudSession(object):
     def assert_response_has_cookie(response, cookie):
         assert cookie in response.cookies, 'Response doesn\'t containt cookie {}'.format(cookie)
 
+    @testmethod()
+    def test_cloud_db_get_system_id(self):
+        auth = HTTPDigestAuth(self.email, self.password)
+        r = requests.get(self._url('/cdb/system/get'), auth=auth).json()
+
+        assert 'systems' in r, 'Invalid response from cloud_db. No systems'
+        assert len(r['systems']) == 1, 'Invalid response from cloud_db. Number of systems != 1'
+        assert r['systems'][0]['id'], 'System ID is invalid'
+
+        self.system_id = r['systems'][0]['id']
+
+        log.info('Got system ID: {}'.format(self.system_id))
+
     def test_cloud_connect_base(self, extra_args=''):
         image = '009544449203.dkr.ecr.us-east-1.amazonaws.com/cloud/cloud_connect_test_util:{}'.format(
             CLOUD_CONNECT_TEST_UTIL_VERSION)
@@ -223,7 +286,7 @@ class CloudSession(object):
         log.info('Stderr:\n{}'.format(stderr.decode('utf-8')))
         container.remove()
 
-        assert b'HTTP/1.1 200 OK' in stdout, 'Received invalid output from cloud connect (extra_args: {})}'.format(
+        assert b'HTTP/1.1 200 OK' in stdout, 'Received invalid output from cloud connect (extra_args: {})'.format(
             extra_args)
         assert status == 0, 'Cloud connect test util exited with non-zero status {}'.format(status)
 
@@ -277,7 +340,7 @@ class CloudSession(object):
         assert len(data) > 0, 'Can\'t find the system'
         assert data[0]['id'], 'Got system without ID'
 
-        self.system_id = data[0]['id']
+        assert self.system_id == data[0]['id'], 'Invalid response from portal. Invalid system id'
 
     @testmethod()
     def share_system(self):

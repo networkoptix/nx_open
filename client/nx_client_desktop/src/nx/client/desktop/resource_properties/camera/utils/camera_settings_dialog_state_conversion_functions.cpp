@@ -261,7 +261,7 @@ void setCredentials(const State::Credentials& value, const Cameras& cameras)
     else if (!value.password.hasValue())
     {
         // Change only login, fetch passwords from cameras.
-        for (const auto& camera : cameras)
+        for (const auto& camera: cameras)
         {
             authenticator.setPassword(camera->getAuth().password());
             camera->setAuth(authenticator);
@@ -336,8 +336,11 @@ void CameraSettingsDialogStateConversionFunctions::applyStateToCameras(
         }
     }
 
-    if (state.credentials.login.hasValue() || state.credentials.password.hasValue())
+    if ((state.credentials.login.hasValue() || state.credentials.password.hasValue())
+        && state.devicesDescription.isWearable == State::CombinedValue::None)
+    {
         setCredentials(state.credentials, cameras);
+    }
 
     setMinRecordingDays(state.recording.minDays, cameras);
     setMaxRecordingDays(state.recording.maxDays, cameras);
