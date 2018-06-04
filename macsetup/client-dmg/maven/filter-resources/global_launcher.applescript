@@ -3,14 +3,13 @@ on run
 end run
 
 on open location targetUrl
-	launchClient(doubleQuoted(targetUrl), "--- OPEN LOCATION:")
+	launchClient(getQuoted(targetUrl), "--- OPEN LOCATION:")
 end open location
 
 on open fileNames
 	set posixFileNames to ""
 	repeat with macFileName in fileNames
-		-- We use double quotation to preserve arguments with spaces in applauncher bash script
-		set posixFileNames to posixFileNames & " " & doubleQuoted(POSIX path of macFileName)
+		set posixFileNames to posixFileNames & " " & getQuoted(POSIX path of macFileName)
 	end repeat
 	
 	launchClient(posixFileNames, "--- OPEN FILES:")
@@ -18,20 +17,22 @@ end open
 
 on launchClient(arguments, debugLogMark)
 	set basePath to (POSIX path of (path to me as text)) & "Contents/MacOS/"
-	set command to quoted form of (basePath & "applauncher") & " " & arguments & " > /dev/null 2>&1 &"
+	set command to getQuoted(basePath & "applauncher") & " " & arguments & " > /dev/null 2>&1 &"
 	debugLog(debugLogMark & " " & command)
 	do shell script command
 end launchClient
 
-on doubleQuoted(value)
-	return quoted form of ("\"" & value & "\"")
-end doubleQuoted
+on getQuoted(value)
+	return quoted form of value
+end getQuoted
 
 on debugLog(logText)
-	set disableDebugLog to true
+	set disableDebugLog to false
 	set logFileName to (POSIX path of (path to home folder as text)) & "global_launcher.log"
 	if disableDebugLog then
 		return
 	end if
-	do shell script "echo " & (quoted form of logText) & ">>" & (quoted form of logFileName)
+	do shell script "echo " & getQuoted(logText) & ">>" & getQuoted(logFileName)
 end debugLog
+
+
