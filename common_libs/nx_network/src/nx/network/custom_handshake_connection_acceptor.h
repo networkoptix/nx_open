@@ -57,7 +57,7 @@ public:
         m_delegate->bindToAioThread(aioThread);
         m_acceptCallScheduler.bindToAioThread(aioThread);
 
-        for (auto& connectionCtx: m_connections)
+        for (auto& connectionCtx: m_connectionsBeingHandshaked)
         {
             connectionCtx.connection->bindToAioThread(aioThread);
             connectionCtx.handshakeTimer.bindToAioThread(aioThread);
@@ -166,7 +166,7 @@ protected:
     {
         m_delegate->pleaseStopSync();
         m_acceptCallScheduler.pleaseStopSync();
-        m_connections.clear();
+        m_connectionsBeingHandshaked.clear();
         m_acceptedConnections.clear();
     }
 
@@ -187,7 +187,7 @@ private:
     using Connections = std::list<ConnectionContext>;
 
     std::unique_ptr<AcceptorDelegate> m_delegate;
-    Connections m_connections;
+    Connections m_connectionsBeingHandshaked;
     AcceptCompletionHandler m_acceptHandler;
     std::deque<std::unique_ptr<CustomHandshakeConnection>> m_acceptedConnections;
     std::size_t m_maxReadyConnectionCount = kDefaultMaxReadyConnectionCount;
@@ -203,11 +203,8 @@ private:
 
         NX_ASSERT(isInSelfAioThread());
 
-        if (m_acceptedConnections.size() + m_connections.size() >=
-            m_maxReadyConnectionCount)
-        {
+        if (m_acceptedConnections.size() >= m_maxReadyConnectionCount)
             return;
-        }
 
         if (!m_isDelegateAccepting)
         {
@@ -231,18 +228,18 @@ private:
         {
             connection->bindToAioThread(getAioThread());
 
-            m_connections.emplace_back(
+            m_connectionsBeingHandshaked.emplace_back(
                 m_customHandshakeConnectionFactory(std::move(connection)));
-            m_connections.back().handshakeTimer.bindToAioThread(getAioThread());
+            m_connectionsBeingHandshaked.back().handshakeTimer.bindToAioThread(getAioThread());
 
             auto handshakeDone =
                 std::bind(&CustomHandshakeConnectionAcceptor::onHandshakeDone, this,
-                    std::prev(m_connections.end()), _1);
+                    std::prev(m_connectionsBeingHandshaked.end()), _1);
 
-            m_connections.back().handshakeTimer.start(
+            m_connectionsBeingHandshaked.back().handshakeTimer.start(
                 m_handshakeTimeout,
                 std::bind(handshakeDone, SystemError::timedOut));
-            m_connections.back().connection->handshakeAsync(handshakeDone);
+            m_connectionsBeingHandshaked.back().connection->handshakeAsync(handshakeDone);
         }
 
         openConnections(lock);
@@ -255,7 +252,7 @@ private:
         QnMutexLocker lock(&m_mutex);
 
         auto connection = std::move(connectionIter->connection);
-        m_connections.erase(connectionIter);
+        m_connectionsBeingHandshaked.erase(connectionIter);
         if (handshakeResult != SystemError::noError)
         {
             openConnections(lock);

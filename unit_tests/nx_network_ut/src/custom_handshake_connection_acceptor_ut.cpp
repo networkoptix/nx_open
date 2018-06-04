@@ -41,7 +41,7 @@ protected:
             {
                 return std::make_unique<ssl::ServerSideStreamSocket>(std::move(streamSocket));
             });
-        //
+        // Using very large timeout by default to make test reliable to various delays.
         m_acceptor->setHandshakeTimeout(std::chrono::hours(1));
 
         m_acceptor->start();
@@ -54,7 +54,13 @@ protected:
         return *m_acceptor;
     }
 
-    void whenEstablishConnection()
+    void givenManySilentConnectionCountGreaterThanListenQueue()
+    {
+        openSilentConnections(
+            m_acceptor->readyConnectionQueueSize()*2);
+    }
+
+    void whenEstablishValidConnection()
     {
         m_clientConnection = std::make_unique<ssl::ClientStreamSocket>(
             std::make_unique<TCPSocket>(AF_INET));
@@ -66,11 +72,10 @@ protected:
 
     void whenEstablishSilentConnection()
     {
-        m_clientConnection = std::make_unique<TCPSocket>(AF_INET);
-
-        ASSERT_TRUE(m_clientConnection->connect(
-            m_tcpServer->getLocalAddress(),
-            kNoTimeout));
+        openSilentConnections(1);
+        m_clientConnection = std::move(m_silentConnections.front());
+        ASSERT_TRUE(m_clientConnection->setNonBlockingMode(false));
+        m_silentConnections.pop_front();
     }
 
     void thenConnectionIsAccepted()
@@ -81,7 +86,8 @@ protected:
     void thenConnectionIsClosedByServerAfterSomeTime()
     {
         std::array<char, 128> readBuf;
-        ASSERT_EQ(0, m_clientConnection->recv(readBuf.data(), readBuf.size()));
+        ASSERT_EQ(0, m_clientConnection->recv(readBuf.data(), readBuf.size()))
+            << SystemError::getLastOSErrorText().toStdString();
     }
 
     void thenNoConnectionsHaveBeenAccepted()
@@ -102,6 +108,7 @@ private:
     nx::utils::SyncQueue<AcceptResult> m_acceptedConnections;
     TCPServerSocket* m_tcpServer = nullptr;
     std::unique_ptr<AbstractStreamSocket> m_clientConnection;
+    std::deque<std::unique_ptr<AbstractStreamSocket>> m_silentConnections;
 
     void saveAcceptedConnection(
         SystemError::ErrorCode systemErrorCode,
@@ -115,11 +122,34 @@ private:
         m_acceptor->acceptAsync(
             std::bind(&CustomHandshakeConnectionAcceptor::saveAcceptedConnection, this, _1, _2));
     }
+
+    void openSilentConnections(int count)
+    {
+        m_silentConnections.resize(count);
+        nx::utils::SyncQueue<SystemError::ErrorCode> connectResults;
+
+        for (int i = 0; i < count; ++i)
+        {
+            m_silentConnections[i] = std::make_unique<TCPSocket>(AF_INET);
+            ASSERT_TRUE(m_silentConnections[i]->setNonBlockingMode(true));
+            m_silentConnections[i]->connectAsync(
+                m_tcpServer->getLocalAddress(),
+                [&connectResults](SystemError::ErrorCode resultCode)
+                {
+                    connectResults.push(resultCode);
+                });
+        }
+
+        for (int i = 0; i < count; ++i)
+        {
+            ASSERT_EQ(SystemError::noError, connectResults.pop());
+        }
+    }
 };
 
 TEST_F(CustomHandshakeConnectionAcceptor, connections_are_accepted)
 {
-    whenEstablishConnection();
+    whenEstablishValidConnection();
     thenConnectionIsAccepted();
 }
 
@@ -138,7 +168,12 @@ TEST_F(CustomHandshakeConnectionAcceptor, silent_connection_is_closed_by_server)
     thenNoConnectionsHaveBeenAccepted();
 }
 
-// TEST_F(CustomHandshakeConnectionAcceptor, silent_connections_do_not_block_active_connections)
+TEST_F(CustomHandshakeConnectionAcceptor, silent_connections_do_not_block_active_connections)
+{
+    givenManySilentConnectionCountGreaterThanListenQueue();
+    whenEstablishValidConnection();
+    thenConnectionIsAccepted();
+}
 
 } // namespace test
 } // namespace network
