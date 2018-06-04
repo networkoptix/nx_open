@@ -3,14 +3,14 @@ on run
 end run
 
 on open location targetUrl
-	launchClient("--" & targetUrl, "--- OPEN LOCATION:")
+	launchClient(doubleQuoted(targetUrl), "--- OPEN LOCATION:")
 end open location
 
 on open fileNames
 	set posixFileNames to ""
 	repeat with macFileName in fileNames
 		-- We use double quotation to preserve arguments with spaces in applauncher bash script
-		set posixFileNames to posixFileNames & " " & (quoted form of ("\"" & (POSIX path of macFileName) & "\""))
+		set posixFileNames to posixFileNames & " " & doubleQuoted(POSIX path of macFileName)
 	end repeat
 	
 	launchClient(posixFileNames, "--- OPEN FILES:")
@@ -22,6 +22,10 @@ on launchClient(arguments, debugLogMark)
 	debugLog(debugLogMark & " " & command)
 	do shell script command
 end launchClient
+
+on doubleQuoted(value)
+	return quoted form of ("\"" & value & "\"")
+end doubleQuoted
 
 on debugLog(logText)
 	set disableDebugLog to true

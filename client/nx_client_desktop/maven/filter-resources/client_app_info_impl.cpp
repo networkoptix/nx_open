@@ -40,17 +40,6 @@ int QnClientAppInfo::videoWallIconId()
     return IDI_ICON_VIDEOWALL;
 }
 
-QString QnClientAppInfo::protocolHandlerBundleName()
-{
-    //TODO: remove this variable before review
-    return QString();
-}
-
-QString QnClientAppInfo::protocolHandlerBundleIdBase()
-{
-    return QStringLiteral("${mac.protocol_handler_bundle.identifier}");
-}
-
 QString QnClientAppInfo::launcherVersionFile()
 {
     return QStringLiteral("${launcher.version.file}");

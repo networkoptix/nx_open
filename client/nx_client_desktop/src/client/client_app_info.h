@@ -23,10 +23,6 @@ struct QnClientAppInfo
     /** Resource file id for videowall shortcut. */
     static int videoWallIconId();
 
-    static QString protocolHandlerBundleName();
-
-    static QString protocolHandlerBundleIdBase();
-
     static QString launcherVersionFile();
 
     /** bin directory location relative to client package root. */
