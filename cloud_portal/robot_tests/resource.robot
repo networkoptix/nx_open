@@ -21,7 +21,7 @@ Open Browser and go to URL
     Go To    ${url}
 
 Check Language
-    Wait Until Element Is Enabled    ${LANGUAGE DROPDOWN}
+    Wait Until Page Contains Element    ${LANGUAGE DROPDOWN}/following-sibling::ul//a[@ng-click='changeLanguage(lang.language)']/span[@lang='en_US']
     Register Keyword To Run On Failure    NONE
     ${status}    ${value}=    Run Keyword And Ignore Error    Wait Until Element Is Visible    ${LANGUAGE DROPDOWN}/span[@lang='${LANGUAGE}']    2
     Register Keyword To Run On Failure    Failure Tasks
