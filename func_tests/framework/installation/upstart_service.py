@@ -12,7 +12,7 @@ _status_output_re = re.compile(
     r'(?P<job>[-_\w]+)'
     r' (?P<goal>start|stop)'
     r'/(?P<status>waiting|starting|pre-start|spawned|post-start|running|pre-stop|stopping|killed|post-stop)'
-    r'(?:, process(?P<pid>\d+))?'
+    r'(?:, process (?P<pid>\d+))?'
     )
 
 
