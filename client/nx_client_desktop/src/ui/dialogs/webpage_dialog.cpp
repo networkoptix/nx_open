@@ -8,6 +8,8 @@
 #include <nx/client/desktop/common/utils/aligner.h>
 #include <nx/network/http/http_types.h>
 
+#include <ui/workaround/widgets_signals_workaround.h>
+
 using namespace nx::client::desktop;
 
 namespace {
