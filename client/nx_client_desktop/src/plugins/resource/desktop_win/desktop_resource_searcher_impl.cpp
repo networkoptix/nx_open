@@ -30,7 +30,7 @@ QnResourceList QnDesktopResourceSearcherImpl::findResources() {
         return QnResourceList();
 
     QnResourceList result;
-    if (m_pD3D == 0)
+    if (!m_pD3D)
         return result;
 
     D3DDISPLAYMODE ddm;
