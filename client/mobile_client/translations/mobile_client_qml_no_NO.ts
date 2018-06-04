@@ -332,6 +332,29 @@
     </message>
   </context>
   <context>
+    <name>LoginUtils</name>
+    <message>
+      <source>Invalid login or password</source>
+      <translation type="unfinished">Invalid login or password</translation>
+    </message>
+    <message>
+      <source>LDAP Server connection timed out</source>
+      <translation type="unfinished">LDAP Server connection timed out</translation>
+    </message>
+    <message>
+      <source>Server or network is not available</source>
+      <translation type="unfinished">Server or network is not available</translation>
+    </message>
+    <message>
+      <source>Incompatible server</source>
+      <translation type="unfinished">Incompatible server</translation>
+    </message>
+    <message>
+      <source>Incompatible server version %1</source>
+      <translation type="unfinished">Incompatible server version %1</translation>
+    </message>
+  </context>
+  <context>
     <name>MoveOnTapOverlay</name>
     <message>
       <source>Tap on the image to position your camera</source>

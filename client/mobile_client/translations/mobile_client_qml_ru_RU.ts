@@ -332,6 +332,29 @@
     </message>
   </context>
   <context>
+    <name>LoginUtils</name>
+    <message>
+      <source>Invalid login or password</source>
+      <translation>Неверный логин или пароль</translation>
+    </message>
+    <message>
+      <source>LDAP Server connection timed out</source>
+      <translation>Истекло время ожидания подключения к серверу LDAP</translation>
+    </message>
+    <message>
+      <source>Server or network is not available</source>
+      <translation>Сервер недоступен или проблемы с сетевым подключением</translation>
+    </message>
+    <message>
+      <source>Incompatible server</source>
+      <translation>Несовместимый сервер</translation>
+    </message>
+    <message>
+      <source>Incompatible server version %1</source>
+      <translation>Версия сервера %1 не поддерживается</translation>
+    </message>
+  </context>
+  <context>
     <name>MoveOnTapOverlay</name>
     <message>
       <source>Tap on the image to position your camera</source>
