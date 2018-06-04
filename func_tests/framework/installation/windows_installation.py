@@ -20,8 +20,8 @@ class WindowsInstallation(Installation):
         self.binary = self.dir / 'mediaserver.exe'
         self.info = self.dir / 'build_info.txt'
         system_profile_dir = windows_access.Path(windows_access.winrm.system_profile_dir())
-        local_app_data_dir = system_profile_dir / 'AppData' / 'Local'
-        self.var = local_app_data_dir / customization.windows_app_data_subdir
+        self._local_app_data_dir = system_profile_dir / 'AppData' / 'Local'
+        self.var = self._local_app_data_dir / customization.windows_app_data_subdir
         self._log_file = self.var / 'log' / 'log_file.log'
         self.key_pair = self.var / 'ssl' / 'cert.pem'
         self._config_key = windows_access.winrm.registry_key(customization.windows_registry_key)
@@ -72,9 +72,7 @@ class WindowsInstallation(Installation):
             dumps.append(path)
 
     def list_core_dumps_from_mediaserver(self):
-        system_profile_dir = self.os_access.Path(self.os_access.winrm.system_profile_dir())
-        local_app_data = system_profile_dir / 'AppData' / 'Local'
-        dumps = list(local_app_data.glob('{}_*.dmp'.format(self.binary.name)))
+        dumps = list(self._local_app_data_dir.glob('{}_*.dmp'.format(self.binary.name)))
         return dumps
 
     def list_core_dumps_from_procdump(self):
