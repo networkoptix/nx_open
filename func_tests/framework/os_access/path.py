@@ -49,7 +49,7 @@ class FileSystemPath(PurePath):
 
     @abstractmethod
     def write_bytes(self, contents, offset=None):
-        pass
+        return 0
 
     @abstractmethod
     def read_text(self, encoding, errors):
@@ -57,7 +57,7 @@ class FileSystemPath(PurePath):
 
     @abstractmethod
     def write_text(self, data, encoding, errors):
-        pass
+        return 0
 
 
 def copy_file(source, destination):  # type: (FileSystemPath, FileSystemPath) -> None

@@ -118,10 +118,11 @@ def test_rmtree_mkdir_exists(dirty_remote_test_dir, depth):
         ('ending_with_chr0', 'abc\0'),
         ],
     ids='{0[0]}'.format)
-def test_write_read_bytes(data, remote_test_dir):
+def test_write_read_bytes(remote_test_dir, data):
     name, written = data
     file_path = remote_test_dir / '{}.dat'.format(name)
-    file_path.write_bytes(written)
+    bytes_written = file_path.write_bytes(written)
+    assert bytes_written == len(written)
     read = file_path.read_bytes()
     assert read == written
 
@@ -140,7 +141,8 @@ def test_write_read_bytes(data, remote_test_dir):
 def test_write_read_text(remote_test_dir, data):
     name, encoding, written = data
     file_path = remote_test_dir / '{}_{}.txt'.format(name, encoding)
-    file_path.write_text(written, encoding=encoding)
+    chars_written = file_path.write_text(written, encoding=encoding)
+    assert chars_written == len(written)
     read = file_path.read_text(encoding=encoding)
     assert read == written
 

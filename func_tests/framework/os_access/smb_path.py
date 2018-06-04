@@ -243,4 +243,6 @@ class SMBPath(FileSystemPath, PureWindowsPath):
 
     def write_text(self, text, encoding='ascii', errors='strict'):
         data = text.encode(encoding=encoding, errors=errors)
-        self.write_bytes(data)
+        bytes_written = self.write_bytes(data)
+        assert bytes_written == len(data)
+        return len(text)
