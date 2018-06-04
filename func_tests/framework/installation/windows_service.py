@@ -4,6 +4,11 @@ from framework.installation.service import Service, ServiceStatus
 class WindowsService(Service):
     def __init__(self, winrm, name):
         self.query = winrm.wmi_query(u'Win32_Service', {u'Name': name})
+        self._winrm = winrm
+        self._name = name
+
+    def __repr__(self):
+        return '<WindowsService {} at {}>'.format(self._name, self._winrm)
 
     def stop(self):
         self.query.invoke_method(u'StopService', {})

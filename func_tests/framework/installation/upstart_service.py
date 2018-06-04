@@ -29,6 +29,9 @@ class UpstartService(Service):
         self._start_timeout_sec = start_timeout_sec
         self._stop_timeout_sec = stop_timeout_sec
 
+    def __repr__(self):
+        return '<UpstartService {} at {}>'.format(self._service_name, self._ssh)
+
     def start(self):
         self._ssh.run_command(['start', self._service_name], timeout_sec=self._start_timeout_sec)
 
