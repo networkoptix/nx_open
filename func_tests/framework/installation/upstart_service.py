@@ -47,12 +47,6 @@ class UpstartService(Service):
         pid = int(match.group('pid')) if match.group('pid') is not None else None
         return ServiceStatus(is_running, pid)
 
-    def make_core_dump(self):
-        try:
-            self._ssh.run_command(['killall', '--signal', 'SIGTRAP', 'mediaserver-bin'])
-        except NonZeroExitStatus:
-            _logger.error("Cannot make core dump of process of %s service on %r.", self._service_name, self._ssh)
-
 
 class LinuxAdHocService(Service):
     """Run multiple mediaservers on single machine
@@ -77,9 +71,6 @@ class LinuxAdHocService(Service):
 
     def stop(self):
         return self._ssh.run_command([self._service_script_path, 'stop'])
-
-    def make_core_dump(self):
-        self._ssh.run_command([self._service_script_path, 'make_core_dump'])
 
     def status(self):
         # TODO: Make a script.

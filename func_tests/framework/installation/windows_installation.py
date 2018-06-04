@@ -54,7 +54,7 @@ class WindowsInstallation(Installation):
         self.os_access.winrm.run_command([remote_installer_path, '/passive', '/log', remote_log_path])
         self._backup_configuration()
 
-    def list_core_dumps(self):
+    def list_core_dumps_from_task_manager(self):
         base_name = self.binary.stem
 
         def iterate_names(limit):
@@ -62,18 +62,31 @@ class WindowsInstallation(Installation):
             for index in range(2, limit + 1):
                 yield '{} ({}).DMP'.format(base_name, index)
 
-        def iterate_existing_paths(profile_dir):
-            user_temp_dir = profile_dir / 'AppData' / 'Local' / 'Temp'
-            for name in iterate_names(20):  # 20 is arbitrarily big number.
-                path = user_temp_dir / name
-                if not path.exists():
-                    break
-                yield path
+        profile_dir = self.os_access.Path(self.os_access.winrm.user_env_vars()[u'UserProfile'])
+        temp_dir = profile_dir / 'AppData' / 'Local' / 'Temp'
+        dumps = []
+        for name in iterate_names(20):  # 20 is arbitrarily big number.
+            path = temp_dir / name
+            if not path.exists():
+                break
+            dumps.append(path)
 
-        user_profile_dir = self.os_access.Path(self.os_access.winrm.user_env_vars()[u'UserProfile'])
+    def list_core_dumps_from_mediaserver(self):
         system_profile_dir = self.os_access.Path(self.os_access.winrm.system_profile_dir())
-        paths = list(iterate_existing_paths(user_profile_dir)) + list(iterate_existing_paths(system_profile_dir))
-        return paths
+        local_app_data = system_profile_dir / 'AppData' / 'Local'
+        dumps = list(local_app_data.glob('{}_*.dmp'.format(self.binary.name)))
+        return dumps
+
+    def list_core_dumps_from_procdump(self):
+        profile_dir = self.os_access.Path(self.os_access.winrm.user_env_vars()[u'UserProfile'])
+        dumps = list(profile_dir.glob('{}_*.dmp'.format(self.binary.name)))
+        return dumps
+
+    def list_core_dumps(self):
+        dumps_from_mediaserver = self.list_core_dumps_from_mediaserver()
+        dumps_from_procdump = self.list_core_dumps_from_procdump()
+        dumps = dumps_from_mediaserver + dumps_from_procdump
+        return dumps
 
     def restore_mediaserver_conf(self):
         pass

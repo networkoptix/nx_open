@@ -43,5 +43,8 @@ class LocalAccess(OSAccess):
     def set_time(self, new_time):
         raise NotImplementedError("Changing local time is prohibited")
 
+    def make_core_dump(self, pid):
+        self.run_command(['kill', '-s', 'SIGTRAP', pid])
+
 
 local_access = LocalAccess()

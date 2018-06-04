@@ -7,6 +7,7 @@ import tzlocal.windows_tz
 
 from framework.method_caching import cached_getter, cached_property
 from framework.networking.windows import WindowsNetworking
+from framework.os_access.exceptions import exit_status_error_cls
 from framework.os_access.os_access_interface import OSAccess
 from framework.os_access.smb_path import SMBConnectionPool, SMBPath
 from framework.os_access.windows_remoting import WinRM
@@ -102,3 +103,12 @@ class WindowsAccess(OSAccess):
             variables={'dateTime': new_time.astimezone(pytz.utc).isoformat()})
         delay_sec = timeit.default_timer() - started_at
         return RunningTime(localized, datetime.timedelta(seconds=delay_sec))
+
+    def make_core_dump(self, pid):
+        expected_exit_status = 0xFFFFFFFE  # ProcDump always exit with this.
+        try:
+            self.winrm.run_command(['procdump', '-accepteula', pid])  # Full dumps (`-ma`) are too big for pysmb.
+        except exit_status_error_cls(expected_exit_status):
+            pass
+        else:
+            raise RuntimeError("Unexpected zero exit status, {} expected".format(expected_exit_status))

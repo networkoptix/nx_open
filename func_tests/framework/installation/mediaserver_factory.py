@@ -54,12 +54,13 @@ def setup_clean_mediaserver(mediaserver_name, installation, ca):
 
 def examine_mediaserver(mediaserver, stopped_ok=False):
     examination_logger = _logger.getChild('examination')
-    if mediaserver.service.is_running():
+    status = mediaserver.service.status()
+    if status.is_running:
         examination_logger.info("%r is running.", mediaserver)
         if mediaserver.is_online():
             examination_logger.info("%r is online.", mediaserver)
         else:
-            mediaserver.service.make_core_dump()
+            mediaserver.os_access.make_core_dump(status.pid)
             _logger.error('{} is not online; core dump made.'.format(mediaserver))
     else:
         if stopped_ok:
@@ -86,21 +87,25 @@ def collect_core_dumps_from_mediaserver(mediaserver, root_artifact_factory):
             artifact_type=CORE_FILE_ARTIFACT_TYPE)
         local_core_dump_path = code_dumps_artifact_factory.produce_file_path()
         copy_file(core_dump, local_core_dump_path)
-        traceback = create_core_file_traceback(
-            mediaserver.os_access,
-            mediaserver.installation.binary,
-            mediaserver.installation.dir / 'lib',
-            core_dump)
-        code_dumps_artifact_factory = root_artifact_factory(
-            ['server', mediaserver.name.lower(), core_dump.name, 'traceback'],
-            name='%s-%s-tb' % (mediaserver.name.lower(), core_dump.name),
-            is_error=True,
-            artifact_type=TRACEBACK_ARTIFACT_TYPE)
-        local_traceback_path = code_dumps_artifact_factory.produce_file_path()
-        local_traceback_path.write_bytes(traceback)
-        _logger.warning(
-            'Core dump on %r: %s, %s.',
-            mediaserver, local_core_dump_path, local_traceback_path)
+        # noinspection PyBroadException
+        try:
+            traceback = create_core_file_traceback(
+                mediaserver.os_access,
+                mediaserver.installation.binary,
+                mediaserver.installation.dir / 'lib',
+                core_dump)
+            code_dumps_artifact_factory = root_artifact_factory(
+                ['server', mediaserver.name.lower(), core_dump.name, 'traceback'],
+                name='%s-%s-tb' % (mediaserver.name.lower(), core_dump.name),
+                is_error=True,
+                artifact_type=TRACEBACK_ARTIFACT_TYPE)
+            local_traceback_path = code_dumps_artifact_factory.produce_file_path()
+            local_traceback_path.write_bytes(traceback)
+            _logger.warning(
+                'Core dump on %r: %s, %s.',
+                mediaserver, local_core_dump_path, local_traceback_path)
+        except Exception:
+            _logger.exception("Cannot parse core dump: %s.", core_dump)
 
 
 def collect_artifacts_from_mediaserver(mediaserver, root_artifact_factory):

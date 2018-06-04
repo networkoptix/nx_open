@@ -53,3 +53,6 @@ class SSHAccess(OSAccess):
         started_at = datetime.datetime.now(pytz.utc)
         self.run_command(['date', '--set', new_time.isoformat()])
         return RunningTime(new_time, datetime.datetime.now(pytz.utc) - started_at)
+
+    def make_core_dump(self, pid):
+        self.ssh.run_command(['kill', '-s', 'SIGTRAP', pid])
