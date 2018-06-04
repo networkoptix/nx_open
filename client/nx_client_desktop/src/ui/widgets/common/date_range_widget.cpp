@@ -5,6 +5,8 @@
 
 #include <common/common_module.h>
 
+#include <translation/datetime_formatter.h>
+
 #include <client/client_settings.h>
 
 #include <core/resource/media_server_resource.h>
@@ -69,6 +71,10 @@ qint64 QnDateRangeWidget::endTimeMs() const
 
 void QnDateRangeWidget::setRange(qint64 startTimeMs, qint64 endTimeMs)
 {
+    // This can be done just once, but not in the constructor. So there is no nice point for it...
+    ui->dateEditFrom->setDisplayFormat(getFormatString(datetime::Format::dd_MM_yyyy));
+    ui->dateEditTo->setDisplayFormat(getFormatString(datetime::Format::dd_MM_yyyy));
+
     const QDate start = displayDate(startTimeMs);
     const QDate end = displayDate(endTimeMs);
 
