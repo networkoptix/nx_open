@@ -42,7 +42,7 @@ class SSH(PosixShell):
         self._key_path = key_path
 
     def __repr__(self):
-        return '<SSH: ssh {}@{} -p {:d} -i {}>'.format(self._username, self._hostname, self._port, self._key_path)
+        return 'SSH({!r}, {!r}, {!r}, {!r})'.format(self._username, self._hostname, self._port, self._key_path)
 
     def run_command(self, command, input=None, cwd=None, timeout_sec=60, env=None):
         script = sh_command_to_script(command)
