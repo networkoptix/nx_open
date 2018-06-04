@@ -56,14 +56,14 @@ int GenericRTSPMediaEncoder::getMediaUrl(char* urlBuf) const
         strcpy(urlBuf, m_mediaUrl);
     else if (m_encoderIndex == 0)
         strcpy(urlBuf, m_cameraManager->info().url);
-    
+
     return nxcip::NX_NO_ERROR;
 }
 
 int GenericRTSPMediaEncoder::setMediaUrl(const char url[nxcip::MAX_TEXT_LEN])
 {
-    memset(m_mediaUrl, 0, nxcip::MAX_TEXT_LEN);
-    strcpy_s(m_mediaUrl, nxcip::MAX_TEXT_LEN, url);
+    strncpy(m_mediaUrl, url, nxcip::MAX_TEXT_LEN);
+    m_mediaUrl[nxcip::MAX_TEXT_LEN - 1] = '\0';
     return nxcip::NX_NO_ERROR;
 }
 
