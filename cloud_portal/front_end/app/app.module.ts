@@ -31,7 +31,8 @@ export function createTranslateLoader(http: HttpClient) {
 class HybridUrlHandlingStrategy implements UrlHandlingStrategy {
     shouldProcessUrl(url: UrlTree) {
         return url.toString().startsWith('/download') ||
-            url.toString().startsWith('/downloads');
+            url.toString().startsWith('/downloads') ||
+            url.toString().startsWith('/browser');
     }
 
     extract(url: UrlTree) {
