@@ -19,7 +19,10 @@ namespace model {
 namespace {
 
 template<typename T>
-bool getQueryResultValue(const cassandra::QueryResult& queryResult, const char* columnName, T* t)
+bool getQueryResultValue(
+    const cassandra::QueryResult& queryResult,
+    const char* columnName,
+    T* t)
 {
     bool getValueResult = queryResult.get(columnName, t);
     NX_ASSERT(getValueResult);
@@ -50,7 +53,7 @@ RemoteRelayPeerPool::RemoteRelayPeerPool(const conf::Settings& settings):
 
 bool RemoteRelayPeerPool::connectToDb()
 {
-    m_cassConnection = 
+    m_cassConnection =
         nx::cassandra::AsyncConnectionFactory::instance().create(
             m_settings.cassandraConnection().host);
 
@@ -123,7 +126,8 @@ void RemoteRelayPeerPool::prepareDbStructure()
             }).wait();
 }
 
-cf::future<std::string> RemoteRelayPeerPool::findRelayByDomain(const std::string& domainName) const
+cf::future<std::string> RemoteRelayPeerPool::findRelayByDomain(
+    const std::string& domainName) const
 {
     if (!m_dbReady)
         return cf::make_ready_future(std::string());
@@ -165,7 +169,7 @@ cf::future<std::string> RemoteRelayPeerPool::findRelayByDomain(const std::string
 
                     if (*relayHost == m_nodeId)
                     {
-                        NX_VERBOSE(this, 
+                        NX_VERBOSE(this,
                             lm("find relay: selected host string is equal to this host string (%1)")
                                 .arg(m_nodeId));
                         continue;
@@ -229,7 +233,7 @@ cf::future<bool> RemoteRelayPeerPool::addPeer(const std::string& domainName)
                 const auto resultCode = executeFuture.get();
                 if (resultCode != CASS_OK)
                 {
-                    NX_VERBOSE(this, 
+                    NX_VERBOSE(this,
                         lm("Error executing insert into cdb.relay_peers. %1").arg(resultCode));
                     return false;
                 }
@@ -329,7 +333,6 @@ bool RemoteRelayPeerPool::bindUpdateParameters(
 
     return bindResult;
 }
-
 
 std::string RemoteRelayPeerPool::whereStringForFind(const std::string& domainName) const
 {

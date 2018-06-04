@@ -254,7 +254,7 @@ public:
     using AbstractAsyncConnection::executeSelect;
     using AbstractAsyncConnection::executeUpdate;
 
-    virtual void init(nx::utils::MoveOnlyFunc<void(CassError)> completionHandler);
+    virtual void init(nx::utils::MoveOnlyFunc<void(CassError)> completionHandler) override;
 
     virtual void prepareQuery(
         const char* queryString,

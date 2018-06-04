@@ -172,12 +172,11 @@ bool contains_if(const Container& container, UnaryPredicate p)
     return contains_if(container.begin(), container.end(), p);
 }
 
-template<typename CharT>
-void to_lower(std::basic_string<CharT>* str)
+template<typename StringType>
+// requires String<StringType>
+void to_lower(StringType* str)
 {
-    std::transform(
-        str->begin(), str->end(),
-        str->begin(), &tolower);
+    std::transform(str->begin(), str->end(), str->begin(), &tolower);
 }
 
 } // namespace utils
