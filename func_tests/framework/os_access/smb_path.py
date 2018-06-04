@@ -15,6 +15,8 @@ from framework.method_caching import cached_getter
 from framework.os_access.exceptions import AlreadyExists, BadParent, DoesNotExist, NotADir, NotAFile
 from framework.os_access.path import FileSystemPath
 
+_STATUS_SUCCESS = 0x00000000  # See: https://msdn.microsoft.com/en-us/library/cc704588.aspx
+_STATUS_NO_SUCH_FILE = 0xC000000F  # See: https://msdn.microsoft.com/en-us/library/cc704588.aspx
 _STATUS_OBJECT_NAME_NOT_FOUND = 0xC0000034  # See: https://msdn.microsoft.com/en-us/library/cc704588.aspx
 _STATUS_OBJECT_NAME_COLLISION = 0xC0000035  # See: https://msdn.microsoft.com/en-us/library/cc704588.aspx
 _STATUS_OBJECT_PATH_NOT_FOUND = 0xC000003A  # See: https://msdn.microsoft.com/en-us/library/cc704588.aspx
@@ -146,9 +148,19 @@ class SMBPath(FileSystemPath, PureWindowsPath):
         _STATUS_OBJECT_PATH_NOT_FOUND: DoesNotExist,
         })
     def _glob(self, pattern):
-        return self._smb_connection_pool.connection().listPath(
-            self._service_name, self._relative_path,
-            pattern=pattern)
+        try:
+            return self._smb_connection_pool.connection().listPath(
+                self._service_name, self._relative_path,
+                pattern=pattern)
+        except OperationFailure as e:
+            no_files_match = all([
+                # TODO: Consider checking commands too.
+                e.smb_messages[-1].status == _STATUS_SUCCESS,
+                e.smb_messages[-2].status == _STATUS_NO_SUCH_FILE,
+                ])
+            if no_files_match:
+                return []
+            raise
 
     def glob(self, pattern):
         return [

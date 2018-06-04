@@ -203,6 +203,15 @@ def test_glob_on_non_existent(existing_remote_dir):
         _ = list(non_existent_path.glob('*'))
 
 
+def test_glob_on_empty_dir(existing_remote_dir):
+    assert not list(existing_remote_dir.glob('*'))
+
+
+def test_glob_no_result(existing_remote_dir):
+    existing_remote_dir.joinpath('oi.existing').write_bytes(b'empty')
+    assert not list(existing_remote_dir.glob('*.non_existent'))
+
+
 @pytest.mark.parametrize('iterations', [2, 10], ids='{}iterations'.format)
 @pytest.mark.parametrize('depth', [2, 10], ids='depth{}'.format)
 def test_many_mkdir_rmtree(remote_test_dir, iterations, depth):
