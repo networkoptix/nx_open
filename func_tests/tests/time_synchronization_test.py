@@ -34,6 +34,8 @@ def _timeless_mediaserver(vm, mediaserver_installers, ca, artifact_factory):
         'ecInternetSyncTimePeriodSec': 3,
         'ecMaxInternetTimeSyncRetryPeriodSec': 3,
         })
+    mediaserver.start()
+    setup_local_system(mediaserver, {})
     try:
         yield mediaserver
     finally:
@@ -46,8 +48,6 @@ def two_mediaservers(two_vms, mediaserver_installers, ca, artifact_factory):
     first_vm, second_vm = two_vms
     with _timeless_mediaserver(first_vm, mediaserver_installers, ca, artifact_factory) as first:
         with _timeless_mediaserver(second_vm, mediaserver_installers, ca, artifact_factory) as second:
-            for mediaserver in (first, second):
-                setup_local_system(mediaserver, {})
             merge_systems(first, second)
             primary, secondary = (first, second) if is_primary_time_server(first.api) else (second, first)
             secondary.os_access.set_time(BASE_TIME.current)
