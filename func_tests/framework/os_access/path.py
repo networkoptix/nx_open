@@ -1,6 +1,9 @@
+import logging
 from abc import ABCMeta, abstractmethod
 
 from pathlib2 import PurePath
+
+_logger = logging.getLogger(__name__)
 
 
 class FileSystemPath(PurePath):
@@ -61,4 +64,5 @@ class FileSystemPath(PurePath):
 
 
 def copy_file(source, destination):  # type: (FileSystemPath, FileSystemPath) -> None
+    _logger.info("Copy from %s to %s", source, destination)
     destination.write_bytes(source.read_bytes())
