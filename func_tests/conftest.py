@@ -65,6 +65,7 @@ def init_logging(request, work_dir):
     root_logger.setLevel(logging.DEBUG)  # It's WARNING by default. Level constraints are set in handlers.
 
     logging.getLogger('SMB.SMBConnection').setLevel(logging.INFO)  # Big files cause too many logs.
+    logging.getLogger('paramiko.transport').setLevel(logging.INFO)  # Big files cause too many logs.
 
     stderr_log_width = request.config.getoption('--max-log-width')
     stderr_handler = logging.StreamHandler()
