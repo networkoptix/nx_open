@@ -5,12 +5,10 @@
 namespace nx {
 namespace utils {
 
-PendingOperation::PendingOperation(const Callback& callback, int interval, QObject* parent):
+PendingOperation::PendingOperation(QObject* parent):
     QObject(parent),
-    m_callback(callback),
     m_timer(new QTimer(this))
 {
-    m_timer->setInterval(interval);
     connect(m_timer, &QTimer::timeout, this,
         [this]()
         {
@@ -21,8 +19,16 @@ PendingOperation::PendingOperation(const Callback& callback, int interval, QObje
             }
 
             m_requested = false;
-            m_callback();
+            if (m_callback)
+                m_callback();
         });
+}
+
+PendingOperation::PendingOperation(const Callback& callback, int intervalMs, QObject* parent):
+    PendingOperation(parent)
+{
+    setCallback(callback);
+    m_timer->setInterval(intervalMs);
 }
 
 void PendingOperation::requestOperation()
@@ -40,7 +46,8 @@ void PendingOperation::requestOperation()
     if (m_flags.testFlag(FireImmediately))
     {
         m_requested = false;
-        m_callback();
+        if (m_callback)
+            m_callback();
     }
     else
     {
@@ -58,6 +65,21 @@ PendingOperation::Flags PendingOperation::flags() const
 void PendingOperation::setFlags(Flags flags)
 {
     m_flags = flags;
+}
+
+int PendingOperation::intervalMs() const
+{
+    return m_timer->interval();
+}
+
+void PendingOperation::setIntervalMs(int value)
+{
+    m_timer->setInterval(value);
+}
+
+void PendingOperation::setCallback(const Callback& callback)
+{
+    m_callback = callback;
 }
 
 } // namespace utils
