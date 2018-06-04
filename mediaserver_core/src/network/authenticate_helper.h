@@ -203,7 +203,7 @@ private:
     //!Check \a digest validity with external authentication service (LDAP currently)
     Qn::AuthResult checkDigestValidity(QnUserResourcePtr userResource, const QByteArray& digest );
 
-    void setClenupTimer();
+    void setCleanupTimer();
     void cleanupExpiredCsrfs();
 
 private:

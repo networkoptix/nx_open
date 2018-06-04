@@ -76,7 +76,7 @@ QnAuthHelper::QnAuthHelper(
     m_userDataProvider(&cloudManagerGroup->userAuthenticator),
     m_ldap(new QnLdapManager(commonModule))
 {
-    setClenupTimer();
+    setCleanupTimer();
 }
 
 QnAuthHelper::~QnAuthHelper()
@@ -778,13 +778,13 @@ QnLdapManager* QnAuthHelper::ldapManager() const
     return m_ldap.get();
 }
 
-void QnAuthHelper::setClenupTimer()
+void QnAuthHelper::setCleanupTimer()
 {
     m_clenupTimer = nx::utils::TimerManager::instance()->addTimerEx(
         [this](nx::utils::TimerId)
         {
             cleanupExpiredCsrfs();
-            setClenupTimer();
+            setCleanupTimer();
         },
         kMaxKeyLifeTime);
 }

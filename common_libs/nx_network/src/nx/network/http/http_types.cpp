@@ -700,7 +700,7 @@ std::map<StringType, StringType> Response::getCookies() const
             continue;
 
         const auto valueBegin = nameEnd + 1;
-        auto valueEnd = header.second.indexOf("; ", nameEnd);
+        auto valueEnd = header.second.indexOf("; ", valueBegin);
         if (valueEnd == -1)
             valueEnd = header.second.length();
 
