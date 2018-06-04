@@ -29,7 +29,7 @@ CLVideoDecoderOutputPtr QnTiledImageFilter::updateImage(const CLVideoDecoderOutp
 
         }
 
-        // Handling first channel of hte camera. Also CLVideoDecoderOutput::scaled() function can
+        // Handling first channel of the camera. Also CLVideoDecoderOutput::scaled() function can
         // return nullptr in case of error, handling it here.
         if (!m_tiledFrame)
         {
