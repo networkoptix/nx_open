@@ -1,1 +1,1 @@
-crowdin download -b cloud --config crowdin-cloud.yaml
+crowdin download -b cloud --config crowdin-cloud.yaml %*
