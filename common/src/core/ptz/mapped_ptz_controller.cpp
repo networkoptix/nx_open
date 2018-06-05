@@ -8,7 +8,7 @@ QnMappedPtzController::QnMappedPtzController(const QnPtzMapperPtr &mapper, const
 }
 
 bool QnMappedPtzController::extends(Ptz::Capabilities capabilities) {
-    return 
+    return
         (capabilities & Ptz::AbsolutePtzCapabilities) &&
         (capabilities & Ptz::DevicePositioningPtzCapability) &&
         !(capabilities & Ptz::LogicalPositioningPtzCapability);
@@ -20,20 +20,35 @@ Ptz::Capabilities QnMappedPtzController::getCapabilities() const
     return extends(capabilities) ? (capabilities | Ptz::LogicalPositioningPtzCapability) : capabilities;
 }
 
-bool QnMappedPtzController::absoluteMove(Qn::PtzCoordinateSpace space, const QVector3D &position, qreal speed) {
-    if(space == Qn::DevicePtzCoordinateSpace) {
+bool QnMappedPtzController::absoluteMove(
+    Qn::PtzCoordinateSpace space,
+    const nx::core::ptz::PtzVector& position,
+    qreal speed)
+{
+    if(space == Qn::DevicePtzCoordinateSpace)
+    {
         return base_type::absoluteMove(Qn::DevicePtzCoordinateSpace, position, speed);
-    } else {
-        return base_type::absoluteMove(Qn::DevicePtzCoordinateSpace, m_mapper->logicalToDevice(position), speed);
+    }
+    else
+    {
+        return base_type::absoluteMove(
+            Qn::DevicePtzCoordinateSpace,
+            m_mapper->logicalToDevice(position),
+            speed);
     }
 }
 
-bool QnMappedPtzController::getPosition(Qn::PtzCoordinateSpace space, QVector3D* position) const
+bool QnMappedPtzController::getPosition(
+    Qn::PtzCoordinateSpace space,
+    nx::core::ptz::PtzVector* position) const
 {
-    if(space == Qn::DevicePtzCoordinateSpace) {
+    if(space == Qn::DevicePtzCoordinateSpace)
+    {
         return base_type::getPosition(Qn::DevicePtzCoordinateSpace, position);
-    } else {
-        QVector3D devicePosition;
+    }
+    else
+    {
+        nx::core::ptz::PtzVector devicePosition;
         if(!base_type::getPosition(Qn::DevicePtzCoordinateSpace, &devicePosition))
             return false;
 

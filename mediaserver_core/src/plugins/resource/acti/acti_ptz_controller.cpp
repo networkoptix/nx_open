@@ -50,12 +50,12 @@ namespace {
         }
     }
 
-    ActiPtzVector toActiPtzSpeed(const QVector3D &speed) {
+    ActiPtzVector toActiPtzSpeed(const nx::core::ptz::PtzVector& speedVector)
+    {
         return ActiPtzVector(
-            toActiPanTiltSpeed(speed.x()),
-            toActiPanTiltSpeed(speed.y()),
-            toActiZoomSpeed(speed.z())
-        );
+            toActiPanTiltSpeed(speedVector.pan),
+            toActiPanTiltSpeed(speedVector.tilt),
+            toActiZoomSpeed(speedVector.zoom));
     }
 
     // TODO: #Elric use QnPtzUtilities
@@ -376,18 +376,31 @@ Ptz::Capabilities QnActiPtzController::getCapabilities() const
     return d->capabilities;
 }
 
-bool QnActiPtzController::continuousMove(const QVector3D &speed) {
-    return d->continuousMove(toActiPtzSpeed(speed));
+bool QnActiPtzController::continuousMove(const nx::core::ptz::PtzVector& speedVector)
+{
+    return d->continuousMove(toActiPtzSpeed(speedVector));
 }
 
-bool QnActiPtzController::absoluteMove(Qn::PtzCoordinateSpace space, const QVector3D &position, qreal speed) {
+bool QnActiPtzController::absoluteMove(
+    Qn::PtzCoordinateSpace space,
+    const nx::core::ptz::PtzVector& position,
+    qreal speed)
+{
     if(space != Qn::DevicePtzCoordinateSpace)
         return false;
 
-    return d->absoluteMove(ActiPtzVector(position.x(), position.y(), position.z()), toActiPanTiltSpeed(qBound(0.01, speed, 1.0))); /* We don't want to get zero speed, hence 0.01 bound. */
+    // We don't want to get zero speed, hence 0.01 bound.
+    return d->absoluteMove(
+        ActiPtzVector(
+            position.pan,
+            position.tilt,
+            position.zoom),
+        toActiPanTiltSpeed(qBound(0.01, speed, 1.0)));
 }
 
-bool QnActiPtzController::getPosition(Qn::PtzCoordinateSpace space, QVector3D *position) const
+bool QnActiPtzController::getPosition(
+    Qn::PtzCoordinateSpace space,
+    nx::core::ptz::PtzVector* outPosition) const
 {
     if(space != Qn::DevicePtzCoordinateSpace)
         return false;
@@ -396,7 +409,11 @@ bool QnActiPtzController::getPosition(Qn::PtzCoordinateSpace space, QVector3D *p
     if(!d->getPosition(&devicePosition))
         return false;
 
-    *position = QVector3D(devicePosition.pan, devicePosition.tilt, devicePosition.zoom);
+    *outPosition = nx::core::ptz::PtzVector(
+        devicePosition.pan,
+        devicePosition.tilt,
+        /*rotation*/ 0.0,
+        devicePosition.zoom);
     return true;
 }
 

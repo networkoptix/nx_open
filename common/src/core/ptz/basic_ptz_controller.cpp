@@ -10,7 +10,7 @@ Ptz::Capabilities QnBasicPtzController::getCapabilities() const
     return Ptz::NoPtzCapabilities;
 }
 
-bool QnBasicPtzController::continuousMove(const QVector3D& /*spped*/)
+bool QnBasicPtzController::continuousMove(const nx::core::ptz::PtzVector& /*spped*/)
 {
     return false;
 }
@@ -22,7 +22,7 @@ bool QnBasicPtzController::continuousFocus(qreal /*speed*/)
 
 bool QnBasicPtzController::absoluteMove(
     Qn::PtzCoordinateSpace /*space*/,
-    const QVector3D& /*position*/,
+    const nx::core::ptz::PtzVector& /*position*/,
     qreal /*speed*/)
 {
     return false;
@@ -38,7 +38,7 @@ bool QnBasicPtzController::viewportMove(
 
 bool QnBasicPtzController::getPosition(
     Qn::PtzCoordinateSpace /*space*/,
-    QVector3D* /*position*/) const
+    nx::core::ptz::PtzVector* /*position*/) const
 {
     return false;
 }

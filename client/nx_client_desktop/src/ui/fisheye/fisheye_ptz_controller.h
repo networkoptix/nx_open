@@ -27,20 +27,23 @@ public:
 
     virtual Ptz::Capabilities getCapabilities() const override;
 
-    virtual bool continuousMove(const QVector3D &speed) override;
+    virtual bool continuousMove(const nx::core::ptz::PtzVector& speedVector) override;
     virtual bool absoluteMove(
         Qn::PtzCoordinateSpace space,
-        const QVector3D& position,
+        const nx::core::ptz::PtzVector& position,
         qreal speed) override;
 
-    virtual bool getPosition(Qn::PtzCoordinateSpace space, QVector3D* position) const override;
+    virtual bool getPosition(
+        Qn::PtzCoordinateSpace space,
+        nx::core::ptz::PtzVector* outPosition) const override;
+
     virtual bool getLimits(Qn::PtzCoordinateSpace space, QnPtzLimits* limits) const override;
     virtual bool getFlip(Qt::Orientations* flip) const override;
 
     QnMediaDewarpingParams mediaDewarpingParams() const;
     QnItemDewarpingParams itemDewarpingParams() const;
 
-    static QVector3D positionFromRect(
+    static nx::core::ptz::PtzVector positionFromRect(
         const QnMediaDewarpingParams& dewarpingParams,
         const QRectF& rect);
 
@@ -57,9 +60,9 @@ private:
     Q_SLOT void updateMediaDewarpingParams();
     Q_SLOT void updateItemDewarpingParams();
 
-    QVector3D boundedPosition(const QVector3D& position);
-    QVector3D getPositionInternal() const;
-    void absoluteMoveInternal(const QVector3D& position);
+    nx::core::ptz::PtzVector boundedPosition(const nx::core::ptz::PtzVector& position);
+    nx::core::ptz::PtzVector getPositionInternal() const;
+    void absoluteMoveInternal(const nx::core::ptz::PtzVector& position);
 
 private:
     enum AnimationMode
@@ -72,7 +75,7 @@ private:
     QPointer<QnMediaResourceWidget> m_widget;
     QPointer<QnResourceWidgetRenderer> m_renderer;
     Ptz::Capabilities m_capabilities;
-    QVector3D m_unitSpeed;
+    nx::core::ptz::PtzVector m_unitSpeed;
 
     QnPtzLimits m_limits;
     bool m_unlimitedPan;
@@ -80,9 +83,9 @@ private:
     qreal m_aspectRatio;
 
     AnimationMode m_animationMode;
-    QVector3D m_speed;
-    QVector3D m_startPosition;
-    QVector3D m_endPosition;
+    nx::core::ptz::PtzVector m_speed;
+    nx::core::ptz::PtzVector m_startPosition;
+    nx::core::ptz::PtzVector m_endPosition;
     qreal m_relativeSpeed;
     qreal m_progress;
 

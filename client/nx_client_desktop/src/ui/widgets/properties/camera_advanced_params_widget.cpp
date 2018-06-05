@@ -200,11 +200,11 @@ void QnCameraAdvancedParamsWidget::sendCustomParameterCommand(const QnCameraAdva
     if(parameter.writeCmd == lit("custom_zoom"))
     {
         // Expecting a single value.
-        QVector3D speed;
+        nx::core::ptz::PtzVector speed;
         qreal val = value.toFloat(&ok);
         if (ok)
         {
-            speed.setZ(val*0.01);
+            speed.zoom = val * 0.01;
             qDebug() << "Sending custom_zoom(" << val << ")";
             serverConnection->ptzContinuousMoveAsync(m_camera, speed, m_ptzSequenceId, m_ptzSequenceNumber, this, slot);
         }
@@ -214,12 +214,12 @@ void QnCameraAdvancedParamsWidget::sendCustomParameterCommand(const QnCameraAdva
         QStringList values = value.split(L',');
         if (values.size() == 3)
         {
-            QVector3D speed;
+            nx::core::ptz::PtzVector speed;
             // Expecting a value like "horisontal,vertical,rotation".
-            speed.setX(values[0].toFloat(&ok));
-            speed.setY(values[1].toFloat(&ok));
+            speed.pan = values[0].toFloat(&ok);
+            speed.tilt = values[1].toFloat(&ok);
 
-            qDebug() << "Sending custom_ptr(pan=" << speed.x() << ", tilt=" << speed.y() << ", rot=" << speed.z() << ")";
+            qDebug() << "Sending custom_ptr(pan=" << speed.pan << ", tilt=" << speed.tilt << ", rot=" << speed.zoom << ")";
             // TODO: Implement rotation stuff
             serverConnection->ptzContinuousMoveAsync(m_camera, speed, m_ptzSequenceId, m_ptzSequenceNumber, this, slot);
         }

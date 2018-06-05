@@ -51,31 +51,40 @@ Ptz::Capabilities QnThirdPartyPtzController::getCapabilities() const
     return m_capabilities;
 }
 
-bool QnThirdPartyPtzController::continuousMove(const QVector3D &speed)
+bool QnThirdPartyPtzController::continuousMove(const nx::core::ptz::PtzVector& speedVector)
 {
-    return m_cameraPtzManager->continuousMove( speed.x(), speed.y(), speed.z() ) == nxcip::NX_NO_ERROR;
+    return m_cameraPtzManager->continuousMove(
+        speedVector.pan,
+        speedVector.tilt,
+        speedVector.zoom) == nxcip::NX_NO_ERROR;
 }
 
-bool QnThirdPartyPtzController::absoluteMove(Qn::PtzCoordinateSpace space, const QVector3D &position, qreal speed)
+bool QnThirdPartyPtzController::absoluteMove(
+    Qn::PtzCoordinateSpace space,
+    const nx::core::ptz::PtzVector& position,
+    qreal speed)
 {
     return m_cameraPtzManager->absoluteMove(
-        space == Qn::DevicePtzCoordinateSpace ? nxcip::CameraPtzManager::DevicePtzCoordinateSpace : nxcip::CameraPtzManager::LogicalPtzCoordinateSpace,
-        position.x(), position.y(), position.z(),
-        speed ) == nxcip::NX_NO_ERROR;
+        space == Qn::DevicePtzCoordinateSpace
+            ? nxcip::CameraPtzManager::DevicePtzCoordinateSpace
+            : nxcip::CameraPtzManager::LogicalPtzCoordinateSpace,
+        position.pan,
+        position.tilt,
+        position.zoom,
+        speed) == nxcip::NX_NO_ERROR;
 }
 
-bool QnThirdPartyPtzController::getPosition(Qn::PtzCoordinateSpace space, QVector3D *position) const
+bool QnThirdPartyPtzController::getPosition(
+    Qn::PtzCoordinateSpace space,
+    nx::core::ptz::PtzVector* outPosition) const
 {
-    double pan = 0, tilt = 0, zoom = 0;
-    if( m_cameraPtzManager->getPosition(
-            space == Qn::DevicePtzCoordinateSpace ? nxcip::CameraPtzManager::DevicePtzCoordinateSpace : nxcip::CameraPtzManager::LogicalPtzCoordinateSpace,
-            &pan, &tilt, &zoom ) != nxcip::NX_NO_ERROR )
-        return false;
-
-    position->setX( pan );
-    position->setY( tilt );
-    position->setZ( zoom );
-    return true;
+    return m_cameraPtzManager->getPosition(
+        space == Qn::DevicePtzCoordinateSpace
+            ? nxcip::CameraPtzManager::DevicePtzCoordinateSpace
+            : nxcip::CameraPtzManager::LogicalPtzCoordinateSpace,
+        &outPosition->pan,
+        &outPosition->tilt,
+        &outPosition->zoom) == nxcip::NX_NO_ERROR;
 }
 
 bool QnThirdPartyPtzController::getLimits(Qn::PtzCoordinateSpace /*space*/, QnPtzLimits* /*limits*/) const

@@ -18,16 +18,17 @@ Ptz::Capabilities QnDwZoomPtzController::getCapabilities() const
     return Ptz::ContinuousZoomCapability;
 }
 
-bool QnDwZoomPtzController::continuousMove(const QVector3D &speed) {
+bool QnDwZoomPtzController::continuousMove(const nx::core::ptz::PtzVector& speedVector)
+{
     const QString query = lit("/cgi-bin/ptzctrl.cgi?ptzchannel=0&query=zoom&ptzctrlvalue=%1");
 
     QString value;
 
-    if(qFuzzyIsNull(speed.z())) {
+    if(qFuzzyIsNull(speedVector.zoom)) {
         value = lit("stop");
-    } else if(speed.z() < 0.0) {
+    } else if(speedVector.zoom < 0.0) {
         value = lit("zoomOut");
-    } else if(speed.z() > 0.0) {
+    } else if(speedVector.zoom > 0.0) {
         value = lit("zoomIn");
     }
 

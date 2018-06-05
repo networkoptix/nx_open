@@ -65,7 +65,7 @@ Ptz::Capabilities QnFallbackPtzController::getCapabilities() const
     return baseController()->getCapabilities();
 }
 
-bool QnFallbackPtzController::continuousMove(const QVector3D& speed)
+bool QnFallbackPtzController::continuousMove(const nx::core::ptz::PtzVector& speed)
 {
     return baseController()->continuousMove(speed);
 }
@@ -77,7 +77,7 @@ bool QnFallbackPtzController::continuousFocus(qreal speed)
 
 bool QnFallbackPtzController::absoluteMove(
     Qn::PtzCoordinateSpace space,
-    const QVector3D& position,
+    const nx::core::ptz::PtzVector& position,
     qreal speed)
 {
     return baseController()->absoluteMove(space, position, speed);
@@ -91,7 +91,9 @@ bool QnFallbackPtzController::viewportMove(
     return baseController()->viewportMove(aspectRatio, viewport, speed);
 }
 
-bool QnFallbackPtzController::getPosition(Qn::PtzCoordinateSpace space, QVector3D* position) const
+bool QnFallbackPtzController::getPosition(
+    Qn::PtzCoordinateSpace space,
+    nx::core::ptz::PtzVector* position) const
 {
     return baseController()->getPosition(space, position);
 }

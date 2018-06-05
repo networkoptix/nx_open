@@ -104,7 +104,11 @@ private:
     void ptzMoveTo(QnMediaResourceWidget* widget, const QPointF& pos);
     void ptzMoveTo(QnMediaResourceWidget* widget, const QRectF& rect);
     void ptzUnzoom(QnMediaResourceWidget* widget);
-    void ptzMove(QnMediaResourceWidget* widget, const QVector3D& speed, bool instant = false);
+    void ptzMove(
+        QnMediaResourceWidget* widget,
+        const nx::core::ptz::PtzVector& speed,
+        bool instant = false);
+
     void focusMove(QnMediaResourceWidget* widget, qreal speed);
     void focusAuto(QnMediaResourceWidget* widget);
 
@@ -119,8 +123,8 @@ private:
 
         Ptz::Capabilities capabilities = 0;
         QnPtzAuxilaryTraitList traits;
-        QVector3D currentSpeed;
-        QVector3D requestedSpeed;
+        nx::core::ptz::PtzVector currentSpeed;
+        nx::core::ptz::PtzVector requestedSpeed;
         PtzOverlayWidget* overlayWidget = nullptr;
         QMetaObject::Connection capabilitiesConnection;
     };

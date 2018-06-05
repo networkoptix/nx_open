@@ -326,7 +326,7 @@ bool QnOnvifPtzController::stopInternal()
     return true;
 }
 
-bool QnOnvifPtzController::moveInternal(const QVector3D &speed) {
+bool QnOnvifPtzController::moveInternal(const nx::core::ptz::PtzVector& speedVector) {
     QString ptzUrl = m_resource->getPtzUrl();
     if (ptzUrl.isEmpty())
     {
@@ -342,11 +342,11 @@ bool QnOnvifPtzController::moveInternal(const QVector3D &speed) {
     ptz.getProxy()->soap->double_format = m_doubleFormat;
 
     onvifXsd__Vector2D onvifPanTiltSpeed;
-    onvifPanTiltSpeed.x = normalizeSpeed(speed.x(), m_panSpeedLimits);
-    onvifPanTiltSpeed.y = normalizeSpeed(speed.y(), m_tiltSpeedLimits);
+    onvifPanTiltSpeed.x = normalizeSpeed(speedVector.pan, m_panSpeedLimits);
+    onvifPanTiltSpeed.y = normalizeSpeed(speedVector.tilt, m_tiltSpeedLimits);
 
     onvifXsd__Vector1D onvifZoomSpeed;
-    onvifZoomSpeed.x = normalizeSpeed(speed.z(), m_zoomSpeedLimits);
+    onvifZoomSpeed.x = normalizeSpeed(speedVector.zoom, m_zoomSpeedLimits);
 
     onvifXsd__PTZSpeed onvifSpeed;
     onvifSpeed.PanTilt = &onvifPanTiltSpeed;
@@ -365,7 +365,7 @@ bool QnOnvifPtzController::moveInternal(const QVector3D &speed) {
     return true;
 }
 
-bool QnOnvifPtzController::continuousMove(const QVector3D &speed)
+bool QnOnvifPtzController::continuousMove(const nx::core::ptz::PtzVector& speed)
 {
     if(qFuzzyIsNull(speed) && !m_stopBroken) {
         return stopInternal();
@@ -403,7 +403,11 @@ bool QnOnvifPtzController::continuousFocus(qreal speed) {
     return true;
 }
 
-bool QnOnvifPtzController::absoluteMove(Qn::PtzCoordinateSpace space, const QVector3D &position, qreal speed) {
+bool QnOnvifPtzController::absoluteMove(
+    Qn::PtzCoordinateSpace space,
+    const nx::core::ptz::PtzVector& position,
+    qreal speed)
+{
     if(space != Qn::DevicePtzCoordinateSpace)
         return false;
 
@@ -418,11 +422,11 @@ bool QnOnvifPtzController::absoluteMove(Qn::PtzCoordinateSpace space, const QVec
     ptz.getProxy()->soap->double_format = m_doubleFormat;
 
     onvifXsd__Vector2D onvifPanTilt;
-    onvifPanTilt.x = position.x();
-    onvifPanTilt.y = position.y();
+    onvifPanTilt.x = position.pan;
+    onvifPanTilt.y = position.tilt;
 
     onvifXsd__Vector1D onvifZoom;
-    onvifZoom.x = position.z();
+    onvifZoom.x = position.zoom;
 
     onvifXsd__PTZVector onvifPosition;
     onvifPosition.PanTilt = &onvifPanTilt;
@@ -481,7 +485,9 @@ bool QnOnvifPtzController::absoluteMove(Qn::PtzCoordinateSpace space, const QVec
     return result;
 }
 
-bool QnOnvifPtzController::getPosition(Qn::PtzCoordinateSpace space, QVector3D *position) const
+bool QnOnvifPtzController::getPosition(
+    Qn::PtzCoordinateSpace space,
+    nx::core::ptz::PtzVector* outPosition) const
 {
     if(space != Qn::DevicePtzCoordinateSpace)
         return false;
@@ -504,15 +510,15 @@ bool QnOnvifPtzController::getPosition(Qn::PtzCoordinateSpace space, QVector3D *
         return false;
     }
 
-    *position = QVector3D();
+    *outPosition = nx::core::ptz::PtzVector();
 
     if (response.PTZStatus && response.PTZStatus->Position) {
         if(response.PTZStatus->Position->PanTilt) {
-            position->setX(response.PTZStatus->Position->PanTilt->x);
-            position->setY(response.PTZStatus->Position->PanTilt->y);
+            outPosition->pan = response.PTZStatus->Position->PanTilt->x;
+            outPosition->tilt = response.PTZStatus->Position->PanTilt->y;
         }
         if(response.PTZStatus->Position->Zoom) {
-            position->setZ(response.PTZStatus->Position->Zoom->x);
+            outPosition->zoom = response.PTZStatus->Position->Zoom->x;
         }
     }
 

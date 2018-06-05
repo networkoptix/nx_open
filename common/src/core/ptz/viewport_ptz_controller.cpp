@@ -41,8 +41,9 @@ Ptz::Capabilities QnViewportPtzController::getCapabilities() const
     return extends(capabilities) ? (capabilities | Ptz::ViewportPtzCapability) : capabilities;
 }
 
-bool QnViewportPtzController::viewportMove(qreal aspectRatio, const QRectF &viewport, qreal speed) {
-    QVector3D oldPosition;
+bool QnViewportPtzController::viewportMove(qreal aspectRatio, const QRectF &viewport, qreal speed)
+{
+    nx::core::ptz::PtzVector oldPosition;
     if(!getPosition(Qn::LogicalPtzCoordinateSpace, &oldPosition))
         return false;
 
@@ -86,11 +87,11 @@ bool QnViewportPtzController::viewportMove(qreal aspectRatio, const QRectF &view
          *      fov
          *     angle
          */
-        float unit = std::tan(qDegreesToRadians(oldPosition.z()) / 2.0) * 2.0;
+        float unit = std::tan(qDegreesToRadians(oldPosition.zoom) / 2.0) * 2.0;
 
-        QVector3D r = sphericalToCartesian<QVector3D>(1.0, qDegreesToRadians(oldPosition.x()), qDegreesToRadians(oldPosition.y()));
-        QVector3D x = sphericalToCartesian<QVector3D>(1.0, qDegreesToRadians(oldPosition.x() + 90 + (flip & Qt::Horizontal ? 180 : 0)), 0.0) * unit;
-        QVector3D y = sphericalToCartesian<QVector3D>(1.0, qDegreesToRadians(oldPosition.x()), qDegreesToRadians(oldPosition.y() - 90 + (flip & Qt::Vertical ? 180 : 0))) * unit;
+        QVector3D r = sphericalToCartesian<QVector3D>(1.0, qDegreesToRadians(oldPosition.pan), qDegreesToRadians(oldPosition.tilt));
+        QVector3D x = sphericalToCartesian<QVector3D>(1.0, qDegreesToRadians(oldPosition.pan + 90 + (flip & Qt::Horizontal ? 180 : 0)), 0.0) * unit;
+        QVector3D y = sphericalToCartesian<QVector3D>(1.0, qDegreesToRadians(oldPosition.pan), qDegreesToRadians(oldPosition.tilt - 90 + (flip & Qt::Vertical ? 180 : 0))) * unit;
 
         /* Calculate new position in spherical coordinates. */
         QVector3D r1 = r + x * delta.x() + y * delta.y();
@@ -100,16 +101,18 @@ bool QnViewportPtzController::viewportMove(qreal aspectRatio, const QRectF &view
         float newFov = qRadiansToDegrees(std::atan((unit / 2.0) / zoom)) * 2.0;
         float newPan = qRadiansToDegrees(newSpherical.phi);
         float newTilt = qRadiansToDegrees(newSpherical.psi);
-        QVector3D newPosition = qBound(QVector3D(newPan, newTilt, newFov), limits);
+        nx::core::ptz::PtzVector newPosition
+            = nx::core::ptz::PtzVector(newPan, newTilt, 0.0, newFov);
 
         /* Send it to the camera. */
         return absoluteMove(Qn::LogicalPtzCoordinateSpace, newPosition, speed);
     } else {
         /* Calculate new position. */
-        float newPan = oldPosition.x() + oldPosition.z() * delta.x();
-        float newTilt = oldPosition.y() - oldPosition.z() * delta.y();
-        float newFov = oldPosition.z() / zoom;
-        QVector3D newPosition = qBound(QVector3D(newPan, newTilt, newFov), limits);
+        float newPan = oldPosition.pan + oldPosition.zoom * delta.x();
+        float newTilt = oldPosition.tilt - oldPosition.zoom * delta.y();
+        float newFov = oldPosition.zoom / zoom;
+        nx::core::ptz::PtzVector newPosition = qBound(
+            nx::core::ptz::PtzVector(newPan, newTilt, 0.0, newFov), limits);
 
         /* Send it to the camera. */
         return absoluteMove(Qn::LogicalPtzCoordinateSpace, newPosition, speed);

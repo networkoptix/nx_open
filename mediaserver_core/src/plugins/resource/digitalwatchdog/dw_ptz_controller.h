@@ -13,7 +13,7 @@ public:
     QnDwPtzController(const QnDigitalWatchdogResourcePtr &resource);
     virtual ~QnDwPtzController();
 
-    virtual bool continuousMove(const QVector3D &speed) override;
+    virtual bool continuousMove(const nx::core::ptz::PtzVector& speedVector) override;
     virtual bool getFlip(Qt::Orientations *flip) const override;
 private slots:
     void at_physicalParamChanged(const QString& id, const QString& value);

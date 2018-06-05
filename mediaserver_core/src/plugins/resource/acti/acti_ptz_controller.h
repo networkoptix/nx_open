@@ -18,10 +18,10 @@ public:
     virtual ~QnActiPtzController();
 
     virtual Ptz::Capabilities getCapabilities() const override;
-    virtual bool continuousMove(const QVector3D &speed) override;
+    virtual bool continuousMove(const nx::core::ptz::PtzVector& speed) override;
     virtual bool getFlip(Qt::Orientations *flip) const override;
-    virtual bool absoluteMove(Qn::PtzCoordinateSpace space, const QVector3D &position, qreal speed) override;
-    virtual bool getPosition(Qn::PtzCoordinateSpace space, QVector3D *position) const override;
+    virtual bool absoluteMove(Qn::PtzCoordinateSpace space, const nx::core::ptz::PtzVector& position, qreal speed) override;
+    virtual bool getPosition(Qn::PtzCoordinateSpace space, nx::core::ptz::PtzVector* outPosition) const override;
 
 private:
     QScopedPointer<QnActiPtzControllerPrivate> d;

@@ -22,7 +22,7 @@ struct HanwhaConfigurationalPtzCommand
 {
     HanwhaConfigurationalPtzCommandType command;
     // For zoom and focus speed.x() is used for speed.
-    QVector4D speed;
+    nx::core::ptz::PtzVector speed;
 };
 
 class HanwhaPtzExecutor
@@ -34,7 +34,7 @@ public:
         const std::map<QString, HanwhaRange>& ranges);
     virtual ~HanwhaPtzExecutor();
 
-    bool continuousMove(const QVector3D& speed);
+    bool continuousMove(const nx::core::ptz::PtzVector& speed);
     bool continuousFocus(qreal speed);
 
 private:

@@ -9,6 +9,7 @@
 #include <utils/common/invocation_event.h>
 #include <utils/common/connective.h>
 #include <nx/utils/collection.h>
+#include <nx/core/ptz/ptz_vector.h>
 
 #include "threaded_ptz_controller.h"
 #include "core/resource/resource_data.h"
@@ -35,9 +36,9 @@ namespace {
 // Model Data
 // -------------------------------------------------------------------------- //
 struct QnPtzTourSpotData {
-    QnPtzTourSpotData(): position(qQNaN<QVector3D>()), moveTime(-1) {}
+    QnPtzTourSpotData(): position(qQNaN<nx::core::ptz::PtzVector>()), moveTime(-1) {}
 
-    QVector3D position;
+    nx::core::ptz::PtzVector position;
     qint64 moveTime;
 };
 
@@ -77,8 +78,7 @@ public:
 
     void startMoving();
     void processMoving();
-    void processMoving(bool status, const QVector3D &position);
-    void tryStartWaiting();
+    void processMoving(bool status, const nx::core::ptz::PtzVector& position);
     void startWaiting();
     void processWaiting();
 
@@ -112,8 +112,8 @@ public:
     bool waitingForNewPosition;
 
     QElapsedTimer spotTimer;
-    QVector3D startPosition;
-    QVector3D lastPosition;
+    nx::core::ptz::PtzVector startPosition;
+    nx::core::ptz::PtzVector lastPosition;
     int lastPositionRequestTime;
     int newPositionRequestTime;
     bool tourGetPosWorkaround;
@@ -205,10 +205,10 @@ void QnTourPtzExecutorPrivate::startMoving() {
     if(state == Stopped) {
         index = 0;
         state = Entering;
-        lastPosition = qQNaN<QVector3D>();
+        lastPosition = qQNaN<nx::core::ptz::PtzVector>();
         lastPositionRequestTime = 0;
 
-        startPosition = qQNaN<QVector3D>();
+        startPosition = qQNaN<nx::core::ptz::PtzVector>();
     } else if(state == Waiting) {
         index = (index + 1) % data.size();
         state = Moving;
@@ -253,7 +253,8 @@ void QnTourPtzExecutorPrivate::processMoving() {
     }
 }
 
-void QnTourPtzExecutorPrivate::processMoving(bool status, const QVector3D &position) {
+void QnTourPtzExecutorPrivate::processMoving(bool status, const nx::core::ptz::PtzVector& position)
+{
     if(state != Entering && state != Moving)
         return;
 
@@ -321,7 +322,7 @@ void QnTourPtzExecutorPrivate::requestPosition()
     if (!canReadPosition)
         return;
 
-    QVector3D position;
+    nx::core::ptz::PtzVector position;
     baseController->getPosition(defaultSpace, &position);
 
     needPositionUpdate = false;
@@ -330,7 +331,7 @@ void QnTourPtzExecutorPrivate::requestPosition()
     newPositionRequestTime = spotTimer.elapsed();
 
     if(usingBlockingController)
-        q->controllerFinishedLater(defaultCommand, position);
+        q->controllerFinishedLater(defaultCommand, QVariant::fromValue(position));
 }
 
 bool QnTourPtzExecutorPrivate::handleTimer(int timerId) {
@@ -352,7 +353,7 @@ void QnTourPtzExecutorPrivate::handleFinished(Qn::PtzCommand command, const QVar
         startWaiting();
     }
     else if(command == defaultCommand)
-        processMoving(data.isValid(), data.value<QVector3D>());
+        processMoving(data.isValid(), data.value<nx::core::ptz::PtzVector>());
 }
 
 

@@ -68,13 +68,19 @@ static QString moveDirection(qreal x, qreal y)
         return y > 0 ? lit("up") : lit("down");
 }
 
-bool QnDlinkPtzController::continuousMove(const QVector3D &speed)
+bool QnDlinkPtzController::continuousMove(const nx::core::ptz::PtzVector& speedVector)
 {
     QString request;
-    if (!qFuzzyIsNull(speed.z()))
-        request = QString(lit("/cgi-bin/camctrl/camctrl.cgi?channel=%1&zoom=%2")).arg(m_resource->getChannel()).arg(zoomDirection(speed.z()));
-    else if (!qFuzzyIsNull(speed.x()) || !qFuzzyIsNull(speed.y()))
-        request = QString(lit("/cgi-bin/camctrl/camctrl.cgi?channel=%1&move=%2")).arg(m_resource->getChannel()).arg(moveDirection(speed.x(), speed.y()));
+    if (!qFuzzyIsNull(speedVector.zoom))
+    {
+        request = lm("/cgi-bin/camctrl/camctrl.cgi?channel=%1&zoom=%2")
+            .args(m_resource->getChannel()).arg(zoomDirection(speedVector.zoom));
+    }
+    else if (!qFuzzyIsNull(speedVector.pan) || !qFuzzyIsNull(speedVector.tilt))
+    {
+        request = lm("/cgi-bin/camctrl/camctrl.cgi?channel=%1&move=%2")
+            .args(m_resource->getChannel()).arg(moveDirection(speedVector.pan, speedVector.tilt));
+    }
 
     m_repeatCommand->stop();
     bool rez = true;

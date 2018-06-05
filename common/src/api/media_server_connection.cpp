@@ -546,16 +546,21 @@ void QnMediaServerConnection::addOldVersionPtzParams(
 }
 
 int QnMediaServerConnection::ptzContinuousMoveAsync(
-    const QnNetworkResourcePtr& camera, const QVector3D& speed, const QnUuid& sequenceId,
-    int sequenceNumber, QObject* target, const char* slot)
+    const QnNetworkResourcePtr& camera,
+    const nx::core::ptz::PtzVector& speed,
+    const QnUuid& sequenceId,
+    int sequenceNumber,
+    QObject* target,
+    const char* slot)
 {
     QnRequestParamList params;
     addOldVersionPtzParams(camera, params);
     params << QnRequestParam("command", QnLexical::serialized(Qn::ContinuousMovePtzCommand));
     params << QnRequestParam("cameraId", camera->getId());
-    params << QnRequestParam("xSpeed", QnLexical::serialized(speed.x()));
-    params << QnRequestParam("ySpeed", QnLexical::serialized(speed.y()));
-    params << QnRequestParam("zSpeed", QnLexical::serialized(speed.z()));
+    params << QnRequestParam("xSpeed", QnLexical::serialized(speed.pan));
+    params << QnRequestParam("ySpeed", QnLexical::serialized(speed.tilt));
+    params << QnRequestParam("zSpeed", QnLexical::serialized(speed.zoom));
+    params << QnRequestParam("rotationSpeed", QnLexical::serialized(speed.rotation));
     params << QnRequestParam("sequenceId", sequenceId);
     params << QnRequestParam("sequenceNumber", sequenceNumber);
 
@@ -575,8 +580,14 @@ int QnMediaServerConnection::ptzContinuousFocusAsync(
 }
 
 int QnMediaServerConnection::ptzAbsoluteMoveAsync(
-    const QnNetworkResourcePtr& camera, Qn::PtzCoordinateSpace space, const QVector3D& position,
-    qreal speed, const QnUuid& sequenceId, int sequenceNumber, QObject* target, const char* slot)
+    const QnNetworkResourcePtr& camera,
+    Qn::PtzCoordinateSpace space,
+    const nx::core::ptz::PtzVector& position,
+    qreal speed,
+    const QnUuid& sequenceId,
+    int sequenceNumber,
+    QObject* target,
+    const char* slot)
 {
     QnRequestParamList params;
     addOldVersionPtzParams(camera, params);
@@ -585,9 +596,10 @@ int QnMediaServerConnection::ptzAbsoluteMoveAsync(
         ? Qn::AbsoluteDeviceMovePtzCommand
         : Qn::AbsoluteLogicalMovePtzCommand));
     params << QnRequestParam("cameraId", camera->getId());
-    params << QnRequestParam("xPos", QnLexical::serialized(position.x()));
-    params << QnRequestParam("yPos", QnLexical::serialized(position.y()));
-    params << QnRequestParam("zPos", QnLexical::serialized(position.z()));
+    params << QnRequestParam("xPos", QnLexical::serialized(position.pan));
+    params << QnRequestParam("yPos", QnLexical::serialized(position.tilt));
+    params << QnRequestParam("zPos", QnLexical::serialized(position.zoom));
+    params << QnRequestParam("rotaion", QnLexical::serialized(position.rotation)); //< TODO: #dmihsin rename all parameters!
     params << QnRequestParam("speed", QnLexical::serialized(speed));
     params << QnRequestParam("sequenceId", sequenceId);
     params << QnRequestParam("sequenceNumber", sequenceNumber);

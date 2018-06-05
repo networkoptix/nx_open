@@ -17,15 +17,15 @@ public:
 
     virtual Ptz::Capabilities getCapabilities() const override;
 
-    virtual bool continuousMove(const QVector3D& speed) override;
+    virtual bool continuousMove(const nx::core::ptz::PtzVector& speed) override;
     virtual bool continuousFocus(qreal speed) override;
     virtual bool absoluteMove(
         Qn::PtzCoordinateSpace space,
-        const QVector3D& position,
+        const nx::core::ptz::PtzVector& position,
         qreal speed) override;
     virtual bool viewportMove(qreal aspectRatio, const QRectF& viewport, qreal speed) override;
 
-    virtual bool getPosition(Qn::PtzCoordinateSpace space, QVector3D* position) const override;
+    virtual bool getPosition(Qn::PtzCoordinateSpace space, nx::core::ptz::PtzVector* position) const override;
     virtual bool getLimits(Qn::PtzCoordinateSpace space, QnPtzLimits* limits) const override;
     virtual bool getFlip(Qt::Orientations* flip) const override;
 

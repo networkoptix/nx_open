@@ -41,7 +41,7 @@ Ptz::Capabilities QnProxyPtzController::getCapabilities() const
         : Ptz::NoPtzCapabilities;
 }
 
-bool QnProxyPtzController::continuousMove(const QVector3D& speed)
+bool QnProxyPtzController::continuousMove(const nx::core::ptz::PtzVector& speed)
 {
     return m_controller
         ? m_controller->continuousMove(speed)
@@ -57,7 +57,7 @@ bool QnProxyPtzController::continuousFocus(qreal speed)
 
 bool QnProxyPtzController::absoluteMove(
     Qn::PtzCoordinateSpace space,
-    const QVector3D& position,
+    const nx::core::ptz::PtzVector& position,
     qreal speed)
 {
     return m_controller
@@ -77,7 +77,7 @@ bool QnProxyPtzController::viewportMove(
 
 bool QnProxyPtzController::getPosition(
     Qn::PtzCoordinateSpace space,
-    QVector3D* position) const
+    nx::core::ptz::PtzVector* position) const
 {
     return m_controller
         ? m_controller->getPosition(space, position)

@@ -78,7 +78,7 @@ int QnRemotePtzController::nextSequenceNumber()
     }
 
 
-bool QnRemotePtzController::continuousMove(const QVector3D& speed)
+bool QnRemotePtzController::continuousMove(const nx::core::ptz::PtzVector& speed)
 {
     RUN_COMMAND(Qn::ContinuousMovePtzCommand, speed, ptzContinuousMoveAsync, speed,
         m_sequenceId, nextSequenceNumber());
@@ -91,7 +91,7 @@ bool QnRemotePtzController::continuousFocus(qreal speed)
 
 bool QnRemotePtzController::absoluteMove(
     Qn::PtzCoordinateSpace space,
-    const QVector3D& position,
+    const nx::core::ptz::PtzVector& position,
     qreal speed)
 {
     RUN_COMMAND(spaceCommand(Qn::AbsoluteDeviceMovePtzCommand, space), position,
@@ -106,7 +106,7 @@ bool QnRemotePtzController::viewportMove(qreal aspectRatio, const QRectF& viewpo
 
 bool QnRemotePtzController::getPosition(
     Qn::PtzCoordinateSpace space,
-    QVector3D* /*position*/) const
+    nx::core::ptz::PtzVector* /*position*/) const
 {
     RUN_COMMAND(spaceCommand(Qn::GetDevicePositionPtzCommand, space), QVariant(),
         ptzGetPositionAsync, space);

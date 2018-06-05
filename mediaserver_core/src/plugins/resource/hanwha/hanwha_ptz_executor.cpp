@@ -55,18 +55,29 @@ HanwhaPtzExecutor::~HanwhaPtzExecutor()
 {
 }
 
-bool HanwhaPtzExecutor::continuousMove(const QVector3D& speed)
+bool HanwhaPtzExecutor::continuousMove(const nx::core::ptz::PtzVector& speed)
 {
     HanwhaConfigurationalPtzCommand ptrCommand;
     ptrCommand.command = HanwhaConfigurationalPtzCommandType::focus;
-    ptrCommand.speed = QVector4D(speed.x(), speed.y(), /*zoom*/ 0, /*rotate*/ 0);
+    ptrCommand.speed = nx::core::ptz::PtzVector(
+        speed.pan,
+        speed.tilt,
+        speed.rotation,
+        /*zoom*/ 0.0);
 
     HanwhaConfigurationalPtzCommand zoomCommand;
     zoomCommand.command = HanwhaConfigurationalPtzCommandType::focus;
-    zoomCommand.speed = QVector4D(speed.z(), 0, 0, 0);
+    zoomCommand.speed = nx::core::ptz::PtzVector(
+        /*pan*/ 0.0,
+        /*tilt*/ 0.0,
+        /*rotation*/ 0.0,
+        speed.zoom);
 
-    executeCommand(ptrCommand);
-    executeCommand(zoomCommand);
+    if (!ptrCommand.speed.isNull())
+        executeCommand(ptrCommand);
+
+    if (!zoomCommand.speed.isNull())
+        executeCommand(zoomCommand);
 
     return true;
 }
@@ -75,7 +86,9 @@ bool HanwhaPtzExecutor::continuousFocus(qreal speed)
 {
     HanwhaConfigurationalPtzCommand command;
     command.command = HanwhaConfigurationalPtzCommandType::focus;
-    command.speed = QVector4D(speed, 0, 0, 0);
+
+    // We use 'zoom' field for both zoom and focus movements.
+    command.speed = nx::core::ptz::PtzVector(/*pan*/ 0, /*tilt*/ 0, /*rotation*/ 0, speed);
     return executeFocusCommand(command);
 }
 
@@ -100,7 +113,7 @@ bool HanwhaPtzExecutor::executeFocusCommand(const HanwhaConfigurationalPtzComman
     if (parameterName.isEmpty())
         return false;
 
-    const auto parameterValue = toHanwhaParameterValue(parameterName, command.speed.x());
+    const auto parameterValue = toHanwhaParameterValue(parameterName, command.speed.zoom);
     if (parameterValue == std::nullopt)
         return false;
 
@@ -173,9 +186,9 @@ std::optional<QUrl> HanwhaPtzExecutor::makePtrUrl(
     };
 
     const std::map<QString, qreal> parameters = {
-        {kHanwhaConfigurationalPan, command.speed.x()},
-        {kHanwhaConfigurationalTilt, command.speed.y()},
-        {kHanwhaConfigurationalRotate, 0.0} //< TODO: #dmishin fix rotate.
+        {kHanwhaConfigurationalPan, command.speed.pan},
+        {kHanwhaConfigurationalTilt, command.speed.tilt},
+        {kHanwhaConfigurationalRotate, command.speed.rotation}
     };
 
     for (const auto& parameter: parameters)

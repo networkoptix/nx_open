@@ -48,13 +48,14 @@ QnDwPtzController::~QnDwPtzController() {
     return;
 }
 
-bool QnDwPtzController::continuousMove(const QVector3D &speed) {
-    QVector3D localSpeed = speed;
+bool QnDwPtzController::continuousMove(const nx::core::ptz::PtzVector& speedVector)
+{
+    auto localSpeed = speedVector;
 
     if(m_flip & Qt::Horizontal)
-        localSpeed.setX(-localSpeed.x());
+        localSpeed.pan = -localSpeed.pan;
     if(m_flip & Qt::Vertical)
-        localSpeed.setY(-localSpeed.y());
+        localSpeed.tilt = -localSpeed.tilt;
 
     return base_type::continuousMove(localSpeed);
 }

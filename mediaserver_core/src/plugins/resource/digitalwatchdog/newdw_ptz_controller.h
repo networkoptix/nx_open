@@ -17,7 +17,7 @@ public:
     virtual ~QnNewDWPtzController();
 
     virtual Ptz::Capabilities getCapabilities() const override;
-    virtual bool continuousMove(const QVector3D &speed) override;
+    virtual bool continuousMove(const nx::core::ptz::PtzVector& speedVector) override;
 
     virtual bool getPresets(QnPtzPresetList *presets) const override;
     virtual bool activatePreset(const QString &presetId, qreal speed) override;

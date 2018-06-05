@@ -26,10 +26,10 @@ public:
 
     virtual Ptz::Capabilities getCapabilities() const override;
 
-    virtual bool continuousMove(const QVector3D& speed) override;
+    virtual bool continuousMove(const nx::core::ptz::PtzVector& speed) override;
     virtual bool absoluteMove(
         Qn::PtzCoordinateSpace space
-        , const QVector3D& position,
+        , const nx::core::ptz::PtzVector& position,
         qreal speed) override;
     virtual bool viewportMove(qreal aspectRatio, const QRectF& viewport, qreal speed) override;
 

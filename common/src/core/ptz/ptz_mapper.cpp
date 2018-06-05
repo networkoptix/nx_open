@@ -6,6 +6,8 @@
 #include <utils/math/math.h>
 #include <nx/fusion/model_functions.h>
 
+#include <nx/core/ptz/ptz_space_mapper.h>
+
 #include "ptz_math.h"
 
 QN_DEFINE_METAOBJECT_ENUM_LEXICAL_FUNCTIONS(Qn, ExtrapolationMode)
@@ -15,36 +17,50 @@ QN_DEFINE_LEXICAL_ENUM(AngleSpace,
     (Mm35EquivSpace,   "35MmEquiv")
 )
 
-typedef std::array<QnSpaceMapperPtr<qreal>, 3> PtzMapperPart;
+typedef std::array<QnSpaceMapperPtr<qreal>, 4> PtzMapperPart;
 
 
-QnPtzMapper::QnPtzMapper(const QnSpaceMapperPtr<QVector3D> &inputMapper, const QnSpaceMapperPtr<QVector3D> &outputMapper):
+QnPtzMapper::QnPtzMapper(
+    const QnSpaceMapperPtr<nx::core::ptz::PtzVector>& inputMapper,
+    const QnSpaceMapperPtr<nx::core::ptz::PtzVector>& outputMapper)
+    :
     m_inputMapper(inputMapper),
     m_outputMapper(outputMapper)
 {
     /* OK, I know that this check sucks, but I really didn't want to
      * extend the space mapper interface to make it simpler. */
     qreal minPan = 36000.0, maxPan = -36000.0;
-    for(int pan = -360; pan <= 360; pan++) {
-        QVector3D pos = m_inputMapper->sourceToTarget(m_inputMapper->targetToSource(QVector3D(pan, 0, 0)));
-        minPan = qMin(pos.x(), minPan);
-        maxPan = qMax(pos.x(), maxPan);
+    for(int pan = -360; pan <= 360; pan++)
+    {
+        const auto pos = m_inputMapper->sourceToTarget(
+            m_inputMapper->targetToSource(nx::core::ptz::PtzVector(pan, 0, 0, 0)));
+
+        minPan = qMin(pos.pan, minPan);
+        maxPan = qMax(pos.tilt, maxPan);
     }
-    if(qFuzzyCompare(maxPan - minPan, 720.0)) {
+
+    if(qFuzzyCompare(maxPan - minPan, 720.0))
+    {
         /* There are no limits for pan. */
         m_logicalLimits.minPan = 0.0;
         m_logicalLimits.maxPan = 360.0;
-    } else {
+    }
+    else
+    {
         m_logicalLimits.minPan = minPan;
         m_logicalLimits.maxPan = maxPan;
     }
 
-    QVector3D lo = m_inputMapper->sourceToTarget(m_inputMapper->targetToSource(QVector3D(0, -90, 0)));
-    QVector3D hi = m_inputMapper->sourceToTarget(m_inputMapper->targetToSource(QVector3D(0, 90, 360)));
-    m_logicalLimits.minTilt = lo.y();
-    m_logicalLimits.maxTilt = hi.y();
-    m_logicalLimits.minFov = lo.z();
-    m_logicalLimits.maxFov = hi.z();
+    auto lo = m_inputMapper->sourceToTarget(
+        m_inputMapper->targetToSource(nx::core::ptz::PtzVector(0,-90, 0, 0)));
+
+    auto hi = m_inputMapper->sourceToTarget(m_inputMapper->targetToSource(
+        nx::core::ptz::PtzVector(0, 90, 0, 360)));
+
+    m_logicalLimits.minTilt = lo.tilt;
+    m_logicalLimits.maxTilt = hi.tilt;
+    m_logicalLimits.minFov = lo.zoom;
+    m_logicalLimits.maxFov = hi.zoom;
 }
 
 bool deserialize(QnJsonContext *ctx, const QJsonValue &value, QnSpaceMapperPtr<qreal> *target) {
@@ -147,21 +163,28 @@ bool deserialize(QnJsonContext *ctx, const QJsonValue &value, QnPtzMapperPtr *ta
     }
 
     /* Null means "take this one from the other mapper". */
-    for(int i = 0; i < 3; i++) {
-        if(!input[i]) {
+    for(int i = 0; i < input.size(); ++i)
+    {
+        if(!input[i])
+        {
             if(!output[i])
                 return false;
 
             input[i] = output[i];
-        } else if(!output[i]) {
+        }
+        else if(!output[i])
+        {
             output[i] = input[i];
         }
     }
 
-    *target = QnPtzMapperPtr(new QnPtzMapper(
-        QnSpaceMapperPtr<QVector3D>(new QnSeparableVectorSpaceMapper(input[0], input[1], input[2])),
-        QnSpaceMapperPtr<QVector3D>(new QnSeparableVectorSpaceMapper(output[0], output[1], output[2]))
-    ));
+    QnSpaceMapperPtr<nx::core::ptz::PtzVector> inputMapper(
+        new nx::core::ptz::SpaceMapper(input[0], input[1], input[2], input[3]));
+
+    QnSpaceMapperPtr<nx::core::ptz::PtzVector> outputMapper(
+        new nx::core::ptz::SpaceMapper(output[0], output[1], output[2], output[3]));
+
+    *target = QnPtzMapperPtr(new QnPtzMapper(inputMapper, outputMapper));
     return true;
 }
 

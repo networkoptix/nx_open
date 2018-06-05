@@ -319,18 +319,34 @@ Ptz::Capabilities QnAxisPtzController::getCapabilities() const
     return m_capabilities;
 }
 
-bool QnAxisPtzController::continuousMove(const QVector3D &speed) {
-    return query(lit("com/ptz.cgi?continuouspantiltmove=%1,%2&continuouszoommove=%3").arg(speed.x() * m_maxDeviceSpeed.x()).arg(speed.y() * m_maxDeviceSpeed.y()).arg(speed.z() * m_maxDeviceSpeed.z()));
+bool QnAxisPtzController::continuousMove(const nx::core::ptz::PtzVector& speedVector)
+{
+    return query(lm("com/ptz.cgi?continuouspantiltmove=%1,%2&continuouszoommove=%3")
+        .args(
+            speedVector.pan * m_maxDeviceSpeed.x(),
+            speedVector.tilt * m_maxDeviceSpeed.y(),
+            speedVector.zoom * m_maxDeviceSpeed.z()));
 }
 
-bool QnAxisPtzController::absoluteMove(Qn::PtzCoordinateSpace space, const QVector3D &position, qreal speed) {
+bool QnAxisPtzController::absoluteMove(
+    Qn::PtzCoordinateSpace space,
+    const nx::core::ptz::PtzVector& position,
+    qreal speed)
+{
     if(space != Qn::LogicalPtzCoordinateSpace)
         return false;
 
-    return query(lit("com/ptz.cgi?pan=%1&tilt=%2&zoom=%3&speed=%4").arg(position.x()).arg(position.y()).arg(m_35mmEquivToCameraZoom(qDegreesTo35mmEquiv(position.z()))).arg(speed * 100));
+    return query(lm("com/ptz.cgi?pan=%1&tilt=%2&zoom=%3&speed=%4")
+        .args(
+            position.pan,
+            position.tilt,
+            m_35mmEquivToCameraZoom(qDegreesTo35mmEquiv(position.zoom)),
+            speed * 100));
 }
 
-bool QnAxisPtzController::getPosition(Qn::PtzCoordinateSpace space, QVector3D *position)  const
+bool QnAxisPtzController::getPosition(
+    Qn::PtzCoordinateSpace space,
+    nx::core::ptz::PtzVector* outPosition)  const
 {
     if(space != Qn::LogicalPtzCoordinateSpace)
         return false;
@@ -340,13 +356,20 @@ bool QnAxisPtzController::getPosition(Qn::PtzCoordinateSpace space, QVector3D *p
         return false;
 
     qreal pan, tilt, zoom;
-    if(params.value(lit("pan"), &pan) && params.value(lit("tilt"), &tilt) && params.value(lit("zoom"), &zoom)) {
-        position->setX(pan);
-        position->setY(tilt);
-        position->setZ(q35mmEquivToDegrees(m_cameraTo35mmEquivZoom(zoom)));
+    if(params.value(lit("pan"), &pan) && params.value(lit("tilt"), &tilt) && params.value(lit("zoom"), &zoom))
+    {
+        outPosition->pan = pan;
+        outPosition->tilt = tilt;
+        outPosition->zoom = q35mmEquivToDegrees(m_cameraTo35mmEquivZoom(zoom));
         return true;
-    } else {
-        qnWarning("Failed to get PTZ position from camera %1. Malformed response.", m_resource->getName());
+    }
+    else
+    {
+        NX_WARNING(
+            this,
+            lm("Failed to get PTZ position from camera %1. Malformed response.")
+                .arg(m_resource->getName()));
+
         return false;
     }
 }

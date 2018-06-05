@@ -267,24 +267,45 @@ int QnPtzRestHandler::executePost(
     }
 }
 
-int QnPtzRestHandler::executeContinuousMove(const QnPtzControllerPtr &controller, const QnRequestParams &params, QnJsonRestResult &result)
+int QnPtzRestHandler::executeContinuousMove(
+    const QnPtzControllerPtr& controller,
+    const QnRequestParams& params,
+    QnJsonRestResult& result)
 {
     NX_VERBOSE(this, lit("Start execute ContinuousMove. params=%1").arg(toString(params)));
 
-
     qreal xSpeed, ySpeed, zSpeed;
-    if (
-        !requireParameter(params, lit("xSpeed"), result, &xSpeed) ||
-        !requireParameter(params, lit("ySpeed"), result, &ySpeed) ||
-        !requireParameter(params, lit("zSpeed"), result, &zSpeed)
-        )
+    nx::core::ptz::PtzVector speedVector;
+
+    bool success =
+        requireOneOfParameters(
+            params,
+            {lit("panSpeed"), lit("xSpeed")},
+            result,
+            &speedVector.pan)
+
+        && requireOneOfParameters(
+            params,
+            {lit("tiltSpeed"), lit("ySpeed")},
+            result,
+            &speedVector.tilt)
+
+        && requireOneOfParameters(
+            params,
+            {lit("zoomSpeed"), lit("zSpeed")},
+            result,
+            &speedVector.zoom)
+
+        && requireParameter(params, lit("rotationSpeed"), result, &speedVector.rotation, true);
+
+
+    if (!success)
     {
         NX_VERBOSE(this, lit("Finish execute ContinuousMove because of invalid params."));
         return CODE_INVALID_PARAMETER;
     }
 
-    QVector3D speed(xSpeed, ySpeed, zSpeed);
-    if (!controller->continuousMove(speed))
+    if (!controller->continuousMove(speedVector))
     {
         NX_VERBOSE(this, lit("Finish execute ContinuousMove: FAILED"));
         return CODE_INTERNAL_ERROR;
@@ -309,20 +330,27 @@ int QnPtzRestHandler::executeContinuousFocus(const QnPtzControllerPtr &controlle
 int QnPtzRestHandler::executeAbsoluteMove(const QnPtzControllerPtr &controller, const QnRequestParams &params, QnJsonRestResult &result)
 {
     Qn::PtzCommand command;
-    qreal xPos, yPos, zPos, speed;
-    if (
-        !requireParameter(params, lit("command"), result, &command) ||
-        !requireParameter(params, lit("xPos"), result, &xPos) ||
-        !requireParameter(params, lit("yPos"), result, &yPos) ||
-        !requireParameter(params, lit("zPos"), result, &zPos) ||
-        !requireParameter(params, lit("speed"), result, &speed)
-        )
-    {
-        return CODE_INVALID_PARAMETER;
-    }
+    qreal speed;
+    nx::core::ptz::PtzVector position;
 
-    QVector3D position(xPos, yPos, zPos);
-    if (!controller->absoluteMove(command == Qn::AbsoluteDeviceMovePtzCommand ? Qn::DevicePtzCoordinateSpace : Qn::LogicalPtzCoordinateSpace, position, speed))
+    bool success = requireParameter(params, lit("command"), result, &command)
+        && requireOneOfParameters(params, { lit("pan"), lit("xPos") }, result, &position.pan)
+        && requireOneOfParameters(params, { lit("tilt"), lit("yPos") }, result, &position.tilt)
+        && requireOneOfParameters(params, { lit("zoom"), lit("zPos") }, result, &position.zoom)
+        && requireParameter(params, lit("rotation"), result, &position.rotation, true)
+        && requireParameter(params, lit("speed"), result, &speed);
+
+    if (!success)
+        return CODE_INVALID_PARAMETER;
+
+    success = controller->absoluteMove(
+        command == Qn::AbsoluteDeviceMovePtzCommand
+            ? Qn::DevicePtzCoordinateSpace
+            : Qn::LogicalPtzCoordinateSpace,
+        position,
+        speed);
+
+    if (!success)
         return CODE_INTERNAL_ERROR;
 
     return CODE_OK;
@@ -356,7 +384,7 @@ int QnPtzRestHandler::executeGetPosition(const QnPtzControllerPtr &controller, c
     if (!requireParameter(params, lit("command"), result, &command))
         return CODE_INVALID_PARAMETER;
 
-    QVector3D position;
+    nx::core::ptz::PtzVector position;
     if (!controller->getPosition(command == Qn::GetDevicePositionPtzCommand ? Qn::DevicePtzCoordinateSpace : Qn::LogicalPtzCoordinateSpace, &position))
         return CODE_INTERNAL_ERROR;
 

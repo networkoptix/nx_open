@@ -49,20 +49,22 @@ Ptz::Capabilities QnWorkaroundPtzController::getCapabilities() const
     return (base_type::getCapabilities() | m_capabilitiesToAdd) & ~m_capabilitiesToRemove;
 }
 
-bool QnWorkaroundPtzController::continuousMove(const QVector3D &speed) {
+bool QnWorkaroundPtzController::continuousMove(const nx::core::ptz::PtzVector& speed)
+{
     if(!m_overrideContinuousMove)
         return base_type::continuousMove(speed);
 
-    QVector3D localSpeed = speed;
+    auto localSpeed = speed;
     if(m_flip & Qt::Horizontal)
-        localSpeed.setX(localSpeed.x() * -1);
+        localSpeed.pan = localSpeed.pan * -1;
     if(m_flip & Qt::Vertical)
-        localSpeed.setY(localSpeed.y() * -1);
+        localSpeed.tilt = localSpeed.tilt * -1;
 
-    if(m_traits & (Ptz::EightWayPtzTrait | Ptz::FourWayPtzTrait)) {
+    if(m_traits & (Ptz::EightWayPtzTrait | Ptz::FourWayPtzTrait))
+    {
         float rounding = (m_traits & Ptz::EightWayPtzTrait) ? M_PI / 4.0 : M_PI / 2.0; /* 45 or 90 degrees. */
 
-        QVector2D cartesianSpeed(localSpeed);
+        QVector2D cartesianSpeed = localSpeed.toQVector2D();
         QnPolarPoint<float> polarSpeed = cartesianToPolar(cartesianSpeed);
         polarSpeed.alpha = qRound(polarSpeed.alpha, rounding);
         cartesianSpeed = polarToCartesian<QVector2D>(polarSpeed.r, polarSpeed.alpha);
@@ -72,7 +74,11 @@ bool QnWorkaroundPtzController::continuousMove(const QVector3D &speed) {
         if(qFuzzyIsNull(cartesianSpeed.y()))
             cartesianSpeed.setY(0.0);
 
-        localSpeed = QVector3D(cartesianSpeed, localSpeed.z());
+        localSpeed = nx::core::ptz::PtzVector(
+            cartesianSpeed.x(),
+            cartesianSpeed.y(),
+            localSpeed.rotation,
+            localSpeed.zoom);
     }
 
     return base_type::continuousMove(localSpeed);

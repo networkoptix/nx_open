@@ -2348,7 +2348,7 @@ void QnMediaResourceWidget::at_fishEyeButton_toggled(bool checked)
     else
     {
         /* Stop all ptz activity. */
-        ptzController()->continuousMove(QVector3D(0, 0, 0));
+        ptzController()->continuousMove(nx::core::ptz::PtzVector());
         suspendHomePtzController();
     }
 

@@ -32,15 +32,19 @@ public:
     void setPtzTraits(const QnPtzAuxilaryTraitList& traits);
     void setAlternativePtzRanges(const std::map<QString, HanwhaRange>& ranges);
 
-    virtual bool continuousMove(const QVector3D& speed) override;
+    virtual bool continuousMove(const nx::core::ptz::PtzVector& speedVector) override;
     virtual bool continuousFocus(qreal speed) override;
     virtual bool absoluteMove(
         Qn::PtzCoordinateSpace space,
-        const QVector3D& position,
+        const nx::core::ptz::PtzVector& position,
         qreal speed) override;
+
     virtual bool viewportMove(qreal aspectRatio, const QRectF& viewport, qreal speed) override;
 
-    virtual bool getPosition(Qn::PtzCoordinateSpace space, QVector3D* position) const override;
+    virtual bool getPosition(
+        Qn::PtzCoordinateSpace space,
+        nx::core::ptz::PtzVector* outPosition) const override;
+
     virtual bool getLimits(Qn::PtzCoordinateSpace space, QnPtzLimits* limits) const override;
     virtual bool getFlip(Qt::Orientations* flip) const override;
 
@@ -57,8 +61,8 @@ public:
 
 private:
     QString channel() const;
-    QVector3D toHanwhaSpeed(const QVector3D& speed) const;
-    QVector3D toHanwhaPosition(const QVector3D& position) const;
+    nx::core::ptz::PtzVector toHanwhaSpeed(const nx::core::ptz::PtzVector& speed) const;
+    nx::core::ptz::PtzVector toHanwhaPosition(const nx::core::ptz::PtzVector& position) const;
     QString toHanwhaFocusCommand(qreal speed) const;
     std::map<QString, QString> makeViewPortParameters(
         qreal aspectRatio,

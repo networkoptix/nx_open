@@ -50,13 +50,18 @@ static QString panDirection(qreal speed)
         return lit("right");
 }
 
-bool QnNewDWPtzController::continuousMove(const QVector3D &speed)
+bool QnNewDWPtzController::continuousMove(const nx::core::ptz::PtzVector& speedVector)
 {
     QString request;
-    if (!qFuzzyIsNull(speed.z()))
-        request = QString(lit("/cgi-bin/ptz.cgi?zoom=%1")).arg(zoomDirection(speed.z()));
+    if (!qFuzzyIsNull(speedVector.zoom))
+    {
+        request = lm("/cgi-bin/ptz.cgi?zoom=%1").arg(zoomDirection(speedVector.zoom));
+    }
     else
-        request = QString(lit("/cgi-bin/ptz.cgi?speed=%1&move=%2")).arg(toNativeSpeed(speed.x())).arg(panDirection(speed.x()));
+    {
+        request = lm("/cgi-bin/ptz.cgi?speed=%1&move=%2")
+            .args(toNativeSpeed(speedVector.pan), panDirection(speedVector.pan));
+    }
     return doQuery(request);
 }
 
