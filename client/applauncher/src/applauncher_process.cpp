@@ -161,7 +161,7 @@ void ApplauncherProcess::launchNewestClient()
 
 int ApplauncherProcess::run()
 {
-    const bool clientIsRunAlready = !m_taskServer.listen(launcherPipeName);
+    const bool clientIsRunAlready = !m_taskServer.listen(launcherPipeName());
     if (clientIsRunAlready)
     {
         if (m_mode == Mode::Quit)
@@ -300,13 +300,13 @@ bool ApplauncherProcess::addTaskToThePipe(const QByteArray& serializedTask)
     return true;
 #else
     QLocalSocket sock;
-    sock.connectToServer(launcherPipeName);
+    sock.connectToServer(launcherPipeName());
     if (!sock.waitForConnected(-1))
     {
         m_isLocalServerWasNotFound = sock.error() == QLocalSocket::ServerNotFoundError ||
             sock.error() == QLocalSocket::ConnectionRefusedError ||
             sock.error() == QLocalSocket::PeerClosedError;
-        NX_LOG(QString::fromLatin1("Failed to connect to local server %1. %2").arg(launcherPipeName).arg(sock.errorString()), cl_logDEBUG1);
+        NX_LOG(QString::fromLatin1("Failed to connect to local server %1. %2").arg(launcherPipeName()).arg(sock.errorString()), cl_logDEBUG1);
         return false;
     }
 
@@ -315,7 +315,7 @@ bool ApplauncherProcess::addTaskToThePipe(const QByteArray& serializedTask)
         m_isLocalServerWasNotFound = sock.error() == QLocalSocket::ServerNotFoundError ||
             sock.error() == QLocalSocket::ConnectionRefusedError ||
             sock.error() == QLocalSocket::PeerClosedError;
-        NX_LOG(QString::fromLatin1("Failed to send launch task to local server %1. %2").arg(launcherPipeName).arg(sock.errorString()), cl_logDEBUG1);
+        NX_LOG(QString::fromLatin1("Failed to send launch task to local server %1. %2").arg(launcherPipeName()).arg(sock.errorString()), cl_logDEBUG1);
         return false;
     }
 
