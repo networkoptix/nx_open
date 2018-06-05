@@ -49,6 +49,22 @@ function patch_dsstore
     cat $xfrom | hexify | sed "s/$from_ver_hex/$to_ver_hex/g" | dehexify > $xto
 }
 
+# Mac OS specific applauncher stuff
+
+LAUNCHER_DIR=LAUNCHER.app
+LAUNCHER_RESOURCES_DIR="$LAUNCHER_DIR/Contents/Resources"
+APP_RESOURCES_DIR="$APP_DIR/Contents/Resources"
+
+rm -rf $LAUNCHER_DIR
+osacompile -o $LAUNCHER_DIR global_launcher.applescript
+
+mkdir -p "$APP_RESOURCES_DIR/Scripts"
+cp "$LAUNCHER_RESOURCES_DIR/Scripts/main.scpt" "$APP_RESOURCES_DIR/Scripts"
+cp "$LAUNCHER_RESOURCES_DIR/droplet.rsrc" "$APP_RESOURCES_DIR/launcher.rsrc"
+cp "$LAUNCHER_DIR/Contents/MacOS/droplet" "$APP_DIR/Contents/MacOS/launcher"
+
+#
+
 patch_dsstore "$SRC/DS_Store" "$SRC/.DS_Store" $RELEASE_VERSION
 rm "$SRC/DS_Store"
 

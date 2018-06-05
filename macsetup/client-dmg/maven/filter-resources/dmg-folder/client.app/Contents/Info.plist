@@ -9,7 +9,7 @@
     <key>CFBundleDisplayName</key>
     <string>@display.product.name@</string>
     <key>CFBundleExecutable</key>
-    <string>applet</string>
+    <string>launcher</string>
     <key>CFBundleIconFile</key>
     <string>appIcon.icns</string>
     <key>CFBundleIdentifier</key>
