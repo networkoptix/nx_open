@@ -3,12 +3,13 @@ Library           SeleniumLibrary    run_on_failure=Failure Tasks
 Library           NoptixImapLibrary/
 Library           String
 Library           NoptixLibrary/
-Resource          ${variables file}
+Resource          variables.robot
+Resource          ${variables_file}
 
 *** variables ***
 ${headless}    false
 ${directory}    ${SCREENSHOTDIRECTORY}
-${variables_file}    variables.robot
+${variables_file}    variables-env.robot
 
 *** Keywords ***
 Open Browser and go to URL
