@@ -27,7 +27,7 @@ on getQuoted(value)
 end getQuoted
 
 on debugLog(logText)
-	set disableDebugLog to false
+        set disableDebugLog to true
 	set logFileName to (POSIX path of (path to home folder as text)) & "global_launcher.log"
 	if disableDebugLog then
 		return
