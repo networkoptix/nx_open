@@ -1,0 +1,52 @@
+{
+    "tiles": [
+        {
+            "title"   : "Cloud Services",
+            "sections": [
+                {
+                    "key"    : "cloud_portal_failure",
+                    "caption": "Cloud Portal"
+                },
+                {
+                    "key"    : "view_and_settings_failure",
+                    "caption": "View and settings interfaces"
+                },
+                {
+                    "key"    : "cloud_authentication_failure",
+                    "caption": "Cloud Authentication"
+                },
+                {
+                    "key"    : "email_failure",
+                    "caption": "Email Server"
+                }
+            ]
+        },
+        {
+            "title"   : "Cloud Systems Connectivity",
+            "sections": [
+                {
+                    "key"    : "p2p_connections_failure",
+                    "caption": "PTP Connections"
+                },
+                {
+                    "key"       : "proxy_connections_failure",
+                    "caption"   : "Proxied Connections",
+                    "dimensions": [
+                        {
+                            "key"    : "relay-fr",
+                            "caption": "Frankfurt"
+                        },
+                        {
+                            "key"    : "relay-ny",
+                            "caption": "New York"
+                        },
+                        {
+                            "key"    : "relay-la",
+                            "caption": "Los Angeles"
+                        }
+                    ]
+                }
+            ]
+        }
+    ]
+}
