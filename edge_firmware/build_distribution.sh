@@ -132,8 +132,8 @@ copyBuildLibs()
         )
     fi
 
-    # Libs for BananaPi-based platforms.
-    if [ "$BOX" = "bpi" ] || [ "$BOX" = "bananapi" ]
+    # Libs for BananaPi-based Nx1 platform.
+    if [ "$BOX" = "bpi" ]
     then
         LIBS_TO_COPY+=(
             libGLESv2

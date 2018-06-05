@@ -140,7 +140,7 @@ private:
         return window;
     }
 private:
-    QScreen* m_screen;
+    QPointer<QScreen> m_screen;
 };
 
 typedef QSharedPointer<MenuScreenCorrector> MenuScreenCorrectorPtr;

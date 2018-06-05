@@ -7349,6 +7349,21 @@ to %1</source>
     </message>
   </context>
   <context>
+    <name>QnWorkbenchContext</name>
+    <message>
+      <source>To use the software you must accept the end user license agreement</source>
+      <translation>การใช้ซอฟต์แวร์คุณต้องยอมรับข้อตกลงใบอนุญาตของผู้ใช้</translation>
+    </message>
+    <message>
+      <source>Accept</source>
+      <translation>ยอมรับ</translation>
+    </message>
+    <message>
+      <source>Decline</source>
+      <translation>ปฏิเสธ</translation>
+    </message>
+  </context>
+  <context>
     <name>QnWorkbenchIncompatibleServersActionHandler</name>
     <message>
       <source>Systems will be merged shortly</source>
@@ -8744,18 +8759,6 @@ to %1</source>
     <message>
       <source>Failed to change password on %1 of %2 cameras</source>
       <translation>ไม่สามารถเปลี่ยนรหัสผ่านได้ที่ %1 จาก %2 กล้อง</translation>
-    </message>
-    <message>
-      <source>To use the software you must accept the end user license agreement</source>
-      <translation>การใช้ซอฟต์แวร์คุณต้องยอมรับข้อตกลงใบอนุญาตของผู้ใช้</translation>
-    </message>
-    <message>
-      <source>Accept</source>
-      <translation>ยอมรับ</translation>
-    </message>
-    <message>
-      <source>Decline</source>
-      <translation>ปฏิเสธ</translation>
     </message>
     <message>
       <source>Warning! This build is for testing purposes only! Please upgrade to a next available patch or release version once available.</source>

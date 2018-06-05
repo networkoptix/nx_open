@@ -70,6 +70,6 @@
   <String Id="Product_ArchMismatch_x86">此软件包专为32位操作系统而设计。安装程序现在将退出。</String>
   <String Id="Product_ArchMismatch_x64">此软件包专为64位操作系统而设计。安装程序现在将退出。</String>
 
-  <UI Dialog="BalExtension" Control="EulaAcceptCheckbox" Width="136"/>
-  <UI Dialog="BalExtension" Control="EulaHyperlink" X="150"/>
+  <UI Dialog="BalExtension" Control="EulaAcceptCheckbox" Width="141"/>
+  <UI Dialog="BalExtension" Control="EulaHyperlink" X="155"/>
 </WixLocalization>
