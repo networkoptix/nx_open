@@ -63,7 +63,7 @@ def determine_package_versions():
 
     if box == "bananapi":
         v["ffmpeg"] = "3.1.1-bananapi"
-        v["qt"] = "5.6.1-1"
+        v["qt"] = "5.6.3-bananapi"
 
     if box == "rpi":
         v["qt"] = "5.6.3"
@@ -107,7 +107,7 @@ def sync_dependencies(syncher):
     if platform == "linux" and box in ("bpi", "bananapi", "rpi", "tx1", "none"):
         sync("sysroot", path_variable="sysroot_directory")
 
-    if box in ("bpi", "bananapi"):
+    if box == "bpi":
         sync("opengl-es-mali")
 
     if box == "rpi":
