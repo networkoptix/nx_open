@@ -22,6 +22,7 @@
 #include "widgets/camera_motion_settings_widget.h"
 #include "widgets/camera_fisheye_settings_widget.h"
 #include "widgets/camera_expert_settings_widget.h"
+#include "widgets/camera_web_page_widget.h"
 #include "widgets/io_module_settings_widget.h"
 
 #include "redux/camera_settings_dialog_state.h"
@@ -191,6 +192,11 @@ CameraSettingsDialog::CameraSettingsDialog(QWidget* parent):
         int(CameraSettingsTab::fisheye),
         new CameraFisheyeSettingsWidget(d->previewManager, d->store, ui->tabWidget),
         tr("Fisheye"));
+
+    addPage(
+        int(CameraSettingsTab::web),
+        new CameraWebPageWidget(d->store, ui->tabWidget),
+        tr("Web Page"));
 
     addPage(
         int(CameraSettingsTab::expert),
@@ -380,6 +386,9 @@ void CameraSettingsDialog::loadState(const CameraSettingsDialogState& state)
 
     setPageVisible(int(CameraSettingsTab::io), state.isSingleCamera() && !hasWearableCameras
         && state.devicesDescription.isIoModule == CombinedValue::All);
+
+    setPageVisible(int(CameraSettingsTab::web), state.isSingleCamera()
+        && !state.singleCameraProperties.settingsUrlPath.isEmpty());
 
     setPageVisible(int(CameraSettingsTab::expert), !hasWearableCameras
         && state.devicesDescription.isIoModule == CombinedValue::None);

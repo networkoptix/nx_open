@@ -5,9 +5,11 @@
 #include <camera/fps_calculator.h>
 #include <client_core/client_core_module.h>
 #include <common/common_module.h>
+#include <common/static_common_module.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/resource_display_info.h>
 #include <core/resource_management/resource_pool.h>
+#include <core/resource_management/resource_data_pool.h>
 #include <utils/camera/camera_bitrate_calculator.h>
 
 #include <nx/fusion/model_functions.h>
@@ -169,6 +171,19 @@ State fillBitrateFromFixedQuality(State state)
     return state;
 }
 
+QString settingsUrlPath(const Camera& camera)
+{
+    const auto resourceData = qnStaticCommon->dataPool()->data(camera);
+    if (!resourceData.value<bool>(lit("showUrl"), false))
+        return QString();
+
+    QString urlPath = resourceData.value<QString>(lit("urlLocalePath"), QString());
+    while (urlPath.startsWith(lit("/"))) //< VMS Gateway does not like slashes at the beginning.
+        urlPath = urlPath.mid(1);
+
+    return urlPath;
+}
+
 State loadNetworkInfo(State state, const Camera& camera)
 {
     NX_ASSERT(camera);
@@ -177,6 +192,7 @@ State loadNetworkInfo(State state, const Camera& camera)
 
     state.singleCameraProperties.ipAddress = QnResourceDisplayInfo(camera).host();
     state.singleCameraProperties.webPage = calculateWebPage(camera);
+    state.singleCameraProperties.settingsUrlPath = settingsUrlPath(camera);
 
     const bool isIoModule = camera->isIOModule();
     const bool hasPrimaryStream = !isIoModule || camera->isAudioSupported();

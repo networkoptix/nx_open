@@ -138,6 +138,7 @@ struct CameraSettingsDialogState
         QString macAddress;
         QString ipAddress;
         QString webPage;
+        QString settingsUrlPath;
         std::optional<QString> primaryStream;
         std::optional<QString> secondaryStream;
         bool hasVideo = true;
