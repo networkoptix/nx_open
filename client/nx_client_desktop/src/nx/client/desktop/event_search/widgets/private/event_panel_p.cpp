@@ -382,6 +382,10 @@ void EventPanel::Private::currentWorkbenchWidgetChanged(Qn::ItemRole role)
 
     at_motionSelectionChanged();
     at_specialModeToggled(m_currentMediaWidget->isMotionSearchModeEnabled(), m_motionTab);
+
+    // This will reload tab content if the camera or resource was changed.
+    if (dynamic_cast<UnifiedSearchWidget*>(m_tabs->currentWidget()))
+        dynamic_cast<UnifiedSearchWidget*>(m_tabs->currentWidget())->requestFetch();
 }
 
 void EventPanel::Private::updateUnreadCounter(int count, QnNotificationLevel::Value importance)
