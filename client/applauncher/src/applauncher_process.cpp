@@ -276,11 +276,12 @@ bool ApplauncherProcess::addTaskToThePipe(const QByteArray& serializedTask)
     //posting to the pipe
 #ifdef _WIN32
     NamedPipeSocket sock;
-    SystemError::ErrorCode result = sock.connectToServerSync(launcherPipeName);
+    SystemError::ErrorCode result = sock.connectToServerSync(launcherPipeName());
     if (result != SystemError::noError)
     {
         m_isLocalServerWasNotFound = result == SystemError::fileNotFound;
-        NX_LOG(QString::fromLatin1("Failed to connect to local server %1. %2").arg(launcherPipeName).arg(SystemError::toString(result)), cl_logDEBUG1);
+        NX_LOG(lm("Failed to connect to local server %1. %2")
+            .args(launcherPipeName(), SystemError::toString(result)), cl_logDEBUG1);
         return false;
     }
 
@@ -289,7 +290,8 @@ bool ApplauncherProcess::addTaskToThePipe(const QByteArray& serializedTask)
     if ((result != SystemError::noError) || (bytesWritten != serializedTask.size()))
     {
         m_isLocalServerWasNotFound = result == SystemError::fileNotFound;
-        NX_LOG(QString::fromLatin1("Failed to send launch task to local server %1. %2").arg(launcherPipeName).arg(SystemError::toString(result)), cl_logDEBUG1);
+        NX_LOG(lm("Failed to send launch task to local server %1. %2")
+            .args(launcherPipeName(), SystemError::toString(result)), cl_logDEBUG1);
         return false;
     }
 

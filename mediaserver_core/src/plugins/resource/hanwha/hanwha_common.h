@@ -220,8 +220,12 @@ static const QString kHanwhaNormalizedSpeedPtzTrait("NormalizedSpeed");
 static const QString kHanwhaHas3AxisPtz("3AxisPTZ");
 static const QString kHanwhaSimpleFocusTrait("SimpleFocusTrait");
 static const QString kHanwhaAutoFocusTrait("AutoFocusTrait");
+
 static const QString kHanwhaAlternativeZoomTrait("AlternativeZoomTrait");
 static const QString kHanwhaAlternativeFocusTrait("AlternativeFocusTrait");
+static const QString kHanwhaAlternativePanTrait("AlternativePanTrait");
+static const QString kHanwhaAlternativeTiltTrait("AlternativeTiltTrait");
+static const QString kHanwhaAlternativeRotateTrait("AlternativeRotateTrait");
 
 static const int kMaxPossibleFps = 1000;
 

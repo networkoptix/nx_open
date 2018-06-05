@@ -14,6 +14,6 @@ public:
     virtual QnResourceList findResources() override;
 
 private:
-    IDirect3D9 *m_pD3D;
-    QGLWidget* m_mainWidget;
+    IDirect3D9* m_pD3D = nullptr;
+    QGLWidget* m_mainWidget = nullptr;
 };

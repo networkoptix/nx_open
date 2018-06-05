@@ -961,28 +961,27 @@
             </group>
         </group>
         <group name="Lens Control">
-            <param id="image/custom/zoom"
+            <param id="image/lens_control/focus"
                 name="Zoom"
-                description="Zoom machinery"
-                range="-30,30"
+                description="Zoom adjustment"
                 dataType="SliderControl"
-                writeCmd="custom_zoom"
-                compact="true"/>
-            <param id="image/custom/Ptr"
+                range="-1,1"
+                compact="true"
+                aux="ptzTraits=AlternativeZoomTrait"/>
+            <param id="image/lens_control/ptr"
                 name=""
-                description="Pan tilt rotation machinery"
+                description="PTR adjustment"
                 dataType="PtrControl"
-                range="-30,30,-30,30,-30,30"
-                readCmd="param.cgi"
-                writeCmd="custom_ptr"
-                compact="true"/>
-            <param id="image/custom/focus"
+                range="-1,1,-1,1,-1,1"
+                compact="true"
+                aux="ptzTraits=AlternativePanTrait,AlternativeTiltTrait,AlternativeRotateTrait"/>
+            <param id="image/lens_control/zoom"
                 name="Focus"
-                description="Focus machinery"
-                range="-30,30"
+                description="Focus adjustment"
                 dataType="SliderControl"
-                writeCmd="custom_focus"
-                compact="true"/>
+                range="-1,1"
+                compact="true"
+                aux="ptzTraits=AlternativeFocusTrait"/>
         </group>
         <group name="Maintenance">
             <param id="image/focus/Mode=SimpleFocus"
