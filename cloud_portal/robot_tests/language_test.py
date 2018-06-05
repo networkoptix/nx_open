@@ -1,4 +1,4 @@
-from os import system, path, remove
+from os import system, path, remove, listdir
 import json
 import codecs
 import time
@@ -9,7 +9,6 @@ waitTime = 30
 
 with codecs.open('language_list.json', 'r', encoding='utf-8-sig') as languages_list:
     langList = json.load(languages_list)
-
 
 def allLanguages():
 
@@ -27,7 +26,8 @@ def runTest(key, langList):
     while True:
         # ping the server at the start to make sure it's ready
         if ping().ok:
-            system('robot -N {}_{} -v BROWSER:headlesschrome -d {} -e not-ready -V getvars.py:{} test-cases'.format(
+            map(remove,(path.join('outputs', file) for file in listdir('outputs') if file.endswith('.png') and file.find(key) > -1 ))
+            system('robot -N {}_{} -v BROWSER:headlesschrome -v SCREENSHOTDIRECTORY:screenshots -d {} -e not-ready -V getvars.py:{} test-cases'.format(
                 langList[key], key, path.join('outputs', key), key))
             # ping the server at the end to make sure it didn't go down
             if ping().ok:

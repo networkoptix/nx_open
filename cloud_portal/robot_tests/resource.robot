@@ -159,7 +159,7 @@ Verify In System
     Wait Until Element Is Visible    //h1[@ng-if='gettingSystem.success' and contains(text(), '${system name}')]
 
 Failure Tasks
-    Capture Page Screenshot    selenium-screenshot-{index}.png
+    Capture Page Screenshot    selenium-screenshot-${LANGUAGE}{index}.png
 
 Wait Until Elements Are Visible
     [arguments]    @{elements}
