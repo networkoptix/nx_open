@@ -7355,6 +7355,21 @@ to %1</source>
     </message>
   </context>
   <context>
+    <name>QnWorkbenchContext</name>
+    <message>
+      <source>To use the software you must accept the end user license agreement</source>
+      <translation>使用該軟體前, 您必須同意使用者授權合約</translation>
+    </message>
+    <message>
+      <source>Accept</source>
+      <translation>同意</translation>
+    </message>
+    <message>
+      <source>Decline</source>
+      <translation>拒絕</translation>
+    </message>
+  </context>
+  <context>
     <name>QnWorkbenchIncompatibleServersActionHandler</name>
     <message>
       <source>Systems will be merged shortly</source>
@@ -8750,18 +8765,6 @@ to %1</source>
     <message>
       <source>Failed to change password on %1 of %2 cameras</source>
       <translation>變更 %2 支攝影機中的 %1 支攝影機密碼失敗</translation>
-    </message>
-    <message>
-      <source>To use the software you must accept the end user license agreement</source>
-      <translation>使用該軟體前, 您必須同意使用者授權合約</translation>
-    </message>
-    <message>
-      <source>Accept</source>
-      <translation>同意</translation>
-    </message>
-    <message>
-      <source>Decline</source>
-      <translation>拒絕</translation>
     </message>
     <message>
       <source>Warning! This build is for testing purposes only! Please upgrade to a next available patch or release version once available.</source>

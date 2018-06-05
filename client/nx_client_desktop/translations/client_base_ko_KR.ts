@@ -7141,7 +7141,7 @@ to %1</source>
     <message>
       <source>%1 users</source>
       <comment>%1 is the short cloud name (like Cloud)</comment>
-      <translation type="unfinished">%1 users</translation>
+      <translation>%1 사용자</translation>
     </message>
     <message>
       <source>%1 belong to this system only and are fully managed by system administrators.</source>
@@ -7347,6 +7347,21 @@ to %1</source>
     <message>
       <source>Video Wall is removed on the server and will be closed.</source>
       <translation>비디오월이 서버에서 제거되어 종료합니다.</translation>
+    </message>
+  </context>
+  <context>
+    <name>QnWorkbenchContext</name>
+    <message>
+      <source>To use the software you must accept the end user license agreement</source>
+      <translation type="unfinished">To use the software you must accept the end user license agreement</translation>
+    </message>
+    <message>
+      <source>Accept</source>
+      <translation type="unfinished">Accept</translation>
+    </message>
+    <message>
+      <source>Decline</source>
+      <translation type="unfinished">Decline</translation>
     </message>
   </context>
   <context>
@@ -8745,18 +8760,6 @@ to %1</source>
     <message>
       <source>Failed to change password on %1 of %2 cameras</source>
       <translation>%2 카메라의 %1에 암호를 변경하지 못했습니다.</translation>
-    </message>
-    <message>
-      <source>To use the software you must accept the end user license agreement</source>
-      <translation type="unfinished">To use the software you must accept the end user license agreement</translation>
-    </message>
-    <message>
-      <source>Accept</source>
-      <translation type="unfinished">Accept</translation>
-    </message>
-    <message>
-      <source>Decline</source>
-      <translation type="unfinished">Decline</translation>
     </message>
     <message>
       <source>Warning! This build is for testing purposes only! Please upgrade to a next available patch or release version once available.</source>
