@@ -9,11 +9,21 @@
 
         .item-status {
             &.healhty {
+                background : url(../../assets/icons/ok.svg);
+                background-repeat: no-repeat;
+                background-position: center;
+            }
 
+            &.alert {
+                background          : url(../../assets/icons/alert.svg);
+                background-repeat   : no-repeat;
+                background-position : center;
             }
 
             &.error {
-                background-color : $danger;
+                background : url(../../assets/icons/error.svg);
+                background-repeat : no-repeat;
+                background-position : center;
             }
         }
 
