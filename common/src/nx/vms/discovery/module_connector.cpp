@@ -182,9 +182,14 @@ void ModuleConnector::Module::setForbiddenEndpoints(std::set<SocketAddress> endp
 {
     NX_VERBOSE(this, lm("Forbid endpoints %1").container(endpoints));
     NX_ASSERT(!m_id.isNull(), "Does not make sense to block endpoints for unknown servers");
-    if (m_forbiddenEndpoints != endpoints)
+
+    std::set<QString> forbiddenEndpoints;
+    for (const auto e: endpoints)
+        forbiddenEndpoints.insert(e.toString());
+
+    if (m_forbiddenEndpoints != forbiddenEndpoints)
     {
-        m_forbiddenEndpoints = std::move(endpoints);
+        m_forbiddenEndpoints = std::move(forbiddenEndpoints);
         if (m_socket || m_httpClients.size())
             remakeConnection();
     }
@@ -271,7 +276,7 @@ void ModuleConnector::Module::connectToGroup(Endpoints::iterator endpointsGroup)
     // Initiate parallel connects to each endpoint in a group.
     size_t endpointsInProgress = 0;
     if (m_lastSuccessfulEndpoint //< TODO: Should not be merged into 4.0!!
-        && !m_forbiddenEndpoints.count(*m_lastSuccessfulEndpoint))
+        && !m_forbiddenEndpoints.count(m_lastSuccessfulEndpoint->toString()))
     {
         ++endpointsInProgress;
         connectToEndpoint(*m_lastSuccessfulEndpoint, endpointsGroup);
@@ -279,7 +284,7 @@ void ModuleConnector::Module::connectToGroup(Endpoints::iterator endpointsGroup)
     }
     for (const auto& endpoint: endpointsGroup->second)
     {
-        if (m_forbiddenEndpoints.count(endpoint))
+        if (m_forbiddenEndpoints.count(endpoint.toString()))
             continue;
 
         ++endpointsInProgress;
