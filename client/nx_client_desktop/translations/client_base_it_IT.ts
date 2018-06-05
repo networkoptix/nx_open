@@ -2935,7 +2935,7 @@ to %1</source>
     </message>
     <message>
       <source>Forgot password?</source>
-      <translation> Password dimenticata? </translation>
+      <translation>Password dimenticata?</translation>
     </message>
     <message>
       <source>Connect to %1</source>
@@ -3082,7 +3082,7 @@ to %1</source>
     </message>
     <message>
       <source>Please close %1 and start it again using the shortcut in the start menu.</source>
-      <translation>Chiudi l'applicazione e riavviala utilizzando il collegamento nel menu di avvio.</translation>
+      <translation>Chiudi %1 e riavviala utilizzando il collegamento nel menu di avvio.</translation>
     </message>
     <message>
       <source>You have to download another version of %1 to connect to this Server.</source>
@@ -3878,6 +3878,10 @@ to %1</source>
         <numerusform>Test completato con successo: %n utenti trovati.</numerusform>
       </translation>
     </message>
+    <message>
+      <source>Changing any LDAP settings other than &quot;Search Filter&quot; will result in connectivity loss for all LDAP fetched users.</source>
+      <translation>La modifica di qualsiasi impostazione LDAP diversa da &quot;Filtro di ricerca&quot; comporterà una perdita di connettività per tutti gli utenti recuperati da LDAP.</translation>
+    </message>
   </context>
   <context>
     <name>QnLdapSettingsDialogPrivate</name>
@@ -4454,7 +4458,7 @@ to %1</source>
     </message>
     <message>
       <source>Forgot password?</source>
-      <translation> Password dimenticata? </translation>
+      <translation>Password dimenticata?</translation>
     </message>
     <message>
       <source>Learn more about</source>
@@ -4776,7 +4780,7 @@ to %1</source>
     </message>
     <message>
       <source>Wearable Camera %1</source>
-      <translation>Telecamera indossabile</translation>
+      <translation>Telecamera indossabile %1</translation>
     </message>
     <message>
       <source>Name</source>
@@ -6405,12 +6409,8 @@ to %1</source>
       <translation>La registrazione è stata abilitata nella memoria USB</translation>
     </message>
     <message>
-      <source>Backup includes servers and cameras settings, users, webpages, event rules, etc. Video is not saved.</source>
-      <translation>Il backup include impostazioni di server e telecamere, utenti, pagine Web, regole degli eventi, ecc. Le immagini non vengono salvate.</translation>
-    </message>
-    <message>
-      <source>Creates a backup of System configuration that can be restored in case of failure.</source>
-      <translation>Crea un backup della configurazione del sistema che può essere ripristinato in caso di errore.</translation>
+      <source>Reindexing can fix problems with archive or backup if they have been lost or damaged, or if some hardware has been replaced.</source>
+      <translation>La reindicizzazione può risolvere i problemi con l'archivio o il backup se sono stati persi o danneggiati, o se alcuni componenti hardware sono stati sostituiti.</translation>
     </message>
   </context>
   <context>
@@ -8517,6 +8517,10 @@ to %1</source>
       <source>Event will trigger only if there are matches in the caption with any of the entered keywords.</source>
       <translation>L'evento verrà attivato solo se sono presenti corrispondenze nella didascalia con una qualsiasi delle parole chiave immesse.</translation>
     </message>
+    <message>
+      <source>This field is case sensitive.</source>
+      <translation>Questo campo distingue maiuscole e minuscole.</translation>
+    </message>
   </context>
   <context>
     <name>nx::client::desktop::ui::ClipboardButton</name>
@@ -8836,10 +8840,6 @@ to %1</source>
       <translation>Versione beta %1</translation>
     </message>
     <message>
-      <source>Some functionality may be unavailable or not working properly.</source>
-      <translation>Alcune funzionalità potrebbero non essere disponibili o non funzionare correttamente.</translation>
-    </message>
-    <message>
       <source>System sends anonymous usage statistics</source>
       <translation>Il sistema invia statistiche di utilizzo anonime</translation>
     </message>
@@ -8878,6 +8878,10 @@ to %1</source>
     <message>
       <source>Decline</source>
       <translation>Rifiutare</translation>
+    </message>
+    <message>
+      <source>Warning! This build is for testing purposes only! Please upgrade to a next available patch or release version once available.</source>
+      <translation>Avvertimento! Questa versione è solo a scopo di test! Esegui l'upgrade alla prossima patch o versione una volta disponibile.</translation>
     </message>
   </context>
   <context>

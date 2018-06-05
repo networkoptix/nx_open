@@ -254,6 +254,12 @@ void QnConnectToCurrentSystemTool::updateServer()
             m_updateTool->deleteLater();
             m_updateTool.clear();
 
+            if (const auto fakeServer = resourcePool()->getIncompatibleServerById(m_targetId)
+                .dynamicCast<QnFakeMediaServerResource>())
+            {
+                fakeServer->setAuthenticator(QAuthenticator());
+            }
+
             m_updateResult = result;
 
             if (result.result != QnUpdateResult::Successful)
@@ -280,6 +286,14 @@ void QnConnectToCurrentSystemTool::updateServer()
     auto targetVersion = qnStaticCommon->engineVersion();
     if (const auto ecServer = commonModule()->currentServer())
         targetVersion = ecServer->getVersion();
+
+    if (auto fakeServer = server.dynamicCast<QnFakeMediaServerResource>())
+    {
+        QAuthenticator authenticator;
+        authenticator.setUser(helpers::kFactorySystemUser);
+        authenticator.setPassword(m_adminPassword);
+        fakeServer->setAuthenticator(authenticator);
+    }
 
     m_updateTool->setTargets({m_targetId});
     m_updateTool->startUpdate(targetVersion);

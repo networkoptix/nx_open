@@ -17,8 +17,6 @@
 #include <QtWidgets/QPushButton>
 #include <QtWidgets/QWhatsThis>
 
-#include <QtWebKitWidgets/QWebView>
-
 #include <api/network_proxy_factory.h>
 #include <api/global_settings.h>
 #include <api/server_rest_connection.h>
@@ -182,7 +180,6 @@
 #include "network/authutil.h"
 #include <core/resource/fake_media_server.h>
 #include <client/client_app_info.h>
-#include <ui/style/webview_style.h>
 #include <ini.h>
 
 namespace {
@@ -192,6 +189,17 @@ static const QString kVersionMismatchShowOnceKey(lit("VersionMismatch"));
 
 const char* uploadingImageARPropertyName = "_qn_uploadingImageARPropertyName";
 
+QnResourcePtr getLayoutByName(const QString& layoutName, QnResourcePool* pool)
+{
+    const auto layouts = pool->getResources<QnLayoutResource>();
+    const auto trimmed = layoutName.trimmed();
+    for (const auto layout: layouts)
+    {
+        if (layout->getName().trimmed() == trimmed)
+            return layout;
+    }
+    return QnResourcePtr();
+}
 } // namespace
 
 //!time that is given to process to exit. After that, applauncher (if present) will try to terminate it
@@ -345,7 +353,6 @@ ActionHandler::ActionHandler(QObject *parent) :
     connect(action(action::BrowseUrlAction), SIGNAL(triggered()), this, SLOT(at_browseUrlAction_triggered()));
     connect(action(action::VersionMismatchMessageAction), &QAction::triggered, this, &ActionHandler::at_versionMismatchMessageAction_triggered);
     connect(action(action::BetaVersionMessageAction), SIGNAL(triggered()), this, SLOT(at_betaVersionMessageAction_triggered()));
-    connect(action(action::ShowEulaAction), &QAction::triggered, this, &ActionHandler::showEula);
     connect(action(action::AllowStatisticsReportMessageAction), &QAction::triggered, this, [this] { checkIfStatisticsReportAllowed(); });
 
     connect(action(action::QueueAppRestartAction), SIGNAL(triggered()), this, SLOT(at_queueAppRestartAction_triggered()));
@@ -563,6 +570,16 @@ void ActionHandler::submitDelayedDrops()
     QnResourceList resources;
     ec2::ApiLayoutTourDataList tours;
 
+    if (!m_delayedDropLayoutName.isEmpty())
+    {
+        if (const auto resource = getLayoutByName(m_delayedDropLayoutName, resourcePool()))
+            resources.append(resource);
+        else
+            NX_EXPECT(false, "Wrong layout name");
+
+        m_delayedDropLayoutName.clear();
+    }
+
     for (const auto& data: m_delayedDrops)
     {
         MimeData mimeData = MimeData::deserialized(data, resourcePool());
@@ -578,7 +595,8 @@ void ActionHandler::submitDelayedDrops()
     if (resources.empty() && tours.empty())
         return;
 
-    resourcePool()->addNewResources(resources);
+    if (!resources.isEmpty())
+        resourcePool()->addNewResources(resources);
 
     workbench()->clear();
     if (!resources.empty())
@@ -689,52 +707,6 @@ void ActionHandler::showMultipleCamerasErrorMessage(
 
     messageBox.setStandardButtons(QDialogButtonBox::Ok);
     messageBox.exec();
-}
-
-void ActionHandler::showEula()
-{
-    const QString eulaHtmlStyle = QString::fromLatin1(R"(
-    <style media="screen" type="text/css">
-    p {
-        color: %1;
-        font-family: 'Roboto-Regular', 'Roboto';
-        font-weight: 400;
-        font-style: normal;
-        font-size: 13px;
-        line-height: 16px;
-    }
-    </style>)").arg(qApp->palette().color(QPalette::WindowText).name());
-
-    QFile eula(lit(":/license.html"));
-    eula.open(QIODevice::ReadOnly);
-    QString eulaText = QString::fromUtf8(eula.readAll());
-    eulaText = eulaText.replace(
-        lit("<head>"),
-        lit("<head>%1").arg(eulaHtmlStyle)
-    );
-
-    QnMessageBox eulaDialog(context()->mainWindow());
-    eulaDialog.setIcon(QnMessageBoxIcon::Warning);
-    eulaDialog.setText(tr("To use the software you must accept the end user license agreement"));
-
-    auto view = new QWebView(&eulaDialog);
-    NxUi::setupWebViewStyle(view, NxUi::WebViewStyle::eula);
-    view->setHtml(eulaText);
-    view->setFixedSize(740, 560);
-    view->show();
-    eulaDialog.addCustomWidget(view);
-
-    eulaDialog.addButton(tr("Accept"), QDialogButtonBox::AcceptRole, Qn::ButtonAccent::Standard);
-    eulaDialog.addButton(tr("Decline"), QDialogButtonBox::RejectRole);
-
-    if (eulaDialog.exec() == QDialogButtonBox::AcceptRole)
-    {
-        qnSettings->setAcceptedEulaVersion(QnClientAppInfo::eulaVersion());
-    }
-    else
-    {
-        executeLater([this] { closeApplication(true); }, this);
-    }
 }
 
 void ActionHandler::changeDefaultPasswords(
@@ -1302,9 +1274,21 @@ void ActionHandler::at_dropResourcesAction_triggered()
 
 void ActionHandler::at_delayedDropResourcesAction_triggered()
 {
-    QByteArray data = menu()->currentParameters(sender()).argument<QByteArray>(
-        Qn::SerializedDataRole);
-    m_delayedDrops.push_back(data);
+    const auto params = menu()->currentParameters(sender());
+    if (params.hasArgument(Qn::SerializedDataRole))
+    {
+        const auto data = params.argument<QByteArray>(Qn::SerializedDataRole);
+        m_delayedDrops.push_back(data);
+    }
+    else if (params.hasArgument(Qn::LayoutNameRole))
+    {
+        m_delayedDropLayoutName = params.argument<QString>(Qn::LayoutNameRole);
+    }
+    else
+    {
+        NX_EXPECT(false, "Wrong delayed drop action paramenters");
+        return;
+    }
 
     submitDelayedDrops();
 }

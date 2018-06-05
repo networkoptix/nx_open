@@ -61,7 +61,7 @@ public:
     QVariant data(Column column, const int role = Qt::DisplayRole) const;
     bool setData(Column column, const QVariant& value, int role);
 
-    void loadFromRule(nx::vms::event::RulePtr businessRule);
+    void loadFromRule(const nx::vms::event::RulePtr& businessRule);
     nx::vms::event::RulePtr createRule() const;
 
     QString getText(Column column, const bool detailed = true) const;
@@ -95,6 +95,9 @@ public:
     QSet<QnUuid> actionResources() const;
     void setActionResources(const QSet<QnUuid>& value);
 
+    QSet<QnUuid> actionResourcesRaw() const;
+    void setActionResourcesRaw(const QSet<QnUuid>& value);
+
     bool isActionProlonged() const;
 
     nx::vms::event::ActionParameters actionParams() const;
@@ -105,6 +108,20 @@ public:
 
     bool disabled() const;
     void setDisabled(const bool value);
+
+    bool canUseSourceCamera() const;
+    bool isUsingSourceCamera() const;
+
+    QIcon iconForAction() const;
+
+    /**
+     * @brief getSourceText     Get text for the Source field.
+     * @param detailed          Detailed text is used in the table cell.
+     *                          Not detailed - as the button caption and in the advanced view.
+     * @return                  Formatted text.
+     */
+    QString getSourceText(const bool detailed) const;
+    QString getTargetText(const bool detailed) const;
 
     QString schedule() const;
 
@@ -132,19 +149,13 @@ private:
     void updateActionTypesModel();
     void updateEventStateModel();
 
-    /**
-     * @brief getSourceText     Get text for the Source field.
-     * @param detailed          Detailed text is used in the table cell.
-     *                          Not detailed - as the button caption and in the advanced view.
-     * @return                  Formatted text.
-     */
-    QString getSourceText(const bool detailed) const;
-    QString getTargetText(const bool detailed) const;
+
 
     QString getAggregationText() const;
 
     static QString toggleStateToModelString(nx::vms::event::EventState value);
     Fields updateEventClassRelatedParams();
+
 private:
     QnUuid m_id;
     bool m_modified;

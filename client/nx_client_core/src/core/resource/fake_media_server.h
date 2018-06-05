@@ -23,6 +23,10 @@ public:
     virtual QString getName() const override;
     virtual Qn::ResourceStatus getStatus() const override;
 
+    virtual QUrl getApiUrl() const override;
+
+    void setAuthenticator(const QAuthenticator& authenticator);
+
 protected:
     virtual void updateInternal(const QnResourcePtr& other, Qn::NotifierList& notifiers) override;
 
@@ -31,5 +35,6 @@ signals:
 
 private:
     ec2::ApiDiscoveredServerData m_serverData;
+    QAuthenticator m_authenticator;
 };
 

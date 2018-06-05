@@ -1122,15 +1122,15 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>File name &quot;%1&quot; is reserved by operating system. Please try another name.</source>
-      <translation type="unfinished">File name &quot;%1&quot; is reserved by operating system. Please try another name.</translation>
+      <translation>שם הקובץ &quot;%1&quot; bnmt נמצא בשימוש של מערכת ההפעלה. אנא נסה שם אחר.</translation>
     </message>
     <message numerus="yes">
       <source>File name must not contain the following reserved characters:</source>
       <comment>Plural relates to the word _characters_ here, not _file name_.</comment>
       <translation type="unfinished">
-        <numerusform>File name must not contain the following reserved characters:</numerusform>
-        <numerusform>File name must not contain the following reserved characters:</numerusform>
-        <numerusform>File name must not contain the following reserved characters:</numerusform>
+        <numerusform>שם הקובץ אינו יכול להכיל את התווים השמורים הבאים:</numerusform>
+        <numerusform>שם הקובץ אינו יכול להכיל את התווים השמורים הבאים:</numerusform>
+        <numerusform>שם הקובץ אינו יכול להכיל את התווים הבאים:</numerusform>
         <numerusform>File name must not contain the following reserved characters:</numerusform>
       </translation>
     </message>
@@ -1418,11 +1418,11 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Helps avoid problems with OpenGL drawing which result in 100% CPU load.</source>
-      <translation type="unfinished">Helps avoid problems with OpenGL drawing which result in 100% CPU load.</translation>
+      <translation>מסייע מניעת בעיות שקשורות ל OpenGL שעלולות לגרום למעבד עומס של 100%.</translation>
     </message>
     <message>
       <source>Adjust to smallest value that does not degrade live view. Bigger buffer makes playback smoother but increases delay between real time and live view; smaller buffer decreases delay but can cause stutters.</source>
-      <translation type="unfinished">Adjust to smallest value that does not degrade live view. Bigger buffer makes playback smoother but increases delay between real time and live view; smaller buffer decreases delay but can cause stutters.</translation>
+      <translation>התאם לערך הקטן ביותר שאינו מוריד את איכות התצוגה חיה. חוצץ גדול עוזר להקלטה חלקה אבל מגדיל את הדילייבין זמן אמת לתצוגה חיה; חוצץ קטן מקטין דיליי אבל יכול לגרום להשהיות.</translation>
     </message>
   </context>
   <context>
@@ -1437,15 +1437,15 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Archive can be deleted in case if there are no space for new recording.</source>
-      <translation type="unfinished">Archive can be deleted in case if there are no space for new recording.</translation>
+      <translation>ניתן למחוק את הארכיון אם אין מקום להקלטות חדשות.</translation>
     </message>
     <message>
       <source>Min and Max settings determine the age of archive which should be kept for this camera.</source>
-      <translation type="unfinished">Min and Max settings determine the age of archive which should be kept for this camera.</translation>
+      <translation>הגדרות מינימום ומקסימום קובעות את זמן ההקלטה שאמור להישמר למצלמה זו.</translation>
     </message>
     <message>
       <source>If &quot;Auto&quot; option is enabled, the oldest footage among all cameras will be deleted first.</source>
-      <translation type="unfinished">If &quot;Auto&quot; option is enabled, the oldest footage among all cameras will be deleted first.</translation>
+      <translation>אם האפשרות &quot;אוטומטי&quot; מאופשרת, קטעי ההקלטות הישנים ביותר בין כל המצלמות יימחקו תחילה.</translation>
     </message>
   </context>
   <context>
@@ -2435,15 +2435,15 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Helps fix image quality issues on some cameras; for others will cause significant bitrate increase.</source>
-      <translation type="unfinished">Helps fix image quality issues on some cameras; for others will cause significant bitrate increase.</translation>
+      <translation>מסייע לתקן בעיות באיכות תמונה בכמה מצלמות; עבור מצלמות אחרות עלול לגרום יגרום לעלייה משמעותית בBITRATE.</translation>
     </message>
     <message>
       <source>Custom number that can be assigned to a camera for quick identification and access</source>
-      <translation type="unfinished">Custom number that can be assigned to a camera for quick identification and access</translation>
+      <translation>מספר מותאם אישית שניתן להקצות למצלמה לצורך גישה מהירה וזיהוי</translation>
     </message>
     <message>
       <source>Server will not change any cameras settings, it will receive and use camera stream as-is.</source>
-      <translation type="unfinished">Server will not change any cameras settings, it will receive and use camera stream as-is.</translation>
+      <translation>השרת לא ישנה הגדרות מצלמה, השרת ישתמש בזרם המצלמה כפי שהוא.</translation>
     </message>
   </context>
   <context>
@@ -2739,11 +2739,11 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Quality setting determines the compression rate only, and does not affect resolution. Low, Medium, High and Best are preset bitrate values.</source>
-      <translation type="unfinished">Quality setting determines the compression rate only, and does not affect resolution. Low, Medium, High and Best are preset bitrate values.</translation>
+      <translation>הגדרת האיכות קובעת את קצב הדחיסה בלבד, ואינה משפיעה על הרזולוציה. Low, Medium, High ו- Best הם ערכי bitrate שנקבעו מראש.</translation>
     </message>
     <message>
       <source>First choose a recording option, then apply it to day and time blocks on the recording schedule. (0 block is 12:00am to 1:00am, 23 block is 11:00pm to 12:00am.)</source>
-      <translation type="unfinished">First choose a recording option, then apply it to day and time blocks on the recording schedule. (0 block is 12:00am to 1:00am, 23 block is 11:00pm to 12:00am.)</translation>
+      <translation>ראשית בחר אפשרות הקלטה, ולאחר מכן להחיל אותו על לוח הזמנים להקלטה</translation>
     </message>
   </context>
   <context>
@@ -2944,20 +2944,20 @@ to %1</source>
     <name>QnCloudResultMessages</name>
     <message>
       <source>Account not found</source>
-      <translation type="unfinished">Account not found</translation>
+      <translation>חשבון לא נמצא</translation>
     </message>
     <message>
       <source>Account is not activated.</source>
-      <translation type="unfinished">Account is not activated.</translation>
+      <translation>החשבון אינו מופעל.</translation>
     </message>
     <message>
       <source>Please log in to %1 and follow the provided instructions.</source>
       <comment>%1 is a cloud site name like &quot;Nx Cloud&quot;</comment>
-      <translation type="unfinished">Please log in to %1 and follow the provided instructions.</translation>
+      <translation>אנא התחבר ל %1 ועקוב אחר ההוראות שסופקו.</translation>
     </message>
     <message>
       <source>Invalid password</source>
-      <translation type="unfinished">Invalid password</translation>
+      <translation>סיסמא שגויה</translation>
     </message>
   </context>
   <context>
@@ -3213,19 +3213,19 @@ to %1</source>
     <name>QnCustomBusinessEventWidget</name>
     <message>
       <source>If the field is empty, event will always trigger.</source>
-      <translation type="unfinished">If the field is empty, event will always trigger.</translation>
+      <translation>אם שדה זה ריק, האירוע יופעל תמיד.</translation>
     </message>
     <message>
       <source>Event will trigger only if there are matches in the source with any of the entered keywords.</source>
-      <translation type="unfinished">Event will trigger only if there are matches in the source with any of the entered keywords.</translation>
+      <translation>האירוע יופעל רק אם יש התאמות במקור עם כל אחת ממילות המפתח שהוזנו.</translation>
     </message>
     <message>
       <source>Event will trigger only if there are matches in the caption with any of the entered keywords.</source>
-      <translation type="unfinished">Event will trigger only if there are matches in the caption with any of the entered keywords.</translation>
+      <translation>האירוע יופעל רק אם יש התאמות בכיתוב עם כל אחת ממילות המפתח שהוזנו.</translation>
     </message>
     <message>
       <source>Event will trigger only if there are matches in the description with any of the entered keywords.</source>
-      <translation type="unfinished">Event will trigger only if there are matches in the description with any of the entered keywords.</translation>
+      <translation>האירוע יופעל רק אם יש התאמות בתיאור עם כל אחת ממילות המפתח שהוזנו.</translation>
     </message>
   </context>
   <context>
@@ -3296,7 +3296,7 @@ to %1</source>
     </message>
     <message>
       <source>Database Backup Files</source>
-      <translation type="unfinished">Database Backup Files</translation>
+      <translation>גיבוי קבצי מסד נתונים</translation>
     </message>
   </context>
   <context>
@@ -3431,7 +3431,7 @@ to %1</source>
     <message>
       <source>All %1 users will be deleted.</source>
       <comment>%1 is the short cloud name (like Cloud)</comment>
-      <translation type="unfinished">All %1 users will be deleted.</translation>
+      <translation>כל %1 המשתמשים יימחקו.</translation>
     </message>
     <message>
       <source>You will not be able to connect to this System with your %1 account after you disconnect this System from %1.</source>
@@ -3443,7 +3443,7 @@ to %1</source>
     <name>QnEmptyBusinessActionWidget</name>
     <message>
       <source>Panic Recording mode switches recording settings for all cameras to maximum FPS and quality.</source>
-      <translation type="unfinished">Panic Recording mode switches recording settings for all cameras to maximum FPS and quality.</translation>
+      <translation>מצב Panic Recording מabv את הגדרות ההקלטה עבור כל המצלמות למקסימום FPS ולאיכות.</translation>
     </message>
   </context>
   <context>
@@ -3696,7 +3696,7 @@ to %1</source>
     <name>QnFisheyeSettingsWidget</name>
     <message>
       <source>Use this setting to compensate for distortion if camera is not mounted exactly vertically or horizontally.</source>
-      <translation type="unfinished">Use this setting to compensate for distortion if camera is not mounted exactly vertically or horizontally.</translation>
+      <translation>השתמש בהגדרה זו כדי לפצות על עיוות אם המצלמה לא נטענה בדיוק אנכית או אופקית.</translation>
     </message>
   </context>
   <context>
@@ -3770,11 +3770,11 @@ to %1</source>
     </message>
     <message>
       <source>Backup includes servers and cameras settings, users, webpages, event rules, etc. Video is not saved.</source>
-      <translation type="unfinished">Backup includes servers and cameras settings, users, webpages, event rules, etc. Video is not saved.</translation>
+      <translation>גיבוי כולל הגדרות שרתים ומצלמות, משתמשים, דפי אינטרנט, כללי אירוע וכו '. וידאו לא נשמר.</translation>
     </message>
     <message>
       <source>Creates a backup of System configuration that can be restored in case of failure.</source>
-      <translation type="unfinished">Creates a backup of System configuration that can be restored in case of failure.</translation>
+      <translation>יוצר גיבוי של תצורת המערכת שניתן לשחזר במקרה של כשל.</translation>
     </message>
   </context>
   <context>
@@ -3956,6 +3956,10 @@ to %1</source>
         <numerusform>הבדיקה הושלמה בהצלחה: %n משתמשים נמצאו.</numerusform>
       </translation>
     </message>
+    <message>
+      <source>Changing any LDAP settings other than &quot;Search Filter&quot; will result in connectivity loss for all LDAP fetched users.</source>
+      <translation>שינוי הגדרות LDAP שאינן &quot;מסנן החיפוש&quot; יוביל לאובדן קישוריות עבור כל המשתמשים שהובאו ב- LDAP.</translation>
+    </message>
   </context>
   <context>
     <name>QnLdapSettingsDialogPrivate</name>
@@ -4026,15 +4030,15 @@ to %1</source>
     <name>QnLensCameraAdvancedParamWidget</name>
     <message>
       <source>Zoom</source>
-      <translation type="unfinished">Zoom</translation>
+      <translation>זום</translation>
     </message>
     <message>
       <source>Rotation:</source>
-      <translation type="unfinished">Rotation:</translation>
+      <translation>רוֹטַציָה:</translation>
     </message>
     <message>
       <source>Focus</source>
-      <translation type="unfinished">Focus</translation>
+      <translation>מוֹקֵד</translation>
     </message>
   </context>
   <context>
@@ -4396,7 +4400,7 @@ to %1</source>
     </message>
     <message>
       <source>All files</source>
-      <translation type="unfinished">All files</translation>
+      <translation>כל הקבצים</translation>
     </message>
     <message>
       <source>Please send email with License Key and Hardware ID provided to %1 to obtain an Activation Key file.</source>
@@ -4625,15 +4629,15 @@ to %1</source>
     </message>
     <message>
       <source>Sets the time to use in the client (timeline, timestamps, etc.) when client and server machines are in different time zones.</source>
-      <translation type="unfinished">Sets the time to use in the client (timeline, timestamps, etc.) when client and server machines are in different time zones.</translation>
+      <translation>קובע את הזמן לשימוש בלקוח (ציר זמן, חותמות זמן וכו ') כאשר מכונות הלקוח והשרת נמצאות באזורי זמן שונים.</translation>
     </message>
     <message>
       <source>Displays IP addresses for cameras and servers and roles for users.</source>
-      <translation type="unfinished">Displays IP addresses for cameras and servers and roles for users.</translation>
+      <translation>מציג כתובות IP עבור מצלמות ושרתים ותפקידים עבור משתמשים.</translation>
     </message>
     <message>
       <source>Length of time each camera on layout will be displayed if you start a Tour.</source>
-      <translation type="unfinished">Length of time each camera on layout will be displayed if you start a Tour.</translation>
+      <translation>משך הזמן של כל מצלמה על פריסה יוצג אם תתחיל סיור.</translation>
     </message>
   </context>
   <context>
@@ -5843,7 +5847,7 @@ to %1</source>
     </message>
     <message>
       <source>Servers with failover enabled will automatically take cameras from offline servers.</source>
-      <translation type="unfinished">Servers with failover enabled will automatically take cameras from offline servers.</translation>
+      <translation>שרתים עם כשל מופעלים באופן אוטומטי לקחת מצלמות משרתים לא מקוונים.</translation>
     </message>
   </context>
   <context>
@@ -6051,15 +6055,15 @@ to %1</source>
     </message>
     <message>
       <source>Update Files</source>
-      <translation type="unfinished">Update Files</translation>
+      <translation>עדכון קבצים</translation>
     </message>
     <message>
       <source>Validating the update...</source>
-      <translation type="unfinished">Validating the update...</translation>
+      <translation>מאמת את העדכון ...</translation>
     </message>
     <message>
       <source>Checking for free space...</source>
-      <translation type="unfinished">Checking for free space...</translation>
+      <translation>בודק מקום פנוי ...</translation>
     </message>
   </context>
   <context>
@@ -6545,12 +6549,8 @@ to %1</source>
       <translation>ההקלטה אופשרה באחסון ה- USB</translation>
     </message>
     <message>
-      <source>Backup includes servers and cameras settings, users, webpages, event rules, etc. Video is not saved.</source>
-      <translation type="unfinished">Backup includes servers and cameras settings, users, webpages, event rules, etc. Video is not saved.</translation>
-    </message>
-    <message>
-      <source>Creates a backup of System configuration that can be restored in case of failure.</source>
-      <translation type="unfinished">Creates a backup of System configuration that can be restored in case of failure.</translation>
+      <source>Reindexing can fix problems with archive or backup if they have been lost or damaged, or if some hardware has been replaced.</source>
+      <translation>Reindexing יכול לתקן בעיות עם ארכיון או גיבוי אם הם אבדו או ניזוקו, או אם כמה חומרה הוחלף.</translation>
     </message>
   </context>
   <context>
@@ -6846,15 +6846,15 @@ to %1</source>
     </message>
     <message>
       <source>Tracks and logs all user actions.</source>
-      <translation type="unfinished">Tracks and logs all user actions.</translation>
+      <translation>עוקב ומבצע את כל פעולות המשתמש.</translation>
     </message>
     <message>
       <source>Includes information about system, such as cameras models and firmware versions, number of servers, etc.</source>
-      <translation type="unfinished">Includes information about system, such as cameras models and firmware versions, number of servers, etc.</translation>
+      <translation>כולל מידע על מערכת, כגון דגמי מצלמות וגרסאות קושחה, מספר שרתים וכו '.</translation>
     </message>
     <message>
       <source>Does not include any personal information and is completely anonymous.</source>
-      <translation type="unfinished">Does not include any personal information and is completely anonymous.</translation>
+      <translation>אינו כולל מידע אישי והוא אנונימי לחלוטין.</translation>
     </message>
   </context>
   <context>
@@ -7118,7 +7118,7 @@ to %1</source>
     <message>
       <source>%1 user</source>
       <comment>%1 is the short cloud name (like Cloud)</comment>
-      <translation type="unfinished">%1 user</translation>
+      <translation>%1 משתמש</translation>
     </message>
   </context>
   <context>
@@ -7168,7 +7168,7 @@ to %1</source>
     </message>
     <message>
       <source>Users can be imported from an LDAP server. They will be able to log in only if LDAP server is online and their accounts are active on it.</source>
-      <translation type="unfinished">Users can be imported from an LDAP server. They will be able to log in only if LDAP server is online and their accounts are active on it.</translation>
+      <translation>ניתן לייבא משתמשים משרת LDAP. הם יוכלו להתחבר רק אם שרת LDAP מקוון והחשבונות שלהם פעילים בו.</translation>
     </message>
   </context>
   <context>
@@ -7361,26 +7361,26 @@ to %1</source>
     <message>
       <source>%1 user with specified email already exists.</source>
       <comment>%1 is the short cloud name (like Cloud)</comment>
-      <translation type="unfinished">%1 user with specified email already exists.</translation>
+      <translation>%1 משתמש עם דוא"ל שצוין כבר קיים.</translation>
     </message>
     <message>
       <source>Local users</source>
-      <translation type="unfinished">Local users</translation>
+      <translation>משתמשים מקומיים</translation>
     </message>
     <message>
       <source>%1 users</source>
       <comment>%1 is the short cloud name (like Cloud)</comment>
-      <translation type="unfinished">%1 users</translation>
+      <translation>%1 משתמשים</translation>
     </message>
     <message>
       <source>%1 belong to this system only and are fully managed by system administrators.</source>
       <comment>%1 is local users definition, e.g. &apos;Local users&apos;</comment>
-      <translation type="unfinished">%1 belong to this system only and are fully managed by system administrators.</translation>
+      <translation>%1 שייכים למערכת זו בלבד ומנוהלים באופן מלא על ידי מנהלי מערכת.</translation>
     </message>
     <message>
       <source>%1 can have access to many Systems. Administrators can manage their rights only.</source>
       <comment>%1 is cloud users definition, e.g. &apos;Cloud users&apos;</comment>
-      <translation type="unfinished">%1 can have access to many Systems. Administrators can manage their rights only.</translation>
+      <translation>%1 יכול לקבל גישה למערכות רבות. מנהלי מערכת יכולים לנהל את זכויותיהם בלבד.</translation>
     </message>
   </context>
   <context>
@@ -7480,7 +7480,7 @@ to %1</source>
     <name>QnWearableUploadWidget</name>
     <message>
       <source>User &quot;%1&quot; is currently uploading footage to this camera.</source>
-      <translation>משתמש אחר מעלה כעת צילומים למצלמה זו.</translation>
+      <translation>משתמש %1 מעלה כעת צילומים למצלמה הזו.</translation>
     </message>
     <message>
       <source>Another user is currently uploading footage to this camera.</source>
@@ -7629,7 +7629,7 @@ to %1</source>
     <message>
       <source>%1 Systems cannot be merged</source>
       <comment>%1 is the short cloud name (like Cloud)</comment>
-      <translation type="unfinished">%1 Systems cannot be merged</translation>
+      <translation>%1 לא ניתן למזג מערכות</translation>
     </message>
   </context>
   <context>
@@ -7961,7 +7961,7 @@ to %1</source>
       <source>Selected files cover periods for which videos have already been uploaded</source>
       <translation type="unfinished">
         <numerusform>מכסה את הזמן שבו הסרטון כבר הועלה</numerusform>
-        <numerusform>%1 נמצא באותו זמן שבו הסרטון כבר הועלה</numerusform>
+        <numerusform>מכסה את הזמן שבו הסרטון כבר הועלה</numerusform>
         <numerusform>Selected files cover periods for which videos have already been uploaded</numerusform>
         <numerusform>Selected files cover periods for which videos have already been uploaded</numerusform>
       </translation>
@@ -8471,7 +8471,7 @@ to %1</source>
     <name>nx::client::desktop::HintButton</name>
     <message>
       <source>Click to read more</source>
-      <translation type="unfinished">Click to read more</translation>
+      <translation>לחץ כדי לקרוא עוד</translation>
     </message>
   </context>
   <context>
@@ -8725,23 +8725,27 @@ to %1</source>
     <name>nx::client::desktop::ui::AnalyticsSdkEventWidget</name>
     <message>
       <source>Analytics events can be set up on a certain cameras.</source>
-      <translation type="unfinished">Analytics events can be set up on a certain cameras.</translation>
+      <translation>ניתן להגדיר אירועים ב- Analytics במצלמות מסוימות.</translation>
     </message>
     <message>
       <source>Choose cameras using the button above to see the list of supported events.</source>
-      <translation type="unfinished">Choose cameras using the button above to see the list of supported events.</translation>
+      <translation>בחר במצלמות באמצעות הלחצן שלמעלה כדי לראות את רשימת האירועים הנתמכים.</translation>
     </message>
     <message>
       <source>If the field is empty, event will always trigger.</source>
-      <translation type="unfinished">If the field is empty, event will always trigger.</translation>
+      <translation>אם השדה ריק, האירוע יפעיל תמיד.</translation>
     </message>
     <message>
       <source>Event will trigger only if there are matches in the description field with any of the entered keywords.</source>
-      <translation type="unfinished">Event will trigger only if there are matches in the description field with any of the entered keywords.</translation>
+      <translation>האירוע יופעל רק אם יש התאמות בשדה התיאור עם כל אחת ממילות המפתח שהוזנו.</translation>
     </message>
     <message>
       <source>Event will trigger only if there are matches in the caption with any of the entered keywords.</source>
-      <translation type="unfinished">Event will trigger only if there are matches in the caption with any of the entered keywords.</translation>
+      <translation>האירוע יופעל רק אם יש התאמות בכיתוב עם כל אחת ממילות המפתח שהוזנו.</translation>
+    </message>
+    <message>
+      <source>This field is case sensitive.</source>
+      <translation>שדה זה תלוי רישיות.</translation>
     </message>
   </context>
   <context>
@@ -9076,10 +9080,6 @@ to %1</source>
       <translation>גירסת ביתא %1</translation>
     </message>
     <message>
-      <source>Some functionality may be unavailable or not working properly.</source>
-      <translation>ייתכן שחלק מהפונקציונליות אינה זמינה או שאינה פועלת כראוי.</translation>
-    </message>
-    <message>
       <source>System sends anonymous usage statistics</source>
       <translation>המערכת שולחת סטטיסטיקות שימוש אנונימיות</translation>
     </message>
@@ -9109,15 +9109,19 @@ to %1</source>
     </message>
     <message>
       <source>To use the software you must accept the end user license agreement</source>
-      <translation type="unfinished">To use the software you must accept the end user license agreement</translation>
+      <translation>כדי להשתמש בתוכנה עליך לקבל את הסכם הרישיון למשתמש קצה</translation>
     </message>
     <message>
       <source>Accept</source>
-      <translation type="unfinished">Accept</translation>
+      <translation>לְקַבֵּל</translation>
     </message>
     <message>
       <source>Decline</source>
-      <translation type="unfinished">Decline</translation>
+      <translation>דחה</translation>
+    </message>
+    <message>
+      <source>Warning! This build is for testing purposes only! Please upgrade to a next available patch or release version once available.</source>
+      <translation>אַזהָרָה! גרסא זו היאלמטרות בדיקה בלבד! שדרג לגרסה זמינה של תיקון או גרסה זמינה אחת.</translation>
     </message>
   </context>
   <context>

@@ -21,9 +21,9 @@
   <String Id="HelpHeader">עזרה בהגדרה</String>
   <String Id="HelpCloseButton">סגירה</String>
   <String Id="InstallOptionsButton">אפשרויות</String>
-  <String Id="InstallInstallButton">Install</String>
+  <String Id="InstallInstallButton">התקנה</String>
   <String Id="InstallCloseButton">סגירה</String>
-  <String Id="InstallAcceptCheckbox">I agree to the</String>
+  <String Id="InstallAcceptCheckbox">אני מסכים ל</String>
   <String Id="InstallLicenseLinkText">הסכם רישיון למשתמש</String>
   <String Id="OptionsHeader">אפשרויות התקנה</String>
   <String Id="OptionsLocationLabel">מיקום ההתקנה:</String>

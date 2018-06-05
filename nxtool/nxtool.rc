@@ -1,7 +1,7 @@
 #include <windows.h>
-#include "${project.build.directory}/app_icons.h"
+#include "${CMAKE_CURRENT_SOURCE_DIR}/app_icons.h"
 
-IDI_ICON1   ICON    DISCARDABLE     "${customization.dir}/icons/${platform}/nxtool.ico"
+IDI_ICON_APPLICATION   ICON    DISCARDABLE     "${customization.dir}/icons/${platform}/nxtool.ico"
 
 VS_VERSION_INFO VERSIONINFO
 FILEVERSION     ${parsedVersion.majorVersion},${parsedVersion.minorVersion},${parsedVersion.incrementalVersion},${buildNumber}
@@ -12,14 +12,14 @@ BEGIN
         BLOCK "040904E4"
         BEGIN
             VALUE "CompanyName",        "${company.name}"
-            VALUE "FileDescription",    "${product.display.title}"
+            VALUE "FileDescription",    "${nxtool.name}"
             VALUE "FileVersion",        "${release.version}.${buildNumber}"
-            VALUE "InternalName",       "${product.title}"
+            VALUE "InternalName",       "${nxtool.name}"
             VALUE "LegalCopyright",     "${nx_copyright}"
             VALUE "LegalTrademarks1",   "All Rights Reserved"
             VALUE "LegalTrademarks2",   "All Rights Reserved"
-            VALUE "OriginalFilename",   "${project.artifactId}.exe"
-            VALUE "ProductName",        "${project.artifactId}"
+            VALUE "OriginalFilename",   "nxtool.exe"
+            VALUE "ProductName",        "nxtool"
             VALUE "ProductVersion",     "${release.version}.${buildNumber}"
         END
     END

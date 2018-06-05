@@ -87,7 +87,9 @@ boost::optional<QSize> toQSize(const boost::optional<QString>& str);
 
 boost::optional<QSize> toQDateTime(const boost::optional<QString>& str);
 
-HanwhaChannelProfiles parseProfiles(const HanwhaResponse& response);
+HanwhaChannelProfiles parseProfiles(
+    const HanwhaResponse& response,
+    const boost::optional<int>& forcedChannel = boost::none);
 
 nx::core::resource::DeviceType fromHanwhaToNxDeviceType(HanwhaDeviceType hanwhaDeviceType);
 

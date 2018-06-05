@@ -73,6 +73,9 @@ private:
 
     void handleAcknowledgeEventAction();
 
+    void handleFullscreenCameraAction(const nx::vms::event::AbstractActionPtr& action);
+    void handleExitFullscreenAction(const nx::vms::event::AbstractActionPtr& action);
+
 private:
     QnWorkbenchUserEmailWatcher* m_userEmailWatcher;
     QnBusinessEventsFilterResourcePropertyAdaptor* m_adaptor;

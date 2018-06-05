@@ -17,7 +17,6 @@
 
 #include "motion_window.h"
 
-
 //!Contains camera settings usually modified by user
 /*!
     E.g., recording schedule, motion type, second stream quality, etc...
@@ -40,14 +39,14 @@ public:
     //!User-given name of camera (can be different from resource name). This is name shown to the user
     QString name;
     QString groupName;
-    QnMediaDewarpingParams  dewarpingParams;
-    Qn::FailoverPriority    failoverPriority;
-    Qn::CameraBackupQualities   backupQualities;
+    QnMediaDewarpingParams dewarpingParams;
+    Qn::FailoverPriority failoverPriority;
+    Qn::CameraBackupQualities backupQualities;
     QString logicalId;
 
     QnCameraUserAttributes();
 
-    void assign( const QnCameraUserAttributes& right, QSet<QByteArray>* const modifiedFields );
+    void assign(const QnCameraUserAttributes& right, QSet<QByteArray>* const modifiedFields);
 };
 
 Q_DECLARE_METATYPE(QnCameraUserAttributes)

@@ -3880,6 +3880,10 @@ to %1</source>
         <numerusform>A teszt sikeresen lefutott: %n felhasználó megtalálva.</numerusform>
       </translation>
     </message>
+    <message>
+      <source>Changing any LDAP settings other than &quot;Search Filter&quot; will result in connectivity loss for all LDAP fetched users.</source>
+      <translation type="unfinished">Changing any LDAP settings other than &quot;Search Filter&quot; will result in connectivity loss for all LDAP fetched users.</translation>
+    </message>
   </context>
   <context>
     <name>QnLdapSettingsDialogPrivate</name>
@@ -6407,12 +6411,8 @@ to %1</source>
       <translation>A felvétel engedélyezve volt az USB-táron</translation>
     </message>
     <message>
-      <source>Backup includes servers and cameras settings, users, webpages, event rules, etc. Video is not saved.</source>
-      <translation type="unfinished">Backup includes servers and cameras settings, users, webpages, event rules, etc. Video is not saved.</translation>
-    </message>
-    <message>
-      <source>Creates a backup of System configuration that can be restored in case of failure.</source>
-      <translation type="unfinished">Creates a backup of System configuration that can be restored in case of failure.</translation>
+      <source>Reindexing can fix problems with archive or backup if they have been lost or damaged, or if some hardware has been replaced.</source>
+      <translation type="unfinished">Reindexing can fix problems with archive or backup if they have been lost or damaged, or if some hardware has been replaced.</translation>
     </message>
   </context>
   <context>
@@ -8519,6 +8519,10 @@ to %1</source>
       <source>Event will trigger only if there are matches in the caption with any of the entered keywords.</source>
       <translation type="unfinished">Event will trigger only if there are matches in the caption with any of the entered keywords.</translation>
     </message>
+    <message>
+      <source>This field is case sensitive.</source>
+      <translation type="unfinished">This field is case sensitive.</translation>
+    </message>
   </context>
   <context>
     <name>nx::client::desktop::ui::ClipboardButton</name>
@@ -8838,10 +8842,6 @@ to %1</source>
       <translation>%1 Beta verzió</translation>
     </message>
     <message>
-      <source>Some functionality may be unavailable or not working properly.</source>
-      <translation>Néhány funkció lehet, hogy nem érhető el vagy nem működik megfelelően.</translation>
-    </message>
-    <message>
       <source>System sends anonymous usage statistics</source>
       <translation>A rendszer névtelen felhasználói statisztikákat küld</translation>
     </message>
@@ -8880,6 +8880,10 @@ to %1</source>
     <message>
       <source>Decline</source>
       <translation type="unfinished">Decline</translation>
+    </message>
+    <message>
+      <source>Warning! This build is for testing purposes only! Please upgrade to a next available patch or release version once available.</source>
+      <translation type="unfinished">Warning! This build is for testing purposes only! Please upgrade to a next available patch or release version once available.</translation>
     </message>
   </context>
   <context>

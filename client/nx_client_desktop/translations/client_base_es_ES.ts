@@ -1423,15 +1423,15 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Archive can be deleted in case if there are no space for new recording.</source>
-      <translation type="unfinished">Archive can be deleted in case if there are no space for new recording.</translation>
+      <translation>El archivo se puede eliminar en caso de que no haya espacio para la grabación nueva.</translation>
     </message>
     <message>
       <source>Min and Max settings determine the age of archive which should be kept for this camera.</source>
-      <translation type="unfinished">Min and Max settings determine the age of archive which should be kept for this camera.</translation>
+      <translation>Los ajustes mínimo y máximo determinan la antigüedad del archivo que debe guardarse para esta cámara.</translation>
     </message>
     <message>
       <source>If &quot;Auto&quot; option is enabled, the oldest footage among all cameras will be deleted first.</source>
-      <translation type="unfinished">If &quot;Auto&quot; option is enabled, the oldest footage among all cameras will be deleted first.</translation>
+      <translation>Si la opción &quot;Auto&quot; está habilitada, primero se eliminará el metraje más antiguo de todas las cámaras.</translation>
     </message>
   </context>
   <context>
@@ -3155,15 +3155,15 @@ a %1</translation>
     </message>
     <message>
       <source>Event will trigger only if there are matches in the source with any of the entered keywords.</source>
-      <translation type="unfinished">Event will trigger only if there are matches in the source with any of the entered keywords.</translation>
+      <translation>El evento se activará solo si hay coincidencias en la fuente con cualquiera de las palabras claves ingresadas.</translation>
     </message>
     <message>
       <source>Event will trigger only if there are matches in the caption with any of the entered keywords.</source>
-      <translation type="unfinished">Event will trigger only if there are matches in the caption with any of the entered keywords.</translation>
+      <translation>El evento se activará solo si hay coincidencias en el título con cualquiera de las palabras clave ingresadas.</translation>
     </message>
     <message>
       <source>Event will trigger only if there are matches in the description with any of the entered keywords.</source>
-      <translation type="unfinished">Event will trigger only if there are matches in the description with any of the entered keywords.</translation>
+      <translation>El evento se activará solo si hay coincidencias en la descripción con cualquiera de las palabras clave ingresadas.</translation>
     </message>
   </context>
   <context>
@@ -3381,7 +3381,7 @@ a %1</translation>
     <name>QnEmptyBusinessActionWidget</name>
     <message>
       <source>Panic Recording mode switches recording settings for all cameras to maximum FPS and quality.</source>
-      <translation type="unfinished">Panic Recording mode switches recording settings for all cameras to maximum FPS and quality.</translation>
+      <translation>El modo de grabación de pánico cambia los ajustes de grabación para todas las cámaras al máximo de FPS y calidad.</translation>
     </message>
   </context>
   <context>
@@ -3879,6 +3879,10 @@ a %1</translation>
         <numerusform>Prueba ha completado con éxito: %n usuarios encontrados.</numerusform>
         <numerusform>Prueba ha completado con éxito: %n usuarios encontrados.</numerusform>
       </translation>
+    </message>
+    <message>
+      <source>Changing any LDAP settings other than &quot;Search Filter&quot; will result in connectivity loss for all LDAP fetched users.</source>
+      <translation>Cambiar cualquier configuración de LDAP que no sea &quot;Search Filter&quot; dará como resultado la pérdida de conectividad para todos los usuarios de LDAP recuperados.</translation>
     </message>
   </context>
   <context>
@@ -4525,11 +4529,11 @@ a %1</translation>
     </message>
     <message>
       <source>Displays IP addresses for cameras and servers and roles for users.</source>
-      <translation type="unfinished">Displays IP addresses for cameras and servers and roles for users.</translation>
+      <translation>Muestra direcciones IP para cámaras y servidores y roles para usuarios.</translation>
     </message>
     <message>
       <source>Length of time each camera on layout will be displayed if you start a Tour.</source>
-      <translation type="unfinished">Length of time each camera on layout will be displayed if you start a Tour.</translation>
+      <translation>Tiempo de duración de cada cámara en el diseño se mostrará si inicia un recorrido.</translation>
     </message>
   </context>
   <context>
@@ -6406,12 +6410,8 @@ a %1</translation>
       <translation>La grabación fue habilitada en el almacenamiento USB</translation>
     </message>
     <message>
-      <source>Backup includes servers and cameras settings, users, webpages, event rules, etc. Video is not saved.</source>
-      <translation>La copia de seguridad incluye configuraciones de servidores y cámaras, usuarios, páginas web, reglas de eventos, etc. El video no se guarda.</translation>
-    </message>
-    <message>
-      <source>Creates a backup of System configuration that can be restored in case of failure.</source>
-      <translation>Crea una copia de seguridad de la configuración del sistema que se puede restaurar en caso de error.</translation>
+      <source>Reindexing can fix problems with archive or backup if they have been lost or damaged, or if some hardware has been replaced.</source>
+      <translation>Reindexar puede solucionar problemas con el archivo o la copia de seguridad si se han perdido o dañado, o si se ha reemplazado algún hardware.</translation>
     </message>
   </context>
   <context>
@@ -6711,11 +6711,11 @@ a %1</translation>
     </message>
     <message>
       <source>Includes information about system, such as cameras models and firmware versions, number of servers, etc.</source>
-      <translation type="unfinished">Includes information about system, such as cameras models and firmware versions, number of servers, etc.</translation>
+      <translation>Incluye información sobre el sistema, como modelos de cámaras y versiones de firmware, cantidad de servidores, etc.</translation>
     </message>
     <message>
       <source>Does not include any personal information and is completely anonymous.</source>
-      <translation type="unfinished">Does not include any personal information and is completely anonymous.</translation>
+      <translation>No incluye información personal y es completamente anónimo.</translation>
     </message>
   </context>
   <context>
@@ -8516,7 +8516,11 @@ a %1</translation>
     </message>
     <message>
       <source>Event will trigger only if there are matches in the caption with any of the entered keywords.</source>
-      <translation type="unfinished">Event will trigger only if there are matches in the caption with any of the entered keywords.</translation>
+      <translation>El evento se activará solo si hay coincidencias en el título con cualquiera de las palabras clave ingresadas.</translation>
+    </message>
+    <message>
+      <source>This field is case sensitive.</source>
+      <translation>Este campo es sensible a mayúsculas y minúsculas.</translation>
     </message>
   </context>
   <context>
@@ -8837,10 +8841,6 @@ a %1</translation>
       <translation>Versión Beta %1</translation>
     </message>
     <message>
-      <source>Some functionality may be unavailable or not working properly.</source>
-      <translation>Es posible que algunas funciones no estén disponibles o no funcionen correctamente.</translation>
-    </message>
-    <message>
       <source>System sends anonymous usage statistics</source>
       <translation>El sistema envía anónimamente estadísticas de uso</translation>
     </message>
@@ -8879,6 +8879,10 @@ a %1</translation>
     <message>
       <source>Decline</source>
       <translation>Rechazar</translation>
+    </message>
+    <message>
+      <source>Warning! This build is for testing purposes only! Please upgrade to a next available patch or release version once available.</source>
+      <translation>¡Advertencia! ¡Esta compilación es solo para fines de prueba! Actualice a un próximo parche o versión de lanzamiento disponible una vez que esté disponible.</translation>
     </message>
   </context>
   <context>

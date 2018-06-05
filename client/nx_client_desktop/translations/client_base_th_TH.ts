@@ -3838,6 +3838,10 @@ to %1</source>
         <numerusform>การทดสอบสมบูรณ์: %n พบผู้ใช้.</numerusform>
       </translation>
     </message>
+    <message>
+      <source>Changing any LDAP settings other than &quot;Search Filter&quot; will result in connectivity loss for all LDAP fetched users.</source>
+      <translation type="unfinished">Changing any LDAP settings other than &quot;Search Filter&quot; will result in connectivity loss for all LDAP fetched users.</translation>
+    </message>
   </context>
   <context>
     <name>QnLdapSettingsDialogPrivate</name>
@@ -6333,12 +6337,8 @@ to %1</source>
       <translation>มีการเปิดใช้การบันทึกในที่จัดเก็บข้อมูล USB</translation>
     </message>
     <message>
-      <source>Backup includes servers and cameras settings, users, webpages, event rules, etc. Video is not saved.</source>
-      <translation>การสำรองข้อมูลประกอบด้วยเซิร์ฟเวอร์และการตั้งค่ากล้อง,ผู้ใช้เว็บเพจ,กิจกรรม ฯลฯ ไม่ได้บันทึกวิดีโอ</translation>
-    </message>
-    <message>
-      <source>Creates a backup of System configuration that can be restored in case of failure.</source>
-      <translation>สร้างการสำรองข้อมูลของการกำหนดค่าระบบที่สามารถเรียกคืนได้ในกรณีที่เกิดความล้มเหลว</translation>
+      <source>Reindexing can fix problems with archive or backup if they have been lost or damaged, or if some hardware has been replaced.</source>
+      <translation type="unfinished">Reindexing can fix problems with archive or backup if they have been lost or damaged, or if some hardware has been replaced.</translation>
     </message>
   </context>
   <context>
@@ -8402,6 +8402,10 @@ to %1</source>
       <source>Event will trigger only if there are matches in the caption with any of the entered keywords.</source>
       <translation>เหตุการณ์จะทริกเกอร์เฉพาะกรณีที่มีการจับคู่ในแหล่งที่มากับคำหลักที่ป้อนไว้</translation>
     </message>
+    <message>
+      <source>This field is case sensitive.</source>
+      <translation type="unfinished">This field is case sensitive.</translation>
+    </message>
   </context>
   <context>
     <name>nx::client::desktop::ui::ClipboardButton</name>
@@ -8714,10 +8718,6 @@ to %1</source>
       <translation>รุ่น ทดสอบ %1</translation>
     </message>
     <message>
-      <source>Some functionality may be unavailable or not working properly.</source>
-      <translation>ฟังก์ชันการทำงานบางอย่างอาจใช้ไม่ได้หรือทำงานไม่ถูกต้อง</translation>
-    </message>
-    <message>
       <source>System sends anonymous usage statistics</source>
       <translation>ระบบจะส่งสถิติการใช้งานที่ไม่ระบุตัวตน</translation>
     </message>
@@ -8756,6 +8756,10 @@ to %1</source>
     <message>
       <source>Decline</source>
       <translation>ปฏิเสธ</translation>
+    </message>
+    <message>
+      <source>Warning! This build is for testing purposes only! Please upgrade to a next available patch or release version once available.</source>
+      <translation type="unfinished">Warning! This build is for testing purposes only! Please upgrade to a next available patch or release version once available.</translation>
     </message>
   </context>
   <context>

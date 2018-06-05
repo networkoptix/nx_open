@@ -145,6 +145,7 @@ QN_HELP_TOPIC(CameraSettings_Expert_SettingsControl_Help,       "preventing_VMS_
 QN_HELP_TOPIC(CameraSettings_Expert_CalculateBitratePerGop,       "adjustiung_average_bitrate_on_.htm")
 QN_HELP_TOPIC(CameraSettings_Expert_DisableArchivePrimary_Help, "disabling_recording_of_primary.htm")
 QN_HELP_TOPIC(CameraSettings_Expert_Rtp_Help,                   "setting_up_camera_transport_pr.htm")
+QN_HELP_TOPIC(CameraSettings_Expert_LogicalId_Help,             "assigning_logical_id.htm")
 
 QN_HELP_TOPIC(EventsActions_Help,                               "configuring_events_and_actions.htm")
 QN_HELP_TOPIC(EventsActions_Schedule_Help,						"setting_up_schedule_for_tracki.htm")

@@ -316,11 +316,9 @@ void QnUserManagementWidget::loadDataToUi()
 
 void QnUserManagementWidget::updateLdapState()
 {
-    bool currentUserIsLdap = context()->user() && context()->user()->isLdap();
-    ui->ldapSettingsButton->setVisible(!currentUserIsLdap);
     ui->ldapSettingsButton->setEnabled(!commonModule()->isReadOnly());
-    ui->fetchButton->setVisible(!currentUserIsLdap);
-    ui->fetchButton->setEnabled(!commonModule()->isReadOnly() && qnGlobalSettings->ldapSettings().isValid());
+    ui->fetchButton->setEnabled(!commonModule()->isReadOnly()
+        && qnGlobalSettings->ldapSettings().isValid());
 }
 
 void QnUserManagementWidget::applyChanges()
@@ -444,7 +442,7 @@ void QnUserManagementWidget::updateSelection()
 
 void QnUserManagementWidget::openLdapSettings()
 {
-    if (!context()->user() || context()->user()->isLdap())
+    if (!context()->user())
         return;
 
     QScopedPointer<QnLdapSettingsDialog> dialog(new QnLdapSettingsDialog(this));
@@ -466,7 +464,7 @@ void QnUserManagementWidget::createUser()
 
 void QnUserManagementWidget::fetchUsers()
 {
-    if (!context()->user() || context()->user()->isLdap())
+    if (!context()->user())
         return;
 
     if (!qnGlobalSettings->ldapSettings().isValid())

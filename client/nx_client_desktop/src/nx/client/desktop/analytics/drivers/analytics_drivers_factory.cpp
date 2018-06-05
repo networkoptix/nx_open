@@ -33,19 +33,7 @@ AbstractAnalyticsDriverPtr AnalyticsDriversFactory::createAnalyticsDriver(
 
 bool AnalyticsDriversFactory::supportsAnalytics(const QnResourcePtr& resource)
 {
-    if (!ini().enableAnalytics)
-        return false;
-
-    if (ini().demoAnalyticsDriver)
-        return true;
-
-    if (const auto camera = resource.dynamicCast<QnVirtualCameraResource>())
-        return true;
-
-    if (ini().externalMetadata && LocalMetadataAnalyticsDriver::supportsAnalytics(resource))
-        return true;
-
-    return false;
+    return ini().enableAnalytics && resource.dynamicCast<QnMediaResource>();
 }
 
 } // namespace desktop

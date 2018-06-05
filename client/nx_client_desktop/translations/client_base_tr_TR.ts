@@ -1122,14 +1122,14 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>File name &quot;%1&quot; is reserved by operating system. Please try another name.</source>
-      <translation type="unfinished">File name &quot;%1&quot; is reserved by operating system. Please try another name.</translation>
+      <translation>Dosya ismi &quot;%1&quot; işletim sistemi tarafından kullanılıyor. Lütfen başka bir isim deneyin.</translation>
     </message>
     <message numerus="yes">
       <source>File name must not contain the following reserved characters:</source>
       <comment>Plural relates to the word _characters_ here, not _file name_.</comment>
-      <translation type="unfinished">
-        <numerusform>File name must not contain the following reserved characters:</numerusform>
-        <numerusform>File name must not contain the following reserved characters:</numerusform>
+      <translation>
+        <numerusform>Dosya adı ayrılmış şu karakterleri içermemelidir:</numerusform>
+        <numerusform>Dosya adı ayrılmış şu karakterleri içermemelidir:</numerusform>
       </translation>
     </message>
   </context>
@@ -1404,11 +1404,11 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Helps avoid problems with OpenGL drawing which result in 100% CPU load.</source>
-      <translation type="unfinished">Helps avoid problems with OpenGL drawing which result in 100% CPU load.</translation>
+      <translation>OpenGL çiziminde% 100 CPU yüküyle sonuçlanan sorunların önlenmesine yardımcı olur.</translation>
     </message>
     <message>
       <source>Adjust to smallest value that does not degrade live view. Bigger buffer makes playback smoother but increases delay between real time and live view; smaller buffer decreases delay but can cause stutters.</source>
-      <translation type="unfinished">Adjust to smallest value that does not degrade live view. Bigger buffer makes playback smoother but increases delay between real time and live view; smaller buffer decreases delay but can cause stutters.</translation>
+      <translation>Canlı görüntüyü bozmayan en küçük değere ayarlayın. Daha büyük tampon oynatımı daha düzgün hale getirir, ancak gerçek zamanlı ve canlı görüntü arasındaki gecikmeyi artırır; Daha küçük tampon gecikmeyi azaltır, ancak aksamalara neden olabilir.</translation>
     </message>
   </context>
   <context>
@@ -1423,15 +1423,15 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Archive can be deleted in case if there are no space for new recording.</source>
-      <translation type="unfinished">Archive can be deleted in case if there are no space for new recording.</translation>
+      <translation>Yeni kayıt için yer yoksa arşiv silinebilir.</translation>
     </message>
     <message>
       <source>Min and Max settings determine the age of archive which should be kept for this camera.</source>
-      <translation type="unfinished">Min and Max settings determine the age of archive which should be kept for this camera.</translation>
+      <translation>Min ve Maks ayarları, bu kamera için saklanması gereken arşivin yaşını belirler.</translation>
     </message>
     <message>
       <source>If &quot;Auto&quot; option is enabled, the oldest footage among all cameras will be deleted first.</source>
-      <translation type="unfinished">If &quot;Auto&quot; option is enabled, the oldest footage among all cameras will be deleted first.</translation>
+      <translation>Eğer &quot;Auto&quot; seçeneği etkinleştirilirse, öncelikle tüm kameralara ait en eski kayıtlar silinecektir.</translation>
     </message>
   </context>
   <context>
@@ -2387,15 +2387,15 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Helps fix image quality issues on some cameras; for others will cause significant bitrate increase.</source>
-      <translation type="unfinished">Helps fix image quality issues on some cameras; for others will cause significant bitrate increase.</translation>
+      <translation>Bazı kameralar için görüntü kalitesini artırabileceği gibi bazı kameralar için ise bitrate değerinde yükselmelere neden olabilir.</translation>
     </message>
     <message>
       <source>Custom number that can be assigned to a camera for quick identification and access</source>
-      <translation type="unfinished">Custom number that can be assigned to a camera for quick identification and access</translation>
+      <translation>Özel numaralar hızlı bulma ve erişim kameralara atanabilir</translation>
     </message>
     <message>
       <source>Server will not change any cameras settings, it will receive and use camera stream as-is.</source>
-      <translation type="unfinished">Server will not change any cameras settings, it will receive and use camera stream as-is.</translation>
+      <translation>Sunucu herhangi bir kamera ayarını değiştirmeyecek, kamera akışını olduğu bırakacak ve kullanacaktır.</translation>
     </message>
   </context>
   <context>
@@ -2681,11 +2681,11 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Quality setting determines the compression rate only, and does not affect resolution. Low, Medium, High and Best are preset bitrate values.</source>
-      <translation type="unfinished">Quality setting determines the compression rate only, and does not affect resolution. Low, Medium, High and Best are preset bitrate values.</translation>
+      <translation>Kalite ayarı sadece sıkıştırma oranını belirler ve çözünürlüğü etkilemez. Düşük, Orta, Yüksek ve En İyi, önceden belirlenmiş bit hızı değerleridir.</translation>
     </message>
     <message>
       <source>First choose a recording option, then apply it to day and time blocks on the recording schedule. (0 block is 12:00am to 1:00am, 23 block is 11:00pm to 12:00am.)</source>
-      <translation type="unfinished">First choose a recording option, then apply it to day and time blocks on the recording schedule. (0 block is 12:00am to 1:00am, 23 block is 11:00pm to 12:00am.)</translation>
+      <translation>Önce bir kayıt seçeneği seçin, ardından kayıt programındaki gün ve zaman bloklarına uygulayın. (0 blok 12:00 - 01:00, 23 blok 11:00 - 12:00 arasıdır.)</translation>
     </message>
   </context>
   <context>
@@ -3148,19 +3148,19 @@ to %1</source>
     <name>QnCustomBusinessEventWidget</name>
     <message>
       <source>If the field is empty, event will always trigger.</source>
-      <translation type="unfinished">If the field is empty, event will always trigger.</translation>
+      <translation>Alan boşsa, etkinlik her zaman tetiklenir.</translation>
     </message>
     <message>
       <source>Event will trigger only if there are matches in the source with any of the entered keywords.</source>
-      <translation type="unfinished">Event will trigger only if there are matches in the source with any of the entered keywords.</translation>
+      <translation>Etkinlik, yalnızca girilen anahtar kelimelerden herhangi biriyle açıklama alanında eşleşme varsa tetiklenecektir.</translation>
     </message>
     <message>
       <source>Event will trigger only if there are matches in the caption with any of the entered keywords.</source>
-      <translation type="unfinished">Event will trigger only if there are matches in the caption with any of the entered keywords.</translation>
+      <translation>Etkinlik, yalnızca girilen anahtar kelimelerden herhangi biriyle açıklama başlığında eşleşme varsa tetiklenecektir.</translation>
     </message>
     <message>
       <source>Event will trigger only if there are matches in the description with any of the entered keywords.</source>
-      <translation type="unfinished">Event will trigger only if there are matches in the description with any of the entered keywords.</translation>
+      <translation>Etkinlik, yalnızca girilen anahtar kelimelerden herhangi biriyle açıklama başlığında eşleşme varsa tetiklenecektir.</translation>
     </message>
   </context>
   <context>
@@ -3366,7 +3366,7 @@ to %1</source>
     <message>
       <source>All %1 users will be deleted.</source>
       <comment>%1 is the short cloud name (like Cloud)</comment>
-      <translation type="unfinished">All %1 users will be deleted.</translation>
+      <translation>Tüm %1 kullanıcıları silinecek.</translation>
     </message>
     <message>
       <source>You will not be able to connect to this System with your %1 account after you disconnect this System from %1.</source>
@@ -3378,7 +3378,7 @@ to %1</source>
     <name>QnEmptyBusinessActionWidget</name>
     <message>
       <source>Panic Recording mode switches recording settings for all cameras to maximum FPS and quality.</source>
-      <translation type="unfinished">Panic Recording mode switches recording settings for all cameras to maximum FPS and quality.</translation>
+      <translation>Panik Kayıt modu, tüm kameraların kayıt ayarlarını maksimum FPS ve kaliteye dönüştürür.</translation>
     </message>
   </context>
   <context>
@@ -3619,7 +3619,7 @@ to %1</source>
     <name>QnFisheyeSettingsWidget</name>
     <message>
       <source>Use this setting to compensate for distortion if camera is not mounted exactly vertically or horizontally.</source>
-      <translation type="unfinished">Use this setting to compensate for distortion if camera is not mounted exactly vertically or horizontally.</translation>
+      <translation>Kamera tam olarak dikey veya yatay olarak monte edilmediyse, bozulmayı telafi etmek için bu ayarı kullanın.</translation>
     </message>
   </context>
   <context>
@@ -3693,11 +3693,11 @@ to %1</source>
     </message>
     <message>
       <source>Backup includes servers and cameras settings, users, webpages, event rules, etc. Video is not saved.</source>
-      <translation type="unfinished">Backup includes servers and cameras settings, users, webpages, event rules, etc. Video is not saved.</translation>
+      <translation>Yedekleme sunucuları ve kamera ayarlarını, kullanıcıları, web sayfalarını, etkinlik kurallarını vb. Içerir. Video kaydedilmez.</translation>
     </message>
     <message>
       <source>Creates a backup of System configuration that can be restored in case of failure.</source>
-      <translation type="unfinished">Creates a backup of System configuration that can be restored in case of failure.</translation>
+      <translation>Herhangi bir aksilik olmasına karşın sistem konfigürasyonunu yedekleyebilir ve daha sonra tekrar yükleyebilirsiniz.</translation>
     </message>
   </context>
   <context>
@@ -3876,6 +3876,10 @@ to %1</source>
         <numerusform>Test Başarıyla Tamamladı: %n Kullanıcılar Bulundu.</numerusform>
         <numerusform>Test Başarıyla Tamamladı: %n Kullanıcılar Bulundu.</numerusform>
       </translation>
+    </message>
+    <message>
+      <source>Changing any LDAP settings other than &quot;Search Filter&quot; will result in connectivity loss for all LDAP fetched users.</source>
+      <translation>&quot;arama filtresi&quot; dışında herhangi bir LDAP ayarlarını değiştirme kullanıcıların getirilen tüm LDAP için bağlantı kaybına neden olur.</translation>
     </message>
   </context>
   <context>
@@ -4518,11 +4522,11 @@ to %1</source>
     </message>
     <message>
       <source>Sets the time to use in the client (timeline, timestamps, etc.) when client and server machines are in different time zones.</source>
-      <translation type="unfinished">Sets the time to use in the client (timeline, timestamps, etc.) when client and server machines are in different time zones.</translation>
+      <translation>İstemci ve sunucu makineleri farklı saat dilimlerinde olduğunda istemcideki zamanı (zaman çizelgesi, zaman damgaları, vb.) Ayarlar.</translation>
     </message>
     <message>
       <source>Displays IP addresses for cameras and servers and roles for users.</source>
-      <translation type="unfinished">Displays IP addresses for cameras and servers and roles for users.</translation>
+      <translation>Kameralar ve sunucular için IP adreslerini ve kullanıcılar için rolleri görüntüler.</translation>
     </message>
     <message>
       <source>Length of time each camera on layout will be displayed if you start a Tour.</source>
@@ -5706,7 +5710,7 @@ to %1</source>
     </message>
     <message>
       <source>Servers with failover enabled will automatically take cameras from offline servers.</source>
-      <translation type="unfinished">Servers with failover enabled will automatically take cameras from offline servers.</translation>
+      <translation>Failover olarak etkinleştirilmiş sunucular otomatik olarak kameraları çevrimdışı sunuculardan alacaktır.</translation>
     </message>
   </context>
   <context>
@@ -5916,11 +5920,11 @@ to %1</source>
     </message>
     <message>
       <source>Validating the update...</source>
-      <translation type="unfinished">Validating the update...</translation>
+      <translation>Güncelleme doğrulanıyor...</translation>
     </message>
     <message>
       <source>Checking for free space...</source>
-      <translation type="unfinished">Checking for free space...</translation>
+      <translation>Boş alan kontrol ediliyor...</translation>
     </message>
   </context>
   <context>
@@ -6403,12 +6407,8 @@ to %1</source>
       <translation>USB depolamada kayıt etkinleştirildi</translation>
     </message>
     <message>
-      <source>Backup includes servers and cameras settings, users, webpages, event rules, etc. Video is not saved.</source>
-      <translation type="unfinished">Backup includes servers and cameras settings, users, webpages, event rules, etc. Video is not saved.</translation>
-    </message>
-    <message>
-      <source>Creates a backup of System configuration that can be restored in case of failure.</source>
-      <translation type="unfinished">Creates a backup of System configuration that can be restored in case of failure.</translation>
+      <source>Reindexing can fix problems with archive or backup if they have been lost or damaged, or if some hardware has been replaced.</source>
+      <translation>Yeniden indexleme zarar gören arşiv ve yedekleri onarabilir yada donanım değişikliğinde gerekecektir.</translation>
     </message>
   </context>
   <context>
@@ -6704,15 +6704,15 @@ to %1</source>
     </message>
     <message>
       <source>Tracks and logs all user actions.</source>
-      <translation type="unfinished">Tracks and logs all user actions.</translation>
+      <translation>Tüm kullanıcı haraket ve işlemlerini kaydet.</translation>
     </message>
     <message>
       <source>Includes information about system, such as cameras models and firmware versions, number of servers, etc.</source>
-      <translation type="unfinished">Includes information about system, such as cameras models and firmware versions, number of servers, etc.</translation>
+      <translation>Kamera modelleri ve ürün yazılımı sürümleri, sunucu sayısı vb. Gibi sistem hakkında bilgi içerir.</translation>
     </message>
     <message>
       <source>Does not include any personal information and is completely anonymous.</source>
-      <translation type="unfinished">Does not include any personal information and is completely anonymous.</translation>
+      <translation>Kişisel bilgiler içermez ve tamamen anonimdir.</translation>
     </message>
   </context>
   <context>
@@ -7016,7 +7016,7 @@ to %1</source>
     </message>
     <message>
       <source>Users can be imported from an LDAP server. They will be able to log in only if LDAP server is online and their accounts are active on it.</source>
-      <translation type="unfinished">Users can be imported from an LDAP server. They will be able to log in only if LDAP server is online and their accounts are active on it.</translation>
+      <translation>Kullanıcılar bir LDAP sunucusundan içe aktarılabilir. Sadece LDAP sunucusu çevrimiçi ve hesapları aktif ise giriş yapabilecekler.</translation>
     </message>
   </context>
   <context>
@@ -7207,26 +7207,26 @@ to %1</source>
     <message>
       <source>%1 user with specified email already exists.</source>
       <comment>%1 is the short cloud name (like Cloud)</comment>
-      <translation type="unfinished">%1 user with specified email already exists.</translation>
+      <translation>%1 Bu e-posta adresiyle kayıtlı bir kullanıcı zaten var.</translation>
     </message>
     <message>
       <source>Local users</source>
-      <translation type="unfinished">Local users</translation>
+      <translation>Yerel kullanıcı</translation>
     </message>
     <message>
       <source>%1 users</source>
       <comment>%1 is the short cloud name (like Cloud)</comment>
-      <translation type="unfinished">%1 users</translation>
+      <translation>%1 kullanıcı</translation>
     </message>
     <message>
       <source>%1 belong to this system only and are fully managed by system administrators.</source>
       <comment>%1 is local users definition, e.g. &apos;Local users&apos;</comment>
-      <translation type="unfinished">%1 belong to this system only and are fully managed by system administrators.</translation>
+      <translation>%1 sadece bu sisteme aittir ve sistem yöneticileri tarafından tamamen yönetilmektedir.</translation>
     </message>
     <message>
       <source>%1 can have access to many Systems. Administrators can manage their rights only.</source>
       <comment>%1 is cloud users definition, e.g. &apos;Cloud users&apos;</comment>
-      <translation type="unfinished">%1 can have access to many Systems. Administrators can manage their rights only.</translation>
+      <translation>%1 birçok sisteme erişebilir. Yöneticiler sadece haklarını yönetebilirler.</translation>
     </message>
   </context>
   <context>
@@ -8497,7 +8497,7 @@ to %1</source>
     <name>nx::client::desktop::ui::AnalyticsSdkEventWidget</name>
     <message>
       <source>Analytics events can be set up on a certain cameras.</source>
-      <translation type="unfinished">Analytics events can be set up on a certain cameras.</translation>
+      <translation>Analytics etkinlikleri belirli kameralarda kurulabilir.</translation>
     </message>
     <message>
       <source>Choose cameras using the button above to see the list of supported events.</source>
@@ -8513,7 +8513,11 @@ to %1</source>
     </message>
     <message>
       <source>Event will trigger only if there are matches in the caption with any of the entered keywords.</source>
-      <translation type="unfinished">Event will trigger only if there are matches in the caption with any of the entered keywords.</translation>
+      <translation>Etkinlik, yalnızca girilen anahtar kelimelerden herhangi biriyle açıklama başlığında eşleşme varsa tetiklenecektir.</translation>
+    </message>
+    <message>
+      <source>This field is case sensitive.</source>
+      <translation>Arama büyük/küçük harfe duyarlı.</translation>
     </message>
   </context>
   <context>
@@ -8834,10 +8838,6 @@ to %1</source>
       <translation>%1 Beta Versiyon</translation>
     </message>
     <message>
-      <source>Some functionality may be unavailable or not working properly.</source>
-      <translation>Bazı işlevler düzgün kullanılamıyor veya çalışmıyor olabilir.</translation>
-    </message>
-    <message>
       <source>System sends anonymous usage statistics</source>
       <translation>Anonim kullanım istatistiklerini topla ve gönder</translation>
     </message>
@@ -8876,6 +8876,10 @@ to %1</source>
     <message>
       <source>Decline</source>
       <translation>Reddet</translation>
+    </message>
+    <message>
+      <source>Warning! This build is for testing purposes only! Please upgrade to a next available patch or release version once available.</source>
+      <translation>Uyarı! Bu yapı sadece test amaçlıdır! Lütfen mevcut olan bir sonraki yamaya veya sürüm sürümüne yükseltin.</translation>
     </message>
   </context>
   <context>

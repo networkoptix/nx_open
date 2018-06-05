@@ -54,19 +54,20 @@ void HanwhaPtzController::setPtzTraits(const QnPtzAuxilaryTraitList& traits)
 }
 
 void HanwhaPtzController::setAlternativePtzRanges(
-    const std::map<QString, std::set<int>>& ranges)
+    const std::map<QString, HanwhaRange>& ranges)
 {
     m_alternativePtzExecutor = std::make_unique<HanwhaPtzExecutor>(m_hanwhaResource, ranges);
 }
 
 bool HanwhaPtzController::continuousMove(const QVector3D& speed)
 {
-    if (m_ptzTraits.contains(kHanwhaAlternativeZoomTrait))
-    {
-        return alternativeContinuousMove(
-            kHanwhaZoomProperty,
-            speed.z());
-    }
+    const bool needToUseAlternativePtz = m_ptzTraits.contains(kHanwhaAlternativePanTrait)
+        || m_ptzTraits.contains(kHanwhaAlternativeTiltTrait)
+        || m_ptzTraits.contains(kHanwhaAlternativeZoomTrait)
+        || m_ptzTraits.contains(kHanwhaAlternativeRotateTrait);
+
+    if (needToUseAlternativePtz && m_alternativePtzExecutor)
+        m_alternativePtzExecutor->continuousMove(speed);
 
     const auto hanwhaSpeed = toHanwhaSpeed(speed);
 
@@ -107,15 +108,10 @@ bool HanwhaPtzController::continuousMove(const QVector3D& speed)
 
 bool HanwhaPtzController::continuousFocus(qreal speed)
 {
-    if (m_ptzTraits.contains(kHanwhaAlternativeFocusTrait))
-    {
-        return alternativeContinuousMove(
-            kHanwhaFocusProperty,
-            speed);
-    }
+    if (m_ptzTraits.contains(kHanwhaAlternativeFocusTrait) && m_alternativePtzExecutor)
+        return m_alternativePtzExecutor->continuousFocus(speed);
 
     HanwhaRequestHelper helper(m_hanwhaResource->sharedContext());
-
     const auto response = helper.control(
         lit("ptzcontrol/continuous"),
         {
@@ -409,16 +405,6 @@ std::map<QString, QString> HanwhaPtzController::makeViewPortParameters(
     result.emplace(lit("Y2"), y2);
 
     return result;
-}
-
-bool HanwhaPtzController::alternativeContinuousMove(const QString& parameterName, qreal speed)
-{
-    NX_ASSERT(m_alternativePtzExecutor);
-    if (!m_alternativePtzExecutor)
-        return false;
-
-    m_alternativePtzExecutor->setSpeed(parameterName, speed);
-    return true;
 }
 
 } // namespace plugins

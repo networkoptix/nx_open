@@ -1128,10 +1128,10 @@ to view more bookmarks</source>
       <source>File name must not contain the following reserved characters:</source>
       <comment>Plural relates to the word _characters_ here, not _file name_.</comment>
       <translation>
-        <numerusform>Nazwa pliku nie może zawierać znaku: </numerusform>
-        <numerusform>Nazwa pliku nie może zawierać następujących zarezerwowanych znaków: </numerusform>
-        <numerusform>Nazwa pliku nie może zawierać następujących zarezerwowanych znaków: </numerusform>
-        <numerusform>Nazwa pliku nie może zawierać następujących zarezerwowanych znaków: </numerusform>
+        <numerusform>Nazwa pliku nie może zawierać znaku:</numerusform>
+        <numerusform>Nazwa pliku nie może zawierać następujących zarezerwowanych znaków:</numerusform>
+        <numerusform>Nazwa pliku nie może zawierać następujących zarezerwowanych znaków:</numerusform>
+        <numerusform>Nazwa pliku nie może zawierać następujących zarezerwowanych znaków:</numerusform>
       </translation>
     </message>
   </context>
@@ -3955,6 +3955,10 @@ to %1</source>
         <numerusform>Test zakończony pomyślnie. Znaleziono %n użytkowników.</numerusform>
       </translation>
     </message>
+    <message>
+      <source>Changing any LDAP settings other than &quot;Search Filter&quot; will result in connectivity loss for all LDAP fetched users.</source>
+      <translation>Zmiana jakichkolwiek ustawień LDAP innych niż &quot;Filtr wyszukiwania&quot; spowoduje utratę łączności wszystkich użytkowników zalogowanych przez LDAP.</translation>
+    </message>
   </context>
   <context>
     <name>QnLdapSettingsDialogPrivate</name>
@@ -6544,12 +6548,8 @@ to %1</source>
       <translation>Nagrywanie zostało włączone na nośniku USB</translation>
     </message>
     <message>
-      <source>Backup includes servers and cameras settings, users, webpages, event rules, etc. Video is not saved.</source>
-      <translation>Kopia zapasowa obejmuje ustawienia serwerów i kamer, użytkowników, stron WWW, reguł zdarzeń itp. Nagrania wideo nie są backupowane.</translation>
-    </message>
-    <message>
-      <source>Creates a backup of System configuration that can be restored in case of failure.</source>
-      <translation>Tworzy kopię zapasową konfiguracji systemu, którą można przywrócić w przypadku awarii.</translation>
+      <source>Reindexing can fix problems with archive or backup if they have been lost or damaged, or if some hardware has been replaced.</source>
+      <translation>Ponowne indeksowanie może rozwiązać problemy z archiwum lub backupem, jeśli jakieś nagrania zostały utracone lub uszkodzone, lub jeśli jakieś komponenty sprzętowe zostały wymienione.</translation>
     </message>
   </context>
   <context>
@@ -8742,6 +8742,10 @@ to %1</source>
       <source>Event will trigger only if there are matches in the caption with any of the entered keywords.</source>
       <translation>Zdarzenie uruchomi się tylko wtedy, gdy w polu tytułu zdarzenia znajdują się dowolne z wprowadzonych słów kluczowych.</translation>
     </message>
+    <message>
+      <source>This field is case sensitive.</source>
+      <translation>W tym polu wielkość liter jest istotna.</translation>
+    </message>
   </context>
   <context>
     <name>nx::client::desktop::ui::ClipboardButton</name>
@@ -9075,10 +9079,6 @@ to %1</source>
       <translation>Wersja beta %1</translation>
     </message>
     <message>
-      <source>Some functionality may be unavailable or not working properly.</source>
-      <translation>Niektóre funkcje mogą być niedostępne lub mogą działać nieprawidłowo.</translation>
-    </message>
-    <message>
       <source>System sends anonymous usage statistics</source>
       <translation>System wysyła anonimowe statystyki</translation>
     </message>
@@ -9117,6 +9117,10 @@ to %1</source>
     <message>
       <source>Decline</source>
       <translation>Nie akceptuję</translation>
+    </message>
+    <message>
+      <source>Warning! This build is for testing purposes only! Please upgrade to a next available patch or release version once available.</source>
+      <translation>Uwaga! Ta wersja służy wyłącznie do testowania! Proszę zaktualizować oprogramowanie do następnej wersji, gdy tylko zostanie ona udostępniona.</translation>
     </message>
   </context>
   <context>

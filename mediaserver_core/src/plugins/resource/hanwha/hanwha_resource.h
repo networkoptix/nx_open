@@ -11,6 +11,7 @@
 #include <plugins/resource/hanwha/hanwha_shared_resource_context.h>
 #include <plugins/resource/hanwha/hanwha_remote_archive_manager.h>
 #include <plugins/resource/hanwha/hanwha_archive_delegate.h>
+#include <plugins/resource/hanwha/hanwha_range.h>
 #include <plugins/resource/onvif/onvif_resource.h>
 
 #include <core/ptz/ptz_auxilary_trait.h>
@@ -95,15 +96,18 @@ public:
 
     int closestFrameRate(Qn::ConnectionRole role, int desiredFrameRate) const;
 
-    int profileByRole(Qn::ConnectionRole role) const;
+    int profileByRole(Qn::ConnectionRole role, bool isBypassProfile = false) const;
 
     CameraDiagnostics::Result findProfiles(
-        boost::optional<HanwhaVideoProfile>* outPrimaryProfileNumber,
-        boost::optional<HanwhaVideoProfile>* outSecondaryProfileNumber,
+        boost::optional<HanwhaVideoProfile>* outPrimaryProfile,
+        boost::optional<HanwhaVideoProfile>* outSecondaryProfile,
         int* totalProfileNumber,
-        std::set<int>* profilesToRemoveIfProfilesExhausted);
+        std::set<int>* profilesToRemoveIfProfilesExhausted,
+        bool useBypass = false);
 
-    CameraDiagnostics::Result fetchProfiles(HanwhaProfileMap* outProfiles);
+    CameraDiagnostics::Result fetchProfiles(
+        HanwhaProfileMap* outProfiles,
+        bool useBypass = false);
 
     CameraDiagnostics::Result removeProfile(int profileNumber);
 
@@ -317,18 +321,32 @@ private:
 
     bool isProxiedMultisensorCamera() const;
 
+    void setDirectProfile(Qn::ConnectionRole role, int profileNumber);
+    void setBypassProfile(Qn::ConnectionRole role, int profileNumber);
+
 private:
     using AdvancedParameterId = QString;
+
+    struct ProfileNumbers
+    {
+        // TODO: #dmishin move to std::optional one day.
+
+        // Profile number available via NVR CGI or standalone camera CGI.
+        int directNumber = kHanwhaInvalidProfile;
+
+        // Profile numbera available via bypass. Not relevant for standalone cameras
+        int bypassNumber = kHanwhaInvalidProfile;
+    };
 
     mutable QnMutex m_mutex;
     int m_maxProfileCount = 0;
     HanwhaCodecInfo m_codecInfo;
-    std::map<Qn::ConnectionRole, int> m_profileByRole;
+    std::map<Qn::ConnectionRole, ProfileNumbers> m_profileByRole;
 
     Ptz::Capabilities m_ptzCapabilities = Ptz::NoPtzCapabilities;
     QnPtzLimits m_ptzLimits;
     QnPtzAuxilaryTraitList m_ptzTraits;
-    std::map<QString, std::set<int>> m_alternativePtzRanges;
+    std::map<QString, HanwhaRange> m_alternativePtzRanges;
 
     std::map<AdvancedParameterId, HanwhaAdavancedParameterInfo> m_advancedParameterInfos;
 
