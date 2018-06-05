@@ -66,7 +66,7 @@ ${TERMS AND CONDITIONS CHECKBOX}      //form[@name= 'registerForm']//input[@ng-m
 ${CREATE ACCOUNT BUTTON}              //form[@name= 'registerForm']//button[contains(text(), '${CREATE ACCOUNT BUTTON TEXT}')]
 ${TERMS AND CONDITIONS LINK}          //form[@name= 'registerForm']//a[@href='/content/eula']
 ${TERMS AND CONDITIONS ERROR}         //form[@name= 'registerForm']//p[@ng-if='registerForm.accept.$touched && registerForm.accept.$error.required' and contains(text(), '${TERMS AND CONDITIONS ERROR TEXT}')]
-${PRIVACY POLICY LINK}                //form[@name= 'registerForm']//a[@href='/content/support']
+${PRIVACY POLICY LINK}                //form[@name= 'registerForm']//a[@href='/content/privacy']
 ${RESEND ACTIVATION LINK BUTTON}      //form[@name= 'reactivateAccount']//button[contains(text(), "${RESEND ACTIVATION LINK BUTTON TEXT}")]
 
 #targets the open nx witness button presented when logging in after activating with from=mobile or client
