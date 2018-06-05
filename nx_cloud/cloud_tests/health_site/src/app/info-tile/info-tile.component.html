@@ -1,12 +1,15 @@
 <div class="content mt-4">
-  <div class="row">
-    <div class="card col-10 offset-1 col-md-6 offset-md-3 p-0">
-      <div class="card-header"><h6 class="mb-0">Services</h6></div>
-      <div class="card-body">
-        <h4 class="card-title">Card title</h4>
-        <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's
-          content.</p>
-      </div>
+    <div class="row">
+        <div class="card col-10 offset-1 col-md-6 offset-md-3 p-0">
+            <div class="card-header"><h6 class="mb-0" translate>Cloud Services</h6></div>
+
+            <div class="card-body" *ngFor="let item of items">
+                <div class="row">
+                    <div class="item-status col-1" [ngClass]="getClassFor(item.value)"></div><h4 class="card-title col-11 m-0 p-0" [innerHTML]="item.name"></h4>
+                    <p class="card-text offset-1 mt-1">{{ item.timestamp | timeChecked }} ({{ item.timestamp | timeAgo:true }} ago)</p>
+                </div>
+            </div>
+
+        </div>
     </div>
-  </div>
 </div>

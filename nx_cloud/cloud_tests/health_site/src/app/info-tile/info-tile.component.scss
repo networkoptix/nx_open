@@ -1,3 +1,25 @@
+@import '~bootstrap/scss/functions';
+@import '~bootstrap/scss/variables';
+
 .card {
-  border-radius: 2px;
+    border-radius : 2px;
+
+    .card-body {
+        border-bottom : $card-border-width solid $card-border-color;
+
+        .item-status {
+            &.healhty {
+
+            }
+
+            &.error {
+                background-color : $danger;
+            }
+        }
+
+        p {
+            font-size: $font-size-sm;
+            color: $gray-500;
+        }
+    }
 }

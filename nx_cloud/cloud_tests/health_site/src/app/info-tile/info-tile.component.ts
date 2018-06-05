@@ -1,15 +1,21 @@
-import { Component, OnInit } from '@angular/core';
+import { Input, Component, OnInit } from '@angular/core';
+import * as moment from 'moment';
 
 @Component({
-  selector: 'app-info-tile',
-  templateUrl: './info-tile.component.html',
-  styleUrls: ['./info-tile.component.scss']
+    selector: 'app-info-tile',
+    templateUrl: './info-tile.component.html',
+    styleUrls: ['./info-tile.component.scss']
 })
 export class InfoTileComponent implements OnInit {
+    @Input() items;
 
-  constructor() { }
+    constructor() {
+    }
 
-  ngOnInit() {
-  }
+    ngOnInit() {
+    }
 
+    getClassFor(item) {
+        return (item) ? 'healthy' : 'error';
+    }
 }
