@@ -132,9 +132,10 @@ bool deserialize(QnJsonContext *ctx, const QJsonValue &value, PtzMapperPart *tar
 
     PtzMapperPart local;
     if(
-        !QJson::deserialize(ctx, map, lit("x"), &local[0], true) ||
-        !QJson::deserialize(ctx, map, lit("y"), &local[1], true) ||
-        !QJson::deserialize(ctx, map, lit("z"), &local[2], true)
+        !QJson::deserialize(ctx, map, lit("x"), &local[0], /*optional*/ true) ||
+        !QJson::deserialize(ctx, map, lit("y"), &local[1], /*optional*/ true) ||
+        !QJson::deserialize(ctx, map, lit("z"), &local[2], /*optional*/ true) ||
+        !QJson::deserialize(ctx, map, lit("r"), &local[3], /*optional*/ true)
     ) {
             return false;
     }
@@ -162,20 +163,19 @@ bool deserialize(QnJsonContext *ctx, const QJsonValue &value, QnPtzMapperPtr *ta
         return false;
     }
 
-    /* Null means "take this one from the other mapper". */
+    // Null means "try to take this one from the other mapper
+    // and use identity mapper if the other mapper is unavailable".
     for(int i = 0; i < input.size(); ++i)
     {
         if(!input[i])
         {
-            if(!output[i])
-                return false;
+            input[i] = output[i]
+                ? output[i]
+                : QnSpaceMapperPtr<qreal>(new QnIdentitySpaceMapper<qreal>());
+        }
 
-            input[i] = output[i];
-        }
-        else if(!output[i])
-        {
+        if(!output[i])
             output[i] = input[i];
-        }
     }
 
     QnSpaceMapperPtr<nx::core::ptz::PtzVector> inputMapper(
