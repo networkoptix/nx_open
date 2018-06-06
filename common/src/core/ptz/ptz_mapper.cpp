@@ -134,8 +134,8 @@ bool deserialize(QnJsonContext *ctx, const QJsonValue &value, PtzMapperPart *tar
     if(
         !QJson::deserialize(ctx, map, lit("x"), &local[0], /*optional*/ true) ||
         !QJson::deserialize(ctx, map, lit("y"), &local[1], /*optional*/ true) ||
-        !QJson::deserialize(ctx, map, lit("z"), &local[2], /*optional*/ true) ||
-        !QJson::deserialize(ctx, map, lit("r"), &local[3], /*optional*/ true)
+        !QJson::deserialize(ctx, map, lit("r"), &local[2], /*optional*/ true) ||
+        !QJson::deserialize(ctx, map, lit("z"), &local[3], /*optional*/ true)
     ) {
             return false;
     }
