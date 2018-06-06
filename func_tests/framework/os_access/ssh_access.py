@@ -55,4 +55,4 @@ class SSHAccess(OSAccess):
         return RunningTime(new_time, datetime.datetime.now(pytz.utc) - started_at)
 
     def make_core_dump(self, pid):
-        self.ssh.run_command(['kill', '-s', 'SIGTRAP', pid])
+        self.ssh.run_sh_script('gcore -o /proc/$PID/cwd/core.$(date +%s) $PID', env={'PID': pid})
