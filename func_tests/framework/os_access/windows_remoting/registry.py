@@ -81,7 +81,7 @@ class Key(object):
         names = [
             Name(self, value_name, _types[value_type])
             for value_type, value_name
-            in zip(response[u'Types'], response[u'sNames'])]
+            in zip(response.get(u'Types', []), response.get(u'sNames', []))]
         return names
 
     def create(self):
