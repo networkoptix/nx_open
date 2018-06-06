@@ -9,6 +9,7 @@ from requests import RequestException
 
 from framework.method_caching import cached_getter
 from framework.os_access.exceptions import exit_status_error_cls
+from framework.os_access.windows_remoting._cim_query import CIMClass
 from ._cim_query import CIMQuery
 from ._cmd import Shell, run_command
 from ._powershell import run_powershell_script
@@ -73,8 +74,13 @@ class WinRM(object):
     def run_powershell_script(self, script, variables):
         return run_powershell_script(self._shell(), script, variables)
 
-    def wmi_query(self, class_name, selectors):
-        return CIMQuery(self._protocol, class_name, selectors)
+    def wmi_query(
+            self,
+            class_name, selectors,
+            namespace=CIMClass.default_namespace, root_uri=CIMClass.default_root_uri):
+        cim_class = CIMClass(class_name, namespace=namespace, root_uri=root_uri)
+        cim_query = CIMQuery(self._protocol, cim_class, selectors)
+        return cim_query
 
     def is_working(self):
         try:
