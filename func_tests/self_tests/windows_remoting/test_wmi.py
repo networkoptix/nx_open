@@ -2,7 +2,7 @@ import logging
 
 import pytest
 
-from framework.os_access.windows_remoting import Users
+from framework.os_access.windows_remoting.users import Users
 
 _logger = logging.getLogger(__name__)
 

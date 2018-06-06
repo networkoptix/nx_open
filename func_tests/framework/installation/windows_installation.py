@@ -14,12 +14,12 @@ class WindowsInstallation(Installation):
 
     def __init__(self, windows_access, installer):
         self.installer = installer  # type: Installer
-        program_files_dir = windows_access.Path(windows_access.winrm.user_env_vars()['ProgramFiles'])
+        program_files_dir = windows_access.Path(windows_access.env_vars()['ProgramFiles'])
         customization = installer.customization  # type: Customization
         self.dir = program_files_dir / customization.windows_installation_subdir
         self.binary = self.dir / 'mediaserver.exe'
         self.info = self.dir / 'build_info.txt'
-        system_profile_dir = windows_access.Path(windows_access.winrm.system_profile_dir())
+        system_profile_dir = windows_access.Path(windows_access.system_profile_dir())
         self._local_app_data_dir = system_profile_dir / 'AppData' / 'Local'
         self.var = self._local_app_data_dir / customization.windows_app_data_subdir
         self._log_file = self.var / 'log' / 'log_file.log'
@@ -62,7 +62,7 @@ class WindowsInstallation(Installation):
             for index in range(2, limit + 1):
                 yield '{} ({}).DMP'.format(base_name, index)
 
-        profile_dir = self.os_access.Path(self.os_access.winrm.user_env_vars()[u'UserProfile'])
+        profile_dir = self.os_access.Path(self.os_access.env_vars()[u'UserProfile'])
         temp_dir = profile_dir / 'AppData' / 'Local' / 'Temp'
         dumps = []
         for name in iterate_names(20):  # 20 is arbitrarily big number.
@@ -76,7 +76,7 @@ class WindowsInstallation(Installation):
         return dumps
 
     def list_core_dumps_from_procdump(self):
-        profile_dir = self.os_access.Path(self.os_access.winrm.user_env_vars()[u'UserProfile'])
+        profile_dir = self.os_access.Path(self.os_access.env_vars()[u'UserProfile'])
         dumps = list(profile_dir.glob('{}_*.dmp'.format(self.binary.name)))
         return dumps
 
