@@ -9,7 +9,7 @@ _logger = logging.getLogger(__name__)
 
 @pytest.fixture(scope='session')
 def users(winrm):
-    users = Users(winrm._protocol)
+    users = Users(winrm)
     return users
 
 

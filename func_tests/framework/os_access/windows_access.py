@@ -11,6 +11,8 @@ from framework.os_access.exceptions import exit_status_error_cls
 from framework.os_access.os_access_interface import OSAccess
 from framework.os_access.smb_path import SMBConnectionPool, SMBPath
 from framework.os_access.windows_remoting import WinRM
+from framework.os_access.windows_remoting.env_vars import EnvVars
+from framework.os_access.windows_remoting.users import Users
 from framework.utils import RunningTime
 
 
@@ -32,10 +34,30 @@ class WindowsAccess(OSAccess):
     def forwarded_ports(self):
         return self._forwarded_ports
 
+    @cached_getter
+    def env_vars(self):
+        """Effective environment: union of default, system's and user's vars"""
+        users = Users(self.winrm)
+        account = users.account_by_name(self._username)
+        profile = users.profile_by_sid(account[u'SID'])
+        profile_dir = profile[u'LocalPath']
+        default_env_vars = {
+            u'USERPROFILE': profile_dir,
+            u'PROGRAMFILES': u'C:\\Program Files',
+            }
+        env_vars = EnvVars.request(self.winrm, account[u'Caption'], default_env_vars)
+        return env_vars
+
+    @cached_getter
+    def system_profile_dir(self):
+        # TODO: Work via Users class.
+        users = Users(self.winrm)
+        system_profile = users.system_profile()
+        profile_dir = system_profile[u'LocalPath']
+        return profile_dir
+
     @cached_property
     def Path(self):
-        winrm = self.winrm
-
         class SpecificSMBPath(SMBPath):
             _direct_smb_address, _direct_smb_port = self.forwarded_ports['tcp', 445]
             _smb_connection_pool = SMBConnectionPool(
@@ -45,12 +67,13 @@ class WindowsAccess(OSAccess):
 
             @classmethod
             def tmp(cls):
-                env_vars = winrm.user_env_vars()
-                return cls(env_vars[u'TEMP']) / 'FuncTests'
+                env_vars = self.env_vars()
+                temp_dir = cls(env_vars[u'TEMP'])
+                return temp_dir / u'FuncTests'
 
             @classmethod
             def home(cls):
-                env_vars = winrm.user_env_vars()
+                env_vars = self.env_vars()
                 return cls(env_vars[u'USERPROFILE'])
 
         return SpecificSMBPath

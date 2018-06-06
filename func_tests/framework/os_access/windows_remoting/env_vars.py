@@ -1,7 +1,5 @@
 import re
 
-from framework.os_access.windows_remoting._cim_query import CIMQuery
-
 
 class EnvVars(object):
     _env_var_re = re.compile('%(?P<var_name>\w+)%')
@@ -12,9 +10,9 @@ class EnvVars(object):
         self._resolved_vars.update(all_vars[user_name])
 
     @classmethod
-    def request(cls, pywinrm_protocol, user_name, default_user_env_vars):
+    def request(cls, winrm, user_name, default_user_env_vars):
         """Return (user name -> (var name -> var value)); values may contain other vars"""
-        query = CIMQuery(pywinrm_protocol, 'Win32_Environment', {})
+        query = winrm.wmi_query('Win32_Environment', {})
         var_objects = list(query.enumerate())
         vars = {}
         for var_object in var_objects:

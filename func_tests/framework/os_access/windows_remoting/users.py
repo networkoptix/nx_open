@@ -1,21 +1,20 @@
 from framework.method_caching import cached_getter
-from ._cim_query import CIMQuery
+from framework.os_access.windows_remoting import WinRM
 
 
 class Users(object):
-    def __init__(self, protocol):
-        # TODO: Work via WinRM in this class.
-        self.protocol = protocol
+    def __init__(self, winrm):
+        self._winrm = winrm  # type: WinRM
 
     @cached_getter
     def all_profiles(self):
-        query = CIMQuery(self.protocol, 'Win32_UserProfile', {})
+        query = self._winrm.wmi_query(u'Win32_UserProfile', {})
         profiles = list(query.enumerate())
         return profiles
 
     def profile_by_sid(self, sid):
-        selectors = {'SID': sid}
-        query = CIMQuery(self.protocol, 'Win32_UserProfile', selectors)
+        selectors = {u'SID': sid}
+        query = self._winrm.wmi_query(u'Win32_UserProfile', selectors)
         profile = query.get_one()
         return profile
 
@@ -27,7 +26,7 @@ class Users(object):
 
     @cached_getter
     def all_accounts(self):
-        query = CIMQuery(self.protocol, 'Win32_UserAccount', {})
+        query = self._winrm.wmi_query(u'Win32_UserAccount', {})
         accounts = list(query.enumerate())
         return accounts
 
