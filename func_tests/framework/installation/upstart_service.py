@@ -2,7 +2,6 @@ import logging
 import re
 
 from framework.installation.service import Service, ServiceStatus
-from framework.os_access.exceptions import NonZeroExitStatus
 from framework.os_access.posix_shell import SSH
 
 _logger = logging.getLogger(__name__)
