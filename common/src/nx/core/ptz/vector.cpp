@@ -144,7 +144,7 @@ Vector operator*(double scalar, const Vector& ptzVector)
     return ptzVector * scalar;
 }
 
-QN_FUSION_ADAPT_STRUCT_FUNCTIONS(Vector, (json)(eq), PtzVector_Fields);
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS(Vector, (json)(eq), PtzVector_Fields, (optional, true));
 
 } // namespace ptz
 } // namespace core
