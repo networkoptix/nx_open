@@ -43,7 +43,7 @@ Ptz::Capabilities QnViewportPtzController::getCapabilities() const
 
 bool QnViewportPtzController::viewportMove(qreal aspectRatio, const QRectF &viewport, qreal speed)
 {
-    nx::core::ptz::PtzVector oldPosition;
+    nx::core::ptz::Vector oldPosition;
     if(!getPosition(Qn::LogicalPtzCoordinateSpace, &oldPosition))
         return false;
 
@@ -101,8 +101,8 @@ bool QnViewportPtzController::viewportMove(qreal aspectRatio, const QRectF &view
         float newFov = qRadiansToDegrees(std::atan((unit / 2.0) / zoom)) * 2.0;
         float newPan = qRadiansToDegrees(newSpherical.phi);
         float newTilt = qRadiansToDegrees(newSpherical.psi);
-        nx::core::ptz::PtzVector newPosition
-            = nx::core::ptz::PtzVector(newPan, newTilt, 0.0, newFov);
+        nx::core::ptz::Vector newPosition
+            = nx::core::ptz::Vector(newPan, newTilt, 0.0, newFov);
 
         /* Send it to the camera. */
         return absoluteMove(Qn::LogicalPtzCoordinateSpace, newPosition, speed);
@@ -111,8 +111,8 @@ bool QnViewportPtzController::viewportMove(qreal aspectRatio, const QRectF &view
         float newPan = oldPosition.pan + oldPosition.zoom * delta.x();
         float newTilt = oldPosition.tilt - oldPosition.zoom * delta.y();
         float newFov = oldPosition.zoom / zoom;
-        nx::core::ptz::PtzVector newPosition = qBound(
-            nx::core::ptz::PtzVector(newPan, newTilt, 0.0, newFov), limits);
+        nx::core::ptz::Vector newPosition = qBound(
+            nx::core::ptz::Vector(newPan, newTilt, 0.0, newFov), limits);
 
         /* Send it to the camera. */
         return absoluteMove(Qn::LogicalPtzCoordinateSpace, newPosition, speed);

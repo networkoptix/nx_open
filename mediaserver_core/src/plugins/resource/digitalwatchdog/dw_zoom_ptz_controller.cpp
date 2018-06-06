@@ -18,7 +18,7 @@ Ptz::Capabilities QnDwZoomPtzController::getCapabilities() const
     return Ptz::ContinuousZoomCapability;
 }
 
-bool QnDwZoomPtzController::continuousMove(const nx::core::ptz::PtzVector& speedVector)
+bool QnDwZoomPtzController::continuousMove(const nx::core::ptz::Vector& speedVector)
 {
     const QString query = lit("/cgi-bin/ptzctrl.cgi?ptzchannel=0&query=zoom&ptzctrlvalue=%1");
 

@@ -106,7 +106,7 @@ private:
     void ptzUnzoom(QnMediaResourceWidget* widget);
     void ptzMove(
         QnMediaResourceWidget* widget,
-        const nx::core::ptz::PtzVector& speed,
+        const nx::core::ptz::Vector& speed,
         bool instant = false);
 
     void focusMove(QnMediaResourceWidget* widget, qreal speed);
@@ -123,8 +123,8 @@ private:
 
         Ptz::Capabilities capabilities = 0;
         QnPtzAuxilaryTraitList traits;
-        nx::core::ptz::PtzVector currentSpeed;
-        nx::core::ptz::PtzVector requestedSpeed;
+        nx::core::ptz::Vector currentSpeed;
+        nx::core::ptz::Vector requestedSpeed;
         PtzOverlayWidget* overlayWidget = nullptr;
         QMetaObject::Connection capabilitiesConnection;
     };

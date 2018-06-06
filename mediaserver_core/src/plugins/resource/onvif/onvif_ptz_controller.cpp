@@ -326,7 +326,7 @@ bool QnOnvifPtzController::stopInternal()
     return true;
 }
 
-bool QnOnvifPtzController::moveInternal(const nx::core::ptz::PtzVector& speedVector) {
+bool QnOnvifPtzController::moveInternal(const nx::core::ptz::Vector& speedVector) {
     QString ptzUrl = m_resource->getPtzUrl();
     if (ptzUrl.isEmpty())
     {
@@ -365,7 +365,7 @@ bool QnOnvifPtzController::moveInternal(const nx::core::ptz::PtzVector& speedVec
     return true;
 }
 
-bool QnOnvifPtzController::continuousMove(const nx::core::ptz::PtzVector& speed)
+bool QnOnvifPtzController::continuousMove(const nx::core::ptz::Vector& speed)
 {
     if(qFuzzyIsNull(speed) && !m_stopBroken) {
         return stopInternal();
@@ -405,7 +405,7 @@ bool QnOnvifPtzController::continuousFocus(qreal speed) {
 
 bool QnOnvifPtzController::absoluteMove(
     Qn::PtzCoordinateSpace space,
-    const nx::core::ptz::PtzVector& position,
+    const nx::core::ptz::Vector& position,
     qreal speed)
 {
     if(space != Qn::DevicePtzCoordinateSpace)
@@ -487,7 +487,7 @@ bool QnOnvifPtzController::absoluteMove(
 
 bool QnOnvifPtzController::getPosition(
     Qn::PtzCoordinateSpace space,
-    nx::core::ptz::PtzVector* outPosition) const
+    nx::core::ptz::Vector* outPosition) const
 {
     if(space != Qn::DevicePtzCoordinateSpace)
         return false;
@@ -510,7 +510,7 @@ bool QnOnvifPtzController::getPosition(
         return false;
     }
 
-    *outPosition = nx::core::ptz::PtzVector();
+    *outPosition = nx::core::ptz::Vector();
 
     if (response.PTZStatus && response.PTZStatus->Position) {
         if(response.PTZStatus->Position->PanTilt) {

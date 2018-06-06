@@ -50,7 +50,7 @@ static QString panDirection(qreal speed)
         return lit("right");
 }
 
-bool QnNewDWPtzController::continuousMove(const nx::core::ptz::PtzVector& speedVector)
+bool QnNewDWPtzController::continuousMove(const nx::core::ptz::Vector& speedVector)
 {
     QString request;
     if (!qFuzzyIsNull(speedVector.zoom))

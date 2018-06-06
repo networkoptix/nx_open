@@ -68,7 +68,7 @@ static QString moveDirection(qreal x, qreal y)
         return y > 0 ? lit("up") : lit("down");
 }
 
-bool QnDlinkPtzController::continuousMove(const nx::core::ptz::PtzVector& speedVector)
+bool QnDlinkPtzController::continuousMove(const nx::core::ptz::Vector& speedVector)
 {
     QString request;
     if (!qFuzzyIsNull(speedVector.zoom))

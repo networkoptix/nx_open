@@ -50,7 +50,7 @@ namespace {
         }
     }
 
-    ActiPtzVector toActiPtzSpeed(const nx::core::ptz::PtzVector& speedVector)
+    ActiPtzVector toActiPtzSpeed(const nx::core::ptz::Vector& speedVector)
     {
         return ActiPtzVector(
             toActiPanTiltSpeed(speedVector.pan),
@@ -376,14 +376,14 @@ Ptz::Capabilities QnActiPtzController::getCapabilities() const
     return d->capabilities;
 }
 
-bool QnActiPtzController::continuousMove(const nx::core::ptz::PtzVector& speedVector)
+bool QnActiPtzController::continuousMove(const nx::core::ptz::Vector& speedVector)
 {
     return d->continuousMove(toActiPtzSpeed(speedVector));
 }
 
 bool QnActiPtzController::absoluteMove(
     Qn::PtzCoordinateSpace space,
-    const nx::core::ptz::PtzVector& position,
+    const nx::core::ptz::Vector& position,
     qreal speed)
 {
     if(space != Qn::DevicePtzCoordinateSpace)
@@ -400,7 +400,7 @@ bool QnActiPtzController::absoluteMove(
 
 bool QnActiPtzController::getPosition(
     Qn::PtzCoordinateSpace space,
-    nx::core::ptz::PtzVector* outPosition) const
+    nx::core::ptz::Vector* outPosition) const
 {
     if(space != Qn::DevicePtzCoordinateSpace)
         return false;
@@ -409,7 +409,7 @@ bool QnActiPtzController::getPosition(
     if(!d->getPosition(&devicePosition))
         return false;
 
-    *outPosition = nx::core::ptz::PtzVector(
+    *outPosition = nx::core::ptz::Vector(
         devicePosition.pan,
         devicePosition.tilt,
         /*rotation*/ 0.0,

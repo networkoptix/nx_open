@@ -20,15 +20,15 @@ public:
      * \param outputMapper              Mapper to use when receiving data from the camera.
      */
     QnPtzMapper(
-        const QnSpaceMapperPtr<nx::core::ptz::PtzVector> &inputMapper,
-        const QnSpaceMapperPtr<nx::core::ptz::PtzVector> &outputMapper);
+        const QnSpaceMapperPtr<nx::core::ptz::Vector> &inputMapper,
+        const QnSpaceMapperPtr<nx::core::ptz::Vector> &outputMapper);
 
-    nx::core::ptz::PtzVector logicalToDevice(const nx::core::ptz::PtzVector &position) const
+    nx::core::ptz::Vector logicalToDevice(const nx::core::ptz::Vector &position) const
     {
         return m_inputMapper->targetToSource(position);
     }
 
-    nx::core::ptz::PtzVector deviceToLogical(const nx::core::ptz::PtzVector& position) const
+    nx::core::ptz::Vector deviceToLogical(const nx::core::ptz::Vector& position) const
     {
         return m_outputMapper->sourceToTarget(position);
     }
@@ -39,8 +39,8 @@ public:
     }
 
 private:
-    QnSpaceMapperPtr<nx::core::ptz::PtzVector> m_inputMapper;
-    QnSpaceMapperPtr<nx::core::ptz::PtzVector> m_outputMapper;
+    QnSpaceMapperPtr<nx::core::ptz::Vector> m_inputMapper;
+    QnSpaceMapperPtr<nx::core::ptz::Vector> m_outputMapper;
     QnPtzLimits m_logicalLimits;
 };
 

@@ -200,7 +200,7 @@ void QnCameraAdvancedParamsWidget::sendCustomParameterCommand(const QnCameraAdva
     if(parameter.writeCmd == lit("custom_zoom"))
     {
         // Expecting a single value.
-        nx::core::ptz::PtzVector speed;
+        nx::core::ptz::Vector speed;
         qreal val = value.toFloat(&ok);
         if (ok)
         {
@@ -214,7 +214,7 @@ void QnCameraAdvancedParamsWidget::sendCustomParameterCommand(const QnCameraAdva
         QStringList values = value.split(L',');
         if (values.size() == 3)
         {
-            nx::core::ptz::PtzVector speed;
+            nx::core::ptz::Vector speed;
             // Expecting a value like "horisontal,vertical,rotation".
             speed.pan = values[0].toFloat(&ok);
             speed.tilt = values[1].toFloat(&ok);

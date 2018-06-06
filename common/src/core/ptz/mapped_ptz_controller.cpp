@@ -22,7 +22,7 @@ Ptz::Capabilities QnMappedPtzController::getCapabilities() const
 
 bool QnMappedPtzController::absoluteMove(
     Qn::PtzCoordinateSpace space,
-    const nx::core::ptz::PtzVector& position,
+    const nx::core::ptz::Vector& position,
     qreal speed)
 {
     if(space == Qn::DevicePtzCoordinateSpace)
@@ -40,7 +40,7 @@ bool QnMappedPtzController::absoluteMove(
 
 bool QnMappedPtzController::getPosition(
     Qn::PtzCoordinateSpace space,
-    nx::core::ptz::PtzVector* position) const
+    nx::core::ptz::Vector* position) const
 {
     if(space == Qn::DevicePtzCoordinateSpace)
     {
@@ -48,7 +48,7 @@ bool QnMappedPtzController::getPosition(
     }
     else
     {
-        nx::core::ptz::PtzVector devicePosition;
+        nx::core::ptz::Vector devicePosition;
         if(!base_type::getPosition(Qn::DevicePtzCoordinateSpace, &devicePosition))
             return false;
 

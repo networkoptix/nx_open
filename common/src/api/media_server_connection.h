@@ -19,7 +19,7 @@
 #include <core/resource/camera_bookmark_fwd.h>
 #include <core/resource/resource_fwd.h>
 #include <nx/vms/event/event_fwd.h>
-#include <nx/core/ptz/ptz_vector.h>
+#include <nx/core/ptz/vector.h>
 
 #include "abstract_connection.h"
 #include "model/manual_camera_seach_reply.h"
@@ -103,7 +103,7 @@ public:
 
     int ptzContinuousMoveAsync(
         const QnNetworkResourcePtr& camera,
-        const nx::core::ptz::PtzVector& speed,
+        const nx::core::ptz::Vector& speed,
         const QnUuid& sequenceId,
         int sequenceNumber,
         QObject* target,
@@ -118,7 +118,7 @@ public:
     int ptzAbsoluteMoveAsync(
         const QnNetworkResourcePtr& camera,
         Qn::PtzCoordinateSpace space,
-        const nx::core::ptz::PtzVector& position,
+        const nx::core::ptz::Vector& position,
         qreal speed,
         const QnUuid& sequenceId,
         int sequenceNumber,

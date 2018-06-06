@@ -275,7 +275,7 @@ int QnPtzRestHandler::executeContinuousMove(
     NX_VERBOSE(this, lit("Start execute ContinuousMove. params=%1").arg(toString(params)));
 
     qreal xSpeed, ySpeed, zSpeed;
-    nx::core::ptz::PtzVector speedVector;
+    nx::core::ptz::Vector speedVector;
 
     bool success =
         requireOneOfParameters(
@@ -331,7 +331,7 @@ int QnPtzRestHandler::executeAbsoluteMove(const QnPtzControllerPtr &controller, 
 {
     Qn::PtzCommand command;
     qreal speed;
-    nx::core::ptz::PtzVector position;
+    nx::core::ptz::Vector position;
 
     bool success = requireParameter(params, lit("command"), result, &command)
         && requireOneOfParameters(params, { lit("pan"), lit("xPos") }, result, &position.pan)
@@ -384,7 +384,7 @@ int QnPtzRestHandler::executeGetPosition(const QnPtzControllerPtr &controller, c
     if (!requireParameter(params, lit("command"), result, &command))
         return CODE_INVALID_PARAMETER;
 
-    nx::core::ptz::PtzVector position;
+    nx::core::ptz::Vector position;
     if (!controller->getPosition(command == Qn::GetDevicePositionPtzCommand ? Qn::DevicePtzCoordinateSpace : Qn::LogicalPtzCoordinateSpace, &position))
         return CODE_INTERNAL_ERROR;
 

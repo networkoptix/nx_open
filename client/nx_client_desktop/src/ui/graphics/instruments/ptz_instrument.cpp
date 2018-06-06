@@ -40,9 +40,9 @@ const double minPtzZoomRectSize = 0.08;
 
 const qreal itemUnzoomThreshold = 0.975; /* In sync with hardcoded constant in workbench_controller */ // TODO: #Elric
 
-nx::core::ptz::PtzVector truncate(const nx::core::ptz::PtzVector& value)
+nx::core::ptz::Vector truncate(const nx::core::ptz::Vector& value)
 {
-    return nx::core::ptz::PtzVector(
+    return nx::core::ptz::Vector(
         trunc(value.pan * 100) / 100.0,
         trunc(value.tilt * 100) / 100.0,
         trunc(value.rotation * 100) / 100.0,
@@ -78,12 +78,12 @@ public:
 
     virtual ~MovementFilter();
 
-    void updateFilteringSpeed(const nx::core::ptz::PtzVector& speed);
+    void updateFilteringSpeed(const nx::core::ptz::Vector& speed);
 
     void stopMovement();
 
 private:
-    void setMovementSpeed(const nx::core::ptz::PtzVector& speed);
+    void setMovementSpeed(const nx::core::ptz::Vector& speed);
 
     void onTimeout();
 
@@ -91,8 +91,8 @@ private:
     PtzInstrument* const m_parent = nullptr;
     QnMediaResourceWidget* const m_widget = nullptr;
     QTimer m_filteringTimer;
-    nx::core::ptz::PtzVector m_targetSpeed;
-    nx::core::ptz::PtzVector m_filteringSpeed;
+    nx::core::ptz::Vector m_targetSpeed;
+    nx::core::ptz::Vector m_filteringSpeed;
 };
 
 PtzInstrument::MovementFilter::MovementFilter(
@@ -110,7 +110,7 @@ PtzInstrument::MovementFilter::MovementFilter(
 PtzInstrument::MovementFilter::~MovementFilter()
 {
     m_filteringTimer.stop();
-    setMovementSpeed(nx::core::ptz::PtzVector());
+    setMovementSpeed(nx::core::ptz::Vector());
 }
 
 void PtzInstrument::MovementFilter::onTimeout()
@@ -120,10 +120,10 @@ void PtzInstrument::MovementFilter::onTimeout()
 
 void PtzInstrument::MovementFilter::stopMovement()
 {
-    updateFilteringSpeed(nx::core::ptz::PtzVector());
+    updateFilteringSpeed(nx::core::ptz::Vector());
 }
 
-void PtzInstrument::MovementFilter::updateFilteringSpeed(const nx::core::ptz::PtzVector& speed)
+void PtzInstrument::MovementFilter::updateFilteringSpeed(const nx::core::ptz::Vector& speed)
 {
     if (speed.isNull())
         setMovementSpeed(m_filteringSpeed);
@@ -136,7 +136,7 @@ void PtzInstrument::MovementFilter::updateFilteringSpeed(const nx::core::ptz::Pt
     m_filteringTimer.start(); //< Restarts if it's started already.
 }
 
-void PtzInstrument::MovementFilter::setMovementSpeed(const nx::core::ptz::PtzVector& speed)
+void PtzInstrument::MovementFilter::setMovementSpeed(const nx::core::ptz::Vector& speed)
 {
     if (speed == m_targetSpeed)
         return;
@@ -475,7 +475,7 @@ void PtzInstrument::ptzUnzoom(QnMediaResourceWidget* widget)
     ptzMoveTo(widget, QRectF(widget->rect().center() - toPoint(size) / 2, size));
 }
 
-void PtzInstrument::ptzMove(QnMediaResourceWidget* widget, const nx::core::ptz::PtzVector& speed, bool instant)
+void PtzInstrument::ptzMove(QnMediaResourceWidget* widget, const nx::core::ptz::Vector& speed, bool instant)
 {
     PtzData& data = m_dataByWidget[widget];
     data.requestedSpeed = speed;
@@ -801,9 +801,9 @@ void PtzInstrument::dragMove(DragInfo* info)
             arrowItem->setSize(QSizeF(arrowSize, arrowSize));
 
             if (m_movementFilter)
-                m_movementFilter->updateFilteringSpeed(nx::core::ptz::PtzVector(speed));
+                m_movementFilter->updateFilteringSpeed(nx::core::ptz::Vector(speed));
             else
-                ptzMove(target(), nx::core::ptz::PtzVector(speed));
+                ptzMove(target(), nx::core::ptz::Vector(speed));
 
              break;
         }
@@ -822,11 +822,11 @@ void PtzInstrument::dragMove(DragInfo* info)
             qreal scale = target()->size().width() / 2.0;
             QPointF shift(delta.x() / scale, -delta.y() / scale);
 
-            nx::core::ptz::PtzVector position;
+            nx::core::ptz::Vector position;
             target()->ptzController()->getPosition(Qn::LogicalPtzCoordinateSpace, &position);
 
             qreal speed = 0.5 * position.zoom;
-            nx::core::ptz::PtzVector positionDelta(shift.x() * speed, shift.y() * speed, 0.0, 0.0);
+            nx::core::ptz::Vector positionDelta(shift.x() * speed, shift.y() * speed, 0.0, 0.0);
             target()->ptzController()->absoluteMove(Qn::LogicalPtzCoordinateSpace,
                 position + positionDelta, 2.0); /* 2.0 means instant movement. */
 
@@ -895,7 +895,7 @@ void PtzInstrument::finishDragProcess(DragInfo* info)
                 if (m_movementFilter)
                     m_movementFilter->stopMovement();
                 else
-                    ptzMove(target(), nx::core::ptz::PtzVector());
+                    ptzMove(target(), nx::core::ptz::Vector());
                 break;
 
             case ViewportMovement:
@@ -980,7 +980,7 @@ void PtzInstrument::at_zoomButton_activated(qreal speed)
     PtzImageButtonWidget* button = checked_cast<PtzImageButtonWidget*>(sender());
 
     if (QnMediaResourceWidget* widget = button->target())
-        ptzMove(widget, nx::core::ptz::PtzVector(0.0, 0.0, 0.0, speed), true);
+        ptzMove(widget, nx::core::ptz::Vector(0.0, 0.0, 0.0, speed), true);
 }
 
 void PtzInstrument::at_focusInButton_pressed()

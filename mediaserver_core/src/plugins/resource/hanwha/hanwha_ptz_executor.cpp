@@ -55,11 +55,11 @@ HanwhaPtzExecutor::~HanwhaPtzExecutor()
 {
 }
 
-bool HanwhaPtzExecutor::continuousMove(const nx::core::ptz::PtzVector& speed)
+bool HanwhaPtzExecutor::continuousMove(const nx::core::ptz::Vector& speed)
 {
     HanwhaConfigurationalPtzCommand ptrCommand;
     ptrCommand.command = HanwhaConfigurationalPtzCommandType::focus;
-    ptrCommand.speed = nx::core::ptz::PtzVector(
+    ptrCommand.speed = nx::core::ptz::Vector(
         speed.pan,
         speed.tilt,
         speed.rotation,
@@ -67,7 +67,7 @@ bool HanwhaPtzExecutor::continuousMove(const nx::core::ptz::PtzVector& speed)
 
     HanwhaConfigurationalPtzCommand zoomCommand;
     zoomCommand.command = HanwhaConfigurationalPtzCommandType::focus;
-    zoomCommand.speed = nx::core::ptz::PtzVector(
+    zoomCommand.speed = nx::core::ptz::Vector(
         /*pan*/ 0.0,
         /*tilt*/ 0.0,
         /*rotation*/ 0.0,
@@ -88,7 +88,7 @@ bool HanwhaPtzExecutor::continuousFocus(qreal speed)
     command.command = HanwhaConfigurationalPtzCommandType::focus;
 
     // We use 'zoom' field for both zoom and focus movements.
-    command.speed = nx::core::ptz::PtzVector(/*pan*/ 0, /*tilt*/ 0, /*rotation*/ 0, speed);
+    command.speed = nx::core::ptz::Vector(/*pan*/ 0, /*tilt*/ 0, /*rotation*/ 0, speed);
     return executeFocusCommand(command);
 }
 

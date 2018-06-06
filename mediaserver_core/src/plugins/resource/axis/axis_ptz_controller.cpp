@@ -319,7 +319,7 @@ Ptz::Capabilities QnAxisPtzController::getCapabilities() const
     return m_capabilities;
 }
 
-bool QnAxisPtzController::continuousMove(const nx::core::ptz::PtzVector& speedVector)
+bool QnAxisPtzController::continuousMove(const nx::core::ptz::Vector& speedVector)
 {
     return query(lm("com/ptz.cgi?continuouspantiltmove=%1,%2&continuouszoommove=%3")
         .args(
@@ -330,7 +330,7 @@ bool QnAxisPtzController::continuousMove(const nx::core::ptz::PtzVector& speedVe
 
 bool QnAxisPtzController::absoluteMove(
     Qn::PtzCoordinateSpace space,
-    const nx::core::ptz::PtzVector& position,
+    const nx::core::ptz::Vector& position,
     qreal speed)
 {
     if(space != Qn::LogicalPtzCoordinateSpace)
@@ -346,7 +346,7 @@ bool QnAxisPtzController::absoluteMove(
 
 bool QnAxisPtzController::getPosition(
     Qn::PtzCoordinateSpace space,
-    nx::core::ptz::PtzVector* outPosition)  const
+    nx::core::ptz::Vector* outPosition)  const
 {
     if(space != Qn::LogicalPtzCoordinateSpace)
         return false;

@@ -22,7 +22,7 @@ QnFisheyePtzController::QnFisheyePtzController(QnMediaResourceWidget* widget):
     m_mediaDewarpingParams(widget->dewarpingParams()),
     m_itemDewarpingParams(widget->item()->dewarpingParams())
 {
-    m_unitSpeed = nx::core::ptz::PtzVector(60.0, 60.0, 0.0, 30.0);
+    m_unitSpeed = nx::core::ptz::Vector(60.0, 60.0, 0.0, 30.0);
 
     m_widget = widget;
     m_widget->registerAnimation(this);
@@ -184,7 +184,7 @@ void QnFisheyePtzController::updateItemDewarpingParams()
     }
 }
 
-nx::core::ptz::PtzVector QnFisheyePtzController::boundedPosition(const nx::core::ptz::PtzVector& position)
+nx::core::ptz::Vector QnFisheyePtzController::boundedPosition(const nx::core::ptz::Vector& position)
 {
     auto result = qBound(position, m_limits);
 
@@ -212,16 +212,16 @@ nx::core::ptz::PtzVector QnFisheyePtzController::boundedPosition(const nx::core:
     return result;
 }
 
-nx::core::ptz::PtzVector QnFisheyePtzController::getPositionInternal() const
+nx::core::ptz::Vector QnFisheyePtzController::getPositionInternal() const
 {
-    return nx::core::ptz::PtzVector(
+    return nx::core::ptz::Vector(
         qRadiansToDegrees(m_itemDewarpingParams.xAngle),
         qRadiansToDegrees(m_itemDewarpingParams.yAngle),
         0.0, //< Rotation is not implemented.
         qRadiansToDegrees(m_itemDewarpingParams.fov));
 }
 
-void QnFisheyePtzController::absoluteMoveInternal(const nx::core::ptz::PtzVector& position)
+void QnFisheyePtzController::absoluteMoveInternal(const nx::core::ptz::Vector& position)
 {
     m_itemDewarpingParams.xAngle = qDegreesToRadians(position.pan);
     m_itemDewarpingParams.yAngle = qDegreesToRadians(position.tilt);
@@ -237,7 +237,7 @@ void QnFisheyePtzController::tick(int deltaMSecs)
 {
     if (m_animationMode == SpeedAnimation)
     {
-        nx::core::ptz::PtzVector speed = m_speed * m_unitSpeed;
+        nx::core::ptz::Vector speed = m_speed * m_unitSpeed;
         absoluteMoveInternal(boundedPosition(getPositionInternal() + speed * deltaMSecs / 1000.0));
     }
     else if (m_animationMode == PositionAnimation)
@@ -277,7 +277,7 @@ bool QnFisheyePtzController::getFlip(Qt::Orientations* flip) const
     return true;
 }
 
-bool QnFisheyePtzController::continuousMove(const nx::core::ptz::PtzVector& speed)
+bool QnFisheyePtzController::continuousMove(const nx::core::ptz::Vector& speed)
 {
     m_speed = speed;
     m_speed.zoom = -m_speed.zoom; /* Positive speed means that fov should decrease. */
@@ -297,13 +297,13 @@ bool QnFisheyePtzController::continuousMove(const nx::core::ptz::PtzVector& spee
 
 bool QnFisheyePtzController::absoluteMove(
     Qn::PtzCoordinateSpace space,
-    const nx::core::ptz::PtzVector& position,
+    const nx::core::ptz::Vector& position,
     qreal speed)
 {
     if (space != Qn::LogicalPtzCoordinateSpace)
         return false;
 
-    m_speed = nx::core::ptz::PtzVector();
+    m_speed = nx::core::ptz::Vector();
     stopListening();
 
     if (!qFuzzyEquals(speed, 1.0) && speed > 1.0)
@@ -347,7 +347,7 @@ bool QnFisheyePtzController::absoluteMove(
 
 bool QnFisheyePtzController::getPosition(
     Qn::PtzCoordinateSpace space,
-    nx::core::ptz::PtzVector* outPosition) const
+    nx::core::ptz::Vector* outPosition) const
 {
     if (space != Qn::LogicalPtzCoordinateSpace)
         return false;
@@ -357,7 +357,7 @@ bool QnFisheyePtzController::getPosition(
     return true;
 }
 
-nx::core::ptz::PtzVector QnFisheyePtzController::positionFromRect(
+nx::core::ptz::Vector QnFisheyePtzController::positionFromRect(
     const QnMediaDewarpingParams &dewarpingParams,
     const QRectF& rect)
 {
@@ -371,7 +371,7 @@ nx::core::ptz::PtzVector QnFisheyePtzController::positionFromRect(
     {
         qreal x = center.x() * M_PI;
         qreal y = -center.y() * M_PI;
-        return nx::core::ptz::PtzVector(
+        return nx::core::ptz::Vector(
             qRadiansToDegrees(x),
             qRadiansToDegrees(y),
             0.0, //< Rotation is not implemented.
@@ -394,7 +394,7 @@ nx::core::ptz::PtzVector QnFisheyePtzController::positionFromRect(
             : rect.top() * M_PI;
     }
 
-    return nx::core::ptz::PtzVector(
+    return nx::core::ptz::Vector(
         qRadiansToDegrees(x),
         qRadiansToDegrees(y),
         0.0, //< Rotation is not implemented.

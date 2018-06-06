@@ -20,17 +20,17 @@ public:
 
     virtual Ptz::Capabilities getCapabilities() const override;
 
-    virtual bool continuousMove(const nx::core::ptz::PtzVector& speed) override;
+    virtual bool continuousMove(const nx::core::ptz::Vector& speed) override;
     virtual bool continuousFocus(qreal speed) override;
 
     virtual bool absoluteMove(
         Qn::PtzCoordinateSpace space,
-        const nx::core::ptz::PtzVector& position,
+        const nx::core::ptz::Vector& position,
         qreal speed) override;
 
     virtual bool getPosition(
         Qn::PtzCoordinateSpace space,
-        nx::core::ptz::PtzVector* outPosition) const override;
+        nx::core::ptz::Vector* outPosition) const override;
 
     virtual bool getLimits(Qn::PtzCoordinateSpace space, QnPtzLimits *limits) const override;
     virtual bool getFlip(Qt::Orientations *flip) const override;
@@ -57,7 +57,7 @@ private:
     bool readBuiltinPresets();
 
     bool stopInternal();
-    bool moveInternal(const nx::core::ptz::PtzVector& speedVector);
+    bool moveInternal(const nx::core::ptz::Vector& speedVector);
     QString presetToken(const QString &presetId);
     QString presetName(const QString &presetId);
 

@@ -48,7 +48,7 @@ QnDwPtzController::~QnDwPtzController() {
     return;
 }
 
-bool QnDwPtzController::continuousMove(const nx::core::ptz::PtzVector& speedVector)
+bool QnDwPtzController::continuousMove(const nx::core::ptz::Vector& speedVector)
 {
     auto localSpeed = speedVector;
 

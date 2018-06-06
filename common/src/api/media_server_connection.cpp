@@ -547,7 +547,7 @@ void QnMediaServerConnection::addOldVersionPtzParams(
 
 int QnMediaServerConnection::ptzContinuousMoveAsync(
     const QnNetworkResourcePtr& camera,
-    const nx::core::ptz::PtzVector& speed,
+    const nx::core::ptz::Vector& speed,
     const QnUuid& sequenceId,
     int sequenceNumber,
     QObject* target,
@@ -582,7 +582,7 @@ int QnMediaServerConnection::ptzContinuousFocusAsync(
 int QnMediaServerConnection::ptzAbsoluteMoveAsync(
     const QnNetworkResourcePtr& camera,
     Qn::PtzCoordinateSpace space,
-    const nx::core::ptz::PtzVector& position,
+    const nx::core::ptz::Vector& position,
     qreal speed,
     const QnUuid& sequenceId,
     int sequenceNumber,

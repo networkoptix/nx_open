@@ -27,15 +27,15 @@ public:
 
     virtual Ptz::Capabilities getCapabilities() const override;
 
-    virtual bool continuousMove(const nx::core::ptz::PtzVector& speedVector) override;
+    virtual bool continuousMove(const nx::core::ptz::Vector& speedVector) override;
     virtual bool absoluteMove(
         Qn::PtzCoordinateSpace space,
-        const nx::core::ptz::PtzVector& position,
+        const nx::core::ptz::Vector& position,
         qreal speed) override;
 
     virtual bool getPosition(
         Qn::PtzCoordinateSpace space,
-        nx::core::ptz::PtzVector* outPosition) const override;
+        nx::core::ptz::Vector* outPosition) const override;
 
     virtual bool getLimits(Qn::PtzCoordinateSpace space, QnPtzLimits* limits) const override;
     virtual bool getFlip(Qt::Orientations* flip) const override;
@@ -43,7 +43,7 @@ public:
     QnMediaDewarpingParams mediaDewarpingParams() const;
     QnItemDewarpingParams itemDewarpingParams() const;
 
-    static nx::core::ptz::PtzVector positionFromRect(
+    static nx::core::ptz::Vector positionFromRect(
         const QnMediaDewarpingParams& dewarpingParams,
         const QRectF& rect);
 
@@ -60,9 +60,9 @@ private:
     Q_SLOT void updateMediaDewarpingParams();
     Q_SLOT void updateItemDewarpingParams();
 
-    nx::core::ptz::PtzVector boundedPosition(const nx::core::ptz::PtzVector& position);
-    nx::core::ptz::PtzVector getPositionInternal() const;
-    void absoluteMoveInternal(const nx::core::ptz::PtzVector& position);
+    nx::core::ptz::Vector boundedPosition(const nx::core::ptz::Vector& position);
+    nx::core::ptz::Vector getPositionInternal() const;
+    void absoluteMoveInternal(const nx::core::ptz::Vector& position);
 
 private:
     enum AnimationMode
@@ -75,7 +75,7 @@ private:
     QPointer<QnMediaResourceWidget> m_widget;
     QPointer<QnResourceWidgetRenderer> m_renderer;
     Ptz::Capabilities m_capabilities;
-    nx::core::ptz::PtzVector m_unitSpeed;
+    nx::core::ptz::Vector m_unitSpeed;
 
     QnPtzLimits m_limits;
     bool m_unlimitedPan;
@@ -83,9 +83,9 @@ private:
     qreal m_aspectRatio;
 
     AnimationMode m_animationMode;
-    nx::core::ptz::PtzVector m_speed;
-    nx::core::ptz::PtzVector m_startPosition;
-    nx::core::ptz::PtzVector m_endPosition;
+    nx::core::ptz::Vector m_speed;
+    nx::core::ptz::Vector m_startPosition;
+    nx::core::ptz::Vector m_endPosition;
     qreal m_relativeSpeed;
     qreal m_progress;
 

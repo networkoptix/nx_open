@@ -33,9 +33,9 @@ std::optional<QString> convertPresets(const QString& oldSerializedPresets)
 
         QnPtzPresetData convertedData;
         convertedData.space = record.data.space;
-        convertedData.position = nx::core::ptz::PtzVector(
+        convertedData.position = nx::core::ptz::Vector(
             record.data.position,
-            nx::core::ptz::PtzVector::kPtzComponents);
+            nx::core::ptz::Vector::kPtzComponents);
 
         QnPtzPresetRecord convertedRecord;
         convertedRecord.preset = record.preset;

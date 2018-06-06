@@ -11,7 +11,7 @@
 
 #include <utils/math/math.h>
 
-#include <nx/core/ptz/ptz_vector.h>
+#include <nx/core/ptz/vector.h>
 
 struct QnPtzLimits: public boost::equality_comparable1<QnPtzLimits>
 {
@@ -91,8 +91,8 @@ inline QVector3D qBound(const QVector3D &position, const QnPtzLimits &limits) {
 }
 #endif
 
-inline nx::core::ptz::PtzVector qBound(
-    const nx::core::ptz::PtzVector& position,
+inline nx::core::ptz::Vector qBound(
+    const nx::core::ptz::Vector& position,
     const QnPtzLimits& limits)
 {
     bool unlimitedPan = false;
@@ -133,7 +133,7 @@ inline nx::core::ptz::PtzVector qBound(
         pan = bestPan;
     }
 
-    return nx::core::ptz::PtzVector(
+    return nx::core::ptz::Vector(
         pan,
         qBound<float>(limits.minTilt, position.tilt, limits.maxTilt),
         qBound<float>(limits.minRotation, position.rotation, limits.maxRotation),

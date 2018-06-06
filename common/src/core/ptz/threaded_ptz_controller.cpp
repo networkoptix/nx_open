@@ -121,7 +121,7 @@ Ptz::Capabilities QnThreadedPtzController::getCapabilities() const
     return extends(capabilities) ? (capabilities | Ptz::AsynchronousPtzCapability) : capabilities;
 }
 
-bool QnThreadedPtzController::continuousMove(const nx::core::ptz::PtzVector& speed)
+bool QnThreadedPtzController::continuousMove(const nx::core::ptz::Vector& speed)
 {
     RUN_COMMAND(Qn::ContinuousMovePtzCommand, void* , speed, continuousMove, speed);
 }
@@ -133,7 +133,7 @@ bool QnThreadedPtzController::continuousFocus(qreal speed)
 
 bool QnThreadedPtzController::absoluteMove(
     Qn::PtzCoordinateSpace space,
-    const nx::core::ptz::PtzVector& position,
+    const nx::core::ptz::Vector& position,
     qreal speed)
 {
     RUN_COMMAND(spaceCommand(Qn::AbsoluteDeviceMovePtzCommand, space), void*,
@@ -148,9 +148,9 @@ bool QnThreadedPtzController::viewportMove(qreal aspectRatio, const QRectF& view
 
 bool QnThreadedPtzController::getPosition(
     Qn::PtzCoordinateSpace space,
-    nx::core::ptz::PtzVector* /*position*/) const
+    nx::core::ptz::Vector* /*position*/) const
 {
-    RUN_COMMAND(spaceCommand(Qn::GetDevicePositionPtzCommand, space), nx::core::ptz::PtzVector,
+    RUN_COMMAND(spaceCommand(Qn::GetDevicePositionPtzCommand, space), nx::core::ptz::Vector,
         result, getPosition, space, &result);
 }
 

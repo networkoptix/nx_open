@@ -2,14 +2,14 @@
 
 #include <map>
 
-#include <nx/core/ptz/ptz_vector.h>
+#include <nx/core/ptz/vector.h>
 #include <utils/math/space_mapper.h>
 
 namespace nx {
 namespace core {
 namespace ptz {
 
-class SpaceMapper: public QnSpaceMapper<PtzVector>
+class SpaceMapper: public QnSpaceMapper<Vector>
 {
 public:
     SpaceMapper(
@@ -18,9 +18,9 @@ public:
         const QnSpaceMapperPtr<qreal>& rotationMapper,
         const QnSpaceMapperPtr<qreal>& zoomMapper);
 
-    virtual PtzVector sourceToTarget(const PtzVector& source) const override;
+    virtual Vector sourceToTarget(const Vector& source) const override;
 
-    virtual PtzVector targetToSource(const PtzVector& target) const override;
+    virtual Vector targetToSource(const Vector& target) const override;
 
 private:
     std::map<QString, QnSpaceMapperPtr<qreal>> m_mappers;

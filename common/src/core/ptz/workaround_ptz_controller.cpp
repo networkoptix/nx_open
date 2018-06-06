@@ -49,7 +49,7 @@ Ptz::Capabilities QnWorkaroundPtzController::getCapabilities() const
     return (base_type::getCapabilities() | m_capabilitiesToAdd) & ~m_capabilitiesToRemove;
 }
 
-bool QnWorkaroundPtzController::continuousMove(const nx::core::ptz::PtzVector& speed)
+bool QnWorkaroundPtzController::continuousMove(const nx::core::ptz::Vector& speed)
 {
     if(!m_overrideContinuousMove)
         return base_type::continuousMove(speed);
@@ -74,7 +74,7 @@ bool QnWorkaroundPtzController::continuousMove(const nx::core::ptz::PtzVector& s
         if(qFuzzyIsNull(cartesianSpeed.y()))
             cartesianSpeed.setY(0.0);
 
-        localSpeed = nx::core::ptz::PtzVector(
+        localSpeed = nx::core::ptz::Vector(
             cartesianSpeed.x(),
             cartesianSpeed.y(),
             localSpeed.rotation,

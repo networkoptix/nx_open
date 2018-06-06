@@ -96,7 +96,7 @@ private:
 };
 
 
-bool getDevicePosition(const QnPtzControllerPtr &controller, nx::core::ptz::PtzVector* outPosition)
+bool getDevicePosition(const QnPtzControllerPtr &controller, nx::core::ptz::Vector* outPosition)
 {
     if (!controller->hasCapabilities(Ptz::AsynchronousPtzCapability))
     {
@@ -114,7 +114,7 @@ bool getDevicePosition(const QnPtzControllerPtr &controller, nx::core::ptz::PtzV
                 {
                     result = data.isValid();
                     if (result)
-                        *outPosition = data.value<nx::core::ptz::PtzVector>();
+                        *outPosition = data.value<nx::core::ptz::Vector>();
                     eventLoop.exit();
                 }
             };
@@ -324,7 +324,7 @@ void QnWorkbenchPtzHandler::at_debugCalibratePtzAction_triggered()
 
     QnPtzControllerPtr controller = widget->ptzController();
 
-    nx::core::ptz::PtzVector position;
+    nx::core::ptz::Vector position;
     if (!getDevicePosition(controller, &position))
         return;
 
@@ -343,7 +343,7 @@ void QnWorkbenchPtzHandler::at_debugCalibratePtzAction_triggered()
         if (!guard || !itemGuard)
             break;
 
-        nx::core::ptz::PtzVector cameraPosition;
+        nx::core::ptz::Vector cameraPosition;
         getDevicePosition(controller, &cameraPosition);
         qDebug() << "SENT POSITION" << position << "GOT POSITION" << cameraPosition;
 
@@ -364,7 +364,7 @@ void QnWorkbenchPtzHandler::at_debugGetPtzPositionAction_triggered()
         return;
     QnPtzControllerPtr controller = widget->ptzController();
 
-    nx::core::ptz::PtzVector position;
+    nx::core::ptz::Vector position;
     if (!getDevicePosition(controller, &position))
     {
         qDebug() << "COULD NOT GET POSITION";
@@ -409,7 +409,7 @@ void QnWorkbenchPtzHandler::at_ptzContinuousMoveAction_triggered()
         + (item->data<bool>(Qn::ItemFlipRole, false) ? 0.0 : 180.0);
     speed = applyRotation(speed, rotation);
 
-    nx::core::ptz::PtzVector speedVector(speed.x(), speed.y(), 0.0, speed.z());
+    nx::core::ptz::Vector speedVector(speed.x(), speed.y(), 0.0, speed.z());
     controller->continuousMove(speedVector);
 }
 

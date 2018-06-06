@@ -1,4 +1,4 @@
-#include "ptz_space_mapper.h"
+#include "space_mapper.h"
 
 namespace nx {
 namespace core {
@@ -28,18 +28,18 @@ SpaceMapper::SpaceMapper(
 {
 }
 
-PtzVector SpaceMapper::sourceToTarget(const PtzVector& source) const
+Vector SpaceMapper::sourceToTarget(const Vector& source) const
 {
-    return PtzVector(
+    return Vector(
         m_mappers.at(kPan)->sourceToTarget(source.pan),
         m_mappers.at(kTilt)->sourceToTarget(source.tilt),
         m_mappers.at(kRotation)->sourceToTarget(source.rotation),
         m_mappers.at(kZoom)->sourceToTarget(source.zoom));
 }
 
-PtzVector SpaceMapper::targetToSource(const PtzVector& target) const
+Vector SpaceMapper::targetToSource(const Vector& target) const
 {
-    return PtzVector(
+    return Vector(
         m_mappers.at(kPan)->targetToSource(target.pan),
         m_mappers.at(kTilt)->targetToSource(target.tilt),
         m_mappers.at(kRotation)->targetToSource(target.rotation),

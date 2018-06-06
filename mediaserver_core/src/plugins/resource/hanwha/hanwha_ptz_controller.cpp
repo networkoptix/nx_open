@@ -59,7 +59,7 @@ void HanwhaPtzController::setAlternativePtzRanges(
     m_alternativePtzExecutor = std::make_unique<HanwhaPtzExecutor>(m_hanwhaResource, ranges);
 }
 
-bool HanwhaPtzController::continuousMove(const nx::core::ptz::PtzVector& speedVector)
+bool HanwhaPtzController::continuousMove(const nx::core::ptz::Vector& speedVector)
 {
     const bool needToUseAlternativePtz = m_ptzTraits.contains(kHanwhaAlternativePanTrait)
         || m_ptzTraits.contains(kHanwhaAlternativeTiltTrait)
@@ -124,7 +124,7 @@ bool HanwhaPtzController::continuousFocus(qreal speed)
 
 bool HanwhaPtzController::absoluteMove(
     Qn::PtzCoordinateSpace space,
-    const nx::core::ptz::PtzVector& position,
+    const nx::core::ptz::Vector& position,
     qreal /*speed*/)
 {
     if (space != Qn::DevicePtzCoordinateSpace)
@@ -157,7 +157,7 @@ bool HanwhaPtzController::viewportMove(qreal aspectRatio, const QRectF& viewport
 
 bool HanwhaPtzController::getPosition(
     Qn::PtzCoordinateSpace space,
-    nx::core::ptz::PtzVector* outPosition) const
+    nx::core::ptz::Vector* outPosition) const
 {
     if (space != Qn::DevicePtzCoordinateSpace)
         return false;
@@ -291,10 +291,10 @@ QString HanwhaPtzController::channel() const
     return QString::number(m_hanwhaResource->getChannel());
 }
 
-nx::core::ptz::PtzVector HanwhaPtzController::toHanwhaSpeed(
-    const nx::core::ptz::PtzVector& speed) const
+nx::core::ptz::Vector HanwhaPtzController::toHanwhaSpeed(
+    const nx::core::ptz::Vector& speed) const
 {
-    nx::core::ptz::PtzVector outSpeed;
+    nx::core::ptz::Vector outSpeed;
 
     auto toNativeSpeed = [](float maxNegativeSpeed, float maxPositiveSpeed, float normalizedValue)
     {
@@ -324,8 +324,8 @@ nx::core::ptz::PtzVector HanwhaPtzController::toHanwhaSpeed(
     return outSpeed;
 }
 
-nx::core::ptz::PtzVector HanwhaPtzController::toHanwhaPosition(
-    const nx::core::ptz::PtzVector& position) const
+nx::core::ptz::Vector HanwhaPtzController::toHanwhaPosition(
+    const nx::core::ptz::Vector& position) const
 {
     return position; //< TODO: #dmishin implement
 }

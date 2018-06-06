@@ -55,7 +55,7 @@ Ptz::Capabilities QnTourPtzController::getCapabilities() const
     return extends(capabilities) ? (capabilities | Ptz::ToursPtzCapability) : capabilities;
 }
 
-bool QnTourPtzController::continuousMove(const nx::core::ptz::PtzVector& speed)
+bool QnTourPtzController::continuousMove(const nx::core::ptz::Vector& speed)
 {
     if (!supports(Qn::ContinuousMovePtzCommand))
         return false;
@@ -66,7 +66,7 @@ bool QnTourPtzController::continuousMove(const nx::core::ptz::PtzVector& speed)
 
 bool QnTourPtzController::absoluteMove(
     Qn::PtzCoordinateSpace space,
-    const nx::core::ptz::PtzVector& position,
+    const nx::core::ptz::Vector& position,
     qreal speed)
 {
     if (!supports(spaceCommand(Qn::AbsoluteDeviceMovePtzCommand, space)))

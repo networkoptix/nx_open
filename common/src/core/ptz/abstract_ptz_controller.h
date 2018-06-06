@@ -15,7 +15,7 @@
 #include <core/resource/resource_fwd.h>
 #include <utils/common/connective.h>
 
-#include <nx/core/ptz/ptz_vector.h>
+#include <nx/core/ptz/vector.h>
 
 /**
  * A thread-safe blocking interface for accessing camera's PTZ functions.
@@ -72,7 +72,7 @@ public slots: //< Class is exposed to QML. All functions in section below are in
      * @param speed Movement speed.
      * @returns Whether the operation was successful.
      */
-    virtual bool continuousMove(const nx::core::ptz::PtzVector& speed) = 0;
+    virtual bool continuousMove(const nx::core::ptz::Vector& speed) = 0;
 
     /**
      * Starts or stops continuous focus movement.
@@ -108,7 +108,7 @@ public slots: //< Class is exposed to QML. All functions in section below are in
      */
     virtual bool absoluteMove(
         Qn::PtzCoordinateSpace space,
-        const nx::core::ptz::PtzVector& position,
+        const nx::core::ptz::Vector& position,
         qreal speed) = 0;
 
     /**
@@ -142,7 +142,7 @@ public slots: //< Class is exposed to QML. All functions in section below are in
      */
     virtual bool getPosition(
         Qn::PtzCoordinateSpace space,
-        nx::core::ptz::PtzVector* outPosition) const = 0;
+        nx::core::ptz::Vector* outPosition) const = 0;
 
     /**
      * Gets PTZ limits of the camera.

@@ -407,7 +407,7 @@ void QnPtzManageDialog::saveData()
         {
             // #TODO: #dklychkov evil hack to reset active object.
             // We should implement an adequate way to do this
-            controller()->continuousMove(nx::core::ptz::PtzVector());
+            controller()->continuousMove(nx::core::ptz::Vector());
         }
     }
 }

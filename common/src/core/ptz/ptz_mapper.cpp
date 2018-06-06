@@ -6,7 +6,7 @@
 #include <utils/math/math.h>
 #include <nx/fusion/model_functions.h>
 
-#include <nx/core/ptz/ptz_space_mapper.h>
+#include <nx/core/ptz/space_mapper.h>
 
 #include "ptz_math.h"
 
@@ -21,8 +21,8 @@ typedef std::array<QnSpaceMapperPtr<qreal>, 4> PtzMapperPart;
 
 
 QnPtzMapper::QnPtzMapper(
-    const QnSpaceMapperPtr<nx::core::ptz::PtzVector>& inputMapper,
-    const QnSpaceMapperPtr<nx::core::ptz::PtzVector>& outputMapper)
+    const QnSpaceMapperPtr<nx::core::ptz::Vector>& inputMapper,
+    const QnSpaceMapperPtr<nx::core::ptz::Vector>& outputMapper)
     :
     m_inputMapper(inputMapper),
     m_outputMapper(outputMapper)
@@ -33,7 +33,7 @@ QnPtzMapper::QnPtzMapper(
     for(int pan = -360; pan <= 360; pan++)
     {
         const auto pos = m_inputMapper->sourceToTarget(
-            m_inputMapper->targetToSource(nx::core::ptz::PtzVector(pan, 0, 0, 0)));
+            m_inputMapper->targetToSource(nx::core::ptz::Vector(pan, 0, 0, 0)));
 
         minPan = qMin(pos.pan, minPan);
         maxPan = qMax(pos.tilt, maxPan);
@@ -52,10 +52,10 @@ QnPtzMapper::QnPtzMapper(
     }
 
     auto lo = m_inputMapper->sourceToTarget(
-        m_inputMapper->targetToSource(nx::core::ptz::PtzVector(0,-90, 0, 0)));
+        m_inputMapper->targetToSource(nx::core::ptz::Vector(0,-90, 0, 0)));
 
     auto hi = m_inputMapper->sourceToTarget(m_inputMapper->targetToSource(
-        nx::core::ptz::PtzVector(0, 90, 0, 360)));
+        nx::core::ptz::Vector(0, 90, 0, 360)));
 
     m_logicalLimits.minTilt = lo.tilt;
     m_logicalLimits.maxTilt = hi.tilt;
@@ -178,10 +178,10 @@ bool deserialize(QnJsonContext *ctx, const QJsonValue &value, QnPtzMapperPtr *ta
             output[i] = input[i];
     }
 
-    QnSpaceMapperPtr<nx::core::ptz::PtzVector> inputMapper(
+    QnSpaceMapperPtr<nx::core::ptz::Vector> inputMapper(
         new nx::core::ptz::SpaceMapper(input[0], input[1], input[2], input[3]));
 
-    QnSpaceMapperPtr<nx::core::ptz::PtzVector> outputMapper(
+    QnSpaceMapperPtr<nx::core::ptz::Vector> outputMapper(
         new nx::core::ptz::SpaceMapper(output[0], output[1], output[2], output[3]));
 
     *target = QnPtzMapperPtr(new QnPtzMapper(inputMapper, outputMapper));

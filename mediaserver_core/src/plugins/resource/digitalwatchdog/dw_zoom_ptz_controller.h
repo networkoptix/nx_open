@@ -13,7 +13,7 @@ public:
     virtual ~QnDwZoomPtzController();
 
     virtual Ptz::Capabilities getCapabilities() const override;
-    virtual bool continuousMove(const nx::core::ptz::PtzVector& speedVector) override;
+    virtual bool continuousMove(const nx::core::ptz::Vector& speedVector) override;
 
 private:
     QnDigitalWatchdogResourcePtr m_resource;

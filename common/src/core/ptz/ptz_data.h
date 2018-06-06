@@ -14,7 +14,7 @@
 #include "ptz_object.h"
 #include "ptz_auxilary_trait.h"
 
-#include <nx/core/ptz/ptz_vector.h>
+#include <nx/core/ptz/vector.h>
 
 struct QnPtzData {
     QnPtzData() {}
@@ -23,8 +23,8 @@ struct QnPtzData {
     Qn::PtzDataFields query;    /**< Fields that were queried from the underlying PTZ controller to fill this data object. */
     Qn::PtzDataFields fields;   /**< Fields that are valid in this data object. */
     Ptz::Capabilities capabilities;
-    nx::core::ptz::PtzVector logicalPosition;
-    nx::core::ptz::PtzVector devicePosition;
+    nx::core::ptz::Vector logicalPosition;
+    nx::core::ptz::Vector devicePosition;
     QnPtzLimits logicalLimits;
     QnPtzLimits deviceLimits;
     Qt::Orientations flip;

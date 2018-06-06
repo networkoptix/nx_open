@@ -51,7 +51,7 @@ Ptz::Capabilities QnThirdPartyPtzController::getCapabilities() const
     return m_capabilities;
 }
 
-bool QnThirdPartyPtzController::continuousMove(const nx::core::ptz::PtzVector& speedVector)
+bool QnThirdPartyPtzController::continuousMove(const nx::core::ptz::Vector& speedVector)
 {
     return m_cameraPtzManager->continuousMove(
         speedVector.pan,
@@ -61,7 +61,7 @@ bool QnThirdPartyPtzController::continuousMove(const nx::core::ptz::PtzVector& s
 
 bool QnThirdPartyPtzController::absoluteMove(
     Qn::PtzCoordinateSpace space,
-    const nx::core::ptz::PtzVector& position,
+    const nx::core::ptz::Vector& position,
     qreal speed)
 {
     return m_cameraPtzManager->absoluteMove(
@@ -76,7 +76,7 @@ bool QnThirdPartyPtzController::absoluteMove(
 
 bool QnThirdPartyPtzController::getPosition(
     Qn::PtzCoordinateSpace space,
-    nx::core::ptz::PtzVector* outPosition) const
+    nx::core::ptz::Vector* outPosition) const
 {
     return m_cameraPtzManager->getPosition(
         space == Qn::DevicePtzCoordinateSpace

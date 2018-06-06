@@ -15,7 +15,7 @@
 #include <core/ptz/ptz_preset.h>
 #include <nx/fusion/model_functions_fwd.h>
 
-#include <nx/core/ptz/ptz_vector.h>
+#include <nx/core/ptz/vector.h>
 
 static const QString kPresetsPropertyKey = lit("ptzPresets");
 static const QString kPtzPresetMappingPropertyName = lit("presetMapping");
@@ -45,7 +45,7 @@ struct QnPtzPresetData
 {
     QnPtzPresetData(): space(Qn::DevicePtzCoordinateSpace) {}
 
-    nx::core::ptz::PtzVector position;
+    nx::core::ptz::Vector position;
     Qn::PtzCoordinateSpace space;
     bool isValid = true;
 };
