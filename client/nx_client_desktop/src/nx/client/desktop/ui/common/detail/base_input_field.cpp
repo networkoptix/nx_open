@@ -158,7 +158,7 @@ bool BaseInputFieldPrivate::eventFilter(QObject* watched, QEvent* event)
         {
             // Ensure input is polished.
             const auto callback = [this](){ defaultPalette = input->palette(); };
-            executeLater(guarded<decltype(callback)>(this, callback), this);
+            executeLater(guarded(this, callback), this);
             break;
         }
         case QEvent::FocusIn:
