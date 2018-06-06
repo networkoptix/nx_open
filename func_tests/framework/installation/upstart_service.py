@@ -2,6 +2,7 @@ import logging
 import re
 
 from framework.installation.service import Service, ServiceStatus
+from framework.os_access.exceptions import Timeout
 from framework.os_access.posix_shell import SSH
 
 _logger = logging.getLogger(__name__)
@@ -35,7 +36,17 @@ class UpstartService(Service):
         self._ssh.run_command(['start', self._service_name], timeout_sec=self._start_timeout_sec)
 
     def stop(self):
-        self._ssh.run_command(['stop', self._service_name], timeout_sec=self._stop_timeout_sec)
+        command = ['stop', self._service_name]
+        try:
+            self._ssh.run_command(command, timeout_sec=self._stop_timeout_sec)
+        except Timeout:
+            status = self.status()
+            _logger.error("`%s` hasn't existed properly.", ' '.join(command))
+            if status.pid is None:
+                _logger.error("Process doesn't exist anymore.")
+            else:
+                _logger.error("Kill process %d with SIGKILL.", status.pid)
+                self._ssh.run_command(['kill', '-s', 'SIGKILL', status.pid])
 
     def status(self):
         command = ['status', self._service_name]
