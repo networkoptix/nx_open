@@ -26,7 +26,7 @@ class MediaEncoder
     public nxcip::CameraMediaEncoder2
 {
 public:
-    MediaEncoder(CameraManager* const cameraManager, 
+    MediaEncoder(CameraManager* const cameraManager,
                  nxpl::TimeProvider *const timeProvider,
                  int encoderNumber );
     virtual ~MediaEncoder();
@@ -40,6 +40,8 @@ public:
 
     //!Implementation of nxcip::CameraMediaEncoder::getMediaUrl
     virtual int getMediaUrl( char* urlBuf ) const override;
+    //!Implementation of nxcip::CameraMediaEncoder::setMediaUrl
+    virtual int setMediaUrl(const char url[nxcip::MAX_TEXT_LEN]) override;
     //!Implementation of nxcip::CameraMediaEncoder::getResolutionList
     virtual int getResolutionList( nxcip::ResolutionInfo* infoList, int* infoListCount ) const override;
     //!Implementation of nxcip::CameraMediaEncoder::getMaxBitrate
@@ -56,8 +58,9 @@ public:
     //!Implementation of nxcip::CameraMediaEncoder2::getAudioFormat
     virtual int getAudioFormat( nxcip::AudioFormat* audioFormat ) const override;
 
-    void updateCameraInfo( const nxcip::CameraInfo& info );
-
+    void updateCredentials(const QString& login, const QString& password);
+private:
+    QString getMediaUrlInternal() const;
 private:
     nxpt::CommonRefManager m_refManager;
     CameraManager* m_cameraManager;
@@ -66,6 +69,7 @@ private:
     int m_encoderNumber;
     QSize m_resolution;
     float m_currentFps;
+    QString m_mediaUrl;
 };
 
 #endif  //ILP_MEDIA_ENCODER_H
