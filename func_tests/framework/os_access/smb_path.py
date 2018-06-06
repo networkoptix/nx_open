@@ -1,12 +1,10 @@
 import logging
 import string
 from abc import ABCMeta, abstractproperty
-from contextlib import closing
 from functools import wraps
 from io import BytesIO
 
 from netaddr import IPAddress
-from nmb.NetBIOS import NetBIOS
 from pathlib2 import PureWindowsPath
 from smb.SMBConnection import SMBConnection
 from smb.smb_structs import OperationFailure
