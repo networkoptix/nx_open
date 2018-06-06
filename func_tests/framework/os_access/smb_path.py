@@ -240,7 +240,6 @@ class SMBPath(FileSystemPath, PureWindowsPath):
         })
     def read_bytes(self):
         # TODO: Speedup. Speed is ~1.4 MB/sec. Full dumps are ~300 MB.
-        # Direct sharing (port 445) doesn't help.
         # Performance is not mentioned on pysmb page.
         ad_hoc_file_object = BytesIO()
         _attributes, bytes_read = self._smb_connection_pool.connection().retrieveFile(
