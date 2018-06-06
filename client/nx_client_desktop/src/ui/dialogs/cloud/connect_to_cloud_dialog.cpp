@@ -275,7 +275,7 @@ void QnConnectToCloudDialogPrivate::showSuccess(const QString& /*cloudLogin*/)
     linkedSuccessfully = true;
     q->menu()->trigger(action::HideCloudPromoAction);
 
-    QnMessageBox::success(q->parentWidget(),
+    QnMessageBox::success(q,
         tr("System connected to %1", "%1 is the cloud name (like Nx Cloud)")
             .arg(nx::network::AppInfo::cloudName()));
 

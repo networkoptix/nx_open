@@ -187,7 +187,10 @@ void ManagerPool::at_rulesUpdated(const QSet<QnUuid>& affectedResources)
             ->resourcePool()
             ->getResourceById(resourceId);
 
-        handleResourceChanges(resource);
+        if (!resource)
+            releaseResourceMetadataManagers(resourceId);
+        else
+            handleResourceChanges(resource);
     }
 }
 
@@ -328,8 +331,13 @@ CameraManager* ManagerPool::createMetadataManager(
 void ManagerPool::releaseResourceMetadataManagers(const QnSecurityCamResourcePtr& resource)
 {
     const auto id = resource->getId();
-    const auto removedCount = m_contexts.erase(id);
-    NX_DEBUG(this, lm("Camera %1 lost all %2 managers %2").args(id, removedCount));
+    releaseResourceMetadataManagers(id);
+}
+
+void ManagerPool::releaseResourceMetadataManagers(const QnUuid & resourceId)
+{
+    const auto removedCount = m_contexts.erase(resourceId);
+    NX_DEBUG(this, lm("Camera %1 lost all %2 managers %2").args(resourceId, removedCount));
 }
 
 MetadataHandler* ManagerPool::createMetadataHandler(
@@ -355,6 +363,10 @@ MetadataHandler* ManagerPool::createMetadataHandler(
 
 void ManagerPool::handleResourceChanges(const QnResourcePtr& resource)
 {
+    NX_ASSERT(resource);
+    if (!resource)
+        return;
+
     NX_VERBOSE(
         this,
         lm("Handling resource changes for resource %1 (%2)")
@@ -362,9 +374,7 @@ void ManagerPool::handleResourceChanges(const QnResourcePtr& resource)
 
     auto camera = resource.dynamicCast<QnSecurityCamResource>();
     if (!camera)
-    {
         return;
-    }
 
     releaseResourceMetadataManagers(camera);
     if (canFetchMetadataFromResource(camera))
