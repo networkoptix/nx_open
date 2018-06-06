@@ -447,7 +447,8 @@ QPair<QString, QString> QnAuthHelper::createAuthenticationQueryItemForPath(
     return QPair<QString, QString>(TEMP_AUTH_KEY_NAME, authKey);
 }
 
-bool QnAuthHelper::isLoginLockedOut(const nx::String& name, const nx::network::HostAddress& address)
+bool QnAuthHelper::isLoginLockedOut(
+    const nx::String& name, const nx::network::HostAddress& address) const
 {
     const auto now = std::chrono::steady_clock::now();
 
@@ -803,7 +804,7 @@ void QnAuthHelper::removeCsrfToken(const nx::Buffer& token)
     m_csrfTokens.erase(token);
 }
 
-bool QnAuthHelper::isCsrfTokenValid(const nx::Buffer& token)
+bool QnAuthHelper::isCsrfTokenValid(const nx::Buffer& token) const
 {
     QnMutexLocker lock(&m_mutex);
     const auto it = m_csrfTokens.find(token);

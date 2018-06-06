@@ -17,7 +17,6 @@
 #include <nx/network/http/http_types.h>
 #include <nx/utils/thread/mutex.h>
 #include <nx/network/http/auth_restriction_list.h>
-#include <nx/network/aio/timer.h>
 #include <nx/network/socket_common.h>
 
 #include <nx/vms/auth/abstract_nonce_provider.h>
@@ -103,7 +102,7 @@ public:
 
     nx::Buffer newCsrfToken();
     void removeCsrfToken(const nx::Buffer& token);
-    bool isCsrfTokenValid(const nx::Buffer& token);
+    bool isCsrfTokenValid(const nx::Buffer& token) const;
 
     struct LockoutOptions
     {
@@ -186,7 +185,7 @@ private:
         Qn::UserAccessData* accessRights);
 
     bool isLoginLockedOut(
-        const nx::String& name, const nx::network::HostAddress& address);
+        const nx::String& name, const nx::network::HostAddress& address) const;
     void saveLoginResult(
         const nx::String& name, const nx::network::HostAddress& address, Qn::AuthResult result);
 
@@ -215,8 +214,9 @@ private:
     nx::vms::auth::AbstractNonceProvider* m_nonceProvider;
     nx::vms::auth::AbstractUserDataProvider* m_userDataProvider;
     std::unique_ptr<QnLdapManager> m_ldap;
-    std::map<nx::Buffer, std::chrono::steady_clock::time_point> m_csrfTokens;
-    std::map<nx::String /*userName*/, std::map<nx::network::HostAddress, AccessFailureData>> m_accessFailures;
+    mutable std::map<nx::Buffer, std::chrono::steady_clock::time_point> m_csrfTokens;
+    mutable std::map<nx::String /*userName*/, std::map<nx::network::HostAddress, AccessFailureData>>
+        m_accessFailures;
     std::optional<LockoutOptions> m_lockoutOptions = LockoutOptions();
 };
 
