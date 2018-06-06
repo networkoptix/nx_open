@@ -55,19 +55,22 @@ int QnCookieLoginRestHandler::executePost(
             nx::network::AppInfo::cloudName() + " is not accessible yet. Please try again later.");
         return nx::network::http::StatusCode::ok;
     }
-    else if (authResult == Qn::Auth_LDAPConnectError)
+
+    if (authResult == Qn::Auth_LDAPConnectError)
     {
         result.setError(QnRestResult::CantProcessRequest,
             "LDAP server is not accessible yet. Please try again later.");
         return nx::network::http::StatusCode::ok;
     }
-    else if (authResult == Qn::Auth_LockedOut)
+
+    if (authResult == Qn::Auth_LockedOut)
     {
         result.setError(QnRestResult::CantProcessRequest,
             "This user on your IP is locked out due to many filed attempts. Please, try again later.");
         return nx::network::http::StatusCode::ok;
     }
-    else if (authResult != Qn::Auth_OK)
+
+    if (authResult != Qn::Auth_OK)
     {
         auto session = owner->authSession();
         session.id = QnUuid::createUuid();
