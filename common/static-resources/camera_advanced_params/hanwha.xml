@@ -961,14 +961,14 @@
             </group>
         </group>
         <group name="Lens Control">
-            <param id="image/lens_control/focus"
+            <param id="image/lens_control/zoom"
                 name="Zoom"
                 description="Zoom adjustment"
                 dataType="SliderControl"
                 range="-1,1"
                 compact="true"
                 aux="ptzTraits=AlternativeZoomTrait"
-                writeCmd="custom_focus"/>
+                writeCmd="custom_zoom"/>
             <param id="image/lens_control/ptr"
                 name=""
                 description="PTR adjustment"
@@ -977,14 +977,14 @@
                 compact="true"
                 aux="ptzTraits=AlternativePanTrait,AlternativeTiltTrait,AlternativeRotateTrait"
                 writeCmd="custom_ptr"/>
-            <param id="image/lens_control/zoom"
+            <param id="image/lens_control/focus"
                 name="Focus"
                 description="Focus adjustment"
                 dataType="SliderControl"
                 range="-1,1"
                 compact="true"
                 aux="ptzTraits=AlternativeFocusTrait"
-                writeCmd="custom_zoom"/>
+                writeCmd="custom_focus"/>
         </group>
         <group name="Maintenance">
             <param id="image/focus/Mode=SimpleFocus"
