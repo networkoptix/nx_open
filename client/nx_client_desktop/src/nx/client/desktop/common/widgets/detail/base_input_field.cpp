@@ -7,6 +7,7 @@
 #include <ui/style/custom_style.h>
 #include <ui/widgets/word_wrapped_label.h>
 #include <utils/common/delayed.h>
+#include <utils/common/guarded_callback.h>
 
 #include <nx/client/desktop/common/utils/accessor.h>
 #include <nx/utils/raii_guard.h>
@@ -169,7 +170,8 @@ bool BaseInputFieldPrivate::eventFilter(QObject* watched, QEvent* event)
         case QEvent::Polish:
         {
             // Ensure input is polished.
-            executeDelayed([this](){ defaultPalette = input->palette(); }, 0);
+            const auto callback = [this](){ defaultPalette = input->palette(); };
+            executeLater(guarded<decltype(callback)>(this, callback), this);
             break;
         }
         case QEvent::FocusIn:
