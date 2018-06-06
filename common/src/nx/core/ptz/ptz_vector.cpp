@@ -8,6 +8,14 @@ namespace nx {
 namespace core {
 namespace ptz {
 
+const ComponentVector<2> PtzVector::kPtComponents = {PtzComponent::pan, PtzComponent::tilt};
+
+const ComponentVector<3> PtzVector::kPtrComponents
+    = {PtzComponent::pan, PtzComponent::tilt, PtzComponent::rotation};
+
+const ComponentVector<3> PtzVector::kPtzComponents
+    = {PtzComponent::pan, PtzComponent::tilt, PtzComponent::zoom};
+
 PtzVector::PtzVector(double pan, double tilt, double rotation, double zoom):
     pan(pan),
     tilt(tilt),
@@ -18,10 +26,19 @@ PtzVector::PtzVector(double pan, double tilt, double rotation, double zoom):
 
 PtzVector::PtzVector(
     const QPointF& point,
-    const std::array<PtzComponent, 2>& components)
+    const ComponentVector<2>& components)
 {
     setComponent(point.x(), components[0]);
     setComponent(point.y(), components[1]);
+}
+
+PtzVector::PtzVector(
+    const QVector3D& vector,
+    const ComponentVector<3>& components)
+{
+    setComponent(vector.x(), components[0]);
+    setComponent(vector.y(), components[1]);
+    setComponent(vector.z(), components[2]);
 }
 
 void PtzVector::setComponent(double value, PtzComponent component)

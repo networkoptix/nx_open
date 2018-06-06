@@ -22,15 +22,29 @@ enum class PtzComponent
 };
 Q_DECLARE_FLAGS(PtzComponents, PtzComponent)
 
+template<int VectorSize>
+using ComponentVector = std::array<PtzComponent, VectorSize>;
+
 struct PtzVector
 {
 
 public:
+    static const ComponentVector<2> kPtComponents;
+    static const ComponentVector<3> kPtrComponents;
+    static const ComponentVector<3> kPtzComponents;
+
+public:
     PtzVector() = default;
     PtzVector(double pan, double tilt, double rotation, double zoom);
+
     PtzVector(
         const QPointF& point,
-        const std::array<PtzComponent, 2>& components = {PtzComponent::pan, PtzComponent::tilt});
+        const ComponentVector<2>& components = { PtzComponent::pan, PtzComponent::tilt });
+
+    PtzVector(
+        const QVector3D& vector,
+        const ComponentVector<3>&
+            = {PtzComponent::pan, PtzComponent::tilt, PtzComponent::rotation});
 
     void setComponent(double value, PtzComponent component);
 
