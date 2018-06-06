@@ -37,7 +37,7 @@ def test_stop_timeout(two_merged_mediaservers):
     status_before = service.status()
     thread = threading.Thread(target=check_and_make_core_dump, args=(status_before,))
     thread.start()
-    service.stop()
+    service.stop(timeout_sec=130)  # 120 sec is default timeout in service conf.
     thread.join()
     for exception in exceptions:
         raise exception

@@ -8,11 +8,11 @@ class Service(object):
     __metaclass__ = abc.ABCMeta
 
     @abc.abstractmethod
-    def start(self):
+    def start(self, timeout_sec=None):
         pass
 
     @abc.abstractmethod
-    def stop(self):
+    def stop(self, timeout_sec=None):
         pass
 
     @abc.abstractmethod

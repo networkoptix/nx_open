@@ -10,11 +10,11 @@ class WindowsService(Service):
     def __repr__(self):
         return '<WindowsService {} at {}>'.format(self._name, self._winrm)
 
-    def stop(self):
-        self.query.invoke_method(u'StopService', {})
+    def stop(self, timeout_sec=None):
+        self.query.invoke_method(u'StopService', {}, timeout_sec=timeout_sec)
 
-    def start(self):
-        self.query.invoke_method(u'StartService', {})
+    def start(self, timeout_sec=None):
+        self.query.invoke_method(u'StartService', {}, timeout_sec=timeout_sec)
 
     def status(self):
         instance = self.query.get_one()

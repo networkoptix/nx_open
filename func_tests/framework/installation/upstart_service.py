@@ -32,13 +32,17 @@ class UpstartService(Service):
     def __repr__(self):
         return '<UpstartService {} at {}>'.format(self._service_name, self._ssh)
 
-    def start(self):
-        self._ssh.run_command(['start', self._service_name], timeout_sec=self._start_timeout_sec)
+    def start(self, timeout_sec=None):
+        if timeout_sec is None:
+            timeout_sec = self._start_timeout_sec
+        self._ssh.run_command(['start', self._service_name], timeout_sec=timeout_sec)
 
-    def stop(self):
+    def stop(self, timeout_sec=None):
+        if timeout_sec is None:
+            timeout_sec = self._stop_timeout_sec
         command = ['stop', self._service_name]
         try:
-            self._ssh.run_command(command, timeout_sec=self._stop_timeout_sec)
+            self._ssh.run_command(command, timeout_sec=timeout_sec)
         except Timeout:
             status = self.status()
             _logger.error("`%s` hasn't existed properly.", ' '.join(command))
@@ -79,11 +83,11 @@ class LinuxAdHocService(Service):
         self._ssh = ssh
         self._service_script_path = dir / 'server_ctl.sh'
 
-    def start(self):
-        return self._ssh.run_command([self._service_script_path, 'start'])
+    def start(self, timeout_sec=None):
+        return self._ssh.run_command([self._service_script_path, 'start'], timeout_sec=timeout_sec)
 
-    def stop(self):
-        return self._ssh.run_command([self._service_script_path, 'stop'])
+    def stop(self, timeout_sec=None):
+        return self._ssh.run_command([self._service_script_path, 'stop'], timeout_sec=timeout_sec)
 
     def status(self):
         # TODO: Make a script.
