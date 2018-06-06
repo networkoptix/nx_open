@@ -89,7 +89,7 @@ private:
     void saveStatisticsRequestResult(
         SystemError::ErrorCode /*systemErrorCode*/,
         const nx::network::http::Response* response,
-        nx::cloud::relay::Statistics statistics)
+        nx::cloud::relay::Statistics /*statistics*/)
     {
         m_apiResponseQueue.push(
             response
