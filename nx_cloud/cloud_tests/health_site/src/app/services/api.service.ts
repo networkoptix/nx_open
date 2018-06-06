@@ -10,10 +10,10 @@ export class ApiService {
     constructor(private http: HttpClient) {
     }
 
-    getHealthStatus() {
-        return this.http
-                   .get('https://api.status.nxvms.com/health');
-
+    getHealthStatus(): Observable<any> {
+        return this.http.get('../assets/payload.json');
+        // return this.http
+        //            .get('https://api.status.nxvms.com/health');
     }
 
     getJSON(): Observable<any> {

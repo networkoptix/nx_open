@@ -2,18 +2,6 @@
 @import "~sass-rem";
 @import '~bootstrap/scss/bootstrap';
 
-// Overwrites  ***********************
-$body-bg : $gray-100;
+@import "app/styles/overwrites";
 
-// ***********************************
-
-html {
-  @include rem-baseline;
-  position   : relative;
-  min-height : 100%;
-  overflow-y : scroll;
-}
-
-body {
-  background-color : $body-bg;
-}
+@import './app/app.component';
