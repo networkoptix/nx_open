@@ -43,8 +43,7 @@ public:
 
     PtzVector(
         const QVector3D& vector,
-        const ComponentVector<3>&
-            = {PtzComponent::pan, PtzComponent::tilt, PtzComponent::rotation});
+        const ComponentVector<3>& components);
 
     void setComponent(double value, PtzComponent component);
 
