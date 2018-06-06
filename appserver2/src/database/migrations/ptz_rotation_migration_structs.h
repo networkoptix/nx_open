@@ -33,7 +33,7 @@ struct OldPtzPresetRecord
 };
 
 #define OldPtzPresetRecord_Fields (preset)(data)
-QN_FUSION_DECLARE_FUNCTIONS(QnPtzPresetRecord, (json)(eq));
+QN_FUSION_DECLARE_FUNCTIONS(OldPtzPresetRecord, (json)(eq));
 
 using OldPtzPresetRecordHash = QHash<QString, OldPtzPresetRecord>;
 
