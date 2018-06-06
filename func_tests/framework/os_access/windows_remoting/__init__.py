@@ -12,7 +12,7 @@ from framework.os_access.exceptions import exit_status_error_cls
 from ._cim_query import CIMQuery
 from ._cmd import Shell, run_command
 from ._powershell import run_powershell_script
-from ._registry import Key
+from .registry import Key
 
 _logger = logging.getLogger(__name__)
 
@@ -75,10 +75,6 @@ class WinRM(object):
 
     def wmi_query(self, class_name, selectors):
         return CIMQuery(self._protocol, class_name, selectors)
-
-    def registry_key(self, path):
-        # TODO: Make a separate Registry class.
-        return Key(self.wmi_query(u'StdRegProv', {}), path)
 
     def is_working(self):
         try:

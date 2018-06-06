@@ -89,3 +89,11 @@ class Key(object):
             u'hDefKey': self.key_int,
             u'sSubKeyName': self.sub_key})
         _logger.debug("CreateKey response: %s", pformat(response))
+
+
+class WindowsRegistry(object):
+    def __init__(self, winrm):
+        self.query = winrm.wmi_query(u'StdRegProv', {})
+
+    def key(self, path):
+        return Key(self.query, path)

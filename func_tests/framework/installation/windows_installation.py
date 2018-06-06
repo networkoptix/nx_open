@@ -5,6 +5,7 @@ from framework.installation.installer import Customization, Installer
 from framework.installation.windows_service import WindowsService
 from framework.os_access.path import copy_file
 from framework.os_access.windows_access import WindowsAccess
+from framework.os_access.windows_remoting.registry import WindowsRegistry
 
 _logger = logging.getLogger(__name__)
 
@@ -24,8 +25,8 @@ class WindowsInstallation(Installation):
         self.var = self._local_app_data_dir / customization.windows_app_data_subdir
         self._log_file = self.var / 'log' / 'log_file.log'
         self.key_pair = self.var / 'ssl' / 'cert.pem'
-        self._config_key = windows_access.winrm.registry_key(customization.windows_registry_key)
-        self._config_key_backup = windows_access.winrm.registry_key(customization.windows_registry_key + ' Backup')
+        self._config_key = WindowsRegistry(windows_access.winrm).key(customization.windows_registry_key)
+        self._config_key_backup = WindowsRegistry(windows_access.winrm).key(customization.windows_registry_key + ' Backup')
         self.service = WindowsService(windows_access.winrm, customization.windows_service_name)
         self.os_access = windows_access  # type: WindowsAccess
 
