@@ -22,7 +22,7 @@ PeerNumberType PeerNumberInfo::encode(
     auto itr = m_fullIdToShortId.find(peer);
     if (itr != m_fullIdToShortId.end())
         return itr.value();
-
+    NX_ASSERT(!peer.isNull());
     if (shortNumber == kUnknownPeerNumnber)
         shortNumber = m_fullIdToShortId.size();
     m_fullIdToShortId.insert(peer, shortNumber);

@@ -26,6 +26,7 @@ class P2pMessageBusTestBase: public testing::Test
 public:
 protected:
     static void connectServers(const Appserver2Ptr& srcServer, const Appserver2Ptr& dstServer);
+    static void bidirectConnectServers(const Appserver2Ptr& srcServer, const Appserver2Ptr& dstServer);
     static void disconnectServers(const Appserver2Ptr& srcServer, const Appserver2Ptr& dstServer);
 
     static void sequenceConnect(std::vector<Appserver2Ptr>& servers);
@@ -49,6 +50,21 @@ protected:
     bool waitForConditionOnAllServers(
         std::function<bool(const Appserver2Ptr&)> condition,
         std::chrono::milliseconds timeout);
+
+    void waitForSync(int cameraCount);
+
+    void checkMessageBus(
+        std::function<bool(MessageBus*, const ApiPersistentIdData&)> checkFunction,
+        const QString& errorMessage);
+    void checkMessageBusInternal(
+        std::function<bool(MessageBus*, const ApiPersistentIdData&)> checkFunction,
+        const QString& errorMessage,
+        bool waitForSync,
+        int& syncDoneCounter);
+
+    static bool checkSubscription(const MessageBus* bus, const ApiPersistentIdData& peer);
+    static bool checkDistance(const MessageBus* bus, const ApiPersistentIdData& peer);
+    bool checkRuntimeInfo(const MessageBus* bus, const ApiPersistentIdData& /*peer*/);
 protected:
     QnStaticCommonModule staticCommon;
     std::vector<Appserver2Ptr> m_servers;

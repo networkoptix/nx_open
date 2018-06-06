@@ -101,9 +101,15 @@ QByteArray serializePeersMessage(
             const bool isOnline = record.distance < kMaxOnlineDistance;
             writer.putBit(isOnline);
             if (isOnline)
+            {
                 NALUnit::writeUEGolombCode(writer, record.distance);
+                if (record.distance > 0)
+                    NALUnit::writeUEGolombCode(writer, record.firstVia);
+            }
             else
+            {
                 writer.putBits(32, record.distance);
+            }
         }
         writer.flushBits(true);
         result.truncate(writer.getBytesCount());
@@ -127,11 +133,18 @@ QVector<PeerDistanceRecord> deserializePeersMessage(const QByteArray& data, bool
             PeerNumberType peerNumber = deserializeCompressPeerNumber(reader);
             bool isOnline = reader.getBit();
             qint32 distance = 0;
+            qint32 firstVia = kUnknownPeerNumnber;
             if (isOnline)
+            {
                 distance = NALUnit::extractUEGolombCode(reader); // todo: move function to another place
+                if (distance > 0)
+                    firstVia = NALUnit::extractUEGolombCode(reader);
+            }
             else
+            {
                 distance = reader.getBits(32);
-            result.push_back(PeerDistanceRecord(peerNumber, distance));
+            }
+            result.push_back(PeerDistanceRecord(peerNumber, distance, firstVia));
         }
     }
     catch (const BitStreamException&)

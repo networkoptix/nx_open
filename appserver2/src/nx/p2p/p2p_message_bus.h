@@ -264,7 +264,7 @@ private:
     void commitLazyData();
 
     P2pConnectionPtr findBestConnectionToSubscribe(
-        const QVector<ApiPersistentIdData>& viaList,
+        const QList<ApiPersistentIdData>& viaList,
         QMap<P2pConnectionPtr, int> newSubscriptions) const;
 
     void deleteRemoveUrlById(const QnUuid& id);

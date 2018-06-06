@@ -61,15 +61,18 @@ struct SubscribeRecord
 struct PeerDistanceRecord
 {
     PeerDistanceRecord() {}
-    PeerDistanceRecord(PeerNumberType peerNumber, qint32 distance):
+    PeerDistanceRecord(PeerNumberType peerNumber, qint32 distance, PeerNumberType firstVia):
         peerNumber(peerNumber),
-        distance(distance)
+        distance(distance),
+        firstVia(firstVia)
     {
     }
-    static const int kMaxRecordSize = 7; // 2 bytes number + 4 bytes distance + online flag
+    static const int kMaxRecordSize = 9; // 2 bytes number + 4 bytes distance + online flag + 2 bytes via
+
 
     PeerNumberType peerNumber = 0;
-    qint32 distance = 0;
+    PeerNumberType firstVia = kUnknownPeerNumnber; //< First via peer in route if distance > 1.
+    qint32 distance = 0; //< Distance to the peer.
 };
 
 struct PeerNumberResponseRecord: public ec2::ApiPersistentIdData
