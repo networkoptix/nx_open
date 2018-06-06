@@ -1,4 +1,5 @@
 import logging
+import pytest
 
 _logger = logging.getLogger(__name__)
 
@@ -30,7 +31,8 @@ class Rule(object):
 
 
 # https://networkoptix.atlassian.net/browse/UT-46
-# https://networkoptix.atlassian.net/wiki/spaces/SD/pages/85204446/Cloud+test
+# https://networkoptix.atlassian.net/wiki/spaces/SD/pages/104103937/Event+tests
+@pytest.mark.timeout(300)
 def test_events_reset(one_running_mediaserver):
     rule_dict_list = one_running_mediaserver.api.ec2.getEventRules.GET()
     _logger.info('Initially server has %d event rules:', len(rule_dict_list))
