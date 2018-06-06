@@ -50,7 +50,7 @@ class _CimAction(object):
             return key, bare_data
         return key, new_namespace_alias + ':' + bare_data
 
-    def perform(self, protocol):
+    def perform(self, protocol, timeout_sec=None):
         # noinspection PyProtectedMember
         rq = {'env:Envelope': protocol._get_soap_header(resource_uri=self.resource_uri, action=self.action)}
         rq['env:Envelope'].setdefault('env:Body', self.body)
@@ -60,6 +60,8 @@ class _CimAction(object):
                 for selector_name, selector_value in self.selectors.items()
                 ]
             }
+        if timeout_sec is not None:
+            rq['env:Envelope']['w:OperationTimeout'] = 'PT{}S'.format(timeout_sec),
         try:
             response = protocol.send_message(xmltodict.unparse(rq))
         except WinRMTransportError as e:
@@ -152,14 +154,15 @@ class CIMQuery(object):
         instance = outcome[self.class_name]
         return instance
 
-    def invoke_method(self, method_name, params):
+    def invoke_method(self, method_name, params, timeout_sec=None):
         _logger.debug("Invoke %s.%s(%r) where %r", self.class_name, method_name, params, self.selectors)
         resource_uri = _CimAction.cim_directory + self.class_name
-        action = resource_uri + '/' + method_name
+        action_uri = resource_uri + '/' + method_name
         method_input = {'p:' + param_name: param_value for param_name, param_value in params.items()}
         method_input['@xmlns:p'] = resource_uri
         body = {method_name + '_INPUT': method_input}
-        response = _CimAction(resource_uri, action, self.selectors, body).perform(self.protocol)
+        action = _CimAction(resource_uri, action_uri, self.selectors, body)
+        response = action.perform(self.protocol, timeout_sec=timeout_sec)
         method_output = response[method_name + '_OUTPUT']
         if method_output[u'ReturnValue'] != u'0':
             raise RuntimeError('Non-zero return value of {!s}.{!s}({!r}) where {!r}:\n{!s}'.format(
