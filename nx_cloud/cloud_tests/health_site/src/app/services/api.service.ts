@@ -11,12 +11,12 @@ export class ApiService {
     }
 
     getHealthStatus(): Observable<any> {
-        return this.http.get('../assets/payload.json');
-        // return this.http
-        //            .get('https://api.status.nxvms.com/health');
+        return this.http
+                   .get('https://api.status.nxvms.com/health');
     }
 
     getJSON(): Observable<any> {
-        return this.http.get('../assets/layout/tiles.json');
+        return this.http
+                   .get('../assets/layout/tiles.json');
     }
 }

@@ -9,39 +9,51 @@ export class InfoTileComponent implements OnInit {
     @Input() tiles;
     @Input() items;
 
-    visible: boolean;
-
     constructor() {
     }
 
     ngOnInit() {
-        this.visible = true;
+    }
+
+    private matchItems(a, b) {
+        return (a.key === b.name || b.dimensions && b.dimensions.host === a.key);
     }
 
     getClassFor(item) {
-
-        if (item.dimension){
-            return (item.value === 0) ? 'nx-error' : 'nx-healthy';
+        if (item.dimension) {
+            return (item.value === 0) ? {value: 'nx-error', alert: ''} : {value: 'nx-healthy', alert: ''};
         }
 
-        if (!item.value){
-            return 'nx-error';
+        if (!item.value) {
+            return {value: 'nx-error', alert: ''};
         }
 
+        // Get aggregates (if any)
         if (item.aggregate) {
             let status = this.items.filter(metric => {
                 return item.aggregate.find(aggr =>
-                   aggr.key === metric.name || metric.dimensions && metric.dimensions.host === aggr.key
+                    this.matchItems(aggr, metric)
                 );
-            }).reduce((a, b) => {
-                return {value: a.value &= b.value};
-            }, { value : 1 });
+            }).reduce((total, elm, idx, array) => {
+                let alert = '';
+                if (elm.value === 0) {
+                    alert = item.aggregate.find(aggr =>
+                        this.matchItems(aggr, elm)
+                    ).message;
 
-            console.log('item -> ', item);
-            return (status.value === 0) ? 'nx-alert' : 'nx-healthy' ;
+                    if (total.alert !== '') {
+                        alert = '<br>' + alert;
+                    }
+                }
+                return {value: total.value &= elm.value, alert: total.alert + alert};
+            }, {value: 1, alert: ''});
+
+            status.value = (status.value === 0) ? 'nx-alert' : 'nx-healthy';
+
+            return status;
         }
 
-        return 'nx-healthy';
+        return {value: 'nx-healthy', alert: ''};
     }
 
     getTileItemsFor(tile) {
