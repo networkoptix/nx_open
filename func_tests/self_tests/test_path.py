@@ -12,13 +12,13 @@ pytest_plugins = ['fixtures.ad_hoc_ssh']
 
 
 @pytest.fixture()
-def local_path():
-    return LocalPath.tmp() / 'test_path-remote'
+def local_path_cls():
+    return LocalPath
 
 
 @pytest.fixture()
-def ssh_path(ad_hoc_ssh):
-    return make_ssh_path_cls(ad_hoc_ssh).tmp() / 'test_path-remote'
+def ssh_path_cls(ad_hoc_ssh):
+    return make_ssh_path_cls(ad_hoc_ssh)
 
 
 @pytest.fixture(scope='session')
@@ -28,15 +28,20 @@ def windows_vm(vm_factory):
 
 
 @pytest.fixture()
-def smb_path(windows_vm):
-    return windows_vm.os_access.Path.tmp() / 'test_path-remote'
+def smb_path_cls(windows_vm):
+    return windows_vm.os_access.Path
 
 
-@pytest.fixture(params=['local_path', 'ssh_path', 'smb_path'])
-def dirty_remote_test_dir(request):
+@pytest.fixture(params=['local_path_cls', 'ssh_path_cls', 'smb_path_cls'])
+def path_cls(request):
+    return request.getfixturevalue(request.param)
+
+
+@pytest.fixture()
+def dirty_remote_test_dir(request, path_cls):
     """Just a name, cleaned up by test"""
     # See: https://docs.pytest.org/en/latest/proposals/parametrize_with_fixtures.html
-    base_remote_dir = request.getfixturevalue(request.param)
+    base_remote_dir = path_cls.tmp() / (__name__ + '-remote')
     return base_remote_dir / request.node.name
 
 
@@ -72,6 +77,14 @@ def existing_remote_dir(remote_test_dir):
     path = remote_test_dir / 'existing_dir'
     path.mkdir()
     return path
+
+
+def test_tmp(path_cls):
+    assert path_cls.tmp().exists()
+
+
+def test_home(path_cls):
+    assert path_cls.home().exists()
 
 
 def test_rmtree_write_exists(dirty_remote_test_dir):
