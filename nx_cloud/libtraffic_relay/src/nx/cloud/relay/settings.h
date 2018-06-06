@@ -6,8 +6,8 @@
 
 #include <nx/network/abstract_socket.h>
 #include <nx/network/socket_common.h>
-#include <nx/utils/settings.h>
 #include <nx/utils/basic_service_settings.h>
+#include <nx/utils/settings.h>
 
 #include <nx/cloud/relaying/settings.h>
 
@@ -31,6 +31,7 @@ struct Http
 struct Https
 {
     std::list<network::SocketAddress> endpoints;
+    std::string certificatePath;
 };
 
 struct ConnectingPeer

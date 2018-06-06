@@ -66,6 +66,8 @@ private:
         const nx::network::http::StringType& method,
         Arg arg);
 
+    void loadSslCertificate();
+
     void startAcceptor();
 
     std::unique_ptr<MultiHttpServer> startHttpServer(

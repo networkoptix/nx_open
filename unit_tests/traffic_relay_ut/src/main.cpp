@@ -14,11 +14,7 @@ int main(int argc, char** argv)
 
     return nx::network::test::runTest(
         argc, argv,
-        [](const nx::utils::ArgumentParser&)
-        {
-            nx::network::ssl::Engine::useRandomCertificate("traffic_relay_ut");
-            return nx::utils::test::DeinitFunctions();
-        },
+        nullptr,
         nx::network::InitializationFlags::disableUdt,
         nx::utils::test::GtestRunFlag::gtestThrowOnFailure);
 }

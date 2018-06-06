@@ -2,6 +2,7 @@
 
 #include <nx/network/cloud/tunnel/relay/api/relay_api_http_paths.h>
 #include <nx/network/http/fusion_data_http_client.h>
+#include <nx/network/ssl/ssl_engine.h>
 #include <nx/network/ssl/ssl_stream_socket.h>
 #include <nx/network/system_socket.h>
 #include <nx/network/url/url_builder.h>
@@ -30,6 +31,14 @@ public:
 protected:
     virtual void SetUp() override
     {
+        const auto certificateFilePath =
+            lm("%1/%2").args(testDataDir(), "traffic_relay.cert").toStdString();
+        addArg("-https/certificatePath", certificateFilePath.c_str());
+
+        ASSERT_TRUE(nx::network::ssl::Engine::useOrCreateCertificate(
+            certificateFilePath.c_str(),
+            "traffic_relay/https test", "US", "Nx"));
+
         ASSERT_TRUE(startAndWaitUntilStarted());
     }
 

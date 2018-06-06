@@ -5,6 +5,7 @@
 #include <nx/network/connection_server/multi_address_server.h>
 #include <nx/network/cloud/tunnel/relay/api/relay_api_http_paths.h>
 #include <nx/network/http/server/abstract_fusion_request_handler.h>
+#include <nx/network/ssl/ssl_engine.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/move_only_func.h>
 #include <nx/utils/std/cpp14.h>
@@ -61,6 +62,7 @@ View::View(
     m_authenticationManager(m_authRestrictionList)
 {
     registerApiHandlers();
+    loadSslCertificate();
     startAcceptor();
 }
 
@@ -176,6 +178,15 @@ void View::registerApiHandler(
             return std::make_unique<Handler>(arg);
         },
         method);
+}
+
+void View::loadSslCertificate()
+{
+    if (!m_settings.https().certificatePath.empty())
+    {
+        nx::network::ssl::Engine::loadCertificateFromFile(
+            m_settings.https().certificatePath.c_str());
+    }
 }
 
 void View::startAcceptor()

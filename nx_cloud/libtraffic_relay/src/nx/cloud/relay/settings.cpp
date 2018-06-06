@@ -34,6 +34,9 @@ const std::chrono::minutes kDefaultHttpInactivityTimeout(1);
 static const char* kHttpsEndpointsToListen = "https/listenOn";
 static const char* kDefaultHttpsEndpointsToListen = "";
 
+static const char* kHttpsCertificatePath = "https/certificatePath";
+static const char* kDefaultHttpsCertificatePath = "";
+
 //-------------------------------------------------------------------------------------------------
 // ConnectingPeer
 
@@ -186,6 +189,9 @@ void Settings::loadHttps()
         kHttpsEndpointsToListen,
         kDefaultHttpsEndpointsToListen,
         &m_https.endpoints);
+
+    m_https.certificatePath = settings().value(
+        kHttpsCertificatePath, kDefaultHttpsCertificatePath).toString().toStdString();
 }
 
 void Settings::loadConnectingPeer()
