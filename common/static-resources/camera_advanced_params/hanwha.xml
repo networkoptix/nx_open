@@ -967,21 +967,24 @@
                 dataType="SliderControl"
                 range="-1,1"
                 compact="true"
-                aux="ptzTraits=AlternativeZoomTrait"/>
+                aux="ptzTraits=AlternativeZoomTrait"
+                writeCmd="custom_focus"/>
             <param id="image/lens_control/ptr"
                 name=""
                 description="PTR adjustment"
                 dataType="PtrControl"
                 range="-1,1,-1,1,-1,1"
                 compact="true"
-                aux="ptzTraits=AlternativePanTrait,AlternativeTiltTrait,AlternativeRotateTrait"/>
+                aux="ptzTraits=AlternativePanTrait,AlternativeTiltTrait,AlternativeRotateTrait"
+                writeCmd="custom_ptr"/>
             <param id="image/lens_control/zoom"
                 name="Focus"
                 description="Focus adjustment"
                 dataType="SliderControl"
                 range="-1,1"
                 compact="true"
-                aux="ptzTraits=AlternativeFocusTrait"/>
+                aux="ptzTraits=AlternativeFocusTrait"
+                writeCmd="custom_zoom"/>
         </group>
         <group name="Maintenance">
             <param id="image/focus/Mode=SimpleFocus"
