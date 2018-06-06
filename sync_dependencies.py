@@ -39,7 +39,7 @@ def determine_package_versions(
         "libjpeg-turbo": "1.4.2",
         "festival": "2.4",
         "directx": "JUN2010",
-		"pandoc": "2.2.1",
+        "pandoc": "2.2.1",
         "cassandra": "2.7.0",
         "doxygen": "1.8.14",
         "gstreamer": "1.0",
