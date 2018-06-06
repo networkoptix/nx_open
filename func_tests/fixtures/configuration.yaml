@@ -51,3 +51,7 @@ vm_types:
             protocol: tcp
             guest_port: 139
             host_port_offset: 9
+          smb-direct:
+            protocol: tcp
+            guest_port: 445
+            host_port_offset: 4

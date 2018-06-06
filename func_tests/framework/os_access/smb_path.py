@@ -74,23 +74,12 @@ class SMBConnectionPool(object):
     def __init__(
             self,
             username, password,
-            name_service_address, name_service_port,
-            session_service_address, session_service_port,
+            direct_smb_address, direct_smb_port,
             ):
         self._username = username  # str
         self._password = password  # str
-        self._name_service_address = name_service_address  # type: IPAddress
-        self._name_service_port = name_service_port  # type: int
-        self._session_service_address = session_service_address  # type: IPAddress
-        self._session_service_port = session_service_port  # type: int
-
-    @cached_getter
-    def _net_bios_name(self):
-        with closing(NetBIOS(broadcast=False)) as client:
-            server_name = client.queryIPForName(
-                str(self._name_service_address), port=self._name_service_port)
-            # TODO: Check and retry when got None.
-        return server_name[0]
+        self._direct_smb_address = direct_smb_address  # type: IPAddress
+        self._direct_smb_port = direct_smb_port  # type: int
 
     @cached_getter
     def connection(self):
@@ -102,17 +91,17 @@ class SMBConnectionPool(object):
         # impose a timeout limit. If the clients fail to respond within
         # the timeout limit, the SMB/CIFS server may disconnect the client.
         client_name = u'FUNC_TESTS_EXECUTION'.encode('ascii')  # Arbitrary ASCII string.
-        server_name = self._net_bios_name()
+        server_name = 'dummy'  # Not used because SMB runs over TCP directly. But must not be empty.
         connection = SMBConnection(
             self._username, self._password,
-            client_name, server_name)
+            client_name, server_name, is_direct_tcp=True)
         connection_succeeded = connection.connect(
-            str(self._session_service_address), port=self._session_service_port)
+            str(self._direct_smb_address), port=self._direct_smb_port)
         # SMBConnectionPool has no special closing actions;
         # socket is closed when object is deleted.
         if not connection_succeeded:
             raise RuntimeError("Connection to {}:{} failed".format(
-                self._session_service_address, self._session_service_port))
+                self._direct_smb_address, self._direct_smb_port))
         return connection
 
 

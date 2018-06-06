@@ -37,12 +37,10 @@ class WindowsAccess(OSAccess):
         winrm = self.winrm
 
         class SpecificSMBPath(SMBPath):
-            _name_service_address, _name_service_port = self.forwarded_ports['udp', 137]
-            _session_service_address, _session_service_port = self.forwarded_ports['tcp', 139]
+            _direct_smb_address, _direct_smb_port = self.forwarded_ports['tcp', 445]
             _smb_connection_pool = SMBConnectionPool(
                 self._username, self._password,
-                _name_service_address, _name_service_port,
-                _session_service_address, _session_service_port,
+                _direct_smb_address, _direct_smb_port,
                 )
 
             @classmethod
