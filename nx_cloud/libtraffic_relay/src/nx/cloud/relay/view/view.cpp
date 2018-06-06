@@ -102,7 +102,12 @@ void View::start()
 
 std::vector<network::SocketAddress> View::httpEndpoints() const
 {
-    return m_multiAddressHttpServer->endpoints();
+    return m_httpEndpoint;
+}
+
+std::vector<network::SocketAddress> View::httpsEndpoints() const
+{
+    return m_httpsEndpoint;
 }
 
 const View::MultiHttpServer& View::httpServer() const
@@ -176,26 +181,66 @@ void View::registerApiHandler(
 void View::startAcceptor()
 {
     const auto& httpEndpoints = m_settings.http().endpoints;
-    if (httpEndpoints.empty())
+    const auto& httpsEndpoints = m_settings.https().endpoints;
+    if (httpEndpoints.empty() && httpsEndpoints.empty())
     {
         NX_LOGX("No HTTP address to listen", cl_logALWAYS);
         throw std::runtime_error("No HTTP address to listen");
     }
 
-    m_multiAddressHttpServer =
-        std::make_unique<nx::network::server::MultiAddressServer<nx::network::http::HttpStreamSocketServer>>(
+    if (httpEndpoints.empty())
+    {
+        m_multiAddressHttpServer = startHttpsServer(httpsEndpoints);
+    }
+    else if (httpsEndpoints.empty())
+    {
+        m_multiAddressHttpServer = startHttpServer(httpEndpoints);
+    }
+    else 
+    {
+        m_multiAddressHttpServer = 
+            network::server::catMultiAddressServers(
+                startHttpServer(httpEndpoints),
+                startHttpsServer(httpsEndpoints));
+    }
+}
+
+std::unique_ptr<View::MultiHttpServer> View::startHttpServer(
+    const std::list<network::SocketAddress>& endpoints)
+{
+    auto server = startServer(endpoints, false);
+    m_httpEndpoint = server->endpoints();
+    return server;
+}
+
+std::unique_ptr<View::MultiHttpServer> View::startHttpsServer(
+    const std::list<network::SocketAddress>& endpoints)
+{
+    auto server = startServer(endpoints, true);
+    m_httpsEndpoint = server->endpoints();
+    return server;
+}
+
+std::unique_ptr<View::MultiHttpServer> View::startServer(
+    const std::list<network::SocketAddress>& endpoints,
+    bool sslMode)
+{   
+    auto multiAddressHttpServer =
+        std::make_unique<MultiHttpServer>(
             &m_authenticationManager,
             &m_httpMessageDispatcher,
-            false,
+            sslMode,
             nx::network::NatTraversalSupport::disabled);
 
-    if (!m_multiAddressHttpServer->bind(httpEndpoints))
+    if (!multiAddressHttpServer->bind(endpoints))
     {
         throw std::runtime_error(
             lm("Cannot bind to address(es) %1. %2")
-                .container(httpEndpoints)
+                .container(endpoints)
                 .arg(SystemError::getLastOSErrorText()).toStdString());
     }
+
+    return multiAddressHttpServer;
 }
 
 } // namespace relay

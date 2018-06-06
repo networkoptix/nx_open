@@ -28,6 +28,11 @@ struct Http
     Http();
 };
 
+struct Https
+{
+    std::list<network::SocketAddress> endpoints;
+};
+
 struct ConnectingPeer
 {
     std::chrono::milliseconds connectSessionIdleTimeout;
@@ -60,11 +65,13 @@ public:
     const relaying::Settings& listeningPeer() const;
     const ConnectingPeer& connectingPeer() const;
     const Http& http() const;
+    const Https& https() const;
     const CassandraConnection& cassandraConnection() const;
 
 private:
     utils::log::Settings m_logging;
     Http m_http;
+    Https m_https;
     relaying::Settings m_listeningPeer;
     ConnectingPeer m_connectingPeer;
     CassandraConnection m_cassandraConnection;
@@ -72,6 +79,7 @@ private:
     virtual void loadSettings() override;
 
     void loadHttp();
+    void loadHttps();
     void loadConnectingPeer();
     void loadCassandraHost();
 };

@@ -30,6 +30,7 @@ public:
     RelayService(int argc, char **argv);
 
     std::vector<network::SocketAddress> httpEndpoints() const;
+    std::vector<network::SocketAddress> httpsEndpoints() const;
 
     const relaying::AbstractListeningPeerPool& listeningPeerPool() const;
 

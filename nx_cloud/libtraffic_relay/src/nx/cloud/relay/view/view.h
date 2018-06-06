@@ -37,6 +37,7 @@ public:
     void start();
 
     std::vector<network::SocketAddress> httpEndpoints() const;
+    std::vector<network::SocketAddress> httpsEndpoints() const;
 
     const MultiHttpServer& httpServer() const;
 
@@ -48,6 +49,8 @@ private:
     nx::network::http::AuthMethodRestrictionList m_authRestrictionList;
     view::AuthenticationManager m_authenticationManager;
     std::unique_ptr<MultiHttpServer> m_multiAddressHttpServer;
+    std::vector<network::SocketAddress> m_httpEndpoint;
+    std::vector<network::SocketAddress> m_httpsEndpoint;
 
     void registerApiHandlers();
     void registerCompatibilityHandlers();
@@ -64,6 +67,16 @@ private:
         Arg arg);
 
     void startAcceptor();
+
+    std::unique_ptr<MultiHttpServer> startHttpServer(
+        const std::list<network::SocketAddress>& endpoints);
+
+    std::unique_ptr<MultiHttpServer> startHttpsServer(
+        const std::list<network::SocketAddress>& endpoints);
+
+    std::unique_ptr<MultiHttpServer> startServer(
+        const std::list<network::SocketAddress>& endpoints,
+        bool sslMode);
 };
 
 } // namespace relay

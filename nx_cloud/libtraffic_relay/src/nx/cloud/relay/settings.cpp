@@ -29,6 +29,12 @@ const QLatin1String kHttpConnectionInactivityTimeout("http/connectionInactivityT
 const std::chrono::minutes kDefaultHttpInactivityTimeout(1);
 
 //-------------------------------------------------------------------------------------------------
+// Https
+
+static const QLatin1String kHttpsEndpointsToListen("https/listenOn");
+static const QLatin1String kDefaultHttpsEndpointsToListen("");
+
+//-------------------------------------------------------------------------------------------------
 // ConnectingPeer
 
 static const QLatin1String kConnectSessionIdleTimeout(
@@ -119,6 +125,11 @@ const Http& Settings::http() const
     return m_http;
 }
 
+const Https& Settings::https() const
+{
+    return m_https;
+}
+
 const CassandraConnection& Settings::cassandraConnection() const
 {
     return m_cassandraConnection;
@@ -128,6 +139,7 @@ void Settings::loadSettings()
 {
     m_logging.load(settings(), QLatin1String("log"));
     loadHttp();
+    loadHttps();
     m_listeningPeer.load(settings());
     loadConnectingPeer();
     loadCassandraHost();
@@ -154,6 +166,22 @@ void Settings::loadHttp()
     m_http.connectionInactivityTimeout = nx::utils::parseOptionalTimerDuration(
         settings().value(kHttpConnectionInactivityTimeout).toString(),
         kDefaultHttpInactivityTimeout);
+}
+
+void Settings::loadHttps()
+{
+    const QStringList& httpAddrToListenStrList = settings().value(
+        kHttpsEndpointsToListen,
+        kDefaultHttpsEndpointsToListen).toString().split(',');
+    if (!httpAddrToListenStrList.isEmpty())
+    {
+        m_https.endpoints.clear();
+        std::transform(
+            httpAddrToListenStrList.begin(),
+            httpAddrToListenStrList.end(),
+            std::back_inserter(m_https.endpoints),
+            [](const QString& str) { return network::SocketAddress(str); });
+    }
 }
 
 void Settings::loadConnectingPeer()
