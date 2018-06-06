@@ -207,7 +207,7 @@ void QnClientVideoCamera::exportMediaPeriodToFile(const QnTimePeriod &timePeriod
 
         if (fileName.toLower().endsWith(QLatin1String(".avi")))
         {
-            m_exportRecorder->setAudioCodec(AV_CODEC_ID_MP3); // transcode audio to MP3
+            m_exportRecorder->setAudioCodec(AV_CODEC_ID_MP2); // transcode audio to MP2
         }
     }
     QnAbstractArchiveStreamReader* archiveReader = dynamic_cast<QnAbstractArchiveStreamReader*> (m_exportReader.data());
