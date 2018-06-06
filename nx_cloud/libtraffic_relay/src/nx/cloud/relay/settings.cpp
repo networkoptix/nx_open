@@ -19,8 +19,8 @@ static const QLatin1String kDataDir("dataDir");
 //-------------------------------------------------------------------------------------------------
 // Http
 
-static const QLatin1String kHttpEndpointsToListen("http/listenOn");
-static const QLatin1String kDefaultHttpEndpointsToListen("0.0.0.0:3349");
+static const char* kHttpEndpointsToListen = "http/listenOn";
+static const char* kDefaultHttpEndpointsToListen = "0.0.0.0:3349";
 
 static const QLatin1String kHttpTcpBacklogSize("http/tcpBacklogSize");
 static constexpr int kDefaultHttpTcpBacklogSize = 4096;
@@ -31,8 +31,8 @@ const std::chrono::minutes kDefaultHttpInactivityTimeout(1);
 //-------------------------------------------------------------------------------------------------
 // Https
 
-static const QLatin1String kHttpsEndpointsToListen("https/listenOn");
-static const QLatin1String kDefaultHttpsEndpointsToListen("");
+static const char* kHttpsEndpointsToListen = "https/listenOn";
+static const char* kDefaultHttpsEndpointsToListen = "";
 
 //-------------------------------------------------------------------------------------------------
 // ConnectingPeer
@@ -147,18 +147,11 @@ void Settings::loadSettings()
 
 void Settings::loadHttp()
 {
-    const QStringList& httpAddrToListenStrList = settings().value(
+    m_http.endpoints.clear();
+    loadEndpointList(
         kHttpEndpointsToListen,
-        kDefaultHttpEndpointsToListen).toString().split(',');
-    if (!httpAddrToListenStrList.isEmpty())
-    {
-        m_http.endpoints.clear();
-        std::transform(
-            httpAddrToListenStrList.begin(),
-            httpAddrToListenStrList.end(),
-            std::back_inserter(m_http.endpoints),
-            [](const QString& str) { return network::SocketAddress(str); });
-    }
+        kDefaultHttpEndpointsToListen,
+        &m_http.endpoints);
 
     m_http.tcpBacklogSize = settings().value(
         kHttpTcpBacklogSize, kDefaultHttpTcpBacklogSize).toInt();
@@ -168,20 +161,31 @@ void Settings::loadHttp()
         kDefaultHttpInactivityTimeout);
 }
 
-void Settings::loadHttps()
+void Settings::loadEndpointList(
+    const char* settingName,
+    const char* defaultValue,
+    std::list<network::SocketAddress>* endpoints)
 {
-    const QStringList& httpAddrToListenStrList = settings().value(
-        kHttpsEndpointsToListen,
-        kDefaultHttpsEndpointsToListen).toString().split(',');
-    if (!httpAddrToListenStrList.isEmpty())
+    const QStringList& endpointStrList = settings().value(
+        settingName,
+        defaultValue).toString().split(',', QString::SkipEmptyParts);
+    if (!endpointStrList.isEmpty())
     {
-        m_https.endpoints.clear();
         std::transform(
-            httpAddrToListenStrList.begin(),
-            httpAddrToListenStrList.end(),
-            std::back_inserter(m_https.endpoints),
+            endpointStrList.begin(),
+            endpointStrList.end(),
+            std::back_inserter(*endpoints),
             [](const QString& str) { return network::SocketAddress(str); });
     }
+}
+
+void Settings::loadHttps()
+{
+    m_https.endpoints.clear();
+    loadEndpointList(
+        kHttpsEndpointsToListen,
+        kDefaultHttpsEndpointsToListen,
+        &m_https.endpoints);
 }
 
 void Settings::loadConnectingPeer()

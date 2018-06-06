@@ -79,6 +79,11 @@ private:
     virtual void loadSettings() override;
 
     void loadHttp();
+    void loadEndpointList(
+        const char* settingName,
+        const char* defaultValue,
+        std::list<network::SocketAddress>* endpoints);
+
     void loadHttps();
     void loadConnectingPeer();
     void loadCassandraHost();
