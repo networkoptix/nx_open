@@ -9,6 +9,7 @@
 #include <QtNetwork/QNetworkCookie>
 #include <QtNetwork/QNetworkProxy>
 #include <QtNetwork/QNetworkReply>
+#include <QtWidgets/QLabel>
 #include <QtWebKitWidgets/QWebFrame>
 #include <QtWebKitWidgets/QWebPage>
 #include <QtWebKitWidgets/QWebView>
@@ -103,14 +104,22 @@ CameraWebPageWidget::Private::Private(CameraWebPageWidget* parent):
     resetContent();
 
     static constexpr int kDotRadius = 8;
-    auto busyIndicator = new BusyIndicatorWidget(webView);
+    auto busyIndicator = new BusyIndicatorWidget(parent);
     busyIndicator->setHidden(true);
     busyIndicator->dots()->setDotRadius(kDotRadius);
     busyIndicator->dots()->setDotSpacing(kDotRadius * 2);
     new WidgetAnchor(busyIndicator);
 
+    auto errorLabel = new QLabel(parent);
+    errorLabel->setText(lit("<h1>%1</h1>").arg(tr("Failed to load page")));
+    errorLabel->setAlignment(Qt::AlignCenter);
+    errorLabel->setForegroundRole(QPalette::WindowText);
+    new WidgetAnchor(errorLabel);
+
     QObject::connect(webView, &QWebView::loadStarted, busyIndicator, &QWidget::show);
     QObject::connect(webView, &QWebView::loadFinished, busyIndicator, &QWidget::hide);
+    QObject::connect(webView, &QWebView::loadStarted, errorLabel, &QWidget::hide);
+    QObject::connect(webView, &QWebView::loadFinished, errorLabel, &QWidget::setHidden);
 
     auto frame = webView->page()->mainFrame();
     frame->setScrollBarPolicy(Qt::Horizontal, Qt::ScrollBarAsNeeded);
