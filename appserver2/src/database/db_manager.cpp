@@ -1663,10 +1663,8 @@ bool QnDbManager::afterInstallUpdate(const QString& updateName)
     if (updateName.endsWith(lit("/99_20180122_remove_secondary_stream_quality.sql")))
         return resyncIfNeeded(ResyncCameraAttributes);
 
-#if 0
     if (updateName.endsWith(lit("/99_20180605_add_rotation_to_presets.sql")))
         return ec2::migration::ptz::addRotationToPresets(m_sdb);
-#endif
 
     NX_LOG(lit("SQL update %1 does not require post-actions.").arg(updateName), cl_logDEBUG1);
     return true;

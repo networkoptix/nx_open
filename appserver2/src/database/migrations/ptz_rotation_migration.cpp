@@ -86,7 +86,7 @@ bool addRotationToPresets(QSqlDatabase& database)
             return false;
     }
 
-    return false;
+    return true;
 }
 
 } // namespace ptz
