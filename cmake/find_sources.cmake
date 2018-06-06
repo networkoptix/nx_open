@@ -53,8 +53,14 @@ function(nx_find_files var src_dir extension)
 
     file(GLOB_RECURSE CODE_FILES ${src_dir}/*.${extension})
 
+    get_filename_component(src_dir_absolute ${src_dir} ABSOLUTE)
+
     foreach(file_name ${CODE_FILES})
-        _nx_pick_file(PICKED ${file_name} "${FIND_EXCLUDE}")
+        file(RELATIVE_PATH rel_file_name ${src_dir_absolute} ${file_name})
+        if(rel_file_name STREQUAL "")
+            set(rel_file_name ${file_name})
+        endif()
+        _nx_pick_file(PICKED ${rel_file_name} "${FIND_EXCLUDE}")
         if(${PICKED})
             list(APPEND RESULT_FILES ${file_name})
         endif()
