@@ -22,6 +22,15 @@ _logger = logging.getLogger(__name__)
 UNEXISTENT_USER_ROLE_GUIID = '44e4161e-158e-2201-e000-000000000001'
 
 
+def test_saved_media_should_appear_after_archive_is_rebuilt(one_running_mediaserver, camera, sample_media_file):
+    server = one_running_mediaserver
+    start_time = datetime(2017, 3, 27, tzinfo=pytz.utc)
+    server.add_camera(camera)
+    server.storage.save_media_sample(camera, start_time, sample_media_file)
+    server.rebuild_archive()
+    assert one_running_mediaserver.get_recorded_time_periods(camera) == [TimePeriod(start_time, sample_media_file.duration)]
+
+
 # https://networkoptix.atlassian.net/browse/VMS-3911
 def test_server_should_pick_archive_file_with_time_after_db_time(one_running_mediaserver, camera, sample_media_file):
     one_running_mediaserver.add_camera(camera)
