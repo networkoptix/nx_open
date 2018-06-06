@@ -50,7 +50,7 @@ public:
     QString exceptionFilters;
 
     QString httpLogLevel;
-    QString hwLogLevel;
+    QString systemLogLevel;
     QString ec2TranLogLevel;
     QString permissionsLogLevel;
 

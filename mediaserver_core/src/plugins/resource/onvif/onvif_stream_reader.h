@@ -101,7 +101,8 @@ private:
     void printProfile(const Profile& profile, bool isPrimary) const;
 
     bool executePreConfigurationRequests();
-
+    CameraDiagnostics::Result bindTwoWayAudioToProfile(
+        MediaSoapWrapper& soapWrapper, const QString& profileToken) const;
 private:
     QnMetaDataV1Ptr m_lastMetadata;
     QnMulticodecRtpReader m_multiCodec;

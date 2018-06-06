@@ -26,8 +26,12 @@ CLVideoDecoderOutputPtr QnTiledImageFilter::updateImage(const CLVideoDecoderOutp
         {
             m_tiledFrame = CLVideoDecoderOutputPtr(m_tiledFrame->scaled(
                 newSize, (AVPixelFormat)frame->format));
+
         }
-        else
+
+        // Handling first channel of the camera. Also CLVideoDecoderOutput::scaled() function can
+        // return nullptr in case of error, handling it here.
+        if (!m_tiledFrame)
         {
             m_tiledFrame = CLVideoDecoderOutputPtr(new CLVideoDecoderOutput());
             m_tiledFrame->reallocate(newSize, frame->format);

@@ -14,7 +14,6 @@
 
 #include "onvif/soapwsddProxy.h"
 
-
 class UDPSocket;
 
 struct wsdd__ProbeMatchesType;
@@ -23,7 +22,6 @@ struct wsa__EndpointReferenceType;
 struct SOAP_ENV__Header;
 
 typedef QSharedPointer<QUdpSocket> QUdpSocketPtr;
-
 
 struct CameraInfo: public EndpointAdditionalInfo
 {
@@ -58,9 +56,13 @@ class OnvifResourceSearcherWsdd
     static const char WSDD_ACTION[];
     static const char WSDD_GSOAP_MULTICAST_ADDRESS[];
 
+    static const QString OBTAIN_MAC_FROM_MULTICAST_PARAM_NAME;
+
     OnvifResourceInformationFetcher* m_onvifFetcher;
     //mutable QHash<QString, QUdpSocketPtr> m_recvSocketList;
     //mutable QnMutex m_mutex;
+public:
+    enum ObtainMacFromMulticast {Auto, Always, Never};
 
 public:
     OnvifResourceSearcherWsdd(OnvifResourceInformationFetcher* informationFetcher);
@@ -123,6 +125,8 @@ private:
     bool sendProbe( const QnInterfaceAndAddr& iface );
     bool readProbeMatches( const QnInterfaceAndAddr& iface, EndpointInfoHash& result );
 };
+QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(OnvifResourceSearcherWsdd::ObtainMacFromMulticast)
+QN_FUSION_DECLARE_FUNCTIONS(OnvifResourceSearcherWsdd::ObtainMacFromMulticast, (metatype)(numeric)(lexical))
 
 #endif //ENABLE_ONVIF
 

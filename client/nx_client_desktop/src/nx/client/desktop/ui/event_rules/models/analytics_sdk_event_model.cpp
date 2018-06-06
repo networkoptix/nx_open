@@ -26,7 +26,7 @@ AnalyticsSdkEventModel::~AnalyticsSdkEventModel()
 void AnalyticsSdkEventModel::loadFromCameras(const QnVirtualCameraResourceList& cameras)
 {
     beginResetModel();
-    
+
     auto addItem = [this](
         QStandardItem* parent,
         const nx::api::TranslatableString& name,
@@ -47,7 +47,10 @@ void AnalyticsSdkEventModel::loadFromCameras(const QnVirtualCameraResourceList& 
     AnalyticsHelper helper(commonModule());
     clear();
 
-    const auto items = helper.supportedAnalyticsEvents(cameras);
+    const auto items = cameras.empty()
+        ? helper.systemCameraIndependentAnalyticsEvents()
+        : helper.supportedAnalyticsEvents(cameras);
+
     const bool useDriverName = nx::vms::event::AnalyticsHelper::hasDifferentDrivers(items);
 
     QMap<QnUuid, QStandardItem*> groups;

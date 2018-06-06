@@ -13,15 +13,15 @@ set(cloudName "VMS Demo Cloud")
 set(installer.name "vmsdemo")
 
 # Support section
-set(companyUrl "http://completeipsolution.com")
-set(productUrl "http://dwspectrum.com")
-set(supportUrl "")
-set(supportEmail "dw-tech@dwcc.tv")
+set(companyUrl "http://networkoptix.com")
+set(productUrl "http://networkoptix.com/nxwitness-overview")
+set(supportUrl "http://support.networkoptix.com")
+set(supportEmail "")
 set(supportPhone "")
-set(licenseEmail "licenses@dwcc.tv")
+set(licenseEmail "support@networkoptix.com")
 # end of Support section
 
-set(defaultWebPages "{\"Home Page\": \"http://dwspectrum.com\"}")
+set(defaultWebPages "")
 
 # Custom Installer (if needed). If not leave "default"
 

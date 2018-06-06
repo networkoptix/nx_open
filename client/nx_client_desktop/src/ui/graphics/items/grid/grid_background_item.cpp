@@ -490,15 +490,21 @@ void QnGridBackgroundItem::setImage(const QImage& image, const QString& filename
     }
 
     //converting image to YUV format
-    m_imgAsFrame = QSharedPointer<CLVideoDecoderOutput>( new CLVideoDecoderOutput() );
 
     //adding stride to source data
     // TODO: #ak it is possible to remove this copying and optimize loading by using ffmpeg to load picture files
     const unsigned int requiredImgXStride = qPower2Ceil( (unsigned int)imgToLoad->width()*4, X_STRIDE_FOR_SSE_CONVERT_UTILS );
     quint8* alignedImgBuffer = (quint8*)qMallocAligned( requiredImgXStride*imgToLoad->height(), X_STRIDE_FOR_SSE_CONVERT_UTILS );
+
+    // Check if there is enough memory to preprocess the image.
+    if (!alignedImgBuffer)
+        return;
+
     //copying image data to aligned buffer
     for( int y = 0; y < imgToLoad->height(); ++y )
         memcpy( alignedImgBuffer + requiredImgXStride*y, imgToLoad->constScanLine(y), imgToLoad->width()*imgToLoad->depth()/8 );
+
+    m_imgAsFrame = QSharedPointer<CLVideoDecoderOutput>( new CLVideoDecoderOutput() );
 
 #ifdef USE_YUVA420
     m_imgAsFrame->reallocate( imgToLoad->width(), imgToLoad->height(), AV_PIX_FMT_YUVA420P );

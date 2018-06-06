@@ -1,11 +1,12 @@
 set(depends
     mediaserver
-    root_tool
+    # The line below will be uncommented when all root_tool related tasks are finished.
+    # root_tool
     server_plugins
     testcamera
 )
 
-# Variables used by build-dist.sh.
+# Variables used for filtering.
 set(common_depends
     "zlib1g (>= 1:1.1.4)"
     "debconf (>= 0.5) | debconf-2.0"
@@ -25,10 +26,6 @@ set(common_depends
 string(REPLACE ";" ", " common.depends "${common_depends}") #< Make a comma-separated list.
 set(arch.depends ", syslinux")
 
-# Variables which may depend on current project and are used by build-dist.sh.
-set(project.build.directory ${CMAKE_CURRENT_BINARY_DIR})
-set(basedir ${CMAKE_CURRENT_SOURCE_DIR}) # For ${basedir}/../scripts
-
 nx_configure_directory(
     ${CMAKE_CURRENT_SOURCE_DIR}/maven/filter-resources
     ${CMAKE_CURRENT_BINARY_DIR}
@@ -39,7 +36,7 @@ set(zip_file ${distribution_output_dir}/${artifact.name.server_update}.zip)
 set(deb_file ${distribution_output_dir}/${artifact.name.server}.deb)
 set(installer_output_list ${zip_file} ${deb_file})
 
-set(script ${CMAKE_CURRENT_BINARY_DIR}/build-dist.sh)
+set(script ${CMAKE_CURRENT_SOURCE_DIR}/build_distribution.sh)
 add_custom_command(
     OUTPUT ${installer_output_list}
     COMMAND ${script}

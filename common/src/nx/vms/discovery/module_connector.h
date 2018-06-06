@@ -69,7 +69,7 @@ private:
         const QnUuid m_id;
         Endpoints m_endpoints;
         boost::optional<SocketAddress> m_lastSuccessfulEndpoint; //< TODO: Should not be merged into 4.0!!
-        std::set<SocketAddress> m_forbiddenEndpoints;
+        std::set<QString> m_forbiddenEndpoints; //< Enforce string comparation to block IPs as well.
         network::RetryTimer m_reconnectTimer;
         std::set<nx_http::AsyncHttpClientPtr> m_httpClients;
         std::unique_ptr<AbstractStreamSocket> m_socket;

@@ -20,7 +20,8 @@ def determine_package_versions():
         "openal": "1.16",
         "libjpeg-turbo": "1.4.2",
         "festival": "2.4",
-        "directx": "JUN2010"
+        "directx": "JUN2010",
+        "pandoc": "2.2.1"
     }
 
     if platform == "windows":
@@ -62,7 +63,7 @@ def determine_package_versions():
 
     if box == "bananapi":
         v["ffmpeg"] = "3.1.1-bananapi"
-        v["qt"] = "5.6.1-1"
+        v["qt"] = "5.6.3-bananapi"
 
     if box == "rpi":
         v["qt"] = "5.6.3"
@@ -106,7 +107,7 @@ def sync_dependencies(syncher):
     if platform == "linux" and box in ("bpi", "bananapi", "rpi", "tx1", "none"):
         sync("sysroot", path_variable="sysroot_directory")
 
-    if box in ("bpi", "bananapi"):
+    if box == "bpi":
         sync("opengl-es-mali")
 
     if box == "rpi":
@@ -128,6 +129,9 @@ def sync_dependencies(syncher):
         sync("vmaxproxy-2.1")
         sync("windows/wix-3.11", path_variable="wix_directory")
         sync("windows/signtool", path_variable="signtool_directory")
+
+    if platform in ("windows", "linux"):
+        sync("%s/pandoc" % platform, path_variable="pandoc_directory")
 
     if box == "edge1":
         sync("cpro-1.0.0-2")
@@ -172,7 +176,7 @@ def sync_dependencies(syncher):
         #sync("additional-fonts")
         #sync("read-edid-3.0.2")
         #sync("a10-display")
-        
+
         # Hardware video decoding in Lite Client on Debian 7; kernel upgrade.
         #sync("libvdpau-sunxi-1.0-deb7")
         #sync("ldpreloadhook-1.0-deb7")

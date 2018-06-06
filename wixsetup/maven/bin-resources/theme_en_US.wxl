@@ -26,8 +26,6 @@
   <String Id="InstallCloseButton">Close</String>
   <String Id="InstallAcceptCheckbox">I agree to the</String>
   <String Id="InstallLicenseLinkText">End User License Agreement</String>
-  <UI Dialog="BalExtension" Control="EulaAcceptCheckbox" Width="86"/>
-  <UI Dialog="BalExtension" Control="EulaHyperlink" X="100"/>
 
   <String Id="OptionsHeader">Setup Options</String>
   <String Id="OptionsLocationLabel">Install location:</String>
@@ -78,4 +76,7 @@
   <!-- ArchCheck -->
   <String Id="Product_ArchMismatch_x86">This package is designed for 32-bit OS. Setup will now exit.</String>
   <String Id="Product_ArchMismatch_x64">This package is designed for 64-bit OS. Setup will now exit.</String>
+
+  <UI Dialog="BalExtension" Control="EulaAcceptCheckbox" Width="91"/>
+  <UI Dialog="BalExtension" Control="EulaHyperlink" X="105"/>
 </WixLocalization>

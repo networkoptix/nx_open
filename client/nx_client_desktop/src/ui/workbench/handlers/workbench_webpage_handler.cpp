@@ -47,11 +47,11 @@ void QnWorkbenchWebPageHandler::at_newWebPageAction_triggered()
     if (!dialog->exec())
         return;
 
-    const auto url = QUrl::fromUserInput(dialog->url());
-
-    QnWebPageResourcePtr webPage(new QnWebPageResource(url));
-    if (!dialog->name().isEmpty())
-        webPage->setName(dialog->name());
+    QnWebPageResourcePtr webPage(new QnWebPageResource(commonModule()));
+    webPage->setId(QnUuid::createUuid());
+    webPage->setUrl(dialog->url().toString());
+    webPage->setName(dialog->name());
+    webPage->setSubtype(dialog->subtype());
 
     // No need to backup newly created webpage.
     auto applyChangesFunction = QnResourcesChangesManager::WebPageChangesFunction();
@@ -81,25 +81,28 @@ void QnWorkbenchWebPageHandler::at_editWebPageAction_triggered()
 
     const auto oldName = webPage->getName();
     const auto oldUrl = webPage->getUrl();
+    const auto oldSubType = webPage->subtype();
 
     QScopedPointer<QnWebpageDialog> dialog(new QnWebpageDialog(mainWindow()));
     dialog->setWindowTitle(tr("Edit Web Page"));
     dialog->setName(oldName);
     dialog->setUrl(oldUrl);
+    dialog->setSubtype(oldSubType);
     if (!dialog->exec())
         return;
 
-    if (oldName == dialog->name() && oldUrl == dialog->url())
+    const auto url = dialog->url();
+    const auto name = dialog->name();
+    const auto subtype = dialog->subtype();
+
+    if (oldName == name && oldUrl == url.toString() && oldSubType == subtype)
         return;
 
-    const auto url = QUrl::fromUserInput(dialog->url());
-
     qnResourcesChangesManager->saveWebPage(webPage,
-        [url, name = dialog->name()](const QnWebPageResourcePtr& webPage)
+        [url, name, subtype](const QnWebPageResourcePtr& webPage)
         {
             webPage->setUrl(url.toString());
-            webPage->setName(name.isEmpty()
-                ? QnWebPageResource::nameForUrl(url)
-                : name);
+            webPage->setName(name);
+            webPage->setSubtype(subtype);
         });
 }

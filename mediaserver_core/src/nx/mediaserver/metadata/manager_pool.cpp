@@ -114,25 +114,33 @@ void ManagerPool::initExistingResources()
 
 void ManagerPool::at_resourceAdded(const QnResourcePtr& resource)
 {
+    auto camera = resource.dynamicCast<QnSecurityCamResource>();
+    if (!camera)
+        return;
+
     NX_VERBOSE(
         this,
         lm("Resource %1 (%2) has been added.")
             .args(resource->getName(), resource->getId()));
 
     connect(
-        resource.data(), &QnResource::statusChanged,
+        resource, &QnResource::statusChanged,
         this, &ManagerPool::handleResourceChanges);
 
     connect(
-        resource.data(), &QnResource::parentIdChanged,
+        resource, &QnResource::parentIdChanged,
         this, &ManagerPool::handleResourceChanges);
 
     connect(
-        resource.data(), &QnResource::urlChanged,
+        resource, &QnResource::urlChanged,
         this, &ManagerPool::handleResourceChanges);
 
     connect(
-        resource.data(), &QnResource::propertyChanged,
+        camera, &QnSecurityCamResource::logicalIdChanged,
+        this, &ManagerPool::handleResourceChanges);
+
+    connect(
+        resource, &QnResource::propertyChanged,
         this, &ManagerPool::at_propertyChanged);
 
     handleResourceChanges(resource);
@@ -162,6 +170,7 @@ void ManagerPool::at_resourceRemoved(const QnResourcePtr& resource)
     if (!camera)
         return;
 
+    camera->disconnect(this);
     releaseResourceMetadataManagers(camera);
 }
 
@@ -651,6 +660,9 @@ bool ManagerPool::cameraInfoFromResource(
         CameraInfo::kStringParameterMaxLength);
 
     outResourceInfo->channel = camera->getChannel();
+
+    // If getLogicalId() returns incorrect number, logicalId is set to 0.
+    outResourceInfo->logicalId = camera->getLogicalId().toInt();
 
     return true;
 }

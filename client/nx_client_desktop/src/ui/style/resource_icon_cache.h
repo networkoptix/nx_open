@@ -54,6 +54,8 @@ public:
         WebPage,
         WebPages,
 
+        C2P,
+
         TypeMask        = 0xFF,
 
         Offline         = 1 << 8,

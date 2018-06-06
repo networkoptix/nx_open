@@ -17,9 +17,6 @@ nx_configure_file(
 nx_configure_file(
     maven/filter-resources/client_app_info_impl.cpp
     ${CMAKE_CURRENT_BINARY_DIR})
-nx_configure_file(
-    ${PROJECT_SOURCE_DIR}/cpp/maven/bin-resources/app_icons.h
-    ${CMAKE_CURRENT_BINARY_DIR})
 
 if(MACOSX)
     set(mac_sources src/ui/workaround/mac_utils.mm)
@@ -36,7 +33,7 @@ nx_add_target(nx_client_desktop LIBRARY
         "${CMAKE_CURRENT_LIST_DIR}/skins/${defaultSkin}"
         "${customization_dir}/nx_client_desktop/resources"
         "${customization_dir}/icons/all/logo.png"
-        "${customization_dir}/license.txt"
+        "${customization_dir}/license.html"
         "${CMAKE_CURRENT_BINARY_DIR}/globals.json"
         "${nov_file_launcher_executable}"
     OTHER_SOURCES

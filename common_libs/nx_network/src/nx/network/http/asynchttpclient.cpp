@@ -1521,7 +1521,7 @@ void downloadFileAsyncEx(
         httpClientCaptured.get(), requestCompletionFunc,
         Qt::DirectConnection);
 
-    if (method.isEmpty() || method == nx_http::Method::get)
+    if (method == nx_http::Method::get)
     {
         httpClientCaptured->doGet(url);
     }

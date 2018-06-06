@@ -1125,10 +1125,6 @@
         </translation>
     </message>
     <message>
-        <source>Storage Failure</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>Network Issue</source>
         <translation></translation>
     </message>
@@ -1232,10 +1228,6 @@
     </message>
     <message>
         <source>Motion on %1</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Storage Failure at %1</source>
         <translation></translation>
     </message>
     <message>
@@ -1529,6 +1521,14 @@
         <source>%1 at %2</source>
         <comment>Analytics Event at some camera</comment>
         <translation></translation>
+    </message>
+    <message>
+        <source>Storage Issue</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Storage Issue at %1</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>

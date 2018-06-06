@@ -24,6 +24,8 @@
 #include <ui/help/help_topics.h>
 #include <common/common_module.h>
 #include <core/resource_management/resource_pool.h>
+
+
 using namespace nx::client::desktop::ui;
 
 namespace {
@@ -123,12 +125,11 @@ QnCameraExpertSettingsWidget::QnCameraExpertSettingsWidget(QWidget* parent):
     setHelpTopic(ui->settingsDisableControlHint, Qn::CameraSettings_Expert_SettingsControl_Help);
 
     ui->bitratePerGopHint->setHint(tr("Helps fix image quality issues on some cameras; for others will cause significant bitrate increase."));
-    setHelpTopic(ui->bitratePerGopHint, Qn::CameraSettings_Expert_SettingsControl_Help);
+    setHelpTopic(ui->bitratePerGopHint, Qn::CameraSettings_Expert_CalculateBitratePerGop);
 
     auto logicalIdHint = nx::client::desktop::HintButton::hintThat(ui->logicalIdGroupBox);
     logicalIdHint->addHintLine(tr("Custom number that can be assigned to a camera for quick identification and access"));
-    // TODO: Fill in help topic when it is implemented
-    //logicalIdHint->setHelpTopic(Qn::)
+    setHelpTopic(logicalIdHint, Qn::CameraSettings_Expert_LogicalId_Help);
 }
 
 QnCameraExpertSettingsWidget::~QnCameraExpertSettingsWidget()

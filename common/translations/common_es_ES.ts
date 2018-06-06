@@ -204,11 +204,11 @@
     </message>
     <message>
       <source>Too many media errors. Please open device issues dialog for more details.</source>
-      <translation>Demasiados errores de los medios de comunicación. Por favor, abra el diálogo de temas de dispositivo para más detalles.</translation>
+      <translation>Hay demasiados errores del medios. Por favor, abra el diálogo de dispositivo para más detalles.</translation>
     </message>
     <message>
       <source>Too many media errors. Please open camera issues dialog for more details.</source>
-      <translation>Demasiados errores de los medios. Por favor abrir el diálogo de cámara para más detalles.</translation>
+      <translation>Hay demasiados errores del medios. Por favor, abra el diálogo de cámara para más detalles.</translation>
     </message>
     <message>
       <source>Camera plugin error. %1</source>
@@ -236,8 +236,7 @@
     </message>
     <message>
       <source>Too many media errors. Please open I/O module issues dialog for more details.</source>
-      <translation>Demasiados errores de medios. Por favor, abra el diálogo 
- del módulo E/S para más detalles.</translation>
+      <translation>Hay demasiados errores del medios. Por favor, abra el diálogo del módulo E/S para más detalles.</translation>
     </message>
     <message>
       <source>Device initialization process is in progress.</source>

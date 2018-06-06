@@ -36,10 +36,7 @@ public:
         nx::sdk::metadata::MetadataHandler*);
 
     std::unique_ptr<nx::sdk::metadata::MetadataHandler> handler;
-
-    std::unique_ptr<
-        nx::sdk::metadata::CameraManager,
-        ManagerDeleter> manager;
+    std::unique_ptr<nx::sdk::metadata::CameraManager, ManagerDeleter> manager;
 };
 
 class ManagerPool final:

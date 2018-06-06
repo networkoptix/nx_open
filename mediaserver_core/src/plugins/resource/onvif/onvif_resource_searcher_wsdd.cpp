@@ -18,6 +18,8 @@
 #include <core/resource/resource_data.h>
 #include <core/resource_management/resource_data_pool.h>
 
+#include <nx/fusion/model_functions.h>
+
 //static const int SOAP_DISCOVERY_TIMEOUT = 1; // "+" in seconds, "-" in mseconds
 static const int SOAP_DISCOVERY_TIMEOUT = -500; // "+" in seconds, "-" in mseconds
 static const int SOAP_HELLO_CHECK_TIMEOUT = -1; // "+" in seconds, "-" in mseconds
@@ -31,9 +33,15 @@ const char OnvifResourceSearcherWsdd::SCOPES_NAME_PREFIX[] = "onvif://www.onvif.
 const char OnvifResourceSearcherWsdd::SCOPES_HARDWARE_PREFIX[] = "onvif://www.onvif.org/hardware/";
 const char OnvifResourceSearcherWsdd::SCOPES_LOCATION_PREFIX[] = "onvif://www.onvif.org/location/";
 const char OnvifResourceSearcherWsdd::PROBE_TYPE[] = "onvifDiscovery:NetworkVideoTransmitter";
-const char OnvifResourceSearcherWsdd::WSA_ADDRESS[] = "http://schemas.xmlsoap.org/ws/2004/08/addressing/role/anonymous";
-const char OnvifResourceSearcherWsdd::WSDD_ADDRESS[] = "urn:schemas-xmlsoap-org:ws:2005:04:discovery";
-const char OnvifResourceSearcherWsdd::WSDD_ACTION[] = "http://schemas.xmlsoap.org/ws/2005/04/discovery/Probe";
+const char OnvifResourceSearcherWsdd::WSA_ADDRESS[] =
+    "http://schemas.xmlsoap.org/ws/2004/08/addressing/role/anonymous";
+const char OnvifResourceSearcherWsdd::WSDD_ADDRESS[] =
+    "urn:schemas-xmlsoap-org:ws:2005:04:discovery";
+const char OnvifResourceSearcherWsdd::WSDD_ACTION[] =
+    "http://schemas.xmlsoap.org/ws/2005/04/discovery/Probe";
+
+const QString  OnvifResourceSearcherWsdd::OBTAIN_MAC_FROM_MULTICAST_PARAM_NAME =
+    lit("obtainMacFromMulticast");
 
 static const std::vector<QString> kManufacturerScopePrefixes
     = {lit("onvif://www.onvif.org/manufacturer/")};
@@ -42,7 +50,7 @@ const char OnvifResourceSearcherWsdd::WSDD_GSOAP_MULTICAST_ADDRESS[] = "soap.udp
 
 static const int WSDD_MULTICAST_PORT = 3702;
 static const char WSDD_MULTICAST_ADDRESS[] = "239.255.255.250";
-static const SocketAddress WSDD_MULTICAST_ENDPOINT( WSDD_MULTICAST_ADDRESS, WSDD_MULTICAST_PORT );
+static const SocketAddress WSDD_MULTICAST_ENDPOINT(WSDD_MULTICAST_ADDRESS, WSDD_MULTICAST_PORT);
 
 namespace
 {
@@ -169,6 +177,9 @@ OnvifResourceSearcherWsdd::OnvifResourceSearcherWsdd(OnvifResourceInformationFet
     m_mutex()*/
 {
     //updateInterfacesListenSockets();
+    qRegisterMetaType<OnvifResourceSearcherWsdd::ObtainMacFromMulticast>();
+    QnJsonSerializer::registerSerializer<OnvifResourceSearcherWsdd::ObtainMacFromMulticast>();
+
 }
 
 OnvifResourceSearcherWsdd::~OnvifResourceSearcherWsdd()
@@ -467,12 +478,12 @@ QString OnvifResourceSearcherWsdd::getMac(const T* source, const SOAP_ENV__Heade
         QString manufacturer = getManufacturer(source, name);
 
         const QnResourceData resourceData = qnStaticCommon->dataPool()->data(manufacturer, name);
-        const bool ignoreMacFromMulticast =
-            resourceData.value<bool>(Qn::IGNORE_MAC_FROM_MULTICAST_PARAM_NAME);
-        const bool useMacFromMulticast = (macFromEndpoint == macFromMessageId
-            || resourceData.value<bool>(Qn::MAC_FROM_MULTICAST_PARAM_NAME));
+        ObtainMacFromMulticast obtainMacFromMulticast = ObtainMacFromMulticast::Auto;
+        resourceData.value(OBTAIN_MAC_FROM_MULTICAST_PARAM_NAME, &obtainMacFromMulticast);
 
-        if (!ignoreMacFromMulticast && useMacFromMulticast)
+        if ((obtainMacFromMulticast == ObtainMacFromMulticast::Always)
+            || (obtainMacFromMulticast == ObtainMacFromMulticast::Auto
+                && macFromEndpoint == macFromMessageId))
         {
             QString result;
             for (int i = 1; i < kMacAddressLength; i += 2)
@@ -918,5 +929,10 @@ bool OnvifResourceSearcherWsdd::readProbeMatches( const QnInterfaceAndAddr& ifac
         ctx.soapWsddProxy.reset();
     }
 }
+
+QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(OnvifResourceSearcherWsdd, ObtainMacFromMulticast,
+(OnvifResourceSearcherWsdd::Auto, "Auto")
+(OnvifResourceSearcherWsdd::Always, "Always")
+(OnvifResourceSearcherWsdd::Never, "Never"))
 
 #endif //ENABLE_ONVIF

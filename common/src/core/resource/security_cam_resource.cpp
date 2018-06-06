@@ -962,8 +962,14 @@ QString QnSecurityCamResource::getLogicalId() const
 void QnSecurityCamResource::setLogicalId(const QString& value)
 {
     NX_ASSERT(!getId().isNull());
-    QnCameraUserAttributePool::ScopedLock userAttributesLock(userAttributesPool(), getId());
-    (*userAttributesLock)->logicalId = value;
+    {
+        QnCameraUserAttributePool::ScopedLock userAttributesLock(userAttributesPool(), getId());
+        if ((*userAttributesLock)->logicalId == value)
+            return;
+        (*userAttributesLock)->logicalId = value;
+    }
+
+    emit logicalIdChanged(::toSharedPointer(this));
 }
 
 void QnSecurityCamResource::setMaxDays(int value)

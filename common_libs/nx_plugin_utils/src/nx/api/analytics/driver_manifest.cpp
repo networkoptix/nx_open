@@ -2,6 +2,9 @@
 
 #include <nx/fusion/model_functions.h>
 
+QN_DEFINE_METAOBJECT_ENUM_LEXICAL_FUNCTIONS(nx::api::AnalyticsDriverManifestBase, Capability)
+QN_DEFINE_METAOBJECT_ENUM_LEXICAL_FUNCTIONS(nx::api::AnalyticsDriverManifestBase, Capabilities)
+
 namespace nx {
 namespace api {
 

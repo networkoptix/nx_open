@@ -253,11 +253,11 @@ QnStorageConfigWidget::QnStorageConfigWidget(QWidget* parent) :
     m_storagePoolMenu->addAction(tr("Backup"))->setData(true);
 
     setHelpTopic(this, Qn::ServerSettings_Storages_Help);
-    setHelpTopic(ui->backupGroupBox, Qn::ServerSettings_ArchiveRestoring_Help);
+    setHelpTopic(ui->backupGroupBox, Qn::SystemSettings_Server_Backup_Help);
 
-    ui->rebuildBackupButtonHint->addHintLine(tr("Creates a backup of System configuration that can be restored in case of failure."));
-    ui->rebuildBackupButtonHint->addHintLine(tr("Backup includes servers and cameras settings, users, webpages, event rules, etc. Video is not saved."));
-    setHelpTopic(ui->rebuildBackupButtonHint, Qn::SystemSettings_Server_Backup_Help);
+    ui->rebuildBackupButtonHint->addHintLine(tr("Reindexing can fix problems with archive or "
+        "backup if they have been lost or damaged, or if some hardware has been replaced."));
+    setHelpTopic(ui->rebuildBackupButtonHint, Qn::ServerSettings_ArchiveRestoring_Help);
 
     auto hoverTracker = new QnItemViewHoverTracker(ui->storageView);
     hoverTracker->setAutomaticMouseCursor(true);

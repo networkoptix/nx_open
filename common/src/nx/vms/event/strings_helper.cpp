@@ -96,6 +96,8 @@ QString StringsHelper::actionName(ActionType value) const
         case showOnAlarmLayoutAction: return tr("Show on Alarm Layout");
         case execHttpRequestAction:   return tr("Do HTTP request");
         case acknowledgeAction:       return tr("Acknowledge");
+        case fullscreenCameraAction:  return tr("Set to fullscreen");
+        case exitFullscreenAction:    return tr("Exit fullscreen");
 
         case cameraOutputAction:
             return QnDeviceDependentStrings::getDefaultNameFromSet(

@@ -595,9 +595,9 @@
       <source>%n camera(s)</source>
       <translation>
         <numerusform>%n камера</numerusform>
-        <numerusform>%n камеры</numerusform>
-        <numerusform>%n камер</numerusform>
-        <numerusform>%n камер</numerusform>
+        <numerusform>%n камера</numerusform>
+        <numerusform>%n камера</numerusform>
+        <numerusform>%n камера</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -613,9 +613,9 @@
       <source>%n device(s)</source>
       <translation>
         <numerusform>%n устройство</numerusform>
-        <numerusform>%n устройства</numerusform>
-        <numerusform>%n устройств</numerusform>
-        <numerusform>%n устройств</numerusform>
+        <numerusform>%n устройство</numerusform>
+        <numerusform>%n устройство</numerusform>
+        <numerusform>%n устройство</numerusform>
       </translation>
     </message>
     <message>
@@ -654,18 +654,18 @@
       <source>%n I/O Module(s)</source>
       <translation>
         <numerusform>%n модуль ввода/вывода</numerusform>
-        <numerusform>%n модуля ввода/вывода</numerusform>
-        <numerusform>%n модулей ввода/вывода</numerusform>
-        <numerusform>%n модулей ввода/вывода</numerusform>
+        <numerusform>%n модуль ввода/вывода</numerusform>
+        <numerusform>%n модуль ввода/вывода</numerusform>
+        <numerusform>%n модуль ввода/вывода</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n I/O module(s)</source>
       <translation>
         <numerusform>%n модуль ввода/вывода</numerusform>
-        <numerusform>%n модуля ввода/вывода</numerusform>
-        <numerusform>%n модулей ввода/вывода</numerusform>
-        <numerusform>%n модулей ввода/вывода</numerusform>
+        <numerusform>%n модуль ввода/вывода</numerusform>
+        <numerusform>%n модуль ввода/вывода</numerusform>
+        <numerusform>%n модуль ввода/вывода</numerusform>
       </translation>
     </message>
     <message>
@@ -1239,7 +1239,7 @@
       <translation>
         <numerusform>Конфликт IP адреса устройства</numerusform>
         <numerusform>Конфликт IP адресов устройств</numerusform>
-        <numerusform>Конфликт IP адресов устройств</numerusform>
+        <numerusform>Конфликт IP адреса устройств</numerusform>
         <numerusform>Конфликт IP адресов устройств</numerusform>
       </translation>
     </message>
@@ -1248,7 +1248,7 @@
       <translation>
         <numerusform>Конфликт IP адреса камеры</numerusform>
         <numerusform>Конфликт IP адресов камер</numerusform>
-        <numerusform>Конфликт IP адресов камер</numerusform>
+        <numerusform>Конфликт IP адреса камер</numerusform>
         <numerusform>Конфликт IP адресов камер</numerusform>
       </translation>
     </message>
@@ -1387,7 +1387,7 @@
       <translation>
         <numerusform>%n раз, первый: %2 &lt;b&gt;%1&lt;/b&gt;</numerusform>
         <numerusform>%n раза, первый: %2 &lt;b&gt;%1&lt;/b&gt;</numerusform>
-        <numerusform>%n раз, первый: %2 &lt;b&gt;%1&lt;/b&gt;</numerusform>
+        <numerusform>%n раза, первый: %2 &lt;b&gt;%1&lt;/b&gt;</numerusform>
         <numerusform>%n раз, первый: %2 &lt;b&gt;%1&lt;/b&gt;</numerusform>
       </translation>
     </message>
@@ -1400,16 +1400,16 @@
       <source>First occurrence: %1 on %2 (%n times total)</source>
       <comment>%1 means time, %2 means date</comment>
       <translation>
-        <numerusform>Первое проявление: %2 %1 (всего %n раз)</numerusform>
         <numerusform>Первое проявление: %2 %1 (всего %n раза)</numerusform>
-        <numerusform>Первое проявление: %2 %1 (всего %n раз)</numerusform>
+        <numerusform>Первое проявление: %2 %1 (всего %n раза)</numerusform>
+        <numerusform>Первое проявление: %2 %1 (всего %n раза)</numerusform>
         <numerusform>Первое проявление: %2 %1 (всего %n раз)</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>No data received during last %n seconds.</source>
       <translation>
-        <numerusform>Нет данных в течение %n секунды.</numerusform>
+        <numerusform>Нет данных в течение %n секунд.</numerusform>
         <numerusform>Нет данных в течение %n секунд.</numerusform>
         <numerusform>Нет данных в течение %n секунд.</numerusform>
         <numerusform>Нет данных в течение %n секунд.</numerusform>
@@ -1545,7 +1545,7 @@
       <translation>
         <numerusform>%n Роль</numerusform>
         <numerusform>%n Роли</numerusform>
-        <numerusform>%n Ролей</numerusform>
+        <numerusform>%n Role</numerusform>
         <numerusform>%n Ролей</numerusform>
       </translation>
     </message>
