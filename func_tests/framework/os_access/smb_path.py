@@ -14,6 +14,7 @@ from smb.smb_structs import OperationFailure
 from framework.method_caching import cached_getter
 from framework.os_access.exceptions import AlreadyExists, BadParent, DoesNotExist, NotADir, NotAFile
 from framework.os_access.path import FileSystemPath
+from framework.waiting import Wait
 
 _STATUS_SUCCESS = 0x00000000  # See: https://msdn.microsoft.com/en-us/library/cc704588.aspx
 _STATUS_NO_SUCH_FILE = 0xC000000F  # See: https://msdn.microsoft.com/en-us/library/cc704588.aspx
@@ -22,6 +23,8 @@ _STATUS_OBJECT_NAME_COLLISION = 0xC0000035  # See: https://msdn.microsoft.com/en
 _STATUS_OBJECT_PATH_NOT_FOUND = 0xC000003A  # See: https://msdn.microsoft.com/en-us/library/cc704588.aspx
 _STATUS_NOT_A_DIRECTORY = 0xC0000103  # See: https://msdn.microsoft.com/en-us/library/cc704588.aspx
 _STATUS_FILE_IS_A_DIRECTORY = 0xC00000BA  # See: https://msdn.microsoft.com/en-us/library/cc704588.aspx
+_STATUS_SHARING_VIOLATION = 0xC0000043  # See: https://msdn.microsoft.com/en-us/library/cc704588.aspx
+_STATUS_DELETE_PENDING = 0xC0000056  # See: https://msdn.microsoft.com/en-us/library/cc704588.aspx
 
 _logger = logging.getLogger(__name__)
 
@@ -38,6 +41,28 @@ def _reraising_on_operation_failure(status_to_error_cls):
                     error_cls = status_to_error_cls[last_message_status]
                     raise error_cls(e)
                 raise
+
+        return decorated
+
+    return decorator
+
+
+def _retrying_on_status(*statuses):
+    def decorator(func):
+        @wraps(func)
+        def decorated(*args, **kwargs):
+            until = "no {} error".format(', '.join(map(hex, statuses)))
+            wait = Wait(until, timeout_sec=5)
+            while True:
+                try:
+                    return func(*args, **kwargs)
+                except OperationFailure as e:
+                    last_message_status = e.smb_messages[-1].status
+                    if last_message_status not in statuses:
+                        raise
+                    if not wait.again():
+                        raise
+                wait.sleep()
 
         return decorated
 
@@ -132,6 +157,7 @@ class SMBPath(FileSystemPath, PureWindowsPath):
             raise
         return True
 
+    @_retrying_on_status(_STATUS_SHARING_VIOLATION)  # Let OS and processes time unlock files.
     @_reraising_on_operation_failure({_STATUS_FILE_IS_A_DIRECTORY: NotAFile})
     def unlink(self):
         if '*' in str(self):
@@ -236,6 +262,7 @@ class SMBPath(FileSystemPath, PureWindowsPath):
         assert bytes_read == len(data)
         return data
 
+    @_retrying_on_status(_STATUS_DELETE_PENDING)
     @_reraising_on_operation_failure({
         _STATUS_FILE_IS_A_DIRECTORY: NotAFile,
         _STATUS_OBJECT_PATH_NOT_FOUND: BadParent})
