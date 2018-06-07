@@ -1,12 +1,12 @@
-#ifndef __FISHEYE_IMAGE_FILTER_H__
-#define __FISHEYE_IMAGE_FILTER_H__
-
+#pragma once
 #ifdef ENABLE_DATA_PROVIDERS
 
 #include <QtCore/QScopedPointer>
+#include <QtCore/QVector>
 
 #include <core/ptz/media_dewarping_params.h>
 #include <core/ptz/item_dewarping_params.h>
+#include <utils/media/frame_info.h>
 
 #include "abstract_image_filter.h"
 
@@ -36,5 +36,3 @@ private:
 };
 
 #endif // ENABLE_DATA_PROVIDERS
-
-#endif // __FISHEYE_IMAGE_FILTER_H__

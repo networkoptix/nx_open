@@ -1,5 +1,8 @@
 #include "legacy_ioport_settings_widget.h"
 #include "ui_legacy_ioport_settings_widget.h"
+
+#include <QtWidgets/QHeaderView>
+
 #include "../widgets/private/io_ports_sort_model.h"
 
 #include <core/resource/param.h>

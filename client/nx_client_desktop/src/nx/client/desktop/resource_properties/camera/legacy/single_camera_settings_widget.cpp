@@ -9,6 +9,7 @@
 #include <QtCore/QProcess>
 #include <QtCore/QScopedValueRollback>
 #include <QtGui/QDesktopServices>
+#include <QtWidgets/QButtonGroup>
 
 #include <camera/fps_calculator.h>
 #include <client/client_settings.h>
