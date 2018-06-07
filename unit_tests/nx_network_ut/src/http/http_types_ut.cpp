@@ -469,7 +469,7 @@ static const std::map<nx::String, nx::String> kTestCookie{
     {"authorizationKey", "88d13fb76ea9"},
 };
 
-TEST(HttpRequestTest, Request_parse)
+TEST(HttpResponseTest, Request_parse)
 {
     nx::network::http::Response request;
     ASSERT_TRUE(request.parse(kTestResponse));
