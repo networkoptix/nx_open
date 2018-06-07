@@ -14,10 +14,10 @@ _logger = logging.getLogger(__name__)
 class WindowsInstallation(Installation):
     """Manage installation on Windows"""
 
-    def __init__(self, windows_access, installer):
-        self.installer = installer  # type: Installer
+    def __init__(self, windows_access, installer):  # type: (WindowsAccess, Installer) -> None
+        self.installer = installer
         program_files_dir = windows_access.Path(windows_access.env_vars()['ProgramFiles'])
-        customization = installer.customization  # type: Customization
+        customization = installer.customization
         self.dir = program_files_dir / customization.windows_installation_subdir
         self.binary = self.dir / 'mediaserver.exe'
         self.info = self.dir / 'build_info.txt'
@@ -28,7 +28,7 @@ class WindowsInstallation(Installation):
         self.key_pair = self.var / 'ssl' / 'cert.pem'
         self._config_key = WindowsRegistry(windows_access.winrm).key(customization.windows_registry_key)
         self._config_key_backup = WindowsRegistry(windows_access.winrm).key(customization.windows_registry_key + ' Backup')
-        self.windows_access = windows_access  # type: WindowsAccess
+        self.windows_access = windows_access
 
     @property
     def os_access(self):
