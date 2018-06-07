@@ -60,6 +60,9 @@ private:
     void addResourcesViaSunApi(QnResourceList& upnpResults);
     void sendSunApiProbe();
     void readSunApiResponse(QnResourceList& resultResourceList);
+    bool readSunApiResponseFromSocket(
+        nx::network::AbstractDatagramSocket* socket,
+        QnResourceList* outResultResourceList);
     void updateSocketList();
 
     struct SunApiData: public nx::network::upnp::DeviceInfo
@@ -104,6 +107,7 @@ private:
 
     const std::vector<std::vector<quint8>> m_sunapiProbePackets;
     std::vector<std::unique_ptr<nx::network::AbstractDatagramSocket>> m_sunApiSocketList;
+    std::unique_ptr<nx::network::AbstractDatagramSocket> m_sunapiReceiveSocket;
     QList<nx::network::QnInterfaceAndAddr> m_lastInterfaceList;
     QMap<nx::network::QnMacAddress, SunApiData> m_sunapiDiscoveredDevices;
 };

@@ -43,7 +43,7 @@ public:
         const QString& qName,
         const QXmlAttributes& /*attrs*/) override
     {
-        if (localName == lit("xml") || localName == lit("Envelope"))
+        if (localName == "xml" || localName == "Envelope")
             return true; // TODO: check attrs
 
         m_awaitedValue = &m_message.params[qName];
@@ -89,13 +89,13 @@ public:
         const QString& qName,
         const QXmlAttributes& attrs) override
     {
-        if (localName == lit("Body"))
+        if (localName == "Body")
             return true;
 
-        if (qName.startsWith(lit("u:")))
+        if (qName.startsWith("u:"))
         {
             m_message.action = localName;
-            m_message.service = fromUpnpUrn(namespaceURI, lit("service"));
+            m_message.service = fromUpnpUrn(namespaceURI, "service");
             return true;
         }
 
@@ -114,8 +114,8 @@ public:
         const QString& qName,
         const QXmlAttributes& attrs) override
     {
-        if (localName == lit("Fault") || localName == lit("UPnpError") ||
-            localName == lit("detail"))
+        if (localName == "Fault" || localName == "UPnpError" ||
+            localName == "detail")
             return true;
 
         return super::startElement(namespaceURI, localName, qName, attrs);
@@ -152,24 +152,23 @@ QString AsyncClient::Message::toString() const
 {
     QStringList paramList;
     for (const auto& param : params)
-        paramList << lit("%1='%2'").arg(param.first).arg(param.second);
+        paramList << lm("%1='%2'").args(param.first, param.second);
 
-    return lit("%1:%2(%3)").arg(service).arg(action)
-        .arg(paramList.join(lit(", ")));
+    return lm("%1:%2(%3)").args(service, action, paramList.join(", "));
 }
 
 void AsyncClient::doUpnp(const nx::utils::Url& url, const Message& message,
     std::function< void(const Message&)> callback)
 {
-    const auto service = toUpnpUrn(message.service, lit("service"));
-    const auto action = lit("\"%1#%2\"").arg(service).arg(message.action);
+    const auto service = toUpnpUrn(message.service, "service");
+    const auto action = QString("\"%1#%2\"").arg(service).arg(message.action);
 
     QStringList params;
     for (const auto& p : message.params)
-        params.push_back(lit("<%1>%2</%1>").arg(p.first).arg(p.second));
+        params.push_back(QString("<%1>%2</%1>").arg(p.first).arg(p.second));
 
     const auto request = SOAP_REQUEST.arg(message.action).arg(service)
-        .arg(params.join(lit("")));
+        .arg(params.join(""));
 
     auto complete = [this, url, callback](const nx::network::http::AsyncHttpClientPtr& ptr)
     {
@@ -200,9 +199,8 @@ void AsyncClient::doUpnp(const nx::utils::Url& url, const Message& message,
             }
         }
 
-        NX_LOGX(lit("Could not parse message from %1")
-            .arg(url.toString(QUrl::RemovePassword)),
-            cl_logERROR);
+        NX_ERROR(this, lm("Could not parse message from %1").arg(
+            url.toString(QUrl::RemovePassword)));
 
         callback(Message());
     };
@@ -218,25 +216,25 @@ void AsyncClient::doUpnp(const nx::utils::Url& url, const Message& message,
     httpClient->doPost(url, "text/xml", request.toUtf8());
 }
 
-const QString AsyncClient::CLIENT_ID = lit("NX UpnpAsyncClient");
-const QString AsyncClient::INTERNAL_GATEWAY = lit("InternetGatewayDevice");
-const QString AsyncClient::WAN_IP = lit("WANIPConnection");
+const QString AsyncClient::CLIENT_ID = "NX UpnpAsyncClient";
+const QString AsyncClient::INTERNAL_GATEWAY = "InternetGatewayDevice";
+const QString AsyncClient::WAN_IP = "WANIPConnection";
 
-static const QString GET_EXTERNAL_IP = lit("GetExternalIPAddress");
-static const QString ADD_PORT_MAPPING = lit("AddPortMapping");
-static const QString DELETE_PORT_MAPPING = lit("DeletePortMapping");
-static const QString GET_GEN_PORT_MAPPING = lit("GetGenericPortMappingEntry");
-static const QString GET_SPEC_PORT_MAPPING = lit("GetSpecificPortMappingEntry");
+static const QString GET_EXTERNAL_IP = "GetExternalIPAddress";
+static const QString ADD_PORT_MAPPING = "AddPortMapping";
+static const QString DELETE_PORT_MAPPING = "DeletePortMapping";
+static const QString GET_GEN_PORT_MAPPING = "GetGenericPortMappingEntry";
+static const QString GET_SPEC_PORT_MAPPING = "GetSpecificPortMappingEntry";
 
-static const QString MAP_INDEX = lit("NewPortMappingIndex");
-static const QString EXTERNAL_IP = lit("NewExternalIPAddress");
-static const QString EXTERNAL_PORT = lit("NewExternalPort");
-static const QString PROTOCOL = lit("NewProtocol");
-static const QString INTERNAL_PORT = lit("NewInternalPort");
-static const QString INTERNAL_IP = lit("NewInternalClient");
-static const QString ENABLED = lit("NewEnabled");
-static const QString DESCRIPTION = lit("NewPortMappingDescription");
-static const QString DURATION = lit("NewLeaseDuration");
+static const QString MAP_INDEX = "NewPortMappingIndex";
+static const QString EXTERNAL_IP = "NewExternalIPAddress";
+static const QString EXTERNAL_PORT = "NewExternalPort";
+static const QString PROTOCOL = "NewProtocol";
+static const QString INTERNAL_PORT = "NewInternalPort";
+static const QString INTERNAL_IP = "NewInternalClient";
+static const QString ENABLED = "NewEnabled";
+static const QString DESCRIPTION = "NewPortMappingDescription";
+static const QString DURATION = "NewLeaseDuration";
 
 void AsyncClient::externalIp(
     const nx::utils::Url& url, std::function< void(const HostAddress&) > callback)
@@ -320,7 +318,7 @@ bool AsyncClient::MappingInfo::isValid() const
 
 QString AsyncClient::MappingInfo::toString() const
 {
-    return lit("MappingInfo( %1:%2 -> %3 %4 : %5 for %6 )")
+    return lm("MappingInfo( %1:%2 -> %3 %4 : %5 for %6 )")
         .arg(internalIp.toString()).arg(internalPort)
         .arg(externalPort).arg(QnLexical::serialized(protocol))
         .arg(description).arg(duration);

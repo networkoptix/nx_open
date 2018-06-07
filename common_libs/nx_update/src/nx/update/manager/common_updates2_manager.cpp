@@ -23,7 +23,6 @@ using namespace vms::common::p2p::downloader;
 
 namespace {
 
-static const qint64 kRefreshTimeoutMs = 24 * 60 * 60 * 1000; //< 1 day
 static const QString kFileName = "update.status";
 
 } // namespace
@@ -77,7 +76,7 @@ void CommonUpdates2Manager::loadStatusFromFile()
 
 update::info::AbstractUpdateRegistryPtr CommonUpdates2Manager::getGlobalRegistry()
 {
-    auto globalRegistry = update::info::UpdateRegistryFactory::create();
+    auto globalRegistry = update::info::UpdateRegistryFactory::create(peerId());
     bool deserializeResult = globalRegistry->fromByteArray(globalSettings()->updates2Registry());
     if (!deserializeResult)
         return update::info::AbstractUpdateRegistryPtr();
@@ -91,7 +90,7 @@ QnUuid CommonUpdates2Manager::moduleGuid() const
 
 void CommonUpdates2Manager::updateGlobalRegistry(const QByteArray& serializedRegistry)
 {
-    // #TODO #akulikov Return here if called on the client or make up somehow.
+    // #TODO #akulikov Return here if called on the client or figure out something better.
 
     globalSettings()->setUpdates2Registry(serializedRegistry);
     globalSettings()->synchronizeNow();

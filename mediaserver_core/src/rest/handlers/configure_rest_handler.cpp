@@ -178,9 +178,7 @@ int QnConfigureRestHandler::changePort(const QnRestConnectionProcessor* owner, i
 {
     const Qn::UserAccessData& accessRights = owner->accessRights();
 
-    int sPort = qnServerModule->roSettings()->value(
-        nx_ms_conf::SERVER_PORT,
-        nx_ms_conf::DEFAULT_SERVER_PORT).toInt();
+    int sPort = qnServerModule->settings().port();
     if (port == 0 || port == sPort)
         return ResultSkip;
 
@@ -215,7 +213,6 @@ int QnConfigureRestHandler::changePort(const QnRestConnectionProcessor* owner, i
     if (errCode != ec2::ErrorCode::ok)
         return ResultFail;
 
-    qnServerModule->roSettings()->setValue(nx_ms_conf::SERVER_PORT, port);
-
+    qnServerModule->mutableSettings()->port.set(port);
     return ResultOk;
 }

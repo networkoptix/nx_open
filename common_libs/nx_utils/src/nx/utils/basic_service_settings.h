@@ -1,7 +1,7 @@
 #pragma once
 
 #include "abstract_service_settings.h"
-#include "settings.h"
+#include "deprecated_settings.h"
 
 namespace nx {
 namespace utils {

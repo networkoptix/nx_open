@@ -81,7 +81,7 @@ QnCodecAudioFormat QnAudioProcessor::float2int16(QnByteArray& audio, QnCodecAudi
     for (int i = 0; i < len; ++i)
     {
         float f = *((float*)inP);
-        *outP = (qint16)(f * (1 << 15));
+        *outP = clip_short((qint32)(f * (1 << 15)));
         ++inP;
         ++outP;
     }

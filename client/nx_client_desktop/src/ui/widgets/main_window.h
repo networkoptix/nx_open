@@ -74,7 +74,7 @@ public:
     bool handleKeyPress(int key);
 
 public slots:
-    bool handleMessage(const QString &message);
+    bool handleOpenFile(const QString &message);
 
 protected:
     virtual bool event(QEvent *event) override;

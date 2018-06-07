@@ -4,39 +4,57 @@ from string import whitespace
 
 import pytest
 
-from framework.os_access.exceptions import BadParent, DoesNotExist, NotAFile, NotADir
+from framework.os_access.exceptions import BadParent, DoesNotExist, NotADir, NotAFile
 from framework.os_access.local_path import LocalPath
+from framework.os_access.ssh_path import make_ssh_path_cls
 
 pytest_plugins = ['fixtures.ad_hoc_ssh']
 
 
 @pytest.fixture()
-def local_path():
-    return LocalPath.tmp() / 'test_path-remote'
+def local_path_cls():
+    return LocalPath
 
 
 @pytest.fixture()
-def ssh_path(ad_hoc_ssh_access):
-    return ad_hoc_ssh_access.Path.tmp() / 'test_path-remote'
+def ssh_path_cls(ad_hoc_ssh):
+    return make_ssh_path_cls(ad_hoc_ssh)
+
+
+@pytest.fixture(scope='session')
+def windows_vm(vm_factory):
+    with vm_factory.allocated_vm('paths-test', vm_type='windows') as windows_vm:
+        yield windows_vm
 
 
 @pytest.fixture()
-def smb_path(windows_vm):
-    return windows_vm.os_access.Path.tmp() / 'test_path-remote'
+def smb_path_cls(windows_vm):
+    return windows_vm.os_access.Path
 
 
-@pytest.fixture(params=['local_path', 'ssh_path', 'smb_path'])
-def dirty_remote_test_dir(request):
+@pytest.fixture(params=['local_path_cls', 'ssh_path_cls', 'smb_path_cls'])
+def path_cls(request):
+    return request.getfixturevalue(request.param)
+
+
+@pytest.fixture()
+def dirty_remote_test_dir(request, path_cls):
     """Just a name, cleaned up by test"""
     # See: https://docs.pytest.org/en/latest/proposals/parametrize_with_fixtures.html
-    base_remote_dir = request.getfixturevalue(request.param)
+    base_remote_dir = path_cls.tmp() / (__name__ + '-remote')
     return base_remote_dir / request.node.name
+
+
+def _cleanup_dir(dir):
+    # To avoid duplication but makes setup and test distinct.
+    dir.rmtree(ignore_errors=True)
+    dir.mkdir(parents=True)  # Its parents may not exist.
+    return dir
 
 
 @pytest.fixture()
 def remote_test_dir(dirty_remote_test_dir):
-    dirty_remote_test_dir.rmtree(ignore_errors=True)
-    dirty_remote_test_dir.mkdir(parents=True)
+    _cleanup_dir(dirty_remote_test_dir)
     return dirty_remote_test_dir
 
 
@@ -61,9 +79,16 @@ def existing_remote_dir(remote_test_dir):
     return path
 
 
+def test_tmp(path_cls):
+    assert path_cls.tmp().exists()
+
+
+def test_home(path_cls):
+    assert path_cls.home().exists()
+
+
 def test_rmtree_write_exists(dirty_remote_test_dir):
-    dirty_remote_test_dir.rmtree(ignore_errors=True)
-    dirty_remote_test_dir.mkdir()
+    _cleanup_dir(dirty_remote_test_dir)
     touched_file = dirty_remote_test_dir / 'touched.empty'
     assert not touched_file.exists()
     touched_file.write_bytes(b'')
@@ -72,8 +97,7 @@ def test_rmtree_write_exists(dirty_remote_test_dir):
 
 @pytest.mark.parametrize('depth', [1, 2, 3, 4], ids='depth_{}'.format)
 def test_rmtree_mkdir_exists(dirty_remote_test_dir, depth):
-    dirty_remote_test_dir.rmtree(ignore_errors=True)
-    dirty_remote_test_dir.mkdir()
+    _cleanup_dir(dirty_remote_test_dir)
     root_dir = dirty_remote_test_dir / 'root'
     root_dir.mkdir()
     target_dir = root_dir.joinpath(*['level_{}'.format(level) for level in range(1, depth + 1)])
@@ -107,10 +131,11 @@ def test_rmtree_mkdir_exists(dirty_remote_test_dir, depth):
         ('ending_with_chr0', 'abc\0'),
         ],
     ids='{0[0]}'.format)
-def test_write_read_bytes(data, remote_test_dir):
+def test_write_read_bytes(remote_test_dir, data):
     name, written = data
     file_path = remote_test_dir / '{}.dat'.format(name)
-    file_path.write_bytes(written)
+    bytes_written = file_path.write_bytes(written)
+    assert bytes_written == len(written)
     read = file_path.read_bytes()
     assert read == written
 
@@ -129,7 +154,8 @@ def test_write_read_bytes(data, remote_test_dir):
 def test_write_read_text(remote_test_dir, data):
     name, encoding, written = data
     file_path = remote_test_dir / '{}_{}.txt'.format(name, encoding)
-    file_path.write_text(written, encoding=encoding)
+    chars_written = file_path.write_text(written, encoding=encoding)
+    assert chars_written == len(written)
     read = file_path.read_text(encoding=encoding)
     assert read == written
 
@@ -188,3 +214,24 @@ def test_glob_on_non_existent(existing_remote_dir):
     non_existent_path = existing_remote_dir / 'non_existent'
     with pytest.raises(DoesNotExist):
         _ = list(non_existent_path.glob('*'))
+
+
+def test_glob_on_empty_dir(existing_remote_dir):
+    assert not list(existing_remote_dir.glob('*'))
+
+
+def test_glob_no_result(existing_remote_dir):
+    existing_remote_dir.joinpath('oi.existing').write_bytes(b'empty')
+    assert not list(existing_remote_dir.glob('*.non_existent'))
+
+
+@pytest.mark.parametrize('iterations', [2, 10], ids='{}iterations'.format)
+@pytest.mark.parametrize('depth', [2, 10], ids='depth{}'.format)
+def test_many_mkdir_rmtree(remote_test_dir, iterations, depth):
+    """Sometimes mkdir after rmtree fails because of pending delete operations"""
+    top_path = remote_test_dir / 'top'
+    deep_path = top_path.joinpath(*('level{}'.format(level) for level in range(depth)))
+    for _ in range(iterations):
+        deep_path.mkdir(parents=True)
+        deep_path.joinpath('treasure').write_bytes(b'\0' * 1000000)
+        top_path.rmtree()

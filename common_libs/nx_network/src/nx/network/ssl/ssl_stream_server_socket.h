@@ -12,9 +12,10 @@ namespace ssl {
 namespace detail {
 
 class NX_NETWORK_API AbstractAcceptedSslStreamSocketWrapper:
-    public StreamSocketDelegate
+    public CustomStreamSocketDelegate<AbstractEncryptedStreamSocket, AbstractStreamSocket>
 {
-    using base_type = StreamSocketDelegate;
+    using base_type =
+        CustomStreamSocketDelegate<AbstractEncryptedStreamSocket, AbstractStreamSocket>;
 
 public:
     template<typename ...Args>

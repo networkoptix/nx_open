@@ -8,10 +8,10 @@ import pytest
 import server_api_data_generators as generator
 import transaction_log
 from framework.api_shortcuts import get_server_id
-from framework.mediaserver import MEDIASERVER_MERGE_TIMEOUT
+from framework.installation.mediaserver import MEDIASERVER_MERGE_TIMEOUT
 from framework.utils import SimpleNamespace, datetime_utc_now
 
-log = logging.getLogger(__name__)
+_logger = logging.getLogger(__name__)
 
 
 DEFAULT_TEST_SIZE = 10
@@ -129,7 +129,7 @@ def get_response(server, method, api_object, api_method):
 
 
 def wait_entity_merge_done(servers, method, api_object, api_method):
-    log.info('TEST for %s %s.%s:', method, api_object, api_method)
+    _logger.info('TEST for %s %s.%s:', method, api_object, api_method)
     start_time = datetime_utc_now()
     while True:
         result_expected = get_response(servers[0], method, api_object, api_method)
@@ -145,7 +145,7 @@ def wait_entity_merge_done(servers, method, api_object, api_method):
         if not result:
             return
         if datetime_utc_now() - start_time >= MEDIASERVER_MERGE_TIMEOUT:
-            log.error("'%s' was not synchronized in %s: '%r' and '%r'" % (
+            _logger.error("'%s' was not synchronized in %s: '%r' and '%r'" % (
                 api_method, MEDIASERVER_MERGE_TIMEOUT, servers[0], result[0]))
             assert result[1] == result_expected
         time.sleep(MEDIASERVER_MERGE_TIMEOUT.total_seconds() / 10.)
@@ -157,7 +157,7 @@ def check_api_calls(env, calls):
 
 
 def check_transaction_log(env):
-    log.info('TEST for GET ec2.getTransactionLog:')
+    _logger.info('TEST for GET ec2.getTransactionLog:')
 
     def servers_to_str(servers):
         return ', '.join("%r" % s for s in servers)

@@ -15,12 +15,18 @@ namespace impl {
 class ByPlatformPeerSelector : public AbstractPeerSelector
 {
 public:
-    explicit ByPlatformPeerSelector(const QnSystemInformation& systemInformation);
+    explicit ByPlatformPeerSelector(
+        const QnSystemInformation& systemInformation,
+        const QList<QnUuid>& additionalPeers);
+
     virtual QList<QnUuid> peers(const PeerInformationList& allOtherPeers) const override;
-    static AbstractPeerSelectorPtr create(const QnSystemInformation& systemInformation);
+    static AbstractPeerSelectorPtr create(
+        const QnSystemInformation& systemInformation,
+        const QList<QnUuid>& additionalPeers);
 
 private:
     QnSystemInformation m_selfInformation;
+    const QList<QnUuid> m_additionalPeers;
 };
 
 } // namespace impl

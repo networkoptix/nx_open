@@ -1740,7 +1740,7 @@
     <message>
       <location/>
       <source>IP addresses for cameras, and servers, groups for users, etc.</source>
-      <translation type="unfinished">IP addresses for cameras, and servers, groups for users, etc.</translation>
+      <translation>摄像机的IP地址,服務器以及用户所属之角色等等...</translation>
     </message>
   </context>
   <context>
@@ -3044,12 +3044,12 @@
     <message>
       <location/>
       <source>There are no custom user roles yet.</source>
-      <translation type="unfinished">There are no custom user roles yet.</translation>
+      <translation>目前还没有自订用户角色</translation>
     </message>
     <message>
       <location/>
       <source>Click &quot;New role&quot; button to create one.</source>
-      <translation type="unfinished">Click &quot;New role&quot; button to create one.</translation>
+      <translation>单击 &quot;新角色&quot; 按钮创建一个</translation>
     </message>
   </context>
   <context>

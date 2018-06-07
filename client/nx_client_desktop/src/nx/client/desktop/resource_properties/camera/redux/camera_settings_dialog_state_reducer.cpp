@@ -5,9 +5,11 @@
 #include <camera/fps_calculator.h>
 #include <client_core/client_core_module.h>
 #include <common/common_module.h>
+#include <common/static_common_module.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/resource_display_info.h>
 #include <core/resource_management/resource_pool.h>
+#include <core/resource_management/resource_data_pool.h>
 #include <utils/camera/camera_bitrate_calculator.h>
 
 #include <nx/fusion/model_functions.h>
@@ -39,6 +41,7 @@ void fetchFromCameras(
     std::function<Data(const Camera&)> getter)
 {
     Data data;
+    value.resetBase();
     if (utils::algorithm::same(cameras.cbegin(), cameras.cend(), getter, &data))
         value.setBase(data);
 }
@@ -51,6 +54,7 @@ void fetchFromCameras(
     std::function<Data(const Intermediate&)> converter)
 {
     Intermediate data;
+    value.resetBase();
     if (utils::algorithm::same(cameras.cbegin(), cameras.cend(), getter, &data))
         value.setBase(converter(data));
 }
@@ -112,6 +116,8 @@ bool calculateRecordingParametersAvailable(const Cameras& cameras)
         [](const Camera& camera)
         {
             return camera->hasVideo()
+            // TODO: Probably server should set param NO_RECORDING_PARAMS_PARAM_NAME for rtsp links.
+                && camera->getVendor() != lit("GENERIC_RTSP")
                 && !camera->hasParam(Qn::NO_RECORDING_PARAMS_PARAM_NAME);
         });
 }
@@ -165,6 +171,19 @@ State fillBitrateFromFixedQuality(State state)
     return state;
 }
 
+QString settingsUrlPath(const Camera& camera)
+{
+    const auto resourceData = qnStaticCommon->dataPool()->data(camera);
+    if (!resourceData.value<bool>(lit("showUrl"), false))
+        return QString();
+
+    QString urlPath = resourceData.value<QString>(lit("urlLocalePath"), QString());
+    while (urlPath.startsWith(lit("/"))) //< VMS Gateway does not like slashes at the beginning.
+        urlPath = urlPath.mid(1);
+
+    return urlPath;
+}
+
 State loadNetworkInfo(State state, const Camera& camera)
 {
     NX_ASSERT(camera);
@@ -173,6 +192,7 @@ State loadNetworkInfo(State state, const Camera& camera)
 
     state.singleCameraProperties.ipAddress = QnResourceDisplayInfo(camera).host();
     state.singleCameraProperties.webPage = calculateWebPage(camera);
+    state.singleCameraProperties.settingsUrlPath = settingsUrlPath(camera);
 
     const bool isIoModule = camera->isIOModule();
     const bool hasPrimaryStream = !isIoModule || camera->isAudioSupported();
@@ -255,7 +275,8 @@ State::ImageControlSettings calculateImageControlSettings(
         [](const auto& camera) { return camera->hasVideo(); });
 
     State::ImageControlSettings result;
-    result.aspectRatioAvailable = hasVideo;
+    result.aspectRatioAvailable = hasVideo && std::all_of(cameras.cbegin(), cameras.cend(),
+        [](const auto& camera) { return !camera->hasFlags(Qn::wearable_camera); });
 
     if (result.aspectRatioAvailable)
     {
@@ -265,8 +286,7 @@ State::ImageControlSettings calculateImageControlSettings(
             [](const auto& camera) { return camera->customAspectRatio(); });
     }
 
-    result.rotationAvailable = hasVideo && std::all_of(cameras.cbegin(), cameras.cend(),
-        [](const auto& camera) { return !camera->hasFlags(Qn::wearable_camera); });
+    result.rotationAvailable = hasVideo;
 
     if (result.rotationAvailable)
     {
@@ -275,7 +295,7 @@ State::ImageControlSettings calculateImageControlSettings(
             cameras,
             [](const auto& camera)
             {
-                QString rotationString = camera->getProperty(QnMediaResource::rotationKey());
+                const QString rotationString = camera->getProperty(QnMediaResource::rotationKey());
                 return rotationString.isEmpty()
                     ? Rotation()
                     : Rotation::closestStandardRotation(rotationString.toInt());
@@ -411,15 +431,34 @@ State CameraSettingsDialogStateReducer::setReadOnly(State state, bool value)
     return state;
 }
 
-State CameraSettingsDialogStateReducer::setPanicMode(State state, bool value)
-{
-    state.panicMode = value;
-    return state;
-}
-
 State CameraSettingsDialogStateReducer::setSettingsOptimizationEnabled(State state, bool value)
 {
     state.settingsOptimizationEnabled = value;
+    return state;
+}
+
+State CameraSettingsDialogStateReducer::setGlobalPermissions(
+    State state, Qn::GlobalPermissions value)
+{
+    state.globalPermissions = value;
+    return state;
+}
+
+State CameraSettingsDialogStateReducer::setSingleWearableState(
+    State state, const WearableState& value)
+{
+    state.singleWearableState = value;
+    state.wearableUploaderName = QString();
+
+    if (state.singleWearableState.status == WearableState::LockedByOtherClient)
+    {
+        if (const auto user = qnClientCoreModule->commonModule()->resourcePool()->getResourceById(
+            state.singleWearableState.lockUserId))
+        {
+            state.wearableUploaderName = user->getName();
+        }
+    }
+
     return state;
 }
 
@@ -431,14 +470,19 @@ State CameraSettingsDialogStateReducer::loadCameras(
         ? Camera()
         : cameras.first();
 
+    // TODO: #vkutin #gdm Separate camera-dependent state from camera-independent state.
+    // Reset camera-dependent state with a single call.
     state.hasChanges = false;
     state.singleCameraProperties = {};
     state.singleCameraSettings = {};
     state.singleIoModuleSettings = {};
     state.devicesDescription = {};
+    state.credentials = {};
     state.expert = {};
     state.recording = {};
+    state.wearableMotion = {};
     state.devicesCount = cameras.size();
+    state.audioEnabled = {};
     state.alert = {};
 
     state.deviceType = firstCamera
@@ -531,6 +575,13 @@ State CameraSettingsDialogStateReducer::loadCameras(
             isMotionDetectionEnabled(firstCamera));
 
         auto regionList = firstCamera->getMotionRegionList();
+        const int channelCount = firstCamera->getVideoLayout()->channelCount();
+
+        if (regionList.size() > channelCount)
+            regionList.erase(regionList.begin() + channelCount, regionList.end());
+        else while (regionList.size() < channelCount)
+            regionList << QnMotionRegion();
+
         if (validateMotionRegionList(state, regionList) != QnMotionRegion::ErrorCode::Ok)
         {
             for (auto& region: regionList)
@@ -600,6 +651,14 @@ State CameraSettingsDialogStateReducer::loadCameras(
 
     state.imageControl = calculateImageControlSettings(cameras);
 
+    fetchFromCameras<bool>(state.audioEnabled, cameras,
+        [](const Camera& camera) { return camera->isAudioEnabled(); });
+
+    fetchFromCameras<QString>(state.credentials.login, cameras,
+        [](const Camera& camera) { return camera->getAuth().user(); });
+    fetchFromCameras<QString>(state.credentials.password, cameras,
+        [](const Camera& camera) { return camera->getAuth().password(); });
+
     fetchFromCameras<bool>(state.expert.dualStreamingDisabled, cameras,
         [](const Camera& camera) { return camera->isDualStreamingDisabled(); });
     fetchFromCameras<bool>(state.expert.cameraControlDisabled, cameras,
@@ -649,6 +708,27 @@ State CameraSettingsDialogStateReducer::loadCameras(
     }
 
     state.isDefaultExpertSettings = isDefaultExpertSettings(state);
+
+    if (state.devicesDescription.isWearable == State::CombinedValue::All)
+    {
+        fetchFromCameras<bool>(state.wearableMotion.enabled, cameras,
+            [](const Camera& camera)
+            {
+                NX_ASSERT(camera->getDefaultMotionType() == vms::api::MT_SoftwareGrid);
+                return camera->getMotionType() == vms::api::MT_SoftwareGrid;
+            });
+
+        fetchFromCameras<int>(state.wearableMotion.sensitivity, cameras,
+            [](const Camera& camera)
+            {
+                NX_ASSERT(camera->getVideoLayout()->channelCount() == 0);
+                QnMotionRegion region = camera->getMotionRegion(0);
+                const auto rects = region.getAllMotionRects();
+                return rects.empty()
+                    ? QnMotionRegion::kDefaultSensitivity
+                    : rects.begin().key();
+            });
+    }
 
     return state;
 }
@@ -873,6 +953,13 @@ State CameraSettingsDialogStateReducer::setRecordingEnabled(State state, bool va
         state.recording.schedule.setUser(tasks);
     }
 
+    return state;
+}
+
+State CameraSettingsDialogStateReducer::setAudioEnabled(State state, bool value)
+{
+    state.hasChanges = true;
+    state.audioEnabled.setUser(value);
     return state;
 }
 
@@ -1104,6 +1191,41 @@ State CameraSettingsDialogStateReducer::resetExpertSettings(State state)
     state = setLogicalId(std::move(state), {});
 
     state.isDefaultExpertSettings = true;
+    return state;
+}
+
+State CameraSettingsDialogStateReducer::setWearableMotionDetectionEnabled(State state, bool value)
+{
+    if (state.devicesDescription.isWearable != State::CombinedValue::All)
+        return state;
+
+    state.wearableMotion.enabled.setUser(value);
+    state.hasChanges = true;
+    return state;
+}
+
+State CameraSettingsDialogStateReducer::setWearableMotionSensitivity(State state, int value)
+{
+    if (state.devicesDescription.isWearable != State::CombinedValue::All)
+        return state;
+
+    state.wearableMotion.sensitivity.setUser(value);
+    state.hasChanges = true;
+    return state;
+}
+
+State CameraSettingsDialogStateReducer::setCredentials(
+    State state, const std::optional<QString>& login, const std::optional<QString>& password)
+{
+    if (!login && !password)
+        return state;
+
+    if (login)
+        state.credentials.login.setUser(login->trimmed());
+    if (password)
+        state.credentials.password.setUser(password->trimmed());
+
+    state.hasChanges = true;
     return state;
 }
 

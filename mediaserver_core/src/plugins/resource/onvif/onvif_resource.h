@@ -310,6 +310,8 @@ public:
         VideoEncoder& encoder,
         Qn::StreamIndex streamIndex,
         const QnLiveStreamParams& streamParams);
+
+    QString audioOutputConfigurationToken() const;
 signals:
     void advancedParameterChanged(const QString &id, const QString &value);
 
@@ -390,6 +392,7 @@ private:
 
     bool checkResultAndSetStatus(const CameraDiagnostics::Result& result);
 
+    void setAudioOutputConfigurationToken(const QString& value);
 protected:
     std::unique_ptr<onvifXsd__EventCapabilities> m_eventCapabilities;
     VideoOptionsLocal m_primaryStreamCapabilities;
@@ -414,6 +417,7 @@ protected:
     void setMaxChannels(int value);
 
     virtual std::vector<Camera::AdvancedParametersProvider*> advancedParametersProviders() override;
+    virtual QnAudioTransmitterPtr initializeTwoWayAudio();
 
 private slots:
     void onRenewSubscriptionTimer( quint64 timerID );
@@ -591,7 +595,6 @@ private:
     void fillFullUrlInfo( const CapabilitiesResp& response );
     CameraDiagnostics::Result getVideoEncoderTokens(MediaSoapWrapper& soapWrapper, QStringList* result, VideoConfigsResp *confResponse);
     QString getInputPortNumberFromString(const QString& portName);
-    virtual QnAudioTransmitterPtr initializeTwoWayAudio();
     QnAudioTransmitterPtr initializeTwoWayAudioByResourceData();
 
     mutable QnMutex m_physicalParamsMutex;
@@ -606,6 +609,7 @@ protected:
     nx::mediaserver::resource::ApiMultiAdvancedParametersProvider<QnPlOnvifResource> m_advancedParametersProvider;
     int m_onvifRecieveTimeout;
     int m_onvifSendTimeout;
+    QString m_audioOutputConfigurationToken;
 };
 
 #endif //ENABLE_ONVIF

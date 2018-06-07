@@ -14,7 +14,7 @@
 #include <core/resource/user_resource.h>
 #include <core/resource_management/resource_discovery_manager.h>
 
-#include <nx/client/desktop/resource_properties/camera/legacy_camera_settings_dialog.h>
+#include <nx/client/desktop/resource_properties/camera/legacy/legacy_camera_settings_dialog.h>
 #include <nx/client/desktop/resource_properties/camera/camera_settings_dialog.h>
 
 #include <ui/dialogs/resource_properties/layout_settings_dialog.h>
@@ -43,6 +43,8 @@ QnWorkbenchResourcesSettingsHandler::QnWorkbenchResourcesSettingsHandler(QObject
     QnWorkbenchContextAware(parent)
 {
     connect(action(action::CameraSettingsAction), &QAction::triggered, this,
+        &QnWorkbenchResourcesSettingsHandler::at_legacyCameraSettingsAction_triggered);
+    connect(action(action::CameraSettingsActionNew), &QAction::triggered, this,
         &QnWorkbenchResourcesSettingsHandler::at_cameraSettingsAction_triggered);
     connect(action(action::ServerSettingsAction), &QAction::triggered, this,
         &QnWorkbenchResourcesSettingsHandler::at_serverSettingsAction_triggered);
@@ -65,7 +67,7 @@ QnWorkbenchResourcesSettingsHandler::~QnWorkbenchResourcesSettingsHandler()
 {
 }
 
-void QnWorkbenchResourcesSettingsHandler::at_cameraSettingsAction_triggered()
+void QnWorkbenchResourcesSettingsHandler::at_legacyCameraSettingsAction_triggered()
 {
     const auto parameters =  menu()->currentParameters(sender());
     auto cameras = parameters.resources().filtered<QnVirtualCameraResource>();
@@ -73,22 +75,6 @@ void QnWorkbenchResourcesSettingsHandler::at_cameraSettingsAction_triggered()
         return;
 
     const auto parent = nx::utils::extractParentWidget(parameters, mainWindowWidget());
-
-    if (ini().redesignedCameraSettingsDialog)
-    {
-        QnNonModalDialogConstructor<CameraSettingsDialog> dialogConstructor(
-            m_cameraSettingsDialog, parent);
-        dialogConstructor.disableAutoFocus();
-
-        if (!m_cameraSettingsDialog->setCameras(cameras))
-            return;
-
-        if (parameters.hasArgument(Qn::FocusTabRole))
-        {
-            const auto tab = parameters.argument(Qn::FocusTabRole).toInt();
-            m_cameraSettingsDialog->setCurrentPage(tab);
-        }
-    }
 
     QnNonModalDialogConstructor<LegacyCameraSettingsDialog> dialogConstructor(
         m_legacyCameraSettingsDialog,
@@ -103,7 +89,29 @@ void QnWorkbenchResourcesSettingsHandler::at_cameraSettingsAction_triggered()
         const auto tab = parameters.argument(Qn::FocusTabRole).toInt();
         m_legacyCameraSettingsDialog->setCurrentTab(static_cast<CameraSettingsTab>(tab));
     }
+}
 
+void QnWorkbenchResourcesSettingsHandler::at_cameraSettingsAction_triggered()
+{
+    const auto parameters = menu()->currentParameters(sender());
+    auto cameras = parameters.resources().filtered<QnVirtualCameraResource>();
+    if (cameras.isEmpty())
+        return;
+
+    const auto parent = nx::utils::extractParentWidget(parameters, mainWindowWidget());
+
+    QnNonModalDialogConstructor<CameraSettingsDialog> dialogConstructor(
+        m_cameraSettingsDialog, parent);
+    dialogConstructor.disableAutoFocus();
+
+    if (!m_cameraSettingsDialog->setCameras(cameras))
+        return;
+
+    if (parameters.hasArgument(Qn::FocusTabRole))
+    {
+        const auto tab = parameters.argument(Qn::FocusTabRole).toInt();
+        m_cameraSettingsDialog->setCurrentPage(tab);
+    }
 }
 
 void QnWorkbenchResourcesSettingsHandler::at_serverSettingsAction_triggered()

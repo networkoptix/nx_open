@@ -487,8 +487,8 @@ int RemoteConnectionFactory::testRemoteConnection(
             infoWithUrl.ecUrl.setQuery(QUrlQuery()); /*< Cleanup 'format' parameter. */
             remoteTestConnectionFinished(reqId, errorCode, infoWithUrl, addr, handler);
         };
-    m_remoteQueryProcessor->processQueryAsync<nullptr_t, QnConnectionInfo>(
-        addr, ApiCommand::testConnection, nullptr_t(), func);
+    m_remoteQueryProcessor->processQueryAsync<std::nullptr_t, QnConnectionInfo>(
+        addr, ApiCommand::testConnection, std::nullptr_t(), func);
     return reqId;
 }
 

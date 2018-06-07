@@ -1,14 +1,14 @@
 #include "camera_schedule_widget.h"
 #include "ui_camera_schedule_widget.h"
+#include "../redux/camera_settings_dialog_state.h"
+#include "../redux/camera_settings_dialog_store.h"
+#include "../export_schedule_resource_selection_dialog_delegate.h"
 
 #include <core/resource_management/resource_pool.h>
 #include <core/resource_management/resources_changes_manager.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/media_server_resource.h>
 #include <core/misc/schedule_task.h>
-
-#include <nx/client/desktop/common/utils/checkbox_utils.h>
-#include <nx/client/desktop/common/utils/aligner.h>
 #include <ui/common/palette.h>
 #include <ui/common/read_only.h>
 #include <ui/dialogs/resource_selection_dialog.h>
@@ -19,17 +19,16 @@
 #include <ui/style/skin.h>
 #include <ui/workaround/widgets_signals_workaround.h>
 #include <ui/widgets/common/snapped_scrollbar.h>
-
 #include <utils/camera/camera_bitrate_calculator.h>
 #include <utils/common/event_processors.h>
 #include <utils/math/color_transformations.h>
 #include <utils/math/math.h>
 #include <utils/license_usage_helper.h>
 
-#include "../export_schedule_resource_selection_dialog_delegate.h"
-
-#include "../redux/camera_settings_dialog_state.h"
-#include "../redux/camera_settings_dialog_store.h"
+#include <nx/client/desktop/common/utils/checkbox_utils.h>
+#include <nx/client/desktop/common/utils/aligner.h>
+#include <nx/client/desktop/common/utils/provided_text_display.h>
+#include <nx/utils/log/assert.h>
 
 namespace {
 
@@ -55,6 +54,7 @@ namespace desktop {
 using namespace ui;
 
 CameraScheduleWidget::CameraScheduleWidget(
+    AbstractTextProvider* licenseUsageTextProvider,
     CameraSettingsDialogStore* store,
     QWidget* parent)
     :
@@ -62,7 +62,39 @@ CameraScheduleWidget::CameraScheduleWidget(
     ui(new Ui::CameraScheduleWidget)
 {
     setupUi();
-    setStore(store);
+    NX_ASSERT(store && licenseUsageTextProvider);
+
+    auto licenseUsageTextDisplay = new ProvidedTextDisplay(licenseUsageTextProvider, this);
+    licenseUsageTextDisplay->setDisplayingWidget(ui->licenseUsageLabel);
+
+    ui->licenseUsageLabel->setMinimumHeight(style::Metrics::kButtonHeight);
+
+    ui->scheduleSettingsWidget->setStore(store);
+    ui->archiveLengthWidget->setStore(store);
+    ui->recordingThresholdWidget->setStore(store);
+
+    connect(store, &CameraSettingsDialogStore::stateChanged, this,
+        &CameraScheduleWidget::loadState);
+
+    connect(ui->enableRecordingCheckBox, &QCheckBox::clicked,
+        store, &CameraSettingsDialogStore::setRecordingEnabled);
+
+    // Called when a cell is Alt-clicked. Fetches cell settings as current.
+    connect(ui->gridWidget, &ScheduleGridWidget::cellActivated, store,
+        [this, store](const QPoint& pos)
+        {
+            store->setScheduleBrush(ui->gridWidget->cellValue(pos));
+        });
+
+    connect(ui->gridWidget, &ScheduleGridWidget::cellValuesChanged, store,
+        [this, store]()
+        {
+            store->setSchedule(calculateScheduleTasks());
+            // TODO: updateAlert(ScheduleChange);
+        });
+
+    connect(ui->licensesButton, &QPushButton::clicked, this,
+        [this]() { emit actionRequested(action::PreferencesLicensesTabAction); });
 
     /*
     QnCamLicenseUsageHelper helper(commonModule());
@@ -80,14 +112,10 @@ CameraScheduleWidget::CameraScheduleWidget(
         &CameraScheduleWidget::at_licensesButton_clicked);
 
     connect(ui->enableRecordingCheckBox, &QCheckBox::stateChanged, this,
-        &CameraScheduleWidget::updateLicensesLabelText);
-
-    connect(ui->enableRecordingCheckBox, &QCheckBox::stateChanged, this,
         notifyAboutScheduleEnabledChanged);
 
     connect(ui->exportScheduleButton, &QPushButton::clicked, this,
         &CameraScheduleWidget::at_exportScheduleButton_clicked);
-
 
     connect(ui->archiveLengthWidget, &QnArchiveLengthWidget::alertChanged, this,
         &nx::client::desktop::CameraScheduleWidget::alert);
@@ -101,42 +129,7 @@ CameraScheduleWidget::CameraScheduleWidget(
                 return;
             updateLicensesLabelText();
         };
-
-
-    auto camerasUsageWatcher = new QnCamLicenseUsageWatcher(commonModule(), this);
-    connect(camerasUsageWatcher, &QnLicenseUsageWatcher::licenseUsageChanged, this,
-        updateLicensesIfNeeded);
     */
-}
-
-void CameraScheduleWidget::setStore(CameraSettingsDialogStore* store)
-{
-    ui->scheduleSettingsWidget->setStore(store);
-    ui->archiveLengthWidget->setStore(store);
-    ui->recordingThresholdWidget->setStore(store);
-
-    connect(store, &CameraSettingsDialogStore::stateChanged, this,
-        &CameraScheduleWidget::loadState);
-
-    connect(ui->enableRecordingCheckBox, &QCheckBox::stateChanged, store,
-        [store](int state)
-        {
-            store->setRecordingEnabled(state == Qt::Checked);
-        });
-
-    // Called when a cell is Alt-clicked. Fetches cell settings as current.
-    connect(ui->gridWidget, &QnScheduleGridWidget::cellActivated, store,
-        [this, store](const QPoint& pos)
-        {
-            store->setScheduleBrush(ui->gridWidget->cellValue(pos));
-        });
-
-    connect(ui->gridWidget, &QnScheduleGridWidget::cellValuesChanged, store,
-        [this, store]()
-        {
-            store->setSchedule(calculateScheduleTasks());
-            // TODO: updateAlert(ScheduleChange);
-        });
 }
 
 void CameraScheduleWidget::setupUi()
@@ -149,6 +142,18 @@ void CameraScheduleWidget::setupUi()
 
     ui->enableRecordingCheckBox->setProperty(style::Properties::kCheckBoxAsButton, true);
     ui->enableRecordingCheckBox->setForegroundRole(QPalette::ButtonText);
+
+    ui->scheduleGridGroupBox->setTitle(lit("%1\t(%2)").arg(
+        tr("Recording Schedule")).arg(
+            tr("based on server time")));
+
+    installEventHandler(ui->scrollAreaWidgetContents, QEvent::Resize, this,
+        [this]()
+        {
+            // Since external scroll bar is used it shouldn't be added to minimum width.
+            ui->scrollArea->setMinimumWidth(
+                ui->scrollAreaWidgetContents->minimumSizeHint().width());
+        });
 
     //TODO: #dkargin Restore hints.
     /*
@@ -179,10 +184,10 @@ void CameraScheduleWidget::loadState(const CameraSettingsDialogState& state)
     ui->gridWidget->setBrush(actualBrush);
 
     const bool recordingEnabled = recording.enabled.valueOr(false);
-    CheckboxUtils::setupTristateCheckbox(ui->enableRecordingCheckBox,
-        state.recording.enabled.hasValue(),
-        recordingEnabled);
+    CheckboxUtils::setupTristateCheckbox(ui->enableRecordingCheckBox, state.recording.enabled);
     setReadOnly(ui->enableRecordingCheckBox, state.readOnly);
+
+    ui->licensesButton->setVisible(state.globalPermissions.testFlag(Qn::GlobalAdminPermission));
 
     setReadOnly(ui->exportScheduleButton, state.readOnly);
     setReadOnly(ui->exportWarningLabel, state.readOnly);
@@ -191,6 +196,7 @@ void CameraScheduleWidget::loadState(const CameraSettingsDialogState& state)
     ui->gridWidget->resetCellValues();
     const auto& schedule = state.recording.schedule;
     ui->gridWidget->setActive(schedule.hasValue());
+
     if (schedule.hasValue())
     {
         for (const auto& task: schedule())
@@ -219,7 +225,7 @@ void CameraScheduleWidget::loadState(const CameraSettingsDialogState& state)
             for (int col = task.startTime / 3600; col < task.endTime / 3600; ++col)
             {
                 const QPoint cell(col, row);
-                QnScheduleGridWidget::CellParams params;
+                ScheduleGridWidget::CellParams params;
                 params.recordingType = task.recordingType;
                 params.quality = quality;
                 params.fps = task.fps;
@@ -247,7 +253,7 @@ ScheduleTasks CameraScheduleWidget::calculateScheduleTasks() const
         for (int col = 0; col < ui->gridWidget->columnCount();)
         {
             const QPoint cell(col, row);
-            const QnScheduleGridWidget::CellParams params = ui->gridWidget->cellValue(cell);
+            const ScheduleGridWidget::CellParams params = ui->gridWidget->cellValue(cell);
 
             const auto recordingType = params.recordingType;
             Qn::StreamQuality streamQuality = Qn::StreamQuality::highest;
@@ -298,8 +304,9 @@ ScheduleTasks CameraScheduleWidget::calculateScheduleTasks() const
     return tasks;
 }
 
-CameraScheduleWidget::~CameraScheduleWidget() = default;
-
+CameraScheduleWidget::~CameraScheduleWidget()
+{
+}
 
 /*
 void CameraScheduleWidget::afterContextInitialized()

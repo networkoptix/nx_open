@@ -33,12 +33,22 @@ def _raising_on_exit_status(exit_status_to_error_cls):
 
 
 class SSHPath(FileSystemPath, PurePosixPath):
+    """Base class for file system access through SSH
+
+    It's the simplest way to integrate with `pathlib` and `pathlib2`.
+    When manipulating with paths, `pathlib` doesn't call neither
+    `__new__` nor `__init__`. The only information preserved is type.
+    That's why `SSH` instance is bound to class, not to object.
+    This class is not on a module level, therefore,
+    it will be referenced by `SSHAccess` object and by path objects
+    and will live until those objects live.
+    """
     __metaclass__ = ABCMeta
-    _ssh_access = abstractproperty()
+    _ssh = abstractproperty()  # PurePath's manipulations can preserve only the type.
 
     @classmethod
     def home(cls):
-        return cls(cls._ssh_access.run_sh_script('echo ~').rstrip())
+        return cls(cls._ssh.run_sh_script('echo ~').rstrip())
 
     @classmethod
     def tmp(cls):
@@ -46,7 +56,7 @@ class SSHPath(FileSystemPath, PurePosixPath):
 
     def exists(self):
         try:
-            self._ssh_access.run_command(['test', '-e', self])
+            self._ssh.run_command(['test', '-e', self])
         except exit_status_error_cls(1):
             return False
         else:
@@ -54,7 +64,7 @@ class SSHPath(FileSystemPath, PurePosixPath):
 
     @_raising_on_exit_status({2: DoesNotExist, 3: NotAFile})
     def unlink(self):
-        self._ssh_access.run_sh_script(
+        self._ssh.run_sh_script(
             # language=Bash
             '''
                 test ! -e "$SELF" && >&2 echo "does not exist: $SELF" && exit 2
@@ -70,7 +80,7 @@ class SSHPath(FileSystemPath, PurePosixPath):
         if self.parts[0] == '~':
             return self.home().joinpath(*self.parts[1:])
         user_name = self.parts[0][1:]
-        output = self._ssh_access.run_command(['getent', 'passwd', user_name])
+        output = self._ssh.run_command(['getent', 'passwd', user_name])
         if not output:
             raise RuntimeError("Can't determine home directory for {!r}".format(user_name))
         user_home_dir = output.split(':')[6]
@@ -78,7 +88,7 @@ class SSHPath(FileSystemPath, PurePosixPath):
 
     @_raising_on_exit_status({2: DoesNotExist, 3: NotADir})
     def glob(self, pattern):
-        output = self._ssh_access.run_sh_script(
+        output = self._ssh.run_sh_script(
             # language=Bash
             '''
                 test ! -e "$SELF" && >&2 echo "does not exist: $SELF" && exit 2
@@ -92,7 +102,7 @@ class SSHPath(FileSystemPath, PurePosixPath):
 
     @_raising_on_exit_status({2: BadParent, 3: AlreadyExists, 4: BadParent})
     def mkdir(self, parents=False, exist_ok=False):
-        self._ssh_access.run_sh_script(
+        self._ssh.run_sh_script(
             # language=Bash
             '''
                 ancestor="$DIR"
@@ -117,7 +127,7 @@ class SSHPath(FileSystemPath, PurePosixPath):
 
     def rmtree(self, ignore_errors=False):
         try:
-            self._ssh_access.run_sh_script(
+            self._ssh.run_sh_script(
                 # language=Bash
                 '''
                     test -e "$SELF" || exit 2
@@ -134,7 +144,7 @@ class SSHPath(FileSystemPath, PurePosixPath):
 
     @_raising_on_exit_status({2: DoesNotExist, 3: NotAFile})
     def read_bytes(self):
-        return self._ssh_access.run_sh_script(
+        return self._ssh.run_sh_script(
             # language=Bash
             '''
                 test ! -e "$SELF" && >&2 echo "does not exist: $SELF" && exit 2
@@ -144,18 +154,22 @@ class SSHPath(FileSystemPath, PurePosixPath):
             env={'SELF': self})
 
     @_raising_on_exit_status({2: BadParent, 3: BadParent, 4: NotAFile})
-    def write_bytes(self, contents):
-        output = self._ssh_access.run_sh_script(
+    def write_bytes(self, contents, offset=None):
+        output = self._ssh.run_sh_script(
             # language=Bash
             '''
                 parent="$(dirname "$SELF")"
                 test ! -e "$parent" && >&2 echo "no parent: $parent" && exit 2
                 test ! -d "$parent" && >&2 echo "parent not a dir: $parent" && exit 3
                 test -e "$SELF" -a ! -f "$SELF" && >&2 echo "not a file: $SELF" && exit 4
-                cat >"$SELF"
+                if [ -z $OFFSET ]; then
+                    cat >"$SELF"
+                else
+                    dd bs=$((1024 * 1024)) conv=notrunc of="$SELF" seek=$OFFSET oflag=seek_bytes
+                fi
                 stat --printf="%s" "$SELF"
                 ''',
-            env={'SELF': self},
+            env={'SELF': self, 'OFFSET': offset},
             input=contents)
         written = int(output)
         return written
@@ -164,6 +178,21 @@ class SSHPath(FileSystemPath, PurePosixPath):
         # ASCII encoding is single used encoding in the project.
         return self.read_bytes().decode(encoding=encoding, errors=errors)
 
-    def write_text(self, data, encoding='ascii', errors='strict'):
+    def write_text(self, text, encoding='ascii', errors='strict'):
         # ASCII encoding is single used encoding in the project.
-        self.write_bytes(data.encode(encoding=encoding, errors=errors))
+        data = text.encode(encoding=encoding, errors=errors)
+        bytes_written = self.write_bytes(data)
+        assert bytes_written == len(data)
+        return len(text)
+
+
+def make_ssh_path_cls(ssh):
+    """Separate function to be used within SSHAccess and with ad-hoc SSH
+
+    Look for explanation in SSHPath.__doc__.
+    """
+
+    class SpecificSSHPath(SSHPath):
+        _ssh = ssh
+
+    return SpecificSSHPath

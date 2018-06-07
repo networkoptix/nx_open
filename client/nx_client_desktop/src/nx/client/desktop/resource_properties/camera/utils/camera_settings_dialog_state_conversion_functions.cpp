@@ -4,6 +4,7 @@
 #include <core/resource/resource_display_info.h>
 #include <core/resource/camera_resource.h>
 
+#include <nx/client/core/motion/motion_grid.h>
 #include <nx/fusion/model_functions.h>
 #include <nx/vms/api/types/rtp_types.h>
 #include <nx/vms/api/types/motion_types.h>
@@ -66,7 +67,7 @@ void setCustomRotation(
         if (!camera->hasVideo())
             continue;
 
-        const QString rotationString = value.isValid() ? value.toString() : QString();
+        const auto rotationString = (value != Rotation()) ? value.toString() : QString();
         camera->setProperty(QnMediaResource::rotationKey(), rotationString);
     }
 }
@@ -218,6 +219,77 @@ void setMotionStreamType(vms::api::MotionStreamType value, const Cameras& camera
     }
 }
 
+void setWearableMotionEnabled(bool value, const Cameras& cameras)
+{
+    for (const auto& camera: cameras)
+    {
+        if (!camera->hasFlags(Qn::wearable_camera))
+            continue;
+
+        NX_ASSERT(camera->getDefaultMotionType() == Qn::MotionType::MT_SoftwareGrid);
+        camera->setMotionType(value
+            ? Qn::MotionType::MT_SoftwareGrid
+            : Qn::MotionType::MT_NoMotion);
+    }
+}
+
+void setAudioEnabled(bool value, const Cameras& cameras)
+{
+    for (const auto& camera: cameras)
+        camera->setAudioEnabled(value);
+}
+
+void setCredentials(const State::Credentials& value, const Cameras& cameras)
+{
+    NX_ASSERT(value.login.hasValue() || value.password.hasValue());
+
+    QAuthenticator authenticator;
+    if (value.login.hasValue())
+        authenticator.setUser(value.login());
+    if (value.password.hasValue())
+        authenticator.setPassword(value.password());
+
+    if (!value.login.hasValue())
+    {
+        // Change only password, fetch logins from cameras.
+        for (const auto& camera: cameras)
+        {
+            authenticator.setUser(camera->getAuth().user());
+            camera->setAuth(authenticator);
+        }
+    }
+    else if (!value.password.hasValue())
+    {
+        // Change only login, fetch passwords from cameras.
+        for (const auto& camera: cameras)
+        {
+            authenticator.setPassword(camera->getAuth().password());
+            camera->setAuth(authenticator);
+        }
+    }
+    else
+    {
+        // Change both login and password.
+        for (const auto& camera: cameras)
+            camera->setAuth(authenticator);
+    }
+}
+
+void setWearableMotionSensitivity(int value, const Cameras& cameras)
+{
+    QnMotionRegion region;
+    region.addRect(value, QRect(0, 0, core::MotionGrid::kWidth, core::MotionGrid::kHeight));
+
+    for (const auto& camera: cameras)
+    {
+        if (!camera->hasFlags(Qn::wearable_camera))
+            continue;
+
+        NX_ASSERT(camera->getVideoLayout()->channelCount() == 1);
+        camera->setMotionRegion(region, 0);
+    }
+}
+
 } // namespace
 
 void CameraSettingsDialogStateConversionFunctions::applyStateToCameras(
@@ -253,6 +325,23 @@ void CameraSettingsDialogStateConversionFunctions::applyStateToCameras(
         }
     }
 
+    if (state.devicesDescription.isWearable == State::CombinedValue::All)
+    {
+        if (state.wearableMotion.enabled.hasValue())
+        {
+            setWearableMotionEnabled(state.wearableMotion.enabled(), cameras);
+
+            if (state.wearableMotion.enabled() && state.wearableMotion.sensitivity.hasValue())
+                setWearableMotionSensitivity(state.wearableMotion.sensitivity(), cameras);
+        }
+    }
+
+    if ((state.credentials.login.hasValue() || state.credentials.password.hasValue())
+        && state.devicesDescription.isWearable == State::CombinedValue::None)
+    {
+        setCredentials(state.credentials, cameras);
+    }
+
     setMinRecordingDays(state.recording.minDays, cameras);
     setMaxRecordingDays(state.recording.maxDays, cameras);
 
@@ -273,6 +362,9 @@ void CameraSettingsDialogStateConversionFunctions::applyStateToCameras(
 
     if (state.recording.thresholds.afterSec.hasValue())
         setRecordingAfterThreshold(state.recording.thresholds.afterSec(), cameras);
+
+    if (state.audioEnabled.hasValue())
+        setAudioEnabled(state.audioEnabled(), cameras);
 
     if (state.settingsOptimizationEnabled)
     {

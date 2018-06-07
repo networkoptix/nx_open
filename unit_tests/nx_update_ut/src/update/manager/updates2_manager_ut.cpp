@@ -11,7 +11,6 @@
 #include <nx/utils/thread/wait_condition.h>
 #include <nx/api//updates2/updates2_status_data.h>
 #include <gtest/gtest.h>
-#include <gmock/gmock.h>
 #include <thread>
 
 namespace nx {
@@ -21,58 +20,237 @@ namespace detail {
 namespace test {
 
 using namespace ::testing;
+using namespace info;
+using namespace vms::common::p2p;
+
+const static QString kFileName = "test.file.name";
+const static QString kUpdatesUrl = "test.url";
+const static QString kCloudHost = "test.cloud.host";
+const static QString kCustomization = "test.customization";
+const static QnSoftwareVersion kVersion = QnSoftwareVersion("1.0.0.1");
+const static QString kPlatform = "test.platform";
+const static QString kArch = "test.arch";
+const static QString kModification = "test.modification";
+
+const static QString kFileUrl = "test.file.url";
+const static int kFileSize = 42;
+const static QByteArray kFileMd5 = "test.file.md5";
+
+const static QString kManualFileName = "nxwitness-server_update-4.5.0.16975-linux64.zip";
+const static QnUuid kCurrentPeerId = QnUuid::createUuid();
+
+struct UpdateRegistryCfg
+{
+    bool hasUpdate = false;
+};
 
 class TestUpdateRegistry: public update::info::AbstractUpdateRegistry
 {
 public:
-    MOCK_CONST_METHOD2(
-        findUpdateFile,
-        update::info::ResultCode(
-            const update::info::UpdateFileRequestData& updateFileRequestData,
-            update::info::FileData* outFileData));
 
-    MOCK_CONST_METHOD2(
-        latestUpdate,
-        update::info::ResultCode(
-            const update::info::UpdateRequestData& updateRequestData,
-            QnSoftwareVersion* outSoftwareVersion));
+    void setCfg(const UpdateRegistryCfg& cfg) { m_cfg = cfg; }
 
-    MOCK_CONST_METHOD0(alternativeServers, QList<QString>());
-    MOCK_CONST_METHOD0(toByteArray, QByteArray());
-    MOCK_METHOD1(fromByteArray, bool(const QByteArray& rawData));
-    MOCK_CONST_METHOD1(equals, bool(AbstractUpdateRegistry* other));
-    MOCK_METHOD2(addFileData, void(const update::info::UpdateFileRequestData&,
-        const update::info::FileData&));
-    MOCK_METHOD1(merge, void(AbstractUpdateRegistry* other));
-    MOCK_METHOD1(addFileData, void(const info::ManualFileData& fileData));
+    virtual info::ResultCode findUpdateFile(
+        const info::UpdateFileRequestData& /*updateFileRequestData*/,
+        info::FileData* outFileData) const override
+    {
+        if (!m_manualData.isEmpty())
+        {
+            outFileData->file = m_manualData[0].file;
+            return info::ResultCode::ok;
+        }
+
+        if (m_cfg.hasUpdate)
+        {
+            outFileData->file = kFileName;
+            outFileData->md5 = kFileMd5;
+            outFileData->size = kFileSize;
+            outFileData->url = kFileUrl;
+
+            return info::ResultCode::ok;
+        }
+
+        return info::ResultCode::noData;
+    }
+
+    virtual info::ResultCode latestUpdate(
+        const update::info::UpdateRequestData& /*updateRequestData*/,
+        QnSoftwareVersion* /*outSoftwareVersion*/) const override
+    {
+        if (m_cfg.hasUpdate || !m_manualData.isEmpty())
+            return info::ResultCode::ok;
+
+        return info::ResultCode::noData;
+    }
+
+    virtual void addFileData(const info::ManualFileData& manualFileData) override
+    {
+        m_manualData.append(manualFileData);
+    }
+
+    virtual void removeFileData(const QString& /*fileName*/) override
+    {
+        m_manualData.clear();
+    }
+
+    virtual QList<QString> alternativeServers() const override
+    {
+        return QStringList();
+    }
+
+    virtual QByteArray toByteArray() const override
+    {
+        return "hello";
+    }
+
+    virtual bool fromByteArray(const QByteArray& /*rawData*/) override
+    {
+        return true;
+    }
+
+    virtual bool equals(AbstractUpdateRegistry* other) const override
+    {
+        if (!other)
+            return false;
+
+        return m_cfg.hasUpdate ==
+            (other->latestUpdate(info::UpdateRequestData(), nullptr) ==
+                info::ResultCode::ok);
+    }
+
+    virtual void merge(AbstractUpdateRegistry* other) override
+    {
+        if (other)
+        {
+            m_cfg.hasUpdate |= (other->latestUpdate(info::UpdateRequestData(), nullptr) ==
+                info::ResultCode::ok);
+        }
+        m_manualData.append(((TestUpdateRegistry*) other)->m_manualData);
+    }
+
+
+    virtual QList<QnUuid> additionalPeers(const QString& /*fileName*/) const override
+    {
+        if (!m_manualData.isEmpty())
+            return m_manualData[0].peers;
+
+        return QList<QnUuid>();
+    }
+
+private:
+    UpdateRegistryCfg m_cfg;
+    QList<ManualFileData> m_manualData;
 };
 
-using namespace vms::common::p2p;
-
-class TestDownloader: downloader::AbstractDownloader
+class TestDownloader: public downloader::AbstractDownloader
 {
 public:
     TestDownloader(): downloader::AbstractDownloader(nullptr) {}
 
-    MOCK_CONST_METHOD0(files, QStringList());
-    MOCK_CONST_METHOD1(filePath, QString(const QString& fileName));
-    MOCK_CONST_METHOD1(fileInformation, downloader::FileInformation(const QString& fileName));
-    MOCK_METHOD1(
-        addFile, downloader::ResultCode(const downloader::FileInformation& fileInformation));
-    MOCK_METHOD3(
-        updateFileInformation,
-        downloader::ResultCode(const QString& fileName, int size, const QByteArray& md5));
-    MOCK_METHOD3(
-        writeFileChunk,
-        downloader::ResultCode(const QString& fileName, int chunkIndex, const QByteArray& buffer));
-    MOCK_METHOD3(
-        readFileChunk,
-        downloader::ResultCode(const QString& fileName, int chunkIndex,QByteArray& buffer));
-    MOCK_METHOD2(
-        deleteFile,
-        downloader::ResultCode(const QString& fileName, bool deleteData));
-    MOCK_METHOD1(
-        getChunkChecksums, QVector<QByteArray>(const QString& fileName));
+    void setValidFileInformation()
+    {
+        m_fi.name = kFileName;
+        m_fi.size = kFileSize;
+        m_fi.md5 = kFileMd5;
+        m_fi.status = downloader::FileInformation::Status::downloaded;
+    }
+
+    void setCorruptedFileInformation()
+    {
+        m_fi.name = kFileName;
+        m_fi.size = kFileSize;
+        m_fi.md5 = kFileMd5;
+        m_fi.status = downloader::FileInformation::Status::corrupted;
+    }
+
+    void setAlreadyDownloadedFileInformation()
+    {
+        m_fi.name = kFileName;
+        m_fi.size = kFileSize;
+        m_fi.md5 = kFileMd5;
+        m_fi.status = downloader::FileInformation::Status::downloaded;
+    }
+
+    void setExternallyAddedFileInformation(downloader::FileInformation::Status status)
+    {
+        m_fi.name = kManualFileName;
+        m_fi.size = kFileSize;
+        m_fi.md5 = kFileMd5;
+        m_fi.status = status;
+    }
+
+    void setAddFileCode(downloader::ResultCode addFileCode)
+    {
+        m_addFileCode = addFileCode;
+    }
+
+    QList<QnUuid> additionalPeers() const
+    {
+        return m_additionalPeers;
+    }
+
+    virtual QStringList files() const override
+    {
+        return QStringList();
+    }
+
+    virtual QString filePath(const QString& /*fileName*/) const override
+    {
+        return "file.path";
+    }
+
+    virtual downloader::FileInformation fileInformation(const QString& /*fileName*/) const override
+    {
+        return m_fi;
+    }
+
+    virtual downloader::ResultCode addFile(
+        const downloader::FileInformation& fileInformation) override
+    {
+        m_additionalPeers.append(fileInformation.additionalPeers);
+        return m_addFileCode;
+    }
+
+    virtual downloader::ResultCode updateFileInformation(
+        const QString& /*fileName*/,
+        int /*size*/,
+        const QByteArray& /*md5*/) override
+    {
+        return downloader::ResultCode::ok;
+    }
+
+    virtual downloader::ResultCode readFileChunk(
+        const QString& /*fileName*/,
+        int /*chunkIndex*/,
+        QByteArray& /*buffer*/) override
+    {
+        return downloader::ResultCode::ok;
+    }
+
+    virtual downloader::ResultCode writeFileChunk(
+        const QString& /*fileName*/,
+        int /*chunkIndex*/,
+        const QByteArray& /*buffer*/) override
+    {
+        return downloader::ResultCode::ok;
+    }
+
+    virtual downloader::ResultCode deleteFile(
+        const QString& /*fileName*/,
+        bool /*deleteData*/) override
+    {
+        return downloader::ResultCode::ok;
+    }
+
+    virtual QVector<QByteArray> getChunkChecksums(const QString& /*fileName*/) override
+    {
+        return QVector<QByteArray>();
+    }
+
+private:
+    downloader::FileInformation m_fi;
+    downloader::ResultCode m_addFileCode = downloader::ResultCode::ok;
+    QList<QnUuid> m_additionalPeers;
 };
 
 enum class PrepareExpectedOutcome
@@ -80,8 +258,6 @@ enum class PrepareExpectedOutcome
     success,
     fail_noFreeSpace
 };
-
-const static QString kFileName = "test.file.name";
 
 class TestInstaller: public installer::detail::AbstractUpdates2Installer, public QnLongRunnable
 {
@@ -93,14 +269,20 @@ public:
         put(handler);
     }
 
-    MOCK_METHOD0(install, bool());
+    virtual bool install() override
+    {
+        return true;
+    }
+
+    virtual void stopSync() override
+    {
+
+    }
 
     void setExpectedOutcome(PrepareExpectedOutcome expectedOutcome)
     {
         m_expectedOutcome = expectedOutcome;
     }
-
-    MOCK_METHOD0(stopSync, void());
 
     ~TestInstaller()
     {
@@ -160,25 +342,23 @@ private:
     }
 };
 
-class TestUpdates2Manager: public Updates2ManagerBase
+class AbstractExternalsSupplier
 {
 public:
-    void setStatus(const detail::Updates2StatusDataEx& status)
-    {
-        m_currentStatus.clone(status);
-    }
+    virtual ~AbstractExternalsSupplier() {}
+    virtual update::info::AbstractUpdateRegistryPtr getGlobalRegistry() = 0;
+    virtual update::info::AbstractUpdateRegistryPtr getRemoteRegistry() = 0;
+    virtual void updateGlobalRegistry(const UpdateRegistryCfg& cfg) = 0;
+    virtual vms::common::p2p::downloader::AbstractDownloader* downloader() = 0;
+    virtual installer::detail::AbstractUpdates2Installer* installer() = 0;
+};
 
-    void setGlobalRegistryFactoryFunc(
-        std::function<update::info::AbstractUpdateRegistryPtr()> globalRegistryFactoryFunc)
-    {
-        m_globalRegistryFactoryFunc = globalRegistryFactoryFunc;
-    }
-
-    void setRemoteRegistryFactoryFunc(
-        std::function<update::info::AbstractUpdateRegistryPtr()> remoteRegistryFactoryFunc)
-    {
-        m_remoteRegistryFactoryFunc = remoteRegistryFactoryFunc;
-    }
+class TestUpdatesManager: public Updates2ManagerBase
+{
+public:
+    TestUpdatesManager(AbstractExternalsSupplier* supplier):
+        m_supplier(supplier)
+    {}
 
     void waitForRemoteUpdate()
     {
@@ -203,6 +383,21 @@ public:
         onChunkDownloadFailed(fileName);
     }
 
+    void emitFileAddedSignal(const downloader::FileInformation& fileInformation)
+    {
+        onFileAdded(fileInformation);
+    }
+
+    void emitFileInformationChanged(const downloader::FileInformation& fileInformation)
+    {
+        onFileInformationChanged(fileInformation);
+    }
+
+    void emitFileDeletedSignal()
+    {
+        onFileDeleted(kManualFileName);
+    }
+
     const detail::Updates2StatusDataEx& fileWrittenData() const
     {
         return m_fileWrittenData;
@@ -215,14 +410,17 @@ public:
         m_getRemoteRegistryCondition.wakeOne();
     }
 
-    MOCK_CONST_METHOD0(refreshTimeout, qint64());
-    MOCK_CONST_METHOD0(filePath, QString());
-    MOCK_METHOD0(loadStatusFromFile, void());
-    MOCK_METHOD0(connectToSignals, void());
+    virtual qint64 refreshTimeout() const override { return 1000; }
+
+    virtual QString filePath() const { return QLatin1Literal("some/path"); }
+
+    virtual void loadStatusFromFile() override {}
+
+    void connectToSignals() override {}
 
     virtual update::info::AbstractUpdateRegistryPtr getGlobalRegistry() override
     {
-        return m_globalRegistryFactoryFunc();
+        return m_supplier->getGlobalRegistry();
     }
 
     virtual update::info::AbstractUpdateRegistryPtr getRemoteRegistry() override
@@ -231,41 +429,57 @@ public:
         while (!m_getRemoteRegistryFinished)
             m_getRemoteRegistryCondition.wait(lock.mutex());
 
-        return m_remoteRegistryFactoryFunc();
+        return m_supplier->getRemoteRegistry();
     }
 
-    MOCK_CONST_METHOD0(moduleGuid, QnUuid());
-    MOCK_METHOD1(updateGlobalRegistry, void(const QByteArray& serializedRegistry));
+    virtual QnUuid moduleGuid() const override
+    {
+        static QnUuid guid = QnUuid::createUuid();
+        return guid;
+    }
+
+    void updateGlobalRegistry(const QByteArray& /*serializedRegistry*/) override
+    {
+        UpdateRegistryCfg cfg;
+
+        cfg.hasUpdate = true;
+        m_supplier->updateGlobalRegistry(cfg);
+    }
 
     virtual void writeStatusToFile(const detail::Updates2StatusDataEx& statusData) override
     {
         m_fileWrittenData.clone(statusData);
     }
 
-    MOCK_METHOD0(downloader, vms::common::p2p::downloader::AbstractDownloader*());
-    MOCK_METHOD0(installer, installer::detail::AbstractUpdates2Installer*());
+    virtual vms::common::p2p::downloader::AbstractDownloader* downloader() override
+    {
+        return m_supplier->downloader();
+    }
+
+    virtual installer::detail::AbstractUpdates2Installer* installer() override
+    {
+        return m_supplier->installer();
+    }
 
     virtual void remoteUpdateCompleted() override
     {
         QnMutexLocker lock(&m_mutex);
         m_remoteUpdateFinished = true;
         m_remoteUpdateCondition.wakeOne();
-        if (m_afterRemoteUpdateAction)
-            m_afterRemoteUpdateAction();
     }
 
-    void setAfterRemoteUpdateAction(std::function<void()> afterRemoteUpdateAction)
+    virtual QnUuid peerId() const override
     {
-        m_afterRemoteUpdateAction = afterRemoteUpdateAction;
+        return kCurrentPeerId;
     }
 
-    MOCK_CONST_METHOD0(peerId, QnUuid());
-    MOCK_CONST_METHOD0(isClient, bool());
+    virtual bool isClient() const override
+    {
+        return false;
+    }
 
 private:
-    std::function<update::info::AbstractUpdateRegistryPtr()> m_globalRegistryFactoryFunc;
-    std::function<update::info::AbstractUpdateRegistryPtr()> m_remoteRegistryFactoryFunc;
-    std::function<void()> m_afterRemoteUpdateAction = nullptr;
+    AbstractExternalsSupplier* m_supplier;
     QnMutex m_mutex;
     QnWaitCondition m_remoteUpdateCondition;
     bool m_remoteUpdateFinished = false;
@@ -274,1428 +488,448 @@ private:
     bool m_getRemoteRegistryFinished = true;
 };
 
-class Updates2Manager: public ::testing::Test
+class Updates2Manager: public ::testing::Test, public AbstractExternalsSupplier
 {
 public:
     const QnSoftwareVersion kNewVersion = QnSoftwareVersion("1.0.0.2");
 
 protected:
-    const static QString kUpdatesUrl;
-    const static QString kCloudHost;
-    const static QString kCustomization;
-    const static QnSoftwareVersion kVersion;
-    const static QString kPlatform;
-    const static QString kArch;
-    const static QString kModification;
-
-    const static QString kFileUrl;
-    const static int kFileSize;
-    const static QByteArray kFileMd5;
-
-    enum class DownloadExpectedOutcome
-    {
-        success_fileNotExists,
-        success_fileAlreadyExists,
-        success_fileAlreadyDownloaded,
-        fail_addFileFailed,
-        fail_downloadFailed,
-        fail_wrongState,
-    };
-
     virtual void SetUp() override
     {
         detail::UpdateFileRequestDataFactory::setFactoryFunc(
-            []()
+            [this]()
             {
-                return update::info::UpdateFileRequestData(kCloudHost, kCustomization, kVersion,
-                    update::info::OsVersion(kPlatform, kArch, kModification), false);
+                return update::info::UpdateFileRequestData(
+                    kCloudHost,
+                    kCustomization,
+                    kVersion,
+                    update::info::OsVersion(kPlatform, kArch, kModification),
+                    false);
             });
-        m_testInstaller.start();
+
+        info::UpdateRegistryFactory::setEmptyFactoryFunction(
+            [](const QnUuid& /*selfPeerId*/)
+            {
+                return std::make_unique<TestUpdateRegistry>();
+            });
+
+        m_updatesManager.reset(new TestUpdatesManager(this));
+        m_installer.start();
     }
 
     virtual void TearDown() override
     {
-        m_testUpdates2Manager->stopAsyncTasks();
+        m_updatesManager->stopAsyncTasks();
     }
 
-    void givenInitialUpdates2ManagerWithInitialRegistry(
-        std::function<update::info::AbstractUpdateRegistryPtr()>initialRegistryFactoryFunc)
+    virtual update::info::AbstractUpdateRegistryPtr getGlobalRegistry() override
     {
-        info::UpdateRegistryFactory::setEmptyFactoryFunction(initialRegistryFactoryFunc);
-        m_testUpdates2Manager.reset(new TestUpdates2Manager);
+        return std::unique_ptr<TestUpdateRegistry>(new TestUpdateRegistry(m_globalRegistry));
     }
 
-    void givenGlobalRegistryFactoryFunc(
-        std::function<update::info::AbstractUpdateRegistryPtr()> globalRegistryFactoryFunc)
+    virtual update::info::AbstractUpdateRegistryPtr getRemoteRegistry() override
     {
-        m_testUpdates2Manager->setGlobalRegistryFactoryFunc(
-            [this, globalRegistryFactoryFunc]()
-            {
-                auto result = globalRegistryFactoryFunc();
-                m_globalRegistry = (TestUpdateRegistry *)  result.get();
-                return result;
-            });
+        return std::unique_ptr<TestUpdateRegistry>(new TestUpdateRegistry(m_remoteRegistry));
     }
 
-    void givenRemoteRegistryFactoryFunc(
-        std::function<update::info::AbstractUpdateRegistryPtr()> remoteRegistryFactoryFunc)
+    virtual vms::common::p2p::downloader::AbstractDownloader* downloader() override
     {
-        m_testUpdates2Manager->setRemoteRegistryFactoryFunc(
-            [this, remoteRegistryFactoryFunc]()
-            {
-                auto result = remoteRegistryFactoryFunc();
-                m_remoteRegistry = (TestUpdateRegistry *) result.get();
-                return result;
-            });
+        return &m_downloader;
     }
 
-    void givenAvailableRemoteUpdate()
+    virtual installer::detail::AbstractUpdates2Installer* installer() override
     {
-        givenGlobalRegistryFactoryFunc([]() { return update::info::AbstractUpdateRegistryPtr(); });
-        givenRemoteRegistryFactoryFunc(
-            [this]()
-            {
-                auto result = createUpdateRegistry(
-                    &kNewVersion,
-                    FindUpdateExpectations::willBeCalledNewVersion,
-                    LatestUpdateExpectations::willBeCalledNewVersion,
-                    AddFileExpectations::wontBeCalled,
-                    AlternativeServersExpectations::wontBeCalled,
-                    ToBytesExpectations::willBeCalled,
-                    FromBytesExpectations::wontBeCalled,
-                    EqualExpectations::returnsFalse,
-                    MergeExpectations::willBeCalled);
-
-                 return result;
-            });
-
-        whenServerStarted();
-        whenRemoteUpdateDone();
-        thenStateShouldBe(api::Updates2StatusData::StatusCode::available);
+        return &m_installer;
     }
 
-    void givenInstallerInstallWithTheOutcome(PrepareExpectedOutcome outcome)
+    virtual void updateGlobalRegistry(const UpdateRegistryCfg& cfg)
     {
-        m_testInstaller.setExpectedOutcome(outcome);
+        m_globalRegistry.setCfg(cfg);
+    }
+
+    void givenUpdateRegistries(bool remoteHasUpdate, bool globalHasUpdate)
+    {
+        UpdateRegistryCfg cfg;
+
+        cfg.hasUpdate = remoteHasUpdate;
+        m_remoteRegistry.setCfg(cfg);
+
+        cfg.hasUpdate = globalHasUpdate;
+        m_globalRegistry.setCfg(cfg);
+    }
+
+    void whenServerHasBeenStarted()
+    {
+        m_updatesManager->atServerStart();
     }
 
     void thenStateShouldBe(
-        api::Updates2StatusData::StatusCode state,
-        const QString& message = "")
+        api::Updates2StatusData::StatusCode status,
+        const QString& message = QString())
     {
-        ASSERT_EQ(state, m_testUpdates2Manager->status().state);
-        ASSERT_TRUE(m_testUpdates2Manager->status().message.toLower().contains(message));
-        expectingStateWrittenToFile(state);
+        ASSERT_EQ(status, m_updatesManager->status().state);
+        if (!message.isEmpty())
+        {
+            ASSERT_TRUE(m_updatesManager->status().message.toLower().contains(message.toLower()));
+        }
     }
 
-    void thenStateShouldBeAtLast(api::Updates2StatusData::StatusCode state)
+    void thenStateShouldFinallyBecome(api::Updates2StatusData::StatusCode status)
     {
-        while (m_testUpdates2Manager->status().state != state)
-            std::this_thread::sleep_for(std::chrono::milliseconds(5));
-    }
-
-    void whenServerStarted()
-    {
-        m_testUpdates2Manager->atServerStart();
-    }
-
-    void whenNeedToWaitForRemoteRegistryCompletion()
-    {
-        m_testUpdates2Manager->setNeedToWaitForgetRemoteRegistry(true);
+        while (m_updatesManager->status().state != status)
+            std::this_thread::sleep_for(std::chrono::milliseconds(10));
     }
 
     void whenRemoteUpdateDone()
     {
-        m_testUpdates2Manager->setNeedToWaitForgetRemoteRegistry(false);
-        m_testUpdates2Manager->waitForRemoteUpdate();
+        m_updatesManager->waitForRemoteUpdate();
     }
 
-    void whenDownloadRequestIssued()
+    void whenRemoteUpdateTakesLongTimeToComplete()
     {
-        m_testUpdates2Manager->download();
+        m_updatesManager->setNeedToWaitForgetRemoteRegistry(true);
     }
 
-    void setAfterRemoteUpdateAction(std::function<void()> afterRemoteUpdateAction)
+    void whenRemoteUpdateFinishedAtLast()
     {
-        m_testUpdates2Manager->setAfterRemoteUpdateAction(afterRemoteUpdateAction);
+        m_updatesManager->setNeedToWaitForgetRemoteRegistry(false);
     }
 
-    enum class FilesExpectations
+    void whenDownloadRequestIssued(api::Updates2StatusData::StatusCode expectedResult)
     {
-        wontBeCalled,
-        willBeCalled
-    };
-
-    enum class FilePathExpectations
-    {
-        wontBeCalled,
-        willBeCalled
-    };
-
-    enum class FileInformationExpectations
-    {
-        wontBeCalled,
-        willBeCalled_Ok,
-        willBeCalled_FirstNotFound_SecondFound,
-        willBeCalled_OnceNotFound
-    };
-
-    enum class DownloaderAddFileExpectations
-    {
-        wontBeCalled,
-        willBeCalled_nonManual,
-        willBeCalled_failedWithNoSpace
-    };
-
-    enum class DeleteFileExpectations
-    {
-        wontBeCalled,
-        willBeCalled
-    };
-
-    void prepareDownloadExpectations(
-        FilesExpectations filesExpectations,
-        FilePathExpectations filePathExpectations,
-        FileInformationExpectations fileInformationExpectations,
-        DownloaderAddFileExpectations addFileExpectations,
-        DeleteFileExpectations deleteFileExpectations)
-    {
-        switch (filesExpectations)
-        {
-        case FilesExpectations::wontBeCalled:
-            break;
-        case FilesExpectations::willBeCalled:
-            EXPECT_CALL(m_testDownloader, files())
-                .Times(AtLeast(1)).WillRepeatedly(Return(QStringList()));
-            break;
-        }
-
-        downloader::FileInformation fi(kFileName);
-        fi.url = kFileUrl;
-        fi.md5 = QByteArray::fromHex(kFileMd5.toBase64());
-        fi.size = kFileSize;
-        fi.peerPolicy = downloader::FileInformation::PeerSelectionPolicy::byPlatform;
-
-        switch (filePathExpectations)
-        {
-        case FilePathExpectations::wontBeCalled:
-            break;
-        case FilePathExpectations::willBeCalled:
-            EXPECT_CALL(m_testDownloader, filePath(kFileName))
-                .Times(AtLeast(1)).WillRepeatedly(Return(QString()));
-            break;
-        }
-
-        downloader::FileInformation downloadedFi = fi;
-        downloadedFi.status = downloader::FileInformation::Status::downloaded;
-
-        switch (fileInformationExpectations)
-        {
-        case FileInformationExpectations::wontBeCalled:
-            break;
-        case FileInformationExpectations::willBeCalled_Ok:
-            EXPECT_CALL(m_testDownloader, fileInformation(kFileName))
-                .Times(1).WillOnce(Return(fi));
-            break;
-        case FileInformationExpectations::willBeCalled_FirstNotFound_SecondFound:
-            EXPECT_CALL(m_testDownloader, fileInformation(kFileName))
-                .Times(2)
-                .WillOnce(Return(downloader::FileInformation()))
-                .WillOnce(Return(downloadedFi));
-            break;
-        case FileInformationExpectations::willBeCalled_OnceNotFound:
-            EXPECT_CALL(m_testDownloader, fileInformation(kFileName))
-                .Times(1)
-                .WillOnce(Return(downloader::FileInformation()));
-            break;
-        }
-
-        switch (addFileExpectations)
-        {
-        case DownloaderAddFileExpectations::wontBeCalled:
-            break;
-        case DownloaderAddFileExpectations::willBeCalled_nonManual:
-            EXPECT_CALL(m_testDownloader, addFile(fi))
-                .Times(1).WillOnce(Return(vms::common::p2p::downloader::ResultCode::ok));
-            break;
-        case DownloaderAddFileExpectations::willBeCalled_failedWithNoSpace:
-            EXPECT_CALL(m_testDownloader, addFile(fi))
-                .Times(1).WillOnce(Return(vms::common::p2p::downloader::ResultCode::noFreeSpace));
-            break;
-        }
-
-        switch (deleteFileExpectations)
-        {
-        case DeleteFileExpectations::wontBeCalled:
-            break;
-        case DeleteFileExpectations::willBeCalled:
-            EXPECT_CALL(m_testDownloader, deleteFile(kFileName, true))
-                .Times(1).WillOnce(Return(vms::common::p2p::downloader::ResultCode::ok));
-            break;
-        }
+        ASSERT_EQ(expectedResult, m_updatesManager->download().state);
     }
 
-    void whenChunkFailedSignalReceived()
+    void whenDownloadRequestIssuedWithFinalResult(api::Updates2StatusData::StatusCode expectedResult)
     {
-        m_testUpdates2Manager->emitCunkDownloadFailedSignal(kFileName);
+        while (m_updatesManager->download().state != expectedResult)
+            std::this_thread::sleep_for(std::chrono::milliseconds(10));
     }
 
     void whenDownloadFinishedSuccessfully()
     {
-        m_testUpdates2Manager->emitDownloadFinishedSignal(kFileName);
+        m_downloader.setValidFileInformation();
+        m_updatesManager->emitDownloadFinishedSignal(kFileName);
     }
 
-    void whenDownloadFinishedWithFailure()
+    void whenDownloadFinishedUNSuccessfully()
     {
-        m_testUpdates2Manager->emitDownloadFailedSignal(kFileName);
+        m_downloader.setCorruptedFileInformation();
+        m_updatesManager->emitDownloadFailedSignal(kFileName);
     }
 
-
-    enum class RefreshTimeoutExpectations
+    void whenDownloaderFailsToAddFile()
     {
-        wontBeCalled,
-        willBeCalled
-    };
+        m_downloader.setAddFileCode(downloader::ResultCode::noFreeSpace);
+    }
 
-    enum class LoadStatusFromFileExpectations
+    void whenChunkDownloadFailedSignalReceived()
     {
-        wontBeCalled,
-        willBeCalledNotAvailable
-    };
+        m_updatesManager->emitCunkDownloadFailedSignal(kFileName);
+    }
 
-    enum class ConnectToSignalsExpectations
+    void givenFileHasAlreadyBeenDownloaded()
     {
-        wontBeCalled,
-        willBeCalled
-    };
+        m_downloader.setAlreadyDownloadedFileInformation();
+        m_downloader.setAddFileCode(downloader::ResultCode::fileAlreadyExists);
+    }
 
-    enum class ModuleGuuidExpectations
+    void givenFileHasBeenAddedExternally(downloader::FileInformation::Status status)
     {
-        wontBeCalled,
-        willBeCalled
-    };
+        m_downloader.setExternallyAddedFileInformation(status);
+        m_downloader.setAddFileCode(downloader::ResultCode::fileAlreadyExists);
+    }
 
-    enum class DownloaderExpectations
+    void givenInstallerFailsWithNoFreeSpace()
     {
-        wontBeCalled,
-        willBeCalled
-    };
+        m_installer.setExpectedOutcome(PrepareExpectedOutcome::fail_noFreeSpace);
+    }
 
-    enum class InstallerExpectations
+    void whenDownloaderAddFileSignalWithFineInfoReceived(downloader::FileInformation::Status status)
     {
-        wontBeCalled,
-        willBeCalled
-    };
+        downloader::FileInformation fileInformation(kManualFileName);
+        fileInformation.status = status;
+        m_updatesManager->emitFileAddedSignal(fileInformation);
+    }
 
-    enum class PeerIdExpectations
+    void whenDownloaderDeleteFileSignalReceived()
     {
-        wontBeCalled,
-        willBeCalled
-    };
+        m_updatesManager->emitFileDeletedSignal();
+    }
 
-    enum class IsClientExpectations
+    void whenDownloaderAddFileSignalWithBadInfoReceived()
     {
-        wontBeCalled,
-        willBeCalledTrue,
-        willBeCalledFalse
-    };
+        downloader::FileInformation fileInformation(kManualFileName);
+        fileInformation.status = downloader::FileInformation::Status::corrupted;
+        m_updatesManager->emitFileAddedSignal(fileInformation);
+    }
 
-    enum class UpdateGlobalRegistryExpectations
+    void thenAdditionalPeersShouldHaveBeenPassedToDownloader()
     {
-        wontBeCalled,
-        willBeCalled
-    };
+        ASSERT_TRUE(m_downloader.additionalPeers().contains(kCurrentPeerId));
+    }
 
-    void prepareUpdateManagerExpectations(
-        RefreshTimeoutExpectations refreshTimeouExpectations,
-        FilePathExpectations filePathExpectations,
-        LoadStatusFromFileExpectations loadStatusFromFileExpectations,
-        ConnectToSignalsExpectations connectToSignalsExpectations,
-        ModuleGuuidExpectations moduleGuuidExpectations,
-        DownloaderExpectations downloaderExpectations,
-        InstallerExpectations installerExpectations,
-        PeerIdExpectations peerIdExpectations,
-        IsClientExpectations isClientExpectations,
-        UpdateGlobalRegistryExpectations updateGlobalRegistryExpectations)
+    void whenDownloaderSetsBadStatusForFile()
     {
-        switch (refreshTimeouExpectations)
-        {
-        case RefreshTimeoutExpectations::wontBeCalled:
-            break;
-        case RefreshTimeoutExpectations::willBeCalled:
-            EXPECT_CALL(*m_testUpdates2Manager, refreshTimeout())
-                .Times(AtLeast(1)).WillRepeatedly(Return(1000));
-            break;
-        }
+        m_downloader.setExternallyAddedFileInformation(downloader::FileInformation::Status::corrupted);
+    }
 
-        switch (filePathExpectations)
-        {
-        case FilePathExpectations::wontBeCalled:
-            break;
-        case FilePathExpectations::willBeCalled:
-            EXPECT_CALL(*m_testUpdates2Manager, filePath())
-                .Times(AtLeast(1)).WillRepeatedly(Return(QString()));
-            break;
-        }
+    void whenDownloaderEmittedFileInformationSignalsWithProgress()
+    {
+        downloader::FileInformation fileInformation(kFileName);
+        fileInformation.status = downloader::FileInformation::Status::downloading;
+        fileInformation.downloadedChunks = QBitArray(32);
 
-        api::Updates2StatusData::StatusCode statusCode;
-        switch (loadStatusFromFileExpectations)
+        m_progressReported.clear();
+        for (int i = 0; i < fileInformation.downloadedChunks.size(); ++i)
         {
-        case LoadStatusFromFileExpectations::wontBeCalled:
-            break;
-        case LoadStatusFromFileExpectations::willBeCalledNotAvailable:
-            statusCode = api::Updates2StatusData::StatusCode::notAvailable;
-            EXPECT_CALL(*m_testUpdates2Manager, loadStatusFromFile())
-                .Times(1)
-                .WillOnce(InvokeWithoutArgs(
-                    [this, statusCode]()
-                    {
-                        m_testUpdates2Manager->setStatus(detail::Updates2StatusDataEx(
-                            1, thisId(), statusCode));
-                    }));
-            break;
-        }
+            fileInformation.downloadedChunks.setBit(i);
+            m_updatesManager->emitFileInformationChanged(fileInformation);
 
-        switch (connectToSignalsExpectations)
-        {
-        case ConnectToSignalsExpectations::wontBeCalled:
-            break;
-        case ConnectToSignalsExpectations::willBeCalled:
-            EXPECT_CALL(*m_testUpdates2Manager, connectToSignals())
-                .Times(1);
-            break;
-        }
-
-        switch (moduleGuuidExpectations)
-        {
-        case ModuleGuuidExpectations::wontBeCalled:
-            break;
-        case ModuleGuuidExpectations::willBeCalled:
-            EXPECT_CALL(*m_testUpdates2Manager, moduleGuid())
-                .Times(AtLeast(0)).WillRepeatedly(Return(thisId()));
-            break;
-        }
-
-        switch (downloaderExpectations)
-        {
-        case DownloaderExpectations::wontBeCalled:
-            break;
-        case DownloaderExpectations::willBeCalled:
-            EXPECT_CALL(*m_testUpdates2Manager, downloader())
-                .Times(AtLeast(1))
-                .WillRepeatedly(Return((downloader::AbstractDownloader*)&m_testDownloader));
-            break;
-        }
-
-        switch (installerExpectations)
-        {
-        case InstallerExpectations::wontBeCalled:
-            break;
-        case InstallerExpectations::willBeCalled:
-            EXPECT_CALL(*m_testUpdates2Manager, installer())
-                .Times(1)
-                .WillOnce(Return(&m_testInstaller));
-            break;
-        }
-
-        switch (peerIdExpectations)
-        {
-        case PeerIdExpectations::wontBeCalled:
-            break;
-        case PeerIdExpectations::willBeCalled:
-            EXPECT_CALL(*m_testUpdates2Manager, peerId())
-                .Times(AtLeast(1))
-                .WillRepeatedly(Return(QnUuid()));
-            break;
-        }
-
-        switch (isClientExpectations)
-        {
-        case IsClientExpectations::wontBeCalled:
-            break;
-        case IsClientExpectations::willBeCalledFalse:
-            EXPECT_CALL(*m_testUpdates2Manager, isClient())
-                .Times(AtLeast(1))
-                .WillRepeatedly(Return(false));
-            break;
-        case IsClientExpectations::willBeCalledTrue:
-            EXPECT_CALL(*m_testUpdates2Manager, isClient())
-                .Times(AtLeast(1))
-                .WillRepeatedly(Return(true));
-            break;
-        }
-
-        switch (updateGlobalRegistryExpectations)
-        {
-        case UpdateGlobalRegistryExpectations::wontBeCalled:
-            break;
-        case UpdateGlobalRegistryExpectations::willBeCalled:
-            EXPECT_CALL(*m_testUpdates2Manager, updateGlobalRegistry(_)).Times(1);
-            break;
+            if (m_updatesManager->status().progress > 0.0f
+                && (m_progressReported.isEmpty() ||
+                    m_progressReported.last() != m_updatesManager->status().progress))
+            {
+                m_progressReported.append(m_updatesManager->status().progress);
+            }
         }
     }
 
-    enum class FindUpdateExpectations
+    void thenProgressShouldBeReflectedInManagerState()
     {
-        wontBeCalled,
-        willBeCalledNoNewVersion,
-        willBeCalledNewVersion,
-    };
-
-    enum class LatestUpdateExpectations
-    {
-        wontBeCalled,
-        willBeCalledNoNewVersion,
-        willBeCalledNewVersion,
-    };
-
-    enum class AddFileExpectations
-    {
-        wontBeCalled,
-        willBeCalled
-    };
-
-    enum class AlternativeServersExpectations
-    {
-        wontBeCalled,
-        willBeCalled,
-    };
-
-    enum class ToBytesExpectations
-    {
-        wontBeCalled,
-        willBeCalled
-    };
-
-    enum class FromBytesExpectations
-    {
-        wontBeCalled,
-        willBeCalled
-    };
-
-    enum class EqualExpectations
-    {
-        wontBeCalled,
-        returnsTrue,
-        returnsFalse,
-    };
-
-    enum class MergeExpectations
-    {
-        wontBeCalled,
-        willBeCalled,
-    };
-
-    void prepareUpdateRegistryExpectations(
-            TestUpdateRegistry* updateRegistry,
-            const QnSoftwareVersion* version,
-            FindUpdateExpectations findUpdateExpectations,
-            LatestUpdateExpectations latestUpdateExpectations,
-            AddFileExpectations addFileExpectations,
-            AlternativeServersExpectations alternativeServersExpectations,
-            ToBytesExpectations toBytesExpectations,
-            FromBytesExpectations fromBytesExpectations,
-            EqualExpectations equalExpectations,
-            MergeExpectations mergeExpectations)
-    {
-        update::info::FileData fileData(kFileName, kFileUrl, kFileSize, kFileMd5);
-        switch (findUpdateExpectations)
-        {
-        case FindUpdateExpectations::wontBeCalled:
-            break;
-        case FindUpdateExpectations::willBeCalledNoNewVersion:
-            EXPECT_CALL(*updateRegistry, findUpdateFile(_, NotNull()))
-                .Times(AtLeast(1))
-                .WillRepeatedly(Return(update::info::ResultCode::noData));
-            break;
-        case FindUpdateExpectations::willBeCalledNewVersion:
-            EXPECT_CALL(*updateRegistry, findUpdateFile(_, NotNull()))
-                .Times(AtLeast(1))
-                .WillRepeatedly(
-                    DoAll(SetArgPointee<1>(fileData), Return(update::info::ResultCode::ok)));
-            break;
-        }
-
-        switch (latestUpdateExpectations)
-        {
-        case LatestUpdateExpectations::wontBeCalled:
-            break;
-        case LatestUpdateExpectations::willBeCalledNoNewVersion:
-            EXPECT_CALL(*updateRegistry, latestUpdate(_, _)).Times(AtLeast(1))
-                .WillRepeatedly(Return(update::info::ResultCode::noData));
-            break;
-        case LatestUpdateExpectations::willBeCalledNewVersion:
-            EXPECT_CALL(*updateRegistry, latestUpdate(_, _)).Times(AtLeast(1))
-                .WillRepeatedly(DoAll(SetArgPointee<1>(*version), Return(update::info::ResultCode::ok)));
-            break;
-        }
-
-        switch (alternativeServersExpectations)
-        {
-        case AlternativeServersExpectations::wontBeCalled:
-            break;
-        case AlternativeServersExpectations::willBeCalled:
-            EXPECT_CALL(*updateRegistry, alternativeServers()).Times(AtLeast(1));
-            break;
-        }
-
-        switch (addFileExpectations)
-        {
-        case AddFileExpectations::wontBeCalled:
-            break;
-        case AddFileExpectations::willBeCalled:
-            EXPECT_CALL(*updateRegistry, addFileData(_)).Times(AtLeast(1));
-            break;
-        }
-
-        switch (toBytesExpectations)
-        {
-        case ToBytesExpectations::wontBeCalled:
-            break;
-        case ToBytesExpectations::willBeCalled:
-            EXPECT_CALL(*updateRegistry, toByteArray())
-                .Times(AtLeast(1))
-                .WillRepeatedly(Return(QByteArray("some data")));
-            break;
-        }
-
-        switch (fromBytesExpectations)
-        {
-        case FromBytesExpectations::wontBeCalled:
-            break;
-        case FromBytesExpectations::willBeCalled:
-            EXPECT_CALL(*updateRegistry, fromByteArray(_))
-                .Times(AtLeast(1));
-            break;
-        }
-
-        switch (equalExpectations)
-        {
-        case EqualExpectations::wontBeCalled:
-            break;
-        case EqualExpectations::returnsFalse:
-            EXPECT_CALL(*updateRegistry, equals(_))
-                .Times(AtLeast(1)).WillRepeatedly(Return(false));
-            break;
-        case EqualExpectations::returnsTrue:
-            EXPECT_CALL(*updateRegistry, equals(_))
-                .Times(AtLeast(1)).WillRepeatedly(Return(true));
-            break;
-        }
-
-        switch (mergeExpectations)
-        {
-        case MergeExpectations::wontBeCalled:
-            break;
-        case MergeExpectations::willBeCalled:
-            EXPECT_CALL(*updateRegistry, merge(_)).Times(AtLeast(1));
-            break;
-        }
+        ASSERT_GT(m_progressReported.size(), 10);
     }
 
-    update::info::AbstractUpdateRegistryPtr createUpdateRegistry(
-        const QnSoftwareVersion* version,
-        FindUpdateExpectations findUpdateExpectations,
-        LatestUpdateExpectations latestUpdateExpectations,
-        AddFileExpectations addFileExpectations,
-        AlternativeServersExpectations alternativeServersExpectations,
-        ToBytesExpectations toBytesExpectations,
-        FromBytesExpectations fromBytesExpectations,
-        EqualExpectations equalExpectations,
-        MergeExpectations mergeExpectations)
+    void whenDownloadCancelled()
     {
-        auto updateRegistry = std::make_unique<TestUpdateRegistry>();
-        prepareUpdateRegistryExpectations(
-            updateRegistry.get(),
-            version,
-            findUpdateExpectations,
-            latestUpdateExpectations,
-            addFileExpectations,
-            alternativeServersExpectations,
-            toBytesExpectations,
-            fromBytesExpectations,
-            equalExpectations,
-            mergeExpectations);
-        return updateRegistry;
+        m_updatesManager->cancel();
     }
-
-    TestUpdateRegistry* currentRemoteRegistry() { return m_remoteRegistry; }
-    TestUpdateRegistry* currentGlobalRegistry() { return m_globalRegistry; }
 
 private:
-    TestDownloader m_testDownloader;
-    std::unique_ptr<TestUpdates2Manager> m_testUpdates2Manager;
-    TestInstaller m_testInstaller;
-    TestUpdateRegistry* m_remoteRegistry;
-    TestUpdateRegistry* m_globalRegistry;
-
-    static QnUuid thisId()
-    {
-        const static QnUuid result = QnUuid::createUuid();
-        return result;
-    }
-
-    void expectingStateWrittenToFile(api::Updates2StatusData::StatusCode state)
-    {
-        ASSERT_EQ(state, m_testUpdates2Manager->fileWrittenData().state);
-    }
+    std::unique_ptr<TestUpdatesManager> m_updatesManager;
+    TestInstaller m_installer;
+    TestDownloader m_downloader;
+    TestUpdateRegistry m_remoteRegistry;
+    TestUpdateRegistry m_globalRegistry;
+    QList<double> m_progressReported;
 };
-
-const QString Updates2Manager::kUpdatesUrl = "test.url";
-const QString Updates2Manager::kCloudHost = "test.cloud.host";
-const QString Updates2Manager::kCustomization = "test.customization";
-const QnSoftwareVersion Updates2Manager::kVersion = QnSoftwareVersion("1.0.0.1");
-const QString Updates2Manager::kPlatform = "test.platform";
-const QString Updates2Manager::kArch = "test.arch";
-const QString Updates2Manager::kModification = "test.modification";
-
-const QString Updates2Manager::kFileUrl = "test.file.url";
-const int Updates2Manager::kFileSize = 42;
-const QByteArray Updates2Manager::kFileMd5 = "test.file.md5";
 
 TEST_F(Updates2Manager, NotAvailableStatusCheck)
 {
-    givenInitialUpdates2ManagerWithInitialRegistry(
-        [this]()
-        {
-            return createUpdateRegistry(
-                /*version*/ nullptr,
-                FindUpdateExpectations::wontBeCalled,
-                LatestUpdateExpectations::willBeCalledNoNewVersion,
-                AddFileExpectations::wontBeCalled,
-                AlternativeServersExpectations::wontBeCalled,
-                ToBytesExpectations::wontBeCalled,
-                FromBytesExpectations::wontBeCalled,
-                EqualExpectations::wontBeCalled,
-                MergeExpectations::wontBeCalled);
-        });
-    prepareUpdateManagerExpectations(
-        RefreshTimeoutExpectations::willBeCalled,
-        FilePathExpectations::wontBeCalled,
-        LoadStatusFromFileExpectations::willBeCalledNotAvailable,
-        ConnectToSignalsExpectations::willBeCalled,
-        ModuleGuuidExpectations::willBeCalled,
-        DownloaderExpectations::wontBeCalled,
-        InstallerExpectations::wontBeCalled,
-        PeerIdExpectations::wontBeCalled,
-        IsClientExpectations::willBeCalledFalse,
-        UpdateGlobalRegistryExpectations::wontBeCalled);
-
-    givenGlobalRegistryFactoryFunc([](){ return update::info::AbstractUpdateRegistryPtr(); });
-    givenRemoteRegistryFactoryFunc([](){ return update::info::AbstractUpdateRegistryPtr(); });
-    whenServerStarted();
-    whenRemoteUpdateDone();
-    thenStateShouldBe(api::Updates2StatusData::StatusCode::notAvailable);
-}
-
-TEST_F(Updates2Manager, FoundGlobalUpdateRegistry_noNewVersion)
-{
-    givenInitialUpdates2ManagerWithInitialRegistry(
-        [this]()
-        {
-            return createUpdateRegistry(
-                /*version*/ nullptr,
-                FindUpdateExpectations::wontBeCalled,
-                LatestUpdateExpectations::wontBeCalled,
-                AddFileExpectations::wontBeCalled,
-                AlternativeServersExpectations::wontBeCalled,
-                ToBytesExpectations::wontBeCalled,
-                FromBytesExpectations::wontBeCalled,
-                EqualExpectations::wontBeCalled,
-                MergeExpectations::wontBeCalled);
-        });
-
-    givenGlobalRegistryFactoryFunc(
-        [this]()
-        {
-            return createUpdateRegistry(
-                /*version*/ nullptr,
-                FindUpdateExpectations::wontBeCalled,
-                LatestUpdateExpectations::willBeCalledNoNewVersion,
-                AddFileExpectations::wontBeCalled,
-                AlternativeServersExpectations::wontBeCalled,
-                ToBytesExpectations::wontBeCalled,
-                FromBytesExpectations::wontBeCalled,
-                EqualExpectations::returnsFalse,
-                MergeExpectations::willBeCalled);
-        });
-
-    prepareUpdateManagerExpectations(
-        RefreshTimeoutExpectations::willBeCalled,
-        FilePathExpectations::wontBeCalled,
-        LoadStatusFromFileExpectations::willBeCalledNotAvailable,
-        ConnectToSignalsExpectations::willBeCalled,
-        ModuleGuuidExpectations::willBeCalled,
-        DownloaderExpectations::wontBeCalled,
-        InstallerExpectations::wontBeCalled,
-        PeerIdExpectations::wontBeCalled,
-        IsClientExpectations::willBeCalledFalse,
-        UpdateGlobalRegistryExpectations::wontBeCalled);
-
-    givenRemoteRegistryFactoryFunc([]() { return update::info::AbstractUpdateRegistryPtr(); });
-    whenServerStarted();
+    givenUpdateRegistries(/*remoteHasUpdate*/ false, /*globalHasUpdate*/ false);
+    whenServerHasBeenStarted();
     whenRemoteUpdateDone();
     thenStateShouldBe(api::Updates2StatusData::StatusCode::notAvailable);
 }
 
 TEST_F(Updates2Manager, FoundGlobalUpdateRegistry_newVersion)
 {
-    givenInitialUpdates2ManagerWithInitialRegistry(
-        [this]()
-        {
-            return createUpdateRegistry(
-                /*version*/ nullptr,
-                FindUpdateExpectations::wontBeCalled,
-                LatestUpdateExpectations::wontBeCalled,
-                AddFileExpectations::wontBeCalled,
-                AlternativeServersExpectations::wontBeCalled,
-                ToBytesExpectations::wontBeCalled,
-                FromBytesExpectations::wontBeCalled,
-                EqualExpectations::wontBeCalled,
-                MergeExpectations::wontBeCalled);
-        });
-
-    const auto newVersion = QnSoftwareVersion("1.0.0.2");
-    givenGlobalRegistryFactoryFunc(
-        [this, &newVersion]()
-        {
-            return createUpdateRegistry(
-                &newVersion,
-                FindUpdateExpectations::willBeCalledNewVersion,
-                LatestUpdateExpectations::willBeCalledNewVersion,
-                AddFileExpectations::wontBeCalled,
-                AlternativeServersExpectations::wontBeCalled,
-                ToBytesExpectations::wontBeCalled,
-                FromBytesExpectations::wontBeCalled,
-                EqualExpectations::returnsFalse,
-                MergeExpectations::willBeCalled);
-        });
-
-    prepareUpdateManagerExpectations(
-        RefreshTimeoutExpectations::willBeCalled,
-        FilePathExpectations::wontBeCalled,
-        LoadStatusFromFileExpectations::willBeCalledNotAvailable,
-        ConnectToSignalsExpectations::willBeCalled,
-        ModuleGuuidExpectations::willBeCalled,
-        DownloaderExpectations::wontBeCalled,
-        InstallerExpectations::wontBeCalled,
-        PeerIdExpectations::wontBeCalled,
-        IsClientExpectations::willBeCalledFalse,
-        UpdateGlobalRegistryExpectations::wontBeCalled);
-
-    givenRemoteRegistryFactoryFunc([]() { return update::info::AbstractUpdateRegistryPtr(); });
-    whenServerStarted();
+    givenUpdateRegistries(/*remoteHasUpdate*/ false, /*globalHasUpdate*/ true);
+    whenServerHasBeenStarted();
     whenRemoteUpdateDone();
-    thenStateShouldBe(
-        api::Updates2StatusData::StatusCode::available, newVersion.toString());
-}
-
-TEST_F(Updates2Manager, FoundRemoteUpdateRegistry_noNewVersion)
-{
-    givenInitialUpdates2ManagerWithInitialRegistry(
-        [this]()
-        {
-            return createUpdateRegistry(
-                /*version*/ nullptr,
-                FindUpdateExpectations::wontBeCalled,
-                LatestUpdateExpectations::wontBeCalled,
-                AddFileExpectations::wontBeCalled,
-                AlternativeServersExpectations::wontBeCalled,
-                ToBytesExpectations::wontBeCalled,
-                FromBytesExpectations::wontBeCalled,
-                EqualExpectations::wontBeCalled,
-                MergeExpectations::wontBeCalled);
-        });
-
-    givenGlobalRegistryFactoryFunc([]() { return update::info::AbstractUpdateRegistryPtr(); });
-    givenRemoteRegistryFactoryFunc(
-        [this]()
-        {
-        return createUpdateRegistry(
-            /*version*/ nullptr,
-            FindUpdateExpectations::wontBeCalled,
-            LatestUpdateExpectations::willBeCalledNoNewVersion,
-            AddFileExpectations::wontBeCalled,
-            AlternativeServersExpectations::wontBeCalled,
-            ToBytesExpectations::willBeCalled,
-            FromBytesExpectations::wontBeCalled,
-            EqualExpectations::returnsFalse,
-            MergeExpectations::willBeCalled);
-        });
-
-    prepareUpdateManagerExpectations(
-        RefreshTimeoutExpectations::willBeCalled,
-        FilePathExpectations::wontBeCalled,
-        LoadStatusFromFileExpectations::willBeCalledNotAvailable,
-        ConnectToSignalsExpectations::willBeCalled,
-        ModuleGuuidExpectations::willBeCalled,
-        DownloaderExpectations::wontBeCalled,
-        InstallerExpectations::wontBeCalled,
-        PeerIdExpectations::wontBeCalled,
-        IsClientExpectations::willBeCalledFalse,
-        UpdateGlobalRegistryExpectations::willBeCalled);
-
-    whenServerStarted();
-    whenRemoteUpdateDone();
-    thenStateShouldBe(api::Updates2StatusData::StatusCode::notAvailable);
+    thenStateShouldBe(api::Updates2StatusData::StatusCode::available);
 }
 
 TEST_F(Updates2Manager, FoundRemoteUpdateRegistry_newVersion)
 {
-    givenInitialUpdates2ManagerWithInitialRegistry(
-        [this]()
-        {
-            return createUpdateRegistry(
-                /*version*/ nullptr,
-                FindUpdateExpectations::wontBeCalled,
-                LatestUpdateExpectations::wontBeCalled,
-                AddFileExpectations::wontBeCalled,
-                AlternativeServersExpectations::wontBeCalled,
-                ToBytesExpectations::wontBeCalled,
-                FromBytesExpectations::wontBeCalled,
-                EqualExpectations::wontBeCalled,
-                MergeExpectations::wontBeCalled);
-        });
-
-    givenGlobalRegistryFactoryFunc([]() { return update::info::AbstractUpdateRegistryPtr(); });
-    givenRemoteRegistryFactoryFunc(
-        [this]()
-        {
-            return createUpdateRegistry(
-                &kNewVersion,
-                FindUpdateExpectations::willBeCalledNewVersion,
-                LatestUpdateExpectations::willBeCalledNewVersion,
-                AddFileExpectations::wontBeCalled,
-                AlternativeServersExpectations::wontBeCalled,
-                ToBytesExpectations::willBeCalled,
-                FromBytesExpectations::wontBeCalled,
-                EqualExpectations::returnsFalse,
-                MergeExpectations::willBeCalled);
-        });
-
-    prepareUpdateManagerExpectations(
-        RefreshTimeoutExpectations::willBeCalled,
-        FilePathExpectations::wontBeCalled,
-        LoadStatusFromFileExpectations::willBeCalledNotAvailable,
-        ConnectToSignalsExpectations::willBeCalled,
-        ModuleGuuidExpectations::willBeCalled,
-        DownloaderExpectations::wontBeCalled,
-        InstallerExpectations::wontBeCalled,
-        PeerIdExpectations::wontBeCalled,
-        IsClientExpectations::willBeCalledFalse,
-        UpdateGlobalRegistryExpectations::willBeCalled);
-
-    whenServerStarted();
+    givenUpdateRegistries(/*remoteHasUpdate*/ true, /*globalHasUpdate*/ false);
+    whenServerHasBeenStarted();
     whenRemoteUpdateDone();
     thenStateShouldBe(api::Updates2StatusData::StatusCode::available);
 }
 
 TEST_F(Updates2Manager, StatusWhileCheckingForUpdate)
 {
-    givenInitialUpdates2ManagerWithInitialRegistry(
-        [this]()
-        {
-            return createUpdateRegistry(
-                /*version*/ nullptr,
-                FindUpdateExpectations::wontBeCalled,
-                LatestUpdateExpectations::wontBeCalled,
-                AddFileExpectations::wontBeCalled,
-                AlternativeServersExpectations::wontBeCalled,
-                ToBytesExpectations::wontBeCalled,
-                FromBytesExpectations::wontBeCalled,
-                EqualExpectations::wontBeCalled,
-                MergeExpectations::wontBeCalled);
-        });
-
-    givenGlobalRegistryFactoryFunc([]() { return update::info::AbstractUpdateRegistryPtr(); });
-    givenRemoteRegistryFactoryFunc(
-        [this]()
-        {
-            return createUpdateRegistry(
-                &kNewVersion,
-                FindUpdateExpectations::willBeCalledNewVersion,
-                LatestUpdateExpectations::willBeCalledNewVersion,
-                AddFileExpectations::wontBeCalled,
-                AlternativeServersExpectations::wontBeCalled,
-                ToBytesExpectations::willBeCalled,
-                FromBytesExpectations::wontBeCalled,
-                EqualExpectations::returnsFalse,
-                MergeExpectations::willBeCalled);
-        });
-
-    prepareUpdateManagerExpectations(
-        RefreshTimeoutExpectations::willBeCalled,
-        FilePathExpectations::wontBeCalled,
-        LoadStatusFromFileExpectations::willBeCalledNotAvailable,
-        ConnectToSignalsExpectations::willBeCalled,
-        ModuleGuuidExpectations::willBeCalled,
-        DownloaderExpectations::wontBeCalled,
-        InstallerExpectations::wontBeCalled,
-        PeerIdExpectations::wontBeCalled,
-        IsClientExpectations::willBeCalledFalse,
-        UpdateGlobalRegistryExpectations::willBeCalled);
-
-    whenNeedToWaitForRemoteRegistryCompletion();
-    whenServerStarted();
-    thenStateShouldBeAtLast(api::Updates2StatusData::StatusCode::checking);
+    givenUpdateRegistries(/*remoteHasUpdate*/ true, /*globalHasUpdate*/ false);
+    whenRemoteUpdateTakesLongTimeToComplete();
+    whenServerHasBeenStarted();
+    thenStateShouldFinallyBecome(api::Updates2StatusData::StatusCode::checking);
+    whenRemoteUpdateFinishedAtLast();
     whenRemoteUpdateDone();
     thenStateShouldBe(api::Updates2StatusData::StatusCode::available);
 }
 
-TEST_F(Updates2Manager, HasRemoteUpdate_Download_successful)
+TEST_F(Updates2Manager, Download_successful)
 {
-    givenInitialUpdates2ManagerWithInitialRegistry(
-        [this]()
-        {
-            return createUpdateRegistry(
-                /*version*/ nullptr,
-                FindUpdateExpectations::wontBeCalled,
-                LatestUpdateExpectations::wontBeCalled,
-                AddFileExpectations::wontBeCalled,
-                AlternativeServersExpectations::wontBeCalled,
-                ToBytesExpectations::wontBeCalled,
-                FromBytesExpectations::wontBeCalled,
-                EqualExpectations::wontBeCalled,
-                MergeExpectations::wontBeCalled);
-        });
+    givenUpdateRegistries(/*remoteHasUpdate*/ true, /*globalHasUpdate*/ false);
+    whenServerHasBeenStarted();
+    whenRemoteUpdateDone();
 
-    prepareUpdateManagerExpectations(
-        RefreshTimeoutExpectations::willBeCalled,
-        FilePathExpectations::wontBeCalled,
-        LoadStatusFromFileExpectations::willBeCalledNotAvailable,
-        ConnectToSignalsExpectations::willBeCalled,
-        ModuleGuuidExpectations::willBeCalled,
-        DownloaderExpectations::willBeCalled,
-        InstallerExpectations::willBeCalled,
-        PeerIdExpectations::wontBeCalled,
-        IsClientExpectations::willBeCalledFalse,
-        UpdateGlobalRegistryExpectations::willBeCalled);
-
-    givenAvailableRemoteUpdate();
-
-    prepareDownloadExpectations(
-        FilesExpectations::wontBeCalled,
-        FilePathExpectations::willBeCalled,
-        FileInformationExpectations::willBeCalled_FirstNotFound_SecondFound,
-        DownloaderAddFileExpectations::willBeCalled_nonManual,
-        DeleteFileExpectations::willBeCalled);
-
-    whenDownloadRequestIssued();
+    whenDownloadRequestIssued(api::Updates2StatusData::StatusCode::downloading);
     whenDownloadFinishedSuccessfully();
     thenStateShouldBe(api::Updates2StatusData::StatusCode::preparing);
-    thenStateShouldBeAtLast(api::Updates2StatusData::StatusCode::readyToInstall);
+    thenStateShouldFinallyBecome(api::Updates2StatusData::StatusCode::readyToInstall);
 }
 
-TEST_F(Updates2Manager, HasRemoteUpdate_Download_addFile_fail)
+TEST_F(Updates2Manager, Download_additionalPeersFromManualData)
 {
-    givenInitialUpdates2ManagerWithInitialRegistry(
-        [this]()
-        {
-            return createUpdateRegistry(
-                /*version*/ nullptr,
-                FindUpdateExpectations::wontBeCalled,
-                LatestUpdateExpectations::wontBeCalled,
-                AddFileExpectations::wontBeCalled,
-                AlternativeServersExpectations::wontBeCalled,
-                ToBytesExpectations::wontBeCalled,
-                FromBytesExpectations::wontBeCalled,
-                EqualExpectations::wontBeCalled,
-                MergeExpectations::wontBeCalled);
-        });
+    givenUpdateRegistries(/*remoteHasUpdate*/ false, /*globalHasUpdate*/ false);
+    givenFileHasBeenAddedExternally(downloader::FileInformation::Status::downloaded);
+    whenServerHasBeenStarted();
+    whenDownloaderAddFileSignalWithFineInfoReceived(downloader::FileInformation::Status::downloaded);
 
-    prepareUpdateManagerExpectations(
-        RefreshTimeoutExpectations::willBeCalled,
-        FilePathExpectations::wontBeCalled,
-        LoadStatusFromFileExpectations::willBeCalledNotAvailable,
-        ConnectToSignalsExpectations::willBeCalled,
-        ModuleGuuidExpectations::willBeCalled,
-        DownloaderExpectations::willBeCalled,
-        InstallerExpectations::wontBeCalled,
-        PeerIdExpectations::wontBeCalled,
-        IsClientExpectations::willBeCalledFalse,
-        UpdateGlobalRegistryExpectations::willBeCalled);
+    whenDownloadRequestIssuedWithFinalResult(api::Updates2StatusData::StatusCode::preparing);
+    thenAdditionalPeersShouldHaveBeenPassedToDownloader();
+    thenStateShouldFinallyBecome(api::Updates2StatusData::StatusCode::readyToInstall);
+}
 
-    givenAvailableRemoteUpdate();
+TEST_F(Updates2Manager, Download_externalFileAdded_wrongState)
+{
+    givenUpdateRegistries(/*remoteHasUpdate*/ false, /*globalHasUpdate*/ false);
+    givenFileHasBeenAddedExternally(downloader::FileInformation::Status::downloading);
+    whenServerHasBeenStarted();
+    whenDownloaderAddFileSignalWithBadInfoReceived();
+    whenRemoteUpdateDone();
 
-    prepareDownloadExpectations(
-        FilesExpectations::wontBeCalled,
-        FilePathExpectations::wontBeCalled,
-        FileInformationExpectations::willBeCalled_OnceNotFound,
-        DownloaderAddFileExpectations::willBeCalled_failedWithNoSpace,
-        DeleteFileExpectations::willBeCalled);
+    whenDownloadRequestIssued(api::Updates2StatusData::StatusCode::notAvailable);
+    thenStateShouldFinallyBecome(api::Updates2StatusData::StatusCode::notAvailable);
+}
 
-    whenDownloadRequestIssued();
-    whenDownloadFinishedWithFailure();
+TEST_F(Updates2Manager, Download_externalFileAdded_stateDownloading_butThenBecomesCorrupted)
+{
+    givenUpdateRegistries(/*remoteHasUpdate*/ false, /*globalHasUpdate*/ false);
+    givenFileHasBeenAddedExternally(downloader::FileInformation::Status::downloading);
+    whenServerHasBeenStarted();
+    whenDownloaderAddFileSignalWithFineInfoReceived(downloader::FileInformation::Status::downloading);
+    whenRemoteUpdateDone();
+
+    thenStateShouldFinallyBecome(api::Updates2StatusData::StatusCode::available);
+
+    whenDownloaderSetsBadStatusForFile();
+    whenDownloadRequestIssued(api::Updates2StatusData::StatusCode::error);
+    whenRemoteUpdateDone();
+
+    thenStateShouldFinallyBecome(api::Updates2StatusData::StatusCode::notAvailable);
+}
+
+TEST_F(Updates2Manager, Download_externalFileDeleted)
+{
+    givenUpdateRegistries(/*remoteHasUpdate*/ false, /*globalHasUpdate*/ false);
+    givenFileHasBeenAddedExternally(downloader::FileInformation::Status::downloaded);
+    whenServerHasBeenStarted();
+    whenDownloaderAddFileSignalWithFineInfoReceived(downloader::FileInformation::Status::downloaded);
+    whenRemoteUpdateDone();
+
+    thenStateShouldFinallyBecome(api::Updates2StatusData::StatusCode::available);
+
+    whenDownloaderDeleteFileSignalReceived();
+    whenDownloadRequestIssued(api::Updates2StatusData::StatusCode::notAvailable);
+    whenRemoteUpdateDone();
+    thenStateShouldFinallyBecome(api::Updates2StatusData::StatusCode::notAvailable);
+}
+
+TEST_F(Updates2Manager, Download_addFile_fail)
+{
+    givenUpdateRegistries(/*remoteHasUpdate*/ true, /*globalHasUpdate*/ false);
+    whenServerHasBeenStarted();
+    whenRemoteUpdateDone();
+
+    whenDownloaderFailsToAddFile();
+    whenDownloadRequestIssued(api::Updates2StatusData::StatusCode::error);
     thenStateShouldBe(api::Updates2StatusData::StatusCode::error);
+    thenStateShouldFinallyBecome(api::Updates2StatusData::StatusCode::available);
+}
 
-    givenGlobalRegistryFactoryFunc(
-        [this]()
-        {
-            return createUpdateRegistry(
-                nullptr,
-                FindUpdateExpectations::wontBeCalled,
-                LatestUpdateExpectations::wontBeCalled,
-                AddFileExpectations::wontBeCalled,
-                AlternativeServersExpectations::wontBeCalled,
-                ToBytesExpectations::wontBeCalled,
-                FromBytesExpectations::wontBeCalled,
-                EqualExpectations::wontBeCalled,
-                MergeExpectations::wontBeCalled);
-        });
+TEST_F(Updates2Manager, Download_notAvailableStateBecauseNoUpdate)
+{
+    givenUpdateRegistries(/*remoteHasUpdate*/ false, /*globalHasUpdate*/ false);
+    whenServerHasBeenStarted();
+    whenRemoteUpdateDone();
 
-    // current registry should be equal to the remote one, settings expectations before it changes
-    prepareUpdateRegistryExpectations(
-                currentRemoteRegistry(),
-                &kNewVersion,
-                FindUpdateExpectations::willBeCalledNewVersion,
-                LatestUpdateExpectations::willBeCalledNewVersion,
-                AddFileExpectations::wontBeCalled,
-                AlternativeServersExpectations::wontBeCalled,
-                ToBytesExpectations::wontBeCalled,
-                FromBytesExpectations::wontBeCalled,
-                EqualExpectations::returnsTrue,
-                MergeExpectations::wontBeCalled);
+    whenDownloadRequestIssued(api::Updates2StatusData::StatusCode::notAvailable);
+    thenStateShouldBe(api::Updates2StatusData::StatusCode::notAvailable);
+}
 
-    givenRemoteRegistryFactoryFunc(
-        [this]()
-        {
-            return createUpdateRegistry(
-                nullptr,
-                FindUpdateExpectations::wontBeCalled,
-                LatestUpdateExpectations::wontBeCalled,
-                AddFileExpectations::wontBeCalled,
-                AlternativeServersExpectations::wontBeCalled,
-                ToBytesExpectations::wontBeCalled,
-                FromBytesExpectations::wontBeCalled,
-                EqualExpectations::returnsTrue,
-                MergeExpectations::wontBeCalled);
-        });
-
+TEST_F(Updates2Manager, Download_notAvailableState_BecauseCheckHasNotFinished)
+{
+    givenUpdateRegistries(/*remoteHasUpdate*/ true, /*globalHasUpdate*/ false);
+    whenRemoteUpdateTakesLongTimeToComplete();
+    whenServerHasBeenStarted();
+    thenStateShouldFinallyBecome(api::Updates2StatusData::StatusCode::checking);
+    whenDownloadRequestIssued(api::Updates2StatusData::StatusCode::checking);
+    whenRemoteUpdateFinishedAtLast();
     whenRemoteUpdateDone();
     thenStateShouldBe(api::Updates2StatusData::StatusCode::available);
 }
 
-TEST_F(Updates2Manager, HasRemoteUpdate_Download_notAvailableStateBecauseNoUpdate)
+TEST_F(Updates2Manager, Download_alreadyDownloadingState)
 {
-    givenInitialUpdates2ManagerWithInitialRegistry(
-        [this]()
-        {
-            return createUpdateRegistry(
-                /*version*/ nullptr,
-                FindUpdateExpectations::wontBeCalled,
-                LatestUpdateExpectations::wontBeCalled,
-                AddFileExpectations::wontBeCalled,
-                AlternativeServersExpectations::wontBeCalled,
-                ToBytesExpectations::wontBeCalled,
-                FromBytesExpectations::wontBeCalled,
-                EqualExpectations::wontBeCalled,
-                MergeExpectations::wontBeCalled);
-        });
-
-    prepareUpdateManagerExpectations(
-        RefreshTimeoutExpectations::willBeCalled,
-        FilePathExpectations::wontBeCalled,
-        LoadStatusFromFileExpectations::willBeCalledNotAvailable,
-        ConnectToSignalsExpectations::willBeCalled,
-        ModuleGuuidExpectations::willBeCalled,
-        DownloaderExpectations::wontBeCalled,
-        InstallerExpectations::wontBeCalled,
-        PeerIdExpectations::wontBeCalled,
-        IsClientExpectations::willBeCalledFalse,
-        UpdateGlobalRegistryExpectations::willBeCalled);
-
-    givenGlobalRegistryFactoryFunc([]() { return update::info::AbstractUpdateRegistryPtr(); });
-    givenRemoteRegistryFactoryFunc(
-        [this]()
-        {
-            auto result = createUpdateRegistry(
-                nullptr,
-                FindUpdateExpectations::wontBeCalled,
-                LatestUpdateExpectations::willBeCalledNoNewVersion,
-                AddFileExpectations::wontBeCalled,
-                AlternativeServersExpectations::wontBeCalled,
-                ToBytesExpectations::willBeCalled,
-                FromBytesExpectations::wontBeCalled,
-                EqualExpectations::returnsFalse,
-                MergeExpectations::willBeCalled);
-
-             return result;
-        });
-
-    whenServerStarted();
+    givenUpdateRegistries(/*remoteHasUpdate*/ true, /*globalHasUpdate*/ false);
+    whenServerHasBeenStarted();
     whenRemoteUpdateDone();
-    thenStateShouldBe(api::Updates2StatusData::StatusCode::notAvailable);
 
-    givenGlobalRegistryFactoryFunc(
-        [this]()
-        {
-            return createUpdateRegistry(
-                nullptr,
-                FindUpdateExpectations::wontBeCalled,
-                LatestUpdateExpectations::wontBeCalled,
-                AddFileExpectations::wontBeCalled,
-                AlternativeServersExpectations::wontBeCalled,
-                ToBytesExpectations::wontBeCalled,
-                FromBytesExpectations::wontBeCalled,
-                EqualExpectations::wontBeCalled,
-                MergeExpectations::wontBeCalled);
-        });
-
-    prepareUpdateRegistryExpectations(
-                currentRemoteRegistry(),
-                nullptr,
-                FindUpdateExpectations::wontBeCalled,
-                LatestUpdateExpectations::willBeCalledNoNewVersion,
-                AddFileExpectations::wontBeCalled,
-                AlternativeServersExpectations::wontBeCalled,
-                ToBytesExpectations::wontBeCalled,
-                FromBytesExpectations::wontBeCalled,
-                EqualExpectations::returnsTrue,
-                MergeExpectations::wontBeCalled);
-
-    givenRemoteRegistryFactoryFunc(
-        [this]()
-        {
-            auto result = createUpdateRegistry(
-                nullptr,
-                FindUpdateExpectations::wontBeCalled,
-                LatestUpdateExpectations::wontBeCalled,
-                AddFileExpectations::wontBeCalled,
-                AlternativeServersExpectations::wontBeCalled,
-                ToBytesExpectations::wontBeCalled,
-                FromBytesExpectations::wontBeCalled,
-                EqualExpectations::returnsTrue,
-                MergeExpectations::wontBeCalled);
-
-             return result;
-        });
-
-    whenDownloadRequestIssued();
-    whenRemoteUpdateDone();
-    thenStateShouldBe(api::Updates2StatusData::StatusCode::notAvailable);
+    whenDownloadRequestIssued(api::Updates2StatusData::StatusCode::downloading);
+    thenStateShouldBe(api::Updates2StatusData::StatusCode::downloading);
+    whenDownloadFinishedSuccessfully();
+    thenStateShouldFinallyBecome(api::Updates2StatusData::StatusCode::readyToInstall);
 }
 
-//TEST_F(Updates2Manager, HasRemoteUpdate_Download_alreadyDownloadingState)
-//{
-//    givenInitialUpdates2ManagerWithInitialRegistry(
-//        [this]()
-//        {
-//            return createUpdateRegistry(
-//                /*version*/ nullptr,
-//                FindUpdateExpectations::wontBeCalled,
-//                LatestUpdateExpectations::wontBeCalled,
-//                AddFileExpectations::wontBeCalled,
-//                AlternativeServersExpectations::wontBeCalled,
-//                ToBytesExpectations::wontBeCalled,
-//                FromBytesExpectations::wontBeCalled,
-//                EqualExpectations::wontBeCalled,
-//                MergeExpectations::wontBeCalled);
-//        });
+TEST_F(Updates2Manager, Download_failed)
+{
+    givenUpdateRegistries(/*remoteHasUpdate*/ true, /*globalHasUpdate*/ false);
+    whenServerHasBeenStarted();
+    whenRemoteUpdateDone();
 
-//    prepareUpdateManagerExpectations(
-//        RefreshTimeoutExpectations::willBeCalled,
-//        FilePathExpectations::wontBeCalled,
-//        LoadStatusFromFileExpectations::willBeCalledNotAvailable,
-//        ConnectToSignalsExpectations::willBeCalled,
-//        ModuleGuuidExpectations::willBeCalled,
-//        DownloaderExpectations::willBeCalled,
-//        InstallerExpectations::willBeCalled,
-//        PeerIdExpectations::wontBeCalled,
-//        IsClientExpectations::willBeCalledFalse,
-//        UpdateGlobalRegistryExpectations::willBeCalled);
+    whenDownloadRequestIssued(api::Updates2StatusData::StatusCode::downloading);
+    whenDownloadFinishedUNSuccessfully();
+    thenStateShouldBe(api::Updates2StatusData::StatusCode::error);
+    thenStateShouldFinallyBecome(api::Updates2StatusData::StatusCode::available);
+}
 
-//    prepareDownloadExpectations(
-//        FilesExpectations::wontBeCalled,
-//        FilePathExpectations::wontBeCalled,
-//        FileInformationExpectations::willBeCalled_OnceNotFound,
-//        DownloaderAddFileExpectations::willBeCalled_failedWithNoSpace,
-//        DeleteFileExpectations::willBeCalled);
+TEST_F(Updates2Manager, Download_chunkFailedAndRecovered)
+{
+    givenUpdateRegistries(/*remoteHasUpdate*/ true, /*globalHasUpdate*/ false);
+    whenServerHasBeenStarted();
+    whenRemoteUpdateDone();
 
-//    givenGlobalRegistryFactoryFunc([]() { return update::info::AbstractUpdateRegistryPtr(); });
-//    givenRemoteRegistryFactoryFunc(
-//        [this]()
-//        {
-//            auto result = createUpdateRegistry(
-//                &kNewVersion,
-//                FindUpdateExpectations::willBeCalledNewVersion,
-//                LatestUpdateExpectations::willBeCalledNewVersion,
-//                AddFileExpectations::wontBeCalled,
-//                AlternativeServersExpectations::wontBeCalled,
-//                ToBytesExpectations::willBeCalled,
-//                FromBytesExpectations::wontBeCalled,
-//                EqualExpectations::returnsFalse,
-//                MergeExpectations::willBeCalled);
+    whenDownloadRequestIssued(api::Updates2StatusData::StatusCode::downloading);
+    whenChunkDownloadFailedSignalReceived();
+    thenStateShouldBe(api::Updates2StatusData::StatusCode::downloading, "problems");
 
-//             return result;
-//        });
+    whenDownloadFinishedSuccessfully();
+    thenStateShouldBe(api::Updates2StatusData::StatusCode::preparing);
+    thenStateShouldFinallyBecome(api::Updates2StatusData::StatusCode::readyToInstall);
+}
 
-//    whenServerStarted();
-//    whenRemoteUpdateDone();
-//    thenStateShouldBe(api::Updates2StatusData::StatusCode::available);
+TEST_F(Updates2Manager, Download_addAlreadyExistingFile)
+{
+    givenUpdateRegistries(/*remoteHasUpdate*/ true, /*globalHasUpdate*/ false);
+    givenFileHasAlreadyBeenDownloaded();
 
-//    givenGlobalRegistryFactoryFunc(
-//        [this]()
-//        {
-//            return createUpdateRegistry(
-//                nullptr,
-//                FindUpdateExpectations::wontBeCalled,
-//                LatestUpdateExpectations::wontBeCalled,
-//                AddFileExpectations::wontBeCalled,
-//                AlternativeServersExpectations::wontBeCalled,
-//                ToBytesExpectations::wontBeCalled,
-//                FromBytesExpectations::wontBeCalled,
-//                EqualExpectations::wontBeCalled,
-//                MergeExpectations::wontBeCalled);
-//        });
+    whenServerHasBeenStarted();
+    whenRemoteUpdateDone();
 
-//    prepareUpdateRegistryExpectations(
-//                currentRemoteRegistry(),
-//                nullptr,
-//                FindUpdateExpectations::wontBeCalled,
-//                LatestUpdateExpectations::wontBeCalled,
-//                AddFileExpectations::wontBeCalled,
-//                AlternativeServersExpectations::wontBeCalled,
-//                ToBytesExpectations::wontBeCalled,
-//                FromBytesExpectations::wontBeCalled,
-//                EqualExpectations::wontBeCalled,
-//                MergeExpectations::wontBeCalled);
+    whenDownloadRequestIssued(api::Updates2StatusData::StatusCode::preparing);
+    thenStateShouldFinallyBecome(api::Updates2StatusData::StatusCode::readyToInstall);
+}
 
-//    givenRemoteRegistryFactoryFunc(
-//        [this]()
-//        {
-//            auto result = createUpdateRegistry(
-//                nullptr,
-//                FindUpdateExpectations::wontBeCalled,
-//                LatestUpdateExpectations::wontBeCalled,
-//                AddFileExpectations::wontBeCalled,
-//                AlternativeServersExpectations::wontBeCalled,
-//                ToBytesExpectations::wontBeCalled,
-//                FromBytesExpectations::wontBeCalled,
-//                EqualExpectations::returnsTrue,
-//                MergeExpectations::wontBeCalled);
+TEST_F(Updates2Manager, Prepare_failedNoFreeSpace)
+{
+    givenUpdateRegistries(/*remoteHasUpdate*/ true, /*globalHasUpdate*/ false);
+    givenInstallerFailsWithNoFreeSpace();
+    whenServerHasBeenStarted();
+    whenRemoteUpdateDone();
 
-//             return result;
-//        });
+    whenDownloadRequestIssued(api::Updates2StatusData::StatusCode::downloading);
+    thenStateShouldBe(api::Updates2StatusData::StatusCode::downloading);
+    whenDownloadFinishedSuccessfully();
+    thenStateShouldFinallyBecome(api::Updates2StatusData::StatusCode::error);
+    thenStateShouldFinallyBecome(api::Updates2StatusData::StatusCode::available);
+}
 
-//    whenDownloadRequestIssued();
-//    thenStateShouldBe(api::Updates2StatusData::StatusCode::downloading);
-//    whenDownloadFinishedSuccessfully();
+TEST_F(Updates2Manager, Cancel_WhileDownloading)
+{
+    givenUpdateRegistries(/*remoteHasUpdate*/ true, /*globalHasUpdate*/ false);
+    whenServerHasBeenStarted();
+    whenRemoteUpdateDone();
 
-//    thenStateShouldBeAtLast(api::Updates2StatusData::StatusCode::readyToInstall);
-//}
+    whenDownloadRequestIssued(api::Updates2StatusData::StatusCode::downloading);
+    whenDownloaderEmittedFileInformationSignalsWithProgress();
+    thenProgressShouldBeReflectedInManagerState();
 
-//TEST_F(Updates2Manager, Download_failed)
-//{
-//    givenAvailableRemoteUpdate();
-//    whenDownloadRequestIssued(DownloadExpectedOutcome::fail_downloadFailed);
-//    thenStateShouldBe(api::Updates2StatusData::StatusCode::downloading);
-
-//    whenDownloadFinishedWithFailure();
-//    thenStateShouldBe(api::Updates2StatusData::StatusCode::error);
-
-//    // now update registry with a new version should already be in global settings
-//    const auto newVersion = QnSoftwareVersion("1.0.0.2");
-//    givenGlobalRegistryFactoryFunc(
-//        [this, &newVersion]()
-//        {
-//            return createUpdateRegistry(
-//                &newVersion,
-//                /*hasUpdate*/ true,
-//                /*expectFindUpdateFileWillBeCalled*/ false,
-//                /*expectToByteArrayWillBeCalled*/ false,
-//                /*shouldBeEqualWithCurrent*/ true);
-//        });
-
-//    givenRemoteRegistryFactoryFunc(
-//        [this, &newVersion]()
-//        {
-//            return createUpdateRegistry(
-//                /*version*/ &newVersion,
-//                /*hasUpdate*/ true,
-//                /*expectFindUpdateFileWillBeCalled*/ false,
-//                /*expectToByteArrayWillBeCalled*/ false,
-//                /*shouldBeEqualWithCurrent*/ true);
-//        });
-
-//    whenRemoteUpdateDone();
-//    thenStateShouldBe(api::Updates2StatusData::StatusCode::available);
-//}
-
-//TEST_F(Updates2Manager, Download_chunkFailedAndRecovered)
-//{
-//    givenAvailableRemoteUpdate();
-//    whenDownloadRequestIssued(DownloadExpectedOutcome::success_fileNotExists);
-//    thenStateShouldBe(api::Updates2StatusData::StatusCode::downloading);
-
-//    whenChunkFailedSignalReceived();
-//    thenStateShouldBe(api::Updates2StatusData::StatusCode::downloading, "problems");
-
-//    whenDownloadFinishedSuccessfully();
-//    thenStateShouldBe(api::Updates2StatusData::StatusCode::preparing);
-//    thenStateShouldBeAtLast(api::Updates2StatusData::StatusCode::readyToInstall);
-//}
-
-//TEST_F(Updates2Manager, Download_addAlreadyExistingFile)
-//{
-//    givenAvailableRemoteUpdate();
-//    whenDownloadRequestIssued(DownloadExpectedOutcome::success_fileAlreadyExists);
-
-//    thenStateShouldBe(api::Updates2StatusData::StatusCode::downloading);
-
-//    whenDownloadFinishedSuccessfully();
-//    thenStateShouldBe(api::Updates2StatusData::StatusCode::preparing);
-//    thenStateShouldBeAtLast(api::Updates2StatusData::StatusCode::readyToInstall);
-//}
-
-//TEST_F(Updates2Manager, Prepare_successfulAndReadyForInstall)
-//{
-//    givenAvailableRemoteUpdate();
-//    givenInstallerInstallWithTheOutcome(PrepareExpectedOutcome::success);
-
-//    whenDownloadRequestIssued(DownloadExpectedOutcome::success_fileNotExists);
-//    whenDownloadFinishedSuccessfully();
-//    thenStateShouldBe(api::Updates2StatusData::StatusCode::preparing);
-//    thenStateShouldBeAtLast(api::Updates2StatusData::StatusCode::readyToInstall);
-//}
-
-//TEST_F(Updates2Manager, Prepare_failedNoFreeSpace)
-//{
-//    givenAvailableRemoteUpdate();
-//    givenInstallerInstallWithTheOutcome(PrepareExpectedOutcome::fail_noFreeSpace);
-
-//    whenDownloadRequestIssued(DownloadExpectedOutcome::success_fileNotExists);
-//    whenDownloadFinishedSuccessfully();
-//    thenStateShouldBe(api::Updates2StatusData::StatusCode::preparing);
-//    thenStateShouldBeAtLast(api::Updates2StatusData::StatusCode::error);
-
-//    const auto newVersion = QnSoftwareVersion("1.0.0.2");
-//    givenGlobalRegistryFactoryFunc(
-//        [this, &newVersion]()
-//        {
-//            return createUpdateRegistry(
-//                &newVersion,
-//                /*hasUpdate*/ true,
-//                /*expectFindUpdateFileWillBeCalled*/ false,
-//                /*expectToByteArrayWillBeCalled*/ false,
-//                /*shouldBeEqualWithCurrent*/ true);
-//        });
-
-//    givenRemoteRegistryFactoryFunc(
-//        [this, &newVersion]()
-//        {
-//            return createUpdateRegistry(
-//                /*version*/ &newVersion,
-//                /*hasUpdate*/ true,
-//                /*expectFindUpdateFileWillBeCalled*/ false,
-//                /*expectToByteArrayWillBeCalled*/ false,
-//                /*shouldBeEqualWithCurrent*/ true);
-//        });
-
-//    whenRemoteUpdateDone();
-//    thenStateShouldBe(api::Updates2StatusData::StatusCode::available);
-//}
-
-// #TODO: #akulikov: Add tests regarding manual file data.
+    whenDownloadCancelled();
+    thenStateShouldFinallyBecome(api::Updates2StatusData::StatusCode::notAvailable);
+}
 
 } // namespace test
 } // namespace detail

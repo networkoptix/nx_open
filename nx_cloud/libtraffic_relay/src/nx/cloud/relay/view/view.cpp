@@ -5,6 +5,7 @@
 #include <nx/network/connection_server/multi_address_server.h>
 #include <nx/network/cloud/tunnel/relay/api/relay_api_http_paths.h>
 #include <nx/network/http/server/abstract_fusion_request_handler.h>
+#include <nx/network/ssl/ssl_engine.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/move_only_func.h>
 #include <nx/utils/std/cpp14.h>
@@ -12,8 +13,10 @@
 #include <nx/cloud/relaying/http_view/begin_listening_http_handler.h>
 
 #include "http_handlers.h"
+#include "proxy_handler.h"
 #include "../controller/connect_session_manager.h"
 #include "../controller/controller.h"
+#include "../model/model.h"
 #include "../settings.h"
 #include "../statistics_provider.h"
 
@@ -50,14 +53,16 @@ private:
 
 View::View(
     const conf::Settings& settings,
-    const Model& /*model*/,
+    Model* model,
     Controller* controller)
     :
     m_settings(settings),
+    m_model(model),
     m_controller(controller),
     m_authenticationManager(m_authRestrictionList)
 {
     registerApiHandlers();
+    loadSslCertificate();
     startAcceptor();
 }
 
@@ -99,7 +104,12 @@ void View::start()
 
 std::vector<network::SocketAddress> View::httpEndpoints() const
 {
-    return m_multiAddressHttpServer->endpoints();
+    return m_httpEndpoint;
+}
+
+std::vector<network::SocketAddress> View::httpsEndpoints() const
+{
+    return m_httpsEndpoint;
 }
 
 const View::MultiHttpServer& View::httpServer() const
@@ -126,6 +136,15 @@ void View::registerApiHandlers()
     // TODO: #ak Following handlers are here for compatibility with 3.1-beta.
     // Keep until 3.2 release just in case.
     registerCompatibilityHandlers();
+
+    m_httpMessageDispatcher.registerRequestProcessor<view::ProxyHandler>(
+        network::http::kAnyPath,
+        [this]() -> std::unique_ptr<view::ProxyHandler>
+        {
+            return std::make_unique<view::ProxyHandler>(
+                &m_model->listeningPeerPool(),
+                &m_model->remoteRelayPeerPool());
+        });
 }
 
 void View::registerCompatibilityHandlers()
@@ -161,29 +180,78 @@ void View::registerApiHandler(
         method);
 }
 
+void View::loadSslCertificate()
+{
+    if (!m_settings.https().certificatePath.empty())
+    {
+        nx::network::ssl::Engine::loadCertificateFromFile(
+            m_settings.https().certificatePath.c_str());
+    }
+}
+
 void View::startAcceptor()
 {
     const auto& httpEndpoints = m_settings.http().endpoints;
-    if (httpEndpoints.empty())
+    const auto& httpsEndpoints = m_settings.https().endpoints;
+    if (httpEndpoints.empty() && httpsEndpoints.empty())
     {
         NX_LOGX("No HTTP address to listen", cl_logALWAYS);
         throw std::runtime_error("No HTTP address to listen");
     }
 
-    m_multiAddressHttpServer =
-        std::make_unique<nx::network::server::MultiAddressServer<nx::network::http::HttpStreamSocketServer>>(
+    if (httpEndpoints.empty())
+    {
+        m_multiAddressHttpServer = startHttpsServer(httpsEndpoints);
+    }
+    else if (httpsEndpoints.empty())
+    {
+        m_multiAddressHttpServer = startHttpServer(httpEndpoints);
+    }
+    else 
+    {
+        m_multiAddressHttpServer = 
+            network::server::catMultiAddressServers(
+                startHttpServer(httpEndpoints),
+                startHttpsServer(httpsEndpoints));
+    }
+}
+
+std::unique_ptr<View::MultiHttpServer> View::startHttpServer(
+    const std::list<network::SocketAddress>& endpoints)
+{
+    auto server = startServer(endpoints, false);
+    m_httpEndpoint = server->endpoints();
+    return server;
+}
+
+std::unique_ptr<View::MultiHttpServer> View::startHttpsServer(
+    const std::list<network::SocketAddress>& endpoints)
+{
+    auto server = startServer(endpoints, true);
+    m_httpsEndpoint = server->endpoints();
+    return server;
+}
+
+std::unique_ptr<View::MultiHttpServer> View::startServer(
+    const std::list<network::SocketAddress>& endpoints,
+    bool sslMode)
+{   
+    auto multiAddressHttpServer =
+        std::make_unique<MultiHttpServer>(
             &m_authenticationManager,
             &m_httpMessageDispatcher,
-            false,
+            sslMode,
             nx::network::NatTraversalSupport::disabled);
 
-    if (!m_multiAddressHttpServer->bind(httpEndpoints))
+    if (!multiAddressHttpServer->bind(endpoints))
     {
         throw std::runtime_error(
             lm("Cannot bind to address(es) %1. %2")
-                .container(httpEndpoints)
+                .container(endpoints)
                 .arg(SystemError::getLastOSErrorText()).toStdString());
     }
+
+    return multiAddressHttpServer;
 }
 
 } // namespace relay

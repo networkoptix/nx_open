@@ -6,6 +6,8 @@ namespace nx {
 namespace network {
 namespace ssl {
 
+namespace detail {
+
 StreamSocketToTwoWayPipelineAdapter::StreamSocketToTwoWayPipelineAdapter(
     AbstractStreamSocket* streamSocket)
     :
@@ -64,6 +66,8 @@ int StreamSocketToTwoWayPipelineAdapter::bytesTransferredToPipelineReturnCode(
             return utils::bstream::StreamIoError::osError;
     }
 }
+
+} // namespace detail
 
 //-------------------------------------------------------------------------------------------------
 
@@ -198,6 +202,11 @@ void StreamSocket::sendAsync(
 {
     switchToAsyncModeIfNeeded();
     m_asyncTransformingChannel->sendAsync(buffer, std::move(handler));
+}
+
+bool StreamSocket::isEncryptionEnabled() const
+{
+    return true;
 }
 
 void StreamSocket::handshakeAsync(

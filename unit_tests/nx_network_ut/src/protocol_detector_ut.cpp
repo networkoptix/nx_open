@@ -48,18 +48,18 @@ protected:
 
     void thenProtocolMatched()
     {
-        thenMatchReported(DetectionResult::detected);
+        thenMatchReported(ProtocolMatchResult::detected);
         ASSERT_EQ(m_expectedProtocolId, *std::get<1>(m_matchResult));
     }
 
-    void thenMatchReported(DetectionResult detectionResult)
+    void thenMatchReported(ProtocolMatchResult detectionResult)
     {
         ASSERT_EQ(detectionResult, std::get<0>(m_matchResult));
     }
 
 private:
     network::ProtocolDetector<int> m_protocolDetector;
-    std::tuple<DetectionResult, int*> m_matchResult;
+    std::tuple<ProtocolMatchResult, int*> m_matchResult;
     std::vector<std::tuple<std::string, int>> m_protocols;
     int m_expectedProtocolId = -1;
 };
@@ -73,13 +73,13 @@ TEST_F(ProtocolDetector, detects_known_protocol)
 TEST_F(ProtocolDetector, requests_more_data_if_appropriate)
 {
     whenMatchPrefixOfKnownProtocol();
-    thenMatchReported(DetectionResult::needMoreData);
+    thenMatchReported(ProtocolMatchResult::needMoreData);
 }
 
 TEST_F(ProtocolDetector, detects_unknown_protocol)
 {
     whenMatchLargeBufferOfUnknownProtocol();
-    thenMatchReported(DetectionResult::unknownProtocol);
+    thenMatchReported(ProtocolMatchResult::unknownProtocol);
 }
 
 } // namespace test

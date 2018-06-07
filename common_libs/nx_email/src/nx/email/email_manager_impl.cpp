@@ -92,10 +92,10 @@ SmtpOperationResult EmailManagerImpl::sendEmail(
         sender = QnEmailAddress(settings.email).value();
     else if (settings.user.contains(L'@'))
         sender = settings.user;
-    else if (settings.server.startsWith(lit("smtp.")))
-        sender = QString(lit("%1@%2")).arg(settings.user).arg(settings.server.mid(5));
+    else if (settings.server.startsWith("smtp."))
+        sender = QString("%1@%2").arg(settings.user, settings.server.mid(5));
     else
-        sender = QString(lit("%1@%2")).arg(settings.user).arg(settings.server);
+        sender = QString("%1@%2").arg(settings.user, settings.server);
 
     mimeMessage.setSender(EmailAddress(sender));
     for (const QString& recipient: message.to)
@@ -142,13 +142,12 @@ SmtpOperationResult EmailManagerImpl::sendEmail(
     if (!lastSmtpResult)
     {
         const SystemError::ErrorCode errorCode = SystemError::getLastOSErrorCode();
-        NX_LOG( lit("SMTP. Failed to connect to %1:%2 with %3. %4 Error: %5")
-            .arg(settings.server)
-            .arg(port)
-            .arg(SmtpClient::toString(connectionType))
-            .arg(SystemError::toString(errorCode))
-            .arg(lastSmtpResult.toString())
-            , cl_logWARNING );
+        NX_WARNING(this, lm("Failed to connect to %1:%2 with %3. %4 Error: %5").args(
+            settings.server,
+            port,
+            SmtpClient::toString(connectionType),
+            SystemError::toString(errorCode),
+            lastSmtpResult.toString()));
         return lastSmtpResult;
     }
 
@@ -157,11 +156,10 @@ SmtpOperationResult EmailManagerImpl::sendEmail(
         lastSmtpResult = smtp.login(settings.user, settings.password);
         if (!lastSmtpResult)
         {
-            NX_LOG( lit("SMTP. Failed to login to %1:%2 Error: %3")
-                .arg(settings.server)
-                .arg(port)
-                .arg(lastSmtpResult.toString())
-                , cl_logWARNING );
+            NX_WARNING(this, lm("Failed to login to %1:%2 Error: %3").args(
+                settings.server,
+                port,
+                lastSmtpResult.toString()));
             smtp.quit();
             return lastSmtpResult;
         }
@@ -171,12 +169,11 @@ SmtpOperationResult EmailManagerImpl::sendEmail(
     if (!lastSmtpResult)
     {
         const SystemError::ErrorCode errorCode = SystemError::getLastOSErrorCode();
-        NX_LOG( lit("SMTP. Failed to send mail to %1:%2. %3 Error %4")
-            .arg(settings.server)
-            .arg(port)
-            .arg(SystemError::toString(errorCode))
-            .arg(lastSmtpResult.toString())
-            , cl_logWARNING );
+        NX_WARNING(this, lm("Failed to send mail to %1:%2. %3 Error %4").args(
+            settings.server,
+            port,
+            SystemError::toString(errorCode),
+            lastSmtpResult.toString()));
         smtp.quit();
         return lastSmtpResult;
     }

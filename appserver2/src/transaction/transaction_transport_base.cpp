@@ -1423,6 +1423,7 @@ void QnTransactionTransportBase::at_httpClientDone( const nx::network::http::Asy
 
     nx::network::http::AsyncClient::State state = client->state();
     if( state == nx::network::http::AsyncClient::State::sFailed ) {
+        NX_WARNING(this, lm("Http request failed %1").arg(client->lastSysErrorCode()));
         cancelConnecting();
     }
 }

@@ -22,6 +22,7 @@ void QnCameraUserAttributes::assign(
         *modifiedFields << "failoverPriorityChanged";
     if (backupQualities != right.backupQualities)
         *modifiedFields << "backupQualitiesChanged";
-
+    if (logicalId != right.logicalId)
+        *modifiedFields << "logicalIdChanged";
     *this = right;
 }

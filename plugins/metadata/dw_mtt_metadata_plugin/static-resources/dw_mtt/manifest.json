@@ -7,62 +7,72 @@
     },
     "supportedCameraModels":
     [
+        "DWC-MVT4Wi28",
+        "DWC-MVT4Wi36",
+        "DWC-MVT4Wi6",
+        "DWC-MBT4Wi28",
+        "DWC-MBT4Wi36",
+        "DWC-MVT4WiA",
+        "DWC-MTT4Wi28",
         "DWC-MTT4Wi36",
+        "DWC-MTT4Wi6",
         "DWC-MTT4WiA"
     ],
     "outputEventTypes":
     [
         {
             "eventTypeId": "a5b9cc7c-6da5-4fe6-a2eb-19dd353fd724",
-            "eventName": { "value": "motion detection", "localization": {} },
+            "eventName": { "value": "Motion Detection", "localization": {} },
             "flags": "stateDependent",
             "internalName": "MOTION"
         },
         {
             "eventTypeId": "12c841a0-33a4-429e-84de-810a43738d35",
-            "eventName": { "value": "video face detection [exclusive]", "localization": {} },
+            "eventName": { "value": "Video face detection [exclusive]", "localization": {} },
             "flags": "stateDependent",
             "internalName": "VFD",
-            "group": 1
+            "group": 1,
+            "unsupported": true
         },
         {
             "eventTypeId": "ba0cde26-a5c9-4101-ae59-7cda70a2fa76",
-            "eventName": { "value": "crowd density detection [exclusive]", "localization": {} },
+            "eventName": { "value": "Crowd Density [exclusive]", "localization": {} },
             "flags": "noFlags",
             "internalName": "CDD",
             "group": 1
         },
         {
             "eventTypeId": "2e149769-64d0-40ee-a79a-5d02962f0fe5",
-            "eventName": { "value": "cross-line people counting [exclusive]", "localization": {} },
+            "eventName": { "value": "People Counting [exclusive]", "localization": {} },
             "flags": "stateDependent",
             "internalName": "CPC",
             "group": 1
         },
         {
             "eventTypeId": "32e32ac6-e3ba-437b-a3d8-8fa9ae5b1830",
-            "eventName": { "value": "intruding people detection [exclusive]", "localization": {} },
+            "eventName": { "value": "People Intrusion [exclusive]", "localization": {} },
             "flags": "stateDependent",
             "internalName": "IPD",
             "group": 1
         },
         {
             "eventTypeId": "3f46d496-798d-49f7-9299-cdfff7914b1f",
-            "eventName": { "value": "line crossing and perimeter intrusion [exclusive]", "localization": {} },
+            "eventName": { "value": "Line Crossing and Perimeter Intrusion [exclusive]", "localization": {} },
             "flags": "noFlags",
             "internalName": "PEA",
             "group": 1
         },
         {
             "eventTypeId": "52f2130b-a7c9-4f10-8615-434ebd3d8f61",
-            "eventName": { "value": "object status changed (object removal) [exclusive]", "localization": {} },
+            "eventName": { "value": "Object Removal [exclusive]", "localization": {} },
             "flags": "stateDependent",
             "internalName": "OSC",
-            "group": 1
+            "group": 1,
+            "unsupported": true
         },
         {
             "eventTypeId": "e499faf1-b818-4c38-a6b1-7150e56ff54f",
-            "eventName": { "value": "abnormal video detection", "localization": {} },
+            "eventName": { "value": "Exception", "localization": {} },
             "flags": "stateDependent",
             "internalName": "AVD"
         }

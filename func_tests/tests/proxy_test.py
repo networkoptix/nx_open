@@ -6,7 +6,7 @@ from requests.auth import HTTPDigestAuth
 
 from framework.api_shortcuts import get_server_id
 
-log = logging.getLogger(__name__)
+_logger = logging.getLogger(__name__)
 
 
 @pytest.fixture()

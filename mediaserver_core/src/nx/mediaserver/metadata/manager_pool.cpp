@@ -120,25 +120,33 @@ void ManagerPool::initExistingResources()
 
 void ManagerPool::at_resourceAdded(const QnResourcePtr& resource)
 {
+    auto camera = resource.dynamicCast<QnSecurityCamResource>();
+    if (!camera)
+        return;
+
     NX_VERBOSE(
         this,
         lm("Resource %1 (%2) has been added.")
             .args(resource->getName(), resource->getId()));
 
     connect(
-        resource.data(), &QnResource::statusChanged,
+        resource, &QnResource::statusChanged,
         this, &ManagerPool::handleResourceChanges);
 
     connect(
-        resource.data(), &QnResource::parentIdChanged,
+        resource, &QnResource::parentIdChanged,
         this, &ManagerPool::handleResourceChanges);
 
     connect(
-        resource.data(), &QnResource::urlChanged,
+        resource, &QnResource::urlChanged,
         this, &ManagerPool::handleResourceChanges);
 
     connect(
-        resource.data(), &QnResource::propertyChanged,
+        camera, &QnSecurityCamResource::logicalIdChanged,
+        this, &ManagerPool::handleResourceChanges);
+
+    connect(
+        resource, &QnResource::propertyChanged,
         this, &ManagerPool::at_propertyChanged);
 
     handleResourceChanges(resource);
@@ -168,6 +176,7 @@ void ManagerPool::at_resourceRemoved(const QnResourcePtr& resource)
     if (!camera)
         return;
 
+    camera->disconnect(this);
     QnMutexLocker lock(&m_contextMutex);
     m_contexts.erase(resource->getId());
 }
@@ -298,7 +307,7 @@ void ManagerPool::saveManifestToFile(
     if (!f.open(QFile::WriteOnly))
         return log(Level::error, lit("Unable to (re)create file"));
 
-    const int len = strlen(manifest);
+    const qint64 len = (qint64) strlen(manifest);
     if (f.write(manifest, len) != len)
         return log(Level::error, lit("Unable to write to file"));
 }
@@ -383,6 +392,7 @@ void ManagerPool::createCameraManagersForResourceUnsafe(const QnSecurityCamResou
             loadManagerManifest(plugin, manager.get(), camera);
         if (managerManifest)
         {
+            // TODO: Fix: Camera property should receive a union of data from all plugins.
             addManifestToCamera(*managerManifest, camera);
         }
         if (auxiliaryPluginManifest)
@@ -730,7 +740,7 @@ ManagerPool::loadManagerManifest(
     auto deviceManifest = deserializeManifest<nx::api::AnalyticsDeviceManifest>(
         managerManifest.get());
 
-    if (deviceManifest && deviceManifest->supportedEventTypes.size())
+    if (deviceManifest && !deviceManifest->supportedEventTypes.empty())
         return std::make_pair(deviceManifest, boost::none);
 
     // If manifest occurred to be not AnalyticsDeviceManifest, we try to treat it as
@@ -760,6 +770,7 @@ ManagerPool::loadManagerManifest(
     return std::make_pair(boost::none, boost::none);
 }
 
+// TODO: #mshevchenko: Rename to addDataFromCameraManagerManifestToCameraResource().
 void ManagerPool::addManifestToCamera(
     const nx::api::AnalyticsDeviceManifest& manifest,
     const QnSecurityCamResourcePtr& camera)
@@ -817,6 +828,9 @@ bool ManagerPool::cameraInfoFromResource(
         CameraInfo::kStringParameterMaxLength);
 
     outCameraInfo->channel = camera->getChannel();
+
+    // If getLogicalId() returns incorrect number, logicalId is set to 0.
+    outCameraInfo->logicalId = camera->getLogicalId().toInt();
 
     return true;
 }

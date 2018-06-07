@@ -172,11 +172,6 @@ enum IDType
     BetaVersionMessageAction,
 
     /**
-     * Displays eula acceptance dialog.
-     */
-    ShowEulaAction,
-
-    /**
      * Displays HiDpi screens support warning dialog.
      */
     HiDpiSupportMessageAction,
@@ -945,6 +940,7 @@ enum IDType
     NewWearableCameraAction,
     UploadWearableCameraFileAction,
     UploadWearableCameraFolderAction,
+    CancelWearableCameraUploadsAction,
 
     /* Timeline actions. */
 
@@ -1159,6 +1155,12 @@ enum IDType
 
     // TODO: #dklychkov Remove when the new scene engine becomes default.
     OpenNewSceneAction,
+
+    /**
+    * Opens legacy camera settings dialog.
+    */
+    // TODO: #vkutin #gdm Remove when the legacy dialog is completely removed.
+    CameraSettingsActionNew,
 
     ActionCount,
 

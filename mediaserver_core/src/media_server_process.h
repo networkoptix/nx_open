@@ -48,7 +48,7 @@ class CmdLineArguments
 public:
     QString logLevel;
     QString httpLogLevel;
-    QString hwLogLevel;
+    QString systemLogLevel;
     QString ec2TranLogLevel;
     QString permissionsLogLevel;
 

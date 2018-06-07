@@ -21,6 +21,11 @@ std::vector<network::SocketAddress> RelayService::httpEndpoints() const
     return m_view->httpEndpoints();
 }
 
+std::vector<network::SocketAddress> RelayService::httpsEndpoints() const
+{
+    return m_view->httpsEndpoints();
+}
+
 const relaying::AbstractListeningPeerPool& RelayService::listeningPeerPool() const
 {
     return m_model->listeningPeerPool();
@@ -54,7 +59,7 @@ int RelayService::serviceMain(const utils::AbstractServiceSettings& abstractSett
         return -1;
     }
 
-    View view(settings, model, &controller);
+    View view(settings, &model, &controller);
     m_view = &view;
 
     auto statisticsProvider = StatisticsProviderFactory::instance().create(

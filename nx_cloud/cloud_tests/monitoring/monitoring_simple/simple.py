@@ -1,37 +1,49 @@
 # Specification is at https://networkoptix.atlassian.net/wiki/display/SD/Auto-test+for+cloud+portal+backend
-
+from io import StringIO
 import time
 import sys
-import requests
 import logging
-import boto3
 import json
-import docker
-
+import traceback
 from urllib.parse import quote
+from datetime import datetime
+
+import requests
+import boto3
+import docker
 from requests.auth import HTTPDigestAuth
 
-logging.basicConfig(stream=sys.stderr, level=logging.INFO)
-logging.getLogger("requests").setLevel(logging.DEBUG)
-logging.getLogger("botocore").setLevel(logging.WARNING)
-logging.getLogger("boto3").setLevel(logging.WARNING)
+CLOUD_CONNECT_TEST_UTIL_VERSION = '18.1.0.20026'
 
 log = logging.getLogger('simple_cloud_test')
 
 
+def setup_logging():
+    logging.basicConfig(stream=sys.stderr, level=logging.INFO)
+    logging.getLogger("requests").setLevel(logging.DEBUG)
+    logging.getLogger("botocore").setLevel(logging.WARNING)
+    logging.getLogger("boto3").setLevel(logging.WARNING)
+
+
 def testclass(cls):
     test_methods_dict = {}
+    metric_keys = []
 
     for name, method in cls.__dict__.items():
         if hasattr(method, "testmethod_index"):
             test_methods_dict[method.testmethod_index] = method
 
+        if hasattr(method, "metric") and method.metric:
+            host = method.host if hasattr(method, "host") and method.host else None
+            metric_keys.append((method.metric, host))
+
     cls._test_methods = test_methods_dict.values()
+    cls._metric_keys = metric_keys
 
     return cls
 
 
-def testmethod(delay=0):
+def testmethod(delay=0, host=None, continue_if_fails=False, metric=None):
     def _testmethod(f):
         def wrapper(self):
             try:
@@ -42,20 +54,35 @@ def testmethod(delay=0):
                 log.info('Running test {}: {}'.format(wrapper.testmethod_index, f.__name__))
                 f(self)
                 log.info('Test {}: success'.format(f.__name__))
-            except AssertionError as e:
-                log.error('Test {}: failure. Message: '.format(f.__name__))
-                log.error(e)
-                raise
-            except:
+
+                if metric:
+                    self.collected_metrics[(metric, host, datetime.utcnow())] = 0
+
+                return 0
+            except Exception:
                 log.error('Test {}: failure'.format(f.__name__))
+
+                io = StringIO()
+                traceback.print_exc(file=io)
+                log.error(io.getvalue())
+
+                if metric:
+                    self.collected_metrics[(metric, host, datetime.utcnow())] = 1
+
+                if continue_if_fails:
+                    return 1
+
                 raise
 
         wrapper.testmethod_index = testmethod.counter
+        wrapper.metric = metric
+        wrapper.host = host
         testmethod.counter += 1
 
         return wrapper
 
     return _testmethod
+
 
 testmethod.counter = 1
 
@@ -80,15 +107,17 @@ class CloudSession(object):
         self.vms_user_id = None
         self.system_id = None
 
+        self.collected_metrics = {}
+
     def _url(self, path):
         return '{}{}'.format(self.base_url, path)
 
-    def wait_for_message(self, queue):
+    def wait_for_message(self, queue, tries=3, seconds_per_try=20):
         sqs = boto3.resource('sqs')
         queue = sqs.get_queue_by_name(QueueName=queue)
 
-        for i in range(3):
-            for message in queue.receive_messages(WaitTimeSeconds=20):
+        for i in range(tries):
+            for message in queue.receive_messages(WaitTimeSeconds=seconds_per_try):
                 try:
                     body = json.loads(message.body)
                     msg = json.loads(body['Message'])
@@ -106,9 +135,87 @@ class CloudSession(object):
     def close(self):
         self.session.close()
 
+    def _metric_data(self):
+        metric_data = []
+
+        for (metric, host, timestamp), value in self.collected_metrics.items():
+            if value is None:
+                continue
+
+            metric_data_item = {
+                'MetricName': metric,
+                'Timestamp': timestamp,
+                'Value': value,
+                'Unit': 'Count',
+            }
+
+            if host:
+                metric_data_item['Dimensions'] = [
+                    {
+                        'Name': 'host',
+                        'Value': host
+                    }
+                ]
+
+            metric_data.append(metric_data_item)
+
+        return metric_data
+
+    def _dynamodb_item(self):
+        metric_items = []
+
+        for (metric, host, timestamp), value in self.collected_metrics.items():
+            metric_item = {
+                'name': metric,
+                'timestamp': timestamp.isoformat(),
+                'value': value
+            }
+
+            if host:
+                metric_item['dimensions'] = {
+                    'host': host
+                }
+
+            metric_items.append(metric_item)
+
+        timestamp = datetime.utcnow()
+        return {
+            'year': timestamp.year,
+            'timestamp': timestamp.isoformat(),
+            'metrics': metric_items
+        }
+
+    def report_metrics(self):
+        collected_keys = set([(metric, host) for (metric, host, timestamp) in self.collected_metrics.keys()])
+
+        timestamp = datetime.utcnow()
+
+        for metric, host in self._metric_keys:
+            if (metric, host) not in collected_keys:
+                self.collected_metrics[(metric, host, timestamp)] = None
+
+        cloudwatch = boto3.client('cloudwatch')
+        cloudwatch.put_metric_data(
+            Namespace='prod__monitoring',
+            MetricData=self._metric_data()
+        )
+
+        dynamodb = boto3.resource('dynamodb')
+        table = dynamodb.Table('prod-health-records')
+        table.put_item(Item=self._dynamodb_item())
+
     def run_tests(self):
-        for method in self._test_methods:
-            method(self)
+        status = 0
+
+        try:
+            for method in self._test_methods:
+                status = method(self) or status
+        except Exception as e:
+            status = 1
+        finally:
+            self.report_metrics()
+
+        return status
 
     def get(self, path, headers={}, **kwargs):
         url = self._url(path)
@@ -131,24 +238,95 @@ class CloudSession(object):
 
         return r
 
-    def assert_response_text_is_ok(self, response):
+    @staticmethod
+    def assert_response_text_is_ok(response):
         response_text = '{"resultCode":"ok"}'
-        self.assert_response_text_equals(response, response_text)
+        CloudSession.assert_response_text_equals(response, response_text)
 
-    def assert_response_text_equals(self, response, text):
+    @staticmethod
+    def assert_response_text_equals(response, text):
         assert response.text == text, 'Response is invalid. Expected:\n{}\nActual:\n{}'.format(response.text, text)
 
-    def assert_response_has_cookie(self, response, cookie):
+    @staticmethod
+    def assert_response_has_cookie(response, cookie):
         assert cookie in response.cookies, 'Response doesn\'t containt cookie {}'.format(cookie)
 
     @testmethod()
+    def test_cloud_db_get_system_id(self):
+        auth = HTTPDigestAuth(self.email, self.password)
+        r = requests.get(self._url('/cdb/system/get'), auth=auth).json()
+
+        assert 'systems' in r, 'Invalid response from cloud_db. No systems'
+        assert len(r['systems']) == 1, 'Invalid response from cloud_db. Number of systems != 1'
+        assert r['systems'][0]['id'], 'System ID is invalid'
+
+        self.system_id = r['systems'][0]['id']
+
+        log.info('Got system ID: {}'.format(self.system_id))
+
+    def test_cloud_connect_base(self, extra_args=''):
+        image = '009544449203.dkr.ecr.us-east-1.amazonaws.com/cloud/cloud_connect_test_util:{}'.format(
+            CLOUD_CONNECT_TEST_UTIL_VERSION)
+        command = '--log-level=DEBUG2 --http-client --url=http://{user}:{password}@{system_id}/ec2/getUsers {extra_args}'.format(
+            user=quote(self.email),
+            password=quote(self.password),
+            system_id=self.system_id,
+            extra_args=extra_args)
+
+        log.info('Running image: {} command: {}'.format(image, command))
+
+        client = docker.client.from_env()
+        container = client.containers.run(image, command, detach=True)
+        status = container.wait()
+        log.info('Container exited with exit status {}'.format(status))
+        stdout = container.logs(stdout=True, stderr=False)
+        stderr = container.logs(stdout=False, stderr=True)
+
+        log.info('Stdout:\n{}'.format(stdout.decode('utf-8')))
+        log.info('Stderr:\n{}'.format(stderr.decode('utf-8')))
+        container.remove()
+
+        assert b'HTTP/1.1 200 OK' in stdout, 'Received invalid output from cloud connect (extra_args: {})'.format(
+            extra_args)
+        assert status == 0, 'Cloud connect test util exited with non-zero status {}'.format(status)
+
+    @testmethod(metric='p2p_connections_failure', continue_if_fails=True)
+    def test_cloud_connect_no_proxy(self):
+        self.test_cloud_connect_base('--cloud-connect-disable-proxy')
+
+    @testmethod(metric='proxy_connections_failure', continue_if_fails=True)
+    def test_cloud_connect_proxy(self):
+        self.test_cloud_connect_base('--cloud-connect-enable-proxy-only')
+
+    @testmethod(metric='cloud_authentication_failure', continue_if_fails=True)
+    def test_mediaserver_direct(self):
+        pass
+
+    def test_traffic_relay(self, relay_name):
+        pass
+
+    @testmethod(metric='traffic_relay_failure', host='relay-la', continue_if_fails=True)
+    def test_traffic_relay_la(self):
+        self.test_traffic_relay('relay-la')
+
+    @testmethod(metric='traffic_relay_failure', host='relay-ny', continue_if_fails=True)
+    def test_traffic_relay_ny(self):
+        self.test_traffic_relay('relay-ny')
+
+    @testmethod(metric='traffic_relay_failure', host='relay-fr', continue_if_fails=True)
+    def test_traffic_relay_fr(self):
+        self.test_traffic_relay('relay-fr')
+
+    @testmethod(metric='email_failure', continue_if_fails=True)
     def restore_password(self):
         r = self.post('/api/account/restorePassword', {"user_email": self.email})
 
         self.assert_response_text_is_ok(r)
+
         assert self.wait_for_message('noptixqa-owner-queue'), "Timeout waiting for e-mail to arrive"
 
-    @testmethod()
+    # We stop here. No other metrics would be reported if we couldn't log in to the system
+    @testmethod(metric='cloud_portal_failure')
     def login(self):
         r = self.post('/api/account/login', {'email': self.email, 'password': self.password, 'remember': True})
 
@@ -162,7 +340,7 @@ class CloudSession(object):
         assert len(data) > 0, 'Can\'t find the system'
         assert data[0]['id'], 'Got system without ID'
 
-        self.system_id = data[0]['id']
+        assert self.system_id == data[0]['id'], 'Invalid response from portal. Invalid system id'
 
     @testmethod()
     def share_system(self):
@@ -185,7 +363,7 @@ class CloudSession(object):
         data = r.json()
         assert 'id' in data, 'No ID'
 
-    @testmethod(delay=20)
+    @testmethod(delay=20, metric='view_and_settings_failure')
     def check_system_users(self):
         headers = {
             'referer': '{}/systems/{}'.format(self.base_url, self.system_id),
@@ -218,44 +396,18 @@ class CloudSession(object):
 
         assert next(filter(lambda x: x['accountEmail'] == self.user_email, data), None) is None, 'User still exists'
 
-    def test_cloud_connect_base(self, extra_args=''):
-        image = '009544449203.dkr.ecr.us-east-1.amazonaws.com/cloud/cloud_connect_test_util:18.1.0.20026'
-        command = '--log-level=DEBUG2 --http-client --url=http://{user}:{password}@{system_id}/ec2/getUsers {extra_args}'.format(
-            user=quote(self.email),
-            password=quote(self.password),
-            system_id=self.system_id,
-            extra_args=extra_args)
-
-        log.info('Running image: {} command: {}'.format(image, command))
-
-        client = docker.client.from_env()
-        container = client.containers.run(image, command, detach=True)
-        status = container.wait()
-        log.info('Container exited with exit status {}'.format(status))
-        stdout = container.logs(stdout=True, stderr=False)
-        stderr = container.logs(stdout=False, stderr=True)
-
-        log.info('Stdout:\n{}'.format(stdout.decode('utf-8')))
-        log.info('Stderr:\n{}'.format(stderr.decode('utf-8')))
-        container.remove()
-
-        assert b'HTTP/1.1 200 OK' in stdout, 'Received invalid output from cloud connect (extra_args: {})}'.format(extra_args)
-        assert status == 0, 'Cloud connect test util exited with non-zero status {}'.format(status)
-
-    @testmethod()
-    def test_cloud_connect(self):
-        self.test_cloud_connect_base()
-
-    @testmethod()
-    def test_cloud_connect_proxy(self):
-        self.test_cloud_connect_base('--cloud-connect-enable-proxy-only')
 
 def main():
+    setup_logging()
+
     host = sys.argv[1]
 
     session = CloudSession(host)
-    session.run_tests()
+    status = session.run_tests()
     session.close()
 
+    return status
+
+
 if __name__ == '__main__':
-    main()
+    sys.exit(main())

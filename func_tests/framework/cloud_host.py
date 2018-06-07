@@ -6,7 +6,7 @@ import requests
 from framework.imap import IMAPConnection
 from framework.rest_api import HttpError, RestApi
 
-log = logging.getLogger(__name__)
+_logger = logging.getLogger(__name__)
 
 
 CLOUD_HOST_REGISTRY_URL = 'https://ireg.hdw.mx/api/v1/cloudhostfinder/'
@@ -79,11 +79,11 @@ class CloudAccount(object):
         assert user_data.get('statusCode') == 'activated'
 
     def check_is_ready_for_tests(self):
-        log.debug('Checking cloud host %r...', self)
+        _logger.debug('Checking cloud host %r...', self)
         self.ping()
-        log.debug('Cloud host %r is up', self)
+        _logger.debug('Cloud host %r is up', self)
         self.check_user_is_valid()
-        log.info('Cloud host %r is up and test user is valid', self)
+        _logger.info('Cloud host %r is up and test user is valid', self)
 
     def bind_system(self, system_name):
         response = self.api.cdb.system.bind.GET(
@@ -111,9 +111,9 @@ class CloudEmail(object):
 
 class CloudAccountFactory(object):
 
-    def __init__(self, cloud_group, customization, cloud_host, autotest_email_password):
+    def __init__(self, cloud_group, customization_name, cloud_host, autotest_email_password):
         self._cloud_group = cloud_group
-        self._customization = customization
+        self._customization_name = customization_name
         self._cloud_host = cloud_host
         self._autotest_email_password = autotest_email_password
         self._account_idx = 0
@@ -123,27 +123,27 @@ class CloudAccountFactory(object):
         return self.create_cloud_account(self._account_idx)
 
     def create_cloud_account(self, account_idx):
-        cloud_email = CloudEmail(self._cloud_group, self._customization, account_idx)
+        cloud_email = CloudEmail(self._cloud_group, self._customization_name, account_idx)
         cloud_account = CloudAccount(
-            self._cloud_group, self._customization, self._cloud_host,
+            self._cloud_group, self._customization_name, self._cloud_host,
             cloud_email.email, CLOUD_ACCOUNT_PASSWORD)
         self.ensure_email_exists(cloud_account, cloud_email)
         return cloud_account
 
     def ensure_email_exists(self, cloud_account, cloud_email):
-        log.info('Checking cloud account %r', cloud_email.email)
+        _logger.info('Checking cloud account %r', cloud_email.email)
         try:
             user_info = cloud_account.get_user_info()
         except HttpError as x:
             result_code = x.json.get('resultCode')
-            assert result_code in ['notAuthorized', 'accountNotActivated'], repr(result_code)
+            assert result_code in ['badUsername', 'accountNotActivated'], repr(result_code)
             if not self._autotest_email_password:
                 raise RuntimeError(
                     '--autotest-email-password must be provided to activate {!r}'.format(cloud_email.email))
             with IMAPConnection(IMAP_HOST, AUTOTEST_LOGIN_EMAIL, self._autotest_email_password) as imap_connection:
                 imap_connection.delete_old_activation_messages(cloud_email.email)
-                if result_code == 'notAuthorized':
-                    log.info('Account %r is missing, creating new one', cloud_email.email)
+                if result_code == 'badUsername':
+                    _logger.info('Account %r is missing, creating new one', cloud_email.email)
                     cloud_account.register_user(cloud_email.first_name, cloud_email.last_name)
                 else:
                     cloud_account.resend_activation_code()
@@ -154,18 +154,18 @@ class CloudAccountFactory(object):
             cloud_account.activate_user(code)
             user_info = cloud_account.get_user_info()
         assert user_info.get('statusCode') == 'activated'
-        if user_info['customization'] != self._customization:
-            log.info('Account %r has wrong customization: %r; updating', cloud_email.email, user_info['customization'])
-            cloud_account.set_user_customization(self._customization)
+        if user_info['customization'] != self._customization_name:
+            _logger.info('Account %r has wrong customization: %r; updating', cloud_email.email, user_info['customization'])
+            cloud_account.set_user_customization(self._customization_name)
             user_info = cloud_account.get_user_info()
-            assert user_info['customization'] == self._customization, repr(user_info)
-        log.info(
+            assert user_info['customization'] == self._customization_name, repr(user_info)
+        _logger.info(
             'Email %r for cloud group %r is valid and belongs to customization %r',
-            cloud_email.email, self._cloud_group, self._customization)
+            cloud_email.email, self._cloud_group, self._customization_name)
 
 
 def resolve_cloud_host_from_registry(cloud_group, customization):
-    log.info(
+    _logger.info(
         'Resolving cloud host for cloud group %r, customization %r on %r:',
         cloud_group, customization, CLOUD_HOST_REGISTRY_URL)
     response = requests.get(
@@ -174,5 +174,5 @@ def resolve_cloud_host_from_registry(cloud_group, customization):
         timeout=120)
     response.raise_for_status()
     cloud_host = response.content
-    log.info('Resolved cloud host for cloud group %r, customization %r: %r', cloud_group, customization, cloud_host)
+    _logger.info('Resolved cloud host for cloud group %r, customization %r: %r', cloud_group, customization, cloud_host)
     return cloud_host

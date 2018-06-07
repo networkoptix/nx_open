@@ -24,7 +24,7 @@ public:
     };
 
     QnConnectToCurrentSystemTool(QObject* parent = nullptr);
-    ~QnConnectToCurrentSystemTool() override;
+    virtual ~QnConnectToCurrentSystemTool() override;
 
     virtual bool tryClose(bool force) override;
     virtual void forcedUpdate() override;

@@ -18,14 +18,19 @@
 #include <core/resource_management/user_roles_manager.h>
 #include <core/resource/user_resource.h>
 #include <core/resource/camera_resource.h>
+#include <core/resource/layout_resource.h>
 #include <core/resource/camera_bookmark.h>
 #include <core/resource/media_server_resource.h>
 
 #include <nx/client/desktop/ui/actions/action_parameters.h>
+
 #include <ui/workbench/watchers/workbench_user_email_watcher.h>
+#include <ui/workbench/workbench.h>
+#include <ui/workbench/workbench_layout.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_access_controller.h>
 #include <ui/workbench/workbench_state_manager.h>
+
 #include <utils/resource_property_adaptors.h>
 #include <utils/common/warnings.h>
 #include <utils/common/synctime.h>
@@ -176,6 +181,47 @@ void QnWorkbenchNotificationsHandler::handleAcknowledgeEventAction()
     emit notificationRemoved(businessAction);
 }
 
+void QnWorkbenchNotificationsHandler::handleFullscreenCameraAction(
+    const nx::vms::event::AbstractActionPtr& action)
+{
+    const auto params = action->getRuntimeParams();
+    const auto camera = resourcePool()->getResourceById(params.eventResourceId).dynamicCast<
+        QnVirtualCameraResource>();
+    NX_ASSERT(camera);
+    if (!camera)
+        return;
+
+    const auto currentLayout = workbench()->currentLayout();
+    const auto layoutResource = currentLayout->resource();
+    if (!layoutResource)
+        return;
+
+    const bool layoutIsAllowed = action->getResources().contains(layoutResource->getId());
+    if (!layoutIsAllowed)
+        return;
+
+    auto items = currentLayout->items(camera);
+    if (items.empty())
+        return;
+
+    workbench()->setItem(Qn::ZoomedRole, *items.cbegin());
+}
+
+void QnWorkbenchNotificationsHandler::handleExitFullscreenAction(
+    const nx::vms::event::AbstractActionPtr& action)
+{
+    const auto currentLayout = workbench()->currentLayout();
+    const auto layoutResource = currentLayout->resource();
+    if (!layoutResource)
+        return;
+
+    const bool layoutIsAllowed = action->getResources().contains(layoutResource->getId());
+    if (!layoutIsAllowed)
+        return;
+
+    workbench()->setItem(Qn::ZoomedRole, nullptr);
+}
+
 void QnWorkbenchNotificationsHandler::clear()
 {
     emit cleared();
@@ -199,7 +245,7 @@ void QnWorkbenchNotificationsHandler::addNotification(const vms::event::Abstract
     if (action->actionType() == vms::api::ActionType::showOnAlarmLayoutAction)
     {
         /* Skip action if it contains list of users, and we are not on the list. */
-        if (!QnBusiness::actionAllowedForUser(action->getParams(), context()->user()))
+        if (!QnBusiness::actionAllowedForUser(action, context()->user()))
             return;
     }
 
@@ -428,7 +474,7 @@ void QnWorkbenchNotificationsHandler::at_userEmailValidityChanged(const QnUserRe
 void QnWorkbenchNotificationsHandler::at_eventManager_actionReceived(
     const vms::event::AbstractActionPtr& action)
 {
-    if (!QnBusiness::actionAllowedForUser(action->getParams(), context()->user()))
+    if (!QnBusiness::actionAllowedForUser(action, context()->user()))
         return;
 
     if (!QnBusiness::hasAccessToSource(action->getRuntimeParams(), context()->user()))
@@ -472,6 +518,18 @@ void QnWorkbenchNotificationsHandler::at_eventManager_actionReceived(
         case vms::api::ActionType::sayTextAction:
         {
             AudioPlayer::sayTextAsync(action->getParams().sayText);
+            break;
+        }
+
+        case ActionType::fullscreenCameraAction:
+        {
+            handleFullscreenCameraAction(action);
+            break;
+        }
+
+        case ActionType::exitFullscreenAction:
+        {
+            handleExitFullscreenAction(action);
             break;
         }
 

@@ -112,7 +112,7 @@
   <customwidget>
    <class>nx::client::desktop::LegacyCameraSettingsStreamsPanel</class>
    <extends>QWidget</extends>
-   <header location="global">nx/client/desktop/resource_properties/camera/widgets/legacy_camera_settings_streams_panel.h</header>
+   <header location="global">nx/client/desktop/resource_properties/camera/legacy/legacy_camera_settings_streams_panel.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

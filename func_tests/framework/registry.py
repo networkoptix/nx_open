@@ -6,7 +6,7 @@ from pprint import pformat
 from framework.move_lock import MoveLock
 from framework.serialize import dump, load
 
-logger = logging.getLogger(__name__)
+_logger = logging.getLogger(__name__)
 
 
 class RegistryError(Exception):
@@ -35,13 +35,13 @@ class Registry(object):
             reservations_raw = self._path.read_text()
             reservations = load(reservations_raw)
             if reservations is not None:
-                logger.debug("Read from %r:\n%s", self, pformat(reservations))
+                _logger.debug("Read from %r:\n%s", self, pformat(reservations))
                 return reservations
-        logger.debug("Empty or non-existent %r.", self)
+        _logger.debug("Empty or non-existent %r.", self)
         return OrderedDict()
 
     def _write_reservations(self, reservations):
-        logger.debug("Write to %r:\n%s", self, pformat(reservations))
+        _logger.debug("Write to %r:\n%s", self, pformat(reservations))
         self._path.write_text(dump(reservations))
 
     @contextmanager
@@ -51,7 +51,7 @@ class Registry(object):
                 reservations = self._read_reservations()
                 yield reservations
             except Exception:
-                logger.warning("Exception thrown, don't save reservations in %r.", self)
+                _logger.warning("Exception thrown, don't save reservations in %r.", self)
                 raise
             else:
                 self._write_reservations(reservations)
@@ -67,12 +67,12 @@ class Registry(object):
                 try:
                     reservation = reservations[name]
                 except KeyError:
-                    logger.debug("%r: new %r.", self, name)
+                    _logger.debug("%r: new %r.", self, name)
                     reservation = None
                 else:
-                    logger.debug("%r: %r -> %r.", self, name, reservation)
+                    _logger.debug("%r: %r -> %r.", self, name, reservation)
                 if reservation is None:
-                    logger.info("%r: %r taken with %r.", self, name, alias)
+                    _logger.info("%r: %r taken with %r.", self, name, alias)
                     reservations[name] = alias
                     return index, name
         raise RegistryLimitReached("Cannot find vacant reservation in {} for {}".format(self, alias))
@@ -83,7 +83,7 @@ class Registry(object):
                 alias = reservations[name]
                 if alias is None:
                     raise RegistryError("%r: %r is known but not reserved.", self, name)
-                logger.info("%r: free %r.", self, name)
+                _logger.info("%r: free %r.", self, name)
                 reservations[name] = None
             except KeyError:
                 raise RegistryError("%r: %r is not even known.", self, name)

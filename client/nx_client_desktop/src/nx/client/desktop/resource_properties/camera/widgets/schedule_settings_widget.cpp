@@ -60,17 +60,11 @@ void ScheduleSettingsWidget::setStore(CameraSettingsDialogStore* store)
             store->setScheduleBrushFps(value);
         });
 
-    connect(ui->displayQualityCheckBox, &QCheckBox::stateChanged, store,
-        [store](int state)
-        {
-            store->setRecordingShowQuality(state == Qt::Checked);
-        });
+    connect(ui->displayQualityCheckBox, &QCheckBox::clicked,
+        store, &CameraSettingsDialogStore::setRecordingShowQuality);
 
-    connect(ui->displayFpsCheckBox, &QCheckBox::stateChanged, store,
-        [store](int state)
-        {
-            store->setRecordingShowFps(state == Qt::Checked);
-        });
+    connect(ui->displayFpsCheckBox, &QCheckBox::clicked,
+        store, &CameraSettingsDialogStore::setRecordingShowFps);
 
     const auto makeRecordingTypeHandler =
         [store](Qn::RecordingType value)
@@ -135,9 +129,10 @@ void ScheduleSettingsWidget::setupUi()
     labelFont.setPixelSize(kRecordingTypeLabelFontSize);
     labelFont.setWeight(kRecordingTypeLabelFontWeight);
 
-    for (auto label: {
-        ui->labelAlways, ui->labelMotionOnly, ui->labelMotionPlusLQ, ui->labelNoRecord
-    })
+    const auto labels =
+        {ui->labelAlways, ui->labelMotionOnly, ui->labelMotionPlusLQ, ui->labelNoRecord};
+
+    for (auto label: labels)
     {
         label->setFont(labelFont);
         label->setProperty(style::Properties::kDontPolishFontProperty, true);
@@ -186,6 +181,9 @@ void ScheduleSettingsWidget::setupUi()
     ui->noRecordButton->setCustomPaintFunction(
         paintFunctions->paintCellFunction(Qn::RecordingType::never));
 
+    auto buttonAligner = new Aligner(this);
+    buttonAligner->addWidgets(
+        {ui->labelAlways, ui->labelMotionOnly, ui->labelMotionPlusLQ, ui->labelNoRecord});
 }
 
 void ScheduleSettingsWidget::loadState(const CameraSettingsDialogState& state)
@@ -251,7 +249,8 @@ void ScheduleSettingsWidget::loadState(const CameraSettingsDialogState& state)
 
     ui->advancedSettingsWidget->setVisible(
         recording.customBitrateAvailable
-        && recording.customBitrateVisible);
+        && recording.customBitrateVisible
+        && recording.parametersAvailable);
 
     if (recording.customBitrateAvailable)
     {
@@ -273,14 +272,19 @@ void ScheduleSettingsWidget::loadState(const CameraSettingsDialogState& state)
         ui->advancedSettingsButton->setIcon(buttonIcon);
     }
 
-    ui->panicModeLabel->setText(state.panicMode ? tr("On") : tr("Off"));
-    setWarningStyleOn(ui->panicModeLabel, state.panicMode);
+    ui->displayQualityCheckBox->setChecked(recording.showQuality);
+    ui->displayFpsCheckBox->setChecked(recording.showFps);
+
+    ui->displaySettingsWidget->setVisible(recording.parametersAvailable);
+    ui->fpsAndQualityWidget->setVisible(recording.parametersAvailable);
 
     ui->settingsGroupBox->layout()->activate();
+    layout()->activate();
 
     const bool recordingEnabled = recording.enabled.valueOr(false);
     const auto labels =
         {ui->labelAlways, ui->labelMotionOnly, ui->labelMotionPlusLQ, ui->labelNoRecord};
+
     for (auto label: labels)
     {
         const auto button = qobject_cast<QAbstractButton*>(label->buddy());

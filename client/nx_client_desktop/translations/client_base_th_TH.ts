@@ -1122,13 +1122,13 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>File name &quot;%1&quot; is reserved by operating system. Please try another name.</source>
-      <translation type="unfinished">File name &quot;%1&quot; is reserved by operating system. Please try another name.</translation>
+      <translation>ชื่อไฟล์ &quot;%1&quot; สงวนไว้สำหรับระบบปฏิบัติการ โปรดลองชื่ออื่น</translation>
     </message>
     <message numerus="yes">
       <source>File name must not contain the following reserved characters:</source>
       <comment>Plural relates to the word _characters_ here, not _file name_.</comment>
-      <translation type="unfinished">
-        <numerusform>File name must not contain the following reserved characters:</numerusform>
+      <translation>
+        <numerusform>ชื่อไฟล์ต้องไม่มีอักขระสงวนไว้ต่อไปนี้:</numerusform>
       </translation>
     </message>
   </context>
@@ -1397,11 +1397,11 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Helps avoid problems with OpenGL drawing which result in 100% CPU load.</source>
-      <translation type="unfinished">Helps avoid problems with OpenGL drawing which result in 100% CPU load.</translation>
+      <translation>ช่วยหลีกเลี่ยงปัญหากับ OpenGL วาดซึ่งผลในการโหลด CPU 100%</translation>
     </message>
     <message>
       <source>Adjust to smallest value that does not degrade live view. Bigger buffer makes playback smoother but increases delay between real time and live view; smaller buffer decreases delay but can cause stutters.</source>
-      <translation type="unfinished">Adjust to smallest value that does not degrade live view. Bigger buffer makes playback smoother but increases delay between real time and live view; smaller buffer decreases delay but can cause stutters.</translation>
+      <translation>ปรับค่าที่น้อยที่สุดที่ลดไลฟ์วิว บัฟเฟอร์ที่ใหญ่ขึ้นทำให้การเล่นราบรื่น แต่เพิ่มการหน่วงเวลาจริงและไลฟ์วิว บัฟเฟอร์มีขนาดเล็กลดลงช้า แต่สามารถทำให้ขาดตอน</translation>
     </message>
   </context>
   <context>
@@ -1415,12 +1415,16 @@ to view more bookmarks</source>
       <translation>ค่าต่ำสุดที่สูงสามารถนำไปสู่เก็บลดลงบนกล้องอื่น ๆ</translation>
     </message>
     <message>
-      <source>Sets when camera archive will be deleted or saved when there is no space for new recordings.</source>
-      <translation type="unfinished">Sets when camera archive will be deleted or saved when there is no space for new recordings.</translation>
+      <source>Archive can be deleted in case if there are no space for new recording.</source>
+      <translation>เก็บถาวรสามารถลบในกรณีถ้ามีไม่มีช่องว่างสำหรับบันทึกใหม่</translation>
     </message>
     <message>
-      <source>&quot;Auto&quot; deletes the oldest footage first, regardless of the source.</source>
-      <translation type="unfinished">&quot;Auto&quot; deletes the oldest footage first, regardless of the source.</translation>
+      <source>Min and Max settings determine the age of archive which should be kept for this camera.</source>
+      <translation>ตั้งค่า min และ Max กำหนดอายุเก็บซึ่งควรจะเก็บไว้สำหรับกล้องนี้</translation>
+    </message>
+    <message>
+      <source>If &quot;Auto&quot; option is enabled, the oldest footage among all cameras will be deleted first.</source>
+      <translation>ถ้า &quot;อัตโนมัติ&quot; ตัวเลือกถูกเปิดใช้ คลิปที่เก่าที่สุดในบรรดากล้องทั้งหมดจะถูกลบก่อน</translation>
     </message>
   </context>
   <context>
@@ -2359,15 +2363,15 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Helps fix image quality issues on some cameras; for others will cause significant bitrate increase.</source>
-      <translation type="unfinished">Helps fix image quality issues on some cameras; for others will cause significant bitrate increase.</translation>
+      <translation>ช่วยแก้ไขปัญหาคุณภาพของภาพในกล้องบางรุ่น สำหรับคนอื่น ๆ จะทำให้อัตราบิตเพิ่มขึ้นอย่างมีนัยสำคัญ</translation>
     </message>
     <message>
       <source>Custom number that can be assigned to a camera for quick identification and access</source>
-      <translation type="unfinished">Custom number that can be assigned to a camera for quick identification and access</translation>
+      <translation>หมายเลขที่กำหนดเองที่สามารถกำหนดให้กับกล้องเพื่อระบุและเข้าถึงได้อย่างรวดเร็ว</translation>
     </message>
     <message>
       <source>Server will not change any cameras settings, it will receive and use camera stream as-is.</source>
-      <translation type="unfinished">Server will not change any cameras settings, it will receive and use camera stream as-is.</translation>
+      <translation>เซิร์ฟเวอร์จะไม่เปลี่ยนแปลงการตั้งค่ากล้องใด ๆ ระบบจะรับและใช้สตรีมมิ่งกล้องตามที่เป็นอยู่</translation>
     </message>
   </context>
   <context>
@@ -2648,11 +2652,11 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Quality setting determines the compression rate only, and does not affect resolution. Low, Medium, High and Best are preset bitrate values.</source>
-      <translation type="unfinished">Quality setting determines the compression rate only, and does not affect resolution. Low, Medium, High and Best are preset bitrate values.</translation>
+      <translation>การตั้งค่าคุณภาพจะกำหนดอัตราการบีบอัดเท่านั้นและไม่มีผลต่อความละเอียด ต่ำสุดปานกลางสูงและดีที่สุดคือค่าบิตเรทที่ตั้งไว้ล่วงหน้า</translation>
     </message>
     <message>
       <source>First choose a recording option, then apply it to day and time blocks on the recording schedule. (0 block is 12:00am to 1:00am, 23 block is 11:00pm to 12:00am.)</source>
-      <translation type="unfinished">First choose a recording option, then apply it to day and time blocks on the recording schedule. (0 block is 12:00am to 1:00am, 23 block is 11:00pm to 12:00am.)</translation>
+      <translation>ก่อนอื่นให้เลือกตัวเลือกการบันทึกจากนั้นใช้วันและเวลาในตารางการบันทึก (0 บล็อกคือ 12:00 น. ถึง 1:00 น., 23 บล็อกคือ 23:00 น. ถึง 12:00 น.)</translation>
     </message>
   </context>
   <context>
@@ -2843,20 +2847,20 @@ to %1</source>
     <name>QnCloudResultMessages</name>
     <message>
       <source>Account not found</source>
-      <translation type="unfinished">Account not found</translation>
+      <translation>ไม่พบบัญชีนี้</translation>
     </message>
     <message>
       <source>Account is not activated.</source>
-      <translation type="unfinished">Account is not activated.</translation>
+      <translation>บัญชีไม่เปิดใช้งาน</translation>
     </message>
     <message>
       <source>Please log in to %1 and follow the provided instructions.</source>
       <comment>%1 is a cloud site name like &quot;Nx Cloud&quot;</comment>
-      <translation type="unfinished">Please log in to %1 and follow the provided instructions.</translation>
+      <translation>โปรดเข้าสู่ %1 และปฏิบัติตามคำแนะนำให้</translation>
     </message>
     <message>
       <source>Invalid password</source>
-      <translation type="unfinished">Invalid password</translation>
+      <translation>รหัสผ่านไม่ถูกต้อง</translation>
     </message>
   </context>
   <context>
@@ -3111,12 +3115,20 @@ to %1</source>
   <context>
     <name>QnCustomBusinessEventWidget</name>
     <message>
-      <source>Event will trigger only if there are matches in caption with any of entered keywords.</source>
-      <translation type="unfinished">Event will trigger only if there are matches in caption with any of entered keywords.</translation>
+      <source>If the field is empty, event will always trigger.</source>
+      <translation>หากช่องว่างกิจกรรมจะเรียกใช้เสมอ</translation>
     </message>
     <message>
-      <source>If the field is empty, event will always trigger.</source>
-      <translation type="unfinished">If the field is empty, event will always trigger.</translation>
+      <source>Event will trigger only if there are matches in the source with any of the entered keywords.</source>
+      <translation>เหตุการณ์จะทริกเกอร์เฉพาะกรณีที่มีการจับคู่ในแหล่งที่มากับคำหลักที่ป้อนไว้</translation>
+    </message>
+    <message>
+      <source>Event will trigger only if there are matches in the caption with any of the entered keywords.</source>
+      <translation>เหตุการณ์จะทริกเกอร์เฉพาะกรณีที่มีการจับคู่ในแหล่งที่มากับคำหลักที่ป้อนไว้</translation>
+    </message>
+    <message>
+      <source>Event will trigger only if there are matches in the description with any of the entered keywords.</source>
+      <translation>เหตุการณ์จะทริกเกอร์เฉพาะกรณีที่มีการจับคู่ในแหล่งที่มากับคำหลักที่ป้อนไว้</translation>
     </message>
   </context>
   <context>
@@ -3187,7 +3199,7 @@ to %1</source>
     </message>
     <message>
       <source>Database Backup Files</source>
-      <translation type="unfinished">Database Backup Files</translation>
+      <translation>แฟ้มสำรองของฐานข้อมูล</translation>
     </message>
   </context>
   <context>
@@ -3322,7 +3334,7 @@ to %1</source>
     <message>
       <source>All %1 users will be deleted.</source>
       <comment>%1 is the short cloud name (like Cloud)</comment>
-      <translation type="unfinished">All %1 users will be deleted.</translation>
+      <translation>ผู้ใช้ %1 จะถูกลบออก</translation>
     </message>
     <message>
       <source>You will not be able to connect to this System with your %1 account after you disconnect this System from %1.</source>
@@ -3333,8 +3345,8 @@ to %1</source>
   <context>
     <name>QnEmptyBusinessActionWidget</name>
     <message>
-      <source>Panic Recording mode switches recording settings for all Cameras to maximum FPS and Quality</source>
-      <translation type="unfinished">Panic Recording mode switches recording settings for all Cameras to maximum FPS and Quality</translation>
+      <source>Panic Recording mode switches recording settings for all cameras to maximum FPS and quality.</source>
+      <translation>โหมดบันทึกภาพ Panic บันทึกการตั้งค่าสำหรับกล้องทั้งหมดเป็น FPS และคุณภาพสูงสุด</translation>
     </message>
   </context>
   <context>
@@ -3569,7 +3581,7 @@ to %1</source>
     <name>QnFisheyeSettingsWidget</name>
     <message>
       <source>Use this setting to compensate for distortion if camera is not mounted exactly vertically or horizontally.</source>
-      <translation type="unfinished">Use this setting to compensate for distortion if camera is not mounted exactly vertically or horizontally.</translation>
+      <translation>ใช้การตั้งค่านี้เพื่อชดเชยความผิดเพี้ยนถ้ากล้องจะติดตั้งตรงในแนวตั้ง หรือแนวนอน</translation>
     </message>
   </context>
   <context>
@@ -3643,11 +3655,11 @@ to %1</source>
     </message>
     <message>
       <source>Backup includes servers and cameras settings, users, webpages, event rules, etc. Video is not saved.</source>
-      <translation type="unfinished">Backup includes servers and cameras settings, users, webpages, event rules, etc. Video is not saved.</translation>
+      <translation>การสำรองข้อมูลประกอบด้วยเซิร์ฟเวอร์และการตั้งค่ากล้อง,ผู้ใช้เว็บเพจ,กิจกรรม ฯลฯ ไม่ได้บันทึกวิดีโอ</translation>
     </message>
     <message>
       <source>Creates a backup of System configuration that can be restored in case of failure.</source>
-      <translation type="unfinished">Creates a backup of System configuration that can be restored in case of failure.</translation>
+      <translation>สร้างการสำรองข้อมูลของการกำหนดค่าระบบที่สามารถเรียกคืนได้ในกรณีที่เกิดความล้มเหลว</translation>
     </message>
   </context>
   <context>
@@ -3826,6 +3838,10 @@ to %1</source>
         <numerusform>การทดสอบสมบูรณ์: %n พบผู้ใช้.</numerusform>
       </translation>
     </message>
+    <message>
+      <source>Changing any LDAP settings other than &quot;Search Filter&quot; will result in connectivity loss for all LDAP fetched users.</source>
+      <translation type="unfinished">Changing any LDAP settings other than &quot;Search Filter&quot; will result in connectivity loss for all LDAP fetched users.</translation>
+    </message>
   </context>
   <context>
     <name>QnLdapSettingsDialogPrivate</name>
@@ -3896,15 +3912,15 @@ to %1</source>
     <name>QnLensCameraAdvancedParamWidget</name>
     <message>
       <source>Zoom</source>
-      <translation type="unfinished">Zoom</translation>
+      <translation>ซูม</translation>
     </message>
     <message>
       <source>Rotation:</source>
-      <translation type="unfinished">Rotation:</translation>
+      <translation>หมุนหน้าจอ:</translation>
     </message>
     <message>
       <source>Focus</source>
-      <translation type="unfinished">Focus</translation>
+      <translation>โฟกัส</translation>
     </message>
   </context>
   <context>
@@ -4236,7 +4252,7 @@ to %1</source>
     </message>
     <message>
       <source>All files</source>
-      <translation type="unfinished">All files</translation>
+      <translation>ไฟล์ทั้งหมด</translation>
     </message>
     <message>
       <source>Please send email with License Key and Hardware ID provided to %1 to obtain an Activation Key file.</source>
@@ -4453,15 +4469,15 @@ to %1</source>
     </message>
     <message>
       <source>Sets the time to use in the client (timeline, timestamps, etc.) when client and server machines are in different time zones.</source>
-      <translation type="unfinished">Sets the time to use in the client (timeline, timestamps, etc.) when client and server machines are in different time zones.</translation>
+      <translation>ตั้งเวลาที่จะใช้ในไคลเอ็นต์ (ไทม์ไลน์ timestamps ฯลฯ ) เมื่อเครื่องไคลเอ็นต์และเซิร์ฟเวอร์อยู่ในโซนเวลาที่ต่างกัน</translation>
     </message>
     <message>
-      <source>Length of time each camera on layout will be displayed if you start a Layout Tour.</source>
-      <translation type="unfinished">Length of time each camera on layout will be displayed if you start a Layout Tour.</translation>
+      <source>Displays IP addresses for cameras and servers and roles for users.</source>
+      <translation>แสดงที่อยู่ IP สำหรับกล้องและเซิร์ฟเวอร์และกลุ่มสำหรับผู้ใช้</translation>
     </message>
     <message>
-      <source>Displays IP addresses for cameras and servers and groups for users.</source>
-      <translation type="unfinished">Displays IP addresses for cameras and servers and groups for users.</translation>
+      <source>Length of time each camera on layout will be displayed if you start a Tour.</source>
+      <translation type="unfinished">Length of time each camera on layout will be displayed if you start a Tour.</translation>
     </message>
   </context>
   <context>
@@ -5626,7 +5642,7 @@ to %1</source>
     </message>
     <message>
       <source>Servers with failover enabled will automatically take cameras from offline servers.</source>
-      <translation type="unfinished">Servers with failover enabled will automatically take cameras from offline servers.</translation>
+      <translation>เซิร์ฟเวอร์ที่เปิดใช้งาน failover จะใช้กล้องจากเซิร์ฟเวอร์ออฟไลน์โดยอัตโนมัติ</translation>
     </message>
   </context>
   <context>
@@ -5831,15 +5847,15 @@ to %1</source>
     </message>
     <message>
       <source>Update Files</source>
-      <translation type="unfinished">Update Files</translation>
+      <translation>อัปเดตไฟล์</translation>
     </message>
     <message>
       <source>Validating the update...</source>
-      <translation type="unfinished">Validating the update...</translation>
+      <translation>กำลังตรวจสอบการอัปเดต ...</translation>
     </message>
     <message>
       <source>Checking for free space...</source>
-      <translation type="unfinished">Checking for free space...</translation>
+      <translation>กำลังตรวจสอบพื้นที่ว่าง ...</translation>
     </message>
   </context>
   <context>
@@ -6321,12 +6337,8 @@ to %1</source>
       <translation>มีการเปิดใช้การบันทึกในที่จัดเก็บข้อมูล USB</translation>
     </message>
     <message>
-      <source>Backup includes servers and cameras settings, users, webpages, event rules, etc. Video is not saved.</source>
-      <translation type="unfinished">Backup includes servers and cameras settings, users, webpages, event rules, etc. Video is not saved.</translation>
-    </message>
-    <message>
-      <source>Creates a backup of System configuration that can be restored in case of failure.</source>
-      <translation type="unfinished">Creates a backup of System configuration that can be restored in case of failure.</translation>
+      <source>Reindexing can fix problems with archive or backup if they have been lost or damaged, or if some hardware has been replaced.</source>
+      <translation type="unfinished">Reindexing can fix problems with archive or backup if they have been lost or damaged, or if some hardware has been replaced.</translation>
     </message>
   </context>
   <context>
@@ -6621,12 +6633,16 @@ to %1</source>
       <translation>อนุญาตให้ระบบเพิ่มประสิทธิภาพการตั้งค่ากล้อง</translation>
     </message>
     <message>
-      <source>Sends anonymous System information (firmware, codecs, streams, etc.).</source>
-      <translation type="unfinished">Sends anonymous System information (firmware, codecs, streams, etc.).</translation>
+      <source>Tracks and logs all user actions.</source>
+      <translation>ติดตามและบันทึกการทำงานของผู้ใช้ทั้งหมด</translation>
     </message>
     <message>
-      <source>Tracks and logs all user actions.</source>
-      <translation type="unfinished">Tracks and logs all user actions.</translation>
+      <source>Includes information about system, such as cameras models and firmware versions, number of servers, etc.</source>
+      <translation>รวมถึงข้อมูลเกี่ยวกับระบบเช่นรุ่นกล้องและรุ่นของเฟิร์มแวร์จำนวนเซิร์ฟเวอร์เป็นต้น</translation>
+    </message>
+    <message>
+      <source>Does not include any personal information and is completely anonymous.</source>
+      <translation>ไม่รวมข้อมูลส่วนบุคคลใด ๆ และไม่ระบุชื่อ</translation>
     </message>
   </context>
   <context>
@@ -6875,7 +6891,7 @@ to %1</source>
     <message>
       <source>%1 user</source>
       <comment>%1 is the short cloud name (like Cloud)</comment>
-      <translation type="unfinished">%1 user</translation>
+      <translation>%1 ผู้ใช้งาน</translation>
     </message>
   </context>
   <context>
@@ -6925,7 +6941,7 @@ to %1</source>
     </message>
     <message>
       <source>Users can be imported from an LDAP server. They will be able to log in only if LDAP server is online and their accounts are active on it.</source>
-      <translation type="unfinished">Users can be imported from an LDAP server. They will be able to log in only if LDAP server is online and their accounts are active on it.</translation>
+      <translation>ผู้ใช้สามารถนำเข้าจากเซิร์ฟเวอร์ LDAP พวกเขาจะสามารถเข้าสู่ระบบได้เฉพาะเมื่อเซิร์ฟเวอร์ LDAP ออนไลน์และบัญชีของพวกเขาใช้งานได้</translation>
     </message>
   </context>
   <context>
@@ -7115,26 +7131,26 @@ to %1</source>
     <message>
       <source>%1 user with specified email already exists.</source>
       <comment>%1 is the short cloud name (like Cloud)</comment>
-      <translation type="unfinished">%1 user with specified email already exists.</translation>
+      <translation>%1 มีอีเมลผู้ใช้ที่ระบุอยู่แล้ว</translation>
     </message>
     <message>
       <source>Local users</source>
-      <translation type="unfinished">Local users</translation>
+      <translation>ผู้ใช้ท้องถิ่น</translation>
     </message>
     <message>
       <source>%1 users</source>
       <comment>%1 is the short cloud name (like Cloud)</comment>
-      <translation type="unfinished">%1 users</translation>
+      <translation>%1 ผู้ใช้</translation>
     </message>
     <message>
       <source>%1 belong to this system only and are fully managed by system administrators.</source>
       <comment>%1 is local users definition, e.g. &apos;Local users&apos;</comment>
-      <translation type="unfinished">%1 belong to this system only and are fully managed by system administrators.</translation>
+      <translation>%1 อยู่ในระบบนี้เท่านั้นและได้รับการจัดการอย่างเต็มที่จากผู้ดูแลระบบ</translation>
     </message>
     <message>
       <source>%1 can have access to many Systems. Administrators can manage their rights only.</source>
       <comment>%1 is cloud users definition, e.g. &apos;Cloud users&apos;</comment>
-      <translation type="unfinished">%1 can have access to many Systems. Administrators can manage their rights only.</translation>
+      <translation>%1 สามารถเข้าถึงระบบได้หลายระบบ ผู้ดูแลระบบสามารถจัดการสิทธิ์ได้เท่านั้น</translation>
     </message>
   </context>
   <context>
@@ -7333,6 +7349,21 @@ to %1</source>
     </message>
   </context>
   <context>
+    <name>QnWorkbenchContext</name>
+    <message>
+      <source>To use the software you must accept the end user license agreement</source>
+      <translation>การใช้ซอฟต์แวร์คุณต้องยอมรับข้อตกลงใบอนุญาตของผู้ใช้</translation>
+    </message>
+    <message>
+      <source>Accept</source>
+      <translation>ยอมรับ</translation>
+    </message>
+    <message>
+      <source>Decline</source>
+      <translation>ปฏิเสธ</translation>
+    </message>
+  </context>
+  <context>
     <name>QnWorkbenchIncompatibleServersActionHandler</name>
     <message>
       <source>Systems will be merged shortly</source>
@@ -7377,7 +7408,7 @@ to %1</source>
     <message>
       <source>%1 Systems cannot be merged</source>
       <comment>%1 is the short cloud name (like Cloud)</comment>
-      <translation type="unfinished">%1 Systems cannot be merged</translation>
+      <translation>%1 ไม่สามารถผสานรวมระบบได้</translation>
     </message>
   </context>
   <context>
@@ -8117,7 +8148,7 @@ to %1</source>
     <name>nx::client::desktop::HintButton</name>
     <message>
       <source>Click to read more</source>
-      <translation type="unfinished">Click to read more</translation>
+      <translation>คลิกเพื่ออ่านรายละเอียดเพิ่มเติม</translation>
     </message>
   </context>
   <context>
@@ -8368,23 +8399,27 @@ to %1</source>
     <name>nx::client::desktop::ui::AnalyticsSdkEventWidget</name>
     <message>
       <source>Analytics events can be set up on a certain cameras.</source>
-      <translation type="unfinished">Analytics events can be set up on a certain cameras.</translation>
+      <translation>คุณสามารถตั้งค่าเหตุการณ์ Analytics ได้ในกล้องบางเครื่อง</translation>
     </message>
     <message>
       <source>Choose cameras using the button above to see the list of supported events.</source>
-      <translation type="unfinished">Choose cameras using the button above to see the list of supported events.</translation>
-    </message>
-    <message>
-      <source>Event will trigger only if there are matches in caption with any of entered keywords.</source>
-      <translation type="unfinished">Event will trigger only if there are matches in caption with any of entered keywords.</translation>
+      <translation>เลือกกล้องโดยใช้ปุ่มด้านบนเพื่อดูรายการกิจกรรมที่สนับสนุน</translation>
     </message>
     <message>
       <source>If the field is empty, event will always trigger.</source>
-      <translation type="unfinished">If the field is empty, event will always trigger.</translation>
+      <translation>หากช่องว่างกิจกรรมจะเรียกใช้เสมอ</translation>
     </message>
     <message>
       <source>Event will trigger only if there are matches in the description field with any of the entered keywords.</source>
-      <translation type="unfinished">Event will trigger only if there are matches in the description field with any of the entered keywords.</translation>
+      <translation>เหตุการณ์จะทริกเกอร์เฉพาะกรณีที่มีการจับคู่ในแหล่งที่มากับคำหลักที่ป้อนไว้</translation>
+    </message>
+    <message>
+      <source>Event will trigger only if there are matches in the caption with any of the entered keywords.</source>
+      <translation>เหตุการณ์จะทริกเกอร์เฉพาะกรณีที่มีการจับคู่ในแหล่งที่มากับคำหลักที่ป้อนไว้</translation>
+    </message>
+    <message>
+      <source>This field is case sensitive.</source>
+      <translation type="unfinished">This field is case sensitive.</translation>
     </message>
   </context>
   <context>
@@ -8698,10 +8733,6 @@ to %1</source>
       <translation>รุ่น ทดสอบ %1</translation>
     </message>
     <message>
-      <source>Some functionality may be unavailable or not working properly.</source>
-      <translation>ฟังก์ชันการทำงานบางอย่างอาจใช้ไม่ได้หรือทำงานไม่ถูกต้อง</translation>
-    </message>
-    <message>
       <source>System sends anonymous usage statistics</source>
       <translation>ระบบจะส่งสถิติการใช้งานที่ไม่ระบุตัวตน</translation>
     </message>
@@ -8730,16 +8761,8 @@ to %1</source>
       <translation>ไม่สามารถเปลี่ยนรหัสผ่านได้ที่ %1 จาก %2 กล้อง</translation>
     </message>
     <message>
-      <source>To use the software you must accept the end user license agreement</source>
-      <translation type="unfinished">To use the software you must accept the end user license agreement</translation>
-    </message>
-    <message>
-      <source>Accept</source>
-      <translation type="unfinished">Accept</translation>
-    </message>
-    <message>
-      <source>Decline</source>
-      <translation type="unfinished">Decline</translation>
+      <source>Warning! This build is for testing purposes only! Please upgrade to a next available patch or release version once available.</source>
+      <translation type="unfinished">Warning! This build is for testing purposes only! Please upgrade to a next available patch or release version once available.</translation>
     </message>
   </context>
   <context>

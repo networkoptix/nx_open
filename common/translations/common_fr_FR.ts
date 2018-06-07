@@ -79,7 +79,7 @@
     <message>
       <source>%1 System can only be merged with non-%1. System name and password are taken from %1 System.</source>
       <comment>%1 is the short cloud name (like Cloud)</comment>
-      <translation type="unfinished">%1 System can only be merged with non-%1. System name and password are taken from %1 System.</translation>
+      <translation>Système %1 peut seulement être fusionné avec non-%1. Nom Système et mot de passe sont pris du Système %1.</translation>
     </message>
     <message>
       <source>Both Systems are connected to %1. Merge is not allowed.</source>
@@ -512,7 +512,7 @@
       <source>%n %2 will be used out of %1.</source>
       <translation>
         <numerusform>%n %2 sera utilisée sur %1.</numerusform>
-        <numerusform>%n %2 seront utilisées sur %1.</numerusform>
+        <numerusform>%n %2 sera utilisée sur %1.</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -526,7 +526,7 @@
       <source>%n more %1 will be used.</source>
       <translation>
         <numerusform>%n plus %1 sera utilisée.</numerusform>
-        <numerusform>%n plus %1 seront utilisées.</numerusform>
+        <numerusform>%n plus %1 sera utilisée.</numerusform>
       </translation>
     </message>
   </context>
@@ -585,7 +585,7 @@
       <source>%n camera(s)</source>
       <translation>
         <numerusform>%n caméra</numerusform>
-        <numerusform>%n caméras</numerusform>
+        <numerusform>%n caméra</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -599,7 +599,7 @@
       <source>%n device(s)</source>
       <translation>
         <numerusform>%n périphérique</numerusform>
-        <numerusform>%n périphériques</numerusform>
+        <numerusform>%n périphérique</numerusform>
       </translation>
     </message>
     <message>
@@ -638,14 +638,14 @@
       <source>%n I/O Module(s)</source>
       <translation>
         <numerusform>%n Module I/O</numerusform>
-        <numerusform>%n Modules I/O</numerusform>
+        <numerusform>%n Module I/O</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n I/O module(s)</source>
       <translation>
         <numerusform>%n module I/O</numerusform>
-        <numerusform>%n modules I/O</numerusform>
+        <numerusform>%n module I/O</numerusform>
       </translation>
     </message>
     <message>

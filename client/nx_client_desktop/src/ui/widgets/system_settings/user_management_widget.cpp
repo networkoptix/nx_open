@@ -283,7 +283,7 @@ QnUserManagementWidget::QnUserManagementWidget(QWidget* parent) :
     setHelpTopic(ui->fetchButton,                                       Qn::UserSettings_LdapFetch_Help);
 
     ui->ldapTooltip->setHint(tr("Users can be imported from an LDAP server. They will be able to log in only if LDAP server is online and their accounts are active on it."));
-    ui->ldapTooltip->setHelpTopic(Qn::UserSettings_LdapAdd_Help);
+    setHelpTopic(ui->ldapTooltip, Qn::UserSettings_LdapAdd_Help);
 
     /* Cursor changes with hover: */
     connect(hoverTracker, &ItemViewHoverTracker::itemEnter, this,
@@ -317,11 +317,9 @@ void QnUserManagementWidget::loadDataToUi()
 
 void QnUserManagementWidget::updateLdapState()
 {
-    bool currentUserIsLdap = context()->user() && context()->user()->isLdap();
-    ui->ldapSettingsButton->setVisible(!currentUserIsLdap);
     ui->ldapSettingsButton->setEnabled(!commonModule()->isReadOnly());
-    ui->fetchButton->setVisible(!currentUserIsLdap);
-    ui->fetchButton->setEnabled(!commonModule()->isReadOnly() && qnGlobalSettings->ldapSettings().isValid());
+    ui->fetchButton->setEnabled(!commonModule()->isReadOnly()
+        && qnGlobalSettings->ldapSettings().isValid());
 }
 
 void QnUserManagementWidget::applyChanges()
@@ -445,7 +443,7 @@ void QnUserManagementWidget::updateSelection()
 
 void QnUserManagementWidget::openLdapSettings()
 {
-    if (!context()->user() || context()->user()->isLdap())
+    if (!context()->user())
         return;
 
     QScopedPointer<QnLdapSettingsDialog> dialog(new QnLdapSettingsDialog(this));
@@ -467,7 +465,7 @@ void QnUserManagementWidget::createUser()
 
 void QnUserManagementWidget::fetchUsers()
 {
-    if (!context()->user() || context()->user()->isLdap())
+    if (!context()->user())
         return;
 
     if (!qnGlobalSettings->ldapSettings().isValid())

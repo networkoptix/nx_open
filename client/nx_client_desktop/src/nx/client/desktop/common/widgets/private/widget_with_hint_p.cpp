@@ -52,11 +52,6 @@ void WidgetWithHintPrivate::addHintLine(const QString& value)
     updateContentsMargins();
 }
 
-void WidgetWithHintPrivate::setHelpTopic(int topicId)
-{
-    m_button->setHelpTopic(topicId);
-}
-
 int WidgetWithHintPrivate::spacing() const
 {
     return m_spacing;

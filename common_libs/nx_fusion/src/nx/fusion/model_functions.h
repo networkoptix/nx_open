@@ -118,7 +118,7 @@ QByteArray serialized(
 
         case Qn::XmlFormat:
         {
-            QByteArray result = QnXml::serialized(outputData, lit("reply"));
+            QByteArray result = QnXml::serialized(outputData, QStringLiteral("reply"));
             return result;
         }
 

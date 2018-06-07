@@ -3,7 +3,7 @@ import logging
 import pytest
 from pathlib2 import Path
 
-from framework.os_access.local_access import LocalAccess
+from framework.os_access.posix_shell import local_shell
 from framework.registry import Registry
 from framework.vms.factory import VMFactory
 from framework.vms.hypervisor import VMNotFound
@@ -16,7 +16,7 @@ def registry(hypervisor):
     registry_path = Path('/tmp/func_tests/linux-test_factory.registry.yaml')
     if registry_path.exists():
         registry_path.unlink()
-    registry = Registry(LocalAccess(), registry_path, 'func_tests-temp-factory_test-{index}', 2)
+    registry = Registry(local_shell, registry_path, 'func_tests-temp-factory_test-{index}', 2)
     for index, name in registry.possible_entries():
         try:
             hypervisor.destroy(name)
@@ -31,7 +31,7 @@ def registry(hypervisor):
 def vm_type_configuration():
     return {
         'os_family': 'linux',
-        'power_on_timeout_sec': 60,
+        'power_on_timeout_sec': 120,
         'vm': {
             'mac_address_format': '0A-00-00-FF-{vm_index:02X}-0{nic_index:01X}',
             'port_forwarding': {
@@ -66,7 +66,7 @@ def test_allocate(vm_factory):
     with vm_factory.allocated_vm(vm_alias, vm_type=_vm_type) as vm:
         assert vm.alias == vm_alias
         assert vm.index in {1, 2}
-        assert vm.os_access.is_working()
+        assert vm.os_access.is_accessible()
 
 
 @pytest.mark.parallel_unsafe

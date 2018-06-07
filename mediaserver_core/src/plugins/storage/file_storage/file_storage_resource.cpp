@@ -136,27 +136,21 @@ QIODevice* QnFileStorageResource::open(
     int ffmpegBufferSize = 0;
 
     int ffmpegMaxBufferSize =
-        qnServerModule->roSettings()->value(
-            nx_ms_conf::MAX_FFMPEG_BUFFER_SIZE,
-            nx_ms_conf::DEFAULT_MAX_FFMPEG_BUFFER_SIZE).toInt();
+        qnServerModule->settings().maxFfmpegBufferSize();
 
     int systemFlags = 0;
     if (openMode & QIODevice::WriteOnly)
     {
-        ioBlockSize = qnServerModule->roSettings()->value(
-            nx_ms_conf::IO_BLOCK_SIZE,
-            nx_ms_conf::DEFAULT_IO_BLOCK_SIZE).toInt();
+        ioBlockSize = qnServerModule->settings().ioBlockSize();
 
         ffmpegBufferSize = qMax(
-            qnServerModule->roSettings()->value(
-                nx_ms_conf::FFMPEG_BUFFER_SIZE,
-                nx_ms_conf::DEFAULT_FFMPEG_BUFFER_SIZE).toInt(),
+            qnServerModule->settings().ffmpegBufferSize(),
             bufferSize);
 
 #ifdef Q_OS_WIN
         if ((openMode & QIODevice::ReadWrite) == QIODevice::ReadWrite)
             systemFlags = 0;
-        else if (qnServerModule->roSettings()->value(nx_ms_conf::DISABLE_DIRECT_IO).toInt() != 1)
+        else if (qnServerModule->settings().disableDirectIO())
             systemFlags = FILE_FLAG_NO_BUFFERING;
 #endif
     }
@@ -880,11 +874,7 @@ qint64 QnFileStorageResource::calcInitialSpaceLimit()
 
 qint64 QnFileStorageResource::calcSpaceLimit(QnPlatformMonitor::PartitionType ptype)
 {
-    const qint64 defaultStorageSpaceLimit = qnServerModule->roSettings()->value(
-        nx_ms_conf::MIN_STORAGE_SPACE,
-        nx_ms_conf::DEFAULT_MIN_STORAGE_SPACE
-    ).toLongLong();
-
+    const qint64 defaultStorageSpaceLimit = qnServerModule->settings().minStorageSpace();
     const bool isLocal =
         ptype == QnPlatformMonitor::LocalDiskPartition
         || ptype == QnPlatformMonitor::RemovableDiskPartition;

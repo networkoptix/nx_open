@@ -1408,7 +1408,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Adjust to smallest value that does not degrade live view. Bigger buffer makes playback smoother but increases delay between real time and live view; smaller buffer decreases delay but can cause stutters.</source>
-      <translation>Aanpassen aan de kleinste waarde die de liveweergave niet verslechtert. Een grotere buffer maakt het afspelen soepeler, maar vergroot de vertraging tussen de werkelijkheid en de weergave; een kleinere buffer verlaagt de vertraging maar kan stotteren gedurende de weergave veroorzaken.</translation>
+      <translation>Aanpassen aan de kleinste waarde die de liveweergave niet verslechtert. Een grotere buffer maakt het afspelen soepeler, maar vergroot de vertraging tussen de werkelijkheid en de weergave; een kleinere buffer verlaagt de vertraging maar kan schokkende beelden gedurende de weergave veroorzaken.</translation>
     </message>
   </context>
   <context>
@@ -1422,12 +1422,16 @@ to view more bookmarks</source>
       <translation>Hoge minimumwaarde kan ertoe leiden dat archieflengte afneemt op andere apparaten.</translation>
     </message>
     <message>
-      <source>Sets when camera archive will be deleted or saved when there is no space for new recordings.</source>
-      <translation>Stelt in wanneer het camera-archief wordt verwijderd of opgeslagen wanneer er geen ruimte is voor nieuwe opnames.</translation>
+      <source>Archive can be deleted in case if there are no space for new recording.</source>
+      <translation>Het archief kan worden verwijderd voor het geval er geen ruimte is voor nieuwe opnamen.</translation>
     </message>
     <message>
-      <source>&quot;Auto&quot; deletes the oldest footage first, regardless of the source.</source>
-      <translation>&quot;Auto&quot; wist eerst de oudste beelden, ongeacht de bron.</translation>
+      <source>Min and Max settings determine the age of archive which should be kept for this camera.</source>
+      <translation>De instellingen Min en Max bepalen de duur dat het archief voor deze camera moet worden bewaard.</translation>
+    </message>
+    <message>
+      <source>If &quot;Auto&quot; option is enabled, the oldest footage among all cameras will be deleted first.</source>
+      <translation>Als de optie &quot;Auto&quot; is ingeschakeld, worden de oudste opnames van alle camera's eerst verwijderd.</translation>
     </message>
   </context>
   <context>
@@ -3143,12 +3147,20 @@ to %1</source>
   <context>
     <name>QnCustomBusinessEventWidget</name>
     <message>
-      <source>Event will trigger only if there are matches in caption with any of entered keywords.</source>
-      <translation>Gebeurtenis wordt alleen geactiveerd als er overeenkomsten zijn in de Caption met een van de gekozen trefwoorden.</translation>
-    </message>
-    <message>
       <source>If the field is empty, event will always trigger.</source>
       <translation>Als het veld leeg is, wordt het event altijd geactiveerd.</translation>
+    </message>
+    <message>
+      <source>Event will trigger only if there are matches in the source with any of the entered keywords.</source>
+      <translation>De gebeurtenis wordt alleen geactiveerd als er overeenkomsten zijn in de Omschrijving met één van de gekozen trefwoorden.</translation>
+    </message>
+    <message>
+      <source>Event will trigger only if there are matches in the caption with any of the entered keywords.</source>
+      <translation>De gebeurtenis wordt alleen geactiveerd als er overeenkomsten zijn in de titel met één van de gekozen trefwoorden.</translation>
+    </message>
+    <message>
+      <source>Event will trigger only if there are matches in the description with any of the entered keywords.</source>
+      <translation>De gebeurtenis wordt alleen geactiveerd als er overeenkomsten zijn in de omschrijving met één van de gekozen trefwoorden.</translation>
     </message>
   </context>
   <context>
@@ -3365,8 +3377,8 @@ to %1</source>
   <context>
     <name>QnEmptyBusinessActionWidget</name>
     <message>
-      <source>Panic Recording mode switches recording settings for all Cameras to maximum FPS and Quality</source>
-      <translation>Paniekopname schakelt opname-instellingen voor alle camera's naar maximale FPS en kwaliteit</translation>
+      <source>Panic Recording mode switches recording settings for all cameras to maximum FPS and quality.</source>
+      <translation>Paniekopname schakelt opname-instellingen voor alle camera's naar maximale FPS en kwaliteit.</translation>
     </message>
   </context>
   <context>
@@ -3864,6 +3876,10 @@ to %1</source>
         <numerusform>Test succesvol afgerond: %n gebruikers gevonden.</numerusform>
         <numerusform>Test succesvol afgerond: %n gebruikers gevonden.</numerusform>
       </translation>
+    </message>
+    <message>
+      <source>Changing any LDAP settings other than &quot;Search Filter&quot; will result in connectivity loss for all LDAP fetched users.</source>
+      <translation>Als u andere LDAP-instellingen dan &quot;Zoekfilter&quot; wijzigt, leidt dit tot problemen met de verbinding voor alle LDAP gebruikers.</translation>
     </message>
   </context>
   <context>
@@ -4509,12 +4525,12 @@ to %1</source>
       <translation>Stelt de tijd in die moet worden gebruikt in de client (tijdlijn, tijdstempels, enz.) wanneer client- en servermachines zich in verschillende tijdzones bevinden.</translation>
     </message>
     <message>
-      <source>Length of time each camera on layout will be displayed if you start a Layout Tour.</source>
-      <translation>Lengte van de weergave voor elke apparaat in de schermindeling als u een tour cyclus start.</translation>
+      <source>Displays IP addresses for cameras and servers and roles for users.</source>
+      <translation>Geeft IP-adressen weer voor camera's en servers en rechten voor gebruikers.</translation>
     </message>
     <message>
-      <source>Displays IP addresses for cameras and servers and groups for users.</source>
-      <translation>Geeft IP-adressen weer voor camera's en servers en groepen voor gebruikers.</translation>
+      <source>Length of time each camera on layout will be displayed if you start a Tour.</source>
+      <translation>Lengte van de weergave voor elke camera in de schermindeling als u een tour cyclus start.</translation>
     </message>
   </context>
   <context>
@@ -6392,12 +6408,8 @@ to %1</source>
       <translation>Opname is ingeschakeld op de USB-opslag</translation>
     </message>
     <message>
-      <source>Backup includes servers and cameras settings, users, webpages, event rules, etc. Video is not saved.</source>
-      <translation>De back-up omvat server- en camerainstellingen, gebruikers, webpagina's, gebeurtenisregels, etc. Video data wordt niet opgeslagen.</translation>
-    </message>
-    <message>
-      <source>Creates a backup of System configuration that can be restored in case of failure.</source>
-      <translation>Creëert een back-up van de systeemconfiguratie om het systeem te kunnnen herstellen in geval van een storing.</translation>
+      <source>Reindexing can fix problems with archive or backup if they have been lost or damaged, or if some hardware has been replaced.</source>
+      <translation>Door opnieuw te indexeren kunnen problemen met het archief of de back-up worden opgelost als deze verloren of beschadigd zijn geraakt of als er hardware is vervangen.</translation>
     </message>
   </context>
   <context>
@@ -6692,12 +6704,16 @@ to %1</source>
       <translation>Laat het systeem toe om de camera-instellingen te optimaliseren</translation>
     </message>
     <message>
-      <source>Sends anonymous System information (firmware, codecs, streams, etc.).</source>
-      <translation>Verzendt anonieme systeeminformatie (firmware, codecs, streams, enz.).</translation>
-    </message>
-    <message>
       <source>Tracks and logs all user actions.</source>
       <translation>Traceert en logt alle gebruikersacties.</translation>
+    </message>
+    <message>
+      <source>Includes information about system, such as cameras models and firmware versions, number of servers, etc.</source>
+      <translation>Bevat informatie over het systeem, zoals cameramodellen en firmwareversies, aantal servers, enz.</translation>
+    </message>
+    <message>
+      <source>Does not include any personal information and is completely anonymous.</source>
+      <translation>Bevat geen persoonlijke informatie en is volledig anoniem.</translation>
     </message>
   </context>
   <context>
@@ -7409,6 +7425,21 @@ to %1</source>
     <message>
       <source>Video Wall is removed on the server and will be closed.</source>
       <translation>Videomuur is verwijderd op de server en zal worden gesloten.</translation>
+    </message>
+  </context>
+  <context>
+    <name>QnWorkbenchContext</name>
+    <message>
+      <source>To use the software you must accept the end user license agreement</source>
+      <translation>Om de software te kunnen gebruiken dient u eerst de gebruiksrechtovereenkomst accepteren</translation>
+    </message>
+    <message>
+      <source>Accept</source>
+      <translation>Accepteren</translation>
+    </message>
+    <message>
+      <source>Decline</source>
+      <translation>Afwijzen</translation>
     </message>
   </context>
   <context>
@@ -8482,15 +8513,11 @@ to %1</source>
     <name>nx::client::desktop::ui::AnalyticsSdkEventWidget</name>
     <message>
       <source>Analytics events can be set up on a certain cameras.</source>
-      <translation>Analytics-gebeurtenissen kunnen op bepaalde camera's worden ingesteld.</translation>
+      <translation>Analytics gebeurtenissen kunnen op bepaalde camera's worden ingesteld.</translation>
     </message>
     <message>
       <source>Choose cameras using the button above to see the list of supported events.</source>
       <translation>Kies camera's met de knop hierboven om de lijst met ondersteunde gebeurtenissen te bekijken.</translation>
-    </message>
-    <message>
-      <source>Event will trigger only if there are matches in caption with any of entered keywords.</source>
-      <translation>Een gebeurtenis wordt alleen geactiveerd als er overeenkomsten zijn in de Caption met een van de gekozen trefwoorden.</translation>
     </message>
     <message>
       <source>If the field is empty, event will always trigger.</source>
@@ -8499,6 +8526,14 @@ to %1</source>
     <message>
       <source>Event will trigger only if there are matches in the description field with any of the entered keywords.</source>
       <translation>De gebeurtenis wordt alleen geactiveerd als er overeenkomsten zijn in de Omschrijving met een van de gekozen trefwoorden.</translation>
+    </message>
+    <message>
+      <source>Event will trigger only if there are matches in the caption with any of the entered keywords.</source>
+      <translation>De gebeurtenis wordt alleen geactiveerd als er overeenkomsten zijn in de titel met één van de gekozen trefwoorden.</translation>
+    </message>
+    <message>
+      <source>This field is case sensitive.</source>
+      <translation>Dit veld is hoofdlettergevoelig.</translation>
     </message>
   </context>
   <context>
@@ -8819,10 +8854,6 @@ to %1</source>
       <translation>Beta versie %1</translation>
     </message>
     <message>
-      <source>Some functionality may be unavailable or not working properly.</source>
-      <translation>Sommige functies zijn mogelijk niet beschikbaar of werken niet goed.</translation>
-    </message>
-    <message>
       <source>System sends anonymous usage statistics</source>
       <translation>Systeem stuurt anonieme gebruiksstatistieken</translation>
     </message>
@@ -8851,16 +8882,8 @@ to %1</source>
       <translation>Wijzigen van wachtwoorden op %1 van %2 camera's mislukt</translation>
     </message>
     <message>
-      <source>To use the software you must accept the end user license agreement</source>
-      <translation>Om de software te kunnen gebruiken dient u eerst de gebruiksrechtovereenkomst accepteren</translation>
-    </message>
-    <message>
-      <source>Accept</source>
-      <translation>Accepteren</translation>
-    </message>
-    <message>
-      <source>Decline</source>
-      <translation>Afwijzen</translation>
+      <source>Warning! This build is for testing purposes only! Please upgrade to a next available patch or release version once available.</source>
+      <translation>Waarschuwing! Deze build is alleen voor testdoeleinden! Voer een upgrade uit naar een volgende beschikbare patch of release-versie zodra deze beschikbaar is.</translation>
     </message>
   </context>
   <context>

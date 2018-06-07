@@ -452,19 +452,15 @@ void QnVideoCameraGopKeeper::clearVideoData()
 // --------------- QnVideoCamera ----------------------------
 
 QnVideoCamera::QnVideoCamera(
-    const MSSettings& settings,
+    const nx::mediaserver::Settings& settings,
     const QnResourcePtr& resource)
     :
     m_settings(settings),
     m_resource(resource),
     m_primaryGopKeeper(nullptr),
     m_secondaryGopKeeper(nullptr),
-    m_loStreamHlsInactivityPeriodMS(m_settings.roSettings()->value(
-        nx_ms_conf::HLS_INACTIVITY_PERIOD,
-        nx_ms_conf::DEFAULT_HLS_INACTIVITY_PERIOD ).toInt() * MSEC_PER_SEC ),
-    m_hiStreamHlsInactivityPeriodMS(m_settings.roSettings()->value(
-        nx_ms_conf::HLS_INACTIVITY_PERIOD,
-        nx_ms_conf::DEFAULT_HLS_INACTIVITY_PERIOD ).toInt() * MSEC_PER_SEC )
+    m_loStreamHlsInactivityPeriodMS(m_settings.hlsInactivityPeriod() * MSEC_PER_SEC),
+    m_hiStreamHlsInactivityPeriodMS(m_settings.hlsInactivityPeriod() * MSEC_PER_SEC)
 {
     //ensuring that vectors will not take much memory
     static_assert(
@@ -597,7 +593,7 @@ void QnVideoCamera::startLiveCacheIfNeeded()
             ensureLiveCacheStarted(
                 MEDIA_Quality_Low,
                 m_secondaryReader,
-                duration_cast<microseconds>(m_settings.hlsTargetDuration()).count());
+                duration_cast<microseconds>(m_settings.hlsTargetDurationMS()).count());
         }
     }
 
@@ -616,7 +612,7 @@ void QnVideoCamera::startLiveCacheIfNeeded()
             ensureLiveCacheStarted(
                 MEDIA_Quality_High,
                 m_primaryReader,
-                duration_cast<microseconds>(m_settings.hlsTargetDuration()).count());
+                duration_cast<microseconds>(m_settings.hlsTargetDurationMS()).count());
         }
     }
 }
@@ -901,10 +897,7 @@ bool QnVideoCamera::ensureLiveCacheStarted(
             MEDIA_CACHE_SIZE_MILLIS,
             MEDIA_CACHE_SIZE_MILLIS*10) );  //hls spec requires 7 last chunks to be in memory, adding extra 3 just for case
 
-        int removedChunksToKeepCount = m_settings.roSettings()->value(
-            nx_ms_conf::HLS_REMOVED_LIVE_CHUNKS_TO_KEEP,
-            nx_ms_conf::DEFAULT_HLS_REMOVED_LIVE_CHUNKS_TO_KEEP).toInt();
-
+        int removedChunksToKeepCount = m_settings.hlsRemovedChunksToKeep();
         m_hlsLivePlaylistManager[streamQuality] =
             std::make_shared<nx::mediaserver::hls::LivePlaylistManager>(
                 m_liveCache[streamQuality].get(),

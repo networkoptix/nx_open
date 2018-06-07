@@ -33,7 +33,7 @@ namespace {
     const int installationDelay = 15000;
 
     QDir getUpdatesDir() {
-        const QString& dataDir = qnServerModule->roSettings()->value( "dataDir" ).toString();
+        const QString& dataDir = qnServerModule->settings().dataDir();
         QDir dir = dataDir.isEmpty() ? QDir::temp() : dataDir;
         if (!dir.exists(updatesDirSuffix))
             dir.mkpath(updatesDirSuffix);
@@ -67,7 +67,12 @@ QnServerUpdateTool::~QnServerUpdateTool()
 
 bool QnServerUpdateTool::initializeUpdateLog(const QString& targetVersion, QString* logFileName) const
 {
-    QString logDir = qnServerModule->roSettings()->value(lit("logDir"), getDataDirectory() + lit("/log/")).toString();
+    QString logDir;
+    if (qnServerModule->settings().logDir.present())
+        logDir = qnServerModule->settings().logDir();
+    else
+        logDir = getDataDirectory() + lit("/log/");
+
     if (logDir.isEmpty())
         return false;
 

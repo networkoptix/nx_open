@@ -12,7 +12,8 @@ SystemError::ErrorCode PredefinedHostResolver::resolve(
     int ipVersion,
     std::deque<AddressEntry>* resolvedAddresses)
 {
-    const auto reversedName = nx::utils::reverseWords(name.toStdString(), ".");
+    auto reversedName = nx::utils::reverseWords(name.toStdString(), ".");
+    nx::utils::to_lower(&reversedName);
 
     QnMutexLocker lock(&m_mutex);
 
@@ -44,7 +45,8 @@ void PredefinedHostResolver::addMapping(
     const std::string& name,
     std::deque<AddressEntry> entries)
 {
-    const auto reversedName = nx::utils::reverseWords(name, ".");
+    auto reversedName = nx::utils::reverseWords(name, ".");
+    nx::utils::to_lower(&reversedName);
 
     QnMutexLocker lock(&m_mutex);
     auto& existingEntries = m_etcHosts[reversedName];
@@ -59,7 +61,8 @@ void PredefinedHostResolver::replaceMapping(
     const std::string& name,
     std::deque<AddressEntry> entries)
 {
-    const auto reversedName = nx::utils::reverseWords(name, ".");
+    auto reversedName = nx::utils::reverseWords(name, ".");
+    nx::utils::to_lower(&reversedName);
 
     QnMutexLocker lock(&m_mutex);
     m_etcHosts[reversedName] = std::move(entries);
@@ -67,7 +70,8 @@ void PredefinedHostResolver::replaceMapping(
 
 void PredefinedHostResolver::removeMapping(const std::string& name)
 {
-    const auto reversedName = nx::utils::reverseWords(name, ".");
+    auto reversedName = nx::utils::reverseWords(name, ".");
+    nx::utils::to_lower(&reversedName);
 
     QnMutexLocker lock(&m_mutex);
     m_etcHosts.erase(reversedName);
@@ -77,7 +81,8 @@ void PredefinedHostResolver::removeMapping(
     const std::string& name,
     const AddressEntry& entryToRemove)
 {
-    const auto reversedName = nx::utils::reverseWords(name, ".");
+    auto reversedName = nx::utils::reverseWords(name, ".");
+    nx::utils::to_lower(&reversedName);
 
     QnMutexLocker lock(&m_mutex);
     auto it = m_etcHosts.find(reversedName);

@@ -33,7 +33,7 @@ void TestAuthenticationManager::authenticate(
         completionHandler(nx::network::http::server::AuthenticationResult(
             true,
             nx::utils::stree::ResourceContainer(),
-            boost::none,
+            std::nullopt,
             nx::network::http::HttpHeaders(),
             nullptr));
     }

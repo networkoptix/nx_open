@@ -18,7 +18,7 @@ class CreateClientSessionHandler:
         api::CreateClientSessionResponse>
 {
     using self_type = CreateClientSessionHandler;
-    using base_type = 
+    using base_type =
         relaying::BasicHandlerWithRequestBody<
             controller::AbstractConnectSessionManager,
             api::CreateClientSessionRequest,

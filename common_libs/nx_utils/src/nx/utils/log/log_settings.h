@@ -1,7 +1,5 @@
 #pragma once
 
-#include <nx/utils/string.h>
-
 #include "log_logger.h"
 
 class QnSettings;
@@ -15,7 +13,7 @@ class NX_UTILS_API Settings
 public:
     LevelSettings level;
     QString directory = QString(); //< dataDir/log
-    uint32_t maxFileSize = (uint32_t) stringToBytesConst("10M");
+    uint32_t maxFileSize = 10 * 1024 * 1024; //< 10 MB.
     uint8_t maxBackupCount = 5;
     QString logBaseName;
 

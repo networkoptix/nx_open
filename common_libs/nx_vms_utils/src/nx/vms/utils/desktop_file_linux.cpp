@@ -23,24 +23,26 @@ bool createDesktopFile(const QString& filePath,
     // We can't use QSettings to write the file because it escapes spaces in the group names.
     // This behavior cannot be changed.
 
-    QString result(lit("[Desktop Entry]\n"));
-    result += lit("Type=%1\n").arg(lit("Application"));
-    result += lit("Name=%1\n").arg(applicationName);
-    result += lit("Comment=%1\n").arg(description);
-    result += lit("Icon=%1\n").arg(icon);
-    result += lit("Exec=\"%1\" %u\n").arg(applicationBinaryPath);
-    result += lit("StartupNotify=%1\n").arg(lit("true"));
-    result += lit("StartupWMClass=%1\n").arg(AppInfo::productNameShort());
-    result += lit("Terminal=%1\n").arg(lit("false"));
+    QString result("[Desktop Entry]");
+    result += "\nType=Application";
+    result += "\nName=" + applicationName;
+    result += "\nComment=" + description;
+    result += "\nIcon=" + icon;
+    result += "\nExec=\"" + applicationBinaryPath + "\" %u";
+    result += "\nStartupNotify=true";
+    result += "\nStartupWMClass=" + AppInfo::productNameShort();
+    result += "\nTerminal=false";
 
     if (!version.isNull())
-        result += lit("Version=%1\n").arg(version.toString());
+        result += "\nVersion=" + version.toString();
 
     if (!protocol.isEmpty())
     {
-        result += lit("NoDisplay=%1\n").arg(lit("true"));
-        result += lit("MimeType=x-scheme-handler/%1\n").arg(protocol);
+        result += "\nNoDisplay=true";
+        result += "\nMimeType=x-scheme-handler/" + protocol;
     }
+
+    result += "\n";
 
     QFile file(filePath);
     if (!file.open(QFile::WriteOnly))

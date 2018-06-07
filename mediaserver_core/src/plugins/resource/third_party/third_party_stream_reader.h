@@ -3,8 +3,7 @@
 * akolesnikov
 ***********************************************************/
 
-#ifndef THIRD_PARTY_STREAM_READER_H
-#define THIRD_PARTY_STREAM_READER_H
+#pragma once
 
 #ifdef ENABLE_THIRD_PARTY
 
@@ -14,10 +13,10 @@
 
 #include "third_party_resource.h"
 #include <nx/utils/time_helper.h>
+#include <nx/utils/safe_direct_connection.h>
 
 //!Stream reader for resource, implemented in external plugin
-class ThirdPartyStreamReader
-:
+class ThirdPartyStreamReader:
     public CLServerPushStreamReader
 {
     typedef CLServerPushStreamReader base_type;
@@ -83,10 +82,9 @@ private:
     using TimeHelperPtr = std::unique_ptr<nx::utils::TimeHelper>;
     std::vector<TimeHelperPtr> m_videoTimeHelpers;
     std::vector<TimeHelperPtr> m_audioTimeHelpers;
+    std::atomic_flag m_isMediaUrlValid;
 
     void initializeAudioContext( const nxcip::AudioFormat& audioFormat, const Extras& extras );
 };
 
 #endif // ENABLE_THIRD_PARTY
-
-#endif // THIRD_PARTY_STREAM_READER_H

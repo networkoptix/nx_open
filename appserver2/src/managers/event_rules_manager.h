@@ -8,6 +8,7 @@
 #include <ec2_thread_pool.h>
 
 #include <transaction/transaction.h>
+#include <transaction/message_bus_adapter.h>
 
 namespace ec2 {
 

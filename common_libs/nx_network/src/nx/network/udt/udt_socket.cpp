@@ -189,7 +189,7 @@ bool UdtSocket<InterfaceToImplement>::close()
     UDT::setsockopt(m_impl->udtHandle, 0, UDT_LINGER, &lingerVal, sizeof(lingerVal));
 
 #ifdef TRACE_UDT_SOCKET
-    NX_LOG(lit("closing UDT socket %1").arg(udtHandle), cl_logDEBUG2);
+    NX_VERBOSE(this, lm("closing UDT socket %1").arg(udtHandle));
 #endif
 
     const int ret = UDT::close(m_impl->udtHandle);
@@ -561,6 +561,14 @@ bool UdtStreamSocket::setRendezvous(bool val)
 {
     return UDT::setsockopt(
         m_impl->udtHandle, 0, UDT_RENDEZVOUS, &val, sizeof(bool)) == 0;
+}
+
+void UdtStreamSocket::bindToAioThread(
+    nx::network::aio::AbstractAioThread* aioThread)
+{
+    base_type::bindToAioThread(aioThread);
+
+    m_aioHelper->bindToAioThread(aioThread);
 }
 
 bool UdtStreamSocket::connect(
@@ -979,13 +987,10 @@ void UdtStreamServerSocket::acceptAsync(AcceptCompletionHandler handler)
             std::unique_ptr<AbstractStreamSocket> socket)
         {
             // Every accepted socket MUST be in blocking mode!
-            if (socket)
+            if (socket && !socket->setNonBlockingMode(false))
             {
-                if (!socket->setNonBlockingMode(false))
-                {
-                    socket.reset();
-                    errorCode = SystemError::getLastOSErrorCode();
-                }
+                errorCode = SystemError::getLastOSErrorCode();
+                socket.reset();
             }
             handler(errorCode, std::move(socket));
         });
@@ -1019,7 +1024,7 @@ void UdtStreamServerSocket::cancelIoInAioThread()
 std::unique_ptr<AbstractStreamSocket> UdtStreamServerSocket::systemAccept()
 {
     NX_ASSERT(m_state == detail::SocketState::connected);
-    UDTSOCKET ret = UDT::accept(m_impl->udtHandle, NULL, NULL);
+    UDTSOCKET ret = UDT::accept(m_impl->udtHandle, nullptr, nullptr);
     if (ret == UDT::INVALID_SOCK)
     {
         detail::setLastSystemErrorCodeAppropriately();
@@ -1027,7 +1032,7 @@ std::unique_ptr<AbstractStreamSocket> UdtStreamServerSocket::systemAccept()
     }
 
 #ifdef TRACE_UDT_SOCKET
-    NX_LOGX(lit("accepted UDT socket %1").arg(ret), cl_logDEBUG2);
+    NX_VERBOSE(this, lm("Accepted UDT socket %1").arg(ret));
 #endif
     auto acceptedSocket = std::make_unique<UdtStreamSocket>(
         m_ipVersion,

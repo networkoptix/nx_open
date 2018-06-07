@@ -13,14 +13,14 @@ import pytest
 
 import server_api_data_generators as generator
 from framework.api_shortcuts import get_server_id, get_system_settings
-from framework.mediaserver import MEDIASERVER_MERGE_TIMEOUT
+from framework.installation.mediaserver import MEDIASERVER_MERGE_TIMEOUT
 from framework.merging import merge_systems
 from framework.utils import bool_to_str, datetime_utc_now, str_to_bool
 from framework.waiting import wait_for_true
 
 CAMERA_SWITCHING_PERIOD_SEC = 4*60
 
-log = logging.getLogger(__name__)
+_logger = logging.getLogger(__name__)
 
 
 class Counter(object):
@@ -78,7 +78,7 @@ def wait_until_servers_are_online(servers):
         while True:
             online_server_guids = sorted([s['id'] for s in srv.api.ec2.getMediaServersEx.GET()
                                           if s['status'] == 'Online'])
-            log.debug("%r online servers: %s, system servers: %s", srv, online_server_guids, server_guids)
+            _logger.debug("%r online servers: %s, system servers: %s", srv, online_server_guids, server_guids)
             if server_guids == online_server_guids:
                 break
             if datetime_utc_now() - start_time >= MEDIASERVER_MERGE_TIMEOUT:
@@ -93,7 +93,7 @@ def create_cameras(camera_factory, counter, count):
         camera_name = 'Camera_%d' % camera_num
         camera = camera_factory(camera_name, camera_mac)
         camera.start_streaming()
-        log.info('Camera is created: mac=%r', camera.mac_addr)
+        _logger.info('Camera is created: mac=%r', camera.mac_addr)
         yield camera.mac_addr
 
 
@@ -103,14 +103,14 @@ def attach_cameras_to_server(server, camera_mac_list):
         camera_id = camera_mac_to_id[camera_mac]
         server.api.ec2.saveCameraUserAttributes.POST(
             cameraId=camera_id, preferredServerId=get_server_id(server.api))
-        log.info('Camera is set as preferred for server %s: mac=%r, id=%r', server, camera_mac, camera_id)
+        _logger.info('Camera is set as preferred for server %s: mac=%r, id=%r', server, camera_mac, camera_id)
 
 
 def online_camera_macs_on_server(server):
     camera_list = [camera for camera in server.api.ec2.getCamerasEx.GET()
                    if camera['parentId'] == get_server_id(server.api)]
     for camera in sorted(camera_list, key=itemgetter('mac')):
-        log.info(
+        _logger.info(
             'Camera mac=%r id=%r is %r on server %s: %r',
             camera['mac'], camera['id'], camera['status'], server, camera)
     return set(camera['mac'] for camera in camera_list if camera['status'] == 'Online')
@@ -145,7 +145,7 @@ def get_server_camera_macs(server):
     camera_list = [c for c in server.api.ec2.getCameras.GET()
                    if c['parentId'] == server_guid]
     for camera in sorted(camera_list, key=itemgetter('id')):
-        log.info('Camera is on server %s: id=%r, mac=%r', server, camera['id'], camera['mac'])
+        _logger.info('Camera is on server %s: id=%r, mac=%r', server, camera['id'], camera['mac'])
     return sorted(camera['id'] for camera in camera_list)
 
 

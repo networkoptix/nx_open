@@ -126,7 +126,7 @@ void AudioOutput::write(const AudioFramePtr& audioFrame)
 
     QnCodecAudioFormat codecAudioFormat(audioFrame->context);
     QnAudioFormat audioFormat(codecAudioFormat);
-    audioFormat.setCodec(lit("audio/pcm"));
+    audioFormat.setCodec("audio/pcm");
     if (!d->audioOutput || //< first call
         d->lastAudioFormat != audioFormat || //< Audio format has been changed
         !d->frameDurationUsec || //< Some internal error or empty data

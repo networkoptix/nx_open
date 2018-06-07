@@ -237,6 +237,7 @@ class CameraControllerImpl
 public:
     CameraControllerImpl()
     {
+        m_client.setIgnoreMutexAnalyzer(true);
         m_client.setResponseReadTimeoutMs(5000);
         m_client.setMessageBodyReadTimeoutMs(5000);
     }

@@ -34,7 +34,7 @@
         Custom##REQUEST_NAME##Handler(TargetType* target, HandlerType func, Qt::ConnectionType connectionType = Qt::AutoConnection) {         \
             QObject::connect(static_cast<AppServerSignaller*>(this), &AppServerSignaller::on##REQUEST_NAME##Done, target, func, connectionType); \
         }                                                                               \
-        virtual void done(int reqID, const FIRST_ARG_TYPE& val1) override { on##REQUEST_NAME##Done(reqID, val1); }; \
+        virtual void done(int reqID, const FIRST_ARG_TYPE& val1) override { on##REQUEST_NAME##Done(reqID, val1); } \
     };
 
 
@@ -54,7 +54,7 @@
         virtual void done(\
             int reqID, \
             const FIRST_ARG_TYPE& val1, \
-            const SECOND_ARG_TYPE& val2) override { on##REQUEST_NAME##Done(reqID, val1, val2); }; \
+            const SECOND_ARG_TYPE& val2) override { on##REQUEST_NAME##Done(reqID, val1, val2); } \
     };
 
 
@@ -75,7 +75,7 @@
             int reqID, \
             const FIRST_ARG_TYPE& val1, \
             const SECOND_ARG_TYPE& val2, \
-            const THIRD_ARG_TYPE& val3) override { on##REQUEST_NAME##Done(reqID, val1, val2, val3); }; \
+            const THIRD_ARG_TYPE& val3) override { on##REQUEST_NAME##Done(reqID, val1, val2, val3); } \
     };
 
 
@@ -308,8 +308,6 @@ namespace ec2
         DEFINE_TWO_ARG_HANDLER(TestConnection, ec2::ErrorCode, QnConnectionInfo)
         DEFINE_TWO_ARG_HANDLER(Connect, ec2::ErrorCode, AbstractECConnectionPtr)
     }
-
-    Q_ENUMS(ErrorCode);
 }
 
 Q_DECLARE_METATYPE(ec2::ErrorCode);

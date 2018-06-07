@@ -45,6 +45,9 @@
        <property name="bottomMargin">
         <number>0</number>
        </property>
+       <property name="horizontalSpacing">
+        <number>16</number>
+       </property>
        <property name="verticalSpacing">
         <number>2</number>
        </property>
@@ -139,9 +142,6 @@
      </widget>
      <widget class="QWidget" name="moreInfoPage">
       <layout class="QGridLayout" name="moreInfoLayout" rowminimumheight="20,20,20,8,20,20,20,8,20,20,20">
-       <property name="sizeConstraint">
-        <enum>QLayout::SetFixedSize</enum>
-       </property>
        <property name="leftMargin">
         <number>8</number>
        </property>
@@ -162,6 +162,18 @@
        </property>
        <item row="9" column="1">
         <widget class="QWidget" name="primaryStreamControlWidget" native="true">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="minimumSize">
+          <size>
+           <width>250</width>
+           <height>0</height>
+          </size>
+         </property>
          <layout class="QHBoxLayout" name="primaryStreamLayout">
           <property name="spacing">
            <number>12</number>
@@ -297,6 +309,18 @@
        </item>
        <item row="10" column="1">
         <widget class="QWidget" name="secondaryStreamControlWidget" native="true">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="minimumSize">
+          <size>
+           <width>250</width>
+           <height>0</height>
+          </size>
+         </property>
          <layout class="QHBoxLayout" name="secondaryStreamLayout">
           <property name="spacing">
            <number>12</number>
@@ -620,8 +644,14 @@
      </property>
      <item>
       <widget class="QStackedWidget" name="controlsStackedWidget">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="MinimumExpanding" vsizetype="Preferred">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
        <property name="currentIndex">
-        <number>0</number>
+        <number>1</number>
        </property>
        <widget class="QWidget" name="toggleInfoPage">
         <layout class="QVBoxLayout" name="verticalLayout_3">
@@ -671,46 +701,60 @@
       </widget>
      </item>
      <item>
-      <spacer name="horizontalSpacer">
-       <property name="orientation">
-        <enum>Qt::Horizontal</enum>
-       </property>
-       <property name="sizeHint" stdset="0">
+      <widget class="QWidget" name="buttonsWidget" native="true">
+       <property name="minimumSize">
         <size>
-         <width>40</width>
-         <height>20</height>
+         <width>100</width>
+         <height>0</height>
         </size>
        </property>
-      </spacer>
-     </item>
-     <item>
-      <widget class="QPushButton" name="showOnLayoutButton">
-       <property name="text">
-        <string>Show on layout</string>
-       </property>
-       <property name="flat">
-        <bool>true</bool>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QPushButton" name="eventLogButton">
-       <property name="text">
-        <string>Event Log</string>
-       </property>
-       <property name="flat">
-        <bool>true</bool>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QPushButton" name="cameraRulesButton">
-       <property name="text">
-        <string>Camera rules</string>
-       </property>
-       <property name="flat">
-        <bool>true</bool>
-       </property>
+       <layout class="QHBoxLayout" name="horizontalLayout_2">
+        <property name="spacing">
+         <number>16</number>
+        </property>
+        <property name="leftMargin">
+         <number>8</number>
+        </property>
+        <property name="topMargin">
+         <number>0</number>
+        </property>
+        <property name="rightMargin">
+         <number>0</number>
+        </property>
+        <property name="bottomMargin">
+         <number>0</number>
+        </property>
+        <item>
+         <widget class="QPushButton" name="showOnLayoutButton">
+          <property name="text">
+           <string>Show on layout</string>
+          </property>
+          <property name="flat">
+           <bool>true</bool>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QPushButton" name="eventLogButton">
+          <property name="text">
+           <string>Event Log</string>
+          </property>
+          <property name="flat">
+           <bool>true</bool>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QPushButton" name="cameraRulesButton">
+          <property name="text">
+           <string>Camera rules</string>
+          </property>
+          <property name="flat">
+           <bool>true</bool>
+          </property>
+         </widget>
+        </item>
+       </layout>
       </widget>
      </item>
     </layout>

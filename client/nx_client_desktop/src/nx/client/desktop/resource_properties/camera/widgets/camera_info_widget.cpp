@@ -3,8 +3,6 @@
 #include "../redux/camera_settings_dialog_state.h"
 #include "../redux/camera_settings_dialog_store.h"
 
-#include <QtCore/QMetaType>
-
 #include <core/resource/camera_resource.h>
 #include <core/resource/device_dependent_strings.h>
 #include <ui/style/custom_style.h>
@@ -34,7 +32,7 @@ CameraInfoWidget::CameraInfoWidget(QWidget* parent):
         true);
 
     autoResizePagesToContents(ui->controlsStackedWidget,
-        {QSizePolicy::Fixed, QSizePolicy::Preferred},
+        {QSizePolicy::MinimumExpanding, QSizePolicy::Preferred},
         true);
 
     alignLabels();
@@ -50,22 +48,21 @@ CameraInfoWidget::CameraInfoWidget(QWidget* parent):
 
     connect(ui->primaryStreamCopyButton, &ClipboardButton::clicked, this,
         [this]() { ClipboardButton::setClipboardText(ui->primaryStreamLabel->text()); });
+
     connect(ui->secondaryStreamCopyButton, &ClipboardButton::clicked, this,
         [this]() { ClipboardButton::setClipboardText(ui->secondaryStreamLabel->text()); });
 
-    qRegisterMetaType<Action>();
-
     connect(ui->pingButton, &QPushButton::clicked, this,
-        [this]() { emit actionRequested(Action::ping); });
+        [this]() { emit actionRequested(ui::action::PingAction); });
 
     connect(ui->eventLogButton, &QPushButton::clicked, this,
-        [this]() { emit actionRequested(Action::openEventLog); });
+        [this]() { emit actionRequested(ui::action::CameraIssuesAction); });
 
     connect(ui->cameraRulesButton, &QPushButton::clicked, this,
-        [this]() { emit actionRequested(Action::openEventRules); });
+        [this]() { emit actionRequested(ui::action::CameraBusinessRulesAction); });
 
     connect(ui->showOnLayoutButton, &QPushButton::clicked, this,
-        [this]() { emit actionRequested(Action::showOnLayout); });
+        [this]() { emit actionRequested(ui::action::OpenInNewTabAction); });
 }
 
 CameraInfoWidget::~CameraInfoWidget()
@@ -89,13 +86,20 @@ void CameraInfoWidget::setStore(CameraSettingsDialogStore* store)
 void CameraInfoWidget::loadState(const CameraSettingsDialogState& state)
 {
     const bool singleCamera = state.isSingleCamera();
+    const bool singleNonWearableCamera = singleCamera
+        && state.devicesDescription.isWearable == CameraSettingsDialogState::CombinedValue::None;
+
     ui->nameLabel->setVisible(singleCamera);
+
     ui->controlsStackedWidget->setCurrentWidget(singleCamera
         ? ui->toggleInfoPage
         : ui->multipleCamerasNamePage);
 
-    ui->stackedWidget->setVisible(singleCamera);
-    ui->cameraRulesButton->setVisible(singleCamera);
+    ui->stackedWidget->setVisible(singleNonWearableCamera);
+    ui->toggleInfoButton->setVisible(singleNonWearableCamera);
+    ui->cameraRulesButton->setVisible(singleNonWearableCamera);
+    ui->eventLogButton->setVisible(singleNonWearableCamera);
+    ui->controlsStackedWidget->setHidden(state.isSingleWearableCamera());
 
     const QString rulesTitle = QnCameraDeviceStringSet(
         tr("Device Rules"),tr("Camera Rules"),tr("I/O Module Rules")).getString(state.deviceType);

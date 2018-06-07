@@ -194,7 +194,7 @@ void QnCameraListModel::removeCamera(const QnResourcePtr &resource) {
     if(row < 0)
         return;
 
-    disconnect(camera, NULL, this, NULL);
+    camera->disconnect(this);
 
     beginRemoveRows(QModelIndex(), row, row);
     m_cameras.removeAt(row);

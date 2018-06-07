@@ -6,7 +6,6 @@ from pathlib2 import Path
 from framework.artifact import ArtifactFactory
 from framework.ca import CA
 from framework.config import SingleTestConfig, TestParameter, TestsConfig
-from framework.mediaserverdeb import MediaserverDeb
 from framework.metrics_saver import MetricsSaver
 
 pytest_plugins = ['fixtures.vms', 'fixtures.mediaservers', 'fixtures.cloud', 'fixtures.layouts', 'fixtures.media']
@@ -14,12 +13,11 @@ pytest_plugins = ['fixtures.vms', 'fixtures.mediaservers', 'fixtures.cloud', 'fi
 JUNK_SHOP_PLUGIN_NAME = 'junk-shop-db-capture'
 
 DEFAULT_WORK_DIR = '/tmp/funtest'
-DEFAULT_MEDIASERVER_DIST_NAME = 'mediaserver.deb'  # in bin dir
 DEFAULT_REST_API_FORWARDED_PORT_BASE = 17000
 
 DEFAULT_MAX_LOG_WIDTH = 500
 
-log = logging.getLogger(__name__)
+_logger = logging.getLogger(__name__)
 
 
 def pytest_addoption(parser):
@@ -30,8 +28,6 @@ def pytest_addoption(parser):
         'debian distributive and media sample are expected there'))
     parser.addoption('--customization', help=(
         "Manufacturer name or 'default'. Optional. Checked against customization from .deb file."))
-    parser.addoption('--mediaserver-dist-path', type=Path, default=DEFAULT_MEDIASERVER_DIST_NAME, help=(
-        'mediaserver package, relative to bin dir [%s]' % DEFAULT_MEDIASERVER_DIST_NAME))
     parser.addoption('--max-log-width', default=DEFAULT_MAX_LOG_WIDTH, type=int, help=(
         'Change maximum log message width. Default is %d' % DEFAULT_MAX_LOG_WIDTH))
     parser.addoption(
@@ -63,26 +59,13 @@ def ca(work_dir):
     return CA(work_dir / 'ca')
 
 
-@pytest.fixture(scope='session')
-def mediaserver_deb(request, bin_dir):
-    deb = MediaserverDeb(bin_dir / request.config.getoption('--mediaserver-dist-path').expanduser())
-    customization_from_command_line = request.config.getoption('--customization')
-    if customization_from_command_line is not None:
-        if deb.customization.name != customization_from_command_line:
-            raise Exception(
-                "Customization {} provided by --customization option "
-                "doesn't match customization {} from .deb file. "
-                "This option is maintained for backward compatibility, "
-                "either don't use it or make sure it matches .deb file.".format(
-                    customization_from_command_line,
-                    deb.customization))
-    return deb
-
-
 @pytest.fixture(scope='session', autouse=True)
 def init_logging(request, work_dir):
     root_logger = logging.getLogger()
     root_logger.setLevel(logging.DEBUG)  # It's WARNING by default. Level constraints are set in handlers.
+
+    logging.getLogger('SMB.SMBConnection').setLevel(logging.INFO)  # Big files cause too many logs.
+    logging.getLogger('paramiko.transport').setLevel(logging.INFO)  # Big files cause too many logs.
 
     stderr_log_width = request.config.getoption('--max-log-width')
     stderr_handler = logging.StreamHandler()
@@ -96,6 +79,7 @@ def init_logging(request, work_dir):
     for level in {logging.DEBUG, logging.INFO}:
         file_name = logging.getLevelName(level).lower() + '.log'
         file_handler = logging.FileHandler(str(work_dir / file_name), mode='w')
+        file_handler.setLevel(level)
         file_handler.setFormatter(file_formatter)
         root_logger.addHandler(file_handler)
 
@@ -145,5 +129,5 @@ def artifact_factory(request, work_dir, junk_shop_repository):
 def metrics_saver(junk_shop_repository):
     db_capture_repository, current_test_run = junk_shop_repository
     if not db_capture_repository:
-        log.warning('Junk shop plugin is not available; No metrics will be saved')
+        _logger.warning('Junk shop plugin is not available; No metrics will be saved')
     return MetricsSaver(db_capture_repository, current_test_run)

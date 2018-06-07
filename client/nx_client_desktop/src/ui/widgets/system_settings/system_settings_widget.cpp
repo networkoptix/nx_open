@@ -22,8 +22,12 @@ QnSystemSettingsWidget::QnSystemSettingsWidget(QWidget *parent):
     setHelpTopic(ui->auditTrailCheckBox,        Qn::AuditTrail_Help);
     setHelpTopic(ui->statisticsReportCheckBox,  Qn::SystemSettings_General_AnonymousUsage_Help);
 
-    ui->statisticsReportHint->setHint(tr("Sends anonymous System information (firmware, codecs, streams, etc.)."));
+    ui->statisticsReportHint->addHintLine(tr("Includes information about system, such as cameras models and firmware versions, number of servers, etc."));
+    ui->statisticsReportHint->addHintLine(tr("Does not include any personal information and is completely anonymous."));
+    setHelpTopic(ui->statisticsReportHint, Qn::SystemSettings_General_AnonymousUsage_Help);
+
     ui->auditTrailHint->setHint(tr("Tracks and logs all user actions."));
+    setHelpTopic(ui->auditTrailHint, Qn::AuditTrail_Help);
 
     setWarningStyle(ui->settingsWarningLabel);
 
@@ -41,10 +45,10 @@ QnSystemSettingsWidget::QnSystemSettingsWidget(QWidget *parent):
     connect(ui->forceVideoTrafficEncryptionCheckBox, &QCheckBox::stateChanged, this,
         &QnAbstractPreferencesWidget::hasChangesChanged);
 
-    connect(ui->forceTrafficEncryptionCheckBox, SIGNAL(clicked(bool)),
-        this, SLOT(at_forceTrafficEncryptionCheckBoxClicked(bool)));
-    connect(ui->forceVideoTrafficEncryptionCheckBox, SIGNAL(clicked(bool)),
-        this, SLOT(at_forceVideoTrafficEncryptionCheckBoxClicked(bool)));
+    connect(ui->forceTrafficEncryptionCheckBox, &QCheckBox::clicked,
+        this, &QnSystemSettingsWidget::at_forceTrafficEncryptionCheckBoxClicked);
+    connect(ui->forceVideoTrafficEncryptionCheckBox, &QCheckBox::clicked,
+        this, &QnSystemSettingsWidget::at_forceVideoTrafficEncryptionCheckBoxClicked);
 
     retranslateUi();
 
@@ -74,14 +78,13 @@ void QnSystemSettingsWidget::retranslateUi()
 
 void QnSystemSettingsWidget::at_forceTrafficEncryptionCheckBoxClicked(bool value)
 {
-    if (value)
+    if (!value)
     {
         if (ui->forceVideoTrafficEncryptionCheckBox->isChecked())
             emit forceVideoTrafficEncryptionChanged(false);
         ui->forceVideoTrafficEncryptionCheckBox->setChecked(false);
     }
     ui->forceVideoTrafficEncryptionCheckBox->setEnabled(value);
-    emit forceVideoTrafficEncryptionChanged(ui->forceVideoTrafficEncryptionCheckBox->isChecked());
 }
 
 void QnSystemSettingsWidget::loadDataToUi()

@@ -169,10 +169,10 @@ namespace detail
         }
 
         //getCurrentTime
-        ErrorCode doQuery(const nullptr_t& /*dummy*/, ApiTimeData& currentTime);
+        ErrorCode doQuery(const std::nullptr_t& /*dummy*/, ApiTimeData& currentTime);
 
         //dumpDatabase
-        ErrorCode doQuery(const nullptr_t& /*dummy*/, nx::vms::api::DatabaseDumpData& data);
+        ErrorCode doQuery(const std::nullptr_t& /*dummy*/, nx::vms::api::DatabaseDumpData& data);
         ErrorCode doQuery(
             const nx::vms::api::StoredFilePath& path,
             nx::vms::api::DatabaseDumpToFileData& dumpFileSize);
@@ -229,7 +229,7 @@ namespace detail
         QnReadWriteLock& getMutex() { return m_mutex; }
 
         // ------------ data retrieval --------------------------------------
-        ErrorCode doQueryNoLock(nullptr_t /*dummy*/, nx::vms::api::ResourceParamDataList& data);
+        ErrorCode doQueryNoLock(std::nullptr_t /*dummy*/, nx::vms::api::ResourceParamDataList& data);
 
         //listDirectory
         ErrorCode doQueryNoLock(
@@ -245,7 +245,7 @@ namespace detail
             const nx::vms::api::StoredFilePath& path,
             nx::vms::api::StoredFileDataList& data);
 
-        ErrorCode doQueryNoLock(const nullptr_t&, nx::vms::api::StoredFileDataList& data)
+        ErrorCode doQueryNoLock(const std::nullptr_t&, nx::vms::api::StoredFileDataList& data)
         {
             return doQueryNoLock(nx::vms::api::StoredFilePath(), data);
         }
@@ -254,7 +254,7 @@ namespace detail
         ErrorCode doQueryNoLock(const QByteArray& /*dummy*/, ApiSystemMergeHistoryRecordList& systemMergeHistory);
         //getResourceTypes
         ErrorCode doQueryNoLock(
-            const nullptr_t& /*dummy*/,
+            const std::nullptr_t& /*dummy*/,
             nx::vms::api::ResourceTypeDataList& resourceTypeList);
 
         //getCameras
@@ -287,7 +287,7 @@ namespace detail
 
         //getCameraServerItems
         ErrorCode doQueryNoLock(
-            const nullptr_t& /*dummy*/,
+            const std::nullptr_t& /*dummy*/,
             nx::vms::api::ServerFootageDataList& historyList);
 
         //getUserList
@@ -297,10 +297,10 @@ namespace detail
         ErrorCode doQueryNoLock(const QnUuid& id, ApiUserRoleDataList& userRoleList);
 
         //getPredefinedRoles
-        ErrorCode doQueryNoLock(const nullptr_t& /*dummy*/, ApiPredefinedRoleDataList& rolesList);
+        ErrorCode doQueryNoLock(const std::nullptr_t& /*dummy*/, ApiPredefinedRoleDataList& rolesList);
 
         //getAccessRights
-        ErrorCode doQueryNoLock(const nullptr_t& /*dummy*/, ApiAccessRightsDataList& accessRightsList);
+        ErrorCode doQueryNoLock(const std::nullptr_t& /*dummy*/, ApiAccessRightsDataList& accessRightsList);
 
         //getVideowallList
         ErrorCode doQueryNoLock(const QnUuid& id, nx::vms::api::VideowallDataList& videowallList);
@@ -326,7 +326,7 @@ namespace detail
         ErrorCode readApiFullInfoDataForMobileClient(ApiFullInfoData* data, const QnUuid& userId);
 
         //getLicenses
-        ErrorCode doQueryNoLock(const nullptr_t& /*dummy*/, ApiLicenseDataList& data);
+        ErrorCode doQueryNoLock(const std::nullptr_t& /*dummy*/, ApiLicenseDataList& data);
 
         // ApiDiscoveryDataList
         ErrorCode doQueryNoLock(const QnUuid& id, ApiDiscoveryDataList& data);
@@ -859,7 +859,7 @@ public:
 
     ApiObjectType getObjectType(const QnUuid& objectId);
 
-    ErrorCode doQuery(nullptr_t /*dummy*/, ApiFullInfoData& data)
+    ErrorCode doQuery(std::nullptr_t /*dummy*/, ApiFullInfoData& data)
     {
         return readApiFullInfoDataComplete(&data);
     }

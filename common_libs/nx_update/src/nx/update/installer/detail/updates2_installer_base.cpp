@@ -3,7 +3,6 @@
 #include <utils/common/process.h>
 #include <nx/utils/raii_guard.h>
 #include <nx/utils/log/log.h>
-#include <nx/utils/literal.h>
 
 namespace nx {
 namespace update {
@@ -103,7 +102,7 @@ PrepareResult Updates2InstallerBase::checkContents(const QString& outputPath) co
         return PrepareResult::updateContentsError;
     }
 
-    m_version = infoMap.value(lit("version")).toString();
+    m_version = infoMap.value(QStringLiteral("version")).toString();
 
     return PrepareResult::ok;
 }
@@ -126,8 +125,8 @@ bool Updates2InstallerBase::install()
         QString argumentsStr(
             " APPSERVER_PASSWORD=\"\" APPSERVER_PASSWORD_CONFIRM=\"\" SERVER_PASSWORD=\"\"\
              SERVER_PASSWORD_CONFIRM=\"\"");
-        for (const QString& arg : arguments)
-            argumentsStr += lit(" ") + arg;
+        for (const QString& arg: arguments)
+            argumentsStr += " " + arg;
 
         NX_INFO(this, lm("Launching %1 %2").arg(m_executable).args(argumentsStr));
     }

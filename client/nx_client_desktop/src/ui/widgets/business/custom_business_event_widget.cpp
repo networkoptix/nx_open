@@ -8,6 +8,7 @@
 #include <core/resource/camera_resource.h>
 #include <core/resource/media_server_resource.h>
 #include <ui/help/help_topics.h>
+#include <ui/help/help_topic_accessor.h>
 #include <utils/common/scoped_value_rollback.h>
 
 namespace {
@@ -30,17 +31,17 @@ QnCustomBusinessEventWidget::QnCustomBusinessEventWidget(QWidget* parent):
 
     connect(ui->omitLogging, SIGNAL(toggled(bool)), this, SLOT(setOmitLogging(bool)));
 
-    ui->sourceLabel->addHintLine(tr("Event will trigger only if there are matches in caption with any of entered keywords."));
+    ui->sourceLabel->addHintLine(tr("Event will trigger only if there are matches in the source with any of the entered keywords."));
     ui->sourceLabel->addHintLine(tr("If the field is empty, event will always trigger."));
-    ui->sourceLabel->setHelpTopic(Qn::EventsActions_Generic_Help);
+    setHelpTopic(ui->sourceLabel, Qn::EventsActions_Generic_Help);
 
-    ui->captionLabel->addHintLine(tr("Event will trigger only if there are matches in caption with any of entered keywords."));
+    ui->captionLabel->addHintLine(tr("Event will trigger only if there are matches in the caption with any of the entered keywords."));
     ui->captionLabel->addHintLine(tr("If the field is empty, event will always trigger."));
-    ui->captionLabel->setHelpTopic(Qn::EventsActions_Generic_Help);
+    setHelpTopic(ui->captionLabel, Qn::EventsActions_Generic_Help);
 
-    ui->descriptionLabel->addHintLine(tr("Event will trigger only if there are matches in caption with any of entered keywords."));
+    ui->descriptionLabel->addHintLine(tr("Event will trigger only if there are matches in the description with any of the entered keywords."));
     ui->descriptionLabel->addHintLine(tr("If the field is empty, event will always trigger."));
-    ui->descriptionLabel->setHelpTopic(Qn::EventsActions_Generic_Help);
+    setHelpTopic(ui->descriptionLabel, Qn::EventsActions_Generic_Help);
 }
 
 QnCustomBusinessEventWidget::~QnCustomBusinessEventWidget()

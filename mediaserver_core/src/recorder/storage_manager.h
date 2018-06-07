@@ -267,6 +267,7 @@ private:
     void updateCameraHistory() const;
     static std::vector<QnUuid> getCamerasWithArchive();
     int64_t calculateNxOccupiedSpace(int storageIndex) const;
+    bool hasArchive(int storageIndex) const;
     QnStorageResourcePtr getStorageByIndex(int index) const;
     bool getSqlDbPath(const QnStorageResourcePtr &storage, QString &dbFolderPath) const;
     void startAuxTimerTasks();

@@ -72,7 +72,9 @@ class AbstractPeerManagerFactory
 {
 public:
     virtual ~AbstractPeerManagerFactory();
-    virtual AbstractPeerManager* createPeerManager(FileInformation::PeerSelectionPolicy peerPolicy) = 0;
+    virtual AbstractPeerManager* createPeerManager(
+        FileInformation::PeerSelectionPolicy peerPolicy,
+        const QList<QnUuid>& additionalPeers) = 0;
 };
 
 } // namespace downloader

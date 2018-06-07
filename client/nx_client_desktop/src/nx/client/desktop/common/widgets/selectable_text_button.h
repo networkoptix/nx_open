@@ -7,28 +7,51 @@ namespace nx {
 namespace client {
 namespace desktop {
 
-// A button that can be selected like a tab in a tabbar.
-// It also can be deactivatable and have a clickable [x] control which puts the button
-// into deactivated state with flat appearance and optionally different text and icon.
-// Clicking the button in either deactivated or unselected state puts it into selected state.
-//
-// Palette groups used in button states:
-//     deactivated and unselected: QPalette::Inactive
-//     selected: QPalette::Active
-//
-// QPalette::Disabled is never used; semi-opaque painting is used when the button is disabled.
-//
-// Icon modes and states used in button states:
-//     deactivated: QIcon::Off, QIcon::Normal or QIcon::Active (hovered)
-//     unselected: QIcon::Off, QIcon::Normal
-//     selected: QIcon::On, QIcon::Normal
-
+/**
+ * A button that can be selected like a tab in a tabbar.
+ * It also can be deactivatable and have a clickable [x] control which puts the button
+ * into deactivated state with flat appearance and optionally different text and icon.
+ * Clicking the button in either deactivated or unselected state puts it into selected state.
+ * Unselected state has optional accented appearance.
+ *
+ * Palette and icons used in button states:
+ *      deactivated: QPalette::Inactive, QIcon::Off
+ *          background: none
+ *          text (normal): QPalette::WindowText
+ *          text (hovered): QPalette::Text
+ *          icon (normal): QIcon::Normal
+ *          icon (hovered): QIcon::Active
+ *
+ *      unselected: QPalette::Inactive, QIcon::Off
+ *          background (normal, pressed): QPalette::Window
+ *          background (hovered): QPalette::Midlight
+ *          frame: none
+ *          text: QPalette::WindowText
+ *          icon: QIcon::Normal
+ *
+ *      unselected (accented): QPalette::Inactive, QIcon::Off
+ *          background (normal, pressed): QPalette::Highlight
+ *          background (hovered): QPalette::Light
+ *          frame: none
+ *          text: QPalette::HighlightedText
+ *          icon: QIcon::Selected
+ *
+ *      selected: QPalette::Active, QIcon::On
+ *          background: QPalette::Dark
+ *          frame: QPalette::Shadow
+ *          text: QPalette::WindowText
+ *          icon: QIcon::Normal
+ *
+ * QPalette::Disabled is never used; semi-opaque painting is used when the button is disabled.
+ *
+ */
 class SelectableTextButton: public QPushButton
 {
     Q_OBJECT
     Q_PROPERTY(State state READ state WRITE setState NOTIFY stateChanged)
     Q_PROPERTY(bool deactivatable READ deactivatable WRITE setDeactivatable)
     Q_PROPERTY(bool selectable READ selectable WRITE setSelectable)
+    Q_PROPERTY(bool accented READ accented WRITE setAccented)
     Q_PROPERTY(QString deactivatedText READ deactivatedText WRITE setDeactivatedText)
 
     using base_type = QPushButton;
@@ -47,11 +70,17 @@ public:
     State state() const;
     void setState(State value);
 
+    // Whether selected state is allowed.
     bool selectable() const;
     void setSelectable(bool value);
 
+    // Whether deactivated state is allowed.
     bool deactivatable() const;
     void setDeactivatable(bool value);
+
+    // Alternative highlighted appearance for unselected state.
+    bool accented() const;
+    void setAccented(bool accented);
 
     void deactivate(); //< Helper slot. Equivalent to setState(State::deactivated).
 
@@ -84,9 +113,6 @@ signals:
 protected:
     virtual void paintEvent(QPaintEvent* event) override;
     virtual bool event(QEvent* event) override;
-
-private:
-    void updateDeactivateButtonPalette();
 
 private:
     struct Private;

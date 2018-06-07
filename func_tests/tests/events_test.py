@@ -1,6 +1,7 @@
 import logging
+import pytest
 
-log = logging.getLogger(__name__)
+_logger = logging.getLogger(__name__)
 
 
 # storing only those event fields which should not change
@@ -30,23 +31,24 @@ class Rule(object):
 
 
 # https://networkoptix.atlassian.net/browse/UT-46
-# https://networkoptix.atlassian.net/wiki/spaces/SD/pages/85204446/Cloud+test
-def test_events_reset(running_linux_mediaserver):
-    rule_dict_list = running_linux_mediaserver.api.ec2.getEventRules.GET()
-    log.info('Initially server has %d event rules:', len(rule_dict_list))
+# https://networkoptix.atlassian.net/wiki/spaces/SD/pages/104103937/Event+tests
+@pytest.mark.timeout(300)
+def test_events_reset(one_running_mediaserver):
+    rule_dict_list = one_running_mediaserver.api.ec2.getEventRules.GET()
+    _logger.info('Initially server has %d event rules:', len(rule_dict_list))
     initial_rule_list = {
         rule.id: rule for rule in map(Rule.from_dict, rule_dict_list)}
     for rule in initial_rule_list:
-        log.info('\t%s' % rule)
-    log.info('Resetting rules...')
-    running_linux_mediaserver.api.ec2.resetEventRules.POST(json={})
-    rule_dict_list = running_linux_mediaserver.api.ec2.getEventRules.GET()
-    log.info('After reset server has %d event rules:', len(rule_dict_list))
+        _logger.info('\t%s' % rule)
+    _logger.info('Resetting rules...')
+    one_running_mediaserver.api.ec2.resetEventRules.POST(json={})
+    rule_dict_list = one_running_mediaserver.api.ec2.getEventRules.GET()
+    _logger.info('After reset server has %d event rules:', len(rule_dict_list))
     final_rule_list = {
         rule.id: rule for rule in map(Rule.from_dict, rule_dict_list)}
     for rule in final_rule_list:
-        log.info('\t%s' % rule)
+        _logger.info('\t%s' % rule)
     assert sorted(initial_rule_list.keys()) == sorted(final_rule_list)
     for id, initial_rule in initial_rule_list.items():
         assert final_rule_list[id] == initial_rule
-    assert not running_linux_mediaserver.installation.list_core_dumps()
+    assert not one_running_mediaserver.installation.list_core_dumps()

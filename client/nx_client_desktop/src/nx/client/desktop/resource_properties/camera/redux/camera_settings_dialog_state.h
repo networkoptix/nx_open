@@ -3,6 +3,7 @@
 #include <QtCore/QList>
 
 #include <api/model/api_ioport_data.h>
+#include <common/common_globals.h>
 #include <core/ptz/media_dewarping_params.h>
 #include <core/resource/device_dependent_strings.h>
 #include <core/resource/media_stream_capability.h>
@@ -12,6 +13,7 @@
 
 #include <nx/client/desktop/common/data/rotation.h>
 #include <nx/client/desktop/resource_properties/camera/utils/schedule_cell_params.h>
+#include <nx/client/desktop/utils/wearable_state.h>
 #include <nx/utils/std/optional.h>
 #include <nx/vms/api/data/camera_attributes_data.h>
 #include <nx/vms/api/types_fwd.h>
@@ -28,7 +30,7 @@ struct CameraSettingsDialogState
         T get() const { return m_user.value_or(m_base); }
         void setUser(T value) { m_user = value; }
         void setBase(T value) { m_base = value; }
-        void resetUser() { m_user.reset(); }
+        void resetUser() { m_user = {}; }
 
         T operator()() const { return get(); }
 
@@ -51,10 +53,11 @@ struct CameraSettingsDialogState
         T valueOr(T value) const { return m_user.value_or(m_base.value_or(value)); }
         void setUser(T value) { m_user = value; }
         void setBase(T value) { m_base = value; }
-        void resetUser() { m_user.reset(); }
-        void resetBase() { m_base.reset(); }
+        void resetUser() { m_user = {}; }
+        void resetBase() { m_base = {}; }
 
         T operator()() const { return get(); }
+        operator std::optional<T>() const { return m_user ? m_user : m_base; }
 
     private:
         std::optional<T> m_base;
@@ -110,8 +113,8 @@ struct CameraSettingsDialogState
 
     bool hasChanges = false;
     bool readOnly = true;
-    bool panicMode = false;
     bool settingsOptimizationEnabled = false;
+    Qn::GlobalPermissions globalPermissions = Qn::NoGlobalPermissions;
 
     // Generic cameras info.
 
@@ -135,6 +138,7 @@ struct CameraSettingsDialogState
         QString macAddress;
         QString ipAddress;
         QString webPage;
+        QString settingsUrlPath;
         std::optional<QString> primaryStream;
         std::optional<QString> secondaryStream;
         bool hasVideo = true;
@@ -144,6 +148,9 @@ struct CameraSettingsDialogState
         std::optional<MotionConstraints> motionConstraints;
     };
     SingleCameraProperties singleCameraProperties;
+
+    WearableState singleWearableState;
+    QString wearableUploaderName; //< Name of user currently uploading footage to wearable camera.
 
     struct FisheyeCalibrationSettings
     {
@@ -203,6 +210,13 @@ struct CameraSettingsDialogState
         int maxDualStreamingFps = 0;
     };
     CombinedProperties devicesDescription;
+
+    struct Credentials
+    {
+        UserEditableMultiple<QString> login;
+        UserEditableMultiple<QString> password;
+    };
+    Credentials credentials;
 
     struct ExpertSettings
     {
@@ -278,6 +292,8 @@ struct CameraSettingsDialogState
     };
     RecordingSettings recording;
 
+    UserEditableMultiple<bool> audioEnabled;
+
     std::optional<Alert> alert;
 
     struct ImageControlSettings
@@ -289,9 +305,21 @@ struct CameraSettingsDialogState
     };
     ImageControlSettings imageControl;
 
+    struct WearableCameraMotionDetection
+    {
+        UserEditableMultiple<bool> enabled;
+        UserEditableMultiple<int> sensitivity;
+    };
+    WearableCameraMotionDetection wearableMotion;
+
     // Helper methods.
 
     bool isSingleCamera() const { return devicesCount == 1; }
+
+    bool isSingleWearableCamera() const
+    {
+        return isSingleCamera() && devicesDescription.isWearable == CombinedValue::All;
+    }
 
     int maxRecordingBrushFps() const
     {
@@ -327,6 +355,7 @@ struct CameraSettingsDialogState
         params.radius = calibration.radius;
         params.hStretch = calibration.aspectRatio;
         params.fovRot = singleCameraSettings.fisheyeFovRotation();
+        params.viewMode = singleCameraSettings.fisheyeMountingType();
         return params;
     }
 };

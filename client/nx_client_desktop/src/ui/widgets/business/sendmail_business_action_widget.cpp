@@ -1,6 +1,8 @@
 #include "sendmail_business_action_widget.h"
 #include "ui_sendmail_business_action_widget.h"
 
+#include <QtWidgets/QAction>
+
 #include <nx/vms/event/action_parameters.h>
 
 #include <nx/client/desktop/ui/actions/action_manager.h>

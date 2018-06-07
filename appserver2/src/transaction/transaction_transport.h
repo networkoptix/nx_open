@@ -5,6 +5,7 @@
 #include <transaction/ubjson_transaction_serializer.h>
 #include <transaction/transaction_transport_header.h>
 
+#include "transaction_descriptor.h"
 #include "transaction_transport_base.h"
 #include "transaction_message_bus_base.h"
 

@@ -355,7 +355,7 @@ private:
     void resetTriggers();
 
     void updateTriggersAvailability();
-    void updateTriggerAvailability(const nx::vms::event::RulePtr& rule, bool force=false);
+    void updateTriggerAvailability(const nx::vms::event::RulePtr& rule);
     void updateTriggerButtonTooltip(
         QnSoftwareTriggerButton* button,
         const SoftwareTriggerInfo& info,

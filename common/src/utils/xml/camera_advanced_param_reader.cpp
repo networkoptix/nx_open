@@ -58,6 +58,20 @@ namespace {
     };
 
     const QString advancedParametersKey(Qn::CAMERA_ADVANCED_PARAMETERS);
+
+    QStringList splitAndTrim(const QString& str, const QChar& separator)
+    {
+        QStringList result;
+        const auto values = str.split(separator);
+
+        for (const auto& value: values)
+        {
+            const auto trimmed = value.trimmed();
+            if (!trimmed.isEmpty())
+                result.push_back(trimmed);
+        }
+        return result;
+    }
 }
 
 QnCameraAdvancedParams QnCameraAdvancedParamsReader::paramsFromResource(const QnResourcePtr &resource) {
@@ -176,7 +190,7 @@ namespace QnXmlTag {
     const QString paramUnit             = lit("unit");
     const QString paramResync           = lit("resync");
     const QString paramDefaultValue     = lit("defaultValue");
-    const QString paramShouldKeepInitialValue = lit("shouldKeepInitialValue");
+    const QString paramShouldKeepInitialValue = lit("keepInitialValue");
     const QString paramBindDefaultToMinimum = lit("bindDefaultToMinimum");
     const QString parameterGroup = lit("group");
 
@@ -285,7 +299,7 @@ bool QnCameraAdvacedParamsXmlParser::parseElementXml(const QDomElement& elementX
     param.notes = elementXml.attribute(QnXmlTag::paramNotes);
     param.unit = elementXml.attribute(QnXmlTag::paramUnit);
     param.resync = parseBooleanXmlValue(elementXml.attribute(QnXmlTag::paramResync));
-    param.shouldKeepInitialValue = parseBooleanXmlValue(
+    param.keepInitialValue = parseBooleanXmlValue(
         elementXml.attribute(QnXmlTag::paramShouldKeepInitialValue));
 
     param.bindDefaultToMinimum = parseBooleanXmlValue(
@@ -362,6 +376,10 @@ bool QnCameraAdvacedParamsXmlParser::parseDependenciesXml(
             dependency.type = QnCameraAdvancedParameterDependency::DependencyType::range;
             dependency.range = depNode.attribute(QnXmlTag::paramRange);
             dependency.internalRange = depNode.attribute(QnXmlTag::paramInternalRange);
+            dependency.valuesToAddToRange
+                = splitAndTrim(depNode.attribute(lit("add-values-to-range")), L',');
+            dependency.valuesToRemoveFromRange
+                = splitAndTrim(depNode.attribute(lit("remove-values-from-range")), L',');
         }
         else if (depNode.nodeName() == QnXmlTag::conditionalTrigger)
         {

@@ -95,7 +95,7 @@
                         writeCmd="update"
                         unit="Kbit/s"
                         aux="range=media/videoprofile/add_update/Bitrate;profile=primary;resourceProperty=primaryStreamBitrate;specific=true;deviceTypes=nvr"
-                        shouldKeepInitialValue="true"
+                        keepInitialValue="true"
                         bindDefaultToMinimum="true">
                 </param>
                 <!-- NVR only properties -->
@@ -323,7 +323,7 @@
                         writeCmd="update"
                         unit="Kbit/s"
                         aux="range=media/videoprofile/add_update/Bitrate;profile=secondary;resourceProperty=secondaryStreamBitrate;specific=true"
-                        shouldKeepInitialValue="true"
+                        keepInitialValue="true"
                         bindDefaultToMinimum="true">
                 </param>
 
@@ -523,6 +523,26 @@
             </group>
         </group>
         <group name="Image">
+            <group name="AGC">
+                <param id="image/camera/AGCMode"
+                        name="AGC Mode"
+                        dataType="Enumeration"
+                        aux="groupLead=agc"/>
+                <param id="image/camera/AGCLevel"
+                        name="AGC Level"
+                        dataType="Number"
+                        aux="group=agc;groupInclude=Manual">
+                    <dependencies>
+                        <dependencies-show>
+                            <conditional-show>
+                                <condition
+                                    watch="image/camera/AGCMode"
+                                    condition="value=Manual"/>
+                            </conditional-show>
+                        </dependencies-show>
+                    </dependencies>
+                </param>
+            </group>
             <group name="SSDR">
                 <param id="image/ssdr/Enable"
                         name="SSDR Enabled"
@@ -838,16 +858,27 @@
                         </dependencies-show>
                     </dependencies>
                 </param>
-                <param id="image/camera/AGCMode"
-                        name="AGC"
-                        dataType="Enumeration"
-                        range="Off,Low,Middle,High"/>
             </group>
             <group name="Day/Night">
                 <param id="image/camera/DayNightMode"
                         name="Mode"
                         dataType="Enumeration"
-                        aux="groupLead=dn"/>
+                        aux="groupLead=dn">
+                        <dependencies>
+                            <dependencies-ranges>
+                                <conditional-range id="dnRemoveAutoFromRange" remove-values-from-range="Auto">
+                                    <condition
+                                        watch="image/camera/AGCMode"
+                                        condition="value=Off"/>
+                                </conditional-range>
+                                <conditional-range id="dnAddAutoFromRange" add-values-to-range="Auto">
+                                    <condition
+                                        watch="image/camera/AGCMode"
+                                        condition="valueNe=Off"/>
+                                </conditional-range>
+                            </dependencies-ranges>
+                        </dependencies>
+                </param>
                 <param id="image/camera/DayNightSwitchingMode"
                         name="Duration"
                         dataType="Enumeration"
@@ -929,6 +960,29 @@
                         dataType="Enumeration"/>
             </group>
         </group>
+        <group name="Lens Control">
+            <param id="image/lens_control/focus"
+                name="Zoom"
+                description="Zoom adjustment"
+                dataType="SliderControl"
+                range="-1,1"
+                compact="true"
+                aux="ptzTraits=AlternativeZoomTrait"/>
+            <param id="image/lens_control/ptr"
+                name=""
+                description="PTR adjustment"
+                dataType="PtrControl"
+                range="-1,1,-1,1,-1,1"
+                compact="true"
+                aux="ptzTraits=AlternativePanTrait,AlternativeTiltTrait,AlternativeRotateTrait"/>
+            <param id="image/lens_control/zoom"
+                name="Focus"
+                description="Focus adjustment"
+                dataType="SliderControl"
+                range="-1,1"
+                compact="true"
+                aux="ptzTraits=AlternativeFocusTrait"/>
+        </group>
         <group name="Maintenance">
             <param id="image/focus/Mode=SimpleFocus"
                     name="Simple Focus"
@@ -940,8 +994,7 @@
                     name="Initialize Focus"
                     dataType="Button"
                     writeCmd="control"
-                    description="Restores the focus adjustment to the default flange back position"
-                    aux="support=Image/ResetFocus"/>
+                    description="Restores the focus adjustment to the default flange back position"/>
             <param id="image/focus/Mode=AutoFocus"
                     name="Simple Focus"
                     dataType="Button"
@@ -979,7 +1032,7 @@
                     confirmation="Are you sure you want to reset all settings (except network) to default?"
                     description="Resets all camera parameters to defaults except for network settings"
                     aux="noChannel=true"/>
-            <param id="system/factoryreset/ExcludeSettings=None"
+            <param id="system/factoryreset"
                     name="Reset to Factory Defaults"
                     dataType="Button"
                     writeCmd="control"

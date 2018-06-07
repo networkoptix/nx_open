@@ -145,6 +145,7 @@ namespace Qn
 
         /* Arguments. */
         ActionIdRole,
+        LayoutNameRole,                             /**< Role for layout delayed drop */
         SerializedDataRole,
         ConnectionInfoRole,
         FocusElementRole,
@@ -454,3 +455,5 @@ QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
     (Qn::LightModeFlags),
     (metatype)(numeric)
     )
+
+QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES((Qn::ThumbnailStatus), (lexical))

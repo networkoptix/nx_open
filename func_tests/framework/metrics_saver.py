@@ -1,7 +1,7 @@
 import datetime
 import logging
 
-log = logging.getLogger(__name__)
+_logger = logging.getLogger(__name__)
 
 
 class MetricsSaver(object):
@@ -12,7 +12,7 @@ class MetricsSaver(object):
 
     def save(self, metric_name, metric_value):
         metric_value_str = self._value2str(metric_value)
-        log.info('Metric: %s = %r / %r', metric_name, metric_value, metric_value_str)
+        _logger.info('Metric: %s = %r / %r', metric_name, metric_value, metric_value_str)
         if self._db_capture_repository:
             self._db_capture_repository.add_metric_with_session(
                 self._current_test_run, metric_name, metric_value_str)

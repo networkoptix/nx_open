@@ -31,8 +31,8 @@ int DeviceSearcherDefaultSettings::cacheTimeout() const
 
 static DeviceSearcher* UPNPDeviceSearcherInstance = nullptr;
 
-const QString DeviceSearcher::DEFAULT_DEVICE_TYPE = lit("%1 Server")
-.arg(nx::utils::AppInfo::organizationName());
+const QString DeviceSearcher::DEFAULT_DEVICE_TYPE =
+    nx::utils::AppInfo::organizationName() + "Server";
 
 DeviceSearcher::DeviceSearcher(
     const AbstractDeviceSearcherSettings& settings,
@@ -322,11 +322,11 @@ void DeviceSearcher::dispatchDiscoverPackets()
                         handler.first : DEFAULT_DEVICE_TYPE;
 
                 QByteArray data;
-                data.append( lit("M-SEARCH * HTTP/1.1\r\n") );
-                data.append( lit("Host: %1\r\n").arg( sock->getLocalAddress().toString() ) );
-                data.append( lit("ST:%1\r\n").arg( toUpnpUrn(deviceType, lit("device")) ) );
-                data.append( lit("Man:\"ssdp:discover\"\r\n") );
-                data.append( lit("MX:3\r\n\r\n") );
+                data.append("M-SEARCH * HTTP/1.1\r\n");
+                data.append("Host: " + sock->getLocalAddress().toString() + "\r\n");
+                data.append("ST:" + toUpnpUrn(deviceType, "device") + "\r\n");
+                data.append("Man:\"sdp:discover\"\r\n");
+                data.append("MX:3\r\n\r\n" );
                 sock->sendTo(data.data(), data.size(), groupAddress.toString(), GROUP_PORT);
             }
         }

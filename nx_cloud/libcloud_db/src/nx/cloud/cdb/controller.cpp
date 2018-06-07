@@ -14,6 +14,7 @@ namespace cdb {
 static const QnUuid kCdbGuid("{674bafd7-4eec-4bba-84aa-a1baea7fc6db}");
 
 Controller::Controller(const conf::Settings& settings):
+    m_settings(settings),
     m_dbInstanceController(settings.dbConnectionOptions()),
     m_emailManager(EMailManagerFactory::create(settings)),
     m_streeManager(settings.auth().rulesXmlPath),
@@ -205,6 +206,7 @@ void Controller::initializeSecurity()
     authDataProviders.push_back(&m_accountManager);
     authDataProviders.push_back(&m_systemManager);
     m_authenticationManager = std::make_unique<AuthenticationManager>(
+        m_settings,
         std::move(authDataProviders),
         *m_authRestrictionList,
         m_streeManager);

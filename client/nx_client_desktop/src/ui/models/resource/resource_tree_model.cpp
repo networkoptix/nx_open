@@ -963,6 +963,16 @@ void QnResourceTreeModel::at_resPool_resourceAdded(const QnResourcePtr& resource
             &QnResourceTreeModel::at_server_redundancyChanged);
     }
 
+    if (const auto webPage = resource.dynamicCast<QnWebPageResource>())
+    {
+        connect(webPage, &QnWebPageResource::subtypeChanged, this,
+            [this](const QnWebPageResourcePtr& webPage)
+            {
+                for (auto node: m_nodesByResource.value(webPage))
+                    node->updateIcon();
+            });
+    }
+
     auto node = ensureResourceNode(resource);
     updateNodeParent(node);
 
@@ -990,7 +1000,7 @@ void QnResourceTreeModel::at_resPool_resourceRemoved(const QnResourcePtr& resour
     if (!resource)
         return;
 
-    disconnect(resource, NULL, this, NULL);
+    resource->disconnect(this);
 
     QList<QnResourceTreeModelNodePtr> nodesToDelete;
     for (auto node: m_allNodes)

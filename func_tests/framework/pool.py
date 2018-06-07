@@ -1,8 +1,9 @@
 """Pool -- containers with .get(key) method with additional functionality via decorator pattern"""
 # TODO: Come up with better name.
 import logging
+from multiprocessing.pool import ThreadPool
 
-logger = logging.getLogger(__name__)
+_logger = logging.getLogger(__name__)
 
 
 class CachingPool(object):
@@ -15,7 +16,7 @@ class CachingPool(object):
     def get(self, key):
         try:
             cached_value = self._cache[key]
-            logger.info("From cache: %r.", cached_value)
+            _logger.info("From cache: %r.", cached_value)
             return cached_value
         except KeyError:
             self._cache[key] = new_value = self._pool.get(key)
@@ -52,7 +53,7 @@ class ClosingPool(object):  # TODO: Consider renaming to ResourcePool or similar
         assert self._entered
         while self._entered_allocations:
             resource, allocation = self._entered_allocations.pop()
-            logger.info("Dispose: %r.", resource)
+            _logger.info("Dispose: %r.", resource)
             allocation.__exit__(None, None, None)
         self._entered = False
 
@@ -64,5 +65,10 @@ class ClosingPool(object):  # TODO: Consider renaming to ResourcePool or similar
         allocation = self._allocate(key, self._second_args.get(key, self._default_second_arg))
         resource = allocation.__enter__()
         self._entered_allocations.append((resource, allocation))
-        logger.info("Remember to dispose: %r.", resource)
+        _logger.info("Remember to dispose: %r.", resource)
         return resource
+
+    def get_many(self, keys, parallel_jobs=10):
+        thread_pools = ThreadPool(processes=parallel_jobs)
+        resources = thread_pools.map_async(self.get, keys).get()
+        return resources

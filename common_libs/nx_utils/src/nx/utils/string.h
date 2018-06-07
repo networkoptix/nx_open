@@ -80,7 +80,8 @@ NX_UTILS_API QString generateUniqueString(const QStringList &usedStrings, const 
 
 NX_UTILS_API void trimInPlace( QString* const str, const QString& symbols = QLatin1String(" ") );
 
-NX_UTILS_API QString elideString(const QString &source, int maxLength, const QString &tail = lit("..."));
+NX_UTILS_API QString elideString(
+    const QString& source, int maxLength, const QString& tail = QLatin1String("..."));
 
 //!Generates random string containing only letters and digits
 NX_UTILS_API QByteArray generateRandomName(int length);

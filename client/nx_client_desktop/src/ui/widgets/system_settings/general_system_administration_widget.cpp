@@ -2,6 +2,7 @@
 #include "ui_general_system_administration_widget.h"
 
 #include <QtWidgets/QPushButton>
+#include <QtWidgets/QAction>
 
 #include <api/runtime_info_manager.h>
 
@@ -133,7 +134,7 @@ QnGeneralSystemAdministrationWidget::QnGeneralSystemAdministrationWidget(QWidget
     auto backupHint = nx::client::desktop::HintButton::hintThat(ui->backupGroupBox);
     backupHint->addHintLine(tr("Creates a backup of System configuration that can be restored in case of failure."));
     backupHint->addHintLine(tr("Backup includes servers and cameras settings, users, webpages, event rules, etc. Video is not saved."));
-    backupHint->setHelpTopic(Qn::SystemSettings_Server_Backup_Help);
+    setHelpTopic(backupHint, Qn::SystemSettings_Server_Backup_Help);
 
     connect(m_buttons[kBusinessRulesButton], &QPushButton::clicked, this,
         [this] { menu()->trigger(ui::action::OpenBusinessRulesAction); });
@@ -156,8 +157,8 @@ QnGeneralSystemAdministrationWidget::QnGeneralSystemAdministrationWidget(QWidget
     connect(ui->systemSettingsWidget, &QnAbstractPreferencesWidget::hasChangesChanged,
         this, &QnAbstractPreferencesWidget::hasChangesChanged);
 
-    connect(ui->systemSettingsWidget, SIGNAL(forceVideoTrafficEncryptionChanged(bool)),
-        this, SLOT(at_setVideoTrafficEncryptionWarning(bool)));
+    connect(ui->systemSettingsWidget, &QnSystemSettingsWidget::forceVideoTrafficEncryptionChanged,
+        ui->forceVideoEncryptionWarning, &QWidget::setVisible);
 }
 
 void QnGeneralSystemAdministrationWidget::loadDataToUi()
@@ -238,10 +239,4 @@ void QnGeneralSystemAdministrationWidget::setReadOnlyInternal(bool readOnly)
 {
     ::setReadOnly(ui->systemSettingsWidget, readOnly);
     ::setReadOnly(ui->backupWidget, readOnly);
-}
-
-void QnGeneralSystemAdministrationWidget::at_setVideoTrafficEncryptionWarning(
-    bool checkboxChecked)
-{
-    ui->forceVideoEncryptionWarning->setVisible(checkboxChecked);
 }

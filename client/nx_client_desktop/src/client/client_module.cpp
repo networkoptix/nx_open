@@ -452,8 +452,7 @@ void QnClientModule::initSingletons(const QnStartupParameters& startupParams)
 
     commonModule->store(new QnQtbugWorkaround());
 
-    const QString vmsGatewayLogFile = lit("vms_gateway") + calculateLogNameSuffix(startupParams);
-    commonModule->store(new nx::cloud::gateway::VmsGatewayEmbeddable(true, {}, vmsGatewayLogFile));
+    commonModule->store(new nx::cloud::gateway::VmsGatewayEmbeddable(true));
 
     m_cameraDataManager = commonModule->store(new QnCameraDataManager(commonModule));
 
@@ -537,6 +536,9 @@ void QnClientModule::initLog(const QnStartupParameters& startupParams)
 
     if (logLevel.isEmpty())
         logLevel = qnSettings->logLevel();
+
+    if (ec2TranLogLevel.isEmpty())
+        ec2TranLogLevel = qnSettings->ec2TranLogLevel();
 
     nx::utils::log::Settings logSettings;
     logSettings.maxBackupCount = qnSettings->rawSettings()->value(lit("logArchiveSize"), 10).toUInt();

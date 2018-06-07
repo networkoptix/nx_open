@@ -78,14 +78,12 @@ void CameraAdvancedParamWidgetsManager::displayParams(const QnCameraAdvancedPara
 
 void CameraAdvancedParamWidgetsManager::loadValues(const QnCameraAdvancedParamValueList& params)
 {
-    QMap<QString, QString> valuesToKeep;
-
     // Disconnect all watches to not trigger handler chains.
-    for (auto& connection : m_handlerChainConnections)
-        disconnect(connection);
+    m_handlerChainConnections = QnDisconnectHelper::create();
 
     // Set widget values and store initial values that should be kept.
-    for (const QnCameraAdvancedParamValue &param: params)
+    QMap<QString, QString> valuesToKeep;
+    for (const auto& param: params)
     {
         if (!m_paramWidgetsById.contains(param.id))
             continue;
@@ -94,21 +92,21 @@ void CameraAdvancedParamWidgetsManager::loadValues(const QnCameraAdvancedParamVa
         widget->setValue(param.value);
         widget->setEnabled(true);
 
-        if (m_parametersById[param.id].shouldKeepInitialValue)
+        if (m_parametersById[param.id].keepInitialValue)
             valuesToKeep[param.id] = param.value;
     }
 
     runAllHandlerChains();
 
     // Connect handler chains to watched values.
-    m_handlerChainConnections.clear();
-    for (const auto& watch : m_handlerChains.keys())
+    for (auto itr = m_handlerChains.cbegin(); itr != m_handlerChains.cend(); ++itr)
     {
-        const auto& handlerChains = m_handlerChains.value(watch);
-        for (auto& func : handlerChains)
+        const auto& watch = itr.key();
+        const auto& handlerChains = itr.value();
+        for (auto& func: handlerChains)
         {
             auto watchWidget = m_paramWidgetsById[watch];
-            m_handlerChainConnections.push_back(
+            m_handlerChainConnections->add(
                 connect(
                     watchWidget,
                     &AbstractCameraAdvancedParamWidget::valueChanged,
@@ -117,7 +115,7 @@ void CameraAdvancedParamWidgetsManager::loadValues(const QnCameraAdvancedParamVa
     }
 
     // Restore initial values for some widgets.
-    for (const auto& paramId : valuesToKeep.keys())
+    for (const auto& paramId: valuesToKeep.keys())
     {
         auto widget = m_paramWidgetsById.value(paramId);
         if (!widget)
@@ -126,7 +124,7 @@ void CameraAdvancedParamWidgetsManager::loadValues(const QnCameraAdvancedParamVa
         widget->setValue(valuesToKeep[paramId]);
     }
 
-    for (const QnCameraAdvancedParamValue &param : params)
+    for (const auto& param: params)
     {
         auto widget = m_paramWidgetsById[param.id];
         disconnect(
@@ -143,11 +141,11 @@ void CameraAdvancedParamWidgetsManager::loadValues(const QnCameraAdvancedParamVa
     }
 }
 
-boost::optional<QString> CameraAdvancedParamWidgetsManager::parameterValue(
+std::optional<QString> CameraAdvancedParamWidgetsManager::parameterValue(
     const QString & parameterId) const
 {
     if (!m_paramWidgetsById.contains(parameterId))
-        return boost::none;
+        return std::nullopt;
 
     return m_paramWidgetsById[parameterId]->value();
 }
@@ -240,7 +238,7 @@ QWidget* CameraAdvancedParamWidgetsManager::createWidgetsForPage(
     auto gridLayout = new QGridLayout(scrollAreaWidgetContents);
     scrollArea->setWidget(scrollAreaWidgetContents);
 
-    // Container for a group of 'compact' widgets
+    // Container for a group of 'compact' widgets.
     QHBoxLayout* compactLayout = nullptr;
     auto checkFinishGroup = [&compactLayout]()
         {
@@ -271,14 +269,14 @@ QWidget* CameraAdvancedParamWidgetsManager::createWidgetsForPage(
         {
             if (!compactLayout)
             {
-                // Creating container for compact controls
+                // Creating container for compact controls.
                 compactLayout = new QHBoxLayout(m_contentsWidget);
                 compactLayout->addWidget(widget, 0, Qt::AlignRight);
                 gridLayout->addLayout(compactLayout, row, 0, 1, 2, Qt::AlignVCenter);
             }
             else
             {
-                // Adding a widget to existing contaner for compact control group
+                // Adding a widget to existing contaner for compact control group.
                 compactLayout->addWidget(widget, 0, Qt::AlignRight);
             }
         }
@@ -307,7 +305,7 @@ QWidget* CameraAdvancedParamWidgetsManager::createWidgetsForPage(
 
         m_paramWidgetsById[param.id] = widget;
 
-        /* Widget is disabled until it receives correct value. */
+        // Widget is disabled until it receives correct value.
         if (QnCameraAdvancedParameter::dataTypeHasValue(param.dataType))
         {
             widget->setEnabled(false);
@@ -365,9 +363,8 @@ void CameraAdvancedParamWidgetsManager::setUpDependenciesForPage(
 void CameraAdvancedParamWidgetsManager::runAllHandlerChains()
 {
     // Run handler chains.
-    for (const auto& watch: m_handlerChains.keys())
+    for (const auto& handlerChains: m_handlerChains)
     {
-        const auto& handlerChains = m_handlerChains.value(watch);
         for (auto& func: handlerChains)
             func();
     }
@@ -416,24 +413,54 @@ CameraAdvancedParamWidgetsManager::DependencyHandler
                 if (!allConditionsSatisfied)
                     return false;
 
-                widget->setRange(dependency.range);
-                if (parameter.bindDefaultToMinimum)
+                if (!dependency.valuesToAddToRange.isEmpty())
                 {
-                    const auto minMax = dependency.range.split(L',');
-                    if (!minMax.isEmpty())
-                        widget->setValue(minMax.first().trimmed());
+                    auto range = widget->range();
+                    for (const auto& valueToAdd: dependency.valuesToAddToRange)
+                    {
+                        if (!range.contains(valueToAdd))
+                            range.push_back(valueToAdd);
+                    }
+
+                    widget->setRange(range.join(L','));
                 }
 
-                auto label = dynamic_cast<QLabel*>(m_paramLabelsById[paramId]);
-                if (!label)
-                    return false;
+                if (!dependency.valuesToRemoveFromRange.isEmpty())
+                {
+                    QStringList result;
+                    const auto range = widget->range();
+                    for (const auto& value: range)
+                    {
+                        if (!dependency.valuesToRemoveFromRange.contains(value))
+                            result.push_back(value);
+                    }
 
-                setLabelText(label, parameter, dependency.range);
+                    widget->setRange(result.join(L','));
+                }
+
+                if (!dependency.range.isEmpty())
+                {
+                    NX_ASSERT(dependency.valuesToAddToRange.isEmpty()
+                        && dependency.valuesToRemoveFromRange.isEmpty());
+
+                    widget->setRange(dependency.range);
+                    if (parameter.bindDefaultToMinimum)
+                    {
+                        const auto minMax = dependency.range.split(L',');
+                        if (!minMax.isEmpty())
+                            widget->setValue(minMax.first().trimmed());
+                    }
+
+                    auto label = dynamic_cast<QLabel*>(m_paramLabelsById[paramId]);
+                    if (!label)
+                        return false;
+
+                    setLabelText(label, parameter, dependency.range);
+                }
             }
             else if (dependency.type == DependencyType::trigger)
             {
-                return false;
-                //< Do nothing. All work will be done by other handlers
+                return false; //< Do nothing. All work will be done by other handlers
             }
 
             return allConditionsSatisfied;

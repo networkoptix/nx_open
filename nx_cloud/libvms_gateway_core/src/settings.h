@@ -4,8 +4,9 @@
 #include <list>
 #include <map>
 
-#include <nx/network/socket_common.h>
 #include <nx/network/abstract_socket.h>
+#include <nx/network/http/server/proxy/proxy_handler.h>
+#include <nx/network/socket_common.h>
 #include <nx/utils/basic_service_settings.h>
 #include <nx/utils/log/log_initializer.h>
 #include <nx/utils/log/log_settings.h>
@@ -62,13 +63,6 @@ public:
     Proxy();
 };
 
-enum class SslMode
-{
-    followIncomingConnection,
-    enabled,
-    disabled,
-};
-
 struct TcpReverseOptions
 {
     uint16_t port = 0;
@@ -85,7 +79,8 @@ public:
     QString fetchPublicIpUrl;
     QString publicIpAddress;
     TcpReverseOptions tcpReverse;
-    SslMode preferedSslMode = SslMode::followIncomingConnection;
+    nx::network::http::server::proxy::SslMode preferedSslMode =
+        nx::network::http::server::proxy::SslMode::followIncomingConnection;
 };
 
 /**

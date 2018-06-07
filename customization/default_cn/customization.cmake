@@ -22,7 +22,7 @@ set(cloudName "Nx Cloud")
 set(companyUrl "http://networkoptix.com")
 set(productUrl "http://networkoptix.com/nxwitness-overview")
 set(supportUrl "http://support.networkoptix.com")
-set(supportEmail "support@networkoptix.com")
+set(supportEmail "")
 set(supportPhone "")
 set(licenseEmail "support@networkoptix.com")
 
@@ -50,7 +50,7 @@ set(freeLicenseCount "4")
 set(freeLicenseKey "0000-0000-0000-0020")
 
 # Installer Customizations
-set(installer.language "zh_TW")
+set(installerLanguage "zh_TW")
 set(installer.cultures "zh-tw")
 set(sign.password "qweasd123")
 set(sign.cer "app.p12")
