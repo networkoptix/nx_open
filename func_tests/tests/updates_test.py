@@ -5,7 +5,7 @@ from framework.remote_daemon import RemoteDaemon
 from framework.remote_python import RemotePython
 from framework.waiting import ensure_persistence, wait_for_true
 
-LOCAL_DIR = Path(__file__).parent / 'framework/updates2/test_updates_server'
+LOCAL_DIR = Path(__file__).parent / 'updates_server'
 REMOTE_DIR = PurePosixPath('/opt/mock_updates_server')
 UTF_LOCALE_ENV = {'LC_ALL': 'C.UTF-8', 'LANG': 'C.UTF-8'}  # Click requires that.
 ROOT_URL = 'http://localhost:8080'
