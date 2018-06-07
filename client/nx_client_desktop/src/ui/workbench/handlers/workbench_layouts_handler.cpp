@@ -186,7 +186,7 @@ void LayoutsHandler::at_openLayoutAction_triggered(const vms::event::AbstractAct
 {
     if (businessAction->actionType() != vms::api::ActionType::openLayoutAction)
         return;
-    const auto &actionParams = businessAction->getParams();
+    const auto& actionParams = businessAction->getParams();
 
     QnResourcePool* pool = this->resourcePool();
     QnLayoutResourcePtr layout =
@@ -204,8 +204,6 @@ void LayoutsHandler::at_openLayoutAction_triggered(const vms::event::AbstractAct
     if (it == permittedUsers.end() && !actionParams.allUsers)
         return;
 
-    // TODO: Is it better to a add additional permission flags to the place
-    // where all menu actions are registered? - Not right now
     if (accessController()->hasPermissions(layout, Qn::ReadPermission))
         menu()->trigger(action::OpenInNewTabAction, layout);
     else
