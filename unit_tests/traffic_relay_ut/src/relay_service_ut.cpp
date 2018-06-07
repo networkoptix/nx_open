@@ -27,13 +27,14 @@ class RelayService:
     public BasicComponentTest
 {
 public:
-    RelayService()
+    RelayService():
+        BasicComponentTest(false /*do not emulate relay cluster*/)
     {
     }
 
     ~RelayService()
     {
-        stop();
+        stopAllInstances();
 
         if (m_cassandraConnectionFactoryBak)
         {
@@ -47,23 +48,23 @@ protected:
     {
         using namespace std::placeholders;
 
-        addArg("--cassandra/host=testHost");
-        addArg("--cassandra/delayBeforeRetryingInitialConnect=1ms");
-
         m_isCassandraOnline = false;
         m_cassandraConnectionFactoryBak =
             nx::cassandra::AsyncConnectionFactory::instance().setCustomFunc(
                 std::bind(&RelayService::createCassandraConnectionStub, this, _1));
 
-        start();
+        addRelayInstance({
+            "--cassandra/host=testHost",
+            "--cassandra/delayBeforeRetryingInitialConnect=1ms"},
+            false);
 
         // Waiting for cassandra connect to fail.
         ASSERT_FALSE(m_cassandraConnectionInitializationEvents.pop());
     }
 
-    void givenStartedRelay()
+    void givenStartedRelay(std::vector<const char*> args = {})
     {
-        ASSERT_TRUE(startAndWaitUntilStarted());
+        addRelayInstance(args);
     }
 
     void whenStartDb()
@@ -78,12 +79,12 @@ protected:
 
     void andRelayHasStarted()
     {
-        ASSERT_TRUE(waitUntilStarted());
+        ASSERT_TRUE(relay().waitUntilStarted());
     }
 
     void thenRelayCanStillBeStopped()
     {
-        stop();
+        relay().stop();
     }
 
 private:
@@ -129,7 +130,9 @@ protected:
     {
         m_connection = std::make_unique<nx::network::TCPSocket>(AF_INET);
         ASSERT_TRUE(m_connection->connect(
-            nx::network::SocketAddress(nx::network::HostAddress::localhost, moduleInstance()->httpEndpoints().front().port),
+            nx::network::SocketAddress(
+                nx::network::HostAddress::localhost,
+                relay().moduleInstance()->httpEndpoints().front().port),
             nx::network::kNoTimeout)) << SystemError::getLastOSErrorText().toStdString();
     }
 
@@ -146,9 +149,7 @@ private:
 
 TEST_F(RelayServiceHttp, connection_inactivity_timeout_present)
 {
-    addArg("--http/connectionInactivityTimeout=1ms");
-
-    givenStartedRelay();
+    givenStartedRelay({"--http/connectionInactivityTimeout=1ms"});
     givenTcpConnectionToRelayHttpPort();
 
     assertConnectionClosedByRelay();

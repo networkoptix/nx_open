@@ -17,14 +17,22 @@ class FailingTcpServerSocket:
     public TCPServerSocket
 {
 public:
+    FailingTcpServerSocket(SystemError::ErrorCode systemErrorCode):
+        m_systemErrorCode(systemErrorCode)
+    {
+    }
+
     virtual void acceptAsync(AcceptCompletionHandler handler) override
     {
         post(
-            [handler = std::move(handler)]()
+            [this, handler = std::move(handler)]()
             {
-                handler(SystemError::ioError, nullptr);
+                handler(m_systemErrorCode, nullptr);
             });
     }
+
+private:
+    const SystemError::ErrorCode m_systemErrorCode;
 };
 
 } // namespace
@@ -88,7 +96,17 @@ protected:
         m_acceptor->pleaseStopSync();
         m_acceptor.reset();
 
-        initializeAcceptor(std::make_unique<FailingTcpServerSocket>());
+        initializeAcceptor(
+            std::make_unique<FailingTcpServerSocket>(SystemError::ioError));
+    }
+
+    void whenRawServerConnectionReportsTimedOut()
+    {
+        m_acceptor->pleaseStopSync();
+        m_acceptor.reset();
+
+        initializeAcceptor(
+            std::make_unique<FailingTcpServerSocket>(SystemError::timedOut));
     }
 
     void thenConnectionIsAccepted()
@@ -111,6 +129,12 @@ protected:
     void thenCorrespondingErrorIsReported()
     {
         ASSERT_NE(SystemError::noError, m_acceptedConnections.pop().resultCode);
+    }
+
+    void thenErrorIsNotReported()
+    {
+        std::this_thread::sleep_for(std::chrono::milliseconds(100));
+        ASSERT_TRUE(m_acceptedConnections.empty());
     }
 
 private:
@@ -194,6 +218,12 @@ TEST_F(CustomHandshakeConnectionAcceptor, underlying_socket_accept_error_is_forw
 {
     whenRawServerConnectionReportsError();
     thenCorrespondingErrorIsReported();
+}
+
+TEST_F(CustomHandshakeConnectionAcceptor, underlying_socket_accept_timeout_is_not_forwarded)
+{
+    whenRawServerConnectionReportsTimedOut();
+    thenErrorIsNotReported();
 }
 
 TEST_F(CustomHandshakeConnectionAcceptor, silent_connection_is_closed_by_server)

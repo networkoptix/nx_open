@@ -22,30 +22,28 @@ class Https:
     public ::testing::Test,
     public BasicComponentTest
 {
-public:
-    Https()
-    {
-        addArg("--https/listenOn=0.0.0.0:0");
-    }
-
 protected:
     virtual void SetUp() override
     {
         const auto certificateFilePath =
             lm("%1/%2").args(testDataDir(), "traffic_relay.cert").toStdString();
-        addArg("-https/certificatePath", certificateFilePath.c_str());
 
         ASSERT_TRUE(nx::network::ssl::Engine::useOrCreateCertificate(
             certificateFilePath.c_str(),
             "traffic_relay/https test", "US", "Nx"));
 
-        ASSERT_TRUE(startAndWaitUntilStarted());
+        addRelayInstance({
+            "--https/listenOn=0.0.0.0:0",
+            "-https/certificatePath",
+            certificateFilePath.c_str()});
     }
 
     nx::utils::Url basicHttpsUrl() const
     {
-        return nx::network::url::Builder().setScheme(nx::network::http::kSecureUrlSchemeName)
-            .setHost("127.0.0.1").setPort(moduleInstance()->httpsEndpoints()[0].port).toUrl();
+        return nx::network::url::Builder()
+            .setScheme(nx::network::http::kSecureUrlSchemeName)
+            .setHost("127.0.0.1").setPort(relay().moduleInstance()->httpsEndpoints()[0].port)
+            .toUrl();
     }
 
     void whenEstablishSecureConnection()

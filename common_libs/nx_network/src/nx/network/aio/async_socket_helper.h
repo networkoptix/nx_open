@@ -189,8 +189,10 @@ public:
                 SystemError::ErrorCode code, std::deque<HostAddress> ips) mutable
             {
                 if (code != SystemError::noError)
+                {
                     return this->m_resolveResultScheduler.post(
                         [h = std::move(handler), code]() { h(code); });
+                }
 
                 connectToIpsAsync(std::move(ips), port, std::move(handler));
             });

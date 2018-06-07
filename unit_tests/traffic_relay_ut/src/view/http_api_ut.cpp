@@ -42,7 +42,7 @@ protected:
     api::Client& relayClient()
     {
         if (!m_relayClient)
-            m_relayClient = api::ClientFactory::create(basicUrl());
+            m_relayClient = api::ClientFactory::create(relay().basicUrl());
         return *m_relayClient;
     }
 
@@ -73,14 +73,14 @@ private:
                 std::bind(&HttpApi::createListeningPeerManager, this,
                     _1, _2));
 
-        ASSERT_TRUE(startAndWaitUntilStarted());
+        addRelayInstance();
     }
 
     virtual void TearDown() override
     {
         if (m_relayClient)
             m_relayClient->pleaseStopSync();
-        stop();
+        stopAllInstances();
 
         relaying::ListeningPeerManagerFactory::instance().setCustomFunc(
             std::move(m_listeningPeerManagerFactoryFuncBak));
@@ -259,7 +259,7 @@ protected:
         using namespace std::placeholders;
 
         m_httpClient = std::make_unique<GetStatisticsHttpClient>(
-            nx::network::url::Builder(basicUrl())
+            nx::network::url::Builder(relay().basicUrl())
                 .setPath(api::kRelayStatisticsMetricsPath).toUrl(),
             nx::network::http::AuthInfo());
         m_httpClient->execute(

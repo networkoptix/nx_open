@@ -1,7 +1,7 @@
 #pragma once
 
-#include <boost/optional/optional.hpp>
 #include <nx/utils/move_only_func.h>
+#include <nx/utils/std/optional.h>
 #include <nx/network/socket_common.h>
 
 namespace nx {
@@ -12,9 +12,10 @@ namespace controller {
 class PublicIpDiscoveryService
 {
 public:
-    using DiscoverFunc = nx::utils::MoveOnlyFunc<boost::optional<network::HostAddress>()>;
+    using DiscoverFunc = nx::utils::MoveOnlyFunc<std::optional<network::HostAddress>()>;
+
     static void setDiscoverFunc(DiscoverFunc func);
-    static boost::optional<network::HostAddress> get();
+    static std::optional<network::HostAddress> get();
 };
 
 } // namespace controller
