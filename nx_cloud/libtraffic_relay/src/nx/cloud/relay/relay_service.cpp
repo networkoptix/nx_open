@@ -21,6 +21,11 @@ std::vector<network::SocketAddress> RelayService::httpEndpoints() const
     return m_view->httpEndpoints();
 }
 
+std::vector<network::SocketAddress> RelayService::httpsEndpoints() const
+{
+    return m_view->httpsEndpoints();
+}
+
 const relaying::AbstractListeningPeerPool& RelayService::listeningPeerPool() const
 {
     return m_model->listeningPeerPool();

@@ -8,6 +8,7 @@ import { ApiService } from './services/api.service';
 })
 export class AppComponent {
     items: {};
+    tiles: {};
 
     constructor(private api: ApiService) {
     }
@@ -19,7 +20,16 @@ export class AppComponent {
                     this.items = data.metrics;
                 },
                 error => {
-                    console.warn('Server error.');
+                    console.error('Server error.');
+                });
+
+        this.api
+            .getJSON()
+            .subscribe((res: any) => {
+                    this.tiles = res.tiles;
+                },
+                error => {
+                    console.error('No tile structure provided');
                 });
     }
 }

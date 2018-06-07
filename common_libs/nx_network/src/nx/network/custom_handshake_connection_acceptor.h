@@ -242,10 +242,13 @@ private:
 
         m_isDelegateAccepting = false;
 
-        if (systemErrorCode != SystemError::noError)
+        // Not forwarding timedOut since user may not even called
+        // CustomHandshakeConnectionAcceptor::acceptAsync.
+        // So, he should not receive timedOut right after calling acceptAsync.
+        if (systemErrorCode != SystemError::noError &&
+            systemErrorCode != SystemError::timedOut)
         {
-            m_acceptedConnections.emplace_back(
-                systemErrorCode, nullptr);
+            m_acceptedConnections.emplace_back(systemErrorCode, nullptr);
 
             post(
                 [this]()
