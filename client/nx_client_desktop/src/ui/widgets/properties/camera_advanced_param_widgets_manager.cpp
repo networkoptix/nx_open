@@ -74,11 +74,6 @@ void QnCameraAdvancedParamWidgetsManager::displayParams(const QnCameraAdvancedPa
 void QnCameraAdvancedParamWidgetsManager::loadValues(
     const QnCameraAdvancedParamValueList &params)
 {
-    for (const auto param : params)
-    {
-        qDebug() << "$$$$$$$$$$$$$$ PARAMETER:" << param.id << param.value;
-    }
-
     // Disconnect all watches to not trigger handler chains.
     m_handlerChainConnections = QnDisconnectHelper::create();
 
@@ -91,7 +86,6 @@ void QnCameraAdvancedParamWidgetsManager::loadValues(
 
         auto widget = m_paramWidgetsById[param.id];
 
-        qDebug() << "########## PARAMETER (SETTING VALUE):" << param.id << param.value;
         widget->setValue(param.value);
         widget->setEnabled(true);
 
@@ -100,8 +94,6 @@ void QnCameraAdvancedParamWidgetsManager::loadValues(
     }
 
     runAllHandlerChains();
-
-    qDebug() << "@@@ VALUE:"<< m_paramWidgetsById[lit("SECONDARY%media/videoprofile/FrameRate")]->value();
 
     // Connect handler chains to watched values.
     for (auto itr = m_handlerChains.cbegin(); itr != m_handlerChains.cend(); ++itr)

@@ -482,7 +482,6 @@ QnCameraAdvancedParamValueMap HanwhaResource::getApiParameters(const QSet<QStrin
                     if (!value)
                         continue;
 
-                    qDebug() << "--------- PARAMETER" << parameterId << *value;
                     result.insert(
                         parameterId,
                         fromHanwhaAdvancedParameterValue(parameter, *info, *value));
