@@ -57,7 +57,8 @@ class Mediaserver(object):
         self.service = installation.service
         self.os_access = installation.os_access
         self.port = 7001
-        forwarded_address, forwarded_port = installation.os_access.forwarded_ports['tcp', self.port]
+        forwarded_port = installation.os_access.port_map.remote.tcp(self.port)
+        forwarded_address = installation.os_access.port_map.remote.address
         self.api = RestApi(name, forwarded_address, forwarded_port)
 
     def __repr__(self):

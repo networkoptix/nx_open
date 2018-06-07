@@ -13,11 +13,10 @@ from framework.utils import RunningTime
 
 
 class SSHAccess(RemoteAccess, PosixAccess):
-    def __init__(self, forwarded_ports, macs, username, key_path):
-        RemoteAccess.__init__(self, forwarded_ports)
+    def __init__(self, port_map, macs, username, key_path):
+        RemoteAccess.__init__(self, port_map)
         self._macs = macs
-        ssh_hostname, ssh_port = forwarded_ports['tcp', 22]
-        self.ssh = SSH(ssh_hostname, ssh_port, username, key_path)
+        self.ssh = SSH(port_map.remote.address, port_map.remote.tcp(22), username, key_path)
 
     def __repr__(self):
         return '<SSHAccess via {!r}>'.format(self.ssh)

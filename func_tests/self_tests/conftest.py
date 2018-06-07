@@ -40,7 +40,8 @@ def windows_vm_info(hypervisor, vm_registries):
 
 @pytest.fixture(scope='session')
 def winrm_raw(windows_vm_info):
-    address, port = windows_vm_info.ports['tcp', 5985]
+    address = windows_vm_info.port_map.remote.address
+    port = windows_vm_info.port_map.remote.tcp(5985)
     return WinRM(address, port, u'Administrator', u'qweasd123')
 
 
@@ -57,7 +58,7 @@ def winrm_shell(winrm):
 
 @pytest.fixture(scope='session')
 def ssh(linux_vm_info):
-    address, port = linux_vm_info.ports['tcp', 22]
+    address, port = linux_vm_info.port_map.remote.tcp(22)
     ssh = SSH(address, port, u'root', SSH_PRIVATE_KEY_PATH)
     wait_for_true(ssh.is_working)
     return ssh

@@ -2,7 +2,7 @@
 from collections import namedtuple
 from pprint import pformat
 
-VMInfo = namedtuple('VMInfo', ['name', 'ports', 'macs', 'networks', 'is_running'])  # TODO: Rename to VMHardware.
+VMInfo = namedtuple('VMInfo', ['name', 'port_map', 'macs', 'networks', 'is_running'])  # TODO: Rename to VMHardware.
 
 
 class VMNotFound(Exception):

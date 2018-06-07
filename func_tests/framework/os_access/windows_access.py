@@ -19,13 +19,12 @@ from framework.utils import RunningTime
 class WindowsAccess(RemoteAccess):
     """Run CMD and PowerShell and access CIM/WMI via WinRM, access filesystem via SMB"""
 
-    def __init__(self, forwarded_ports, macs, username, password):
-        RemoteAccess.__init__(self, forwarded_ports)
+    def __init__(self, port_map, macs, username, password):
+        RemoteAccess.__init__(self, port_map)
         self.macs = macs
         self._username = username
         self._password = password
-        winrm_address, winrm_port = forwarded_ports['tcp', 5985]
-        self.winrm = WinRM(winrm_address, winrm_port, username, password)
+        self.winrm = WinRM(port_map.remote.address, port_map.remote.tcp(5985), username, password)
 
     def __repr__(self):
         return '<WindowsAccess via {!r}>'.format(self.winrm)
@@ -55,10 +54,9 @@ class WindowsAccess(RemoteAccess):
     @cached_property
     def Path(self):
         class SpecificSMBPath(SMBPath):
-            _direct_smb_address, _direct_smb_port = self.forwarded_ports['tcp', 445]
             _smb_connection_pool = SMBConnectionPool(
                 self._username, self._password,
-                _direct_smb_address, _direct_smb_port,
+                self.port_map.remote.address, self.port_map.remote.tcp(445),
                 )
 
             @classmethod
