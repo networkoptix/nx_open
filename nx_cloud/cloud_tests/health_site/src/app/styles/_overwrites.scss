@@ -16,18 +16,25 @@ body {
     background-color : $body-bg;
 }
 
-@include media-breakpoint-down(sm) {
-
-    h4 {
+h4 {
+    font-family : "robotobold";
+    @include media-breakpoint-down(sm) {
         font-size : rem(16px);
     }
+}
 
-    h5 {
+h5 {
+    font-family : "robotoregular";
+    @include media-breakpoint-down(sm) {
         font-size : rem(14px);
     }
+}
 
-    h6 {
+h6 {
+    font-family : "robotolight";
+    @include media-breakpoint-down(sm) {
         font-size : rem(12px);
     }
 }
+
 
