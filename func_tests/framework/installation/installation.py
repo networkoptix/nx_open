@@ -1,5 +1,6 @@
-from abc import ABCMeta, abstractmethod
+from abc import ABCMeta, abstractmethod, abstractproperty
 
+from framework.installation.service import Service
 from framework.os_access.path import FileSystemPath
 
 
@@ -14,6 +15,10 @@ class Installation(object):
     @abstractmethod
     def is_valid(self):
         return False
+
+    @abstractproperty
+    def service(self):
+        return Service()
 
     @abstractmethod
     def list_core_dumps(self):

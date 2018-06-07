@@ -5,6 +5,7 @@ from io import BytesIO
 from framework.installation.installation import Installation
 from framework.installation.installer import Version, known_customizations
 from framework.installation.upstart_service import UpstartService
+from framework.method_caching import cached_property
 from framework.os_access.exceptions import DoesNotExist
 from framework.os_access.path import copy_file
 from framework.os_access.posix_shell import SSH
@@ -34,11 +35,6 @@ class DebInstallation(Installation):
         self._log_file = self.var / 'log' / 'log_file.log'
         self.key_pair = self.var / 'ssl' / 'cert.pem'
         self.os_access = ssh_access
-        self.service = UpstartService(
-            self.os_access.ssh,
-            self.installer.customization.linux_service_name,
-            stop_timeout_sec=10,  # 120 seconds specified in upstart conf file.
-            )
 
     def is_valid(self):
         paths_to_check = [
@@ -52,6 +48,12 @@ class DebInstallation(Installation):
                 _logger.warning("Path %r does not exists.", path)
                 all_paths_exist = False
         return all_paths_exist
+
+    @cached_property
+    def service(self):
+        service_name = self.installer.customization.linux_service_name
+        stop_timeout_sec = 10  # 120 seconds specified in upstart conf file.
+        return UpstartService(self.os_access.ssh, service_name, stop_timeout_sec)
 
     def list_core_dumps(self):
         return self._bin.glob('core.*')

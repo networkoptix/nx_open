@@ -3,6 +3,7 @@ import logging
 from framework.installation.installation import Installation
 from framework.installation.installer import Customization, Installer
 from framework.installation.windows_service import WindowsService
+from framework.method_caching import cached_property
 from framework.os_access.path import copy_file
 from framework.os_access.windows_access import WindowsAccess
 from framework.os_access.windows_remoting.registry import WindowsRegistry
@@ -27,7 +28,6 @@ class WindowsInstallation(Installation):
         self.key_pair = self.var / 'ssl' / 'cert.pem'
         self._config_key = WindowsRegistry(windows_access.winrm).key(customization.windows_registry_key)
         self._config_key_backup = WindowsRegistry(windows_access.winrm).key(customization.windows_registry_key + ' Backup')
-        self.service = WindowsService(windows_access.winrm, customization.windows_service_name)
         self.os_access = windows_access  # type: WindowsAccess
 
     def is_valid(self):
@@ -35,6 +35,11 @@ class WindowsInstallation(Installation):
             _logger.info("%r does not exist", self.binary)
             return False
         return True
+
+    @cached_property
+    def service(self):
+        service_name = self.installer.customization.windows_service_name
+        return WindowsService(self.os_access.winrm, service_name)
 
     def _upload_installer(self):
         remote_path = self.os_access.Path.tmp() / self.installer.path.name
