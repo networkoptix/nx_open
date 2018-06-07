@@ -91,9 +91,6 @@
                     <Component Id="ServerVcaMetadataPlugin">
                         <File Id="vca_metadata_plugin.dll" Name="vca_metadata_plugin.dll" Source="$(var.PluginsDir)\vca_metadata_plugin.dll" DiskId="10" />
                     </Component>
-                    <Component Id="ServerSscMetadataPlugin">
-                        <File Id="ssc_metadata_plugin.dll" Name="ssc_metadata_plugin.dll" Source="$(var.PluginsDir)\ssc_metadata_plugin.dll" DiskId="10" />
-                    </Component>
                 </Directory>
 
                 <Directory Id="$(var.customization)ServerVoxDir" Name="vox"/>
@@ -192,9 +189,6 @@
             <Component>
                 <File Id="Qt5WebSockets.dll" Name="Qt5WebSockets.dll" Source="$(var.QtDir)\Qt5WebSockets.dll" DiskId="10"/>
             </Component>
-            <Component>
-                <File Id="Qt5SerialPort.dll" Name="Qt5SerialPort.dll" Source="$(var.QtDir)\Qt5SerialPort.dll" DiskId="10"/>
-            </Component>
 
             <Component>
                 <File Id="icudt58.dll" Name="icudt58.dll" Source="$(var.QtDir)\icudt58.dll" DiskId="5" />
@@ -255,7 +249,6 @@
             <ComponentRef Id="ServerHikvisionMetadataPlugin"/>
             <ComponentRef Id="ServerAxisMetadataPlugin"/>
             <ComponentRef Id="ServerVcaMetadataPlugin"/>
-            <ComponentRef Id="ServerSscMetadataPlugin"/>
             <ComponentGroupRef Id="ServerQTLibraries" />
             <ComponentGroupRef Id="ServerQuazip" />
             <ComponentGroupRef Id="ServerOpenSSL"/>
