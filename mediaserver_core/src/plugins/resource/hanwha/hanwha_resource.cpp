@@ -96,15 +96,15 @@ static const std::map<QString, PtzDescriptor> kHanwhaCameraPtzCapabilityDescript
 
 static const std::map<QString, PtzDescriptor> kHanwhaNvrPtzCapabilityDescriptors =
 {
-    { lit("Absolute.Pan"), PtzDescriptor(Ptz::Capability::AbsolutePanCapability) },
-    { lit("Absolute.Tilt"), PtzDescriptor(Ptz::Capability::AbsoluteTiltCapability) },
-    { lit("Absolute.Zoom"), PtzDescriptor(Ptz::Capability::AbsoluteZoomCapability) },
-    { lit("Continuous.Pan"), PtzDescriptor(Ptz::Capability::ContinuousPanCapability) },
-    { lit("Continuous.Tilt"), PtzDescriptor(Ptz::Capability::ContinuousTiltCapability) },
-    { lit("Continuous.Zoom"), PtzDescriptor(Ptz::Capability::ContinuousZoomCapability) },
-    { lit("Continuous.Focus"), PtzDescriptor(Ptz::Capability::ContinuousFocusCapability) },
-    { lit("Preset"), PtzDescriptor(Ptz::Capability::NativePresetsPtzCapability) },
-    { lit("AreaZoom"), PtzDescriptor(Ptz::Capability::ViewportPtzCapability) },
+    {lit("Absolute.Pan"), PtzDescriptor(Ptz::Capability::AbsolutePanCapability)},
+    {lit("Absolute.Tilt"), PtzDescriptor(Ptz::Capability::AbsoluteTiltCapability)},
+    {lit("Absolute.Zoom"), PtzDescriptor(Ptz::Capability::AbsoluteZoomCapability)},
+    {lit("Continuous.Pan"), PtzDescriptor(Ptz::Capability::ContinuousPanCapability)},
+    {lit("Continuous.Tilt"), PtzDescriptor(Ptz::Capability::ContinuousTiltCapability)},
+    {lit("Continuous.Zoom"), PtzDescriptor(Ptz::Capability::ContinuousZoomCapability)},
+    {lit("Continuous.Focus"), PtzDescriptor(Ptz::Capability::ContinuousFocusCapability)},
+    {lit("Preset"), PtzDescriptor(Ptz::Capability::NativePresetsPtzCapability)},
+    {lit("AreaZoom"), PtzDescriptor(Ptz::Capability::ViewportPtzCapability)},
     // Native Home command is not implemented yet
     //{ lit("Home"), PtzDescriptor(Ptz::Capability::HomePtzCapability) },
     {
@@ -113,8 +113,7 @@ static const std::map<QString, PtzDescriptor> kHanwhaNvrPtzCapabilityDescriptors
             Ptz::Capability::ContinuousZoomCapability |
             Ptz::Capability::ContinuousTiltCapability |
             Ptz::Capability::ContinuousPanCapability,
-            PtzOperation::remove
-        )
+            PtzOperation::remove)
     }
 };
 
@@ -242,7 +241,7 @@ static const std::map<QString, HanwhaAlternativePtzTrait>
             kHanwhaAlternativePanTrait,
             {
                 QString(), //< No attribute is available for PTR.
-                lit("image/ptr/control/pan"),
+                lit("image/ptr/control/Pan"),
                 Ptz::ContinuousPanCapability
             }
         },
@@ -250,7 +249,7 @@ static const std::map<QString, HanwhaAlternativePtzTrait>
             kHanwhaAlternativeTiltTrait,
             {
                 QString(),
-                lit("image/ptr/control/tilt"),
+                lit("image/ptr/control/Tilt"),
                 Ptz::ContinuousTiltCapability
             }
         },
@@ -258,7 +257,7 @@ static const std::map<QString, HanwhaAlternativePtzTrait>
             kHanwhaAlternativeRotateTrait,
             {
                 QString(),
-                lit("image/ptr/control/rotate"),
+                lit("image/ptr/control/Rotate"),
                 Ptz::NoPtzCapabilities
             }
         }
@@ -1385,7 +1384,7 @@ CameraDiagnostics::Result HanwhaResource::initAlternativePtz()
         }
 
         bool hasTrait = true;
-        if (trait.supportAttribute.isEmpty())
+        if (!trait.supportAttribute.isEmpty())
         {
             const auto attribute = m_attributes
                 .attribute<bool>(lit("%1/%2").arg(trait.supportAttribute).arg(channel));
