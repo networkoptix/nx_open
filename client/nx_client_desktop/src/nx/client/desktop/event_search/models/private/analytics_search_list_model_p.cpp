@@ -779,7 +779,7 @@ void AnalyticsSearchListModel::Private::executePluginAction(
 
             if (!reply.actionUrl.isEmpty())
             {
-                WebViewDialog::showUrl(reply.actionUrl);
+                WebViewDialog::showUrl(QUrl::fromUserInput(reply.actionUrl));
             }
         };
 

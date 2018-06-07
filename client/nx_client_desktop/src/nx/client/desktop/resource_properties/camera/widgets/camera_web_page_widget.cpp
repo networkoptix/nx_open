@@ -9,18 +9,16 @@
 #include <QtNetwork/QNetworkCookie>
 #include <QtNetwork/QNetworkProxy>
 #include <QtNetwork/QNetworkReply>
-#include <QtWidgets/QLabel>
 #include <QtWebKitWidgets/QWebFrame>
 #include <QtWebKitWidgets/QWebPage>
 #include <QtWebKitWidgets/QWebView>
 
 #include <common/common_module.h>
-#include <ui/style/webview_style.h>
 #include <ui/widgets/common/web_page.h>
 #include <utils/common/event_processors.h>
 
 #include <nx/client/desktop/common/utils/widget_anchor.h>
-#include <nx/client/desktop/common/widgets/busy_indicator.h>
+#include <nx/client/desktop/common/widgets/web_widget.h>
 #include <nx/network/http/custom_headers.h>
 
 #include <vms_gateway_embeddable.h>
@@ -32,12 +30,11 @@ namespace desktop {
 struct CameraWebPageWidget::Private
 {
     Private(CameraWebPageWidget* parent);
-    void resetContent();
 
     class WebPage;
     class CookieJar;
 
-    QWebView* const webView;
+    WebWidget* const webWidget;
     const QScopedPointer<CookieJar> cookieJar;
 
     CameraSettingsDialogState::Credentials credentials;
@@ -88,42 +85,19 @@ protected:
 };
 
 CameraWebPageWidget::Private::Private(CameraWebPageWidget* parent):
-    webView(new QWebView(parent)),
+    webWidget(new WebWidget(parent)),
     cookieJar(new CookieJar())
 {
-    NxUi::setupWebViewStyle(webView);
+    auto webView = webWidget->view();
     webView->setPage(new WebPage(webView));
-    new WidgetAnchor(webView);
+
+    new WidgetAnchor(webWidget);
 
     // Special actions list for context menu for links.
     webView->insertActions(nullptr, {
         webView->pageAction(QWebPage::OpenLink),
         webView->pageAction(QWebPage::Copy),
         webView->pageAction(QWebPage::CopyLinkToClipboard)});
-
-    resetContent();
-
-    static constexpr int kDotRadius = 8;
-    auto busyIndicator = new BusyIndicatorWidget(parent);
-    busyIndicator->setHidden(true);
-    busyIndicator->dots()->setDotRadius(kDotRadius);
-    busyIndicator->dots()->setDotSpacing(kDotRadius * 2);
-    new WidgetAnchor(busyIndicator);
-
-    auto errorLabel = new QLabel(parent);
-    errorLabel->setText(lit("<h1>%1</h1>").arg(tr("Failed to load page")));
-    errorLabel->setAlignment(Qt::AlignCenter);
-    errorLabel->setForegroundRole(QPalette::WindowText);
-    new WidgetAnchor(errorLabel);
-
-    QObject::connect(webView, &QWebView::loadStarted, busyIndicator, &QWidget::show);
-    QObject::connect(webView, &QWebView::loadFinished, busyIndicator, &QWidget::hide);
-    QObject::connect(webView, &QWebView::loadStarted, errorLabel, &QWidget::hide);
-    QObject::connect(webView, &QWebView::loadFinished, errorLabel, &QWidget::setHidden);
-
-    auto frame = webView->page()->mainFrame();
-    frame->setScrollBarPolicy(Qt::Horizontal, Qt::ScrollBarAsNeeded);
-    frame->setScrollBarPolicy(Qt::Vertical, Qt::ScrollBarAsNeeded);
 
     const auto accessManager = webView->page()->networkAccessManager();
     accessManager->setCookieJar(cookieJar.data());
@@ -153,7 +127,7 @@ CameraWebPageWidget::Private::Private(CameraWebPageWidget* parent):
         });
 
     installEventHandler(webView, QEvent::ContextMenu, webView,
-        [this](QObject* watched, QEvent* event)
+        [webView](QObject* watched, QEvent* event)
         {
             NX_ASSERT(watched == webView && event->type() == QEvent::ContextMenu);
             const auto frame = webView->page()->mainFrame();
@@ -167,13 +141,6 @@ CameraWebPageWidget::Private::Private(CameraWebPageWidget* parent):
                 ? Qt::DefaultContextMenu
                 : Qt::ActionsContextMenu); //< Special context menu for links.
         });
-}
-
-void CameraWebPageWidget::Private::resetContent()
-{
-    webView->triggerPageAction(QWebPage::Stop);
-    webView->triggerPageAction(QWebPage::StopScheduledPageRefresh);
-    webView->setContent({});
 }
 
 CameraWebPageWidget::CameraWebPageWidget(CameraSettingsDialogStore* store, QWidget* parent):
@@ -200,7 +167,7 @@ void CameraWebPageWidget::loadState(const CameraSettingsDialogState& state)
         if (state.singleCameraProperties.settingsUrlPath.isEmpty())
         {
             d->lastRequest = QNetworkRequest();
-            d->resetContent();
+            d->webWidget->reset();
             return;
         }
 
@@ -229,17 +196,17 @@ void CameraWebPageWidget::loadState(const CameraSettingsDialogState& state)
             gatewayAddress.address.toString(), gatewayAddress.port,
             currentServerUrl.userName(), currentServerUrl.password());
 
-        d->webView->page()->networkAccessManager()->setProxy(gatewayProxy);
+        d->webWidget->view()->page()->networkAccessManager()->setProxy(gatewayProxy);
 
         const QNetworkRequest request(targetUrl);
         if (d->lastRequest == request)
             return;
 
         d->lastRequest = request;
-        d->resetContent();
+        d->webWidget->reset();
     }
 
-    d->webView->load(d->lastRequest);
+    d->webWidget->load(d->lastRequest);
 }
 
 } // namespace desktop
