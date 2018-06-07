@@ -1,6 +1,6 @@
-import QtQuick 2.6;
-import Qt.labs.controls 1.0;
-import Nx 1.0;
+import QtQuick 2.6
+import QtQuick.Controls 2.4
+import Nx 1.0
 
 Button
 {
@@ -22,7 +22,6 @@ Button
     property string pressedIconUrl;
 
     property bool showBackground: true;
-    property bool flat: false;
 
     height: 28;
 
@@ -120,7 +119,7 @@ Button
         }
     }
 
-    label: NxLabel
+    contentItem: NxLabel
     {
         anchors.centerIn: parent;
 

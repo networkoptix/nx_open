@@ -1,6 +1,6 @@
-import QtQuick 2.5;
-import Qt.labs.controls 1.0;
-import Nx 1.0;
+import QtQuick 2.5
+import QtQuick.Controls 2.4
+import Nx 1.0
 
 // TODO: add half-checked state (future)
 // TODO: add table-specific skin (future)
@@ -9,9 +9,7 @@ CheckBox
 {
     id: thisComponent;
 
-    property bool hovered: hoverArea.containsMouse;
-
-    height: label.height;
+    implicitHeight: contentItem.implicitHeight;
 
     opacity: (enabled ? 1.0 : 0.3);
 
@@ -19,15 +17,6 @@ CheckBox
 
     Keys.onEnterPressed: { thisComponent.accepted(); }
     Keys.onReturnPressed: { thisComponent.accepted(); }
-
-    MouseArea
-    {
-        id: hoverArea;
-
-        anchors.fill: parent;
-        acceptedButtons: Qt.NoButton;
-        hoverEnabled: true;
-    }
 
     indicator: Image
     {
@@ -47,7 +36,7 @@ CheckBox
         }
     }
 
-    label: NxLabel
+    contentItem: NxLabel
     {
         anchors.left: thisComponent.indicator.right;
         anchors.leftMargin: 6;

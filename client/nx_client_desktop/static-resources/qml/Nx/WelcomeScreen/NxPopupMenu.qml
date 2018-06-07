@@ -1,6 +1,6 @@
-import QtQuick 2.6;
-import Qt.labs.controls 1.0 as Labs;
-import Nx 1.0;
+import QtQuick 2.6
+import QtQuick.Controls 2.4 as Labs
+import Nx 1.0
 
 Labs.Menu
 {

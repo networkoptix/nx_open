@@ -1,7 +1,6 @@
-import QtQuick 2.6;
-import Qt.labs.controls 1.0;
-import Qt.labs.templates 1.0 as T
-import Nx 1.0;
+import QtQuick 2.6
+import QtQuick.Controls 2.4
+import Nx 1.0
 
 // TODO: inner shadow
 // TODO: implement exactly as in specification
@@ -11,7 +10,6 @@ ComboBox
     id: thisComponent;
 
     property bool expanded: popup.visible;
-    property bool editable: true;
 
     property bool isEditMode: false;
     property string text;
@@ -256,7 +254,7 @@ ComboBox
     }
 
 
-    popup: T.Popup
+    popup: Popup
     {
         y: thisComponent.height;
         topMargin: 2;
