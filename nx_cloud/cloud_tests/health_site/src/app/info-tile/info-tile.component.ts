@@ -21,10 +21,10 @@ export class InfoTileComponent implements OnInit {
 
     getClassFor(item) {
         if (item.dimension) {
-            return (item.value === 0) ? {value: 'nx-error', alert: ''} : {value: 'nx-healthy', alert: ''};
+            return (item.value) ? {value: 'nx-error', alert: ''} : {value: 'nx-healthy', alert: ''};
         }
 
-        if (!item.value) {
+        if (item.value) {
             return {value: 'nx-error', alert: ''};
         }
 
@@ -45,10 +45,10 @@ export class InfoTileComponent implements OnInit {
                         alert = '<br>' + alert;
                     }
                 }
-                return {value: total.value &= elm.value, alert: total.alert + alert};
-            }, {value: 1, alert: ''});
+                return {value: total.value |= elm.value, alert: total.alert + alert};
+            }, {value: 0, alert: ''});
 
-            status.value = (status.value === 0) ? 'nx-alert' : 'nx-healthy';
+            status.value = (status.value) ? 'nx-alert' : 'nx-healthy';
 
             return status;
         }
