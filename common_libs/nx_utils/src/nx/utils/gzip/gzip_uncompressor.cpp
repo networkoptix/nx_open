@@ -24,7 +24,8 @@ public:
 };
 
 Uncompressor::Uncompressor(const std::shared_ptr<AbstractByteStreamFilter>& nextFilter):
-    AbstractByteStreamFilter(nextFilter)
+    AbstractByteStreamFilter(nextFilter),
+    d(new Private())
 {
     memset(&d->zStream, 0, sizeof(d->zStream));
     d->outputBuffer.resize(kOutputBufferSize);
