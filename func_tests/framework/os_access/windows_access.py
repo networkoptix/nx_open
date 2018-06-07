@@ -8,7 +8,7 @@ import tzlocal.windows_tz
 from framework.method_caching import cached_getter, cached_property
 from framework.networking.windows import WindowsNetworking
 from framework.os_access.exceptions import exit_status_error_cls
-from framework.os_access.os_access_interface import OSAccess
+from framework.os_access.remote_access import RemoteAccess
 from framework.os_access.smb_path import SMBConnectionPool, SMBPath
 from framework.os_access.windows_remoting import WinRM
 from framework.os_access.windows_remoting.env_vars import EnvVars
@@ -16,23 +16,19 @@ from framework.os_access.windows_remoting.users import Users
 from framework.utils import RunningTime
 
 
-class WindowsAccess(OSAccess):
+class WindowsAccess(RemoteAccess):
     """Run CMD and PowerShell and access CIM/WMI via WinRM, access filesystem via SMB"""
 
     def __init__(self, forwarded_ports, macs, username, password):
+        RemoteAccess.__init__(self, forwarded_ports)
         self.macs = macs
         self._username = username
         self._password = password
         winrm_address, winrm_port = forwarded_ports['tcp', 5985]
         self.winrm = WinRM(winrm_address, winrm_port, username, password)
-        self._forwarded_ports = forwarded_ports
 
     def __repr__(self):
         return '<WindowsAccess via {!r}>'.format(self.winrm)
-
-    @property
-    def forwarded_ports(self):
-        return self._forwarded_ports
 
     @cached_getter
     def env_vars(self):
