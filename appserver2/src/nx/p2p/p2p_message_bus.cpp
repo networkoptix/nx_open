@@ -436,7 +436,7 @@ void MessageBus::sendAlivePeersMessage(const P2pConnectionPtr& connection)
             PeerNumberType firstViaNumber = kUnknownPeerNumnber;
             if (!viaList.isEmpty() && !viaList.first().firstVia.isNull())
                 firstViaNumber = m_localShortPeerInfo.encode(viaList.first().firstVia);
-            records.push_back(PeerDistanceRecord(peerNumber, minDistance, firstViaNumber));
+            records.push_back({peerNumber, minDistance, firstViaNumber});
         }
         NX_ASSERT(!records.isEmpty());
 
@@ -529,7 +529,7 @@ void MessageBus::resubscribePeers(
             QVector<SubscribeRecord> request;
             request.reserve(shortValues.size());
             for (int i = 0; i < shortValues.size(); ++i)
-                request.push_back(SubscribeRecord(shortValues[i], sequences[i]));
+                request.push_back({shortValues[i], sequences[i]});
             auto serializedData = serializeSubscribeRequest(request);
             serializedData.data()[0] = (quint8) (MessageType::subscribeForDataUpdates);
             connection->sendMessage(serializedData);
