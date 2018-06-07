@@ -9,6 +9,7 @@ import { ApiService }        from './services/api.service';
 export class AppComponent implements OnInit {
     items: {};
     tiles: {};
+    serverTime: string;
 
     constructor(private api: ApiService) {
     }
@@ -18,8 +19,7 @@ export class AppComponent implements OnInit {
             .getHealthStatus()
             .subscribe((data: any) => {
                     this.items = data.metrics;
-
-                    console.log(this.items);
+                    this.serverTime = data.server_timestamp;
                 },
                 error => {
                     console.error('Server error.');

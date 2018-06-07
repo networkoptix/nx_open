@@ -1,4 +1,5 @@
 import { Input, Component, OnInit } from '@angular/core';
+import * as moment                  from 'moment';
 
 @Component({
     selector: 'app-info-tile',
@@ -8,6 +9,7 @@ import { Input, Component, OnInit } from '@angular/core';
 export class InfoTileComponent implements OnInit {
     @Input() tiles;
     @Input() items;
+    @Input() serverTime;
 
     constructor() {
     }
