@@ -7,11 +7,12 @@
 #include <QtCore/QDir>
 #include <QtCore/QFile>
 
+#include <nx_ec/data/api_fwd.h>
+
+#include <nx/cloud/cdb/api/connection.h>
 #include <nx/network/socket_common.h>
 #include <nx/utils/std/future.h>
 #include <nx/utils/test_support/module_instance_launcher.h>
-
-#include <nx/cloud/cdb/api/connection.h>
 #include <nx/utils/db/test_support/test_with_db_helper.h>
 #include <nx/utils/db/types.h>
 
