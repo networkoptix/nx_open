@@ -119,6 +119,8 @@ void ProxyHandler::findRelayInstanceToRedirectTo(
         std::optional<std::string> /*relayHostName*/,
         std::string /*proxyTargetHostName*/)> handler)
 {
+    QnMutexLocker lock(&m_mutex);
+
     m_pendingRequestCount = hostNames.size();
     m_findRelayInstanceHandler = std::move(handler);
 
@@ -132,6 +134,12 @@ void ProxyHandler::findRelayInstanceToRedirectTo(
                 if (!lock)
                     return cf::unit();
 
+                {
+                    // Using this to make sure
+                    // ProxyHandler::findRelayInstanceToRedirectTo has exited.
+                    QnMutexLocker lock(&m_mutex);
+                }
+
                 --m_pendingRequestCount;
                 if (!m_findRelayInstanceHandler)
                     return cf::unit();
@@ -140,12 +148,16 @@ void ProxyHandler::findRelayInstanceToRedirectTo(
                 if (relayDomain.empty())
                 {
                     if (m_pendingRequestCount == 0)
-                        nx::utils::swapAndCall(m_findRelayInstanceHandler, std::nullopt, std::string());
+                    {
+                        nx::utils::swapAndCall(
+                            m_findRelayInstanceHandler, std::nullopt, std::string());
+                    }
                     // Else, waiting for other requests to finish.
                     return cf::unit();
                 }
 
-                nx::utils::swapAndCall(m_findRelayInstanceHandler, relayDomain, domainName);
+                nx::utils::swapAndCall(
+                    m_findRelayInstanceHandler, relayDomain, domainName);
                 return cf::unit();
             });
     }
@@ -165,7 +177,8 @@ void ProxyHandler::onRelayInstanceSearchCompleted(
     }
 
     auto locationUrl = network::url::Builder(m_requestUrl)
-        .setHost(lm("%1.%2").args(proxyTargetHost, *relayHost)).toUrl();
+        .setEndpoint(network::SocketAddress(
+            lm("%1.%2").args(proxyTargetHost, *relayHost))).toUrl();
 
     response()->headers.emplace("Location", locationUrl.toString().toUtf8());
 

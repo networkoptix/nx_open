@@ -11,7 +11,8 @@ Model::Model(const conf::Settings& settings):
     m_settings(settings),
     m_clientSessionPool(settings),
     m_listeningPeerPool(settings.listeningPeer()),
-    m_remoteRelayPeerPool(model::RemoteRelayPeerPoolFactory::create(settings))
+    m_remoteRelayPeerPool(
+        model::RemoteRelayPeerPoolFactory::instance().create(settings))
 {
 }
 

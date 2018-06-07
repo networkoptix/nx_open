@@ -1,9 +1,12 @@
 #pragma once
 
+#include <nx/utils/std/optional.h>
 #include <nx/utils/test_support/module_instance_launcher.h>
 #include <nx/utils/test_support/test_with_temporary_directory.h>
 
 #include <nx/cloud/relay/relay_service.h>
+
+#include "remote_relay_peer_pool.h"
 
 namespace nx {
 namespace cloud {
@@ -26,7 +29,8 @@ class BasicComponentTest:
     public utils::test::TestWithTemporaryDirectory
 {
 public:
-    BasicComponentTest(QString tmpDir = QString());
+    BasicComponentTest(bool initializeRelayCluster = true);
+    ~BasicComponentTest();
 
     void addRelayInstance(
         std::vector<const char*> args = {},
@@ -38,7 +42,12 @@ public:
     void stopAllInstances();
 
 private:
+    ListeningPeerPool m_listeningPeerPool;
     std::vector<std::unique_ptr<Relay>> m_relays;
+    std::optional<model::RemoteRelayPeerPoolFactory::Function> m_factoryFunctionBak;
+
+    std::unique_ptr<model::AbstractRemoteRelayPeerPool> createRemoteRelayPeerPool(
+        const conf::Settings& settings);
 };
 
 } // namespace test

@@ -107,6 +107,7 @@ protected:
         const Relay& relayInstance)
     {
         m_httpClient = std::make_unique<nx::network::http::AsyncClient>();
+        m_httpClient->setResponseReadTimeout(std::chrono::hours(1));
         m_httpClient->doGet(
             nx::network::url::Builder(proxyUrlForHost(relayInstance, hostName))
             .setPath(kTestPath),
@@ -172,9 +173,9 @@ private:
     {
         auto url = relayInstance.basicUrl();
 
-        auto host = lm("%1.gw.%2").args(hostName, url.host()).toStdString();
+        auto host = lm("%1.%2").args(hostName, url.host()).toStdString();
         nx::network::SocketGlobals::addressResolver().addFixedAddress(
-            host, network::SocketAddress(network::HostAddress::localhost, url.port()));
+            host, network::SocketAddress(network::HostAddress::localhost, 0));
         m_registeredHostNames.push_back(host);
         url.setHost(host.c_str());
 
@@ -202,6 +203,36 @@ TEST_F(HttpProxy, works_for_peer_with_composite_name)
 {
     givenListeningPeerWithCompositeName();
     whenSendHttpRequestToPeer();
+    thenResponseFromPeerIsReceived();
+}
+
+//-------------------------------------------------------------------------------------------------
+
+class HttpProxyRedirect:
+    public HttpProxy
+{
+    using base_type = HttpProxy;
+
+protected:
+    virtual void SetUp() override
+    {
+        base_type::SetUp();
+
+        addRelayInstance();
+    }
+
+    void whenSendHttpRequestViaBadRelay()
+    {
+        sendHttpRequestToPeer(
+            listeningPeerHostName(),
+            relay(1));
+    }
+};
+
+TEST_F(HttpProxyRedirect, request_is_redirected_to_a_proxy_relay_instance)
+{
+    givenListeningPeer();
+    whenSendHttpRequestViaBadRelay();
     thenResponseFromPeerIsReceived();
 }
 

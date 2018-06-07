@@ -29,7 +29,7 @@ public:
     controller::AbstractConnectSessionManager& connectSessionManager();
     relaying::AbstractListeningPeerManager& listeningPeerManager();
 
-    bool discoverPublicAddress();
+    std::optional<network::HostAddress> discoverPublicAddress();
 
 private:
     std::unique_ptr<controller::AbstractTrafficRelay> m_trafficRelay;

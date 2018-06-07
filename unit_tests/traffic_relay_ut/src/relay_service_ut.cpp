@@ -27,7 +27,8 @@ class RelayService:
     public BasicComponentTest
 {
 public:
-    RelayService()
+    RelayService():
+        BasicComponentTest(false /*do not emulate relay cluster*/)
     {
     }
 
