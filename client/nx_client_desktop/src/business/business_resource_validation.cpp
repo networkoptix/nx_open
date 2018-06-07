@@ -22,6 +22,7 @@
 
 #include <nx/api/analytics/driver_manifest.h>
 #include <nx/api/analytics/supported_events.h>
+#include <nx/vms/event/analytics_helper.h>
 
 #include <utils/email/email.h>
 
@@ -238,7 +239,7 @@ QString QnCameraRecordingPolicy::getText(const QnResourceList &resources, const 
 
 bool QnCameraAnalyticsPolicy::isResourceValid(const QnVirtualCameraResourcePtr& camera)
 {
-    return !camera->analyticsSupportedEvents().isEmpty();
+    return !nx::vms::event::AnalyticsHelper::supportedAnalyticsEvents({camera}).isEmpty();
 }
 
 QString QnCameraAnalyticsPolicy::getText(const QnResourceList& resources, const bool detailed)

@@ -355,15 +355,21 @@ void MessageBus::printPeersMessage()
     {
         const auto& peer = itr.value();
 
-        qint32 minDistance = peer.minDistance();
+        RoutingInfo outViaList;
+        qint32 minDistance = peer.minDistance(&outViaList);
         if (minDistance == kMaxDistance)
             continue;
         m_localShortPeerInfo.encode(itr.key());
 
-        records << lit("\t\t\t\t\t To:  %1(dbId=%2). Distance: %3")
+        QStringList outViaListStr;
+        for (const auto& peer: outViaList.keys())
+            outViaListStr << qnStaticCommon->moduleDisplayName(peer.id);
+
+        records << lit("\t\t\t\t\t To:  %1(dbId=%2). Distance: %3 (via %4)")
             .arg(qnStaticCommon->moduleDisplayName(itr.key().id))
             .arg(itr.key().persistentId.toString())
-            .arg(minDistance);
+            .arg(minDistance)
+            .arg(outViaListStr.join(","));
     }
 
     NX_VERBOSE(
@@ -417,12 +423,8 @@ void MessageBus::sendAlivePeersMessage(const P2pConnectionPtr& connection)
             if (isLocalConnection(itr.key()))
                 continue; //< don't show this connection to other servers
 
-            // Don't send longer route than this peer already has.
-            // Otherwise it could generate route loop.
-            qint32 minDistance = itr->minDistance();
-
-            if (itr->distanceVia(connection->remotePeer()) == minDistance)
-                continue;
+            RoutingInfo viaList;
+            qint32 minDistance = itr->minDistance(&viaList);
 
             // Don't broadcast foreign offline distances
             if (minDistance < kMaxDistance && minDistance > kMaxOnlineDistance)
@@ -430,12 +432,27 @@ void MessageBus::sendAlivePeersMessage(const P2pConnectionPtr& connection)
 
             if (minDistance == kMaxDistance)
                 continue;
-            const qint16 peerNumber = m_localShortPeerInfo.encode(itr.key());
-            records.push_back(PeerDistanceRecord(peerNumber, minDistance));
+            const PeerNumberType peerNumber = m_localShortPeerInfo.encode(itr.key());
+            PeerNumberType firstViaNumber = kUnknownPeerNumnber;
+            if (!viaList.isEmpty() && !viaList.first().firstVia.isNull())
+                firstViaNumber = m_localShortPeerInfo.encode(viaList.first().firstVia);
+            records.push_back({peerNumber, minDistance, firstViaNumber});
         }
         NX_ASSERT(!records.isEmpty());
+
+        std::sort(records.begin(), records.end(),
+            [](const PeerDistanceRecord& left, const PeerDistanceRecord& right)
+            {
+                if (left.distance != right.distance)
+                    return left.distance < right.distance;
+                return left.peerNumber < right.peerNumber;
+            });
+
         QByteArray data = serializePeersMessage(records, 1);
         data.data()[0] = (quint8)MessageType::alivePeers;
+
+        auto connectionContext = context(connection);
+
         return data;
     };
 
@@ -512,7 +529,7 @@ void MessageBus::resubscribePeers(
             QVector<SubscribeRecord> request;
             request.reserve(shortValues.size());
             for (int i = 0; i < shortValues.size(); ++i)
-                request.push_back(SubscribeRecord(shortValues[i], sequences[i]));
+                request.push_back({shortValues[i], sequences[i]});
             auto serializedData = serializeSubscribeRequest(request);
             serializedData.data()[0] = (quint8) (MessageType::subscribeForDataUpdates);
             connection->sendMessage(serializedData);
@@ -615,7 +632,7 @@ void MessageBus::startStopConnections(const QMap<ApiPersistentIdData, P2pConnect
 }
 
 P2pConnectionPtr MessageBus::findBestConnectionToSubscribe(
-    const QVector<ApiPersistentIdData>& viaList,
+    const QList<ApiPersistentIdData>& viaList,
     QMap<P2pConnectionPtr, int> newSubscriptions) const
 {
     P2pConnectionPtr result;
@@ -685,8 +702,9 @@ void MessageBus::doSubscribe(const QMap<ApiPersistentIdData, P2pConnectionPtr>& 
                 if (needDelay)
                     continue; //< allow only direct subscription if network configuration are still changing
             }
-            QVector<ApiPersistentIdData> viaList;
-            info.minDistance(&viaList);
+            RoutingInfo viaListData;
+            info.minDistance(&viaListData);
+            const auto viaList = viaListData.keys();
 
             NX_ASSERT(!viaList.empty());
             // If any of connections with min distance subscribed to us then postpone our subscription.
@@ -962,8 +980,12 @@ bool MessageBus::handleResolvePeerNumberRequest(const P2pConnectionPtr& connecti
 
     QVector<PeerNumberResponseRecord> response;
     response.reserve(request.size());
-    for (const auto& peer : request)
-        response.push_back(PeerNumberResponseRecord(peer, m_localShortPeerInfo.decode(peer)));
+    for (const auto& peer: request)
+    {
+        const auto fullPeerId = m_localShortPeerInfo.decode(peer);
+        NX_ASSERT(!fullPeerId.isNull());
+        response.push_back(PeerNumberResponseRecord(peer, fullPeerId));
+    }
 
     auto responseData = serializeResolvePeerNumberResponse(response, 1);
     responseData.data()[0] = (quint8) MessageType::resolvePeerNumberResponse;
@@ -1008,12 +1030,17 @@ bool MessageBus::handlePeersMessage(const P2pConnectionPtr& connection, const QB
 
     m_lastPeerInfoTimer.restart();
 
-    QVector<PeerNumberType> numbersToResolve;
+    std::set<PeerNumberType> numbersToResolve;
     BitStreamReader reader((const quint8*)data.data(), data.size());
     for (const auto& peer: peers)
     {
         if (context(connection)->decode(peer.peerNumber).isNull())
-            numbersToResolve.push_back(peer.peerNumber);
+            numbersToResolve.insert(peer.peerNumber);
+        if (peer.firstVia != kUnknownPeerNumnber)
+        {
+            if (context(connection)->decode(peer.firstVia).isNull())
+                numbersToResolve.insert(peer.firstVia);
+        }
     }
     context(connection)->remotePeersMessage = data;
 
@@ -1029,17 +1056,42 @@ bool MessageBus::handlePeersMessage(const P2pConnectionPtr& connection, const QB
                 ++distance;
                 NX_ASSERT(distance != kMaxOnlineDistance);
             }
+
+            auto firstVia = shortPeers.decode(peer.firstVia);
+            if (firstVia.isNull())
+            {
+                // Direct connection to the target peer
+                firstVia = connection->localPeer();
+            }
+            else if (distance <= kMaxOnlineDistance)
+            {
+                const auto gatewayDistance = distanceTo(firstVia);
+                if (gatewayDistance > kMaxOnlineDistance)
+                    continue; //< Route loop detected.
+                if (gatewayDistance < distance - 1)
+                {
+                    NX_VERBOSE(
+                        this,
+                        lm("Peer %1 ignores alivePeers record due to route loop. Distance to %2 = %3. Distance to gateway %4 = %5")
+                        .arg(qnStaticCommon->moduleDisplayName(localPeer().id))
+                        .arg(qnStaticCommon->moduleDisplayName(shortPeers.decode(peer.peerNumber).id))
+                        .arg(distance)
+                        .arg(qnStaticCommon->moduleDisplayName(firstVia.id))
+                        .arg(gatewayDistance));
+                    continue; //< Route loop detected.
+                }
+            }
+
             m_peers->addRecord(
                 connection->remotePeer(),
                 shortPeers.decode(peer.peerNumber),
-                nx::p2p::RoutingRecord(distance));
+                nx::p2p::RoutingRecord(distance, firstVia));
         }
         emitPeerFoundLostSignals();
         return true;
     }
 
     auto connectionContext = context(connection);
-    std::sort(numbersToResolve.begin(), numbersToResolve.end());
     QVector<PeerNumberType> moreNumbersToResolve;
 
     std::set_difference(
@@ -1608,9 +1660,9 @@ QnUuid MessageBus::routeToPeerVia(const QnUuid& peerId, int* distance) const
         return QnUuid();
     }
 
-    QVector<ApiPersistentIdData> via;
+    RoutingInfo via;
     *distance = m_peers->distanceTo(peerId, &via);
-    return via.isEmpty() ? QnUuid() : via[0].id;
+    return via.isEmpty() ? QnUuid() : via.begin().key().id;
 }
 
 int MessageBus::distanceToPeer(const QnUuid& peerId) const

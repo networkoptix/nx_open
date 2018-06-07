@@ -84,7 +84,7 @@ TEST(P2pSerialization, PeersMessage)
 
     QVector<PeerDistanceRecord> peers;
     for (int i = 0; i < 100; ++i)
-        peers.push_back(PeerDistanceRecord(i, i * 1000));
+        peers.push_back(PeerDistanceRecord(i, i * 1000, i));
 
     QByteArray expectedData = serializePeersMessage(peers, 0);
     bool success = false;

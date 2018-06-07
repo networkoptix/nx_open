@@ -70,6 +70,8 @@ private:
 
     void releaseResourceMetadataManagers(const QnSecurityCamResourcePtr& camera);
 
+    void releaseResourceMetadataManagers(const QnUuid& resourceId);
+
     nx::sdk::metadata::MetadataHandler* createMetadataHandler(
         const QnResourcePtr& resource,
         const nx::api::AnalyticsDriverManifest& manifest);
