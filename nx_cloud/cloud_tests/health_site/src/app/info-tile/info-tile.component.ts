@@ -1,5 +1,4 @@
 import { Input, Component, OnInit } from '@angular/core';
-import * as moment                  from 'moment';
 
 @Component({
     selector: 'app-info-tile',

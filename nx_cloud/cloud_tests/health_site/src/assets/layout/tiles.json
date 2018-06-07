@@ -1,6 +1,53 @@
 {
     "tiles": [
         {
+            "title"   : "Cloud Services",
+            "sections": [
+                {
+                    "key"      : "cloud_portal_failure",
+                    "caption"  : "Cloud Portal",
+                    "messages" : {
+                        "error": "Cloud Portal doesn't work."
+                    },
+                    "aggregate": [
+                        {
+                            "key"    : "email_failure",
+                            "message": "Registration e-mail on cloud portal are delayed."
+                        },
+                        {
+                            "key"    : "view_and_settings_failure",
+                            "message": "View and settings interface may not work for some users."
+                        },
+                        {
+                            "key"    : "cloud_authentication_failure",
+                            "message": "Users may experience problems with accessing their systems via web."
+                        }
+                    ]
+                },
+                {
+                    "key"     : "view_and_settings_failure",
+                    "caption" : "View and settings interfaces",
+                    "messages": {
+                        "error": "View And Settings page on cloud portal doesn't work."
+                    }
+                },
+                {
+                    "key"     : "cloud_authentication_failure",
+                    "caption" : "Cloud Authentication",
+                    "messages": {
+                        "error": "Users may experience problems logging in to their systems with desktop/mobile/web clients."
+                    }
+                },
+                {
+                    "key"     : "email_failure",
+                    "caption" : "Email Server",
+                    "messages": {
+                        "error": "E-mail notifications are delayed until the issue is resolved."
+                    }
+                }
+            ]
+        },
+        {
             "title"   : "Cloud Systems Connectivity",
             "sections": [
                 {
@@ -56,53 +103,6 @@
                             "message": "Connect to remote systems may not work for clients in Asia, Antarctica and Oceania."
                         }
                     ]
-                }
-            ]
-        },
-        {
-            "title"   : "Cloud Services",
-            "sections": [
-                {
-                    "key"      : "cloud_portal_failure",
-                    "caption"  : "Cloud Portal",
-                    "messages" : {
-                        "error": "Cloud Portal doesn't work."
-                    },
-                    "aggregate": [
-                        {
-                            "key"    : "email_failure",
-                            "message": "Registration e-mail on cloud portal are delayed."
-                        },
-                        {
-                            "key"    : "view_and_settings_failure",
-                            "message": "View and settings interface may not work for some users."
-                        },
-                        {
-                            "key"    : "cloud_authentication_failure",
-                            "message": "Users may experience problems with accessing their systems via web."
-                        }
-                    ]
-                },
-                {
-                    "key"     : "view_and_settings_failure",
-                    "caption" : "View and settings interfaces",
-                    "messages": {
-                        "error": "View And Settings page on cloud portal doesn't work."
-                    }
-                },
-                {
-                    "key"     : "cloud_authentication_failure",
-                    "caption" : "Cloud Authentication",
-                    "messages": {
-                        "error": "Users may experience problems logging in to their systems with desktop/mobile/web clients."
-                    }
-                },
-                {
-                    "key"     : "email_failure",
-                    "caption" : "Email Server",
-                    "messages": {
-                        "error": "E-mail notifications are delayed until the issue is resolved."
-                    }
                 }
             ]
         }
