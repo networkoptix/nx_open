@@ -4,20 +4,29 @@ import codecs
 import time
 from datetime import datetime
 from check_server import ping
+import sys
 
 waitTime = 30
 
+# Path to the results folder
+loc = path.join('C:\\', 'Users', 'Kyle', 'Desktop', 'robot-outputs')
+# Path I use on my VM for a shared file
+#loc = path.join('/media', 'sf_robot-outputs')
+
+# Get the list of all langauges, updating the JSON file automatically adds
+# or removes languages
 with codecs.open('language_list.json', 'r', encoding='utf-8-sig') as languages_list:
     langList = json.load(languages_list)
+
 
 def allLanguages():
 
     for key in langList:
         runTest(key, langList)
-        mergableOutputs = (path.join('outputs', lang, 'output.xml')
-                           for lang in langList if path.isfile(path.join('outputs', lang, 'output.xml')))
-        system('rebot --suitestatlevel 2 -o allLanguages.xml -l allLanguagesLog.html -r allLanguagesReport.html ' +
-               ' '.join(mergableOutputs))
+        mergableOutputs = (path.join(loc, lang, 'output.xml')
+                           for lang in langList if path.isfile(path.join(loc, lang, 'output.xml')))
+        system('rebot --suitestatlevel 2 -d {} -o allLanguages.xml -l allLanguagesLog.html -r allLanguagesReport.html '.format(
+            path.join(loc, 'combined-results')) + ' '.join(mergableOutputs))
 
 
 def runTest(key, langList):
@@ -26,9 +35,12 @@ def runTest(key, langList):
     while True:
         # ping the server at the start to make sure it's ready
         if ping().ok:
-            map(remove,(path.join('outputs', file) for file in listdir('outputs') if file.endswith('.png') and file.find(key) > -1 ))
-            system('robot -N {}_{} -v BROWSER:headlesschrome -v SCREENSHOTDIRECTORY:screenshots -d {} -e not-ready -V getvars.py:{} test-cases'.format(
-                langList[key], key, path.join('outputs', key), key))
+            # If the server is up, delete screenshots from previous run and
+            # start testing.
+            map(remove, (path.join(loc, file) for file in listdir(loc)
+                         if file.endswith('.png') and file.find(key) > -1))
+            system('robot -N {}_{} -v SCREENSHOTDIRECTORY:{} -v BROWSER:headlesschrome -d {} -e not-ready -V getvars.py:{} test-cases'.format(
+                langList[key], key, path.join(loc, 'combined-results'), path.join(loc, key), key))
             # ping the server at the end to make sure it didn't go down
             if ping().ok:
                 break
