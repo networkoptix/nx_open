@@ -773,14 +773,10 @@ void AnalyticsSearchListModel::Private::executePluginAction(
 
             const auto reply = result.deserialized<AnalyticsActionResult>();
             if (!reply.messageToUser.isEmpty())
-            {
                 QnMessageBox::success(q->mainWindowWidget(), reply.messageToUser);
-            }
 
             if (!reply.actionUrl.isEmpty())
-            {
-                WebViewDialog::showUrl(QUrl::fromUserInput(reply.actionUrl));
-            }
+                WebViewDialog::showUrl(QUrl(reply.actionUrl));
         };
 
     AnalyticsAction actionData;
