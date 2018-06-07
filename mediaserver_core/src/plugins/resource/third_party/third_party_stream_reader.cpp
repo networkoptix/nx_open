@@ -78,7 +78,7 @@ ThirdPartyStreamReader::ThirdPartyStreamReader(
     m_audioLayout.reset( new QnResourceCustomAudioLayout() );
 
     m_camManager.getCameraCapabilities( &m_cameraCapabilities );
-    
+
     Qn::directConnect(
         res.data(), &QnResource::propertyChanged,
         this,
@@ -177,9 +177,15 @@ CameraDiagnostics::Result ThirdPartyStreamReader::openStreamInternal(bool isCame
 
     if (auto camera = m_resource.dynamicCast<QnVirtualCameraResource>())
     {
-        const auto meduaUrl = camera->sourceUrl(getRole());
-        if (camera->getCameraCapabilities().testFlag(Qn::customMediaUrlCapability))
-            cameraEncoder.setMediaUrl(meduaUrl);
+        if (camera->getCameraCapabilities().testFlag(Qn::CustomMediaUrlCapability))
+        {
+            const auto mediaUrl = camera->sourceUrl(getRole());
+            nxpt::ScopedRef<nxcip::CameraMediaEncoder4> mediaEncoder4(
+                (nxcip::CameraMediaEncoder4*)intf->queryInterface(nxcip::IID_CameraMediaEncoder4),
+                false);
+            if (mediaEncoder4.get())
+                mediaEncoder4->setMediaUrl(mediaUrl.toUtf8().constData());
+        }
     }
 
     QAuthenticator auth = m_thirdPartyRes->getAuth();
@@ -441,7 +447,7 @@ QnAbstractMediaDataPtr ThirdPartyStreamReader::getNextData()
 {
     if( !isStreamOpened() )
         return QnAbstractMediaDataPtr(0);
-    
+
     if (!m_isMediaUrlValid.test_and_set())
     {
         closeStream();

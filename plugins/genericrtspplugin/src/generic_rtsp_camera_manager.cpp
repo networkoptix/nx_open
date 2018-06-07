@@ -42,9 +42,9 @@ GenericRTSPCameraManager::GenericRTSPCameraManager(const nxcip::CameraInfo& info
     m_capabilities(0)
 {
     //checking, whether nxcip::audioCapability is supported
-    m_capabilities = 
+    m_capabilities =
           nxcip::BaseCameraManager::audioCapability
-        | nxcip::BaseCameraManager::shareIpCapability 
+        | nxcip::BaseCameraManager::shareIpCapability
         | nxcip::BaseCameraManager::primaryStreamSoftMotionCapability
         | nxcip::BaseCameraManager::customMediaUrlCapability;
 }
@@ -91,7 +91,7 @@ unsigned int GenericRTSPCameraManager::releaseRef()
 //!Implementation of nxcip::BaseCameraManager::getEncoderCount
 int GenericRTSPCameraManager::getEncoderCount(int* encoderCount) const
 {
-    *encoderCount = 2;
+    *encoderCount = kEncodersCount;
     return nxcip::NX_NO_ERROR;
 }
 

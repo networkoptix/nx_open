@@ -250,11 +250,6 @@ namespace nxcip
         */
         virtual int getMediaUrl( char* urlBuf ) const = 0;
 
-        virtual int setMediaUrl(const char url[nxcip::MAX_TEXT_LEN]) 
-        { 
-            return NX_NOT_IMPLEMENTED; 
-        }
-
         //!Returns supported resolution list
         /*!
             \param[out] infoList Array of size \a MAX_RESOLUTION_LIST_SIZE
@@ -342,12 +337,10 @@ namespace nxcip
     static const nxpl::NX_GUID IID_CameraMediaEncoder2 = { { 0x9a, 0x1b, 0xda, 0x18, 0x56, 0x3c, 0x42, 0xde, 0x8e, 0x23, 0xb9, 0x24, 0x4f, 0xd0, 0x6, 0x58 } };
 
     //!Extends \a CameraMediaEncoder by adding functionality for plugin to directly provide live media stream
-    class CameraMediaEncoder2
-    :
-        public CameraMediaEncoder
+    class CameraMediaEncoder2: public CameraMediaEncoder
     {
     public:
-        virtual ~CameraMediaEncoder2() {}
+        virtual ~CameraMediaEncoder2() override {}
 
         //!Returns stream reader, providing live data stream
         /*!
@@ -394,9 +387,7 @@ namespace nxcip
     // {D1C7F082-B6F9-45F3-82D6-3CFE3EAE0260}
     static const nxpl::NX_GUID IID_CameraMediaEncoder3 = { { 0xd1, 0xc7, 0xf0, 0x82, 0xb6, 0xf9, 0x45, 0xf3, 0x82, 0xd6, 0x3c, 0xfe, 0x3e, 0xae, 0x2, 0x60 } };
 
-    class CameraMediaEncoder3
-    :
-        public CameraMediaEncoder2
+    class CameraMediaEncoder3: public CameraMediaEncoder2
     {
     public:
         //!Returns configured stream reader, providing live data stream
@@ -420,6 +411,15 @@ namespace nxcip
             \sa nxcip::CompressionType \sa nxcip::PixelFormat
         */
         virtual int getVideoFormat(CompressionType * codec, PixelFormat * pixelFormat) const = 0;
+    };
+
+    // {9807EA20-FA37-4EA7-BF07-9AC61511E1DF}
+    static const nxpl::NX_GUID IID_CameraMediaEncoder4 = { { 0x98, 0x07, 0xEA ,0x20, 0xFA, 0x37, 0x4E, 0xA7, 0xBF, 0x07, 0x9A, 0xC6 ,0x15 ,0x11 ,0xE1, 0xDF } };
+    class CameraMediaEncoder4: public CameraMediaEncoder3
+    {
+    public:
+        /** This function is used in case of camera has customMediaStreamCapability */
+        virtual int setMediaUrl(const char url[nxcip::MAX_TEXT_LEN]) = 0;
     };
 
     class CameraPtzManager;

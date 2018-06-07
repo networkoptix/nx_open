@@ -2101,7 +2101,7 @@ Qn::ResourceStatusOverlay QnMediaResourceWidget::calculateStatusOverlay() const
     if (d->isPlayingLive() && d->camera && d->camera->hasFlags(Qn::wearable_camera))
         return Qn::NoLiveStreamOverlay;
 
-    if (d->camera && d->camera->hasCameraCapabilities(Qn::isOldFirmwareCapability))
+    if (d->camera && d->camera->hasCameraCapabilities(Qn::IsOldFirmwareCapability))
         return Qn::OldFirmwareOverlay;
 
     if (d->isOffline())
