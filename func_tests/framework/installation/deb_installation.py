@@ -34,7 +34,11 @@ class DebInstallation(Installation):
         self.var = self.dir / 'var'
         self._log_file = self.var / 'log' / 'log_file.log'
         self.key_pair = self.var / 'ssl' / 'cert.pem'
-        self.os_access = ssh_access
+        self.ssh_access = ssh_access
+
+    @property
+    def os_access(self):
+        return self.ssh_access
 
     def is_valid(self):
         paths_to_check = [
@@ -53,7 +57,7 @@ class DebInstallation(Installation):
     def service(self):
         service_name = self.installer.customization.linux_service_name
         stop_timeout_sec = 10  # 120 seconds specified in upstart conf file.
-        return UpstartService(self.os_access.ssh, service_name, stop_timeout_sec)
+        return UpstartService(self.ssh_access.ssh, service_name, stop_timeout_sec)
 
     def list_core_dumps(self):
         return self._bin.glob('core.*')
@@ -106,7 +110,7 @@ class DebInstallation(Installation):
         remote_path = self.os_access.Path.tmp() / self.installer.path.name
         remote_path.parent.mkdir(parents=True, exist_ok=True)
         copy_file(self.installer.path, remote_path)
-        self.os_access.ssh.run_sh_script(
+        self.ssh_access.ssh.run_sh_script(
             # language=Bash
             '''
                 # Commands and dependencies for trusty template.

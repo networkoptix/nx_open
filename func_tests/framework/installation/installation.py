@@ -1,12 +1,17 @@
 from abc import ABCMeta, abstractmethod, abstractproperty
 
 from framework.installation.service import Service
+from framework.os_access.os_access_interface import OSAccess
 from framework.os_access.path import FileSystemPath
 
 
 class Installation(object):
     """Install and access installed files in uniform way"""
     __metaclass__ = ABCMeta
+
+    @abstractproperty
+    def os_access(self):
+        return OSAccess()
 
     @abstractmethod
     def install(self):
