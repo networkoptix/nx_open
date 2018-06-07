@@ -10,15 +10,35 @@ namespace cloud {
 namespace relay {
 namespace test {
 
+class Relay:
+    public utils::test::ModuleLauncher<relay::RelayService>
+{
+public:
+    Relay();
+    ~Relay();
+
+    nx::utils::Url basicUrl() const;
+};
+
+//-------------------------------------------------------------------------------------------------
+
 class BasicComponentTest:
-    public utils::test::ModuleLauncher<relay::RelayService>,
     public utils::test::TestWithTemporaryDirectory
 {
 public:
     BasicComponentTest(QString tmpDir = QString());
-    ~BasicComponentTest();
 
-    nx::utils::Url basicUrl() const;
+    void addRelayInstance(
+        std::vector<const char*> args = {},
+        bool waitUntilStarted = true);
+
+    Relay& relay(int index = 0);
+    const Relay& relay(int index = 0) const;
+
+    void stopAllInstances();
+
+private:
+    std::vector<std::unique_ptr<Relay>> m_relays;
 };
 
 } // namespace test
