@@ -1,10 +1,10 @@
-urllib3>=1.22
+urllib3==1.22
 pytest==3.0.7
 pytest-timeout==1.2.1
 pytest-cpp==0.4.5
 pytz==2017.3
 tzlocal==1.5.1
-requests>=2.18.4
+requests==2.18.4
 Jinja2==2.10
 python-debian>=0.1.28
 netaddr==0.7.19
