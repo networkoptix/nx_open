@@ -10,7 +10,7 @@ export class TimeAgoPipe implements PipeTransform {
         // Calculate item's age
         let t1 = new Date(value).getTime();
         let t2 = new Date(args).getTime();
-        let age = (t2 - t1) / 1000;
+        let age: any = (t2 - t1) / 1000;
 
         if (age < 10) {
             age = 'few seconds ago';
