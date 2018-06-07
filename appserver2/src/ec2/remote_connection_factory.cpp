@@ -355,7 +355,8 @@ void RemoteConnectionFactory::remoteTestConnectionFinished(
         || errorCode == ErrorCode::forbidden
         || errorCode == ErrorCode::ldap_temporary_unauthorized
         || errorCode == ErrorCode::cloud_temporary_unauthorized
-        || errorCode == ErrorCode::disabled_user_unauthorized)
+        || errorCode == ErrorCode::disabled_user_unauthorized
+        || errorCode == ErrorCode::userLockedOut)
     {
         handler->done(reqId, errorCode, connectionInfo);
         QnMutexLocker lk(&m_mutex);

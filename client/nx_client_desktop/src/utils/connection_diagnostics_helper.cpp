@@ -41,6 +41,7 @@ Qn::HelpTopic helpTopic(Qn::ConnectionResult result)
         case Qn::IncompatibleInternalConnectionResult:
         case Qn::ForbiddenConnectionResult:
         case Qn::DisabledUserConnectionResult:
+        case Qn::UserTemporaryLockedOut:
             return Qn::Login_Help;
         case Qn::IncompatibleCloudHostConnectionResult:
         case Qn::IncompatibleVersionConnectionResult:
@@ -233,6 +234,12 @@ void QnConnectionDiagnosticsHelper::showValidateConnectionErrorMessage(
                     + L'\n' + tr("Restart %1 in compatibility mode "
                         "will be required.").arg(QnClientAppInfo::applicationDisplayName()));
             break;
+        case Qn::UserTemporaryLockedOut:
+        {
+            QString message = tr("Too many attempts. Try again in a minute.");
+            QnMessageBox::critical(parentWidget, message);
+            break;
+        }
         default:
             break;
     }

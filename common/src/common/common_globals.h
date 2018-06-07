@@ -804,8 +804,9 @@ using CameraBackupQualities = nx::vms::api::CameraBackupQualities;
         IncompatibleCloudHostConnectionResult,      /*< Server has different cloud host. */
         IncompatibleVersionConnectionResult,        /*< Server version is too low. */
         IncompatibleProtocolConnectionResult,       /*< Ec2 protocol versions differs.*/
-        ForbiddenConnectionResult,                   /*< Connection is not allowed yet. Try again later*/
-        DisabledUserConnectionResult                /*< Disabled user*/
+        ForbiddenConnectionResult,                  /*< Connection is not allowed yet. Try again later*/
+        DisabledUserConnectionResult,               /*< Disabled user*/
+        UserTemporaryLockedOut,                     /*< User is prohibited from logging in for several minutes. Try again later*/
     };
 
     enum MediaStreamEvent

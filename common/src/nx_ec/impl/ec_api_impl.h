@@ -109,8 +109,9 @@ namespace ec2
         //!Can't check authorization because of cloud is offline
         cloud_temporary_unauthorized,
         //!User is disabled
-        disabled_user_unauthorized
-
+        disabled_user_unauthorized,
+        //!Login is locked for next few minutes after a series of unsuccessful attempts
+        userLockedOut
     };
 
     QString toString(ErrorCode errorCode);
