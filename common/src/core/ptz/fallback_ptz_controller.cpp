@@ -65,6 +65,11 @@ Ptz::Capabilities QnFallbackPtzController::getCapabilities() const
     return baseController()->getCapabilities();
 }
 
+Ptz::Capabilities QnFallbackPtzController::alternativeCapabilities() const
+{
+    return baseController()->alternativeCapabilities();
+}
+
 bool QnFallbackPtzController::continuousMove(const nx::core::ptz::Vector& speed)
 {
     return baseController()->continuousMove(speed);

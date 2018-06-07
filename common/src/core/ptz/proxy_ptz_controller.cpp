@@ -41,6 +41,13 @@ Ptz::Capabilities QnProxyPtzController::getCapabilities() const
         : Ptz::NoPtzCapabilities;
 }
 
+Ptz::Capabilities QnProxyPtzController::alternativeCapabilities() const
+{
+    return m_controller
+        ? m_controller->alternativeCapabilities()
+        : Ptz::NoPtzCapabilities;
+}
+
 bool QnProxyPtzController::continuousMove(const nx::core::ptz::Vector& speed)
 {
     return m_controller

@@ -27,7 +27,10 @@ public:
     virtual ~HanwhaPtzController() override;
 
     virtual Ptz::Capabilities getCapabilities() const override;
+    virtual Ptz::Capabilities alternativeCapabilities() const override;
+
     void setPtzCapabilities(Ptz::Capabilities capabilities);
+    void setAlternativePtzCapabilities(Ptz::Capabilities capabilities);
     void setPtzLimits(const QnPtzLimits& limits);
     void setPtzTraits(const QnPtzAuxilaryTraitList& traits);
     void setAlternativePtzRanges(const std::map<QString, HanwhaRange>& ranges);
@@ -75,6 +78,7 @@ private:
     mutable QnMutex m_mutex;
     HanwhaResourcePtr m_hanwhaResource;
     Ptz::Capabilities m_ptzCapabilities = Ptz::NoPtzCapabilities;
+    Ptz::Capabilities m_alternativePtzCapabilities = Ptz::NoPtzCapabilities;
     QnPtzLimits m_ptzLimits;
     QnPtzAuxilaryTraitList m_ptzTraits;
     mutable std::unique_ptr<HanwhaMappedPresetManager> m_presetManager;

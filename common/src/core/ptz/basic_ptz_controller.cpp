@@ -10,6 +10,11 @@ Ptz::Capabilities QnBasicPtzController::getCapabilities() const
     return Ptz::NoPtzCapabilities;
 }
 
+Ptz::Capabilities QnBasicPtzController::alternativeCapabilities() const
+{
+    return Ptz::NoPtzCapabilities;
+}
+
 bool QnBasicPtzController::continuousMove(const nx::core::ptz::Vector& /*spped*/)
 {
     return false;

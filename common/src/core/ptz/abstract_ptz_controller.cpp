@@ -100,7 +100,7 @@ bool QnAbstractPtzController::getData(Qn::PtzDataFields query, QnPtzData* data) 
 
 bool QnAbstractPtzController::supports(Qn::PtzCommand command) const
 {
-    const Ptz::Capabilities capabilities = getCapabilities();
+    const auto capabilities = getCapabilities() | alternativeCapabilities();
     switch (command)
     {
         case Qn::ContinuousMovePtzCommand:

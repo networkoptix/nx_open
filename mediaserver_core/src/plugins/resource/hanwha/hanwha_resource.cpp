@@ -258,7 +258,7 @@ static const std::map<QString, HanwhaAlternativePtzTrait>
             {
                 QString(),
                 lit("image/ptr/control/Rotate"),
-                Ptz::NoPtzCapabilities
+                Ptz::ContinuousRotationCapability
             }
         }
     };
@@ -916,11 +916,12 @@ nx::media::CameraStreamCapability HanwhaResource::mediaCapabilityForRole(Qn::Con
 
 QnAbstractPtzController* HanwhaResource::createPtzControllerInternal() const
 {
-    if (m_ptzCapabilities == Ptz::NoPtzCapabilities)
+    if (m_ptzCapabilities == Ptz::NoPtzCapabilities && m_ptzTraits.isEmpty())
         return nullptr;
 
     auto controller = new HanwhaPtzController(toSharedPointer(this));
     controller->setPtzCapabilities(m_ptzCapabilities);
+    controller->setAlternativePtzCapabilities(m_alternativePtzCapabilities);
     controller->setPtzLimits(m_ptzLimits);
     controller->setPtzTraits(m_ptzTraits);
     controller->setAlternativePtzRanges(m_alternativePtzRanges);
@@ -1342,6 +1343,7 @@ CameraDiagnostics::Result HanwhaResource::initAlternativePtz()
         if (qnGlobalSettings->showHanwhaAlternativePtzControlsOnTile())
             m_ptzCapabilities |= trait.capabilities;
 
+        m_alternativePtzCapabilities |= trait.capabilities;
         m_alternativePtzRanges[parameter->name()] = HanwhaRange(*parameter);
     }
 

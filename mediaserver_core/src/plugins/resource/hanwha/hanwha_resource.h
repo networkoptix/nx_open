@@ -344,6 +344,7 @@ private:
     std::map<Qn::ConnectionRole, ProfileNumbers> m_profileByRole;
 
     Ptz::Capabilities m_ptzCapabilities = Ptz::NoPtzCapabilities;
+    Ptz::Capabilities m_alternativePtzCapabilities = Ptz::NoPtzCapabilities;
     QnPtzLimits m_ptzLimits;
     QnPtzAuxilaryTraitList m_ptzTraits;
     std::map<QString, HanwhaRange> m_alternativePtzRanges;

@@ -37,9 +37,19 @@ Ptz::Capabilities HanwhaPtzController::getCapabilities() const
     return m_ptzCapabilities;
 }
 
+Ptz::Capabilities HanwhaPtzController::alternativeCapabilities() const
+{
+    return m_alternativePtzCapabilities;
+}
+
 void HanwhaPtzController::setPtzCapabilities(Ptz::Capabilities capabilities)
 {
     m_ptzCapabilities = capabilities;
+}
+
+void HanwhaPtzController::setAlternativePtzCapabilities(Ptz::Capabilities capabilities)
+{
+    m_alternativePtzCapabilities = capabilities;
 }
 
 void HanwhaPtzController::setPtzLimits(const QnPtzLimits& limits)

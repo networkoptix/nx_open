@@ -52,6 +52,11 @@ public slots: //< Class is exposed to QML. All functions in section below are in
     virtual Ptz::Capabilities getCapabilities() const = 0;
 
     /**
+     * @returns alternative PTZ capabilities (e.g configurational ptz)
+     */
+    virtual Ptz::Capabilities alternativeCapabilities() const = 0;
+
+    /**
      * @param command Ptz command to check.
      * @returns Whether this controller supports the given command.
      */

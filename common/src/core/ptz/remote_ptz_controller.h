@@ -16,6 +16,7 @@ public:
     virtual ~QnRemotePtzController();
 
     virtual Ptz::Capabilities getCapabilities() const override;
+    virtual Ptz::Capabilities alternativeCapabilities() const override;
 
     virtual bool continuousMove(const nx::core::ptz::Vector& speed) override;
     virtual bool continuousFocus(qreal speed) override;

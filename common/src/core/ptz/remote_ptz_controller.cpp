@@ -33,6 +33,11 @@ Ptz::Capabilities QnRemotePtzController::getCapabilities() const
     return result;
 }
 
+Ptz::Capabilities QnRemotePtzController::alternativeCapabilities() const
+{
+    return Ptz::NoPtzCapabilities;
+}
+
 QnMediaServerResourcePtr QnRemotePtzController::getMediaServer() const
 {
     return m_resource->getParentResource().dynamicCast<QnMediaServerResource>();
