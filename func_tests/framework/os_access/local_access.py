@@ -9,8 +9,9 @@ from framework.os_access.posix_shell import local_shell
 
 
 class _LocalPorts(object):
-    def __getitem__(self, item):
-        return '127.0.0.1', item
+    def __getitem__(self, protocol_port):
+        protocol, port = protocol_port
+        return '127.0.0.1', port
 
 
 _local_ports = _LocalPorts()
