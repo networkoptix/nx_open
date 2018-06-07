@@ -7,11 +7,7 @@
 #include <QtConcurrent/QtConcurrent>
 #include <QtCore/QDateTime>
 #include <nx/utils/thread/mutex.h>
-#if defined(Q_OS_MACX) || defined(Q_OS_ANDROID) || defined(Q_OS_IOS) || defined(__aarch64__)
-#include <zlib.h>
-#else
-#include <QtZlib/zlib.h>
-#endif
+#include <nx/utils/crc32.h>
 
 #include <api/global_settings.h>
 #include <api/runtime_info_manager.h>
@@ -405,7 +401,7 @@ void TimeSynchronizationManager::start(
     m_localTimePriorityKey.flags |= Qn::TF_peerIsNotEdgeServer;
 #endif
     QByteArray localGUID = commonModule()->moduleGUID().toByteArray();
-    m_localTimePriorityKey.seed = crc32(0, (const Bytef*)localGUID.constData(), localGUID.size());
+    m_localTimePriorityKey.seed = nx::utils::crc32(localGUID);
     //TODO #ak use guid to avoid handle priority key duplicates
     if (QElapsedTimer::isMonotonic())
         m_localTimePriorityKey.flags |= Qn::TF_peerHasMonotonicClock;
@@ -477,10 +473,9 @@ ApiTimeData TimeSynchronizationManager::getTimeInfo() const
     if (m_usedTimeSyncInfo.timePriorityKey.flags & Qn::TF_peerTimeSetByUser)
         result.syncTimeFlags |= Qn::TF_peerTimeSetByUser;
 
-    for (const auto& serverId : allServerIds)
+    for (const auto& serverId: allServerIds)
     {
-        const auto s = serverId.toByteArray();
-        if (m_usedTimeSyncInfo.timePriorityKey.seed == crc32(0, (const Bytef*)s.constData(), s.size()))
+        if (m_usedTimeSyncInfo.timePriorityKey.seed == nx::utils::crc32(serverId.toByteArray()))
         {
             result.primaryTimeServerGuid = serverId;
             break;
