@@ -102,9 +102,6 @@ CameraWebPageWidget::Private::Private(CameraWebPageWidget* parent):
     const auto accessManager = webView->page()->networkAccessManager();
     accessManager->setCookieJar(cookieJar.data());
 
-    QObject::connect(accessManager, &QNetworkAccessManager::sslErrors,
-        [](QNetworkReply* reply, const QList<QSslError>& /*errors*/) { reply->ignoreSslErrors(); });
-
     QObject::connect(accessManager, &QNetworkAccessManager::authenticationRequired,
         [this](QNetworkReply* reply, QAuthenticator* authenticator)
         {
