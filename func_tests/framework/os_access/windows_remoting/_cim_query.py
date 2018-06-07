@@ -124,6 +124,7 @@ class _Enumeration(object):
             'n:EndOfSequence' in response['n:PullResponse'],
             'w:EndOfSequence' in response['n:PullResponse']))
         items = response['n:PullResponse']['n:Items'][self.class_name]
+        self.enumeration_context = None if self.is_ended else response['n:PullResponse']['n:EnumerationContext']
         assert isinstance(items, list)
         return items if isinstance(items, list) else [items]
 
