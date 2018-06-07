@@ -1,6 +1,7 @@
 import QtQuick 2.5
 import QtQuick.Controls 2.4
 import Nx 1.0
+import nx.client.desktop 1.0
 
 // TODO: add half-checked state (future)
 // TODO: add table-specific skin (future)
@@ -9,7 +10,8 @@ CheckBox
 {
     id: thisComponent;
 
-    implicitHeight: contentItem.implicitHeight;
+    topPadding: 0
+    bottomPadding: 0
 
     opacity: (enabled ? 1.0 : 0.3);
 
@@ -51,14 +53,13 @@ CheckBox
             : ColorTheme.lighter(ColorTheme.light, 2);
         disabledColor: ColorTheme.light;
 
-        Rectangle
+        FocusFrame
         {
-            // TODO: It is not possible to do dotted border. Make this in future
-            anchors.fill: parent;
-            visible: thisComponent.activeFocus;
-            color: "transparent";
-            border.color: ColorTheme.colors.brand_d4;
+            anchors.fill: parent
+            anchors.leftMargin: -2
+            anchors.rightMargin: -2
+            visible: thisComponent.activeFocus
+            color: ColorTheme.colors.brand_d4
         }
-
     }
 }

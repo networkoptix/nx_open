@@ -1,25 +1,24 @@
 import QtQuick 2.6
-import QtQuick.Controls 2.4 as Labs
+import QtQuick.Controls 2.4
 import Nx 1.0
 
-Labs.Menu
+Menu
 {
-    id: control;
+    id: control
 
-    topPadding: 2;
-    bottomPadding: 2;
+    topPadding: 2
+    bottomPadding: 2
+
     background: Rectangle
     {
-        implicitHeight: 300;
-
-        radius: 2;
-        color: ColorTheme.midlight;
+        radius: 2
+        color: ColorTheme.midlight
     }
 
     Binding
     {
         target: contentItem
         property: "implicitWidth"
-        value: contentItem.contentItem.childrenRect.width;
+        value: contentItem.contentItem.childrenRect.width
     }
 }
