@@ -24,6 +24,11 @@ target_compile_definitions(nx_utils
     PRIVATE NX_UTILS_API=${API_EXPORT_MACRO}
     INTERFACE NX_UTILS_API=${API_IMPORT_MACRO})
 
+target_include_directories(nx_utils
+    PRIVATE
+        ${Qt5Core_PRIVATE_INCLUDE_DIRS}
+)
+
 if(WINDOWS)
     target_link_libraries(nx_utils PRIVATE DbgHelp ws2_32)
 endif()
@@ -35,9 +40,9 @@ endif()
 if(MACOSX)
     find_library(Foundation_LIBRARY Foundation)
     mark_as_advanced(Foundation_LIBRARY)
-    target_link_libraries(nx_utils PUBLIC ${Foundation_LIBRARY} z)
+    target_link_libraries(nx_utils PUBLIC ${Foundation_LIBRARY})
 endif()
 
-if(targetDevice STREQUAL "tx1")
+if(NOT WINDOWS)
     target_link_libraries(nx_utils PRIVATE z)
 endif()

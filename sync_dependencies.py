@@ -28,7 +28,7 @@ def determine_package_versions(
     v = {
         "gcc": "7.3.0",
         "clang": "6.0.0",
-        "qt": "5.6.2",
+        "qt": "5.11.0",
         "boost": "1.66.0",
         "openssl": "1.0.2e",
         "ffmpeg": "3.1.1",
@@ -51,15 +51,14 @@ def determine_package_versions(
     }
 
     if platform == "windows":
-        v["qt"] = "5.6.1-1"
         v["ffmpeg"] = "3.1.9"
 
     if platform == "linux" and box == "none":
-        v["qt"] = "5.6.2-2"
         v["festival"] = "2.4-1"
         v["festival-vox"] = "2.4"
-        v["sysroot"] = "xenial"
+        v["sysroot"] = "xenial-1"
         v["ffmpeg"] = "3.1.9"
+        v["openssl"] = "1.0.2g"
 
     if platform == "linux" and box != "none":
         if box == "tx1":
@@ -68,13 +67,11 @@ def determine_package_versions(
             v["gcc"] = "linaro-7.2.1"
 
     if platform == "macosx":
-        v["qt"] = "5.6.3"
         v["ffmpeg"] = "3.1.9"
         v["openssl"] = "1.0.2e-2"
         v["festival"] = "2.1"
 
     if platform == "android":
-        v["qt"] = "5.6.2-2"
         v["openssl"] = "1.0.2g"
         v["openal"] = "1.17.2"
 
@@ -86,26 +83,21 @@ def determine_package_versions(
         v["openssl"] = "1.0.2l-deb9"
 
     if box in ("bpi", "bananapi"):
-        v["qt"] = "5.6.2-1"
         v["festival"] = "2.4-1"
         v["festival-vox"] = "2.4"
         v["sysroot"] = "1"
 
     if box == "bananapi":
         v["ffmpeg"] = "3.1.1-bananapi"
-        v["qt"] = "5.6.3-bananapi"
 
     if box == "rpi":
-        v["qt"] = "5.6.3"
         v["festival"] = "2.4-1"
         v["festival-vox"] = "2.4"
 
     if box == "edge1":
-        v["qt"] = "5.6.3"
         v["openssl"] = "1.0.1f"
 
     if box == "tx1":
-        v["qt"] = "5.6.3"
         v["festival"] = "2.1x"
         v["openssl"] = "1.0.0j"
 
