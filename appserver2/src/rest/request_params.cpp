@@ -62,7 +62,7 @@ bool parseHttpRequestParams(
 
 void toUrlParams(const QByteArray& id, QUrlQuery* query)
 {
-    serialize(QLatin1String(id), lit("id"), query);
+    serialize(QString::fromLatin1(id), lit("id"), query);
 }
 
 bool parseHttpRequestParams(
