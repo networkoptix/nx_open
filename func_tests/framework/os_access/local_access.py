@@ -4,7 +4,7 @@ import tzlocal
 
 from framework.networking.prohibited import ProhibitedNetworking
 from framework.os_access.local_path import LocalPath
-from framework.os_access.os_access_interface import OSAccess
+from framework.os_access.posix_access import PosixAccess
 from framework.os_access.posix_shell import local_shell
 
 
@@ -16,12 +16,13 @@ class _LocalPorts(object):
 _local_ports = _LocalPorts()
 
 
-class LocalAccess(OSAccess):
-    def run_command(self, command, input=None):
-        return local_shell.run_command(command, input=input)
-
+class LocalAccess(PosixAccess):
     def is_accessible(self):
         return True
+
+    @property
+    def shell(self):
+        return local_shell
 
     @property
     def Path(self):
@@ -42,9 +43,6 @@ class LocalAccess(OSAccess):
 
     def set_time(self, new_time):
         raise NotImplementedError("Changing local time is prohibited")
-
-    def make_core_dump(self, pid):
-        self.run_command(['kill', '-s', 'SIGTRAP', pid])
 
 
 local_access = LocalAccess()

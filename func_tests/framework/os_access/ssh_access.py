@@ -5,13 +5,13 @@ import pytz
 
 from framework.method_caching import cached_property
 from framework.networking.linux import LinuxNetworking
-from framework.os_access.os_access_interface import OSAccess
+from framework.os_access.posix_access import PosixAccess
 from framework.os_access.posix_shell import SSH
 from framework.os_access.ssh_path import make_ssh_path_cls
 from framework.utils import RunningTime
 
 
-class SSHAccess(OSAccess):
+class SSHAccess(PosixAccess):
     def __init__(self, forwarded_ports, macs, username, key_path):
         self._macs = macs
         ssh_hostname, ssh_port = forwarded_ports['tcp', 22]
@@ -22,15 +22,16 @@ class SSHAccess(OSAccess):
         return '<SSHAccess via {!r}>'.format(self.ssh)
 
     @property
+    def shell(self):
+        return self.ssh
+
+    @property
     def forwarded_ports(self):
         return self._forwarded_ports
 
     @cached_property
     def Path(self):
         return make_ssh_path_cls(self.ssh)
-
-    def run_command(self, command, input=None):
-        return self.ssh.run_command(command, input=input)
 
     def is_accessible(self):
         return self.ssh.is_working()
@@ -53,6 +54,3 @@ class SSHAccess(OSAccess):
         started_at = datetime.datetime.now(pytz.utc)
         self.run_command(['date', '--set', new_time.isoformat()])
         return RunningTime(new_time, datetime.datetime.now(pytz.utc) - started_at)
-
-    def make_core_dump(self, pid):
-        self.ssh.run_sh_script('gcore -o /proc/$PID/cwd/core.$(date +%s) $PID', env={'PID': pid})
