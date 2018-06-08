@@ -152,7 +152,7 @@ int StreamReader::getNextData(nxcip::MediaDataPacket** lpPacket)
         }
         else
         {
-            NX_LOG(QString::fromLatin1("Unsupported Content-Type %1").arg(QLatin1String(localHttpClientPtr->contentType())), cl_logDEBUG1);
+            NX_DEBUG(this, QString::fromLatin1("Unsupported Content-Type %1").arg(QLatin1String(localHttpClientPtr->contentType())));
             return nxcip::NX_UNSUPPORTED_CODEC;
         }
     }
@@ -273,19 +273,19 @@ int StreamReader::doRequest(nx_http::HttpClient* const httpClient)
     httpClient->setUserPassword(m_password);
     if(!httpClient->doGet(QUrl(m_url)) || !httpClient->response())
     {
-        NX_LOG(QString::fromLatin1("Failed to request %1").arg(m_url), cl_logDEBUG1);
+        NX_DEBUG(this, QString::fromLatin1("Failed to request %1").arg(m_url));
         return nxcip::NX_NETWORK_ERROR;
     }
     if(httpClient->response()->statusLine.statusCode == nx_http::StatusCode::unauthorized)
     {
-        NX_LOG(QString::fromLatin1("Failed to request %1: %2").arg(m_url).
-            arg(QLatin1String(httpClient->response()->statusLine.reasonPhrase)), cl_logDEBUG1 );
+        NX_DEBUG(this, QString::fromLatin1("Failed to request %1: %2").arg(m_url).
+            arg(QLatin1String(httpClient->response()->statusLine.reasonPhrase)));
         return nxcip::NX_NOT_AUTHORIZED;
     }
     if(httpClient->response()->statusLine.statusCode / 100 * 100 != nx_http::StatusCode::ok)
     {
-        NX_LOG(QString::fromLatin1("Failed to request %1: %2").arg(m_url).
-            arg(QLatin1String(httpClient->response()->statusLine.reasonPhrase)), cl_logDEBUG1 );
+        NX_DEBUG(this, QString::fromLatin1("Failed to request %1: %2").arg(m_url).
+            arg(QLatin1String(httpClient->response()->statusLine.reasonPhrase)));
         return nxcip::NX_NETWORK_ERROR;
     }
     return nxcip::NX_NO_ERROR;

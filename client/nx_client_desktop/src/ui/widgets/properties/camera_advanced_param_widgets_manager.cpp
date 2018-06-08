@@ -85,6 +85,7 @@ void QnCameraAdvancedParamWidgetsManager::loadValues(
             continue;
 
         auto widget = m_paramWidgetsById[param.id];
+
         widget->setValue(param.value);
         widget->setEnabled(true);
 

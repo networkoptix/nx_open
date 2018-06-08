@@ -14,7 +14,16 @@ const size_t kMaxWriteQueueSize = 1000;
 template<typename StructToWrite>
 static QDataStream &operator << (QDataStream &stream, const StructToWrite &s)
 {
-    return stream << s.part1 << s.part2;
+    QByteArray tmpBuffer;
+    tmpBuffer.resize(sizeof(s.part1) + sizeof(s.part2));
+
+    decltype (s.part1) *part1 = (decltype (s.part1)*) tmpBuffer.data();
+    decltype (s.part2) *part2 = (decltype (s.part2)*) (tmpBuffer.data() + sizeof(s.part1));
+    *part1 = qToLittleEndian(s.part1);
+    *part2 = qToLittleEndian(s.part2);
+
+    stream.writeRawData(tmpBuffer.data(), tmpBuffer.size());
+    return stream;
 }
 
 namespace

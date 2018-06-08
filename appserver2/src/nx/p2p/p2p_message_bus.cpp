@@ -1643,6 +1643,7 @@ int MessageBus::connectionTries() const
 
 QSet<QnUuid> MessageBus::directlyConnectedClientPeers() const
 {
+    QnMutexLocker lock(&m_mutex);
     QSet<QnUuid> result;
     for (const auto& connection: m_connections)
     {
@@ -1654,6 +1655,7 @@ QSet<QnUuid> MessageBus::directlyConnectedClientPeers() const
 
 QnUuid MessageBus::routeToPeerVia(const QnUuid& peerId, int* distance) const
 {
+    QnMutexLocker lock(&m_mutex);
     if (localPeer().id == peerId)
     {
         *distance = 0;

@@ -149,11 +149,6 @@ namespace nxcip_qt
         return result;
     }
 
-    int CameraMediaEncoder::setMediaUrl(const QString& url)
-    {
-        return m_intf->setMediaUrl(url.toUtf8().constData());
-    }
-
     //!See nxcip::BaseCameraManager::getResolutionList
     int CameraMediaEncoder::getResolutionList( QVector<nxcip::ResolutionInfo>* infoList ) const
     {
@@ -198,7 +193,7 @@ namespace nxcip_qt
         m_textBuf( new char[nxcip::MAX_TEXT_LEN] )
     {
     }
-    
+
     BaseCameraManager::~BaseCameraManager()
     {
         delete[] m_textBuf;

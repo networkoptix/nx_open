@@ -30,6 +30,16 @@ MediaEncoder::~MediaEncoder()
 
 void* MediaEncoder::queryInterface( const nxpl::NX_GUID& interfaceID )
 {
+    if (memcmp(&interfaceID, &nxcip::IID_CameraMediaEncoder4, sizeof(nxcip::IID_CameraMediaEncoder4)) == 0)
+    {
+        addRef();
+        return static_cast<nxcip::CameraMediaEncoder4*>(this);
+    }
+    if (memcmp(&interfaceID, &nxcip::IID_CameraMediaEncoder3, sizeof(nxcip::IID_CameraMediaEncoder3)) == 0)
+    {
+        addRef();
+        return static_cast<nxcip::CameraMediaEncoder3*>(this);
+    }
     if( memcmp( &interfaceID, &nxcip::IID_CameraMediaEncoder2, sizeof(nxcip::IID_CameraMediaEncoder2) ) == 0 )
     {
         addRef();
@@ -69,7 +79,7 @@ QString MediaEncoder::getMediaUrlInternal() const
 {
     if (!m_mediaUrl.isEmpty())
         return m_mediaUrl;
-    else if (m_encoderNumber == 0)
+    if (m_encoderNumber == 0)
         return m_cameraManager->info().url;
     return QString();
 }
@@ -169,4 +179,17 @@ void MediaEncoder::updateCredentials(const QString& login, const QString& passwo
 {
     if(m_streamReader)
         m_streamReader->updateCredentials(login, password);
+}
+
+int MediaEncoder::getConfiguredLiveStreamReader(
+    nxcip::LiveStreamConfig* /*config*/, nxcip::StreamReader** reader)
+{
+    *reader = getLiveStreamReader();
+    return nxcip::NX_NO_ERROR;
+}
+
+int MediaEncoder::getVideoFormat(
+    nxcip::CompressionType* /*codec*/, nxcip::PixelFormat* /*pixelFormat*/) const
+{
+    return nxcip::NX_NO_ERROR;
 }

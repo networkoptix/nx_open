@@ -21,9 +21,7 @@ class CameraManager;
 /*!
     \note Delegates reference counting to \a AxisCameraManager instance
 */
-class MediaEncoder
-:
-    public nxcip::CameraMediaEncoder2
+class MediaEncoder: public nxcip::CameraMediaEncoder4
 {
 public:
     MediaEncoder(CameraManager* const cameraManager,
@@ -40,8 +38,6 @@ public:
 
     //!Implementation of nxcip::CameraMediaEncoder::getMediaUrl
     virtual int getMediaUrl( char* urlBuf ) const override;
-    //!Implementation of nxcip::CameraMediaEncoder::setMediaUrl
-    virtual int setMediaUrl(const char url[nxcip::MAX_TEXT_LEN]) override;
     //!Implementation of nxcip::CameraMediaEncoder::getResolutionList
     virtual int getResolutionList( nxcip::ResolutionInfo* infoList, int* infoListCount ) const override;
     //!Implementation of nxcip::CameraMediaEncoder::getMaxBitrate
@@ -59,6 +55,16 @@ public:
     virtual int getAudioFormat( nxcip::AudioFormat* audioFormat ) const override;
 
     void updateCredentials(const QString& login, const QString& password);
+
+    //!Implementation of nxcip::CameraMediaEncoder3::getConfiguredLiveStreamReader
+    virtual int getConfiguredLiveStreamReader(
+        nxcip::LiveStreamConfig* config, nxcip::StreamReader** reader) override;
+    //!Implementation of nxcip::CameraMediaEncoder3::getVideoFormat
+    virtual int getVideoFormat(
+        nxcip::CompressionType* codec, nxcip::PixelFormat* pixelFormat) const override;
+
+    //!Implementation of nxcip::CameraMediaEncoder4::setMediaUrl
+    virtual int setMediaUrl(const char url[nxcip::MAX_TEXT_LEN]) override;
 private:
     QString getMediaUrlInternal() const;
 private:

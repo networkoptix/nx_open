@@ -138,7 +138,7 @@ def sync_dependencies(syncher):
         sync("gdb")
 
     if withDesktopClient:
-        sync("any/help-{}-3.1".format(customization), path_variable="help_directory")
+        sync("any/help-{}-3.2".format(customization), path_variable="help_directory")
 
     if withDesktopClient or withMobileClient:
         sync("any/roboto-fonts", path_variable="fonts_directory")

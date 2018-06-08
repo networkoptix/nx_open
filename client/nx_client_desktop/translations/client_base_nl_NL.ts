@@ -7431,7 +7431,7 @@ to %1</source>
     <name>QnWorkbenchContext</name>
     <message>
       <source>To use the software you must accept the end user license agreement</source>
-      <translation>Om de software te kunnen gebruiken dient u eerst de gebruiksrechtovereenkomst accepteren</translation>
+      <translation>Om de software te gebruiken, moet u de licentieovereenkomst voor eindgebruikers accepteren</translation>
     </message>
     <message>
       <source>Accept</source>

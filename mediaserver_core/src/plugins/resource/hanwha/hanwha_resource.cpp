@@ -794,8 +794,8 @@ CameraDiagnostics::Result HanwhaResource::initDevice()
     auto isDefaultPasswordGuard = makeScopeGuard(
         [&]
         {
-            setCameraCapability(Qn::isDefaultPasswordCapability, isDefaultPassword);
-            setCameraCapability(Qn::isOldFirmwareCapability, isOldFirmware);
+            setCameraCapability(Qn::IsDefaultPasswordCapability, isDefaultPassword);
+            setCameraCapability(Qn::IsOldFirmwareCapability, isOldFirmware);
             saveParams();
         });
 
@@ -954,7 +954,7 @@ CameraDiagnostics::Result HanwhaResource::initSystem()
 
     if (isNvr())
     {
-        setCameraCapability(Qn::isPlaybackSpeedSupported, true);
+        setCameraCapability(Qn::IsPlaybackSpeedSupported, true);
 
         const auto sunapiSupportAttribute = m_attributes.attribute<bool>(
             lit("Media/Protocol.SUNAPI/%1").arg(getChannel()));

@@ -85,6 +85,7 @@
                     group="primaryStream"
                     dataType="Number"
                     writeCmd="update"
+                    keepInitialValue="true"
                     aux="range=media/videoprofile/add_update/FrameRate;profile=primary;resourceProperty=primaryStreamFps;specific=true;deviceTypes=nvr">
                 </param>
 
@@ -313,6 +314,7 @@
                         group="secondaryStream"
                         dataType="Number"
                         writeCmd="update"
+                        keepInitialValue="true"
                         aux="range=media/videoprofile/add_update/FrameRate;profile=secondary;resourceProperty=secondaryStreamFps;specific=true">
                 </param>
 

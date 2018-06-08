@@ -33,7 +33,9 @@
 #include "http/http_transaction_receiver.h"
 #include "mutex/distributed_mutex_manager.h"
 #include <http/p2p_connection_listener.h>
+
 #include <transaction/message_bus_adapter.h>
+#include <transaction/threadsafe_message_bus_adapter.h>
 
 #include <ini.h>
 
@@ -62,12 +64,24 @@ Ec2DirectConnectionFactory::Ec2DirectConnectionFactory(
         m_transactionLog.reset(new QnTransactionLog(m_dbManager.get(), m_ubjsonTranSerializer.get()));
     }
 
-    m_bus.reset(new TransactionMessageBusAdapter(
-        m_dbManager.get(),
-        peerType,
-        commonModule,
-        m_jsonTranSerializer.get(),
-        m_ubjsonTranSerializer.get()));
+    if (peerType == Qn::PT_Server)
+    {
+        m_bus.reset(new TransactionMessageBusAdapter(
+            m_dbManager.get(),
+            peerType,
+            commonModule,
+            m_jsonTranSerializer.get(),
+            m_ubjsonTranSerializer.get()));
+    }
+    else
+    {
+        m_bus.reset(new ThreadsafeMessageBusAdapter(
+            m_dbManager.get(),
+            peerType,
+            commonModule,
+            m_jsonTranSerializer.get(),
+            m_ubjsonTranSerializer.get()));
+    }
 
 
     m_timeSynchronizationManager.reset(new TimeSynchronizationManager(
