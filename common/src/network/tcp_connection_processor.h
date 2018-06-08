@@ -75,6 +75,8 @@ public:
     int notFound(QByteArray& contentType);
     QnAuthSession authSession() const;
 
+    QnTcpListener* owner() const;
+
 protected:
     QString extractPath() const;
     static QString extractPath(const QString& fullUrl);
@@ -115,6 +117,7 @@ protected:
     bool sendData(const char* data, int size);
     inline bool sendData(const QByteArray& data) { return sendData(data.constData(), data.size()); }
     void sendUnauthorizedResponse(nx::network::http::StatusCode::Value httpResult, const QByteArray& messageBody);
+
 protected:
     Q_DECLARE_PRIVATE(QnTCPConnectionProcessor);
 

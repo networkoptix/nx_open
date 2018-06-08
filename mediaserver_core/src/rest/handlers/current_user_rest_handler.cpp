@@ -1,17 +1,14 @@
 #include "current_user_rest_handler.h"
 
-#include "nx_ec/data/api_user_data.h"
-#include "api/app_server_connection.h"
-
-#include <nx_ec/managers/abstract_user_manager.h>
-#include "rest/server/rest_connection_processor.h"
-
+#include <api/app_server_connection.h>
+#include <common/common_module.h>
+#include <network/universal_tcp_listener.h>
+#include <nx_ec/data/api_user_data.h>
 #include <nx_ec/ec_api.h>
-
+#include <nx_ec/managers/abstract_user_manager.h>
 #include <nx/network/http/custom_headers.h>
 #include <nx/network/http/http_types.h>
-#include <network/authenticate_helper.h>
-#include <common/common_module.h>
+#include <rest/server/rest_connection_processor.h>
 
 int QnCurrentUserRestHandler::executeGet(
     const QString&,
@@ -21,11 +18,12 @@ int QnCurrentUserRestHandler::executeGet(
 {
     ec2::ApiUserData user;
 
+    const auto authorizer = QnUniversalTcpListener::authorizer(owner->owner());
     const auto clientIp = owner->socket()->getForeignAddress().address;
     auto accessRights = owner->accessRights();
     if (accessRights.isNull())
     {
-        QnAuthHelper::instance()->doCookieAuthorization(
+        authorizer->doCookieAuthorization(
             clientIp, "GET", nx::network::http::getHeaderValue(owner->request().headers, "Cookie"),
             nx::network::http::getHeaderValue(owner->request().headers, Qn::CSRF_TOKEN_HEADER_NAME),
             *owner->response(), &accessRights);
@@ -33,7 +31,7 @@ int QnCurrentUserRestHandler::executeGet(
     if (accessRights.isNull())
     {
         nx::network::http::Response response;
-        QnAuthHelper::instance()->authenticateByUrl(
+        authorizer->authenticateByUrl(
             clientIp, params.value(Qn::URL_QUERY_AUTH_KEY_NAME).toUtf8(),
             "GET", response, &accessRights);
     }

@@ -3,7 +3,6 @@
 
 #include "network/tcp_connection_processor.h"
 #include "universal_tcp_listener.h"
-#include "authenticate_helper.h"
 
 class QnUniversalRequestProcessorPrivate;
 

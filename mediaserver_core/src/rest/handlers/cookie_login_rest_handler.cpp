@@ -2,19 +2,20 @@
 
 #include <QTimeZone>
 
-#include <network/authenticate_helper.h>
+#include <api/model/cookie_login_data.h>
+#include <audit/audit_manager.h>
+#include <network/client_authenticate_helper.h>
 #include <network/tcp_connection_priv.h>
+#include <network/universal_tcp_listener.h>
+#include <nx/network/http/custom_headers.h>
+#include <nx/utils/scope_guard.h>
+#include <rest/server/rest_connection_processor.h>
 #include <utils/common/app_info.h>
 #include <utils/common/synctime.h>
 #include <utils/common/util.h>
-#include <rest/server/rest_connection_processor.h>
-#include <nx/network/http/custom_headers.h>
-#include <network/client_authenticate_helper.h>
-#include "current_user_rest_handler.h"
-#include <api/model/cookie_login_data.h>
+
 #include "cookie_logout_rest_handler.h"
-#include <nx/utils/scope_guard.h>
-#include <audit/audit_manager.h>
+#include "current_user_rest_handler.h"
 
 int QnCookieLoginRestHandler::executePost(
     const QString &/*path*/,
@@ -40,8 +41,9 @@ int QnCookieLoginRestHandler::executePost(
         return nx::network::http::StatusCode::ok;
     }
 
+    const auto authorizer = QnUniversalTcpListener::authorizer(owner->owner());
     Qn::UserAccessData accessRights;
-    Qn::AuthResult authResult = QnAuthHelper::instance()->authenticateByUrl(
+    Qn::AuthResult authResult = authorizer->authenticateByUrl(
         owner->socket()->getForeignAddress().address,
         cookieData.auth,
         QByteArray("GET"),
@@ -96,7 +98,7 @@ int QnCookieLoginRestHandler::executePost(
 
     setCookie(Qn::URL_QUERY_AUTH_KEY_NAME, cookieData.auth, "HttpOnly");
     setCookie(Qn::EC2_RUNTIME_GUID_HEADER_NAME, QnUuid::createUuid().toByteArray(), "HttpOnly");
-    setCookie(Qn::CSRF_TOKEN_COOKIE_NAME, QnAuthHelper::instance()->newCsrfToken(), "");
+    setCookie(Qn::CSRF_TOKEN_COOKIE_NAME, authorizer->newCsrfToken(), "");
 
     QnCurrentUserRestHandler currentUser;
     return currentUser.executeGet(QString(), QnRequestParams(), result, owner);

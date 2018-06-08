@@ -24,7 +24,6 @@
 #include <utils/common/app_info.h>
 #include <common/common_module.h>
 
-#include <network/authenticate_helper.h>
 #include <network/system_helpers.h>
 
 #include <nx/network/nettools.h>

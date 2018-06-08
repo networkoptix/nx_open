@@ -40,6 +40,7 @@ QnUniversalRequestProcessor::QnUniversalRequestProcessor(
     QnTCPConnectionProcessor(new QnUniversalRequestProcessorPrivate, socket, owner)
 {
     Q_D(QnUniversalRequestProcessor);
+    d->listener = owner;
     d->processor = 0;
     d->needAuth = needAuth;
 
@@ -90,7 +91,7 @@ bool QnUniversalRequestProcessor::authenticate(Qn::UserAccessData* accessRights,
         Qn::AuthResult authResult;
         QnAuthSession lastUnauthorizedData;
         const auto clientIp = d->socket->getForeignAddress().address;
-        while ((authResult = qnAuthHelper->authenticate(
+        while ((authResult = d->listener->authorizer()->authenticate(
             clientIp, d->request, d->response, isProxy, accessRights, &usedMethod)) != Qn::Auth_OK)
         {
             lastUnauthorizedData = authSession();

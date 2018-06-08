@@ -1,5 +1,4 @@
-#ifndef __QN_AUTH_HELPER__
-#define __QN_AUTH_HELPER__
+#pragma once
 
 #include <deque>
 #include <map>
@@ -13,11 +12,11 @@
 #include <nx/utils/std/optional.h>
 #include <nx/utils/timer_manager.h>
 #include <nx/utils/uuid.h>
-#include <nx/utils/singleton.h>
 #include <nx/network/http/http_types.h>
 #include <nx/utils/thread/mutex.h>
 #include <nx/network/http/auth_restriction_list.h>
 #include <nx/network/socket_common.h>
+#include <nx/network/temporary_key_keeper.h>
 
 #include <nx/vms/auth/abstract_nonce_provider.h>
 #include <nx/vms/auth/abstract_user_data_provider.h>
@@ -27,29 +26,32 @@
 #include <core/resource_access/user_access_data.h>
 #include <utils/common/id.h>
 
-#include "ldap/ldap_manager.h"
+#include "ldap_manager.h"
 
 struct QnLdapDigestAuthContext;
 class TimeBasedNonceProvider;
 namespace nx { namespace vms { namespace cloud_integration {  struct CloudManagerGroup; } } }
 
-class QnAuthHelper:
+namespace nx {
+namespace mediaserver {
+
+/**
+ * Authenticates requests on server side.
+ */
+class Authorizer:
     public QObject,
-    public QnCommonModuleAware,
-    public Singleton<QnAuthHelper>
+    public QnCommonModuleAware
 {
     Q_OBJECT
 
 public:
     static const constexpr std::chrono::milliseconds kMaxKeyLifeTime = std::chrono::hours(1);
 
-    QnAuthHelper(
+    Authorizer(
         QnCommonModule* commonModule,
         TimeBasedNonceProvider* timeBasedNonceProvider,
         nx::vms::cloud_integration::CloudManagerGroup* cloudManagerGroup);
-    virtual ~QnAuthHelper();
 
-    //!Authenticates request on server side
     Qn::AuthResult authenticate(
         const nx::network::HostAddress& clientIp,
         const nx::network::http::Request& request,
@@ -68,11 +70,9 @@ public:
 
     nx::network::http::AuthMethodRestrictionList* restrictionList();
 
-    //!Creates query item for \a path which does not require authentication
-    /*!
-        Created key is valid for \a periodMillis milliseconds
-        \param periodMillis cannot be greater than \a QnAuthHelper::MAX_AUTHENTICATED_ALIAS_LIFE_TIME_MS
-        \note pair<query key name, key value>. Returned key is only valid for \a path
+    /**
+     * Creates query item for \a path which does not require authentication.
+     * @note pair<query key name, key value>. Returned key is only valid for provided path.
     */
     QPair<QString, QString> createAuthenticationQueryItemForPath(
         const Qn::UserAccessData& accessRights,
@@ -88,9 +88,9 @@ public:
         const boost::optional<QByteArray>& csrfToken,
         nx::network::http::Response& responseHeaders, Qn::UserAccessData* accessRights);
 
-    /*!
-    \param authDigest base64(username : nonce : MD5(ha1, nonce, MD5(METHOD :)))
-    */
+    /**
+     * @param authDigest base64(username : nonce : MD5(ha1, nonce, MD5(METHOD :)))
+     */
     Qn::AuthResult authenticateByUrl(
         const nx::network::HostAddress& clientIp,
         const QByteArray& authRecord,
@@ -98,7 +98,7 @@ public:
         nx::network::http::Response& response,
         Qn::UserAccessData* accessRights = nullptr);
 
-    QnLdapManager* ldapManager() const;
+    LdapManager* ldapManager() const;
 
     nx::Buffer newCsrfToken();
     void removeCsrfToken(const nx::Buffer& token);
@@ -146,38 +146,25 @@ private:
         TempAuthenticationKeyCtx& operator=( const TempAuthenticationKeyCtx& );
     };
 
-    class UserDigestData
-    {
-    public:
-        nx::network::http::StringType ha1Digest;
-        nx::network::http::StringType realm;
-        nx::network::http::StringType cryptSha512Hash;
-        nx::network::http::StringType nxUserName;
-
-        void parse( const nx::network::http::Request& request );
-        bool empty() const;
-    };
-
     struct AccessFailureData
     {
         std::optional<std::chrono::steady_clock::time_point> lockedOut;
         std::deque<std::chrono::steady_clock::time_point> failures;
     };
 
-    /*!
-        \param userRes Can be NULL
-    */
     void addAuthHeader(
         nx::network::http::Response& responseHeaders,
-        const QnUserResourcePtr& userRes,
-        bool isProxy,
+            const QnUserResourcePtr& userRes = {},
+        bool isProxy = false,
         bool isDigest = true);
+
     Qn::AuthResult doDigestAuth(
         const nx::network::http::RequestLine& requestLine,
         const nx::network::http::header::Authorization& authorization,
         nx::network::http::Response& responseHeaders,
         bool isProxy,
         Qn::UserAccessData* accessRights);
+
     Qn::AuthResult doBasicAuth(
         const QByteArray& method,
         const nx::network::http::header::Authorization& authorization,
@@ -213,13 +200,12 @@ private:
     nx::vms::auth::AbstractNonceProvider* m_timeBasedNonceProvider;
     nx::vms::auth::AbstractNonceProvider* m_nonceProvider;
     nx::vms::auth::AbstractUserDataProvider* m_userDataProvider;
-    std::unique_ptr<QnLdapManager> m_ldap;
+    std::unique_ptr<LdapManager> m_ldap;
     mutable std::map<nx::Buffer, std::chrono::steady_clock::time_point> m_csrfTokens;
     mutable std::map<nx::String /*userName*/, std::map<nx::network::HostAddress, AccessFailureData>>
         m_accessFailures;
     std::optional<LockoutOptions> m_lockoutOptions = LockoutOptions();
 };
 
-#define qnAuthHelper QnAuthHelper::instance()
-
-#endif // __QN_AUTH_HELPER__
+} // namespace mediaserver
+} // namespace nx

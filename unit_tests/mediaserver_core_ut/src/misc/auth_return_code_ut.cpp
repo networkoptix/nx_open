@@ -11,7 +11,7 @@
 #include <nx/network/http/custom_headers.h>
 
 #include <nx/fusion/model_functions.h>
-#include <network/authenticate_helper.h>
+#include <nx/mediaserver/authorizer.h>
 #include <api/model/cookie_login_data.h>
 #include <network/authutil.h>
 #include <rest/server/json_rest_result.h>
@@ -23,24 +23,28 @@
 #include <audit/mserver_audit_manager.h>
 #include <nx/utils/elapsed_timer.h>
 
+namespace nx {
+namespace mediaserver {
+namespace test {
+
 class AuthReturnCodeTest:
     public ::testing::Test
 {
 public:
     static void SetUpTestCase()
     {
-        mediaServerLauncher.reset(new MediaServerLauncher());
-        ASSERT_TRUE(mediaServerLauncher->start());
+        server.reset(new MediaServerLauncher());
+        ASSERT_TRUE(server->start());
     }
 
     static void TearDownTestCase()
     {
-        mediaServerLauncher.reset();
+        server.reset();
     }
 
     virtual void SetUp() override
     {
-        auto ec2Connection = mediaServerLauncher->commonModule()->ec2Connection();
+        auto ec2Connection = server->commonModule()->ec2Connection();
         ec2::AbstractUserManagerPtr userManager = ec2Connection->getUserManager(Qn::kSystemAccess);
 
         userData.id = QnUuid::createUuid();
@@ -67,7 +71,7 @@ public:
 
         ASSERT_EQ(ec2::ErrorCode::ok, userManager->saveSync(ldapUserWithFilledDigest));
 
-        auto settings = mediaServerLauncher->commonModule()->globalSettings();
+        auto settings = server->commonModule()->globalSettings();
         settings->setCloudSystemId(QnUuid::createUuid().toString());
         settings->setCloudAuthKey(QnUuid::createUuid().toString());
         settings->synchronizeNowSync();
@@ -75,14 +79,14 @@ public:
 
     nx::utils::Url serverUrl(const QString& path) const
     {
-        nx::utils::Url url = mediaServerLauncher->apiUrl();
+        nx::utils::Url url = server->apiUrl();
         url.setPath(path);
         return url;
     }
 
     void addLocalUser(QString userName, QString password, bool isEnabled = true)
     {
-        auto ec2Connection = mediaServerLauncher->commonModule()->ec2Connection();
+        auto ec2Connection = server->commonModule()->ec2Connection();
         ec2::AbstractUserManagerPtr userManager = ec2Connection->getUserManager(Qn::kSystemAccess);
 
         userData.id = QnUuid::createUuid();
@@ -138,7 +142,7 @@ public:
             password,
             nx::network::AppInfo::realm().toUtf8(),
             nx::network::http::Method::get,
-            QnAuthHelper::instance()->generateNonce());
+            server->authorizer()->generateNonce());
 
         nx::network::http::HttpClient client;
         client.doPost(serverUrl("/api/cookieLogin"), "application/json", QJson::serialized(cookieLogin));
@@ -183,7 +187,7 @@ public:
     ec2::ApiUserData ldapUserWithEmptyDigest;
     ec2::ApiUserData ldapUserWithFilledDigest;
 
-    static std::unique_ptr<MediaServerLauncher> mediaServerLauncher;
+    static std::unique_ptr<MediaServerLauncher> server;
 
     void testServerReturnCode(
         const QString& login,
@@ -209,7 +213,7 @@ public:
         constexpr const auto maxPeriodToWaitForMediaServerStart = std::chrono::seconds(150);
         while (std::chrono::steady_clock::now() - startTime < maxPeriodToWaitForMediaServerStart)
         {
-            if (mediaServerLauncher->port() == 0)
+            if (server->port() == 0)
             {
                 std::this_thread::sleep_for(std::chrono::milliseconds(1));
                 continue;
@@ -252,16 +256,36 @@ public:
             }
         }
     }
+
+    std::unique_ptr<nx::network::http::HttpClient> manualDigestClient(
+        const QByteArray& method, const QByteArray& uri)
+    {
+        nx::network::http::header::WWWAuthenticate unquthorizedHeader;
+        EXPECT_TRUE(unquthorizedHeader.parse(
+            "Digest realm=\"VMS\", "
+            "nonce=\"" + server->authorizer()->generateNonce() + "\", "
+            "algorithm=MD5"));
+
+        nx::network::http::header::DigestAuthorization digestHeader;
+        EXPECT_TRUE(nx::network::http::calcDigestResponse(
+            method, "admin", QByteArray("admin"), boost::none, uri,
+            unquthorizedHeader, &digestHeader));
+
+        auto client = std::make_unique<nx::network::http::HttpClient>();
+        client->setDisablePrecalculatedAuthorization(true);
+        client->addAdditionalHeader(nx::network::http::header::Authorization::NAME, digestHeader.serialized());
+        return client;
+    }
 };
 
-std::unique_ptr<MediaServerLauncher> AuthReturnCodeTest::mediaServerLauncher;
+std::unique_ptr<MediaServerLauncher> AuthReturnCodeTest::server;
 
 TEST_F(AuthReturnCodeTest, authWhileRestart)
 {
     // Cloud users is forbidden for basic auth.
     // We had bug: server return invalid code if request occurred when server is just started.
-    mediaServerLauncher->stop();
-    mediaServerLauncher->startAsync();
+    server->stop();
+    server->startAsync();
     testServerReturnCodeForWrongPassword(
         userData,
         nx::network::http::AuthType::authBasic,
@@ -342,26 +366,6 @@ TEST_F(AuthReturnCodeTest, noLdapConnect)
         Qn::Auth_LDAPConnectError);
 }
 
-static std::unique_ptr<nx::network::http::HttpClient> manualDigestClient(
-    const QByteArray& method, const QByteArray& uri)
-{
-    nx::network::http::header::WWWAuthenticate unquthorizedHeader;
-    EXPECT_TRUE(unquthorizedHeader.parse(
-        "Digest realm=\"VMS\", "
-        "nonce=\"" + QnAuthHelper::instance()->generateNonce() + "\", "
-        "algorithm=MD5"));
-
-    nx::network::http::header::DigestAuthorization digestHeader;
-    EXPECT_TRUE(nx::network::http::calcDigestResponse(
-        method, "admin", QByteArray("admin"), boost::none, uri,
-        unquthorizedHeader, &digestHeader));
-
-    auto client = std::make_unique<nx::network::http::HttpClient>();
-    client->setDisablePrecalculatedAuthorization(true);
-    client->addAdditionalHeader(nx::network::http::header::Authorization::NAME, digestHeader.serialized());
-    return client;
-}
-
 TEST_F(AuthReturnCodeTest, manualDigest)
 {
     auto client = manualDigestClient("GET", "/ec2/getUsers");
@@ -400,13 +404,13 @@ TEST_F(AuthReturnCodeTest, manualDigestWrongMethod_onGateway)
 
 TEST_F(AuthReturnCodeTest, lockoutTest)
 {
-    static const QnAuthHelper::LockoutOptions kLockoutOptions{
+    static const Authorizer::LockoutOptions kLockoutOptions{
         3, std::chrono::milliseconds(500), std::chrono::milliseconds(100)};
 
-    const auto lockoutOptons = QnAuthHelper::instance()->getLockoutOptions();
-    QnAuthHelper::instance()->setLockoutOptions(kLockoutOptions);
+    const auto lockoutOptons = server->authorizer()->getLockoutOptions();
+    server->authorizer()->setLockoutOptions(kLockoutOptions);
     const auto lockoutGuard = makeSharedGuard(
-        [&](){ QnAuthHelper::instance()->setLockoutOptions(lockoutOptons); });
+        [&](){ server->authorizer()->setLockoutOptions(lockoutOptons); });
 
     // Lockout does not happen on a random attemp.
     assertServerAcceptsUserCredentials("admin", "admin");
@@ -423,3 +427,7 @@ TEST_F(AuthReturnCodeTest, lockoutTest)
     std::this_thread::sleep_for(kLockoutOptions.lockoutTime);
     assertServerAcceptsUserCredentials("admin", "admin");
 }
+
+} // namespace test
+} // namespace mediaserver
+} // namespace nx

@@ -10,8 +10,8 @@
 #include <nx/network/system_socket.h>
 #include <nx/network/udt/udt_socket.h>
 #include <nx/utils/log/log.h>
-
 #include <nx/vms/cloud_integration/cloud_connection_manager.h>
+#include <nx/vms/cloud_integration/cloud_manager_group.h>
 
 #include <common/common_module.h>
 
@@ -20,7 +20,8 @@
 
 QnUniversalTcpListener::QnUniversalTcpListener(
     QnCommonModule* commonModule,
-    const nx::vms::cloud_integration::CloudConnectionManager& cloudConnectionManager,
+    TimeBasedNonceProvider* timeBasedNonceProvider,
+    nx::vms::cloud_integration::CloudManagerGroup* cloudConnectionGroup,
     const QHostAddress& address,
     int port,
     int maxConnections,
@@ -32,19 +33,20 @@ QnUniversalTcpListener::QnUniversalTcpListener(
         port,
         maxConnections,
         useSsl),
-    m_cloudConnectionManager(cloudConnectionManager),
+    m_authorizer(commonModule, timeBasedNonceProvider, cloudConnectionGroup),
+    m_cloudConnectionManager(cloudConnectionGroup->connectionManager),
     m_boundToCloud(false),
     m_httpModManager(new nx::network::http::HttpModManager())
 {
     m_cloudCredentials.serverId = commonModule->moduleGUID().toByteArray();
     Qn::directConnect(
-        &cloudConnectionManager, &nx::vms::cloud_integration::CloudConnectionManager::cloudBindingStatusChanged,
+        &m_cloudConnectionManager, &nx::vms::cloud_integration::CloudConnectionManager::cloudBindingStatusChanged,
         this,
-        [this, &cloudConnectionManager](bool /*boundToCloud*/)
+        [this](bool /*boundToCloud*/)
         {
-            onCloudBindingStatusChanged(cloudConnectionManager.getSystemCredentials());
+            onCloudBindingStatusChanged(m_cloudConnectionManager.getSystemCredentials());
         });
-    onCloudBindingStatusChanged(cloudConnectionManager.getSystemCredentials());
+    onCloudBindingStatusChanged(m_cloudConnectionManager.getSystemCredentials());
 }
 
 QnUniversalTcpListener::~QnUniversalTcpListener()
@@ -211,6 +213,18 @@ void QnUniversalTcpListener::updateCloudConnectState(
 void QnUniversalTcpListener::applyModToRequest(nx::network::http::Request* request)
 {
     m_httpModManager->apply(request);
+}
+
+nx::mediaserver::Authorizer* QnUniversalTcpListener::authorizer() const
+{
+    return &m_authorizer;
+}
+
+nx::mediaserver::Authorizer* QnUniversalTcpListener::authorizer(const QnTcpListener* listener)
+{
+    const auto universalListener = dynamic_cast<const QnUniversalTcpListener*>(listener);
+    NX_CRITICAL(universalListener);
+    return universalListener->authorizer();
 }
 
 bool QnUniversalTcpListener::isAuthentificationRequired(nx::network::http::Request& request)

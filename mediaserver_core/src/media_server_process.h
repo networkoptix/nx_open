@@ -35,8 +35,8 @@ class QNetworkReply;
 class QnServerMessageProcessor;
 struct QnModuleInformation;
 struct QnPeerRuntimeInfo;
-class QnLdapManager;
 struct BeforeRestoreDbData;
+class TimeBasedNonceProvider;
 namespace ec2 { class CrashReporter; }
 
 namespace nx { namespace vms { namespace cloud_integration { struct CloudManagerGroup; } } }
@@ -107,6 +107,7 @@ public:
     }
 
     MSSettings* serverSettings() const { return m_settings.get(); }
+    nx::mediaserver::Authorizer* authorizer() const { return m_universalTcpListener->authorizer(); }
 
     static void configureApiRestrictions(nx::network::http::AuthMethodRestrictionList* restrictions);
 
@@ -154,6 +155,7 @@ private:
     void regTcp(const QByteArray& protocol, const QString& path, ExtraParam... extraParam);
 
     bool initTcpListener(
+        TimeBasedNonceProvider* timeBasedNonceProvider,
         nx::vms::cloud_integration::CloudManagerGroup* const cloudManagerGroup,
         ec2::TransactionMessageBusAdapter* messageBus);
     void initializeCloudConnect();

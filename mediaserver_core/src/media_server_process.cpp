@@ -82,7 +82,7 @@
 #include <motion/motion_helper.h>
 
 #include <nx/vms/auth/time_based_nonce_provider.h>
-#include <network/authenticate_helper.h>
+#include <nx/mediaserver/authorizer.h>
 #include <network/connection_validator.h>
 #include <network/default_tcp_connection_processor.h>
 #include <network/system_helpers.h>
@@ -254,7 +254,6 @@
 #include "core/resource/camera_history.h"
 #include <nx/network/nettools.h>
 #include "http/iomonitor_tcp_server.h"
-#include "ldap/ldap_manager.h"
 #include "rest/handlers/multiserver_chunks_rest_handler.h"
 #include "rest/handlers/merge_ldap_users_rest_handler.h"
 #include "audit/mserver_audit_manager.h"
@@ -2662,6 +2661,7 @@ void MediaServerProcess::regTcp(
 }
 
 bool MediaServerProcess::initTcpListener(
+    TimeBasedNonceProvider* timeBasedNonceProvider,
     nx::vms::cloud_integration::CloudManagerGroup* const cloudManagerGroup,
     ec2::TransactionMessageBusAdapter* messageBus)
 {
@@ -2678,11 +2678,17 @@ bool MediaServerProcess::initTcpListener(
 
     m_universalTcpListener = new QnUniversalTcpListener(
         commonModule(),
-        cloudManagerGroup->connectionManager,
+        timeBasedNonceProvider,
+        cloudManagerGroup,
         QHostAddress::Any,
         rtspPort,
         maxConnections,
         acceptSslConnections);
+
+    configureApiRestrictions(m_universalTcpListener->authorizer()->restrictionList());
+    connect(
+        m_universalTcpListener->authorizer(), &nx::mediaserver::Authorizer::emptyDigestDetected,
+        this, &MediaServerProcess::at_emptyDigestDetected);
 
     m_universalTcpListener->httpModManager()->addCustomRequestMod(std::bind(
         &QnAutoRequestForwarder::processRequest,
@@ -2707,7 +2713,8 @@ bool MediaServerProcess::initTcpListener(
     // Server returns code 403 (forbidden) instead of 401 if the user isn't authorized for requests
     // starting with "web" path.
     m_universalTcpListener->setPathIgnorePrefix("web/");
-    QnAuthHelper::instance()->restrictionList()->deny(lit("/web/.+"), nx::network::http::AuthMethod::http);
+    m_universalTcpListener->authorizer()->restrictionList()->deny(
+        lit("/web/.+"), nx::network::http::AuthMethod::http);
 
     nx::network::http::AuthMethod::Values methods = (nx::network::http::AuthMethod::Values) (
         nx::network::http::AuthMethod::cookie |
@@ -3432,16 +3439,6 @@ void MediaServerProcess::run()
         ec2ConnectionFactory->messageBus(),
         &timeBasedNonceProvider);
 
-    auto authHelper = std::make_unique<QnAuthHelper>(
-        commonModule(),
-        &timeBasedNonceProvider,
-        &cloudIntegrationManager->cloudManagerGroup());
-    connect(
-        authHelper.get(), &QnAuthHelper::emptyDigestDetected,
-        this, &MediaServerProcess::at_emptyDigestDetected);
-
-    configureApiRestrictions(QnAuthHelper::instance()->restrictionList());
-
     MediaServerStatusWatcher mediaServerStatusWatcher(commonModule());
 
     //passing settings
@@ -3601,7 +3598,10 @@ void MediaServerProcess::run()
 
     auto hlsSessionPool = std::make_unique<nx::mediaserver::hls::SessionPool>();
 
-    if (!initTcpListener(&cloudIntegrationManager->cloudManagerGroup(), ec2ConnectionFactory->messageBus()))
+    if (!initTcpListener(
+            &timeBasedNonceProvider,
+            &cloudIntegrationManager->cloudManagerGroup(),
+            ec2ConnectionFactory->messageBus()))
     {
         qCritical() << "Failed to bind to local port. Terminating...";
         QCoreApplication::quit();
@@ -3887,8 +3887,6 @@ void MediaServerProcess::run()
     qnGlobalSettings->synchronizeNowSync(); // TODO: #GDM double sync
 #endif
 
-    std::unique_ptr<QnLdapManager> ldapManager(new QnLdapManager(commonModule()));
-
     commonModule()->resourceDiscoveryManager()->setReady(true);
     const bool isDiscoveryDisabled =
         qnServerModule->settings().noResourceDiscovery();
@@ -3977,7 +3975,7 @@ void MediaServerProcess::run()
     auto cleanUpGuard = makeScopeGuard(
         [&]()
         {
-            disconnect(authHelper.get(), 0, this, 0);
+            disconnect(m_universalTcpListener->authorizer(), 0, this, 0);
             disconnect(commonModule()->resourceDiscoveryManager(), 0, this, 0);
             disconnect(qnNormalStorageMan, 0, this, 0);
             disconnect(qnBackupStorageMan, 0, this, 0);
@@ -4071,11 +4069,6 @@ void MediaServerProcess::run()
             // This method will set flag on message channel to threat next connection close as normal
             //appServerConnection->disconnectSync();
             qnServerModule->setLastRunningTime(std::chrono::milliseconds::zero());
-
-            authHelper.reset();
-            //fileDeletor.reset();
-            //qnNormalStorageMan.reset();
-            //qnBackupStorageMan.reset();
 
             if (m_mediaServer)
                 m_mediaServer->beforeDestroy();

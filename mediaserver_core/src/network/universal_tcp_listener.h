@@ -7,11 +7,13 @@
 #include <nx/network/multiple_server_socket.h>
 #include <nx/utils/thread/mutex.h>
 #include <nx/network/http/http_mod_manager.h>
+#include <nx/mediaserver/authorizer.h>
 
 namespace nx {
 namespace vms {
 namespace cloud_integration {
 
+class CloudManagerGroup;
 class CloudConnectionManager;
 
 } // namespace cloud_integration
@@ -24,7 +26,8 @@ class QnUniversalTcpListener:
 public:
     QnUniversalTcpListener(
         QnCommonModule* commonModule,
-        const nx::vms::cloud_integration::CloudConnectionManager& cloudConnectionManager,
+        TimeBasedNonceProvider* timeBasedNonceProvider,
+        nx::vms::cloud_integration::CloudManagerGroup* cloudConnectionGroup,
         const QHostAddress& address,
         int port,
         int maxConnections,
@@ -35,9 +38,11 @@ public:
     nx::network::http::HttpModManager* httpModManager() const;
     virtual void applyModToRequest(nx::network::http::Request* request) override;
 
+    nx::mediaserver::Authorizer* authorizer() const;
+    static nx::mediaserver::Authorizer* authorizer(const QnTcpListener* listener);
+
     bool isAuthentificationRequired(nx::network::http::Request& request);
     void enableUnauthorizedForwarding(const QString& path);
-
 
     static std::vector<std::unique_ptr<nx::network::AbstractStreamServerSocket>> 
         createAndPrepareTcpSockets(const nx::network::SocketAddress& localAddress);
@@ -51,6 +56,7 @@ protected:
     virtual void destroyServerSocket(nx::network::AbstractStreamServerSocket* serverSocket) override;
 
 private:
+    mutable nx::mediaserver::Authorizer m_authorizer;
     const nx::vms::cloud_integration::CloudConnectionManager& m_cloudConnectionManager;
     nx::network::MultipleServerSocket* m_multipleServerSocket;
     std::unique_ptr<nx::network::AbstractStreamServerSocket> m_serverSocket;

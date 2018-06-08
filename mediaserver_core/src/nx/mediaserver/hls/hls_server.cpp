@@ -35,13 +35,13 @@
 #include "media_server/settings.h"
 #include "streaming/streaming_chunk_cache.h"
 #include "streaming/streaming_params.h"
-#include <network/authenticate_helper.h>
 #include <network/tcp_connection_priv.h>
 #include <network/tcp_listener.h>
 #include <media_server/media_server_module.h>
 #include <rest/server/json_rest_result.h>
 #include <nx/fusion/serialization_format.h>
 #include <api/helpers/camera_id_helper.h>
+#include <network/universal_tcp_listener.h>
 
 //TODO #ak if camera has hi stream only, than playlist request with no quality specified returns No Content, hi returns OK, lo returns Not Found
 
@@ -990,11 +990,13 @@ nx::network::http::StatusCode::Value HttpLiveStreamingProcessor::createSession(
         }
     }
 
-    const auto& chunkAuthenticationKey = QnAuthHelper::instance()->createAuthenticationQueryItemForPath(
+    const auto authorizer = QnUniversalTcpListener::authorizer(owner());
+
+    const auto& chunkAuthenticationKey = authorizer->createAuthenticationQueryItemForPath(
         accessRights, HLS_PREFIX + camResource->getUniqueId() + ".ts");
     newHlsSession->setChunkAuthenticationQueryItem( chunkAuthenticationKey );
 
-    const auto& playlistAuthenticationKey = QnAuthHelper::instance()->createAuthenticationQueryItemForPath(
+    const auto& playlistAuthenticationKey = authorizer->createAuthenticationQueryItemForPath(
         accessRights, requestedPlaylistPath);
     newHlsSession->setPlaylistAuthenticationQueryItem( playlistAuthenticationKey );
 
