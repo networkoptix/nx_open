@@ -66,7 +66,7 @@ void HanwhaPtzController::setPtzTraits(const QnPtzAuxilaryTraitList& traits)
 void HanwhaPtzController::setAlternativePtzRanges(
     const std::map<QString, HanwhaRange>& ranges)
 {
-    m_alternativePtzExecutor = std::make_unique<HanwhaPtzExecutor>(m_hanwhaResource, ranges);
+    m_commandStreamer = std::make_unique<HanwhaPtzCommandStreamer>(m_hanwhaResource, ranges);
 }
 
 bool HanwhaPtzController::continuousMove(const nx::core::ptz::Vector& speedVector)
@@ -76,8 +76,8 @@ bool HanwhaPtzController::continuousMove(const nx::core::ptz::Vector& speedVecto
         || m_ptzTraits.contains(kHanwhaAlternativeZoomTrait)
         || m_ptzTraits.contains(kHanwhaAlternativeRotateTrait);
 
-    if (needToUseAlternativePtz && m_alternativePtzExecutor)
-        m_alternativePtzExecutor->continuousMove(speedVector);
+    if (needToUseAlternativePtz && m_commandStreamer)
+        m_commandStreamer->continuousMove(speedVector);
 
     const auto hanwhaSpeed = toHanwhaSpeed(speedVector);
 
@@ -118,8 +118,8 @@ bool HanwhaPtzController::continuousMove(const nx::core::ptz::Vector& speedVecto
 
 bool HanwhaPtzController::continuousFocus(qreal speed)
 {
-    if (m_ptzTraits.contains(kHanwhaAlternativeFocusTrait) && m_alternativePtzExecutor)
-        return m_alternativePtzExecutor->continuousFocus(speed);
+    if (m_ptzTraits.contains(kHanwhaAlternativeFocusTrait) && m_commandStreamer)
+        return m_commandStreamer->continuousFocus(speed);
 
     HanwhaRequestHelper helper(m_hanwhaResource->sharedContext());
     const auto response = helper.control(

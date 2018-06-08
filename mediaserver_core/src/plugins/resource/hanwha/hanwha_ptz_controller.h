@@ -1,7 +1,7 @@
 #pragma once
 
 #include <plugins/resource/hanwha/hanwha_mapped_preset_manager.h>
-#include <plugins/resource/hanwha/hanwha_ptz_executor.h>
+#include <plugins/resource/hanwha/hanwha_ptz_command_streamer.h>
 #include <plugins/resource/hanwha/hanwha_common.h>
 #include <plugins/resource/hanwha/hanwha_range.h>
 
@@ -83,7 +83,7 @@ private:
     QnPtzAuxilaryTraitList m_ptzTraits;
     mutable std::unique_ptr<HanwhaMappedPresetManager> m_presetManager;
     QMap<QString, float> m_lastParamValue;
-    std::unique_ptr<HanwhaPtzExecutor> m_alternativePtzExecutor;
+    std::unique_ptr<HanwhaPtzCommandStreamer> m_commandStreamer;
 
 };
 

@@ -53,43 +53,7 @@ HanwhaPtzExecutor::HanwhaPtzExecutor(
 
 HanwhaPtzExecutor::~HanwhaPtzExecutor()
 {
-}
-
-bool HanwhaPtzExecutor::continuousMove(const nx::core::ptz::Vector& speed)
-{
-    HanwhaConfigurationalPtzCommand ptrCommand;
-    ptrCommand.command = HanwhaConfigurationalPtzCommandType::focus;
-    ptrCommand.speed = nx::core::ptz::Vector(
-        speed.pan,
-        speed.tilt,
-        speed.rotation,
-        /*zoom*/ 0.0);
-
-    HanwhaConfigurationalPtzCommand zoomCommand;
-    zoomCommand.command = HanwhaConfigurationalPtzCommandType::focus;
-    zoomCommand.speed = nx::core::ptz::Vector(
-        /*pan*/ 0.0,
-        /*tilt*/ 0.0,
-        /*rotation*/ 0.0,
-        speed.zoom);
-
-    if (!ptrCommand.speed.isNull())
-        executeCommand(ptrCommand);
-
-    if (!zoomCommand.speed.isNull())
-        executeCommand(zoomCommand);
-
-    return true;
-}
-
-bool HanwhaPtzExecutor::continuousFocus(qreal speed)
-{
-    HanwhaConfigurationalPtzCommand command;
-    command.command = HanwhaConfigurationalPtzCommandType::focus;
-
-    // We use 'zoom' field for both zoom and focus movements.
-    command.speed = nx::core::ptz::Vector(/*pan*/ 0, /*tilt*/ 0, /*rotation*/ 0, speed);
-    return executeFocusCommand(command);
+    stop();
 }
 
 bool HanwhaPtzExecutor::executeCommand(const HanwhaConfigurationalPtzCommand& command)
@@ -107,6 +71,24 @@ bool HanwhaPtzExecutor::executeCommand(const HanwhaConfigurationalPtzCommand& co
     }
 }
 
+void HanwhaPtzExecutor::setCommandDoneCallback(CommandDoneCallback callback)
+{
+    m_callback = std::move(callback);
+}
+
+void HanwhaPtzExecutor::stop()
+{
+    decltype(m_httpClient) httpClient;
+    {
+        QnMutexLocker lock(&m_mutex);
+        m_terminated = true;
+        m_httpClient.swap(httpClient);
+    }
+
+    if (httpClient)
+        httpClient->pleaseStopSync();
+}
+
 bool HanwhaPtzExecutor::executeFocusCommand(const HanwhaConfigurationalPtzCommand& command)
 {
     const auto parameterName = commandToParameterName(command.command);
@@ -117,40 +99,63 @@ bool HanwhaPtzExecutor::executeFocusCommand(const HanwhaConfigurationalPtzComman
     if (parameterValue == std::nullopt)
         return false;
 
-    auto httpClient = makeHttpClient();
+
     const auto url = HanwhaRequestHelper::buildRequestUrl(
         m_hanwhaResource->sharedContext().get(),
         lit("image/focus/control"),
         {
-            {parameterName, *parameterValue},
             // TODO: #dmishin think about bypass here.
+            {parameterName, *parameterValue},
             {kHanwhaChannelProperty, QString::number(m_hanwhaResource->getChannel())}
         });
 
-    httpClient->doGet(
-        url,
-        [this, parameterName]() { /* Do something here.*/ });
+    {
+        QnMutexLocker lock(&m_mutex);
+        m_httpClient = makeHttpClientThreadUnsafe();
+        if (!m_httpClient)
+            return false;
+
+        m_httpClient->doGet(
+            url,
+            [this, commandType = command.command]()
+            {
+                if (m_callback)
+                    m_callback(commandType);
+            });
+    }
 
     return true;
 }
 
 bool HanwhaPtzExecutor::executePtrCommand(const HanwhaConfigurationalPtzCommand& command)
 {
-    const auto httpClient = makeHttpClient();
     const auto url = makePtrUrl(command);
-
     if (url == std::nullopt)
         return false;
 
-    httpClient->doGet(
-        *url,
-        []() {/* Do something here.*/});
+    {
+        QnMutexLocker lock(&m_mutex);
+        m_httpClient = makeHttpClientThreadUnsafe();
+        if (!m_httpClient)
+            return false;
+
+        m_httpClient->doGet(
+            *url,
+            [this, commandType = command.command]()
+            {
+                if (m_callback)
+                    m_callback(commandType);
+            });
+    }
 
     return true;
 }
 
-std::unique_ptr<nx_http::AsyncClient> HanwhaPtzExecutor::makeHttpClient() const
+std::unique_ptr<nx_http::AsyncClient> HanwhaPtzExecutor::makeHttpClientThreadUnsafe() const
 {
+    if (m_terminated)
+        return nullptr;
+
     auto auth = m_hanwhaResource->getAuth();
     auto httpClient = std::make_unique<nx_http::AsyncClient>();
     httpClient->setAuth({auth.user(), auth.password()});
@@ -175,7 +180,7 @@ std::optional<QString> HanwhaPtzExecutor::toHanwhaParameterValue(
 std::optional<QUrl> HanwhaPtzExecutor::makePtrUrl(
     const HanwhaConfigurationalPtzCommand& command) const
 {
-    if (command.command == HanwhaConfigurationalPtzCommandType::ptr)
+    if (command.command != HanwhaConfigurationalPtzCommandType::ptr)
     {
         NX_ASSERT(false, lit("Wrong command. PTR command is expected"));
         return QUrl();
