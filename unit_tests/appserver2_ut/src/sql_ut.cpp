@@ -40,7 +40,7 @@ public:
         logSize();
     }
 
-    DataBase::~DataBase()
+    ~DataBase()
     {
         m_db.close();
         QSqlDatabase::removeDatabase("db");
