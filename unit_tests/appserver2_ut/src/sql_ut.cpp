@@ -40,6 +40,13 @@ public:
         logSize();
     }
 
+    ~DataBase()
+    {
+        m_db.close();
+        QSqlDatabase::removeDatabase("db");
+        QDir(".").remove(m_file);
+    }
+
     QSqlQuery query(const QString& s)
     {
         QSqlQuery q(m_db);

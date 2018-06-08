@@ -97,23 +97,7 @@ nx::network::AbstractStreamServerSocket* QnUniversalTcpListener::createAndPrepar
             setLastError(SystemError::getLastOSErrorCode());
             return nullptr;
         }
-
-        ++m_totalListeningSockets;
-        ++m_cloudSocketIndex;
     }
-
-
-    #ifdef LISTEN_ON_UDT_SOCKET
-        auto udtServerSocket = std::make_unique<nx::network::UdtStreamServerSocket>();
-        if (!udtServerSocket->setReuseAddrFlag(true) ||
-            !udtServerSocket->bind(localAddress) ||
-            !udtServerSocket->listen() ||
-            !multipleServerSocket->addSocket(std::move(udtServerSocket)))
-        {
-            setLastError(SystemError::getLastOSErrorCode());
-            return nullptr;
-        }
-    #endif
 
     m_multipleServerSocket = multipleServerSocket.get();
     m_serverSocket = std::move(multipleServerSocket);
@@ -188,8 +172,6 @@ void QnUniversalTcpListener::updateCloudConnectState(
     NX_LOGX(lm("Update cloud connect state (boundToCloud=%1)").arg(m_boundToCloud), cl_logINFO);
     if (m_boundToCloud)
     {
-        NX_ASSERT(m_multipleServerSocket->count() == m_cloudSocketIndex);
-
         nx::network::RetryPolicy registrationOnMediatorRetryPolicy;
         registrationOnMediatorRetryPolicy.maxRetryCount =
             nx::network::RetryPolicy::kInfiniteRetries;
@@ -200,10 +182,10 @@ void QnUniversalTcpListener::updateCloudConnectState(
                 std::move(registrationOnMediatorRetryPolicy));
         cloudServerSocket->listen(0);
         m_multipleServerSocket->addSocket(std::move(cloudServerSocket));
+        m_cloudSocketIndex = m_multipleServerSocket->count() - 1;
     }
     else
     {
-        NX_ASSERT(m_multipleServerSocket->count() == m_totalListeningSockets);
         m_multipleServerSocket->removeSocket(m_cloudSocketIndex);
     }
 }
