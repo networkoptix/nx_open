@@ -5,6 +5,7 @@ from framework.installation.installer import Customization, Installer
 from framework.installation.windows_service import WindowsService
 from framework.os_access.path import copy_file
 from framework.os_access.windows_access import WindowsAccess
+from framework.os_access.windows_remoting.registry import WindowsRegistry
 
 _logger = logging.getLogger(__name__)
 
@@ -14,18 +15,18 @@ class WindowsInstallation(Installation):
 
     def __init__(self, windows_access, installer):
         self.installer = installer  # type: Installer
-        program_files_dir = windows_access.Path(windows_access.winrm.user_env_vars()['ProgramFiles'])
+        program_files_dir = windows_access.Path(windows_access.env_vars()['ProgramFiles'])
         customization = installer.customization  # type: Customization
         self.dir = program_files_dir / customization.windows_installation_subdir
         self.binary = self.dir / 'mediaserver.exe'
         self.info = self.dir / 'build_info.txt'
-        system_profile_dir = windows_access.Path(windows_access.winrm.system_profile_dir())
-        local_app_data_dir = system_profile_dir / 'AppData' / 'Local'
-        self.var = local_app_data_dir / customization.windows_app_data_subdir
+        system_profile_dir = windows_access.Path(windows_access.system_profile_dir())
+        self._local_app_data_dir = system_profile_dir / 'AppData' / 'Local'
+        self.var = self._local_app_data_dir / customization.windows_app_data_subdir
         self._log_file = self.var / 'log' / 'log_file.log'
         self.key_pair = self.var / 'ssl' / 'cert.pem'
-        self._config_key = windows_access.winrm.registry_key(customization.windows_registry_key)
-        self._config_key_backup = windows_access.winrm.registry_key(customization.windows_registry_key + ' Backup')
+        self._config_key = WindowsRegistry(windows_access.winrm).key(customization.windows_registry_key)
+        self._config_key_backup = WindowsRegistry(windows_access.winrm).key(customization.windows_registry_key + ' Backup')
         self.service = WindowsService(windows_access.winrm, customization.windows_service_name)
         self.os_access = windows_access  # type: WindowsAccess
 
@@ -54,7 +55,7 @@ class WindowsInstallation(Installation):
         self.os_access.winrm.run_command([remote_installer_path, '/passive', '/log', remote_log_path])
         self._backup_configuration()
 
-    def list_core_dumps(self):
+    def list_core_dumps_from_task_manager(self):
         base_name = self.binary.stem
 
         def iterate_names(limit):
@@ -62,18 +63,29 @@ class WindowsInstallation(Installation):
             for index in range(2, limit + 1):
                 yield '{} ({}).DMP'.format(base_name, index)
 
-        def iterate_existing_paths(profile_dir):
-            user_temp_dir = profile_dir / 'AppData' / 'Local' / 'Temp'
-            for name in iterate_names(20):  # 20 is arbitrarily big number.
-                path = user_temp_dir / name
-                if not path.exists():
-                    break
-                yield path
+        profile_dir = self.os_access.Path(self.os_access.env_vars()[u'UserProfile'])
+        temp_dir = profile_dir / 'AppData' / 'Local' / 'Temp'
+        dumps = []
+        for name in iterate_names(20):  # 20 is arbitrarily big number.
+            path = temp_dir / name
+            if not path.exists():
+                break
+            dumps.append(path)
 
-        user_profile_dir = self.os_access.Path(self.os_access.winrm.user_env_vars()[u'UserProfile'])
-        system_profile_dir = self.os_access.Path(self.os_access.winrm.system_profile_dir())
-        paths = list(iterate_existing_paths(user_profile_dir)) + list(iterate_existing_paths(system_profile_dir))
-        return paths
+    def list_core_dumps_from_mediaserver(self):
+        dumps = list(self._local_app_data_dir.glob('{}_*.dmp'.format(self.binary.name)))
+        return dumps
+
+    def list_core_dumps_from_procdump(self):
+        profile_dir = self.os_access.Path(self.os_access.env_vars()[u'UserProfile'])
+        dumps = list(profile_dir.glob('{}_*.dmp'.format(self.binary.name)))
+        return dumps
+
+    def list_core_dumps(self):
+        dumps_from_mediaserver = self.list_core_dumps_from_mediaserver()
+        dumps_from_procdump = self.list_core_dumps_from_procdump()
+        dumps = dumps_from_mediaserver + dumps_from_procdump
+        return dumps
 
     def restore_mediaserver_conf(self):
         pass

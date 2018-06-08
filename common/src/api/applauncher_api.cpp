@@ -6,6 +6,11 @@
 
 #include <QtCore/QList>
 
+namespace {
+
+const auto kArgumentsDelimitter = lit("@#$%^delim");
+
+}
 
 namespace applauncher
 {
@@ -145,13 +150,9 @@ namespace applauncher
         {
         }
 
-        StartApplicationTask::StartApplicationTask(
-            const QnSoftwareVersion &_version,
-            const QString& _appParams )
-        :
+        StartApplicationTask::StartApplicationTask(const QnSoftwareVersion &_version):
             BaseTask( TaskType::startApplication ),
             version( _version ),
-            appArgs( _appParams ),
             autoRestore( false )
         {
         }
@@ -162,16 +163,17 @@ namespace applauncher
         :
             BaseTask( TaskType::startApplication ),
             version( _version ),
-            appArgs( _appParams.join(QLatin1String(" ")) ),
+            appArgs( _appParams ),
             autoRestore( false )
         {
         }
 
         QByteArray StartApplicationTask::serialize() const
         {
-            return lit("%1\n%2\n%3\n%4\n\n").arg(QLatin1String(TaskType::toString(type))).
-                arg(version.toString()).arg(appArgs).
+            const auto res = lit("%1\n%2\n%3\n%4\n\n").arg(QLatin1String(TaskType::toString(type))).
+                arg(version.toString()).arg(appArgs.join(kArgumentsDelimitter)).
                 arg(autoRestore ? QLatin1String("true") : QLatin1String("false")).toLatin1();
+            return res;
         }
 
         bool StartApplicationTask::deserialize( const QnByteArrayConstRef& data )
@@ -182,7 +184,8 @@ namespace applauncher
             if( lines[0] != TaskType::toString(type) )
                 return false;
             version = QnSoftwareVersion(lines[1].toByteArrayWithRawData());
-            appArgs = QLatin1String(lines[2].toByteArrayWithRawData());
+            const auto stringArguments = QString::fromLatin1(lines[2].toByteArrayWithRawData());
+            appArgs = stringArguments.split(kArgumentsDelimitter, QString::SkipEmptyParts);
             if( lines.size() > 3 )
                 autoRestore = lines[3].toByteArrayWithRawData() == "true";
 

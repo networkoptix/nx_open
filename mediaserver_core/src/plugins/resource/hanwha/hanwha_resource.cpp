@@ -215,7 +215,7 @@ QnPtzLimits calculatePtzLimits(
 struct HanwhaAlternativePtzTrait
 {
     QString supportAttribute;
-    QString valueAttribute;
+    QString valueParameter;
     Ptz::Capabilities capabilities;
 };
 
@@ -236,6 +236,30 @@ static const std::map<QString, HanwhaAlternativePtzTrait>
                 lit("Image/ZoomAdjust"),
                 lit("image/focus/control/Zoom"),
                 Ptz::ContinuousZoomCapability
+            }
+        },
+        {
+            kHanwhaAlternativePanTrait,
+            {
+                QString(), //< No attribute is available for PTR.
+                lit("image/ptr/control/pan"),
+                Ptz::ContinuousPanCapability
+            }
+        },
+        {
+            kHanwhaAlternativeTiltTrait,
+            {
+                QString(),
+                lit("image/ptr/control/tilt"),
+                Ptz::ContinuousTiltCapability
+            }
+        },
+        {
+            kHanwhaAlternativeRotateTrait,
+            {
+                QString(),
+                lit("image/ptr/control/rotate"),
+                Ptz::NoPtzCapabilities
             }
         }
     };
@@ -1332,12 +1356,7 @@ CameraDiagnostics::Result HanwhaResource::initPtz()
     if ((m_ptzCapabilities & Ptz::AbsolutePtzCapabilities) == Ptz::AbsolutePtzCapabilities)
         m_ptzCapabilities |= Ptz::DevicePositioningPtzCapability;
 
-    const bool needToInitAlternativePtz =
-        !m_ptzCapabilities.testFlag(Ptz::ContinuousFocusCapability)
-        && !m_ptzCapabilities.testFlag(Ptz::ContinuousZoomCapability);
-
-    if (needToInitAlternativePtz)
-        initAlternativePtz();
+    initAlternativePtz();
 
     m_ptzLimits = calculatePtzLimits(m_attributes, m_cgiParameters, getChannel());
     m_ptzTraits.append(calculatePtzTraits());
@@ -1353,44 +1372,39 @@ CameraDiagnostics::Result HanwhaResource::initPtz()
 CameraDiagnostics::Result HanwhaResource::initAlternativePtz()
 {
     const auto channel = getChannel();
-
     for (const auto& item: kHanwhaAlternativePtzTraits)
     {
-        bool success = false;
-        std::set<int> possibleValues;
-        const auto& traitName = item.first;
         const auto& trait = item.second;
+        const auto& traitName = item.first;
 
-        const auto hasTrait = m_attributes
-            .attribute<bool>(lit("%1/%2").arg(trait.supportAttribute).arg(channel));
-
-        if (hasTrait == boost::none || !hasTrait.get())
-            continue;
-
-        const auto valuesParameter = m_cgiParameters.parameter(trait.valueAttribute);
-        if (valuesParameter == boost::none || !valuesParameter->isValid())
-            continue;
-
-        for (const auto& value: valuesParameter->possibleValues())
+        if (ini().forceLensControl)
         {
-            possibleValues.insert(value.toInt(&success));
-            if (!success)
-                break;
+            // Add all possible traits.
+            m_ptzTraits.push_back(traitName);
+            continue;
         }
 
-        if (!success)
+        bool hasTrait = true;
+        if (trait.supportAttribute.isEmpty())
+        {
+            const auto attribute = m_attributes
+                .attribute<bool>(lit("%1/%2").arg(trait.supportAttribute).arg(channel));
+
+            hasTrait = attribute != boost::none && *attribute;
+        }
+
+        if (!hasTrait)
             continue;
 
-        const auto split = trait.valueAttribute.split('/');
-        NX_ASSERT(!split.isEmpty());
-        if (split.isEmpty())
+        const auto parameter = m_cgiParameters.parameter(trait.valueParameter);
+        if (parameter == boost::none || !parameter->isValid())
             continue;
 
         m_ptzTraits.append(traitName);
         if (qnGlobalSettings->showHanwhaAlternativePtzControlsOnTile())
             m_ptzCapabilities |= trait.capabilities;
 
-        m_alternativePtzRanges[split.last()] = std::move(possibleValues);
+        m_alternativePtzRanges[parameter->name()] = HanwhaRange(*parameter);
     }
 
     NX_VERBOSE(this, lm("%1: Supported PTZ capabilities alternative: %2")
@@ -2581,32 +2595,35 @@ QnCameraAdvancedParams HanwhaResource::filterParameters(
     for (const auto& id: allParameters.allParameterIds())
     {
         const auto parameter = allParameters.getParameterById(id);
-        #if 1 //< TODO: #dmishin properly handle lens control parameters
-        static const std::set<QString> kLensControlParameters = {
-            lit("custom_ptr"),
-            lit("custom_zoom"),
-            lit("custom_focus")
-        };
-
-        if (kLensControlParameters.find(parameter.writeCmd) != kLensControlParameters.cend())
-        {
-            supportedIds.insert(parameter.id);
-            continue;
-        }
-        #endif
-
         const auto info = advancedParameterInfo(parameter.id);
-
         if (!info)
             continue;
 
-        if (info->isService())
+        if (info->isService()) //< E.g, "Reset profiles to default" button.
         {
             supportedIds.insert(id);
             continue;
         }
 
-        bool needToCheck = parameter.dataType == QnCameraAdvancedParameter::DataType::Number
+        const auto ptzTraits = info->ptzTraits();
+        if (!ptzTraits.isEmpty())
+        {
+            bool supported = true;
+            for (const auto& trait: ptzTraits)
+            {
+                // All PTZ traits declared by control must be supported.
+                supported = m_ptzTraits.contains(trait);
+                if (!supported)
+                    break;
+            }
+
+            if (supported)
+                supportedIds.insert(id);
+
+            continue;
+        }
+
+        const bool needToCheck = parameter.dataType == QnCameraAdvancedParameter::DataType::Number
             || parameter.dataType == QnCameraAdvancedParameter::DataType::Enumeration;
 
         if (needToCheck && parameter.range.isEmpty())

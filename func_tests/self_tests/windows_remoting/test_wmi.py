@@ -2,30 +2,15 @@ import logging
 
 import pytest
 
-from framework.installation.windows_service import WindowsService
-from framework.os_access.windows_remoting import Users
+from framework.os_access.windows_remoting.registry import WindowsRegistry
+from framework.os_access.windows_remoting.users import Users
 
-log = logging.getLogger(__name__)
-
-
-@pytest.fixture(scope='session', params=['Spooler'])
-def service(request, winrm):
-    service = WindowsService(winrm, request.param)
-    return service
-
-
-def test_service(service):
-    if service.is_running():
-        service.stop()
-        service.start()
-    else:
-        service.start()
-        service.stop()
+_logger = logging.getLogger(__name__)
 
 
 @pytest.fixture(scope='session')
 def users(winrm):
-    users = Users(winrm._protocol)
+    users = Users(winrm)
     return users
 
 
@@ -37,3 +22,18 @@ def test_user_profiles(users):
 def test_get_user(users):
     account = users.account_by_name(u'Administrator')
     assert account[u'Name'] == u'Administrator'
+
+
+@pytest.fixture(scope='session')
+def windows_registry(winrm):
+    return WindowsRegistry(winrm)
+
+
+def test_registry_empty_key(windows_registry):
+    path = u'HKEY_LOCAL_MACHINE\\SOFTWARE'
+    assert not windows_registry.key(path).list_values()
+
+
+def test_registry_key(windows_registry):
+    path = u'HKEY_LOCAL_MACHINE\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\DateTime\\Servers'
+    assert windows_registry.key(path).list_values()

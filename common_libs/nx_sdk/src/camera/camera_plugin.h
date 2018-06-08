@@ -250,6 +250,11 @@ namespace nxcip
         */
         virtual int getMediaUrl( char* urlBuf ) const = 0;
 
+        virtual int setMediaUrl(const char url[nxcip::MAX_TEXT_LEN]) 
+        { 
+            return NX_NOT_IMPLEMENTED; 
+        }
+
         //!Returns supported resolution list
         /*!
             \param[out] infoList Array of size \a MAX_RESOLUTION_LIST_SIZE
@@ -491,7 +496,8 @@ namespace nxcip
             searchByMotionMaskCapability        = 0x1000,     //!< if present, \a nxcip::BaseCameraManager2::find supports \a ArchiveSearchOptions::motionMask()
             motionRegionCapability              = 0x2000,     //!< if present, \a nxcip::BaseCameraManager3::setMotionMask is implemented
             needIFrameDetectionCapability       = 0x4000,      //!< packet will be tested if it's a I-Frame. Use it if plugin can't set \a fKeyPacket
-            relativeTimestampCapability         = 0x8000       //!< camera provides relative timestamps. It need to align them to the current time.
+            relativeTimestampCapability         = 0x8000,      //!< camera provides relative timestamps. It need to align them to the current time.
+            customMediaUrlCapability            = 0x10000,     //!< camera's media streams are editable and can be provided directly via setProperty API call.
         };
 
         //!Return bit set of camera capabilities (\a CameraCapability enumeration)

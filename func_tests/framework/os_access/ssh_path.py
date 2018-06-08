@@ -178,9 +178,12 @@ class SSHPath(FileSystemPath, PurePosixPath):
         # ASCII encoding is single used encoding in the project.
         return self.read_bytes().decode(encoding=encoding, errors=errors)
 
-    def write_text(self, data, encoding='ascii', errors='strict'):
+    def write_text(self, text, encoding='ascii', errors='strict'):
         # ASCII encoding is single used encoding in the project.
-        self.write_bytes(data.encode(encoding=encoding, errors=errors))
+        data = text.encode(encoding=encoding, errors=errors)
+        bytes_written = self.write_bytes(data)
+        assert bytes_written == len(data)
+        return len(text)
 
 
 def make_ssh_path_cls(ssh):

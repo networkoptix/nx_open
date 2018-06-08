@@ -7,9 +7,12 @@ import tzlocal.windows_tz
 
 from framework.method_caching import cached_getter, cached_property
 from framework.networking.windows import WindowsNetworking
+from framework.os_access.exceptions import exit_status_error_cls
 from framework.os_access.os_access_interface import OSAccess
 from framework.os_access.smb_path import SMBConnectionPool, SMBPath
 from framework.os_access.windows_remoting import WinRM
+from framework.os_access.windows_remoting.env_vars import EnvVars
+from framework.os_access.windows_remoting.users import Users
 from framework.utils import RunningTime
 
 
@@ -31,27 +34,46 @@ class WindowsAccess(OSAccess):
     def forwarded_ports(self):
         return self._forwarded_ports
 
+    @cached_getter
+    def env_vars(self):
+        """Effective environment: union of default, system's and user's vars"""
+        users = Users(self.winrm)
+        account = users.account_by_name(self._username)
+        profile = users.profile_by_sid(account[u'SID'])
+        profile_dir = profile[u'LocalPath']
+        default_env_vars = {
+            u'USERPROFILE': profile_dir,
+            u'PROGRAMFILES': u'C:\\Program Files',
+            }
+        env_vars = EnvVars.request(self.winrm, account[u'Caption'], default_env_vars)
+        return env_vars
+
+    @cached_getter
+    def system_profile_dir(self):
+        # TODO: Work via Users class.
+        users = Users(self.winrm)
+        system_profile = users.system_profile()
+        profile_dir = system_profile[u'LocalPath']
+        return profile_dir
+
     @cached_property
     def Path(self):
-        winrm = self.winrm
-
         class SpecificSMBPath(SMBPath):
-            _name_service_address, _name_service_port = self.forwarded_ports['udp', 137]
-            _session_service_address, _session_service_port = self.forwarded_ports['tcp', 139]
+            _direct_smb_address, _direct_smb_port = self.forwarded_ports['tcp', 445]
             _smb_connection_pool = SMBConnectionPool(
                 self._username, self._password,
-                _name_service_address, _name_service_port,
-                _session_service_address, _session_service_port,
+                _direct_smb_address, _direct_smb_port,
                 )
 
             @classmethod
             def tmp(cls):
-                env_vars = winrm.user_env_vars()
-                return cls(env_vars[u'TEMP']) / 'FuncTests'
+                env_vars = self.env_vars()
+                temp_dir = cls(env_vars[u'TEMP'])
+                return temp_dir / u'FuncTests'
 
             @classmethod
             def home(cls):
-                env_vars = winrm.user_env_vars()
+                env_vars = self.env_vars()
                 return cls(env_vars[u'USERPROFILE'])
 
         return SpecificSMBPath
@@ -93,7 +115,6 @@ class WindowsAccess(OSAccess):
 
     def set_time(self, new_time):  # type: (datetime.datetime) -> RunningTime
         localized = new_time.astimezone(self._get_timezone())
-        timestamp = (new_time - datetime.datetime(1970, 1, 1, tzinfo=pytz.utc)).total_seconds()
         started_at = timeit.default_timer()
         # TODO: Do that with Win32_OperatingSystem.SetDateTime WMI method.
         # See: https://superuser.com/q/1323610/174311
@@ -103,3 +124,12 @@ class WindowsAccess(OSAccess):
             variables={'dateTime': new_time.astimezone(pytz.utc).isoformat()})
         delay_sec = timeit.default_timer() - started_at
         return RunningTime(localized, datetime.timedelta(seconds=delay_sec))
+
+    def make_core_dump(self, pid):
+        expected_exit_status = 0xFFFFFFFE  # ProcDump always exit with this.
+        try:
+            self.winrm.run_command(['procdump', '-accepteula', pid])  # Full dumps (`-ma`) are too big for pysmb.
+        except exit_status_error_cls(expected_exit_status):
+            pass
+        else:
+            raise RuntimeError("Unexpected zero exit status, {} expected".format(expected_exit_status))

@@ -1,4 +1,4 @@
-nx_add_server_plugin(stub_metadata_plugin LIBRARY NO_MOC
+nx_add_server_plugin(stub_metadata_plugin LIBRARY NO_MOC OPTIONAL
     PUBLIC_LIBS
         nx_sdk
         nx_kit

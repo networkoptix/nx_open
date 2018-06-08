@@ -7427,6 +7427,21 @@ to %1</source>
     </message>
   </context>
   <context>
+    <name>QnWorkbenchContext</name>
+    <message>
+      <source>To use the software you must accept the end user license agreement</source>
+      <translation>Yazılımı kullanmak için son kullanıcı lisans sözleşmesini kabul etmelisiniz</translation>
+    </message>
+    <message>
+      <source>Accept</source>
+      <translation>Kabul Et</translation>
+    </message>
+    <message>
+      <source>Decline</source>
+      <translation>Reddet</translation>
+    </message>
+  </context>
+  <context>
     <name>QnWorkbenchIncompatibleServersActionHandler</name>
     <message>
       <source>Systems will be merged shortly</source>
@@ -8864,18 +8879,6 @@ to %1</source>
     <message>
       <source>Failed to change password on %1 of %2 cameras</source>
       <translation>%2 kameradan %1'de şifre değiştirilemedi</translation>
-    </message>
-    <message>
-      <source>To use the software you must accept the end user license agreement</source>
-      <translation>Yazılımı kullanmak için son kullanıcı lisans sözleşmesini kabul etmelisiniz</translation>
-    </message>
-    <message>
-      <source>Accept</source>
-      <translation>Kabul Et</translation>
-    </message>
-    <message>
-      <source>Decline</source>
-      <translation>Reddet</translation>
     </message>
     <message>
       <source>Warning! This build is for testing purposes only! Please upgrade to a next available patch or release version once available.</source>

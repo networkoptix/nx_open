@@ -1,5 +1,5 @@
-# Variables used by build-dist.sh and/or .deb contents.
-set(build.configuration "") #< Used by build-dist.sh as suffix to lib and bin dirs.
+# Variables used by build_distribution.conf files and/or .deb contents.
+set(build.configuration "") #< Used by cloud_db-deb and connection_mediator-deb.
 if(arch STREQUAL "x64")
     set(os.arch "amd64")
     set(arch.dir "x86_64-linux-gnu/")
@@ -23,7 +23,7 @@ endif()
 
 # Read license.txt and properly format it to be included into deb templates file:
 #  - All lines but the first one must start with a space.
-#  - Empty lines must contain a single period (preceeded by a space too).
+#  - Empty lines must contain a single period (preceded by a space too).
 file(READ ${CMAKE_CURRENT_BINARY_DIR}/license.txt license.text)
 string(REGEX REPLACE "\n\n" "\n.\n" license.text "${license.text}")
 string(REGEX REPLACE "\n" "\n " license.text "${license.text}")

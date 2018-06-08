@@ -16,10 +16,19 @@ from framework.rest_api import HttpError
 from framework.utils import log_list
 from framework.waiting import wait_for_true
 
-log = logging.getLogger(__name__)
+_logger = logging.getLogger(__name__)
 
 
 UNEXISTENT_USER_ROLE_GUIID = '44e4161e-158e-2201-e000-000000000001'
+
+
+def test_saved_media_should_appear_after_archive_is_rebuilt(one_running_mediaserver, camera, sample_media_file):
+    server = one_running_mediaserver
+    start_time = datetime(2017, 3, 27, tzinfo=pytz.utc)
+    server.add_camera(camera)
+    server.storage.save_media_sample(camera, start_time, sample_media_file)
+    server.rebuild_archive()
+    assert one_running_mediaserver.get_recorded_time_periods(camera) == [TimePeriod(start_time, sample_media_file.duration)]
 
 
 # https://networkoptix.atlassian.net/browse/VMS-3911
@@ -162,12 +171,12 @@ def test_http_header_server(one_running_mediaserver):
     url = one_running_mediaserver.api.url('ec2/testConnection')
     valid_auth = HTTPDigestAuth(one_running_mediaserver.api.user, one_running_mediaserver.api.password)
     response = requests.get(url, auth=valid_auth)
-    log.debug('%r headers: %s', one_running_mediaserver, response.headers)
+    _logger.debug('%r headers: %s', one_running_mediaserver, response.headers)
     assert response.status_code == 200
     assert 'Server' in response.headers.keys(), "HTTP header 'Server' is expected"
     invalid_auth = HTTPDigestAuth('invalid', 'invalid')
     response = requests.get(url, auth=invalid_auth)
-    log.debug('%r headers: %s', one_running_mediaserver, response.headers)
+    _logger.debug('%r headers: %s', one_running_mediaserver, response.headers)
     assert response.status_code == 401
     assert 'WWW-Authenticate' in response.headers.keys(), "HTTP header 'WWW-Authenticate' is expected"
     assert 'Server' not in response.headers.keys(), "Unexpected HTTP header 'Server'"
@@ -198,7 +207,7 @@ def test_auth_with_time_changed(timeless_server):
 
     response = requests.get(url, auth=HTTPDigestAuth(timeless_server.api.user, timeless_server.api.password))
     authorization_header_value = response.request.headers['Authorization']
-    log.info(authorization_header_value)
+    _logger.info(authorization_header_value)
     response = requests.get(url, headers={'Authorization': authorization_header_value})
     response.raise_for_status()
 
@@ -218,14 +227,14 @@ def test_uptime_is_monotonic(timeless_server):
     timeless_server.os_access.set_time(datetime.now(pytz.utc))
     first_uptime = timeless_server.api.api.statistics.GET()['uptimeMs']
     if not isinstance(first_uptime, (int, float)):
-        log.warning("Type of uptimeMs is %s but expected to be numeric.", type(first_uptime).__name__)
+        _logger.warning("Type of uptimeMs is %s but expected to be numeric.", type(first_uptime).__name__)
     new_time = timeless_server.os_access.set_time(datetime.now(pytz.utc) - timedelta(minutes=1))
     wait_for_true(
         lambda: get_time(timeless_server.api).is_close_to(new_time),
         "time on {} is close to {}".format(timeless_server, new_time))
     second_uptime = timeless_server.api.api.statistics.GET()['uptimeMs']
     if not isinstance(first_uptime, (int, float)):
-        log.warning("Type of uptimeMs is %s but expected to be numeric.", type(second_uptime).__name__)
+        _logger.warning("Type of uptimeMs is %s but expected to be numeric.", type(second_uptime).__name__)
     assert float(first_uptime) < float(second_uptime)
     assert not timeless_server.installation.list_core_dumps()
 
@@ -258,5 +267,5 @@ def test_https_verification(one_running_mediaserver):
         response = requests.get(url, verify=str(one_running_mediaserver.api.ca_cert))
     assert response.status_code == 200
     for warning in warning_list:
-        log.warning("Warning collected: %s.", warning)
+        _logger.warning("Warning collected: %s.", warning)
         assert not isinstance(warning, urllib3.exceptions.InsecureRequestWarning)

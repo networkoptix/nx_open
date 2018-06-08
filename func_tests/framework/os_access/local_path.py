@@ -75,8 +75,8 @@ class LocalPath(PosixPath, FileSystemPath):
 
     def write_bytes(self, data, offset=None):
         if offset is None:
-            self._write_bytes_to_entire_file(data)
+            return self._write_bytes_to_entire_file(data)
         else:
             with self.open('r+b') as f:  # See: https://stackoverflow.com/a/28932052/1833960
                 f.seek(offset)
-                f.write(data)
+                return f.write(data)

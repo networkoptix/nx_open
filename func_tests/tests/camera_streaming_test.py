@@ -6,7 +6,7 @@ import pytest
 
 from framework.api_shortcuts import get_server_id
 
-log = logging.getLogger(__name__)
+_logger = logging.getLogger(__name__)
 
 
 EXPECTED_TRANSPORT_LIST = {'rtsp', 'hls', 'mjpeg', 'webm'}
@@ -22,7 +22,7 @@ def wait_for_and_check_camera_history(camera, server_list, expected_servers_orde
                 cameraId=camera.id, startTime=0, endTime='now')
             assert len(response) == 1, repr(response)  # must contain exactly one record for one camera
             servers_order = [item['serverGuid'] for item in response[0]['items']]
-            log.debug('Received camera history servers order: %s', servers_order)
+            _logger.debug('Received camera history servers order: %s', servers_order)
             if servers_order == [get_server_id(server.api) for server in expected_servers_order]:
                 camera_history_responses.append(response)
                 continue
@@ -50,7 +50,7 @@ def check_media_stream_transports(server):
                 transports = set()
                 for codec_rec in value['streams']:
                     transports |= set(codec_rec['transports'])
-                log.info('Mediaserver %s returned following transports for camera %s: %s',
+                _logger.info('Mediaserver %s returned following transports for camera %s: %s',
                          server, camera_info['physicalId'], ', '.join(sorted(transports)))
                 assert transports == EXPECTED_TRANSPORT_LIST, repr(transports)
                 break

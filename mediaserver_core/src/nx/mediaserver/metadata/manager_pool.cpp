@@ -177,7 +177,6 @@ void ManagerPool::at_resourceRemoved(const QnResourcePtr& resource)
         return;
 
     camera->disconnect(this);
-
     QnMutexLocker lock(&m_contextMutex);
     m_contexts.erase(resource->getId());
 }

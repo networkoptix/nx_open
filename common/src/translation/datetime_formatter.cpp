@@ -48,7 +48,7 @@ std::map<Format, QString> formatStrings =
 
 void DateTimeFormats::setFormats()
 {
-    QLocale locale = QLocale();
+    QLocale locale = QLocale::system(); //< We now use OS locale for time instead of client locale.
     const bool amPm = locale.timeFormat().contains(lit("AP"), Qt::CaseInsensitive);
 
     formatStrings[Format::hh] = amPm ? lit("h AP") : lit("hh:00");

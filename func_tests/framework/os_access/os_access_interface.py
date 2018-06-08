@@ -40,3 +40,7 @@ class OSAccess(object):
     @abstractmethod
     def set_time(self, new_time):  # type: (datetime.datetime) -> RunningTime
         return RunningTime(datetime.now())
+
+    @abstractmethod
+    def make_core_dump(self, pid):
+        pass

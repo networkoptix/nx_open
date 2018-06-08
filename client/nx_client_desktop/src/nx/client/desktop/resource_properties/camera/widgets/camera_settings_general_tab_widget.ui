@@ -68,7 +68,7 @@
     <widget class="nx::client::desktop::WearableCameraUploadWidget" name="wearableUploadWidget" native="true"/>
    </item>
    <item>
-    <layout class="QHBoxLayout" name="horizontalLayout" stretch="0,0">
+    <layout class="QHBoxLayout" name="horizontalLayout" stretch="1,1">
      <property name="spacing">
       <number>24</number>
      </property>

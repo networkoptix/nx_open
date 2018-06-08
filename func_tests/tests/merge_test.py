@@ -23,7 +23,7 @@ from framework.rest_api import HttpError
 from framework.utils import bool_to_str, datetime_utc_now, str_to_bool
 from framework.waiting import wait_for_true
 
-log = logging.getLogger(__name__)
+_logger = logging.getLogger(__name__)
 
 
 @pytest.fixture

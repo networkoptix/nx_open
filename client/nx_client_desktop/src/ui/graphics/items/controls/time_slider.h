@@ -32,6 +32,8 @@ class QnTimePeriodList;
 class QnBookmarksViewer;
 class QnBookmarkMergeHelper;
 
+namespace nx { namespace client {namespace desktop { class TimelineCursorLayout; }}}
+
 class QnTimeSlider: public Animated<QnToolTipSlider>, public HelpTopicQueryable,
     protected DragProcessHandler, protected AnimationTimerListener
 {
@@ -504,8 +506,7 @@ private:
     bool m_liveSupported;
     bool m_selectionInitiated;
 
-    GraphicsLabel* m_tooltipLine1;
-    GraphicsLabel* m_tooltipLine2;
+    nx::client::desktop::TimelineCursorLayout* m_positionCursorLayout;
 
     bool m_updatingValue;
 

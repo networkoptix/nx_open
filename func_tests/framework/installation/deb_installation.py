@@ -37,7 +37,7 @@ class DebInstallation(Installation):
         self.service = UpstartService(
             self.os_access.ssh,
             self.installer.customization.linux_service_name,
-            stop_timeout_sec=120 + 10,  # 120 seconds specified in upstart conf file.
+            stop_timeout_sec=10,  # 120 seconds specified in upstart conf file.
             )
 
     def is_valid(self):

@@ -47,6 +47,8 @@ public:
     bool isDeviceTypeSupported(HanwhaDeviceType deviceType) const;
     QSet<QString> associatedParameters() const;
 
+    QSet<QString> ptzTraits() const;
+
     bool isValid() const;
 
 private:
@@ -81,9 +83,11 @@ private:
     QString m_parameterValue;
 
     QSet<QString> m_associatedParameters;
+    QSet<QString> m_ptzTraits;
 
     static const std::map<QString, QString HanwhaAdavancedParameterInfo::*> m_stringAuxes;
     static const std::map<QString, bool HanwhaAdavancedParameterInfo::*> m_boolAuxes;
+    static const std::map<QString, QSet<QString> HanwhaAdavancedParameterInfo::*> m_stringSetAuxes;
 };
 
 } // namespace plugins

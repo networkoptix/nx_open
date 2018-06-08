@@ -5,7 +5,7 @@ import logging
 
 from .utils import is_list_inst
 
-log = logging.getLogger(__name__)
+_logger = logging.getLogger(__name__)
 
 
 class ArtifactType(object):
@@ -88,9 +88,9 @@ class ArtifactFactory(object):
             return
         for artifact in sorted(self._artifact_set, key=lambda artifact: artifact.name):
             assert artifact.artifact_type, repr(artifact)
-            log.info('Storing artifact: %r', artifact)
+            _logger.info('Storing artifact: %r', artifact)
             if not artifact.path.exists():
-                log.warning('Artifact file is missing, skipping: %s' % artifact.path)
+                _logger.warning('Artifact file is missing, skipping: %s' % artifact.path)
                 continue
             data = artifact.path.read_bytes()
             repository_artifact_type = artifact.artifact_type.produce_repository_type(repository)

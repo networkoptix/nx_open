@@ -27,7 +27,7 @@ MEDIASERVER_MERGE_TIMEOUT = MEDIASERVER_CREDENTIALS_TIMEOUT  # timeout for local
 MEDIASERVER_MERGE_REQUEST_TIMEOUT = datetime.timedelta(seconds=90)  # timeout for mergeSystems REST api request
 MEDIASERVER_START_TIMEOUT = datetime.timedelta(minutes=20)  # timeout when waiting for server become online (pingable)
 
-log = logging.getLogger(__name__)
+_logger = logging.getLogger(__name__)
 
 
 class TimePeriod(object):
@@ -79,7 +79,7 @@ class Mediaserver(object):
             wait_for_true(self.is_online)
 
     def stop(self, already_stopped_ok=False):
-        log.info("Stop mediaserver %r.", self)
+        _logger.info("Stop mediaserver %r.", self)
         if self.service.is_running():
             self.service.stop()
             wait_for_true(lambda: not self.service.is_running(), "{} stops".format(self.service))
@@ -89,7 +89,7 @@ class Mediaserver(object):
 
     def restart_via_api(self, timeout=MEDIASERVER_START_TIMEOUT):
         old_runtime_id = self.api.api.moduleInformation.GET()['runtimeId']
-        log.info("Runtime id before restart: %s", old_runtime_id)
+        _logger.info("Runtime id before restart: %s", old_runtime_id)
         started_at = datetime.datetime.now(pytz.utc)
         self.api.api.restart.GET()
         sleep_time_sec = timeout.total_seconds() / 100.
@@ -100,7 +100,7 @@ class Mediaserver(object):
             except requests.ConnectionError as e:
                 if datetime.datetime.now(pytz.utc) - started_at > timeout:
                     assert False, "Mediaserver hasn't started, caught %r, timed out." % e
-                log.debug("Expected failed connection: %r", e)
+                _logger.debug("Expected failed connection: %r", e)
                 failed_connections += 1
                 time.sleep(sleep_time_sec)
                 continue
@@ -110,10 +110,10 @@ class Mediaserver(object):
                     assert False, "Runtime id remains same after failed connections."
                 if datetime.datetime.now(pytz.utc) - started_at > timeout:
                     assert False, "Mediaserver hasn't stopped, timed out."
-                log.warning("Mediaserver hasn't stopped yet, delay is acceptable.")
+                _logger.warning("Mediaserver hasn't stopped yet, delay is acceptable.")
                 time.sleep(sleep_time_sec)
                 continue
-            log.info("Mediaserver restarted successfully, new runtime id is %s", new_runtime_id)
+            _logger.info("Mediaserver restarted successfully, new runtime id is %s", new_runtime_id)
             break
 
     def add_camera(self, camera):
@@ -156,9 +156,9 @@ class Mediaserver(object):
             TimePeriod(datetime.datetime.utcfromtimestamp(int(d['startTimeMs']) / 1000.).replace(tzinfo=pytz.utc),
                        datetime.timedelta(seconds=int(d['durationMs']) / 1000.))
             for d in self.api.ec2.recordedTimePeriods.GET(cameraId=camera.id, flat=True)]
-        log.info('Mediaserver %r returned %d recorded periods:', self.name, len(periods))
+        _logger.info('Mediaserver %r returned %d recorded periods:', self.name, len(periods))
         for period in periods:
-            log.info('\t%s', period)
+            _logger.info('\t%s', period)
         return periods
 
     def get_media_stream(self, stream_type, camera):
@@ -191,7 +191,7 @@ class Storage(object):
         for quality in {'low_quality', 'hi_quality'}:
             path = self._construct_fpath(camera_mac_addr, quality, start_time, unixtime_utc_ms, sample.duration)
             path.parent.mkdir(parents=True, exist_ok=True)
-            log.info('Storing media sample %r to %r', sample.fpath, path)
+            _logger.info('Storing media sample %r to %r', sample.fpath, path)
             path.write_bytes(contents)
 
     def _read_with_start_time_metadata(self, sample, unixtime_utc_ms):

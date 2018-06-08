@@ -104,6 +104,8 @@ namespace nxcip_qt
 
         //!See nxcip::BaseCameraManager::getMediaUrl
         int getMediaUrl( QString* const url ) const;
+        //!See nxcip::BaseCameraManager::setMediaUrl
+        int setMediaUrl(const QString& url);
         //!See nxcip::BaseCameraManager::getResolutionList
         int getResolutionList( QVector<nxcip::ResolutionInfo>* infoList ) const;
         //!See nxcip::BaseCameraManager::getMaxBitrate
