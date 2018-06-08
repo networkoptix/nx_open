@@ -332,6 +332,7 @@ namespace rpi_omx
             m_eventDisabled(0),
             m_eventEnabled(0)
         {
+            debug_print("%s\n", name());
             OMX_STRING xName = const_cast<OMX_STRING>(name());
             ERR_OMX( OMX_GetHandle(&m_component, xName, pAppData, callbacks), "OMX_GetHandle");
 
@@ -410,12 +411,18 @@ namespace rpi_omx
         :   Component(cType, (OMX_PTR) this, &cbsEvents),
             m_ready(false)
         {
+            debug_print("%s\n", __FUNCTION__);
+
+            debug_print("requestCallback\n");
             requestCallback();
+            debug_print("setDeviceNumber(%d)\n", CAM_DEVICE_NUMBER);
             setDeviceNumber(CAM_DEVICE_NUMBER);
 
+            debug_print("tsMode\n");
             Parameter<OMX_PARAM_TIMESTAMPMODETYPE> tsMode;
             tsMode->eTimestampMode = OMX_TimestampModeRawStc;
 
+            debug_print("OMC_SetConfig");
             ERR_OMX( OMX_SetConfig(m_component, OMX_IndexParamCommonUseStcTimestamps, &tsMode), "camera timestamp mode");
         }
 

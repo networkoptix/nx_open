@@ -61,7 +61,7 @@ private:
     CyclicAllocator m_allocator;
     nxcip::CameraInfo m_info;
     int m_encoderNumber;
-    
+
     CodecContext m_codecContext;
     bool m_initialized;
     bool m_modified;
@@ -69,10 +69,10 @@ private:
     QnMutex m_mutex;
 
     bool m_transcodingNeeded;
-    AVFormatContext * m_formatContext;
-    AVInputFormat * m_inputFormat;
-    AVDictionary * m_formatContextOptions;
-    AVPacket* m_avDecodePacket;
+    AVFormatContext * m_formatContext = nullptr;
+    AVInputFormat * m_inputFormat = nullptr;
+    AVDictionary * m_formatContextOptions = nullptr;
+    AVPacket* m_avDecodePacket = nullptr;
     std::unique_ptr<AVCodecContainer> m_videoEncoder;
     std::unique_ptr<AVCodecContainer> m_videoDecoder;
     int m_lastAVError = 0;
@@ -80,7 +80,7 @@ private:
 private:
     std::unique_ptr<ILPVideoPacket> toNxVideoPacket(AVPacket *packet, AVCodecID codecID);
     std::unique_ptr<ILPVideoPacket> transcodeVideo(int *nxcipErrorCode, AVPacket * decodePacket);
-    
+
     int decodeVideoFrame(AVFrame** outFrame, AVPacket* decodePacket);
     AVFrame* toEncodableFrame(AVFrame* frame) const;
     QString decodeCameraInfoUrl() const;

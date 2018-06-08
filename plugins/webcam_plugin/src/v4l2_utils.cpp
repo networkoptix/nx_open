@@ -12,6 +12,8 @@
 #include <fcntl.h>
 #include <sys/ioctl.h>
 #include <linux/videodev2.h>
+#include <stdlib.h>
+#include <map>
 
 namespace nx {
 namespace webcam_plugin {
@@ -21,6 +23,54 @@ namespace v4l2 {
 std::vector<std::string> getDevicePaths();
 nxcip::CompressionType toNxCompressionTypeVideo(unsigned int v4l2PixelFormat);
 unsigned int toV4L2PixelFormat(nxcip::CompressionType nxCodecID);
+
+
+struct BitrateMap
+{
+    nxcip::CompressionType codecID;
+    nxcip::Resolution resolution;
+    int bitrate;
+};
+
+static BitrateMap bitrateMappings[] =
+{
+    // codecID                 resolution    bitrate
+    {nxcip::AV_CODEC_ID_H264,  {2560, 1440}, 16000000},
+    {nxcip::AV_CODEC_ID_H264,  {1920, 1080},  8000000},
+    {nxcip::AV_CODEC_ID_H264,  {1280, 720},   5000000},
+    {nxcip::AV_CODEC_ID_H264,  {640, 480},    2500000},
+    {nxcip::AV_CODEC_ID_H264,  {320, 240},    1000000},
+
+    {nxcip::AV_CODEC_ID_H263,  {2560, 1440}, 16000000},
+    {nxcip::AV_CODEC_ID_H263,  {1920, 1080},  8000000},
+    {nxcip::AV_CODEC_ID_H263,  {1280, 720},   5000000},
+    {nxcip::AV_CODEC_ID_H263,  {640, 480},    2500000},
+    {nxcip::AV_CODEC_ID_H263,  {320, 240},    1000000},
+
+    {nxcip::AV_CODEC_ID_MJPEG, {2560, 1440}, 0},
+    {nxcip::AV_CODEC_ID_MJPEG, {1920, 1080}, 0},
+    {nxcip::AV_CODEC_ID_MJPEG, {1280, 720},  0},
+    {nxcip::AV_CODEC_ID_MJPEG, {640, 480},   0},
+    {nxcip::AV_CODEC_ID_MJPEG, {320, 240},   0},
+
+    {nxcip::AV_CODEC_ID_MPEG4, {2560, 1440}, 0},
+    {nxcip::AV_CODEC_ID_MPEG4, {1920, 1080}, 0},
+    {nxcip::AV_CODEC_ID_MPEG4, {1280, 720},  0},
+    {nxcip::AV_CODEC_ID_MPEG4, {640, 480},   0},
+    {nxcip::AV_CODEC_ID_MPEG4, {320, 240},   0},
+
+    {nxcip::AV_CODEC_ID_NONE, {2560, 1440}, 0},
+    {nxcip::AV_CODEC_ID_NONE, {1920, 1080}, 0},
+    {nxcip::AV_CODEC_ID_NONE, {1280, 720},  0},
+    {nxcip::AV_CODEC_ID_NONE, {640, 480},   0},
+    {nxcip::AV_CODEC_ID_NONE, {320, 240},   0},
+
+};
+
+int calculateBitRate(nxcip::CompressionType codecID, const nxcip::Resolution& resolution, float fps)
+{
+    return 0;
+}
 
 /*!
  * convenience class for opening and closing devices represented by devicePath
@@ -183,9 +233,9 @@ float getHighestFrameRate(
     const auto toFrameRate =
         [] (const v4l2_fract& frameInterval) -> float
         {
-            return frameInterval.numerator == 0
-            ? 0
-            : (frameInterval.denominator / frameInterval.numerator);
+            return frameInterval.numerator
+                ? (float)(frameInterval.denominator / frameInterval.numerator)
+                : 0;
         };
 
     struct v4l2_frmivalenum frameRateEnum;
@@ -211,6 +261,7 @@ float getHighestFrameRate(
 
         ++frameRateEnum.index;
     }
+
     return highestFrameRate;
 }
 
@@ -266,6 +317,8 @@ std::vector<ResolutionData> getResolutionList(
     {
         ResolutionData resolutionData;
         resolutionData.resolution = getResolution(frameSizeEnum);
+        printf("v4l2_utils::getResolutionList()::resolution: w=%d, h=%d\n",
+            resolutionData.resolution.width, resolutionData.resolution.height);
         resolutionData.maxFps =
             getHighestFrameRate(fileDescriptor, pixelFormat, resolutionData.resolution);
         resolutionData.bitrate = getBitrate(fileDescriptor);

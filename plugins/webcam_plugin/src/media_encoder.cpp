@@ -1,5 +1,7 @@
 #include "media_encoder.h"
 
+#include <nx/utils/log/log.h>
+
 #include "camera_manager.h"
 #include "stream_reader.h"
 #include "utils.h"
@@ -7,7 +9,7 @@
 namespace nx {
 namespace webcam_plugin {
 
-MediaEncoder::MediaEncoder(CameraManager* const cameraManager, 
+MediaEncoder::MediaEncoder(CameraManager* const cameraManager,
                            nxpl::TimeProvider *const timeProvider,
                            int encoderNumber,
                            const CodecContext& codecContext)
@@ -65,13 +67,16 @@ int MediaEncoder::getResolutionList( nxcip::ResolutionInfo* infoList, int* infoL
 {
     QString url = decodeCameraInfoUrl();
 
-    std::vector<utils::ResolutionData> resList 
+    std::vector<utils::ResolutionData> resList
         = utils::getResolutionList(url.toLatin1().data(), m_videoCodecContext.codecID());
-    
+
+    NX_DEBUG(this) << "getResolutionList()::m_info.modelName:" << m_cameraManager->info().modelName;
     int count = resList.size();
     for (int i = 0; i < count; ++i)
     {
-        infoList[i].resolution.width = resList[i].resolution.width;
+        NX_DEBUG(this)
+            << "w:" << resList[i].resolution.width << ", h:" << resList[i].resolution.height;
+        infoList[i].resolution = resList[i].resolution;
         infoList[i].maxFps = resList[i].maxFps;
     }
     *infoListCount = count;
@@ -97,7 +102,7 @@ int MediaEncoder::getMaxBitrate( int* maxBitrate ) const
         *maxBitrate = 0;
         return nxcip::NX_IO_ERROR;
     }
-    
+
     auto max = std::max_element(resList.begin(), resList.end(),
         [](const utils::ResolutionData& a, const utils::ResolutionData& b)
     {
@@ -122,7 +127,7 @@ int MediaEncoder::setFps( const float& fps, float* selectedFps )
     static constexpr double MIN_FPS = 1.0 / 86400.0; //once per day
     static constexpr double MAX_FPS = 60;
 
-    
+
     auto newFps = std::min<float>( std::max<float>( fps, MIN_FPS ), MAX_FPS );
     m_videoCodecContext.setFps(newFps);
     if( m_streamReader)
@@ -184,5 +189,5 @@ QString MediaEncoder::decodeCameraInfoUrl() const
 }
 
 
-} // namespace nx 
+} // namespace nx
 } // namespace webcam_plugin

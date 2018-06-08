@@ -7,7 +7,7 @@
 namespace nx {
 namespace webcam_plugin {
 
-CameraManager::CameraManager(const nxcip::CameraInfo& info, 
+CameraManager::CameraManager(const nxcip::CameraInfo& info,
                              nxpl::TimeProvider *const timeProvider)
 :
     m_refManager( this ),
@@ -74,7 +74,7 @@ int CameraManager::getEncoder( int encoderIndex, nxcip::CameraMediaEncoder** enc
             getEncoderDefaults()));
     }
     m_encoder->addRef();
-    
+
     *encoderPtr = m_encoder.get();
 
     return nxcip::NX_NO_ERROR;
@@ -160,22 +160,22 @@ CodecContext CameraManager::getEncoderDefaults()
     nxcip::CompressionType codecID = m_videoCodecPriority.getPriorityCodec(codecList);
 
     auto resolutionList = utils::getResolutionList(url.toLatin1().data(), codecID);
-    auto it = std::max_element(resolutionList.begin(), resolutionList.end(), 
+    auto it = std::max_element(resolutionList.begin(), resolutionList.end(),
         [](const utils::ResolutionData& a, const utils::ResolutionData& b)
         {
             return
-                a.resolution.width 
+                a.resolution.width
                  * a.resolution.height <
-                b.resolution.width 
+                b.resolution.width
                  * b.resolution.height;
         });
 
-    float defaultFPS = 30;
-    int64_t defaultBitrate = 0;
+    static float defaultFPS = 30;
+    static int64_t defaultBitrate = 0;
     auto res = it != resolutionList.end() ? it->resolution : nxcip::Resolution();
 
     return CodecContext(codecID, res, defaultFPS, defaultBitrate);
 }
 
-} // namespace nx 
-} // namespace webcam_plugin 
+} // namespace nx
+} // namespace webcam_plugin

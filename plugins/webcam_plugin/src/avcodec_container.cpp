@@ -1,5 +1,7 @@
 #include "avcodec_container.h"
 
+#include <nx/utils/log/log.h>
+
 namespace nx {
 namespace webcam_plugin {
 
@@ -13,7 +15,11 @@ int AVCodecContainer::open()
     if (m_open)
         return 0;
 
+    NX_DEBUG(this) << "open():: m_codecContext != nullptr:" << (m_codecContext != nullptr) <<
+    ", m_codec != nullptr:" << (m_codec != nullptr);
+
     int codecOpenCode = avcodec_open2(m_codecContext, m_codec, nullptr);
+    NX_DEBUG(this) << "open()::codecOpenCode:" << codecOpenCode;
     if (codecOpenCode < 0)
     {
         close();
@@ -82,14 +88,19 @@ int AVCodecContainer::initializeEncoder(AVCodecID codecID)
 int AVCodecContainer::initializeDecoder(AVCodecParameters * codecParameters)
 {
     m_codec = avcodec_find_decoder(codecParameters->codec_id);
+    NX_DEBUG(this) << "initializeDecoder()::m_codec!=nullptr:" << (m_codec != nullptr);
+
     if (!m_codec)
         return AVERROR_DECODER_NOT_FOUND;
 
     m_codecContext = avcodec_alloc_context3(m_codec);
+    NX_DEBUG(this) << "initializeDecoder()::m_codecContext != nullptr:" << (m_codecContext != nullptr);
     if(!m_codecContext)
         return AVERROR(ENOMEM);
-    
-    return avcodec_parameters_to_context(m_codecContext, codecParameters);
+
+    int paramToContextCode = avcodec_parameters_to_context(m_codecContext, codecParameters);
+    NX_DEBUG(this) << "initializeDecoder()::paramToContextCode:"<< paramToContextCode;
+    return paramToContextCode;
 }
 
 AVCodecContext * AVCodecContainer::codecContext() const
