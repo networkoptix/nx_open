@@ -1,6 +1,6 @@
 #include "discovery_settings.h"
 
-#include <nx/utils/settings.h>
+#include <nx/utils/deprecated_settings.h>
 #include <nx/utils/timer_manager.h>
 
 namespace nx {

@@ -8,8 +8,8 @@ import subprocess
 from abc import ABCMeta, abstractmethod
 
 import paramiko
-from pylru import lrudecorator
 
+from framework.method_caching import cached_getter
 from framework.os_access.exceptions import Timeout, exit_status_error_cls
 from framework.os_access.posix_shell_utils import sh_augment_script, sh_command_to_script
 from framework.waiting import Wait
@@ -42,14 +42,14 @@ class SSH(PosixShell):
         self._key_path = key_path
 
     def __repr__(self):
-        return '<SSH: ssh {}@{} -p {:d} -i {}>'.format(self._username, self._hostname, self._port, self._key_path)
+        return 'SSH({!r}, {!r}, {!r}, {!r})'.format(self._username, self._hostname, self._port, self._key_path)
 
     def run_command(self, command, input=None, cwd=None, timeout_sec=60, env=None):
         script = sh_command_to_script(command)
         output = self.run_sh_script(script, input=input, cwd=cwd, timeout_sec=timeout_sec, env=env)
         return output
 
-    @lrudecorator(1)
+    @cached_getter
     def _client(self):
         client = paramiko.SSHClient()
         client.set_missing_host_key_policy(paramiko.MissingHostKeyPolicy())  # Ignore completely.
@@ -58,9 +58,10 @@ class SSH(PosixShell):
                 str(self._hostname), port=self._port,
                 username=self._username, key_filename=str(self._key_path),
                 look_for_keys=False, allow_agent=False)
-        except paramiko.ssh_exception.NoValidConnectionsError:
-            raise SSHNotConnected("Cannot connect with {}.".format(self))
-        channel = client.get_transport().open_session()
+        except paramiko.ssh_exception.NoValidConnectionsError as e:
+            raise SSHNotConnected("Cannot connect to {}: {} (is port opened?)".format(self, e))
+        except paramiko.ssh_exception.SSHException as e:
+            raise SSHNotConnected("Cannot connect to {}: {} (is service started? using VirtualBox?)".format(self, e))
         return client
 
     def __del__(self):
@@ -74,7 +75,7 @@ class SSH(PosixShell):
     @staticmethod
     def _send_input(channel, input):
         if input is not None:
-            channel.settimeout(10)  # Must never time out.
+            channel.settimeout(10)  # Must never time out assuming process always open stdin and read from it.
             input_offset = 0
             while True:
                 assert 0 <= input_offset <= len(input)
@@ -130,7 +131,9 @@ class SSH(PosixShell):
                     except UnicodeDecodeError:
                         output_logger.debug("Binary: %d bytes", len(output_chunk))
             if not subprocess_responded:
+                subprocess_logger.debug("Exit status: %r.", channel.exit_status)
                 if channel.exit_status != -1:
+                    assert 0 <= channel.exit_status <= 255
                     subprocess_logger.error("Remote process exited but streams left open (child forked?)")
                     break  # Leave
                 if not wait_for_data.again():

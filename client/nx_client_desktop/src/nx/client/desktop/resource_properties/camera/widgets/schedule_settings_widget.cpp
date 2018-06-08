@@ -180,6 +180,10 @@ void ScheduleSettingsWidget::setupUi()
         paintFunctions->paintCellFunction(Qn::RecordingType::motionAndLow));
     ui->noRecordButton->setCustomPaintFunction(
         paintFunctions->paintCellFunction(Qn::RecordingType::never));
+
+    auto buttonAligner = new Aligner(this);
+    buttonAligner->addWidgets(
+        {ui->labelAlways, ui->labelMotionOnly, ui->labelMotionPlusLQ, ui->labelNoRecord});
 }
 
 void ScheduleSettingsWidget::loadState(const CameraSettingsDialogState& state)

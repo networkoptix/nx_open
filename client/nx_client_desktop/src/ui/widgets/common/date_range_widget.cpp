@@ -5,6 +5,8 @@
 
 #include <common/common_module.h>
 
+#include <translation/datetime_formatter.h>
+
 #include <client/client_settings.h>
 
 #include <core/resource/media_server_resource.h>
@@ -44,6 +46,9 @@ QnDateRangeWidget::QnDateRangeWidget(QWidget* parent):
     ui(new Ui::DateRangeWidget())
 {
     ui->setupUi(this);
+
+    ui->dateEditFrom->setDisplayFormat(getFormatString(datetime::Format::dd_MM_yyyy));
+    ui->dateEditTo->setDisplayFormat(getFormatString(datetime::Format::dd_MM_yyyy));
 
     reset();
 

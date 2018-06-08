@@ -8,6 +8,7 @@
 
 #include <QtWidgets/QDialogButtonBox>
 #include <QtWidgets/QPushButton>
+#include <QtWidgets/QStyle>
 
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>

@@ -2,9 +2,9 @@
 
 #include <QtGui/QPainter>
 #include <QtWidgets/QStyle>
-#include <QtWidgets/QToolButton>
 
 #include <nx/client/desktop/common/utils/widget_anchor.h>
+#include <nx/client/desktop/common/widgets/close_button.h>
 #include <ui/common/palette.h>
 #include <ui/style/helper.h>
 #include <ui/style/skin.h>
@@ -36,13 +36,14 @@ auto stateColorGroup(SelectableTextButton::State state)
 struct SelectableTextButton::Private
 {
     State state = State::unselected;
-    QScopedPointer<QToolButton> deactivateButton;
+    QScopedPointer<CloseButton> deactivateButton;
     QString deactivatedText;
     QString deactivationToolTip;
     bool deactivatedTextSet = false;
     QIcon deactivatedIcon;
     bool deactivatedIconSet = false;
     bool selectable = true;
+    bool accented = false;
 };
 
 SelectableTextButton::SelectableTextButton(QWidget* parent):
@@ -52,13 +53,6 @@ SelectableTextButton::SelectableTextButton(QWidget* parent):
     setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
 
     connect(this, &QPushButton::clicked, [this]() { setState(State::selected); });
-
-    installEventHandler(this, QEvent::PaletteChange, this,
-        &SelectableTextButton::updateDeactivateButtonPalette);
-    connect(this, &QPushButton::pressed, this,
-        &SelectableTextButton::updateDeactivateButtonPalette);
-    connect(this, &QPushButton::released, this,
-        &SelectableTextButton::updateDeactivateButtonPalette);
 }
 
 SelectableTextButton::~SelectableTextButton()
@@ -91,9 +85,6 @@ void SelectableTextButton::setState(State value)
             d->deactivateButton->setHidden(hidden);
             updateGeometry();
         }
-
-        if (!hidden)
-            updateDeactivateButtonPalette();
     }
 
     update();
@@ -128,17 +119,14 @@ void SelectableTextButton::setDeactivatable(bool value)
 
     if (value)
     {
-        d->deactivateButton.reset(new QToolButton(this));
-        d->deactivateButton->setIcon(qnSkin->icon(lit("text_buttons/clear.png")));
-        d->deactivateButton->setFixedSize({ kDeactivateButtonSize, kDeactivateButtonSize });
+        d->deactivateButton.reset(new CloseButton(this));
         d->deactivateButton->setToolTip(d->deactivationToolTip);
-        updateDeactivateButtonPalette();
 
         auto anchor = new WidgetAnchor(d->deactivateButton.data());
         anchor->setEdges(Qt::TopEdge | Qt::RightEdge | Qt::BottomEdge);
-        anchor->setMargins(0, 1, 1, 1);
+        anchor->setMargins(0, 0, 0, 1);
 
-        connect(d->deactivateButton.data(), &QToolButton::clicked,
+        connect(d->deactivateButton.data(), &CloseButton::clicked,
             [this]() { setState(State::deactivated); });
 
         setState(State::deactivated); //< Sets deactivated state by default.
@@ -153,6 +141,18 @@ void SelectableTextButton::setDeactivatable(bool value)
 
     updateGeometry();
 }
+
+bool SelectableTextButton::accented() const
+{
+    return d->accented;
+}
+
+void SelectableTextButton::setAccented(bool accented)
+{
+    d->accented = accented;
+    update();
+}
+
 
 void SelectableTextButton::deactivate()
 {
@@ -271,28 +271,19 @@ bool SelectableTextButton::event(QEvent* event)
         case QEvent::MouseButtonRelease:
         case QEvent::Shortcut:
         case QEvent::KeyPress:
+        case QEvent::Enter:
+        case QEvent::Leave:
         {
             // QAbstractButton forces repaint before emitting clicked.
             // We change state on clicked, therefore have to block updates until then.
             QnRaiiGuard updateGuard([this]() { setUpdatesEnabled(true); });
             setUpdatesEnabled(false);
-
             return base_type::event(event);
         }
 
         default:
             return base_type::event(event);
     }
-}
-
-void SelectableTextButton::updateDeactivateButtonPalette()
-{
-    if (!d->deactivateButton)
-        return;
-
-    setPaletteColor(d->deactivateButton.data(), QPalette::Window, isDown()
-        ? Qt::transparent
-        : palette().color(stateColorGroup(d->state), QPalette::Window));
 }
 
 void SelectableTextButton::paintEvent(QPaintEvent* /*event*/)
@@ -307,18 +298,26 @@ void SelectableTextButton::paintEvent(QPaintEvent* /*event*/)
     palette.setCurrentColorGroup(stateColorGroup(d->state));
 
     auto rect = this->rect();
-    const bool hovered = isEnabled() && underMouse()
-        && (d->deactivateButton.isNull() || !d->deactivateButton->underMouse());
+    const bool hovered = isEnabled() && !isDown()
+        && (underMouse() || (d->deactivateButton && d->deactivateButton->underMouse()));
 
     if (d->state != State::deactivated)
     {
-        painter.setPen(d->state == State::selected
-            ? QPen(palette.color(QPalette::Shadow))
-            : Qt::NoPen);
+        if (d->state == State::selected)
+        {
+            painter.setPen(palette.color(QPalette::Shadow));
+            painter.setBrush(palette.dark());
+        }
+        else
+        {
+            NX_EXPECT(d->state == State::unselected);
+            painter.setPen(Qt::NoPen);
 
-        painter.setBrush(isDown()
-            ? palette.dark()
-            : (hovered ? palette.midlight() : palette.window()));
+            if (d->accented)
+                painter.setBrush(hovered ? palette.light() : palette.highlight());
+            else
+                painter.setBrush(hovered ? palette.midlight() : palette.window());
+        }
 
         painter.drawRoundedRect(rect, kRoundingRadius, kRoundingRadius);
     }
@@ -345,9 +344,9 @@ void SelectableTextButton::paintEvent(QPaintEvent* /*event*/)
         const auto iconRect = QStyle::alignedRect(layoutDirection(),
             Qt::AlignLeft | Qt::AlignVCenter, iconSize, rect);
 
-        const auto iconMode = hovered && d->state == State::deactivated
-            ? QIcon::Active
-            : QIcon::Normal;
+        const auto iconMode = d->state == State::deactivated
+            ? (hovered ? QIcon::Active : QIcon::Normal)
+            : ((d->accented && d->state != State::selected) ? QIcon::Selected : QIcon::Normal);
 
         const auto iconState = d->state == State::selected
             ? QIcon::On
@@ -365,9 +364,25 @@ void SelectableTextButton::paintEvent(QPaintEvent* /*event*/)
 
     adjustRect(rect, Side::right, rightIndent);
 
-    painter.setPen(palette.color(d->state != State::deactivated || hovered
-        ? QPalette::WindowText
-        : QPalette::Text));
+    switch (d->state)
+    {
+        case State::deactivated:
+            painter.setPen(palette.color(hovered ? QPalette::WindowText : QPalette::Text));
+            break;
+
+        case State::unselected:
+            painter.setPen(palette.color(d->accented
+                ? QPalette::HighlightedText
+                : QPalette::WindowText));
+            break;
+
+        case State::selected:
+            painter.setPen(palette.color(QPalette::WindowText));
+            break;
+
+        default:
+            NX_ASSERT(false, "Should never get here!");
+    }
 
     painter.drawText(rect, Qt::AlignLeft | Qt::AlignVCenter, effectiveText());
 }

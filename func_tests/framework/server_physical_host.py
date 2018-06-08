@@ -5,13 +5,13 @@ import uuid
 
 from framework.installation.deb_installation import DebInstallation
 from framework.installation.mediaserver import Mediaserver
-from framework.installation.upstart_service import AdHocService
+from framework.installation.upstart_service import LinuxAdHocService
 from framework.os_access.path import FileSystemPath, copy_file
 from framework.rest_api import RestApi
 from .template_renderer import TemplateRenderer
 from .utils import is_list_inst
 
-log = logging.getLogger(__name__)
+_logger = logging.getLogger(__name__)
 
 
 SERVER_CTL_TEMPLATE_PATH = 'server_ctl.sh.jinja2'
@@ -84,7 +84,7 @@ class PhysicalInstallationCtl(object):
         return None
 
     def release_all_servers(self):
-        log.info('Releasing all physical installations')
+        _logger.info('Releasing all physical installations')
         for host in self.installation_hosts:
             host.release_all_servers()
         self._available_hosts = self.installation_hosts[:]
@@ -126,7 +126,7 @@ class PhysicalInstallationHost(object):
         self._must_reset_installation = True
 
     def _reset_installations(self):
-        log.info('%s: removing directory: %s', self.name, self.root_dir)
+        _logger.info('%s: removing directory: %s', self.name, self.root_dir)
         self.os_access.rm_tree(self.root_dir, ignore_errors=True)
 
         self._dist_unpacked = False
@@ -149,7 +149,7 @@ class PhysicalInstallationHost(object):
                 return None
         server_port = self._installation_server_port(self._installations.index(installation))
         api = RestApi(config.name, config.http_schema, server_port)
-        service = AdHocService(self.os_access, installation.dir)
+        service = LinuxAdHocService(self.os_access.ssh, installation.dir)
         server = Mediaserver(config.name, service, installation, api, self, port=server_port)
         self._allocated_server_list.append(server)
         return server
@@ -193,7 +193,7 @@ class PhysicalInstallationHost(object):
 
     def _ensure_servers_are_stopped(self):
         for installation in self._installations:
-            service = AdHocService(self.os_access, installation.dir)
+            service = LinuxAdHocService(self.os_access.ssh, installation.dir)
             if service.is_running():
                 service.stop()
 

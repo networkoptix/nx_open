@@ -18,8 +18,8 @@ set(defaultWebPages
 
 # Support section
 set(companyUrl "http://networkoptix.com")
-set(productUrl "http://networkoptix.com/nxwitness-overview")
-set(supportUrl "https://networkoptix.com/meta/")
+set(productUrl "https://networkoptix.com/meta/")
+set(supportUrl "")
 set(supportEmail "meta@networkoptix.com")
 set(supportPhone "")
 set(licenseEmail "meta@networkoptix.com")

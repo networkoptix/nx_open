@@ -654,4 +654,7 @@ void QnResourcesChangesManager::saveWebPage(const QnWebPageResourcePtr& webPage,
     ec2::fromResourceToApi(webPage, apiWebpage);
 
     connection->getWebPageManager(Qn::kSystemAccess)->save(apiWebpage, this, replyProcessor);
+
+    // TODO: #GDM Prorperties are not rolled back
+    propertyDictionary()->saveParamsAsync({webPage->getId()});
 }

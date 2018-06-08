@@ -565,6 +565,15 @@ TEST_F(QnLicenseUsageHelperTest, validateLicenseNames)
 
         auto longName = QnLicense::longDisplayName(licenseType);
         ASSERT_FALSE(longName.isEmpty());
+
+        for (int i = 0; i < 10; ++i)
+        {
+            auto text1 = QnLicense::displayText(licenseType, i);
+            ASSERT_FALSE(text1.isEmpty());
+
+            auto text2 = QnLicense::displayText(licenseType, i, 9);
+            ASSERT_FALSE(text2.isEmpty());
+        }
     }
 }
 

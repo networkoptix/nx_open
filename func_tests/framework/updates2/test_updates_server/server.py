@@ -1,8 +1,10 @@
 import copy
 import json
 import logging
+import os
 import shutil
 import sys
+import tempfile
 from textwrap import dedent
 
 import click
@@ -20,12 +22,6 @@ elif sys.version_info[:2] in {(3, 4), (3, 5), (3, 6)}:  # Python 3.4 is on Ubunt
 _logger = logging.getLogger(__name__)
 
 UPDATE_PATH_PATTERN = '/{}/{}/update.json'
-UPDATES_PATH = '/updates.json'
-
-DATA_DIR = Path(__file__).with_name('data').resolve()
-DUMMY_FILE_NAME = 'dummy.zip'
-DUMMY_FILE_PATH = Path(__file__).parent / DUMMY_FILE_NAME
-UPDATES_FILE_NAME = 'updates.json'
 
 
 def write_json(path, data):
@@ -49,7 +45,7 @@ def collect_actual_data():
     base_url = 'updates.networkoptix.com'
 
     conn = HTTPConnection(base_url, port=80)
-    conn.request('GET', UPDATES_PATH)
+    conn.request('GET', '/updates.json')
     root_obj = json.loads(conn.getresponse().read().decode())
 
     path_to_update_obj = dict()
@@ -124,35 +120,46 @@ def append_new_versions(root_obj, path_to_update_obj, new_versions):
     return root_obj, path_to_update_obj
 
 
-def save_data_to_files(root_obj, path_to_update_obj):
-    shutil.rmtree(str(DATA_DIR), ignore_errors=True)
-    DATA_DIR.mkdir()
-    write_json(DATA_DIR / UPDATES_FILE_NAME, root_obj)
+def save_data_to_files(data_dir, root_obj, path_to_update_obj):
+    shutil.rmtree(str(data_dir), ignore_errors=True)
+    data_dir.mkdir()
+    write_json(data_dir / 'updates.json', root_obj)
     for key, value in path_to_update_obj.items():
-        file_path = DATA_DIR / key.lstrip('/')
+        file_path = data_dir / key.lstrip('/')
         file_path.parent.mkdir(parents=True, exist_ok=True)
         write_json(file_path, value)
 
 
-@click.group(help='Test updates server', epilog=dedent("""
+@click.group(help="Test updates server", epilog=dedent("""
     Replicates functionality of updates.networkoptix.com but
     appends new versions and cloud host information and
     corresponding specific updates links to the existing ones.
     You may specify versions to add as arguments of append_new_versions(...)."""))
-def main():
+@click.option(
+    '-d', '--dir', '--data-dir',
+    type=click.Path(file_okay=False, dir_okay=True, resolve_path=True),
+    default=os.path.join(tempfile.gettempdir(), 'test_updates_server'),
+    help="Directory to store downloaded and generated data and serve updates from.")
+@click.pass_context
+def main(ctx, data_dir):
+    ctx.obj['data_dir'] = Path(data_dir)
+    ctx.obj['dummy_file_path'] = ctx.obj['data_dir'] / 'dummy.zip'
     pass
 
 
 @main.command(short_help="Collect data, add versions", help=dedent("""
     Collect actual data from updates.networkoptix.com, add versions and save to the data dir."""))
-def generate():
+@click.pass_context
+def generate(ctx):
+    data_dir = ctx.obj['data_dir']
+    dummy_file_path = ctx.obj['dummy_file_path']
     _logger.info('Loading and generating data. Be patient')
     root_obj, path_to_update_obj = collect_actual_data()
     new_versions = [('4.0', '4.0.0.21200', 'cloud-test.hdw.mx')]
     new_root, new_path_to_update_obj = append_new_versions(root_obj, path_to_update_obj, new_versions)
-    save_data_to_files(new_root, new_path_to_update_obj)
-    if not DUMMY_FILE_PATH.exists():
-        with DUMMY_FILE_PATH.open('wb') as f:
+    save_data_to_files(data_dir, new_root, new_path_to_update_obj)
+    if not dummy_file_path.exists():
+        with dummy_file_path.open('wb') as f:
             f.seek(1024 * 1024 * 100)
             f.write(b'\0')
 
@@ -162,13 +169,17 @@ def generate():
     Server can serve update files requests. Pre-generated dummy file is given as a response.
     This option might be turned off to test how mediaserver deals with update files absence."""))
 @click.option('--range-header', type=click.Choice(['support', 'ignore', 'err']), default='support', show_default=True)
-def serve(serve_update_archives, range_header):
+@click.pass_context
+def serve(ctx, serve_update_archives, range_header):
+    data_dir = ctx.obj['data_dir']
+    dummy_file_path = ctx.obj['dummy_file_path']
+
     app = Flask(__name__)
 
     @app.route('/<path:path>')
     def serve(path):
-        path = DATA_DIR.joinpath(path).resolve()
-        if DATA_DIR not in path.parents:
+        path = data_dir.joinpath(path).resolve()
+        if data_dir not in path.parents:
             raise SecurityError("Resolved path is outside of data dir.")
         if 'Range' in request.headers and range_header == 'err':
             raise BadRequest('Range header is not supported')
@@ -184,7 +195,7 @@ def serve(serve_update_archives, range_header):
                         for package in os_specific_packages.values():
                             if package['file'] == path.name:
                                 return send_file(
-                                    str(DUMMY_FILE_PATH),
+                                    str(dummy_file_path),
                                     as_attachment=True, attachment_filename=path.name,
                                     conditional=range_header == 'support')
         raise NotFound()
@@ -194,5 +205,4 @@ def serve(serve_update_archives, range_header):
 
 if __name__ == '__main__':
     logging.basicConfig(level=logging.INFO)
-    main()
-
+    main(obj={})

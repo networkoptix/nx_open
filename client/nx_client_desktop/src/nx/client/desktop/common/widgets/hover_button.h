@@ -1,6 +1,6 @@
 #pragma once
 
-#include <QtWidgets/QPushButton>
+#include <QtWidgets/QAbstractButton>
 
 namespace nx {
 namespace client {
@@ -16,22 +16,20 @@ class HoverButton: public QAbstractButton
 
 public:
     // Use this one if you do NOT want the pressed state.
-    HoverButton(const QString& normal, const QString& highlighted, QWidget* parent);
+    HoverButton(const QString& normalPixmap, const QString& hoveredPixmap, QWidget* parent = nullptr);
+
     // Use this one if you want the pressed state.
-    HoverButton(const QString& normal, const QString& highlighted,
-        const QString& pressed, QWidget* parent);
+    HoverButton(const QString& normalPixmap, const QString& hoveredPixmap,
+        const QString& pressedPixmap, QWidget* parent = nullptr);
+
+    virtual QSize sizeHint() const override;
 
 protected:
-    virtual QSize sizeHint() const override;
     virtual void paintEvent(QPaintEvent* event) override;
-    virtual void mouseMoveEvent(QMouseEvent* event) override;
-    virtual void leaveEvent(QEvent* event) override;
 
 private:
-    bool m_isHovered = false;
-    bool m_hasPressedState = false;
     QPixmap m_normal;
-    QPixmap m_highlighted;
+    QPixmap m_hovered;
     QPixmap m_pressed;
 };
 

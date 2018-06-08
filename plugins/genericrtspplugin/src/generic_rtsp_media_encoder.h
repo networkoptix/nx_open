@@ -21,7 +21,7 @@ class GenericRTSPMediaEncoder
     public nxcip::CameraMediaEncoder
 {
 public:
-    GenericRTSPMediaEncoder( GenericRTSPCameraManager* const cameraManager );
+    GenericRTSPMediaEncoder(GenericRTSPCameraManager* const cameraManager, int encoderIndex);
     virtual ~GenericRTSPMediaEncoder();
 
     //!Implementation of nxpl::PluginInterface::queryInterface
@@ -33,6 +33,8 @@ public:
 
     //!Implementation of nxcip::CameraMediaEncoder::getMediaUrl
     virtual int getMediaUrl( char* urlBuf ) const override;
+    //!Implementation of nxcip::CameraMediaEncoder::setMediaUrl
+    virtual int setMediaUrl(const char url[nxcip::MAX_TEXT_LEN]) override;
     //!Implementation of nxcip::CameraMediaEncoder::getResolutionList
     virtual int getResolutionList( nxcip::ResolutionInfo* infoList, int* infoListCount ) const override;
     //!Implementation of nxcip::CameraMediaEncoder::getMaxBitrate
@@ -47,6 +49,8 @@ public:
 private:
     nxpt::CommonRefManager m_refManager;
     GenericRTSPCameraManager* m_cameraManager;
+    int m_encoderIndex = 0;
+    char m_mediaUrl[nxcip::MAX_TEXT_LEN];
 };
 
 #endif  //GENERIC_RTSP_MEDIA_ENCODER_H

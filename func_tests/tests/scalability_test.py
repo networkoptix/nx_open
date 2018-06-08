@@ -22,7 +22,7 @@ from framework.installation.mediaserver import MEDIASERVER_MERGE_TIMEOUT
 from framework.utils import GrowingSleep
 from memory_usage_metrics import load_host_memory_usage
 
-log = logging.getLogger(__name__)
+_logger = logging.getLogger(__name__)
 
 
 SET_RESOURCE_STATUS_CMD = '202'
@@ -49,7 +49,7 @@ def lightweight_servers(metrics_saver, lightweight_servers_factory, config):
     if not config.USE_LIGHTWEIGHT_SERVERS:
         return []
     lws_count = config.SERVER_COUNT - 1
-    log.info('Creating %d lightweight servers:', lws_count)
+    _logger.info('Creating %d lightweight servers:', lws_count)
     start_time = utils.datetime_utc_now()
     # at least one full/real server is required for testing
     lws_list = lightweight_servers_factory(
@@ -58,7 +58,7 @@ def lightweight_servers(metrics_saver, lightweight_servers_factory, config):
         USERS_PER_SERVER=config.USERS_PER_SERVER,
         PROPERTIES_PER_CAMERA=config.PROPERTIES_PER_CAMERA,
         )
-    log.info('Created %d lightweight servers', len(lws_list))
+    _logger.info('Created %d lightweight servers', len(lws_list))
     metrics_saver.save('lws_server_init_duration', utils.datetime_utc_now() - start_time)
     assert lws_list, 'No lightweight servers were created'
     return lws_list
@@ -67,7 +67,7 @@ def lightweight_servers(metrics_saver, lightweight_servers_factory, config):
 @pytest.fixture
 def servers(metrics_saver, linux_mediaservers_pool, lightweight_servers, config):
     server_count = config.SERVER_COUNT - len(lightweight_servers)
-    log.info('Creating %d servers:', server_count)
+    _logger.info('Creating %d servers:', server_count)
     setup_settings = dict(systemSettings=dict(
         autoDiscoveryEnabled=utils.bool_to_str(False),
         synchronizeTimeWithInternet=utils.bool_to_str(False),
@@ -104,7 +104,7 @@ def create_resources_on_server(server, api_method, resource_generators, sequence
         resources.append((server, resource_data))
     duration = utils.datetime_utc_now() - start_time
     requests = len(sequence)
-    log.info('%r ec2/%s: total requests=%d, total duration=%s (%s), avg request duration=%s (%s)' % (
+    _logger.info('%r ec2/%s: total requests=%d, total duration=%s (%s), avg request duration=%s (%s)' % (
         server, api_method, requests, duration, req_duration, duration / requests, req_duration / requests))
     return resources
 
@@ -122,7 +122,7 @@ def with_traceback(fn):
             return fn(*args, **kw)
         except:
             for line in traceback.format_exc().splitlines():
-                log.error(line)
+                _logger.error(line)
             raise
     return wrapper
 
@@ -176,10 +176,10 @@ def get_response(server, method, api_object, api_method):
         try:
             return server.api.get_api_fn(method, api_object, api_method)(timeout=120)
         except ReadTimeout as x:
-            log.error('ReadTimeout when waiting for %s call %s/%s: %s', server, api_object, api_method, x)
+            _logger.error('ReadTimeout when waiting for %s call %s/%s: %s', server, api_object, api_method, x)
         except Exception as x:
-            log.error("%s call '%s/%s' error: %s", server, api_object, api_method, x)
-    log.error('Retry count exceeded limit (%d) for %s call %s/%s; seems server is deadlocked, will make core dump.',
+            _logger.error("%s call '%s/%s' error: %s", server, api_object, api_method, x)
+    _logger.error('Retry count exceeded limit (%d) for %s call %s/%s; seems server is deadlocked, will make core dump.',
               CHECK_METHOD_RETRY_COUNT, server, api_object, api_method)
     server.service.make_core_dump()
     raise  # reraise last exception
@@ -214,22 +214,22 @@ def log_diffs(x, y):
     lines = compare_values(x, y)
     if lines:
         for line in lines:
-            log.debug(line)
+            _logger.debug(line)
     else:
-        log.warning('Strange, no diffs are found...')
+        _logger.warning('Strange, no diffs are found...')
 
 
 def save_json_artifact(artifact_factory, api_method, side_name, server, value):
     artifact = artifact_factory(['result', api_method, side_name], name='%s-%s' % (api_method, side_name))
     file_path = artifact.save_as_json(value, encoder=transaction_log.TransactionJsonEncoder)
-    log.debug('results from %s from server %s %s is stored to %s', api_method, server.name, server, file_path)
+    _logger.debug('results from %s from server %s %s is stored to %s', api_method, server.name, server, file_path)
 
 
 def make_dumps_and_fail(message, servers, merge_timeout, api_method, api_call_start_time):
     full_message = 'Servers did not merge in %s: %s; currently waiting for method %r for %s' % (
         merge_timeout, message, api_method, utils.datetime_utc_now() - api_call_start_time)
-    log.info(full_message)
-    log.info('killing servers for core dumps')
+    _logger.info(full_message)
+    _logger.info('killing servers for core dumps')
     for server in servers:
         server.service.make_core_dump()
     pytest.fail(full_message)
@@ -257,11 +257,11 @@ def wait_for_method_matched(artifact_factory, servers, method, api_object, api_m
     
         first_unsynced_server, unmatched_result = check(servers[1:])
         if not first_unsynced_server:
-            log.info('%s/%s merge duration: %s' % (api_object, api_method,
+            _logger.info('%s/%s merge duration: %s' % (api_object, api_method,
                                                    utils.datetime_utc_now() - api_call_start_time))
             return
         if utils.datetime_utc_now() - start_time >= merge_timeout:
-            log.info(
+            _logger.info(
                 'Servers %s and %s still has unmatched results for method %r:',
                 servers[0], first_unsynced_server, api_method)
             log_diffs(expected_result, unmatched_result)

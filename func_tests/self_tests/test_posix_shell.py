@@ -49,7 +49,7 @@ def test_create_path(posix_shell):
 
 def test_timeout(posix_shell):
     with pytest.raises(Timeout):
-        posix_shell.run_command(['sleep', 5], timeout_sec=1)
+        posix_shell.run_command(['sleep', 60], timeout_sec=1)
 
 
 # language=Python
@@ -72,7 +72,7 @@ if __name__ == '__main__':
 
 
 def test_streams_left_open(posix_shell):
-    sleep_time_sec = 10
+    sleep_time_sec = 60
     start_time = timeit.default_timer()
     posix_shell.run_command(['python', '-c', _forked_child_script, sleep_time_sec], timeout_sec=5)
     assert timeit.default_timer() - start_time < sleep_time_sec

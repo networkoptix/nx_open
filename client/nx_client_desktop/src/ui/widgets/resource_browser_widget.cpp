@@ -242,7 +242,7 @@ QnResourceBrowserWidget::QnResourceBrowserWidget(QWidget* parent, QnWorkbenchCon
 
 void QnResourceBrowserWidget::initNewSearch()
 {
-    if (!nx::client::desktop::ini().enableResourceFiltering)
+    if (!nx::client::desktop::ini().enableResourceFilteringByDefault)
         return;
 
     ui->tabWidget->tabBar()->hide();

@@ -122,5 +122,72 @@ TEST(DeviceFileCatalog, mergeData)
     ASSERT_EQ(kRecordsToTest * 3 + 1, catalog.size());
 }
 
+TEST(DeviceFileCatalog, ChunksDeque_insertRemove)
+{
+    DeviceFileCatalog::Chunk storage1Chunk, storage2Chunk;
+    DeviceFileCatalog::ChunksDeque chunksDeque;
+    const int count = 5;
+    const int storage1Index = 0;
+    const int storage2Index = 1;
+
+    storage1Chunk.storageIndex = storage1Index;
+    storage2Chunk.storageIndex = storage2Index;
+
+    for (int i = 0; i < count; ++i)
+        chunksDeque.insert(chunksDeque.end(), storage1Chunk);
+
+    ASSERT_TRUE(chunksDeque.hasArchive(storage1Index));
+    ASSERT_FALSE(chunksDeque.hasArchive(storage2Index));
+
+    for (int i = 0; i < count; ++i)
+        chunksDeque.insert(chunksDeque.end(), storage2Chunk);
+
+    ASSERT_TRUE(chunksDeque.hasArchive(storage1Index));
+    ASSERT_TRUE(chunksDeque.hasArchive(storage2Index));
+
+
+    for (int i = 0; i < count; ++i)
+        chunksDeque.erase(chunksDeque.begin());
+
+    ASSERT_FALSE(chunksDeque.hasArchive(storage1Index));
+    ASSERT_TRUE(chunksDeque.hasArchive(storage2Index));
+
+    for (int i = 0; i < count; ++i)
+        chunksDeque.erase(chunksDeque.begin());
+
+    ASSERT_FALSE(chunksDeque.hasArchive(storage1Index));
+    ASSERT_FALSE(chunksDeque.hasArchive(storage2Index));
+}
+
+TEST(DeviceFileCatalog, ChunksDeque_reCalcPresence)
+{
+    DeviceFileCatalog::Chunk storage1Chunk, storage2Chunk;
+    DeviceFileCatalog::ChunksDeque chunksDeque;
+    const int count = 5;
+    const int storage1Index = 0;
+    const int storage2Index = 1;
+
+    storage1Chunk.storageIndex = storage1Index;
+    storage2Chunk.storageIndex = storage2Index;
+
+    for (int i = 0; i < count; ++i)
+        chunksDeque.insert(chunksDeque.end(), storage1Chunk);
+
+    ASSERT_TRUE(chunksDeque.hasArchive(storage1Index));
+    ASSERT_FALSE(chunksDeque.hasArchive(storage2Index));
+
+    std::vector<DeviceFileCatalog::Chunk> chunksForMerge;
+    chunksForMerge.push_back(storage2Chunk);
+    chunksForMerge.push_back(storage2Chunk);
+
+    int oldSize = chunksDeque.size();
+    chunksDeque.resize(chunksDeque.size() + chunksForMerge.size());
+    std::copy(chunksForMerge.cbegin(), chunksForMerge.cend(), chunksDeque.begin() + oldSize);
+    ASSERT_FALSE(chunksDeque.hasArchive(storage2Index));
+
+    chunksDeque.reCalcArchivePresence();
+    ASSERT_TRUE(chunksDeque.hasArchive(storage2Index));
+}
+
 } // test
 } // nx

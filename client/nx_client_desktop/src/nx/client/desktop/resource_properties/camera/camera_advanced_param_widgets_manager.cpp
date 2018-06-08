@@ -78,14 +78,12 @@ void CameraAdvancedParamWidgetsManager::displayParams(const QnCameraAdvancedPara
 
 void CameraAdvancedParamWidgetsManager::loadValues(const QnCameraAdvancedParamValueList& params)
 {
-    QMap<QString, QString> valuesToKeep;
-
     // Disconnect all watches to not trigger handler chains.
-    for (auto& connection : m_handlerChainConnections)
-        disconnect(connection);
+    m_handlerChainConnections = QnDisconnectHelper::create();
 
     // Set widget values and store initial values that should be kept.
-    for (const QnCameraAdvancedParamValue &param: params)
+    QMap<QString, QString> valuesToKeep;
+    for (const auto& param: params)
     {
         if (!m_paramWidgetsById.contains(param.id))
             continue;
@@ -94,21 +92,21 @@ void CameraAdvancedParamWidgetsManager::loadValues(const QnCameraAdvancedParamVa
         widget->setValue(param.value);
         widget->setEnabled(true);
 
-        if (m_parametersById[param.id].shouldKeepInitialValue)
+        if (m_parametersById[param.id].keepInitialValue)
             valuesToKeep[param.id] = param.value;
     }
 
     runAllHandlerChains();
 
     // Connect handler chains to watched values.
-    m_handlerChainConnections.clear();
-    for (const auto& watch : m_handlerChains.keys())
+    for (auto itr = m_handlerChains.cbegin(); itr != m_handlerChains.cend(); ++itr)
     {
-        const auto& handlerChains = m_handlerChains.value(watch);
-        for (auto& func : handlerChains)
+        const auto& watch = itr.key();
+        const auto& handlerChains = itr.value();
+        for (auto& func: handlerChains)
         {
             auto watchWidget = m_paramWidgetsById[watch];
-            m_handlerChainConnections.push_back(
+            m_handlerChainConnections->add(
                 connect(
                     watchWidget,
                     &AbstractCameraAdvancedParamWidget::valueChanged,
@@ -117,7 +115,7 @@ void CameraAdvancedParamWidgetsManager::loadValues(const QnCameraAdvancedParamVa
     }
 
     // Restore initial values for some widgets.
-    for (const auto& paramId : valuesToKeep.keys())
+    for (const auto& paramId: valuesToKeep.keys())
     {
         auto widget = m_paramWidgetsById.value(paramId);
         if (!widget)
@@ -126,7 +124,7 @@ void CameraAdvancedParamWidgetsManager::loadValues(const QnCameraAdvancedParamVa
         widget->setValue(valuesToKeep[paramId]);
     }
 
-    for (const QnCameraAdvancedParamValue &param : params)
+    for (const auto& param: params)
     {
         auto widget = m_paramWidgetsById[param.id];
         disconnect(
@@ -143,11 +141,11 @@ void CameraAdvancedParamWidgetsManager::loadValues(const QnCameraAdvancedParamVa
     }
 }
 
-boost::optional<QString> CameraAdvancedParamWidgetsManager::parameterValue(
+std::optional<QString> CameraAdvancedParamWidgetsManager::parameterValue(
     const QString & parameterId) const
 {
     if (!m_paramWidgetsById.contains(parameterId))
-        return boost::none;
+        return std::nullopt;
 
     return m_paramWidgetsById[parameterId]->value();
 }
@@ -365,9 +363,8 @@ void CameraAdvancedParamWidgetsManager::setUpDependenciesForPage(
 void CameraAdvancedParamWidgetsManager::runAllHandlerChains()
 {
     // Run handler chains.
-    for (const auto& watch: m_handlerChains.keys())
+    for (const auto& handlerChains: m_handlerChains)
     {
-        const auto& handlerChains = m_handlerChains.value(watch);
         for (auto& func: handlerChains)
             func();
     }
@@ -463,8 +460,7 @@ CameraAdvancedParamWidgetsManager::DependencyHandler
             }
             else if (dependency.type == DependencyType::trigger)
             {
-                return false;
-                //< Do nothing. All work will be done by other handlers
+                return false; //< Do nothing. All work will be done by other handlers
             }
 
             return allConditionsSatisfied;

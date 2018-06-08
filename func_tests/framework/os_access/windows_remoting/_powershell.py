@@ -5,11 +5,11 @@ from textwrap import dedent
 
 from ._cmd import receive_stdout_and_stderr_until_done
 
-log = logging.getLogger(__name__)
+_logger = logging.getLogger(__name__)
 
 
 def start_raw_powershell_script(shell, script):
-    log.debug("Run\n%s", script)
+    _logger.debug("Run\n%s", script)
     return shell.start(
         'PowerShell',
         '-NoProfile', '-NonInteractive', '-ExecutionPolicy', 'Unrestricted',

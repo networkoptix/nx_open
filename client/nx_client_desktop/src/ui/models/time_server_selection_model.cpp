@@ -27,6 +27,7 @@
 #include <api/model/time_reply.h>
 
 #include <nx/utils/algorithm/index_of.h>
+#include <utils/common/guarded_callback.h>
 
 namespace {
 
@@ -203,7 +204,8 @@ void QnTimeServerSelectionModel::updateTimeOffset()
     if (!server)
         return;
     auto apiConnection = server->restConnection();
-    m_currentRequest = apiConnection->getTimeOfServersAsync(
+
+    const auto callback = guarded(this,
         [this, apiConnection]
             (bool success, rest::Handle handle, rest::MultiServerTimeData data)
         {
@@ -238,6 +240,8 @@ void QnTimeServerSelectionModel::updateTimeOffset()
                 emit dataChanged(index(idx, TimeColumn), index(idx, OffsetColumn), kTextRoles);
             }
         });
+
+    m_currentRequest = apiConnection->getTimeOfServersAsync(callback, thread());
 }
 
 void QnTimeServerSelectionModel::updateFirstItemCheckbox()

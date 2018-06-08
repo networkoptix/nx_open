@@ -65,6 +65,8 @@ bool operator==(const OsVersion& lhs, const OsVersion& rhs)
         && lhs.version == rhs.version;
 }
 
+namespace {
+
 static const QString kLinuxFamily = "linux";
 static const QString kWindowsFamily = "windows";
 static const QString kMacOsxFamily = "macosx";
@@ -74,6 +76,8 @@ static const QString kx64 = "x64";
 static const QString kUbuntu = "ubuntu";
 static const QString kWinxp = "winxp";
 static const QString kArm = "arm";
+
+} // namespace
 
 OsVersion ubuntuX64()
 {

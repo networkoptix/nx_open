@@ -1,10 +1,11 @@
 #pragma once
 
 #include <QtCore/QScopedPointer>
-
 #include <QtWidgets/QWidget>
 
 #include <core/resource/resource_fwd.h>
+
+#include <nx/client/desktop/ui/actions/actions.h>
 
 namespace Ui { class CameraScheduleWidget; }
 
@@ -14,6 +15,7 @@ namespace desktop {
 
 struct CameraSettingsDialogState;
 class CameraSettingsDialogStore;
+class AbstractTextProvider;
 
 class CameraScheduleWidget: public QWidget
 {
@@ -22,13 +24,15 @@ class CameraScheduleWidget: public QWidget
 
 public:
     explicit CameraScheduleWidget(
+        AbstractTextProvider* licenseUsageTextProvider,
         CameraSettingsDialogStore* store,
         QWidget* parent = nullptr);
     virtual ~CameraScheduleWidget() override;
 
     //void overrideMotionType(Qn::MotionType motionTypeOverride = Qn::MotionType::MT_Default);
 
-    void setStore(CameraSettingsDialogStore* store);
+signals:
+    void actionRequested(nx::client::desktop::ui::action::IDType action);
 
 private:
     void setupUi();

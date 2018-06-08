@@ -19,7 +19,6 @@ set(CMAKE_EXE_LINKER_FLAGS_INIT "${common_link_flags}")
 set(CMAKE_SHARED_LINKER_FLAGS_INIT "${common_link_flags}")
 
 set(common_c_flags "-mcpu=cortex-a7 -mfpu=neon-vfpv4")
-string(APPEND common_c_flags " -I${zlib_dir}/include")
 set(CMAKE_C_FLAGS_INIT "${common_c_flags}")
 set(CMAKE_CXX_FLAGS_INIT "${common_c_flags}")
 

@@ -1422,12 +1422,16 @@ to view more bookmarks</source>
       <translation>Alto valor mínimo puede llevar a archivo longitud disminución en otros dispositivos.</translation>
     </message>
     <message>
-      <source>Sets when camera archive will be deleted or saved when there is no space for new recordings.</source>
-      <translation>Establece cuándo se borrará o guardará el archivo de la cámara cuando no haya espacio para nuevas grabaciones.</translation>
+      <source>Archive can be deleted in case if there are no space for new recording.</source>
+      <translation>El archivo se puede eliminar en caso de que no haya espacio para la grabación nueva.</translation>
     </message>
     <message>
-      <source>&quot;Auto&quot; deletes the oldest footage first, regardless of the source.</source>
-      <translation>&quot;Auto&quot; elimina primero el material de archivo más antiguo, independientemente de la fuente.</translation>
+      <source>Min and Max settings determine the age of archive which should be kept for this camera.</source>
+      <translation>Los ajustes mínimo y máximo determinan la antigüedad del archivo que debe guardarse para esta cámara.</translation>
+    </message>
+    <message>
+      <source>If &quot;Auto&quot; option is enabled, the oldest footage among all cameras will be deleted first.</source>
+      <translation>Si la opción &quot;Auto&quot; está habilitada, primero se eliminará el metraje más antiguo de todas las cámaras.</translation>
     </message>
   </context>
   <context>
@@ -3146,12 +3150,20 @@ a %1</translation>
   <context>
     <name>QnCustomBusinessEventWidget</name>
     <message>
-      <source>Event will trigger only if there are matches in caption with any of entered keywords.</source>
-      <translation>El evento se activará solo si hay correspondencia en el título con cualquiera de las palabras clave introducidas.</translation>
-    </message>
-    <message>
       <source>If the field is empty, event will always trigger.</source>
       <translation>Si el campo está vacío, el evento siempre se disparará.</translation>
+    </message>
+    <message>
+      <source>Event will trigger only if there are matches in the source with any of the entered keywords.</source>
+      <translation>El evento se activará solo si hay coincidencias en la fuente con cualquiera de las palabras claves ingresadas.</translation>
+    </message>
+    <message>
+      <source>Event will trigger only if there are matches in the caption with any of the entered keywords.</source>
+      <translation>El evento se activará solo si hay coincidencias en el título con cualquiera de las palabras clave ingresadas.</translation>
+    </message>
+    <message>
+      <source>Event will trigger only if there are matches in the description with any of the entered keywords.</source>
+      <translation>El evento se activará solo si hay coincidencias en la descripción con cualquiera de las palabras clave ingresadas.</translation>
     </message>
   </context>
   <context>
@@ -3368,8 +3380,8 @@ a %1</translation>
   <context>
     <name>QnEmptyBusinessActionWidget</name>
     <message>
-      <source>Panic Recording mode switches recording settings for all Cameras to maximum FPS and Quality</source>
-      <translation>El modo de grabación de pánico cambia la configuración de grabación para todas las cámaras al máximo de FPS y calidad</translation>
+      <source>Panic Recording mode switches recording settings for all cameras to maximum FPS and quality.</source>
+      <translation>El modo de grabación de pánico cambia los ajustes de grabación para todas las cámaras al máximo de FPS y calidad.</translation>
     </message>
   </context>
   <context>
@@ -3867,6 +3879,10 @@ a %1</translation>
         <numerusform>Prueba ha completado con éxito: %n usuarios encontrados.</numerusform>
         <numerusform>Prueba ha completado con éxito: %n usuarios encontrados.</numerusform>
       </translation>
+    </message>
+    <message>
+      <source>Changing any LDAP settings other than &quot;Search Filter&quot; will result in connectivity loss for all LDAP fetched users.</source>
+      <translation>Cambiar cualquier configuración de LDAP que no sea &quot;Search Filter&quot; dará como resultado la pérdida de conectividad para todos los usuarios de LDAP recuperados.</translation>
     </message>
   </context>
   <context>
@@ -4512,12 +4528,12 @@ a %1</translation>
       <translation>Establece el tiempo para usar en el cliente (línea de tiempo, marcas de tiempo, etc.) cuando las máquinas cliente y servidor se encuentran en diferentes zonas horarias.</translation>
     </message>
     <message>
-      <source>Length of time each camera on layout will be displayed if you start a Layout Tour.</source>
-      <translation>Periodo de tiempo que se mostrará cada cámara en el diseño si inicia un Tour de diseño.</translation>
+      <source>Displays IP addresses for cameras and servers and roles for users.</source>
+      <translation>Muestra direcciones IP para cámaras y servidores y roles para usuarios.</translation>
     </message>
     <message>
-      <source>Displays IP addresses for cameras and servers and groups for users.</source>
-      <translation>Muestra direcciones IP para cámaras y servidores y grupos para usuarios.</translation>
+      <source>Length of time each camera on layout will be displayed if you start a Tour.</source>
+      <translation>Tiempo de duración de cada cámara en el diseño se mostrará si inicia un recorrido.</translation>
     </message>
   </context>
   <context>
@@ -6394,12 +6410,8 @@ a %1</translation>
       <translation>La grabación fue habilitada en el almacenamiento USB</translation>
     </message>
     <message>
-      <source>Backup includes servers and cameras settings, users, webpages, event rules, etc. Video is not saved.</source>
-      <translation>La copia de seguridad incluye configuraciones de servidores y cámaras, usuarios, páginas web, reglas de eventos, etc. El video no se guarda.</translation>
-    </message>
-    <message>
-      <source>Creates a backup of System configuration that can be restored in case of failure.</source>
-      <translation>Crea una copia de seguridad de la configuración del sistema que se puede restaurar en caso de error.</translation>
+      <source>Reindexing can fix problems with archive or backup if they have been lost or damaged, or if some hardware has been replaced.</source>
+      <translation>Reindexar puede solucionar problemas con el archivo o la copia de seguridad si se han perdido o dañado, o si se ha reemplazado algún hardware.</translation>
     </message>
   </context>
   <context>
@@ -6694,12 +6706,16 @@ a %1</translation>
       <translation>Permitir el sistema optimizar la configuración de las cámaras</translation>
     </message>
     <message>
-      <source>Sends anonymous System information (firmware, codecs, streams, etc.).</source>
-      <translation>Envía información anónima del sistema (firmware, códecs, secuencias, etc.).</translation>
-    </message>
-    <message>
       <source>Tracks and logs all user actions.</source>
       <translation>Rastrea y registra todas las acciones del usuario.</translation>
+    </message>
+    <message>
+      <source>Includes information about system, such as cameras models and firmware versions, number of servers, etc.</source>
+      <translation>Incluye información sobre el sistema, como modelos de cámaras y versiones de firmware, cantidad de servidores, etc.</translation>
+    </message>
+    <message>
+      <source>Does not include any personal information and is completely anonymous.</source>
+      <translation>No incluye información personal y es completamente anónimo.</translation>
     </message>
   </context>
   <context>
@@ -7411,6 +7427,21 @@ a %1</translation>
     <message>
       <source>Video Wall is removed on the server and will be closed.</source>
       <translation>Video Wall se elimina en el servidor y se cerrará.</translation>
+    </message>
+  </context>
+  <context>
+    <name>QnWorkbenchContext</name>
+    <message>
+      <source>To use the software you must accept the end user license agreement</source>
+      <translation>Para usar el software debe aceptar el acuerdo de licencia del usuario final</translation>
+    </message>
+    <message>
+      <source>Accept</source>
+      <translation>Aceptar</translation>
+    </message>
+    <message>
+      <source>Decline</source>
+      <translation>Rechazar</translation>
     </message>
   </context>
   <context>
@@ -8491,16 +8522,20 @@ a %1</translation>
       <translation>Elija cámaras usando el botón de arriba para ver la lista de eventos compatibles.</translation>
     </message>
     <message>
-      <source>Event will trigger only if there are matches in caption with any of entered keywords.</source>
-      <translation>El evento se activará solo si hay coincidencias en el título con cualquiera de las palabras clave introducidas.</translation>
-    </message>
-    <message>
       <source>If the field is empty, event will always trigger.</source>
       <translation>Si el campo está vacío, el evento siempre se disparará.</translation>
     </message>
     <message>
       <source>Event will trigger only if there are matches in the description field with any of the entered keywords.</source>
       <translation>El evento se activará solo si hay coincidencias en el campo de descripción con cualquiera de las palabras clave ingresadas.</translation>
+    </message>
+    <message>
+      <source>Event will trigger only if there are matches in the caption with any of the entered keywords.</source>
+      <translation>El evento se activará solo si hay coincidencias en el título con cualquiera de las palabras clave ingresadas.</translation>
+    </message>
+    <message>
+      <source>This field is case sensitive.</source>
+      <translation>Este campo es sensible a mayúsculas y minúsculas.</translation>
     </message>
   </context>
   <context>
@@ -8821,10 +8856,6 @@ a %1</translation>
       <translation>Versión Beta %1</translation>
     </message>
     <message>
-      <source>Some functionality may be unavailable or not working properly.</source>
-      <translation>Es posible que algunas funciones no estén disponibles o no funcionen correctamente.</translation>
-    </message>
-    <message>
       <source>System sends anonymous usage statistics</source>
       <translation>El sistema envía anónimamente estadísticas de uso</translation>
     </message>
@@ -8853,16 +8884,8 @@ a %1</translation>
       <translation>Error al cambiar la contraseña en %1 de %2 cámaras</translation>
     </message>
     <message>
-      <source>To use the software you must accept the end user license agreement</source>
-      <translation>Para usar el software debe aceptar el acuerdo de licencia del usuario final</translation>
-    </message>
-    <message>
-      <source>Accept</source>
-      <translation>Aceptar</translation>
-    </message>
-    <message>
-      <source>Decline</source>
-      <translation>Rechazar</translation>
+      <source>Warning! This build is for testing purposes only! Please upgrade to a next available patch or release version once available.</source>
+      <translation>¡Advertencia! ¡Esta compilación es solo para fines de prueba! Actualice a un próximo parche o versión de lanzamiento disponible una vez que esté disponible.</translation>
     </message>
   </context>
   <context>

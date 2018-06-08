@@ -137,9 +137,9 @@
                         <input type="radio"
                                ng-model="apiMethod.params[param.name]"
                                name="{{param.name}}"
-                               id="{{param.name}}_true"
-                               ng-value="true">
-                        true
+                               id="{{param.name}}_จริง"
+                               ng-value="จริง">
+                        จริง
                     </label>
                 </div>
                 <div ng-switch-when="boolean" ng-if="param.optional" class="radio">
@@ -147,9 +147,9 @@
                         <input type="radio"
                                ng-model="apiMethod.params[param.name]"
                                name="{{param.name}}"
-                               id="{{param.name}}_false"
-                               ng-value="false">
-                        false
+                               id="{{param.name}}_เป็นเท็จ"
+                               ng-value="เป็นเท็จ">
+                        เป็นเท็จ
                     </label>
                 </div>
 

@@ -25,7 +25,7 @@ TEST(hls_LivePlaylistManager, general)
     nx::mediaserver::hls::LivePlaylistManager hlsPlaylistManager(
         &mediaCache,
         targetDuration.count(),
-        nx_ms_conf::DEFAULT_HLS_REMOVED_LIVE_CHUNKS_TO_KEEP);
+        nx::mediaserver::Settings::kDefaultHlsRemovedLiveChunksToKeep);
 
     microseconds totalTimestampChange(0);
     const microseconds startTimestamp(nx::utils::random::number());

@@ -453,12 +453,14 @@ void QnResourceDirectoryBrowser::at_filesystemDirectoryChanged(const QString& pa
     // We get here if:
     // - file has been added. Should iterate over all resources from this path.
     // - file has been removed. This case is handled by at_filesystemFileChanged callback.
+    // - containing folder has been renamed/removed. We should handle this, because at_filesystemFileChanged
+    //   will not be invoked for the contents of this folder
     QStringList files;
 
     ResourceCache cache;
     {
         QnMutexLocker lock(&m_cacheMutex);
-        cache = this->m_resourceCache;
+        cache = m_resourceCache;
     }
 
     QnResourceList result;
@@ -469,7 +471,18 @@ void QnResourceDirectoryBrowser::at_filesystemDirectoryChanged(const QString& pa
     if (findResources(path, cache, handler, kMaxResourceCount) > 0)
     {
         resourcePool()->addResources(result);
-        this->trackResources(result, files);
+        trackResources(result, files);
+    }
+
+    // This is the case for removed folder.
+    // We need to all files in our resource cache for existance.
+    for (const auto entry: cache)
+    {
+        QString path = entry->getUrl();
+        if (!QFileInfo::exists(path))
+        {
+            at_filesystemFileChanged(path);
+        }
     }
 }
 
@@ -479,8 +492,7 @@ void QnResourceDirectoryBrowser::at_filesystemFileChanged(const QString& path)
     // - file has been removed
     // - file has been renamed. Just the same as to be removed
 
-    QFile file(path);
-    if (!file.exists()) //< File does not exist means resource should be deleted.
+    if (!QFileInfo::exists(path)) //< File does not exist means resource should be deleted.
     {
         QnResourcePool* pool = resourcePool();
         QnResourcePtr res = pool->getResourceByUrl(path);

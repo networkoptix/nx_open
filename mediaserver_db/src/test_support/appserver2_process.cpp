@@ -8,7 +8,7 @@
 #include <nx/network/http/http_mod_manager.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/scope_guard.h>
-#include <nx/utils/settings.h>
+#include <nx/utils/deprecated_settings.h>
 #include <nx/utils/std/cpp14.h>
 #include <nx/utils/timer_manager.h>
 
@@ -132,9 +132,6 @@ int Appserver2Process::exec()
             Qn::PT_Server,
             nx::utils::TimerManager::instance(),
             settings.isP2pMode()));
-
-    std::map<QString, QVariant> confParams;
-    ec2ConnectionFactory->setConfParams(std::move(confParams));
 
     const nx::utils::Url dbUrl = nx::utils::Url::fromLocalFile(settings.dbFilePath());
 

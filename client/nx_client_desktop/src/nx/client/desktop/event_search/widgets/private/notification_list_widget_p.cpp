@@ -72,6 +72,7 @@ NotificationListWidget::Private::Private(NotificationListWidget* q) :
     auto layout = new QVBoxLayout(q);
     layout->setSpacing(0);
     layout->addWidget(m_placeholder);
+    layout->addSpacing(8);
     layout->addWidget(m_eventRibbon);
 
     const auto verticalLayout = new QVBoxLayout(m_placeholder);
@@ -116,10 +117,6 @@ NotificationListWidget::Private::Private(NotificationListWidget* q) :
         {
             m_placeholder->setVisible(count < 1);
         });
-
-    q->setContextMenuPolicy(Qt::CustomContextMenu);
-    connect(q, &NotificationListWidget::customContextMenuRequested,
-        this, &NotificationListWidget::Private::showContextMenu);
 }
 
 NotificationListWidget::Private::~Private() = default;
@@ -167,17 +164,6 @@ QToolButton* NotificationListWidget::Private::newActionButton(
 
     context()->statisticsModule()->registerButton(statAlias, button);
     return button;
-}
-
-void NotificationListWidget::Private::showContextMenu(const QPoint& pos)
-{
-    QMenu contextMenu;
-    contextMenu.addAction(action(ui::action::OpenBusinessLogAction));
-    contextMenu.addAction(action(ui::action::BusinessEventsAction));
-    contextMenu.addAction(action(ui::action::PreferencesNotificationTabAction));
-    contextMenu.addSeparator();
-    contextMenu.addAction(action(ui::action::PinNotificationsAction));
-    contextMenu.exec(QnHiDpiWorkarounds::safeMapToGlobal(q, pos));
 }
 
 } // namespace desktop

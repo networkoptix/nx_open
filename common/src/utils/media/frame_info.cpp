@@ -185,6 +185,17 @@ void CLVideoDecoderOutput::fillRightEdge()
     }
 }
 
+AVPixelFormat CLVideoDecoderOutput::fixDeprecatedPixelFormat(AVPixelFormat original)
+{
+    switch (original)
+    {
+        case AV_PIX_FMT_YUVJ420P: return AV_PIX_FMT_YUV420P;
+        case AV_PIX_FMT_YUVJ422P: return AV_PIX_FMT_YUV422P;
+        case AV_PIX_FMT_YUVJ444P: return AV_PIX_FMT_YUV444P;
+        default: return original;
+    }
+}
+
 void CLVideoDecoderOutput::memZerro()
 {
     const AVPixFmtDescriptor* descr = av_pix_fmt_desc_get((AVPixelFormat) format);
@@ -347,7 +358,8 @@ void CLVideoDecoderOutput::copyDataFrom(const AVFrame* frame)
 {
     NX_ASSERT(width == frame->width);
     NX_ASSERT(height == frame->height);
-    NX_ASSERT(format == frame->format);
+    NX_ASSERT(fixDeprecatedPixelFormat((AVPixelFormat) format) 
+        == fixDeprecatedPixelFormat((AVPixelFormat) frame->format));
 
     const AVPixFmtDescriptor* descr = av_pix_fmt_desc_get((AVPixelFormat) format);
     for (int i = 0; i < descr->nb_components && frame->data[i]; ++i)

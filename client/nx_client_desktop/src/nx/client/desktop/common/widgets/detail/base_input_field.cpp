@@ -1,15 +1,16 @@
 #include "base_input_field.h"
 
 #include <QtGui/QFocusEvent>
-
+#include <QtWidgets/QApplication>
 #include <QtWidgets/QBoxLayout>
 
-#include <nx/client/desktop/common/utils/accessor.h>
 #include <ui/style/custom_style.h>
 #include <ui/widgets/word_wrapped_label.h>
 #include <utils/common/delayed.h>
+#include <utils/common/guarded_callback.h>
 
-#include <QApplication>
+#include <nx/client/desktop/common/utils/accessor.h>
+#include <nx/utils/raii_guard.h>
 
 namespace nx {
 namespace client {
@@ -43,16 +44,31 @@ public:
     void updateStateWhileActive();
     void updateVisualStateDelayed();
 
+    void updatePlaceholder()
+    {
+        if (!placeholderAccessor || !input)
+            return;
+
+        placeholderAccessor->set(input, optionalTextIsNull
+            ? optionalTextPlaceholder
+            : normalTextPlaceholder);
+    }
+
 public:
-    BaseInputField* parent;
-    QLabel* title;
-    QnWordWrappedLabel* hint;
+    BaseInputField* parent = nullptr;
+    QLabel* title = nullptr;
+    QnWordWrappedLabel* hint = nullptr;
     QString customHintText;
-    QWidget* input;
+    QWidget* input = nullptr;
     QPalette defaultPalette;
 
     TextValidateFunction validator;
-    bool useWarningStyleForControl;
+    bool useWarningStyleForControl = false;
+
+    bool optionalTextIsNull = false;
+    bool settingOptionalText = false;
+    QString normalTextPlaceholder;
+    QString optionalTextPlaceholder;
 
     const BaseInputField::AccessorPtr textAccessor;
     const BaseInputField::AccessorPtr readOnlyAccessor;
@@ -77,11 +93,10 @@ BaseInputFieldPrivate::BaseInputFieldPrivate(
     input(inputInstance),
     defaultPalette(),
     useWarningStyleForControl(useWarningStyleForControl),
-
+    optionalTextPlaceholder(lit("<%1>").arg(BaseInputField::tr("multiple values"))),
     textAccessor(textAccessor),
     readOnlyAccessor(readOnlyAccessor),
     placeholderAccessor(placeholderAccessor),
-
     lastResult(QValidator::Intermediate)
 {
     hint->setOpenExternalLinks(true);
@@ -155,7 +170,8 @@ bool BaseInputFieldPrivate::eventFilter(QObject* watched, QEvent* event)
         case QEvent::Polish:
         {
             // Ensure input is polished.
-            executeDelayed([this](){ defaultPalette = input->palette(); }, 0);
+            const auto callback = [this](){ defaultPalette = input->palette(); };
+            executeLater(guarded<decltype(callback)>(this, callback), this);
             break;
         }
         case QEvent::FocusIn:
@@ -272,7 +288,15 @@ BaseInputField::BaseInputField(
     d->title->setVisible(false);
     d->hint->setVisible(false);
 
-    connect(this, &BaseInputField::textChanged, d, &BaseInputFieldPrivate::updateStateWhileActive);
+    connect(this, &BaseInputField::textChanged, d,
+        [d]()
+        {
+            if (!d->settingOptionalText)
+                d->optionalTextIsNull = false;
+
+            d->updatePlaceholder();
+            d->updateStateWhileActive();
+        });
 }
 
 BaseInputField::~BaseInputField()
@@ -324,16 +348,52 @@ void BaseInputField::setText(const QString& value)
 QString BaseInputField::placeholderText() const
 {
     Q_D(const BaseInputField);
-    return d->input && d->placeholderAccessor
-        ? d->placeholderAccessor->get(d->input).toString()
-        : QString();
+    return d->normalTextPlaceholder;
 }
 
 void BaseInputField::setPlaceholderText(const QString& value)
 {
     Q_D(BaseInputField);
-    if (d->placeholderAccessor && d->input)
-        d->placeholderAccessor->set(d->input, value);
+    if (d->normalTextPlaceholder == value)
+        return;
+
+    d->normalTextPlaceholder = value;
+    d->updatePlaceholder();
+}
+
+std::optional<QString> BaseInputField::optionalText() const
+{
+    Q_D(const BaseInputField);
+    return d->optionalTextIsNull ? std::optional<QString>() : text();
+}
+
+void BaseInputField::setOptionalText(const std::optional<QString>& value)
+{
+    Q_D(BaseInputField);
+
+    d->optionalTextIsNull = !value;
+    d->updatePlaceholder();
+
+    QnRaiiGuard updateGuard([d]() { d->settingOptionalText = false; });
+    d->settingOptionalText = true;
+
+    setText(value.value_or(QString()));
+}
+
+QString BaseInputField::optionalTextPlaceholder() const
+{
+    Q_D(const BaseInputField);
+    return d->optionalTextPlaceholder;
+}
+
+void BaseInputField::setOptionalTextPlaceholder(const QString& value)
+{
+    Q_D(BaseInputField);
+    if (d->optionalTextPlaceholder == value)
+        return;
+
+    d->optionalTextPlaceholder = value;
+    d->updatePlaceholder();
 }
 
 bool BaseInputField::isReadOnly() const
@@ -416,7 +476,7 @@ void BaseInputField::setIntermediateResult()
 ValidationResult BaseInputField::calculateValidationResult() const
 {
     Q_D(const BaseInputField);
-    return d->validator
+    return d->validator && !d->optionalTextIsNull
         ? d->validator(d->getText())
         : ValidationResult(QValidator::Acceptable);
 }

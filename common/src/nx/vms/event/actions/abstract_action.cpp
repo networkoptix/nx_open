@@ -33,6 +33,7 @@ bool requiresCameraResource(ActionType actionType)
         case ActionType::diagnosticsAction:
         case ActionType::showPopupAction:
         case ActionType::openLayoutAction:
+        case ActionType::exitFullscreenAction:
             return false;
 
         case ActionType::playSoundOnceAction:
@@ -45,6 +46,7 @@ bool requiresCameraResource(ActionType actionType)
         case ActionType::showTextOverlayAction:
         case ActionType::showOnAlarmLayoutAction:
         case ActionType::acknowledgeAction:
+        case ActionType::fullscreenCameraAction:
             return true;
 
         default:
@@ -71,6 +73,8 @@ bool requiresUserResource(ActionType actionType)
         case ActionType::showOnAlarmLayoutAction:
         case ActionType::execHttpRequestAction:
         case ActionType::openLayoutAction:
+        case ActionType::fullscreenCameraAction:
+        case ActionType::exitFullscreenAction:
             return false;
 
         case ActionType::acknowledgeAction:
@@ -100,6 +104,8 @@ bool requiresAdditionalUserResource(ActionType actionType)
         case ActionType::acknowledgeAction:
         case ActionType::sendMailAction:
         case ActionType::openLayoutAction:
+        case ActionType::fullscreenCameraAction:
+        case ActionType::exitFullscreenAction:
             return false;
 
         case ActionType::bookmarkAction:
@@ -130,6 +136,7 @@ bool hasToggleState(ActionType actionType)
         case ActionType::execHttpRequestAction:
         case ActionType::acknowledgeAction:
         case ActionType::openLayoutAction:
+        case ActionType::exitFullscreenAction:
             return false;
 
         case ActionType::cameraOutputAction:
@@ -138,6 +145,7 @@ bool hasToggleState(ActionType actionType)
         case ActionType::playSoundAction:
         case ActionType::bookmarkAction:
         case ActionType::showTextOverlayAction:
+        case ActionType::fullscreenCameraAction:
             return true;
 
         default:
@@ -163,6 +171,7 @@ bool supportsDuration(ActionType actionType)
         case ActionType::showTextOverlayAction:
         case ActionType::cameraOutputAction:
         case ActionType::cameraRecordingAction:
+        case ActionType::fullscreenCameraAction:
             return true;
         default:
             return false;
@@ -177,6 +186,8 @@ bool allowsAggregation(ActionType actionType)
         case ActionType::showTextOverlayAction:
         case ActionType::cameraOutputAction:
         case ActionType::playSoundAction:
+        case ActionType::fullscreenCameraAction:
+        case ActionType::exitFullscreenAction:
             return false;
 
         default:
@@ -195,6 +206,7 @@ bool isActionProlonged(ActionType actionType, const ActionParameters &parameters
         case ActionType::showTextOverlayAction:
         case ActionType::cameraOutputAction:
         case ActionType::cameraRecordingAction:
+        case ActionType::fullscreenCameraAction:
             return parameters.durationMs <= 0;
 
         default:
@@ -223,6 +235,9 @@ QList<ActionType> userAvailableActions()
         ActionType::showOnAlarmLayoutAction,
         ActionType::execHttpRequestAction,
         ActionType::openLayoutAction,
+        ActionType::execHttpRequestAction,
+        ActionType::fullscreenCameraAction,
+        ActionType::exitFullscreenAction,
     };
 
     return result;

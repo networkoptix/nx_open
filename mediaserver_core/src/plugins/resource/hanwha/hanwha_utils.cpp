@@ -78,7 +78,9 @@ boost::optional<QSize> toQSize(const boost::optional<QString>& str)
     return fromHanwhaString<QSize>(*str);
 }
 
-HanwhaChannelProfiles parseProfiles(const HanwhaResponse& response)
+HanwhaChannelProfiles parseProfiles(
+    const HanwhaResponse& response,
+    const boost::optional<int>& forcedChannel)
 {
     NX_ASSERT(response.isSuccessful());
     if (!response.isSuccessful())
@@ -97,9 +99,17 @@ HanwhaChannelProfiles parseProfiles(const HanwhaResponse& response)
             continue;
 
         bool success = false;
-        const auto profileChannel = split[1].toInt(&success);
-        if (!success)
-            continue;
+        auto profileChannel = kHanwhaInvalidChannel;
+        if (forcedChannel != boost::none)
+        {
+            profileChannel = *forcedChannel;
+        }
+        else
+        {
+            profileChannel = split[1].toInt(&success);
+            if (!success)
+                continue;
+        }
 
         if (split[2] != kHanwhaProfileNumberProperty)
             continue;

@@ -85,20 +85,24 @@ public:
 
     QString displayName() const;
     static QString displayName(Qn::LicenseType licenseType);
+
     QString longDisplayName() const;
     static QString longDisplayName(Qn::LicenseType licenseType);
+
+    static QString displayText(Qn::LicenseType licenseType, int count);
+    static QString displayText(Qn::LicenseType licenseType, int count, int total);
 
     static LicenseTypeInfo licenseTypeInfo(Qn::LicenseType licenseType);
 
 protected:
     void setClass(const QString &xclass);
+
 private:
     void parseLicenseBlock(
         const QByteArray& licenseBlock,
         QByteArray* const v1LicenseBlock,
         QByteArray* const v2LicenseBlock );
     void verify( const QByteArray& v1LicenseBlock, const QByteArray& v2LicenseBlock );
-
 
 private:
     QByteArray m_rawLicense;

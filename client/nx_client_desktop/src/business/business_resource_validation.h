@@ -16,7 +16,8 @@
 
 namespace QnBusiness {
 
-bool actionAllowedForUser(const nx::vms::event::ActionParameters& params,
+bool actionAllowedForUser(
+    const nx::vms::event::AbstractActionPtr& action,
     const QnUserResourcePtr& user);
 
 bool hasAccessToSource(const nx::vms::event::EventParameters& params,
@@ -101,7 +102,18 @@ public:
     static bool multiChoiceListIsValid() { return true; }
 };
 
-typedef QnCameraRecordingPolicy QnBookmarkActionPolicy;
+using QnBookmarkActionPolicy = QnCameraRecordingPolicy;
+
+class QnFullscreenCameraPolicy
+{
+    Q_DECLARE_TR_FUNCTIONS(QnFullscreenCameraPolicy)
+public:
+    typedef QnVirtualCameraResource resource_type;
+    static bool isResourceValid(const QnVirtualCameraResourcePtr &camera);
+    static QString getText(const QnResourceList &resources, const bool detailed = true);
+    static bool emptyListIsValid() { return false; }
+    static bool multiChoiceListIsValid() { return false; }
+};
 
 template<typename CheckingPolicy>
 static bool isResourcesListValid(const QnResourceList& resources)

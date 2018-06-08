@@ -2,6 +2,8 @@
 
 #include <memory> /* For std::shared_ptr. */
 
+#include <QtCore/QList>
+
 namespace ec2 {
 
 enum class ErrorCode;

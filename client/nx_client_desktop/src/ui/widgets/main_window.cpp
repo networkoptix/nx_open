@@ -18,6 +18,7 @@
 #include <utils/common/warnings.h>
 #include <utils/common/event_processors.h>
 #include <nx/vms/discovery/manager.h>
+#include <nx/vms/utils/system_uri.h>
 
 #include <core/resource/media_resource.h>
 #include <core/resource/media_server_resource.h>
@@ -101,6 +102,7 @@
 #include <client/client_settings.h>
 #include <client/client_runtime_settings.h>
 #include <client/client_message_processor.h>
+#include <client/self_updater.h>
 
 #include <client_core/client_core_module.h>
 
@@ -588,12 +590,12 @@ void MainWindow::minimize() {
     showMinimized();
 }
 
-bool MainWindow::handleMessage(const QString &message)
+bool MainWindow::handleOpenFile(const QString &message)
 {
-    const QStringList files = message.split(QLatin1Char('\n'), QString::SkipEmptyParts);
-
-    QnResourceList resources = QnFileProcessor::createResourcesForFiles(
+    const auto files = message.split(QLatin1Char('\n'), QString::SkipEmptyParts);
+    const auto resources = QnFileProcessor::createResourcesForFiles(
         QnFileProcessor::findAcceptedFiles(files));
+
     if (resources.isEmpty())
         return false;
 
@@ -877,13 +879,21 @@ Qt::WindowFrameSection MainWindow::windowFrameSectionAt(const QPoint &pos) const
     return result;
 }
 
-void MainWindow::at_fileOpenSignalizer_activated(QObject *, QEvent *event) {
-    if(event->type() != QEvent::FileOpen) {
-        qnWarning("Expected event of type %1, received an event of type %2.", static_cast<int>(QEvent::FileOpen), static_cast<int>(event->type()));
+void MainWindow::at_fileOpenSignalizer_activated(QObject*, QEvent* event)
+{
+    if(event->type() != QEvent::FileOpen)
+    {
+        qnWarning("Expected event of type %1, received an event of type %2.",
+            static_cast<int>(QEvent::FileOpen), static_cast<int>(event->type()));
         return;
     }
 
-    handleMessage(static_cast<QFileOpenEvent *>(event)->file());
+    const auto fileEvent = static_cast<QFileOpenEvent *>(event);
+    const auto url = fileEvent->url();
+    if (!url.isEmpty() && !url.isLocalFile())
+        vms::client::SelfUpdater::runNewClient(QStringList() << url.toString());
+    else
+        handleOpenFile(fileEvent->file());
 }
 
 } // namespace ui

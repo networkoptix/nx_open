@@ -38,7 +38,7 @@ QnCompressedVideoDataPtr getNextArchiveVideoPacket(
     }
 
     // If ceilTime specified try frame with time > requested time (round time to ceil).
-    if (ceilTimeUs != (qint64)AV_NOPTS_VALUE && video && video->timestamp < ceilTimeUs - 1000ll)
+    if (ceilTimeUs != (qint64) AV_NOPTS_VALUE && video && video->timestamp < ceilTimeUs - 1000LL)
     {
         for (int i = 0; i < kMaxGopLen; ++i)
         {

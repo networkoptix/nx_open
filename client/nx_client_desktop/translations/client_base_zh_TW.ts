@@ -1416,12 +1416,16 @@ to view more bookmarks</source>
       <translation>過高的最小值可能會導致其它攝影機上的錄影天數減少.</translation>
     </message>
     <message>
-      <source>Sets when camera archive will be deleted or saved when there is no space for new recordings.</source>
-      <translation>當錄影空間不夠時, 請設定攝影機存檔應被刪除或儲存。</translation>
+      <source>Archive can be deleted in case if there are no space for new recording.</source>
+      <translation>如果儲存空間已滿, 則可以刪除存檔</translation>
     </message>
     <message>
-      <source>&quot;Auto&quot; deletes the oldest footage first, regardless of the source.</source>
-      <translation>&quot;自動&quot; 優先刪除最早的錄影, 不考慮來源。</translation>
+      <source>Min and Max settings determine the age of archive which should be kept for this camera.</source>
+      <translation>最小和最大的設定值決定了此攝影機的錄影檔被保存的時間</translation>
+    </message>
+    <message>
+      <source>If &quot;Auto&quot; option is enabled, the oldest footage among all cameras will be deleted first.</source>
+      <translation>如果啟用了 &quot;自動&quot; 選項, 所有攝影機中最​舊的影片將優先被刪除</translation>
     </message>
   </context>
   <context>
@@ -3116,12 +3120,20 @@ to %1</source>
   <context>
     <name>QnCustomBusinessEventWidget</name>
     <message>
-      <source>Event will trigger only if there are matches in caption with any of entered keywords.</source>
-      <translation>只有當標題欄位中的文字與輸入的任何關鍵字相符時, 事件才會觸發。</translation>
-    </message>
-    <message>
       <source>If the field is empty, event will always trigger.</source>
       <translation>如果該欄位為空白, 事件將維持在觸發狀態</translation>
+    </message>
+    <message>
+      <source>Event will trigger only if there are matches in the source with any of the entered keywords.</source>
+      <translation>只有當來源欄位中的文字與輸入的任何關鍵字相符時, 事件才會觸發</translation>
+    </message>
+    <message>
+      <source>Event will trigger only if there are matches in the caption with any of the entered keywords.</source>
+      <translation>只有當標題欄位中的文字與輸入的任何關鍵字相符時, 事件才會觸發</translation>
+    </message>
+    <message>
+      <source>Event will trigger only if there are matches in the description with any of the entered keywords.</source>
+      <translation>只有當敘述欄位中的文字與輸入的任何關鍵字相符時, 事件才會觸發</translation>
     </message>
   </context>
   <context>
@@ -3338,7 +3350,7 @@ to %1</source>
   <context>
     <name>QnEmptyBusinessActionWidget</name>
     <message>
-      <source>Panic Recording mode switches recording settings for all Cameras to maximum FPS and Quality</source>
+      <source>Panic Recording mode switches recording settings for all cameras to maximum FPS and quality.</source>
       <translation>緊急錄影模式將切換全部攝影機的錄影設定至最大帪數和畫素</translation>
     </message>
   </context>
@@ -3830,6 +3842,10 @@ to %1</source>
       <translation>
         <numerusform>測試成功: 找到 %n 個使用者.</numerusform>
       </translation>
+    </message>
+    <message>
+      <source>Changing any LDAP settings other than &quot;Search Filter&quot; will result in connectivity loss for all LDAP fetched users.</source>
+      <translation>除了 &quot;搜尋篩選器&quot; 更改其他的LDAP設定, 將導致所有 LDAP使用者的連接失敗</translation>
     </message>
   </context>
   <context>
@@ -4461,12 +4477,12 @@ to %1</source>
       <translation>當客戶端和伺服器電腦處於不同時區時, 設定依循客戶端使用的時間 (時間表、時間戳記等)。</translation>
     </message>
     <message>
-      <source>Length of time each camera on layout will be displayed if you start a Layout Tour.</source>
-      <translation>當啟動佈局巡航, 調整影像在螢幕上顯示的時間長度。</translation>
+      <source>Displays IP addresses for cameras and servers and roles for users.</source>
+      <translation>顯示額外資訊, 包含攝影機和伺服器的IP位址以及使用者所屬之角色</translation>
     </message>
     <message>
-      <source>Displays IP addresses for cameras and servers and groups for users.</source>
-      <translation>顯示額外資訊, 包含攝影機和伺服器的IP位址以及使用者所屬之角色。</translation>
+      <source>Length of time each camera on layout will be displayed if you start a Tour.</source>
+      <translation>當啟動巡航, 調整影像在螢幕上顯示的時間長度</translation>
     </message>
   </context>
   <context>
@@ -6327,12 +6343,8 @@ to %1</source>
       <translation>在 USB 儲存設備上啟用錄影</translation>
     </message>
     <message>
-      <source>Backup includes servers and cameras settings, users, webpages, event rules, etc. Video is not saved.</source>
-      <translation>備份包括伺服器和攝影機設定，使用者，網頁，事件規則等。錄影資料不保存。</translation>
-    </message>
-    <message>
-      <source>Creates a backup of System configuration that can be restored in case of failure.</source>
-      <translation>建立系統備份檔可在系統故障後還原.</translation>
+      <source>Reindexing can fix problems with archive or backup if they have been lost or damaged, or if some hardware has been replaced.</source>
+      <translation>當資料遺失、損壞或更新硬體時，重新索引可以協助歸檔或備份</translation>
     </message>
   </context>
   <context>
@@ -6627,12 +6639,16 @@ to %1</source>
       <translation>允許系統優化攝影機設定</translation>
     </message>
     <message>
-      <source>Sends anonymous System information (firmware, codecs, streams, etc.).</source>
-      <translation>發送匿名系統訊息（韌體，編解碼器，串流等）。</translation>
-    </message>
-    <message>
       <source>Tracks and logs all user actions.</source>
       <translation>追蹤和記錄所有使用者操作</translation>
+    </message>
+    <message>
+      <source>Includes information about system, such as cameras models and firmware versions, number of servers, etc.</source>
+      <translation>包含系統相關資訊, 如攝影機型號和韌體版本、伺服器數量等等</translation>
+    </message>
+    <message>
+      <source>Does not include any personal information and is completely anonymous.</source>
+      <translation>不包含任何個人資訊, 並且完全匿名</translation>
     </message>
   </context>
   <context>
@@ -7226,11 +7242,11 @@ to %1</source>
     </message>
     <message>
       <source>Uploading %1...</source>
-      <translation>正在上傳 %1...  </translation>
+      <translation>正在上傳 %1...</translation>
     </message>
     <message>
       <source>Finalizing %1...</source>
-      <translation>正在完成 %1...  </translation>
+      <translation>正在完成 %1...</translation>
     </message>
   </context>
   <context>
@@ -7336,6 +7352,21 @@ to %1</source>
     <message>
       <source>Video Wall is removed on the server and will be closed.</source>
       <translation>電視牆將從伺服器中移除, 並將其關閉。</translation>
+    </message>
+  </context>
+  <context>
+    <name>QnWorkbenchContext</name>
+    <message>
+      <source>To use the software you must accept the end user license agreement</source>
+      <translation>使用該軟體前, 您必須同意使用者授權合約</translation>
+    </message>
+    <message>
+      <source>Accept</source>
+      <translation>同意</translation>
+    </message>
+    <message>
+      <source>Decline</source>
+      <translation>拒絕</translation>
     </message>
   </context>
   <context>
@@ -7762,7 +7793,7 @@ to %1</source>
     </message>
     <message>
       <source>%1 covers period for which video has already been uploaded.</source>
-      <translation>%1  包含了已上傳過的影像</translation>
+      <translation>%1 包含了已上傳過的影像</translation>
     </message>
     <message>
       <source>%1 covers period for which video is being uploaded.</source>
@@ -8381,16 +8412,20 @@ to %1</source>
       <translation>選擇攝影機並點擊上方的按鈕以查看支援的事件清單</translation>
     </message>
     <message>
-      <source>Event will trigger only if there are matches in caption with any of entered keywords.</source>
-      <translation>只有當標題欄位中的文字與輸入的任何關鍵字相符時, 事件才會觸發</translation>
-    </message>
-    <message>
       <source>If the field is empty, event will always trigger.</source>
       <translation>如果該欄位為空白, 事件將維持在觸發狀態</translation>
     </message>
     <message>
       <source>Event will trigger only if there are matches in the description field with any of the entered keywords.</source>
       <translation>只有當敘述欄位中的文字與輸入的任何關鍵字相符時, 事件才會觸發。</translation>
+    </message>
+    <message>
+      <source>Event will trigger only if there are matches in the caption with any of the entered keywords.</source>
+      <translation>只有當標題欄位中的文字與輸入的任何關鍵字相符時, 事件才會觸發</translation>
+    </message>
+    <message>
+      <source>This field is case sensitive.</source>
+      <translation>此欄位有大小寫之區分</translation>
     </message>
   </context>
   <context>
@@ -8704,10 +8739,6 @@ to %1</source>
       <translation>測試版 %1</translation>
     </message>
     <message>
-      <source>Some functionality may be unavailable or not working properly.</source>
-      <translation>某些功能可能不可用或運作不良.</translation>
-    </message>
-    <message>
       <source>System sends anonymous usage statistics</source>
       <translation>系統匿名發送使用狀況統計資訊</translation>
     </message>
@@ -8736,16 +8767,8 @@ to %1</source>
       <translation>變更 %2 支攝影機中的 %1 支攝影機密碼失敗</translation>
     </message>
     <message>
-      <source>To use the software you must accept the end user license agreement</source>
-      <translation>使用該軟體前, 您必須同意使用者授權合約</translation>
-    </message>
-    <message>
-      <source>Accept</source>
-      <translation>同意</translation>
-    </message>
-    <message>
-      <source>Decline</source>
-      <translation>拒絕</translation>
+      <source>Warning! This build is for testing purposes only! Please upgrade to a next available patch or release version once available.</source>
+      <translation>警告！此版本僅用於測試目的! 請升級到下一版更新程式或正式版</translation>
     </message>
   </context>
   <context>

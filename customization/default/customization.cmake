@@ -27,7 +27,7 @@ set(defaultWebPages
 set(companyUrl "http://networkoptix.com")
 set(productUrl "http://networkoptix.com/nxwitness-overview")
 set(supportUrl "http://support.networkoptix.com")
-set(supportEmail "support@networkoptix.com")
+set(supportEmail "")
 set(supportPhone "")
 set(licenseEmail "support@networkoptix.com")
 

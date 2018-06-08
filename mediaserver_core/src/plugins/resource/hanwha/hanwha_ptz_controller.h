@@ -3,6 +3,7 @@
 #include <plugins/resource/hanwha/hanwha_mapped_preset_manager.h>
 #include <plugins/resource/hanwha/hanwha_ptz_executor.h>
 #include <plugins/resource/hanwha/hanwha_common.h>
+#include <plugins/resource/hanwha/hanwha_range.h>
 
 #include <core/ptz/basic_ptz_controller.h>
 #include <core/resource/resource_fwd.h>
@@ -29,7 +30,7 @@ public:
     void setPtzCapabilities(Ptz::Capabilities capabilities);
     void setPtzLimits(const QnPtzLimits& limits);
     void setPtzTraits(const QnPtzAuxilaryTraitList& traits);
-    void setAlternativePtzRanges(const std::map<QString, std::set<int>>& ranges);
+    void setAlternativePtzRanges(const std::map<QString, HanwhaRange>& ranges);
 
     virtual bool continuousMove(const QVector3D& speed) override;
     virtual bool continuousFocus(qreal speed) override;
@@ -62,8 +63,6 @@ private:
     std::map<QString, QString> makeViewPortParameters(
         qreal aspectRatio,
         const QRectF rect) const;
-
-    bool alternativeContinuousMove(const QString& parameterName, qreal speed);
 
 private:
     using PresetNumber = QString;

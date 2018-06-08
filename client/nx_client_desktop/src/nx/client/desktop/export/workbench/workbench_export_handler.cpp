@@ -121,7 +121,7 @@ struct WorkbenchExportHandler::Private
     {
         const auto& manager = q->context()->instance<WorkbenchProgressManager>();
         const auto exportProcessId = informersEnabled()
-            ? manager->add(tr("Export video"), fileName.completeFileName())
+            ? manager->add(tr("Exporting video"), fileName.completeFileName())
             : QnUuid::createUuid();
 
         const auto progressDialog = new QnProgressDialog(

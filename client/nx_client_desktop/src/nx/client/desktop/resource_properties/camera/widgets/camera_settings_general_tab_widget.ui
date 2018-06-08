@@ -7,10 +7,10 @@
     <x>0</x>
     <y>0</y>
     <width>748</width>
-    <height>343</height>
+    <height>415</height>
    </rect>
   </property>
-  <layout class="QVBoxLayout" name="verticalLayout_4" stretch="0,0,0,0,1">
+  <layout class="QVBoxLayout" name="verticalLayout_4" stretch="0,0,0,0,0,1">
    <property name="spacing">
     <number>0</number>
    </property>
@@ -31,6 +31,12 @@
    </item>
    <item>
     <widget class="Line" name="overLicensingLine">
+     <property name="maximumSize">
+      <size>
+       <width>16777215</width>
+       <height>1</height>
+      </size>
+     </property>
      <property name="frameShadow">
       <enum>QFrame::Plain</enum>
      </property>
@@ -40,10 +46,16 @@
     </widget>
    </item>
    <item>
-    <widget class="QnLicensesProposeWidget" name="licensingWidget" native="true"/>
+    <widget class="nx::client::desktop::CameraLicensePanelWidget" name="licensePanel" native="true"/>
    </item>
    <item>
     <widget class="Line" name="overGridLine">
+     <property name="maximumSize">
+      <size>
+       <width>16777215</width>
+       <height>1</height>
+      </size>
+     </property>
      <property name="frameShadow">
       <enum>QFrame::Plain</enum>
      </property>
@@ -51,6 +63,9 @@
       <enum>Qt::Horizontal</enum>
      </property>
     </widget>
+   </item>
+   <item>
+    <widget class="nx::client::desktop::WearableCameraUploadWidget" name="wearableUploadWidget" native="true"/>
    </item>
    <item>
     <layout class="QHBoxLayout" name="horizontalLayout" stretch="1,1">
@@ -71,7 +86,7 @@
      </property>
      <item>
       <widget class="QWidget" name="leftWidget" native="true">
-       <layout class="QVBoxLayout" name="verticalLayout" stretch="0,0,1">
+       <layout class="QVBoxLayout" name="verticalLayout" stretch="0,0,0,1">
         <property name="spacing">
          <number>20</number>
         </property>
@@ -93,6 +108,9 @@
            <enum>Qt::TabFocus</enum>
           </property>
          </widget>
+        </item>
+        <item>
+         <widget class="nx::client::desktop::ArchiveLengthWidget" name="wearableArchiveLengthWidget" native="true"/>
         </item>
         <item>
          <widget class="QGroupBox" name="authenticationGroupBox">
@@ -137,7 +155,7 @@
      </item>
      <item>
       <widget class="QWidget" name="rightWidget" native="true">
-       <layout class="QVBoxLayout" name="verticalLayout_3" stretch="0,0,0,1">
+       <layout class="QVBoxLayout" name="verticalLayout_3" stretch="0,0,1">
         <property name="spacing">
          <number>20</number>
         </property>
@@ -165,7 +183,7 @@
            <item>
             <widget class="QCheckBox" name="enableAudioCheckBox">
              <property name="text">
-              <string>Enable Audio</string>
+              <string>Enable audio</string>
              </property>
             </widget>
            </item>
@@ -184,9 +202,6 @@
            </item>
           </layout>
          </widget>
-        </item>
-        <item>
-         <widget class="nx::client::desktop::ArchiveLengthWidget" name="wearableArchiveLengthWidget" native="true"/>
         </item>
         <item>
          <widget class="nx::client::desktop::WearableCameraMotionWidget" name="wearableMotionWidget" native="true"/>
@@ -225,12 +240,6 @@
    <container>1</container>
   </customwidget>
   <customwidget>
-   <class>QnLicensesProposeWidget</class>
-   <extends>QWidget</extends>
-   <header location="global">ui/widgets/licensing/licenses_propose_widget.h</header>
-   <container>1</container>
-  </customwidget>
-  <customwidget>
    <class>nx::client::desktop::CameraInfoWidget</class>
    <extends>QWidget</extends>
    <header location="global">nx/client/desktop/resource_properties/camera/widgets/camera_info_widget.h</header>
@@ -240,6 +249,18 @@
    <class>nx::client::desktop::WearableCameraMotionWidget</class>
    <extends>QWidget</extends>
    <header location="global">nx/client/desktop/resource_properties/camera/widgets/wearable_camera_motion_widget.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>nx::client::desktop::CameraLicensePanelWidget</class>
+   <extends>QWidget</extends>
+   <header location="global">nx/client/desktop/resource_properties/camera/widgets/camera_license_panel_widget.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>nx::client::desktop::WearableCameraUploadWidget</class>
+   <extends>QWidget</extends>
+   <header location="global">nx/client/desktop/resource_properties/camera/widgets/wearable_camera_upload_widget.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

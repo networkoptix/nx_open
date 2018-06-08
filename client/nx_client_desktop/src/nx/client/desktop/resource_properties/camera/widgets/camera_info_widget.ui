@@ -651,7 +651,7 @@
         </sizepolicy>
        </property>
        <property name="currentIndex">
-        <number>2</number>
+        <number>1</number>
        </property>
        <widget class="QWidget" name="toggleInfoPage">
         <layout class="QVBoxLayout" name="verticalLayout_3">
@@ -698,37 +698,63 @@
          </item>
         </layout>
        </widget>
-       <widget class="nx::client::desktop::WearableCameraUploadWidget" name="wearableControlsPage"/>
       </widget>
      </item>
      <item>
-      <widget class="QPushButton" name="showOnLayoutButton">
-       <property name="text">
-        <string>Show on layout</string>
+      <widget class="QWidget" name="buttonsWidget" native="true">
+       <property name="minimumSize">
+        <size>
+         <width>100</width>
+         <height>0</height>
+        </size>
        </property>
-       <property name="flat">
-        <bool>true</bool>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QPushButton" name="eventLogButton">
-       <property name="text">
-        <string>Event Log</string>
-       </property>
-       <property name="flat">
-        <bool>true</bool>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QPushButton" name="cameraRulesButton">
-       <property name="text">
-        <string>Camera rules</string>
-       </property>
-       <property name="flat">
-        <bool>true</bool>
-       </property>
+       <layout class="QHBoxLayout" name="horizontalLayout_2">
+        <property name="spacing">
+         <number>16</number>
+        </property>
+        <property name="leftMargin">
+         <number>8</number>
+        </property>
+        <property name="topMargin">
+         <number>0</number>
+        </property>
+        <property name="rightMargin">
+         <number>0</number>
+        </property>
+        <property name="bottomMargin">
+         <number>0</number>
+        </property>
+        <item>
+         <widget class="QPushButton" name="showOnLayoutButton">
+          <property name="text">
+           <string>Show on layout</string>
+          </property>
+          <property name="flat">
+           <bool>true</bool>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QPushButton" name="eventLogButton">
+          <property name="text">
+           <string>Event Log</string>
+          </property>
+          <property name="flat">
+           <bool>true</bool>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QPushButton" name="cameraRulesButton">
+          <property name="text">
+           <string>Camera rules</string>
+          </property>
+          <property name="flat">
+           <bool>true</bool>
+          </property>
+         </widget>
+        </item>
+       </layout>
       </widget>
      </item>
     </layout>
@@ -746,12 +772,6 @@
    <class>nx::client::desktop::ClipboardButton</class>
    <extends>QPushButton</extends>
    <header location="global">nx/client/desktop/common/widgets/clipboard_button.h</header>
-  </customwidget>
-  <customwidget>
-   <class>nx::client::desktop::WearableCameraUploadWidget</class>
-   <extends>QWidget</extends>
-   <header location="global">nx/client/desktop/resource_properties/camera/widgets/wearable_camera_upload_widget.h</header>
-   <container>1</container>
   </customwidget>
  </customwidgets>
  <resources/>

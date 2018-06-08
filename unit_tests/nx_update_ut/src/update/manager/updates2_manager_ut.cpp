@@ -360,11 +360,6 @@ public:
         m_supplier(supplier)
     {}
 
-    void setStatus(const detail::Updates2StatusDataEx& status)
-    {
-        m_currentStatus.clone(status);
-    }
-
     void waitForRemoteUpdate()
     {
         QnMutexLocker lock(&m_mutex);
@@ -391,6 +386,11 @@ public:
     void emitFileAddedSignal(const downloader::FileInformation& fileInformation)
     {
         onFileAdded(fileInformation);
+    }
+
+    void emitFileInformationChanged(const downloader::FileInformation& fileInformation)
+    {
+        onFileInformationChanged(fileInformation);
     }
 
     void emitFileDeletedSignal()
@@ -674,12 +674,44 @@ protected:
         m_downloader.setExternallyAddedFileInformation(downloader::FileInformation::Status::corrupted);
     }
 
+    void whenDownloaderEmittedFileInformationSignalsWithProgress()
+    {
+        downloader::FileInformation fileInformation(kFileName);
+        fileInformation.status = downloader::FileInformation::Status::downloading;
+        fileInformation.downloadedChunks = QBitArray(32);
+
+        m_progressReported.clear();
+        for (int i = 0; i < fileInformation.downloadedChunks.size(); ++i)
+        {
+            fileInformation.downloadedChunks.setBit(i);
+            m_updatesManager->emitFileInformationChanged(fileInformation);
+
+            if (m_updatesManager->status().progress > 0.0f
+                && (m_progressReported.isEmpty() ||
+                    m_progressReported.last() != m_updatesManager->status().progress))
+            {
+                m_progressReported.append(m_updatesManager->status().progress);
+            }
+        }
+    }
+
+    void thenProgressShouldBeReflectedInManagerState()
+    {
+        ASSERT_GT(m_progressReported.size(), 10);
+    }
+
+    void whenDownloadCancelled()
+    {
+        m_updatesManager->cancel();
+    }
+
 private:
     std::unique_ptr<TestUpdatesManager> m_updatesManager;
     TestInstaller m_installer;
     TestDownloader m_downloader;
     TestUpdateRegistry m_remoteRegistry;
     TestUpdateRegistry m_globalRegistry;
+    QList<double> m_progressReported;
 };
 
 TEST_F(Updates2Manager, NotAvailableStatusCheck)
@@ -885,7 +917,19 @@ TEST_F(Updates2Manager, Prepare_failedNoFreeSpace)
     thenStateShouldFinallyBecome(api::Updates2StatusData::StatusCode::available);
 }
 
-// #TODO #akulikov Implement cancel() related unit tests.
+TEST_F(Updates2Manager, Cancel_WhileDownloading)
+{
+    givenUpdateRegistries(/*remoteHasUpdate*/ true, /*globalHasUpdate*/ false);
+    whenServerHasBeenStarted();
+    whenRemoteUpdateDone();
+
+    whenDownloadRequestIssued(api::Updates2StatusData::StatusCode::downloading);
+    whenDownloaderEmittedFileInformationSignalsWithProgress();
+    thenProgressShouldBeReflectedInManagerState();
+
+    whenDownloadCancelled();
+    thenStateShouldFinallyBecome(api::Updates2StatusData::StatusCode::notAvailable);
+}
 
 } // namespace test
 } // namespace detail
