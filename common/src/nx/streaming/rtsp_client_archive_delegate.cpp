@@ -367,7 +367,7 @@ bool QnRtspClientArchiveDelegate::openInternal()
             auto newValue = QnCustomResourceVideoLayout::fromString(vLayout);
             bool isChanged =  getVideoLayout()->toString() != newValue->toString();
             setCustomVideoLayout(newValue);
-            if(isChanged)
+            if (m_reader && isChanged)
                 emit m_reader->videoLayoutChanged();
         }
     }
