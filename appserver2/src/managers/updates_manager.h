@@ -1,12 +1,12 @@
 #pragma once
 
-#include "nx_ec/ec_api.h"
-#include "nx_ec/data/api_update_data.h"
 #include "utils/db/db_helper.h"
 #include "transaction/transaction.h"
 #include "transaction/message_bus_adapter.h"
 #include "ec2_thread_pool.h"
+
 #include <nx/utils/concurrent.h>
+#include <nx/vms/api/data/update_data.h>
 
 namespace ec2 {
 
@@ -57,7 +57,7 @@ namespace ec2 {
     {
         const int reqId = generateRequestID();
 
-        QnTransaction<ApiUpdateUploadData> transaction(
+        QnTransaction<nx::vms::api::UpdateUploadData> transaction(
             ApiCommand::uploadUpdate,
             m_messageBus->commonModule()->moduleGUID());
         transaction.params.updateId = updateId;
@@ -73,14 +73,14 @@ namespace ec2 {
     }
 
     template<class QueryProcessorType>
-    int QnUpdatesManager<QueryProcessorType>::sendUpdateUploadResponce(const QString &updateId, const QnUuid &peerId, int chunks, impl::SimpleHandlerPtr handler)
+    int QnUpdatesManager<QueryProcessorType>::sendUpdateUploadResponce(const QString& updateId,
+        const QnUuid& peerId, int chunks, impl::SimpleHandlerPtr handler)
     {
         const int reqId = generateRequestID();
-        ApiUpdateUploadResponceData params;
+        nx::vms::api::UpdateUploadResponseData params;
         params.id = peerId;
         params.updateId = updateId;
         params.chunks = chunks;
-
 
         using namespace std::placeholders;
         m_queryProcessor->getAccess(m_userAccessData).processUpdateAsync(

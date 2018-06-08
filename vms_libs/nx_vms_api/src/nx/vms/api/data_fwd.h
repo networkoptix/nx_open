@@ -66,6 +66,10 @@ DECLARE_STRUCT(LayoutTourData)
 
 DECLARE_STRUCT(LockData)
 
+DECLARE_STRUCT_NO_LIST(UpdateInstallData)
+DECLARE_STRUCT_NO_LIST(UpdateUploadData)
+DECLARE_STRUCT(UpdateUploadResponseData)
+
 DECLARE_STRUCT(VideowallItemData)
 DECLARE_STRUCT(VideowallScreenData)
 DECLARE_STRUCT(VideowallMatrixItemData)

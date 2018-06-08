@@ -14,6 +14,7 @@
 #include "data/layout_data.h"
 #include "data/layout_tour_data.h"
 #include "data/lock_data.h"
+#include "data/update_data.h"
 #include "data/videowall_data.h"
 #include "data/event_rule_data.h"
 #include "data/cleanup_db_data.h"
@@ -65,6 +66,9 @@ void Metatypes::initialize()
     qRegisterMetaType<nx::vms::api::ResourceParamWithRefDataList>();
     qRegisterMetaType<nx::vms::api::ServerFootageData>();
     qRegisterMetaType<nx::vms::api::ServerFootageDataList>();
+    qRegisterMetaType<nx::vms::api::UpdateInstallData>();
+    qRegisterMetaType<nx::vms::api::UpdateUploadData>();
+    qRegisterMetaType<nx::vms::api::UpdateUploadResponseData>();
     qRegisterMetaType<nx::vms::api::VideowallData>();
     qRegisterMetaType<nx::vms::api::VideowallControlMessageData>();
     qRegisterMetaType<nx::vms::api::WebPageData>();

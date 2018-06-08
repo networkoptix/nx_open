@@ -1027,7 +1027,7 @@ APPLY(1003, removeLicense, ApiLicenseData, \
                        InvalidFilterFunc(), /* Filter read func */ \
                        AllowForAllAccessOut(), /* Check remote peer rights for outgoing transaction */ \
                        RegularTransactionType()) /* regular transaction type */ \
-APPLY(1200, uploadUpdate, ApiUpdateUploadData, \
+APPLY(1200, uploadUpdate, nx::vms::api::UpdateUploadData, \
                        false, \
                        true, \
                        InvalidGetHashHelper(), \
@@ -1038,7 +1038,7 @@ APPLY(1200, uploadUpdate, ApiUpdateUploadData, \
                        InvalidFilterFunc(), /* Filter read func */ \
                        AdminOnlyAccessOut(), /* Check remote peer rights for outgoing transaction */ \
                        RegularTransactionType()) /* regular transaction type */ \
-APPLY(1201, uploadUpdateResponce, ApiUpdateUploadResponceData, \
+APPLY(1201, uploadUpdateResponce, nx::vms::api::UpdateUploadResponseData, \
                        false, \
                        true, \
                        InvalidGetHashHelper(), \
@@ -1049,7 +1049,7 @@ APPLY(1201, uploadUpdateResponce, ApiUpdateUploadResponceData, \
                        InvalidFilterFunc(), /* Filter read func */ \
                        AdminOnlyAccessOut(), /* Check remote peer rights for outgoing transaction */ \
                        RegularTransactionType()) /* regular transaction type */ \
-APPLY(1202, installUpdate, ApiUpdateInstallData, \
+APPLY(1202, installUpdate, nx::vms::api::UpdateInstallData, \
                        false, \
                        true, \
                        InvalidGetHashHelper(), \

@@ -26,10 +26,7 @@ struct ApiStorageData;
 struct ApiUserData;
 struct ApiUserRoleData;
 struct ApiPredefinedRoleData;
-struct ApiUpdateUploadData;
-struct ApiUpdateUploadResponceData;
 struct ApiSystemMergeHistoryRecord;
-struct ApiUpdateInstallData;
 struct ApiDiscoveryData;
 struct ApiDiscoverPeerData;
 struct ApiConnectionData;
@@ -67,7 +64,6 @@ typedef std::vector<ApiUserRoleData> ApiUserRoleDataList;
 typedef std::vector<ApiPredefinedRoleData> ApiPredefinedRoleDataList;
 typedef std::vector<ApiDiscoveryData> ApiDiscoveryDataList;
 typedef std::vector<ApiDiscoveredServerData> ApiDiscoveredServerDataList;
-typedef std::vector<ApiUpdateUploadResponceData> ApiUpdateUploadResponceDataList;
 typedef std::vector<ApiSystemMergeHistoryRecord> ApiSystemMergeHistoryRecordList;
 
 /**
@@ -100,9 +96,6 @@ struct ParentId
     (ApiUserData)\
     (ApiUserRoleData)\
     (ApiPredefinedRoleData)\
-    (ApiUpdateInstallData)\
-    (ApiUpdateUploadData)\
-    (ApiUpdateUploadResponceData)\
     (ApiSystemMergeHistoryRecord) \
     (ApiDiscoveryData)\
     (ApiDiscoverPeerData)\

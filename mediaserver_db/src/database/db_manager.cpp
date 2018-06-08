@@ -36,7 +36,6 @@
 #include <nx_ec/data/api_license_data.h>
 #include <nx_ec/data/api_full_info_data.h>
 #include <nx_ec/data/api_media_server_data.h>
-#include <nx_ec/data/api_update_data.h>
 #include <nx_ec/data/api_time_data.h>
 #include <nx_ec/data/api_conversion_functions.h>
 #include <nx_ec/data/api_discovery_data.h>
@@ -48,11 +47,12 @@
 #include <nx/vms/api/data/camera_data_ex.h>
 #include <nx/vms/api/data/camera_history_data.h>
 #include <nx/vms/api/data/event_rule_data.h>
-#include "nx/vms/api/data/layout_data.h"
+#include <nx/vms/api/data/layout_data.h>
 #include <nx/vms/api/data/resource_type_data.h>
 #include <nx/vms/api/data/stored_file_data.h>
+#include <nx/vms/api/data/update_data.h>
 #include <nx/vms/api/data/videowall_data.h>
-#include "nx/vms/api/data/webpage_data.h"
+#include <nx/vms/api/data/webpage_data.h>
 #include <nx/vms/event/event_fwd.h>
 #include <nx/vms/event/rule.h>
 
@@ -2813,7 +2813,9 @@ ErrorCode QnDbManager::executeTransactionInternal(const QnTransaction<ApiDiscove
     return ErrorCode::ok;
 }
 
-ErrorCode QnDbManager::executeTransactionInternal(const QnTransaction<ApiUpdateUploadResponceData>& /*tran*/) {
+ErrorCode QnDbManager::executeTransactionInternal(
+    const QnTransaction<UpdateUploadResponseData>& /*tran*/)
+{
     return ErrorCode::ok;
 }
 
@@ -3584,7 +3586,7 @@ ErrorCode QnDbManager::doQueryNoLock(const QnUuid& resId, ResourceStatusDataList
     return ErrorCode::ok;
 }
 
-ec2::ErrorCode QnDbManager::doQueryNoLock(const QnUuid& /*id*/, ApiUpdateUploadResponceDataList& data)
+ec2::ErrorCode QnDbManager::doQueryNoLock(const QnUuid& /*id*/, UpdateUploadResponseDataList& data)
 {
     data.clear();
     return ErrorCode::ok;

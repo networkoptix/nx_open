@@ -339,7 +339,8 @@ namespace detail
         ErrorCode doQueryNoLock(const ApiTranLogFilter&, ApiTransactionDataList& tranList);
 
         // Stub - acts as if nothing is found in the database. Needed for merge algorithm.
-        ErrorCode doQueryNoLock(const QnUuid& /*id*/, ApiUpdateUploadResponceDataList& data);
+        ErrorCode doQueryNoLock(
+            const QnUuid& /*id*/, nx::vms::api::UpdateUploadResponseDataList& data);
 
         // getLayoutTours
         ErrorCode doQueryNoLock(
@@ -396,7 +397,7 @@ namespace detail
         ErrorCode executeTransactionInternal(
             const QnTransaction<nx::vms::api::VideowallData>& tran);
         ErrorCode executeTransactionInternal(
-            const QnTransaction<ApiUpdateUploadResponceData>& tran);
+            const QnTransaction<nx::vms::api::UpdateUploadResponseData>& tran);
         ErrorCode executeTransactionInternal(
             const QnTransaction<nx::vms::api::VideowallDataList>& tran);
         ErrorCode executeTransactionInternal(const QnTransaction<nx::vms::api::WebPageData>& tran);
@@ -482,7 +483,7 @@ namespace detail
             return ErrorCode::notImplemented;
         }
 
-        ErrorCode executeTransactionInternal(const QnTransaction<ApiUpdateUploadData>&)
+        ErrorCode executeTransactionInternal(const QnTransaction<nx::vms::api::UpdateUploadData>&)
         {
             NX_ASSERT(false, Q_FUNC_INFO, "This is a non persistent transaction!");
             return ErrorCode::notImplemented;
@@ -530,7 +531,7 @@ namespace detail
             return ErrorCode::notImplemented;
         }
 
-        ErrorCode executeTransactionInternal(const QnTransaction<ApiUpdateInstallData>&)
+        ErrorCode executeTransactionInternal(const QnTransaction<nx::vms::api::UpdateInstallData>&)
         {
             NX_ASSERT(false, Q_FUNC_INFO, "This is a non persistent transaction!");
             return ErrorCode::notImplemented;
