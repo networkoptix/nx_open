@@ -10,6 +10,7 @@ type TestReport struct {
 //-------------------------------------------------------------------------------------------------
 
 type TestSuiteReport struct {
+	name        string
 	testReports []TestReport
 }
 
@@ -46,5 +47,7 @@ func (report *TestsRunReport) success() bool {
 //-------------------------------------------------------------------------------------------------
 
 type TestSuite interface {
+	// Tests state of services this suite tests depend on.
+	testServiceUp() TestSuiteReport
 	run() TestSuiteReport
 }
