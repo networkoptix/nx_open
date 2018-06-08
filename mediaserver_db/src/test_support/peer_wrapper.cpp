@@ -59,7 +59,7 @@ void PeerWrapper::addSetting(const std::string& name, const std::string& value)
 
 bool PeerWrapper::startAndWaitUntilStarted()
 {
-    const QString dbFileArg = lm("--dbFile=%1/db.sqlite").args(m_dataDir);
+    const QString dbFileArg = lm("--dbFile=%1/db.dir").args(m_dataDir);
     m_process.addArg(dbFileArg.toStdString().c_str());
     return m_process.startAndWaitUntilStarted();
 }
