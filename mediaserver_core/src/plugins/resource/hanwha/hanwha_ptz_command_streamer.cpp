@@ -100,15 +100,17 @@ bool HanwhaPtzCommandStreamer::launchQueue(const HanwhaConfigurationalPtzCommand
     auto& queue = m_commandQueues[command.command];
     queue.pendingCommand = command.speed;
 
-    bool result = true;
     if (!queue.isRunning && !queue.pendingCommand.isNull())
-        result = queue.executor->executeCommand(command);
+    {
+        queue.isRunning = queue.executor->executeCommand(command);
+        if (!queue.isRunning)
+        {
+            queue.pendingCommand = nx::core::ptz::Vector();
+            return false;
+        }
+    }
 
-    queue.isRunning = result;
-    if (!result)
-        queue.pendingCommand = nx::core::ptz::Vector();
-
-    return result;
+    return true;
 }
 
 void HanwhaPtzCommandStreamer::scheduleNextRequest(HanwhaConfigurationalPtzCommandType commandType)
