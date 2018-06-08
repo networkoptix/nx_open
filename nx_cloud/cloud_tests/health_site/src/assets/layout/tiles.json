@@ -35,7 +35,7 @@
                     "key"     : "cloud_authentication_failure",
                     "caption" : "Cloud Authentication",
                     "messages": {
-                        "error": "Users may experience problems logging in to their systems with desktop/mobile/web clients."
+                        "error": "Users may experience problems logging in to their systems with desktop, mobile or web clients."
                     }
                 },
                 {
@@ -54,14 +54,14 @@
                     "key"     : "p2p_connections_failure",
                     "caption" : "PTP Connections",
                     "messages": {
-                        "error": "Direct connections between Clients and Media servers don't work."
+                        "error": "Direct connections between clients and media servers don't work."
                     }
                 },
                 {
                     "key"        : "traffic_relay_failure",
                     "caption"    : "Proxied Connections",
                     "messages"   : {
-                        "error": "All proxy servers are offline. Users may experience troubles connecting to their systems."
+                        "error": "All proxy servers are offline. Users may experience troubles connecting to their systems. (Depending on the internet provider, ~80% likelihood connection will still work.)"
                     },
                     "subsections": [
                         {
@@ -77,7 +77,7 @@
                             "key"      : "relay-ny",
                             "caption"  : "New York",
                             "messages" : {
-                                "error": "Connect to remote systems may not work for clients in America."
+                                "error": "Connect to remote systems may not work for clients in the Americas."
                             }
                         },
                         {
@@ -92,7 +92,7 @@
                     "aggregate"  : [
                         {
                             "key"    : "relay-ny",
-                            "message": "Connect to remote systems may not work for clients in America."
+                            "message": "Connect to remote systems may not work for clients in the Americas."
                         },
                         {
                             "key"    : "relay-fr",
