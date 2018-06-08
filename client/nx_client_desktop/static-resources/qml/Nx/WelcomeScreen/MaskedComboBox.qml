@@ -26,11 +26,14 @@ MaskedItem
         onDisplayTextChanged:
         {
             control.displayValue = displayText
+            control.value =
+                dataAccessor.getData(currentIndex, control.comboBoxValueRole) || displayText
+        }
 
-            // TODO: Fix getData call which unexpectedly returns undefined.
-            control.value = (currentIndex === -1)
-                ? displayText
-                : dataAccessor.getData(currentIndex, control.comboBoxValueRole)
+        onCountChanged:
+        {
+            if (count > 0 && currentIndex === -1)
+                currentIndex = 0
         }
 
         KeyNavigation.tab: control.KeyNavigation.tab

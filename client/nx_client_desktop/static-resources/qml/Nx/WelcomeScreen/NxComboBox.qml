@@ -68,10 +68,16 @@ ComboBox
 
         function updateControl()
         {
-            // TODO: Fix this method. This updates the control improperly in some cases (sets empty
-            // text, when the text is not empty).
+            var currentText = text
+
             control.currentIndex =
                 control.find(text.trim(), Qt.MatchExactly | Qt.MatchCaseSensitive)
+
+            if (control.currentIndex === -1)
+            {
+                // Setting currentIndex to -1 will clear editText, so restoring it.
+                control.editText = currentText
+            }
         }
     }
 
