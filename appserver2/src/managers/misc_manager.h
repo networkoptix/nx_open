@@ -101,7 +101,7 @@ int QnMiscManager<QueryProcessorType>::cleanupDatabase(
     impl::SimpleHandlerPtr handler)
 {
     const int reqId = generateRequestID();
-    ApiCleanupDatabaseData data;
+    nx::vms::api::CleanupDatabaseData data;
     data.cleanupDbObjects = cleanupDbObjects;
     data.cleanupTransactionLog = cleanupTransactionLog;
 

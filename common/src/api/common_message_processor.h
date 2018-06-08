@@ -63,7 +63,7 @@ public:
         const nx::vms::api::CameraAttributesDataList& cameraUserAttributesList);
     void resetPropertyList(const nx::vms::api::ResourceParamWithRefDataList& params);
     void resetStatusList(const nx::vms::api::ResourceStatusDataList& params);
-    void resetAccessRights(const ec2::ApiAccessRightsDataList& accessRights);
+    void resetAccessRights(const nx::vms::api::AccessRightsDataList& accessRights);
     void resetUserRoles(const ec2::ApiUserRoleDataList& roles);
     void resetEventRules(const nx::vms::api::EventRuleDataList& eventRules);
 
@@ -141,7 +141,7 @@ private slots:
     void on_resourceRemoved(const QnUuid& resourceId );
     void on_resourceStatusRemoved(const QnUuid& resourceId);
 
-    void on_accessRightsChanged(const ec2::ApiAccessRightsData& accessRights);
+    void on_accessRightsChanged(const nx::vms::api::AccessRightsData& accessRights);
     void on_userRoleChanged(const ec2::ApiUserRoleData& userRole);
     void on_userRoleRemoved(const QnUuid& userRoleId);
 

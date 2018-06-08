@@ -15,7 +15,7 @@
 #include <nx/utils/concurrent.h>
 #include <network/http_connection_listener.h>
 #include <nx_ec/ec_proto_version.h>
-#include <nx_ec/data/api_access_rights_data.h>
+#include <nx/vms/api/data/access_rights_data.h>
 #include <nx_ec/data/api_user_role_data.h>
 #include <nx/vms/api/data/camera_history_data.h>
 
@@ -1075,7 +1075,7 @@ void LocalConnectionFactory::registerRestHandlers(QnRestProcessorPool* const p)
      * %return List of access rights data objects in the requested format.
      * %// AbstractUserManager::getAccessRights
      */
-    regGet<std::nullptr_t, ApiAccessRightsDataList>(p, ApiCommand::getAccessRights);
+    regGet<std::nullptr_t, AccessRightsDataList>(p, ApiCommand::getAccessRights);
 
     /**%apidoc POST /ec2/setAccessRights
      * <p>
@@ -1088,7 +1088,7 @@ void LocalConnectionFactory::registerRestHandlers(QnRestProcessorPool* const p)
      * %param resourceIds List of accessible resources ids.
      * %// AbstractUserManager::setAccessRights
      */
-    regUpdate<ApiAccessRightsData>(p, ApiCommand::setAccessRights);
+    regUpdate<AccessRightsData>(p, ApiCommand::setAccessRights);
 
     /**%apidoc POST /ec2/saveUser
      * <p>

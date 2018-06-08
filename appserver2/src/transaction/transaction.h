@@ -638,7 +638,7 @@ APPLY(502, removeUser, nx::vms::api::IdData, \
                        InvalidFilterFunc(), /* Filter read func */ \
                        AllowForAllAccessOut(), /* Check remote peer rights for outgoing transaction */ \
                        RemoveUserTransactionType()) /* regular transaction type */ \
-APPLY(503, getAccessRights, ApiAccessRightsDataList, \
+APPLY(503, getAccessRights, nx::vms::api::AccessRightsDataList, \
                        false, /* persistent*/ \
                        false, /* system*/ \
                        InvalidGetHashHelper(), /* getHash*/ \
@@ -649,7 +649,7 @@ APPLY(503, getAccessRights, ApiAccessRightsDataList, \
                        FilterListByAccess<AllowForAllAccess>(), /* Filter read func */ \
                        ReadListAccessOut<AllowForAllAccess>(), /* Check remote peer rights for outgoing transaction */ \
                        RegularTransactionType()) /* regular transaction type */ \
-APPLY(504, setAccessRights, ApiAccessRightsData, \
+APPLY(504, setAccessRights, nx::vms::api::AccessRightsData, \
                        true, /* persistent*/ \
                        false, /* system*/ \
                        &createHashForApiAccessRightsDataHelper, /* getHash*/ \
@@ -1237,7 +1237,7 @@ APPLY(2007, getSettings, nx::vms::api::ResourceParamDataList, \
                        FilterListByAccess<ReadResourceParamAccess>(), /* Filter read func */ \
                        ReadListAccessOut<AllowForAllAccess>(),  \
                        RegularTransactionType()) /* Check remote peer rights for outgoing transaction */ \
-APPLY(2008, cleanupDatabase, ApiCleanupDatabaseData, \
+APPLY(2008, cleanupDatabase, nx::vms::api::CleanupDatabaseData, \
                        true, \
                        false, \
                        InvalidGetHashHelper(), \

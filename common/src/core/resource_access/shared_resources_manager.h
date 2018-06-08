@@ -18,7 +18,7 @@ public:
     QnSharedResourcesManager(QObject* parent = nullptr);
     virtual ~QnSharedResourcesManager();
 
-    void reset(const ec2::ApiAccessRightsDataList& accessibleResourcesList);
+    void reset(const nx::vms::api::AccessRightsDataList& accessibleResourcesList);
 
     /** List of resources ids, the given user has access to (only given directly). */
     QSet<QnUuid> sharedResources(const QnResourceAccessSubject& subject) const;

@@ -184,7 +184,7 @@ QnUuid createHashForApiCameraAttributesDataHelper(const nx::vms::api::CameraAttr
     return QnAbstractTransaction::makeHash(params.cameraId.toRfc4122(), "camera_attributes");
 }
 
-QnUuid createHashForApiAccessRightsDataHelper(const ApiAccessRightsData& params)
+QnUuid createHashForApiAccessRightsDataHelper(const nx::vms::api::AccessRightsData& params)
 {
     return QnAbstractTransaction::makeHash(params.userId.toRfc4122(), "access_rights");
 }

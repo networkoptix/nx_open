@@ -10,8 +10,10 @@ namespace api {
 
 struct Data;
 
-#define DECLARE_STRUCT(Type) struct Type; \
-    QN_FUSION_DECLARE_FUNCTIONS(Type, (eq)(ubjson)(xml)(json)(sql_record)(csv_record), NX_VMS_API) \
+#define DECLARE_STRUCT_NO_LIST(Type) struct Type; \
+    QN_FUSION_DECLARE_FUNCTIONS(Type, (eq)(ubjson)(xml)(json)(sql_record)(csv_record), NX_VMS_API)
+
+#define DECLARE_STRUCT(Type) DECLARE_STRUCT_NO_LIST(Type) \
     using Type##List = std::vector<Type>;
 
 DECLARE_STRUCT(IdData)
@@ -70,6 +72,11 @@ DECLARE_STRUCT(VideowallMatrixItemData)
 DECLARE_STRUCT(VideowallMatrixData)
 DECLARE_STRUCT(VideowallData)
 DECLARE_STRUCT(VideowallControlMessageData)
+
+DECLARE_STRUCT(AccessRightsData)
+DECLARE_STRUCT(CloudSystemData)
+
+DECLARE_STRUCT_NO_LIST(CleanupDatabaseData)
 
 #undef DECLARE_STRUCT
 

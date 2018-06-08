@@ -60,5 +60,7 @@ struct ResourceParamWithRefData: ResourceParamData
 } // namespace vms
 } // namespace nx
 
+Q_DECLARE_METATYPE(nx::vms::api::ResourceData)
+Q_DECLARE_METATYPE(nx::vms::api::ResourceStatusData)
 Q_DECLARE_METATYPE(nx::vms::api::ResourceParamData)
 Q_DECLARE_METATYPE(nx::vms::api::ResourceParamWithRefData)

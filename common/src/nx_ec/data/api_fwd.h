@@ -26,7 +26,6 @@ struct ApiStorageData;
 struct ApiUserData;
 struct ApiUserRoleData;
 struct ApiPredefinedRoleData;
-struct ApiAccessRightsData;
 struct ApiUpdateUploadData;
 struct ApiUpdateUploadResponceData;
 struct ApiSystemMergeHistoryRecord;
@@ -51,7 +50,6 @@ struct ApiPeerDataEx;
 struct ApiRuntimeData;
 
 struct ApiLicenseOverflowData;
-struct ApiCleanupDatabaseData;
 
 struct ApiP2pStatisticsData;
 
@@ -67,7 +65,6 @@ typedef std::vector<ApiStorageData> ApiStorageDataList;
 typedef std::vector<ApiUserData> ApiUserDataList;
 typedef std::vector<ApiUserRoleData> ApiUserRoleDataList;
 typedef std::vector<ApiPredefinedRoleData> ApiPredefinedRoleDataList;
-typedef std::vector<ApiAccessRightsData> ApiAccessRightsDataList;
 typedef std::vector<ApiDiscoveryData> ApiDiscoveryDataList;
 typedef std::vector<ApiDiscoveredServerData> ApiDiscoveredServerDataList;
 typedef std::vector<ApiUpdateUploadResponceData> ApiUpdateUploadResponceDataList;
@@ -103,7 +100,6 @@ struct ParentId
     (ApiUserData)\
     (ApiUserRoleData)\
     (ApiPredefinedRoleData)\
-    (ApiAccessRightsData)\
     (ApiUpdateInstallData)\
     (ApiUpdateUploadData)\
     (ApiUpdateUploadResponceData)\
@@ -118,7 +114,6 @@ struct ParentId
     (ApiPeerDataEx)\
     (ApiRuntimeData)\
     (ApiLicenseOverflowData)\
-    (ApiCleanupDatabaseData)\
     (ApiDiscoveredServerData)\
     (ApiP2pStatisticsData)
 

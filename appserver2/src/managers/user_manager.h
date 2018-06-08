@@ -26,7 +26,7 @@ public:
     virtual int removeUserRole(const QnUuid& id, impl::SimpleHandlerPtr handler) override;
 
     virtual int getAccessRights(impl::GetAccessRightsHandlerPtr handler) override;
-    virtual int setAccessRights(const ec2::ApiAccessRightsData& data,
+    virtual int setAccessRights(const nx::vms::api::AccessRightsData& data,
         impl::SimpleHandlerPtr handler) override;
 private:
     QueryProcessorType* const m_queryProcessor;
@@ -177,18 +177,18 @@ int QnUserManager<QueryProcessorType>::getAccessRights(impl::GetAccessRightsHand
     const int reqID = generateRequestID();
 
     auto queryDoneHandler =
-        [reqID, handler](ErrorCode errorCode, const ApiAccessRightsDataList& result)
+        [reqID, handler](ErrorCode errorCode, const nx::vms::api::AccessRightsDataList& result)
         {
             handler->done(reqID, errorCode, result);
         };
-    m_queryProcessor->getAccess(m_userAccessData)
-        .template processQueryAsync<std::nullptr_t, ApiAccessRightsDataList, decltype(queryDoneHandler)>
-        (ApiCommand::getAccessRights, nullptr, queryDoneHandler);
+    m_queryProcessor->getAccess(m_userAccessData).template processQueryAsync<
+        std::nullptr_t, nx::vms::api::AccessRightsDataList, decltype(queryDoneHandler)>
+            (ApiCommand::getAccessRights, nullptr, queryDoneHandler);
     return reqID;
 }
 
 template<class QueryProcessorType>
-int QnUserManager<QueryProcessorType>::setAccessRights(const ec2::ApiAccessRightsData& data,
+int QnUserManager<QueryProcessorType>::setAccessRights(const nx::vms::api::AccessRightsData& data,
     impl::SimpleHandlerPtr handler)
 {
     const int reqID = generateRequestID();

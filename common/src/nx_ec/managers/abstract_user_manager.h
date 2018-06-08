@@ -3,9 +3,10 @@
 #include <nx_ec/ec_api_fwd.h>
 #include <nx_ec/data/api_user_data.h>
 #include <nx_ec/data/api_user_role_data.h>
-#include <nx_ec/data/api_access_rights_data.h>
 #include <nx_ec/impl/ec_api_impl.h>
 #include <nx_ec/impl/sync_handler.h>
+
+#include <nx/vms/api/data/access_rights_data.h>
 
 namespace ec2 {
 
@@ -22,7 +23,7 @@ signals:
     void userRoleAddedOrUpdated(const ec2::ApiUserRoleData& userRole);
     void removed(const QnUuid& id);
     void userRoleRemoved(const QnUuid& id);
-    void accessRightsChanged(const ec2::ApiAccessRightsData& access);
+    void accessRightsChanged(const nx::vms::api::AccessRightsData& access);
 };
 
 typedef std::shared_ptr<AbstractUserNotificationManager> AbstractUserNotificationManagerPtr;
@@ -180,7 +181,7 @@ public:
                 target, handler)));
     }
 
-    ErrorCode getAccessRightsSync(ApiAccessRightsDataList* const result)
+    ErrorCode getAccessRightsSync(nx::vms::api::AccessRightsDataList* const result)
     {
         return impl::doSyncCall<impl::GetAccessRightsHandler>(
             [this](impl::GetAccessRightsHandlerPtr handler)
@@ -194,14 +195,15 @@ public:
      * @param handler Functor with params: (ErrorCode)
      */
     template<class TargetType, class HandlerType>
-    int setAccessRights(const ApiAccessRightsData& data, TargetType* target, HandlerType handler)
+    int setAccessRights(
+        const nx::vms::api::AccessRightsData& data, TargetType* target, HandlerType handler)
     {
         return setAccessRights(data, std::static_pointer_cast<impl::SimpleHandler>(
             std::make_shared<impl::CustomSimpleHandler<TargetType, HandlerType>>(
                 target, handler)));
     }
 
-    ErrorCode setAccessRightsSync(const ApiAccessRightsData& data)
+    ErrorCode setAccessRightsSync(const nx::vms::api::AccessRightsData& data)
     {
         return impl::doSyncCall<impl::SimpleHandler>(
             [=](const impl::SimpleHandlerPtr& handler)
@@ -223,7 +225,7 @@ private:
 
     virtual int getAccessRights(impl::GetAccessRightsHandlerPtr handler) = 0;
     virtual int setAccessRights(
-        const ApiAccessRightsData& data, impl::SimpleHandlerPtr handler) = 0;
+        const nx::vms::api::AccessRightsData& data, impl::SimpleHandlerPtr handler) = 0;
 };
 
 } // namespace ec2

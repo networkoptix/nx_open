@@ -30,6 +30,8 @@
 
 #include <utils/common/delayed.h>
 
+using namespace nx;
+
 namespace {
 
 // TODO: #vkutin #common Move this function to some common helpers file
@@ -510,7 +512,7 @@ void QnResourcesChangesManager::saveAccessibleResources(const QnResourceAccessSu
                 sharedResourcesManager()->setSharedResources(subject, backup);
         };
 
-    ec2::ApiAccessRightsData accessRights;
+    vms::api::AccessRightsData accessRights;
     accessRights.userId = subject.effectiveId();
     for (const auto& id: accessibleResources)
         accessRights.resourceIds.push_back(id);
@@ -526,7 +528,7 @@ void QnResourcesChangesManager::cleanAccessibleResources(const QnUuid& subject)
 
     auto handler = [this, subject](int /*reqID*/, ec2::ErrorCode /*errorCode*/) {};
 
-    ec2::ApiAccessRightsData accessRights;
+    vms::api::AccessRightsData accessRights;
     accessRights.userId = subject;
     connection->getUserManager(Qn::kSystemAccess)->setAccessRights(accessRights, this,
         makeReplyProcessor(this, handler));

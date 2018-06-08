@@ -44,7 +44,7 @@ void QnUserNotificationManager::triggerNotification(
 }
 
 void QnUserNotificationManager::triggerNotification(
-    const QnTransaction<ApiAccessRightsData>& tran,
+    const QnTransaction<nx::vms::api::AccessRightsData>& tran,
     NotificationSource /*source*/)
 {
     NX_ASSERT(tran.command == ApiCommand::setAccessRights);

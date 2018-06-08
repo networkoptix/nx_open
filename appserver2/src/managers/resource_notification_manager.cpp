@@ -1,8 +1,12 @@
 #include "resource_notification_manager.h"
 
 #include <core/resource_management/resource_pool.h>
-#include "nx_ec/data/api_conversion_functions.h"
+
+#include <nx_ec/data/api_conversion_functions.h>
+
 #include <nx/utils/log/log.h>
+
+using namespace nx;
 
 namespace ec2 {
 
@@ -11,7 +15,7 @@ QnResourceNotificationManager::QnResourceNotificationManager()
 }
 
 void QnResourceNotificationManager::triggerNotification(
-    const QnTransaction<nx::vms::api::ResourceStatusData>& tran,
+    const QnTransaction<vms::api::ResourceStatusData>& tran,
     NotificationSource source)
 {
     NX_LOG(lit("%1 Emit statusChanged signal for resource %2")
@@ -27,13 +31,13 @@ void QnResourceNotificationManager::triggerNotification(
 }
 
 void QnResourceNotificationManager::triggerNotification(
-    const QnTransaction<ApiCleanupDatabaseData>& /*tran*/,
+    const QnTransaction<vms::api::CleanupDatabaseData>& /*tran*/,
     NotificationSource /*source*/)
 {
 }
 
 void QnResourceNotificationManager::triggerNotification(
-    const QnTransaction<nx::vms::api::ResourceParamWithRefData>& tran,
+    const QnTransaction<vms::api::ResourceParamWithRefData>& tran,
     NotificationSource /*source*/)
 {
     if (tran.command == ApiCommand::setResourceParam)
@@ -43,7 +47,7 @@ void QnResourceNotificationManager::triggerNotification(
 }
 
 void QnResourceNotificationManager::triggerNotification(
-    const QnTransaction<nx::vms::api::ResourceParamWithRefDataList>& tran,
+    const QnTransaction<vms::api::ResourceParamWithRefDataList>& tran,
     NotificationSource /*source*/)
 {
     for (const auto& param: tran.params)
@@ -56,7 +60,7 @@ void QnResourceNotificationManager::triggerNotification(
 }
 
 void QnResourceNotificationManager::triggerNotification(
-    const QnTransaction<nx::vms::api::IdData>& tran,
+    const QnTransaction<vms::api::IdData>& tran,
     NotificationSource /*source*/)
 {
     if (tran.command == ApiCommand::removeResourceStatus)
@@ -66,10 +70,10 @@ void QnResourceNotificationManager::triggerNotification(
 }
 
 void QnResourceNotificationManager::triggerNotification(
-    const QnTransaction<nx::vms::api::IdDataList>& tran,
+    const QnTransaction<vms::api::IdDataList>& tran,
     NotificationSource /*source*/)
 {
-    for (const nx::vms::api::IdData& id: tran.params)
+    for (const vms::api::IdData& id: tran.params)
         emit resourceRemoved(id.id);
 }
 

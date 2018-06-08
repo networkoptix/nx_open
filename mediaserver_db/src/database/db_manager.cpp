@@ -1,28 +1,17 @@
 #include "db_manager.h"
-
-#include <utils/common/app_info.h>
+#include "restype_xml_parser.h"
 
 #include <QtSql/QtSql>
 
+#include <api/runtime_info_manager.h>
 #include <common/common_module.h>
-
-#include "utils/common/util.h"
-#include "managers/time_manager.h"
-#include "nx_ec/data/api_discovery_data.h"
-#include <nx/vms/event/event_fwd.h>
-#include "utils/common/synctime.h"
-#include "utils/crypt/symmetrical.h"
-
-#include "core/resource/user_resource.h"
+#include <core/resource/user_resource.h>
 #include <core/resource/camera_resource.h>
-
 #include <core/resource_management/user_roles_manager.h>
-
 #include <database/api/db_resource_api.h>
 #include <database/api/db_layout_api.h>
 #include <database/api/db_layout_tour_api.h>
 #include <database/api/db_webpage_api.h>
-
 #include <database/migrations/event_rules_db_migration.h>
 #include <database/migrations/user_permissions_db_migration.h>
 #include <database/migrations/accessible_resources_db_migration.h>
@@ -35,34 +24,37 @@
 #include <database/migrations/cleanup_removed_transactions.h>
 #include <database/migrations/access_rights_db_migration.h>
 #include <database/migrations/camera_user_attributes_migration.h>
-
+#include <managers/time_manager.h>
 #include <network/system_helpers.h>
+#include <settings.h>
+#include <utils/common/app_info.h>
+#include <utils/common/synctime.h>
+#include <utils/common/util.h>
+#include <utils/crypt/symmetrical.h>
 
-#include <nx/vms/api/data/camera_data.h>
-#include <nx/vms/api/data/resource_type_data.h>
-#include <nx/vms/api/data/stored_file_data.h>
-#include "nx_ec/data/api_user_data.h"
-#include "nx/vms/api/data/layout_data.h"
-#include <nx/vms/api/data/videowall_data.h>
-#include "nx/vms/api/data/webpage_data.h"
-#include "nx_ec/data/api_license_data.h"
-#include <nx/vms/api/data/event_rule_data.h>
-#include "nx_ec/data/api_full_info_data.h"
-#include <nx/vms/api/data/camera_history_data.h>
-#include "nx_ec/data/api_media_server_data.h"
-#include "nx_ec/data/api_update_data.h"
+#include <nx_ec/data/api_user_data.h>
+#include <nx_ec/data/api_license_data.h>
+#include <nx_ec/data/api_full_info_data.h>
+#include <nx_ec/data/api_media_server_data.h>
+#include <nx_ec/data/api_update_data.h>
 #include <nx_ec/data/api_time_data.h>
-#include "nx_ec/data/api_conversion_functions.h"
-#include <nx_ec/data/api_access_rights_data.h>
-#include "api/runtime_info_manager.h"
-#include <nx/utils/log/log.h>
-#include <nx/vms/api/data/camera_data_ex.h>
-#include "restype_xml_parser.h"
-#include <nx/vms/event/rule.h>
-#include "settings.h"
-#include <database/api/db_resource_api.h>
+#include <nx_ec/data/api_conversion_functions.h>
+#include <nx_ec/data/api_discovery_data.h>
 
 #include <nx/fusion/model_functions.h>
+#include <nx/utils/log/log.h>
+#include <nx/vms/api/data/access_rights_data.h>
+#include <nx/vms/api/data/camera_data.h>
+#include <nx/vms/api/data/camera_data_ex.h>
+#include <nx/vms/api/data/camera_history_data.h>
+#include <nx/vms/api/data/event_rule_data.h>
+#include "nx/vms/api/data/layout_data.h"
+#include <nx/vms/api/data/resource_type_data.h>
+#include <nx/vms/api/data/stored_file_data.h>
+#include <nx/vms/api/data/videowall_data.h>
+#include "nx/vms/api/data/webpage_data.h"
+#include <nx/vms/event/event_fwd.h>
+#include <nx/vms/event/rule.h>
 
 static const QString RES_TYPE_MSERVER = "mediaserver";
 static const QString RES_TYPE_CAMERA = "camera";
@@ -727,8 +719,8 @@ bool QnDbManager::init(const nx::utils::Url& dbUrl)
 
                 if (!fillTransactionLogInternal<
                     std::nullptr_t,
-                    ApiAccessRightsData,
-                    ApiAccessRightsDataList>(ApiCommand::setAccessRights))
+                    AccessRightsData,
+                    AccessRightsDataList>(ApiCommand::setAccessRights))
                 {
                     return false;
                 }
@@ -741,8 +733,8 @@ bool QnDbManager::init(const nx::utils::Url& dbUrl)
 
                 if (!fillTransactionLogInternal<
                     std::nullptr_t,
-                    ApiAccessRightsData,
-                    ApiAccessRightsDataList>(ApiCommand::setAccessRights))
+                    AccessRightsData,
+                    AccessRightsDataList>(ApiCommand::setAccessRights))
                 {
                     return false;
                 }
@@ -1082,8 +1074,8 @@ bool QnDbManager::resyncTransactionLog()
 
     if (!fillTransactionLogInternal<
         std::nullptr_t,
-        ApiAccessRightsData,
-        ApiAccessRightsDataList>(ApiCommand::setAccessRights))
+        AccessRightsData,
+        AccessRightsDataList>(ApiCommand::setAccessRights))
     {
         return false;
     }
@@ -3049,7 +3041,7 @@ ErrorCode QnDbManager::checkExistingUser(const QString &name, qint32 internalId)
     return ErrorCode::ok;
 }
 
-ErrorCode QnDbManager::setAccessRights(const ApiAccessRightsData& data)
+ErrorCode QnDbManager::setAccessRights(const AccessRightsData& data)
 {
     if (data.resourceIds.empty())
         return cleanAccessRights(data.userId);
@@ -3121,7 +3113,7 @@ ErrorCode QnDbManager::executeTransactionInternal(const QnTransaction<ApiUserRol
     return insertOrReplaceUserRole(tran.params);
 }
 
-ErrorCode QnDbManager::executeTransactionInternal(const QnTransaction<ApiAccessRightsData>& tran)
+ErrorCode QnDbManager::executeTransactionInternal(const QnTransaction<AccessRightsData>& tran)
 {
     NX_ASSERT(tran.command == ApiCommand::setAccessRights, Q_FUNC_INFO, "Unsupported transaction");
     if (tran.command != ApiCommand::setAccessRights)
@@ -4060,7 +4052,7 @@ ErrorCode QnDbManager::doQueryNoLock(const std::nullptr_t& /*dummy*/, ApiPredefi
     return ErrorCode::ok;
 }
 
-ec2::ErrorCode QnDbManager::doQueryNoLock(const std::nullptr_t& /*dummy*/, ApiAccessRightsDataList& accessRightsList)
+ec2::ErrorCode QnDbManager::doQueryNoLock(const std::nullptr_t& /*dummy*/, AccessRightsDataList& accessRightsList)
 {
     QSqlQuery query(m_sdb);
     query.setForwardOnly(true);
@@ -4078,7 +4070,7 @@ ec2::ErrorCode QnDbManager::doQueryNoLock(const std::nullptr_t& /*dummy*/, ApiAc
 
     while (query.next())
     {
-        ApiAccessRightsData data;
+        AccessRightsData data;
         data.userId = QnUuid::fromRfc4122(query.value(0).toByteArray());
         data.resourceIds = QnUbjson::deserialized<std::vector<QnUuid>>(query.value(1).toByteArray());
         accessRightsList.push_back(std::move(data));
@@ -4152,7 +4144,7 @@ ErrorCode QnDbManager::doQueryNoLock(const QnUuid& id, VideowallDataList& videow
     std::vector<VideowallItemWithRefData> items;
     QnSql::fetch_many(queryItems, &items);
 
-    mergeObjectListData(videowallList, items, &VideowallData::items, 
+    mergeObjectListData(videowallList, items, &VideowallData::items,
         &VideowallItemWithRefData::videowallGuid);
 
     QSqlQuery queryScreens(m_sdb);
@@ -4992,7 +4984,7 @@ ErrorCode QnDbManager::executeTransactionInternal(const QnTransaction<ApiLicense
     return ErrorCode::ok;
 }
 
-ErrorCode QnDbManager::executeTransactionInternal(const QnTransaction<ApiCleanupDatabaseData>& tran)
+ErrorCode QnDbManager::executeTransactionInternal(const QnTransaction<CleanupDatabaseData>& tran)
 {
     ErrorCode result = ErrorCode::ok;
     if (tran.params.cleanupDbObjects)

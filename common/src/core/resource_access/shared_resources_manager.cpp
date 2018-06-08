@@ -1,19 +1,19 @@
 #include "shared_resources_manager.h"
 
-#include <nx_ec/data/api_access_rights_data.h>
-
 #include <core/resource_access/resource_access_subjects_cache.h>
-
 #include <core/resource_management/resource_pool.h>
 #include <core/resource_management/user_roles_manager.h>
-
 #include <core/resource/user_resource.h>
+
+#include <nx/vms/api/data/access_rights_data.h>
 
 namespace {
 
 static const QSet<QnUuid> kEmpty;
 
-}
+} // namespace
+
+using namespace nx;
 
 QnSharedResourcesManager::QnSharedResourcesManager(QObject* parent):
     base_type(parent),
@@ -36,7 +36,7 @@ QnSharedResourcesManager::~QnSharedResourcesManager()
 {
 }
 
-void QnSharedResourcesManager::reset(const ec2::ApiAccessRightsDataList& accessibleResourcesList)
+void QnSharedResourcesManager::reset(const vms::api::AccessRightsDataList& accessibleResourcesList)
 {
     QHash<QnUuid, QSet<QnUuid> > oldValuesMap;
     {

@@ -28,8 +28,8 @@
 #include <nx_ec/data/api_reverse_connection_data.h>
 #include <nx/vms/api/data/client_info_data.h>
 #include <nx/vms/api/data/camera_attributes_data.h>
+#include <nx/vms/api/data/access_rights_data.h>
 #include <nx_ec/data/api_media_server_data.h>
-#include <nx_ec/data/api_access_rights_data.h>
 #include <nx_ec/data/api_user_role_data.h>
 #include <nx_ec/data/api_misc_data.h>
 #include <nx_ec/data/api_system_merge_history_record.h>

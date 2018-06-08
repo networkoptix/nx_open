@@ -18,7 +18,7 @@ public:
         const QnTransaction<ApiLicenseOverflowData>& /*tran*/,
         NotificationSource /*source*/);
     void triggerNotification(
-        const QnTransaction<ApiCleanupDatabaseData>& /*tran*/,
+        const QnTransaction<nx::vms::api::CleanupDatabaseData>& /*tran*/,
         NotificationSource /*source*/);
     void triggerNotification(
         const QnTransaction<nx::vms::api::ResourceParamWithRefData>& tran,

@@ -20,7 +20,7 @@ public:
         const QnTransaction<nx::vms::api::IdData>& tran,
         NotificationSource source);
     void triggerNotification(
-        const QnTransaction<ApiAccessRightsData>& tran,
+        const QnTransaction<nx::vms::api::AccessRightsData>& tran,
         NotificationSource source);
     void triggerNotification(
         const QnTransaction<ApiUserRoleData>& tran,

@@ -252,7 +252,7 @@ void loadResourcesFromEcs(
 
     {
         //loading accessible resources
-        ec2::ApiAccessRightsDataList accessRights;
+        nx::vms::api::AccessRightsDataList accessRights;
         while ((rez = ec2Connection->getUserManager(Qn::kSystemAccess)->getAccessRightsSync(&accessRights)) != ec2::ErrorCode::ok)
         {
             qDebug() << "QnMain::run(): Can't get accessRights. Reason: " << ec2::toString(rez);

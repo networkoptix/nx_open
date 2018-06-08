@@ -1,4 +1,5 @@
 #include "transaction_message_bus.h"
+#include "transaction_message_bus_priv.h"
 
 #include <chrono>
 
@@ -6,32 +7,30 @@
 #include <QtCore/QTextStream>
 
 #include <api/global_settings.h>
-#include "api/app_server_connection.h"
-#include "api/runtime_info_manager.h"
+#include <api/app_server_connection.h>
+#include <api/runtime_info_manager.h>
+#include <core/resource/media_server_resource.h>
+#include <common/common_module.h>
+#include <common/common_module.h>
+#include <settings.h>
+#include <utils/common/checked_cast.h>
+#include <utils/common/synctime.h>
+#include <utils/common/warnings.h>
 
-#include "common/common_module.h"
-#include "nx/vms/discovery/manager.h"
-#include "settings.h"
+#include <nx_ec/data/api_resource_data.h>
+#include <nx_ec/data/api_reverse_connection_data.h>
+#include <nx_ec/data/api_peer_alive_data.h>
+#include <nx_ec/data/api_discovery_data.h>
 
+#include <nx/cloud/cdb/api/ec2_request_paths.h>
+#include <nx/utils/log/log.h>
+#include <nx/utils/random.h>
+#include <nx/utils/system_error.h>
+#include <nx/vms/api/data/access_rights_data.h>
 #include <nx/vms/api/data/camera_data.h>
 #include <nx/vms/api/data/camera_data_ex.h>
-#include "nx_ec/data/api_resource_data.h"
 #include <nx/vms/api/data/resource_type_data.h>
-#include "nx_ec/data/api_reverse_connection_data.h"
-#include "nx_ec/data/api_peer_alive_data.h"
-#include "nx_ec/data/api_discovery_data.h"
-#include <nx_ec/data/api_access_rights_data.h>
-#include <nx/cloud/cdb/api/ec2_request_paths.h>
-
-#include <utils/common/checked_cast.h>
-#include <nx/utils/log/log.h>
-#include "utils/common/synctime.h"
-#include <nx/utils/system_error.h>
-#include "utils/common/warnings.h"
-#include <core/resource/media_server_resource.h>
-#include <nx/utils/random.h>
-#include "transaction_message_bus_priv.h"
-#include <common/common_module.h>
+#include <nx/vms/discovery/manager.h>
 
 namespace ec2 {
 
@@ -885,7 +884,7 @@ bool QnTransactionMessageBus::moveConnectionToReadyForStreaming(const QnUuid& co
 }
 
 nx::utils::Url QnTransactionMessageBus::updateOutgoingUrl(
-    const QnUuid& peer, 
+    const QnUuid& peer,
     const nx::utils::Url& srcUrl) const
 {
     nx::utils::Url url(srcUrl);
