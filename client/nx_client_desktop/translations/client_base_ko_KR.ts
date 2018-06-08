@@ -7136,7 +7136,7 @@ to %1</source>
     </message>
     <message>
       <source>Local users</source>
-      <translation type="unfinished">Local users</translation>
+      <translation>로컬 사용자</translation>
     </message>
     <message>
       <source>%1 users</source>
@@ -8149,7 +8149,7 @@ to %1</source>
     <name>nx::client::desktop::HintButton</name>
     <message>
       <source>Click to read more</source>
-      <translation type="unfinished">Click to read more</translation>
+      <translation>클릭하여 더 자세히 알아보십시오</translation>
     </message>
   </context>
   <context>
