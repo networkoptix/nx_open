@@ -35,17 +35,17 @@ _types = {
     }
 
 
-class Name(object):
+class _WindowsRegistryValue(object):
     def __init__(self, key, name, type):
-        self.key = key  # type: Key
+        self.key = key  # type: _WindowsRegistryKey
         self.query = key.query  # type: CIMQuery
         self.type = type  # type: Type
         self.name = name  # type: str
 
     def __repr__(self):
-        return '<Name {} of type {}>'.format(self.name, self.type.define)
+        return '<Value {} of type {}>'.format(self.name, self.type.define)
 
-    def value(self):
+    def get_data(self):
         response = self.query.invoke_method(self.type.getter, {
             u'hDefKey': self.key.key_int,
             u'sSubKeyName': self.key.sub_key,
@@ -57,17 +57,17 @@ class Name(object):
         return value
 
     def copy(self, another_key):
-        value = self.value()
+        data = self.get_data()
         response = self.query.invoke_method(self.type.setter, {
             u'hDefKey': another_key.key_int,
             u'sSubKeyName': another_key.sub_key,
             u'sValueName': self.name,
-            self.type.parameter: value,
+            self.type.parameter: data,
             })
         _logger.debug("%s response: %s", self.type.setter, pformat(response))
 
 
-class Key(object):
+class _WindowsRegistryKey(object):
     def __init__(self, query, path):
         self.query = query
         self.key, self.sub_key = path.split('\\', 1)
@@ -78,11 +78,11 @@ class Key(object):
             u'hDefKey': self.key_int,
             u'sSubKeyName': self.sub_key})
         _logger.debug("EnumValues response: %s", pformat(response))
-        names = [
-            Name(self, value_name, _types[value_type])
+        values = [
+            _WindowsRegistryValue(self, value_name, _types[value_type])
             for value_type, value_name
             in zip(response.get(u'Types', []), response.get(u'sNames', []))]
-        return names
+        return values
 
     def create(self):
         response = self.query.invoke_method(u'CreateKey', {
@@ -96,4 +96,4 @@ class WindowsRegistry(object):
         self.query = winrm.wmi_query(u'StdRegProv', {})
 
     def key(self, path):
-        return Key(self.query, path)
+        return _WindowsRegistryKey(self.query, path)
