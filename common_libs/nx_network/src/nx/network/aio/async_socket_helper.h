@@ -884,7 +884,9 @@ public:
             {
                 SystemError::ErrorCode errorCode = SystemError::noError;
                 sock->getLastError(&errorCode);
-                acceptHandlerBakLocal(errorCode, nullptr);
+                acceptHandlerBakLocal(
+                    errorCode != SystemError::noError ? errorCode : SystemError::invalidData,
+                    nullptr);
                 break;
             }
 
