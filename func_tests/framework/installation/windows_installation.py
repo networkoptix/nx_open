@@ -53,10 +53,7 @@ class WindowsInstallation(Installation):
         return remote_path
 
     def _backup_configuration(self):
-        values = self._config_key.list_values()
-        self._config_key_backup.create()
-        for value in values:
-            value.copy(self._config_key_backup)
+        self._config_key.copy_values_to(self._config_key_backup)
 
     def install(self):
         remote_installer_path = self._upload_installer()
