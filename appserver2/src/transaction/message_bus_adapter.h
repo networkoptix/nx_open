@@ -28,7 +28,7 @@ namespace ec2
             QnUbjsonTransactionSerializer* ubjsonTranSerializer
         );
 
-        void init(MessageBusType value);
+        virtual void init(MessageBusType value);
 
         template <typename T> T dynamicCast() { return dynamic_cast<T> (m_bus.get()); }
 
