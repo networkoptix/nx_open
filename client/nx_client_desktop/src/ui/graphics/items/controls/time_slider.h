@@ -32,14 +32,7 @@ class QnTimePeriodList;
 class QnBookmarksViewer;
 class QnBookmarkMergeHelper;
 
-namespace nx {
-namespace client {
-namespace desktop {
-class TimelineCursorLayout;
-}
-}
-}
-
+namespace nx { namespace client {namespace desktop { class TimelineCursorLayout; }}}
 
 class QnTimeSlider: public Animated<QnToolTipSlider>, public HelpTopicQueryable,
     protected DragProcessHandler, protected AnimationTimerListener

@@ -12,14 +12,14 @@ namespace desktop {
 
 class TimelineCursorLayout: public QGraphicsLinearLayout
 {
-    Q_DECLARE_TR_FUNCTIONS(DateTimeFormats);
+    Q_DECLARE_TR_FUNCTIONS(TimelineCursorLayout);
 
-    typedef QGraphicsLayout base_type;
+    using base_type = QGraphicsLayout;
 
  public:
     explicit TimelineCursorLayout();
 
-    virtual ~TimelineCursorLayout();
+    virtual ~TimelineCursorLayout() override;
 
     // Shows "live" instead of time if isLive.
     void setTimeContent(bool isLive, qint64 pos = 0, bool showDate = true, bool showHours = true);
