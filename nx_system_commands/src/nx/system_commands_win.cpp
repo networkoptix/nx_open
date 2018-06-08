@@ -26,7 +26,7 @@ SystemCommands::UnmountCode SystemCommands::unmount(
 
 bool SystemCommands::changeOwner(const std::string& /*path*/)
 {
-    return false;
+    return true;
 }
 
 bool SystemCommands::makeDirectory(const std::string& directoryPath)
