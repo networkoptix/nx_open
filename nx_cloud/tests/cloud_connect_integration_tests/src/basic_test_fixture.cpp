@@ -90,7 +90,7 @@ void BasicTestFixture::setUpRemoteRelayPeerPoolFactoryFunc()
         {
             return std::make_unique<MemoryRemoteRelayPeerPool>(this);
         };
-    RemoteRelayPeerPoolFactory::setFactoryFunc(createRemoteRelayPeerPoolFunc);
+    RemoteRelayPeerPoolFactory::instance().setCustomFunc(createRemoteRelayPeerPoolFunc);
 }
 
 BasicTestFixture::~BasicTestFixture()

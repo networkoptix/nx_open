@@ -53,16 +53,11 @@ relaying::AbstractListeningPeerManager& Controller::listeningPeerManager()
     return *m_listeningPeerManager;
 }
 
-bool Controller::discoverPublicAddress()
+std::optional<network::HostAddress> Controller::discoverPublicAddress()
 {
     auto publicHostAddress = controller::PublicIpDiscoveryService::get();
     if (!(bool)publicHostAddress)
-        return false;
-
-    network::SocketAddress publicSocketAddress(
-        *publicHostAddress,
-        m_settings->http().endpoints.front().port);
-    m_model->remoteRelayPeerPool().setNodeId(publicSocketAddress.toStdString());
+        return std::nullopt;
 
     nx::utils::SubscriptionId subscriptionId;
     subscribeForPeerConnected(&subscriptionId);
@@ -71,7 +66,7 @@ bool Controller::discoverPublicAddress()
     subscribeForPeerDisconnected(&subscriptionId);
     m_listeningPeerPoolSubscriptions.push_back(subscriptionId);
 
-    return true;
+    return *publicHostAddress;
 }
 
 void Controller::subscribeForPeerConnected(nx::utils::SubscriptionId* subscriptionId)

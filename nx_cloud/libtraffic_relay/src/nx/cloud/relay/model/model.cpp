@@ -11,14 +11,15 @@ Model::Model(const conf::Settings& settings):
     m_settings(settings),
     m_clientSessionPool(settings),
     m_listeningPeerPool(settings.listeningPeer()),
-    m_remoteRelayPeerPool(model::RemoteRelayPeerPoolFactory::create(settings))
+    m_remoteRelayPeerPool(
+        model::RemoteRelayPeerPoolFactory::instance().create(settings))
 {
 }
 
 bool Model::doMandatoryInitialization()
 {
-    // TODO: #ak Refactor here. E.g., if DB connection parameters are specified, 
-    // we can create some dummy RemoteRelayPeerPool so that we keep real RemoteRelayPeerPool 
+    // TODO: #ak Refactor here. E.g., if DB connection parameters are specified,
+    // we can create some dummy RemoteRelayPeerPool so that we keep real RemoteRelayPeerPool
     // implementation clear (free of DB needed/not needed checks).
     if (m_settings.cassandraConnection().host.empty())
         return true;

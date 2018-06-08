@@ -1,14 +1,15 @@
-import { Component }  from '@angular/core';
-import { ApiService } from './services/api.service';
+import { Component, OnInit } from '@angular/core';
+import { ApiService }        from './services/api.service';
 
 @Component({
     selector: 'app-root',
     templateUrl: './app.component.html',
     styleUrls: ['./app.component.scss']
 })
-export class AppComponent {
+export class AppComponent implements OnInit {
     items: {};
     tiles: {};
+    serverTime: string;
 
     constructor(private api: ApiService) {
     }
@@ -18,6 +19,7 @@ export class AppComponent {
             .getHealthStatus()
             .subscribe((data: any) => {
                     this.items = data.metrics;
+                    this.serverTime = data.server_timestamp;
                 },
                 error => {
                     console.error('Server error.');
