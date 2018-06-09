@@ -161,7 +161,7 @@ struct WorkbenchExportHandler::Private
                 {
                     if (!quiet)
                     {
-                        QnMessageBox::warning(q->mainWindow(), tr("Cannot write file"),
+                        QnMessageBox::warning(q->mainWindowWidget(), tr("Cannot write file"),
                             tr("%1 is in use by another export.", "%1 is file name")
                                 .arg(filename.completeFileName()));
                     }
