@@ -9,8 +9,6 @@
 
 #include <nx/utils/log/log.h>
 
-#include <decoders/abstractclientplugin.h>
-#include <decoders/abstractvideodecoderplugin.h>
 #include <camera/camera_plugin.h>
 #include <nx/sdk/metadata/plugin.h>
 #include <plugins/plugin_tools.h>
@@ -27,14 +25,8 @@ static QStringList stringToList(const QString& s)
     return list;
 }
 
-PluginManager::PluginManager(
-    QObject* parent,
-    const QString& pluginDir,
-    nxpl::PluginInterface* pluginContainer)
-    :
-    QObject(parent),
-    m_pluginDir(pluginDir),
-    m_pluginContainer(pluginContainer)
+PluginManager::PluginManager(QObject* parent, nxpl::PluginInterface* pluginContainer):
+    QObject(parent), m_pluginContainer(pluginContainer)
 {
 }
 
@@ -47,26 +39,17 @@ PluginManager::~PluginManager()
         nxPlugin->releaseRef();
 }
 
-void PluginManager::loadPlugins(
-    const QSettings* settings,
-    PluginManager::PluginType pluginsToLoad)
+void PluginManager::loadPlugins(const QSettings* settings)
 {
-    QnMutexLocker lk(&m_mutex);
+    QnMutexLocker lock(&m_mutex);
 
     std::set<QString> directoriesToSearchForPlugins;
 
-    // Loading plugins.
-    if(!m_pluginDir.isEmpty())
-        directoriesToSearchForPlugins.insert(QDir(m_pluginDir).absolutePath());
-
-#ifndef Q_OS_WIN32
-    char* vmsPluginDir = getenv("VMS_PLUGIN_DIR");
-    if( vmsPluginDir )
-        directoriesToSearchForPlugins.insert( QString::fromLatin1(vmsPluginDir) );
-#endif
+    const char* const vmsPluginDir = getenv("VMS_PLUGIN_DIR");
+    if (vmsPluginDir)
+        directoriesToSearchForPlugins.insert(QString::fromLatin1(vmsPluginDir));
 
     const QString binPath = QDir(QCoreApplication::applicationDirPath()).absolutePath();
-    //directoriesToSearchForPlugins.insert( QDir(QDir::currentPath()).absolutePath() );
     directoriesToSearchForPlugins.insert(binPath + lit("/plugins/"));
 
     const QString optionalPluginsDir = binPath + lit("/plugins_optional/");
@@ -98,7 +81,7 @@ void PluginManager::loadPlugins(
         for (const QString& dir: directoriesToSearchForPlugins)
         {
             loadPluginsFromDir(
-                disabledLibNames, enabledLibNames, settingsForPlugin, dir, pluginsToLoad);
+                disabledLibNames, enabledLibNames, settingsForPlugin, dir);
         }
     }
     else
@@ -122,7 +105,7 @@ void PluginManager::loadPlugins(
 
         loadPluginsFromDir(
             disabledLibNames, enabledLibNames, settingsForPlugin,
-            optionalPluginsDir, pluginsToLoad);
+            optionalPluginsDir);
     }
 
     for (nxpl::Setting& setting: settingsForPlugin)
@@ -140,8 +123,7 @@ void PluginManager::loadPluginsFromDir(
     const QStringList& disabledLibNames,
     const QStringList& enabledLibNames,
     const std::vector<nxpl::Setting>& settingsForPlugin,
-    const QString& dirToSearchIn,
-    PluginType pluginsToLoad)
+    const QString& dirToSearchIn)
 {
     QDir pluginDir(dirToSearchIn);
     const QStringList& entries = pluginDir.entryList(QStringList(), QDir::Files | QDir::Readable);
@@ -151,60 +133,30 @@ void PluginManager::loadPluginsFromDir(
         if (!QLibrary::isLibrary(entry))
             continue;
 
-        if (pluginsToLoad & QtPlugin)
-            loadQtPlugin(pluginDir.path() + lit("/") + entry);
+        const QString filename = pluginDir.path() + lit("/") + entry;
 
-        if (pluginsToLoad & NxPlugin)
+        QString libName = entry.left(entry.lastIndexOf(lit(".")));
+        static const auto kPrefix = lit("lib");
+        if (libName.startsWith(kPrefix))
+            libName.remove(0, kPrefix.size());
+
+        if (disabledLibNames.contains(libName))
         {
-            const QString filename = pluginDir.path() + lit("/") + entry;
-
-            QString libName = entry.left(entry.lastIndexOf(lit(".")));
-            static const auto kPrefix = lit("lib");
-            if (libName.startsWith(kPrefix))
-                libName.remove(0, kPrefix.size());
-
-            if (disabledLibNames.contains(libName))
-            {
-                NX_WARNING(this) << lm("Skipped loading Nx plugin [%1] (blacklisted by %2)")
-                    .args(filename, pluginsIni().iniFile());
-                continue;
-            }
-
-            if (!enabledLibNames.isEmpty() && !enabledLibNames.contains(libName))
-            {
-                NX_WARNING(this) << lm("Skipped loading Nx plugin [%1] (not whitelisted by %2)")
-                    .args(filename, pluginsIni().iniFile());
-                continue;
-            }
-
-            loadNxPlugin(settingsForPlugin, filename, libName);
-            // Ignore return value - an error is aleady logged.
+            NX_WARNING(this) << lm("Skipped loading Nx plugin [%1] (blacklisted by %2)")
+                .args(filename, pluginsIni().iniFile());
+            continue;
         }
+
+        if (!enabledLibNames.isEmpty() && !enabledLibNames.contains(libName))
+        {
+            NX_WARNING(this) << lm("Skipped loading Nx plugin [%1] (not whitelisted by %2)")
+                .args(filename, pluginsIni().iniFile());
+            continue;
+        }
+
+        loadNxPlugin(settingsForPlugin, filename, libName);
+        // Ignore return value - an error is aleady logged.
     }
-}
-
-bool PluginManager::loadQtPlugin(const QString& fullFilePath)
-{
-    QSharedPointer<QPluginLoader> plugin(new QPluginLoader(fullFilePath));
-    if(!plugin->load())
-        return false;
-
-    QObject* obj = plugin->instance();
-    QnAbstractClientPlugin* clientPlugin = dynamic_cast<QnAbstractClientPlugin*>(obj);
-    if (!clientPlugin)
-        return false;
-    clientPlugin->initializeLog(QnLog::instance().get());
-    if(!clientPlugin->initialized())
-    {
-        NX_LOG(lit("Failed to initialize Qt plugin %1").arg(fullFilePath), cl_logERROR);
-        return false;
-    }
-
-    NX_LOG(lit("Successfully loaded Qt plugin %1").arg(fullFilePath), cl_logWARNING);
-    m_qtPlugins.push_back(plugin);
-
-    emit pluginLoaded();
-    return true;
 }
 
 bool PluginManager::loadNxPlugin(
