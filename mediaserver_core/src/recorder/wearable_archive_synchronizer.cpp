@@ -16,7 +16,7 @@ namespace nx {
 namespace mediaserver_core {
 namespace recorder {
 
-WearableArchiveSynchronizer::WearableArchiveSynchronizer(QnMediaServerModule* serverModule) :
+WearableArchiveSynchronizer::WearableArchiveSynchronizer(QnMediaServerModule* serverModule):
     nx::mediaserver::ServerModuleAware(serverModule),
     m_workerPool(std::make_unique<RemoteArchiveWorkerPool>())
 {

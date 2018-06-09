@@ -75,7 +75,8 @@ QSet<QnUuid> TransactionMessageBusStub::directlyConnectedServerPeers() const
 
 QnUuid TransactionMessageBusStub::routeToPeerVia(
     const QnUuid& /*dstPeer*/,
-    int* /*distance*/) const
+    int* /*distance*/,
+    nx::network::SocketAddress* /*knownPeerAddress*/) const
 {
     // TODO
     return QnUuid();
@@ -139,12 +140,6 @@ ConnectionGuardSharedState* TransactionMessageBusStub::connectionGuardSharedStat
 {
     // TODO
     return nullptr;
-}
-
-void TransactionMessageBusStub::setTimeSyncManager(
-    TimeSynchronizationManager* /*timeSyncManager*/)
-{
-    // TODO
 }
 
 void TransactionMessageBusStub::addConnectionToRemotePeer(

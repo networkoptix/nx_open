@@ -287,6 +287,11 @@ void AsyncHttpClient::setUserName(const QString& userName)
     m_delegate.setUserName(userName);
 }
 
+void AsyncHttpClient::setSocket(std::unique_ptr<AbstractStreamSocket> socket)
+{
+    m_delegate.setSocket(std::move(socket));
+}
+
 void AsyncHttpClient::setUserPassword(const QString& userPassword)
 {
     m_delegate.setUserPassword(userPassword);

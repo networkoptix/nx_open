@@ -40,7 +40,7 @@ Ec2MserverCloudSynchronization::~Ec2MserverCloudSynchronization()
     m_cdb.stop();
 }
 
-utils::test::ModuleLauncher<::ec2::Appserver2ProcessPublic>*
+utils::test::ModuleLauncher<::ec2::Appserver2Process>*
     Ec2MserverCloudSynchronization::appserver2()
 {
     return &m_appserver2;

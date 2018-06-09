@@ -18,6 +18,13 @@ struct QnTimeReply
 };
 #define QnTimeReply_Fields (utcTime)(timeZoneOffset)(timezoneId)(realm)
 
+struct SyncTimeData
+{
+    qint64 utcTimeMs = 0; //< Utc time in milliseconds since epoch.
+    bool isTakenFromInternet = false;
+};
+#define SyncTimeData_Fields (utcTimeMs)(isTakenFromInternet)
+
 struct ApiDateTimeData
 {
     qint64 timeSinseEpochMs = 0;
@@ -34,4 +41,6 @@ struct ApiServerDateTimeData: public ApiDateTimeData
 
 using ApiMultiserverServerDateTimeDataList = std::vector<ApiServerDateTimeData>;
 
-QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES((QnTimeReply)(ApiDateTimeData)(ApiServerDateTimeData), (json)(ubjson)(xml)(csv_record)(metatype))
+QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
+    (QnTimeReply)(ApiDateTimeData)(ApiServerDateTimeData)(SyncTimeData),
+    (json)(ubjson)(xml)(csv_record)(metatype))

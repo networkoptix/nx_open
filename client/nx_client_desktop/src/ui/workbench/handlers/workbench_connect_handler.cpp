@@ -829,16 +829,6 @@ void QnWorkbenchConnectHandler::at_messageProcessor_connectionOpened()
 
     auto connection = commonModule()->ec2Connection();
     NX_ASSERT(connection);
-    connect(connection->getTimeNotificationManager(),
-        &ec2::AbstractTimeNotificationManager::timeChanged,
-        this,
-        [](qint64 syncTime)
-        {
-            NX_ASSERT(qnSyncTime);
-            if (qnSyncTime)
-                qnSyncTime->updateTime(syncTime);
-        });
-
     commonModule()->setReadOnly(connection->connectionInfo().ecDbReadOnly);
 }
 

@@ -141,6 +141,10 @@ void apiIdDataTriggerNotificationHelper(
             return notificationParams.userNotificationManager->triggerNotification(
                 tran,
                 notificationParams.source);
+        case ApiCommand::broadcastPeerSyncTime:
+            return notificationParams.timeNotificationManager->triggerNotification(
+                tran,
+                notificationParams.source);
         case ApiCommand::removeEventRule:
             return notificationParams.businessEventNotificationManager->triggerNotification(
                 tran,
@@ -165,7 +169,6 @@ void apiIdDataTriggerNotificationHelper(
             return notificationParams.cameraNotificationManager->triggerNotification(
                 tran,
                 notificationParams.source);
-        case ApiCommand::forcePrimaryTimeServer:
         case ApiCommand::removeAccessRights:
             //#ak no notification needed
             break;
@@ -242,6 +245,15 @@ struct UserNotificationManagerHelper
     void operator ()(const QnTransaction<Param> &tran, const NotificationParams &notificationParams)
     {
         notificationParams.userNotificationManager->triggerNotification(tran, notificationParams.source);
+    }
+};
+
+struct TimeNotificationManagerHelper
+{
+    template<typename Param>
+    void operator ()(const QnTransaction<Param> &tran, const NotificationParams &notificationParams)
+    {
+        notificationParams.timeNotificationManager->triggerNotification(tran, notificationParams.source);
     }
 };
 

@@ -58,13 +58,10 @@ private slots:
     void at_updateChunkReceived(const QString& updateId, const QByteArray& data, qint64 offset);
     void at_updateInstallationRequested(const QString& updateId);
 
-    void at_reverseConnectionRequested(const ec2::ApiReverseConnectionData& data);
-
     void at_remotePeerUnauthorized(const QnUuid& id);
 
 private:
     mutable QnMutex m_mutexAddrList;
-    const int m_serverPort;
     QnUniversalTcpListener* m_universalTcpListener;
     mutable QnMediaServerResourcePtr m_mServer;
     QSet<QnUuid> m_delayedOnlineStatus;

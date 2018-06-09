@@ -1,8 +1,9 @@
-#ifndef __PROXY_CONNECTION_H_
-#define __PROXY_CONNECTION_H_
+#pragma once
 
 #include <QtNetwork/QHostAddress>
 #include "network/universal_request_processor.h"
+#include <nx/mediaserver/server_module_aware.h>
+#include <nx/vms/network/reverse_connection_manager.h>
 
 class QnAbstractStreamDataProvider;
 class QnProxyConnectionProcessorPrivate;
@@ -16,15 +17,9 @@ class QnProxyConnectionProcessor: public QnTCPConnectionProcessor
 {
 public:
     QnProxyConnectionProcessor(
-        ec2::TransactionMessageBusAdapter* messageBus,
+        nx::vms::network::ReverseConnectionManager* reverseConnectionManager,
         QSharedPointer<nx::network::AbstractStreamSocket> socket,
         QnHttpConnectionListener* owner);
-
-    QnProxyConnectionProcessor(
-        QnProxyConnectionProcessorPrivate* priv,
-        QSharedPointer<nx::network::AbstractStreamSocket> socket,
-        QnHttpConnectionListener* owner);
-
 
     static void cleanupProxyInfo(nx::network::http::Request* request);
 
@@ -54,5 +49,3 @@ private:
 private:
     Q_DECLARE_PRIVATE(QnProxyConnectionProcessor);
 };
-
-#endif // __PROXY_CONNECTION_H_

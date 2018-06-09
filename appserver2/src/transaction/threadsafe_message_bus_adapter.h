@@ -25,7 +25,8 @@ public:
 
     virtual QSet<QnUuid> directlyConnectedClientPeers() const override;
 
-    virtual QnUuid routeToPeerVia(const QnUuid& dstPeer, int* distance) const override;
+    virtual QnUuid routeToPeerVia(
+        const QnUuid& dstPeer, int* distance, nx::network::SocketAddress* knownPeerAddress) const override;
     virtual int distanceToPeer(const QnUuid& dstPeer) const override;
 
     virtual void addOutgoingConnectionToPeer(const QnUuid& id, const nx::utils::Url& url) override;
@@ -42,8 +43,6 @@ public:
     virtual QnUbjsonTransactionSerializer* ubjsonTranSerializer() const override;
 
     virtual ConnectionGuardSharedState* connectionGuardSharedState() override;
-
-    virtual void setTimeSyncManager(TimeSynchronizationManager* timeSyncManager) override;
 
 private:
     mutable QnMutex m_mutex;

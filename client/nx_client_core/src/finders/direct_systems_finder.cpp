@@ -150,9 +150,11 @@ void QnDirectSystemsFinder::removeServer(QnUuid id)
 {
     const auto systemIt = getSystemItByServer(id);
     const auto serverIsInKnownSystem = (systemIt != m_systems.end());
-//    NX_ASSERT(serverIsInKnownSystem, Q_FUNC_INFO, "Server is not known");
     if (!serverIsInKnownSystem)
+    {
+        NX_WARNING(this, lm("Server id %1 is not known").arg(id));
         return;
+    }
 
     NX_LOGX(lm("Removed server %1 from system %2").args(id, systemIt.value()->id()), cl_logDEBUG2);
     const auto removedCount = m_serverToSystem.remove(id);

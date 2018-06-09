@@ -27,6 +27,7 @@
 #include <decoders/video/ffmpeg_video_decoder.h>
 #include <nx/debugging/abstract_visual_metadata_debugger.h>
 #include <nx/sdk/metadata/uncompressed_video_frame.h>
+#include <nx/mediaserver/server_module_aware.h>
 
 class QnMediaServerModule;
 class QnCompressedVideoData;
@@ -38,14 +39,14 @@ namespace metadata {
 class MetadataHandler;
 
 class ManagerPool final:
-    public Connective<QObject>
+    public Connective<QObject>,
+    public nx::mediaserver::ServerModuleAware
 {
     using ResourceMetadataContextMap = std::map<QnUuid, ResourceMetadataContext>;
 
     Q_OBJECT
-
 public:
-    ManagerPool(QnMediaServerModule* commonModule);
+    ManagerPool(QnMediaServerModule* serverModule);
     ~ManagerPool();
     void init();
     void stop();
@@ -187,7 +188,6 @@ private:
 
 private:
     ResourceMetadataContextMap m_contexts;
-    QnMediaServerModule* m_serverModule;
     QnMutex m_contextMutex;
     bool m_compressedFrameWarningIssued = false;
     bool m_uncompressedFrameWarningIssued = false;

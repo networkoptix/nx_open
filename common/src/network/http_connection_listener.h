@@ -96,16 +96,6 @@ public:
 
     InstanceFunc findHandler(const QByteArray& protocol, const nx::network::http::Request& request);
 
-    // Proxy support functions.
-
-    bool registerProxyReceiverConnection(
-        const QString& url, QSharedPointer<nx::network::AbstractStreamSocket> socket);
-
-    typedef std::function<void(int count)> SocketRequest;
-
-    QSharedPointer<nx::network::AbstractStreamSocket> getProxySocket(
-        const QString& guid, int timeout, const SocketRequest& socketRequest);
-
     void disableAuth();
 
     bool isProxy(const nx::network::http::Request& request);
@@ -113,38 +103,13 @@ public:
 
     QnRestProcessorPool* processorPool() { return &m_processorPool; }
 
-protected:
-    virtual void doPeriodicTasks() override;
-
 private:
     void doAddHandler(const QByteArray& protocol, const QString& path, InstanceFunc instanceFunc);
 
-    struct AwaitProxyInfo
-    {
-        explicit AwaitProxyInfo(const QSharedPointer<nx::network::AbstractStreamSocket>& socket):
-            socket(socket)
-        {
-            timer.restart();
-        }
 
-        QSharedPointer<nx::network::AbstractStreamSocket> socket;
-        QElapsedTimer timer;
-    };
-
-    struct ServerProxyPool
-    {
-        ServerProxyPool(): requested(0) {}
-
-        size_t requested;
-        QList<AwaitProxyInfo> available;
-        QElapsedTimer timer;
-    };
 
     QList<HandlerInfo> m_handlers;
     ProxyInfo m_proxyInfo;
-    QnMutex m_proxyMutex;
-    QMap<QString, ServerProxyPool> m_proxyPool;
-    QnWaitCondition m_proxyCondition;
     bool m_needAuth;
     QnRestProcessorPool m_processorPool;
 };

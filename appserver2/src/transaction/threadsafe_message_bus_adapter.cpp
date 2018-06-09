@@ -20,10 +20,13 @@ QSet<QnUuid> ThreadsafeMessageBusAdapter::directlyConnectedClientPeers() const
     return base_type::directlyConnectedClientPeers();
 }
 
-QnUuid ThreadsafeMessageBusAdapter::routeToPeerVia(const QnUuid& dstPeer, int* distance) const
+QnUuid ThreadsafeMessageBusAdapter::routeToPeerVia(
+    const QnUuid& dstPeer,
+    int* distance,
+    nx::network::SocketAddress* knownPeerAddress) const
 {
     QnMutexLocker guard(&m_mutex);
-    return base_type::routeToPeerVia(dstPeer, distance);
+    return base_type::routeToPeerVia(dstPeer, distance, knownPeerAddress);
 }
 
 int ThreadsafeMessageBusAdapter::distanceToPeer(const QnUuid& dstPeer) const
@@ -84,12 +87,6 @@ ConnectionGuardSharedState* ThreadsafeMessageBusAdapter::connectionGuardSharedSt
 {
     QnMutexLocker guard(&m_mutex);
     return base_type::connectionGuardSharedState();
-}
-
-void ThreadsafeMessageBusAdapter::setTimeSyncManager(TimeSynchronizationManager* timeSyncManager)
-{
-    QnMutexLocker guard(&m_mutex);
-    base_type::setTimeSyncManager(timeSyncManager);
 }
 
 } // namespace ec2

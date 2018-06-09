@@ -15,12 +15,10 @@
 
 #include <common/common_module.h>
 
-#include "proxy_sender_connection_processor.h"
 #include "universal_request_processor.h"
 
 QnUniversalTcpListener::QnUniversalTcpListener(
     QnCommonModule* commonModule,
-    const nx::vms::cloud_integration::CloudConnectionManager& cloudConnectionManager,
     const QHostAddress& address,
     int port,
     int maxConnections,
@@ -32,18 +30,22 @@ QnUniversalTcpListener::QnUniversalTcpListener(
         port,
         maxConnections,
         useSsl),
-    m_cloudConnectionManager(cloudConnectionManager),
     m_boundToCloud(false),
     m_httpModManager(new nx::network::http::HttpModManager())
 {
     m_cloudCredentials.serverId = commonModule->moduleGUID().toByteArray();
+}
+
+void QnUniversalTcpListener::setCloudConnectionManager(
+    const nx::vms::cloud_integration::CloudConnectionManager& cloudConnectionManager)
+{
     Qn::directConnect(
         &cloudConnectionManager, &nx::vms::cloud_integration::CloudConnectionManager::cloudBindingStatusChanged,
         this,
         [this, &cloudConnectionManager](bool /*boundToCloud*/)
-        {
-            onCloudBindingStatusChanged(cloudConnectionManager.getSystemCredentials());
-        });
+    {
+        onCloudBindingStatusChanged(cloudConnectionManager.getSystemCredentials());
+    });
     onCloudBindingStatusChanged(cloudConnectionManager.getSystemCredentials());
 }
 
@@ -51,26 +53,6 @@ QnUniversalTcpListener::~QnUniversalTcpListener()
 {
     stop();
     directDisconnectAll();
-}
-
-void QnUniversalTcpListener::addProxySenderConnections(
-    const nx::network::SocketAddress& proxyUrl,
-    int size)
-{
-    if (m_needStop)
-        return;
-
-    NX_LOG(lit("QnHttpConnectionListener: %1 reverse connection(s) to %2 is(are) needed")
-        .arg(size).arg(proxyUrl.toString()), cl_logDEBUG1);
-
-    for (int i = 0; i < size; ++i)
-    {
-        auto connect = new QnProxySenderConnection(
-            proxyUrl, commonModule()->moduleGUID(), this, needAuth());
-
-        connect->start();
-        addOwnership(connect);
-    }
 }
 
 QnTCPConnectionProcessor* QnUniversalTcpListener::createRequestProcessor(

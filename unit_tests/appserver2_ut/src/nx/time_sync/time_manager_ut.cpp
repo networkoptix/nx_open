@@ -18,34 +18,26 @@
 #include <api/runtime_info_manager.h>
 #include <common/common_module.h>
 
-#include <managers/time_manager.h>
-#include <rest/handlers/time_sync_rest_handler.h>
+#include <nx/time_sync/server_time_sync_manager.h>
 #include <settings.h>
+#include <api/model/time_reply.h>
 
-#include "misc_manager_stub.h"
-#include "transaction_message_bus_stub.h"
+#include <rest/server/json_rest_result.h>
+#include <nx_ec/ec_api.h>
+#include <nx/utils/test_support/module_instance_launcher.h>
+#include <test_support/appserver2_process.h>
+#include <nx/utils/test_support/test_options.h>
+#include <transaction/message_bus_adapter.h>
 
-namespace ec2 {
+using namespace nx::utils::test;
+
+namespace nx {
+namespace time_sync {
 namespace test {
 
-TEST(TimePriorityKey, common)
-{
-    ec2::TimePriorityKey key1;
-    key1.sequence = 1;
-    ec2::TimePriorityKey key2;
-    key2.sequence = 2;
-
-    ASSERT_TRUE(key1.hasLessPriorityThan(key2, true));
-    ASSERT_FALSE(key2.hasLessPriorityThan(key1, true));
-
-    key2.sequence = std::numeric_limits<decltype(ec2::TimePriorityKey::sequence)>::max()-1;
-    ASSERT_FALSE(key1.hasLessPriorityThan(key2, true));
-    ASSERT_TRUE(key2.hasLessPriorityThan(key1, true));
-}
-
-//-------------------------------------------------------------------------------------------------
-
 namespace {
+
+static const QString kSystemName("timeSyncTestSystem");
 
 class TestSystemClock:
     public AbstractSystemClock
@@ -88,138 +80,100 @@ private:
 
 //-------------------------------------------------------------------------------------------------
 
-class TimeSynchronizationPeer
+class TimeSynchronizationPeer: public QObject
 {
 public:
-    TimeSynchronizationPeer():
-        m_commonModule(
-            /*clientMode*/ false,
-            nx::core::access::Mode::direct),
-        m_testSystemClock(std::make_shared<TestSystemClock>()),
-        m_testSteadyClock(std::make_shared<TestSteadyClock>()),
-        m_miscManager(std::make_shared<MiscManagerStub>()),
-        m_transactionMessageBus(std::make_unique<TransactionMessageBusStub>(&m_commonModule)),
-        m_workAroundMiscDataSaverStub(
-            std::make_shared<WorkAroundMiscDataSaverStub>(m_miscManager.get())),
-        m_timeSynchronizationManager(std::make_unique<TimeSynchronizationManager>(
-            commonModule(),
-            Qn::PeerType::PT_Server,
-            &m_timerManager,
-            &m_settings,
-            m_workAroundMiscDataSaverStub,
-            m_testSystemClock,
-            m_testSteadyClock))
+    TimeSynchronizationPeer()
     {
-        m_commonModule.setModuleGUID(QnUuid::createUuid());
-
-        m_commonModule.globalSettings()->setOsTimeChangeCheckPeriod(
-            std::chrono::milliseconds(100));
-        m_commonModule.globalSettings()->setSyncTimeExchangePeriod(
-            std::chrono::seconds(1));
-
-        initializeRuntimeInfo();
-
-        m_eventLoopThread.start();
-        m_workAroundMiscDataSaverStub->moveToThread(&m_eventLoopThread);
-
-        m_timerManager.start();
+        m_testSystemClock = std::make_shared<TestSystemClock>();
+        m_testSteadyClock = std::make_shared<TestSteadyClock>();
     }
 
     ~TimeSynchronizationPeer()
     {
-        m_timeSynchronizationManager.reset();
-
-        m_eventLoopThread.exit(0);
-        m_eventLoopThread.wait();
+        m_appserver.reset();
     }
 
-    QnCommonModule* commonModule()
+    QnCommonModule* commonModule() const
     {
-        return &m_commonModule;
+        return m_appserver->moduleInstance()->commonModule();
     }
 
-    void setSynchronizeWithInternetEnabled(bool val)
+    void setSynchronizeWithInternetEnabled(bool value)
     {
-        m_commonModule.globalSettings()->setSynchronizingTimeWithInternet(val);
+        m_syncWithInternetEnabled = value;
     }
 
-    bool start()
+    bool start(bool keepDatabase = false)
     {
-        if (!startHttpServer())
-            return false;
-        m_timeSynchronizationManager->start(m_transactionMessageBus.get(), m_miscManager);
-        return true;
+        m_appserver = ec2::Appserver2Launcher::createAppserver(keepDatabase);
+
+        connect(m_appserver.get(), &ec2::Appserver2Launcher::beforeStart,
+            this,
+            [this]()
+            {
+                auto moduleInstance = dynamic_cast<ec2::Appserver2Process*>(m_appserver->moduleInstance().get());
+                connect(moduleInstance, &ec2::Appserver2Process::beforeStart,
+                    this,
+                    [this]()
+                {
+                    auto commonModule = m_appserver->moduleInstance()->commonModule();
+                    auto globalSettings = commonModule->globalSettings();
+                    globalSettings->setSynchronizingTimeWithInternet(m_syncWithInternetEnabled);
+
+                    auto timeSyncManager = m_appserver->moduleInstance()->ecConnection()->timeSyncManager();
+                    timeSyncManager->setClock(m_testSystemClock, m_testSteadyClock);
+
+                    commonModule->globalSettings()->setOsTimeChangeCheckPeriod(
+                        std::chrono::milliseconds(100));
+                    commonModule->globalSettings()->setSyncTimeExchangePeriod(
+                        std::chrono::milliseconds(100));
+
+                }, Qt::DirectConnection);
+            }, Qt::DirectConnection);
+
+
+        m_appserver->start();
+        return m_appserver->waitUntilStarted()
+            && m_appserver->moduleInstance()->createInitialData(kSystemName);
     }
 
     std::chrono::milliseconds getSyncTime() const
     {
-        return std::chrono::milliseconds(m_timeSynchronizationManager->getSyncTime());
+        auto timeSyncManager = commonModule()->ec2Connection()->timeSyncManager();
+        return std::chrono::milliseconds(timeSyncManager->getSyncTime());
     }
 
     void stop()
     {
-        m_timeSynchronizationManager.reset();
-        m_transactionMessageBus.reset();
-    }
-
-    void restart()
-    {
-        if (m_timeSynchronizationManager)
-            m_timeSynchronizationManager.reset();
-        if (m_transactionMessageBus)
-            m_transactionMessageBus.reset();
-
-        m_transactionMessageBus =
-            std::make_unique<TransactionMessageBusStub>(&m_commonModule);
-        m_timeSynchronizationManager = std::make_unique<TimeSynchronizationManager>(
-            commonModule(),
-            Qn::PeerType::PT_Server,
-            &m_timerManager,
-            &m_settings,
-            m_workAroundMiscDataSaverStub,
-            m_testSystemClock,
-            m_testSteadyClock);
-        m_timeSynchronizationManager->start(m_transactionMessageBus.get(), m_miscManager);
+        m_appserver.reset();
     }
 
     void setPrimaryPeerId(const QnUuid& peerId)
     {
-        m_timeSynchronizationManager->primaryTimeServerChanged(nx::vms::api::IdData(peerId));
+        commonModule()->globalSettings()->setPrimaryTimeServer(peerId);
+        commonModule()->globalSettings()->synchronizeNow();
     }
 
     void connectTo(TimeSynchronizationPeer* remotePeer)
     {
-        m_transactionMessageBus->addConnectionToRemotePeer(
-            peerData(),
-            remotePeer->peerData(),
-            remotePeer->apiUrl(),
-            /*isIncoming*/ false);
-
-        remotePeer->emulatePeerConnectionAccept(this);
-    }
-
-    void emulatePeerConnectionAccept(TimeSynchronizationPeer* remotePeer)
-    {
-        m_transactionMessageBus->addConnectionToRemotePeer(
-            peerData(),
-            remotePeer->peerData(),
-            remotePeer->apiUrl(),
-            /*isIncoming*/ true);
+        m_appserver->moduleInstance()->connectTo(remotePeer->m_appserver->moduleInstance().get());
     }
 
     ::ec2::ApiPeerData peerData() const
     {
         ::ec2::ApiPeerData peerData;
-        peerData.id = m_commonModule.moduleGUID();
+        peerData.id = commonModule()->moduleGUID();
         peerData.peerType = Qn::PT_Server;
         return peerData;
     }
 
     nx::utils::Url apiUrl() const
     {
+        auto endpoint = m_appserver->moduleInstance()->endpoint();
         return nx::network::url::Builder()
             .setScheme(nx::network::http::kUrlSchemeName)
-            .setEndpoint(m_httpServer.serverAddress()).toUrl();
+            .setEndpoint(endpoint).toUrl();
     }
 
     std::chrono::milliseconds getSystemTime() const
@@ -229,7 +183,7 @@ public:
 
     QnGlobalSettings* globalSettings() const
     {
-        return m_commonModule.globalSettings();
+        return commonModule()->globalSettings();
     }
 
     void shiftSystemClock(std::chrono::milliseconds shift)
@@ -243,66 +197,10 @@ public:
     }
 
 private:
-    nx::utils::StandaloneTimerManager m_timerManager;
-    QnCommonModule m_commonModule;
-    Settings m_settings;
-    nx::network::http::TestHttpServer m_httpServer;
+    ec2::Appserver2Ptr m_appserver;
+    bool m_syncWithInternetEnabled = false;
     std::shared_ptr<TestSystemClock> m_testSystemClock;
     std::shared_ptr<TestSteadyClock> m_testSteadyClock;
-    std::shared_ptr<MiscManagerStub> m_miscManager;
-    std::shared_ptr<AbstractECConnection> m_connection;
-    std::unique_ptr<TransactionMessageBusStub> m_transactionMessageBus;
-    std::shared_ptr<WorkAroundMiscDataSaverStub> m_workAroundMiscDataSaverStub;
-    std::unique_ptr<TimeSynchronizationManager> m_timeSynchronizationManager;
-    QThread m_eventLoopThread;
-
-    void initializeRuntimeInfo()
-    {
-        QnPeerRuntimeInfo localPeerInfo;
-        localPeerInfo.uuid = m_commonModule.moduleGUID();
-        localPeerInfo.data.peer.peerType = Qn::PT_Server;
-        localPeerInfo.data.peer.id = m_commonModule.moduleGUID();
-        localPeerInfo.data.peer.instanceId = m_commonModule.moduleGUID();
-        localPeerInfo.data.peer.persistentId = m_commonModule.moduleGUID();
-        m_commonModule.runtimeInfoManager()->updateLocalItem(localPeerInfo);
-    }
-
-    bool startHttpServer()
-    {
-        using namespace std::placeholders;
-
-        if (!m_httpServer.bindAndListen())
-            return false;
-
-        m_httpServer.registerRequestProcessorFunc(
-            nx::network::url::joinPath("/", TimeSynchronizationManager::kTimeSyncUrlPath.toStdString()).c_str(),
-            std::bind(&TimeSynchronizationPeer::syncTimeHttpHandler, this, _1, _2, _3, _4, _5));
-
-        return true;
-    }
-
-    void syncTimeHttpHandler(
-        nx::network::http::HttpServerConnection* const connection,
-        nx::utils::stree::ResourceContainer /*authInfo*/,
-        nx::network::http::Request request,
-        nx::network::http::Response* const response,
-        nx::network::http::RequestProcessedHandler completionHandler)
-    {
-        const auto resultCode = QnTimeSyncRestHandler::processRequest(
-            request,
-            m_timeSynchronizationManager.get(),
-            connection->socket().get());
-        if (resultCode != nx::network::http::StatusCode::ok)
-            return completionHandler(resultCode);
-
-        // Sending our time synchronization information to remote peer.
-        QnTimeSyncRestHandler::prepareResponse(
-            *m_timeSynchronizationManager,
-            m_commonModule,
-            response);
-
-        return completionHandler(nx::network::http::StatusCode::ok);
-    }
 };
 
 } // namespace
@@ -346,7 +244,7 @@ protected:
         for (int i = 0; i < peerCount; ++i)
         {
             m_connectTable[i].resize(peerCount);
-            for (int j = i+1; j < peerCount; ++j)
+            for (int j = 0; j < peerCount; ++j)
                 m_connectTable[i][j] = connectTable[i][j];
         }
 
@@ -364,6 +262,7 @@ protected:
     void givenMultipleSynchronizedPeers()
     {
         givenMultipleOfflinePeersEachWithDifferentLocalTime();
+        selectRandomPeerAsPrimary();
         waitForTimeToBeSynchronizedAcrossAllPeers();
     }
 
@@ -405,8 +304,10 @@ protected:
     void restartAllPeers()
     {
         for (const auto& peer: m_peers)
-            peer->restart();
-
+            peer->stop();
+        ec2::Appserver2Process::resetInstanceCounter();
+        for (const auto& peer : m_peers)
+            peer->start(true);
         if (m_peersConnected)
             connectEveryPeerToEachOther();
     }
@@ -424,11 +325,11 @@ protected:
                 kMinMonotonicClockSkew.count(), kMaxMonotonicClockSkew.count())));
     }
 
-    void shiftMonotonicClockOnRandomPeer()
+    void shiftLocalTimeOnNonPrimaryPeer()
     {
-        const auto randomPeerIndex =
-            nx::utils::random::number<int>(0, m_peers.size() - 1);
-        shiftMonotonicClockOnPeer(randomPeerIndex);
+        int index = (m_primaryPeerIndex + 1) % m_peers.size();
+        m_peers[index]->shiftSystemClock(
+            std::chrono::hours(nx::utils::random::number<int>(-1000, 1000)));
     }
 
     void shiftLocalTimeOnPrimaryPeer()
@@ -534,8 +435,10 @@ private:
     {
         for (int i = 0; i < m_peers.size(); ++i)
         {
-            for (int j = i + 1; j < m_peers.size(); ++j)
+            for (int j = 0; j < m_peers.size(); ++j)
             {
+                if (i == j)
+                    continue;
                 if (m_connectTable[i][j])
                     m_peers[i]->connectTo(m_peers[j].get());
             }
@@ -587,13 +490,14 @@ TEST_F(TimeSynchronization, single_offline_server_follows_local_system_clock)
 TEST_F(TimeSynchronization, multiple_peers_synchronize_time)
 {
     givenMultipleOfflinePeersEachWithDifferentLocalTime();
+    selectRandomPeerAsPrimary();
     waitForTimeToBeSynchronizedAcrossAllPeers();
 }
 
 TEST_F(TimeSynchronization, multiple_peers_synchronize_time_after_monotonic_clock_skew)
 {
     givenMultipleSynchronizedPeers();
-    shiftMonotonicClockOnRandomPeer();
+    shiftLocalTimeOnNonPrimaryPeer();
     waitForTimeToBeSynchronizedAcrossAllPeers();
 }
 
@@ -640,4 +544,5 @@ TEST_F(TimeSynchronization, synctime_follows_selected_peer_after_clock_skew_fix)
 }
 
 } // namespace test
-} // namespace ec2
+} // namespace time_sync
+} // namespace nx

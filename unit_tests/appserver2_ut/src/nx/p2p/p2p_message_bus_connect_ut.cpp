@@ -129,7 +129,7 @@ protected:
         nx::utils::ArgumentParser args(QCoreApplication::instance()->arguments());
 
         m_servers.clear();
-        m_instanceCounter = 0;
+        ec2::Appserver2Process::resetInstanceCounter();
 
         const int instanceCount = getIntParam(args, kServerCountParamName, kDefaultInstanceCount);
         const int serverPort = getIntParam(args, kServerPortParamName);

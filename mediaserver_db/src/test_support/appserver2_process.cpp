@@ -56,6 +56,9 @@
 #include "cloud_integration/cloud_connector.h"
 #include "ec2_connection_processor.h"
 #include <local_connection_factory.h>
+#include <api/model/time_reply.h>
+#include <nx/utils/test_support/test_options.h>
+#include <rest/handlers/sync_time_rest_handler.h>
 
 static int registerQtResources()
 {
@@ -64,6 +67,8 @@ static int registerQtResources()
 }
 
 namespace ec2 {
+
+int m_instanceCounter = 0;
 
 //-------------------------------------------------------------------------------------------------
 // class Appserver2Process
@@ -124,14 +129,22 @@ int Appserver2Process::exec()
 
     qnStaticCommon->setModuleShortId(m_commonModule->moduleGUID(), settings.moduleInstance());
 
+    QnSimpleHttpConnectionListener tcpListener(
+        m_commonModule.get(),
+        QHostAddress::Any,
+        settings.endpoint().port,
+        QnTcpListener::DEFAULT_MAX_CONNECTIONS,
+        true);
+
     AuditManager auditManager(m_commonModule.get());
+    using namespace nx::vms::network;
 
     std::unique_ptr<ec2::LocalConnectionFactory>
         ec2ConnectionFactory(new ec2::LocalConnectionFactory(
             m_commonModule.get(),
             Qn::PT_Server,
-            nx::utils::TimerManager::instance(),
-            settings.isP2pMode()));
+            settings.isP2pMode(),
+            &tcpListener));
 
     const nx::utils::Url dbUrl = nx::utils::Url::fromLocalFile(settings.dbFilePath());
 
@@ -173,13 +186,6 @@ int Appserver2Process::exec()
         QnMediaServerResourcePtr(),
         []() { return false; });
 
-    QnSimpleHttpConnectionListener tcpListener(
-        m_commonModule.get(),
-        QHostAddress::Any,
-        settings.endpoint().port,
-        QnTcpListener::DEFAULT_MAX_CONNECTIONS,
-        true);
-
     {
         QnMutexLocker lk(&m_mutex);
         m_tcpListener = &tcpListener;
@@ -201,10 +207,11 @@ int Appserver2Process::exec()
     if (!tcpListener.bindToLocalAddress())
         return 1;
 
-    tcpListener.start();
-
-    m_commonModule->messageProcessor()->init(ec2Connection);
     m_ecConnection = ec2Connection.get();
+    emit beforeStart();
+
+    tcpListener.start();
+    m_commonModule->messageProcessor()->init(ec2Connection);
 
     processStartResult = true;
     triggerOnStartedEventHandlerGuard.fire();
@@ -422,12 +429,26 @@ void Appserver2Process::registerHttpHandlers(
                 result->setError(QnRestResult::CantProcessRequest);
             return resultCode;
         });
+    
+    m_tcpListener->addHandler<JsonConnectionProcessor>("HTTP",
+        nx::time_sync::TimeSyncManager::kTimeSyncUrlPath.mid(1), //< remove '/'
+        [](const nx::network::http::Request& request, QnHttpConnectionListener* owner, QnJsonRestResult* result)
+    {
+        auto timeSyncManager = owner->commonModule()->ec2Connection()->timeSyncManager();
+        result->setReply(rest::handlers::SyncTimeRestHandler::execute(timeSyncManager));
+        return nx::network::http::StatusCode::ok;
+    });
 
     m_tcpListener->disableAuthForPath("/api/getNonce");
     m_tcpListener->disableAuthForPath("/api/moduleInformation");
 
     m_tcpListener->addHandler<QnRestConnectionProcessor>("HTTP", "ec2");
     ec2ConnectionFactory->registerTransactionListener(m_tcpListener);
+}
+
+void Appserver2Process::resetInstanceCounter()
+{
+    m_instanceCounter = 0;
 }
 
 void Appserver2Process::addSelfServerResource(
@@ -438,11 +459,13 @@ void Appserver2Process::addSelfServerResource(
     m_commonModule->resourcePool()->addResource(server);
     server->setStatus(Qn::Online);
     server->setServerFlags(Qn::SF_HasPublicIP);
+    server->setName(QString::number(m_instanceCounter));
 
     m_commonModule->bindModuleInformation(server);
 
     ::ec2::ApiMediaServerData apiServer;
     apiServer.id = commonModule()->moduleGUID();
+    apiServer.name = server->getName();
     ::ec2::fromResourceToApi(server, apiServer);
     if (ec2Connection->getMediaServerManager(Qn::kSystemAccess)->saveSync(apiServer)
         != ec2::ErrorCode::ok)
@@ -450,48 +473,138 @@ void Appserver2Process::addSelfServerResource(
     }
 }
 
-//-------------------------------------------------------------------------------------------------
-// class Appserver2ProcessPublic
-
-Appserver2ProcessPublic::Appserver2ProcessPublic(int argc, char **argv):
-    m_impl(std::make_unique<Appserver2Process>(argc, argv))
+bool initResourceTypes(ec2::AbstractECConnection* ec2Connection)
 {
+    QList<QnResourceTypePtr> resourceTypeList;
+    const ec2::ErrorCode errorCode = ec2Connection->getResourceManager(Qn::kSystemAccess)->getResourceTypesSync(&resourceTypeList);
+    if (errorCode != ec2::ErrorCode::ok)
+        return false;
+    qnResTypePool->replaceResourceTypeList(resourceTypeList);
+    return true;
 }
 
-void Appserver2ProcessPublic::pleaseStop()
+bool initUsers(ec2::AbstractECConnection* ec2Connection)
 {
-    m_impl->pleaseStop();
+    ec2::ApiUserDataList users;
+    const ec2::ErrorCode errorCode = ec2Connection->getUserManager(Qn::kSystemAccess)->getUsersSync(&users);
+    auto messageProcessor = ec2Connection->commonModule()->messageProcessor();
+    if (errorCode != ec2::ErrorCode::ok)
+        return false;
+    for (const auto &user : users)
+        messageProcessor->updateResource(user, ec2::NotificationSource::Local);
+    return true;
 }
 
-void Appserver2ProcessPublic::setOnStartedEventHandler(
-    nx::utils::MoveOnlyFunc<void(bool)> handler)
+bool Appserver2Process::createInitialData(const QString& systemName)
 {
-    m_impl->setOnStartedEventHandler(std::move(handler));
+    const auto connection = ecConnection();
+    if (connection == nullptr)
+        return false;
+    auto messageProcessor = commonModule()->messageProcessor();
+
+    if (!initResourceTypes(connection))
+        return false;
+    if (!initUsers(connection))
+        return false;
+
+    const auto settings = connection->commonModule()->globalSettings();
+    settings->setSystemName(systemName);
+    settings->setLocalSystemId(guidFromArbitraryData(systemName));
+    settings->setAutoDiscoveryEnabled(false);
+
+    //read server list
+    ec2::ApiMediaServerDataList mediaServerList;
+    auto resultCode =
+        connection->getMediaServerManager(Qn::kSystemAccess)->getServersSync(&mediaServerList);
+    if (resultCode != ec2::ErrorCode::ok)
+        return false;
+    for (const auto &mediaServer : mediaServerList)
+        messageProcessor->updateResource(mediaServer, ec2::NotificationSource::Local);
+
+    //read camera list
+    nx::vms::api::CameraDataList cameraList;
+    resultCode = 
+        connection->getCameraManager(Qn::kSystemAccess)->getCamerasSync(&cameraList);
+    if (resultCode != ec2::ErrorCode::ok)
+        return false;
+
+    for (const auto &camera : cameraList)
+        messageProcessor->updateResource(camera, ec2::NotificationSource::Local);
+
+    ec2::ApiMediaServerData serverData;
+    auto resTypePtr = qnResTypePool->getResourceTypeByName("Server");
+    if (resTypePtr.isNull())
+        return false;
+    serverData.typeId = resTypePtr->getId();
+    serverData.id = commonModule()->moduleGUID();
+    serverData.authKey = QnUuid::createUuid().toString();
+    serverData.name = lm("server %1").arg(serverData.id);
+    if (resTypePtr.isNull())
+        return false;
+    serverData.typeId = resTypePtr->getId();
+
+    auto serverManager = connection->getMediaServerManager(Qn::kSystemAccess);
+    resultCode = serverManager->saveSync(serverData);
+    if (resultCode != ec2::ErrorCode::ok)
+        return false;
+
+    auto ownServer = commonModule()->resourcePool()->getResourceById(serverData.id);
+    if (!ownServer)
+        return false;
+    ownServer->setStatus(Qn::Online);
+
+    return true;
 }
 
-int Appserver2ProcessPublic::exec()
+void Appserver2Process::connectTo(const Appserver2Process* dstServer)
 {
-    return m_impl->exec();
+    const auto addr = dstServer->endpoint();
+    auto peerId = dstServer->commonModule()->moduleGUID();
+
+    nx::utils::Url url = lit("http://%1:%2/ec2/messageBus").arg(addr.address.toString()).arg(addr.port);
+    ecConnection()->messageBus()->
+        addOutgoingConnectionToPeer(peerId, url);
 }
 
-const Appserver2Process* Appserver2ProcessPublic::impl() const
-{
-    return m_impl.get();
-}
+// ----------------------------- Appserver2Launcher ----------------------------------------------
 
-ec2::AbstractECConnection* Appserver2ProcessPublic::ecConnection()
+std::unique_ptr<ec2::Appserver2Launcher> Appserver2Launcher::createAppserver(
+    bool keepDbFile,
+    quint16 baseTcpPort)
 {
-    return m_impl->ecConnection();
-}
+    auto tmpDir = nx::utils::TestOptions::temporaryDirectoryPath();
+    if (tmpDir.isEmpty())
+        tmpDir = QDir::homePath();
+    tmpDir += lm("/ec2_server_sync_ut.data%1").arg(m_instanceCounter);
+    if (!keepDbFile)
+        QDir(tmpDir).removeRecursively();
 
-nx::network::SocketAddress Appserver2ProcessPublic::endpoint() const
-{
-    return m_impl->endpoint();
-}
+    Appserver2Ptr result(new Appserver2Launcher());
+    auto guid = guidFromArbitraryData(lm("guid_hash%1").arg(m_instanceCounter));
 
-QnCommonModule* Appserver2ProcessPublic::commonModule() const
-{
-    return m_impl->commonModule();
+    const QString dbFileArg = lit("--dbFile=%1").arg(tmpDir);
+    result->addArg(dbFileArg.toStdString().c_str());
+
+    const QString p2pModeArg = lit("--p2pMode=1");
+    result->addArg(p2pModeArg.toStdString().c_str());
+
+    const QString instanceArg = lit("--moduleInstance=%1").arg(m_instanceCounter);
+    result->addArg(instanceArg.toStdString().c_str());
+    const QString guidArg = lit("--moduleGuid=%1").arg(guid.toString());
+    result->addArg(guidArg.toStdString().c_str());
+
+    // Some p2p synchronization tests rely on broken authentication in appserver2.
+    result->addArg("--disableAuth");
+
+    if (baseTcpPort)
+    {
+        const QString guidArg = lit("--endpoint=0.0.0.0:%1").arg(baseTcpPort + m_instanceCounter);
+        result->addArg(guidArg.toStdString().c_str());
+    }
+
+    ++m_instanceCounter;
+
+    return result;
 }
 
 }   // namespace ec2

@@ -1,0 +1,46 @@
+#include "set_primary_time_server_rest_handler.h"
+
+#include <rest/server/rest_connection_processor.h>
+#include <common/common_module.h>
+#include <nx_ec/ec_api.h>
+#include <nx/time_sync/time_sync_manager.h>
+#include <core/resource_management/resource_pool.h>
+#include <api/global_settings.h>
+#include <core/resource/media_server_resource.h>
+
+namespace rest {
+namespace handlers {
+
+int SetPrimaryTimeServerRestHandler::executeGet(
+    const QString& /*path*/,
+    const QnRequestParams& params,
+    QnJsonRestResult& result,
+    const QnRestConnectionProcessor* owner)
+{
+    auto timeSyncManager = owner->commonModule()->ec2Connection()->timeSyncManager();
+    result = execute(timeSyncManager, QnUuid(params.value("id")));
+    return nx::network::http::StatusCode::ok;
+}
+
+QnJsonRestResult SetPrimaryTimeServerRestHandler::execute(
+    nx::time_sync::TimeSyncManager* timeSyncManager, const QnUuid& id)
+{
+    auto commonModule = timeSyncManager->commonModule();
+    auto server = commonModule->resourcePool()->getResourceById<QnMediaServerResource>(id);
+    QnJsonRestResult result;
+    if (!server && !id.isNull())
+    {
+        result.setError(QnRestResult::InvalidParameter, 
+            lit("Mediaserver with Id '%1' is not found.").arg(id.toString()));
+        return result;
+    }
+    
+    auto settings = commonModule->globalSettings();
+    settings->setPrimaryTimeServer(id);
+    settings->setSynchronizingTimeWithInternet(id.isNull());
+    settings->synchronizeNow();
+    return result;
+}
+
+} // namespace handlers
+} // namespace rest

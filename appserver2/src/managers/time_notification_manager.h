@@ -1,6 +1,13 @@
 #pragma once
 
 #include <nx_ec/ec_api.h>
+#include <transaction/transaction.h>
+
+namespace nx {
+namespace time_sync {
+class TimeSyncManager;
+}
+}
 
 namespace ec2
 {
@@ -8,10 +15,14 @@ namespace ec2
 class QnTimeNotificationManager : public AbstractTimeNotificationManager
 {
 public:
-    QnTimeNotificationManager(TimeSynchronizationManager* timeSyncManager);
-    ~QnTimeNotificationManager();
-private:
-    QPointer<TimeSynchronizationManager> m_timeSyncManager;
+    QnTimeNotificationManager(nx::time_sync::TimeSyncManager* timeSyncManager);
+    virtual ~QnTimeNotificationManager() override {}
+
+    void triggerNotification(
+        const QnTransaction<ApiPeerSyncTimeData> &transaction,
+        NotificationSource source);
 };
+
+typedef std::shared_ptr<QnTimeNotificationManager> QnTimeNotificationManagerPtr;
 
 } // namespace ec2

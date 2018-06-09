@@ -18,21 +18,22 @@ std::tuple<ResultType> makeSyncCall(
     return std::make_tuple(future.get());
 }
 
-template<typename ResultType, typename OutArg1>
-std::tuple<ResultType, OutArg1> makeSyncCall(
-    std::function<void(std::function<void(ResultType, OutArg1)>)> function)
+template<typename ResultType, typename... OutArgs>
+std::tuple<ResultType, OutArgs...> makeSyncCall(
+    std::function<void(std::function<void(ResultType, OutArgs...)>)> function)
 {
     nx::utils::promise<ResultType> promise;
     auto future = promise.get_future();
-    OutArg1 result;
+    std::tuple<OutArgs...> resultArgs;
     function(
-        [&promise, &result](ResultType resCode, OutArg1 outArg1)
+        [&promise, &resultArgs](ResultType resCode, OutArgs... args)
         {
-            result = std::move(outArg1);
+            resultArgs = std::move(args...);
             promise.set_value(resCode);
         });
     future.wait();
-    return std::make_tuple(future.get(), std::move(result));
+    ResultType resultValue = future.get();
+    return std::tuple_cat(std::tie(resultValue), std::move(resultArgs));
 }
 
 template<typename ResultType, typename OutArg1, typename FuncPtr, typename Arg1, typename ... Args>
