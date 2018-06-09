@@ -45,7 +45,7 @@ def determine_package_versions(
         "gstreamer": "1.0",
         "glib": "2.0",
         "deepstream": "0.1",
-        "help": customization + "-" + short_release_version(release_version),
+        "help": customization + "-3.2",
         "server-external": release_version,
         "certificates": customization,
     }

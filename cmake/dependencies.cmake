@@ -17,6 +17,7 @@ set(sync_command ${PYTHON_EXECUTABLE} ${CMAKE_SOURCE_DIR}/sync_dependencies.py
     --packages-dir=${PACKAGES_DIR}
     --target=${rdep_target}
     --release-version=${releaseVersion}
+    --customization=${customization}
     --cmake-include-file=${cmake_include_file}
 )
 
