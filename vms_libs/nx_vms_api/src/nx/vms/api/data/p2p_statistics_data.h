@@ -9,7 +9,7 @@ namespace nx {
 namespace vms {
 namespace api {
 
-struct P2pStatisticsData: public Data
+struct NX_VMS_API P2pStatisticsData: public Data
 {
     qint64 totalBytesSent = 0;
     qint64 totalDbData = 0;
