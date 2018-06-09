@@ -223,6 +223,36 @@ TimePeriodType periodType(const QnTimePeriod& period)
     return NormalTimePeriod;
 }
 
+bool canExportPeriods(
+    const QnResourceList& resources,
+    const QnTimePeriod& period,
+    QnWorkbenchContext* context)
+{
+    const auto cameraManager = qnClientModule->cameraDataManager();
+    const auto accessController = context->accessController();
+    return std::any_of(
+        resources.cbegin(),
+        resources.cend(),
+        [&](const auto& resource)
+        {
+            const auto media = resource.dynamicCast<QnMediaResource>();
+            if (!media)
+                return false;
+
+            if (resource->hasFlags(Qn::still_image))
+                return false;
+
+            const auto loader = cameraManager->loader(media, false);
+            const auto hasPeriods = !resource->hasFlags(Qn::periods)
+                || (loader && loader->periods(Qn::RecordingContent).intersects(period));
+
+            if (!hasPeriods)
+                return false;
+
+            return accessController->hasPermissions(resource, Qn::ExportPermission);
+        });
+}
+
 } // namespace
 
 Condition::Condition()
@@ -761,60 +791,6 @@ ActionVisibility TimePeriodCondition::check(const Parameters& parameters, QnWork
     return m_nonMatchingVisibility;
 }
 
-ActionVisibility ExportCondition::check(const Parameters& parameters, QnWorkbenchContext* context)
-{
-    const bool hasBookmark = parameters.hasArgument(Qn::CameraBookmarkRole);
-    const bool hasPeriod = parameters.hasArgument(Qn::TimePeriodRole);
-
-    QnTimePeriod period;
-    QnResourceList resources;
-    if (hasBookmark)
-    {
-        const auto bookmark = parameters.argument<QnCameraBookmark>(Qn::CameraBookmarkRole);
-        resources.push_back(context->resourcePool()->getResourceById(bookmark.cameraId));
-        period = QnTimePeriod(bookmark.startTimeMs, bookmark.durationMs);
-    }
-    else if (hasPeriod)
-    {
-        resources = ParameterTypes::resources(context->display()->widgets());
-        period = parameters.argument<QnTimePeriod>(Qn::TimePeriodRole);
-    }
-    else
-    {
-        return InvisibleAction;
-    }
-
-    if (periodType(period) != NormalTimePeriod)
-        return DisabledAction;
-
-    auto errorLevel = InvisibleAction;
-    const auto cameraManager = qnClientModule->cameraDataManager();
-    const auto accessController = context->accessController();
-    for (const auto& resource: resources)
-    {
-        const auto media = resource.dynamicCast<QnMediaResource>();
-        if (!media)
-            continue;
-
-        if (resource->hasFlags(Qn::still_image))
-            continue;
-
-        const auto loader = cameraManager->loader(media, false);
-        const auto hasPeriods = !resource-> hasFlags(Qn::periods)
-            || (loader && loader->periods(Qn::RecordingContent).intersects(period));
-
-        if (!hasPeriods)
-            continue;
-
-        if (accessController->hasPermissions(resource, Qn::ExportPermission))
-            return EnabledAction;
-
-        errorLevel = DisabledAction;
-    }
-
-    return errorLevel;
-}
-
 ActionVisibility AddBookmarkCondition::check(const Parameters& parameters, QnWorkbenchContext* context)
 {
     if (!parameters.hasArgument(Qn::TimePeriodRole))
@@ -822,10 +798,10 @@ ActionVisibility AddBookmarkCondition::check(const Parameters& parameters, QnWor
 
     QnTimePeriod period = parameters.argument<QnTimePeriod>(Qn::TimePeriodRole);
     if (periodType(period) != NormalTimePeriod)
-        return DisabledAction;
+        return InvisibleAction;
 
     if (!context->workbench()->item(Qn::CentralRole))
-        return DisabledAction;
+        return InvisibleAction;
 
     QnResourcePtr resource = parameters.resource();
     if (!resource->flags().testFlag(Qn::live))
@@ -835,7 +811,7 @@ ActionVisibility AddBookmarkCondition::check(const Parameters& parameters, QnWor
     {
         QnTimePeriodList periods = parameters.argument<QnTimePeriodList>(Qn::TimePeriodsRole);
         if (!periods.intersects(period))
-            return DisabledAction;
+            return InvisibleAction;
     }
 
     return EnabledAction;
@@ -872,7 +848,7 @@ ActionVisibility PreviewCondition::check(const Parameters& parameters, QnWorkben
     if (auto camera = resource.dynamicCast<QnSecurityCamResource>())
     {
         if (camera->isDtsBased())
-            return DisabledAction;
+            return InvisibleAction;
     }
 
     const bool isPanoramic = media->getVideoLayout()->channelCount() > 1;
@@ -892,7 +868,7 @@ ActionVisibility PreviewCondition::check(const Parameters& parameters, QnWorkben
             return InvisibleAction;
 
        if (!periods.intersects(period))
-           return DisabledAction;
+           return InvisibleAction;
 
        return EnabledAction;
     }
@@ -901,14 +877,14 @@ ActionVisibility PreviewCondition::check(const Parameters& parameters, QnWorkben
 
     /// If parameters contain periods it means we need current selected item
     if (containsAvailablePeriods && !context->workbench()->item(Qn::CentralRole))
-        return DisabledAction;
+        return InvisibleAction;
 
     if (containsAvailablePeriods && resource->hasFlags(Qn::sync))
     {
         const auto period = parameters.argument<QnTimePeriod>(Qn::TimePeriodRole);
         const auto periods = parameters.argument<QnTimePeriodList>(Qn::TimePeriodsRole);
         if (!periods.intersects(period))
-            return DisabledAction;
+            return InvisibleAction;
     }
 
     return EnabledAction;
@@ -1802,6 +1778,44 @@ ConditionWrapper syncIsForced()
         [](const Parameters& /*parameters*/, QnWorkbenchContext* context)
         {
             return context->navigator()->syncIsForced();
+        });
+}
+
+ConditionWrapper canExportLayout()
+{
+    return new CustomBoolCondition(
+        [](const Parameters& parameters, QnWorkbenchContext* context)
+        {
+            if (!parameters.hasArgument(Qn::TimePeriodRole))
+                return false;
+
+            const auto period = parameters.argument<QnTimePeriod>(Qn::TimePeriodRole);
+            if (periodType(period) != NormalTimePeriod)
+                return false;
+            const auto resources = ParameterTypes::resources(context->display()->widgets());
+            return canExportPeriods(resources, period, context);
+        });
+}
+
+
+ConditionWrapper canExportBookmark()
+{
+    return new CustomBoolCondition(
+        [](const Parameters& parameters, QnWorkbenchContext* context)
+        {
+            if (!parameters.hasArgument(Qn::CameraBookmarkRole))
+                return false;
+
+            const auto bookmark = parameters.argument<QnCameraBookmark>(Qn::CameraBookmarkRole);
+
+            const QnTimePeriod period(bookmark.startTimeMs, bookmark.durationMs);
+            if (periodType(period) != NormalTimePeriod)
+                return false;
+
+            const QnResourceList resources{
+                context->resourcePool()->getResourceById(bookmark.cameraId)
+            };
+            return canExportPeriods(resources, period, context);
         });
 }
 
