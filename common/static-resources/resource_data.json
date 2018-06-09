@@ -592,7 +592,8 @@
                 "Sony|SNT-EX104",
                 "Sony|SNT-EX154",
                 "Sony|SNT-EP154",
-                "Dahua|DHI-HCVR7108H*"
+                "Dahua|DHI-HCVR7108H*",
+                "Siqura|EVE FOUR"
             ],
             "analogEncoder": true
         },
