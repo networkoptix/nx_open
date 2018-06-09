@@ -26,7 +26,6 @@
 #include "nx_ec/data/api_tran_state_data.h"
 #include "nx_ec/data/api_full_info_data.h"
 #include "nx_ec/data/api_discovery_data.h"
-#include "nx_ec/data/api_routing_data.h"
 #include "nx_ec/data/api_system_name_data.h"
 #include "nx_ec/data/api_runtime_data.h"
 #include "nx_ec/data/api_peer_system_time_data.h"

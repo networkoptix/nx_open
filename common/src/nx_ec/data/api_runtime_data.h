@@ -3,7 +3,6 @@
 #include "api_globals.h"
 #include "api_data.h"
 #include "api_peer_data.h"
-#include "api_routing_data.h"
 #include "nx/utils/latin1_array.h"
 #include <nx/fusion/model_functions_fwd.h>
 
@@ -32,7 +31,7 @@ struct ApiRuntimeData: nx::vms::api::DataWithVersion
      * This operator must not be replaced with fusion implementation as it skips brand and
      * customization checking.
      */
-    bool operator==(const ApiRuntimeData& other) const 
+    bool operator==(const ApiRuntimeData& other) const
     {
         return version == other.version
             && peer == other.peer

@@ -5,7 +5,6 @@
 #include <nx/vms/api/data/videowall_data.h>
 #include <nx/vms/api/data/webpage_data.h>
 #include <nx_ec/data/api_discovery_data.h>
-#include <nx_ec/data/api_routing_data.h>
 #include <nx_ec/data/api_system_name_data.h>
 #include <nx_ec/data/api_peer_data.h>
 #include <nx_ec/data/api_runtime_data.h>
