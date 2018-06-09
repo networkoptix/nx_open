@@ -171,7 +171,7 @@ struct WorkbenchExportHandler::Private
                 if (QFileInfo::exists(filename.completeFileName()))
                 {
                     if (quiet || !QnFileMessages::confirmOverwrite(
-                        q->mainWindow(),
+                        q->mainWindowWidget(),
                         filename.completeFileName()))
                     {
                         return false;
