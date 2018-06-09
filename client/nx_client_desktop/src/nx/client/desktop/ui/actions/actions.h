@@ -975,6 +975,11 @@ enum IDType
     ExportVideoAction,
 
     /**
+     * Exports selected bookmark.
+     */
+    ExportBookmarkAction,
+
+    /**
      * Bookmark selected range.
      */
     AddCameraBookmarkAction,

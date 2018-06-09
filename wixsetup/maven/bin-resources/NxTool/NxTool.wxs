@@ -68,6 +68,9 @@
                 <File Id="Qt5Quick.dll" Name="Qt5Quick.dll" Source="$(var.QtDir)\Qt5Quick.dll" DiskId="1"  />
             </Component>
             <Component>
+                <File Id="Qt5Widgets.dll" Name="Qt5Widgets.dll" Source="$(var.QtDir)\Qt5Widgets.dll" DiskId="1"  />
+            </Component>
+            <Component>
                 <File Id="icudt58.dll" Name="icudt58.dll" Source="$(var.QtDir)\icudt58.dll"  />
             </Component>
             <Component>

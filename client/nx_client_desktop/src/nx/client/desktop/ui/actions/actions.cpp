@@ -169,6 +169,14 @@ void initialize(Manager* manager, Action* root)
         .requiredGlobalPermission(Qn::GlobalAdminPermission)
         .text(ContextMenu::tr("Cameras to Backup..."));
 
+    factory(AcknowledgeEventAction)
+        .mode(DesktopMode)
+        .flags(SingleTarget | ResourceTarget)
+        .requiredTargetPermissions(Qn::ViewContentPermission)
+        .requiredGlobalPermission(Qn::GlobalManageBookmarksPermission)
+        .condition(condition::hasFlags(Qn::live_cam, MatchMode::ExactlyOne)
+            && !condition::isSafeMode());
+
     factory(StartVideoWallControlAction)
         .flags(Tree | VideoWallReviewScene | SingleTarget | MultiTarget | VideoWallItemTarget)
         .requiredGlobalPermission(Qn::GlobalControlVideoWallPermission)
@@ -722,7 +730,14 @@ void initialize(Manager* manager, Action* root)
     factory(BeforeExitAction)
         .flags(NoTarget);
 
-    /* Slider actions. */
+
+//-------------------------------------------------------------------------------------------------
+// Slider actions.
+
+
+//-------------------------------------------------------------------------------------------------
+// Selection actions section.
+
     factory(StartTimeSelectionAction)
         .flags(Slider | SingleTarget)
         .text(ContextMenu::tr("Mark Selection Start"))
@@ -747,12 +762,12 @@ void initialize(Manager* manager, Action* root)
         .text(ContextMenu::tr("Zoom to Selection"))
         .condition(new TimePeriodCondition(NormalTimePeriod, InvisibleAction));
 
-    factory(AcknowledgeEventAction)
-        .flags(SingleTarget | ResourceTarget)
-        .requiredTargetPermissions(Qn::ViewContentPermission)
-        .requiredGlobalPermission(Qn::GlobalManageBookmarksPermission)
-        .condition(condition::hasFlags(Qn::live_cam, MatchMode::ExactlyOne)
-            && !condition::isSafeMode());
+    factory()
+        .flags(Slider)
+        .separator();
+
+//-------------------------------------------------------------------------------------------------
+// Bookmarks actions section.
 
     factory(AddCameraBookmarkAction)
         .flags(Slider | SingleTarget)
@@ -790,22 +805,30 @@ void initialize(Manager* manager, Action* root)
             && ConditionWrapper(new RemoveBookmarksCondition())
         );
 
+    factory(ExportBookmarkAction)
+        .flags(Slider | SingleTarget | MultiTarget | NoTarget | WidgetTarget | ResourceTarget)
+        .text(ContextMenu::tr("Export Bookmark..."))
+        .condition(condition::canExportBookmark());
+
     factory()
         .flags(Slider)
         .separator();
 
+//-------------------------------------------------------------------------------------------------
+// Selected time period actions section.
+
     factory(ExportVideoAction)
         .flags(Slider | SingleTarget | MultiTarget | NoTarget | WidgetTarget | ResourceTarget)
         .text(ContextMenu::tr("Export Video..."))
-        .conditionalText(ContextMenu::tr("Export Bookmark..."),
-            condition::hasArgument(Qn::CameraBookmarkRole))
-        .condition(ConditionWrapper(new ExportCondition()));
+        .condition(condition::canExportLayout());
 
     factory(ThumbnailsSearchAction)
         .flags(Slider | Scene | SingleTarget)
         .mode(DesktopMode)
         .text(ContextMenu::tr("Preview Search..."))
         .condition(new PreviewCondition());
+
+//-------------------------------------------------------------------------------------------------
 
     factory()
         .flags(Tree | SingleTarget | ResourceTarget)

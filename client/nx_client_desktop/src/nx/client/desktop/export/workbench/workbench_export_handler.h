@@ -10,6 +10,7 @@ namespace nx {
 namespace client {
 namespace desktop {
 
+class ExportSettingsDialog;
 struct ExportProcessInfo;
 
 /**
@@ -30,6 +31,9 @@ private:
     void exportProcessFinished(const ExportProcessInfo& info);
 
     void handleExportVideoAction();
+    void handleExportBookmarkAction();
+
+    void startExportFromDialog(ExportSettingsDialog* dialog);
 
 private:
     struct Private;
