@@ -7,15 +7,15 @@ type MyTesting struct {
 	*testing.T
 }
 
-func (t *MyTesting) AssertEqual(expected int, actual int, msg string) {
+func (t *MyTesting) AssertEqual(expected interface{}, actual interface{}, msg string) {
 	if actual != expected {
-		t.Errorf("Assertion fail (%s). Expected (%d) equal to (%d)", msg, expected, actual)
+		t.Errorf("Assertion fail (%s). Expected (%v) equal to (%v)", msg, expected, actual)
 	}
 }
 
-func (t *MyTesting) AssertNotEqual(expected int, actual int, msg string) {
+func (t *MyTesting) AssertNotEqual(expected interface{}, actual interface{}, msg string) {
 	if actual == expected {
-		t.Errorf("Assertion fail (%s). Expected (%d) not equal to (%d)", msg, expected, actual)
+		t.Errorf("Assertion fail (%s). Expected (%v) not equal to (%v)", msg, expected, actual)
 	}
 }
 

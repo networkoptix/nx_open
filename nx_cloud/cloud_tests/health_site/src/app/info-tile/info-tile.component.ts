@@ -35,7 +35,7 @@ export class InfoTileComponent implements OnInit {
                 return item.aggregate.find(aggr =>
                     this.matchItems(aggr, metric)
                 );
-            }).reduce((total, elm, idx, array) => {
+            }).reduce((total, elm) => {
                 let alert = '';
                 if (elm.value === 0) {
                     alert = item.aggregate.find(aggr =>
@@ -74,17 +74,14 @@ export class InfoTileComponent implements OnInit {
             })[0];
 
             if (section.subsections) {
-                let idx = 0;
-                section.subsections.forEach((subsection) => {
+                section.subsections.forEach((subsection, idx) => {
                     let subitem = this.items.filter(item => {
-
                         if (item.name === subsection.dimension && item.dimensions && item.dimensions.host === subsection.key) {
                             return item;
                         }
                     })[0];
 
                     section.subsections[idx] = {...subsection, ...subitem}; // extend subsection info
-                    idx++;
                 });
             }
 

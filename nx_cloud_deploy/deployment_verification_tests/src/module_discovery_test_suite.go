@@ -18,6 +18,8 @@ type CloudModules struct {
 	} `xml:"set"`
 }
 
+const moduleDiscoverySuiteName string = "ModuleDiscovery"
+
 func (cloudModules *CloudModules) getModuleUrl(name string) (*url.URL, error) {
 	for _, module := range cloudModules.Modules {
 		if module.Name == name {
@@ -43,8 +45,33 @@ func NewModuleDiscoveryTestSuite(configuration *Configuration) *ModuleDiscoveryT
 	return &ModuleDiscoveryTestSuite{configuration}
 }
 
+func (testSuite *ModuleDiscoveryTestSuite) testServiceUp() TestSuiteReport {
+	report := TestSuiteReport{name: moduleDiscoverySuiteName}
+	report.testReports = append(report.testReports, TestReport{})
+	report.testReports[0].name = "Service up"
+
+	url := testSuite.prepareUrl("/api/cloud_modules.xml")
+
+	response, err := http.Get(url)
+	if err != nil {
+		report.testReports[0].success = false
+		report.testReports[0].err = err
+		return report
+	}
+
+	if response.StatusCode != http.StatusOK {
+		report.testReports[0].success = false
+		report.testReports[0].err =
+			fmt.Errorf("Error. Got %d status from %s", response.StatusCode, url)
+		return report
+	}
+
+	report.testReports[0].success = true
+	return report
+}
+
 func (testSuite *ModuleDiscoveryTestSuite) run() TestSuiteReport {
-	testSuiteReport := TestSuiteReport{}
+	testSuiteReport := TestSuiteReport{name: moduleDiscoverySuiteName}
 
 	testSuiteReport.testReports = append(testSuiteReport.testReports, testSuite.verifyEveryModuleIsAccesible())
 
@@ -72,11 +99,7 @@ func (testSuite *ModuleDiscoveryTestSuite) verifyEveryModuleIsAccesible() TestRe
 }
 
 func (testSuite *ModuleDiscoveryTestSuite) fetchCloudModulesXml() (CloudModules, error) {
-	addr := testSuite.configuration.instanceHostname
-	if testSuite.configuration.httpPort != 0 {
-		addr += fmt.Sprintf(":%d", testSuite.configuration.httpPort)
-	}
-	url := "http://" + addr + "/api/cloud_modules.xml"
+	url := testSuite.prepareUrl("/api/cloud_modules.xml")
 
 	response, err := http.Get(url)
 	if err != nil {
@@ -98,6 +121,14 @@ func (testSuite *ModuleDiscoveryTestSuite) fetchCloudModulesXml() (CloudModules,
 	}
 
 	return cloudModules, nil
+}
+
+func (testSuite *ModuleDiscoveryTestSuite) prepareUrl(path string) string {
+	addr := testSuite.configuration.instanceHostname
+	if testSuite.configuration.httpPort != 0 {
+		addr += fmt.Sprintf(":%d", testSuite.configuration.httpPort)
+	}
+	return "http://" + addr + path
 }
 
 func (testSuite *ModuleDiscoveryTestSuite) verifyUrlPointsToAValidResource(resourceUrl *url.URL) error {
