@@ -186,7 +186,7 @@ QnBusinessRuleViewModel::QnBusinessRuleViewModel(QObject* parent):
     const auto addActionItem =
         [this](vms::event::ActionType actionType)
         {
-            QStandardItem *item = new QStandardItem(m_helper->actionName(actionType));
+            auto item = new QStandardItem(m_helper->actionName(actionType));
             item->setData(actionType);
             item->setData(!vms::event::canBeInstant(actionType), ProlongedActionRole);
             m_actionTypesModel->appendRow(item);
