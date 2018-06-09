@@ -152,7 +152,7 @@ QN_FUSION_ADAPT_STRUCT_FUNCTIONS(Vector, (json)(eq), PtzVector_Fields, (optional
 
 QDebug operator<<(QDebug dbg, const nx::core::ptz::Vector& ptzVector)
 {
-    dbg.nospace() << lm("nx::core::ptz::Vector(pan=%1, tilt=%2, rotation=%3, zoom=%4")
+    dbg.nospace() << lm("nx::core::ptz::Vector(pan=%1, tilt=%2, rotation=%3, zoom=%4)")
         .args(
             ptzVector.pan,
             ptzVector.tilt,

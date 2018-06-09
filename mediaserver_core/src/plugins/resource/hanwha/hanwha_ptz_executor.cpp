@@ -56,15 +56,17 @@ HanwhaPtzExecutor::~HanwhaPtzExecutor()
     stop();
 }
 
-bool HanwhaPtzExecutor::executeCommand(const HanwhaConfigurationalPtzCommand& command)
+bool HanwhaPtzExecutor::executeCommand(
+    const HanwhaConfigurationalPtzCommand& command,
+    int64_t sequenceId)
 {
     switch (command.command)
     {
         case HanwhaConfigurationalPtzCommandType::focus:
         case HanwhaConfigurationalPtzCommandType::zoom:
-            return executeFocusCommand(command);
+            return executeFocusCommand(command, sequenceId);
         case HanwhaConfigurationalPtzCommandType::ptr:
-            return executePtrCommand(command);
+            return executePtrCommand(command, sequenceId);
         default:
             NX_ASSERT(false, lit("Wrong command type. We should never be here."));
             return false;
@@ -89,7 +91,9 @@ void HanwhaPtzExecutor::stop()
         httpClient->pleaseStopSync();
 }
 
-bool HanwhaPtzExecutor::executeFocusCommand(const HanwhaConfigurationalPtzCommand& command)
+bool HanwhaPtzExecutor::executeFocusCommand(
+    const HanwhaConfigurationalPtzCommand& command,
+    int64_t sequenceId)
 {
     const auto parameterName = commandToParameterName(command.command);
     if (parameterName.isEmpty())
@@ -106,7 +110,8 @@ bool HanwhaPtzExecutor::executeFocusCommand(const HanwhaConfigurationalPtzComman
         {
             // TODO: #dmishin think about bypass here.
             {parameterName, *parameterValue},
-            {kHanwhaChannelProperty, QString::number(m_hanwhaResource->getChannel())}
+            {kHanwhaChannelProperty, QString::number(m_hanwhaResource->getChannel())},
+            {kHanwhaSequenceIdProperty, QString::number(sequenceId)}
         });
 
     {
@@ -120,16 +125,18 @@ bool HanwhaPtzExecutor::executeFocusCommand(const HanwhaConfigurationalPtzComman
             [this, commandType = command.command]()
             {
                 if (m_callback)
-                    m_callback(commandType);
+                    m_callback(commandType, m_httpClient->hasRequestSuccesed());
             });
     }
 
     return true;
 }
 
-bool HanwhaPtzExecutor::executePtrCommand(const HanwhaConfigurationalPtzCommand& command)
+bool HanwhaPtzExecutor::executePtrCommand(
+    const HanwhaConfigurationalPtzCommand& command,
+    int64_t sequenceId)
 {
-    const auto url = makePtrUrl(command);
+    const auto url = makePtrUrl(command, sequenceId);
     if (url == std::nullopt)
         return false;
 
@@ -144,7 +151,7 @@ bool HanwhaPtzExecutor::executePtrCommand(const HanwhaConfigurationalPtzCommand&
             [this, commandType = command.command]()
             {
                 if (m_callback)
-                    m_callback(commandType);
+                    m_callback(commandType, m_httpClient->hasRequestSuccesed());
             });
     }
 
@@ -178,7 +185,8 @@ std::optional<QString> HanwhaPtzExecutor::toHanwhaParameterValue(
 }
 
 std::optional<QUrl> HanwhaPtzExecutor::makePtrUrl(
-    const HanwhaConfigurationalPtzCommand& command) const
+    const HanwhaConfigurationalPtzCommand& command,
+    int64_t sequenceId) const
 {
     if (command.command != HanwhaConfigurationalPtzCommandType::ptr)
     {
@@ -187,7 +195,8 @@ std::optional<QUrl> HanwhaPtzExecutor::makePtrUrl(
     }
 
     HanwhaRequestHelper::Parameters requestParameters = {
-        {kHanwhaChannelProperty, QString::number(m_hanwhaResource->getChannel())}
+        {kHanwhaChannelProperty, QString::number(m_hanwhaResource->getChannel())},
+        {kHanwhaSequenceIdProperty, QString::number(sequenceId)}
     };
 
     const std::map<QString, qreal> parameters = {

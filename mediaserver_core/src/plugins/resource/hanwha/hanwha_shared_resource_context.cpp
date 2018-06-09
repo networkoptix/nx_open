@@ -19,7 +19,7 @@ namespace {
 // Limited by NPM-9080VQ, it can only be opening 3 stream at the same time, while it has 4.
 static const int kMaxConcurrentRequestNumber = 3;
 static const std::chrono::seconds kCacheUrlTimeout(10);
-static const std::chrono::seconds kCacheDataTimeout(30);
+static const std::chrono::seconds kCacheDataTimeout(30000);
 static const QString kObsoleteInterfaceParameter = lit("Network1");
 
 static const QUrl cleanUrl(QUrl url)

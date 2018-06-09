@@ -76,8 +76,8 @@ bool HanwhaPtzController::continuousMove(const nx::core::ptz::Vector& speedVecto
         || m_ptzTraits.contains(kHanwhaAlternativeZoomTrait)
         || m_ptzTraits.contains(kHanwhaAlternativeRotateTrait);
 
-    if (needToUseAlternativePtz && m_commandStreamer)
-        m_commandStreamer->continuousMove(speedVector);
+    if ((needToUseAlternativePtz || true) && m_commandStreamer)
+        return m_commandStreamer->continuousMove(speedVector);
 
     const auto hanwhaSpeed = toHanwhaSpeed(speedVector);
 

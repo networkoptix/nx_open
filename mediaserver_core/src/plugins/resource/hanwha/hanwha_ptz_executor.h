@@ -27,7 +27,8 @@ struct HanwhaConfigurationalPtzCommand
 class HanwhaPtzExecutor
 {
 public:
-    using CommandDoneCallback = nx::utils::MoveOnlyFunc<void(HanwhaConfigurationalPtzCommandType)>;
+    using CommandDoneCallback = nx::utils::MoveOnlyFunc<
+        void(HanwhaConfigurationalPtzCommandType, bool hasRequestSucceeded)>;
 
 public:
     HanwhaPtzExecutor(
@@ -38,20 +39,22 @@ public:
 
     virtual ~HanwhaPtzExecutor();
 
-    bool executeCommand(const HanwhaConfigurationalPtzCommand& command);
+    bool executeCommand(const HanwhaConfigurationalPtzCommand& command, int64_t sequenceId);
     void setCommandDoneCallback(CommandDoneCallback callback);
     void stop();
 
 private:
     // For focus and zoom, since they're both controlled via the 'focus' submenu.
-    bool executeFocusCommand(const HanwhaConfigurationalPtzCommand& command);
+    bool executeFocusCommand(const HanwhaConfigurationalPtzCommand& command, int64_t sequenceId);
 
     // For PTR.
-    bool executePtrCommand(const HanwhaConfigurationalPtzCommand& command);
+    bool executePtrCommand(const HanwhaConfigurationalPtzCommand& command, int64_t sequenceId);
 
     std::unique_ptr<nx_http::AsyncClient> makeHttpClientThreadUnsafe() const;
     std::optional<QString> toHanwhaParameterValue(const QString& parameterName, qreal speed) const;
-    std::optional<QUrl> makePtrUrl(const HanwhaConfigurationalPtzCommand& command) const;
+    std::optional<QUrl> makePtrUrl(
+        const HanwhaConfigurationalPtzCommand& command,
+        int64_t sequenceId) const;
 
 private:
     mutable QnMutex m_mutex;
