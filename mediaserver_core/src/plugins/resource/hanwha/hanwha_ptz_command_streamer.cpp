@@ -100,15 +100,12 @@ bool HanwhaPtzCommandStreamer::launchQueue(const HanwhaConfigurationalPtzCommand
     auto& queue = m_commandQueues[command.command];
     queue.pendingCommand = command.speed;
 
-    // CHECK HERE.
     const bool needToRunQueue = !queue.isRunning
         && (!queue.pendingCommand.isNull() || !queue.doesRequireRepeat);
 
     if (needToRunQueue)
     {
-        qDebug() << "*****************************************************GOING TO RUN QUEUE!";
         queue.isRunning = queue.executor->executeCommand(command, ++m_sequenceId);
-        qDebug() << "COMMAND HAS BEEN SENT";
         if (!queue.isRunning)
         {
             queue.pendingCommand = nx::core::ptz::Vector();
@@ -164,10 +161,6 @@ void HanwhaPtzCommandStreamer::scheduleNextRequest(
     else
     {
         const bool isTheSameCommand = qFuzzyEquals(context.lastCommand, context.pendingCommand);
-        qDebug() << "@@@@ SCHEDULTING PTR"
-            << isTheSameCommand
-            << context.lastCommand << "==>" << context.pendingCommand;
-
         if (!isTheSameCommand || !hasRequestSucceeded)
         {
             context.lastCommand = context.pendingCommand;
