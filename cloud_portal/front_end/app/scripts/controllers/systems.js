@@ -17,6 +17,7 @@ angular.module('cloudApp')
             $scope.systems = $scope.systemsProvider.systems;
             $scope.showSearch = $scope.systems.length >= Config.minSystemsToSearch;
             if($scope.systems.length ==1){
+                $scope.keepToastMessages = true;
                 $scope.openSystem($scope.systems[0]);
             }
         });
@@ -47,6 +48,8 @@ angular.module('cloudApp')
         };
 
         $scope.$on('$destroy', function(){
-            dialogs.dismissNotifications();
+            if(typeof($scope.keepToastMessages) === 'undefined') {
+                dialogs.dismissNotifications();
+            }
         });
     }]);
