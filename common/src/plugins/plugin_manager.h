@@ -80,7 +80,10 @@ public:
         return foundPlugins;
     }
 
-    /** @return Null string if not found. */
+    /**
+     * @return Name of the plugin dynamic library, without "lib" prefix and without extension, or
+     * null string if not found.
+     */
     QString pluginLibName(const nxpl::PluginInterface* plugin)
     {
         return m_libNameByNxPlugin.value(plugin);
@@ -107,6 +110,8 @@ private:
     mutable QnMutex m_mutex;
 
     void loadPluginsFromDir(
+        const QStringList& disabledLibNames,
+        const QStringList& enabledLibNames,
         const std::vector<nxpl::Setting>& settingsForPlugin,
         const QString& dirToSearchIn,
         PluginType pluginsToLoad );
@@ -114,7 +119,6 @@ private:
     //!Loads \a nxpl::PluginInterface based plugin
     bool loadNxPlugin(
         const std::vector<nxpl::Setting>& settingsForPlugin,
-        const QString& fileDir,
-        const QString& fileName,
-        const QStringList& disabledPluginLibNames);
+        const QString& filename,
+        const QString& libName);
 };
