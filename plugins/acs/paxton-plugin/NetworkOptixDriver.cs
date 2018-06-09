@@ -293,8 +293,8 @@ namespace Paxton.NetworkOptixControl
                             }
 
                             UriBuilder uriBuilder = new UriBuilder(baseUrl);
-                            uriBuilder.UserName = cnInfo.UserId;
-                            uriBuilder.Password = cnInfo.Password;
+                            uriBuilder.UserName = Uri.EscapeDataString(cnInfo.UserId);
+                            uriBuilder.Password = Uri.EscapeDataString(cnInfo.Password);
                             Load(pbSurface, uriBuilder.Uri);
 
                             _cameras = pbInfo.DvrCameras;
