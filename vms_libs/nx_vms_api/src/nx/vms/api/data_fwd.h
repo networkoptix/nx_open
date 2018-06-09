@@ -80,13 +80,15 @@ DECLARE_STRUCT(VideowallControlMessageData)
 DECLARE_STRUCT(AccessRightsData)
 DECLARE_STRUCT(CloudSystemData)
 
-DECLARE_STRUCT_NO_LIST(CleanupDatabaseData)
-
 DECLARE_STRUCT(LicenseData)
 DECLARE_STRUCT(DetailedLicenseData)
 DECLARE_STRUCT_NO_LIST(LicenseOverflowData)
 
+DECLARE_STRUCT_NO_LIST(CleanupDatabaseData)
+DECLARE_STRUCT_NO_LIST(P2pStatisticsData)
+
 #undef DECLARE_STRUCT
+#undef DECLARE_STRUCT_NO_LIST
 
 } // namespace api
 } // namespace vms

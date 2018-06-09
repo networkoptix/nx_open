@@ -44,8 +44,6 @@ struct ApiPeerData;
 struct ApiPeerDataEx;
 struct ApiRuntimeData;
 
-struct ApiP2pStatisticsData;
-
 typedef std::vector<ApiTransactionData> ApiTransactionDataList;
 
 typedef std::vector<ApiMediaServerData> ApiMediaServerDataList;
@@ -99,7 +97,6 @@ struct ParentId
     (ApiPeerDataEx)\
     (ApiRuntimeData)\
     (ApiDiscoveredServerData)\
-    (ApiP2pStatisticsData)
 
 QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
     QN_EC2_API_DATA_TYPES,
