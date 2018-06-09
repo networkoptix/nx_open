@@ -233,7 +233,7 @@ bool canExportPeriods(
     return std::any_of(
         resources.cbegin(),
         resources.cend(),
-        [&](const auto& resource)
+        [&](const QnResourcePtr& resource)
         {
             const auto media = resource.dynamicCast<QnMediaResource>();
             if (!media)
