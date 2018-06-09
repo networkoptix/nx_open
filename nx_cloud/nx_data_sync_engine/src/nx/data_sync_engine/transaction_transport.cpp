@@ -20,7 +20,7 @@ TransactionTransport::TransactionTransport(
     TransactionLog* const transactionLog,
     const ConnectionRequestAttributes& connectionRequestAttributes,
     const nx::String& systemId,
-    const ::ec2::ApiPeerData& localPeer,
+    const vms::api::PeerData& localPeer,
     const network::SocketAddress& remotePeerEndpoint,
     const nx::network::http::Request& request)
 :
@@ -174,7 +174,7 @@ void TransactionTransport::sendTransaction(
                 cl_logDEBUG1);
 
             //cannot send transaction right now: updating local transaction sequence
-            const ::ec2::ApiPersistentIdData tranStateKey(
+            const vms::api::PersistentIdData tranStateKey(
                 transactionHeader.peerID,
                 transactionHeader.persistentInfo.dbID);
             m_tranStateToSynchronizeTo.values[tranStateKey] =

@@ -3,21 +3,21 @@
 #include <QtCore/QCollator>
 
 #include <api/global_settings.h>
+#include <common/common_module.h>
 #include <core/resource_access/resource_access_manager.h>
 #include <core/resource_management/resource_pool.h>
 #include <core/resource_management/resource_properties.h>
 #include <core/resource/media_server_resource.h>
-#include <nx/utils/random.h>
-#include <nx/utils/app_info.h>
-
 #include <utils/common/synctime.h>
 #include <utils/common/app_info.h>
-#include <network/system_helpers.h>
-
 #include <licensing/license_validator.h>
+#include <network/system_helpers.h>
 #include <nx_ec/data/api_conversion_functions.h>
-#include <common/common_module.h>
+
 #include <nx/fusion/serialization/json.h>
+#include <nx/utils/random.h>
+#include <nx/utils/app_info.h>
+#include <nx/utils/log/log.h>
 
 static const std::chrono::hours kDefaultSendCycleTime(30 * 24); //< About a month.
 static const std::chrono::hours kSendAfterUpdateTime(3);

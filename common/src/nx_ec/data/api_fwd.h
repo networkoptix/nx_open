@@ -13,7 +13,6 @@ struct ApiMediaServerData;
 struct ApiMediaServerUserAttributesData;
 struct ApiMediaServerDataEx;
 
-struct ApiPersistentIdData;
 struct QnTranState;
 struct QnTranStateResponse;
 struct ApiSyncRequestData;
@@ -40,8 +39,6 @@ struct ApiPeerSystemTimeData;
 struct ApiPeerSyncTimeData;
 typedef std::vector<ApiPeerSystemTimeData> ApiPeerSystemTimeDataList;
 
-struct ApiPeerData;
-struct ApiPeerDataEx;
 struct ApiRuntimeData;
 
 typedef std::vector<ApiTransactionData> ApiTransactionDataList;
@@ -76,7 +73,6 @@ struct ParentId
     (ApiPeerSystemTimeData)\
     (ApiPeerSyncTimeData)\
     (ApiReverseConnectionData)\
-    (ApiPersistentIdData)\
     (QnTranState)\
     (ApiSyncRequestData)\
     (QnTranStateResponse)\
@@ -93,8 +89,6 @@ struct ParentId
     (ApiSystemIdData)\
     (ApiTimeData)\
     (ApiMiscData)\
-    (ApiPeerData)\
-    (ApiPeerDataEx)\
     (ApiRuntimeData)\
     (ApiDiscoveredServerData)\
 

@@ -2,6 +2,8 @@
 #include <nx/p2p/p2p_message_bus.h>
 #include "transaction_message_bus.h"
 
+using namespace nx::vms;
+
 namespace ec2 {
 
 TransactionMessageBusAdapter::TransactionMessageBusAdapter(
@@ -21,7 +23,7 @@ void TransactionMessageBusAdapter::reset()
     m_bus.reset();
 }
 
-void TransactionMessageBusAdapter::initInternal(Qn::PeerType peerType)
+void TransactionMessageBusAdapter::initInternal(api::PeerType peerType)
 {
     m_bus->setTimeSyncManager(m_timeSyncManager);
     connect(m_bus.get(), &AbstractTransactionMessageBus::peerFound,

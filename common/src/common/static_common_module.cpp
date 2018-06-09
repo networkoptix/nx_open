@@ -13,13 +13,15 @@
 
 #include "common_meta_types.h"
 
+using namespace nx;
+
 struct QnStaticCommonModulePrivate
 {
     nx::network::cloud::tcp::EndpointVerificatorFactory::Function endpointVerificatorFactoryBak;
 };
 
 QnStaticCommonModule::QnStaticCommonModule(
-    Qn::PeerType localPeerType,
+    vms::api::PeerType localPeerType,
     const QString& brand,
     const QString& customization,
     const QString& customCloudHost,
@@ -76,7 +78,7 @@ QnStaticCommonModule::~QnStaticCommonModule()
     m_private = nullptr;
 }
 
-Qn::PeerType QnStaticCommonModule::localPeerType() const
+vms::api::PeerType QnStaticCommonModule::localPeerType() const
 {
     return m_localPeerType;
 }

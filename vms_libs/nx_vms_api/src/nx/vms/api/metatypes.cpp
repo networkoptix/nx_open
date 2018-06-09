@@ -17,6 +17,7 @@
 #include "data/license_overflow_data.h"
 #include "data/lock_data.h"
 #include "data/p2p_statistics_data.h"
+#include "data/peer_data.h"
 #include "data/update_data.h"
 #include "data/videowall_data.h"
 #include "data/event_rule_data.h"
@@ -65,6 +66,9 @@ void Metatypes::initialize()
     qRegisterMetaType<nx::vms::api::LicenseOverflowData>();
     qRegisterMetaType<nx::vms::api::LockData>();
     qRegisterMetaType<nx::vms::api::P2pStatisticsData>();
+    qRegisterMetaType<nx::vms::api::PeerData>();
+    qRegisterMetaType<nx::vms::api::PeerDataEx>();
+    qRegisterMetaType<nx::vms::api::PersistentIdData>();
     qRegisterMetaType<nx::vms::api::ResourceData>();
     qRegisterMetaType<nx::vms::api::ResourceStatusData>();
     qRegisterMetaType<nx::vms::api::ResourceParamData>();

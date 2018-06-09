@@ -12,6 +12,7 @@
 #include <nx/utils/log/log.h>
 #include <nx/mediaserver/fs/media_paths/media_paths.h>
 #include <nx/mediaserver/fs/media_paths/media_paths_filter_config.h>
+#include <nx/network/cloud/cloud_connect_controller.h>
 
 namespace nx {
 namespace mserver_aux {

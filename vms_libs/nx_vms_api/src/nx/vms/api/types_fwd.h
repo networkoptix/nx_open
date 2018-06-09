@@ -16,18 +16,25 @@ enum class IoModuleVisualStyle;
 enum class ConnectionType;
 enum class RtpTransportType;
 enum class MotionStreamType;
+enum class PeerType;
 
 } // namespace api
 } // namespace vms
 } // namespace nx
 
-QN_FUSION_DECLARE_FUNCTIONS(nx::vms::api::EventReason, (metatype)(lexical), NX_VMS_API)
-QN_FUSION_DECLARE_FUNCTIONS(nx::vms::api::EventState, (metatype)(lexical), NX_VMS_API)
-QN_FUSION_DECLARE_FUNCTIONS(nx::vms::api::ResourceStatus, (metatype)(lexical), NX_VMS_API)
-QN_FUSION_DECLARE_FUNCTIONS(nx::vms::api::RecordingType, (metatype)(lexical), NX_VMS_API)
-QN_FUSION_DECLARE_FUNCTIONS(nx::vms::api::StreamQuality, (metatype)(lexical), NX_VMS_API)
-QN_FUSION_DECLARE_FUNCTIONS(nx::vms::api::FailoverPriority, (metatype)(lexical), NX_VMS_API)
-QN_FUSION_DECLARE_FUNCTIONS(nx::vms::api::IoModuleVisualStyle, (metatype)(lexical), NX_VMS_API)
-QN_FUSION_DECLARE_FUNCTIONS(nx::vms::api::ConnectionType, (metatype)(lexical), NX_VMS_API)
-QN_FUSION_DECLARE_FUNCTIONS(nx::vms::api::RtpTransportType, (metatype)(lexical), NX_VMS_API)
-QN_FUSION_DECLARE_FUNCTIONS(nx::vms::api::MotionStreamType, (metatype)(lexical), NX_VMS_API)
+#define DECLARE_TYPE(type) \
+    QN_FUSION_DECLARE_FUNCTIONS(nx::vms::api::type, (metatype)(lexical)(debug), NX_VMS_API)
+
+DECLARE_TYPE(EventReason)
+DECLARE_TYPE(EventState)
+DECLARE_TYPE(ResourceStatus)
+DECLARE_TYPE(RecordingType)
+DECLARE_TYPE(StreamQuality)
+DECLARE_TYPE(FailoverPriority)
+DECLARE_TYPE(IoModuleVisualStyle)
+DECLARE_TYPE(ConnectionType)
+DECLARE_TYPE(RtpTransportType)
+DECLARE_TYPE(MotionStreamType)
+DECLARE_TYPE(PeerType)
+
+#undef DECLARE_TYPE

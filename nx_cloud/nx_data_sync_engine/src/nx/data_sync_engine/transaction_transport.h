@@ -24,7 +24,7 @@ class TransactionLog;
 struct ConnectionRequestAttributes
 {
     nx::String connectionId;
-    ::ec2::ApiPeerData remotePeer;
+    vms::api::PeerData remotePeer;
     nx::String contentEncoding;
     int remotePeerProtocolVersion = 0;
 };
@@ -45,7 +45,7 @@ public:
         TransactionLog* const transactionLog,
         const ConnectionRequestAttributes& connectionRequestAttributes,
         const nx::String& systemId,
-        const ::ec2::ApiPeerData& localPeer,
+        const vms::api::PeerData& localPeer,
         const network::SocketAddress& remotePeerEndpoint,
         const nx::network::http::Request& request);
     virtual ~TransactionTransport();

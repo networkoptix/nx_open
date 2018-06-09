@@ -15,12 +15,12 @@
 namespace ec2
 {
     RemoteEC2Connection::RemoteEC2Connection(
-        Qn::PeerType peerType,
+        nx::vms::api::PeerType peerType,
         const AbstractECConnectionFactory* connectionFactory,
         const QnUuid& remotePeerId,
         const FixedUrlClientQueryProcessorPtr& queryProcessor,
         const QnConnectionInfo& connectionInfo )
-    :
+        :
         base_type(connectionFactory, queryProcessor.get() ),
         m_peerType(peerType),
         m_queryProcessor( queryProcessor ),

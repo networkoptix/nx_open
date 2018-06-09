@@ -1,13 +1,14 @@
 #include "nx/appserver/orphan_camera_watcher.h"
 
-#include <common/common_module.h>
-#include <nx_ec/dummy_handler.h>
+#include <algorithm>
 
+#include <common/common_module.h>
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource/camera_resource.h>
+#include <nx_ec/dummy_handler.h>
 
-#include <algorithm>
+#include <nx/utils/log/log.h>
 
 namespace nx {
 namespace appserver {
@@ -20,8 +21,8 @@ OrphanCameraWatcher::OrphanCameraWatcher(QnCommonModule* commonModule):
     connect(&m_timer, &QTimer::timeout, this, &OrphanCameraWatcher::update);
     start();
 
-    connect(this, &OrphanCameraWatcher::doChangeInterval, this,  
-        [&](int ms) 
+    connect(this, &OrphanCameraWatcher::doChangeInterval, this,
+        [&](int ms)
         {
             m_updateIntervalMs = ms;
             m_timer.stop();
@@ -72,7 +73,7 @@ void OrphanCameraWatcher::update()
         cameraManagerPtr->remove(CameraId, ec2::DummyHandler::instance(), &ec2::DummyHandler::onRequestDone);
         currentOrphanCameras.erase(CameraId);
     }
-    
+
     m_previousOrphanCameras = currentOrphanCameras;
 }
 

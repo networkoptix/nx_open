@@ -8,9 +8,8 @@
 
 #include <nx/fusion/model_functions_fwd.h>
 #include <nx/fusion/serialization_format.h>
-
-#include <nx_ec/data/api_peer_data.h>
 #include <nx/fusion/fusion/fusion_fwd.h>
+#include <nx/vms/api/data/peer_data.h>
 
 namespace nx {
 
@@ -48,11 +47,12 @@ const static PeerNumberType kUnknownPeerNumnber = 0xffff;
 
 struct PeerNumberInfo
 {
-    ec2::ApiPersistentIdData decode(PeerNumberType number) const;
-    PeerNumberType encode(const ec2::ApiPersistentIdData& peer, PeerNumberType shortNumber = kUnknownPeerNumnber);
+    vms::api::PersistentIdData decode(PeerNumberType number) const;
+    PeerNumberType encode(const vms::api::PersistentIdData& peer,
+        PeerNumberType shortNumber = kUnknownPeerNumnber);
 private:
-    QMap<ec2::ApiPersistentIdData, PeerNumberType> m_fullIdToShortId;
-    QMap<PeerNumberType, ec2::ApiPersistentIdData> m_shortIdToFullId;
+    QMap<vms::api::PersistentIdData, PeerNumberType> m_fullIdToShortId;
+    QMap<PeerNumberType, vms::api::PersistentIdData> m_shortIdToFullId;
 };
 
 struct SubscribeRecord
@@ -78,13 +78,13 @@ struct PeerDistanceRecord
     qint32 distance = 0;
 };
 
-struct PeerNumberResponseRecord: public ec2::ApiPersistentIdData
+struct PeerNumberResponseRecord: public vms::api::PersistentIdData
 {
     static const int kRecordSize = 16 * 2 + 2; //< two guid + uncompressed PeerNumber per record
 
     PeerNumberResponseRecord() {}
-    PeerNumberResponseRecord(PeerNumberType peerNumber, const ec2::ApiPersistentIdData& id):
-        ec2::ApiPersistentIdData(id),
+    PeerNumberResponseRecord(PeerNumberType peerNumber, const vms::api::PersistentIdData& id):
+        vms::api::PersistentIdData(id),
         peerNumber(peerNumber)
     {
     }

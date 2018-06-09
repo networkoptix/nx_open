@@ -35,6 +35,8 @@
 #include "ec2_thread_pool.h"
 #include "settings.h"
 
+using namespace nx::vms;
+
 namespace ec2 {
 
 // TODO: remove this constants
@@ -305,8 +307,8 @@ static_assert(INTERNET_SYNC_TIME_PERIOD_SEC <= MAX_INTERNET_SYNC_TIME_PERIOD_SEC
     "Check INTERNET_SYNC_TIME_PERIOD_SEC and MAX_INTERNET_SYNC_TIME_PERIOD_SEC");
 
 TimeSynchronizationManager::TimeSynchronizationManager(
-	QnCommonModule* commonModule,
-    Qn::PeerType peerType,
+    QnCommonModule* commonModule,
+    api::PeerType peerType,
     nx::utils::StandaloneTimerManager* const timerManager,
     Settings* settings,
     std::shared_ptr<AbstractWorkAroundMiscDataSaver> workAroundMiscDataSaver,
@@ -394,7 +396,7 @@ void TimeSynchronizationManager::start(
 {
     m_miscManager = miscManager;
 
-    if (m_peerType == Qn::PT_Server)
+    if (m_peerType == api::PeerType::server)
         m_localTimePriorityKey.flags |= Qn::TF_peerIsServer;
 
 #ifndef EDGE_SERVER
@@ -430,7 +432,7 @@ void TimeSynchronizationManager::start(
         QnMutexLocker lock(&m_mutex);
 
         using namespace std::placeholders;
-        if (m_peerType == Qn::PT_Server)
+        if (m_peerType == api::PeerType::server)
         {
             initializeTimeFetcher();
             addInternetTimeSynchronizationTask();
@@ -485,12 +487,12 @@ ApiTimeData TimeSynchronizationManager::getTimeInfo() const
     return result;
 }
 
-void TimeSynchronizationManager::onGotPrimariTimeServerTran(const QnTransaction<nx::vms::api::IdData>& tran)
+void TimeSynchronizationManager::onGotPrimariTimeServerTran(const QnTransaction<api::IdData>& tran)
 {
     primaryTimeServerChanged(tran.params.id);
 }
 
-void TimeSynchronizationManager::primaryTimeServerChanged(const nx::vms::api::IdData& serverId)
+void TimeSynchronizationManager::primaryTimeServerChanged(const api::IdData& serverId)
 {
     quint64 localTimePriorityBak = 0;
     quint64 newLocalTimePriority = 0;
@@ -737,7 +739,7 @@ void TimeSynchronizationManager::onNewConnectionEstablished(QnAbstractTransactio
 {
     using namespace std::placeholders;
 
-    if (transport->remotePeer().peerType != Qn::PT_Server)
+    if (transport->remotePeer().peerType != api::PeerType::server)
         return;
     if (!transport->isIncoming())
     {
@@ -751,7 +753,7 @@ void TimeSynchronizationManager::onNewConnectionEstablished(QnAbstractTransactio
     }
 }
 
-void TimeSynchronizationManager::onPeerLost(QnUuid peer, Qn::PeerType /*peerType*/)
+void TimeSynchronizationManager::onPeerLost(QnUuid peer, api::PeerType /*peerType*/)
 {
     stopSynchronizingTimeWithPeer(peer);
 }
@@ -857,7 +859,7 @@ void TimeSynchronizationManager::synchronizeWithPeer(const QnUuid& peerID)
         },
         Qt::DirectConnection);
 
-    if (m_peerType == Qn::PT_Server)
+    if (m_peerType == api::PeerType::server)
     {
         //client does not send its time to anyone
         const auto timeSyncInfo = getTimeSyncInfoNonSafe();
@@ -1101,7 +1103,7 @@ qint64 TimeSynchronizationManager::currentMSecsSinceEpoch() const
 void TimeSynchronizationManager::updateRuntimeInfoPriority(quint64 priority)
 {
     QnPeerRuntimeInfo localInfo = commonModule()->runtimeInfoManager()->localInfo();
-    if (localInfo.data.peer.peerType != Qn::PT_Server)
+    if (localInfo.data.peer.peerType != api::PeerType::server)
         return;
 
     if (localInfo.data.serverTimePriority == priority)
@@ -1334,7 +1336,7 @@ void TimeSynchronizationManager::handleLocalTimePriorityKeyChange(
 
 void TimeSynchronizationManager::onTimeSynchronizationSettingsChanged()
 {
-    if (m_peerType != Qn::PeerType::PT_Server)
+    if (m_peerType != api::PeerType::server)
         return;
     const auto& settings = commonModule()->globalSettings();
     if (settings->isSynchronizingTimeWithInternet())

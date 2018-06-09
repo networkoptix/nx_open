@@ -1,68 +1,67 @@
 #include "time_server_selection_model.h"
 
+#include <boost/algorithm/cxx11/any_of.hpp>
+#include <algorithm>
+
+#include <api/model/time_reply.h>
 #include <api/app_server_connection.h>
 #include <api/common_message_processor.h>
 #include <api/runtime_info_manager.h>
-
-#include <translation/datetime_formatter.h>
 #include <common/common_module.h>
-
 #include <core/resource_management/resource_changes_listener.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource/resource_display_info.h>
+#include <text/time_strings.h>
+#include <translation/datetime_formatter.h>
+#include <ui/style/resource_icon_cache.h>
+#include <ui/workbench/workbench_context.h>
+#include <utils/common/guarded_callback.h>
+#include <utils/common/synctime.h>
 
 #include <nx_ec/ec_api.h>
 #include <nx_ec/data/api_runtime_data.h>
 
-#include <text/time_strings.h>
-
-#include <ui/style/resource_icon_cache.h>
-#include <ui/workbench/workbench_context.h>
 #include <nx/client/core/watchers/server_time_watcher.h>
 #include <nx/client/core/utils/human_readable.h>
-#include <utils/common/synctime.h>
-
-#include <boost/algorithm/cxx11/any_of.hpp>
-#include <algorithm>
-#include <api/model/time_reply.h>
-
 #include <nx/utils/algorithm/index_of.h>
-#include <utils/common/guarded_callback.h>
+#include <nx/vms/api/types/connection_types.h>
+
+using namespace nx;
 
 namespace {
 
-    template<class T>
-    QVector<T> sortedVector(const QVector<T>& unsorted)
-    {
-        auto sorted = unsorted;
-        std::sort(sorted.begin(), sorted.end());
-        return sorted;
-    }
+template<class T>
+QVector<T> sortedVector(const QVector<T>& unsorted)
+{
+    auto sorted = unsorted;
+    std::sort(sorted.begin(), sorted.end());
+    return sorted;
+}
 
-    QVector<unsigned int> kOffsetThresholdSeconds = sortedVector<unsigned int>(
-        { 3, 5, 10, 30, 60, 180, 300, 600 });
+QVector<unsigned int> kOffsetThresholdSeconds = sortedVector<unsigned int>(
+    { 3, 5, 10, 30, 60, 180, 300, 600 });
 
-    QVector<int> kTextRoles = {
-        Qt::DisplayRole,
-        Qt::StatusTipRole,
-        Qt::WhatsThisRole,
-        Qt::AccessibleTextRole,
-        Qt::AccessibleDescriptionRole,
-        Qt::ToolTipRole };
+QVector<int> kTextRoles = {
+    Qt::DisplayRole,
+    Qt::StatusTipRole,
+    Qt::WhatsThisRole,
+    Qt::AccessibleTextRole,
+    Qt::AccessibleDescriptionRole,
+    Qt::ToolTipRole };
 
-    QVector<int> kCheckboxRoles = {
-        Qt::DisplayRole,
-        Qt::CheckStateRole };
+QVector<int> kCheckboxRoles = {
+    Qt::DisplayRole,
+    Qt::CheckStateRole };
 
-    QVector<int> kForegroundRole = {
-        Qt::ForegroundRole };
+QVector<int> kForegroundRole = {
+    Qt::ForegroundRole };
 
-    QString serverName(const QnResourcePtr& server)
-    {
-        return server
-            ? QnResourceDisplayInfo(server).toString(Qn::RI_NameOnly)
-            : QnTimeServerSelectionModel::tr("Server");
-    }
+QString serverName(const QnResourcePtr& server)
+{
+    return server
+        ? QnResourceDisplayInfo(server).toString(Qn::RI_NameOnly)
+        : QnTimeServerSelectionModel::tr("Server");
+}
 
 } // namespace
 
@@ -99,7 +98,7 @@ QnTimeServerSelectionModel::QnTimeServerSelectionModel(QObject* parent):
     connect(runtimeInfoManager(), &QnRuntimeInfoManager::runtimeInfoAdded, this,
         [this](const QnPeerRuntimeInfo& info)
         {
-            if (info.data.peer.peerType != Qn::PT_Server)
+            if (info.data.peer.peerType != vms::api::PeerType::server)
                 return;
 
             ScopedInsertRows insertRows(this, QModelIndex(), m_items.size(), m_items.size());
@@ -111,7 +110,7 @@ QnTimeServerSelectionModel::QnTimeServerSelectionModel(QObject* parent):
     connect(runtimeInfoManager(), &QnRuntimeInfoManager::runtimeInfoChanged, this,
         [this](const QnPeerRuntimeInfo& info)
         {
-            if (info.data.peer.peerType != Qn::PT_Server)
+            if (info.data.peer.peerType != vms::api::PeerType::server)
                 return;
 
             PRINT_DEBUG("peer " + info.uuid.toByteArray() + " is changed");
@@ -125,7 +124,7 @@ QnTimeServerSelectionModel::QnTimeServerSelectionModel(QObject* parent):
     connect(runtimeInfoManager(), &QnRuntimeInfoManager::runtimeInfoRemoved, this,
         [this](const QnPeerRuntimeInfo& info)
         {
-            if (info.data.peer.peerType != Qn::PT_Server)
+            if (info.data.peer.peerType != vms::api::PeerType::server)
                 return;
 
             int idx = nx::utils::algorithm::index_of(m_items,
@@ -622,7 +621,7 @@ void QnTimeServerSelectionModel::resetData(qint64 currentSyncTime)
     m_items.clear();
     for (const auto& runtimeInfo : runtimeInfoManager()->items()->getItems())
     {
-        if (runtimeInfo.data.peer.peerType != Qn::PT_Server)
+        if (runtimeInfo.data.peer.peerType != vms::api::PeerType::server)
             continue;
         addItem(runtimeInfo);
     }

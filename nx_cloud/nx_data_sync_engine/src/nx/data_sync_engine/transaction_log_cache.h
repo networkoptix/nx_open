@@ -17,7 +17,7 @@ namespace data_sync_engine {
 
 struct UpdateHistoryData
 {
-    ::ec2::ApiPersistentIdData updatedBy;
+    vms::api::PersistentIdData updatedBy;
     ::ec2::Timestamp timestamp;
 };
 
@@ -52,7 +52,7 @@ public:
         const QByteArray& hash) const;
 
     void restoreTransaction(
-        ::ec2::ApiPersistentIdData tranStateKey,
+        vms::api::PersistentIdData tranStateKey,
         int sequence,
         const nx::Buffer& tranHash,
         const ::ec2::Timestamp& timestamp);
@@ -71,8 +71,8 @@ public:
      */
     const VmsDataState* state(TranId tranId) const;
     ::ec2::Timestamp generateTransactionTimestamp(TranId tranId);
-    int generateTransactionSequence(const ::ec2::ApiPersistentIdData& tranStateKey);
-    void shiftTransactionSequence(const ::ec2::ApiPersistentIdData& tranStateKey, int delta);
+    int generateTransactionSequence(const vms::api::PersistentIdData& tranStateKey);
+    void shiftTransactionSequence(const vms::api::PersistentIdData& tranStateKey, int delta);
 
     ::ec2::QnTranState committedTransactionState() const;
     std::uint64_t committedTimestampSequence() const;

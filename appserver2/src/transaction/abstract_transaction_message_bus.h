@@ -2,7 +2,6 @@
 
 #include <QtCore/QThread>
 
-#include <nx_ec/data/api_peer_data.h>
 #include <common/common_module_aware.h>
 #include "connection_guard_shared_state.h"
 #include <utils/common/enable_multi_thread_direct_connection.h>
@@ -56,8 +55,8 @@ namespace ec2
         virtual void setTimeSyncManager(TimeSynchronizationManager* timeSyncManager) = 0;
 
     signals:
-        void peerFound(QnUuid data, Qn::PeerType peerType);
-        void peerLost(QnUuid data, Qn::PeerType peerType);
+        void peerFound(QnUuid data, nx::vms::api::PeerType peerType);
+        void peerLost(QnUuid data, nx::vms::api::PeerType peerType);
         void remotePeerUnauthorized(QnUuid id);
 
         /** Emitted on a new direct connection to a remote peer has been established */

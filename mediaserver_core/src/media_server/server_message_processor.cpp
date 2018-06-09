@@ -32,6 +32,8 @@
 #include <media_server/media_server_module.h>
 #include "nx_ec/ec_api.h"
 
+using namespace nx;
+
 QnServerMessageProcessor::QnServerMessageProcessor(QnCommonModule* commonModule):
     base_type(commonModule),
     m_serverPort(qnServerModule->settings().port())
@@ -144,7 +146,7 @@ void QnServerMessageProcessor::disconnectFromConnection(
     connection->getMiscNotificationManager()->disconnect(this);
 }
 
-void QnServerMessageProcessor::handleRemotePeerFound(QnUuid peer, Qn::PeerType peerType)
+void QnServerMessageProcessor::handleRemotePeerFound(QnUuid peer, vms::api::PeerType peerType)
 {
     base_type::handleRemotePeerFound(peer, peerType);
     QnResourcePtr res = resourcePool()->getResourceById(peer);
@@ -154,13 +156,13 @@ void QnServerMessageProcessor::handleRemotePeerFound(QnUuid peer, Qn::PeerType p
         m_delayedOnlineStatus << peer;
 }
 
-void QnServerMessageProcessor::handleRemotePeerLost(QnUuid peer, Qn::PeerType peerType)
+void QnServerMessageProcessor::handleRemotePeerLost(QnUuid peer, vms::api::PeerType peerType)
 {
     base_type::handleRemotePeerLost(peer, peerType);
     QnResourcePtr res = resourcePool()->getResourceById(peer);
     if (res) {
         res->setStatus(Qn::Offline);
-        if (peerType != Qn::PT_Server)
+        if (peerType != vms::api::PeerType::server)
         {
             // This server hasn't own DB
             for(const QnResourcePtr& camera: resourcePool()->getAllCameras(res))

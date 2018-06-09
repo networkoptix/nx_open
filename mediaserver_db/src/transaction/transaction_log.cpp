@@ -14,6 +14,8 @@
 #include "nx_ec/data/api_discovery_data.h"
 #include <common/static_common_module.h>
 
+using namespace nx;
+
 namespace ec2
 {
 
@@ -84,7 +86,7 @@ bool QnTransactionLog::init()
         while (query.next())
         {
             seqFound = true;
-            ApiPersistentIdData key(QnUuid::fromRfc4122(query.value(0).toByteArray()), QnUuid::fromRfc4122(query.value(1).toByteArray()));
+            vms::api::PersistentIdData key(QnUuid::fromRfc4122(query.value(0).toByteArray()), QnUuid::fromRfc4122(query.value(1).toByteArray()));
             m_state.values.insert(key, query.value(2).toInt());
         }
     }
@@ -104,7 +106,7 @@ bool QnTransactionLog::init()
                 QnUuid peerID = QnUuid::fromRfc4122(query.value(0).toByteArray());
                 QnUuid dbID = QnUuid::fromRfc4122(query.value(1).toByteArray());
                 int sequence = query.value(2).toInt();
-                ApiPersistentIdData key(peerID, dbID);
+                vms::api::PersistentIdData key(peerID, dbID);
                 updateSequenceNoLock(peerID, dbID, sequence);
             }
         }
@@ -129,7 +131,7 @@ bool QnTransactionLog::init()
             timestamp.ticks = query2.value("timestamp").toLongLong();
             QnUuid peerID = QnUuid::fromRfc4122(query2.value("peer_guid").toByteArray());
             QnUuid dbID = QnUuid::fromRfc4122(query2.value("db_guid").toByteArray());
-            m_updateHistory.insert(hash, UpdateHistoryData(ApiPersistentIdData(peerID, dbID), timestamp));
+            m_updateHistory.insert(hash, UpdateHistoryData(vms::api::PersistentIdData(peerID, dbID), timestamp));
 
             m_lastTimestamp = qMax(m_lastTimestamp, timestamp);
         }
@@ -182,7 +184,7 @@ Timestamp QnTransactionLog::getTimeStamp()
 
 int QnTransactionLog::currentSequenceNoLock() const
 {
-    ApiPersistentIdData key (m_dbManager->commonModule()->moduleGUID(), m_dbManager->getID());
+    vms::api::PersistentIdData key (m_dbManager->commonModule()->moduleGUID(), m_dbManager->getID());
     return qMax(m_state.values.value(key), m_commitData.state.values.value(key));
 }
 
@@ -212,8 +214,8 @@ ErrorCode QnTransactionLog::updateSequence(const QnAbstractTransaction& tran, Tr
     else
         locker.reset(new detail::QnDbManager::QnLazyTransactionLocker(m_dbManager->getTransaction()));
 
-    //NX_ASSERT(m_state.values.value(ApiPersistentIdData(tran.peerID, tran.persistentInfo.dbID)) <= tran.persistentInfo.sequence);
-    if (m_state.values.value(ApiPersistentIdData(tran.peerID, tran.persistentInfo.dbID)) >= tran.persistentInfo.sequence)
+    //NX_ASSERT(m_state.values.value(vms::api::PersistentIdData(tran.peerID, tran.persistentInfo.dbID)) <= tran.persistentInfo.sequence);
+    if (m_state.values.value(vms::api::PersistentIdData(tran.peerID, tran.persistentInfo.dbID)) >= tran.persistentInfo.sequence)
     {
         if (lockType == TransactionLockType::Lazy)
             locker->commit(); //< prevent rollback previously saved data
@@ -235,7 +237,7 @@ ErrorCode QnTransactionLog::updateSequence(const QnAbstractTransaction& tran, Tr
 
 ErrorCode QnTransactionLog::updateSequenceNoLock(const QnUuid& peerID, const QnUuid& dbID, int sequence)
 {
-    ApiPersistentIdData key(peerID, dbID);
+    vms::api::PersistentIdData key(peerID, dbID);
     if (m_state.values.value(key) >= sequence)
         return ErrorCode::ok;
 
@@ -313,7 +315,7 @@ ErrorCode QnTransactionLog::saveToDB(
         qDebug() << "add record to transaction log. Transaction=" << toString(tran.command) << "timestamp=" << tran.timestamp << "producedOnCurrentPeer=" << (tran.peerID == commonModule()->moduleGUID());
     #endif
 
-    ApiPersistentIdData key(tran.peerID, tran.persistentInfo.dbID);
+    vms::api::PersistentIdData key(tran.peerID, tran.persistentInfo.dbID);
     ErrorCode code = updateSequenceNoLock(tran.peerID, tran.persistentInfo.dbID, tran.persistentInfo.sequence);
     if (code != ErrorCode::ok)
         return code;
@@ -352,7 +354,7 @@ QnTranState QnTransactionLog::getTransactionsState()
     return m_state;
 }
 
-QVector<qint32> QnTransactionLog::getTransactionsState(const QVector<ApiPersistentIdData>& filter)
+QVector<qint32> QnTransactionLog::getTransactionsState(const QVector<vms::api::PersistentIdData>& filter)
 {
     QnReadLocker lock(&m_dbManager->getMutex());
 
@@ -373,7 +375,7 @@ QVector<qint32> QnTransactionLog::getTransactionsState(const QVector<ApiPersiste
     return result;
 }
 
-int QnTransactionLog::getLatestSequence(const ApiPersistentIdData& key) const
+int QnTransactionLog::getLatestSequence(const vms::api::PersistentIdData& key) const
 {
     QnReadLocker lock(&m_dbManager->getMutex());
     return m_state.values.value(key);
@@ -382,7 +384,7 @@ int QnTransactionLog::getLatestSequence(const ApiPersistentIdData& key) const
 QnTransactionLog::ContainsReason QnTransactionLog::contains(const QnAbstractTransaction& tran, const QnUuid& hash) const
 {
 
-    ApiPersistentIdData key (tran.peerID, tran.persistentInfo.dbID);
+    vms::api::PersistentIdData key (tran.peerID, tran.persistentInfo.dbID);
     NX_ASSERT(tran.persistentInfo.sequence != 0);
     if (m_state.values.value(key) >= tran.persistentInfo.sequence) {
         NX_LOG( QnLog::EC2_TRAN_LOG,
@@ -439,7 +441,7 @@ ErrorCode QnTransactionLog::getTransactionsAfter(
 
     for (auto itr = stateToIterate.values.begin(); itr != stateToIterate.values.end(); ++itr)
     {
-        const ApiPersistentIdData& key = itr.key();
+        const vms::api::PersistentIdData& key = itr.key();
         qint32 querySequence = filterState.values.value(key);
         QSqlQuery query(m_dbManager->getDB());
         query.setForwardOnly(true);
@@ -492,10 +494,10 @@ ErrorCode QnTransactionLog::getExactTransactionsAfter(
     if (onlyCloudData)
         extraFilter = lit("AND tran_type = %1").arg(TransactionType::Cloud);
 
-    //QMap <ApiPersistentIdData, int> tranLogSequence;
+    //QMap <vms::api::PersistentIdData, int> tranLogSequence;
     for (auto itr = inOutState->values.begin(); itr != inOutState->values.end(); ++itr)
     {
-        const ApiPersistentIdData& key = itr.key();
+        const vms::api::PersistentIdData& key = itr.key();
         qint32 querySequence = itr.value();
         const qint32 latestSequence = m_state.values.value(itr.key());
         if (querySequence >= latestSequence)

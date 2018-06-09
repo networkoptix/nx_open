@@ -560,7 +560,7 @@ public:
         const QString& updateId,
         const QByteArray& data,
         qint64 offset,
-        const QnPeerSet& peers,
+        const nx::vms::api::PeerSet& peers,
         TargetType* target,
         HandlerType handler)
     {
@@ -598,7 +598,7 @@ protected:
         const QString& updateId,
         const QByteArray& data,
         qint64 offset,
-        const QnPeerSet& peers,
+        const nx::vms::api::PeerSet& peers,
         impl::SimpleHandlerPtr handler) = 0;
     virtual int sendUpdateUploadResponce(
         const QString& updateId,
@@ -1137,8 +1137,8 @@ signals :
 
     void reverseConnectionRequested(const ec2::ApiReverseConnectionData& reverseConnetionData);
 
-    void remotePeerFound(QnUuid data, Qn::PeerType peerType);
-    void remotePeerLost(QnUuid data, Qn::PeerType peerType);
+    void remotePeerFound(QnUuid data, nx::vms::api::PeerType peerType);
+    void remotePeerLost(QnUuid data, nx::vms::api::PeerType peerType);
     void remotePeerUnauthorized(const QnUuid& id);
     void newDirectConnectionEstablished(QnAbstractTransactionTransport* transport);
 

@@ -85,7 +85,18 @@ enum class IoModuleVisualStyle
 } // namespace vms
 } // namespace nx
 
-QN_FUSION_DECLARE_FUNCTIONS(nx::vms::api::CameraStatusFlags, (metatype)(numeric)(lexical),
+QN_FUSION_DECLARE_FUNCTIONS(nx::vms::api::CameraStatusFlag,
+    (metatype)(numeric)(lexical)(debug),
     NX_VMS_API)
-QN_FUSION_DECLARE_FUNCTIONS(nx::vms::api::CameraBackupQualities, (metatype)(numeric)(lexical),
+
+QN_FUSION_DECLARE_FUNCTIONS(nx::vms::api::CameraStatusFlags,
+    (metatype)(numeric)(lexical)(debug),
+    NX_VMS_API)
+
+QN_FUSION_DECLARE_FUNCTIONS(nx::vms::api::CameraBackupQuality,
+    (metatype)(numeric)(lexical)(debug),
+    NX_VMS_API)
+
+QN_FUSION_DECLARE_FUNCTIONS(nx::vms::api::CameraBackupQualities,
+    (metatype)(numeric)(lexical)(debug),
     NX_VMS_API)

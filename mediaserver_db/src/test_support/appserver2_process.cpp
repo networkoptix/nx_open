@@ -63,6 +63,8 @@ static int registerQtResources()
     return 0;
 }
 
+using namespace nx::vms;
+
 namespace ec2 {
 
 //-------------------------------------------------------------------------------------------------
@@ -129,7 +131,7 @@ int Appserver2Process::exec()
     std::unique_ptr<ec2::LocalConnectionFactory>
         ec2ConnectionFactory(new ec2::LocalConnectionFactory(
             m_commonModule.get(),
-            Qn::PT_Server,
+            api::PeerType::server,
             nx::utils::TimerManager::instance(),
             settings.isP2pMode()));
 
@@ -248,7 +250,7 @@ void Appserver2Process::updateRuntimeData()
     ec2::ApiRuntimeData runtimeData;
     runtimeData.peer.id = m_commonModule->moduleGUID();
     runtimeData.peer.instanceId = m_commonModule->runningInstanceGUID();
-    runtimeData.peer.peerType = Qn::PT_Server;
+    runtimeData.peer.peerType = api::PeerType::server;
     runtimeData.box = QnAppInfo::armBox();
     runtimeData.brand = QnAppInfo::productNameShort();
     runtimeData.platform = QnAppInfo::applicationPlatform();

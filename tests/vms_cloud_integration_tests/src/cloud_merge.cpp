@@ -29,7 +29,7 @@ public:
     static void SetUpTestCase()
     {
         s_staticCommonModule =
-            std::make_unique<QnStaticCommonModule>(Qn::PeerType::PT_Server);
+            std::make_unique<QnStaticCommonModule>(nx::vms::api::PeerType::server);
     }
 
     static void TearDownTestCase()

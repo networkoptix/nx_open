@@ -2,9 +2,9 @@
 
 #include "api_globals.h"
 #include "api_data.h"
-#include "api_peer_data.h"
 #include "nx/utils/latin1_array.h"
 #include <nx/fusion/model_functions_fwd.h>
+#include <nx/vms/api/data/peer_data.h>
 
 namespace ec2 {
 
@@ -50,7 +50,7 @@ struct ApiRuntimeData: nx::vms::api::DataWithVersion
             && flags == other.flags;
     }
 
-    ApiPeerData peer;
+    nx::vms::api::PeerData peer;
 
     QString platform;
     QString box;

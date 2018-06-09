@@ -63,7 +63,7 @@ namespace ec2
         QnTranState getTransactionsState();
 
         // filter should contains sorted data
-        QVector<qint32> getTransactionsState(const QVector<ApiPersistentIdData>& filter);
+        QVector<qint32> getTransactionsState(const QVector<nx::vms::api::PersistentIdData>& filter);
 
         bool contains(const QnTranState& state) const;
 
@@ -95,7 +95,7 @@ namespace ec2
         bool init();
         bool clear();
 
-        int getLatestSequence(const ApiPersistentIdData& key) const;
+        int getLatestSequence(const nx::vms::api::PersistentIdData& key) const;
 
         ErrorCode updateSequence(const nx::vms::api::UpdateSequenceData& data);
         ErrorCode updateSequence(const QnAbstractTransaction& tran, TransactionLockType lockType);
@@ -126,8 +126,8 @@ namespace ec2
         struct UpdateHistoryData
         {
             UpdateHistoryData(): timestamp(Timestamp::fromInteger(0)) {}
-            UpdateHistoryData(const ApiPersistentIdData& updatedBy, const Timestamp& timestamp): updatedBy(updatedBy), timestamp(timestamp) {}
-            ApiPersistentIdData updatedBy;
+            UpdateHistoryData(const nx::vms::api::PersistentIdData& updatedBy, const Timestamp& timestamp): updatedBy(updatedBy), timestamp(timestamp) {}
+            nx::vms::api::PersistentIdData updatedBy;
             Timestamp timestamp;
         };
         struct CommitData

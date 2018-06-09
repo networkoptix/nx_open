@@ -3126,14 +3126,14 @@ void MediaServerProcess::initializeLogging()
 
     logSettings.level.parse(cmdLineArguments().ec2TranLogLevel,
         settings.tranLogLevel(), toString(nx::utils::log::Level::none));
-    logSettings.logBaseName = "ec2_tran";        
+    logSettings.logBaseName = "ec2_tran";
     nx::utils::log::initialize(
         logSettings, qApp->applicationName(), binaryPath,
         nx::utils::log::addLogger({QnLog::EC2_TRAN_LOG}));
 
     logSettings.level.parse(cmdLineArguments().permissionsLogLevel,
         settings.permissionsLogLevel(), toString(nx::utils::log::Level::none));
-    logSettings.logBaseName = "permissions";        
+    logSettings.logBaseName = "permissions";
     nx::utils::log::initialize(
         logSettings, qApp->applicationName(), binaryPath,
         nx::utils::log::addLogger({QnLog::PERMISSIONS_LOG}));
@@ -3402,7 +3402,7 @@ void MediaServerProcess::run()
     runtimeData.peer.id = commonModule()->moduleGUID();
     runtimeData.peer.instanceId = commonModule()->runningInstanceGUID();
     runtimeData.peer.persistentId = commonModule()->dbId();
-    runtimeData.peer.peerType = Qn::PT_Server;
+    runtimeData.peer.peerType = vms::api::PeerType::server;
     runtimeData.box = QnAppInfo::armBox();
     runtimeData.brand = QnAppInfo::productNameShort();
     runtimeData.customization = QnAppInfo::customizationName();
@@ -3422,7 +3422,7 @@ void MediaServerProcess::run()
     std::unique_ptr<ec2::LocalConnectionFactory> ec2ConnectionFactory(
         new ec2::LocalConnectionFactory(
             commonModule(),
-            Qn::PT_Server,
+            vms::api::PeerType::server,
             nx::utils::TimerManager::instance(),
             qnServerModule->settings().p2pMode()));
 

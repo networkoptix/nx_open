@@ -4,6 +4,8 @@
 #include <transaction/message_bus_adapter.h>
 #include <api/global_settings.h>
 
+using namespace nx::vms;
+
 namespace ec2 {
 
 ApiDiscoveryData toApiDiscoveryData(
@@ -35,9 +37,9 @@ QnDiscoveryMonitor::~QnDiscoveryMonitor()
     commonModule()->moduleDiscoveryManager()->disconnect(this);
 }
 
-void QnDiscoveryMonitor::clientFound(QnUuid peerId, Qn::PeerType peerType)
+void QnDiscoveryMonitor::clientFound(QnUuid peerId, api::PeerType peerType)
 {
-    if (!ApiPeerData::isClient(peerType))
+    if (!api::PeerData::isClient(peerType))
         return;
 
     send(ApiCommand::discoveredServersList,

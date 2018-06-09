@@ -3,7 +3,6 @@
 #include <QtCore/QElapsedTimer>
 #include <QtCore/QObject>
 
-#include <nx_ec/data/api_peer_data.h>
 #include <nx_ec/data/api_tran_state_data.h>
 #include "p2p_fwd.h"
 
@@ -23,18 +22,19 @@ public:
         localPeersTimer.invalidate();
     }
 
-    bool isRemotePeerSubscribedTo(const ec2::ApiPersistentIdData& peer) const;
+    bool isRemotePeerSubscribedTo(const vms::api::PersistentIdData& peer) const;
     bool isRemotePeerSubscribedTo(const QnUuid& peer) const;
-    bool isLocalPeerSubscribedTo(const ec2::ApiPersistentIdData& peer) const;
+    bool isLocalPeerSubscribedTo(const vms::api::PersistentIdData& peer) const;
     bool updateSequence(const ec2::QnAbstractTransaction& tran);
 
-    ec2::ApiPersistentIdData decode(PeerNumberType shortPeerNumber) const;
-    PeerNumberType encode(const ec2::ApiPersistentIdData& fullId, PeerNumberType shortPeerNumber = kUnknownPeerNumnber);
+    vms::api::PersistentIdData decode(PeerNumberType shortPeerNumber) const;
+    PeerNumberType encode(const vms::api::PersistentIdData& fullId,
+        PeerNumberType shortPeerNumber = kUnknownPeerNumnber);
 public:
     // to local part
     QByteArray localPeersMessage; //< last sent peers message
     QElapsedTimer localPeersTimer; //< last sent peers time
-    QVector<ec2::ApiPersistentIdData> localSubscription; //< local -> remote subscription
+    QVector<vms::api::PersistentIdData> localSubscription; //< local -> remote subscription
     bool isLocalStarted = false; //< we opened connection to remote peer
     QVector<PeerNumberType> awaitingNumbersToResolve;
     bool sendDataInProgress = false; //< Select from transaction log in progress

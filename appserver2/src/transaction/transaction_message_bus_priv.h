@@ -165,7 +165,7 @@ void QnTransactionMessageBus::proxyTransaction(
     const QnTransaction<T>& tran,
     const QnTransactionTransportHeader& transportHeader)
 {
-    if (ApiPeerData::isClient(m_localPeerType))
+    if (nx::vms::api::PeerData::isClient(m_localPeerType))
         return;
 
     auto newTransportHeader = transportHeader;
@@ -260,7 +260,7 @@ bool QnTransactionMessageBus::processSpecialTransaction(
         return true;
     }
 
-    if (tran.isLocal() && ApiPeerData::isServer(m_localPeerType))
+    if (tran.isLocal() && nx::vms::api::PeerData::isServer(m_localPeerType))
     {
         printTransaction("reject local transaction",
             tran, transactionHash, transportHeader, sender);

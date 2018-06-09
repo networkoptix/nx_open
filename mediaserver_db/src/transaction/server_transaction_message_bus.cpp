@@ -4,6 +4,8 @@
 #include <database/db_manager.h>
 #include <transaction/transaction_message_bus_priv.h>
 
+using namespace nx;
+
 namespace ec2 {
 
 struct GotTransactionFuction
@@ -12,9 +14,9 @@ struct GotTransactionFuction
 
     template<class T>
     void operator()(
-		ServerTransactionMessageBus* bus, 
-		const QnTransaction<T> &transaction, 
-		QnTransactionTransport *sender, 
+		ServerTransactionMessageBus* bus,
+		const QnTransaction<T> &transaction,
+		QnTransactionTransport *sender,
 		const QnTransactionTransportHeader &transportHeader) const
     {
         bus->gotTransaction(transaction, sender, transportHeader);
@@ -27,9 +29,9 @@ struct SendTransactionToTransportFuction
 
     template<class T>
     void operator()(
-		ServerTransactionMessageBus* bus, 
-		const QnTransaction<T> &transaction, 
-		QnTransactionTransport *sender, 
+		ServerTransactionMessageBus* bus,
+		const QnTransaction<T> &transaction,
+		QnTransactionTransport *sender,
 		const QnTransactionTransportHeader &transportHeader) const
     {
         bus->sendTransactionToTransport(transaction, sender, transportHeader);
@@ -48,7 +50,7 @@ struct SendTransactionToTransportFastFuction
 // --------------------------------- ServerTransactionMessageBus ------------------------------
 
 ServerTransactionMessageBus::ServerTransactionMessageBus(
-    Qn::PeerType peerType,
+    vms::api::PeerType peerType,
     QnCommonModule* commonModule,
     QnJsonTransactionSerializer* jsonTranSerializer,
     QnUbjsonTransactionSerializer* ubjsonTranSerializer)
@@ -78,8 +80,8 @@ void ServerTransactionMessageBus::printTranState(const QnTranState& tranState)
 }
 
 bool ServerTransactionMessageBus::gotAliveData(
-	const ApiPeerAliveData &aliveData, 
-	QnTransactionTransport* transport, 
+	const ApiPeerAliveData &aliveData,
+	QnTransactionTransport* transport,
 	const QnTransactionTransportHeader* ttHeader)
 {
 	base_type::gotAliveData(aliveData, transport, ttHeader);
@@ -105,7 +107,7 @@ bool ServerTransactionMessageBus::gotAliveData(
 
 bool ServerTransactionMessageBus::checkSequence(
 	const QnTransactionTransportHeader& transportHeader,
-	const QnAbstractTransaction& tran, 
+	const QnAbstractTransaction& tran,
 	QnTransactionTransport* transport)
 {
 	if (!base_type::checkSequence(transportHeader, tran, transport))
@@ -115,7 +117,7 @@ bool ServerTransactionMessageBus::checkSequence(
 	if (tran.persistentInfo.isNull())
 		return true; // nothing to check
 
-	ApiPersistentIdData persistentKey(tran.peerID, tran.persistentInfo.dbID);
+	vms::api::PersistentIdData persistentKey(tran.peerID, tran.persistentInfo.dbID);
 	int persistentSeq = m_db->transactionLog()->getLatestSequence(persistentKey);
 
 	if (nx::utils::log::isToBeLogged(nx::utils::log::Level::warning, QnLog::EC2_TRAN_LOG))
@@ -135,10 +137,10 @@ bool ServerTransactionMessageBus::checkSequence(
 			NX_LOG(QnLog::EC2_TRAN_LOG, lit("GAP in persistent data detected! for peer %1 Expected seq=%2, but got seq=%3").
 				arg(tran.peerID.toString()).arg(persistentSeq + 1).arg(tran.persistentInfo.sequence), cl_logDEBUG1);
 
-			if (!transport->remotePeer().isClient() && !ApiPeerData::isClient(m_localPeerType))
-				queueSyncRequest(transport);
+			if (!transport->remotePeer().isClient() && !vms::api::PeerData::isClient(m_localPeerType))
+			    queueSyncRequest(transport);
 			else
-				transport->setState(QnTransactionTransport::Error); // reopen
+			    transport->setState(QnTransactionTransport::Error); // reopen
 			return false;
 		}
 		else
@@ -152,8 +154,8 @@ bool ServerTransactionMessageBus::checkSequence(
 
 template <class T>
 void ServerTransactionMessageBus::sendTransactionToTransport(
-	const QnTransaction<T> &tran, 
-	QnTransactionTransport* transport, 
+	const QnTransaction<T> &tran,
+	QnTransactionTransport* transport,
 	const QnTransactionTransportHeader &transportHeader)
 {
 	NX_ASSERT(!tran.isLocal());
@@ -175,7 +177,7 @@ void ServerTransactionMessageBus::onGotTransactionSyncRequest(
 	QList<QByteArray> serializedTransactions;
 	const ErrorCode errorCode = m_db->transactionLog()->getTransactionsAfter(
 		tran.params.persistentState,
-		sender->remotePeer().peerType == Qn::PeerType::PT_CloudServer,
+		sender->remotePeer().peerType == vms::api::PeerType::cloudServer,
 		serializedTransactions);
 
 	if (errorCode == ErrorCode::ok)
@@ -248,7 +250,8 @@ void ServerTransactionMessageBus::queueSyncRequest(QnTransactionTransport* trans
 
 	NX_LOG(QnLog::EC2_TRAN_LOG, lit("send syncRequest to peer %1").arg(transport->remotePeer().id.toString()), cl_logDEBUG1);
 	printTranState(requestTran.params.persistentState);
-	transport->sendTransaction(requestTran, QnPeerSet() << transport->remotePeer().id << commonModule()->moduleGUID());
+	transport->sendTransaction(requestTran, vms::api::PeerSet(
+            {transport->remotePeer().id, commonModule()->moduleGUID()}));
 }
 
 bool ServerTransactionMessageBus::isSyncInProgress() const
@@ -264,11 +267,11 @@ bool ServerTransactionMessageBus::isSyncInProgress() const
 
 bool ServerTransactionMessageBus::readApiFullInfoData(
 	const Qn::UserAccessData& userAccess,
-	const ec2::ApiPeerData& remotePeer,
+	const vms::api::PeerData& remotePeer,
 	ApiFullInfoData* outData)
 {
 	ErrorCode errorCode;
-	if (remotePeer.peerType == Qn::PT_MobileClient)
+	if (remotePeer.peerType == vms::api::PeerType::mobileClient)
 		errorCode = dbManager(m_db, userAccess).readApiFullInfoDataForMobileClient(outData, userAccess.userId);
 	else
 		errorCode = dbManager(m_db, userAccess).readApiFullInfoDataComplete(outData);
@@ -284,13 +287,13 @@ bool ServerTransactionMessageBus::readApiFullInfoData(
 bool ServerTransactionMessageBus::sendInitialData(QnTransactionTransport* transport)
 {
 	/** Send all data to the client peers on the connect. */
-	QnPeerSet processedPeers = QnPeerSet() << transport->remotePeer().id << commonModule()->moduleGUID();
+        vms::api::PeerSet processedPeers({transport->remotePeer().id, commonModule()->moduleGUID()});
 	if (!base_type::sendInitialData(transport))
 		return false;
-	
-	if (transport->remotePeer().peerType == Qn::PT_DesktopClient ||
-		transport->remotePeer().peerType == Qn::PT_VideowallClient ||
-		transport->remotePeer().peerType == Qn::PT_MobileClient)
+
+	if (transport->remotePeer().peerType == vms::api::PeerType::desktopClient ||
+		transport->remotePeer().peerType == vms::api::PeerType::videowallClient ||
+		transport->remotePeer().peerType == vms::api::PeerType::mobileClient)
 	{
 		/** Request all data to be sent to the Desktop Client peers on the connect. */
 		QnTransaction<ApiFullInfoData> tran;
@@ -304,7 +307,7 @@ bool ServerTransactionMessageBus::sendInitialData(QnTransactionTransport* transp
 		transport->sendTransaction(tran, processedPeers);
 		transport->setReadSync(true);
 	}
-	else if (transport->remotePeer().peerType == Qn::PT_OldMobileClient)
+	else if (transport->remotePeer().peerType == vms::api::PeerType::oldMobileClient)
 	{
 		/** Request all data to be sent to the client peers on the connect. */
 		QnTransaction<ApiMediaServerDataExList> tranServers;
@@ -375,7 +378,7 @@ bool ServerTransactionMessageBus::sendInitialData(QnTransactionTransport* transp
 		transport->setReadSync(true);
 	}
 
-	if (!transport->remotePeer().isClient() && !ApiPeerData::isClient(m_localPeerType))
+	if (!transport->remotePeer().isClient() && !vms::api::PeerData::isClient(m_localPeerType))
 		queueSyncRequest(transport);
 
 	return true;
@@ -401,7 +404,7 @@ void ServerTransactionMessageBus::gotConnectionFromRemotePeer(
 	ConnectionLockGuard connectionLockGuard,
 	QSharedPointer<nx::network::AbstractStreamSocket> socket,
 	ConnectionType::Type connectionType,
-	const ApiPeerData& remotePeer,
+	const vms::api::PeerData& remotePeer,
 	qint64 remoteSystemIdentityTime,
 	const nx::network::http::Request& request,
 	const QByteArray& contentEncoding,
@@ -434,8 +437,8 @@ void ServerTransactionMessageBus::gotConnectionFromRemotePeer(
 		std::find_if(
 			m_connectingConnections.begin(), m_connectingConnections.end(),
 			[&connectionGuid](QnTransactionTransport* connection)
-		{ 
-			return connection->connectionGuid() == connectionGuid; 
+		{
+			return connection->connectionGuid() == connectionGuid;
 		}
 		) == m_connectingConnections.end());
 
@@ -447,7 +450,7 @@ void ServerTransactionMessageBus::gotConnectionFromRemotePeer(
 void ServerTransactionMessageBus::gotIncomingTransactionsConnectionFromRemotePeer(
 	const QnUuid& connectionGuid,
 	QSharedPointer<nx::network::AbstractStreamSocket> socket,
-	const ApiPeerData &/*remotePeer*/,
+	const vms::api::PeerData &/*remotePeer*/,
 	qint64 /*remoteSystemIdentityTime*/,
 	const nx::network::http::Request& request,
 	const QByteArray& requestBuf)
@@ -500,7 +503,7 @@ ErrorCode ServerTransactionMessageBus::updatePersistentMarker(
 }
 
 void ServerTransactionMessageBus::proxyFillerTransaction(
-    const QnAbstractTransaction& tran, 
+    const QnAbstractTransaction& tran,
     const QnTransactionTransportHeader& transportHeader)
 {
     // proxy filler transaction to avoid gaps in the persistent sequence
@@ -527,7 +530,7 @@ void ServerTransactionMessageBus::gotTransaction(const QnTransaction<T> &tran, Q
     if (!tran.persistentInfo.isNull())
     {
         QByteArray serializedTran = m_ubjsonTranSerializer->serializedTransaction(tran);
-        ErrorCode errorCode = 
+        ErrorCode errorCode =
             dbManager(m_db, sender->getUserAccessData()).executeTransaction(tran, serializedTran);
 
         switch (errorCode)

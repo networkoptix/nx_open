@@ -16,6 +16,7 @@
 #include <nx/network/flash_socket/types.h>
 #include <rest/server/rest_connection_processor.h>
 #include <utils/common/app_info.h>
+#include <nx/network/cloud/cloud_connect_controller.h>
 #include <nx/utils/log/log.h>
 
 namespace {

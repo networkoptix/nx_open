@@ -29,8 +29,8 @@ public:
         const nx::String& systemId,
         const QnUuid& connectionId,
         std::unique_ptr<network::websocket::WebSocket> webSocket,
-        ::ec2::ApiPeerDataEx localPeerData,
-        ::ec2::ApiPeerDataEx remotePeerData);
+        vms::api::PeerDataEx localPeerData,
+        vms::api::PeerDataEx remotePeerData);
 
     virtual network::SocketAddress remoteSocketAddr() const override;
     virtual void setOnConnectionClosed(ConnectionClosedEventHandler handler) override;

@@ -64,6 +64,8 @@
 #include "wearable_upload_manager.h"
 #include <core/resource/resource_command_processor.h>
 
+using namespace nx;
+
 namespace {
 
 const auto kLastRunningTime = lit("lastRunningTime");
@@ -99,7 +101,7 @@ QnMediaServerModule::QnMediaServerModule(
     nx::mediaserver::MetaTypes::initialize();
 
     store(new QnStaticCommonModule(
-        Qn::PT_Server,
+        vms::api::PeerType::server,
         QnAppInfo::productNameShort(),
         QnAppInfo::customizationName()));
 

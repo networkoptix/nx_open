@@ -37,7 +37,7 @@ public:
     virtual ~QnDiscoveryMonitor();
 
 private:
-    void clientFound(QnUuid peerId, Qn::PeerType peerType);
+    void clientFound(QnUuid peerId, nx::vms::api::PeerType peerType);
     void serverFound(nx::vms::discovery::ModuleEndpoint module);
     void serverLost(QnUuid id);
 

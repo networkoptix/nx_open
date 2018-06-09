@@ -27,7 +27,6 @@
 #include "api_resource_data.h"
 #include <nx/vms/api/data/resource_type_data.h>
 #include "api_user_data.h"
-#include "api_peer_data.h"
 #include "api_runtime_data.h"
 
 #include <utils/email/email.h>
@@ -43,6 +42,7 @@
 #include <nx/vms/api/data/event_rule_data.h>
 #include <nx/vms/api/data/layout_data.h>
 #include <nx/vms/api/data/license_data.h>
+#include <nx/vms/api/data/peer_data.h>
 #include <nx/vms/api/data/videowall_data.h>
 
 using namespace nx;

@@ -481,13 +481,13 @@ void QnCommonMessageProcessor::on_gotDiscoveryData(const ec2::ApiDiscoveryData &
     server->setIgnoredUrls(ignoredUrls);
 }
 
-void QnCommonMessageProcessor::on_remotePeerFound(QnUuid data, Qn::PeerType peerType)
+void QnCommonMessageProcessor::on_remotePeerFound(QnUuid data, PeerType peerType)
 {
     handleRemotePeerFound(data, peerType);
     emit remotePeerFound(data, peerType);
 }
 
-void QnCommonMessageProcessor::on_remotePeerLost(QnUuid data, Qn::PeerType peerType)
+void QnCommonMessageProcessor::on_remotePeerLost(QnUuid data, PeerType peerType)
 {
     handleRemotePeerLost(data, peerType);
     emit remotePeerLost(data, peerType);
@@ -794,11 +794,11 @@ void QnCommonMessageProcessor::removeResourceIgnored(const QnUuid &)
 {
 }
 
-void QnCommonMessageProcessor::handleRemotePeerFound(QnUuid /*data*/, Qn::PeerType /*peerType*/)
+void QnCommonMessageProcessor::handleRemotePeerFound(QnUuid /*data*/, PeerType /*peerType*/)
 {
 }
 
-void QnCommonMessageProcessor::handleRemotePeerLost(QnUuid /*data*/, Qn::PeerType /*peerType*/)
+void QnCommonMessageProcessor::handleRemotePeerLost(QnUuid /*data*/, PeerType /*peerType*/)
 {
 }
 

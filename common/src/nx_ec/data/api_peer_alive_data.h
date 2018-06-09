@@ -3,20 +3,19 @@
 #include "api_globals.h"
 #include "api_data.h"
 #include "nx/utils/latin1_array.h"
-#include "api_peer_data.h"
 #include "api_fwd.h"
 #include "api_tran_state_data.h"
 
-#include <nx/vms/api/data/data.h>
+#include <nx/vms/api/data/peer_data.h>
 
 namespace ec2 {
 
 struct ApiPeerAliveData: nx::vms::api::Data
 {
     ApiPeerAliveData() = default;
-    ApiPeerAliveData(const ApiPeerData& peer, bool isAlive): peer(peer), isAlive(isAlive) {}
+    ApiPeerAliveData(const nx::vms::api::PeerData& peer, bool isAlive): peer(peer), isAlive(isAlive) {}
 
-    ApiPeerData peer;
+    nx::vms::api::PeerData peer;
     bool isAlive = false;
     QnTranState persistentState;
     QnTranState runtimeState;

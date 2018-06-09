@@ -25,6 +25,9 @@
 #include <utils/common/software_version.h>
 #include <utils/common/app_info.h>
 
+#include <nx/network/cloud/cloud_connect_controller.h>
+#include <nx/network/socket_global.h>
+
 namespace {
 
 Qn::HelpTopic helpTopic(Qn::ConnectionResult result)

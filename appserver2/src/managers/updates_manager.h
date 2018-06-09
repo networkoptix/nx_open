@@ -23,8 +23,12 @@ namespace ec2 {
         virtual ~QnUpdatesManager();
 
     protected:
-        virtual int sendUpdatePackageChunk(const QString &updateId, const QByteArray &data, qint64 offset, const QnPeerSet &peers, impl::SimpleHandlerPtr handler) override;
-        virtual int sendUpdateUploadResponce(const QString &updateId, const QnUuid &peerId, int chunks, impl::SimpleHandlerPtr handler) override;
+        virtual int sendUpdatePackageChunk(
+            const QString &updateId, const QByteArray &data, qint64 offset,
+            const nx::vms::api::PeerSet &peers, impl::SimpleHandlerPtr handler) override;
+
+        virtual int sendUpdateUploadResponce(const QString &updateId, const QnUuid &peerId,
+            int chunks, impl::SimpleHandlerPtr handler) override;
 
     private:
         QueryProcessorType* const m_queryProcessor;
@@ -53,7 +57,12 @@ namespace ec2 {
     QnUpdatesManager<QueryProcessorType>::~QnUpdatesManager() {}
 
     template<class QueryProcessorType>
-    int QnUpdatesManager<QueryProcessorType>::sendUpdatePackageChunk(const QString &updateId, const QByteArray &data, qint64 offset, const QnPeerSet& peers, impl::SimpleHandlerPtr handler)
+    int QnUpdatesManager<QueryProcessorType>::sendUpdatePackageChunk(
+        const QString &updateId,
+        const QByteArray &data,
+        qint64 offset,
+        const nx::vms::api::PeerSet& peers,
+        impl::SimpleHandlerPtr handler)
     {
         const int reqId = generateRequestID();
 

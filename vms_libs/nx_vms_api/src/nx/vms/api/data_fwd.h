@@ -11,7 +11,9 @@ namespace api {
 struct Data;
 
 #define DECLARE_STRUCT_NO_LIST(Type) struct Type; \
-    QN_FUSION_DECLARE_FUNCTIONS(Type, (eq)(ubjson)(xml)(json)(sql_record)(csv_record), NX_VMS_API)
+    QN_FUSION_DECLARE_FUNCTIONS(Type,
+    (eq)(ubjson)(xml)(json)(sql_record)(csv_record),
+    NX_VMS_API)
 
 #define DECLARE_STRUCT(Type) DECLARE_STRUCT_NO_LIST(Type) \
     using Type##List = std::vector<Type>;
@@ -86,6 +88,10 @@ DECLARE_STRUCT_NO_LIST(LicenseOverflowData)
 
 DECLARE_STRUCT_NO_LIST(CleanupDatabaseData)
 DECLARE_STRUCT_NO_LIST(P2pStatisticsData)
+
+DECLARE_STRUCT_NO_LIST(PersistentIdData)
+DECLARE_STRUCT_NO_LIST(PeerData)
+DECLARE_STRUCT_NO_LIST(PeerDataEx)
 
 #undef DECLARE_STRUCT
 #undef DECLARE_STRUCT_NO_LIST

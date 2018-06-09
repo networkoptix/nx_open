@@ -53,6 +53,7 @@
 #include <ui/workbench/extensions/workbench_stream_synchronizer.h>
 #include <nx/client/desktop/ui/messages/resources_messages.h>
 
+#include <nx/utils/log/log.h>
 #include <nx/utils/string.h>
 
 #include <nx/utils/counter.h>

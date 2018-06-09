@@ -55,7 +55,7 @@ TEST(ExecActionAccessRightsTest, main) //< Crash on QnDbManager nullptr
             launcher.commonModule(),
             &jsonTranSerializer,
             &ubjsonTranSerializer);
-        messageBus.init<ec2::QnTransactionMessageBus>(Qn::PeerType::PT_Server);
+        messageBus.init<ec2::QnTransactionMessageBus>(nx::vms::api::PeerType::server);
 
         ec2::ServerQueryProcessorAccess access(nullptr/*QnDbManager*/, &messageBus);
         access.getAccess(userAccess).processUpdateAsync(

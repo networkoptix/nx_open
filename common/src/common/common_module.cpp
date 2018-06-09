@@ -7,14 +7,11 @@
 #include <QtCore/QFile>
 #include <QtCore/QCryptographicHash>
 
+#include <api/common_message_processor.h>
 #include <api/global_settings.h>
 #include <api/runtime_info_manager.h>
-#include <api/common_message_processor.h>
-
-#include <nx/vms/event/rule_manager.h>
-
+#include <api/session_manager.h>
 #include <common/common_meta_types.h>
-
 #include <core/resource_access/resource_access_manager.h>
 #include <core/resource_access/shared_resources_manager.h>
 #include <core/resource_access/global_permissions_manager.h>
@@ -24,7 +21,6 @@
 #include <core/resource_access/providers/shared_resource_access_provider.h>
 #include <core/resource_access/providers/shared_layout_item_access_provider.h>
 #include <core/resource_access/providers/videowall_item_access_provider.h>
-
 #include <core/resource_management/resource_pool.h>
 #include <core/resource_management/user_roles_manager.h>
 #include <core/resource_management/resource_properties.h>
@@ -32,22 +28,19 @@
 #include <core/resource_management/server_additional_addresses_dictionary.h>
 #include <core/resource_management/resource_discovery_manager.h>
 #include <core/resource_management/layout_tour_manager.h>
-
 #include <core/resource/media_server_resource.h>
 #include <core/resource/user_resource.h>
 #include <core/resource/camera_history.h>
 #include <core/resource/camera_user_attribute_pool.h>
 #include <core/resource/media_server_user_attributes.h>
-
 #include <licensing/license.h>
-
+#include <network/router.h>
+#include <nx_ec/ec_proto_version.h>
 #include <utils/common/app_info.h>
 
 #include <nx/network/socket_global.h>
 #include <nx/vms/discovery/manager.h>
-
-#include <api/session_manager.h>
-#include <network/router.h>
+#include <nx/vms/event/rule_manager.h>
 
 using namespace nx;
 

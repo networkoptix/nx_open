@@ -13,7 +13,7 @@ class TransactionTransport:
 public:
     TransactionTransport(
         ::ec2::ConnectionGuardSharedState* const connectionGuardSharedState,
-        ::ec2::ApiPeerData localPeer,
+        nx::vms::api::PeerData localPeer,
         const std::string& systemId,
         const std::string& systemAuthKey,
         int protocolVersion,

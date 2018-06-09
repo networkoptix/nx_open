@@ -1,27 +1,26 @@
 #include "connection_validator.h"
 
 #include <api/model/connection_info.h>
+#include <api/global_settings.h>
 #include <api/runtime_info_manager.h>
-
-#include <nx_ec/impl/ec_api_impl.h>
-
 #include <common/common_module.h>
+#include <common/common_module_aware.h>
 #include <common/static_common_module.h>
-
 #include <network/module_information.h>
-
+#include <network/system_helpers.h>
+#include <nx_ec/impl/ec_api_impl.h>
 #include <utils/common/software_version.h>
 #include <utils/common/app_info.h>
-#include <api/global_settings.h>
-#include <network/system_helpers.h>
-#include <common/common_module_aware.h>
+
 #include <nx/network/app_info.h>
+#include <nx/network/socket_global.h>
+#include <nx/network/cloud/cloud_connect_controller.h>
 
 namespace {
 
-QnSoftwareVersion minSupportedVersion(Qn::PeerType localPeerType)
+QnSoftwareVersion minSupportedVersion(nx::vms::api::PeerType localPeerType)
 {
-    if (ec2::ApiPeerData::isMobileClient(localPeerType))
+    if (nx::vms::api::PeerData::isMobileClient(localPeerType))
         return QnSoftwareVersion("2.5");
 
     if (QnAppInfo::applicationPlatform() == lit("macosx"))
@@ -115,7 +114,7 @@ Qn::ConnectionResult QnConnectionValidator::validateConnectionInternal(
     const QnSoftwareVersion& version,
     const QString& cloudHost)
 {
-    bool isMobile = ec2::ApiPeerData::isMobileClient(qnStaticCommon->localPeerType());
+    bool isMobile = nx::vms::api::PeerData::isMobileClient(qnStaticCommon->localPeerType());
 
     if (!compatibleCustomization(brand, qnStaticCommon->brand(), isMobile))
         return Qn::IncompatibleInternalConnectionResult;

@@ -132,7 +132,7 @@
 
 #include <ini.h>
 
-
+using namespace nx;
 using namespace nx::client::desktop;
 
 static QtMessageHandler defaultMsgHandler = 0;
@@ -347,9 +347,9 @@ void QnClientModule::initMetaInfo()
 
 void QnClientModule::initSingletons(const QnStartupParameters& startupParams)
 {
-    Qn::PeerType clientPeerType = startupParams.videoWallGuid.isNull()
-        ? Qn::PT_DesktopClient
-        : Qn::PT_VideowallClient;
+    vms::api::PeerType clientPeerType = startupParams.videoWallGuid.isNull()
+        ? vms::api::PeerType::desktopClient
+        : vms::api::PeerType::videowallClient;
     const auto brand = startupParams.isDevMode() ? QString() : QnAppInfo::productNameShort();
     const auto customization = startupParams.isDevMode() ? QString() : QnAppInfo::customizationName();
 
@@ -724,9 +724,9 @@ void QnClientModule::initLocalInfo(const QnStartupParameters& startupParams)
 {
     auto commonModule = m_clientCoreModule->commonModule();
 
-    Qn::PeerType clientPeerType = startupParams.videoWallGuid.isNull()
-        ? Qn::PT_DesktopClient
-        : Qn::PT_VideowallClient;
+    vms::api::PeerType clientPeerType = startupParams.videoWallGuid.isNull()
+        ? vms::api::PeerType::desktopClient
+        : vms::api::PeerType::videowallClient;
 
     ec2::ApiRuntimeData runtimeData;
     runtimeData.peer.id = commonModule->moduleGUID();

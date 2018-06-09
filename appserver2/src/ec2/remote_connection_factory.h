@@ -17,6 +17,8 @@
 #include <transaction/json_transaction_serializer.h>
 #include <transaction/ubjson_transaction_serializer.h>
 
+#include <nx/vms/api/types/connection_types.h>
+
 namespace ec2 {
 
 class ClientQueryProcessor;
@@ -29,7 +31,7 @@ class RemoteConnectionFactory:
 public:
     RemoteConnectionFactory(
         QnCommonModule* commonModule,
-        Qn::PeerType peerType,
+        nx::vms::api::PeerType peerType,
         nx::utils::TimerManager* const timerManager,
         bool isP2pMode);
     virtual ~RemoteConnectionFactory();
@@ -72,7 +74,7 @@ private:
 
     std::unique_ptr<ClientQueryProcessor> m_remoteQueryProcessor;
     bool m_p2pMode = false;
-    Qn::PeerType m_peerType = Qn::PeerType::PT_NotDefined;
+    nx::vms::api::PeerType m_peerType = nx::vms::api::PeerType::notDefined;
 
 private:
     int establishConnectionToRemoteServer(

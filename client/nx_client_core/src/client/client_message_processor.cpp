@@ -23,6 +23,8 @@
 
 #include <nx/utils/log/log.h>
 
+using namespace nx::vms;
+
 QnClientMessageProcessor::QnClientMessageProcessor(QObject* parent):
     base_type(parent),
     m_status(),
@@ -190,7 +192,7 @@ void QnClientMessageProcessor::updateResource(const QnResourcePtr &resource, ec2
     }
 }
 
-void QnClientMessageProcessor::handleRemotePeerFound(QnUuid peer, Qn::PeerType peerType)
+void QnClientMessageProcessor::handleRemotePeerFound(QnUuid peer, api::PeerType peerType)
 {
     base_type::handleRemotePeerFound(peer, peerType);
 
@@ -217,7 +219,7 @@ void QnClientMessageProcessor::handleRemotePeerFound(QnUuid peer, Qn::PeerType p
     emit connectionOpened();
 }
 
-void QnClientMessageProcessor::handleRemotePeerLost(QnUuid peer, Qn::PeerType peerType)
+void QnClientMessageProcessor::handleRemotePeerLost(QnUuid peer, api::PeerType peerType)
 {
     base_type::handleRemotePeerLost(peer, peerType);
 

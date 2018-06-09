@@ -9,7 +9,7 @@ class ServerTransactionMessageBus: public QnTransactionMessageBus
     using base_type = QnTransactionMessageBus;
 public:
 	ServerTransactionMessageBus(
-        Qn::PeerType peerType,
+        nx::vms::api::PeerType peerType,
         QnCommonModule* commonModule,
         QnJsonTransactionSerializer* jsonTranSerializer,
         QnUbjsonTransactionSerializer* ubjsonTranSerializer);
@@ -22,7 +22,7 @@ public:
 		ConnectionLockGuard connectionLockGuard,
 		QSharedPointer<nx::network::AbstractStreamSocket> socket,
 		ConnectionType::Type connectionType,
-		const ApiPeerData& remotePeer,
+		const nx::vms::api::PeerData& remotePeer,
 		qint64 remoteSystemIdentityTime,
 		const nx::network::http::Request& request,
 		const QByteArray& contentEncoding,
@@ -36,7 +36,7 @@ public:
 	void gotIncomingTransactionsConnectionFromRemotePeer(
 		const QnUuid& connectionGuid,
 		QSharedPointer<nx::network::AbstractStreamSocket> socket,
-		const ApiPeerData &remotePeer,
+		const nx::vms::api::PeerData &remotePeer,
 		qint64 remoteSystemIdentityTime,
 		const nx::network::http::Request& request,
 		const QByteArray& requestBuf);
@@ -47,13 +47,13 @@ public:
 		const QByteArray& requestMsgBody);
 protected:
 	virtual bool gotAliveData(
-		const ApiPeerAliveData &aliveData, 
-		QnTransactionTransport* transport, 
+		const ApiPeerAliveData &aliveData,
+		QnTransactionTransport* transport,
 		const QnTransactionTransportHeader* ttHeader) override;
 
 	virtual bool checkSequence(
-		const QnTransactionTransportHeader& transportHeader, 
-		const QnAbstractTransaction& tran, 
+		const QnTransactionTransportHeader& transportHeader,
+		const QnAbstractTransaction& tran,
 		QnTransactionTransport* transport) override;
 
 	virtual void onGotTransactionSyncRequest(
@@ -81,8 +81,8 @@ private:
 
 	bool isSyncInProgress() const;
 	bool readApiFullInfoData(
-		const Qn::UserAccessData& userAccess, 
-		const ec2::ApiPeerData& remotePeer, 
+		const Qn::UserAccessData& userAccess,
+		const nx::vms::api::PeerData& remotePeer,
 		ApiFullInfoData* outData);
 	void printTranState(const QnTranState& tranState);
 

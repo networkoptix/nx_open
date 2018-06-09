@@ -4,8 +4,8 @@ namespace ec2 {
 namespace test {
 
 TransactionTransportStub::TransactionTransportStub(
-    const ::ec2::ApiPeerData& localPeer,
-    const ::ec2::ApiPeerData& remotePeer,
+    const nx::vms::api::PeerData& localPeer,
+    const nx::vms::api::PeerData& remotePeer,
     const nx::utils::Url& remotePeerApiUrl,
     bool isIncoming)
     :
@@ -16,12 +16,12 @@ TransactionTransportStub::TransactionTransportStub(
 {
 }
 
-const ec2::ApiPeerData& TransactionTransportStub::localPeer() const
+const nx::vms::api::PeerData& TransactionTransportStub::localPeer() const
 {
     return m_localPeer;
 }
 
-const ec2::ApiPeerData& TransactionTransportStub::remotePeer() const
+const nx::vms::api::PeerData& TransactionTransportStub::remotePeer() const
 {
     return m_remotePeer;
 }
@@ -148,8 +148,8 @@ void TransactionMessageBusStub::setTimeSyncManager(
 }
 
 void TransactionMessageBusStub::addConnectionToRemotePeer(
-    const ::ec2::ApiPeerData& localPeer,
-    const ::ec2::ApiPeerData& remotePeer,
+    const nx::vms::api::PeerData& localPeer,
+    const nx::vms::api::PeerData& remotePeer,
     const nx::utils::Url& remotePeerApiUrl,
     bool isIncoming)
 {

@@ -67,7 +67,7 @@ protected:
     {
         const auto connection = m_servers[index]->moduleInstance()->ecConnection();
         auto bus = connection->messageBus()->dynamicCast<MessageBus*>();
-        ApiPersistentIdData lostPeer = bus->localPeer();
+        vms::api::PersistentIdData lostPeer = bus->localPeer();
         return m_alivePeers.find(lostPeer.id) == m_alivePeers.end();
     }
     bool isPeerAlive(int index)
@@ -104,7 +104,7 @@ protected:
         QObject::connect(
             bus,
             &ec2::TransactionMessageBusBase::peerFound,
-            [this](QnUuid peer, Qn::PeerType)
+            [this](QnUuid peer, nx::vms::api::PeerType)
             {
                 auto result = m_alivePeers.insert(peer);
                 ASSERT_TRUE(result.second);
@@ -113,7 +113,7 @@ protected:
         QObject::connect(
             bus,
             &ec2::TransactionMessageBusBase::peerLost,
-            [this](QnUuid peer, Qn::PeerType)
+            [this](QnUuid peer, nx::vms::api::PeerType)
             {
                 auto oldSize = m_alivePeers.size();
                 m_alivePeers.erase(peer);
@@ -143,7 +143,7 @@ protected:
         m_servers[1]->moduleInstance()->ecConnection()->messageBus()->dropConnections();
         waitForCondition(std::bind(&MessageBusOnlinePeers::isPeerLost, this, 2));
         waitForCondition(std::bind(&MessageBusOnlinePeers::isPeerLost, this, 3));
-		
+
 		// It should have some offline distance because server[0] has got some data.
         for (int i = 0; i < kServerCount; ++i)
             ASSERT_LT(serverDistance(0, i), kMaxDistance);

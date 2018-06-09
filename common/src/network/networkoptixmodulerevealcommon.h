@@ -11,17 +11,19 @@
 
 #include "module_information.h"
 
+#include <nx/vms/api/types_fwd.h>
+
 //!This request is sent by host which tries to find other modules
 class RevealRequest
 {
 public:
-    RevealRequest(const QnUuid& moduleGuid, Qn::PeerType peerType);
+    RevealRequest(const QnUuid& moduleGuid, nx::vms::api::PeerType peerType);
 
     QByteArray serialize();
     static bool isValid(const quint8 *bufStart, const quint8 *bufEnd);
 private:
     const QnUuid m_moduleGuid;
-    const Qn::PeerType m_peerType;
+    const nx::vms::api::PeerType m_peerType;
 };
 
 typedef QMap<QString, QString> TypeSpecificParamMap;

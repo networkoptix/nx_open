@@ -32,6 +32,8 @@
 #include <nx/vms/api/data/resource_type_data.h>
 #include <nx/vms/discovery/manager.h>
 
+using namespace nx::vms;
+
 namespace ec2 {
 
 static const int RECONNECT_TIMEOUT = 1000 * 5;
@@ -67,7 +69,7 @@ struct GotTransactionFuction
 // --------------------------------- QnTransactionMessageBus ------------------------------
 
 QnTransactionMessageBus::QnTransactionMessageBus(
-    Qn::PeerType peerType,
+    api::PeerType peerType,
     QnCommonModule* commonModule,
     QnJsonTransactionSerializer* jsonTranSerializer,
     QnUbjsonTransactionSerializer* ubjsonTranSerializer)
@@ -126,7 +128,7 @@ QnTransactionMessageBus::~QnTransactionMessageBus()
     delete m_timer;
 }
 
-void QnTransactionMessageBus::addAlivePeerInfo(const ApiPeerData& peerData, const QnUuid& gotFromPeer, int distance)
+void QnTransactionMessageBus::addAlivePeerInfo(const api::PeerData& peerData, const QnUuid& gotFromPeer, int distance)
 {
     AlivePeersMap::iterator itr = m_alivePeers.find(peerData.id);
     if (itr == m_alivePeers.end())
@@ -140,7 +142,7 @@ void QnTransactionMessageBus::removeTTSequenceForPeer(const QnUuid& id)
 {
     NX_LOG(QnLog::EC2_TRAN_LOG, lit("Clear transportSequence for peer %1").arg(id.toString()), cl_logDEBUG1);
 
-    ApiPersistentIdData key(id, QnUuid());
+    api::PersistentIdData key(id, QnUuid());
     auto itr = m_lastTransportSeq.lowerBound(key);
     while (itr != m_lastTransportSeq.end() && itr.key().id == id)
         itr = m_lastTransportSeq.erase(itr);
@@ -229,7 +231,7 @@ void QnTransactionMessageBus::sendDelayedAliveTran()
 
 void QnTransactionMessageBus::resyncWithPeer(QnTransactionTransport* transport)
 {
-	if (!transport->remotePeer().isClient() && !ApiPeerData::isClient(m_localPeerType))
+	if (!transport->remotePeer().isClient() && !api::PeerData::isClient(m_localPeerType))
 		queueSyncRequest(transport);
 	else
 		transport->setState(QnTransactionTransport::Error);
@@ -244,8 +246,8 @@ bool QnTransactionMessageBus::gotAliveData(const ApiPeerAliveData &aliveData, Qn
     if (transport)
         gotFromPeer = transport->remotePeer().id;
 
-    NX_LOG(QnLog::EC2_TRAN_LOG, lit("received peerAlive transaction. id=%1 type=%2 isAlive=%3").
-        arg(aliveData.peer.id.toString()).arg(aliveData.peer.peerType).arg(aliveData.isAlive), cl_logDEBUG1);
+    NX_LOG(QnLog::EC2_TRAN_LOG, lm("received peerAlive transaction. id=%1 type=%2 isAlive=%3").
+        args(aliveData.peer.id.toString(), aliveData.peer.peerType, aliveData.isAlive), cl_logDEBUG1);
     if (aliveData.peer.id == commonModule()->moduleGUID())
         return false; // ignore himself
 
@@ -286,7 +288,7 @@ bool QnTransactionMessageBus::gotAliveData(const ApiPeerAliveData &aliveData, Qn
     bool isPeerExist = m_alivePeers.contains(aliveData.peer.id);
     if (aliveData.isAlive)
     {
-        addAlivePeerInfo(ApiPeerData(aliveData.peer.id, aliveData.peer.instanceId, aliveData.peer.peerType), gotFromPeer, ttHeader->distance);
+        addAlivePeerInfo(api::PeerData(aliveData.peer.id, aliveData.peer.instanceId, aliveData.peer.peerType), gotFromPeer, ttHeader->distance);
         if (!isPeerExist)
         {
             NX_LOG(QnLog::EC2_TRAN_LOG, lit("emit peerFound. id=%1").arg(aliveData.peer.id.toString()), cl_logDEBUG1);
@@ -305,7 +307,7 @@ bool QnTransactionMessageBus::gotAliveData(const ApiPeerAliveData &aliveData, Qn
 
     if (aliveData.isAlive)
     {
-        m_runtimeTransactionLog->clearOldRuntimeData(ApiPersistentIdData(aliveData.peer.id, aliveData.peer.instanceId));
+        m_runtimeTransactionLog->clearOldRuntimeData(api::PersistentIdData(aliveData.peer.id, aliveData.peer.instanceId));
     }
 
     if (transport && transport->isSyncDone() && aliveData.isAlive)
@@ -332,7 +334,7 @@ void QnTransactionMessageBus::onGotServerAliveInfo(const QnTransaction<ApiPeerAl
     if (!gotAliveData(tran.params, transport, &ttHeader))
         return; // ignore offline alive tran and resend online tran instead
 
-    if (transport->remotePeer().peerType == Qn::PT_CloudServer)
+    if (transport->remotePeer().peerType == api::PeerType::cloudServer)
         return; //< do not propagate cloud peer alive to other peers. It isn't used yet
 
     QnTransaction<ApiPeerAliveData> modifiedTran(tran);
@@ -436,14 +438,14 @@ void QnTransactionMessageBus::onGotTransactionSyncDone(QnTransactionTransport* s
 
 bool QnTransactionMessageBus::checkSequence(const QnTransactionTransportHeader& transportHeader, const QnAbstractTransaction& tran, QnTransactionTransport* transport)
 {
-    if (ApiPeerData::isClient(m_localPeerType))
+    if (api::PeerData::isClient(m_localPeerType))
         return true;
 
     if (transportHeader.sender.isNull())
         return true; // old version, nothing to check
 
     // 1. check transport sequence
-    ApiPersistentIdData ttSenderKey(transportHeader.sender, transportHeader.senderRuntimeID);
+    api::PersistentIdData ttSenderKey(transportHeader.sender, transportHeader.senderRuntimeID);
     int transportSeq = m_lastTransportSeq[ttSenderKey];
     if (transportSeq >= transportHeader.sequence)
     {
@@ -493,19 +495,19 @@ void QnTransactionMessageBus::onGotTransactionSyncRequest(
     QnTransactionTransport* sender,
     const QnTransaction<ApiSyncRequestData> &tran)
 {
-	NX_ASSERT("This function should not be called for non-server peers");
+    NX_ASSERT("This function should not be called for non-server peers");
 }
 
 void QnTransactionMessageBus::queueSyncRequest(QnTransactionTransport* transport)
 {
-	NX_ASSERT("This function should not be called for non-server peers");
+    NX_ASSERT("This function should not be called for non-server peers");
 }
 
 bool QnTransactionMessageBus::sendInitialData(QnTransactionTransport* transport)
 {
     /** Send all data to the client peers on the connect. */
-    QnPeerSet processedPeers = QnPeerSet() << transport->remotePeer().id << commonModule()->moduleGUID();
-    if (ApiPeerData::isClient(m_localPeerType))
+    api::PeerSet processedPeers({transport->remotePeer().id, commonModule()->moduleGUID()});
+    if (api::PeerData::isClient(m_localPeerType))
     {
         transport->setWriteSync(true);
         sendRuntimeInfo(transport, processedPeers, QnTranState());
@@ -520,7 +522,7 @@ void QnTransactionMessageBus::connectToPeerLost(const QnUuid& id)
         removeAlivePeer(id, true);
 }
 
-void QnTransactionMessageBus::connectToPeerEstablished(const ApiPeerData &peer)
+void QnTransactionMessageBus::connectToPeerEstablished(const api::PeerData& peer)
 {
     if (m_alivePeers.contains(peer.id))
         return;
@@ -533,7 +535,7 @@ void QnTransactionMessageBus::fillExtraAliveTransactionParams(ApiPeerAliveData* 
 {
 }
 
-void QnTransactionMessageBus::handlePeerAliveChanged(const ApiPeerData &peer, bool isAlive, bool sendTran)
+void QnTransactionMessageBus::handlePeerAliveChanged(const api::PeerData& peer, bool isAlive, bool sendTran)
 {
     ApiPeerAliveData aliveData(peer, isAlive);
 
@@ -553,7 +555,8 @@ void QnTransactionMessageBus::handlePeerAliveChanged(const ApiPeerData &peer, bo
                 ALIVE_RESEND_TIMEOUT_MIN, ALIVE_RESEND_TIMEOUT_MAX);
             addDelayedAliveTran(std::move(tran), delay);
         }
-        NX_LOG(QnLog::EC2_TRAN_LOG, lit("sending peerAlive info. id=%1 type=%2 isAlive=%3").arg(peer.id.toString()).arg(peer.peerType).arg(isAlive), cl_logDEBUG1);
+        NX_LOG(QnLog::EC2_TRAN_LOG, lm("sending peerAlive info. id=%1 type=%2 isAlive=%3").args(
+            peer.id.toString(), peer.peerType, isAlive), cl_logDEBUG1);
     }
 
     if (peer.id == commonModule()->moduleGUID())
@@ -625,7 +628,7 @@ void QnTransactionMessageBus::at_stateChanged(QnTransactionTransport::State)
             NX_ASSERT(found);
             removeTTSequenceForPeer(transport->remotePeer().id);
 
-            if (ApiPeerData::isServer(m_localPeerType) && transport->remoteIdentityTime() > commonModule()->systemIdentityTime())
+            if (api::PeerData::isServer(m_localPeerType) && transport->remoteIdentityTime() > commonModule()->systemIdentityTime())
             {
                 // swith to new time
                 NX_LOG(lit("Remote peer %1 has database restore time greater then current peer. Restarting and resync database with remote peer").arg(transport->remotePeer().id.toString()), cl_logINFO);
@@ -643,7 +646,7 @@ void QnTransactionMessageBus::at_stateChanged(QnTransactionTransport::State)
             transport->processExtraData();
             transport->startListening();
 
-            m_runtimeTransactionLog->clearOldRuntimeData(ApiPersistentIdData(transport->remotePeer().id, transport->remotePeer().instanceId));
+            m_runtimeTransactionLog->clearOldRuntimeData(api::PersistentIdData(transport->remotePeer().id, transport->remotePeer().instanceId));
             if (sendInitialData(transport))
             {
                 connectToPeerEstablished(transport->remotePeer());
@@ -721,7 +724,7 @@ void QnTransactionMessageBus::doPeriodicTasks()
             continue;
         }
 
-        if (!ApiPeerData::isClient(m_localPeerType))
+        if (!api::PeerData::isClient(m_localPeerType))
         {
             if (transport->getState() == QnTransactionTransport::ReadyForStreaming &&
                 !transport->remotePeer().isClient() &&
@@ -740,7 +743,7 @@ void QnTransactionMessageBus::doPeriodicTasks()
         bool isTimeout = !connectInfo.lastConnectedTime.isValid() || connectInfo.lastConnectedTime.hasExpired(RECONNECT_TIMEOUT);
 
         if (isTimeout && !isPeerUsing(url) && !m_restartPending &&
-            (ApiPeerData::isClient(m_localPeerType) ||
+            (api::PeerData::isClient(m_localPeerType) ||
                 !commonModule()->isReadOnly()))
         {
             if (!connectInfo.discoveredPeer.isNull())
@@ -842,7 +845,7 @@ void QnTransactionMessageBus::removePeersWithTimeout(const QSet<QnUuid>& lostPee
                 if (transport->getState() == QnTransactionTransport::Closed)
                     continue; // it's going to close soon
                 if (transport->remotePeer().id == itr.key() &&
-                    ec2::ApiPeerData::isServer(transport->remotePeer().peerType))
+                    api::PeerData::isServer(transport->remotePeer().peerType))
                 {
                     qWarning() << "No alive info during timeout. reconnect to peer" << transport->remotePeer().id;
                     transport->setState(QnTransactionTransport::Error);
@@ -1037,9 +1040,9 @@ QnTransactionMessageBus::AlivePeersMap QnTransactionMessageBus::alivePeers() con
     return m_alivePeers;
 }
 
-QnPeerSet QnTransactionMessageBus::connectedServerPeers() const
+api::PeerSet QnTransactionMessageBus::connectedServerPeers() const
 {
-    QnPeerSet result;
+    api::PeerSet result;
     for (QnConnectionMap::const_iterator itr = m_connections.begin(); itr != m_connections.end(); ++itr)
     {
         QnTransactionTransport* transport = *itr;
@@ -1050,10 +1053,10 @@ QnPeerSet QnTransactionMessageBus::connectedServerPeers() const
     return result;
 }
 
-QMap<QnUuid, ApiPeerData> QnTransactionMessageBus::aliveServerPeers() const
+QMap<QnUuid, api::PeerData> QnTransactionMessageBus::aliveServerPeers() const
 {
     QnMutexLocker lock(&m_mutex);
-    QMap<QnUuid, ApiPeerData> result;
+    QMap<QnUuid, api::PeerData> result;
     for (AlivePeersMap::const_iterator itr = m_alivePeers.begin(); itr != m_alivePeers.end(); ++itr)
     {
         if (itr->peer.isServer())
@@ -1097,9 +1100,9 @@ QSet<QnUuid> QnTransactionMessageBus::directlyConnectedServerPeers() const
     return connectedServerPeers();
 }
 
-ec2::ApiPeerData QnTransactionMessageBus::localPeer() const
+api::PeerData QnTransactionMessageBus::localPeer() const
 {
-    return ec2::ApiPeerData(commonModule()->moduleGUID(), commonModule()->runningInstanceGUID(), m_localPeerType);
+    return api::PeerData(commonModule()->moduleGUID(), commonModule()->runningInstanceGUID(), m_localPeerType);
 }
 
 void QnTransactionMessageBus::at_runtimeDataUpdated(const QnTransaction<ApiRuntimeData>& tran)

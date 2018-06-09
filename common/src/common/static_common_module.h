@@ -5,15 +5,14 @@
 #include <QtCore/QDateTime>
 
 #include <common/common_globals.h>
-
 #include <core/resource/resource_fwd.h>
-
-#include <nx/utils/singleton.h>
-
 #include <utils/common/instance_storage.h>
 #include <utils/common/software_version.h>
+
+#include <nx/utils/singleton.h>
 #include <nx/utils/thread/mutex.h>
 #include <nx/utils/uuid.h>
+#include <nx/vms/api/types/connection_types.h>
 
 class QnResourceDataPool;
 struct QnStaticCommonModulePrivate;
@@ -32,7 +31,7 @@ class QnStaticCommonModule:
 
 public:
     QnStaticCommonModule(
-        Qn::PeerType localPeerType = Qn::PeerType::PT_NotDefined,
+        nx::vms::api::PeerType localPeerType = nx::vms::api::PeerType::notDefined,
         const QString& brand = QString(),
         const QString& customization = QString(),
         const QString& customCloudHost = QString(),
@@ -43,7 +42,7 @@ public:
     using QnInstanceStorage::instance;
     using QnInstanceStorage::store;
 
-    Qn::PeerType localPeerType() const;
+    nx::vms::api::PeerType localPeerType() const;
     QString brand() const;
     QString customization() const;
 
@@ -63,7 +62,7 @@ private:
 	QMap<QnUuid, int> m_longToShortInstanceId;
     QnStaticCommonModulePrivate* m_private;
 
-    const Qn::PeerType m_localPeerType;
+    const nx::vms::api::PeerType m_localPeerType;
     const QString m_brand;
     const QString m_customization;
     QnSoftwareVersion m_engineVersion;

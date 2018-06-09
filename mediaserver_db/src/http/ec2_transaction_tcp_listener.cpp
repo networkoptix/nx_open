@@ -11,6 +11,7 @@
 #include <database/db_manager.h>
 #include "common/common_module.h"
 #include "transaction/transaction_transport.h"
+#include <nx/network/cloud/cloud_connect_controller.h>
 #include <nx/network/http/custom_headers.h>
 #include <nx/network/socket_global.h>
 #include "audit/audit_manager.h"
@@ -18,6 +19,7 @@
 #include <core/resource/media_server_resource.h>
 #include <nx/fusion/serialization/lexical.h>
 
+using namespace nx;
 
 namespace ec2
 {
@@ -84,30 +86,30 @@ void QnTransactionTcpProcessor::run()
     qint64 remoteSystemIdentityTime = query.queryItemValue("system-identity-time").toLongLong();
 
     bool deserialized = false;
-    Qn::PeerType peerType = QnLexical::deserialized<Qn::PeerType>(
+    vms::api::PeerType peerType = QnLexical::deserialized<vms::api::PeerType>(
         query.queryItemValue("peerType"),
-        Qn::PT_NotDefined,
+        vms::api::PeerType::notDefined,
         &deserialized);
-    if (!deserialized || peerType == Qn::PT_NotDefined)
+    if (!deserialized || peerType == vms::api::PeerType::notDefined)
     {
         QnUuid videowallGuid = QnUuid(query.queryItemValue("videowallGuid"));
         const bool isVideowall = !videowallGuid.isNull();
         const bool isClient = query.hasQueryItem("isClient");
         const bool isMobileClient = query.hasQueryItem("isMobile");
 
-        peerType = isMobileClient ? Qn::PT_OldMobileClient
-            : isVideowall ? Qn::PT_VideowallClient
-            : isClient ? Qn::PT_DesktopClient
-            : Qn::PT_Server;
+        peerType = isMobileClient ? vms::api::PeerType::oldMobileClient
+            : isVideowall ? vms::api::PeerType::videowallClient
+            : isClient ? vms::api::PeerType::desktopClient
+            : vms::api::PeerType::server;
     }
 
     Qn::SerializationFormat dataFormat = Qn::UbjsonFormat;
     if (query.hasQueryItem("format"))
          QnLexical::deserialize(query.queryItemValue("format"), &dataFormat);
 
-    ApiPeerData remotePeer(remoteGuid, remoteRuntimeGuid, peerType, dataFormat);
+    vms::api::PeerData remotePeer(remoteGuid, remoteRuntimeGuid, peerType, dataFormat);
 
-    if (peerType == Qn::PT_Server && commonModule()->isReadOnly())
+    if (peerType == vms::api::PeerType::server && commonModule()->isReadOnly())
     {
         sendResponse(nx::network::http::StatusCode::forbidden, nx::network::http::StringType());
         return;
@@ -192,7 +194,7 @@ void QnTransactionTcpProcessor::run()
         remoteGuid,
         ConnectionLockGuard::Direction::Incoming);
 
-    if (remotePeer.peerType == Qn::PT_Server)
+    if (remotePeer.peerType == vms::api::PeerType::server)
     {
         // use two stage connect for server peers only, go to second stage for client immediately
 
@@ -314,7 +316,7 @@ void QnTransactionTcpProcessor::run()
 
         // By default all peers have read permissions on all resources
         auto access = d->accessRights;
-        if (remotePeer.peerType == Qn::PT_Server)
+        if (remotePeer.peerType == vms::api::PeerType::server)
         {
             // Here we substitute admin user with SuperAccess user to pass by all access checks unhurt
             // since server-to-server order of transactions is unpredictable and access check for resource attribute

@@ -20,11 +20,13 @@
 #include <transaction/message_bus_adapter.h>
 #include <managers/time_manager.h>
 
+using namespace nx::vms;
+
 namespace ec2 {
 
 RemoteConnectionFactory::RemoteConnectionFactory(
     QnCommonModule* commonModule,
-    Qn::PeerType peerType,
+    api::PeerType peerType,
     nx::utils::TimerManager* const timerManager,
     bool isP2pMode)
 :
@@ -105,7 +107,7 @@ int RemoteConnectionFactory::connectAsync(
     nx::utils::Url url = addr;
     url.setUserName(url.userName().toLower());
 
-    if (ApiPeerData::isMobileClient(qnStaticCommon->localPeerType()))
+    if (api::PeerData::isMobileClient(qnStaticCommon->localPeerType()))
     {
         QUrlQuery query(url.toQUrl());
         query.removeQueryItem(lit("format"));

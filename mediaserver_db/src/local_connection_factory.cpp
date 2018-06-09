@@ -52,36 +52,36 @@ static const char* const kIncomingTransactionsPath = "ec2/forward_events";
 
 LocalConnectionFactory::LocalConnectionFactory(
     QnCommonModule* commonModule,
-    Qn::PeerType peerType,
-	nx::utils::TimerManager* const timerManager,
-	bool isP2pMode)
-	:
+    PeerType peerType,
+    nx::utils::TimerManager* const timerManager,
+    bool isP2pMode)
+    :
     AbstractECConnectionFactory(commonModule),
-	// dbmanager is initialized by direct connection.
+    // dbmanager is initialized by direct connection.
 
-	m_jsonTranSerializer(new QnJsonTransactionSerializer()),
-	m_ubjsonTranSerializer(new QnUbjsonTransactionSerializer()),
-	m_terminated(false),
-	m_runningRequests(0),
-	m_sslEnabled(false),
-	m_p2pMode(isP2pMode)
+    m_jsonTranSerializer(new QnJsonTransactionSerializer()),
+    m_ubjsonTranSerializer(new QnUbjsonTransactionSerializer()),
+    m_terminated(false),
+    m_runningRequests(0),
+    m_sslEnabled(false),
+    m_p2pMode(isP2pMode)
 {
-	if (peerType == Qn::PT_Server)
-	{
-		m_dbManager.reset(new detail::QnDbManager(commonModule));
-		m_transactionLog.reset(new QnTransactionLog(m_dbManager.get(), m_ubjsonTranSerializer.get()));
-	}
+    if (peerType == PeerType::server)
+    {
+        m_dbManager.reset(new detail::QnDbManager(commonModule));
+        m_transactionLog.reset(new QnTransactionLog(m_dbManager.get(), m_ubjsonTranSerializer.get()));
+    }
 
-	m_bus.reset(new TransactionMessageBusAdapter(
-		commonModule,
-		m_jsonTranSerializer.get(),
-		m_ubjsonTranSerializer.get()));
-
-	m_timeSynchronizationManager.reset(new TimeSynchronizationManager(
+    m_bus.reset(new TransactionMessageBusAdapter(
         commonModule,
-		peerType,
-		timerManager,
-		&m_settingsInstance));
+        m_jsonTranSerializer.get(),
+        m_ubjsonTranSerializer.get()));
+
+    m_timeSynchronizationManager.reset(new TimeSynchronizationManager(
+        commonModule,
+        peerType,
+        timerManager,
+        &m_settingsInstance));
 
     if (m_p2pMode)
     {
@@ -95,34 +95,34 @@ LocalConnectionFactory::LocalConnectionFactory(
         m_distributedMutexManager.reset(new QnDistributedMutexManager(messageBus));
     }
 
-	m_serverQueryProcessor.reset(new ServerQueryProcessorAccess(m_dbManager.get(), m_bus.get()));
+    m_serverQueryProcessor.reset(new ServerQueryProcessorAccess(m_dbManager.get(), m_bus.get()));
 
-	m_dbManager->setTransactionLog(m_transactionLog.get());
-	m_dbManager->setTimeSyncManager(m_timeSynchronizationManager.get());
+    m_dbManager->setTransactionLog(m_transactionLog.get());
+    m_dbManager->setTimeSyncManager(m_timeSynchronizationManager.get());
 
-	m_bus->setTimeSyncManager(m_timeSynchronizationManager.get());
+    m_bus->setTimeSyncManager(m_timeSynchronizationManager.get());
 
-	// Cannot be done in TimeSynchronizationManager constructor to keep valid object destruction
-	// order.
-	// TODO: #Elric #EC2 register in a proper place!
-	// Registering ec2 types with Qt meta-type system.
-	qRegisterMetaType<QnTransactionTransportHeader>("QnTransactionTransportHeader");
+    // Cannot be done in TimeSynchronizationManager constructor to keep valid object destruction
+    // order.
+    // TODO: #Elric #EC2 register in a proper place!
+    // Registering ec2 types with Qt meta-type system.
+    qRegisterMetaType<QnTransactionTransportHeader>("QnTransactionTransportHeader");
 
-	// TODO: Add comment why this code is commented out.
-	//m_transactionMessageBus->start();
+    // TODO: Add comment why this code is commented out.
+    //m_transactionMessageBus->start();
 }
 
 void LocalConnectionFactory::shutdown()
 {
-	// Have to do it before m_transactionMessageBus destruction since TimeSynchronizationManager
-	// uses QnTransactionMessageBus.
-	if (m_timeSynchronizationManager)
-		m_timeSynchronizationManager->pleaseStop();
+    // Have to do it before m_transactionMessageBus destruction since TimeSynchronizationManager
+    // uses QnTransactionMessageBus.
+    if (m_timeSynchronizationManager)
+        m_timeSynchronizationManager->pleaseStop();
 
-	m_serverQueryProcessor->waitForAsyncTasks();
+    m_serverQueryProcessor->waitForAsyncTasks();
 
-	pleaseStop();
-	join();
+    pleaseStop();
+    join();
 }
 
 LocalConnectionFactory::~LocalConnectionFactory()
@@ -131,73 +131,73 @@ LocalConnectionFactory::~LocalConnectionFactory()
 
 void LocalConnectionFactory::pleaseStop()
 {
-	QnMutexLocker lk(&m_mutex);
-	m_terminated = true;
+    QnMutexLocker lk(&m_mutex);
+    m_terminated = true;
 }
 
 void LocalConnectionFactory::join()
 {
-	// Cancelling all ongoing requests.
+    // Cancelling all ongoing requests.
 }
 
 // Implementation of AbstractECConnectionFactory::testConnectionAsync
 int LocalConnectionFactory::testConnectionAsync(
-	const nx::utils::Url &addr,
-	impl::TestConnectionHandlerPtr handler)
+    const nx::utils::Url &addr,
+    impl::TestConnectionHandlerPtr handler)
 {
-	nx::utils::Url url = addr;
-	url.setUserName(url.userName().toLower());
+    nx::utils::Url url = addr;
+    url.setUserName(url.userName().toLower());
 
-	QUrlQuery query(url.toQUrl());
-	query.removeQueryItem(lit("format"));
-	query.addQueryItem(lit("format"), QnLexical::serialized(Qn::JsonFormat));
-	url.setQuery(query);
+    QUrlQuery query(url.toQUrl());
+    query.removeQueryItem(lit("format"));
+    query.addQueryItem(lit("format"), QnLexical::serialized(Qn::JsonFormat));
+    url.setQuery(query);
 
-	return testDirectConnection(url, handler);
+    return testDirectConnection(url, handler);
 }
 
 // Implementation of AbstractECConnectionFactory::connectAsync
 int LocalConnectionFactory::connectAsync(
-	const nx::utils::Url& addr,
-	const nx::vms::api::ClientInfoData& clientInfo,
-	impl::ConnectHandlerPtr handler)
+    const nx::utils::Url& addr,
+    const nx::vms::api::ClientInfoData& clientInfo,
+    impl::ConnectHandlerPtr handler)
 {
-	nx::utils::Url url = addr;
-	url.setUserName(url.userName().toLower());
+    nx::utils::Url url = addr;
+    url.setUserName(url.userName().toLower());
 
-	if (ApiPeerData::isMobileClient(qnStaticCommon->localPeerType()))
-	{
-		QUrlQuery query(url.toQUrl());
-		query.removeQueryItem(lit("format"));
-		query.addQueryItem(lit("format"), QnLexical::serialized(Qn::JsonFormat));
-		url.setQuery(query);
-	}
+    if (PeerData::isMobileClient(qnStaticCommon->localPeerType()))
+    {
+        QUrlQuery query(url.toQUrl());
+        query.removeQueryItem(lit("format"));
+        query.addQueryItem(lit("format"), QnLexical::serialized(Qn::JsonFormat));
+        url.setQuery(query);
+    }
 
-	return establishDirectConnection(url, handler);
+    return establishDirectConnection(url, handler);
 }
 
 void LocalConnectionFactory::registerTransactionListener(
-	QnHttpConnectionListener* httpConnectionListener)
+    QnHttpConnectionListener* httpConnectionListener)
 {
-	if (auto bus = m_bus->dynamicCast<ServerTransactionMessageBus*>())
-	{
-		httpConnectionListener->addHandler<QnTransactionTcpProcessor, ServerTransactionMessageBus*>(
-			"HTTP", "ec2/events", bus);
-		httpConnectionListener->addHandler<QnHttpTransactionReceiver, ServerTransactionMessageBus*>(
-			"HTTP", kIncomingTransactionsPath, bus);
-	}
-	else if (auto bus = m_bus->dynamicCast<nx::p2p::MessageBus*>())
-	{
-		httpConnectionListener->addHandler<nx::p2p::ConnectionProcessor>(
-			"HTTP", QnTcpListener::normalizedPath(nx::p2p::MessageBus::kUrlPath));
-	}
+    if (auto bus = m_bus->dynamicCast<ServerTransactionMessageBus*>())
+    {
+        httpConnectionListener->addHandler<QnTransactionTcpProcessor, ServerTransactionMessageBus*>(
+            "HTTP", "ec2/events", bus);
+        httpConnectionListener->addHandler<QnHttpTransactionReceiver, ServerTransactionMessageBus*>(
+            "HTTP", kIncomingTransactionsPath, bus);
+    }
+    else if (auto bus = m_bus->dynamicCast<nx::p2p::MessageBus*>())
+    {
+        httpConnectionListener->addHandler<nx::p2p::ConnectionProcessor>(
+            "HTTP", QnTcpListener::normalizedPath(nx::p2p::MessageBus::kUrlPath));
+    }
 
-	m_sslEnabled = httpConnectionListener->isSslEnabled();
+    m_sslEnabled = httpConnectionListener->isSslEnabled();
 }
 
 void LocalConnectionFactory::registerRestHandlers(QnRestProcessorPool* const p)
 {
-	using namespace std::placeholders;
+    using namespace std::placeholders;
     using namespace nx::vms::api;
 
     /**%apidoc GET /ec2/getResourceTypes
@@ -1623,281 +1623,281 @@ void LocalConnectionFactory::registerRestHandlers(QnRestProcessorPool* const p)
     // Ec2StaticticsReporter
     regFunctor<std::nullptr_t, ApiSystemStatistics>(p, ApiCommand::getStatisticsReport,
         [this](std::nullptr_t, ApiSystemStatistics* const out, const Qn::UserAccessData&)
-        {
-            if (!m_directConnection)
-                return ErrorCode::failure;
-            return m_directConnection->getStaticticsReporter()->collectReportData(
-                nullptr, out);
-        });
+    {
+        if (!m_directConnection)
+            return ErrorCode::failure;
+        return m_directConnection->getStaticticsReporter()->collectReportData(
+            nullptr, out);
+    });
     regFunctor<std::nullptr_t, ApiStatisticsServerInfo>(p, ApiCommand::triggerStatisticsReport,
         [this](std::nullptr_t, ApiStatisticsServerInfo* const out, const Qn::UserAccessData&)
-        {
-            if (!m_directConnection)
-                return ErrorCode::failure;
-            return m_directConnection->getStaticticsReporter()->triggerStatisticsReport(
-                nullptr, out);
-        });
+    {
+        if (!m_directConnection)
+            return ErrorCode::failure;
+        return m_directConnection->getStaticticsReporter()->triggerStatisticsReport(
+            nullptr, out);
+    });
 
     p->registerHandler("ec2/activeConnections", new QnActiveConnectionsRestHandler(m_bus.get()));
     p->registerHandler(TimeSynchronizationManager::kTimeSyncUrlPath, new QnTimeSyncRestHandler(this));
 
 #if 0 // Using HTTP processor since HTTP REST does not support HTTP interleaving.
-	p->registerHandler(
-		QLatin1String(kIncomingTransactionsPath),
-		new QnRestTransactionReceiver());
+    p->registerHandler(
+        QLatin1String(kIncomingTransactionsPath),
+        new QnRestTransactionReceiver());
 #endif // 0
 }
 
 void LocalConnectionFactory::setConfParams(std::map<QString, QVariant> confParams)
 {
-	m_settingsInstance.loadParams(std::move(confParams));
+    m_settingsInstance.loadParams(std::move(confParams));
 }
 
 int LocalConnectionFactory::establishDirectConnection(
-	const nx::utils::Url& url, impl::ConnectHandlerPtr handler)
+    const nx::utils::Url& url, impl::ConnectHandlerPtr handler)
 {
-	const int reqId = generateRequestID();
+    const int reqId = generateRequestID();
 
-	ConnectionData loginInfo;
-	QnConnectionInfo connectionInfo;
-	fillConnectionInfo(loginInfo, &connectionInfo); // < TODO: #ak not appropriate here
-	connectionInfo.ecUrl = url;
-	ErrorCode connectionInitializationResult = ErrorCode::ok;
-	{
-		QnMutexLocker lk(&m_mutex);
-		if (!m_directConnection)
-		{
-			m_directConnection.reset(
-				new Ec2DirectConnection(
-					this,
-					m_serverQueryProcessor.get(),
-					connectionInfo,
-					url));
-			if (m_directConnection->initialized())
-			{
-			}
-			else
-			{
-				connectionInitializationResult = ErrorCode::dbError;
-				m_directConnection.reset();
-			}
+    ConnectionData loginInfo;
+    QnConnectionInfo connectionInfo;
+    fillConnectionInfo(loginInfo, &connectionInfo); // < TODO: #ak not appropriate here
+    connectionInfo.ecUrl = url;
+    ErrorCode connectionInitializationResult = ErrorCode::ok;
+    {
+        QnMutexLocker lk(&m_mutex);
+        if (!m_directConnection)
+        {
+            m_directConnection.reset(
+                new Ec2DirectConnection(
+                    this,
+                    m_serverQueryProcessor.get(),
+                    connectionInfo,
+                    url));
+            if (m_directConnection->initialized())
+            {
+            }
+            else
+            {
+                connectionInitializationResult = ErrorCode::dbError;
+                m_directConnection.reset();
+            }
 
-		}
-	}
-	nx::utils::concurrent::run(
-		Ec2ThreadPool::instance(),
-		std::bind(
-			&impl::ConnectHandler::done,
-			handler,
-			reqId,
-			connectionInitializationResult,
-			m_directConnection));
-	return reqId;
+        }
+    }
+    nx::utils::concurrent::run(
+        Ec2ThreadPool::instance(),
+        std::bind(
+            &impl::ConnectHandler::done,
+            handler,
+            reqId,
+            connectionInitializationResult,
+            m_directConnection));
+    return reqId;
 }
 
 void LocalConnectionFactory::tryConnectToOldEC(const nx::utils::Url& ecUrl,
-	impl::ConnectHandlerPtr handler, int reqId)
+    impl::ConnectHandlerPtr handler, int reqId)
 {
-	// Checking for old EC.
-	nx::utils::concurrent::run(
-		Ec2ThreadPool::instance(),
-		[this, ecUrl, handler, reqId]()
-	{
-		using namespace std::placeholders;
-		return connectToOldEC(
-			ecUrl,
-			[reqId, handler](
-				ErrorCode errorCode, const QnConnectionInfo& oldECConnectionInfo)
-		{
-			if (errorCode == ErrorCode::ok
-				&& oldECConnectionInfo.version >= QnSoftwareVersion(2, 3, 0))
-			{
-				// Somehow connected to 2.3 server with old ec connection. Returning
-				// error, since could not connect to ec 2.3 during normal connect.
-				handler->done(
-					reqId,
-					ErrorCode::ioError,
-					AbstractECConnectionPtr());
-			}
-			else
-			{
-				handler->done(
-					reqId,
-					errorCode,
-					errorCode == ErrorCode::ok
-					? std::make_shared<OldEcConnection>(oldECConnectionInfo)
-					: AbstractECConnectionPtr());
-			}
-		});
-	});
+    // Checking for old EC.
+    nx::utils::concurrent::run(
+        Ec2ThreadPool::instance(),
+        [this, ecUrl, handler, reqId]()
+    {
+        using namespace std::placeholders;
+        return connectToOldEC(
+            ecUrl,
+            [reqId, handler](
+                ErrorCode errorCode, const QnConnectionInfo& oldECConnectionInfo)
+        {
+            if (errorCode == ErrorCode::ok
+                && oldECConnectionInfo.version >= QnSoftwareVersion(2, 3, 0))
+            {
+                // Somehow connected to 2.3 server with old ec connection. Returning
+                // error, since could not connect to ec 2.3 during normal connect.
+                handler->done(
+                    reqId,
+                    ErrorCode::ioError,
+                    AbstractECConnectionPtr());
+            }
+            else
+            {
+                handler->done(
+                    reqId,
+                    errorCode,
+                    errorCode == ErrorCode::ok
+                    ? std::make_shared<OldEcConnection>(oldECConnectionInfo)
+                    : AbstractECConnectionPtr());
+            }
+        });
+    });
 }
 
 const char oldEcConnectPath[] = "/api/connect/?format=pb&guid&ping=1";
 
 static bool parseOldECConnectionInfo(
-	const QByteArray& oldECConnectResponse, QnConnectionInfo* const connectionInfo)
+    const QByteArray& oldECConnectResponse, QnConnectionInfo* const connectionInfo)
 {
-	static const char PROTOBUF_FIELD_TYPE_STRING = 0x0a;
+    static const char PROTOBUF_FIELD_TYPE_STRING = 0x0a;
 
-	if (oldECConnectResponse.isEmpty())
-		return false;
+    if (oldECConnectResponse.isEmpty())
+        return false;
 
-	const char* data = oldECConnectResponse.data();
-	const char* dataEnd = oldECConnectResponse.data() + oldECConnectResponse.size();
-	if (data + 2 >= dataEnd)
-		return false;
-	if (*data != PROTOBUF_FIELD_TYPE_STRING)
-		return false;
-	++data;
-	const int fieldLen = *data;
-	++data;
-	if (data + fieldLen >= dataEnd)
-		return false;
-	connectionInfo->version = QnSoftwareVersion(QByteArray::fromRawData(data, fieldLen));
-	return true;
+    const char* data = oldECConnectResponse.data();
+    const char* dataEnd = oldECConnectResponse.data() + oldECConnectResponse.size();
+    if (data + 2 >= dataEnd)
+        return false;
+    if (*data != PROTOBUF_FIELD_TYPE_STRING)
+        return false;
+    ++data;
+    const int fieldLen = *data;
+    ++data;
+    if (data + fieldLen >= dataEnd)
+        return false;
+    connectionInfo->version = QnSoftwareVersion(QByteArray::fromRawData(data, fieldLen));
+    return true;
 }
 
 template<class Handler>
 void LocalConnectionFactory::connectToOldEC(const nx::utils::Url& ecUrl, Handler completionFunc)
 {
-	nx::utils::Url httpsEcUrl = ecUrl; // < Old EC supports only https.
-	httpsEcUrl.setScheme(lit("https"));
+    nx::utils::Url httpsEcUrl = ecUrl; // < Old EC supports only https.
+    httpsEcUrl.setScheme(lit("https"));
 
-	QAuthenticator auth;
-	auth.setUser(httpsEcUrl.userName());
-	auth.setPassword(httpsEcUrl.password());
-	CLSimpleHTTPClient simpleHttpClient(httpsEcUrl, 3000, auth);
-	const CLHttpStatus statusCode = simpleHttpClient.doGET(
-		QByteArray::fromRawData(oldEcConnectPath, sizeof(oldEcConnectPath)));
-	switch (statusCode)
-	{
-	case CL_HTTP_SUCCESS:
-	{
-		// Reading mesasge body.
-		QByteArray oldECResponse;
-		simpleHttpClient.readAll(oldECResponse);
-		QnConnectionInfo oldECConnectionInfo;
-		oldECConnectionInfo.ecUrl = httpsEcUrl;
-		if (parseOldECConnectionInfo(oldECResponse, &oldECConnectionInfo))
-		{
-			if (oldECConnectionInfo.version >= QnSoftwareVersion(2, 3))
-			{
-				// Ignoring response from 2.3+ server received using compatibility response.
-				completionFunc(ErrorCode::ioError, QnConnectionInfo());
-			}
-			else
-			{
-				completionFunc(ErrorCode::ok, oldECConnectionInfo);
-			}
-		}
-		else
-		{
-			completionFunc(ErrorCode::badResponse, oldECConnectionInfo);
-		}
-		break;
-	}
+    QAuthenticator auth;
+    auth.setUser(httpsEcUrl.userName());
+    auth.setPassword(httpsEcUrl.password());
+    CLSimpleHTTPClient simpleHttpClient(httpsEcUrl, 3000, auth);
+    const CLHttpStatus statusCode = simpleHttpClient.doGET(
+        QByteArray::fromRawData(oldEcConnectPath, sizeof(oldEcConnectPath)));
+    switch (statusCode)
+    {
+    case CL_HTTP_SUCCESS:
+    {
+        // Reading mesasge body.
+        QByteArray oldECResponse;
+        simpleHttpClient.readAll(oldECResponse);
+        QnConnectionInfo oldECConnectionInfo;
+        oldECConnectionInfo.ecUrl = httpsEcUrl;
+        if (parseOldECConnectionInfo(oldECResponse, &oldECConnectionInfo))
+        {
+            if (oldECConnectionInfo.version >= QnSoftwareVersion(2, 3))
+            {
+                // Ignoring response from 2.3+ server received using compatibility response.
+                completionFunc(ErrorCode::ioError, QnConnectionInfo());
+            }
+            else
+            {
+                completionFunc(ErrorCode::ok, oldECConnectionInfo);
+            }
+        }
+        else
+        {
+            completionFunc(ErrorCode::badResponse, oldECConnectionInfo);
+        }
+        break;
+    }
 
-	case CL_HTTP_AUTH_REQUIRED:
-		completionFunc(ErrorCode::unauthorized, QnConnectionInfo());
-		break;
+    case CL_HTTP_AUTH_REQUIRED:
+        completionFunc(ErrorCode::unauthorized, QnConnectionInfo());
+        break;
 
-	case CL_HTTP_FORBIDDEN:
-		completionFunc(ErrorCode::forbidden, QnConnectionInfo());
-		break;
+    case CL_HTTP_FORBIDDEN:
+        completionFunc(ErrorCode::forbidden, QnConnectionInfo());
+        break;
 
-	default:
-		completionFunc(ErrorCode::ioError, QnConnectionInfo());
-		break;
-	}
+    default:
+        completionFunc(ErrorCode::ioError, QnConnectionInfo());
+        break;
+    }
 
-	QnMutexLocker lk(&m_mutex);
-	--m_runningRequests;
+    QnMutexLocker lk(&m_mutex);
+    --m_runningRequests;
 }
 
 ErrorCode LocalConnectionFactory::fillConnectionInfo(
-	const ConnectionData& loginInfo,
-	QnConnectionInfo* const connectionInfo,
-	nx::network::http::Response* response)
+    const ConnectionData& loginInfo,
+    QnConnectionInfo* const connectionInfo,
+    nx::network::http::Response* response)
 {
-	connectionInfo->version = qnStaticCommon->engineVersion();
-	connectionInfo->brand = qnStaticCommon->brand();
-	connectionInfo->customization = qnStaticCommon->customization();
-	connectionInfo->systemName = commonModule()->globalSettings()->systemName();
-	connectionInfo->ecsGuid = commonModule()->moduleGUID().toString();
-	connectionInfo->cloudSystemId = commonModule()->globalSettings()->cloudSystemId();
-	connectionInfo->localSystemId = commonModule()->globalSettings()->localSystemId();
+    connectionInfo->version = qnStaticCommon->engineVersion();
+    connectionInfo->brand = qnStaticCommon->brand();
+    connectionInfo->customization = qnStaticCommon->customization();
+    connectionInfo->systemName = commonModule()->globalSettings()->systemName();
+    connectionInfo->ecsGuid = commonModule()->moduleGUID().toString();
+    connectionInfo->cloudSystemId = commonModule()->globalSettings()->cloudSystemId();
+    connectionInfo->localSystemId = commonModule()->globalSettings()->localSystemId();
 #if defined(__arm__) || defined(__aarch64__)
-	connectionInfo->box = QnAppInfo::armBox();
+    connectionInfo->box = QnAppInfo::armBox();
 #endif
-	connectionInfo->allowSslConnections = m_sslEnabled;
-	connectionInfo->nxClusterProtoVersion = nx_ec::EC2_PROTO_VERSION;
-	connectionInfo->ecDbReadOnly = m_settingsInstance.dbReadOnly();
-	connectionInfo->newSystem = commonModule()->globalSettings()->isNewSystem();
-	connectionInfo->p2pMode = m_p2pMode;
-	if (response)
-	{
-		connectionInfo->effectiveUserName =
-			nx::network::http::getHeaderValue(response->headers, Qn::EFFECTIVE_USER_NAME_HEADER_NAME);
-	}
+    connectionInfo->allowSslConnections = m_sslEnabled;
+    connectionInfo->nxClusterProtoVersion = nx_ec::EC2_PROTO_VERSION;
+    connectionInfo->ecDbReadOnly = m_settingsInstance.dbReadOnly();
+    connectionInfo->newSystem = commonModule()->globalSettings()->isNewSystem();
+    connectionInfo->p2pMode = m_p2pMode;
+    if (response)
+    {
+        connectionInfo->effectiveUserName =
+            nx::network::http::getHeaderValue(response->headers, Qn::EFFECTIVE_USER_NAME_HEADER_NAME);
+    }
 
 #ifdef ENABLE_EXTENDED_STATISTICS
-	if (!loginInfo.clientInfo.id.isNull())
-	{
-		auto clientInfo = loginInfo.clientInfo;
-		clientInfo.parentId = commonModule()->moduleGUID();
+    if (!loginInfo.clientInfo.id.isNull())
+    {
+        auto clientInfo = loginInfo.clientInfo;
+        clientInfo.parentId = commonModule()->moduleGUID();
 
-		nx::vms::api::ClientInfoDataList infoList;
-		auto result = dbManager(Qn::kSystemAccess).doQuery(clientInfo.id, infoList);
-		if (result != ErrorCode::ok)
-			return result;
+        nx::vms::api::ClientInfoDataList infoList;
+        auto result = dbManager(Qn::kSystemAccess).doQuery(clientInfo.id, infoList);
+        if (result != ErrorCode::ok)
+            return result;
 
-		if (infoList.size() > 0
-			&& QJson::serialized(clientInfo) == QJson::serialized(infoList.front()))
-		{
-			NX_LOG(lit("LocalConnectionFactory: New client had already been registered with the same params"),
-				cl_logDEBUG2);
-			return ErrorCode::ok;
-		}
+        if (infoList.size() > 0
+            && QJson::serialized(clientInfo) == QJson::serialized(infoList.front()))
+        {
+            NX_LOG(lit("LocalConnectionFactory: New client had already been registered with the same params"),
+                cl_logDEBUG2);
+            return ErrorCode::ok;
+        }
 
-		m_serverQueryProcessor.getAccess(Qn::kSystemAccess).processUpdateAsync(
-			ApiCommand::saveClientInfo, clientInfo,
-			[&](ErrorCode result)
-		{
-			if (result == ErrorCode::ok)
-			{
-				NX_LOG(lit("LocalConnectionFactory: New client has been registered"),
-					cl_logINFO);
-			}
-			else
-			{
-				NX_LOG(lit("LocalConnectionFactory: New client transaction has failed %1")
-					.arg(toString(result)), cl_logERROR);
-			}
-		});
-	}
+        m_serverQueryProcessor.getAccess(Qn::kSystemAccess).processUpdateAsync(
+            ApiCommand::saveClientInfo, clientInfo,
+            [&](ErrorCode result)
+        {
+            if (result == ErrorCode::ok)
+            {
+                NX_LOG(lit("LocalConnectionFactory: New client has been registered"),
+                    cl_logINFO);
+            }
+            else
+            {
+                NX_LOG(lit("LocalConnectionFactory: New client transaction has failed %1")
+                    .arg(toString(result)), cl_logERROR);
+            }
+        });
+    }
 #else
-	nx::utils::unused(loginInfo);
+    nx::utils::unused(loginInfo);
 #endif
 
-	return ErrorCode::ok;
+    return ErrorCode::ok;
 }
 
 int LocalConnectionFactory::testDirectConnection(
-	const nx::utils::Url& /*addr*/,
-	impl::TestConnectionHandlerPtr handler)
+    const nx::utils::Url& /*addr*/,
+    impl::TestConnectionHandlerPtr handler)
 {
-	const int reqId = generateRequestID();
-	QnConnectionInfo connectionInfo;
-	fillConnectionInfo(ConnectionData(), &connectionInfo);
-	nx::utils::concurrent::run(
-		Ec2ThreadPool::instance(),
-		std::bind(
-			&impl::TestConnectionHandler::done,
-			handler,
-			reqId,
-			ErrorCode::ok,
-			connectionInfo));
-	return reqId;
+    const int reqId = generateRequestID();
+    QnConnectionInfo connectionInfo;
+    fillConnectionInfo(ConnectionData(), &connectionInfo);
+    nx::utils::concurrent::run(
+        Ec2ThreadPool::instance(),
+        std::bind(
+            &impl::TestConnectionHandler::done,
+            handler,
+            reqId,
+            ErrorCode::ok,
+            connectionInfo));
+    return reqId;
 }
 
 ErrorCode LocalConnectionFactory::getSettings(
@@ -1912,51 +1912,51 @@ ErrorCode LocalConnectionFactory::getSettings(
 
 template<class InputDataType>
 void LocalConnectionFactory::regUpdate(
-	QnRestProcessorPool* const restProcessorPool,
-	ApiCommand::Value cmd,
-	Qn::GlobalPermission permission)
+    QnRestProcessorPool* const restProcessorPool,
+    ApiCommand::Value cmd,
+    Qn::GlobalPermission permission)
 {
-	restProcessorPool->registerHandler(
-		lit("ec2/%1").arg(ApiCommand::toString(cmd)),
-		new UpdateHttpHandler<InputDataType>(m_directConnection),
-		permission);
+    restProcessorPool->registerHandler(
+        lit("ec2/%1").arg(ApiCommand::toString(cmd)),
+        new UpdateHttpHandler<InputDataType>(m_directConnection),
+        permission);
 }
 
 template<class InputDataType, class CustomActionType>
 void LocalConnectionFactory::regUpdate(
-	QnRestProcessorPool* const restProcessorPool,
-	ApiCommand::Value cmd,
-	CustomActionType customAction,
-	Qn::GlobalPermission permission)
+    QnRestProcessorPool* const restProcessorPool,
+    ApiCommand::Value cmd,
+    CustomActionType customAction,
+    Qn::GlobalPermission permission)
 {
-	restProcessorPool->registerHandler(
-		lit("ec2/%1").arg(ApiCommand::toString(cmd)),
-		new UpdateHttpHandler<InputDataType>(m_directConnection, customAction),
-		permission);
+    restProcessorPool->registerHandler(
+        lit("ec2/%1").arg(ApiCommand::toString(cmd)),
+        new UpdateHttpHandler<InputDataType>(m_directConnection, customAction),
+        permission);
 }
 
 template<class InputDataType, class OutputDataType>
 void LocalConnectionFactory::regGet(
-	QnRestProcessorPool* const restProcessorPool,
-	ApiCommand::Value cmd,
-	Qn::GlobalPermission permission)
+    QnRestProcessorPool* const restProcessorPool,
+    ApiCommand::Value cmd,
+    Qn::GlobalPermission permission)
 {
-	restProcessorPool->registerHandler(
-		lit("ec2/%1").arg(ApiCommand::toString(cmd)),
-		new QueryHttpHandler<InputDataType, OutputDataType>(cmd, m_serverQueryProcessor.get()),
-		permission);
+    restProcessorPool->registerHandler(
+        lit("ec2/%1").arg(ApiCommand::toString(cmd)),
+        new QueryHttpHandler<InputDataType, OutputDataType>(cmd, m_serverQueryProcessor.get()),
+        permission);
 }
 
 template<class InputType, class OutputType>
 void LocalConnectionFactory::regFunctor(
-	QnRestProcessorPool* const restProcessorPool,
-	ApiCommand::Value cmd,
-	std::function<ErrorCode(InputType, OutputType*, const Qn::UserAccessData&)> handler, Qn::GlobalPermission permission)
+    QnRestProcessorPool* const restProcessorPool,
+    ApiCommand::Value cmd,
+    std::function<ErrorCode(InputType, OutputType*, const Qn::UserAccessData&)> handler, Qn::GlobalPermission permission)
 {
-	restProcessorPool->registerHandler(
-		lit("ec2/%1").arg(ApiCommand::toString(cmd)),
-		new FlexibleQueryHttpHandler<InputType, OutputType>(cmd, std::move(handler)),
-		permission);
+    restProcessorPool->registerHandler(
+        lit("ec2/%1").arg(ApiCommand::toString(cmd)),
+        new FlexibleQueryHttpHandler<InputType, OutputType>(cmd, std::move(handler)),
+        permission);
 }
 
 /**
@@ -1964,30 +1964,30 @@ void LocalConnectionFactory::regFunctor(
 */
 template<class InputType, class OutputType>
 void LocalConnectionFactory::regFunctorWithResponse(
-	QnRestProcessorPool* const restProcessorPool,
-	ApiCommand::Value cmd,
-	std::function<ErrorCode(InputType, OutputType*, nx::network::http::Response*)> handler,
-	Qn::GlobalPermission permission)
+    QnRestProcessorPool* const restProcessorPool,
+    ApiCommand::Value cmd,
+    std::function<ErrorCode(InputType, OutputType*, nx::network::http::Response*)> handler,
+    Qn::GlobalPermission permission)
 {
-	restProcessorPool->registerHandler(
-		lit("ec2/%1").arg(ApiCommand::toString(cmd)),
-		new FlexibleQueryHttpHandler<InputType, OutputType>(cmd, std::move(handler)),
-		permission);
+    restProcessorPool->registerHandler(
+        lit("ec2/%1").arg(ApiCommand::toString(cmd)),
+        new FlexibleQueryHttpHandler<InputType, OutputType>(cmd, std::move(handler)),
+        permission);
 }
 
 TransactionMessageBusAdapter* LocalConnectionFactory::messageBus() const
 {
-	return m_bus.get();
+    return m_bus.get();
 }
 
 QnDistributedMutexManager* LocalConnectionFactory::distributedMutex() const
 {
-	return m_distributedMutexManager.get();
+    return m_distributedMutexManager.get();
 }
 
 TimeSynchronizationManager* LocalConnectionFactory::timeSyncManager() const
 {
-	return m_timeSynchronizationManager.get();
+    return m_timeSynchronizationManager.get();
 }
 
 } // namespace ec2

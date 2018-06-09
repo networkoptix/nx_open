@@ -191,8 +191,8 @@ public:
      * TimeSynchronizationManager::start MUST be called before using class instance.
      */
     TimeSynchronizationManager(
-		QnCommonModule* commonModule,
-		Qn::PeerType peerType,
+	QnCommonModule* commonModule,
+        nx::vms::api::PeerType peerType,
         nx::utils::StandaloneTimerManager* const timerManager,
         Settings* settings,
         std::shared_ptr<AbstractWorkAroundMiscDataSaver> workAroundMiscDataSaver = nullptr,
@@ -307,7 +307,7 @@ private:
     boost::optional<qint64> m_prevMonotonicClock;
     bool m_terminated;
     std::shared_ptr<AbstractMiscManager> m_miscManager;
-    const Qn::PeerType m_peerType;
+    const nx::vms::api::PeerType m_peerType;
     nx::utils::StandaloneTimerManager* const m_timerManager;
     std::unique_ptr<AbstractAccurateTimeFetcher> m_timeSynchronizer;
     size_t m_internetTimeSynchronizationPeriod;
@@ -391,7 +391,7 @@ private:
 
 private slots:
     void onNewConnectionEstablished(QnAbstractTransactionTransport* transport);
-    void onPeerLost(QnUuid peer, Qn::PeerType peerType);
+    void onPeerLost(QnUuid peer, nx::vms::api::PeerType peerType);
     void onDbManagerInitialized();
     void onTimeSynchronizationSettingsChanged();
 };

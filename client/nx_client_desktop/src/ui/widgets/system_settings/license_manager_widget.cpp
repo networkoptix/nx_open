@@ -54,12 +54,14 @@
 #include <utils/common/delayed.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/license/util.h>
+#include <nx/vms/api/types/connection_types.h>
 
 #include <nx/client/desktop/license/license_helpers.h>
 #include <nx/client/desktop/ui/dialogs/license_deactivation_reason.h>
 
 #include <nx/client/desktop/common/widgets/clipboard_button.h>
 
+using namespace nx;
 using namespace nx::client::desktop;
 
 namespace {
@@ -320,7 +322,7 @@ void QnLicenseManagerWidget::updateLicenses()
     bool connected = false;
     for (const QnPeerRuntimeInfo& info: runtimeInfoManager()->items()->getItems())
     {
-        if (info.data.peer.peerType != Qn::PT_Server)
+        if (info.data.peer.peerType != vms::api::PeerType::server)
             continue;
         connected = true;
         break;

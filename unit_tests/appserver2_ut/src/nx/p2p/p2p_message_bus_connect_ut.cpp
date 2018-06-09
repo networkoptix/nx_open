@@ -45,23 +45,23 @@ class P2pMessageBusTest: public P2pMessageBusTestBase
 {
 protected:
 
-    static bool checkSubscription(const MessageBus* bus, const ApiPersistentIdData& peer)
+    static bool checkSubscription(const MessageBus* bus, const vms::api::PersistentIdData& peer)
     {
         return bus->isSubscribedTo(peer);
     }
 
-    static bool checkDistance(const MessageBus* bus, const ApiPersistentIdData& peer)
+    static bool checkDistance(const MessageBus* bus, const vms::api::PersistentIdData& peer)
     {
         return bus->distanceTo(peer) <= kMaxOnlineDistance;
     }
 
-    bool checkRuntimeInfo(const MessageBus* bus, const ApiPersistentIdData& /*peer*/)
+    bool checkRuntimeInfo(const MessageBus* bus, const vms::api::PersistentIdData& /*peer*/)
     {
         return bus->runtimeInfo().size() == m_servers.size();
     }
 
     void checkMessageBus(
-        std::function<bool(MessageBus*, const ApiPersistentIdData&)> checkFunction,
+        std::function<bool(MessageBus*, const vms::api::PersistentIdData&)> checkFunction,
         const QString& errorMessage)
     {
         int syncDoneCounter = 0;
@@ -73,7 +73,7 @@ protected:
     }
 
     void checkMessageBusInternal(
-        std::function<bool (MessageBus*, const ApiPersistentIdData&)> checkFunction,
+        std::function<bool (MessageBus*, const vms::api::PersistentIdData&)> checkFunction,
         const QString& errorMessage,
         bool waitForSync,
         int& syncDoneCounter)
@@ -91,7 +91,7 @@ protected:
                 for (const auto& serverTo: m_servers)
                 {
                     const auto& commonModuleTo = serverTo->moduleInstance()->commonModule();
-                    ec2::ApiPersistentIdData peer(commonModuleTo->moduleGUID(), commonModuleTo->dbId());
+                    vms::api::PersistentIdData peer(commonModuleTo->moduleGUID(), commonModuleTo->dbId());
                     bool result = checkFunction(bus, peer);
                     if (!result)
                     {
@@ -187,7 +187,7 @@ protected:
         runtimeData.peer.id = commonModule->moduleGUID();
         runtimeData.peer.instanceId = commonModule->runningInstanceGUID();
         runtimeData.peer.persistentId = commonModule->dbId();
-        runtimeData.peer.peerType = Qn::PT_Server;
+        runtimeData.peer.peerType = nx::vms::api::PeerType::server;
 
         connection->getMiscManager(Qn::kSystemAccess)
             ->saveRuntimeInfo(

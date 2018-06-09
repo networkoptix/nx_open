@@ -20,6 +20,7 @@
 #include <ui/help/help_topic_accessor.h>
 
 #include <nx/utils/string.h>
+#include <nx/vms/api/types/connection_types.h>
 #include <utils/common/synctime.h>
 
 //#define QN_TIME_SERVER_SELECTION_DEBUG
@@ -29,6 +30,8 @@
 #else
 #define PRINT_DEBUG(MSG)
 #endif
+
+using namespace nx;
 
 namespace {
 
@@ -241,7 +244,7 @@ QnUuid QnTimeServerSelectionWidget::selectedServer() const
 
     for (const auto& runtimeInfo : runtimeInfoManager()->items()->getItems())
     {
-        if (runtimeInfo.data.peer.peerType != Qn::PT_Server)
+        if (runtimeInfo.data.peer.peerType != vms::api::PeerType::server)
             continue;
 
         if (!m_model->isSelected(runtimeInfo.data.serverTimePriority))

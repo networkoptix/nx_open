@@ -421,19 +421,6 @@ using StreamQuality = nx::vms::api::StreamQuality;
 
     using RecordingType = nx::vms::api::RecordingType;
 
-    enum PeerType {
-        PT_NotDefined = -1,
-        PT_Server = 0,
-        PT_DesktopClient = 1,
-        PT_VideowallClient = 2,
-        PT_OldMobileClient = 3,
-        PT_MobileClient = 4,
-        PT_CloudServer = 5,
-        PT_OldServer = 6, //< 2.6 or below
-        PT_Count
-    };
-    QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(PeerType)
-
     enum TTHeaderFlag
     {
         TT_None          = 0x0,
@@ -859,7 +846,7 @@ QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
     (Qn::ServerFlag)(Qn::BackupType)(Qn::StorageInitResult)
     (Qn::PanicMode)
     (Qn::ConnectionRole)(Qn::BitratePerGopType)
-    (Qn::PeerType)(Qn::RebuildState)(Qn::BackupState)
+    (Qn::RebuildState)(Qn::BackupState)
     (Qn::BookmarkSortField)(Qt::SortOrder)
     (Qn::RebuildAction)(Qn::BackupAction)
     (Qn::TTHeaderFlag)(Qn::IOPortType)(Qn::IODefaultState)(Qn::AuditRecordType)(Qn::AuthResult)

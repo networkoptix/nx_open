@@ -28,8 +28,8 @@ protected:
     virtual void connectToConnection(const ec2::AbstractECConnectionPtr& connection) override;
     virtual void disconnectFromConnection(const ec2::AbstractECConnectionPtr& connection) override;
 
-    virtual void handleRemotePeerFound(QnUuid peer, Qn::PeerType peerType) override;
-    virtual void handleRemotePeerLost(QnUuid peer, Qn::PeerType peerType) override;
+    virtual void handleRemotePeerFound(QnUuid peer, nx::vms::api::PeerType peerType) override;
+    virtual void handleRemotePeerLost(QnUuid peer, nx::vms::api::PeerType peerType) override;
 
     virtual void onResourceStatusChanged(const QnResourcePtr& resource, Qn::ResourceStatus,
         ec2::NotificationSource source) override;

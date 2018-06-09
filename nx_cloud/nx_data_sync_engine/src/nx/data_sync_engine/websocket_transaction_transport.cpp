@@ -1,6 +1,5 @@
 #include "websocket_transaction_transport.h"
 
-#include <nx_ec/data/api_peer_data.h>
 #include <nx/p2p/p2p_serialization.h>
 #include <transaction/connection_guard.h>
 
@@ -18,8 +17,8 @@ WebSocketTransactionTransport::WebSocketTransactionTransport(
     const nx::String& systemId,
     const QnUuid& connectionId,
     std::unique_ptr<network::websocket::WebSocket> webSocket,
-    ::ec2::ApiPeerDataEx localPeerData,
-    ::ec2::ApiPeerDataEx remotePeerData)
+    vms::api::PeerDataEx localPeerData,
+    vms::api::PeerDataEx remotePeerData)
     :
     nx::p2p::ConnectionBase(
         remotePeerData,

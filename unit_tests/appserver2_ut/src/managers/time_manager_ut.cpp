@@ -103,7 +103,7 @@ public:
             std::make_shared<WorkAroundMiscDataSaverStub>(m_miscManager.get())),
         m_timeSynchronizationManager(std::make_unique<TimeSynchronizationManager>(
             commonModule(),
-            Qn::PeerType::PT_Server,
+            nx::vms::api::PeerType::server,
             &m_timerManager,
             &m_settings,
             m_workAroundMiscDataSaverStub,
@@ -173,7 +173,7 @@ public:
             std::make_unique<TransactionMessageBusStub>(&m_commonModule);
         m_timeSynchronizationManager = std::make_unique<TimeSynchronizationManager>(
             commonModule(),
-            Qn::PeerType::PT_Server,
+            nx::vms::api::PeerType::server,
             &m_timerManager,
             &m_settings,
             m_workAroundMiscDataSaverStub,
@@ -207,11 +207,11 @@ public:
             /*isIncoming*/ true);
     }
 
-    ::ec2::ApiPeerData peerData() const
+    nx::vms::api::PeerData peerData() const
     {
-        ::ec2::ApiPeerData peerData;
+        nx::vms::api::PeerData peerData;
         peerData.id = m_commonModule.moduleGUID();
-        peerData.peerType = Qn::PT_Server;
+        peerData.peerType = nx::vms::api::PeerType::server;
         return peerData;
     }
 
@@ -260,7 +260,7 @@ private:
     {
         QnPeerRuntimeInfo localPeerInfo;
         localPeerInfo.uuid = m_commonModule.moduleGUID();
-        localPeerInfo.data.peer.peerType = Qn::PT_Server;
+        localPeerInfo.data.peer.peerType = nx::vms::api::PeerType::server;
         localPeerInfo.data.peer.id = m_commonModule.moduleGUID();
         localPeerInfo.data.peer.instanceId = m_commonModule.moduleGUID();
         localPeerInfo.data.peer.persistentId = m_commonModule.moduleGUID();

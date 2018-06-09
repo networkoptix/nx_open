@@ -19,7 +19,7 @@ const QString moduleInfoStr(lit(", { seed: \"%1\" }, {peerType: \"%2\"}"));
 
 }
 
-RevealRequest::RevealRequest(const QnUuid& moduleGuid, Qn::PeerType peerType):
+RevealRequest::RevealRequest(const QnUuid& moduleGuid, nx::vms::api::PeerType peerType):
     m_moduleGuid(moduleGuid),
     m_peerType(peerType)
 {

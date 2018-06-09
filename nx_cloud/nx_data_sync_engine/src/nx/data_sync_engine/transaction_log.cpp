@@ -94,7 +94,7 @@ void TransactionLog::readTransactions(
 
     if (!to)
     {
-        ::ec2::ApiPersistentIdData maxTranStateKey;
+        vms::api::PersistentIdData maxTranStateKey;
         maxTranStateKey.id = QnUuid::fromStringSafe(lit("{FFFFFFFF-FFFF-FFFF-FFFF-FFFFFFFFFFFF}"));
         ::ec2::QnTranState maxTranState;
         maxTranState.values.insert(std::move(maxTranStateKey), std::numeric_limits<qint32>::max());
@@ -146,7 +146,7 @@ void TransactionLog::shiftLocalTransactionSequence(
 {
     QnMutexLocker lock(&m_mutex);
     return getTransactionLogContext(lock, systemId)->cache.shiftTransactionSequence(
-        ::ec2::ApiPersistentIdData(m_peerId, guidFromArbitraryData(systemId)),
+        vms::api::PersistentIdData(m_peerId, guidFromArbitraryData(systemId)),
         delta);
 }
 
@@ -212,7 +212,7 @@ nx::utils::db::DBResult TransactionLog::fetchTransactionState(
         timestamp.sequence = selectTransactionStateQuery.value("timestamp_hi").toLongLong();
         timestamp.ticks = selectTransactionStateQuery.value("timestamp").toLongLong();
 
-        ::ec2::ApiPersistentIdData tranStateKey(
+        vms::api::PersistentIdData tranStateKey(
             QnUuid::fromStringSafe(peerGuid),
             QnUuid::fromStringSafe(dbGuid));
 
@@ -328,7 +328,7 @@ int TransactionLog::generateNewTransactionSequence(
     const nx::String& systemId)
 {
     return getTransactionLogContext(lock, systemId)->cache.generateTransactionSequence(
-        ::ec2::ApiPersistentIdData(m_peerId, guidFromArbitraryData(systemId)));
+        vms::api::PersistentIdData(m_peerId, guidFromArbitraryData(systemId)));
 }
 
 ::ec2::Timestamp TransactionLog::generateNewTransactionTimestamp(

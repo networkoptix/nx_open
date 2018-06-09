@@ -94,6 +94,7 @@
 #include <utils/unity_launcher_workaround.h>
 #include <utils/common/delayed.h>
 
+#include <nx/vms/api/types/connection_types.h>
 #include <nx/vms/utils/platform/autorun.h>
 #include <nx/client/desktop/ui/workbench/layouts/layout_factory.h>
 #include <utils/screen_utils.h>
@@ -103,6 +104,7 @@
 //#define RECEIVER_DEBUG
 
 using nx::client::desktop::utils::UnityLauncherWorkaround;
+using namespace nx;
 using namespace nx::client::desktop;
 using namespace nx::client::desktop::ui;
 
@@ -327,7 +329,7 @@ QnWorkbenchVideoWallHandler::QnWorkbenchVideoWallHandler(QObject *parent):
     connect(runtimeInfoManager(), &QnRuntimeInfoManager::runtimeInfoAdded, this,
         [this](const QnPeerRuntimeInfo &info)
         {
-            if (info.data.peer.peerType == Qn::PT_VideowallClient)
+            if (info.data.peer.peerType == vms::api::PeerType::videowallClient)
             {
                 /* Master node, will run other clients and exit. */
                 if (info.data.videoWallInstanceGuid.isNull())
@@ -344,7 +346,7 @@ QnWorkbenchVideoWallHandler::QnWorkbenchVideoWallHandler(QObject *parent):
     connect(runtimeInfoManager(), &QnRuntimeInfoManager::runtimeInfoRemoved, this,
         [this](const QnPeerRuntimeInfo &info)
         {
-            if (info.data.peer.peerType == Qn::PT_VideowallClient)
+            if (info.data.peer.peerType == vms::api::PeerType::videowallClient)
             {
                 setItemOnline(info.data.videoWallInstanceGuid, false);
             }
@@ -387,7 +389,7 @@ QnWorkbenchVideoWallHandler::QnWorkbenchVideoWallHandler(QObject *parent):
 
     foreach(const QnPeerRuntimeInfo &info, runtimeInfoManager()->items()->getItems())
     {
-        if (info.data.peer.peerType != Qn::PT_VideowallClient)
+        if (info.data.peer.peerType != vms::api::PeerType::videowallClient)
             continue;
 
         /* Master node, will run other clients and exit. */

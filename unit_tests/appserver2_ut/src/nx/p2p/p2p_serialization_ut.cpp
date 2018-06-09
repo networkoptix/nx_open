@@ -119,7 +119,7 @@ TEST(P2pSerialization, SubscribeAllRequest)
     for (int i = 0; i < 100; ++i)
     {
         tranState.values.insert(
-            ec2::ApiPersistentIdData(QnUuid::createUuid(), QnUuid::createUuid()), i);
+            vms::api::PersistentIdData(QnUuid::createUuid(), QnUuid::createUuid()), i);
     }
 
     QByteArray expectedData = serializeSubscribeAllRequest(tranState, 0);
@@ -137,7 +137,7 @@ TEST(P2pSerialization, ResolvePeerNumberResponse)
     QVector<PeerNumberResponseRecord> peers;
     for (int i = 0; i < 100; ++i)
     {
-        ec2::ApiPersistentIdData id(QnUuid::createUuid(), QnUuid::createUuid());
+        vms::api::PersistentIdData id(QnUuid::createUuid(), QnUuid::createUuid());
         peers.push_back(PeerNumberResponseRecord(i, id));
     }
 
