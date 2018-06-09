@@ -9,21 +9,18 @@
 #include <QElapsedTimer>
 #include <QCache>
 
+#include <common/common_module_aware.h>
+#include <core/resource_access/user_access_data.h>
+#include <core/resource/resource_fwd.h>
+#include <nx/network/http/auth_restriction_list.h>
+#include <nx/network/http/http_types.h>
+#include <nx/network/socket_common.h>
 #include <nx/utils/std/optional.h>
+#include <nx/utils/thread/mutex.h>
 #include <nx/utils/timer_manager.h>
 #include <nx/utils/uuid.h>
-#include <nx/network/http/http_types.h>
-#include <nx/utils/thread/mutex.h>
-#include <nx/network/http/auth_restriction_list.h>
-#include <nx/network/socket_common.h>
-#include <nx/network/temporary_key_keeper.h>
-
 #include <nx/vms/auth/abstract_nonce_provider.h>
 #include <nx/vms/auth/abstract_user_data_provider.h>
-
-#include <common/common_module_aware.h>
-#include <core/resource/resource_fwd.h>
-#include <core/resource_access/user_access_data.h>
 #include <utils/common/id.h>
 
 #include "ldap_manager.h"
