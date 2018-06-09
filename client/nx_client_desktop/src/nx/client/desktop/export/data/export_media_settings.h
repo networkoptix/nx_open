@@ -15,7 +15,7 @@ namespace desktop {
 struct ExportMediaSettings
 {
     QnMediaResourcePtr mediaResource;
-    QnTimePeriod timePeriod;
+    QnTimePeriod period;
     Filename fileName;
     qint64 timelapseFrameStepMs = 0; //< 0 means disabled timelapse.
     qint64 serverTimeZoneMs = 0;
