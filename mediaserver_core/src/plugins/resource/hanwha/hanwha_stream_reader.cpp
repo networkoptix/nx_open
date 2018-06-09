@@ -8,6 +8,7 @@
 #include "hanwha_utils.h"
 #include "hanwha_common.h"
 #include "hanwha_chunk_reader.h"
+#include "hanwha_ini_config.h"
 
 #include <utils/common/sleep.h>
 #include <nx/utils/scope_guard.h>
@@ -168,6 +169,13 @@ bool HanwhaStreamReader::isCorrectProfile(int profileNumber) const
 
 CameraDiagnostics::Result HanwhaStreamReader::streamUri(QString* outUrl)
 {
+    const auto forcedUrlString = forcedUrl(getRole());
+    if (!forcedUrlString.isEmpty())
+    {
+        *outUrl = forcedUrlString;
+        return CameraDiagnostics::NoErrorResult();
+    }
+
     using ParameterMap = std::map<QString, QString>;
     ParameterMap params =
     {
@@ -351,6 +359,19 @@ QnAbstractMediaDataPtr HanwhaStreamReader::createEmptyPacket()
     if (speed < 0)
         rez->flags |= QnAbstractMediaData::MediaFlags_Reverse;
     return rez;
+}
+
+QString HanwhaStreamReader::forcedUrl(Qn::ConnectionRole role) const
+{
+    switch (role)
+    {
+        case Qn::ConnectionRole::CR_LiveVideo:
+            return QString::fromUtf8(ini().forcedPrimaryStreamUrl);
+        case Qn::ConnectionRole::CR_SecondaryLiveVideo:
+            return QString::fromUtf8(ini().forcedSecondaryStreamUrl);
+        default:
+            return QString();
+    }
 }
 
 QnAbstractMediaDataPtr HanwhaStreamReader::getNextData()

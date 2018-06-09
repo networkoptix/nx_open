@@ -1039,6 +1039,9 @@ CameraDiagnostics::Result HanwhaResource::initBypass()
 
 CameraDiagnostics::Result HanwhaResource::initMedia()
 {
+    if (!ini().initMedia)
+        return CameraDiagnostics::NoErrorResult();
+
     if (QnResource::isStopping())
         return CameraDiagnostics::ServerTerminatedResult();
 
@@ -1150,6 +1153,9 @@ CameraDiagnostics::Result HanwhaResource::setProfileSessionPolicy()
 
 CameraDiagnostics::Result HanwhaResource::initIo()
 {
+    if (!ini().initIo)
+        return CameraDiagnostics::NoErrorResult();
+
     if (QnResource::isStopping())
         return CameraDiagnostics::ServerTerminatedResult();
 
@@ -1260,6 +1266,9 @@ static QString ptzCapabilityBits(Ptz::Capabilities capabilities)
 
 CameraDiagnostics::Result HanwhaResource::initPtz()
 {
+    if (!ini().initPtz)
+        return CameraDiagnostics::NoErrorResult();
+
     if (QnResource::isStopping())
         return CameraDiagnostics::ServerTerminatedResult();
 
@@ -1425,6 +1434,9 @@ void HanwhaResource::calculateAutoFocusSupport(QnPtzAuxilaryTraitList* outTraitL
 
 CameraDiagnostics::Result HanwhaResource::initAdvancedParameters()
 {
+    if (!ini().initAdvancedParameters)
+        return CameraDiagnostics::NoErrorResult();
+
     if (QnResource::isStopping())
         return CameraDiagnostics::ServerTerminatedResult();
 
@@ -1442,8 +1454,12 @@ CameraDiagnostics::Result HanwhaResource::initAdvancedParameters()
     if (!result)
         return CameraDiagnostics::NoErrorResult();
 
+    const auto allowedParameters = QString(ini().enabledAdvancedParameters).split(L',');
     for (const auto& id: parameters.allParameterIds())
     {
+        if (!allowedParameters.isEmpty() && !allowedParameters.contains(id))
+            continue;
+
         const auto parameter = parameters.getParameterById(id);
         HanwhaAdavancedParameterInfo info(parameter);
 
@@ -1466,6 +1482,9 @@ CameraDiagnostics::Result HanwhaResource::initAdvancedParameters()
 
 CameraDiagnostics::Result HanwhaResource::initTwoWayAudio()
 {
+    if (!ini().initTwoWayAudio)
+        return CameraDiagnostics::NoErrorResult();
+
     if (QnResource::isStopping())
         return CameraDiagnostics::ServerTerminatedResult();
 
