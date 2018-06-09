@@ -189,11 +189,7 @@ void ManagerPool::at_rulesUpdated(const QSet<QnUuid>& affectedResources)
 
     for (const auto& resourceId: affectedResources)
     {
-        auto resource = m_serverModule
-            ->commonModule()
-            ->resourcePool()
-            ->getResourceById(resourceId);
-
+        auto resource = resourcePool()->getResourceById(resourceId);
         if (!resource)
             releaseResourceCameraManagersUnsafe(resourceId);
         else

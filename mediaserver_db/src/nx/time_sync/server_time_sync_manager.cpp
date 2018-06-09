@@ -83,15 +83,15 @@ void ServerTimeSyncManager::start()
     }
     auto timeDelta = std::chrono::milliseconds(deltaData.value.toLongLong());
     setSyncTimeInternal(m_systemClock->millisSinceEpoch() + timeDelta);
-    
+
     initializeTimeFetcher();
 
     connect(
         commonModule()->ec2Connection()->getTimeNotificationManager().get(),
         &ec2::AbstractTimeNotificationManager::primaryTimeServerTimeChanged,
         this,
-        [this]() 
-        { 
+        [this]()
+        {
             m_lastNetworkSyncTime.invalidate();
         });
 
@@ -198,7 +198,7 @@ void ServerTimeSyncManager::updateTime()
     bool syncWithInternel = commonModule()->globalSettings()->isSynchronizingTimeWithInternet();
 
     auto networkTimeSyncInterval = commonModule()->globalSettings()->syncTimeExchangePeriod();
-    const bool isTimeRecentlySync = m_lastNetworkSyncTime.isValid() 
+    const bool isTimeRecentlySync = m_lastNetworkSyncTime.isValid()
         && !m_lastNetworkSyncTime.hasExpired(networkTimeSyncInterval);
 
     if (syncWithInternel)
@@ -242,9 +242,9 @@ void ServerTimeSyncManager::updateTime()
     }
 }
 
-bool ServerTimeSyncManager::isTimeTakenFromInternet() const 
-{ 
-    return m_isTimeTakenFromInternet; 
+bool ServerTimeSyncManager::isTimeTakenFromInternet() const
+{
+    return m_isTimeTakenFromInternet;
 }
 } // namespace time_sync
 } // namespace nx
