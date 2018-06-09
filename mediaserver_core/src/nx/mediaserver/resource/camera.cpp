@@ -523,7 +523,7 @@ QnAbstractStreamDataProvider* Camera::createDataProvider(
 
             QnAbstractArchiveDelegate* archiveDelegate = camera->createArchiveDelegate();
             if (!archiveDelegate)
-                archiveDelegate = new QnServerArchiveDelegate(qnServerModule); // default value
+                archiveDelegate = new QnServerArchiveDelegate(qnServerModule); //< Default value.
             if (!archiveDelegate)
                 return nullptr;
 

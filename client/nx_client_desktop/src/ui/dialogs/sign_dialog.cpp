@@ -99,7 +99,7 @@ SignDialog::SignDialog(QnResourcePtr checkResource, QWidget* parent):
 
     m_resource = QnAviResourcePtr(new QnAviResource(checkResource->getUrl()));
 
-    m_reader.reset(qobject_cast<QnAbstractArchiveStreamReader*> (
+    m_reader.reset(qobject_cast<QnAbstractArchiveStreamReader*>(
         qnClientCoreModule->dataProviderFactory()->createDataProvider(m_resource)));
 
     m_reader->setCycleMode(false);
