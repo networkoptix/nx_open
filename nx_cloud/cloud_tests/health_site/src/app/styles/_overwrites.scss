@@ -1,0 +1,33 @@
+@import "~sass-rem";
+
+// Overwrites  ***********************
+$body-bg : $gray-100;
+
+// ***********************************
+
+html {
+    @include rem-baseline;
+    position   : relative;
+    min-height : 100%;
+    overflow-y : scroll;
+}
+
+body {
+    background-color : $body-bg;
+}
+
+@include media-breakpoint-down(sm) {
+
+    h4 {
+        font-size : rem(16px);
+    }
+
+    h5 {
+        font-size : rem(14px);
+    }
+
+    h6 {
+        font-size : rem(12px);
+    }
+}
+

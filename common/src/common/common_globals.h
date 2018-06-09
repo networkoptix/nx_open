@@ -44,10 +44,10 @@ QN_DECLARE_METAOBJECT_HEADER(Qn,
         AudioTransmitCapability             = 0x040,
         RemoteArchiveCapability             = 0x100,
         SetUserPasswordCapability           = 0x200, //< Can change password on a camera.
-        isDefaultPasswordCapability         = 0x400, //< Camera has default password now.
-        isOldFirmwareCapability             = 0x800, //< Camera has too old firmware.
-        CanEditStreamsCapability            = 0x1000, //< Camera's streams are editable.
-        isPlaybackSpeedSupported            = 0x2000, //< For NVR which support playback speed 1,2,4 e.t.c natively.
+        IsDefaultPasswordCapability         = 0x400, //< Camera has default password now.
+        IsOldFirmwareCapability             = 0x800, //< Camera has too old firmware.
+        CustomMediaUrlCapability            = 0x1000, //< Camera's streams are editable.
+        IsPlaybackSpeedSupported            = 0x2000, //< For NVR which support playback speed 1,2,4 e.t.c natively.
     };
     Q_DECLARE_FLAGS(CameraCapabilities, CameraCapability)
     Q_DECLARE_OPERATORS_FOR_FLAGS(CameraCapabilities)

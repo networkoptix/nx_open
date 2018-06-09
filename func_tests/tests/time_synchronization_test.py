@@ -1,53 +1,27 @@
 import logging
 import time
-from contextlib import contextmanager
 from datetime import datetime, timedelta
 
 import pytest
 from pytz import utc
 
+from framework.timeless_mediaserver import timeless_mediaserver
 from framework.api_shortcuts import get_server_id, get_time, is_primary_time_server
-from framework.installation.make_installation import make_installation
-from framework.installation.mediaserver_factory import (
-    cleanup_mediaserver,
-    collect_artifacts_from_mediaserver,
-    make_dirty_mediaserver,
-    )
-from framework.merging import merge_systems, setup_local_system
+from framework.merging import merge_systems
 from framework.utils import RunningTime, get_internet_time
 from framework.waiting import ensure_persistence, wait_for_true
 
-log = logging.getLogger(__name__)
+_logger = logging.getLogger(__name__)
 
 BASE_TIME = RunningTime(datetime(2017, 3, 14, 15, 0, 0, tzinfo=utc))  # Tue Mar 14 15:00:00 UTC 2017
-
-
-@contextmanager
-def _timeless_mediaserver(vm, mediaserver_installers, ca, artifact_factory):
-    """Mediaserver never exposed to internet depending on machine time"""
-    installation = make_installation(mediaserver_installers, vm.type, vm.os_access)
-    mediaserver = make_dirty_mediaserver(vm.alias, installation)
-    mediaserver.stop(already_stopped_ok=True)
-    vm.os_access.networking.disable_internet()
-    cleanup_mediaserver(mediaserver, ca)
-    mediaserver.installation.update_mediaserver_conf({
-        'ecInternetSyncTimePeriodSec': 3,
-        'ecMaxInternetTimeSyncRetryPeriodSec': 3,
-        })
-    try:
-        yield mediaserver
-    finally:
-        collect_artifacts_from_mediaserver(mediaserver, artifact_factory)
 
 
 @pytest.fixture()
 def two_mediaservers(two_vms, mediaserver_installers, ca, artifact_factory):
     """Make sure mediaservers are installed, stopped and internet is disabled."""
     first_vm, second_vm = two_vms
-    with _timeless_mediaserver(first_vm, mediaserver_installers, ca, artifact_factory) as first:
-        with _timeless_mediaserver(second_vm, mediaserver_installers, ca, artifact_factory) as second:
-            for mediaserver in (first, second):
-                setup_local_system(mediaserver, {})
+    with timeless_mediaserver(first_vm, mediaserver_installers, ca, artifact_factory) as first:
+        with timeless_mediaserver(second_vm, mediaserver_installers, ca, artifact_factory) as second:
             merge_systems(first, second)
             primary, secondary = (first, second) if is_primary_time_server(first.api) else (second, first)
             secondary.os_access.set_time(BASE_TIME.current)

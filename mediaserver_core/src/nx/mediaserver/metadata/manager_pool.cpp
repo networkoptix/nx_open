@@ -120,25 +120,33 @@ void ManagerPool::initExistingResources()
 
 void ManagerPool::at_resourceAdded(const QnResourcePtr& resource)
 {
+    auto camera = resource.dynamicCast<QnSecurityCamResource>();
+    if (!camera)
+        return;
+
     NX_VERBOSE(
         this,
         lm("Resource %1 (%2) has been added.")
             .args(resource->getName(), resource->getId()));
 
     connect(
-        resource.data(), &QnResource::statusChanged,
+        resource, &QnResource::statusChanged,
         this, &ManagerPool::handleResourceChanges);
 
     connect(
-        resource.data(), &QnResource::parentIdChanged,
+        resource, &QnResource::parentIdChanged,
         this, &ManagerPool::handleResourceChanges);
 
     connect(
-        resource.data(), &QnResource::urlChanged,
+        resource, &QnResource::urlChanged,
         this, &ManagerPool::handleResourceChanges);
 
     connect(
-        resource.data(), &QnResource::propertyChanged,
+        camera, &QnSecurityCamResource::logicalIdChanged,
+        this, &ManagerPool::handleResourceChanges);
+
+    connect(
+        resource, &QnResource::propertyChanged,
         this, &ManagerPool::at_propertyChanged);
 
     handleResourceChanges(resource);
@@ -168,6 +176,7 @@ void ManagerPool::at_resourceRemoved(const QnResourcePtr& resource)
     if (!camera)
         return;
 
+    camera->disconnect(this);
     QnMutexLocker lock(&m_contextMutex);
     m_contexts.erase(resource->getId());
 }
@@ -180,8 +189,15 @@ void ManagerPool::at_rulesUpdated(const QSet<QnUuid>& affectedResources)
 
     for (const auto& resourceId: affectedResources)
     {
-        auto resource = commonModule()->resourcePool()->getResourceById(resourceId);
-        handleResourceChanges(resource);
+        auto resource = m_serverModule
+            ->commonModule()
+            ->resourcePool()
+            ->getResourceById(resourceId);
+
+        if (!resource)
+            releaseResourceCameraManagersUnsafe(resourceId);
+        else
+            handleResourceChanges(resource);
     }
 }
 
@@ -437,10 +453,15 @@ CameraManager* ManagerPool::createCameraManager(
 
 void ManagerPool::releaseResourceCameraManagersUnsafe(const QnSecurityCamResourcePtr& camera)
 {
+    releaseResourceCameraManagersUnsafe(camera->getId());
+}
+
+void ManagerPool::releaseResourceCameraManagersUnsafe(const QnUuid& cameraId)
+{
     if (ini().enablePersistentMetadataManager)
         return;
 
-    auto& context = m_contexts[camera->getId()];
+    auto& context = m_contexts[cameraId];
     context.clearManagers();
     context.setManagersInitialized(false);
 }
@@ -468,6 +489,10 @@ MetadataHandler* ManagerPool::createMetadataHandler(
 
 void ManagerPool::handleResourceChanges(const QnResourcePtr& resource)
 {
+    NX_ASSERT(resource);
+    if (!resource)
+        return;
+
     NX_VERBOSE(
         this,
         lm("Handling resource changes for resource %1 (%2)")
@@ -475,9 +500,7 @@ void ManagerPool::handleResourceChanges(const QnResourcePtr& resource)
 
     auto camera = resource.dynamicCast<QnSecurityCamResource>();
     if (!camera)
-    {
         return;
-    }
 
     {
         NX_DEBUG(
@@ -814,7 +837,7 @@ bool ManagerPool::cameraInfoFromResource(
     outCameraInfo->channel = camera->getChannel();
 
     // If getLogicalId() returns incorrect number, logicalId is set to 0.
-    outCameraInfo->logicalId = atoi(camera->getLogicalId().toStdString().c_str());
+    outCameraInfo->logicalId = camera->getLogicalId().toInt();
 
     return true;
 }

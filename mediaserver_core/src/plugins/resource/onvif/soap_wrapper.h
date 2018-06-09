@@ -75,6 +75,15 @@ typedef _onvifMedia__GetCompatibleMetadataConfigurations CompatibleMetadataConfi
 typedef _onvifMedia__GetCompatibleMetadataConfigurationsResponse CompatibleMetadataConfigurationResp;
 
 
+class _onvifMedia__GetCompatibleAudioDecoderConfigurations;
+class _onvifMedia__GetCompatibleAudioDecoderConfigurationsResponse;
+class _onvifMedia__AddAudioOutputConfiguration;
+class _onvifMedia__AddAudioOutputConfigurationResponse;
+class _onvifMedia__AddAudioDecoderConfiguration;
+class _onvifMedia__AddAudioDecoderConfigurationResponse;
+class _onvifMedia__GetAudioOutputConfigurations;
+class _onvifMedia__GetAudioOutputConfigurationsResponse;
+
 class _onvifMedia__AddAudioEncoderConfiguration;
 class _onvifMedia__AddAudioEncoderConfigurationResponse;
 class _onvifMedia__AddAudioSourceConfiguration;
@@ -118,6 +127,15 @@ class _onvifMedia__SetVideoEncoderConfiguration;
 class _onvifMedia__SetVideoEncoderConfigurationResponse;
 class _onvifMedia__SetVideoSourceConfiguration;
 class _onvifMedia__SetVideoSourceConfigurationResponse;
+
+typedef _onvifMedia__AddAudioOutputConfiguration AddAudioOutputConfigurationReq;
+typedef _onvifMedia__AddAudioOutputConfigurationResponse AddAudioOutputConfigurationResp;
+typedef _onvifMedia__AddAudioDecoderConfiguration AddAudioDecoderConfigurationReq;
+typedef _onvifMedia__AddAudioDecoderConfigurationResponse AddAudioDecoderConfigurationResp;
+typedef _onvifMedia__GetCompatibleAudioDecoderConfigurations GetCompatibleAudioDecoderConfigurationsReq;
+typedef _onvifMedia__GetCompatibleAudioDecoderConfigurationsResponse GetCompatibleAudioDecoderConfigurationsResp;
+typedef _onvifMedia__GetAudioOutputConfigurations GetAudioOutputConfigurationsReq;
+typedef _onvifMedia__GetAudioOutputConfigurationsResponse GetAudioOutputConfigurationsResp;
 
 typedef _onvifMedia__AddAudioEncoderConfiguration AddAudioConfigReq;
 typedef _onvifMedia__AddAudioEncoderConfigurationResponse AddAudioConfigResp;
@@ -358,6 +376,11 @@ class MediaSoapWrapper: public SoapWrapper<MediaBindingProxy>
 public:
     MediaSoapWrapper(const std::string& endpoint, const QString& login, const QString& passwd, int timeDrift, bool tcpKeepAlive = false);
     virtual ~MediaSoapWrapper();
+
+    int getAudioOutputConfigurations(GetAudioOutputConfigurationsReq& request, GetAudioOutputConfigurationsResp& response);
+    int addAudioOutputConfiguration(AddAudioOutputConfigurationReq& request, AddAudioOutputConfigurationResp& response);
+    int getCompatibleAudioDecoderConfigurations(GetCompatibleAudioDecoderConfigurationsReq& request, GetCompatibleAudioDecoderConfigurationsResp& response);
+    int addAudioDecoderConfiguration(AddAudioDecoderConfigurationReq& request, AddAudioDecoderConfigurationResp& response);
 
     int getAudioEncoderConfigurationOptions(AudioOptionsReq& request, AudioOptionsResp& response);
     int getAudioEncoderConfigurations(AudioConfigsReq& request, AudioConfigsResp& response);

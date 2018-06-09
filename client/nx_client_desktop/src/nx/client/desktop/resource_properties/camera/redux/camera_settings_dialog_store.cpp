@@ -341,6 +341,16 @@ void CameraSettingsDialogStore::setWearableMotionSensitivity(int value)
         [&](State state) { return Reducer::setWearableMotionSensitivity(std::move(state), value); });
 }
 
+void CameraSettingsDialogStore::setCredentials(
+    const std::optional<QString>& login, const std::optional<QString>& password)
+{
+    if (!login && !password)
+        return;
+
+    d->executeAction(
+        [&](State state) { return Reducer::setCredentials(std::move(state), login, password); });
+}
+
 } // namespace desktop
 } // namespace client
 } // namespace nx

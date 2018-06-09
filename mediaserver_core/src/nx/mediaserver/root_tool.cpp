@@ -68,6 +68,7 @@ Qn::StorageInitResult RootTool::mount(const QUrl& url, const QString& path)
             return Qn::StorageInitResult::StorageInit_WrongPath;
         };
 
+    SystemCommands systemCommands;
     auto logMountResult =
         [&](SystemCommands::MountCode mountResult, bool viaSocket)
         {
@@ -75,18 +76,17 @@ Qn::StorageInitResult RootTool::mount(const QUrl& url, const QString& path)
             switch (mountResult)
             {
             case SystemCommands::MountCode::ok:
-                NX_DEBUG(
-                    this, lm("[mount] Successfully mounted '%1' to '%2' %3").args(url, path, viaString));
+                NX_DEBUG(this, lm(
+                    "[mount] Successfully mounted '%1' to '%2' %3").args(url, path, viaString));
                 break;
             case SystemCommands::MountCode::otherError:
-                NX_WARNING(
-                    this, lm("[mount] Failed to mount '%1' to '%2' %3").args(url, path, viaString));
+                NX_WARNING(this, lm("[mount] Failed to mount '%1' to '%2' %3: %4").args(
+                        url, path, viaString, systemCommands.lastError()));
                 break;
             case SystemCommands::MountCode::wrongCredentials:
-                NX_WARNING(
-                    this,
-                    lm("[mount] Failed to mount '%1' to '%2' %3 due to WRONG credentials")
-                        .args(url, path, viaString));
+                NX_WARNING(this, lm(
+                    "[mount] Failed to mount '%1' to '%2' %3 due to WRONG credentials").args(
+                        url, path, viaString, systemCommands.lastError()));
                 break;
             }
         };
@@ -98,7 +98,7 @@ Qn::StorageInitResult RootTool::mount(const QUrl& url, const QString& path)
     {
         auto userName = url.userName().toStdString();
         auto password = url.password().toStdString();
-        auto mountResult = SystemCommands().mount(
+        auto mountResult = systemCommands.mount(
             uncString.toStdString(), path.toStdString(),
             userName.empty() ? none : boost::optional<std::string>(userName),
             password.empty() ? none : boost::optional<std::string>(password),

@@ -180,7 +180,7 @@ SpaceInfo::RecordingReadinessState SpaceInfo::state(int storageIndex) const
 {
     QnMutexLocker lock(&m_mutex);
     if (hasStorageWithoutEffectiveSpace(m_storageSpaceInfo))
-        return ready;
+        return enoughSpace;
 
     auto it = std::find_if(
                 m_storageSpaceInfo.cbegin(),
@@ -193,7 +193,7 @@ SpaceInfo::RecordingReadinessState SpaceInfo::state(int storageIndex) const
     if (it == m_storageSpaceInfo.cend())
         return notExist;
 
-    return it->effectiveSpace > 0 ? ready : notReady;
+    return it->effectiveSpace > 0 ? enoughSpace : notEnoughSpace;
 }
 
 }

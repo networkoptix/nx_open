@@ -913,8 +913,14 @@ QString QnSecurityCamResource::getLogicalId() const
 void QnSecurityCamResource::setLogicalId(const QString& value)
 {
     NX_ASSERT(!getId().isNull());
-    QnCameraUserAttributePool::ScopedLock userAttributesLock(userAttributesPool(), getId());
-    (*userAttributesLock)->logicalId = value;
+    {
+        QnCameraUserAttributePool::ScopedLock userAttributesLock(userAttributesPool(), getId());
+        if ((*userAttributesLock)->logicalId == value)
+            return;
+        (*userAttributesLock)->logicalId = value;
+    }
+
+    emit logicalIdChanged(::toSharedPointer(this));
 }
 
 void QnSecurityCamResource::setMaxDays(int value)
@@ -1080,7 +1086,7 @@ void QnSecurityCamResource::setManuallyAdded(bool value)
 
 bool QnSecurityCamResource::isDefaultAuth() const
 {
-    return hasCameraCapabilities(Qn::isDefaultPasswordCapability);
+    return hasCameraCapabilities(Qn::IsDefaultPasswordCapability);
 }
 
 Qn::CameraBackupQualities QnSecurityCamResource::getBackupQualities() const
@@ -1427,9 +1433,9 @@ bool QnSecurityCamResource::setCameraCredentialsSync(
 Qn::MediaStreamEvent QnSecurityCamResource::checkForErrors() const
 {
     const auto capabilities = getCameraCapabilities();
-    if (capabilities.testFlag(Qn::isDefaultPasswordCapability))
+    if (capabilities.testFlag(Qn::IsDefaultPasswordCapability))
         return Qn::MediaStreamEvent::ForbiddenWithDefaultPassword;
-    if (capabilities.testFlag(Qn::isOldFirmwareCapability))
+    if (capabilities.testFlag(Qn::IsOldFirmwareCapability))
         return Qn::MediaStreamEvent::oldFirmware;
     return Qn::MediaStreamEvent::NoEvent;
 }

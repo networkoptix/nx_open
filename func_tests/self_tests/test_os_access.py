@@ -28,7 +28,7 @@ def test_path(os_access):
 
 
 def test_networking(os_access):
-    assert issubclass(os_access.networking, Networking)
+    assert isinstance(os_access.networking, Networking)
     assert os_access.networking is os_access.networking  # I.e. same class returned each time.
 
 

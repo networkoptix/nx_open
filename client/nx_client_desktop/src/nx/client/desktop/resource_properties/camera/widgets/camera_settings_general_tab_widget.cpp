@@ -1,5 +1,6 @@
 #include "camera_settings_general_tab_widget.h"
 #include "ui_camera_settings_general_tab_widget.h"
+#include "../dialogs/camera_credentials_dialog.h"
 #include "../redux/camera_settings_dialog_state.h"
 #include "../redux/camera_settings_dialog_store.h"
 
@@ -27,11 +28,12 @@ CameraSettingsGeneralTabWidget::CameraSettingsGeneralTabWidget(
     ui->imageControlWidget->setStore(store);
     ui->wearableArchiveLengthWidget->setStore(store);
     ui->wearableMotionWidget->setStore(store);
+    ui->wearableUploadWidget->setStore(store);
 
     ui->licensePanel->init(licenseUsageTextProvider, store);
 
     ui->wearableArchiveLengthWidget->aligner()->addAligner(
-        ui->wearableMotionWidget->aligner());
+        ui->imageControlWidget->aligner());
 
     CheckboxUtils::autoClearTristate(ui->enableAudioCheckBox);
 
@@ -47,8 +49,11 @@ CameraSettingsGeneralTabWidget::CameraSettingsGeneralTabWidget(
     connect(ui->enableAudioCheckBox, &QCheckBox::clicked,
         store, &CameraSettingsDialogStore::setAudioEnabled);
 
-    // TODO: #vkutin #gdm Handle "Edit Credentials" button and remove the following line.
-    ui->authenticationGroupBox->hide();
+    connect(ui->wearableUploadWidget, &WearableCameraUploadWidget::actionRequested,
+        this, &CameraSettingsGeneralTabWidget::actionRequested);
+
+    connect(ui->editCredentialsButton, &QPushButton::clicked, this,
+        [this, store = QPointer<CameraSettingsDialogStore>(store)]() { editCredentials(store); });
 }
 
 CameraSettingsGeneralTabWidget::~CameraSettingsGeneralTabWidget()
@@ -63,16 +68,17 @@ void CameraSettingsGeneralTabWidget::loadState(const CameraSettingsDialogState& 
     const bool allWearableCameras = state.devicesDescription.isWearable == CombinedValue::All;
     ui->wearableArchiveLengthWidget->setVisible(allWearableCameras);
     ui->wearableMotionWidget->setVisible(allWearableCameras);
+    ui->wearableUploadWidget->setVisible(state.isSingleWearableCamera());
 
     const bool licensePanelVisible = state.devicesDescription.isIoModule != CombinedValue::None
         || state.devicesDescription.isDtsBased != CombinedValue::None;
 
     ui->licensePanel->setVisible(licensePanelVisible);
     ui->overLicensingLine->setVisible(licensePanelVisible);
+    ui->authenticationGroupBox->setVisible(
+        state.devicesDescription.isWearable == CombinedValue::None);
 
-    CheckboxUtils::setupTristateCheckbox(ui->enableAudioCheckBox,
-        state.audioEnabled.hasValue(),
-        state.audioEnabled.valueOr(false));
+    CheckboxUtils::setupTristateCheckbox(ui->enableAudioCheckBox, state.audioEnabled);
 
     ::setReadOnly(ui->enableAudioCheckBox, state.readOnly);
     ::setReadOnly(ui->editCredentialsButton, state.readOnly);
@@ -80,6 +86,21 @@ void CameraSettingsGeneralTabWidget::loadState(const CameraSettingsDialogState& 
     ui->rightWidget->layout()->activate();
     ui->horizontalLayout->activate();
     layout()->activate();
+}
+
+void CameraSettingsGeneralTabWidget::editCredentials(CameraSettingsDialogStore* store)
+{
+    if (!store)
+        return;
+
+    QScopedPointer<CameraCredentialsDialog> dialog(new CameraCredentialsDialog(this));
+
+    const auto& credentials = store->state().credentials;
+    dialog->setLogin(credentials.login);
+    dialog->setPassword(credentials.password);
+
+    if (dialog->exec() == QDialog::Accepted)
+        store->setCredentials(dialog->login(), dialog->password());
 }
 
 } // namespace desktop

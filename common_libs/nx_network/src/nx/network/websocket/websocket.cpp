@@ -94,7 +94,6 @@ void WebSocket::reportErrorIfAny(
         {
             auto readData = m_readQueue.pop();
             readData.handler(ecode, bytesRead);
-            NX_VERBOSE(this, "Reporting error, user handler completed");
         }
         continueHandler(true);
         return;
@@ -108,13 +107,10 @@ void WebSocket::handleSocketRead(SystemError::ErrorCode ecode, size_t bytesRead)
     reportErrorIfAny(
         ecode,
         bytesRead,
-        [this, bytesRead, ecode](bool errorOccured)
+        [this, bytesRead](bool errorOccured)
         {
             if (errorOccured)
-            {
-                NX_DEBUG(this, lm("Handle read error: %1").arg(ecode));
                 return;
-            }
 
             restartTimers();
             m_parser.consume(m_readBuffer.data(), (int)bytesRead);
@@ -126,11 +122,7 @@ void WebSocket::handleSocketRead(SystemError::ErrorCode ecode, size_t bytesRead)
                 [this](bool errorOccured)
                 {
                     if (errorOccured)
-                    {
-                        NX_DEBUG(this,
-                            lm("Handle while parsing read data error: %1").arg(m_lastError));
                         return;
-                    }
 
                     processReadData();
                 });

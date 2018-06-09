@@ -197,14 +197,33 @@ enum ActionType
      */
     execHttpRequestAction = 15,
 
+    /**
+     * Displays event notification for the user, where special 'Acknowledge' button is available.
+     * On this button press, bookmark on the source camera is created.
+     */
     acknowledgeAction = 16,
+
+    /**
+     * Expand given camera to fullscreen if it is displayed on the current layout.
+     * Parameters:
+     * - camera (may be taken from the event)
+     * - layout (may belong to the fixed user or be shared)
+     */
+    fullscreenCameraAction = 17,
+
+    /**
+     * Reset given layout from fullscreen if it is displayed currently.
+     * Parameters:
+     * - layout (may belong to the fixed user or be shared)
+     */
+    exitFullscreenAction = 18,
 
     /**
     * Open layout as an action.
     * actionParams:
     * - layoutResourceId - Uuid of layout to be opened
     */
-    openLayoutAction = 17,
+    openLayoutAction = 19,
 };
 QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(ActionType)
 

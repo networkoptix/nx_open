@@ -4,7 +4,7 @@
 
 QnSystemDescription::PointerType QnLocalSystemDescription::createFactory(const QString& systemId)
 {
-    return PointerType(new QnLocalSystemDescription(systemId));
+    return PointerType(static_cast<base_type*>(new QnLocalSystemDescription(systemId)));
 }
 
 QnSystemDescription::PointerType QnLocalSystemDescription::create(
@@ -12,7 +12,8 @@ QnSystemDescription::PointerType QnLocalSystemDescription::create(
     const QnUuid& localSystemId,
     const QString& systemName)
 {
-    return PointerType(new QnLocalSystemDescription(systemId, localSystemId, systemName));
+    return PointerType(static_cast<base_type*>(
+        new QnLocalSystemDescription(systemId, localSystemId, systemName)));
 }
 
 QnLocalSystemDescription::QnLocalSystemDescription(const QString& systemId):

@@ -7,7 +7,7 @@ import server_api_data_generators as generator
 from framework.api_shortcuts import get_local_system_id, get_server_id
 from framework.waiting import wait_for_true
 
-log = logging.getLogger(__name__)
+_logger = logging.getLogger(__name__)
 
 
 def servers_is_online(server):

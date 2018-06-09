@@ -554,10 +554,6 @@ void initialize(Manager* manager, Action* root)
         .flags(NoTarget)
         .mode(DesktopMode);
 
-    factory(ShowEulaAction)
-        .flags(NoTarget)
-        .mode(DesktopMode);
-
     factory(AllowStatisticsReportMessageAction)
         .flags(NoTarget)
         .mode(DesktopMode)

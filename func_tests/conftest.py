@@ -17,7 +17,7 @@ DEFAULT_REST_API_FORWARDED_PORT_BASE = 17000
 
 DEFAULT_MAX_LOG_WIDTH = 500
 
-log = logging.getLogger(__name__)
+_logger = logging.getLogger(__name__)
 
 
 def pytest_addoption(parser):
@@ -64,6 +64,9 @@ def init_logging(request, work_dir):
     root_logger = logging.getLogger()
     root_logger.setLevel(logging.DEBUG)  # It's WARNING by default. Level constraints are set in handlers.
 
+    logging.getLogger('SMB.SMBConnection').setLevel(logging.INFO)  # Big files cause too many logs.
+    logging.getLogger('paramiko.transport').setLevel(logging.INFO)  # Big files cause too many logs.
+
     stderr_log_width = request.config.getoption('--max-log-width')
     stderr_handler = logging.StreamHandler()
     # %(message).10s truncates log message to 10 characters.
@@ -76,6 +79,7 @@ def init_logging(request, work_dir):
     for level in {logging.DEBUG, logging.INFO}:
         file_name = logging.getLevelName(level).lower() + '.log'
         file_handler = logging.FileHandler(str(work_dir / file_name), mode='w')
+        file_handler.setLevel(level)
         file_handler.setFormatter(file_formatter)
         root_logger.addHandler(file_handler)
 
@@ -125,5 +129,5 @@ def artifact_factory(request, work_dir, junk_shop_repository):
 def metrics_saver(junk_shop_repository):
     db_capture_repository, current_test_run = junk_shop_repository
     if not db_capture_repository:
-        log.warning('Junk shop plugin is not available; No metrics will be saved')
+        _logger.warning('Junk shop plugin is not available; No metrics will be saved')
     return MetricsSaver(db_capture_repository, current_test_run)

@@ -6,6 +6,7 @@
 #include <core/resource_access/resource_access_subject.h>
 
 #include <ui/workbench/workbench_state_manager.h>
+#include <nx/vms/event/event_fwd.h>
 
 class QnWorkbenchLayout;
 typedef QList<QnWorkbenchLayout *> QnWorkbenchLayoutList;
@@ -40,6 +41,7 @@ private:
     void at_openNewTabAction_triggered();
     void at_removeLayoutItemAction_triggered();
     void at_removeLayoutItemFromSceneAction_triggered();
+    void at_openLayoutAction_triggered(const vms::event::AbstractActionPtr& businessAction);
 
 private:
     bool closeAllLayouts(bool force = false);

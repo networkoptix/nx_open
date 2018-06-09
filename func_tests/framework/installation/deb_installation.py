@@ -1,5 +1,3 @@
-"""Manipulate directory to which server instance is installed."""
-
 import logging
 import sys
 from io import BytesIO
@@ -7,8 +5,10 @@ from io import BytesIO
 from framework.installation.installation import Installation
 from framework.installation.installer import Version, known_customizations
 from framework.installation.upstart_service import UpstartService
+from framework.method_caching import cached_property
 from framework.os_access.exceptions import DoesNotExist
 from framework.os_access.path import copy_file
+from framework.os_access.posix_shell import SSH
 
 if sys.version_info[:2] == (2, 7):
     # noinspection PyCompatibility,PyUnresolvedReferences
@@ -21,13 +21,12 @@ _logger = logging.getLogger(__name__)
 
 
 class DebInstallation(Installation):
-    """Either installed via dpkg or unpacked"""
+    """Manage installation via dpkg"""
 
     def __init__(self, ssh_access, deb):
-        """Either valid or hypothetical (invalid or non-existent) installation."""
-        self._ssh = ssh_access.ssh
-        self._deb = deb
-        self.dir = ssh_access.Path('/opt', self._deb.customization.linux_subdir)
+        self._ssh = ssh_access.ssh  # type: SSH
+        self.installer = deb
+        self.dir = ssh_access.Path('/opt', self.installer.customization.linux_subdir)
         self._bin = self.dir / 'bin'
         self.binary = self._bin / 'mediaserver-bin'
         self._config = self.dir / 'etc' / 'mediaserver.conf'
@@ -35,12 +34,11 @@ class DebInstallation(Installation):
         self.var = self.dir / 'var'
         self._log_file = self.var / 'log' / 'log_file.log'
         self.key_pair = self.var / 'ssl' / 'cert.pem'
-        self.os_access = ssh_access
-        self.service = UpstartService(
-            self.os_access.ssh,
-            self._deb.customization.linux_service_name,
-            stop_timeout_sec=120 + 10,  # 120 seconds specified in upstart conf file.
-            )
+        self.ssh_access = ssh_access
+
+    @property
+    def os_access(self):
+        return self.ssh_access
 
     def is_valid(self):
         paths_to_check = [
@@ -54,6 +52,12 @@ class DebInstallation(Installation):
                 _logger.warning("Path %r does not exists.", path)
                 all_paths_exist = False
         return all_paths_exist
+
+    @cached_property
+    def service(self):
+        service_name = self.installer.customization.linux_service_name
+        stop_timeout_sec = 10  # 120 seconds specified in upstart conf file.
+        return UpstartService(self.ssh_access.ssh, service_name, stop_timeout_sec)
 
     def list_core_dumps(self):
         return self._bin.glob('core.*')
@@ -89,13 +93,13 @@ class DebInstallation(Installation):
         build_info = dict(
             line.split('=', 1)
             for line in build_info_text.splitlines(False))
-        if self._deb.version != Version(build_info['version']):
+        if self.installer.version != Version(build_info['version']):
             return False
         customization, = (
             customization
             for customization in known_customizations
             if customization.customization_name == build_info['customization'])
-        if self._deb.customization != customization:
+        if self.installer.customization != customization:
             return False
         return True
 
@@ -103,27 +107,22 @@ class DebInstallation(Installation):
         if self._can_be_reused():
             return
 
-        remote_path = self.os_access.Path.tmp() / self._deb.path.name
+        remote_path = self.os_access.Path.tmp() / self.installer.path.name
         remote_path.parent.mkdir(parents=True, exist_ok=True)
-        copy_file(self._deb.path, remote_path)
-        self.os_access.ssh.run_sh_script(
+        copy_file(self.installer.path, remote_path)
+        self.ssh_access.ssh.run_sh_script(
             # language=Bash
             '''
                 # Commands and dependencies for trusty template.
                 CORE_PATTERN_FILE='/etc/sysctl.d/60-core-pattern.conf'
                 echo 'kernel.core_pattern=core.%t.%p' > "$CORE_PATTERN_FILE"  # %t is timestamp, %p is pid.
                 sysctl -p "$CORE_PATTERN_FILE"  # See: https://superuser.com/questions/625840
-                POINT=/mnt/trusty-packages
-                mkdir -p "$POINT"
-                mount -t nfs -o ro "$SHARE" "$POINT"
-                DEBIAN_FRONTEND=noninteractive dpkg -i "$DEB" "$POINT"/*  # GDB (to parse core dumps) and deps.
-                umount "$POINT"
+                DEBIAN_FRONTEND=noninteractive dpkg -i "$DEB"
                 cp "$CONFIG" "$CONFIG_INITIAL"
                 ''',
             env={
                 'DEB': remote_path,
                 'CONFIG': self._config,
                 'CONFIG_INITIAL': self._config_initial,
-                'SHARE': '10.0.2.107:/data/QA/func_tests/trusty-packages',
                 })
         assert self.is_valid()

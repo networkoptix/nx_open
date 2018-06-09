@@ -39,13 +39,13 @@ def determine_package_versions(
         "libjpeg-turbo": "1.4.2",
         "festival": "2.4",
         "directx": "JUN2010",
-		"pandoc": "2.2.1",
+        "pandoc": "2.2.1",
         "cassandra": "2.7.0",
         "doxygen": "1.8.14",
         "gstreamer": "1.0",
         "glib": "2.0",
         "deepstream": "0.1",
-        "help": customization + "-" + short_release_version(release_version),
+        "help": customization + "-3.2",
         "server-external": release_version,
         "certificates": customization,
     }
@@ -93,7 +93,7 @@ def determine_package_versions(
 
     if box == "bananapi":
         v["ffmpeg"] = "3.1.1-bananapi"
-        v["qt"] = "5.6.1-1"
+        v["qt"] = "5.6.3-bananapi"
 
     if box == "rpi":
         v["qt"] = "5.6.3"
@@ -160,7 +160,7 @@ def sync_dependencies(syncher, platform, arch, box, release_version, options={})
         sync("linux-arm/glib-2.0")
         sync("linux-arm/zlib-1.2")
 
-    if box in ("bpi", "bananapi"):
+    if box == "bpi":
         sync("opengl-es-mali")
 
     if box == "rpi":

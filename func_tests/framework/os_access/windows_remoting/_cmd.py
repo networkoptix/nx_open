@@ -2,8 +2,9 @@ import base64
 import logging
 
 import xmltodict
+from winrm.exceptions import WinRMTransportError
 
-log = logging.getLogger(__name__)
+_logger = logging.getLogger(__name__)
 
 
 class Shell(object):
@@ -36,7 +37,7 @@ class _Command(object):
 
     def __enter__(self):
         # Rewrite with bigger MaxEnvelopeSize, currently hardcoded to 150k, while 8M needed.
-        log.getChild('command').debug(' '.join([self._command] + list(self._arguments)))
+        _logger.getChild('command').debug(' '.join([self._command] + list(self._arguments)))
         self._command_id = self._protocol.run_command(
             self._shell_id,
             self._command, self._arguments,
@@ -45,14 +46,18 @@ class _Command(object):
         return self
 
     def __exit__(self, exc_type, exc_val, exc_tb):
-        self._protocol.cleanup_command(self._shell_id, self._command_id)
+        try:
+            self._protocol.cleanup_command(self._shell_id, self._command_id)
+        except WinRMTransportError as e:
+            _logger.exception("XML:\n%s", e.response_text)
+            raise
         self._command_id = None
 
     def send_stdin(self, stdin_bytes, end=False):
         assert not self.is_done
-        log.getChild('stdin.size').debug(len(stdin_bytes))
+        _logger.getChild('stdin.size').debug(len(stdin_bytes))
         if len(stdin_bytes) < 8192:
-            log.getChild('stdin.data').debug(stdin_bytes.decode(errors='backslashreplace'))
+            _logger.getChild('stdin.data').debug(stdin_bytes.decode(errors='backslashreplace'))
         # noinspection PyProtectedMember
         rq = {
             'env:Envelope': self._protocol._get_soap_header(
@@ -70,20 +75,20 @@ class _Command(object):
         try:
             stdin_text = stdin_bytes.decode('ascii')
         except UnicodeDecodeError:
-            log.getChild('stdin').debug("Sent:\n%r", stdin_bytes)
+            _logger.getChild('stdin').debug("Sent:\n%r", stdin_bytes)
         else:
-            log.getChild('stdin').debug("Sent:\n%s", stdin_text)
+            _logger.getChild('stdin').debug("Sent:\n%s", stdin_text)
 
     def receive_stdout_and_stderr(self):
         assert not self.is_done
-        log.getChild('stdout').debug("Receive")
+        _logger.getChild('stdout').debug("Receive")
         # noinspection PyProtectedMember
         stdout_chunk, stderr_chunk, exit_code, self.is_done = self._protocol._raw_get_command_output(
             self._shell_id, self._command_id)
-        log.getChild('stdout.size').debug(len(stdout_chunk))
+        _logger.getChild('stdout.size').debug(len(stdout_chunk))
         if len(stdout_chunk) < 8192:
-            log.getChild('stdout.data').debug(stdout_chunk.decode(errors='backslashreplace'))
-        log.getChild('stderr.data').debug(stderr_chunk.decode(errors='backslashreplace'))
+            _logger.getChild('stdout.data').debug(stdout_chunk.decode(errors='backslashreplace'))
+        _logger.getChild('stderr.data').debug(stderr_chunk.decode(errors='backslashreplace'))
         if self.is_done:
             assert isinstance(exit_code, int)
             self.exit_code = exit_code

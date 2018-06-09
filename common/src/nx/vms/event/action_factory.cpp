@@ -93,6 +93,8 @@ AbstractActionPtr ActionFactory::createAction(
         case ActionType::showOnAlarmLayoutAction:
         case ActionType::execHttpRequestAction:
         case ActionType::openLayoutAction:
+        case ActionType::fullscreenCameraAction:
+        case ActionType::exitFullscreenAction:
             return AbstractActionPtr(new CommonAction(actionType, runtimeParams));
 
         default:

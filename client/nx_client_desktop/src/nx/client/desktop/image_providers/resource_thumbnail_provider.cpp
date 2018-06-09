@@ -71,7 +71,7 @@ struct ResourceThumbnailProvider::Private
             QPixmap pixmap = qnSkin->pixmap(placeholderIconPath, true);
             // TODO: vms 4.0 has a new way to get preset colors
             const auto& palette = QnNxStyle::instance()->genericPalette();
-            const auto& backgroundColor = palette.color(lit("dark"), 4);
+            const auto& backgroundColor = palette.color(lit("dark"), 3);
             const auto& frameColor = palette.color(lit("dark"), 6);
             QSize size = pixmap.size();
             QPixmap dst(size);

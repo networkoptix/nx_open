@@ -11,7 +11,7 @@ from framework.rest_api import RestApi
 from .template_renderer import TemplateRenderer
 from .utils import is_list_inst
 
-log = logging.getLogger(__name__)
+_logger = logging.getLogger(__name__)
 
 
 SERVER_CTL_TEMPLATE_PATH = 'server_ctl.sh.jinja2'
@@ -84,7 +84,7 @@ class PhysicalInstallationCtl(object):
         return None
 
     def release_all_servers(self):
-        log.info('Releasing all physical installations')
+        _logger.info('Releasing all physical installations')
         for host in self.installation_hosts:
             host.release_all_servers()
         self._available_hosts = self.installation_hosts[:]
@@ -126,7 +126,7 @@ class PhysicalInstallationHost(object):
         self._must_reset_installation = True
 
     def _reset_installations(self):
-        log.info('%s: removing directory: %s', self.name, self.root_dir)
+        _logger.info('%s: removing directory: %s', self.name, self.root_dir)
         self.os_access.rm_tree(self.root_dir, ignore_errors=True)
 
         self._dist_unpacked = False

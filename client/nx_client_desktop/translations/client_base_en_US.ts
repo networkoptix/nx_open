@@ -6363,11 +6363,7 @@ to %1</source>
         <translation></translation>
     </message>
     <message>
-        <source>Backup includes servers and cameras settings, users, webpages, event rules, etc. Video is not saved.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Creates a backup of System configuration that can be restored in case of failure.</source>
+        <source>Reindexing can fix problems with archive or backup if they have been lost or damaged, or if some hardware has been replaced.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -7391,6 +7387,21 @@ to %1</source>
     </message>
     <message>
         <source>Video Wall is removed on the server and will be closed.</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>QnWorkbenchContext</name>
+    <message>
+        <source>To use the software you must accept the end user license agreement</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Accept</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Decline</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -8537,6 +8548,10 @@ to %1</source>
         <source>Event will trigger only if there are matches in the caption with any of the entered keywords.</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>This field is case sensitive.</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>nx::client::desktop::ui::ClipboardButton</name>
@@ -8886,18 +8901,6 @@ to %1</source>
     <message>
         <source>Failed to change password on %1 of %2 cameras</source>
         <translation></translation>
-    </message>
-    <message>
-        <source>To use the software you must accept the end user license agreement</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Accept</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Decline</source>
-        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Warning! This build is for testing purposes only! Please upgrade to a next available patch or release version once available.</source>

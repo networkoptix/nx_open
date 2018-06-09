@@ -64,7 +64,7 @@ void LegacyCameraSettingsStreamsPanel::setCamera(const QnVirtualCameraResourcePt
 bool LegacyCameraSettingsStreamsPanel::hasChanges() const
 {
     return m_camera
-        && m_camera->hasCameraCapabilities(Qn::CanEditStreamsCapability)
+        && m_camera->hasCameraCapabilities(Qn::CustomMediaUrlCapability)
         && (m_camera->sourceUrl(Qn::CR_LiveVideo) != m_model.primaryStreamUrl
             || m_camera->sourceUrl(Qn::CR_SecondaryLiveVideo) != m_model.secondaryStreamUrl);
 }
@@ -105,7 +105,7 @@ void LegacyCameraSettingsStreamsPanel::updateFromResource()
     }
 
     ui->editStreamsButton->setVisible(m_camera
-        && m_camera->hasCameraCapabilities(Qn::CanEditStreamsCapability));
+        && m_camera->hasCameraCapabilities(Qn::CustomMediaUrlCapability));
     updateFields();
 }
 

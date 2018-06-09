@@ -4,7 +4,7 @@
 #include <deque>
 #include <numeric>
 
-#include <boost/optional.hpp>
+#include <nx/utils/std/optional.h>
 
 #include "../time.h"
 
@@ -14,14 +14,25 @@ namespace math {
 
 /**
  * Given stream of values returns sum of values per specified period.
+ * Every operation has constant-time complexity against number of values provided.
+ * It is achieved by calculating sums for a number of subperiods
+ * and summing them up when needed.
+ * Such approach results in calculation error of 1.0 / {sub period count}.
+ * So, this class is effective for cases with a very large number of values.
+ * E.g., calculating traffic per period.
+ * Max error can be retrieved with SumPerPeriod::maxError().
  */
 template<typename Value>
 class SumPerPeriod
 {
 public:
-    SumPerPeriod(std::chrono::milliseconds period):
-        m_subPeriodCount(5),
-        m_subperiod(period / m_subPeriodCount)
+    SumPerPeriod(
+        std::chrono::milliseconds period,
+        int subPeriodCount = 20)
+        :
+        m_subPeriodCount(subPeriodCount),
+        m_subperiod(
+            std::chrono::duration_cast<std::chrono::microseconds>(period) / m_subPeriodCount)
     {
         m_sumPerSubperiod.resize(m_subPeriodCount);
     }
@@ -51,7 +62,7 @@ public:
             const auto currentPeriodLength =
                 periodIndex == 0
                 ? duration_cast<microseconds>(now - *m_currentPeriodStart)
-                : duration_cast<microseconds>(m_subperiod);
+                : m_subperiod;
             if (currentPeriodLength >= valuePeriod)
             {
                 m_sumPerSubperiod[periodIndex] += value;
@@ -80,11 +91,17 @@ public:
         return 1.0 / m_subPeriodCount;
     }
 
+    void reset()
+    {
+        m_sumPerSubperiod = std::deque<Value>(m_subPeriodCount);
+        m_currentPeriodStart = std::nullopt;
+    }
+
 private:
-    const int m_subPeriodCount;
-    const std::chrono::milliseconds m_subperiod;
+    int m_subPeriodCount;
+    std::chrono::microseconds m_subperiod;
     std::deque<Value> m_sumPerSubperiod;
-    boost::optional<std::chrono::steady_clock::time_point> m_currentPeriodStart;
+    std::optional<std::chrono::steady_clock::time_point> m_currentPeriodStart;
 
     void closeExpiredPeriods(
         std::chrono::steady_clock::time_point now)
@@ -100,7 +117,8 @@ private:
         {
             const auto lastPeriodStart =
                 *m_currentPeriodStart - (m_subPeriodCount - 1) * m_subperiod;
-            if (lastPeriodStart > deadline)
+            const auto lastPeriodEnd = lastPeriodStart + m_subperiod;
+            if (lastPeriodEnd > deadline)
             {
                 break;
             }

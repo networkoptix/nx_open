@@ -25,6 +25,7 @@
 
 #include <motion/motion_detection.h>
 #include <utils/common/synctime.h>
+#include <core/resource/param.h>
 
 namespace
 {
@@ -76,10 +77,25 @@ ThirdPartyStreamReader::ThirdPartyStreamReader(
     m_audioLayout.reset( new QnResourceCustomAudioLayout() );
 
     m_camManager.getCameraCapabilities( &m_cameraCapabilities );
+
+    Qn::directConnect(
+        res.data(), &QnResource::propertyChanged,
+        this,
+        [this](const QnResourcePtr& resource, const QString& propertyName)
+        {
+            if (propertyName == Qn::CAMERA_STREAM_URLS)
+            {
+                // Reinitialize camera driver. hasDualStreaming may be changed.
+                m_resource->setStatus(Qn::Offline);
+                m_isMediaUrlValid.clear();
+            }
+        });
+    m_isMediaUrlValid.test_and_set();
 }
 
 ThirdPartyStreamReader::~ThirdPartyStreamReader()
 {
+    directDisconnectAll();
     stop();
 }
 
@@ -157,6 +173,19 @@ CameraDiagnostics::Result ThirdPartyStreamReader::openStreamInternal(bool isCame
         return CameraDiagnostics::NoMediaTrackResult( requestedUrl.toString() );
     }
     nxcip_qt::CameraMediaEncoder cameraEncoder( intf );
+
+    if (auto camera = m_resource.dynamicCast<QnVirtualCameraResource>())
+    {
+        if (camera->getCameraCapabilities().testFlag(Qn::CustomMediaUrlCapability))
+        {
+            const auto mediaUrl = camera->sourceUrl(getRole());
+            nxpt::ScopedRef<nxcip::CameraMediaEncoder4> mediaEncoder4(
+                (nxcip::CameraMediaEncoder4*)intf->queryInterface(nxcip::IID_CameraMediaEncoder4),
+                false);
+            if (mediaEncoder4.get())
+                mediaEncoder4->setMediaUrl(mediaUrl.toUtf8().constData());
+        }
+    }
 
     QAuthenticator auth = m_thirdPartyRes->getAuth();
     m_camManager.setCredentials( auth.user(), auth.password() );
@@ -417,6 +446,12 @@ QnAbstractMediaDataPtr ThirdPartyStreamReader::getNextData()
 {
     if( !isStreamOpened() )
         return QnAbstractMediaDataPtr(0);
+
+    if (!m_isMediaUrlValid.test_and_set())
+    {
+        closeStream();
+        return QnAbstractMediaDataPtr(); //< Reopen stream.
+    }
 
     if( !(m_cameraCapabilities & nxcip::BaseCameraManager::hardwareMotionCapability) && needMetadata() )
         return getMetadata();

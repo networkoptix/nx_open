@@ -193,7 +193,7 @@ namespace nxcip_qt
         m_textBuf( new char[nxcip::MAX_TEXT_LEN] )
     {
     }
-    
+
     BaseCameraManager::~BaseCameraManager()
     {
         delete[] m_textBuf;

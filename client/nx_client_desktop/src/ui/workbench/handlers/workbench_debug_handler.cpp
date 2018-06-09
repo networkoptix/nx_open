@@ -141,7 +141,7 @@ public:
                 if (cameras.empty())
                     return;
 
-                const auto caps = Qn::SetUserPasswordCapability | Qn::isDefaultPasswordCapability;
+                const auto caps = Qn::SetUserPasswordCapability | Qn::IsDefaultPasswordCapability;
 
                 const bool isDefaultPassword = cameras.first()->needsToChangeDefaultPassword();
 

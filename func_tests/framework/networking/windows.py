@@ -61,13 +61,9 @@ class WindowsNetworking(Networking):
         return self._names
 
     def firewall_rule_exists(self):
-        rules = self._winrm.run_powershell_script(
-            # language=PowerShell
-            '''
-                Get-NetFirewallRule -Name:$Name -ErrorAction:SilentlyContinue |
-                    select Name,DisplayName,Direction,RemoteAddress,Action
-                ''',
-            {'name': self._firewall_rule_name})
+        query = self._winrm.wmi_query(u'MSFT_NetFirewallRule', {}, namespace='Root/StandardCimv2')
+        all_rules = list(query.enumerate())
+        rules = [rule for rule in all_rules if rule[u'InstanceID'] == self._firewall_rule_name]
         return bool(rules)
 
     def create_firewall_rule(self):

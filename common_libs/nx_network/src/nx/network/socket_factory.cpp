@@ -7,11 +7,10 @@
 #include <nx/network/ssl_socket.h>
 #include <nx/network/ssl/ssl_stream_server_socket.h>
 #include <nx/network/ssl/ssl_stream_socket.h>
+#include <nx/network/socket_global.h>
 #include <nx/network/system_socket.h>
 #include <nx/network/udt/udt_socket.h>
 #include <nx/utils/std/cpp14.h>
-
-//#define USE_NEW_SSL_SOCKET
 
 namespace nx {
 namespace network {
@@ -60,11 +59,10 @@ std::unique_ptr<AbstractStreamSocket> SocketFactory::createStreamSocket(
 std::unique_ptr<nx::network::AbstractStreamSocket> SocketFactory::createSslAdapter(
     std::unique_ptr<nx::network::AbstractStreamSocket> connection)
 {
-#ifdef USE_NEW_SSL_SOCKET
-    return std::make_unique<ssl::ClientStreamSocket>(std::move(connection));
-#else
-    return std::make_unique<deprecated::SslSocket>(std::move(connection), false);
-#endif // USE_NEW_SSL_SOCKET
+    if (SocketGlobals::ini().enableNewSslSocket)
+        return std::make_unique<ssl::ClientStreamSocket>(std::move(connection));
+    else
+        return std::make_unique<deprecated::SslSocket>(std::move(connection), false);
 }
 
 std::unique_ptr< AbstractStreamServerSocket > SocketFactory::createStreamServerSocket(
@@ -103,17 +101,18 @@ std::unique_ptr<nx::network::AbstractStreamServerSocket> SocketFactory::createSs
 {
     std::unique_ptr<nx::network::AbstractStreamServerSocket> result;
 
-#ifdef USE_NEW_SSL_SOCKET
-    result.reset(new ssl::StreamServerSocket(
-        std::move(serverSocket),
-        encryptionUse));
-#else
-    result.reset(new deprecated::SslServerSocket(
-        std::move(serverSocket),
-        encryptionUse == ssl::EncryptionUse::autoDetectByReceivedData));
-#endif // USE_NEW_SSL_SOCKET
-
-    return result;
+    if (SocketGlobals::ini().enableNewSslSocket)
+    {
+        return std::make_unique<ssl::StreamServerSocket>(
+            std::move(serverSocket),
+            encryptionUse);
+    }
+    else
+    {
+        return std::make_unique<deprecated::SslServerSocket>(
+            std::move(serverSocket),
+            encryptionUse == ssl::EncryptionUse::autoDetectByReceivedData);
+    }
 }
 
 QString SocketFactory::toString(SocketType type)

@@ -49,6 +49,17 @@ known_customizations = {
         windows_app_data_subdir=PureWindowsPath(u'Network Optix', u'Network Optix Media Server'),
         windows_registry_key=u'HKEY_LOCAL_MACHINE\\SOFTWARE\\Network Optix\\Network Optix Media Server',
         ),
+    Customization(
+        customization_name='metavms',
+        installer_name='metavms',
+        company_name='Nx MetaVMS',
+        linux_service_name='networkoptix-mediaserver',
+        linux_subdir=PurePosixPath('networkoptix/mediaserver'),
+        windows_service_name='metavmsMediaServer',
+        windows_installation_subdir=PureWindowsPath(u'Network Optix', u'Nx MetaVMS', u'MediaServer'),
+        windows_app_data_subdir=PureWindowsPath(u'Network Optix', u'Network Optix Media Server'),
+        windows_registry_key=u'HKEY_LOCAL_MACHINE\\SOFTWARE\\Network Optix\\Network Optix Media Server',
+        ),
     }
 
 

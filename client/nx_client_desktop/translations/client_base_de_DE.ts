@@ -3879,7 +3879,7 @@ to %1</source>
     </message>
     <message>
       <source>Changing any LDAP settings other than &quot;Search Filter&quot; will result in connectivity loss for all LDAP fetched users.</source>
-      <translation type="unfinished">Changing any LDAP settings other than &quot;Search Filter&quot; will result in connectivity loss for all LDAP fetched users.</translation>
+      <translation>Wenn Sie andere LDAP-Einstellungen als &quot;Suchfilter&quot; ändern, führt dies zum Verlust der Konnektivität für alle LDAP-Benutzer.</translation>
     </message>
   </context>
   <context>
@@ -6408,12 +6408,8 @@ to %1</source>
       <translation>Die Aufnahme wurde auf dem USB-Speicher aktiviert</translation>
     </message>
     <message>
-      <source>Backup includes servers and cameras settings, users, webpages, event rules, etc. Video is not saved.</source>
-      <translation>Backup beinhaltet Server- und Kameraeinstellungen, Benutzer, Webseiten, Ereignisregeln, etc. Video wird nicht gespeichert.</translation>
-    </message>
-    <message>
-      <source>Creates a backup of System configuration that can be restored in case of failure.</source>
-      <translation>Erstellt ein Backup der Systemkonfiguration, das im Fehlerfall wiederhergestellt werden kann.</translation>
+      <source>Reindexing can fix problems with archive or backup if they have been lost or damaged, or if some hardware has been replaced.</source>
+      <translation>Eine Neuindizierung kann Probleme mit dem Archiv oder der Sicherung beheben, wenn sie verloren gegangen sind, beschädigt wurden oder wenn eine Hardware ersetzt wurde.</translation>
     </message>
   </context>
   <context>
@@ -7429,6 +7425,21 @@ to %1</source>
     <message>
       <source>Video Wall is removed on the server and will be closed.</source>
       <translation>Die Videowand wird auf dem Server entfernt und geschlossen.</translation>
+    </message>
+  </context>
+  <context>
+    <name>QnWorkbenchContext</name>
+    <message>
+      <source>To use the software you must accept the end user license agreement</source>
+      <translation>Um die Software nutzen zu können, müssen Sie die Endbenutzer-Lizenzvereinbarung akzeptieren</translation>
+    </message>
+    <message>
+      <source>Accept</source>
+      <translation>Akzeptieren</translation>
+    </message>
+    <message>
+      <source>Decline</source>
+      <translation>Ablehnen</translation>
     </message>
   </context>
   <context>
@@ -8520,6 +8531,10 @@ to %1</source>
       <source>Event will trigger only if there are matches in the caption with any of the entered keywords.</source>
       <translation>Das Ereignis wird nur ausgelöst, wenn es Übereinstimmungen mit einem der eingegebenen Schlüsselwörter gibt.</translation>
     </message>
+    <message>
+      <source>This field is case sensitive.</source>
+      <translation>In diesem Feld wird zwischen Groß- und Kleinschreibung unterschieden.</translation>
+    </message>
   </context>
   <context>
     <name>nx::client::desktop::ui::ClipboardButton</name>
@@ -8867,20 +8882,8 @@ to %1</source>
       <translation>Passwörter auf %1 von %2 Kameras konnten nicht geändert werden</translation>
     </message>
     <message>
-      <source>To use the software you must accept the end user license agreement</source>
-      <translation>Um die Software nutzen zu können, müssen Sie die Endbenutzer-Lizenzvereinbarung akzeptieren</translation>
-    </message>
-    <message>
-      <source>Accept</source>
-      <translation>Akzeptieren</translation>
-    </message>
-    <message>
-      <source>Decline</source>
-      <translation>Ablehnen</translation>
-    </message>
-    <message>
       <source>Warning! This build is for testing purposes only! Please upgrade to a next available patch or release version once available.</source>
-      <translation type="unfinished">Warning! This build is for testing purposes only! Please upgrade to a next available patch or release version once available.</translation>
+      <translation>Warnung! Diese Version dient nur zu Testzwecken! Bitte aktualisieren Sie auf die nächste verfügbare Patch- oder Release-Version, sobald diese verfügbar ist.</translation>
     </message>
   </context>
   <context>

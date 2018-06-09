@@ -24,9 +24,11 @@ public:
 
     static bool useCertificateAndPkey(const String& certData);
 
-    static void useOrCreateCertificate(
+    static bool useOrCreateCertificate(
         const QString& filePath,
         const String& name, const String& country, const String& company);
+
+    static bool loadCertificateFromFile(const QString& filePath);
 
     static void useRandomCertificate(const String& module);
 

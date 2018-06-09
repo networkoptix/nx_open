@@ -3152,15 +3152,15 @@ to %1</source>
     </message>
     <message>
       <source>Event will trigger only if there are matches in the source with any of the entered keywords.</source>
-      <translation type="unfinished">Event will trigger only if there are matches in the source with any of the entered keywords.</translation>
+      <translation>De gebeurtenis wordt alleen geactiveerd als er overeenkomsten zijn in de bron met een van de gekozen trefwoorden.</translation>
     </message>
     <message>
       <source>Event will trigger only if there are matches in the caption with any of the entered keywords.</source>
-      <translation type="unfinished">Event will trigger only if there are matches in the caption with any of the entered keywords.</translation>
+      <translation>De gebeurtenis wordt alleen geactiveerd als er overeenkomsten zijn in het onderschrift met een van de gekozen trefwoorden.</translation>
     </message>
     <message>
       <source>Event will trigger only if there are matches in the description with any of the entered keywords.</source>
-      <translation type="unfinished">Event will trigger only if there are matches in the description with any of the entered keywords.</translation>
+      <translation>De gebeurtenis wordt alleen geactiveerd als er overeenkomsten zijn in de omschrijving met een van de gekozen trefwoorden.</translation>
     </message>
   </context>
   <context>
@@ -3378,7 +3378,7 @@ to %1</source>
     <name>QnEmptyBusinessActionWidget</name>
     <message>
       <source>Panic Recording mode switches recording settings for all cameras to maximum FPS and quality.</source>
-      <translation type="unfinished">Panic Recording mode switches recording settings for all cameras to maximum FPS and quality.</translation>
+      <translation>Paniekopname schakelt opname-instellingen voor alle camera's naar maximale FPS en kwaliteit.</translation>
     </message>
   </context>
   <context>
@@ -3879,7 +3879,7 @@ to %1</source>
     </message>
     <message>
       <source>Changing any LDAP settings other than &quot;Search Filter&quot; will result in connectivity loss for all LDAP fetched users.</source>
-      <translation type="unfinished">Changing any LDAP settings other than &quot;Search Filter&quot; will result in connectivity loss for all LDAP fetched users.</translation>
+      <translation>Als u andere LDAP-instellingen dan &quot;Zoekfilter&quot; wijzigt, leidt dit tot problemen met de verbinding voor alle LDAP gebruikers.</translation>
     </message>
   </context>
   <context>
@@ -4526,11 +4526,11 @@ to %1</source>
     </message>
     <message>
       <source>Displays IP addresses for cameras and servers and roles for users.</source>
-      <translation type="unfinished">Displays IP addresses for cameras and servers and roles for users.</translation>
+      <translation>Geeft IP-adressen weer voor camera's en servers en profielen voor gebruikers.</translation>
     </message>
     <message>
       <source>Length of time each camera on layout will be displayed if you start a Tour.</source>
-      <translation type="unfinished">Length of time each camera on layout will be displayed if you start a Tour.</translation>
+      <translation>Duur van de weergave voor elke apparaat in de schermindeling als u een tour cyclus start.</translation>
     </message>
   </context>
   <context>
@@ -6408,12 +6408,8 @@ to %1</source>
       <translation>Opname is ingeschakeld op de USB-opslag</translation>
     </message>
     <message>
-      <source>Backup includes servers and cameras settings, users, webpages, event rules, etc. Video is not saved.</source>
-      <translation>De back-up omvat server- en camerainstellingen, gebruikers, webpagina's, gebeurtenisregels, etc. Video data wordt niet opgeslagen.</translation>
-    </message>
-    <message>
-      <source>Creates a backup of System configuration that can be restored in case of failure.</source>
-      <translation>Creëert een back-up van de systeemconfiguratie om het systeem te kunnnen herstellen in geval van een storing.</translation>
+      <source>Reindexing can fix problems with archive or backup if they have been lost or damaged, or if some hardware has been replaced.</source>
+      <translation>Door opnieuw te indexeren kunnen problemen met het archief of de back-up worden opgelost als deze verloren of beschadigd zijn geraakt of als er hardware is vervangen.</translation>
     </message>
   </context>
   <context>
@@ -6713,11 +6709,11 @@ to %1</source>
     </message>
     <message>
       <source>Includes information about system, such as cameras models and firmware versions, number of servers, etc.</source>
-      <translation type="unfinished">Includes information about system, such as cameras models and firmware versions, number of servers, etc.</translation>
+      <translation>Bevat informatie over het systeem, zoals cameramodellen en firmwareversies, aantal servers, enz.</translation>
     </message>
     <message>
       <source>Does not include any personal information and is completely anonymous.</source>
-      <translation type="unfinished">Does not include any personal information and is completely anonymous.</translation>
+      <translation>Bevat geen persoonlijke informatie en is volledig anoniem.</translation>
     </message>
   </context>
   <context>
@@ -7429,6 +7425,21 @@ to %1</source>
     <message>
       <source>Video Wall is removed on the server and will be closed.</source>
       <translation>De VideoWall is verwijderd van de server en zal worden gesloten.</translation>
+    </message>
+  </context>
+  <context>
+    <name>QnWorkbenchContext</name>
+    <message>
+      <source>To use the software you must accept the end user license agreement</source>
+      <translation>Om de software te gebruiken, moet u de licentieovereenkomst voor eindgebruikers accepteren</translation>
+    </message>
+    <message>
+      <source>Accept</source>
+      <translation>Accepteren</translation>
+    </message>
+    <message>
+      <source>Decline</source>
+      <translation>Afwijzen</translation>
     </message>
   </context>
   <context>
@@ -8518,7 +8529,11 @@ to %1</source>
     </message>
     <message>
       <source>Event will trigger only if there are matches in the caption with any of the entered keywords.</source>
-      <translation type="unfinished">Event will trigger only if there are matches in the caption with any of the entered keywords.</translation>
+      <translation>De gebeurtenis wordt alleen geactiveerd als er overeenkomsten zijn in het onderschrift met een van de gekozen trefwoorden.</translation>
+    </message>
+    <message>
+      <source>This field is case sensitive.</source>
+      <translation>Dit veld is hoofdlettergevoelig.</translation>
     </message>
   </context>
   <context>
@@ -8867,20 +8882,8 @@ to %1</source>
       <translation>Wijzigen van wachtwoord op %1 of %2 camera's mislukt</translation>
     </message>
     <message>
-      <source>To use the software you must accept the end user license agreement</source>
-      <translation>Om de software te kunnen gebruiken dient u eerst de gebruiksrechtovereenkomst accepteren</translation>
-    </message>
-    <message>
-      <source>Accept</source>
-      <translation>Accepteren</translation>
-    </message>
-    <message>
-      <source>Decline</source>
-      <translation>Afwijzen</translation>
-    </message>
-    <message>
       <source>Warning! This build is for testing purposes only! Please upgrade to a next available patch or release version once available.</source>
-      <translation type="unfinished">Warning! This build is for testing purposes only! Please upgrade to a next available patch or release version once available.</translation>
+      <translation>Waarschuwing! Deze build is alleen voor testdoeleinden! Voer een upgrade uit naar een volgende beschikbare patch of release-versie zodra deze beschikbaar is.</translation>
     </message>
   </context>
   <context>

@@ -30,8 +30,8 @@ public:
 
     enum RecordingReadinessState
     {
-        ready,
-        notReady,
+        enoughSpace,
+        notEnoughSpace,
         notExist
     };
 

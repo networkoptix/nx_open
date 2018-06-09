@@ -85,6 +85,7 @@
                     group="primaryStream"
                     dataType="Number"
                     writeCmd="update"
+                    keepInitialValue="true"
                     aux="range=media/videoprofile/add_update/FrameRate;profile=primary;resourceProperty=primaryStreamFps;specific=true;deviceTypes=nvr">
                 </param>
 
@@ -95,7 +96,7 @@
                         writeCmd="update"
                         unit="Kbit/s"
                         aux="range=media/videoprofile/add_update/Bitrate;profile=primary;resourceProperty=primaryStreamBitrate;specific=true;deviceTypes=nvr"
-                        shouldKeepInitialValue="true"
+                        keepInitialValue="true"
                         bindDefaultToMinimum="true">
                 </param>
                 <!-- NVR only properties -->
@@ -313,6 +314,7 @@
                         group="secondaryStream"
                         dataType="Number"
                         writeCmd="update"
+                        keepInitialValue="true"
                         aux="range=media/videoprofile/add_update/FrameRate;profile=secondary;resourceProperty=secondaryStreamFps;specific=true">
                 </param>
 
@@ -323,7 +325,7 @@
                         writeCmd="update"
                         unit="Kbit/s"
                         aux="range=media/videoprofile/add_update/Bitrate;profile=secondary;resourceProperty=secondaryStreamBitrate;specific=true"
-                        shouldKeepInitialValue="true"
+                        keepInitialValue="true"
                         bindDefaultToMinimum="true">
                 </param>
 
@@ -961,28 +963,27 @@
             </group>
         </group>
         <group name="Lens Control">
-            <param id="image/custom/zoom"
+            <param id="image/lens_control/focus"
                 name="Zoom"
-                description="Zoom machinery"
-                range="-30,30"
+                description="Zoom adjustment"
                 dataType="SliderControl"
-                writeCmd="custom_zoom"
-                compact="true"/>
-            <param id="image/custom/Ptr"
+                range="-1,1"
+                compact="true"
+                aux="ptzTraits=AlternativeZoomTrait"/>
+            <param id="image/lens_control/ptr"
                 name=""
-                description="Pan tilt rotation machinery"
+                description="PTR adjustment"
                 dataType="PtrControl"
-                range="-30,30,-30,30,-30,30"
-                readCmd="param.cgi"
-                writeCmd="custom_ptr"
-                compact="true"/>
-            <param id="image/custom/focus"
+                range="-1,1,-1,1,-1,1"
+                compact="true"
+                aux="ptzTraits=AlternativePanTrait,AlternativeTiltTrait,AlternativeRotateTrait"/>
+            <param id="image/lens_control/zoom"
                 name="Focus"
-                description="Focus machinery"
-                range="-30,30"
+                description="Focus adjustment"
                 dataType="SliderControl"
-                writeCmd="custom_focus"
-                compact="true"/>
+                range="-1,1"
+                compact="true"
+                aux="ptzTraits=AlternativeFocusTrait"/>
         </group>
         <group name="Maintenance">
             <param id="image/focus/Mode=SimpleFocus"

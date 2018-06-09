@@ -44,30 +44,55 @@ void MetadataHandler::handleMetadata(
     MetadataPacket* metadata)
 {
     if (metadata == nullptr)
+	{
+	    NX_VERBOSE(this) << "WARNING: Received null metadata packet; ignoring";
         return;
+	}
 
     if (error != Error::noError)
+	{
+	    NX_VERBOSE(this) << "WARNING: Received metadata packet along with an error ccde "
+			<< (int) error << "; ignoring";
         return;
-
+	}
+    
+    bool handled = false;
+    
     nxpt::ScopedRef<EventsMetadataPacket> eventsPacket(
         metadata->queryInterface(IID_EventsMetadataPacket));
     if (eventsPacket)
+    {
         handleEventsPacket(std::move(eventsPacket));
-
+        handled = true;
+    }
+    
     nxpt::ScopedRef<ObjectsMetadataPacket> objectsPacket(
         metadata->queryInterface(IID_ObjectsMetadataPacket));
     if (objectsPacket)
+    {
         handleObjectsPacket(std::move(objectsPacket));
+        handled = true;
+    }           
+	
+	if (!handled)
+    {
+        NX_VERBOSE(this) << "WARNING: Received unsupported metadata packet with timestampUsec "
+            << metadata->timestampUsec() << ", durationUsec " << metadata->durationUsec() 
+            << "; ignoring";
+    }
 }
 
 void MetadataHandler::handleEventsPacket(nxpt::ScopedRef<EventsMetadataPacket> packet)
 {
+	int eventsCount = 0;
     while (true)
     {
         nxpt::ScopedRef<MetadataItem> item(packet->nextItem(), /*increaseRef*/ false);
         if (!item)
             break;
 
+		++eventsCount;
+		
         nxpt::ScopedRef<Event> eventData(item->queryInterface(IID_Event));
         if (eventData)
         {
@@ -76,9 +101,12 @@ void MetadataHandler::handleEventsPacket(nxpt::ScopedRef<EventsMetadataPacket> p
         }
         else
         {
-            NX_VERBOSE(this) << "ERROR: Received event does not implement Event";
+            NX_VERBOSE(this) << __func__ << "(): ERROR: Received event does not implement Event";
         }
     }
+	
+	if (eventsCount == 0)
+        NX_VERBOSE(this) << __func__ << "(): WARNING: Received empty event packet; ignoring";
 }
 
 void MetadataHandler::handleObjectsPacket(nxpt::ScopedRef<ObjectsMetadataPacket> packet)
@@ -106,10 +134,12 @@ void MetadataHandler::handleObjectsPacket(nxpt::ScopedRef<ObjectsMetadataPacket>
             attribute.value = QString::fromStdString(item->attribute(i)->value());
             object.labels.push_back(attribute);
 
-            NX_VERBOSE(this) << __func__ << "Attribute:" << attribute.name << attribute.value;
+            NX_VERBOSE(this) << __func__ << "(): Attribute:" << attribute.name << attribute.value;
         }
         data.objects.push_back(std::move(object));
     }
+	if (data.objects.empty())
+	    NX_VERBOSE(this) << __func__ << "(): WARNING: ObjectsMetadataPacket is empty";
     data.timestampUsec = packet->timestampUsec();
     data.durationUsec = packet->durationUsec();
     data.deviceId = m_resource->getId();
@@ -143,7 +173,7 @@ void MetadataHandler::handleMetadataEvent(
 
         if (isDublicate)
         {
-            NX_VERBOSE(this) << __func__ << lm("(): Ignoring duplicate event");
+            NX_VERBOSE(this) << __func__ << "(): Ignoring duplicate event";
             return;
         }
     }

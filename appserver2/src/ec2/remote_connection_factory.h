@@ -16,6 +16,7 @@
 #include "settings.h"
 #include <transaction/json_transaction_serializer.h>
 #include <transaction/ubjson_transaction_serializer.h>
+#include <transaction/threadsafe_message_bus_adapter.h>
 
 namespace nx {
 namespace time_sync {
@@ -67,7 +68,7 @@ public:
 private:
     QnMutex m_mutex;
     Settings m_settingsInstance;
-    std::unique_ptr<TransactionMessageBusAdapter> m_bus;
+    std::unique_ptr<ThreadsafeMessageBusAdapter> m_bus;
     std::unique_ptr<nx::time_sync::TimeSyncManager> m_timeSynchronizationManager;
     std::unique_ptr<QnJsonTransactionSerializer> m_jsonTranSerializer;
     std::unique_ptr<QnUbjsonTransactionSerializer> m_ubjsonTranSerializer;

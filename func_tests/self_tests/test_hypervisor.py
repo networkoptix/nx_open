@@ -7,20 +7,20 @@ import pytest
 from framework.vms.hypervisor import VMInfo
 from framework.waiting import wait_for_true
 
-logger = logging.getLogger(__name__)
+_logger = logging.getLogger(__name__)
 
 name_format = 'func_tests-temp-dummy-{}'
 
 
 def _remove_vm(name):
-    logger.debug("Delete %s if exists.", name)
+    _logger.debug("Delete %s if exists.", name)
     call(['VBoxManage', 'controlvm', name, 'poweroff'])
     call(['VBoxManage', 'unregistervm', name, '--delete'])
 
 
 def _create_vm(name):
     _remove_vm(name)
-    logger.debug("Create template %s.", name)
+    _logger.debug("Create template %s.", name)
     check_call(['VBoxManage', 'createvm', '--name', name, '--register'])
     check_call(['VBoxManage', 'modifyvm', name, '--description', 'For testing purposes. Can be deleted.'])
 
@@ -74,7 +74,7 @@ def test_find(hypervisor, dummy):
 
 def test_clone(hypervisor, clone_name, clone_configuration):
     clone = hypervisor.clone(clone_name, 1, clone_configuration)
-    logger.debug("Clone:\n%s", pformat(clone))
+    _logger.debug("Clone:\n%s", pformat(clone))
     assert clone.name == clone_name
 
 

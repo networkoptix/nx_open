@@ -566,6 +566,21 @@ int64_t QnStorageManager::calculateNxOccupiedSpace(int storageIndex) const
         calculateNxOccupiedSpaceByQuality(storageIndex, QnServer::LowQualityCatalog);
 }
 
+bool QnStorageManager::hasArchive(int storageIndex) const
+{
+    for (int i = 0; i < QnServer::ChunksCatalogCount; ++i)
+    {
+        QnMutexLocker lock(&m_mutexCatalog);
+        for (auto it = m_devFileCatalog[i].cbegin(); it != m_devFileCatalog[i].cend(); ++it)
+        {
+            if (it.value()->hasArchive(storageIndex))
+                return true;
+        }
+    }
+
+    return false;
+}
+
 void QnStorageManager::createArchiveCameras(const nx::caminfo::ArchiveCameraDataList& archiveCameras)
 {
     nx::caminfo::ArchiveCameraDataList camerasToAdd;
@@ -2092,8 +2107,7 @@ bool QnStorageManager::clearOldestSpace(const QnStorageResourcePtr &storage, boo
     if (targetFreeSpace == 0)
         return true; // unlimited. nothing to delete
 
-    QString dir = storage->getUrl();
-
+    int storageIndex = qnStorageDbPool->getStorageIndex(storage);
     if (!(storage->getCapabilities() & QnAbstractStorageResource::cap::RemoveFile))
         return true; // nothing to delete
 
@@ -2104,7 +2118,16 @@ bool QnStorageManager::clearOldestSpace(const QnStorageResourcePtr &storage, boo
     qint64 toDelete = targetFreeSpace - freeSpace;
     if (toDelete > 0)
     {
-      NX_LOG(lit("Cleanup. Starting for storage %1. %2 Mb to clean")
+        if (!hasArchive(storageIndex))
+        {
+            NX_DEBUG(
+                this,
+                lm("Cleanup. Won't cleanup storage %1 because this storage contains no archive")
+                    .args(storage->getUrl()));
+            return true;
+        }
+
+        NX_LOG(lit("Cleanup. Starting for storage %1. %2 Mb to clean")
               .arg(storage->getUrl())
               .arg(toDelete / (1024 * 1024)), cl_logDEBUG1);
     }
@@ -2164,7 +2187,7 @@ bool QnStorageManager::clearOldestSpace(const QnStorageResourcePtr &storage, boo
 
     if (toDelete > 0)
     {
-        if (!useMinArchiveDays &&!m_diskFullWarned[storage->getId()])
+        if (!useMinArchiveDays && !m_diskFullWarned[storage->getId()])
         {
             emit storageFailure(storage, nx::vms::api::EventReason::storageFull);
             m_diskFullWarned[storage->getId()] = true;
@@ -2172,9 +2195,7 @@ bool QnStorageManager::clearOldestSpace(const QnStorageResourcePtr &storage, boo
     }
     else
     {
-        m_diskFullWarned[storage->getId()] = false;
-        int storageIndex = qnStorageDbPool->getStorageIndex(storage);
-        if (m_spaceInfo.state(storageIndex) == nx::recorder::SpaceInfo::notReady)
+        if (m_spaceInfo.state(storageIndex) == nx::recorder::SpaceInfo::notEnoughSpace)
         {
             m_spaceInfo.storageChanged(
                 storageIndex,
@@ -2183,6 +2204,9 @@ bool QnStorageManager::clearOldestSpace(const QnStorageResourcePtr &storage, boo
                 storage->getSpaceLimit());
         }
     }
+
+    if (toDelete <= 0 || useMinArchiveDays)
+        m_diskFullWarned[storage->getId()] = false;
 
     return toDelete <= 0;
 }

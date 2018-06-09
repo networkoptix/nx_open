@@ -83,6 +83,7 @@ endif()
 set(static_resources
     ${CMAKE_CURRENT_BINARY_DIR}/api.xml
     ${CMAKE_CURRENT_BINARY_DIR}/api.json
+    ${customization_dir}/license.html
     ${NX_SDK_PACKAGE}
     ${NX_STORAGE_SDK_PACKAGE}
 )

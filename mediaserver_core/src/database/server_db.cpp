@@ -953,7 +953,9 @@ vms::event::ActionDataList QnServerDb::getActions(
             || actionData.eventParams.eventType == vms::api::cameraInputEvent
             || actionData.eventParams.eventType == vms::api::analyticsSdkEvent
             || actionData.actionType == vms::api::bookmarkAction
-            || actionData.actionType == vms::api::acknowledgeAction)
+            || actionData.actionType == vms::api::ActionType::acknowledgeAction
+            || actionData.actionType == vms::api::ActionType::fullscreenCameraAction
+            )
         {
             QnNetworkResourcePtr camRes =
                 resourcePool()->getResourceById<QnNetworkResource>(actionData.eventParams.eventResourceId);
@@ -1017,7 +1019,9 @@ void QnServerDb::getAndSerializeActions(const QnEventLogRequestData& request,
         if (eventType == vms::api::EventType::cameraMotionEvent
             || eventType == vms::api::EventType::cameraInputEvent
             || actionType == vms::api::ActionType::bookmarkAction
-            || actionType == vms::api::ActionType::acknowledgeAction)
+            || actionType == vms::api::ActionType::acknowledgeAction
+            || actionType == vms::api::ActionType::fullscreenCameraAction
+            )
         {
             QnUuid eventResId = QnUuid::fromRfc4122(actionsQuery.value(eventResIdx).toByteArray());
             QnNetworkResourcePtr camRes =

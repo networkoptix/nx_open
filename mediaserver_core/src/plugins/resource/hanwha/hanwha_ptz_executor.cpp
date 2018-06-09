@@ -20,105 +20,120 @@ static const std::chrono::milliseconds kHanwhaExecutorSendTimeout(5000);
 static const std::chrono::milliseconds kHanwhaExecutorReceiveTimeout(5000);
 static const std::chrono::milliseconds kRequestInterval(500);
 
+static const QString kHanwhaConfigurationalPan = lit("Pan");
+static const QString kHanwhaConfigurationalTilt = lit("Tilt");
+static const QString kHanwhaConfigurationalRotate = lit("Rotate");
+static const QString kHanwhaConfigurationalZoom = lit("Zoom");
+static const QString kHanwhaConfigurationalFocus = lit("Focus");
+
+QString commandToParameterName(HanwhaConfigurationalPtzCommandType command)
+{
+    switch (command)
+    {
+        case HanwhaConfigurationalPtzCommandType::focus:
+            return lit("Focus");
+        case HanwhaConfigurationalPtzCommandType::zoom:
+            return lit("Zoom");
+        default:
+            NX_ASSERT(false, lit("Wrong command type. We should never be here."));
+            return QString();
+    }
+}
+
 } // namespace
 
 HanwhaPtzExecutor::HanwhaPtzExecutor(
     const HanwhaResourcePtr& hanwhaResource,
-    const std::map<QString, std::set<int>>& ranges)
+    const std::map<QString, HanwhaRange>& ranges)
     :
-    m_hanwhaResource(hanwhaResource)
+    m_hanwhaResource(hanwhaResource),
+    m_ranges(ranges)
 {
-    for (auto& item: ranges)
-    {
-        const auto& parameterName = item.first;
-        const auto& range = item.second;
-
-        m_parameterContexts[parameterName] = ParameterContext();
-        auto& context = m_parameterContexts[parameterName];
-        context.httpClient = makeHttpClient();
-        context.timer = std::make_unique<nx::network::aio::Timer>(
-            context.httpClient->getAioThread());
-
-        context.range = range;
-    }
 }
 
 HanwhaPtzExecutor::~HanwhaPtzExecutor()
 {
-    nx::utils::promise<void> promise;
+}
+
+bool HanwhaPtzExecutor::continuousMove(const QVector3D& speed)
+{
+    HanwhaConfigurationalPtzCommand ptrCommand;
+    ptrCommand.command = HanwhaConfigurationalPtzCommandType::focus;
+    ptrCommand.speed = QVector4D(speed.x(), speed.y(), /*zoom*/ 0, /*rotate*/ 0);
+
+    HanwhaConfigurationalPtzCommand zoomCommand;
+    zoomCommand.command = HanwhaConfigurationalPtzCommandType::focus;
+    zoomCommand.speed = QVector4D(speed.z(), 0, 0, 0);
+
+    executeCommand(ptrCommand);
+    executeCommand(zoomCommand);
+
+    return true;
+}
+
+bool HanwhaPtzExecutor::continuousFocus(qreal speed)
+{
+    HanwhaConfigurationalPtzCommand command;
+    command.command = HanwhaConfigurationalPtzCommandType::focus;
+    command.speed = QVector4D(speed, 0, 0, 0);
+    return executeFocusCommand(command);
+}
+
+bool HanwhaPtzExecutor::executeCommand(const HanwhaConfigurationalPtzCommand& command)
+{
+    switch (command.command)
     {
-        nx::utils::BarrierHandler allIoStopped([&promise]() { promise.set_value(); });
-        for (auto& item: m_parameterContexts)
-        {
-            auto& context = item.second;
-            context.httpClient->pleaseStop(
-                [this, &context, handler = allIoStopped.fork()]()
-                {
-                    context.timer->pleaseStopSync();
-                    handler();
-                });
-        }
+        case HanwhaConfigurationalPtzCommandType::focus:
+        case HanwhaConfigurationalPtzCommandType::zoom:
+            return executeFocusCommand(command);
+        case HanwhaConfigurationalPtzCommandType::ptr:
+            return executePtrCommand(command);
+        default:
+            NX_ASSERT(false, lit("Wrong command type. We should never be here."));
+            return false;
     }
-    promise.get_future().wait();
 }
 
-void HanwhaPtzExecutor::setSpeed(const QString& parameterName, qreal speed)
+bool HanwhaPtzExecutor::executeFocusCommand(const HanwhaConfigurationalPtzCommand& command)
 {
-    auto& parameterContext = context(parameterName);
-    parameterContext.timer->post(
-        [this, parameterName, speed]()
+    const auto parameterName = commandToParameterName(command.command);
+    if (parameterName.isEmpty())
+        return false;
+
+    const auto parameterValue = toHanwhaParameterValue(parameterName, command.speed.x());
+    if (parameterValue == std::nullopt)
+        return false;
+
+    auto httpClient = makeHttpClient();
+    const auto url = HanwhaRequestHelper::buildRequestUrl(
+        m_hanwhaResource->sharedContext().get(),
+        lit("image/focus/control"),
         {
-            const auto hanwhaSpeed = toHanwhaSpeed(parameterName, speed);
-            if (hanwhaSpeed == boost::none)
-            {
-                NX_WARNING(
-                    this,
-                    lm("Can't convert internal speed to Hanwha. Parameter %1, speed %2")
-                        .args(parameterName, speed));
-
-                return;
-            }
-            context(parameterName).speed = hanwhaSpeed.get();
-            startMovement(parameterName);
+            {parameterName, *parameterValue},
+            // TODO: #dmishin think about bypass here.
+            {kHanwhaChannelProperty, QString::number(m_hanwhaResource->getChannel())}
         });
+
+    httpClient->doGet(
+        url,
+        [this, parameterName]() { /* Do something here.*/ });
+
+    return true;
 }
 
-void HanwhaPtzExecutor::startMovement(const QString& parameterName)
+bool HanwhaPtzExecutor::executePtrCommand(const HanwhaConfigurationalPtzCommand& command)
 {
-    const auto speed = context(parameterName).speed;
-    if (speed == 0)
-        scheduleNextRequest(parameterName);
-    else
-        sendValueToDevice(parameterName, speed);
-}
+    const auto httpClient = makeHttpClient();
+    const auto url = makePtrUrl(command);
 
-void HanwhaPtzExecutor::scheduleNextRequest(const QString& parameterName)
-{
-    auto& timer = context(parameterName).timer;
-    timer->start(kRequestInterval, [this, parameterName]() { startMovement(parameterName); });
-}
+    if (url == std::nullopt)
+        return false;
 
-void HanwhaPtzExecutor::sendValueToDevice(const QString& parameterName, int parameterValue)
-{
-    auto& timer = context(parameterName).timer;
-    timer->cancelAsync(
-        [this, parameterName, parameterValue]()
-        {
-            auto& httpClient = context(parameterName).httpClient;
-            NX_ASSERT(httpClient, lm("Wrong parameter name: %1").arg(parameterName));
+    httpClient->doGet(
+        *url,
+        []() {/* Do something here.*/});
 
-            const auto url = HanwhaRequestHelper::buildRequestUrl(
-                m_hanwhaResource->sharedContext().get(),
-                lit("image/focus/control"),
-                {
-                    { parameterName, QString::number(parameterValue) },
-                    { kHanwhaChannelProperty, QString::number(m_hanwhaResource->getChannel())}
-                });
-
-            httpClient->doGet(
-                url,
-                [this, parameterName]() { scheduleNextRequest(parameterName); });
-        });
+    return true;
 }
 
 std::unique_ptr<nx::network::http::AsyncClient> HanwhaPtzExecutor::makeHttpClient() const
@@ -133,64 +148,53 @@ std::unique_ptr<nx::network::http::AsyncClient> HanwhaPtzExecutor::makeHttpClien
     return httpClient;
 }
 
-boost::optional<int> HanwhaPtzExecutor::toHanwhaSpeed(
+std::optional<QString> HanwhaPtzExecutor::toHanwhaParameterValue(
     const QString& parameterName,
     qreal speed) const
 {
-    if (qFuzzyIsNull(speed))
-        return 0;
+    const auto itr = m_ranges.find(parameterName);
+    if (itr == m_ranges.cend())
+        return QString();
 
-    const auto& parameterRange = range(parameterName);
-    if (parameterRange.empty())
-        return boost::none;
+    const auto& range = itr->second;
+    return range.mapValue(speed);
+}
 
-    const auto resData = qnStaticCommon->dataPool()->data(m_hanwhaResource);
-    const auto calibratedSpeed = resData.value<int>(
-        lit("%1Alt%2Speed")
-            .arg(speed > 0 ? lit("positive") : lit("negative"))
-            .arg(parameterName),
-        0);
-
-    if (calibratedSpeed != 0)
-        return calibratedSpeed;
-
-    // Always use the maximum speed value for zoom, since others are too slow.
-    if (parameterName == kHanwhaZoomProperty)
-        return speed > 0 ? *parameterRange.rbegin() : *parameterRange.begin();
-
-    // For focus use the next value after the maximum/minimum one.
-    if (parameterName == kHanwhaFocusProperty)
+std::optional<nx::utils::Url> HanwhaPtzExecutor::makePtrUrl(
+    const HanwhaConfigurationalPtzCommand& command) const
+{
+    if (command.command == HanwhaConfigurationalPtzCommandType::ptr)
     {
-        if (speed > 0)
-        {
-            const auto nextPositiveValue = ++parameterRange.rbegin();
-            return nextPositiveValue != parameterRange.rend() && *nextPositiveValue > 0
-                ? *nextPositiveValue
-                : *parameterRange.rbegin();
-        }
-        else
-        {
-            const auto nextNegativeValue = ++parameterRange.begin();
-            return nextNegativeValue != parameterRange.end() && *nextNegativeValue < 0
-                ? *nextNegativeValue
-                : *parameterRange.begin();
-        }
+        NX_ASSERT(false, lit("Wrong command. PTR command is expected"));
+        return nx::utils::Url();
     }
 
-    NX_ASSERT(false, lm("Invalid property: %1").arg(parameterName));
-    return boost::none;
-}
+    HanwhaRequestHelper::Parameters requestParameters = {
+        {kHanwhaChannelProperty, QString::number(m_hanwhaResource->getChannel())}
+    };
 
-HanwhaPtzExecutor::ParameterContext& HanwhaPtzExecutor::context(const QString& parameterName)
-{
-    NX_CRITICAL(m_parameterContexts.find(parameterName) != m_parameterContexts.cend());
-    return m_parameterContexts[parameterName];
-}
+    const std::map<QString, qreal> parameters = {
+        {kHanwhaConfigurationalPan, command.speed.x()},
+        {kHanwhaConfigurationalTilt, command.speed.y()},
+        {kHanwhaConfigurationalRotate, 0.0} //< TODO: #dmishin fix rotate.
+    };
 
-std::set<int> HanwhaPtzExecutor::range(const QString& parameterName) const
-{
-    NX_CRITICAL(m_parameterContexts.find(parameterName) != m_parameterContexts.cend());
-    return m_parameterContexts.at(parameterName).range;
+    for (const auto& parameter: parameters)
+    {
+        const auto& parameterName = parameter.first;
+        const auto parameterValue = parameter.second;
+
+        const auto deviceValue = toHanwhaParameterValue(parameterName, parameterValue);
+        if (deviceValue == std::nullopt || deviceValue->isEmpty())
+            return std::nullopt;
+
+        requestParameters[parameterName] = *deviceValue;
+    }
+
+    return HanwhaRequestHelper::buildRequestUrl(
+        m_hanwhaResource->sharedContext().get(),
+        lit("image/ptr/control"),
+        requestParameters);
 }
 
 } // namespace plugins

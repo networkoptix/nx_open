@@ -193,14 +193,18 @@ QnLiveStreamParams QnLiveStreamProvider::mergeWithAdvancedParams(const QnLiveStr
         params.codec = advancedLiveStreamParams.codec;
     if (m_role == Qn::CR_SecondaryLiveVideo)
         params.bitrateKbps = advancedLiveStreamParams.bitrateKbps;
+
     if (params.bitrateKbps == 0)
     {
         const bool isSecondary = m_role == Qn::CR_SecondaryLiveVideo;
         if (params.quality == Qn::StreamQuality::undefined)
             params.quality = isSecondary ? Qn::StreamQuality::low : Qn::StreamQuality::normal;
 
-        params.bitrateKbps = m_cameraRes->suggestBitrateForQualityKbps(
-            params.quality, params.resolution, params.fps, m_role);
+        if (!params.resolution.isEmpty())
+        {
+            params.bitrateKbps = m_cameraRes->suggestBitrateForQualityKbps(
+                params.quality, params.resolution, params.fps, m_role);
+        }
     }
 
     return params;

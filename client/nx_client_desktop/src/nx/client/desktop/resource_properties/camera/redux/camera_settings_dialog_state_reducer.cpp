@@ -5,9 +5,11 @@
 #include <camera/fps_calculator.h>
 #include <client_core/client_core_module.h>
 #include <common/common_module.h>
+#include <common/static_common_module.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/resource_display_info.h>
 #include <core/resource_management/resource_pool.h>
+#include <core/resource_management/resource_data_pool.h>
 #include <utils/camera/camera_bitrate_calculator.h>
 
 #include <nx/fusion/model_functions.h>
@@ -39,6 +41,7 @@ void fetchFromCameras(
     std::function<Data(const Camera&)> getter)
 {
     Data data;
+    value.resetBase();
     if (utils::algorithm::same(cameras.cbegin(), cameras.cend(), getter, &data))
         value.setBase(data);
 }
@@ -51,6 +54,7 @@ void fetchFromCameras(
     std::function<Data(const Intermediate&)> converter)
 {
     Intermediate data;
+    value.resetBase();
     if (utils::algorithm::same(cameras.cbegin(), cameras.cend(), getter, &data))
         value.setBase(converter(data));
 }
@@ -167,6 +171,19 @@ State fillBitrateFromFixedQuality(State state)
     return state;
 }
 
+QString settingsUrlPath(const Camera& camera)
+{
+    const auto resourceData = qnStaticCommon->dataPool()->data(camera);
+    if (!resourceData.value<bool>(lit("showUrl"), false))
+        return QString();
+
+    QString urlPath = resourceData.value<QString>(lit("urlLocalePath"), QString());
+    while (urlPath.startsWith(lit("/"))) //< VMS Gateway does not like slashes at the beginning.
+        urlPath = urlPath.mid(1);
+
+    return urlPath;
+}
+
 State loadNetworkInfo(State state, const Camera& camera)
 {
     NX_ASSERT(camera);
@@ -175,6 +192,7 @@ State loadNetworkInfo(State state, const Camera& camera)
 
     state.singleCameraProperties.ipAddress = QnResourceDisplayInfo(camera).host();
     state.singleCameraProperties.webPage = calculateWebPage(camera);
+    state.singleCameraProperties.settingsUrlPath = settingsUrlPath(camera);
 
     const bool isIoModule = camera->isIOModule();
     const bool hasPrimaryStream = !isIoModule || camera->isAudioSupported();
@@ -452,15 +470,19 @@ State CameraSettingsDialogStateReducer::loadCameras(
         ? Camera()
         : cameras.first();
 
+    // TODO: #vkutin #gdm Separate camera-dependent state from camera-independent state.
+    // Reset camera-dependent state with a single call.
     state.hasChanges = false;
     state.singleCameraProperties = {};
     state.singleCameraSettings = {};
     state.singleIoModuleSettings = {};
     state.devicesDescription = {};
+    state.credentials = {};
     state.expert = {};
     state.recording = {};
     state.wearableMotion = {};
     state.devicesCount = cameras.size();
+    state.audioEnabled = {};
     state.alert = {};
 
     state.deviceType = firstCamera
@@ -631,6 +653,11 @@ State CameraSettingsDialogStateReducer::loadCameras(
 
     fetchFromCameras<bool>(state.audioEnabled, cameras,
         [](const Camera& camera) { return camera->isAudioEnabled(); });
+
+    fetchFromCameras<QString>(state.credentials.login, cameras,
+        [](const Camera& camera) { return camera->getAuth().user(); });
+    fetchFromCameras<QString>(state.credentials.password, cameras,
+        [](const Camera& camera) { return camera->getAuth().password(); });
 
     fetchFromCameras<bool>(state.expert.dualStreamingDisabled, cameras,
         [](const Camera& camera) { return camera->isDualStreamingDisabled(); });
@@ -1183,6 +1210,21 @@ State CameraSettingsDialogStateReducer::setWearableMotionSensitivity(State state
         return state;
 
     state.wearableMotion.sensitivity.setUser(value);
+    state.hasChanges = true;
+    return state;
+}
+
+State CameraSettingsDialogStateReducer::setCredentials(
+    State state, const std::optional<QString>& login, const std::optional<QString>& password)
+{
+    if (!login && !password)
+        return state;
+
+    if (login)
+        state.credentials.login.setUser(login->trimmed());
+    if (password)
+        state.credentials.password.setUser(password->trimmed());
+
     state.hasChanges = true;
     return state;
 }

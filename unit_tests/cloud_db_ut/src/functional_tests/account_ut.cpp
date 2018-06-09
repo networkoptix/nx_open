@@ -13,6 +13,7 @@
 #include <nx/network/deprecated/asynchttpclient.h>
 #include <nx/network/http/http_client.h>
 #include <nx/network/http/server/fusion_request_result.h>
+#include <nx/network/connection_server/user_locker.h>
 #include <nx/utils/app_info.h>
 #include <nx/utils/test_support/utils.h>
 #include <nx/utils/time.h>
@@ -1313,6 +1314,115 @@ TEST_F(AccountInvite, repeating_invite_after_previous_invite_link_has_expired_is
     inviteUser();
 
     assertAccountCanBeActivatedUsingLatestInviteLink();
+}
+
+//-------------------------------------------------------------------------------------------------
+
+class AccountLockout:
+    public AccountNewTest
+{
+public:
+    AccountLockout():
+        m_wrongPassword(QnUuid::createUuid().toStdString()),
+        m_timeShift(nx::utils::test::ClockType::steady)
+    {
+    }
+
+protected:
+    void givenBlockedAccount()
+    {
+        givenActivatedAccount();
+        whenDoNumberOfRequestsWithWrongPassword();
+        thenAccountIsBlocked();
+    }
+
+    void whenDoNumberOfRequestsWithWrongPassword()
+    {
+        for (int i = 0; i < m_settings.authFailureCount; ++i)
+        {
+            api::AccountData response;
+            getAccount(account().email, m_wrongPassword, &response);
+        }
+    }
+
+    void whenLockPeriodPasses()
+    {
+        m_timeShift.applyRelativeShift(m_settings.lockPeriod);
+    }
+
+    void thenAccountIsBlocked()
+    {
+        api::AccountData response;
+        ASSERT_EQ(
+            api::ResultCode::accountBlocked,
+            getAccount(account().email, account().password, &response));
+    }
+
+    void thenAccountIsUnlocked()
+    {
+        api::AccountData response;
+        ASSERT_EQ(
+            api::ResultCode::ok,
+            getAccount(account().email, account().password, &response));
+    }
+
+protected:
+    nx::network::server::UserLockerSettings m_settings;
+
+private:
+    std::string m_wrongPassword;
+    nx::utils::test::ScopedTimeShift m_timeShift;
+};
+
+class AccountLockoutEnabled:
+    public AccountLockout
+{
+public:
+    AccountLockoutEnabled()
+    {
+        m_settings.lockPeriod = std::chrono::seconds(3);
+
+        addArg("--loginLockout/enabled=true");
+
+        auto str = lm("--loginLockout/lockPeriod=%1")
+            .args(m_settings.lockPeriod).toStdString();
+        addArg(str.c_str());
+    }
+};
+
+TEST_F(
+    AccountLockoutEnabled,
+    account_is_locked_out_after_number_of_requests_with_wrong_password)
+{
+    givenActivatedAccount();
+    whenDoNumberOfRequestsWithWrongPassword();
+    thenAccountIsBlocked();
+}
+
+TEST_F(AccountLockoutEnabled, account_is_unlocked_when_lock_period_passes)
+{
+    givenBlockedAccount();
+    whenLockPeriodPasses();
+    thenAccountIsUnlocked();
+}
+
+//-------------------------------------------------------------------------------------------------
+
+class AccountLockoutDisabled:
+    public AccountLockout
+{
+public:
+    AccountLockoutDisabled()
+    {
+        addArg("--loginLockout/enabled=false");
+    }
+};
+
+TEST_F(AccountLockoutDisabled, account_is_not_locked_if_disabled)
+{
+    givenActivatedAccount();
+    whenDoNumberOfRequestsWithWrongPassword();
+    thenAccountIsUnlocked();
 }
 
 } // namespace test

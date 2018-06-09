@@ -55,3 +55,9 @@ def factory_reset(api):
         return current_runtime_id != old_runtime_id
 
     wait_for_true(_mediaserver_has_restarted)
+
+
+def get_updates_state(api):
+    response = api.get('api/updates2/status')
+    status = response['state']
+    return status

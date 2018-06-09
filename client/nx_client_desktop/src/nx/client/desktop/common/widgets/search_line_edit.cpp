@@ -3,6 +3,7 @@
 #include <QtGui/QFocusEvent>
 #include <QtWidgets/QCompleter>
 #include <QtWidgets/QLineEdit>
+#include <QtWidgets/QAction>
 
 #include <ui/common/palette.h>
 #include <ui/style/skin.h>
@@ -39,7 +40,8 @@ SearchLineEdit::SearchLineEdit(QWidget* parent):
     m_lineEdit->setPalette(clearPalette);
 
     m_lineEdit->setPlaceholderText(tr("Search"));
-    m_lineEdit->addAction(qnSkin->icon("theme/input_search.png"), QLineEdit::LeadingPosition);
+    m_glassIcon = m_lineEdit->addAction(qnSkin->icon("theme/input_search.png"),
+        QLineEdit::LeadingPosition);
     m_lineEdit->setClearButtonEnabled(true);
 
     m_emitTextChanged->setFlags(utils::PendingOperation::FireOnlyWhenIdle);
@@ -161,6 +163,11 @@ void SearchLineEdit::setTextChangedSignalFilterMs(int filterMs)
 void SearchLineEdit::clear()
 {
     m_lineEdit->clear();
+}
+
+void SearchLineEdit::setGlassVisible(bool visible)
+{
+    m_glassIcon->setVisible(visible);
 }
 
 void SearchLineEdit::inputMethodEvent(QInputMethodEvent* event)

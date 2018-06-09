@@ -113,6 +113,8 @@ private:
 
     void releaseResourceCameraManagersUnsafe(const QnSecurityCamResourcePtr& camera);
 
+    void releaseResourceCameraManagersUnsafe(const QnUuid& resourceId);
+
     MetadataHandler* createMetadataHandler(
         const QnResourcePtr& resource,
         const nx::api::AnalyticsDriverManifest& manifest);

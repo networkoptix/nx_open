@@ -101,11 +101,11 @@ function(nx_add_target name type)
             if(NX_RC_FILE)
                 set(rc_source_file "${NX_RC_FILE}")
                 set(rc_filename "${NX_RC_FILE}")
-                get_filename_component(rc_filename, rc_source_file, NAME)
+                get_filename_component(rc_filename ${rc_source_file} NAME)
                 set(rc_file "${CMAKE_CURRENT_BINARY_DIR}/${rc_filename}")
             else()
                 set(rc_source_file "${CMAKE_SOURCE_DIR}/cmake/project.rc")
-                set(rc_file "${CMAKE_CURRENT_BINARY_DIR}/project.rc")
+                set(rc_file "${CMAKE_CURRENT_BINARY_DIR}/${name}.rc")
             endif()
             configure_file(
                 "${rc_source_file}"

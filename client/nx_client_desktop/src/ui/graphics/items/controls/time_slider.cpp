@@ -40,6 +40,8 @@
 #include <ui/processors/drag_processor.h>
 #include <ui/utils/bookmark_merge_helper.h>
 #include <nx/client/desktop/ui/workbench/workbench_animations.h>
+#include <nx/client/desktop/timeline/graphics/timeline_cursor_layout.h>
+#include <nx/client/desktop/timeline/graphics/timeline_screenshot_cursor.h>
 #include <nx/client/core/utils/geometry.h>
 
 #include <ui/help/help_topics.h>
@@ -143,9 +145,6 @@ namespace
 
     /** Minimal width of big datetime tooltips. */
     const qreal kDateTimeTooltipMinimalWidth = 128.0;
-
-    /** Gap between position marker and tooltip tail. */
-    const qreal kToolTipMargin = 4.0;
 
     /** Mouse wheel sensitivities. */
     const qreal kWheelDegreesFor2xScale = 90.0;
@@ -614,8 +613,9 @@ QnTimeSlider::QnTimeSlider(QGraphicsItem* parent, QGraphicsItem* tooltipParent):
     m_bookmarksHelper(nullptr),
     m_liveSupported(false),
     m_selectionInitiated(false),
-    m_tooltipLine1(new GraphicsLabel(this)),
-    m_tooltipLine2(new GraphicsLabel(this)),
+    m_positionCursorLayout(new nx::client::desktop::TimelineCursorLayout),
+    m_screenshotCursor(new nx::client::desktop::TimelineScreenshotCursor(this, tooltipParent)),
+    m_iniUseScreenshotCursor(nx::client::desktop::ini().enableTimelineScreenshotCursor),
     m_updatingValue(false),
     m_kineticZoomHandler(new KineticZoomHandler(this)),
     m_kineticScrollHandler(new KineticScrollHandler(this))
@@ -632,24 +632,9 @@ QnTimeSlider::QnTimeSlider(QGraphicsItem* parent, QGraphicsItem* tooltipParent):
 
     generateProgressPatterns();
 
-    /* Create tooltip layout. */
-    QGraphicsLinearLayout* tooltipLayout = new QGraphicsLinearLayout(Qt::Vertical);
-    tooltipLayout->setContentsMargins(5.0, 4.0, 5.0, 3.0);
-    tooltipLayout->setSpacing(2.0);
-    tooltipLayout->addItem(m_tooltipLine1);
-    tooltipLayout->addItem(m_tooltipLine2);
-
-    toolTipItem()->setLayout(tooltipLayout);
+    /* Assign tooltip layout. */
+    toolTipItem()->setLayout(m_positionCursorLayout);
     toolTipItem()->setContentsMargins(0.0, 0.0, 0.0, 0.0);
-    setTooltipMargin(kToolTipMargin);
-
-    m_tooltipLine1->setAlignment(Qt::AlignCenter);
-    m_tooltipLine2->setAlignment(Qt::AlignCenter);
-
-    QFont font;
-    font.setPixelSize(font.pixelSize() + 2);
-    font.setBold(true);
-    m_tooltipLine2->setFont(font);
 
     /* Fine-tuned kinetic processor contants. */
     static const qreal kZoomProcessorMaxShiftIntervalSeconds = 0.4;
@@ -1749,47 +1734,10 @@ void QnTimeSlider::updateToolTipText()
         return;
 
     const auto pos = sliderPosition();
-
-    QString line1;
-    QString line2;
-
-    if (isLive())
-    {
-        line1 = tr("Live");
-    }
-    else
-    {
-        if (m_options.testFlag(UseUTC))
-        {
-            QDateTime dateTime = QDateTime::fromMSecsSinceEpoch(pos + m_localOffset);
-            line1 = datetime::toString(dateTime.date());
-            line2 = datetime::toString(dateTime.time());
-        }
-        else
-        {
-            const auto format = maximum() >= 60ll * 60ll * 1000ll /* Longer than 1 hour? */
-                ? datetime::Format::hh_mm_ss
-                : datetime::Format::mm_ss;
-
-            line1 = datetime::toString(pos, format);
-        }
-    }
-
-    m_tooltipLine1->setText(line1);
-
-    if (line2.isEmpty())
-    {
-        m_tooltipLine2->setVisible(false);
-        toolTipItem()->setMinimumWidth(0.0);
-    }
-    else
-    {
-        m_tooltipLine2->setText(line2);
-        m_tooltipLine2->setVisible(true);
-
-        /* Big datetime tooltips shouldn't be narrower than some minimal value: */
-        toolTipItem()->setMinimumWidth(kDateTimeTooltipMinimalWidth);
-    }
+    bool isUtc = m_options.testFlag(UseUTC);
+    m_positionCursorLayout->setTimeContent(isLive(),
+        isUtc ? pos + m_localOffset : pos,
+        isUtc,  maximum() >= 60ll * 60ll * 1000ll); //< Longer than 1 hour?
 }
 
 void QnTimeSlider::updateLineCommentPixmap(int line)
@@ -1836,6 +1784,18 @@ void QnTimeSlider::updateTickmarkTextSteps()
 bool QnTimeSlider::positionMarkerVisible() const
 {
     return !m_options.testFlag(HideLivePosition) || !isLive() || (isSliderDown() && !m_dragIsClick);
+}
+
+QGraphicsItem* QnTimeSlider::screenshotCursor()
+{
+    return m_screenshotCursor;
+}
+
+void QnTimeSlider::updateScreenshotCursor(qreal position)
+{
+    if (!m_iniUseScreenshotCursor)
+        return;
+    m_screenshotCursor->showAt(position);
 }
 
 bool QnTimeSlider::isLiveSupported() const
@@ -3194,6 +3154,8 @@ void QnTimeSlider::hoverMoveEvent(QGraphicsSceneHoverEvent* event)
     m_hoverMousePos = event->pos();
     updateBookmarksViewerLocation();
 
+    updateScreenshotCursor(event->pos().x());
+
     if (isWindowBeingDragged())
         return;
 
@@ -3310,6 +3272,7 @@ void QnTimeSlider::mousePressEvent(QGraphicsSceneMouseEvent* event)
 void QnTimeSlider::mouseMoveEvent(QGraphicsSceneMouseEvent* event)
 {
     dragProcessor()->mouseMoveEvent(this, event);
+    updateScreenshotCursor(event->pos().x());
     event->accept();
 }
 

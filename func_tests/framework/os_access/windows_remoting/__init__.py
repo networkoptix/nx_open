@@ -9,12 +9,11 @@ from requests import RequestException
 
 from framework.method_caching import cached_getter
 from framework.os_access.exceptions import exit_status_error_cls
+from framework.os_access.windows_remoting._cim_query import CIMClass
 from ._cim_query import CIMQuery
 from ._cmd import Shell, run_command
-from ._env_vars import EnvVars
 from ._powershell import run_powershell_script
-from ._registry import Key
-from ._users import Users
+from .registry import Key
 
 _logger = logging.getLogger(__name__)
 
@@ -40,7 +39,8 @@ class WinRM(object):
         self._protocol = winrm.Protocol(
             'http://{}:{}/wsman'.format(address, port),
             username=username, password=password,
-            transport='ntlm',  # 'ntlm' works fast, 'plaintext' is easier to debug.
+            transport='ntlm',  # 'plaintext' is easier to debug but, for some obscure reason, is slower.
+            message_encryption='never',  # Any value except 'always' and 'auto'.
             operation_timeout_sec=120, read_timeout_sec=240)
         self._username = username
         self._repr = 'WinRM({!r}, {!r}, {!r}, {!r})'.format(address, port, username, password)
@@ -74,34 +74,13 @@ class WinRM(object):
     def run_powershell_script(self, script, variables):
         return run_powershell_script(self._shell(), script, variables)
 
-    @cached_getter
-    def user_env_vars(self):
-        # TODO: Work via Users class.
-        users = Users(self._protocol)
-        account = users.account_by_name(self._username)
-        profile = users.profile_by_sid(account[u'SID'])
-        profile_dir = profile[u'LocalPath']
-        default_env_vars = {
-            u'USERPROFILE': profile_dir,
-            u'PROGRAMFILES': u'C:\\Program Files',
-            }
-        env_vars = EnvVars.request(self._protocol, account[u'Caption'], default_env_vars)
-        return env_vars
-
-    @cached_getter
-    def system_profile_dir(self):
-        # TODO: Work via Users class.
-        users = Users(self._protocol)
-        system_profile = users.system_profile()
-        profile_dir = system_profile[u'LocalPath']
-        return profile_dir
-
-    def wmi_query(self, class_name, selectors):
-        return CIMQuery(self._protocol, class_name, selectors)
-
-    def registry_key(self, path):
-        # TODO: Make a separate Registry class.
-        return Key(self.wmi_query(u'StdRegProv', {}), path)
+    def wmi_query(
+            self,
+            class_name, selectors,
+            namespace=CIMClass.default_namespace, root_uri=CIMClass.default_root_uri):
+        cim_class = CIMClass(class_name, namespace=namespace, root_uri=root_uri)
+        cim_query = CIMQuery(self._protocol, cim_class, selectors)
+        return cim_query
 
     def is_working(self):
         try:
