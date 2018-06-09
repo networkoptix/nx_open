@@ -28,7 +28,7 @@ std::tuple<ResultType, OutArgs...> makeSyncCall(
     function(
         [&promise, &resultArgs](ResultType resCode, OutArgs... args)
         {
-            resultArgs = std::move(args...);
+            resultArgs = {std::move(args)...};
             promise.set_value(resCode);
         });
     future.wait();
