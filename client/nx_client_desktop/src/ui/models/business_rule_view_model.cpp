@@ -828,7 +828,7 @@ bool QnBusinessRuleViewModel::disabled() const
     return m_disabled;
 }
 
-void QnBusinessRuleViewModel::setDisabled(const bool value)
+void QnBusinessRuleViewModel::setDisabled(bool value)
 {
     if (m_disabled == value)
         return;
@@ -855,7 +855,7 @@ QString QnBusinessRuleViewModel::comments() const
     return m_comments;
 }
 
-void QnBusinessRuleViewModel::setComments(const QString value)
+void QnBusinessRuleViewModel::setComments(const QString& value)
 {
     if (m_comments == value)
         return;
@@ -871,7 +871,7 @@ QString QnBusinessRuleViewModel::schedule() const
     return m_schedule;
 }
 
-void QnBusinessRuleViewModel::setSchedule(const QString value)
+void QnBusinessRuleViewModel::setSchedule(const QString& value)
 {
     if (m_schedule == value)
         return;
@@ -899,7 +899,7 @@ QStandardItemModel* QnBusinessRuleViewModel::actionTypesModel()
 
 // utilities
 
-QString QnBusinessRuleViewModel::getText(Column column, const bool detailed) const
+QString QnBusinessRuleViewModel::getText(Column column, bool detailed) const
 {
     switch (column)
     {
@@ -1182,7 +1182,7 @@ void QnBusinessRuleViewModel::updateActionTypesModel()
     }
 }
 
-QString QnBusinessRuleViewModel::getSourceText(const bool detailed) const
+QString QnBusinessRuleViewModel::getSourceText(bool detailed) const
 {
     QnResourceList resources = resourcePool()->getResourcesByIds(eventResources());
     if (m_eventType == EventType::cameraMotionEvent)
@@ -1222,7 +1222,7 @@ QString QnBusinessRuleViewModel::getSourceText(const bool detailed) const
 
 }
 
-QString QnBusinessRuleViewModel::getTargetText(const bool detailed) const
+QString QnBusinessRuleViewModel::getTargetText(bool detailed) const
 {
     QnResourceList resources = resourcePool()->getResourcesByIds(actionResources());
     switch (m_actionType)
