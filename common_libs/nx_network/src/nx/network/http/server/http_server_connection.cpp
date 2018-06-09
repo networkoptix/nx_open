@@ -84,8 +84,8 @@ void HttpServerConnection::extractClientEndpointFromXForwardedHeader(
     if (xForwardedForIter != headers.end() &&
         xForwardedFor.parse(xForwardedForIter->second))
     {
-        m_clientEndpoint.emplace(SocketAddress());
-        m_clientEndpoint->address = xForwardedFor.client.constData();
+        m_clientEndpoint.emplace(
+            SocketAddress(xForwardedFor.client.constData(), 0));
 
         auto xForwardedPortIter = headers.find("X-Forwarded-Port");
         if (xForwardedPortIter != headers.end())
@@ -103,8 +103,6 @@ void HttpServerConnection::extractClientEndpointFromForwardedHeader(
         !forwarded.elements.front().for_.isEmpty())
     {
         m_clientEndpoint.emplace(forwarded.elements.front().for_);
-        if (m_clientEndpoint->port == 0)
-            m_clientEndpoint->port = socket()->getForeignAddress().port;
     }
 }
 
