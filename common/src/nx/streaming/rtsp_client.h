@@ -116,12 +116,9 @@ public:
     void setSSRC(quint32 value) {ssrc = value; }
     quint32 getSSRC() const { return ssrc; }
 
-    void setRtpTrackNum(quint8 value) { m_rtpTrackNum = value; }
     void setRemoteEndpointRtcpPort(quint16 rtcpPort) {m_remoteEndpointRtcpPort = rtcpPort;}
     void setHostAddress(const HostAddress& hostAddress) {m_hostAddress = hostAddress;};
     void setForceRtcpReports(bool force) {m_forceRtcpReports = force;};
-    quint8 getRtpTrackNum() const { return m_rtpTrackNum; }
-    quint8 getRtcpTrackNum() const { return m_rtpTrackNum+1; }
 private:
     void processRtcpData();
 private:
@@ -134,7 +131,6 @@ private:
     quint16 m_remoteEndpointRtcpPort;
     HostAddress m_hostAddress;
     quint32 ssrc;
-    quint8 m_rtpTrackNum;
     QElapsedTimer m_reportTimer;
     bool m_reportTimerStarted;
     bool m_forceRtcpReports;
@@ -151,45 +147,81 @@ public:
 
     struct SDPTrackInfo
     {
-        SDPTrackInfo(const QString& _codecName, const QByteArray& _trackTypeStr, const QByteArray& _setupURL, int _mapNum, int _trackNum, QnRtspClient* owner, bool useTCP):
-            codecName(_codecName), setupURL(_setupURL), mapNum(_mapNum), trackNum(_trackNum)
+        SDPTrackInfo(
+            const QString& codecName,
+            const QByteArray& trackTypeStr,
+            const QByteArray& setupURL,
+            int mapNumber,
+            QnRtspClient* owner,
+            bool useTCP)
+            :
+            SDPTrackInfo(owner, useTCP)
         {
-            QByteArray trackTypeStr = _trackTypeStr.toLower();
-            if (trackTypeStr == "audio")
-                trackType = TT_AUDIO;
-            else if (trackTypeStr == "audio-rtcp")
-                trackType = TT_AUDIO_RTCP;
-            else if (trackTypeStr == "video")
-                trackType = TT_VIDEO;
-            else if (trackTypeStr == "video-rtcp")
-                trackType = TT_VIDEO_RTCP;
-            else if (trackTypeStr == "metadata")
-                trackType = TT_METADATA;
-            else
-                trackType = TT_UNKNOWN;
-
+            this->codecName = codecName;
+            this->trackType = trackTypeFromString(trackTypeStr);
+            this->setupURL = setupURL;
+            this->mapNumber = mapNumber;
+        }
+        SDPTrackInfo(QnRtspClient* owner, bool useTCP)
+        {
             ioDevice = new QnRtspIoDevice(owner, useTCP);
-            ioDevice->setRtpTrackNum(_trackNum * 2);
             ioDevice->setHostAddress(HostAddress(owner->getUrl().host()));
-            interleaved = QPair<int,int>(-1,-1);
+        }
+        ~SDPTrackInfo() { delete ioDevice; }
+
+        static TrackType trackTypeFromString(const QByteArray& value)
+        {
+            QByteArray trackTypeStr = value.toLower();
+            if (trackTypeStr == "audio")
+                return TT_AUDIO;
+            else if (trackTypeStr == "audio-rtcp")
+                return TT_AUDIO_RTCP;
+            else if (trackTypeStr == "video")
+                return TT_VIDEO;
+            else if (trackTypeStr == "video-rtcp")
+                return TT_VIDEO_RTCP;
+            else if (trackTypeStr == "metadata")
+                return TT_METADATA;
+            else
+                return TT_UNKNOWN;
         }
 
-        void setRemoteEndpointRtcpPort(quint16 rtcpPort) {ioDevice->setRemoteEndpointRtcpPort(rtcpPort);};
+        void setMapNumber(int value)
+        {
+            mapNumber = value;
+            if (codecName.isEmpty())
+                codecName = findCodecById(mapNumber);
+        }
+
+        // see rfc1890 for full RTP predefined codec list
+        static QString findCodecById(int num)
+        {
+            switch (num)
+            {
+            case 0: return QLatin1String("PCMU");
+            case 8: return QLatin1String("PCMA");
+            case 26: return QLatin1String("JPEG");
+            default: return QString();
+            }
+        }
+
+        bool isValid() const
+        {
+            return mapNumber >= 0 && !codecName.isEmpty();
+        }
+
+        void setRemoteEndpointRtcpPort(quint16 rtcpPort) { ioDevice->setRemoteEndpointRtcpPort(rtcpPort); };
 
         void setSSRC(quint32 value);
         quint32 getSSRC() const;
 
-        ~SDPTrackInfo() { delete ioDevice; }
-
         QString codecName;
-        TrackType trackType;
+        TrackType trackType = TT_UNKNOWN;
         QByteArray setupURL;
-        int mapNum;
-        int trackNum;
-        QPair<int,int> interleaved;
-
-        QnRtspIoDevice* ioDevice;
-
+        int mapNumber = -1;
+        int trackNumber = -1;
+        QPair<int, int> interleaved{ -1, -1 };
+        QnRtspIoDevice* ioDevice = nullptr;
         bool isBackChannel = false;
         int timeBase = 0;
     };
@@ -295,7 +327,6 @@ public:
     */
     int readBinaryResponce(std::vector<QnByteArray*>& demuxedData, int& channelNumber);
 
-
     void sendBynaryResponse(const quint8* buffer, int size);
 
     QnRtspStatistic parseServerRTCPReport(quint8* srcBuffer, int srcBufferSize, bool* gotStatistics);
@@ -309,7 +340,7 @@ public:
 
     QString getVideoLayout() const;
     TrackMap getTrackInfo() const;
-    
+
     void setTrackInfo(const TrackMap& tracks);
 
     AbstractStreamSocket* tcpSock(); //< This method need for UT. do not delete
@@ -333,7 +364,6 @@ private:
 
     bool readTextResponce(QByteArray &responce);
     void addAuth( nx_http::Request* const request );
-
 
     QString extractRTSPParam(const QString &buffer, const QString &paramName);
     void updateTransportHeader(QByteArray &responce);

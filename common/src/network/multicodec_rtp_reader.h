@@ -96,10 +96,10 @@ private:
 
     struct TrackInfo
     {
-        TrackInfo(): ioDevice(0), parser(0) {}
         ~TrackInfo() { delete parser; }
-        QnRtspIoDevice* ioDevice; //< External reference; do not delete.
-        QnRtpStreamParser* parser;
+        QnRtspIoDevice* ioDevice = nullptr; //< External reference; do not delete.
+        QnRtpStreamParser* parser = nullptr;
+        int rtcpChannelNumber = 0;
     };
 
     QnRtpStreamParser* createParser(const QString& codecName);
