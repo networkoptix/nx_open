@@ -381,6 +381,14 @@
         }}
     },
 
+    "nx::client::desktop::TimelineScreenshotCursor": {
+        "palette": { "default": {
+            "window": "dark13",
+            "windowText": "light3",
+            "mid": "dark15"
+        }}
+    },
+
     "QnTimelinePlaceholder": {
         "palette": { "default": {
             "windowText": "dark16"

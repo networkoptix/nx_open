@@ -32,7 +32,14 @@ class QnTimePeriodList;
 class QnBookmarksViewer;
 class QnBookmarkMergeHelper;
 
-namespace nx { namespace client {namespace desktop { class TimelineCursorLayout; }}}
+namespace nx {
+namespace client {
+namespace desktop {
+class TimelineCursorLayout;
+class TimelineScreenshotCursor;
+} // namespace desktop
+} // namespace client
+} // namespace nx
 
 class QnTimeSlider: public Animated<QnToolTipSlider>, public HelpTopicQueryable,
     protected DragProcessHandler, protected AnimationTimerListener
@@ -239,6 +246,9 @@ public:
     qreal msecsPerPixel() const;
 
     bool positionMarkerVisible() const;
+
+    QGraphicsItem * screenshotCursor();
+    void updateScreenshotCursor(qreal position);
 
 signals:
     void windowMoved();
@@ -507,6 +517,8 @@ private:
     bool m_selectionInitiated;
 
     nx::client::desktop::TimelineCursorLayout* m_positionCursorLayout;
+    nx::client::desktop::TimelineScreenshotCursor* m_screenshotCursor = nullptr;
+    bool m_iniUseScreenshotCursor;
 
     bool m_updatingValue;
 
