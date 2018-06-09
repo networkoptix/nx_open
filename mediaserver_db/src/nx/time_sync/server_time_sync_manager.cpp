@@ -67,7 +67,8 @@ void ServerTimeSyncManager::broadcastSystemTime()
 
 ServerTimeSyncManager::~ServerTimeSyncManager()
 {
-    disconnect(commonModule()->ec2Connection()->getTimeNotificationManager().get());
+    if (commonModule()->ec2Connection())
+        disconnect(commonModule()->ec2Connection()->getTimeNotificationManager().get());
     stop();
 }
 
