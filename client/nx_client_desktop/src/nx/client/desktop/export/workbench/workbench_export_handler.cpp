@@ -119,6 +119,36 @@ struct WorkbenchExportHandler::Private
         return exportProcessId;
     }
 
+    std::function<bool(const Filename& filename, bool quiet)> fileNameValidator()
+    {
+        return
+            [this](const Filename& filename, bool quiet) -> bool
+            {
+                if (isInRunningExports(filename))
+                {
+                    if (!quiet)
+                    {
+                        QnMessageBox::warning(q->mainWindow(), tr("Cannot write file"),
+                            tr("%1 is in use by another export.", "%1 is file name")
+                                .arg(filename.completeFileName()));
+                    }
+                    return false;
+                }
+
+                if (QFileInfo::exists(filename.completeFileName()))
+                {
+                    if (quiet || !QnFileMessages::confirmOverwrite(
+                        q->mainWindow(),
+                        filename.completeFileName()))
+                    {
+                        return false;
+                    }
+                }
+
+                return true;
+            };
+    }
+
     static void addResourceToPool(const Filename& filename, QnResourcePool* resourcePool)
     {
         const auto completeFilename = filename.completeFileName();
@@ -173,6 +203,9 @@ WorkbenchExportHandler::WorkbenchExportHandler(QObject *parent):
     connect(action(ui::action::ExportVideoAction), &QAction::triggered, this,
         &WorkbenchExportHandler::handleExportVideoAction);
 
+    connect(action(ui::action::ExportBookmarkAction), &QAction::triggered, this,
+        &WorkbenchExportHandler::handleExportBookmarkAction);
+
     connect(action(ui::action::ExportStandaloneClientAction), &QAction::triggered, this,
         &WorkbenchExportHandler::at_exportStandaloneClientAction_triggered);
 }
@@ -225,7 +258,6 @@ void WorkbenchExportHandler::handleExportVideoAction()
 {
     const auto parameters = menu()->currentParameters(sender());
     const auto period = parameters.argument<QnTimePeriod>(Qn::TimePeriodRole);
-    const auto bookmark = parameters.argument<QnCameraBookmark>(Qn::CameraBookmarkRole);
 
     const auto widget = extractMediaWidget(display(), parameters);
     const auto mediaResource = parameters.resource().dynamicCast<QnMediaResource>();
@@ -234,96 +266,94 @@ void WorkbenchExportHandler::handleExportVideoAction()
     if (!widget && !mediaResource) //< Media resource or widget is mandatory.
         return;
 
-    NX_ASSERT(period.isValid() || bookmark.isValid());
-    if (!period.isValid() && !bookmark.isValid())
+    NX_ASSERT(period.isValid());
+    if (!period.isValid())
         return;
-
-    const auto isFileNameValid =
-        [this](const Filename& filename, bool quiet) -> bool
-        {
-            if (d->isInRunningExports(filename))
-            {
-                if (!quiet)
-                {
-                    QnMessageBox::warning(mainWindow(), tr("Cannot write file"),
-                        tr("%1 is in use by another export.", "%1 is file name")
-                            .arg(filename.completeFileName()));
-                }
-                return false;
-            }
-
-            if (QFileInfo::exists(filename.completeFileName()))
-            {
-                if (quiet || !QnFileMessages::confirmOverwrite(mainWindow(), filename.completeFileName()))
-                    return false;
-            }
-
-            return true;
-        };
-
-    QWidget* main = mainWindow();
-    QScopedPointer<ExportSettingsDialog> dialog;
 
     const auto centralResource = widget ? widget->resource() : mediaResource;
 
-    bool hasPermission = accessController()->hasPermissions(centralResource->toResourcePtr(),
+    const bool hasPermission = accessController()->hasPermissions(
+        centralResource->toResourcePtr(),
         Qn::ExportPermission);
+
+    if (!hasPermission && !widget)
+        return;
+
+    QScopedPointer<ExportSettingsDialog> dialog(
+        new ExportSettingsDialog(
+            period,
+            QnCameraBookmark(),
+            d->fileNameValidator(),
+            mainWindow()));
+
     if (!hasPermission)
     {
-        if (!widget || !period.isValid())
-            return;
-
         // We have no permission for camera, but still can view the rest of layout
-        dialog.reset(new ExportSettingsDialog(period, QnCameraBookmark(), isFileNameValid, main));
-
-        static const QString reason = tr("Selected period cannot be exported for the current camera.");
+        static const QString reason =
+            tr("Selected period cannot be exported for the current camera.");
         dialog->disableTab(ExportSettingsDialog::Mode::Media, reason);
         dialog->setLayout(widget->item()->layout()->resource());
     }
     else if (widget)
     {
-        QnLayoutItemData itemData = widget->item()->data();
+        const QnLayoutItemData itemData = widget->item()->data();
         // Exporting from the scene and timeline
-        if (bookmark.isValid())
-        {
-            dialog.reset(new ExportSettingsDialog(
-                { bookmark.startTimeMs, bookmark.durationMs }, bookmark, isFileNameValid, main));
+        dialog->setMediaParams(centralResource, itemData, widget->context());
 
-            dialog->setMediaParams(centralResource, itemData, widget->context());
-            dialog->hideTab(ExportSettingsDialog::Mode::Layout);
-        }
+        // Why symmetry with the next block is broken?
+        const auto periods = parameters.argument<QnTimePeriodList>(Qn::MergedTimePeriodsRole);
+        const bool layoutExportAllowed = periods.intersects(period);
+        if (layoutExportAllowed)
+            dialog->setLayout(widget->item()->layout()->resource());
         else
-        {
-            dialog.reset(new ExportSettingsDialog(period, bookmark, isFileNameValid, main));
-            dialog->setMediaParams(centralResource, itemData, widget->context());
-
-            // Why symmetry with the next block is broken?
-            const auto periods = parameters.argument<QnTimePeriodList>(Qn::MergedTimePeriodsRole);
-            bool layoutExportAllowed = periods.intersects(period);
-            if (layoutExportAllowed)
-                dialog->setLayout(widget->item()->layout()->resource());
-            else
-                dialog->hideTab(ExportSettingsDialog::Mode::Layout);
-        }
+            dialog->hideTab(ExportSettingsDialog::Mode::Layout);
     }
     else
     {
-        if (bookmark.isValid())
-        {
-            dialog.reset(new ExportSettingsDialog(
-                { bookmark.startTimeMs, bookmark.durationMs }, bookmark, isFileNameValid, main));
-        }
-        else
-        {
-            dialog.reset(new ExportSettingsDialog(period, QnCameraBookmark(), isFileNameValid, main));
-        }
         dialog->setMediaParams(centralResource, QnLayoutItemData(), context());
         dialog->hideTab(ExportSettingsDialog::Mode::Layout);
     }
 
-    if (dialog->exec() != QDialog::Accepted)
+    if (dialog->exec() == QDialog::Accepted)
+        startExportFromDialog(dialog.data());
+}
+
+void WorkbenchExportHandler::handleExportBookmarkAction()
+{
+    const auto parameters = menu()->currentParameters(sender());
+    const auto bookmark = parameters.argument<QnCameraBookmark>(Qn::CameraBookmarkRole);
+    NX_ASSERT(bookmark.isValid());
+    if (!bookmark.isValid())
         return;
 
+    const auto camera =
+        resourcePool()->getResourceById<QnVirtualCameraResource>(bookmark.cameraId);
+    NX_ASSERT(camera);
+    if (!camera)
+        return;
+
+    const auto widget = extractMediaWidget(display(), parameters);
+    NX_ASSERT(!widget || widget->resource()->toResourcePtr() == camera);
+
+    const bool hasPermission = accessController()->hasPermissions(camera, Qn::ExportPermission);
+    NX_ASSERT(hasPermission);
+    if (!hasPermission)
+        return;
+
+    const QnTimePeriod period(bookmark.startTimeMs, bookmark.durationMs);
+    QScopedPointer<ExportSettingsDialog> dialog(
+        new ExportSettingsDialog(period, bookmark, d->fileNameValidator(), mainWindow()));
+
+    const QnLayoutItemData itemData = widget ? widget->item()->data() : QnLayoutItemData();
+    dialog->setMediaParams(camera, itemData, context());
+    dialog->hideTab(ExportSettingsDialog::Mode::Layout);
+
+    if (dialog->exec() == QDialog::Accepted)
+        startExportFromDialog(dialog.data());
+}
+
+void WorkbenchExportHandler::startExportFromDialog(ExportSettingsDialog* dialog)
+{
     QnUuid exportProcessId;
     std::unique_ptr<AbstractExportTool> exportTool;
 
@@ -338,10 +368,10 @@ void WorkbenchExportHandler::handleExportVideoAction()
             {
                 ExportLayoutSettings layoutSettings;
                 layoutSettings.filename = settings.fileName;
-                const auto& resourcePtr = mediaResource->toResourcePtr();
+                const auto& resourcePtr = settings.mediaResource->toResourcePtr();
                 layoutSettings.layout = QnLayoutResource::createFromResource(resourcePtr);
                 layoutSettings.mode = ExportLayoutSettings::Mode::Export;
-                layoutSettings.period = period;
+                layoutSettings.period = settings.timePeriod;
                 layoutSettings.readOnly = false;
 
                 // Forcing camera rotation to match a rotation, used for camera in export preview.
@@ -407,7 +437,6 @@ void WorkbenchExportHandler::handleExportVideoAction()
             break;
     }
 }
-
 
 void WorkbenchExportHandler::at_exportStandaloneClientAction_triggered()
 {

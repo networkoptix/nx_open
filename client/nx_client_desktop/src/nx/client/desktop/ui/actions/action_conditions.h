@@ -297,12 +297,6 @@ private:
     ActionVisibility m_nonMatchingVisibility;
 };
 
-class ExportCondition: public Condition
-{
-public:
-    virtual ActionVisibility check(const Parameters& parameters, QnWorkbenchContext* context) override;
-};
-
 class AddBookmarkCondition: public Condition
 {
 public:
@@ -633,6 +627,10 @@ ConditionWrapper isEntropixCamera();
 
 /** Playback sync is forced. */
 ConditionWrapper syncIsForced();
+
+ConditionWrapper canExportLayout();
+
+ConditionWrapper canExportBookmark();
 
 } // namespace condition
 

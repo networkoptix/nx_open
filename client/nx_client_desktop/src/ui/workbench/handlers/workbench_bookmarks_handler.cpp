@@ -121,7 +121,7 @@ QnWorkbenchBookmarksHandler::QnWorkbenchBookmarksHandler(QObject *parent /* = NU
         [this, getActionParamsFunc](const QnCameraBookmark &bookmark)
         {
             context()->statisticsModule()->registerClick(lit("bookmark_tooltip_export"));
-            menu()->triggerIfPossible(action::ExportVideoAction, getActionParamsFunc(bookmark));
+            menu()->triggerIfPossible(action::ExportBookmarkAction, getActionParamsFunc(bookmark));
         });
 
     connect(bookmarksViewer, &QnBookmarksViewer::playBookmark, this,
