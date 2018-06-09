@@ -37,7 +37,7 @@ RemoteConnectionFactory::RemoteConnectionFactory(
     m_remoteQueryProcessor(new ClientQueryProcessor(commonModule)),
     m_peerType(peerType)
 {
-    m_bus.reset(new TransactionMessageBusAdapter(
+    m_bus.reset(new ThreadsafeMessageBusAdapter(
         commonModule,
         m_jsonTranSerializer.get(),
         m_ubjsonTranSerializer.get()));

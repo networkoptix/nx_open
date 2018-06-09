@@ -272,15 +272,21 @@ void MessageBus::printPeersMessage()
     {
         const auto& peer = itr.value();
 
-        qint32 minDistance = peer.minDistance();
+        RoutingInfo outViaList;
+        qint32 minDistance = peer.minDistance(&outViaList);
         if (minDistance == kMaxDistance)
             continue;
         m_localShortPeerInfo.encode(itr.key());
 
-        records << lit("\t\t\t\t\t To:  %1(dbId=%2). Distance: %3")
+        QStringList outViaListStr;
+        for (const auto& peer: outViaList.keys())
+            outViaListStr << qnStaticCommon->moduleDisplayName(peer.id);
+
+        records << lit("\t\t\t\t\t To:  %1(dbId=%2). Distance: %3 (via %4)")
             .arg(qnStaticCommon->moduleDisplayName(itr.key().id))
             .arg(itr.key().persistentId.toString())
-            .arg(minDistance);
+            .arg(minDistance)
+            .arg(outViaListStr.join(","));
     }
 
     NX_VERBOSE(
@@ -598,8 +604,12 @@ bool MessageBus::handleResolvePeerNumberRequest(const P2pConnectionPtr& connecti
 
     QVector<PeerNumberResponseRecord> response;
     response.reserve(request.size());
-    for (const auto& peer : request)
-        response.push_back(PeerNumberResponseRecord(peer, m_localShortPeerInfo.decode(peer)));
+    for (const auto& peer: request)
+    {
+        const auto fullPeerId = m_localShortPeerInfo.decode(peer);
+        NX_ASSERT(!fullPeerId.isNull());
+        response.push_back(PeerNumberResponseRecord(peer, fullPeerId));
+    }
 
     auto responseData = serializeResolvePeerNumberResponse(response, 1);
     responseData.data()[0] = (quint8) MessageType::resolvePeerNumberResponse;
@@ -644,12 +654,17 @@ bool MessageBus::handlePeersMessage(const P2pConnectionPtr& connection, const QB
 
     m_lastPeerInfoTimer.restart();
 
-    QVector<PeerNumberType> numbersToResolve;
+    std::set<PeerNumberType> numbersToResolve;
     BitStreamReader reader((const quint8*)data.data(), data.size());
     for (const auto& peer: peers)
     {
         if (context(connection)->decode(peer.peerNumber).isNull())
-            numbersToResolve.push_back(peer.peerNumber);
+            numbersToResolve.insert(peer.peerNumber);
+        if (peer.firstVia != kUnknownPeerNumnber)
+        {
+            if (context(connection)->decode(peer.firstVia).isNull())
+                numbersToResolve.insert(peer.firstVia);
+        }
     }
     context(connection)->remotePeersMessage = data;
 
@@ -665,17 +680,42 @@ bool MessageBus::handlePeersMessage(const P2pConnectionPtr& connection, const QB
                 ++distance;
                 NX_ASSERT(distance != kMaxOnlineDistance);
             }
+
+            auto firstVia = shortPeers.decode(peer.firstVia);
+            if (firstVia.isNull())
+            {
+                // Direct connection to the target peer
+                firstVia = connection->localPeer();
+            }
+            else if (distance <= kMaxOnlineDistance)
+            {
+                const auto gatewayDistance = distanceTo(firstVia);
+                if (gatewayDistance > kMaxOnlineDistance)
+                    continue; //< Route loop detected.
+                if (gatewayDistance < distance - 1)
+                {
+                    NX_VERBOSE(
+                        this,
+                        lm("Peer %1 ignores alivePeers record due to route loop. Distance to %2 = %3. Distance to gateway %4 = %5")
+                        .arg(qnStaticCommon->moduleDisplayName(localPeer().id))
+                        .arg(qnStaticCommon->moduleDisplayName(shortPeers.decode(peer.peerNumber).id))
+                        .arg(distance)
+                        .arg(qnStaticCommon->moduleDisplayName(firstVia.id))
+                        .arg(gatewayDistance));
+                    continue; //< Route loop detected.
+                }
+            }
+
             m_peers->addRecord(
                 connection->remotePeer(),
                 shortPeers.decode(peer.peerNumber),
-                nx::p2p::RoutingRecord(distance));
+                nx::p2p::RoutingRecord(distance, firstVia));
         }
         emitPeerFoundLostSignals();
         return true;
     }
 
     auto connectionContext = context(connection);
-    std::sort(numbersToResolve.begin(), numbersToResolve.end());
     QVector<PeerNumberType> moreNumbersToResolve;
 
     std::set_difference(
@@ -981,6 +1021,7 @@ int MessageBus::connectionTries() const
 
 QSet<QnUuid> MessageBus::directlyConnectedClientPeers() const
 {
+    QnMutexLocker lock(&m_mutex);
     QSet<QnUuid> result;
     for (const auto& connection: m_connections)
     {
@@ -998,15 +1039,16 @@ QSet<QnUuid> MessageBus::directlyConnectedServerPeers() const
 
 QnUuid MessageBus::routeToPeerVia(const QnUuid& peerId, int* distance) const
 {
+    QnMutexLocker lock(&m_mutex);
     if (localPeer().id == peerId)
     {
         *distance = 0;
         return QnUuid();
     }
 
-    QVector<ApiPersistentIdData> via;
+    RoutingInfo via;
     *distance = m_peers->distanceTo(peerId, &via);
-    return via.isEmpty() ? QnUuid() : via[0].id;
+    return via.isEmpty() ? QnUuid() : via.begin().key().id;
 }
 
 int MessageBus::distanceToPeer(const QnUuid& peerId) const

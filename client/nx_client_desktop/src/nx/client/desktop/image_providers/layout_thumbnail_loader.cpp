@@ -467,6 +467,8 @@ void LayoutThumbnailLoader::doLoadAsync()
     QnResourcePool* resourcePool = d->layout->resourcePool();
     if (!resourcePool)
         resourcePool = m_resourcePool;
+    if (!resourcePool)
+        return;
 
     d->reset();
 

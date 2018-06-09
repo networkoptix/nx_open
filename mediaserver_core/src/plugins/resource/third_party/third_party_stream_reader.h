@@ -13,11 +13,9 @@
 
 #include "third_party_resource.h"
 #include <nx/utils/time_helper.h>
-#include <nx/utils/safe_direct_connection.h>
 
 //!Stream reader for resource, implemented in external plugin
-class ThirdPartyStreamReader:
-    public CLServerPushStreamReader
+class ThirdPartyStreamReader: public CLServerPushStreamReader
 {
     typedef CLServerPushStreamReader base_type;
 

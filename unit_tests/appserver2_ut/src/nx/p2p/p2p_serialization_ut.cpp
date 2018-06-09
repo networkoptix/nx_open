@@ -84,8 +84,8 @@ TEST(P2pSerialization, PeersMessage)
     using namespace nx::p2p;
 
     QVector<PeerDistanceRecord> peers;
-    for (int i = 0; i < 100; ++i)
-        peers.push_back(PeerDistanceRecord(i, i * 1000));
+    for (PeerNumberType i = 0; i < 100; ++i)
+        peers.push_back({i, i * 1000, i});
 
     QByteArray expectedData = serializePeersMessage(peers, 0);
     bool success = false;
@@ -100,8 +100,8 @@ TEST(P2pSerialization, SubscribeRequest)
     using namespace nx::p2p;
 
     QVector<SubscribeRecord> peers;
-    for (int i = 0; i < 100; ++i)
-        peers.push_back(SubscribeRecord(i, i * 1000));
+    for (PeerNumberType i = 0; i < 100; ++i)
+        peers.push_back({i, i * 1000});
 
     QByteArray expectedData = serializeSubscribeRequest(peers, 0);
     bool success = false;
