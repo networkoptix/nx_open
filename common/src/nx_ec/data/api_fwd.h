@@ -9,8 +9,6 @@ class QString;
 namespace ec2 {
 
 struct ApiFullInfoData;
-struct ApiLicenseData;
-struct ApiDetailedLicenseData;
 struct ApiMediaServerData;
 struct ApiMediaServerUserAttributesData;
 struct ApiMediaServerDataEx;
@@ -46,14 +44,10 @@ struct ApiPeerData;
 struct ApiPeerDataEx;
 struct ApiRuntimeData;
 
-struct ApiLicenseOverflowData;
-
 struct ApiP2pStatisticsData;
 
 typedef std::vector<ApiTransactionData> ApiTransactionDataList;
 
-typedef std::vector<ApiLicenseData> ApiLicenseDataList;
-typedef std::vector<ApiDetailedLicenseData> ApiDetailedLicenseDataList;
 typedef std::vector<ApiMediaServerData> ApiMediaServerDataList;
 typedef std::vector<ApiMediaServerUserAttributesData> ApiMediaServerUserAttributesDataList;
 typedef std::vector<ApiMediaServerDataEx> ApiMediaServerDataExList;
@@ -78,8 +72,6 @@ struct ParentId
 
 #define QN_EC2_API_DATA_TYPES \
     (ApiFullInfoData)\
-    (ApiLicenseData)\
-    (ApiDetailedLicenseData)\
     (ApiMediaServerData)\
     (ApiMediaServerUserAttributesData)\
     (ApiMediaServerDataEx)\
@@ -106,7 +98,6 @@ struct ParentId
     (ApiPeerData)\
     (ApiPeerDataEx)\
     (ApiRuntimeData)\
-    (ApiLicenseOverflowData)\
     (ApiDiscoveredServerData)\
     (ApiP2pStatisticsData)
 

@@ -7,10 +7,11 @@
 #include "api_media_server_data.h"
 #include <nx/vms/api/data/camera_data_ex.h>
 #include <nx/vms/api/data/client_info_data.h>
-#include "api_license_data.h"
 #include <nx/vms/api/data/event_rule_data.h>
 #include <nx/vms/api/data/layout_data.h>
 #include "api_user_data.h"
+
+#include <nx/vms/api/data/license_data.h>
 #include <nx/vms/api/data/videowall_data.h>
 
 #include <nx/fusion/model_functions_fwd.h>
@@ -74,7 +75,7 @@ struct ApiMediaServerDataStatistics:
 struct ApiLicenseStatistics
 {
     ApiLicenseStatistics();
-    ApiLicenseStatistics(const ApiLicenseData& data);
+    ApiLicenseStatistics(const nx::vms::api::LicenseData& data);
 
     QString name, key, licenseType, version, brand, expiration, validation;
     qint64 cameraCount;

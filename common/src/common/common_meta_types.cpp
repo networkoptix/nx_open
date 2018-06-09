@@ -99,7 +99,7 @@
 #include <nx/vms/api/data/webpage_data.h> //< Required for the FullInfoData
 #include <nx/vms/api/data/videowall_data.h> //< Required for the FullInfoData
 #include <nx_ec/data/api_user_data.h>
-#include <nx_ec/data/api_license_data.h>
+#include <nx/vms/api/data/license_data.h>    //< Required for the FullInfoData
 #include <nx/vms/api/data/layout_data.h>    //< Required for the FullInfoData
 #include <nx/vms/api/data/layout_tour_data.h>  //< Required for the FullInfoData
 #include <nx/vms/api/data/access_rights_data.h>  //< Required for the FullInfoData

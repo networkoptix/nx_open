@@ -23,27 +23,27 @@
 
 #include <nx_ec/ec_api.h>
 
-#include <nx/vms/api/data/event_rule_data.h>
-#include <nx/vms/api/data/camera_data.h>
-#include <nx/vms/api/data/camera_attributes_data.h>
-#include <nx/vms/api/data/camera_data_ex.h>
-#include <nx/vms/api/data/camera_history_data.h>
-#include <nx/vms/api/data/email_settings_data.h>
-#include <nx/vms/api/data/layout_data.h>
-#include "api_license_data.h"
 #include "api_media_server_data.h"
 #include "api_resource_data.h"
 #include <nx/vms/api/data/resource_type_data.h>
 #include "api_user_data.h"
-#include <nx/vms/api/data/videowall_data.h>
 #include "api_peer_data.h"
 #include "api_runtime_data.h"
 
 #include <utils/email/email.h>
 #include <utils/common/ldap.h>
-#include <nx/network/socket_common.h>
 
+#include <nx/network/socket_common.h>
 #include <nx/utils/log/assert.h>
+#include <nx/vms/api/data/camera_data.h>
+#include <nx/vms/api/data/camera_attributes_data.h>
+#include <nx/vms/api/data/camera_data_ex.h>
+#include <nx/vms/api/data/camera_history_data.h>
+#include <nx/vms/api/data/email_settings_data.h>
+#include <nx/vms/api/data/event_rule_data.h>
+#include <nx/vms/api/data/layout_data.h>
+#include <nx/vms/api/data/license_data.h>
+#include <nx/vms/api/data/videowall_data.h>
 
 using namespace nx;
 using namespace nx::vms::api;
@@ -500,20 +500,20 @@ void fromResourceListToApi(const QnLayoutResourceList& src, LayoutDataList& dst)
     }
 }
 
-void fromResourceToApi(const QnLicensePtr& src, ApiLicenseData& dst)
+void fromResourceToApi(const QnLicensePtr& src, LicenseData& dst)
 {
     dst.key = src->key();
     dst.licenseBlock = src->rawLicense();
 }
 
-void fromApiToResource(const ApiLicenseData& src, QnLicensePtr& dst)
+void fromApiToResource(const LicenseData& src, QnLicensePtr& dst)
 {
     dst->loadLicenseBlock(src.licenseBlock);
     if (dst->key().isEmpty())
         dst->setKey(src.key);
 }
 
-void fromResourceToApi(const QnLicensePtr& src, ApiDetailedLicenseData& dst)
+void fromResourceToApi(const QnLicensePtr& src, DetailedLicenseData& dst)
 {
     dst.key = src->key();
     dst.signature = src->signature();
@@ -526,21 +526,21 @@ void fromResourceToApi(const QnLicensePtr& src, ApiDetailedLicenseData& dst)
     dst.expiration = src->expiration();
 }
 
-void fromResourceListToApi(const QnLicenseList& src, ApiLicenseDataList& dst)
+void fromResourceListToApi(const QnLicenseList& src, LicenseDataList& dst)
 {
     dst.reserve(dst.size() + src.size());
 
     for (const QnLicensePtr& srcLicense: src)
     {
-        dst.push_back(ApiLicenseData());
+        dst.push_back(LicenseData());
         fromResourceToApi(srcLicense, dst.back());
     }
 }
 
-void fromApiToResourceList(const ApiLicenseDataList& src, QnLicenseList& dst)
+void fromApiToResourceList(const LicenseDataList& src, QnLicenseList& dst)
 {
     dst.reserve(dst.size() + (int)src.size());
-    for (const ApiLicenseData& srcLicense: src)
+    for (const LicenseData& srcLicense: src)
     {
         dst.push_back(QnLicensePtr(new QnLicense()));
         fromApiToResource(srcLicense, dst.back());

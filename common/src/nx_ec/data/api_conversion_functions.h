@@ -86,11 +86,11 @@ void fromApiToResourceList(const nx::vms::api::LayoutDataList& src, QnResourceLi
 void fromApiToResourceList(const nx::vms::api::LayoutDataList& src, QnLayoutResourceList& dst);
 void fromResourceListToApi(const QnLayoutResourceList& src, nx::vms::api::LayoutDataList& dst);
 
-void fromResourceToApi(const QnLicensePtr& src, ApiLicenseData& dst);
-void fromApiToResource(const ApiLicenseData& src, QnLicensePtr& dst);
-void fromResourceToApi(const QnLicensePtr& src, ApiDetailedLicenseData& dst);
-void fromResourceListToApi(const QnLicenseList& src, ApiLicenseDataList& dst);
-void fromApiToResourceList(const ApiLicenseDataList& src, QnLicenseList& dst);
+void fromResourceToApi(const QnLicensePtr& src, nx::vms::api::LicenseData& dst);
+void fromApiToResource(const nx::vms::api::LicenseData& src, QnLicensePtr& dst);
+void fromResourceToApi(const QnLicensePtr& src, nx::vms::api::DetailedLicenseData& dst);
+void fromResourceListToApi(const QnLicenseList& src, nx::vms::api::LicenseDataList& dst);
+void fromApiToResourceList(const nx::vms::api::LicenseDataList& src, QnLicenseList& dst);
 
 void fromResourceToApi(const QnStorageResourcePtr& src, ApiStorageData& dst);
 void fromApiToResource(const ApiStorageData& src, QnStorageResourcePtr& dst);

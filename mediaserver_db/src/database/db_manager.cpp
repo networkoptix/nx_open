@@ -33,7 +33,6 @@
 #include <utils/crypt/symmetrical.h>
 
 #include <nx_ec/data/api_user_data.h>
-#include <nx_ec/data/api_license_data.h>
 #include <nx_ec/data/api_full_info_data.h>
 #include <nx_ec/data/api_media_server_data.h>
 #include <nx_ec/data/api_time_data.h>
@@ -47,6 +46,7 @@
 #include <nx/vms/api/data/camera_data_ex.h>
 #include <nx/vms/api/data/camera_history_data.h>
 #include <nx/vms/api/data/event_rule_data.h>
+#include <nx/vms/api/data/license_data.h>
 #include <nx/vms/api/data/layout_data.h>
 #include <nx/vms/api/data/resource_type_data.h>
 #include <nx/vms/api/data/stored_file_data.h>
@@ -607,8 +607,8 @@ bool QnDbManager::init(const nx::utils::Url& dbUrl)
             {
                 if (!fillTransactionLogInternal<
                     std::nullptr_t,
-                    ApiLicenseData,
-                    ApiLicenseDataList>(ApiCommand::addLicense))
+                    LicenseData,
+                    LicenseDataList>(ApiCommand::addLicense))
                 {
                     return false;
                 }
@@ -855,17 +855,17 @@ bool QnDbManager::init(const nx::utils::Url& dbUrl)
 bool QnDbManager::syncLicensesBetweenDB()
 {
     // move license table to static DB
-    ec2::ApiLicenseDataList licensesMainDbVect;
-    ec2::ApiLicenseDataList licensesStaticDbVect;
+    LicenseDataList licensesMainDbVect;
+    LicenseDataList licensesStaticDbVect;
     if (getLicenses(licensesMainDbVect, m_sdb) != ErrorCode::ok)
         return false;
     if (getLicenses(licensesStaticDbVect, m_sdbStatic) != ErrorCode::ok)
         return false;
 
-    std::set<ApiLicenseData> licensesMainDbSet(licensesMainDbVect.begin(), licensesMainDbVect.end());
-    std::set<ApiLicenseData> licensesStaticDbSet(licensesStaticDbVect.begin(), licensesStaticDbVect.end());
+    std::set<LicenseData> licensesMainDbSet(licensesMainDbVect.begin(), licensesMainDbVect.end());
+    std::set<LicenseData> licensesStaticDbSet(licensesStaticDbVect.begin(), licensesStaticDbVect.end());
 
-    ec2::ApiLicenseDataList addToMain;
+    LicenseDataList addToMain;
     std::set_difference(
         licensesStaticDbSet.begin(),
         licensesStaticDbSet.end(),
@@ -873,7 +873,7 @@ bool QnDbManager::syncLicensesBetweenDB()
         licensesMainDbSet.end(),
         std::inserter(addToMain, addToMain.begin()));
 
-    ec2::ApiLicenseDataList addToStatic;
+    LicenseDataList addToStatic;
     std::set_difference(
         licensesMainDbSet.begin(),
         licensesMainDbSet.end(),
@@ -1042,8 +1042,8 @@ bool QnDbManager::resyncTransactionLog()
 
     if (!fillTransactionLogInternal<
         std::nullptr_t,
-        ApiLicenseData,
-        ApiLicenseDataList>(ApiCommand::addLicense))
+        LicenseData,
+        LicenseDataList>(ApiCommand::addLicense))
     {
         return false;
     }
@@ -4496,7 +4496,7 @@ ErrorCode QnDbManager::doQueryNoLock(const QnUuid& id, ApiDiscoveryDataList &dat
     return ErrorCode::ok;
 }
 
-ErrorCode QnDbManager::saveLicense(const ApiLicenseData& license)
+ErrorCode QnDbManager::saveLicense(const LicenseData& license)
 {
     QnDbTransactionLocker lockStatic(&m_tranStatic);
     auto result = saveLicense(license, m_sdbStatic);
@@ -4509,7 +4509,7 @@ ErrorCode QnDbManager::saveLicense(const ApiLicenseData& license)
     return result;
 }
 
-ErrorCode QnDbManager::saveLicense(const ApiLicenseData& license, QSqlDatabase& database)
+ErrorCode QnDbManager::saveLicense(const LicenseData& license, QSqlDatabase& database)
 {
     QSqlQuery insQuery(database);
     insQuery.prepare("INSERT OR REPLACE INTO vms_license (license_key, license_block) VALUES(:licenseKey, :licenseBlock)");
@@ -4524,7 +4524,7 @@ ErrorCode QnDbManager::saveLicense(const ApiLicenseData& license, QSqlDatabase& 
     }
 }
 
-ErrorCode QnDbManager::removeLicense(const ApiLicenseData& license)
+ErrorCode QnDbManager::removeLicense(const LicenseData& license)
 {
     QnDbTransactionLocker lockStatic(&m_tranStatic);
     auto result = removeLicense(license, m_sdbStatic);
@@ -4537,7 +4537,7 @@ ErrorCode QnDbManager::removeLicense(const ApiLicenseData& license)
     return result;
 }
 
-ErrorCode QnDbManager::removeLicense(const ApiLicenseData& license, QSqlDatabase& database)
+ErrorCode QnDbManager::removeLicense(const LicenseData& license, QSqlDatabase& database)
 {
     QSqlQuery delQuery(database);
     delQuery.prepare("DELETE FROM vms_license WHERE license_key = ?");
@@ -4579,7 +4579,7 @@ ErrorCode QnDbManager::executeTransactionInternal(
     return ErrorCode::ok;
 }
 
-ErrorCode QnDbManager::executeTransactionInternal(const QnTransaction<ApiLicenseData>& tran)
+ErrorCode QnDbManager::executeTransactionInternal(const QnTransaction<LicenseData>& tran)
 {
     if (tran.command == ApiCommand::addLicense)
         return saveLicense(tran.params);
@@ -4591,24 +4591,24 @@ ErrorCode QnDbManager::executeTransactionInternal(const QnTransaction<ApiLicense
     }
 }
 
-ErrorCode QnDbManager::executeTransactionInternal(const QnTransaction<ApiLicenseDataList>& tran)
+ErrorCode QnDbManager::executeTransactionInternal(const QnTransaction<LicenseDataList>& tran)
 {
-    for (const ApiLicenseData& license: tran.params) {
+    for (const auto& license: tran.params)
+    {
         ErrorCode result = saveLicense(license);
-        if (result != ErrorCode::ok) {
+        if (result != ErrorCode::ok)
             return ErrorCode::dbError;
-        }
     }
 
     return ErrorCode::ok;
 }
 
-ErrorCode QnDbManager::doQueryNoLock(const std::nullptr_t& /*dummy*/, ec2::ApiLicenseDataList& data)
+ErrorCode QnDbManager::doQueryNoLock(const std::nullptr_t& /*dummy*/, LicenseDataList& data)
 {
     return getLicenses(data, m_sdb);
 }
 
-ErrorCode QnDbManager::getLicenses(ec2::ApiLicenseDataList& data, QSqlDatabase& database)
+ErrorCode QnDbManager::getLicenses(LicenseDataList& data, QSqlDatabase& database)
 {
     QSqlQuery query(database);
 
@@ -4968,7 +4968,7 @@ ErrorCode QnDbManager::insertOrReplaceWebPage(const WebPageData& data, qint32 in
     return ErrorCode::dbError;
 }
 
-ErrorCode QnDbManager::executeTransactionInternal(const QnTransaction<ApiLicenseOverflowData>& tran)
+ErrorCode QnDbManager::executeTransactionInternal(const QnTransaction<LicenseOverflowData>& tran)
 {
     if (m_licenseOverflowMarked == tran.params.value)
         return ErrorCode::ok;

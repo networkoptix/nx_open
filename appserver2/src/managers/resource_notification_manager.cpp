@@ -25,7 +25,7 @@ void QnResourceNotificationManager::triggerNotification(
 }
 
 void QnResourceNotificationManager::triggerNotification(
-    const QnTransaction<ApiLicenseOverflowData>& /*tran*/,
+    const QnTransaction<vms::api::LicenseOverflowData>& /*tran*/,
     NotificationSource /*source*/)
 {
 }

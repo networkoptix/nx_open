@@ -82,6 +82,10 @@ DECLARE_STRUCT(CloudSystemData)
 
 DECLARE_STRUCT_NO_LIST(CleanupDatabaseData)
 
+DECLARE_STRUCT(LicenseData)
+DECLARE_STRUCT(DetailedLicenseData)
+DECLARE_STRUCT_NO_LIST(LicenseOverflowData)
+
 #undef DECLARE_STRUCT
 
 } // namespace api

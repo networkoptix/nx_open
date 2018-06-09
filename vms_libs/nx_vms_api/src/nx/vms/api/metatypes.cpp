@@ -13,6 +13,8 @@
 #include "data/webpage_data.h"
 #include "data/layout_data.h"
 #include "data/layout_tour_data.h"
+#include "data/license_data.h"
+#include "data/license_overflow_data.h"
 #include "data/lock_data.h"
 #include "data/update_data.h"
 #include "data/videowall_data.h"
@@ -52,11 +54,14 @@ void Metatypes::initialize()
     qRegisterMetaType<nx::vms::api::CloudSystemDataList>();
     qRegisterMetaType<nx::vms::api::DatabaseDumpData>();
     qRegisterMetaType<nx::vms::api::DatabaseDumpToFileData>();
+    qRegisterMetaType<nx::vms::api::DetailedLicenseData>();
     qRegisterMetaType<nx::vms::api::EventRuleData>();
     qRegisterMetaType<nx::vms::api::EventRuleDataList>();
     qRegisterMetaType<nx::vms::api::LayoutData>();
     qRegisterMetaType<nx::vms::api::LayoutItemData>();
     qRegisterMetaType<nx::vms::api::LayoutTourData>();
+    qRegisterMetaType<nx::vms::api::LicenseData>();
+    qRegisterMetaType<nx::vms::api::LicenseOverflowData>();
     qRegisterMetaType<nx::vms::api::LockData>();
     qRegisterMetaType<nx::vms::api::ResourceData>();
     qRegisterMetaType<nx::vms::api::ResourceStatusData>();

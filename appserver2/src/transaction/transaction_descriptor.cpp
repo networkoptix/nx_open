@@ -189,7 +189,7 @@ QnUuid createHashForApiAccessRightsDataHelper(const nx::vms::api::AccessRightsDa
     return QnAbstractTransaction::makeHash(params.userId.toRfc4122(), "access_rights");
 }
 
-QnUuid createHashForApiLicenseDataHelper(const ApiLicenseData &params)
+QnUuid createHashForApiLicenseDataHelper(const nx::vms::api::LicenseData& params)
 {
     return QnAbstractTransaction::makeHash(params.key, "ApiLicense");
 }

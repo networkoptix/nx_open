@@ -100,7 +100,7 @@ namespace ec2 {
     ApiLicenseStatistics::ApiLicenseStatistics()
         : cameraCount(0) {}
 
-    ApiLicenseStatistics::ApiLicenseStatistics(const ApiLicenseData& data)
+    ApiLicenseStatistics::ApiLicenseStatistics(const nx::vms::api::LicenseData& data)
         : cameraCount(0)
     {
         QMap<QString, QString> parsed;

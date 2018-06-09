@@ -40,11 +40,11 @@
 #include <nx_ec/data/api_full_info_data.h>
 #include <nx_ec/data/api_discovery_data.h>
 #include <nx_ec/data/api_conversion_functions.h>
-#include <nx_ec/data/api_license_data.h>
 
 #include <nx/network/socket_common.h>
 #include <nx/vms/api/data/access_rights_data.h>
 #include <nx/vms/api/data/event_rule_data.h>
+#include <nx/vms/api/data/license_data.h>
 #include <nx/vms/api/data/resource_type_data.h>
 #include <nx/vms/event/rule.h>
 #include <nx/vms/event/rule_manager.h>
@@ -739,7 +739,7 @@ void QnCommonMessageProcessor::resetResources(const ec2::ApiFullInfoData& fullDa
         resourcePool()->removeResource(resource);
 }
 
-void QnCommonMessageProcessor::resetLicenses(const ec2::ApiLicenseDataList& licenses)
+void QnCommonMessageProcessor::resetLicenses(const LicenseDataList& licenses)
 {
     licensePool()->replaceLicenses(licenses);
 }

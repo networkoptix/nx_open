@@ -983,7 +983,7 @@ APPLY(905, getStoredFiles, nx::vms::api::StoredFileDataList, \
                        FilterListByAccess<AllowForAllAccess>(), /* Filter read func */ \
                        ReadListAccessOut<AllowForAllAccess>(), /* Check remote peer rights for outgoing transaction */ \
                        RegularTransactionType()) /* regular transaction type */ \
-APPLY(1000, getLicenses, ApiLicenseDataList, \
+APPLY(1000, getLicenses, nx::vms::api::LicenseDataList, \
                        false, \
                        false, \
                        InvalidGetHashHelper(), \
@@ -994,7 +994,7 @@ APPLY(1000, getLicenses, ApiLicenseDataList, \
                        FilterListByAccess<AllowForAllAccess>(), /* Filter read func */ \
                        ReadListAccessOut<AllowForAllAccess>(), /* Check remote peer rights for outgoing transaction */ \
                        RegularTransactionType()) /* regular transaction type */ \
-APPLY(1001, addLicense, ApiLicenseData, \
+APPLY(1001, addLicense, nx::vms::api::LicenseData, \
                        true, \
                        false, \
                        &createHashForApiLicenseDataHelper, \
@@ -1005,7 +1005,7 @@ APPLY(1001, addLicense, ApiLicenseData, \
                        InvalidFilterFunc(), /* Filter read func */ \
                        AllowForAllAccessOut(), /* Check remote peer rights for outgoing transaction */ \
                        RegularTransactionType()) /* regular transaction type */ \
-APPLY(1002, addLicenses, ApiLicenseDataList, \
+APPLY(1002, addLicenses, nx::vms::api::LicenseDataList, \
                        true, \
                        false, \
                        InvalidGetHashHelper(), \
@@ -1016,7 +1016,7 @@ APPLY(1002, addLicenses, ApiLicenseDataList, \
                        FilterListByAccess<AllowForAllAccess>(), /* Filter read func */ \
                        ReadListAccessOut<AllowForAllAccess>(), /* Check remote peer rights for outgoing transaction */ \
                        RegularTransactionType()) /* regular transaction type */ \
-APPLY(1003, removeLicense, ApiLicenseData, \
+APPLY(1003, removeLicense, nx::vms::api::LicenseData, \
                        true, \
                        false, \
                        &createHashForApiLicenseDataHelper, \
@@ -1215,7 +1215,7 @@ APPLY(2005, getKnownPeersSystemTime, ApiPeerSystemTimeDataList, \
                        FilterListByAccess<AllowForAllAccess>(), /* Filter read func */ \
                        ReadListAccessOut<AllowForAllAccess>(), /* Check remote peer rights for outgoing transaction */ \
                        RegularTransactionType()) /* regular transaction type */ \
-APPLY(2006, markLicenseOverflow, ApiLicenseOverflowData, \
+APPLY(2006, markLicenseOverflow, nx::vms::api::LicenseOverflowData, \
                        true, \
                        false, \
                        InvalidGetHashHelper(), \

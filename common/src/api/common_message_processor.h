@@ -111,7 +111,7 @@ protected:
 
     void resetResourceTypes(const nx::vms::api::ResourceTypeDataList& resTypes);
     void resetResources(const ec2::ApiFullInfoData& fullData);
-    void resetLicenses(const ec2::ApiLicenseDataList& licenses);
+    void resetLicenses(const nx::vms::api::LicenseDataList& licenses);
     void resetCamerasWithArchiveList(const nx::vms::api::ServerFootageDataList& cameraHistoryList);
     void resetTime();
 

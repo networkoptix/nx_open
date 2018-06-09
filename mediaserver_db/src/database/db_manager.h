@@ -327,7 +327,8 @@ namespace detail
         ErrorCode readApiFullInfoDataForMobileClient(ApiFullInfoData* data, const QnUuid& userId);
 
         //getLicenses
-        ErrorCode doQueryNoLock(const std::nullptr_t& /*dummy*/, ApiLicenseDataList& data);
+        ErrorCode doQueryNoLock(
+            const std::nullptr_t& /*dummy*/, nx::vms::api::LicenseDataList& data);
 
         // ApiDiscoveryDataList
         ErrorCode doQueryNoLock(const QnUuid& id, ApiDiscoveryDataList& data);
@@ -414,8 +415,9 @@ namespace detail
         // delete camera, server, layout, any resource, etc.
         ErrorCode executeTransactionInternal(const QnTransaction<nx::vms::api::IdData>& tran);
 
-        ErrorCode executeTransactionInternal(const QnTransaction<ApiLicenseDataList>& tran);
-        ErrorCode executeTransactionInternal(const QnTransaction<ApiLicenseData>& tran);
+        ErrorCode executeTransactionInternal(
+            const QnTransaction<nx::vms::api::LicenseDataList>& tran);
+        ErrorCode executeTransactionInternal(const QnTransaction<nx::vms::api::LicenseData>& tran);
 
         ErrorCode executeTransactionInternal(
             const QnTransaction<nx::vms::api::IdDataList>& /*tran*/)
@@ -561,7 +563,8 @@ namespace detail
             return ErrorCode::notImplemented;
         }
 
-        ErrorCode executeTransactionInternal(const QnTransaction<ApiLicenseOverflowData>&);
+        ErrorCode executeTransactionInternal(
+            const QnTransaction<nx::vms::api::LicenseOverflowData>&);
         ErrorCode executeTransactionInternal(
             const QnTransaction<nx::vms::api::CleanupDatabaseData>& tran);
 
@@ -664,10 +667,10 @@ namespace detail
         ErrorCode removeBusinessRule( const QnUuid& id );
         ErrorCode updateBusinessRule(const nx::vms::api::EventRuleData& rule);
 
-        ErrorCode saveLicense(const ApiLicenseData& license);
-        ErrorCode saveLicense(const ApiLicenseData& license, QSqlDatabase& database);
-        ErrorCode removeLicense(const ApiLicenseData& license);
-        ErrorCode removeLicense(const ApiLicenseData& license, QSqlDatabase& database);
+        ErrorCode saveLicense(const nx::vms::api::LicenseData& license);
+        ErrorCode saveLicense(const nx::vms::api::LicenseData& license, QSqlDatabase& database);
+        ErrorCode removeLicense(const nx::vms::api::LicenseData& license);
+        ErrorCode removeLicense(const nx::vms::api::LicenseData& license, QSqlDatabase& database);
 
         ErrorCode insertOrReplaceStoredFile(const QString &fileName, const QByteArray &fileContents);
 
@@ -783,7 +786,7 @@ namespace detail
         bool fixDefaultBusinessRuleGuids();
         bool updateBusinessRulesTransactions();
 
-        ErrorCode getLicenses(ApiLicenseDataList& data, QSqlDatabase& database);
+        ErrorCode getLicenses(nx::vms::api::LicenseDataList& data, QSqlDatabase& database);
 
         /** Raise flags if db is not just created. Always returns true. */
         bool resyncIfNeeded(ResyncFlags flags);

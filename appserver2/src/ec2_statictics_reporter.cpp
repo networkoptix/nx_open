@@ -90,7 +90,7 @@ namespace ec2
 
         for (const auto& license: licenses)
         {
-            ApiLicenseData apiLicense;
+            nx::vms::api::LicenseData apiLicense;
             fromResourceToApi(license, apiLicense);
             ApiLicenseStatistics statLicense(std::move(apiLicense));
             QnLicenseValidator validator(m_ec2Connection->commonModule());

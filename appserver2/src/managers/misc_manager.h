@@ -3,7 +3,8 @@
 #include <nx_ec/ec_api.h>
 #include <nx_ec/data/api_system_name_data.h>
 #include <transaction/transaction.h>
-#include "nx_ec/data/api_license_overflow_data.h"
+
+#include <nx/vms/api/data/license_overflow_data.h>
 
 namespace ec2
 {
@@ -78,7 +79,7 @@ int QnMiscManager<QueryProcessorType>::markLicenseOverflow(
         impl::SimpleHandlerPtr handler)
 {
     const int reqId = generateRequestID();
-    ApiLicenseOverflowData params;
+    nx::vms::api::LicenseOverflowData params;
     params.value = value;
     params.time = time;
 

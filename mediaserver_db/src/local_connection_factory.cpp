@@ -878,9 +878,9 @@ void LocalConnectionFactory::registerRestHandlers(QnRestProcessorPool* const p)
     regGet<ParentId, ApiStorageDataList>(p, ApiCommand::getStorages);
 
     // AbstractLicenseManager::addLicenses
-    regUpdate<ApiLicenseDataList>(p, ApiCommand::addLicenses);
+    regUpdate<LicenseDataList>(p, ApiCommand::addLicenses);
     // AbstractLicenseManager::removeLicense
-    regUpdate<ApiLicenseData>(p, ApiCommand::removeLicense);
+    regUpdate<LicenseData>(p, ApiCommand::removeLicense);
 
     /**%apidoc GET /ec2/getEventRules
      * Return all event rules.
@@ -1601,7 +1601,7 @@ void LocalConnectionFactory::registerRestHandlers(QnRestProcessorPool* const p)
      * %param[default] format
      * %return List of license objects in the requested format.
      */
-    regGet<std::nullptr_t, ApiLicenseDataList>(p, ApiCommand::getLicenses);
+    regGet<std::nullptr_t, LicenseDataList>(p, ApiCommand::getLicenses);
 
     regGet<std::nullptr_t, DatabaseDumpData>(p, ApiCommand::dumpDatabase);
     regGet<StoredFilePath, DatabaseDumpToFileData>(p, ApiCommand::dumpDatabaseToFile);

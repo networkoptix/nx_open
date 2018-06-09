@@ -221,10 +221,10 @@ public:
      * @param handler Called upon request completion. Functor(ErrorCode).
      */
     template<class HandlerType>
-    void processUpdateAsync(QnTransaction<ApiLicenseDataList>& tran, HandlerType handler)
+    void processUpdateAsync(QnTransaction<nx::vms::api::LicenseDataList>& tran, HandlerType handler)
     {
         NX_ASSERT(tran.command == ApiCommand::addLicenses);
-        return processMultiUpdateAsync<ApiLicenseDataList, ApiLicenseData>(
+        return processMultiUpdateAsync<nx::vms::api::LicenseDataList, nx::vms::api::LicenseData>(
             tran, handler, ApiCommand::addLicense);
     }
 
