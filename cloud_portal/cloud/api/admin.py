@@ -59,5 +59,16 @@ class AccountLoginHistoryAdmin(admin.ModelAdmin):
         cutoff_date = datetime.now() - timedelta(days=settings.CLEAR_HISTORY_RECORDS_OLDER_THAN_X_DAYS)
         AccountLoginHistory.objects.filter(date__lt=cutoff_date).delete()
 
+    def get_readonly_fields(self, request, obj=None):
+        return list(set(list(self.readonly_fields) +
+                        [field.name for field in obj._meta.fields] +
+                        [field.name for field in obj._meta.many_to_many]))
+
+    def has_add_permission(self, request):
+        return False
+
+    def has_delete_permission(self, request, obj=None):
+        return False
+
     clean_old_records.short_description = "Remove messages older than {} days".format(
         settings.CLEAR_HISTORY_RECORDS_OLDER_THAN_X_DAYS)

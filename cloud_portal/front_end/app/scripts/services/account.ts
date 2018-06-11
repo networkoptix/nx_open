@@ -6,10 +6,10 @@
         .module('cloudApp')
         .factory('account', AccountService);
 
-    AccountService.$inject = ['cloudApi', '$q', '$location', '$localStorage',
+    AccountService.$inject = ['cloudApi', '$q', '$location', '$localStorage', '$routeParams',
         '$rootScope', '$base64', 'configService', 'dialogs', 'languageService'];
 
-    function AccountService(cloudApi, $q, $location, $localStorage,
+    function AccountService(cloudApi, $q, $location, $localStorage, $routeParams,
                             $rootScope, $base64, configService, dialogs, languageService) {
 
         $rootScope.session = $localStorage;
@@ -20,7 +20,7 @@
         const lang = languageService.lang;
 
         $rootScope.$watch('session.loginState', function (value) {  // Catch logout from other tabs
-            if (initialState !== value) {
+            if (!$routeParams.next && initialState !== value) {
                 document.location.reload();
             }
         });

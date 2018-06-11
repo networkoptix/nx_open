@@ -28,6 +28,7 @@ Restart
 
 Open New Browser On Failure
     Close Browser
+    Reset System Names
     Open Browser and go to URL    ${url}
 
 *** Test Cases ***
@@ -37,7 +38,6 @@ should confirm, if owner deletes system (You are going to disconnect your system
     Wait Until Elements Are Visible    ${DISCONNECT FORM}    ${DISCONNECT FORM HEADER}    ${DISCONNECT FORM CANCEL}
     Click Button    ${DISCONNECT FORM CANCEL}
     Wait Until Page Does Not Contain Element    ${BACKDROP}
-
 
 should confirm, if not owner deletes system (You will loose access to this system)
     Log in to Autotests System    ${EMAIL OWNER}

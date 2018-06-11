@@ -8,7 +8,7 @@ from zipfile import ZipFile
 from ..models import DataStructure, Context
 
 IGNORE_DIRECTORIES = ('help',)
-IMAGES_EXTENSIONS = ('ico', 'png', 'bmp', 'icns')
+IMAGES_EXTENSIONS = ('ico', 'png', 'bmp', 'icns', 'jpg', 'jpeg')
 
 
 def image_meta(data, extension):
@@ -119,7 +119,7 @@ def iterate_zip(file_descriptor):
     zip_file = ZipFile(file_descriptor)
     root = None
     for name in zip_file.namelist():
-        if name.count('/') == 0:  #  ignore files from the root of the archive
+        if name.count('/') == 0:  # ignore files from the root of the archive
             print("IGNORED FILE", name)
             continue
         if name.endswith('/'):
@@ -144,7 +144,6 @@ def iterate_directory(directory):
 
 
 def iterate_contexts(file_iterator):
-    root = None
     context_name = 'root'
     for name, data in file_iterator:
         if name.startswith('__'):  # Ignore trash in archive from MACs
@@ -159,10 +158,10 @@ def iterate_contexts(file_iterator):
 
         if name.endswith('/'):  # this is directory
             if name.count('/') == 1:  # top level directory - update active_context
-                context_name = name
+                context_name = root_dir
             continue  # ignore directories
 
-        if name.count('/') == 1:  # file from top level directory - update active_context
+        if name.count('/') == 0:  # file from top level directory - update active_context
             context_name = 'root'
 
         yield name, context_name, data
@@ -171,7 +170,7 @@ def iterate_contexts(file_iterator):
 def process_files(file_iterator, product):
     log_errors = []
     structure = OrderedDict([('product', product.name), ('canPreview', product.can_preview), ('contexts', [])])
-    root_context = find_context('root', '.', structure, product.name)
+    find_context('root', '.', structure, product.name)
     for short_name, context_name, data in iterate_contexts(file_iterator):
         context = find_context(context_name, context_name, structure, product.name)
         error = read_data(data, short_name, context, structure, product.name)
