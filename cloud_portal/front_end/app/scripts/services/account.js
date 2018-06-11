@@ -3,16 +3,16 @@
     angular
         .module('cloudApp')
         .factory('account', AccountService);
-    AccountService.$inject = ['cloudApi', '$q', '$location', '$localStorage',
+    AccountService.$inject = ['cloudApi', '$q', '$location', '$localStorage', '$routeParams',
         '$rootScope', '$base64', 'configService', 'dialogs', 'languageService'];
-    function AccountService(cloudApi, $q, $location, $localStorage, $rootScope, $base64, configService, dialogs, languageService) {
+    function AccountService(cloudApi, $q, $location, $localStorage, $routeParams, $rootScope, $base64, configService, dialogs, languageService) {
         $rootScope.session = $localStorage;
         let requestingLogin;
         let initialState = $rootScope.session.loginState;
         const CONFIG = configService.config;
         const lang = languageService.lang;
         $rootScope.$watch('session.loginState', function (value) {
-            if (initialState !== value) {
+            if (!$routeParams.next && initialState !== value) {
                 document.location.reload();
             }
         });

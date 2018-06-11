@@ -241,7 +241,7 @@ def upload_file(data_structure, file):
         file_errors.append((data_structure.name, "Image is damaged please upload an valid version"))
         return None, file_errors
 
-    if not encoded_file and file_size > 0:
+    if not encoded_file:
         error_msg = "Invalid file type. Uploaded file is {}. It should be {}." \
             .format(file.content_type,
                     data_structure.meta_settings['format'].replace(',', ' or '))
@@ -254,11 +254,10 @@ def upload_file(data_structure, file):
         if data_structure.type == DataStructure.DATA_TYPES.image:
             file_errors = check_image_dimensions(data_structure.name, data_structure.meta_settings, file_dimensions)
 
-        elif data_structure.type == DataStructure.DATA_TYPES.file:
-            if 'file_size' in data_structure.meta_settings \
-                    and file_size > data_structure.meta_settings['file_size']:
-                file_errors.append((data_structure.name, 'File size is {} it should be less than {}'
-                                    .format(file_size, data_structure.meta_settings['file_size'])))
+        if 'size' in data_structure.meta_settings \
+                and file_size > data_structure.meta_settings['size']:
+            file_errors.append((data_structure.name, 'File size is {} it should be less than {}'
+                                .format(file_size, data_structure.meta_settings['size'])))
     if file_errors:
         return None, file_errors
 

@@ -5,23 +5,13 @@ Variables    getvars.py
 ${ALERT}                              //div[contains(@class, 'ng-toast')]//span[@ng-bind-html='message.content']
 ${ALERT CLOSE}                        //div[contains(@class, 'ng-toast')]//span[@ng-bind-html='message.content']/../preceding-sibling::button[@ng-click='!message.dismissOnClick && dismiss()']
 
-${LOCAL}                              https://localhost:9000/
-${CLOUD TEST}                         https://cloud-test.hdw.mx
-${CLOUD DEV}                          https://cloud-dev2.hdw.mx
-${CLOUD TEST REGISTER}                https://cloud-test.hdw.mx/register
-${CLOUD STAGE}                        https://cloud-stage.hdw.mx
-${ENV}                                ${CLOUD TEST}
-${SCREENSHOTDIRECTORY}               \Screenshots
+${BACKDROP}                           //div[@uib-modal-backdrop="modal-backdrop"]
 
-${BROWSER}                            Chrome
-
-${LANGUAGE DROPDOWN}                  //nx-footer//button[@ngbdropdowntoggle]
-${LANGUAGE TO SELECT}                 //nx-footer//span[@lang='${LANGUAGE}']/..
+${LANGUAGE DROPDOWN}                  //footer//button[@uib-dropdown-toggle and @id='language-dropdown' and @aria-haspopup='true']
+${LANGUAGE TO SELECT}                 //footer//span[@lang='${LANGUAGE}']/..
 
 @{LANGUAGES LIST}                          en_US    en_GB    ru_RU           fr_FR   de_DE    es_ES   hu_HU  zh_CN  zh_TW  ja_JP   ko_KR  tr_TR  th_TH     nl_NL    he_IL  pl_PL  vi_VN
 @{LANGUAGES ACCOUNT TEXT LIST}             Account  Account  Учетная запись  Compte  Account  Cuenta  Fiók   帐户    帳號   アカウント  계정    Hesap  บัญชีผู้ใช้  Account  חשבון    Konto  Tài khoản
-
-${BACKDROP}                           //ngb-modal-window
 
 ${CYRILLIC TEXT}                      Кенгшщзх
 ${SMILEY TEXT}                        ☠☿☂⊗⅓∠∩λ℘웃♞⊀☻★
@@ -30,21 +20,20 @@ ${SYMBOL TEXT}                        `~!@#$%^&*()_:";'{}[]+<>?,./\
 ${TM TEXT}                            qweasdzxc123®™
 
 #Log In Elements
-${LOG IN MODAL}                       //form[@name='loginForm']
-${EMAIL INPUT}                        //form[@name='loginForm']//input[@id='email']
-${PASSWORD INPUT}                     //form[@name='loginForm']//input[@id='password']
-${LOG IN BUTTON}                      //form[@name='loginForm']//button[text()= 'Log In']
-${REMEMBER ME CHECKBOX}               //form[@name='loginForm']//input[@id='remember']
-${FORGOT PASSWORD}                    //form[@name='loginForm']//a[@href='/restore_password']
-${LOG IN CLOSE BUTTON}                //button[@data-dismiss='modal']
-${ACCOUNT NOT FOUND}                  //form[@name='loginForm']//label[contains(text(), '${ACCOUNT NOT FOUND TEXT}')]
+${LOG IN MODAL}                       //div[contains(@class, 'modal-content')]
+${EMAIL INPUT}                        //form[contains(@name, 'loginForm')]//input[@ng-model='auth.email']
+${PASSWORD INPUT}                     //form[contains(@name, 'loginForm')]//input[@ng-model='auth.password']
+${LOG IN BUTTON}                      //form[contains(@name, 'loginForm')]//button[@ng-click='checkForm()']
+${REMEMBER ME CHECKBOX}               //form[contains(@name, 'loginForm')]//input[@ng-model='auth.remember']
+${FORGOT PASSWORD}                    //form[contains(@name, 'loginForm')]//a[@href='/restore_password']
+${LOG IN CLOSE BUTTON}                //button[@ng-click='close()']
 
 ${LOG IN NAV BAR}                     //nav//a[contains(@ng-click, 'login()')]
 ${YOU HAVE NO SYSTEMS}                //span[contains(text(),'${YOU HAVE NO SYSTEMS TEXT}')]
 
-${ACCOUNT DROPDOWN}                   //button[@id = 'accountSettingsSelect']
+${ACCOUNT DROPDOWN}                   //li[contains(@class, 'collapse-first')]//a['uib-dropdown-toggle']
 ${LOG OUT BUTTON}                     //li[contains(@class, 'collapse-first')]//a[contains(text(), '${LOG OUT BUTTON TEXT}')]
-${ACCOUNT SETTINGS BUTTON}            //li//a[(@href = '/account/')]
+${ACCOUNT SETTINGS BUTTON}            //li[contains(@class, 'collapse-first')]//a[contains(text(), '${ACCOUNT SETTINGS BUTTON TEXT}')]
 ${SYSTEMS DROPDOWN}                   //li[contains(@class, 'collapse-second')]//a['uib-dropdown-toggle']
 ${ALL SYSTEMS}                        //li[contains(@class, 'collapse-second')]//a[@ng-href='/systems']
 ${AUTHORIZED BODY}                    //body[contains(@class, 'authorized')]
@@ -77,8 +66,8 @@ ${TERMS AND CONDITIONS CHECKBOX}      //form[@name= 'registerForm']//input[@ng-m
 ${CREATE ACCOUNT BUTTON}              //form[@name= 'registerForm']//button[contains(text(), '${CREATE ACCOUNT BUTTON TEXT}')]
 ${TERMS AND CONDITIONS LINK}          //form[@name= 'registerForm']//a[@href='/content/eula']
 ${TERMS AND CONDITIONS ERROR}         //form[@name= 'registerForm']//p[@ng-if='registerForm.accept.$touched && registerForm.accept.$error.required' and contains(text(), '${TERMS AND CONDITIONS ERROR TEXT}')]
-${PRIVACY POLICY LINK}                //form[@name= 'registerForm']//a[@href='/content/support']
-${RESEND ACTIVATION LINK BUTTON}      //form[@name= 'loginForm']//a[contains(text(), "${RESEND ACTIVATION LINK BUTTON TEXT}")]
+${PRIVACY POLICY LINK}                //form[@name= 'registerForm']//a[@href='/content/privacy']
+${RESEND ACTIVATION LINK BUTTON}      //form[@name= 'reactivateAccount']//button[contains(text(), "${RESEND ACTIVATION LINK BUTTON TEXT}")]
 
 #targets the open nx witness button presented when logging in after activating with from=mobile or client
 ${OPEN NX WITNESS BUTTON FROM =}      //button[text()='${OPEN NX WITNESS BUTTON TEXT}']
@@ -123,12 +112,12 @@ ${PROMO BLOCK}                        //div[contains(@class,'promo-block') and n
 ${ALREADY ACTIVATED}                  //h1[@ng-if='!activate.success' and contains(text(),'${ALREADY ACTIVATED TEXT}')]
 
 #Share Elements (Note: Share and Permissions are the same form so these are the same variables.  Making two just in case they do diverge at some point.)
-${SHARE MODAL}                        //form[@name='shareForm']
+${SHARE MODAL}                        //div[@uib-modal-transclude]
 ${SHARE EMAIL}                        //form[@name='shareForm']//input[@ng-model='user.email']
-${SHARE PERMISSIONS DROPDOWN}         //form[@name='shareForm']//nx-permissions-select//button[@id='permissionsSelect']
+${SHARE PERMISSIONS DROPDOWN}         //form[@name='shareForm']//select[@ng-model='user.role']
 ${SHARE BUTTON MODAL}                 //form[@name='shareForm']//button[@ng-click='checkForm()']
-${SHARE CANCEL}                       //form[@name='shareForm']//button[text()='Cancel']
-${SHARE CLOSE}                        //form[@name='shareForm']//button[@data-dismiss='modal']
+${SHARE CANCEL}                       //form[@name='shareForm']//button[@ng-click='close()']
+${SHARE CLOSE}                        //div[@uib-modal-transclude]//div[@ng-if='settings.title']//button[@ng-click='close()']
 ${SHARE PERMISSIONS HINT}             //form[@name='shareForm']//span[contains(@class,'help-block')]
 
 ${EDIT PERMISSIONS EMAIL}             //form[@name='shareForm']//input[@ng-model='user.email']
@@ -147,56 +136,18 @@ ${EDIT PERMISSIONS HINT}              //form[@name='shareForm']//span[contains(@
 ${ACCOUNT EMAIL}                      //form[@name='accountForm']//input[@ng-model='account.email']
 ${ACCOUNT FIRST NAME}                 //form[@name='accountForm']//input[@ng-model='account.first_name']
 ${ACCOUNT LAST NAME}                  //form[@name='accountForm']//input[@ng-model='account.last_name']
-${ACCOUNT LANGUAGE DROPDOWN}          //form[@name='accountForm']//nx-language-select//button[@id = 'languageSelect']
+${ACCOUNT LANGUAGE DROPDOWN}          //form[@name='accountForm']//language-select//button
 ${ACCOUNT SAVE}                       //form[@name='accountForm']//button[@ng-click='checkForm()']
-${ACCOUNT SUBSCRIBE CHECKBOX}         //form[@name='accountForm']//input[@ng-model='account.subscribe']/following-sibling::span[contains(@class, 'checkmark')]
+
 #Already logged in modal
 ${LOGGED IN CONTINUE BUTTON}          //div[@uib-modal-transclude]//button[@ng-click='ok()']
 ${LOGGED IN LOG OUT BUTTON}           //div[@uib-modal-transclude]//button[@ng-click='cancel()']
 
-${CONTINUE BUTTON}                    //ngb-modal-window//button[contains(text(), 'Continue')]
-${CONTINUE MODAL}                     //ngb-modal-window
+${CONTINUE BUTTON}                    //div[@uib-modal-window='modal-window']//button[@ng-class='settings.buttonClass' and @ng-click='ok()']
+${CONTINUE MODAL}                     //div[@uib-modal-window='modal-window']
 
 ${300CHARS}                           QWErtyuiopasdfghhkljzxcvbnmqwertyuiopasdfghhkljzxcvbnmqwertyuiopasdfghhkljzxcvbnmqwertyuiopasdfghhkljzxcvbnmqwertyuiopasdfghhkljzxcvbnmqwertyuiopasdfghhkljzxcvbnmqwertyuiopasdfghhkljzxcvbnmqwertyuiopasdfghhkljzxcvbnmqwertyuiopasdfghhkljzxcvbnmqwertyuiopasdfghhkljzxcvbnmqwertyuiopasdfghhkljzxcvbnmyy
 ${255CHARS}                           QWErtyuiopasdfghhkljzxcvbnmqwertyuiopasdfghhkljzxcvbnmqwertyuiopasdfghhkljzxcvbnmqwertyuiopasdfghhkljzxcvbnmqwertyuiopasdfghhkljzxcvbnmqwertyuiopasdfghhkljzxcvbnmqwertyuiopasdfghhkljzxcvbnmqwertyuiopasdfghhkljzxcvbnmqwertyuiopasdfghhkljzxcvbnmqwertyuiopas
-
-#Emails
-${BASE EMAIL}                         noptixautoqa@gmail.com
-${BASE EMAIL PASSWORD}                qweasd!@#$%
-${BASE HOST}                          imap.gmail.com
-${BASE PORT}                          993
-${EMAIL VIEWER}                       noptixautoqa+viewer@gmail.com
-${EMAIL ADV VIEWER}                   noptixautoqa+advviewer@gmail.com
-${EMAIL LIVE VIEWER}                  noptixautoqa+liveviewer@gmail.com
-${EMAIL OWNER}                        noptixautoqa+owner@gmail.com
-${EMAIL NOT OWNER}                    noptixautoqa+notowner@gmail.com
-${EMAIL ADMIN}                        noptixautoqa+admin@gmail.com
-${EMAIL CUSTOM}                       noptixautoqa+custom@gmail.com
-@{EMAILS LIST}                        ${EMAIL VIEWER}    ${EMAIL ADV VIEWER}    ${EMAIL LIVE VIEWER}    ${EMAIL OWNER}    ${EMAIL ADMIN}    ${EMAIL CUSTOM}
-${ADMIN FIRST NAME}                   mark
-${ADMIN LAST NAME}                    hamil
-${EMAIL UNREGISTERED}                 noptixautoqa+unregistered@gmail.com
-${EMAIL NOPERM}                       noptixautoqa+noperm@gmail.com
-${BASE PASSWORD}                      qweasd123
-${ALT PASSWORD}                       qweasd1234
-
-${TEST FIRST NAME}                    testFirstName
-${TEST LAST NAME}                     testLastName
-
-#Related to Auto Tests system
-${AUTO TESTS}                         Auto Tests
-${AUTO_TESTS SYSTEM ID}                     37038300-20e5-46c2-81f6-104db23b959c
-${AUTO TESTS TITLE}                   //div[@ng-repeat='system in systems | filter:searchSystems as filtered']//h2[text()='Auto Tests']
-${AUTO TESTS USER}                    //div[@ng-repeat='system in systems | filter:searchSystems as filtered']//h2[text()='Auto Tests']/following-sibling::span[contains(@class,'user-name')]
-${AUTO TESTS OPEN NX}                 //div[@ng-repeat='system in systems | filter:searchSystems as filtered']//h2[text()='Auto Tests']/..//button[@ng-click='checkForm()']
-${SYSTEMS SEARCH INPUT}               //input[@ng-model='search.value']
-${SYSTEMS TILE}                       //div[@ng-repeat="system in systems | filter:searchSystems as filtered"]
-${NOT OWNER IN SYSTEM}                //div[@process-loading='gettingSystemUsers']//tbody//tr//td[contains(text(), '${EMAIL NOT OWNER}')]
-
-#AUTO TESTS 2 is an offline system used for testing offline status on the systems page and offline status on the system page
-${AUTOTESTS OFFLINE}                  //div[@ng-repeat='system in systems | filter:searchSystems as filtered']//h2[contains(text(),'Auto Tests 2')]/following-sibling::span[contains(text(), '${AUTOTESTS OFFLINE TEXT}')]
-${AUTOTESTS OFFLINE OPEN NX}          //div[@ng-repeat='system in systems | filter:searchSystems as filtered']//h2[contains(text(),'Auto Tests 2')]/..//button[@ng-click='checkForm()']
-${AUTOTESTS OFFLINE SYSTEM ID}                9551a722-6ea2-4d0b-91ae-5ac104c9a413
 
 #ASCII
 ${ESCAPE}                             \\27

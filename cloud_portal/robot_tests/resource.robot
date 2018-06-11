@@ -3,12 +3,13 @@ Library           SeleniumLibrary    run_on_failure=Failure Tasks
 Library           NoptixImapLibrary/
 Library           String
 Library           NoptixLibrary/
-Resource          ${variables file}
+Resource          variables.robot
+Resource          ${variables_file}
 
 *** variables ***
 ${headless}    false
 ${directory}    ${SCREENSHOTDIRECTORY}
-${variables_file}    variables.robot
+${variables_file}    variables-env.robot
 
 *** Keywords ***
 Open Browser and go to URL
@@ -21,7 +22,7 @@ Open Browser and go to URL
     Go To    ${url}
 
 Check Language
-    Wait Until Element Is Enabled    ${LANGUAGE DROPDOWN}
+    Wait Until Page Contains Element    ${LANGUAGE DROPDOWN}/following-sibling::ul//a[@ng-click='changeLanguage(lang.language)']/span[@lang='en_US']
     Register Keyword To Run On Failure    NONE
     ${status}    ${value}=    Run Keyword And Ignore Error    Wait Until Element Is Visible    ${LANGUAGE DROPDOWN}/span[@lang='${LANGUAGE}']    2
     Register Keyword To Run On Failure    Failure Tasks
@@ -157,7 +158,7 @@ Verify In System
     Wait Until Element Is Visible    //h1[@ng-if='gettingSystem.success' and contains(text(), '${system name}')]
 
 Failure Tasks
-    Capture Page Screenshot    selenium-screenshot-{index}.png
+    Capture Page Screenshot    selenium-screenshot-${LANGUAGE}{index}.png
 
 Wait Until Elements Are Visible
     [arguments]    @{elements}
@@ -252,4 +253,28 @@ Make sure notowner is in the system
     Go To    ${url}/systems/${AUTO_TESTS SYSTEM ID}
     ${status}    Run Keyword And Return Status    Wait Until Element Is Visible    ${NOT OWNER IN SYSTEM}
     Run Keyword Unless    ${status}    Add notowner
+    Close Browser
+
+Reset System Names
+    Open Browser and go to URL    ${url}/systems/${AUTOTESTS OFFLINE SYSTEM ID}
+    Log In    ${EMAIL OWNER}    ${BASE PASSWORD}    None
+    Validate Log In
+    Wait Until Elements Are Visible    ${DISCONNECT FROM NX}    ${SHARE BUTTON SYSTEMS}    ${OPEN IN NX BUTTON}    ${RENAME SYSTEM}
+    Click Button    ${RENAME SYSTEM}
+    Wait Until Elements Are Visible    ${RENAME CANCEL}    ${RENAME SAVE}    ${RENAME INPUT}
+    Clear Element Text    ${RENAME INPUT}
+    Input Text    ${RENAME INPUT}    Auto Tests 2
+    Click Button    ${RENAME SAVE}
+    Check For Alert    ${SYSTEM NAME SAVED}
+    Verify In System    Auto Tests 2
+
+    Go To    ${url}/systems/${AUTO TESTS SYSTEM ID}
+    Wait Until Elements Are Visible    ${DISCONNECT FROM NX}    ${SHARE BUTTON SYSTEMS}    ${OPEN IN NX BUTTON}    ${RENAME SYSTEM}
+    Click Button    ${RENAME SYSTEM}
+    Wait Until Elements Are Visible    ${RENAME CANCEL}    ${RENAME SAVE}    ${RENAME INPUT}
+    Clear Element Text    ${RENAME INPUT}
+    Input Text    ${RENAME INPUT}    Auto Tests
+    Click Button    ${RENAME SAVE}
+    Check For Alert    ${SYSTEM NAME SAVED}
+    Verify In System    Auto Tests
     Close Browser

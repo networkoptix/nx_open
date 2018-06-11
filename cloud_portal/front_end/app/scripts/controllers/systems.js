@@ -22,8 +22,10 @@ angular
         $scope.systemsProvider = systemsProvider;
         $scope.$watch('systemsProvider.systems', function(){
             $scope.systems = $scope.systemsProvider.systems;
+
             $scope.showSearch = $scope.systems.length >= $scope.Config.minSystemsToSearch;
             if($scope.systems.length === 1){
+                $scope.keepToastMessages = true;
                 $scope.openSystem($scope.systems[0]);
             }
         });
@@ -54,6 +56,8 @@ angular
         };
 
         $scope.$on('$destroy', function(){
-            dialogs.dismissNotifications();
+            if(typeof($scope.keepToastMessages) === 'undefined') {
+                dialogs.dismissNotifications();
+            }
         });
     }]);

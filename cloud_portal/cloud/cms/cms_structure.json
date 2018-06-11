@@ -55,7 +55,7 @@
             "label": "Privacy policy link",
             "name": "%PRIVACY_LINK%",
             "old_name": "{{supportLink}}",
-            "value": "/content/support",
+            "value": "/content/privacy",
             "description": "Privacy policy link. Use https://{{CLOUD_ADDRESS}}/content/privacy to use embedded page."
           },
           {

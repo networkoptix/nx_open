@@ -31,6 +31,7 @@ Check System Text
 
 Reset DB and Open New Browser On Failure
     Close Browser
+    Reset System Names
     Make sure notowner is in the system
     Open Browser and go to URL    ${url}
 
