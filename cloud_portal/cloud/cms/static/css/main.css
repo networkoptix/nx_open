@@ -44,9 +44,10 @@
     padding: 8px !important;
 }
 
-a.btn {
-    color:black !important;
+td a.btn {
+    color:white !important;
     text-decoration:none !important;
+    background-color: #35464F;
 }
 
 button.btn-danger > a{
