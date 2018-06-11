@@ -31,6 +31,10 @@ class CIMClass(object):
 
 class _CimAction(object):
     common_namespaces = {
+        # Namespaces from pywinrm's Protocol.
+        # TODO: Use aliases from WS-Management spec.
+        # See: https://www.dmtf.org/sites/default/files/standards/documents/DSP0226_1.0.0.pdf, Table A-1.
+        # Currently aliases are coupled from those from Protocol.
         'http://www.w3.org/XML/1998/namespace': 'xml',
         'http://www.w3.org/2003/05/soap-envelope': 'env',
         'http://schemas.xmlsoap.org/ws/2004/09/enumeration': 'n',
