@@ -122,14 +122,16 @@ class _Enumeration(object):
             'n:Enumerate': {
                 'w:OptimizeEnumeration': None,
                 'w:MaxElements': str(self.max_elements),
+                # See: https://www.dmtf.org/sites/default/files/standards/documents/DSP0226_1.0.0.pdf, 8.7.
+                'w:EnumerationMode': 'EnumerateObjectAndEPR',
                 }
             }
         response = _CimAction(self.cim_class, action, self.selectors, body).perform(self.protocol)
         self.enumeration_context = response['n:EnumerateResponse']['n:EnumerationContext']
         self.is_ended = 'w:EndOfSequence' in response['n:EnumerateResponse']
-        items = response['n:EnumerateResponse']['w:Items'][self.cim_class.name]
-        assert isinstance(items, list)
-        return items if isinstance(items, list) else [items]
+        items = response['n:EnumerateResponse']['w:Items']['w:Item']
+        objects = [item[self.cim_class.name] for item in items]
+        return objects
 
     def _pull(self):
         _logger.debug("Continue enumerating %s where %r", self.cim_class, self.selectors)
@@ -145,9 +147,9 @@ class _Enumeration(object):
         response = _CimAction(self.cim_class, action, self.selectors, body).perform(self.protocol)
         self.is_ended = 'n:EndOfSequence' in response['n:PullResponse']
         self.enumeration_context = None if self.is_ended else response['n:PullResponse']['n:EnumerationContext']
-        items = response['n:PullResponse']['n:Items'][self.cim_class.name]
-        assert isinstance(items, list)
-        return items if isinstance(items, list) else [items]
+        items = response['n:PullResponse']['n:Items']['w:Item']
+        objects = [item[self.cim_class.name] for item in items]
+        return objects
 
     def enumerate(self):
         for item in self._start():
