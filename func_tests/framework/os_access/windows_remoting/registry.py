@@ -76,6 +76,15 @@ class Type(object):
                 return type
         raise ValueError("No type with name {!r}".format(name))
 
+    @classmethod
+    def guess(cls, name, data):
+        """Guess type when value is new, use simple heuristic"""
+        if isinstance(data, (bool, int)):
+            if 'time' in name.lower():
+                return cls.from_name('REG_QWORD')
+            return cls.from_name('REG_DWORD')
+        return cls.from_name('REG_SZ')
+
 
 class _WindowsRegistryValue(object):
     def __init__(self, query, hive, key, name, type):
@@ -139,6 +148,23 @@ class _WindowsRegistryKey(object):
         for value in self.list_values():
             new_value = another_key.make_value(value.name, value.type)
             new_value.set_data(value.get_data())
+
+    def update_values(self, new_data_dict):
+        """When updating values, there's need to know their types, that's why they're listed first"""
+        new_data_dict = new_data_dict.copy()
+        for value in self.list_values():
+            try:
+                new_data = new_data_dict.pop(value.name)
+            except KeyError:
+                _logger.debug("Left intact: %r", value)
+                continue
+            _logger.debug("Will be updated: %r <- %r", value, new_data)
+            value.set_data(new_data)
+        for name, new_data in new_data_dict.items():
+            type_guess = Type.guess(name, new_data)
+            value = self.make_value(name, type_guess)
+            _logger.debug("Will be set: %r <- %r", value, new_data)
+            value.set_data(new_data)
 
 
 class WindowsRegistry(object):
