@@ -44,7 +44,7 @@
     "RESET PASSWORD EMAIL SUBJECT": "パスワードをリセット",
     "INVITED TO SYSTEM EMAIL SUBJECT": "ビデオ システム {{message.system_name}} が共有されました",
     "INVITED TO SYSTEM EMAIL SUBJECT UNREGISTERED": "{{message.sharer_name}} さんがあなたを %PRODUCT_NAME%に招待しています",
-    "DISCONNECT FORM HEADER TEXT": "%PRODUCT_NAME% からシステムを切断?",
+    "DISCONNECT FORM HEADER TEXT": "%PRODUCT_NAME% からシステムを切断しますか？",
     "FIRST NAME IS REQUIRED TEXT": "名前は必須です",
     "LAST NAME IS REQUIRED TEXT": "姓は必須です",
     "EMAIL IS REQUIRED TEXT": "メールアドレスが必要です",
