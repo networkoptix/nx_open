@@ -21,7 +21,7 @@ export class AppComponent {
                 private location: Location,
                 translate: TranslateService) {
 
-        // TODO: Componetize this
+        // TODO: Componentize this
         this.allowedDevices = {
             windows: {
                 ie: 10,
@@ -41,8 +41,13 @@ export class AppComponent {
         };
 
         this.deviceInfo = this.deviceService.getDeviceInfo();
-
         let allowedDevice = this.allowedDevices[this.deviceInfo.os];
+
+        // Special case for Kyle's robot tests
+        // ... device detector doesn't detect it correctly
+        if (this.deviceInfo.userAgent.indexOf('HeadlessChrome') > -1){
+            allowedDevice = undefined;
+        }
 
         if (allowedDevice !== undefined) {
             let allowedVersion = allowedDevice[this.deviceInfo.browser] || 0;
