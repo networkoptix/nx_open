@@ -92,24 +92,30 @@ class WindowsNetworking(Networking):
                 ''',
             {'Name': self._firewall_rule_name})
 
+    def _network_profile_wmi_query(self, informal_profile_name):
+        query = self._winrm.wmi_query(
+            u'MSFT_NetFirewallProfile',
+            {u'InstanceID': u'MSFT|FW|FirewallProfile|{}'.format(informal_profile_name)},
+            namespace='Root/StandardCimv2')
+        return query
+
+    def _allow_outbound_by_default(self, allow):
+        value = 0 if allow else 1  # "0 -> enable, 1 or any positive -> disable.
+        for profile_name in {'Private', 'Domain', 'Public'}:
+            query = self._network_profile_wmi_query(profile_name)
+            query.put({u'DefaultOutboundAction': value})
+
     def disable_internet(self):
-        self._winrm.run_powershell_script(
-            # language=PowerShell
-            '''Set-NetFirewallProfile -DefaultOutboundAction:Block''',
-            {})
+        self._allow_outbound_by_default(False)
 
     def enable_internet(self):
-        self._winrm.run_powershell_script(
-            # language=PowerShell
-            '''Set-NetFirewallProfile -DefaultOutboundAction:Allow''',
-            {})
+        self._allow_outbound_by_default(True)
 
     def internet_is_enabled(self):
-        all_profiles = self._winrm.run_powershell_script(
-            # language=PowerShell
-            '''Get-NetFirewallProfile | select DefaultOutboundAction | ConvertTo-Json''',
-            {})
-        return not all(profile['DefaultOutboundAction'] == 'Block' for profile in all_profiles)
+        profile_name = 'Private'  # Check only this: all interfaces assigned with the private profile.
+        query = self._network_profile_wmi_query(profile_name)
+        profile = query.get_one()
+        return int(profile[u'DefaultOutboundAction']) == 0
 
     def setup_ip(self, mac, ip, prefix_length):
         all_configurations = self._winrm.wmi_query(u'Win32_NetworkAdapterConfiguration', {}).enumerate()
