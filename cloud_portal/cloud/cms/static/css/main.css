@@ -95,6 +95,7 @@ img.preview-image{
 }
 
 .show-html{
+    word-wrap : break-word;
     overflow-y: scroll;
     max-height: 350px;
     padding: 5px;
