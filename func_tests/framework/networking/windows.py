@@ -2,6 +2,7 @@ import logging
 from pprint import pformat
 
 from netaddr import EUI, IPNetwork, mac_eui48
+from winrm.exceptions import WinRMError
 
 from framework.method_caching import cached_property
 from framework.networking.interface import Networking
@@ -67,19 +68,29 @@ class WindowsNetworking(Networking):
         return bool(rules)
 
     def create_firewall_rule(self):
-        self._winrm.run_powershell_script(
-            # language=PowerShell
-            '''
-                if ( -not ( Get-NetFirewallRule -Name:$Name -ErrorAction:SilentlyContinue ) ) {
-                    $newRule = New-NetFirewallRule `
-                        -Name:$Name `
-                        -DisplayName:$DisplayName `
-                        -Direction:Outbound `
-                        -RemoteAddress:@('10.0.0.0/8', '192.168.0.0/16') `
-                        -Action:Allow
-                }
-                ''',
-            {'Name': self._firewall_rule_name, 'DisplayName': self._firewall_rule_display_name})
+        # No problem if there are multiple identical rules.
+        query = self._winrm.wmi_query(u'MSFT_NetFirewallRule', {}, namespace='Root/StandardCimv2')
+        properties_dict = {
+            # See on numeric constants: https://msdn.microsoft.com/en-us/library/jj676843(v=vs.85).aspx
+            u'InstanceID': self._firewall_rule_name,
+            u'ElementName': self._firewall_rule_display_name,
+            u'Direction': 2,  # Outbound.
+            u'Action': 2,  # Allow.
+            }
+        try:
+            selector_set = query.create(properties_dict)
+        except WinRMError as e:
+            if u'already exists' not in e.message:  # TODO: Retrieve detailed error from pywinrm internals.
+                raise
+            _logger.error(e.message, exc_info=e)
+        else:
+            self._winrm.run_powershell_script(
+                # language=PowerShell
+                '''
+                    Set-NetFirewallRule -RemoteAddress @('10.0.0.0/8', '192.168.0.0/16') `
+                        -Name:$Name
+                    ''',
+                {'Name': self._firewall_rule_name})
 
     def remove_firewall_rule(self):
         self._winrm.run_powershell_script(

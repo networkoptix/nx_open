@@ -38,6 +38,8 @@ class _CimAction(object):
         'http://www.w3.org/2001/XMLSchema': 'xs',
         'http://schemas.dmtf.org/wbem/wscim/1/common': 'cim',
         'http://schemas.dmtf.org/wbem/wsman/1/wsman.xsd': 'w',
+        'http://schemas.xmlsoap.org/ws/2004/09/transfer': 't',
+        'http://schemas.xmlsoap.org/ws/2004/08/addressing': 'a',
         CIMClass('Win32_FolderRedirectionHealth').uri: 'folder',  # Commonly encountered in responses.
         }
 
@@ -182,6 +184,19 @@ class CIMQuery(object):
         outcome = action.perform(self.protocol)
         instance = outcome[self.cim_class.name]
         return instance
+
+    def create(self, properties_dict):
+        assert not self.selectors
+        _logger.debug("Create %r: %r", self.cim_class, properties_dict)
+        action_url = 'http://schemas.xmlsoap.org/ws/2004/09/transfer/Create'
+        body = {self.cim_class.name: properties_dict}
+        body[self.cim_class.name]['@xmlns'] = self.cim_class.uri
+        action = _CimAction(self.cim_class, action_url, self.selectors, body)
+        outcome = action.perform(self.protocol)
+        reference_parameters = outcome[u't:ResourceCreated'][u'a:ReferenceParameters']
+        assert reference_parameters[u'w:ResourceURI'] == self.cim_class.uri
+        selector_set = reference_parameters[u'w:SelectorSet']
+        return selector_set
 
     def invoke_method(self, method_name, params, timeout_sec=None):
         _logger.debug("Invoke %s.%s(%r) where %r", self.cim_class, method_name, params, self.selectors)
