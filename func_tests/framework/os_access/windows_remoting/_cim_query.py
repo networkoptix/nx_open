@@ -126,9 +126,7 @@ class _Enumeration(object):
             }
         response = _CimAction(self.cim_class, action, self.selectors, body).perform(self.protocol)
         self.enumeration_context = response['n:EnumerateResponse']['n:EnumerationContext']
-        self.is_ended = any((
-            'n:EndOfSequence' in response['n:EnumerateResponse'],
-            'w:EndOfSequence' in response['n:EnumerateResponse']))
+        self.is_ended = 'w:EndOfSequence' in response['n:EnumerateResponse']
         items = response['n:EnumerateResponse']['w:Items'][self.cim_class.name]
         assert isinstance(items, list)
         return items if isinstance(items, list) else [items]
@@ -145,9 +143,7 @@ class _Enumeration(object):
                 }
             }
         response = _CimAction(self.cim_class, action, self.selectors, body).perform(self.protocol)
-        self.is_ended = any((
-            'n:EndOfSequence' in response['n:PullResponse'],
-            'w:EndOfSequence' in response['n:PullResponse']))
+        self.is_ended = 'n:EndOfSequence' in response['n:PullResponse']
         self.enumeration_context = None if self.is_ended else response['n:PullResponse']['n:EnumerationContext']
         items = response['n:PullResponse']['n:Items'][self.cim_class.name]
         assert isinstance(items, list)
