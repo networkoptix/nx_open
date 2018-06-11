@@ -15,7 +15,7 @@ class Users(object):
     def profile_by_sid(self, sid):
         selectors = {u'SID': sid}
         query = self._winrm.wmi_query(u'Win32_UserProfile', selectors)
-        profile = query.get_one()
+        profile = query.get()
         return profile
 
     @cached_getter

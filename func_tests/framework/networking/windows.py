@@ -114,7 +114,7 @@ class WindowsNetworking(Networking):
     def internet_is_enabled(self):
         profile_name = 'Private'  # Check only this: all interfaces assigned with the private profile.
         query = self._network_profile_wmi_query(profile_name)
-        profile = query.get_one()
+        profile = query.get()
         return int(profile[u'DefaultOutboundAction']) == 0
 
     def setup_ip(self, mac, ip, prefix_length):
@@ -197,7 +197,7 @@ class WindowsNetworking(Networking):
 
     def can_reach(self, ip, timeout_sec=4):
         query = self._winrm.wmi_query(u'Win32_PingStatus', {u'Address': str(ip)})
-        status = query.get_one()
+        status = query.get()
         return status[u'StatusCode'] == u'0'
 
     def reset(self):

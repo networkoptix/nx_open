@@ -17,7 +17,7 @@ class WindowsService(Service):
         self.query.invoke_method(u'StartService', {}, timeout_sec=timeout_sec)
 
     def status(self):
-        instance = self.query.get_one()
+        instance = self.query.get()
         if instance[u'ProcessId'] == u'0':
             pid = None
             assert instance[u'State'] != u'Running'

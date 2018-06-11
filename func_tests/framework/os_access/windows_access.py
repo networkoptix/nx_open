@@ -101,7 +101,7 @@ class WindowsAccess(RemoteAccess):
 
     def get_time(self):
         started_at = timeit.default_timer()
-        result = self.winrm.wmi_query(u'Win32_OperatingSystem', {}).get_one()
+        result = self.winrm.wmi_query(u'Win32_OperatingSystem', {}).get()
         delay_sec = timeit.default_timer() - started_at
         raw = result[u'LocalDateTime'][u'cim:Datetime']
         time = dateutil.parser.parse(raw).astimezone(self._get_timezone())

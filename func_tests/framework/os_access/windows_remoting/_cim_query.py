@@ -165,7 +165,7 @@ class CIMQuery(object):
         _logger.debug("Enumerate %s where %r", self.cim_class, self.selectors)
         return _Enumeration(self.protocol, self.cim_class, self.selectors, max_elements=max_elements).enumerate()
 
-    def get_one(self):
+    def get(self):
         _logger.debug("Get %s where %r", self.cim_class, self.selectors)
         action_url = 'http://schemas.xmlsoap.org/ws/2004/09/transfer/Get'
         action = _CimAction(self.cim_class, action_url, self.selectors, {})
