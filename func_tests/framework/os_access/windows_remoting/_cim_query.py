@@ -173,6 +173,16 @@ class CIMQuery(object):
         instance = outcome[self.cim_class.name]
         return instance
 
+    def put(self, new_properties_dict):
+        _logger.debug("Put %s where %r: %r", self.cim_class, self.selectors, new_properties_dict)
+        action_url = 'http://schemas.xmlsoap.org/ws/2004/09/transfer/Put'
+        body = {self.cim_class.name: new_properties_dict}
+        body[self.cim_class.name]['@xmlns'] = self.cim_class.uri
+        action = _CimAction(self.cim_class, action_url, self.selectors, body)
+        outcome = action.perform(self.protocol)
+        instance = outcome[self.cim_class.name]
+        return instance
+
     def invoke_method(self, method_name, params, timeout_sec=None):
         _logger.debug("Invoke %s.%s(%r) where %r", self.cim_class, method_name, params, self.selectors)
         action_uri = self.cim_class.method_uri(method_name)
