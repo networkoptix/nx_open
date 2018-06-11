@@ -94,10 +94,10 @@ class WindowsInstallation(Installation):
         return dumps
 
     def restore_mediaserver_conf(self):
-        pass
+        self._config_key_backup.copy_values_to(self._config_key)
 
     def update_mediaserver_conf(self, new_configuration):
-        pass
+        self._config_key.update_values(new_configuration)
 
     def read_log(self):
         pass
