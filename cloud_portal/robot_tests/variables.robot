@@ -7,11 +7,15 @@ ${ALERT CLOSE}                        //div[contains(@class, 'ng-toast')]//span[
 
 ${BACKDROP}                           //div[@uib-modal-backdrop="modal-backdrop"]
 
-${LANGUAGE DROPDOWN}                  //footer//button[@uib-dropdown-toggle and @id='language-dropdown' and @aria-haspopup='true']
-${LANGUAGE TO SELECT}                 //footer//span[@lang='${LANGUAGE}']/..
+${BROWSER}                            Chrome
+
+${LANGUAGE DROPDOWN}                  //nx-footer//button[@ngbdropdowntoggle]
+${LANGUAGE TO SELECT}                 //nx-footer//span[@lang='${LANGUAGE}']/..
 
 @{LANGUAGES LIST}                          en_US    en_GB    ru_RU           fr_FR   de_DE    es_ES   hu_HU  zh_CN  zh_TW  ja_JP   ko_KR  tr_TR  th_TH     nl_NL    he_IL  pl_PL  vi_VN
 @{LANGUAGES ACCOUNT TEXT LIST}             Account  Account  Учетная запись  Compte  Account  Cuenta  Fiók   帐户    帳號   アカウント  계정    Hesap  บัญชีผู้ใช้  Account  חשבון    Konto  Tài khoản
+
+${BACKDROP}                           //ngb-modal-window
 
 ${CYRILLIC TEXT}                      Кенгшщзх
 ${SMILEY TEXT}                        ☠☿☂⊗⅓∠∩λ℘웃♞⊀☻★
@@ -20,21 +24,22 @@ ${SYMBOL TEXT}                        `~!@#$%^&*()_:";'{}[]+<>?,./\
 ${TM TEXT}                            qweasdzxc123®™
 
 #Log In Elements
-${LOG IN MODAL}                       //div[contains(@class, 'modal-content')]
-${EMAIL INPUT}                        //form[contains(@name, 'loginForm')]//input[@ng-model='auth.email']
-${PASSWORD INPUT}                     //form[contains(@name, 'loginForm')]//input[@ng-model='auth.password']
-${LOG IN BUTTON}                      //form[contains(@name, 'loginForm')]//button[@ng-click='checkForm()']
-${REMEMBER ME CHECKBOX}               //form[contains(@name, 'loginForm')]//input[@ng-model='auth.remember']
-${FORGOT PASSWORD}                    //form[contains(@name, 'loginForm')]//a[@href='/restore_password']
-${LOG IN CLOSE BUTTON}                //button[@ng-click='close()']
+${LOG IN MODAL}                       //form[@name='loginForm']
+${EMAIL INPUT}                        //form[@name='loginForm']//input[@id='email']
+${PASSWORD INPUT}                     //form[@name='loginForm']//input[@id='password']
+${LOG IN BUTTON}                      //form[@name='loginForm']//button[text()= 'Log In']
+${REMEMBER ME CHECKBOX}               //form[@name='loginForm']//input[@id='remember']
+${FORGOT PASSWORD}                    //form[@name='loginForm']//a[@href='/restore_password']
+${LOG IN CLOSE BUTTON}                //button[@data-dismiss='modal']
+${ACCOUNT NOT FOUND}                  //form[@name='loginForm']//label[contains(text(), '${ACCOUNT NOT FOUND TEXT}')]
 ${RESEND ACTIVATION EMAIL LINK}       //form[@name='loginForm']//a[text()='${RESEND ACTVIATION EMAIL}']
 
 ${LOG IN NAV BAR}                     //nav//a[contains(@ng-click, 'login()')]
 ${YOU HAVE NO SYSTEMS}                //span[contains(text(),'${YOU HAVE NO SYSTEMS TEXT}')]
 
-${ACCOUNT DROPDOWN}                   //li[contains(@class, 'collapse-first')]//a['uib-dropdown-toggle']
+${ACCOUNT DROPDOWN}                   //button[@id = 'accountSettingsSelect']
 ${LOG OUT BUTTON}                     //li[contains(@class, 'collapse-first')]//a[contains(text(), '${LOG OUT BUTTON TEXT}')]
-${ACCOUNT SETTINGS BUTTON}            //li[contains(@class, 'collapse-first')]//a[contains(text(), '${ACCOUNT SETTINGS BUTTON TEXT}')]
+${ACCOUNT SETTINGS BUTTON}            //li//a[(@href = '/account/')]
 ${SYSTEMS DROPDOWN}                   //li[contains(@class, 'collapse-second')]//button['btn-dropdown-toggle']
 ${ALL SYSTEMS}                        //li[contains(@class, 'collapse-second')]//a[@href='/systems']
 ${AUTHORIZED BODY}                    //body[contains(@class, 'authorized')]
@@ -67,8 +72,8 @@ ${TERMS AND CONDITIONS CHECKBOX}      //form[@name= 'registerForm']//input[@ng-m
 ${CREATE ACCOUNT BUTTON}              //form[@name= 'registerForm']//button[contains(text(), '${CREATE ACCOUNT BUTTON TEXT}')]
 ${TERMS AND CONDITIONS LINK}          //form[@name= 'registerForm']//a[@href='/content/eula']
 ${TERMS AND CONDITIONS ERROR}         //form[@name= 'registerForm']//p[@ng-if='registerForm.accept.$touched && registerForm.accept.$error.required' and contains(text(), '${TERMS AND CONDITIONS ERROR TEXT}')]
-${PRIVACY POLICY LINK}                //form[@name= 'registerForm']//a[@href='/content/privacy']
-${RESEND ACTIVATION LINK BUTTON}      //form[@name= 'reactivateAccount']//button[contains(text(), "${RESEND ACTIVATION LINK BUTTON TEXT}")]
+${PRIVACY POLICY LINK}                //form[@name= 'registerForm']//a[@href='/content/support']
+${RESEND ACTIVATION LINK BUTTON}      //form[@name= 'loginForm']//a[contains(text(), "${RESEND ACTIVATION LINK BUTTON TEXT}")]
 
 #targets the open nx witness button presented when logging in after activating with from=mobile or client
 ${OPEN NX WITNESS BUTTON FROM =}      //button[text()='${OPEN NX WITNESS BUTTON TEXT}']
@@ -114,12 +119,12 @@ ${PROMO BLOCK}                        //div[contains(@class,'promo-block') and n
 ${ALREADY ACTIVATED}                  //h1[@ng-if='!activate.success' and contains(text(),'${ALREADY ACTIVATED TEXT}')]
 
 #Share Elements (Note: Share and Permissions are the same form so these are the same variables.  Making two just in case they do diverge at some point.)
-${SHARE MODAL}                        //div[@uib-modal-transclude]
+${SHARE MODAL}                        //form[@name='shareForm']
 ${SHARE EMAIL}                        //form[@name='shareForm']//input[@id='email']
-${SHARE PERMISSIONS DROPDOWN}         //form[@name='shareForm']//select[@ng-model='user.role']
+${SHARE PERMISSIONS DROPDOWN}         //form[@name='shareForm']//nx-permissions-select//button[@id='permissionsSelect']
 ${SHARE BUTTON MODAL}                 //form[@name='shareForm']//button[text()='Share']
-${SHARE CANCEL}                       //form[@name='shareForm']//button[@ng-click='close()']
-${SHARE CLOSE}                        //div[@uib-modal-transclude]//div[@ng-if='settings.title']//button[@ng-click='close()']
+${SHARE CANCEL}                       //form[@name='shareForm']//button[text()='Cancel']
+${SHARE CLOSE}                        //form[@name='shareForm']//button[@data-dismiss='modal']
 ${SHARE PERMISSIONS HINT}             //form[@name='shareForm']//span[contains(@class,'help-block')]
 
 ${EDIT PERMISSIONS EMAIL}             //form[@name='shareForm']//input[@ng-model='user.email']
@@ -138,16 +143,16 @@ ${EDIT PERMISSIONS HINT}              //form[@name='shareForm']//span[contains(@
 ${ACCOUNT EMAIL}                      //form[@name='accountForm']//input[@ng-model='account.email']
 ${ACCOUNT FIRST NAME}                 //form[@name='accountForm']//input[@ng-model='account.first_name']
 ${ACCOUNT LAST NAME}                  //form[@name='accountForm']//input[@ng-model='account.last_name']
-${ACCOUNT LANGUAGE DROPDOWN}          //form[@name='accountForm']//language-select//button
+${ACCOUNT LANGUAGE DROPDOWN}          //form[@name='accountForm']//nx-language-select//button[@id = 'languageSelect']
 ${ACCOUNT SAVE}                       //form[@name='accountForm']//button[@ng-click='checkForm()']
-
+${ACCOUNT SUBSCRIBE CHECKBOX}         //form[@name='accountForm']//input[@ng-model='account.subscribe']/following-sibling::span[contains(@class, 'checkmark')]
 #Already logged in modal
 #extra spaces here temporarily
 ${LOGGED IN CONTINUE BUTTON}          //ngb-modal-window//button[text()='Continue ']
 ${LOGGED IN LOG OUT BUTTON}           //ngb-modal-window//button[text()='Log Out ']
 
-${CONTINUE BUTTON}                    //div[@uib-modal-window='modal-window']//button[@ng-class='settings.buttonClass' and @ng-click='ok()']
-${CONTINUE MODAL}                     //div[@uib-modal-window='modal-window']
+${CONTINUE BUTTON}                    //ngb-modal-window//button[contains(text(), 'Continue')]
+${CONTINUE MODAL}                     //ngb-modal-window
 
 ${300CHARS}                           QWErtyuiopasdfghhkljzxcvbnmqwertyuiopasdfghhkljzxcvbnmqwertyuiopasdfghhkljzxcvbnmqwertyuiopasdfghhkljzxcvbnmqwertyuiopasdfghhkljzxcvbnmqwertyuiopasdfghhkljzxcvbnmqwertyuiopasdfghhkljzxcvbnmqwertyuiopasdfghhkljzxcvbnmqwertyuiopasdfghhkljzxcvbnmqwertyuiopasdfghhkljzxcvbnmqwertyuiopasdfghhkljzxcvbnmyy
 ${255CHARS}                           QWErtyuiopasdfghhkljzxcvbnmqwertyuiopasdfghhkljzxcvbnmqwertyuiopasdfghhkljzxcvbnmqwertyuiopasdfghhkljzxcvbnmqwertyuiopasdfghhkljzxcvbnmqwertyuiopasdfghhkljzxcvbnmqwertyuiopasdfghhkljzxcvbnmqwertyuiopasdfghhkljzxcvbnmqwertyuiopasdfghhkljzxcvbnmqwertyuiopas
