@@ -34,7 +34,7 @@
     "play": "lecture",
     "pause": "pause",
     "live": "go to live | show me live",
-    "view": "view + [camera name]",
+    "view": "vue + [nom de la caméra]",
     "search": "find + [text for searchbar]",
     "clear search": "effacer la recherche",
     "expand server": "expand server + [server name]",

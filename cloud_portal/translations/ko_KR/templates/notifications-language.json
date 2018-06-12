@@ -1,12 +1,12 @@
 {
   "activate_account": {
-    "emailSubject": "귀하의 계정을 활성화 합니다"
+    "emailSubject": "귀하의 계정을 활성화합니다"
   },
   "restore_password": {
     "emailSubject": "사용자 암호 초기화"
   },
   "system_invite": {
-    "emailSubject": "{{#message.sharer_name}}{{message.sharer_name}} invites you to {{PRODUCT_NAME}}{{/message.sharer_name}}{{^message.sharer_name}}Video system {{message.system_name}} was shared with you{{/message.sharer_name}}"
+    "emailSubject": "{{#message.sharer_name}}{{message.sharer_name}} 께서 당신을 %PRODUCT_NAME%{{/message.sharer_name}}에 초대합니다{{^message.sharer_name}}께서 {{message.system_name}}시스템을 {{/message.sharer_name}}에게 공유 하였습니다"
   },
   "system_shared": {
     "emailSubject": "비디오 시스템 {{message.system_name}} 공유 되었습니다."

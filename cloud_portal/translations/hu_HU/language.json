@@ -135,7 +135,8 @@
     "cantEditAdmin": "Ez a felhasználó rendszergazdai jogokkal rendelkezik",
     "cantOpenClient": "%VMS_NAME% nincs törölve. <a href=\"/download\">Letöltés</a>",
     "lostConnection": "{{systemName}} kapcsolat megszakadt",
-    "thisSystem": "a rendszer"
+    "thisSystem": "a rendszer",
+    "oldSafariNotSupported": "Versions of Safari older than 10 are not supported"
   },
   "passwordRequirements": {
     "minLengthMessage": "A jelszónak legalább 8 karakterből kell állnia",

@@ -16,67 +16,66 @@
         <input type="password" style="display:none">
         <!-- /end of special hack -->
 
-        <div class="form-group row" validate-field>
-            <label for="firstName" class="col-12 col-md-4 text-left text-md-right control-label">Имя</label>
-            <div class="col-12 col-md-4">
-                <input type="text" class="form-control"
-                       ng-model="account.firstName" id="firstName" maxlength="255"
-                       required name="firstName" autocomplete="off" autofocus>
+        <div class="form-group" validate-field>
+            <label for="firstName" class="col-sm-4 control-label">Имя</label>
+            <div class="col-sm-4">
+                <input type="text" class="form-control" ng-model="account.firstName" id="firstName" maxlength="255"
+                       required
+ name="firstName" autocomplete="off" autofocus>
             </div>
-            <div class="col-12 col-md-4">
-                <span class="help-block input-error" ng-if="registerForm.firstName.$touched && registerForm.firstName.$error.required">Имя обязательно для заполнения</span>
-            </div>
-        </div>
-        <div class="form-group row" validate-field>
-            <label for="lastName"  class="col-12 col-md-4 text-left text-md-right control-label">Фамилия</label>
-            <div class="col-12 col-md-4">
-                <input type="text" class="form-control"
-                       ng-model="account.lastName" id="lastName" maxlength="255"
-                       required name="lastName" autocomplete="off">
-            </div>
-            <div class="col-12 col-md-4">
-                <span class="help-block input-error" ng-if="registerForm.lastName.$touched && registerForm.lastName.$error.required">Фамилия обязательна для заполнения</span>
+            <div class="col-sm-4">
+                <span class="help-block" ng-if="registerForm.firstName.$touched && registerForm.firstName.$error.required">Имя обязательно для заполнения</span>
             </div>
         </div>
-        <div class="form-group row" validate-field>
-            <label for="registerEmail"  class="col-12 col-md-4 text-left text-md-right control-label">Email</label>
-            <div class="col-12 col-md-4">
-                <input ng-hide="lockEmail" type="email" class="form-control"
-                       ng-model="account.email" id="registerEmail" maxlength="255"
+        <div class="form-group" validate-field>
+            <label for="lastName"  class="col-sm-4 control-label">Фамилия</label>
+            <div class="col-sm-4">
+                <input type="text" class="form-control" ng-model="account.lastName" id="lastName" maxlength="255"
+                       required
+ name="lastName" autocomplete="off">
+            </div>
+            <div class="col-sm-4">
+                <span class="help-block" ng-if="registerForm.lastName.$touched && registerForm.lastName.$error.required">Фамилия обязательна для заполнения</span>
+            </div>
+        </div>
+        <div class="form-group" validate-field>
+            <label for="registerEmail"  class="col-sm-4 control-label">Email</label>
+            <div class="col-sm-4">
+                <input ng-hide="lockEmail" type="email" class="form-control" ng-model="account.email" id="registerEmail" maxlength="255"
                        name="registerEmail" required autocomplete="off"  validate-email
  ng-change="hideAlreadyExists()">
 
                 <input type="text" ng-if="lockEmail"
                        class="form-control" ng-model="account.email" readonly>
             </div>
-            <div class="col-12 col-md-4">
-                <span class="help-block input-error" ng-if="registerForm.registerEmail.$touched && registerForm.registerEmail.$error.required">Email is required</span>
-                <span class="help-block input-error" ng-if="registerForm.registerEmail.$touched && registerForm.registerEmail.$error.email">Please enter a valid Email</span>
-                <span class="help-block input-error" ng-if="registerForm.registerEmail.$error.alreadyExists">This Email has been already registered in {{PRODUCT_NAME}}</span>
+            <div class="col-sm-4">
+                <div><span class="help-block" ng-if="registerForm.registerEmail.$touched && registerForm.registerEmail.$error.required">Email обязателен для заполнения</span></div>
+
+                <div><span class="help-block" ng-if="registerForm.registerEmail.$touched && registerForm.registerEmail.$error.email">Пожалуйста, введите действительный Email</span></div>
+
+                <div><span class="help-block" ng-if="registerForm.registerEmail.$error.alreadyExists">Этот Email уже зарегистрирован в %PRODUCT_NAME%</span></div>
             </div>
         </div>
         <password-input ng-model="account.password" id="'registerPassword'" label="$root.L.regActions.passwordLabel"></password-input>
-        <div class="form-group" >
-            <div class="col-12 offset-md-4 col-md-8">
-                <label class="checkbox">Subscribe to email newsletters
-                    <input type="checkbox" checked="checked"
-                           ng-model="account.subscribe"
-                           name="subscribe"
-                           id="subscribe">
-                    <span class="checkmark"></span>
-                </label>
+        <div class="form-group" validate-field>
+            <div class="col-sm-offset-4 col-sm-4">
+                <div class="checkbox">
+                    <label>
+                        <input type="checkbox" ng-model="account.accept" name="accept" id="accept" required>
+                        Я согласен с <a href="/content/eula" target="_blank">Условиями использования</a> и <a href="%PRIVACY_LINK%" target="_blank">Политикой конфиденциальности</a>
+                    </label>
+                    <p class="form-control-static" ng-if="registerForm.accept.$touched && registerForm.accept.$error.required">
+                        Пожалуйста, просмотрите и согласитесь с условиями использования и политикой конфиденциальности для того, чтобы продолжить
+                    </p>
+                </div>
             </div>
         </div>
         <div class="form-group">
-            <div class="col-12 offset-md-4 col-md-8">
+            <div class="col-sm-offset-4 col-sm-8">
                 <process-button process="register"
                                 form="registerForm"
-                                class="float-left"
+                                class="pull-left"
                                 button-text="$root.L.regActions.createAccount"></process-button>
-                <div class="small conditions-note">
-                    Нажимая на кнопку "Создать учётную запись", вы соглашаетесь соблюдать
-                    <div><a href="/content/eula" target="_blank">Условия и положения</a></div>
-                </div>
             </div>
         </div>
     </form>

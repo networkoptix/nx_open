@@ -4,7 +4,7 @@
             Il suo account è stato creato con successo
         </h1>
         <h1 class="process-success" ng-if="activate.success">
-            <a class="btn btn-default" href="/login">Accedi</a>
+            <a class="btn btn-default" href="/accesso">Log In</a>
         </h1>
 
         <h1 class="process-success" ng-if="!activate.success">
@@ -17,7 +17,7 @@
             Il suo account è stato creato con successo
         </h1>
         <h1 class="process-success">
-            <a class="btn btn-default" href="/login">Accedi</a>
+            <a class="btn btn-default" href="/accesso">Log In</a>
         </h1>
     </div>
     
@@ -29,7 +29,7 @@
         <h1 ng-if="!data.email">Attivi il suo Account</h1>
         <form name="reactivateAccount" class="form-horizontal" ng-if="!reactivate.success" novalidate>
             <div class="form-group" ng-if="!data.email" validate-field>
-                <label for="emailReactivate"  class="col-sm-4 control-label">E-mail</label>
+                <label for="emailReactivate"  class="col-sm-4 control-label">Email</label>
                 <div class="col-sm-4">
                     <input type="email" class="form-control"  validate-email
  ng-model="data.email"
@@ -38,12 +38,11 @@
                            required autofocus>
                 </div>
                 <div class="col-sm-4">
-                    <span class="help-block input-error" ng-if="reactivateAccount.email.$touched && reactivateAccount.email.$error.required">Email is required</span>
-                    <span class="help-block input-error" ng-if="reactivateAccount.email.$touched && reactivateAccount.email.$error.email">Please enter a valid Email</span>
+                    <span class="help-block" ng-if="reactivateAccount.email.$touched && reactivateAccount.email.$error.required"> È richiesta l'email </span> <span class="help-block" ng-if="reactivateAccount.email.$touched && reactivateAccount.email.$error.email"> Inserisca un'e-mail valida </span>
                 </div>
             </div>
             <div class="form-group">
-                <div class="offset-sm-2 col-sm-8">
+                <div class="col-sm-offset-2 col-sm-8">
                     <process-button process="reactivate"
                                     form="reactivateAccount"
                                     button-text="$root.L.activeActions.sendConfirm"></process-button>
@@ -62,7 +61,7 @@
         <h1>Reimpostare la password</h1>
         <form name="restorePassword" class="form-horizontal" novalidate>
             <div class="form-group" validate-field>
-                <label for="email"  class="col-sm-4 control-label">E-mail</label>
+                <label for="email"  class="col-sm-4 control-label">Email</label>
                 <div class="col-sm-4">
                     <input type="email" class="form-control"  validate-email
  ng-model="data.email"
@@ -71,11 +70,11 @@
                            required autofocus>
                 </div>
                 <div class="col-sm-4">
-                    <span class="help-block input-error" ng-if="restorePassword.email.$touched && restorePassword.email.$error.required"> È richiesta l'email </span> <span class="help-block input-error" ng-if="restorePassword.email.$touched && restorePassword.email.$error.email"> Inserisci un'e-mail valida </span>
+                    <span class="help-block" ng-if="restorePassword.email.$touched && restorePassword.email.$error.required"> È richiesta l'email </span> <span class="help-block" ng-if="restorePassword.email.$touched && restorePassword.email.$error.email"> Inserisci un'e-mail valida </span>
                 </div>
             </div>
             <div class="form-group">
-                <div class="offset-sm-4 col-sm-8">
+                <div class="col-sm-offset-4 col-sm-8">
                     <process-button process="restore"
                                     form="restorePassword"
                                     button-text="$root.L.activeActions.resetPassword"></process-button>
@@ -88,7 +87,7 @@
             Password salvata correttamente
         </h1>
         <h1 class="process-success" ng-if="change.success || changeSuccess">
-            <a class="btn btn-default" href="/login">Log In</a>
+            <a class="btn btn-default" href="/accesso">Accedi</a>
         </h1>
 
         <form name="restorePasswordWithCode" class="form-horizontal" ng-if="!change.success && !changeSuccess" novalidate>
@@ -96,7 +95,7 @@
             <password-input ng-model="data.newPassword" id="'newPassword'" label="$root.L.activeActions.setNewPasswordLabel"></password-input>
 
             <div class="form-group">
-                <div class="offset-sm-4 col-sm-8">
+                <div class="col-sm-offset-4 col-sm-8">
                     <process-button process="change"
                                     form="restorePasswordWithCode"
                                     button-text="$root.L.activeActions.setNewPassword"></process-button>

@@ -1,21 +1,21 @@
 
-<div class="card card-default" ng-if="system.isMine">
-    <div class="card-body">
+<div class="panel panel-default" ng-if="system.isMine">
+    <div class="panel-body">
         <h2>Ваша система</h2>
         <p></p>
         <p>
             <button class="btn btn-default" ng-click="rename()">Переименовать систему</button>
         </p>
         <p>
-            <button class="btn btn-default" ng-if="canMerge || debugMode" ng-click="mergeSystems()">Merge with Another System</button>
+            <button class="btn btn-default" ng-if="canMerge || debugMode" ng-click="mergeSystems()">Объединить с другой системой</button>
         </p>
         <hr></hr>
         <button class="btn btn-default" ng-click="disconnect()">Отсоединить от
             <span class="product-name">%PRODUCT_NAME%</span></button>
     </div>
 </div>
-<div class="card card-default" ng-if="!system.isMine">
-    <div class="card-body">
+<div class="panel panel-default" ng-if="!system.isMine">
+    <div class="panel-body">
         <h2>Владелец</h2>
         <h3 class="user-name">{{system.info.ownerFullName}}</h3>
         <a ng-href="mailto:{{system.info.ownerAccountEmail}}">{{system.info.ownerAccountEmail}}</a>
@@ -30,22 +30,21 @@
         <button class="btn btn-default" ng-click="delete()">Отвязать от учетной записи</button>
     </div>
 </div>
-<div class="card card-default" ng-if="currentlyMerging">
-    <div class="card-body" ng-if="isMaster && system.isMine">
+<div class="panel panel-default" ng-if="currentlyMerging">
+    <div class="panel-body" ng-if="isMaster && system.isMine">
         <div><strong>{{mergeTargetSystem.name}}</strong>
-            is being merged to this system</div>
+            объединяется с этой системой</div>
         <hr></hr>
-        <div class="merge-info-text">Depending of the size of the database it may take up to several hours</div>
+        <div class="merge-info-text">В зависимости от размера базы данных может потребоваться до нескольких часов</div>
     </div>
-    <div class="card-body" ng-if="!isMaster || !system.isMine">
-        <div>This system is being merged to
+    <div class="panel-body" ng-if="!isMaster || !system.isMine">
+        <div>Эта система объединяется с 
             <strong>{{mergeTargetSystem.name}}</strong></div>
         <hr></hr>
         <div class="merge-info-text">
-            <p>Depending of the size of the database it may take up to several hours.</p>
-            <p>Until merge is finished you can log in to this system and watch video, but cannot change any settings.</p>
-            <p>When merge is finished, all users and cameras from this system will become available
-                in <span class="merge-system-name">{{mergeTargetSystem.name}}</span>. System, and this system will be deleted.</p>
+            <p>В зависимости от размера базы данных может потребоваться до нескольких часов.</p>
+            <p>До окончания объединения вы можете войти в эту систему и посмотреть видео, но не можете изменить какие-либо настройки.</p>
+            <p>После завершения объединения все пользователи и камеры из этой системы станут доступны в <span class="merge-system-name">{{mergeTargetSystem.name}}</span>. Система, и эта система будет удалены.</p>
         </div>
     </div>
 </div>
