@@ -214,7 +214,7 @@
                                 lang.downloads.action, 'btn-primary',
                                 lang.dialogs.cancelButton)
                             .then((result) => {
-                                if ('OK' === result) {
+                                if (result) {
                                     $location.path('/download');
                                 }
                             });
