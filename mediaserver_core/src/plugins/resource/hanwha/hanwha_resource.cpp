@@ -1454,7 +1454,8 @@ CameraDiagnostics::Result HanwhaResource::initAdvancedParameters()
     if (!result)
         return CameraDiagnostics::NoErrorResult();
 
-    const auto allowedParameters = QString(ini().enabledAdvancedParameters).split(L',');
+    const auto allowedParameters = QString(ini().enabledAdvancedParameters)
+        .split(L',', QString::SplitBehavior::SkipEmptyParts);
     for (const auto& id: parameters.allParameterIds())
     {
         if (!allowedParameters.isEmpty() && !allowedParameters.contains(id))

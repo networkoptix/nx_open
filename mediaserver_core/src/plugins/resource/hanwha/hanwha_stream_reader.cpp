@@ -366,9 +366,9 @@ QString HanwhaStreamReader::forcedUrl(Qn::ConnectionRole role) const
     switch (role)
     {
         case Qn::ConnectionRole::CR_LiveVideo:
-            return QString::fromUtf8(ini().forcedPrimaryStreamUrl);
+            return QString::fromUtf8(ini().forcedPrimaryStreamUrl).trimmed();
         case Qn::ConnectionRole::CR_SecondaryLiveVideo:
-            return QString::fromUtf8(ini().forcedSecondaryStreamUrl);
+            return QString::fromUtf8(ini().forcedSecondaryStreamUrl).trimmed();
         default:
             return QString();
     }

@@ -16,24 +16,25 @@ struct HanwhaIni: public nx::kit::IniConfig
     NX_INI_STRING(
         "",
         enabledAdvancedParameters,
-        "Comma separated list of advanced parameters that will be shown on 'Advanced' page"
-        "(if camera supports it). If empty then no filter is applied.");
+        "Comma separated list of advanced parameters that will be shown on the 'Advanced' page"
+        "(if the camera supports it). Other parameters will be filtered out."
+        "If empty then no filter is applied.");
 
-    NX_INI_FLAG(1, initMedia, "Enable/disable media initialization");
+    NX_INI_FLAG(1, initMedia, "Enable/disable media initialization.");
     NX_INI_FLAG(1, initIo, "Enable/disable IO initialization.");
     NX_INI_FLAG(1, initAdvancedParameters, "Enable/disable advanced parameter initialization.");
-    NX_INI_FLAG(1, initPtz, "Enable/disable PTZ initialization");
-    NX_INI_FLAG(1, initTwoWayAudio, "Enable/disable Two-way audio initialization");
+    NX_INI_FLAG(1, initPtz, "Enable/disable PTZ initialization.");
+    NX_INI_FLAG(1, initTwoWayAudio, "Enable/disable two-way audio initialization.");
 
     NX_INI_STRING(
         "",
         forcedPrimaryStreamUrl,
-        "Forcing use of the given URL for the primary stream");
+        "Force use of the given URL for the primary stream.");
 
     NX_INI_STRING(
         "",
         forcedSecondaryStreamUrl,
-        "Forcing use of the given URL for the secondary stream");
+        "Force use of the given URL for the secondary stream.");
 
 };
 
