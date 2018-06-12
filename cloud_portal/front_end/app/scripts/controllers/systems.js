@@ -46,10 +46,4 @@ angular.module('cloudApp')
                     hasMatch(system.ownerFullName, search) ||
                     hasMatch(system.ownerAccountEmail, search);
         };
-
-        $scope.$on('$destroy', function(){
-            if(typeof($scope.keepToastMessages) === 'undefined') {
-                dialogs.dismissNotifications();
-            }
-        });
     }]);
