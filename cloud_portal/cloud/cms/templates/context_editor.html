@@ -33,7 +33,7 @@
             <label {% if not optional and not record_exists %} class="text-danger" {% endif %}
                    for="id_{{ field.name }}">{{ field.label }}<p class="help">{{field.name}}</p>
             </label>
-            <div id="{{field.name}}" style="display:inline-block;">
+            <div id="{{field.name}}" style="width: 100%">
                 {% if field|is_ImageField and field.value %}
                     <div>
                         {% if optional and record_exists %}
@@ -68,7 +68,7 @@
                 {% endif %}
                 {% if not field.field.disabled %}
                     {{ field }}
-                {% else %}
+                {% elif not field|is_FileField and not field|is_ImageField %}
                     <div class="show-html">{{field.value|safe}}</div>
                 {% endif %}
                 
