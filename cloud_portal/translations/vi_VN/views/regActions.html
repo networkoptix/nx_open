@@ -57,10 +57,17 @@
             </div>
         </div>
         <password-input ng-model="account.password" id="'registerPassword'" label="$root.L.regActions.passwordLabel"></password-input>
-        <div class="form-group" >
-            <div class="col-sm-offset-4 col-sm-8">
+        <div class="form-group" validate-field>
+            <div class="col-sm-offset-4 col-sm-4">
                 <div class="checkbox">
-                    <label ><input type="checkbox" ng-model="account.subscribe" name="subscribe" id="subscribe"> Đăng ký nhận bản tin qua email</label>
+                    <label>
+                        <input type="checkbox" ng-model="account.accept" name="accept" id="accept" required>
+                        Tôi đồng ý với <a href="/content/eula" target="_blank"> Điều khoản và Điều kiện </a> và
+                          <a href="%PRIVACY_LINK%" target="_blank"> Chính sách bảo mật </a>
+                    </label>
+                    <p class="form-control-static" ng-if="registerForm.accept.$touched && registerForm.accept.$error.required">
+                        Vui lòng xem và đồng ý với các điều khoản và điều kiện và quyền riêng tư chính sách để tiếp tục
+                    </p>
                 </div>
             </div>
         </div>
@@ -70,10 +77,6 @@
                                 form="registerForm"
                                 class="pull-left"
                                 button-text="$root.L.regActions.createAccount"></process-button>
-                <div class="small conditions-note">
-                    Bằng cách nhấp vào "Tạo Tài khoản", bạn đồng ý
-                    <div><a href="/content/eula" target="_blank">Điều khoản và điều kiện</a></div>
-                </div>
             </div>
         </div>
     </form>

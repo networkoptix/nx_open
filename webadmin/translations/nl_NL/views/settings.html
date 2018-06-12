@@ -9,7 +9,7 @@
             </alert>
             <alert type="danger" ng-if="!settings.flags.noHDD && settings.flags.noNetwork">
                 Dit apparaat heeft een netwerkverbinding nodig om te functioneren.<br>
-                Sluit het apparaat aanop het  lokale netwerk of het internet
+                Sluit het apparaat aan op het  lokale netwerk of het internet
             </alert>
             <alert type="danger" ng-if="!settings.flags.noHDD && !settings.flags.noNetwork && settings.flags.wrongNetwork">
                 Dit apparaat heeft de verkeerde netwerkconfiguratie.<br>
@@ -39,19 +39,14 @@
                     <div>
                         <h3>Reset server</h3>
                         <p>Met deze actie wordt deze server teruggezet naar de standaardinstellingen (de database en de configuratie zullen worden gewist).
-                            De server zal worden losgemaakt van het huidige systeem. Het videoarchief zal intact blijven.</p>
+                            De server zal worden losgekoppeld van het huidige systeem. Het videoarchief zal intact blijven.</p>
                         <p><button type="button" class="btn btn-default" ng-click="openRestoreDefaultsDialog()">Fabrieksinstellingen herstellen</button></p>
                     </div>
                     <div ng-if="user.isOwner">
-                        <h3>Maak de server los van het systeem</h3>
+                        <h3>Koppel de server los van het huidige systeem</h3>
                         <p>Met deze actie wordt de server losgekoppeld van de systeemdatabase met behoud van lokale gebruikers en configuratie.
                             Het videoarchief zal intact blijven. <b>Alle cloud gebruikers zullen worden verwijderd.</b></p>
-                        <p><button class="btn btn-default" ng-click="disconnectFromSystem()">Maak los van het systeem</button></p>
-                    </div>
-                    <div>
-                        <h3>Maak de server los van het systeem</h3>
-                        <p>Met deze actie wordt de server losgemaakt van de systeemdatabase, lokale gebruikers en configuratie. Videoarchief blijft intact. <b> Cloud gebruikers worden verwijderd. </b></p>
-                        <p><button class="btn btn-default" ng-click="disconnectFromSystem()">Maak los van het systeem</button></p>
+                        <p><button class="btn btn-default" ng-click="disconnectFromSystem()">Loskoppelen van het systeem</button></p>
                     </div>
                     <div>
                         <h3>Herstarten</h3>
@@ -100,7 +95,7 @@
 
                         <div ng-if="cloudSystemID">
                             <p>Dit systeem is gekoppeld aan {{Config.cloud.productName}}, eigenaar: <b>{{cloudAccountName}}</b></p>
-                            <p ng-if="canConnectToCloud"><button class="btn btn-default" ng-click="disconnectFromCloud()">Losmaken van {{Config.cloud.productName}}</button></p>
+                            <p ng-if="canConnectToCloud"><button class="btn btn-default" ng-click="disconnectFromCloud()">Koppel het systeem los van {{Config.cloud.productName}}</button></p>
                             <p><a ng-if="!mode.liteClient"
                                   ng-href="{{Config.cloud.portalUrl}}{{Config.cloud.portalSystemUrl.replace('{systemId}',cloudSystemID) + Config.cloud.webadminContext}}"
                                   target="_blank">Ga naar {{Config.cloud.productName}} Portaal</a></p>

@@ -53,14 +53,20 @@
 
                 <div><span class="help-block" ng-if="registerForm.registerEmail.$touched && registerForm.registerEmail.$error.email">Lütfen geçerli bir Eposta girin</span></div>
 
-                <div><span class="help-block" ng-if="registerForm.registerEmail.$error.alreadyExists">Bu e-posta, %PRODUCT_NAME%'de zaten kayıtlı</span></div>
+                <div><span class="help-block" ng-if="registerForm.registerEmail.$error.alreadyExists">Bu e-posta, {{PRODUCT_NAME}}'de zaten kayıtlı</span></div>
             </div>
         </div>
         <password-input ng-model="account.password" id="'registerPassword'" label="$root.L.regActions.passwordLabel"></password-input>
-        <div class="form-group" >
-            <div class="col-sm-offset-4 col-sm-8">
+        <div class="form-group" validate-field>
+            <div class="col-sm-offset-4 col-sm-4">
                 <div class="checkbox">
-                    <label ><input type="checkbox" ng-model="account.subscribe" name="subscribe" id="subscribe"> E-posta haber bültenlerine abone olun</label>
+                    <label>
+                        <input type="checkbox" ng-model="account.accept" name="accept" id="accept" required>
+                        <a href="/content/eula" target="_blank"> Şartlar ve Koşullarını kabul ediyorum </a> ve <a href="%PRIVACY_LINK%" target="_blank"> Gizlilik politikası </a>
+                    </label>
+                    <p class="form-control-static" ng-if="registerForm.accept.$touched && registerForm.accept.$error.required">
+                        Devam etmek için lütfen Şartlar ve Koşullar ve Gizlilik politikasını inceleyin ve kabul edin
+                    </p>
                 </div>
             </div>
         </div>
@@ -70,10 +76,6 @@
                                 form="registerForm"
                                 class="pull-left"
                                 button-text="$root.L.regActions.createAccount"></process-button>
-                <div class="small conditions-note">
-                    Hesap Oluştur düğmesini tıklayarak şunlara uymayı kabul ediyorsunuz
-                    <div><a href="/content/eula" target="_blank">Koşullar ve Şartlar</a></div>
-                </div>
             </div>
         </div>
     </form>

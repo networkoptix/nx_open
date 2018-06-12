@@ -129,13 +129,14 @@
     "accountAlreadyActivated": "חשבון זה כבר פעיל",
     "emailNotFound": "החשבון לא קיים.",
     "EmailAlreadyExists": "האימייל הזה כבר רשום",
-    "oldPasswordMistmatch": "הסיסמה הנוכחית אינה נכונה.",
+    "oldPasswordMistmatch": "הסיסמא הנוכחית אינה נכונה.",
     "passwordMismatch": "סיסמה שגויה",
     "cantEditYourself": "שינוי הרשאות של המשתמש אינו מאופשר",
     "cantEditAdmin": "למשתמש זה יש הרשאות מנהל",
     "cantOpenClient": "%VMS_NAME% יישום לא אותר. <a href=\"/download\"> הורדה</a>",
     "lostConnection": "החיבור ל- {{systemName}} אבד",
-    "thisSystem": "המערכת"
+    "thisSystem": "המערכת",
+    "oldSafariNotSupported": "Versions of Safari older than 10 are not supported"
   },
   "passwordRequirements": {
     "minLengthMessage": "הסיסמה חייבת להכיל 8 תווים לפחות",
@@ -160,7 +161,7 @@
     "offline": "השרת אינו זמין",
     "openClient": "פתח ב- %VMS_NAME%",
     "openClientNoSystem": "פתח %VMS_NAME%",
-    "confirmMergeAction": "Merge",
+    "confirmMergeAction": "לְמַזֵג",
     "mergeSystemTitle": "מיזוג מערכות",
     "confirmRenameTitle": "שם מערכת",
     "confirmRenameAction": "שמור",
@@ -258,7 +259,7 @@
     "setNewPasswordLabel": "סיסמה חדשה"
   },
   "regActions": {
-    "passwordLabel": "סיסמא",
+    "passwordLabel": "סיסמה",
     "createAccount": "צור חשבון"
   },
   "header": {

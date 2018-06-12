@@ -135,7 +135,8 @@
     "cantEditAdmin": "Deze gebruiker heeft beheerdersrechten",
     "cantOpenClient": "%VMS_NAME% applicatie is niet gedetecteerd. <a href=\"/download\">Download</a>",
     "lostConnection": "Verbinding met {{systemName}} verloren",
-    "thisSystem": "het systeem"
+    "thisSystem": "het systeem",
+    "oldSafariNotSupported": "Versions of Safari older than 10 are not supported"
   },
   "passwordRequirements": {
     "minLengthMessage": "Het wachtwoord moet minstens 8 karakters bevatten",

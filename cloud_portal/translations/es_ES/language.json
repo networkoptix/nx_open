@@ -135,7 +135,8 @@
     "cantEditAdmin": "Este usuario tiene permisos de administrador",
     "cantOpenClient": "%VMS_NAME% aplicación no es detectada.<a href=\"/download\">Descargar</a>",
     "lostConnection": "Conexión al {{systemName}} se ha perdido",
-    "thisSystem": "el sistema"
+    "thisSystem": "el sistema",
+    "oldSafariNotSupported": "Versions of Safari older than 10 are not supported"
   },
   "passwordRequirements": {
     "minLengthMessage": "La contraseña debe tener al menos 8 caracteres",
@@ -160,7 +161,7 @@
     "offline": "Sistema está desconectado",
     "openClient": "Abierto en %VMS_NAME%",
     "openClientNoSystem": "Abrir %VMS_NAME%",
-    "confirmMergeAction": "Merge",
+    "confirmMergeAction": "Combinar",
     "mergeSystemTitle": "Unir Sistemas",
     "confirmRenameTitle": "Nombre del sistema",
     "confirmRenameAction": "Guardar",

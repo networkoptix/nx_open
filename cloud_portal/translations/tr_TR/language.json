@@ -135,7 +135,8 @@
     "cantEditAdmin": "Bu kullanıcının yönetici izinleri var",
     "cantOpenClient": "%VMS_NAME% uygulama algılanmadı. <a href=\"/download\">İndir</a>",
     "lostConnection": "{{systemName}} ile bağlantı kayboldu",
-    "thisSystem": "sistem"
+    "thisSystem": "sistem",
+    "oldSafariNotSupported": "Versions of Safari older than 10 are not supported"
   },
   "passwordRequirements": {
     "minLengthMessage": "Şifre en az 8 karakter içermelidir",
@@ -160,7 +161,7 @@
     "offline": "Sistem çevrimdışı",
     "openClient": "%VMS_NAME% içinde aç",
     "openClientNoSystem": "Aç%VMS_NAME%",
-    "confirmMergeAction": "Merge",
+    "confirmMergeAction": "Birleştir",
     "mergeSystemTitle": "Sistemleri Birleştir",
     "confirmRenameTitle": "Sistem Adı",
     "confirmRenameAction": "Kaydet",

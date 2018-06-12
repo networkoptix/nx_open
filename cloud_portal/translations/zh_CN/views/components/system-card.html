@@ -7,7 +7,7 @@
             <button class="btn btn-default" ng-click="rename()">重命名系统</button>
         </p>
         <p>
-            <button class="btn btn-default" ng-if="canMerge || debugMode" ng-click="mergeSystems()">Merge with Another System</button>
+            <button class="btn btn-default" ng-if="canMerge || debugMode" ng-click="mergeSystems()">与其他系统合并</button>
         </p>
         <hr></hr>
         <button class="btn btn-default" ng-click="disconnect()">断开与 <span class="product-name">%PRODUCT_NAME%</span></button>
@@ -33,19 +33,21 @@
 <div class="panel panel-default" ng-if="currentlyMerging">
     <div class="panel-body" ng-if="isMaster && system.isMine">
         <div><strong>{{mergeTargetSystem.name}}</strong>
-            is being merged to this system</div>
+            正被合并到此系统中</div>
         <hr></hr>
-        <div class="merge-info-text">Depending of the size of the database it may take up to several hours</div>
+        <div class="merge-info-text">根据录影资料的大小，可能会花费数小时</div>
     </div>
     <div class="panel-body" ng-if="!isMaster || !system.isMine">
-        <div>This system is being merged to
+        <div>这个系统正被合并到
             <strong>{{mergeTargetSystem.name}}</strong></div>
         <hr></hr>
         <div class="merge-info-text">
-            <p>Depending of the size of the database it may take up to several hours.</p>
-            <p>Until merge is finished you can log in to this system and watch video, but cannot change any settings.</p>
-            <p>When merge is finished, all users and cameras from this system will become available
-                in <span class="merge-system-name">{{mergeTargetSystem.name}}</span>. System, and this system will be deleted.</p>
+            <p>根据录影资料的大小，可能会花费数小时</p>
+            <p>在合并完成前，您可以登录到此系统并观看视频，但无法更改任何配置
+</p>
+            <p>合併完成後, 此系統中的所有用戶和攝像機都將可用於
+                <span class="merge-system-name">{{mergeTargetSystem.name}}</span>
+ 系统和此系统将被删除</p>
         </div>
     </div>
 </div>

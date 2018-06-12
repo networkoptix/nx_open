@@ -6,7 +6,7 @@
     "emailSubject": "Parolanızı sıfırlayın"
   },
   "system_invite": {
-    "emailSubject": "{{#message.sharer_name}}{{message.sharer_name}} invites you to {{PRODUCT_NAME}}{{/message.sharer_name}}{{^message.sharer_name}}Video system {{message.system_name}} was shared with you{{/message.sharer_name}}"
+    "emailSubject": "{{#message.sharer_name}}{{message.sharer_name}} seni davet ediyor %PRODUCT_NAME%{{/message.sharer_name}}{{^message.sharer_name}}Video sistemi {{message.system_name}} seninle paylaşıldı{{/message.sharer_name}}"
   },
   "system_shared": {
     "emailSubject": "Video sistemi {{message.system_name}} sizinle paylaşılan yapıldı"
