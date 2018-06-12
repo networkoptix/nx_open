@@ -154,7 +154,9 @@ angular.module('cloudApp')
                 return dialogs
                     .rename(systemId, $scope.system.info.name)
                     .then(function (finalName) {
-                        $scope.system.info.name = finalName;
+                        if (finalName) {
+                            $scope.system.info.name = finalName;
+                        }
                     });
             };
 
