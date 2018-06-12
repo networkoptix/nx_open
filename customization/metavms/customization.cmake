@@ -4,11 +4,11 @@ set(enable_hanwha true)
 # Components Namings
 set(display.product.name "Nx MetaVMS")
 set(product.name "Nx MetaVMS")
-set(product.name.short "metavms") # why do we have so lot of different names?
+set(product.name.short "metavms")
 set(product.appName "nxmetavms")  # why not metavms here
 set(company.name "Network Optix")
 set(cloudName "Nx Meta Cloud")
-set(uri.protocol "nx-vms")  # are you sure we cannot have both Nx and Meta installed on the same pc?
+set(uri.protocol "nx-metavms")
 
 # Default settings
 set(backgroundImage
