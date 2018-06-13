@@ -606,7 +606,10 @@ ConditionWrapper isSafeMode();
 ConditionWrapper hasFlags(Qn::ResourceFlags flags, MatchMode matchMode);
 
 ConditionWrapper treeNodeType(QSet<ResourceTreeNodeType> types);
-inline ConditionWrapper treeNodeType(ResourceTreeNodeType type) { return treeNodeType({{type}}); }
+inline ConditionWrapper treeNodeType(ResourceTreeNodeType type)
+{
+    return treeNodeType(QSet<ResourceTreeNodeType>{type});
+}
 
 /** Visible in layout tour preview mode only. */
 ConditionWrapper isLayoutTourReviewMode();

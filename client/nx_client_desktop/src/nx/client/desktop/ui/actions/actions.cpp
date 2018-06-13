@@ -343,7 +343,7 @@ void initialize(Manager* manager, Action* root)
             .text(ContextMenu::tr("Showreel..."))
             .pulledText(ContextMenu::tr("New Showreel..."))
             .condition(condition::isLoggedIn()
-                && condition::treeNodeType({ResourceTreeNodeType::layoutTours})
+                && condition::treeNodeType(ResourceTreeNodeType::layoutTours)
                 && !condition::isSafeMode()
             )
             .autoRepeat(false);

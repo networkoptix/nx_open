@@ -1507,7 +1507,7 @@ ResourceStatusCondition::ResourceStatusCondition(const QSet<Qn::ResourceStatus> 
 }
 
 ResourceStatusCondition::ResourceStatusCondition(Qn::ResourceStatus status, bool allResources):
-    ResourceStatusCondition({{status}}, allResources)
+    ResourceStatusCondition(QSet<Qn::ResourceStatus>{status}, allResources)
 {
 }
 
