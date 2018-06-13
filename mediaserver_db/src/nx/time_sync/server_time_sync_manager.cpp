@@ -209,7 +209,7 @@ void ServerTimeSyncManager::updateTime()
             return;
         if (isTimeRecentlySync && m_timeLoadFromServer == route.id)
             return;
-        m_timeLoadFromServer == route.id;
+        m_timeLoadFromServer = route.id;
         m_lastNetworkSyncTime.restart();
 
         bool success = false;
