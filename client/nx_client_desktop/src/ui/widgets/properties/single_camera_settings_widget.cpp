@@ -536,7 +536,7 @@ void QnSingleCameraSettingsWidget::updateFromResource(bool silent)
         setTabEnabledSafe(Qn::AdvancedCameraSettingsTab, !m_lockedMode  && !isWearable);
         setTabEnabledSafe(Qn::RecordingSettingsTab, !dtsBased && (hasAudio || hasVideo) && !m_lockedMode  && !isWearable);
         setTabEnabledSafe(Qn::MotionSettingsTab, !dtsBased && hasVideo && !m_lockedMode  && !isWearable);
-        setTabEnabledSafe(Qn::ExpertCameraSettingsTab, !dtsBased && hasVideo && !isReadOnly() && !m_lockedMode  && !isWearable);
+        setTabEnabledSafe(Qn::ExpertCameraSettingsTab, !m_lockedMode);
         setTabEnabledSafe(Qn::IOPortsSettingsTab, isIoModule && !m_lockedMode  && !isWearable);
         setTabEnabledSafe(Qn::FisheyeCameraSettingsTab, !isIoModule && !m_lockedMode  && !isWearable);
         setTabEnabledSafe(Qn::AdvancedCameraSettingsTab, !isWearable && !m_lockedMode  && !isWearable);
@@ -554,11 +554,8 @@ void QnSingleCameraSettingsWidget::updateFromResource(bool silent)
 
             updateMotionCapabilities();
             updateMotionWidgetFromResource();
-
-            QnVirtualCameraResourceList cameras;
-            cameras.push_back(m_camera);
-            ui->expertSettingsWidget->updateFromResources(cameras);
         }
+        ui->expertSettingsWidget->updateFromResources({m_camera});
 
         m_cameraThumbnailManager->selectCamera(m_camera);
         m_cameraThumbnailManager->refreshSelectedCamera();
@@ -666,9 +663,7 @@ void QnSingleCameraSettingsWidget::setReadOnly(bool readOnly)
     setReadOnly(ui->advancedSettingsWidget, readOnly);
     setReadOnly(ui->ioPortSettingsWidget, readOnly);
     setReadOnly(ui->wearableMotionWidget, readOnly);
-
-    if (readOnly)
-        setTabEnabledSafe(Qn::ExpertCameraSettingsTab, false);
+    setReadOnly(ui->expertSettingsWidget, readOnly);
 
     // TODO: #vkutin #GDM Read-only for Fisheye tab
 
