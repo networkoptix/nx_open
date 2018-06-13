@@ -775,9 +775,6 @@ public:
             time);
     }
 
-    //!Returns list of peers whose local system time is known
-    virtual void forceTimeResync() = 0;
-
 protected:
     virtual int getCurrentTimeImpl(impl::CurrentTimeHandlerPtr handler) = 0;
     virtual int forcePrimaryTimeServerImpl(
