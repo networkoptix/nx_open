@@ -81,17 +81,17 @@ protected:
 
         Option(
             Settings* settings,
-            const QString& name,
-            const T& defaultValue,
-            const QString& description,
-            const Accessor& accessor = defaultAccessor)
+            QString name,
+            T defaultValue,
+            QString description,
+            Accessor accessor = defaultAccessor)
             :
             BaseOption(settings, name),
             m_settings(settings),
             m_value(defaultValue),
-            m_defaultValue(defaultValue),
-            m_description(description),
-            m_accessor(accessor)
+            m_defaultValue(std::move(defaultValue)),
+            m_description(std::move(description)),
+            m_accessor(std::move(accessor))
         {
         }
 
@@ -103,9 +103,9 @@ protected:
 
         T defaultValue() const { return m_defaultValue; }
 
-        void set(const T& value)
+        void set(T value)
         {
-            m_value = value;
+            m_value = std::move(value);
             isPresent = true;
             isRemoved = false;
         }

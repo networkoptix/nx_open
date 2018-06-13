@@ -8,13 +8,13 @@ namespace utils {
 void Settings::add(const QString& name, BaseOption* option)
 {
     NX_ASSERT(m_options.find(name) == m_options.end(), lit("Duplicate setting: %1.").arg(name));
-    m_options.insert(std::make_pair(name, option));
+    m_options.emplace(name, option);
 }
 
 bool Settings::load(const QSettings& settings)
 {
     QStringList keys = settings.allKeys();
-    for (auto& key: keys)
+    for (const auto& key: keys)
     {
         auto optionIt = m_options.find(key);
         if (optionIt == m_options.end())
