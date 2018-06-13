@@ -7,8 +7,8 @@ namespace vms {
 namespace api {
 
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(
-    (AccessRightsData), 
-    (ubjson)(xml)(json)(sql_record)(csv_record), 
+    (AccessRightsData),
+    (eq)(ubjson)(xml)(json)(sql_record)(csv_record),
     _Fields)
 
 } // namespace api

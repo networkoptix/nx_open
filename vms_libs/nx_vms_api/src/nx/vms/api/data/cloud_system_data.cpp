@@ -6,7 +6,10 @@ namespace nx {
 namespace vms {
 namespace api {
 
-QN_FUSION_ADAPT_STRUCT_FUNCTIONS(CloudSystemData, (json), CloudSystemData_Fields)
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(
+    (CloudSystemData),
+    (eq)(ubjson)(xml)(json)(sql_record)(csv_record),
+    _Fields)
 
 } // namespace api
 } // namespace vms

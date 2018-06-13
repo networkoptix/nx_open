@@ -8,7 +8,7 @@ namespace api {
 
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(
     (UpdateUploadData)(UpdateUploadResponseData)(UpdateInstallData),
-    (ubjson)(xml)(json)(sql_record)(csv_record),
+    (eq)(ubjson)(xml)(json)(sql_record)(csv_record),
     _Fields)
 
 } // namespace api
