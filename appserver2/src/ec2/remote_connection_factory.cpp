@@ -39,7 +39,6 @@ RemoteConnectionFactory::RemoteConnectionFactory(
     m_peerType(peerType)
 {
     m_bus.reset(new ThreadsafeMessageBusAdapter(
-        Qn::PeerType(),
         commonModule,
         m_jsonTranSerializer.get(),
         m_ubjsonTranSerializer.get()));

@@ -5,7 +5,6 @@
 namespace ec2 {
 
 TransactionMessageBusAdapter::TransactionMessageBusAdapter(
-    Qn::PeerType /*peerType*/,
     QnCommonModule* commonModule,
     QnJsonTransactionSerializer* jsonTranSerializer,
     QnUbjsonTransactionSerializer* ubjsonTranSerializer)
@@ -21,7 +20,7 @@ void TransactionMessageBusAdapter::reset()
     m_bus.reset();
 }
 
-void TransactionMessageBusAdapter::initInternal(Qn::PeerType peerType)
+void TransactionMessageBusAdapter::initInternal()
 {
     connect(m_bus.get(), &AbstractTransactionMessageBus::peerFound,
         this, &AbstractTransactionMessageBus::peerFound, Qt::DirectConnection);

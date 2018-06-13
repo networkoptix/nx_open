@@ -13,12 +13,6 @@ class ThreadsafeMessageBusAdapter: public TransactionMessageBusAdapter
 public:
     using TransactionMessageBusAdapter::TransactionMessageBusAdapter;
 
-    ThreadsafeMessageBusAdapter* init(Qn::PeerType peerType)
-    {
-        QnMutexLocker guard(&m_mutex);
-        return base_type::init<ThreadsafeMessageBusAdapter>(peerType);
-    }
-
     virtual void start() override;
     virtual void stop() override;
 
