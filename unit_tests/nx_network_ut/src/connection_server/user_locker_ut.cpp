@@ -16,11 +16,11 @@ class UserLocker:
 {
 public:
     UserLocker():
-        m_locker(m_settings),
-        m_timeShift(nx::utils::test::ClockType::steady),
         m_userKey(std::make_tuple(
             HostAddress::localhost,
-            nx::utils::generateRandomName(7)))
+            nx::utils::generateRandomName(7))),
+        m_locker(m_settings),
+        m_timeShift(nx::utils::test::ClockType::steady)
     {
     }
 
