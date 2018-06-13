@@ -8,7 +8,7 @@ set(product.name.short "metavms")
 set(product.appName "metavms")
 set(company.name "Network Optix")
 set(cloudName "Nx Meta Cloud")
-set(uri.protocol "meta-vms")
+set(uri.protocol "nx-metavms")
 
 # Default settings
 set(backgroundImage
