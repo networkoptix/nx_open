@@ -3,6 +3,8 @@ import json
 import logging
 from textwrap import dedent
 
+from pathlib2 import PurePath
+
 from ._cmd import receive_stdout_and_stderr_until_done
 
 _logger = logging.getLogger(__name__)
@@ -25,6 +27,8 @@ def format_script(body, variables):
     arguments = []
     for name, value in sorted(variables.items()):
         parameters.append('${name}'.format(name=name))
+        if isinstance(value, PurePath):
+            value = str(PurePath)
         arguments.append(
             "-{name}:(ConvertFrom-Json '{value}')".format(
                 name=name,
