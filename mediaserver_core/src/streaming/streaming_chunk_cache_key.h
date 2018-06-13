@@ -67,7 +67,9 @@ public:
     //media format (codec format, container format)
     const QString& containerFormat() const;
     const QString& videoCodec() const;
-    const QString& audioCodec() const;
+
+    AVCodecID audioCodecId() const;
+    void setAudioCodecId(AVCodecID);
 
     QString streamingSessionId() const;
 
@@ -92,7 +94,7 @@ private:
     bool m_isLive;
     QSize m_pictureSizePixels;
     QString m_videoCodec;
-    QString m_audioCodec;
+    AVCodecID m_audioCodecId = AV_CODEC_ID_NONE;
     std::multimap<QString, QString> m_auxiliaryParams;
 };
 
