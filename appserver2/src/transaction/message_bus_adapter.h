@@ -15,6 +15,7 @@ namespace ec2 {
 
     public:
         TransactionMessageBusAdapter(
+            Qn::PeerType peerType,
             QnCommonModule* commonModule,
             QnJsonTransactionSerializer* jsonTranSerializer,
             QnUbjsonTransactionSerializer* ubjsonTranSerializer
@@ -25,7 +26,7 @@ namespace ec2 {
 		{
 			reset();
 			m_bus.reset(new MessageBusType(
-				peerType,
+                peerType,
 				commonModule(),
 				m_jsonTranSerializer,
 				m_ubjsonTranSerializer));
@@ -103,7 +104,7 @@ namespace ec2 {
 	private:
 		void initInternal(Qn::PeerType peerType);
     private:
-        std::unique_ptr<TransactionMessageBusBase> m_bus;
+        std::unique_ptr<AbstractTransactionMessageBus> m_bus;
 
         QnJsonTransactionSerializer* m_jsonTranSerializer;
         QnUbjsonTransactionSerializer* m_ubjsonTranSerializer;

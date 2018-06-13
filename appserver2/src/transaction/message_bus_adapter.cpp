@@ -5,6 +5,7 @@
 namespace ec2 {
 
 TransactionMessageBusAdapter::TransactionMessageBusAdapter(
+    Qn::PeerType /*peerType*/,
     QnCommonModule* commonModule,
     QnJsonTransactionSerializer* jsonTranSerializer,
     QnUbjsonTransactionSerializer* ubjsonTranSerializer)

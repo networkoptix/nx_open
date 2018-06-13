@@ -69,9 +69,9 @@ private:
     QnMutex m_mutex;
     Settings m_settingsInstance;
     std::unique_ptr<ThreadsafeMessageBusAdapter> m_bus;
-    std::unique_ptr<nx::time_sync::TimeSyncManager> m_timeSynchronizationManager;
     std::unique_ptr<QnJsonTransactionSerializer> m_jsonTranSerializer;
     std::unique_ptr<QnUbjsonTransactionSerializer> m_ubjsonTranSerializer;
+    std::unique_ptr<nx::time_sync::TimeSyncManager> m_timeSynchronizationManager;
     bool m_terminated;
     int m_runningRequests;
     bool m_sslEnabled;

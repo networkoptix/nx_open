@@ -74,6 +74,7 @@ LocalConnectionFactory::LocalConnectionFactory(
 	}
 
 	m_bus.reset(new TransactionMessageBusAdapter(
+        Qn::PeerType(),
 		commonModule,
 		m_jsonTranSerializer.get(),
 		m_ubjsonTranSerializer.get()));

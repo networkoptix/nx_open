@@ -13,8 +13,8 @@ ReverseConnectionListener::ReverseConnectionListener(
     QSharedPointer<nx::network::AbstractStreamSocket> socket,
     QnHttpConnectionListener* owner)
 :
-    m_reverseConnectionManager(reverseConnectionManager),
-    QnTCPConnectionProcessor(socket, owner)
+    QnTCPConnectionProcessor(socket, owner),
+    m_reverseConnectionManager(reverseConnectionManager)
 {
     setObjectName(::toString(this));
 }
