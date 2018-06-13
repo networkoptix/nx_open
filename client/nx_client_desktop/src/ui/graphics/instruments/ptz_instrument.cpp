@@ -148,7 +148,10 @@ void PtzInstrument::MovementFilter::setMovementSpeed(const nx::core::ptz::Vector
 // -------------------------------------------------------------------------- //
 // PtzInstrument
 // -------------------------------------------------------------------------- //
-PtzInstrument::PtzInstrument(QObject *parent):
+PtzInstrument::PtzInstrument(
+    nx::core::ptz::Type ptzType,
+    QObject *parent)
+    :
     base_type(
         makeSet(QEvent::MouseButtonPress, AnimationEvent::Animation),
         makeSet(),
@@ -163,7 +166,8 @@ PtzInstrument::PtzInstrument(QObject *parent):
     QnWorkbenchContextAware(parent),
     m_clickDelayMSec(QApplication::doubleClickInterval()),
     m_expansionSpeed(qnGlobals->workbenchUnitSize() / 5.0),
-    m_movement(NoMovement)
+    m_movement(NoMovement),
+    m_ptzType(ptzType)
 {
 }
 
@@ -433,7 +437,7 @@ void PtzInstrument::updateCapabilities(QnMediaResourceWidget* widget)
 {
     PtzData& data = m_dataByWidget[widget];
 
-    Ptz::Capabilities capabilities = widget->ptzController()->getCapabilities();
+    Ptz::Capabilities capabilities = widget->ptzController()->getCapabilities({m_ptzType});
     if (data.capabilities == capabilities)
         return;
 
@@ -449,7 +453,7 @@ void PtzInstrument::updateTraits(QnMediaResourceWidget* widget)
     PtzData& data = m_dataByWidget[widget];
 
     QnPtzAuxilaryTraitList traits;
-    widget->ptzController()->getAuxilaryTraits(&traits);
+    widget->ptzController()->getAuxilaryTraits(&traits, {m_ptzType});
     if (data.traits == traits)
         return;
 
@@ -466,7 +470,7 @@ void PtzInstrument::ptzMoveTo(QnMediaResourceWidget* widget, const QRectF& rect)
 {
     qreal aspectRatio = QnGeometry::aspectRatio(widget->size());
     QRectF viewport = QnGeometry::cwiseDiv(rect, widget->size());
-    widget->ptzController()->viewportMove(aspectRatio, viewport, 1.0);
+    widget->ptzController()->viewportMove(aspectRatio, viewport, 1.0, {m_ptzType});
 }
 
 void PtzInstrument::ptzUnzoom(QnMediaResourceWidget* widget)
@@ -489,7 +493,7 @@ void PtzInstrument::ptzMove(QnMediaResourceWidget* widget, const nx::core::ptz::
 
     if (instant)
     {
-        widget->ptzController()->continuousMove(data.requestedSpeed);
+        widget->ptzController()->continuousMove(data.requestedSpeed, {m_ptzType});
         data.currentSpeed = data.requestedSpeed;
 
         m_movementTimer.stop();
@@ -503,12 +507,15 @@ void PtzInstrument::ptzMove(QnMediaResourceWidget* widget, const nx::core::ptz::
 
 void PtzInstrument::focusMove(QnMediaResourceWidget* widget, qreal speed)
 {
-    widget->ptzController()->continuousFocus(speed);
+    widget->ptzController()->continuousFocus(speed, {m_ptzType});
 }
 
 void PtzInstrument::focusAuto(QnMediaResourceWidget* widget)
 {
-    widget->ptzController()->runAuxilaryCommand(Ptz::ManualAutoFocusPtzTrait, QString());
+    widget->ptzController()->runAuxilaryCommand(
+        Ptz::ManualAutoFocusPtzTrait,
+        QString(),
+        {m_ptzType});
 }
 
 void PtzInstrument::processPtzClick(const QPointF& pos)
@@ -823,12 +830,15 @@ void PtzInstrument::dragMove(DragInfo* info)
             QPointF shift(delta.x() / scale, -delta.y() / scale);
 
             nx::core::ptz::Vector position;
-            target()->ptzController()->getPosition(Qn::LogicalPtzCoordinateSpace, &position);
+            target()->ptzController()->getPosition(
+                Qn::LogicalPtzCoordinateSpace,
+                &position,
+                {m_ptzType});
 
             qreal speed = 0.5 * position.zoom;
             nx::core::ptz::Vector positionDelta(shift.x() * speed, shift.y() * speed, 0.0, 0.0);
             target()->ptzController()->absoluteMove(Qn::LogicalPtzCoordinateSpace,
-                position + positionDelta, 2.0); /* 2.0 means instant movement. */
+                position + positionDelta, 2.0, {m_ptzType}); /* 2.0 means instant movement. */
 
             ensureElementsWidget();
             auto arrowItem = elementsWidget()->arrowItem();

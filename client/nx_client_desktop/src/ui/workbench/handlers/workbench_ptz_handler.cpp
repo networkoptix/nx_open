@@ -98,9 +98,12 @@ private:
 
 bool getDevicePosition(const QnPtzControllerPtr &controller, nx::core::ptz::Vector* outPosition)
 {
-    if (!controller->hasCapabilities(Ptz::AsynchronousPtzCapability))
+    if (!controller->hasCapabilities(Ptz::AsynchronousPtzCapability, nx::core::ptz::Options()))
     {
-        return controller->getPosition(Qn::DevicePtzCoordinateSpace, outPosition);
+        return controller->getPosition(
+            Qn::DevicePtzCoordinateSpace,
+            outPosition,
+            nx::core::ptz::Options());
     }
     else
     {
@@ -126,7 +129,11 @@ bool getDevicePosition(const QnPtzControllerPtr &controller, nx::core::ptz::Vect
             finishedHandler,
             Qt::QueuedConnection);
 
-        controller->getPosition(Qn::DevicePtzCoordinateSpace, outPosition);
+        controller->getPosition(
+            Qn::DevicePtzCoordinateSpace,
+            outPosition,
+            nx::core::ptz::Options());
+
         eventLoop.exec();
         QObject::disconnect(connection);
         return result;
@@ -174,8 +181,9 @@ void QnWorkbenchPtzHandler::at_ptzSavePresetAction_triggered()
         return;
     }
 
+    QScopedPointer<QnPtzPresetDialog> dialog(
+        new QnPtzPresetDialog(mainWindow()));
 
-    QScopedPointer<QnPtzPresetDialog> dialog(new QnPtzPresetDialog(mainWindow()));
     dialog->setController(widget->ptzController());
     QScopedPointer<QnSingleCameraPtzHotkeysDelegate> hotkeysDelegate(
         new QnSingleCameraPtzHotkeysDelegate(dialog.data(), resource, context()));
@@ -193,7 +201,8 @@ void QnWorkbenchPtzHandler::at_ptzActivatePresetAction_triggered()
         return;
     QnResourcePtr resource = widget->resource()->toResourcePtr();
 
-    if (!widget->ptzController()->hasCapabilities(Ptz::PresetsPtzCapability))
+    if (!widget->ptzController()->hasCapabilities(
+        Ptz::PresetsPtzCapability, nx::core::ptz::Options()))
     {
         // TODO: #GDM #PTZ show appropriate error message?
         return;
@@ -334,7 +343,11 @@ void QnWorkbenchPtzHandler::at_debugCalibratePtzAction_triggered()
     for (int i = 0; i <= 20; i++)
     {
         position.zoom = startZ + (endZ - startZ) * i / 20.0;
-        controller->absoluteMove(Qn::DevicePtzCoordinateSpace, position, 1.0);
+        controller->absoluteMove(
+            Qn::DevicePtzCoordinateSpace,
+            position,
+            1.0,
+            nx::core::ptz::Options());
 
         QEventLoop loop;
         QTimer::singleShot(10000, &loop, SLOT(quit()));
@@ -410,7 +423,7 @@ void QnWorkbenchPtzHandler::at_ptzContinuousMoveAction_triggered()
     speed = applyRotation(speed, rotation);
 
     nx::core::ptz::Vector speedVector(speed.x(), speed.y(), 0.0, speed.z());
-    controller->continuousMove(speedVector);
+    controller->continuousMove(speedVector, nx::core::ptz::Options());
 }
 
 void QnWorkbenchPtzHandler::at_ptzActivatePresetByIndexAction_triggered()

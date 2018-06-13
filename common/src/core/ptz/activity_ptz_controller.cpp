@@ -5,6 +5,7 @@
 #include <core/resource/resource.h>
 #include <core/resource_management/resource_properties.h>
 
+using namespace nx::core;
 
 QnActivityPtzController::QnActivityPtzController(
     QnCommonModule* commonModule,
@@ -45,15 +46,21 @@ bool QnActivityPtzController::extends(Ptz::Capabilities capabilities)
         && !capabilities.testFlag(Ptz::ActivityPtzCapability);
 }
 
-Ptz::Capabilities QnActivityPtzController::getCapabilities() const
+Ptz::Capabilities QnActivityPtzController::getCapabilities(
+    const nx::core::ptz::Options& options) const
 {
-    const Ptz::Capabilities capabilities = base_type::getCapabilities();
+    const Ptz::Capabilities capabilities = base_type::getCapabilities(options);
+    if (options.type != ptz::Type::operational)
+        return capabilities;
+
     return extends(capabilities) ? (capabilities | Ptz::ActivityPtzCapability) : capabilities;
 }
 
-bool QnActivityPtzController::continuousMove(const nx::core::ptz::Vector& speed)
+bool QnActivityPtzController::continuousMove(
+    const nx::core::ptz::Vector& speed,
+    const nx::core::ptz::Options& options)
 {
-    if (!base_type::continuousMove(speed))
+    if (!base_type::continuousMove(speed, options))
         return false;
 
     if (m_mode != Client)
@@ -64,9 +71,10 @@ bool QnActivityPtzController::continuousMove(const nx::core::ptz::Vector& speed)
 bool QnActivityPtzController::absoluteMove(
     Qn::PtzCoordinateSpace space,
     const nx::core::ptz::Vector& position,
-    qreal speed)
+    qreal speed,
+    const nx::core::ptz::Options& options)
 {
-    if (!base_type::absoluteMove(space, position, speed))
+    if (!base_type::absoluteMove(space, position, speed, options))
         return false;
 
     if (m_mode != Client)
@@ -77,9 +85,10 @@ bool QnActivityPtzController::absoluteMove(
 bool QnActivityPtzController::viewportMove(
     qreal aspectRatio,
     const QRectF& viewport,
-    qreal speed)
+    qreal speed,
+    const nx::core::ptz::Options& options)
 {
-    if (!base_type::viewportMove(aspectRatio, viewport, speed))
+    if (!base_type::viewportMove(aspectRatio, viewport, speed, options))
         return false;
 
     if (m_mode != Client)
@@ -107,7 +116,8 @@ bool QnActivityPtzController::activatePreset(const QString& presetId, qreal spee
     return true;
 }
 
-bool QnActivityPtzController::removeTour(const QString &tourId) {
+bool QnActivityPtzController::removeTour(const QString &tourId)
+{
     if (!base_type::removeTour(tourId))
         return false;
 
@@ -131,11 +141,14 @@ bool QnActivityPtzController::getActiveObject(QnPtzObject* activeObject) const
     return true;
 }
 
-bool QnActivityPtzController::getData(Qn::PtzDataFields query, QnPtzData* data) const
+bool QnActivityPtzController::getData(
+    Qn::PtzDataFields query,
+    QnPtzData* data,
+    const nx::core::ptz::Options& options) const
 {
     // TODO: #Elric #PTZ this is a hack. Need to do it better.
-    return baseController()->hasCapabilities(Ptz::AsynchronousPtzCapability)
-        ? baseController()->getData(query, data)
-        : base_type::getData(query, data);
+    return baseController()->hasCapabilities(Ptz::AsynchronousPtzCapability, options)
+        ? baseController()->getData(query, data, options)
+        : base_type::getData(query, data, options);
 }
 

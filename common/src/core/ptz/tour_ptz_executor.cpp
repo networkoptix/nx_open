@@ -25,12 +25,12 @@
 #   define TRACE(...)
 #endif
 
+using namespace nx::core;
 
 namespace {
     int pingTimeout = 333;
     int samePositionTimeout = 5000;
 }
-
 
 // -------------------------------------------------------------------------- //
 // Model Data
@@ -146,9 +146,10 @@ QnTourPtzExecutorPrivate::~QnTourPtzExecutorPrivate() {
 void QnTourPtzExecutorPrivate::init(const QnPtzControllerPtr &controller, QThreadPool* threadPool)
 {
     baseController = controller;
-    if(baseController->hasCapabilities(Ptz::AsynchronousPtzCapability)) {
+
+    if(baseController->hasCapabilities(Ptz::AsynchronousPtzCapability, ptz::Options())){
         /* Just use it as is. */
-    } else if(baseController->hasCapabilities(Ptz::VirtualPtzCapability)) {
+    } else if(baseController->hasCapabilities(Ptz::VirtualPtzCapability, ptz::Options())) {
         usingBlockingController = true;
     } else {
         baseController.reset(new QnThreadedPtzController(baseController, threadPool));
@@ -167,12 +168,22 @@ void QnTourPtzExecutorPrivate::init(const QnPtzControllerPtr &controller, QThrea
 
 void QnTourPtzExecutorPrivate::updateDefaults()
 {
-    defaultSpace = baseController->hasCapabilities(Ptz::LogicalPositioningPtzCapability) ? Qn::LogicalPtzCoordinateSpace : Qn::DevicePtzCoordinateSpace;
-    defaultDataField = defaultSpace == Qn::LogicalPtzCoordinateSpace ? Qn::LogicalPositionPtzField : Qn::DevicePositionPtzField;
-    defaultCommand = defaultSpace == Qn::LogicalPtzCoordinateSpace ? Qn::GetLogicalPositionPtzCommand : Qn::GetDevicePositionPtzCommand;
+    defaultSpace =
+        baseController->hasCapabilities(Ptz::LogicalPositioningPtzCapability, ptz::Options())
+            ? Qn::LogicalPtzCoordinateSpace
+            : Qn::DevicePtzCoordinateSpace;
 
-    canReadPosition = baseController->hasCapabilities(Ptz::DevicePositioningPtzCapability) ||
-                      baseController->hasCapabilities(Ptz::LogicalPositioningPtzCapability);
+    defaultDataField = defaultSpace == Qn::LogicalPtzCoordinateSpace
+        ? Qn::LogicalPositionPtzField
+        : Qn::DevicePositionPtzField;
+
+    defaultCommand = defaultSpace == Qn::LogicalPtzCoordinateSpace
+        ? Qn::GetLogicalPositionPtzCommand
+        : Qn::GetDevicePositionPtzCommand;
+
+    canReadPosition =
+        baseController->hasCapabilities(Ptz::DevicePositioningPtzCapability, ptz::Options())
+        || baseController->hasCapabilities(Ptz::LogicalPositioningPtzCapability, ptz::Options());
 }
 
 void QnTourPtzExecutorPrivate::stopTour() {
@@ -323,7 +334,7 @@ void QnTourPtzExecutorPrivate::requestPosition()
         return;
 
     nx::core::ptz::Vector position;
-    baseController->getPosition(defaultSpace, &position);
+    baseController->getPosition(defaultSpace, &position, ptz::Options());
 
     needPositionUpdate = false;
     waitingForNewPosition = true;
@@ -366,9 +377,20 @@ QnTourPtzExecutor::QnTourPtzExecutor(const QnPtzControllerPtr &controller, QThre
     d->q = this;
     d->init(controller, threadPool);
 
-    connect(this, &QnTourPtzExecutor::startTourRequested,       this,   &QnTourPtzExecutor::at_startTourRequested,  Qt::QueuedConnection);
-    connect(this, &QnTourPtzExecutor::stopTourRequested,        this,   &QnTourPtzExecutor::at_stopTourRequested,   Qt::QueuedConnection);
-    connect(this, &QnTourPtzExecutor::controllerFinishedLater,  this,   &QnTourPtzExecutor::at_controller_finished, Qt::QueuedConnection);
+    connect(
+        this, &QnTourPtzExecutor::startTourRequested,
+        this, &QnTourPtzExecutor::at_startTourRequested,
+        Qt::QueuedConnection);
+
+    connect(
+        this, &QnTourPtzExecutor::stopTourRequested,
+        this, &QnTourPtzExecutor::at_stopTourRequested,
+        Qt::QueuedConnection);
+
+    connect(
+        this, &QnTourPtzExecutor::controllerFinishedLater,
+        this, &QnTourPtzExecutor::at_controller_finished,
+        Qt::QueuedConnection);
 }
 
 QnTourPtzExecutor::~QnTourPtzExecutor() {

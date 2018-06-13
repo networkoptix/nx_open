@@ -16,14 +16,17 @@ public:
     QnNewDWPtzController(const QnDigitalWatchdogResourcePtr &resource);
     virtual ~QnNewDWPtzController();
 
-    virtual Ptz::Capabilities getCapabilities() const override;
-    virtual bool continuousMove(const nx::core::ptz::Vector& speedVector) override;
+    virtual Ptz::Capabilities getCapabilities(const nx::core::ptz::Options& options) const override;
+    virtual bool continuousMove(
+        const nx::core::ptz::Vector& speedVector,
+        const nx::core::ptz::Options& options) override;
 
     virtual bool getPresets(QnPtzPresetList *presets) const override;
     virtual bool activatePreset(const QString &presetId, qreal speed) override;
     virtual bool createPreset(const QnPtzPreset &preset) override;
     virtual bool updatePreset(const QnPtzPreset &preset) override;
     virtual bool removePreset(const QString &presetId) override;
+
 private:
     bool doQuery(const QString &request, QByteArray* body = 0) const;
     QString toInternalID(const QString& externalId);

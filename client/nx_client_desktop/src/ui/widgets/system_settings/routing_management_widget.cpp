@@ -322,13 +322,18 @@ void QnRoutingManagementWidget::applyChanges() {
     m_changes->changes.clear();
 }
 
-bool QnRoutingManagementWidget::hasChanges() const {
+bool QnRoutingManagementWidget::hasChanges() const
+{
     if (isReadOnly())
         return false;
 
-    return boost::algorithm::any_of(m_changes->changes, [](const RoutingChange &change) {
-        return !change.isEmpty();
-    });
+    for (const auto& change: m_changes->changes)
+    {
+        if (!change.isEmpty())
+            return true;
+    }
+
+    return false;
 }
 
 void QnRoutingManagementWidget::setReadOnlyInternal(bool readOnly) {

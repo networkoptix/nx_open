@@ -4,6 +4,8 @@
 #include "plugins/resource/digitalwatchdog/digital_watchdog_resource.h"
 #include "nx/utils/math/fuzzy.h"
 
+using namespace nx::core;
+
 static const int CACHE_UPDATE_TIMEOUT = 60 * 1000;
 
 QnNewDWPtzController::QnNewDWPtzController(const QnDigitalWatchdogResourcePtr &resource):
@@ -19,8 +21,11 @@ QnNewDWPtzController::~QnNewDWPtzController()
 
 }
 
-Ptz::Capabilities QnNewDWPtzController::getCapabilities() const
+Ptz::Capabilities QnNewDWPtzController::getCapabilities(const nx::core::ptz::Options& options) const
 {
+    if (options.type != ptz::Type::operational)
+        return Ptz::NoPtzCapabilities;
+
     return Ptz::ContinuousZoomCapability | Ptz::ContinuousPanCapability
         | Ptz::PresetsPtzCapability | Ptz::NativePresetsPtzCapability;
 }
@@ -50,8 +55,16 @@ static QString panDirection(qreal speed)
         return lit("right");
 }
 
-bool QnNewDWPtzController::continuousMove(const nx::core::ptz::Vector& speedVector)
+bool QnNewDWPtzController::continuousMove(
+    const nx::core::ptz::Vector& speedVector,
+    const nx::core::ptz::Options& options)
 {
+    if (options.type != ptz::Type::operational)
+    {
+        NX_ASSERT(false, lit("Wrong PTZ type. Only operational PTZ is supported"));
+        return false;
+    }
+
     QString request;
     if (!qFuzzyIsNull(speedVector.zoom))
     {

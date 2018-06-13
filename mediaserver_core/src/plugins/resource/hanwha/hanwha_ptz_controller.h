@@ -26,8 +26,8 @@ public:
     HanwhaPtzController(const HanwhaResourcePtr& resource);
     virtual ~HanwhaPtzController() override;
 
-    virtual Ptz::Capabilities getCapabilities() const override;
-    virtual Ptz::Capabilities alternativeCapabilities() const override;
+    virtual Ptz::Capabilities getCapabilities(
+        const nx::core::ptz::Options& options) const override;
 
     void setPtzCapabilities(Ptz::Capabilities capabilities);
     void setAlternativePtzCapabilities(Ptz::Capabilities capabilities);
@@ -35,21 +35,39 @@ public:
     void setPtzTraits(const QnPtzAuxilaryTraitList& traits);
     void setAlternativePtzRanges(const std::map<QString, HanwhaRange>& ranges);
 
-    virtual bool continuousMove(const nx::core::ptz::Vector& speedVector) override;
-    virtual bool continuousFocus(qreal speed) override;
+    virtual bool continuousMove(
+        const nx::core::ptz::Vector& speedVector,
+        const nx::core::ptz::Options& options) override;
+
+    virtual bool continuousFocus(
+        qreal speed,
+        const nx::core::ptz::Options& options) override;
+
     virtual bool absoluteMove(
         Qn::PtzCoordinateSpace space,
         const nx::core::ptz::Vector& position,
-        qreal speed) override;
+        qreal speed,
+        const nx::core::ptz::Options& options) override;
 
-    virtual bool viewportMove(qreal aspectRatio, const QRectF& viewport, qreal speed) override;
+    virtual bool viewportMove(
+        qreal aspectRatio,
+        const QRectF& viewport,
+        qreal speed,
+        const nx::core::ptz::Options& options) override;
 
     virtual bool getPosition(
         Qn::PtzCoordinateSpace space,
-        nx::core::ptz::Vector* outPosition) const override;
+        nx::core::ptz::Vector* outPosition,
+        const nx::core::ptz::Options& options) const override;
 
-    virtual bool getLimits(Qn::PtzCoordinateSpace space, QnPtzLimits* limits) const override;
-    virtual bool getFlip(Qt::Orientations* flip) const override;
+    virtual bool getLimits(
+        Qn::PtzCoordinateSpace space,
+        QnPtzLimits* limits,
+        const nx::core::ptz::Options& options) const override;
+
+    virtual bool getFlip(
+        Qt::Orientations* flip,
+        const nx::core::ptz::Options& options) const override;
 
     virtual bool createPreset(const QnPtzPreset& preset) override;
     virtual bool updatePreset(const QnPtzPreset& preset) override;
@@ -57,10 +75,14 @@ public:
     virtual bool activatePreset(const QString& presetId, qreal speed) override;
     virtual bool getPresets(QnPtzPresetList* presets) const override;
 
-    virtual bool getAuxilaryTraits(QnPtzAuxilaryTraitList* auxilaryTraits) const override;
+    virtual bool getAuxilaryTraits(
+        QnPtzAuxilaryTraitList* auxilaryTraits,
+        const nx::core::ptz::Options& options) const override;
+
     virtual bool runAuxilaryCommand(
         const QnPtzAuxilaryTrait& trait,
-        const QString& data) override;
+        const QString& data,
+        const nx::core::ptz::Options& options) override;
 
 private:
     QString channel() const;

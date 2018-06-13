@@ -106,6 +106,8 @@ TEST(PtzMapper, deserialization)
     for (const auto& testCase: deviceToLogicalCases)
     {
         const auto result = mapper->deviceToLogical(testCase.input);
+
+        // Data is not very precise, so ASSERT_DOUBLE_EQ is not the option.
         ASSERT_LT((result - testCase.output).length(), 0.001);
     }
 

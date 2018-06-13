@@ -12,6 +12,8 @@
 #include "drag_processing_instrument.h"
 #include "core/ptz/abstract_ptz_controller.h"
 
+#include <nx/core/ptz/type.h>
+
 class FixedArSelectionItem;
 class PtzOverlayWidget;
 class PtzElementsWidget;
@@ -27,7 +29,7 @@ class PtzInstrument: public DragProcessingInstrument, public QnWorkbenchContextA
     using base_type = DragProcessingInstrument;
 
 public:
-    PtzInstrument(QObject* parent = nullptr);
+    PtzInstrument(nx::core::ptz::Type ptzType, QObject* parent = nullptr);
     virtual ~PtzInstrument();
 
 signals:
@@ -186,4 +188,5 @@ private:
     QScopedPointer<MovementFilter> m_movementFilter;
 
     QList<SplashItemAnimation> m_freeAnimations, m_activeAnimations;
+    nx::core::ptz::Type m_ptzType;
 };

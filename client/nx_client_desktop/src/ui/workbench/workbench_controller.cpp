@@ -191,7 +191,7 @@ QnWorkbenchController::QnWorkbenchController(QObject *parent):
 
     SignalingInstrument *sceneKeySignalingInstrument = new SignalingInstrument(Instrument::Scene, Instrument::makeSet(QEvent::KeyPress), this);
     SignalingInstrument *sceneFocusSignalingInstrument = new SignalingInstrument(Instrument::Scene, Instrument::makeSet(QEvent::FocusIn), this);
-    PtzInstrument *ptzInstrument = new PtzInstrument(this);
+    PtzInstrument *ptzInstrument = new PtzInstrument(nx::core::ptz::Type::operational, this);
     m_zoomWindowInstrument = new ZoomWindowInstrument(this);
 
 

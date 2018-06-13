@@ -17,8 +17,10 @@ public:
     QnDlinkPtzController(const QnPlOnvifResourcePtr &resource);
     virtual ~QnDlinkPtzController();
 
-    virtual Ptz::Capabilities getCapabilities() const override;
-    virtual bool continuousMove(const nx::core::ptz::Vector& speedVector) override;
+    virtual Ptz::Capabilities getCapabilities(const nx::core::ptz::Options& options) const override;
+    virtual bool continuousMove(
+        const nx::core::ptz::Vector& speedVector,
+        const nx::core::ptz::Options& options) override;
 
 private:
     friend class QnDlinkPtzRepeatCommand;

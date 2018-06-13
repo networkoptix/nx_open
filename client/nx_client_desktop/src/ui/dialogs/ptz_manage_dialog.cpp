@@ -41,6 +41,7 @@
 
 using namespace nx::client::desktop;
 using namespace nx::client::desktop::ui;
+using namespace nx::core;
 
 class QnPtzToursDialogItemDelegate: public QStyledItemDelegate
 {
@@ -407,7 +408,7 @@ void QnPtzManageDialog::saveData()
         {
             // #TODO: #dklychkov evil hack to reset active object.
             // We should implement an adequate way to do this
-            controller()->continuousMove(nx::core::ptz::Vector());
+            controller()->continuousMove(nx::core::ptz::Vector(), ptz::Options());
         }
     }
 }

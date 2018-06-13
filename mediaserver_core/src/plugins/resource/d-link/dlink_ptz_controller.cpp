@@ -5,6 +5,7 @@
 #include "plugins/resource/onvif/onvif_resource.h"
 #include "nx/utils/thread/long_runnable.h"
 
+using namespace nx::core;
 //static const int CACHE_UPDATE_TIMEOUT = 60 * 1000;
 
 class QnDlinkPtzRepeatCommand : public QnLongRunnable
@@ -47,9 +48,12 @@ QnDlinkPtzController::~QnDlinkPtzController()
 
 }
 
-Ptz::Capabilities QnDlinkPtzController::getCapabilities() const
+Ptz::Capabilities QnDlinkPtzController::getCapabilities(const nx::core::ptz::Options& options) const
 {
-    return Ptz::ContinuousZoomCapability | Ptz::ContinuousPanCapability | Ptz::ContinuousTiltCapability;
+    if (options.type != ptz::Type::operational)
+        return Ptz::NoPtzCapabilities;
+
+    return Ptz::ContinuousPtzCapabilities;
 }
 
 static QString zoomDirection(qreal speed)
@@ -68,8 +72,16 @@ static QString moveDirection(qreal x, qreal y)
         return y > 0 ? lit("up") : lit("down");
 }
 
-bool QnDlinkPtzController::continuousMove(const nx::core::ptz::Vector& speedVector)
+bool QnDlinkPtzController::continuousMove(
+    const nx::core::ptz::Vector& speedVector,
+    const nx::core::ptz::Options& options)
 {
+    if (options.type != ptz::Type::operational)
+    {
+        NX_ASSERT(false, lit("Wrong PTZ type. Only operational PTZ is supported"));
+        return false;
+    }
+
     QString request;
     if (!qFuzzyIsNull(speedVector.zoom))
     {

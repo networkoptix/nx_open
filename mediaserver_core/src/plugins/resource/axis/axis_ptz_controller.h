@@ -20,26 +20,38 @@ public:
     QnAxisPtzController(const QnPlAxisResourcePtr &resource);
     virtual ~QnAxisPtzController();
 
-    virtual Ptz::Capabilities getCapabilities() const override;
+    virtual Ptz::Capabilities getCapabilities(const nx::core::ptz::Options& options) const override;
 
-    virtual bool continuousMove(const nx::core::ptz::Vector& speedVector) override;
+    virtual bool continuousMove(
+        const nx::core::ptz::Vector& speedVector,
+        const nx::core::ptz::Options& options) override;
+
     virtual bool absoluteMove(
         Qn::PtzCoordinateSpace space,
         const nx::core::ptz::Vector& position,
-        qreal speed) override;
+        qreal speed,
+        const nx::core::ptz::Options& options) override;
 
     virtual bool getPosition(
         Qn::PtzCoordinateSpace space,
-        nx::core::ptz::Vector* position) const override;
+        nx::core::ptz::Vector* position,
+        const nx::core::ptz::Options& options) const override;
 
-    virtual bool getLimits(Qn::PtzCoordinateSpace space, QnPtzLimits *limits) const override;
-    virtual bool getFlip(Qt::Orientations *flip) const override;
+    virtual bool getLimits(
+        Qn::PtzCoordinateSpace space,
+        QnPtzLimits *limits,
+        const nx::core::ptz::Options& options) const override;
+
+    virtual bool getFlip(
+        Qt::Orientations *flip,
+        const nx::core::ptz::Options& options) const override;
 
     virtual bool getPresets(QnPtzPresetList *presets) const override;
     virtual bool activatePreset(const QString &presetId, qreal speed) override;
     virtual bool createPreset(const QnPtzPreset &preset) override;
     virtual bool updatePreset(const QnPtzPreset &preset) override;
     virtual bool removePreset(const QString &presetId) override;
+
 private:
     void updateState();
     void updateState(const QnAxisParameterMap &params);

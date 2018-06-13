@@ -41,18 +41,21 @@ QnWorkaroundPtzController::QnWorkaroundPtzController(const QnPtzControllerPtr &b
         m_overrideCapabilities = true;
 }
 
-Ptz::Capabilities QnWorkaroundPtzController::getCapabilities() const
+Ptz::Capabilities QnWorkaroundPtzController::getCapabilities(
+    const nx::core::ptz::Options& options) const
 {
     if (m_overrideCapabilities)
         return m_capabilities;
 
-    return (base_type::getCapabilities() | m_capabilitiesToAdd) & ~m_capabilitiesToRemove;
+    return (base_type::getCapabilities(options) | m_capabilitiesToAdd) & ~m_capabilitiesToRemove;
 }
 
-bool QnWorkaroundPtzController::continuousMove(const nx::core::ptz::Vector& speed)
+bool QnWorkaroundPtzController::continuousMove(
+    const nx::core::ptz::Vector& speed,
+    const nx::core::ptz::Options& options)
 {
     if(!m_overrideContinuousMove)
-        return base_type::continuousMove(speed);
+        return base_type::continuousMove(speed, options);
 
     auto localSpeed = speed;
     if(m_flip & Qt::Horizontal)
@@ -81,7 +84,7 @@ bool QnWorkaroundPtzController::continuousMove(const nx::core::ptz::Vector& spee
             localSpeed.zoom);
     }
 
-    return base_type::continuousMove(localSpeed);
+    return base_type::continuousMove(localSpeed, options);
 }
 
 bool QnWorkaroundPtzController::extends(Ptz::Capabilities) {

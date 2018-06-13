@@ -24,14 +24,21 @@ public:
 
     static bool extends(Ptz::Capabilities capabilities);
 
-    virtual Ptz::Capabilities getCapabilities() const override;
+    virtual Ptz::Capabilities getCapabilities(const nx::core::ptz::Options& options) const override;
 
-    virtual bool continuousMove(const nx::core::ptz::Vector& speed) override;
+    virtual bool continuousMove(
+        const nx::core::ptz::Vector& speed,
+        const nx::core::ptz::Options& options) override;
     virtual bool absoluteMove(
         Qn::PtzCoordinateSpace space
         , const nx::core::ptz::Vector& position,
-        qreal speed) override;
-    virtual bool viewportMove(qreal aspectRatio, const QRectF& viewport, qreal speed) override;
+        qreal speed,
+        const nx::core::ptz::Options& options) override;
+    virtual bool viewportMove(
+        qreal aspectRatio,
+        const QRectF& viewport,
+        qreal speed,
+        const nx::core::ptz::Options& options) override;
 
     virtual bool removePreset(const QString& presetId) override;
     virtual bool activatePreset(const QString& presetId, qreal speed) override;
@@ -41,7 +48,9 @@ public:
 
     virtual bool getActiveObject(QnPtzObject* activeObject) const override;
 
-    virtual bool getData(Qn::PtzDataFields query, QnPtzData* data) const override;
+    virtual bool getData(
+        Qn::PtzDataFields query, QnPtzData* data,
+        const nx::core::ptz::Options& options) const override;
 
 private:
     const Mode m_mode;

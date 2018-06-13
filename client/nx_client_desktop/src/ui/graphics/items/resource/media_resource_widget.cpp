@@ -343,11 +343,17 @@ QnMediaResourceWidget::QnMediaResourceWidget(QnWorkbenchContext* context, QnWork
         {
             if (businessAction->actionType() != vms::event::executePtzPresetAction)
                 return;
+
             const auto &actionParams = businessAction->getParams();
             if (actionParams.actionResourceId != d->resource->getId())
                 return;
+
             if (m_ptzController)
-                m_ptzController->activatePreset(actionParams.presetId, QnAbstractPtzController::MaxPtzSpeed);
+            {
+                m_ptzController->activatePreset(
+                    actionParams.presetId,
+                    QnAbstractPtzController::MaxPtzSpeed);
+            }
         });
 
     connect(context, &QnWorkbenchContext::userChanged,
@@ -2348,7 +2354,7 @@ void QnMediaResourceWidget::at_fishEyeButton_toggled(bool checked)
     else
     {
         /* Stop all ptz activity. */
-        ptzController()->continuousMove(nx::core::ptz::Vector());
+        ptzController()->continuousMove(nx::core::ptz::Vector(), nx::core::ptz::Options());
         suspendHomePtzController();
     }
 
@@ -2385,8 +2391,13 @@ void QnMediaResourceWidget::at_zoomRectChanged()
 
     // TODO: #PTZ probably belongs to instrument.
     if (options() & DisplayDewarped)
-        m_ptzController->absoluteMove(Qn::LogicalPtzCoordinateSpace,
-            QnFisheyePtzController::positionFromRect(m_dewarpingParams, zoomRect()), 2.0);
+    {
+        m_ptzController->absoluteMove(
+            Qn::LogicalPtzCoordinateSpace,
+            QnFisheyePtzController::positionFromRect(m_dewarpingParams, zoomRect()),
+            2.0,
+            nx::core::ptz::Options());
+    }
 }
 
 void QnMediaResourceWidget::at_ptzController_changed(Qn::PtzDataFields fields)

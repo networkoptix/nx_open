@@ -15,6 +15,7 @@
 
 #include <ui/workbench/workbench_item.h>
 
+using namespace nx::core;
 
 QnFisheyePtzController::QnFisheyePtzController(QnMediaResourceWidget* widget):
     base_type(widget->resource()->toResourcePtr()),
@@ -256,13 +257,26 @@ void QnFisheyePtzController::tick(int deltaMSecs)
     }
 }
 
-Ptz::Capabilities QnFisheyePtzController::getCapabilities() const
+Ptz::Capabilities QnFisheyePtzController::getCapabilities(
+    const nx::core::ptz::Options& options) const
 {
+    if (options.type != ptz::Type::operational)
+        return Ptz::NoPtzCapabilities;
+
     return m_capabilities;
 }
 
-bool QnFisheyePtzController::getLimits(Qn::PtzCoordinateSpace space, QnPtzLimits* limits) const
+bool QnFisheyePtzController::getLimits(
+    Qn::PtzCoordinateSpace space,
+    QnPtzLimits* limits,
+    const nx::core::ptz::Options& options) const
 {
+    if (options.type != ptz::Type::operational)
+    {
+        NX_ASSERT(false, lit("Wrong PTZ type. Only operational PTZ is supported"));
+        return false;
+    }
+
     if (space != Qn::LogicalPtzCoordinateSpace)
         return false;
 
@@ -271,14 +285,30 @@ bool QnFisheyePtzController::getLimits(Qn::PtzCoordinateSpace space, QnPtzLimits
     return true;
 }
 
-bool QnFisheyePtzController::getFlip(Qt::Orientations* flip) const
+bool QnFisheyePtzController::getFlip(
+    Qt::Orientations* flip,
+    const nx::core::ptz::Options& options) const
 {
+    if (options.type != ptz::Type::operational)
+    {
+        NX_ASSERT(false, lit("Wrong PTZ type. Only operational PTZ is supported"));
+        return false;
+    }
+
     *flip = 0;
     return true;
 }
 
-bool QnFisheyePtzController::continuousMove(const nx::core::ptz::Vector& speed)
+bool QnFisheyePtzController::continuousMove(
+    const nx::core::ptz::Vector& speed,
+    const nx::core::ptz::Options& options)
 {
+    if (options.type != ptz::Type::operational)
+    {
+        NX_ASSERT(false, lit("Wrong PTZ type. Only operational PTZ is supported"));
+        return false;
+    }
+
     m_speed = speed;
     m_speed.zoom = -m_speed.zoom; /* Positive speed means that fov should decrease. */
 
@@ -298,8 +328,15 @@ bool QnFisheyePtzController::continuousMove(const nx::core::ptz::Vector& speed)
 bool QnFisheyePtzController::absoluteMove(
     Qn::PtzCoordinateSpace space,
     const nx::core::ptz::Vector& position,
-    qreal speed)
+    qreal speed,
+    const nx::core::ptz::Options& options)
 {
+    if (options.type != ptz::Type::operational)
+    {
+        NX_ASSERT(false, lit("Wrong PTZ type. Only operational PTZ is supported"));
+        return false;
+    }
+
     if (space != Qn::LogicalPtzCoordinateSpace)
         return false;
 
@@ -347,8 +384,15 @@ bool QnFisheyePtzController::absoluteMove(
 
 bool QnFisheyePtzController::getPosition(
     Qn::PtzCoordinateSpace space,
-    nx::core::ptz::Vector* outPosition) const
+    nx::core::ptz::Vector* outPosition,
+    const nx::core::ptz::Options& options) const
 {
+    if (options.type != ptz::Type::operational)
+    {
+        NX_ASSERT(false, lit("Wrong PTZ type. Only operational PTZ is supported"));
+        return false;
+    }
+
     if (space != Qn::LogicalPtzCoordinateSpace)
         return false;
 

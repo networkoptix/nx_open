@@ -17,6 +17,8 @@
 #include "soap_wrapper.h"
 #include <nx/utils/log/log_main.h>
 
+using namespace nx::core;
+
 namespace {
 
 static const Namespace kOverridenNamespaces[] = {
@@ -289,8 +291,11 @@ double QnOnvifPtzController::normalizeSpeed(qreal speed, const SpeedLimits &spee
     return qBound(speedLimits.min, speed, speedLimits.max);
 }
 
-Ptz::Capabilities QnOnvifPtzController::getCapabilities() const
+Ptz::Capabilities QnOnvifPtzController::getCapabilities(const nx::core::ptz::Options& options) const
 {
+    if (options.type != ptz::Type::operational)
+        return Ptz::NoPtzCapabilities;
+
     return m_capabilities;
 }
 
@@ -365,8 +370,16 @@ bool QnOnvifPtzController::moveInternal(const nx::core::ptz::Vector& speedVector
     return true;
 }
 
-bool QnOnvifPtzController::continuousMove(const nx::core::ptz::Vector& speed)
+bool QnOnvifPtzController::continuousMove(
+    const nx::core::ptz::Vector& speed,
+    const nx::core::ptz::Options& options)
 {
+    if (options.type != ptz::Type::operational)
+    {
+        NX_ASSERT(false, lit("Wrong PTZ type. Only operational PTZ is supported"));
+        return false;
+    }
+
     if(qFuzzyIsNull(speed) && !m_stopBroken) {
         return stopInternal();
     } else {
@@ -374,7 +387,16 @@ bool QnOnvifPtzController::continuousMove(const nx::core::ptz::Vector& speed)
     }
 }
 
-bool QnOnvifPtzController::continuousFocus(qreal speed) {
+bool QnOnvifPtzController::continuousFocus(
+    qreal speed,
+    const nx::core::ptz::Options& options)
+{
+    if (options.type != ptz::Type::operational)
+    {
+        NX_ASSERT(false, lit("Wrong PTZ type. Only operational PTZ is supported"));
+        return false;
+    }
+
     QString imagingUrl = m_resource->getImagingUrl();
     if(imagingUrl.isEmpty())
         return false;
@@ -406,8 +428,15 @@ bool QnOnvifPtzController::continuousFocus(qreal speed) {
 bool QnOnvifPtzController::absoluteMove(
     Qn::PtzCoordinateSpace space,
     const nx::core::ptz::Vector& position,
-    qreal speed)
+    qreal speed,
+    const nx::core::ptz::Options& options)
 {
+    if (options.type != ptz::Type::operational)
+    {
+        NX_ASSERT(false, lit("Wrong PTZ type. Only operational PTZ is supported"));
+        return false;
+    }
+
     if(space != Qn::DevicePtzCoordinateSpace)
         return false;
 
@@ -487,8 +516,15 @@ bool QnOnvifPtzController::absoluteMove(
 
 bool QnOnvifPtzController::getPosition(
     Qn::PtzCoordinateSpace space,
-    nx::core::ptz::Vector* outPosition) const
+    nx::core::ptz::Vector* outPosition,
+    const nx::core::ptz::Options& options) const
 {
+    if (options.type != ptz::Type::operational)
+    {
+        NX_ASSERT(false, lit("Wrong PTZ type. Only operational PTZ is supported"));
+        return false;
+    }
+
     if(space != Qn::DevicePtzCoordinateSpace)
         return false;
 
@@ -525,8 +561,17 @@ bool QnOnvifPtzController::getPosition(
     return true;
 }
 
-bool QnOnvifPtzController::getLimits(Qn::PtzCoordinateSpace space, QnPtzLimits *limits) const
+bool QnOnvifPtzController::getLimits(
+    Qn::PtzCoordinateSpace space,
+    QnPtzLimits *limits,
+    const nx::core::ptz::Options& options) const
 {
+    if (options.type != ptz::Type::operational)
+    {
+        NX_ASSERT(false, lit("Wrong PTZ type. Only operational PTZ is supported"));
+        return false;
+    }
+
     if(space != Qn::DevicePtzCoordinateSpace)
         return false;
 
@@ -534,8 +579,16 @@ bool QnOnvifPtzController::getLimits(Qn::PtzCoordinateSpace space, QnPtzLimits *
     return true;
 }
 
-bool QnOnvifPtzController::getFlip(Qt::Orientations *flip) const
+bool QnOnvifPtzController::getFlip(
+    Qt::Orientations *flip,
+    const nx::core::ptz::Options& options) const
 {
+    if (options.type != ptz::Type::operational)
+    {
+        NX_ASSERT(false, lit("Wrong PTZ type. Only operational PTZ is supported"));
+        return false;
+    }
+
     *flip = 0; // TODO: #PTZ #Elric
     return true;
 }
@@ -556,7 +609,8 @@ QString QnOnvifPtzController::presetName(const QString &presetId) {
     return m_presetNameByToken.value(internalId);
 }
 
-bool QnOnvifPtzController::removePreset(const QString &presetId) {
+bool QnOnvifPtzController::removePreset(const QString &presetId)
+{
     QnMutexLocker lk( &m_mutex );
 
     QString ptzUrl = m_resource->getPtzUrl();
@@ -592,7 +646,8 @@ bool QnOnvifPtzController::getPresets(QnPtzPresetList *presets) const
     return true;
 }
 
-bool QnOnvifPtzController::activatePreset(const QString &presetId, qreal speed) {
+bool QnOnvifPtzController::activatePreset(const QString &presetId, qreal speed)
+{
     QnMutexLocker lk( &m_mutex );
 
     QString ptzUrl = m_resource->getPtzUrl();
@@ -644,11 +699,13 @@ bool QnOnvifPtzController::activatePreset(const QString &presetId, qreal speed) 
     return true;
 }
 
-bool QnOnvifPtzController::updatePreset(const QnPtzPreset &preset) {
+bool QnOnvifPtzController::updatePreset(const QnPtzPreset &preset)
+{
     return createPreset(preset); // TODO: #Elric #PTZ wrong, update does not create new preset, and does not change saved position
 }
 
-bool QnOnvifPtzController::createPreset(const QnPtzPreset &preset) {
+bool QnOnvifPtzController::createPreset(const QnPtzPreset &preset)
+{
     QnMutexLocker lk( &m_mutex );
 
     if (!readBuiltinPresets())

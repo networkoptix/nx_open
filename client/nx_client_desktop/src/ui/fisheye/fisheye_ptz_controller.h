@@ -25,20 +25,31 @@ public:
     QnFisheyePtzController(const QnMediaResourcePtr& mediaRes);
     virtual ~QnFisheyePtzController();
 
-    virtual Ptz::Capabilities getCapabilities() const override;
+    virtual Ptz::Capabilities getCapabilities(const nx::core::ptz::Options& options) const override;
 
-    virtual bool continuousMove(const nx::core::ptz::Vector& speedVector) override;
+    virtual bool continuousMove(
+        const nx::core::ptz::Vector& speedVector,
+        const nx::core::ptz::Options& options) override;
+
     virtual bool absoluteMove(
         Qn::PtzCoordinateSpace space,
         const nx::core::ptz::Vector& position,
-        qreal speed) override;
+        qreal speed,
+        const nx::core::ptz::Options& options) override;
 
     virtual bool getPosition(
         Qn::PtzCoordinateSpace space,
-        nx::core::ptz::Vector* outPosition) const override;
+        nx::core::ptz::Vector* outPosition,
+        const nx::core::ptz::Options& options) const override;
 
-    virtual bool getLimits(Qn::PtzCoordinateSpace space, QnPtzLimits* limits) const override;
-    virtual bool getFlip(Qt::Orientations* flip) const override;
+    virtual bool getLimits(
+        Qn::PtzCoordinateSpace space,
+        QnPtzLimits* limits,
+        const nx::core::ptz::Options& options) const override;
+
+    virtual bool getFlip(
+        Qt::Orientations* flip,
+        const nx::core::ptz::Options& options) const override;
 
     QnMediaDewarpingParams mediaDewarpingParams() const;
     QnItemDewarpingParams itemDewarpingParams() const;

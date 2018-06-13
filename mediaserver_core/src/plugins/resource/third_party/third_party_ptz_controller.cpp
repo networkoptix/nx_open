@@ -7,6 +7,8 @@
 
 #ifdef ENABLE_THIRD_PARTY
 
+using namespace nx::core;
+
 QnThirdPartyPtzController::QnThirdPartyPtzController(
     const QnThirdPartyResourcePtr& resource,
     nxcip::CameraPtzManager* cameraPtzManager )
@@ -46,13 +48,25 @@ QnThirdPartyPtzController::~QnThirdPartyPtzController()
     m_cameraPtzManager = nullptr;
 }
 
-Ptz::Capabilities QnThirdPartyPtzController::getCapabilities() const
+Ptz::Capabilities QnThirdPartyPtzController::getCapabilities(
+    const nx::core::ptz::Options& options) const
 {
+    if (options.type != ptz::Type::operational)
+        return Ptz::NoPtzCapabilities;
+
     return m_capabilities;
 }
 
-bool QnThirdPartyPtzController::continuousMove(const nx::core::ptz::Vector& speedVector)
+bool QnThirdPartyPtzController::continuousMove(
+    const nx::core::ptz::Vector& speedVector,
+    const nx::core::ptz::Options& options)
 {
+    if (options.type != ptz::Type::operational)
+    {
+        NX_ASSERT(false, lit("Wrong PTZ type. Only operational PTZ is supported"));
+        return false;
+    }
+
     return m_cameraPtzManager->continuousMove(
         speedVector.pan,
         speedVector.tilt,
@@ -62,8 +76,15 @@ bool QnThirdPartyPtzController::continuousMove(const nx::core::ptz::Vector& spee
 bool QnThirdPartyPtzController::absoluteMove(
     Qn::PtzCoordinateSpace space,
     const nx::core::ptz::Vector& position,
-    qreal speed)
+    qreal speed,
+    const nx::core::ptz::Options& options)
 {
+    if (options.type != ptz::Type::operational)
+    {
+        NX_ASSERT(false, lit("Wrong PTZ type. Only operational PTZ is supported"));
+        return false;
+    }
+
     return m_cameraPtzManager->absoluteMove(
         space == Qn::DevicePtzCoordinateSpace
             ? nxcip::CameraPtzManager::DevicePtzCoordinateSpace
@@ -76,8 +97,15 @@ bool QnThirdPartyPtzController::absoluteMove(
 
 bool QnThirdPartyPtzController::getPosition(
     Qn::PtzCoordinateSpace space,
-    nx::core::ptz::Vector* outPosition) const
+    nx::core::ptz::Vector* outPosition,
+    const nx::core::ptz::Options& options) const
 {
+    if (options.type != ptz::Type::operational)
+    {
+        NX_ASSERT(false, lit("Wrong PTZ type. Only operational PTZ is supported"));
+        return false;
+    }
+
     return m_cameraPtzManager->getPosition(
         space == Qn::DevicePtzCoordinateSpace
             ? nxcip::CameraPtzManager::DevicePtzCoordinateSpace
@@ -87,13 +115,18 @@ bool QnThirdPartyPtzController::getPosition(
         &outPosition->zoom) == nxcip::NX_NO_ERROR;
 }
 
-bool QnThirdPartyPtzController::getLimits(Qn::PtzCoordinateSpace /*space*/, QnPtzLimits* /*limits*/) const
+bool QnThirdPartyPtzController::getLimits(
+    Qn::PtzCoordinateSpace /*space*/,
+    QnPtzLimits* /*limits*/,
+    const nx::core::ptz::Options& /*options*/) const
 {
     //TODO/IMPL
     return false;
 }
 
-bool QnThirdPartyPtzController::getFlip(Qt::Orientations* /*flip*/) const
+bool QnThirdPartyPtzController::getFlip(
+    Qt::Orientations* /*flip*/,
+    const nx::core::ptz::Options& /*options*/) const
 {
     //TODO/IMPL
     return false;

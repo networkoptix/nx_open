@@ -35,22 +35,27 @@ bool QnViewportPtzController::extends(Ptz::Capabilities capabilities) {
         && !capabilities.testFlag(Ptz::ViewportPtzCapability);
 }
 
-Ptz::Capabilities QnViewportPtzController::getCapabilities() const
+Ptz::Capabilities QnViewportPtzController::getCapabilities(
+    const nx::core::ptz::Options& options) const
 {
-    Ptz::Capabilities capabilities = base_type::getCapabilities();
+    Ptz::Capabilities capabilities = base_type::getCapabilities(options);
     return extends(capabilities) ? (capabilities | Ptz::ViewportPtzCapability) : capabilities;
 }
 
-bool QnViewportPtzController::viewportMove(qreal aspectRatio, const QRectF &viewport, qreal speed)
+bool QnViewportPtzController::viewportMove(
+    qreal aspectRatio,
+    const QRectF& viewport,
+    qreal speed,
+    const nx::core::ptz::Options& options)
 {
     nx::core::ptz::Vector oldPosition;
-    if(!getPosition(Qn::LogicalPtzCoordinateSpace, &oldPosition))
+    if(!getPosition(Qn::LogicalPtzCoordinateSpace, &oldPosition, options))
         return false;
 
     /* Note that we don't care about getLimits result as default-constructed
      * limits is actually 'no limits'. */
     QnPtzLimits limits;
-    getLimits(Qn::LogicalPtzCoordinateSpace, &limits);
+    getLimits(Qn::LogicalPtzCoordinateSpace, &limits, options);
 
     /* This is hacky. In theory projection should be a part of controller's interface. */
     Projection projection = Projection::Rectilinear;
@@ -59,7 +64,7 @@ bool QnViewportPtzController::viewportMove(qreal aspectRatio, const QRectF &view
 
     /* Same here, we don't care about getFlip result. */
     Qt::Orientations flip = 0;
-    getFlip(&flip);
+    getFlip(&flip, options);
 
     /* Passed viewport should be square, but who knows... */
     float zoom = 1.0 / qMax(viewport.width(), viewport.height()); /* For 2x zoom we'll get 2.0 here. */
@@ -105,7 +110,7 @@ bool QnViewportPtzController::viewportMove(qreal aspectRatio, const QRectF &view
             = nx::core::ptz::Vector(newPan, newTilt, 0.0, newFov);
 
         /* Send it to the camera. */
-        return absoluteMove(Qn::LogicalPtzCoordinateSpace, newPosition, speed);
+        return absoluteMove(Qn::LogicalPtzCoordinateSpace, newPosition, speed, options);
     } else {
         /* Calculate new position. */
         float newPan = oldPosition.pan + oldPosition.zoom * delta.x();
@@ -115,6 +120,6 @@ bool QnViewportPtzController::viewportMove(qreal aspectRatio, const QRectF &view
             nx::core::ptz::Vector(newPan, newTilt, 0.0, newFov), limits);
 
         /* Send it to the camera. */
-        return absoluteMove(Qn::LogicalPtzCoordinateSpace, newPosition, speed);
+        return absoluteMove(Qn::LogicalPtzCoordinateSpace, newPosition, speed, options);
     }
 }

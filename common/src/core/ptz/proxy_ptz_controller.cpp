@@ -34,76 +34,79 @@ QnPtzControllerPtr QnProxyPtzController::baseController() const
     return m_controller;
 }
 
-Ptz::Capabilities QnProxyPtzController::getCapabilities() const
+Ptz::Capabilities QnProxyPtzController::getCapabilities(const nx::core::ptz::Options& options) const
 {
     return m_controller
-        ? m_controller->getCapabilities()
+        ? m_controller->getCapabilities(options)
         : Ptz::NoPtzCapabilities;
 }
 
-Ptz::Capabilities QnProxyPtzController::alternativeCapabilities() const
+bool QnProxyPtzController::continuousMove(
+    const nx::core::ptz::Vector& speed,
+    const nx::core::ptz::Options& options)
 {
     return m_controller
-        ? m_controller->alternativeCapabilities()
-        : Ptz::NoPtzCapabilities;
-}
-
-bool QnProxyPtzController::continuousMove(const nx::core::ptz::Vector& speed)
-{
-    return m_controller
-        ? m_controller->continuousMove(speed)
+        ? m_controller->continuousMove(speed, options)
         : false;
 }
 
-bool QnProxyPtzController::continuousFocus(qreal speed)
+bool QnProxyPtzController::continuousFocus(
+    qreal speed,
+    const nx::core::ptz::Options& options)
 {
     return m_controller
-        ? m_controller->continuousFocus(speed)
+        ? m_controller->continuousFocus(speed, options)
         : false;
 }
 
 bool QnProxyPtzController::absoluteMove(
     Qn::PtzCoordinateSpace space,
     const nx::core::ptz::Vector& position,
-    qreal speed)
+    qreal speed,
+    const nx::core::ptz::Options& options)
 {
     return m_controller
-        ? m_controller->absoluteMove(space, position, speed)
+        ? m_controller->absoluteMove(space, position, speed, options)
         : false;
 }
 
 bool QnProxyPtzController::viewportMove(
     qreal aspectRatio,
     const QRectF& viewport,
-    qreal speed)
+    qreal speed,
+    const nx::core::ptz::Options& options)
 {
     return m_controller
-        ? m_controller->viewportMove(aspectRatio, viewport, speed)
+        ? m_controller->viewportMove(aspectRatio, viewport, speed, options)
         : false;
 }
 
 bool QnProxyPtzController::getPosition(
     Qn::PtzCoordinateSpace space,
-    nx::core::ptz::Vector* position) const
+    nx::core::ptz::Vector* position,
+    const nx::core::ptz::Options& options) const
 {
     return m_controller
-        ? m_controller->getPosition(space, position)
+        ? m_controller->getPosition(space, position, options)
         : false;
 }
 
 bool QnProxyPtzController::getLimits(
     Qn::PtzCoordinateSpace space,
-    QnPtzLimits* limits) const
+    QnPtzLimits* limits,
+    const nx::core::ptz::Options& options) const
 {
     return m_controller
-        ? m_controller->getLimits(space, limits)
+        ? m_controller->getLimits(space, limits, options)
         : false;
 }
 
-bool QnProxyPtzController::getFlip(Qt::Orientations* flip) const
+bool QnProxyPtzController::getFlip(
+    Qt::Orientations* flip,
+    const nx::core::ptz::Options& options) const
 {
     return m_controller
-        ? m_controller->getFlip(flip)
+        ? m_controller->getFlip(flip, options)
         : false;
 }
 
@@ -163,7 +166,8 @@ bool QnProxyPtzController::activateTour(const QString& tourId)
         : false;
 }
 
-bool QnProxyPtzController::getTours(QnPtzTourList* tours) const
+bool QnProxyPtzController::getTours(
+    QnPtzTourList* tours) const
 {
     return m_controller
         ? m_controller->getTours(tours)
@@ -191,26 +195,32 @@ bool QnProxyPtzController::getHomeObject(QnPtzObject* homeObject) const
         : false;
 }
 
-bool QnProxyPtzController::getAuxilaryTraits(QnPtzAuxilaryTraitList* auxilaryTraits) const
+bool QnProxyPtzController::getAuxilaryTraits(
+    QnPtzAuxilaryTraitList* auxilaryTraits,
+    const nx::core::ptz::Options& options) const
 {
     return m_controller
-        ? m_controller->getAuxilaryTraits(auxilaryTraits)
+        ? m_controller->getAuxilaryTraits(auxilaryTraits, options)
         : false;
 }
 
 bool QnProxyPtzController::runAuxilaryCommand(
     const QnPtzAuxilaryTrait& trait,
-    const QString& data)
+    const QString& data,
+    const nx::core::ptz::Options& options)
 {
     return m_controller
-        ? m_controller->runAuxilaryCommand(trait, data)
+        ? m_controller->runAuxilaryCommand(trait, data, options)
         : false;
 }
 
-bool QnProxyPtzController::getData(Qn::PtzDataFields query, QnPtzData* data) const
+bool QnProxyPtzController::getData(
+    Qn::PtzDataFields query,
+    QnPtzData* data,
+    const nx::core::ptz::Options& options) const
 {
     // This is important because of base implementation! Do not change it!
-    return base_type::getData(query, data);
+    return base_type::getData(query, data, options);
 }
 
 void QnProxyPtzController::baseFinished(Qn::PtzCommand command, const QVariant& data)
