@@ -30,26 +30,18 @@ HanwhaPtzController::HanwhaPtzController(const HanwhaResourcePtr& resource):
 {
 }
 
-HanwhaPtzController::~HanwhaPtzController()
-{
-}
-
 Ptz::Capabilities HanwhaPtzController::getCapabilities(const nx::core::ptz::Options& options) const
 {
-    if (options.type == ptz::Type::operational)
-        return m_ptzCapabilities;
+    const auto itr = m_ptzCapabilities.find(options.type);
+    if (itr == m_ptzCapabilities.cend())
+        return Ptz::NoPtzCapabilities;
 
-    return m_alternativePtzCapabilities;
+    return itr->second;
 }
 
-void HanwhaPtzController::setPtzCapabilities(Ptz::Capabilities capabilities)
+void HanwhaPtzController::setPtzCapabilities(const CapabilitiesMap& capabilities)
 {
     m_ptzCapabilities = capabilities;
-}
-
-void HanwhaPtzController::setAlternativePtzCapabilities(Ptz::Capabilities capabilities)
-{
-    m_alternativePtzCapabilities = capabilities;
 }
 
 void HanwhaPtzController::setPtzLimits(const QnPtzLimits& limits)
@@ -63,8 +55,7 @@ void HanwhaPtzController::setPtzTraits(const QnPtzAuxilaryTraitList& traits)
     m_ptzTraits = traits;
 }
 
-void HanwhaPtzController::setAlternativePtzRanges(
-    const std::map<QString, HanwhaRange>& ranges)
+void HanwhaPtzController::setConfigurationalPtzRanges(const RangeMap& ranges)
 {
     m_commandStreamer = std::make_unique<HanwhaPtzCommandStreamer>(m_hanwhaResource, ranges);
 }
@@ -74,7 +65,12 @@ bool HanwhaPtzController::continuousMove(
     const nx::core::ptz::Options& options)
 {
     if (m_commandStreamer && options.type == ptz::Type::configurational)
+    {
+        if (!hasAnyCapability(Ptz::ContinuousPtrzCapabilities, ptz::Type::configurational))
+            return false;
+
         return m_commandStreamer->continuousMove(speedVector);
+    }
 
     const auto hanwhaSpeed = toHanwhaSpeed(speedVector);
 
@@ -118,7 +114,12 @@ bool HanwhaPtzController::continuousFocus(
     const nx::core::ptz::Options& options)
 {
     if (m_commandStreamer && options.type == ptz::Type::configurational)
+    {
+        if (!hasAnyCapability(Ptz::ContinuousFocusCapability, ptz::Type::configurational))
+            return false;
+
         return m_commandStreamer->continuousFocus(speed);
+    }
 
     HanwhaRequestHelper helper(m_hanwhaResource->sharedContext());
     const auto response = helper.control(
@@ -328,7 +329,7 @@ bool HanwhaPtzController::runAuxilaryCommand(
         return false;
     }
 
-    if (!m_ptzCapabilities.testFlag(Ptz::AuxilaryPtzCapability))
+    if (!hasAnyCapability(Ptz::AuxilaryPtzCapability, ptz::Type::operational))
         return false;
 
     if (trait.standardTrait() == Ptz::ManualAutoFocusPtzTrait)
@@ -483,6 +484,17 @@ std::map<QString, QString> HanwhaPtzController::makeViewPortParameters(
     result.emplace(lit("Y2"), y2);
 
     return result;
+}
+
+bool HanwhaPtzController::hasAnyCapability(
+    Ptz::Capabilities capabilities,
+    nx::core::ptz::Type ptzType) const
+{
+    const auto itr = m_ptzCapabilities.find(ptzType);
+    if (itr == m_ptzCapabilities.cend())
+        return false;
+
+    return Ptz::NoPtzCapabilities != (itr->second & capabilities);
 }
 
 } // namespace plugins

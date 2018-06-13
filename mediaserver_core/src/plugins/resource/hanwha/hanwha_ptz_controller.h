@@ -21,19 +21,21 @@ class HanwhaPtzController: public QnBasicPtzController
 public:
     using DevicePresetId = QString;
     using NxPresetId = QString;
+    using CapabilitiesMap = std::map<nx::core::ptz::Type, Ptz::Capabilities>;
+    using ParameterName = QString;
+    using RangeMap = std::map<ParameterName, HanwhaRange>;
 
 public:
     HanwhaPtzController(const HanwhaResourcePtr& resource);
-    virtual ~HanwhaPtzController() override;
+    virtual ~HanwhaPtzController() = default;
 
     virtual Ptz::Capabilities getCapabilities(
         const nx::core::ptz::Options& options) const override;
 
-    void setPtzCapabilities(Ptz::Capabilities capabilities);
-    void setAlternativePtzCapabilities(Ptz::Capabilities capabilities);
+    void setPtzCapabilities(const CapabilitiesMap& capabilities);
     void setPtzLimits(const QnPtzLimits& limits);
     void setPtzTraits(const QnPtzAuxilaryTraitList& traits);
-    void setAlternativePtzRanges(const std::map<QString, HanwhaRange>& ranges);
+    void setConfigurationalPtzRanges(const RangeMap& ranges);
 
     virtual bool continuousMove(
         const nx::core::ptz::Vector& speedVector,
@@ -93,14 +95,15 @@ private:
         qreal aspectRatio,
         const QRectF rect) const;
 
+    bool hasAnyCapability(Ptz::Capabilities capabilities, nx::core::ptz::Type ptzType) const;
+
 private:
     using PresetNumber = QString;
     using PresetId = QString;
 
     mutable QnMutex m_mutex;
     HanwhaResourcePtr m_hanwhaResource;
-    Ptz::Capabilities m_ptzCapabilities = Ptz::NoPtzCapabilities;
-    Ptz::Capabilities m_alternativePtzCapabilities = Ptz::NoPtzCapabilities;
+    CapabilitiesMap m_ptzCapabilities;
     QnPtzLimits m_ptzLimits;
     QnPtzAuxilaryTraitList m_ptzTraits;
     mutable std::unique_ptr<HanwhaMappedPresetManager> m_presetManager;

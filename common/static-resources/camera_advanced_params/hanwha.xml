@@ -969,7 +969,7 @@
                 dataType="SliderControl"
                 range="-1,1"
                 compact="true"
-                aux="ptzTraits=AlternativeZoomTrait"
+                aux="ptzCapabilities=ContinuousZoomCapability"
                 writeCmd="custom_zoom"/>
             <param id="image/lens_control/ptr"
                 name=""
@@ -977,7 +977,7 @@
                 dataType="PtrControl"
                 range="-1,1,-1,1,-1,1"
                 compact="true"
-                aux="ptzTraits=AlternativePanTrait,AlternativeTiltTrait,AlternativeRotateTrait"
+                aux="ptzCapabilities=ContinuousPanCapability|ContinuousTiltCapability|ContinuousRotationCapability"
                 writeCmd="custom_ptr"/>
             <param id="image/lens_control/focus"
                 name="Focus"
@@ -985,7 +985,7 @@
                 dataType="SliderControl"
                 range="-1,1"
                 compact="true"
-                aux="ptzTraits=AlternativeFocusTrait"
+                aux="ptzCapabilities=ContinuousFocusCapability"
                 writeCmd="custom_focus"/>
         </group>
         <group name="Maintenance">

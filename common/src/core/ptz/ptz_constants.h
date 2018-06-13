@@ -57,6 +57,10 @@ public:
         ContinuousPtzCapabilities =
             ContinuousPanCapability | ContinuousTiltCapability | ContinuousZoomCapability,
 
+        ContinuousPtrzCapabilities =
+            ContinuousPanCapability | ContinuousTiltCapability | ContinuousZoomCapability
+            | ContinuousRotationCapability,
+
         AbsolutePtzCapabilities =
             AbsolutePanCapability | AbsoluteTiltCapability | AbsoluteZoomCapability,
     };

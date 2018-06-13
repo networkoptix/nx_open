@@ -25,6 +25,7 @@ static const QString kShouldAffectAllChannels = lit("shouldAffectAllChannels");
 static const QString kDeviceTypesAux = lit("deviceTypes");
 static const QString kAssociatedParametersAux = lit("associatedWith");
 static const QString kPtzTraitsAux = lit("ptzTraits");
+static const QString kPtzCapabilitiesAux = lit("ptzCapabilities");
 
 static const QString kPrimaryProfile = lit("primary");
 static const QString kSecondaryProfile = lit("secondary");
@@ -229,6 +230,11 @@ QSet<QString> HanwhaAdavancedParameterInfo::ptzTraits() const
     return m_ptzTraits;
 }
 
+Ptz::Capabilities HanwhaAdavancedParameterInfo::ptzCapabilities() const
+{
+    return m_ptzCapabilities;
+}
+
 bool HanwhaAdavancedParameterInfo::isValid() const
 {
     return (!m_cgi.isEmpty()
@@ -304,6 +310,13 @@ void HanwhaAdavancedParameterInfo::parseAux(const QString& auxString)
 
                 m_deviceTypes.insert(deviceType);
             }
+        }
+
+        if (auxName == kPtzCapabilitiesAux)
+        {
+            m_ptzCapabilities = QnLexical::deserialized<Ptz::Capabilities>(
+                auxValue,
+                Ptz::NoPtzCapabilities);
         }
     }
 }
