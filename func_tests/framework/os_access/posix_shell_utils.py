@@ -46,7 +46,7 @@ def sh_env_to_command(env):
     command = []
     for name, value in converted_env.items():
         if name in _SH_PROHIBITED_ENV_NAMES:
-            raise ValueError("")
+            raise ValueError("Potential name clash with built-in name: {}".format(name))
         command.append('{}={}'.format(name, sh_quote_arg(str(value))))
     return command
 
