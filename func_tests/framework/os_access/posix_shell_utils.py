@@ -51,11 +51,17 @@ def sh_env_to_command(env):
     return command
 
 
-def sh_augment_script(script, cwd, env):
-    script = dedent(script).strip()
+# language=Bash
+def sh_augment_script(script, cwd=None, env=None, set_eux=True, shebang=False):
+    augmented_script_lines = []
+    if shebang:
+        augmented_script_lines.append('#!/bin/sh')
+    if set_eux:
+        augmented_script_lines.append('set -eux')  # It's sh (dash), pipefail cannot be set here.
     if cwd is not None:
-        script = sh_command_to_script(['cd', cwd]) + '\n' + script
+        augmented_script_lines.append(sh_command_to_script(['cd', cwd]))
     if env is not None:
-        script = '\n'.join(sh_env_to_command(env)) + '\n' + script
-    script = 'set -eux' + '\n' + script
-    return script
+        augmented_script_lines.extend(sh_env_to_command(env))
+    augmented_script_lines.append(dedent(script).strip())
+    augmented_script = '\n'.join(augmented_script_lines)
+    return augmented_script
