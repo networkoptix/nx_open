@@ -52,7 +52,6 @@ TEST(ExecActionAccessRightsTest, main) //< Crash on QnDbManager nullptr
         ec2::QnJsonTransactionSerializer jsonTranSerializer;
         ec2::QnUbjsonTransactionSerializer ubjsonTranSerializer;
         ec2::TransactionMessageBusAdapter messageBus(
-            Qn::PeerType(),
             launcher.commonModule(),
             &jsonTranSerializer,
             &ubjsonTranSerializer);
