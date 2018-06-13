@@ -81,9 +81,11 @@ public:
 
     void setTimeSyncInterval(std::chrono::milliseconds value);
     std::chrono::milliseconds timeSyncInterval() const;
+
 signals:
     /** Emitted when synchronized time has been changed. */
     void timeChanged(qint64 syncTimeMs);
+
 protected:
     using AbstractStreamSocketPtr = std::unique_ptr<nx::network::AbstractStreamSocket>;
 
@@ -94,13 +96,14 @@ protected:
     virtual AbstractStreamSocketPtr connectToRemoteHost(const QnRoute& route);
     virtual bool setSyncTime(std::chrono::milliseconds value, std::chrono::milliseconds rtt);
     void setSyncTimeInternal(std::chrono::milliseconds value);
-private:
-    using AbstractStreamSocketPtr = std::unique_ptr<nx::network::AbstractStreamSocket>;
 
+private:
     void doPeriodicTasks();
+
 protected:
     std::shared_ptr<AbstractSystemClock> m_systemClock;
     std::shared_ptr<AbstractSteadyClock> m_steadyClock;
+
 private:
     std::chrono::milliseconds m_synchronizedTime{0};
     std::chrono::milliseconds m_synchronizedOnClock{0};
