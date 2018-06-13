@@ -11,6 +11,7 @@
 
 #include <nx/fusion/model_functions.h>
 #include <nx/utils/log/log.h>
+#include <utils/common/guarded_callback.h>
 
 namespace nx {
 namespace client {
@@ -99,20 +100,20 @@ void CameraThumbnailProvider::doLoadAsync()
         return;
     }
 
-    QPointer<CameraThumbnailProvider> guard(this);
     NX_VERBOSE(this) "CameraThumbnailProvider::doLoadAsync(" << m_request.camera->getName() << ") - sending request to the server";
-    auto handle = commonModule()->currentServer()->restConnection()->cameraThumbnailAsync(
-        m_request,
-        [this, guard] (bool success, rest::Handle /*id*/, const QByteArray& imageData)
+
+    auto callback = guarded(this,
+        [this] (bool success, rest::Handle /*id*/, const QByteArray& imageData)
         {
-            if (!guard)
-                return;
             Qn::ThumbnailStatus nextStatus =
                 success ? Qn::ThumbnailStatus::Loaded : Qn::ThumbnailStatus::NoData;
             if (imageData.isEmpty())
                 nextStatus = Qn::ThumbnailStatus::NoData;
             emit imageDataLoadedInternal(imageData, nextStatus);
         });
+
+    auto handle = commonModule()->currentServer()->restConnection()->cameraThumbnailAsync(
+        m_request, callback, thread());
 
     if (handle <= 0)
     {
