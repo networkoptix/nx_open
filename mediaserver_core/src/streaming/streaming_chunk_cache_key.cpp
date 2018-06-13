@@ -51,10 +51,6 @@ StreamingChunkCacheKey::StreamingChunkCacheKey(
     if( it != auxiliaryParams.end() )
         m_videoCodec = it->second;
 
-    it = auxiliaryParams.find( StreamingParams::AUDIO_CODEC_PARAM_NAME );
-    if( it != auxiliaryParams.end() )
-        m_audioCodec = it->second;
-
     it = auxiliaryParams.find( StreamingParams::PICTURE_SIZE_PIXELS_PARAM_NAME );
     if( it != auxiliaryParams.end() )
     {
@@ -132,9 +128,14 @@ const QString& StreamingChunkCacheKey::videoCodec() const
     return m_videoCodec;
 }
 
-const QString& StreamingChunkCacheKey::audioCodec() const
+AVCodecID StreamingChunkCacheKey::audioCodecId() const
 {
-    return m_audioCodec;
+    return m_audioCodecId;
+}
+
+void StreamingChunkCacheKey::setAudioCodecId(AVCodecID audioCodecId)
+{
+    m_audioCodecId = audioCodecId;
 }
 
 bool StreamingChunkCacheKey::live() const
@@ -158,7 +159,7 @@ bool StreamingChunkCacheKey::mediaStreamParamsEqualTo(const StreamingChunkCacheK
            pictureSizePixels() == right.pictureSizePixels() &&
            containerFormat() == right.containerFormat() &&
            videoCodec() == right.videoCodec() &&
-           audioCodec() == right.audioCodec();
+           audioCodecId() == right.audioCodecId();
 }
 
 bool StreamingChunkCacheKey::operator<( const StreamingChunkCacheKey& right ) const
@@ -208,9 +209,9 @@ bool StreamingChunkCacheKey::operator<( const StreamingChunkCacheKey& right ) co
     if( m_videoCodec > right.m_videoCodec )
         return false;
 
-    if( m_audioCodec < right.m_audioCodec )
+    if( m_audioCodecId < right.m_audioCodecId)
         return true;
-    if( m_audioCodec > right.m_audioCodec )
+    if( m_audioCodecId > right.m_audioCodecId )
         return false;
 
     if( m_streamQuality < right.m_streamQuality )
@@ -261,5 +262,5 @@ uint qHash( const StreamingChunkCacheKey& key )
         + key.pictureSizePixels().height()
         + qHash(key.containerFormat())
         + qHash(key.videoCodec())
-        + qHash(key.audioCodec());
+        + qHash(key.audioCodecId());
 }

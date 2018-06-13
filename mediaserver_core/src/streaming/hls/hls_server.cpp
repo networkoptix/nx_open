@@ -46,6 +46,7 @@
 #include <rest/server/json_rest_result.h>
 #include <nx/fusion/serialization_format.h>
 #include <api/helpers/camera_id_helper.h>
+#include <plugins/resource/server_archive/server_archive_delegate.h>
 
 //TODO #ak if camera has hi stream only, than playlist request with no quality specified returns No Content, hi returns OK, lo returns Not Found
 
@@ -757,6 +758,16 @@ namespace nx_hls
         if (params.duration)
             chunkDuration = params.duration->count();
 
+        StreamingChunkCacheKey currentChunkKey(
+            uniqueResourceID.toString(),
+            params.channel,
+            params.containerFormat,
+            params.alias ? *params.alias : QString(),
+            startTimestamp,
+            std::chrono::microseconds(chunkDuration),
+            params.streamQuality,
+            requestParams);
+
         bool requestIsAPartOfHlsSession = false;
         {
             std::multimap<QString, QString>::const_iterator sessionIDIter =
@@ -770,20 +781,21 @@ namespace nx_hls
                     requestIsAPartOfHlsSession = true;
                     hlsSession->updateAuditInfo(startTimestamp);
                     if (params.alias)
-                        hlsSession->getChunkByAlias(params.streamQuality, *params.alias, &startTimestamp, &chunkDuration);
+                    {
+                        hlsSession->getChunkByAlias(
+                            params.streamQuality, *params.alias, &startTimestamp, &chunkDuration);
+                    }
+
+                    if (!hlsSession->audioCodecId())
+                        hlsSession->setAudioCodecId(detectAudioCodecId(currentChunkKey));
+                    currentChunkKey.setAudioCodecId(*hlsSession->audioCodecId());
                 }
             }
+            else
+            {
+                currentChunkKey.setAudioCodecId(detectAudioCodecId(currentChunkKey));
+            }
         }
-
-        StreamingChunkCacheKey currentChunkKey(
-            uniqueResourceID.toString(),
-            params.channel,
-            params.containerFormat,
-            params.alias ? *params.alias : QString(),
-            startTimestamp,
-            std::chrono::microseconds(chunkDuration),
-            params.streamQuality,
-            requestParams);
 
         auto requiredPermission = currentChunkKey.live()
             ? Qn::Permission::ViewLivePermission : Qn::Permission::ViewFootagePermission;
@@ -792,7 +804,6 @@ namespace nx_hls
         {
             return nx_http::StatusCode::forbidden;
         }
-
 
         //streaming chunk
         if (m_currentChunk)
@@ -1026,7 +1037,9 @@ namespace nx_hls
         return bandwidth;
     }
 
-    void QnHttpLiveStreamingProcessor::ensureChunkCacheFilledEnoughForPlayback( HLSSession* const session, MediaQuality streamQuality )
+    void QnHttpLiveStreamingProcessor::ensureChunkCacheFilledEnoughForPlayback(
+        HLSSession* const session,
+        MediaQuality streamQuality )
     {
         static const size_t PLAYLIST_CHECK_TIMEOUT_MS = 1000;
 
@@ -1058,6 +1071,28 @@ namespace nx_hls
                 QThread::msleep( PLAYLIST_CHECK_TIMEOUT_MS );
             }
         }
+    }
+
+    AVCodecID QnHttpLiveStreamingProcessor::detectAudioCodecId(
+        const StreamingChunkCacheKey& chunkParams)
+    {
+        const auto resource = commonModule()->resourcePool()->getResourceByUniqueId(
+            chunkParams.srcResourceUniqueID());
+        if (!resource)
+            return AV_CODEC_ID_NONE;
+
+        QnServerArchiveDelegate archive;
+        if (!archive.open(resource, qnServerModule->archiveIntegrityWatcher()))
+            return AV_CODEC_ID_NONE;
+        if (chunkParams.startTimestamp() != DATETIME_NOW)
+            archive.seek(chunkParams.startTimestamp(), true);
+        if (archive.getAudioLayout() &&
+            archive.getAudioLayout()->getAudioTrackInfo(0).codecContext)
+        {
+            return archive.getAudioLayout()->getAudioTrackInfo(0).codecContext->getCodecId();
+        }
+
+        return AV_CODEC_ID_NONE;
     }
 
     HlsRequestParams QnHttpLiveStreamingProcessor::readRequestParams(
