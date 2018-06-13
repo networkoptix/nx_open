@@ -21,8 +21,8 @@ std::tuple<ResultType> makeSyncCall(
 template<typename ResultType, typename OutArg1, typename FuncPtr, typename Arg1, typename ... Args>
 std::tuple<ResultType, OutArg1> makeSyncCall(FuncPtr funcPtr, Arg1 arg1, Args... args);
 
-template<typename ResultType, typename... OutArgs>
-std::tuple<ResultType, OutArgs...> makeSyncCall(auto f)
+template<typename ResultType, typename... OutArgs, typename FuncType>
+std::tuple<ResultType, OutArgs...> makeSyncCall(FuncType f)
 {
     std::function<void(std::function<void(ResultType, OutArgs...)>)> function = f;
     return makeSyncCall<ResultType, OutArgs...>(function);
