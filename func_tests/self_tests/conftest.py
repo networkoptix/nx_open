@@ -58,7 +58,8 @@ def winrm_shell(winrm):
 
 @pytest.fixture(scope='session')
 def ssh(linux_vm_info):
-    address, port = linux_vm_info.port_map.remote.tcp(22)
+    port = linux_vm_info.port_map.remote.tcp(22)
+    address = linux_vm_info.port_map.remote.address
     ssh = SSH(address, port, u'root', SSH_PRIVATE_KEY_PATH)
     wait_for_true(ssh.is_working)
     return ssh
