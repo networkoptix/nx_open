@@ -602,3 +602,15 @@ select {
         }
     }
 }
+
+ngb-tabset {
+    .nav-tabs {
+        a {
+            color       : $dark12;
+            font-size   : $h5-font-size;
+            font-family : $font-family-medium;
+            line-height : 26px;
+            padding     : 7px 20px;
+        }
+    }
+}
