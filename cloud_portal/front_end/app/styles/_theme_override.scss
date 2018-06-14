@@ -2,580 +2,603 @@
 @import '_theme_variables';
 @import '~sass-rem/rem';
 
-$font-size-a-bit-large:   ceil($font-size-base * 1.15); //~16px - we just need 16px sometimes :-)
+$font-size-a-bit-large : ceil($font-size-base * 1.15); //~16px - we just need 16px sometimes :-)
 
-
-body{
-  color: $text-color;
+body {
+    color : $text-color;
 }
 
 .container-fluid {
-    padding:0;
+    padding : 0;
 }
 
-.card{
-  border-radius: 2px;
-  box-shadow: 0 1px 2px transparentize($dark15,0.9);
+.card {
+    border-radius : 2px;
+    box-shadow    : 0 1px 2px transparentize($dark15, 0.9);
 }
 
 .panel-heading {
-  border-bottom: none;
+    border-bottom : none;
 }
 
 // NG-Bootstrap collapsible element
 .collapse {
-  display: block;
-  transition: opacity .5s ease-out;
-  opacity: 0;
-  height: 0;
-  overflow: hidden;
+    display    : block;
+    transition : opacity .5s ease-out;
+    opacity    : 0;
+    height     : 0;
+    overflow   : hidden;
 
-  &.show {
-    opacity: 1;
-    transition: opacity .5s ease-in;
-    display: block;
-    height: auto;
-  }
+    &.show {
+        opacity    : 1;
+        transition : opacity .5s ease-in;
+        display    : block;
+        height     : auto;
+    }
 }
 
 h1, h2 {
-  margin-top    : $line-height-computed;
-  margin-bottom : $line-height-computed;
-  padding       : 0;
-  font-size     : $h1-font-size;
-  display       : flex;
-  align-items   : center;
-  font-family   : $font-family-regular;
+    margin-top    : $line-height-computed;
+    margin-bottom : $line-height-computed;
+    padding       : 0;
+    font-size     : $h1-font-size;
+    display       : flex;
+    align-items   : center;
+    font-family   : $font-family-regular;
 }
 
 h2 {
-  margin      : 0;
-  padding     : 0;
-  font-size   : $h2-font-size;
-  font-family : $font-family-regular;
+    margin      : 0;
+    padding     : 0;
+    font-size   : $h2-font-size;
+    font-family : $font-family-regular;
 }
 
 h3 {
-  margin-top    : ($line-height-computed / 2);
-  margin-bottom : ($line-height-computed / 4);
-  font-size     : $h3-font-size;
-  font-family   : $font-family-medium;
+    margin-top    : ($line-height-computed / 2);
+    margin-bottom : ($line-height-computed / 4);
+    font-size     : $h3-font-size;
+    font-family   : $font-family-medium;
 }
 
 h4 {
-  font-size   : $h4-font-size;
-  font-family : $font-family-medium;
+    font-size   : $h4-font-size;
+    font-family : $font-family-medium;
 }
 
 h5 {
-  font-size   : $h5-font-size;
-  font-family : $font-family-medium;
+    font-size   : $h5-font-size;
+    font-family : $font-family-medium;
 }
 
 h6 {
-  font-size   : $h6-font-size;
-  font-family : $font-family-medium;
+    font-size   : $h6-font-size;
+    font-family : $font-family-medium;
 }
 
-h1>.label{
-  font-size:60%;
-  vertical-align: 33%;
+h1 > .label {
+    font-size      : 60%;
+    vertical-align : 33%;
 }
 
-.card > .table, .card > .table-responsive {
-  margin-bottom: 16px;
+.card .table-responsive {
+    margin-left  : -15px;
+    margin-right : -15px;
+    width        : auto;
+}
+
+.card .table {
+    width : 100%;
+}
+
+table {
+    & > thead > tr > th {
+        color : $brand-core;
+
+        &:first-child {
+            padding-left : 15px;
+        }
+    }
+
+    & > tbody > tr {
+        & td:first-child {
+            padding-left : 15px;
+        }
+
+        &.hoverable:hover {
+            background-color : $light2;
+        }
+    }
 }
 
 .jumbotron {
-  text-align: center;
+    text-align : center;
 }
 
-
 hr {
-  margin-top:    16px;
-  margin-bottom: 16px;
+    margin-top    : 16px;
+    margin-bottom : 16px;
 }
 
 label {
-  font-weight: 700;
+    font-weight : 700;
 }
 
 .buttons-panel {
-  display: flex;
+    display : flex;
 }
 
 .form-horizontal {
-  .form-group {
-    display: flex;
+    .form-group {
+        display : flex;
 
-    & > div {
-      display: flex;
-      align-items: center;
-      float: left;
+        & > div {
+            display     : flex;
+            align-items : center;
+            float       : left;
+        }
     }
-  }
 
-  .control-label {
-    float: left;
-    text-align: right;
-    margin-bottom: 0;
-    padding-top: 8px;
-  }
+    .control-label {
+        float         : left;
+        text-align    : right;
+        margin-bottom : 0;
+        padding-top   : 8px;
+    }
 }
 
 .form-control {
-  display: block;
-  width: 100%;
-  height: 32px;
-  font-size: 14px;
-  line-height: 1.428571429;
-  color: #121517;
-  background-color: #fff;
-  background-image: none;
-  border: 1px solid #d7dfe3;
-  border-radius: 2px;
-  transition: border-color ease-in-out .15s, box-shadow ease-in-out .15s;
+    display          : block;
+    width            : 100%;
+    height           : 32px;
+    font-size        : 14px;
+    line-height      : 1.428571429;
+    color            : #121517;
+    background-color : #fff;
+    background-image : none;
+    border           : 1px solid #d7dfe3;
+    border-radius    : 2px;
+    transition       : border-color ease-in-out .15s, box-shadow ease-in-out .15s;
 
-  box-shadow: none;
-  padding: $padding-base-vertical $padding-input-horizontal;
+    box-shadow       : none;
+    padding          : $padding-base-vertical $padding-input-horizontal;
 
-  &:focus {
-    box-shadow: none;
-  }
-
-  &[disabled],
-  fieldset[disabled] & {
-    opacity: 0.3;
-  }
-
-  &:invalid:not(.ng-untouched) {
-    border-color: $error;
-
-    + .input-group-addon {
-      border-color: $error;
-      background-color: $red2;
+    &:focus {
+        box-shadow : none;
     }
-  }
+
+    &[disabled],
+    fieldset[disabled] & {
+        opacity : 0.3;
+    }
+
+    &:invalid:not(.ng-untouched) {
+        border-color : $error;
+
+        + .input-group-addon {
+            border-color     : $error;
+            background-color : $red2;
+        }
+    }
 }
 
 .form-control:read-only:focus {
-  border-color: $input-border;
+    border-color : $input-border;
 }
 
 .form-control:focus {
-  border-color: $input-border-focus;
+    border-color : $input-border-focus;
 }
 
 .form-control:focus + .input-group-addon {
-    border-color: $input-border-focus;
+    border-color : $input-border-focus;
 }
 
-
-select.form-control{
-  -webkit-appearance: none;
-  -moz-appearance: none;
-  background-color: transparent;
+select.form-control {
+    -webkit-appearance : none;
+    -moz-appearance    : none;
+    background-color   : transparent;
 }
 
 .dropdown {
-  &.dropdown-wide {
-    .dropdown-menu {
-      width: 100%;
-    }
+    &.dropdown-wide {
+        .dropdown-menu {
+            width : 100%;
+        }
 
-    .dropdown-toggle {
-      max-width: none;
-      width: 100%;
+        .dropdown-toggle {
+            max-width : none;
+            width     : 100%;
 
-      .arrow {
-        position: absolute;
-        margin-top: 4px;
-        margin-right: 10px !important;
-      }
+            .arrow {
+                position     : absolute;
+                margin-top   : 4px;
+                margin-right : 10px !important;
+            }
+        }
     }
-  }
 }
 
 button {
-  &:hover,
-  &:active,
-  &.active,
-  &:focus,
-  &.focus {
-    box-shadow: none;
-    outline: none !important;
-    outline: 0 !important;
-  }
+    &:hover,
+    &:active,
+    &.active,
+    &:focus,
+    &.focus {
+        box-shadow : none;
+        outline    : none !important;
+        outline    : 0 !important;
+    }
 }
 
-.btn{
-  outline: none !important;
-  outline: 0 !important;
-  max-width: 278px;
-  text-overflow: ellipsis;
-  overflow: hidden;
-  line-height: 1.428571429;
-  font-weight: 700;
-  border-radius: 2px;
-  padding: 5px 16px;
-  font-size: 14px;
-  display: flex;
-  align-items: center;
+.btn {
+    outline       : none !important;
+    outline       : 0 !important;
+    max-width     : 278px;
+    text-overflow : ellipsis;
+    overflow      : hidden;
+    line-height   : 1.428571429;
+    font-weight   : 700;
+    border-radius : 2px;
+    padding       : 5px 16px;
+    font-size     : 14px;
+    display       : flex;
+    align-items   : center;
 
-  &:hover,
-  &:active,
-  &.active,
-  &:focus,
-  &.focus {
-    box-shadow: none;
-    outline: none !important;
-    outline: 0 !important;
-  }
-
-  &.dropdown-toggle{
-    display: flex;
-    padding: 5px 10px;
-
-    &::after {
-      display: none;
+    &:hover,
+    &:active,
+    &.active,
+    &:focus,
+    &.focus {
+        box-shadow : none;
+        outline    : none !important;
+        outline    : 0 !important;
     }
 
-    &:hover {
-      .arrow {
+    &.dropdown-toggle {
+        display : flex;
+        padding : 5px 10px;
+
         &::after {
-          border-top-color: $light3;
-          transition: border-top-color 0.2s ease-in-out;
+            display : none;
         }
 
-        &.up::after {
-          border-bottom-color: $light3;
-          border-top-color: transparent;
-          transition: border-bottom-color 0.2s ease-in-out;
+        &:hover {
+            .arrow {
+                &::after {
+                    border-top-color : $light3;
+                    transition       : border-top-color 0.2s ease-in-out;
+                }
+
+                &.up::after {
+                    border-bottom-color : $light3;
+                    border-top-color    : transparent;
+                    transition          : border-bottom-color 0.2s ease-in-out;
+                }
+            }
         }
-      }
+
+        .arrow {
+            position         : relative;
+            bottom           : auto;
+            right            : 0;
+            margin-left      : 10px !important;
+            margin-top       : 6px;
+            border-top-color : $dark_core;
+            border-width     : 6px;
+
+            &:after {
+                bottom           : 2px;
+                border-top-color : $light2;
+            }
+
+            &.up {
+                top                 : auto;
+                left                : auto;
+                border-top-width    : 0;
+                border-bottom-color : $dark_core;
+                margin-top          : 0;
+
+                &:after {
+                    bottom              : 2px;
+                    border-bottom-color : $light2;
+                    border-top-color    : transparent;
+                }
+            }
+        }
     }
-
-    .arrow {
-      position: relative;
-      bottom: auto;
-      right: 0;
-      margin-left: 10px !important;
-      margin-top: 6px;
-      border-top-color: $dark_core;
-      border-width: 6px;
-
-      &:after {
-        bottom: 2px;
-        border-top-color: $light2;
-      }
-
-      &.up {
-        top: auto;
-        left: auto;
-        border-top-width: 0;
-        border-bottom-color: $dark_core;
-        margin-top: 0;
-
-        &:after {
-          bottom: 2px;
-          border-bottom-color: $light2;
-          border-top-color: transparent;
-        }
-      }
-    }
-  }
 }
 
-.btn.btn-default, .btn.btn-dropdown-toggle{
-  color: $dark10;
-  background-color: transparent;
-  border-color: $light5;
+.btn.btn-default, .btn.btn-dropdown-toggle {
+    color            : $dark10;
+    background-color : transparent;
+    border-color     : $light5;
 
-  &:hover:not([disabled]):not(.disabled),
-  &:focus:not([disabled]):not(.disabled),
-  &.focus:not([disabled]):not(.disabled) {
-    background-color: transparentize($light5,0.75);
-    border-color: $light8;
-  }
+    &:hover:not([disabled]):not(.disabled),
+    &:focus:not([disabled]):not(.disabled),
+    &.focus:not([disabled]):not(.disabled) {
+        background-color : transparentize($light5, 0.75);
+        border-color     : $light8;
+    }
 
-  &:active,
-  &.active{
-    background-color: transparentize($light5,0.5) !important;
-    border-color: transparentize($light5,0.5) !important;
-    @include box-shadow(inset 0px 1px 0px 1px $light9);
-    outline: none;
-  }
+    &:active,
+    &.active {
+        background-color : transparentize($light5, 0.5) !important;
+        border-color     : transparentize($light5, 0.5) !important;
+        @include box-shadow(inset 0px 1px 0px 1px $light9);
+        outline          : none;
+    }
 }
 
-.btn.btn-primary{
-  background-color: $brand_core;
-  border-color: $brand_core;
-  &:hover,
-  &:focus,
-  &.focus {
-    background-color: $brand_l1;
-    border-color: $brand_core;
-  }
+.btn.btn-primary {
+    background-color : $brand_core;
+    border-color     : $brand_core;
+    &:hover,
+    &:focus,
+    &.focus {
+        background-color : $brand_l1;
+        border-color     : $brand_core;
+    }
 
-  &:active,
-  &.active{
-    background-color: $brand_core !important;
-    border-color: $brand_core !important;
-    @include box-shadow(inset 0px 1px 0px 1px $brand_d2);
-    outline: none;
-  }
+    &:active,
+    &.active {
+        background-color : $brand_core !important;
+        border-color     : $brand_core !important;
+        @include box-shadow(inset 0px 1px 0px 1px $brand_d2);
+        outline          : none;
+    }
 }
 
 .btn.btn-lg {
-  padding: 10px 16px;
-  font-size: 15px;
-  line-height: 1.3333333;
-  border-radius: 4px;
+    padding       : 10px 16px;
+    font-size     : 15px;
+    line-height   : 1.3333333;
+    border-radius : 4px;
 }
 
 .btn-dropdown-toggle {
-  background-color: transparent;
+    background-color : transparent;
 }
 
 .dropdown-divider {
-  margin: 4px 12px;
-  border-top: 1px solid $light6;
+    margin     : 4px 12px;
+    border-top : 1px solid $light6;
 }
 
 .alert {
-  font-size: $h4-font-size;
-  padding-top: 8px;
-  padding-bottom: 8px;
-  @include box-shadow(0px 8px 4px 0px transparentize($light16, 0.9));
+    font-size      : $h4-font-size;
+    padding-top    : 8px;
+    padding-bottom : 8px;
+    @include box-shadow(0px 8px 4px 0px transparentize($light16, 0.9));
 }
 
-.alert-dismissable .close, .alert-dismissible .close{
-  -webkit-appearance: none !important;
-  -moz-appearance: none !important;
-  outline: none !important;
-  &:hover,
-  &:focus,
-  &:active{
-    -webkit-appearance: none !important;
-    -moz-appearance: none !important;
-    outline: none !important;
-  }
+.alert-dismissable .close, .alert-dismissible .close {
+    -webkit-appearance : none !important;
+    -moz-appearance    : none !important;
+    outline            : none !important;
+    &:hover,
+    &:focus,
+    &:active {
+        -webkit-appearance : none !important;
+        -moz-appearance    : none !important;
+        outline            : none !important;
+    }
 }
 
 label {
-  line-height:  16px;
-  margin-bottom: 8px;
+    line-height   : 16px;
+    margin-bottom : 8px;
 }
 
 .radio,
 .checkbox {
-  margin-top: 5px;
-  margin-bottom: 5px;
-  line-height: 16px;
+    margin-top    : 5px;
+    margin-bottom : 5px;
+    line-height   : 16px;
 
-  label{
-    min-height: 16px;
-    padding-left: 20px;
-    margin-bottom: 0;
-    font-weight: 400;
-    cursor: pointer;
-  }
+    label {
+        min-height    : 16px;
+        padding-left  : 20px;
+        margin-bottom : 0;
+        font-weight   : 400;
+        cursor        : pointer;
+    }
 
-  input[type="radio"],
-  input[type="checkbox"] {
-    margin-top: 2px;
-  }
+    input[type="radio"],
+    input[type="checkbox"] {
+        margin-top : 2px;
+    }
 }
 
-.form-control-static{
-  min-height:32px;
+.form-control-static {
+    min-height : 32px;
 }
 
-.table{
-  th{
-    text-transform: uppercase;
-    font-size: 13px;
-  }
+.table {
+    th {
+        text-transform : uppercase;
+        font-size      : 13px;
+    }
 }
 
-.help-block{
-  background-color: $body-bg;
+.help-block {
+    background-color : $body-bg;
 }
 
-@mixin kill-glyphicon{
-  background-size: 112px 32px;
-  background-image: url('/static/images/portal_icons.png') !important;
-  &:before{
-    content:none;
-  }
+@mixin kill-glyphicon {
+    background-size  : 112px 32px;
+    background-image : url('/static/images/portal_icons.png') !important;
+    &:before {
+        content : none;
+    }
 
-  @media only screen and (-webkit-min-device-pixel-ratio: 2), only screen and (min-device-pixel-ratio: 2) {
-    background-image: url('/static/images/portal_icons@2x.png');
-  }
+    @media only screen and (-webkit-min-device-pixel-ratio : 2), only screen and (min-device-pixel-ratio : 2) {
+        background-image : url('/static/images/portal_icons@2x.png');
+    }
 }
 
 select {
-  position: relative;
-  background-image: url('/static/images/arrow_down.png') !important;
-  background-repeat: no-repeat;
-  background-size: 16px 16px;
-  background-position: right 8px center;
+    position            : relative;
+    background-image    : url('/static/images/arrow_down.png') !important;
+    background-repeat   : no-repeat;
+    background-size     : 16px 16px;
+    background-position : right 8px center;
 
-  @media only screen and (-webkit-min-device-pixel-ratio: 2), only screen and (min-device-pixel-ratio: 2) {
-    background-image: url('/static/images/arrow_down@2x.png') !important;
-  }
+    @media only screen and (-webkit-min-device-pixel-ratio : 2), only screen and (min-device-pixel-ratio : 2) {
+        background-image : url('/static/images/arrow_down@2x.png') !important;
+    }
 }
 
-.tab-pane>.card{
-    border-top: none;
-    border-top-right-radius: 0;
-    border-top-left-radius: 0;
+.tab-pane > .card {
+    border-top              : none;
+    border-top-right-radius : 0;
+    border-top-left-radius  : 0;
 }
 
-.btn:disabled *{
-    pointer-events: none;
+.btn:disabled * {
+    pointer-events : none;
 }
 
-.btn.form-control{
-    text-align:left;
-    .caret{
-        float:right;
-        margin-top: 8px;
+.btn.form-control {
+    text-align : left;
+    .caret {
+        float      : right;
+        margin-top : 8px;
     }
 }
 
 .nav-tabs {
-  .nav-item {
-    margin-right: 2px;
-  }
+    .nav-item {
+        margin-right : 2px;
+    }
 }
 
 .nav-tabs .nav-link {
-  border-top-left-radius: 2px;
-  border-top-right-radius: 2px;
+    border-top-left-radius  : 2px;
+    border-top-right-radius : 2px;
 
-  &.active {
-    background-color: $light1;
-    border-bottom: 1px solid transparent;
+    &.active {
+        background-color : $light1;
+        border-bottom    : 1px solid transparent;
 
-    .tab-heading {
-      border-bottom: 1px solid #d7dfe3;
-      padding: 10px 0;
+        .tab-heading {
+            border-bottom : 1px solid #d7dfe3;
+            padding       : 10px 0;
+        }
     }
-  }
 }
 
-  .nav-tabs > li > a{
-    line-height: 22px;
-  }
+.nav-tabs > li > a {
+    line-height : 22px;
+}
 
-  .nav-tabs > li > a:hover {
-    background-color: #fff !important;
-  }
+.nav-tabs > li > a:hover {
+    background-color : #fff !important;
+}
 
-  .info-icon.active {
-    color: $brand_core !important;
-  }
+.info-icon.active {
+    color : $brand_core !important;
+}
 
-  .video-settings-button:hover,
-  .webclient-panel .dropdown-menu > li > a:hover{
-    background-color: $brand_l2 !important;
-  }
+.video-settings-button:hover,
+.webclient-panel .dropdown-menu > li > a:hover {
+    background-color : $brand_l2 !important;
+}
 
-  .webclient-panel .dropdown-menu {
-    box-shadow: none;
+.webclient-panel .dropdown-menu {
+    box-shadow : none;
 
     & > li > a.active {
-      background-color: $brand_l1 !important;
+        background-color : $brand_l1 !important;
     }
-  }
+}
 
-  ///////////////////////
-  // New styling or retrofitting missing styles
-  ///////////////////////
+///////////////////////
+// New styling or retrofitting missing styles
+///////////////////////
 
-  .dropdown-menu {
-    box-shadow: 0 16px 32px 0 transparentize($dark15, 0.4);
-    position: absolute !important;
-    background-color: $light4;
-    border-top: 1px solid $light6;
-    border-radius: 0;
-    border-bottom-left-radius: 2px;
-    border-bottom-right-radius: 2px;
-    width: 100%;
-    padding: 4px 0;
+.dropdown-menu {
+    box-shadow                 : 0 16px 32px 0 transparentize($dark15, 0.4);
+    position                   : absolute !important;
+    background-color           : $light4;
+    border-top                 : 1px solid $light6;
+    border-radius              : 0;
+    border-bottom-left-radius  : 2px;
+    border-bottom-right-radius : 2px;
+    width                      : 100%;
+    padding                    : 4px 0;
 
     li > a {
-      padding: 0 12px;
-      display: block;
-      text-decoration: none;
-      color: $dark9;
-      line-height: 26px;
+        padding         : 0 12px;
+        display         : block;
+        text-decoration : none;
+        color           : $dark9;
+        line-height     : 26px;
 
-      &:hover {
-        color: $light1;
-        background-color: $light16;
-      }
+        &:hover {
+            color            : $light1;
+            background-color : $light16;
+        }
     }
-  }
+}
 
-  .input-group {
+.input-group {
     &.has-addon {
-      input {
-        border-right: none !important;
-      }
+        input {
+            border-right : none !important;
+        }
     }
 
     &-addon {
-      height: 32px;
-      padding: 5px 16px;
-      font-size: 14px;
-      font-weight: 400;
-      line-height: 1;
-      color: #121517;
-      text-align: center;
-      background-color: $light_core !important;
-      border: 1px solid $light5;
-      border-left: none;
-      border-radius: 2px;
-      display: flex;
-      align-items: center;
-      justify-items: center;
+        height           : 32px;
+        padding          : 5px 16px;
+        font-size        : 14px;
+        font-weight      : 400;
+        line-height      : 1;
+        color            : #121517;
+        text-align       : center;
+        background-color : $light_core !important;
+        border           : 1px solid $light5;
+        border-left      : none;
+        border-radius    : 2px;
+        display          : flex;
+        align-items      : center;
+        justify-items    : center;
 
-      .glyphicon {
-        margin: 0;
-      }
+        .glyphicon {
+            margin : 0;
+        }
     }
-  }
+}
 
-  .badge {
-    border-radius: $border-radius-small;
-    font-weight: normal;
-    padding: 5px;
+.badge {
+    border-radius : $border-radius-small;
+    font-weight   : normal;
+    padding       : 5px;
 
     &-default {
-      background-color: $light8;
+        background-color : $light8;
     }
-  }
+}
 
 .card-body {
-  padding: rem(12px 16px 14px 16px);
+    padding : rem(12px 16px 14px 16px);
 
-  .user-name {
-    height: 20px;
-  }
+    .user-name {
+        height : 20px;
+    }
 }
 
 .table {
-  & thead {
-    & th {
-      padding-left: 0;
+    & thead {
+        & th {
+            padding-left : 0;
+        }
     }
-  }
 
-  & tbody {
-    & td {
-      padding-left: 0;
+    & tbody {
+        & td {
+            padding-left : 0;
+        }
     }
-  }
 }

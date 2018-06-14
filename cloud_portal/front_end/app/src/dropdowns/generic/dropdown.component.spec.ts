@@ -1,21 +1,21 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { NxDropdown } from './dropdown.component';
+import { NxGenericDropdown } from './dropdown.component';
 
-describe('NxDropdown', () => {
-    let component: NxDropdown;
-    let fixture: ComponentFixture<NxDropdown>;
+describe('NxGenericDropdown', () => {
+    let component: NxGenericDropdown;
+    let fixture: ComponentFixture<NxGenericDropdown>;
 
     beforeEach(async(() => {
         TestBed
                 .configureTestingModule({
-                    declarations: [NxDropdown]
+                    declarations: [NxGenericDropdown]
                 })
                 .compileComponents();
     }));
 
     beforeEach(() => {
-        fixture = TestBed.createComponent(NxDropdown);
+        fixture = TestBed.createComponent(NxGenericDropdown);
         component = fixture.componentInstance;
         fixture.detectChanges();
     });
