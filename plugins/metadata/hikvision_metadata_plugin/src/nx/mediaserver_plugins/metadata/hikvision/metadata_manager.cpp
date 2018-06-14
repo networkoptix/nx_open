@@ -9,6 +9,7 @@
 #include <nx/sdk/metadata/common_event_metadata_packet.h>
 #include <nx/mediaserver_plugins/utils/uuid.h>
 #include <nx/utils/log/log_main.h>
+#include <nx/fusion/model_functions.h>
 
 namespace nx {
 namespace mediaserver {
@@ -87,7 +88,12 @@ Error MetadataManager::startFetchingMetadata(
     for (int i = 0; i < typeListSize; ++i)
         eventTypes.push_back(nx::mediaserver_plugins::utils::fromPluginGuidToQnUuid(typeList[i]));
     m_monitor =
-        std::make_unique<HikvisionMetadataMonitor>(m_plugin->driverManifest(), m_url, m_auth, eventTypes);
+        std::make_unique<HikvisionMetadataMonitor>(
+            m_plugin->driverManifest(), 
+            QJson::deserialized<nx::api::AnalyticsDeviceManifest>(m_deviceManifest),
+            m_url, 
+            m_auth, 
+            eventTypes);
 
     m_handler = handler;
 
