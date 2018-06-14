@@ -37,13 +37,27 @@ public:
         "this port, so name \a rtspPort does not reflects its purpose"
     };
     Option<int> appserverPort{this, "appserverPort", 7001, ""};
-    Option<QString> appserverHost{this, "appserverHost", "", ""};
-    Option<QString> appserverPassword{this, "appserverPassword","", ""};
+    Option<QString> appserverHost{this, "appserverHost", "",
+        "Application server IP address. Usually it's built in to a media server. So, value is "
+        "empty or has value 'localhost'. But it's allowed to redirect media server to a remote "
+        "database placed at another media server."
+    };
+    Option<QString> appserverPassword{this, "appserverPassword","",
+        "Password to authenticate on EC database. If server use local database, this password is "
+        "writen to a database as an admin password then it's removed from config for security "
+        "reasons."
+    };
     Option<QString> appserverLogin{this, "appserverLogin",helpers::kFactorySystemUser, ""};
     Option<qint64> minStorageSpace{this, "minStorageSpace",kDefaultMinStorageSpace, ""};
     Option<int> disableStorageDbOptimization{this, "disableStorageDbOptimization",0, ""};
-    Option<int> maxRecordQueueSizeBytes{this, "maxRecordQueueSizeBytes", 1024 * 1024 * 20, ""};
-    Option<int> maxRecordQueueSizeElements{this, "maxRecordQueueSizeElements", 1000, ""};
+    Option<int> maxRecordQueueSizeBytes{this, "maxRecordQueueSizeBytes", 1024 * 1024 * 20,
+        "Maximum size of recording queue per camera stream. Queue overflow results in frame drops "
+        "and \"Not enough HDD/SDD recording speed\" event."
+    };
+    Option<int> maxRecordQueueSizeElements{this, "maxRecordQueueSizeElements", 1000,
+        "Maximum number of frames in recording queue per camera stream. Queue overflow results in "
+        "frame drops and \"Not enough HDD/SDD recording speed\" event."
+    };
     Option<unsigned int> hlsChunkCacheSizeSec{this, "hlsChunkCacheSizeSec", 60, ""};
     Option<int> hlsRemovedChunksToKeep{this, "hlsRemovedChunksToKeep",
         kDefaultHlsRemovedLiveChunksToKeep,
@@ -57,7 +71,7 @@ public:
         "removed from playlist which are still available for downloading\n"
         "\\warning Value of 0 is unreliable and can lead to improper playback (chunked removed "
         "after client has received playlist but before chunk has been downloaded), so 1 minimum "
-        "is ecommended"
+        "is recommended"
     };
     Option<int> hlsPlaylistPreFillChunks{this, "hlsPlaylistPreFillChunks",
         kDefaultHlsPlaylistPreFillChunks,
@@ -75,28 +89,49 @@ public:
     Option<bool> disableDirectIO{this, "disableDirectIO", 0, ""};
     Option<int> ffmpegBufferSize{this, "ffmpegBufferSize",
         4 * 1024 * 1024,
-        "This required to minimize seeks on disk, since ffmpeg sometimes seeks to the left from "
-        "current file position to fill in some media file structure size"
+        "Size of data to keep in memory after each write. This is required to minimize seeks on "
+        "disk, since ffmpeg sometimes seeks to the left from current file position to fill in some"
+        " media file structure size. Minimal value for adaptive buffer."
     };
-    Option<int> maxFfmpegBufferSize{this, "maxFfmpegBufferSize", 4 * 1024 * 1024, ""};
+    Option<int> maxFfmpegBufferSize{this, "maxFfmpegBufferSize", 4 * 1024 * 1024,
+        "Size of data to keep in memory after each write. This is required to minimize seeks on "
+        "disk, since ffmpeg sometimes seeks to the left from current file position to fill in some"
+        " media file structure size. Minimal value for adaptive buffer."
+    };
     Option<int> mediaFileDuration{this, "mediaFileDuration", 60, ""};
     Option<int> hlsInactivityPeriod{this, "hlsInactivityPeriod", 10,
         "If no one uses HLS for thid time period (in seconds), than live media cache is stopped "
         "and cleaned. It will be restarted with next HLS request"
     };
     Option<int> resourceInitThreadsCount{this, "resourceInitThreadsCount", 32, ""};
-    Option<QString> allowedSslVersions{this, "allowedSslVersions", "", ""};
-    Option<QString> allowedSslCiphers{this, "allowedSslCiphers", "", ""};
+    Option<QString> allowedSslVersions{this, "allowedSslVersions", "",
+        "Supported values: SSLv1, SSLv2, TLSv1, TLSv1.1, TLSv1.2"
+    };
+    Option<QString> allowedSslCiphers{this, "allowedSslCiphers", "",
+        "Supported ciphers, see SSL docs."
+    };
     Option<int> progressiveDownloadSessionLiveTimeSec {this,
         "progressiveDownloadSessionLiveTimeSec",
         0,
-        ""
+        "0 means no limit"
     };
-    Option<bool> allowSslConnections{this, "allowSslConnections", true, ""};
-    Option<bool> createFullCrashDump{this, "createFullCrashDump", false, ""};
+    Option<bool> allowSslConnections{this, "allowSslConnections", true,
+        "Either enable or not receive  ssl connection on the same TCP port. It's enabled by "
+        "default."
+    };
+    Option<bool> createFullCrashDump{this, "createFullCrashDump", false,
+        "Configures the size of crash dumps:\n"
+        "Windows: If true, crash dump with contain full process memory included is created in case"
+        " of medaserver crash. Otherwise, only stack trace of each thread is available in crash "
+        "dump.\n"
+        "Linux: If true, crash dumps are not affected (configured by kernel). Otherwise creates "
+        "all threads backtrace text file (breaks real crash dump).\n"
+        "Other platforms: Ignored (unsupported yet)."
+    };
     Option<QString> publicIPServers{this, "publicIPServers", \
         "",
-        "Semicolon-separated list of servers to get public ip."
+        "Server list via ';'. List of server for checking public IP address. Such server must "
+        "return any HTTP page with IP address inside. It's extracted via regular expression."
     };
     Option<bool> ecDbReadOnly{this, "ecDbReadOnly",
         false,
@@ -105,52 +140,99 @@ public:
     };
     Option<QString> cdbEndpoint{this, "cdbEndpoint", "", ""};
     Option<QString> onvifTimeouts{this, "onvifTimeouts", "", ""};
-    Option<int> enableMultipleInstances{this, "enableMultipleInstances", 0, ""};
+    Option<int> enableMultipleInstances{this, "enableMultipleInstances", 0,
+        "Enables multiple server instances to be started on the same machine. Each server should "
+        "be started with its own config file and should have unique 'port', 'dataDir' and "
+        "'serverGuid' values. If this option is turned on, then automatically found storages path "
+        "will end with storages guid."
+    };
     Option<QString> delayBeforeSettingMasterFlag{this, "delayBeforeSettingMasterFlag", "30s", ""};
-    Option<bool> p2pMode{this, "p2pMode", false, ""};
-    Option<int> allowRemovableStorages{this, "allowRemovableStorages", 1, ""};
+    Option<bool> p2pMode{this, "p2pMode", false,
+        "Switch data synchronization to the new optimized mode"
+    };
+    Option<int> allowRemovableStorages{this, "allowRemovableStorages", 1,
+        "Allows automatic inclusion of discovered local removable storages into the resource pool."
+    };
     Option<QString> checkForUpdateUrl{this, "checkForUpdateUrl",
         nx::update::info::kDefaultUrl,
-        ""};
+        "Url used by mediaserver as a root update information source. Default = "
+        "http://updates.networkoptix.com.\n"
+        "See: https://networkoptix.atlassian.net/wiki/spaces/PM/pages/197394433/Updates"
+    };
     Option<bool> secureAppserverConnection{this, "secureAppserverConnection", false, ""};
     Option<bool> lowPriorityPassword{this, "lowPriorityPassword", false, ""};
-    Option<QString> pendingSwitchToClusterMode{this, "pendingSwitchToClusterMode", "", ""};
+    Option<QString> pendingSwitchToClusterMode{this, "pendingSwitchToClusterMode", "",
+        "Temporary flag. Used on upgrading machine with mediaserver only. If set to true "
+        "mediaserver connects to remote system, sets correct system name, removes this flag and "
+        "restarts."
+    };
     Option<bool> ffmpegRealTimeOptimization{this, "ffmpegRealTimeOptimization", true, ""};
     Option<int> redundancyTimeout{this, "redundancyTimeout", 3, ""};
-    Option<QString> logDir{this, "logDir", "", ""};
+    Option<QString> logDir{this, "logDir", "",
+        "Directory to store logs in."
+    };
     Option<QString> logLevel{this, "logLevel", "", ""};
-    Option<QString> httpLogLevel{this, "http-log-level", "", ""};
+    Option<QString> httpLogLevel{this, "http-log-level", "",
+        "If not equal to none, http_log.log appears in logDir. All HTTP/RTSP requests/responses"
+        " logged to that file."
+    };
     Option<QString> systemLogLevel{this, "systemLogLevel", "", ""};
-    Option<QString> tranLogLevel{this, "tranLogLevel", "", ""};
+    Option<QString> tranLogLevel{this, "tranLogLevel", "",
+        "If not equal to none, ec2_tran.log appears in logDir and ec2 transaction - related "
+        "messages written to it."
+    };
     Option<QString> permissionsLogLevel{this, "permissionsLogLevel", "", ""};
-    Option<int> logArchiveSize{this, "logArchiveSize", 25, ""};
-    Option<unsigned int> maxLogFileSize{this, "maxLogFileSize", 10*1024*1024, ""};
+    Option<int> logArchiveSize{this, "logArchiveSize", 25,
+        "Maximum number of log files of each type to store."
+    };
+    Option<unsigned int> maxLogFileSize{this, "maxLogFileSize", 10*1024*1024,
+        "Maximum size (in bytes) of a single log file."
+    };
     Option<int> tcpLogPort{this, "tcpLogPort", 0, ""};
     Option<int> noSetupWizard{this, "noSetupWizard", 0, ""};
-    Option<int> publicIPEnabled{this, "publicIPEnabled", 1, ""};
-    Option<QString> staticPublicIP{this, "staticPublicIP", "", ""};
+    Option<int> publicIPEnabled{this, "publicIPEnabled", 1,
+        "If true, allow server to discovery its public IP address. Default value is 'true'."
+    };
+    Option<QString> staticPublicIP{this, "staticPublicIP", "",
+        "Set server public IP address manually. If it set server won't discovery it."
+    };
     Option<QString> mediatorAddressUpdate{this, "mediatorAddressUpdate", "", ""};
     Option<bool> disableTranscoding{this, "disableTranscoding", false, ""};
     Option<bool> noResourceDiscovery{this, "noResourceDiscovery", false, ""};
-    Option<bool> removeDbOnStartup{this, "removeDbOnStartup", false, ""};
+    Option<bool> removeDbOnStartup{this, "removeDbOnStartup", false,
+        "Cleanup ecs.sqlite when server is running if parameter is '1'. So, server will started "
+        "with empty database. This parameter applies only once. Server will change it to '0' "
+        "automatically."
+    };
     Option<int> disableRename{this, "disableRename", 0, ""};
     Option<int> systemIdFromSystemName{this, "systemIdFromSystemName", 0, ""};
     Option<bool> noMonitorStatistics{this, "noMonitorStatistics",
         false,
         "disable CPU/network usage stats"
     };
-    Option<QString> guidIsHWID{this, "guidIsHWID", "", ""};
+    Option<QString> guidIsHWID{this, "guidIsHWID", "",
+        "yes If current servers's hardware id is used as server id, no if not used. Initially this"
+        " value is empty. On first start server checks if it can use hardwareid as its id and sets"
+        " this flag to yes or no accordingly."
+    };
     Option<QString> serverGuid{this, "serverGuid", "", ""};
-    Option<QString> serverGuid2{this, "serverGuid2", "", ""};
-    Option<QString> obsoleteServerGuid{this, "obsoleteServerGuid", "", ""};
-
-    Option<QString> if_{this, "if", "", ""};
+    Option<QString> serverGuid2{this, "serverGuid2", "",
+        "Server Guid used by v < 2.3 to connect to another server (workaround for DW's issue with "
+        "cloning)."
+    };
+    Option<QString> obsoleteServerGuid{this, "obsoleteServerGuid", "",
+        "Temporary variable. Set when changing serverGuid to hardware id."
+    };
+    Option<QString> if_{this, "if", "",
+        "Allow only specific network adapter for a server"
+    };
     Option<qint64> sysIdTime{this, "sysIdTime", 0, ""};
     Option<bool> authenticationEnabled{this, "authenticationEnabled", true, ""};
     Option<QByteArray> authKey{this, "authKey", "", ""};
     Option<qint64> forceStopRecordingTime{this, "forceStopRecordingTime",
         60 * 24 * 30,
-        "",
+        "Stop camera recording timeout if not enough license. Value in minutes. By default it's 30"
+        " days.",
         [this](const qint64& value)
         {
             return qMin(value, forceStopRecordingTime.defaultValue());
@@ -164,13 +246,13 @@ public:
 #if defined(Q_OS_LINUX)
     Option<QString> varDir{this, "varDir",
         QString("/opt/%1/mediaserver/var").arg(QnAppInfo::linuxOrganizationName()),
-        ""
+        "Linux specific."
     };
 #endif // defined(Q_OS_LINUX)
 
     Option<QString> sslCertificatePath{this, "sslCertificatePath",
         "",
-        "",
+        "Custom certificate path.",
         [this](const QString& value)
         {
             if (!sslCertificatePath.present())
@@ -181,7 +263,9 @@ public:
     };
     Option<QString> dataDir{this, "dataDir",
         "",
-        "",
+        "/var (on linux). "
+        "C:\\Users\\{username}\\AppData\\Local\\Network Optix\\Network Optix Media Server\\ on "
+        "MSWin",
         [this](const QString& value)
         {
             if (!value.isEmpty())
@@ -192,7 +276,7 @@ public:
     };
     Option<QString> staticDataDir{this, "staticDataDir",
         "",
-        "",
+        "If set, license ecs_static.sqlite will be forwarded to specified directory.",
         [this](const QString& value)
         {
             if (!staticDataDir.present())
@@ -214,7 +298,9 @@ public:
     };
     Option<std::chrono::milliseconds> hlsTargetDurationMS{this, "hlsTargetDurationMS",
         kDefaultHlsTargetDurationMs,
-        "",
+        "Size of HLS chunk in millis. Specification recommends this value to be 10 seconds. Keep "
+        "in mind that live playback delay is about 3 * hlsTargetDurationMS. Lower value can result"
+        " in playback defects due to network congestion.",
         [](const std::chrono::milliseconds& value)
         {
             if (value.count() == 0)
@@ -225,7 +311,7 @@ public:
     };
     Option<qint64> checkForUpdateTimeout{this, "checkForUpdateTimeout",
         0, //< TODO: #lbusygin: Investiagate documentation inconsistency.
-        "",
+        "Check for update timeout in ms. Default value = 24 * 60 * 60 * 1000 (1 day)",
         [](const qint64& value)
         {
             if (value == 0)

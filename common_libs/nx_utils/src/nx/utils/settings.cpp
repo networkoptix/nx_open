@@ -1,6 +1,11 @@
 #include <nx/utils/settings.h>
+
+#include <QJsonArray>
+
 #include <nx/utils/log/log.h>
 #include <nx/utils/literal.h>
+
+
 
 namespace nx {
 namespace utils {
@@ -46,6 +51,22 @@ bool Settings::save(QSettings& settings) const
         }
     }
     return true;
+}
+
+QJsonObject Settings::buildDocumentation() const
+{
+    QJsonObject documentation;
+    QJsonArray settings;
+    for (auto& option: m_options)
+    {
+        QJsonObject description;
+        description.insert("name", option.first);
+        description.insert("defaultValue", option.second->defaultValueVariant().toString());
+        description.insert("description", option.second->description());
+        settings << description;
+    }
+    documentation.insert("settings", settings);
+    return documentation;
 }
 
 } // namespace utils

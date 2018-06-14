@@ -7,6 +7,8 @@
 #include <nx/utils/log/assert.h>
 
 #include <QSettings>
+#include <QJsonObject>
+
 
 namespace nx {
 namespace utils {
@@ -49,10 +51,13 @@ public:
     bool load(const QSettings& settings);
     bool save(QSettings& settings) const;
 
+    QJsonObject buildDocumentation() const;
+
 protected:
     struct BaseOption
     {
-        BaseOption(Settings* settings, const QString& name)
+        BaseOption(Settings* settings, const QString& name, QString description):
+            m_description(std::move(description))
         {
             settings->add(name, this);
         }
@@ -62,13 +67,17 @@ protected:
         bool present() const { return isPresent; }
         bool removed() const { return isRemoved; }
 
+        const QString& description() { return m_description; }
+
         virtual bool load(const QVariant& value) = 0;
         virtual QVariant save() const = 0;
+        virtual QVariant defaultValueVariant() const = 0;
 
         BaseOption(const BaseOption&) = delete;
         BaseOption& operator=(const BaseOption&) = delete;
 
     protected:
+        QString m_description;
         bool isPresent = false;
         bool isRemoved = false;
     };
@@ -81,16 +90,15 @@ protected:
 
         Option(
             Settings* settings,
-            QString name,
+            const QString& name,
             T defaultValue,
             QString description,
             Accessor accessor = defaultAccessor)
             :
-            BaseOption(settings, name),
+            BaseOption(settings, name, std::move(description)),
             m_settings(settings),
             m_value(defaultValue),
             m_defaultValue(std::move(defaultValue)),
-            m_description(std::move(description)),
             m_accessor(std::move(accessor))
         {
         }
@@ -119,18 +127,36 @@ protected:
     private:
         virtual bool load(const QVariant& value) override
         {
-            if (!value.isValid() || !value.canConvert<T>())
+            if (!fromQVariant(value, m_value))
                 return false;
 
-            m_value = value.value<T>();
             isPresent = true;
             return true;
         }
 
         virtual QVariant save() const override
         {
+            return toQVariant(m_value);
+        }
+
+        virtual QVariant defaultValueVariant() const override
+        {
+            return toQVariant(m_defaultValue);
+        }
+
+        static bool fromQVariant(const QVariant& value, T& result)
+        {
+            if (!value.isValid() || !value.canConvert<T>())
+                return false;
+
+            result = value.value<T>();
+            return true;
+        }
+
+        static QVariant toQVariant(const T& value)
+        {
             QVariant result;
-            result.setValue(m_value);
+            result.setValue(value);
             return result;
         }
 
@@ -138,7 +164,7 @@ protected:
         const Settings *const m_settings;
         T  m_value;
         T  m_defaultValue;
-        QString m_description;
+
         Accessor m_accessor;
     };
 
@@ -153,21 +179,22 @@ private:
 };
 
 template<>
-inline bool Settings::Option<std::chrono::milliseconds>::load(const QVariant& value)
+inline bool Settings::Option<std::chrono::milliseconds>::fromQVariant(
+    const QVariant& value, std::chrono::milliseconds& result)
 {
     if (!value.isValid() || !value.canConvert<quint64>())
         return false;
 
-    m_value = std::chrono::milliseconds(value.value<quint64>());
-    isPresent = true;
+    result = std::chrono::milliseconds(value.value<quint64>());
     return true;
 }
 
 template<>
-inline QVariant Settings::Option<std::chrono::milliseconds>::save() const
+inline QVariant Settings::Option<std::chrono::milliseconds>::toQVariant(
+    const std::chrono::milliseconds& value)
 {
     QVariant result;
-    result.setValue(m_value.count());
+    result.setValue(value.count());
     return result;
 }
 

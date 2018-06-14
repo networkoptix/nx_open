@@ -169,6 +169,7 @@
 #include <rest/handlers/detach_from_cloud_rest_handler.h>
 #include <rest/handlers/detach_from_system_rest_handler.h>
 #include <rest/handlers/restore_state_rest_handler.h>
+#include <rest/handlers/settings_documentation_handler.h>
 #include <rest/handlers/setup_local_rest_handler.h>
 #include <rest/handlers/setup_cloud_rest_handler.h>
 #include <rest/handlers/merge_systems_rest_handler.h>
@@ -2680,6 +2681,15 @@ void MediaServerProcess::registerRestHandlers(
 
     using namespace mediaserver::rest::updates2;
     reg(kUpdates2Path, new Updates2RestHandler());
+
+    /**%apidoc GET /api/settingsDocumentation
+     * Return settings documentation
+     * %return:array List of setting descriptions.
+     *     %param:string name Setting name
+     *     %param:string defaultValue Setting default value
+     *     %param:string description Setiing description
+     */
+    reg("api/settingsDocumentation", new QnSettingsDocumentationHandler());
 }
 
 template<class TcpConnectionProcessor, typename... ExtraParam>
