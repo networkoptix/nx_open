@@ -99,7 +99,7 @@ rest::Handle ServerConnection::cameraThumbnailAsync(const nx::api::CameraImageRe
     QnThumbnailRequestData data;
     data.request = request;
     data.format = Qn::UbjsonFormat;
- 
+
     return executeGet(lit("/ec2/cameraThumbnail"), data.toParams(), callback, targetThread);
 }
 
