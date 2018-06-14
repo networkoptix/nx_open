@@ -23,7 +23,7 @@ QnFisheyePtzController::QnFisheyePtzController(QnMediaResourceWidget* widget):
     m_mediaDewarpingParams(widget->dewarpingParams()),
     m_itemDewarpingParams(widget->item()->dewarpingParams())
 {
-    m_unitSpeed = nx::core::ptz::Vector(60.0, 60.0, 0.0, 30.0);
+    m_unitSpeed = {60.0, 60.0, 0.0, 30.0};
 
     m_widget = widget;
     m_widget->registerAnimation(this);

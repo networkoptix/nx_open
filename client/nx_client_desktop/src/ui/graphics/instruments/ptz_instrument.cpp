@@ -30,6 +30,8 @@
 #include <ui/workbench/workbench_display.h>
 #include <ui/workbench/workbench_context.h>
 
+using namespace nx::core;
+
 namespace {
 
 const qreal instantSpeedUpdateThreshold = 0.1;
@@ -148,10 +150,7 @@ void PtzInstrument::MovementFilter::setMovementSpeed(const nx::core::ptz::Vector
 // -------------------------------------------------------------------------- //
 // PtzInstrument
 // -------------------------------------------------------------------------- //
-PtzInstrument::PtzInstrument(
-    nx::core::ptz::Type ptzType,
-    QObject *parent)
-    :
+PtzInstrument::PtzInstrument(QObject *parent):
     base_type(
         makeSet(QEvent::MouseButtonPress, AnimationEvent::Animation),
         makeSet(),
@@ -166,8 +165,7 @@ PtzInstrument::PtzInstrument(
     QnWorkbenchContextAware(parent),
     m_clickDelayMSec(QApplication::doubleClickInterval()),
     m_expansionSpeed(qnGlobals->workbenchUnitSize() / 5.0),
-    m_movement(NoMovement),
-    m_ptzType(ptzType)
+    m_movement(NoMovement)
 {
 }
 
@@ -437,7 +435,7 @@ void PtzInstrument::updateCapabilities(QnMediaResourceWidget* widget)
 {
     PtzData& data = m_dataByWidget[widget];
 
-    Ptz::Capabilities capabilities = widget->ptzController()->getCapabilities({m_ptzType});
+    Ptz::Capabilities capabilities = widget->ptzController()->getCapabilities(ptz::Options());
     if (data.capabilities == capabilities)
         return;
 
@@ -453,7 +451,7 @@ void PtzInstrument::updateTraits(QnMediaResourceWidget* widget)
     PtzData& data = m_dataByWidget[widget];
 
     QnPtzAuxilaryTraitList traits;
-    widget->ptzController()->getAuxilaryTraits(&traits, {m_ptzType});
+    widget->ptzController()->getAuxilaryTraits(&traits, ptz::Options());
     if (data.traits == traits)
         return;
 
@@ -470,7 +468,7 @@ void PtzInstrument::ptzMoveTo(QnMediaResourceWidget* widget, const QRectF& rect)
 {
     qreal aspectRatio = QnGeometry::aspectRatio(widget->size());
     QRectF viewport = QnGeometry::cwiseDiv(rect, widget->size());
-    widget->ptzController()->viewportMove(aspectRatio, viewport, 1.0, {m_ptzType});
+    widget->ptzController()->viewportMove(aspectRatio, viewport, 1.0, ptz::Options());
 }
 
 void PtzInstrument::ptzUnzoom(QnMediaResourceWidget* widget)
@@ -493,7 +491,7 @@ void PtzInstrument::ptzMove(QnMediaResourceWidget* widget, const nx::core::ptz::
 
     if (instant)
     {
-        widget->ptzController()->continuousMove(data.requestedSpeed, {m_ptzType});
+        widget->ptzController()->continuousMove(data.requestedSpeed, ptz::Options());
         data.currentSpeed = data.requestedSpeed;
 
         m_movementTimer.stop();
@@ -507,7 +505,7 @@ void PtzInstrument::ptzMove(QnMediaResourceWidget* widget, const nx::core::ptz::
 
 void PtzInstrument::focusMove(QnMediaResourceWidget* widget, qreal speed)
 {
-    widget->ptzController()->continuousFocus(speed, {m_ptzType});
+    widget->ptzController()->continuousFocus(speed, ptz::Options());
 }
 
 void PtzInstrument::focusAuto(QnMediaResourceWidget* widget)
@@ -515,7 +513,7 @@ void PtzInstrument::focusAuto(QnMediaResourceWidget* widget)
     widget->ptzController()->runAuxilaryCommand(
         Ptz::ManualAutoFocusPtzTrait,
         QString(),
-        {m_ptzType});
+        ptz::Options());
 }
 
 void PtzInstrument::processPtzClick(const QPointF& pos)
@@ -833,12 +831,12 @@ void PtzInstrument::dragMove(DragInfo* info)
             target()->ptzController()->getPosition(
                 Qn::LogicalPtzCoordinateSpace,
                 &position,
-                {m_ptzType});
+                ptz::Options());
 
             qreal speed = 0.5 * position.zoom;
             nx::core::ptz::Vector positionDelta(shift.x() * speed, shift.y() * speed, 0.0, 0.0);
             target()->ptzController()->absoluteMove(Qn::LogicalPtzCoordinateSpace,
-                position + positionDelta, 2.0, {m_ptzType}); /* 2.0 means instant movement. */
+                position + positionDelta, 2.0, ptz::Options()); /* 2.0 means instant movement. */
 
             ensureElementsWidget();
             auto arrowItem = elementsWidget()->arrowItem();

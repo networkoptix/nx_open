@@ -29,7 +29,7 @@ class PtzInstrument: public DragProcessingInstrument, public QnWorkbenchContextA
     using base_type = DragProcessingInstrument;
 
 public:
-    PtzInstrument(nx::core::ptz::Type ptzType, QObject* parent = nullptr);
+    PtzInstrument(QObject* parent = nullptr);
     virtual ~PtzInstrument();
 
 signals:
@@ -188,5 +188,4 @@ private:
     QScopedPointer<MovementFilter> m_movementFilter;
 
     QList<SplashItemAnimation> m_freeAnimations, m_activeAnimations;
-    nx::core::ptz::Type m_ptzType;
 };

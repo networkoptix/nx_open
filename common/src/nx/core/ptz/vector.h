@@ -20,6 +20,7 @@ public:
     static const ComponentVector<2> kPtComponents;
     static const ComponentVector<3> kPtrComponents;
     static const ComponentVector<3> kPtzComponents;
+    static const ComponentVector<4> kPtrzComponents;
 
 public:
     Vector() = default;
@@ -32,6 +33,10 @@ public:
     Vector(
         const QVector3D& vector,
         const ComponentVector<3>& components);
+
+    Vector(
+        const QVector4D& vector,
+        const ComponentVector<4>& components);
 
     void setComponent(double value, Component component);
 
@@ -46,8 +51,8 @@ public:
 
     Vector operator-(const Vector& other) const;
 
-    // Multiplies the corresponding components of two vectors.
-    // Is not the same as cross profuct.
+    // Multiplies the corresponding components of two vectors (Hadamar product).
+    // Is not the same as cross product.
     Vector operator*(const Vector& other) const;
 
     Vector operator/(const Vector& other) const;

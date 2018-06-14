@@ -10,11 +10,14 @@ namespace ptz {
 
 const ComponentVector<2> Vector::kPtComponents = {Component::pan, Component::tilt};
 
-const ComponentVector<3> Vector::kPtrComponents
-    = {Component::pan, Component::tilt, Component::rotation};
+const ComponentVector<3> Vector::kPtrComponents =
+    {Component::pan, Component::tilt, Component::rotation};
 
-const ComponentVector<3> Vector::kPtzComponents
-    = {Component::pan, Component::tilt, Component::zoom};
+const ComponentVector<3> Vector::kPtzComponents =
+    {Component::pan, Component::tilt, Component::zoom};
+
+const ComponentVector<4> Vector::kPtrzComponents =
+    {Component::pan, Component::tilt, Component::rotation, Component::zoom};
 
 Vector::Vector(double pan, double tilt, double rotation, double zoom):
     pan(pan),
@@ -24,21 +27,25 @@ Vector::Vector(double pan, double tilt, double rotation, double zoom):
 {
 }
 
-Vector::Vector(
-    const QPointF& point,
-    const ComponentVector<2>& components)
+Vector::Vector(const QPointF& point, const ComponentVector<2>& components)
 {
     setComponent(point.x(), components[0]);
     setComponent(point.y(), components[1]);
 }
 
-Vector::Vector(
-    const QVector3D& vector,
-    const ComponentVector<3>& components)
+Vector::Vector(const QVector3D& vector, const ComponentVector<3>& components)
 {
     setComponent(vector.x(), components[0]);
     setComponent(vector.y(), components[1]);
     setComponent(vector.z(), components[2]);
+}
+
+Vector::Vector(const QVector4D& vector, const ComponentVector<4>& components)
+{
+    setComponent(vector.x(), components[0]);
+    setComponent(vector.y(), components[1]);
+    setComponent(vector.z(), components[2]);
+    setComponent(vector.w(), components[3]);
 }
 
 void Vector::setComponent(double value, Component component)
@@ -92,14 +99,17 @@ Vector Vector::operator*(const Vector& other) const
 Vector Vector::operator/(const Vector& other) const
 {
     return Vector(
-        pan / other.pan,
-        tilt / other.tilt,
-        rotation / other.rotation,
-        zoom / other.zoom);
+        (other.pan == 0) ? pan / other.pan : qQNaN<double>(),
+        (other.tilt == 0) ? tilt / other.tilt : qQNaN<double>(),
+        (other.rotation == 0) ? rotation / other.rotation : qQNaN<double>(),
+        (other.zoom == 0) ? zoom / other.zoom : qQNaN<double>());
 }
 
 Vector Vector::operator/(double scalar) const
 {
+    if (scalar == 0)
+        return qQNaN<Vector>();
+
     return Vector(
         pan / scalar,
         tilt / scalar,
