@@ -40,6 +40,7 @@
 #include <ui/processors/drag_processor.h>
 #include <ui/utils/bookmark_merge_helper.h>
 #include <nx/client/desktop/ui/workbench/workbench_animations.h>
+#include <nx/client/desktop/utils/widget_utils.h>
 #include <nx/client/desktop/timeline/graphics/timeline_cursor_layout.h>
 #include <nx/client/desktop/timeline/graphics/timeline_screenshot_cursor.h>
 #include <nx/client/core/utils/geometry.h>
@@ -1791,11 +1792,26 @@ QGraphicsItem* QnTimeSlider::screenshotCursor()
     return m_screenshotCursor;
 }
 
-void QnTimeSlider::updateScreenshotCursor(qreal position)
+void QnTimeSlider::showScreenshotCursor(QPointF screenPosition, bool lazy)
 {
     if (!m_iniUseScreenshotCursor)
         return;
-    m_screenshotCursor->showAt(position);
+
+    qint64 timePosition = valueFromPosition(screenPosition, true);
+    bool isUtc = m_options.testFlag(UseUTC);
+    m_screenshotCursor->content()->setTimeContent(false, //< Screenshot is never live.
+        isUtc ? timePosition + m_localOffset : timePosition,
+        isUtc,  maximum() >= 60ll * 60ll * 1000ll); //< Longer than 1 hour?
+    m_screenshotCursor->showAt(screenPosition.x(), lazy);
+}
+
+void QnTimeSlider::updateScreenshotCursor()
+{
+    QPointF cursor = nx::client::desktop::WidgetUtils::mapFromGlobal(this, QCursor::pos());
+    if (rect().contains(cursor))
+        showScreenshotCursor(cursor, true);
+    else
+        m_screenshotCursor->hide();
 }
 
 bool QnTimeSlider::isLiveSupported() const
@@ -3025,6 +3041,8 @@ void QnTimeSlider::sliderChange(SliderChange change)
         default:
             break;
     }
+
+    updateScreenshotCursor();
 }
 
 void QnTimeSlider::wheelEvent(QGraphicsSceneWheelEvent* event)
@@ -3132,7 +3150,7 @@ void QnTimeSlider::hoverEnterEvent(QGraphicsSceneHoverEvent* event)
 {
     base_type::hoverEnterEvent(event);
     m_hoverMousePos = event->pos();
-
+    showScreenshotCursor(event->pos());
     unsetCursor();
 }
 
@@ -3140,9 +3158,8 @@ void QnTimeSlider::hoverLeaveEvent(QGraphicsSceneHoverEvent* event)
 {
     base_type::hoverLeaveEvent(event);
     m_hoverMousePos = kInvalidHoverPos;
-
     unsetCursor();
-
+    m_screenshotCursor->hide();
     setThumbnailSelecting(m_lastHoverThumbnail, false);
     m_lastHoverThumbnail = -1;
 }
@@ -3154,7 +3171,7 @@ void QnTimeSlider::hoverMoveEvent(QGraphicsSceneHoverEvent* event)
     m_hoverMousePos = event->pos();
     updateBookmarksViewerLocation();
 
-    updateScreenshotCursor(event->pos().x());
+    showScreenshotCursor(event->pos());
 
     if (isWindowBeingDragged())
         return;
@@ -3272,7 +3289,7 @@ void QnTimeSlider::mousePressEvent(QGraphicsSceneMouseEvent* event)
 void QnTimeSlider::mouseMoveEvent(QGraphicsSceneMouseEvent* event)
 {
     dragProcessor()->mouseMoveEvent(this, event);
-    updateScreenshotCursor(event->pos().x());
+    showScreenshotCursor(event->pos());
     event->accept();
 }
 

@@ -77,7 +77,7 @@ void TimelineCursorLayout::setTimeContent(bool isLive, qint64 pos, bool showDate
         m_tooltipLine2->setText(line2);
         m_tooltipLine2->setVisible(true);
 
-        /* Big datetime tooltips shouldn't be narrower than some minimal value: */
+        // Big datetime tooltips shouldn't be narrower than some minimal value.
         parentLayoutItem()->setMinimumWidth(kDateTimeTooltipMinimalWidth);
     }
 }

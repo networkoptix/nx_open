@@ -1,43 +1,123 @@
 #include "timeline_screenshot_cursor.h"
 
-#include <ui/graphics/items/controls/time_slider.h>
+#include <QtWidgets/QGraphicsProxyWidget>
+
+#include <nx/client/desktop/common/widgets/async_image_widget.h>
+#include <nx/client/desktop/image_providers/image_provider.h>
+#include <nx/client/desktop/image_providers/resource_thumbnail_provider.h>
 #include <nx/client/desktop/timeline/graphics/timeline_cursor_layout.h>
 #include <utils/common/event_processors.h>
+#include <core/resource/resource.h>
+#include <ui/graphics/items/controls/time_slider.h>
+#include <ui/graphics/items/resource/resource_widget.h>
+#include <ui/workbench/workbench_navigator.h>
 
 namespace nx {
 namespace client {
 namespace desktop {
 
-TimelineScreenshotCursor::TimelineScreenshotCursor(QnTimeSlider* slider, QGraphicsItem* tooltipParent):
-    base_type(slider),
+namespace {
+constexpr int kThumbnailWidth = 192;
+constexpr int kThumbnailHeight = 108;
+constexpr int kLazyUpdateMs = 1000; //< Autoupdate cursor once per sec.
+}
+
+TimelineScreenshotCursor::TimelineScreenshotCursor(QnTimeSlider* slider, QGraphicsItem* tooltipParent)
+    : base_type(slider),
+    QnWorkbenchContextAware(slider),
     m_slider(slider),
     m_layout(new TimelineCursorLayout()),
-    m_mark(new QGraphicsLineItem(this))
-{
+    m_mark(new QGraphicsLineItem(this)),
+    m_thumbnail(new AsyncImageWidget()),
+    m_thumbnailHeight(kThumbnailHeight),
+    m_lazyExecutor([this] { showNow(); }, kLazyUpdateMs)
+ {
     setParentItem(tooltipParent);
-    setLayout(m_layout);
-    setContentsMargins(QMarginsF());
-    m_layout->setTimeContent(false, 0, true);
+    setContentsMargins(0.0, 0.0, 0.0, 0.0);
+
+    m_thumbnail = new AsyncImageWidget();
+    m_thumbnail->setMaximumWidth(kThumbnailWidth);
+    m_thumbnail->setMinimumWidth(kThumbnailWidth);
+    m_thumbnail->setReloadMode(AsyncImageWidget::ReloadMode::showPreviousImage);
+
+    auto graphicsWidget = new QGraphicsProxyWidget();
+    graphicsWidget->setWidget(m_thumbnail);
+
+    auto mainLayout = new QGraphicsLinearLayout(Qt::Vertical);
+    mainLayout->setContentsMargins(0.0, 0.0, 0.0, 0.0);
+    mainLayout->addItem(graphicsWidget);
+    mainLayout->addItem(m_layout);
+    setLayout(mainLayout);
+
     m_mark->setParentItem(slider);
     m_mark->setPen(palette().mid().color());
 
-    // we should set color for the mark on the timeline.
+    // We should set color for the mark on the timeline.
     installEventHandler(this, QEvent::PaletteChange, this,
         [this](QObject*, QEvent*) { m_mark->setPen(palette().mid().color()); });
+
     hide();
 }
 
 TimelineScreenshotCursor::~TimelineScreenshotCursor()
 {
+    m_thumbnail->setImageProvider(nullptr);
 }
 
-void TimelineScreenshotCursor::showAt(qreal position)
+void TimelineScreenshotCursor::showAt(qreal position, bool lazy)
 {
-    QPointF point = mapToParent(mapFromItem(m_slider, position, -kToolTipMargin));
-    pointTo(point);
-    m_mark->setLine(position, 0, position, m_slider->geometry().height());
+    m_position = position;
+    if (lazy) // Execute showNow(), but probably later and not too often.
+        m_lazyExecutor.requestOperation();
+    else
+        showNow();
+}
+
+TimelineCursorLayout* TimelineScreenshotCursor::content()
+{
+    return m_layout;
+}
+
+QVariant TimelineScreenshotCursor::itemChange(GraphicsItemChange change, const QVariant &value)
+{
+    if (change == ItemVisibleHasChanged)
+        m_mark->setVisible(value.toBool());
+    return QGraphicsItem::itemChange(change, value);
+}
+
+void TimelineScreenshotCursor::showNow()
+{
+    qint64 timePoint = m_slider->valueFromPosition(QPointF(m_position, 0), true);
+    api::ResourceImageRequest request;
+    request.usecSinceEpoch = timePoint;
+    request.size = QSize(kThumbnailWidth, 0);
+    request.imageFormat = nx::api::ImageRequest::ThumbnailFormat::jpg;
+    request.roundMethod = nx::api::ImageRequest::RoundMethod::iFrameBefore;
+    request.resource = navigator()->currentWidget()->resource();
+
+    // We probably want to initialize image provider first time unconditionally.
+    if (!m_imageProvider)
+    {
+        m_imageProvider.reset(new ResourceThumbnailProvider(request, this));
+        m_thumbnail->setImageProvider(m_imageProvider.data());
+        m_imageProvider->loadAsync();
+    }
+    else
+        m_imageProvider->setRequestData(request);
+
+    auto resource = navigator()->currentWidget()->resource();
+    bool isLocalFile = resource->hasFlags(Qn::local_video) && !resource->hasFlags(Qn::periods);
+    bool imageExists = isLocalFile
+        || m_slider->timePeriods(0, Qn::RecordingContent).containTime(timePoint);
+
+    m_thumbnail->setNoDataMode(!imageExists);
+
+    if(imageExists)
+        m_imageProvider->loadAsync(); //< Seems second call to loadAsync is OK.
+
+    pointTo(mapToParent(mapFromItem(m_slider, m_position, -kToolTipMargin)));
+    m_mark->setLine(m_position, 0, m_position, m_slider->geometry().height());
     show();
-    qDebug() << "ScreenShot at" << position << point;
 }
 
 } // namespace desktop
