@@ -255,7 +255,7 @@ def upload_file(data_structure, file):
             file_errors = check_image_dimensions(data_structure.name, data_structure.meta_settings, file_dimensions)
 
         if 'size' in data_structure.meta_settings \
-                and file_size > data_structure.meta_settings['size']:
+                and file_size > int(data_structure.meta_settings['size']):
             file_errors.append((data_structure.name, 'File size is {} it should be less than {}'
                                 .format(file_size, data_structure.meta_settings['size'])))
     if file_errors:
