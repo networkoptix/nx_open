@@ -7,6 +7,7 @@
 
 #include <core/resource/camera_resource.h>
 #include <core/resource/layout_resource.h>
+#include <core/resource/avi/avi_resource.h>
 #include <core/resource_management/resource_pool.h>
 
 #include <nx/client/desktop/image_providers/layout_background_image_provider.h>
@@ -24,7 +25,6 @@
 #include <ini.h>
 
 using nx::client::core::Geometry;
-
 
 namespace nx {
 namespace client {
@@ -615,6 +615,11 @@ void LayoutThumbnailLoader::doLoadAsync()
         api::ResourceImageRequest request;
         request.resource = thumbnailItem->resource;
         request.usecSinceEpoch = microseconds(milliseconds(d->msecSinceEpoch)).count();
+        // Here we imitate old FfmpegImageProvider behavior where it ignored position
+        // and always returned middle screenshot.
+        if (thumbnailItem->resource.dynamicCast<QnAviResource>())
+            request.usecSinceEpoch = -1;
+
         request.size = thumbnailSize;
         request.rotation = 0;
         // server still should provide most recent frame when we request request.msecSinceEpoch = -1

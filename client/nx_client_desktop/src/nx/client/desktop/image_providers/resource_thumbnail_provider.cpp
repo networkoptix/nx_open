@@ -58,7 +58,7 @@ struct ResourceThumbnailProvider::Private
         }
         else if (const auto aviResource = resource.dynamicCast<QnAviResource>())
         {
-            baseProvider.reset(new FfmpegImageProvider(resource));
+            baseProvider.reset(new FfmpegImageProvider(resource, request.usecSinceEpoch));
         }
         else
         {
