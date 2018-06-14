@@ -53,91 +53,116 @@ HanwhaPtzExecutor::HanwhaPtzExecutor(
 
 HanwhaPtzExecutor::~HanwhaPtzExecutor()
 {
+    stop();
 }
 
-bool HanwhaPtzExecutor::continuousMove(const QVector3D& speed)
-{
-    HanwhaConfigurationalPtzCommand ptrCommand;
-    ptrCommand.command = HanwhaConfigurationalPtzCommandType::focus;
-    ptrCommand.speed = QVector4D(speed.x(), speed.y(), /*zoom*/ 0, /*rotate*/ 0);
-
-    HanwhaConfigurationalPtzCommand zoomCommand;
-    zoomCommand.command = HanwhaConfigurationalPtzCommandType::focus;
-    zoomCommand.speed = QVector4D(speed.z(), 0, 0, 0);
-
-    executeCommand(ptrCommand);
-    executeCommand(zoomCommand);
-
-    return true;
-}
-
-bool HanwhaPtzExecutor::continuousFocus(qreal speed)
-{
-    HanwhaConfigurationalPtzCommand command;
-    command.command = HanwhaConfigurationalPtzCommandType::focus;
-    command.speed = QVector4D(speed, 0, 0, 0);
-    return executeFocusCommand(command);
-}
-
-bool HanwhaPtzExecutor::executeCommand(const HanwhaConfigurationalPtzCommand& command)
+bool HanwhaPtzExecutor::executeCommand(
+    const HanwhaConfigurationalPtzCommand& command,
+    int64_t sequenceId)
 {
     switch (command.command)
     {
         case HanwhaConfigurationalPtzCommandType::focus:
         case HanwhaConfigurationalPtzCommandType::zoom:
-            return executeFocusCommand(command);
+            return executeFocusCommand(command, sequenceId);
         case HanwhaConfigurationalPtzCommandType::ptr:
-            return executePtrCommand(command);
+            return executePtrCommand(command, sequenceId);
         default:
             NX_ASSERT(false, lit("Wrong command type. We should never be here."));
             return false;
     }
 }
 
-bool HanwhaPtzExecutor::executeFocusCommand(const HanwhaConfigurationalPtzCommand& command)
+void HanwhaPtzExecutor::setCommandDoneCallback(CommandDoneCallback callback)
+{
+    m_callback = std::move(callback);
+}
+
+void HanwhaPtzExecutor::stop()
+{
+    decltype(m_httpClient) httpClient;
+    {
+        QnMutexLocker lock(&m_mutex);
+        m_terminated = true;
+        m_httpClient.swap(httpClient);
+    }
+
+    if (httpClient)
+        httpClient->pleaseStopSync();
+}
+
+bool HanwhaPtzExecutor::executeFocusCommand(
+    const HanwhaConfigurationalPtzCommand& command,
+    int64_t sequenceId)
 {
     const auto parameterName = commandToParameterName(command.command);
     if (parameterName.isEmpty())
         return false;
 
-    const auto parameterValue = toHanwhaParameterValue(parameterName, command.speed.x());
+    const auto parameterValue = toHanwhaParameterValue(parameterName, command.speed.zoom);
     if (parameterValue == std::nullopt)
         return false;
 
-    auto httpClient = makeHttpClient();
+
     const auto url = HanwhaRequestHelper::buildRequestUrl(
         m_hanwhaResource->sharedContext().get(),
         lit("image/focus/control"),
         {
-            {parameterName, *parameterValue},
             // TODO: #dmishin think about bypass here.
-            {kHanwhaChannelProperty, QString::number(m_hanwhaResource->getChannel())}
+            {parameterName, *parameterValue},
+            {kHanwhaChannelProperty, QString::number(m_hanwhaResource->getChannel())},
+            {kHanwhaSequenceIdProperty, QString::number(sequenceId)}
         });
 
-    httpClient->doGet(
-        url,
-        [this, parameterName]() { /* Do something here.*/ });
+    {
+        QnMutexLocker lock(&m_mutex);
+        m_httpClient = makeHttpClientThreadUnsafe();
+        if (!m_httpClient)
+            return false;
+
+        m_httpClient->doGet(
+            url,
+            [this, commandType = command.command]()
+            {
+                if (m_callback)
+                    m_callback(commandType, m_httpClient->hasRequestSuccesed());
+            });
+    }
 
     return true;
 }
 
-bool HanwhaPtzExecutor::executePtrCommand(const HanwhaConfigurationalPtzCommand& command)
+bool HanwhaPtzExecutor::executePtrCommand(
+    const HanwhaConfigurationalPtzCommand& command,
+    int64_t sequenceId)
 {
-    const auto httpClient = makeHttpClient();
-    const auto url = makePtrUrl(command);
-
+    const auto url = makePtrUrl(command, sequenceId);
     if (url == std::nullopt)
         return false;
 
-    httpClient->doGet(
-        *url,
-        []() {/* Do something here.*/});
+    {
+        QnMutexLocker lock(&m_mutex);
+        m_httpClient = makeHttpClientThreadUnsafe();
+        if (!m_httpClient)
+            return false;
+
+        m_httpClient->doGet(
+            *url,
+            [this, commandType = command.command]()
+            {
+                if (m_callback)
+                    m_callback(commandType, m_httpClient->hasRequestSuccesed());
+            });
+    }
 
     return true;
 }
 
-std::unique_ptr<nx_http::AsyncClient> HanwhaPtzExecutor::makeHttpClient() const
+std::unique_ptr<nx_http::AsyncClient> HanwhaPtzExecutor::makeHttpClientThreadUnsafe() const
 {
+    if (m_terminated)
+        return nullptr;
+
     auto auth = m_hanwhaResource->getAuth();
     auto httpClient = std::make_unique<nx_http::AsyncClient>();
     httpClient->setAuth({auth.user(), auth.password()});
@@ -160,22 +185,24 @@ std::optional<QString> HanwhaPtzExecutor::toHanwhaParameterValue(
 }
 
 std::optional<QUrl> HanwhaPtzExecutor::makePtrUrl(
-    const HanwhaConfigurationalPtzCommand& command) const
+    const HanwhaConfigurationalPtzCommand& command,
+    int64_t sequenceId) const
 {
-    if (command.command == HanwhaConfigurationalPtzCommandType::ptr)
+    if (command.command != HanwhaConfigurationalPtzCommandType::ptr)
     {
         NX_ASSERT(false, lit("Wrong command. PTR command is expected"));
         return QUrl();
     }
 
     HanwhaRequestHelper::Parameters requestParameters = {
-        {kHanwhaChannelProperty, QString::number(m_hanwhaResource->getChannel())}
+        {kHanwhaChannelProperty, QString::number(m_hanwhaResource->getChannel())},
+        {kHanwhaSequenceIdProperty, QString::number(sequenceId)}
     };
 
     const std::map<QString, qreal> parameters = {
-        {kHanwhaConfigurationalPan, command.speed.x()},
-        {kHanwhaConfigurationalTilt, command.speed.y()},
-        {kHanwhaConfigurationalRotate, 0.0} //< TODO: #dmishin fix rotate.
+        {kHanwhaConfigurationalPan, command.speed.pan},
+        {kHanwhaConfigurationalTilt, command.speed.tilt},
+        {kHanwhaConfigurationalRotate, command.speed.rotation}
     };
 
     for (const auto& parameter: parameters)

@@ -96,11 +96,14 @@ private:
 };
 
 
-bool getDevicePosition(const QnPtzControllerPtr &controller, QVector3D *position)
+bool getDevicePosition(const QnPtzControllerPtr &controller, nx::core::ptz::Vector* outPosition)
 {
-    if (!controller->hasCapabilities(Ptz::AsynchronousPtzCapability))
+    if (!controller->hasCapabilities(Ptz::AsynchronousPtzCapability, nx::core::ptz::Options()))
     {
-        return controller->getPosition(Qn::DevicePtzCoordinateSpace, position);
+        return controller->getPosition(
+            Qn::DevicePtzCoordinateSpace,
+            outPosition,
+            nx::core::ptz::Options());
     }
     else
     {
@@ -109,15 +112,15 @@ bool getDevicePosition(const QnPtzControllerPtr &controller, QVector3D *position
 
         auto finishedHandler =
             [&](Qn::PtzCommand command, const QVariant &data)
-        {
-            if (command == Qn::GetDevicePositionPtzCommand)
             {
-                result = data.isValid();
-                if (result)
-                    *position = data.value<QVector3D>();
-                eventLoop.exit();
-            }
-        };
+                if (command == Qn::GetDevicePositionPtzCommand)
+                {
+                    result = data.isValid();
+                    if (result)
+                        *outPosition = data.value<nx::core::ptz::Vector>();
+                    eventLoop.exit();
+                }
+            };
 
         QMetaObject::Connection connection = QObject::connect(
             controller.data(),
@@ -126,7 +129,11 @@ bool getDevicePosition(const QnPtzControllerPtr &controller, QVector3D *position
             finishedHandler,
             Qt::QueuedConnection);
 
-        controller->getPosition(Qn::DevicePtzCoordinateSpace, position);
+        controller->getPosition(
+            Qn::DevicePtzCoordinateSpace,
+            outPosition,
+            nx::core::ptz::Options());
+
         eventLoop.exec();
         QObject::disconnect(connection);
         return result;
@@ -174,8 +181,9 @@ void QnWorkbenchPtzHandler::at_ptzSavePresetAction_triggered()
         return;
     }
 
+    QScopedPointer<QnPtzPresetDialog> dialog(
+        new QnPtzPresetDialog(mainWindow()));
 
-    QScopedPointer<QnPtzPresetDialog> dialog(new QnPtzPresetDialog(mainWindow()));
     dialog->setController(widget->ptzController());
     QScopedPointer<QnSingleCameraPtzHotkeysDelegate> hotkeysDelegate(
         new QnSingleCameraPtzHotkeysDelegate(dialog.data(), resource, context()));
@@ -193,7 +201,8 @@ void QnWorkbenchPtzHandler::at_ptzActivatePresetAction_triggered()
         return;
     QnResourcePtr resource = widget->resource()->toResourcePtr();
 
-    if (!widget->ptzController()->hasCapabilities(Ptz::PresetsPtzCapability))
+    if (!widget->ptzController()->hasCapabilities(
+        Ptz::PresetsPtzCapability, nx::core::ptz::Options()))
     {
         // TODO: #GDM #PTZ show appropriate error message?
         return;
@@ -324,7 +333,7 @@ void QnWorkbenchPtzHandler::at_debugCalibratePtzAction_triggered()
 
     QnPtzControllerPtr controller = widget->ptzController();
 
-    QVector3D position;
+    nx::core::ptz::Vector position;
     if (!getDevicePosition(controller, &position))
         return;
 
@@ -333,8 +342,12 @@ void QnWorkbenchPtzHandler::at_debugCalibratePtzAction_triggered()
 
     for (int i = 0; i <= 20; i++)
     {
-        position.setZ(startZ + (endZ - startZ) * i / 20.0);
-        controller->absoluteMove(Qn::DevicePtzCoordinateSpace, position, 1.0);
+        position.zoom = startZ + (endZ - startZ) * i / 20.0;
+        controller->absoluteMove(
+            Qn::DevicePtzCoordinateSpace,
+            position,
+            1.0,
+            nx::core::ptz::Options());
 
         QEventLoop loop;
         QTimer::singleShot(10000, &loop, SLOT(quit()));
@@ -343,7 +356,7 @@ void QnWorkbenchPtzHandler::at_debugCalibratePtzAction_triggered()
         if (!guard || !itemGuard)
             break;
 
-        QVector3D cameraPosition;
+        nx::core::ptz::Vector cameraPosition;
         getDevicePosition(controller, &cameraPosition);
         qDebug() << "SENT POSITION" << position << "GOT POSITION" << cameraPosition;
 
@@ -351,7 +364,9 @@ void QnWorkbenchPtzHandler::at_debugCalibratePtzAction_triggered()
             break;
 
         menu()->trigger(action::TakeScreenshotAction, action::Parameters(widget)
-            .withArgument(Qn::FileNameRole, lit("PTZ_CALIBRATION_%1.jpg").arg(position.z(), 0, 'f', 4)));
+            .withArgument(
+                Qn::FileNameRole,
+                lit("PTZ_CALIBRATION_%1.jpg").arg(position.zoom, 0, 'f', 4)));
     }
 }
 
@@ -362,7 +377,7 @@ void QnWorkbenchPtzHandler::at_debugGetPtzPositionAction_triggered()
         return;
     QnPtzControllerPtr controller = widget->ptzController();
 
-    QVector3D position;
+    nx::core::ptz::Vector position;
     if (!getDevicePosition(controller, &position))
     {
         qDebug() << "COULD NOT GET POSITION";
@@ -406,7 +421,9 @@ void QnWorkbenchPtzHandler::at_ptzContinuousMoveAction_triggered()
     const auto rotation = item->rotation()
         + (item->data<bool>(Qn::ItemFlipRole, false) ? 0.0 : 180.0);
     speed = applyRotation(speed, rotation);
-    controller->continuousMove(speed);
+
+    nx::core::ptz::Vector speedVector(speed.x(), speed.y(), 0.0, speed.z());
+    controller->continuousMove(speedVector, nx::core::ptz::Options());
 }
 
 void QnWorkbenchPtzHandler::at_ptzActivatePresetByIndexAction_triggered()

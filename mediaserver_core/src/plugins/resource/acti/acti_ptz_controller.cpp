@@ -6,6 +6,7 @@
 
 #include "acti_resource.h"
 
+using namespace nx::core;
 
 // -------------------------------------------------------------------------- //
 // Utility
@@ -50,12 +51,12 @@ namespace {
         }
     }
 
-    ActiPtzVector toActiPtzSpeed(const QVector3D &speed) {
+    ActiPtzVector toActiPtzSpeed(const nx::core::ptz::Vector& speedVector)
+    {
         return ActiPtzVector(
-            toActiPanTiltSpeed(speed.x()),
-            toActiPanTiltSpeed(speed.y()),
-            toActiZoomSpeed(speed.z())
-        );
+            toActiPanTiltSpeed(speedVector.pan),
+            toActiPanTiltSpeed(speedVector.tilt),
+            toActiZoomSpeed(speedVector.zoom));
     }
 
     // TODO: #Elric use QnPtzUtilities
@@ -371,24 +372,62 @@ QnActiPtzController::~QnActiPtzController() {
     return;
 }
 
-Ptz::Capabilities QnActiPtzController::getCapabilities() const
+Ptz::Capabilities QnActiPtzController::getCapabilities(const nx::core::ptz::Options& options) const
 {
+    if (options.type != ptz::Type::operational)
+        return Ptz::NoPtzCapabilities;
+
     return d->capabilities;
 }
 
-bool QnActiPtzController::continuousMove(const QVector3D &speed) {
-    return d->continuousMove(toActiPtzSpeed(speed));
+bool QnActiPtzController::continuousMove(
+    const nx::core::ptz::Vector& speedVector,
+    const nx::core::ptz::Options& options)
+{
+    if (options.type != ptz::Type::operational)
+    {
+        NX_ASSERT(false, lit("Wrong PTZ type. Only operational PTZ is supported"));
+        return false;
+    }
+
+    return d->continuousMove(toActiPtzSpeed(speedVector));
 }
 
-bool QnActiPtzController::absoluteMove(Qn::PtzCoordinateSpace space, const QVector3D &position, qreal speed) {
+bool QnActiPtzController::absoluteMove(
+    Qn::PtzCoordinateSpace space,
+    const nx::core::ptz::Vector& position,
+    qreal speed,
+    const nx::core::ptz::Options& options)
+{
+    if (options.type != ptz::Type::operational)
+    {
+        NX_ASSERT(false, lit("Wrong PTZ type. Only operational PTZ is supported"));
+        return false;
+    }
+
     if(space != Qn::DevicePtzCoordinateSpace)
         return false;
 
-    return d->absoluteMove(ActiPtzVector(position.x(), position.y(), position.z()), toActiPanTiltSpeed(qBound(0.01, speed, 1.0))); /* We don't want to get zero speed, hence 0.01 bound. */
+    // We don't want to get zero speed, hence 0.01 bound.
+    return d->absoluteMove(
+        ActiPtzVector(
+            position.pan,
+            position.tilt,
+            position.zoom),
+        toActiPanTiltSpeed(qBound(0.01, speed, 1.0)));
 }
 
-bool QnActiPtzController::getPosition(Qn::PtzCoordinateSpace space, QVector3D *position) const
+bool QnActiPtzController::getPosition(
+    Qn::PtzCoordinateSpace space,
+    nx::core::ptz::Vector* outPosition,
+    const nx::core::ptz::Options& options) const
 {
+    if (options.type != ptz::Type::operational)
+    {
+        NX_ASSERT(false, lit("Wrong PTZ type. Only operational PTZ is supported"));
+        return false;
+    }
+
     if(space != Qn::DevicePtzCoordinateSpace)
         return false;
 
@@ -396,12 +435,24 @@ bool QnActiPtzController::getPosition(Qn::PtzCoordinateSpace space, QVector3D *p
     if(!d->getPosition(&devicePosition))
         return false;
 
-    *position = QVector3D(devicePosition.pan, devicePosition.tilt, devicePosition.zoom);
+    *outPosition = nx::core::ptz::Vector(
+        devicePosition.pan,
+        devicePosition.tilt,
+        /*rotation*/ 0.0,
+        devicePosition.zoom);
     return true;
 }
 
-bool QnActiPtzController::getFlip(Qt::Orientations *flip) const
+bool QnActiPtzController::getFlip(
+    Qt::Orientations *flip,
+    const nx::core::ptz::Options& options) const
 {
+    if (options.type != ptz::Type::operational)
+    {
+        NX_ASSERT(false, lit("Wrong PTZ type. Only operational PTZ is supported"));
+        return false;
+    }
+
     *flip = d->flip;
     return true;
 }

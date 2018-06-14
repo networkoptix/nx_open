@@ -12,6 +12,8 @@
 #include "drag_processing_instrument.h"
 #include "core/ptz/abstract_ptz_controller.h"
 
+#include <nx/core/ptz/type.h>
+
 class FixedArSelectionItem;
 class PtzOverlayWidget;
 class PtzElementsWidget;
@@ -104,7 +106,11 @@ private:
     void ptzMoveTo(QnMediaResourceWidget* widget, const QPointF& pos);
     void ptzMoveTo(QnMediaResourceWidget* widget, const QRectF& rect);
     void ptzUnzoom(QnMediaResourceWidget* widget);
-    void ptzMove(QnMediaResourceWidget* widget, const QVector3D& speed, bool instant = false);
+    void ptzMove(
+        QnMediaResourceWidget* widget,
+        const nx::core::ptz::Vector& speed,
+        bool instant = false);
+
     void focusMove(QnMediaResourceWidget* widget, qreal speed);
     void focusAuto(QnMediaResourceWidget* widget);
 
@@ -119,8 +125,8 @@ private:
 
         Ptz::Capabilities capabilities = 0;
         QnPtzAuxilaryTraitList traits;
-        QVector3D currentSpeed;
-        QVector3D requestedSpeed;
+        nx::core::ptz::Vector currentSpeed;
+        nx::core::ptz::Vector requestedSpeed;
         PtzOverlayWidget* overlayWidget = nullptr;
         QMetaObject::Connection capabilitiesConnection;
     };

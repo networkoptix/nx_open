@@ -15,6 +15,9 @@
 #include <core/resource/resource_fwd.h>
 #include <utils/common/connective.h>
 
+#include <nx/core/ptz/vector.h>
+#include <nx/core/ptz/options.h>
+
 /**
  * A thread-safe blocking interface for accessing camera's PTZ functions.
  */
@@ -40,20 +43,28 @@ public:
 public slots: //< Class is exposed to QML. All functions in section below are invokable
     /**
      * @param capabilities Capabilities to check.
+     * @param options Additional options (e.g. ptz type)
      * @returns Whether this controller implements the given capabilities.
      */
-    bool hasCapabilities(Ptz::Capabilities capabilities) const;
+    bool hasCapabilities(
+        Ptz::Capabilities capabilities,
+        const nx::core::ptz::Options& options) const;
 
     /**
      * @returns PTZ capabilities that this controller implements.
+     * @param options Additional options (e.g. ptz type)
      */
-    virtual Ptz::Capabilities getCapabilities() const = 0;
+    virtual Ptz::Capabilities getCapabilities(
+        const nx::core::ptz::Options& options) const = 0;
 
     /**
      * @param command Ptz command to check.
+     * @param options Additional options (e.g. ptz type)
      * @returns Whether this controller supports the given command.
      */
-    bool supports(Qn::PtzCommand command) const;
+    bool supports(
+        Qn::PtzCommand command,
+        const nx::core::ptz::Options& options) const;
 
     /**
      * Starts or stops continuous PTZ movement.
@@ -65,12 +76,15 @@ public slots: //< Class is exposed to QML. All functions in section below are in
      * Passing zero in speed should stop PTZ movement.
      *
      * This function is expected to be implemented if this controller has
-     * at least one of the <tt>Ptz::ContinuousPtzCapabilities</tt>.
+     * at least one of the <tt>Ptz::ContinuousPtrzCapabilities</tt>.
      *
      * @param speed Movement speed.
+     * @param options Additional options (e.g. ptz type)
      * @returns Whether the operation was successful.
      */
-    virtual bool continuousMove(const QVector3D& speed) = 0;
+    virtual bool continuousMove(
+        const nx::core::ptz::Vector& speed,
+        const nx::core::ptz::Options& options) = 0;
 
     /**
      * Starts or stops continuous focus movement.
@@ -84,9 +98,12 @@ public slots: //< Class is exposed to QML. All functions in section below are in
      * <tt>Ptz::ContinuousFocusCapability</tt>.
      *
      * @param speed Focus speed.
+     * @param options Additional options (e.g. ptz type)
      * @returns Whether the operation was successful.
      */
-    virtual bool continuousFocus(qreal speed) = 0;
+    virtual bool continuousFocus(
+        qreal speed,
+        const nx::core::ptz::Options &options) = 0;
 
     /**
      * Sets camera PTZ position in the given coordinate space.
@@ -97,17 +114,19 @@ public slots: //< Class is exposed to QML. All functions in section below are in
      * <tt>Ptz::LogicalPositioningPtzCapability</tt>.
      *
      * This function is expected to be implemented if this controller has
-     * at least one of the <tt>Ptz::AbsolutePtzCapabilities</tt>.
+     * at least one of the <tt>Ptz::AbsolutePtrzCapabilities</tt>.
      *
      * @param space Coordinate space of the provided position.
      * @param position Position to move to.
      * @param speed Movement speed, in range [0, 1].
+     * @param options Additional options (e.g. ptz type)
      * @returns Whether the operation was successful.
      */
     virtual bool absoluteMove(
         Qn::PtzCoordinateSpace space,
-        const QVector3D& position,
-        qreal speed) = 0;
+        const nx::core::ptz::Vector& position,
+        qreal speed,
+        const nx::core::ptz::Options& options) = 0;
 
     /**
      * Moves camera's viewport relative to current viewport. New viewport
@@ -120,12 +139,42 @@ public slots: //< Class is exposed to QML. All functions in section below are in
      * @param aspectRatio Actual aspect ratio of the current viewport.
      * @param viewpor New viewport position.
      * @param speed Movement speed, in range [0, 1].
+     * @param options Additional options (e.g. ptz type)
      * @returns Whether the operation was successful.
      */
     virtual bool viewportMove(
         qreal aspectRatio,
         const QRectF& viewport,
-        qreal speed) = 0;
+        qreal speed,
+        const nx::core::ptz::Options& options) = 0;
+
+    /**
+     * Moves the camera realtive to its current position.
+     *
+     * This function is expected to be implemented if this controller has
+     * at least one of the <tt>Ptz::RelativePtrzCapabilities</tt>.
+     *
+     * @param direction Direction to move. Each component must be in range [-1, 1].
+     * @param options Additional options (e.g. ptz type)
+     * @returns Whether the operation was successful.
+     */
+    virtual bool relativeMove(
+        const nx::core::ptz::Vector& direction,
+        const nx::core::ptz::Options& options) = 0;
+
+    /**
+     * Changes the camera focus relatively to its current position.
+     *
+     * This function is expected to be implemented if this controller has
+     * <tt>Ptz::RelativeFocusCapability</tt>.
+     *
+     * @param direction. Direction to move, must be in range [-1, 1].
+     * @param options Additional options (e.g. ptz type)
+     * @returns Whether the operation was successful.
+     */
+    virtual bool relativeFocus(
+        qreal direction,
+        const nx::core::ptz::Options& options) = 0;
 
     /**
      * Gets PTZ position from camera in the given coordinate space.
@@ -135,12 +184,14 @@ public slots: //< Class is exposed to QML. All functions in section below are in
      *
      * @param space Coordinate space to get position in.
      * @param[out] position Current ptz position.
+     * @param options Additional options (e.g. ptz type)
      * @returns Whether the operation was successful.
      * @see absoluteMove
      */
     virtual bool getPosition(
         Qn::PtzCoordinateSpace space,
-        QVector3D* position) const = 0;
+        nx::core::ptz::Vector* outPosition,
+        const nx::core::ptz::Options& options) const = 0;
 
     /**
      * Gets PTZ limits of the camera.
@@ -150,11 +201,13 @@ public slots: //< Class is exposed to QML. All functions in section below are in
      *
      * @param space Coordinate space to get limits in.
      * @param[out] limits Ptz limits.
+     * @param options Additional options (e.g. ptz type)
      * @returns Whether the operation was successful.
      */
     virtual bool getLimits(
         Qn::PtzCoordinateSpace space,
-        QnPtzLimits* limits) const = 0;
+        QnPtzLimits* limits,
+        const nx::core::ptz::Options& options) const = 0;
 
     /**
      * Returns the camera streams's flipped state. This function can be used for
@@ -164,9 +217,12 @@ public slots: //< Class is exposed to QML. All functions in section below are in
      * <tt>Ptz::FlipPtzCapability</tt>.
      *
      * @param[out] flip Flipped state of the camera's video stream.
+     * @param options Additional options (e.g. ptz type)
      * @returns Whether the operation was successful.
      */
-    virtual bool getFlip(Qt::Orientations* flip) const = 0;
+    virtual bool getFlip(
+        Qt::Orientations* flip,
+        const nx::core::ptz::Options& options) const = 0;
 
     /**
      * Saves current PTZ position as a preset, either as a new one or
@@ -226,6 +282,7 @@ public slots: //< Class is exposed to QML. All functions in section below are in
      * <tt>Ptz::PresetsPtzCapability<tt>.
      *
      * @param[out] presets PTZ presets.
+     * @param options Additional options (e.g. ptz type)
      * @returns Whether the operation was successful.
      */
     virtual bool getPresets(QnPtzPresetList* presets) const = 0;
@@ -241,6 +298,7 @@ public slots: //< Class is exposed to QML. All functions in section below are in
      * <tt>Ptz::ToursPtzCapability<tt>.
      *
      * @param tour Tour to create.
+     * @param options Additional options (e.g. ptz type)
      * @returns Whether the operation was successful.
      */
     virtual bool createTour(const QnPtzTour& tour) = 0;
@@ -252,6 +310,7 @@ public slots: //< Class is exposed to QML. All functions in section below are in
      * <tt>Ptz::ToursPtzCapability<tt>.
      *
      * @param tourId Id of the tour to remove.
+     * @param options Additional options (e.g. ptz type)
      * @returns Whether the operation was successful.
      */
     virtual bool removeTour(const QString& tourId) = 0;
@@ -266,6 +325,7 @@ public slots: //< Class is exposed to QML. All functions in section below are in
      * <tt>Ptz::ToursPtzCapability<tt>.
      *
      * @param tourId Id of the tour to activate.
+     * @param options Additional options (e.g. ptz type)
      * @returns Whether the operation was successful.
      */
     virtual bool activateTour(const QString& tourId) = 0;
@@ -277,6 +337,7 @@ public slots: //< Class is exposed to QML. All functions in section below are in
      * <tt>Ptz::ToursPtzCapability<tt>.
      *
      * @param[out] tours PTZ tours.
+     * @param options Additional options (e.g. ptz type)
      * @returns Whether the operation was successful.
      */
     virtual bool getTours(QnPtzTourList* tours) const = 0;
@@ -290,6 +351,7 @@ public slots: //< Class is exposed to QML. All functions in section below are in
      * <tt>Ptz::HomePtzCapability<tt>.
      *
      * @param homeObject PTZ home object.
+     * @param options Additional options (e.g. ptz type)
      * @returns Whether the operation was successful.
      */
     virtual bool updateHomeObject(const QnPtzObject& homeObject) = 0;
@@ -301,13 +363,19 @@ public slots: //< Class is exposed to QML. All functions in section below are in
      * <tt>Ptz::HomePtzCapability<tt>.
      *
      * @param[out] homePosition PTZ home object.
+     * @param options Additional options (e.g. ptz type)
      * @returns Whether the operation was successful.
      */
     virtual bool getHomeObject(QnPtzObject* homeObject) const = 0;
 
-    virtual bool getAuxilaryTraits(QnPtzAuxilaryTraitList* auxilaryTraits) const = 0;
+    virtual bool getAuxilaryTraits(
+        QnPtzAuxilaryTraitList* auxilaryTraits,
+        const nx::core::ptz::Options& options) const = 0;
 
-    virtual bool runAuxilaryCommand(const QnPtzAuxilaryTrait& trait, const QString& data) = 0;
+    virtual bool runAuxilaryCommand(
+        const QnPtzAuxilaryTrait& trait,
+        const QString& data,
+        const nx::core::ptz::Options& options) = 0;
 
     /**
      * Gets all PTZ data associated with this controller in a single operation.
@@ -315,9 +383,13 @@ public slots: //< Class is exposed to QML. All functions in section below are in
      *
      * @param query Data fields to get.
      * @param[out] data PTZ data.
+     * @param options Additional options (e.g. ptz type)
      * @returns Whether the operation was successful.
      */
-    virtual bool getData(Qn::PtzDataFields query, QnPtzData* data) const;
+    virtual bool getData(
+        Qn::PtzDataFields query,
+        QnPtzData* data,
+        const nx::core::ptz::Options& options) const;
 
 signals:
     void changed(Qn::PtzDataFields fields);

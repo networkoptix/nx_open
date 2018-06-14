@@ -19,12 +19,18 @@ public:
     QnVistaFocusPtzController(const QnPtzControllerPtr &baseController);
     virtual ~QnVistaFocusPtzController();
 
-    virtual Ptz::Capabilities getCapabilities() const override;
+    virtual Ptz::Capabilities getCapabilities(const nx::core::ptz::Options& options) const override;
 
-    virtual bool continuousFocus(qreal speed) override;
+    virtual bool continuousFocus(qreal speed, const nx::core::ptz::Options& options) override;
 
-    virtual bool getAuxilaryTraits(QnPtzAuxilaryTraitList *auxilaryTraits) const;
-    virtual bool runAuxilaryCommand(const QnPtzAuxilaryTrait &trait, const QString &data);
+    virtual bool getAuxilaryTraits(
+        QnPtzAuxilaryTraitList *auxilaryTraits,
+        const nx::core::ptz::Options& options) const;
+
+    virtual bool runAuxilaryCommand(
+        const QnPtzAuxilaryTrait &trait,
+        const QString &data,
+        const nx::core::ptz::Options& options);
 
 private:
     void init();

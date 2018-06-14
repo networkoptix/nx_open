@@ -4,6 +4,8 @@
 
 #include "digital_watchdog_resource.h"
 
+using namespace nx::core;
+
 QnDwZoomPtzController::QnDwZoomPtzController(const QnDigitalWatchdogResourcePtr &resource):
     base_type(resource),
     m_resource(resource)
@@ -13,21 +15,33 @@ QnDwZoomPtzController::~QnDwZoomPtzController() {
     return;
 }
 
-Ptz::Capabilities QnDwZoomPtzController::getCapabilities() const
+Ptz::Capabilities QnDwZoomPtzController::getCapabilities(const nx::core::ptz::Options& options) const
 {
+    if (options.type != ptz::Type::operational)
+        return Ptz::NoPtzCapabilities;
+
     return Ptz::ContinuousZoomCapability;
 }
 
-bool QnDwZoomPtzController::continuousMove(const QVector3D &speed) {
+bool QnDwZoomPtzController::continuousMove(
+    const nx::core::ptz::Vector& speedVector,
+    const nx::core::ptz::Options& options)
+{
+    if (options.type != ptz::Type::operational)
+    {
+        NX_ASSERT(false, lit("Wrong PTZ type. Only operational PTZ is supported"));
+        return false;
+    }
+
     const QString query = lit("/cgi-bin/ptzctrl.cgi?ptzchannel=0&query=zoom&ptzctrlvalue=%1");
 
     QString value;
 
-    if(qFuzzyIsNull(speed.z())) {
+    if(qFuzzyIsNull(speedVector.zoom)) {
         value = lit("stop");
-    } else if(speed.z() < 0.0) {
+    } else if(speedVector.zoom < 0.0) {
         value = lit("zoomOut");
-    } else if(speed.z() > 0.0) {
+    } else if(speedVector.zoom > 0.0) {
         value = lit("zoomIn");
     }
 

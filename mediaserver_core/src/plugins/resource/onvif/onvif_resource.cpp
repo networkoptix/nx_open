@@ -3050,8 +3050,18 @@ QnAbstractPtzController *QnPlOnvifResource::createPtzControllerInternal() const
         return NULL;
 
     result.reset(new QnOnvifPtzController(toSharedPointer(this)));
-    if (result->getCapabilities() == Ptz::NoPtzCapabilities)
+
+    const auto operationalCapabilities
+        = result->getCapabilities({nx::core::ptz::Type::operational});
+
+    const auto configurationalCapabilities
+        = result->getCapabilities({nx::core::ptz::Type::configurational});
+
+    if (operationalCapabilities == Ptz::NoPtzCapabilities
+        && configurationalCapabilities == Ptz::NoPtzCapabilities)
+    {
         return NULL;
+    }
 
     return result.take();
 }

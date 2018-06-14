@@ -196,17 +196,19 @@ void QnCameraAdvancedParamsWidget::sendCustomParameterCommand(const QnCameraAdva
     m_ptzSequenceNumber++;
 
     auto slot = SLOT(at_ptzCommandProcessed(int, const QVariant &, int));
+    nx::core::ptz::Options options{nx::core::ptz::Type::configurational};
 
     if(parameter.writeCmd == lit("custom_zoom"))
     {
         // Expecting a single value.
-        QVector3D speed;
+        nx::core::ptz::Vector speed;
         qreal val = value.toFloat(&ok);
         if (ok)
         {
-            speed.setZ(val*0.01);
+            speed.zoom = val * 0.01;
             qDebug() << "Sending custom_zoom(" << val << ")";
-            serverConnection->ptzContinuousMoveAsync(m_camera, speed, m_ptzSequenceId, m_ptzSequenceNumber, this, slot);
+            serverConnection->ptzContinuousMoveAsync(
+                m_camera, speed, options, m_ptzSequenceId, m_ptzSequenceNumber, this, slot);
         }
     }
     else if (parameter.writeCmd == lit("custom_ptr"))
@@ -214,14 +216,21 @@ void QnCameraAdvancedParamsWidget::sendCustomParameterCommand(const QnCameraAdva
         QStringList values = value.split(L',');
         if (values.size() == 3)
         {
-            QVector3D speed;
+            nx::core::ptz::Vector speed;
             // Expecting a value like "horisontal,vertical,rotation".
-            speed.setX(values[0].toFloat(&ok));
-            speed.setY(values[1].toFloat(&ok));
+            speed.pan = values[0].toFloat(&ok);
+            speed.tilt = values[1].toFloat(&ok);
 
-            qDebug() << "Sending custom_ptr(pan=" << speed.x() << ", tilt=" << speed.y() << ", rot=" << speed.z() << ")";
+            qDebug() << "Sending custom_ptr(pan=" << speed.pan << ", tilt=" << speed.tilt << ", rot=" << speed.zoom << ")";
             // TODO: Implement rotation stuff
-            serverConnection->ptzContinuousMoveAsync(m_camera, speed, m_ptzSequenceId, m_ptzSequenceNumber, this, slot);
+            serverConnection->ptzContinuousMoveAsync(
+                m_camera,
+                speed,
+                options,
+                m_ptzSequenceId,
+                m_ptzSequenceNumber,
+                this,
+                slot);
         }
     }
     else if (parameter.writeCmd == lit("custom_focus"))
@@ -230,7 +239,7 @@ void QnCameraAdvancedParamsWidget::sendCustomParameterCommand(const QnCameraAdva
         qreal speed = value.toFloat(&ok);
         if (ok)
         {
-            serverConnection->ptzContinuousFocusAsync(m_camera, speed, this, slot);
+            serverConnection->ptzContinuousFocusAsync(m_camera, speed, options, this, slot);
             qDebug() << "Sending custom_focus(" << speed << ")";
         }
     }

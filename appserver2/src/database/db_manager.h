@@ -705,6 +705,7 @@ namespace detail
         bool rebuildUserAccessRightsTransactions();
         bool setMediaServersStatus(Qn::ResourceStatus status);
         bool updateDefaultRules(const nx::vms::event::RuleList& rules);
+
     private:
         QnUuid m_storageTypeId;
         QnUuid m_serverTypeId;

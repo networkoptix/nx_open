@@ -51,6 +51,8 @@ bool checkUserAccess(
         case Qn::AbsoluteDeviceMovePtzCommand:
         case Qn::AbsoluteLogicalMovePtzCommand:
         case Qn::ViewportMovePtzCommand:
+        case Qn::RelativeMovePtzCommand:
+        case Qn::RelativeFocusPtzCommand:
         case Qn::ActivateTourPtzCommand:
         case Qn::UpdateHomeObjectPtzCommand:
         case Qn::RunAuxilaryCommandPtzCommand:
@@ -238,53 +240,110 @@ int QnPtzRestHandler::executePost(
     {
         case Qn::ContinuousMovePtzCommand:
             NX_VERBOSE(this, lm("Before execute ContinuousMovePtzCommand. %1").arg(params));
-            return execCommandAsync(hash, std::bind(&QnPtzRestHandler::executeContinuousMove, this, controller, params, result));
+            return execCommandAsync(
+                hash,
+                [this, controller, params, result]() mutable
+                {
+                    return executeContinuousMove(controller, params, result);
+                });
+
         case Qn::ContinuousFocusPtzCommand:
             NX_VERBOSE(this, lm("Before execute ContinuousFocusPtzCommand. %1").arg(params));
-            return execCommandAsync(hash, std::bind(&QnPtzRestHandler::executeContinuousFocus, this, controller, params, result));
+            return execCommandAsync(
+                hash,
+                [this, controller, params, result]() mutable
+                {
+                    return executeContinuousFocus(controller, params, result);
+                });
 
         case Qn::AbsoluteDeviceMovePtzCommand:
-        case Qn::AbsoluteLogicalMovePtzCommand: return executeAbsoluteMove(controller, params, result);
-        case Qn::ViewportMovePtzCommand:        return executeViewportMove(controller, params, result);
+        case Qn::AbsoluteLogicalMovePtzCommand:
+            return executeAbsoluteMove(controller, params, result);
+        case Qn::ViewportMovePtzCommand:
+            return executeViewportMove(controller, params, result);
+        case Qn::RelativeMovePtzCommand:
+            return executeRelativeMove(controller, params, result);
+        case Qn::RelativeFocusPtzCommand:
+            return executeRelativeFocus(controller, params, result);
         case Qn::GetDevicePositionPtzCommand:
-        case Qn::GetLogicalPositionPtzCommand:  return executeGetPosition(controller, params, result);
-        case Qn::CreatePresetPtzCommand:        return executeCreatePreset(controller, params, result);
-        case Qn::UpdatePresetPtzCommand:        return executeUpdatePreset(controller, params, result);
-        case Qn::RemovePresetPtzCommand:        return executeRemovePreset(controller, params, result);
-        case Qn::ActivatePresetPtzCommand:      return executeActivatePreset(controller, params, result);
-        case Qn::GetPresetsPtzCommand:          return executeGetPresets(controller, params, result);
-        case Qn::CreateTourPtzCommand:          return executeCreateTour(controller, params, body, result);
-        case Qn::RemoveTourPtzCommand:          return executeRemoveTour(controller, params, result);
-        case Qn::ActivateTourPtzCommand:        return executeActivateTour(controller, params, result);
-        case Qn::GetToursPtzCommand:            return executeGetTours(controller, params, result);
-        case Qn::GetActiveObjectPtzCommand:     return executeGetActiveObject(controller, params, result);
-        case Qn::UpdateHomeObjectPtzCommand:    return executeUpdateHomeObject(controller, params, result);
-        case Qn::GetHomeObjectPtzCommand:       return executeGetHomeObject(controller, params, result);
-        case Qn::GetAuxilaryTraitsPtzCommand:   return executeGetAuxilaryTraits(controller, params, result);
-        case Qn::RunAuxilaryCommandPtzCommand:  return executeRunAuxilaryCommand(controller, params, result);
-        case Qn::GetDataPtzCommand:             return executeGetData(controller, params, result);
-        default:                                return CODE_INVALID_PARAMETER;
+        case Qn::GetLogicalPositionPtzCommand:
+            return executeGetPosition(controller, params, result);
+        case Qn::CreatePresetPtzCommand:
+            return executeCreatePreset(controller, params, result);
+        case Qn::UpdatePresetPtzCommand:
+            return executeUpdatePreset(controller, params, result);
+        case Qn::RemovePresetPtzCommand:
+            return executeRemovePreset(controller, params, result);
+        case Qn::ActivatePresetPtzCommand:
+            return executeActivatePreset(controller, params, result);
+        case Qn::GetPresetsPtzCommand:
+            return executeGetPresets(controller, params, result);
+        case Qn::CreateTourPtzCommand:
+            return executeCreateTour(controller, params, body, result);
+        case Qn::RemoveTourPtzCommand:
+            return executeRemoveTour(controller, params, result);
+        case Qn::ActivateTourPtzCommand:
+            return executeActivateTour(controller, params, result);
+        case Qn::GetToursPtzCommand:
+            return executeGetTours(controller, params, result);
+        case Qn::GetActiveObjectPtzCommand:
+            return executeGetActiveObject(controller, params, result);
+        case Qn::UpdateHomeObjectPtzCommand:
+            return executeUpdateHomeObject(controller, params, result);
+        case Qn::GetHomeObjectPtzCommand:
+            return executeGetHomeObject(controller, params, result);
+        case Qn::GetAuxilaryTraitsPtzCommand:
+            return executeGetAuxilaryTraits(controller, params, result);
+        case Qn::RunAuxilaryCommandPtzCommand:
+            return executeRunAuxilaryCommand(controller, params, result);
+        case Qn::GetDataPtzCommand:
+            return executeGetData(controller, params, result);
+        default:
+            return CODE_INVALID_PARAMETER;
     }
 }
 
-int QnPtzRestHandler::executeContinuousMove(const QnPtzControllerPtr &controller, const QnRequestParams &params, QnJsonRestResult &result)
+int QnPtzRestHandler::executeContinuousMove(
+    const QnPtzControllerPtr& controller,
+    const QnRequestParams& params,
+    QnJsonRestResult& result)
 {
     NX_VERBOSE(this, lit("Start execute ContinuousMove. params=%1").arg(toString(params)));
 
-
     qreal xSpeed, ySpeed, zSpeed;
-    if (
-        !requireParameter(params, lit("xSpeed"), result, &xSpeed) ||
-        !requireParameter(params, lit("ySpeed"), result, &ySpeed) ||
-        !requireParameter(params, lit("zSpeed"), result, &zSpeed)
-        )
+    nx::core::ptz::Vector speedVector;
+    nx::core::ptz::Options options;
+
+    bool success =
+        requireOneOfParameters(
+            params,
+            {lit("panSpeed"), lit("xSpeed")},
+            result,
+            &speedVector.pan)
+
+        && requireOneOfParameters(
+            params,
+            {lit("tiltSpeed"), lit("ySpeed")},
+            result,
+            &speedVector.tilt)
+
+        && requireOneOfParameters(
+            params,
+            {lit("zoomSpeed"), lit("zSpeed")},
+            result,
+            &speedVector.zoom)
+
+        && requireParameter(params, lit("rotationSpeed"), result, &speedVector.rotation, true)
+        && requireParameter(params, lit("type"), result, &options.type, true);
+
+
+    if (!success)
     {
         NX_VERBOSE(this, lit("Finish execute ContinuousMove because of invalid params."));
         return CODE_INVALID_PARAMETER;
     }
 
-    QVector3D speed(xSpeed, ySpeed, zSpeed);
-    if (!controller->continuousMove(speed))
+    if (!controller->continuousMove(speedVector, options))
     {
         NX_VERBOSE(this, lit("Finish execute ContinuousMove: FAILED"));
         return CODE_INTERNAL_ERROR;
@@ -294,13 +353,21 @@ int QnPtzRestHandler::executeContinuousMove(const QnPtzControllerPtr &controller
     return CODE_OK;
 }
 
-int QnPtzRestHandler::executeContinuousFocus(const QnPtzControllerPtr &controller, const QnRequestParams &params, QnJsonRestResult &result)
+int QnPtzRestHandler::executeContinuousFocus(
+    const QnPtzControllerPtr& controller,
+    const QnRequestParams& params,
+    QnJsonRestResult& result)
 {
     qreal speed;
-    if (!requireParameter(params, lit("speed"), result, &speed))
-        return CODE_INVALID_PARAMETER;
+    nx::core::ptz::Options options;
 
-    if (!controller->continuousFocus(speed))
+    if (!requireParameter(params, lit("speed"), result, &speed)
+        || !requireParameter(params, lit("type"), result, &options.type, /*optional*/ true))
+    {
+        return CODE_INVALID_PARAMETER;
+    }
+
+    if (!controller->continuousFocus(speed, options))
         return CODE_INTERNAL_ERROR;
 
     return CODE_OK;
@@ -309,20 +376,30 @@ int QnPtzRestHandler::executeContinuousFocus(const QnPtzControllerPtr &controlle
 int QnPtzRestHandler::executeAbsoluteMove(const QnPtzControllerPtr &controller, const QnRequestParams &params, QnJsonRestResult &result)
 {
     Qn::PtzCommand command;
-    qreal xPos, yPos, zPos, speed;
-    if (
-        !requireParameter(params, lit("command"), result, &command) ||
-        !requireParameter(params, lit("xPos"), result, &xPos) ||
-        !requireParameter(params, lit("yPos"), result, &yPos) ||
-        !requireParameter(params, lit("zPos"), result, &zPos) ||
-        !requireParameter(params, lit("speed"), result, &speed)
-        )
-    {
-        return CODE_INVALID_PARAMETER;
-    }
+    qreal speed;
+    nx::core::ptz::Vector position;
+    nx::core::ptz::Options options;
 
-    QVector3D position(xPos, yPos, zPos);
-    if (!controller->absoluteMove(command == Qn::AbsoluteDeviceMovePtzCommand ? Qn::DevicePtzCoordinateSpace : Qn::LogicalPtzCoordinateSpace, position, speed))
+    bool success = requireParameter(params, lit("command"), result, &command)
+        && requireOneOfParameters(params, { lit("pan"), lit("xPos") }, result, &position.pan)
+        && requireOneOfParameters(params, { lit("tilt"), lit("yPos") }, result, &position.tilt)
+        && requireOneOfParameters(params, { lit("zoom"), lit("zPos") }, result, &position.zoom)
+        && requireParameter(params, lit("rotation"), result, &position.rotation, true)
+        && requireParameter(params, lit("speed"), result, &speed)
+        && requireParameter(params, lit("type"), result, &options.type, true);
+
+    if (!success)
+        return CODE_INVALID_PARAMETER;
+
+    success = controller->absoluteMove(
+        command == Qn::AbsoluteDeviceMovePtzCommand
+            ? Qn::DevicePtzCoordinateSpace
+            : Qn::LogicalPtzCoordinateSpace,
+        position,
+        speed,
+        options);
+
+    if (!success)
         return CODE_INTERNAL_ERROR;
 
     return CODE_OK;
@@ -331,20 +408,73 @@ int QnPtzRestHandler::executeAbsoluteMove(const QnPtzControllerPtr &controller, 
 int QnPtzRestHandler::executeViewportMove(const QnPtzControllerPtr &controller, const QnRequestParams &params, QnJsonRestResult &result)
 {
     qreal viewportTop, viewportLeft, viewportBottom, viewportRight, aspectRatio, speed;
+    nx::core::ptz::Options options;
     if (
         !requireParameter(params, lit("viewportTop"), result, &viewportTop) ||
         !requireParameter(params, lit("viewportLeft"), result, &viewportLeft) ||
         !requireParameter(params, lit("viewportBottom"), result, &viewportBottom) ||
         !requireParameter(params, lit("viewportRight"), result, &viewportRight) ||
         !requireParameter(params, lit("aspectRatio"), result, &aspectRatio) ||
-        !requireParameter(params, lit("speed"), result, &speed)
+        !requireParameter(params, lit("speed"), result, &speed) ||
+        !requireParameter(params, lit("type"), result, &options.type, true)
         )
     {
         return CODE_INVALID_PARAMETER;
     }
 
     QRectF viewport(QPointF(viewportLeft, viewportTop), QPointF(viewportRight, viewportBottom));
-    if (!controller->viewportMove(aspectRatio, viewport, speed))
+    if (!controller->viewportMove(aspectRatio, viewport, speed, options))
+        return CODE_INTERNAL_ERROR;
+
+    return CODE_OK;
+}
+
+int QnPtzRestHandler::executeRelativeMove(
+    const QnPtzControllerPtr& controller,
+    const QnRequestParams& params,
+    QnJsonRestResult& result)
+{
+    nx::core::ptz::Vector vector;
+    nx::core::ptz::Options options;
+
+    const bool success =
+        !requireParameter(params, lit("pan"), result, &vector.pan, /*optional*/ true)
+        || !requireParameter(params, lit("tilt"), result, &vector.tilt, /*optional*/ true)
+        || !requireParameter(params, lit("rotate"), result, &vector.tilt, /*optional*/ true)
+        || !requireParameter(params, lit("zoom"), result, &vector.tilt, /*optional*/ true)
+        || !requireParameter(params, lit("type"), result, &options.type, /*optional*/ true);
+
+    if (!success)
+        return CODE_INVALID_PARAMETER;
+
+    if (vector.isNull())
+        return CODE_OK;
+
+    if (!controller->relativeMove(vector, options))
+        return CODE_INTERNAL_ERROR;
+
+    return CODE_OK;
+}
+
+int QnPtzRestHandler::executeRelativeFocus(
+    const QnPtzControllerPtr& controller,
+    const QnRequestParams& params,
+    QnJsonRestResult& result)
+{
+    qreal focus;
+    nx::core::ptz::Options options;
+
+    const bool success =
+        !requireParameter(params, lit("focus"), result, &focus, /*optional*/ true)
+        || !requireParameter(params, lit("type"), result, &options.type, /*optional*/ true);
+
+    if (!success)
+        return CODE_INVALID_PARAMETER;
+
+    if (qFuzzyIsNull(focus))
+        return CODE_OK;
+
+    if (!controller->relativeFocus(focus, options))
         return CODE_INTERNAL_ERROR;
 
     return CODE_OK;
@@ -353,12 +483,23 @@ int QnPtzRestHandler::executeViewportMove(const QnPtzControllerPtr &controller, 
 int QnPtzRestHandler::executeGetPosition(const QnPtzControllerPtr &controller, const QnRequestParams &params, QnJsonRestResult &result)
 {
     Qn::PtzCommand command;
-    if (!requireParameter(params, lit("command"), result, &command))
+    nx::core::ptz::Options options;
+    if (!requireParameter(params, lit("command"), result, &command)
+        || !requireParameter(params, lit("type"), result, &options.type, true))
+    {
         return CODE_INVALID_PARAMETER;
+    }
 
-    QVector3D position;
-    if (!controller->getPosition(command == Qn::GetDevicePositionPtzCommand ? Qn::DevicePtzCoordinateSpace : Qn::LogicalPtzCoordinateSpace, &position))
+    nx::core::ptz::Vector position;
+    if (!controller->getPosition(
+        command == Qn::GetDevicePositionPtzCommand
+            ? Qn::DevicePtzCoordinateSpace
+            : Qn::LogicalPtzCoordinateSpace,
+        &position,
+        options))
+    {
         return CODE_INTERNAL_ERROR;
+    }
 
     result.setReply(position);
     return CODE_OK;
@@ -367,8 +508,12 @@ int QnPtzRestHandler::executeGetPosition(const QnPtzControllerPtr &controller, c
 int QnPtzRestHandler::executeCreatePreset(const QnPtzControllerPtr &controller, const QnRequestParams &params, QnJsonRestResult &result)
 {
     QString presetId, presetName;
-    if (!requireParameter(params, lit("presetId"), result, &presetId) || !requireParameter(params, lit("presetName"), result, &presetName))
+
+    if (!requireParameter(params, lit("presetId"), result, &presetId)
+        || !requireParameter(params, lit("presetName"), result, &presetName))
+    {
         return CODE_INVALID_PARAMETER;
+    }
 
     QnPtzPreset preset(presetId, presetName);
     if (!controller->createPreset(preset))
@@ -380,8 +525,12 @@ int QnPtzRestHandler::executeCreatePreset(const QnPtzControllerPtr &controller, 
 int QnPtzRestHandler::executeUpdatePreset(const QnPtzControllerPtr &controller, const QnRequestParams &params, QnJsonRestResult &result)
 {
     QString presetId, presetName;
-    if (!requireParameter(params, lit("presetId"), result, &presetId) || !requireParameter(params, lit("presetName"), result, &presetName))
+
+    if (!requireParameter(params, lit("presetId"), result, &presetId)
+        || !requireParameter(params, lit("presetName"), result, &presetName))
+    {
         return CODE_INVALID_PARAMETER;
+    }
 
     QnPtzPreset preset(presetId, presetName);
     if (!controller->updatePreset(preset))
@@ -393,6 +542,7 @@ int QnPtzRestHandler::executeUpdatePreset(const QnPtzControllerPtr &controller, 
 int QnPtzRestHandler::executeRemovePreset(const QnPtzControllerPtr &controller, const QnRequestParams &params, QnJsonRestResult &result)
 {
     QString presetId;
+
     if (!requireParameter(params, lit("presetId"), result, &presetId))
         return CODE_INVALID_PARAMETER;
 
@@ -404,10 +554,14 @@ int QnPtzRestHandler::executeRemovePreset(const QnPtzControllerPtr &controller, 
 
 int QnPtzRestHandler::executeActivatePreset(const QnPtzControllerPtr &controller, const QnRequestParams &params, QnJsonRestResult &result)
 {
-    QString presetId;
     qreal speed;
-    if (!requireParameter(params, lit("presetId"), result, &presetId) || !requireParameter(params, lit("speed"), result, &speed))
+    QString presetId;
+
+    if (!requireParameter(params, lit("presetId"), result, &presetId)
+        || !requireParameter(params, lit("speed"), result, &speed))
+    {
         return CODE_INVALID_PARAMETER;
+    }
 
     if (!controller->activatePreset(presetId, speed))
         return CODE_INTERNAL_ERROR;
@@ -415,9 +569,13 @@ int QnPtzRestHandler::executeActivatePreset(const QnPtzControllerPtr &controller
     return CODE_OK;
 }
 
-int QnPtzRestHandler::executeGetPresets(const QnPtzControllerPtr &controller, const QnRequestParams &, QnJsonRestResult &result)
+int QnPtzRestHandler::executeGetPresets(
+    const QnPtzControllerPtr& controller,
+    const QnRequestParams& params,
+    QnJsonRestResult& result)
 {
     QnPtzPresetList presets;
+
     if (!controller->getPresets(&presets))
         return CODE_INTERNAL_ERROR;
 
@@ -425,9 +583,14 @@ int QnPtzRestHandler::executeGetPresets(const QnPtzControllerPtr &controller, co
     return CODE_OK;
 }
 
-int QnPtzRestHandler::executeCreateTour(const QnPtzControllerPtr &controller, const QnRequestParams &, const QByteArray &body, QnJsonRestResult& /*result*/)
+int QnPtzRestHandler::executeCreateTour(
+    const QnPtzControllerPtr& controller,
+    const QnRequestParams& params,
+    const QByteArray& body,
+    QnJsonRestResult& result)
 {
     QnPtzTour tour;
+
     if (!QJson::deserialize(body, &tour))
         return CODE_INVALID_PARAMETER;
 
@@ -439,9 +602,13 @@ int QnPtzRestHandler::executeCreateTour(const QnPtzControllerPtr &controller, co
     return CODE_OK;
 }
 
-int QnPtzRestHandler::executeRemoveTour(const QnPtzControllerPtr &controller, const QnRequestParams &params, QnJsonRestResult &result)
+int QnPtzRestHandler::executeRemoveTour(
+    const QnPtzControllerPtr& controller,
+    const QnRequestParams& params,
+    QnJsonRestResult& result)
 {
     QString tourId;
+
     if (!requireParameter(params, lit("tourId"), result, &tourId))
         return CODE_INVALID_PARAMETER;
 
@@ -451,9 +618,13 @@ int QnPtzRestHandler::executeRemoveTour(const QnPtzControllerPtr &controller, co
     return CODE_OK;
 }
 
-int QnPtzRestHandler::executeActivateTour(const QnPtzControllerPtr &controller, const QnRequestParams &params, QnJsonRestResult &result)
+int QnPtzRestHandler::executeActivateTour(
+    const QnPtzControllerPtr& controller,
+    const QnRequestParams& params,
+    QnJsonRestResult& result)
 {
     QString tourId;
+
     if (!requireParameter(params, lit("tourId"), result, &tourId))
         return CODE_INVALID_PARAMETER;
 
@@ -463,9 +634,13 @@ int QnPtzRestHandler::executeActivateTour(const QnPtzControllerPtr &controller, 
     return CODE_OK;
 }
 
-int QnPtzRestHandler::executeGetTours(const QnPtzControllerPtr &controller, const QnRequestParams &, QnJsonRestResult &result)
+int QnPtzRestHandler::executeGetTours(
+    const QnPtzControllerPtr& controller,
+    const QnRequestParams& params,
+    QnJsonRestResult& result)
 {
     QnPtzTourList tours;
+
     if (!controller->getTours(&tours))
         return CODE_INTERNAL_ERROR;
 
@@ -473,9 +648,13 @@ int QnPtzRestHandler::executeGetTours(const QnPtzControllerPtr &controller, cons
     return CODE_OK;
 }
 
-int QnPtzRestHandler::executeGetActiveObject(const QnPtzControllerPtr &controller, const QnRequestParams &, QnJsonRestResult &result)
+int QnPtzRestHandler::executeGetActiveObject(
+    const QnPtzControllerPtr& controller,
+    const QnRequestParams& params,
+    QnJsonRestResult& result)
 {
     QnPtzObject activeObject;
+
     if (!controller->getActiveObject(&activeObject))
         return CODE_INTERNAL_ERROR;
 
@@ -483,12 +662,19 @@ int QnPtzRestHandler::executeGetActiveObject(const QnPtzControllerPtr &controlle
     return CODE_OK;
 }
 
-int QnPtzRestHandler::executeUpdateHomeObject(const QnPtzControllerPtr &controller, const QnRequestParams &params, QnJsonRestResult &result)
+int QnPtzRestHandler::executeUpdateHomeObject(
+    const QnPtzControllerPtr& controller,
+    const QnRequestParams& params,
+    QnJsonRestResult& result)
 {
     Qn::PtzObjectType objectType;
     QString objectId;
-    if (!requireParameter(params, lit("objectType"), result, &objectType) || !requireParameter(params, lit("objectId"), result, &objectId))
+
+    if (!requireParameter(params, lit("objectType"), result, &objectType)
+        || !requireParameter(params, lit("objectId"), result, &objectId))
+    {
         return CODE_INVALID_PARAMETER;
+    }
 
     if (!controller->updateHomeObject(QnPtzObject(objectType, objectId)))
         return CODE_INTERNAL_ERROR;
@@ -496,9 +682,13 @@ int QnPtzRestHandler::executeUpdateHomeObject(const QnPtzControllerPtr &controll
     return CODE_OK;
 }
 
-int QnPtzRestHandler::executeGetHomeObject(const QnPtzControllerPtr &controller, const QnRequestParams &, QnJsonRestResult &result)
+int QnPtzRestHandler::executeGetHomeObject(
+    const QnPtzControllerPtr& controller,
+    const QnRequestParams& params,
+    QnJsonRestResult& result)
 {
     QnPtzObject homeObject;
+
     if (!controller->getHomeObject(&homeObject))
         return CODE_INTERNAL_ERROR;
 
@@ -506,22 +696,34 @@ int QnPtzRestHandler::executeGetHomeObject(const QnPtzControllerPtr &controller,
     return CODE_OK;
 }
 
-int QnPtzRestHandler::executeGetAuxilaryTraits(const QnPtzControllerPtr &controller, const QnRequestParams &params, QnJsonRestResult &result)
+int QnPtzRestHandler::executeGetAuxilaryTraits(
+    const QnPtzControllerPtr& controller,
+    const QnRequestParams& params,
+    QnJsonRestResult& result)
 {
-    Q_UNUSED(params);
-
     QnPtzAuxilaryTraitList traits;
-    if (!controller->getAuxilaryTraits(&traits))
+    nx::core::ptz::Options options;
+
+    requireParameter(params, lit("type"), result, &options.type, /*optional*/ true);
+
+    if (!controller->getAuxilaryTraits(&traits, options))
         return CODE_INTERNAL_ERROR;
 
     result.setReply(traits);
     return CODE_OK;
 }
 
-int QnPtzRestHandler::executeRunAuxilaryCommand(const QnPtzControllerPtr &controller, const QnRequestParams &params, QnJsonRestResult &result)
+int QnPtzRestHandler::executeRunAuxilaryCommand(
+    const QnPtzControllerPtr& controller,
+    const QnRequestParams& params,
+    QnJsonRestResult& result)
 {
     QnPtzAuxilaryTrait trait;
     QString data;
+    nx::core::ptz::Options options;
+
+    requireParameter(params, lit("type"), result, &options.type, /*optional*/ true);
+
     if (
         !requireParameter(params, lit("trait"), result, &trait) ||
         !requireParameter(params, lit("data"), result, &data)
@@ -530,24 +732,29 @@ int QnPtzRestHandler::executeRunAuxilaryCommand(const QnPtzControllerPtr &contro
         return CODE_INVALID_PARAMETER;
     }
 
-    if (!controller->runAuxilaryCommand(trait, data))
+    if (!controller->runAuxilaryCommand(trait, data, options))
         return CODE_INTERNAL_ERROR;
 
     return CODE_OK;
 }
 
-int QnPtzRestHandler::executeGetData(const QnPtzControllerPtr &controller, const QnRequestParams &params, QnJsonRestResult &result)
+int QnPtzRestHandler::executeGetData(
+    const QnPtzControllerPtr& controller,\
+    const QnRequestParams& params,
+    QnJsonRestResult& result)
 {
     Qn::PtzDataFields query;
+    nx::core::ptz::Options options;
+
+    requireParameter(params, lit("type"), result, &options.type, /*optional*/ true);
+
     if (!requireParameter(params, lit("query"), result, &query))
         return CODE_INVALID_PARAMETER;
 
     QnPtzData data;
-    if (!controller->getData(query, &data))
+    if (!controller->getData(query, &data, options))
         return CODE_INTERNAL_ERROR;
 
     result.setReply(data);
     return CODE_OK;
 }
-
-// TODO: #Elric not valid anymore

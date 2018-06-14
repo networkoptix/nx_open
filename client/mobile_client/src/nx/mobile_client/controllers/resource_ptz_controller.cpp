@@ -64,6 +64,11 @@ ResourcePtzController::ResourcePtzController(QObject* parent):
     setParent(parent);
 }
 
+Ptz::Capabilities ResourcePtzController::operationalCapabilities() const
+{
+    return getCapabilities(nx::core::ptz::Options());
+}
+
 QString ResourcePtzController::resourceId() const
 {
     return m_resourceId.toString();
@@ -98,7 +103,7 @@ bool ResourcePtzController::available() const
 Ptz::Traits ResourcePtzController::auxTraits() const
 {
     QnPtzAuxilaryTraitList traits;
-    if (!getAuxilaryTraits(&traits))
+    if (!getAuxilaryTraits(&traits, nx::core::ptz::Options()))
         return Ptz::NoPtzTraits;
 
     Ptz::Traits result = Ptz::NoPtzTraits;
@@ -110,7 +115,7 @@ Ptz::Traits ResourcePtzController::auxTraits() const
 
 int ResourcePtzController::presetsCount() const
 {
-    if (!getCapabilities().testFlag(Ptz::PresetsPtzCapability))
+    if (!operationalCapabilities().testFlag(Ptz::PresetsPtzCapability))
         return 0;
 
     QnPtzPresetList presets;
@@ -119,12 +124,15 @@ int ResourcePtzController::presetsCount() const
 
 int ResourcePtzController::activePresetIndex() const
 {
-    if (!supports(Qn::GetActiveObjectPtzCommand))
+    if (!supports(Qn::GetActiveObjectPtzCommand, nx::core::ptz::Options()))
         return -1;
 
     QnPtzObject activeObject;
-    if (!getActiveObject(&activeObject) || activeObject.type != Qn::PresetPtzObject)
+    if (!getActiveObject(&activeObject)
+        || activeObject.type != Qn::PresetPtzObject)
+    {
         return -1;
+    }
 
     QnPtzPresetList presets;
     if (!core::ptz::helpers::getSortedPresets(this, presets) || presets.isEmpty())
@@ -140,20 +148,21 @@ int ResourcePtzController::activePresetIndex() const
 
 bool ResourcePtzController::setPresetByIndex(int index)
 {
-    if (!getCapabilities().testFlag(Ptz::PresetsPtzCapability)
+    if (!operationalCapabilities().testFlag(Ptz::PresetsPtzCapability)
         || !qBetween(0, index, presetsCount()))
     {
         return false;
     }
 
     QnPtzPresetList presets;
-    return core::ptz::helpers::getSortedPresets(this, presets) && !presets.isEmpty()
+    return core::ptz::helpers::getSortedPresets(this, presets)
+        && !presets.isEmpty()
         && activatePreset(presets.at(index).id, QnAbstractPtzController::MaxPtzSpeed);
 }
 
 bool ResourcePtzController::setPresetById(const QString& id)
 {
-    if (!getCapabilities().testFlag(Ptz::PresetsPtzCapability))
+    if (!operationalCapabilities().testFlag(Ptz::PresetsPtzCapability))
         return false;
 
     QnPtzPresetList presets;
@@ -163,7 +172,8 @@ bool ResourcePtzController::setPresetById(const QString& id)
     const bool found = std::find_if(presets.begin(), presets.end(),
         [id](const QnPtzPreset& preset) { return id == preset.id; }) != presets.end();
 
-    return found && activatePreset(id, QnAbstractPtzController::MaxPtzSpeed);
+    return found
+        && activatePreset(id, QnAbstractPtzController::MaxPtzSpeed);
 }
 
 int ResourcePtzController::indexOfPreset(const QString& id) const
@@ -181,7 +191,7 @@ int ResourcePtzController::indexOfPreset(const QString& id) const
 bool ResourcePtzController::setAutoFocus()
 {
     return auxTraits().testFlag(Ptz::ManualAutoFocusPtzTrait)
-        && runAuxilaryCommand(Ptz::ManualAutoFocusPtzTrait, QString());
+        && runAuxilaryCommand(Ptz::ManualAutoFocusPtzTrait, QString(), nx::core::ptz::Options());
 }
 
 } // namespace mobile

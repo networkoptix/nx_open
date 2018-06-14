@@ -22,10 +22,18 @@ public:
         ContinuousTiltCapability = 0x00000002,
         ContinuousZoomCapability = 0x00000004,
         ContinuousFocusCapability = 0x00000008,
+        ContinuousRotationCapability = 0x20000000,
 
         AbsolutePanCapability = 0x00000010,
         AbsoluteTiltCapability = 0x00000020,
         AbsoluteZoomCapability = 0x00000040,
+        AbsoluteRotationCapability = 0x40000000,
+
+        RelativePanCapability = 0x00000400,
+        RelativeTiltCapability = 0x00000800,
+        RelativeZoomCapability = 0x00004000,
+        RelativeRotationCapability = 0x00008000,
+        RelativeFocusCapability = 0x00800000,
 
         ViewportPtzCapability = 0x00000080,
 
@@ -55,8 +63,22 @@ public:
         ContinuousPtzCapabilities =
             ContinuousPanCapability | ContinuousTiltCapability | ContinuousZoomCapability,
 
+        ContinuousPtrCapabilities =
+            ContinuousPanCapability | ContinuousTiltCapability | ContinuousRotationCapability,
+
+        ContinuousPtrzCapabilities =
+            ContinuousPanCapability | ContinuousTiltCapability | ContinuousZoomCapability
+            | ContinuousRotationCapability,
+
         AbsolutePtzCapabilities =
             AbsolutePanCapability | AbsoluteTiltCapability | AbsoluteZoomCapability,
+
+        AbsolutePtrCapabilities =
+            AbsolutePanCapability | AbsoluteTiltCapability | AbsoluteRotationCapability,
+
+        AbsolutePtrzCapabilities =
+            AbsolutePanCapability | AbsoluteTiltCapability | AbsoluteRotationCapability
+            | AbsoluteZoomCapability,
     };
     Q_DECLARE_FLAGS(Capabilities, Capability)
 

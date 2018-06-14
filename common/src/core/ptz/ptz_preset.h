@@ -15,6 +15,8 @@
 #include <core/ptz/ptz_preset.h>
 #include <nx/fusion/model_functions_fwd.h>
 
+#include <nx/core/ptz/vector.h>
+
 static const QString kPresetsPropertyKey = lit("ptzPresets");
 static const QString kPtzPresetMappingPropertyName = lit("presetMapping");
 
@@ -23,14 +25,9 @@ struct QnPtzPreset: public boost::equality_comparable1<QnPtzPreset>
     Q_GADGET
 public:
     QnPtzPreset() {}
-    QnPtzPreset(
-        const QString& id,
-        const QString& name,
-        const QString& idOnDevice = QString())
-        : 
+    QnPtzPreset(const QString& id, const QString& name):
         id(id),
-        name(name),
-        idOnDevice(idOnDevice)
+        name(name)
     {
     }
 
@@ -38,9 +35,8 @@ public:
 
     QString id;
     QString name;
-    QString idOnDevice;
 };
-#define QnPtzPreset_Fields (id)(name)(idOnDevice)
+#define QnPtzPreset_Fields (id)(name)
 
 Q_DECLARE_METATYPE(QnPtzPreset)
 Q_DECLARE_METATYPE(QnPtzPresetList)
@@ -49,7 +45,7 @@ struct QnPtzPresetData
 {
     QnPtzPresetData(): space(Qn::DevicePtzCoordinateSpace) {}
 
-    QVector3D position;
+    nx::core::ptz::Vector position;
     Qn::PtzCoordinateSpace space;
     bool isValid = true;
 };

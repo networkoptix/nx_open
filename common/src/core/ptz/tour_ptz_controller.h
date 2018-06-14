@@ -23,14 +23,24 @@ public:
 
     static bool extends(Ptz::Capabilities capabilities);
 
-    virtual Ptz::Capabilities getCapabilities() const override;
+    virtual Ptz::Capabilities getCapabilities(const nx::core::ptz::Options& options) const override;
 
-    virtual bool continuousMove(const QVector3D& speed) override;
+    virtual bool continuousMove(
+        const nx::core::ptz::Vector& speed,
+        const nx::core::ptz::Options& options) override;
+
     virtual bool absoluteMove(
         Qn::PtzCoordinateSpace space,
-        const QVector3D& position,
-        qreal speed) override;
-    virtual bool viewportMove(qreal aspectRatio, const QRectF& viewport, qreal speed) override;
+        const nx::core::ptz::Vector& position,
+        qreal speed,
+        const nx::core::ptz::Options& options) override;
+
+    virtual bool viewportMove(
+        qreal aspectRatio,
+        const QRectF& viewport,
+        qreal speed,
+        const nx::core::ptz::Options& options) override;
+
     virtual bool activatePreset(const QString& presetId, qreal speed) override;
 
     virtual bool createTour(const QnPtzTour& tour) override;

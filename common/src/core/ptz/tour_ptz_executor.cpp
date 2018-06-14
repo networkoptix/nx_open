@@ -9,6 +9,7 @@
 #include <utils/common/invocation_event.h>
 #include <utils/common/connective.h>
 #include <nx/utils/collection.h>
+#include <nx/core/ptz/vector.h>
 
 #include "threaded_ptz_controller.h"
 #include "core/resource/resource_data.h"
@@ -24,20 +25,20 @@
 #   define TRACE(...)
 #endif
 
+using namespace nx::core;
 
 namespace {
     int pingTimeout = 333;
     int samePositionTimeout = 5000;
 }
 
-
 // -------------------------------------------------------------------------- //
 // Model Data
 // -------------------------------------------------------------------------- //
 struct QnPtzTourSpotData {
-    QnPtzTourSpotData(): position(qQNaN<QVector3D>()), moveTime(-1) {}
+    QnPtzTourSpotData(): position(qQNaN<nx::core::ptz::Vector>()), moveTime(-1) {}
 
-    QVector3D position;
+    nx::core::ptz::Vector position;
     qint64 moveTime;
 };
 
@@ -77,8 +78,7 @@ public:
 
     void startMoving();
     void processMoving();
-    void processMoving(bool status, const QVector3D &position);
-    void tryStartWaiting();
+    void processMoving(bool status, const nx::core::ptz::Vector& position);
     void startWaiting();
     void processWaiting();
 
@@ -112,8 +112,8 @@ public:
     bool waitingForNewPosition;
 
     QElapsedTimer spotTimer;
-    QVector3D startPosition;
-    QVector3D lastPosition;
+    nx::core::ptz::Vector startPosition;
+    nx::core::ptz::Vector lastPosition;
     int lastPositionRequestTime;
     int newPositionRequestTime;
     bool tourGetPosWorkaround;
@@ -146,9 +146,10 @@ QnTourPtzExecutorPrivate::~QnTourPtzExecutorPrivate() {
 void QnTourPtzExecutorPrivate::init(const QnPtzControllerPtr &controller, QThreadPool* threadPool)
 {
     baseController = controller;
-    if(baseController->hasCapabilities(Ptz::AsynchronousPtzCapability)) {
+
+    if(baseController->hasCapabilities(Ptz::AsynchronousPtzCapability, ptz::Options())){
         /* Just use it as is. */
-    } else if(baseController->hasCapabilities(Ptz::VirtualPtzCapability)) {
+    } else if(baseController->hasCapabilities(Ptz::VirtualPtzCapability, ptz::Options())) {
         usingBlockingController = true;
     } else {
         baseController.reset(new QnThreadedPtzController(baseController, threadPool));
@@ -167,12 +168,22 @@ void QnTourPtzExecutorPrivate::init(const QnPtzControllerPtr &controller, QThrea
 
 void QnTourPtzExecutorPrivate::updateDefaults()
 {
-    defaultSpace = baseController->hasCapabilities(Ptz::LogicalPositioningPtzCapability) ? Qn::LogicalPtzCoordinateSpace : Qn::DevicePtzCoordinateSpace;
-    defaultDataField = defaultSpace == Qn::LogicalPtzCoordinateSpace ? Qn::LogicalPositionPtzField : Qn::DevicePositionPtzField;
-    defaultCommand = defaultSpace == Qn::LogicalPtzCoordinateSpace ? Qn::GetLogicalPositionPtzCommand : Qn::GetDevicePositionPtzCommand;
+    defaultSpace =
+        baseController->hasCapabilities(Ptz::LogicalPositioningPtzCapability, ptz::Options())
+            ? Qn::LogicalPtzCoordinateSpace
+            : Qn::DevicePtzCoordinateSpace;
 
-    canReadPosition = baseController->hasCapabilities(Ptz::DevicePositioningPtzCapability) ||
-                      baseController->hasCapabilities(Ptz::LogicalPositioningPtzCapability);
+    defaultDataField = defaultSpace == Qn::LogicalPtzCoordinateSpace
+        ? Qn::LogicalPositionPtzField
+        : Qn::DevicePositionPtzField;
+
+    defaultCommand = defaultSpace == Qn::LogicalPtzCoordinateSpace
+        ? Qn::GetLogicalPositionPtzCommand
+        : Qn::GetDevicePositionPtzCommand;
+
+    canReadPosition =
+        baseController->hasCapabilities(Ptz::DevicePositioningPtzCapability, ptz::Options())
+        || baseController->hasCapabilities(Ptz::LogicalPositioningPtzCapability, ptz::Options());
 }
 
 void QnTourPtzExecutorPrivate::stopTour() {
@@ -205,10 +216,10 @@ void QnTourPtzExecutorPrivate::startMoving() {
     if(state == Stopped) {
         index = 0;
         state = Entering;
-        lastPosition = qQNaN<QVector3D>();
+        lastPosition = qQNaN<nx::core::ptz::Vector>();
         lastPositionRequestTime = 0;
 
-        startPosition = qQNaN<QVector3D>();
+        startPosition = qQNaN<nx::core::ptz::Vector>();
     } else if(state == Waiting) {
         index = (index + 1) % data.size();
         state = Moving;
@@ -253,7 +264,8 @@ void QnTourPtzExecutorPrivate::processMoving() {
     }
 }
 
-void QnTourPtzExecutorPrivate::processMoving(bool status, const QVector3D &position) {
+void QnTourPtzExecutorPrivate::processMoving(bool status, const nx::core::ptz::Vector& position)
+{
     if(state != Entering && state != Moving)
         return;
 
@@ -321,8 +333,8 @@ void QnTourPtzExecutorPrivate::requestPosition()
     if (!canReadPosition)
         return;
 
-    QVector3D position;
-    baseController->getPosition(defaultSpace, &position);
+    nx::core::ptz::Vector position;
+    baseController->getPosition(defaultSpace, &position, ptz::Options());
 
     needPositionUpdate = false;
     waitingForNewPosition = true;
@@ -330,7 +342,7 @@ void QnTourPtzExecutorPrivate::requestPosition()
     newPositionRequestTime = spotTimer.elapsed();
 
     if(usingBlockingController)
-        q->controllerFinishedLater(defaultCommand, position);
+        q->controllerFinishedLater(defaultCommand, QVariant::fromValue(position));
 }
 
 bool QnTourPtzExecutorPrivate::handleTimer(int timerId) {
@@ -352,7 +364,7 @@ void QnTourPtzExecutorPrivate::handleFinished(Qn::PtzCommand command, const QVar
         startWaiting();
     }
     else if(command == defaultCommand)
-        processMoving(data.isValid(), data.value<QVector3D>());
+        processMoving(data.isValid(), data.value<nx::core::ptz::Vector>());
 }
 
 
@@ -365,9 +377,20 @@ QnTourPtzExecutor::QnTourPtzExecutor(const QnPtzControllerPtr &controller, QThre
     d->q = this;
     d->init(controller, threadPool);
 
-    connect(this, &QnTourPtzExecutor::startTourRequested,       this,   &QnTourPtzExecutor::at_startTourRequested,  Qt::QueuedConnection);
-    connect(this, &QnTourPtzExecutor::stopTourRequested,        this,   &QnTourPtzExecutor::at_stopTourRequested,   Qt::QueuedConnection);
-    connect(this, &QnTourPtzExecutor::controllerFinishedLater,  this,   &QnTourPtzExecutor::at_controller_finished, Qt::QueuedConnection);
+    connect(
+        this, &QnTourPtzExecutor::startTourRequested,
+        this, &QnTourPtzExecutor::at_startTourRequested,
+        Qt::QueuedConnection);
+
+    connect(
+        this, &QnTourPtzExecutor::stopTourRequested,
+        this, &QnTourPtzExecutor::at_stopTourRequested,
+        Qt::QueuedConnection);
+
+    connect(
+        this, &QnTourPtzExecutor::controllerFinishedLater,
+        this, &QnTourPtzExecutor::at_controller_finished,
+        Qt::QueuedConnection);
 }
 
 QnTourPtzExecutor::~QnTourPtzExecutor() {

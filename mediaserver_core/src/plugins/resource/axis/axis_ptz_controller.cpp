@@ -15,6 +15,8 @@
 
 #include "axis_resource.h"
 
+using namespace nx::core;
+
 static const int DEFAULT_AXIS_API_PORT = 80; // TODO: #Elric copypasta from axis_resource.cpp
 static const int CACHE_UPDATE_TIMEOUT = 60 * 1000;
 
@@ -314,24 +316,65 @@ int QnAxisPtzController::channel() const
     return channelCount.toInt() > 1 ? m_resource->getChannelNumAxis() : -1;
 }
 
-Ptz::Capabilities QnAxisPtzController::getCapabilities() const
+Ptz::Capabilities QnAxisPtzController::getCapabilities(const nx::core::ptz::Options& options) const
 {
+    if (options.type != ptz::Type::operational)
+        return Ptz::NoPtzCapabilities;
+
     return m_capabilities;
 }
 
-bool QnAxisPtzController::continuousMove(const QVector3D &speed) {
-    return query(lit("com/ptz.cgi?continuouspantiltmove=%1,%2&continuouszoommove=%3").arg(speed.x() * m_maxDeviceSpeed.x()).arg(speed.y() * m_maxDeviceSpeed.y()).arg(speed.z() * m_maxDeviceSpeed.z()));
+bool QnAxisPtzController::continuousMove(
+    const nx::core::ptz::Vector& speedVector,
+    const nx::core::ptz::Options& options)
+{
+    if (options.type != ptz::Type::operational)
+    {
+        NX_ASSERT(false, lit("Wrong PTZ type. Only operational PTZ is supported"));
+        return false;
+    }
+
+    return query(lm("com/ptz.cgi?continuouspantiltmove=%1,%2&continuouszoommove=%3")
+        .args(
+            speedVector.pan * m_maxDeviceSpeed.x(),
+            speedVector.tilt * m_maxDeviceSpeed.y(),
+            speedVector.zoom * m_maxDeviceSpeed.z()));
 }
 
-bool QnAxisPtzController::absoluteMove(Qn::PtzCoordinateSpace space, const QVector3D &position, qreal speed) {
+bool QnAxisPtzController::absoluteMove(
+    Qn::PtzCoordinateSpace space,
+    const nx::core::ptz::Vector& position,
+    qreal speed,
+    const nx::core::ptz::Options& options)
+{
+    if (options.type != ptz::Type::operational)
+    {
+        NX_ASSERT(false, lit("Wrong PTZ type. Only operational PTZ is supported"));
+        return false;
+    }
+
     if(space != Qn::LogicalPtzCoordinateSpace)
         return false;
 
-    return query(lit("com/ptz.cgi?pan=%1&tilt=%2&zoom=%3&speed=%4").arg(position.x()).arg(position.y()).arg(m_35mmEquivToCameraZoom(qDegreesTo35mmEquiv(position.z()))).arg(speed * 100));
+    return query(lm("com/ptz.cgi?pan=%1&tilt=%2&zoom=%3&speed=%4")
+        .args(
+            position.pan,
+            position.tilt,
+            m_35mmEquivToCameraZoom(qDegreesTo35mmEquiv(position.zoom)),
+            speed * 100));
 }
 
-bool QnAxisPtzController::getPosition(Qn::PtzCoordinateSpace space, QVector3D *position)  const
+bool QnAxisPtzController::getPosition(
+    Qn::PtzCoordinateSpace space,
+    nx::core::ptz::Vector* outPosition,
+    const nx::core::ptz::Options& options)  const
 {
+    if (options.type != ptz::Type::operational)
+    {
+        NX_ASSERT(false, lit("Wrong PTZ type. Only operational PTZ is supported"));
+        return false;
+    }
+
     if(space != Qn::LogicalPtzCoordinateSpace)
         return false;
 
@@ -340,19 +383,35 @@ bool QnAxisPtzController::getPosition(Qn::PtzCoordinateSpace space, QVector3D *p
         return false;
 
     qreal pan, tilt, zoom;
-    if(params.value(lit("pan"), &pan) && params.value(lit("tilt"), &tilt) && params.value(lit("zoom"), &zoom)) {
-        position->setX(pan);
-        position->setY(tilt);
-        position->setZ(q35mmEquivToDegrees(m_cameraTo35mmEquivZoom(zoom)));
+    if(params.value(lit("pan"), &pan) && params.value(lit("tilt"), &tilt) && params.value(lit("zoom"), &zoom))
+    {
+        outPosition->pan = pan;
+        outPosition->tilt = tilt;
+        outPosition->zoom = q35mmEquivToDegrees(m_cameraTo35mmEquivZoom(zoom));
         return true;
-    } else {
-        qnWarning("Failed to get PTZ position from camera %1. Malformed response.", m_resource->getName());
+    }
+    else
+    {
+        NX_WARNING(
+            this,
+            lm("Failed to get PTZ position from camera %1. Malformed response.")
+                .arg(m_resource->getName()));
+
         return false;
     }
 }
 
-bool QnAxisPtzController::getLimits(Qn::PtzCoordinateSpace space, QnPtzLimits *limits) const
+bool QnAxisPtzController::getLimits(
+    Qn::PtzCoordinateSpace space,
+    QnPtzLimits *limits,
+    const nx::core::ptz::Options& options) const
 {
+    if (options.type != ptz::Type::operational)
+    {
+        NX_ASSERT(false, lit("Wrong PTZ type. Only operational PTZ is supported"));
+        return false;
+    }
+
     if(space != Qn::LogicalPtzCoordinateSpace)
         return false;
 
@@ -360,13 +419,21 @@ bool QnAxisPtzController::getLimits(Qn::PtzCoordinateSpace space, QnPtzLimits *l
     return true;
 }
 
-bool QnAxisPtzController::getFlip(Qt::Orientations *flip) const
+bool QnAxisPtzController::getFlip(
+    Qt::Orientations* flip,
+    const nx::core::ptz::Options& options) const
 {
+    if (options.type != ptz::Type::operational)
+    {
+        NX_ASSERT(false, lit("Wrong PTZ type. Only operational PTZ is supported"));
+        return false;
+    }
+
     *flip = m_flip;
     return true;
 }
 
-bool QnAxisPtzController::getPresets(QnPtzPresetList *presets) const
+bool QnAxisPtzController::getPresets(QnPtzPresetList* presets) const
 {
     if (!(m_capabilities & Ptz::PresetsPtzCapability))
         return base_type::getPresets(presets);
@@ -415,7 +482,7 @@ bool QnAxisPtzController::activatePreset(const QString &presetId, qreal speed)
 }
 
 
-bool QnAxisPtzController::createPreset(const QnPtzPreset &preset)
+bool QnAxisPtzController::createPreset(const QnPtzPreset& preset)
 {
     if (!(m_capabilities & Ptz::PresetsPtzCapability))
         return base_type::createPreset(preset);
@@ -424,7 +491,7 @@ bool QnAxisPtzController::createPreset(const QnPtzPreset &preset)
     return query(lit("com/ptz.cgi?setserverpresetname=%1").arg(preset.name));
 }
 
-bool QnAxisPtzController::updatePreset(const QnPtzPreset &preset)
+bool QnAxisPtzController::updatePreset(const QnPtzPreset& preset)
 {
     if (!(m_capabilities & Ptz::PresetsPtzCapability))
         return base_type::updatePreset(preset);
@@ -432,7 +499,7 @@ bool QnAxisPtzController::updatePreset(const QnPtzPreset &preset)
     return removePreset(preset.id) && createPreset(preset);
 }
 
-bool QnAxisPtzController::removePreset(const QString &presetId)
+bool QnAxisPtzController::removePreset(const QString& presetId)
 {
     if (!(m_capabilities & Ptz::PresetsPtzCapability))
         return base_type::removePreset(presetId);
