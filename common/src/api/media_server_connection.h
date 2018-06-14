@@ -140,6 +140,22 @@ public:
         QObject* target,
         const char* slot);
 
+    int ptzRelativeMoveAsync(
+        const QnNetworkResourcePtr& camera,
+        const nx::core::ptz::Vector& direction,
+        const nx::core::ptz::Options& options,
+        const QnUuid& sequenceId,
+        int sequenceNumber,
+        QObject* target,
+        const char* slot);
+
+    int ptzRelativeFocusAsync(
+        const QnNetworkResourcePtr& camera,
+        qreal direction,
+        const nx::core::ptz::Options& options,
+        QObject* target,
+        const char* slot);
+
     int ptzGetPositionAsync(
         const QnNetworkResourcePtr& camera,
         Qn::PtzCoordinateSpace space,

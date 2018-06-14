@@ -76,7 +76,7 @@ public slots: //< Class is exposed to QML. All functions in section below are in
      * Passing zero in speed should stop PTZ movement.
      *
      * This function is expected to be implemented if this controller has
-     * at least one of the <tt>Ptz::ContinuousPtzCapabilities</tt>.
+     * at least one of the <tt>Ptz::ContinuousPtrzCapabilities</tt>.
      *
      * @param speed Movement speed.
      * @param options Additional options (e.g. ptz type)
@@ -114,7 +114,7 @@ public slots: //< Class is exposed to QML. All functions in section below are in
      * <tt>Ptz::LogicalPositioningPtzCapability</tt>.
      *
      * This function is expected to be implemented if this controller has
-     * at least one of the <tt>Ptz::AbsolutePtzCapabilities</tt>.
+     * at least one of the <tt>Ptz::AbsolutePtrzCapabilities</tt>.
      *
      * @param space Coordinate space of the provided position.
      * @param position Position to move to.
@@ -146,6 +146,34 @@ public slots: //< Class is exposed to QML. All functions in section below are in
         qreal aspectRatio,
         const QRectF& viewport,
         qreal speed,
+        const nx::core::ptz::Options& options) = 0;
+
+    /**
+     * Moves the camera realtive to its current position.
+     *
+     * This function is expected to be implemented if this controller has
+     * at least one of the <tt>Ptz::RelativePtrzCapabilities</tt>.
+     *
+     * @param direction Direction to move. Each component must be in range [-1, 1].
+     * @param options Additional options (e.g. ptz type)
+     * @returns Whether the operation was successful.
+     */
+    virtual bool relativeMove(
+        const nx::core::ptz::Vector& direction,
+        const nx::core::ptz::Options& options) = 0;
+
+    /**
+     * Changes the camera focus relatively to its current position.
+     *
+     * This function is expected to be implemented if this controller has
+     * <tt>Ptz::RelativeFocusCapability</tt>.
+     *
+     * @param direction. Direction to move, must be in range [-1, 1].
+     * @param options Additional options (e.g. ptz type)
+     * @returns Whether the operation was successful.
+     */
+    virtual bool relativeFocus(
+        qreal direction,
         const nx::core::ptz::Options& options) = 0;
 
     /**

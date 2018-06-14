@@ -51,6 +51,8 @@ bool checkUserAccess(
         case Qn::AbsoluteDeviceMovePtzCommand:
         case Qn::AbsoluteLogicalMovePtzCommand:
         case Qn::ViewportMovePtzCommand:
+        case Qn::RelativeMovePtzCommand:
+        case Qn::RelativeFocusPtzCommand:
         case Qn::ActivateTourPtzCommand:
         case Qn::UpdateHomeObjectPtzCommand:
         case Qn::RunAuxilaryCommandPtzCommand:
@@ -238,32 +240,66 @@ int QnPtzRestHandler::executePost(
     {
         case Qn::ContinuousMovePtzCommand:
             NX_VERBOSE(this, lm("Before execute ContinuousMovePtzCommand. %1").arg(params));
-            return execCommandAsync(hash, std::bind(&QnPtzRestHandler::executeContinuousMove, this, controller, params, result));
+            return execCommandAsync(
+                hash,
+                [this, controller, params, result]() mutable
+                {
+                    return executeContinuousMove(controller, params, result);
+                });
+
         case Qn::ContinuousFocusPtzCommand:
             NX_VERBOSE(this, lm("Before execute ContinuousFocusPtzCommand. %1").arg(params));
-            return execCommandAsync(hash, std::bind(&QnPtzRestHandler::executeContinuousFocus, this, controller, params, result));
+            return execCommandAsync(
+                hash,
+                [this, controller, params, result]() mutable
+                {
+                    return executeContinuousFocus(controller, params, result);
+                });
 
         case Qn::AbsoluteDeviceMovePtzCommand:
-        case Qn::AbsoluteLogicalMovePtzCommand: return executeAbsoluteMove(controller, params, result);
-        case Qn::ViewportMovePtzCommand:        return executeViewportMove(controller, params, result);
+        case Qn::AbsoluteLogicalMovePtzCommand:
+            return executeAbsoluteMove(controller, params, result);
+        case Qn::ViewportMovePtzCommand:
+            return executeViewportMove(controller, params, result);
+        case Qn::RelativeMovePtzCommand:
+            return executeRelativeMove(controller, params, result);
+        case Qn::RelativeFocusPtzCommand:
+            return executeRelativeFocus(controller, params, result);
         case Qn::GetDevicePositionPtzCommand:
-        case Qn::GetLogicalPositionPtzCommand:  return executeGetPosition(controller, params, result);
-        case Qn::CreatePresetPtzCommand:        return executeCreatePreset(controller, params, result);
-        case Qn::UpdatePresetPtzCommand:        return executeUpdatePreset(controller, params, result);
-        case Qn::RemovePresetPtzCommand:        return executeRemovePreset(controller, params, result);
-        case Qn::ActivatePresetPtzCommand:      return executeActivatePreset(controller, params, result);
-        case Qn::GetPresetsPtzCommand:          return executeGetPresets(controller, params, result);
-        case Qn::CreateTourPtzCommand:          return executeCreateTour(controller, params, body, result);
-        case Qn::RemoveTourPtzCommand:          return executeRemoveTour(controller, params, result);
-        case Qn::ActivateTourPtzCommand:        return executeActivateTour(controller, params, result);
-        case Qn::GetToursPtzCommand:            return executeGetTours(controller, params, result);
-        case Qn::GetActiveObjectPtzCommand:     return executeGetActiveObject(controller, params, result);
-        case Qn::UpdateHomeObjectPtzCommand:    return executeUpdateHomeObject(controller, params, result);
-        case Qn::GetHomeObjectPtzCommand:       return executeGetHomeObject(controller, params, result);
-        case Qn::GetAuxilaryTraitsPtzCommand:   return executeGetAuxilaryTraits(controller, params, result);
-        case Qn::RunAuxilaryCommandPtzCommand:  return executeRunAuxilaryCommand(controller, params, result);
-        case Qn::GetDataPtzCommand:             return executeGetData(controller, params, result);
-        default:                                return CODE_INVALID_PARAMETER;
+        case Qn::GetLogicalPositionPtzCommand:
+            return executeGetPosition(controller, params, result);
+        case Qn::CreatePresetPtzCommand:
+            return executeCreatePreset(controller, params, result);
+        case Qn::UpdatePresetPtzCommand:
+            return executeUpdatePreset(controller, params, result);
+        case Qn::RemovePresetPtzCommand:
+            return executeRemovePreset(controller, params, result);
+        case Qn::ActivatePresetPtzCommand:
+            return executeActivatePreset(controller, params, result);
+        case Qn::GetPresetsPtzCommand:
+            return executeGetPresets(controller, params, result);
+        case Qn::CreateTourPtzCommand:
+            return executeCreateTour(controller, params, body, result);
+        case Qn::RemoveTourPtzCommand:
+            return executeRemoveTour(controller, params, result);
+        case Qn::ActivateTourPtzCommand:
+            return executeActivateTour(controller, params, result);
+        case Qn::GetToursPtzCommand:
+            return executeGetTours(controller, params, result);
+        case Qn::GetActiveObjectPtzCommand:
+            return executeGetActiveObject(controller, params, result);
+        case Qn::UpdateHomeObjectPtzCommand:
+            return executeUpdateHomeObject(controller, params, result);
+        case Qn::GetHomeObjectPtzCommand:
+            return executeGetHomeObject(controller, params, result);
+        case Qn::GetAuxilaryTraitsPtzCommand:
+            return executeGetAuxilaryTraits(controller, params, result);
+        case Qn::RunAuxilaryCommandPtzCommand:
+            return executeRunAuxilaryCommand(controller, params, result);
+        case Qn::GetDataPtzCommand:
+            return executeGetData(controller, params, result);
+        default:
+            return CODE_INVALID_PARAMETER;
     }
 }
 
@@ -388,6 +424,57 @@ int QnPtzRestHandler::executeViewportMove(const QnPtzControllerPtr &controller, 
 
     QRectF viewport(QPointF(viewportLeft, viewportTop), QPointF(viewportRight, viewportBottom));
     if (!controller->viewportMove(aspectRatio, viewport, speed, options))
+        return CODE_INTERNAL_ERROR;
+
+    return CODE_OK;
+}
+
+int QnPtzRestHandler::executeRelativeMove(
+    const QnPtzControllerPtr& controller,
+    const QnRequestParams& params,
+    QnJsonRestResult& result)
+{
+    nx::core::ptz::Vector vector;
+    nx::core::ptz::Options options;
+
+    const bool success =
+        !requireParameter(params, lit("pan"), result, &vector.pan, /*optional*/ true)
+        || !requireParameter(params, lit("tilt"), result, &vector.tilt, /*optional*/ true)
+        || !requireParameter(params, lit("rotate"), result, &vector.tilt, /*optional*/ true)
+        || !requireParameter(params, lit("zoom"), result, &vector.tilt, /*optional*/ true)
+        || !requireParameter(params, lit("type"), result, &options.type, /*optional*/ true);
+
+    if (!success)
+        return CODE_INVALID_PARAMETER;
+
+    if (vector.isNull())
+        return CODE_OK;
+
+    if (!controller->relativeMove(vector, options))
+        return CODE_INTERNAL_ERROR;
+
+    return CODE_OK;
+}
+
+int QnPtzRestHandler::executeRelativeFocus(
+    const QnPtzControllerPtr& controller,
+    const QnRequestParams& params,
+    QnJsonRestResult& result)
+{
+    qreal focus;
+    nx::core::ptz::Options options;
+
+    const bool success =
+        !requireParameter(params, lit("focus"), result, &focus, /*optional*/ true)
+        || !requireParameter(params, lit("type"), result, &options.type, /*optional*/ true);
+
+    if (!success)
+        return CODE_INVALID_PARAMETER;
+
+    if (qFuzzyIsNull(focus))
+        return CODE_OK;
+
+    if (!controller->relativeFocus(focus, options))
         return CODE_INTERNAL_ERROR;
 
     return CODE_OK;
@@ -671,5 +758,3 @@ int QnPtzRestHandler::executeGetData(
     result.setReply(data);
     return CODE_OK;
 }
-
-// TODO: #Elric not valid anymore

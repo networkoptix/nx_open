@@ -163,7 +163,33 @@ bool QnThreadedPtzController::viewportMove(
     const nx::core::ptz::Options& options)
 {
     RUN_COMMAND(Qn::ViewportMovePtzCommand, void*,
-        viewport, viewportMove, options, aspectRatio, viewport, speed, options);
+                viewport, viewportMove, options, aspectRatio, viewport, speed, options);
+}
+
+bool QnThreadedPtzController::relativeMove(
+    const ptz::Vector& direction,
+    const ptz::Options& options)
+{
+    RUN_COMMAND(
+        Qn::RelativeMovePtzCommand,
+        void*,
+        direction,
+        relativeMove,
+        options,
+        direction,
+        options);
+}
+
+bool QnThreadedPtzController::relativeFocus(qreal direction, const ptz::Options& options)
+{
+    RUN_COMMAND(
+        Qn::RelativeFocusPtzCommand,
+        void*,
+        direction,
+        relativeFocus,
+        options,
+        direction,
+        options);
 }
 
 bool QnThreadedPtzController::getPosition(

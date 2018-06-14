@@ -34,6 +34,20 @@ bool QnBasicPtzController::absoluteMove(
     return false;
 }
 
+bool QnBasicPtzController::relativeMove(
+    const nx::core::ptz::Vector& /*direction*/,
+    const nx::core::ptz::Options& /*options*/)
+{
+    return false;
+}
+
+bool QnBasicPtzController::relativeFocus(
+    qreal /*direction*/,
+    const nx::core::ptz::Options& /*options*/)
+{
+    return false;
+}
+
 bool QnBasicPtzController::viewportMove(
     qreal /*ratio*/,
     const QRectF& /*viewport*/,

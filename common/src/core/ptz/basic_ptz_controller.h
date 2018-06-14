@@ -23,6 +23,12 @@ public:
         qreal speed,
         const nx::core::ptz::Options& options) override;
 
+    virtual bool relativeMove(
+        const nx::core::ptz::Vector& direction,
+        const nx::core::ptz::Options& options) override;
+
+    virtual bool relativeFocus(qreal direction, const nx::core::ptz::Options& options) override;
+
     virtual bool viewportMove(
         qreal aspectRatio,
         const QRectF& viewport,

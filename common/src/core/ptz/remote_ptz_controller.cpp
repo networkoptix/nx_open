@@ -150,7 +150,33 @@ bool QnRemotePtzController::viewportMove(
         speed,
         options,
         m_sequenceId,
+                nextSequenceNumber());
+}
+
+bool QnRemotePtzController::relativeMove(
+    const ptz::Vector& direction,
+    const ptz::Options& options)
+{
+    RUN_COMMAND(
+        Qn::RelativeMovePtzCommand,
+        direction,
+        ptzRelativeMoveAsync,
+        options,
+        direction,
+        options,
+        m_sequenceId,
         nextSequenceNumber());
+}
+
+bool QnRemotePtzController::relativeFocus(qreal direction, const ptz::Options& options)
+{
+    RUN_COMMAND(
+        Qn::RelativeFocusPtzCommand,
+        direction,
+        ptzRelativeFocusAsync,
+        options,
+        direction,
+        options);
 }
 
 bool QnRemotePtzController::getPosition(

@@ -62,6 +62,8 @@ QN_DEFINE_LEXICAL_ENUM(RequestObject,
     (PtzContinuousFocusObject, "ptz")
     (PtzAbsoluteMoveObject, "ptz")
     (PtzViewportMoveObject, "ptz")
+    (PtzRelativeMoveObject, "ptz")
+    (PtzRelativeFocusObject, "ptz")
     (PtzGetPositionObject, "ptz")
     (PtzCreatePresetObject, "ptz")
     (PtzUpdatePresetObject, "ptz")
@@ -211,6 +213,8 @@ void QnMediaServerReplyProcessor::processReply(const QnHTTPRawResponse& response
         case PtzContinuousFocusObject:
         case PtzAbsoluteMoveObject:
         case PtzViewportMoveObject:
+        case PtzRelativeMoveObject:
+        case PtzRelativeFocusObject:
         case PtzCreatePresetObject:
         case PtzUpdatePresetObject:
         case PtzRemovePresetObject:
@@ -642,6 +646,45 @@ int QnMediaServerConnection::ptzViewportMoveAsync(
     params << QnRequestParam("sequenceNumber", sequenceNumber);
 
     return sendAsyncGetRequestLogged(PtzViewportMoveObject, params, nullptr, target, slot);
+}
+
+int QnMediaServerConnection::ptzRelativeMoveAsync(
+    const QnNetworkResourcePtr& camera,
+    const core::ptz::Vector& direction,
+    const core::ptz::Options& options,
+    const QnUuid& sequenceId,
+    int sequenceNumber,
+    QObject* target,
+    const char* slot)
+{
+    QnRequestParamList params;
+    params << QnRequestParam("command", QnLexical::serialized(Qn::RelativeMovePtzCommand));
+    params << QnRequestParam("cameraId", camera->getId());
+    params << QnRequestParam("pan", QnLexical::serialized(direction.pan));
+    params << QnRequestParam("tilt", QnLexical::serialized(direction.tilt));
+    params << QnRequestParam("rotation", QnLexical::serialized(direction.rotation));
+    params << QnRequestParam("zoom", QnLexical::serialized(direction.zoom));
+    params << QnRequestParam("type", QnLexical::serialized(options.type));
+    params << QnRequestParam("sequenceId", sequenceId);
+    params << QnRequestParam("sequenceNumber", sequenceNumber);
+
+    return sendAsyncGetRequestLogged(PtzRelativeMoveObject, params, nullptr, target, slot);
+}
+
+int QnMediaServerConnection::ptzRelativeFocusAsync(
+    const QnNetworkResourcePtr& camera,
+    qreal direction,
+    const core::ptz::Options& options,
+    QObject* target,
+    const char* slot)
+{
+    QnRequestParamList params;
+    params << QnRequestParam("command", QnLexical::serialized(Qn::RelativeFocusPtzCommand));
+    params << QnRequestParam("cameraId", camera->getId());
+    params << QnRequestParam("focus", QnLexical::serialized(direction));
+    params << QnRequestParam("type", QnLexical::serialized(options.type));
+
+    return sendAsyncGetRequestLogged(PtzRelativeFocusObject, params, nullptr, target, slot);
 }
 
 int QnMediaServerConnection::ptzGetPositionAsync(

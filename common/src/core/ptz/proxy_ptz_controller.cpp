@@ -81,6 +81,22 @@ bool QnProxyPtzController::viewportMove(
         : false;
 }
 
+bool QnProxyPtzController::relativeMove(
+    const nx::core::ptz::Vector& direction,
+    const nx::core::ptz::Options& options)
+{
+    return m_controller
+        ? m_controller->relativeMove(direction, options)
+        : false;
+}
+
+bool QnProxyPtzController::relativeFocus(qreal direction, const nx::core::ptz::Options& options)
+{
+    return m_controller
+        ? m_controller->relativeFocus(direction, options)
+        : false;
+}
+
 bool QnProxyPtzController::getPosition(
     Qn::PtzCoordinateSpace space,
     nx::core::ptz::Vector* position,

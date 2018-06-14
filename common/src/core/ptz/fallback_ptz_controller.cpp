@@ -110,6 +110,18 @@ bool QnFallbackPtzController::viewportMove(
     return baseController(options)->viewportMove(aspectRatio, viewport, speed, options);
 }
 
+bool QnFallbackPtzController::relativeMove(
+    const ptz::Vector& direction,
+    const ptz::Options& options)
+{
+    return baseController(options)->relativeMove(direction, options);
+}
+
+bool QnFallbackPtzController::relativeFocus(qreal direction, const ptz::Options& options)
+{
+    return baseController(options)->relativeFocus(direction, options);
+}
+
 bool QnFallbackPtzController::getPosition(
     Qn::PtzCoordinateSpace space,
     nx::core::ptz::Vector* position,
