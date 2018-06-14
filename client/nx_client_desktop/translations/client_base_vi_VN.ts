@@ -1021,8 +1021,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Matroska</source>
-      <translation>Matroska
-</translation>
+      <translation>Matroska</translation>
     </message>
     <message>
       <source>MPEG-4 Part 14</source>
@@ -4253,7 +4252,7 @@ to %1</source>
     </message>
     <message>
       <source>All files</source>
-      <translation>tất cả các file</translation>
+      <translation>Tất cả các file</translation>
     </message>
     <message>
       <source>Please send email with License Key and Hardware ID provided to %1 to obtain an Activation Key file.</source>
@@ -8119,7 +8118,7 @@ to %1</source>
     </message>
     <message>
       <source>Delete Bookmark Info</source>
-      <translation>Xóa bookmarks?</translation>
+      <translation>Xóa bookmarks</translation>
     </message>
     <message>
       <source>Bookmark Info</source>
