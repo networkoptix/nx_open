@@ -155,7 +155,7 @@ public:
     boost::optional<hpm::api::ConnectionMethods> connectionMethonds;
 };
 
-std::unique_ptr<nx::network::AbstractStreamServerSocket> initializeLocalServer(
+static std::unique_ptr<nx::network::AbstractStreamServerSocket> initializeLocalServer(
     const nx::utils::ArgumentParser& args)
 {
     network::SocketAddress localAddress(network::HostAddress::localhost);
@@ -189,7 +189,7 @@ String makeServerName(const QString& prefix, size_t number)
     return kFormat.arg(prefix).arg((uint)number, 5, 10, QLatin1Char('0')).toUtf8();
 }
 
-void emulateCloudServerSockets(
+static void emulateCloudServerSockets(
     const nx::utils::ArgumentParser& args,
     CloudServerSocketGenerator* cloudServerSocketGenerator,
     nx::network::MultipleServerSocket* multiServerSocket)
@@ -236,7 +236,7 @@ void emulateCloudServerSockets(
     }
 }
 
-std::unique_ptr<nx::network::AbstractStreamServerSocket> initializeSslServer(
+static std::unique_ptr<nx::network::AbstractStreamServerSocket> initializeSslServer(
     nx::network::test::TestTransmissionMode transmissionMode,
     std::unique_ptr<nx::network::AbstractStreamServerSocket> serverSocket)
 {
@@ -259,7 +259,7 @@ std::unique_ptr<nx::network::AbstractStreamServerSocket> initializeSslServer(
         false);
 }
 
-void loadSettings(
+static void loadSettings(
     const nx::utils::ArgumentParser& args,
     nx::network::test::TestTransmissionMode* transmissionMode,
     std::chrono::milliseconds* rwTimeout)
@@ -285,7 +285,8 @@ int runInListenMode(const nx::utils::ArgumentParser& args)
     const auto beginTime = std::chrono::steady_clock::now();
 
     auto transmissionMode = test::TestTransmissionMode::spam;
-    std::chrono::milliseconds rwTimeout = nx::network::test::TestConnection::kDefaultRwTimeout;
+    std::chrono::milliseconds rwTimeout =
+        nx::network::test::TestConnection::kDefaultRwTimeout;
     loadSettings(args, &transmissionMode, &rwTimeout);
 
     std::cout << lm("Server mode: %1").args(transmissionMode).toStdString() << std::endl;
