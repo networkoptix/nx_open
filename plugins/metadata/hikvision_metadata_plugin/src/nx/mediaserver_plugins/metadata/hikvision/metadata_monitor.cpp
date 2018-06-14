@@ -222,10 +222,8 @@ void HikvisionMetadataMonitor::at_monitorSomeBytesAvailable()
 std::chrono::milliseconds HikvisionMetadataMonitor::reopenDelay() const
 {
     const auto elapsed = m_timeSinceLastOpen.elapsed();
-    const auto ms = std::max(0LL,
-        (qint64) std::chrono::duration_cast<std::chrono::milliseconds>(kMinReopenInterval)
-                .count() -
-            elapsed);
+    const auto ms = std::max(0LL, (qint64) std::chrono::duration_cast
+        <std::chrono::milliseconds>(kMinReopenInterval).count() - elapsed);
     return std::chrono::milliseconds(ms);
 }
 
@@ -247,14 +245,16 @@ bool HikvisionMetadataMonitor::processEvent(const HikvisionEvent& hikvisionEvent
     if (!hikvisionEvent.typeId.isNull())
         result.push_back(hikvisionEvent);
 
-    auto getEventKey = [](const HikvisionEvent& event) {
-        QString result = event.typeId.toString();
-        if (event.region)
-            result += QString::number(*event.region) + lit("_");
-        if (event.channel)
-            result += QString::number(*event.channel);
-        return result;
-    };
+    auto getEventKey = 
+        [](const HikvisionEvent& event) 
+        {
+            QString result = event.typeId.toString();
+            if (event.region)
+                result += QString::number(*event.region) + lit("_");
+            if (event.channel)
+                result += QString::number(*event.channel);
+            return result;
+        };
 
     auto eventDescriptor = m_manifest.eventDescriptorById(hikvisionEvent.typeId);
     using namespace nx::sdk::metadata;
@@ -272,7 +272,7 @@ bool HikvisionMetadataMonitor::processEvent(const HikvisionEvent& hikvisionEvent
         return true;
 
     QnMutexLocker lock(&m_mutex);
-    for (const auto handler : m_handlers)
+    for (const auto handler: m_handlers)
         handler(result);
 
     return true;
