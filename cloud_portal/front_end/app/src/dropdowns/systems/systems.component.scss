@@ -2,74 +2,97 @@
 @import '../../../styles/native-theme/theme_palette';
 @import '../../../styles/theme_palette';
 @import '../../../styles/theme_variables';
+@import '~bootstrap/scss/mixins/breakpoints';
 @import '~bootstrap/scss/functions';
 @import '~bootstrap/scss/variables';
 
+.dropdown-menu {
+    width : auto !important;
+
+    @media (max-width : $collapse-first-width) {
+        right : 0;
+        left  : auto !important;
+    }
+
+    & li > a {
+        white-space : nowrap;
+        display     : flex;
+        align-items : center;
+
+        @media (max-width : $collapse-first-width) {
+            text-align : right;
+        }
+
+        & .system-owner {
+            color : $blue10;
+        }
+
+        &:hover .system-owner {
+            color : white;
+        }
+    }
+}
+
 .popup {
     &.arrow {
-        left: 16px;
-    }
-}
+        left : 16px;
 
-@media (max-width: $collapse-second-width) {
-    .dropdown-toggle {
-        padding-right: 10px !important;
-    }
-
-    .popup {
-        &.arrow {
-            right: 16px;
-            left: auto;
+        @media (max-width : $collapse-first-width) {
+            right : 36px;
+            left  : auto;
         }
-    }
-}
 
-@media (max-width: $grid-breakpoints(md)) {
-    .popup {
-        &.arrow {
-            right: 16px;
-            left: auto;
+        @media (max-width : $collapse-second-width) {
+            right : 14px;
+            left  : auto;
         }
-    }
-
-    .dropdown-toggle {
-        padding-right: 10px !important;
-
-        .glyphicon {
-            margin: 0 4px !important;
-        }
-    }
-
-    .dropdown-menu {
-        right: 0;
-        left: auto !important;
-    }
-
-    .dropdown-menu li > a {
-        text-align: right !important;
     }
 }
 
 .dropdown-toggle {
-    height: 47px;
-    border: none;
+    height : 47px;
+    border : none;
+
+    @media (max-width : $collapse-second-width) {
+        padding-right : 10px !important;
+    }
+
+    .glyphicon {
+        @media (max-width : $collapse-first-width ) {
+            margin : 0 4px !important;
+        }
+    }
+
+    .nav-arrow {
+        display : none;
+        @media (min-width : $collapse-second-width + 1) {
+            display : block;
+        }
+    }
+
+    .ellipsis {
+        display : none;
+        @media (min-width : $collapse-first-width + 1) {
+            display : block;
+        }
+    }
+
+    .systems-label {
+        display : none;
+        @media (min-width : $collapse-first-width + 1) {
+            display : block;
+        }
+    }
 }
 
-.dropdown .dropdown-menu {
-    width: auto !important;
+.nx-d-md-block {
+    @media (min-width : $collapse-first-width + 1) {
+        display : block !important;
+    }
 }
 
-.dropdown .dropdown-menu li > a {
-    white-space: nowrap;
-    display: flex;
-    align-items: center;
+.nx-d-md-none {
+    @media (min-width : $collapse-first-width + 1) {
+        display : none !important;
+    }
 }
-
-.dropdown .dropdown-menu li > a .system-owner {
-    color: $blue10; // TODO: vars not available here ... Hmmmm
-}
-
-.dropdown .dropdown-menu li > a:hover .system-owner {
-    color: white;
-}
-

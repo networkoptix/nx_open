@@ -6,10 +6,10 @@
     "okButton": "Ok",
     "cancelButton": "Annulla",
     "loginTitle": "Accedi a %PRODUCT_NAME%",
-    "loginButton": "Log in",
+    "loginButton": "Accesso",
     "logoutAuthorisedTitle": "Ha già effettuato l'accesso",
     "logoutAuthorisedContinueButton": "Continua",
-    "logoutAuthorisedLogoutButton": "Disconnetti"
+    "logoutAuthorisedLogoutButton": "Scollegati"
   },
   "pageTitles": {
     "template": "{{title}} %PRODUCT_NAME%",
@@ -30,7 +30,7 @@
     "restorePasswordCode": "Reimpostare la Password -",
     "view": "Visualizzazione delle telecamere - ",
     "debug": "Debug",
-    "login": "Log in -",
+    "login": "Accesso -",
     "download": "Scarica %VMS_NAME%",
     "downloadPlatform": "Scarica %VMS_NAME% ",
     "pageNotFound": "Pagina non trovata"
@@ -68,7 +68,7 @@
       "description": "Accesso illimitato inclusa la possibilità di condividere"
     },
     "Custom": {
-      "label": "Personalizza",
+      "label": "Personalizzato",
       "description": "Utilizzare l'applicazione client %PRODUCT_NAME% per impostare le autorizzazioni personalizzate"
     },
     "cloudAdmin": {
@@ -96,7 +96,7 @@
       "description": "È possibile visualizzare video Live, sfogliare l'archivio, configurare telecamere, controllare PTZ ecc"
     },
     "custom": {
-      "label": "Personalizza",
+      "label": "Personalizzato",
       "description": "Utilizzare l'applicazione client %PRODUCT_NAME% per impostare le autorizzazioni personalizzate"
     }
   },
@@ -135,7 +135,8 @@
     "cantEditAdmin": "Questo utente ha le autorizzazioni di amministratore",
     "cantOpenClient": "%VMS_NAME% applicazione non rilevata. <a href=\"/download\">Scarica</a>",
     "lostConnection": "Connessione a {{systemName}} persa",
-    "thisSystem": "il sistema"
+    "thisSystem": "il sistema",
+    "oldSafariNotSupported": "Le versioni di Safari precedenti alla 10 non sono supportate"
   },
   "passwordRequirements": {
     "minLengthMessage": "La password deve contenere almeno 8 caratteri",
@@ -150,7 +151,7 @@
     "shareTitle": "Condividere",
     "shareConfirmButton": "Condividere",
     "editShareTitle": "Modifica Permessi",
-    "editShareConfirmButton": "Salva",
+    "editShareConfirmButton": "Salvare",
     "permissionsSaved": "Nuove autorizzazioni salvate"
   },
   "system": {
@@ -160,10 +161,10 @@
     "offline": "Il sistema è offline",
     "openClient": "Apri in %VMS_NAME%",
     "openClientNoSystem": "Apri in %VMS_NAME%",
-    "confirmMergeAction": "Merge",
+    "confirmMergeAction": "Unisci",
     "mergeSystemTitle": "Unione dei sistemi",
     "confirmRenameTitle": "Nome del sistema",
-    "confirmRenameAction": "Salva",
+    "confirmRenameAction": "Salvare",
     "successRename": "Nome del sistema salvato",
     "confirmDisconnectTitle": "Scollegare il sistema da %PRODUCT_NAME%?",
     "confirmDisconnectAction": "Scollegamento",
@@ -181,9 +182,9 @@
     "accountSavedSuccess": "Il suo account è stato salvato con successo",
     "activationLinkSent": "Link di attivazione inviato",
     "passwordChangedSuccess": "Il suo account è stato salvato con successo",
-    "changePassword": "Cambio Password",
+    "changePassword": "Cambia Password",
     "newPasswordLabel": "Nuova password",
-    "saveChanges": "Salva"
+    "saveChanges": "Salvare"
   },
   "downloads": {
     "noClientDetectedTitle": "Installa %VMS_NAME% per visualizzare il suo sistema",

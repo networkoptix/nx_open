@@ -16,67 +16,67 @@
         <input type="password" style="display:none">
         <!-- /end of special hack -->
 
-        <div class="form-group row" validate-field>
-            <label for="firstName" class="col-12 col-md-4 text-left text-md-right control-label">名</label>
-            <div class="col-12 col-md-4">
-                <input type="text" class="form-control"
-                       ng-model="account.firstName" id="firstName" maxlength="255"
-                       required name="firstName" autocomplete="off" autofocus>
+        <div class="form-group" validate-field>
+            <label for="firstName" class="col-sm-4 control-label">名</label>
+            <div class="col-sm-4">
+                <input type="text" class="form-control" ng-model="account.firstName" id="firstName" maxlength="255"
+                       required
+ name="firstName" autocomplete="off" autofocus>
             </div>
-            <div class="col-12 col-md-4">
-                <span class="help-block input-error" ng-if="registerForm.firstName.$touched && registerForm.firstName.$error.required">名字是必填项</span>
-            </div>
-        </div>
-        <div class="form-group row" validate-field>
-            <label for="lastName"  class="col-12 col-md-4 text-left text-md-right control-label">姓氏</label>
-            <div class="col-12 col-md-4">
-                <input type="text" class="form-control"
-                       ng-model="account.lastName" id="lastName" maxlength="255"
-                       required name="lastName" autocomplete="off">
-            </div>
-            <div class="col-12 col-md-4">
-                <span class="help-block input-error" ng-if="registerForm.lastName.$touched && registerForm.lastName.$error.required">姓氏是必填项</span>
+            <div class="col-sm-4">
+                <span class="help-block" ng-if="registerForm.firstName.$touched && registerForm.firstName.$error.required">名字是必填项</span>
             </div>
         </div>
-        <div class="form-group row" validate-field>
-            <label for="registerEmail"  class="col-12 col-md-4 text-left text-md-right control-label">邮箱</label>
-            <div class="col-12 col-md-4">
-                <input ng-hide="lockEmail" type="email" class="form-control"
-                       ng-model="account.email" id="registerEmail" maxlength="255"
+        <div class="form-group" validate-field>
+            <label for="lastName"  class="col-sm-4 control-label">姓氏</label>
+            <div class="col-sm-4">
+                <input type="text" class="form-control" ng-model="account.lastName" id="lastName" maxlength="255"
+                       required
+ name="lastName" autocomplete="off">
+            </div>
+            <div class="col-sm-4">
+                <span class="help-block" ng-if="registerForm.lastName.$touched && registerForm.lastName.$error.required">姓氏是必填项</span>
+            </div>
+        </div>
+        <div class="form-group" validate-field>
+            <label for="registerEmail"  class="col-sm-4 control-label">邮箱</label>
+            <div class="col-sm-4">
+                <input ng-hide="lockEmail" type="email" class="form-control" ng-model="account.email" id="registerEmail" maxlength="255"
                        name="registerEmail" required autocomplete="off"  validate-email
  ng-change="hideAlreadyExists()">
 
                 <input type="text" ng-if="lockEmail"
                        class="form-control" ng-model="account.email" readonly>
             </div>
-            <div class="col-12 col-md-4">
-                <span class="help-block input-error" ng-if="registerForm.registerEmail.$touched && registerForm.registerEmail.$error.required">Email is required</span>
-                <span class="help-block input-error" ng-if="registerForm.registerEmail.$touched && registerForm.registerEmail.$error.email">Please enter a valid Email</span>
-                <span class="help-block input-error" ng-if="registerForm.registerEmail.$error.alreadyExists">This Email has been already registered in {{PRODUCT_NAME}}</span>
+            <div class="col-sm-4">
+                <div><span class="help-block" ng-if="registerForm.registerEmail.$touched && registerForm.registerEmail.$error.required">电子邮件为必填</span></div>
+
+                <div><span class="help-block" ng-if="registerForm.registerEmail.$touched && registerForm.registerEmail.$error.email">请输入一个有效的电子邮件地址</span></div>
+
+                <div><span class="help-block" ng-if="registerForm.registerEmail.$error.alreadyExists">此电子邮件已在 %PRODUCT_NAME% 中注册</span></div>
             </div>
         </div>
         <password-input ng-model="account.password" id="'registerPassword'" label="$root.L.regActions.passwordLabel"></password-input>
-        <div class="form-group" >
-            <div class="col-12 offset-md-4 col-md-8">
-                <label class="checkbox">Subscribe to email newsletters
-                    <input type="checkbox" checked="checked"
-                           ng-model="account.subscribe"
-                           name="subscribe"
-                           id="subscribe">
-                    <span class="checkmark"></span>
-                </label>
+        <div class="form-group" validate-field>
+            <div class="col-sm-offset-4 col-sm-4">
+                <div class="checkbox">
+                    <label>
+                        <input type="checkbox" ng-model="account.accept" name="accept" id="accept" required>
+                        我同意<a href="/content/eula" target="_blank">条款和条件</a>和
+                                       <a href="%PRIVACY_LINK%" target="_blank">隐私政策</a>
+                    </label>
+                    <p class="form-control-static" ng-if="registerForm.accept.$touched && registerForm.accept.$error.required">
+                        请审阅并同意条款及条件和隐私政策, 以便继续进行
+                    </p>
+                </div>
             </div>
         </div>
         <div class="form-group">
-            <div class="col-12 offset-md-4 col-md-8">
+            <div class="col-sm-offset-4 col-sm-8">
                 <process-button process="register"
                                 form="registerForm"
-                                class="float-left"
+                                class="pull-left"
                                 button-text="$root.L.regActions.createAccount"></process-button>
-                <div class="small conditions-note">
-                    点击“创建帐户”即表示您同意
-                    <div><a href="/content/eula" target="_blank">条款与条件</a></div>
-                </div>
             </div>
         </div>
     </form>

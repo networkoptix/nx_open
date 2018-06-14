@@ -3,10 +3,10 @@
     <button class="btn btn-dropdown-toggle"
             id="systemsDropdown"
             ngbDropdownToggle>
-        <span [ngClass]="{'d-md-none':!activeSystem}" class="d-block glyphicon glyphicon-home"></span>
-        <span *ngIf="activeSystem" class="ellipsis d-block d-md-block">{{activeSystem.name}}</span>
-        <span *ngIf="!activeSystem" class="d-none" [ngClass]="{'d-md-block':!activeSystem}">{{systemCounter}}&nbsp;<span translate>Systems</span></span>
-        <div class="nav-arrow d-none d-md-block">
+        <span [ngClass]="{'nx-d-md-none':!activeSystem}" class="glyphicon glyphicon-home"></span>
+        <span *ngIf="activeSystem" class="ellipsis">{{activeSystem.name}}</span>
+        <span *ngIf="!activeSystem" class="d-none" [ngClass]="{'nx-d-md-block':!activeSystem}">{{systemCounter}}&nbsp;<span translate>Systems</span></span>
+        <div class="nav-arrow">
             <span></span>
             <span></span>
         </div>

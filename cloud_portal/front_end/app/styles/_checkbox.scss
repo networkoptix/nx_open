@@ -20,6 +20,10 @@
         position: absolute;
         opacity: 0;
         cursor: pointer;
+
+        &:focus ~ .checkmark {
+            background-color : $light3;
+        }
     }
 
     /* On mouse-over, add a grey background color */

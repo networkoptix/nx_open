@@ -4,5 +4,5 @@ Hallo,
 
 {{config.portal_url}}/aktivieren/{{message.code}}
 
-Wenn Sie sich nicht bei {{PRODUCT_NAME}} registriert haben, ignorieren Sie diese Email.
+Wenn Sie sich nicht bei %PRODUCT_NAME% registriert haben, ignorieren Sie diese E-Mail.
 Teilen Sie die Nachricht oder den Link nicht mit anderen Personen.

@@ -141,7 +141,7 @@
                             languageService.lang.dialogs.logoutAuthorisedLogoutButton
                         )
                         .then((result) => {
-                            if ('OK' === result) {
+                            if (result) {
                                 redirectAuthorised();
                             } else {
                                 logout(true);

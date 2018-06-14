@@ -1,20 +1,20 @@
 
-<div class="card card-default" ng-if="system.isMine">
-    <div class="card-body">
+<div class="panel panel-default" ng-if="system.isMine">
+    <div class="panel-body">
         <h2>Twój system</h2>
         <p></p>
         <p>
             <button class="btn btn-default" ng-click="rename()">Zmień nazwę systemu</button>
         </p>
         <p>
-            <button class="btn btn-default" ng-if="canMerge || debugMode" ng-click="mergeSystems()">Merge with Another System</button>
+            <button class="btn btn-default" ng-if="canMerge || debugMode" ng-click="mergeSystems()">Złącz z innym systemem</button>
         </p>
         <hr></hr>
         <button class="btn btn-default" ng-click="disconnect()">Odłącz od <span class="product-name">%PRODUCT_NAME%</span></button>
     </div>
 </div>
-<div class="card card-default" ng-if="!system.isMine">
-    <div class="card-body">
+<div class="panel panel-default" ng-if="!system.isMine">
+    <div class="panel-body">
         <h2>Właściciel</h2>
         <h3 class="user-name">{{system.info.ownerFullName}}</h3>
         <a ng-href="mailto:{{system.info.ownerAccountEmail}}">{{system.info.ownerAccountEmail}}</a>
@@ -29,22 +29,21 @@
         <button class="btn btn-default" ng-click="delete()">Odłącz od mojego konta</button>
     </div>
 </div>
-<div class="card card-default" ng-if="currentlyMerging">
-    <div class="card-body" ng-if="isMaster && system.isMine">
+<div class="panel panel-default" ng-if="currentlyMerging">
+    <div class="panel-body" ng-if="isMaster && system.isMine">
         <div><strong>{{mergeTargetSystem.name}}</strong>
-            is being merged to this system</div>
+            jest w trakcie złączania z tym systemem</div>
         <hr></hr>
-        <div class="merge-info-text">Depending of the size of the database it may take up to several hours</div>
+        <div class="merge-info-text">W zależności od rozmiaru bazy danych może to potrwać do kilku godzin</div>
     </div>
-    <div class="card-body" ng-if="!isMaster || !system.isMine">
-        <div>This system is being merged to
-            <strong>{{mergeTargetSystem.name}}</strong></div>
+    <div class="panel-body" ng-if="!isMaster || !system.isMine">
+        <div>Ten system jest w trakcie złączania z <strong>{{mergeTargetSystem.name}}</strong></div>
         <hr></hr>
         <div class="merge-info-text">
-            <p>Depending of the size of the database it may take up to several hours.</p>
-            <p>Until merge is finished you can log in to this system and watch video, but cannot change any settings.</p>
-            <p>When merge is finished, all users and cameras from this system will become available
-                in <span class="merge-system-name">{{mergeTargetSystem.name}}</span>. System, and this system will be deleted.</p>
+            <p>W zależności od rozmiaru bazy danych może to potrwać do kilku godzin.</p>
+            <p>W trakcie złączania systemów można logować się do nich i odtwarzać wideo, ale nie można zmieniać ich konfiguracji. </p>
+            <p>Po złączeniu systemów wszyscy użytkownicy i kamery z tego systemu będą również dostępne
+                w <span class="merge-system-name">{{mergeTargetSystem.name}}</span>. System zostanie usunięty.</p>
         </div>
     </div>
 </div>

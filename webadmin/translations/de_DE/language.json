@@ -174,52 +174,5 @@
     },
     "pageTitles": {
         "default": "{{PRODUCT_NAME}} Benutzeroberfläche"
-    },
-    "common": {
-        "voiceCommands": {
-            "search": "Finden + [Text für Suchleiste]",
-            "pause": "Pause",
-            "help": "Hilfe | Befehle anzeigen",
-            "collapse all servers": "Alle Server zusammenklappen",
-            "collapse server": "Server zusammenklappen + [Servername]",
-            "play": "Abspielen",
-            "clear search": "Suche zurücksetzen",
-            "live": "Live gehen | Live anzeigen",
-            "expand all servers": "Alle Server erweitern",
-            "stop listening": "Abhören stoppen",
-            "expand server": "Server erweitern + [Servername]",
-            "view": "Ansicht + [Kameraname]"
-        },
-        "systemOffline": "System offline",
-        "cameraLinks": {
-            "copyToClipboard": "in zwischenablage kopieren",
-            "highStream": "Hoher Stream",
-            "copyDefaultText": "kopieren",
-            "unknown": "Unbekannt",
-            "lowStream": "Niedriger Stream",
-            "transcoding": "Umkodierung",
-            "copyActiveText": "in die zwischenablage kopiert"
-        },
-        "searchCamPlaceholder": "Suche",
-        "cameraStates": {
-            "noFormat": "Dieser Browser unterstützt keine Videowiedergabe von dieser Kamera.",
-            "ieWin10": "Bitte benutzen Sie Microsoft Edge oder Google Chrome Browser.",
-            "iosVideoTooLarge": "iOS unterstützt Videos größer als FullHD (2MP: 1920 x 1080) nicht.",
-            "unauthorized": "Authentifizierung erforderlich",
-            "ubuntuNX": "Dieser Browser unterstützt keine Videos von ARM-basierten Servern. Bitte, verwenden Sie den Browser Chromium.",
-            "ieNoWebm": "Installieren Sie bitte <a href='https://tools.google.com/dlpage/webmmf/' target='_blank'>WebM Codec</a> für den Internet Explorer.",
-            "flashOrWebmRequired": "Installieren Sie bitte <a href='https://get.adobe.com/flashplayer/' target='_blank'>Adobe Flash</a> oder<a href='https://tools.google.com/dlpage/webmmf/' target='_blank'> WebM Codec</a>, um Videos im Internet Explorer abzuspielen.",
-            "noArmSupport": "Dieser Browser bzw. dieses Gerät unterstützt keine Videowiedergabe von ARM-basierten Servern.",
-            "error": "Fehler",
-            "offline": "Offline",
-            "noData": "Keine Daten",
-            "flashRequired": "Installieren Sie bitte <a href='https://get.adobe.com/flashplayer/' target='_blank'>Adobe Flash</a>, um Videos abzuspielen."
-        },
-        "chromeCastWarning": "Chromecast ist ressourcenintensiv und kann Probleme auf Ihrem Server verursachen.",
-        "resolution": {
-            "high": "Hoch",
-            "auto": "Auto",
-            "low": "Niedrig"
-        }
     }
 }

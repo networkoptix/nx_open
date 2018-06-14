@@ -114,7 +114,7 @@
                 nxDialogsService
                     .confirm(languageService.lang.dialogs.logoutAuthorisedText, languageService.lang.dialogs.logoutAuthorisedTitle, languageService.lang.dialogs.logoutAuthorisedContinueButton, 'btn-primary', languageService.lang.dialogs.logoutAuthorisedLogoutButton)
                     .then((result) => {
-                    if ('OK' === result) {
+                    if (result) {
                         redirectAuthorised();
                     }
                     else {

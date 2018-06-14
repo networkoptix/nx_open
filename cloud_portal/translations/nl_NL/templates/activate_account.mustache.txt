@@ -4,5 +4,5 @@ Hallo,
 
 {{config.portal_url}}/activeren/{{message.code}}
 
-Als u zich niet in {{PRODUCT_NAME}} heeft aangemeld, negeer en verwijder dan deze e-mail.
+Als u zich niet in %PRODUCT_NAME% heeft aangemeld, negeer en verwijder dan deze e-mail.
 Deel het bericht of de link met niemand.

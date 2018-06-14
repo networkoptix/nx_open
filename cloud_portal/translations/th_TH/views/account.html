@@ -3,60 +3,42 @@
     <h1>บัญชีผู้ใช้</h1>
     <form name="accountForm" class="form-horizontal" novalidate>
 
-        <div class="form-group row">
-            <label class="col-12 col-md-4 text-left text-md-right control-label"> อีเมล </label>
-            <div class="col-12 col-md-4">
+        <div class="form-group">
+            <label class="col-sm-4 control-label"> อีเมล </label>
+            <div class="col-sm-4">
                 <input type="text"  class="form-control" ng-model="account.email" readonly>
             </div>
         </div>
 
-        <div class="form-group row" validate-field>
-            <label for="firstName" class="col-12 col-md-4 text-left text-md-right control-label">ชื่อ</label>
-            <div class="col-12 col-md-4">
+        <div class="form-group" validate-field>
+            <label for="firstName" class="col-sm-4 control-label">ชื่อ</label>
+            <div class="col-sm-4">
                 <input type="text" class="form-control" ng-model="account.first_name" name="firstName" id="firstName" maxlength="255" required>
             </div>
-            <div class="col-12 col-md-4">
-                <span class="help-block input-error" ng-if="accountForm.firstName.$touched && accountForm.firstName.$error.required">ต้องระบุชื่อ</span>
+            <div class="col-sm-4">
+                <span class="help-block" ng-if="accountForm.firstName.$touched && accountForm.firstName.$error.required">ต้องระบุชื่อ</span>
             </div>
         </div>
-        <div class="form-group row" validate-field>
-            <label for="lastName" class="col-12 col-md-4 text-left text-md-right control-label">นามสกุล</label>
-            <div class="col-12 col-md-4">
+        <div class="form-group"  validate-field>
+            <label for="lastName"  class="col-sm-4 control-label">นามสกุล</label>
+            <div class="col-sm-4">
                 <input type="text" class="form-control" ng-model="account.last_name" name="lastName" id="lastName" maxlength="255"  required>
             </div>
-<<<<<<< mine
-            <div class="col-12 col-md-4">
-                <span class="help-block input-error" ng-if="accountForm.lastName.$touched && accountForm.lastName.$error.required">ต้องเป็นนามสกุล</span>
-=======
             <div class="col-sm-4">
                 <span class="help-block" ng-if="accountForm.lastName.$touched && accountForm.lastName.$error.required">ต้องระบุนามสกุล</span>
->>>>>>> theirs
             </div>
         </div>
-        <div class="form-group row" validate-field>
-            <label for="lastName" class="col-12 col-md-4 text-left text-md-right control-label"> ภาษา </label>
-            <div class="col-12 col-md-4">
-                <nx-language-select account-mode="true"></nx-language-select>
-                <!--<language-select account-mode="true" ng-model="account.language"></language-select>-->
+        <div class="form-group"  validate-field>
+            <label for="lastName"  class="col-sm-4 control-label"> ภาษา </label>
+            <div class="col-sm-4">
+                <language-select account-mode="true" ng-model="account.language"></language-select>
             </div>
-            <div class="col-12 col-md-4">
+            <div class="col-sm-4">
             </div>
         </div>
 
-        <div class="form-group row">
-            <div class="col-12 offset-md-4 col-md-6">
-                <label class="checkbox">Subscribe to Email newsletters
-                    <input type="checkbox" checked="checked"
-                           ng-model="account.subscribe"
-                           name="subscribe"
-                           id="subscribe">
-                    <span class="checkmark"></span>
-                </label>
-            </div>
-        </div>
-
-        <div class="form-group row">
-            <div class="col-12 offset-md-4 col-md-4">
+        <div class="form-group">
+            <div class="col-sm-offset-4 col-sm-4">
                 <process-button process="save"
                                 form="accountForm"
                                 button-text="$root.L.account.saveChanges"></process-button>
@@ -68,22 +50,22 @@
 <div class="container" ng-if="passwordMode" >
     <h1>เปลี่ยนรหัสผ่าน</h1>
     <form name="passwordForm" class="form-horizontal" novalidate>
-        <div class="form-group row" validate-field>
-            <label for="password"  class="col-12 col-md-4 text-left text-md-right control-label">รหัสผ่านปัจจุบัน</label>
-            <div class="col-12 col-md-4">
+        <div class="form-group" validate-field>
+            <label for="password"  class="col-sm-4 control-label">รหัสผ่านปัจจุบัน</label>
+            <div class="col-sm-4">
                 <input type="password" class="form-control" ng-model="pass.password"
                        name="password"
                        id="password" required>
             </div>
-            <div class="col-12 col-md-4">
-                <span class="help-block input-error" ng-if="passwordForm.password.$touched && passwordForm.password.$error.required">ต้องระบุรหัสผ่านปัจจุบัน</span>
+            <div class="col-sm-4">
+                <span class="help-block" ng-if="passwordForm.password.$touched && passwordForm.password.$error.required">ต้องระบุรหัสผ่านปัจจุบัน</span>
             </div>
         </div>
 
         <password-input ng-model="pass.newPassword" id="'newPassword'" label="$root.L.account.newPasswordLabel"></password-input>
 
-        <div class="form-group row">
-            <div class="col-12 offset-md-4 col-md-4">
+        <div class="form-group">
+            <div class="col-sm-offset-4 col-sm-4">
                 <process-button process="changePassword"
                                 form="passwordForm"
                                 button-text="$root.L.account.changePassword"></process-button>

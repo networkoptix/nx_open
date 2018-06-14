@@ -2,65 +2,66 @@
 @import '../../../styles/native-theme/theme_palette';
 @import '../../../styles/theme_palette';
 @import '../../../styles/theme_variables';
+@import '~bootstrap/scss/mixins/breakpoints';
 @import '~bootstrap/scss/functions';
 @import '~bootstrap/scss/variables';
 
+.dropdown-menu {
+    width : auto !important;
+
+    @media (max-width : $collapse-first-width) {
+        right : 0;
+        left  : auto !important;
+    }
+
+    & li > a {
+        @media (max-width : $collapse-first-width) {
+            text-align : right;
+        }
+    }
+}
+
 .popup {
     &.arrow {
-        left: 16px;
-    }
-}
+        left : 16px;
 
-@media (max-width: $grid-breakpoints (lg)) {
-
-    .dropdown-menu {
-        right: 0;
-        left: auto !important;
-    }
-
-    .dropdown-menu li > a {
-        text-align: right;
-    }
-
-    .popup {
-        &.arrow {
-            right: 34px;
-            left: auto;
+        @media (max-width : $collapse-first-width) {
+            right : 32px;
+            left  : auto;
         }
-    }
-}
 
-@media (max-width: $grid-breakpoints (md)) {
-    .popup {
-        &.arrow {
-            right: 12px;
-            left: auto;
+        @media (max-width : $collapse-second-width) {
+            right : 10px;
+            left  : auto;
         }
-    }
-
-    .dropdown-toggle {
-        padding-right: 10px !important;
-
-        .glyphicon {
-            margin: 0 4px !important;
-        }
-    }
-
-    .dropdown-menu {
-        right: 0;
-        left: auto !important;
-    }
-
-    .dropdown-menu li > a {
-        text-align: right;
     }
 }
 
 .dropdown-toggle {
-    height: 47px;
-    border: none;
-}
+    height : 47px;
+    border : none;
 
-.dropdown .dropdown-menu {
-    width: auto !important;
+    @media (max-width : $collapse-second-width) {
+        padding-right : 10px !important;
+    }
+
+    .glyphicon {
+        @media (max-width : $collapse-first-width) {
+            margin : 0 4px !important;
+        }
+    }
+
+    .nav-arrow {
+        display : none;
+        @media (min-width : $collapse-second-width + 1) {
+            display : block;
+        }
+    }
+
+    .ellipsis {
+        display : none;
+        @media (min-width : $collapse-first-width + 1) {
+            display : block;
+        }
+    }
 }

@@ -44,9 +44,10 @@
     padding: 8px !important;
 }
 
-a.btn {
-    color:black !important;
+td a.btn {
+    color:white !important;
     text-decoration:none !important;
+    background-color: #35464F;
 }
 
 button.btn-danger > a{
@@ -94,6 +95,7 @@ img.preview-image{
 }
 
 .show-html{
+    word-wrap : break-word;
     overflow-y: scroll;
     max-height: 350px;
     padding: 5px;

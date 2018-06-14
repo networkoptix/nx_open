@@ -44,8 +44,6 @@
 						{% endif %}
 						{% if data_structure_type == "Image" %}
 							<div><img class="preview-image review-preview" src="data:image/png;base64,{{record}}"></div>
-						{% elif data_structure_type == "Text" %}
-						{{record}}
 						{% elif data_structure_type == "File" %}
 							<a href="{% url 'download_file' data_structure.name %}?version_id={{version.id}}&lang={{language.code}}&draft" download>Download</a>
 						{% else %}
