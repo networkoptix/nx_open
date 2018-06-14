@@ -1,5 +1,4 @@
 import { Component, OnInit, Inject, ViewEncapsulation } from '@angular/core';
-import { NgbDropdownModule }                            from '@ng-bootstrap/ng-bootstrap';
 import { TranslateService }                             from "@ngx-translate/core";
 
 export interface activeLanguage {

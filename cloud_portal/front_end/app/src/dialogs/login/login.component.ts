@@ -9,7 +9,7 @@ import {
 }                                                           from '@angular/core';
 import { Location, LocationStrategy, PathLocationStrategy } from '@angular/common';
 import { NgbModal, NgbActiveModal, NgbModalRef }            from '@ng-bootstrap/ng-bootstrap';
-import { NxModalGeneralComponent }                          from "../general/general.component";
+import { NxModalGenericComponent }                          from "../generic/generic.component";
 
 @Component({
     selector: 'ngbd-modal-content',
@@ -36,7 +36,7 @@ export class LoginModalContent implements OnInit, AfterViewInit {
                 @Inject('process') private process: any,
                 @Inject('cloudApiService') private cloudApi: any,
                 private renderer: Renderer2,
-                private generalModal: NxModalGeneralComponent) {
+                private genericModal: NxModalGenericComponent) {
 
         this.nx_wrong_password = false;
     }
@@ -56,7 +56,7 @@ export class LoginModalContent implements OnInit, AfterViewInit {
             })
             .run()
             .then(() => {
-                this.generalModal.openConfirm(
+                this.genericModal.openConfirm(
                     'Check your inbox and visit provided link to activate account',
                     'Activation email sent',
                     'OK');

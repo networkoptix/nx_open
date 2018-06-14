@@ -1,7 +1,7 @@
 import { Component, Inject, OnInit, Input, ViewEncapsulation } from '@angular/core';
 import { NgbModal, NgbActiveModal, NgbModalRef }                                                 from '@ng-bootstrap/ng-bootstrap';
 import { EmailValidator }                                                                        from '@angular/forms';
-import { NxModalGeneralComponent }                                                               from "../general/general.component";
+import { NxModalGenericComponent }                                                               from "../generic/generic.component";
 // import { NxPermissionsDropdown }                                                     from "../../dropdowns/permissions/permissions.component";
 
 @Component({
@@ -32,7 +32,7 @@ export class ShareModalContent {
                 @Inject('process') private process: any,
                 @Inject('configService') private configService: any,
                 @Inject('ngToast') private toast: any,
-                private generalModal: NxModalGeneralComponent) {
+                private genericModal: NxModalGenericComponent) {
 
         this.url = 'share';
     }
@@ -96,7 +96,7 @@ export class ShareModalContent {
         this.buttonText = this.language.sharing.shareConfirmButton;
         this.isNewShare = !this.user;
 
-        this.user = (this.user) ? {...this.user} : {email: '', isEnabled: true, role: {name: "Live Viewer"}};
+        this.user = (this.user) ? {...this.user} : {email: '', isEnabled: true, role: {}};
 
         if (!this.isNewShare) {
             this.account
@@ -123,7 +123,7 @@ export class ShareModalContent {
 
         this.sharing = this.process.init(() => {
             if (this.user.role.isOwner) {
-                return this.generalModal
+                return this.genericModal
                            .openConfirm(this.language.sharing.confirmOwner,
                                this.language.sharing.shareTitle,
                                this.language.sharing.shareConfirmButton,

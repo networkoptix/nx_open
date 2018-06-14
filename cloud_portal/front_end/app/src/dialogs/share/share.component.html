@@ -33,6 +33,14 @@
                     (onSelected)="setPermission($event)">
             </nx-permissions-select>
 
+            <nx-select name="permissions"
+                       [items]="accessRoles"
+                       label="optionLabel"
+                       [(ngModel)]="user.role.name"
+                       required>
+            </nx-select>
+
+            {{shareForm.value | json}}
             <span class="help-block" [innerHtml]="accessDescription"></span>
         </div>
     </div>
