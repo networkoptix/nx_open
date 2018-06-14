@@ -44,7 +44,7 @@ std::optional<QString> convertPresets(const QString& oldSerializedPresets)
         newHash[itr.key()] = convertedRecord;
     }
 
-    return QJson::serialized(newHash);
+    return QString::fromUtf8(QJson::serialized(newHash));
 }
 
 } // namespace
