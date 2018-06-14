@@ -315,6 +315,10 @@ void QnConnectToCloudDialogPrivate::at_bindFinished(
                 showCredentialsError(QnCloudResultMessages::accountNotActivated());
                 break;
 
+            case api::ResultCode::accountBlocked:
+                showCredentialsError(QnCloudResultMessages::userLockedOut());
+                break;
+
             default:
                 showFailure(QnCloudResultInfo(result));
                 break;
