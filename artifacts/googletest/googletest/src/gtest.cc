@@ -4167,7 +4167,6 @@ void UnitTest::AddTestPartResult(
       // from removing. We use this rather than abort() or __builtin_trap() for
       // portability: Symbian doesn't implement abort() well, and some debuggers
       // don't correctly trap abort().
-
       *static_cast<volatile int*>(NULL) = 1;
 #endif  // GTEST_OS_WINDOWS
     } else if (GTEST_FLAG(throw_on_failure)) {
