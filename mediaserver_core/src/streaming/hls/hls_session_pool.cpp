@@ -47,6 +47,16 @@ void HLSSession::updateAuditInfo(qint64 timeUsec)
         qnAuditManager->notifyPlaybackInProgress(m_auditHandle, timeUsec);
 }
 
+std::optional<AVCodecID> HLSSession::audioCodecId() const
+{
+    return m_audioCodecId;
+}
+
+void HLSSession::setAudioCodecId(AVCodecID audioCodecId)
+{
+    m_audioCodecId = audioCodecId;
+}
+
 HLSSession::~HLSSession()
 {
     if (m_live)

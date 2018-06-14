@@ -758,6 +758,10 @@ void initialize(Manager* manager, Action* root)
             && ConditionWrapper(new AddBookmarkCondition())
         );
 
+    factory()
+        .flags(Slider)
+        .separator();
+
     factory(EditCameraBookmarkAction)
         .flags(Slider | SingleTarget | ResourceTarget)
         .text(ContextMenu::tr("Edit Bookmark..."))

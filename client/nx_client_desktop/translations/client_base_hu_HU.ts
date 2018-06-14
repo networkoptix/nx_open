@@ -7313,7 +7313,7 @@ to %1</source>
     </message>
     <message>
       <source>(%1 of %2)</source>
-      <translation type="unfinished">(%1 of %2)</translation>
+      <translation>(%1 a %2-ból)</translation>
     </message>
     <message>
       <source>Uploading %1...</source>

@@ -149,6 +149,8 @@ namespace nx_hls
             MediaQuality streamQuality );
         void ensureChunkCacheFilledEnoughForPlayback( HLSSession* const session, MediaQuality streamQuality );
 
+        AVCodecID detectAudioCodecId(const StreamingChunkCacheKey& chunkParams);
+
         static HlsRequestParams readRequestParams(
             const std::multimap<QString, QString>& requestParams);
     };
