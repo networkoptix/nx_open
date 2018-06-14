@@ -7794,7 +7794,7 @@ to %1</source>
       <source>You can upload these files to a different instance of a Wearable Camera.</source>
       <translation type="unfinished">
         <numerusform>U kunt deze bestanden uploaden naar een ander exemplaar van een draagbare camera.</numerusform>
-        <numerusform>You can upload these files to a different instance of a Wearable Camera.</numerusform>
+        <numerusform>U kunt deze bestanden uploaden naar een ander exemplaar van een draagbare camera.</numerusform>
       </translation>
     </message>
     <message numerus="yes">
