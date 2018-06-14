@@ -22,7 +22,7 @@ wget https://www.virtualbox.org/download/oracle_vbox.asc -O- | sudo apt-key add 
 sudo apt-get update
 sudo apt-get install --yes python-virtualenv virtualbox-5.2
 
-test -e "${VENV_DIR}" || virtualenv --system-site-packages "${VENV_DIR}"
+test -e "${VENV_DIR}" || python2.7 -m virtualenv --system-site-packages "${VENV_DIR}"
 "${VENV_DIR}/bin/pip" install -U pip setuptools wheel  # Update to avoid compilation where possible.
 "${VENV_DIR}/bin/pip" install -r requirements.txt
 rsync -av rsync://noptix.enk.me/buildenv/test/ "${BIN_DIR}/"
