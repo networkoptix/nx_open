@@ -1,7 +1,7 @@
 #include "ptz_rotation_migration.h"
 #include "ptz_rotation_migration_structs.h"
 
-#include <optional>
+#include <nx/utils/std/optional.h>
 
 #include <QtSql/QSqlDatabase>
 #include <QtSql/QSqlQuery>
