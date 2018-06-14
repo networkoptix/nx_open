@@ -14,10 +14,10 @@ _logger = logging.getLogger(__name__)  # TODO: Rename all such vars to `_logger`
 
 
 class LinuxNetworking(Networking):
-    def __init__(self, ssh_access, macs):
+    def __init__(self, ssh, macs):
         super(LinuxNetworking, self).__init__()
         self._macs = macs
-        self._ssh = ssh_access  # type: SSH
+        self._ssh = ssh  # type: SSH
 
     @cached_property  # TODO: Use cached_getter.
     def interfaces(self):
