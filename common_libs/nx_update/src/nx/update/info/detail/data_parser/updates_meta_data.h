@@ -42,6 +42,7 @@ struct UpdatesMetaData
     // todo: add data structure for storing information about unsupported versions
     QList<CustomizationData> customizationDataList;
     QList<AlternativeServerData> alternativeServersDataList;
+    int updateManifestVersion = -1;
 };
 
 inline bool operator == (const UpdatesMetaData& lhs, const UpdatesMetaData& rhs)

@@ -41,6 +41,7 @@ QN_FUSION_ADAPT_STRUCT_FUNCTIONS(
     (current_release)(updates_prefix)(release_notes)(description)(releases))
 
 const static QString kAlternativesServersKey = "__info";
+const static QString kManifestVersionKey = "__version";
 const static QString kVersionKey = "version";
 const static QString kCloudHostKey = "cloudHost";
 const static QString kServerPackagesKey = "packages";
@@ -63,6 +64,14 @@ public:
         // #TODO #akulikov: Implement parsing information about unsupported versions.
         parseAlternativesServerData();
         parseCustomizationData();
+
+        if (!QJson::deserialize(
+                topLevelObject,
+                kManifestVersionKey,
+                &m_updatesMetaData.updateManifestVersion))
+        {
+            m_ok = false;
+        }
     }
 
     bool ok() const
@@ -109,7 +118,7 @@ private:
         if (!m_ok)
             return;
 
-        if (key == kAlternativesServersKey)
+        if (key == kAlternativesServersKey || key == kManifestVersionKey)
             return;
 
         CustomizationInfo customizationInfo;

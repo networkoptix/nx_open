@@ -11,6 +11,7 @@ const QByteArray& metaDataJson()
 {
     static const QByteArray result = R"JSON(
 {
+    "__version": 42,
     "__info": [
         {
             "url": "http://beta.networkoptix.com/beta-builds/daily/updates.json",

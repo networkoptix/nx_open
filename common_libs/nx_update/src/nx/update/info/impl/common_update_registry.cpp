@@ -1037,41 +1037,18 @@ bool CommonUpdateRegistry::removeFileDataImpl(const QString& fileName, const QLi
     return result;
 }
 
+int CommonUpdateRegistry::updateVersion() const
+{
+    return m_metaData.updateManifestVersion;
+}
+
 void CommonUpdateRegistry::merge(AbstractUpdateRegistry* other)
 {
     auto otherCommonUpdateRegistry = dynamic_cast<CommonUpdateRegistry*>(other);
     if (!otherCommonUpdateRegistry)
         return;
 
-    bool hasNewVersions = false;
-    if (m_metaData.customizationDataList.isEmpty()
-        && !otherCommonUpdateRegistry->m_metaData.customizationDataList.isEmpty())
-    {
-        hasNewVersions = true;
-    }
-    else
-    {
-        for (const auto& customizationData: m_metaData.customizationDataList)
-        {
-            for (const auto& otherCustomizationData:
-                otherCommonUpdateRegistry->m_metaData.customizationDataList)
-            {
-                if (otherCustomizationData.versions.isEmpty() || customizationData.versions.isEmpty())
-                    continue;
-
-                if (otherCustomizationData.name == customizationData.name
-                    && otherCustomizationData.versions.last() > customizationData.versions.last())
-                {
-                    hasNewVersions = true;
-                    break;
-                }
-            }
-            if (hasNewVersions)
-                break;
-        }
-    }
-
-    if (hasNewVersions)
+    if (m_metaData.updateManifestVersion < otherCommonUpdateRegistry->m_metaData.updateManifestVersion)
     {
         m_metaData = otherCommonUpdateRegistry->m_metaData;
         m_customizationVersionToUpdate = otherCommonUpdateRegistry->m_customizationVersionToUpdate;
