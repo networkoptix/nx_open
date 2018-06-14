@@ -150,7 +150,7 @@ bool QnRemotePtzController::viewportMove(
         speed,
         options,
         m_sequenceId,
-                nextSequenceNumber());
+        nextSequenceNumber());
 }
 
 bool QnRemotePtzController::relativeMove(
