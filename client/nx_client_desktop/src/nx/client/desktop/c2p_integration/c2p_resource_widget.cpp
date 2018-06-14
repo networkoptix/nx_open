@@ -64,8 +64,10 @@ void C2pResourceWidget::resetC2pLayout(const QnVirtualCameraResourceList& camera
 
     QnLayoutItemDataList items;
 
+    const int size = std::max(cameras.size(), 1);
+
     auto currentItem = this->item()->data();
-    currentItem.combinedGeometry = QRectF(0, 0, 3, 3);
+    currentItem.combinedGeometry = QRectF(0, 0, size, size);
     items.push_back(currentItem);
 
     int y = 0;
@@ -85,7 +87,7 @@ void C2pResourceWidget::resetC2pLayout(const QnVirtualCameraResourceList& camera
         }
 
         item.flags = Qn::Pinned;
-        item.combinedGeometry = QRectF(3, y, 1, 1);
+        item.combinedGeometry = QRectF(size, y, 1, 1);
         y++;
 
         items.push_back(item);
