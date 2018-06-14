@@ -13,6 +13,7 @@
 #include <nx/network/http/multipart_content_parser.h>
 #include <QtCore/QElapsedTimer>
 #include <nx/utils/elapsed_timer.h>
+#include <nx/api/analytics/device_manifest.h>
 
 namespace nx {
 namespace mediaserver {
@@ -31,6 +32,7 @@ public:
 
     HikvisionMetadataMonitor(
         const Hikvision::DriverManifest& manifest,
+        const nx::api::AnalyticsDeviceManifest& deviceManifest,
         const QUrl& resourceUrl,
         const QAuthenticator& auth,
         const std::vector<QnUuid>& eventTypes);
@@ -69,6 +71,7 @@ private:
     void at_LprRequestDone();
 private:
     const Hikvision::DriverManifest& m_manifest;
+    nx::api::AnalyticsDeviceManifest m_deviceManifest;
     const QUrl m_monitorUrl;
     const QUrl m_lprUrl;
     const QAuthenticator m_auth;

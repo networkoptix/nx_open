@@ -1,18 +1,18 @@
-#include "metadata_monitor.h"
 #include "bytestream_filter.h"
+#include "metadata_monitor.h"
 
 #include <QtCore/QUrlQuery>
 
 #include <chrono>
 #include <iostream>
 
-#include <nx/utils/std/cpp14.h>
-#include <nx/utils/log/log_main.h>
-#include <nx/network/http/buffer_source.h>
-#include <nx/fusion/serialization_format.h>
 #include "attributes_parser.h"
 #include "string_helper.h"
+#include <nx/fusion/serialization_format.h>
+#include <nx/network/http/buffer_source.h>
 #include <nx/sdk/metadata/events_metadata_packet.h>
+#include <nx/utils/log/log_main.h>
+#include <nx/utils/std/cpp14.h>
 
 namespace nx {
 namespace mediaserver {
@@ -30,44 +30,41 @@ static const std::chrono::seconds kExpiredEventTimeout(5);
 
 HikvisionMetadataMonitor::HikvisionMetadataMonitor(
     const Hikvision::DriverManifest& manifest,
+    const nx::api::AnalyticsDeviceManifest& deviceManifest,
     const QUrl& url,
     const QAuthenticator& auth,
     const std::vector<QnUuid>& eventTypes)
-    :
-    m_manifest(manifest),
-    m_monitorUrl(buildMonitoringUrl(url, eventTypes)),
-    m_lprUrl(buildLprUrl(url)),
+    : 
+    m_manifest(manifest), 
+    m_deviceManifest(deviceManifest),
+    m_monitorUrl(buildMonitoringUrl(url, eventTypes)), 
+    m_lprUrl(buildLprUrl(url)), 
     m_auth(auth)
 {
     m_lprTimer.bindToAioThread(m_monitorTimer.getAioThread());
 }
 
-HikvisionMetadataMonitor::~HikvisionMetadataMonitor()
-{
-    stopMonitoring();
-}
+HikvisionMetadataMonitor::~HikvisionMetadataMonitor() { stopMonitoring(); }
 
 void HikvisionMetadataMonitor::startMonitoring()
 {
     NX_VERBOSE(this, "Started");
-    m_monitorTimer.post([this](){ initMonitorUnsafe(); });
+    m_monitorTimer.post([this]() { initMonitorUnsafe(); });
 }
 
 void HikvisionMetadataMonitor::stopMonitoring()
 {
     utils::promise<void> promise;
-    m_monitorTimer.post(
-        [this, &promise]()
-        {
-            if (m_monitorHttpClient)
-                m_monitorHttpClient->pleaseStopSync();
-            if (m_lprHttpClient)
-                m_lprHttpClient->pleaseStopSync();
+    m_monitorTimer.post([this, &promise]() {
+        if (m_monitorHttpClient)
+            m_monitorHttpClient->pleaseStopSync();
+        if (m_lprHttpClient)
+            m_lprHttpClient->pleaseStopSync();
 
-            m_monitorTimer.pleaseStopSync();
-            m_lprTimer.pleaseStopSync();
-            promise.set_value();
-        });
+        m_monitorTimer.pleaseStopSync();
+        m_lprTimer.pleaseStopSync();
+        promise.set_value();
+    });
 
     promise.get_future().wait();
     NX_VERBOSE(this, "Stopped");
@@ -92,12 +89,11 @@ void HikvisionMetadataMonitor::clearHandlers()
 }
 
 QUrl HikvisionMetadataMonitor::buildMonitoringUrl(
-    const QUrl& resourceUrl,
-    const std::vector<QnUuid>& eventTypes) const
+    const QUrl& resourceUrl, const std::vector<QnUuid>& eventTypes) const
 {
     int channel = std::max(1, QUrlQuery(resourceUrl.query()).queryItemValue("channel").toInt());
     QString eventListIds;
-    for (const auto& eventTypeId: eventTypes)
+    for (const auto& eventTypeId : eventTypes)
     {
         auto name = m_manifest.eventDescriptorById(eventTypeId).internalName;
         eventListIds += lit("/%1-%2").arg(name).arg(channel).toLower();
@@ -118,7 +114,17 @@ QUrl HikvisionMetadataMonitor::buildLprUrl(const QUrl& resourceUrl) const
 void HikvisionMetadataMonitor::initMonitorUnsafe()
 {
     initEventMonitor();
-    initLprMonitor();
+
+    std::array<const char*, 3> lprEventTypes = { "BlackList", "WhiteList", "otherlist" };
+    for (const auto& eventName: lprEventTypes)
+    {
+        auto lprEventDescriptor = m_manifest.eventDescriptorByInternalName(eventName);
+        if (m_deviceManifest.supportedEventTypes.contains(lprEventDescriptor.eventTypeId))
+        {
+            initLprMonitor();
+            break;
+        }
+    }
 }
 
 void HikvisionMetadataMonitor::initEventMonitor()
@@ -164,12 +170,9 @@ void HikvisionMetadataMonitor::sendLprRequest()
 {
     static const QString kLprRequest("<AfterTime><picTime>%1</picTime></AfterTime>");
     QByteArray requestBody = kLprRequest.arg(m_fromDateFilter).toLatin1();
-    m_lprHttpClient->setRequestBody(
-        std::make_unique<nx_http::BufferSource>(
-            Qn::serializationFormatToHttpContentType(Qn::XmlFormat),
-            std::move(requestBody)));
+    m_lprHttpClient->setRequestBody(std::make_unique<nx_http::BufferSource>(
+        Qn::serializationFormatToHttpContentType(Qn::XmlFormat), std::move(requestBody)));
     m_lprHttpClient->doPost(m_lprUrl);
-
 }
 
 void HikvisionMetadataMonitor::at_monitorResponseReceived()
@@ -195,17 +198,17 @@ void HikvisionMetadataMonitor::at_LprRequestDone()
         return;
     }
 
-    auto hikvisionEvents = AttributesParser::parseLprXml(
-        m_lprHttpClient->fetchMessageBodyBuffer(), m_manifest);
+    auto hikvisionEvents =
+        AttributesParser::parseLprXml(m_lprHttpClient->fetchMessageBodyBuffer(), m_manifest);
     const bool isFirstTime = m_fromDateFilter.isEmpty();
-    for (const auto& hikvisionEvent: hikvisionEvents)
+    for (const auto& hikvisionEvent : hikvisionEvents)
     {
         if (!isFirstTime)
             processEvent(hikvisionEvent);
         m_fromDateFilter = hikvisionEvent.picName;
     }
 
-    m_lprTimer.start(kLprRequestsTimeout, [this]() { sendLprRequest(); } );
+    m_lprTimer.start(kLprRequestsTimeout, [this]() { sendLprRequest(); });
 }
 
 void HikvisionMetadataMonitor::at_monitorSomeBytesAvailable()
@@ -219,8 +222,10 @@ void HikvisionMetadataMonitor::at_monitorSomeBytesAvailable()
 std::chrono::milliseconds HikvisionMetadataMonitor::reopenDelay() const
 {
     const auto elapsed = m_timeSinceLastOpen.elapsed();
-    const auto ms = std::max(0LL, (qint64)std::chrono::duration_cast
-        <std::chrono::milliseconds>(kMinReopenInterval).count() - elapsed);
+    const auto ms = std::max(0LL,
+        (qint64) std::chrono::duration_cast<std::chrono::milliseconds>(kMinReopenInterval)
+                .count() -
+            elapsed);
     return std::chrono::milliseconds(ms);
 }
 
@@ -242,8 +247,7 @@ bool HikvisionMetadataMonitor::processEvent(const HikvisionEvent& hikvisionEvent
     if (!hikvisionEvent.typeId.isNull())
         result.push_back(hikvisionEvent);
 
-    auto getEventKey = [](const HikvisionEvent& event)
-    {
+    auto getEventKey = [](const HikvisionEvent& event) {
         QString result = event.typeId.toString();
         if (event.region)
             result += QString::number(*event.region) + lit("_");
@@ -268,7 +272,7 @@ bool HikvisionMetadataMonitor::processEvent(const HikvisionEvent& hikvisionEvent
         return true;
 
     QnMutexLocker lock(&m_mutex);
-    for (const auto handler: m_handlers)
+    for (const auto handler : m_handlers)
         handler(result);
 
     return true;
