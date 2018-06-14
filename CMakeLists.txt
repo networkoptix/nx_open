@@ -33,9 +33,13 @@ include(cmake/find_python.cmake)
 include(cmake/rdep.cmake)
 nx_rdep_configure()
 
-if(targetDevice AND NOT targetDevice STREQUAL "ios")
-    set(CMAKE_TOOLCHAIN_FILE "${CMAKE_CURRENT_LIST_DIR}/cmake/toolchain/${targetDevice}.cmake")
-    include(cmake/sync_toolchain.cmake)
+include(cmake/sync_toolchain.cmake)
+
+if(NOT CMAKE_TOOLCHAIN_FILE AND targetDevice)
+    set(CMAKE_TOOLCHAIN_FILE ${CMAKE_CURRENT_LIST_DIR}/cmake/toolchain/${targetDevice}.cmake)
+    if(NOT EXISTS ${CMAKE_TOOLCHAIN_FILE})
+        unset(CMAKE_TOOLCHAIN_FILE)
+    endif()
 endif()
 
 project(vms VERSION 3.2.0)
