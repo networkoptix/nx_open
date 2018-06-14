@@ -1,4 +1,5 @@
 from collections import namedtuple
+from pprint import pformat
 
 from pathlib2 import PurePosixPath, PureWindowsPath
 
@@ -26,7 +27,7 @@ Customization = namedtuple('Customization', [
     'windows_service_name', 'windows_installation_subdir', 'windows_app_data_subdir', 'windows_registry_key',
     ])
 
-known_customizations = {
+_known_customizations = {
     Customization(
         customization_name='hanwha',
         installer_name='wave',
@@ -63,6 +64,39 @@ known_customizations = {
     }
 
 
+class UnknownCustomization(EnvironmentError):
+    def __init__(self, field_name, field_value):
+        super(UnknownCustomization, self).__init__(
+            "No customization found with {!s}={!r}".format(
+                field_name, field_value))
+        self.field_name = field_name
+        self.field_value = field_value
+
+
+class AmbiguousCustomization(EnvironmentError):
+    def __init__(self, field_name, field_value, customizations):
+        super(AmbiguousCustomization, self).__init__(
+            "Multiple customizations found with {!s}={!r}:\n{}".format(
+                field_name, field_value, pformat(customizations)))
+        self.field_name = field_name
+        self.field_value = field_value
+        self.customizations = customizations
+
+
+def find_customization(field_name, field_value):
+    found = []
+    for customization in _known_customizations:
+        if getattr(customization, field_name) == field_value:
+            found.append(customization)
+    if not found:
+        raise UnknownCustomization(field_name, field_value)
+    try:
+        one, = found
+    except ValueError:
+        raise AmbiguousCustomization(field_name, field_value, found)
+    return one
+
+
 class Installer(object):
     """Information that can be extracted from package name."""
     _extensions = {'linux64': 'deb', 'win64': 'exe'}
@@ -80,14 +114,7 @@ class Installer(object):
         if platform_extension != self.extension:
             raise PackageNameParseError("Extension of {} should be {}".format(path.name, platform_extension))
         self.version = Version(version_str)
-        try:
-            customization, = (
-                customization
-                for customization in known_customizations
-                if customization.installer_name == installer_name)
-        except ValueError:
-            raise PackageNameParseError("Customization with installer name {} is unknown".format(installer_name))
-        self.customization = customization  # type: Customization
+        self.customization = find_customization('installer_name', installer_name)
         self.path = path
 
     def __repr__(self):

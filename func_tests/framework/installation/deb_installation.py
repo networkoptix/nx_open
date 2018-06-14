@@ -3,7 +3,7 @@ import sys
 from io import BytesIO
 
 from framework.installation.installation import Installation
-from framework.installation.installer import Version, known_customizations
+from framework.installation.installer import Version, find_customization, UnknownCustomization
 from framework.installation.upstart_service import UpstartService
 from framework.method_caching import cached_property
 from framework.os_access.exceptions import DoesNotExist
@@ -95,11 +95,11 @@ class DebInstallation(Installation):
             for line in build_info_text.splitlines(False))
         if self.installer.version != Version(build_info['version']):
             return False
-        customization, = (
-            customization
-            for customization in known_customizations
-            if customization.customization_name == build_info['customization'])
-        if self.installer.customization != customization:
+        try:
+            installed_customization = find_customization('customization_name', build_info['customization'])
+        except UnknownCustomization:
+            return False
+        if self.installer.customization != installed_customization:
             return False
         return True
 
