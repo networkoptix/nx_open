@@ -13,6 +13,8 @@ mkdir -p "${WORK_DIR}"
 mkdir -p "${BIN_DIR}"
 type pytest && exit 4  # `pytest` MUST NOT be installed globally.
 
+sudo apt-get update
+sudo apt-get install software-properties-common
 sudo apt-add-repository http://download.virtualbox.org/virtualbox/debian
 wget https://www.virtualbox.org/download/oracle_vbox_2016.asc -O- | sudo apt-key add -
 wget https://www.virtualbox.org/download/oracle_vbox.asc -O- | sudo apt-key add -
