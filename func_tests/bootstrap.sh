@@ -25,9 +25,9 @@ test -e "${VENV_DIR}" || virtualenv --system-site-packages "${VENV_DIR}"
 "${VENV_DIR}/bin/pip" install -r requirements.txt
 rsync -av rsync://noptix.enk.me/buildenv/test/ "${BIN_DIR}/"
 
-echo Check if basics work with "${VENV_DIR}/bin/pytest" --collect-only:
-"${VENV_DIR}/bin/pytest" --collect-only
+echo Check if basics work with "${VENV_DIR}/bin/pytest" --collect-only --mediaserver-installers-dir=~/Downloads:
+"${VENV_DIR}/bin/pytest" --collect-only --mediaserver-installers-dir=~/Downloads
 
 echo Download mediaserver deb package and specify path to it with --mediaserver-dist-path= option.
 echo Run tests:
-echo "${VENV_DIR}/bin/pytest" -s --work-dir="${BASE_DIR}" --bin-dir="${BIN_DIR}" --mediaserver-dist-path=~/Downloads/nxwitness-server.deb
+echo "${VENV_DIR}/bin/pytest" -s --work-dir="${BASE_DIR}" --bin-dir="${BIN_DIR}" --mediaserver-installers-dir=~/Downloads
