@@ -53,7 +53,7 @@ _known_customizations = {
     Customization(
         customization_name='metavms',
         installer_name='metavms',
-        company_name='Nx MetaVMS',
+        company_name='Network Optix',
         linux_service_name='networkoptix-mediaserver',
         linux_subdir=PurePosixPath('networkoptix/mediaserver'),
         windows_service_name='metavmsMediaServer',
