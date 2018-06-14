@@ -61,6 +61,17 @@ _known_customizations = {
         windows_app_data_subdir=PureWindowsPath(u'Network Optix', u'Network Optix Media Server'),
         windows_registry_key=u'HKEY_LOCAL_MACHINE\\SOFTWARE\\Network Optix\\Network Optix Media Server',
         ),
+    Customization(
+        customization_name='digitalwatchdog',
+        installer_name='dwspectrum',
+        company_name='Digital Watchdog',
+        linux_service_name='dwspectrum-mediaserver',
+        linux_subdir=PurePosixPath('dwspectrum/mediaserver'),
+        windows_service_name='dwspectrumMediaServer',
+        windows_installation_subdir=PureWindowsPath(u'Digital Watchdog', u'DW Spectrum', u'MediaServer'),
+        windows_app_data_subdir=PureWindowsPath(u'Digital Watchdog', u'Digital Watchdog Media Server'),
+        windows_registry_key=u'HKEY_LOCAL_MACHINE\\SOFTWARE\\Digital Watchdog\\Digital Watchdog Media Server',
+        ),
     }
 
 
