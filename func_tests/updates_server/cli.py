@@ -37,11 +37,12 @@ def generate(ctx):
     Server can serve update files requests. Pre-generated dummy file is given as a response.
     This option might be turned off to test how mediaserver deals with update files absence."""))
 @click.option('--range-header', type=click.Choice(['support', 'ignore', 'err']), default='support', show_default=True)
+@click.option('--port', '-p', type=click.IntRange(min=1025, max=65535), default='8080', show_default=True)
 @click.pass_context
-def serve(ctx, serve_update_archives, range_header):
+def serve(ctx, serve_update_archives, range_header, port):
     server = ctx.obj  # type: UpdatesServer
     app = server.make_app(serve_update_archives, range_header)
-    app.run(port=8080)
+    app.run(port=port)
 
 
 if __name__ == '__main__':
