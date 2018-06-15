@@ -1,5 +1,5 @@
 function(detect_target)
-    if(NOT targetDevice OR targetDevice STREQUAL "linux-x86" OR targetDevice STREQUAL "linux-x64")
+    if(NOT targetDevice OR targetDevice MATCHES "linux|macosx|windows")
         if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
             set(LINUX TRUE PARENT_SCOPE)
             set(detected_platform "linux")
