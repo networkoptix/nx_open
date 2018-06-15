@@ -18,6 +18,8 @@
 #include "data/lock_data.h"
 #include "data/p2p_statistics_data.h"
 #include "data/peer_data.h"
+#include "data/peer_alive_data.h"
+#include "data/reverse_connection_data.h"
 #include "data/tran_state_data.h"
 #include "data/update_data.h"
 #include "data/videowall_data.h"
@@ -69,6 +71,7 @@ void Metatypes::initialize()
     qRegisterMetaType<nx::vms::api::P2pStatisticsData>();
     qRegisterMetaType<nx::vms::api::PeerData>();
     qRegisterMetaType<nx::vms::api::PeerDataEx>();
+    qRegisterMetaType<nx::vms::api::PeerAliveData>();
     qRegisterMetaType<nx::vms::api::PersistentIdData>();
     qRegisterMetaType<nx::vms::api::ResourceData>();
     qRegisterMetaType<nx::vms::api::ResourceStatusData>();
@@ -76,6 +79,7 @@ void Metatypes::initialize()
     qRegisterMetaType<nx::vms::api::ResourceParamDataList>();
     qRegisterMetaType<nx::vms::api::ResourceParamWithRefData>();
     qRegisterMetaType<nx::vms::api::ResourceParamWithRefDataList>();
+    qRegisterMetaType<nx::vms::api::ReverseConnectionData>();
     qRegisterMetaType<nx::vms::api::ServerFootageData>();
     qRegisterMetaType<nx::vms::api::ServerFootageDataList>();
     qRegisterMetaType<nx::vms::api::SyncRequestData>();

@@ -81,7 +81,7 @@ void QnClientMessageProcessor::init(const ec2::AbstractECConnectionPtr &connecti
     else if (m_connected)
     { // double init by null is allowed
         NX_ASSERT(!commonModule()->remoteGUID().isNull());
-        ec2::ApiPeerAliveData data;
+        api::PeerAliveData data;
         data.peer.id = commonModule()->remoteGUID();
         commonModule()->setRemoteGUID(QnUuid());
         m_connected = false;

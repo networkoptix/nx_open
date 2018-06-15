@@ -244,7 +244,7 @@ void QnServerMessageProcessor::at_updateInstallationRequested(const QString& upd
 }
 
 void QnServerMessageProcessor::at_reverseConnectionRequested(
-    const ec2::ApiReverseConnectionData& data)
+    const nx::vms::api::ReverseConnectionData& data)
 {
     if (m_universalTcpListener)
     {

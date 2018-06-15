@@ -527,7 +527,7 @@ namespace detail
             return ErrorCode::notImplemented;
         }
 
-        ErrorCode executeTransactionInternal(const QnTransaction<ApiPeerAliveData>&)
+        ErrorCode executeTransactionInternal(const QnTransaction<nx::vms::api::PeerAliveData>&)
         {
             NX_ASSERT(false, Q_FUNC_INFO, "This is a non persistent transaction!");
             return ErrorCode::notImplemented;
@@ -587,7 +587,8 @@ namespace detail
             return ErrorCode::notImplemented;
         }
 
-        ErrorCode executeTransactionInternal(const QnTransaction<ApiReverseConnectionData>&)
+        ErrorCode executeTransactionInternal(
+            const QnTransaction<nx::vms::api::ReverseConnectionData>&)
         {
             NX_ASSERT(false, Q_FUNC_INFO, "This is a non persistent transaction!");
             return ErrorCode::notImplemented;

@@ -80,7 +80,7 @@ void ServerTransactionMessageBus::printTranState(const nx::vms::api::TranState& 
 }
 
 bool ServerTransactionMessageBus::gotAliveData(
-    const ApiPeerAliveData &aliveData,
+    const vms::api::PeerAliveData& aliveData,
     QnTransactionTransport* transport,
     const QnTransactionTransportHeader* ttHeader)
 {
@@ -384,7 +384,8 @@ bool ServerTransactionMessageBus::sendInitialData(QnTransactionTransport* transp
     return true;
 }
 
-void ServerTransactionMessageBus::fillExtraAliveTransactionParams(ApiPeerAliveData* outAliveData)
+void ServerTransactionMessageBus::fillExtraAliveTransactionParams(
+    vms::api::PeerAliveData* outAliveData)
 {
     if (outAliveData->isAlive && outAliveData->peer.id == commonModule()->moduleGUID())
     {

@@ -92,7 +92,6 @@
 #include <nx_ec/ec_api.h>
 #include <nx_ec/data/api_discovery_data.h>
 #include <nx_ec/data/api_resource_data.h>
-#include <nx_ec/data/api_reverse_connection_data.h>
 #include <nx_ec/data/api_full_info_data.h>
 #include <nx/vms/api/data/event_rule_data.h> //< Required for the FullInfoData
 #include <nx/vms/api/data/resource_type_data.h> //< Required for the FullInfoData
@@ -310,12 +309,10 @@ void QnCommonMetaTypes::initialize()
     qRegisterMetaType<ec2::AbstractECConnectionPtr>( "AbstractECConnectionPtr" );
     qRegisterMetaType<ec2::QnPeerTimeInfo>( "QnPeerTimeInfo" );
     qRegisterMetaType<ec2::QnPeerTimeInfoList>( "QnPeerTimeInfoList" );
-    qRegisterMetaType<ec2::ApiPeerAliveData>( "ApiPeerAliveData" );
     qRegisterMetaType<ec2::ApiDiscoveryDataList>( "ApiDiscoveryDataList" );
     qRegisterMetaType<ec2::ApiDiscoveryData>( "ApiDiscoveryData" );
     qRegisterMetaType<ec2::ApiDiscoveredServerData>("ApiDiscoveredServerData");
     qRegisterMetaType<ec2::ApiDiscoveredServerDataList>("ApiDiscoveredServerDataList");
-    qRegisterMetaType<ec2::ApiReverseConnectionData>( "ApiReverseConnectionData" );
     qRegisterMetaType<ec2::ApiRuntimeData>( "ApiRuntimeData" );
 
     qRegisterMetaType<ec2::ApiFullInfoData>("ec2::ApiFullInfoData");

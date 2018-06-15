@@ -18,8 +18,6 @@
 #include <utils/common/warnings.h>
 
 #include <nx_ec/data/api_resource_data.h>
-#include <nx_ec/data/api_reverse_connection_data.h>
-#include <nx_ec/data/api_peer_alive_data.h>
 #include <nx_ec/data/api_discovery_data.h>
 
 #include <nx/cloud/cdb/api/ec2_request_paths.h>
@@ -29,7 +27,9 @@
 #include <nx/vms/api/data/access_rights_data.h>
 #include <nx/vms/api/data/camera_data.h>
 #include <nx/vms/api/data/camera_data_ex.h>
+#include <nx/vms/api/data/peer_alive_data.h>
 #include <nx/vms/api/data/resource_type_data.h>
+#include <nx/vms/api/data/reverse_connection_data.h>
 #include <nx/vms/discovery/manager.h>
 
 using namespace nx::vms;
@@ -192,7 +192,8 @@ void QnTransactionMessageBus::removeAlivePeer(const QnUuid& id, bool sendTran, b
         removeAlivePeer(p, true, true);
 }
 
-void QnTransactionMessageBus::addDelayedAliveTran(QnTransaction<ApiPeerAliveData>&& tran, int timeout)
+void QnTransactionMessageBus::addDelayedAliveTran(
+    QnTransaction<api::PeerAliveData>&& tran, int timeout)
 {
     DelayedAliveData data;
     data.tran = std::move(tran);
@@ -237,7 +238,8 @@ void QnTransactionMessageBus::resyncWithPeer(QnTransactionTransport* transport)
 		transport->setState(QnTransactionTransport::Error);
 }
 
-bool QnTransactionMessageBus::gotAliveData(const ApiPeerAliveData &aliveData, QnTransactionTransport* transport, const QnTransactionTransportHeader* ttHeader)
+bool QnTransactionMessageBus::gotAliveData(const api::PeerAliveData& aliveData,
+    QnTransactionTransport* transport, const QnTransactionTransportHeader* ttHeader)
 {
     if (ttHeader->dstPeers.isEmpty())
         m_delayedAliveTran.remove(aliveData.peer.id); // cancel delayed status tran if we got new broadcast alive data for that peer
@@ -267,7 +269,7 @@ bool QnTransactionMessageBus::gotAliveData(const ApiPeerAliveData &aliveData, Qn
         if (isPeerActuallyAlive)
         {
             // ignore incoming offline peer info because we can see that peer online
-            QnTransaction<ApiPeerAliveData> tran(
+            QnTransaction<api::PeerAliveData> tran(
                 ApiCommand::peerAliveInfo,
                 commonModule()->moduleGUID());
             tran.params = aliveData;
@@ -328,7 +330,8 @@ bool QnTransactionMessageBus::gotAliveData(const ApiPeerAliveData &aliveData, Qn
     return true;
 }
 
-void QnTransactionMessageBus::onGotServerAliveInfo(const QnTransaction<ApiPeerAliveData> &tran, QnTransactionTransport* transport, const QnTransactionTransportHeader& ttHeader)
+void QnTransactionMessageBus::onGotServerAliveInfo(const QnTransaction<api::PeerAliveData>& tran,
+    QnTransactionTransport* transport, const QnTransactionTransportHeader& ttHeader)
 {
     NX_ASSERT(tran.peerID != commonModule()->moduleGUID());
     if (!gotAliveData(tran.params, transport, &ttHeader))
@@ -337,7 +340,7 @@ void QnTransactionMessageBus::onGotServerAliveInfo(const QnTransaction<ApiPeerAl
     if (transport->remotePeer().peerType == api::PeerType::cloudServer)
         return; //< do not propagate cloud peer alive to other peers. It isn't used yet
 
-    QnTransaction<ApiPeerAliveData> modifiedTran(tran);
+    QnTransaction<api::PeerAliveData> modifiedTran(tran);
     NX_ASSERT(!modifiedTran.params.peer.instanceId.isNull());
     modifiedTran.params.persistentState.values.clear(); // do not proxy persistent state to other peers. this checking required for directly connected peers only
     modifiedTran.params.runtimeState.values.clear();
@@ -349,7 +352,7 @@ bool QnTransactionMessageBus::onGotServerRuntimeInfo(const QnTransaction<ApiRunt
     if (tran.params.peer.id == commonModule()->moduleGUID())
         return false; // ignore himself
 
-    gotAliveData(ApiPeerAliveData(tran.params.peer, true), transport, &ttHeader);
+    gotAliveData(api::PeerAliveData(tran.params.peer, true), transport, &ttHeader);
     if (m_runtimeTransactionLog->contains(tran))
         return false;
     else
@@ -533,17 +536,17 @@ void QnTransactionMessageBus::connectToPeerEstablished(const api::PeerData& peer
     handlePeerAliveChanged(peer, true, false);
 }
 
-void QnTransactionMessageBus::fillExtraAliveTransactionParams(ApiPeerAliveData* outAliveData)
+void QnTransactionMessageBus::fillExtraAliveTransactionParams(api::PeerAliveData* outAliveData)
 {
 }
 
 void QnTransactionMessageBus::handlePeerAliveChanged(const api::PeerData& peer, bool isAlive, bool sendTran)
 {
-    ApiPeerAliveData aliveData(peer, isAlive);
+    api::PeerAliveData aliveData(peer, isAlive);
 
     if (sendTran)
     {
-        QnTransaction<ApiPeerAliveData> tran(
+        QnTransaction<api::PeerAliveData> tran(
             ApiCommand::peerAliveInfo,
             commonModule()->moduleGUID());
         tran.params = aliveData;

@@ -20,11 +20,11 @@
 #include <nx_ec/impl/sync_handler.h>
 #include <nx_ec/data/api_resource_data.h>
 #include <nx/vms/api/data/email_settings_data.h>
-#include <nx_ec/data/api_peer_alive_data.h>
+#include <nx/vms/api/data/peer_alive_data.h>
 #include <nx_ec/data/api_time_data.h>
 #include <nx_ec/data/api_discovery_data.h>
 #include <nx/vms/api/data/camera_history_data.h>
-#include <nx_ec/data/api_reverse_connection_data.h>
+#include <nx/vms/api/data/reverse_connection_data.h>
 #include <nx/vms/api/data/client_info_data.h>
 #include <nx/vms/api/data/camera_attributes_data.h>
 #include <nx/vms/api/data/access_rights_data.h>
@@ -1135,7 +1135,7 @@ signals :
     void initNotification(const ec2::ApiFullInfoData& fullData);
     void runtimeInfoChanged(const ec2::ApiRuntimeData& runtimeInfo);
 
-    void reverseConnectionRequested(const ec2::ApiReverseConnectionData& reverseConnetionData);
+    void reverseConnectionRequested(const nx::vms::api::ReverseConnectionData& reverseConnetionData);
 
     void remotePeerFound(QnUuid data, nx::vms::api::PeerType peerType);
     void remotePeerLost(QnUuid data, nx::vms::api::PeerType peerType);

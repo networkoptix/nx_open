@@ -131,7 +131,7 @@ APPLY(5, unlockRequest, nx::vms::api::LockData, \
                        InvalidFilterFunc(), /* Filter read func */ \
                        AdminOnlyAccessOut(), /* Check remote peer rights for outgoing transaction */ \
                        RegularTransactionType()) /* regular transaction type */ \
-APPLY(6, peerAliveInfo, ApiPeerAliveData, \
+APPLY(6, peerAliveInfo, nx::vms::api::PeerAliveData, \
                        false, /* persistent*/ \
                        true, /* system*/ \
                        InvalidGetHashHelper(), /* getHash*/ \
@@ -175,11 +175,12 @@ APPLY(101, connect, nx::vms::api::ConnectionData, \
                        InvalidFilterFunc(), /* Filter read func */ \
                        AdminOnlyAccessOut(), /* Check remote peer rights for outgoing transaction */ \
                        RegularTransactionType()) /* regular transaction type */ \
-APPLY(102, openReverseConnection, ApiReverseConnectionData, \
+APPLY(102, openReverseConnection, nx::vms::api::ReverseConnectionData, \
                        false, /* persistent*/ \
                        true,  /* system*/ \
                        InvalidGetHashHelper(), /* getHash*/ \
-                       [](const QnTransaction<ApiReverseConnectionData> &tran, const NotificationParams &notificationParams) \
+                       [](const QnTransaction<nx::vms::api::ReverseConnectionData>& tran, \
+                            const NotificationParams& notificationParams) \
                        { \
                             NX_ASSERT(tran.command == ApiCommand::openReverseConnection); \
                             emit notificationParams.ecConnection->reverseConnectionRequested(tran.params); \

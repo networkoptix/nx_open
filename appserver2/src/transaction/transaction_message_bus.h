@@ -186,7 +186,7 @@ private:
     void connectToPeerLost(const QnUuid& id);
     void handlePeerAliveChanged(const nx::vms::api::PeerData& peer, bool isAlive, bool sendTran);
     bool isPeerUsing(const nx::utils::Url& url);
-    void onGotServerAliveInfo(const QnTransaction<ApiPeerAliveData>& tran,
+    void onGotServerAliveInfo(const QnTransaction<nx::vms::api::PeerAliveData>& tran,
         QnTransactionTransport* transport, const QnTransactionTransportHeader& ttHeader);
 
     bool onGotServerRuntimeInfo(const QnTransaction<ApiRuntimeData>& tran,
@@ -196,8 +196,8 @@ protected:
     /*
     * Return true if alive transaction accepted or false if it should be ignored (offline data is deprecated)
     */
-    virtual bool gotAliveData(const ApiPeerAliveData &aliveData, QnTransactionTransport* transport,
-        const QnTransactionTransportHeader* ttHeader);
+    virtual bool gotAliveData(const nx::vms::api::PeerAliveData& aliveData,
+        QnTransactionTransport* transport, const QnTransactionTransportHeader* ttHeader);
 
     virtual bool checkSequence(const QnTransactionTransportHeader& transportHeader,
         const QnAbstractTransaction& tran, QnTransactionTransport* transport);
@@ -209,7 +209,7 @@ protected:
 
     virtual void queueSyncRequest(QnTransactionTransport* transport);
     virtual bool sendInitialData(QnTransactionTransport* transport);
-    virtual void fillExtraAliveTransactionParams(ApiPeerAliveData* outAliveData);
+    virtual void fillExtraAliveTransactionParams(nx::vms::api::PeerAliveData* outAliveData);
     virtual void logTransactionState();
 
     virtual void handleIncomingTransaction(
@@ -251,7 +251,7 @@ private:
     void updateLastActivity(QnTransactionTransport* sender,
         const QnTransactionTransportHeader& transportHeader);
 
-    void addDelayedAliveTran(QnTransaction<ApiPeerAliveData>&& tranToSend, int timeout);
+    void addDelayedAliveTran(QnTransaction<nx::vms::api::PeerAliveData>&& tranToSend, int timeout);
     void sendDelayedAliveTran();
 
     void reconnectAllPeers(QnMutexLockerBase* const /*lock*/);
@@ -308,7 +308,7 @@ private:
 
     struct DelayedAliveData
     {
-        QnTransaction<ApiPeerAliveData> tran;
+        QnTransaction<nx::vms::api::PeerAliveData> tran;
         qint64 timeToSend;
     };
 

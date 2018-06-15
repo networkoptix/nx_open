@@ -13,8 +13,6 @@ struct ApiMediaServerData;
 struct ApiMediaServerUserAttributesData;
 struct ApiMediaServerDataEx;
 
-struct ApiPeerAliveData;
-struct ApiReverseConnectionData;
 struct ApiStorageData;
 struct ApiUserData;
 struct ApiUserRoleData;
@@ -68,8 +66,6 @@ struct ParentId
     (ApiMediaServerDataEx)\
     (ApiPeerSystemTimeData)\
     (ApiPeerSyncTimeData)\
-    (ApiReverseConnectionData)\
-    (ApiPeerAliveData)\
     (ApiStorageData)\
     (ApiUserData)\
     (ApiUserRoleData)\

@@ -4,7 +4,6 @@
 
 #include <core/resource/resource_fwd.h>
 #include <nx_ec/impl/ec_api_impl.h>
-#include <nx_ec/data/api_peer_alive_data.h>
 #include <nx/vms/event/event_fwd.h>
 #include <nx/network/http/http_types.h>
 #include <network/universal_tcp_listener.h>
@@ -54,11 +53,12 @@ protected:
     virtual void removeResourceIgnored(const QnUuid& resourceId) override;
 
     virtual QnResourceFactory* getResourceFactory() const override;
+
 private slots:
     void at_updateChunkReceived(const QString& updateId, const QByteArray& data, qint64 offset);
     void at_updateInstallationRequested(const QString& updateId);
 
-    void at_reverseConnectionRequested(const ec2::ApiReverseConnectionData& data);
+    void at_reverseConnectionRequested(const nx::vms::api::ReverseConnectionData& data);
 
     void at_remotePeerUnauthorized(const QnUuid& id);
 

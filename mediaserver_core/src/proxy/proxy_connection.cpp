@@ -141,7 +141,7 @@ QString QnProxyConnectionProcessor::connectToRemoteHost(const QnRoute& route, co
             d->connectTimeout.count(),
             [&](int socketCount)
             {
-                ec2::QnTransaction<ec2::ApiReverseConnectionData> tran(
+                ec2::QnTransaction<nx::vms::api::ReverseConnectionData> tran(
                     ec2::ApiCommand::openReverseConnection,
                     commonModule()->moduleGUID());
                 tran.params.targetServer = commonModule()->moduleGUID();

@@ -48,7 +48,7 @@ public:
         const QByteArray& requestMsgBody);
 protected:
     virtual bool gotAliveData(
-        const ApiPeerAliveData &aliveData,
+        const nx::vms::api::PeerAliveData& aliveData,
         QnTransactionTransport* transport,
         const QnTransactionTransportHeader* ttHeader) override;
 
@@ -59,11 +59,11 @@ protected:
 
     virtual void onGotTransactionSyncRequest(
         QnTransactionTransport* sender,
-        const QnTransaction<nx::vms::api::SyncRequestData> &tran) override;
+        const QnTransaction<nx::vms::api::SyncRequestData>& tran) override;
 
     virtual void queueSyncRequest(QnTransactionTransport* transport) override;
     virtual bool sendInitialData(QnTransactionTransport* transport) override;
-    virtual void fillExtraAliveTransactionParams(ApiPeerAliveData* outAliveData) override;
+    virtual void fillExtraAliveTransactionParams(nx::vms::api::PeerAliveData* outAliveData) override;
     virtual void logTransactionState() override;
     virtual ErrorCode updatePersistentMarker(
         const QnTransaction<nx::vms::api::UpdateSequenceData>& tran) override;
@@ -72,13 +72,14 @@ protected:
         QnTransactionTransport* sender,
         Qn::SerializationFormat tranFormat,
         QByteArray serializedTran,
-        const QnTransactionTransportHeader &transportHeader) override;
+        const QnTransactionTransportHeader& transportHeader) override;
 private:
     friend struct SendTransactionToTransportFuction;
     friend struct GotTransactionFuction;
 
     template <class T>
-    void sendTransactionToTransport(const QnTransaction<T> &tran, QnTransactionTransport* transport, const QnTransactionTransportHeader &transportHeader);
+    void sendTransactionToTransport(const QnTransaction<T>& tran,
+        QnTransactionTransport* transport, const QnTransactionTransportHeader& transportHeader);
 
     bool isSyncInProgress() const;
     bool readApiFullInfoData(
@@ -92,7 +93,8 @@ private:
         const QnTransactionTransportHeader& transportHeader);
 
     template <class T>
-    void gotTransaction(const QnTransaction<T> &tran, QnTransactionTransport* sender, const QnTransactionTransportHeader &transportHeader);
+    void gotTransaction(const QnTransaction<T>& tran,
+        QnTransactionTransport* sender, const QnTransactionTransportHeader& transportHeader);
 
 private:
     detail::QnDbManager* m_db = nullptr;
