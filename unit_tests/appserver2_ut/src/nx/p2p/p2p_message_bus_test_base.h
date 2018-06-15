@@ -55,7 +55,7 @@ protected:
         std::function<bool(MessageBus*, const ApiPersistentIdData&)> checkFunction,
         const QString& errorMessage,
         bool waitForSync,
-        int& syncDoneCounter);
+        int* outSyncDoneCounter);
 
     static bool checkSubscription(const MessageBus* bus, const ApiPersistentIdData& peer);
     static bool checkDistance(const MessageBus* bus, const ApiPersistentIdData& peer);

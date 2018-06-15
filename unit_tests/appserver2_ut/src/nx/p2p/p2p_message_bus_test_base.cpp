@@ -197,23 +197,28 @@ void P2pMessageBusTestBase::checkMessageBus(
 {
     int syncDoneCounter = 0;
     // Wait until done
-    checkMessageBusInternal(checkFunction, errorMessage, true, syncDoneCounter);
+    checkMessageBusInternal(checkFunction, errorMessage, /*waitForSync*/ true, &syncDoneCounter);
     // Report error
     if (syncDoneCounter != m_servers.size() * m_servers.size())
-        checkMessageBusInternal(checkFunction, errorMessage, false, syncDoneCounter);
+    {
+        checkMessageBusInternal(
+            checkFunction, errorMessage, /*waitForSync*/ false, &syncDoneCounter);
+    }
 }
 
 void P2pMessageBusTestBase::checkMessageBusInternal(
     std::function<bool(MessageBus*, const ApiPersistentIdData&)> checkFunction,
     const QString& errorMessage,
     bool waitForSync,
-    int& syncDoneCounter)
+    int* outSyncDoneCounter)
 {
+    int& syncDoneCounter = *outSyncDoneCounter;
+
     QElapsedTimer timer;
     timer.restart();
     do
     {
-        syncDoneCounter = 0;
+        *outSyncDoneCounter = 0;
         for (const auto& server : m_servers)
         {
             const auto& connection = server->moduleInstance()->ecConnection();
@@ -243,7 +248,8 @@ void P2pMessageBusTestBase::checkMessageBusInternal(
             }
         }
         std::this_thread::sleep_for(std::chrono::milliseconds(50));
-    } while (waitForSync && syncDoneCounter != m_servers.size()*m_servers.size() && timer.elapsed() < kMaxSyncTimeoutMs);
+    } while (waitForSync && syncDoneCounter != m_servers.size()*m_servers.size()
+        && timer.elapsed() < kMaxSyncTimeoutMs);
 }
 
 bool P2pMessageBusTestBase::checkSubscription(const MessageBus* bus, const ApiPersistentIdData& peer)

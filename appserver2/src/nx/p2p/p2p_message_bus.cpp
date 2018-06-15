@@ -683,19 +683,19 @@ bool MessageBus::handlePeersMessage(const P2pConnectionPtr& connection, const QB
             auto firstVia = shortPeers.decode(peer.firstVia);
             if (firstVia.isNull())
             {
-                // Direct connection to the target peer
+                // Direct connection to the target peer.
                 firstVia = connection->localPeer();
             }
             else if (distance <= kMaxOnlineDistance)
             {
                 const auto gatewayDistance = distanceTo(firstVia);
                 if (gatewayDistance > kMaxOnlineDistance)
-                    continue; //< Route loop detected.
+                    continue; //< Gateway is offline now.
                 if (gatewayDistance < distance - 1)
                 {
                     NX_VERBOSE(
                         this,
-                        lm("Peer %1 ignores alivePeers record due to route loop. Distance to %2 = %3. Distance to gateway %4 = %5")
+                        lm("Peer %1 ignores alivePeers record due to route loop. Distance to %2 is %3. Distance to gateway %4 is %5")
                         .arg(qnStaticCommon->moduleDisplayName(localPeer().id))
                         .arg(qnStaticCommon->moduleDisplayName(shortPeers.decode(peer.peerNumber).id))
                         .arg(distance)

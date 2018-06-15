@@ -174,7 +174,7 @@ protected:
 
     void extendedCircleConnectMain()
     {
-        auto serverConnector = [](std::vector<Appserver2Ptr>& servers)
+        auto connectServers = [](std::vector<Appserver2Ptr>& servers)
         {
             bidirectConnectServers(servers[0], servers[1]);
             bidirectConnectServers(servers[1], servers[2]);
@@ -185,7 +185,7 @@ protected:
             bidirectConnectServers(servers[4], servers[5]);
         };
 
-        startAllServers(serverConnector, 6);
+        startAllServers(connectServers, 6);
         ASSERT_TRUE(m_servers.size() == 6);
 
         waitForSync(0);

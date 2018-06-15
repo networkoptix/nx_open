@@ -122,9 +122,9 @@ QByteArray serializePeersMessage(
     }
 }
 
-QVector<PeerDistanceRecord> deserializePeersMessage(const QByteArray& data, bool* success)
+std::vector<PeerDistanceRecord> deserializePeersMessage(const QByteArray& data, bool* success)
 {
-    QVector<PeerDistanceRecord> result;
+    std::vector<PeerDistanceRecord> result;
     BitStreamReader reader((const quint8*)data.data(), data.size());
     try
     {
@@ -145,8 +145,7 @@ QVector<PeerDistanceRecord> deserializePeersMessage(const QByteArray& data, bool
             {
                 distance = reader.getBits(32);
             }
-            // TODO: #rvasilenko std::vector with emplace_back would be better here
-            result.push_back({peerNumber, distance, firstVia});
+            result.emplace_back(PeerDistanceRecord{peerNumber, distance, firstVia});
         }
     }
     catch (const BitStreamException&)
