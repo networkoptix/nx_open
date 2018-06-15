@@ -17,6 +17,14 @@ nx_add_target(vms_gateway_core LIBRARY ${library_type} NO_MOC
         common cloud_db_client nx_network nx_fusion nx_utils nx_relaying
 )
 
+set(mocableNetworkFiles
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/vms_gateway_embeddable.h)
+
+nx_add_qt_mocables(vms_gateway_core ${mocableNetworkFiles}
+    INCLUDE_DIRS
+        "${CMAKE_CURRENT_SOURCE_DIR}/src"
+)
+
 target_compile_definitions(vms_gateway_core
     PRIVATE NX_VMS_GATEWAY_API=${API_EXPORT_MACRO}
     INTERFACE NX_VMS_GATEWAY_API=${API_IMPORT_MACRO})

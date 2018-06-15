@@ -16,6 +16,8 @@ class NX_VMS_GATEWAY_API VmsGatewayEmbeddable:
     public Singleton<VmsGatewayEmbeddable>,
     private utils::test::ModuleLauncher<VmsGatewayProcessPublic>
 {
+    Q_OBJECT
+
 public:
     VmsGatewayEmbeddable(
         bool isSslEnabled,
