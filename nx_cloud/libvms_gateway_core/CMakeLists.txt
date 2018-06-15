@@ -10,7 +10,7 @@ nx_configure_file(
     maven/filter-resources/libvms_gateway_core_app_info_impl.cpp
     ${CMAKE_CURRENT_BINARY_DIR})
 
-nx_add_target(vms_gateway_core LIBRARY ${library_type}
+nx_add_target(vms_gateway_core LIBRARY ${library_type} NO_MOC
     ADDITIONAL_SOURCES
         "${CMAKE_CURRENT_BINARY_DIR}/libvms_gateway_core_app_info_impl.cpp"
     PUBLIC_LIBS
