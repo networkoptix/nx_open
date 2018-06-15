@@ -187,11 +187,11 @@ def test_enable_failover_on_one_server(three_mediaservers, camera_factory, count
         allowAutoRedundancy=True)
     # stop server one; all it's cameras must go to server two
     one.stop()
-    wait_until_camera_count_is_online(two.server, 4)
+    wait_until_camera_count_is_online(two, 4)
     # start server one again; all it's cameras must go back to him
     one.start()
-    wait_until_camera_count_is_online(one.server, 2)
-    wait_until_camera_count_is_online(two.server, 2)
+    wait_until_camera_count_is_online(one, 2)
+    wait_until_camera_count_is_online(two, 2)
 
     assert not one.installation.list_core_dumps()
     assert not two.installation.list_core_dumps()
@@ -212,11 +212,11 @@ def test_enable_failover_on_two_servers(three_mediaservers, camera_factory, coun
         allowAutoRedundancy=True)
     # stop server two; one of it's 2 cameras must go to server one, another - to server three:
     two.stop()
-    wait_until_camera_count_is_online(one.server, 3)
-    assert len(online_camera_macs_on_server(one.server)) == 3, (
+    wait_until_camera_count_is_online(one, 3)
+    assert len(online_camera_macs_on_server(one)) == 3, (
         'Mediaserver "one" maxCameras limit (3) does not work - it got more than 3 cameras')
-    wait_until_camera_count_is_online(three.server, 3)
-    assert len(online_camera_macs_on_server(three.server)) == 3, (
+    wait_until_camera_count_is_online(three, 3)
+    assert len(online_camera_macs_on_server(three)) == 3, (
         'Mediaserver "three" maxCameras limit (3) does not work - it got more than 3 cameras')
     # start server two back; cameras must return to their original owners
     two.start()
