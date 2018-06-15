@@ -57,28 +57,41 @@ public:
         NativePresetsPtzCapability = 0x08000000,
         NoNxPresetsPtzCapability = 0x10000000, //<< TODO: remove it. Introduce NativePresets and NxPresets capabilities instead
 
+        AbsolutePanTiltCapabilities =
+            AbsolutePanCapability | AbsoluteTiltCapability,
+
+        AbsolutePtzCapabilities =
+            AbsolutePanTiltCapabilities | AbsoluteZoomCapability,
+
+        AbsolutePtrCapabilities =
+            AbsolutePanTiltCapabilities | AbsoluteRotationCapability,
+
+        AbsolutePtrzCapabilities =
+            AbsolutePtrCapabilities | AbsoluteZoomCapability,
+
         ContinuousPanTiltCapabilities =
             ContinuousPanCapability | ContinuousTiltCapability,
 
         ContinuousPtzCapabilities =
-            ContinuousPanCapability | ContinuousTiltCapability | ContinuousZoomCapability,
+            ContinuousPanTiltCapabilities | ContinuousZoomCapability,
 
         ContinuousPtrCapabilities =
-            ContinuousPanCapability | ContinuousTiltCapability | ContinuousRotationCapability,
+            ContinuousPanTiltCapabilities | ContinuousRotationCapability,
 
         ContinuousPtrzCapabilities =
-            ContinuousPanCapability | ContinuousTiltCapability | ContinuousZoomCapability
-            | ContinuousRotationCapability,
+            ContinuousPtrCapabilities | ContinuousZoomCapability,
 
-        AbsolutePtzCapabilities =
-            AbsolutePanCapability | AbsoluteTiltCapability | AbsoluteZoomCapability,
+        RelativePanTiltCapabilities =
+            RelativePanCapability | RelativeTiltCapability,
 
-        AbsolutePtrCapabilities =
-            AbsolutePanCapability | AbsoluteTiltCapability | AbsoluteRotationCapability,
+        RelativePtzCapabilities =
+            RelativePanTiltCapabilities | RelativeZoomCapability,
 
-        AbsolutePtrzCapabilities =
-            AbsolutePanCapability | AbsoluteTiltCapability | AbsoluteRotationCapability
-            | AbsoluteZoomCapability,
+        RelativePtrCapabilities =
+            RelativePanTiltCapabilities | RelativeRotationCapability,
+
+        RelativePtrzCapabilities =
+            RelativePtrCapabilities | RelativeZoomCapability,
     };
     Q_DECLARE_FLAGS(Capabilities, Capability)
 
