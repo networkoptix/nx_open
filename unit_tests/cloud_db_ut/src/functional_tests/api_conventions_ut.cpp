@@ -192,7 +192,7 @@ TEST_F(ApiConventions, api_conventions_ok)
     ASSERT_EQ(api::ResultCode::ok, result);
 
     nx::network::http::HttpClient client;
-    client.setResponseReadTimeoutMs(60000);
+    client.setResponseReadTimeout(std::chrono::minutes(1));
     for (int i = 0; i < 27; ++i)
     {
         nx::utils::Url url =

@@ -12,9 +12,9 @@ namespace utils {
 std::unique_ptr<nx::network::http::HttpClient> makeHttpClient(const QAuthenticator& authenticator)
 {
     std::unique_ptr<nx::network::http::HttpClient> client(new nx::network::http::HttpClient);
-    client->setResponseReadTimeoutMs((unsigned int)kRequestTimeout.count());
-    client->setSendTimeoutMs((unsigned int)kRequestTimeout.count());
-    client->setMessageBodyReadTimeoutMs((unsigned int)kRequestTimeout.count());
+    client->setResponseReadTimeout(kRequestTimeout);
+    client->setSendTimeout(kRequestTimeout);
+    client->setMessageBodyReadTimeout(kRequestTimeout);
     client->setUserName(authenticator.user());
     client->setUserPassword(authenticator.password());
     return client;

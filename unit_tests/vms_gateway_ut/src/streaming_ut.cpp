@@ -62,9 +62,9 @@ private:
 
     virtual void SetUp() override
     {
-        m_httpClient.setSendTimeoutMs(0);
-        m_httpClient.setResponseReadTimeoutMs(0);
-        m_httpClient.setMessageBodyReadTimeoutMs(0);
+        m_httpClient.setSendTimeout(nx::network::kNoTimeout);
+        m_httpClient.setResponseReadTimeout(nx::network::kNoTimeout);
+        m_httpClient.setMessageBodyReadTimeout(nx::network::kNoTimeout);
 
         addArg("--tcp/recvTimeout=1h");
         addArg("--tcp/sendTimeout=1h");

@@ -344,9 +344,9 @@ int Helper::handleDownloadChunkFromInternet(const QString& fileName, int chunkIn
     }
 
     nx::network::http::HttpClient httpClient;
-    httpClient.setResponseReadTimeoutMs(kDownloadRequestTimeoutMs);
-    httpClient.setSendTimeoutMs(kDownloadRequestTimeoutMs);
-    httpClient.setMessageBodyReadTimeoutMs(kDownloadRequestTimeoutMs);
+    httpClient.setResponseReadTimeout(std::chrono::milliseconds(kDownloadRequestTimeoutMs));
+    httpClient.setSendTimeout(std::chrono::milliseconds(kDownloadRequestTimeoutMs));
+    httpClient.setMessageBodyReadTimeout(std::chrono::milliseconds(kDownloadRequestTimeoutMs));
 
     const qint64 pos = chunkIndex * chunkSize;
     httpClient.addAdditionalHeader("Range",

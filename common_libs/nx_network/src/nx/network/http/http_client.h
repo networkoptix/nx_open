@@ -1,5 +1,7 @@
 #pragma once
 
+#include <chrono>
+
 #include <nx/utils/std/optional.h>
 
 #include <nx/network/async_stoppable.h>

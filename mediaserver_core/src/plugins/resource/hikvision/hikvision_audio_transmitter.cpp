@@ -186,9 +186,9 @@ std::unique_ptr<nx::network::http::HttpClient> HikvisionAudioTransmitter::create
     auto httpHelper = std::make_unique<nx::network::http::HttpClient>();
     httpHelper->setUserName(auth.user());
     httpHelper->setUserPassword(auth.password());
-    httpHelper->setResponseReadTimeoutMs(kHttpHelperTimeout.count());
-    httpHelper->setSendTimeoutMs(kHttpHelperTimeout.count());
-    httpHelper->setMessageBodyReadTimeoutMs(kHttpHelperTimeout.count());
+    httpHelper->setResponseReadTimeout(kHttpHelperTimeout);
+    httpHelper->setSendTimeout(kHttpHelperTimeout);
+    httpHelper->setMessageBodyReadTimeout(kHttpHelperTimeout);
 
     return httpHelper;
 }

@@ -56,9 +56,9 @@ CameraDiagnostics::Result FcResource::initializeCameraDriver()
     nx::network::http::HttpClient httpClient;
     auto auth = getAuth();
 
-    httpClient.setSendTimeoutMs(kServerStatusRequestTimeout.count());
-    httpClient.setMessageBodyReadTimeoutMs(kServerStatusResponseTimeout.count());
-    httpClient.setResponseReadTimeoutMs(kServerStatusResponseTimeout.count());
+    httpClient.setSendTimeout(kServerStatusRequestTimeout);
+    httpClient.setMessageBodyReadTimeout(kServerStatusResponseTimeout);
+    httpClient.setResponseReadTimeout(kServerStatusResponseTimeout);
     httpClient.setUserName(auth.user());
     httpClient.setUserPassword(auth.password());
 
