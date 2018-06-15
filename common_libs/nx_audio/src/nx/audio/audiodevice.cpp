@@ -21,6 +21,9 @@ void alc_deinit(void);
 }
 #endif
 
+#include <utils/common/app_info.h>
+#include <utils/common/software_version.h>
+
 namespace nx {
 namespace audio {
 
@@ -37,6 +40,22 @@ struct ALCdevice_struct
     ALuint       UpdateSize;
     ALuint       NumUpdates;
 };
+
+// After 11.4 iOS version we have problems with low volume level.
+// Looks like it is because of a lot of fixes related to the audio
+// are made in 11.4. As we haven't been able to find out what is
+// wrong/changed, it is decided to make this workaround.
+void fixVolumeLevel()
+{
+    if (!QnAppInfo::isIos())
+        return;
+
+    if (QnSoftwareVersion(QSysInfo::productVersion()) < QnSoftwareVersion(11, 4))
+        return;
+
+    static constexpr int kTimesGain = 32;
+    alListenerf(AL_GAIN, kTimesGain);
+}
 
 } // unnamed namespace
 
@@ -111,6 +130,8 @@ AudioDevice::AudioDevice(QObject *parent)
         {
             alcMakeContextCurrent(m_context);
             alListener3f(AL_POSITION, 0.0f, 0.0f, 0.0f);
+
+            fixVolumeLevel();
 
             NX_INFO(this, "OpenAL info: ");
             NX_INFO(this, lm("Version: %1").arg(versionString()));
