@@ -15,6 +15,7 @@
 #include <ui/workbench/workbench_layout.h>
 #include <ui/workbench/workbench_item.h>
 #include <core/resource/layout_resource.h>
+#include <core/resource_management/resource_runtime_data.h>
 
 namespace nx {
 namespace client {
@@ -37,8 +38,6 @@ C2pResourceWidget::C2pResourceWidget(
 
 void C2pResourceWidget::c2pplayback(const QString& cameraNames, int timestamp)
 {
-    qDebug() << "!!!c2pplayback!!!" << cameraNames << timestamp;
-
     QnVirtualCameraResourceList cameras;
     for (auto name: cameraNames.split(L',', QString::SplitBehavior::SkipEmptyParts))
     {
@@ -53,10 +52,11 @@ void C2pResourceWidget::c2pplayback(const QString& cameraNames, int timestamp)
         }
     }
     if (!cameras.empty())
-        resetC2pLayout(cameras);
+        resetC2pLayout(cameras, timestamp);
 }
 
-void C2pResourceWidget::resetC2pLayout(const QnVirtualCameraResourceList& cameras)
+void C2pResourceWidget::resetC2pLayout(const QnVirtualCameraResourceList& cameras,
+     qint64 timestampMs)
 {
     const auto currentItemId = this->item()->uuid();
     auto currentLayout = item()->layout()->resource();
@@ -93,8 +93,16 @@ void C2pResourceWidget::resetC2pLayout(const QnVirtualCameraResourceList& camera
         items.push_back(item);
     }
 
+    // Uuids are generated here if needed.
     currentLayout->setItems(items);
     currentLayout->setCellSpacing(0);
+
+    for (const auto& item: currentLayout->getItems())
+    {
+        if (item.uuid == currentItemId)
+            continue;
+        qnResourceRuntimeDataManager->setLayoutItemData(item.uuid, Qn::ItemTimeRole, timestampMs);
+    }
 }
 
 } // namespace desktop
