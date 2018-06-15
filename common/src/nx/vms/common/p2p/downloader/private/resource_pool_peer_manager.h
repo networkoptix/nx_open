@@ -9,7 +9,6 @@
 #include <nx/network/deprecated/asynchttpclient.h>
 
 class QnResourcePool;
-class QnAsyncHttpClientReply;
 
 namespace nx {
 namespace vms {
