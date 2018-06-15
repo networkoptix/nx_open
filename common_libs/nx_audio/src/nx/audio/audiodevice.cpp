@@ -53,7 +53,7 @@ void fixVolumeLevel()
     if (QnSoftwareVersion(QSysInfo::productVersion()) < QnSoftwareVersion(11, 4))
         return;
 
-    static constexpr int kTimesGain = 32;
+    static constexpr int kTimesGain = 64;
     alListenerf(AL_GAIN, kTimesGain);
 }
 
