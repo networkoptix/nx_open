@@ -16,14 +16,14 @@ enum class RequestProcessingBehavior
     succeed,
 };
 
-class ClientImpl:
+class ClientStub:
     public api::Client
 {
     using base_type = api::Client;
 
 public:
-    ClientImpl();
-    virtual ~ClientImpl() override;
+    ClientStub(const nx::utils::Url& relayUrl = nx::utils::Url());
+    virtual ~ClientStub() override;
 
     virtual void beginListening(
         const nx::String& peerName,

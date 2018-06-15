@@ -1,6 +1,6 @@
 #include <gtest/gtest.h>
 
-#include <nx/network/cloud/tunnel/relay/api/relay_api_client.h>
+#include <nx/network/cloud/tunnel/relay/api/relay_api_client_over_http_upgrade.h>
 #include <nx/network/cloud/tunnel/relay/api/relay_api_http_paths.h>
 #include <nx/network/http/rest/http_rest_client.h>
 #include <nx/network/http/test_http_server.h>
@@ -47,7 +47,7 @@ protected:
     void whenInvokedSomeRequest()
     {
         initializeHttpServerIfNeeded();
-        m_client = std::make_unique<ClientImpl>(m_baseUrl);
+        m_client = std::make_unique<ClientOverHttpUpgrade>(m_baseUrl);
 
         nx::utils::promise<void> done;
         m_client->startSession(
@@ -67,7 +67,7 @@ protected:
         using namespace std::placeholders;
 
         initializeHttpServerIfNeeded();
-        m_client = std::make_unique<ClientImpl>(m_baseUrl);
+        m_client = std::make_unique<ClientOverHttpUpgrade>(m_baseUrl);
 
         m_client->beginListening(
             ::testing::UnitTest::GetInstance()->current_test_info()->name(),
@@ -98,7 +98,7 @@ protected:
 
 private:
     std::unique_ptr<nx::network::http::TestHttpServer> m_httpServer;
-    std::unique_ptr<ClientImpl> m_client;
+    std::unique_ptr<ClientOverHttpUpgrade> m_client;
     nx::utils::Url m_baseUrl;
     ResultCode m_lastResultCode = ResultCode::unknownError;
     boost::optional<QAuthenticator> m_authenticator;
