@@ -1,10 +1,15 @@
 #pragma once
 
-#include <nx/vms/api/types/event_rule_types.h>
-
 #include "id_data.h"
 
+#include <vector>
+
+#include <QtCore/QString>
+#include <QtCore/QtGlobal>
+#include <QtCore/QByteArray>
+
 #include <nx/utils/latin1_array.h>
+#include <nx/vms/api/types/event_rule_types.h>
 
 namespace nx {
 namespace vms {

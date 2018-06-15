@@ -2,6 +2,8 @@
 
 #include "data.h"
 
+#include <QtCore/QString>
+
 namespace nx {
 namespace vms {
 namespace api {

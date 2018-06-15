@@ -2,6 +2,8 @@
 
 #include "data.h"
 
+#include <QtCore/QtGlobal>
+
 namespace nx {
 namespace vms {
 namespace api {

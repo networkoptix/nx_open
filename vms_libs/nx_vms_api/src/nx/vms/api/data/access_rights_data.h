@@ -2,6 +2,8 @@
 
 #include "data.h"
 
+#include <vector>
+
 #include <nx/utils/uuid.h>
 
 namespace nx {

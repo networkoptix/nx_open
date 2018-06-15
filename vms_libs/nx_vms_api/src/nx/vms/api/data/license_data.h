@@ -3,6 +3,7 @@
 #include "data.h"
 
 #include <QtCore/QString>
+#include <QtCore/QtGlobal>
 
 #include <nx/utils/latin1_array.h>
 

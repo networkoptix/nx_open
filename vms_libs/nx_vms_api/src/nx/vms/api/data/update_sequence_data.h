@@ -2,6 +2,8 @@
 
 #include "sync_marker_record_data.h"
 
+#include <vector>
+
 namespace nx {
 namespace vms {
 namespace api {

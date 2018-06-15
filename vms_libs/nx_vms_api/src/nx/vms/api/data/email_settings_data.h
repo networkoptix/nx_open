@@ -2,6 +2,8 @@
 
 #include "data.h"
 
+#include <QtCore/QString>
+
 #include <nx/vms/api/types/smtp_types.h>
 
 namespace nx {

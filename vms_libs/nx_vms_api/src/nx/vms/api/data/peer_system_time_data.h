@@ -2,6 +2,8 @@
 
 #include "data.h"
 
+#include <QtCore/QtGlobal>
+
 #include <nx/utils/uuid.h>
 
 namespace nx {

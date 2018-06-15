@@ -13,10 +13,10 @@ struct NX_VMS_API PeerAliveData: Data
     PeerAliveData() = default;
     PeerAliveData(const PeerData& peer, bool isAlive): peer(peer), isAlive(isAlive) {}
 
-    nx::vms::api::PeerData peer;
+    PeerData peer;
     bool isAlive = false;
-    nx::vms::api::TranState persistentState;
-    nx::vms::api::TranState runtimeState;
+    TranState persistentState;
+    TranState runtimeState;
 };
 #define PeerAliveData_Fields \
     (peer) \

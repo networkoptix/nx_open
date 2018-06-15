@@ -2,6 +2,9 @@
 
 #include "id_data.h"
 
+#include <QtCore/QString>
+#include <QtCore/QtGlobal>
+
 #include <nx/fusion/serialization_format.h>
 #include <nx/vms/api/types_fwd.h>
 

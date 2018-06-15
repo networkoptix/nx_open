@@ -2,6 +2,9 @@
 
 #include "id_data.h"
 
+#include <QtCore/QString>
+#include <QtCore/QtGlobal>
+
 namespace nx {
 namespace vms {
 namespace api {

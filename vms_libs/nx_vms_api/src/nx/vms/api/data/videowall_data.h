@@ -1,8 +1,12 @@
 #pragma once
 
-#include "data.h"
 #include "id_data.h"
 #include "resource_data.h"
+
+#include <vector>
+#include <map>
+
+#include <QtCore/QString>
 
 namespace nx {
 namespace vms {

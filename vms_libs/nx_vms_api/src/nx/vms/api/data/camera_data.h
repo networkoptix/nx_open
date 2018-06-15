@@ -2,6 +2,8 @@
 
 #include "resource_data.h"
 
+#include <QtCore/QString>
+
 #include <nx/utils/latin1_array.h>
 
 namespace nx {

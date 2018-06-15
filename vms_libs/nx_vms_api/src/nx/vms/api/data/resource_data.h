@@ -2,6 +2,8 @@
 
 #include "id_data.h"
 
+#include <QtCore/QString>
+
 #include <nx/vms/api/types/resource_types.h>
 
 namespace nx {

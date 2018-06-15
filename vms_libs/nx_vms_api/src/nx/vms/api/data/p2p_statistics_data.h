@@ -4,6 +4,7 @@
 
 #include <QtCore/QMap>
 #include <QtCore/QString>
+#include <QtCore/QtGlobal>
 
 namespace nx {
 namespace vms {

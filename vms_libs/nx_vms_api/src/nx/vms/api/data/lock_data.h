@@ -2,6 +2,10 @@
 
 #include "data.h"
 
+#include <QtCore/QString>
+#include <QtCore/QtGlobal>
+#include <QtCore/QByteArray>
+
 #include <nx/utils/uuid.h>
 
 namespace nx {

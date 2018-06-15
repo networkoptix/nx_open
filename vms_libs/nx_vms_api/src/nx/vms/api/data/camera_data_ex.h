@@ -3,6 +3,8 @@
 #include "camera_data.h"
 #include "camera_attributes_data.h"
 
+#include <vector>
+
 namespace nx {
 namespace vms {
 namespace api {

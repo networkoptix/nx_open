@@ -2,6 +2,9 @@
 
 #include "data.h"
 
+#include <QtCore/QString>
+#include <QtCore/QByteArray>
+
 namespace nx {
 namespace vms {
 namespace api {

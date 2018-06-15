@@ -2,12 +2,14 @@
 
 #include "data.h"
 
-#include <nx/vms/api/types/motion_types.h>
-#include <nx/vms/api/types/resource_types.h>
+#include <vector>
+
+#include <QtCore/QString>
 
 #include <nx/utils/uuid.h>
 #include <nx/utils/latin1_array.h>
-
+#include <nx/vms/api/types/motion_types.h>
+#include <nx/vms/api/types/resource_types.h>
 
 namespace nx {
 namespace vms {
