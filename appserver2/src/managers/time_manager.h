@@ -15,6 +15,7 @@
 #include <nx/utils/timer_manager.h>
 #include <nx/utils/safe_direct_connection.h>
 #include <nx/utils/singleton.h>
+#include <nx/vms/api/types/connection_types.h>
 #include <nx/network/time/abstract_accurate_time_fetcher.h>
 #include <nx/network/http/http_types.h>
 
@@ -128,8 +129,8 @@ class TimePriorityKey
 public:
     //!sequence number. Incremented with each peer selection by user
     quint16 sequence;
-    //!bitset of flags from \a TimeSynchronizationManager class
-    quint16 flags;
+    //!bitset of time flags
+    nx::vms::api::TimeFlags flags;
     //!some random number
     quint32 seed;
 
@@ -213,7 +214,7 @@ public:
 
     /** Returns synchronized time (millis from epoch, UTC). */
     qint64 getSyncTime() const;
-    ApiTimeData getTimeInfo() const;
+    nx::vms::api::TimeData getTimeInfo() const;
     /** Called when primary time server has been changed by user. */
     void onGotPrimariTimeServerTran(const QnTransaction<nx::vms::api::IdData>& tran);
     void primaryTimeServerChanged(const nx::vms::api::IdData& serverId);

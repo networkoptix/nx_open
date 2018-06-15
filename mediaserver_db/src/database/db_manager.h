@@ -169,7 +169,7 @@ namespace detail
         }
 
         //getCurrentTime
-        ErrorCode doQuery(const std::nullptr_t& /*dummy*/, ApiTimeData& currentTime);
+        ErrorCode doQuery(const std::nullptr_t& /*dummy*/, nx::vms::api::TimeData& currentTime);
 
         //dumpDatabase
         ErrorCode doQuery(const std::nullptr_t& /*dummy*/, nx::vms::api::DatabaseDumpData& data);

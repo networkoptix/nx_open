@@ -17,6 +17,7 @@ enum class ConnectionType;
 enum class RtpTransportType;
 enum class MotionStreamType;
 enum class PeerType;
+enum class TimeFlag;
 
 } // namespace api
 } // namespace vms
@@ -36,5 +37,6 @@ DECLARE_TYPE(ConnectionType)
 DECLARE_TYPE(RtpTransportType)
 DECLARE_TYPE(MotionStreamType)
 DECLARE_TYPE(PeerType)
+DECLARE_TYPE(TimeFlag)
 
 #undef DECLARE_TYPE

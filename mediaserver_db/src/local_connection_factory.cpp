@@ -1582,7 +1582,7 @@ void LocalConnectionFactory::registerRestHandlers(QnRestProcessorPool* const p)
      * %return Object in the requested format.
      * %// AbstractTimeManager::getCurrentTimeImpl
      */
-    regGet<std::nullptr_t, ApiTimeData>(p, ApiCommand::getCurrentTime);
+    regGet<std::nullptr_t, TimeData>(p, ApiCommand::getCurrentTime);
 
     // AbstractTimeManager::forcePrimaryTimeServer
     regUpdate<IdData>(p, ApiCommand::forcePrimaryTimeServer,

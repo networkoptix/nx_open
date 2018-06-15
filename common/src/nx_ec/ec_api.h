@@ -21,13 +21,13 @@
 #include <nx_ec/data/api_resource_data.h>
 #include <nx/vms/api/data/email_settings_data.h>
 #include <nx/vms/api/data/peer_alive_data.h>
-#include <nx_ec/data/api_time_data.h>
 #include <nx_ec/data/api_discovery_data.h>
 #include <nx/vms/api/data/camera_history_data.h>
 #include <nx/vms/api/data/reverse_connection_data.h>
 #include <nx/vms/api/data/client_info_data.h>
 #include <nx/vms/api/data/camera_attributes_data.h>
 #include <nx/vms/api/data/access_rights_data.h>
+#include <nx/vms/api/data/time_data.h>
 #include <nx_ec/data/api_media_server_data.h>
 #include <nx_ec/data/api_user_role_data.h>
 #include <nx_ec/data/api_misc_data.h>

@@ -6,8 +6,6 @@
 
 #include <QtConcurrent/QtConcurrent>
 #include <QtCore/QDateTime>
-#include <nx/utils/thread/mutex.h>
-#include <nx/utils/crc32.h>
 
 #include <api/global_settings.h>
 #include <api/runtime_info_manager.h>
@@ -16,20 +14,23 @@
 #include <common/common_globals.h>
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/media_server_resource.h>
-#include <nx/network/http/custom_headers.h>
 #include <transaction/abstract_transaction_message_bus.h>
+#include <utils/common/rfc868_servers.h>
 
 #include <nx_ec/data/api_runtime_data.h>
 #include <nx_ec/data/api_misc_data.h>
 
-#include <nx/utils/thread/joinable.h>
-#include <nx/utils/time.h>
-#include <utils/common/rfc868_servers.h>
-#include <nx/utils/log/log.h>
-#include <nx/utils/std/cpp14.h>
-#include <nx/utils/timer_manager.h>
+#include <nx/network/http/custom_headers.h>
 #include <nx/network/time/mean_time_fetcher.h>
 #include <nx/network/time/time_protocol_client.h>
+#include <nx/utils/crc32.h>
+#include <nx/utils/log/log.h>
+#include <nx/utils/std/cpp14.h>
+#include <nx/utils/time.h>
+#include <nx/utils/timer_manager.h>
+#include <nx/utils/thread/joinable.h>
+#include <nx/utils/thread/mutex.h>
+#include <nx/vms/api/data/time_data.h>
 
 #include <api/app_server_connection.h>
 #include "ec2_thread_pool.h"
@@ -42,7 +43,6 @@ namespace ec2 {
 // TODO: remove this constants
 const QString TimeSynchronizationManager::kTimeSyncUrlPath = QString::fromLatin1("ec2/timeSync");
 const QByteArray TimeSynchronizationManager::TIME_SYNC_HEADER_NAME("NX-TIME-SYNC-DATA");
-
 
 namespace {
 
@@ -57,6 +57,11 @@ public:
         return nx::utils::millisSinceEpoch();
     }
 };
+
+void clearFlag(api::TimeFlags& flags, api::TimeFlag flag)
+{
+    flags &= ~api::TimeFlags(flag);
+}
 
 } // namespace
 
@@ -159,43 +164,36 @@ bool TimePriorityKey::hasLessPriorityThan(
     const TimePriorityKey& right,
     bool takeIntoAccountInternetTime) const
 {
-    const int peerIsServerSet = flags & Qn::TF_peerIsServer;
-    const int right_peerIsServerSet = right.flags & Qn::TF_peerIsServer;
-    if (peerIsServerSet < right_peerIsServerSet)
-        return true;
-    if (right_peerIsServerSet < peerIsServerSet)
-        return false;
+    const bool l = flags.testFlag(api::TimeFlag::peerIsServer);
+    const bool r = right.flags.testFlag(api::TimeFlag::peerIsServer);
+    if (l != r)
+        return r;
 
     if (takeIntoAccountInternetTime)
     {
-        const int internetFlagSet = flags & Qn::TF_peerTimeSynchronizedWithInternetServer;
-        const int right_internetFlagSet = right.flags & Qn::TF_peerTimeSynchronizedWithInternetServer;
-        if (internetFlagSet < right_internetFlagSet)
-            return true;
-        if (right_internetFlagSet < internetFlagSet)
-            return false;
+        const bool l = flags.testFlag(api::TimeFlag::peerTimeSynchronizedWithInternetServer);
+        const bool r = right.flags.testFlag(api::TimeFlag::peerTimeSynchronizedWithInternetServer);
+        if (l != r)
+            return r;
     }
 
     if (sequence != right.sequence)
     {
-        //taking into account sequence overflow. it should be same as "sequence < right.sequence"
-        //but with respect to sequence overflow
+        // Taking into account sequence overflow.
+        // It should be same as "sequence < right.sequence" but with respect to sequence overflow.
         return ((quint16)(right.sequence - sequence)) <
             (std::numeric_limits<decltype(sequence)>::max() / 2);
     }
 
-    quint16 effectiveFlags = flags;
-    quint16 right_effectiveFlags = right.flags;
-    if (!takeIntoAccountInternetTime)
-    {
-        effectiveFlags &= ~Qn::TF_peerTimeSynchronizedWithInternetServer;
-        right_effectiveFlags &= ~Qn::TF_peerTimeSynchronizedWithInternetServer;
-    }
+    static constexpr auto preprocessedFlags = api::TimeFlag::peerIsServer
+        | api::TimeFlag::peerTimeSynchronizedWithInternetServer;
 
-    return
-        effectiveFlags < right_effectiveFlags ? true :
-        effectiveFlags > right_effectiveFlags ? false :
-        seed < right.seed;
+    const auto effectiveFlags = flags & ~preprocessedFlags;
+    const auto rightEffectiveFlags = right.flags & ~preprocessedFlags;
+
+    return effectiveFlags != rightEffectiveFlags
+        ? effectiveFlags < rightEffectiveFlags
+        : seed < right.seed;
 }
 
 quint64 TimePriorityKey::toUInt64() const
@@ -206,13 +204,13 @@ quint64 TimePriorityKey::toUInt64() const
 void TimePriorityKey::fromUInt64(quint64 val)
 {
     sequence = (quint16)(val >> 48);
-    flags = (quint16)((val >> 32) & 0xFFFF);
+    flags = (api::TimeFlags)((val >> 32) & 0xFFFF);
     seed = val & 0xFFFFFFFF;
 }
 
 bool TimePriorityKey::isTakenFromInternet() const
 {
-    return (flags & Qn::TF_peerTimeSynchronizedWithInternetServer) > 0;
+    return flags.testFlag(api::TimeFlag::peerTimeSynchronizedWithInternetServer);
 }
 
 //////////////////////////////////////////////
@@ -397,16 +395,16 @@ void TimeSynchronizationManager::start(
     m_miscManager = miscManager;
 
     if (m_peerType == api::PeerType::server)
-        m_localTimePriorityKey.flags |= Qn::TF_peerIsServer;
+        m_localTimePriorityKey.flags |= api::TimeFlag::peerIsServer;
 
 #ifndef EDGE_SERVER
-    m_localTimePriorityKey.flags |= Qn::TF_peerIsNotEdgeServer;
+    m_localTimePriorityKey.flags |= api::TimeFlag::peerIsNotEdgeServer;
 #endif
     QByteArray localGUID = commonModule()->moduleGUID().toByteArray();
     m_localTimePriorityKey.seed = nx::utils::crc32(localGUID);
     //TODO #ak use guid to avoid handle priority key duplicates
     if (QElapsedTimer::isMonotonic())
-        m_localTimePriorityKey.flags |= Qn::TF_peerHasMonotonicClock;
+        m_localTimePriorityKey.flags |= api::TimeFlag::peerHasMonotonicClock;
 
     m_monotonicClock.restart();
     //initializing synchronized time with local system time
@@ -456,7 +454,7 @@ qint64 TimeSynchronizationManager::getSyncTime() const
     return getSyncTimeNonSafe();
 }
 
-ApiTimeData TimeSynchronizationManager::getTimeInfo() const
+api::TimeData TimeSynchronizationManager::getTimeInfo() const
 {
     std::vector<QnUuid> allServerIds;
     if (const auto& resourcePool = commonModule()->resourcePool())
@@ -466,14 +464,14 @@ ApiTimeData TimeSynchronizationManager::getTimeInfo() const
     }
 
     QnMutexLocker lock(&m_mutex);
-    ApiTimeData result;
+    api::TimeData result;
     result.value = getSyncTimeNonSafe();
     result.isPrimaryTimeServer = m_usedTimeSyncInfo.timePriorityKey == m_localTimePriorityKey;
 
-    if (m_usedTimeSyncInfo.timePriorityKey.flags & Qn::TF_peerTimeSynchronizedWithInternetServer)
-        result.syncTimeFlags |= Qn::TF_peerTimeSynchronizedWithInternetServer;
-    if (m_usedTimeSyncInfo.timePriorityKey.flags & Qn::TF_peerTimeSetByUser)
-        result.syncTimeFlags |= Qn::TF_peerTimeSetByUser;
+    if (m_usedTimeSyncInfo.timePriorityKey.flags.testFlag(api::TimeFlag::peerTimeSynchronizedWithInternetServer))
+        result.syncTimeFlags |= api::TimeFlag::peerTimeSynchronizedWithInternetServer;
+    if (m_usedTimeSyncInfo.timePriorityKey.flags.testFlag(api::TimeFlag::peerTimeSetByUser))
+        result.syncTimeFlags |= api::TimeFlag::peerTimeSetByUser;
 
     for (const auto& serverId: allServerIds)
     {
@@ -506,12 +504,12 @@ void TimeSynchronizationManager::primaryTimeServerChanged(const api::IdData& ser
 
         if (serverId.id == commonModule()->moduleGUID())
         {
-            m_localTimePriorityKey.flags |= Qn::TF_peerTimeSetByUser;
+            m_localTimePriorityKey.flags |= api::TimeFlag::peerTimeSetByUser;
             selectLocalTimeAsSynchronized(&lock, m_usedTimeSyncInfo.timePriorityKey.sequence + 1);
         }
         else
         {
-            m_localTimePriorityKey.flags &= ~Qn::TF_peerTimeSetByUser;
+            clearFlag(m_localTimePriorityKey.flags, api::TimeFlag::peerTimeSetByUser);
         }
         newLocalTimePriority = m_localTimePriorityKey.toUInt64();
         if (newLocalTimePriority != localTimePriorityBak)
@@ -530,7 +528,7 @@ void TimeSynchronizationManager::selectLocalTimeAsSynchronized(
     //incrementing sequence
     m_localTimePriorityKey.sequence = newTimePriorityKeySequence;
     //"select primary time server" means "take its local time", so resetting internet synchronization flag
-    m_localTimePriorityKey.flags &= ~Qn::TF_peerTimeSynchronizedWithInternetServer;
+    clearFlag(m_localTimePriorityKey.flags, api::TimeFlag::peerTimeSynchronizedWithInternetServer);
     if (!m_usedTimeSyncInfo.timePriorityKey.hasLessPriorityThan(
             m_localTimePriorityKey,
             commonModule()->globalSettings()->isSynchronizingTimeWithInternet()))
@@ -669,9 +667,9 @@ void TimeSynchronizationManager::remotePeerTimeSyncUpdate(
     }
 
     // If Internet time has been reported and synchronizing with local peer, then taking local time once again.
-    if (remotePeerTimePriorityKey.isTakenFromInternet() &&
-        !commonModule()->globalSettings()->isSynchronizingTimeWithInternet() &&
-        ((m_localTimePriorityKey.flags & Qn::TF_peerTimeSetByUser) > 0))
+    if (remotePeerTimePriorityKey.isTakenFromInternet()
+        && !commonModule()->globalSettings()->isSynchronizingTimeWithInternet()
+        && m_localTimePriorityKey.flags.testFlag(api::TimeFlag::peerTimeSetByUser))
     {
         // Sending back local time with increased sequence.
         NX_LOG(lm("TimeSynchronizationManager. Received Internet time "
@@ -944,9 +942,9 @@ void TimeSynchronizationManager::checkIfManualTimeServerSelectionIsRequired(quin
 
     if (m_usedTimeSyncInfo.timePriorityKey == m_localTimePriorityKey)
         return;
-    if (m_usedTimeSyncInfo.timePriorityKey.flags & Qn::TF_peerTimeSynchronizedWithInternetServer)
+    if (m_usedTimeSyncInfo.timePriorityKey.flags.testFlag(api::TimeFlag::peerTimeSynchronizedWithInternetServer))
         return;
-    if (m_usedTimeSyncInfo.timePriorityKey.flags & Qn::TF_peerTimeSetByUser)
+    if (m_usedTimeSyncInfo.timePriorityKey.flags.testFlag(api::TimeFlag::peerTimeSetByUser))
         return;
 
     NX_LOGX(lm("User input required. Used sync time 0x%1, local time 0x%2")
@@ -1010,7 +1008,7 @@ void TimeSynchronizationManager::onTimeFetchingDone(const qint64 millisFromEpoch
 
             //using received time
             const auto localTimePriorityKeyBak = m_localTimePriorityKey;
-            m_localTimePriorityKey.flags |= Qn::TF_peerTimeSynchronizedWithInternetServer;
+            m_localTimePriorityKey.flags |= api::TimeFlag::peerTimeSynchronizedWithInternetServer;
 
             const auto maxDifferenceBetweenSynchronizedAndInternetTime =
                 commonModule()->globalSettings()->maxDifferenceBetweenSynchronizedAndInternetTime();
@@ -1050,7 +1048,10 @@ void TimeSynchronizationManager::onTimeFetchingDone(const qint64 millisFromEpoch
 
             ++m_internetSynchronizationFailureCount;
             if (m_internetSynchronizationFailureCount > MAX_SEQUENT_INTERNET_SYNCHRONIZATION_FAILURES)
-                m_localTimePriorityKey.flags &= ~Qn::TF_peerTimeSynchronizedWithInternetServer;
+            {
+                clearFlag(m_localTimePriorityKey.flags,
+                    api::TimeFlag::peerTimeSynchronizedWithInternetServer);
+            }
         }
 
         addInternetTimeSynchronizationTask();
@@ -1143,12 +1144,12 @@ void TimeSynchronizationManager::onDbManagerInitialized()
         TimePriorityKey restoredPriorityKey;
         restoredPriorityKey.fromUInt64(restoredPriorityKeyVal);
         //considering time, restored from DB, to be unreliable
-        restoredPriorityKey.flags &= ~Qn::TF_peerTimeSynchronizedWithInternetServer;
+        clearFlag(restoredPriorityKey.flags, api::TimeFlag::peerTimeSynchronizedWithInternetServer);
 
         if (m_localTimePriorityKey.sequence < restoredPriorityKey.sequence)
             m_localTimePriorityKey.sequence = restoredPriorityKey.sequence;
-        if (restoredPriorityKey.flags & Qn::TF_peerTimeSetByUser)
-            m_localTimePriorityKey.flags |= Qn::TF_peerTimeSetByUser;
+        if (restoredPriorityKey.flags.testFlag(api::TimeFlag::peerTimeSetByUser))
+            m_localTimePriorityKey.flags |= api::TimeFlag::peerTimeSetByUser;
 
         NX_LOGX(lit("Successfully restored time priority key 0x%1 from DB").arg(restoredPriorityKeyVal, 0, 16), cl_logWARNING);
     }
@@ -1169,10 +1170,11 @@ void TimeSynchronizationManager::onDbManagerInitialized()
         {
             m_usedTimeSyncInfo.syncTime = m_systemClock->millisSinceEpoch().count() - restoredTimeDelta;
             m_usedTimeSyncInfo.timePriorityKey = restoredPriorityKey;
-            m_usedTimeSyncInfo.timePriorityKey.flags &= ~Qn::TF_peerTimeSynchronizedWithInternetServer;
+            clearFlag(m_usedTimeSyncInfo.timePriorityKey.flags,
+                api::TimeFlag::peerTimeSynchronizedWithInternetServer);
             // TODO: #ak The next line is doubtful. It may be needed in case if server was down
             // for a long time and time priority sequence has overflowed.
-            m_usedTimeSyncInfo.timePriorityKey.flags &= ~Qn::TF_peerTimeSetByUser;
+            clearFlag(m_usedTimeSyncInfo.timePriorityKey.flags, api::TimeFlag::peerTimeSetByUser);
             NX_LOGX(lit("Successfully restored synchronized time %1 (delta %2, key 0x%3) from DB").
                 arg(QDateTime::fromMSecsSinceEpoch(m_usedTimeSyncInfo.syncTime).toString(Qt::ISODate)).
                 arg(restoredTimeDelta).
@@ -1237,7 +1239,7 @@ void TimeSynchronizationManager::switchBackToLocalTime(QnMutexLockerBase* const 
 {
     m_localSystemTimeDelta = std::numeric_limits<qint64>::min();
     ++m_localTimePriorityKey.sequence;
-    m_localTimePriorityKey.flags &= ~Qn::TF_peerTimeSynchronizedWithInternetServer;
+    clearFlag(m_localTimePriorityKey.flags, api::TimeFlag::peerTimeSynchronizedWithInternetServer);
     m_usedTimeSyncInfo = TimeSyncInfo(
         m_monotonicClock.elapsed().count(),
         currentMSecsSinceEpoch(),
@@ -1262,7 +1264,7 @@ void TimeSynchronizationManager::checkSystemTimeForChange()
     //by local host time then updating system time
     const bool isSystemTimeSynchronizedWithInternet =
         settings->isSynchronizingTimeWithInternet() &&
-        ((m_localTimePriorityKey.flags & Qn::TF_peerTimeSynchronizedWithInternetServer) > 0);
+        m_localTimePriorityKey.flags.testFlag(api::TimeFlag::peerTimeSynchronizedWithInternetServer);
 
     const bool isTimeSynchronizedByThisPeerLocalTime =
         m_usedTimeSyncInfo.timePriorityKey.seed == m_localTimePriorityKey.seed &&

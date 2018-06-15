@@ -1182,7 +1182,7 @@ APPLY(2002, broadcastPeerSystemTime, nx::vms::api::PeerSystemTimeData, \
                        InvalidFilterFunc(), /* Filter read func */ \
                        AllowForAllAccessOut(), /* Check remote peer rights for outgoing transaction */ \
                        RegularTransactionType()) /* regular transaction type */ \
-APPLY(2003, getCurrentTime, ApiTimeData, \
+APPLY(2003, getCurrentTime, nx::vms::api::TimeData, \
                        false, \
                        false, \
                        InvalidGetHashHelper(), \

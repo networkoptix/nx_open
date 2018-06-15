@@ -35,7 +35,6 @@
 #include <nx_ec/data/api_user_data.h>
 #include <nx_ec/data/api_full_info_data.h>
 #include <nx_ec/data/api_media_server_data.h>
-#include <nx_ec/data/api_time_data.h>
 #include <nx_ec/data/api_conversion_functions.h>
 #include <nx_ec/data/api_discovery_data.h>
 
@@ -50,6 +49,7 @@
 #include <nx/vms/api/data/layout_data.h>
 #include <nx/vms/api/data/resource_type_data.h>
 #include <nx/vms/api/data/stored_file_data.h>
+#include <nx/vms/api/data/time_data.h>
 #include <nx/vms/api/data/update_data.h>
 #include <nx/vms/api/data/videowall_data.h>
 #include <nx/vms/api/data/webpage_data.h>
@@ -4291,7 +4291,7 @@ ErrorCode QnDbManager::doQueryNoLock(const QnUuid& resourceId, ResourceParamWith
 }
 
 // getCurrentTime
-ErrorCode QnDbManager::doQuery(const std::nullptr_t& /*dummy*/, ApiTimeData& currentTime)
+ErrorCode QnDbManager::doQuery(const std::nullptr_t& /*dummy*/, TimeData& currentTime)
 {
     currentTime = m_timeSyncManager->getTimeInfo();
     return ErrorCode::ok;
