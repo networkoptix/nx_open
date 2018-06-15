@@ -1,15 +1,13 @@
 #pragma once
 
-#if !defined(Q_MOC_RUN)
-    #include <boost/optional.hpp>
-#endif
+#include <boost/optional.hpp>
 
 #include <nx/network/async_stoppable.h>
 #include <nx/utils/thread/wait_condition.h>
 #include <nx/utils/thread/mutex.h>
 #include <nx/utils/url.h>
 
-#include "../deprecated/asynchttpclient.h"
+#include "http_async_client.h"
 
 namespace nx {
 namespace network {
@@ -21,11 +19,8 @@ namespace http {
  * NOTE: This class is not thread-safe.
  * WARNING: Message body is read asynchronously to some internal buffer.
  */
-class NX_NETWORK_API HttpClient:
-    public QObject
+class NX_NETWORK_API HttpClient
 {
-    Q_OBJECT
-
 public:
     HttpClient();
     ~HttpClient();
@@ -124,7 +119,7 @@ public:
         boost::optional<std::chrono::milliseconds> customResponseReadTimeout);
 
 private:
-    nx::network::http::AsyncHttpClientPtr m_asyncHttpClient;
+    std::unique_ptr<nx::network::http::AsyncClient> m_asyncHttpClient;
     QnWaitCondition m_cond;
     mutable QnMutex m_mutex;
     bool m_done;
@@ -152,11 +147,9 @@ private:
     template<typename AsyncClientFunc>
         bool doRequest(AsyncClientFunc func);
 
-private slots:
     void onResponseReceived();
     void onSomeMessageBodyAvailable();
     void onDone();
-    void onReconnected();
 };
 
 } // namespace nx

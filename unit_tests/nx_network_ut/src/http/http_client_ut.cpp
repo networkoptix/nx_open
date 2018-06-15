@@ -5,11 +5,8 @@
 #include <mutex>
 #include <vector>
 
-#include <QtCore/QFile>
-
 #include <gtest/gtest.h>
 
-#include <nx/network/deprecated/asynchttpclient.h>
 #include <nx/network/http/http_client.h>
 #include <nx/network/http/server/http_stream_socket_server.h>
 #include <nx/network/http/test_http_server.h>
