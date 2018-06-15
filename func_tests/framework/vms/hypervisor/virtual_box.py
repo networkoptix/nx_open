@@ -49,7 +49,7 @@ def vm_info_from_raw_info(raw_info):
         # Hostname is given with port because knowledge that VMs are accessible through
         # forwarded port is not part of logical interface. Other possibility is to make virtual network
         # in which host can access VMs on IP level. One more option is special Machine which is accessible by IP
-        # and forwards port_map to target VMs.
+        # and forwards ports to target VMs.
         ports_dict[protocol, int(guest_port)] = int(host_port)
     try:
         nat_network = IPNetwork(raw_info['natnet1'])

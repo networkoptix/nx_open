@@ -66,9 +66,9 @@ class ReciprocalPortMap(object):
     """
 
     def __init__(self, remote, local):
-        # Remote port map. Knows how to access port_map on remote machine from local.
+        # Remote port map. Knows how to access ports on remote machine from local.
         self.remote = remote  # type: OneWayPortMap
-        # Local port map. Knows how to access port_map on local machine from remote.
+        # Local port map. Knows how to access ports on local machine from remote.
         self.local = local  # type: OneWayPortMap
 
 
