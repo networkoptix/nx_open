@@ -39,6 +39,7 @@ public:
         Qn::StreamIndex streamIndex) override;
     virtual bool isInitialized() const override { return true; }
     virtual CameraDiagnostics::Result initializeCameraDriver() override;
+    virtual bool needCheckIpConflicts() const override { return false; }
 };
 
 #endif //ENABLE_DESKTOP_CAMERA
