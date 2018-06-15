@@ -84,7 +84,7 @@ private:
 TEST_F(HttpClientServerTest, SimpleTest)
 {
     nx::network::http::HttpClient client;
-    client.setResponseReadTimeoutMs(nx::network::kNoTimeout.count());
+    client.setResponseReadTimeout(nx::network::kNoTimeout);
 
     ASSERT_TRUE(client.doGet(staticDataUrl()));
     ASSERT_TRUE(client.response());
@@ -95,7 +95,7 @@ TEST_F(HttpClientServerTest, SimpleTest)
 TEST_F(HttpClientServerTest, FileDownload)
 {
     nx::network::http::HttpClient client;
-    client.setResponseReadTimeoutMs(nx::network::kNoTimeout.count());
+    client.setResponseReadTimeout(nx::network::kNoTimeout);
 
     for (int i = 0; i < 17; ++i)
     {
@@ -119,7 +119,7 @@ TEST_F(HttpClientServerTest, KeepAlive)
     static const int TEST_RUNS = 2;
 
     nx::network::http::HttpClient client;
-    client.setResponseReadTimeoutMs(nx::network::kNoTimeout.count());
+    client.setResponseReadTimeout(nx::network::kNoTimeout);
 
     nx::Buffer msgBody;
     for (int i = 0; i < TEST_RUNS; ++i)

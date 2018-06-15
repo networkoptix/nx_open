@@ -2,7 +2,6 @@
 
 #include <nx/utils/log/log.h>
 #include <nx/utils/std/future.h>
-#include <nx/utils/thread/mutex.h>
 #include <nx/utils/type_utils.h>
 
 #include "buffer_source.h"
@@ -139,14 +138,14 @@ BufferType HttpClient::fetchMessageBodyBuffer()
     return result;
 }
 
-boost::optional<BufferType> HttpClient::fetchEntireMessageBody()
+std::optional<BufferType> HttpClient::fetchEntireMessageBody()
 {
     QByteArray buffer;
     while (!eof())
         buffer += fetchMessageBodyBuffer();
 
     if (m_error)
-        return boost::none;
+        return std::nullopt;
 
     return buffer;
 }
@@ -181,19 +180,22 @@ void HttpClient::setTotalReconnectTries(int reconnectTries)
     m_reconnectTries = reconnectTries;
 }
 
-void HttpClient::setSendTimeoutMs(unsigned int sendTimeoutMs)
+void HttpClient::setSendTimeout(
+    std::chrono::milliseconds sendTimeout)
 {
-    m_sendTimeoutMs = sendTimeoutMs;
+    m_sendTimeout = sendTimeout;
 }
 
-void HttpClient::setResponseReadTimeoutMs(unsigned int responseReadTimeoutMs)
+void HttpClient::setResponseReadTimeout(
+    std::chrono::milliseconds responseReadTimeout)
 {
-    m_responseReadTimeoutMs = responseReadTimeoutMs;
+    m_responseReadTimeout = responseReadTimeout;
 }
 
-void HttpClient::setMessageBodyReadTimeoutMs(unsigned int messageBodyReadTimeoutMs)
+void HttpClient::setMessageBodyReadTimeout(
+    std::chrono::milliseconds messageBodyReadTimeout)
 {
-    m_messageBodyReadTimeoutMs = messageBodyReadTimeoutMs;
+    m_messageBodyReadTimeout = messageBodyReadTimeout;
 }
 
 void HttpClient::setUserAgent(const QString& userAgent)
@@ -275,11 +277,11 @@ bool HttpClient::fetchResource(
     const nx::utils::Url& url,
     BufferType* msgBody,
     StringType* contentType,
-    boost::optional<std::chrono::milliseconds> customResponseReadTimeout)
+    std::optional<std::chrono::milliseconds> customResponseReadTimeout)
 {
     nx::network::http::HttpClient client;
     if (customResponseReadTimeout)
-        client.setResponseReadTimeoutMs(customResponseReadTimeout->count());
+        client.setResponseReadTimeout(*customResponseReadTimeout);
     if (!client.doGet(url))
         return false;
 
@@ -323,25 +325,25 @@ bool HttpClient::doRequest(AsyncClientFunc func)
         for (const auto& keyValue : m_additionalHeaders)
             m_asyncHttpClient->addAdditionalHeader(keyValue.first, keyValue.second);
         if (m_subsequentReconnectTries)
-            m_asyncHttpClient->setSubsequentReconnectTries(m_subsequentReconnectTries.get());
+            m_asyncHttpClient->setSubsequentReconnectTries(*m_subsequentReconnectTries);
         if (m_reconnectTries)
-            m_asyncHttpClient->setTotalReconnectTries(m_reconnectTries.get());
-        if (m_sendTimeoutMs)
-            m_asyncHttpClient->setSendTimeout(std::chrono::milliseconds(m_sendTimeoutMs.get()));
-        if (m_responseReadTimeoutMs)
-            m_asyncHttpClient->setResponseReadTimeout(std::chrono::milliseconds(m_responseReadTimeoutMs.get()));
-        if (m_messageBodyReadTimeoutMs)
-            m_asyncHttpClient->setMessageBodyReadTimeout(std::chrono::milliseconds(m_messageBodyReadTimeoutMs.get()));
+            m_asyncHttpClient->setTotalReconnectTries(*m_reconnectTries);
+        if (m_sendTimeout)
+            m_asyncHttpClient->setSendTimeout(*m_sendTimeout);
+        if (m_responseReadTimeout)
+            m_asyncHttpClient->setResponseReadTimeout(*m_responseReadTimeout);
+        if (m_messageBodyReadTimeout)
+            m_asyncHttpClient->setMessageBodyReadTimeout(*m_messageBodyReadTimeout);
         if (m_userAgent)
-            m_asyncHttpClient->setUserAgent(m_userAgent.get());
+            m_asyncHttpClient->setUserAgent(*m_userAgent);
         if (m_userName)
-            m_asyncHttpClient->setUserName(m_userName.get());
+            m_asyncHttpClient->setUserName(*m_userName);
         if (m_userPassword)
-            m_asyncHttpClient->setUserPassword(m_userPassword.get());
+            m_asyncHttpClient->setUserPassword(*m_userPassword);
         if (m_authType)
-            m_asyncHttpClient->setAuthType(m_authType.get());
+            m_asyncHttpClient->setAuthType(*m_authType);
         if (m_proxyEndpoint)
-            m_asyncHttpClient->setProxyVia(m_proxyEndpoint.get());
+            m_asyncHttpClient->setProxyVia(*m_proxyEndpoint);
 
         m_asyncHttpClient->setDisablePrecalculatedAuthorization(m_precalculatedAuthorizationDisabled);
         m_asyncHttpClient->setExpectOnlyMessageBodyWithoutHeaders(m_expectOnlyBody);

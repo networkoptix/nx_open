@@ -1,6 +1,6 @@
 #pragma once
 
-#include <boost/optional.hpp>
+#include <nx/utils/std/optional.h>
 
 #include <nx/network/async_stoppable.h>
 #include <nx/utils/thread/wait_condition.h>
@@ -72,7 +72,7 @@ public:
     BufferType fetchMessageBodyBuffer();
 
     /** Blocks until entire message body is avaliable. */
-    boost::optional<BufferType> fetchEntireMessageBody();
+    std::optional<BufferType> fetchEntireMessageBody();
 
     void addAdditionalHeader(const StringType& key, const StringType& value);
     const nx::utils::Url& url() const;
@@ -85,14 +85,14 @@ public:
     /** See AsyncHttpClient::setTotalReconnectTries */
     void setTotalReconnectTries(int reconnectTries);
 
-    /** See AsyncHttpClient::setSendTimeoutMs */
-    void setSendTimeoutMs(unsigned int sendTimeoutMs);
+    /** See http::AsyncClient::setSendTimeout */
+    void setSendTimeout(std::chrono::milliseconds sendTimeout);
 
-    /** See AsyncHttpClient::setResponseReadTimeoutMs */
-    void setResponseReadTimeoutMs(unsigned int messageBodyReadTimeoutMs);
+    /** See http::AsyncClient::setResponseReadTimeout */
+    void setResponseReadTimeout(std::chrono::milliseconds messageBodyReadTimeout);
 
-    /** See AsyncHttpClient::setMessageBodyReadTimeoutMs */
-    void setMessageBodyReadTimeoutMs(unsigned int messageBodyReadTimeoutMs);
+    /** See http::AsyncClient::setMessageBodyReadTimeout */
+    void setMessageBodyReadTimeout(std::chrono::milliseconds messageBodyReadTimeout);
 
     void setUserAgent(const QString& userAgent);
     void setUserName(const QString& userAgent);
@@ -116,7 +116,7 @@ public:
         const nx::utils::Url& url,
         BufferType* msgBody,
         StringType* contentType,
-        boost::optional<std::chrono::milliseconds> customResponseReadTimeout);
+        std::optional<std::chrono::milliseconds> customResponseReadTimeout);
 
 private:
     std::unique_ptr<nx::network::http::AsyncClient> m_asyncHttpClient;
@@ -127,17 +127,17 @@ private:
     bool m_terminated;
     nx::network::http::BufferType m_msgBodyBuffer;
     std::vector<std::pair<StringType, StringType>> m_additionalHeaders;
-    boost::optional<int> m_subsequentReconnectTries;
-    boost::optional<int> m_reconnectTries;
-    boost::optional<unsigned int> m_sendTimeoutMs;
-    boost::optional<unsigned int> m_responseReadTimeoutMs;
-    boost::optional<unsigned int> m_messageBodyReadTimeoutMs;
-    boost::optional<QString> m_userAgent;
-    boost::optional<QString> m_userName;
-    boost::optional<QString> m_userPassword;
+    std::optional<int> m_subsequentReconnectTries;
+    std::optional<int> m_reconnectTries;
+    std::optional<std::chrono::milliseconds> m_sendTimeout;
+    std::optional<std::chrono::milliseconds> m_responseReadTimeout;
+    std::optional<std::chrono::milliseconds> m_messageBodyReadTimeout;
+    std::optional<QString> m_userAgent;
+    std::optional<QString> m_userName;
+    std::optional<QString> m_userPassword;
     std::size_t m_maxInternalBufferSize;
-    boost::optional<SocketAddress> m_proxyEndpoint;
-    boost::optional<AuthType> m_authType;
+    std::optional<SocketAddress> m_proxyEndpoint;
+    std::optional<AuthType> m_authType;
 
     bool m_precalculatedAuthorizationDisabled = false;
     bool m_expectOnlyBody = false;
