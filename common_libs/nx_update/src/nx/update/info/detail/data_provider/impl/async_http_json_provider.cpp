@@ -43,11 +43,10 @@ void AsyncHttpJsonProvider::getUpdatesMetaInformation()
             this));
 }
 
-void AsyncHttpJsonProvider::getSpecificUpdateData(const QString& customization, const QString& version)
+void AsyncHttpJsonProvider::getSpecificUpdateData(const QString& updatePrefix, const QString& build)
 {
-    nx::network::url::Builder urlBuilder(m_baseUrl);
-    urlBuilder.appendPath("/" + customization);
-    urlBuilder.appendPath("/" + version);
+    nx::network::url::Builder urlBuilder(updatePrefix);
+    urlBuilder.appendPath("/" + build);
     urlBuilder.appendPath(kUpdateUrlPostfix);
 
     m_asyncHttpClient.doGet(

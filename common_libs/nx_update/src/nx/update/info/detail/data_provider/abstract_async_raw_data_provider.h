@@ -13,7 +13,7 @@ class AbstractAsyncRawDataProvider
 public:
     virtual ~AbstractAsyncRawDataProvider() {}
     virtual void getUpdatesMetaInformation() = 0;
-    virtual void getSpecificUpdateData(const QString& customization, const QString& version) = 0;
+    virtual void getSpecificUpdateData(const QString& updatePrefix, const QString& build) = 0;
 };
 
 } // namespace data_provider

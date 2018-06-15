@@ -418,7 +418,7 @@ const std::vector<UpdateTestData>& updateTestDataList()
 {
     static const std::vector<UpdateTestData> result = {
 {
-    "default",
+    "http://updates.networkoptix.com/default",
     "16975",
     R"JSON(
     {
@@ -503,7 +503,7 @@ const std::vector<UpdateTestData>& updateTestDataList()
     )JSON"
 },
 {
-    "tricom",
+    "http://updates.networkoptix.com/tricom",
     "14532",
     R"JSON(
     {
@@ -587,7 +587,7 @@ const std::vector<UpdateTestData>& updateTestDataList()
     )JSON"
 },
 {
-    "vista",
+    "http://updates.vista-cctv.com/vista",
     "16975",
     R"JSON(
     {

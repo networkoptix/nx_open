@@ -29,6 +29,7 @@ inline bool operator == (const AlternativeServerData& lhs, const AlternativeServ
 struct CustomizationData
 {
     QString name;
+    QString updatePrefix;
     QList<QnSoftwareVersion> versions;
 };
 

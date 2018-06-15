@@ -50,8 +50,7 @@ const static QString kClientPackagesKey = "clientPackages";
 class MetaDataParser
 {
 public:
-    MetaDataParser(const QJsonObject& topLevelObject):
-        m_topLevelObject(topLevelObject)
+    MetaDataParser(const QJsonObject& topLevelObject): m_topLevelObject(topLevelObject)
     {
         NX_ASSERT(!topLevelObject.isEmpty());
         if (topLevelObject.isEmpty())
@@ -139,6 +138,7 @@ private:
     {
         CustomizationData customizationData;
         customizationData.name = customizationName;
+        customizationData.updatePrefix = customizationInfo.updates_prefix;
 
         for (auto releasesIt = customizationInfo.releases.constBegin();
              releasesIt != customizationInfo.releases.constEnd();
@@ -155,8 +155,7 @@ private:
 class UpdateDataParser
 {
 public:
-    UpdateDataParser(const QJsonObject& topLevelObject):
-        m_topLevelObject(topLevelObject)
+    UpdateDataParser(const QJsonObject& topLevelObject): m_topLevelObject(topLevelObject)
     {
         if (topLevelObject.isEmpty())
         {
