@@ -270,6 +270,9 @@ bool HikvisionMetadataMonitor::processEvent(const HikvisionEvent& hikvisionEvent
 
     if (result.empty())
         return true;
+    
+    for (const HikvisionEvent& e : result)
+        NX_VERBOSE(this, lm("Got event %1, isActive=%2").args(e.caption, e.isActive));
 
     QnMutexLocker lock(&m_mutex);
     for (const auto handler: m_handlers)

@@ -113,7 +113,10 @@ boost::optional<HikvisionEvent> AttributesParser::parseEventXml(
     result.description = buildDescription(manifest, result);
 
     if (reader.error() != QXmlStreamReader::NoError)
+    {
+        NX_VERBOSE(typeid(AttributesParser), lm("XML parse error: %1").arg(reader.errorString()));
         return boost::optional<HikvisionEvent>();
+    }
     return result;
 }
 
