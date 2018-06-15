@@ -181,15 +181,15 @@ def get_server_camera_macs(server):
 def test_enable_failover_on_one_server(three_mediaservers, camera_factory, counter):
     one, two, three = three_mediaservers
     create_cameras_and_setup_servers([one, two, three], camera_factory, counter)
-    two.server.api.ec2.saveMediaServerUserAttributes.POST(
-        serverId=get_server_id(two.server.api),
+    two.api.ec2.saveMediaServerUserAttributes.POST(
+        serverId=get_server_id(two.api),
         maxCameras=4,
         allowAutoRedundancy=True)
     # stop server one; all it's cameras must go to server two
-    one.server.stop()
+    one.stop()
     wait_until_camera_count_is_online(two.server, 4)
     # start server one again; all it's cameras must go back to him
-    one.server.start()
+    one.start()
     wait_until_camera_count_is_online(one.server, 2)
     wait_until_camera_count_is_online(two.server, 2)
 
@@ -202,16 +202,16 @@ def test_enable_failover_on_one_server(three_mediaservers, camera_factory, count
 def test_enable_failover_on_two_servers(three_mediaservers, camera_factory, counter):
     one, two, three = three_mediaservers
     create_cameras_and_setup_servers([one, two, three], camera_factory, counter)
-    one.server.api.ec2.saveMediaServerUserAttributes.POST(
-        serverId=get_server_id(one.server.api),
+    one.api.ec2.saveMediaServerUserAttributes.POST(
+        serverId=get_server_id(one.api),
         maxCameras=3,
         allowAutoRedundancy=True)
-    three.server.api.ec2.saveMediaServerUserAttributes.POST(
-        serverId=get_server_id(three.server.api),
+    three.api.ec2.saveMediaServerUserAttributes.POST(
+        serverId=get_server_id(three.api),
         maxCameras=3,
         allowAutoRedundancy=True)
     # stop server two; one of it's 2 cameras must go to server one, another - to server three:
-    two.server.stop()
+    two.stop()
     wait_until_camera_count_is_online(one.server, 3)
     assert len(online_camera_macs_on_server(one.server)) == 3, (
         'Mediaserver "one" maxCameras limit (3) does not work - it got more than 3 cameras')
@@ -219,8 +219,8 @@ def test_enable_failover_on_two_servers(three_mediaservers, camera_factory, coun
     assert len(online_camera_macs_on_server(three.server)) == 3, (
         'Mediaserver "three" maxCameras limit (3) does not work - it got more than 3 cameras')
     # start server two back; cameras must return to their original owners
-    two.server.start()
-    wait_until_camera_count_is_online(two.server, 2)
+    two.start()
+    wait_until_camera_count_is_online(two, 2)
 
     assert not one.installation.list_core_dumps()
     assert not two.installation.list_core_dumps()
@@ -239,8 +239,7 @@ def test_failover_and_auto_discovery(two_clean_mediaservers, camera_factory, cou
     camera_mac_set = set(create_cameras(camera_factory, counter, count=2))
     one, two = two_clean_mediaservers
     setup_server(one, camera_mac_set)
-    setup_server(two, set(), system_settings=dict(
-        systemSettings=dict(autoDiscoveryEnabled=bool_to_str(discovery))))
+    setup_server(two, set(), system_settings=dict(autoDiscoveryEnabled=bool_to_str(discovery)))
     assert str_to_bool(get_system_settings(two.api)['autoDiscoveryEnabled']) == discovery
     attach_cameras_to_server(one, camera_mac_set)
     merge_systems(one, two)
@@ -267,30 +266,30 @@ def test_failover_and_auto_discovery(two_clean_mediaservers, camera_factory, cou
 def test_max_camera_settings(two_clean_mediaservers, camera_factory, counter):
     one, two = two_clean_mediaservers
     create_cameras_and_setup_servers([one, two], camera_factory, counter)
-    one.server.api.ec2.saveMediaServerUserAttributes.POST(
-        serverId=get_server_id(one.server.api),
+    one.api.ec2.saveMediaServerUserAttributes.POST(
+        serverId=get_server_id(one.api),
         maxCameras=3,
         allowAutoRedundancy=True)
-    two.server.api.ec2.saveMediaServerUserAttributes.POST(
-        serverId=get_server_id(two.server.api),
+    two.api.ec2.saveMediaServerUserAttributes.POST(
+        serverId=get_server_id(two.api),
         maxCameras=2,
         allowAutoRedundancy=True)
     # stop server two; exactly one camera from server two must go to server one
-    two.server.stop()
-    wait_until_camera_count_is_online(one.server, 3)
-    assert len(online_camera_macs_on_server(one.server)) == 3, (
+    two.stop()
+    wait_until_camera_count_is_online(one, 3)
+    assert len(online_camera_macs_on_server(one)) == 3, (
         'Mediaserver "one" maxCameras limit (3) does not work - it got more than 3 cameras')
     # stop server one, and start two; no additional cameras must go to server two
-    one.server.stop()
-    two.server.start()
-    wait_until_camera_count_is_online(two.server, 2)
-    assert len(online_camera_macs_on_server(two.server)) == 2, (
+    one.stop()
+    two.start()
+    wait_until_camera_count_is_online(two, 2)
+    assert len(online_camera_macs_on_server(two)) == 2, (
         'Mediaserver "two" maxCameras limit (2) does not work - '
         'it got cameras from server one, while already has 2 own cameras')
     # start server one again; all cameras must go back to their original owners
-    one.server.start()
-    wait_until_camera_count_is_online(one.server, 2)
-    wait_until_camera_count_is_online(two.server, 2)
+    one.start()
+    wait_until_camera_count_is_online(one, 2)
+    wait_until_camera_count_is_online(two, 2)
 
     assert not one.installation.list_core_dumps()
     assert not two.installation.list_core_dumps()
