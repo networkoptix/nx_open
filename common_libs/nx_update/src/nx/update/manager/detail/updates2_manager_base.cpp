@@ -40,6 +40,7 @@ void Updates2ManagerBase::atServerStart()
         case api::Updates2StatusData::StatusCode::notAvailable:
             break;
         case api::Updates2StatusData::StatusCode::checking:
+        case api::Updates2StatusData::StatusCode::installing:
             setStatus(
                 api::Updates2StatusData::StatusCode::notAvailable,
                 "Update is unavailable");
@@ -52,7 +53,6 @@ void Updates2ManagerBase::atServerStart()
             download();
             break;
         case api::Updates2StatusData::StatusCode::readyToInstall:
-        case api::Updates2StatusData::StatusCode::installing:
             break;
     }
 
