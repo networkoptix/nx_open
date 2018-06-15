@@ -21,7 +21,7 @@ public:
 
     virtual QString getHostAddress() const override;
     virtual void setHostAddress(const QString &ip) override;
-
+    virtual bool needCheckIpConflicts() const override { return false; }
 protected:
     virtual nx::mediaserver::resource::StreamCapabilityMap getStreamCapabilityMapFromDrives(
         Qn::StreamIndex streamIndex) override;

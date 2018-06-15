@@ -78,6 +78,9 @@ public:
 
     nx::mediaserver::RootTool* rootTool() const;
 
+    QnStorageManager* normalStorageManager() const;
+    QnStorageManager* backupStorageManager() const;
+
 private:
     QnCommonModule* m_commonModule;
     MSSettings* m_settings;
