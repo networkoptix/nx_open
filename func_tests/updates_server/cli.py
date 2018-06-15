@@ -24,8 +24,7 @@ def main(ctx, data_dir):
     ctx.obj = UpdatesServer(Path(data_dir))
 
 
-@main.command(short_help="Collect data, add versions", help=dedent("""
-    Collect actual data from updates.networkoptix.com, add versions and save to the data dir."""))
+@main.command(short_help="Generate data")
 @click.pass_context
 def generate(ctx):
     server = ctx.obj  # type: UpdatesServer

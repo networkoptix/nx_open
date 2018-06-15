@@ -12,9 +12,13 @@ class Version(tuple):  # `tuple` gives `__hash__` and comparisons but requires `
         super(Version, self).__init__()
         self.major, self.minor, self.fix, self.build = self
         self.as_str = version_str
+        self.short_as_str = '{}.{}'.format(self.major, self.minor)
 
     def __repr__(self):
         return 'Version({!r})'.format(self.as_str)
+
+    def __str__(self):
+        return self.as_str
 
 
 class PackageNameParseError(Exception):

@@ -1,4 +1,0 @@
-click==6.7
-Flask==0.12.2
-pathlib2==2.3.0
-Werkzeug==0.14.1

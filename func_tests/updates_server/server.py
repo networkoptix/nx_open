@@ -1,18 +1,13 @@
-import copy
 import json
 import logging
-import shutil
-import sys
+import os
+import random
 
 from flask import Flask, request, send_file
+import hashlib
 from werkzeug.exceptions import BadRequest, NotFound, SecurityError
 
-if sys.version_info[:2] == (2, 7):
-    # noinspection PyCompatibility,PyUnresolvedReferences
-    from httplib import HTTPConnection
-elif sys.version_info[:2] in {(3, 4), (3, 5), (3, 6)}:  # Python 3.4 is on Ubuntu 14.04.
-    # noinspection PyCompatibility,PyUnresolvedReferences
-    from http.client import HTTPConnection
+from framework.installation.installer import Version, known_customizations
 
 _logger = logging.getLogger(__name__)
 
@@ -36,105 +31,85 @@ def read_json(path):
         return json.loads(path.read_text())
 
 
+class _UpdatesData(object):
+    _platforms = {
+        'packages': {
+            'linux': {'x64_ubuntu', 'x86_ubuntu', 'arm_rpi', 'arm_bpi', 'arm_bananapi'},
+            'windows': {'x64_winxp', 'x86_winxp'},
+            },
+        'clientPackages': {
+            'linux': {'x64_ubuntu', 'x86_ubuntu'},
+            'macosx': {'x64_macosx'},
+            'windows': {'x64_winxp', 'x86_winxp'},
+            }
+        }
+    _product_infix = {
+        'packages': 'server',
+        'clientPackages': 'client',
+        }
+    _platform_infix = {
+        'x64_ubuntu': 'linux64', 'x86_ubuntu': 'linux86',
+        'x64_macosx': 'mac',
+        'x64_winxp': 'win64', 'x86_winxp': 'win86',
+        'arm_rpi': 'rpi', 'arm_bpi': 'bpi', 'arm_bananapi': 'bananapi',
+        }
+
+    def __init__(self, data_dir):
+        self.data_dir = data_dir
+        self.root_path = self.data_dir / 'updates.json'
+        self.root = {
+            '__version': 1,
+            '__info': [{}],
+            }
+
+    def save_root(self):
+        write_json(self.root_path, self.root)
+
+    def add_customization(self, customization):
+        self.root[customization.customization_name] = {'releases': {}}
+
+    def _make_archive_name(self, customization, product, platform, version):
+        return '{}-{}_update-{}-{}.zip'.format(
+            customization.installer_name,
+            self._product_infix[product],
+            version,
+            self._platform_infix[platform],
+            )
+
+    def add_release(self, customization, version):
+        _logger.info("Create %s %s", customization.customization_name, version)
+        self.root[customization.customization_name]['releases'][version.short_as_str] = version.as_str
+        release_dir = self.data_dir / customization.customization_name / str(version.build)
+        release_dir.mkdir(parents=True, exist_ok=True)
+        packages = {}
+        for product, family_to_platforms in self._platforms.items():
+            packages[product] = {}
+            for family, platforms in family_to_platforms.items():
+                packages[product][family] = {}
+                for platform in platforms:
+                    archive_name = self._make_archive_name(customization, product, platform, version)
+                    packages[product][family][platform] = {
+                        'file': archive_name,
+                        'size': random.randint(1000000, 2000000),
+                        'md5': hashlib.md5(os.urandom(10)).hexdigest(),
+                        }
+        update_path = release_dir / 'update.json'
+        packages['cloudHost'] = 'cloud-test.hdw.mx'
+        write_json(update_path, packages)
+
+
 class UpdatesServer(object):
     def __init__(self, data_dir):
         self.data_dir = data_dir
         self.dummy_file_path = data_dir / 'dummy.zip'
 
-    @staticmethod
-    def _collect_actual_data():
-        base_url = 'updates.networkoptix.com'
-
-        conn = HTTPConnection(base_url, port=80)
-        conn.request('GET', '/updates.json')
-        root_obj = json.loads(conn.getresponse().read().decode())
-
-        path_to_update_obj = dict()
-        for customization in root_obj:
-            if customization == '__info':
-                continue
-            releases_obj = root_obj[customization]['releases']
-            for release in releases_obj:
-                build_num = releases_obj[release].split('.')[-1]
-                update_path = UPDATE_PATH_PATTERN.format(customization, build_num)
-                conn.request('GET', update_path)
-                response = conn.getresponse()
-                response_contents = response.read().decode()
-                if response.status != 200:
-                    _logger.warning("Ignore %s: HTTP status code %d.", update_path, response.status)
-                    continue
-                try:
-                    update_metadata = json.loads(response_contents)
-                except ValueError:
-                    _logger.warning("Ignore %s: not a valid JSON.", update_path)
-                    continue
-                path_to_update_obj[update_path] = update_metadata
-
-        return root_obj, path_to_update_obj
-
-    @staticmethod
-    def _append_new_versions(root_obj, path_to_update_obj, new_versions):
-        for customization_name, customization_obj in root_obj.items():
-            # Searching for the update object with the highest build number for the current customization.
-            new_update_obj = None
-            highest_build = 0
-            for path in path_to_update_obj.keys():
-                path_parts = path.split('/')
-                if customization_name == path_parts[1] and int(path_parts[2]) > highest_build:
-                    if 'packages' in path_to_update_obj[path]:
-                        highest_build = int(path_parts[2])
-                        new_update_obj = copy.deepcopy(path_to_update_obj[path])
-
-            if not new_update_obj:
-                continue
-
-            for new_version in new_versions:
-                customization_obj['releases'][new_version[0]] = new_version[1]
-                new_update_obj['version'] = new_version[1]
-                new_update_obj['cloudHost'] = new_version[2]
-
-                def amend_file_info_obj(file_info_obj):
-                    # TODO: amend md5 and size as well
-                    # Amending file name. Changing only the version part of the file name.
-                    old_file_name_splits = file_info_obj['file'].split('.')
-                    new_version_splits = new_version[1].split('.')
-                    new_file_name_prefix = list(old_file_name_splits[0])
-                    new_file_name_prefix[-1] = new_version_splits[0]
-                    new_file_name_prefix = ''.join(new_file_name_prefix)
-                    new_file_name = '.'.join([
-                        new_file_name_prefix,
-                        new_version_splits[1], new_version_splits[2], new_version_splits[3],
-                        'zip'])
-                    file_info_obj['file'] = new_file_name
-
-                def amend_packages(update_obj, packages_name):
-                    for os_key, os_obj in update_obj[packages_name].items():
-                        for file_key, file_obj in os_obj.items():
-                            amend_file_info_obj(file_obj)
-
-                amend_packages(new_update_obj, 'clientPackages')
-                amend_packages(new_update_obj, 'packages')
-
-                new_path_key = UPDATE_PATH_PATTERN.format(customization_name, new_version[1].split('.')[-1])
-                path_to_update_obj[new_path_key] = new_update_obj
-
-        return root_obj, path_to_update_obj
-
-    def _save_data_to_files(self, root_obj, path_to_update_obj):
-        shutil.rmtree(str(self.data_dir), ignore_errors=True)
-        self.data_dir.mkdir()
-        write_json(self.data_dir / 'updates.json', root_obj)
-        for key, value in path_to_update_obj.items():
-            file_path = self.data_dir / key.lstrip('/')
-            file_path.parent.mkdir(parents=True, exist_ok=True)
-            write_json(file_path, value)
-
     def generate_data(self):
-        _logger.info('Loading and generating data. Be patient')
-        root_obj, path_to_update_obj = self._collect_actual_data()
-        new_versions = [('4.0', '4.0.0.21200', 'cloud-test.hdw.mx')]
-        new_root, new_path_to_update_obj = self._append_new_versions(root_obj, path_to_update_obj, new_versions)
-        self._save_data_to_files(new_root, new_path_to_update_obj)
+        updates = _UpdatesData(self.data_dir)
+        for customization in known_customizations:
+            updates.add_customization(customization)
+            for version in {Version('3.1.0.16975'), Version('3.2.0.17000'), Version('4.0.0.21200')}:
+                updates.add_release(customization, version)
+        updates.save_root()
         if not self.dummy_file_path.exists():
             with self.dummy_file_path.open('wb') as f:
                 f.seek(1024 * 1024 * 100)

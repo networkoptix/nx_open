@@ -14,8 +14,7 @@ from updates_server.server import UpdatesServer
 def updates_server(work_dir):
     data_dir = work_dir / 'updates'
     server = UpdatesServer(data_dir)
-    if not data_dir.exists() or not data_dir.glob('*'):
-        server.generate_data()
+    server.generate_data()
     app = server.make_app(True, 'support')
     for port in range(8080, 8100):
         try:
