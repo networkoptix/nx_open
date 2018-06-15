@@ -57,12 +57,11 @@ class _UpdatesData(object):
     def __init__(self, data_dir):
         self.data_dir = data_dir
         self.root_path = self.data_dir / 'updates.json'
-        self.root = {
-            '__version': 1,
-            '__info': [{}],
-            }
+        self.root = {}
 
     def save_root(self):
+        self.root['__version'] = 1
+        self.root['__info'] = [{}]
         write_json(self.root_path, self.root)
 
     def add_customization(self, customization):
