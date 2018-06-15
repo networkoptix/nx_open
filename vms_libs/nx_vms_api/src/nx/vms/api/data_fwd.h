@@ -98,6 +98,9 @@ DECLARE_STRUCT_NO_LIST(TranStateResponse)
 DECLARE_STRUCT_NO_LIST(TranSyncDoneData)
 DECLARE_STRUCT_NO_LIST(SyncRequestData)
 
+DECLARE_STRUCT(PeerSystemTimeData)
+DECLARE_STRUCT_NO_LIST(PeerSyncTimeData)
+
 DECLARE_STRUCT_NO_LIST(ReverseConnectionData)
 
 #undef DECLARE_STRUCT

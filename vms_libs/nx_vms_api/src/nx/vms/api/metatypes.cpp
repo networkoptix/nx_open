@@ -19,6 +19,7 @@
 #include "data/p2p_statistics_data.h"
 #include "data/peer_data.h"
 #include "data/peer_alive_data.h"
+#include "data/peer_system_time_data.h"
 #include "data/reverse_connection_data.h"
 #include "data/tran_state_data.h"
 #include "data/update_data.h"
@@ -72,6 +73,8 @@ void Metatypes::initialize()
     qRegisterMetaType<nx::vms::api::PeerData>();
     qRegisterMetaType<nx::vms::api::PeerDataEx>();
     qRegisterMetaType<nx::vms::api::PeerAliveData>();
+    qRegisterMetaType<nx::vms::api::PeerSystemTimeData>();
+    qRegisterMetaType<nx::vms::api::PeerSyncTimeData>();
     qRegisterMetaType<nx::vms::api::PersistentIdData>();
     qRegisterMetaType<nx::vms::api::ResourceData>();
     qRegisterMetaType<nx::vms::api::ResourceStatusData>();

@@ -551,13 +551,14 @@ namespace detail
             return ErrorCode::notImplemented;
         }
 
-        ErrorCode executeTransactionInternal(const QnTransaction<ApiPeerSystemTimeData>&)
+        ErrorCode executeTransactionInternal(const QnTransaction<nx::vms::api::PeerSystemTimeData>&)
         {
             NX_ASSERT(false, Q_FUNC_INFO, "This is a non persistent transaction!");
             return ErrorCode::notImplemented;
         }
 
-        ErrorCode executeTransactionInternal(const QnTransaction<ApiPeerSystemTimeDataList>&)
+        ErrorCode executeTransactionInternal(
+            const QnTransaction<nx::vms::api::PeerSystemTimeDataList>&)
         {
             NX_ASSERT(false, Q_FUNC_INFO, "This is a non persistent transaction!");
             return ErrorCode::notImplemented;

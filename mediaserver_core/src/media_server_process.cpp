@@ -4117,7 +4117,7 @@ void MediaServerProcess::at_timeChanged(qint64 newTime)
     QnSyncTime::instance()->updateTime(newTime);
 
     using namespace ec2;
-    QnTransaction<ApiPeerSyncTimeData> tran(
+    QnTransaction<vms::api::PeerSyncTimeData> tran(
         ApiCommand::broadcastPeerSyncTime,
         commonModule()->moduleGUID());
     tran.params.syncTimeMs = newTime;

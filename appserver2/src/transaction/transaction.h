@@ -1171,7 +1171,7 @@ APPLY(2001, forcePrimaryTimeServer, nx::vms::api::IdData, \
                        InvalidFilterFunc(), /* Filter read func */ \
                        AllowForAllAccessOut(), /* Check remote peer rights for outgoing transaction */ \
                        RegularTransactionType()) /* regular transaction type */ \
-APPLY(2002, broadcastPeerSystemTime, ApiPeerSystemTimeData, \
+APPLY(2002, broadcastPeerSystemTime, nx::vms::api::PeerSystemTimeData, \
                        false, \
                        true, \
                        InvalidGetHashHelper(), \
@@ -1205,7 +1205,7 @@ APPLY(2004, changeSystemId, ApiSystemIdData, \
                        InvalidFilterFunc(), /* Filter read func */ \
                        AllowForAllAccessOut(), /* Check remote peer rights for outgoing transaction */ \
                        RegularTransactionType()) /* regular transaction type */ \
-APPLY(2005, getKnownPeersSystemTime, ApiPeerSystemTimeDataList, \
+APPLY(2005, getKnownPeersSystemTime, nx::vms::api::PeerSystemTimeDataList, \
                        false, \
                        false, \
                        InvalidGetHashHelper(), \
@@ -1249,7 +1249,7 @@ APPLY(2008, cleanupDatabase, nx::vms::api::CleanupDatabaseData, \
                        InvalidFilterFunc(), /* Filter read func */ \
                        AllowForAllAccessOut(),      \
                        LocalTransactionType()) /* Check remote peer rights for outgoing transaction */ \
-APPLY(2009, broadcastPeerSyncTime, ApiPeerSyncTimeData, \
+APPLY(2009, broadcastPeerSyncTime, nx::vms::api::PeerSyncTimeData, \
                        false, \
                        true, \
                        InvalidGetHashHelper(), \
