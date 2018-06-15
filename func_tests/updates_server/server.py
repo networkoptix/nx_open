@@ -1,10 +1,10 @@
+import hashlib
 import json
 import logging
 import os
 import random
 
 from flask import Flask, request, send_file
-import hashlib
 from werkzeug.exceptions import BadRequest, NotFound, SecurityError
 
 from framework.installation.installer import Version, known_customizations
