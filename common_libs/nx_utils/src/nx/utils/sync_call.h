@@ -5,7 +5,7 @@
 #include <nx/utils/std/future.h>
 
 namespace detail {
-   
+
 template<typename ResultType, typename... OutArgs>
 std::tuple<ResultType, OutArgs...> makeSyncCall(
     std::function<void(std::function<void(ResultType, OutArgs...)>)> function)
@@ -23,7 +23,7 @@ std::tuple<ResultType, OutArgs...> makeSyncCall(
     ResultType resultValue = future.get();
     return std::tuple_cat(std::tie(resultValue), std::move(resultArgs));
 }
-    
+
 } // namespace detail
 
 /**
