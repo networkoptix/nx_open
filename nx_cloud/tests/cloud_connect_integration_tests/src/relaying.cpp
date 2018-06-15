@@ -8,7 +8,7 @@
 #include <nx/network/cloud/cloud_connect_controller.h>
 #include <nx/network/cloud/cloud_connect_settings.h>
 #include <nx/network/cloud/tunnel/connector_factory.h>
-#include <nx/network/cloud/tunnel/relay/api/relay_api_client.h>
+#include <nx/network/cloud/tunnel/relay/api/relay_api_client_factory.h>
 #include <nx/utils/std/future.h>
 #include <nx/utils/std/optional.h>
 #include <nx/utils/sync_call.h>
@@ -47,7 +47,7 @@ protected:
     {
         using namespace nx::cloud::relay;
 
-        auto relayClient = api::ClientFactory::create(relayUrl());
+        auto relayClient = api::ClientFactory::instance().create(relayUrl());
 
         for (;;)
         {

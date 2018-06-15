@@ -3,6 +3,7 @@
 #include <gtest/gtest.h>
 
 #include <nx/network/cloud/tunnel/connector_factory.h>
+#include <nx/network/cloud/tunnel/relay/api/relay_api_client_factory.h>
 #include <nx/utils/std/future.h>
 
 #include <nx/cloud/relay/settings.h>
@@ -38,7 +39,7 @@ public:
     {
         using namespace nx::cloud::relay;
 
-        auto relayClient = api::ClientFactory::create(relayUrl(2));
+        auto relayClient = api::ClientFactory::instance().create(relayUrl(2));
 
         for (;;)
         {

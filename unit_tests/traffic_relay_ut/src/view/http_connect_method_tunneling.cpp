@@ -1,6 +1,7 @@
 #include <gtest/gtest.h>
 
 #include <nx/network/cloud/tunnel/relay/api/relay_api_client.h>
+#include <nx/network/cloud/tunnel/relay/api/relay_api_client_factory.h>
 #include <nx/network/http/http_async_client.h>
 #include <nx/network/url/url_builder.h>
 #include <nx/utils/sync_call.h>
@@ -99,7 +100,7 @@ private:
     {
         addRelayInstance();
 
-        m_relayClient = api::ClientFactory::create(relay().basicUrl());
+        m_relayClient = api::ClientFactory::instance().create(relay().basicUrl());
     }
 
     void saveEstablishServerTunnelResult()

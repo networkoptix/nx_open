@@ -12,7 +12,7 @@ namespace relay {
 namespace api {
 namespace test {
 
-ClientStub::ClientStub(const nx::utils::Url& relayUrl):
+ClientStub::ClientStub(const nx::utils::Url& /*relayUrl*/):
     m_scheduledRequestCount(0)
 {
 }
