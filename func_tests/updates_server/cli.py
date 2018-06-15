@@ -25,10 +25,13 @@ def main(ctx, data_dir):
 
 
 @main.command(short_help="Generate data")
+@click.option(
+    '--base-url', '-u', default='http://localhost:8080/', show_default=True,
+    help="Base URL to inject into install.sh and install.ps1 callbacks.")
 @click.pass_context
-def generate(ctx):
+def generate(ctx, base_url):
     server = ctx.obj  # type: UpdatesServer
-    server.generate_data()
+    server.generate_data(base_url)
 
 
 @main.command(short_help="Start HTTP server", help="Serve update metadata and, optionally, archives by HTTP.")

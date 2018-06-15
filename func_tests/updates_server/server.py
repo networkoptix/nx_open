@@ -1,17 +1,61 @@
 import hashlib
 import json
 import logging
-import os
-import random
+import zipfile
 
 from flask import Flask, request, send_file
 from werkzeug.exceptions import BadRequest, NotFound, SecurityError
 
 from framework.installation.installer import Version, known_customizations
+from framework.os_access.posix_shell_utils import sh_augment_script, sh_command_to_script
+from framework.os_access.windows_power_shell_utils import power_shell_augment_script
 
 _logger = logging.getLogger(__name__)
 
 UPDATE_PATH_PATTERN = '/{}/{}/update.json'
+
+
+def _create_install_sh(path, callback_url, data):
+    command = ['curl', '--verbose', '--get', callback_url]
+    for key, value in data.items():
+        command.append('-data-urlencode')
+        command.append('{}={}'.format(key, value))
+    bare = sh_command_to_script(command)
+    full = sh_augment_script(bare, set_eux=False, shebang=True)
+    path.write_bytes(full)
+    path.chmod(0o755)
+    return path
+
+
+def _create_archive(archive_path, callback_url, update_info):
+    # Archives are made unique intentionally to make their sizes and MD5 hashes different.
+    # Files are created to make debug easy and to let Flask serve them with all features.
+    unpacked_path = archive_path.with_suffix('')
+    unpacked_path.mkdir(parents=True, exist_ok=True)
+    install_sh_path = unpacked_path / 'install'  # Without extension: same call on Windows and Linux.
+    _create_install_sh(install_sh_path, callback_url, update_info)
+    install_ps1_path = unpacked_path / 'install.ps1'
+    install_ps1_path.write_text(power_shell_augment_script(
+        # language=PowerShell
+        u'Invoke-WebRequest -Uri $url -UseBasicParsing -Body $data',
+        {'url': callback_url, 'data': update_info}))
+    install_bat_path = unpacked_path / 'install.bat'
+    install_bat_path.write_text(u'powershell -File %~dp0install.ps1')
+    with zipfile.ZipFile(str(archive_path), 'w') as zf:
+        zf.write(str(install_sh_path), install_sh_path.name)
+        zf.write(str(install_ps1_path), install_ps1_path.name)
+        zf.write(str(install_bat_path), install_bat_path.name)
+        zf.writestr('update.json', json.dumps(update_info, indent=4))  # Mediaserver looks for it.
+
+
+def _calculate_md5_of_file(path):
+    hash = hashlib.md5()
+    with path.open('rb') as f:
+        while True:
+            chunk = f.read(65536)
+            if not chunk:
+                return hash.hexdigest()
+            hash.update(chunk)
 
 
 def write_json(path, data):
@@ -54,10 +98,11 @@ class _UpdatesData(object):
         'arm_rpi': 'rpi', 'arm_bpi': 'bpi', 'arm_bananapi': 'bananapi',
         }
 
-    def __init__(self, data_dir):
+    def __init__(self, data_dir, callback_url):
         self.data_dir = data_dir
         self.root_path = self.data_dir / 'updates.json'
         self.root = {}
+        self._callback_url = callback_url
 
     def save_root(self):
         self.root['__version'] = 1
@@ -67,15 +112,7 @@ class _UpdatesData(object):
     def add_customization(self, customization):
         self.root[customization.customization_name] = {'releases': {}}
 
-    def _make_archive_name(self, customization, product, platform, version):
-        return '{}-{}_update-{}-{}.zip'.format(
-            customization.installer_name,
-            self._product_infix[product],
-            version,
-            self._platform_infix[platform],
-            )
-
-    def add_release(self, customization, version):
+    def add_release(self, customization, version, cloud_host='cloud-test.hdw.mx'):
         _logger.info("Create %s %s", customization.customization_name, version)
         self.root[customization.customization_name]['releases'][version.short_as_str] = version.as_str
         release_dir = self.data_dir / customization.customization_name / str(version.build)
@@ -83,39 +120,63 @@ class _UpdatesData(object):
         packages = {}
         for product, family_to_platforms in self._platforms.items():
             packages[product] = {}
-            for family, platforms in family_to_platforms.items():
-                packages[product][family] = {}
-                for platform in platforms:
-                    archive_name = self._make_archive_name(customization, product, platform, version)
-                    packages[product][family][platform] = {
-                        'file': archive_name,
-                        'size': random.randint(1000000, 2000000),
-                        'md5': hashlib.md5(os.urandom(10)).hexdigest(),
+            # "mod" is for "modification".
+            for platform, archs_and_mods in family_to_platforms.items():
+                packages[product][platform] = {}
+                for arch_and_mod in archs_and_mods:
+                    archive_name = '{}-{}_update-{}-{}.zip'.format(
+                        customization.installer_name,
+                        self._product_infix[product],
+                        version,
+                        self._platform_infix[arch_and_mod],
+                        )
+                    arch, mod = arch_and_mod.split('_')
+                    update_info = {
+                        'product': product,  # For callback only.
+                        'customization': customization.customization_name,  # For callback only.
+                        'version': str(version),
+                        'platform': platform,
+                        'modification': mod,
+                        'arch': arch,
+                        'cloudHost': cloud_host,
+                        'executable': 'install',  # Same for Windows and Linux.
                         }
+                    archive_path = release_dir / archive_name
+                    _create_archive(archive_path, self._callback_url, update_info)
+                    packages[product][platform][arch_and_mod] = {
+                        'file': archive_name,
+                        'size': archive_path.stat().st_size,
+                        'md5': _calculate_md5_of_file(archive_path),
+                        }
+
         update_path = release_dir / 'update.json'
-        packages['cloudHost'] = 'cloud-test.hdw.mx'
+        packages['cloudHost'] = cloud_host
         write_json(update_path, packages)
 
 
 class UpdatesServer(object):
+    _callback_endpoint = '/.install'
+
     def __init__(self, data_dir):
         self.data_dir = data_dir
-        self.dummy_file_path = data_dir / 'dummy.zip'
+        self.callback_requests = []
+        self.download_requests = []
 
-    def generate_data(self):
-        updates = _UpdatesData(self.data_dir)
+    def generate_data(self, base_url):
+        updates = _UpdatesData(self.data_dir, base_url + self._callback_endpoint)
         for customization in known_customizations:
             updates.add_customization(customization)
             for version in {Version('3.1.0.16975'), Version('3.2.0.17000'), Version('4.0.0.21200')}:
                 updates.add_release(customization, version)
         updates.save_root()
-        if not self.dummy_file_path.exists():
-            with self.dummy_file_path.open('wb') as f:
-                f.seek(1024 * 1024 * 100)
-                f.write(b'\0')
 
     def make_app(self, serve_update_archives, range_header_policy):
         app = Flask(__name__)
+
+        @app.route(self._callback_endpoint)
+        def install_callback():
+            self.callback_requests.append(request.args)
+            return '', 204
 
         @app.route('/<path:path>')
         def serve(path):
@@ -128,17 +189,21 @@ class UpdatesServer(object):
                 if path.exists():
                     return send_file(str(path))
             elif path.suffix == '.zip' and serve_update_archives:
-                update_path = path.with_name('update.json')
-                if update_path.exists():
-                    update = read_json(update_path)
-                    for packages_key in {'packages', 'clientPackages'}:
-                        for os_specific_packages in update[packages_key].values():
-                            for package in os_specific_packages.values():
-                                if package['file'] == path.name:
-                                    return send_file(
-                                        str(self.dummy_file_path),
-                                        as_attachment=True, attachment_filename=path.name,
-                                        conditional=range_header_policy == 'support')
+                self.download_requests.append(path)
+                return send_file(
+                    str(path),
+                    as_attachment=True, attachment_filename=path.name,
+                    conditional=range_header_policy == 'support')
             raise NotFound()
 
         return app
+
+
+def make_base_url_for_remote_machine(os_access, local_port):
+    """Convenience function for fixtures"""
+    # TODO: Refactor to get it out of here.
+    port_map_local = os_access.port_map.local
+    address_from_there = port_map_local.address
+    port_from_there = port_map_local.tcp(local_port)
+    url = 'http://{}:{}'.format(address_from_there, port_from_there)
+    return url
