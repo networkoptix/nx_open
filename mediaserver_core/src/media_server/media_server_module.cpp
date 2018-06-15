@@ -155,16 +155,18 @@ QnMediaServerModule::QnMediaServerModule(
 
     m_context.reset(new UniquePtrContext());
 
-    m_context->normalStorageManager.reset(
+   m_context->normalStorageManager.reset(
         new QnStorageManager(
             commonModule(),
-            QnServer::StoragePool::Normal
+            QnServer::StoragePool::Normal,
+            m_settings->roSettings()->value("disableRename").toInt()
         ));
 
-    m_context->backupStorageManager.reset(
+   m_context->backupStorageManager.reset(
         new QnStorageManager(
             commonModule(),
-            QnServer::StoragePool::Backup
+            QnServer::StoragePool::Backup,
+            m_settings->roSettings()->value("disableRename").toInt()
         ));
 
     store(new QnFileDeletor(commonModule()));
@@ -288,4 +290,14 @@ AbstractArchiveIntegrityWatcher* QnMediaServerModule::archiveIntegrityWatcher() 
 nx::mediaserver::RootTool* QnMediaServerModule::rootTool() const
 {
     return m_rootTool.get();
+}
+
+QnStorageManager* QnMediaServerModule::normalStorageManager() const
+{
+    return m_context->normalStorageManager.get();
+}
+
+QnStorageManager* QnMediaServerModule::backupStorageManager() const
+{
+    return m_context->backupStorageManager.get();
 }

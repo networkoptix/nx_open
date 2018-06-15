@@ -464,7 +464,8 @@ static QnStorageManager* QnBackupStorageManager_instance = nullptr;
 
 QnStorageManager::QnStorageManager(
     QnCommonModule* commonModule,
-    QnServer::StoragePool role)
+    QnServer::StoragePool role,
+    bool isRenameDisabled)
 :
     QnCommonModuleAware(commonModule),
     m_role(role),
@@ -475,7 +476,7 @@ QnStorageManager::QnStorageManager(
     m_rebuildCancelled(false),
     m_rebuildArchiveThread(0),
     m_firstStoragesTestDone(false),
-    m_isRenameDisabled(qnServerModule->roSettings()->value("disableRename").toInt()),
+    m_isRenameDisabled(isRenameDisabled),
     m_camInfoWriterHandler(this, commonModule->resourcePool()),
     m_camInfoWriter(&m_camInfoWriterHandler)
 {
