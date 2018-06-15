@@ -16,7 +16,7 @@ def updates_server(work_dir):
     server = UpdatesServer(data_dir)
     server.generate_data()
     app = server.make_app(True, 'support')
-    for port in range(8080, 8100):
+    for port in range(8081, 8100):
         try:
             wsgi_server = wsgiref.simple_server.make_server('localhost', port, app.wsgi_app)
         except socket.error as e:

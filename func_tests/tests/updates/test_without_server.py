@@ -11,7 +11,7 @@ from framework.waiting import ensure_persistence
 def updates_server():
     """Server which has been only bound to protect port from being bound by someone else"""
     address = 'localhost'
-    for port in range(8080, 8100):
+    for port in range(8081, 8100):
         s = socket.socket()
         try:
             s.bind((address, port))
