@@ -4,7 +4,7 @@
 #include <thread>
 
 #include <nx/utils/timer_manager.h>
-#include <nx/utils/settings.h>
+#include <nx/utils/deprecated_settings.h>
 
 namespace nx {
 namespace utils {

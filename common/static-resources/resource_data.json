@@ -21,7 +21,7 @@
             "keys": [
                 "N8Fx-OLAH4|IP-Camera"
             ],
-            "macFromMulticast": true
+            "obtainMacFromMulticast": "Always"
         },
         {
             "_comment1": "Autodiscovery response contains scopes like onvif://www.onvif.org/hardware/DWC-MTT4Wi36 and onvif://www.onvif.org/name/ONVIF",
@@ -31,7 +31,7 @@
                 "DWC-MTT4Wi*|ONVIF",
                 "DWC-MVT4Wi*|ONVIF"
             ],
-            "ignoreMacFromMulticast": true
+            "obtainMacFromMulticast": "Never"
         },
         {
             "keys": [
@@ -589,7 +589,11 @@
                 "Samsung Techwin|SPE-400*",
                 "VIVOTEK|VS8102",
                 "TCS-300|TCAM",
-                "UNIVEW|NVR302-16S-P16*"
+                "UNIVEW|NVR302-16S-P16*",
+                "Sony|SNT-EX104",
+                "Sony|SNT-EX154",
+                "Sony|SNT-EP154",
+                "Dahua|DHI-HCVR7108H*"
             ],
             "analogEncoder": true
         },
@@ -950,7 +954,12 @@
             "portNamePrefixToIgnore": "AlarmOut"
         },
     {
-            "keys": ["DW|DWC-PF5M1TIR"],
+            "keys": [
+            	"DW|DWC-PF5M1TIR",
+            	"DW|DWC-MB45DiA",
+            	"DW|DWC-MV85DiA",
+            	"DW|DWC-PB6M4T"
+            ],
       "fixWrongInputPortNumber": true
     },
         {
@@ -2671,6 +2680,52 @@
                         "space": "35MmEquiv"
                     }
                 }
+            }
+        },
+        {
+            "keys": [
+                "UNIVIEW|NVR302-08S-P8*"
+            ],
+            "forcedOnvifParams":
+            {
+                "videoEncoders":
+                [
+                    "00100,00101",
+                    "00200,00201",
+                    "00300,00301",
+                    "00400,00401",
+                    "00500,00501",
+                    "00600,00601",
+                    "00700,00701",
+                    "00800,00801"
+                ]
+            }
+        },
+        {
+            "keys": [
+                "UNIVIEW|NVR302-16S-P16*"
+            ],
+            "forcedOnvifParams":
+            {
+                "videoEncoders":
+                [
+                    "00100,00101",
+                    "00200,00201",
+                    "00300,00301",
+                    "00400,00401",
+                    "00500,00501",
+                    "00600,00601",
+                    "00700,00701",
+                    "00800,00801",
+                    "00900,00901",
+                    "01000,01001",
+                    "01100,01101",
+                    "01200,01201",
+                    "01300,01301",
+                    "01400,01401",
+                    "01500,01501",
+                    "01600,01601"
+                ]
             }
         }
     ]

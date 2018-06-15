@@ -192,52 +192,146 @@ QnLicensePtr QnLicense::createFromKey(const QByteArray& key)
     return QnLicensePtr(result);
 }
 
-QString QnLicense::displayName() const {
+QString QnLicense::displayName() const
+{
     return QnLicense::displayName(type());
 }
 
-QString QnLicense::displayName(Qn::LicenseType licenseType) {
-    switch (licenseType) {
-    case Qn::LC_Trial:          return tr("Time");
-    case Qn::LC_Analog:         return tr("Analog");
-    case Qn::LC_Professional:   return tr("Professional");
-    case Qn::LC_Edge:           return tr("Edge");
-    case Qn::LC_VMAX:           return tr("Vmax");
-    case Qn::LC_AnalogEncoder:  return tr("Analog Encoder");
-    case Qn::LC_VideoWall:      return tr("Video Wall");
-    case Qn::LC_IO:             return tr("I/O Module");
-    case Qn::LC_Start:          return tr("Start");
-    case Qn::LC_Free:           return tr("Free");
-    case Qn::LC_Bridge:         return tr("Bridge");
-    case Qn::LC_Invalid:        return tr("Invalid");
-    default:
-        break;
+QString QnLicense::displayName(Qn::LicenseType licenseType)
+{
+    switch (licenseType)
+    {
+        case Qn::LC_Trial:
+            return tr("Time");
+        case Qn::LC_Analog:
+            return tr("Analog");
+        case Qn::LC_Professional:
+            return tr("Professional");
+        case Qn::LC_Edge:
+            return tr("Edge");
+        case Qn::LC_VMAX:
+            return tr("Vmax");
+        case Qn::LC_AnalogEncoder:
+            return tr("Analog Encoder");
+        case Qn::LC_VideoWall:
+            return tr("Video Wall");
+        case Qn::LC_IO:
+            return tr("I/O Module");
+        case Qn::LC_Start:
+            return tr("Start");
+        case Qn::LC_Free:
+            return tr("Free");
+        case Qn::LC_Bridge:
+            return tr("Bridge");
+        case Qn::LC_Invalid:
+            return tr("Invalid");
+        default:
+            return QString();
     }
-    return QString();
 }
 
-QString QnLicense::longDisplayName() const {
+QString QnLicense::longDisplayName() const
+{
     return QnLicense::longDisplayName(type());
 }
 
-QString QnLicense::longDisplayName(Qn::LicenseType licenseType) {
-    switch (licenseType) {
-    case Qn::LC_Trial:          return tr("Time Licenses");
-    case Qn::LC_Analog:         return tr("Analog Licenses");
-    case Qn::LC_Professional:   return tr("Professional Licenses");
-    case Qn::LC_Edge:           return tr("Edge Licenses");
-    case Qn::LC_VMAX:           return tr("Vmax Licenses");
-    case Qn::LC_AnalogEncoder:  return tr("Analog Encoder Licenses");
-    case Qn::LC_VideoWall:      return tr("Video Wall Licenses");
-    case Qn::LC_IO:             return tr("I/O Module Licenses");
-    case Qn::LC_Start:          return tr("Start Licenses");
-    case Qn::LC_Free:           return tr("Free license");
-    case Qn::LC_Bridge:         return tr("Bridge Licenses");
-    case Qn::LC_Invalid:        return tr("Invalid Licenses");
-    default:
-        break;
+QString QnLicense::longDisplayName(Qn::LicenseType licenseType)
+{
+    switch (licenseType)
+    {
+        case Qn::LC_Trial:
+            return tr("Time Licenses");
+        case Qn::LC_Analog:
+            return tr("Analog Licenses");
+        case Qn::LC_Professional:
+            return tr("Professional Licenses");
+        case Qn::LC_Edge:
+            return tr("Edge Licenses");
+        case Qn::LC_VMAX:
+            return tr("Vmax Licenses");
+        case Qn::LC_AnalogEncoder:
+            return tr("Analog Encoder Licenses");
+        case Qn::LC_VideoWall:
+            return tr("Video Wall Licenses");
+        case Qn::LC_IO:
+            return tr("I/O Module Licenses");
+        case Qn::LC_Start:
+            return tr("Start Licenses");
+        case Qn::LC_Free:
+            return tr("Free license");
+        case Qn::LC_Bridge:
+            return tr("Bridge Licenses");
+        case Qn::LC_Invalid:
+            return tr("Invalid Licenses");
+        default:
+            return QString();
     }
-    return QString();
+}
+
+QString QnLicense::displayText(Qn::LicenseType licenseType, int count)
+{
+    switch (licenseType)
+    {
+        case Qn::LC_Trial:
+            return tr("%n Time Licenses", "", count);
+        case Qn::LC_Analog:
+            return tr("%n Analog Licenses", "", count);
+        case Qn::LC_Professional:
+            return tr("%n Professional Licenses", "", count);
+        case Qn::LC_Edge:
+            return tr("%n Edge Licenses", "", count);
+        case Qn::LC_VMAX:
+            return tr("%n Vmax Licenses", "", count);
+        case Qn::LC_AnalogEncoder:
+            return tr("%n Analog Encoder Licenses", "", count);
+        case Qn::LC_VideoWall:
+            return tr("%n Video Wall Licenses", "", count);
+        case Qn::LC_IO:
+            return tr("%n I/O Module Licenses", "", count);
+        case Qn::LC_Start:
+            return tr("%n Start Licenses", "", count);
+        case Qn::LC_Free:
+            return tr("%n Free license", "", count);
+        case Qn::LC_Bridge:
+            return tr("%n Bridge Licenses", "", count);
+        case Qn::LC_Invalid:
+            return tr("%n Invalid Licenses", "", count);
+        default:
+            return QString();
+    }
+}
+
+QString QnLicense::displayText(Qn::LicenseType licenseType, int count, int total)
+{
+    switch (licenseType)
+    {
+        case Qn::LC_Trial:
+            return tr("%n/%1 Time Licenses", "", count).arg(total);
+        case Qn::LC_Analog:
+            return tr("%n/%1 Analog Licenses", "", count).arg(total);
+        case Qn::LC_Professional:
+            return tr("%n/%1 Professional Licenses", "", count).arg(total);
+        case Qn::LC_Edge:
+            return tr("%n/%1 Edge Licenses", "", count).arg(total);
+        case Qn::LC_VMAX:
+            return tr("%n/%1 Vmax Licenses", "", count).arg(total);
+        case Qn::LC_AnalogEncoder:
+            return tr("%n/%1 Analog Encoder Licenses", "", count).arg(total);
+        case Qn::LC_VideoWall:
+            return tr("%n/%1 Video Wall Licenses", "", count).arg(total);
+        case Qn::LC_IO:
+            return tr("%n/%1 I/O Module Licenses", "", count).arg(total);
+        case Qn::LC_Start:
+            return tr("%n/%1 Start Licenses", "", count).arg(total);
+        case Qn::LC_Free:
+            return tr("%n/%1 Free license", "", count).arg(total);
+        case Qn::LC_Bridge:
+            return tr("%n/%1 Bridge Licenses", "", count).arg(total);
+        case Qn::LC_Invalid:
+            return tr("%n/%1 Invalid Licenses", "", count).arg(total);
+        default:
+            return QString();
+    }
 }
 
 QString QnLicense::name() const

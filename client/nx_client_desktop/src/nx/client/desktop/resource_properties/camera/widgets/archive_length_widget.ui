@@ -58,7 +58,7 @@
       <item row="1" column="0">
        <widget class="QLabel" name="labelMaxDays">
         <property name="text">
-         <string>Max. Days</string>
+         <string>Max. days</string>
         </property>
         <property name="alignment">
          <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
@@ -81,7 +81,7 @@
       <item row="0" column="0">
        <widget class="QLabel" name="labelMinDays">
         <property name="text">
-         <string>Min. Days</string>
+         <string>Min. days</string>
         </property>
         <property name="alignment">
          <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
@@ -118,13 +118,6 @@
        </spacer>
       </item>
      </layout>
-     <zorder>checkBoxMaxArchive</zorder>
-     <zorder>labelMaxDays</zorder>
-     <zorder>spinBoxMinDays</zorder>
-     <zorder>labelMinDays</zorder>
-     <zorder>checkBoxMinArchive</zorder>
-     <zorder>spinBoxMaxDays</zorder>
-     <zorder>horizontalSpacer</zorder>
     </widget>
    </item>
   </layout>

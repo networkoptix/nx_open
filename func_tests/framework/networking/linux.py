@@ -3,14 +3,14 @@ import logging
 from pprint import pformat
 
 from netaddr import EUI
-from pylru import lrudecorator
 
+from framework.method_caching import cached_property
 from framework.networking.interface import Networking
 from framework.os_access.exceptions import NonZeroExitStatus, exit_status_error_cls
 from framework.os_access.posix_shell import SSH
 from framework.waiting import wait_for_true
 
-logger = logging.getLogger(__name__)  # TODO: Rename all such vars to `_logger`.
+_logger = logging.getLogger(__name__)  # TODO: Rename all such vars to `_logger`.
 
 
 class LinuxNetworking(Networking):
@@ -19,8 +19,7 @@ class LinuxNetworking(Networking):
         self._macs = macs
         self._ssh = ssh_access  # type: SSH
 
-    @property
-    @lrudecorator(1)
+    @cached_property  # TODO: Use cached_getter.
     def interfaces(self):
         output = self._ssh.run_sh_script(
             # language=Bash
@@ -38,7 +37,7 @@ class LinuxNetworking(Networking):
             in csv.reader(output.splitlines(), delimiter='\t')
             if EUI(raw_mac) in mac_values}
         assert mac_values == set(interfaces.keys())
-        logger.info("Interfaces on %r:\n%s", self._ssh, pformat(interfaces))
+        _logger.info("Interfaces on %r:\n%s", self._ssh, pformat(interfaces))
         return interfaces
 
     def reset(self):
@@ -69,7 +68,7 @@ class LinuxNetworking(Networking):
                 ip link set dev ${INTERFACE} up
                 ''',
             env={'INTERFACE': interface, 'ADDRESS': ip, 'PREFIX_LENGTH': prefix_length})
-        logger.info("Machine %r has IP %s/%d on %s (%s).", self._ssh, ip, prefix_length, interface, mac)
+        _logger.info("Machine %r has IP %s/%d on %s (%s).", self._ssh, ip, prefix_length, interface, mac)
 
     def route(self, destination_ip_net, gateway_bound_mac, gateway_ip):
         interface = self.interfaces[gateway_bound_mac]
@@ -81,7 +80,7 @@ class LinuxNetworking(Networking):
             try:
                 self._ssh.run_command(['iptables', '-D', 'OUTPUT', '-j', 'REJECT'])
             except NonZeroExitStatus:
-                logger.debug("No more internet restricting rules in iptables.")
+                _logger.debug("No more internet restricting rules in iptables.")
                 break
         global_ip = '8.8.8.8'
         wait_for_true(

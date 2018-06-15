@@ -24,6 +24,8 @@ namespace utils {
 NX_UTILS_API void logAssert(const log::Message& message);
 void NX_UTILS_API setOnAssertHandler(std::function<void(const log::Message&)> handler);
 
+NX_UTILS_API void crashProgram();
+
 template<typename Reason>
 log::Message assertLog(const char* file, int line, const char* condition, const Reason& message)
 {
@@ -39,13 +41,20 @@ log::Message assertLog(const char* file, int line, const char* condition, const 
     return out;
 }
 
-template<typename ... Arguments>
-void assertCrash(Arguments&& ... args)
+template<typename Reason>
+void assertCrash(const char* file, int line, const char* condition, const Reason& message)
 {
-    const auto out  = assertLog(std::forward<Arguments>(args)...);
-    std::cerr << std::endl << ">>>" << out.toStdString() << std::endl;
+    std::cerr << std::endl << ">>>" 
+        << assertLog(file, line, condition, message).toStdString() << std::endl;
 
-    *reinterpret_cast<volatile int*>(0) = 7;
+    #ifdef _WIN32
+        // Copy error text to stack variable so it is present in mini dump.
+        char textOnStack[256] = { 0 };
+        const auto text = lm("%1").arg(message).toStdString();
+        std::memcpy(textOnStack, text.c_str(), std::min(text.size() + 1, sizeof(textOnStack)));
+    #endif
+
+    crashProgram();
 }
 
 class NX_UTILS_API AssertTimer

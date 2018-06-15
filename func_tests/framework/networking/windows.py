@@ -2,8 +2,8 @@ import logging
 from pprint import pformat
 
 from netaddr import EUI, IPNetwork, mac_eui48
-from pylru import lrudecorator
 
+from framework.method_caching import cached_property
 from framework.networking.interface import Networking
 from framework.os_access.windows_remoting import WinRM
 
@@ -55,20 +55,15 @@ class WindowsNetworking(Networking):
                     for mac, new_name in mac_to_new_name.items()],
                 })
 
-    @property
-    @lrudecorator(1)
+    @cached_property  # TODO: Use cached_getter.
     def interfaces(self):
         self.rename_interfaces(self._names)
         return self._names
 
     def firewall_rule_exists(self):
-        rules = self._winrm.run_powershell_script(
-            # language=PowerShell
-            '''
-                Get-NetFirewallRule -Name:$Name -ErrorAction:SilentlyContinue |
-                    select Name,DisplayName,Direction,RemoteAddress,Action
-                ''',
-            {'name': self._firewall_rule_name})
+        query = self._winrm.wmi_query(u'MSFT_NetFirewallRule', {}, namespace='Root/StandardCimv2')
+        all_rules = list(query.enumerate())
+        rules = [rule for rule in all_rules if rule[u'InstanceID'] == self._firewall_rule_name]
         return bool(rules)
 
     def create_firewall_rule(self):

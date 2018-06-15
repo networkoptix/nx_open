@@ -21,9 +21,9 @@
   <String Id="HelpHeader">설치 도움말</String>
   <String Id="HelpCloseButton">닫기</String>
   <String Id="InstallOptionsButton">옵션:</String>
-  <String Id="InstallInstallButton">Install</String>
+  <String Id="InstallInstallButton">설치</String>
   <String Id="InstallCloseButton">닫기</String>
-  <String Id="InstallAcceptCheckbox">I agree to the</String>
+  <String Id="InstallAcceptCheckbox">에 동의 합니다</String>
   <String Id="InstallLicenseLinkText">사용자 라이센스 계약 보기</String>
   <String Id="OptionsHeader">설치 옵션</String>
   <String Id="OptionsLocationLabel">설치 위치:</String>

@@ -11,11 +11,7 @@ set(tar_file ${distribution_output_dir}/${artifact.name.server}.tar.gz)
 set(zip_file ${distribution_output_dir}/${artifact.name.server_update}.zip)
 set(installer_output_list ${tar_file} ${zip_file})
 
-# Set variables which may depend on current project and are used by create_arm_installer.conf.
-set(project.build.directory ${CMAKE_CURRENT_BINARY_DIR})
-set(build.configuration "") #< Used by create_arm_installer.sh as suffix to lib and bin dirs.
-
-set(conf_file maven/filter-resources/create_arm_installer.conf)
+set(conf_file maven/filter-resources/build_distribution.conf)
 nx_configure_file(
     ${conf_file}
     ${CMAKE_CURRENT_BINARY_DIR}
@@ -40,7 +36,7 @@ nx_configure_directory(
     @ONLY
     OUTPUT_FILES_VARIABLE filtered2)
 
-set(script ${CMAKE_CURRENT_SOURCE_DIR}/maven/bin-resources/create_arm_installer.sh)
+set(script ${CMAKE_CURRENT_SOURCE_DIR}/build_distribution.sh)
 
 add_custom_command(
     OUTPUT ${installer_output_list}
@@ -49,6 +45,6 @@ add_custom_command(
     COMMENT "Creating ARM installer archives"
 )
 
-add_custom_target(arm-installer ALL
+add_custom_target(arm-distribution ALL
     DEPENDS ${installer_output_list}
 )

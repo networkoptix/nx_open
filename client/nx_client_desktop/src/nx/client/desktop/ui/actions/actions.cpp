@@ -554,10 +554,6 @@ void initialize(Manager* manager, Action* root)
         .flags(NoTarget)
         .mode(DesktopMode);
 
-    factory(ShowEulaAction)
-        .flags(NoTarget)
-        .mode(DesktopMode);
-
     factory(AllowStatisticsReportMessageAction)
         .flags(NoTarget)
         .mode(DesktopMode)
@@ -1300,7 +1296,7 @@ void initialize(Manager* manager, Action* root)
         .requiredGlobalPermission(Qn::GlobalEditCamerasPermission)
         .text(ContextMenu::tr("Cancel Upload..."))
         .condition(condition::isTrue(ini().enableWearableCameras)
-            && condition::wearableCameraUploadCancellable());
+            && condition::canCancelWearableCameraUpload());
 
     factory(CameraIssuesAction)
         .mode(DesktopMode)

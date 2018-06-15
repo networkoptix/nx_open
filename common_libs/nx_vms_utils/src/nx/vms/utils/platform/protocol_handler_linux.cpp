@@ -159,7 +159,6 @@ bool registerSystemUriProtocolHandler(
     const QString& protocol,
     const QString& applicationBinaryPath,
     const QString& applicationName,
-    const QString& /*macHandlerBundleIdBase*/,
     const QString& description,
     const QString& /*customization*/,
     const SoftwareVersion& version)

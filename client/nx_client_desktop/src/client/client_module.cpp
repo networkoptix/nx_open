@@ -537,6 +537,9 @@ void QnClientModule::initLog(const QnStartupParameters& startupParams)
     if (logLevel.isEmpty())
         logLevel = qnSettings->logLevel();
 
+    if (ec2TranLogLevel.isEmpty())
+        ec2TranLogLevel = qnSettings->ec2TranLogLevel();
+
     nx::utils::log::Settings logSettings;
     logSettings.maxBackupCount = qnSettings->rawSettings()->value(lit("logArchiveSize"), 10).toUInt();
     logSettings.maxFileSize = qnSettings->rawSettings()->value(lit("maxLogFileSize"), 10 * 1024 * 1024).toUInt();

@@ -237,6 +237,7 @@ class CameraControllerImpl
 public:
     CameraControllerImpl()
     {
+        m_client.setIgnoreMutexAnalyzer(true);
         m_client.setResponseReadTimeout(std::chrono::seconds(5));
         m_client.setMessageBodyReadTimeout(std::chrono::seconds(5));
     }

@@ -1,18 +1,19 @@
-#ifndef QN_HELP_TOPICS_H
-#define QN_HELP_TOPICS_H
+#pragma once
+#if !defined(Q_MOC_RUN)
 
 namespace Qn {
 
-    enum HelpTopic {
-        Empty_Help = 0,
-        Forced_Empty_Help,
+enum HelpTopic {
+    Empty_Help = 0,
+    Forced_Empty_Help,
 
 #define QN_HELP_TOPIC(ID, URL) ID,
 #include "help_topics.i"
+#undef QN_HELP_TOPIC
 
-        HelpTopicCount
-    };
+    HelpTopicCount
+};
 
 } // namespace Qn
 
-#endif // QN_HELP_TOPICS_H
+#endif // !defined(Q_MOC_RUN)

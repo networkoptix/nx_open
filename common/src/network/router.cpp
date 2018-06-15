@@ -76,14 +76,3 @@ QnRoute QnRouter::routeTo(const QnUuid &id)
 
     return result;
 }
-
-void QnRouter::updateRequest(QUrl& url, nx::network::http::HttpHeaders& headers, const QnUuid &id)
-{
-    QnRoute route = routeTo(id);
-    if (route.isValid())
-    {
-        url.setHost(route.addr.address.toString());
-        url.setPort(route.addr.port);
-        headers.emplace("x-server-guid", id.toByteArray());
-    }
-}

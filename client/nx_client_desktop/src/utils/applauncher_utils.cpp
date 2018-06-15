@@ -26,10 +26,10 @@ namespace applauncher
         int timeoutMs = kDefaultTimeoutMs)
     {
         NamedPipeSocket sock;
-        SystemError::ErrorCode resultCode = sock.connectToServerSync( launcherPipeName );
+        SystemError::ErrorCode resultCode = sock.connectToServerSync(launcherPipeName());
         if( resultCode != SystemError::noError )
         {
-            NX_LOG( lit("Failed to connect to local server %1. %2").arg(launcherPipeName).arg(SystemError::toString(resultCode)), cl_logWARNING );
+            NX_LOG( lit("Failed to connect to local server %1. %2").arg(launcherPipeName()).arg(SystemError::toString(resultCode)), cl_logWARNING );
             return api::ResultType::connectError;
         }
 
@@ -39,7 +39,7 @@ namespace applauncher
         resultCode = sock.write(serializedTask.data(), serializedTask.size(), &bytesWritten);
         if( resultCode != SystemError::noError )
         {
-            NX_LOG( lit("Failed to send launch task to local server %1. %2").arg(launcherPipeName).arg(SystemError::toString(resultCode)), cl_logWARNING );
+            NX_LOG( lit("Failed to send launch task to local server %1. %2").arg(launcherPipeName()).arg(SystemError::toString(resultCode)), cl_logWARNING );
             return api::ResultType::connectError;
         }
 
@@ -48,7 +48,7 @@ namespace applauncher
         resultCode = sock.read(buf, sizeof(buf), &bytesRead, timeoutMs);  //ignoring return code
         if( resultCode != SystemError::noError )
         {
-            NX_LOG( lit("Failed to read response from local server %1. %2").arg(launcherPipeName).arg(SystemError::toString(resultCode)), cl_logWARNING );
+            NX_LOG( lit("Failed to read response from local server %1. %2").arg(launcherPipeName()).arg(SystemError::toString(resultCode)), cl_logWARNING );
             return api::ResultType::connectError;
         }
         if( response )

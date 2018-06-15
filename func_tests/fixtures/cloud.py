@@ -19,7 +19,7 @@ def pytest_addoption(parser):
 
 @pytest.fixture(scope='session')
 def customization(mediaserver_installers):
-    customizations = set(installer.customization for installer in mediaserver_installers)
+    customizations = set(installer.customization for installer in mediaserver_installers.values())
     customization, = customizations  # This should be checked in mediaserver_installers fixture.
     return customization
 
@@ -34,7 +34,7 @@ def cloud_host(request, customization):
 def cloud_account_factory(request, customization, cloud_host):
     return CloudAccountFactory(
         request.config.getoption('--cloud-group'),
-        customization.company_name,
+        customization.customization_name,
         cloud_host,
         request.config.getoption('--autotest-email-password') or os.environ.get('AUTOTEST_EMAIL_PASSWORD'))
 

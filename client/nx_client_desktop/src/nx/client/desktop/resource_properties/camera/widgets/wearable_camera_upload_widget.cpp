@@ -45,7 +45,9 @@ void WearableCameraUploadWidget::setStore(CameraSettingsDialogStore* store)
 
 void WearableCameraUploadWidget::loadState(const CameraSettingsDialogState& state)
 {
+    bool progressVisible = false;
     const auto& wearableState = state.singleWearableState;
+
     switch (wearableState.status)
     {
         case WearableState::Unlocked:
@@ -83,7 +85,8 @@ void WearableCameraUploadWidget::loadState(const CameraSettingsDialogState& stat
 
             ui->cancelButton->setEnabled(wearableState.isCancellable());
             ui->uploadProgressBar->setValue(wearableState.progress());
-            ui->stackedWidget->setCurrentWidget(ui->progressPage);
+            ui->stackedWidget->setCurrentWidget(ui->controlsPage);
+            progressVisible = true;
             break;
         }
 
@@ -91,7 +94,12 @@ void WearableCameraUploadWidget::loadState(const CameraSettingsDialogState& stat
             NX_ASSERT(false, Q_FUNC_INFO, "Should never get here");
             ui->stackedWidget->setCurrentWidget(ui->messagePage);
             ui->messageLabel->setText(QString());
+            break;
     }
+
+    ui->controlsPage->setEnabled(!progressVisible);
+    ui->progressPanel->setVisible(progressVisible);
+    ui->line->setVisible(progressVisible);
 }
 
 } // namespace desktop

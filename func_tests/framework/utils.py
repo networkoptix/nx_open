@@ -10,7 +10,7 @@ import pytz
 from pylru import lrudecorator
 from pytz import utc
 
-log = logging.getLogger(__name__)
+_logger = logging.getLogger(__name__)
 
 
 class SimpleNamespace:
@@ -54,9 +54,9 @@ def is_list_inst(l, cls):
 
 
 def log_list(name, values):
-    log.debug('%s:', name)
+    _logger.debug('%s:', name)
     for i, value in enumerate(values):
-        log.debug('\t #%d: %s', i, value)
+        _logger.debug('\t #%d: %s', i, value)
 
 
 def quote(s, char='"'):

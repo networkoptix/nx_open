@@ -37,6 +37,8 @@ public:
 
     QString cgi() const;
     QString submenu() const;
+
+    bool hasParameter() const;
     QString parameterName() const;
     QString parameterValue() const;
     bool shouldAffectAllChannels() const;
@@ -44,6 +46,8 @@ public:
     // Parameter can be applied only to certain device types.
     bool isDeviceTypeSupported(HanwhaDeviceType deviceType) const;
     QSet<QString> associatedParameters() const;
+
+    QSet<QString> ptzTraits() const;
 
     bool isValid() const;
 
@@ -79,9 +83,11 @@ private:
     QString m_parameterValue;
 
     QSet<QString> m_associatedParameters;
+    QSet<QString> m_ptzTraits;
 
     static const std::map<QString, QString HanwhaAdavancedParameterInfo::*> m_stringAuxes;
     static const std::map<QString, bool HanwhaAdavancedParameterInfo::*> m_boolAuxes;
+    static const std::map<QString, QSet<QString> HanwhaAdavancedParameterInfo::*> m_stringSetAuxes;
 };
 
 } // namespace plugins

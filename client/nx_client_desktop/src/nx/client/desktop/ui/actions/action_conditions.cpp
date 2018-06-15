@@ -229,13 +229,8 @@ public:
     virtual ActionVisibility check(
         const Parameters& parameters, QnWorkbenchContext* /*context*/) override
     {
-        const auto& resources = parameters.resources();
-        if (resources.size() != 1 || !resources.front()->hasFlags(Qn::wearable_camera))
-            return InvisibleAction;
-
-        const auto& camera = resources.front().dynamicCast<QnVirtualCameraResource>();
-        NX_ASSERT(camera);
-        if (!camera)
+        const auto camera = parameters.resource().dynamicCast<QnVirtualCameraResource>();
+        if (!camera || !camera->hasFlags(Qn::wearable_camera))
             return InvisibleAction;
 
         const auto state = qnClientModule->wearableManager()->state(camera);
@@ -1858,7 +1853,7 @@ ConditionWrapper wearableCameraUploadEnabled()
         });
 }
 
-ConditionWrapper wearableCameraUploadCancellable()
+ConditionWrapper canCancelWearableCameraUpload()
 {
     return new WearableCameraCondition(
         [](const WearableState& state)

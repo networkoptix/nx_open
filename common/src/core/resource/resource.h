@@ -56,7 +56,6 @@ public:
     virtual QString getUniqueId() const { return getId().toString(); }
     virtual void setUniqId(const QString& value);
 
-
     // TypeId unique string id for resource with SUCH list of params and CLASS
     // in other words TypeId can be used instantiate the right resource
     QnUuid getTypeId() const;
@@ -98,7 +97,6 @@ public:
     void addFlags(Qn::ResourceFlags flags);
     void removeFlags(Qn::ResourceFlags flags);
 
-
     //just a simple resource name
     virtual QString getName() const;
     virtual void setName(const QString& name);
@@ -108,7 +106,6 @@ public:
 
     QString toSearchString() const;
     virtual QStringList searchFilters() const;
-
 
     template<class Resource>
     static QnSharedResourcePointer<Resource> toSharedPointer(const Resource *resource);
@@ -153,13 +150,13 @@ public:
     };
 
     virtual bool setProperty(
-		const QString &key,
-		const QString &value,
+        const QString &key,
+        const QString &value,
         PropertyOptions options = DEFAULT_OPTIONS);
 
     virtual bool setProperty(
-		const QString &key,
-		const QVariant& value,
+        const QString &key,
+        const QVariant& value,
         PropertyOptions options = DEFAULT_OPTIONS);
 
     template<typename Update>

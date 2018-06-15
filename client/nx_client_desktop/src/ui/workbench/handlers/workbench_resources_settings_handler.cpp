@@ -14,7 +14,7 @@
 #include <core/resource/user_resource.h>
 #include <core/resource_management/resource_discovery_manager.h>
 
-#include <nx/client/desktop/resource_properties/camera/legacy_camera_settings_dialog.h>
+#include <nx/client/desktop/resource_properties/camera/legacy/legacy_camera_settings_dialog.h>
 #include <nx/client/desktop/resource_properties/camera/camera_settings_dialog.h>
 
 #include <ui/dialogs/resource_properties/layout_settings_dialog.h>

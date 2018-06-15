@@ -6,6 +6,7 @@
 namespace nx {
 namespace api {
 
+// TODO: #mshevchenko: Rename to MetadataCameraManagerManifest.
 struct /*NX_PLUGIN_UTILS_API*/ AnalyticsDeviceManifest
 {
     QList<QnUuid> supportedEventTypes;

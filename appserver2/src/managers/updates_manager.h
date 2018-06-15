@@ -4,6 +4,7 @@
 #include "nx_ec/data/api_update_data.h"
 #include "utils/db/db_helper.h"
 #include "transaction/transaction.h"
+#include "transaction/message_bus_adapter.h"
 #include "ec2_thread_pool.h"
 #include <nx/utils/concurrent.h>
 

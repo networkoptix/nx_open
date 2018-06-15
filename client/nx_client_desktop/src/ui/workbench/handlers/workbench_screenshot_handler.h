@@ -39,7 +39,7 @@ struct QnScreenshotParameters
     QnAspectRatio customAspectRatio;
     qreal rotationAngle = 0;
 
-    QString timeString() const;
+    QString timeString(bool forFilename = false) const;
 };
 
 /* Proxy class, that starts loading instantly after base provider is set and notifies only once. */

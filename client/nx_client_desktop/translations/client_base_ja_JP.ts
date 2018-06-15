@@ -1415,12 +1415,16 @@ to view more bookmarks</source>
       <translation>高い最小値は、他のカメラのアーカイブ期間を減少させる可能性があります</translation>
     </message>
     <message>
-      <source>Sets when camera archive will be deleted or saved when there is no space for new recordings.</source>
-      <translation>新しい録画のためのスペースがない場合に、カメラのアーカイブを削除または保存するかどうかを設定します</translation>
+      <source>Archive can be deleted in case if there are no space for new recording.</source>
+      <translation>新しい録画のためのスペースがない場合、アーカイブは削除されます</translation>
     </message>
     <message>
-      <source>&quot;Auto&quot; deletes the oldest footage first, regardless of the source.</source>
-      <translation>&quot;自動&quot; は、ソースに関係なく、最も古い記録データを最初に削除します</translation>
+      <source>Min and Max settings determine the age of archive which should be kept for this camera.</source>
+      <translation>最小値と最大値の設定は、このカメラのアーカイブの保持期間を決定します</translation>
+    </message>
+    <message>
+      <source>If &quot;Auto&quot; option is enabled, the oldest footage among all cameras will be deleted first.</source>
+      <translation>&quot;自動&quot; オプションが有効になっている場合、すべてのカメラの中で最も古い映像が最初に削除されます</translation>
     </message>
   </context>
   <context>
@@ -3111,12 +3115,20 @@ to %1</source>
   <context>
     <name>QnCustomBusinessEventWidget</name>
     <message>
-      <source>Event will trigger only if there are matches in caption with any of entered keywords.</source>
-      <translation>入力したキーワードとキャプションが一致している場合にのみ、イベントがトリガーされます</translation>
-    </message>
-    <message>
       <source>If the field is empty, event will always trigger.</source>
       <translation>フィールドが空の場合は、常にイベントがトリガーされます</translation>
+    </message>
+    <message>
+      <source>Event will trigger only if there are matches in the source with any of the entered keywords.</source>
+      <translation>ソースフィールドに入力したキーワードのいずれかと一致するものがある場合にのみ、イベントが発生します</translation>
+    </message>
+    <message>
+      <source>Event will trigger only if there are matches in the caption with any of the entered keywords.</source>
+      <translation>キャプションフィールドに入力したキーワードのいずれかと一致するものがある場合にのみ、イベントが発生します</translation>
+    </message>
+    <message>
+      <source>Event will trigger only if there are matches in the description with any of the entered keywords.</source>
+      <translation>説明フィールドに入力したキーワードのいずれかと一致するものがある場合にのみ、イベントが発生します</translation>
     </message>
   </context>
   <context>
@@ -3333,7 +3345,7 @@ to %1</source>
   <context>
     <name>QnEmptyBusinessActionWidget</name>
     <message>
-      <source>Panic Recording mode switches recording settings for all Cameras to maximum FPS and Quality</source>
+      <source>Panic Recording mode switches recording settings for all cameras to maximum FPS and quality.</source>
       <translation>パニック録画モードは、すべてのカメラの録画設定を最大FPSと品質に切り替えます</translation>
     </message>
   </context>
@@ -3825,6 +3837,10 @@ to %1</source>
       <translation>
         <numerusform>テスト成功 %n ユーザー検出</numerusform>
       </translation>
+    </message>
+    <message>
+      <source>Changing any LDAP settings other than &quot;Search Filter&quot; will result in connectivity loss for all LDAP fetched users.</source>
+      <translation>&quot;検索フィルター&quot; 以外のLDAP設定を変更すると、すべてのLDAPフェッチユーザーの接続が失われます</translation>
     </message>
   </context>
   <context>
@@ -4456,12 +4472,12 @@ to %1</source>
       <translation>クライアントとサーバーが異なるタイムゾーンにある場合に、クライアントで使用する時間（タイムライン、タイムスタンプなど）を設定します</translation>
     </message>
     <message>
-      <source>Length of time each camera on layout will be displayed if you start a Layout Tour.</source>
-      <translation>レイアウトツアー開始後にレイアウトに表示された各カメラの時間</translation>
+      <source>Displays IP addresses for cameras and servers and roles for users.</source>
+      <translation>カメラとサーバーのIPアドレスとユーザーの役割を表示</translation>
     </message>
     <message>
-      <source>Displays IP addresses for cameras and servers and groups for users.</source>
-      <translation>カメラとサーバーのIPアドレスとユーザーグループを表示</translation>
+      <source>Length of time each camera on layout will be displayed if you start a Tour.</source>
+      <translation>レイアウトツアー開始後にレイアウトに表示する各カメラの時間</translation>
     </message>
   </context>
   <context>
@@ -6322,12 +6338,8 @@ to %1</source>
       <translation>USBストレージで録画が有効になりました</translation>
     </message>
     <message>
-      <source>Backup includes servers and cameras settings, users, webpages, event rules, etc. Video is not saved.</source>
-      <translation>バックアップには、サーバーとカメラの設定、ユーザー、Webページ、イベントルールなどが含まれます。ビデオは保存されません</translation>
-    </message>
-    <message>
-      <source>Creates a backup of System configuration that can be restored in case of failure.</source>
-      <translation>障害発生時に復元可能なシステム構成のバックアップを作成します</translation>
+      <source>Reindexing can fix problems with archive or backup if they have been lost or damaged, or if some hardware has been replaced.</source>
+      <translation>アーカイブの再インデックスは、アーカイブやバックアップが紛失または破損した場合、または一部のハードウェアが交換された場合の問題を解決できます</translation>
     </message>
   </context>
   <context>
@@ -6622,12 +6634,16 @@ to %1</source>
       <translation>カメラ設定の最適化有効</translation>
     </message>
     <message>
-      <source>Sends anonymous System information (firmware, codecs, streams, etc.).</source>
-      <translation>匿名のシステム情報（ファームウェア、コーデック、ストリームなど）を送信します</translation>
-    </message>
-    <message>
       <source>Tracks and logs all user actions.</source>
       <translation>すべてのユーザーアクションを追跡して記録する</translation>
+    </message>
+    <message>
+      <source>Includes information about system, such as cameras models and firmware versions, number of servers, etc.</source>
+      <translation>カメラのモデルやファームウェアのバージョン、サーバーの数など、システムに関する情報が含まれます</translation>
+    </message>
+    <message>
+      <source>Does not include any personal information and is completely anonymous.</source>
+      <translation>個人情報は含まず、完全に匿名です</translation>
     </message>
   </context>
   <context>
@@ -7331,6 +7347,21 @@ to %1</source>
     <message>
       <source>Video Wall is removed on the server and will be closed.</source>
       <translation>ビデオウォールは削除され、終了します</translation>
+    </message>
+  </context>
+  <context>
+    <name>QnWorkbenchContext</name>
+    <message>
+      <source>To use the software you must accept the end user license agreement</source>
+      <translation>ソフトウェアを使用するには、エンドユーザー使用許諾契約書に同意する必要があります</translation>
+    </message>
+    <message>
+      <source>Accept</source>
+      <translation>同意</translation>
+    </message>
+    <message>
+      <source>Decline</source>
+      <translation>同意しない</translation>
     </message>
   </context>
   <context>
@@ -8376,16 +8407,20 @@ to %1</source>
       <translation>上のボタンを使用して、サポートされるイベントの一覧を表示するカメラを選択します</translation>
     </message>
     <message>
-      <source>Event will trigger only if there are matches in caption with any of entered keywords.</source>
-      <translation>入力したキーワードとキャプションが一致している場合にのみ、イベントがトリガーされます</translation>
-    </message>
-    <message>
       <source>If the field is empty, event will always trigger.</source>
       <translation>フィールドが空の場合は、常にイベントがトリガーされます</translation>
     </message>
     <message>
       <source>Event will trigger only if there are matches in the description field with any of the entered keywords.</source>
       <translation>説明フィールドに入力したキーワードのいずれかと一致するものがある場合にのみ、イベントが発生します</translation>
+    </message>
+    <message>
+      <source>Event will trigger only if there are matches in the caption with any of the entered keywords.</source>
+      <translation>キャプションフィールドに入力したキーワードのいずれかと一致するものがある場合にのみ、イベントが発生します</translation>
+    </message>
+    <message>
+      <source>This field is case sensitive.</source>
+      <translation>このフィールドは大文字と小文字を区別します</translation>
     </message>
   </context>
   <context>
@@ -8699,10 +8734,6 @@ to %1</source>
       <translation>ベータバージョン %1</translation>
     </message>
     <message>
-      <source>Some functionality may be unavailable or not working properly.</source>
-      <translation>いくつかの機能が使用できないか正しくなる動作しない可能性があります</translation>
-    </message>
-    <message>
       <source>System sends anonymous usage statistics</source>
       <translation>システムは使用状況を匿名で送信する</translation>
     </message>
@@ -8731,16 +8762,8 @@ to %1</source>
       <translation>%2 カメラの %1 のパスワードを変更できませんでした</translation>
     </message>
     <message>
-      <source>To use the software you must accept the end user license agreement</source>
-      <translation>ソフトウェアを使用するには、エンドユーザー使用許諾契約書に同意する必要があります</translation>
-    </message>
-    <message>
-      <source>Accept</source>
-      <translation>同意</translation>
-    </message>
-    <message>
-      <source>Decline</source>
-      <translation>同意しない</translation>
+      <source>Warning! This build is for testing purposes only! Please upgrade to a next available patch or release version once available.</source>
+      <translation>警告！このビルドはテスト目的のみのものです！利用可能な次のパッチまたはリリースバージョンにアップグレードしてください</translation>
     </message>
   </context>
   <context>

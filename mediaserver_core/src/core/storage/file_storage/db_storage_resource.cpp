@@ -27,7 +27,11 @@ QIODevice* QnDbStorageResource::open(const QString& fileName, QIODevice::OpenMod
     m_filePath = removeProtocolPrefix(fileName);
 
     auto resCommonModule = commonModule();
-    NX_ASSERT(resCommonModule, "Common module should be set");
+    if (!resCommonModule)
+    {
+        NX_ASSERT(false, "Common module should be set");
+        return nullptr;
+    }
 
     auto connection = resCommonModule->ec2Connection();
 

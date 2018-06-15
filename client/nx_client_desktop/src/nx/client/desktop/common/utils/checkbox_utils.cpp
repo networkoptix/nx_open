@@ -30,6 +30,11 @@ void CheckboxUtils::setupTristateCheckbox(QCheckBox* checkbox, bool sameValue, b
         checkbox->setCheckState(checked ? Qt::Checked : Qt::Unchecked);
 }
 
+void CheckboxUtils::setupTristateCheckbox(QCheckBox* checkbox, std::optional<bool> checked)
+{
+    setupTristateCheckbox(checkbox, bool(checked), checked.value_or(false));
+}
+
 } // namespace desktop
 } // namespace client
 } // namespace nx

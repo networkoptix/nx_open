@@ -129,7 +129,7 @@ void QnWeekTimeScheduleDialog::updateGridParams(bool fromUserInput)
     if (m_disableUpdateGridParams)
         return;
 
-    QnScheduleGridWidget::CellParams brush;
+    nx::client::desktop::ScheduleGridWidget::CellParams brush;
     brush.recordingType = Qn::RecordingType::never;
     if (ui->valueOnButton->isChecked())
         brush.recordingType = Qn::RecordingType::always;

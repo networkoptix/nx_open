@@ -640,7 +640,7 @@ ConditionWrapper syncIsForced();
 ConditionWrapper wearableCameraUploadEnabled();
 
 /** Whether wearable camera upload can be cancelled. */
-ConditionWrapper wearableCameraUploadCancellable();
+ConditionWrapper canCancelWearableCameraUpload();
 
 } // namespace condition
 
