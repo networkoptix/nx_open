@@ -114,7 +114,7 @@ void ServerMessageBus::sendAlivePeersMessage(const P2pConnectionPtr& connection)
 {
 	auto serializeMessage = [this](const P2pConnectionPtr& connection)
 	{
-		QVector<PeerDistanceRecord> records;
+		std::vector<PeerDistanceRecord> records;
 		records.reserve(m_peers->allPeerDistances.size());
 		const auto localPeer = ApiPersistentIdData(this->localPeer());
 		for (auto itr = m_peers->allPeerDistances.cbegin(); itr != m_peers->allPeerDistances.cend(); ++itr)
@@ -136,9 +136,9 @@ void ServerMessageBus::sendAlivePeersMessage(const P2pConnectionPtr& connection)
             PeerNumberType firstViaNumber = kUnknownPeerNumnber;
             if (!viaList.isEmpty() && !viaList.first().firstVia.isNull())
                 firstViaNumber = m_localShortPeerInfo.encode(viaList.first().firstVia);
-            records.push_back({ peerNumber, minDistance, firstViaNumber });
+            records.emplace_back(PeerDistanceRecord{peerNumber, minDistance, firstViaNumber});
         }
-		NX_ASSERT(!records.isEmpty());
+		NX_ASSERT(!records.empty());
 
         std::sort(records.begin(), records.end(),
             [](const PeerDistanceRecord& left, const PeerDistanceRecord& right)

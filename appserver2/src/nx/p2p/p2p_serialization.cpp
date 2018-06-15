@@ -83,7 +83,7 @@ QString toString(MessageType value)
 }
 
 QByteArray serializePeersMessage(
-    const QVector<PeerDistanceRecord>& records,
+    const std::vector<PeerDistanceRecord>& records,
     int reservedSpaceAtFront)
 {
     QByteArray result;

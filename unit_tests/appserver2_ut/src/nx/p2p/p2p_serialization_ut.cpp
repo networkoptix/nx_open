@@ -83,7 +83,7 @@ TEST(P2pSerialization, PeersMessage)
 {
     using namespace nx::p2p;
 
-    QVector<PeerDistanceRecord> peers;
+    std::vector<PeerDistanceRecord> peers;
     for (PeerNumberType i = 0; i < 100; ++i)
         peers.push_back({i, i * 1000, i});
 
