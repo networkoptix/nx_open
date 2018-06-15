@@ -103,6 +103,7 @@
 #include <nx/client/desktop/utils/upload_manager.h>
 #include <nx/client/desktop/utils/wearable_manager.h>
 #include <nx/client/desktop/analytics/object_display_settings.h>
+#include <nx/client/desktop/ui/common/color_theme.h>
 
 #include <statistics/statistics_manager.h>
 #include <statistics/storage/statistics_file_storage.h>
@@ -669,6 +670,7 @@ void QnClientModule::initSkin(const QnStartupParameters& startupParams)
     auto commonModule = m_clientCoreModule->commonModule();
     commonModule->store(skin.take());
     commonModule->store(customizer.take());
+    commonModule->store(new ColorTheme());
 }
 
 void QnClientModule::initLocalResources(const QnStartupParameters& startupParams)
