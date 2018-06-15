@@ -22,7 +22,6 @@
 #include <ui/style/noptix_style_animator.h>
 #include <ui/style/globals.h>
 #include <ui/style/skin.h>
-#include <ui/widgets/palette_widget.h>
 
 #include <utils/common/scoped_painter_rollback.h>
 #include <utils/common/variant.h>
