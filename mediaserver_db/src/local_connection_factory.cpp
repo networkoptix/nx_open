@@ -103,11 +103,6 @@ LocalConnectionFactory::LocalConnectionFactory(
 
 void LocalConnectionFactory::shutdown()
 {
-	// Have to do it before m_transactionMessageBus destruction since TimeSynchronizationManager
-	// uses QnTransactionMessageBus.
-    if (m_timeSynchronizationManager)
-        m_timeSynchronizationManager->stop();
-
 	m_serverQueryProcessor->waitForAsyncTasks();
 
 	pleaseStop();

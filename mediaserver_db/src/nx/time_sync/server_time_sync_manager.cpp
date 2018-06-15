@@ -67,9 +67,6 @@ void ServerTimeSyncManager::broadcastSystemTime()
 
 ServerTimeSyncManager::~ServerTimeSyncManager()
 {
-    if (commonModule()->ec2Connection())
-        disconnect(commonModule()->ec2Connection()->getTimeNotificationManager().get());
-    stop();
 }
 
 void ServerTimeSyncManager::start()
@@ -108,6 +105,8 @@ void ServerTimeSyncManager::stop()
         m_internetTimeSynchronizer->pleaseStopSync();
         m_internetTimeSynchronizer.reset();
     }
+
+    disconnect(commonModule()->ec2Connection()->getTimeNotificationManager().get());
 }
 
 void ServerTimeSyncManager::initializeTimeFetcher()
