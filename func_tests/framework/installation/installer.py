@@ -27,7 +27,7 @@ Customization = namedtuple('Customization', [
     'windows_service_name', 'windows_installation_subdir', 'windows_app_data_subdir', 'windows_registry_key',
     ])
 
-_known_customizations = {
+known_customizations = {
     Customization(
         customization_name='hanwha',
         installer_name='wave',
@@ -96,7 +96,7 @@ class AmbiguousCustomization(EnvironmentError):
 
 def find_customization(field_name, field_value):
     found = []
-    for customization in _known_customizations:
+    for customization in known_customizations:
         if getattr(customization, field_name) == field_value:
             found.append(customization)
     if not found:
