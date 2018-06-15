@@ -2,6 +2,13 @@
 <!DOCTYPE TS>
 <TS version="2.1" language="en_US" sourcelanguage="en">
 <context>
+    <name>ActionButtonsPanel</name>
+    <message>
+        <source>Press and hold to</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>CameraItem</name>
     <message>
         <source>Select camera</source>
@@ -279,10 +286,6 @@
         <source>Custom-Res</source>
         <translation type="unfinished"></translation>
     </message>
-    <message>
-        <source> (%1)</source>
-        <translation type="unfinished"></translation>
-    </message>
 </context>
 <context>
     <name>LaunchButton</name>
@@ -325,6 +328,29 @@
     <name>LoginButton</name>
     <message>
         <source>Connect</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>LoginUtils</name>
+    <message>
+        <source>Invalid login or password</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>LDAP Server connection timed out</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Server or network is not available</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Incompatible server</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Incompatible server version %1</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

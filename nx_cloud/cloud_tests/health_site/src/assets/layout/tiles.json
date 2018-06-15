@@ -1,65 +1,6 @@
 {
     "tiles": [
         {
-            "title"   : "Cloud Systems Connectivity",
-            "sections": [
-                {
-                    "key"     : "p2p_connections_failure",
-                    "caption" : "PTP Connections",
-                    "messages": {
-                        "error": "Direct connections between Clients and Media servers don't work."
-                    }
-                },
-                {
-                    "key"        : "traffic_relay_failure",
-                    "caption"    : "Proxied Connections",
-                    "messages"   : {
-                        "error": "All proxy servers are offline. Users may experience troubles connecting to their systems."
-                    },
-                    "subsections": [
-                        {
-                            "dimension": "traffic_relay_failure",
-                            "key"      : "relay-fr",
-                            "caption"  : "Frankfurt",
-                            "messages" : {
-                                "error": "Connect to remote systems may not work for clients in Europe and Africa."
-                            }
-                        },
-                        {
-                            "dimension": "traffic_relay_failure",
-                            "key"      : "relay-ny",
-                            "caption"  : "New York",
-                            "messages" : {
-                                "error": "Connect to remote systems may not work for clients in America."
-                            }
-                        },
-                        {
-                            "dimension": "traffic_relay_failure",
-                            "key"      : "relay-la",
-                            "caption"  : "Los Angeles",
-                            "messages" : {
-                                "error": "Connect to remote systems may not work for clients in Asia, Antarctica and Oceania."
-                            }
-                        }
-                    ],
-                    "aggregate"  : [
-                        {
-                            "key"    : "relay-ny",
-                            "message": "Connect to remote systems may not work for clients in America."
-                        },
-                        {
-                            "key"    : "relay-fr",
-                            "message": "Connect to remote systems may not work for clients in Europe and Africa."
-                        },
-                        {
-                            "key"    : "relay-la",
-                            "message": "Connect to remote systems may not work for clients in Asia, Antarctica and Oceania."
-                        }
-                    ]
-                }
-            ]
-        },
-        {
             "title"   : "Cloud Services",
             "sections": [
                 {
@@ -94,7 +35,7 @@
                     "key"     : "cloud_authentication_failure",
                     "caption" : "Cloud Authentication",
                     "messages": {
-                        "error": "Users may experience problems logging in to their systems with desktop/mobile/web clients."
+                        "error": "Users may experience problems logging in to their systems with desktop, mobile or web clients."
                     }
                 },
                 {
@@ -103,6 +44,65 @@
                     "messages": {
                         "error": "E-mail notifications are delayed until the issue is resolved."
                     }
+                }
+            ]
+        },
+        {
+            "title"   : "Cloud Systems Connectivity",
+            "sections": [
+                {
+                    "key"     : "p2p_connections_failure",
+                    "caption" : "PTP Connections",
+                    "messages": {
+                        "error": "Direct connections between clients and media servers don't work."
+                    }
+                },
+                {
+                    "key"        : "traffic_relay_failure",
+                    "caption"    : "Proxied Connections",
+                    "messages"   : {
+                        "error": "All proxy servers are offline. Users may experience troubles connecting to their systems. (Depending on the internet provider, ~80% likelihood connection will still work.)"
+                    },
+                    "subsections": [
+                        {
+                            "dimension": "traffic_relay_failure",
+                            "key"      : "relay-fr",
+                            "caption"  : "Frankfurt",
+                            "messages" : {
+                                "error": "Connect to remote systems may not work for clients in Europe and Africa."
+                            }
+                        },
+                        {
+                            "dimension": "traffic_relay_failure",
+                            "key"      : "relay-ny",
+                            "caption"  : "New York",
+                            "messages" : {
+                                "error": "Connect to remote systems may not work for clients in the Americas."
+                            }
+                        },
+                        {
+                            "dimension": "traffic_relay_failure",
+                            "key"      : "relay-la",
+                            "caption"  : "Los Angeles",
+                            "messages" : {
+                                "error": "Connect to remote systems may not work for clients in Asia, Antarctica and Oceania."
+                            }
+                        }
+                    ],
+                    "aggregate"  : [
+                        {
+                            "key"    : "relay-ny",
+                            "message": "Connect to remote systems may not work for clients in the Americas."
+                        },
+                        {
+                            "key"    : "relay-fr",
+                            "message": "Connect to remote systems may not work for clients in Europe and Africa."
+                        },
+                        {
+                            "key"    : "relay-la",
+                            "message": "Connect to remote systems may not work for clients in Asia, Antarctica and Oceania."
+                        }
+                    ]
                 }
             ]
         }

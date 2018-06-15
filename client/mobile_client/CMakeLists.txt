@@ -137,6 +137,9 @@ if(IOS)
         message(FATAL_ERROR "Cannot get provisioning profile id from \"${provisioning_profile}\"")
     endif()
 
+    message(STATUS
+        "Using provisioning profile: ${provisioning_profile}, id: ${provisioning_profile_id}")
+
     set(system_provisioning_profiles_dir "$ENV{HOME}/Library/MobileDevice/Provisioning Profiles")
     execute_process(
         COMMAND ${CMAKE_COMMAND} -E copy "${provisioning_profile}"
@@ -197,4 +200,10 @@ if(IOS)
     set(ipa_file_name "${distribution_output_dir}/${mobile_client_distribution_name}.ipa")
 
     add_ios_ipa(mobile_client_ipa TARGET mobile_client FILE_NAME ${ipa_file_name})
+
+    set(app_dir "$<TARGET_FILE_DIR:mobile_client>")
+    add_custom_command(TARGET mobile_client PRE_LINK
+        COMMAND ${CMAKE_COMMAND} -E copy_directory ${fonts_directory}/bin/fonts ${app_dir}/fonts
+        COMMENT "Copying fonts"
+    )
 endif()

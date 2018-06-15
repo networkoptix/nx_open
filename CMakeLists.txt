@@ -72,6 +72,12 @@ list(APPEND CMAKE_MODULE_PATH
 include(CMakeParseArguments)
 include(CMakeDependentOption)
 include(ExternalProject)
+
+cmake_dependent_option(codeSigning "Enable code signing"
+    ON "NOT developerBuild"
+    OFF
+)
+
 include(target_detection)
 include(utils)
 include(find_sources)
@@ -116,11 +122,6 @@ include(project_utils)
 include(test_utils)
 
 nx_create_dev_qt_conf()
-
-cmake_dependent_option(codeSigning "Enable code signing"
-    ON "NOT developerBuild"
-    OFF
-)
 
 list(APPEND CMAKE_PREFIX_PATH ${QT_DIR})
 if(MACOSX)

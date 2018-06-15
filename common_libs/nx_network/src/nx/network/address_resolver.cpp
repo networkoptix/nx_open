@@ -1,6 +1,5 @@
 #include "address_resolver.h"
 
-#include <nx/fusion/serialization/lexical.h>
 #include <nx/network/socket_global.h>
 #include <nx/network/stun/extension/stun_extension_types.h>
 #include <nx/utils/std/future.h>

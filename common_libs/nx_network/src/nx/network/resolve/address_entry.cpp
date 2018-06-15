@@ -75,8 +75,11 @@ AddressEntry::AddressEntry(const SocketAddress& address):
     type(AddressType::direct),
     host(address.address)
 {
-    attributes.push_back(AddressAttribute(
-        AddressAttributeType::port, address.port));
+    if (address.port != 0)
+    {
+        attributes.push_back(AddressAttribute(
+            AddressAttributeType::port, address.port));
+    }
 }
 
 bool AddressEntry::operator==(const AddressEntry& rhs) const

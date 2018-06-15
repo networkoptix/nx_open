@@ -1,6 +1,7 @@
 #include "calendar_model.h"
 
 #include <QtCore/QLocale>
+#include <QtCore/QTimeZone>
 
 #include "camera/camera_chunk_provider.h"
 
@@ -16,9 +17,15 @@ namespace {
         }
 
         QDateTime toDateTime() const {
-            return QDateTime(date, QTime(0, 0, 0));
+            return QDateTime(date, QTime(0, 0, 0), Qt::UTC);
         }
     };
+
+QDate utcDateFromMilliseconds(qint64 timeMs)
+{
+    return QDateTime::fromMSecsSinceEpoch(timeMs, QTimeZone(0)).date();
+}
+
 }
 
 class QnCalendarModelPrivate {
@@ -261,8 +268,10 @@ void QnCalendarModelPrivate::updateArchiveInfo() {
             break;
         }
 
-        QDate startDate = QDateTime::fromMSecsSinceEpoch(it->startTimeMs).date();
-        QDate endDate = it->isInfinite() ? QDateTime::currentDateTime().date() : QDateTime::fromMSecsSinceEpoch(it->endTimeMs()).date();
+        const auto startDate = utcDateFromMilliseconds(it->startTimeMs);
+        const auto endDate = it->isInfinite()
+            ? utcDateFromMilliseconds(QDateTime::currentMSecsSinceEpoch())
+            : utcDateFromMilliseconds(it->endTimeMs());
 
         while (i < days.size() && days[i].date < startDate)
             days[i++].hasArchive = false;

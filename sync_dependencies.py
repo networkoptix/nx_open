@@ -74,7 +74,7 @@ def determine_package_versions(
         v["festival"] = "2.1"
 
     if platform == "android":
-        v["qt"] = "5.6.2-2"
+        v["qt"] = "5.6.3"
         v["openssl"] = "1.0.2g"
         v["openal"] = "1.17.2"
 

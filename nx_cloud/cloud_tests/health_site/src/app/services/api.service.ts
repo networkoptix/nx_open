@@ -16,7 +16,6 @@ export class ApiService {
     }
 
     getJSON(): Observable<any> {
-        return this.http
-                   .get('../assets/layout/tiles.json');
+        return this.http.get('../assets/layout/tiles.json');
     }
 }

@@ -11,6 +11,13 @@ type DummyTestSuite struct {
 	revertBrokenStateAfterRun int
 }
 
+func (testSuite *DummyTestSuite) testServiceUp() TestSuiteReport {
+	report := TestSuiteReport{}
+	report.name = "Dummy"
+	report.testReports = append(report.testReports, TestReport{"DummyServiceUp", true, nil})
+	return report
+}
+
 func (testSuite *DummyTestSuite) run() TestSuiteReport {
 	if testSuite.revertBrokenStateAfterRun > 0 && testSuite.runCount == testSuite.revertBrokenStateAfterRun {
 		testSuite.broken = !testSuite.broken
@@ -18,6 +25,7 @@ func (testSuite *DummyTestSuite) run() TestSuiteReport {
 	testSuite.runCount++
 
 	report := TestSuiteReport{}
+	report.name = "Dummy"
 	report.testReports = append(report.testReports, TestReport{"Dummy", !testSuite.broken, nil})
 	return report
 }
@@ -52,6 +60,10 @@ func newTestSuiteCollectionRunnerTestContext(t *testing.T) *TestSuiteCollectionR
 	return &ctx
 }
 
+func (testCtx *TestSuiteCollectionRunnerTestContext) enableServiceUpTests() {
+	testCtx.configuration.maxTimeToWaitForServiceUp = time.Duration(1) * time.Millisecond
+}
+
 func (testCtx *TestSuiteCollectionRunnerTestContext) givenBrokenTestSuite() {
 	testCtx.testSuiteFactory.testSuite.broken = true
 }
@@ -61,7 +73,7 @@ func (testCtx *TestSuiteCollectionRunnerTestContext) givenRunnerWithInfiniteRetr
 	testCtx.configuration.retryTestPeriod = time.Duration(10) * time.Millisecond
 }
 
-func (testCtx *TestSuiteCollectionRunnerTestContext) givenRunnerWithNonZeroRetyTime() {
+func (testCtx *TestSuiteCollectionRunnerTestContext) givenRunnerWithNonZeroRetryTime() {
 	testCtx.configuration.maxTimeToWaitForTestsToPass = time.Duration(100) * time.Millisecond
 	testCtx.configuration.retryTestPeriod = time.Duration(10) * time.Millisecond
 }
@@ -85,12 +97,21 @@ func (testCtx *TestSuiteCollectionRunnerTestContext) thenTestSuiteHasFailed() {
 	testCtx.t.AssertNotEqual(0, testCtx.runner.report.totalFailureCount(), "totalFailureCount")
 }
 
+func (testCtx *TestSuiteCollectionRunnerTestContext) thenServiceUpTestWasInvoked() {
+	testCtx.t.AssertEqual(
+		"DummyServiceUp",
+		testCtx.runner.report.suiteReports[0].testReports[0].name,
+		"testCtx.runner.report.suiteReports[0].testReports[0].name")
+}
+
 func (testCtx *TestSuiteCollectionRunnerTestContext) andTestSuiteRunCountIs(runCount int) {
-	testCtx.t.AssertEqual(runCount, testCtx.testSuiteFactory.testSuite.runCount, "testCtx.testSuiteFactory.testSuite.runCount")
+	testCtx.t.AssertEqual(runCount, testCtx.testSuiteFactory.testSuite.runCount,
+		"testCtx.testSuiteFactory.testSuite.runCount")
 }
 
 func (testCtx *TestSuiteCollectionRunnerTestContext) andTestSuiteRunCountIsGreaterThan(runCount int) {
-	testCtx.t.AssertGreaterThan(testCtx.testSuiteFactory.testSuite.runCount, runCount, "testCtx.testSuiteFactory.testSuite.runCount")
+	testCtx.t.AssertGreaterThan(testCtx.testSuiteFactory.testSuite.runCount, runCount,
+		"testCtx.testSuiteFactory.testSuite.runCount")
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -121,11 +142,31 @@ func TestRunIsRetriedUntilEveryTestPasses(t *testing.T) {
 func TestRunIsRetriedUntilMaxWaitTimePasses(t *testing.T) {
 	testCtx := newTestSuiteCollectionRunnerTestContext(t)
 
-	testCtx.givenRunnerWithNonZeroRetyTime()
+	testCtx.givenRunnerWithNonZeroRetryTime()
 	testCtx.givenBrokenTestSuite()
 
 	testCtx.whenRunTests()
 
 	testCtx.thenTestSuiteHasFailed()
 	testCtx.andTestSuiteRunCountIsGreaterThan(0)
+}
+
+func TestServiceUpIsInvoked(t *testing.T) {
+	testCtx := newTestSuiteCollectionRunnerTestContext(t)
+	testCtx.enableServiceUpTests()
+
+	testCtx.whenRunTests()
+	testCtx.thenServiceUpTestWasInvoked()
+}
+
+func TestSuiteIsPerformedAfterServiceUp(t *testing.T) {
+	// TODO
+}
+
+func TestServiceUpIsRetriedUntilPasses(t *testing.T) {
+	// TODO
+}
+
+func TestServiceUpIsRetriedUntilTimeoutPasses(t *testing.T) {
+	// TODO
 }

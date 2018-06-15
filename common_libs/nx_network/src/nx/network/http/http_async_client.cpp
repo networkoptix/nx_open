@@ -1217,7 +1217,11 @@ void AsyncClient::prepareRequestHeaders(bool useHttp11, const nx::network::http:
         if (httpMethod == nx::network::http::Method::get || httpMethod == nx::network::http::Method::head)
         {
             if (m_contentEncodingUsed)
-                m_request.headers.insert(std::make_pair("Accept-Encoding", "gzip"));
+            {
+                http::insertOrReplaceHeader(
+                    &m_request.headers,
+                    HttpHeader("Accept-Encoding", "gzip"));
+            }
         }
 
         if (m_additionalHeaders.count("Connection") == 0)

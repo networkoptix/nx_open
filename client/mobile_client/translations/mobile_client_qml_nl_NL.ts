@@ -2,6 +2,13 @@
 <!DOCTYPE TS>
 <TS version="2.1" language="nl" sourcelanguage="en">
   <context>
+    <name>ActionButtonsPanel</name>
+    <message>
+      <source>Press and hold to</source>
+      <translation>Ingedrukt houden om te</translation>
+    </message>
+  </context>
+  <context>
     <name>CameraItem</name>
     <message>
       <source>Select camera</source>
@@ -15,6 +22,14 @@
       <source>Offline</source>
       <translation>Offline</translation>
     </message>
+    <message>
+      <source>Password required</source>
+      <translation>Wachtwoord vereist</translation>
+    </message>
+    <message>
+      <source>Unsupported firmware version</source>
+      <translation>Niet-ondersteunde firmwareversie</translation>
+    </message>
   </context>
   <context>
     <name>CloudPanel</name>
@@ -26,8 +41,9 @@
   <context>
     <name>CloudScreen</name>
     <message>
-      <source>Cloud Account</source>
-      <translation>Cloud Account</translation>
+      <source>%1 Account</source>
+      <comment>%1 is the short cloud name (like &apos;Cloud&apos;)</comment>
+      <translation>%1 Account</translation>
     </message>
   </context>
   <context>
@@ -68,16 +84,48 @@
       <translation>Kan niet verbinden met %1</translation>
     </message>
     <message>
-      <source>Email and password cannot be empty</source>
-      <translation>E-mail en wachtwoord kunnen niet leeg zijn</translation>
-    </message>
-    <message>
       <source>Log in</source>
-      <translation>Log in</translation>
+      <translation>Inloggen</translation>
     </message>
     <message>
-      <source>Incorrect email or password</source>
-      <translation>Incorrecte email of wachtwoord</translation>
+      <source>Resend activation email</source>
+      <translation>Stuur activeringsmail opnieuw</translation>
+    </message>
+    <message>
+      <source>Activation email sent</source>
+      <translation>Activeringsmail verzonden</translation>
+    </message>
+    <message>
+      <source>Cannot send activation email</source>
+      <translation>Kan de activerings-e-mail niet verzenden</translation>
+    </message>
+    <message>
+      <source>Check your inbox and visit provided link to activate account</source>
+      <translation>Controleer uw inbox en klik op de link om uw account te activeren</translation>
+    </message>
+    <message>
+      <source>Check your internet connection or try again later</source>
+      <translation>Controleer uw internetverbinding of probeer het later opnieuw</translation>
+    </message>
+    <message>
+      <source>Account not found</source>
+      <translation>Account niet gevonden</translation>
+    </message>
+    <message>
+      <source>Wrong password</source>
+      <translation>Wachtwoord onjuist</translation>
+    </message>
+    <message>
+      <source>Account not activated</source>
+      <translation>Account is niet geactiveerd</translation>
+    </message>
+    <message>
+      <source>Email cannot be empty</source>
+      <translation>Email mag niet leeg zijn</translation>
+    </message>
+    <message>
+      <source>Password cannot be empty</source>
+      <translation>Wachtwoord mag niet leeg zijn</translation>
     </message>
   </context>
   <context>
@@ -112,7 +160,7 @@
     </message>
     <message>
       <source>Password cannot be empty</source>
-      <translation>Wachtwoord kan niet leeg zijn</translation>
+      <translation>Wachtwoord mag niet leeg zijn</translation>
     </message>
   </context>
   <context>
@@ -138,7 +186,7 @@
     </message>
     <message>
       <source>Close</source>
-      <translation>Sluiten</translation>
+      <translation>Afsluiten</translation>
     </message>
     <message>
       <source>Yes</source>
@@ -194,7 +242,7 @@
     </message>
     <message>
       <source>Press any key to go to cameras</source>
-      <translation>Druk op een willekeurige toets om naar camera's te gaan</translation>
+      <translation>Druk op een toets om naar de camera's te gaan</translation>
     </message>
     <message>
       <source>Press F1 to show this message again</source>
@@ -236,7 +284,7 @@
     </message>
     <message>
       <source>Custom-Res</source>
-      <translation>Custom-Res</translation>
+      <translation>Aangepaste-Res</translation>
     </message>
   </context>
   <context>
@@ -250,7 +298,7 @@
     <name>LiteClientControlScreen</name>
     <message>
       <source>Cannot start client</source>
-      <translation>Kan client niet starten</translation>
+      <translation>Kan de client niet starten</translation>
     </message>
     <message>
       <source>Cannot stop client</source>
@@ -281,6 +329,29 @@
     <message>
       <source>Connect</source>
       <translation>Verbinden</translation>
+    </message>
+  </context>
+  <context>
+    <name>LoginUtils</name>
+    <message>
+      <source>Invalid login or password</source>
+      <translation>Ongeldige gebruikersnaam of wachtwoord</translation>
+    </message>
+    <message>
+      <source>LDAP Server connection timed out</source>
+      <translation>LDAP-serververbinding heeft een time-out</translation>
+    </message>
+    <message>
+      <source>Server or network is not available</source>
+      <translation type="unfinished">Server or network is not available</translation>
+    </message>
+    <message>
+      <source>Incompatible server</source>
+      <translation type="unfinished">Incompatible server</translation>
+    </message>
+    <message>
+      <source>Incompatible server version %1</source>
+      <translation type="unfinished">Incompatible server version %1</translation>
     </message>
   </context>
   <context>
@@ -346,6 +417,22 @@
     <message>
       <source>Best quality</source>
       <translation>Beste kwaliteit</translation>
+    </message>
+    <message>
+      <source>Transcoding is disabled.</source>
+      <translation>Transcoderen is uitgeschakeld.</translation>
+    </message>
+    <message>
+      <source>Transcoding is not supported for this camera.</source>
+      <translation>Transcodering wordt niet ondersteund voor deze camera.</translation>
+    </message>
+    <message>
+      <source>Transcoding is not supported for servers with version lower than 3.0.</source>
+      <translation>Transcoderen wordt niet ondersteund voor servers met een versie lager dan 3.0.</translation>
+    </message>
+    <message>
+      <source>Transcoding is not supported for ARM servers.</source>
+      <translation>Transcoderen wordt niet ondersteund voor ARM-servers.</translation>
     </message>
   </context>
   <context>
@@ -416,7 +503,7 @@
     </message>
     <message>
       <source>Login</source>
-      <translation>Login</translation>
+      <translation>Gebruikersnaam</translation>
     </message>
     <message>
       <source>Password</source>
@@ -435,7 +522,7 @@
     <name>SessionItem</name>
     <message>
       <source>This server has too old version. Please update it to the latest version.</source>
-      <translation>Deze server heeft te oude versie. Update het bij de nieuwste versie.</translation>
+      <translation>Deze server heeft een te oude versie. Update deze naar de nieuwste versie.</translation>
     </message>
     <message>
       <source>OFFLINE</source>
@@ -443,7 +530,7 @@
     </message>
     <message>
       <source>INCOMPATIBLE</source>
-      <translation>INCOMPATIBELE</translation>
+      <translation>INCOMPATIBLE</translation>
     </message>
     <message>
       <source>UNREACHABLE</source>
@@ -451,18 +538,14 @@
     </message>
     <message>
       <source>Connect to this server from web browser or through desktop client to set it up</source>
-      <translation>Verbinding maken met deze server vanuit een webbrowser of via een desktopclient om het in te stellen</translation>
+      <translation>Maak verbinding met deze server vanuit de webbrowser of via de desktopclient om deze in te stellen</translation>
     </message>
   </context>
   <context>
     <name>SessionsScreen</name>
     <message>
       <source>Log in to %1</source>
-      <translation>Inloggen op %1</translation>
-    </message>
-    <message>
-      <source>Cannot connect to %1</source>
-      <translation>Kan niet verbinden met %1</translation>
+      <translation>Log in op %1</translation>
     </message>
     <message>
       <source>Check your network connection or press &quot;%1&quot; button to enter a known server address.</source>
@@ -505,7 +588,15 @@
     </message>
     <message>
       <source>Save passwords for servers</source>
-      <translation>Onthou de wachtwoorden voor servers</translation>
+      <translation>Sla de wachtwoorden voor de servers op</translation>
+    </message>
+    <message>
+      <source>What to do with currently saved passwords?</source>
+      <translation>Wat te doen met de momenteel opgeslagen wachtwoorden?</translation>
+    </message>
+    <message>
+      <source>Delete</source>
+      <translation>Verwijder</translation>
     </message>
   </context>
   <context>
@@ -634,6 +725,38 @@
       <source>Cannot play any video stream</source>
       <translation>Kan geen enkele videostream afspelen</translation>
     </message>
+    <message>
+      <source>Not enough licenses</source>
+      <translation>Niet genoeg licenties</translation>
+    </message>
+    <message>
+      <source>Password required</source>
+      <translation>Wachtwoord vereist</translation>
+    </message>
+    <message>
+      <source>Set password on this camera using Wisenet WAVE client or camera web-page to view video</source>
+      <translation>Stel een wachtwoord in voor deze camera met behulp van de Wisenet WAVE client of de webpagina van de camera om video te bekijken</translation>
+    </message>
+    <message>
+      <source>Unsupported firmware version</source>
+      <translation>Niet-ondersteunde firmwareversie</translation>
+    </message>
+    <message>
+      <source>Please update firmware</source>
+      <translation>Gelieve de firmware te updaten</translation>
+    </message>
+    <message>
+      <source>Too many connections</source>
+      <translation>Teveel verbindingen</translation>
+    </message>
+    <message>
+      <source>I/O interface not supported yet</source>
+      <translation>I/O interface wordt nog niet gesteund</translation>
+    </message>
+    <message>
+      <source>In this app I/O module can be used as a sound input device only. To use it as a control module, please use desktop version of %1</source>
+      <translation>In deze app kan de I/O-module alleen als geluidsinvoerapparaat worden gebruikt. Gebruik de desktopversie van %1 om hem als een controlemodule te gebruiken</translation>
+    </message>
   </context>
   <context>
     <name>VideoNavigation</name>
@@ -644,11 +767,6 @@
     <message>
       <source>LIVE</source>
       <translation>LIVE</translation>
-    </message>
-    <message>
-      <source>d MMMM yyyy</source>
-      <comment>DO NOT TRANSLATE THIS STRING!</comment>
-      <translation type="unfinished">d MMMM yyyy</translation>
     </message>
   </context>
   <context>
@@ -667,6 +785,17 @@
     <message>
       <source>Skip</source>
       <translation>Overslaan</translation>
+    </message>
+  </context>
+  <context>
+    <name>main</name>
+    <message>
+      <source>Server offline. Reconnecting...</source>
+      <translation>Server offline. Opnieuw verbinding maken...</translation>
+    </message>
+    <message>
+      <source>Cannot connect to %1</source>
+      <translation>Kan geen verbinding maken met %1</translation>
     </message>
   </context>
 </TS>

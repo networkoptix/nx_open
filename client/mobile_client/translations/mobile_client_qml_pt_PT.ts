@@ -2,10 +2,17 @@
 <!DOCTYPE TS>
 <TS version="2.1" language="pt-PT" sourcelanguage="en">
   <context>
+    <name>ActionButtonsPanel</name>
+    <message>
+      <source>Press and hold to</source>
+      <translation type="unfinished">Press and hold to</translation>
+    </message>
+  </context>
+  <context>
     <name>CameraItem</name>
     <message>
       <source>Select camera</source>
-      <translation type="unfinished">Select camera</translation>
+      <translation>Select camera</translation>
     </message>
     <message>
       <source>Authentication required</source>
@@ -15,19 +22,28 @@
       <source>Offline</source>
       <translation type="unfinished">Offline</translation>
     </message>
+    <message>
+      <source>Password required</source>
+      <translation type="unfinished">Password required</translation>
+    </message>
+    <message>
+      <source>Unsupported firmware version</source>
+      <translation type="unfinished">Unsupported firmware version</translation>
+    </message>
   </context>
   <context>
     <name>CloudPanel</name>
     <message>
       <source>Log in to %1</source>
-      <translation type="unfinished">Log in to %1</translation>
+      <translation>Log in to %1</translation>
     </message>
   </context>
   <context>
     <name>CloudScreen</name>
     <message>
-      <source>Cloud Account</source>
-      <translation type="unfinished">Cloud Account</translation>
+      <source>%1 Account</source>
+      <comment>%1 is the short cloud name (like &apos;Cloud&apos;)</comment>
+      <translation type="unfinished">%1 Account</translation>
     </message>
   </context>
   <context>
@@ -45,19 +61,19 @@
     <name>CredentialsEditor</name>
     <message>
       <source>Email</source>
-      <translation type="unfinished">Email</translation>
+      <translation>Email</translation>
     </message>
     <message>
       <source>Password</source>
-      <translation type="unfinished">Password</translation>
+      <translation>Password</translation>
     </message>
     <message>
       <source>Learn more about %1</source>
-      <translation type="unfinished">Learn more about %1</translation>
+      <translation>Learn more about %1</translation>
     </message>
     <message>
       <source>Create account</source>
-      <translation type="unfinished">Create account</translation>
+      <translation>Create account</translation>
     </message>
     <message>
       <source>Forgot your password?</source>
@@ -65,19 +81,51 @@
     </message>
     <message>
       <source>Cannot connect to %1</source>
-      <translation type="unfinished">Cannot connect to %1</translation>
-    </message>
-    <message>
-      <source>Email and password cannot be empty</source>
-      <translation type="unfinished">Email and password cannot be empty</translation>
+      <translation>Cannot connect to %1</translation>
     </message>
     <message>
       <source>Log in</source>
-      <translation type="unfinished">Log in</translation>
+      <translation>Log in</translation>
     </message>
     <message>
-      <source>Incorrect email or password</source>
-      <translation type="unfinished">Incorrect email or password</translation>
+      <source>Resend activation email</source>
+      <translation type="unfinished">Resend activation email</translation>
+    </message>
+    <message>
+      <source>Activation email sent</source>
+      <translation type="unfinished">Activation email sent</translation>
+    </message>
+    <message>
+      <source>Cannot send activation email</source>
+      <translation type="unfinished">Cannot send activation email</translation>
+    </message>
+    <message>
+      <source>Check your inbox and visit provided link to activate account</source>
+      <translation type="unfinished">Check your inbox and visit provided link to activate account</translation>
+    </message>
+    <message>
+      <source>Check your internet connection or try again later</source>
+      <translation type="unfinished">Check your internet connection or try again later</translation>
+    </message>
+    <message>
+      <source>Account not found</source>
+      <translation type="unfinished">Account not found</translation>
+    </message>
+    <message>
+      <source>Wrong password</source>
+      <translation type="unfinished">Wrong password</translation>
+    </message>
+    <message>
+      <source>Account not activated</source>
+      <translation type="unfinished">Account not activated</translation>
+    </message>
+    <message>
+      <source>Email cannot be empty</source>
+      <translation>Email cannot be empty</translation>
+    </message>
+    <message>
+      <source>Password cannot be empty</source>
+      <translation>A password não pode estar vazia</translation>
     </message>
   </context>
   <context>
@@ -108,11 +156,11 @@
     </message>
     <message>
       <source>Login cannot be empty</source>
-      <translation type="unfinished">Login cannot be empty</translation>
+      <translation>O login não pode estar vazio</translation>
     </message>
     <message>
       <source>Password cannot be empty</source>
-      <translation type="unfinished">Password cannot be empty</translation>
+      <translation>A password não pode estar vazia</translation>
     </message>
   </context>
   <context>
@@ -130,7 +178,7 @@
     <name>DialogButtonBox</name>
     <message>
       <source>OK</source>
-      <translation type="unfinished">OK</translation>
+      <translation>OK</translation>
     </message>
     <message>
       <source>Cancel</source>
@@ -220,15 +268,15 @@
     </message>
     <message>
       <source>%1 Mbps</source>
-      <translation type="unfinished">%1 Mbps</translation>
+      <translation>%1 Mbps</translation>
     </message>
     <message>
       <source>Hi-Res</source>
-      <translation type="unfinished">Hi-Res</translation>
+      <translation>Hi-Res</translation>
     </message>
     <message>
       <source>Lo-Res</source>
-      <translation type="unfinished">Lo-Res</translation>
+      <translation>Lo-Res</translation>
     </message>
     <message>
       <source>Keyfr + Lo-Res</source>
@@ -284,6 +332,29 @@
     </message>
   </context>
   <context>
+    <name>LoginUtils</name>
+    <message>
+      <source>Invalid login or password</source>
+      <translation type="unfinished">Invalid login or password</translation>
+    </message>
+    <message>
+      <source>LDAP Server connection timed out</source>
+      <translation>Timeout da ligação ao Servidor LDAP</translation>
+    </message>
+    <message>
+      <source>Server or network is not available</source>
+      <translation type="unfinished">Server or network is not available</translation>
+    </message>
+    <message>
+      <source>Incompatible server</source>
+      <translation type="unfinished">Incompatible server</translation>
+    </message>
+    <message>
+      <source>Incompatible server version %1</source>
+      <translation type="unfinished">Incompatible server version %1</translation>
+    </message>
+  </context>
+  <context>
     <name>MoveOnTapOverlay</name>
     <message>
       <source>Tap on the image to position your camera</source>
@@ -298,7 +369,7 @@
     <name>NoCameraItem</name>
     <message>
       <source>No image</source>
-      <translation type="unfinished">No image</translation>
+      <translation>No image</translation>
     </message>
   </context>
   <context>
@@ -347,6 +418,22 @@
       <source>Best quality</source>
       <translation type="unfinished">Best quality</translation>
     </message>
+    <message>
+      <source>Transcoding is disabled.</source>
+      <translation type="unfinished">Transcoding is disabled.</translation>
+    </message>
+    <message>
+      <source>Transcoding is not supported for this camera.</source>
+      <translation type="unfinished">Transcoding is not supported for this camera.</translation>
+    </message>
+    <message>
+      <source>Transcoding is not supported for servers with version lower than 3.0.</source>
+      <translation type="unfinished">Transcoding is not supported for servers with version lower than 3.0.</translation>
+    </message>
+    <message>
+      <source>Transcoding is not supported for ARM servers.</source>
+      <translation type="unfinished">Transcoding is not supported for ARM servers.</translation>
+    </message>
   </context>
   <context>
     <name>ResourcesScreen</name>
@@ -372,7 +459,7 @@
     </message>
     <message>
       <source>Nothing found</source>
-      <translation type="unfinished">Nothing found</translation>
+      <translation>Nothing found</translation>
     </message>
     <message>
       <source>Cannot connect to server</source>
@@ -387,14 +474,14 @@
     <name>SearchToolBar</name>
     <message>
       <source>Search</source>
-      <translation>Pesquisa</translation>
+      <translation>Pesquisar</translation>
     </message>
   </context>
   <context>
     <name>SelectCameraDummy</name>
     <message>
       <source>Select camera</source>
-      <translation type="unfinished">Select camera</translation>
+      <translation>Select camera</translation>
     </message>
     <message>
       <source>Press Ctrl + Arrow or use mouse wheel</source>
@@ -416,11 +503,11 @@
     </message>
     <message>
       <source>Login</source>
-      <translation type="unfinished">Login</translation>
+      <translation>Login</translation>
     </message>
     <message>
       <source>Password</source>
-      <translation type="unfinished">Password</translation>
+      <translation>Password</translation>
     </message>
     <message>
       <source>Hosts</source>
@@ -439,15 +526,15 @@
     </message>
     <message>
       <source>OFFLINE</source>
-      <translation type="unfinished">OFFLINE</translation>
+      <translation>OFFLINE</translation>
     </message>
     <message>
       <source>INCOMPATIBLE</source>
-      <translation type="unfinished">INCOMPATIBLE</translation>
+      <translation>INCOMPATIBLE</translation>
     </message>
     <message>
       <source>UNREACHABLE</source>
-      <translation type="unfinished">UNREACHABLE</translation>
+      <translation>UNREACHABLE</translation>
     </message>
     <message>
       <source>Connect to this server from web browser or through desktop client to set it up</source>
@@ -458,11 +545,7 @@
     <name>SessionsScreen</name>
     <message>
       <source>Log in to %1</source>
-      <translation type="unfinished">Log in to %1</translation>
-    </message>
-    <message>
-      <source>Cannot connect to %1</source>
-      <translation type="unfinished">Cannot connect to %1</translation>
+      <translation>Log in to %1</translation>
     </message>
     <message>
       <source>Check your network connection or press &quot;%1&quot; button to enter a known server address.</source>
@@ -507,6 +590,14 @@
       <source>Save passwords for servers</source>
       <translation type="unfinished">Save passwords for servers</translation>
     </message>
+    <message>
+      <source>What to do with currently saved passwords?</source>
+      <translation type="unfinished">What to do with currently saved passwords?</translation>
+    </message>
+    <message>
+      <source>Delete</source>
+      <translation>Apagar</translation>
+    </message>
   </context>
   <context>
     <name>SideNavigation</name>
@@ -528,7 +619,7 @@
     </message>
     <message>
       <source>Disconnect from Server</source>
-      <translation type="unfinished">Disconnect from Server</translation>
+      <translation>Disconnect from Server</translation>
     </message>
   </context>
   <context>
@@ -553,7 +644,7 @@
     </message>
     <message>
       <source>New Server</source>
-      <translation type="unfinished">New Server</translation>
+      <translation>New Server</translation>
     </message>
   </context>
   <context>
@@ -594,7 +685,7 @@
     </message>
     <message>
       <source>(Space)</source>
-      <translation type="unfinished">(Space)</translation>
+      <translation>(Espaço)</translation>
     </message>
   </context>
   <context>
@@ -634,6 +725,38 @@
       <source>Cannot play any video stream</source>
       <translation type="unfinished">Cannot play any video stream</translation>
     </message>
+    <message>
+      <source>Not enough licenses</source>
+      <translation type="unfinished">Not enough licenses</translation>
+    </message>
+    <message>
+      <source>Password required</source>
+      <translation type="unfinished">Password required</translation>
+    </message>
+    <message>
+      <source>Set password on this camera using Wisenet WAVE client or camera web-page to view video</source>
+      <translation type="unfinished">Set password on this camera using Wisenet WAVE client or camera web-page to view video</translation>
+    </message>
+    <message>
+      <source>Unsupported firmware version</source>
+      <translation type="unfinished">Unsupported firmware version</translation>
+    </message>
+    <message>
+      <source>Please update firmware</source>
+      <translation type="unfinished">Please update firmware</translation>
+    </message>
+    <message>
+      <source>Too many connections</source>
+      <translation type="unfinished">Too many connections</translation>
+    </message>
+    <message>
+      <source>I/O interface not supported yet</source>
+      <translation type="unfinished">I/O interface not supported yet</translation>
+    </message>
+    <message>
+      <source>In this app I/O module can be used as a sound input device only. To use it as a control module, please use desktop version of %1</source>
+      <translation type="unfinished">In this app I/O module can be used as a sound input device only. To use it as a control module, please use desktop version of %1</translation>
+    </message>
   </context>
   <context>
     <name>VideoNavigation</name>
@@ -644,11 +767,6 @@
     <message>
       <source>LIVE</source>
       <translation>Em Directo</translation>
-    </message>
-    <message>
-      <source>d MMMM yyyy</source>
-      <comment>DO NOT TRANSLATE THIS STRING!</comment>
-      <translation type="unfinished">d MMMM yyyy</translation>
     </message>
   </context>
   <context>
@@ -666,7 +784,18 @@
     <name>WelcomeScreen</name>
     <message>
       <source>Skip</source>
-      <translation type="unfinished">Skip</translation>
+      <translation>Skip</translation>
+    </message>
+  </context>
+  <context>
+    <name>main</name>
+    <message>
+      <source>Server offline. Reconnecting...</source>
+      <translation type="unfinished">Server offline. Reconnecting...</translation>
+    </message>
+    <message>
+      <source>Cannot connect to %1</source>
+      <translation>Cannot connect to %1</translation>
     </message>
   </context>
 </TS>
