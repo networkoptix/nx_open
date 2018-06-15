@@ -4,8 +4,6 @@
 #include <QtCore/QSharedPointer>
 #include <QtWidgets/QPushButton>
 
-#include <nx/fusion/model_functions.h>
-
 #include <core/resource_management/resource_pool.h>
 #include <core/resource_management/resources_changes_manager.h>
 #include <core/resource/camera_resource.h>
@@ -130,32 +128,6 @@ struct CameraSettingsDialog::Private
     }
 };
 
-enum class TestEnum
-{
-    a,
-    b,
-    c
-};
-
-QN_FUSION_DECLARE_FUNCTIONS(TestEnum, (lexical)(debug))
-QN_FUSION_DEFINE_FUNCTIONS(TestEnum, (debug))
-
-QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(nx::client::desktop, TestEnum,
-    (TestEnum::a, "a")
-    (TestEnum::b, "b")
-    (TestEnum::c, "c"))
-
-struct TestStruct
-{
-    QString name;
-    int value;
-};
-QN_FUSION_DECLARE_FUNCTIONS(TestStruct, (debug))
-QN_FUSION_ADAPT_STRUCT_FUNCTIONS(
-    TestStruct,
-    (debug),
-    (name)(value))
-
 CameraSettingsDialog::CameraSettingsDialog(QWidget* parent):
     base_type(parent),
     QnSessionAwareDelegate(parent, InitializationMode::lazy),
@@ -165,13 +137,6 @@ CameraSettingsDialog::CameraSettingsDialog(QWidget* parent):
     ui->setupUi(this);
     setButtonBox(ui->buttonBox);
     ui->alertBar->setReservedSpace(false);
-
-    TestStruct testStruct{ lit("Qwerty"), 100500 };
-    qDebug() << testStruct;
-
-    TestEnum e(TestEnum::a);
-    qDebug() << QnLexical::serialized(e);
-    qDebug() << e;
 
     d->store = new CameraSettingsDialogStore(this);
     connect(d->store, &CameraSettingsDialogStore::stateChanged, this,
