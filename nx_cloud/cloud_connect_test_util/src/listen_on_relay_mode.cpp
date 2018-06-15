@@ -50,7 +50,7 @@ static void httpRequestHandler(
 {
     auto responseMessage = std::make_unique<nx::network::http::BufferSource>(
         "text/plain",
-        lm("Hello from %1 %2")
+        lm("Hello from %1 %2\r\n")
             .args(request.requestLine.method, request.requestLine.url.path()).toUtf8());
 
     std::cout << request.requestLine.method.toStdString() << " "
