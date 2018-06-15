@@ -68,8 +68,8 @@ private:
     {                                                                               \
         const auto nonConstThis = const_cast<QnThreadedPtzController*>(this);       \
         const Qn::PtzCommand command = COMMAND;                                     \
-        const nx::core::ptz::Options options = OPTIONS;                             \
-        if (!nonConstThis->supports(command, options))                              \
+        const nx::core::ptz::Options internalOptions = OPTIONS;                     \
+        if (!nonConstThis->supports(command, internalOptions))                      \
             return false;                                                           \
                                                                                     \
         runCommand(command,                                                         \

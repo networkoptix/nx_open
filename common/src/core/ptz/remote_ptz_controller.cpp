@@ -68,8 +68,8 @@ int QnRemotePtzController::nextSequenceNumber()
     {                                                                           \
         const auto nonConstThis = const_cast<QnRemotePtzController*>(this);     \
         const Qn::PtzCommand command = COMMAND;                                 \
-        const nx::core::ptz::Options options = OPTIONS;                         \
-        if (nonConstThis->isPointless(command, options))                        \
+        const nx::core::ptz::Options internalOptions = OPTIONS;                 \
+        if (nonConstThis->isPointless(command, internalOptions))                \
             return false;                                                       \
                                                                                 \
         auto server = getMediaServer();                                         \

@@ -20,11 +20,6 @@ namespace {
         return param.isValid() && !QnCameraAdvancedParameter::dataTypeHasValue(param.dataType);
     }
 
-    bool parameterIsCustomCommand(const QnCameraAdvancedParameter &param)
-    {
-        return param.isValid() && param.writeCmd.startsWith(lit("custom_"));
-    }
-
     QSet<QString> parameterIds(const QnCameraAdvancedParamGroup& group) {
         QSet<QString> result;
         for (const QnCameraAdvancedParamGroup &subGroup: group.groups)
@@ -221,7 +216,15 @@ void QnCameraAdvancedParamsWidget::sendCustomParameterCommand(const QnCameraAdva
             speed.pan = values[0].toFloat(&ok);
             speed.tilt = values[1].toFloat(&ok);
 
-            qDebug() << "Sending custom_ptr(pan=" << speed.pan << ", tilt=" << speed.tilt << ", rot=" << speed.zoom << ")";
+            // Control provides the angle in range [-180;180],
+            // but we should send values in range [-1.0, 1.0].
+            speed.rotation = values[2].toFloat(&ok) / 180.0;
+            if (speed.rotation > 1.0)
+                speed.rotation = 1.0;
+            if (speed.rotation < -1.0)
+                speed.rotation = -1.0;
+
+            qDebug() << "Sending custom_ptr(pan=" << speed.pan << ", tilt=" << speed.tilt << ", rot=" << speed.rotation << ")";
             // TODO: Implement rotation stuff
             serverConnection->ptzContinuousMoveAsync(
                 m_camera,
@@ -252,7 +255,7 @@ void QnCameraAdvancedParamsWidget::sendCustomParameterCommand(const QnCameraAdva
 
 void QnCameraAdvancedParamsWidget::at_ptzCommandProcessed(int status, const QVariant& reply, int handle)
 {
-
+    // Just an empty handler for REST response.
 }
 
 
@@ -370,7 +373,7 @@ void QnCameraAdvancedParamsWidget::at_advancedParamChanged(const QString &id, co
     if (!parameter.isValid())
         return;
 
-    if (parameterIsCustomCommand(parameter))
+    if (parameter.isCustomControl())
     {
         // This is a custom parameter with specific API.
         sendCustomParameterCommand(parameter, value);
