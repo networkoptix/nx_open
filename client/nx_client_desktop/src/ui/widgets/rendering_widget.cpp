@@ -1,5 +1,7 @@
 #include "rendering_widget.h"
 
+#include <QtCore/QTimer>
+
 #include <camera/resource_display.h>
 #include <camera/cam_display.h>
 
@@ -29,14 +31,11 @@ QSize rendererSourceSize(const QnResourceWidgetRenderer* renderer)
 
 
 QnRenderingWidget::QnRenderingWidget(
-    const QGLFormat& format,
     QWidget* parent,
     QGLWidget* shareWidget,
     Qt::WindowFlags f)
     :
-    QnGLWidget(format, parent, shareWidget, f),
-    m_display(nullptr),
-    m_renderer(nullptr)
+    QGLWidget(parent, shareWidget, f)
 {
     QTimer* timer = new QTimer(this);
     connect(timer, &QTimer::timeout, this, [this]() { update(); });
@@ -193,7 +192,7 @@ void QnRenderingWidget::ensureDisplay()
 // -------------------------------------------------------------------------- //
 void QnRenderingWidget::initializeGL()
 {
-    QnGLWidget::initializeGL();
+    QGLWidget::initializeGL();
     invalidateDisplay(); /* OpenGL context may have changed. */
 
     glClearColor(0, 0, 0, 0);
