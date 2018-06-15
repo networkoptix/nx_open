@@ -422,12 +422,14 @@ void QnTransactionMessageBus::onGotDistributedMutexTransaction(const QnTransacti
         emit gotLockResponse(tran.params);
 }
 
-void QnTransactionMessageBus::onGotTransactionSyncResponse(QnTransactionTransport* sender, const QnTransaction<QnTranStateResponse>& /*tran*/)
+void QnTransactionMessageBus::onGotTransactionSyncResponse(QnTransactionTransport* sender,
+    const QnTransaction<api::TranStateResponse>& /*tran*/)
 {
     sender->setReadSync(true);
 }
 
-void QnTransactionMessageBus::onGotTransactionSyncDone(QnTransactionTransport* sender, const QnTransaction<ApiTranSyncDoneData>& /*tran*/)
+void QnTransactionMessageBus::onGotTransactionSyncDone(QnTransactionTransport* sender,
+    const QnTransaction<api::TranSyncDoneData>& /*tran*/)
 {
     sender->setSyncDone(true);
     sender->setSyncInProgress(false);
@@ -493,7 +495,7 @@ void QnTransactionMessageBus::gotTransaction(
 
 void QnTransactionMessageBus::onGotTransactionSyncRequest(
     QnTransactionTransport* sender,
-    const QnTransaction<ApiSyncRequestData> &tran)
+    const QnTransaction<api::SyncRequestData>& tran)
 {
     NX_ASSERT("This function should not be called for non-server peers");
 }
@@ -510,7 +512,7 @@ bool QnTransactionMessageBus::sendInitialData(QnTransactionTransport* transport)
     if (api::PeerData::isClient(m_localPeerType))
     {
         transport->setWriteSync(true);
-        sendRuntimeInfo(transport, processedPeers, QnTranState());
+        sendRuntimeInfo(transport, processedPeers, api::TranState());
         transport->setReadSync(true);
     }
     return true;
@@ -857,7 +859,8 @@ void QnTransactionMessageBus::removePeersWithTimeout(const QSet<QnUuid>& lostPee
         connectToPeerLost(id);
 }
 
-void QnTransactionMessageBus::sendRuntimeInfo(QnTransactionTransport* transport, const QnTransactionTransportHeader& transportHeader, const QnTranState& runtimeState)
+void QnTransactionMessageBus::sendRuntimeInfo(QnTransactionTransport* transport,
+    const QnTransactionTransportHeader& transportHeader, const api::TranState& runtimeState)
 {
     QList<QnTransaction<ApiRuntimeData>> result;
     m_runtimeTransactionLog->getTransactionsAfter(runtimeState, result);

@@ -7,7 +7,6 @@
 
 #include <utils/math/math.h>
 #include <utils/media/nalUnits.h>
-#include <nx_ec/data/api_tran_state_data.h>
 #include <nx_ec/ec_proto_version.h>
 
 #include <nx/fusion/model_functions.h>
@@ -222,7 +221,7 @@ QVector<SubscribeRecord> deserializeSubscribeRequest(const QByteArray& data, boo
     return result;
 }
 
-QByteArray serializeSubscribeAllRequest(const ec2::QnTranState& request, int reservedSpaceAtFront)
+QByteArray serializeSubscribeAllRequest(const vms::api::TranState& request, int reservedSpaceAtFront)
 {
     QByteArray result;
     {
@@ -246,10 +245,10 @@ QByteArray serializeSubscribeAllRequest(const ec2::QnTranState& request, int res
     return result;
 }
 
-ec2::QnTranState deserializeSubscribeAllRequest(const QByteArray& _response, bool* success)
+vms::api::TranState deserializeSubscribeAllRequest(const QByteArray& _response, bool* success)
 {
     QByteArray response(_response);
-    ec2::QnTranState result;
+    vms::api::TranState result;
     *success = false;
 
     QBuffer buffer(&response);

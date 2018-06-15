@@ -114,7 +114,7 @@ void WebSocketTransactionTransport::readTransactions()
     m_tranLogRequestInProgress = true;
     m_transactionLogReader->readTransactions(
         m_remoteSubscription,
-        boost::optional<::ec2::QnTranState>(), //< toState. Unlimited
+        boost::optional<vms::api::TranState>(), //< toState. Unlimited
         kMaxTransactionsPerIteration,
         std::bind(&WebSocketTransactionTransport::onTransactionsReadFromLog, this, _1, _2, _3));
 }
@@ -122,7 +122,7 @@ void WebSocketTransactionTransport::readTransactions()
 void WebSocketTransactionTransport::onTransactionsReadFromLog(
     ResultCode resultCode,
     std::vector<dao::TransactionLogRecord> serializedTransactions,
-    ::ec2::QnTranState readedUpTo)
+    vms::api::TranState readedUpTo)
 {
     m_tranLogRequestInProgress = false;
     if ((resultCode != ResultCode::ok) && (resultCode != ResultCode::partialContent))

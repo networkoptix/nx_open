@@ -326,7 +326,7 @@ private:
             [&transactionsReadPromise](
                 ResultCode resultCode,
                 std::vector<dao::TransactionLogRecord> serializedTransactions,
-                ::ec2::QnTranState /*readedUpTo*/)
+                nx::vms::api::TranState /*readedUpTo*/)
             {
                 ASSERT_EQ(ResultCode::ok, resultCode);
                 transactionsReadPromise.set_value(std::move(serializedTransactions));

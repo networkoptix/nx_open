@@ -10,7 +10,7 @@
 #include <core/resource/shared_resource_pointer.h>
 #include <core/resource_access/user_access_data.h>
 #include <transaction/connection_guard.h>
-#include <nx_ec/data/api_tran_state_data.h>
+#include <nx/vms/api/data/tran_state_data.h>
 #include <nx/network/http/http_async_client.h>
 #include <transaction/abstract_transaction_transport.h>
 

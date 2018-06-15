@@ -46,16 +46,16 @@ ConnectionManager::ConnectionManager(
     using namespace std::placeholders;
 
     m_transactionDispatcher->registerSpecialCommandHandler
-        <::ec2::ApiCommand::tranSyncRequest, ::ec2::ApiSyncRequestData>(
-            std::bind(&ConnectionManager::processSpecialTransaction<::ec2::ApiSyncRequestData>,
+        <::ec2::ApiCommand::tranSyncRequest, vms::api::SyncRequestData>(
+            std::bind(&ConnectionManager::processSpecialTransaction<vms::api::SyncRequestData>,
                         this, _1, _2, _3, _4));
     m_transactionDispatcher->registerSpecialCommandHandler
-        <::ec2::ApiCommand::tranSyncResponse, ::ec2::QnTranStateResponse>(
-            std::bind(&ConnectionManager::processSpecialTransaction<::ec2::QnTranStateResponse>,
+        <::ec2::ApiCommand::tranSyncResponse, vms::api::TranStateResponse>(
+            std::bind(&ConnectionManager::processSpecialTransaction<vms::api::TranStateResponse>,
                         this, _1, _2, _3, _4));
     m_transactionDispatcher->registerSpecialCommandHandler
-        <::ec2::ApiCommand::tranSyncDone, ::ec2::ApiTranSyncDoneData>(
-            std::bind(&ConnectionManager::processSpecialTransaction<::ec2::ApiTranSyncDoneData>,
+        <::ec2::ApiCommand::tranSyncDone, vms::api::TranSyncDoneData>(
+            std::bind(&ConnectionManager::processSpecialTransaction<vms::api::TranSyncDoneData>,
                         this, _1, _2, _3, _4));
 
     m_outgoingTransactionDispatcher->onNewTransactionSubscription()->subscribe(

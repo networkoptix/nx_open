@@ -2,7 +2,6 @@
 
 #include <utils/media/bitStream.h>
 #include <nx/p2p/p2p_serialization.h>
-#include <nx_ec/data/api_tran_state_data.h>
 
 namespace nx {
 namespace p2p {
@@ -114,8 +113,9 @@ TEST(P2pSerialization, SubscribeRequest)
 TEST(P2pSerialization, SubscribeAllRequest)
 {
     using namespace nx::p2p;
+    using namespace nx::vms::api;
 
-    ec2::QnTranState tranState;
+    TranState tranState;
     for (int i = 0; i < 100; ++i)
     {
         tranState.values.insert(

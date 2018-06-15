@@ -536,7 +536,7 @@ bool ServerMessageBus::pushTransactionList(
 
 bool ServerMessageBus::selectAndSendTransactions(
     const P2pConnectionPtr& connection,
-    QnTranState newSubscription,
+    vms::api::TranState newSubscription,
     bool addImplicitData)
 {
 

@@ -12,7 +12,7 @@ struct Data;
 
 #define DECLARE_STRUCT_NO_LIST(Type) struct Type; \
     QN_FUSION_DECLARE_FUNCTIONS(Type, \
-        (eq)(ubjson)(xml)(json)(sql_record)(csv_record), \
+        (eq)(ubjson)(json)(xml)(sql_record)(csv_record), \
         NX_VMS_API)
 
 #define DECLARE_STRUCT(Type) DECLARE_STRUCT_NO_LIST(Type) \
@@ -92,6 +92,11 @@ DECLARE_STRUCT_NO_LIST(P2pStatisticsData)
 DECLARE_STRUCT_NO_LIST(PersistentIdData)
 DECLARE_STRUCT_NO_LIST(PeerData)
 DECLARE_STRUCT_NO_LIST(PeerDataEx)
+
+DECLARE_STRUCT_NO_LIST(TranState)
+DECLARE_STRUCT_NO_LIST(TranStateResponse)
+DECLARE_STRUCT_NO_LIST(TranSyncDoneData)
+DECLARE_STRUCT_NO_LIST(SyncRequestData)
 
 #undef DECLARE_STRUCT
 #undef DECLARE_STRUCT_NO_LIST

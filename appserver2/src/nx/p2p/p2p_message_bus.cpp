@@ -488,7 +488,7 @@ void MessageBus::at_allDataSent(QWeakPointer<ConnectionBase> weakRef)
 
 bool MessageBus::selectAndSendTransactions(
 	const P2pConnectionPtr& connection,
-	QnTranState newSubscription,
+	vms::api::TranState newSubscription,
 	bool addImplicitData)
 {
 	context(connection)->sendDataInProgress = false;
@@ -723,7 +723,7 @@ bool MessageBus::handleSubscribeForDataUpdates(const P2pConnectionPtr& connectio
     QVector<SubscribeRecord> request = deserializeSubscribeRequest(data, &success);
     if (!success)
         return false;
-    QnTranState newSubscription;
+    vms::api::TranState newSubscription;
     for (const auto& shortPeer : request)
     {
         const auto& id = m_localShortPeerInfo.decode(shortPeer.peer);
@@ -733,7 +733,7 @@ bool MessageBus::handleSubscribeForDataUpdates(const P2pConnectionPtr& connectio
     context(connection)->remoteAddImplicitData = false;
 
     // merge current and new subscription
-    QnTranState& oldSubscription = context(connection)->remoteSubscription;
+    auto& oldSubscription = context(connection)->remoteSubscription;
     auto itrOldSubscription = oldSubscription.values.begin();
     for (auto itr = newSubscription.values.begin(); itr != newSubscription.values.end(); ++itr)
     {
@@ -768,7 +768,7 @@ bool MessageBus::handleSubscribeForAllDataUpdates(
     NX_ASSERT(connection->remotePeer().peerType == PeerType::cloudServer);
     context(connection)->remoteAddImplicitData = true;
     bool success = false;
-    QnTranState newSubscription = deserializeSubscribeAllRequest(data, &success);
+    auto newSubscription = deserializeSubscribeAllRequest(data, &success);
 
     if (context(connection)->sendDataInProgress)
     {

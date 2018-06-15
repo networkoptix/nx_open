@@ -13,10 +13,6 @@ struct ApiMediaServerData;
 struct ApiMediaServerUserAttributesData;
 struct ApiMediaServerDataEx;
 
-struct QnTranState;
-struct QnTranStateResponse;
-struct ApiSyncRequestData;
-struct ApiTranSyncDoneData;
 struct ApiPeerAliveData;
 struct ApiReverseConnectionData;
 struct ApiStorageData;
@@ -73,10 +69,6 @@ struct ParentId
     (ApiPeerSystemTimeData)\
     (ApiPeerSyncTimeData)\
     (ApiReverseConnectionData)\
-    (QnTranState)\
-    (ApiSyncRequestData)\
-    (QnTranStateResponse)\
-    (ApiTranSyncDoneData)\
     (ApiPeerAliveData)\
     (ApiStorageData)\
     (ApiUserData)\

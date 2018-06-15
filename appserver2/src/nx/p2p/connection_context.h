@@ -1,14 +1,13 @@
 #pragma once
 
+#include "p2p_fwd.h"
+
 #include <QtCore/QElapsedTimer>
 #include <QtCore/QObject>
 
-#include <nx_ec/data/api_tran_state_data.h>
-#include "p2p_fwd.h"
+#include <nx/vms/api/data/tran_state_data.h>
 
-namespace ec2 {
-class QnAbstractTransaction;
-}
+namespace ec2 { class QnAbstractTransaction; }
 
 namespace nx {
 namespace p2p {
@@ -42,7 +41,7 @@ public:
     // to remote part
     QByteArray remotePeersMessage; //< last received peers message
     QVector<PeerDistanceRecord> remotePeers;
-    ec2::QnTranState remoteSubscription; //< remote -> local subscription
+    vms::api::TranState remoteSubscription; //< remote -> local subscription
     bool remoteAddImplicitData = false; //< remote -> local subscription. Add implicit data to subscription (subscribeAll).
     bool recvDataInProgress = false;
     bool isRemoteStarted = false; //< remote peer has open logical connection to us

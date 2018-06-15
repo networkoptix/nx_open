@@ -15,7 +15,6 @@
 #include <nx/utils/move_only_func.h>
 #include <nx/utils/thread/mutex.h>
 #include <nx/vms/api/data/peer_data.h>
-#include <nx_ec/data/api_tran_state_data.h>
 
 #include <transaction/connection_guard_shared_state.h>
 

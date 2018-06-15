@@ -7,7 +7,7 @@
 #include "nx_ec/ec_api.h"
 #include "nx_ec/data/api_runtime_data.h"
 #include "ubjson_transaction_serializer.h"
-#include "nx_ec/data/api_tran_state_data.h"
+#include <nx/vms/api/data/tran_state_data.h>
 #include "api/runtime_info_manager.h"
 #include <common/common_module_aware.h>
 
@@ -23,12 +23,13 @@ public:
 
     void clearOldRuntimeData(const nx::vms::api::PersistentIdData& key);
     void clearRuntimeData(const QnUuid& id);
-    bool contains(const QnTranState& state) const;
+    bool contains(const nx::vms::api::TranState& state) const;
     bool contains(const QnTransaction<ApiRuntimeData>& tran) const;
 
     ErrorCode saveTransaction(const QnTransaction<ApiRuntimeData>& tran);
-    QnTranState getTransactionsState();
-    ErrorCode getTransactionsAfter(const QnTranState& state, QList<QnTransaction<ApiRuntimeData>>& result);
+    nx::vms::api::TranState getTransactionsState();
+    ErrorCode getTransactionsAfter(const nx::vms::api::TranState& state,
+        QList<QnTransaction<ApiRuntimeData>>& result);
     void clearRuntimeData();
 
 signals:
@@ -47,7 +48,7 @@ private slots:
     void at_runtimeInfoChanged(const QnPeerRuntimeInfo& runtimeInfo);
 
 private:
-    QnTranState m_state;
+    nx::vms::api::TranState m_state;
     QMap<nx::vms::api::PersistentIdData, ApiRuntimeData> m_data;
     mutable QnMutex m_mutex;
 };

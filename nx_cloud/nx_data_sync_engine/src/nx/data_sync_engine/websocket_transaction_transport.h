@@ -2,16 +2,14 @@
 
 #include <memory>
 
-#include <nx/network/websocket/websocket.h>
-
-#include <nx/p2p/p2p_connection_base.h>
-#include <nx/p2p/connection_context.h>
-
-#include <nx_ec/data/api_tran_state_data.h>
-
 #include "abstract_transaction_transport.h"
 #include "dao/abstract_transaction_data_object.h"
 #include "transaction_log_reader.h"
+
+#include <nx/network/websocket/websocket.h>
+#include <nx/p2p/p2p_connection_base.h>
+#include <nx/p2p/connection_context.h>
+#include <nx/vms/api/data/tran_state_data.h>
 
 namespace nx {
 namespace data_sync_engine {
@@ -50,14 +48,17 @@ protected:
 
 private:
     int highestProtocolVersionCompatibleWithRemotePeer() const;
+
     void onGotMessage(
         QWeakPointer<nx::p2p::ConnectionBase> connection,
         nx::p2p::MessageType messageType,
         const QByteArray& payload);
+
     void onTransactionsReadFromLog(
         ResultCode resultCode,
         std::vector<dao::TransactionLogRecord> serializedTransactions,
-        ::ec2::QnTranState readedUpTo);
+        vms::api::TranState readedUpTo);
+
     void readTransactions();
 
 private:
@@ -68,7 +69,7 @@ private:
 
     bool m_sendHandshakeDone = false;
     bool m_tranLogRequestInProgress = false;
-    ::ec2::QnTranState m_remoteSubscription; //< remote -> local subscription
+    vms::api::TranState m_remoteSubscription; //< remote -> local subscription
     QnUuid m_connectionGuid;
 };
 

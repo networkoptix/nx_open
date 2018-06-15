@@ -197,7 +197,7 @@ void VmsTransactionLogCache::shiftTransactionSequence(
     currentSequence += delta;
 }
 
-::ec2::QnTranState VmsTransactionLogCache::committedTransactionState() const
+vms::api::TranState VmsTransactionLogCache::committedTransactionState() const
 {
     QnMutexLocker lock(&m_mutex);
     return m_committedData.transactionState;

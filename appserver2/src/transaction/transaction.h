@@ -76,7 +76,7 @@ static const char ADD_HASH_DATA[] = "$$_HASH_$$";
 struct NotDefinedApiData {};
 
 #define TRANSACTION_DESCRIPTOR_LIST(APPLY)  \
-APPLY(1, tranSyncRequest, ApiSyncRequestData, \
+APPLY(1, tranSyncRequest, nx::vms::api::SyncRequestData, \
                        false, /* persistent*/ \
                        true,  /* system*/ \
                        InvalidGetHashHelper(), /* getHash*/ \
@@ -87,7 +87,7 @@ APPLY(1, tranSyncRequest, ApiSyncRequestData, \
                        InvalidFilterFunc(), /* Filter read func */ \
                        AdminOnlyAccessOut(), /* Check remote peer rights for outgoing transaction */ \
                        RegularTransactionType()) /* regular transaction type */ \
-APPLY(2, tranSyncResponse, QnTranStateResponse, \
+APPLY(2, tranSyncResponse, nx::vms::api::TranStateResponse, \
                        false, /* persistent*/ \
                        true,  /* system*/ \
                        InvalidGetHashHelper(), /* getHash*/ \
@@ -142,7 +142,7 @@ APPLY(6, peerAliveInfo, ApiPeerAliveData, \
                        InvalidFilterFunc(), /* Filter read func */ \
                        AllowForAllAccessOut(), /* Check remote peer rights for outgoing transaction */ \
                        RegularTransactionType()) /* regular transaction type */ \
-APPLY(7, tranSyncDone, ApiTranSyncDoneData, \
+APPLY(7, tranSyncDone, nx::vms::api::TranSyncDoneData, \
                        false, /* persistent*/ \
                        true,  /* system*/ \
                        InvalidGetHashHelper(), /* getHash*/ \

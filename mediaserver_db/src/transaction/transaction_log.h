@@ -46,7 +46,7 @@ namespace ec2
          *        result and keep only cloud related transactions.
          */
         ErrorCode getTransactionsAfter(
-            const QnTranState& state,
+            const nx::vms::api::TranState& state,
             bool onlyCloudData,
             QList<QByteArray>& result);
 
@@ -54,18 +54,18 @@ namespace ec2
          * This function is similar to previous one but returns transactions included in state parameter only
          */
         ErrorCode getExactTransactionsAfter(
-            QnTranState* inOutState,
+            nx::vms::api::TranState* inOutState,
             bool onlyCloudData,
             QList<QByteArray>& result,
             int maxDataSize,
             bool* outIsFinished);
 
-        QnTranState getTransactionsState();
+        nx::vms::api::TranState getTransactionsState();
 
         // filter should contains sorted data
         QVector<qint32> getTransactionsState(const QVector<nx::vms::api::PersistentIdData>& filter);
 
-        bool contains(const QnTranState& state) const;
+        bool contains(const nx::vms::api::TranState& state) const;
 
         template <typename T>
         ErrorCode saveTransaction(const QnTransaction<T>& tran)
@@ -135,12 +135,12 @@ namespace ec2
             CommitData() {}
             void clear() { state.values.clear(); updateHistory.clear(); }
 
-            QnTranState state;
+            nx::vms::api::TranState state;
             QMap<QnUuid, UpdateHistoryData> updateHistory;
         };
     private:
         detail::QnDbManager* m_dbManager;
-        QnTranState m_state;
+        nx::vms::api::TranState m_state;
         QMap<QnUuid, UpdateHistoryData> m_updateHistory;
 
         mutable QnMutex m_timeMutex;

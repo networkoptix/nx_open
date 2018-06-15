@@ -4,9 +4,9 @@
 #include "api_data.h"
 #include "nx/utils/latin1_array.h"
 #include "api_fwd.h"
-#include "api_tran_state_data.h"
 
 #include <nx/vms/api/data/peer_data.h>
+#include <nx/vms/api/data/tran_state_data.h>
 
 namespace ec2 {
 
@@ -17,8 +17,8 @@ struct ApiPeerAliveData: nx::vms::api::Data
 
     nx::vms::api::PeerData peer;
     bool isAlive = false;
-    QnTranState persistentState;
-    QnTranState runtimeState;
+    nx::vms::api::TranState persistentState;
+    nx::vms::api::TranState runtimeState;
 };
 #define ApiPeerAliveData_Fields (peer)(isAlive)(persistentState)(runtimeState)
 

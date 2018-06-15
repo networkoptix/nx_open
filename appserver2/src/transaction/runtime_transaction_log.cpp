@@ -100,7 +100,7 @@ void QnRuntimeTransactionLog::clearRuntimeData()
     m_data.clear();
 }
 
-bool QnRuntimeTransactionLog::contains(const QnTranState& state) const
+bool QnRuntimeTransactionLog::contains(const api::TranState& state) const
 {
     QnMutexLocker lock(&m_mutex);
     for (auto itr = state.values.begin(); itr != state.values.end(); ++itr)
@@ -139,13 +139,14 @@ ErrorCode QnRuntimeTransactionLog::saveTransaction(const QnTransaction<ApiRuntim
     return ErrorCode::ok;
 }
 
-QnTranState QnRuntimeTransactionLog::getTransactionsState()
+api::TranState QnRuntimeTransactionLog::getTransactionsState()
 {
     QnMutexLocker lock(&m_mutex);
     return m_state;
 }
 
-ErrorCode QnRuntimeTransactionLog::getTransactionsAfter(const QnTranState& state, QList<QnTransaction<ApiRuntimeData>>& result)
+ErrorCode QnRuntimeTransactionLog::getTransactionsAfter(const api::TranState& state, 
+    QList<QnTransaction<ApiRuntimeData>>& result)
 {
     QnMutexLocker lock(&m_mutex);
     for (const ApiRuntimeData &data: m_data)

@@ -18,6 +18,7 @@
 #include "data/lock_data.h"
 #include "data/p2p_statistics_data.h"
 #include "data/peer_data.h"
+#include "data/tran_state_data.h"
 #include "data/update_data.h"
 #include "data/videowall_data.h"
 #include "data/event_rule_data.h"
@@ -77,6 +78,10 @@ void Metatypes::initialize()
     qRegisterMetaType<nx::vms::api::ResourceParamWithRefDataList>();
     qRegisterMetaType<nx::vms::api::ServerFootageData>();
     qRegisterMetaType<nx::vms::api::ServerFootageDataList>();
+    qRegisterMetaType<nx::vms::api::SyncRequestData>();
+    qRegisterMetaType<nx::vms::api::TranState>();
+    qRegisterMetaType<nx::vms::api::TranStateResponse>();
+    qRegisterMetaType<nx::vms::api::TranSyncDoneData>();
     qRegisterMetaType<nx::vms::api::UpdateInstallData>();
     qRegisterMetaType<nx::vms::api::UpdateUploadData>();
     qRegisterMetaType<nx::vms::api::UpdateUploadResponseData>();

@@ -8,7 +8,7 @@
 #include <common/common_module_aware.h>
 #include <nx/utils/thread/mutex.h>
 #include <transaction/transaction_message_bus_base.h>
-#include <nx_ec/data/api_tran_state_data.h>
+#include <nx/vms/api/data/tran_state_data.h>
 #include "p2p_connection.h"
 #include "p2p_fwd.h"
 #include <transaction/transaction.h>
@@ -268,7 +268,7 @@ protected:
 
 	virtual bool selectAndSendTransactions(
 		const P2pConnectionPtr& connection,
-		QnTranState newSubscription,
+                vms::api::TranState newSubscription,
 		bool addImplicitData);
 	virtual bool handlePushTransactionData(
 		const P2pConnectionPtr& connection,

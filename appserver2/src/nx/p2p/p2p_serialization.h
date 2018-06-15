@@ -6,7 +6,7 @@
 
 #include <nx/network/http/http_types.h>
 #include <nx/vms/api/data_fwd.h>
-#include <nx_ec/data/api_tran_state_data.h>
+#include <nx/vms/api/data/tran_state_data.h>
 
 namespace nx {
 namespace p2p {
@@ -35,8 +35,8 @@ QList<QByteArray> deserializeTransactionList(const QByteArray& tranList, bool* s
 QByteArray serializeTransportHeader(const TransportHeader& records);
 TransportHeader deserializeTransportHeader(const QByteArray& data, int* bytesRead);
 
-QByteArray serializeSubscribeAllRequest(const ec2::QnTranState& request, int reservedSpaceAtFront = 1);
-ec2::QnTranState deserializeSubscribeAllRequest(const QByteArray& data, bool* success);
+QByteArray serializeSubscribeAllRequest(const vms::api::TranState& request, int reservedSpaceAtFront = 1);
+vms::api::TranState deserializeSubscribeAllRequest(const QByteArray& data, bool* success);
 
 vms::api::PeerDataEx deserializePeerData(
     const network::http::HttpHeaders& headers, Qn::SerializationFormat dataFormat);

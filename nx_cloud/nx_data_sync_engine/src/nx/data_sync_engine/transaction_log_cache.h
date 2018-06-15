@@ -38,7 +38,7 @@ public:
     {
         /** map<transaction hash, peer which updated transaction> */
         std::map<nx::Buffer, UpdateHistoryData> transactionHashToUpdateAuthor;
-        ::ec2::QnTranState transactionState;
+        vms::api::TranState transactionState;
         boost::optional<std::uint64_t> timestampSequence;
     };
 
@@ -74,7 +74,7 @@ public:
     int generateTransactionSequence(const vms::api::PersistentIdData& tranStateKey);
     void shiftTransactionSequence(const vms::api::PersistentIdData& tranStateKey, int delta);
 
-    ::ec2::QnTranState committedTransactionState() const;
+    vms::api::TranState committedTransactionState() const;
     std::uint64_t committedTimestampSequence() const;
 
 private:
@@ -89,8 +89,6 @@ private:
     TranId m_tranIdSequence;
     TransactionTimestampCalculator m_timestampCalculator;
     VmsDataState m_committedData;
-    /** map<peer, transport sequence> */
-    //std::map<::ec2::QnTranStateKey, int> m_lastTransportSeq;
 
     std::uint64_t timestampSequence(const QnMutexLockerBase& /*lock*/, TranId tranId) const;
 

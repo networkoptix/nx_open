@@ -348,7 +348,7 @@ void QnTransactionLog::rollback()
     m_commitData.clear();
 }
 
-QnTranState QnTransactionLog::getTransactionsState()
+nx::vms::api::TranState QnTransactionLog::getTransactionsState()
 {
     QnReadLocker lock(&m_dbManager->getMutex());
     return m_state;
@@ -411,7 +411,7 @@ QnTransactionLog::ContainsReason QnTransactionLog::contains(const QnAbstractTran
     }
 }
 
-bool QnTransactionLog::contains(const QnTranState& state) const
+bool QnTransactionLog::contains(const nx::vms::api::TranState& state) const
 {
     QnReadLocker lock(&m_dbManager->getMutex());
     for (auto itr = state.values.begin(); itr != state.values.end(); ++itr)
@@ -423,13 +423,13 @@ bool QnTransactionLog::contains(const QnTranState& state) const
 }
 
 ErrorCode QnTransactionLog::getTransactionsAfter(
-    const QnTranState& filterState,
+    const nx::vms::api::TranState& filterState,
     bool onlyCloudData,
     QList<QByteArray>& result)
 {
     QnReadLocker lock(&m_dbManager->getMutex());
 
-    const QnTranState& stateToIterate = m_state;
+    const nx::vms::api::TranState& stateToIterate = m_state;
 
     QnTransaction<nx::vms::api::UpdateSequenceData> syncMarkersTran(
         ApiCommand::updatePersistentSequence,
@@ -477,7 +477,7 @@ ErrorCode QnTransactionLog::getTransactionsAfter(
 }
 
 ErrorCode QnTransactionLog::getExactTransactionsAfter(
-    QnTranState* inOutState,
+    nx::vms::api::TranState* inOutState,
     bool onlyCloudData,
     QList<QByteArray>& result,
     int maxDataSize,

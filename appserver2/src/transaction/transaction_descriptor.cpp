@@ -18,8 +18,6 @@
 #include <core/resource_management/resource_pool.h>
 #include <utils/license_usage_helper.h>
 
-#include <nx_ec/data/api_tran_state_data.h>
-
 #include <nx/cloud/cdb/client/data/auth_data.h>
 
 #include "ec_connection_notification_manager.h"

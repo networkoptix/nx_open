@@ -539,13 +539,13 @@ namespace detail
             return ErrorCode::notImplemented;
         }
 
-        ErrorCode executeTransactionInternal(const QnTransaction<ApiSyncRequestData>&)
+        ErrorCode executeTransactionInternal(const QnTransaction<nx::vms::api::SyncRequestData>&)
         {
             NX_ASSERT(false, Q_FUNC_INFO, "This is a non persistent transaction!");
             return ErrorCode::notImplemented;
         }
 
-        ErrorCode executeTransactionInternal(const QnTransaction<QnTranStateResponse>&)
+        ErrorCode executeTransactionInternal(const QnTransaction<nx::vms::api::TranStateResponse>&)
         {
             NX_ASSERT(false, Q_FUNC_INFO, "This is a non persistent transaction!");
             return ErrorCode::notImplemented;
@@ -575,7 +575,7 @@ namespace detail
             return ErrorCode::notImplemented;
         }
 
-        ErrorCode executeTransactionInternal(const QnTransaction<ApiTranSyncDoneData>&)
+        ErrorCode executeTransactionInternal(const QnTransaction<nx::vms::api::TranSyncDoneData>&)
         {
             NX_ASSERT(false, Q_FUNC_INFO, "This is a non persistent transaction!");
             return ErrorCode::notImplemented;
