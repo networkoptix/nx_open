@@ -59,6 +59,9 @@ PageBase
 
         property bool animatePlaybackControls: true
         property bool showOfflineStatus: false
+        property bool showNoLicensesWarning:
+            videoScreenController.noLicenses
+            && !videoScreenController.mediaPlayer.liveMode
         property bool showDefaultPasswordWarning:
             videoScreenController.hasDefaultCameraPassword
             && videoScreenController.mediaPlayer.liveMode
@@ -68,14 +71,14 @@ PageBase
                 || videoScreenController.cameraOffline
                 || videoScreenController.cameraUnauthorized
                 || videoScreenController.failed
-                || videoScreenController.noVideoStreams
-                || videoScreenController.noLicenses)
-            && !videoScreenController.mediaPlayer.playing)
+                || videoScreenController.noVideoStreams)
+                && !videoScreenController.mediaPlayer.playing)
             || videoScreenController.hasOldFirmware
             || videoScreenController.tooManyConnections
             || videoScreenController.ioModuleWarning
             || videoScreenController.ioModuleAudioPlaying
             || showDefaultPasswordWarning
+            || showNoLicensesWarning
 
         readonly property bool applicationActive: Qt.application.state === Qt.ApplicationActive
 
@@ -146,7 +149,8 @@ PageBase
         background: Image
         {            
             y: -toolBar.statusBarHeight
-            width: parent.width
+            x: -mainWindow.leftPadding
+            width: mainWindow.width
             height: 96
             source: lp("/images/toolbar_gradient.png")
         }
@@ -449,34 +453,6 @@ PageBase
                     moveOnTapOverlay.close()
                 }
             }
-
-            Connections
-            {
-                target: moveOnTapOverlay
-                onClicked:
-                {
-                    if (videoScreenController.resourceHelper.fisheyeParams.enabled || !video.item)
-                        return
-
-                    var mapped = mapToItem(video.item, pos.x, pos.y)
-                    var data = video.item.getMoveViewportData(mapped)
-                    if (!data)
-                        return
-
-                    ptzPanel.moveViewport(data.viewport, data.aspect)
-                    preloader.pos = pos
-                    preloader.visible = true
-                }
-
-                onVisibleChanged:
-                {
-                    if (moveOnTapOverlay.visible)
-                        return
-
-                    showUi()
-                    ptzPanel.moveOnTapMode = false
-                }
-            }
         }
 
         PtzViewportMovePreloader
@@ -495,6 +471,30 @@ PageBase
             width: mainWindow.width
             height: mainWindow.height
             parent: videoScreen
+
+            onClicked:
+            {
+                if (videoScreenController.resourceHelper.fisheyeParams.enabled || !video.item)
+                    return
+
+                var mapped = contentItem.mapToItem(video.item, pos.x, pos.y)
+                var data = video.item.getMoveViewportData(mapped)
+                if (!data)
+                    return
+
+                ptzPanel.moveViewport(data.viewport, data.aspect)
+                preloader.pos = contentItem.mapToItem(preloader.parent, pos.x, pos.y)
+                preloader.visible = true
+            }
+
+            onVisibleChanged:
+            {
+                if (moveOnTapOverlay.visible)
+                    return
+
+                showUi()
+                ptzPanel.moveOnTapMode = false
+            }
         }
 
         VideoNavigation
@@ -554,6 +554,7 @@ PageBase
         id: navigationBarTint
 
         color: ColorTheme.base3
+        visible: mainWindow.hasNavigationBar
         width: mainWindow.width - parent.width
         height: video.height
         x: mainWindow.leftPadding ? -mainWindow.leftPadding : parent.width

@@ -2,6 +2,13 @@
 <!DOCTYPE TS>
 <TS version="2.1" language="de" sourcelanguage="en">
   <context>
+    <name>ActionButtonsPanel</name>
+    <message>
+      <source>Press and hold to</source>
+      <translation>Drücken und halten um</translation>
+    </message>
+  </context>
+  <context>
     <name>CameraItem</name>
     <message>
       <source>Select camera</source>
@@ -15,6 +22,14 @@
       <source>Offline</source>
       <translation>Offline</translation>
     </message>
+    <message>
+      <source>Password required</source>
+      <translation>Passwort erforderlich</translation>
+    </message>
+    <message>
+      <source>Unsupported firmware version</source>
+      <translation>Nicht unterstützte Firmwareversion</translation>
+    </message>
   </context>
   <context>
     <name>CloudPanel</name>
@@ -26,8 +41,9 @@
   <context>
     <name>CloudScreen</name>
     <message>
-      <source>Cloud Account</source>
-      <translation>Cloudaccount</translation>
+      <source>%1 Account</source>
+      <comment>%1 is the short cloud name (like &apos;Cloud&apos;)</comment>
+      <translation>%1-Account</translation>
     </message>
   </context>
   <context>
@@ -68,16 +84,48 @@
       <translation>Kann keine Verbindung zu %1 herstellen</translation>
     </message>
     <message>
-      <source>Email and password cannot be empty</source>
-      <translation>Email und Passwort dürfen nicht leer sein</translation>
-    </message>
-    <message>
       <source>Log in</source>
       <translation>Anmelden</translation>
     </message>
     <message>
-      <source>Incorrect email or password</source>
-      <translation>E-Mail oder Passwort ungültig</translation>
+      <source>Resend activation email</source>
+      <translation>Aktivierungsmail erneut senden</translation>
+    </message>
+    <message>
+      <source>Activation email sent</source>
+      <translation>Aktivierungsemail wurde gesendet</translation>
+    </message>
+    <message>
+      <source>Cannot send activation email</source>
+      <translation>Aktivierungsemail konnte nicht gesendet werden</translation>
+    </message>
+    <message>
+      <source>Check your inbox and visit provided link to activate account</source>
+      <translation>Überprüfen Sie Ihren Posteingang und besuchen Sie den angegebenen Link, um Ihr Konto zu aktivieren</translation>
+    </message>
+    <message>
+      <source>Check your internet connection or try again later</source>
+      <translation>Überprüfen Sie Ihre Internetverbindung oder versuchen Sie es später noch einmal</translation>
+    </message>
+    <message>
+      <source>Account not found</source>
+      <translation>Account nicht gefunden</translation>
+    </message>
+    <message>
+      <source>Wrong password</source>
+      <translation>Falsches Passwort</translation>
+    </message>
+    <message>
+      <source>Account not activated</source>
+      <translation>Konto nicht aktiviert</translation>
+    </message>
+    <message>
+      <source>Email cannot be empty</source>
+      <translation>Email darf nicht leer sein</translation>
+    </message>
+    <message>
+      <source>Password cannot be empty</source>
+      <translation>Passwort darf nicht leer sein</translation>
     </message>
   </context>
   <context>
@@ -284,6 +332,29 @@
     </message>
   </context>
   <context>
+    <name>LoginUtils</name>
+    <message>
+      <source>Invalid login or password</source>
+      <translation>Ungültiger Login oder Passwort</translation>
+    </message>
+    <message>
+      <source>LDAP Server connection timed out</source>
+      <translation>Zeitüberschreitung bei LDAP-Server</translation>
+    </message>
+    <message>
+      <source>Server or network is not available</source>
+      <translation>Server oder Netzwerk ist nicht verfügbar</translation>
+    </message>
+    <message>
+      <source>Incompatible server</source>
+      <translation>Inkompatibler Server</translation>
+    </message>
+    <message>
+      <source>Incompatible server version %1</source>
+      <translation>Inkompatible Serverversion %1</translation>
+    </message>
+  </context>
+  <context>
     <name>MoveOnTapOverlay</name>
     <message>
       <source>Tap on the image to position your camera</source>
@@ -346,6 +417,22 @@
     <message>
       <source>Best quality</source>
       <translation>Beste Qualität</translation>
+    </message>
+    <message>
+      <source>Transcoding is disabled.</source>
+      <translation>Umkodierung ist deaktiviert.</translation>
+    </message>
+    <message>
+      <source>Transcoding is not supported for this camera.</source>
+      <translation>Umkodierung wird für diese Kamera nicht unterstützt.</translation>
+    </message>
+    <message>
+      <source>Transcoding is not supported for servers with version lower than 3.0.</source>
+      <translation>Umkodierung wird für Server mit Version niedriger als 3.0 nicht unterstützt.</translation>
+    </message>
+    <message>
+      <source>Transcoding is not supported for ARM servers.</source>
+      <translation>Umkodierung wird für ARM-Server nicht unterstützt.</translation>
     </message>
   </context>
   <context>
@@ -461,10 +548,6 @@
       <translation>Anmelden bei %1</translation>
     </message>
     <message>
-      <source>Cannot connect to %1</source>
-      <translation>Kann keine Verbindung zu %1 herstellen</translation>
-    </message>
-    <message>
       <source>Check your network connection or press &quot;%1&quot; button to enter a known server address.</source>
       <translation>Überprüfen Sie Ihre Netzwerkverbindung oder drücken Sie &quot;%1&quot;, um eine Serveradresse einzugeben.</translation>
     </message>
@@ -507,6 +590,14 @@
       <source>Save passwords for servers</source>
       <translation>Passwörter für Server speichern</translation>
     </message>
+    <message>
+      <source>What to do with currently saved passwords?</source>
+      <translation>Was tun mit den aktuell gespeicherten Passwörtern?</translation>
+    </message>
+    <message>
+      <source>Delete</source>
+      <translation>Löschen</translation>
+    </message>
   </context>
   <context>
     <name>SideNavigation</name>
@@ -528,7 +619,7 @@
     </message>
     <message>
       <source>Disconnect from Server</source>
-      <translation>Serververbindung getrennt</translation>
+      <translation>Serververbindung trennen</translation>
     </message>
   </context>
   <context>
@@ -634,6 +725,38 @@
       <source>Cannot play any video stream</source>
       <translation>Kann keinen Videostream spielen</translation>
     </message>
+    <message>
+      <source>Not enough licenses</source>
+      <translation>Nicht genug Lizenzen</translation>
+    </message>
+    <message>
+      <source>Password required</source>
+      <translation>Passwort erforderlich</translation>
+    </message>
+    <message>
+      <source>Set password on this camera using Wisenet WAVE client or camera web-page to view video</source>
+      <translation>Setzen Sie das Passwort für diese Kamera mit dem Wisenet WAVE-Client oder der Kamerawebseite, um das Video anzusehen</translation>
+    </message>
+    <message>
+      <source>Unsupported firmware version</source>
+      <translation>Nicht unterstützte Firmwareversion</translation>
+    </message>
+    <message>
+      <source>Please update firmware</source>
+      <translation>Bitte aktualisieren Sie die Firmware</translation>
+    </message>
+    <message>
+      <source>Too many connections</source>
+      <translation>Zu viele Verbindungen</translation>
+    </message>
+    <message>
+      <source>I/O interface not supported yet</source>
+      <translation>I/O-Schnittstelle noch nicht unterstützt</translation>
+    </message>
+    <message>
+      <source>In this app I/O module can be used as a sound input device only. To use it as a control module, please use desktop version of %1</source>
+      <translation>In dieser App kann das I/O-Modul nur als Soundeingabegerät verwendet werden. Um es als Steuermodul zu verwenden, verwenden Sie bitte die Desktopversion von %1</translation>
+    </message>
   </context>
   <context>
     <name>VideoNavigation</name>
@@ -644,11 +767,6 @@
     <message>
       <source>LIVE</source>
       <translation>LIVE</translation>
-    </message>
-    <message>
-      <source>d MMMM yyyy</source>
-      <comment>DO NOT TRANSLATE THIS STRING!</comment>
-      <translation type="unfinished">d MMMM yyyy</translation>
     </message>
   </context>
   <context>
@@ -667,6 +785,17 @@
     <message>
       <source>Skip</source>
       <translation>Überspringen</translation>
+    </message>
+  </context>
+  <context>
+    <name>main</name>
+    <message>
+      <source>Server offline. Reconnecting...</source>
+      <translation>Server offline. Wiederaufbau...</translation>
+    </message>
+    <message>
+      <source>Cannot connect to %1</source>
+      <translation>Kann keine Verbindung zu %1 herstellen</translation>
     </message>
   </context>
 </TS>

@@ -2,6 +2,13 @@
 <!DOCTYPE TS>
 <TS version="2.1" language="pl" sourcelanguage="en">
   <context>
+    <name>ActionButtonsPanel</name>
+    <message>
+      <source>Press and hold to</source>
+      <translation>Naciśnij i przytrzymaj</translation>
+    </message>
+  </context>
+  <context>
     <name>CameraItem</name>
     <message>
       <source>Select camera</source>
@@ -15,6 +22,14 @@
       <source>Offline</source>
       <translation>Offline</translation>
     </message>
+    <message>
+      <source>Password required</source>
+      <translation>Hasło jest wymagane</translation>
+    </message>
+    <message>
+      <source>Unsupported firmware version</source>
+      <translation>Nieobsługiwana wersja firmware</translation>
+    </message>
   </context>
   <context>
     <name>CloudPanel</name>
@@ -26,8 +41,9 @@
   <context>
     <name>CloudScreen</name>
     <message>
-      <source>Cloud Account</source>
-      <translation>Konto w chmurze</translation>
+      <source>%1 Account</source>
+      <comment>%1 is the short cloud name (like &apos;Cloud&apos;)</comment>
+      <translation>Konto %1</translation>
     </message>
   </context>
   <context>
@@ -68,16 +84,48 @@
       <translation>Nie można połączyć się z %1</translation>
     </message>
     <message>
-      <source>Email and password cannot be empty</source>
-      <translation>Adres e-mail i hasło nie mogą być puste</translation>
-    </message>
-    <message>
       <source>Log in</source>
       <translation>Zaloguj</translation>
     </message>
     <message>
-      <source>Incorrect email or password</source>
-      <translation>Nieprawidłowy e-mail lub hasło</translation>
+      <source>Resend activation email</source>
+      <translation>Wyślij ponownie e-mail aktywacyjny</translation>
+    </message>
+    <message>
+      <source>Activation email sent</source>
+      <translation>Wysłano e-mail aktywacyjny</translation>
+    </message>
+    <message>
+      <source>Cannot send activation email</source>
+      <translation>Nie można wysłać e-maila aktywacyjnego</translation>
+    </message>
+    <message>
+      <source>Check your inbox and visit provided link to activate account</source>
+      <translation>Sprawdź swoją skrzynkę odbiorczą i otwórz dostarczony link, aby aktywować konto</translation>
+    </message>
+    <message>
+      <source>Check your internet connection or try again later</source>
+      <translation>Sprawdź swoje połączenie internetowe lub spróbuj ponownie później</translation>
+    </message>
+    <message>
+      <source>Account not found</source>
+      <translation>Nie znaleziono konta</translation>
+    </message>
+    <message>
+      <source>Wrong password</source>
+      <translation>Nieprawidłowe hasło</translation>
+    </message>
+    <message>
+      <source>Account not activated</source>
+      <translation>Konto nie jest aktywne</translation>
+    </message>
+    <message>
+      <source>Email cannot be empty</source>
+      <translation>Adres e-mail nie może być pusty</translation>
+    </message>
+    <message>
+      <source>Password cannot be empty</source>
+      <translation>Hasło nie może być puste</translation>
     </message>
   </context>
   <context>
@@ -273,7 +321,7 @@
     <name>LiveVideoNavigation</name>
     <message>
       <source>LIVE</source>
-      <translation>NA ŻYWO</translation>
+      <translation>LIVE</translation>
     </message>
   </context>
   <context>
@@ -281,6 +329,29 @@
     <message>
       <source>Connect</source>
       <translation>Połącz</translation>
+    </message>
+  </context>
+  <context>
+    <name>LoginUtils</name>
+    <message>
+      <source>Invalid login or password</source>
+      <translation>Nieprawidłowy login lub hasło</translation>
+    </message>
+    <message>
+      <source>LDAP Server connection timed out</source>
+      <translation>Przekroczono limit czasu oczekiwania na połączenie z serwerem LDAP</translation>
+    </message>
+    <message>
+      <source>Server or network is not available</source>
+      <translation>Serwer lub sieć są niedostępne</translation>
+    </message>
+    <message>
+      <source>Incompatible server</source>
+      <translation>Serwer niekompatybilny</translation>
+    </message>
+    <message>
+      <source>Incompatible server version %1</source>
+      <translation>Niekompatybilna wersja serwera %1</translation>
     </message>
   </context>
   <context>
@@ -346,6 +417,22 @@
     <message>
       <source>Best quality</source>
       <translation>Najlepsza jakość</translation>
+    </message>
+    <message>
+      <source>Transcoding is disabled.</source>
+      <translation>Transkodowanie jest wyłączone.</translation>
+    </message>
+    <message>
+      <source>Transcoding is not supported for this camera.</source>
+      <translation>Transkodowanie nie jest dostępne dla tej kamery.</translation>
+    </message>
+    <message>
+      <source>Transcoding is not supported for servers with version lower than 3.0.</source>
+      <translation>Transkodowanie nie jest dostępne na serwerach w wersji niższej niż 3.0.</translation>
+    </message>
+    <message>
+      <source>Transcoding is not supported for ARM servers.</source>
+      <translation>Transkodowanie nie jest dostępne na serwerach ARM.</translation>
     </message>
   </context>
   <context>
@@ -461,10 +548,6 @@
       <translation>Zaloguj się do %1</translation>
     </message>
     <message>
-      <source>Cannot connect to %1</source>
-      <translation>Nie można połączyć się z %1</translation>
-    </message>
-    <message>
       <source>Check your network connection or press &quot;%1&quot; button to enter a known server address.</source>
       <translation>Sprawdź połączenie sieciowe lub naciśnij przycisk &quot;%1&quot;, aby wprowadzić adres znanego serwera.</translation>
     </message>
@@ -506,6 +589,14 @@
     <message>
       <source>Save passwords for servers</source>
       <translation>Zapisz hasła dla serwerów</translation>
+    </message>
+    <message>
+      <source>What to do with currently saved passwords?</source>
+      <translation>Co zrobić z aktualnie przechowywanymi hasłami?</translation>
+    </message>
+    <message>
+      <source>Delete</source>
+      <translation>Usuń</translation>
     </message>
   </context>
   <context>
@@ -634,6 +725,38 @@
       <source>Cannot play any video stream</source>
       <translation>Nie można odtworzyć żadnego strumienia wideo</translation>
     </message>
+    <message>
+      <source>Not enough licenses</source>
+      <translation>Za mało licencji</translation>
+    </message>
+    <message>
+      <source>Password required</source>
+      <translation>Hasło jest wymagane</translation>
+    </message>
+    <message>
+      <source>Set password on this camera using Wisenet WAVE client or camera web-page to view video</source>
+      <translation>Ustaw hasło w tej kamerze za pomocą klienta Wisenet WAVE lub strony internetowej kamery, aby wyświetlić obraz wideo</translation>
+    </message>
+    <message>
+      <source>Unsupported firmware version</source>
+      <translation>Nieobsługiwana wersja firmware</translation>
+    </message>
+    <message>
+      <source>Please update firmware</source>
+      <translation>Proszę zaktualizować firmware</translation>
+    </message>
+    <message>
+      <source>Too many connections</source>
+      <translation>Zbyt wiele połączeń</translation>
+    </message>
+    <message>
+      <source>I/O interface not supported yet</source>
+      <translation>Interfejs I/O nie jest jeszcze obsługiwany</translation>
+    </message>
+    <message>
+      <source>In this app I/O module can be used as a sound input device only. To use it as a control module, please use desktop version of %1</source>
+      <translation>W tej aplikacji moduł I/O może być używany tylko jako urządzenie wejściowe audio. Aby użyć go jako modułu sterowania, użyj wersji desktop %1</translation>
+    </message>
   </context>
   <context>
     <name>VideoNavigation</name>
@@ -643,12 +766,7 @@
     </message>
     <message>
       <source>LIVE</source>
-      <translation>NA ŻYWO</translation>
-    </message>
-    <message>
-      <source>d MMMM yyyy</source>
-      <comment>DO NOT TRANSLATE THIS STRING!</comment>
-      <translation type="unfinished">d MMMM yyyy</translation>
+      <translation>LIVE</translation>
     </message>
   </context>
   <context>
@@ -667,6 +785,17 @@
     <message>
       <source>Skip</source>
       <translation>Pomiń</translation>
+    </message>
+  </context>
+  <context>
+    <name>main</name>
+    <message>
+      <source>Server offline. Reconnecting...</source>
+      <translation>Serwer rozłączony. Trwa ponowne łączenie...</translation>
+    </message>
+    <message>
+      <source>Cannot connect to %1</source>
+      <translation>Nie można połączyć się z %1</translation>
     </message>
   </context>
 </TS>

@@ -317,38 +317,33 @@ QSize IOSVideoDecoder::maxResolution(const AVCodecID codec)
 {
     static const QSize kHdReadyResolution(1280, 720);
     static const QSize kFullHdResolution(1920, 1080);
-    static const QSize kUhd4kResolution(3840, 2160);
+    static const QSize kDci4kResolution(4096, 2160);
 
     const auto& deviceInfo = iosDeviceInformation();
     switch (codec)
     {
-        case AV_CODEC_ID_H265:
-            // List of models with HEVC:
-            // https://support.apple.com/en-ie/HT207022
-            // https://stackoverflow.com/questions/11197509/how-to-get-device-make-and-model-on-ios
-            if (deviceInfo.type == IosDeviceInformation::Type::iPhone)
-            {
-                if (deviceInfo.majorVersion > 7)
-                    return kUhd4kResolution;
-            }
-            else if (deviceInfo.type == IosDeviceInformation::Type::iPad)
-            {
-                if (deviceInfo.majorVersion > 5)
-                    return kUhd4kResolution;
-            }
-            return QSize(); //< HEVC is not supported.
         case AV_CODEC_ID_H264:
+        case AV_CODEC_ID_H265:
             if (deviceInfo.type == IosDeviceInformation::Type::iPhone)
             {
-                if (deviceInfo.majorVersion >= 7) //< iPhone 6 and newer.
-                    return kUhd4kResolution;
+                if (deviceInfo.majorVersion >= IosDeviceInformation::iPhone6)
+                    return kDci4kResolution;
             }
             else if (deviceInfo.type == IosDeviceInformation::Type::iPad)
             {
-                if (deviceInfo.majorVersion >= 5) //< iPad Air 2 / iPad Mini 4 or newer.
-                    return kUhd4kResolution;
+                if (deviceInfo.majorVersion >= IosDeviceInformation::iPadAir2)
+                    return kDci4kResolution;
+            }
+
+            if (codec == AV_CODEC_ID_H265)
+            {
+                // List of models with HEVC:
+                // https://support.apple.com/en-ie/HT207022
+                // https://stackoverflow.com/questions/11197509/how-to-get-device-make-and-model-on-ios
+                return QSize(); //< HEVC is not supported on deviced older than iPhone 6.
             }
             return kFullHdResolution;
+
         default:
             return kHdReadyResolution;
     }

@@ -59,7 +59,7 @@ def get_files_list(path):
 
 # TODO: #GDM Method looks crappy
 def detect_module(entry):
-    if 'ios' in entry or 'android' in entry:
+    if 'ios' in entry or 'android' in entry or ('mobile' in entry and 'build_mobile' not in entry):
         return 'build_mobile'  # TODO: #GDM fix in 4.0
     if 'paxton' in entry:
         return 'build_paxton'
