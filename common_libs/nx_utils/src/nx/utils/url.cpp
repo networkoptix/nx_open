@@ -216,6 +216,11 @@ QString Url::toString(QUrl::FormattingOptions options) const
     return url(options);
 }
 
+std::string Url::toStdString(QUrl::FormattingOptions options) const
+{
+    return toString(options).toStdString();
+}
+
 QString Url::toDisplayString(QUrl::FormattingOptions options) const
 {
     return url(options);

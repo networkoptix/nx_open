@@ -2,7 +2,7 @@ nx_configure_file(
     "maven/filter-resources/time_server_app_info_impl.cpp"
     "${CMAKE_CURRENT_BINARY_DIR}")
 
-nx_add_target(time_server EXECUTABLE
+nx_add_target(time_server EXECUTABLE NO_MOC
     ADDITIONAL_SOURCES
         "${CMAKE_CURRENT_BINARY_DIR}/time_server_app_info_impl.cpp"
     PUBLIC_LIBS

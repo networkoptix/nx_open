@@ -116,7 +116,7 @@ int StreamReader::getNextData( nxcip::MediaDataPacket** lpPacket )
         if( !m_httpClient )
         {
             m_httpClient = std::make_shared<nx::network::http::HttpClient>();
-            m_httpClient->setMessageBodyReadTimeoutMs( MAX_FRAME_DURATION_MS );
+            m_httpClient->setMessageBodyReadTimeout(std::chrono::milliseconds(MAX_FRAME_DURATION_MS));
             httpClientHasBeenJustCreated = true;
         }
         localHttpClientPtr = m_httpClient;

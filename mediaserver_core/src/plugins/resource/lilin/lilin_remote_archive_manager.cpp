@@ -125,9 +125,9 @@ std::unique_ptr<nx::network::http::HttpClient> LilinRemoteArchiveManager::initHt
     httpClient->setUserName(auth.user());
     httpClient->setUserPassword(auth.password());
     httpClient->setAuthType(nx::network::http::AuthType::authBasic);
-    httpClient->setResponseReadTimeoutMs(kHttpTimeout.count());
-    httpClient->setSendTimeoutMs(kHttpTimeout.count());
-    httpClient->setMessageBodyReadTimeoutMs(kHttpTimeout.count());
+    httpClient->setResponseReadTimeout(kHttpTimeout);
+    httpClient->setSendTimeout(kHttpTimeout);
+    httpClient->setMessageBodyReadTimeout(kHttpTimeout);
 
     return httpClient;
 }

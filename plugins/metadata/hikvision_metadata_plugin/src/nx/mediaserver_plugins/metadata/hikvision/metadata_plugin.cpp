@@ -10,6 +10,7 @@
 #include <QtCore/QFileInfo>
 
 #include <nx/network/http/http_client.h>
+#include <nx/network/deprecated/asynchttpclient.h>
 #include <nx/api/analytics/device_manifest.h>
 #include <nx/fusion/model_functions.h>
 #include <nx/utils/log/log_main.h>
