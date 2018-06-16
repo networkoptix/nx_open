@@ -45,6 +45,7 @@ h1, h2 {
     display       : flex;
     align-items   : center;
     font-family   : $font-family-regular;
+    color         : $dark9;
 }
 
 h2 {
@@ -52,6 +53,7 @@ h2 {
     padding     : 0;
     font-size   : $h2-font-size;
     font-family : $font-family-regular;
+    color       : $dark9;
 }
 
 h3 {
@@ -59,26 +61,35 @@ h3 {
     margin-bottom : ($line-height-computed / 4);
     font-size     : $h3-font-size;
     font-family   : $font-family-medium;
+    color         : $dark9;
 }
 
 h4 {
     font-size   : $h4-font-size;
     font-family : $font-family-medium;
+    color       : $dark9;
 }
 
 h5 {
     font-size   : $h5-font-size;
     font-family : $font-family-medium;
+    color       : $dark9;
 }
 
 h6 {
     font-size   : $h6-font-size;
     font-family : $font-family-medium;
+    color       : $dark9;
 }
 
 h1 > .label {
     font-size      : 60%;
     vertical-align : 33%;
+}
+
+.regular14 {
+    @extend h5;
+    font-family : $font-family-regular;
 }
 
 .card .table-responsive {
