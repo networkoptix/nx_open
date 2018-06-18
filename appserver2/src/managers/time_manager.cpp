@@ -1185,7 +1185,13 @@ void TimeSynchronizationManager::updateRuntimeInfoPriority(quint64 priority)
 
 qint64 TimeSynchronizationManager::getSyncTimeNonSafe() const
 {
-    return m_usedTimeSyncInfo.syncTime + m_monotonicClock.elapsed().count() - m_usedTimeSyncInfo.monotonicClockValue;
+    if (m_messageBus->commonModule()->globalSettings()->isTimeSynchronizationEnabled())
+    {
+        return m_usedTimeSyncInfo.syncTime + m_monotonicClock.elapsed().count() -
+            m_usedTimeSyncInfo.monotonicClockValue;
+    }
+
+    return QDateTime::currentMSecsSinceEpoch();
 }
 
 void TimeSynchronizationManager::onDbManagerInitialized()
