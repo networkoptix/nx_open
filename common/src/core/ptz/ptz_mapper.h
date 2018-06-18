@@ -5,6 +5,8 @@
 
 #include <utils/math/space_mapper.h>
 
+#include <nx/core/ptz/vector.h>
+
 #include "ptz_fwd.h"
 #include "ptz_limits.h"
 

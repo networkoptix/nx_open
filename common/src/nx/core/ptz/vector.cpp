@@ -140,6 +140,42 @@ bool Vector::isNull() const
     return qFuzzyIsNull(*this);
 }
 
+Vector Vector::restricted(const QnPtzLimits& limits, LimitsType restrictionType) const
+{
+    if (restrictionType == LimitsType::position)
+    {
+        return Vector(
+            std::clamp(pan, limits.minPan, limits.maxPan),
+            std::clamp(tilt, limits.minTilt, limits.maxTilt),
+            std::clamp(rotation, limits.minRotation, limits.maxRotation),
+            std::clamp(zoom, limits.minFov, limits.maxFov));
+    }
+
+    return Vector(
+            std::clamp(pan, limits.minPanSpeed, limits.maxPanSpeed),
+            std::clamp(tilt, limits.minTiltSpeed, limits.maxTiltSpeed),
+            std::clamp(rotation, limits.minRotationSpeed, limits.maxRotationSpeed),
+            std::clamp(zoom, limits.minZoomSpeed, limits.maxZoomSpeed));
+}
+
+/*static*/ Vector Vector::rangeVector(const QnPtzLimits& limits, LimitsType limitsType)
+{
+    if (limitsType == LimitsType::position)
+    {
+        return Vector(
+            limits.maxPan - limits.minPan,
+            limits.maxTilt - limits.minTilt,
+            limits.maxRotation - limits.minRotation,
+            limits.maxFov - limits.minFov);
+    }
+
+    return Vector(
+        limits.maxPanSpeed - limits.minPanSpeed,
+        limits.maxTiltSpeed - limits.minTiltSpeed,
+        limits.maxRotationSpeed - limits.minRotationSpeed,
+        limits.maxZoomSpeed - limits.minZoomSpeed);
+}
+
 Vector operator*(const Vector& ptzVector, double scalar)
 {
     return Vector(

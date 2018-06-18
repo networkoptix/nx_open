@@ -11,8 +11,6 @@
 
 #include <utils/math/math.h>
 
-#include <nx/core/ptz/vector.h>
-
 struct QnPtzLimits: public boost::equality_comparable1<QnPtzLimits>
 {
     friend bool operator==(const QnPtzLimits &l, const QnPtzLimits &r);
@@ -90,54 +88,5 @@ inline QVector3D qBound(const QVector3D &position, const QnPtzLimits &limits) {
     );
 }
 #endif
-
-inline nx::core::ptz::Vector qBound(
-    const nx::core::ptz::Vector& position,
-    const QnPtzLimits& limits)
-{
-    bool unlimitedPan = false;
-    const qreal panRange = (limits.maxPan - limits.minPan);
-    if (qFuzzyCompare(panRange, 360) || panRange > 360)
-        unlimitedPan = true;
-
-    qreal pan = position.pan;
-    if (!unlimitedPan && !qBetween(limits.minPan, pan, limits.maxPan))
-    {
-        /* Round it to the nearest boundary. */
-        qreal panBase = limits.minPan - qMod(limits.minPan, 360.0);
-        qreal panShift = qMod(pan, 360.0);
-
-        qreal bestPan = pan;
-        qreal bestDist = std::numeric_limits<qreal>::max();
-
-        pan = panBase - 360.0 + panShift;
-        for (int i = 0; i < 3; i++)
-        {
-            qreal dist;
-            if (pan < limits.minPan)
-                dist = limits.minPan - pan;
-            else if (pan > limits.maxPan)
-                dist = pan - limits.maxPan;
-            else
-                dist = 0.0;
-
-            if (dist < bestDist)
-            {
-                bestDist = dist;
-                bestPan = pan;
-            }
-
-            pan += 360.0;
-        }
-
-        pan = bestPan;
-    }
-
-    return nx::core::ptz::Vector(
-        pan,
-        qBound<float>(limits.minTilt, position.tilt, limits.maxTilt),
-        qBound<float>(limits.minRotation, position.rotation, limits.maxRotation),
-        qBound<float>(limits.minFov, position.zoom, limits.maxFov));
-}
 
 #endif // QN_PTZ_LIMITS_H

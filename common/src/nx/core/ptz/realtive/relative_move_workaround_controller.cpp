@@ -79,7 +79,7 @@ RelativeMoveWorkaroundController::RelativeMoveWorkaroundController(
     :
     base_type(controller),
     m_continuousMoveEngine(std::make_unique<RelativeContinuousMoveEngine>()),
-    m_absoluteMoveEngine(std::make_unique<RelativeAbsoluteMoveEngine>())
+    m_absoluteMoveEngine(std::make_unique<RelativeAbsoluteMoveEngine>(controller.data()))
 {
 }
 

@@ -6,6 +6,7 @@
 #include <nx/network/http/http_async_client.h>
 #include <nx/network/aio/timer.h>
 #include <nx/utils/std/optional.h>
+#include <nx/core/ptz/vector.h>
 
 namespace nx {
 namespace mediaserver_core {
