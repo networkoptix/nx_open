@@ -463,7 +463,7 @@ APPLY(314, removeCameraUserAttributes, nx::vms::api::IdData, \
                        InvalidFilterFunc(), /* Filter read func */ \
                        AllowForAllAccessOut(), /* Check remote peer rights for outgoing transaction */ \
                        RegularTransactionType()) /* regular transaction type */ \
-APPLY(400, getMediaServers, ApiMediaServerDataList, \
+APPLY(400, getMediaServers, nx::vms::api::MediaServerDataList, \
                        false, /* persistent*/ \
                        false, /* system*/ \
                        InvalidGetHashHelper(), /* getHash*/ \
@@ -474,7 +474,7 @@ APPLY(400, getMediaServers, ApiMediaServerDataList, \
                        FilterListByAccess<ReadResourceAccess>(), /* Filter read func */ \
                        ReadListAccessOut<ReadResourceAccess>(), /* Check remote peer rights for outgoing transaction */ \
                        RegularTransactionType()) /* regular transaction type */ \
-APPLY(401, saveMediaServer, ApiMediaServerData, \
+APPLY(401, saveMediaServer, nx::vms::api::MediaServerData, \
                        true, /* persistent*/ \
                        false, /* system*/ \
                        CreateHashByIdHelper(), /* getHash*/ \
@@ -496,7 +496,7 @@ APPLY(402, removeMediaServer, nx::vms::api::IdData, \
                        InvalidFilterFunc(), /* Filter read func */ \
                        AllowForAllAccessOut(), /* Check remote peer rights for outgoing transaction */ \
                        RegularTransactionType()) /* regular transaction type */ \
-APPLY(403, saveMediaServerUserAttributes, ApiMediaServerUserAttributesData, \
+APPLY(403, saveMediaServerUserAttributes, nx::vms::api::MediaServerUserAttributesData, \
                        true, /* persistent*/ \
                        false, /* system*/ \
                        &createHashForApiMediaServerUserAttributesDataHelper, /* getHash*/ \
@@ -507,7 +507,7 @@ APPLY(403, saveMediaServerUserAttributes, ApiMediaServerUserAttributesData, \
                        InvalidFilterFunc(), /* Filter read func */ \
                        ReadServerAttributesAccessOut(), /* Check remote peer rights for outgoing transaction */ \
                        RegularTransactionType()) /* regular transaction type */ \
-APPLY(404, saveMediaServerUserAttributesList, ApiMediaServerUserAttributesDataList, \
+APPLY(404, saveMediaServerUserAttributesList, nx::vms::api::MediaServerUserAttributesDataList, \
                        true, /* persistent*/ \
                        false, /* system*/ \
                        InvalidGetHashHelper(), /* getHash*/ \
@@ -518,7 +518,7 @@ APPLY(404, saveMediaServerUserAttributesList, ApiMediaServerUserAttributesDataLi
                        FilterListByAccess<ReadServerAttributesAccess>(), /* Filter read func */ \
                        ReadListAccessOut<ReadServerAttributesAccess>(), /* Check remote peer rights for outgoing transaction */ \
                        RegularTransactionType()) /* regular transaction type */ \
-APPLY(405, getMediaServerUserAttributesList, ApiMediaServerUserAttributesDataList, \
+APPLY(405, getMediaServerUserAttributesList, nx::vms::api::MediaServerUserAttributesDataList, \
                        false, /* persistent*/ \
                        false, /* system*/ \
                        InvalidGetHashHelper(), /* getHash*/ \
@@ -540,7 +540,7 @@ APPLY(406, removeServerUserAttributes, nx::vms::api::IdData, \
                        InvalidFilterFunc(), /* Filter read func */ \
                        AllowForAllAccessOut(), /* Check remote peer rights for outgoing transaction */ \
                        RegularTransactionType()) /* regular transaction type */ \
-APPLY(407, saveStorage, ApiStorageData, \
+APPLY(407, saveStorage, nx::vms::api::StorageData, \
                        true, /* persistent*/ \
                        false, /* system*/ \
                        CreateHashByIdHelper(), /* getHash*/ \
@@ -551,7 +551,7 @@ APPLY(407, saveStorage, ApiStorageData, \
                        InvalidFilterFunc(), /* Filter read func */ \
                        ReadResourceAccessOut(), /* Check remote peer rights for outgoing transaction */ \
                        RegularTransactionType()) /* regular transaction type */ \
-APPLY(408, saveStorages, ApiStorageDataList, \
+APPLY(408, saveStorages, nx::vms::api::StorageDataList, \
                        true, /* persistent*/ \
                        false, /* system*/ \
                        InvalidGetHashHelper(), /* getHash*/ \
@@ -584,7 +584,7 @@ APPLY(410, removeStorages, nx::vms::api::IdDataList, \
                        FilterListByAccess<ReadResourceAccess>(), /* Filter read func */ \
                        ReadListAccessOut<AllowForAllAccess>(), /* Check remote peer rights for outgoing transaction */ \
                        RegularTransactionType()) /* regular transaction type */ \
-APPLY(411, getMediaServersEx, ApiMediaServerDataExList, \
+APPLY(411, getMediaServersEx, nx::vms::api::MediaServerDataExList, \
                        false, /* persistent*/ \
                        false, /* system*/ \
                        InvalidGetHashHelper(), /* getHash*/ \
@@ -595,7 +595,7 @@ APPLY(411, getMediaServersEx, ApiMediaServerDataExList, \
                        FilterListByAccess<ReadResourceAccess>(), /* Filter read func */ \
                        ReadListAccessOut<ReadResourceAccess>(), /* Check remote peer rights for outgoing transaction */ \
                        RegularTransactionType()) /* regular transaction type */ \
-APPLY(412, getStorages, ApiStorageDataList, \
+APPLY(412, getStorages, nx::vms::api::StorageDataList, \
                        false, /* persistent*/ \
                        false, /* system*/ \
                        InvalidGetHashHelper(), /* getHash*/ \

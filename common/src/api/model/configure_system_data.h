@@ -2,7 +2,7 @@
 
 #include "password_data.h"
 #include <nx/fusion/fusion/fusion_fwd.h>
-#include <nx_ec/data/api_media_server_data.h>
+#include <nx/vms/api/data/media_server_data.h>
 #include <nx_ec/transaction_timestamp.h>
 #include <nx_ec/data/api_user_data.h>
 
@@ -35,7 +35,7 @@ struct ConfigureSystemData: public PasswordData
     qint64 sysIdTime;
     ec2::Timestamp tranLogTime;
     int port;
-    ec2::ApiMediaServerData foreignServer;
+    nx::vms::api::MediaServerData foreignServer;
     std::vector<ec2::ApiUserData> foreignUsers;
     nx::vms::api::ResourceParamDataList foreignSettings;
     nx::vms::api::ResourceParamWithRefDataList additionParams;

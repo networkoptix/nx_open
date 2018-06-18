@@ -409,10 +409,10 @@ void makeFakeData(const QString& fakeDataString,
         }
     }
 
-    std::vector<ec2::ApiStorageData> storages;
+    std::vector<nx::vms::api::StorageData> storages;
     for (int i = 0; i < storageCount; ++i)
     {
-        ec2::ApiStorageData storage;
+        nx::vms::api::StorageData storage;
         storage.id = QnUuid::createUuid();
         storage.parentId = serverId;
         storage.name = lm("Fake Storage/%1").arg(storage.id);

@@ -50,14 +50,14 @@ public:
         const nx::vms::api::CameraData& camera,
         ec2::NotificationSource source);
     virtual void updateResource(
-        const ec2::ApiMediaServerData& server,
+        const nx::vms::api::MediaServerData& server,
         ec2::NotificationSource source);
     virtual void updateResource(
-        const ec2::ApiStorageData& storage,
+        const nx::vms::api::StorageData& storage,
         ec2::NotificationSource source);
 
     void resetServerUserAttributesList(
-        const ec2::ApiMediaServerUserAttributesDataList& serverUserAttributesList);
+        const nx::vms::api::MediaServerUserAttributesDataList& serverUserAttributesList);
     void resetCameraUserAttributesList(
         const nx::vms::api::CameraAttributesDataList& cameraUserAttributesList);
     void resetPropertyList(const nx::vms::api::ResourceParamWithRefDataList& params);
@@ -148,7 +148,8 @@ private slots:
     void on_cameraUserAttributesRemoved(const QnUuid& cameraId);
     void on_cameraHistoryChanged(const nx::vms::api::ServerFootageData& cameraHistory);
 
-    void on_mediaServerUserAttributesChanged(const ec2::ApiMediaServerUserAttributesData& userAttributes);
+    void on_mediaServerUserAttributesChanged(
+        const nx::vms::api::MediaServerUserAttributesData& userAttributes);
     void on_mediaServerUserAttributesRemoved(const QnUuid& serverId);
 
     void on_businessEventRemoved(const QnUuid &id);

@@ -251,9 +251,9 @@ nx::network::http::StatusCode::Value SystemMergeProcessor::checkWhetherMergeIsPo
             m_commonModule->moduleGUID());
     bool isDefaultSystemName;
     if (data.takeRemoteSettings)
-        isDefaultSystemName = m_remoteModuleInformation.serverFlags.testFlag(Qn::SF_NewSystem);
+        isDefaultSystemName = m_remoteModuleInformation.serverFlags.testFlag(api::SF_NewSystem);
     else
-        isDefaultSystemName = mServer && (mServer->getServerFlags().testFlag(Qn::SF_NewSystem));
+        isDefaultSystemName = mServer && (mServer->getServerFlags().testFlag(api::SF_NewSystem));
     if (isDefaultSystemName)
     {
         NX_LOG(lit("SystemMergeProcessor. Can not merge to the non configured system"), cl_logDEBUG1);
@@ -345,7 +345,8 @@ bool SystemMergeProcessor::applyCurrentSettings(
     const QString& postKey,
     bool oneServer)
 {
-    auto server = m_commonModule->resourcePool()->getResourceById<QnMediaServerResource>(m_commonModule->moduleGUID());
+    auto server = m_commonModule->resourcePool()->getResourceById<QnMediaServerResource>(
+        m_commonModule->moduleGUID());
     if (!server)
         return false;
     Q_ASSERT(!server->getAuthKey().isEmpty());
@@ -361,7 +362,7 @@ bool SystemMergeProcessor::applyCurrentSettings(
      * Save current server to the foreign system.
      * It could be only way to pass authentication if current admin user is disabled
      */
-    fromResourceToApi(server, data.foreignServer);
+    ec2::fromResourceToApi(server, data.foreignServer);
 
     /**
      * Save current admin and cloud users to the foreign system
@@ -517,8 +518,8 @@ bool SystemMergeProcessor::applyRemoteSettings(
                 m_commonModule->moduleGUID());
         if (!mServer)
             return false;
-        ec2::ApiMediaServerData currentServer;
-        fromResourceToApi(mServer, currentServer);
+        api::MediaServerData currentServer;
+        ec2::fromResourceToApi(mServer, currentServer);
 
         nx::network::http::HttpClient client;
         client.setResponseReadTimeoutMs(kRequestTimeout.count());

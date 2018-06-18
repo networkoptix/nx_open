@@ -9,8 +9,8 @@ namespace ec2 {
 struct ApiFullInfoData: nx::vms::api::Data
 {
     nx::vms::api::ResourceTypeDataList resourceTypes;
-    ApiMediaServerDataList servers;
-    ApiMediaServerUserAttributesDataList serversUserAttributesList;
+    nx::vms::api::MediaServerDataList servers;
+    nx::vms::api::MediaServerUserAttributesDataList serversUserAttributesList;
     nx::vms::api::CameraDataList cameras;
     nx::vms::api::CameraAttributesDataList cameraUserAttributesList;
     ApiUserDataList users;
@@ -23,7 +23,7 @@ struct ApiFullInfoData: nx::vms::api::Data
     nx::vms::api::LicenseDataList licenses;
     ApiDiscoveryDataList discoveryData;
     nx::vms::api::ResourceParamWithRefDataList allProperties;
-    ApiStorageDataList storages;
+    nx::vms::api::StorageDataList storages;
     nx::vms::api::ResourceStatusDataList resStatusList;
     nx::vms::api::WebPageDataList webPages;
     nx::vms::api::LayoutTourDataList layoutTours;

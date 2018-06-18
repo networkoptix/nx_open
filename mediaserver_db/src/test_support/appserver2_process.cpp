@@ -439,13 +439,13 @@ void Appserver2Process::addSelfServerResource(
     server->setId(commonModule()->moduleGUID());
     m_commonModule->resourcePool()->addResource(server);
     server->setStatus(Qn::Online);
-    server->setServerFlags(Qn::SF_HasPublicIP);
+    server->setServerFlags(nx::vms::api::SF_HasPublicIP);
 
     m_commonModule->bindModuleInformation(server);
 
-    ::ec2::ApiMediaServerData apiServer;
+    api::MediaServerData apiServer;
     apiServer.id = commonModule()->moduleGUID();
-    ::ec2::fromResourceToApi(server, apiServer);
+    ec2::fromResourceToApi(server, apiServer);
     if (ec2Connection->getMediaServerManager(Qn::kSystemAccess)->saveSync(apiServer)
         != ec2::ErrorCode::ok)
     {

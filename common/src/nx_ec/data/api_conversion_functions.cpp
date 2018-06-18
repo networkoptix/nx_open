@@ -23,8 +23,6 @@
 
 #include <nx_ec/ec_api.h>
 
-#include "api_media_server_data.h"
-#include "api_resource_data.h"
 #include <nx/vms/api/data/resource_type_data.h>
 #include "api_user_data.h"
 #include "api_runtime_data.h"
@@ -42,7 +40,9 @@
 #include <nx/vms/api/data/event_rule_data.h>
 #include <nx/vms/api/data/layout_data.h>
 #include <nx/vms/api/data/license_data.h>
+#include <nx/vms/api/data/media_server_data.h>
 #include <nx/vms/api/data/peer_data.h>
+#include <nx/vms/api/data/resource_data.h>
 #include <nx/vms/api/data/videowall_data.h>
 
 using namespace nx;
@@ -567,7 +567,7 @@ static QString serializeNetAddrList(const QList<nx::network::SocketAddress>& net
     return result.join(L';');
 }
 
-void fromResourceToApi(const QnStorageResourcePtr& src, ApiStorageData& dst)
+void fromResourceToApi(const QnStorageResourcePtr& src, StorageData& dst)
 {
     fromResourceToApi(src, static_cast<ResourceData&>(dst));
 
@@ -577,17 +577,17 @@ void fromResourceToApi(const QnStorageResourcePtr& src, ApiStorageData& dst)
     dst.isBackup = src->isBackup();
 }
 
-void fromResourceListToApi(const QnStorageResourceList& src, ApiStorageDataList& dst)
+void fromResourceListToApi(const QnStorageResourceList& src, StorageDataList& dst)
 {
     for (const QnStorageResourcePtr& storage: src)
     {
-        ApiStorageData dstStorage;
+        StorageData dstStorage;
         fromResourceToApi(storage, dstStorage);
         dst.push_back(std::move(dstStorage));
     }
 }
 
-void fromApiToResource(const ApiStorageData& src, QnStorageResourcePtr& dst)
+void fromApiToResource(const StorageData& src, QnStorageResourcePtr& dst)
 {
     fromApiToResource(static_cast<const ResourceData&>(src), dst.data());
 
@@ -597,7 +597,7 @@ void fromApiToResource(const ApiStorageData& src, QnStorageResourcePtr& dst)
     dst->setBackup(src.isBackup);
 }
 
-void fromResourceToApi(const QnMediaServerResourcePtr& src, ApiMediaServerData& dst)
+void fromResourceToApi(const QnMediaServerResourcePtr& src, MediaServerData& dst)
 {
     fromResourceToApi(src, static_cast<ResourceData&>(dst));
 
@@ -608,7 +608,7 @@ void fromResourceToApi(const QnMediaServerResourcePtr& src, ApiMediaServerData& 
     dst.authKey = src->getAuthKey();
 }
 
-void fromApiToResource(const ApiMediaServerData& src, QnMediaServerResourcePtr& dst)
+void fromApiToResource(const MediaServerData& src, QnMediaServerResourcePtr& dst)
 {
     fromApiToResource(static_cast<const ResourceData&>(src), dst.data());
 
@@ -623,10 +623,10 @@ void fromApiToResource(const ApiMediaServerData& src, QnMediaServerResourcePtr& 
 }
 
 template<class List>
-void fromApiToResourceList(const ApiMediaServerDataList& src, List& dst, const overload_tag&, QnCommonModule* commonModule)
+void fromApiToResourceList(const MediaServerDataList& src, List& dst, const overload_tag&, QnCommonModule* commonModule)
 {
     dst.reserve(dst.size() + (int)src.size());
-    for (const ApiMediaServerData& srcServer: src)
+    for (const MediaServerData& srcServer: src)
     {
         QnMediaServerResourcePtr dstServer(new QnMediaServerResource(commonModule));
         fromApiToResource(srcServer, dstServer);
@@ -634,21 +634,21 @@ void fromApiToResourceList(const ApiMediaServerDataList& src, List& dst, const o
     }
 }
 
-void fromApiToResourceList(const ApiMediaServerDataList& src, QnResourceList& dst, QnCommonModule* commonModule)
+void fromApiToResourceList(const MediaServerDataList& src, QnResourceList& dst, QnCommonModule* commonModule)
 {
     fromApiToResourceList(src, dst, overload_tag(), commonModule);
 }
 
-void fromApiToResourceList(const ApiMediaServerDataList& src, QnMediaServerResourceList& dst, QnCommonModule* commonModule)
+void fromApiToResourceList(const MediaServerDataList& src, QnMediaServerResourceList& dst, QnCommonModule* commonModule)
 {
     fromApiToResourceList(src, dst, overload_tag(), commonModule);
 }
 
 
 ////////////////////////////////////////////////////////////
-//// ApiMediaServerUserAttributesData
+//// MediaServerUserAttributesData
 ////////////////////////////////////////////////////////////
-void fromResourceToApi(const QnMediaServerUserAttributesPtr& src, ApiMediaServerUserAttributesData& dst)
+void fromResourceToApi(const QnMediaServerUserAttributesPtr& src, MediaServerUserAttributesData& dst)
 {
     dst.serverId = src->serverId;
     dst.serverName = src->name;
@@ -661,7 +661,7 @@ void fromResourceToApi(const QnMediaServerUserAttributesPtr& src, ApiMediaServer
     dst.backupBitrate = src->backupSchedule.backupBitrate;
 }
 
-void fromApiToResource(const ApiMediaServerUserAttributesData& src, QnMediaServerUserAttributesPtr& dst)
+void fromApiToResource(const MediaServerUserAttributesData& src, QnMediaServerUserAttributesPtr& dst)
 {
     dst->serverId = src.serverId;
     dst->name = src.serverName;
@@ -674,10 +674,10 @@ void fromApiToResource(const ApiMediaServerUserAttributesData& src, QnMediaServe
     dst->backupSchedule.backupBitrate = src.backupBitrate;
 }
 
-void fromApiToResourceList(const ApiMediaServerUserAttributesDataList& src, QnMediaServerUserAttributesList& dst)
+void fromApiToResourceList(const MediaServerUserAttributesDataList& src, QnMediaServerUserAttributesList& dst)
 {
     dst.reserve(dst.size() + static_cast<int>(src.size()));
-    for (const ApiMediaServerUserAttributesData& serverAttrs: src)
+    for (const MediaServerUserAttributesData& serverAttrs: src)
     {
         QnMediaServerUserAttributesPtr dstElement(new QnMediaServerUserAttributes());
         fromApiToResource(serverAttrs, dstElement);
@@ -685,12 +685,12 @@ void fromApiToResourceList(const ApiMediaServerUserAttributesDataList& src, QnMe
     }
 }
 
-void fromResourceListToApi(const QnMediaServerUserAttributesList& src, ApiMediaServerUserAttributesDataList& dst)
+void fromResourceListToApi(const QnMediaServerUserAttributesList& src, MediaServerUserAttributesDataList& dst)
 {
     dst.reserve(dst.size() + src.size());
     for (const QnMediaServerUserAttributesPtr& camerAttrs: src)
     {
-        dst.push_back(ApiMediaServerUserAttributesData());
+        dst.push_back(MediaServerUserAttributesData());
         fromResourceToApi(camerAttrs, dst.back());
     }
 }

@@ -22,6 +22,8 @@
 
 #include "ec_connection_notification_manager.h"
 
+using namespace nx::vms;
+
 namespace ec2 {
 
 namespace detail {
@@ -192,7 +194,8 @@ QnUuid createHashForApiLicenseDataHelper(const nx::vms::api::LicenseData& params
     return QnAbstractTransaction::makeHash(params.key, "ApiLicense");
 }
 
-QnUuid createHashForApiMediaServerUserAttributesDataHelper(const ApiMediaServerUserAttributesData &params)
+QnUuid createHashForApiMediaServerUserAttributesDataHelper(
+    const api::MediaServerUserAttributesData &params)
 {
     return QnAbstractTransaction::makeHash(params.serverId.toRfc4122(), "server_attributes");
 }
@@ -502,13 +505,15 @@ struct ModifyCameraDataAccess
 template<typename Param>
 void applyColumnFilter(QnCommonModule*, const Qn::UserAccessData& /*accessData*/, Param& /*data*/) {}
 
-void applyColumnFilter(QnCommonModule*, const Qn::UserAccessData& accessData, ApiMediaServerData& data)
+void applyColumnFilter(
+    QnCommonModule*, const Qn::UserAccessData& accessData, api::MediaServerData& data)
 {
     if (accessData != Qn::kSystemAccess)
         data.authKey.clear();
 }
 
-void applyColumnFilter(QnCommonModule* commonModule, const Qn::UserAccessData& accessData, ApiStorageData& data)
+void applyColumnFilter(
+    QnCommonModule* commonModule, const Qn::UserAccessData& accessData, api::StorageData& data)
 {
     if (!hasSystemAccess(accessData) && !commonModule->resourceAccessManager()->hasGlobalPermission(
             accessData,
@@ -793,7 +798,8 @@ struct ModifyCameraAttributesListAccess
 
 struct ReadServerAttributesAccess
 {
-    bool operator()(QnCommonModule* commonModule, const Qn::UserAccessData& accessData, const ApiMediaServerUserAttributesData& param)
+    bool operator()(QnCommonModule* commonModule, const Qn::UserAccessData& accessData, 
+        const api::MediaServerUserAttributesData& param)
     {
         return resourceAccessHelper(commonModule, accessData, param.serverId, Qn::ReadPermission);
     }
@@ -801,7 +807,8 @@ struct ReadServerAttributesAccess
 
 struct ReadServerAttributesAccessOut
 {
-    RemotePeerAccess operator()(QnCommonModule* commonModule, const Qn::UserAccessData& accessData, const ApiMediaServerUserAttributesData& param)
+    RemotePeerAccess operator()(QnCommonModule* commonModule, const Qn::UserAccessData& accessData, 
+        const api::MediaServerUserAttributesData& param)
     {
         return resourceAccessHelper(commonModule, accessData, param.serverId, Qn::ReadPermission)
             ? RemotePeerAccess::Allowed
@@ -811,7 +818,8 @@ struct ReadServerAttributesAccessOut
 
 struct ModifyServerAttributesAccess
 {
-    bool operator()(QnCommonModule* commonModule, const Qn::UserAccessData& accessData, const ApiMediaServerUserAttributesData& param)
+    bool operator()(QnCommonModule* commonModule, const Qn::UserAccessData& accessData, 
+        const api::MediaServerUserAttributesData& param)
     {
         return resourceAccessHelper(commonModule, accessData, param.serverId, Qn::SavePermission);
     }
@@ -1104,9 +1112,10 @@ struct LocalTransactionType
     }
 };
 
-ec2::TransactionType::Value getStatusTransactionTypeFromDb(const QnUuid& id, AbstractPersistentStorage* db)
+ec2::TransactionType::Value getStatusTransactionTypeFromDb(
+    const QnUuid& id, AbstractPersistentStorage* db)
 {
-    ApiMediaServerData server = db->getServer(id);
+    api::MediaServerData server = db->getServer(id);
     if (server.id.isNull())
         return ec2::TransactionType::Unknown;
     return TransactionType::Local;

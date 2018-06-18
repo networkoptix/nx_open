@@ -7,7 +7,7 @@
 //#include <nx/fusion/fusion/fusion_fwd.h>
 #include <core/resource_access/user_access_data.h>
 #include <utils/common/optional.h>
-#include <nx_ec/data/api_media_server_data.h>
+#include <nx/vms/api/data/media_server_data.h>
 #include <nx_ec/data/api_user_data.h>
 #include <nx_ec/transaction_timestamp.h>
 #include <api/model/configure_system_data.h>

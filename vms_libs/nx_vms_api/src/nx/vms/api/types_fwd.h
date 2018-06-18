@@ -18,6 +18,8 @@ enum class RtpTransportType;
 enum class MotionStreamType;
 enum class PeerType;
 enum class TimeFlag;
+enum class DayOfWeek;
+enum class BackupType;
 
 } // namespace api
 } // namespace vms
@@ -38,5 +40,6 @@ DECLARE_TYPE(RtpTransportType)
 DECLARE_TYPE(MotionStreamType)
 DECLARE_TYPE(PeerType)
 DECLARE_TYPE(TimeFlag)
+DECLARE_TYPE(BackupType)
 
 #undef DECLARE_TYPE

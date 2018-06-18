@@ -302,8 +302,9 @@ bool VmsCloudConnectionProcessor::validateInputData(
 bool VmsCloudConnectionProcessor::checkInternetConnection(
     QnJsonRestResult* result)
 {
-    auto server = m_commonModule->resourcePool()->getResourceById<QnMediaServerResource>(m_commonModule->moduleGUID());
-    bool hasPublicIP = server && server->getServerFlags().testFlag(Qn::SF_HasPublicIP);
+    auto server = m_commonModule->resourcePool()->getResourceById<QnMediaServerResource>(
+        m_commonModule->moduleGUID());
+    bool hasPublicIP = server && server->getServerFlags().testFlag(nx::vms::api::SF_HasPublicIP);
     if (!hasPublicIP)
     {
         result->setError(

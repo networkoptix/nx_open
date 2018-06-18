@@ -622,10 +622,11 @@ void QnCommonMessageProcessor::on_cameraUserAttributesRemoved(const QnUuid& came
         res->emitModificationSignals( modifiedFields );
 }
 
-void QnCommonMessageProcessor::on_mediaServerUserAttributesChanged(const ec2::ApiMediaServerUserAttributesData& attrs)
+void QnCommonMessageProcessor::on_mediaServerUserAttributesChanged(
+    const MediaServerUserAttributesData& attrs)
 {
     QnMediaServerUserAttributesPtr userAttributes(new QnMediaServerUserAttributes());
-    fromApiToResource(attrs, userAttributes);
+    ec2::fromApiToResource(attrs, userAttributes);
 
     QSet<QByteArray> modifiedFields;
     {
@@ -802,15 +803,17 @@ void QnCommonMessageProcessor::handleRemotePeerLost(QnUuid /*data*/, PeerType /*
 {
 }
 
-void QnCommonMessageProcessor::resetServerUserAttributesList( const ec2::ApiMediaServerUserAttributesDataList& serverUserAttributesList )
+void QnCommonMessageProcessor::resetServerUserAttributesList(
+    const MediaServerUserAttributesDataList& serverUserAttributesList)
 {
     mediaServerUserAttributesPool()->clear();
     for( const auto& serverAttrs: serverUserAttributesList )
     {
         QnMediaServerUserAttributesPtr dstElement(new QnMediaServerUserAttributes());
-        fromApiToResource(serverAttrs, dstElement);
+        ec2::fromApiToResource(serverAttrs, dstElement);
 
-        QnMediaServerUserAttributesPool::ScopedLock userAttributesLock( mediaServerUserAttributesPool(), serverAttrs.serverId );
+        QnMediaServerUserAttributesPool::ScopedLock userAttributesLock(
+            mediaServerUserAttributesPool(), serverAttrs.serverId);
         *(*userAttributesLock) = *dstElement;
     }
 }
@@ -978,14 +981,16 @@ void QnCommonMessageProcessor::updateResource(const CameraData& camera, ec2::Not
     }
 }
 
-void QnCommonMessageProcessor::updateResource(const ec2::ApiMediaServerData& server, ec2::NotificationSource source)
+void QnCommonMessageProcessor::updateResource(
+    const MediaServerData& server, ec2::NotificationSource source)
 {
     QnMediaServerResourcePtr qnServer(new QnMediaServerResource(commonModule()));
-    fromApiToResource(server, qnServer);
+    ec2::fromApiToResource(server, qnServer);
     updateResource(qnServer, source);
 }
 
-void QnCommonMessageProcessor::updateResource(const ec2::ApiStorageData& storage, ec2::NotificationSource source)
+void QnCommonMessageProcessor::updateResource(
+    const StorageData& storage, ec2::NotificationSource source)
 {
     auto resTypeId = qnResTypePool->getFixedResourceTypeId(QnResourceTypePool::kStorageTypeId);
     NX_ASSERT(!resTypeId.isNull(), Q_FUNC_INFO, "Invalid resource type pool state");
@@ -999,7 +1004,7 @@ void QnCommonMessageProcessor::updateResource(const ec2::ApiStorageData& storage
     NX_ASSERT(qnStorage, Q_FUNC_INFO, "Invalid resource type pool state");
     if (qnStorage)
     {
-        fromApiToResource(storage, qnStorage);
+        ec2::fromApiToResource(storage, qnStorage);
         updateResource(qnStorage, source);
     }
 }

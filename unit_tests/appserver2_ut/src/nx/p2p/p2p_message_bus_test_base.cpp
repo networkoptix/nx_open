@@ -61,7 +61,7 @@ void P2pMessageBusTestBase::createData(
     settings->synchronizeNow();
 
     //read server list
-    ec2::ApiMediaServerDataList mediaServerList;
+    vms::api::MediaServerDataList mediaServerList;
     ASSERT_EQ(
         ec2::ErrorCode::ok,
         connection->getMediaServerManager(Qn::kSystemAccess)->getServersSync(&mediaServerList));
@@ -77,7 +77,7 @@ void P2pMessageBusTestBase::createData(
         messageProcessor->updateResource(camera, ec2::NotificationSource::Local);
 
     {
-        ec2::ApiMediaServerData serverData;
+        vms::api::MediaServerData serverData;
         auto resTypePtr = qnResTypePool->getResourceTypeByName("Server");
         ASSERT_TRUE(!resTypePtr.isNull());
         serverData.typeId = resTypePtr->getId();

@@ -544,8 +544,11 @@ QnVirtualCameraResourceList QnRecordingManager::getLocalControlledCameras() cons
         QnMediaServerResourcePtr mServer = camRes->getParentServer();
         if (!mServer)
             continue;
-        if (mServer->getId() == commonModule()->moduleGUID() || (mServer->getServerFlags() | Qn::SF_RemoteEC))
+        if (mServer->getId() == commonModule()->moduleGUID()
+            || mServer->getServerFlags().testFlag(nx::vms::api::SF_RemoteEC))
+        {
             result << camRes;
+        }
     }
     return result;
 }

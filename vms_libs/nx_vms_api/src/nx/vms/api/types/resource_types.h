@@ -75,6 +75,41 @@ Q_DECLARE_FLAGS(CameraBackupQualities, CameraBackupQuality)
 QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(CameraBackupQuality)
 Q_DECLARE_OPERATORS_FOR_FLAGS(CameraBackupQualities)
 
+// TODO: #rvasilenko Write comments.
+enum ServerFlag
+{
+    SF_None = 0x000,
+    SF_Edge = 0x001,
+    SF_RemoteEC = 0x002,
+    SF_HasPublicIP = 0x004,
+    SF_IfListCtrl = 0x008,
+    SF_timeCtrl = 0x010,
+
+    /** System name is default, so it will be displayed as "Unassigned System' in NxTool. */
+    //SF_AutoSystemName = 0x020,
+
+    SF_ArmServer = 0x040,
+    SF_Has_HDD = 0x080,
+
+    /** System is just installed, it has default admin password and is not linked to the cloud. */
+    SF_NewSystem = 0x100,
+
+    SF_SupportsTranscoding = 0x200,
+    SF_HasLiteClient = 0x400,
+    SF_P2pSyncDone = 0x1000000, //< For UT purpose only
+};
+Q_DECLARE_FLAGS(ServerFlags, ServerFlag)
+Q_DECLARE_OPERATORS_FOR_FLAGS(ServerFlags)
+QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(ServerFlag)
+
+enum class BackupType
+{
+    manual,
+    realtime,
+    scheduled
+};
+QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(BackupType)
+
 enum class IoModuleVisualStyle
 {
     form,
@@ -98,5 +133,13 @@ QN_FUSION_DECLARE_FUNCTIONS(nx::vms::api::CameraBackupQuality,
     NX_VMS_API)
 
 QN_FUSION_DECLARE_FUNCTIONS(nx::vms::api::CameraBackupQualities,
+    (metatype)(numeric)(lexical)(debug),
+    NX_VMS_API)
+
+QN_FUSION_DECLARE_FUNCTIONS(nx::vms::api::ServerFlag,
+    (metatype)(numeric)(lexical)(debug),
+    NX_VMS_API)
+
+QN_FUSION_DECLARE_FUNCTIONS(nx::vms::api::ServerFlags,
     (metatype)(numeric)(lexical)(debug),
     NX_VMS_API)

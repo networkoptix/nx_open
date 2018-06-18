@@ -32,7 +32,7 @@ void loadResourcesFromEcs(
     ec2::ErrorCode rez;
     {
         //reading servers list
-        ec2::ApiMediaServerDataList mediaServerList;
+        api::MediaServerDataList mediaServerList;
         while (ec2Connection->getMediaServerManager(Qn::kSystemAccess)->getServersSync(&mediaServerList) != ec2::ErrorCode::ok)
         {
             NX_LOG(lit("QnMain::run(). Can't get servers."), cl_logERROR);
@@ -104,7 +104,7 @@ void loadResourcesFromEcs(
         messageProcessor->resetStatusList(statusList);
 
         //reading server attributes
-        ec2::ApiMediaServerUserAttributesDataList mediaServerUserAttributesList;
+        api::MediaServerUserAttributesDataList mediaServerUserAttributesList;
         while ((rez = ec2Connection->getMediaServerManager(Qn::kSystemAccess)->getUserAttributesSync(QnUuid(), &mediaServerUserAttributesList)) != ec2::ErrorCode::ok)
         {
             NX_LOG(lit("QnMain::run(): Can't get server user attributes list. Reason: %1").arg(ec2::toString(rez)), cl_logDEBUG1);

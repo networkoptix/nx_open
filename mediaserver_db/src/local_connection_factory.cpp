@@ -18,6 +18,7 @@
 #include <nx/vms/api/data/access_rights_data.h>
 #include <nx_ec/data/api_user_role_data.h>
 #include <nx/vms/api/data/camera_history_data.h>
+#include <nx/vms/api/data/media_server_data.h>
 
 #include <rest/handlers/active_connections_rest_handler.h>
 #include "compatibility/old_ec_connection.h"
@@ -43,6 +44,8 @@
 
 #include <nx/p2p/p2p_server_message_bus.h>
 #include <transaction/server_transaction_message_bus.h>
+
+// TODO: #vkutin #gdm #fixme Check and fix API documentation after API refactoring!
 
 using namespace nx::vms::api;
 
@@ -250,10 +253,10 @@ void LocalConnectionFactory::registerRestHandlers(QnRestProcessorPool* const p)
     regGet<QnUuid, ResourceStatusDataList>(p, ApiCommand::getStatusList);
 
     // AbstractMediaServerManager::getServers
-    regGet<QnUuid, ApiMediaServerDataList>(p, ApiCommand::getMediaServers);
+    regGet<QnUuid, MediaServerDataList>(p, ApiCommand::getMediaServers);
 
     // AbstractMediaServerManager::save
-    regUpdate<ApiMediaServerData>(p, ApiCommand::saveMediaServer);
+    regUpdate<MediaServerData>(p, ApiCommand::saveMediaServer);
 
     /**%apidoc POST /ec2/saveMediaServerUserAttributes
      * Save additional attributes of a server.
@@ -289,7 +292,7 @@ void LocalConnectionFactory::registerRestHandlers(QnRestProcessorPool* const p)
      *     value if not limited.
      * %// AbstractCameraManager::saveUserAttributes
      */
-    regUpdate<ApiMediaServerUserAttributesData>(p, ApiCommand::saveMediaServerUserAttributes);
+    regUpdate<MediaServerUserAttributesData>(p, ApiCommand::saveMediaServerUserAttributes);
 
     /**%apidoc:arrayParams POST /ec2/saveMediaServerUserAttributesList
      * Save additional attributes of a number of servers.
@@ -324,7 +327,7 @@ void LocalConnectionFactory::registerRestHandlers(QnRestProcessorPool* const p)
      *     value if not limited.
      * %// AbstractMediaServerManager::saveUserAttributes
      */
-    regUpdate<ApiMediaServerUserAttributesDataList>(p, ApiCommand::saveMediaServerUserAttributesList);
+    regUpdate<MediaServerUserAttributesDataList>(p, ApiCommand::saveMediaServerUserAttributesList);
 
     /**%apidoc GET /ec2/getMediaServerUserAttributesList
     * Read additional media server attributes.
@@ -358,7 +361,7 @@ void LocalConnectionFactory::registerRestHandlers(QnRestProcessorPool* const p)
     *         value if not limited.
     * %// AbstractMediaServerManager::getUserAttributes
     */
-    regGet<QnUuid, ApiMediaServerUserAttributesDataList>(p, ApiCommand::getMediaServerUserAttributesList);
+    regGet<QnUuid, MediaServerUserAttributesDataList>(p, ApiCommand::getMediaServerUserAttributesList);
 
     // AbstractMediaServerManager::remove
     regUpdate<IdData>(p, ApiCommand::removeMediaServer);
@@ -369,9 +372,9 @@ void LocalConnectionFactory::registerRestHandlers(QnRestProcessorPool* const p)
      * %return Server object in the requested format.
      * %// AbstractMediaServerManager::getServersEx
      */
-    regGet<QnUuid, ApiMediaServerDataExList>(p, ApiCommand::getMediaServersEx);
+    regGet<QnUuid, MediaServerDataExList>(p, ApiCommand::getMediaServersEx);
 
-    regUpdate<ApiStorageDataList>(p, ApiCommand::saveStorages);
+    regUpdate<StorageDataList>(p, ApiCommand::saveStorages);
 
     /**%apidoc[proprietary] POST /ec2/saveStorage
      * Save the storage.
@@ -403,7 +406,7 @@ void LocalConnectionFactory::registerRestHandlers(QnRestProcessorPool* const p)
      *     %value false
      *     %value true
      */
-    regUpdate<ApiStorageData>(p, ApiCommand::saveStorage);
+    regUpdate<StorageData>(p, ApiCommand::saveStorage);
 
     regUpdate<IdDataList>(p, ApiCommand::removeStorages);
     regUpdate<IdData>(p, ApiCommand::removeStorage);
@@ -875,7 +878,7 @@ void LocalConnectionFactory::registerRestHandlers(QnRestProcessorPool* const p)
      *         %value false
      *         %value true
      */
-    regGet<ParentId, ApiStorageDataList>(p, ApiCommand::getStorages);
+    regGet<ParentId, StorageDataList>(p, ApiCommand::getStorages);
 
     // AbstractLicenseManager::addLicenses
     regUpdate<LicenseDataList>(p, ApiCommand::addLicenses);

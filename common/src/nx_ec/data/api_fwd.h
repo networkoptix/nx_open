@@ -9,11 +9,7 @@ class QString;
 namespace ec2 {
 
 struct ApiFullInfoData;
-struct ApiMediaServerData;
-struct ApiMediaServerUserAttributesData;
-struct ApiMediaServerDataEx;
 
-struct ApiStorageData;
 struct ApiUserData;
 struct ApiUserRoleData;
 struct ApiPredefinedRoleData;
@@ -33,11 +29,6 @@ struct ApiRuntimeData;
 
 typedef std::vector<ApiTransactionData> ApiTransactionDataList;
 
-typedef std::vector<ApiMediaServerData> ApiMediaServerDataList;
-typedef std::vector<ApiMediaServerUserAttributesData> ApiMediaServerUserAttributesDataList;
-typedef std::vector<ApiMediaServerDataEx> ApiMediaServerDataExList;
-
-typedef std::vector<ApiStorageData> ApiStorageDataList;
 typedef std::vector<ApiUserData> ApiUserDataList;
 typedef std::vector<ApiUserRoleData> ApiUserRoleDataList;
 typedef std::vector<ApiPredefinedRoleData> ApiPredefinedRoleDataList;
@@ -46,7 +37,7 @@ typedef std::vector<ApiDiscoveredServerData> ApiDiscoveredServerDataList;
 typedef std::vector<ApiSystemMergeHistoryRecord> ApiSystemMergeHistoryRecordList;
 
 /**
- * Wrapper to be used for overloading as a distinct type for ApiStorageData api requests.
+ * Wrapper to be used for overloading as a distinct type for nx::vms::api::StorageData api requests.
  */
 struct ParentId
 {
@@ -57,10 +48,6 @@ struct ParentId
 
 #define QN_EC2_API_DATA_TYPES \
     (ApiFullInfoData)\
-    (ApiMediaServerData)\
-    (ApiMediaServerUserAttributesData)\
-    (ApiMediaServerDataEx)\
-    (ApiStorageData)\
     (ApiUserData)\
     (ApiUserRoleData)\
     (ApiPredefinedRoleData)\

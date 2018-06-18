@@ -310,7 +310,7 @@ bool ServerTransactionMessageBus::sendInitialData(QnTransactionTransport* transp
     else if (transport->remotePeer().peerType == vms::api::PeerType::oldMobileClient)
     {
         /** Request all data to be sent to the client peers on the connect. */
-        QnTransaction<ApiMediaServerDataExList> tranServers;
+        QnTransaction<vms::api::MediaServerDataExList> tranServers;
         tranServers.command = ApiCommand::getMediaServersEx;
         tranServers.peerID = commonModule()->moduleGUID();
         if (dbManager(m_db, transport->getUserAccessData()).doQuery(QnUuid(), tranServers.params) != ErrorCode::ok)

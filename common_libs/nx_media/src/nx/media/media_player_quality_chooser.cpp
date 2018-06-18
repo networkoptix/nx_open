@@ -410,7 +410,7 @@ Player::TranscodingSupportStatus transcodingSupportStatus(
     if (!server)
         return Player::TranscodingNotSupported;
 
-    if (server->getServerFlags().testFlag(Qn::SF_SupportsTranscoding))
+    if (server->getServerFlags().testFlag(vms::api::SF_SupportsTranscoding))
         return Player::TranscodingSupported;
 
     if (requestType == TranscodingRequestType::detailed)

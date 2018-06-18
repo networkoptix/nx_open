@@ -91,13 +91,13 @@ QnMediaServerResourcePtr RuleProcessor::getDestinationServer(
             // Look for server with public IP address.
             const auto server = resourcePool()->getResourceById<QnMediaServerResource>(
                 commonModule()->moduleGUID());
-            if (!server || (server->getServerFlags() & Qn::SF_HasPublicIP))
+            if (!server || server->getServerFlags().testFlag(vms::api::SF_HasPublicIP))
                 return QnMediaServerResourcePtr(); //< Do not proxy.
 
             const auto onlineServers = resourcePool()->getAllServers(Qn::Online);
             for (const auto& server: onlineServers)
             {
-                if (server->getServerFlags() & Qn::SF_HasPublicIP)
+                if (server->getServerFlags().testFlag(vms::api::SF_HasPublicIP))
                     return server;
             }
             return QnMediaServerResourcePtr();

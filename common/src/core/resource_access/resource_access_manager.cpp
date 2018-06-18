@@ -21,9 +21,9 @@
 
 #include <nx/streaming/abstract_archive_resource.h>
 
-#include <nx/vms/api/data/layout_data.h>
-#include <nx_ec/data/api_media_server_data.h>
 #include <nx_ec/data/api_user_data.h>
+#include <nx/vms/api/data/layout_data.h>
+#include <nx/vms/api/data/media_server_data.h>
 #include <nx/vms/api/data/videowall_data.h>
 #include <nx/vms/api/data/webpage_data.h>
 
@@ -233,7 +233,7 @@ bool QnResourceAccessManager::canCreateResource(const QnResourceAccessSubject& s
 }
 
 bool QnResourceAccessManager::canCreateResource(const QnResourceAccessSubject& subject,
-    const ec2::ApiStorageData& data) const
+    const nx::vms::api::StorageData& data) const
 {
     NX_EXPECT(!isUpdating());
     return canCreateStorage(subject, data.parentId);
@@ -834,7 +834,7 @@ bool QnResourceAccessManager::canCreateLayout(const QnResourceAccessSubject& sub
     /* Everybody can create layout for lite client. */
     if (const auto& parentServer = ownerResource.dynamicCast<QnMediaServerResource>())
     {
-        if (!parentServer->getServerFlags().testFlag(Qn::SF_HasLiteClient))
+        if (!parentServer->getServerFlags().testFlag(nx::vms::api::SF_HasLiteClient))
             return false;
 
         /* There can only be one layout for each lite client. */
@@ -900,7 +900,7 @@ bool QnResourceAccessManager::canCreateWebPage(const QnResourceAccessSubject& su
 }
 
 bool QnResourceAccessManager::canModifyResource(const QnResourceAccessSubject& subject,
-    const QnResourcePtr& target, const ec2::ApiStorageData& update) const
+    const QnResourcePtr& target, const nx::vms::api::StorageData& update) const
 {
     NX_ASSERT(target.dynamicCast<QnStorageResource>());
 

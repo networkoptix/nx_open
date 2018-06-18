@@ -6,6 +6,8 @@
 
 #include "mediaserver_cloud_integration_test_setup.h"
 
+using nx::vms::api::ServerFlag;
+
 class FtConfiguringNewSystem:
     public MediaServerCloudIntegrationTest
 {
@@ -102,7 +104,7 @@ protected:
             ASSERT_EQ(
                 QnJsonRestResult::NoError,
                 client.getModuleInformation(&moduleInformation).error);
-            if (moduleInformation.serverFlags.testFlag(Qn::ServerFlag::SF_NewSystem))
+            if (moduleInformation.serverFlags.testFlag(ServerFlag::SF_NewSystem))
                 break;
         }
     }

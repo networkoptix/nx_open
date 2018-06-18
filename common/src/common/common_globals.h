@@ -20,7 +20,7 @@ QN_DECLARE_METAOBJECT_HEADER(Qn,
     StreamFpsSharingMethod TimePeriodContent SystemComponent
     ConnectionRole ResourceStatus BitratePerGopType
     PanicMode RebuildState BackupState PeerType StatisticsDeviceType
-    ServerFlag BackupType StorageInitResult IOPortType IODefaultState AuditRecordType AuthResult
+    StorageInitResult IOPortType IODefaultState AuditRecordType AuthResult
     RebuildAction BackupAction MediaStreamEvent StreamIndex
     Permission GlobalPermission UserRole ConnectionResult
     ,
@@ -292,27 +292,6 @@ QN_DECLARE_METAOBJECT_HEADER(Qn,
     };
     QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(BitratePerGopType)
 
-    // TODO: #Elric #EC2 talk to Roma, write comments
-    enum ServerFlag {
-        SF_None = 0x000,
-        SF_Edge = 0x001,
-        SF_RemoteEC = 0x002,
-        SF_HasPublicIP = 0x004,
-        SF_IfListCtrl = 0x008,
-        SF_timeCtrl = 0x010,
-        //SF_AutoSystemName = 0x020, /**< System name is default, so it will be displayed as "Unassigned System' in NxTool. */
-        SF_ArmServer = 0x040,
-        SF_Has_HDD = 0x080,
-        SF_NewSystem = 0x100, /**< System is just installed, it has default admin password and is not linked to the cloud. */
-        SF_SupportsTranscoding = 0x200,
-        SF_HasLiteClient = 0x400,
-        SF_P2pSyncDone = 0x1000000, //< For UT purpose only
-    };
-    QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(ServerFlag)
-
-    Q_DECLARE_FLAGS(ServerFlags, ServerFlag)
-    Q_DECLARE_OPERATORS_FOR_FLAGS(ServerFlags)
-
     enum IOPortType {
         PT_Unknown  = 0x0,
         PT_Disabled = 0x1,
@@ -518,13 +497,6 @@ using StreamQuality = nx::vms::api::StreamQuality;
     /**
      * backup settings
      */
-    enum BackupType
-    {
-        Backup_Manual,
-        Backup_RealTime,
-        Backup_Schedule
-    };
-    QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(BackupType)
 
 using CameraBackupQuality = nx::vms::api::CameraBackupQuality;
 using CameraBackupQualities = nx::vms::api::CameraBackupQualities;
@@ -827,7 +799,7 @@ QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
 QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
     (Qn::PtzObjectType)(Qn::PtzCommand)(Qn::PtzCoordinateSpace)
     (Qn::StatisticsDeviceType)
-    (Qn::ServerFlag)(Qn::BackupType)(Qn::StorageInitResult)
+    (Qn::StorageInitResult)
     (Qn::PanicMode)
     (Qn::ConnectionRole)(Qn::BitratePerGopType)
     (Qn::RebuildState)(Qn::BackupState)
@@ -840,7 +812,7 @@ QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
 )
 
 QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
-    (Qn::ServerFlags)(Qn::IOPortTypes)
+    (Qn::IOPortTypes)
     (Qn::Permission)(Qn::GlobalPermission)(Qn::Permissions)(Qn::GlobalPermissions)
     ,
     (metatype)(numeric)(lexical)

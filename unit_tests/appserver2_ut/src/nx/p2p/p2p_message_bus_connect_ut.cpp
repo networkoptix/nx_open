@@ -267,7 +267,7 @@ protected:
             auto serverRes = commonModule->resourcePool()->
                 getResourceById<QnMediaServerResource>(commonModule->moduleGUID());
             auto flags = serverRes->getServerFlags();
-            flags |= Qn::SF_P2pSyncDone;
+            flags |= nx::vms::api::SF_P2pSyncDone;
             serverRes->setServerFlags(flags);
             commonModule->bindModuleInformation(serverRes);
         }

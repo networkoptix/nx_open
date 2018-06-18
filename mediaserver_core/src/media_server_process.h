@@ -160,7 +160,7 @@ private:
     void prepareOsResources();
 
     std::unique_ptr<nx::network::upnp::PortMapper> initializeUpnpPortMapper();
-    Qn::ServerFlags calcServerFlags();
+    nx::vms::api::ServerFlags calcServerFlags();
     void initPublicIpDiscovery();
     void initPublicIpDiscoveryUpdate();
     QnMediaServerResourcePtr findServer(ec2::AbstractECConnectionPtr ec2Connection);

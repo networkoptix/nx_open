@@ -21,7 +21,6 @@
 #include "abstract_persistent_storage.h"
 #include "nx_ec/access_helpers.h"
 #include "nx_ec/ec_api.h"
-#include "nx_ec/data/api_media_server_data.h"
 #include "nx_ec/data/api_user_data.h"
 #include "nx_ec/data/api_full_info_data.h"
 #include "nx_ec/data/api_discovery_data.h"
@@ -40,6 +39,7 @@
 #include <nx/vms/api/data/license_data.h>
 #include <nx/vms/api/data/license_overflow_data.h>
 #include <nx/vms/api/data/lock_data.h>
+#include <nx/vms/api/data/media_server_data.h>
 #include <nx/vms/api/data/peer_system_time_data.h>
 #include <nx/vms/api/data/resource_type_data.h>
 #include <nx/vms/api/data/stored_file_data.h>

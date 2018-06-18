@@ -95,7 +95,8 @@ bool RevealResponse::deserialize(const quint8 *bufStart, const quint8 *bufEnd)
     port = static_cast<quint16>(map.value(lit("port")).toUInt());
     protoVersion = map.value(lit("protoVersion"), nx_ec::INITIAL_EC2_PROTO_VERSION).toInt();
     runtimeId = QnUuid::fromStringSafe(map.value(lit("runtimeId")).toString());
-    serverFlags = QnLexical::deserialized<Qn::ServerFlags>(map.value(lit("flags")).toString(), Qn::SF_None);
+    serverFlags = QnLexical::deserialized<nx::vms::api::ServerFlags>(
+        map.value(lit("flags")).toString(), nx::vms::api::SF_None);
     ecDbReadOnly = map.value(lit("ecDbReadOnly"), ecDbReadOnly).toBool();
     cloudSystemId =  map.value(lit("cloudSystemId")).toString();
     cloudHost = map.value(lit("cloudHost")).toString();

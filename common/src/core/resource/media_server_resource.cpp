@@ -37,6 +37,8 @@
 
 #include <nx/api/analytics/driver_manifest.h>
 
+using namespace nx;
+
 namespace {
     const QString kUrlScheme = lit("rtsp");
     const QString protoVersionPropertyName = lit("protoVersion");
@@ -50,7 +52,7 @@ QString QnMediaServerResource::apiUrlScheme(bool sslAllowed)
 
 QnMediaServerResource::QnMediaServerResource(QnCommonModule* commonModule):
     base_type(commonModule),
-    m_serverFlags(Qn::SF_None),
+    m_serverFlags(vms::api::SF_None),
     m_panicModeCache(
         std::bind(&QnMediaServerResource::calculatePanicMode, this),
         &m_mutex ),
@@ -133,7 +135,7 @@ QString QnMediaServerResource::getUniqueId() const
 
 QString QnMediaServerResource::getName() const
 {
-    if (getServerFlags() & Qn::SF_Edge)
+    if (getServerFlags().testFlag(vms::api::SF_Edge))
     {
         QnMutexLocker lock( &m_mutex );
         if (m_firstCamera)
@@ -161,7 +163,7 @@ void QnMediaServerResource::setName( const QString& name )
         return;
     }
 
-    if (getServerFlags() & Qn::SF_Edge)
+    if (getServerFlags().testFlag(vms::api::SF_Edge))
         return;
 
     {
@@ -403,12 +405,12 @@ void QnMediaServerResource::setPanicMode(Qn::PanicMode panicMode) {
     m_panicModeCache.update();
 }
 
-Qn::ServerFlags QnMediaServerResource::getServerFlags() const
+vms::api::ServerFlags QnMediaServerResource::getServerFlags() const
 {
     return m_serverFlags;
 }
 
-void QnMediaServerResource::setServerFlags(Qn::ServerFlags flags)
+void QnMediaServerResource::setServerFlags(vms::api::ServerFlags flags)
 {
     {
         QnMutexLocker lock(&m_mutex);
@@ -600,15 +602,17 @@ void QnMediaServerResource::setAnalyticsDrivers(
     setProperty(Qn::kAnalyticsDriversParamName, value);
 }
 
-bool QnMediaServerResource::isEdgeServer(const QnResourcePtr &resource) {
+bool QnMediaServerResource::isEdgeServer(const QnResourcePtr &resource)
+{
     if (QnMediaServerResourcePtr server = resource.dynamicCast<QnMediaServerResource>())
-        return (server->getServerFlags() & Qn::SF_Edge);
+        return (server->getServerFlags().testFlag(vms::api::SF_Edge));
     return false;
 }
 
-bool QnMediaServerResource::isHiddenServer(const QnResourcePtr &resource) {
+bool QnMediaServerResource::isHiddenServer(const QnResourcePtr &resource)
+{
     if (QnMediaServerResourcePtr server = resource.dynamicCast<QnMediaServerResource>())
-        return (server->getServerFlags() & Qn::SF_Edge) && !server->isRedundancy();
+        return server->getServerFlags().testFlag(vms::api::SF_Edge) && !server->isRedundancy();
     return false;
 }
 
@@ -681,7 +685,7 @@ void QnMediaServerResource::setResourcePool(QnResourcePool *resourcePool)
 
     if (auto pool = this->resourcePool())
     {
-        if (getServerFlags() & Qn::SF_Edge)
+        if (getServerFlags().testFlag(vms::api::SF_Edge))
         {
             // watch to own camera to change default server name
             connect(pool, &QnResourcePool::resourceAdded,

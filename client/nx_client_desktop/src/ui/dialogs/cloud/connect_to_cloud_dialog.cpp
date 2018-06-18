@@ -49,7 +49,7 @@ rest::QnConnectionPtr getPublicServerConnection(QnResourcePool* resourcePool)
 {
     for (const QnMediaServerResourcePtr server: resourcePool->getAllServers(Qn::Online))
     {
-        if (!server->getServerFlags().testFlag(Qn::SF_HasPublicIP))
+        if (!server->getServerFlags().testFlag(nx::vms::api::SF_HasPublicIP))
             continue;
 
         return server->restConnection();

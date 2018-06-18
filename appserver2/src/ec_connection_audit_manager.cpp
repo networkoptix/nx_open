@@ -48,7 +48,7 @@ void ECConnectionAuditManager::addAuditRecord(
 
 void ECConnectionAuditManager::addAuditRecord(
     ApiCommand::Value /*command*/,
-    const ApiMediaServerUserAttributesData& params,
+    const MediaServerUserAttributesData& params,
     const QnAuthSession& authInfo)
 {
     QnAuditRecord auditRecord = qnAuditManager->prepareRecord(authInfo, Qn::AR_ServerUpdate);
@@ -58,7 +58,7 @@ void ECConnectionAuditManager::addAuditRecord(
 
 void ECConnectionAuditManager::addAuditRecord(
     ApiCommand::Value /*command*/,
-    const ApiMediaServerUserAttributesDataList& params,
+    const MediaServerUserAttributesDataList& params,
     const QnAuthSession& authInfo)
 {
     QnAuditRecord auditRecord = qnAuditManager->prepareRecord(authInfo, Qn::AR_ServerUpdate);
@@ -69,7 +69,7 @@ void ECConnectionAuditManager::addAuditRecord(
 
 void ECConnectionAuditManager::addAuditRecord(
     ApiCommand::Value /*command*/,
-    const ApiStorageData& params,
+    const StorageData& params,
     const QnAuthSession& authInfo)
 {
     QnAuditRecord auditRecord = qnAuditManager->prepareRecord(authInfo, Qn::AR_ServerUpdate);
@@ -79,7 +79,7 @@ void ECConnectionAuditManager::addAuditRecord(
 
 void ECConnectionAuditManager::addAuditRecord(
     ApiCommand::Value /*command*/,
-    const ApiStorageDataList& params,
+    const StorageDataList& params,
     const QnAuthSession& authInfo)
 {
     QnAuditRecord auditRecord = qnAuditManager->prepareRecord(authInfo, Qn::AR_ServerUpdate);

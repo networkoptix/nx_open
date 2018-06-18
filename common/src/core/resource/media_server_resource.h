@@ -90,8 +90,8 @@ public:
     Qn::PanicMode getPanicMode() const;
     void setPanicMode(Qn::PanicMode panicMode);
 
-    Qn::ServerFlags getServerFlags() const;
-    void setServerFlags(Qn::ServerFlags flags);
+    nx::vms::api::ServerFlags getServerFlags() const;
+    void setServerFlags(nx::vms::api::ServerFlags flags);
 
     int getMaxCameras() const;
     void setMaxCameras(int value);
@@ -169,7 +169,7 @@ private:
     QList<nx::utils::Url> m_additionalUrls;
     QList<nx::utils::Url> m_ignoredUrls;
     bool m_sslAllowed = false;
-    Qn::ServerFlags m_serverFlags;
+    nx::vms::api::ServerFlags m_serverFlags;
     QnSoftwareVersion m_version;
     QnSystemInformation m_systemInfo;
     QVector<nx::network::http::AsyncHttpClientPtr> m_runningIfRequests;

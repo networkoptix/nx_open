@@ -32,6 +32,8 @@ static const uint kMaxTimerCycle = 24 * 60 * 60 * 1000; //< MSecs, once a day at
 
 static const QString kServerReportApi = lit("statserver/api/report");
 
+using namespace nx::vms;
+
 namespace ec2
 {
     const QString Ec2StaticticsReporter::DEFAULT_SERVER_API = lit("http://stats.networkoptix.com");
@@ -64,7 +66,7 @@ namespace ec2
 
         ErrorCode errCode;
 
-        ApiMediaServerDataExList mediaServers;
+        api::MediaServerDataExList mediaServers;
         errCode = m_ec2Connection->getMediaServerManager(Qn::kSystemAccess)->getServersExSync(&mediaServers);
         if (errCode != ErrorCode::ok)
             return errCode;

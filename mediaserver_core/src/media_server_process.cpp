@@ -715,9 +715,10 @@ void MediaServerProcess::initStoragesAsync(QnCommonMessageProcessor* messageProc
         //read server's storages
         ec2::AbstractECConnectionPtr ec2Connection = messageProcessor->commonModule()->ec2Connection();
         ec2::ErrorCode rez;
-        ec2::ApiStorageDataList storages;
+        vms::api::StorageDataList storages;
 
-        while ((rez = ec2Connection->getMediaServerManager(Qn::kSystemAccess)->getStoragesSync(QnUuid(), &storages)) != ec2::ErrorCode::ok)
+        while ((rez = ec2Connection->getMediaServerManager(Qn::kSystemAccess)->getStoragesSync(
+            QnUuid(), &storages)) != ec2::ErrorCode::ok)
         {
             NX_DEBUG(this, lm("Can't get storage list. Reason: %1").arg(rez));
             QnSleep::msleep(APP_SERVER_REQUEST_ERROR_TIMEOUT_MS);
@@ -816,7 +817,7 @@ QString getDefaultServerName()
 
 QnMediaServerResourcePtr MediaServerProcess::findServer(ec2::AbstractECConnectionPtr ec2Connection)
 {
-    ec2::ApiMediaServerDataList servers;
+    nx::vms::api::MediaServerDataList servers;
 
     while (servers.empty() && !needToStop())
     {
@@ -833,7 +834,7 @@ QnMediaServerResourcePtr MediaServerProcess::findServer(ec2::AbstractECConnectio
         if (server.id == serverGuid())
         {
             QnMediaServerResourcePtr qnServer(new QnMediaServerResource(commonModule()));
-            fromApiToResource(server, qnServer);
+            ec2::fromApiToResource(server, qnServer);
             return qnServer;
         }
     }
@@ -841,10 +842,11 @@ QnMediaServerResourcePtr MediaServerProcess::findServer(ec2::AbstractECConnectio
     return QnMediaServerResourcePtr();
 }
 
-QnMediaServerResourcePtr registerServer(ec2::AbstractECConnectionPtr ec2Connection, const QnMediaServerResourcePtr &server, bool isNewServerInstance)
+QnMediaServerResourcePtr registerServer(ec2::AbstractECConnectionPtr ec2Connection,
+    const QnMediaServerResourcePtr &server, bool isNewServerInstance)
 {
-    ec2::ApiMediaServerData apiServer;
-    fromResourceToApi(server, apiServer);
+    nx::vms::api::MediaServerData apiServer;
+    ec2::fromResourceToApi(server, apiServer);
 
     ec2::ErrorCode rez = ec2Connection->getMediaServerManager(Qn::kSystemAccess)->saveSync(apiServer);
     if (rez != ec2::ErrorCode::ok)
@@ -863,12 +865,12 @@ QnMediaServerResourcePtr registerServer(ec2::AbstractECConnectionPtr ec2Connecti
     if (!f.open(QFile::ReadOnly))
         return server;
     QByteArray data = f.readAll();
-    ec2::ApiMediaServerUserAttributesData userAttrsData;
+    nx::vms::api::MediaServerUserAttributesData userAttrsData;
     if (!QJson::deserialize(data, &userAttrsData))
         return server;
     userAttrsData.serverId = server->getId();
 
-    ec2::ApiMediaServerUserAttributesDataList attrsList;
+    nx::vms::api::MediaServerUserAttributesDataList attrsList;
     attrsList.push_back(userAttrsData);
     rez = ec2Connection->getMediaServerManager(Qn::kSystemAccess)->saveUserAttributesSync(attrsList);
     if (rez != ec2::ErrorCode::ok)
@@ -884,11 +886,12 @@ void MediaServerProcess::saveStorages(
     ec2::AbstractECConnectionPtr ec2Connection,
     const QnStorageResourceList& storages)
 {
-    ec2::ApiStorageDataList apiStorages;
-    fromResourceListToApi(storages, apiStorages);
+    nx::vms::api::StorageDataList apiStorages;
+    ec2::fromResourceListToApi(storages, apiStorages);
 
     ec2::ErrorCode rez;
-    while((rez = ec2Connection->getMediaServerManager(Qn::kSystemAccess)->saveStoragesSync(apiStorages)) != ec2::ErrorCode::ok && !needToStop())
+    while((rez = ec2Connection->getMediaServerManager(Qn::kSystemAccess)->saveStoragesSync(apiStorages))
+        != ec2::ErrorCode::ok && !needToStop())
     {
         NX_WARNING(this) << "Call to change server's storages failed. Reason: " << rez;
         QnSleep::msleep(APP_SERVER_REQUEST_ERROR_TIMEOUT_MS);
@@ -1259,8 +1262,8 @@ void MediaServerProcess::updateAddressesList()
     if (isStopping())
         return;
 
-    ec2::ApiMediaServerData prevValue;
-    fromResourceToApi(m_mediaServer, prevValue);
+    vms::api::MediaServerData prevValue;
+    ec2::fromResourceToApi(m_mediaServer, prevValue);
 
     nx::network::AddressFilters addressMask =
         nx::network::AddressFilter::ipV4
@@ -1296,8 +1299,8 @@ void MediaServerProcess::updateAddressesList()
         m_mediaServer->setPrimaryAddress(newAddress);
     }
 
-    ec2::ApiMediaServerData server;
-    fromResourceToApi(m_mediaServer, server);
+    vms::api::MediaServerData server;
+    ec2::fromResourceToApi(m_mediaServer, server);
     if (server != prevValue)
     {
         auto mediaServerManager =
@@ -1365,18 +1368,19 @@ void MediaServerProcess::at_updatePublicAddress(const QHostAddress& publicIp)
     QnMediaServerResourcePtr server = resPool->getResourceById<QnMediaServerResource>(commonModule()->moduleGUID());
     if (server)
     {
-        Qn::ServerFlags serverFlags = server->getServerFlags();
+        auto serverFlags = server->getServerFlags();
         if (publicIp.isNull())
-            serverFlags &= ~Qn::SF_HasPublicIP;
+            serverFlags &= ~vms::api::SF_HasPublicIP;
         else
-            serverFlags |= Qn::SF_HasPublicIP;
+            serverFlags |= vms::api::SF_HasPublicIP;
+
         if (serverFlags != server->getServerFlags())
         {
             server->setServerFlags(serverFlags);
             ec2::AbstractECConnectionPtr ec2Connection = commonModule()->ec2Connection();
 
-            ec2::ApiMediaServerData apiServer;
-            fromResourceToApi(server, apiServer);
+            vms::api::MediaServerData apiServer;
+            ec2::fromResourceToApi(server, apiServer);
             ec2Connection->getMediaServerManager(Qn::kSystemAccess)->save(apiServer, this, [] {});
         }
 
@@ -2832,28 +2836,28 @@ std::unique_ptr<nx::network::upnp::PortMapper> MediaServerProcess::initializeUpn
     return mapper;
 }
 
-Qn::ServerFlags MediaServerProcess::calcServerFlags()
+vms::api::ServerFlags MediaServerProcess::calcServerFlags()
 {
-    Qn::ServerFlags serverFlags = Qn::SF_None; // TODO: #Elric #EC2 type safety has just walked out of the window.
+    vms::api::ServerFlags serverFlags = vms::api::SF_None; // TODO: #Elric #EC2 type safety has just walked out of the window.
 
 #ifdef EDGE_SERVER
-    serverFlags |= Qn::SF_Edge;
+    serverFlags |= vms::api::SF_Edge;
 #endif
     if (QnAppInfo::isBpi())
     {
-        serverFlags |= Qn::SF_IfListCtrl | Qn::SF_timeCtrl;
+        serverFlags |= vms::api::SF_IfListCtrl | vms::api::SF_timeCtrl;
         if (QnStartLiteClientRestHandler::isLiteClientPresent())
-            serverFlags |= Qn::SF_HasLiteClient;
+            serverFlags |= vms::api::SF_HasLiteClient;
     }
 
     if (ini().forceLiteClient)
     {
         if (QnStartLiteClientRestHandler::isLiteClientPresent())
-            serverFlags |= Qn::SF_HasLiteClient;
+            serverFlags |= vms::api::SF_HasLiteClient;
     }
 
 #ifdef __arm__
-    serverFlags |= Qn::SF_ArmServer;
+    serverFlags |= vms::api::SF_ArmServer;
 
     struct stat st;
     memset(&st, 0, sizeof(st));
@@ -2863,22 +2867,22 @@ Qn::ServerFlags MediaServerProcess::calcServerFlags()
         ::stat("/dev/sdc", &st) == 0 ||
         ::stat("/dev/sdd", &st) == 0;
     if (hddPresent)
-        serverFlags |= Qn::SF_Has_HDD;
+        serverFlags |= vms::api::SF_Has_HDD;
 #else
-    serverFlags |= Qn::SF_Has_HDD;
+    serverFlags |= vms::api::SF_Has_HDD;
 #endif
 
-    if (!(serverFlags & (Qn::SF_ArmServer | Qn::SF_Edge)))
-        serverFlags |= Qn::SF_SupportsTranscoding;
+    if (!(serverFlags & (vms::api::SF_ArmServer | vms::api::SF_Edge)))
+        serverFlags |= vms::api::SF_SupportsTranscoding;
 
     const QString appserverHostString = qnServerModule->settings().appserverHost();
     bool isLocal = isLocalAppServer(appserverHostString);
     if (!isLocal)
-        serverFlags |= Qn::SF_RemoteEC;
+        serverFlags |= vms::api::SF_RemoteEC;
 
     initPublicIpDiscovery();
     if (!m_ipDiscovery->publicIP().isNull())
-        serverFlags |= Qn::SF_HasPublicIP;
+        serverFlags |= vms::api::SF_HasPublicIP;
 
     return serverFlags;
 }
@@ -3630,10 +3634,10 @@ void MediaServerProcess::run()
     while (m_mediaServer.isNull() && !needToStop())
     {
         QnMediaServerResourcePtr server = findServer(ec2Connection);
-        ec2::ApiMediaServerData prevServerData;
+        vms::api::MediaServerData prevServerData;
         if (server)
         {
-            fromResourceToApi(server, prevServerData);
+            ec2::fromResourceToApi(server, prevServerData);
             foundOwnServerInDb = true;
         }
         else
@@ -3648,7 +3652,7 @@ void MediaServerProcess::run()
             server->setName(serverName);
         }
 
-        server->setServerFlags((Qn::ServerFlags) calcServerFlags());
+        server->setServerFlags(calcServerFlags());
 
         QHostAddress appserverHost;
         bool isLocal = isLocalAppServer(appserverHostString);
@@ -3681,8 +3685,8 @@ void MediaServerProcess::run()
         if (settingsAuthKey != authKey)
             nx::ServerSetting::setAuthKey(authKey);
 
-        ec2::ApiMediaServerData newServerData;
-        fromResourceToApi(server, newServerData);
+        vms::api::MediaServerData newServerData;
+        ec2::fromResourceToApi(server, newServerData);
         if (prevServerData != newServerData)
         {
             m_mediaServer = registerServer(
@@ -4155,7 +4159,7 @@ void MediaServerProcess::at_emptyDigestDetected(const QnUserResourcePtr& user, c
         user->setPasswordAndGenerateHash(password);
 
         ec2::ApiUserData userData;
-        fromResourceToApi(user, userData);
+        ec2::fromResourceToApi(user, userData);
 
         QnUuid userId = user->getId();
         m_updateUserRequests << userId;

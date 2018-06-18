@@ -5,7 +5,6 @@
 #include "core/resource_management/resource_pool.h"
 #include "ec_connection_notification_manager.h"
 #include "ec_connection_audit_manager.h"
-#include "nx_ec/data/api_media_server_data.h"
 #include "nx_ec/data/api_full_info_data.h"
 #include <nx/vms/api/data/videowall_data.h>
 #include "nx_ec/data/api_conversion_functions.h"

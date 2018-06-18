@@ -415,8 +415,8 @@ void QnResourcesChangesManager::saveServersBatch(const QnMediaServerResourceList
 
     applyChanges();
     auto changes = pool->getAttributesList(idList);
-    ec2::ApiMediaServerUserAttributesDataList attributes;
-    fromResourceListToApi(changes, attributes);
+    vms::api::MediaServerUserAttributesDataList attributes;
+    ec2::fromResourceListToApi(changes, attributes);
     connection->getMediaServerManager(Qn::kSystemAccess)->saveUserAttributes(attributes, this,
         makeReplyProcessor(this, handler));
 

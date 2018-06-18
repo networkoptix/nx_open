@@ -4,11 +4,11 @@
 
 #include "api_globals.h"
 #include "api_resource_data.h"
-#include "api_media_server_data.h"
 #include <nx/vms/api/data/camera_data_ex.h>
 #include <nx/vms/api/data/client_info_data.h>
 #include <nx/vms/api/data/event_rule_data.h>
 #include <nx/vms/api/data/layout_data.h>
+#include <nx/vms/api/data/media_server_data.h>
 #include "api_user_data.h"
 
 #include <nx/vms/api/data/license_data.h>
@@ -51,19 +51,19 @@ struct ApiCameraDataStatistics:
     (backupType)
 
 struct ApiStorageDataStatistics:
-    ApiStorageData
+    nx::vms::api::StorageData
 {
     ApiStorageDataStatistics();
-    ApiStorageDataStatistics(ApiStorageData&& data);
+    ApiStorageDataStatistics(nx::vms::api::StorageData&& data);
 };
 #define ApiStorageDataStatistics_Fields (id)(parentId)(spaceLimit)(usedForWriting) \
     (storageType)(isBackup)(addParams)
 
 struct ApiMediaServerDataStatistics:
-    ApiMediaServerDataEx
+    nx::vms::api::MediaServerDataEx
 {
     ApiMediaServerDataStatistics();
-    ApiMediaServerDataStatistics(ApiMediaServerDataEx&& data);
+    ApiMediaServerDataStatistics(nx::vms::api::MediaServerDataEx&& data);
 
     // overrides ApiMediaServerDataEx::storages for fusion
     std::vector<ApiStorageDataStatistics> storages;

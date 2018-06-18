@@ -204,7 +204,7 @@ int QnConfigureRestHandler::changePort(const QnRestConnectionProcessor* owner, i
     url.setPort(port);
     server->setUrl(url.toString());
 
-    ec2::ApiMediaServerData apiServer;
+    nx::vms::api::MediaServerData apiServer;
     ec2::fromResourceToApi(server, apiServer);
     auto connection = owner->commonModule()->ec2Connection();
     auto manager = connection->getMediaServerManager(accessRights);

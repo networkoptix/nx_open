@@ -7,7 +7,6 @@
 #include <nx_ec/data/api_discovery_data.h>
 #include <nx_ec/data/api_system_name_data.h>
 #include <nx_ec/data/api_runtime_data.h>
-#include <nx_ec/data/api_media_server_data.h>
 #include <nx/vms/api/data/resource_type_data.h>
 #include <nx/vms/api/data/license_data.h>
 #include <nx/vms/api/data/event_rule_data.h>
@@ -16,6 +15,7 @@
 #include <nx/vms/api/data/camera_history_data.h>
 #include <nx/vms/api/data/layout_data.h>
 #include <nx/vms/api/data/layout_tour_data.h>
+#include <nx/vms/api/data/media_server_data.h>
 #include <nx/vms/api/data/access_rights_data.h>
 #include <nx_ec/data/api_user_role_data.h>
 

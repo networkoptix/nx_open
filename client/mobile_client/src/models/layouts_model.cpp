@@ -20,6 +20,7 @@
 #include <watchers/layout_cameras_watcher.h>
 #include <mobile_client/mobile_client_roles.h>
 
+using namespace nx;
 using nx::client::mobile::LayoutCamerasWatcher;
 
 namespace {
@@ -281,7 +282,7 @@ bool QnLayoutsModelUnsorted::isLayoutSuitable(const QnLayoutResourcePtr& layout)
 
 bool QnLayoutsModelUnsorted::isServerSuitable(const QnMediaServerResourcePtr& server) const
 {
-    return server->getServerFlags().testFlag(Qn::SF_HasLiteClient);
+    return server->getServerFlags().testFlag(vms::api::SF_HasLiteClient);
 }
 
 void QnLayoutsModelUnsorted::at_userChanged(const QnUserResourcePtr& user)

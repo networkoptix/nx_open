@@ -5,6 +5,8 @@
 
 #include <nx/fusion/model_functions.h>
 
+using namespace nx::vms;
+
 const static QString __CAMERA_EXCEPT_PARAMS[] =
 {
 	Qn::CAMERA_CREDENTIALS_PARAM_NAME,
@@ -80,28 +82,34 @@ namespace ec2 {
     const std::set<QString> ApiCameraDataStatistics::RESOURCE_PARAMS(
             INIT_LIST(__CAMERA_RESOURCE_PARAMS));
 
-    ApiStorageDataStatistics::ApiStorageDataStatistics() {}
-
-    ApiStorageDataStatistics::ApiStorageDataStatistics(ApiStorageData&& data)
-        : ApiStorageData(std::move(data))
-    {}
-
-    ApiMediaServerDataStatistics::ApiMediaServerDataStatistics() {}
-
-    ApiMediaServerDataStatistics::ApiMediaServerDataStatistics(ApiMediaServerDataEx&& data)
-        : ApiMediaServerDataEx(std::move(data))
+    ApiStorageDataStatistics::ApiStorageDataStatistics()
     {
-        for (auto& s : ApiMediaServerDataEx::storages)
-            storages.push_back(std::move(s));
-
-        ApiMediaServerDataEx::storages.clear();
     }
 
-    ApiLicenseStatistics::ApiLicenseStatistics()
-        : cameraCount(0) {}
+    ApiStorageDataStatistics::ApiStorageDataStatistics(api::StorageData&& data):
+        api::StorageData(std::move(data))
+    {
+    }
 
-    ApiLicenseStatistics::ApiLicenseStatistics(const nx::vms::api::LicenseData& data)
-        : cameraCount(0)
+    ApiMediaServerDataStatistics::ApiMediaServerDataStatistics()
+    {
+    }
+
+    ApiMediaServerDataStatistics::ApiMediaServerDataStatistics(api::MediaServerDataEx&& data):
+        api::MediaServerDataEx(std::move(data))
+    {
+        for (auto& s: api::MediaServerDataEx::storages)
+            storages.push_back(std::move(s));
+
+        api::MediaServerDataEx::storages.clear();
+    }
+
+    ApiLicenseStatistics::ApiLicenseStatistics(): cameraCount(0)
+    {
+    }
+
+    ApiLicenseStatistics::ApiLicenseStatistics(const nx::vms::api::LicenseData& data):
+        cameraCount(0)
     {
         QMap<QString, QString> parsed;
         for (const auto& value : data.licenseBlock.split('\n'))
@@ -120,22 +128,29 @@ namespace ec2 {
         expiration  = parsed[lit("EXPIRATION")];
     }
 
-    ApiBusinessRuleStatistics::ApiBusinessRuleStatistics() {}
+    ApiBusinessRuleStatistics::ApiBusinessRuleStatistics()
+    {
+    }
 
-    ApiBusinessRuleStatistics::ApiBusinessRuleStatistics(nx::vms::api::EventRuleData&& data)
-        : nx::vms::api::EventRuleData(std::move(data))
-    {}
+    ApiBusinessRuleStatistics::ApiBusinessRuleStatistics(nx::vms::api::EventRuleData&& data):
+        nx::vms::api::EventRuleData(std::move(data))
+    {
+    }
 
-    ApiUserDataStatistics::ApiUserDataStatistics() {}
+    ApiUserDataStatistics::ApiUserDataStatistics()
+    {
+    }
 
-    ApiUserDataStatistics::ApiUserDataStatistics(ApiUserData&& data)
-        : ApiUserData(std::move(data))
-    {}
+    ApiUserDataStatistics::ApiUserDataStatistics(ApiUserData&& data):
+        ApiUserData(std::move(data))
+    {
+    }
 
-    ApiStatisticsReportInfo::ApiStatisticsReportInfo()
-        : id(QnUuid::createUuid())
-        , number(-1)
-    {}
+    ApiStatisticsReportInfo::ApiStatisticsReportInfo():
+        id(QnUuid::createUuid()),
+        number(-1)
+    {
+    }
 
     QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(
         API_STATISTICS_DATA_TYPES, (ubjson)(xml)(json)(csv_record), _Fields)

@@ -17,13 +17,13 @@ namespace ec2
         virtual int getServers(impl::GetServersHandlerPtr handler) override;
         virtual int getServersEx(impl::GetServersExHandlerPtr handler) override;
         //!Implementation of QnMediaServerManager::saveServer
-        virtual int save( const ec2::ApiMediaServerData&, impl::SimpleHandlerPtr handler ) override;
+        virtual int save( const nx::vms::api::MediaServerData&, impl::SimpleHandlerPtr handler ) override;
         //!Implementation of QnMediaServerManager::remove
         virtual int remove( const QnUuid& id, impl::SimpleHandlerPtr handler ) override;
         //!Implementation of QnMediaServerManager::saveUserAttributes
-        virtual int saveUserAttributes( const ec2::ApiMediaServerUserAttributesDataList& serverAttrs, impl::SimpleHandlerPtr handler ) override;
+        virtual int saveUserAttributes( const nx::vms::api::MediaServerUserAttributesDataList& serverAttrs, impl::SimpleHandlerPtr handler ) override;
         //!Implementation of QnMediaServerManager::saveStorages
-        virtual int saveStorages( const ec2::ApiStorageDataList& storages, impl::SimpleHandlerPtr handler ) override;
+        virtual int saveStorages( const nx::vms::api::StorageDataList& storages, impl::SimpleHandlerPtr handler ) override;
         //!Implementation of QnMediaServerManager::removeStorages
         virtual int removeStorages( const nx::vms::api::IdDataList& storages, impl::SimpleHandlerPtr handler ) override;
         //!Implementation of QnMediaServerManager::getUserAttributes
@@ -36,7 +36,7 @@ namespace ec2
         Qn::UserAccessData m_userAccessData;
     };
 
-    
+
     template<class QueryProcessorType>
     QnMediaServerManager<QueryProcessorType>::QnMediaServerManager(QueryProcessorType* const queryProcessor, const Qn::UserAccessData &userAccessData)
     :
@@ -49,10 +49,10 @@ namespace ec2
     {
         const int reqID = generateRequestID();
 
-        auto queryDoneHandler = [reqID, handler, this]( ErrorCode errorCode, const ec2::ApiMediaServerDataList& servers) {
+        auto queryDoneHandler = [reqID, handler, this]( ErrorCode errorCode, const nx::vms::api::MediaServerDataList& servers) {
             handler->done( reqID, errorCode, servers);
         };
-        m_queryProcessor->getAccess(m_userAccessData).template processQueryAsync<QnUuid, ApiMediaServerDataList, decltype(queryDoneHandler)> (
+        m_queryProcessor->getAccess(m_userAccessData).template processQueryAsync<QnUuid, nx::vms::api::MediaServerDataList, decltype(queryDoneHandler)> (
             ApiCommand::getMediaServers, QnUuid(), queryDoneHandler);
         return reqID;
     }
@@ -62,16 +62,16 @@ namespace ec2
     {
         const int reqID = generateRequestID();
 
-        auto queryDoneHandler = [reqID, handler, this](ErrorCode errorCode, const ec2::ApiMediaServerDataExList& servers) {
+        auto queryDoneHandler = [reqID, handler, this](ErrorCode errorCode, const nx::vms::api::MediaServerDataExList& servers) {
             handler->done(reqID, errorCode, servers);
         };
-        m_queryProcessor->getAccess(m_userAccessData).template processQueryAsync<QnUuid, ApiMediaServerDataExList, decltype(queryDoneHandler)>(
+        m_queryProcessor->getAccess(m_userAccessData).template processQueryAsync<QnUuid, nx::vms::api::MediaServerDataExList, decltype(queryDoneHandler)>(
             ApiCommand::getMediaServersEx, QnUuid(), queryDoneHandler);
         return reqID;
     }
 
     template<class T>
-    int QnMediaServerManager<T>::save(const ec2::ApiMediaServerData& server, impl::SimpleHandlerPtr handler)
+    int QnMediaServerManager<T>::save(const nx::vms::api::MediaServerData& server, impl::SimpleHandlerPtr handler)
     {
         const int reqID = generateRequestID();
         m_queryProcessor->getAccess(m_userAccessData).processUpdateAsync(
@@ -97,7 +97,7 @@ namespace ec2
     }
 
     template<class T>
-    int QnMediaServerManager<T>::saveUserAttributes(const ec2::ApiMediaServerUserAttributesDataList& serverAttrs, impl::SimpleHandlerPtr handler)
+    int QnMediaServerManager<T>::saveUserAttributes(const nx::vms::api::MediaServerUserAttributesDataList& serverAttrs, impl::SimpleHandlerPtr handler)
     {
         const int reqID = generateRequestID();
         m_queryProcessor->getAccess(m_userAccessData).processUpdateAsync(
@@ -110,7 +110,7 @@ namespace ec2
     }
 
     template<class T>
-    int QnMediaServerManager<T>::saveStorages( const ec2::ApiStorageDataList& storages, impl::SimpleHandlerPtr handler )
+    int QnMediaServerManager<T>::saveStorages(const nx::vms::api::StorageDataList& storages, impl::SimpleHandlerPtr handler)
     {
         const int reqID = generateRequestID();
         m_queryProcessor->getAccess(m_userAccessData).processUpdateAsync(
@@ -123,7 +123,7 @@ namespace ec2
     }
 
     template<class T>
-    int QnMediaServerManager<T>::removeStorages( const nx::vms::api::IdDataList& storages, impl::SimpleHandlerPtr handler )
+    int QnMediaServerManager<T>::removeStorages(const nx::vms::api::IdDataList& storages, impl::SimpleHandlerPtr handler)
     {
         const int reqID = generateRequestID();
         m_queryProcessor->getAccess(m_userAccessData).processUpdateAsync(
@@ -139,10 +139,10 @@ namespace ec2
     int QnMediaServerManager<T>::getUserAttributes( const QnUuid& mediaServerId, impl::GetServerUserAttributesHandlerPtr handler )
     {
         const int reqID = generateRequestID();
-        auto queryDoneHandler = [reqID, handler, this]( ErrorCode errorCode, const ApiMediaServerUserAttributesDataList& serverUserAttributesList ) {
+        auto queryDoneHandler = [reqID, handler, this]( ErrorCode errorCode, const nx::vms::api::MediaServerUserAttributesDataList& serverUserAttributesList ) {
             handler->done( reqID, errorCode, serverUserAttributesList);
         };
-        m_queryProcessor->getAccess(m_userAccessData).template processQueryAsync<QnUuid, ApiMediaServerUserAttributesDataList, decltype(queryDoneHandler)>
+        m_queryProcessor->getAccess(m_userAccessData).template processQueryAsync<QnUuid, nx::vms::api::MediaServerUserAttributesDataList, decltype(queryDoneHandler)>
             ( ApiCommand::getMediaServerUserAttributesList, mediaServerId, queryDoneHandler );
         return reqID;
     }
@@ -151,11 +151,11 @@ namespace ec2
     int QnMediaServerManager<T>::getStorages( const QnUuid& mediaServerId, impl::GetStoragesHandlerPtr handler )
     {
         const int reqID = generateRequestID();
-        auto queryDoneHandler = [reqID, handler, this]( ErrorCode errorCode, const ec2::ApiStorageDataList& storages )
+        auto queryDoneHandler = [reqID, handler, this]( ErrorCode errorCode, const nx::vms::api::StorageDataList& storages )
         {
             handler->done( reqID, errorCode, storages );
         };
-        m_queryProcessor->getAccess(m_userAccessData).template processQueryAsync<ParentId, ec2::ApiStorageDataList, decltype(queryDoneHandler)>
+        m_queryProcessor->getAccess(m_userAccessData).template processQueryAsync<ParentId, nx::vms::api::StorageDataList, decltype(queryDoneHandler)>
             ( ApiCommand::getStorages, mediaServerId, queryDoneHandler );
         return reqID;
     }

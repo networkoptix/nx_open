@@ -634,6 +634,6 @@ void QnTimeServerSelectionModel::updateHasInternetAccess()
         [](const QnMediaServerResourcePtr& server)
         {
             return server->getStatus() == Qn::Online
-                && server->getServerFlags().testFlag(Qn::SF_HasPublicIP);
+                && server->getServerFlags().testFlag(vms::api::SF_HasPublicIP);
         });
 }

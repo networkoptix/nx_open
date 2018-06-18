@@ -175,10 +175,10 @@ namespace ec2
             void onSaveKvPairsDone              (int reqID, const ec2::ErrorCode, const nx::vms::api::ResourceParamWithRefDataList&);
             void onGetMiscParamDone             (int reqID, const ec2::ErrorCode, const ec2::ApiMiscData&);
             void onSaveBusinessRuleDone         (int reqID, const ec2::ErrorCode, const nx::vms::event::RulePtr&);
-            void onGetServersDone               (int reqID, const ec2::ErrorCode, const ec2::ApiMediaServerDataList&);
-            void onGetServerUserAttributesDone  (int reqID, const ec2::ErrorCode, const ec2::ApiMediaServerUserAttributesDataList&);
-            void onGetServersExDone             (int reqID, const ec2::ErrorCode, const ec2::ApiMediaServerDataExList&);
-            void onGetStoragesDone              (int reqID, const ec2::ErrorCode, const ec2::ApiStorageDataList&);
+            void onGetServersDone               (int reqID, const ec2::ErrorCode, const nx::vms::api::MediaServerDataList&);
+            void onGetServerUserAttributesDone  (int reqID, const ec2::ErrorCode, const nx::vms::api::MediaServerUserAttributesDataList&);
+            void onGetServersExDone             (int reqID, const ec2::ErrorCode, const nx::vms::api::MediaServerDataExList&);
+            void onGetStoragesDone              (int reqID, const ec2::ErrorCode, const nx::vms::api::StorageDataList&);
             void onGetCamerasDone               (int reqID, const ec2::ErrorCode, const nx::vms::api::CameraDataList&);
             void onGetCameraUserAttributesDone  (int reqID, const ec2::ErrorCode, const nx::vms::api::CameraAttributesDataList&);
             void onGetCamerasExDone             (int reqID, const ec2::ErrorCode, const nx::vms::api::CameraDataExList&);
@@ -228,10 +228,10 @@ namespace ec2
         //////////////////////////////////////////////////////////
         ///////// Handlers for AbstractMediaServerManager
         //////////////////////////////////////////////////////////
-        DEFINE_TWO_ARG_HANDLER(GetServers,                  ec2::ErrorCode, ec2::ApiMediaServerDataList)
-        DEFINE_TWO_ARG_HANDLER(GetServersEx,                ec2::ErrorCode, ec2::ApiMediaServerDataExList)
-        DEFINE_TWO_ARG_HANDLER(GetServerUserAttributes,     ec2::ErrorCode, ec2::ApiMediaServerUserAttributesDataList)
-        DEFINE_TWO_ARG_HANDLER(GetStorages,                 ec2::ErrorCode, ec2::ApiStorageDataList)
+        DEFINE_TWO_ARG_HANDLER(GetServers,                  ec2::ErrorCode, nx::vms::api::MediaServerDataList)
+        DEFINE_TWO_ARG_HANDLER(GetServersEx,                ec2::ErrorCode, nx::vms::api::MediaServerDataExList)
+        DEFINE_TWO_ARG_HANDLER(GetServerUserAttributes,     ec2::ErrorCode, nx::vms::api::MediaServerUserAttributesDataList)
+        DEFINE_TWO_ARG_HANDLER(GetStorages,                 ec2::ErrorCode, nx::vms::api::StorageDataList)
 
         //////////////////////////////////////////////////////////
         ///////// Handlers for AbstractCameraManager

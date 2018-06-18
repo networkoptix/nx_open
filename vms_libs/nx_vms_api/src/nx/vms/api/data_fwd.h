@@ -104,6 +104,11 @@ DECLARE_STRUCT_NO_LIST(TimeData)
 
 DECLARE_STRUCT_NO_LIST(ReverseConnectionData)
 
+DECLARE_STRUCT(StorageData)
+DECLARE_STRUCT(MediaServerData)
+DECLARE_STRUCT(MediaServerDataEx)
+DECLARE_STRUCT(MediaServerUserAttributesData)
+
 #undef DECLARE_STRUCT
 #undef DECLARE_STRUCT_NO_LIST
 

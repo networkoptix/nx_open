@@ -121,7 +121,7 @@ void Appserver2MessageProcessor::removeResourceIgnored(const QnUuid& resourceId)
         return;
     QnMediaServerResourcePtr mServer = resourcePool()->getResourceById<QnMediaServerResource>(resourceId);
 
-    ec2::ApiMediaServerData apiServer;
+    nx::vms::api::MediaServerData apiServer;
     ec2::fromResourceToApi(mServer, apiServer);
     auto connection = commonModule()->ec2Connection();
     connection->getMediaServerManager(Qn::kSystemAccess)->save(

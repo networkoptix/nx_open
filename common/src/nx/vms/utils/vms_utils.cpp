@@ -106,8 +106,8 @@ bool configureLocalPeerAsPartOfASystem(
 
     // update auth key if system name is changed
     server->setAuthKey(QnUuid::createUuid().toString());
-    ec2::ApiMediaServerData apiServer;
-    fromResourceToApi(server, apiServer);
+    nx::vms::api::MediaServerData apiServer;
+    ec2::fromResourceToApi(server, apiServer);
     if (connection->getMediaServerManager(Qn::kSystemAccess)->saveSync(apiServer) != ec2::ErrorCode::ok)
     {
         NX_LOG("Failed to update server auth key while configuring system", cl_logWARNING);

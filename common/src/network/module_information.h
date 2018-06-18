@@ -7,6 +7,7 @@
 #include <nx/fusion/model_functions_fwd.h>
 #include <nx/network/socket_common.h>
 #include <nx/utils/uuid.h>
+#include <nx/vms/api/types/resource_types.h>
 
 #include <common/common_globals.h>
 #include <utils/common/software_version.h>
@@ -26,7 +27,7 @@ struct QnModuleInformation
     bool sslAllowed;
     int protoVersion;
     QnUuid runtimeId;
-    Qn::ServerFlags serverFlags;
+    nx::vms::api::ServerFlags serverFlags;
     QString realm;
     bool ecDbReadOnly;
     QString cloudSystemId;

@@ -55,7 +55,9 @@ void SoftwareTriggersController::setResourceId(const QString& id)
         : QnUuid();
 
     if (m_resourceId.isNull())
+    {
         NX_EXPECT(false, "Resource is not camera");
+    }
 
     cancelTriggerAction();
     emit resourceIdChanged();

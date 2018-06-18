@@ -16,7 +16,7 @@ QnMasterServerStatusWatcher::QnMasterServerStatusWatcher(
     m_delayBeforeSettingMasterFlag(delayBeforeSettingMasterFlag)
 {
     connect(
-        m_commonModule->resourcePool(), &QnResourcePool::resourceAdded, 
+        m_commonModule->resourcePool(), &QnResourcePool::resourceAdded,
         this,
         [this](const QnResourcePtr& resource)
         {
@@ -49,7 +49,7 @@ bool QnMasterServerStatusWatcher::localPeerCanBeMaster() const
 {
     auto mServer = m_commonModule->resourcePool()->getResourceById<QnMediaServerResource>(
         m_commonModule->moduleGUID());
-    return mServer && mServer->getServerFlags().testFlag(Qn::SF_HasPublicIP);
+    return mServer && mServer->getServerFlags().testFlag(vms::api::SF_HasPublicIP);
 }
 
 void QnMasterServerStatusWatcher::at_updateMasterFlag()

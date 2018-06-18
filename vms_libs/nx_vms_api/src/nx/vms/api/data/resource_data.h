@@ -10,22 +10,27 @@ namespace nx {
 namespace vms {
 namespace api {
 
-struct ResourceData: IdData
+struct NX_VMS_API ResourceData: IdData
 {
     QnUuid parentId;
     QString name;
     QString url;
     QnUuid typeId;
+
+    ResourceData() = default;
+    ResourceData(const QnUuid& typeId): typeId(typeId) {}
+
+    static QnUuid typeIdFromName(const QString& typeName);
 };
 #define ResourceData_Fields IdData_Fields (parentId)(name)(url)(typeId)
 
-struct ResourceStatusData: IdData
+struct NX_VMS_API ResourceStatusData: IdData
 {
     ResourceStatus status = ResourceStatus::offline;
 };
 #define ResourceStatusData_Fields IdData_Fields (status)
 
-struct ResourceParamData: Data
+struct NX_VMS_API ResourceParamData: Data
 {
     ResourceParamData() = default;
 
@@ -40,7 +45,7 @@ struct ResourceParamData: Data
 };
 #define ResourceParamData_Fields (value)(name)
 
-struct ResourceParamWithRefData: ResourceParamData
+struct NX_VMS_API ResourceParamWithRefData: ResourceParamData
 {
     ResourceParamWithRefData() = default;
 

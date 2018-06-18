@@ -92,32 +92,32 @@ void fromResourceToApi(const QnLicensePtr& src, nx::vms::api::DetailedLicenseDat
 void fromResourceListToApi(const QnLicenseList& src, nx::vms::api::LicenseDataList& dst);
 void fromApiToResourceList(const nx::vms::api::LicenseDataList& src, QnLicenseList& dst);
 
-void fromResourceToApi(const QnStorageResourcePtr& src, ApiStorageData& dst);
-void fromApiToResource(const ApiStorageData& src, QnStorageResourcePtr& dst);
-void fromResourceListToApi(const QnStorageResourceList& src, ApiStorageDataList& dst);
+void fromResourceToApi(const QnStorageResourcePtr& src, nx::vms::api::StorageData& dst);
+void fromApiToResource(const nx::vms::api::StorageData& src, QnStorageResourcePtr& dst);
+void fromResourceListToApi(const QnStorageResourceList& src, nx::vms::api::StorageDataList& dst);
 
-void fromResourceToApi(const QnMediaServerResourcePtr& src, ApiMediaServerData& dst);
-void fromApiToResource(const ApiMediaServerData& src, QnMediaServerResourcePtr& dst);
+void fromResourceToApi(const QnMediaServerResourcePtr& src, nx::vms::api::MediaServerData& dst);
+void fromApiToResource(const nx::vms::api::MediaServerData& src, QnMediaServerResourcePtr& dst);
 void fromApiToResourceList(
-    const ApiMediaServerDataList& src,
+    const nx::vms::api::MediaServerDataList& src,
     QnResourceList& dst,
     QnCommonModule* commonModule);
 void fromApiToResourceList(
-    const ApiMediaServerDataList& src,
+    const nx::vms::api::MediaServerDataList& src,
     QnMediaServerResourceList& dst,
     QnCommonModule* commonModule);
 void fromResourceToApi(
     const QnMediaServerUserAttributesPtr& src,
-    ApiMediaServerUserAttributesData& dst);
+    nx::vms::api::MediaServerUserAttributesData& dst);
 void fromApiToResource(
-    const ApiMediaServerUserAttributesData& src,
+    const nx::vms::api::MediaServerUserAttributesData& src,
     QnMediaServerUserAttributesPtr& dst);
 void fromApiToResourceList(
-    const ApiMediaServerUserAttributesDataList& src,
+    const nx::vms::api::MediaServerUserAttributesDataList& src,
     QnMediaServerUserAttributesList& dst);
 void fromResourceListToApi(
     const QnMediaServerUserAttributesList& src,
-    ApiMediaServerUserAttributesDataList& dst);
+    nx::vms::api::MediaServerUserAttributesDataList& dst);
 
 void fromResourceToApi(const QnResourcePtr& src, nx::vms::api::ResourceData& dst);
 void fromApiToResource(const nx::vms::api::ResourceData& src, QnResource* dst);

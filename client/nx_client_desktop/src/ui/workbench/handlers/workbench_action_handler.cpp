@@ -2520,9 +2520,11 @@ void ActionHandler::checkIfStatisticsReportAllowed() {
         return;
 
     /* Suppress notification if no server has internet access. */
-    bool atLeastOneServerHasInternetAccess = boost::algorithm::any_of(servers, [](const QnMediaServerResourcePtr &server) {
-        return (server->getServerFlags() & Qn::SF_HasPublicIP);
-    });
+    const bool atLeastOneServerHasInternetAccess = boost::algorithm::any_of(servers,
+        [](const QnMediaServerResourcePtr &server)
+        {
+            return server->getServerFlags().testFlag(vms::api::SF_HasPublicIP);
+        });
     if (!atLeastOneServerHasInternetAccess)
         return;
 

@@ -64,7 +64,7 @@ protected:
         auto resTypePtr = qnResTypePool->getResourceTypeByName("Server");
         ASSERT_TRUE(!resTypePtr.isNull());
 
-        ec2::ApiMediaServerData serverData;
+        nx::vms::api::MediaServerData serverData;
         serverData.typeId = resTypePtr->getId();
         serverData.id = module->commonModule()->moduleGUID();
         serverData.authKey = QnUuid::createUuid().toString();

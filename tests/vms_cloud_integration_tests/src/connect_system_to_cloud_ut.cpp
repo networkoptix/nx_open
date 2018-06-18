@@ -15,6 +15,8 @@
 
 #include "mediaserver_cloud_integration_test_setup.h"
 
+using nx::vms::api::ServerFlag;
+
 namespace {
 
 static constexpr auto kRetryRequestDelay = std::chrono::seconds(1);
@@ -49,7 +51,7 @@ protected:
                 mediaServerClient->getModuleInformation(&moduleInformation);
             ASSERT_EQ(QnJsonRestResult::NoError, resultCode.error);
 
-            if (moduleInformation.serverFlags.testFlag(Qn::ServerFlag::SF_NewSystem))
+            if (moduleInformation.serverFlags.testFlag(ServerFlag::SF_NewSystem))
                 break;
             std::this_thread::sleep_for(kRetryRequestDelay);
         }

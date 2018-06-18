@@ -320,10 +320,6 @@ void QnCommonMetaTypes::initialize()
     qRegisterMetaType<ec2::ApiUserRoleData>("ec2::ApiUserRoleData");
     qRegisterMetaType<ec2::ApiPredefinedRoleData>("ec2::ApiPredefinedRoleData");
 
-    qRegisterMetaType<ec2::ApiMediaServerData>("ec2::ApiMediaServerData");
-    qRegisterMetaType<ec2::ApiMediaServerUserAttributesData>("ec2::ApiMediaServerUserAttributesData");
-    qRegisterMetaType<ec2::ApiStorageData>("ec2::ApiStorageData");
-
     qRegisterMetaType<QnUuid>();
     qRegisterMetaTypeStreamOperators<QnUuid>();
     qRegisterMetaType<QnRecordingStatsReply>();

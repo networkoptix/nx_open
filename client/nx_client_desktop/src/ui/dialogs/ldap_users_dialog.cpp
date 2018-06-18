@@ -26,6 +26,7 @@
 #include <utils/common/ldap.h>
 #include <common/common_module.h>
 
+using namespace nx;
 using namespace nx::client::desktop;
 
 namespace {
@@ -66,7 +67,7 @@ QnLdapUsersDialog::QnLdapUsersDialog(QWidget* parent):
     const auto onlineServers = resourcePool()->getAllServers(Qn::Online);
     for (const QnMediaServerResourcePtr server: onlineServers)
     {
-        if (!(server->getServerFlags() & Qn::SF_HasPublicIP))
+        if (!server->getServerFlags().testFlag(vms::api::SF_HasPublicIP))
             continue;
 
         serverConnection = server->apiConnection();

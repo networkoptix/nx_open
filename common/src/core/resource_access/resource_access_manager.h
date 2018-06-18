@@ -98,7 +98,7 @@ public:
 
     bool canCreateResource(
         const QnResourceAccessSubject& subject,
-        const ec2::ApiStorageData& data) const;
+        const nx::vms::api::StorageData& data) const;
     bool canCreateResource(
         const QnResourceAccessSubject& subject,
         const nx::vms::api::LayoutData& data) const;
@@ -135,7 +135,7 @@ public:
     }
 
     bool canModifyResource(const QnResourceAccessSubject& subject, const QnResourcePtr& target,
-        const ec2::ApiStorageData& update) const;
+        const nx::vms::api::StorageData& update) const;
     bool canModifyResource(const QnResourceAccessSubject& subject, const QnResourcePtr& target,
         const nx::vms::api::LayoutData& update) const;
     bool canModifyResource(const QnResourceAccessSubject& subject, const QnResourcePtr& target,

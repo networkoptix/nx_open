@@ -21,6 +21,8 @@
 #include <ui/help/help_topics.h>
 #include <ui/workbench/workbench_context.h>
 
+using namespace nx;
+
 namespace {
     // TODO: #GDM move timeout constant to more common module
     const int testLdapTimeoutMSec = 30 * 1000; //ec2::RESPONSE_WAIT_TIMEOUT_MS;
@@ -81,7 +83,7 @@ void QnLdapSettingsDialogPrivate::testSettings() {
     const auto onlineServers = resourcePool()->getAllServers(Qn::Online);
     for (const QnMediaServerResourcePtr server: onlineServers)
     {
-        if (!server->getServerFlags().testFlag(Qn::SF_HasPublicIP))
+        if (!server->getServerFlags().testFlag(vms::api::SF_HasPublicIP))
             continue;
 
         serverConnection = server->apiConnection();

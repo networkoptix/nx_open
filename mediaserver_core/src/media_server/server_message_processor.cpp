@@ -57,9 +57,8 @@ void QnServerMessageProcessor::updateResource(const QnResourcePtr& resource,
     {
         if (resource->getId() == ownMediaServer->getId())
         {
-            ec2::ApiMediaServerData ownData;
-
-            ec2::ApiMediaServerData newData;
+            vms::api::MediaServerData ownData;
+            vms::api::MediaServerData newData;
 
             ec2::fromResourceToApi(ownMediaServer, ownData);
             ec2::fromResourceToApi(resource.staticCast<QnMediaServerResource>(), newData);
@@ -286,7 +285,7 @@ void QnServerMessageProcessor::removeResourceIgnored(const QnUuid& resourceId)
     bool isOwnStorage = (storage && storage->getParentId() == commonModule()->moduleGUID());
     if (isOwnServer)
     {
-        ec2::ApiMediaServerData apiServer;
+        vms::api::MediaServerData apiServer;
         ec2::fromResourceToApi(mServer, apiServer);
         auto connection = commonModule()->ec2Connection();
         connection->getMediaServerManager(Qn::kSystemAccess)->save(
@@ -296,8 +295,8 @@ void QnServerMessageProcessor::removeResourceIgnored(const QnUuid& resourceId)
     }
     else if (isOwnStorage && !storage->isExternal() && storage->isWritable())
     {
-        ec2::ApiStorageDataList apiStorages;
-        fromResourceListToApi(QnStorageResourceList() << storage, apiStorages);
+        vms::api::StorageDataList apiStorages;
+        ec2::fromResourceListToApi(QnStorageResourceList() << storage, apiStorages);
         commonModule()->ec2Connection()->getMediaServerManager(Qn::kSystemAccess)->saveStorages(
             apiStorages,
             ec2::DummyHandler::instance(),
