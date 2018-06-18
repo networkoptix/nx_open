@@ -3338,7 +3338,7 @@ void MediaServerProcess::initializeLogging()
         logSettings, qApp->applicationName(), binaryPath,
         QLatin1String("system_log"), nx::utils::log::addLogger(
             {
-                QnLog::HWID_LOG, 
+                QnLog::HWID_LOG,
                 toString(typeid(nx::mediaserver::LicenseWatcher))
             }));
 
@@ -3698,6 +3698,10 @@ void MediaServerProcess::run()
         QnSleep::msleep(3000);
     }
     QnAppServerConnectionFactory::setEc2Connection(ec2Connection);
+    auto clearEc2ConnectionGuardFunc = [](MediaServerProcess*) {
+        QnAppServerConnectionFactory::setEc2Connection(ec2::AbstractECConnectionPtr()); };
+    std::unique_ptr<MediaServerProcess, decltype(clearEc2ConnectionGuardFunc)>
+        clearEc2ConnectionGuard(this, clearEc2ConnectionGuardFunc);
 
     const auto& runtimeManager = commonModule()->runtimeInfoManager();
     connect(
@@ -3740,11 +3744,6 @@ void MediaServerProcess::run()
     }
 
     settings->setValue(LOW_PRIORITY_ADMIN_PASSWORD, "");
-
-    auto clearEc2ConnectionGuardFunc = [](MediaServerProcess*){
-        QnAppServerConnectionFactory::setEc2Connection(ec2::AbstractECConnectionPtr()); };
-    std::unique_ptr<MediaServerProcess, decltype(clearEc2ConnectionGuardFunc)>
-        clearEc2ConnectionGuard(this, clearEc2ConnectionGuardFunc);
 
     if (m_cmdLineArguments.cleanupDb)
     {
