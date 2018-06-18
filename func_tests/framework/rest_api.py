@@ -63,6 +63,12 @@ class RestApiError(Exception):
         self.error_string = error_string
 
 
+class InappropriateRedirect(Exception):
+    def __init__(self, server_name, url, location):
+        message = 'Mediaserver {} redirected {} to {}'.format(server_name, url, location)
+        super(InappropriateRedirect, self).__init__(self, message)
+
+
 class _RestApiProxy(object):
     """
     >>> api = RestApi('HTTP Request & Response Service', 'http://httpbin.org', '', '')
@@ -220,8 +226,11 @@ class RestApi(object):
         url = self.url(path, secure=secure)
         response = requests.request(
             method, url, auth=self._auth, verify=str(self.ca_cert),
+            allow_redirects=False,
             timeout=timeout or REST_API_TIMEOUT_SEC,
             **kwargs)
+        if response.is_redirect:
+            raise InappropriateRedirect(self._alias, url, response.next.url)
         data = self._retrieve_data(response)
         self._raise_for_status(response)
         return data
