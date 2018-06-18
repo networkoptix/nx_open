@@ -38,7 +38,7 @@ set(customization.fullBundleUpgradeCode "{99a56b24-e551-49bf-acea-7c082cefd5d8}"
 set(deb.customization.company.name "xccelo")
 
 set(ios.new_bundle_identifier "com.xccelo.xstreammobile")
-set(ios.group_identifier "group.com.xccelo.xstream")
+set(ios.group_identifier "group.com.xccelo.xstreammobile")
 set(ios.sign.identity "iPhone Distribution: iPhone Distribution: Xccelo GmbH (23H86XY72Z)")
 
 set(mac.sign.identity "Developer ID Application: Network Optix, Inc. (L6FE34GJWM)")
