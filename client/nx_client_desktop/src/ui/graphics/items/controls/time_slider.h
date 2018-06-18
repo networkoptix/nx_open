@@ -361,6 +361,10 @@ private:
     class KineticScrollHandler;
 
 private:
+    // These two functions are crucial for AbstractLinearGraphicsSlider to work correctly.
+    virtual QPointF positionFromValue(qint64 logicalValue, bool bound = true) const override;
+    virtual qint64 valueFromPosition(const QPointF& position, bool bound = true) const override;
+
     Marker markerFromPosition(const QPointF& pos, qreal maxDistance = 1.0) const;
     QPointF positionFromMarker(Marker marker) const;
 
@@ -447,8 +451,6 @@ private:
     bool isWindowBeingDragged() const;
 
     // Remove from public everything qint64-position-based from parent classes.
-    using base_type::positionFromValue;
-    using base_type::valueFromPosition;
     using base_type::setTickInterval;
     using base_type::tickInterval;
     using base_type::setMinimum;

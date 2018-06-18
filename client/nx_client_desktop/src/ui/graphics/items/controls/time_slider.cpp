@@ -1411,6 +1411,16 @@ bool QnTimeSlider::scaleWindow(qreal factor, milliseconds anchor)
     return end <= maximum();
 }
 
+QPointF QnTimeSlider::positionFromValue(qint64 logicalValue, bool bound) const
+{
+    return positionFromTime(milliseconds(logicalValue), bound);
+}
+
+qint64 QnTimeSlider::valueFromPosition(const QPointF& position, bool bound) const
+{
+    return timeFromPosition(position, bound).count();
+}
+
 QnTimeSlider::Marker QnTimeSlider::markerFromPosition(const QPointF& pos, qreal maxDistance) const
 {
     if (m_selectionValid)
@@ -3208,6 +3218,9 @@ void QnTimeSlider::hoverLeaveEvent(QGraphicsSceneHoverEvent* event)
 
 void QnTimeSlider::hoverMoveEvent(QGraphicsSceneHoverEvent* event)
 {
+    qDebug() << "hover at" << valueFromPosition(event->pos())
+        << datetime::toString(timeFromPosition(event->pos()).count());
+
     base_type::hoverMoveEvent(event);
 
     m_hoverMousePos = event->pos();
