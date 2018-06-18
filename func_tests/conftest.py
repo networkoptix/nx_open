@@ -3,6 +3,7 @@ import logging
 import pytest
 from pathlib2 import Path
 
+from defaults import defaults
 from framework.artifact import ArtifactFactory
 from framework.ca import CA
 from framework.config import SingleTestConfig, TestParameter, TestsConfig
@@ -12,26 +13,21 @@ pytest_plugins = ['fixtures.vms', 'fixtures.mediaservers', 'fixtures.cloud', 'fi
 
 JUNK_SHOP_PLUGIN_NAME = 'junk-shop-db-capture'
 
-DEFAULT_WORK_DIR = '/tmp/funtest'
-DEFAULT_REST_API_FORWARDED_PORT_BASE = 17000
-
-DEFAULT_MAX_LOG_WIDTH = 500
-
 _logger = logging.getLogger(__name__)
 
 
 def pytest_addoption(parser):
-    parser.addoption('--work-dir', type=Path, default=DEFAULT_WORK_DIR, help=(
+    parser.addoption('--work-dir', type=Path, default=defaults.get('work_dir'), help=(
         'working directory for tests: all generated files will be placed there'))
     parser.addoption('--bin-dir', type=Path, help=(
         'directory with binary files for tests: '
         'debian distributive and media sample are expected there'))
     parser.addoption('--customization', help=(
         "Manufacturer name or 'default'. Optional. Checked against customization from .deb file."))
-    parser.addoption('--max-log-width', default=DEFAULT_MAX_LOG_WIDTH, type=int, help=(
-        'Change maximum log message width. Default is %d' % DEFAULT_MAX_LOG_WIDTH))
+    parser.addoption('--max-log-width', default=defaults.get('max_log_width', 500), type=int, help=(
+        'Change maximum log message width. Default is %(default)s'))
     parser.addoption(
-        '--log-level', type=str.upper, choices=['DEBUG', 'INFO', 'WARNING', 'ERROR', 'CRITICAL'], default='DEBUG',
+        '--log-level', type=str.upper, choices=['DEBUG', 'INFO', 'WARNING', 'ERROR', 'CRITICAL'], default=defaults.get('log_level', 'DEBUG'),
         help='choices: DEBUG (default), INFO, WARNING, ERROR, CRITICAL')
     parser.addoption('--tests-config-file', type=TestsConfig.from_yaml_file, nargs='*', help=(
         'Configuration file for tests, in yaml format.'))
