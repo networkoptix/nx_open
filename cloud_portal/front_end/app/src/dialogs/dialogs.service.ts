@@ -1,20 +1,20 @@
 import { Inject, Injectable } from '@angular/core';
 
-import "./../dialogs/dialogs.scss";
+import './../dialogs/dialogs.scss';
 
-import { NxModalLoginComponent }      from "./../dialogs/login/login.component";
-import { NxModalGeneralComponent }    from "./../dialogs/general/general.component";
-import { NxModalShareComponent }      from "./../dialogs/share/share.component";
-import { NxModalDisconnectComponent } from "./../dialogs/disconnect/disconnect.component";
-import { NxModalRenameComponent }     from "./../dialogs/rename/rename.component";
-import { NxModalMergeComponent }      from "./../dialogs/merge/merge.component";
+import { NxModalLoginComponent }      from './../dialogs/login/login.component';
+import { NxModalGenericComponent }    from './../dialogs/generic/generic.component';
+import { NxModalShareComponent }      from './../dialogs/share/share.component';
+import { NxModalDisconnectComponent } from './../dialogs/disconnect/disconnect.component';
+import { NxModalRenameComponent }     from './../dialogs/rename/rename.component';
+import { NxModalMergeComponent }      from './../dialogs/merge/merge.component';
 
 @Injectable()
 export class nxDialogsService {
 
     constructor(@Inject('ngToast') private toast: any,
                 private loginModal: NxModalLoginComponent,
-                private generalModal: NxModalGeneralComponent,
+                private genericModal: NxModalGenericComponent,
                 private disconnectModal: NxModalDisconnectComponent,
                 private renameModal: NxModalRenameComponent,
                 private mergeModal: NxModalMergeComponent,
@@ -41,7 +41,7 @@ export class nxDialogsService {
 
     confirm(message, title, actionLabel, actionType?, cancelLabel?) {
         //title, template, url, content, hasFooter, cancellable, params, closable, actionLabel, buttonType, size
-        return this.generalModal.openConfirm(message, title, actionLabel, actionType, cancelLabel);
+        return this.genericModal.openConfirm(message, title, actionLabel, actionType, cancelLabel);
     }
 
 

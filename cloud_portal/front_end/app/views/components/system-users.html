@@ -5,13 +5,13 @@
         <div class="table-responsive">
             <table class="table table-hover" ng-if="system.users.length">
                 <thead>
-                <tr>
-                    <th>Name</th>
-                    <th>Email</th>
-                    <th>Permissions</th>
-                    <th class="button-cell"></th>
-                    <th class="button-cell"></th>
-                </tr>
+                    <tr>
+                        <th>Name</th>
+                        <th>Email</th>
+                        <th>Permissions</th>
+                        <th class="button-cell"></th>
+                        <th class="button-cell"></th>
+                    </tr>
                 </thead>
                 <tbody>
                 <tr ng-repeat="user in system.users" class="hoverable" ng-class="{disabled:!user.isEnabled}">

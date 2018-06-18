@@ -1,7 +1,6 @@
 import { Component, OnInit, Input, SimpleChanges, Inject, OnChanges, OnDestroy } from '@angular/core';
-import { NgbDropdownModule }                                                     from '@ng-bootstrap/ng-bootstrap';
-import { ActivatedRoute, Params }                                                from "@angular/router";
-import { Location }                                                              from "@angular/common";
+import { ActivatedRoute }                                                        from '@angular/router';
+import { Location }                                                              from '@angular/common';
 
 @Component({
     selector: 'nx-systems',
@@ -31,7 +30,7 @@ export class NxSystemsDropdown implements OnInit, OnDestroy, OnChanges {
     private isActive(val) {
         const currentPath = this.location.path();
 
-        return (currentPath.indexOf(val) >= 0)
+        return (currentPath.indexOf(val) >= 0);
     }
 
     private updateActive() {

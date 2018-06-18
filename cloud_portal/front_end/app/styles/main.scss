@@ -587,7 +587,7 @@ td{
   color: $light15;
 
   h2 {
-    font-weight: bold;
+    justify-content: center;
   }
 }
 
@@ -741,22 +741,30 @@ h1 .badge {
     }
 }
 
-.download-button{
-    max-width: 100%;
-    margin-bottom:8px;
-    margin-top:0;
-    .installer-name{
-        font-weight: normal;
+.download-button {
+    max-width     : fit-content;
+    margin-bottom : 8px;
+    margin-top    : 0;
+
+    .installer-name {
+        font-weight : normal;
     }
-    .media-body{
-        width:auto;
+
+    .media-body {
+        width : auto;
     }
-    h2{
-        max-width: 320px;
-        overflow: hidden;
-        text-overflow: ellipsis;
+
+    h2 {
+        max-width     : 320px;
+        overflow      : hidden;
+        text-overflow : ellipsis;
+    }
+
+    & + p {
+        color: $light16;
     }
 }
+
 h2.version-number{
     font-weight: bold;
     font-size: 32px;

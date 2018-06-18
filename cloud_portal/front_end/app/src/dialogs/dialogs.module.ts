@@ -6,7 +6,7 @@ import { DropdownsModule }  from '../dropdowns/dropdowns.module';
 
 import { nxDialogsService }                                   from "./dialogs.service";
 import { NxModalLoginComponent, LoginModalContent }           from "./login/login.component";
-import { GeneralModalContent, NxModalGeneralComponent }       from "./general/general.component";
+import { GenericModalContent, NxModalGenericComponent }       from "./generic/generic.component";
 import { DisconnectModalContent, NxModalDisconnectComponent } from "./disconnect/disconnect.component";
 import { RenameModalContent, NxModalRenameComponent }         from "./rename/rename.component";
 import { ShareModalContent, NxModalShareComponent }           from "./share/share.component";
@@ -26,7 +26,7 @@ import { TranslateModule }                                    from '@ngx-transla
     ],
     declarations: [
         LoginModalContent, NxModalLoginComponent,
-        GeneralModalContent, NxModalGeneralComponent,
+        GenericModalContent, NxModalGenericComponent,
         DisconnectModalContent, NxModalDisconnectComponent,
         RenameModalContent, NxModalRenameComponent,
         ShareModalContent, NxModalShareComponent,
@@ -34,7 +34,7 @@ import { TranslateModule }                                    from '@ngx-transla
     ],
     entryComponents: [
         LoginModalContent, NxModalLoginComponent,
-        GeneralModalContent, NxModalGeneralComponent,
+        GenericModalContent, NxModalGenericComponent,
         DisconnectModalContent, NxModalDisconnectComponent,
         RenameModalContent, NxModalRenameComponent,
         ShareModalContent, NxModalShareComponent,
@@ -43,7 +43,7 @@ import { TranslateModule }                                    from '@ngx-transla
     providers: [
         nxDialogsService,
         NxModalLoginComponent,
-        NxModalGeneralComponent,
+        NxModalGenericComponent,
         NxModalDisconnectComponent,
         NxModalRenameComponent,
         NxModalShareComponent,

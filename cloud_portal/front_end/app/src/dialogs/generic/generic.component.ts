@@ -4,11 +4,11 @@ import {NgbModal, NgbActiveModal, NgbModalRef} from '@ng-bootstrap/ng-bootstrap'
 import {EmailValidator} from '@angular/forms';
 
 @Component({
-    selector: 'nx-modal-general-content',
-    templateUrl: 'general.component.html',
+    selector: 'nx-modal-generic-content',
+    templateUrl: 'generic.component.html',
     styleUrls: []
 })
-export class GeneralModalContent implements OnInit {
+export class GenericModalContent implements OnInit {
     @Input() language;
     @Input() message;
     @Input() title;
@@ -44,7 +44,7 @@ export class GeneralModalContent implements OnInit {
     styleUrls: []
 })
 
-export class NxModalGeneralComponent implements OnInit {
+export class NxModalGenericComponent implements OnInit {
     modalRef: NgbModalRef;
 
     constructor(@Inject('languageService') private language: any,
@@ -54,7 +54,7 @@ export class NxModalGeneralComponent implements OnInit {
 
     private dialog(message, title, actionLabel, actionType?, cancelLabel?,
                    hasFooter?, cancellable?, closable?) {
-        this.modalRef = this.modalService.open(GeneralModalContent, {backdrop: 'static', centered: true});
+        this.modalRef = this.modalService.open(GenericModalContent, {backdrop: 'static', centered: true});
         this.modalRef.componentInstance.language = this.language.lang;
 
         this.modalRef.componentInstance.message = message;

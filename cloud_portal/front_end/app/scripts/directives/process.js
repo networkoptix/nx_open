@@ -48,7 +48,7 @@ angular.module('cloudApp').directive('processButton', ['$timeout',function ($tim
                     touchForm(scope.form);
 
                     $timeout(function () {
-                        if(scope.form && scope.form.$invalid || scope.form.$invalid === undefined){
+                        if(scope.form && scope.form.$invalid || scope.form && scope.form.$invalid === undefined){
                             setFocusToInvalid(scope.form);
                             return false;
                         } else {
@@ -75,7 +75,7 @@ angular.module('cloudApp').directive('processButton', ['$timeout',function ($tim
                             element.children('.preloader').remove();
                             return;
                         }
-                        else if(scope.processLoading.processing){
+                        else if(scope.processLoading.processing){ 
                             element.removeClass('hidden');
                             element.addClass('process-loading');
                             if(!element.children('.preloader').get(0)) {

@@ -14,3 +14,9 @@
         align-items: center;
     }
 }
+
+nx-select.ng-invalid:not(.ng-untouched) {
+    .form-control {
+        border-color : #d65029;
+    }
+}

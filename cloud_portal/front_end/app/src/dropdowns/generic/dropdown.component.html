@@ -1,0 +1,21 @@
+<div ngbDropdown class="d-inline-block dropdown-wide">
+
+    <button class="form-control btn btn-dropdown-toggle"
+            id="genericSelect"
+            [ngClass]="{'ng-invalid': !isValid}"
+            ngbDropdownToggle>
+        <span [innerHtml]="selection"></span>
+        <div class="nav-arrow">
+            <span></span>
+            <span></span>
+        </div>
+    </button>
+
+    <div ngbDropdownMenu aria-labelledby="genericSelect">
+        <button class="dropdown-item"
+                *ngFor="let item of items"
+                (click)="change(item)">
+            <span>{{item[label]}}</span>
+        </button>
+    </div>
+</div>

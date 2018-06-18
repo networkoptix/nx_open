@@ -1,7 +1,7 @@
 <div class="container">
     <h1 translate>Release notes</h1>
 
-    <div class="col-12">
+    <div class="col-12 p-0">
         <ngb-tabset *ngIf="downloadTypes"
                     (tabChange)="beforeChange($event)" #tabs>
             <ngb-tab *ngFor="let type of downloadTypes"

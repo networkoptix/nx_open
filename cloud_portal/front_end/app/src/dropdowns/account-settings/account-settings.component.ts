@@ -1,5 +1,4 @@
-import { Component, OnInit, Input, ChangeDetectorRef, Inject } from '@angular/core';
-import { NgbDropdownModule }                                   from '@ng-bootstrap/ng-bootstrap';
+import { Component, OnInit, Inject } from '@angular/core';
 
 @Component({
     selector: 'nx-account-settings-select',
