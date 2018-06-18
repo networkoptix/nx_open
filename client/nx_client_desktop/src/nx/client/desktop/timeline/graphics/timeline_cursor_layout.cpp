@@ -38,7 +38,7 @@ TimelineCursorLayout::~TimelineCursorLayout()
 {
 }
 
-void TimelineCursorLayout::setTimeContent(bool isLive, qint64 pos, bool showDate, bool showHours)
+void TimelineCursorLayout::setTimeContent(bool isLive, milliseconds pos, bool showDate, bool showHours)
 {
     if (!parentLayoutItem())
         return; // Layout belongs to another universe.
@@ -54,14 +54,14 @@ void TimelineCursorLayout::setTimeContent(bool isLive, qint64 pos, bool showDate
     {
         if (showDate)
         {
-            QDateTime dateTime = QDateTime::fromMSecsSinceEpoch(pos);
+            QDateTime dateTime = QDateTime::fromMSecsSinceEpoch(pos.count());
             line1 = datetime::toString(dateTime.date());
             line2 = datetime::toString(dateTime.time());
         }
         else
         {
             const auto format = showHours ? datetime::Format::hh_mm_ss : datetime::Format::mm_ss;
-            line1 = datetime::toString(pos, format);
+            line1 = datetime::toString(pos.count(), format);
         }
     }
 

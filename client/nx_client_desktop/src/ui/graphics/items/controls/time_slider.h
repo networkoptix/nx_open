@@ -1,5 +1,7 @@
 #pragma once
 
+#include <chrono>
+
 #include <QtCore/QLocale>
 #include <QtCore/QScopedPointer>
 
@@ -45,13 +47,15 @@ class QnTimeSlider: public Animated<QnToolTipSlider>, public HelpTopicQueryable,
     protected DragProcessHandler, protected AnimationTimerListener
 {
     Q_OBJECT
-    Q_PROPERTY(qint64 windowStart READ windowStart WRITE setWindowStart)
-    Q_PROPERTY(qint64 windowEnd READ windowEnd WRITE setWindowEnd)
+    Q_PROPERTY(std::chrono::milliseconds windowStart READ windowStart WRITE setWindowStart)
+    Q_PROPERTY(std::chrono::milliseconds windowEnd READ windowEnd WRITE setWindowEnd)
     Q_PROPERTY(QnTimeSliderColors colors READ colors WRITE setColors)
 
     typedef Animated<QnToolTipSlider> base_type;
 
 public:
+    using milliseconds = std::chrono::milliseconds;
+
     enum Option {
         /**
          * Whether window start should stick to slider's minimum value.
@@ -129,11 +133,6 @@ public:
         DragScrollsWindow = 0x1000,
 
         /**
-        * Whether bookmarks viewer should be anchored to timeline pixel location (otherwise - to a timestamp).
-        */
-        StillBookmarksViewer = 0x2000,
-
-        /**
         * Whether single click with mouse button immediately clears existing selection.
         */
         ClearSelectionOnClick = 0x4000
@@ -165,31 +164,35 @@ public:
     void setOptions(Options options);
     void setOption(Option option, bool value);
 
-    qint64 windowStart() const;
-    void setWindowStart(qint64 windowStart);
+    void setTimeRange(milliseconds min, milliseconds max);
+    milliseconds minimum() const;
+    milliseconds maximum() const;
 
-    qint64 windowEnd() const;
-    void setWindowEnd(qint64 windowEnd);
+    milliseconds windowStart() const;
+    void setWindowStart(milliseconds windowStart);
 
-    void setWindow(qint64 start, qint64 end, bool animate = false);
-    void shiftWindow(qint64 delta, bool animate = false);
+    milliseconds windowEnd() const;
+    void setWindowEnd(milliseconds windowEnd);
 
-    bool windowContains(qint64 position);
-    void ensureWindowContains(qint64 position);
+    void setWindow(milliseconds start, milliseconds end, bool animate = false);
+    void shiftWindow(milliseconds delta, bool animate = false);
 
-    using base_type::setSliderPosition;
-    void setSliderPosition(qint64 position, bool keepInWindow);
+    bool windowContains(milliseconds position);
+    void ensureWindowContains(milliseconds position);
 
-    using base_type::setValue;
-    void setValue(qint64 value, bool keepInWindow);
+    milliseconds sliderTimePosition() const;
+    void setSliderPosition(milliseconds position, bool keepInWindow);
 
-    qint64 selectionStart() const;
-    void setSelectionStart(qint64 selectionStart);
+    milliseconds value() const;
+    void setValue(milliseconds value, bool keepInWindow);
 
-    qint64 selectionEnd() const;
-    void setSelectionEnd(qint64 selectionEnd);
+    milliseconds selectionStart() const;
+    void setSelectionStart(milliseconds selectionStart);
 
-    void setSelection(qint64 start, qint64 end);
+    milliseconds selectionEnd() const;
+    void setSelectionEnd(milliseconds selectionEnd);
+
+    void setSelection(milliseconds start, milliseconds end);
 
     bool isSelectionValid() const;
     void setSelectionValid(bool valid);
@@ -206,8 +209,8 @@ public:
 
     virtual bool eventFilter(QObject* target, QEvent* event) override;
 
-    virtual QPointF positionFromValue(qint64 logicalValue, bool bound = true) const override;
-    virtual qint64 valueFromPosition(const QPointF& position, bool bound = true) const override;
+    QPointF positionFromTime(milliseconds logicalValue, bool bound = true) const;
+    milliseconds timeFromPosition(const QPointF& position, bool bound = true) const;
 
     bool isThumbnailsVisible() const;
     qreal thumbnailsHeight() const;
@@ -216,11 +219,11 @@ public:
     QnThumbnailsLoader* thumbnailsLoader() const;
     void setThumbnailsLoader(QnThumbnailsLoader* value, qreal aspectRatio); // TODO: #Elric remove aspectRatio
 
-    const QVector<qint64>& indicators() const;
-    void setIndicators(const QVector<qint64>& indicators);
+    const QVector<milliseconds>& indicators() const;
+    void setIndicators(const QVector<milliseconds>& indicators);
 
-    qint64 localOffset() const;
-    void setLocalOffset(qint64 utcOffset);
+    milliseconds localOffset() const;
+    void setLocalOffset(milliseconds utcOffset);
 
     const QnTimeSliderColors& colors() const;
     void setColors(const QnTimeSliderColors& colors);
@@ -254,8 +257,10 @@ public:
     void updateScreenshotCursor();
 
 signals:
+    void timeChanged(milliseconds value);
+    void timeRangeChanged(milliseconds min, milliseconds max);
     void windowMoved();
-    void windowChanged(qint64 windowStart, qint64 windowEnd);
+    void windowChanged(milliseconds windowStart, milliseconds windowEnd);
     void selectionChanged(const QnTimePeriod& selection);
     void customContextMenuRequested(const QPointF& pos, const QPoint& screenPos);
     void selectionPressed();
@@ -359,7 +364,7 @@ private:
     Marker markerFromPosition(const QPointF& pos, qreal maxDistance = 1.0) const;
     QPointF positionFromMarker(Marker marker) const;
 
-    qreal quickPositionFromValue(qint64 logicalValue, bool bound = true) const;
+    qreal quickPositionFromTime(milliseconds logicalValue, bool bound = true) const;
 
     QRectF thumbnailsRect() const;
     QRectF rulerRect() const;
@@ -375,18 +380,18 @@ private:
     QColor tickmarkLineColor(int level) const;
     QColor tickmarkTextColor(int level) const;
 
-    void setMarkerSliderPosition(Marker marker, qint64 position);
+    void setMarkerSliderPosition(Marker marker, milliseconds position);
 
-    void extendSelection(qint64 position);
+    void extendSelection(milliseconds position);
 
     bool isAnimatingWindow() const;
 
-    bool scaleWindow(qreal factor, qint64 anchor);
+    bool scaleWindow(qreal factor, milliseconds anchor);
 
     void drawPeriodsBar(QPainter* painter, const QnTimePeriodList& recorded, const QnTimePeriodList& extra, const QRectF& rect);
     void drawTickmarks(QPainter* painter, const QRectF& rect);
     void drawSolidBackground(QPainter* painter, const QRectF& rect);
-    void drawMarker(QPainter* painter, qint64 pos, const QColor& color, qreal width = 1.0);
+    void drawMarker(QPainter* painter, milliseconds pos, const QColor& color, qreal width = 1.0);
     void drawSelection(QPainter* painter);
     void drawSeparator(QPainter* painter, const QRectF& rect);
     void drawLastMinute(QPainter* painter, const QRectF& rect);
@@ -426,12 +431,12 @@ private:
     void freezeThumbnails();
     void animateLastMinute(int deltaMSecs);
 
-    void setThumbnailSelecting(qint64 time, bool selecting);
+    void setThumbnailSelecting(milliseconds time, bool selecting);
 
-    void setTargetStart(qint64 start);
-    void setTargetEnd(qint64 end);
-    qint64 targetStart();
-    qint64 targetEnd();
+    void setTargetStart(milliseconds start);
+    void setTargetEnd(milliseconds end);
+    milliseconds targetStart();
+    milliseconds targetEnd();
 
     void generateProgressPatterns();
 
@@ -441,6 +446,27 @@ private:
 
     bool isWindowBeingDragged() const;
 
+    // Remove from public everything qint64-position-based from parent classes.
+    using base_type::positionFromValue;
+    using base_type::valueFromPosition;
+    using base_type::setTickInterval;
+    using base_type::tickInterval;
+    using base_type::setMinimum;
+    using base_type::setMaximum;
+    using base_type::setRange;
+    using base_type::singleStep;
+    using base_type::setSingleStep;
+    using base_type::pageStep;
+    using base_type::setPageStep;
+    using base_type::sliderPosition;
+    using base_type::setSliderPosition;
+    using base_type::setValue;
+    using base_type::valueChanged;
+    using base_type::pageStepChanged;
+    using base_type::singleStepChanged;
+    using base_type::sliderMoved;
+    using base_type::rangeChanged;
+
 private:
     Q_DECLARE_PRIVATE(GraphicsSlider);
 
@@ -449,22 +475,22 @@ private:
 
     QnTimeSliderColors m_colors;
 
-    qint64 m_windowStart, m_windowEnd;
-    qint64 m_minimalWindow;
+    milliseconds m_windowStart, m_windowEnd;
+    milliseconds m_minimalWindow;
 
-    qint64 m_selectionStart, m_selectionEnd;
+    milliseconds m_selectionStart, m_selectionEnd;
     bool m_selectionValid;
 
-    qint64 m_oldMinimum, m_oldMaximum;
+    milliseconds m_oldMinimum, m_oldMaximum;
     Options m_options;
 
     QnLinearFunction m_unboundMapper;
     QnBoundedLinearFunction m_boundMapper;
 
-    qint64 m_zoomAnchor;
+    milliseconds m_zoomAnchor;
     bool m_animatingSliderWindow;
     bool m_kineticsHurried;
-    qint64 m_targetStart, m_targetEnd;
+    milliseconds m_targetStart, m_targetEnd;
     Marker m_dragMarker;
     QPointF m_dragDelta;
     bool m_dragIsClick;
@@ -479,18 +505,18 @@ private:
     int m_maxStepIndex;
     qreal m_msecsPerPixel;
     qreal m_animationUpdateMSecsPerPixel;
-    QVector<qint64> m_nextTickmarkPos;
+    QVector<milliseconds> m_nextTickmarkPos;
     QVector<QVector<QPointF> > m_tickmarkLines;
 
     QPointer<QnThumbnailsLoader> m_thumbnailsLoader;
     qreal m_thumbnailsAspectRatio;
     QTimer* m_thumbnailsUpdateTimer;
-    qint64 m_lastThumbnailsUpdateTime;
+    milliseconds m_lastThumbnailsUpdateTime;
     QPixmap m_noThumbnailsPixmap;
-    QMap<qint64, ThumbnailData> m_thumbnailData;
+    QMap<milliseconds, ThumbnailData> m_thumbnailData;
     QList<ThumbnailData> m_oldThumbnailData;
     QRectF m_thumbnailsPaintRect;
-    qint64 m_lastHoverThumbnail;
+    milliseconds m_lastHoverThumbnail;
     bool m_thumbnailsVisible;
     bool m_tooltipVisible;
 
@@ -503,9 +529,9 @@ private:
 
     QnTimeSliderPixmapCache* m_pixmapCache;
 
-    QVector<qint64> m_indicators;
+    QVector<milliseconds> m_indicators;
 
-    qint64 m_localOffset;
+    milliseconds m_localOffset;
 
     QLocale m_locale;
 
@@ -525,7 +551,7 @@ private:
 
     bool m_updatingValue;
 
-    qint64 m_dragWindowStart = 0;
+    milliseconds m_dragWindowStart = milliseconds(0);
 
     Qn::TimePeriodContent m_selectedExtraContent = Qn::RecordingContent;
 

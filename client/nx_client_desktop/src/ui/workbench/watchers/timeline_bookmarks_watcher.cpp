@@ -1,5 +1,7 @@
 #include "timeline_bookmarks_watcher.h"
 
+#include <chrono>
+
 #include <QtCore/QTimer>
 
 #include <utils/common/delayed.h>
@@ -20,6 +22,9 @@
 
 #include <utils/common/scoped_timer.h>
 #include <nx/utils/pending_operation.h>
+
+using std::chrono::milliseconds;
+using namespace std::literals::chrono_literals;
 
 namespace {
 
@@ -121,8 +126,8 @@ QnTimelineBookmarksWatcher::~QnTimelineBookmarksWatcher()
 {
 }
 
-QnCameraBookmarkList QnTimelineBookmarksWatcher::bookmarksAtPosition(qint64 position
-    , qint64 msecdsPerDp)
+QnCameraBookmarkList QnTimelineBookmarksWatcher::bookmarksAtPosition(milliseconds position,
+    milliseconds  msecdsPerDp)
 {
     return m_mergeHelper->bookmarksAtPosition(position, msecdsPerDp);
 }
@@ -218,16 +223,16 @@ void QnTimelineBookmarksWatcher::setTimelineBookmarks(const QnCameraBookmarkList
     }
 }
 
-void QnTimelineBookmarksWatcher::onTimelineWindowChanged(qint64 startTimeMs, qint64 endTimeMs)
+void QnTimelineBookmarksWatcher::onTimelineWindowChanged(milliseconds startTimeMs, milliseconds endTimeMs)
 {
     if (!m_timelineQuery)
         return;
 
-    if (!startTimeMs || !endTimeMs || (startTimeMs > endTimeMs))
+    if (startTimeMs == 0ms || endTimeMs == 0ms || (startTimeMs > endTimeMs))
         return;
 
-    m_timlineFilter.startTimeMs = startTimeMs;
-    m_timlineFilter.endTimeMs = endTimeMs;
+    m_timlineFilter.startTimeMs = startTimeMs.count();
+    m_timlineFilter.endTimeMs = endTimeMs.count();
     m_updateQueryOperation->requestOperation();
 }
 

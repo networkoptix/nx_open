@@ -12,6 +12,9 @@
 #include <ui/graphics/items/resource/resource_widget.h>
 #include <ui/workbench/workbench_navigator.h>
 
+using std::chrono::milliseconds;
+using std::chrono::microseconds;
+
 namespace nx {
 namespace client {
 namespace desktop {
@@ -87,9 +90,9 @@ QVariant TimelineScreenshotCursor::itemChange(GraphicsItemChange change, const Q
 
 void TimelineScreenshotCursor::showNow()
 {
-    qint64 timePoint = m_slider->valueFromPosition(QPointF(m_position, 0), true);
+    milliseconds timePoint = m_slider->timeFromPosition(QPointF(m_position, 0), true);
     api::ResourceImageRequest request;
-    request.usecSinceEpoch = timePoint;
+    request.usecSinceEpoch = microseconds(timePoint).count();
     request.size = QSize(kThumbnailWidth, 0);
     request.imageFormat = nx::api::ImageRequest::ThumbnailFormat::jpg;
     request.roundMethod = nx::api::ImageRequest::RoundMethod::iFrameBefore;
@@ -108,7 +111,7 @@ void TimelineScreenshotCursor::showNow()
     auto resource = navigator()->currentWidget()->resource();
     bool isLocalFile = resource->hasFlags(Qn::local_video) && !resource->hasFlags(Qn::periods);
     bool imageExists = isLocalFile
-        || m_slider->timePeriods(0, Qn::RecordingContent).containTime(timePoint);
+        || m_slider->timePeriods(0, Qn::RecordingContent).containTime(timePoint.count());
 
     m_thumbnail->setNoDataMode(!imageExists);
 
