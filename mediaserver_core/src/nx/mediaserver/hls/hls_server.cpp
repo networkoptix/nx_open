@@ -759,44 +759,41 @@ nx::network::http::StatusCode::Value HttpLiveStreamingProcessor::getResourceChun
     if (params.duration)
         chunkDuration = params.duration->count();
 
-        StreamingChunkCacheKey currentChunkKey(
-            uniqueResourceID.toString(),
-            params.channel,
-            params.containerFormat,
-            params.alias ? *params.alias : QString(),
-            startTimestamp,
-            std::chrono::microseconds(chunkDuration),
-            params.streamQuality,
-            requestParams);
+    StreamingChunkCacheKey currentChunkKey(
+        uniqueResourceID.toString(),
+        params.channel,
+        params.containerFormat,
+        params.alias ? *params.alias : QString(),
+        startTimestamp,
+        std::chrono::microseconds(chunkDuration),
+        params.streamQuality,
+        requestParams);
 
-        bool requestIsAPartOfHlsSession = false;
+    bool requestIsAPartOfHlsSession = false;
+    std::multimap<QString, QString>::const_iterator sessionIDIter =
+        requestParams.find(StreamingParams::SESSION_ID_PARAM_NAME);
+    if (sessionIDIter != requestParams.end())
+    {
+        SessionPool::ScopedSessionIDLock lk(SessionPool::instance(), sessionIDIter->second);
+        Session* hlsSession = SessionPool::instance()->find(sessionIDIter->second);
+        if (hlsSession)
         {
-            SessionPool::ScopedSessionIDLock lk(SessionPool::instance(), sessionIDIter->second);
-            Session* hlsSession = SessionPool::instance()->find(sessionIDIter->second);
-            if (hlsSession)
+            requestIsAPartOfHlsSession = true;
+            hlsSession->updateAuditInfo(startTimestamp);
+            if (params.alias)
             {
-                HLSSessionPool::ScopedSessionIDLock lk(HLSSessionPool::instance(), sessionIDIter->second);
-                HLSSession* hlsSession = HLSSessionPool::instance()->find(sessionIDIter->second);
-                if (hlsSession)
-                {
-                    requestIsAPartOfHlsSession = true;
-                    hlsSession->updateAuditInfo(startTimestamp);
-                    if (params.alias)
-                    {
-                        hlsSession->getChunkByAlias(
-                            params.streamQuality, *params.alias, &startTimestamp, &chunkDuration);
-                    }
+                hlsSession->getChunkByAlias(
+                    params.streamQuality, *params.alias, &startTimestamp, &chunkDuration);
+            }
 
-                    if (!hlsSession->audioCodecId())
-                        hlsSession->setAudioCodecId(detectAudioCodecId(currentChunkKey));
-                    currentChunkKey.setAudioCodecId(*hlsSession->audioCodecId());
-                }
-            }
-            else
-            {
-                currentChunkKey.setAudioCodecId(detectAudioCodecId(currentChunkKey));
-            }
+            if (!hlsSession->audioCodecId())
+                hlsSession->setAudioCodecId(detectAudioCodecId(currentChunkKey));
+            currentChunkKey.setAudioCodecId(*hlsSession->audioCodecId());
         }
+    }
+    else
+    {
+        currentChunkKey.setAudioCodecId(detectAudioCodecId(currentChunkKey));
     }
 
     auto requiredPermission = currentChunkKey.live()
@@ -1075,28 +1072,27 @@ void HttpLiveStreamingProcessor::ensureChunkCacheFilledEnoughForPlayback(
     }
 }
 
-    AVCodecID QnHttpLiveStreamingProcessor::detectAudioCodecId(
-        const StreamingChunkCacheKey& chunkParams)
-    {
-        const auto resource = commonModule()->resourcePool()->getResourceByUniqueId(
-            chunkParams.srcResourceUniqueID());
-        if (!resource)
-            return AV_CODEC_ID_NONE;
-
-        QnServerArchiveDelegate archive;
-        if (!archive.open(resource, qnServerModule->archiveIntegrityWatcher()))
-            return AV_CODEC_ID_NONE;
-        if (chunkParams.startTimestamp() != DATETIME_NOW)
-            archive.seek(chunkParams.startTimestamp(), true);
-        if (archive.getAudioLayout() &&
-            archive.getAudioLayout()->getAudioTrackInfo(0).codecContext)
-        {
-            return archive.getAudioLayout()->getAudioTrackInfo(0).codecContext->getCodecId();
-        }
-
+AVCodecID HttpLiveStreamingProcessor::detectAudioCodecId(
+    const StreamingChunkCacheKey& chunkParams)
+{
+    const auto resource = commonModule()->resourcePool()->getResourceByUniqueId(
+        chunkParams.srcResourceUniqueID());
+    if (!resource)
         return AV_CODEC_ID_NONE;
+
+    QnServerArchiveDelegate archive(qnServerModule);
+    if (!archive.open(resource, qnServerModule->archiveIntegrityWatcher()))
+        return AV_CODEC_ID_NONE;
+    if (chunkParams.startTimestamp() != DATETIME_NOW)
+        archive.seek(chunkParams.startTimestamp(), true);
+    if (archive.getAudioLayout() &&
+        archive.getAudioLayout()->getAudioTrackInfo(0).codecContext)
+    {
+        return archive.getAudioLayout()->getAudioTrackInfo(0).codecContext->getCodecId();
     }
 
+    return AV_CODEC_ID_NONE;
+}
 
 RequestParams HttpLiveStreamingProcessor::readRequestParams(
     const std::multimap<QString, QString>& requestParams)
