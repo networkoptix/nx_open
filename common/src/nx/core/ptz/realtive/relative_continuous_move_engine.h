@@ -1,14 +1,13 @@
 #pragma once
 
-#include <nx/core/ptz/realtive/relative_move_executor.h>
+#include <nx/core/ptz/realtive/relative_move_engine.h>
 
 namespace nx {
 namespace core {
 namespace ptz {
 
-class RelativeAbsoluteMoveExecutor: public RelativeMoveExecutor
+class RelativeContinuousMoveEngine: public RelativeMoveEngine
 {
-
 public:
     virtual bool relativeMove(
         const nx::core::ptz::Vector& direction,

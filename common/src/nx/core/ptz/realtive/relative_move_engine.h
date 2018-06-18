@@ -7,7 +7,7 @@ namespace nx {
 namespace core {
 namespace ptz {
 
-class RelativeMoveExecutor
+class RelativeMoveEngine
 {
 public:
     virtual bool relativeMove(

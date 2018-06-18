@@ -1,10 +1,10 @@
-#include "relative_absolute_move_executor.h"
+#include "relative_absolute_move_engine.h"
 
 namespace nx {
 namespace core {
 namespace ptz {
 
-bool RelativeAbsoluteMoveExecutor::relativeMove(
+bool RelativeAbsoluteMoveEngine::relativeMove(
     const nx::core::ptz::Vector& direction,
     const nx::core::ptz::Options& options)
 {
@@ -12,7 +12,7 @@ bool RelativeAbsoluteMoveExecutor::relativeMove(
     return false;
 }
 
-bool RelativeAbsoluteMoveExecutor::relativeFocus(
+bool RelativeAbsoluteMoveEngine::relativeFocus(
     qreal direction,
     const nx::core::ptz::Options& options)
 {

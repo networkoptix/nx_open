@@ -1,6 +1,6 @@
 #include "relative_move_workaround_controller.h"
-#include "relative_continuous_move_executor.h"
-#include "relative_absolute_move_executor.h"
+#include "relative_continuous_move_engine.h"
+#include "relative_absolute_move_engine.h"
 
 #include <map>
 
@@ -78,8 +78,8 @@ RelativeMoveWorkaroundController::RelativeMoveWorkaroundController(
     const QnPtzControllerPtr& controller)
     :
     base_type(controller),
-    m_continuousMoveExecutor(std::make_unique<RelativeContinuousMoveExecutor>()),
-    m_absoluteMoveExecutor(std::make_unique<RelativeAbsoluteMoveExecutor>())
+    m_continuousMoveEngine(std::make_unique<RelativeContinuousMoveEngine>()),
+    m_absoluteMoveEngine(std::make_unique<RelativeAbsoluteMoveEngine>())
 {
 }
 
@@ -143,13 +143,13 @@ bool RelativeMoveWorkaroundController::relativeMove(
 
     if (!qFuzzyIsNull(absoluteVector))
     {
-        if (!m_absoluteMoveExecutor->relativeMove(absoluteVector, options))
+        if (!m_absoluteMoveEngine->relativeMove(absoluteVector, options))
             return false;
     }
 
     if (!qFuzzyIsNull(continuousVector))
     {
-        if (!m_continuousMoveExecutor->relativeMove(continuousVector, options))
+        if (!m_continuousMoveEngine->relativeMove(continuousVector, options))
             return false;
     }
 
@@ -171,7 +171,7 @@ bool RelativeMoveWorkaroundController::relativeFocus(
         return base_type::relativeFocus(direction, options);
 
     if (isContinuous(extensionCapability))
-        return m_continuousMoveExecutor->relativeFocus(direction, options);
+        return m_continuousMoveEngine->relativeFocus(direction, options);
 
     return false;
 }

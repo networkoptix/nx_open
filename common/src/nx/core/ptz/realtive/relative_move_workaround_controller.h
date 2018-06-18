@@ -1,7 +1,7 @@
 #pragma once
 
 #include <core/ptz/proxy_ptz_controller.h>
-#include <nx/core/ptz/realtive/relative_move_executor.h>
+#include <nx/core/ptz/realtive/relative_move_engine.h>
 
 namespace nx {
 namespace core {
@@ -33,8 +33,8 @@ private:
         const nx::core::ptz::Options& options) const;
 
 private:
-    std::unique_ptr<RelativeMoveExecutor> m_continuousMoveExecutor;
-    std::unique_ptr<RelativeMoveExecutor> m_absoluteMoveExecutor;
+    std::unique_ptr<RelativeMoveEngine> m_continuousMoveEngine;
+    std::unique_ptr<RelativeMoveEngine> m_absoluteMoveEngine;
 };
 
 } // namespace ptz
