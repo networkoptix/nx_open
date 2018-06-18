@@ -162,69 +162,42 @@ bool StreamingChunkCacheKey::mediaStreamParamsEqualTo(const StreamingChunkCacheK
            audioCodecId() == right.audioCodecId();
 }
 
-bool StreamingChunkCacheKey::operator<( const StreamingChunkCacheKey& right ) const
+bool StreamingChunkCacheKey::operator<(const StreamingChunkCacheKey& right) const
 {
-    if( m_uniqueResourceID < right.m_uniqueResourceID )
-        return true;
-    if( m_uniqueResourceID > right.m_uniqueResourceID )
-        return false;
+    if (m_uniqueResourceID != right.m_uniqueResourceID)
+        return m_uniqueResourceID < right.m_uniqueResourceID;
 
-    if( m_channel < right.m_channel )
-        return true;
-    if( m_channel > right.m_channel )
-        return false;
+    if (m_channel != right.m_channel)
+        return m_channel < right.m_channel;
 
-    if( m_containerFormat < right.m_containerFormat )
-        return true;
-    if( m_containerFormat > right.m_containerFormat )
-        return false;
+    if (m_containerFormat != right.m_containerFormat)
+        return m_containerFormat < right.m_containerFormat;
 
-    if( m_alias < right.m_alias )
-        return true;
-    if( m_alias > right.m_alias )
-        return false;
+    if (m_alias != right.m_alias)
+        return m_alias < right.m_alias;
 
-    if( m_startTimestamp < right.m_startTimestamp )
-        return true;
-    if( m_startTimestamp > right.m_startTimestamp )
-        return false;
+    if (m_startTimestamp != right.m_startTimestamp)
+        return m_startTimestamp < right.m_startTimestamp;
 
-    if( m_duration < right.m_duration )
-        return true;
-    if( m_duration > right.m_duration )
-        return false;
+    if (m_duration != right.m_duration)
+        return m_duration < right.m_duration;
 
-    if( m_pictureSizePixels.width() < right.m_pictureSizePixels.width() )
-        return true;
-    if( m_pictureSizePixels.width() > right.m_pictureSizePixels.width() )
-        return false;
+    if (m_pictureSizePixels.width() != right.m_pictureSizePixels.width())
+        return m_pictureSizePixels.width() < right.m_pictureSizePixels.width();
 
-    if( m_pictureSizePixels.height() < right.m_pictureSizePixels.height() )
-        return true;
-    if( m_pictureSizePixels.height() > right.m_pictureSizePixels.height() )
-        return false;
+    if (m_pictureSizePixels.height() != right.m_pictureSizePixels.height())
+        return m_pictureSizePixels.height() < right.m_pictureSizePixels.height();
 
-    if( m_videoCodec < right.m_videoCodec )
-        return true;
-    if( m_videoCodec > right.m_videoCodec )
-        return false;
+    if (m_videoCodec != right.m_videoCodec)
+        return m_videoCodec < right.m_videoCodec;
 
-    if( m_audioCodecId < right.m_audioCodecId)
-        return true;
-    if( m_audioCodecId > right.m_audioCodecId )
-        return false;
+    if (m_audioCodecId != right.m_audioCodecId)
+        return m_audioCodecId < right.m_audioCodecId;
 
-    if( m_streamQuality < right.m_streamQuality )
-        return true;
-    if( m_streamQuality > right.m_streamQuality )
-        return false;
+    if (m_streamQuality != right.m_streamQuality)
+        return m_streamQuality < right.m_streamQuality;
 
-    //if( m_auxiliaryParams < right.m_auxiliaryParams )
-    //    return true;
-    //else if( m_auxiliaryParams > right.m_auxiliaryParams )
-    //    return false;
-
-    return false;   //equal
+    return false;
 }
 
 bool StreamingChunkCacheKey::operator>( const StreamingChunkCacheKey& right ) const
