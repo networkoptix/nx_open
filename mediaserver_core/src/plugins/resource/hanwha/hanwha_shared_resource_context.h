@@ -116,7 +116,7 @@ public:
         const nx::mediaserver::resource::AbstractSharedResourceContext::SharedId& sharedId);
 
     // TODO: Better to make class HanwhaAccess and keep these fields separate from context.
-    void setRecourceAccess(const QUrl& url, const QAuthenticator& authenticator);
+    void setResourceAccess(const QUrl& url, const QAuthenticator& authenticator);
     void setLastSucessfulUrl(const QUrl& value);
 
     QUrl url() const;

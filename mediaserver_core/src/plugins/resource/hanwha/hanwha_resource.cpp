@@ -795,7 +795,7 @@ CameraDiagnostics::Result HanwhaResource::initDevice()
         m_sharedContext = sharedContext;
     }
 
-    m_sharedContext->setRecourceAccess(getUrl(), getAuth());
+    m_sharedContext->setResourceAccess(getUrl(), getAuth());
     m_sharedContext->setChunkLoaderSettings(
         {
             std::chrono::seconds(qnGlobalSettings->hanwhaChunkReaderResponseTimeoutSeconds()),

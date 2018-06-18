@@ -46,14 +46,14 @@ HanwhaMetadataPlugin::SharedResources::SharedResources(
     monitor(std::make_unique<HanwhaMetadataMonitor>(driverManifest, url, auth)),
     sharedContext(std::make_shared<HanwhaSharedResourceContext>(sharedId))
 {
-    sharedContext->setRecourceAccess(url, auth);
+    sharedContext->setResourceAccess(url, auth);
 }
 
 void HanwhaMetadataPlugin::SharedResources::setResourceAccess(
     const QUrl& url,
     const QAuthenticator& auth)
 {
-    sharedContext->setRecourceAccess(url, auth);
+    sharedContext->setResourceAccess(url, auth);
     monitor->setResourceAccess(url, auth);
 }
 

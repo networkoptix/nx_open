@@ -49,7 +49,7 @@ HanwhaSharedResourceContext::HanwhaSharedResourceContext(
 {
 }
 
-void HanwhaSharedResourceContext::setRecourceAccess(
+void HanwhaSharedResourceContext::setResourceAccess(
     const QUrl& url, const QAuthenticator& authenticator)
 {
     {
