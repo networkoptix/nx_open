@@ -57,7 +57,7 @@ private:
 
     enum class UserHandlerResult
     {
-        proceed,
+        thisLeftRunning,
         thisDeleted,
     };
 

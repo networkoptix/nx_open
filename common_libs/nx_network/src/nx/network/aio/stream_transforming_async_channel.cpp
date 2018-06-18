@@ -334,7 +334,7 @@ StreamTransformingAsyncChannel::UserHandlerResult
     }
 
     m_rawWriteQueue.erase(std::get<0>(completedIoRange), std::get<1>(completedIoRange));
-    return UserHandlerResult::proceed;
+    return UserHandlerResult::thisLeftRunning;
 }
 
 void StreamTransformingAsyncChannel::scheduleNextRawSendTaskIfAny()
