@@ -11,14 +11,15 @@
 namespace rest {
 namespace handlers {
 
-int SetPrimaryTimeServerRestHandler::executeGet(
+int SetPrimaryTimeServerRestHandler::executePost(
     const QString& /*path*/,
-    const QnRequestParams& params,
+    const QnRequestParams& /*params*/,
+    const QByteArray& body,
     QnJsonRestResult& result,
     const QnRestConnectionProcessor* owner)
 {
     auto timeSyncManager = owner->commonModule()->ec2Connection()->timeSyncManager();
-    result = execute(timeSyncManager, QnUuid(params.value("id")));
+    result = execute(timeSyncManager, QJson::deserialized<nx::vms::api::IdData>(body).id);
     return nx::network::http::StatusCode::ok;
 }
 
@@ -30,11 +31,11 @@ QnJsonRestResult SetPrimaryTimeServerRestHandler::execute(
     QnJsonRestResult result;
     if (!server && !id.isNull())
     {
-        result.setError(QnRestResult::InvalidParameter, 
+        result.setError(QnRestResult::InvalidParameter,
             lit("Mediaserver with Id '%1' is not found.").arg(id.toString()));
         return result;
     }
-    
+
     auto settings = commonModule->globalSettings();
     settings->setPrimaryTimeServer(id);
     settings->setSynchronizingTimeWithInternet(id.isNull());

@@ -849,8 +849,8 @@ QnMediaServerResourcePtr MediaServerProcess::findServer(ec2::AbstractECConnectio
 }
 
 QnMediaServerResourcePtr MediaServerProcess::registerServer(
-    ec2::AbstractECConnectionPtr ec2Connection, 
-    const QnMediaServerResourcePtr &server, 
+    ec2::AbstractECConnectionPtr ec2Connection,
+    const QnMediaServerResourcePtr &server,
     bool isNewServerInstance)
 {
     ec2::ApiMediaServerData apiServer;
@@ -1221,7 +1221,7 @@ void MediaServerProcess::stopObjects()
     if (const auto manager = commonModule()->moduleDiscoveryManager())
         manager->stop();
 
-    if (m_universalTcpListener) 
+    if (m_universalTcpListener)
     {
         m_universalTcpListener->stop();
         delete m_universalTcpListener;
@@ -1574,15 +1574,12 @@ void MediaServerProcess::registerRestHandlers(
      *     %param:integer utcTimeMs Server synchronized time.
      *     %param:boolean isTakenFromInternet Whether the server has got the time from the internet.
      */
-    reg(nx::time_sync::TimeSyncManager::kTimeSyncUrlPath.mid(1), 
+    reg(nx::time_sync::TimeSyncManager::kTimeSyncUrlPath.mid(1),
         new ::rest::handlers::SyncTimeRestHandler());
 
-    /**%apidoc GET /ec2/forcePrimaryTimeServer
-    * Set primary time server. If parameter id is missing then there is no
-    * primary time server and time synchronization with internet is turned on.
-    * Otherwise synchronization with internet is turned off.
-    * %param[opt]:uuid Primary time server id. All other servers in the system will
-    * get time from this server.
+    /**%apidoc POST /ec2/forcePrimaryTimeServer
+    * Set primary time server. Requires json object with optional 'id' field in the message body.
+    * If id field is missing, primary time server is turned off.
     * %return:object JSON object with error message and error code (0 means OK).
     */
     reg("ec2/forcePrimaryTimeServer",
@@ -3160,14 +3157,14 @@ void MediaServerProcess::initializeLogging()
 
     logSettings.level.parse(cmdLineArguments().ec2TranLogLevel,
         settings.tranLogLevel(), toString(nx::utils::log::Level::none));
-    logSettings.logBaseName = "ec2_tran";        
+    logSettings.logBaseName = "ec2_tran";
     nx::utils::log::initialize(
         logSettings, qApp->applicationName(), binaryPath,
         nx::utils::log::addLogger({QnLog::EC2_TRAN_LOG}));
 
     logSettings.level.parse(cmdLineArguments().permissionsLogLevel,
         settings.permissionsLogLevel(), toString(nx::utils::log::Level::none));
-    logSettings.logBaseName = "permissions";        
+    logSettings.logBaseName = "permissions";
     nx::utils::log::initialize(
         logSettings, qApp->applicationName(), binaryPath,
         nx::utils::log::addLogger({QnLog::PERMISSIONS_LOG}));
@@ -4372,7 +4369,7 @@ int MediaServerProcess::main(int argc, char* argv[])
 #endif
 
     QnVideoService service( argc, argv );
-    
+
     m_staticCommonModule.reset(new QnStaticCommonModule(
         Qn::PT_Server,
         QnAppInfo::productNameShort(),
