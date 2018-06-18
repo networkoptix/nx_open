@@ -3218,9 +3218,6 @@ void QnTimeSlider::hoverLeaveEvent(QGraphicsSceneHoverEvent* event)
 
 void QnTimeSlider::hoverMoveEvent(QGraphicsSceneHoverEvent* event)
 {
-    qDebug() << "hover at" << valueFromPosition(event->pos())
-        << datetime::toString(timeFromPosition(event->pos()).count());
-
     base_type::hoverMoveEvent(event);
 
     m_hoverMousePos = event->pos();
