@@ -1,5 +1,4 @@
-#ifndef QN_PTZ_FWD_H
-#define QN_PTZ_FWD_H
+#pragma once
 
 #include <QtCore/QSharedPointer>
 #include <QtCore/QList>
@@ -33,8 +32,11 @@ struct QnPtzData;
 
 struct QnPtzObject;
 
-QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES((QnPtzMapperPtr)(QnPtzPreset)(QnPtzTourSpot)(QnPtzTour)(QnPtzLimits)(QnPtzData)(QnPtzObject), (json))
-QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES((QnPtzAuxilaryTrait), (json)(lexical))
+QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
+    (QnPtzLimits)(QnPtzPreset)(QnPtzTourSpot)(QnPtzTour)(QnPtzData)(QnPtzObject),
+    (json)(eq))
 
-#endif // QN_PTZ_FWD_H
+QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES((QnPtzAuxilaryTrait), (json)(lexical))
+QN_FUSION_DECLARE_FUNCTIONS(QnPtzMapperPtr, (json))
+
 
