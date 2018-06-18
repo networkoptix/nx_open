@@ -40,6 +40,11 @@ class QnAbstractMediaStreamDataProvider;
 class QnFfmpegAudioTranscoder;
 class QnFfmpegVideoTranscoder;
 
+extern "C"
+{
+    typedef int (*FfmpegWriteFrame) (AVFormatContext *s, AVPacket *pkt);
+}
+
 class QnStreamRecorder:
     public QnAbstractDataConsumer,
     public QnResourceConsumer,
@@ -255,6 +260,7 @@ private:
     QnResourceAudioLayoutPtr m_forcedAudioLayout;
     bool m_disableRegisterFile;
     int64_t m_lastFileSize = 0;
+    FfmpegWriteFrame m_writeFrameFunc = nullptr;
 };
 
 #endif // ENABLE_DATA_PROVIDERS

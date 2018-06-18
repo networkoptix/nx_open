@@ -2363,15 +2363,15 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Helps fix image quality issues on some cameras; for others will cause significant bitrate increase.</source>
-      <translation type="unfinished">Helps fix image quality issues on some cameras; for others will cause significant bitrate increase.</translation>
+      <translation>일부 카메라에서 이미지 품질 문제를 해결하는 데 도움이되고 다른 것들은 상당한 비트 전송률 증가를 야기 할 것이다.</translation>
     </message>
     <message>
       <source>Custom number that can be assigned to a camera for quick identification and access</source>
-      <translation type="unfinished">Custom number that can be assigned to a camera for quick identification and access</translation>
+      <translation>빠른 식별 및 액세스를 위해 카메라에 할당 할 수있는 사용자 지정 번호</translation>
     </message>
     <message>
       <source>Server will not change any cameras settings, it will receive and use camera stream as-is.</source>
-      <translation type="unfinished">Server will not change any cameras settings, it will receive and use camera stream as-is.</translation>
+      <translation>서버는 어떤 카메라 설정도 변경하지 않고 그대로 카메라 스트림을 수신하여 사용합니다.</translation>
     </message>
   </context>
   <context>
@@ -2652,11 +2652,11 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Quality setting determines the compression rate only, and does not affect resolution. Low, Medium, High and Best are preset bitrate values.</source>
-      <translation type="unfinished">Quality setting determines the compression rate only, and does not affect resolution. Low, Medium, High and Best are preset bitrate values.</translation>
+      <translation>품질 설정은 압축률 만 판단하며 해상도에는 영향을 미치지 않습니다. 낮음, 중간, 높음 및 최상은 사전 설정된 비트 전송률 값입니다.</translation>
     </message>
     <message>
       <source>First choose a recording option, then apply it to day and time blocks on the recording schedule. (0 block is 12:00am to 1:00am, 23 block is 11:00pm to 12:00am.)</source>
-      <translation type="unfinished">First choose a recording option, then apply it to day and time blocks on the recording schedule. (0 block is 12:00am to 1:00am, 23 block is 11:00pm to 12:00am.)</translation>
+      <translation>먼저 녹화 옵션을 선택한 다음 녹화 일정의 요일 및 시간 블록에 적용합니다. (0 블록은 오전 12 시부 터 오전 1 시까 지, 23 블록은 오후 11시에서 12시 사이입니다.)</translation>
     </message>
   </context>
   <context>
@@ -3116,19 +3116,19 @@ to %1</source>
     <name>QnCustomBusinessEventWidget</name>
     <message>
       <source>If the field is empty, event will always trigger.</source>
-      <translation type="unfinished">If the field is empty, event will always trigger.</translation>
+      <translation>필드가 비어 있으면 이벤트가 항상 트리거됩니다.</translation>
     </message>
     <message>
       <source>Event will trigger only if there are matches in the source with any of the entered keywords.</source>
-      <translation type="unfinished">Event will trigger only if there are matches in the source with any of the entered keywords.</translation>
+      <translation>소스에 입력 된 키워드 중 하나와 일치하는 항목이있는 경우에만 이벤트가 트리거됩니다.</translation>
     </message>
     <message>
       <source>Event will trigger only if there are matches in the caption with any of the entered keywords.</source>
-      <translation type="unfinished">Event will trigger only if there are matches in the caption with any of the entered keywords.</translation>
+      <translation>캡션에 입력 한 키워드 중 하나와 일치하는 것이있는 경우에만 이벤트가 트리거됩니다.</translation>
     </message>
     <message>
       <source>Event will trigger only if there are matches in the description with any of the entered keywords.</source>
-      <translation type="unfinished">Event will trigger only if there are matches in the description with any of the entered keywords.</translation>
+      <translation>설명에 입력 한 키워드 중 하나와 일치하는 항목이있는 경우에만 이벤트가 트리거됩니다.</translation>
     </message>
   </context>
   <context>
@@ -3346,7 +3346,7 @@ to %1</source>
     <name>QnEmptyBusinessActionWidget</name>
     <message>
       <source>Panic Recording mode switches recording settings for all cameras to maximum FPS and quality.</source>
-      <translation type="unfinished">Panic Recording mode switches recording settings for all cameras to maximum FPS and quality.</translation>
+      <translation>패닉 촬영 모드는 모든 카메라의 녹화 설정을 최대 FPS 및 화질로 전환합니다.</translation>
     </message>
   </context>
   <context>
@@ -3581,7 +3581,7 @@ to %1</source>
     <name>QnFisheyeSettingsWidget</name>
     <message>
       <source>Use this setting to compensate for distortion if camera is not mounted exactly vertically or horizontally.</source>
-      <translation type="unfinished">Use this setting to compensate for distortion if camera is not mounted exactly vertically or horizontally.</translation>
+      <translation>카메라가 정확히 수직 또는 수평으로 장착되지 않은 경우 왜곡을 보정하려면이 설정을 사용하십시오.</translation>
     </message>
   </context>
   <context>
@@ -3655,11 +3655,11 @@ to %1</source>
     </message>
     <message>
       <source>Backup includes servers and cameras settings, users, webpages, event rules, etc. Video is not saved.</source>
-      <translation type="unfinished">Backup includes servers and cameras settings, users, webpages, event rules, etc. Video is not saved.</translation>
+      <translation>백업에는 서버 및 카메라 설정, 사용자, 웹 페이지, 이벤트 규칙 등이 포함됩니다. 비디오는 저장되지 않습니다.</translation>
     </message>
     <message>
       <source>Creates a backup of System configuration that can be restored in case of failure.</source>
-      <translation type="unfinished">Creates a backup of System configuration that can be restored in case of failure.</translation>
+      <translation>오류가 발생할 경우 복원할 수 있는 시스템 구성에 대 한 백업을 만듭니다.</translation>
     </message>
   </context>
   <context>
@@ -3840,7 +3840,7 @@ to %1</source>
     </message>
     <message>
       <source>Changing any LDAP settings other than &quot;Search Filter&quot; will result in connectivity loss for all LDAP fetched users.</source>
-      <translation type="unfinished">Changing any LDAP settings other than &quot;Search Filter&quot; will result in connectivity loss for all LDAP fetched users.</translation>
+      <translation>&quot;검색 필터&quot; 이외의 LDAP 설정을 변경하면 LDAP에서 갖고온 모든 사용자의 연결이 끊어집니다.</translation>
     </message>
   </context>
   <context>
@@ -4469,15 +4469,15 @@ to %1</source>
     </message>
     <message>
       <source>Sets the time to use in the client (timeline, timestamps, etc.) when client and server machines are in different time zones.</source>
-      <translation type="unfinished">Sets the time to use in the client (timeline, timestamps, etc.) when client and server machines are in different time zones.</translation>
+      <translation>클라이언트와 서버 시스템이 다른 시간대에있을 때 클라이언트에서 사용할 시간 (시간대, 시간 소인 등) 을 설정합니다.</translation>
     </message>
     <message>
       <source>Displays IP addresses for cameras and servers and roles for users.</source>
-      <translation type="unfinished">Displays IP addresses for cameras and servers and roles for users.</translation>
+      <translation>카메라 및 서버의 IP 주소와 사용자의 역할을 표시합니다.</translation>
     </message>
     <message>
       <source>Length of time each camera on layout will be displayed if you start a Tour.</source>
-      <translation type="unfinished">Length of time each camera on layout will be displayed if you start a Tour.</translation>
+      <translation>둘러보기를 시작하면 레이아웃의 각 카메라가 표시되는 시간입니다.</translation>
     </message>
   </context>
   <context>
@@ -5642,7 +5642,7 @@ to %1</source>
     </message>
     <message>
       <source>Servers with failover enabled will automatically take cameras from offline servers.</source>
-      <translation type="unfinished">Servers with failover enabled will automatically take cameras from offline servers.</translation>
+      <translation>장애조치가 활성화 된 서버는 자동으로 오프라인 서버에서 카메라를 가져옵니다.</translation>
     </message>
   </context>
   <context>
