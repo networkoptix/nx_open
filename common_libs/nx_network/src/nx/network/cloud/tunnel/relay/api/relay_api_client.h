@@ -25,6 +25,8 @@ using StartClientConnectSessionHandler =
 using OpenRelayConnectionHandler =
     nx::utils::MoveOnlyFunc<void(ResultCode, std::unique_ptr<network::AbstractStreamSocket>)>;
 
+using ClientFeedbackFunction = nx::utils::MoveOnlyFunc<void(ResultCode)>;
+
 class NX_NETWORK_API Client:
     public network::aio::BasicPollable
 {

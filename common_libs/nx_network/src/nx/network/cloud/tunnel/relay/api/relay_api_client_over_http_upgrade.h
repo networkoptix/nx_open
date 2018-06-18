@@ -13,7 +13,9 @@ class NX_NETWORK_API ClientOverHttpUpgrade:
     using base_type = Client;
 
 public:
-    ClientOverHttpUpgrade(const nx::utils::Url& baseUrl);
+    ClientOverHttpUpgrade(
+        const nx::utils::Url& baseUrl,
+        ClientFeedbackFunction /*feedbackFunction*/);
 
     virtual void bindToAioThread(network::aio::AbstractAioThread* aioThread) override;
 

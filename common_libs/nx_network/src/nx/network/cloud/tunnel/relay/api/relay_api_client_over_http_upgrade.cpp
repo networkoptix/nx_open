@@ -9,7 +9,10 @@
 
 namespace nx::cloud::relay::api {
 
-ClientOverHttpUpgrade::ClientOverHttpUpgrade(const nx::utils::Url& baseUrl):
+ClientOverHttpUpgrade::ClientOverHttpUpgrade(
+    const nx::utils::Url& baseUrl,
+    ClientFeedbackFunction /*feedbackFunction*/)
+    :
     m_baseUrl(baseUrl),
     m_prevSysErrorCode(SystemError::noError)
 {

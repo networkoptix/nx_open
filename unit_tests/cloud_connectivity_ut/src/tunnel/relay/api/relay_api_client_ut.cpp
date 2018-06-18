@@ -47,7 +47,7 @@ protected:
     void whenInvokedSomeRequest()
     {
         initializeHttpServerIfNeeded();
-        m_client = std::make_unique<ClientOverHttpUpgrade>(m_baseUrl);
+        m_client = std::make_unique<ClientOverHttpUpgrade>(m_baseUrl, nullptr);
 
         nx::utils::promise<void> done;
         m_client->startSession(
@@ -67,7 +67,7 @@ protected:
         using namespace std::placeholders;
 
         initializeHttpServerIfNeeded();
-        m_client = std::make_unique<ClientOverHttpUpgrade>(m_baseUrl);
+        m_client = std::make_unique<ClientOverHttpUpgrade>(m_baseUrl, nullptr);
 
         m_client->beginListening(
             ::testing::UnitTest::GetInstance()->current_test_info()->name(),

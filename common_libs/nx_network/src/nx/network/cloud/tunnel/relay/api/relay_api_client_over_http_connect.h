@@ -10,7 +10,9 @@ class NX_NETWORK_API ClientImplUsingHttpConnect:
     using base_type = ClientOverHttpUpgrade;
 
 public:
-    ClientImplUsingHttpConnect(const nx::utils::Url& baseUrl);
+    ClientImplUsingHttpConnect(
+        const nx::utils::Url& baseUrl,
+        ClientFeedbackFunction feedbackFunction);
 
     virtual void beginListening(
         const nx::String& peerName,

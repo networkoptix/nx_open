@@ -5,9 +5,10 @@
 namespace nx::cloud::relay::api {
 
 ClientImplUsingHttpConnect::ClientImplUsingHttpConnect(
-    const nx::utils::Url& baseUrl)
+    const nx::utils::Url& baseUrl,
+    ClientFeedbackFunction feedbackFunction)
     :
-    base_type(baseUrl)
+    base_type(baseUrl, std::move(feedbackFunction))
 {
 }
 
@@ -44,9 +45,15 @@ void ClientImplUsingHttpConnect::processBeginListeningResponse(
     m_activeRequests.erase(httpClientIter);
 
     if (httpClient->failed() || !httpClient->response())
-        return completionHandler(ResultCode::networkError, BeginListeningResponse(), nullptr);
+    {
+        return completionHandler(
+            ResultCode::networkError,
+            BeginListeningResponse(),
+            nullptr);
+    }
 
-    const auto resultCode = toResultCode(SystemError::noError, httpClient->response());
+    const auto resultCode =
+        toResultCode(SystemError::noError, httpClient->response());
     if (httpClient->response()->statusLine.statusCode != network::http::StatusCode::ok)
     {
         return completionHandler(
@@ -56,9 +63,14 @@ void ClientImplUsingHttpConnect::processBeginListeningResponse(
     }
 
     BeginListeningResponse response;
-    deserializeFromHeaders(httpClient->response()->headers, &response);
+    deserializeFromHeaders(
+        httpClient->response()->headers,
+        &response);
 
-    completionHandler(api::ResultCode::ok, std::move(response), httpClient->takeSocket());
+    completionHandler(
+        api::ResultCode::ok,
+        std::move(response),
+        httpClient->takeSocket());
 }
 
 } // namespace nx::cloud::relay::api
