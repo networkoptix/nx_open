@@ -1,16 +1,12 @@
-#ifndef QN_PTZ_OBJECT_H
-#define QN_PTZ_OBJECT_H
-
-#ifndef Q_MOC_RUN
-#include <boost/operators.hpp>
-#endif
+#pragma once
 
 #include <QtCore/QString>
 
 #include <common/common_globals.h>
 #include <nx/core/ptz/options.h>
 
-struct QnPtzObject: public boost::equality_comparable1<QnPtzObject> {
+struct QnPtzObject
+{
     QnPtzObject(): type(Qn::InvalidPtzObject) {}
     QnPtzObject(Qn::PtzObjectType type, const QString &id): type(type), id(id) {}
 
@@ -22,5 +18,3 @@ struct QnPtzObject: public boost::equality_comparable1<QnPtzObject> {
 #define QnPtzObject_Fields (type)(id)
 
 Q_DECLARE_METATYPE(QnPtzObject)
-
-#endif // QN_PTZ_OBJECT_H

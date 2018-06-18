@@ -5,10 +5,6 @@
 #include <QtCore/QMetaType>
 #include <QtGui/QVector3D>
 
-#ifndef Q_MOC_RUN
-#include <boost/operators.hpp>
-#endif
-
 #include "ptz_fwd.h"
 
 #include <common/common_globals.h>
@@ -20,7 +16,7 @@
 static const QString kPresetsPropertyKey = lit("ptzPresets");
 static const QString kPtzPresetMappingPropertyName = lit("presetMapping");
 
-struct QnPtzPreset: public boost::equality_comparable1<QnPtzPreset>
+struct QnPtzPreset
 {
     Q_GADGET
 public:
