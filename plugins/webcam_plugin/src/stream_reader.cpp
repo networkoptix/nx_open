@@ -130,7 +130,7 @@ int StreamReader::getNextData(nxcip::MediaDataPacket** lpPacket)
 
 void StreamReader::interrupt()
 {
-    QnMutexLocker lk(&m_mutex);
+    QnMutexLocker lock(&m_mutex);
     m_terminated = true;
 }
 
@@ -362,6 +362,8 @@ int StreamReader::openVideoDecoder()
     auto decoder = std::make_unique<AVCodecContainer>();
     int initCode = decoder->initializeDecoder(videoStream->codecpar);
 
+    setDecoderOptions(decoder.get());
+
     NX_DEBUG(this) << "openVideoDecoder()::initCode:" << initCode;
     if (initCode < 0)
         return initCode;
@@ -376,27 +378,24 @@ int StreamReader::openVideoDecoder()
     return 0;
 }
 
-void StreamReader::setEncoderOptions(AVCodecContext* encoderContext)
+void StreamReader::setEncoderOptions(AVCodecContainer* encoder)
 {
-    NX_ASSERT(m_videoDecoder);
-    if(m_videoDecoder)
-    {
-        AVCodecContext * decoderContext = m_videoDecoder->codecContext();
-        encoderContext->width = decoderContext->width;
-        encoderContext->height = decoderContext->height;
-    }
-
+    AVCodecContext* encoderContext = encoder->codecContext();
+    encoderContext->width = m_codecContext.resolution().width;
+    encoderContext->height = m_codecContext.resolution().height;
     encoderContext->pix_fmt = utils::av::suggestPixelFormat(encoderContext->codec_id);
-
-    float fps = m_codecContext.fps();
-    encoderContext->time_base = { 1, (int) fps };
-
+    encoderContext->framerate = (int) m_codecContext.fps();
+    encoderContext->time_base = { 1, (int) m_codecContext.fps() };
+    encoderContext->bit_rate = m_codecContext.bitrate();
     encoderContext->flags = AV_CODEC_FLAG_GLOBAL_HEADER;
     encoderContext->global_quality = encoderContext->qmin * FF_QP2LAMBDA;
+}
 
-    int bitrate = m_codecContext.bitrate();
-    if (bitrate)
-        encoderContext->bit_rate = bitrate;
+void StreamReader::setDecoderOptions(AVCodecContainer* decoder)
+{
+    AVCodecContext *decoderContext = decoder->codecContext();
+
+    decoderContext->bit_rate = m_codecContext.bitrate();
 }
 
 int StreamReader::openVideoEncoder()
@@ -407,7 +406,7 @@ int StreamReader::openVideoEncoder()
     if (initCode < 0)
         return initCode;
 
-    setEncoderOptions(encoder->codecContext());
+    setEncoderOptions(encoder.get());
 
     int openCode = encoder->open();
     if (openCode < 0)
@@ -483,7 +482,8 @@ void StreamReader::setFormatContextOptions()
         auto resolution = m_codecContext.resolution();
         // eg. "1920x1080"
         std::string videoSize =
-            std::to_string(resolution.width).append("x").append(std::to_string(resolution.height));
+            //std::to_string(resolution.width).append("x").append(std::to_string(resolution.height));
+            "1920x1080";
         NX_DEBUG(this) << "     ffmpeg video_size:" << videoSize;
         av_dict_set(&m_formatContextOptions, "video_size", videoSize.c_str(), 0);
     }

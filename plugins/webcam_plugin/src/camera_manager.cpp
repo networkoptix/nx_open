@@ -171,7 +171,7 @@ CodecContext CameraManager::getEncoderDefaults()
         });
 
     static float defaultFPS = 30;
-    static int64_t defaultBitrate = 0;
+    static int64_t defaultBitrate = 192000;
     auto res = it != resolutionList.end() ? it->resolution : nxcip::Resolution();
 
     return CodecContext(codecID, res, defaultFPS, defaultBitrate);

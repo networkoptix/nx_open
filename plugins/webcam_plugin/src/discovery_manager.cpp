@@ -14,6 +14,27 @@
 namespace nx {
 namespace webcam_plugin {
 
+namespace {
+
+static const char* cameraBlacklist[] = 
+{
+    "mmal service 16.1" // rpi ICS Camera v1
+    ,nullptr
+};
+
+bool isBlacklisted(const char * cameraName)
+{
+    for (int i = 0; cameraBlacklist[i] != nullptr; ++i)
+    {
+        if (strcmp(cameraBlacklist[i], cameraName) == 0)
+            return true;
+    }
+    return false;
+}
+
+}
+
+
 DiscoveryManager::DiscoveryManager(nxpt::CommonRefManager* const refManager,
     nxpl::TimeProvider *const timeProvider)
     :
@@ -58,19 +79,24 @@ int DiscoveryManager::findCameras(nxcip::CameraInfo* cameras, const char* localI
 {
     std::vector<utils::DeviceData> devices = utils::getDeviceList();
     int deviceCount = devices.size();
+    int camerasIndex = 0;
     for (int i = 0; i < deviceCount && i < nxcip::CAMERA_INFO_ARRAY_SIZE; ++i)
     {
+        if(isBlacklisted(devices[i].deviceName().c_str()))
+            continue;
+
         std::string deviceName = devices[i].deviceName();
         strcpy(cameras[i].modelName, deviceName.c_str());
 
         std::string devicePath = devices[i].devicePath();
         QByteArray url =
-            QByteArray("webcam://").append(
-            nx::utils::Url::toPercentEncoding(devicePath.c_str()));
-        strcpy(cameras[i].url, url.data());
+            QByteArray("webcam://").append(nx::utils::Url::toPercentEncoding(devicePath.c_str()));
+        strcpy(cameras[camerasIndex].url, url.data());
 
         const QByteArray& uid = QCryptographicHash::hash(url, QCryptographicHash::Md5).toHex();
-        strcpy(cameras[i].uid, uid.data());
+        strcpy(cameras[camerasIndex].uid, uid.data());
+
+        ++camerasIndex;
     }
     return deviceCount;
 }
