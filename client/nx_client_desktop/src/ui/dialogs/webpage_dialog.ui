@@ -51,7 +51,7 @@
          </widget>
         </item>
         <item>
-         <widget class="QCheckBox" name="ctpCheckBox">
+         <widget class="QCheckBox" name="c2pCheckBox">
           <property name="text">
            <string>This web page is for C2P integration</string>
           </property>

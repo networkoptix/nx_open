@@ -93,14 +93,14 @@ void QnWebpageDialog::setUrl(const QUrl& url)
 
 WebPageSubtype QnWebpageDialog::subtype() const
 {
-    return ui->ctpCheckBox->isChecked()
+    return ui->c2pCheckBox->isChecked()
         ? WebPageSubtype::c2p
         : WebPageSubtype::none;
 }
 
 void QnWebpageDialog::setSubtype(WebPageSubtype value)
 {
-    ui->ctpCheckBox->setChecked(value == WebPageSubtype::c2p);
+    ui->c2pCheckBox->setChecked(value == WebPageSubtype::c2p);
 }
 
 void QnWebpageDialog::accept()
