@@ -282,7 +282,7 @@ bool Downloader::validate(const QString& url, bool onlyConnectionCheck, int expe
     nx::utils::promise<bool> readyPromise;
     auto readyFuture = readyPromise.get_future();
 
-    validateAsync(url, checkConnectionOnly, expectedSize,
+    validateAsync(url, onlyConnectionCheck, expectedSize,
         [&readyPromise](bool success) mutable
         {
             readyPromise.set_value(success);
