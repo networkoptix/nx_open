@@ -50,7 +50,7 @@
     "EMAIL IS REQUIRED TEXT": "Email er påkrævet",
     "EMAIL ALREADY REGISTERED TEXT": "This Email has been already registered in %PRODUCT_NAME%",
     "EMAIL INVALID TEXT": "Please enter a valid Email",
-    "PASSWORD IS REQUIRED TEXT": "adgangskode er påkrævet",
+    "PASSWORD IS REQUIRED TEXT": "Adgangskode er påkrævet",
     "CURRENT PASSWORD IS REQUIRED TEXT": "Current password is required",
     "PASSWORD SPECIAL CHARS TEXT": "Brug kun latinske bogstaver, tal og tastatursymboler, undgå ledende og efterfølgende mellemrum",
     "PASSWORD TOO SHORT TEXT": "Adgangskoden skal indeholde mindst 8 tegn",

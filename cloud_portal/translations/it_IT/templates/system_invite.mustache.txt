@@ -9,5 +9,5 @@ E' invitato ad iscriversi a %PRODUCT_NAME%.
 Le è stato concesso l'accesso a {{message.system_name}}.
 {{/message.sharer_name}}
 
-Registri e visualizzi il sistema: {{config.portal_url}}/ register /{{message.code}}
+Registri e visualizzi il sistema: {{config.portal_url}}/register/{{message.code}}
 

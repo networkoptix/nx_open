@@ -97,7 +97,7 @@
     },
     "custom": {
       "label": "カスタム",
-      "description": "%PRODUCT_NAME% クライアント アプリケーションを使用してカスタム権限を設定する"
+      "description": "%VMS_NAME% クライアントアプリケーションを使用してカスタム権限を設定"
     }
   },
   "errorCodes": {
