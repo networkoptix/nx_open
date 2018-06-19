@@ -132,6 +132,14 @@ bool ResourcePoolPeerManager::hasInternetConnection(const QnUuid& peerId) const
     return server->getServerFlags().testFlag(Qn::SF_HasPublicIP);
 }
 
+bool ResourcePoolPeerManager::hasAccessToTheUrl(const QString& url) const
+{
+    if (url.isEmpty())
+        return false;
+
+    return Downloader::validate(url, /* onlyConnectionCheck */ true, /* expectedSize */ 0);
+}
+
 rest::Handle ResourcePoolPeerManager::requestFileInfo(
     const QnUuid& peerId, const QString& fileName, FileInfoCallback callback)
 {
@@ -257,7 +265,7 @@ rest::Handle ResourcePoolPeerManager::validateFileInformation(
 
     const auto handle = ++m_currentSelfRequestHandle;
     Downloader::validateAsync(
-        fileInformation.url.toString(), fileInformation.size,
+        fileInformation.url.toString(), /* onlyConnectionCheck */ false, fileInformation.size,
         [this, callback, handle](bool success)
         {
             callback(success, handle);
