@@ -10,15 +10,18 @@
 #include <nx/utils/datetime.h>
 #include <nx/utils/log/assert.h>
 
+using std::chrono::milliseconds;
+using namespace std::literals::chrono_literals;
+
 namespace {
 
 struct BookmarkItem;
 typedef QSharedPointer<BookmarkItem> BookmarkItemPtr;
 typedef QList<BookmarkItemPtr> BookmarkItemList;
 
-static constexpr int kExpandAreaDpix = 20;
-static constexpr int kDefaultMergeDistanseDpix = 100;
-static constexpr int kDefaultMergeSpacingDpix = 20;
+constexpr int kExpandAreaDpix = 20;
+constexpr int kDefaultMergeDistanseDpix = 100;
+constexpr int kDefaultMergeSpacingDpix = 20;
 
 struct BookmarkItem
 {
@@ -26,27 +29,27 @@ struct BookmarkItem
 
     BookmarkItemPtr parent;
 
-    qint64 startTimeMs;
-    qint64 endTimeMs;
+    milliseconds startTimeMs;
+    milliseconds endTimeMs;
 
 public:
-    BookmarkItem()
-        : startTimeMs(0)
-        , endTimeMs(0)
+    BookmarkItem():
+        startTimeMs(0),
+        endTimeMs(0)
     {
     }
 
-    BookmarkItem(const QnCameraBookmark &bookmark)
-        : bookmark(bookmark)
-        , startTimeMs(bookmark.startTimeMs)
-        , endTimeMs(bookmark.endTimeMs())
+    BookmarkItem(const QnCameraBookmark &bookmark):
+        bookmark(bookmark),
+        startTimeMs(bookmark.startTimeMs),
+        endTimeMs(bookmark.endTimeMs())
     {
     }
 
-    BookmarkItem(const BookmarkItem &item)
-        : bookmark(item.bookmark)
-        , startTimeMs(item.startTimeMs)
-        , endTimeMs(item.endTimeMs)
+    BookmarkItem(const BookmarkItem &item):
+        bookmark(item.bookmark),
+        startTimeMs(item.startTimeMs),
+        endTimeMs(item.endTimeMs)
     {
     }
 
@@ -56,18 +59,19 @@ public:
 
 struct DetailLevel
 {
-    qint64 msecsPerDpix;
-    qint64 mergeDistance;
-    qint64 mergeSpacing;
+    milliseconds msecsPerDpix;
+    milliseconds mergeDistance;
+    milliseconds mergeSpacing;
     QList<BookmarkItemPtr> items;
 
     DetailLevel(
-            qint64 msecsInDpix,
-            qint64 mergeDistanceDpix = kDefaultMergeDistanseDpix,
-            qint64 mergeSpacingDpix = kDefaultMergeSpacingDpix)
-        : msecsPerDpix(msecsInDpix)
-        , mergeDistance(mergeDistanceDpix * msecsInDpix)
-        , mergeSpacing(mergeSpacingDpix * msecsPerDpix)
+        milliseconds  msecsInDpix,
+        qint64 mergeDistanceDpix = kDefaultMergeDistanseDpix,
+        qint64 mergeSpacingDpix = kDefaultMergeSpacingDpix)
+        :
+        msecsPerDpix(msecsInDpix),
+        mergeDistance(mergeDistanceDpix * msecsInDpix),
+        mergeSpacing(mergeSpacingDpix * msecsPerDpix)
     {
     }
 
@@ -90,18 +94,12 @@ bool bookmarkItemLess(const BookmarkItemPtr &left, const BookmarkItemPtr &right)
 class QnBookmarkMergeHelperPrivate
 {
 public:
-    int bookmarkMergeDistanceDpix;
-    int bookmarkMergeSpacingDpix;
+    int bookmarkMergeDistanceDpix = 100;
+    int bookmarkMergeSpacingDpix = 20;
     QList<DetailLevel> detailLevels;
 
-    QnBookmarkMergeHelperPrivate()
-        : bookmarkMergeDistanceDpix(100)
-        , bookmarkMergeSpacingDpix(20)
-    {
-    }
-
 public:
-    int detailLevel(qint64 msecsPerDPix) const;
+    int detailLevel(milliseconds msecsPerDPix) const;
     void clear();
     void mergeBookmarkItems(int detailLevel);
     void adjustItemBoundsAfterRemoval(BookmarkItemPtr item, int level, const BookmarkItemPtr &removedItem);
@@ -109,38 +107,38 @@ public:
     BookmarkItemList childrenForItem(const BookmarkItemPtr &item, int itemLevel) const;
 };
 
-QnBookmarkMergeHelper::QnBookmarkMergeHelper() :
+QnBookmarkMergeHelper::QnBookmarkMergeHelper():
     d_ptr(new QnBookmarkMergeHelperPrivate)
 {
     Q_D(QnBookmarkMergeHelper);
-    d->detailLevels << DetailLevel(0)   // Zero level - not merged
-                    << DetailLevel(250)     // 250 ms
-                    << DetailLevel(500)     // 500 ms
-                    << DetailLevel(1000)        // 1 sec
-                    << DetailLevel(2500)        // 2.5 sec
-                    << DetailLevel(5 * 1000ll)    // 5 sec
-                    << DetailLevel(15 * 1000ll)   // 15 sec
-                    << DetailLevel(30 * 1000ll)   // 30 sec
-                    << DetailLevel(60 * 1000ll)       // 1 min
-                    << DetailLevel(5 * 60 * 1000ll)   // 5 min
-                    << DetailLevel(15 * 60 * 1000ll)  // 15 min
-                    << DetailLevel(30 * 60 * 1000ll)  // 30 min
-                    << DetailLevel(60 * 60 * 1000ll)          // 1 hr
-                    << DetailLevel(3 * 60 * 60 * 1000ll)      // 3 hr
-                    << DetailLevel(6 * 60 * 60 * 1000ll)      // 6 hr
-                    << DetailLevel(12 * 60 * 60 * 1000ll)     // 12 hr
-                    << DetailLevel(24 * 60 * 60 * 1000ll)         // 1 day
-                    << DetailLevel(5 * 24 * 60 * 60 * 1000ll)     // 5 days
-                    << DetailLevel(15 * 24 * 60 * 60 * 1000ll)    // 15 days
-                    << DetailLevel(30 * 24 * 60 * 60 * 1000ll)        // 1 month
-                    << DetailLevel(3 * 30 * 24 * 60 * 60 * 1000ll);   // 3 months
+    d->detailLevels << DetailLevel(1ms)   // Zero level - not merged
+                    << DetailLevel(250ms)
+                    << DetailLevel(500ms)
+                    << DetailLevel(1s)
+                    << DetailLevel(2500ms)
+                    << DetailLevel(5s)
+                    << DetailLevel(15s)
+                    << DetailLevel(30s)
+                    << DetailLevel(1min)
+                    << DetailLevel(5min)
+                    << DetailLevel(15min)
+                    << DetailLevel(30min)
+                    << DetailLevel(1h)
+                    << DetailLevel(3h)
+                    << DetailLevel(6h)
+                    << DetailLevel(12h)
+                    << DetailLevel(24h) // Days are only in C++20
+                    << DetailLevel(5 * 24h) // 5 days
+                    << DetailLevel(15 * 24h)
+                    << DetailLevel(30 * 24h) // 1 month
+                    << DetailLevel(3 * 30 * 24h);   // 3 months
 }
 
 QnBookmarkMergeHelper::~QnBookmarkMergeHelper()
 {
 }
 
-QnTimelineBookmarkItemList QnBookmarkMergeHelper::bookmarks(qint64 msecsPerDp) const
+QnTimelineBookmarkItemList QnBookmarkMergeHelper::bookmarks(milliseconds msecsPerDp) const
 {
     Q_D(const QnBookmarkMergeHelper);
 
@@ -151,18 +149,15 @@ QnTimelineBookmarkItemList QnBookmarkMergeHelper::bookmarks(qint64 msecsPerDp) c
     return result;
 }
 
-int QnBookmarkMergeHelper::indexAtPosition(
-    const QnTimelineBookmarkItemList& bookmarks,
-    milliseconds time,
-    int msecsPerDp,
-    BookmarkSearchOptions options)
+int QnBookmarkMergeHelper::indexAtPosition(const QnTimelineBookmarkItemList& bookmarks,
+    milliseconds time, milliseconds msecsPerDp, BookmarkSearchOptions options)
 {
     // Calculate distance to the center of a bookmark to reach total active area of 20 px.
     auto bookmarkDistance =
         [&bookmarks, time](int index)
         {
             const QnTimelineBookmarkItem& bookmarkItem = bookmarks[index];
-            return std::abs((bookmarkItem.startTimeMs() + bookmarkItem.endTimeMs())
+            return std::abs((bookmarkItem.startTimeMs() + bookmarkItem.endTimeMs()).count()
                 / 2 - time.count());
         };
 
@@ -170,12 +165,12 @@ int QnBookmarkMergeHelper::indexAtPosition(
     int nearestItemIndex = -1;
 
     // We are not interested in bookmarks that are too far away.
-    int nearestBookmarkDistance = kExpandAreaDpix * msecsPerDp / 2;
+    int nearestBookmarkDistance = kExpandAreaDpix * msecsPerDp.count() / 2;
 
     for (int i = 0; i < bookmarks.size(); ++i)
     {
         const QnTimelineBookmarkItem& bookmarkItem = bookmarks[i];
-        if (time.count() >= bookmarkItem.startTimeMs() && time.count() <= bookmarkItem.endTimeMs())
+        if (time >= bookmarkItem.startTimeMs() && time <= bookmarkItem.endTimeMs())
         {
             foundItemIndex = i;
 
@@ -195,9 +190,7 @@ int QnBookmarkMergeHelper::indexAtPosition(
         }
     }
 
-    return foundItemIndex < 0
-        ? nearestItemIndex
-        : foundItemIndex;
+    return foundItemIndex < 0 ? nearestItemIndex : foundItemIndex;
 }
 
 QnCameraBookmarkList QnBookmarkMergeHelper::bookmarksAtPosition(milliseconds time,
@@ -207,7 +200,7 @@ QnCameraBookmarkList QnBookmarkMergeHelper::bookmarksAtPosition(milliseconds tim
 
     Q_D(const QnBookmarkMergeHelper);
 
-    const DetailLevel &level = d->detailLevels[d->detailLevel(msecsPerDp.count())];
+    const DetailLevel &level = d->detailLevels[d->detailLevel(msecsPerDp)];
 
     QnCameraBookmarkList result;
 
@@ -215,7 +208,7 @@ QnCameraBookmarkList QnBookmarkMergeHelper::bookmarksAtPosition(milliseconds tim
     {
         for (const auto& item: level.items | boost::adaptors::reversed)
         {
-            if (time.count() >= item->startTimeMs && time.count() <= item->endTimeMs)
+            if (time >= item->startTimeMs && time <= item->endTimeMs)
             {
                 for (const auto& bookmarkItem: d->bookmarksForItem(item))
                 {
@@ -234,7 +227,7 @@ QnCameraBookmarkList QnBookmarkMergeHelper::bookmarksAtPosition(milliseconds tim
     {
         for (const auto& item: level.items)
         {
-            if (item->startTimeMs > time.count() || item->endTimeMs <= time.count())
+            if (item->startTimeMs > time || item->endTimeMs <= time)
                 continue;
 
             BookmarkItemList bookmarkItems = d->bookmarksForItem(item);
@@ -249,9 +242,9 @@ QnCameraBookmarkList QnBookmarkMergeHelper::bookmarksAtPosition(milliseconds tim
 
     if (result.empty() && options.testFlag(ExpandArea))
     {
-        const auto items = bookmarks(msecsPerDp.count());
+        const auto items = bookmarks(msecsPerDp);
         NX_EXPECT(items.size() == level.items.size());
-        int nearestItemIndex = indexAtPosition(items, time, msecsPerDp.count(), options);
+        int nearestItemIndex = indexAtPosition(items, time, msecsPerDp, options);
         if (nearestItemIndex >= 0)
         {
             auto item = level.items[nearestItemIndex];
@@ -294,40 +287,48 @@ void QnBookmarkMergeHelper::addBookmark(const QnCameraBookmark &bookmark)
 
     BookmarkItemPtr item(new BookmarkItem(bookmark));
 
-    DetailLevel &zeroLevel = d->detailLevels.first();
-    auto it = std::lower_bound(zeroLevel.items.begin(), zeroLevel.items.end(), item, &bookmarkItemLess);
-    zeroLevel.items.insert(it, item);
+    DetailLevel& zeroLevel = d->detailLevels.first();
+    auto itr = std::lower_bound(zeroLevel.items.begin(), zeroLevel.items.end(), item, &bookmarkItemLess);
+    zeroLevel.items.insert(itr, item);
 
-    for (int i = 1; i < d->detailLevels.size(); ++i) {
+    for (int i = 1; i < d->detailLevels.size(); ++i)
+    {
         DetailLevel &currentLevel = d->detailLevels[i];
 
         const auto it = std::lower_bound(currentLevel.items.begin(), currentLevel.items.end(), item, &bookmarkItemLess);
 
-        if (it != currentLevel.items.begin() && currentLevel.shouldBeMerged(*(it - 1), item)) {
+        if (it != currentLevel.items.begin() && currentLevel.shouldBeMerged(*(it - 1), item))
+        {
             BookmarkItemPtr existingItem = *(it - 1);
             item->parent = existingItem;
             existingItem->bookmark.reset();
 
-            while (existingItem) {
+            while (existingItem)
+            {
                 if (item->endTimeMs <= existingItem->endTimeMs)
                     break;
 
                 existingItem->endTimeMs = item->endTimeMs;
                 existingItem = existingItem->parent;
             }
-        } else if (it != currentLevel.items.end() && currentLevel.shouldBeMerged(item, *it)) {
+        }
+        else if (it != currentLevel.items.end() && currentLevel.shouldBeMerged(item, *it))
+        {
             BookmarkItemPtr existingItem = *it;
             item->parent = existingItem;
             existingItem->bookmark.reset();
 
-            while (existingItem) {
+            while (existingItem)
+            {
                 if (item->startTimeMs >= existingItem->startTimeMs)
                     break;
 
                 existingItem->startTimeMs = item->startTimeMs;
                 existingItem = existingItem->parent;
             }
-        } else {
+        }
+        else
+        {
             BookmarkItemPtr newItem(new BookmarkItem(*item.data()));
             currentLevel.items.insert(it, newItem);
             item->parent = newItem;
@@ -348,7 +349,8 @@ void QnBookmarkMergeHelper::removeBookmark(const QnCameraBookmark &bookmark)
 
     DetailLevel &zeroLevel = d->detailLevels.first();
 
-    auto it = std::lower_bound(zeroLevel.items.begin(), zeroLevel.items.end(), BookmarkItemPtr(new BookmarkItem(bookmark)), &bookmarkItemLess);
+    auto it = std::lower_bound(zeroLevel.items.begin(), zeroLevel.items.end(),
+        BookmarkItemPtr(new BookmarkItem(bookmark)), &bookmarkItemLess);
     if (it == zeroLevel.items.end() || (*it)->bookmark.get().guid != bookmark.guid)
         return;
 
@@ -357,20 +359,27 @@ void QnBookmarkMergeHelper::removeBookmark(const QnCameraBookmark &bookmark)
 
     BookmarkItemPtr parent = item->parent;
     int level = 1;
-    while (parent) {
+    while (parent)
+    {
         DetailLevel &currentLevel = d->detailLevels[level];
 
-        if (parent->bookmark) {
+        if (parent->bookmark)
+        {
             auto parentIt = std::lower_bound(currentLevel.items.begin(), currentLevel.items.end(), parent, &bookmarkItemLess);
-            if (parentIt == zeroLevel.items.end() || (*parentIt)->bookmark.get().guid != bookmark.guid) {
+            if (parentIt == zeroLevel.items.end() || (*parentIt)->bookmark.get().guid != bookmark.guid)
+            {
                 NX_ASSERT(false, Q_FUNC_INFO, "Bookmark item parent is not found in a higher level.");
                 return;
             }
             currentLevel.items.erase(parentIt);
-        } else {
-            if (item->startTimeMs == parent->startTimeMs || item->endTimeMs == parent->endTimeMs) {
+        }
+        else
+        {
+            if (item->startTimeMs == parent->startTimeMs || item->endTimeMs == parent->endTimeMs)
+            {
                 const auto children = d->childrenForItem(parent, level);
-                if (children.isEmpty()) {
+                if (children.isEmpty())
+                {
                     NX_ASSERT(false, Q_FUNC_INFO, "Bookmark children list should not be empty at the moment.");
                     return;
                 }
@@ -381,9 +390,9 @@ void QnBookmarkMergeHelper::removeBookmark(const QnCameraBookmark &bookmark)
 
                 if (children.size() == 1)
                     parent->bookmark = children.first()->bookmark;
-            } else {
-                break;
             }
+            else
+                break;
         }
 
         parent = parent->parent;
@@ -391,12 +400,12 @@ void QnBookmarkMergeHelper::removeBookmark(const QnCameraBookmark &bookmark)
 }
 
 
-int QnBookmarkMergeHelperPrivate::detailLevel(qint64 msecsPerDPix) const
+int QnBookmarkMergeHelperPrivate::detailLevel(milliseconds msecsPerDPix) const
 {
-    for (int i = 1; i < detailLevels.size(); ++i) {
+    for (int i = 1; i < detailLevels.size(); ++i)
         if (detailLevels[i].msecsPerDpix > msecsPerDPix)
             return i - 1;
-    }
+
     return detailLevels.size() - 1;
 }
 
@@ -421,22 +430,31 @@ void QnBookmarkMergeHelperPrivate::mergeBookmarkItems(int detailLevel)
 
     BookmarkItemPtr currentItem;
 
-    for (BookmarkItemPtr &item: prevLevel.items) {
-        if (currentItem) {
-            if (currentLevel.shouldBeMerged(currentItem, item)) {
+    for (BookmarkItemPtr &item: prevLevel.items)
+    {
+        if (currentItem)
+        {
+            if (currentLevel.shouldBeMerged(currentItem, item))
+            {
                 currentItem->endTimeMs = qMax(currentItem->endTimeMs, item->endTimeMs);
                 currentItem->bookmark.reset();
                 item->parent = currentItem;
-            } else {
+            }
+            else
+            {
                 currentLevel.items.append(currentItem);
                 currentItem.clear();
             }
         }
 
-        if (!currentItem) {
-            if (item->bookmark) {
+        if (!currentItem)
+        {
+            if (item->bookmark)
+            {
                 currentItem = BookmarkItemPtr(new BookmarkItem(item->bookmark.get()));
-            } else {
+            }
+            else
+            {
                 currentItem = BookmarkItemPtr(new BookmarkItem());
                 currentItem->startTimeMs = item->startTimeMs;
                 currentItem->endTimeMs = item->endTimeMs;
@@ -475,15 +493,17 @@ void QnBookmarkMergeHelperPrivate::adjustItemBoundsAfterRemoval(BookmarkItemPtr 
     if (adjustStart)
         item->startTimeMs = (*it)->startTimeMs;
 
-    if (adjustEnd) {
+    if (adjustEnd)
+    {
         auto nextItemIt = itemIt + 1;
 
-        qint64 searchEndTimeMs = (nextItemIt == currentLevel.items.end())
-                                 ? DATETIME_NOW
+        milliseconds searchEndTimeMs = (nextItemIt == currentLevel.items.end())
+                                 ? milliseconds(DATETIME_NOW)
                                  : (*nextItemIt)->startTimeMs;
 
         item->endTimeMs = item->startTimeMs;
-        while ((*it)->startTimeMs < searchEndTimeMs) {
+        while ((*it)->startTimeMs < searchEndTimeMs)
+        {
             item->endTimeMs = qMax(item->endTimeMs, (*it)->endTimeMs);
             ++it;
         }
@@ -492,7 +512,8 @@ void QnBookmarkMergeHelperPrivate::adjustItemBoundsAfterRemoval(BookmarkItemPtr 
 
 BookmarkItemList QnBookmarkMergeHelperPrivate::bookmarksForItem(const BookmarkItemPtr &item) const
 {
-    if (item->bookmark) {
+    if (item->bookmark)
+    {
         // We can return item from the highest levels if it is a standalone bookmark
         return BookmarkItemList() << item;
     }
@@ -500,14 +521,15 @@ BookmarkItemList QnBookmarkMergeHelperPrivate::bookmarksForItem(const BookmarkIt
     const DetailLevel &zeroLevel = detailLevels.first();
 
     auto it = std::lower_bound(zeroLevel.items.begin(), zeroLevel.items.end(), item->startTimeMs,
-                               [](const BookmarkItemPtr &item, qint64 startTimeMs)
-    {
-        return item->startTimeMs < startTimeMs;
-    });
+        [](const BookmarkItemPtr &item, milliseconds startTimeMs)
+        {
+            return item->startTimeMs < startTimeMs;
+        });
 
     BookmarkItemList result;
 
-    while (it != zeroLevel.items.end() && (*it)->startTimeMs < item->endTimeMs) {
+    while (it != zeroLevel.items.end() && (*it)->startTimeMs < item->endTimeMs)
+    {
         if ((*it)->isParentedBy(item))
             result.append(*it);
         ++it;
@@ -524,14 +546,15 @@ BookmarkItemList QnBookmarkMergeHelperPrivate::childrenForItem(const BookmarkIte
     const DetailLevel &prevLevel = detailLevels[itemLevel - 1];
 
     auto it = std::lower_bound(prevLevel.items.begin(), prevLevel.items.end(), item->startTimeMs,
-                               [](const BookmarkItemPtr &item, qint64 startTimeMs)
-    {
-        return item->startTimeMs < startTimeMs;
-    });
+        [](const BookmarkItemPtr &item, milliseconds startTimeMs)
+        {
+            return item->startTimeMs < startTimeMs;
+        });
 
     BookmarkItemList result;
 
-    while (it != prevLevel.items.end() && (*it)->startTimeMs < item->endTimeMs) {
+    while (it != prevLevel.items.end() && (*it)->startTimeMs < item->endTimeMs)
+    {
         if ((*it)->parent == item)
             result.append(*it);
         ++it;
@@ -563,6 +586,6 @@ bool DetailLevel::shouldBeMerged(const BookmarkItemPtr &left, const BookmarkItem
     if (left->startTimeMs > right->startTimeMs)
         return shouldBeMerged(right, left);
 
-    return right->startTimeMs - left->startTimeMs < mergeDistance &&
-           right->startTimeMs - left->endTimeMs < mergeSpacing;
+    return right->startTimeMs - left->startTimeMs < mergeDistance
+        && right->startTimeMs - left->endTimeMs < mergeSpacing;
 }

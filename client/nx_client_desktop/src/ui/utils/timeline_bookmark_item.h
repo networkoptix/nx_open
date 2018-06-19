@@ -1,16 +1,20 @@
 #pragma once
 
+#include <chrono>
+
 #ifndef Q_MOC_RUN
 #include <boost/optional/optional.hpp>
 #endif
 
 #include <core/resource/camera_bookmark.h>
 
-struct QnBookmarkCluster {
-    qint64 startTimeMs;
-    qint64 durationMs;
+struct QnBookmarkCluster
+{
+    using milliseconds = std::chrono::milliseconds;
+    milliseconds startTimeMs;
+    milliseconds durationMs;
 
-    qint64 endTimeMs() const;
+    milliseconds endTimeMs() const;
 
     QnBookmarkCluster();
 };
@@ -18,6 +22,8 @@ struct QnBookmarkCluster {
 class QnTimelineBookmarkItem
 {
 public:
+    using milliseconds = std::chrono::milliseconds;
+
     QnTimelineBookmarkItem(const QnCameraBookmark &bookmark);
     QnTimelineBookmarkItem(const QnBookmarkCluster &cluster);
 
@@ -26,8 +32,8 @@ public:
     QnCameraBookmark bookmark() const;
     QnBookmarkCluster cluster() const;
 
-    qint64 startTimeMs() const;
-    qint64 endTimeMs() const;
+    milliseconds startTimeMs() const;
+    milliseconds endTimeMs() const;
 
 private:
     boost::optional<QnCameraBookmark> m_bookmark;
