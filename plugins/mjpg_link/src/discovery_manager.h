@@ -67,7 +67,7 @@ public:
 private:
     QList<QUrl> translateUrlHook(const QUrl& url) const;
     QString getGroupName(const QUrl& url) const;
-    static bool DiscoveryManager::validateUrl(const QUrl& url);
+    static bool validateUrl(const QUrl& url);
 private:
     nxpt::CommonRefManager m_refManager;
     nxpl::TimeProvider *const m_timeProvider;
