@@ -3,10 +3,13 @@
 #include <gtest/gtest.h>
 
 #include <nx/network/cloud/tunnel/relay/relay_connection_acceptor.h>
+#include <nx/network/cloud/tunnel/relay/api/relay_api_client_factory.h>
+#include <nx/network/cloud/tunnel/relay/api/relay_api_client_over_http_upgrade.h>
 #include <nx/network/cloud/tunnel/relay/api/relay_api_http_paths.h>
 #include <nx/network/cloud/tunnel/relay/api/relay_api_open_tunnel_notification.h>
 #include <nx/network/http/test_http_server.h>
 #include <nx/utils/random.h>
+#include <nx/utils/std/optional.h>
 #include <nx/utils/thread/sync_queue.h>
 
 namespace nx {
@@ -23,7 +26,22 @@ class RelayTest:
 public:
     RelayTest()
     {
+        using namespace std::placeholders;
+
+        m_factoryFunctionBak =
+            nx::cloud::relay::api::ClientFactory::instance().setCustomFunc(
+                std::bind(&RelayTest::createClient, this, _1));
+
         setKeepAliveReported(true);
+    }
+
+    ~RelayTest()
+    {
+        if (m_factoryFunctionBak)
+        {
+            nx::cloud::relay::api::ClientFactory::instance().setCustomFunc(
+                *std::exchange(m_factoryFunctionBak, std::nullopt));
+        }
     }
 
 protected:
@@ -83,6 +101,7 @@ private:
     nx::network::http::TestHttpServer m_testHttpServer;
     nx::utils::Url m_relayServerUrl;
     api::BeginListeningResponse m_beginListeningResponse;
+    std::optional<nx::cloud::relay::api::ClientFactory::Function> m_factoryFunctionBak;
 
     void processIncomingConnection(
         nx::network::http::HttpServerConnection* const connection,
@@ -115,6 +134,13 @@ private:
         NX_ASSERT(socket->isInSelfAioThread());
         socket->cancelIOSync(aio::etNone);
         m_listeningPeerConnectionsToRelay.push(std::move(socket));
+    }
+
+    std::unique_ptr<nx::cloud::relay::api::Client> createClient(
+        const nx::utils::Url& relayUrl)
+    {
+        return std::make_unique<nx::cloud::relay::api::ClientOverHttpUpgrade>(
+            relayUrl, nullptr);
     }
 };
 
@@ -241,7 +267,9 @@ protected:
 
     void thenRelaySettingsAreAvailable()
     {
-        ASSERT_EQ(lastReportedBeginListeningResponse(), m_connection->beginListeningResponse());
+        ASSERT_EQ(
+            lastReportedBeginListeningResponse(),
+            m_connection->beginListeningResponse());
     }
 
     void thenNotificationIsIgnored()

@@ -11,14 +11,16 @@ namespace nx::cloud::relay::api {
 
 ClientOverHttpUpgrade::ClientOverHttpUpgrade(
     const nx::utils::Url& baseUrl,
-    ClientFeedbackFunction /*feedbackFunction*/)
+    ClientFeedbackFunction feedbackFunction)
     :
     m_baseUrl(baseUrl),
+    m_feedbackFunction(std::move(feedbackFunction)),
     m_prevSysErrorCode(SystemError::noError)
 {
 }
 
-void ClientOverHttpUpgrade::bindToAioThread(network::aio::AbstractAioThread* aioThread)
+void ClientOverHttpUpgrade::bindToAioThread(
+    network::aio::AbstractAioThread* aioThread)
 {
     base_type::bindToAioThread(aioThread);
     for (const auto& request: m_activeRequests)
@@ -41,7 +43,17 @@ void ClientOverHttpUpgrade::beginListening(
             std::move(request),
             kServerIncomingConnectionsPath,
             {peerName},
-            std::move(completionHandler));
+            [this, completionHandler = std::move(completionHandler)](
+                ResultCode resultCode,
+                BeginListeningResponse response,
+                std::unique_ptr<network::AbstractStreamSocket> connection)
+            {
+                giveFeedback(resultCode);
+                completionHandler(
+                    resultCode,
+                    std::move(response),
+                    std::move(connection));
+            });
 }
 
 void ClientOverHttpUpgrade::startSession(
@@ -98,7 +110,13 @@ void ClientOverHttpUpgrade::openConnectionToTheTargetHost(
             std::move(request),
             kClientSessionConnectionsPath,
             {sessionId},
-            std::move(completionHandler));
+            [this, completionHandler = std::move(completionHandler)](
+                ResultCode resultCode,
+                std::unique_ptr<network::AbstractStreamSocket> connection)
+            {
+                giveFeedback(resultCode);
+                completionHandler(resultCode, std::move(connection));
+            });
 }
 
 nx::utils::Url ClientOverHttpUpgrade::url() const
@@ -292,6 +310,12 @@ ResultCode ClientOverHttpUpgrade::toResultCode(
     return fromHttpStatusCode(
         static_cast<nx::network::http::StatusCode::Value>(
             httpResponse->statusLine.statusCode));
+}
+
+void ClientOverHttpUpgrade::giveFeedback(ResultCode resultCode)
+{
+    if (m_feedbackFunction)
+        m_feedbackFunction(resultCode);
 }
 
 } // namespace nx::cloud::relay::api

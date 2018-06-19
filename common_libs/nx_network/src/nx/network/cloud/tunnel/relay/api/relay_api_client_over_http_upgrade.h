@@ -45,8 +45,11 @@ protected:
         SystemError::ErrorCode sysErrorCode,
         const nx::network::http::Response* httpResponse);
 
+    void giveFeedback(ResultCode resultCode);
+
 private:
     const nx::utils::Url m_baseUrl;
+    ClientFeedbackFunction m_feedbackFunction;
     SystemError::ErrorCode m_prevSysErrorCode;
     nx::network::http::AuthInfo m_authInfo;
 

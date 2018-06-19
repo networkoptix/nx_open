@@ -27,12 +27,12 @@ public:
     ClientFactory();
 
     template<typename ClientType>
-    void registerClientType(int priority = 0)
+    void registerClientType()
     {
         QnMutexLocker lock(&m_mutex);
 
         m_clientTypes.push_front(ClientTypeContext{
-            priority,
+            ++m_prevUsedTypeId,
             [](const nx::utils::Url& baseUrl, ClientFeedbackFunction feedbackFunction)
             {
                 return std::make_unique<ClientType>(
@@ -49,19 +49,18 @@ private:
 
     struct ClientTypeContext
     {
-        int priority = 0;
+        int id = 0;
         InternalFactoryFunction factoryFunction;
     };
 
     std::deque<ClientTypeContext> m_clientTypes;
     QnMutex m_mutex;
+    int m_prevUsedTypeId = 0;
 
     std::unique_ptr<Client> defaultFactoryFunction(
         const nx::utils::Url& baseUrl);
 
-    void processClientFeedback(
-        std::deque<ClientTypeContext>::iterator clientTypeIter,
-        ResultCode resultCode);
+    void processClientFeedback(int typeId, ResultCode resultCode);
 };
 
 } // namespace nx::cloud::relay::api

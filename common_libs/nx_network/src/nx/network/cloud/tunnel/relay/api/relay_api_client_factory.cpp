@@ -16,8 +16,8 @@ ClientFactory::ClientFactory():
     base_type(std::bind(&ClientFactory::defaultFactoryFunction, this,
         std::placeholders::_1))
 {
-    registerClientType<ClientImplUsingHttpConnect>(0);
-    registerClientType<ClientOverHttpUpgrade>(1);
+    registerClientType<ClientImplUsingHttpConnect>();
+    registerClientType<ClientOverHttpUpgrade>();
 }
 
 ClientFactory& ClientFactory::instance()
@@ -37,20 +37,25 @@ std::unique_ptr<Client> ClientFactory::defaultFactoryFunction(
 
     return clientTypeIter->factoryFunction(
         baseUrl,
-        [this, clientTypeIter](ResultCode resultCode)
+        [this, typeId = clientTypeIter->id](ResultCode resultCode)
         {
-            processClientFeedback(clientTypeIter, resultCode);
+            processClientFeedback(typeId, resultCode);
         });
 }
 
-void ClientFactory::processClientFeedback(
-    std::deque<ClientTypeContext>::iterator clientTypeIter,
-    ResultCode resultCode)
+void ClientFactory::processClientFeedback(int typeId, ResultCode resultCode)
 {
     QnMutexLocker lock(&m_mutex);
 
-    if (resultCode != ResultCode::ok)
-        std::rotate(m_clientTypes.begin(), std::next(clientTypeIter), m_clientTypes.end());
+    const bool typeStillSelected =
+        typeId == m_clientTypes.begin()->id;
+    if (typeStillSelected && resultCode != ResultCode::ok)
+    {
+        std::rotate(
+            m_clientTypes.begin(),
+            std::next(m_clientTypes.begin()),
+            m_clientTypes.end());
+    }
 }
 
 } // namespace nx::cloud::relay::api

@@ -16,6 +16,19 @@ void ClientImplUsingHttpConnect::beginListening(
     const nx::String& peerName,
     BeginListeningHandler completionHandler)
 {
+    completionHandler =
+        [this, completionHandler = std::move(completionHandler)](
+            ResultCode resultCode,
+            BeginListeningResponse response,
+            std::unique_ptr<network::AbstractStreamSocket> connection)
+        {
+            giveFeedback(resultCode);
+            completionHandler(
+                resultCode,
+                std::move(response),
+                std::move(connection));
+        };
+
     post(
         [this, peerName, completionHandler = std::move(completionHandler)]() mutable
         {
