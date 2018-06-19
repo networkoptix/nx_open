@@ -1,7 +1,7 @@
 *** Settings ***
 Resource          ../resource.robot
 Resource          ../variables.robot
-Suite Setup       Open Log In Dialog
+Suite Setup       Open Browser and go to URL    ${url}
 Suite Teardown    Close Browser
 Test Teardown     Run Keyword If Test Failed    Restart
 Test Template     Test Login Invalid
@@ -36,12 +36,13 @@ Restart
 
 Open Log In Dialog
     Open Browser and go to URL    ${url}
-    Wait Until Elements Are Visible    ${LOG IN NAV BAR}
-    Click Link    ${LOG IN NAV BAR}
-    Wait Until Elements Are Visible    ${EMAIL INPUT}    ${PASSWORD INPUT}    ${LOG IN BUTTON}
 
 Test Login Invalid
     [Arguments]    ${email}    ${pass}
+    Reload Page
+    Wait Until Elements Are Visible    ${LOG IN NAV BAR}
+    Click Link    ${LOG IN NAV BAR}
+    Wait Until Elements Are Visible    ${EMAIL INPUT}    ${PASSWORD INPUT}    ${LOG IN BUTTON}
     Log In Form Validation    ${email}    ${pass}
     Outline Error    ${email}    ${pass}
 
