@@ -122,10 +122,6 @@ nx_add_vendor_macros(mediaserver_core)
 
 if(LINUX)
     target_link_libraries(mediaserver_core PRIVATE ldap lber)
-
-    if(arch STREQUAL "aarch64" OR box STREQUAL "edge1")
-        target_link_libraries(mediaserver_core PRIVATE sasl2)
-    endif()
 endif()
 
 if(WINDOWS)
