@@ -75,7 +75,10 @@ public:
     template<typename T>
     void sendTransaction(const QnTransaction<T>& tran, const QnUuid& dstPeerId)
     {
-        dstPeerId.isNull() ? sendTransaction(tran) : sendTransaction(tran, {dstPeerId});
+        if (dstPeerId.isNull())
+            sendTransaction(tran);
+        else
+            sendTransaction(tran, nx::vms::api::PeerSet({dstPeerId}));
     }
 
     typedef QMap<QnUuid, RoutingRecord> RoutingInfo;
