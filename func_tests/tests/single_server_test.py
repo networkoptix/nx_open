@@ -10,7 +10,7 @@ import urllib3.exceptions
 from requests.auth import HTTPDigestAuth
 
 import server_api_data_generators as generator
-from framework.api_shortcuts import get_time
+from framework.api_shortcuts import get_time, get_server_id, is_primary_time_server
 from framework.installation.mediaserver import TimePeriod
 from framework.rest_api import HttpError, REST_API_TIMEOUT_SEC
 from framework.utils import log_list
@@ -29,7 +29,7 @@ def test_saved_media_should_appear_after_archive_is_rebuilt(one_running_mediaser
     server.add_camera(camera)
     server.storage.save_media_sample(camera, start_time, sample_media_file)
     server.rebuild_archive()
-    assert (one_running_mediaserver.get_recorded_time_periods(camera) ==
+    assert (server.get_recorded_time_periods(camera) ==
             [TimePeriod(start_time, sample_media_file.duration)])
 
 
@@ -199,7 +199,10 @@ def test_static_vulnerability(one_running_mediaserver):
 # https://networkoptix.atlassian.net/browse/VMS-7775
 def test_auth_with_time_changed(one_vm, mediaserver_installers, ca, artifact_factory):
     with timeless_mediaserver(one_vm, mediaserver_installers, ca, artifact_factory) as timeless_server:
-        url = timeless_server.api.url('ec2/getCurrentTime')
+        timeless_guid = get_server_id(timeless_server.api)
+        timeless_server.api.ec2.forcePrimaryTimeServer.POST(id=timeless_guid)
+        assert is_primary_time_server(timeless_server.api)
+        url = timeless_server.api.url('ec2/testConnection')
 
         timeless_server.os_access.set_time(datetime.now(pytz.utc))
         wait_for_true(
@@ -228,6 +231,9 @@ def test_auth_with_time_changed(one_vm, mediaserver_installers, ca, artifact_fac
 
 def test_uptime_is_monotonic(one_vm, mediaserver_installers, ca, artifact_factory):
     with timeless_mediaserver(one_vm, mediaserver_installers, ca, artifact_factory) as timeless_server:
+        timeless_guid = get_server_id(timeless_server.api)
+        timeless_server.api.ec2.forcePrimaryTimeServer.POST(id=timeless_guid)
+        assert is_primary_time_server(timeless_server.api)
         timeless_server.os_access.set_time(datetime.now(pytz.utc))
         first_uptime = timeless_server.api.api.statistics.GET()['uptimeMs']
         if not isinstance(first_uptime, (int, float)):
