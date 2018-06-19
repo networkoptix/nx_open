@@ -23,7 +23,7 @@ public:
 
     static bool extends(Ptz::Capabilities capabilities, bool disableNative = false);
 
-    virtual Ptz::Capabilities getCapabilities() const override;
+    virtual Ptz::Capabilities getCapabilities(const nx::core::ptz::Options& options) const override;
 
     virtual bool createPreset(const QnPtzPreset &preset) override;
     virtual bool updatePreset(const QnPtzPreset &preset) override;

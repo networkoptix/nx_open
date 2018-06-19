@@ -59,6 +59,9 @@ QN_DECLARE_METAOBJECT_HEADER(Qn,
         AbsoluteLogicalMovePtzCommand,
         ViewportMovePtzCommand,
 
+        RelativeMovePtzCommand,
+        RelativeFocusPtzCommand,
+
         GetDevicePositionPtzCommand,
         GetLogicalPositionPtzCommand,
         GetDeviceLimitsPtzCommand,

@@ -42,6 +42,7 @@
 #include <rest/server/json_rest_result.h>
 #include <nx/fusion/serialization_format.h>
 #include <api/helpers/camera_id_helper.h>
+#include <plugins/resource/server_archive/server_archive_delegate.h>
 
 //TODO #ak if camera has hi stream only, than playlist request with no quality specified returns No Content, hi returns OK, lo returns Not Found
 
@@ -758,6 +759,16 @@ nx::network::http::StatusCode::Value HttpLiveStreamingProcessor::getResourceChun
     if (params.duration)
         chunkDuration = params.duration->count();
 
+    StreamingChunkCacheKey currentChunkKey(
+        uniqueResourceID.toString(),
+        params.channel,
+        params.containerFormat,
+        params.alias ? *params.alias : QString(),
+        startTimestamp,
+        std::chrono::microseconds(chunkDuration),
+        params.streamQuality,
+        requestParams);
+
     bool requestIsAPartOfHlsSession = false;
     {
         std::multimap<QString, QString>::const_iterator sessionIDIter =
@@ -771,20 +782,21 @@ nx::network::http::StatusCode::Value HttpLiveStreamingProcessor::getResourceChun
                 requestIsAPartOfHlsSession = true;
                 hlsSession->updateAuditInfo(startTimestamp);
                 if (params.alias)
-                    hlsSession->getChunkByAlias(params.streamQuality, *params.alias, &startTimestamp, &chunkDuration);
+                {
+                    hlsSession->getChunkByAlias(
+                        params.streamQuality, *params.alias, &startTimestamp, &chunkDuration);
+                }
+
+                if (!hlsSession->audioCodecId())
+                    hlsSession->setAudioCodecId(detectAudioCodecId(currentChunkKey));
+                currentChunkKey.setAudioCodecId(*hlsSession->audioCodecId());
             }
         }
+        else
+        {
+            currentChunkKey.setAudioCodecId(detectAudioCodecId(currentChunkKey));
+        }
     }
-
-    StreamingChunkCacheKey currentChunkKey(
-        uniqueResourceID.toString(),
-        params.channel,
-        params.containerFormat,
-        params.alias ? *params.alias : QString(),
-        startTimestamp,
-        std::chrono::microseconds(chunkDuration),
-        params.streamQuality,
-        requestParams);
 
     auto requiredPermission = currentChunkKey.live()
         ? Qn::Permission::ViewLivePermission : Qn::Permission::ViewFootagePermission;
@@ -793,7 +805,6 @@ nx::network::http::StatusCode::Value HttpLiveStreamingProcessor::getResourceChun
     {
         return nx::network::http::StatusCode::forbidden;
     }
-
 
     //streaming chunk
     if (m_currentChunk)
@@ -1027,7 +1038,9 @@ int HttpLiveStreamingProcessor::estimateStreamBitrate(
     return bandwidth;
 }
 
-void HttpLiveStreamingProcessor::ensureChunkCacheFilledEnoughForPlayback( Session* const session, MediaQuality streamQuality )
+void HttpLiveStreamingProcessor::ensureChunkCacheFilledEnoughForPlayback(
+    Session* const session,
+    MediaQuality streamQuality)
 {
     static const size_t PLAYLIST_CHECK_TIMEOUT_MS = 1000;
 
@@ -1059,6 +1072,28 @@ void HttpLiveStreamingProcessor::ensureChunkCacheFilledEnoughForPlayback( Sessio
             QThread::msleep( PLAYLIST_CHECK_TIMEOUT_MS );
         }
     }
+    }
+
+AVCodecID HttpLiveStreamingProcessor::detectAudioCodecId(
+    const StreamingChunkCacheKey& chunkParams)
+{
+    const auto resource = commonModule()->resourcePool()->getResourceByUniqueId(
+        chunkParams.srcResourceUniqueID());
+    if (!resource)
+        return AV_CODEC_ID_NONE;
+
+    QnServerArchiveDelegate archive(qnServerModule);
+    if (!archive.open(resource, qnServerModule->archiveIntegrityWatcher()))
+        return AV_CODEC_ID_NONE;
+    if (chunkParams.startTimestamp() != DATETIME_NOW)
+        archive.seek(chunkParams.startTimestamp(), true);
+    if (archive.getAudioLayout() &&
+        archive.getAudioLayout()->getAudioTrackInfo(0).codecContext)
+    {
+        return archive.getAudioLayout()->getAudioTrackInfo(0).codecContext->getCodecId();
+    }
+
+    return AV_CODEC_ID_NONE;
 }
 
 RequestParams HttpLiveStreamingProcessor::readRequestParams(

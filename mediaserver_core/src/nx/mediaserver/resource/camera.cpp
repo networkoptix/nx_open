@@ -60,7 +60,7 @@ QnAbstractPtzController* Camera::createPtzController() const
         return result;
 
     /* Do some sanity checking. */
-    Ptz::Capabilities capabilities = result->getCapabilities();
+    Ptz::Capabilities capabilities = result->getCapabilities(nx::core::ptz::Options());
     if((capabilities & Ptz::LogicalPositioningPtzCapability)
         && !(capabilities & Ptz::AbsolutePtzCapabilities))
     {

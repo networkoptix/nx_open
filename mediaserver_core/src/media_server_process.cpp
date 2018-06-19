@@ -3542,6 +3542,10 @@ void MediaServerProcess::run()
         QnSleep::msleep(3000);
     }
     QnAppServerConnectionFactory::setEc2Connection(ec2Connection);
+    auto clearEc2ConnectionGuardFunc = [](MediaServerProcess*) {
+        QnAppServerConnectionFactory::setEc2Connection(ec2::AbstractECConnectionPtr()); };
+    std::unique_ptr<MediaServerProcess, decltype(clearEc2ConnectionGuardFunc)>
+        clearEc2ConnectionGuard(this, clearEc2ConnectionGuardFunc);
 
     while (!needToStop())
     {
@@ -3593,10 +3597,6 @@ void MediaServerProcess::run()
     }
 
     serverModule->mutableSettings()->lowPriorityPassword.set(false);
-    auto clearEc2ConnectionGuardFunc = [](MediaServerProcess*){
-        QnAppServerConnectionFactory::setEc2Connection(ec2::AbstractECConnectionPtr()); };
-    std::unique_ptr<MediaServerProcess, decltype(clearEc2ConnectionGuardFunc)>
-        clearEc2ConnectionGuard(this, clearEc2ConnectionGuardFunc);
 
     if (m_cmdLineArguments.cleanupDb)
     {

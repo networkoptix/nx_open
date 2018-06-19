@@ -20,6 +20,8 @@ class LegacyExpertSettingsWidget:
     public QnConnectionContextAware
 {
     Q_OBJECT
+    Q_PROPERTY(bool readOnly READ isReadOnly WRITE setReadOnly)
+
     using base_type = QWidget;
 
 public:
@@ -31,6 +33,9 @@ public:
 
     bool isSecondStreamEnabled() const;
     void setSecondStreamEnabled(bool value = true);
+
+    bool isReadOnly() const;
+    void setReadOnly(bool readOnly);
 
 signals:
     void dataChanged();
@@ -57,6 +62,7 @@ private:
     bool m_hasDualStreaming = false;
     bool m_hasRemoteArchiveCapability = false;
     QnUuid m_currentCameraId;
+    bool m_readOnly = false;
 };
 
 } // namespace desktop

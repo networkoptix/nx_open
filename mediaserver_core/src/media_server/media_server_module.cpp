@@ -158,7 +158,7 @@ QnMediaServerModule::QnMediaServerModule(
             QnServer::StoragePool::Normal
         ));
 
-    m_context->backupStorageManager.reset(
+   m_context->backupStorageManager.reset(
         new QnStorageManager(
             this,
             nullptr,
@@ -340,4 +340,14 @@ QnResourcePropertyDictionary* QnMediaServerModule::propertyDictionary() const
 QnCameraHistoryPool* QnMediaServerModule::cameraHistoryPool() const
 {
     return commonModule()->cameraHistoryPool();
+}
+
+QnStorageManager* QnMediaServerModule::normalStorageManager() const
+{
+    return m_context->normalStorageManager.get();
+}
+
+QnStorageManager* QnMediaServerModule::backupStorageManager() const
+{
+    return m_context->backupStorageManager.get();
 }

@@ -10,7 +10,8 @@
 
 class QnPtzMapperPrivate;
 
-class QnPtzMapper {
+class QnPtzMapper
+{
 public:
     /**
      * Note that in both mappers source is device coordinates and target is logical coordinates.
@@ -18,22 +19,28 @@ public:
      * \param inputMapper               Mapper to use when sending data to the camera.
      * \param outputMapper              Mapper to use when receiving data from the camera.
      */
-    QnPtzMapper(const QnSpaceMapperPtr<QVector3D> &inputMapper, const QnSpaceMapperPtr<QVector3D> &outputMapper);
+    QnPtzMapper(
+        const QnSpaceMapperPtr<nx::core::ptz::Vector> &inputMapper,
+        const QnSpaceMapperPtr<nx::core::ptz::Vector> &outputMapper);
 
-    QVector3D logicalToDevice(const QVector3D &position) const {
+    nx::core::ptz::Vector logicalToDevice(const nx::core::ptz::Vector &position) const
+    {
         return m_inputMapper->targetToSource(position);
     }
 
-    QVector3D deviceToLogical(const QVector3D &position) const {
+    nx::core::ptz::Vector deviceToLogical(const nx::core::ptz::Vector& position) const
+    {
         return m_outputMapper->sourceToTarget(position);
     }
 
-    const QnPtzLimits &logicalLimits() const {
+    const QnPtzLimits& logicalLimits() const
+    {
         return m_logicalLimits;
     }
 
 private:
-    QnSpaceMapperPtr<QVector3D> m_inputMapper, m_outputMapper;
+    QnSpaceMapperPtr<nx::core::ptz::Vector> m_inputMapper;
+    QnSpaceMapperPtr<nx::core::ptz::Vector> m_outputMapper;
     QnPtzLimits m_logicalLimits;
 };
 

@@ -12,6 +12,8 @@ namespace {
 
 static const QString kStyleName = lit("fusion");
 
+} // namespace
+
 QPalette createWebViewPalette(WebViewStyle style)
 {
     QPalette result = qApp->palette();
@@ -20,9 +22,14 @@ QPalette createWebViewPalette(WebViewStyle style)
     {
         case WebViewStyle::common:
         {
-            const QColor base = Qt::white;
-            result.setColor(QPalette::Base, base);
-            result.setColor(QPalette::Window, base);
+            const QColor light(Qt::white);
+            const QColor dark(Qt::black);
+            result.setColor(QPalette::Base, light);
+            result.setColor(QPalette::Window, light);
+            result.setColor(QPalette::Text, dark);
+            result.setColor(QPalette::HighlightedText, light);
+            result.setColor(QPalette::Button, light);
+            result.setColor(QPalette::ButtonText, dark);
             break;
         }
         default:
@@ -33,25 +40,17 @@ QPalette createWebViewPalette(WebViewStyle style)
     return result;
 }
 
-} // namespace
-
 void setupWebViewStyle(QWebView* webView, WebViewStyle style)
 {
     webView->setStyle(QStyleFactory::create(kStyleName));
     webView->setPalette(createWebViewPalette(style));
-    if (style == WebViewStyle::common)
-    {
-        webView->setAutoFillBackground(true);
-        webView->setBackgroundRole(QPalette::Base);
-        webView->setForegroundRole(QPalette::Base);
-    }
 }
 
 void setupWebViewStyle(QGraphicsWebView* webView, WebViewStyle style)
 {
     webView->setStyle(QStyleFactory::create(kStyleName));
     webView->setPalette(createWebViewPalette(style));
-    webView->setAutoFillBackground(true);
+    //webView->setAutoFillBackground(true);
 }
 
 } // namespace NxUi

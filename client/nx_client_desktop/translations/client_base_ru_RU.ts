@@ -1652,7 +1652,7 @@ to view more bookmarks</source>
     </message>
     <message numerus="yes">
       <source>%n action(s)</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%n действие</numerusform>
         <numerusform>%n действия</numerusform>
         <numerusform>%n действий</numerusform>
@@ -1920,7 +1920,7 @@ to view more bookmarks</source>
     <name>QnBusinessRuleViewModel</name>
     <message numerus="yes">
       <source>%n Server(s)</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%n Сервер</numerusform>
         <numerusform>%n Сервера</numerusform>
         <numerusform>%n Серверов</numerusform>
@@ -7592,7 +7592,7 @@ to %1</source>
     <name>QnWorkbenchContext</name>
     <message>
       <source>To use the software you must accept the end user license agreement</source>
-      <translation>Чтобы использовать ПО, вы должны принять лицензионное соглашение с конечным пользователем</translation>
+      <translation>Чтобы использовать ПО вы должны принять лицензионное соглашение с конечным пользователем</translation>
     </message>
     <message>
       <source>Accept</source>

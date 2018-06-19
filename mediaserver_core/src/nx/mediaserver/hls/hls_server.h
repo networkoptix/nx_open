@@ -146,6 +146,8 @@ private:
         MediaQuality streamQuality );
     void ensureChunkCacheFilledEnoughForPlayback( Session* const session, MediaQuality streamQuality );
 
+    AVCodecID detectAudioCodecId(const StreamingChunkCacheKey& chunkParams);
+
     static RequestParams readRequestParams(
         const std::multimap<QString, QString>& requestParams);
 };

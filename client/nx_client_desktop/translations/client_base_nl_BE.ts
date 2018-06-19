@@ -2381,7 +2381,7 @@ to view more bookmarks</source>
     <message numerus="yes">
       <source>This ID is already used on the following %n cameras: %1</source>
       <translation>
-        <numerusform>Deze ID wordt al gebruikt op de volgende camera: %1</numerusform>
+        <numerusform>Deze ID wordt al gebruikt op de volgende %n camera: %1</numerusform>
         <numerusform>Deze ID wordt al gebruikt op de volgende %n camera's: %1</numerusform>
       </translation>
     </message>

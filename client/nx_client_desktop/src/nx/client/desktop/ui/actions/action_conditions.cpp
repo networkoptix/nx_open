@@ -271,14 +271,17 @@ bool canExportPeriods(
             if (resource->hasFlags(Qn::still_image))
                 return false;
 
-            const auto loader = cameraManager->loader(media, false);
-            const auto hasPeriods = !resource->hasFlags(Qn::periods)
-                || (loader && loader->periods(Qn::RecordingContent).intersects(period));
-
-            if (!hasPeriods)
+            if (!accessController->hasPermissions(resource, Qn::ExportPermission))
                 return false;
 
-            return accessController->hasPermissions(resource, Qn::ExportPermission);
+            const auto isAviFile = resource->hasFlags(Qn::local_video)
+                && !resource->hasFlags(Qn::periods);
+            if (isAviFile)
+                return true;
+
+            // This condition can be checked in the bookmarks dialog when loader is not created.
+            const auto loader = cameraManager->loader(media, true);
+            return loader && loader->periods(Qn::RecordingContent).intersects(period);
         });
 }
 
@@ -1276,7 +1279,7 @@ ActionVisibility PtzCondition::check(const QnResourceWidgetList& widgets, QnWork
 
 bool PtzCondition::check(const QnPtzControllerPtr &controller)
 {
-    return controller && controller->hasCapabilities(m_capabilities);
+    return controller && controller->hasCapabilities(m_capabilities, nx::core::ptz::Options());
 }
 
 ActionVisibility NonEmptyVideowallCondition::check(const QnResourceList& resources, QnWorkbenchContext* /*context*/)
