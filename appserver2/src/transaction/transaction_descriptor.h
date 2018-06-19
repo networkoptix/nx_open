@@ -40,7 +40,7 @@
 #include <nx/vms/api/data/license_overflow_data.h>
 #include <nx/vms/api/data/lock_data.h>
 #include <nx/vms/api/data/media_server_data.h>
-#include <nx/vms/api/data/peer_system_time_data.h>
+#include <nx/vms/api/data/peer_sync_time_data.h>
 #include <nx/vms/api/data/resource_type_data.h>
 #include <nx/vms/api/data/stored_file_data.h>
 #include <nx/vms/api/data/tran_state_data.h>

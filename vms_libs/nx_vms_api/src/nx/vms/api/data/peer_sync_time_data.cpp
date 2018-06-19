@@ -1,4 +1,4 @@
-#include "peer_system_time_data.h"
+#include "peer_sync_time_data.h"
 
 #include <nx/fusion/model_functions.h>
 
@@ -7,7 +7,7 @@ namespace vms {
 namespace api {
 
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(
-    (PeerSystemTimeData)(PeerSyncTimeData),
+    (PeerSyncTimeData),
     (eq)(ubjson)(json)(xml)(sql_record)(csv_record),
     _Fields)
 

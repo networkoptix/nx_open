@@ -20,7 +20,7 @@
 #include "data/p2p_statistics_data.h"
 #include "data/peer_data.h"
 #include "data/peer_alive_data.h"
-#include "data/peer_system_time_data.h"
+#include "data/peer_sync_time_data.h"
 #include "data/reverse_connection_data.h"
 #include "data/tran_state_data.h"
 #include "data/update_data.h"
@@ -80,7 +80,6 @@ void Metatypes::initialize()
     qRegisterMetaType<PeerData>();
     qRegisterMetaType<PeerDataEx>();
     qRegisterMetaType<PeerAliveData>();
-    qRegisterMetaType<PeerSystemTimeData>();
     qRegisterMetaType<PeerSyncTimeData>();
     qRegisterMetaType<PersistentIdData>();
     qRegisterMetaType<ResourceData>();
