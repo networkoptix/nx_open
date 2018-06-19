@@ -49,7 +49,6 @@ Log In Form Validation
     [Arguments]    ${email}    ${pass}
     Input Text    ${EMAIL INPUT}    ${email}
     Input Text    ${PASSWORD INPUT}    ${pass}
-    Click Element    ${BACKDROP}
     click button    ${LOG IN BUTTON}
 
 Outline Error
