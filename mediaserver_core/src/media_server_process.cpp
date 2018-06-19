@@ -4371,17 +4371,15 @@ int MediaServerProcess::main(int argc, char* argv[])
     textToWaveServer->waitForStarted();
 #endif
 
-    QnVideoService service( argc, argv );
+    QnVideoService service(argc, argv);
 
     m_staticCommonModule.reset(new QnStaticCommonModule(
-        Qn::PT_Server,
+        nx::vms::api::PeerType::server,
         QnAppInfo::productNameShort(),
         QnAppInfo::customizationName()));
 
-    int res = service.exec();
-    if (restartFlag && res == 0)
-        return 1;
-    return 0;
+    const int res = service.exec();
+    return (restartFlag && res == 0) ? 1 : 0;
 }
 
 const CmdLineArguments MediaServerProcess::cmdLineArguments() const

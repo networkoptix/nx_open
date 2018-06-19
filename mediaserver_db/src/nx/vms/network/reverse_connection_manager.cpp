@@ -53,7 +53,7 @@ ReverseConnectionManager::~ReverseConnectionManager()
 }
 
 void ReverseConnectionManager::at_reverseConnectionRequested(
-    const ec2::ApiReverseConnectionData& data)
+    const nx::vms::api::ReverseConnectionData& data)
 {
     QnMutexLocker lock(&m_mutex);
 
@@ -63,7 +63,7 @@ void ReverseConnectionManager::at_reverseConnectionRequested(
     QnRoute route = commonModule()->router()->routeTo(data.targetServer);
     if (!route.gatewayId.isNull() || route.addr.isNull())
     {
-        NX_WARNING(this, 
+        NX_WARNING(this,
             lm("Got reverse connection request that can't be processed. Target server=%1").arg(data.targetServer));
         return;
     }
@@ -123,7 +123,7 @@ void ReverseConnectionManager::onHttpClientDone(nx::network::http::AsyncClient* 
     }
 }
 
-ReverseConnectionManager::SocketData 
+ReverseConnectionManager::SocketData
     ReverseConnectionManager::getPreparedSocketUnsafe(const QnUuid& guid)
 {
     auto& socketPool = m_preparedSockets[guid];
@@ -140,10 +140,10 @@ std::unique_ptr<nx::network::AbstractStreamSocket> ReverseConnectionManager::get
     const QnUuid& guid, std::chrono::milliseconds timeout)
 {
     NX_DEBUG(this, lit("Reverse connection to %1 is requested").arg(guid.toString()));
-    
+
     auto doSocketRequest = [&](int socketCount)
     {
-        ec2::QnTransaction<ec2::ApiReverseConnectionData> tran(
+        ec2::QnTransaction<nx::vms::api::ReverseConnectionData> tran(
             ec2::ApiCommand::openReverseConnection,
             commonModule()->moduleGUID());
         tran.params.targetServer = commonModule()->moduleGUID();
@@ -187,18 +187,18 @@ bool ReverseConnectionManager::addIncomingTcpConnection(
     }
 
     --socketPool->second.requested;
-    
+
     using namespace std::placeholders;
     socket->setNonBlockingMode(true);
     socket->setRecvTimeout(kPreperedSocketTimeout);
-    
+
     SocketData data;
     data.socket = std::move(socket);
     data.socket->readSomeAsync(data.tmpReadBuffer.get(),
         std::bind(&ReverseConnectionManager::at_socketReadTimeout, this, QnUuid(guid), data.socket.get(), _1, _2));
-    
+
     socketPool->second.sockets.push_back(std::move(data));
-    
+
     NX_DEBUG(this, lit(
         "Got new reverse connection from %1, there is (are) %2 avaliable and %3 requested")
         .arg(guid).arg(socketPool->second.sockets.size()));
@@ -218,8 +218,8 @@ void ReverseConnectionManager::at_socketReadTimeout(
     preparedData.sockets.erase(std::remove_if(
         preparedData.sockets.begin(), preparedData.sockets.end(),
         [socket](const SocketData& data)
-        { 
-            return data.socket.get() == socket; 
+        {
+            return data.socket.get() == socket;
         }), preparedData.sockets.end());
 
     m_proxyCondition.wakeAll();

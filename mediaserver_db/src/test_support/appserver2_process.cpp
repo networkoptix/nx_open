@@ -431,7 +431,7 @@ void Appserver2Process::registerHttpHandlers(
                 result->setError(QnRestResult::CantProcessRequest);
             return resultCode;
         });
-    
+
     m_tcpListener->addHandler<JsonConnectionProcessor>("HTTP",
         nx::time_sync::TimeSyncManager::kTimeSyncUrlPath.mid(1), //< remove '/'
         [](const nx::network::http::Request& request, QnHttpConnectionListener* owner, QnJsonRestResult* result)
@@ -515,7 +515,7 @@ bool Appserver2Process::createInitialData(const QString& systemName)
     settings->setAutoDiscoveryEnabled(false);
 
     //read server list
-    ec2::ApiMediaServerDataList mediaServerList;
+    nx::vms::api::MediaServerDataList mediaServerList;
     auto resultCode =
         connection->getMediaServerManager(Qn::kSystemAccess)->getServersSync(&mediaServerList);
     if (resultCode != ec2::ErrorCode::ok)
@@ -525,7 +525,7 @@ bool Appserver2Process::createInitialData(const QString& systemName)
 
     //read camera list
     nx::vms::api::CameraDataList cameraList;
-    resultCode = 
+    resultCode =
         connection->getCameraManager(Qn::kSystemAccess)->getCamerasSync(&cameraList);
     if (resultCode != ec2::ErrorCode::ok)
         return false;
@@ -533,7 +533,7 @@ bool Appserver2Process::createInitialData(const QString& systemName)
     for (const auto &camera : cameraList)
         messageProcessor->updateResource(camera, ec2::NotificationSource::Local);
 
-    ec2::ApiMediaServerData serverData;
+    nx::vms::api::MediaServerData serverData;
     auto resTypePtr = qnResTypePool->getResourceTypeByName("Server");
     if (resTypePtr.isNull())
         return false;

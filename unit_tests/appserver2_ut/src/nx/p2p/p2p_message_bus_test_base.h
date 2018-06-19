@@ -5,11 +5,14 @@
 #include <vector>
 #include <memory>
 
+#include "ec2_connection.h"
+
 #include <nx_ec/ec_api.h>
 #include <common/static_common_module.h>
-#include <nx/utils/test_support/module_instance_launcher.h>
 #include <test_support/appserver2_process.h>
-#include "ec2_connection.h"
+
+#include <nx/utils/test_support/module_instance_launcher.h>
+#include <nx/vms/api/data_fwd.h>
 
 namespace nx {
 namespace p2p {
@@ -49,17 +52,18 @@ protected:
     void waitForSync(int cameraCount);
 
     void checkMessageBus(
-        std::function<bool(MessageBus*, const ApiPersistentIdData&)> checkFunction,
+        std::function<bool(MessageBus*, const vms::api::PersistentIdData&)> checkFunction,
         const QString& errorMessage);
     void checkMessageBusInternal(
-        std::function<bool(MessageBus*, const ApiPersistentIdData&)> checkFunction,
+        std::function<bool(MessageBus*, const vms::api::PersistentIdData&)> checkFunction,
         const QString& errorMessage,
         bool waitForSync,
         int* outSyncDoneCounter);
 
-    static bool checkSubscription(const MessageBus* bus, const ApiPersistentIdData& peer);
-    static bool checkDistance(const MessageBus* bus, const ApiPersistentIdData& peer);
-    bool checkRuntimeInfo(const MessageBus* bus, const ApiPersistentIdData& /*peer*/);
+    static bool checkSubscription(const MessageBus* bus, const vms::api::PersistentIdData& peer);
+    static bool checkDistance(const MessageBus* bus, const vms::api::PersistentIdData& peer);
+    bool checkRuntimeInfo(const MessageBus* bus, const vms::api::PersistentIdData& /*peer*/);
+
 protected:
     std::vector<Appserver2Ptr> m_servers;
 };

@@ -25,7 +25,6 @@
 #include <database/migrations/cleanup_removed_transactions.h>
 #include <database/migrations/access_rights_db_migration.h>
 #include <database/migrations/camera_user_attributes_migration.h>
-#include <managers/time_manager.h>
 #include <network/system_helpers.h>
 #include <settings.h>
 #include <utils/common/app_info.h>
@@ -5135,7 +5134,7 @@ bool QnDbManager::migrateTimeManagerData()
     syncTimeKey.fromUInt64(syncTimeKeyData.value.toULongLong());
 
     QnUuid primaryTimeServerId;
-    ApiMediaServerDataList serverList;
+    MediaServerDataList serverList;
     if (doQueryNoLock(QnUuid(), serverList) != ErrorCode::ok)
         return false;
 

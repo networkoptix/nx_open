@@ -1,21 +1,21 @@
 #include "time_sync_manager.h"
 
+#include <api/global_settings.h>
+#include <api/model/time_reply.h>
+#include <common/common_module.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource_management/resource_pool.h>
-#include <common/common_module.h>
-#include <api/global_settings.h>
-#include <nx/utils/elapsed_timer.h>
-#include <nx_ec/data/api_reverse_connection_data.h>
-#include <nx/network/time/time_protocol_client.h>
-#include <utils/common/rfc868_servers.h>
-#include <nx/network/socket_factory.h>
-#include <nx/network/http/http_client.h>
-#include <nx/utils/time.h>
 #include <network/router.h>
-#include <nx/fusion/serialization/json.h>
 #include <rest/server/json_rest_result.h>
-#include <api/model/time_reply.h>
+#include <utils/common/rfc868_servers.h>
+
+#include <nx/fusion/serialization/json.h>
 #include <nx/network/http/custom_headers.h>
+#include <nx/network/http/http_client.h>
+#include <nx/network/socket_factory.h>
+#include <nx/network/time/time_protocol_client.h>
+#include <nx/utils/elapsed_timer.h>
+#include <nx/utils/time.h>
 
 namespace nx {
 namespace time_sync {
@@ -31,7 +31,7 @@ TimeSyncManager::TimeSyncManager(
     m_thread(new QThread())
 {
     moveToThread(m_thread);
-        
+
     connect(m_thread, &QThread::started,
         [this]()
         {
@@ -49,9 +49,9 @@ TimeSyncManager::TimeSyncManager(
 
     connect(
         commonModule->globalSettings(), &QnGlobalSettings::timeSynchronizationSettingsChanged,
-        this, [this]() 
-        { 
-            updateTime(); 
+        this, [this]()
+        {
+            updateTime();
         });
 }
 
@@ -91,7 +91,7 @@ void TimeSyncManager::loadTimeFromLocalClock()
 {
     auto newValue = m_systemClock->millisSinceEpoch();
     static const std::chrono::milliseconds kMaxJitterForLocalClock(250);
-    
+
     setSyncTime(newValue, kMaxJitterForLocalClock);
     NX_DEBUG(this, lm("Set time %1 from the local clock").
         arg(QDateTime::fromMSecsSinceEpoch(newValue.count()).toString(Qt::ISODate)));
@@ -103,7 +103,7 @@ bool TimeSyncManager::loadTimeFromServer(const QnRoute& route)
 
     if (!socket)
     {
-        NX_WARNING(this, 
+        NX_WARNING(this,
             lm("Can't read time from server %1. Can't establish connection to the remote host."));
         return false;
     }
@@ -151,7 +151,7 @@ bool TimeSyncManager::loadTimeFromServer(const QnRoute& route)
             .arg(route.id.toString()));
         return false;
     }
-    
+
     const std::chrono::milliseconds rtt = rttTimer.elapsed();
     auto newTime = std::chrono::milliseconds(timeData.utcTimeMs - rtt.count() / 2);
     bool syncWithInternel = commonModule()->globalSettings()->isSynchronizingTimeWithInternet();
