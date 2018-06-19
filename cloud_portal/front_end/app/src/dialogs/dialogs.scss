@@ -4,117 +4,118 @@
 
 .modal {
     &-backdrop {
-        background-color: $modal-backdrop-bg;
+        background-color : $modal-backdrop-bg;
+        transition       : none;
 
         &.show {
-            opacity: $modal-backdrop-opacity;
+            opacity : $modal-backdrop-opacity;
         }
     }
 
     &-content {
-        border-radius: 2px;
-        box-shadow: 0 16px 32px 0 transparentize(dark(15), 0.8);
+        border-radius : 2px;
+        box-shadow    : 0 16px 32px 0 transparentize(dark(15), 0.8);
     }
 
     &-header {
-        background-color: $additional_light1;
-        border-top: 1px solid transparent;
-        border-bottom: 1px solid $light3;
-        padding: $modal-title-padding 1rem;
-        border-radius: 2px 2px 0 0;
+        background-color : $additional_light1;
+        border-top       : 1px solid transparent;
+        border-bottom    : 1px solid $light3;
+        padding          : $modal-title-padding 1rem;
+        border-radius    : 2px 2px 0 0;
 
         .modal-title {
-            font-size: $h5-font-size;
-            font-weight: $modal-title-font-weight;
-            color: $dark9;
-            line-height: $modal-title-line-height;
-            margin: 0;
-            padding: 0;
+            font-size   : $h5-font-size;
+            font-weight : $modal-title-font-weight;
+            color       : $dark9;
+            line-height : $modal-title-line-height;
+            margin      : 0;
+            padding     : 0;
         }
 
         .close {
-            color: $dark9;
-            opacity: 1;
-            width: 48px;
-            height: 48px;
-            position: absolute;
-            right: 0;
-            top: 0;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin: 0;
-            padding: 0;
+            color           : $dark9;
+            opacity         : 1;
+            width           : 48px;
+            height          : 48px;
+            position        : absolute;
+            right           : 0;
+            top             : 0;
+            display         : flex;
+            align-items     : center;
+            justify-content : center;
+            margin          : 0;
+            padding         : 0;
 
             .close-content {
-                border-radius: 25px;
+                border-radius : 25px;
             }
 
             &:hover,
             &:active,
             &:focus {
-                box-shadow: none;
-                outline: none !important;
-                outline: 0 !important;
+                box-shadow : none;
+                outline    : none !important;
+                outline    : 0 !important;
             }
 
             &:hover,
             &:focus {
                 .close-content {
-                    background-color: $additional_light2;
+                    background-color : $additional_light2;
                 }
             }
 
             &:active {
                 .close-content {
-                    background-color: $additional_light3;
+                    background-color : $additional_light3;
                 }
             }
 
             &-content {
-                width: 40px;
-                height: 40px;
-                display: flex;
-                align-items: center;
-                justify-content: center;
+                width           : 40px;
+                height          : 40px;
+                display         : flex;
+                align-items     : center;
+                justify-content : center;
 
                 .close-icon {
-                    margin: 0;
+                    margin : 0;
                 }
             }
         }
     }
 
     &-body {
-        padding: 1rem 1rem 0;
-        background-color: $light1;
+        padding          : 1rem 1rem 0;
+        background-color : $light1;
 
         .form-group {
-            margin-bottom: 1rem;
+            margin-bottom : 1rem;
         }
 
         label {
-            font-size: $font-size-base;
-            font-weight: normal;
-            margin: 0;
-            padding: 0 0 0.5rem 0;
+            font-size   : $font-size-base;
+            font-weight : normal;
+            margin      : 0;
+            padding     : 0 0 0.5rem 0;
         }
 
         .checkbox {
-            margin: 0;
+            margin : 0;
         }
 
         .help-block {
-            display: block;
-            background-color: transparent;
-            color: $light16;
-            padding: 0.5rem 0 0 0;
+            display          : block;
+            background-color : transparent;
+            color            : $light16;
+            padding          : 0.5rem 0 0 0;
         }
     }
 
     &-footer {
-        justify-content: flex-start;
-        align-items: baseline;
-        padding: 1rem;
+        justify-content : flex-start;
+        align-items     : baseline;
+        padding         : 1rem;
     }
 }
