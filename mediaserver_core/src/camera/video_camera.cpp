@@ -451,6 +451,9 @@ void QnVideoCamera::createReader(QnServer::ChunksCatalog catalog)
 
 	const QnSecurityCamResource* cameraResource = dynamic_cast<QnSecurityCamResource*>(m_resource.data());
 
+    if (!cameraResource->hasVideo() && !cameraResource->isAudioSupported())
+        return;
+
     QnLiveStreamProviderPtr &reader = primaryLiveStream ? m_primaryReader : m_secondaryReader;
     if (reader == 0)
     {
