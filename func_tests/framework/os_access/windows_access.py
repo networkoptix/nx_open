@@ -127,3 +127,6 @@ class WindowsAccess(RemoteAccess):
             pass
         else:
             raise RuntimeError("Unexpected zero exit status, {} expected".format(expected_exit_status))
+
+    def make_fake_disk(self, name, size_bytes):
+        raise NotImplementedError()
