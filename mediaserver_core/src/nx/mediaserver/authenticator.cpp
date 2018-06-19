@@ -1,4 +1,4 @@
-#include "authorizer.h"
+#include "authenticator.h"
 
 #include <QtCore/QCryptographicHash>
 
@@ -56,7 +56,7 @@ static const qint64 LDAP_TIMEOUT = 1000000ll * 60 * 5;
 static const QString COOKIE_DIGEST_AUTH(lit("Authorization=Digest"));
 static const QString TEMP_AUTH_KEY_NAME = lit("authKey");
 
-Authorizer::Authorizer(
+Authenticator::Authenticator(
     QnCommonModule* commonModule,
     TimeBasedNonceProvider* timeBasedNonceProvider,
     nx::vms::cloud_integration::CloudManagerGroup* cloudManagerGroup)
@@ -70,7 +70,7 @@ Authorizer::Authorizer(
     setCleanupTimer();
 }
 
-Qn::AuthResult Authorizer::authenticate(
+Qn::AuthResult Authenticator::authenticate(
     const nx::network::HostAddress& clientIp,
     const nx::network::http::Request& request,
     nx::network::http::Response& response,
@@ -220,7 +220,7 @@ Qn::AuthResult Authorizer::authenticate(
     return result;
 }
 
-Qn::AuthResult Authorizer::httpAuthenticate(
+Qn::AuthResult Authenticator::httpAuthenticate(
     const nx::network::HostAddress& clientIp,
     const nx::network::http::Request& request,
     nx::network::http::Response& response,
@@ -399,12 +399,12 @@ Qn::AuthResult Authorizer::httpAuthenticate(
     return authResult;
 }
 
-nx::network::http::AuthMethodRestrictionList* Authorizer::restrictionList()
+nx::network::http::AuthMethodRestrictionList* Authenticator::restrictionList()
 {
     return &m_authMethodRestrictionList;
 }
 
-QPair<QString, QString> Authorizer::createAuthenticationQueryItemForPath(
+QPair<QString, QString> Authenticator::createAuthenticationQueryItemForPath(
     const Qn::UserAccessData& accessRights,
     const QString& path,
     std::chrono::milliseconds timeout)
@@ -422,7 +422,7 @@ QPair<QString, QString> Authorizer::createAuthenticationQueryItemForPath(
     nx::utils::TimerManager::TimerGuard timerGuard(
         nx::utils::TimerManager::instance(),
         nx::utils::TimerManager::instance()->addTimer(
-            std::bind(&Authorizer::authenticationExpired, this, authKey, std::placeholders::_1),
+            std::bind(&Authenticator::authenticationExpired, this, authKey, std::placeholders::_1),
             std::min(timeout, kMaxKeyLifeTime)));
 
     TempAuthenticationKeyCtx ctx;
@@ -434,7 +434,7 @@ QPair<QString, QString> Authorizer::createAuthenticationQueryItemForPath(
     return QPair<QString, QString>(TEMP_AUTH_KEY_NAME, authKey);
 }
 
-bool Authorizer::isLoginLockedOut(
+bool Authenticator::isLoginLockedOut(
     const nx::String& name, const nx::network::HostAddress& address) const
 {
     const auto now = std::chrono::steady_clock::now();
@@ -469,7 +469,7 @@ bool Authorizer::isLoginLockedOut(
     return true;
 }
 
-void Authorizer::saveLoginResult(
+void Authenticator::saveLoginResult(
     const nx::String& name, const nx::network::HostAddress& address, Qn::AuthResult result)
 {
     if (result != Qn::Auth_WrongPassword)
@@ -498,7 +498,7 @@ void Authorizer::saveLoginResult(
     }
 }
 
-void Authorizer::authenticationExpired(const QString& authKey, quint64 /*timerID*/)
+void Authenticator::authenticationExpired(const QString& authKey, quint64 /*timerID*/)
 {
     QnMutexLocker lk(&m_mutex);
     m_authenticatedPaths.erase(authKey);
@@ -532,7 +532,7 @@ static bool verifyDigestUri(const nx::utils::Url& requestUrl, const QByteArray& 
         : isEqual(requestUrl.path(), digestUrl.path());
 }
 
-Qn::AuthResult Authorizer::doDigestAuth(
+Qn::AuthResult Authenticator::doDigestAuth(
     const nx::network::http::RequestLine& requestLine,
     const nx::network::http::header::Authorization& authorization,
     nx::network::http::Response& responseHeaders,
@@ -586,7 +586,7 @@ Qn::AuthResult Authorizer::doDigestAuth(
     return errCode;
 }
 
-Qn::AuthResult Authorizer::doBasicAuth(
+Qn::AuthResult Authenticator::doBasicAuth(
     const QByteArray& method,
     const nx::network::http::header::Authorization& authorization,
     nx::network::http::Response& response,
@@ -626,7 +626,7 @@ Qn::AuthResult Authorizer::doBasicAuth(
     return errCode;
 }
 
-Qn::AuthResult Authorizer::doCookieAuthorization(
+Qn::AuthResult Authenticator::doCookieAuthorization(
     const nx::network::HostAddress& clientIp,
     const QByteArray& method,
     const QByteArray& authData,
@@ -659,7 +659,7 @@ Qn::AuthResult Authorizer::doCookieAuthorization(
 
 }
 
-void Authorizer::addAuthHeader(
+void Authenticator::addAuthHeader(
     nx::network::http::Response& response,
     const QnUserResourcePtr& userResource,
     bool isProxy,
@@ -685,7 +685,7 @@ void Authorizer::addAuthHeader(
         auth.toLatin1()));
 }
 
-QByteArray Authorizer::generateNonce(NonceProvider provider) const
+QByteArray Authenticator::generateNonce(NonceProvider provider) const
 {
     if (provider == NonceProvider::automatic)
         return m_nonceProvider->generateNonce();
@@ -693,7 +693,7 @@ QByteArray Authorizer::generateNonce(NonceProvider provider) const
         return m_timeBasedNonceProvider->generateNonce();
 }
 
-Qn::AuthResult Authorizer::authenticateByUrl(
+Qn::AuthResult Authenticator::authenticateByUrl(
     const nx::network::HostAddress& clientIp,
     const QByteArray& authRecordBase64,
     const QByteArray& method,
@@ -737,7 +737,7 @@ Qn::AuthResult Authorizer::authenticateByUrl(
     return errCode;
 }
 
-QnUserResourcePtr Authorizer::findUserByName(const QByteArray& nxUserName) const
+QnUserResourcePtr Authenticator::findUserByName(const QByteArray& nxUserName) const
 {
     auto res = m_userDataProvider->findResByName(nxUserName);
     if (auto user = res.dynamicCast<QnUserResource>())
@@ -745,7 +745,7 @@ QnUserResourcePtr Authorizer::findUserByName(const QByteArray& nxUserName) const
     return QnUserResourcePtr();
 }
 
-void Authorizer::updateUserHashes(const QnUserResourcePtr& userResource, const QString& password)
+void Authenticator::updateUserHashes(const QnUserResourcePtr& userResource, const QString& password)
 {
     if (userResource->isLdap() && userResource->decodeLDAPPassword() == password)
         return; //< password is not changed
@@ -762,12 +762,12 @@ void Authorizer::updateUserHashes(const QnUserResourcePtr& userResource, const Q
         &ec2::DummyHandler::onRequestDone);
 }
 
-LdapManager* Authorizer::ldapManager() const
+LdapManager* Authenticator::ldapManager() const
 {
     return m_ldap.get();
 }
 
-void Authorizer::setCleanupTimer()
+void Authenticator::setCleanupTimer()
 {
     m_clenupTimer = nx::utils::TimerManager::instance()->addTimerEx(
         [this](nx::utils::TimerId)
@@ -778,7 +778,7 @@ void Authorizer::setCleanupTimer()
         kMaxKeyLifeTime);
 }
 
-nx::Buffer Authorizer::newCsrfToken()
+nx::Buffer Authenticator::newCsrfToken()
 {
     const auto token = QnUuid::createUuid().toSimpleByteArray();
     QnMutexLocker lock(&m_mutex);
@@ -786,13 +786,13 @@ nx::Buffer Authorizer::newCsrfToken()
     return token;
 }
 
-void Authorizer::removeCsrfToken(const nx::Buffer& token)
+void Authenticator::removeCsrfToken(const nx::Buffer& token)
 {
     QnMutexLocker lock(&m_mutex);
     m_csrfTokens.erase(token);
 }
 
-bool Authorizer::isCsrfTokenValid(const nx::Buffer& token) const
+bool Authenticator::isCsrfTokenValid(const nx::Buffer& token) const
 {
     QnMutexLocker lock(&m_mutex);
     const auto it = m_csrfTokens.find(token);
@@ -810,19 +810,19 @@ bool Authorizer::isCsrfTokenValid(const nx::Buffer& token) const
     return true;
 }
 
-std::optional<Authorizer::LockoutOptions> Authorizer::getLockoutOptions() const
+std::optional<Authenticator::LockoutOptions> Authenticator::getLockoutOptions() const
 {
     QnMutexLocker lock(&m_mutex);
     return m_lockoutOptions;
 }
 
-void Authorizer::setLockoutOptions(std::optional<LockoutOptions> options)
+void Authenticator::setLockoutOptions(std::optional<LockoutOptions> options)
 {
     QnMutexLocker lock(&m_mutex);
     m_lockoutOptions = std::move(options);
 }
 
-void Authorizer::cleanupExpiredCsrfs()
+void Authenticator::cleanupExpiredCsrfs()
 {
     QnMutexLocker lock(&m_mutex);
     const auto now = std::chrono::steady_clock::now();

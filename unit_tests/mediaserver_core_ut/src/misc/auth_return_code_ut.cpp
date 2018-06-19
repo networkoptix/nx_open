@@ -11,7 +11,7 @@
 #include <nx/network/http/custom_headers.h>
 
 #include <nx/fusion/model_functions.h>
-#include <nx/mediaserver/authorizer.h>
+#include <nx/mediaserver/authenticator.h>
 #include <api/model/cookie_login_data.h>
 #include <network/authutil.h>
 #include <rest/server/json_rest_result.h>
@@ -404,7 +404,7 @@ TEST_F(AuthReturnCodeTest, manualDigestWrongMethod_onGateway)
 
 TEST_F(AuthReturnCodeTest, lockoutTest)
 {
-    static const Authorizer::LockoutOptions kLockoutOptions{
+    static const Authenticator::LockoutOptions kLockoutOptions{
         3, std::chrono::milliseconds(500), std::chrono::milliseconds(100)};
 
     const auto lockoutOptons = server->authorizer()->getLockoutOptions();

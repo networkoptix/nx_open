@@ -7,7 +7,7 @@
 #include <nx/network/multiple_server_socket.h>
 #include <nx/utils/thread/mutex.h>
 #include <nx/network/http/http_mod_manager.h>
-#include <nx/mediaserver/authorizer.h>
+#include <nx/mediaserver/authenticator.h>
 
 namespace nx {
 namespace vms {
@@ -38,8 +38,8 @@ public:
     nx::network::http::HttpModManager* httpModManager() const;
     virtual void applyModToRequest(nx::network::http::Request* request) override;
 
-    nx::mediaserver::Authorizer* authorizer() const;
-    static nx::mediaserver::Authorizer* authorizer(const QnTcpListener* listener);
+    nx::mediaserver::Authenticator* authorizer() const;
+    static nx::mediaserver::Authenticator* authorizer(const QnTcpListener* listener);
 
     bool isAuthentificationRequired(nx::network::http::Request& request);
     void enableUnauthorizedForwarding(const QString& path);
@@ -56,7 +56,7 @@ protected:
     virtual void destroyServerSocket(nx::network::AbstractStreamServerSocket* serverSocket) override;
 
 private:
-    mutable nx::mediaserver::Authorizer m_authorizer;
+    mutable nx::mediaserver::Authenticator m_authorizer;
     const nx::vms::cloud_integration::CloudConnectionManager& m_cloudConnectionManager;
     nx::network::MultipleServerSocket* m_multipleServerSocket;
     std::unique_ptr<nx::network::AbstractStreamServerSocket> m_serverSocket;

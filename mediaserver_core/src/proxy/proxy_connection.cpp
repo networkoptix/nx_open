@@ -239,7 +239,7 @@ bool QnProxyConnectionProcessor::replaceAuthHeader()
         wwwAuthenticateHeader.authScheme = nx::network::http::header::AuthScheme::digest;
         wwwAuthenticateHeader.params["realm"] = nx::network::AppInfo::realm().toUtf8();
         wwwAuthenticateHeader.params["nonce"] = QnUniversalTcpListener::authorizer(owner())
-            ->generateNonce(nx::mediaserver::Authorizer::NonceProvider::local);
+            ->generateNonce(nx::mediaserver::Authenticator::NonceProvider::local);
 
         if (!nx::network::http::calcDigestResponse(
             d->request.requestLine.method,

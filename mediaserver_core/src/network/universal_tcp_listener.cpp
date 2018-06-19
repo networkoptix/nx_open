@@ -215,12 +215,12 @@ void QnUniversalTcpListener::applyModToRequest(nx::network::http::Request* reque
     m_httpModManager->apply(request);
 }
 
-nx::mediaserver::Authorizer* QnUniversalTcpListener::authorizer() const
+nx::mediaserver::Authenticator* QnUniversalTcpListener::authorizer() const
 {
     return &m_authorizer;
 }
 
-nx::mediaserver::Authorizer* QnUniversalTcpListener::authorizer(const QnTcpListener* listener)
+nx::mediaserver::Authenticator* QnUniversalTcpListener::authorizer(const QnTcpListener* listener)
 {
     const auto universalListener = dynamic_cast<const QnUniversalTcpListener*>(listener);
     NX_CRITICAL(universalListener);

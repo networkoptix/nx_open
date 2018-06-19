@@ -82,7 +82,7 @@
 #include <motion/motion_helper.h>
 
 #include <nx/vms/auth/time_based_nonce_provider.h>
-#include <nx/mediaserver/authorizer.h>
+#include <nx/mediaserver/authenticator.h>
 #include <network/connection_validator.h>
 #include <network/default_tcp_connection_processor.h>
 #include <network/system_helpers.h>
@@ -2687,7 +2687,7 @@ bool MediaServerProcess::initTcpListener(
 
     configureApiRestrictions(m_universalTcpListener->authorizer()->restrictionList());
     connect(
-        m_universalTcpListener->authorizer(), &nx::mediaserver::Authorizer::emptyDigestDetected,
+        m_universalTcpListener->authorizer(), &nx::mediaserver::Authenticator::emptyDigestDetected,
         this, &MediaServerProcess::at_emptyDigestDetected);
 
     m_universalTcpListener->httpModManager()->addCustomRequestMod(std::bind(

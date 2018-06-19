@@ -35,7 +35,7 @@ namespace mediaserver {
 /**
  * Authenticates requests on server side.
  */
-class Authorizer:
+class Authenticator:
     public QObject,
     public QnCommonModuleAware
 {
@@ -44,7 +44,7 @@ class Authorizer:
 public:
     static const constexpr std::chrono::milliseconds kMaxKeyLifeTime = std::chrono::hours(1);
 
-    Authorizer(
+    Authenticator(
         QnCommonModule* commonModule,
         TimeBasedNonceProvider* timeBasedNonceProvider,
         nx::vms::cloud_integration::CloudManagerGroup* cloudManagerGroup);

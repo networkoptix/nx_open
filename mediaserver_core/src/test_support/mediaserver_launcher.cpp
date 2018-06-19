@@ -35,7 +35,7 @@ QnCommonModule* MediaServerLauncher::commonModule() const
     return m_mediaServerProcess->commonModule();
 }
 
-nx::mediaserver::Authorizer* MediaServerLauncher::authorizer() const
+nx::mediaserver::Authenticator* MediaServerLauncher::authorizer() const
 {
     return m_mediaServerProcess->authorizer();
 }
