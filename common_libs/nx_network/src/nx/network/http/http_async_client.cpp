@@ -985,11 +985,16 @@ AsyncClient::Result AsyncClient::processResponseHeadersBytes(
         return Result::proceed;
     }
 
+    const bool messageBodyAllowed = Method::isMessageBodyAllowedInResponse(
+        m_request.requestLine.method,
+        StatusCode::Value(m_httpStreamReader.message().response->statusLine.statusCode));
+
     const bool messageHasMessageBody =
         (m_httpStreamReader.state() == HttpStreamReader::readingMessageBody) ||
         (m_httpStreamReader.state() == HttpStreamReader::pullingLineEndingBeforeMessageBody) ||
         (m_httpStreamReader.messageBodyBufferSize() > 0);
-    if (!messageHasMessageBody)
+
+    if (!messageHasMessageBody || !messageBodyAllowed)
     {
         // No message body: done.
         m_state = m_httpStreamReader.state() == HttpStreamReader::parseError
