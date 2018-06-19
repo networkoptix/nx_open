@@ -12,27 +12,9 @@ namespace p2p {
 namespace test {
 
 static const int kMaxInstancesWithTimeManager = 100;
+static const int kMaxSyncTimeoutMs = 1000 * 30;
 
-int P2pMessageBusTestBase::m_instanceCounter = 0;
 static const QString kP2pTestSystemName(lit("P2pTestSystem"));
-
-void P2pMessageBusTestBase::initResourceTypes(ec2::AbstractECConnection* ec2Connection)
-{
-    QList<QnResourceTypePtr> resourceTypeList;
-    const ec2::ErrorCode errorCode = ec2Connection->getResourceManager(Qn::kSystemAccess)->getResourceTypesSync(&resourceTypeList);
-    ASSERT_EQ(ec2::ErrorCode::ok, errorCode);
-    qnResTypePool->replaceResourceTypeList(resourceTypeList);
-}
-
-void initUsers(ec2::AbstractECConnection* ec2Connection)
-{
-    ec2::ApiUserDataList users;
-    const ec2::ErrorCode errorCode = ec2Connection->getUserManager(Qn::kSystemAccess)->getUsersSync(&users);
-    auto messageProcessor = ec2Connection->commonModule()->messageProcessor();
-    ASSERT_EQ(ec2::ErrorCode::ok, errorCode);
-    for (const auto &user: users)
-        messageProcessor->updateResource(user, ec2::NotificationSource::Local);
-}
 
 void P2pMessageBusTestBase::createData(
     const Appserver2Ptr& server,
@@ -40,17 +22,9 @@ void P2pMessageBusTestBase::createData(
     int propertiesPerCamera,
     int userCount)
 {
-    const auto connection = server->moduleInstance()->ecConnection();
-    ASSERT_TRUE(connection != nullptr);
-    auto messageProcessor = server->moduleInstance()->commonModule()->messageProcessor();
+    ASSERT_TRUE(server->moduleInstance()->createInitialData(kP2pTestSystemName));
 
-    initResourceTypes(connection);
-    initUsers(connection);
-
-    const auto settings = connection->commonModule()->globalSettings();
-    settings->setSystemName(kP2pTestSystemName);
-    settings->setLocalSystemId(guidFromArbitraryData(kP2pTestSystemName));
-    settings->setAutoDiscoveryEnabled(false);
+    const auto settings = server->moduleInstance()->commonModule()->globalSettings();
     const bool disableTimeManager = m_servers.size() > kMaxInstancesWithTimeManager;
     if (disableTimeManager)
     {
@@ -59,37 +33,6 @@ void P2pMessageBusTestBase::createData(
     }
 
     settings->synchronizeNow();
-
-    //read server list
-    vms::api::MediaServerDataList mediaServerList;
-    ASSERT_EQ(
-        ec2::ErrorCode::ok,
-        connection->getMediaServerManager(Qn::kSystemAccess)->getServersSync(&mediaServerList));
-    for (const auto &mediaServer : mediaServerList)
-        messageProcessor->updateResource(mediaServer, ec2::NotificationSource::Local);
-
-    //read camera list
-    nx::vms::api::CameraDataList cameraList;
-    ASSERT_EQ(
-        ec2::ErrorCode::ok,
-        connection->getCameraManager(Qn::kSystemAccess)->getCamerasSync(&cameraList));
-    for (const auto &camera: cameraList)
-        messageProcessor->updateResource(camera, ec2::NotificationSource::Local);
-
-    {
-        vms::api::MediaServerData serverData;
-        auto resTypePtr = qnResTypePool->getResourceTypeByName("Server");
-        ASSERT_TRUE(!resTypePtr.isNull());
-        serverData.typeId = resTypePtr->getId();
-        serverData.id = server->moduleInstance()->commonModule()->moduleGUID();
-        serverData.authKey = QnUuid::createUuid().toString();
-        serverData.name = lm("server %1").arg(serverData.id);
-        ASSERT_TRUE(!resTypePtr.isNull());
-        serverData.typeId = resTypePtr->getId();
-
-        auto serverManager = connection->getMediaServerManager(Qn::kSystemAccess);
-        ASSERT_EQ(ec2::ErrorCode::ok, serverManager->saveSync(serverData));
-    }
 
     std::vector<ec2::ApiUserData> users;
 
@@ -134,6 +77,7 @@ void P2pMessageBusTestBase::createData(
                     lit("value%1").arg(j)));
         }
     }
+    auto connection = server->moduleInstance()->commonModule()->ec2Connection();
     auto userManager = connection->getUserManager(Qn::kSystemAccess);
     auto cameraManager = connection->getCameraManager(Qn::kSystemAccess);
     auto resourceManager = connection->getResourceManager(Qn::kSystemAccess);
@@ -145,52 +89,16 @@ void P2pMessageBusTestBase::createData(
     ASSERT_EQ(ec2::ErrorCode::ok, cameraManager->addCamerasSync(cameras));
 }
 
-Appserver2Ptr P2pMessageBusTestBase::createAppserver(
-    bool keepDbFile,
-    quint16 baseTcpPort)
-{
-    auto tmpDir = nx::utils::TestOptions::temporaryDirectoryPath();
-    if (tmpDir.isEmpty())
-        tmpDir = QDir::homePath();
-    tmpDir += lm("/ec2_server_sync_ut.data%1").arg(m_instanceCounter);
-    if (!keepDbFile)
-        QDir(tmpDir).removeRecursively();
-
-    Appserver2Ptr result(new Appserver2());
-    auto guid = guidFromArbitraryData(lm("guid_hash%1").arg(m_instanceCounter));
-
-    const QString dbFileArg = lit("--dbFile=%1").arg(tmpDir);
-    result->addArg(dbFileArg.toStdString().c_str());
-
-    const QString p2pModeArg = lit("--p2pMode=1");
-    result->addArg(p2pModeArg.toStdString().c_str());
-
-    const QString instanceArg = lit("--moduleInstance=%1").arg(m_instanceCounter);
-    result->addArg(instanceArg.toStdString().c_str());
-    const QString guidArg = lit("--moduleGuid=%1").arg(guid.toString());
-    result->addArg(guidArg.toStdString().c_str());
-
-    // Some p2p synchronization tests rely on broken authentication in appserver2.
-    result->addArg("--disableAuth");
-
-    if (baseTcpPort)
-    {
-        const QString guidArg = lit("--endpoint=0.0.0.0:%1").arg(baseTcpPort + m_instanceCounter);
-        result->addArg(guidArg.toStdString().c_str());
-    }
-
-    ++m_instanceCounter;
-
-    result->start();
-    return result;
-}
-
 void P2pMessageBusTestBase::startServers(int count, int keepDbAtServerIndex, quint16 baseTcpPort)
 {
     QElapsedTimer t;
     t.restart();
     for (int i = 0; i < count; ++i)
-        m_servers.push_back(createAppserver(i == keepDbAtServerIndex, baseTcpPort));
+    {
+        auto appserver = Appserver2Launcher::createAppserver(i == keepDbAtServerIndex, baseTcpPort);
+        appserver->start();
+        m_servers.push_back(std::move(appserver));
+    }
 
     for (const auto& server: m_servers)
     {
@@ -202,14 +110,15 @@ void P2pMessageBusTestBase::startServers(int count, int keepDbAtServerIndex, qui
     }
 }
 
+void P2pMessageBusTestBase::bidirectConnectServers(const Appserver2Ptr& srcServer, const Appserver2Ptr& dstServer)
+{
+    connectServers(srcServer, dstServer);
+    connectServers(dstServer, srcServer);
+}
+
 void P2pMessageBusTestBase::connectServers(const Appserver2Ptr& srcServer, const Appserver2Ptr& dstServer)
 {
-    const auto addr = dstServer->moduleInstance()->endpoint();
-    auto peerId = dstServer->moduleInstance()->commonModule()->moduleGUID();
-
-    nx::utils::Url url = lit("http://%1:%2/ec2/messageBus").arg(addr.address.toString()).arg(addr.port);
-    srcServer->moduleInstance()->ecConnection()->messageBus()->
-        addOutgoingConnectionToPeer(peerId, url);
+    srcServer->moduleInstance()->connectTo(dstServer->moduleInstance().get());
 }
 
 void P2pMessageBusTestBase::disconnectServers(const Appserver2Ptr& srcServer, const Appserver2Ptr& dstServer)
@@ -280,6 +189,119 @@ bool P2pMessageBusTestBase::waitForConditionOnAllServers(
         std::this_thread::sleep_for(std::chrono::milliseconds(50));
     } while (syncDoneCounter != m_servers.size() && timer.elapsed() < timeout.count());
     return timer.elapsed() < timeout.count();
+}
+
+void P2pMessageBusTestBase::checkMessageBus(
+    std::function<bool(MessageBus*, const ApiPersistentIdData&)> checkFunction,
+    const QString& errorMessage)
+{
+    int syncDoneCounter = 0;
+    // Wait until done
+    checkMessageBusInternal(checkFunction, errorMessage, /*waitForSync*/ true, &syncDoneCounter);
+    // Report error
+    if (syncDoneCounter != m_servers.size() * m_servers.size())
+    {
+        checkMessageBusInternal(
+            checkFunction, errorMessage, /*waitForSync*/ false, &syncDoneCounter);
+    }
+}
+
+void P2pMessageBusTestBase::checkMessageBusInternal(
+    std::function<bool(MessageBus*, const ApiPersistentIdData&)> checkFunction,
+    const QString& errorMessage,
+    bool waitForSync,
+    int* outSyncDoneCounter)
+{
+    int& syncDoneCounter = *outSyncDoneCounter;
+
+    QElapsedTimer timer;
+    timer.restart();
+    do
+    {
+        *outSyncDoneCounter = 0;
+        for (const auto& server : m_servers)
+        {
+            const auto& connection = server->moduleInstance()->ecConnection();
+            const auto& bus = connection->messageBus()->dynamicCast<MessageBus*>();
+            const auto& commonModule = server->moduleInstance()->commonModule();
+            for (const auto& serverTo : m_servers)
+            {
+                const auto& commonModuleTo = serverTo->moduleInstance()->commonModule();
+                ec2::ApiPersistentIdData peer(commonModuleTo->moduleGUID(), commonModuleTo->dbId());
+                bool result = checkFunction(bus, peer);
+                if (!result)
+                {
+                    if (!waitForSync)
+                        NX_DEBUG(
+                            this,
+                            lit("Peer %1 %2 to peer %3")
+                            .arg(qnStaticCommon->moduleDisplayName(commonModule->moduleGUID()))
+                            .arg(errorMessage)
+                            .arg(qnStaticCommon->moduleDisplayName(commonModuleTo->moduleGUID())));
+                }
+                else
+                {
+                    ++syncDoneCounter;
+                }
+                if (!waitForSync)
+                    ASSERT_TRUE(bus->isSubscribedTo(peer));
+            }
+        }
+        std::this_thread::sleep_for(std::chrono::milliseconds(50));
+    } while (waitForSync && syncDoneCounter != m_servers.size()*m_servers.size()
+        && timer.elapsed() < kMaxSyncTimeoutMs);
+}
+
+bool P2pMessageBusTestBase::checkSubscription(const MessageBus* bus, const ApiPersistentIdData& peer)
+{
+    return bus->isSubscribedTo(peer);
+}
+
+bool P2pMessageBusTestBase::checkDistance(const MessageBus* bus, const ApiPersistentIdData& peer)
+{
+    return bus->distanceTo(peer) <= kMaxOnlineDistance;
+}
+
+bool P2pMessageBusTestBase::checkRuntimeInfo(const MessageBus* bus, const ApiPersistentIdData& /*peer*/)
+{
+    return bus->runtimeInfo().size() == m_servers.size();
+}
+
+void P2pMessageBusTestBase::waitForSync(int cameraCount)
+{
+    QElapsedTimer timer;
+    timer.restart();
+
+    // Check all peers have subscribed to each other
+    checkMessageBus(&checkSubscription, lm("is not subscribed"));
+
+    // Check all peers is able to see each other
+    checkMessageBus(&checkDistance, lm("has not online distance"));
+
+    // Check all runtime data are received
+    using namespace std::placeholders;
+    checkMessageBus(std::bind(&P2pMessageBusTestBase::checkRuntimeInfo, this, _1, _2), lm("missing runtime info"));
+
+    int expectedCamerasCount = m_servers.size();
+    expectedCamerasCount *= cameraCount;
+    // wait for data sync
+    int syncDoneCounter = 0;
+    do
+    {
+        syncDoneCounter = 0;
+        for (const auto& server : m_servers)
+        {
+            const auto& resPool = server->moduleInstance()->commonModule()->resourcePool();
+            const auto& cameraList = resPool->getAllCameras(QnResourcePtr());
+            if (cameraList.size() == expectedCamerasCount)
+                ++syncDoneCounter;
+            else
+                break;
+        }
+        ASSERT_TRUE(timer.elapsed() < kMaxSyncTimeoutMs);
+        std::this_thread::sleep_for(std::chrono::milliseconds(50));
+    } while (syncDoneCounter != m_servers.size() && timer.elapsed() < kMaxSyncTimeoutMs);
+    NX_LOG(lit("Sync data time: %1 ms").arg(timer.elapsed()), cl_logINFO);
 }
 
 } // namespace test

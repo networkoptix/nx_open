@@ -1157,7 +1157,8 @@ void QnTransactionMessageBus::onEc2ConnectionSettingsChanged(const QString& key)
     }
 }
 
-QnUuid QnTransactionMessageBus::routeToPeerVia(const QnUuid& dstPeer, int* peerDistance) const
+QnUuid QnTransactionMessageBus::routeToPeerVia(
+    const QnUuid& dstPeer, int* peerDistance, nx::network::SocketAddress* knownPeerAddress) const
 {
     QnMutexLocker lock(&m_mutex);
     *peerDistance = INT_MAX;
@@ -1177,6 +1178,21 @@ QnUuid QnTransactionMessageBus::routeToPeerVia(const QnUuid& dstPeer, int* peerD
         }
     }
     *peerDistance = minDistance;
+
+    if (knownPeerAddress)
+    {
+        *knownPeerAddress = nx::network::SocketAddress();
+        for (auto itr = m_remoteUrls.begin(); itr != m_remoteUrls.end(); ++itr)
+        {
+            if (itr.value().id == dstPeer)
+            {
+                const auto url = itr.key();
+                *knownPeerAddress = nx::network::SocketAddress(url.host(), url.port());
+                break;
+            }
+        }
+    }
+
     return result;
 }
 

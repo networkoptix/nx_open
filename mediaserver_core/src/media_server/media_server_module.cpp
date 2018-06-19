@@ -63,8 +63,11 @@
 #include "wearable_lock_manager.h"
 #include "wearable_upload_manager.h"
 #include <core/resource/resource_command_processor.h>
+#include <nx/vms/network/reverse_connection_manager.h>
+#include <nx/time_sync/server_time_sync_manager.h>
 
 using namespace nx;
+using namespace nx::mediaserver;
 
 namespace {
 
@@ -79,15 +82,6 @@ void installTranslations()
     QnTranslationManager::installTranslation(defaultTranslation);
 }
 
-QDir downloadsDirectory()
-{
-    const QDir dir(qnServerModule->settings().dataDir() + lit("/downloads"));
-    if (!dir.exists())
-        QDir().mkpath(dir.absolutePath());
-
-    return dir;
-}
-
 } // namespace
 
 QnMediaServerModule::QnMediaServerModule(
@@ -99,11 +93,6 @@ QnMediaServerModule::QnMediaServerModule(
     Q_INIT_RESOURCE(mediaserver_core);
     Q_INIT_RESOURCE(appserver2);
     nx::mediaserver::MetaTypes::initialize();
-
-    store(new QnStaticCommonModule(
-        vms::api::PeerType::server,
-        QnAppInfo::productNameShort(),
-        QnAppInfo::customizationName()));
 
     m_settings = store(new MSSettings(roSettingsPath, rwSettingsPath));
 
@@ -165,14 +154,14 @@ QnMediaServerModule::QnMediaServerModule(
 
     m_context->normalStorageManager.reset(
         new QnStorageManager(
-            commonModule(),
+            this,
             m_analyticsEventsStorage.get(),
             QnServer::StoragePool::Normal
         ));
 
     m_context->backupStorageManager.reset(
         new QnStorageManager(
-            commonModule(),
+            this,
             nullptr,
             QnServer::StoragePool::Backup
         ));
@@ -182,7 +171,7 @@ QnMediaServerModule::QnMediaServerModule(
     store(new nx::vms::common::p2p::downloader::Downloader(
         downloadsDirectory(), commonModule(), nullptr, this));
 
-    m_pluginManager = store(new PluginManager(this, QString(), &m_pluginContainer));
+    m_pluginManager = store(new PluginManager(this, &m_pluginContainer));
     m_pluginManager->loadPlugins(roSettings());
 
     m_metadataRuleWatcher = store(
@@ -208,6 +197,15 @@ QnMediaServerModule::QnMediaServerModule(
 
     // Translations must be installed from the main application thread.
     executeDelayed(&installTranslations, kDefaultDelay, qApp->thread());
+}
+
+QDir QnMediaServerModule::downloadsDirectory() const
+{
+    const QDir dir(settings().dataDir() + lit("/downloads"));
+    if (!dir.exists())
+        QDir().mkpath(dir.absolutePath());
+
+    return dir;
 }
 
 QnMediaServerModule::~QnMediaServerModule()
@@ -328,4 +326,19 @@ QnDataProviderFactory* QnMediaServerModule::dataProviderFactory() const
 QnResourceCommandProcessor* QnMediaServerModule::resourceCommandProcessor() const
 {
     return m_resourceCommandProcessor.data();
+}
+
+QnResourcePool* QnMediaServerModule::resourcePool() const
+{
+    return commonModule()->resourcePool();
+}
+
+QnResourcePropertyDictionary* QnMediaServerModule::propertyDictionary() const
+{
+    return commonModule()->propertyDictionary();
+}
+
+QnCameraHistoryPool* QnMediaServerModule::cameraHistoryPool() const
+{
+    return commonModule()->cameraHistoryPool();
 }

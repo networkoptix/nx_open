@@ -12,7 +12,7 @@
 static const double MIN_FPS = 1.0 / 86400.0; //once per day
 static const double MAX_FPS = 30;
 
-MediaEncoder::MediaEncoder(CameraManager* const cameraManager, 
+MediaEncoder::MediaEncoder(CameraManager* const cameraManager,
                            nxpl::TimeProvider *const timeProvider,
                            int encoderNumber )
 :
@@ -30,6 +30,16 @@ MediaEncoder::~MediaEncoder()
 
 void* MediaEncoder::queryInterface( const nxpl::NX_GUID& interfaceID )
 {
+    if (memcmp(&interfaceID, &nxcip::IID_CameraMediaEncoder4, sizeof(nxcip::IID_CameraMediaEncoder4)) == 0)
+    {
+        addRef();
+        return static_cast<nxcip::CameraMediaEncoder4*>(this);
+    }
+    if (memcmp(&interfaceID, &nxcip::IID_CameraMediaEncoder3, sizeof(nxcip::IID_CameraMediaEncoder3)) == 0)
+    {
+        addRef();
+        return static_cast<nxcip::CameraMediaEncoder3*>(this);
+    }
     if( memcmp( &interfaceID, &nxcip::IID_CameraMediaEncoder2, sizeof(nxcip::IID_CameraMediaEncoder2) ) == 0 )
     {
         addRef();
@@ -58,9 +68,27 @@ unsigned int MediaEncoder::releaseRef()
     return m_refManager.releaseRef();
 }
 
-int MediaEncoder::getMediaUrl( char* urlBuf ) const
+int MediaEncoder::getMediaUrl(char* urlBuf) const
 {
-    strcpy( urlBuf, m_cameraManager->info().url );
+    urlBuf[0] = 0;
+    strcpy(urlBuf, getMediaUrlInternal().toUtf8().constData());
+    return nxcip::NX_NO_ERROR;
+}
+
+QString MediaEncoder::getMediaUrlInternal() const
+{
+    if (!m_mediaUrl.isEmpty())
+        return m_mediaUrl;
+    if (m_encoderNumber == 0)
+        return m_cameraManager->info().url;
+    return QString();
+}
+
+int MediaEncoder::setMediaUrl(const char url[nxcip::MAX_TEXT_LEN])
+{
+    m_mediaUrl = QString::fromUtf8(url);
+    if (m_streamReader)
+        m_streamReader->updateMediaUrl(m_mediaUrl);
     return nxcip::NX_NO_ERROR;
 }
 
@@ -131,7 +159,9 @@ nxcip::StreamReader* MediaEncoder::getLiveStreamReader()
         m_streamReader.reset( new StreamReader(
             &m_refManager,
             m_timeProvider,
-            m_cameraManager->info(),
+            m_cameraManager->info().defaultLogin,
+            m_cameraManager->info().defaultPassword,
+            getMediaUrlInternal(),
             m_currentFps,
             m_encoderNumber ) );
 
@@ -145,8 +175,21 @@ int MediaEncoder::getAudioFormat( nxcip::AudioFormat* audioFormat ) const
     return nxcip::NX_UNSUPPORTED_CODEC;
 }
 
-void MediaEncoder::updateCameraInfo( const nxcip::CameraInfo& info )
+void MediaEncoder::updateCredentials(const QString& login, const QString& password)
 {
-    if( m_streamReader.get() )
-        m_streamReader->updateCameraInfo( info );
+    if(m_streamReader)
+        m_streamReader->updateCredentials(login, password);
+}
+
+int MediaEncoder::getConfiguredLiveStreamReader(
+    nxcip::LiveStreamConfig* /*config*/, nxcip::StreamReader** reader)
+{
+    *reader = getLiveStreamReader();
+    return nxcip::NX_NO_ERROR;
+}
+
+int MediaEncoder::getVideoFormat(
+    nxcip::CompressionType* /*codec*/, nxcip::PixelFormat* /*pixelFormat*/) const
+{
+    return nxcip::NX_NO_ERROR;
 }

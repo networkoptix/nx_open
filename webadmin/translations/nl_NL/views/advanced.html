@@ -158,7 +158,7 @@
 
     <form class="form form-horizontal row" role="form" name="systemSettings" novalidate>
         <div class="form-group" ng-repeat="(setting, value) in systemSettings">
-            <label class="col-sm-6" for="{{setting}}">{{L.settingsConfig[setting] || instelling}}
+            <label class="col-sm-6" for="{{setting}}">{{L.settingsConfig[setting] || setting}}
                     <small ng-if="L.settingsConfig[setting]" class="text-muted">&nbsp;&nbsp;{{setting}}</small>
             </label>
             <div class="col-sm-6">
@@ -182,7 +182,7 @@
                        ng-model="systemSettings[setting]"
                        class="form-control input-sm"/>
 
-                <p ng-if="Config.settingsConfig[setting].type == 'static'" class="form-control-static input-sm" >{{systemSettings[setting] || " lege '}}</p>
+                <p ng-if="Config.settingsConfig[setting].type == 'static'" class="form-control-static input-sm" >{{systemSettings[setting]||'empty'}}</p>
 
                 <div class="has-error" ng-if="Config.settingsConfig[setting].alert">
                     <div class="help-block" ng-bind-html="Config.settingsConfig[setting].alert">

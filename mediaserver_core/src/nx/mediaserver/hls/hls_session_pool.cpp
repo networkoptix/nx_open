@@ -49,6 +49,16 @@ void Session::updateAuditInfo(qint64 timeUsec)
         qnAuditManager->notifyPlaybackInProgress(m_auditHandle, timeUsec);
 }
 
+std::optional<AVCodecID> Session::audioCodecId() const
+{
+    return m_audioCodecId;
+}
+
+void Session::setAudioCodecId(AVCodecID audioCodecId)
+{
+    m_audioCodecId = audioCodecId;
+}
+
 Session::~Session()
 {
     if (m_live)

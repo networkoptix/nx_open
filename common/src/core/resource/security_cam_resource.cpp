@@ -1086,7 +1086,7 @@ void QnSecurityCamResource::setManuallyAdded(bool value)
 
 bool QnSecurityCamResource::isDefaultAuth() const
 {
-    return hasCameraCapabilities(Qn::isDefaultPasswordCapability);
+    return hasCameraCapabilities(Qn::IsDefaultPasswordCapability);
 }
 
 Qn::CameraBackupQualities QnSecurityCamResource::getBackupQualities() const
@@ -1433,9 +1433,9 @@ bool QnSecurityCamResource::setCameraCredentialsSync(
 Qn::MediaStreamEvent QnSecurityCamResource::checkForErrors() const
 {
     const auto capabilities = getCameraCapabilities();
-    if (capabilities.testFlag(Qn::isDefaultPasswordCapability))
+    if (capabilities.testFlag(Qn::IsDefaultPasswordCapability))
         return Qn::MediaStreamEvent::ForbiddenWithDefaultPassword;
-    if (capabilities.testFlag(Qn::isOldFirmwareCapability))
+    if (capabilities.testFlag(Qn::IsOldFirmwareCapability))
         return Qn::MediaStreamEvent::oldFirmware;
     return Qn::MediaStreamEvent::NoEvent;
 }

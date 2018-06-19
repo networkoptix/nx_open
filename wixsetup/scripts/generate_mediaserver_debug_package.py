@@ -17,7 +17,8 @@ def create_mediaserver_debug_file(binaries_dir, output_filename):
         'plugins/hikvision_metadata_plugin.pdb',
         'plugins/axis_metadata_plugin.pdb',
         'plugins/vca_metadata_plugin.pdb',
-        'plugins/image_library_plugin.pdb',
+        'plugins_optional/image_library_plugin.pdb',
+        'plugins_optional/stub_metadata_plugin.pdb',
         'plugins/mjpg_link.pdb']
     zip_files(pdb_filenames, binaries_dir, output_filename, mandatory=False)
 

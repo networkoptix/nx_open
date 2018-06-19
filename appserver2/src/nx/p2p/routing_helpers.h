@@ -7,10 +7,11 @@ namespace p2p {
 
 struct RoutingRecord
 {
-    RoutingRecord() : distance(0) {}
-    RoutingRecord(int distance) : distance(distance) {}
+    RoutingRecord() = default;
+    RoutingRecord(int distance, ec2::ApiPersistentIdData firstVia = ec2::ApiPersistentIdData());
 
-    qint32 distance;
+    qint32 distance = 0;
+    ec2::ApiPersistentIdData firstVia;
 };
 
 typedef QMap<nx::vms::api::PersistentIdData, RoutingRecord> RoutingInfo;
@@ -29,7 +30,7 @@ struct RouteToPeerInfo
 {
     RouteToPeerInfo() {}
 
-    qint32 minDistance(QVector<nx::vms::api::PersistentIdData>* outViaList = nullptr) const;
+    qint32 minDistance(RoutingInfo* outViaList = nullptr) const;
     qint32 distanceVia(const nx::vms::api::PersistentIdData& peer) const;
     const RoutingInfo& routeVia() const { return m_routeVia; }
 
@@ -61,8 +62,8 @@ struct BidirectionRoutingInfo
         const nx::vms::api::PersistentIdData& via,
         const nx::vms::api::PersistentIdData& to,
         const RoutingRecord& record);
-    qint32 distanceTo(const nx::vms::api::PersistentIdData& peer, QVector<nx::vms::api::PersistentIdData>* outVia = nullptr) const;
-    qint32 distanceTo(const QnUuid& peerId, QVector<nx::vms::api::PersistentIdData>* outVia = nullptr) const;
+    qint32 distanceTo(const nx::vms::api::PersistentIdData& peer, RoutingInfo* outVia = nullptr) const;
+    qint32 distanceTo(const QnUuid& peerId, RoutingInfo* outVia = nullptr) const;
     void updateLocalDistance(const nx::vms::api::PersistentIdData& peer, qint32 sequence);
 
     AlivePeersMap alivePeers; //< alive peers in the system. key - route via, value - route to

@@ -10,11 +10,12 @@ import urllib3.exceptions
 from requests.auth import HTTPDigestAuth
 
 import server_api_data_generators as generator
-from framework.api_shortcuts import get_time
+from framework.api_shortcuts import get_time, get_server_id, is_primary_time_server
 from framework.installation.mediaserver import TimePeriod
-from framework.rest_api import HttpError
+from framework.rest_api import HttpError, REST_API_TIMEOUT_SEC
 from framework.utils import log_list
 from framework.waiting import wait_for_true
+from framework.timeless_mediaserver import timeless_mediaserver
 
 _logger = logging.getLogger(__name__)
 
@@ -28,7 +29,8 @@ def test_saved_media_should_appear_after_archive_is_rebuilt(one_running_mediaser
     server.add_camera(camera)
     server.storage.save_media_sample(camera, start_time, sample_media_file)
     server.rebuild_archive()
-    assert one_running_mediaserver.get_recorded_time_periods(camera) == [TimePeriod(start_time, sample_media_file.duration)]
+    assert (server.get_recorded_time_periods(camera) ==
+            [TimePeriod(start_time, sample_media_file.duration)])
 
 
 # https://networkoptix.atlassian.net/browse/VMS-3911
@@ -170,12 +172,12 @@ def test_remove_child_resources(one_running_mediaserver):
 def test_http_header_server(one_running_mediaserver):
     url = one_running_mediaserver.api.url('ec2/testConnection')
     valid_auth = HTTPDigestAuth(one_running_mediaserver.api.user, one_running_mediaserver.api.password)
-    response = requests.get(url, auth=valid_auth)
+    response = requests.get(url, auth=valid_auth, timeout=REST_API_TIMEOUT_SEC)
     _logger.debug('%r headers: %s', one_running_mediaserver, response.headers)
     assert response.status_code == 200
     assert 'Server' in response.headers.keys(), "HTTP header 'Server' is expected"
     invalid_auth = HTTPDigestAuth('invalid', 'invalid')
-    response = requests.get(url, auth=invalid_auth)
+    response = requests.get(url, auth=invalid_auth, timeout=REST_API_TIMEOUT_SEC)
     _logger.debug('%r headers: %s', one_running_mediaserver, response.headers)
     assert response.status_code == 401
     assert 'WWW-Authenticate' in response.headers.keys(), "HTTP header 'WWW-Authenticate' is expected"
@@ -195,48 +197,56 @@ def test_static_vulnerability(one_running_mediaserver):
 
 
 # https://networkoptix.atlassian.net/browse/VMS-7775
-def test_auth_with_time_changed(timeless_server):
-    url = timeless_server.api.url('ec2/getCurrentTime')
+def test_auth_with_time_changed(one_vm, mediaserver_installers, ca, artifact_factory):
+    with timeless_mediaserver(one_vm, mediaserver_installers, ca, artifact_factory) as timeless_server:
+        timeless_guid = get_server_id(timeless_server.api)
+        timeless_server.api.ec2.forcePrimaryTimeServer.POST(id=timeless_guid)
+        assert is_primary_time_server(timeless_server.api)
+        url = timeless_server.api.url('ec2/testConnection')
 
-    timeless_server.os_access.set_time(datetime.now(pytz.utc))
-    wait_for_true(
-        lambda: get_time(timeless_server.api).is_close_to(datetime.now(pytz.utc)),
-        "time on {} is close to now".format(timeless_server))
+        timeless_server.os_access.set_time(datetime.now(pytz.utc))
+        wait_for_true(
+            lambda: get_time(timeless_server.api).is_close_to(datetime.now(pytz.utc)),
+            "time on {} is close to now".format(timeless_server))
 
-    shift = timedelta(days=3)
+        shift = timedelta(days=3)
 
-    response = requests.get(url, auth=HTTPDigestAuth(timeless_server.api.user, timeless_server.api.password))
-    authorization_header_value = response.request.headers['Authorization']
-    _logger.info(authorization_header_value)
-    response = requests.get(url, headers={'Authorization': authorization_header_value})
-    response.raise_for_status()
+        response = requests.get(url, auth=HTTPDigestAuth(timeless_server.api.user, timeless_server.api.password))
+        authorization_header_value = response.request.headers['Authorization']
+        _logger.info(authorization_header_value)
+        response = requests.get(url, headers={'Authorization': authorization_header_value})
+        response.raise_for_status()
 
-    timeless_server.os_access.set_time(datetime.now(pytz.utc) + shift)
-    wait_for_true(
-        lambda: get_time(timeless_server.api).is_close_to(datetime.now(pytz.utc) + shift),
-        "time on {} is close to now + {}".format(timeless_server, shift))
+        timeless_server.os_access.set_time(datetime.now(pytz.utc) + shift)
+        wait_for_true(
+            lambda: get_time(timeless_server.api).is_close_to(datetime.now(pytz.utc) + shift),
+            "time on {} is close to now + {}".format(timeless_server, shift))
 
-    response = requests.get(url, headers={'Authorization': authorization_header_value})
-    assert response.status_code != 401, "Cannot authenticate after time changed on server"
-    response.raise_for_status()
+        response = requests.get(url, headers={'Authorization': authorization_header_value})
+        assert response.status_code != 401, "Cannot authenticate after time changed on server"
+        response.raise_for_status()
 
-    assert not timeless_server.installation.list_core_dumps()
+        assert not timeless_server.installation.list_core_dumps()
 
 
-def test_uptime_is_monotonic(timeless_server):
-    timeless_server.os_access.set_time(datetime.now(pytz.utc))
-    first_uptime = timeless_server.api.api.statistics.GET()['uptimeMs']
-    if not isinstance(first_uptime, (int, float)):
-        _logger.warning("Type of uptimeMs is %s but expected to be numeric.", type(first_uptime).__name__)
-    new_time = timeless_server.os_access.set_time(datetime.now(pytz.utc) - timedelta(minutes=1))
-    wait_for_true(
-        lambda: get_time(timeless_server.api).is_close_to(new_time),
-        "time on {} is close to {}".format(timeless_server, new_time))
-    second_uptime = timeless_server.api.api.statistics.GET()['uptimeMs']
-    if not isinstance(first_uptime, (int, float)):
-        _logger.warning("Type of uptimeMs is %s but expected to be numeric.", type(second_uptime).__name__)
-    assert float(first_uptime) < float(second_uptime)
-    assert not timeless_server.installation.list_core_dumps()
+def test_uptime_is_monotonic(one_vm, mediaserver_installers, ca, artifact_factory):
+    with timeless_mediaserver(one_vm, mediaserver_installers, ca, artifact_factory) as timeless_server:
+        timeless_guid = get_server_id(timeless_server.api)
+        timeless_server.api.ec2.forcePrimaryTimeServer.POST(id=timeless_guid)
+        assert is_primary_time_server(timeless_server.api)
+        timeless_server.os_access.set_time(datetime.now(pytz.utc))
+        first_uptime = timeless_server.api.api.statistics.GET()['uptimeMs']
+        if not isinstance(first_uptime, (int, float)):
+            _logger.warning("Type of uptimeMs is %s but expected to be numeric.", type(first_uptime).__name__)
+        new_time = timeless_server.os_access.set_time(datetime.now(pytz.utc) - timedelta(minutes=1))
+        wait_for_true(
+            lambda: get_time(timeless_server.api).is_close_to(new_time),
+            "time on {} is close to {}".format(timeless_server, new_time))
+        second_uptime = timeless_server.api.api.statistics.GET()['uptimeMs']
+        if not isinstance(first_uptime, (int, float)):
+            _logger.warning("Type of uptimeMs is %s but expected to be numeric.", type(second_uptime).__name__)
+        assert float(first_uptime) < float(second_uptime)
+        assert not timeless_server.installation.list_core_dumps()
 
 
 def test_frequent_restarts(one_running_mediaserver):
@@ -260,11 +270,11 @@ def test_non_existent_api_endpoints(one_running_mediaserver, path):
     assert not one_running_mediaserver.installation.list_core_dumps()
 
 
-def test_https_verification(one_running_mediaserver):
+def test_https_verification(one_running_mediaserver, ca):
     url = one_running_mediaserver.api.url('/api/ping', secure=True)
     assert url.startswith('https://')
     with warnings.catch_warnings(record=True) as warning_list:
-        response = requests.get(url, verify=str(one_running_mediaserver.api.ca_cert))
+        response = requests.get(url, verify=str(ca.cert_path))
     assert response.status_code == 200
     for warning in warning_list:
         _logger.warning("Warning collected: %s.", warning)

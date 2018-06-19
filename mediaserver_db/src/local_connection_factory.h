@@ -12,25 +12,27 @@
 
 #include "ec2_connection.h"
 #include "settings.h"
+#include <nx/time_sync/time_sync_manager.h>
+#include <nx/vms/network/abstract_server_connector.h>
+#include <nx/vms/network/reverse_connection_manager.h>
 
 namespace ec2 {
 
 struct ServerQueryProcessorAccess;
 class QnDistributedMutexManager;
 
-// TODO: #2.4 remove Ec2 prefix to avoid ec2::LocalConnectionFactory
-class LocalConnectionFactory :
-    public AbstractECConnectionFactory,
-    public QnStoppable,
-    public QnJoinable
+class LocalConnectionFactory:
+	public AbstractECConnectionFactory,
+	public QnStoppable,
+	public QnJoinable
 {
 public:
     LocalConnectionFactory(
         QnCommonModule* commonModule,
         nx::vms::api::PeerType peerType,
-        nx::utils::TimerManager* const timerManager,
-        bool isP2pMode);
-
+        bool isP2pMode,
+        QnHttpConnectionListener* tcpListener);
+		
     virtual ~LocalConnectionFactory();
 
     virtual void pleaseStop() override;
@@ -60,25 +62,27 @@ public:
 
     TransactionMessageBusAdapter* messageBus() const;
     QnDistributedMutexManager* distributedMutex() const;
-    virtual TimeSynchronizationManager* timeSyncManager() const override;
+    virtual nx::time_sync::TimeSyncManager* timeSyncManager() const override;
 
     QnJsonTransactionSerializer* jsonTranSerializer() const;
     QnUbjsonTransactionSerializer* ubjsonTranSerializer() const;
     virtual void shutdown() override;
-
+    nx::vms::network::ReverseConnectionManager* serverConnector() const;
+	
 private:
     QnMutex m_mutex;
     Settings m_settingsInstance;
 
     std::unique_ptr<QnJsonTransactionSerializer> m_jsonTranSerializer;
     std::unique_ptr<QnUbjsonTransactionSerializer> m_ubjsonTranSerializer;
+    std::unique_ptr<nx::vms::network::ReverseConnectionManager> m_serverConnector;
+    std::unique_ptr<nx::time_sync::TimeSyncManager> m_timeSynchronizationManager;
 
     std::unique_ptr<detail::QnDbManager> m_dbManager;
     std::unique_ptr<QnTransactionLog> m_transactionLog;
     std::unique_ptr<TransactionMessageBusAdapter> m_bus;
 
     std::shared_ptr<ServerQueryProcessorAccess> m_serverQueryProcessor;
-    std::unique_ptr<TimeSynchronizationManager> m_timeSynchronizationManager;
     std::unique_ptr<QnDistributedMutexManager> m_distributedMutexManager;
     bool m_terminated;
     int m_runningRequests;
@@ -87,6 +91,7 @@ private:
     Ec2DirectConnectionPtr m_directConnection;
     bool m_p2pMode = false;
 private:
+
     int establishDirectConnection(const nx::utils::Url& url, impl::ConnectHandlerPtr handler);
 
     void tryConnectToOldEC(const nx::utils::Url& ecUrl, impl::ConnectHandlerPtr handler, int reqId);

@@ -284,7 +284,7 @@ bool QnPtzManageDialog::isValid() const
 void QnPtzManageDialog::updateCanSaveCurrentPosition()
 {
     const auto condition = action::condition::canSavePtzPosition();
-    const auto parameters = action::Parameters({m_widget.data()});
+    const auto parameters = action::Parameters(m_widget.data());
     ui->savePositionButton->setEnabled(isValid()
         && condition->check(parameters, context()) == action::EnabledAction);
 }

@@ -8,7 +8,7 @@ namespace controller {
 
 namespace {
 
-boost::optional<network::HostAddress> publicAddress()
+std::optional<network::HostAddress> publicAddress()
 {
     network::PublicIPDiscovery ipDiscovery;
 
@@ -19,7 +19,7 @@ boost::optional<network::HostAddress> publicAddress()
     if (!addr.isNull())
         return network::HostAddress(addr.toString());
 
-    return boost::none;
+    return std::nullopt;
 }
 
 } // namespace
@@ -31,7 +31,7 @@ void PublicIpDiscoveryService::setDiscoverFunc(DiscoverFunc func)
     discoverFunc.swap(func);
 }
 
-boost::optional<network::HostAddress> PublicIpDiscoveryService::get()
+std::optional<network::HostAddress> PublicIpDiscoveryService::get()
 {
     if (discoverFunc)
         return discoverFunc();

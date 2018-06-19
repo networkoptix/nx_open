@@ -289,17 +289,6 @@ bool QnTransactionMessageBus::processSpecialTransaction(
         case ApiCommand::peerAliveInfo:
             onGotServerAliveInfo(tran, sender, transportHeader);
             return true; //< Do not proxy. This call contains built in proxy.
-        case ApiCommand::forcePrimaryTimeServer:
-            if (m_timeSyncManager)
-                m_timeSyncManager->onGotPrimariTimeServerTran(tran);
-            break;
-        case ApiCommand::broadcastPeerSyncTime:
-            if (m_timeSyncManager)
-                m_timeSyncManager->resyncTimeWithPeer(tran.peerID);
-            return true; //< Do not proxy.
-        case ApiCommand::broadcastPeerSystemTime:
-        case ApiCommand::getKnownPeersSystemTime:
-            return true; //< Ignore deprecated transactions.
         case ApiCommand::runtimeInfoChanged:
             if (!onGotServerRuntimeInfo(tran, sender, transportHeader))
                 return true; //< Already processed. Do not proxy and ignore the transaction.

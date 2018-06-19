@@ -13,11 +13,9 @@ add_subdirectory(dw_mtt_metadata_plugin)
 
 add_subdirectory(ssc_metadata_plugin)
 
-if (targetDevice STREQUAL "tx1")
+if(targetDevice STREQUAL "tx1")
     add_subdirectory(deepstream_metadata_plugin)
 endif()
 
-if(withPluginStubs)
-    add_subdirectory(stub_metadata_plugin)
-endif()
+add_subdirectory(stub_metadata_plugin)
 

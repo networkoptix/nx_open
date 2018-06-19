@@ -42,6 +42,7 @@
 #include <nx_ec/data/api_conversion_functions.h>
 
 #include <nx/network/socket_common.h>
+#include <nx/time_sync/time_sync_manager.h>
 #include <nx/vms/api/data/access_rights_data.h>
 #include <nx/vms/api/data/event_rule_data.h>
 #include <nx/vms/api/data/license_data.h>
@@ -64,6 +65,7 @@ void QnCommonMessageProcessor::init(const ec2::AbstractECConnectionPtr& connecti
     if (m_connection) {
         /* Safety check in case connection will not be deleted instantly. */
         m_connection->stopReceivingNotifications();
+        qnSyncTime->setTimeNotificationManager(nullptr);
         disconnectFromConnection(m_connection);
     }
     m_connection = connection;
@@ -71,6 +73,7 @@ void QnCommonMessageProcessor::init(const ec2::AbstractECConnectionPtr& connecti
     if (!connection)
         return;
 
+    qnSyncTime->setTimeNotificationManager(connection->getTimeNotificationManager());
     connectToConnection(connection);
     connection->startReceivingNotifications();
 }
@@ -753,20 +756,11 @@ void QnCommonMessageProcessor::resetCamerasWithArchiveList(
 
 void QnCommonMessageProcessor::resetTime()
 {
-    qnSyncTime->reset();
-
     if (!m_connection)
         return;
 
-    auto timeManager = m_connection->getTimeManager(Qn::kSystemAccess);
-    timeManager->getCurrentTime(this, [this](int /*handle*/, ec2::ErrorCode errCode, qint64 syncTime)
-    {
-        const auto& runtimeManager = runtimeInfoManager();
-        if (errCode != ec2::ErrorCode::ok || !m_connection)
-            return;
-
-        emit syncTimeChanged(syncTime);
-    });
+    auto timeManager = m_connection->timeSyncManager();
+    emit syncTimeChanged(timeManager->getSyncTime().count());
 }
 
 void QnCommonMessageProcessor::resetEventRules(const nx::vms::api::EventRuleDataList& eventRules)

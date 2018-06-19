@@ -20,7 +20,7 @@ nx::network::RetryPolicy kReconnectPolicy(
 class DiscoveryTest: public testing::Test
 {
 protected:
-    typedef nx::utils::test::ModuleLauncher<::ec2::Appserver2ProcessPublic> MediaServer;
+    typedef nx::utils::test::ModuleLauncher<::ec2::Appserver2Process> MediaServer;
 
     void addServer()
     {
@@ -48,7 +48,7 @@ protected:
         m_servers.emplace(module->commonModule()->moduleGUID(), std::move(server));
     }
 
-    void initServerData(::ec2::Appserver2ProcessPublic* module)
+    void initServerData(::ec2::Appserver2Process* module)
     {
         QnSoftwareVersion version(1, 2, 3, 123);
         const auto connection = module->ecConnection();

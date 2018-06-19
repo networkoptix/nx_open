@@ -75,9 +75,6 @@
 #include <ui/graphics/view/graphics_view.h>
 #include <ui/graphics/opengl/gl_hardware_checker.h>
 
-#include <ui/workaround/gl_widget_factory.h>
-#include <ui/workaround/gl_widget_workaround.h>
-
 #include <ui/style/skin.h>
 #include <ui/style/globals.h>
 
@@ -480,7 +477,7 @@ void QnWorkbenchDisplay::deinitSceneView()
 
 QGLWidget *QnWorkbenchDisplay::newGlWidget(QWidget *parent, Qt::WindowFlags windowFlags) const
 {
-    return QnGlWidgetFactory::create<QnGLWidget>(parent, windowFlags);
+    return new QGLWidget(parent, nullptr, windowFlags);
 }
 
 QSet<QnWorkbenchItem*> QnWorkbenchDisplay::draggedItems() const

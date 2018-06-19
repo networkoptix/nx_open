@@ -34,14 +34,14 @@ public:
         Qt::WindowFlags windowFlags = {});
     virtual ~LayoutSelectionDialog() override;
 
-    // Mode for selecting local layout
+    // Mode for selecting local layout.
     enum LocalLayoutSelection
     {
         // Can select any layout.
         ModeFull,
         // Show selected layout, but clear selection if user picks shared one.
         ModeLimited,
-        // No local layouts are displayed
+        // No local layouts are displayed.
         ModeHideLocal,
     };
 
@@ -61,7 +61,8 @@ public:
     QSet<QnUuid> checkedLayouts() const;
 
 signals:
-    void layoutsChanged(); //< Selection or contents were changed. Potential alert must be re-evaluated.
+    // Selection or contents were changed. Potential alert must be re-evaluated.
+    void layoutsChanged();
 
 private:
     void at_localLayoutSelected();
@@ -76,7 +77,7 @@ private:
     QPointer<QnResourceListModel> m_sharedLayoutsModel;
     const bool m_singlePick;
 
-    LocalLayoutSelection m_localSelectionMode;
+    LocalLayoutSelection m_localSelectionMode = ModeFull;
 };
 
 } // namespace desktop

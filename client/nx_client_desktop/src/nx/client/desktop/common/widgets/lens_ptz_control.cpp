@@ -33,18 +33,18 @@ namespace {
 
     const QString kNormalIcons[] =
     {
-        lit("buttons/arrow_left.png"),
-        lit("buttons/arrow_right.png"),
-        lit("buttons/arrow_up.png"),
-        lit("buttons/arrow_down.png"),
+        lit("text_buttons/arrow_left.png"),
+        lit("text_buttons/arrow_right.png"),
+        lit("text_buttons/arrow_up.png"),
+        lit("text_buttons/arrow_down.png"),
     };
 
     const QString kHoveredIcons[] =
     {
-        lit("buttons/arrow_left_hovered.png"),
-        lit("buttons/arrow_right_hovered.png"),
-        lit("buttons/arrow_up_hovered.png"),
-        lit("buttons/arrow_down_hovered.png"),
+        lit("text_buttons/arrow_left_hovered.png"),
+        lit("text_buttons/arrow_right_hovered.png"),
+        lit("text_buttons/arrow_up_hovered.png"),
+        lit("text_buttons/arrow_down_hovered.png"),
     };
 
     inline qreal length(const QPointF& point)

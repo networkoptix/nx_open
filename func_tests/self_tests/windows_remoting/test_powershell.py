@@ -7,10 +7,10 @@ import pytest
 from framework.os_access.windows_remoting._cmd import receive_stdout_and_stderr_until_done
 from framework.os_access.windows_remoting._powershell import (
     PowershellError,
-    format_script,
     run_powershell_script,
     start_raw_powershell_script,
     )
+from framework.os_access.windows_power_shell_utils import power_shell_augment_script
 
 _logger = logging.getLogger(__name__)
 
@@ -62,7 +62,7 @@ def test_format_script():
             ConvertTo-Json @( 'fail', $ExceptionInfo )
         }
         ''').strip()
-    assert format_script(body, variables) == expected_formatted_script
+    assert power_shell_augment_script(body, variables) == expected_formatted_script
 
 
 def test_run_script(winrm_shell):

@@ -71,6 +71,7 @@ QnToolTipSlider::QnToolTipSlider(QGraphicsItem* parent):
     setAcceptHoverEvents(true);
 
     setFlag(ItemSendsScenePositionChanges, true);
+    setTooltipMargin(QnSliderTooltipWidget::kToolTipMargin);
 }
 
 QnToolTipSlider::~QnToolTipSlider()

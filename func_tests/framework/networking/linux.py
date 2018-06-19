@@ -6,18 +6,26 @@ from netaddr import EUI
 
 from framework.method_caching import cached_property
 from framework.networking.interface import Networking
-from framework.os_access.exceptions import NonZeroExitStatus, exit_status_error_cls
+from framework.os_access.exceptions import exit_status_error_cls
 from framework.os_access.posix_shell import SSH
 from framework.waiting import wait_for_true
 
 _logger = logging.getLogger(__name__)  # TODO: Rename all such vars to `_logger`.
 
+_iptables_rules = [
+    'OUTPUT -m state --state RELATED,ESTABLISHED -j ACCEPT',
+    'OUTPUT -o lo -j ACCEPT',
+    'OUTPUT -d 10.0.0.0/8 -j ACCEPT',
+    'OUTPUT -d 192.168.0.0/16 -j ACCEPT',
+    'OUTPUT -j REJECT',
+    ]
+
 
 class LinuxNetworking(Networking):
-    def __init__(self, ssh_access, macs):
+    def __init__(self, ssh, macs):
         super(LinuxNetworking, self).__init__()
         self._macs = macs
-        self._ssh = ssh_access  # type: SSH
+        self._ssh = ssh  # type: SSH
 
     @cached_property  # TODO: Use cached_getter.
     def interfaces(self):
@@ -51,11 +59,6 @@ class LinuxNetworking(Networking):
                 sysctl net.ipv4.ip_forward=0
                 iptables -F
                 iptables -t nat -F
-                iptables -A OUTPUT -m state --state RELATED,ESTABLISHED -j ACCEPT
-                iptables -A OUTPUT -o lo -j ACCEPT
-                iptables -A OUTPUT -d 10.0.0.0/8 -j ACCEPT
-                iptables -A OUTPUT -d 192.168.0.0/16 -j ACCEPT
-                iptables -A OUTPUT -j REJECT
                 ''',
             env={'AVAILABLE_INTERFACES': '\n'.join(self.interfaces.values())})
 
@@ -76,22 +79,36 @@ class LinuxNetworking(Networking):
             ['ip', 'route', 'replace', destination_ip_net, 'dev', interface, 'via', gateway_ip, 'proto', 'static'])
 
     def enable_internet(self):
-        while True:
-            try:
-                self._ssh.run_command(['iptables', '-D', 'OUTPUT', '-j', 'REJECT'])
-            except NonZeroExitStatus:
-                _logger.debug("No more internet restricting rules in iptables.")
-                break
+        rules_in_order = reversed(_iptables_rules)  # Mind `reversed` or get locked!
+        rules_input = '\n'.join(rules_in_order) + '\n'  # Mind '\n': or last
+        self._ssh.run_sh_script(
+            # language=Bash
+            '''
+                while read -r rule; do
+                    # Rules are deleted until they are present.
+                    while iptables -D $rule; do :; done
+                done
+                ''',
+            input=rules_input)
         global_ip = '8.8.8.8'
         wait_for_true(
             lambda: self.can_reach(global_ip),
             "internet on {} is on ({} is reachable)".format(self, global_ip))
 
     def disable_internet(self):
-        try:
-            self._ssh.run_command(['iptables', '-C', 'OUTPUT', '-j', 'REJECT'])
-        except NonZeroExitStatus:
-            self._ssh.run_command(['iptables', '-A', 'OUTPUT', '-j', 'REJECT'])
+        rules_in_order = _iptables_rules  # Mind order or get locked!
+        rules_input = '\n'.join(rules_in_order) + '\n'  # Mind '\n': or last
+        self._ssh.run_sh_script(
+            # language=Bash
+            '''
+                while read -r rule; do
+                    # Don't add duplicate rules although it's matter of perfectionism.
+                    if ! iptables -C $rule ; then
+                        iptables -A $rule
+                    fi
+                done
+                ''',
+            input=rules_input)
         global_ip = '8.8.8.8'
         wait_for_true(
             lambda: not self.can_reach(global_ip),

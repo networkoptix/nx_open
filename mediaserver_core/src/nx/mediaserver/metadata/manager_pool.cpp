@@ -60,7 +60,7 @@ using namespace nx::debugging;
 using PixelFormat = UncompressedVideoFrame::PixelFormat;
 
 ManagerPool::ManagerPool(QnMediaServerModule* serverModule):
-    m_serverModule(serverModule),
+    nx::mediaserver::ServerModuleAware(serverModule),
     m_visualMetadataDebugger(
         VisualMetadataDebuggerFactory::makeDebugger(DebuggerType::managerPool)),
     m_thread(new QThread(this))
@@ -87,7 +87,7 @@ void ManagerPool::stop()
 void ManagerPool::init()
 {
     NX_DEBUG(this, lit("Initializing metadata manager pool."));
-    auto resourcePool = m_serverModule->commonModule()->resourcePool();
+    auto resourcePool = commonModule()->resourcePool();
 
     connect(
         resourcePool, &QnResourcePool::resourceAdded,
@@ -98,7 +98,7 @@ void ManagerPool::init()
         this, &ManagerPool::at_resourceRemoved);
 
     connect(
-        qnServerModule->metadataRuleWatcher(), &EventRuleWatcher::rulesUpdated,
+        serverModule()->metadataRuleWatcher(), &EventRuleWatcher::rulesUpdated,
         this, &ManagerPool::at_rulesUpdated);
 
     QMetaObject::invokeMethod(this, "initExistingResources");
@@ -106,9 +106,9 @@ void ManagerPool::init()
 
 void ManagerPool::initExistingResources()
 {
-    auto resourcePool = m_serverModule->commonModule()->resourcePool();
+    auto resourcePool = commonModule()->resourcePool();
     const auto mediaServer = resourcePool->getResourceById<QnMediaServerResource>(
-        m_serverModule->commonModule()->moduleGUID());
+        commonModule()->moduleGUID());
 
     const auto cameras = resourcePool->getAllCameras(
         mediaServer,
@@ -189,18 +189,17 @@ void ManagerPool::at_rulesUpdated(const QSet<QnUuid>& affectedResources)
 
     for (const auto& resourceId: affectedResources)
     {
-        auto resource = m_serverModule
-            ->commonModule()
-            ->resourcePool()
-            ->getResourceById(resourceId);
-
-        handleResourceChanges(resource);
+        auto resource = resourcePool()->getResourceById(resourceId);
+        if (!resource)
+            releaseResourceCameraManagersUnsafe(resourceId);
+        else
+            handleResourceChanges(resource);
     }
 }
 
 ManagerPool::PluginList ManagerPool::availablePlugins() const
 {
-    auto pluginManager = qnServerModule->pluginManager();
+    auto pluginManager = serverModule()->pluginManager();
     NX_ASSERT(pluginManager, lit("Cannot access PluginManager instance"));
     if (!pluginManager)
         return PluginList();
@@ -358,18 +357,15 @@ void ManagerPool::createCameraManagersForResourceUnsafe(const QnSecurityCamResou
                 return;
         }
     }
-    QnMediaServerResourcePtr server = m_serverModule
-        ->commonModule()
-        ->resourcePool()
-        ->getResourceById<QnMediaServerResource>(
-            m_serverModule->commonModule()->moduleGUID());
+    QnMediaServerResourcePtr server = commonModule()->resourcePool()
+        ->getResourceById<QnMediaServerResource>(commonModule()->moduleGUID());
     NX_ASSERT(server, lm("Can not obtain current server resource."));
     if (!server)
         return;
 
     for (Plugin* const plugin: availablePlugins())
     {
-        const QString& pluginLibName = qnServerModule->pluginManager()->pluginLibName(plugin);
+        const QString& pluginLibName = serverModule()->pluginManager()->pluginLibName(plugin);
 
         // TODO: Consider assigning plugin settings earlier.
         setPluginDeclaredSettings(plugin, pluginLibName);
@@ -453,10 +449,15 @@ CameraManager* ManagerPool::createCameraManager(
 
 void ManagerPool::releaseResourceCameraManagersUnsafe(const QnSecurityCamResourcePtr& camera)
 {
+    releaseResourceCameraManagersUnsafe(camera->getId());
+}
+
+void ManagerPool::releaseResourceCameraManagersUnsafe(const QnUuid& cameraId)
+{
     if (ini().enablePersistentMetadataManager)
         return;
 
-    auto& context = m_contexts[camera->getId()];
+    auto& context = m_contexts[cameraId];
     context.clearManagers();
     context.setManagersInitialized(false);
 }
@@ -484,6 +485,10 @@ MetadataHandler* ManagerPool::createMetadataHandler(
 
 void ManagerPool::handleResourceChanges(const QnResourcePtr& resource)
 {
+    NX_ASSERT(resource);
+    if (!resource)
+        return;
+
     NX_VERBOSE(
         this,
         lm("Handling resource changes for resource %1 (%2)")
@@ -491,9 +496,7 @@ void ManagerPool::handleResourceChanges(const QnResourcePtr& resource)
 
     auto camera = resource.dynamicCast<QnSecurityCamResource>();
     if (!camera)
-    {
         return;
-    }
 
     {
         NX_DEBUG(
@@ -509,7 +512,7 @@ void ManagerPool::handleResourceChanges(const QnResourcePtr& resource)
     {
         if (!context.isManagerInitialized())
             createCameraManagersForResourceUnsafe(camera);
-        auto events = qnServerModule->metadataRuleWatcher()->watchedEventsForResource(resourceId);
+        auto events = serverModule()->metadataRuleWatcher()->watchedEventsForResource(resourceId);
         fetchMetadataForResourceUnsafe(resourceId, context, events);
     }
     else

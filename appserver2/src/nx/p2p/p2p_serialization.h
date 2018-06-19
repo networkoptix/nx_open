@@ -17,8 +17,8 @@ PeerNumberType deserializeCompressPeerNumber(BitStreamReader& reader);
 void serializeCompressedSize(BitStreamWriter& writer, quint32 size);
 quint32 deserializeCompressedSize(BitStreamReader& reader);
 
-QByteArray serializePeersMessage(const QVector<PeerDistanceRecord>& records, int reservedSpaceAtFront = 1);
-QVector<PeerDistanceRecord> deserializePeersMessage(const QByteArray& data, bool* success);
+QByteArray serializePeersMessage(const std::vector<PeerDistanceRecord>& records, int reservedSpaceAtFront = 1);
+std::vector<PeerDistanceRecord> deserializePeersMessage(const QByteArray& data, bool* success);
 
 QByteArray serializeCompressedPeers(const QVector<PeerNumberType>& peers, int reservedSpaceAtFront = 1);
 QVector<PeerNumberType> deserializeCompressedPeers(const QByteArray& data, bool* success);

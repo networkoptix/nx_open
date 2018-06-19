@@ -381,10 +381,10 @@ public:
     {
         QSize buttonSize(30, 30);
 
-        const QString kIconCw(lit("buttons/rotate_cw.png"));
-        const QString kIconCwHovered(lit("buttons/rotate_cw_hovered.png"));
-        const QString kIconCcw(lit("buttons/rotate_ccw.png"));
-        const QString kIconCcwHovered(lit("buttons/rotate_ccw_hovered.png"));
+        const QString kIconCw(lit("text_buttons/rotate_cw.png"));
+        const QString kIconCwHovered(lit("text_buttons/rotate_cw_hovered.png"));
+        const QString kIconCcw(lit("text_buttons/rotate_ccw.png"));
+        const QString kIconCcwHovered(lit("text_buttons/rotate_ccw_hovered.png"));
 
         // Central widget is here.
         const auto ptzrContainer = new QVBoxLayout();

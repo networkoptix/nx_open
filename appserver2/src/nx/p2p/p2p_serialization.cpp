@@ -89,7 +89,7 @@ QString toString(MessageType value)
 }
 
 QByteArray serializePeersMessage(
-    const QVector<PeerDistanceRecord>& records,
+    const std::vector<PeerDistanceRecord>& records,
     int reservedSpaceAtFront)
 {
     QByteArray result;
@@ -108,9 +108,15 @@ QByteArray serializePeersMessage(
             const bool isOnline = record.distance < kMaxOnlineDistance;
             writer.putBit(isOnline);
             if (isOnline)
+            {
                 NALUnit::writeUEGolombCode(writer, record.distance);
+                if (record.distance > 0)
+                    NALUnit::writeUEGolombCode(writer, record.firstVia);
+            }
             else
+            {
                 writer.putBits(32, record.distance);
+            }
         }
         writer.flushBits(true);
         result.truncate(writer.getBytesCount());
@@ -122,9 +128,9 @@ QByteArray serializePeersMessage(
     }
 }
 
-QVector<PeerDistanceRecord> deserializePeersMessage(const QByteArray& data, bool* success)
+std::vector<PeerDistanceRecord> deserializePeersMessage(const QByteArray& data, bool* success)
 {
-    QVector<PeerDistanceRecord> result;
+    std::vector<PeerDistanceRecord> result;
     BitStreamReader reader((const quint8*)data.data(), data.size());
     try
     {
@@ -134,11 +140,18 @@ QVector<PeerDistanceRecord> deserializePeersMessage(const QByteArray& data, bool
             PeerNumberType peerNumber = deserializeCompressPeerNumber(reader);
             bool isOnline = reader.getBit();
             qint32 distance = 0;
+            PeerNumberType firstVia = kUnknownPeerNumnber;
             if (isOnline)
+            {
                 distance = NALUnit::extractUEGolombCode(reader); // todo: move function to another place
+                if (distance > 0)
+                    firstVia = NALUnit::extractUEGolombCode(reader);
+            }
             else
+            {
                 distance = reader.getBits(32);
-            result.push_back(PeerDistanceRecord(peerNumber, distance));
+            }
+            result.emplace_back(PeerDistanceRecord{peerNumber, distance, firstVia});
         }
     }
     catch (const BitStreamException&)
@@ -210,7 +223,7 @@ QVector<SubscribeRecord> deserializeSubscribeRequest(const QByteArray& data, boo
         {
             PeerNumberType peer = reader.getBits(16);
             qint32 sequence = reader.getBits(32);
-            result.push_back(SubscribeRecord(peer, sequence));
+            result.push_back({peer, sequence});
         }
         *success = true;
     }
@@ -304,8 +317,8 @@ QList<QByteArray> deserializeTransactionList(const QByteArray& tranList, bool* s
         while (reader.bitsLeft() > 0)
         {
             quint32 size = deserializeCompressedSize(reader);
-            int offset = reader.getBitsCount() / 8;
-            if (int(offset + size) > tranList.size())
+            unsigned int offset = reader.getBitsCount() / 8;
+            if (offset + size > tranList.size())
             {
                 *success = false;
                 return result;

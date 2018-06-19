@@ -1,6 +1,7 @@
 #pragma once
 
 #include <QtCore/QThread>
+#include <QtNetwork/QHostAddress>
 
 #include <common/common_module_aware.h>
 #include "connection_guard_shared_state.h"
@@ -35,7 +36,8 @@ namespace ec2
         virtual QSet<QnUuid> directlyConnectedClientPeers() const = 0;
         virtual QSet<QnUuid> directlyConnectedServerPeers() const = 0;
 
-        virtual QnUuid routeToPeerVia(const QnUuid& dstPeer, int* distance) const = 0;
+        virtual QnUuid routeToPeerVia(
+            const QnUuid& dstPeer, int* distance, nx::network::SocketAddress* knownPeerAddress) const = 0;
         virtual int distanceToPeer(const QnUuid& dstPeer) const = 0;
 
         virtual void addOutgoingConnectionToPeer(const QnUuid& id, const nx::utils::Url& url) = 0;
@@ -52,7 +54,6 @@ namespace ec2
         virtual QnUbjsonTransactionSerializer* ubjsonTranSerializer() const = 0;
 
         virtual ConnectionGuardSharedState* connectionGuardSharedState() = 0;
-        virtual void setTimeSyncManager(TimeSynchronizationManager* timeSyncManager) = 0;
 
     signals:
         void peerFound(QnUuid data, nx::vms::api::PeerType peerType);

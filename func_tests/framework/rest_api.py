@@ -22,7 +22,7 @@ from requests.auth import HTTPDigestAuth
 DEFAULT_API_USER = 'admin'
 DEFAULT_API_PASSWORD = 'admin'
 STANDARD_PASSWORDS = [DEFAULT_API_PASSWORD, 'qweasd123']  # do not mask these passwords in log files
-REST_API_TIMEOUT = datetime.timedelta(seconds=20)
+REST_API_TIMEOUT_SEC = 20
 MAX_CONTENT_LEN_TO_LOG = 1000
 
 _logger = logging.getLogger(__name__)
@@ -61,6 +61,12 @@ class RestApiError(Exception):
                 server_name, url, error, error_string))
         self.error = error
         self.error_string = error_string
+
+
+class InappropriateRedirect(Exception):
+    def __init__(self, server_name, url, location):
+        message = 'Mediaserver {} redirected {} to {}'.format(server_name, url, location)
+        super(InappropriateRedirect, self).__init__(self, message)
 
 
 class _RestApiProxy(object):
@@ -216,9 +222,15 @@ class RestApi(object):
         _logger.debug('JSON payload:\n%s', json.dumps(data, indent=4))
         return self.request('POST', path, json=data, **kwargs)
 
-    def request(self, method, path, secure=False, timeout=10, **kwargs):
+    def request(self, method, path, secure=False, timeout=None, **kwargs):
         url = self.url(path, secure=secure)
-        response = requests.request(method, url, auth=self._auth, verify=str(self.ca_cert), timeout=timeout, **kwargs)
+        response = requests.request(
+            method, url, auth=self._auth, verify=str(self.ca_cert),
+            allow_redirects=False,
+            timeout=timeout or REST_API_TIMEOUT_SEC,
+            **kwargs)
+        if response.is_redirect:
+            raise InappropriateRedirect(self._alias, url, response.next.url)
         data = self._retrieve_data(response)
         self._raise_for_status(response)
         return data

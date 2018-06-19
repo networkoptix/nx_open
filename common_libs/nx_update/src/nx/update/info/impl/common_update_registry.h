@@ -34,6 +34,7 @@ public:
     virtual void addFileData(const ManualFileData& manualFileData) override;
     virtual void removeFileData(const QString& fileName) override;
     virtual QList<QString> alternativeServers() const override;
+    virtual int updateVersion() const override;
     virtual QByteArray toByteArray() const override;
     virtual bool fromByteArray(const QByteArray& rawData) override;
     virtual bool equals(AbstractUpdateRegistry* other) const override;

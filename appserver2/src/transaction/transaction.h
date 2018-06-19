@@ -1160,28 +1160,6 @@ APPLY(1502, removeWebPage, nx::vms::api::IdData, \
                        InvalidFilterFunc(), /* Filter read func */ \
                        AllowForAllAccessOut(), /* Check remote peer rights for outgoing transaction */ \
                        RegularTransactionType()) /* regular transaction type */ \
-APPLY(2001, forcePrimaryTimeServer, nx::vms::api::IdData, \
-                       false, \
-                       false, \
-                       CreateHashByIdHelper(), \
-                       &apiIdDataTriggerNotificationHelper, \
-                       AdminOnlyAccess(), /* save permission checker */ \
-                       AllowForAllAccess(), /* read permission checker */ \
-                       InvalidFilterFunc(), /* Filter save func */ \
-                       InvalidFilterFunc(), /* Filter read func */ \
-                       AllowForAllAccessOut(), /* Check remote peer rights for outgoing transaction */ \
-                       RegularTransactionType()) /* regular transaction type */ \
-APPLY(2002, broadcastPeerSystemTime, nx::vms::api::PeerSystemTimeData, \
-                       false, \
-                       true, \
-                       InvalidGetHashHelper(), \
-                       EmptyNotificationHelper(), \
-                       AdminOnlyAccess(), /* save permission checker */ \
-                       AllowForAllAccess(), /* read permission checker */ \
-                       InvalidFilterFunc(), /* Filter save func */ \
-                       InvalidFilterFunc(), /* Filter read func */ \
-                       AllowForAllAccessOut(), /* Check remote peer rights for outgoing transaction */ \
-                       RegularTransactionType()) /* regular transaction type */ \
 APPLY(2003, getCurrentTime, nx::vms::api::TimeData, \
                        false, \
                        false, \
@@ -1204,17 +1182,6 @@ APPLY(2004, changeSystemId, ApiSystemIdData, \
                        InvalidFilterFunc(), /* Filter save func */ \
                        InvalidFilterFunc(), /* Filter read func */ \
                        AllowForAllAccessOut(), /* Check remote peer rights for outgoing transaction */ \
-                       RegularTransactionType()) /* regular transaction type */ \
-APPLY(2005, getKnownPeersSystemTime, nx::vms::api::PeerSystemTimeDataList, \
-                       false, \
-                       false, \
-                       InvalidGetHashHelper(), \
-                       InvalidTriggerNotificationHelper(), \
-                       InvalidAccess(), /* save permission checker */ \
-                       InvalidAccess(), /* read permission checker */ \
-                       FilterListByAccess<AdminOnlyAccess>(), /* Filter save func */ \
-                       FilterListByAccess<AllowForAllAccess>(), /* Filter read func */ \
-                       ReadListAccessOut<AllowForAllAccess>(), /* Check remote peer rights for outgoing transaction */ \
                        RegularTransactionType()) /* regular transaction type */ \
 APPLY(2006, markLicenseOverflow, nx::vms::api::LicenseOverflowData, \
                        true, \
@@ -1253,7 +1220,7 @@ APPLY(2009, broadcastPeerSyncTime, nx::vms::api::PeerSyncTimeData, \
                        false, \
                        true, \
                        InvalidGetHashHelper(), \
-                       EmptyNotificationHelper(), \
+                       TimeNotificationManagerHelper(), \
                        AdminOnlyAccess(), /* save permission checker */ \
                        AllowForAllAccess(), /* read permission checker */ \
                        InvalidFilterFunc(), /* Filter save func */ \

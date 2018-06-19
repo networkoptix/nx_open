@@ -25,8 +25,8 @@
 #include "managers/updates_manager.h"
 #include "managers/misc_manager.h"
 #include "managers/discovery_manager.h"
-#include "managers/time_manager.h"
 #include "managers/time_manager_api.h"
+#include <nx/time_sync/time_sync_manager.h>
 
 namespace ec2
 {
@@ -60,7 +60,6 @@ public:
     virtual AbstractUpdatesManagerPtr getUpdatesManager(const Qn::UserAccessData &userAccessData) override;
     virtual AbstractMiscManagerPtr getMiscManager(const Qn::UserAccessData &userAccessData) override;
     virtual AbstractDiscoveryManagerPtr getDiscoveryManager(const Qn::UserAccessData &userAccessData) override;
-    virtual AbstractTimeManagerPtr getTimeManager(const Qn::UserAccessData &userAccessData) override;
 
     virtual AbstractLicenseNotificationManagerPtr getLicenseNotificationManager() override;
     virtual AbstractTimeNotificationManagerPtr getTimeNotificationManager() override;
@@ -98,9 +97,13 @@ public:
     virtual ECConnectionNotificationManager* notificationManager() override;
     ECConnectionAuditManager* auditManager() { return m_auditManager.get(); }
 
-    virtual QnUuid routeToPeerVia(const QnUuid& dstPeer, int* distance) const override;
+    virtual QnUuid routeToPeerVia(
+        const QnUuid& dstPeer, 
+        int* distance, 
+        nx::network::SocketAddress* knownPeerAddress) const override;
 
     virtual TransactionMessageBusAdapter* messageBus() const override;
+    virtual nx::time_sync::TimeSyncManager* timeSyncManager() const override;
 protected:
     const AbstractECConnectionFactory* m_connectionFactory;
     QueryProcessorType* m_queryProcessor;
@@ -118,7 +121,7 @@ protected:
     QnUpdatesNotificationManagerPtr m_updatesNotificationManager;
     QnMiscNotificationManagerPtr m_miscNotificationManager;
     QnDiscoveryNotificationManagerPtr m_discoveryNotificationManager;
-    AbstractTimeNotificationManagerPtr m_timeNotificationManager;
+    QnTimeNotificationManagerPtr m_timeNotificationManager;
     std::unique_ptr<ECConnectionNotificationManager> m_notificationManager;
     std::unique_ptr<ECConnectionAuditManager> m_auditManager;
 };
@@ -154,6 +157,7 @@ BaseEc2Connection<QueryProcessorType>::BaseEc2Connection(
             m_mediaServerNotificationManager.get(),
             m_cameraNotificationManager.get(),
             m_userNotificationManager.get(),
+            m_timeNotificationManager.get(),
             m_businessEventNotificationManager.get(),
             m_layoutNotificationManager.get(),
             m_layoutTourNotificationManager.get(),
@@ -184,13 +188,14 @@ void BaseEc2Connection<QueryProcessorType>::startReceivingNotifications()
     connect(m_connectionFactory->messageBus(), &AbstractTransactionMessageBus::newDirectConnectionEstablished,
         this, &BaseEc2Connection<QueryProcessorType>::newDirectConnectionEstablished, Qt::DirectConnection);
 
-    m_connectionFactory->timeSyncManager()->start(messageBus(), getMiscManager(Qn::kSystemAccess));
+    m_connectionFactory->timeSyncManager()->start();
     messageBus()->start();
 }
 
 template<class QueryProcessorType>
 void BaseEc2Connection<QueryProcessorType>::stopReceivingNotifications()
 {
+    m_connectionFactory->timeSyncManager()->stop();	
     m_connectionFactory->messageBus()->disconnectAndJoin(this);
     m_connectionFactory->messageBus()->stop();
 }
@@ -408,16 +413,6 @@ AbstractDiscoveryNotificationManagerPtr
 }
 
 template<class QueryProcessorType>
-AbstractTimeManagerPtr BaseEc2Connection<QueryProcessorType>::getTimeManager(
-    const Qn::UserAccessData& userAccessData)
-{
-    return std::make_shared<QnTimeManager<QueryProcessorType>>(
-        m_queryProcessor,
-        m_connectionFactory->timeSyncManager(),
-        userAccessData);
-}
-
-template<class QueryProcessorType>
 AbstractTimeNotificationManagerPtr
     BaseEc2Connection<QueryProcessorType>::getTimeNotificationManager()
 {
@@ -510,16 +505,22 @@ void BaseEc2Connection<QueryProcessorType>::deleteRemotePeer(const QnUuid& id)
 
 template<class QueryProcessorType>
 QnUuid BaseEc2Connection<QueryProcessorType>::routeToPeerVia(
-    const QnUuid& dstPeer, int* distance) const
+    const QnUuid& dstPeer, int* distance, nx::network::SocketAddress* knownPeerAddress) const
 {
     auto messageBus = m_connectionFactory->messageBus();
-    return messageBus ? messageBus->routeToPeerVia(dstPeer, distance) : QnUuid();
+    return messageBus ? messageBus->routeToPeerVia(dstPeer, distance, knownPeerAddress) : QnUuid();
 }
 
 template<class QueryProcessorType>
 TransactionMessageBusAdapter* BaseEc2Connection<QueryProcessorType>::messageBus() const
 {
     return m_connectionFactory->messageBus();
+}
+
+template<class QueryProcessorType>
+nx::time_sync::TimeSyncManager* BaseEc2Connection<QueryProcessorType>::timeSyncManager() const
+{
+    return m_connectionFactory->timeSyncManager();
 }
 
 } // namespace ec2

@@ -8,7 +8,7 @@ import tzlocal.windows_tz
 from framework.method_caching import cached_getter, cached_property
 from framework.networking.windows import WindowsNetworking
 from framework.os_access.exceptions import exit_status_error_cls
-from framework.os_access.os_access_interface import OSAccess
+from framework.os_access.remote_access import RemoteAccess
 from framework.os_access.smb_path import SMBConnectionPool, SMBPath
 from framework.os_access.windows_remoting import WinRM
 from framework.os_access.windows_remoting.env_vars import EnvVars
@@ -16,23 +16,18 @@ from framework.os_access.windows_remoting.users import Users
 from framework.utils import RunningTime
 
 
-class WindowsAccess(OSAccess):
+class WindowsAccess(RemoteAccess):
     """Run CMD and PowerShell and access CIM/WMI via WinRM, access filesystem via SMB"""
 
-    def __init__(self, forwarded_ports, macs, username, password):
+    def __init__(self, port_map, macs, username, password):
+        RemoteAccess.__init__(self, port_map)
         self.macs = macs
         self._username = username
         self._password = password
-        winrm_address, winrm_port = forwarded_ports['tcp', 5985]
-        self.winrm = WinRM(winrm_address, winrm_port, username, password)
-        self._forwarded_ports = forwarded_ports
+        self.winrm = WinRM(port_map.remote.address, port_map.remote.tcp(5985), username, password)
 
     def __repr__(self):
         return '<WindowsAccess via {!r}>'.format(self.winrm)
-
-    @property
-    def forwarded_ports(self):
-        return self._forwarded_ports
 
     @cached_getter
     def env_vars(self):
@@ -59,10 +54,9 @@ class WindowsAccess(OSAccess):
     @cached_property
     def Path(self):
         class SpecificSMBPath(SMBPath):
-            _direct_smb_address, _direct_smb_port = self.forwarded_ports['tcp', 445]
             _smb_connection_pool = SMBConnectionPool(
                 self._username, self._password,
-                _direct_smb_address, _direct_smb_port,
+                self.port_map.remote.address, self.port_map.remote.tcp(445),
                 )
 
             @classmethod
@@ -107,7 +101,7 @@ class WindowsAccess(OSAccess):
 
     def get_time(self):
         started_at = timeit.default_timer()
-        result = self.winrm.wmi_query(u'Win32_OperatingSystem', {}).get_one()
+        result = self.winrm.wmi_query(u'Win32_OperatingSystem', {}).get()
         delay_sec = timeit.default_timer() - started_at
         raw = result[u'LocalDateTime'][u'cim:Datetime']
         time = dateutil.parser.parse(raw).astimezone(self._get_timezone())

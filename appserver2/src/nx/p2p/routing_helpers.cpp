@@ -7,13 +7,24 @@ namespace p2p {
 using namespace ec2;
 using namespace vms::api;
 
+RoutingRecord::RoutingRecord(
+    int distance,
+    vms::api::PersistentIdData firstVia)
+    :
+    distance(distance),
+    firstVia(firstVia)
+{
+    NX_ASSERT(!firstVia.isNull() || distance == 0 || distance > kMaxOnlineDistance);
+}
+
+
 qint32 AlivePeerInfo::distanceTo(const PersistentIdData& peer) const
 {
     auto itr = routeTo.find(peer);
     return itr != routeTo.end() ? itr.value().distance : kMaxDistance;
 }
 
-qint32 RouteToPeerInfo::minDistance(QVector<PersistentIdData>* outViaList) const
+qint32 RouteToPeerInfo::minDistance(RoutingInfo* outViaList) const
 {
     if (m_minDistance == kMaxDistance)
     {
@@ -25,7 +36,7 @@ qint32 RouteToPeerInfo::minDistance(QVector<PersistentIdData>* outViaList) const
         for (auto itr = m_routeVia.cbegin(); itr != m_routeVia.cend(); ++itr)
         {
             if (itr.value().distance == m_minDistance)
-                outViaList->push_back(itr.key());
+                outViaList->insert(itr.key(), itr.value());
         }
     }
     return m_minDistance;
@@ -39,9 +50,7 @@ qint32 RouteToPeerInfo::distanceVia(const PersistentIdData& peer) const
 
 // ---------------------- BidirectionRoutingInfo --------------
 
-BidirectionRoutingInfo::BidirectionRoutingInfo(
-    const PersistentIdData& localPeer)
-:
+BidirectionRoutingInfo::BidirectionRoutingInfo(const PersistentIdData& localPeer):
     m_localPeer(localPeer)
 {
     addLocalPeer();
@@ -78,7 +87,7 @@ void BidirectionRoutingInfo::addRecord(
 
 qint32 BidirectionRoutingInfo::distanceTo(
     const PersistentIdData& peer,
-    QVector<PersistentIdData>* outVia) const
+    RoutingInfo* outVia) const
 {
     auto itr = allPeerDistances.find(peer);
     return itr != allPeerDistances.end() ? itr->minDistance(outVia) : kMaxDistance;
@@ -86,7 +95,7 @@ qint32 BidirectionRoutingInfo::distanceTo(
 
 qint32 BidirectionRoutingInfo::distanceTo(
     const QnUuid& peerId,
-    QVector<PersistentIdData>* outVia) const
+    RoutingInfo* outVia) const
 {
     PersistentIdData peer(peerId, QnUuid());
 

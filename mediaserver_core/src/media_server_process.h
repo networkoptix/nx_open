@@ -29,6 +29,7 @@
 #include <nx/utils/log/log.h>
 #include <nx/utils/log/log_settings.h>
 #include <nx/vms/discovery/manager.h>
+#include <common/static_common_module.h>
 
 class QnAppserverResourceProcessor;
 class QNetworkReply;
@@ -37,7 +38,13 @@ struct QnModuleInformation;
 struct QnPeerRuntimeInfo;
 class QnLdapManager;
 struct BeforeRestoreDbData;
-namespace ec2 { class CrashReporter; }
+
+namespace ec2 { 
+
+class CrashReporter; 
+class LocalConnectionFactory;
+
+} // namespace ec2
 
 namespace nx { namespace vms { namespace cloud_integration { struct CloudManagerGroup; } } }
 
@@ -106,6 +113,14 @@ public:
             return nullptr;
     }
 
+    QnMediaServerModule* serverModule() const
+    {
+        if (const auto& module = m_serverModule.lock())
+            return module.get();
+        else
+            return nullptr;
+    }
+
     MSSettings* serverSettings() const { return m_settings.get(); }
 
     static void configureApiRestrictions(nx::network::http::AuthMethodRestrictionList* restrictions);
@@ -132,7 +147,6 @@ private slots:
 
     void at_appStarted();
     void at_runtimeInfoChanged(const QnPeerRuntimeInfo& runtimeInfo);
-    void at_timeChanged(qint64 time);
     void at_emptyDigestDetected(
         const QnUserResourcePtr& user, const QString& login, const QString& password);
     void at_databaseDumped();
@@ -155,7 +169,7 @@ private:
 
     bool initTcpListener(
         nx::vms::cloud_integration::CloudManagerGroup* const cloudManagerGroup,
-        ec2::TransactionMessageBusAdapter* messageBus);
+        ec2::LocalConnectionFactory* ec2ConnectionFactory);
     void initializeCloudConnect();
     void prepareOsResources();
 
@@ -182,7 +196,11 @@ private:
     QString hardwareIdAsGuid() const;
     void updateGuidIfNeeded();
     void connectArchiveIntegrityWatcher();
-
+    QnMediaServerResourcePtr registerServer(
+        ec2::AbstractECConnectionPtr ec2Connection,
+        const QnMediaServerResourcePtr &server,
+        bool isNewServerInstance);
+    nx::utils::Url appServerConnectionUrl() const;
 private:
     int m_argc;
     char** m_argv;
@@ -208,6 +226,7 @@ private:
     QnUuid m_obsoleteGuid;
     std::unique_ptr<nx::utils::promise<void>> m_initStoragesAsyncPromise;
     std::weak_ptr<QnMediaServerModule> m_serverModule;
+    static std::unique_ptr<QnStaticCommonModule> m_staticCommonModule;
     const bool m_serviceMode;
     std::unique_ptr<MSSettings> m_settings;
     bool m_stopObjectsCalled = false;

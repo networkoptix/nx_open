@@ -114,8 +114,8 @@ void ExportSettingsDialog::Private::loadSettings()
     m_exportMediaSettings.fileName.extension = FileSystemStrings::extension(
         m_exportMediaPersistentSettings.fileFormat, FileExtension::mkv);
 
-    m_exportLayoutSettings.filename.path = lastExportDir;
-    m_exportLayoutSettings.filename.extension = FileSystemStrings::extension(
+    m_exportLayoutSettings.fileName.path = lastExportDir;
+    m_exportLayoutSettings.fileName.extension = FileSystemStrings::extension(
         m_exportLayoutPersistentSettings.fileFormat, FileExtension::nov);
 
     auto& imageOverlay = m_exportMediaPersistentSettings.imageOverlay;
@@ -167,7 +167,7 @@ void ExportSettingsDialog::Private::saveSettings()
         case Mode::Layout:
         {
             qnSettings->setExportLayoutSettings(m_exportLayoutPersistentSettings);
-            qnSettings->setLastExportDir(m_exportLayoutSettings.filename.path);
+            qnSettings->setLastExportDir(m_exportLayoutSettings.fileName.path);
             break;
         }
     }
@@ -221,7 +221,7 @@ void ExportSettingsDialog::Private::refreshMediaPreview()
         api::ResourceImageRequest request;
         request.resource = m_exportMediaSettings.mediaResource->toResourcePtr();
         request.usecSinceEpoch = std::chrono::microseconds(std::chrono::milliseconds(
-            m_exportMediaSettings.timePeriod.startTimeMs)).count();
+            m_exportMediaSettings.period.startTimeMs)).count();
         request.roundMethod = api::ImageRequest::RoundMethod::iFrameBefore;
         request.rotation = 0;
         request.aspectRatio = api::ImageRequest::AspectRatio::source;
@@ -345,7 +345,7 @@ void ExportSettingsDialog::Private::setLayout(const QnLayoutResourcePtr& layout,
 
 void ExportSettingsDialog::Private::setTimePeriod(const QnTimePeriod& period, bool forceValidate)
 {
-    m_exportMediaSettings.timePeriod = period;
+    m_exportMediaSettings.period = period;
     m_exportLayoutSettings.period = period;
     m_needValidateMedia = true;
     m_needValidateLayout = true;
@@ -379,7 +379,7 @@ void ExportSettingsDialog::Private::setMediaFilename(const Filename& filename)
 
 void ExportSettingsDialog::Private::setLayoutFilename(const Filename& filename)
 {
-    m_exportLayoutSettings.filename = filename;
+    m_exportLayoutSettings.fileName = filename;
     m_exportLayoutPersistentSettings.fileFormat = FileSystemStrings::suffix(filename.extension);
     validateSettings(Mode::Layout);
 }
@@ -755,7 +755,7 @@ QString ExportSettingsDialog::Private::timestampText(qint64 timeMs) const
 void ExportSettingsDialog::Private::updateTimestampText()
 {
     overlay(ExportOverlayType::timestamp)->setText(timestampText(
-        m_exportMediaSettings.timePeriod.startTimeMs));
+        m_exportMediaSettings.period.startTimeMs));
 }
 
 ExportOverlayWidget* ExportSettingsDialog::Private::overlay(ExportOverlayType type)
@@ -789,7 +789,7 @@ Filename ExportSettingsDialog::Private::selectedFileName(Mode mode) const
 {
     return mode == Mode::Media
         ? m_exportMediaSettings.fileName
-        : m_exportLayoutSettings.filename;
+        : m_exportLayoutSettings.fileName;
 }
 
 bool ExportSettingsDialog::Private::mediaSupportsUtc() const

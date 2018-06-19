@@ -21,14 +21,14 @@ TEST(P2pRouting, distanceTo)
     vms::api::PersistentIdData to3 = to2;
     to3.persistentId = QnUuid::createUuid();
 
-    routing.addRecord(via1, to1, RoutingRecord(1));
-    routing.addRecord(via1, to2, RoutingRecord(2));
-    routing.addRecord(via1, to3, RoutingRecord(3));
+    routing.addRecord(via1, to1, RoutingRecord(1, via1));
+    routing.addRecord(via1, to2, RoutingRecord(2, via1));
+    routing.addRecord(via1, to3, RoutingRecord(3, via1));
 
     vms::api::PersistentIdData via2 = genId();
-    routing.addRecord(via2, to1, RoutingRecord(4));
-    routing.addRecord(via2, to2, RoutingRecord(5));
-    routing.addRecord(via2, to3, RoutingRecord(6));
+    routing.addRecord(via2, to1, RoutingRecord(4, via2));
+    routing.addRecord(via2, to2, RoutingRecord(5, via2));
+    routing.addRecord(via2, to3, RoutingRecord(6, via2));
 
     ASSERT_EQ(1, routing.distanceTo(to1));
     ASSERT_EQ(2, routing.distanceTo(to2));
@@ -62,16 +62,16 @@ TEST(P2pRouting, routeTo)
     vms::api::PersistentIdData to3 = to2;
     to3.persistentId = QnUuid::createUuid();
 
-    routing.addRecord(via1, to1, RoutingRecord(1));
-    routing.addRecord(via1, to2, RoutingRecord(2));
-    routing.addRecord(via1, to3, RoutingRecord(3));
+    routing.addRecord(via1, to1, RoutingRecord(1, via1));
+    routing.addRecord(via1, to2, RoutingRecord(2, via1));
+    routing.addRecord(via1, to3, RoutingRecord(3, via1));
 
     vms::api::PersistentIdData via2 = genId();
-    routing.addRecord(via2, to1, RoutingRecord(4));
-    routing.addRecord(via2, to2, RoutingRecord(5));
-    routing.addRecord(via2, to3, RoutingRecord(6));
+    routing.addRecord(via2, to1, RoutingRecord(4, via2));
+    routing.addRecord(via2, to2, RoutingRecord(5, via2));
+    routing.addRecord(via2, to3, RoutingRecord(6, via2));
 
-    QVector<vms::api::PersistentIdData> viaList;
+    RoutingInfo viaList;
     qint32 distance = routing.distanceTo(to3.id, &viaList);
     ASSERT_EQ(1, viaList.size());
     ASSERT_EQ(2, distance);

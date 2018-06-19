@@ -10,6 +10,7 @@ import transaction_log
 from framework.api_shortcuts import get_server_id
 from framework.installation.mediaserver import MEDIASERVER_MERGE_TIMEOUT
 from framework.utils import SimpleNamespace, datetime_utc_now
+from framework.merging import merge_systems
 
 _logger = logging.getLogger(__name__)
 
@@ -111,15 +112,14 @@ def resource_generators():
 
 
 @pytest.fixture
-def env(network, layout_file):
-    machines, servers = network
+def env(system, layout_file):
     return SimpleNamespace(
-        one=servers['first'],
-        two=servers['second'],
-        servers=servers.values(),
+        one=system['first'],
+        two=system['second'],
+        servers=system.values(),
         test_size=DEFAULT_TEST_SIZE,
         thread_number=DEFAULT_THREAD_NUMBER,
-        system_is_merged='no_merge.yaml' not in layout_file,
+        system_is_merged='direct-no_merge.yaml' not in layout_file,
         resource_generators=resource_generators(),
         )
 
@@ -134,11 +134,11 @@ def wait_entity_merge_done(servers, method, api_object, api_method):
     while True:
         result_expected = get_response(servers[0], method, api_object, api_method)
 
-        def check(servers, result_expected):
-            for srv in servers:
-                result = get_response(srv, method, api_object, api_method)
-                if result != result_expected:
-                    return srv, result
+        def check(_servers, _result_expected):
+            for srv in _servers:
+                _result = get_response(srv, method, api_object, api_method)
+                if _result != _result_expected:
+                    return srv, _result
             return None
 
         result = check(servers[1:], result_expected)
@@ -162,8 +162,8 @@ def check_transaction_log(env):
     def servers_to_str(servers):
         return ', '.join("%r" % s for s in servers)
 
-    def transactions_to_str(transactions):
-        return '\n  '.join("%s: [%s]" % (k, servers_to_str(v)) for k, v in transactions.items())
+    def transactions_to_str(_transactions):
+        return '\n  '.join("%s: [%s]" % (k, servers_to_str(v)) for k, v in _transactions.items())
 
     start_time = datetime_utc_now()
     while True:
@@ -182,7 +182,8 @@ def check_transaction_log(env):
         time.sleep(MEDIASERVER_MERGE_TIMEOUT.total_seconds() / 10.)
 
 
-def server_api_post((server, api_method, data)):
+def server_api_post(post_call_data):
+    server, api_method, data = post_call_data
     server_api_fn = server.api.get_api_fn('POST', 'ec2', api_method)
     return server_api_fn(json=data)
 
@@ -192,7 +193,7 @@ def merge_system_if_unmerged(env):
         return
     assert len(env.servers) >= 2
     for i in range(len(env.servers) - 1):
-        env.servers[i+1].merge_systems(env.servers[i])
+        merge_systems(env.servers[i+1], env.servers[i])
         env.system_is_merged = True
 
 
@@ -270,8 +271,9 @@ def make_async_post_calls(env, call_list):
 
 
 def prepare_and_make_async_post_calls(env, api_method, sequence=None):
-    return make_async_post_calls(env,
-                                 prepare_call_list(env, api_method, sequence))
+    return make_async_post_calls(
+        env,
+        prepare_call_list(env, api_method, sequence))
 
 
 @pytest.mark.parametrize('layout_file', ['direct-merge_toward_requested.yaml'])
@@ -363,7 +365,7 @@ def test_mediaserver_data_synchronization(env):
 def test_storage_data_synchronization(env):
     servers = [env.servers[i % len(env.servers)] for i in range(env.test_size)]
     server_with_guid_list = map(lambda s: (s, get_server_id(s.api)), servers)
-    storages = prepare_and_make_async_post_calls(env, 'saveStorage', server_with_guid_list)
+    prepare_and_make_async_post_calls(env, 'saveStorage', server_with_guid_list)
     merge_system_if_unmerged(env)
     check_api_calls(
         env,

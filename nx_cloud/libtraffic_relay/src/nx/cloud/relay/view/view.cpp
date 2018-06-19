@@ -207,9 +207,9 @@ void View::startAcceptor()
     {
         m_multiAddressHttpServer = startHttpServer(httpEndpoints);
     }
-    else 
+    else
     {
-        m_multiAddressHttpServer = 
+        m_multiAddressHttpServer =
             network::server::catMultiAddressServers(
                 startHttpServer(httpEndpoints),
                 startHttpsServer(httpsEndpoints));
@@ -235,7 +235,7 @@ std::unique_ptr<View::MultiHttpServer> View::startHttpsServer(
 std::unique_ptr<View::MultiHttpServer> View::startServer(
     const std::list<network::SocketAddress>& endpoints,
     bool sslMode)
-{   
+{
     auto multiAddressHttpServer =
         std::make_unique<MultiHttpServer>(
             &m_authenticationManager,

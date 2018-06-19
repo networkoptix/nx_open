@@ -474,7 +474,7 @@ void ExportSettingsDialog::updateAlertsInternal(QLayout* layout,
         {
             auto item = layout->itemAt(index);
             auto bar = item ? qobject_cast<AlertBar*>(item->widget()) : nullptr;
-            NX_EXPECT(bar);
+            //NX_EXPECT(bar);
             if (bar)
                 bar->setText(text);
         };
@@ -556,7 +556,7 @@ void ExportSettingsDialog::setMediaParams(
 
     const auto resource = mediaResource->toResourcePtr();
     const auto currentSettings = d->exportMediaSettings();
-    const auto startTimeMs = currentSettings.timePeriod.startTimeMs;
+    const auto startTimeMs = currentSettings.period.startTimeMs;
 
     QString timePart;
     if (resource->hasFlags(Qn::utc))
@@ -609,7 +609,7 @@ void ExportSettingsDialog::setLayout(const QnLayoutResourcePtr& layout)
     auto baseName = nx::utils::replaceNonFileNameCharacters(layout->getName(), L' ');
     if (qnRuntime->isActiveXMode() || baseName.isEmpty())
         baseName = tr("exported");
-    Filename baseFileName = d->exportLayoutSettings().filename;
+    Filename baseFileName = d->exportLayoutSettings().fileName;
     baseFileName.name = baseName;
     ui->layoutFilenamePanel->setFilename(suggestedFileName(baseFileName));
 }

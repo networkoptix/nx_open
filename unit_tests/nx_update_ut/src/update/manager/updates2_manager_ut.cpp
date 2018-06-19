@@ -98,6 +98,11 @@ public:
         return QStringList();
     }
 
+    virtual int updateVersion() const
+    {
+        return 42;
+    }
+
     virtual QByteArray toByteArray() const override
     {
         return "hello";

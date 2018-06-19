@@ -71,7 +71,7 @@ private:
         const QMap<vms::api::PersistentIdData, P2pConnectionPtr>& currentSubscription);
 
     P2pConnectionPtr findBestConnectionToSubscribe(
-        const QVector<vms::api::PersistentIdData>& viaList,
+        const QList<vms::api::PersistentIdData>& viaList,
         QMap<P2pConnectionPtr, int> newSubscriptions) const;
 
     void doSubscribe(const QMap<vms::api::PersistentIdData, P2pConnectionPtr>& currentSubscription);

@@ -111,6 +111,7 @@ private:
     void assertUpdateRegistryContent() const
     {
         assertAlternativeServer();
+        ASSERT_EQ(42, m_updateRegistry->updateVersion());
         assertFileDataContent();
         assertUpdateDataContent();
         assertSerializability();

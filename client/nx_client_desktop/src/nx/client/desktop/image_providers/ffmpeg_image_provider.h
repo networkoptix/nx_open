@@ -15,7 +15,9 @@ class FfmpegImageProvider: public ImageProvider
     using base_type = ImageProvider;
 
 public:
+    // This one retrives screenshot in the middle of the file.
     explicit FfmpegImageProvider(const QnResourcePtr& resource, QObject* parent = nullptr);
+    explicit FfmpegImageProvider(const QnResourcePtr& resource, qint64 positionUsec,  QObject* parent = nullptr);
     virtual ~FfmpegImageProvider() override;
 
     virtual QImage image() const override;
@@ -31,6 +33,7 @@ protected:
 private:
     struct Private;
     QScopedPointer<Private> d;
+    qint64 m_positionUsec;
 };
 
 } // namespace desktop

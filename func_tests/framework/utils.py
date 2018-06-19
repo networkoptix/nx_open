@@ -118,7 +118,10 @@ class RunningTime(object):
         return self._initial + (datetime.now(pytz.utc) - self._received_at)
 
     def is_close_to(self, other, threshold=timedelta(seconds=2)):
-        return abs(self.current - other.current) <= threshold + self.error + other.error
+        if isinstance(other, self.__class__):
+            return abs(self.current - other.current) <= threshold + self.error + other.error
+        else:
+            return abs(self.current - other) <= threshold + self.error
 
     def __str__(self):
         return '{} +/- {}'.format(self.current.strftime('%Y-%m-%d %H:%M:%S.%f %Z'), self.error.total_seconds())

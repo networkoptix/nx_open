@@ -107,7 +107,6 @@ int QnSetTimeRestHandler::execute(
     }
 
     //ec2::AbstractECConnectionPtr ec2Connection = commonModule()->ec2Connection();
-    //ec2Connection->getTimeManager()->forceTimeResync();
 
     return CODE_OK;
 }

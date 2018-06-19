@@ -51,6 +51,8 @@ public: // Overrides section
 
     virtual bool getData(Qn::PtzDataFields query, QnPtzData* data) const override;
 
+    virtual QnResourcePtr resource() const override;
+
 signals:
     void finishedLater(Qn::PtzCommand command, const QVariant& data);
     void baseControllerChanged();

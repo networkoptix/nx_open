@@ -11,6 +11,7 @@ from pathlib2 import Path
 
 from framework.api_shortcuts import get_server_id
 from framework.camera import Camera, SampleMediaFile, make_schedule_task
+from framework.installation.installation import Installation
 from framework.media_stream import open_media_stream
 from framework.method_caching import cached_property
 from framework.os_access.posix_shell import local_shell
@@ -50,13 +51,14 @@ class TimePeriod(object):
 class Mediaserver(object):
     """Mediaserver, same for physical and virtual machines"""
 
-    def __init__(self, name, installation):
+    def __init__(self, name, installation):  # type: (str, Installation) -> None
         self.name = name
         self.installation = installation
         self.service = installation.service
         self.os_access = installation.os_access
         self.port = 7001
-        forwarded_address, forwarded_port = installation.os_access.forwarded_ports['tcp', self.port]
+        forwarded_port = installation.os_access.port_map.remote.tcp(self.port)
+        forwarded_address = installation.os_access.port_map.remote.address
         self.api = RestApi(name, forwarded_address, forwarded_port)
 
     def __repr__(self):
