@@ -4,13 +4,13 @@
 
 namespace nx::cloud::relay::api {
 
-class NX_NETWORK_API ClientImplUsingHttpConnect:
+class NX_NETWORK_API ClientOverHttpConnect:
     public ClientOverHttpUpgrade
 {
     using base_type = ClientOverHttpUpgrade;
 
 public:
-    ClientImplUsingHttpConnect(
+    ClientOverHttpConnect(
         const nx::utils::Url& baseUrl,
         ClientFeedbackFunction feedbackFunction);
 

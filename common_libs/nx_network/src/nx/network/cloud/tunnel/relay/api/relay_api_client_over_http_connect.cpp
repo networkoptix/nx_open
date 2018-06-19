@@ -4,7 +4,7 @@
 
 namespace nx::cloud::relay::api {
 
-ClientImplUsingHttpConnect::ClientImplUsingHttpConnect(
+ClientOverHttpConnect::ClientOverHttpConnect(
     const nx::utils::Url& baseUrl,
     ClientFeedbackFunction feedbackFunction)
     :
@@ -12,7 +12,7 @@ ClientImplUsingHttpConnect::ClientImplUsingHttpConnect(
 {
 }
 
-void ClientImplUsingHttpConnect::beginListening(
+void ClientOverHttpConnect::beginListening(
     const nx::String& peerName,
     BeginListeningHandler completionHandler)
 {
@@ -49,7 +49,7 @@ void ClientImplUsingHttpConnect::beginListening(
         });
 }
 
-void ClientImplUsingHttpConnect::processBeginListeningResponse(
+void ClientOverHttpConnect::processBeginListeningResponse(
     std::list<std::unique_ptr<network::aio::BasicPollable>>::iterator httpClientIter,
     BeginListeningHandler completionHandler)
 {

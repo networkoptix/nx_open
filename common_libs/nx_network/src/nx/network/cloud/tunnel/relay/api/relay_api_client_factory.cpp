@@ -16,7 +16,7 @@ ClientFactory::ClientFactory():
     base_type(std::bind(&ClientFactory::defaultFactoryFunction, this,
         std::placeholders::_1))
 {
-    registerClientType<ClientImplUsingHttpConnect>();
+    registerClientType<ClientOverHttpConnect>();
     registerClientType<ClientOverHttpUpgrade>();
 }
 
