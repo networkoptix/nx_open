@@ -1,6 +1,7 @@
 #ifndef NX_CAMERA_PLUGIN_H
 #define NX_CAMERA_PLUGIN_H
 
+#include <cstring>
 #include <stdint.h>
 
 #include "camera_plugin_types.h"
