@@ -1030,6 +1030,7 @@ void TimeSynchronizationManager::syncTimeWithInternet(quint64 taskID)
     NX_LOGX(lit("TimeSynchronizationManager::syncTimeWithInternet. taskID %1").arg(taskID), cl_logDEBUG2);
     const auto& commonModule = m_messageBus->commonModule();
     const bool isSynchronizingTimeWithInternet =
+        commonModule->globalSettings()->isTimeSynchronizationEnabled() &&
         commonModule->globalSettings()->isSynchronizingTimeWithInternet();
 
     QnMutexLocker lock(&m_mutex);
