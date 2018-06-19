@@ -34,12 +34,12 @@ class Counter(object):
         return self._value
 
 
-@pytest.fixture
+@pytest.fixture()
 def counter():
     return Counter()
 
 
-@pytest.fixture
+@pytest.fixture()
 def layout():
     return {
         'networks':
@@ -54,7 +54,7 @@ def layout():
     }
 
 
-@pytest.fixture
+@pytest.fixture()
 def three_mediaservers(network, mediaserver_factory):
     allocated_mediaservers = []
     with ClosingPool(mediaserver_factory.allocated_mediaserver, network, None) as mediaservers:

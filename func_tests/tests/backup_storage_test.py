@@ -89,7 +89,7 @@ def backup_storage_volume(one_mediaserver):
     return storage_volume
 
 
-@pytest.fixture
+@pytest.fixture()
 def server(one_mediaserver, system_backup_type, backup_storage_volume):
     config_file_params = dict(minStorageSpace=1024*1024)  # 1M
     one_mediaserver.installation.update_mediaserver_conf(config_file_params)

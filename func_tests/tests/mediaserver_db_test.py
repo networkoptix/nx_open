@@ -42,13 +42,13 @@ def db_version(request):
     return request.param
 
 
-@pytest.fixture
+@pytest.fixture()
 def one(two_stopped_mediaservers, bin_dir, db_version):
     one, _ = two_stopped_mediaservers
     yield server('one', one, bin_dir, db_version)
 
 
-@pytest.fixture
+@pytest.fixture()
 def two(two_stopped_mediaservers, bin_dir, db_version):
     _, two = two_stopped_mediaservers
     yield server('two', two, bin_dir, db_version)

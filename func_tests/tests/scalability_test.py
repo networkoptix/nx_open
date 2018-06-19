@@ -29,7 +29,7 @@ SET_RESOURCE_STATUS_CMD = '202'
 CHECK_METHOD_RETRY_COUNT = 5
 
 
-@pytest.fixture
+@pytest.fixture()
 def config(test_config):
     return test_config.with_defaults(
         SERVER_COUNT=2,
@@ -43,7 +43,7 @@ def config(test_config):
         )
 
 
-@pytest.fixture
+@pytest.fixture()
 def lightweight_servers(metrics_saver, lightweight_servers_factory, config):
     assert config.SERVER_COUNT > 1, repr(config.SERVER_COUNT)  # Must be at least 2 servers
     if not config.USE_LIGHTWEIGHT_SERVERS:
@@ -64,7 +64,7 @@ def lightweight_servers(metrics_saver, lightweight_servers_factory, config):
     return lws_list
 
 
-@pytest.fixture
+@pytest.fixture()
 def servers(metrics_saver, linux_mediaservers_pool, lightweight_servers, config):
     server_count = config.SERVER_COUNT - len(lightweight_servers)
     _logger.info('Creating %d servers:', server_count)

@@ -9,21 +9,21 @@ from framework.ca import CA
 _logger = logging.getLogger(__name__)
 
 
-@pytest.fixture
+@pytest.fixture()
 def temp_ca(work_dir):
     ca_self_test_dir = work_dir / 'ca_self_test'
     shutil.rmtree(str(ca_self_test_dir), ignore_errors=True)
     return CA(ca_self_test_dir)
 
 
-@pytest.fixture
+@pytest.fixture()
 def gen_dir(work_dir):
     path = work_dir / 'ca_self_test_gen'
     path.mkdir(parents=True, exist_ok=True)
     return path
 
 
-@pytest.fixture
+@pytest.fixture()
 def key_and_cert_path(temp_ca, gen_dir):
     contents = temp_ca.generate_key_and_cert()
     path = gen_dir / 'latest.pem'
@@ -44,7 +44,7 @@ def test_key_and_cert_match(key_and_cert_path):
     assert key_modulus == cert_modulus
 
 
-@pytest.fixture
+@pytest.fixture()
 def real_ca(work_dir):
     return CA(work_dir / 'ca')
 

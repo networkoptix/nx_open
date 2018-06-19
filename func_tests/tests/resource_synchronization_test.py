@@ -111,7 +111,7 @@ def resource_generators():
         saveLayout=LayoutGenerator())
 
 
-@pytest.fixture
+@pytest.fixture()
 def env(system, layout_file):
     return SimpleNamespace(
         one=system['first'],

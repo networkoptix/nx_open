@@ -26,7 +26,7 @@ from framework.waiting import wait_for_true
 _logger = logging.getLogger(__name__)
 
 
-@pytest.fixture
+@pytest.fixture()
 def test_system_settings():
     return {'cameraSettingsOptimization': 'false', 'autoDiscoveryEnabled': 'false', 'statisticsAllowed': 'false'}
 
@@ -62,7 +62,7 @@ def check_admin_disabled(server):
     assert x_info.value.status_code == 403
 
 
-@pytest.fixture
+@pytest.fixture()
 def one(two_stopped_mediaservers, test_system_settings, cloud_host):
     one, _ = two_stopped_mediaservers
     set_cloud_host(one.installation, cloud_host)
@@ -72,7 +72,7 @@ def one(two_stopped_mediaservers, test_system_settings, cloud_host):
     return one
 
 
-@pytest.fixture
+@pytest.fixture()
 def two(two_stopped_mediaservers, cloud_host):
     _, two = two_stopped_mediaservers
     set_cloud_host(two.installation, cloud_host)
