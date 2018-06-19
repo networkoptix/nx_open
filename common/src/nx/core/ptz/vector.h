@@ -24,10 +24,11 @@ public:
     static const ComponentVector<3> kPtrComponents;
     static const ComponentVector<3> kPtzComponents;
     static const ComponentVector<4> kPtrzComponents;
+    static const ComponentVector<5> kPtrzfComponents;
 
 public:
     Vector() = default;
-    Vector(double pan, double tilt, double rotation, double zoom);
+    Vector(double pan, double tilt, double rotation, double zoom, double focus = 0.0);
 
     Vector(
         const QPointF& point,
@@ -47,6 +48,7 @@ public:
     double tilt = 0.0;
     double rotation = 0.0;
     double zoom = 0.0;
+    double focus = 0.0;
 
     // If you need more freedom degrees fill free to extend this struct.
 

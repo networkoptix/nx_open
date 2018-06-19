@@ -19,11 +19,15 @@ const ComponentVector<3> Vector::kPtzComponents =
 const ComponentVector<4> Vector::kPtrzComponents =
     {Component::pan, Component::tilt, Component::rotation, Component::zoom};
 
-Vector::Vector(double pan, double tilt, double rotation, double zoom):
+const ComponentVector<5> Vector::kPtrzfComponents =
+    {Component::pan, Component::tilt, Component::rotation, Component::zoom, Component::focus};
+
+Vector::Vector(double pan, double tilt, double rotation, double zoom, double focus):
     pan(pan),
     tilt(tilt),
     rotation(rotation),
-    zoom(zoom)
+    zoom(zoom),
+    focus(focus)
 {
 }
 
@@ -64,6 +68,9 @@ void Vector::setComponent(double value, Component component)
         case Component::zoom:
             zoom = value;
             break;
+        case Component::focus:
+            focus = value;
+            break;
         default:
             NX_ASSERT(false, lit("Wrong component. We should never be here"));
     }
@@ -75,7 +82,8 @@ Vector Vector::operator+(const Vector& other) const
         pan + other.pan,
         tilt + other.tilt,
         rotation + other.rotation,
-        zoom + other.zoom);
+        zoom + other.zoom,
+        focus + other.focus);
 }
 
 Vector Vector::operator-(const Vector& other) const
@@ -84,7 +92,8 @@ Vector Vector::operator-(const Vector& other) const
         pan - other.pan,
         tilt - other.tilt,
         rotation - other.rotation,
-        zoom - other.zoom);
+        zoom - other.zoom,
+        focus - other.focus);
 }
 
 Vector Vector::operator*(const Vector& other) const
@@ -93,7 +102,8 @@ Vector Vector::operator*(const Vector& other) const
         pan * other.pan,
         tilt * other.tilt,
         rotation * other.rotation,
-        zoom * other.zoom);
+        zoom * other.zoom,
+        focus* other.focus);
 }
 
 Vector Vector::operator/(const Vector& other) const
@@ -102,7 +112,8 @@ Vector Vector::operator/(const Vector& other) const
         (other.pan == 0) ? pan / other.pan : qQNaN<double>(),
         (other.tilt == 0) ? tilt / other.tilt : qQNaN<double>(),
         (other.rotation == 0) ? rotation / other.rotation : qQNaN<double>(),
-        (other.zoom == 0) ? zoom / other.zoom : qQNaN<double>());
+        (other.zoom == 0) ? zoom / other.zoom : qQNaN<double>(),
+        (other.focus == 0) ? focus / other.focus : qQNaN<double>());
 }
 
 Vector Vector::operator/(double scalar) const
@@ -114,7 +125,8 @@ Vector Vector::operator/(double scalar) const
         pan / scalar,
         tilt / scalar,
         rotation / scalar,
-        zoom / scalar);
+        zoom / scalar,
+        focus / scalar);
 }
 
 double Vector::length() const
@@ -127,7 +139,8 @@ double Vector::lengthSquared() const
     return pan * pan
         + tilt * tilt
         + rotation * rotation
-        + zoom * zoom;
+        + zoom * zoom
+        + focus * focus;
 }
 
 QVector2D Vector::toQVector2D() const
@@ -182,7 +195,8 @@ Vector operator*(const Vector& ptzVector, double scalar)
         ptzVector.pan * scalar,
         ptzVector.tilt * scalar,
         ptzVector.rotation * scalar,
-        ptzVector.zoom * scalar);
+        ptzVector.zoom * scalar,
+        ptzVector.focus * scalar);
 }
 
 Vector operator*(double scalar, const Vector& ptzVector)
@@ -198,12 +212,13 @@ QN_FUSION_ADAPT_STRUCT_FUNCTIONS(Vector, (json)(eq), PtzVector_Fields, (optional
 
 QDebug operator<<(QDebug dbg, const nx::core::ptz::Vector& ptzVector)
 {
-    dbg.nospace() << lm("nx::core::ptz::Vector(pan=%1, tilt=%2, rotation=%3, zoom=%4)")
+    dbg.nospace() << lm("nx::core::ptz::Vector(pan=%1, tilt=%2, rotation=%3, zoom=%4, focus=%5)")
         .args(
             ptzVector.pan,
             ptzVector.tilt,
             ptzVector.rotation,
-            ptzVector.zoom);
+            ptzVector.zoom,
+            ptzVector.focus);
 
     return dbg.maybeSpace();
 }
