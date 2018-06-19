@@ -78,7 +78,7 @@ cmake_dependent_option(withDistributions "Enable distributions build"
 option(enableHanwha OFF "Enable hanwha camera vendor even if it is disabled by default")
 mark_as_advanced(enableHanwha)
 
-if(enableHanwha OR developerBuild)
+if(enableHanwha OR developerBuild AND NOT targetDevice STREQUAL "edge1")
     set(enable_hanwha true)
 endif()
 

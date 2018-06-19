@@ -98,10 +98,11 @@ class _UpdatesData(object):
         'arm_rpi': 'rpi', 'arm_bpi': 'bpi', 'arm_bananapi': 'bananapi',
         }
 
-    def __init__(self, data_dir, callback_url):
+    def __init__(self, data_dir, base_url, callback_url):
         self.data_dir = data_dir
         self.root_path = self.data_dir / 'updates.json'
         self.root = {}
+        self._base_url = base_url
         self._callback_url = callback_url
 
     def save_root(self):
@@ -110,7 +111,10 @@ class _UpdatesData(object):
         write_json(self.root_path, self.root)
 
     def add_customization(self, customization):
-        self.root[customization.customization_name] = {'releases': {}}
+        self.root[customization.customization_name] = {
+            'releases': {},
+            'updates_prefix': self._base_url + '/' + customization.customization_name,
+            }
 
     def add_release(self, customization, version, cloud_host='cloud-test.hdw.mx'):
         _logger.info("Create %s %s", customization.customization_name, version)
@@ -163,7 +167,7 @@ class UpdatesServer(object):
         self.download_requests = []
 
     def generate_data(self, base_url):
-        updates = _UpdatesData(self.data_dir, base_url + self._callback_endpoint)
+        updates = _UpdatesData(self.data_dir, base_url, base_url + self._callback_endpoint)
         for customization in known_customizations:
             updates.add_customization(customization)
             for version in {Version('3.1.0.16975'), Version('3.2.0.17000'), Version('4.0.0.21200')}:

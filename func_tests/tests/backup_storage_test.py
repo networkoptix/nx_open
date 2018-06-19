@@ -124,7 +124,7 @@ def server(one_mediaserver, linux_vm_volume, system_backup_type):
     one_mediaserver.installation.update_mediaserver_conf(config_file_params)
     linux_vm_volume.ensure_volume_exists(BACKUP_STORAGE_PATH)
     one_mediaserver.os_access.ssh.run_sh_script(
-        'rm -rfv "$STORAGE_PATH/*"',
+        'rm -rfv "$STORAGE_PATH/"*',
         env=dict(STORAGE_PATH=BACKUP_STORAGE_PATH),
         )
     one_mediaserver.start()

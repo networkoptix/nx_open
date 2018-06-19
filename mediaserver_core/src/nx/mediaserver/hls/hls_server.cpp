@@ -770,32 +770,30 @@ nx::network::http::StatusCode::Value HttpLiveStreamingProcessor::getResourceChun
         requestParams);
 
     bool requestIsAPartOfHlsSession = false;
+    std::multimap<QString, QString>::const_iterator sessionIDIter =
+        requestParams.find(StreamingParams::SESSION_ID_PARAM_NAME);
+    if (sessionIDIter != requestParams.end())
     {
-        std::multimap<QString, QString>::const_iterator sessionIDIter =
-            requestParams.find(StreamingParams::SESSION_ID_PARAM_NAME);
-        if (sessionIDIter != requestParams.end())
+        SessionPool::ScopedSessionIDLock lk(SessionPool::instance(), sessionIDIter->second);
+        Session* hlsSession = SessionPool::instance()->find(sessionIDIter->second);
+        if (hlsSession)
         {
-            SessionPool::ScopedSessionIDLock lk(SessionPool::instance(), sessionIDIter->second);
-            Session* hlsSession = SessionPool::instance()->find(sessionIDIter->second);
-            if (hlsSession)
+            requestIsAPartOfHlsSession = true;
+            hlsSession->updateAuditInfo(startTimestamp);
+            if (params.alias)
             {
-                requestIsAPartOfHlsSession = true;
-                hlsSession->updateAuditInfo(startTimestamp);
-                if (params.alias)
-                {
-                    hlsSession->getChunkByAlias(
-                        params.streamQuality, *params.alias, &startTimestamp, &chunkDuration);
-                }
-
-                if (!hlsSession->audioCodecId())
-                    hlsSession->setAudioCodecId(detectAudioCodecId(currentChunkKey));
-                currentChunkKey.setAudioCodecId(*hlsSession->audioCodecId());
+                hlsSession->getChunkByAlias(
+                    params.streamQuality, *params.alias, &startTimestamp, &chunkDuration);
             }
+
+            if (!hlsSession->audioCodecId())
+                hlsSession->setAudioCodecId(detectAudioCodecId(currentChunkKey));
+            currentChunkKey.setAudioCodecId(*hlsSession->audioCodecId());
         }
-        else
-        {
-            currentChunkKey.setAudioCodecId(detectAudioCodecId(currentChunkKey));
-        }
+    }
+    else
+    {
+        currentChunkKey.setAudioCodecId(detectAudioCodecId(currentChunkKey));
     }
 
     auto requiredPermission = currentChunkKey.live()
@@ -1040,7 +1038,7 @@ int HttpLiveStreamingProcessor::estimateStreamBitrate(
 
 void HttpLiveStreamingProcessor::ensureChunkCacheFilledEnoughForPlayback(
     Session* const session,
-    MediaQuality streamQuality)
+    MediaQuality streamQuality )
 {
     static const size_t PLAYLIST_CHECK_TIMEOUT_MS = 1000;
 
@@ -1072,7 +1070,7 @@ void HttpLiveStreamingProcessor::ensureChunkCacheFilledEnoughForPlayback(
             QThread::msleep( PLAYLIST_CHECK_TIMEOUT_MS );
         }
     }
-    }
+}
 
 AVCodecID HttpLiveStreamingProcessor::detectAudioCodecId(
     const StreamingChunkCacheKey& chunkParams)
@@ -1100,14 +1098,6 @@ RequestParams HttpLiveStreamingProcessor::readRequestParams(
     const std::multimap<QString, QString>& requestParams)
 {
     RequestParams result;
-
-    std::multimap<QString, QString>::const_iterator hiQualityIter =
-        requestParams.find(StreamingParams::HI_QUALITY_PARAM_NAME);
-    std::multimap<QString, QString>::const_iterator loQualityIter =
-        requestParams.find(StreamingParams::LO_QUALITY_PARAM_NAME);
-    result.streamQuality = (hiQualityIter != requestParams.end()) || (loQualityIter == requestParams.end())  //hi quality is default
-        ? MEDIA_Quality_High
-        : MEDIA_Quality_Low;
 
     std::multimap<QString, QString>::const_iterator channelIter =
         requestParams.find(QLatin1String(StreamingParams::CHANNEL_PARAM_NAME));

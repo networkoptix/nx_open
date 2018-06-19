@@ -2,16 +2,15 @@ import os
 
 import pytest
 
+from defaults import defaults
 from framework.cloud_host import CloudAccountFactory, resolve_cloud_host_from_registry
-
-DEFAULT_CLOUD_GROUP = 'test'
 
 
 def pytest_addoption(parser):
     group = parser.getgroup('cloud')
-    group.addoption('--cloud-group', default=DEFAULT_CLOUD_GROUP, help=(
+    group.addoption('--cloud-group', default=defaults['cloud_group'], help=(
         'Cloud group; cloud host for it will be requested from ireg.hdw.mx; '
-        'default is %r' % DEFAULT_CLOUD_GROUP))
+        'default is %(default)r'))
     group.addoption('--autotest-email-password', help=(
         'Password for accessing service account via IMAP protocol. '
         'Used for activation cloud accounts for different cloud groups and customizations.'))
