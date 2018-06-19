@@ -97,7 +97,7 @@
     },
     "custom": {
       "label": "Niestandardowa",
-      "description": "Użyj aplikacji klienckiej %PRODUCT_NAME%, aby skonfigurować uprawnienia niestandardowe"
+      "description": "Użyj aplikacji klienckiej %VMS_NAME% , aby skonfigurować niestandardowe uprawnienia"
     }
   },
   "errorCodes": {

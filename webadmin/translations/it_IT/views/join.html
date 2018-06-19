@@ -57,7 +57,7 @@
         <div class="form-group" ng-class="{hidden:!systems.systemFound}">
             <p>Il sistema attuale sta per essere unito <b>{{systems.systemName}}</b> con System <b>{{systems.joinSystemName}}</b></p>
             <p>
-                Il nuovo sistema avrà password e nome dal seguente sistema: <0 /> <label> <2 /> {{systems.systemName}} (attuale) </label> <0 /> <label ng-if="!systems.remoteSystemIsNew"> <4 /> {{systems.joinSystemName}}</label>
+                Il nuovo sistema avrà password e nome dal seguente sistema: <br/><label><input type="radio" name="keepMySystem" ng-value="true" ng-disabled="systems.remoteSystemIsNew" ng-model="settings.keepMySystem" id="checkbox-current-system"/>{{systems.systemName}} (attuale) </label><br/><label ng-if="!systems.remoteSystemIsNew"><input type="radio" name="keepMySystem" ng-value="false" ng-disabled="systems.remoteSystemIsNew" ng-model="settings.keepMySystem" id="checkbox-external-system"/> {{systems.joinSystemName}}</label>
             </p>
         </div>
     </div>

@@ -97,7 +97,7 @@
     },
     "custom": {
       "label": "Personalizado",
-      "description": "Use el %PRODUCT_NAME% Aplicación de cliente para establecer permisos personalizados"
+      "description": "Use la aplicación de cliente %VMS_NAME% para configurar permisos personalizados"
     }
   },
   "errorCodes": {
@@ -173,7 +173,7 @@
     "confirmUnshareFromMeAction": "Desconectar",
     "confirmUnshare": "Este usuario no podrá acceder el sistema. ¿Está seguro?",
     "confirmUnshareTitle": "¿Eliminar el usuario?",
-    "confirmUnshareAction": "borrar",
+    "confirmUnshareAction": "Borrar",
     "successDisconnected": "El sistema está desconectado de %PRODUCT_NAME%",
     "successDeleted": "Sistema {{systemName}} se ha eliminado de su cuenta",
     "permissionsRemoved": "Los permisos fueron removidos de {{email}}"

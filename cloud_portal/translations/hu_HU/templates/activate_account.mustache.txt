@@ -4,5 +4,5 @@
 
 {{config.portal_url}}/activate/{{message.code}}
 
-If you didn't register in %PRODUCT_NAME%, just ignore this email.
+Ha nem regisztrált %PRODUCT_NAME% alkalmazásban ne foglalkozzon ezzel az e-maillel.
 Ne ossza meg az üzenetet vagy a klinket senkivel.

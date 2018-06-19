@@ -61,7 +61,7 @@
     },
     "Advanced Viewer": {
       "label": "Speciális felhasználó",
-      "description": "Élőkép, rögzített kép, kamerák konfigurálása, PTZ vezérlés, stb..."
+      "description": "Élőkép, rögzített kép, kamerák konfigurálása, PTZ vezérlés, stb"
     },
     "Administrator": {
       "label": "Adminisztrátor",
@@ -93,11 +93,11 @@
     },
     "advancedViewer": {
       "label": "Speciális felhasználó",
-      "description": "Élőkép, rögzített kép, kamerák konfigurálása, PTZ vezérlés, stb..."
+      "description": "Élőkép, rögzített kép, kamerák konfigurálása, PTZ vezérlés, stb"
     },
     "custom": {
       "label": "Egyéni",
-      "description": "Egyéni engedélyek konfigurálásához használja a %PRODUCT_NAME% klienst"
+      "description": "Egyéni engedélyek konfigurálásához használja a %VMS_NAME% klienst"
     }
   },
   "errorCodes": {

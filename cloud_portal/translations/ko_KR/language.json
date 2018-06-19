@@ -97,7 +97,7 @@
     },
     "custom": {
       "label": "사용자 정의",
-      "description": "%PRODUCT_NAME% 클라이언트 프로그램을 사용하여 사용자 정의 권한 설정"
+      "description": "%VMS_NAME% 클라이언트을 사용하여 권한 설정"
     }
   },
   "errorCodes": {

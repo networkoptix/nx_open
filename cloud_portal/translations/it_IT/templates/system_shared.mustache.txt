@@ -1,11 +1,11 @@
 Buongiorno, {{message.fullName}}
 
 {{#message.sharer_name}}
-<a href="mailto:{{message.sharer_email}}">{{message.sharer_name}}</a> ha condiviso l'accesso al sistema di gestione video "{{message.system_name}}" con lei.
+{{message.sharer_name}} ({{message.sharer_email}}) ha condiviso l'accesso al sistema di gestione video "{{message.system_name}}" con lei.
 {{/message.sharer_name}}
 
 {{^message.sharer_name}}
 Le è stato concesso l'accesso al sistema di gestione video "{{message.system_name}}".
 {{/message.sharer_name}}
 
-Visualizzi nel {{PRODUCT_NAME}} Portale: {{config.portal_url}}/ systems /{{message.system_id}}
+Visualizzi nel %PRODUCT_NAME% Portale: {{config.portal_url}}/systems/{{message.system_id}}

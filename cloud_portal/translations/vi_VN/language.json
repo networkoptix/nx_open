@@ -97,7 +97,7 @@
     },
     "custom": {
       "label": "Tùy chỉnh",
-      "description": "Sử dụng ứng dụng Khách hàng %PRODUCT_NAME% để thiết lập quyền tùy chỉnh"
+      "description": "Sử dụng ứng dụng Khách hàng %VMS_NAME% để thiết lập quyền tùy chỉnh"
     }
   },
   "errorCodes": {

@@ -97,7 +97,7 @@
     },
     "custom": {
       "label": "Personalizzato",
-      "description": "Utilizzare l'applicazione client %PRODUCT_NAME% per impostare le autorizzazioni personalizzate"
+      "description": "Utilizzare l'applicazione client %VMS_NAME% per impostare le autorizzazioni personalizzate"
     }
   },
   "errorCodes": {
@@ -254,7 +254,7 @@
   },
   "activeActions": {
     "sendConfirm": "Rinvia il link di attivazione",
-    "resetPassword": "Reimpostare la Password",
+    "resetPassword": "Reimpostare la password",
     "setNewPassword": "Salva password",
     "setNewPasswordLabel": "Nuova password"
   },

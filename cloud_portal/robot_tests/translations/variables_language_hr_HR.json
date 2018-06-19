@@ -50,7 +50,7 @@
     "EMAIL IS REQUIRED TEXT": "E-pošta je obavezna",
     "EMAIL ALREADY REGISTERED TEXT": "This Email has been already registered in %PRODUCT_NAME%",
     "EMAIL INVALID TEXT": "Please enter a valid Email",
-    "PASSWORD IS REQUIRED TEXT": "potrebna je lozinka",
+    "PASSWORD IS REQUIRED TEXT": "Potrebna je lozinka",
     "CURRENT PASSWORD IS REQUIRED TEXT": "Current password is required",
     "PASSWORD SPECIAL CHARS TEXT": "Koristite samo latino slova, brojeve i simbole tipkovnice, izbjegavajte vodeće i prateće prostore",
     "PASSWORD TOO SHORT TEXT": "Zaporka mora sadržavati najmanje 8 znakova",

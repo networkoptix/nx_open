@@ -97,7 +97,7 @@
     },
     "custom": {
       "label": "自定义",
-      "description": "使用 %PRODUCT_NAME% 客户端应用程序可以设置自定义权限"
+      "description": "请使用 %VMS_NAME% 客户端应用程序以配置自订权限"
     }
   },
   "errorCodes": {

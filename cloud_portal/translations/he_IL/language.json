@@ -97,7 +97,7 @@
     },
     "custom": {
       "label": "התאמה אישית",
-      "description": "השתמש ב %PRODUCT_NAME% כדי להגדיר הרשאות מותאמות אישית"
+      "description": "השתמש ב %VMS_NAME% כדי להגדיר הרשאות מותאמות אישית"
     }
   },
   "errorCodes": {
