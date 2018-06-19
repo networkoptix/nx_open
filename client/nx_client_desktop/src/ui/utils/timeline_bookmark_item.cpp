@@ -5,9 +5,9 @@
 using std::chrono::milliseconds;
 using namespace std::literals::chrono_literals;
 
-QnBookmarkCluster::QnBookmarkCluster()
-    : startTimeMs(0)
-    , durationMs(0)
+QnBookmarkCluster::QnBookmarkCluster():
+    startTimeMs(0),
+    durationMs(0)
 {
 }
 
@@ -17,13 +17,13 @@ milliseconds QnBookmarkCluster::endTimeMs() const
 }
 
 
-QnTimelineBookmarkItem::QnTimelineBookmarkItem(const QnCameraBookmark &bookmark)
-    : m_bookmark(bookmark)
+QnTimelineBookmarkItem::QnTimelineBookmarkItem(const QnCameraBookmark &bookmark):
+    m_bookmark(bookmark)
 {
 }
 
-QnTimelineBookmarkItem::QnTimelineBookmarkItem(const QnBookmarkCluster &cluster)
-    : m_cluster(cluster)
+QnTimelineBookmarkItem::QnTimelineBookmarkItem(const QnBookmarkCluster &cluster):
+    m_cluster(cluster)
 {
 }
 
