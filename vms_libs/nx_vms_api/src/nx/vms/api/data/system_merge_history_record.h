@@ -1,6 +1,9 @@
 #pragma once
 
+#include "../data_fwd.h"
+
 #include <QtCore/QtGlobal>
+#include <QtCore/QMetaType>
 #include <QtCore/QByteArray>
 #include <QtCore/QString>
 
