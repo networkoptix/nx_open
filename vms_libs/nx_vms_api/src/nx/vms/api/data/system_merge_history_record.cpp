@@ -1,11 +1,15 @@
-#include "api_system_merge_history_record.h"
+#include "system_merge_history_record.h"
+
+#include <QtCore/QCryptographicHash>
 
 #include <nx/fusion/model_functions.h>
+#include <nx/utils/log/log_message.h>
 
-namespace ec2 {
+namespace nx {
+namespace vms {
+namespace api {
 
-void ApiSystemMergeHistoryRecord::sign(
-    const nx::String& mergedSystemCloudAuthKey)
+void SystemMergeHistoryRecord::sign(const QByteArray& mergedSystemCloudAuthKey)
 {
     signature = calculateSignature(
         mergedSystemCloudId,
@@ -13,8 +17,7 @@ void ApiSystemMergeHistoryRecord::sign(
         mergedSystemCloudAuthKey);
 }
 
-bool ApiSystemMergeHistoryRecord::verify(
-    const nx::String& mergedSystemCloudAuthKey) const
+bool SystemMergeHistoryRecord::verify(const QByteArray& mergedSystemCloudAuthKey) const
 {
     return calculateSignature(
         mergedSystemCloudId,
@@ -22,12 +25,11 @@ bool ApiSystemMergeHistoryRecord::verify(
         mergedSystemCloudAuthKey) == signature;
 }
 
-nx::String ApiSystemMergeHistoryRecord::calculateSignature(
-    const nx::String& cloudSystemId,
+QByteArray SystemMergeHistoryRecord::calculateSignature(
+    const QByteArray& cloudSystemId,
     qint64 timestamp,
-    const nx::String& cloudAuthKey)
+    const QByteArray& cloudAuthKey)
 {
-    //base64(utc_timestamp_millis_decimal:base64(MD5(cloud_system_id:utc_timestamp_millis_decimal:cloud_auth_key))).
     const auto h1 = QCryptographicHash::hash(lm("%1:%2:%3")
         .args(cloudSystemId, timestamp, cloudAuthKey).toUtf8(), QCryptographicHash::Sha512)
         .toBase64();
@@ -35,8 +37,10 @@ nx::String ApiSystemMergeHistoryRecord::calculateSignature(
 }
 
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(
-    (ApiSystemMergeHistoryRecord),
-    (ubjson)(xml)(json)(sql_record)(csv_record),
+    (SystemMergeHistoryRecord),
+    (eq)(ubjson)(xml)(json)(sql_record)(csv_record),
     _Fields)
 
-} // namespace ec2
+} // namespace api
+} // namespace vms
+} // namespace nx

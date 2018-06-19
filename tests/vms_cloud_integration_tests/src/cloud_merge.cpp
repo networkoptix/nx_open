@@ -166,7 +166,7 @@ protected:
 
     void andMergeHistoryRecordIsAdded()
     {
-        const ::ec2::ApiSystemMergeHistoryRecordList systemMergeHistory =
+        const nx::vms::api::SystemMergeHistoryRecordList systemMergeHistory =
             m_systemMergeFixture.waitUntilMergeHistoryIsAdded();
         ASSERT_GE(systemMergeHistory.size(), 1U);
         if (!systemMergeHistory.front().mergedSystemCloudId.isEmpty())

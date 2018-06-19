@@ -109,6 +109,8 @@ DECLARE_STRUCT(MediaServerData)
 DECLARE_STRUCT(MediaServerDataEx)
 DECLARE_STRUCT(MediaServerUserAttributesData)
 
+DECLARE_STRUCT(SystemMergeHistoryRecord)
+
 #undef DECLARE_STRUCT
 #undef DECLARE_STRUCT_NO_LIST
 

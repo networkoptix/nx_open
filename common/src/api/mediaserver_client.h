@@ -118,9 +118,10 @@ public:
         const QnUuid& resourceId,
         nx::vms::api::ResourceParamDataList* result);
 
-    void ec2GetSystemMergeHistory(
-        std::function<void(ec2::ErrorCode, ec2::ApiSystemMergeHistoryRecordList)> completionHandler);
-    ec2::ErrorCode ec2GetSystemMergeHistory(ec2::ApiSystemMergeHistoryRecordList* result);
+    void ec2GetSystemMergeHistory(std::function<
+        void(ec2::ErrorCode, nx::vms::api::SystemMergeHistoryRecordList)> completionHandler);
+
+    ec2::ErrorCode ec2GetSystemMergeHistory(nx::vms::api::SystemMergeHistoryRecordList* result);
 
     void ec2AnalyticsLookupDetectedObjects(
         const nx::analytics::storage::Filter& request,

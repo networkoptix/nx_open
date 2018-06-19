@@ -656,7 +656,7 @@ bool SystemMergeProcessor::addMergeHistoryRecord(const MergeSystemData& data)
         ? m_localModuleInformation
         : static_cast<const QnModuleInformation&>(m_remoteModuleInformation);
 
-    ::ec2::ApiSystemMergeHistoryRecord mergeHistoryRecord;
+    nx::vms::api::SystemMergeHistoryRecord mergeHistoryRecord;
     mergeHistoryRecord.timestamp = QDateTime::currentMSecsSinceEpoch();
     mergeHistoryRecord.mergedSystemLocalId =
         mergedSystemModuleInformation.localSystemId.toSimpleByteArray();

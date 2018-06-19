@@ -13,7 +13,6 @@ struct ApiFullInfoData;
 struct ApiUserData;
 struct ApiUserRoleData;
 struct ApiPredefinedRoleData;
-struct ApiSystemMergeHistoryRecord;
 struct ApiDiscoveryData;
 struct ApiDiscoverPeerData;
 struct ApiConnectionData;
@@ -34,7 +33,6 @@ typedef std::vector<ApiUserRoleData> ApiUserRoleDataList;
 typedef std::vector<ApiPredefinedRoleData> ApiPredefinedRoleDataList;
 typedef std::vector<ApiDiscoveryData> ApiDiscoveryDataList;
 typedef std::vector<ApiDiscoveredServerData> ApiDiscoveredServerDataList;
-typedef std::vector<ApiSystemMergeHistoryRecord> ApiSystemMergeHistoryRecordList;
 
 /**
  * Wrapper to be used for overloading as a distinct type for nx::vms::api::StorageData api requests.
@@ -51,7 +49,6 @@ struct ParentId
     (ApiUserData)\
     (ApiUserRoleData)\
     (ApiPredefinedRoleData)\
-    (ApiSystemMergeHistoryRecord) \
     (ApiDiscoveryData)\
     (ApiDiscoverPeerData)\
     (ApiConnectionData)\

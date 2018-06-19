@@ -199,7 +199,7 @@ namespace ec2
             void onGetVideowallsDone            (int reqID, const ec2::ErrorCode, const nx::vms::api::VideowallDataList&);
             void onGetWebPagesDone              (int reqID, const ec2::ErrorCode, const nx::vms::api::WebPageDataList&);
             void onGetAccessRightsDone          (int reqID, const ec2::ErrorCode, const nx::vms::api::AccessRightsDataList&);
-            void onGetSystemMergeHistoryDone    (int reqID, const ec2::ErrorCode, const ec2::ApiSystemMergeHistoryRecordList&);
+            void onGetSystemMergeHistoryDone    (int reqID, const ec2::ErrorCode, const nx::vms::api::SystemMergeHistoryRecordList&);
         };
 
 
@@ -223,7 +223,7 @@ namespace ec2
         DEFINE_TWO_ARG_HANDLER(GetStatusList,               ec2::ErrorCode, nx::vms::api::ResourceStatusDataList)
         DEFINE_TWO_ARG_HANDLER(SaveKvPairs,                 ec2::ErrorCode, nx::vms::api::ResourceParamWithRefDataList)
         DEFINE_TWO_ARG_HANDLER(GetMiscParam,                ec2::ErrorCode, ec2::ApiMiscData)
-        DEFINE_TWO_ARG_HANDLER(GetSystemMergeHistory,       ec2::ErrorCode, ec2::ApiSystemMergeHistoryRecordList)
+        DEFINE_TWO_ARG_HANDLER(GetSystemMergeHistory,       ec2::ErrorCode, nx::vms::api::SystemMergeHistoryRecordList)
 
         //////////////////////////////////////////////////////////
         ///////// Handlers for AbstractMediaServerManager

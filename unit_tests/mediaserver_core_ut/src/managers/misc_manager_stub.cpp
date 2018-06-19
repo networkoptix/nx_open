@@ -44,7 +44,7 @@ int MiscManagerStub::cleanupDatabase(
 }
 
 int MiscManagerStub::saveSystemMergeHistoryRecord(
-    const ApiSystemMergeHistoryRecord& /*param*/,
+    const nx::vms::api::SystemMergeHistoryRecord& /*param*/,
     impl::SimpleHandlerPtr /*handler*/)
 {
     // TODO

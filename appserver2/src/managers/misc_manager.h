@@ -6,33 +6,33 @@
 
 #include <nx/vms/api/data/license_overflow_data.h>
 
-namespace ec2
+namespace ec2 {
+
+template<class QueryProcessorType>
+class QnMiscManager: public AbstractMiscManager
 {
+public:
+    QnMiscManager(QueryProcessorType * const queryProcessor, const Qn::UserAccessData &userAccessData);
 
-    template<class QueryProcessorType>
-    class QnMiscManager : public AbstractMiscManager
-    {
-    public:
-        QnMiscManager(QueryProcessorType * const queryProcessor, const Qn::UserAccessData &userAccessData);
+    virtual ~QnMiscManager();
+    virtual int markLicenseOverflow(bool value, qint64 time, impl::SimpleHandlerPtr handler) override;
+    virtual int cleanupDatabase(bool cleanupDbObjects, bool cleanupTransactionLog, impl::SimpleHandlerPtr handler) override;
 
-        virtual ~QnMiscManager();
-        virtual int markLicenseOverflow(bool value, qint64 time, impl::SimpleHandlerPtr handler) override;
-        virtual int cleanupDatabase(bool cleanupDbObjects, bool cleanupTransactionLog, impl::SimpleHandlerPtr handler) override;
+    virtual int saveMiscParam(const ec2::ApiMiscData& params, impl::SimpleHandlerPtr handler) override;
+    virtual int getMiscParam(const QByteArray& paramName, impl::GetMiscParamHandlerPtr handler) override;
 
-        virtual int saveMiscParam(const ec2::ApiMiscData& params, impl::SimpleHandlerPtr handler) override;
-        virtual int getMiscParam(const QByteArray& paramName, impl::GetMiscParamHandlerPtr handler) override;
+    virtual int saveSystemMergeHistoryRecord(const nx::vms::api::SystemMergeHistoryRecord& param, impl::SimpleHandlerPtr handler) override;
+    virtual int getSystemMergeHistory(impl::GetSystemMergeHistoryHandlerPtr handler) override;
 
-        virtual int saveSystemMergeHistoryRecord(const ApiSystemMergeHistoryRecord& param, impl::SimpleHandlerPtr handler) override;
-        virtual int getSystemMergeHistory(impl::GetSystemMergeHistoryHandlerPtr handler) override;
+    virtual int saveRuntimeInfo(const ec2::ApiRuntimeData& data, impl::SimpleHandlerPtr handler) override;
 
-        virtual int saveRuntimeInfo(const ec2::ApiRuntimeData& data, impl::SimpleHandlerPtr handler) override;
-    protected:
-        virtual int changeSystemId(const QnUuid& systemId, qint64 sysIdTime, Timestamp tranLogTime, impl::SimpleHandlerPtr handler) override;
+protected:
+    virtual int changeSystemId(const QnUuid& systemId, qint64 sysIdTime, Timestamp tranLogTime, impl::SimpleHandlerPtr handler) override;
 
-    private:
-        QueryProcessorType* const m_queryProcessor;
-        Qn::UserAccessData m_userAccessData;
-    };
+private:
+    QueryProcessorType* const m_queryProcessor;
+    Qn::UserAccessData m_userAccessData;
+};
 
 template<class QueryProcessorType>
 QnMiscManager<QueryProcessorType>::QnMiscManager(QueryProcessorType * const queryProcessor,
@@ -163,7 +163,7 @@ int QnMiscManager<T>::getMiscParam(const QByteArray& paramName, impl::GetMiscPar
 
 template<class T>
 int QnMiscManager<T>::saveSystemMergeHistoryRecord(
-    const ApiSystemMergeHistoryRecord& data,
+    const nx::vms::api::SystemMergeHistoryRecord& data,
     impl::SimpleHandlerPtr handler)
 {
     const int reqID = generateRequestID();
@@ -186,16 +186,18 @@ int QnMiscManager<T>::getSystemMergeHistory(
     auto queryDoneHandler =
         [reqID, handler](
             ErrorCode errorCode,
-            const ApiSystemMergeHistoryRecordList& outData)
+            const nx::vms::api::SystemMergeHistoryRecordList& outData)
         {
             if (errorCode == ErrorCode::ok)
                 handler->done(reqID, errorCode, std::move(outData));
             else
-                handler->done(reqID, errorCode, ApiSystemMergeHistoryRecordList());
+                handler->done(reqID, errorCode, nx::vms::api::SystemMergeHistoryRecordList());
         };
-    m_queryProcessor->getAccess(m_userAccessData)
-        .template processQueryAsync<QByteArray /*dummy*/, ApiSystemMergeHistoryRecordList, decltype(queryDoneHandler)>
-            (ApiCommand::getSystemMergeHistory, QByteArray(), queryDoneHandler);
+
+    m_queryProcessor->getAccess(m_userAccessData).template processQueryAsync<QByteArray /*dummy*/,
+            nx::vms::api::SystemMergeHistoryRecordList, decltype(queryDoneHandler)>
+        (ApiCommand::getSystemMergeHistory, QByteArray(), queryDoneHandler);
+
     return reqID;
 }
 

@@ -48,7 +48,7 @@ protected:
         impl::SimpleHandlerPtr handler) override;
 
     virtual int saveSystemMergeHistoryRecord(
-        const ApiSystemMergeHistoryRecord& param,
+        const nx::vms::api::SystemMergeHistoryRecord& param,
         impl::SimpleHandlerPtr handler) override;
 
     virtual int getSystemMergeHistory(

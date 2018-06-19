@@ -1350,10 +1350,10 @@ APPLY(10101, getMiscParam, ApiMiscData, \
                        InvalidFilterFunc(), /* Filter read func */ \
                        AllowForAllAccessOut(), /* Check remote peer rights for outgoing transaction */ \
                        LocalTransactionType()) /* regular transaction type */ \
-APPLY(10200, saveSystemMergeHistoryRecord, ApiSystemMergeHistoryRecord, \
+APPLY(10200, saveSystemMergeHistoryRecord, nx::vms::api::SystemMergeHistoryRecord, \
                        true, /* persistent*/ \
                        false, /* system*/ \
-                       makeCreateHashFromCustomFieldHelper(&ApiSystemMergeHistoryRecord::mergedSystemLocalId), /* getHash*/ \
+                       makeCreateHashFromCustomFieldHelper(&nx::vms::api::SystemMergeHistoryRecord::mergedSystemLocalId), /* getHash*/ \
                        EmptyNotificationHelper(), \
                        AdminOnlyAccess(), /* save permission checker */ \
                        AdminOnlyAccess(), /* read permission checker */ \
@@ -1361,7 +1361,7 @@ APPLY(10200, saveSystemMergeHistoryRecord, ApiSystemMergeHistoryRecord, \
                        InvalidFilterFunc(), /* Filter read func */ \
                        AllowForAllAccessOut(), /* Check remote peer rights for outgoing transaction */ \
                        CloudTransactionType()) \
-APPLY(10201, getSystemMergeHistory, ApiSystemMergeHistoryRecordList, \
+APPLY(10201, getSystemMergeHistory, nx::vms::api::SystemMergeHistoryRecordList, \
                        true, /* persistent*/ \
                        false, /* system*/ \
                        InvalidGetHashHelper(), /* getHash*/ \

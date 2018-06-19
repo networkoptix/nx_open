@@ -260,18 +260,18 @@ ec2::ErrorCode MediaServerClient::ec2GetResourceParams(
         result);
 }
 
-void MediaServerClient::ec2GetSystemMergeHistory(
-    std::function<void(ec2::ErrorCode, ec2::ApiSystemMergeHistoryRecordList)> completionHandler)
+void MediaServerClient::ec2GetSystemMergeHistory(std::function<
+    void(ec2::ErrorCode, nx::vms::api::SystemMergeHistoryRecordList)> completionHandler)
 {
     performAsyncEc2Call("ec2/getSystemMergeHistory", std::move(completionHandler));
 }
 
 ec2::ErrorCode MediaServerClient::ec2GetSystemMergeHistory(
-    ec2::ApiSystemMergeHistoryRecordList* result)
+    nx::vms::api::SystemMergeHistoryRecordList* result)
 {
     using Ec2GetSystemMergeHistoryAsyncFuncPointer =
         void(MediaServerClient::*)(
-            std::function<void(ec2::ErrorCode, ec2::ApiSystemMergeHistoryRecordList)>);
+            std::function<void(ec2::ErrorCode, nx::vms::api::SystemMergeHistoryRecordList)>);
 
     return syncCallWrapper(
         this,

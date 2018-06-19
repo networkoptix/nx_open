@@ -909,8 +909,8 @@ bool QnDbManager::syncLicensesBetweenDB()
 
 template <typename FilterDataType, class ObjectType, class ObjectListType>
 bool QnDbManager::fillTransactionLogInternal(
-    ApiCommand::Value command, 
-    std::function<bool (ObjectType& data)> updater, 
+    ApiCommand::Value command,
+    std::function<bool (ObjectType& data)> updater,
     FilterDataType filter)
 {
     ObjectListType objects;
@@ -3441,7 +3441,7 @@ ErrorCode QnDbManager::doQueryNoLock(const QByteArray &name, ApiMiscData& miscDa
     query.addBindValue(name);
     if (!execSQLQuery(&query, Q_FUNC_INFO))
         return ErrorCode::dbError;
-    
+
     if (query.next())
         miscData.value = query.value(0).toByteArray();
     miscData.name = name;
@@ -3450,7 +3450,7 @@ ErrorCode QnDbManager::doQueryNoLock(const QByteArray &name, ApiMiscData& miscDa
 
 ErrorCode QnDbManager::doQueryNoLock(
     const QByteArray& /*dummy*/,
-    ApiSystemMergeHistoryRecordList& systemMergeHistory)
+    SystemMergeHistoryRecordList& systemMergeHistory)
 {
     QSqlQuery fetchMergeHistoryQuery(m_sdb);
     fetchMergeHistoryQuery.prepare(R"sql(
@@ -4562,7 +4562,7 @@ ErrorCode QnDbManager::executeTransactionInternal(const QnTransaction<ApiMiscDat
 }
 
 ErrorCode QnDbManager::executeTransactionInternal(
-    const QnTransaction<ApiSystemMergeHistoryRecord>& tran)
+    const QnTransaction<SystemMergeHistoryRecord>& tran)
 {
     QSqlQuery insQuery(m_sdb);
     insQuery.prepare(R"sql(

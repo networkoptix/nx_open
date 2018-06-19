@@ -31,7 +31,7 @@
 #include <nx/vms/api/data/media_server_data.h>
 #include <nx_ec/data/api_user_role_data.h>
 #include <nx_ec/data/api_misc_data.h>
-#include <nx_ec/data/api_system_merge_history_record.h>
+#include <nx/vms/api/data/system_merge_history_record.h>
 #include "nx_ec/managers/abstract_server_manager.h"
 #include "nx_ec/managers/abstract_camera_manager.h"
 #include "nx_ec/managers/abstract_user_manager.h"
@@ -49,7 +49,7 @@ class QnHttpConnectionListener;
 class QnCommonModule;
 struct QnModuleInformation;
 
-namespace nx { 
+namespace nx {
 
 namespace vms { namespace discovery { class Manager; }}
 namespace time_sync { class TimeSyncManager; }
@@ -899,10 +899,10 @@ public:
             outData);
     }
 
-    ErrorCode saveSystemMergeHistoryRecord(const ec2::ApiSystemMergeHistoryRecord& param)
+    ErrorCode saveSystemMergeHistoryRecord(const nx::vms::api::SystemMergeHistoryRecord& param)
     {
         int (AbstractMiscManager::*fn)(
-                const ec2::ApiSystemMergeHistoryRecord&,
+                const nx::vms::api::SystemMergeHistoryRecord&,
                 impl::SimpleHandlerPtr) =
             &AbstractMiscManager::saveSystemMergeHistoryRecord;
         return impl::doSyncCall<impl::SimpleHandler>(
@@ -918,7 +918,7 @@ public:
                 >(target, handler)));
     }
 
-    ErrorCode getSystemMergeHistorySync(ApiSystemMergeHistoryRecordList* const outData)
+    ErrorCode getSystemMergeHistorySync(nx::vms::api::SystemMergeHistoryRecordList* const outData)
     {
         return impl::doSyncCall<impl::GetSystemMergeHistoryHandler>(
             [this](const impl::GetSystemMergeHistoryHandlerPtr& handler)
@@ -948,7 +948,7 @@ protected:
         impl::GetMiscParamHandlerPtr handler) = 0;
 
     virtual int saveSystemMergeHistoryRecord(
-        const ApiSystemMergeHistoryRecord& param,
+        const nx::vms::api::SystemMergeHistoryRecord& param,
         impl::SimpleHandlerPtr handler) = 0;
     virtual int getSystemMergeHistory(impl::GetSystemMergeHistoryHandlerPtr handler) = 0;
 };
@@ -1035,8 +1035,8 @@ public:
     virtual QnCommonModule* commonModule() const = 0;
 
     virtual QnUuid routeToPeerVia(
-        const QnUuid& dstPeer, 
-        int* distance, 
+        const QnUuid& dstPeer,
+        int* distance,
         nx::network::SocketAddress* knownPeerAddress) const = 0;
     virtual TransactionMessageBusAdapter* messageBus() const = 0;
     virtual nx::time_sync::TimeSyncManager* timeSyncManager() const = 0;

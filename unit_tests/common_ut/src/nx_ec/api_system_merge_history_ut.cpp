@@ -2,7 +2,7 @@
 
 #include <nx/utils/random.h>
 
-#include <nx_ec/data/api_system_merge_history_record.h>
+#include <nx/vms/api/data/system_merge_history_record.h>
 
 namespace ec2 {
 namespace test {
@@ -48,7 +48,7 @@ protected:
     }
 
 private:
-    ApiSystemMergeHistoryRecord m_record;
+    nx::vms::api::SystemMergeHistoryRecord m_record;
     nx::String m_authKey;
 };
 

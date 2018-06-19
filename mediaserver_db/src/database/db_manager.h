@@ -246,7 +246,7 @@ namespace detail
 
         ErrorCode doQueryNoLock(const QByteArray &paramName, ApiMiscData& miscData);
         ErrorCode doQueryNoLock(const QByteArray& /*dummy*/,
-            ApiSystemMergeHistoryRecordList& systemMergeHistory);
+            nx::vms::api::SystemMergeHistoryRecordList& systemMergeHistory);
         //getResourceTypes
         ErrorCode doQueryNoLock(
             const std::nullptr_t& /*dummy*/,
@@ -407,7 +407,8 @@ namespace detail
         ErrorCode executeTransactionInternal(
             const QnTransaction<nx::vms::api::ClientInfoData>& tran);
         ErrorCode executeTransactionInternal(const QnTransaction<ApiMiscData>& tran);
-        ErrorCode executeTransactionInternal(const QnTransaction<ApiSystemMergeHistoryRecord>& tran);
+        ErrorCode executeTransactionInternal(
+            const QnTransaction<nx::vms::api::SystemMergeHistoryRecord>& tran);
 
         // delete camera, server, layout, any resource, etc.
         ErrorCode executeTransactionInternal(const QnTransaction<nx::vms::api::IdData>& tran);
@@ -750,7 +751,7 @@ namespace detail
 
         template <class FilterDataType, class ObjectType, class ObjectListType>
         bool fillTransactionLogInternal(
-            ApiCommand::Value command, 
+            ApiCommand::Value command,
             std::function<bool (ObjectType& data)> updater = nullptr,
             FilterDataType filter = FilterDataType());
 
