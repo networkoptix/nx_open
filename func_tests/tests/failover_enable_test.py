@@ -34,9 +34,6 @@ class Counter(object):
         return self._value
 
 
-
-
-
 @pytest.fixture
 def counter():
     return Counter()
@@ -70,10 +67,10 @@ def three_mediaservers(network, mediaserver_factory):
 
 ServerRec = namedtuple('ServerRec', 'server camera_mac_set')
 
+
 # Each server can have own copy of each auto-discovered cameras until they completely merge.
 # To catch exact moment when servers merge complete, we first wait until each server discover all cameras.
 # After that we merge servers and wait until preferred cameras settle down on destined servers.
-
 def create_cameras_and_setup_servers(servers, camera_factory, counter):
     server_count = len(servers)
     # we always use 2 cameras per server
