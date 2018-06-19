@@ -19,7 +19,7 @@ _logger = logging.getLogger(__name__)
 def pytest_addoption(parser):
     parser.addoption('--work-dir', type=Path, default=defaults.get('work_dir'), help=(
         'working directory for tests: all generated files will be placed there'))
-    parser.addoption('--bin-dir', type=Path, help=(
+    parser.addoption('--bin-dir', type=Path, default=defaults.get('bin_dir'), help=(
         'directory with binary files for tests: '
         'debian distributive and media sample are expected there'))
     parser.addoption('--customization', help=(
