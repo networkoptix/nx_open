@@ -131,9 +131,10 @@ if(UNIX)
     )
 
     if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
-        if(CMAKE_CXX_COMPILER_VERSION VERSION_GREATER_EQUAL 7.0)
-            add_compile_options(-Wno-error=dangling-else)
-        endif()
+        add_compile_options(
+            -Wno-error=dangling-else
+            -Wno-psabi
+        )
     elseif(CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
         add_compile_options(
             -Wno-c++14-extensions
