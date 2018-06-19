@@ -70,7 +70,7 @@ def test_change_primary_server(two_mediaservers):
     """Change PRIMARY server, change time on its machine. Expect all servers align with it."""
     old_primary, old_secondary = two_mediaservers
     old_secondary_uuid = get_server_id(old_secondary.api)
-    old_secondary.api.ec2.forcePrimaryTimeServer.POST(id=old_secondary_uuid)
+    old_secondary.api.post('ec2/forcePrimaryTimeServer', dict(id=old_secondary_uuid))
     wait_for_true(
         lambda: is_primary_time_server(old_secondary.api),
         '{} becomes primary'.format(old_primary))
@@ -114,7 +114,7 @@ def test_primary_server_temporary_offline(two_mediaservers):
 
 def test_secondary_server_temporary_inet_on(two_mediaservers):
     primary, secondary = two_mediaservers
-    primary.api.api.systemSettings.GET(synchronizeTimeWithInternet=True)
+    primary.api.get('api/systemSettings', params=dict(synchronizeTimeWithInternet=True))
     secondary.os_access.networking.enable_internet()
 
     wait_for_true(

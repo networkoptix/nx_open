@@ -18,8 +18,8 @@ def wait_for_and_check_camera_history(camera, server_list, expected_servers_orde
     while True:
         camera_history_responses = []
         for server in server_list:
-            response = server.api.ec2.cameraHistory.GET(
-                cameraId=camera.id, startTime=0, endTime='now')
+            response = server.api.get('ec2/cameraHistory', dict(
+                cameraId=camera.id, startTime=0, endTime='now'))
             assert len(response) == 1, repr(response)  # must contain exactly one record for one camera
             servers_order = [item['serverGuid'] for item in response[0]['items']]
             _logger.debug('Received camera history servers order: %s', servers_order)
@@ -41,7 +41,7 @@ def wait_for_and_check_camera_history(camera, server_list, expected_servers_orde
 # https://networkoptix.atlassian.net/browse/TEST-181
 # transport check part (3):
 def check_media_stream_transports(server):
-    camera_info_list = server.api.ec2.getCamerasEx.GET()
+    camera_info_list = server.api.get('ec2/getCamerasEx')
     assert camera_info_list  # At least one camera must be returned for following check to work
     for camera_info in camera_info_list:
         for add_params_rec in camera_info['addParams']:

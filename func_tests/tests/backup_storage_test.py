@@ -95,14 +95,14 @@ def server(one_mediaserver, system_backup_type, backup_storage_volume):
     one_mediaserver.installation.update_mediaserver_conf(config_file_params)
     one_mediaserver.start()
     setup_local_system(one_mediaserver, {})
-    one_mediaserver.api.api.systemSettings.GET(backupQualities=system_backup_type)
+    one_mediaserver.api.get('api/systemSettings', params=dict(backupQualities=system_backup_type))
     return one_mediaserver
 
 
 def wait_storage_ready(server, storage_guid):
     start = time.time()
     while True:
-        status = server.api.ec2.getStatusList.GET(id=storage_guid)
+        status = server.api.get('ec2/getStatusList', params=dict(id=storage_guid))
         if status and status[0]['status'] == 'Online':
             return
         if time.time() - start >= BACKUP_STORAGE_READY_TIMEOUT_SEC:
@@ -113,20 +113,20 @@ def wait_storage_ready(server, storage_guid):
 
 def change_and_assert_server_backup_type(server, expected_backup_type):
     server_guid = get_server_id(server.api)
-    server.api.ec2.saveMediaServerUserAttributes.POST(
+    server.api.post('ec2/saveMediaServerUserAttributes', dict(
         serverId=server_guid,
         backupType='BackupManual',
         backupDaysOfTheWeek=BACKUP_EVERY_DAY,
         backupStart=0,  # start backup at 00:00:00
         backupDuration=BACKUP_DURATION_NOT_SET,
         backupBitrate=BACKUP_BITRATE_NOT_LIMITED,
-        )
-    attributes = server.api.ec2.getMediaServerUserAttributesList.GET(id=server_guid)
+        ))
+    attributes = server.api.get('ec2/getMediaServerUserAttributesList', params=dict(id=server_guid))
     assert (expected_backup_type and attributes[0]['backupType'] == expected_backup_type)
 
 
 def get_storage(server, storage_path):
-    storage_list = [s for s in server.api.ec2.getStorages.GET()
+    storage_list = [s for s in server.api.get('ec2/getStorages')
                     if str(storage_path) in s['url'] and s['usedForWriting']]
     if storage_list:
         assert len(storage_list) == 1
@@ -141,7 +141,7 @@ def add_backup_storage(server, storage_path):
     assert storage, 'Mediaserver did not accept storage %r in %r seconds' % (
         storage_path, BACKUP_STORAGE_APPEARS_TIMEOUT_SEC)
     storage['isBackup'] = True
-    server.api.ec2.saveStorage.POST(**storage)
+    server.api.post('ec2/saveStorage', dict(**storage))
     wait_storage_ready(server, storage['id'])
     change_and_assert_server_backup_type(server, 'BackupManual')
     return Path(storage['url'])
@@ -150,7 +150,7 @@ def add_backup_storage(server, storage_path):
 def wait_backup_finish(server, expected_backup_time):
     start = time.time()
     while True:
-        backup_response = server.api.api.backupControl.GET()
+        backup_response = server.api.get('api/backupControl')
         backup_time_ms = int(backup_response['backupTimeMs'])
         backup_state = backup_response['state']
         backup_time = utils.datetime_utc_from_timestamp(backup_time_ms / 1000.)
@@ -172,7 +172,7 @@ def add_camera(camera_factory, server, camera_id, backup_type):
         camera_attr = generator.generate_camera_user_attributes_data(
             dict(id=camera_guid, name=camera.name),
             backupType=backup_type)
-        server.api.ec2.saveCameraUserAttributes.POST(**camera_attr)
+        server.api.post('ec2/saveCameraUserAttributes', dict(**camera_attr))
     return camera
 
 
@@ -213,15 +213,14 @@ def test_backup_by_request(
         server, backup_storage_volume, camera_factory, sample_media_file,
         system_backup_type, backup_new_camera, second_camera_backup_type):
     backup_storage_path = add_backup_storage(server, backup_storage_volume)
-    server.api.api.systemSettings.GET(
-        backupNewCamerasByDefault=backup_new_camera)
+    server.api.get('api/systemSettings', params=dict(backupNewCamerasByDefault=backup_new_camera))
     start_time = datetime(2017, 3, 27, tzinfo=pytz.utc)
     camera_1 = add_camera(camera_factory, server, camera_id=1, backup_type=BACKUP_BOTH)
     camera_2 = add_camera(camera_factory, server, camera_id=2, backup_type=second_camera_backup_type)
     server.storage.save_media_sample(camera_1, start_time, sample_media_file)
     server.storage.save_media_sample(camera_2, start_time, sample_media_file)
     server.rebuild_archive()
-    server.api.api.backupControl.GET(action='start')
+    server.api.get('api/backupControl', params=dict(action='start'))
     expected_backup_time = start_time + sample_media_file.duration
     wait_backup_finish(server, expected_backup_time)
     assert_backup_equal_to_archive(
@@ -239,12 +238,12 @@ def test_backup_by_schedule(server, backup_storage_volume, camera_factory, sampl
     server.storage.save_media_sample(camera, start_time_1, sample_media_file)
     server.storage.save_media_sample(camera, start_time_2, sample_media_file)
     server.rebuild_archive()
-    server.api.ec2.saveMediaServerUserAttributes.POST(
+    server.api.post('ec2/saveMediaServerUserAttributes', dict(
         serverId=get_server_id(server.api), backupType='BackupSchedule',
         backupDaysOfTheWeek=BACKUP_EVERY_DAY,
         backupStart=0,  # start backup at 00:00:00
         backupDuration=BACKUP_DURATION_NOT_SET,
-        backupBitrate=BACKUP_BITRATE_NOT_LIMITED)
+        backupBitrate=BACKUP_BITRATE_NOT_LIMITED))
     expected_backup_time = start_time_2 + sample_media_file.duration
     wait_backup_finish(server, expected_backup_time)
     assert_backup_equal_to_archive(

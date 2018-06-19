@@ -81,21 +81,21 @@ def test_server_should_pick_archive_file_with_time_after_db_time(one_running_med
 def assert_server_has_resource(server, method, **kw):
     def is_subset(subset, superset):
         return all(item in superset.items() for item in subset.items())
-    resources = [r for r in server.api.get_api_fn('GET', 'ec2', method)()
+    resources = [r for r in server.api.get('ec2/' + method)
                  if is_subset(kw, r)]
     assert len(resources) != 0, "'%r' doesn't have resource '%s'" % (
         server, kw)
 
 
 def assert_server_does_not_have_resource(server, method, resource_id):
-    resources = server.api.get_api_fn('GET', 'ec2', method)(id=resource_id)
+    resources = server.api.get('ec2/' + method, params=dict(id=resource_id))
     assert len(resources) == 0, "'%r' has unexpected resource '%s'" % (
         server, resource_id)
 
 
 def assert_post_forbidden(server, method, **kw):
     with pytest.raises(HttpError) as x_info:
-        server.api.get_api_fn('POST', 'ec2', method)(**kw)
+        server.api.post('ec2/' + method, kw)
     assert x_info.value.status_code == 403
 
 
@@ -105,15 +105,15 @@ def test_create_and_remove_user_with_resource(one_running_mediaserver):
         user_id=1,  name="user1", email="user1@example.com",
         permissions="2432", cryptSha512Hash="", digest="",
         hash="", isAdmin=False, isEnabled=True, isLdap=False, realm="")
-    one_running_mediaserver.api.ec2.saveUser.POST(**user)
+    one_running_mediaserver.api.post('ec2/saveUser', dict(**user))
     expected_permissions = "GlobalViewArchivePermission|GlobalManageBookmarksPermission|0x80"
     user_resource = [generator.generate_resource_params_data(id=1, resource=user)]
-    one_running_mediaserver.api.ec2.setResourceParams.POST(json=user_resource)
+    one_running_mediaserver.api.post('ec2/setResourceParams', user_resource)
     assert_server_has_resource(one_running_mediaserver, 'getUsers', id=user['id'], permissions=expected_permissions)
     assert_server_has_resource(
         one_running_mediaserver,
         'getResourceParams', resourceId=user['id'], name=user_resource[0]['name'])
-    one_running_mediaserver.api.ec2.removeUser.POST(id=user['id'])
+    one_running_mediaserver.api.post('ec2/removeUser', dict(id=user['id']))
     assert_server_does_not_have_resource(one_running_mediaserver, 'getUsers', user['id'])
     assert_server_does_not_have_resource(one_running_mediaserver, 'getResourceParams', user['id'])
     assert not one_running_mediaserver.installation.list_core_dumps()
@@ -125,7 +125,7 @@ def test_missing_user_role(one_running_mediaserver):
     user_2 = generator.generate_user_data(user_id=2, name="user2", email="user2@example.com",
                                           userRoleId=UNEXISTENT_USER_ROLE_GUIID)
     # Try link existing user to a missing role
-    one_running_mediaserver.api.ec2.saveUser.POST(**user_1)
+    one_running_mediaserver.api.post('ec2/saveUser', dict(**user_1))
     assert_server_has_resource(one_running_mediaserver, 'getUsers', id=user_1['id'])
     user_1_with_unexpected_role = dict(user_1, userRoleId=UNEXISTENT_USER_ROLE_GUIID)
     assert_post_forbidden(one_running_mediaserver, 'saveUser', **user_1_with_unexpected_role)
@@ -151,16 +151,16 @@ def test_remove_child_resources(one_running_mediaserver):
         ('saveCamera', 'getCameras', camera_1),
         ('saveCamera', 'getCameras', camera_2)]
     for post_method, get_method, data in tested_calls:
-        one_running_mediaserver.api.get_api_fn('POST', 'ec2', post_method)(**data)
+        one_running_mediaserver.api.post('ec2/' + post_method, data)
         resource_params = [generator.generate_resource_params_data(id=1, resource=data)]
-        one_running_mediaserver.api.ec2.setResourceParams.POST(json=resource_params)
+        one_running_mediaserver.api.post('ec2/setResourceParams', resource_params)
         assert_server_has_resource(one_running_mediaserver, get_method, id=data['id'])
         assert_server_has_resource(one_running_mediaserver, 'getResourceParams', resourceId=data['id'])
     # Remove camera_2
-    one_running_mediaserver.api.ec2.removeResource.POST(id=camera_1['id'])
+    one_running_mediaserver.api.post('ec2/removeResource', dict(id=camera_1['id']))
     assert_server_does_not_have_resource(one_running_mediaserver, 'getCameras', camera_1['id'])
     # Remove running_linux_server and check that all running_linux_server child resources have been removed
-    one_running_mediaserver.api.ec2.removeResource.POST(id=server_data['id'])
+    one_running_mediaserver.api.post('ec2/removeResource', dict(id=server_data['id']))
     for _, get_method, data in tested_calls:
         assert_server_does_not_have_resource(one_running_mediaserver, get_method, data['id'])
         assert_server_does_not_have_resource(one_running_mediaserver, 'getResourceParams', data['id'])
@@ -200,7 +200,7 @@ def test_static_vulnerability(one_running_mediaserver):
 def test_auth_with_time_changed(one_vm, mediaserver_installers, ca, artifact_factory):
     with timeless_mediaserver(one_vm, mediaserver_installers, ca, artifact_factory) as timeless_server:
         timeless_guid = get_server_id(timeless_server.api)
-        timeless_server.api.ec2.forcePrimaryTimeServer.POST(id=timeless_guid)
+        timeless_server.api.post('ec2/forcePrimaryTimeServer', dict(id=timeless_guid))
         assert is_primary_time_server(timeless_server.api)
         url = timeless_server.api.url('ec2/testConnection')
 
@@ -232,17 +232,17 @@ def test_auth_with_time_changed(one_vm, mediaserver_installers, ca, artifact_fac
 def test_uptime_is_monotonic(one_vm, mediaserver_installers, ca, artifact_factory):
     with timeless_mediaserver(one_vm, mediaserver_installers, ca, artifact_factory) as timeless_server:
         timeless_guid = get_server_id(timeless_server.api)
-        timeless_server.api.ec2.forcePrimaryTimeServer.POST(id=timeless_guid)
+        timeless_server.api.post('ec2/forcePrimaryTimeServer', dict(id=timeless_guid))
         assert is_primary_time_server(timeless_server.api)
         timeless_server.os_access.set_time(datetime.now(pytz.utc))
-        first_uptime = timeless_server.api.api.statistics.GET()['uptimeMs']
+        first_uptime = timeless_server.api.get('api/statistics')['uptimeMs']
         if not isinstance(first_uptime, (int, float)):
             _logger.warning("Type of uptimeMs is %s but expected to be numeric.", type(first_uptime).__name__)
         new_time = timeless_server.os_access.set_time(datetime.now(pytz.utc) - timedelta(minutes=1))
         wait_for_true(
             lambda: get_time(timeless_server.api).is_close_to(new_time),
             "time on {} is close to {}".format(timeless_server, new_time))
-        second_uptime = timeless_server.api.api.statistics.GET()['uptimeMs']
+        second_uptime = timeless_server.api.get('api/statistics')['uptimeMs']
         if not isinstance(first_uptime, (int, float)):
             _logger.warning("Type of uptimeMs is %s but expected to be numeric.", type(second_uptime).__name__)
         assert float(first_uptime) < float(second_uptime)

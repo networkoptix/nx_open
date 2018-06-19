@@ -47,31 +47,31 @@ class CloudAccount(object):
         return 'http://%s/' % self.hostname
 
     def ping(self):
-        unused_realm = self.api.cdb.ping.GET()
+        unused_realm = self.api.get('cdb/ping')
 
     def get_user_info(self):
-        return self.api.cdb.account.get.GET()
+        return self.api.get('cdb/account')
 
     def register_user(self, first_name, last_name):
-        response = self.api.api.account.register.POST(
+        response = self.api.post('api/account/register', dict(
             email=self.api.user,
             password=self.api.password,
             first_name=first_name,
             last_name=last_name,
             subscribe=False,
-            )
+            ))
         assert response == dict(resultCode='ok'), repr(response)
 
     def resend_activation_code(self):
-        response = self.api.cdb.account.reactivate.POST(email=self.api.user)
+        response = self.api.post('cdb/account/reactivate', dict(email=self.api.user))
         assert response == dict(code=''), repr(response)
 
     def activate_user(self, activation_code):
-        response = self.api.cdb.account.activate.POST(code=activation_code)
+        response = self.api.post('cdb/account/activate', dict(code=activation_code))
         assert response.get('email') == self.api.user, repr(response)  # Got activation code for another user?
 
     def set_user_customization(self, customization):
-        response = self.api.cdb.account.update.POST(customization=customization)
+        response = self.api.portst('cdb/account/update', dict(customization=customization))
         assert response.get('resultCode') == 'ok'
 
     def check_user_is_valid(self):
@@ -86,10 +86,10 @@ class CloudAccount(object):
         _logger.info('Cloud host %r is up and test user is valid', self)
 
     def bind_system(self, system_name):
-        response = self.api.cdb.system.bind.GET(
+        response = self.api.get('cdb/system/bind', dict(
             name=system_name,
             customization=self.customization,
-            )
+            ))
         return ServerBindInfo(response['authKey'], response['id'])
 
 
