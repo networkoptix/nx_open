@@ -55,9 +55,9 @@ $modal-content-border-color:  transparent;
 $panel-default-heading-bg:    transparent;
 
 // Fonts
-$rem-baseline: 13px;
+$rem-baseline: 16px;
 
-$font-size-base : rem($rem-baseline); // Assumes the browser default, typically `16px`
+$font-size-base : rem(13px); // Assumes the browser default, typically `16px`
 $font-size-lg : $font-size-base * 1.25;
 $font-size-sm : $font-size-base * .785;
 

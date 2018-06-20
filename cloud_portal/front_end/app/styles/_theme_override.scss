@@ -440,7 +440,7 @@ label {
 }
 
 @mixin kill-glyphicon {
-    background-size  : 112px 32px;
+    background-size  : 112px 80px;
     background-image : url('/static/images/portal_icons.png') !important;
     &:before {
         content : none;

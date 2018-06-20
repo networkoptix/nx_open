@@ -27,8 +27,14 @@
             color : $blue10;
         }
 
-        &:hover .system-owner {
-            color : white;
+        &:hover {
+            & .system-owner {
+                color : white;
+            }
+
+            & .glyphicon-home {
+                background-position : 0px -60px !important;
+            }
         }
     }
 }

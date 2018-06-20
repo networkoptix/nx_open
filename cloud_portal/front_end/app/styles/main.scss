@@ -827,7 +827,7 @@ h2.version-number{
 
 @mixin icon{
   display: inline-block;
-  background-size: 112px 56px;
+  background-size: 112px 80px;
   width: 16px;
   height: 16px;
   margin-right: 5px;
@@ -848,7 +848,7 @@ h2.version-number{
     @include kill-glyphicon;
     width: 20px;
     height: 18px;
-    background-position: -26px -34px;
+    background-position: -24px -34px;
 }
 
 .glyphicon-user{
