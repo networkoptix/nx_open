@@ -438,11 +438,11 @@ int QnPtzRestHandler::executeRelativeMove(
     nx::core::ptz::Options options;
 
     const bool success =
-        !requireParameter(params, lit("pan"), result, &vector.pan, /*optional*/ true)
-        || !requireParameter(params, lit("tilt"), result, &vector.tilt, /*optional*/ true)
-        || !requireParameter(params, lit("rotate"), result, &vector.tilt, /*optional*/ true)
-        || !requireParameter(params, lit("zoom"), result, &vector.tilt, /*optional*/ true)
-        || !requireParameter(params, lit("type"), result, &options.type, /*optional*/ true);
+        requireParameter(params, lit("pan"), result, &vector.pan, /*optional*/ true)
+        && requireParameter(params, lit("tilt"), result, &vector.tilt, /*optional*/ true)
+        && requireParameter(params, lit("rotate"), result, &vector.rotation, /*optional*/ true)
+        && requireParameter(params, lit("zoom"), result, &vector.zoom, /*optional*/ true)
+        && requireParameter(params, lit("type"), result, &options.type, /*optional*/ true);
 
     if (!success)
         return CODE_INVALID_PARAMETER;
