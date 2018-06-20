@@ -32,9 +32,9 @@ int QnCookieLoginRestHandler::executePost(
         return nx::network::http::StatusCode::ok;
     }
 
-    const auto authorizer = QnUniversalTcpListener::authorizer(owner->owner());
+    const auto authenticator = QnUniversalTcpListener::authorizer(owner->owner());
     Qn::UserAccessData accessRights;
-    Qn::AuthResult authResult = authorizer->tryAuthRecord(
+    Qn::AuthResult authResult = authenticator->tryAuthRecord(
         owner->socket()->getForeignAddress().address,
         cookieData.auth,
         QByteArray("GET"),
@@ -73,8 +73,7 @@ int QnCookieLoginRestHandler::executePost(
         return nx::network::http::StatusCode::ok;
     }
 
-    authorizer->setAccessCookie(owner->request(), owner->response(), accessRights);
-
+    authenticator->setAccessCookie(owner->request(), owner->response(), accessRights);
     QnCurrentUserRestHandler currentUser;
     return currentUser.executeGet(QString(), QnRequestParams(), result, owner);
 }

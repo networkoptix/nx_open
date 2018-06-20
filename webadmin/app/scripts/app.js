@@ -11,7 +11,7 @@ angular.module('webadminApp', [
     'ngStorage',
     'angular-clipboard'
 ]).config(['$httpProvider', function ($httpProvider) {
-    $httpProvider.defaults.xsrfCookieName = 'x-runtime-guld';
+    $httpProvider.defaults.xsrfCookieName = 'x-runtime-guid';
     $httpProvider.defaults.xsrfHeaderName = 'X-Runtime-Guid';
 }]).config(['$routeProvider', function ($routeProvider) {
 

@@ -120,6 +120,8 @@ private:
         std::deque<std::chrono::steady_clock::time_point> failures;
     };
 
+    // TODO: Refactor all these methods so they return Result instead of out paramiters.
+    // It's also preferable to come to identical interfase, so they could be used as generics.
     Qn::AuthResult doAllMethods(
         const nx::network::HostAddress& clientIp,
         const nx::network::http::Request& request,
@@ -138,7 +140,7 @@ private:
 
     void addAuthHeader(
         nx::network::http::Response& responseHeaders,
-            const QnUserResourcePtr& userRes = {},
+        const QnUserResourcePtr& userRes = {},
         bool isProxy = false,
         bool isDigest = true);
 
@@ -170,14 +172,14 @@ private:
         \return \a true if password expiration timestamp has been increased
     */
     //!Check \a digest validity with external authentication service (LDAP currently)
-    Qn::AuthResult checkDigestValidity(QnUserResourcePtr userResource, const QByteArray& digest );
+    Qn::AuthResult checkDigestValidity(QnUserResourcePtr userResource, const QByteArray& digest);
 
 private:
     nx::network::http::AuthMethodRestrictionList m_authMethodRestrictionList;
     nx::vms::auth::AbstractNonceProvider* const m_timeBasedNonceProvider;
     nx::vms::auth::AbstractNonceProvider* const m_nonceProvider;
     nx::vms::auth::AbstractUserDataProvider* const m_userDataProvider;
-    std::unique_ptr<LdapManager> const m_ldap;
+    const std::unique_ptr<LdapManager> m_ldap;
 
     struct SessionKeys: public nx::network::TemporayKeyKeeper<Qn::UserAccessData> { SessionKeys(); };
     SessionKeys m_sessionKeys;

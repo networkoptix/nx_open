@@ -18,17 +18,17 @@ int QnCurrentUserRestHandler::executeGet(
 {
     ec2::ApiUserData user;
 
-    const auto authorizer = QnUniversalTcpListener::authorizer(owner->owner());
+    const auto authenticator = QnUniversalTcpListener::authorizer(owner->owner());
     const auto clientIp = owner->socket()->getForeignAddress().address;
     auto accessRights = owner->accessRights();
 
     if (accessRights.isNull())
-        accessRights = authorizer->tryCookie(owner->request()).access;
+        accessRights = authenticator->tryCookie(owner->request()).access;
 
     if (accessRights.isNull())
     {
         nx::network::http::Response response;
-        authorizer->tryAuthRecord(
+        authenticator->tryAuthRecord(
             clientIp, params.value(Qn::URL_QUERY_AUTH_KEY_NAME).toUtf8(),
             "GET", response, &accessRights);
     }

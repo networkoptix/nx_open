@@ -990,15 +990,12 @@ nx::network::http::StatusCode::Value HttpLiveStreamingProcessor::createSession(
         }
     }
 
-    const auto authorizer = QnUniversalTcpListener::authorizer(owner());
+    const auto authenticator = QnUniversalTcpListener::authorizer(owner());
+    newHlsSession->setChunkAuthenticationQueryItem( authenticator->makeQueryItemForPath(
+        accessRights, HLS_PREFIX + camResource->getUniqueId() + ".ts") );
 
-    const auto& chunkAuthenticationKey = authorizer->makeQueryItemForPath(
-        accessRights, HLS_PREFIX + camResource->getUniqueId() + ".ts");
-    newHlsSession->setChunkAuthenticationQueryItem( chunkAuthenticationKey );
-
-    const auto& playlistAuthenticationKey = authorizer->makeQueryItemForPath(
-        accessRights, requestedPlaylistPath);
-    newHlsSession->setPlaylistAuthenticationQueryItem( playlistAuthenticationKey );
+    newHlsSession->setPlaylistAuthenticationQueryItem( authenticator->makeQueryItemForPath(
+        accessRights, requestedPlaylistPath) );
 
     *session = newHlsSession.release();
     return nx::network::http::StatusCode::ok;
