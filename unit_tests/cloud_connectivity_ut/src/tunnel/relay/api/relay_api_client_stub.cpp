@@ -12,12 +12,12 @@ namespace relay {
 namespace api {
 namespace test {
 
-ClientImpl::ClientImpl():
+ClientStub::ClientStub(const nx::utils::Url& /*relayUrl*/):
     m_scheduledRequestCount(0)
 {
 }
 
-ClientImpl::~ClientImpl()
+ClientStub::~ClientStub()
 {
     if (isInSelfAioThread())
         stopWhileInAioThread();
@@ -28,7 +28,7 @@ ClientImpl::~ClientImpl()
         handler();
 }
 
-void ClientImpl::beginListening(
+void ClientStub::beginListening(
     const nx::String& /*peerName*/,
     nx::cloud::relay::api::BeginListeningHandler handler)
 {
@@ -48,7 +48,7 @@ void ClientImpl::beginListening(
         });
 }
 
-void ClientImpl::startSession(
+void ClientStub::startSession(
     const nx::String& desiredSessionId,
     const nx::String& /*targetPeerName*/,
     nx::cloud::relay::api::StartClientConnectSessionHandler handler)
@@ -69,7 +69,7 @@ void ClientImpl::startSession(
         });
 }
 
-void ClientImpl::openConnectionToTheTargetHost(
+void ClientStub::openConnectionToTheTargetHost(
     const nx::String& /*sessionId*/,
     nx::cloud::relay::api::OpenRelayConnectionHandler handler)
 {
@@ -107,42 +107,42 @@ void ClientImpl::openConnectionToTheTargetHost(
         });
 }
 
-utils::Url ClientImpl::url() const
+utils::Url ClientStub::url() const
 {
     return nx::utils::Url();
 }
 
-SystemError::ErrorCode ClientImpl::prevRequestSysErrorCode() const
+SystemError::ErrorCode ClientStub::prevRequestSysErrorCode() const
 {
     return SystemError::noError;
 }
 
-int ClientImpl::scheduledRequestCount() const
+int ClientStub::scheduledRequestCount() const
 {
     return m_scheduledRequestCount;
 }
 
-void ClientImpl::setOnBeforeDestruction(nx::utils::MoveOnlyFunc<void()> handler)
+void ClientStub::setOnBeforeDestruction(nx::utils::MoveOnlyFunc<void()> handler)
 {
     m_onBeforeDestruction = std::move(handler);
 }
 
-void ClientImpl::setBehavior(RequestProcessingBehavior behavior)
+void ClientStub::setBehavior(RequestProcessingBehavior behavior)
 {
     m_behavior = behavior;
 }
 
-void ClientImpl::setIgnoreRequests()
+void ClientStub::setIgnoreRequests()
 {
     m_behavior = RequestProcessingBehavior::ignore;
 }
 
-void ClientImpl::setFailRequests()
+void ClientStub::setFailRequests()
 {
     m_behavior = RequestProcessingBehavior::fail;
 }
 
-void ClientImpl::stopWhileInAioThread()
+void ClientStub::stopWhileInAioThread()
 {
     // TODO
 }
