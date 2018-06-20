@@ -12,6 +12,7 @@ namespace {
 
 TimedCommand makeComponentCommand(
     double value,
+    const Options& options,
     Component componentType,
     const RelativeContinuousMoveComponentMapping& mapping)
 {
@@ -38,11 +39,12 @@ TimedCommand makeComponentCommand(
             : -mapping.workingSpeed.absoluteValue,
         componentType);
 
-    return {command, commandDuration};
+    return {command, options, commandDuration};
 }
 
 CommandSequence makeCommandSequence(
     const Vector& relativeMovement,
+    const Options& options,
     const nx::core::ptz::RelativeContinuousMoveMapping& movementMapping)
 {
     // TODO: #dmishin implement iterators for nx::core::ptz::Vector.
@@ -62,7 +64,7 @@ CommandSequence makeCommandSequence(
 
         const auto componentType = component.second;
         const auto mapping = movementMapping.componentMapping(componentType);
-        const auto command = makeComponentCommand(value, componentType, mapping);
+        const auto command = makeComponentCommand(value, options, componentType, mapping);
 
         if (!command.command.isNull())
             result.push_back(command);
@@ -74,9 +76,10 @@ CommandSequence makeCommandSequence(
 
 RelativeContinuousMoveEngine::RelativeContinuousMoveEngine(
     QnAbstractPtzController* controller,
-    const RelativeContinuousMoveMapping& mapping)
+    const RelativeContinuousMoveMapping& mapping,
+    QThreadPool* threadPool)
     :
-    m_sequenceExecutor(controller),
+    m_sequenceExecutor(controller, threadPool),
     m_mapping(mapping)
 {
 }
@@ -85,7 +88,7 @@ bool RelativeContinuousMoveEngine::relativeMove(
     const nx::core::ptz::Vector& direction,
     const nx::core::ptz::Options& options)
 {
-    const auto commandSequence = makeCommandSequence(direction, m_mapping);
+    const auto commandSequence = makeCommandSequence(direction, options, m_mapping);
     return m_sequenceExecutor.executeSequence(commandSequence);
 }
 
@@ -95,6 +98,7 @@ bool RelativeContinuousMoveEngine::relativeFocus(
 {
     const auto command = makeComponentCommand(
         direction,
+        options,
         Component::focus,
         m_mapping.componentMapping(Component::focus));
 
