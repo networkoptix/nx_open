@@ -1,9 +1,8 @@
 import pytest
 
 from framework.api_shortcuts import get_updates_state
-from framework.serving import reserved_port
+from framework.serving import make_base_url_for_remote_machine, reserved_port
 from framework.waiting import ensure_persistence
-from updates_server.server import make_base_url_for_remote_machine
 
 
 @pytest.fixture()

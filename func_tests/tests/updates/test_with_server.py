@@ -2,9 +2,9 @@ import pytest
 
 from framework.api_shortcuts import get_updates_state
 from framework.installation.mediaserver import Mediaserver
-from framework.serving import WsgiServer
+from framework.serving import WsgiServer, make_base_url_for_remote_machine
 from framework.waiting import wait_for_true
-from updates_server.server import UpdatesServer, make_base_url_for_remote_machine
+from updates_server.server import UpdatesServer
 
 
 @pytest.fixture()

@@ -219,13 +219,3 @@ class UpdatesServer(object):
             raise NotFound()
 
         return app
-
-
-def make_base_url_for_remote_machine(os_access, local_port):
-    """Convenience function for fixtures"""
-    # TODO: Refactor to get it out of here.
-    port_map_local = os_access.port_map.local
-    address_from_there = port_map_local.address
-    port_from_there = port_map_local.tcp(local_port)
-    url = 'http://{}:{}'.format(address_from_there, port_from_there)
-    return url
