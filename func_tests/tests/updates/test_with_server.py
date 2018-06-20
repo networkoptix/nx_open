@@ -12,7 +12,7 @@ from updates_server.server import UpdatesServer, make_base_url_for_remote_machin
 
 
 @pytest.fixture()
-def updates_server(work_dir, one_mediaserver):
+def updates_server(work_dir, one_mediaserver, cloud_group):
     # Mediaserver which is stopped,
     # only needed to know what's address host has
     # from machine, on which mediaserver is installed.
@@ -31,7 +31,7 @@ def updates_server(work_dir, one_mediaserver):
         raise RuntimeError("Cannot find available port.")
     base_url = make_base_url_for_remote_machine(one_mediaserver.os_access, port)
     # When port is bound and it's known how to access server's address and port, generate.
-    server.generate_data(base_url)
+    server.generate_data(base_url, cloud_group)
     thread = Thread(target=wsgi_server.serve_forever)
     thread.start()
     yield base_url, server.callback_requests, server.download_requests

@@ -7,6 +7,7 @@ from flask import Flask, request, send_file
 from pathlib2 import PurePosixPath, PureWindowsPath
 from werkzeug.exceptions import BadRequest, NotFound, SecurityError
 
+from framework.cloud_host import resolve_cloud_host_from_registry
 from framework.installation.installer import Version, known_customizations
 from framework.os_access.posix_shell_utils import sh_augment_script, sh_command_to_script
 from framework.os_access.windows_power_shell_utils import power_shell_augment_script
@@ -140,8 +141,9 @@ class _UpdatesData(object):
             'updates_prefix': self._base_url.rstrip('/') + '/' + customization.customization_name,
             }
 
-    def add_release(self, customization, version, cloud_host='cloud-test.hdw.mx'):
+    def add_release(self, customization, version, cloud_group):
         _logger.info("Create %s %s", customization.customization_name, version)
+        cloud_host = resolve_cloud_host_from_registry(cloud_group, customization.customization_name)
         self.root[customization.customization_name]['releases'][version.short_as_str] = version.as_str
         release_dir = self.data_dir / customization.customization_name / str(version.build)
         release_dir.mkdir(parents=True, exist_ok=True)
@@ -182,12 +184,12 @@ class UpdatesServer(object):
         self.callback_requests = []
         self.download_requests = []
 
-    def generate_data(self, base_url):
+    def generate_data(self, base_url, cloud_group):
         updates = _UpdatesData(self.data_dir, base_url, base_url + self._callback_endpoint)
         for customization in known_customizations:
             updates.add_customization(customization)
             for version in {Version('3.1.0.16975'), Version('3.2.0.17000'), Version('4.0.0.21200')}:
-                updates.add_release(customization, version)
+                updates.add_release(customization, version, cloud_group)
         updates.save_root()
 
     def make_app(self, serve_update_archives, range_header_policy):
