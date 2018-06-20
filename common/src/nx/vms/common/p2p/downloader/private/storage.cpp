@@ -124,7 +124,7 @@ ResultCode Storage::addDownloadedFile(const FileInformation& fileInformation)
 
     lock.unlock();
 
-    emit fileAdded(fileInformation);
+    emit fileAdded(info);
 
     return ResultCode::ok;
 }
@@ -200,7 +200,7 @@ ResultCode Storage::addNewFile(const FileInformation& fileInformation)
 
     lock.unlock();
 
-    emit fileAdded(fileInformation);
+    emit fileAdded(info);
 
     return ResultCode::ok;
 }
