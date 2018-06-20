@@ -1,9 +1,4 @@
-////////////////////////////////////////////////////////////
-// 25 dec 2012    Andrey Kolesnikov
-////////////////////////////////////////////////////////////
-
-#ifndef ONDEMAND_MEDIA_DATA_PROVIDER_H
-#define ONDEMAND_MEDIA_DATA_PROVIDER_H
+#pragma once
 
 #include <deque>
 #include <memory>
@@ -54,5 +49,3 @@ private:
 };
 
 typedef std::shared_ptr<OnDemandMediaDataProvider> OnDemandMediaDataProviderPtr;
-
-#endif  //ONDEMAND_MEDIA_DATA_PROVIDER_H

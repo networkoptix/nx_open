@@ -1,9 +1,4 @@
-////////////////////////////////////////////////////////////
-// 18 dec 2012    Andrey Kolesnikov
-////////////////////////////////////////////////////////////
-
-#ifndef HLS_SERVER_H
-#define HLS_SERVER_H
+#pragma once
 
 #include <QDateTime>
 #include <nx/utils/thread/mutex.h>
@@ -155,5 +150,3 @@ private:
         const std::multimap<QString, QString>& requestParams);
 };
 }
-
-#endif  //HLS_SERVER_H

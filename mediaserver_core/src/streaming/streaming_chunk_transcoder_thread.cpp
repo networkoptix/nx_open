@@ -1,7 +1,3 @@
-////////////////////////////////////////////////////////////
-// 14 jan 2012    Andrey Kolesnikov
-////////////////////////////////////////////////////////////
-
 #include "streaming_chunk_transcoder_thread.h"
 
 #include <fstream>
@@ -157,7 +153,7 @@ void StreamingChunkTranscoderThread::run()
 
         QnAbstractMediaDataPtr srcMediaData = std::dynamic_pointer_cast<QnAbstractMediaData>(srcPacket);
 
-        if( !srcMediaData || 
+        if( !srcMediaData ||
             std::dynamic_pointer_cast<QnEmptyMediaData>(srcMediaData) ) //< QnEmptyMediaData signals end-of-stream
         {
             NX_LOG( lit("End of file reached while transcoding resource %1 data. Transcoded %2 ms of source data").

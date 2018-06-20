@@ -1,9 +1,4 @@
-////////////////////////////////////////////////////////////
-// 14 jan 2012    Andrey Kolesnikov
-////////////////////////////////////////////////////////////
-
-#ifndef STREAMING_CHUNK_TRANSCODER_THREAD_H
-#define STREAMING_CHUNK_TRANSCODER_THREAD_H
+#pragma once
 
 #include <memory>
 
@@ -67,7 +62,7 @@ private:
         StreamingChunkCacheKey transcodeParams;
         bool dataAvailable;
         qint64 prevReadTryTimestamp;
-        quint64 msTranscoded; 
+        quint64 msTranscoded;
         quint64 packetsTranscoded;
         //!-1, if no prev packet
         qint64 prevPacketTimestamp;
@@ -98,5 +93,3 @@ private:
         const std::map<int, std::unique_ptr<TranscodeContext>>::iterator& transcodingIter,
         bool transcodingFinishedSuccessfully);
 };
-
-#endif  //STREAMING_CHUNK_TRANSCODER_THREAD_H

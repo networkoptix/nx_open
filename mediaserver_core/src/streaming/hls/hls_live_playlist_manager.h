@@ -1,9 +1,4 @@
-////////////////////////////////////////////////////////////
-// 21 feb 2013    Andrey Kolesnikov
-////////////////////////////////////////////////////////////
-
-#ifndef HLS_LIVE_PLAYLIST_MANAGER_H
-#define HLS_LIVE_PLAYLIST_MANAGER_H
+#pragma once
 
 #include <deque>
 #include <memory>
@@ -72,5 +67,3 @@ private:
 //!Using std::shared_ptr for \a std::shared_ptr::unique()
 typedef std::shared_ptr<nx_hls::HLSLivePlaylistManager> HLSLivePlaylistManagerPtr;
 }
-
-#endif  //HLS_LIVE_PLAYLIST_MANAGER_H

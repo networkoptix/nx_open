@@ -1,10 +1,4 @@
-/**********************************************************
-* Aug 24, 2015
-* a.kolesnikov
-***********************************************************/
-
-#ifndef HLS_PLAYLIST_MANAGER_PROXY_H
-#define HLS_PLAYLIST_MANAGER_PROXY_H
+#pragma once
 
 #include <memory>
 
@@ -31,5 +25,3 @@ private:
 };
 
 }
-
-#endif  //HLS_PLAYLIST_MANAGER_PROXY_H

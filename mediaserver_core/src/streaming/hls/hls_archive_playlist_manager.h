@@ -1,9 +1,4 @@
-////////////////////////////////////////////////////////////
-// 11 mar 2013    Andrey Kolesnikov
-////////////////////////////////////////////////////////////
-
-#ifndef HLS_ARCHIVE_PLAYLIST_MANAGER_H
-#define HLS_ARCHIVE_PLAYLIST_MANAGER_H
+#pragma once
 
 #include "hls_playlist_manager.h"
 
@@ -77,5 +72,3 @@ private:
 //!Using std::shared_ptr for \a std::shared_ptr::unique()
 typedef std::shared_ptr<ArchivePlaylistManager> ArchivePlaylistManagerPtr;
 }
-
-#endif  //HLS_ARCHIVE_PLAYLIST_MANAGER_H
