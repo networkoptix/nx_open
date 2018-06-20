@@ -105,7 +105,7 @@ public:
     {
         size_t maxLoginFailures = 10;
         std::chrono::milliseconds accountTime = std::chrono::minutes(5);
-        std::chrono::milliseconds lockoutTime = std::chrono::minutes(1);
+        std::chrono::milliseconds lockoutTime = std::chrono::seconds(30);
     };
 
     std::optional<LockoutOptions> getLockoutOptions() const;
