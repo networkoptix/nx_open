@@ -15,7 +15,6 @@ struct ApiUserData: nx::vms::api::ResourceData
 
     ApiUserData():
         isAdmin(false),
-        permissions(Qn::NoGlobalPermissions),
         realm(nx::network::AppInfo::realm()),
         isLdap(false),
         isEnabled(true),
@@ -51,7 +50,7 @@ struct ApiUserData: nx::vms::api::ResourceData
     bool isAdmin;
 
     /** Global user permissions. */
-    Qn::GlobalPermissions permissions;
+    GlobalPermissions permissions;
 
     QnUuid userRoleId;
 

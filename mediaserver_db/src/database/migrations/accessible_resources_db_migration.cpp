@@ -91,7 +91,7 @@ namespace ec2
             return query.value(0).toInt();
         }
 
-        int getCurrentUserPermissions(const QSqlDatabase& database, int internalUserId)
+        GlobalPermissions getCurrentUserPermissions(const QSqlDatabase& database, int internalUserId)
         {
             QSqlQuery query(database);
             query.setForwardOnly(true);
@@ -110,12 +110,12 @@ namespace ec2
             if (internalUserId <= 0)
                 return false;
 
-            int oldPermissions = getCurrentUserPermissions(database, internalUserId);
-            int newPermissions = oldPermissions | Qn::GlobalLiveViewerPermissionSet;
+            const auto oldPermissions = getCurrentUserPermissions(database, internalUserId);
+            const auto  newPermissions = oldPermissions | GlobalPermission::liveViewerPermissions;
 
             QString logMessage = lit("Adding User Permissions: %1 -> %2")
-                .arg(QnLexical::serialized(static_cast<Qn::GlobalPermissions>(oldPermissions)))
-                .arg(QnLexical::serialized(static_cast<Qn::GlobalPermissions>(newPermissions)));
+                .arg(QnLexical::serialized(oldPermissions))
+                .arg(QnLexical::serialized(newPermissions));
             NX_LOG(logMessage, cl_logINFO);
 
             QSqlQuery query(database);
@@ -124,7 +124,7 @@ namespace ec2
             if (!nx::utils::db::SqlQueryExecutionHelper::prepareSQLQuery(&query, sqlText, Q_FUNC_INFO))
                 return false;
             query.bindValue(":id", internalUserId);
-            query.bindValue(":permissions", newPermissions);
+            query.bindValue(":permissions", int(newPermissions));
             return nx::utils::db::SqlQueryExecutionHelper::execSQLQuery(&query, Q_FUNC_INFO);
         }
 

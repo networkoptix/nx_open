@@ -598,9 +598,9 @@ bool LayoutsHandler::confirmChangeLocalLayout(const QnUserResourcePtr& user,
     /* Calculate removed cameras that are still directly accessible. */
     switch (user->userRole())
     {
-        case Qn::UserRole::CustomPermissions:
+        case Qn::UserRole::customPermissions:
             return ui::messages::Resources::changeUserLocalLayout(mainWindowWidget(), change.removed);
-        case Qn::UserRole::CustomUserRole:
+        case Qn::UserRole::customUserRole:
             return ui::messages::Resources::addToRoleLocalLayout(
                     mainWindowWidget(),
                     calculateResourcesToShare(change.added, user))
@@ -620,7 +620,7 @@ bool LayoutsHandler::confirmDeleteLocalLayouts(const QnUserResourcePtr& user,
     if (!user)
         return true;
 
-    if (resourceAccessManager()->hasGlobalPermission(user, Qn::GlobalAccessAllMediaPermission))
+    if (resourceAccessManager()->hasGlobalPermission(user, GlobalPermission::accessAllMedia))
         return true;
 
     /* Never ask for own layouts. */
@@ -660,7 +660,7 @@ void LayoutsHandler::grantMissingAccessRights(const QnUserResourcePtr& user,
     if (!user)
         return;
 
-    if (resourceAccessManager()->hasGlobalPermission(user, Qn::GlobalAccessAllMediaPermission))
+    if (resourceAccessManager()->hasGlobalPermission(user, GlobalPermission::accessAllMedia))
         return;
 
     auto accessible = sharedResourcesManager()->sharedResources(user);

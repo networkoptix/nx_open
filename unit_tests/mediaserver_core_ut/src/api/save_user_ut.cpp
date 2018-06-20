@@ -40,7 +40,7 @@ TEST(SaveUser, fillDigestAndName)
     ec2::ApiUserData receivedUserData;
     ec2::ApiUserData userData;
     userData.fullName = "Tester Fullname";
-    userData.permissions = Qn::GlobalAdminPermission;
+    userData.permissions = GlobalPermission::admin;
     userData.email = "cloud-tester@email.com";
     userData.isCloud = true;
 

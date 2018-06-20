@@ -51,7 +51,7 @@ protected:
     QnCommonModule* commonModule() const { return m_module->commonModule(); }
     QnResourcePool* resourcePool() const { return commonModule()->resourcePool(); }
 
-    QnUserResourcePtr addUser(const QString &name, Qn::GlobalPermissions globalPermissions, QnUserType userType = QnUserType::Local)
+    QnUserResourcePtr addUser(const QString &name, GlobalPermissions globalPermissions, QnUserType userType = QnUserType::Local)
     {
         QnUserResourcePtr user(new QnUserResource(userType));
         user->setId(QnUuid::createUuid());
@@ -88,13 +88,13 @@ protected:
     void loginAsOwner()
     {
         logout();
-        auto user = addUser(userName1, Qn::NoGlobalPermissions);
+        auto user = addUser(userName1, {});
         user->setOwner(true);
         m_currentUser = user;
         m_accessController->setUser(m_currentUser);
     }
 
-    void loginAs(Qn::GlobalPermissions globalPermissions, QnUserType userType = QnUserType::Local)
+    void loginAs(GlobalPermissions globalPermissions, QnUserType userType = QnUserType::Local)
     {
         logout();
         auto user = addUser(userName1, globalPermissions, userType);
@@ -146,7 +146,7 @@ TEST_F(QnWorkbenchAccessControllerTest, checkExportedLayouts)
     checkPermissions(layout, desired, forbidden);
 
     /* Result is the same even for live users... */
-    loginAs(Qn::GlobalLiveViewerPermissionSet);
+    loginAs(GlobalPermission::liveViewerPermissions);
     checkPermissions(layout, desired, forbidden);
 
     /* ...even in safe mode. */
@@ -170,7 +170,7 @@ TEST_F(QnWorkbenchAccessControllerTest, checkExportedLayoutsLocked)
     checkPermissions(layout, desired, forbidden);
 
     /* Result is the same even for live users... */
-    loginAs(Qn::GlobalLiveViewerPermissionSet);
+    loginAs(GlobalPermission::liveViewerPermissions);
     checkPermissions(layout, desired, forbidden);
 
     /* ...even in safe mode. */
@@ -204,7 +204,7 @@ TEST_F(QnWorkbenchAccessControllerTest, checkLocalLayoutsUnlogged)
 /** Check permissions for unsaved layouts when the user is logged in. */
 TEST_F(QnWorkbenchAccessControllerTest, checkLocalLayoutsLoggedIn)
 {
-    loginAs(Qn::GlobalLiveViewerPermissionSet);
+    loginAs(GlobalPermission::liveViewerPermissions);
 
     auto layout = createLayout(Qn::local);
     resourcePool()->addResource(layout);
@@ -223,7 +223,7 @@ TEST_F(QnWorkbenchAccessControllerTest, checkLocalLayoutsLoggedIn)
 /** Check permissions for locked unsaved layouts when the user is logged in. */
 TEST_F(QnWorkbenchAccessControllerTest, checkLockedLocalLayoutsLoggedIn)
 {
-    loginAs(Qn::GlobalLiveViewerPermissionSet);
+    loginAs(GlobalPermission::liveViewerPermissions);
 
     auto layout = createLayout(Qn::local, true);
     resourcePool()->addResource(layout);
@@ -247,7 +247,7 @@ TEST_F(QnWorkbenchAccessControllerTest, checkLockedLocalLayoutsLoggedIn)
 /** Check permissions for unsaved layouts when the user is logged in safe mode. */
 TEST_F(QnWorkbenchAccessControllerTest, checkLocalLayoutsLoggedInSafeMode)
 {
-    loginAs(Qn::GlobalLiveViewerPermissionSet);
+    loginAs(GlobalPermission::liveViewerPermissions);
     commonModule()->setReadOnly(true);
 
     auto layout = createLayout(Qn::local);
@@ -267,7 +267,7 @@ TEST_F(QnWorkbenchAccessControllerTest, checkLocalLayoutsLoggedInSafeMode)
 /** Check permissions for locked unsaved layouts when the user is logged in safe mode. */
 TEST_F(QnWorkbenchAccessControllerTest, checkLockedLocalLayoutsLoggedInSafeMode)
 {
-    loginAs(Qn::GlobalLiveViewerPermissionSet);
+    loginAs(GlobalPermission::liveViewerPermissions);
     commonModule()->setReadOnly(true);
 
     auto layout = createLayout(Qn::local, true);

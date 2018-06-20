@@ -83,33 +83,33 @@ bool QnUserResource::setMemberChecked(
 Qn::UserRole QnUserResource::userRole() const
 {
     if (isOwner())
-        return Qn::UserRole::Owner;
+        return Qn::UserRole::owner;
 
     QnUuid id = userRoleId();
     if (!id.isNull())
-        return Qn::UserRole::CustomUserRole;
+        return Qn::UserRole::customUserRole;
 
     auto permissions = getRawPermissions();
 
-    if (permissions.testFlag(Qn::GlobalAdminPermission))
-        return Qn::UserRole::Administrator;
+    if (permissions.testFlag(GlobalPermission::admin))
+        return Qn::UserRole::administrator;
 
     switch (permissions)
     {
-        case Qn::GlobalAdvancedViewerPermissionSet:
-            return Qn::UserRole::AdvancedViewer;
+        case GlobalPermission::advancedViewerPermissions:
+            return Qn::UserRole::advancedViewer;
 
-        case Qn::GlobalViewerPermissionSet:
-            return Qn::UserRole::Viewer;
+        case GlobalPermission::viewerPermissions:
+            return Qn::UserRole::viewer;
 
-        case Qn::GlobalLiveViewerPermissionSet:
-            return Qn::UserRole::LiveViewer;
+        case GlobalPermission::liveViewerPermissions:
+            return Qn::UserRole::liveViewer;
 
         default:
             break;
     };
 
-    return Qn::UserRole::CustomPermissions;
+    return Qn::UserRole::customPermissions;
 }
 
 QByteArray QnUserResource::getHash() const
@@ -243,13 +243,13 @@ void QnUserResource::setRealm(const QString& realm)
         emit realmChanged(::toSharedPointer(this));
 }
 
-Qn::GlobalPermissions QnUserResource::getRawPermissions() const
+GlobalPermissions QnUserResource::getRawPermissions() const
 {
     QnMutexLocker locker(&m_mutex);
     return m_permissions;
 }
 
-void QnUserResource::setRawPermissions(Qn::GlobalPermissions permissions)
+void QnUserResource::setRawPermissions(GlobalPermissions permissions)
 {
     if (setMemberChecked(&QnUserResource::m_permissions, permissions))
         emit permissionsChanged(::toSharedPointer(this));

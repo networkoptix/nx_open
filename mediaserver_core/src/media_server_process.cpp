@@ -357,7 +357,7 @@ bool initResourceTypes(const ec2::AbstractECConnectionPtr& ec2Connection)
 void addFakeVideowallUser(QnCommonModule* commonModule)
 {
     ec2::ApiUserData fakeUserData;
-    fakeUserData.permissions = Qn::GlobalVideoWallModePermissionSet;
+    fakeUserData.permissions = GlobalPermission::videowallModePermissions;
     fakeUserData.typeId = qnResTypePool->getFixedResourceTypeId(QnResourceTypePool::kUserTypeId);
     auto fakeUser = ec2::fromApiToResource(fakeUserData);
     fakeUser->setId(Qn::kVideowallUserAccess.userId);
@@ -1558,9 +1558,9 @@ void MediaServerProcess::registerRestHandlers(
         [this, processorPool](
             const QString& path,
             QnRestRequestHandler* handler,
-            Qn::GlobalPermission permissions = Qn::NoGlobalPermissions)
+            GlobalPermission permission = GlobalPermission::none)
         {
-            processorPool->registerHandler(path, handler, permissions);
+            processorPool->registerHandler(path, handler, permission);
 
             const auto& cameraIdUrlParams = handler->cameraIdUrlParams();
             if (!cameraIdUrlParams.isEmpty())
@@ -1568,8 +1568,8 @@ void MediaServerProcess::registerRestHandlers(
         };
 
     // TODO: When supported by apidoctool, the comment to these constants should be parsed.
-    const auto kAdmin = Qn::GlobalAdminPermission;
-    const auto kViewLogs = Qn::GlobalViewLogsPermission;
+    const auto kAdmin = GlobalPermission::admin;
+    const auto kViewLogs = GlobalPermission::viewLogs;
 
     /**%apidoc GET /api/synchronizedTime
      * This method is used for internal purpose to synchronize time between mediaservers and clients.

@@ -326,7 +326,7 @@ void SystemManager::shareSystem(
     if (sharing.customPermissions.empty())
     {
         bool isAdmin = false;
-        Qn::GlobalPermissions permissions(Qn::NoPermissions);
+        GlobalPermissions permissions(Qn::NoPermissions);
         ec2::accessRoleToPermissions(sharing.accessRole, &permissions, &isAdmin);
         sharing.customPermissions = QnLexical::serialized(permissions).toStdString();
     }
@@ -806,7 +806,7 @@ nx::utils::db::DBResult SystemManager::insertOwnerSharingToDb(
         ownerSharing->accountEmail).toSimpleString().toStdString();
     ownerSharing->isEnabled = true;
     ownerSharing->customPermissions = QnLexical::serialized(
-        static_cast<Qn::GlobalPermissions>(Qn::GlobalAdminPermissionSet)).toStdString();
+        static_cast<GlobalPermissions>(GlobalPermission::adminPermissions)).toStdString();
     const auto resultCode = updateSharingInDbAndGenerateTransaction(
         queryContext,
         newSystem.accountEmail,

@@ -40,21 +40,21 @@ TEST_F(QnDirectSharedResourceAccessProviderTest, checkInvalidAccess)
 
 TEST_F(QnDirectSharedResourceAccessProviderTest, checkAccessToInvalidResource)
 {
-    auto user = addUser(Qn::GlobalAdminPermission);
+    auto user = addUser(GlobalPermission::admin);
     ASSERT_FALSE(accessProvider()->hasAccess(user, QnResourcePtr()));
 }
 
 TEST_F(QnDirectSharedResourceAccessProviderTest, checkDefaultCamera)
 {
     auto target = addCamera();
-    auto user = addUser(Qn::GlobalAdminPermission);
+    auto user = addUser(GlobalPermission::admin);
     ASSERT_FALSE(accessProvider()->hasAccess(user, target));
 }
 
 TEST_F(QnDirectSharedResourceAccessProviderTest, checkSource)
 {
     auto target = addCamera();
-    auto user = addUser(Qn::NoGlobalPermissions);
+    auto user = addUser(GlobalPermission::none);
     sharedResourcesManager()->setSharedResources(user, QSet<QnUuid>() << target->getId());
     ASSERT_EQ(accessProvider()->accessibleVia(user, target), kSource);
 }
@@ -62,14 +62,14 @@ TEST_F(QnDirectSharedResourceAccessProviderTest, checkSource)
 TEST_F(QnDirectSharedResourceAccessProviderTest, checkDirectAccessCamera)
 {
     auto target = addCamera();
-    auto user = addUser(Qn::NoGlobalPermissions);
+    auto user = addUser(GlobalPermission::none);
     sharedResourcesManager()->setSharedResources(user, QSet<QnUuid>() << target->getId());
     ASSERT_TRUE(accessProvider()->hasAccess(user, target));
 }
 
 TEST_F(QnDirectSharedResourceAccessProviderTest, checkDirectAccessUser)
 {
-    auto user = addUser(Qn::NoGlobalPermissions);
+    auto user = addUser(GlobalPermission::none);
     sharedResourcesManager()->setSharedResources(user, QSet<QnUuid>() << user->getId());
 
     /* We can share only layout and media resources. */
@@ -79,7 +79,7 @@ TEST_F(QnDirectSharedResourceAccessProviderTest, checkDirectAccessUser)
 TEST_F(QnDirectSharedResourceAccessProviderTest, checkDirectAccessLayout)
 {
     auto target = addLayout();
-    auto user = addUser(Qn::NoGlobalPermissions);
+    auto user = addUser(GlobalPermission::none);
     sharedResourcesManager()->setSharedResources(user, QSet<QnUuid>() << target->getId());
     ASSERT_TRUE(accessProvider()->hasAccess(user, target));
 }
@@ -87,7 +87,7 @@ TEST_F(QnDirectSharedResourceAccessProviderTest, checkDirectAccessLayout)
 TEST_F(QnDirectSharedResourceAccessProviderTest, checkDirectAccessOwnedLayout)
 {
     auto target = addLayout();
-    auto user = addUser(Qn::NoGlobalPermissions);
+    auto user = addUser(GlobalPermission::none);
     target->setParentId(user->getId());
     ASSERT_FALSE(target->isShared());
     sharedResourcesManager()->setSharedResources(user, QSet<QnUuid>() << target->getId());
@@ -99,7 +99,7 @@ TEST_F(QnDirectSharedResourceAccessProviderTest, checkDirectAccessOwnedLayout)
 TEST_F(QnDirectSharedResourceAccessProviderTest, checkLayoutMadeShared)
 {
     auto target = addLayout();
-    auto user = addUser(Qn::NoGlobalPermissions);
+    auto user = addUser(GlobalPermission::none);
     target->setParentId(user->getId());
     ASSERT_FALSE(target->isShared());
     sharedResourcesManager()->setSharedResources(user, QSet<QnUuid>() << target->getId());
@@ -113,7 +113,7 @@ TEST_F(QnDirectSharedResourceAccessProviderTest, checkLayoutMadeShared)
 TEST_F(QnDirectSharedResourceAccessProviderTest, accessProviders)
 {
     auto camera = addCamera();
-    auto user = addUser(Qn::NoGlobalPermissions);
+    auto user = addUser(GlobalPermission::none);
     sharedResourcesManager()->setSharedResources(user, QSet<QnUuid>() << camera->getId());
     QnResourceList providers;
     accessProvider()->accessibleVia(user, camera, &providers);

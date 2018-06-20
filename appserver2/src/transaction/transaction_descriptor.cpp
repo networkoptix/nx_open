@@ -437,7 +437,7 @@ bool resourceAccessHelper(
     const auto& resPool = commonModule->resourcePool();
     QnResourcePtr target = resPool->getResourceById(resourceId);
     auto userResource = resPool->getResourceById(accessData.userId).dynamicCast<QnUserResource>();
-    if (commonModule->resourceAccessManager()->hasGlobalPermission(userResource, Qn::GlobalAdminPermission))
+    if (commonModule->resourceAccessManager()->hasGlobalPermission(userResource, GlobalPermission::admin))
         return true;
 
     if (permissions == Qn::ReadPermission
@@ -528,8 +528,7 @@ void applyColumnFilter(
     QnCommonModule* commonModule, const Qn::UserAccessData& accessData, api::StorageData& data)
 {
     if (!hasSystemAccess(accessData) && !commonModule->resourceAccessManager()->hasGlobalPermission(
-            accessData,
-            Qn::GlobalPermission::GlobalAdminPermission))
+        accessData, GlobalPermission::admin))
     {
         data.url = QnStorageResource::urlWithoutCredentials(data.url);
     }
@@ -810,7 +809,7 @@ struct ModifyCameraAttributesListAccess
 
 struct ReadServerAttributesAccess
 {
-    bool operator()(QnCommonModule* commonModule, const Qn::UserAccessData& accessData, 
+    bool operator()(QnCommonModule* commonModule, const Qn::UserAccessData& accessData,
         const api::MediaServerUserAttributesData& param)
     {
         return resourceAccessHelper(commonModule, accessData, param.serverId, Qn::ReadPermission);
@@ -819,7 +818,7 @@ struct ReadServerAttributesAccess
 
 struct ReadServerAttributesAccessOut
 {
-    RemotePeerAccess operator()(QnCommonModule* commonModule, const Qn::UserAccessData& accessData, 
+    RemotePeerAccess operator()(QnCommonModule* commonModule, const Qn::UserAccessData& accessData,
         const api::MediaServerUserAttributesData& param)
     {
         return resourceAccessHelper(commonModule, accessData, param.serverId, Qn::ReadPermission)
@@ -830,7 +829,7 @@ struct ReadServerAttributesAccessOut
 
 struct ModifyServerAttributesAccess
 {
-    bool operator()(QnCommonModule* commonModule, const Qn::UserAccessData& accessData, 
+    bool operator()(QnCommonModule* commonModule, const Qn::UserAccessData& accessData,
         const api::MediaServerUserAttributesData& param)
     {
         return resourceAccessHelper(commonModule, accessData, param.serverId, Qn::SavePermission);
@@ -847,7 +846,7 @@ struct UserInputAccess
 
         const auto& resPool = commonModule->resourcePool();
         auto userResource = resPool->getResourceById(accessData.userId).dynamicCast<QnUserResource>();
-        bool result = commonModule->resourceAccessManager()->hasGlobalPermission(userResource, Qn::GlobalUserInputPermission);
+        bool result = commonModule->resourceAccessManager()->hasGlobalPermission(userResource, GlobalPermission::userInput);
         return result;
     }
 };
@@ -862,7 +861,7 @@ struct AdminOnlyAccess
 
         const auto& resPool = commonModule->resourcePool();
         auto userResource = resPool->getResourceById(accessData.userId).dynamicCast<QnUserResource>();
-        bool result = commonModule->resourceAccessManager()->hasGlobalPermission(userResource, Qn::GlobalAdminPermission);
+        bool result = commonModule->resourceAccessManager()->hasGlobalPermission(userResource, GlobalPermission::admin);
         return result;
     }
 };
@@ -877,7 +876,7 @@ struct AdminOnlyAccessOut
 
         const auto& resPool = commonModule->resourcePool();
         auto userResource = resPool->getResourceById(accessData.userId).dynamicCast<QnUserResource>();
-        RemotePeerAccess result = commonModule->resourceAccessManager()->hasGlobalPermission(userResource, Qn::GlobalAdminPermission)
+        RemotePeerAccess result = commonModule->resourceAccessManager()->hasGlobalPermission(userResource, GlobalPermission::admin)
             ? RemotePeerAccess::Allowed
             : RemotePeerAccess::Forbidden;
         return result;
@@ -922,7 +921,7 @@ struct VideoWallControlAccess
         >();
         bool result = commonModule->resourceAccessManager()->hasGlobalPermission(
             userResource,
-            Qn::GlobalControlVideoWallPermission);
+            GlobalPermission::controlVideowall);
         if (!result)
         {
             QString userName = userResource ? userResource->fullName() : lit("Unknown user");

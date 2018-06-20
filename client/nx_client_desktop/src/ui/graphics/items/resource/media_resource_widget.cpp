@@ -503,7 +503,7 @@ void QnMediaResourceWidget::initIoModuleOverlay()
         m_ioModuleOverlayWidget->setIOModule(d->camera);
         m_ioModuleOverlayWidget->setAcceptedMouseButtons(Qt::NoButton);
         m_ioModuleOverlayWidget->setUserInputEnabled(
-            accessController()->hasGlobalPermission(Qn::GlobalUserInputPermission));
+            accessController()->hasGlobalPermission(GlobalPermission::userInput));
         m_ioModuleOverlayWidget->setContentsMargins(0.0, topMargin, 0.0, 0.0);
         addOverlayWidget(m_ioModuleOverlayWidget, detail::OverlayParams(Visible, true, true));
 
@@ -623,7 +623,7 @@ QString QnMediaResourceWidget::overlayCustomButtonText(
     if (statusOverlay != Qn::PasswordRequiredOverlay)
         return QString();
 
-    if (!accessController()->hasGlobalPermission(Qn::GlobalAdminPermission))
+    if (!accessController()->hasGlobalPermission(GlobalPermission::admin))
         return QString();
 
     const auto watcher = context()->instance<DefaultPasswordCamerasWatcher>();
@@ -1072,7 +1072,7 @@ void QnMediaResourceWidget::ensureTwoWayAudioWidget()
         return;
 
     bool hasTwoWayAudio = d->camera && d->camera->hasTwoWayAudio()
-        && accessController()->hasGlobalPermission(Qn::GlobalUserInputPermission);
+        && accessController()->hasGlobalPermission(GlobalPermission::userInput);
 
     if (!hasTwoWayAudio)
         return;
@@ -2221,7 +2221,7 @@ Qn::ResourceOverlayButton QnMediaResourceWidget::calculateOverlayButton(
         return Qn::ResourceOverlayButton::Empty;
 
     if (statusOverlay == Qn::PasswordRequiredOverlay
-        && context()->accessController()->hasGlobalPermission(Qn::GlobalAdminPermission))
+        && context()->accessController()->hasGlobalPermission(GlobalPermission::admin))
     {
         return Qn::ResourceOverlayButton::SetPassword;
     }
@@ -2984,7 +2984,7 @@ void QnMediaResourceWidget::resetTriggers()
     /* Clear triggers information: */
     m_triggers.clear();
 
-    if (!accessController()->hasGlobalPermission(Qn::GlobalUserInputPermission))
+    if (!accessController()->hasGlobalPermission(GlobalPermission::userInput))
         return;
 
     /* Create new relevant triggers: */
@@ -3039,7 +3039,7 @@ rest::Handle QnMediaResourceWidget::invokeTrigger(
     std::function<void(bool, rest::Handle)> resultHandler,
     vms::api::EventState toggleState)
 {
-    if (!accessController()->hasGlobalPermission(Qn::GlobalUserInputPermission))
+    if (!accessController()->hasGlobalPermission(GlobalPermission::userInput))
         return rest::Handle();
 
     const auto responseHandler =

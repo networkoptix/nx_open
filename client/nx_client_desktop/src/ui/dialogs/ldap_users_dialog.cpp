@@ -54,7 +54,7 @@ QnLdapUsersDialog::QnLdapUsersDialog(QWidget* parent):
 
     setHelpTopic(ui->selectRoleLabel, ui->userRoleComboBox, Qn::UserSettings_UserRoles_Help);
     ui->userRoleComboBox->setModel(m_rolesModel);
-    ui->userRoleComboBox->setCurrentIndex(m_rolesModel->rowForRole(Qn::UserRole::LiveViewer)); // sensible default
+    ui->userRoleComboBox->setCurrentIndex(m_rolesModel->rowForRole(Qn::UserRole::liveViewer)); // sensible default
 
     const QnLdapSettings &settings = qnGlobalSettings->ldapSettings();
 
@@ -215,7 +215,7 @@ void QnLdapUsersDialog::importUsers(const QnLdapUsers &users)
     const bool enableUsers = !ui->disableUsersCheckBox->isChecked();
     const Qn::UserRole selectedRole = ui->userRoleComboBox->itemData(
         ui->userRoleComboBox->currentIndex(), Qn::UserRoleRole).value<Qn::UserRole>();
-    const Qn::GlobalPermissions permissions = QnUserRolesManager::userRolePermissions(selectedRole);
+    const GlobalPermissions permissions = QnUserRolesManager::userRolePermissions(selectedRole);
     const QnUuid selectedUserRoleId = ui->userRoleComboBox->itemData(
         ui->userRoleComboBox->currentIndex(), Qn::UuidRole).value<QnUuid>();
 
@@ -227,7 +227,7 @@ void QnLdapUsersDialog::importUsers(const QnLdapUsers &users)
         user->setEmail(ldapUser.email);
         user->fillId();
         user->setEnabled(enableUsers);
-        if (selectedRole == Qn::UserRole::CustomUserRole)
+        if (selectedRole == Qn::UserRole::customUserRole)
             user->setUserRoleId(selectedUserRoleId);
         else
             user->setRawPermissions(permissions);

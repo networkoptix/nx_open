@@ -91,7 +91,7 @@ QnUserRolesDialog::QnUserRolesDialog(QWidget* parent):
             userRole.id = QnUuid::createUuid();
             userRole.name = nx::utils::generateUniqueString(
                 usedNames, tr("New Role"), tr("New Role %1"));
-            userRole.permissions = Qn::NoGlobalPermissions;
+            userRole.permissions = {};
 
             int row = m_model->addUserRole(userRole);
             ui->userRolesTreeView->selectionModel()->setCurrentIndex(m_model->index(row),
@@ -254,7 +254,7 @@ void QnUserRolesDialog::applyChanges()
             {
                 qnResourcesChangesManager->saveUser(user, applyChanges, handleUserSaved);
 
-                if (replacement.permissions == Qn::GlobalCustomUserPermission)
+                if (replacement.permissions == GlobalPermissions(GlobalPermission::customUser))
                     qnResourcesChangesManager->saveAccessibleResources(user, QSet<QnUuid>());
             }
         }

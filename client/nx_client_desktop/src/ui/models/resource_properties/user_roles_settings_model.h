@@ -22,9 +22,9 @@ public:
     struct UserRoleReplacement
     {
         QnUuid userRoleId;
-        Qn::GlobalPermissions permissions;
+        GlobalPermissions permissions;
         UserRoleReplacement();
-        UserRoleReplacement(const QnUuid& userRoleId, Qn::GlobalPermissions permissions);
+        UserRoleReplacement(const QnUuid& userRoleId, GlobalPermissions permissions);
         bool isEmpty() const;
     };
 
@@ -62,8 +62,8 @@ public:
     bool isUserRoleValid(const ec2::ApiUserRoleData& userRole) const;
     bool isValid() const;
 
-    virtual Qn::GlobalPermissions rawPermissions() const override;
-    virtual void setRawPermissions(Qn::GlobalPermissions value) override;
+    virtual GlobalPermissions rawPermissions() const override;
+    virtual void setRawPermissions(GlobalPermissions value) override;
 
     virtual QSet<QnUuid> accessibleResources() const override;
     virtual void setAccessibleResources(const QSet<QnUuid>& value) override;

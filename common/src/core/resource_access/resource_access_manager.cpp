@@ -119,7 +119,7 @@ void QnResourceAccessManager::setPermissionsInternal(const QnResourceAccessSubje
     emit permissionsChanged(subject, resource, permissions);
 }
 
-Qn::GlobalPermissions QnResourceAccessManager::globalPermissions(
+GlobalPermissions QnResourceAccessManager::globalPermissions(
     const QnResourceAccessSubject& subject) const
 {
     return globalPermissionsManager()->globalPermissions(subject);
@@ -127,14 +127,14 @@ Qn::GlobalPermissions QnResourceAccessManager::globalPermissions(
 
 bool QnResourceAccessManager::hasGlobalPermission(
     const Qn::UserAccessData& accessRights,
-    Qn::GlobalPermission requiredPermission) const
+    GlobalPermission requiredPermission) const
 {
     return globalPermissionsManager()->hasGlobalPermission(accessRights, requiredPermission);
 }
 
 bool QnResourceAccessManager::hasGlobalPermission(
     const QnResourceAccessSubject& subject,
-    Qn::GlobalPermission requiredPermission) const
+    GlobalPermission requiredPermission) const
 {
     return globalPermissionsManager()->hasGlobalPermission(subject, requiredPermission);
 }
@@ -229,7 +229,7 @@ bool QnResourceAccessManager::canCreateResource(const QnResourceAccessSubject& s
     if (QnWebPageResourcePtr webPage = target.dynamicCast<QnWebPageResource>())
         return canCreateWebPage(subject);
 
-    return hasGlobalPermission(subject, Qn::GlobalAdminPermission);
+    return hasGlobalPermission(subject, GlobalPermission::admin);
 }
 
 bool QnResourceAccessManager::canCreateResource(const QnResourceAccessSubject& subject,
@@ -474,7 +474,7 @@ Qn::Permissions QnResourceAccessManager::calculatePermissionsInternal(
     Qn::Permissions result = Qn::NoPermissions;
 
     /* Admins must be able to remove any cameras to delete servers.  */
-    if (hasGlobalPermission(subject, Qn::GlobalAdminPermission))
+    if (hasGlobalPermission(subject, GlobalPermission::admin))
         result |= Qn::RemovePermission;
 
     if (!commonModule()->resourceAccessProvider()->hasAccess(subject, camera))
@@ -483,9 +483,9 @@ Qn::Permissions QnResourceAccessManager::calculatePermissionsInternal(
     result |= Qn::ReadPermission | Qn::ViewContentPermission;
 
     bool isLiveAllowed = !camera->needsToChangeDefaultPassword();
-    bool isFootageAllowed = hasGlobalPermission(subject, Qn::GlobalViewArchivePermission);
+    bool isFootageAllowed = hasGlobalPermission(subject, GlobalPermission::viewArchive);
     bool isExportAllowed = isFootageAllowed
-        && hasGlobalPermission(subject, Qn::GlobalExportPermission);
+        && hasGlobalPermission(subject, GlobalPermission::exportArchive);
 
     if (!camera->isLicenseUsed())
     {
@@ -522,13 +522,13 @@ Qn::Permissions QnResourceAccessManager::calculatePermissionsInternal(
         result |= Qn::ExportPermission;
     }
 
-    if (hasGlobalPermission(subject, Qn::GlobalUserInputPermission))
+    if (hasGlobalPermission(subject, GlobalPermission::userInput))
         result |= Qn::WritePtzPermission;
 
     if (commonModule()->isReadOnly())
         return result;
 
-    if (hasGlobalPermission(subject, Qn::GlobalEditCamerasPermission))
+    if (hasGlobalPermission(subject, GlobalPermission::editCameras))
         result |= Qn::ReadWriteSavePermission | Qn::WriteNamePermission;
 
     return result;
@@ -544,7 +544,7 @@ Qn::Permissions QnResourceAccessManager::calculatePermissionsInternal(
         return result;
 
     result |= Qn::ViewContentPermission;
-    if (hasGlobalPermission(subject, Qn::GlobalAdminPermission) && !commonModule()->isReadOnly())
+    if (hasGlobalPermission(subject, GlobalPermission::admin) && !commonModule()->isReadOnly())
         result |= Qn::FullServerPermissions;
 
     return result;
@@ -573,7 +573,7 @@ Qn::Permissions QnResourceAccessManager::calculatePermissionsInternal(
 {
     NX_ASSERT(videoWall);
     Qn::Permissions result = Qn::NoPermissions;
-    if (!hasGlobalPermission(subject, Qn::GlobalControlVideoWallPermission))
+    if (!hasGlobalPermission(subject, GlobalPermission::controlVideowall))
         return result;
 
     result = Qn::ReadPermission | Qn::WritePermission;
@@ -581,7 +581,7 @@ Qn::Permissions QnResourceAccessManager::calculatePermissionsInternal(
         return result;
 
     result |= Qn::SavePermission | Qn::WriteNamePermission;
-    if (hasGlobalPermission(subject, Qn::GlobalAdminPermission))
+    if (hasGlobalPermission(subject, GlobalPermission::admin))
         result |= Qn::RemovePermission;
 
     return result;
@@ -600,7 +600,7 @@ Qn::Permissions QnResourceAccessManager::calculatePermissionsInternal(
         return result;
 
     /* Web Page behaves totally like camera. */
-    if (hasGlobalPermission(subject, Qn::GlobalEditCamerasPermission))
+    if (hasGlobalPermission(subject, GlobalPermission::editCameras))
         result |= Qn::ReadWriteSavePermission | Qn::RemovePermission | Qn::WriteNamePermission;
 
     return result;
@@ -668,7 +668,7 @@ Qn::Permissions QnResourceAccessManager::calculatePermissionsInternal(
             if (videowall)
             {
                 /* Videowall layout. */
-                return hasGlobalPermission(subject, Qn::GlobalControlVideoWallPermission)
+                return hasGlobalPermission(subject, GlobalPermission::controlVideowall)
                     ? Qn::FullLayoutPermissions
                     : Qn::NoPermissions;
             }
@@ -681,7 +681,7 @@ Qn::Permissions QnResourceAccessManager::calculatePermissionsInternal(
                     return Qn::NoPermissions;
 
                 /* Global layouts editor. */
-                if (hasGlobalPermission(subject, Qn::GlobalAdminPermission))
+                if (hasGlobalPermission(subject, GlobalPermission::admin))
                     return Qn::FullLayoutPermissions;
 
                 return Qn::ModifyLayoutPermission;
@@ -711,7 +711,7 @@ Qn::Permissions QnResourceAccessManager::calculatePermissionsInternal(
                         }
 
                         /* Layout of user, which we don't know of. */
-                        return hasGlobalPermission(subject, Qn::GlobalAdminPermission)
+                        return hasGlobalPermission(subject, GlobalPermission::admin)
                             ? Qn::FullLayoutPermissions
                             : Qn::NoPermissions;
                     }
@@ -772,7 +772,7 @@ Qn::Permissions QnResourceAccessManager::calculatePermissionsInternal(
     }
     else
     {
-        if (hasGlobalPermission(subject, Qn::GlobalAdminPermission))
+        if (hasGlobalPermission(subject, GlobalPermission::admin))
         {
             result |= Qn::ReadPermission;
 
@@ -785,7 +785,7 @@ Qn::Permissions QnResourceAccessManager::calculatePermissionsInternal(
             auto isOwner = subject.user() && subject.user()->isOwner();
 
             /* Admins can only be edited by owner, other users - by all admins. */
-            bool targetIsAdmin = targetUser->getRawPermissions().testFlag(Qn::GlobalAdminPermission);
+            bool targetIsAdmin = targetUser->getRawPermissions().testFlag(GlobalPermission::admin);
             if (isOwner || !targetIsAdmin)
                 result |= Qn::FullUserPermissions;
         }
@@ -818,11 +818,11 @@ bool QnResourceAccessManager::canCreateLayout(const QnResourceAccessSubject& sub
 
     /* Only admins can create global layouts. */
     if (layoutParentId.isNull())
-        return hasGlobalPermission(subject, Qn::GlobalAdminPermission);
+        return hasGlobalPermission(subject, GlobalPermission::admin);
 
     /* Videowall-admins can create layouts on videowall. */
     if (resPool->getResourceById<QnVideoWallResource>(layoutParentId))
-        return hasGlobalPermission(subject, Qn::GlobalControlVideoWallPermission);
+        return hasGlobalPermission(subject, GlobalPermission::controlVideowall);
 
     // Tour owner can create layouts in it.
     const auto tour = layoutTourManager()->tour(layoutParentId);
@@ -856,7 +856,7 @@ bool QnResourceAccessManager::canCreateLayout(const QnResourceAccessSubject& sub
 }
 
 bool QnResourceAccessManager::canCreateUser(const QnResourceAccessSubject& subject,
-    Qn::GlobalPermissions targetPermissions, bool isOwner) const
+    GlobalPermissions targetPermissions, bool isOwner) const
 {
     if (!subject.isValid() || commonModule()->isReadOnly())
         return false;
@@ -866,18 +866,18 @@ bool QnResourceAccessManager::canCreateUser(const QnResourceAccessSubject& subje
         return false;
 
     /* Only owner can create admins. */
-    if (targetPermissions.testFlag(Qn::GlobalAdminPermission))
+    if (targetPermissions.testFlag(GlobalPermission::admin))
         return subject.user() && subject.user()->isOwner();
 
     /* Admins can create other users. */
-    return hasGlobalPermission(subject, Qn::GlobalAdminPermission);
+    return hasGlobalPermission(subject, GlobalPermission::admin);
 }
 
 bool QnResourceAccessManager::canCreateUser(const QnResourceAccessSubject& subject,
     Qn::UserRole role) const
 {
     const auto permissions = QnUserRolesManager::userRolePermissions(role);
-    const bool isOwner = (role == Qn::UserRole::Owner);
+    const bool isOwner = (role == Qn::UserRole::owner);
     return canCreateUser(subject, permissions, isOwner);
 }
 
@@ -887,7 +887,7 @@ bool QnResourceAccessManager::canCreateVideoWall(const QnResourceAccessSubject& 
         return false;
 
     /* Only admins can create new videowalls (and attach new screens). */
-    return hasGlobalPermission(subject, Qn::GlobalAdminPermission);
+    return hasGlobalPermission(subject, GlobalPermission::admin);
 }
 
 bool QnResourceAccessManager::canCreateWebPage(const QnResourceAccessSubject& subject) const
@@ -896,7 +896,7 @@ bool QnResourceAccessManager::canCreateWebPage(const QnResourceAccessSubject& su
         return false;
 
     /* Only admins can add new web pages. */
-    return hasGlobalPermission(subject, Qn::GlobalAdminPermission);
+    return hasGlobalPermission(subject, GlobalPermission::admin);
 }
 
 bool QnResourceAccessManager::canModifyResource(const QnResourceAccessSubject& subject,
@@ -993,7 +993,7 @@ bool QnResourceAccessManager::canModifyResource(const QnResourceAccessSubject& s
 
     /* Only admin can add and remove videowall items. */
     if (hasItemsChange())
-        return hasGlobalPermission(subject, Qn::GlobalAdminPermission);
+        return hasGlobalPermission(subject, GlobalPermission::admin);
 
     /* Otherwise - default behavior. */
     return hasPermission(subject, target, Qn::SavePermission);

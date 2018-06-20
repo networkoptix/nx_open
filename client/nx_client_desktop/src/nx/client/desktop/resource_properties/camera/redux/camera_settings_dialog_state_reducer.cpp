@@ -438,7 +438,7 @@ State CameraSettingsDialogStateReducer::setSettingsOptimizationEnabled(State sta
 }
 
 State CameraSettingsDialogStateReducer::setGlobalPermissions(
-    State state, Qn::GlobalPermissions value)
+    State state, GlobalPermissions value)
 {
     state.globalPermissions = value;
     return state;

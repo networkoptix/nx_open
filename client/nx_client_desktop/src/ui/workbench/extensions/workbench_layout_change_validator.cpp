@@ -24,7 +24,7 @@ bool QnWorkbenchLayoutsChangeValidator::confirmChangeVideoWallLayout(
         return true;
 
     //quick check
-    if (accessController()->hasGlobalPermission(Qn::GlobalAccessAllMediaPermission))
+    if (accessController()->hasGlobalPermission(GlobalPermission::accessAllMedia))
         return true;
 
     QnResourceList inaccessible = removedResources.filtered(

@@ -1892,7 +1892,7 @@ template<class InputDataType>
 void LocalConnectionFactory::regUpdate(
     QnRestProcessorPool* const restProcessorPool,
     ApiCommand::Value cmd,
-    Qn::GlobalPermission permission)
+    GlobalPermission permission)
 {
     restProcessorPool->registerHandler(
         lit("ec2/%1").arg(ApiCommand::toString(cmd)),
@@ -1905,7 +1905,7 @@ void LocalConnectionFactory::regUpdate(
     QnRestProcessorPool* const restProcessorPool,
     ApiCommand::Value cmd,
     CustomActionType customAction,
-    Qn::GlobalPermission permission)
+    GlobalPermission permission)
 {
     restProcessorPool->registerHandler(
         lit("ec2/%1").arg(ApiCommand::toString(cmd)),
@@ -1917,7 +1917,7 @@ template<class InputDataType, class OutputDataType>
 void LocalConnectionFactory::regGet(
     QnRestProcessorPool* const restProcessorPool,
     ApiCommand::Value cmd,
-    Qn::GlobalPermission permission)
+    GlobalPermission permission)
 {
     restProcessorPool->registerHandler(
         lit("ec2/%1").arg(ApiCommand::toString(cmd)),
@@ -1929,7 +1929,7 @@ template<class InputType, class OutputType>
 void LocalConnectionFactory::regFunctor(
     QnRestProcessorPool* const restProcessorPool,
     ApiCommand::Value cmd,
-    std::function<ErrorCode(InputType, OutputType*, const Qn::UserAccessData&)> handler, Qn::GlobalPermission permission)
+    std::function<ErrorCode(InputType, OutputType*, const Qn::UserAccessData&)> handler, GlobalPermission permission)
 {
     restProcessorPool->registerHandler(
         lit("ec2/%1").arg(ApiCommand::toString(cmd)),
@@ -1945,7 +1945,7 @@ void LocalConnectionFactory::regFunctorWithResponse(
     QnRestProcessorPool* const restProcessorPool,
     ApiCommand::Value cmd,
     std::function<ErrorCode(InputType, OutputType*, nx::network::http::Response*)> handler,
-    Qn::GlobalPermission permission)
+    GlobalPermission permission)
 {
     restProcessorPool->registerHandler(
         lit("ec2/%1").arg(ApiCommand::toString(cmd)),

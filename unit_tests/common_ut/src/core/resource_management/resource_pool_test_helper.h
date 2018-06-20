@@ -20,11 +20,11 @@ public:
     static QString kTestUserName;
     static QString kTestUserName2;
 
-    QnUserResourcePtr createUser(Qn::GlobalPermissions globalPermissions,
+    QnUserResourcePtr createUser(GlobalPermissions globalPermissions,
         const QString& name = kTestUserName,
         QnUserType userType = QnUserType::Local);
 
-    QnUserResourcePtr addUser(Qn::GlobalPermissions globalPermissions,
+    QnUserResourcePtr addUser(GlobalPermissions globalPermissions,
         const QString& name = kTestUserName,
         QnUserType userType = QnUserType::Local);
 
@@ -45,7 +45,7 @@ public:
 
     QnStorageResourcePtr addStorage(const QnMediaServerResourcePtr& server);
 
-    ec2::ApiUserRoleData createRole(Qn::GlobalPermissions permissions);
+    ec2::ApiUserRoleData createRole(GlobalPermissions permissions);
 
 private:
     QScopedPointer<QnStaticCommonModule> m_staticCommon;

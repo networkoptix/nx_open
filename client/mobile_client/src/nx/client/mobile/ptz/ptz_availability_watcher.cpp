@@ -35,7 +35,7 @@ PtzAvailabilityWatcher::PtzAvailabilityWatcher(QObject* parent):
     const auto manager = globalPermissionsManager();
     connect(manager, &QnGlobalPermissionsManager::globalPermissionsChanged, this,
         [this, userWatcher]
-            (const QnResourceAccessSubject& subject, Qn::GlobalPermissions /*permissions*/)
+            (const QnResourceAccessSubject& subject, GlobalPermissions /*permissions*/)
         {
             const auto user = userWatcher->user();
             if (subject != user)
@@ -76,7 +76,7 @@ void PtzAvailabilityWatcher::updateAvailability()
 
     const auto userWatcher = commonModule()->instance<nx::client::core::UserWatcher>();
     const auto user = userWatcher->user();
-    if (!user || !globalPermissionsManager()->hasGlobalPermission(user, Qn::GlobalUserInputPermission))
+    if (!user || !globalPermissionsManager()->hasGlobalPermission(user, GlobalPermission::userInput))
         return;
 
     const auto cameraStatus = m_camera->getStatus();

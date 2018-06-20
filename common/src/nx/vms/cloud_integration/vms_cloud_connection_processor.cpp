@@ -361,7 +361,7 @@ bool VmsCloudConnectionProcessor::insertCloudOwner(
     userData.typeId = QnResourceTypePool::kUserTypeUuid;
     userData.email = data.cloudAccountName;
     userData.name = data.cloudAccountName;
-    userData.permissions = Qn::GlobalAdminPermissionSet;
+    userData.permissions = GlobalPermission::adminPermissions;
     userData.isAdmin = true;
     userData.isEnabled = true;
     userData.realm = nx::network::AppInfo::realm();

@@ -20,6 +20,7 @@ enum class PeerType;
 enum class TimeFlag;
 enum class DayOfWeek;
 enum class BackupType;
+enum class UserRole;
 
 } // namespace api
 } // namespace vms
@@ -41,5 +42,6 @@ DECLARE_TYPE(MotionStreamType)
 DECLARE_TYPE(PeerType)
 DECLARE_TYPE(TimeFlag)
 DECLARE_TYPE(BackupType)
+DECLARE_TYPE(UserRole)
 
 #undef DECLARE_TYPE

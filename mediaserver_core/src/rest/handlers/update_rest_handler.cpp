@@ -31,7 +31,7 @@ int QnUpdateRestHandler::executePost(
 {
     bool remotePeerHasAdminRights = processor->resourceAccessManager()->hasGlobalPermission(
         processor->accessRights(),
-        Qn::GlobalAdminPermission);
+        GlobalPermission::admin);
 
     if (!remotePeerHasAdminRights)
     {

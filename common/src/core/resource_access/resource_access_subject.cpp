@@ -26,7 +26,7 @@ public:
     QnUuid effectiveId() const
     {
         QnUuid key = m_id;
-        if (user && user->userRole() == Qn::UserRole::CustomUserRole)
+        if (user && user->userRole() == Qn::UserRole::customUserRole)
             key = user->userRoleId();
 
         return key;

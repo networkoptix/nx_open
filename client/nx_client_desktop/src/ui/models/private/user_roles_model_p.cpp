@@ -34,7 +34,7 @@ RoleDescription::RoleDescription(const Qn::UserRole roleType):
 }
 
 RoleDescription::RoleDescription(const ec2::ApiUserRoleData& userRole):
-    roleType(Qn::UserRole::CustomUserRole),
+    roleType(Qn::UserRole::customUserRole),
     name(userRole.name),
     description(QnUserRolesManager::userRoleDescription(roleType)),
     permissions(QnUserRolesManager::userRolePermissions(roleType)),
@@ -82,7 +82,7 @@ int QnUserRolesModelPrivate::rowForUser(const QnUserResourcePtr& user) const
     auto role = user->userRole();
     switch (role)
     {
-        case Qn::UserRole::CustomUserRole:
+        case Qn::UserRole::customUserRole:
         {
             auto roleIterator = std::find_if(m_userRoles.begin(), m_userRoles.end(),
                 [roleId = user->userRoleId()](const ec2::ApiUserRoleData& role)
@@ -96,7 +96,7 @@ int QnUserRolesModelPrivate::rowForUser(const QnUserResourcePtr& user) const
             return std::distance(m_userRoles.begin(), roleIterator) + m_standardRoles.size();
         }
 
-        case Qn::UserRole::CustomPermissions:
+        case Qn::UserRole::customPermissions:
             return defaultRow;
 
         default:
@@ -259,7 +259,7 @@ RoleDescription QnUserRolesModelPrivate::roleByRow(int row) const
     NX_ASSERT(m_customRoleEnabled);
     if (m_customRoleEnabled)
     {
-        auto result = RoleDescription(Qn::UserRole::CustomPermissions);
+        auto result = RoleDescription(Qn::UserRole::customPermissions);
         if (!m_customRoleName.isEmpty())
             result.name = m_customRoleName;
         if (!m_customRoleDescription.isEmpty())
@@ -297,7 +297,7 @@ void QnUserRolesModelPrivate::setCustomRoleStrings(const QString& name, const QS
 QnUuid QnUserRolesModelPrivate::id(int row, bool predefinedRoleIdsEnabled) const
 {
     const auto role = roleByRow(row);
-    return role.roleType != Qn::UserRole::CustomUserRole && predefinedRoleIdsEnabled
+    return role.roleType != Qn::UserRole::customUserRole && predefinedRoleIdsEnabled
         ? QnUserRolesManager::predefinedRoleId(role.roleType)
         : role.roleUuid;
 }

@@ -30,6 +30,8 @@
 #include "data/event_rule_data.h"
 #include "data/cleanup_db_data.h"
 
+#include "types/access_types.h"
+
 namespace {
 
 static bool nx_vms_api_metatypes_initialized = false;
@@ -49,6 +51,9 @@ void Metatypes::initialize()
     nx_vms_api_metatypes_initialized = true;
 
     // Fully qualified namespaces are not needed here but are mandatory in all signal declarations.
+
+    qRegisterMetaType<GlobalPermission>();
+    qRegisterMetaType<GlobalPermissions>();
 
     qRegisterMetaType<AccessRightsData>();
     qRegisterMetaType<AccessRightsDataList>();

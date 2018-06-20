@@ -37,22 +37,22 @@ QnGlobalPermissionsManager::~QnGlobalPermissionsManager()
 
 }
 
-Qn::GlobalPermissions QnGlobalPermissionsManager::dependentPermissions(Qn::GlobalPermission value)
+GlobalPermissions QnGlobalPermissionsManager::dependentPermissions(GlobalPermission value)
 {
     switch (value)
     {
-        case Qn::GlobalViewArchivePermission:
-            return Qn::GlobalViewBookmarksPermission | Qn::GlobalExportPermission
-                | Qn::GlobalManageBookmarksPermission;
-        case Qn::GlobalViewBookmarksPermission:
-            return Qn::GlobalManageBookmarksPermission;
+        case GlobalPermission::viewArchive:
+            return GlobalPermission::viewBookmarks | GlobalPermission::exportArchive
+                | GlobalPermission::manageBookmarks;
+        case GlobalPermission::viewBookmarks:
+            return GlobalPermission::manageBookmarks;
         default:
             break;
     }
-    return Qn::NoGlobalPermissions;
+    return {};
 }
 
-Qn::GlobalPermissions QnGlobalPermissionsManager::globalPermissions(
+GlobalPermissions QnGlobalPermissionsManager::globalPermissions(
     const QnResourceAccessSubject& subject) const
 {
     if (m_mode == Mode::cached)
@@ -66,16 +66,16 @@ Qn::GlobalPermissions QnGlobalPermissionsManager::globalPermissions(
 }
 
 bool QnGlobalPermissionsManager::hasGlobalPermission(const QnResourceAccessSubject& subject,
-    Qn::GlobalPermission requiredPermission) const
+    GlobalPermission requiredPermission) const
 {
-    if (requiredPermission == Qn::NoGlobalPermissions)
+    if (requiredPermission == GlobalPermission::none)
         return true;
 
     return globalPermissions(subject).testFlag(requiredPermission);
 }
 
 bool QnGlobalPermissionsManager::hasGlobalPermission(const Qn::UserAccessData& accessRights,
-    Qn::GlobalPermission requiredPermission) const
+    GlobalPermission requiredPermission) const
 {
     if (accessRights == Qn::kSystemAccess)
         return true;
@@ -87,20 +87,16 @@ bool QnGlobalPermissionsManager::hasGlobalPermission(const Qn::UserAccessData& a
     return hasGlobalPermission(user, requiredPermission);
 }
 
-Qn::GlobalPermissions QnGlobalPermissionsManager::filterDependentPermissions(Qn::GlobalPermissions source) const
+GlobalPermissions QnGlobalPermissionsManager::filterDependentPermissions(GlobalPermissions source) const
 {
     // TODO: #GDM code duplication with ::dependentPermissions() method.
-    Qn::GlobalPermissions result = source;
-    if (!result.testFlag(Qn::GlobalViewArchivePermission))
-    {
-        result &= ~Qn::GlobalViewBookmarksPermission;
-        result &= ~Qn::GlobalExportPermission;
-    }
+    GlobalPermissions result = source;
+    if (!result.testFlag(GlobalPermission::viewArchive))
+        result &= ~(GlobalPermission::viewBookmarks | GlobalPermission::exportArchive);
 
-    if (!result.testFlag(Qn::GlobalViewBookmarksPermission))
-    {
-        result &= ~Qn::GlobalManageBookmarksPermission;
-    }
+    if (!result.testFlag(GlobalPermission::viewBookmarks))
+        result &= ~GlobalPermissions(GlobalPermission::manageBookmarks);
+
     return result;
 }
 
@@ -111,10 +107,10 @@ void QnGlobalPermissionsManager::updateGlobalPermissions(const QnResourceAccessS
     setGlobalPermissionsInternal(subject, calculateGlobalPermissions(subject));
 }
 
-Qn::GlobalPermissions QnGlobalPermissionsManager::calculateGlobalPermissions(
+GlobalPermissions QnGlobalPermissionsManager::calculateGlobalPermissions(
     const QnResourceAccessSubject& subject) const
 {
-    Qn::GlobalPermissions result = Qn::NoGlobalPermissions;
+    GlobalPermissions result = {};
 
     if (!subject.isValid())
         return result;
@@ -131,18 +127,18 @@ Qn::GlobalPermissions QnGlobalPermissionsManager::calculateGlobalPermissions(
 
         /* User is already removed. Problems with 'on_resource_removed' connection order. */
         if (!user->resourcePool())
-            return Qn::NoGlobalPermissions;
+            return {};
 
         QnUuid userId = user->getId();
 
         switch (user->userRole())
         {
-            case Qn::UserRole::CustomUserRole:
+            case Qn::UserRole::customUserRole:
                 result = globalPermissions(userRolesManager()->userRole(user->userRoleId()));
                 break;
-            case Qn::UserRole::Owner:
-            case Qn::UserRole::Administrator:
-                result = Qn::GlobalAdminPermissionSet;
+            case Qn::UserRole::owner:
+            case Qn::UserRole::administrator:
+                result = GlobalPermission::adminPermissions;
                 break;
             default:
                 result = filterDependentPermissions(user->getRawPermissions());
@@ -155,7 +151,7 @@ Qn::GlobalPermissions QnGlobalPermissionsManager::calculateGlobalPermissions(
         result = subject.role().permissions;
 
         /* If user belongs to group, he cannot be an admin - by design. */
-        result &= ~Qn::GlobalAdminPermission;
+        result &= ~GlobalPermissions(GlobalPermission::admin);
         result = filterDependentPermissions(result);
     }
 
@@ -163,7 +159,7 @@ Qn::GlobalPermissions QnGlobalPermissionsManager::calculateGlobalPermissions(
 }
 
 void QnGlobalPermissionsManager::setGlobalPermissionsInternal(
-    const QnResourceAccessSubject& subject, Qn::GlobalPermissions permissions)
+    const QnResourceAccessSubject& subject, GlobalPermissions permissions)
 {
     {
         QnMutexLocker lk(&m_mutex);
@@ -219,5 +215,5 @@ void QnGlobalPermissionsManager::handleSubjectRemoved(const QnResourceAccessSubj
         NX_ASSERT(m_cache.contains(id));
         m_cache.remove(id);
     }
-    emit globalPermissionsChanged(subject, Qn::NoGlobalPermissions);
+    emit globalPermissionsChanged(subject, {});
 }

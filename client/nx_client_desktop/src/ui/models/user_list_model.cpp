@@ -65,7 +65,7 @@ public:
 
         connect(globalPermissionsManager(), &QnGlobalPermissionsManager::globalPermissionsChanged,
             this,
-            [this](const QnResourceAccessSubject& subject, Qn::GlobalPermissions /*value*/)
+            [this](const QnResourceAccessSubject& subject, GlobalPermissions /*value*/)
             {
                 if (subject.user())
                     handleUserChanged(subject.user());
@@ -124,33 +124,33 @@ QString QnUserListModelPrivate::permissionsString(const QnUserResourcePtr& user)
 {
     QStringList permissionStrings;
 
-    Qn::GlobalPermissions permissions = globalPermissionsManager()->globalPermissions(user);
+    GlobalPermissions permissions = globalPermissionsManager()->globalPermissions(user);
 
     if (user->isOwner())
         return tr("Owner");
 
-    if (permissions.testFlag(Qn::GlobalAdminPermission))
+    if (permissions.testFlag(GlobalPermission::admin))
         return tr("Administrator");
 
     permissionStrings.append(tr("View live video"));
 
-    if (permissions.testFlag(Qn::GlobalEditCamerasPermission))
+    if (permissions.testFlag(GlobalPermission::editCameras))
         permissionStrings.append(QnDeviceDependentStrings::getDefaultNameFromSet(
             resourcePool(),
             tr("Adjust device settings"),
             tr("Adjust camera settings")
         ));
 
-    if (permissions.testFlag(Qn::GlobalUserInputPermission))
+    if (permissions.testFlag(GlobalPermission::userInput))
         permissionStrings.append(tr("Use PTZ controls"));
 
-    if (permissions.testFlag(Qn::GlobalViewArchivePermission))
+    if (permissions.testFlag(GlobalPermission::viewArchive))
         permissionStrings.append(tr("View video archives"));
 
-    if (permissions.testFlag(Qn::GlobalExportPermission))
+    if (permissions.testFlag(GlobalPermission::exportArchive))
         permissionStrings.append(tr("Export video"));
 
-    if (permissions.testFlag(Qn::GlobalControlVideoWallPermission))
+    if (permissions.testFlag(GlobalPermission::controlVideowall))
         permissionStrings.append(tr("Control Video Walls"));
 
     return permissionStrings.join(lit(", "));

@@ -65,7 +65,7 @@ int QnMergeLdapUsersRestHandler::executePost(
             dbUser.hash = lit("-").toLatin1();
             dbUser.email = ldapUser.email;
             dbUser.isAdmin = false;
-            dbUser.permissions = Qn::GlobalLiveViewerPermissionSet;
+            dbUser.permissions = GlobalPermission::liveViewerPermissions;
 
             dbUser.isLdap = true;
             dbUser.isEnabled = false;

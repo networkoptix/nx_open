@@ -11,9 +11,9 @@ namespace {
 
 const char* kPermissionProperty = "_qn_global_permission_property";
 
-Qn::GlobalPermission permission(QCheckBox* checkbox)
+GlobalPermission permission(QCheckBox* checkbox)
 {
-    return checkbox->property(kPermissionProperty).value<Qn::GlobalPermission>();
+    return checkbox->property(kPermissionProperty).value<GlobalPermission>();
 }
 
 }
@@ -29,17 +29,17 @@ QnPermissionsWidget::QnPermissionsWidget(QnAbstractPermissionsModel* permissions
     // TODO: #GDM think where to store flags set to avoid duplication
 
     /* Manager permissions. */
-    addCheckBox(Qn::GlobalEditCamerasPermission,         tr("Edit camera settings"),
+    addCheckBox(GlobalPermission::editCameras,         tr("Edit camera settings"),
         tr("This is also required to create/edit PTZ presets and tours."));
-    addCheckBox(Qn::GlobalControlVideoWallPermission,    tr("Control video walls"));
-    addCheckBox(Qn::GlobalViewLogsPermission,            tr("View event log"));
+    addCheckBox(GlobalPermission::controlVideowall,    tr("Control video walls"));
+    addCheckBox(GlobalPermission::viewLogs,            tr("View event log"));
 
     /* Viewer permissions. */
-    addCheckBox(Qn::GlobalViewArchivePermission,         tr("View archive"));
-    addCheckBox(Qn::GlobalExportPermission,              tr("Export archive"));
-    addCheckBox(Qn::GlobalViewBookmarksPermission,       tr("View bookmarks"));
-    addCheckBox(Qn::GlobalManageBookmarksPermission,     tr("Modify bookmarks"));
-    addCheckBox(Qn::GlobalUserInputPermission,           tr("User Input"),
+    addCheckBox(GlobalPermission::viewArchive,         tr("View archive"));
+    addCheckBox(GlobalPermission::exportArchive,              tr("Export archive"));
+    addCheckBox(GlobalPermission::viewBookmarks,       tr("View bookmarks"));
+    addCheckBox(GlobalPermission::manageBookmarks,     tr("Modify bookmarks"));
+    addCheckBox(GlobalPermission::userInput,           tr("User Input"),
         tr("PTZ, Device Output, 2-Way Audio, Soft Triggers."));
 
     ui->permissionsLayout->addStretch();
@@ -52,17 +52,17 @@ QnPermissionsWidget::~QnPermissionsWidget()
 
 bool QnPermissionsWidget::hasChanges() const
 {
-    Qn::GlobalPermissions value = m_permissionsModel->rawPermissions();
+    GlobalPermissions value = m_permissionsModel->rawPermissions();
 
     /* These permissions are handled separately. */
-    value &= ~Qn::GlobalAccessAllMediaPermission;
+    value &= ~GlobalPermissions(GlobalPermission::accessAllMedia);
 
     return selectedPermissions() != value;
 }
 
 void QnPermissionsWidget::loadDataToUi()
 {
-    Qn::GlobalPermissions value = m_permissionsModel->rawPermissions();
+    GlobalPermissions value = m_permissionsModel->rawPermissions();
 
     for (QCheckBox* checkbox : m_checkboxes)
         checkbox->setChecked(value.testFlag(permission(checkbox)));
@@ -78,26 +78,26 @@ void QnPermissionsWidget::applyChanges()
         if (checkbox->isEnabled() && checkbox->isChecked())
             value |= permission(checkbox);
         else
-            value &= ~permission(checkbox);
+            value &= ~GlobalPermissions(permission(checkbox));
     }
 
     m_permissionsModel->setRawPermissions(value);
 }
 
-Qn::GlobalPermissions QnPermissionsWidget::selectedPermissions() const
+GlobalPermissions QnPermissionsWidget::selectedPermissions() const
 {
-    Qn::GlobalPermissions value = Qn::NoGlobalPermissions;
+    GlobalPermissions value;
     for (QCheckBox* checkbox : m_checkboxes)
     {
         if (checkbox->isEnabled() && checkbox->isChecked())
             value |= permission(checkbox);
         else
-            value &= ~permission(checkbox);
+            value &= ~GlobalPermissions(permission(checkbox));
     }
 
     /* We must set special 'Custom' flag for the users to avoid collisions with built-in roles. */
     if (m_permissionsModel->subject().user())
-        value |= Qn::GlobalCustomUserPermission;
+        value |= GlobalPermission::customUser;
 
     return value;
 }
@@ -107,7 +107,7 @@ void QnPermissionsWidget::updateDependentPermissions()
     for (QCheckBox* checkbox : m_checkboxes)
     {
         auto dependent = QnGlobalPermissionsManager::dependentPermissions(permission(checkbox));
-        if (dependent == Qn::NoGlobalPermissions)
+        if (dependent == 0)
             continue;
 
         bool enable = checkbox->isEnabled() && checkbox->isChecked();
@@ -120,7 +120,8 @@ void QnPermissionsWidget::updateDependentPermissions()
     }
 }
 
-void QnPermissionsWidget::addCheckBox(Qn::GlobalPermission permission, const QString& text, const QString& description /*= QString()*/)
+void QnPermissionsWidget::addCheckBox(GlobalPermission permission,
+    const QString& text, const QString& description /*= QString()*/)
 {
     QCheckBox* checkbox = new QCheckBox(this);
     checkbox->setText(text);

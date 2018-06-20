@@ -187,7 +187,7 @@ void CameraScheduleWidget::loadState(const CameraSettingsDialogState& state)
     CheckboxUtils::setupTristateCheckbox(ui->enableRecordingCheckBox, state.recording.enabled);
     setReadOnly(ui->enableRecordingCheckBox, state.readOnly);
 
-    ui->licensesButton->setVisible(state.globalPermissions.testFlag(Qn::GlobalAdminPermission));
+    ui->licensesButton->setVisible(state.globalPermissions.testFlag(GlobalPermission::admin));
 
     setReadOnly(ui->exportScheduleButton, state.readOnly);
     setReadOnly(ui->exportWarningLabel, state.readOnly);
@@ -433,7 +433,7 @@ void CameraScheduleWidget::updateLicensesLabelText()
 
 void CameraScheduleWidget::updateLicensesButtonVisible()
 {
-    ui->licensesButton->setVisible(accessController()->hasGlobalPermission(Qn::GlobalAdminPermission));
+    ui->licensesButton->setVisible(accessController()->hasGlobalPermission(GlobalPermission::admin));
 }
 
 void CameraScheduleWidget::at_cameraResourceChanged()

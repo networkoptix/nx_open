@@ -231,7 +231,7 @@ void MediaServerCloudIntegrationTest::waitForCloudDataSynchronizedToTheMediaServ
     userData.realm = nx::network::AppInfo::realm();
     userData.hash = "password_is_in_cloud";
     userData.digest = "password_is_in_cloud";
-    userData.permissions = Qn::GlobalLiveViewerPermissionSet;
+    userData.permissions = GlobalPermission::liveViewerPermissions;
 
     auto mediaServerClient = prepareMediaServerClient();
     NX_GTEST_ASSERT_EQ(::ec2::ErrorCode::ok, mediaServerClient->ec2SaveUser(userData));

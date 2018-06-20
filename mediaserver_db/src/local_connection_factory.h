@@ -32,7 +32,7 @@ public:
         nx::vms::api::PeerType peerType,
         bool isP2pMode,
         QnHttpConnectionListener* tcpListener);
-		
+
     virtual ~LocalConnectionFactory();
 
     virtual void pleaseStop() override;
@@ -68,7 +68,7 @@ public:
     QnUbjsonTransactionSerializer* ubjsonTranSerializer() const;
     virtual void shutdown() override;
     nx::vms::network::ReverseConnectionManager* serverConnector() const;
-	
+
 private:
     QnMutex m_mutex;
     Settings m_settingsInstance;
@@ -115,29 +115,29 @@ private:
 
     template<class InputDataType>
     void regUpdate(QnRestProcessorPool* const restProcessorPool, ApiCommand::Value cmd,
-        Qn::GlobalPermission permission = Qn::NoGlobalPermissions);
+        GlobalPermission permission = GlobalPermission::none);
 
     template<class InputDataType, class CustomActionType>
     void regUpdate(QnRestProcessorPool* const restProcessorPool, ApiCommand::Value cmd,
-        CustomActionType customAction, Qn::GlobalPermission permission = Qn::NoGlobalPermissions);
+        CustomActionType customAction, GlobalPermission permission = GlobalPermission::none);
 
     template<class InputDataType, class OutputDataType>
     void regGet(QnRestProcessorPool* const restProcessorPool, ApiCommand::Value cmd,
-        Qn::GlobalPermission permission = Qn::NoGlobalPermissions);
+        GlobalPermission permission = GlobalPermission::none);
 
     template<class InputType, class OutputType>
     void regFunctor(
         QnRestProcessorPool* const restProcessorPool,
         ApiCommand::Value cmd,
         std::function<ErrorCode(InputType, OutputType*, const Qn::UserAccessData&)> handler,
-        Qn::GlobalPermission permission = Qn::NoGlobalPermissions);
+        GlobalPermission permission = GlobalPermission::none);
 
     template<class InputType, class OutputType>
     void regFunctorWithResponse(
         QnRestProcessorPool* const restProcessorPool,
         ApiCommand::Value cmd,
         std::function<ErrorCode(InputType, OutputType*, nx::network::http::Response*)> handler,
-        Qn::GlobalPermission permission = Qn::NoGlobalPermissions);
+        GlobalPermission permission = GlobalPermission::none);
 
     template<class Function>
     void statisticsCall(const Function& function);

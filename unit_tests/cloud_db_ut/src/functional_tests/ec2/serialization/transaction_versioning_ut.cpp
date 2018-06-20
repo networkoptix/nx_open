@@ -55,7 +55,7 @@ struct ApiResourceData: ApiIdData
 struct ApiUserData: ApiResourceData
 {
     bool isAdmin;
-    Qn::GlobalPermissions permissions;
+    GlobalPermissions permissions;
     QnUuid userRoleId;
     QString email;
     QnLatin1Array digest;

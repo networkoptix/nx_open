@@ -103,7 +103,7 @@ protected:
             vmsUserData.realm = nx::network::AppInfo::realm();
             vmsUserData.hash = "password_is_in_cloud";
             vmsUserData.digest = "password_is_in_cloud";
-            vmsUserData.permissions = Qn::GlobalAdminPermissionSet;
+            vmsUserData.permissions = GlobalPermission::adminPermissions;
 
             auto mediaServerClient = m_systemMergeFixture.peer(i).mediaServerClient();
             ASSERT_EQ(::ec2::ErrorCode::ok, mediaServerClient->ec2SaveUser(vmsUserData));

@@ -35,7 +35,7 @@ protected:
     }
 
     bool hasGlobalPermission(const QnResourceAccessSubject& subject,
-        Qn::GlobalPermission requiredPermission)
+        GlobalPermission requiredPermission)
     {
         return globalPermissionsManager()->hasGlobalPermission(subject, requiredPermission);
     }
@@ -46,16 +46,16 @@ protected:
 
 TEST_F(QnDirectGlobalPermissionsManagerTest, checkRoleRemoved)
 {
-    auto role = createRole(Qn::GlobalAccessAllMediaPermission);
+    auto role = createRole(GlobalPermission::accessAllMedia);
     userRolesManager()->addOrUpdateUserRole(role);
-    ASSERT_TRUE(hasGlobalPermission(role, Qn::GlobalAccessAllMediaPermission));
+    ASSERT_TRUE(hasGlobalPermission(role, GlobalPermission::accessAllMedia));
 
-    auto user = addUser(Qn::NoGlobalPermissions);
-    ASSERT_FALSE(hasGlobalPermission(user, Qn::GlobalAccessAllMediaPermission));
+    auto user = addUser(GlobalPermission::none);
+    ASSERT_FALSE(hasGlobalPermission(user, GlobalPermission::accessAllMedia));
 
     user->setUserRoleId(role.id);
-    ASSERT_TRUE(hasGlobalPermission(user, Qn::GlobalAccessAllMediaPermission));
+    ASSERT_TRUE(hasGlobalPermission(user, GlobalPermission::accessAllMedia));
 
     userRolesManager()->removeUserRole(role.id);
-    ASSERT_FALSE(hasGlobalPermission(user, Qn::GlobalAccessAllMediaPermission));
+    ASSERT_FALSE(hasGlobalPermission(user, GlobalPermission::accessAllMedia));
 }

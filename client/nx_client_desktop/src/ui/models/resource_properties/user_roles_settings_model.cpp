@@ -12,13 +12,13 @@
 #include <nx/utils/string.h>
 
 QnUserRolesSettingsModel::UserRoleReplacement::UserRoleReplacement():
-    UserRoleReplacement(QnUuid(), Qn::NoGlobalPermissions)
+    UserRoleReplacement(QnUuid(), GlobalPermission::none)
 {
 }
 
 QnUserRolesSettingsModel::UserRoleReplacement::UserRoleReplacement(
     const QnUuid& userRoleId,
-    Qn::GlobalPermissions permissions)
+    GlobalPermissions permissions)
     :
     userRoleId(userRoleId),
     permissions(permissions)
@@ -27,7 +27,7 @@ QnUserRolesSettingsModel::UserRoleReplacement::UserRoleReplacement(
 
 bool QnUserRolesSettingsModel::UserRoleReplacement::isEmpty() const
 {
-    return userRoleId.isNull() && permissions == Qn::NoGlobalPermissions;
+    return userRoleId.isNull() && permissions == 0;
 }
 
 QnUserRolesSettingsModel::QnUserRolesSettingsModel(QObject* parent /*= nullptr*/):
@@ -36,7 +36,7 @@ QnUserRolesSettingsModel::QnUserRolesSettingsModel(QObject* parent /*= nullptr*/
     m_userRoles()
 {
     auto predefinedRoles = userRolesManager()->predefinedRoles();
-    predefinedRoles << Qn::UserRole::CustomPermissions << Qn::UserRole::CustomUserRole;
+    predefinedRoles << Qn::UserRole::customPermissions << Qn::UserRole::customUserRole;
     for (auto role : predefinedRoles)
         m_predefinedNames << userRolesManager()->userRoleName(role).trimmed().toLower();
 }
@@ -154,15 +154,15 @@ bool QnUserRolesSettingsModel::isValid() const
         [this](const ec2::ApiUserRoleData& role) { return isUserRoleValid(role); });
 }
 
-Qn::GlobalPermissions QnUserRolesSettingsModel::rawPermissions() const
+GlobalPermissions QnUserRolesSettingsModel::rawPermissions() const
 {
     auto iter = currentRole();
     if (iter == m_userRoles.cend())
-        return Qn::NoGlobalPermissions;
+        return {};
     return iter->permissions;
 }
 
-void QnUserRolesSettingsModel::setRawPermissions(Qn::GlobalPermissions value)
+void QnUserRolesSettingsModel::setRawPermissions(GlobalPermissions value)
 {
     auto iter = currentRole();
     if (iter == m_userRoles.end())

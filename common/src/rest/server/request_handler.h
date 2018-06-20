@@ -71,7 +71,7 @@ public:
 
     friend class QnRestProcessorPool;
 
-    Qn::GlobalPermission permissions() const { return m_permissions; }
+    GlobalPermission permissions() const { return m_permissions; }
 
     /** In derived classes, report all url params carrying camera id. */
     virtual QStringList cameraIdUrlParams() const { return {}; }
@@ -129,12 +129,12 @@ protected:
 
 protected:
     void setPath(const QString& path) { m_path = path; }
-    void setPermissions(Qn::GlobalPermission permissions ) { m_permissions = permissions; }
+    void setPermissions(GlobalPermission permissions ) { m_permissions = permissions; }
     QString extractAction(const QString& path) const;
 
 protected:
     QString m_path;
-    Qn::GlobalPermission m_permissions;
+    GlobalPermission m_permissions;
 };
 
 typedef QSharedPointer<QnRestRequestHandler> QnRestRequestHandlerPtr;

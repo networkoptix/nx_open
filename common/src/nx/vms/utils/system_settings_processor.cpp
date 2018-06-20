@@ -53,7 +53,7 @@ nx::network::http::StatusCode::Value SystemSettingsProcessor::updateSettings(
 
         writeAllowed &= m_commonModule->resourceAccessManager()->hasGlobalPermission(
             accessRights,
-            Qn::GlobalPermission::GlobalAdminPermission);
+            GlobalPermission::admin);
 
         if (!filteredParams.isEmpty())
         {

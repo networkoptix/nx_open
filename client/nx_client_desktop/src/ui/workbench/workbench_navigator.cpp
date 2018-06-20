@@ -688,7 +688,7 @@ void QnWorkbenchNavigator::updateFootageState()
 
 void QnWorkbenchNavigator::updateHasArchive()
 {
-    bool newValue = accessController()->hasGlobalPermission(Qn::GlobalViewArchivePermission)
+    bool newValue = accessController()->hasGlobalPermission(GlobalPermission::viewArchive)
         && std::any_of(m_syncedResources.keyBegin(), m_syncedResources.keyEnd(),
             [this](const QnMediaResourcePtr& resource)
             {
@@ -704,7 +704,7 @@ void QnWorkbenchNavigator::updateHasArchive()
 
 void QnWorkbenchNavigator::updateIsRecording(bool forceOn)
 {
-    bool newValue = forceOn || (accessController()->hasGlobalPermission(Qn::GlobalViewArchivePermission)
+    bool newValue = forceOn || (accessController()->hasGlobalPermission(GlobalPermission::viewArchive)
         && std::any_of(m_syncedResources.keyBegin(), m_syncedResources.keyEnd(),
             [](const QnMediaResourcePtr& resource)
             {

@@ -9,6 +9,7 @@
 
 #include <nx/fusion/model_functions_fwd.h>
 #include <nx/fusion/serialization_format.h>
+#include <nx/vms/api/types/access_types.h>
 #include <nx/vms/api/types/motion_types.h>
 #include <nx/vms/api/types/resource_types.h>
 
@@ -22,11 +23,11 @@ QN_DECLARE_METAOBJECT_HEADER(Qn,
     PanicMode RebuildState BackupState PeerType StatisticsDeviceType
     StorageInitResult IOPortType IODefaultState AuditRecordType AuthResult
     RebuildAction BackupAction MediaStreamEvent StreamIndex
-    Permission GlobalPermission UserRole ConnectionResult
+    Permission UserRole ConnectionResult
     ,
     Borders Corners ResourceFlags CameraCapabilities PtzDataFields
     ServerFlags TimeFlags IOPortTypes
-    Permissions GlobalPermissions
+    Permissions
     )
 
     enum ExtrapolationMode {
@@ -659,80 +660,18 @@ using CameraBackupQualities = nx::vms::api::CameraBackupQualities;
     Q_DECLARE_OPERATORS_FOR_FLAGS(Permissions)
     QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(Permission)
 
-
-
     /**
-     * Flags describing global user capabilities, independently of resources. Stored in the database.
-     * QFlags uses int internally, so we are limited to 32 bits.
+     * An enumeration for user role types: predefined roles, custom groups, custom permissions.
      */
-    enum GlobalPermission
-    {
-        /* Generic permissions. */
-        NoGlobalPermissions                     = 0x00000000,   /**< Only live video access. */
-
-        /* Admin permissions. */
-        GlobalAdminPermission                   = 0x00000001,   /**< Admin, can edit other non-admins. */
-
-        /* Manager permissions. */
-        GlobalEditCamerasPermission             = 0x00000002,   /**< Can edit camera settings. */
-        GlobalControlVideoWallPermission        = 0x00000004,   /**< Can control videowalls. */
-
-        GlobalViewLogsPermission                = 0x00000010,   /**< Can access event log and audit trail. */
-
-        /* Viewer permissions. */
-        GlobalViewArchivePermission             = 0x00000100,   /**< Can view archives of available cameras. */
-        GlobalExportPermission                  = 0x00000200,   /**< Can export archives of available cameras. */
-        GlobalViewBookmarksPermission           = 0x00000400,   /**< Can view bookmarks of available cameras. */
-        GlobalManageBookmarksPermission         = 0x00000800,   /**< Can modify bookmarks of available cameras. */
-
-        /* Input permissions. */
-        GlobalUserInputPermission               = 0x00010000,   /**< Can change camera's PTZ state, use 2-way audio, I/O buttons. */
-
-        /* Resources access permissions */
-        GlobalAccessAllMediaPermission          = 0x01000000,   /**< Has access to all media resources (cameras and web pages). */
-
-
-        GlobalCustomUserPermission              = 0x10000000,   /**< Flag that just mark new user as 'custom'. */
-
-        /* Shortcuts. */
-
-        /* Live viewer has access to all cameras and global layouts by default. */
-        GlobalLiveViewerPermissionSet       = GlobalAccessAllMediaPermission,
-
-        /* Viewer can additionally view archive and bookmarks and export video. */
-        GlobalViewerPermissionSet           = GlobalLiveViewerPermissionSet | GlobalViewArchivePermission | GlobalExportPermission | GlobalViewBookmarksPermission,
-
-        /* Advanced viewer can manage bookmarks and use various input methods. */
-        GlobalAdvancedViewerPermissionSet   = GlobalViewerPermissionSet | GlobalManageBookmarksPermission | GlobalUserInputPermission | GlobalViewLogsPermission,
-
-        /* Admin can do everything. */
-        GlobalAdminPermissionSet            = GlobalAdminPermission | GlobalAdvancedViewerPermissionSet | GlobalControlVideoWallPermission | GlobalEditCamerasPermission,
-
-        /* PTZ here is intended - for SpaceX, see VMS-2208 */
-        GlobalVideoWallModePermissionSet    = GlobalLiveViewerPermissionSet | GlobalViewArchivePermission | GlobalUserInputPermission |
-                                              GlobalControlVideoWallPermission | GlobalViewBookmarksPermission,
-
-        /* Actions in ActiveX plugin mode are limited. */
-        GlobalActiveXModePermissionSet      = GlobalViewerPermissionSet | GlobalUserInputPermission,
-    };
-
-    Q_DECLARE_FLAGS(GlobalPermissions, GlobalPermission)
-    Q_DECLARE_OPERATORS_FOR_FLAGS(GlobalPermissions)
-    QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(GlobalPermission)
-
-
-    /**
-    * An enumeration for user role types: predefined roles, custom groups, custom permissions.
-    */
     enum class UserRole
     {
-        CustomUserRole = -2,
-        CustomPermissions = -1,
-        Owner = 0,
-        Administrator,
-        AdvancedViewer,
-        Viewer,
-        LiveViewer,
+        customUserRole = -2,
+        customPermissions = -1,
+        owner = 0,
+        administrator,
+        advancedViewer,
+        viewer,
+        liveViewer
     };
 
     enum ConnectionResult
@@ -785,6 +724,9 @@ using CameraBackupQualities = nx::vms::api::CameraBackupQualities;
 
 } // namespace Qn
 
+using nx::vms::api::GlobalPermission;
+using nx::vms::api::GlobalPermissions;
+
 Q_DECLARE_METATYPE(Qn::StatusChangeReason)
 Q_DECLARE_METATYPE(Qn::ResourceFlags)
 Q_DECLARE_METATYPE(Qn::ResourceStatus)
@@ -812,9 +754,7 @@ QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
 )
 
 QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
-    (Qn::IOPortTypes)
-    (Qn::Permission)(Qn::GlobalPermission)(Qn::Permissions)(Qn::GlobalPermissions)
-    ,
+    (Qn::IOPortTypes)(Qn::Permission)(Qn::Permissions),
     (metatype)(numeric)(lexical)
 )
 

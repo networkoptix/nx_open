@@ -306,7 +306,7 @@ bool QnTransactionMessageBus::processSpecialTransaction(
             // We are only interested in relevant notifications triggered.
             // Also they are allowed only if sender is Admin.
             if (!commonModule()->resourceAccessManager()->hasGlobalPermission(
-                sender->getUserAccessData(), Qn::GlobalAdminPermission))
+                sender->getUserAccessData(), GlobalPermission::admin))
             {
                 NX_WARNING(QnLog::EC2_TRAN_LOG,
                     lm("Can't handle transaction %1 because of no administrator rights. "

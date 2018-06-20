@@ -54,8 +54,8 @@ public:
 
     // Do not use this method directly.
     // Use resourceAccessManager()::globalPermissions(user) instead
-    Qn::GlobalPermissions getRawPermissions() const;
-    void setRawPermissions(Qn::GlobalPermissions permissions);
+    GlobalPermissions getRawPermissions() const;
+    void setRawPermissions(GlobalPermissions permissions);
 
     /**
      * Owner user has maxumum permissions. Could be local or cloud user
@@ -132,7 +132,7 @@ private:
     QByteArray m_digest;
     QByteArray m_cryptSha512Hash;
     QString m_realm;
-    Qn::GlobalPermissions m_permissions;
+    GlobalPermissions m_permissions;
     QnUuid m_userRoleId;
     bool m_isOwner;
     bool m_isEnabled;

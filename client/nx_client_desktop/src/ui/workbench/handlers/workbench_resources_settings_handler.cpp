@@ -129,7 +129,7 @@ void QnWorkbenchResourcesSettingsHandler::at_serverSettingsAction_triggered()
 
     QnMediaServerResourcePtr server = servers.first();
 
-    bool hasAccess = accessController()->hasGlobalPermission(Qn::GlobalAdminPermission);
+    bool hasAccess = accessController()->hasGlobalPermission(GlobalPermission::admin);
     NX_ASSERT(hasAccess, Q_FUNC_INFO, "Invalid action condition"); /*< It must be checked on action level. */
     if (!hasAccess)
         return;
@@ -148,7 +148,7 @@ void QnWorkbenchResourcesSettingsHandler::at_serverSettingsAction_triggered()
 void QnWorkbenchResourcesSettingsHandler::at_newUserAction_triggered()
 {
     QnUserResourcePtr user(new QnUserResource(QnUserType::Local));
-    user->setRawPermissions(Qn::GlobalLiveViewerPermissionSet);
+    user->setRawPermissions(GlobalPermission::liveViewerPermissions);
 
     // Shows New User dialog as modal because we can't pick anothr user from resources tree anyway.
     const auto params = menu()->currentParameters(sender());

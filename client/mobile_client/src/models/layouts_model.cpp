@@ -253,7 +253,7 @@ void QnLayoutsModelUnsorted::resetModel()
         addLayout(layout);
     }
 
-    if (resourceAccessManager()->hasGlobalPermission(m_user, Qn::GlobalControlVideoWallPermission))
+    if (resourceAccessManager()->hasGlobalPermission(m_user, GlobalPermission::controlVideowall))
     {
         const auto servers = resourcePool()->getAllServers(Qn::AnyStatus);
         for (const auto& server : servers)

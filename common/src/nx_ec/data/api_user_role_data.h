@@ -2,13 +2,15 @@
 
 #include "api_data.h"
 
+#include <nx/vms/api/types/access_types.h>
+
 namespace ec2 {
 
 struct ApiUserRoleData: nx::vms::api::IdData
 {
     ApiUserRoleData() = default;
 
-    ApiUserRoleData(const QnUuid& id, const QString& name, Qn::GlobalPermissions permissions):
+    ApiUserRoleData(const QnUuid& id, const QString& name, GlobalPermissions permissions):
         nx::vms::api::IdData(id),
         name(name),
         permissions(permissions)
@@ -16,7 +18,7 @@ struct ApiUserRoleData: nx::vms::api::IdData
     }
 
     QString name;
-    Qn::GlobalPermissions permissions = Qn::NoGlobalPermissions;
+    GlobalPermissions permissions;
 
     bool isNull() const;
 };
@@ -27,7 +29,7 @@ struct ApiPredefinedRoleData: nx::vms::api::Data
 {
     ApiPredefinedRoleData() = default;
 
-    ApiPredefinedRoleData(const QString& name, Qn::GlobalPermissions permissions, bool isOwner = false):
+    ApiPredefinedRoleData(const QString& name, GlobalPermissions permissions, bool isOwner = false):
         name(name),
         permissions(permissions),
         isOwner(isOwner)
@@ -35,7 +37,7 @@ struct ApiPredefinedRoleData: nx::vms::api::Data
     }
 
     QString name;
-    Qn::GlobalPermissions permissions = Qn::NoGlobalPermissions;
+    GlobalPermissions permissions;
     bool isOwner = false;
 };
 #define ApiPredefinedRoleData_Fields (name)(permissions)(isOwner)

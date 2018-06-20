@@ -56,7 +56,7 @@ public:
     static QString userRoleDescription(Qn::UserRole userRole);
 
     // Returns global permission flags for specified user role.
-    static Qn::GlobalPermissions userRolePermissions(Qn::UserRole userRole);
+    static GlobalPermissions userRolePermissions(Qn::UserRole userRole);
 
     // Returns human-readable name of specified user role.
     static QString userRoleName(Qn::UserRole userRole);

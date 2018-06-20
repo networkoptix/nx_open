@@ -923,7 +923,7 @@ void ActionHandler::at_openInLayoutAction_triggered()
             addParams.position = position;
 
             // Live viewers must not open items on archive position
-            if (accessController()->hasGlobalPermission(Qn::GlobalViewArchivePermission))
+            if (accessController()->hasGlobalPermission(GlobalPermission::viewArchive))
                 addParams.time = parameters.argument<qint64>(Qn::ItemTimeRole, -1);
             addToLayout(layout, resources, addParams);
         }
@@ -2342,7 +2342,7 @@ void ActionHandler::at_scheduleWatcher_scheduleEnabledChanged() {
     // TODO: #Elric totally evil copypasta and hacky workaround.
     bool enabled =
         context()->instance<QnWorkbenchScheduleWatcher>()->isScheduleEnabled() &&
-        accessController()->hasGlobalPermission(Qn::GlobalAdminPermission);
+        accessController()->hasGlobalPermission(GlobalPermission::admin);
 
     action(action::TogglePanicModeAction)->setEnabled(enabled);
     if (!enabled)

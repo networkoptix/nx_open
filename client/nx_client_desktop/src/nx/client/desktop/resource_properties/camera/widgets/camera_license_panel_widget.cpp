@@ -53,7 +53,7 @@ void CameraLicensePanelWidget::loadState(const CameraSettingsDialogState& state)
 {
     CheckboxUtils::setupTristateCheckbox(ui->useLicenseCheckBox, state.recording.enabled);
 
-    ui->moreLicensesButton->setVisible(state.globalPermissions.testFlag(Qn::GlobalAdminPermission));
+    ui->moreLicensesButton->setVisible(state.globalPermissions.testFlag(GlobalPermission::admin));
 
     ui->useLicenseCheckBox->setText(tr("Use License", "", state.devicesCount));
     setReadOnly(ui->useLicenseCheckBox, state.readOnly);

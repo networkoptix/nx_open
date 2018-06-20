@@ -192,7 +192,7 @@ public:
                 return userRole.id == selectedId;
             });
 
-        Qn::GlobalPermissions oldPermissions = Qn::NoGlobalPermissions;
+        GlobalPermissions oldPermissions;
         if (selectedRole != roles.end())
         {
             oldPermissions = selectedRole->permissions;
@@ -202,9 +202,9 @@ public:
         replacementRolesModel->setUserRoles(roles);
 
         Qn::UserRole defaultReplacementRole =
-            oldPermissions.testFlag(Qn::GlobalAccessAllMediaPermission)
-                ? Qn::UserRole::LiveViewer
-                : Qn::UserRole::CustomPermissions;
+            oldPermissions.testFlag(GlobalPermission::accessAllMedia)
+                ? Qn::UserRole::liveViewer
+                : Qn::UserRole::customPermissions;
 
         auto indices = replacementRolesModel->match(replacementRolesModel->index(0, 0),
             Qn::UserRoleRole,
@@ -229,7 +229,7 @@ public:
 
         replacement = QnUserRolesSettingsModel::UserRoleReplacement(
             index.data(Qn::UuidRole).value<QnUuid>(),
-            index.data(Qn::GlobalPermissionsRole).value<Qn::GlobalPermissions>());
+            index.data(Qn::GlobalPermissionsRole).value<GlobalPermissions>());
 
         return true;
     }
@@ -337,7 +337,7 @@ QnUserRoleSettingsWidget::QnUserRoleSettingsWidget(
             }
 
             auto predefined = userRolesManager()->predefinedRoles();
-            predefined << Qn::UserRole::CustomPermissions << Qn::UserRole::CustomUserRole;
+            predefined << Qn::UserRole::customPermissions << Qn::UserRole::customUserRole;
             for (auto role: predefined)
             {
                 if (userRolesManager()->userRoleName(role).trimmed().toLower() != name)

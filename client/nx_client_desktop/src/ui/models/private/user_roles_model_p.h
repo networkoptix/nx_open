@@ -19,7 +19,7 @@ struct RoleDescription
     Qn::UserRole roleType;
     QString name;
     QString description;
-    Qn::GlobalPermissions permissions;
+    GlobalPermissions permissions;
     QnUuid roleUuid;
 };
 

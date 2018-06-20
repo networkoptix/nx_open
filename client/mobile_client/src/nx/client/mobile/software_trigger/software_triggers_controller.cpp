@@ -134,7 +134,7 @@ bool SoftwareTriggersController::setTriggerState(QnUuid id, vms::event::EventSta
     }
 
     const auto currentUser = m_userWatcher->user();
-    if (!m_accessManager->hasGlobalPermission(currentUser, Qn::GlobalUserInputPermission))
+    if (!m_accessManager->hasGlobalPermission(currentUser, GlobalPermission::userInput))
         return false;
 
     const auto rule = m_ruleManager->rule(id);

@@ -198,7 +198,7 @@ bool QnAccessibleResourcesWidget::hasChanges() const
     if (m_controlsVisible)
     {
         bool checkedAll = !m_controlsModel->checkedResources().isEmpty();
-        if (m_permissionsModel->rawPermissions().testFlag(Qn::GlobalAccessAllMediaPermission) != checkedAll)
+        if (m_permissionsModel->rawPermissions().testFlag(GlobalPermission::accessAllMedia) != checkedAll)
             return true;
     }
 
@@ -215,13 +215,13 @@ void QnAccessibleResourcesWidget::loadDataToUi()
     if (m_controlsVisible)
     {
         bool hasAllMedia = m_permissionsModel->rawPermissions().testFlag(
-            Qn::GlobalAccessAllMediaPermission);
+            GlobalPermission::accessAllMedia);
 
         /* For custom users 'All Resources' must be unchecked by default */
         if (m_permissionsModel->subject().user())
         {
             hasAllMedia &= m_permissionsModel->rawPermissions().testFlag(
-                Qn::GlobalCustomUserPermission);
+                GlobalPermission::customUser);
         }
 
         QSet<QnUuid> checkedControls;
@@ -285,11 +285,11 @@ void QnAccessibleResourcesWidget::applyChanges()
     if (m_controlsVisible)
     {
         bool checkedAll = !m_controlsModel->checkedResources().isEmpty();
-        Qn::GlobalPermissions permissions = m_permissionsModel->rawPermissions();
+        GlobalPermissions permissions = m_permissionsModel->rawPermissions();
         if (checkedAll)
-            permissions |= Qn::GlobalAccessAllMediaPermission;
+            permissions |= GlobalPermission::accessAllMedia;
         else
-            permissions &= ~Qn::GlobalAccessAllMediaPermission;
+            permissions &= ~GlobalPermissions(GlobalPermission::accessAllMedia);
         m_permissionsModel->setRawPermissions(permissions);
     }
 

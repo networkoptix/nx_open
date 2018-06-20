@@ -165,7 +165,7 @@ void EventSearchListModel::Private::clear()
 
 bool EventSearchListModel::Private::hasAccessRights() const
 {
-    return q->accessController()->hasGlobalPermission(Qn::GlobalViewLogsPermission);
+    return q->accessController()->hasGlobalPermission(GlobalPermission::viewLogs);
 }
 
 rest::Handle EventSearchListModel::Private::requestPrefetch(qint64 fromMs, qint64 toMs)

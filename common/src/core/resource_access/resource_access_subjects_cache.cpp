@@ -108,7 +108,7 @@ void QnResourceAccessSubjectsCache::updateUserRole(const QnUserResourcePtr& user
     const bool knownUser = oldRoleIter != m_roleIdByUserId.end();
 
     const auto userRole = user->userRole();
-    const auto newRoleId = userRole == Qn::UserRole::CustomUserRole
+    const auto newRoleId = userRole == Qn::UserRole::customUserRole
         ? user->userRoleId()
         : QnUserRolesManager::predefinedRoleId(userRole);
 

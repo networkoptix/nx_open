@@ -329,7 +329,7 @@ void Ec2MserverCloudSynchronization::addCloudUserLocally(
     accountVmsData->hash = "password_is_in_cloud";
     accountVmsData->digest = "password_is_in_cloud";
     // TODO: randomize access rights
-    accountVmsData->permissions = Qn::GlobalLiveViewerPermissionSet;
+    accountVmsData->permissions = GlobalPermission::liveViewerPermissions;
     ASSERT_EQ(
         ::ec2::ErrorCode::ok,
         appserver2()->moduleInstance()->ecConnection()
@@ -482,7 +482,7 @@ void Ec2MserverCloudSynchronization::verifyCloudUserPresenceInLocalDb(
     if (sharingData.accessRole == api::SystemAccessRole::owner)
     {
         ASSERT_TRUE(userData.isAdmin);
-        ASSERT_EQ(Qn::GlobalAdminPermissionSet, userData.permissions);
+        ASSERT_EQ(GlobalPermissions(GlobalPermission::adminPermissions), userData.permissions);
     }
 
     // Verifying user full name.

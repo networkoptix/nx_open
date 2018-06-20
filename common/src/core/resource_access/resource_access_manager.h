@@ -35,7 +35,7 @@ public:
     * \returns                         Global permissions of the given user,
     *                                  adjusted to take dependencies and superuser status into account.
     */
-    Qn::GlobalPermissions globalPermissions(const QnResourceAccessSubject& subject) const;
+    GlobalPermissions globalPermissions(const QnResourceAccessSubject& subject) const;
 
     /**
     * \param user                      User to get global permissions for.
@@ -43,7 +43,7 @@ public:
     * \returns                         Whether actual global permissions include required permission.
     */
     bool hasGlobalPermission(const QnResourceAccessSubject& subject,
-        Qn::GlobalPermission requiredPermission) const;
+        GlobalPermission requiredPermission) const;
 
     /**
     * \param accessRights              Access rights descriptor
@@ -51,7 +51,7 @@ public:
     * \returns                         Whether actual global permissions include required permission.
     */
     bool hasGlobalPermission(const Qn::UserAccessData& accessRights,
-        Qn::GlobalPermission requiredPermission) const;
+        GlobalPermission requiredPermission) const;
 
     /**
     * \param user                      User that should have permissions.
@@ -93,7 +93,7 @@ public:
     template <typename ApiDataType>
     bool canCreateResource(const QnResourceAccessSubject& subject, const ApiDataType& /*data*/) const
     {
-        return hasGlobalPermission(subject, Qn::GlobalAdminPermission);
+        return hasGlobalPermission(subject, GlobalPermission::admin);
     }
 
     bool canCreateResource(
@@ -120,7 +120,7 @@ public:
         const QnUuid& layoutParentId) const;
     bool canCreateUser(
         const QnResourceAccessSubject& subject,
-        Qn::GlobalPermissions targetPermissions,
+        GlobalPermissions targetPermissions,
         bool isOwner) const;
     bool canCreateUser(const QnResourceAccessSubject& subject, Qn::UserRole role) const;
     bool canCreateVideoWall(const QnResourceAccessSubject& subject) const;

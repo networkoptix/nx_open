@@ -85,7 +85,7 @@ QnWorkbenchBookmarksHandler::QnWorkbenchBookmarksHandler(QObject *parent /* = NU
                 return;
 
             const bool readonly = commonModule()->isReadOnly()
-                || !accessController()->hasGlobalPermission(Qn::GlobalManageBookmarksPermission);
+                || !accessController()->hasGlobalPermission(GlobalPermission::manageBookmarks);
             bookmarksViewer->setReadOnly(readonly);
 
         };

@@ -24,14 +24,14 @@ public:
     virtual ~QnGlobalPermissionsManager();
 
     /** Get a set of global permissions that will not work without the given one. */
-    static Qn::GlobalPermissions dependentPermissions(Qn::GlobalPermission value);
+    static GlobalPermissions dependentPermissions(GlobalPermission value);
 
     /**
     * \param user                      User or role to get global permissions for.
     * \returns                         Global permissions of the given user,
     *                                  adjusted to take dependencies and superuser status into account.
     */
-    Qn::GlobalPermissions globalPermissions(const QnResourceAccessSubject& subject) const;
+    GlobalPermissions globalPermissions(const QnResourceAccessSubject& subject) const;
 
     /**
     * \param user                      User to get global permissions for.
@@ -39,7 +39,7 @@ public:
     * \returns                         Whether actual global permissions include required permission.
     */
     bool hasGlobalPermission(const QnResourceAccessSubject& subject,
-        Qn::GlobalPermission requiredPermission) const;
+        GlobalPermission requiredPermission) const;
 
     /**
     * \param accessRights              Access rights descriptor
@@ -47,21 +47,21 @@ public:
     * \returns                         Whether actual global permissions include required permission.
     */
     bool hasGlobalPermission(const Qn::UserAccessData& accessRights,
-        Qn::GlobalPermission requiredPermission) const;
+        GlobalPermission requiredPermission) const;
 
 signals:
     void globalPermissionsChanged(const QnResourceAccessSubject& subject,
-        Qn::GlobalPermissions permissions);
+        GlobalPermissions permissions);
 
 private:
-    Qn::GlobalPermissions filterDependentPermissions(Qn::GlobalPermissions source) const;
+    GlobalPermissions filterDependentPermissions(GlobalPermissions source) const;
 
     void updateGlobalPermissions(const QnResourceAccessSubject& subject);
 
-    Qn::GlobalPermissions calculateGlobalPermissions(const QnResourceAccessSubject& subject) const;
+    GlobalPermissions calculateGlobalPermissions(const QnResourceAccessSubject& subject) const;
 
     void setGlobalPermissionsInternal(const QnResourceAccessSubject& subject,
-        Qn::GlobalPermissions permissions);
+        GlobalPermissions permissions);
 
     void handleResourceAdded(const QnResourcePtr& resource);
     void handleResourceRemoved(const QnResourcePtr& resource);
@@ -71,5 +71,5 @@ private:
 private:
     const nx::core::access::Mode m_mode;
     mutable QnMutex m_mutex;
-    QHash<QnUuid, Qn::GlobalPermissions> m_cache;
+    QHash<QnUuid, GlobalPermissions> m_cache;
 };
