@@ -1,12 +1,16 @@
 #include "resource_access_subject.h"
 
 #include <core/resource/user_resource.h>
-#include <nx_ec/data/api_user_role_data.h>
+
+#include <nx/vms/api/data/user_role_data.h>
 
 struct QnResourceAccessSubjectPrivate
 {
 public:
-    QnResourceAccessSubjectPrivate(const QnUserResourcePtr& user, const ec2::ApiUserRoleData& role):
+    QnResourceAccessSubjectPrivate(
+        const QnUserResourcePtr& user,
+        const nx::vms::api::UserRoleData& role)
+        :
         user(user),
         role(role),
         m_id(user ? user->getId() : role.id)
@@ -40,20 +44,18 @@ public:
     }
 
     QnUserResourcePtr user;
-    ec2::ApiUserRoleData role;
+    nx::vms::api::UserRoleData role;
 
 private:
     QnUuid m_id;
 };
 
-
-
 QnResourceAccessSubject::QnResourceAccessSubject(const QnUserResourcePtr& user):
-    d_ptr(new QnResourceAccessSubjectPrivate(user, ec2::ApiUserRoleData()))
+    d_ptr(new QnResourceAccessSubjectPrivate(user, {}))
 {
 }
 
-QnResourceAccessSubject::QnResourceAccessSubject(const ec2::ApiUserRoleData& role):
+QnResourceAccessSubject::QnResourceAccessSubject(const nx::vms::api::UserRoleData& role):
     d_ptr(new QnResourceAccessSubjectPrivate(QnUserResourcePtr(), role))
 {
 }
@@ -64,7 +66,7 @@ QnResourceAccessSubject::QnResourceAccessSubject(const QnResourceAccessSubject& 
 }
 
 QnResourceAccessSubject::QnResourceAccessSubject():
-    d_ptr(new QnResourceAccessSubjectPrivate(QnUserResourcePtr(), ec2::ApiUserRoleData()))
+    d_ptr(new QnResourceAccessSubjectPrivate(QnUserResourcePtr(), {}))
 {
 }
 
@@ -77,7 +79,7 @@ const QnUserResourcePtr& QnResourceAccessSubject::user() const
     return d_ptr->user;
 }
 
-const ec2::ApiUserRoleData& QnResourceAccessSubject::role() const
+const nx::vms::api::UserRoleData& QnResourceAccessSubject::role() const
 {
     return d_ptr->role;
 }

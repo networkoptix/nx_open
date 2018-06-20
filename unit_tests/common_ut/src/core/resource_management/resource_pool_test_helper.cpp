@@ -127,7 +127,7 @@ QnStorageResourcePtr QnResourcePoolTestHelper::addStorage(const QnMediaServerRes
     return storage;
 }
 
-ec2::ApiUserRoleData QnResourcePoolTestHelper::createRole(GlobalPermissions permissions)
+nx::vms::api::UserRoleData QnResourcePoolTestHelper::createRole(GlobalPermissions permissions)
 {
-    return ec2::ApiUserRoleData(QnUuid::createUuid(), "test_role", permissions);
+    return {QnUuid::createUuid(), "test_role", permissions};
 }

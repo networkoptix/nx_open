@@ -1,17 +1,14 @@
 #include <core/resource_access/providers/direct_base_access_provider_test_fixture.h>
 #include <core/resource_access/providers/shared_layout_item_access_provider.h>
-
 #include <core/resource_access/shared_resources_manager.h>
-
 #include <core/resource_management/resource_pool.h>
-
 #include <core/resource/camera_resource.h>
 #include <core/resource/layout_resource.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource/user_resource.h>
 #include <core/resource/webpage_resource.h>
 
-#include <nx_ec/data/api_user_role_data.h>
+#include <nx/vms/api/data/user_role_data.h>
 
 using namespace nx::core::access;
 
@@ -28,7 +25,7 @@ TEST_F(QnDirectSharedLayoutItemAccessProviderTest, checkInvalidAccess)
 {
     auto camera = addCamera();
 
-    ec2::ApiUserRoleData userRole;
+    nx::vms::api::UserRoleData userRole;
     QnResourceAccessSubject subject(userRole);
     ASSERT_FALSE(subject.isValid());
     ASSERT_FALSE(accessProvider()->hasAccess(subject, camera));

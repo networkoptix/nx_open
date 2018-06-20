@@ -66,20 +66,20 @@ template void QnUserRolesManager::usersAndRoles(
 template void QnUserRolesManager::usersAndRoles(
     const QSet<QnUuid>& ids, QnUserResourceList& users, QList<QnUuid>& roles);
 
-ec2::ApiUserRoleDataList QnUserRolesManager::userRoles() const
+QnUserRolesManager::UserRoleDataList QnUserRolesManager::userRoles() const
 {
     QnMutexLocker lk(&m_mutex);
-    ec2::ApiUserRoleDataList result;
+    UserRoleDataList result;
     result.reserve(m_roles.size());
     for (const auto& role: m_roles)
         result.push_back(role);
     return result;
 }
 
-void QnUserRolesManager::resetUserRoles(const ec2::ApiUserRoleDataList& userRoles)
+void QnUserRolesManager::resetUserRoles(const UserRoleDataList& userRoles)
 {
-    ec2::ApiUserRoleDataList removed;
-    ec2::ApiUserRoleDataList updated;
+    UserRoleDataList removed;
+    UserRoleDataList updated;
     {
         QnMutexLocker lk(&m_mutex);
 
@@ -113,7 +113,7 @@ bool QnUserRolesManager::hasRole(const QnUuid& id) const
     return m_roles.contains(id);
 }
 
-ec2::ApiUserRoleData QnUserRolesManager::userRole(const QnUuid& id) const
+QnUserRolesManager::UserRoleData QnUserRolesManager::userRole(const QnUuid& id) const
 {
     QnMutexLocker lk(&m_mutex);
     return m_roles.value(id);
@@ -130,7 +130,7 @@ QnUuid QnUserRolesManager::unifiedUserRoleId(const QnUserResourcePtr& user)
         : predefinedRoleId(userRole);
 }
 
-void QnUserRolesManager::addOrUpdateUserRole(const ec2::ApiUserRoleData& role)
+void QnUserRolesManager::addOrUpdateUserRole(const UserRoleData& role)
 {
     NX_ASSERT(!role.isNull());
     if (role.isNull())
@@ -149,7 +149,7 @@ void QnUserRolesManager::addOrUpdateUserRole(const ec2::ApiUserRoleData& role)
 void QnUserRolesManager::removeUserRole(const QnUuid& id)
 {
     NX_ASSERT(!id.isNull());
-    ec2::ApiUserRoleData role;
+    UserRoleData role;
     {
         QnMutexLocker lk(&m_mutex);
         if (!m_roles.contains(id))
@@ -317,9 +317,9 @@ QString QnUserRolesManager::userRoleName(const QnUserResourcePtr& user) const
     return userRoleName(userRole);
 }
 
-ec2::ApiPredefinedRoleDataList QnUserRolesManager::getPredefinedRoles()
+QnUserRolesManager::PredefinedRoleDataList QnUserRolesManager::getPredefinedRoles()
 {
-    static ec2::ApiPredefinedRoleDataList kPredefinedRoles;
+    static PredefinedRoleDataList kPredefinedRoles;
     if (kPredefinedRoles.empty())
     {
         for (auto role: predefinedRoles())

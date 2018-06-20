@@ -3,22 +3,18 @@
 #include <core/resource_access/resource_access_filter.h>
 #include <core/resource_access/global_permissions_manager.h>
 #include <core/resource_access/providers/resource_access_provider.h>
-
 #include <core/resource_management/resource_pool.h>
 #include <core/resource_management/user_roles_manager.h>
-
 #include <core/resource/camera_resource.h>
 #include <core/resource/layout_resource.h>
 #include <core/resource/user_resource.h>
-
-#include <nx_ec/data/api_user_role_data.h>
-
 #include <ui/models/resource/resource_tree_model.h>
 #include <ui/models/resource/resource_tree_model_node.h>
 #include <ui/models/resource/tree/resource_tree_model_layout_node.h>
 #include <ui/models/resource/tree/resource_tree_model_recorder_node.h>
-
 #include <ui/workbench/workbench_context.h>
+
+#include <nx/vms/api/data/user_role_data.h>
 
 using namespace nx::client::desktop;
 
@@ -59,13 +55,13 @@ QnResourceTreeModelUserNodes::QnResourceTreeModelUserNodes(
         });
 
     connect(userRolesManager(), &QnUserRolesManager::userRoleAddedOrUpdated, this,
-        [this](const ec2::ApiUserRoleData& role)
+        [this](const nx::vms::api::UserRoleData& role)
         {
             ensureRoleNode(role)->update();
         });
 
     connect(userRolesManager(), &QnUserRolesManager::userRoleRemoved, this,
-        [this](const ec2::ApiUserRoleData& role)
+        [this](const nx::vms::api::UserRoleData& role)
         {
             if (m_roles.contains(role.id))
                 removeNode(m_roles.take(role.id));
@@ -276,7 +272,7 @@ QnResourceTreeModelNodePtr QnResourceTreeModelUserNodes::ensureSubjectNode(
 }
 
 QnResourceTreeModelNodePtr QnResourceTreeModelUserNodes::ensureRoleNode(
-    const ec2::ApiUserRoleData& role)
+    const nx::vms::api::UserRoleData& role)
 {
     auto pos = m_roles.find(role.id);
     if (pos == m_roles.end())

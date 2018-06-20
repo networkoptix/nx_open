@@ -2,11 +2,11 @@
 
 #include <nx_ec/ec_api_fwd.h>
 #include <nx_ec/data/api_user_data.h>
-#include <nx_ec/data/api_user_role_data.h>
 #include <nx_ec/impl/ec_api_impl.h>
 #include <nx_ec/impl/sync_handler.h>
 
 #include <nx/vms/api/data/access_rights_data.h>
+#include <nx/vms/api/data/user_role_data.h>
 
 namespace ec2 {
 
@@ -20,7 +20,7 @@ signals:
      * will fail to pick correct metadata when you try to emit queued signal
      */
     void addedOrUpdated(const ec2::ApiUserData& user, ec2::NotificationSource source);
-    void userRoleAddedOrUpdated(const ec2::ApiUserRoleData& userRole);
+    void userRoleAddedOrUpdated(const nx::vms::api::UserRoleData& userRole);
     void removed(const QnUuid& id);
     void userRoleRemoved(const QnUuid& id);
     void accessRightsChanged(const nx::vms::api::AccessRightsData& access);
@@ -129,7 +129,7 @@ public:
                 target, handler)));
     }
 
-    ErrorCode getUserRolesSync(ApiUserRoleDataList* const result)
+    ErrorCode getUserRolesSync(nx::vms::api::UserRoleDataList* const result)
     {
         return impl::doSyncCall<impl::GetUserRolesHandler>(
             [this](impl::GetUserRolesHandlerPtr handler)
@@ -143,14 +143,14 @@ public:
      * @param handler Functor with params: (ErrorCode)
      */
     template<class TargetType, class HandlerType>
-    int saveUserRole(const ApiUserRoleData& user, TargetType* target, HandlerType handler)
+    int saveUserRole(const nx::vms::api::UserRoleData& user, TargetType* target, HandlerType handler)
     {
         return saveUserRole(user, std::static_pointer_cast<impl::SimpleHandler>(
             std::make_shared<impl::CustomSimpleHandler<TargetType, HandlerType>>(
                 target, handler)));
     }
 
-    ErrorCode saveUserRoleSync(const ApiUserRoleData& data)
+    ErrorCode saveUserRoleSync(const nx::vms::api::UserRoleData& data)
     {
         return impl::doSyncCall<impl::SimpleHandler>(
             [=](const impl::SimpleHandlerPtr& handler)
@@ -220,7 +220,8 @@ private:
     virtual int remove(const QnUuid& id, impl::SimpleHandlerPtr handler) = 0;
 
     virtual int getUserRoles(impl::GetUserRolesHandlerPtr handler) = 0;
-    virtual int saveUserRole(const ApiUserRoleData& userRole, impl::SimpleHandlerPtr handler) = 0;
+    virtual int saveUserRole(
+        const nx::vms::api::UserRoleData& userRole, impl::SimpleHandlerPtr handler) = 0;
     virtual int removeUserRole(const QnUuid& id, impl::SimpleHandlerPtr handler) = 0;
 
     virtual int getAccessRights(impl::GetAccessRightsHandlerPtr handler) = 0;

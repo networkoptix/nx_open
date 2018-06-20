@@ -316,8 +316,6 @@ void QnCommonMetaTypes::initialize()
 
     qRegisterMetaType<ec2::ApiFullInfoData>("ec2::ApiFullInfoData");
     qRegisterMetaType<ec2::ApiUserData>("ec2::ApiUserData");
-    qRegisterMetaType<ec2::ApiUserRoleData>("ec2::ApiUserRoleData");
-    qRegisterMetaType<ec2::ApiPredefinedRoleData>("ec2::ApiPredefinedRoleData");
 
     qRegisterMetaType<QnUuid>();
     qRegisterMetaTypeStreamOperators<QnUuid>();

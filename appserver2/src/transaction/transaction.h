@@ -672,7 +672,7 @@ APPLY(509, removeAccessRights, nx::vms::api::IdData, /* Remove records from vms_
                        InvalidFilterFunc(), /* Filter read func */ \
                        AllowForAllAccessOut(),                     \
                        RegularTransactionType()) /* Check remote peer rights for outgoing transaction */ \
-APPLY(505, getUserRoles, ApiUserRoleDataList, \
+APPLY(505, getUserRoles, nx::vms::api::UserRoleDataList, \
                        false, \
                        false, \
                        InvalidGetHashHelper(), \
@@ -683,7 +683,7 @@ APPLY(505, getUserRoles, ApiUserRoleDataList, \
                        FilterListByAccess<AllowForAllAccess>(), /* Filter read func */ \
                        ReadListAccessOut<AllowForAllAccess>(), /* Check remote peer rights for outgoing transaction */ \
                        RegularTransactionType()) /* regular transaction type */ \
-APPLY(506, saveUserRole, ApiUserRoleData, \
+APPLY(506, saveUserRole, nx::vms::api::UserRoleData, \
                        true, \
                        false, \
                        CreateHashByIdHelper(), \
@@ -705,7 +705,7 @@ APPLY(507, removeUserRole, nx::vms::api::IdData, \
                        InvalidFilterFunc(), /* Filter read func */ \
                        AllowForAllAccessOut(), /* Check remote peer rights for outgoing transaction */ \
                        RegularTransactionType()) /* regular transaction type */ \
-APPLY(508, getPredefinedRoles, ApiPredefinedRoleDataList, \
+APPLY(508, getPredefinedRoles, nx::vms::api::PredefinedRoleDataList, \
                        false, /* persistent*/ \
                        false, /* system*/ \
                        InvalidGetHashHelper(), /* getHash*/ \

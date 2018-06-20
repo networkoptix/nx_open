@@ -16,7 +16,7 @@
 #include <nx/vms/api/data/layout_tour_data.h>
 #include <nx/vms/api/data/media_server_data.h>
 #include <nx/vms/api/data/access_rights_data.h>
-#include <nx_ec/data/api_user_role_data.h>
+#include <nx/vms/api/data/user_role_data.h>
 
 #include <nx/fusion/model_functions.h>
 

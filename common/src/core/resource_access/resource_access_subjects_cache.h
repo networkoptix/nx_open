@@ -29,8 +29,8 @@ private:
     void handleUserRemoved(const QnUserResourcePtr& user);
     void updateUserRole(const QnUserResourcePtr& user);
 
-    void handleRoleAdded(const ec2::ApiUserRoleData& userRole);
-    void handleRoleRemoved(const ec2::ApiUserRoleData& userRole);
+    void handleRoleAdded(const nx::vms::api::UserRoleData& userRole);
+    void handleRoleRemoved(const nx::vms::api::UserRoleData& userRole);
 
     void removeUserFromRole(const QnUserResourcePtr& user, const QnUuid& roleId);
 private:

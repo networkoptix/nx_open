@@ -576,7 +576,7 @@ void QnCommonMessageProcessor::on_accessRightsChanged(const AccessRightsData& ac
     }
 }
 
-void QnCommonMessageProcessor::on_userRoleChanged(const ec2::ApiUserRoleData& userRole)
+void QnCommonMessageProcessor::on_userRoleChanged(const UserRoleData& userRole)
 {
     userRolesManager()->addOrUpdateUserRole(userRole);
 }
@@ -775,7 +775,7 @@ void QnCommonMessageProcessor::resetAccessRights(const AccessRightsDataList& acc
     sharedResourcesManager()->reset(accessRights);
 }
 
-void QnCommonMessageProcessor::resetUserRoles(const ec2::ApiUserRoleDataList& roles)
+void QnCommonMessageProcessor::resetUserRoles(const UserRoleDataList& roles)
 {
     userRolesManager()->resetUserRoles(roles);
 }

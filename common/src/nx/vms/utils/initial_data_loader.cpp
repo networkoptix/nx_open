@@ -264,8 +264,8 @@ void loadResourcesFromEcs(
     }
 
     {
-        //loading user roles
-        ec2::ApiUserRoleDataList userRoles;
+        // Loading user roles.
+        api::UserRoleDataList userRoles;
         while ((rez = ec2Connection->getUserManager(Qn::kSystemAccess)->getUserRolesSync(&userRoles)) != ec2::ErrorCode::ok)
         {
             qDebug() << "QnMain::run(): Can't get roles. Reason: " << ec2::toString(rez);

@@ -4,29 +4,36 @@
 
 #include <core/resource/resource_fwd.h>
 
-#include <nx_ec/data/api_user_role_data.h>
-
 #include <nx/utils/singleton.h>
 #include <nx/utils/thread/mutex.h>
+#include <nx/vms/api/data/user_role_data.h>
 
-class QnUserRolesManager: public QObject, public QnCommonModuleAware
+class QnUserRolesManager:
+    public QObject,
+    public QnCommonModuleAware
 {
     Q_OBJECT
     using base_type = QObject;
+
+public:
+    using UserRoleData = nx::vms::api::UserRoleData;
+    using UserRoleDataList = nx::vms::api::UserRoleDataList;
+    using PredefinedRoleData = nx::vms::api::PredefinedRoleData;
+    using PredefinedRoleDataList = nx::vms::api::PredefinedRoleDataList;
 
 public:
     QnUserRolesManager(QObject* parent);
     virtual ~QnUserRolesManager();
 
     // Returns list of information structures for all custom user roles.
-    ec2::ApiUserRoleDataList userRoles() const;
+    UserRoleDataList userRoles() const;
 
     // Returns list of information structures for custom user roles specified by their uuids.
     template <class IDList>
-    ec2::ApiUserRoleDataList userRoles(IDList idList) const
+    UserRoleDataList userRoles(IDList idList) const
     {
         QnMutexLocker lk(&m_mutex);
-        ec2::ApiUserRoleDataList result;
+        UserRoleDataList result;
         for (const auto& id : idList)
         {
             const auto itr = m_roles.find(id);
@@ -44,7 +51,7 @@ public:
     bool hasRole(const QnUuid& id) const;
 
     // Returns information structure for custom user role with specified uuid.
-    ec2::ApiUserRoleData userRole(const QnUuid& id) const;
+    UserRoleData userRole(const QnUuid& id) const;
 
     // Returns custom or predefined role id for specified user.
     static QnUuid unifiedUserRoleId(const QnUserResourcePtr& user);
@@ -81,27 +88,27 @@ public:
     static Qn::UserRole predefinedRole(const QnUuid& id);
 
     // Returns list of predefined user role information structures.
-    static ec2::ApiPredefinedRoleDataList getPredefinedRoles();
+    static PredefinedRoleDataList getPredefinedRoles();
 
 // Slots called by the message processor:
 
     // Sets new custom user roles handled by this manager.
-    void resetUserRoles(const ec2::ApiUserRoleDataList& userRoles);
+    void resetUserRoles(const UserRoleDataList& userRoles);
 
     // Adds or updates custom user role information:
-    void addOrUpdateUserRole(const ec2::ApiUserRoleData& role);
+    void addOrUpdateUserRole(const UserRoleData& role);
 
     // Removes specified custom user role from this manager.
     void removeUserRole(const QnUuid& id);
 
 signals:
-    void userRoleAddedOrUpdated(const ec2::ApiUserRoleData& userRole);
-    void userRoleRemoved(const ec2::ApiUserRoleData& userRole);
+    void userRoleAddedOrUpdated(const nx::vms::api::UserRoleData& userRole);
+    void userRoleRemoved(const nx::vms::api::UserRoleData& userRole);
 
 private:
     bool isValidRoleId(const QnUuid& id) const; //< This function is not thread-safe.
 
 private:
     mutable QnMutex m_mutex;
-    QHash<QnUuid, ec2::ApiUserRoleData> m_roles;
+    QHash<QnUuid, UserRoleData> m_roles;
 };

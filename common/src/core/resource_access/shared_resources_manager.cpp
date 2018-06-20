@@ -115,14 +115,14 @@ void QnSharedResourcesManager::handleResourceRemoved(const QnResourcePtr& resour
         handleSubjectRemoved(user);
 }
 
-void QnSharedResourcesManager::handleRoleAddedOrUpdated(const ec2::ApiUserRoleData& userRole)
+void QnSharedResourcesManager::handleRoleAddedOrUpdated(const nx::vms::api::UserRoleData& userRole)
 {
     auto resources = sharedResources(userRole);
     if (!resources.isEmpty())
         emit sharedResourcesChanged(userRole, kEmpty, resources);
 }
 
-void QnSharedResourcesManager::handleRoleRemoved(const ec2::ApiUserRoleData& userRole)
+void QnSharedResourcesManager::handleRoleRemoved(const nx::vms::api::UserRoleData& userRole)
 {
     handleSubjectRemoved(userRole);
     for (auto subject: resourceAccessSubjectsCache()->usersInRole(userRole.id))

@@ -534,7 +534,7 @@ void QnResourcesChangesManager::cleanAccessibleResources(const QnUuid& subject)
         makeReplyProcessor(this, handler));
 }
 
-void QnResourcesChangesManager::saveUserRole(const ec2::ApiUserRoleData& role)
+void QnResourcesChangesManager::saveUserRole(const nx::vms::api::UserRoleData& role)
 {
     auto connection = commonModule()->ec2Connection();
     if (!connection)

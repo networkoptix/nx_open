@@ -16,7 +16,7 @@
 #include <network/http_connection_listener.h>
 #include <nx_ec/ec_proto_version.h>
 #include <nx/vms/api/data/access_rights_data.h>
-#include <nx_ec/data/api_user_role_data.h>
+#include <nx/vms/api/data/user_role_data.h>
 #include <nx/vms/api/data/camera_history_data.h>
 #include <nx/vms/api/data/media_server_data.h>
 
@@ -1057,7 +1057,7 @@ void LocalConnectionFactory::registerRestHandlers(QnRestProcessorPool* const p)
      *     %// TODO: Describe ApiUserRole fields.
      * %// AbstractUserManager::getUserRoles
      */
-    regGet<QnUuid, ApiUserRoleDataList>(p, ApiCommand::getUserRoles);
+    regGet<QnUuid, UserRoleDataList>(p, ApiCommand::getUserRoles);
 
     /**%apidoc GET /ec2/getAccessRights
      * Return list of ids of accessible resources for each user in the System.
@@ -1232,7 +1232,7 @@ void LocalConnectionFactory::registerRestHandlers(QnRestProcessorPool* const p)
      *     %value GlobalAccessAllMediaPermission Has access to all media (cameras and web pages).
      * %// AbstractUserManager::saveUserRole
      */
-    regUpdate<ApiUserRoleData>(p, ApiCommand::saveUserRole);
+    regUpdate<UserRoleData>(p, ApiCommand::saveUserRole);
 
     /**%apidoc POST /ec2/removeUserRole
      * Delete the specified user role.
@@ -1252,7 +1252,7 @@ void LocalConnectionFactory::registerRestHandlers(QnRestProcessorPool* const p)
     * %param[default] format
     * %return List of predefined user role objects in the requested format.
     */
-    regGet<std::nullptr_t, ApiPredefinedRoleDataList>(p, ApiCommand::getPredefinedRoles);
+    regGet<std::nullptr_t, PredefinedRoleDataList>(p, ApiCommand::getPredefinedRoles);
 
     /**%apidoc GET /ec2/getVideowalls
      * Return list of video walls

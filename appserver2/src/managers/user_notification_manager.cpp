@@ -24,7 +24,7 @@ void QnUserNotificationManager::triggerNotification(
 }
 
 void QnUserNotificationManager::triggerNotification(
-    const QnTransaction<ApiUserRoleData>& tran,
+    const QnTransaction<nx::vms::api::UserRoleData>& tran,
     NotificationSource /*source*/)
 {
     NX_ASSERT(tran.command == ApiCommand::saveUserRole);

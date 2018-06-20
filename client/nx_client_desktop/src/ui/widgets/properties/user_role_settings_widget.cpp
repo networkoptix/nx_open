@@ -187,7 +187,7 @@ public:
 
         auto roles = model->userRoles();
         auto selectedRole = std::find_if(roles.begin(), roles.end(),
-            [selectedId = model->selectedUserRoleId()](const ec2::ApiUserRoleData& userRole)
+            [selectedId = model->selectedUserRoleId()](const nx::vms::api::UserRoleData& userRole)
             {
                 return userRole.id == selectedId;
             });

@@ -11,8 +11,6 @@ namespace ec2 {
 struct ApiFullInfoData;
 
 struct ApiUserData;
-struct ApiUserRoleData;
-struct ApiPredefinedRoleData;
 struct ApiDiscoveryData;
 struct ApiDiscoverPeerData;
 struct ApiConnectionData;
@@ -27,8 +25,6 @@ typedef std::vector<ApiMiscData> ApiMiscDataList;
 typedef std::vector<ApiTransactionData> ApiTransactionDataList;
 
 typedef std::vector<ApiUserData> ApiUserDataList;
-typedef std::vector<ApiUserRoleData> ApiUserRoleDataList;
-typedef std::vector<ApiPredefinedRoleData> ApiPredefinedRoleDataList;
 typedef std::vector<ApiDiscoveryData> ApiDiscoveryDataList;
 typedef std::vector<ApiDiscoveredServerData> ApiDiscoveredServerDataList;
 
@@ -45,8 +41,6 @@ struct ParentId
 #define QN_EC2_API_DATA_TYPES \
     (ApiFullInfoData)\
     (ApiUserData)\
-    (ApiUserRoleData)\
-    (ApiPredefinedRoleData)\
     (ApiDiscoveryData)\
     (ApiDiscoverPeerData)\
     (ApiConnectionData)\

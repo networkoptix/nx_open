@@ -90,7 +90,7 @@ public:
     /** Clean accessible resources for the given user */
     void cleanAccessibleResources(const QnUuid& subject);
 
-    void saveUserRole(const ec2::ApiUserRoleData& role);
+    void saveUserRole(const nx::vms::api::UserRoleData& role);
     void removeUserRole(const QnUuid& id);
 
     /** Apply changes to the given videoWall. */

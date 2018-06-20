@@ -65,8 +65,8 @@ private:
 
     void handleResourceAdded(const QnResourcePtr& resource);
     void handleResourceRemoved(const QnResourcePtr& resource);
-    void handleRoleAddedOrUpdated(const ec2::ApiUserRoleData& userRole);
-    void handleRoleRemoved(const ec2::ApiUserRoleData& userRole);
+    void handleRoleAddedOrUpdated(const nx::vms::api::UserRoleData& userRole);
+    void handleRoleRemoved(const nx::vms::api::UserRoleData& userRole);
     void handleSubjectRemoved(const QnResourceAccessSubject& subject);
 private:
     const nx::core::access::Mode m_mode;

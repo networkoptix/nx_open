@@ -45,7 +45,7 @@ public:
 
     QnStorageResourcePtr addStorage(const QnMediaServerResourcePtr& server);
 
-    ec2::ApiUserRoleData createRole(GlobalPermissions permissions);
+    nx::vms::api::UserRoleData createRole(GlobalPermissions permissions);
 
 private:
     QScopedPointer<QnStaticCommonModule> m_staticCommon;

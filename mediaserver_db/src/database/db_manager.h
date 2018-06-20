@@ -287,10 +287,11 @@ namespace detail
         ErrorCode doQueryNoLock(const QnUuid& id, ApiUserDataList& userList);
 
         //getUserRoleList
-        ErrorCode doQueryNoLock(const QnUuid& id, ApiUserRoleDataList& userRoleList);
+        ErrorCode doQueryNoLock(const QnUuid& id, nx::vms::api::UserRoleDataList& userRoleList);
 
         //getPredefinedRoles
-        ErrorCode doQueryNoLock(const std::nullptr_t& /*dummy*/, ApiPredefinedRoleDataList& rolesList);
+        ErrorCode doQueryNoLock(const std::nullptr_t& /*dummy*/,
+            nx::vms::api::PredefinedRoleDataList& rolesList);
 
         //getAccessRights
         ErrorCode doQueryNoLock(const std::nullptr_t& /*dummy*/,
@@ -379,7 +380,7 @@ namespace detail
         ErrorCode executeTransactionInternal(
             const QnTransaction<nx::vms::api::EventRuleData>& tran);
         ErrorCode executeTransactionInternal(const QnTransaction<ApiUserData>& tran);
-        ErrorCode executeTransactionInternal(const QnTransaction<ApiUserRoleData>& tran);
+        ErrorCode executeTransactionInternal(const QnTransaction<nx::vms::api::UserRoleData>& tran);
         ErrorCode executeTransactionInternal(
             const QnTransaction<nx::vms::api::AccessRightsData>& tran);
 
@@ -627,7 +628,7 @@ namespace detail
         ErrorCode removeUser( const QnUuid& guid );
         ErrorCode insertOrReplaceUser(const ApiUserData& data, qint32 internalId);
         ErrorCode checkExistingUser(const QString &name, qint32 internalId);
-        ErrorCode insertOrReplaceUserRole(const ApiUserRoleData& data);
+        ErrorCode insertOrReplaceUserRole(const nx::vms::api::UserRoleData& data);
         ErrorCode removeUserRole( const QnUuid& guid );
         ErrorCode setAccessRights(const nx::vms::api::AccessRightsData& data);
         ErrorCode cleanAccessRights(const QnUuid& userOrRoleId);

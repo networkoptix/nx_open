@@ -122,7 +122,7 @@ void QnResourceAccessSubjectsCache::updateUserRole(const QnUserResourcePtr& user
     m_usersByRoleId[newRoleId].append(user);
 }
 
-void QnResourceAccessSubjectsCache::handleRoleAdded(const ec2::ApiUserRoleData& userRole)
+void QnResourceAccessSubjectsCache::handleRoleAdded(const nx::vms::api::UserRoleData& userRole)
 {
     QnMutexLocker lk(&m_mutex);
     m_subjects << userRole;
@@ -140,7 +140,7 @@ void QnResourceAccessSubjectsCache::handleRoleAdded(const ec2::ApiUserRoleData& 
         m_usersByRoleId[userRole.id] = children;
 }
 
-void QnResourceAccessSubjectsCache::handleRoleRemoved(const ec2::ApiUserRoleData& userRole)
+void QnResourceAccessSubjectsCache::handleRoleRemoved(const nx::vms::api::UserRoleData& userRole)
 {
     QnMutexLocker lk(&m_mutex);
     m_subjects.removeOne(userRole);

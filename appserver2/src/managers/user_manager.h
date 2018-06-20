@@ -21,7 +21,7 @@ public:
     virtual int remove(const QnUuid& id, impl::SimpleHandlerPtr handler) override;
 
     virtual int getUserRoles(impl::GetUserRolesHandlerPtr handler) override;
-    virtual int saveUserRole(const ec2::ApiUserRoleData& userRole,
+    virtual int saveUserRole(const nx::vms::api::UserRoleData& userRole,
         impl::SimpleHandlerPtr handler) override;
     virtual int removeUserRole(const QnUuid& id, impl::SimpleHandlerPtr handler) override;
 
@@ -132,18 +132,18 @@ int ec2::QnUserManager<QueryProcessorType>::getUserRoles(impl::GetUserRolesHandl
 {
     const int reqID = generateRequestID();
     auto queryDoneHandler =
-        [reqID, handler](ErrorCode errorCode, const ApiUserRoleDataList& result)
+        [reqID, handler](ErrorCode errorCode, const nx::vms::api::UserRoleDataList& result)
         {
             handler->done(reqID, errorCode, result);
         };
-    m_queryProcessor->getAccess(m_userAccessData)
-        .template processQueryAsync<QnUuid, ApiUserRoleDataList, decltype(queryDoneHandler)>
+    m_queryProcessor->getAccess(m_userAccessData).template processQueryAsync<
+            QnUuid, nx::vms::api::UserRoleDataList, decltype(queryDoneHandler)>
         (ApiCommand::getUserRoles, QnUuid(), queryDoneHandler);
     return reqID;
 }
 
 template<class QueryProcessorType>
-int ec2::QnUserManager<QueryProcessorType>::saveUserRole(const ec2::ApiUserRoleData& userRole,
+int ec2::QnUserManager<QueryProcessorType>::saveUserRole(const nx::vms::api::UserRoleData& userRole,
     impl::SimpleHandlerPtr handler)
 {
     const int reqID = generateRequestID();

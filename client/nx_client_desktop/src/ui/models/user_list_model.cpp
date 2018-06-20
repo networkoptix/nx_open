@@ -1,31 +1,26 @@
 #include "user_list_model.h"
 
 #include <client_core/connection_context_aware.h>
-
 #include <core/resource_access/global_permissions_manager.h>
-
 #include <core/resource_management/resource_pool.h>
 #include <core/resource_management/user_roles_manager.h>
-
 #include <core/resource/user_resource.h>
 #include <core/resource/device_dependent_strings.h>
-
-#include <nx_ec/data/api_user_role_data.h>
-
 #include <ui/style/skin.h>
 #include <ui/style/globals.h>
 #include <ui/workbench/workbench_access_controller.h>
-
 #include <utils/common/app_info.h>
 
-#include <nx/utils/string.h>
 #include <nx/network/app_info.h>
+#include <nx/utils/string.h>
+#include <nx/vms/api/data/user_role_data.h>
 
-class QnUserListModelPrivate : public Connective<QObject>, public QnConnectionContextAware
+class QnUserListModelPrivate:
+    public Connective<QObject>,
+    public QnConnectionContextAware
 {
     Q_DECLARE_TR_FUNCTIONS(QnUserListModelPrivate)
-
-    typedef Connective<QObject> base_type;
+    using base_type = Connective<QObject>;
 
 public:
     QnUserListModel* model;
@@ -53,7 +48,7 @@ public:
             });
 
         connect(userRolesManager(), &QnUserRolesManager::userRoleAddedOrUpdated, this,
-            [this](const ec2::ApiUserRoleData& userRole)
+            [this](const nx::vms::api::UserRoleData& userRole)
             {
                 for (auto user: users)
                 {
@@ -90,7 +85,6 @@ public:
 private:
     void addUserInternal(const QnUserResourcePtr& user);
     void removeUserInternal(const QnUserResourcePtr& user);
-
 };
 
 void QnUserListModelPrivate::at_resourcePool_resourceChanged(const QnResourcePtr& resource)

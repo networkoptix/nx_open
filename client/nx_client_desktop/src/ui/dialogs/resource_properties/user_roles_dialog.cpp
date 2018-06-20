@@ -28,6 +28,9 @@
 
 using namespace nx::client::desktop::ui;
 
+using nx::vms::api::UserRoleData;
+using nx::vms::api::UserRoleDataList;
+
 QnUserRolesDialog::QnUserRolesDialog(QWidget* parent):
     base_type(parent),
     ui(new Ui::UserRolesDialog()),
@@ -87,7 +90,7 @@ QnUserRolesDialog::QnUserRolesDialog(QWidget* parent):
             for (const auto& userRole: m_model->userRoles())
                 usedNames << userRole.name;
 
-            ec2::ApiUserRoleData userRole;
+            UserRoleData userRole;
             userRole.id = QnUuid::createUuid();
             userRole.name = nx::utils::generateUniqueString(
                 usedNames, tr("New Role"), tr("New Role %1"));
@@ -126,10 +129,10 @@ QnUserRolesDialog::~QnUserRolesDialog()
 
 bool QnUserRolesDialog::selectUserRole(const QnUuid& userRoleId)
 {
-    ec2::ApiUserRoleDataList userRoles = m_model->userRoles();
-    ec2::ApiUserRoleDataList::const_iterator userRole = std::find_if(
+    UserRoleDataList userRoles = m_model->userRoles();
+    UserRoleDataList::const_iterator userRole = std::find_if(
         userRoles.cbegin(), userRoles.cend(),
-        [userRoleId](const ec2::ApiUserRoleData& elem)
+        [userRoleId](const UserRoleData& elem)
         {
             return elem.id == userRoleId;
         });
@@ -281,4 +284,3 @@ void QnUserRolesDialog::at_model_currentChanged(const QModelIndex& current)
     m_model->selectUserRoleId(userRoleId);
     loadDataToUi();
 }
-

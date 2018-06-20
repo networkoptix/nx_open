@@ -29,7 +29,6 @@ struct UserPermissionsRemapData
     int permissions = 0;
 };
 
-
 bool doRemap(const QSqlDatabase& database, const UserPermissionsRemapData& data)
 {
     QSqlQuery query(database);
@@ -95,7 +94,7 @@ int fixCustomFlag(int oldPermissions)
         return int(GlobalPermission::admin);
 
     const bool isPredefined = any_of(QnUserRolesManager::getPredefinedRoles(),
-        [result](const ApiPredefinedRoleData& role)
+        [result](const nx::vms::api::PredefinedRoleData& role)
         {
             return role.permissions == result;
         });

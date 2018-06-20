@@ -1,15 +1,12 @@
 #include <core/resource_access/providers/cached_base_access_provider_test_fixture.h>
 #include <core/resource_access/providers/shared_resource_access_provider.h>
-
 #include <core/resource_access/shared_resources_manager.h>
-
 #include <core/resource_management/user_roles_manager.h>
-
 #include <core/resource/camera_resource.h>
 #include <core/resource/layout_resource.h>
 #include <core/resource/user_resource.h>
 
-#include <nx_ec/data/api_user_role_data.h>
+#include <nx/vms/api/data/user_role_data.h>
 
 using namespace nx::core::access;
 
@@ -41,7 +38,7 @@ TEST_F(QnCachedSharedResourceAccessProviderTest, checkInvalidAccess)
 {
     auto camera = addCamera();
 
-    ec2::ApiUserRoleData userRole;
+    nx::vms::api::UserRoleData userRole;
     QnResourceAccessSubject subject(userRole);
     ASSERT_FALSE(subject.isValid());
     ASSERT_FALSE(accessProvider()->hasAccess(subject, camera));

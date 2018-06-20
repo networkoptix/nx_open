@@ -1094,8 +1094,8 @@ bool QnDbManager::resyncTransactionLog()
     }
 
     if (!fillTransactionLogInternal<QnUuid,
-        ApiUserRoleData,
-        ApiUserRoleDataList>(ApiCommand::saveUserRole))
+        UserRoleData,
+        UserRoleDataList>(ApiCommand::saveUserRole))
     {
         return false;
     }
@@ -2178,7 +2178,7 @@ ErrorCode QnDbManager::insertOrReplaceUser(const ApiUserData& data, qint32 inter
     return ErrorCode::ok;
 }
 
-ErrorCode QnDbManager::insertOrReplaceUserRole(const ApiUserRoleData& data)
+ErrorCode QnDbManager::insertOrReplaceUserRole(const UserRoleData& data)
 {
     QSqlQuery query(m_sdb);
     const QString queryStr = R"(
@@ -3125,7 +3125,7 @@ ErrorCode QnDbManager::executeTransactionInternal(const QnTransaction<ApiUserDat
     return insertOrReplaceUser(tran.params, internalId);
 }
 
-ErrorCode QnDbManager::executeTransactionInternal(const QnTransaction<ApiUserRoleData>& tran)
+ErrorCode QnDbManager::executeTransactionInternal(const QnTransaction<UserRoleData>& tran)
 {
     NX_ASSERT(tran.command == ApiCommand::saveUserRole, Q_FUNC_INFO, "Unsupported transaction");
     if (tran.command != ApiCommand::saveUserRole)
@@ -4035,7 +4035,7 @@ ErrorCode QnDbManager::doQueryNoLock(const QnUuid& id, ApiUserDataList& userList
 }
 
 //getUserRoles
-ErrorCode QnDbManager::doQueryNoLock(const QnUuid& id, ApiUserRoleDataList& result)
+ErrorCode QnDbManager::doQueryNoLock(const QnUuid& id, UserRoleDataList& result)
 {
     QString filterStr;
     if (!id.isNull())
@@ -4060,7 +4060,7 @@ ErrorCode QnDbManager::doQueryNoLock(const QnUuid& id, ApiUserRoleDataList& resu
     return ErrorCode::ok;
 }
 
-ErrorCode QnDbManager::doQueryNoLock(const std::nullptr_t& /*dummy*/, ApiPredefinedRoleDataList& result)
+ErrorCode QnDbManager::doQueryNoLock(const std::nullptr_t& /*dummy*/, PredefinedRoleDataList& result)
 {
     result = QnUserRolesManager::getPredefinedRoles();
     return ErrorCode::ok;
