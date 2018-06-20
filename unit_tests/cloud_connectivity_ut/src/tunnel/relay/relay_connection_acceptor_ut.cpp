@@ -40,7 +40,8 @@ public:
         if (m_factoryFunctionBak)
         {
             nx::cloud::relay::api::ClientFactory::instance().setCustomFunc(
-                *std::exchange(m_factoryFunctionBak, std::nullopt));
+                std::move(*m_factoryFunctionBak));
+            m_factoryFunctionBak = std::nullopt;
         }
     }
 
