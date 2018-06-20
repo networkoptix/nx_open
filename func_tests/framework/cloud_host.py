@@ -71,7 +71,7 @@ class CloudAccount(object):
         assert response.get('email') == self.api.user, repr(response)  # Got activation code for another user?
 
     def set_user_customization(self, customization):
-        response = self.api.portst('cdb/account/update', dict(customization=customization))
+        response = self.api.post('cdb/account/update', dict(customization=customization))
         assert response.get('resultCode') == 'ok'
 
     def check_user_is_valid(self):
