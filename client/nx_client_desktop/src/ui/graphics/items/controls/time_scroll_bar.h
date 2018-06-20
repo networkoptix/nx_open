@@ -9,14 +9,16 @@ class QnTimeScrollBarPrivate;
 class QnTimeScrollBar: public GraphicsScrollBar
 {
     Q_OBJECT
+
     typedef GraphicsScrollBar base_type;
+    using milliseconds = std::chrono::milliseconds;
 
 public:
     QnTimeScrollBar(QGraphicsItem* parent = nullptr);
     virtual ~QnTimeScrollBar();
 
-    qint64 indicatorPosition() const;
-    void setIndicatorPosition(qint64 indicatorPosition);
+    milliseconds indicatorPosition() const;
+    void setIndicatorPosition(milliseconds indicatorPosition);
 
     bool indicatorVisible() const;
     void setIndicatorVisible(bool value);
