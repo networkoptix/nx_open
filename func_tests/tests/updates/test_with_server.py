@@ -1,11 +1,8 @@
-import wsgiref.simple_server
-from threading import Thread
-
 import pytest
 
 from framework.api_shortcuts import get_updates_state
 from framework.installation.mediaserver import Mediaserver
-from framework.port_reservation import reserve_port
+from framework.serving import WsgiServer
 from framework.waiting import wait_for_true
 from updates_server.server import UpdatesServer, make_base_url_for_remote_machine
 
@@ -19,19 +16,12 @@ def updates_server(work_dir, one_mediaserver, cloud_group):
     server = UpdatesServer(data_dir)
     app = server.make_app(True, 'support')
 
-    def make_server(port):
-        return wsgiref.simple_server.make_server('localhost', port, app.wsgi_app)
-
-    port, wsgi_server = reserve_port(range(8081, 8100), make_server)
-    base_url = make_base_url_for_remote_machine(one_mediaserver.os_access, port)
+    wsgi_server = WsgiServer(app, range(8081, 8100))
     # When port is bound and it's known how to access server's address and port, generate.
+    base_url = make_base_url_for_remote_machine(one_mediaserver.os_access, wsgi_server.port)
     server.generate_data(base_url, cloud_group)
-    thread = Thread(target=wsgi_server.serve_forever)
-    thread.start()
-    yield base_url, server.callback_requests, server.download_requests
-    wsgi_server.shutdown()
-    thread.join()
-    wsgi_server.server_close()
+    with wsgi_server.serving():
+        yield base_url, server.callback_requests, server.download_requests
 
 
 def test_updates_available(mediaserver):
