@@ -43,7 +43,7 @@ Ptz::Capability extendsCapabilitiesWith(
     Ptz::Capabilities realCapabilities)
 {
     if (realCapabilities.testFlag(relativeCapability))
-        return Ptz::NoPtzCapabilities;
+        return relativeCapability;
 
     const auto itr = kCapabilityRequirements.find(relativeCapability);
     if (itr == kCapabilityRequirements.cend())
