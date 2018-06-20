@@ -502,7 +502,7 @@ std::unique_ptr<QnTranscoder> StreamingChunkTranscoder::createTranscoder(
         {
             NX_LOGX(lm("Failed to create transcoder with audio codec \"%1\" to transcode chunk (%2 - %3) of resource %4").
                 arg(transcodeParams.audioCodecId()).arg(transcodeParams.startTimestamp()).
-                arg(transcodeParams.endTimestamp()).arg(transcodeParams.srcResourceUniqueID()), cl_logWARNING );
+                arg(transcodeParams.endTimestamp()).arg(transcodeParams.srcResourceUniqueID()), cl_logWARNING);
             return nullptr;
         }
     }

@@ -25,24 +25,24 @@ ArchivePlaylistManager::ArchivePlaylistManager(
     qint64 startTimestamp,
     unsigned int maxChunkNumberInPlaylist,
     qint64 targetDurationUsec,
-    MediaQuality streamQuality )
-:
-    m_camResource( camResource ),
-    m_startTimestamp( startTimestamp ),
-    m_maxChunkNumberInPlaylist( maxChunkNumberInPlaylist ),
-    m_targetDurationUsec( targetDurationUsec ),
-    m_getNextIFrameLoopMaxSize( MAX_GOP_LENGTH_SEC * USEC_IN_MSEC * MSEC_IN_SEC / m_targetDurationUsec ),
-    m_streamQuality( streamQuality ),
-    m_totalPlaylistDuration( 0 ),
-    m_prevChunkEndTimestamp( 0 ),
-    m_eof( false ),
-    m_chunkMediaSequence( 0 ),
-    m_timerCorrection( 0 ),
-    m_initialPlaylistCreated( false ),
-    m_prevGeneratedChunkDuration( 0 ),
-    m_discontinuityDetected( false )
+    MediaQuality streamQuality)
+    :
+    m_camResource(camResource),
+    m_startTimestamp(startTimestamp),
+    m_maxChunkNumberInPlaylist(maxChunkNumberInPlaylist),
+    m_targetDurationUsec(targetDurationUsec),
+    m_getNextIFrameLoopMaxSize(MAX_GOP_LENGTH_SEC * USEC_IN_MSEC * MSEC_IN_SEC / m_targetDurationUsec),
+    m_streamQuality(streamQuality),
+    m_totalPlaylistDuration(0),
+    m_prevChunkEndTimestamp(0),
+    m_eof(false),
+    m_chunkMediaSequence(0),
+    m_timerCorrection(0),
+    m_initialPlaylistCreated(false),
+    m_prevGeneratedChunkDuration(0),
+    m_discontinuityDetected(false)
 {
-    NX_ASSERT( m_maxChunkNumberInPlaylist > 0 );
+    NX_ASSERT(m_maxChunkNumberInPlaylist > 0);
 }
 
 ArchivePlaylistManager::~ArchivePlaylistManager()
@@ -51,17 +51,17 @@ ArchivePlaylistManager::~ArchivePlaylistManager()
 
 bool ArchivePlaylistManager::initialize()
 {
-    QnAbstractArchiveDelegatePtr archiveDelegate( m_camResource->createArchiveDelegate() );
-    if( !archiveDelegate )
+    QnAbstractArchiveDelegatePtr archiveDelegate(m_camResource->createArchiveDelegate());
+    if (!archiveDelegate)
     {
         archiveDelegate = QnAbstractArchiveDelegatePtr(new QnServerArchiveDelegate(qnServerModule)); // default value
-        if(!archiveDelegate->open(m_camResource, qnServerModule->archiveIntegrityWatcher()))
+        if (!archiveDelegate->open(m_camResource, qnServerModule->archiveIntegrityWatcher()))
             return false;
     }
-    if( !archiveDelegate->setQuality(
-            m_streamQuality == MEDIA_Quality_High ? MEDIA_Quality_ForceHigh : m_streamQuality,
-            true,
-            QSize()) )
+    if (!archiveDelegate->setQuality(
+        m_streamQuality == MEDIA_Quality_High ? MEDIA_Quality_ForceHigh : m_streamQuality,
+        true,
+        QSize()))
         return false;
     archiveDelegate->setPlaybackMode(PlaybackMode::ThumbNails);
 
@@ -69,10 +69,10 @@ bool ArchivePlaylistManager::initialize()
         m_delegate = archiveDelegate;
     else
         m_delegate.reset(new QnThumbnailsArchiveDelegate(archiveDelegate));
-    m_delegate->setRange( m_startTimestamp, std::numeric_limits<qint64>::max(), m_targetDurationUsec );
+    m_delegate->setRange(m_startTimestamp, std::numeric_limits<qint64>::max(), m_targetDurationUsec);
 
     const QnAbstractMediaDataPtr& nextData = m_delegate->getNextData();
-    if( !nextData )
+    if (!nextData)
     {
         m_prevChunkEndTimestamp = -1;
         return false;
@@ -92,14 +92,14 @@ CameraDiagnostics::Result ArchivePlaylistManager::lastError() const
 
 size_t ArchivePlaylistManager::generateChunkList(
     std::vector<AbstractPlaylistManager::ChunkData>* const chunkList,
-    bool* const endOfStreamReached ) const
+    bool* const endOfStreamReached) const
 {
-    QnMutexLocker lk( &m_mutex );
+    QnMutexLocker lk(&m_mutex);
 
     const_cast<ArchivePlaylistManager*>(this)->generateChunksIfNeeded();
 
-    std::copy( m_chunks.cbegin(), m_chunks.cend(), std::back_inserter(*chunkList) );
-    if( endOfStreamReached )
+    std::copy(m_chunks.cbegin(), m_chunks.cend(), std::back_inserter(*chunkList));
+    if (endOfStreamReached)
         *endOfStreamReached = m_eof;
     return m_chunks.size();
 }
@@ -112,12 +112,12 @@ int ArchivePlaylistManager::getMaxBitrate() const
 
 void ArchivePlaylistManager::generateChunksIfNeeded()
 {
-    if( !m_initialPlaylistCreated )
+    if (!m_initialPlaylistCreated)
     {
         //creating initial playlist
-        for( size_t i = 0; i < m_maxChunkNumberInPlaylist; ++i )
+        for (size_t i = 0; i < m_maxChunkNumberInPlaylist; ++i)
         {
-            if( !addOneMoreChunk() )
+            if (!addOneMoreChunk())
                 break;
         }
         m_initialPlaylistCreated = true;
@@ -126,9 +126,9 @@ void ArchivePlaylistManager::generateChunksIfNeeded()
     }
     else
     {
-        if( (m_playlistUpdateTimer.elapsed() * USEC_IN_MSEC - m_timerCorrection) > m_prevGeneratedChunkDuration )
+        if ((m_playlistUpdateTimer.elapsed() * USEC_IN_MSEC - m_timerCorrection) > m_prevGeneratedChunkDuration)
         {
-            if( addOneMoreChunk() )
+            if (addOneMoreChunk())
                 m_timerCorrection += m_prevGeneratedChunkDuration;
         }
     }
@@ -136,25 +136,25 @@ void ArchivePlaylistManager::generateChunksIfNeeded()
 
 bool ArchivePlaylistManager::addOneMoreChunk()
 {
-    if( m_eof )
+    if (m_eof)
         return false;
 
     QnAbstractMediaDataPtr nextData;
-    for( int i = 0; i < m_getNextIFrameLoopMaxSize; ++i )
+    for (int i = 0; i < m_getNextIFrameLoopMaxSize; ++i)
     {
         nextData = m_delegate->getNextData();
-        if( !nextData )
+        if (!nextData)
         {
             //end of archive reached
                 //TODO/HLS: #ak end of archive is moving forward constantly, so need just imply some delay 
             m_eof = true;
             return false;
         }
-        if( nextData->timestamp != m_prevChunkEndTimestamp )
+        if (nextData->timestamp != m_prevChunkEndTimestamp)
             break;
     }
-    NX_ASSERT( nextData->timestamp != m_prevChunkEndTimestamp );
-    if( nextData->timestamp == m_prevChunkEndTimestamp )
+    NX_ASSERT(nextData->timestamp != m_prevChunkEndTimestamp);
+    if (nextData->timestamp == m_prevChunkEndTimestamp)
         return false;
     const qint64 currentChunkEndTimestamp = nextData->timestamp;
 
@@ -162,14 +162,14 @@ bool ArchivePlaylistManager::addOneMoreChunk()
     chunkData.mediaSequence = ++m_chunkMediaSequence;
     chunkData.startTimestamp = m_prevChunkEndTimestamp;
     chunkData.discontinuity = m_discontinuityDetected;
-    if( nextData->flags & QnAbstractMediaData::MediaFlags_BOF )
+    if (nextData->flags & QnAbstractMediaData::MediaFlags_BOF)
     {
         //gap in archive detected
-            if( m_prevChunkEndTimestamp >= m_currentArchiveChunk.startTimeUsec && 
-            m_prevChunkEndTimestamp < (m_currentArchiveChunk.startTimeUsec + m_currentArchiveChunk.durationUsec) )
+            if (m_prevChunkEndTimestamp >= m_currentArchiveChunk.startTimeUsec && 
+                m_prevChunkEndTimestamp < (m_currentArchiveChunk.startTimeUsec + m_currentArchiveChunk.durationUsec))
         {
             chunkData.duration = m_currentArchiveChunk.durationUsec - (m_prevChunkEndTimestamp - m_currentArchiveChunk.startTimeUsec);
-            NX_ASSERT( chunkData.duration > 0 );
+            NX_ASSERT(chunkData.duration > 0);
         }
         else
         {
@@ -185,9 +185,9 @@ bool ArchivePlaylistManager::addOneMoreChunk()
         m_discontinuityDetected = false;
     }
     m_totalPlaylistDuration += chunkData.duration;
-    m_chunks.push_back( chunkData );
+    m_chunks.push_back(chunkData);
 
-    if( m_chunks.size() > m_maxChunkNumberInPlaylist )
+    if (m_chunks.size() > m_maxChunkNumberInPlaylist)
     {
         m_totalPlaylistDuration -= m_chunks.front().duration;
         m_chunks.pop_front();
