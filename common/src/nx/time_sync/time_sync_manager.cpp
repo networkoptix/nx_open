@@ -31,7 +31,7 @@ TimeSyncManager::TimeSyncManager(
     m_thread(new QThread())
 {
     moveToThread(m_thread);
-        
+
     connect(m_thread, &QThread::started,
         [this]()
         {
@@ -49,9 +49,9 @@ TimeSyncManager::TimeSyncManager(
 
     connect(
         commonModule->globalSettings(), &QnGlobalSettings::timeSynchronizationSettingsChanged,
-        this, [this]() 
-        { 
-            updateTime(); 
+        this, [this]()
+        {
+            updateTime();
         });
 }
 
@@ -91,7 +91,7 @@ void TimeSyncManager::loadTimeFromLocalClock()
 {
     auto newValue = m_systemClock->millisSinceEpoch();
     static const std::chrono::milliseconds kMaxJitterForLocalClock(250);
-    
+
     setSyncTime(newValue, kMaxJitterForLocalClock);
     NX_DEBUG(this, lm("Set time %1 from the local clock").
         arg(QDateTime::fromMSecsSinceEpoch(newValue.count()).toString(Qt::ISODate)));
@@ -103,7 +103,7 @@ bool TimeSyncManager::loadTimeFromServer(const QnRoute& route)
 
     if (!socket)
     {
-        NX_WARNING(this, 
+        NX_WARNING(this,
             lm("Can't read time from server %1. Can't establish connection to the remote host."));
         return false;
     }
@@ -151,7 +151,7 @@ bool TimeSyncManager::loadTimeFromServer(const QnRoute& route)
             .arg(route.id.toString()));
         return false;
     }
-    
+
     const std::chrono::milliseconds rtt = rttTimer.elapsed();
     auto newTime = std::chrono::milliseconds(timeData.utcTimeMs - rtt.count() / 2);
     bool syncWithInternel = commonModule()->globalSettings()->isSynchronizingTimeWithInternet();
@@ -188,6 +188,8 @@ void TimeSyncManager::setSyncTimeInternal(std::chrono::milliseconds value)
 std::chrono::milliseconds TimeSyncManager::getSyncTime() const
 {
     QnMutexLocker lock(&m_mutex);
+    if (m_synchronizedTime == std::chrono::milliseconds::zero())
+        return m_systemClock->millisSinceEpoch(); //< Network sync is not initialized yet.
 
     auto elapsed = m_steadyClock->now() - m_synchronizedOnClock;
     return m_synchronizedTime + elapsed;

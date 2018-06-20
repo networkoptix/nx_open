@@ -11,11 +11,12 @@
 #include <nx/time_sync/time_sync_manager.h>
 #include <nx/vms/network/abstract_server_connector.h>
 #include <nx/utils/elapsed_timer.h>
+#include <nx_ec/ec_api_fwd.h>
 
 namespace nx {
 namespace time_sync {
 
-class ServerTimeSyncManager: 
+class ServerTimeSyncManager:
     public nx::time_sync::TimeSyncManager
 {
     Q_OBJECT;
@@ -29,6 +30,7 @@ public:
 
     virtual void stop() override;
     virtual void start() override;
+    void init(const ec2::AbstractECConnectionPtr& connection);
 
     virtual bool isTimeTakenFromInternet() const;
 protected:
@@ -50,6 +52,7 @@ private:
     nx::utils::ElapsedTimer m_lastNetworkSyncTime;
     QnUuid m_timeLoadFromServer;
     std::atomic<bool> m_isTimeTakenFromInternet {false};
+    ec2::AbstractECConnectionPtr m_connection;
 };
 
 } // namespace time_sync

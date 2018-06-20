@@ -41,7 +41,6 @@
 
 #include <nx/p2p/p2p_server_message_bus.h>
 #include <transaction/server_transaction_message_bus.h>
-#include <nx/time_sync/server_time_sync_manager.h>
 
 using namespace nx::vms::api;
 
@@ -1644,6 +1643,8 @@ int LocalConnectionFactory::establishDirectConnection(
 					m_serverQueryProcessor.get(),
 					connectionInfo,
 					url));
+            m_timeSynchronizationManager->init(m_directConnection);
+
             messageBus()->setHandler(m_directConnection->notificationManager());
 
 			if (m_directConnection->initialized())

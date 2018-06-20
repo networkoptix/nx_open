@@ -27,7 +27,6 @@ ServerTimeSyncManager::ServerTimeSyncManager(
     base_type(commonModule),
     m_serverConnector(serverConnector)
 {
-
     connect(this, &ServerTimeSyncManager::timeChanged, this,
         [this](qint64 syncTimeMs)
         {
@@ -71,17 +70,6 @@ ServerTimeSyncManager::~ServerTimeSyncManager()
 
 void ServerTimeSyncManager::start()
 {
-    ec2::ApiMiscData deltaData;
-    auto connection = commonModule()->ec2Connection();
-    auto miscManager = connection->getMiscManager(Qn::kSystemAccess);
-    auto dbResult = miscManager->getMiscParamSync(kTimeDeltaParamName, &deltaData);
-    if (dbResult != ec2::ErrorCode::ok)
-    {
-        NX_WARNING(this, "Failed to load time delta parameter from the database");
-    }
-    auto timeDelta = std::chrono::milliseconds(deltaData.value.toLongLong());
-    setSyncTimeInternal(m_systemClock->millisSinceEpoch() + timeDelta);
-
     initializeTimeFetcher();
 
     connect(
@@ -246,5 +234,19 @@ bool ServerTimeSyncManager::isTimeTakenFromInternet() const
 {
     return m_isTimeTakenFromInternet;
 }
+
+void ServerTimeSyncManager::init(const ec2::AbstractECConnectionPtr& connection)
+{
+    ec2::ApiMiscData deltaData;
+    auto miscManager = connection->getMiscManager(Qn::kSystemAccess);
+    auto dbResult = miscManager->getMiscParamSync(kTimeDeltaParamName, &deltaData);
+    if (dbResult != ec2::ErrorCode::ok)
+    {
+        NX_WARNING(this, "Failed to load time delta parameter from the database");
+    }
+    auto timeDelta = std::chrono::milliseconds(deltaData.value.toLongLong());
+    setSyncTimeInternal(m_systemClock->millisSinceEpoch() + timeDelta);
+}
+
 } // namespace time_sync
 } // namespace nx

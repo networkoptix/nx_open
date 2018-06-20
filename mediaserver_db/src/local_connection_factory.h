@@ -15,6 +15,7 @@
 #include <nx/time_sync/time_sync_manager.h>
 #include <nx/vms/network/abstract_server_connector.h>
 #include <nx/vms/network/reverse_connection_manager.h>
+#include <nx/time_sync/server_time_sync_manager.h>
 
 namespace ec2 {
 
@@ -74,7 +75,7 @@ private:
 	std::unique_ptr<QnJsonTransactionSerializer> m_jsonTranSerializer;
 	std::unique_ptr<QnUbjsonTransactionSerializer> m_ubjsonTranSerializer;
     std::unique_ptr<nx::vms::network::ReverseConnectionManager> m_serverConnector;
-    std::unique_ptr<nx::time_sync::TimeSyncManager> m_timeSynchronizationManager;
+    std::unique_ptr<nx::time_sync::ServerTimeSyncManager> m_timeSynchronizationManager;
 
 	std::unique_ptr<detail::QnDbManager> m_dbManager;
 	std::unique_ptr<QnTransactionLog> m_transactionLog;
