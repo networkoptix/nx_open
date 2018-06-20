@@ -8,10 +8,8 @@ But for POST method keyword parameters are translated to json request body.
 """
 import base64
 import csv
-import datetime
 import hashlib
 import json
-import json as json_module
 import logging
 from pprint import pformat
 
