@@ -21,7 +21,7 @@ void QnRuntimeInfoManager::setMessageProcessor(QnCommonMessageProcessor* message
     if (messageProcessor)
     {
         connect(messageProcessor, &QnCommonMessageProcessor::runtimeInfoChanged, this,
-            [this](const ec2::ApiRuntimeData &runtimeData)
+            [this](const nx::vms::api::RuntimeData &runtimeData)
             {
                 QnPeerRuntimeInfo info(runtimeData);
                 m_items->addOrUpdateItem(info);
@@ -43,7 +43,7 @@ void QnRuntimeInfoManager::setMessageProcessor(QnCommonMessageProcessor* message
         connect(commonModule(), &QnCommonModule::runningInstanceGUIDChanged, this,
             [this]()
             {
-                ec2::ApiRuntimeData item = localInfo().data;
+                nx::vms::api::RuntimeData item = localInfo().data;
                 item.peer.instanceId = commonModule()->runningInstanceGUID();
                 updateLocalItem(item);
             }, Qt::DirectConnection);

@@ -313,7 +313,6 @@ void QnCommonMetaTypes::initialize()
     qRegisterMetaType<ec2::ApiDiscoveryData>( "ApiDiscoveryData" );
     qRegisterMetaType<ec2::ApiDiscoveredServerData>("ApiDiscoveredServerData");
     qRegisterMetaType<ec2::ApiDiscoveredServerDataList>("ApiDiscoveredServerDataList");
-    qRegisterMetaType<ec2::ApiRuntimeData>( "ApiRuntimeData" );
 
     qRegisterMetaType<ec2::ApiFullInfoData>("ec2::ApiFullInfoData");
     qRegisterMetaType<ec2::ApiUserData>("ec2::ApiUserData");

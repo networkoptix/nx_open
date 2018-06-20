@@ -749,7 +749,7 @@ void MessageBus::sendRuntimeData(
         auto runtimeInfoItr = m_lastRuntimeInfo.find(peer);
         if (runtimeInfoItr != m_lastRuntimeInfo.end())
         {
-            QnTransaction<ApiRuntimeData> tran(ApiCommand::runtimeInfoChanged, peer.id);
+            QnTransaction<RuntimeData> tran(ApiCommand::runtimeInfoChanged, peer.id);
             tran.params = runtimeInfoItr.value();
             sendTransactionImpl(connection, tran, TransportHeader());
         }
@@ -854,7 +854,7 @@ void MessageBus::cleanupRuntimeInfo(const PersistentIdData& peer)
     {
         if (m_handler)
         {
-            QnTransaction<ApiRuntimeData> tran(ApiCommand::runtimeInfoChanged, peer.id);
+            QnTransaction<RuntimeData> tran(ApiCommand::runtimeInfoChanged, peer.id);
             tran.params = itr.value();
             m_handler->triggerNotification(tran, NotificationSource::Remote);
         }
@@ -876,7 +876,7 @@ void MessageBus::gotTransaction(
 
 
 void MessageBus::processRuntimeInfo(
-    const QnTransaction<ApiRuntimeData> &tran,
+    const QnTransaction<RuntimeData> &tran,
     const P2pConnectionPtr& connection,
     const TransportHeader& transportHeader)
 {
@@ -1195,7 +1195,7 @@ MessageBus::DelayIntervals MessageBus::delayIntervals() const
     return m_intervals;
 }
 
-QMap<PersistentIdData, ApiRuntimeData> MessageBus::runtimeInfo() const
+QMap<PersistentIdData, RuntimeData> MessageBus::runtimeInfo() const
 {
     QnMutexLocker lock(&m_mutex);
     return m_lastRuntimeInfo;

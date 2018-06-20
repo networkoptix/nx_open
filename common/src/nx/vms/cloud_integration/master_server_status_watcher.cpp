@@ -58,12 +58,12 @@ void QnMasterServerStatusWatcher::at_updateMasterFlag()
     bool hasBetterMaster = std::any_of(items.begin(), items.end(),
         [this](const QnPeerRuntimeInfo& item)
         {
-            return item.data.peer.id < m_commonModule->moduleGUID() &&
-                   item.data.flags.testFlag(ec2::RF_MasterCloudSync);
+            return item.data.peer.id < m_commonModule->moduleGUID()
+                && item.data.flags.testFlag(api::RuntimeFlag::masterCloudSync);
         });
 
     QnPeerRuntimeInfo localInfo = m_commonModule->runtimeInfoManager()->localInfo();
-    bool isLocalMaster = localInfo.data.flags.testFlag(ec2::RF_MasterCloudSync);
+    bool isLocalMaster = localInfo.data.flags.testFlag(api::RuntimeFlag::masterCloudSync);
     bool canBeMaster = localPeerCanBeMaster() && !hasBetterMaster;
     if (!canBeMaster && isLocalMaster)
     {
@@ -81,9 +81,10 @@ void QnMasterServerStatusWatcher::setMasterFlag(bool value)
 {
     QnPeerRuntimeInfo localInfo = m_commonModule->runtimeInfoManager()->localInfo();
     if (value)
-        localInfo.data.flags |= ec2::RF_MasterCloudSync;
+        localInfo.data.flags |= api::RuntimeFlag::masterCloudSync;
     else
-        localInfo.data.flags &= ~ec2::RF_MasterCloudSync;
+        localInfo.data.flags &= ~api::RuntimeFlags(api::RuntimeFlag::masterCloudSync);
+
     m_commonModule->runtimeInfoManager()->updateLocalItem(localInfo);
 }
 

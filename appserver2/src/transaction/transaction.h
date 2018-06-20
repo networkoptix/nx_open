@@ -1251,11 +1251,11 @@ APPLY(5002, triggerStatisticsReport, ApiStatisticsServerInfo, \
                        InvalidFilterFunc(), /* Filter read func */ \
                        AdminOnlyAccessOut(), /* Check remote peer rights for outgoing transaction */ \
                        RegularTransactionType()) /* regular transaction type */ \
-APPLY(9004, runtimeInfoChanged, ApiRuntimeData, \
+APPLY(9004, runtimeInfoChanged, nx::vms::api::RuntimeData, \
                        false, \
                        true, \
                        InvalidGetHashHelper(), \
-                       [] (const QnTransaction<ApiRuntimeData> & tran, const NotificationParams &notificationParams) \
+                       [] (const QnTransaction<nx::vms::api::RuntimeData> & tran, const NotificationParams &notificationParams) \
                         { \
                             NX_ASSERT(tran.command == ApiCommand::runtimeInfoChanged); \
                             emit notificationParams.ecConnection->runtimeInfoChanged(tran.params); \

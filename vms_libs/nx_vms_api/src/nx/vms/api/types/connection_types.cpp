@@ -32,3 +32,11 @@ QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(nx::vms::api, TimeFlags,
     (nx::vms::api::TimeFlag::peerTimeSynchronizedWithInternetServer,
         "TF_peerTimeSynchronizedWithInternetServer")
     (nx::vms::api::TimeFlag::peerIsServer, "TF_peerIsServer"))
+
+QN_FUSION_DEFINE_FUNCTIONS(nx::vms::api::RuntimeFlag, (numeric)(debug))
+QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(nx::vms::api, RuntimeFlag,
+    (nx::vms::api::RuntimeFlag::masterCloudSync, "MasterCloudSync"))
+
+QN_FUSION_DEFINE_FUNCTIONS(nx::vms::api::RuntimeFlags, (numeric)(debug))
+QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(nx::vms::api, RuntimeFlags,
+    (nx::vms::api::RuntimeFlag::masterCloudSync, "MasterCloudSync"))

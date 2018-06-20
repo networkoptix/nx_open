@@ -19,12 +19,10 @@
 #include <utils/common/synctime.h>
 
 #include <nx_ec/ec_api.h>
-#include <nx_ec/data/api_runtime_data.h>
-
 #include <nx/client/core/watchers/server_time_watcher.h>
 #include <nx/client/core/utils/human_readable.h>
 #include <nx/utils/algorithm/index_of.h>
-#include <nx/vms/api/types/connection_types.h>
+#include <nx/vms/api/data/runtime_data.h>
 
 using namespace nx;
 
@@ -528,7 +526,8 @@ void QnTimeServerSelectionModel::updateColumn(Columns column)
 
 bool QnTimeServerSelectionModel::isSelected(quint64 priority)
 {
-    return (priority & ec2::ApiRuntimeData::tpfPeerTimeSetByUser) > 0;
+    return vms::api::RuntimeData::timeFlags(priority)
+        .testFlag(vms::api::TimeFlag::peerTimeSetByUser);
 }
 
 QString QnTimeServerSelectionModel::formattedOffset(qint64 offsetMs)

@@ -743,7 +743,7 @@ void QnClientModule::initLocalInfo(const QnStartupParameters& startupParams)
         ? vms::api::PeerType::desktopClient
         : vms::api::PeerType::videowallClient;
 
-    ec2::ApiRuntimeData runtimeData;
+    nx::vms::api::RuntimeData runtimeData;
     runtimeData.peer.id = commonModule->moduleGUID();
     runtimeData.peer.instanceId = commonModule->runningInstanceGUID();
     runtimeData.peer.peerType = clientPeerType;

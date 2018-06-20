@@ -76,10 +76,10 @@ public:
     virtual void dropConnections() override;
     virtual QVector<QnTransportConnectionInfo> connectionsInfo() const override;
 
-    void sendTransaction(const ec2::QnTransaction<ApiRuntimeData>& tran)
+    void sendTransaction(const ec2::QnTransaction<vms::api::RuntimeData>& tran)
     {
         QnMutexLocker lock(&m_mutex);
-        nx::vms::api::PersistentIdData peerId(tran.peerID, tran.params.peer.persistentId);
+        vms::api::PersistentIdData peerId(tran.peerID, tran.params.peer.persistentId);
         m_lastRuntimeInfo[peerId] = tran.params;
         for (const auto& connection : m_connections)
             sendTransactionImpl(connection, tran, TransportHeader());
@@ -109,8 +109,8 @@ public:
         sendUnicastTransaction(tran, dstPeers);
     }
 
-    bool isSubscribedTo(const nx::vms::api::PersistentIdData& peer) const;
-    qint32 distanceTo(const nx::vms::api::PersistentIdData& peer) const;
+    bool isSubscribedTo(const vms::api::PersistentIdData& peer) const;
+    qint32 distanceTo(const vms::api::PersistentIdData& peer) const;
 
 protected:
     template<class T>
@@ -127,7 +127,7 @@ protected:
         if (transportHeader.via.find(connection->remotePeer().id) != transportHeader.via.end())
             return; //< Already processed by remote peer
 
-        const nx::vms::api::PersistentIdData remotePeer(connection->remotePeer());
+        const vms::api::PersistentIdData remotePeer(connection->remotePeer());
         const auto& descriptor = ec2::getTransactionDescriptorByTransaction(tran);
         auto remoteAccess = descriptor->checkRemotePeerAccessFunc(
             commonModule(), connection.staticCast<Connection>()->userAccessData(), tran.params);
@@ -142,7 +142,7 @@ protected:
         }
 
 
-        const nx::vms::api::PersistentIdData peerId(tran.peerID, tran.persistentInfo.dbID);
+        const vms::api::PersistentIdData peerId(tran.peerID, tran.persistentInfo.dbID);
         const auto context = this->context(connection);
         if (connection->remotePeer().isServer())
         {
@@ -278,18 +278,18 @@ protected:
 		const P2pConnectionPtr& connection,
 		const QByteArray& payload);
 protected:
-	QMap<nx::vms::api::PersistentIdData, P2pConnectionPtr> getCurrentSubscription() const;
+	QMap<vms::api::PersistentIdData, P2pConnectionPtr> getCurrentSubscription() const;
 
 	/**  Local connections are not supposed to be shown in 'aliveMessage' */
-	bool isLocalConnection(const nx::vms::api::PersistentIdData& peer) const;
-    void createOutgoingConnections(const QMap<nx::vms::api::PersistentIdData, P2pConnectionPtr>& currentSubscription);
+	bool isLocalConnection(const vms::api::PersistentIdData& peer) const;
+    void createOutgoingConnections(const QMap<vms::api::PersistentIdData, P2pConnectionPtr>& currentSubscription);
 	bool hasStartingConnections() const;
 	void printPeersMessage();
-	P2pConnectionPtr findConnectionById(const nx::vms::api::PersistentIdData& id) const;
+	P2pConnectionPtr findConnectionById(const vms::api::PersistentIdData& id) const;
 	void emitPeerFoundLostSignals();
 	void connectSignals(const P2pConnectionPtr& connection);
 	void startReading(P2pConnectionPtr connection);
-    void sendRuntimeData(const P2pConnectionPtr& connection, const QList<nx::vms::api::PersistentIdData>& peers);
+    void sendRuntimeData(const P2pConnectionPtr& connection, const QList<vms::api::PersistentIdData>& peers);
 
     template<typename T>
     bool processSpecialTransaction(
@@ -300,7 +300,7 @@ protected:
         if (nx::utils::log::isToBeLogged(nx::utils::log::Level::verbose, this))
             printTran(connection, tran, Connection::Direction::incoming);
 
-        nx::vms::api::PersistentIdData peerId(tran.peerID, tran.persistentInfo.dbID);
+        vms::api::PersistentIdData peerId(tran.peerID, tran.persistentInfo.dbID);
 
         // Process special cases.
         switch (tran.command)
@@ -314,12 +314,12 @@ protected:
     }
 
     void gotTransaction(
-        const QnTransaction<nx::vms::api::UpdateSequenceData> &tran,
+        const QnTransaction<vms::api::UpdateSequenceData> &tran,
         const P2pConnectionPtr& connection,
         const TransportHeader& transportHeader);
 
     void processRuntimeInfo(
-        const QnTransaction<ApiRuntimeData> &tran,
+        const QnTransaction<vms::api::RuntimeData> &tran,
         const P2pConnectionPtr& connection,
         const TransportHeader& transportHeader);
 
@@ -328,7 +328,7 @@ protected:
 private:
 	void sendAlivePeersMessage(const P2pConnectionPtr& connection = P2pConnectionPtr());
 
-    void doSubscribe(const QMap<nx::vms::api::PersistentIdData, P2pConnectionPtr>& currentSubscription);
+    void doSubscribe(const QMap<vms::api::PersistentIdData, P2pConnectionPtr>& currentSubscription);
 
     bool handleResolvePeerNumberRequest(const P2pConnectionPtr& connection, const QByteArray& data);
     bool handleResolvePeerNumberResponse(const P2pConnectionPtr& connection, const QByteArray& data);
@@ -351,14 +351,14 @@ private slots:
     void at_gotMessage(QWeakPointer<ConnectionBase> connection, MessageType messageType, const QByteArray& payload);
     void at_stateChanged(QWeakPointer<ConnectionBase> connection, Connection::State state);
     void at_allDataSent(QWeakPointer<ConnectionBase> connection);
-    void cleanupRuntimeInfo(const nx::vms::api::PersistentIdData& peer);
+    void cleanupRuntimeInfo(const vms::api::PersistentIdData& peer);
 public:
     bool needStartConnection(
-        const nx::vms::api::PersistentIdData& peer,
-        const QMap<nx::vms::api::PersistentIdData, P2pConnectionPtr>& currentSubscription) const;
+        const vms::api::PersistentIdData& peer,
+        const QMap<vms::api::PersistentIdData, P2pConnectionPtr>& currentSubscription) const;
     bool needStartConnection(
         const QnUuid& peerId,
-        const QMap<nx::vms::api::PersistentIdData, P2pConnectionPtr>& currentSubscription) const;
+        const QMap<vms::api::PersistentIdData, P2pConnectionPtr>& currentSubscription) const;
     static ConnectionContext* context(const P2pConnectionPtr& connection);
 
     struct DelayIntervals
@@ -379,11 +379,11 @@ public:
     void setDelayIntervals(const DelayIntervals& intervals);
     DelayIntervals delayIntervals() const;
 
-    QMap<nx::vms::api::PersistentIdData, ApiRuntimeData> runtimeInfo() const;
+    QMap<vms::api::PersistentIdData, vms::api::RuntimeData> runtimeInfo() const;
 
     void updateOfflineDistance(
         const P2pConnectionPtr& connection,
-        const nx::vms::api::PersistentIdData& to,
+        const vms::api::PersistentIdData& to,
         int sequence);
 protected:
 	std::unique_ptr<BidirectionRoutingInfo> m_peers;
@@ -403,7 +403,7 @@ protected:
 	} m_miscData;
     QMap<QnUuid, P2pConnectionPtr> m_connections; //< Actual connection list
 	QElapsedTimer m_lastPeerInfoTimer;
-	QMap<nx::vms::api::PersistentIdData, ApiRuntimeData> m_lastRuntimeInfo;
+	QMap<vms::api::PersistentIdData, vms::api::RuntimeData> m_lastRuntimeInfo;
 private:
 	QMap<QnUuid, P2pConnectionPtr> m_outgoingConnections; //< Temporary list of outgoing connections
 

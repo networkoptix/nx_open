@@ -15,8 +15,7 @@ enum class PeerType
     oldMobileClient = 3,
     mobileClient = 4,
     cloudServer = 5,
-    oldServer = 6, //< 2.6 or below
-    count
+    oldServer = 6 //< 2.6 or below
 };
 QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(PeerType)
 
@@ -33,8 +32,19 @@ Q_DECLARE_FLAGS(TimeFlags, TimeFlag)
 Q_DECLARE_OPERATORS_FOR_FLAGS(TimeFlags)
 QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(TimeFlag)
 
+enum class RuntimeFlag
+{
+    /** Sync transactions with cloud. */
+    masterCloudSync = 0x1
+};
+Q_DECLARE_FLAGS(RuntimeFlags, RuntimeFlag)
+Q_DECLARE_OPERATORS_FOR_FLAGS(RuntimeFlags)
+QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(RuntimeFlag)
+
 } // namespace api
 } // namespace vms
 } // namespace nx
 
 QN_FUSION_DECLARE_FUNCTIONS(nx::vms::api::TimeFlags, (metatype)(lexical)(debug), NX_VMS_API)
+QN_FUSION_DECLARE_FUNCTIONS(nx::vms::api::RuntimeFlag, (metatype)(lexical)(debug), NX_VMS_API)
+QN_FUSION_DECLARE_FUNCTIONS(nx::vms::api::RuntimeFlags, (metatype)(lexical)(debug), NX_VMS_API)

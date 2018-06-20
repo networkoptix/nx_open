@@ -5,8 +5,8 @@
 
 #include "transaction.h"
 #include "nx_ec/ec_api.h"
-#include "nx_ec/data/api_runtime_data.h"
 #include "ubjson_transaction_serializer.h"
+#include <nx/vms/api/data/runtime_data.h>
 #include <nx/vms/api/data/tran_state_data.h>
 #include "api/runtime_info_manager.h"
 #include <common/common_module_aware.h>
@@ -24,12 +24,12 @@ public:
     void clearOldRuntimeData(const nx::vms::api::PersistentIdData& key);
     void clearRuntimeData(const QnUuid& id);
     bool contains(const nx::vms::api::TranState& state) const;
-    bool contains(const QnTransaction<ApiRuntimeData>& tran) const;
+    bool contains(const QnTransaction<nx::vms::api::RuntimeData>& tran) const;
 
-    ErrorCode saveTransaction(const QnTransaction<ApiRuntimeData>& tran);
+    ErrorCode saveTransaction(const QnTransaction<nx::vms::api::RuntimeData>& tran);
     nx::vms::api::TranState getTransactionsState();
     ErrorCode getTransactionsAfter(const nx::vms::api::TranState& state,
-        QList<QnTransaction<ApiRuntimeData>>& result);
+        QList<QnTransaction<nx::vms::api::RuntimeData>>& result);
     void clearRuntimeData();
 
 signals:
@@ -38,7 +38,7 @@ signals:
     * So, old data will be removed soon. If we have 2 different data for same peer and old data has been deleted
     * this signal is emitted
     */
-    void runtimeDataUpdated(const QnTransaction<ApiRuntimeData>& data);
+    void runtimeDataUpdated(const QnTransaction<nx::vms::api::RuntimeData>& data);
 
 private:
     void clearOldRuntimeDataUnsafe(
@@ -49,7 +49,7 @@ private slots:
 
 private:
     nx::vms::api::TranState m_state;
-    QMap<nx::vms::api::PersistentIdData, ApiRuntimeData> m_data;
+    QMap<nx::vms::api::PersistentIdData, nx::vms::api::RuntimeData> m_data;
     mutable QnMutex m_mutex;
 };
 

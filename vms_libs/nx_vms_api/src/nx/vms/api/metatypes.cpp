@@ -22,6 +22,7 @@
 #include "data/peer_alive_data.h"
 #include "data/peer_sync_time_data.h"
 #include "data/reverse_connection_data.h"
+#include "data/runtime_data.h"
 #include "data/system_merge_history_record.h"
 #include "data/tran_state_data.h"
 #include "data/update_data.h"
@@ -90,6 +91,7 @@ void Metatypes::initialize()
     qRegisterMetaType<ResourceParamWithRefData>();
     qRegisterMetaType<ResourceParamWithRefDataList>();
     qRegisterMetaType<ReverseConnectionData>();
+    qRegisterMetaType<RuntimeData>();
     qRegisterMetaType<ServerFootageData>();
     qRegisterMetaType<ServerFootageDataList>();
     qRegisterMetaType<StorageData>();

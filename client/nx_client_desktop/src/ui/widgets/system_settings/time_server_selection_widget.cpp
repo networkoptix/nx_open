@@ -11,8 +11,6 @@
 #include <common/common_module.h>
 #include <translation/datetime_formatter.h>
 
-#include <nx_ec/data/api_runtime_data.h>
-
 #include <ui/delegates/resource_item_delegate.h>
 #include <ui/style/helper.h>
 #include <ui/models/time_server_selection_model.h>
@@ -220,7 +218,7 @@ void QnTimeServerSelectionWidget::applyChanges()
     }
 
     PRINT_DEBUG("forcing selected server to " + m_model->selectedServer().toByteArray());
-    
+
     globalSettings->setPrimaryTimeServer(m_model->selectedServer());
     globalSettings->synchronizeNow();
 }

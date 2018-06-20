@@ -111,7 +111,7 @@ protected:
     {
         auto commonModule = server->moduleInstance()->commonModule();
         auto connection = server->moduleInstance()->ecConnection();
-        ApiRuntimeData runtimeData;
+        nx::vms::api::RuntimeData runtimeData;
         runtimeData.peer.id = commonModule->moduleGUID();
         runtimeData.peer.instanceId = commonModule->runningInstanceGUID();
         runtimeData.peer.persistentId = commonModule->dbId();

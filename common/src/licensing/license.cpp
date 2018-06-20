@@ -18,7 +18,6 @@
 #include <utils/common/app_info.h>
 #include <utils/common/synctime.h>
 
-#include <nx_ec/data/api_runtime_data.h>
 #include <nx_ec/data/api_conversion_functions.h>
 
 #include <nx/utils/uuid.h>

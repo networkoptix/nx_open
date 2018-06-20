@@ -866,7 +866,7 @@ public:
 
     template<class TargetType, class HandlerType>
     int saveRuntimeInfo(
-        const ApiRuntimeData& data,
+        const nx::vms::api::RuntimeData& data,
         TargetType* target,
         HandlerType handler)
     {
@@ -941,7 +941,7 @@ protected:
         impl::SimpleHandlerPtr handler) = 0;
     virtual int saveMiscParam(const ec2::ApiMiscData& param, impl::SimpleHandlerPtr handler) = 0;
     virtual int saveRuntimeInfo(
-        const ec2::ApiRuntimeData& data,
+        const nx::vms::api::RuntimeData& data,
         impl::SimpleHandlerPtr handler) = 0;
     virtual int getMiscParam(
         const QByteArray& paramName,
@@ -1121,7 +1121,7 @@ signals :
         \param cameraHistoryItems
     */
     void initNotification(const ec2::ApiFullInfoData& fullData);
-    void runtimeInfoChanged(const ec2::ApiRuntimeData& runtimeInfo);
+    void runtimeInfoChanged(const nx::vms::api::RuntimeData& runtimeInfo);
 
     void reverseConnectionRequested(const nx::vms::api::ReverseConnectionData& reverseConnetionData);
 

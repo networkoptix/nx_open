@@ -9,7 +9,6 @@
 #include <nx/vms/event/event_fwd.h>
 
 #include "nx_ec/ec_api.h"
-#include "nx_ec/data/api_runtime_data.h"
 
 #include <nx/utils/singleton.h>
 #include <utils/common/connective.h>
@@ -82,7 +81,7 @@ signals:
 
     void videowallControlMessageReceived(const nx::vms::api::VideowallControlMessageData& message);
 
-    void runtimeInfoChanged(const ec2::ApiRuntimeData &runtimeInfo);
+    void runtimeInfoChanged(const nx::vms::api::RuntimeData& runtimeInfo);
     void remotePeerFound(QnUuid data, nx::vms::api::PeerType peerType);
     void remotePeerLost(QnUuid data, nx::vms::api::PeerType peerType);
 

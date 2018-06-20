@@ -6,7 +6,6 @@
 #include "activate_license_rest_handler.h"
 #include <network/tcp_connection_priv.h>
 #include <utils/common/util.h>
-#include "nx_ec/data/api_runtime_data.h"
 #include <nx/network/deprecated/simple_http_client.h>
 #include "common/common_module.h"
 #include "licensing/license.h"
@@ -103,7 +102,9 @@ CLHttpStatus QnActivateLicenseRestHandler::makeRequest(
     QUrl url(QN_LICENSE_URL);
     CLSimpleHTTPClient client(url.host(), url.port(80), TCP_TIMEOUT, QAuthenticator());
 
-    ec2::ApiRuntimeData runtimeData = commonModule->runtimeInfoManager()->items()->getItem(commonModule->moduleGUID()).data;
+    const auto runtimeData = commonModule->runtimeInfoManager()->items()
+        ->getItem(commonModule->moduleGUID()).data;
+
     QUrlQuery params;
     params.addQueryItem(kLicenseKey, licenseKey);
     params.addQueryItem(kBox, runtimeData.box);

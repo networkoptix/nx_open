@@ -73,7 +73,7 @@ void QnRuntimeTransactionLog::clearOldRuntimeDataUnsafe(
     }
     if (newPeerFound && oldPeerFound)
     {
-        QnTransaction<ApiRuntimeData> tran(
+        QnTransaction<api::RuntimeData> tran(
             ApiCommand::runtimeInfoChanged,
             commonModule()->moduleGUID());
         tran.params = m_data[key];
@@ -123,14 +123,14 @@ bool QnRuntimeTransactionLog::contains(const api::TranState& state) const
     return true;
 }
 
-bool QnRuntimeTransactionLog::contains(const QnTransaction<ApiRuntimeData>& tran) const
+bool QnRuntimeTransactionLog::contains(const QnTransaction<api::RuntimeData>& tran) const
 {
     QnMutexLocker lock(&m_mutex);
     api::PersistentIdData key(tran.params.peer.id, tran.params.peer.instanceId);
     return m_state.values.value(key) >= tran.params.version;
 }
 
-ErrorCode QnRuntimeTransactionLog::saveTransaction(const QnTransaction<ApiRuntimeData>& tran)
+ErrorCode QnRuntimeTransactionLog::saveTransaction(const QnTransaction<api::RuntimeData>& tran)
 {
     QnMutexLocker lock(&m_mutex);
     api::PersistentIdData key(tran.params.peer.id, tran.params.peer.instanceId);
@@ -145,15 +145,15 @@ api::TranState QnRuntimeTransactionLog::getTransactionsState()
     return m_state;
 }
 
-ErrorCode QnRuntimeTransactionLog::getTransactionsAfter(const api::TranState& state, 
-    QList<QnTransaction<ApiRuntimeData>>& result)
+ErrorCode QnRuntimeTransactionLog::getTransactionsAfter(const api::TranState& state,
+    QList<QnTransaction<api::RuntimeData>>& result)
 {
     QnMutexLocker lock(&m_mutex);
-    for (const ApiRuntimeData &data: m_data)
+    for (const auto& data: m_data)
     {
         api::PersistentIdData key(data.peer.id, data.peer.instanceId);
         if (data.version > state.values.value(key)) {
-            QnTransaction<ApiRuntimeData> tran(
+            QnTransaction<api::RuntimeData> tran(
                 ApiCommand::runtimeInfoChanged,
                 commonModule()->moduleGUID());
             tran.params = data;

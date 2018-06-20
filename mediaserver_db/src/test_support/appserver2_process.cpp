@@ -254,7 +254,7 @@ nx::network::SocketAddress Appserver2Process::endpoint() const
 
 void Appserver2Process::updateRuntimeData()
 {
-    ec2::ApiRuntimeData runtimeData;
+    nx::vms::api::RuntimeData runtimeData;
     runtimeData.peer.id = m_commonModule->moduleGUID();
     runtimeData.peer.instanceId = m_commonModule->runningInstanceGUID();
     runtimeData.peer.peerType = api::PeerType::server;

@@ -44,7 +44,7 @@ protected:
         impl::GetMiscParamHandlerPtr handler) override;
 
     virtual int saveRuntimeInfo(
-        const ec2::ApiRuntimeData& data,
+        const nx::vms::api::RuntimeData& data,
         impl::SimpleHandlerPtr handler) override;
 
     virtual int saveSystemMergeHistoryRecord(

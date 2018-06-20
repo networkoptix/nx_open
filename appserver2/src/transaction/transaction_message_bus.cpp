@@ -80,7 +80,7 @@ QnTransactionMessageBus::QnTransactionMessageBus(
     m_thread->setObjectName("QnTransactionMessageBusThread");
     qRegisterMetaType<QnTransactionTransport::State>(); // TODO: #Elric #EC2 registration
     qRegisterMetaType<QnAbstractTransaction>("QnAbstractTransaction");
-    qRegisterMetaType<QnTransaction<ApiRuntimeData> >("QnTransaction<ApiRuntimeData>");
+    qRegisterMetaType<QnTransaction<api::RuntimeData>>("QnTransaction<nx::vms::api::RuntimeData>");
 
     connect(m_thread, &QThread::started,
         [this]()
@@ -166,7 +166,7 @@ void QnTransactionMessageBus::removeAlivePeer(const QnUuid& id, bool sendTran, b
     if (m_alivePeers.isEmpty())
     {
         QnTranState runtimeState;
-        QList<QnTransaction<ApiRuntimeData>> result;
+        QList<QnTransaction<api::RuntimeData>> result;
         m_runtimeTransactionLog->getTransactionsAfter(runtimeState, result);
         const bool validPeerId = result.size() == 1 && result[0].peerID == commonModule()->moduleGUID();
         if (!validPeerId)
@@ -347,7 +347,8 @@ void QnTransactionMessageBus::onGotServerAliveInfo(const QnTransaction<api::Peer
     proxyTransaction(modifiedTran, ttHeader);
 }
 
-bool QnTransactionMessageBus::onGotServerRuntimeInfo(const QnTransaction<ApiRuntimeData> &tran, QnTransactionTransport* transport, const QnTransactionTransportHeader& ttHeader)
+bool QnTransactionMessageBus::onGotServerRuntimeInfo(const QnTransaction<api::RuntimeData> &tran,
+    QnTransactionTransport* transport, const QnTransactionTransportHeader& ttHeader)
 {
     if (tran.params.peer.id == commonModule()->moduleGUID())
         return false; // ignore himself
@@ -417,7 +418,8 @@ void QnTransactionMessageBus::handleIncomingTransaction(
 
 // ------------------ QnTransactionMessageBus::CustomHandler -------------------
 
-void QnTransactionMessageBus::onGotDistributedMutexTransaction(const QnTransaction<nx::vms::api::LockData>& tran)
+void QnTransactionMessageBus::onGotDistributedMutexTransaction(
+    const QnTransaction<api::LockData>& tran)
 {
     if (tran.command == ApiCommand::lockRequest)
         emit gotLockRequest(tran.params);
@@ -474,7 +476,7 @@ void QnTransactionMessageBus::updateLastActivity(QnTransactionTransport* sender,
 }
 
 ErrorCode QnTransactionMessageBus::updatePersistentMarker(
-    const QnTransaction<nx::vms::api::UpdateSequenceData>& tran)
+    const QnTransaction<api::UpdateSequenceData>& tran)
 {
     return ErrorCode::notImplemented;
 }
@@ -865,9 +867,9 @@ void QnTransactionMessageBus::removePeersWithTimeout(const QSet<QnUuid>& lostPee
 void QnTransactionMessageBus::sendRuntimeInfo(QnTransactionTransport* transport,
     const QnTransactionTransportHeader& transportHeader, const api::TranState& runtimeState)
 {
-    QList<QnTransaction<ApiRuntimeData>> result;
+    QList<QnTransaction<api::RuntimeData>> result;
     m_runtimeTransactionLog->getTransactionsAfter(runtimeState, result);
-    for (const QnTransaction<ApiRuntimeData> &tran : result)
+    for (const QnTransaction<api::RuntimeData> &tran : result)
     {
         QnTransactionTransportHeader ttHeader = transportHeader;
         ttHeader.distance = distanceToPeer(tran.params.peer.id);
@@ -1111,7 +1113,7 @@ api::PeerData QnTransactionMessageBus::localPeer() const
     return api::PeerData(commonModule()->moduleGUID(), commonModule()->runningInstanceGUID(), m_localPeerType);
 }
 
-void QnTransactionMessageBus::at_runtimeDataUpdated(const QnTransaction<ApiRuntimeData>& tran)
+void QnTransactionMessageBus::at_runtimeDataUpdated(const QnTransaction<api::RuntimeData>& tran)
 {
     // data was changed by local transaction log (old data instance for same peer was removed), emit notification to apply new data version outside
     if (m_handler)

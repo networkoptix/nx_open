@@ -5,24 +5,22 @@
 #include <QtSql/QSqlError>
 
 #include <common/common_module_aware.h>
-
+#include <core/resource_access/user_access_data.h>
+#include <core/resource_access/resource_access_manager.h>
+#include <core/resource/user_resource.h>
+#include <database/api/db_resource_api.h>
 #include <nx_ec/ec_api.h>
-#include <nx/vms/api/data/lock_data.h>
-#include "nx_ec/data/api_fwd.h"
-#include "nx_ec/data/api_misc_data.h"
+#include <nx_ec/data/api_fwd.h>
+#include <nx_ec/data/api_misc_data.h>
+#include <transaction/transaction.h>
+#include <transaction/transaction_log.h>
 #include <utils/db/db_helper.h>
-#include "nx_ec/data/api_runtime_data.h"
+
+#include <nx/fusion/serialization/sql.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/singleton.h>
-#include "core/resource_access/user_access_data.h"
-#include "core/resource_access/resource_access_manager.h"
-#include "core/resource/user_resource.h"
-#include <nx/fusion/serialization/sql.h>
-
-#include <database/api/db_resource_api.h>
-
-#include "transaction/transaction.h"
-#include "transaction/transaction_log.h"
+#include <nx/vms/api/data/runtime_data.h>
+#include <nx/vms/api/data/lock_data.h>
 #include <nx/vms/event/event_fwd.h>
 
 struct BeforeRestoreDbData;
@@ -520,7 +518,7 @@ namespace detail
             return ErrorCode::notImplemented;
         }
 
-        ErrorCode executeTransactionInternal(const QnTransaction<ApiRuntimeData>&)
+        ErrorCode executeTransactionInternal(const QnTransaction<nx::vms::api::RuntimeData>&)
         {
             NX_ASSERT(false, Q_FUNC_INFO, "This is a non persistent transaction!");
             return ErrorCode::notImplemented;

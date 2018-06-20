@@ -196,7 +196,7 @@ void LicenseWatcher::stopHttpClient()
 
 ServerLicenseInfo LicenseWatcher::licenseData() const
 {
-    ec2::ApiRuntimeData runtimeData = runtimeInfoManager()->items()
+    const auto runtimeData = runtimeInfoManager()->items()
         ->getItem(commonModule()->moduleGUID()).data;
 
     ServerLicenseInfo result;

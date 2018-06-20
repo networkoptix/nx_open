@@ -24,7 +24,8 @@ public:
     virtual int saveSystemMergeHistoryRecord(const nx::vms::api::SystemMergeHistoryRecord& param, impl::SimpleHandlerPtr handler) override;
     virtual int getSystemMergeHistory(impl::GetSystemMergeHistoryHandlerPtr handler) override;
 
-    virtual int saveRuntimeInfo(const ec2::ApiRuntimeData& data, impl::SimpleHandlerPtr handler) override;
+    virtual int saveRuntimeInfo(const nx::vms::api::RuntimeData& data,
+        impl::SimpleHandlerPtr handler) override;
 
 protected:
     virtual int changeSystemId(const QnUuid& systemId, qint64 sysIdTime, Timestamp tranLogTime, impl::SimpleHandlerPtr handler) override;
@@ -132,7 +133,8 @@ int QnMiscManager<T>::saveMiscParam(const ec2::ApiMiscData& param, impl::SimpleH
 }
 
 template<class T>
-int QnMiscManager<T>::saveRuntimeInfo(const ec2::ApiRuntimeData& data, impl::SimpleHandlerPtr handler)
+int QnMiscManager<T>::saveRuntimeInfo(const nx::vms::api::RuntimeData& data,
+    impl::SimpleHandlerPtr handler)
 {
     const int reqID = generateRequestID();
     m_queryProcessor->getAccess(m_userAccessData).processUpdateAsync(

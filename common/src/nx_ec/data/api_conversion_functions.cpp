@@ -25,7 +25,6 @@
 
 #include <nx/vms/api/data/resource_type_data.h>
 #include "api_user_data.h"
-#include "api_runtime_data.h"
 
 #include <utils/email/email.h>
 #include <utils/common/ldap.h>

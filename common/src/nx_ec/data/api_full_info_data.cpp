@@ -6,7 +6,6 @@
 #include <nx/vms/api/data/webpage_data.h>
 #include <nx_ec/data/api_discovery_data.h>
 #include <nx_ec/data/api_system_name_data.h>
-#include <nx_ec/data/api_runtime_data.h>
 #include <nx/vms/api/data/resource_type_data.h>
 #include <nx/vms/api/data/license_data.h>
 #include <nx/vms/api/data/event_rule_data.h>

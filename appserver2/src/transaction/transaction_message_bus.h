@@ -192,7 +192,7 @@ private:
     void onGotServerAliveInfo(const QnTransaction<nx::vms::api::PeerAliveData>& tran,
         QnTransactionTransport* transport, const QnTransactionTransportHeader& ttHeader);
 
-    bool onGotServerRuntimeInfo(const QnTransaction<ApiRuntimeData>& tran,
+    bool onGotServerRuntimeInfo(const QnTransaction<nx::vms::api::RuntimeData>& tran,
         QnTransactionTransport* transport, const QnTransactionTransportHeader& ttHeader);
 
 protected:
@@ -276,7 +276,7 @@ protected slots:
 
     void doPeriodicTasks();
     void at_peerIdDiscovered(const nx::utils::Url &url, const QnUuid& id);
-    void at_runtimeDataUpdated(const QnTransaction<ApiRuntimeData>& data);
+    void at_runtimeDataUpdated(const QnTransaction<nx::vms::api::RuntimeData>& data);
     void emitRemotePeerUnauthorized(const QnUuid& id);
     void onEc2ConnectionSettingsChanged(const QString& key);
 

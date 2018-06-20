@@ -24,8 +24,6 @@ struct ApiDiscoveredServerData;
 struct ApiMiscData;
 typedef std::vector<ApiMiscData> ApiMiscDataList;
 
-struct ApiRuntimeData;
-
 typedef std::vector<ApiTransactionData> ApiTransactionDataList;
 
 typedef std::vector<ApiUserData> ApiUserDataList;
@@ -54,7 +52,6 @@ struct ParentId
     (ApiConnectionData)\
     (ApiSystemIdData)\
     (ApiMiscData)\
-    (ApiRuntimeData)\
     (ApiDiscoveredServerData)\
 
 QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
