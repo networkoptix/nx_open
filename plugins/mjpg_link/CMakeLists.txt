@@ -1,5 +1,6 @@
-nx_add_server_plugin(mjpg_link
-    NO_MOC PUBLIC_LIBS
+nx_add_server_plugin(mjpg_link NO_MOC
+    PRIVATE_LIBS
         common
-        #nx_plugin_utils
+        nx_network
+        nx_utils
 )
