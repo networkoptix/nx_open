@@ -1,8 +1,7 @@
 import { Component, Inject, OnInit, Input, ViewEncapsulation } from '@angular/core';
-import { NgbModal, NgbActiveModal, NgbModalRef }                                                 from '@ng-bootstrap/ng-bootstrap';
-import { EmailValidator }                                                                        from '@angular/forms';
-import { NxModalGenericComponent }                                                               from "../generic/generic.component";
-// import { NxPermissionsDropdown }                                                     from "../../dropdowns/permissions/permissions.component";
+import { NgbModal, NgbActiveModal, NgbModalRef }               from '@ng-bootstrap/ng-bootstrap';
+import { EmailValidator }                                      from '@angular/forms';
+import { NxModalGenericComponent }                             from '../generic/generic.component';
 
 @Component({
     selector: 'nx-modal-share-content',
@@ -75,7 +74,7 @@ export class ShareModalContent {
             this.user.role = this.system.findAccessRole(this.user);
         }
 
-        this.options = this.accessRoles
+        this.options = this.accessRoles;
     }
 
     formatUserName() {
@@ -96,7 +95,7 @@ export class ShareModalContent {
         this.buttonText = this.language.sharing.shareConfirmButton;
         this.isNewShare = !this.user;
 
-        this.user = (this.user) ? {...this.user} : {email: '', isEnabled: true, role: {}};
+        this.user = (this.user) ? {...this.user} : {email: '', isEnabled: true, role: {name: 'Live Viewer'}};
 
         if (!this.isNewShare) {
             this.account
