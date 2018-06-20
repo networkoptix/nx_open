@@ -24,9 +24,14 @@ html {
 }
 
 body {
-  /* Margin bottom by footer height */
-  margin-bottom: 80px;
-  min-width: 360px;
+    /* Margin bottom by footer height */
+    margin-bottom : 200px;
+
+    @include media-breakpoint-up(lg) {
+        margin-bottom : 80px;
+    }
+
+    min-width     : 360px;
 }
 
 html.webclient-page{
@@ -49,54 +54,53 @@ nx-app {
 }
 
 footer {
-  position: absolute;
-  bottom: 0;
-  width: 100%;
-  /* Set the fixed height of the footer here */
-  height: 48px;
-  border-top: 1px solid $common-border-color;
-  padding-bottom: 2px;
+    position         : absolute;
+    bottom           : 0;
+    width            : 100%;
+    border-top       : 1px solid $common-border-color;
+    padding-bottom   : 2px;
+    background-color : $body-bg;
 
     .row {
-        margin-left: 0;
+        margin-left : 0;
     }
 
-  .nav > li {
-    position: relative;
-    display: block;
+    .nav > li {
+        position : relative;
+        display  : block;
 
-    & > span {
-      line-height: 24px;
-      display: block;
+        & > span {
+            line-height : 24px;
+            display     : block;
+        }
+
+        nx-language-select {
+            padding : 7px 5px;
+            display : block;
+        }
     }
 
-    nx-language-select {
-      padding: 7px 5px;
-      display: block;
-    }
-  }
+    .nav > li > a,
+    .nav > li > span {
+        position  : relative;
+        display   : block;
+        font-size : $font-size-sm;
+        padding   : 15px 10px;
+        color     : $light12;
 
-  .nav > li > a,
-  .nav > li > span{
-    position: relative;
-    display: block;
-    font-size: $font-size-sm;
-    padding: 15px 10px;
-    color:  $light12;
-
-    &:hover, &:focus {
-      outline: none !important;
-      outline: 0 !important;
-      box-shadow: none;
-      text-decoration: none !important;
-      background-color: transparentize($light5, 0.75);
-      color:$light16;
+        &:hover, &:focus {
+            outline          : none !important;
+            outline          : 0 !important;
+            box-shadow       : none;
+            text-decoration  : none !important;
+            background-color : transparentize($light5, 0.75);
+            color            : $light16;
+        }
     }
-  }
 
     @include media-breakpoint-down(md) {
         .nav > li > a:not(.company) {
-            padding: 5px;
+            padding : 5px;
         }
     }
 
@@ -109,12 +113,12 @@ footer {
         float : right;
     }
 
-    .navbar-right > li > a, .navbar-right > li > span > a{
-    color:$light8;
-    &:hover{
-      color:$light12;
+    .navbar-right > li > a, .navbar-right > li > span > a {
+        color : $light8;
+        &:hover {
+            color : $light12;
+        }
     }
-  }
 }
 
 
