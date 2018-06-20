@@ -137,7 +137,7 @@ class _UpdatesData(object):
     def add_customization(self, customization):
         self.root[customization.customization_name] = {
             'releases': {},
-            'updates_prefix': self._base_url + '/' + customization.customization_name,
+            'updates_prefix': self._base_url.rstrip('/') + '/' + customization.customization_name,
             }
 
     def add_release(self, customization, version, cloud_host='cloud-test.hdw.mx'):
