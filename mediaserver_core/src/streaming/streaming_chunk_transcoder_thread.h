@@ -1,9 +1,4 @@
-////////////////////////////////////////////////////////////
-// 14 jan 2012    Andrey Kolesnikov
-////////////////////////////////////////////////////////////
-
-#ifndef STREAMING_CHUNK_TRANSCODER_THREAD_H
-#define STREAMING_CHUNK_TRANSCODER_THREAD_H
+#pragma once
 
 #include <memory>
 
@@ -98,5 +93,3 @@ private:
         const std::map<int, std::unique_ptr<TranscodeContext>>::iterator& transcodingIter,
         bool transcodingFinishedSuccessfully);
 };
-
-#endif  //STREAMING_CHUNK_TRANSCODER_THREAD_H

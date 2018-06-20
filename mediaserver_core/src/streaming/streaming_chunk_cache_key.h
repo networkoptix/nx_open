@@ -1,9 +1,4 @@
-////////////////////////////////////////////////////////////
-// 14 dec 2012    Andrey Kolesnikov
-////////////////////////////////////////////////////////////
-
-#ifndef STREAMING_CHUNK_CACHE_KEY_H
-#define STREAMING_CHUNK_CACHE_KEY_H
+#pragma once
 
 #include <chrono>
 #include <map>
@@ -99,5 +94,3 @@ private:
 };
 
 uint qHash( const StreamingChunkCacheKey& key );
-
-#endif  //STREAMING_CHUNK_CACHE_KEY_H

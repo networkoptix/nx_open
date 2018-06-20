@@ -72,7 +72,6 @@ private:
 
 //!Using std::shared_ptr for \a std::shared_ptr::unique()
 typedef std::shared_ptr<ArchivePlaylistManager> ArchivePlaylistManagerPtr;
-
 } // namespace hls
 } // namespace mediaserver
 } // namespace nx
