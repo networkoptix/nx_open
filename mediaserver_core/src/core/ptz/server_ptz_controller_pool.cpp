@@ -1,5 +1,7 @@
 #include "server_ptz_controller_pool.h"
 
+#include <nx/utils/std/optional.h>
+
 #include <api/app_server_connection.h>
 #include <common/common_module.h>
 #include <common/static_common_module.h>
@@ -12,6 +14,8 @@
 #include <core/ptz/tour_ptz_controller.h>
 #include <core/ptz/viewport_ptz_controller.h>
 #include <core/ptz/workaround_ptz_controller.h>
+#include <nx/core/ptz/realtive/relative_move_workaround_controller.h>
+#include <nx/core/ptz/realtive/relative_continuous_move_mapping.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource_management/resource_data_pool.h>
 #include <core/resource/param.h>
@@ -19,6 +23,23 @@
 #include <nx/mediaserver/resource/camera.h>
 
 using namespace nx::core;
+
+namespace {
+
+static const QString kRelativeMoveMapping("relativeMoveMapping");
+
+ptz::RelativeContinuousMoveMapping relativeMoveMapping(const QnResourcePtr& resource)
+{
+    const auto camera = resource.dynamicCast<QnSecurityCamResource>();
+    if (!camera)
+        return ptz::RelativeContinuousMoveMapping();
+
+    const auto resourceData = qnStaticCommon->dataPool()->data(camera);
+    return resourceData.value<ptz::RelativeContinuousMoveMapping>(
+        kRelativeMoveMapping, ptz::RelativeContinuousMoveMapping());
+}
+
+} // namespace
 
 QnServerPtzControllerPool::QnServerPtzControllerPool(QObject *parent):
     base_type(parent)
@@ -119,6 +140,15 @@ QnPtzControllerPtr QnServerPtzControllerPool::createController(const QnResourceP
         if (QnWorkaroundPtzController::extends(controller->getCapabilities(ptz::Options())))
         {
             controller.reset(new QnWorkaroundPtzController(controller));
+        }
+
+        if (ptz::RelativeMoveWorkaroundController::extends(
+                controller->getCapabilities(ptz::Options())))
+        {
+            controller.reset(new ptz::RelativeMoveWorkaroundController(
+                controller,
+                relativeMoveMapping(controller->resource()),
+                qnPtzPool->commandThreadPool()));
         }
     }
 
