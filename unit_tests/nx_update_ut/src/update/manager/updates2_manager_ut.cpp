@@ -525,6 +525,7 @@ protected:
     virtual void TearDown() override
     {
         m_updatesManager->stopAsyncTasks();
+        info::UpdateRegistryFactory::setEmptyFactoryFunction(nullptr);
     }
 
     virtual update::info::AbstractUpdateRegistryPtr getGlobalRegistry() override
