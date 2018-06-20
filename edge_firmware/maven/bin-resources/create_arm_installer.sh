@@ -659,7 +659,7 @@ main()
     local -r WORK_DIR="$BUILD_DIR/create_arm_installer_tmp"
     rm -rf "$WORK_DIR"
 
-    if [ KEEP_WORK_DIR = 1 ]; then
+    if [ $KEEP_WORK_DIR = 1 ]; then
         local -r WORK_DIR_NOTE="(ATTENTION: will NOT be deleted)"
     else
         local -r WORK_DIR_NOTE="(will be deleted on success)"
@@ -672,7 +672,7 @@ main()
 
     buildDistribution
 
-    if [ KEEP_WORK_DIR = 0 ]; then
+    if [ $KEEP_WORK_DIR = 0 ]; then
         rm -rf "$WORK_DIR"
     fi
 }
