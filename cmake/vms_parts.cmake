@@ -65,7 +65,6 @@ option(withMobileClient "Enable mobile client" ${_withMobileClient})
 option(withClouds "Enable cloud components" ${_withClouds})
 option(withTestCamera "Enable test camera" ${_withTestCamera})
 option(withTests "Enable unit tests" ${_withTests})
-option(withPluginStubs "Enable plugin stubs" OFF)
 option(withMiniLauncher "Enable minilauncher" ${_withMiniLauncher})
 option(withScreenChecker "Enable screen checker" OFF)
 

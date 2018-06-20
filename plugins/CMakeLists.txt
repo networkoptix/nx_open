@@ -4,7 +4,13 @@ set_output_directories(RUNTIME "bin/plugins" LIBRARY "bin/plugins")
 add_custom_target(server_plugins)
 
 function(nx_add_server_plugin target)
-    nx_add_target(${target} LIBRARY ${ARGN})
+    cmake_parse_arguments(PLUGIN "OPTIONAL" "" "" ${ARGN})
+
+    if(PLUGIN_OPTIONAL)
+        set_output_directories(RUNTIME "bin/plugins_optional" LIBRARY "bin/plugins_optional")
+    endif()
+
+    nx_add_target(${target} LIBRARY ${PLUGIN_UNPARSED_ARGUMENTS})
     add_dependencies(server_plugins ${target})
 endfunction()
 
