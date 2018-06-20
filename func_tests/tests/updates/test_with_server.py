@@ -1,5 +1,3 @@
-import errno
-import socket
 import wsgiref.simple_server
 from threading import Thread
 
@@ -7,6 +5,7 @@ import pytest
 
 from framework.api_shortcuts import get_updates_state
 from framework.installation.mediaserver import Mediaserver
+from framework.port_reservation import reserve_port
 from framework.waiting import wait_for_true
 from updates_server.server import UpdatesServer, make_base_url_for_remote_machine
 
@@ -19,16 +18,11 @@ def updates_server(work_dir, one_mediaserver, cloud_group):
     data_dir = work_dir / 'updates'
     server = UpdatesServer(data_dir)
     app = server.make_app(True, 'support')
-    for port in range(8081, 8100):
-        try:
-            wsgi_server = wsgiref.simple_server.make_server('localhost', port, app.wsgi_app)
-        except socket.error as e:
-            if e.errno == errno.EADDRINUSE:
-                continue
-            raise
-        break
-    else:
-        raise RuntimeError("Cannot find available port.")
+
+    def make_server(port):
+        return wsgiref.simple_server.make_server('localhost', port, app.wsgi_app)
+
+    port, wsgi_server = reserve_port(range(8081, 8100), make_server)
     base_url = make_base_url_for_remote_machine(one_mediaserver.os_access, port)
     # When port is bound and it's known how to access server's address and port, generate.
     server.generate_data(base_url, cloud_group)
