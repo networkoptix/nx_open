@@ -102,7 +102,7 @@ int DiscoveryManager::findCameras2(nxcip::CameraInfo2* /*cameras*/, const char* 
 static const QString HTTP_PROTO_NAME( QString::fromLatin1("http") );
 static const QString HTTPS_PROTO_NAME( QString::fromLatin1("https") );
 
-bool DiscoveryManager::validateUrl(const QUrl& url)
+bool DiscoveryManager::validateUrl(const nx::utils::Url& url)
 {
     nx::network::http::HttpClient httpClient;
     if (!httpClient.doGet(url))
@@ -119,15 +119,15 @@ bool DiscoveryManager::validateUrl(const QUrl& url)
     return true;
 }
 
-QList<QUrl> DiscoveryManager::translateUrlHook(const QUrl& url) const
+QList<nx::utils::Url> DiscoveryManager::translateUrlHook(const nx::utils::Url& url) const
 {
-    QList<QUrl> result;
+    QList<nx::utils::Url> result;
     const QString path(url.path());
     for (const auto& value: m_replaceData)
     {
         if (path == value.fromPath)
         {
-            QUrl urlToCheck(url);
+            nx::utils::Url urlToCheck(url);
             urlToCheck.setPath(value.toPath);
             if (validateUrl(urlToCheck))
                 result << urlToCheck;
@@ -141,7 +141,7 @@ QList<QUrl> DiscoveryManager::translateUrlHook(const QUrl& url) const
     return result;
 }
 
-QString DiscoveryManager::getGroupName(const QUrl& url) const
+QString DiscoveryManager::getGroupName(const nx::utils::Url& url) const
 {
     const QString path(url.path());
     for (const auto& value : m_replaceData)
@@ -156,7 +156,7 @@ QString DiscoveryManager::getGroupName(const QUrl& url) const
             }
             if (counter > 2)
             {
-                QUrl u(url);
+                nx::utils::Url u(url);
                 u.setPath(value.fromPath);
                 return u.toString(QUrl::RemoveUserInfo);
             }
@@ -173,7 +173,7 @@ int DiscoveryManager::checkHostAddress(nxcip::CameraInfo* cameras, const char* a
 int DiscoveryManager::checkHostAddress2(
     nxcip::CameraInfo2* cameras, const char* address, const char* login, const char* password)
 {
-    QUrl url( QString::fromUtf8(address) );
+    nx::utils::Url url( QString::fromUtf8(address) );
     if (url.scheme() != HTTP_PROTO_NAME && url.scheme() != HTTPS_PROTO_NAME)
         return 0;
 
@@ -186,7 +186,7 @@ int DiscoveryManager::checkHostAddress2(
     int cameraCount = 0;
     for (int i = 0; i < urlList.size(); ++i)
     {
-        QUrl url(urlList[i]);
+        nx::utils::Url url(urlList[i]);
         url.setUserName(QString());
         url.setPassword(QString());
         QByteArray urlStr = url.toString().toUtf8();

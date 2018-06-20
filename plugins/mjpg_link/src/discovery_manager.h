@@ -8,13 +8,13 @@
 
 #include <vector>
 
+#include <QtCore/QString>
+
+#include <nx/utils/url.h>
+
 #include <camera/camera_plugin.h>
 #include <plugins/plugin_tools.h>
 #include <plugins/plugin_container_api.h>
-
-#include <QtCore/QString>
-#include <QtCore/QUrl>
-
 
 struct UrlPathReplaceRecord
 {
@@ -65,9 +65,9 @@ public:
     */
     virtual int getReservedModelList( char** modelList, int* count ) override;
 private:
-    QList<QUrl> translateUrlHook(const QUrl& url) const;
-    QString getGroupName(const QUrl& url) const;
-    static bool validateUrl(const QUrl& url);
+    QList<nx::utils::Url> translateUrlHook(const nx::utils::Url& url) const;
+    QString getGroupName(const nx::utils::Url& url) const;
+    static bool validateUrl(const nx::utils::Url& url);
 private:
     nxpt::CommonRefManager m_refManager;
     nxpl::TimeProvider *const m_timeProvider;
