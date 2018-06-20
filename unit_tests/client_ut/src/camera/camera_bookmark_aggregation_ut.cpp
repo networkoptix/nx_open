@@ -4,11 +4,15 @@
 
 #include <nx/utils/log/log.h>
 
+using std::chrono::milliseconds;
+using namespace std::literals::chrono_literals;
+
 namespace
 {
-    const qint64 kDefaultBookmarkDurationMs = 60 * 1000;
+    const milliseconds kDefaultBookmarkDurationMs = 60s;
 
-    QnCameraBookmark createValidBookmark(qint64 startTimeMs = 0) {
+    QnCameraBookmark createValidBookmark(milliseconds startTimeMs = 0ms)
+    {
         QnCameraBookmark result;
         result.guid = QnUuid::createUuid();
         result.name = lit("Bookmark");
