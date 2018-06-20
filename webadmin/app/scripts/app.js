@@ -11,8 +11,8 @@ angular.module('webadminApp', [
     'ngStorage',
     'angular-clipboard'
 ]).config(['$httpProvider', function ($httpProvider) {
-    $httpProvider.defaults.xsrfCookieName = 'nx-vms-csrf-token';
-    $httpProvider.defaults.xsrfHeaderName = 'Nx-Vms-Csrf-Token';
+    $httpProvider.defaults.xsrfCookieName = 'x-runtime-guld';
+    $httpProvider.defaults.xsrfHeaderName = 'X-Runtime-Guid';
 }]).config(['$routeProvider', function ($routeProvider) {
 
     var universalResolves = {

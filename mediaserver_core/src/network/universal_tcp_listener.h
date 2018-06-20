@@ -38,7 +38,7 @@ public:
     nx::network::http::HttpModManager* httpModManager() const;
     virtual void applyModToRequest(nx::network::http::Request* request) override;
 
-    nx::mediaserver::Authenticator* authorizer() const;
+    nx::mediaserver::Authenticator* authenticator() const;
     static nx::mediaserver::Authenticator* authorizer(const QnTcpListener* listener);
 
     bool isAuthentificationRequired(nx::network::http::Request& request);

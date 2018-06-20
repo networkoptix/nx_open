@@ -107,7 +107,7 @@ public:
     }
 
     MSSettings* serverSettings() const { return m_settings.get(); }
-    nx::mediaserver::Authenticator* authorizer() const { return m_universalTcpListener->authorizer(); }
+    nx::mediaserver::Authenticator* authenticator() const { return m_universalTcpListener->authenticator(); }
 
     static void configureApiRestrictions(nx::network::http::AuthMethodRestrictionList* restrictions);
 

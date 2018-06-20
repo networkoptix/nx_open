@@ -21,13 +21,10 @@ int QnCurrentUserRestHandler::executeGet(
     const auto authorizer = QnUniversalTcpListener::authorizer(owner->owner());
     const auto clientIp = owner->socket()->getForeignAddress().address;
     auto accessRights = owner->accessRights();
+
     if (accessRights.isNull())
-    {
-        authorizer->doCookieAuthorization(
-            clientIp, "GET", nx::network::http::getHeaderValue(owner->request().headers, "Cookie"),
-            nx::network::http::getHeaderValue(owner->request().headers, Qn::CSRF_TOKEN_HEADER_NAME),
-            *owner->response(), &accessRights);
-    }
+        accessRights = authorizer->tryCookie(owner->request()).access;
+
     if (accessRights.isNull())
     {
         nx::network::http::Response response;
@@ -35,6 +32,7 @@ int QnCurrentUserRestHandler::executeGet(
             clientIp, params.value(Qn::URL_QUERY_AUTH_KEY_NAME).toUtf8(),
             "GET", response, &accessRights);
     }
+
     if (accessRights.isNull())
     {
         result.setError(QnJsonRestResult::CantProcessRequest, lit("Auth did not pass"));

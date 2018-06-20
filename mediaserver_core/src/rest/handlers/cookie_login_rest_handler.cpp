@@ -26,15 +26,6 @@ int QnCookieLoginRestHandler::executePost(
 {
     bool success = false;
     QnCookieData cookieData = QJson::deserialized<QnCookieData>(body, QnCookieData(), &success);
-
-    auto logoutGuard = makeScopeGuard(
-        [owner]
-        {
-            auto headers = &owner->response()->headers;
-            if (headers->find("Set-Cookie") == headers->end())
-                QnCookieHelper::addLogoutHeaders(headers);
-        });
-
     if (!success)
     {
         result.setError(QnRestResult::InvalidParameter, "Invalid json object. All fields are mandatory");
@@ -82,23 +73,7 @@ int QnCookieLoginRestHandler::executePost(
         return nx::network::http::StatusCode::ok;
     }
 
-    const auto setCookie =
-        [&](const QByteArray& name, const QByteArray& value, const QByteArray& options)
-    {
-        QByteArray data = name;
-        data += "=";
-        data += value;
-        data += "; Path=/";
-        if (!options.isEmpty())
-            data += "; " + options;
-        nx::network::http::insertHeader(
-            &owner->response()->headers,
-            nx::network::http::HttpHeader("Set-Cookie", data));
-    };
-
-    setCookie(Qn::URL_QUERY_AUTH_KEY_NAME, cookieData.auth, "HttpOnly");
-    setCookie(Qn::EC2_RUNTIME_GUID_HEADER_NAME, QnUuid::createUuid().toByteArray(), "HttpOnly");
-    setCookie(Qn::CSRF_TOKEN_COOKIE_NAME, authorizer->newCsrfToken(), "");
+    authorizer->setAccessCookie(owner->request(), owner->response(), accessRights);
 
     QnCurrentUserRestHandler currentUser;
     return currentUser.executeGet(QString(), QnRequestParams(), result, owner);

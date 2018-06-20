@@ -23,9 +23,16 @@
 #include <audit/mserver_audit_manager.h>
 #include <nx/utils/elapsed_timer.h>
 
+// TODO: Major refactring is required:
+// - Get rid of number http codes, use constants intead.
+// - Replace hardcoded credentials with constants.
+
 namespace nx {
 namespace mediaserver {
 namespace test {
+
+static const Authenticator::LockoutOptions kLockoutOptions{
+    3, std::chrono::milliseconds(500), std::chrono::milliseconds(100)};
 
 class AuthReturnCodeTest:
     public ::testing::Test
@@ -142,7 +149,7 @@ public:
             password,
             nx::network::AppInfo::realm().toUtf8(),
             nx::network::http::Method::get,
-            server->authorizer()->generateNonce());
+            server->authenticator()->generateNonce());
 
         nx::network::http::HttpClient client;
         client.doPost(serverUrl("/api/cookieLogin"), "application/json", QJson::serialized(cookieLogin));
@@ -160,7 +167,7 @@ public:
             cookieList << lm("%1=%2").args(it.first, it.second);
 
         const auto cookie = cookieList.join("; ").toUtf8();
-        const auto csrf = cookieMap["nx-vms-csrf-token"];
+        const auto session = cookieMap["x-runtime-guid"];
         const auto doGet =
             [&](QString path, std::map<nx::String, nx::String> headers)
             {
@@ -174,13 +181,13 @@ public:
                 return client.response()->statusLine.statusCode;
             };
 
-        // Cookie works only with CSRF.
+        // Cookie works only with extra header.
         ASSERT_EQ(401, doGet("/ec2/getUsers", {{"Cookie", cookie}}));
-        ASSERT_EQ(200, doGet("/ec2/getUsers", {{"Cookie", cookie}, {"Nx-Vms-Csrf-Token", csrf}}));
+        ASSERT_EQ(200, doGet("/ec2/getUsers", {{"Cookie", cookie}, {"X-Runtime-Guid", session}}));
 
         // Cookies does not work after logout.
-        ASSERT_EQ(200, doGet("api/cookieLogout", {{"Cookie", cookie}, {"Nx-Vms-Csrf-Token", csrf}}));
-        ASSERT_EQ(401, doGet("/ec2/getUsers", {{"Cookie", cookie}, {"Nx-Vms-Csrf-Token", csrf}}));
+        ASSERT_EQ(200, doGet("api/cookieLogout", {{"Cookie", cookie}, {"X-Runtime-Guid", session}}));
+        ASSERT_EQ(401, doGet("/ec2/getUsers", {{"Cookie", cookie}, {"X-Runtime-Guid", session}}));
     }
 
     ec2::ApiUserData userData;
@@ -263,7 +270,7 @@ public:
         nx::network::http::header::WWWAuthenticate unquthorizedHeader;
         EXPECT_TRUE(unquthorizedHeader.parse(
             "Digest realm=\"VMS\", "
-            "nonce=\"" + server->authorizer()->generateNonce() + "\", "
+            "nonce=\"" + server->authenticator()->generateNonce() + "\", "
             "algorithm=MD5"));
 
         nx::network::http::header::DigestAuthorization digestHeader;
@@ -275,6 +282,15 @@ public:
         client->setDisablePrecalculatedAuthorization(true);
         client->addAdditionalHeader(nx::network::http::header::Authorization::NAME, digestHeader.serialized());
         return client;
+    }
+
+    std::shared_ptr<SharedGuard<std::function<void()>>> setCustomLockoutOptions()
+    {
+        const auto lockoutOptons = server->authenticator()->getLockoutOptions();
+        server->authenticator()->setLockoutOptions(kLockoutOptions);
+
+        const auto restoreOptions = [=](){ server->authenticator()->setLockoutOptions(lockoutOptons); };
+        return makeSharedGuard(std::function<void()>(restoreOptions));
     }
 };
 
@@ -402,15 +418,11 @@ TEST_F(AuthReturnCodeTest, manualDigestWrongMethod_onGateway)
     testServerReturnCode(std::move(client), 401, Qn::AuthResult::Auth_WrongDigest);
 }
 
+
+
 TEST_F(AuthReturnCodeTest, lockoutTest)
 {
-    static const Authenticator::LockoutOptions kLockoutOptions{
-        3, std::chrono::milliseconds(500), std::chrono::milliseconds(100)};
-
-    const auto lockoutOptons = server->authorizer()->getLockoutOptions();
-    server->authorizer()->setLockoutOptions(kLockoutOptions);
-    const auto lockoutGuard = makeSharedGuard(
-        [&](){ server->authorizer()->setLockoutOptions(lockoutOptons); });
+    const auto guard = setCustomLockoutOptions();
 
     // Lockout does not happen on a random attemp.
     assertServerAcceptsUserCredentials("admin", "admin");
@@ -426,6 +438,39 @@ TEST_F(AuthReturnCodeTest, lockoutTest)
     // Wait for lockout to clear.
     std::this_thread::sleep_for(kLockoutOptions.lockoutTime);
     assertServerAcceptsUserCredentials("admin", "admin");
+}
+
+TEST_F(AuthReturnCodeTest, sessionKey)
+{
+    // Initial request to authorize session.
+    const auto sessionKey = QnUuid::createUuid().toByteArray();
+    {
+        auto client = std::make_unique<nx::network::http::HttpClient>();
+        client->setUserName("admin");
+        client->setUserPassword("admin");
+        client->addAdditionalHeader(Qn::EC2_RUNTIME_GUID_HEADER_NAME, sessionKey);
+        testServerReturnCode(std::move(client), 200);
+    }
+
+    // When session is authorized, login/password is not needed.
+    {
+        auto client = std::make_unique<nx::network::http::HttpClient>();
+        client->addAdditionalHeader(Qn::EC2_RUNTIME_GUID_HEADER_NAME, sessionKey);
+        testServerReturnCode(std::move(client), 200);
+    }
+
+    // Cause user to lockout.
+    const auto guard = setCustomLockoutOptions();
+    for (int i = 0; i < kLockoutOptions.maxLoginFailures; ++i)
+        assertServerRejectsUserCredentials("admin", "qweasd123", Qn::Auth_WrongPassword);
+    assertServerRejectsUserCredentials("admin", "admin", Qn::Auth_LockedOut);
+
+    // Authorized session still works.
+    {
+        auto client = std::make_unique<nx::network::http::HttpClient>();
+        client->addAdditionalHeader(Qn::EC2_RUNTIME_GUID_HEADER_NAME, sessionKey);
+        testServerReturnCode(std::move(client), 200);
+    }
 }
 
 } // namespace test

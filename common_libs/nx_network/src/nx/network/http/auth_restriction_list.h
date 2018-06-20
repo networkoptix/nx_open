@@ -41,6 +41,11 @@ enum Value
     tempUrlQueryParam = 1 << 6,
 
     /**
+     * X-Runtime-Guid header name.
+     */
+    sessionKey = 1 << 7,
+
+    /**
      * Normally all GET requests do not requres SCRF token, but we could not allow that, because of
      * poorly designed requests changing information (including passwords).
      * TODO: Remove this propery as soon as all these requests are terminated.

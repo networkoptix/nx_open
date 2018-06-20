@@ -87,19 +87,16 @@ bool QnUniversalRequestProcessor::authenticate(Qn::UserAccessData* accessRights,
         const bool isProxy = needStandardProxy(d->owner->commonModule(), d->request);
         QElapsedTimer t;
         t.restart();
-        nx::network::http::AuthMethod::Value usedMethod = nx::network::http::AuthMethod::noAuth;
-        Qn::AuthResult authResult;
         QnAuthSession lastUnauthorizedData;
         const auto clientIp = d->socket->getForeignAddress().address;
-        while ((authResult = d->listener->authorizer()->authenticate(
-            clientIp, d->request, d->response, isProxy, accessRights, &usedMethod)) != Qn::Auth_OK)
+        nx::mediaserver::Authenticator::Result result;
+        while ((result = d->listener->authenticator()->tryAllMethods(
+            clientIp, d->request, &d->response, isProxy)).code != Qn::Auth_OK)
         {
             lastUnauthorizedData = authSession();
-
             nx::network::http::insertOrReplaceHeader(
                 &d->response.headers,
-                nx::network::http::HttpHeader( Qn::AUTH_RESULT_HEADER_NAME, QnLexical::serialized(authResult).toUtf8() ) );
-
+                {Qn::AUTH_RESULT_HEADER_NAME, QnLexical::serialized(result.code).toUtf8()});
 
             if( !d->socket->isConnected() )
                 break;   //connection has been closed
@@ -111,14 +108,14 @@ bool QnUniversalRequestProcessor::authenticate(Qn::UserAccessData* accessRights,
                 msgBody = STATIC_PROXY_UNAUTHORIZED_HTML;
                 httpResult = nx::network::http::StatusCode::proxyAuthenticationRequired;
             }
-            else if (authResult ==  Qn::Auth_Forbidden)
+            else if (result.code ==  Qn::Auth_Forbidden)
             {
                 msgBody = STATIC_FORBIDDEN_HTML;
                 httpResult = nx::network::http::StatusCode::forbidden;
             }
             else
             {
-                if (usedMethod & m_unauthorizedPageForMethods)
+                if (result.usedMethods & m_unauthorizedPageForMethods)
                     msgBody = unauthorizedPageBody();
                 else
                     msgBody = STATIC_UNAUTHORIZED_HTML;
@@ -141,13 +138,14 @@ bool QnUniversalRequestProcessor::authenticate(Qn::UserAccessData* accessRights,
                 break; // close connection
         }
 
-        if (usedMethod == nx::network::http::AuthMethod::noAuth)
+        *accessRights = result.access;
+        if (result.usedMethods == nx::network::http::AuthMethod::noAuth)
         {
             *noAuth = true;
         }
-        else if (authResult != Qn::Auth_OK)
+        else if (result.code != Qn::Auth_OK)
         {
-            if (authResult != Qn::Auth_WrongInternalLogin)
+            if (result.code != Qn::Auth_WrongInternalLogin)
             {
                 lastUnauthorizedData.id = QnUuid::createUuid();
                 qnAuditManager->addAuditRecord(qnAuditManager->prepareRecord(
@@ -160,6 +158,7 @@ bool QnUniversalRequestProcessor::authenticate(Qn::UserAccessData* accessRights,
             d->authenticatedOnce = true;
         }
     }
+
     return true;
 }
 

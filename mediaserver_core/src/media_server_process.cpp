@@ -2685,9 +2685,9 @@ bool MediaServerProcess::initTcpListener(
         maxConnections,
         acceptSslConnections);
 
-    configureApiRestrictions(m_universalTcpListener->authorizer()->restrictionList());
+    configureApiRestrictions(m_universalTcpListener->authenticator()->restrictionList());
     connect(
-        m_universalTcpListener->authorizer(), &nx::mediaserver::Authenticator::emptyDigestDetected,
+        m_universalTcpListener->authenticator(), &nx::mediaserver::Authenticator::emptyDigestDetected,
         this, &MediaServerProcess::at_emptyDigestDetected);
 
     m_universalTcpListener->httpModManager()->addCustomRequestMod(std::bind(
@@ -2713,7 +2713,7 @@ bool MediaServerProcess::initTcpListener(
     // Server returns code 403 (forbidden) instead of 401 if the user isn't authorized for requests
     // starting with "web" path.
     m_universalTcpListener->setPathIgnorePrefix("web/");
-    m_universalTcpListener->authorizer()->restrictionList()->deny(
+    m_universalTcpListener->authenticator()->restrictionList()->deny(
         lit("/web/.+"), nx::network::http::AuthMethod::http);
 
     nx::network::http::AuthMethod::Values methods = (nx::network::http::AuthMethod::Values) (
@@ -3975,7 +3975,7 @@ void MediaServerProcess::run()
     auto cleanUpGuard = makeScopeGuard(
         [&]()
         {
-            disconnect(m_universalTcpListener->authorizer(), 0, this, 0);
+            disconnect(m_universalTcpListener->authenticator(), 0, this, 0);
             disconnect(commonModule()->resourceDiscoveryManager(), 0, this, 0);
             disconnect(qnNormalStorageMan, 0, this, 0);
             disconnect(qnBackupStorageMan, 0, this, 0);

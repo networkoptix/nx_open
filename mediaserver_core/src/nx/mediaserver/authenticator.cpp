@@ -67,10 +67,107 @@ Authenticator::Authenticator(
     m_userDataProvider(&cloudManagerGroup->userAuthenticator),
     m_ldap(std::make_unique<LdapManager>(commonModule))
 {
-    setCleanupTimer();
 }
 
-Qn::AuthResult Authenticator::authenticate(
+Authenticator::Result Authenticator::tryAllMethods(
+    const nx::network::HostAddress& clientIp,
+    const nx::network::http::Request& request,
+    nx::network::http::Response* response,
+    bool isProxy)
+{
+    const auto sessionKey = nx::network::http::getHeaderValue(
+        request.headers, Qn::EC2_RUNTIME_GUID_HEADER_NAME);
+
+    if (!sessionKey.isEmpty())
+    {
+        if (auto session = m_sessionKeys.get(sessionKey))
+            return {Qn::Auth_OK, std::move(*session), network::http::AuthMethod::sessionKey};
+    }
+
+    Result result;
+    result.code = doAllMethods(
+        clientIp, request, *response, isProxy, &result.access, &result.usedMethods);
+
+    if (result.code == Qn::Auth_OK && !sessionKey.isEmpty())
+    {
+        // TODO: Transfer user resource from internal functions instead of searching again.
+        if (const auto user = resourcePool()->getResourceById<QnUserResource>(result.access.userId))
+        {
+            m_sessionKeys.addOrUpdate(sessionKey, result.access);
+            const auto removeKey =
+                [this, id = user->getId()](const QnResourcePtr& user)
+                {
+                    user->disconnect(this);
+                    m_sessionKeys.removeIf(
+                        [&](const auto& /*key*/, const auto& value, const auto& /*binding*/)
+                        {
+                            return value.userId == id;
+                        });
+                };
+
+            connect(user.data(), &QnUserResource::permissionsChanged, this, removeKey);
+            connect(user.data(), &QnUserResource::userRoleChanged, this, removeKey);
+            connect(user.data(), &QnUserResource::enabledChanged, this, removeKey);
+            connect(user.data(), &QnUserResource::hashChanged, this, removeKey);
+            connect(user.data(), &QnUserResource::passwordChanged, this, removeKey);
+            connect(user.data(), &QnUserResource::cryptSha512HashChanged, this, removeKey);
+            connect(user.data(), &QnUserResource::realmChanged, this, removeKey);
+        }
+    }
+
+    return result;
+}
+
+static const auto kCookieRuntimeGuid = Qn::EC2_RUNTIME_GUID_HEADER_NAME.toLower();
+
+Authenticator::Result Authenticator::tryCookie(const nx::network::http::Request& request)
+{
+    const auto sessionKey = request.getCookieValue(kCookieRuntimeGuid);
+    if (sessionKey.isEmpty())
+        return {Qn::Auth_Forbidden, {}, nx::network::http::AuthMethod::NotDefined};
+
+    // TODO: Should be replaced with request.requestLine.method == "GET"
+    // as soon as GET queries do not modify anything.
+    if (m_authMethodRestrictionList.getAllowedAuthMethods(request)
+        && nx::network::http::AuthMethod::allowWithourCsrf)
+    {
+        if (auto session = m_sessionKeys.get(sessionKey))
+            return {Qn::Auth_Forbidden, std::move(*session), nx::network::http::AuthMethod::cookie};
+    }
+
+    return {Qn::Auth_Forbidden, {}, nx::network::http::AuthMethod::cookie};
+}
+
+void Authenticator::setAccessCookie(
+    const nx::network::http::Request& request,
+    nx::network::http::Response* response,
+    Qn::UserAccessData access)
+{
+    const auto sessionKey = request.getCookieValue(kCookieRuntimeGuid);
+    if (!sessionKey.isEmpty())
+        return m_sessionKeys.addOrUpdate(sessionKey, access); //< Use existing if possible.
+
+    const auto newSessionKey = m_sessionKeys.make(access);
+    const auto cookie = lm("%1=%2; Path=/").args(kCookieRuntimeGuid, newSessionKey);
+    nx::network::http::insertHeader(&response->headers, {"Set-Cookie", cookie.toUtf8()});
+}
+
+void Authenticator::removeAccessCookie(
+    const nx::network::http::Request& request,
+    nx::network::http::Response* response)
+{
+    const auto sessionKey = request.getCookieValue(kCookieRuntimeGuid);
+    if (sessionKey.isEmpty())
+        return;
+
+    const auto cookie = lm("%1=deleted; Path=/; expires=Thu, 01 Jan 1970 00:00 : 00 GMT")
+        .args(kCookieRuntimeGuid);
+
+    m_sessionKeys.remove(sessionKey);
+    nx::network::http::insertHeader(&response->headers, {"Set-Cookie", cookie.toUtf8()});
+}
+
+Qn::AuthResult Authenticator::doAllMethods(
     const nx::network::HostAddress& clientIp,
     const nx::network::http::Request& request,
     nx::network::http::Response& response,
@@ -179,23 +276,16 @@ Qn::AuthResult Authenticator::authenticate(
     auto result = Qn::Auth_Forbidden;
     if (allowedAuthMethods & nx::network::http::AuthMethod::cookie)
     {
-        const auto cookie = nx::network::http::getHeaderValue(request.headers, "Cookie");
-        if (cookie.indexOf(Qn::URL_QUERY_AUTH_KEY_NAME))
-        {
-            if (usedAuthMethod)
-                *usedAuthMethod = nx::network::http::AuthMethod::cookie;
+        const auto cookieResult = tryCookie(request);
+        if (usedAuthMethod)
+            *usedAuthMethod = cookieResult.usedMethods;
 
-            boost::optional<QByteArray> csrfToken;
-            if ((allowedAuthMethods & nx::network::http::AuthMethod::allowWithourCsrf) == 0)
-                csrfToken = nx::network::http::getHeaderValue(request.headers, Qn::CSRF_TOKEN_HEADER_NAME);
+        if (accessRights)
+            *accessRights = cookieResult.access;
 
-            result = doCookieAuthorization(
-                clientIp, request.requestLine.method, cookie, csrfToken, response, accessRights);
-
-            NX_VERBOSE(this, lm("%1 with cookie (%2)").args(result, request.requestLine));
-            if (result == Qn::Auth_OK)
-                return result;
-        }
+        result = cookieResult.code;
+        if (result == Qn::Auth_OK)
+            return result;
     }
 
     if (allowedAuthMethods & nx::network::http::AuthMethod::http)
@@ -203,7 +293,7 @@ Qn::AuthResult Authenticator::authenticate(
         NX_VERBOSE(this, lm("Authenticating %1 with HTTP authentication")
             .arg(request.requestLine));
 
-        result = httpAuthenticate(clientIp, request, response, isProxy, accessRights, usedAuthMethod);
+        result = doHttp(clientIp, request, response, isProxy, accessRights, usedAuthMethod);
         if (result == Qn::Auth_OK)
         {
             NX_VERBOSE(this, lm("Authenticated %1 with HTTP authentication").args(request.requestLine.url));
@@ -220,7 +310,7 @@ Qn::AuthResult Authenticator::authenticate(
     return result;
 }
 
-Qn::AuthResult Authenticator::httpAuthenticate(
+Qn::AuthResult Authenticator::doHttp(
     const nx::network::HostAddress& clientIp,
     const nx::network::http::Request& request,
     nx::network::http::Response& response,
@@ -326,7 +416,7 @@ Qn::AuthResult Authenticator::httpAuthenticate(
             authResult == Qn::Auth_WrongLogin) &&
             authorizationHeader.authScheme == nx::network::http::header::AuthScheme::digest)
         {
-            if (doDigestAuth(request.requestLine,
+            if (doDigest(request.requestLine,
                 authorizationHeader, response, isProxy, accessRights) == Qn::Auth_OK)
             {
                 // Cached value matched user digest by not LDAP server.
@@ -353,7 +443,7 @@ Qn::AuthResult Authenticator::httpAuthenticate(
         if (usedAuthMethod)
             *usedAuthMethod = nx::network::http::AuthMethod::httpDigest;
 
-        authResult = doDigestAuth(
+        authResult = doDigest(
             request.requestLine, authorizationHeader, response, isProxy, accessRights);
         NX_DEBUG(this, lm("%1 with digest (%2)").args(authResult, request.requestLine));
     }
@@ -361,7 +451,7 @@ Qn::AuthResult Authenticator::httpAuthenticate(
     {
         if (usedAuthMethod)
             *usedAuthMethod = nx::network::http::AuthMethod::httpBasic;
-        authResult = doBasicAuth(request.requestLine.method, authorizationHeader, response, accessRights);
+        authResult = doBasic(request.requestLine.method, authorizationHeader, response, accessRights);
 
         if (authResult == Qn::Auth_OK && userResource &&
             (userResource->getDigest().isEmpty() || userResource->getRealm() != nx::network::AppInfo::realm()))
@@ -532,7 +622,7 @@ static bool verifyDigestUri(const nx::utils::Url& requestUrl, const QByteArray& 
         : isEqual(requestUrl.path(), digestUrl.path());
 }
 
-Qn::AuthResult Authenticator::doDigestAuth(
+Qn::AuthResult Authenticator::doDigest(
     const nx::network::http::RequestLine& requestLine,
     const nx::network::http::header::Authorization& authorization,
     nx::network::http::Response& responseHeaders,
@@ -586,7 +676,7 @@ Qn::AuthResult Authenticator::doDigestAuth(
     return errCode;
 }
 
-Qn::AuthResult Authenticator::doBasicAuth(
+Qn::AuthResult Authenticator::doBasic(
     const QByteArray& method,
     const nx::network::http::header::Authorization& authorization,
     nx::network::http::Response& response,
@@ -624,39 +714,6 @@ Qn::AuthResult Authenticator::doBasicAuth(
     }
 
     return errCode;
-}
-
-Qn::AuthResult Authenticator::doCookieAuthorization(
-    const nx::network::HostAddress& clientIp,
-    const QByteArray& method,
-    const QByteArray& authData,
-    const boost::optional<QByteArray>& csrfToken,
-    nx::network::http::Response& responseHeaders,
-    Qn::UserAccessData* accessRights)
-{
-    QMap<nx::network::http::BufferType, nx::network::http::BufferType> params;
-    nx::utils::parseNameValuePairs(authData, ';', &params);
-
-    const auto auth = params.value(Qn::URL_QUERY_AUTH_KEY_NAME);
-    if (auth.isEmpty())
-        return Qn::Auth_Forbidden;
-
-    if (csrfToken)
-    {
-        if (!isCsrfTokenValid(*csrfToken))
-            return Qn::Auth_InvalidCsrfToken;
-
-        const auto csrfParam = params.value(Qn::CSRF_TOKEN_COOKIE_NAME);
-        if (csrfParam.isEmpty() || csrfParam != *csrfToken)
-            return Qn::Auth_InvalidCsrfToken;
-    }
-
-    return authenticateByUrl(
-        clientIp,
-        nx::utils::Url::fromPercentEncoding(auth).toUtf8(),
-        kCookieAuthMethod,
-        responseHeaders, accessRights);
-
 }
 
 void Authenticator::addAuthHeader(
@@ -767,49 +824,6 @@ LdapManager* Authenticator::ldapManager() const
     return m_ldap.get();
 }
 
-void Authenticator::setCleanupTimer()
-{
-    m_clenupTimer = nx::utils::TimerManager::instance()->addTimerEx(
-        [this](nx::utils::TimerId)
-        {
-            cleanupExpiredCsrfs();
-            setCleanupTimer();
-        },
-        kMaxKeyLifeTime);
-}
-
-nx::Buffer Authenticator::newCsrfToken()
-{
-    const auto token = QnUuid::createUuid().toSimpleByteArray();
-    QnMutexLocker lock(&m_mutex);
-    m_csrfTokens[token] = std::chrono::steady_clock::now() + kMaxKeyLifeTime;
-    return token;
-}
-
-void Authenticator::removeCsrfToken(const nx::Buffer& token)
-{
-    QnMutexLocker lock(&m_mutex);
-    m_csrfTokens.erase(token);
-}
-
-bool Authenticator::isCsrfTokenValid(const nx::Buffer& token) const
-{
-    QnMutexLocker lock(&m_mutex);
-    const auto it = m_csrfTokens.find(token);
-    if (it == m_csrfTokens.end())
-        return false;
-
-    const auto now = std::chrono::steady_clock::now();
-    if (it->second < now)
-    {
-        m_csrfTokens.erase(it);
-        return false;
-    }
-
-    it->second = now + kMaxKeyLifeTime;
-    return true;
-}
-
 std::optional<Authenticator::LockoutOptions> Authenticator::getLockoutOptions() const
 {
     QnMutexLocker lock(&m_mutex);
@@ -822,17 +836,10 @@ void Authenticator::setLockoutOptions(std::optional<LockoutOptions> options)
     m_lockoutOptions = std::move(options);
 }
 
-void Authenticator::cleanupExpiredCsrfs()
+Authenticator::SessionKeys::SessionKeys():
+    nx::network::TemporayKeyKeeper<Qn::UserAccessData>(
+        {kSessionKeyLifeTime, /*prolongLifeOnUse*/ true})
 {
-    QnMutexLocker lock(&m_mutex);
-    const auto now = std::chrono::steady_clock::now();
-    for (auto it = m_csrfTokens.begin(); it != m_csrfTokens.end(); )
-    {
-        if (it->second < now)
-            it = m_csrfTokens.erase(it);
-        else
-            ++it;
-    }
 }
 
 } // namespace mediaserver
