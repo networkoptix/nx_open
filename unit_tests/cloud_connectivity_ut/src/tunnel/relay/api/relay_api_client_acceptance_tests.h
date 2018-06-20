@@ -161,45 +161,45 @@ TYPED_TEST_CASE_P(RelayApiClientAcceptance);
 
 TYPED_TEST_P(RelayApiClientAcceptance, extends_path)
 {
-    whenInvokedSomeRequest();
-    thenClientUsedRightUrl();
+    this->whenInvokedSomeRequest();
+    this->thenClientUsedRightUrl();
 }
 
 TYPED_TEST_P(RelayApiClientAcceptance, base_url_has_trailing_slash)
 {
-    givenBaseUrlWithTrailingSlash();
-    whenInvokedSomeRequest();
-    thenClientUsedRightUrl();
+    this->givenBaseUrlWithTrailingSlash();
+    this->whenInvokedSomeRequest();
+    this->thenClientUsedRightUrl();
 }
 
 TYPED_TEST_P(RelayApiClientAcceptance, base_url_has_empty_path)
 {
-    givenBaseUrlWithEmptyPath();
-    whenInvokedSomeRequest();
-    thenClientUsedRightUrl();
+    this->givenBaseUrlWithEmptyPath();
+    this->whenInvokedSomeRequest();
+    this->thenClientUsedRightUrl();
 }
 
 TYPED_TEST_P(RelayApiClientAcceptance, base_url_is_a_root_path)
 {
-    givenBaseUrlWithRootPath();
-    whenInvokedSomeRequest();
-    thenClientUsedRightUrl();
+    this->givenBaseUrlWithRootPath();
+    this->whenInvokedSomeRequest();
+    this->thenClientUsedRightUrl();
 }
 
 TYPED_TEST_P(RelayApiClientAcceptance, uses_authentication)
 {
-    enableAuthentication();
+    this->enableAuthentication();
 
-    whenInvokedSomeRequest();
-    thenClientUsedRightUrl();
+    this->whenInvokedSomeRequest();
+    this->thenClientUsedRightUrl();
 }
 
 TYPED_TEST_P(RelayApiClientAcceptance, begin_listening_response_delivered_properly)
 {
-    whenInvokeBeginListening();
+    this->whenInvokeBeginListening();
 
-    thenRequestSucceded();
-    andBeginListeningResponseIsCorrect();
+    this->thenRequestSucceded();
+    this->andBeginListeningResponseIsCorrect();
 }
 
 REGISTER_TYPED_TEST_CASE_P(RelayApiClientAcceptance,
