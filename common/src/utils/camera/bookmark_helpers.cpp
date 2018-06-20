@@ -1,6 +1,8 @@
 
 #include "bookmark_helpers.h"
 
+#include <chrono>
+
 #include <utils/math/math.h>
 #include <core/resource/user_resource.h>
 #include <core/resource/camera_bookmark.h>
@@ -11,6 +13,8 @@
 #include <nx/vms/event/actions/abstract_action.h>
 
 #include <utils/common/synctime.h>
+
+using std::chrono::milliseconds;
 
 using namespace nx;
 
@@ -64,11 +68,13 @@ QnCameraBookmark helpers::bookmarkFromAction(
     QnCameraBookmark bookmark;
 
     bookmark.guid = QnUuid::createUuid();
-    bookmark.startTimeMs = startTimeMs - recordBeforeMs;
-    bookmark.durationMs = fixedDurationMs > 0 ? fixedDurationMs : endTimeMs - startTimeMs;
-    bookmark.durationMs += recordBeforeMs + recordAfterMs;
+    bookmark.startTimeMs = milliseconds(startTimeMs - recordBeforeMs);
+    bookmark.durationMs = milliseconds(fixedDurationMs > 0
+        ? fixedDurationMs
+        : endTimeMs - startTimeMs);
+    bookmark.durationMs += milliseconds(recordBeforeMs + recordAfterMs);
     bookmark.cameraId = camera->getId();
-    bookmark.creationTimeStampMs = qnSyncTime->currentMSecsSinceEpoch();
+    bookmark.creationTimeStampMs = milliseconds(qnSyncTime->currentMSecsSinceEpoch());
 
     vms::event::StringsHelper helper(camera->commonModule());
     bookmark.name = helper.eventAtResource(action->getRuntimeParams(), Qn::RI_WithUrl);
@@ -83,7 +89,7 @@ QnCameraBookmarkList helpers::bookmarksAtPosition(
     const auto predicate =
         [posMs](const QnCameraBookmark &bookmark)
         {
-            return qBetween(bookmark.startTimeMs, posMs, bookmark.endTimeMs());
+            return qBetween(bookmark.startTimeMs.count(), posMs, bookmark.endTime().count());
         };
 
     QnCameraBookmarkList result;

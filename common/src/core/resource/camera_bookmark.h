@@ -1,6 +1,8 @@
 #ifndef QN_CAMERA_BOOKMARK_H
 #define QN_CAMERA_BOOKMARK_H
 
+#include <chrono>
+
 #include <QtCore/QList>
 #include <QtCore/QMetaType>
 #include <QtCore/QStringList>
@@ -17,11 +19,11 @@ class QnCommonModule;
 
 struct QnBookmarkSortOrder
 {
-    Qn::BookmarkSortField column;
-    Qt::SortOrder order;
+    Qn::BookmarkSortField column = Qn::BookmarkStartTime;
+    Qt::SortOrder order = Qt::AscendingOrder;
 
-    explicit QnBookmarkSortOrder(Qn::BookmarkSortField column = Qn::BookmarkStartTime
-        , Qt::SortOrder order = Qt::AscendingOrder);
+    explicit QnBookmarkSortOrder(Qn::BookmarkSortField column = Qn::BookmarkStartTime,
+        Qt::SortOrder order = Qt::AscendingOrder);
 
     static const QnBookmarkSortOrder defaultOrder;
 };
@@ -29,11 +31,13 @@ struct QnBookmarkSortOrder
 
 struct QnBookmarkSparsingOptions
 {
-    bool used;
-    int minVisibleLengthMs;
+    using milliseconds = std::chrono::milliseconds;
 
-    explicit QnBookmarkSparsingOptions(bool used = false
-        , qint64 minVisibleLengthMs = 0);
+    bool used = false;
+    milliseconds minVisibleLengthMs = milliseconds(0);
+
+    explicit QnBookmarkSparsingOptions(bool used = false,
+        milliseconds minVisibleLengthMs = milliseconds(0));
 
     static const QnBookmarkSparsingOptions kNosparsing;
 };
@@ -44,6 +48,7 @@ struct QnBookmarkSparsingOptions
  */
 struct QnCameraBookmark
 {
+    using milliseconds = std::chrono::milliseconds;
     /** Id of the bookmark. */
     QnUuid guid;
 
@@ -56,7 +61,7 @@ struct QnCameraBookmark
       * Time of bookmark creation in milliseconds since epoch. Equals to startTimeMs
       * field if bookmark is created by system.
       */
-    qint64 creationTimeStampMs = 0;
+    milliseconds creationTimeStampMs = milliseconds(0); //< Ms in names are left for serialization.
 
     /** Name of the bookmark.*/
     QString name;
@@ -65,16 +70,16 @@ struct QnCameraBookmark
     QString description;
 
     /** Time during which recorded period should be preserved, in milliseconds. */
-    qint64 timeout = -1;
+    milliseconds timeout = milliseconds(-1);
 
     /** Start time in milliseconds since epoch. */
-    qint64 startTimeMs = 0;
+    milliseconds startTimeMs = milliseconds(0);
 
     /** Duration in milliseconds. */
-    qint64 durationMs = 0;
+    milliseconds durationMs = milliseconds(0);
 
     /** \returns End time in milliseconds since epoch. */
-    qint64 endTimeMs() const;
+    milliseconds endTime() const;
 
     /** List of tags attached to the bookmark. */
     QnCameraBookmarkTags tags;
@@ -86,7 +91,7 @@ struct QnCameraBookmark
       * If bookmark is created by system or by older VMS version returns
       * timestamp that equals to startTimeMs field
       */
-    qint64 creationTimeMs() const;
+    milliseconds creationTime() const;
 
     bool isCreatedInOlderVMS() const;
 
@@ -128,11 +133,12 @@ struct QnCameraBookmark
 
 struct QnCameraBookmarkSearchFilter
 {
+    using milliseconds = std::chrono::milliseconds;
     /** Minimum start time for the bookmark. */
-    qint64 startTimeMs;
+    milliseconds startTimeMs;
 
     /** Maximum end time for the bookmark. */
-    qint64 endTimeMs; // TODO: #GDM #Bookmarks now works as maximum start time
+    milliseconds endTimeMs; // TODO: #GDM #Bookmarks now works as maximum start time
 
     /** Text-search filter string. */
     QString text;
@@ -175,13 +181,15 @@ struct QnCameraBookmarkTag
         return !name.isEmpty();
     }
 
-    static QnCameraBookmarkTagList mergeCameraBookmarkTags(const QnMultiServerCameraBookmarkTagList &source, int limit = std::numeric_limits<int>().max());
+    static QnCameraBookmarkTagList mergeCameraBookmarkTags(
+        const QnMultiServerCameraBookmarkTagList &source,
+        int limit = std::numeric_limits<int>().max());
 };
 #define QnCameraBookmarkTag_Fields (name)(count)
 
 bool operator<(const QnCameraBookmark &first, const QnCameraBookmark &other);
-bool operator<(qint64 first, const QnCameraBookmark &other);
-bool operator<(const QnCameraBookmark &first, qint64 other);
+bool operator<(std::chrono::milliseconds first, const QnCameraBookmark &other);
+bool operator<(const QnCameraBookmark &first, std::chrono::milliseconds other);
 
 QDebug operator<<(QDebug dbg, const QnCameraBookmark &bookmark);
 

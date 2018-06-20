@@ -11,12 +11,11 @@
 struct QnBookmarkCluster
 {
     using milliseconds = std::chrono::milliseconds;
-    milliseconds startTimeMs;
-    milliseconds durationMs;
 
-    milliseconds endTimeMs() const;
+    milliseconds startTime = milliseconds(0);
+    milliseconds duration = milliseconds(0);
 
-    QnBookmarkCluster();
+    milliseconds endTime() const;
 };
 
 class QnTimelineBookmarkItem
@@ -32,8 +31,8 @@ public:
     QnCameraBookmark bookmark() const;
     QnBookmarkCluster cluster() const;
 
-    milliseconds startTimeMs() const;
-    milliseconds endTimeMs() const;
+    milliseconds startTime() const;
+    milliseconds endTime() const;
 
 private:
     boost::optional<QnCameraBookmark> m_bookmark;

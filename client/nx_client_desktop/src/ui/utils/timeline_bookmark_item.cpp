@@ -5,15 +5,9 @@
 using std::chrono::milliseconds;
 using namespace std::literals::chrono_literals;
 
-QnBookmarkCluster::QnBookmarkCluster():
-    startTimeMs(0),
-    durationMs(0)
+milliseconds QnBookmarkCluster::endTime() const
 {
-}
-
-milliseconds QnBookmarkCluster::endTimeMs() const
-{
-    return startTimeMs + durationMs;
+    return startTime + duration;
 }
 
 
@@ -42,20 +36,20 @@ QnBookmarkCluster QnTimelineBookmarkItem::cluster() const
     return m_cluster.get();
 }
 
-milliseconds QnTimelineBookmarkItem::startTimeMs() const
+milliseconds QnTimelineBookmarkItem::startTime() const
 {
     if (m_bookmark)
-        return milliseconds(m_bookmark.get().startTimeMs);
+        return m_bookmark.get().startTimeMs;
     if (m_cluster)
-        return m_cluster.get().startTimeMs;
+        return m_cluster.get().startTime;
     return 0ms;
 }
 
-milliseconds QnTimelineBookmarkItem::endTimeMs() const
+milliseconds QnTimelineBookmarkItem::endTime() const
 {
     if (m_bookmark)
-        return milliseconds(m_bookmark.get().endTimeMs());
+        return milliseconds(m_bookmark.get().endTime());
     if (m_cluster)
-        return m_cluster.get().endTimeMs();
+        return m_cluster.get().endTime();
     return 0ms;
 }

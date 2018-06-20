@@ -2868,12 +2868,12 @@ void QnTimeSlider::drawBookmarks(QPainter* painter, const QRectF& rect)
     {
         const QnTimelineBookmarkItem& bookmarkItem = bookmarks[i];
 
-        if (bookmarkItem.startTimeMs() >= m_windowEnd || bookmarkItem.endTimeMs() <= m_windowStart)
+        if (bookmarkItem.startTime() >= m_windowEnd || bookmarkItem.endTime() <= m_windowStart)
             continue;
 
         QRectF bookmarkRect = rect;
-        bookmarkRect.setLeft(quickPositionFromTime(qMax(bookmarkItem.startTimeMs(), m_windowStart)));
-        bookmarkRect.setRight(quickPositionFromTime(qMin(bookmarkItem.endTimeMs(), m_windowEnd)));
+        bookmarkRect.setLeft(quickPositionFromTime(qMax(bookmarkItem.startTime(), m_windowStart)));
+        bookmarkRect.setRight(quickPositionFromTime(qMin(bookmarkItem.endTime(), m_windowEnd)));
 
         bool hovered = i == hoveredBookmarkItem;
         const QColor& pastBg = hovered ? m_colors.pastBookmarkHover : m_colors.pastBookmark;
@@ -2911,7 +2911,7 @@ void QnTimeSlider::drawBookmarks(QPainter* painter, const QRectF& rect)
         if (i < bookmarks.size() - 1)
         {
             textRect.setRight(qMin(bookmarkRect.right(),
-                quickPositionFromTime(milliseconds(bookmarks[i + 1].startTimeMs()))));
+                quickPositionFromTime(milliseconds(bookmarks[i + 1].startTime()))));
         }
         textRect.adjust(kBookmarkTextPadding, 0, -kBookmarkTextPadding, 0);
 

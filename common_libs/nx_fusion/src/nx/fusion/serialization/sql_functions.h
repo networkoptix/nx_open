@@ -100,6 +100,15 @@ inline void deserialize_field(const QVariant &value, QnUuid *target) {
     *target = QnUuid::fromRfc4122(value.value<QByteArray>());
 }
 
+inline void serialize_field(const std::chrono::milliseconds &value, QVariant *target) {
+    *target = QVariant::fromValue<qint64>(value.count());
+}
+
+inline void deserialize_field(const QVariant &value, std::chrono::milliseconds *target) {
+    *target = std::chrono::milliseconds(value.value<qint64>());
+}
+
+
 /**
  * Representing system_clock::time_point in SQL as milliseconds since epoch (1970-01-01T00:00).
  */
