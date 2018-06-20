@@ -1,5 +1,5 @@
 import 'angular';
-import 'bootstrap';
+// import 'bootstrap';
 import 'ng-toast';
 import 'ngstorage';
 import 'angular-route';
@@ -7,11 +7,11 @@ import 'angular-base64';
 import 'angular-cookies';
 import 'angular-resource';
 import 'angular-sanitize';
-import 'angular-animate';
+// import 'angular-animate';
 import '@ng-bootstrap/ng-bootstrap';
 import 'angular-clipboard';
-import 'tc-angular-chartjs';
-import 'jquery-mousewheel';
+// import 'tc-angular-chartjs';
+// import 'jquery-mousewheel';
 
 import 'ng-toast/dist/ngToast.css';
 import 'ng-toast/dist/ngToast-animations.css';
