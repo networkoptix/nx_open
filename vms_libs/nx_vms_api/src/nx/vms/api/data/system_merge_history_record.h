@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../data_fwd.h"
+#include "data.h"
 
 #include <QtCore/QtGlobal>
 #include <QtCore/QMetaType>
@@ -11,7 +11,7 @@ namespace nx {
 namespace vms {
 namespace api {
 
-struct NX_VMS_API SystemMergeHistoryRecord
+struct NX_VMS_API SystemMergeHistoryRecord: Data
 {
     /** Milliseconds since epoch. */
     qint64 timestamp;
