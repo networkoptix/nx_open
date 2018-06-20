@@ -4,6 +4,7 @@ import logging
 import zipfile
 
 from flask import Flask, request, send_file
+from pathlib2 import PurePosixPath, PureWindowsPath
 from werkzeug.exceptions import BadRequest, NotFound, SecurityError
 
 from framework.installation.installer import Version, known_customizations
@@ -15,36 +16,59 @@ _logger = logging.getLogger(__name__)
 UPDATE_PATH_PATTERN = '/{}/{}/update.json'
 
 
-def _create_install_sh(path, callback_url, data):
+def _create_install_sh(dir, callback_url, data):
+    path = PurePosixPath('install.sh')
     command = ['curl', '--verbose', '--get', callback_url]
     for key, value in data.items():
         command.append('-data-urlencode')
         command.append('{}={}'.format(key, value))
     bare = sh_command_to_script(command)
     full = sh_augment_script(bare, set_eux=False, shebang=True)
-    path.write_bytes(full)
-    path.chmod(0o755)
+    abs_path = dir / path
+    abs_path.write_bytes(full)
+    abs_path.chmod(0o755)
     return path
 
 
-def _create_archive(archive_path, callback_url, update_info):
+def _create_install_ps1(dir, callback_url, data):
+    path = PureWindowsPath('install.ps1')
+    abs_path = dir / path
+    abs_path.write_text(power_shell_augment_script(
+        # language=PowerShell
+        u'Invoke-WebRequest -Uri $url -UseBasicParsing -Body $data',
+        {'url': callback_url, 'data': data}))
+    return path
+
+
+_script_factories = {
+    'linux': _create_install_sh,
+    'macosx': _create_install_sh,
+    'windows': _create_install_ps1,
+    }
+
+
+def _create_archive(archive_path, callback_url, product, customization, cloud_host, version, platform, mod, arch):
     # Archives are made unique intentionally to make their sizes and MD5 hashes different.
     # Files are created to make debug easy and to let Flask serve them with all features.
     unpacked_path = archive_path.with_suffix('')
     unpacked_path.mkdir(parents=True, exist_ok=True)
-    install_sh_path = unpacked_path / 'install'  # Without extension: same call on Windows and Linux.
-    _create_install_sh(install_sh_path, callback_url, update_info)
-    install_ps1_path = unpacked_path / 'install.ps1'
-    install_ps1_path.write_text(power_shell_augment_script(
-        # language=PowerShell
-        u'Invoke-WebRequest -Uri $url -UseBasicParsing -Body $data',
-        {'url': callback_url, 'data': update_info}))
-    install_bat_path = unpacked_path / 'install.bat'
-    install_bat_path.write_text(u'powershell -File %~dp0install.ps1')
+    callback_data = {
+        'product': product,
+        'customization': customization.customization_name,
+        'version': platform,
+        }
     with zipfile.ZipFile(str(archive_path), 'w') as zf:
-        zf.write(str(install_sh_path), install_sh_path.name)
-        zf.write(str(install_ps1_path), install_ps1_path.name)
-        zf.write(str(install_bat_path), install_bat_path.name)
+        _create_install_script = _script_factories[platform]
+        script_rel_path = _create_install_script(unpacked_path, callback_url, callback_data)
+        zf.write(str(unpacked_path / script_rel_path), str(script_rel_path))
+        update_info = {
+            'version': str(version),
+            'platform': platform,
+            'modification': mod,
+            'arch': arch,
+            'cloudHost': cloud_host,
+            'executable': str(script_rel_path),
+            }
         zf.writestr('update.json', json.dumps(update_info, indent=4))  # Mediaserver looks for it.
 
 
@@ -135,18 +159,10 @@ class _UpdatesData(object):
                         self._platform_infix[arch_and_mod],
                         )
                     arch, mod = arch_and_mod.split('_')
-                    update_info = {
-                        'product': product,  # For callback only.
-                        'customization': customization.customization_name,  # For callback only.
-                        'version': str(version),
-                        'platform': platform,
-                        'modification': mod,
-                        'arch': arch,
-                        'cloudHost': cloud_host,
-                        'executable': 'install',  # Same for Windows and Linux.
-                        }
                     archive_path = release_dir / archive_name
-                    _create_archive(archive_path, self._callback_url, update_info)
+                    _create_archive(
+                        archive_path, self._callback_url,
+                        product, customization, cloud_host, version, platform, mod, arch)
                     packages[product][platform][arch_and_mod] = {
                         'file': archive_name,
                         'size': archive_path.stat().st_size,
