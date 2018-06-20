@@ -44,7 +44,7 @@ class Authenticator:
 
 public:
     static const constexpr std::chrono::milliseconds kSessionKeyLifeTime = std::chrono::hours(1);
-    static const constexpr std::chrono::milliseconds kMaxKeyLifeTime = std::chrono::hours(1);
+    static const constexpr std::chrono::milliseconds kPathKeyLifeTime = std::chrono::hours(1);
 
     Authenticator(
         QnCommonModule* commonModule,
@@ -75,29 +75,28 @@ public:
         const nx::network::http::Request& request,
         nx::network::http::Response* response);
 
+    /**
+     * @param authRecord base64(username : nonce : MD5(ha1, nonce, MD5(METHOD :)))
+     */
+    Qn::AuthResult tryAuthRecord(
+        const nx::network::HostAddress& clientIp,
+        const QByteArray& authRecord,
+        const QByteArray& method,
+        nx::network::http::Response& response,
+        Qn::UserAccessData* accessRights = nullptr);
+
     nx::network::http::AuthMethodRestrictionList* restrictionList();
 
     /**
      * Creates query item for \a path which does not require authentication.
      * @note pair<query key name, key value>. Returned key is only valid for provided path.
      */
-    QPair<QString, QString> createAuthenticationQueryItemForPath(
+    QPair<QString, QString> makeQueryItemForPath(
         const Qn::UserAccessData& accessRights,
-        const QString& path,
-        std::chrono::milliseconds timeout = kMaxKeyLifeTime);
+        const QString& path);
 
     enum class NonceProvider { automatic, local };
     QByteArray generateNonce(NonceProvider provider = NonceProvider::automatic) const;
-
-    /**
-     * @param authDigest base64(username : nonce : MD5(ha1, nonce, MD5(METHOD :)))
-     */
-    Qn::AuthResult authenticateByUrl(
-        const nx::network::HostAddress& clientIp,
-        const QByteArray& authRecord,
-        const QByteArray& method,
-        nx::network::http::Response& response,
-        Qn::UserAccessData* accessRights = nullptr);
 
     LdapManager* ldapManager() const;
 
@@ -115,34 +114,6 @@ signals:
     void emptyDigestDetected(const QnUserResourcePtr& user, const QString& login, const QString& password);
 
 private:
-    class TempAuthenticationKeyCtx
-    {
-    public:
-        nx::utils::TimerManager::TimerGuard timeGuard;
-        QString path;
-        Qn::UserAccessData accessRights;
-
-        TempAuthenticationKeyCtx() {}
-        TempAuthenticationKeyCtx( TempAuthenticationKeyCtx&& right )
-        :
-            timeGuard( std::move( right.timeGuard ) ),
-            path( std::move( right.path ) ),
-            accessRights(right.accessRights)
-        {
-        }
-        TempAuthenticationKeyCtx& operator=( TempAuthenticationKeyCtx&& right )
-        {
-            timeGuard = std::move( right.timeGuard );
-            path = std::move( right.path );
-            accessRights = right.accessRights;
-            return *this;
-        }
-
-    private:
-        TempAuthenticationKeyCtx( const TempAuthenticationKeyCtx& );
-        TempAuthenticationKeyCtx& operator=( const TempAuthenticationKeyCtx& );
-    };
-
     struct AccessFailureData
     {
         std::optional<std::chrono::steady_clock::time_point> lockedOut;
@@ -189,7 +160,6 @@ private:
     void saveLoginResult(
         const nx::String& name, const nx::network::HostAddress& address, Qn::AuthResult result);
 
-    void authenticationExpired( const QString& path, quint64 timerID );
     QnUserResourcePtr findUserByName( const QByteArray& nxUserName ) const;
     void updateUserHashes(const QnUserResourcePtr& userResource, const QString& password);
 
@@ -203,17 +173,19 @@ private:
     Qn::AuthResult checkDigestValidity(QnUserResourcePtr userResource, const QByteArray& digest );
 
 private:
+    nx::network::http::AuthMethodRestrictionList m_authMethodRestrictionList;
+    nx::vms::auth::AbstractNonceProvider* const m_timeBasedNonceProvider;
+    nx::vms::auth::AbstractNonceProvider* const m_nonceProvider;
+    nx::vms::auth::AbstractUserDataProvider* const m_userDataProvider;
+    std::unique_ptr<LdapManager> const m_ldap;
+
     struct SessionKeys: public nx::network::TemporayKeyKeeper<Qn::UserAccessData> { SessionKeys(); };
     SessionKeys m_sessionKeys;
 
+    struct PathKeys: public nx::network::TemporayKeyKeeper<Qn::UserAccessData> { PathKeys(); };
+    SessionKeys m_pathKeys;
+
     mutable QnMutex m_mutex;
-    nx::utils::TimerManager::TimerGuard m_clenupTimer;
-    nx::network::http::AuthMethodRestrictionList m_authMethodRestrictionList;
-    std::map<QString, TempAuthenticationKeyCtx> m_authenticatedPaths;
-    nx::vms::auth::AbstractNonceProvider* m_timeBasedNonceProvider;
-    nx::vms::auth::AbstractNonceProvider* m_nonceProvider;
-    nx::vms::auth::AbstractUserDataProvider* m_userDataProvider;
-    std::unique_ptr<LdapManager> m_ldap;
     mutable std::map<nx::String /*userName*/, std::map<nx::network::HostAddress, AccessFailureData>>
         m_accessFailures;
     std::optional<LockoutOptions> m_lockoutOptions = LockoutOptions();

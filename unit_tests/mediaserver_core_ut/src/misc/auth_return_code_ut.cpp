@@ -84,10 +84,11 @@ public:
         settings->synchronizeNowSync();
     }
 
-    nx::utils::Url serverUrl(const QString& path) const
+    nx::utils::Url serverUrl(const QString& path, const QString& query = {}) const
     {
         nx::utils::Url url = server->apiUrl();
         url.setPath(path);
+        url.setQuery(query);
         return url;
     }
 
@@ -418,8 +419,6 @@ TEST_F(AuthReturnCodeTest, manualDigestWrongMethod_onGateway)
     testServerReturnCode(std::move(client), 401, Qn::AuthResult::Auth_WrongDigest);
 }
 
-
-
 TEST_F(AuthReturnCodeTest, lockoutTest)
 {
     const auto guard = setCustomLockoutOptions();
@@ -471,6 +470,29 @@ TEST_F(AuthReturnCodeTest, sessionKey)
         client->addAdditionalHeader(Qn::EC2_RUNTIME_GUID_HEADER_NAME, sessionKey);
         testServerReturnCode(std::move(client), 200);
     }
+}
+
+TEST_F(AuthReturnCodeTest, authKeyInUrl)
+{
+    auto client = std::make_unique<nx::network::http::HttpClient>();
+
+    ASSERT_TRUE(client->doGet(serverUrl("/ec2/getUsers")));
+    ASSERT_TRUE(client->response());
+    ASSERT_EQ(401, client->response()->statusLine.statusCode);
+
+    const auto queryItem = server->authenticator()->makeQueryItemForPath(
+        Qn::kSystemAccess, "/ec2/getUsers");
+
+    QUrlQuery query;
+    query.addQueryItem(queryItem.first, queryItem.second);
+
+    ASSERT_TRUE(client->doGet(serverUrl("/ec2/getUsers", query.toString())));
+    ASSERT_TRUE(client->response());
+    ASSERT_EQ(200, client->response()->statusLine.statusCode);
+
+    ASSERT_TRUE(client->doGet(serverUrl("/ec2/getUsersEx", query.toString())));
+    ASSERT_TRUE(client->response());
+    ASSERT_EQ(401, client->response()->statusLine.statusCode);
 }
 
 } // namespace test

@@ -195,24 +195,19 @@ Qn::AuthResult Authenticator::doAllMethods(
         return Qn::Auth_OK;
     }
 
+    const auto tempAuthKey = urlQuery.queryItemValue(TEMP_AUTH_KEY_NAME).toUtf8();
+    if (!tempAuthKey.isEmpty())
     {
-        QnMutexLocker lk(&m_mutex);
-        if (urlQuery.hasQueryItem(TEMP_AUTH_KEY_NAME))
+        const auto path = request.requestLine.url.path().toUtf8();
+        if (const auto access = m_pathKeys.get(tempAuthKey, path))
         {
-            NX_VERBOSE(this, lm("Authenticating %1 by auth key").arg(request.requestLine));
+            if (usedAuthMethod)
+                *usedAuthMethod = nx::network::http::AuthMethod::tempUrlQueryParam;
 
-            auto it = m_authenticatedPaths.find(urlQuery.queryItemValue(TEMP_AUTH_KEY_NAME));
-            if (it != m_authenticatedPaths.end() &&
-                it->second.path == request.requestLine.url.path())
-            {
-                NX_VERBOSE(this, lm("Authenticated %1 by auth key").arg(request.requestLine));
+            if (accessRights)
+                *accessRights = std::move(*access);
 
-                if (usedAuthMethod)
-                    *usedAuthMethod = nx::network::http::AuthMethod::tempUrlQueryParam;
-                if (accessRights)
-                    *accessRights = it->second.accessRights;
-                return Qn::Auth_OK;
-            }
+            return Qn::Auth_OK;
         }
     }
 
@@ -254,7 +249,7 @@ Qn::AuthResult Authenticator::doAllMethods(
             NX_VERBOSE(this, lm("Authenticating %1 by auth query item")
                 .arg(request.requestLine));
 
-            auto authResult = authenticateByUrl(
+            auto authResult = tryAuthRecord(
                 clientIp,
                 authQueryParam,
                 request.requestLine.version.protocol == nx_rtsp::rtsp_1_0.protocol
@@ -494,34 +489,11 @@ nx::network::http::AuthMethodRestrictionList* Authenticator::restrictionList()
     return &m_authMethodRestrictionList;
 }
 
-QPair<QString, QString> Authenticator::createAuthenticationQueryItemForPath(
+QPair<QString, QString> Authenticator::makeQueryItemForPath(
     const Qn::UserAccessData& accessRights,
-    const QString& path,
-    std::chrono::milliseconds timeout)
+    const QString& path)
 {
-    QString authKey = QnUuid::createUuid().toString();
-    if (authKey.isEmpty())
-        return QPair<QString, QString>();   //bad guid, failure
-    authKey.replace(lit("{"), QString());
-    authKey.replace(lit("}"), QString());
-
-    //disabling authentication
-    QnMutexLocker lk(&m_mutex);
-
-    //adding active period
-    nx::utils::TimerManager::TimerGuard timerGuard(
-        nx::utils::TimerManager::instance(),
-        nx::utils::TimerManager::instance()->addTimer(
-            std::bind(&Authenticator::authenticationExpired, this, authKey, std::placeholders::_1),
-            std::min(timeout, kMaxKeyLifeTime)));
-
-    TempAuthenticationKeyCtx ctx;
-    ctx.timeGuard = std::move(timerGuard);
-    ctx.path = path;
-    ctx.accessRights = accessRights;
-    m_authenticatedPaths.emplace(authKey, std::move(ctx));
-
-    return QPair<QString, QString>(TEMP_AUTH_KEY_NAME, authKey);
+    return {TEMP_AUTH_KEY_NAME, m_pathKeys.make(accessRights, path.toUtf8())};
 }
 
 bool Authenticator::isLoginLockedOut(
@@ -586,12 +558,6 @@ void Authenticator::saveLoginResult(
             data.failures.push_back(std::chrono::steady_clock::now());
         }
     }
-}
-
-void Authenticator::authenticationExpired(const QString& authKey, quint64 /*timerID*/)
-{
-    QnMutexLocker lk(&m_mutex);
-    m_authenticatedPaths.erase(authKey);
 }
 
 static bool verifyDigestUri(const nx::utils::Url& requestUrl, const QByteArray& uri)
@@ -750,7 +716,7 @@ QByteArray Authenticator::generateNonce(NonceProvider provider) const
         return m_timeBasedNonceProvider->generateNonce();
 }
 
-Qn::AuthResult Authenticator::authenticateByUrl(
+Qn::AuthResult Authenticator::tryAuthRecord(
     const nx::network::HostAddress& clientIp,
     const QByteArray& authRecordBase64,
     const QByteArray& method,
@@ -839,6 +805,12 @@ void Authenticator::setLockoutOptions(std::optional<LockoutOptions> options)
 Authenticator::SessionKeys::SessionKeys():
     nx::network::TemporayKeyKeeper<Qn::UserAccessData>(
         {kSessionKeyLifeTime, /*prolongLifeOnUse*/ true})
+{
+}
+
+Authenticator::PathKeys::PathKeys():
+    nx::network::TemporayKeyKeeper<Qn::UserAccessData>(
+        {kPathKeyLifeTime, /*prolongLifeOnUse*/ false})
 {
 }
 

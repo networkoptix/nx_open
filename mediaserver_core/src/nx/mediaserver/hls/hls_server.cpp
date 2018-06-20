@@ -992,11 +992,11 @@ nx::network::http::StatusCode::Value HttpLiveStreamingProcessor::createSession(
 
     const auto authorizer = QnUniversalTcpListener::authorizer(owner());
 
-    const auto& chunkAuthenticationKey = authorizer->createAuthenticationQueryItemForPath(
+    const auto& chunkAuthenticationKey = authorizer->makeQueryItemForPath(
         accessRights, HLS_PREFIX + camResource->getUniqueId() + ".ts");
     newHlsSession->setChunkAuthenticationQueryItem( chunkAuthenticationKey );
 
-    const auto& playlistAuthenticationKey = authorizer->createAuthenticationQueryItemForPath(
+    const auto& playlistAuthenticationKey = authorizer->makeQueryItemForPath(
         accessRights, requestedPlaylistPath);
     newHlsSession->setPlaylistAuthenticationQueryItem( playlistAuthenticationKey );
 

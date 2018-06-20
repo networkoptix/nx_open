@@ -28,7 +28,7 @@ int QnCurrentUserRestHandler::executeGet(
     if (accessRights.isNull())
     {
         nx::network::http::Response response;
-        authorizer->authenticateByUrl(
+        authorizer->tryAuthRecord(
             clientIp, params.value(Qn::URL_QUERY_AUTH_KEY_NAME).toUtf8(),
             "GET", response, &accessRights);
     }
