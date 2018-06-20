@@ -14,12 +14,10 @@
 #include "streaming_chunk.h"
 #include "streaming_chunk_cache_key.h"
 
-
 class QnTranscoder;
 class StreamingChunkCacheKey;
 
-class StreamingChunkTranscoderThread
-:
+class StreamingChunkTranscoderThread:
     public QnLongRunnable
 {
     Q_OBJECT
@@ -32,26 +30,25 @@ public:
         int transcodingID,
         StreamingChunkPtr chunk,
         DataSourceContextPtr dataSourceCtx,
-        const StreamingChunkCacheKey& transcodeParams );
-    //void cancel( int transcodingID );
+        const StreamingChunkCacheKey& transcodeParams);
 
     size_t ongoingTranscodings() const;
 
-public slots:
+    public slots:
     virtual void pleaseStop() override;
 
 protected:
     virtual void run() override;
 
-protected slots:
-    void onStreamDataAvailable( AbstractOnDemandDataProvider* pThis );
+    protected slots:
+    void onStreamDataAvailable(AbstractOnDemandDataProvider* pThis);
 
 signals:
     void transcodingFinished(
         int transcodingID,
         bool result,
         const StreamingChunkCacheKey& key,
-        DataSourceContextPtr data );
+        DataSourceContextPtr data);
 
 private:
     class TranscodeContext
@@ -73,7 +70,7 @@ private:
         TranscodeContext(
             StreamingChunkPtr _chunk,
             DataSourceContextPtr dataSourceCtx,
-            const StreamingChunkCacheKey& _transcodeParams );
+            const StreamingChunkCacheKey& _transcodeParams);
     };
 
     //map<transcodingID, TranscodeContext>
@@ -87,7 +84,7 @@ private:
     void removeTranscodingNonSafe(
         const std::map<int, std::unique_ptr<TranscodeContext>>::iterator& transcodingIter,
         bool transcodingFinishedSuccessfully,
-        QnMutexLockerBase* const lk );
+        QnMutexLockerBase* const lk);
     void finishTranscoding(
         QnMutexLockerBase* const lk,
         const std::map<int, std::unique_ptr<TranscodeContext>>::iterator& transcodingIter,

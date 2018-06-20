@@ -8,16 +8,15 @@
 namespace nx_hls {
 
 //!Redirects calls to another AbstractPlaylistManager. If target object has been removed, does nothing
-class HlsPlayListManagerWeakRefProxy
-:
+class HlsPlayListManagerWeakRefProxy:
     public AbstractPlaylistManager
 {
 public:
-    HlsPlayListManagerWeakRefProxy( AbstractPlaylistManagerPtr target );
+    HlsPlayListManagerWeakRefProxy(AbstractPlaylistManagerPtr target);
 
     virtual size_t generateChunkList(
         std::vector<ChunkData>* const chunkList,
-        bool* const endOfStreamReached ) const override;
+        bool* const endOfStreamReached) const override;
     virtual int getMaxBitrate() const override;
 
 private:

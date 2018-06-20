@@ -14,11 +14,11 @@ public:
     virtual ~AbstractStreamingChunkProvider() = default;
 
     /**
-        Posts a task to transcoder to create required chunk.
-        Does not wait for transcoding to complete, so returned chunk is still being filled with data,
-        or transcoding could be not even started if chunk time is in future.
-        @return Returned chunk is in opened state. Ownership is passed to the caller.
-    */
+     * Posts a task to transcoder to create required chunk.
+     * Does not wait for transcoding to complete, so returned chunk is still being filled with data,
+     * or transcoding could be not even started if chunk time is in future.
+     * @return Returned chunk is in opened state. Ownership is passed to the caller.
+     */
     virtual bool get(
         const StreamingChunkCacheKey& key,
         int* const itemCost,
@@ -27,9 +27,6 @@ public:
 
 //-------------------------------------------------------------------------------------------------
 
-/*!
-    \note Not thread-safe
-*/
 class StreamingChunkProvider:
     public AbstractStreamingChunkProvider
 {

@@ -73,7 +73,7 @@ bool StreamingChunk::tryRead(
 
     if (ctx->m_currentOffset >= dataOffsetAtTheEndOfTheBuffer) //< Whole data has been read.
     {
-        // If chunk is not opened, signalling end-of-data. 
+        // If chunk is not opened, signalling end-of-data.
         // Otherwise, expecting more data to arrive to chunk.
         return m_modificationState != State::opened;
     }
@@ -246,8 +246,8 @@ bool StreamingChunkInputStream::tryRead(
     dataBuffer->append(chunkData.mid(
         m_range.get().rangeSpec.start,
         m_range.get().rangeSpec.end
-        ? (m_range.get().rangeSpec.end.get() - m_range.get().rangeSpec.start)
-        : -1));
+            ? (m_range.get().rangeSpec.end.get() - m_range.get().rangeSpec.start)
+            : -1));
 
     return true;
 }
