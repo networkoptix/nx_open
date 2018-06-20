@@ -202,8 +202,8 @@ class UpdatesServer(object):
 
         @app.route('/<path:path>')
         def serve(path):
-            path = self.data_dir.joinpath(path).resolve()
-            if self.data_dir not in path.parents:
+            path = self.data_dir.joinpath(path)
+            if self.data_dir.resolve() not in path.resolve().parents:
                 raise SecurityError("Resolved path is outside of data dir.")
             if 'Range' in request.headers and range_header_policy == 'err':
                 raise BadRequest('Range header is not supported')
