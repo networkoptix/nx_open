@@ -48,7 +48,7 @@ angular.module('cloudApp').directive('processButton', ['$timeout',function ($tim
                     touchForm(scope.form);
 
                     $timeout(function () {
-                        if(scope.form && scope.form.$invalid || scope.form && scope.form.$invalid === undefined){
+                        if(scope.form && (scope.form.$invalid || scope.form.$invalid === undefined)){
                             setFocusToInvalid(scope.form);
                             return false;
                         } else {
