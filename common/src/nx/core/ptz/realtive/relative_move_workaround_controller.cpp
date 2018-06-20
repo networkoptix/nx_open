@@ -78,8 +78,11 @@ RelativeMoveWorkaroundController::RelativeMoveWorkaroundController(
     const QnPtzControllerPtr& controller)
     :
     base_type(controller),
-    m_continuousMoveEngine(std::make_unique<RelativeContinuousMoveEngine>()),
-    m_absoluteMoveEngine(std::make_unique<RelativeAbsoluteMoveEngine>())
+    m_continuousMoveEngine(
+        std::make_unique<RelativeContinuousMoveEngine>(
+            controller.data(),
+            RelativeContinuousMoveMapping())), //< TODO: #dmishin pass mapping to controller.
+    m_absoluteMoveEngine(std::make_unique<RelativeAbsoluteMoveEngine>(controller.data()))
 {
 }
 

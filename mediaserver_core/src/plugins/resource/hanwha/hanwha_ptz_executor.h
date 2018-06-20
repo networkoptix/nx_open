@@ -3,6 +3,8 @@
 #include <plugins/resource/hanwha/hanwha_resource.h>
 #include <plugins/resource/hanwha/hanwha_range.h>
 
+#include <nx/core/ptz/vector.h>
+
 #include <nx/network/http/http_async_client.h>
 #include <nx/utils/std/optional.h>
 #include <nx/utils/url.h>

@@ -6,15 +6,24 @@
 #ifndef ILP_DISCOVERY_MANAGER_H
 #define ILP_DISCOVERY_MANAGER_H
 
-#include <camera/camera_plugin.h>
+#include <vector>
 
+#include <camera/camera_plugin.h>
 #include <plugins/plugin_tools.h>
 #include <plugins/plugin_container_api.h>
 
+#include <QtCore/QString>
+#include <QtCore/QUrl>
+
+
+struct UrlPathReplaceRecord
+{
+    QString fromPath;
+    QString toPath;
+};
+
 //!Represents defined (in settings) image directories as cameras with dts archive storage
-class DiscoveryManager
-:
-    public nxcip::CameraDiscoveryManager
+class DiscoveryManager: public nxcip::CameraDiscoveryManager2
 {
 public:
     DiscoveryManager(nxpt::CommonRefManager* const refManager,
@@ -29,10 +38,17 @@ public:
 
     //!Implementation of nxcip::CameraDiscoveryManager::getVendorName
     virtual void getVendorName( char* buf ) const override;
+
     //!Implementation of nxcip::CameraDiscoveryManager::findCameras
     virtual int findCameras( nxcip::CameraInfo* cameras, const char* localInterfaceIPAddr ) override;
+    //!Implementation of nxcip::CameraDiscoveryManager2::findCameras
+    virtual int findCameras2(nxcip::CameraInfo2* cameras, const char* localInterfaceIPAddr) override;
+
     //!Implementation of nxcip::CameraDiscoveryManager::checkHostAddress
-    virtual int checkHostAddress( nxcip::CameraInfo* cameras, const char* address, const char* login, const char* password ) override;
+    virtual int checkHostAddress(nxcip::CameraInfo* cameras, const char* address, const char* login, const char* password ) override;
+    //!Implementation of nxcip::CameraDiscoveryManager2::checkHostAddress
+    virtual int checkHostAddress2(nxcip::CameraInfo2* cameras, const char* address, const char* login, const char* password) override;
+
     //!Implementation of nxcip::CameraDiscoveryManager::fromMDNSData
     virtual int fromMDNSData(
         const char* discoveredAddress,
@@ -48,10 +64,14 @@ public:
         Does nothing
     */
     virtual int getReservedModelList( char** modelList, int* count ) override;
-
+private:
+    QList<QUrl> translateUrlHook(const QUrl& url) const;
+    QString getGroupName(const QUrl& url) const;
+    static bool validateUrl(const QUrl& url);
 private:
     nxpt::CommonRefManager m_refManager;
     nxpl::TimeProvider *const m_timeProvider;
+    std::vector<UrlPathReplaceRecord> m_replaceData;
 };
 
 #endif  //ILP_DISCOVERY_MANAGER_H

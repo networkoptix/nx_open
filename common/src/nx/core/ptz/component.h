@@ -14,6 +14,7 @@ enum class Component
     tilt = 1 << 1,
     rotation = 1 << 2,
     zoom = 1 << 3,
+    focus = 1 << 4,
 };
 Q_DECLARE_FLAGS(Components, Component)
 Q_DECLARE_OPERATORS_FOR_FLAGS(Components)
