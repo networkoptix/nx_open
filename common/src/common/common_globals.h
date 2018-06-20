@@ -9,7 +9,7 @@
 
 #include <nx/fusion/model_functions_fwd.h>
 #include <nx/fusion/serialization_format.h>
-#include <nx/vms/api/types/access_types.h>
+#include <nx/vms/api/types/access_rights_types.h>
 #include <nx/vms/api/types/motion_types.h>
 #include <nx/vms/api/types/resource_types.h>
 

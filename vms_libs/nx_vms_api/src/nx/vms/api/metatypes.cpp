@@ -30,7 +30,7 @@
 #include "data/event_rule_data.h"
 #include "data/cleanup_db_data.h"
 
-#include "types/access_types.h"
+#include "types/access_rights_types.h"
 
 namespace {
 

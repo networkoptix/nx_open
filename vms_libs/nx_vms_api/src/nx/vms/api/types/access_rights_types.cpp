@@ -1,4 +1,4 @@
-#include "access_types.h"
+#include "access_rights_types.h"
 
 #include <nx/fusion/model_functions.h>
 

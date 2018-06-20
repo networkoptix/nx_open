@@ -2,7 +2,7 @@
 
 #include "api_data.h"
 
-#include <nx/vms/api/types/access_types.h>
+#include <nx/vms/api/types/access_rights_types.h>
 
 namespace ec2 {
 
