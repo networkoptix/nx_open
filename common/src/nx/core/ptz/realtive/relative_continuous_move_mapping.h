@@ -68,10 +68,11 @@ struct RelativeContinuousMoveMapping
     (RelativeContinuousMoveMapping)\
     (RelativeContinuousMoveComponentMapping)
 
-QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(CONTINUOUS_PTZ_MAPPING_TYPES, (json))
+QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(CONTINUOUS_PTZ_MAPPING_TYPES, (json)(eq))
 
 } // namespace ptz
 } // namespace core
 } // namespace nx
 
+Q_DECLARE_METATYPE(nx::core::ptz::RelativeContinuousMoveMapping);
 QN_FUSION_DECLARE_FUNCTIONS(nx::core::ptz::AccelerationType, (lexical));

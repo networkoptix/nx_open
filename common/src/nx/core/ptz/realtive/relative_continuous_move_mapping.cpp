@@ -6,20 +6,20 @@ namespace nx {
 namespace core {
 namespace ptz {
 
-QN_FUSION_ADAPT_STRUCT_FUNCTIONS(Speed, (json), PtzSpeed_Fields);
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS(Speed, (json)(eq), PtzSpeed_Fields);
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(
     AccelerationParameters,
-    (json),
+    (json)(eq),
     PtzAccelerationParameters_Fields);
 
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(
     RelativeContinuousMoveComponentMapping,
-    (json),
+    (json)(eq),
     RelativeContinuousMoveComponentMapping_Fields);
 
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(
     RelativeContinuousMoveMapping,
-        (json),
+        (json)(eq),
         RelativeContinuousMoveMapping_Fields);
 
 RelativeContinuousMoveComponentMapping RelativeContinuousMoveMapping::componentMapping(
