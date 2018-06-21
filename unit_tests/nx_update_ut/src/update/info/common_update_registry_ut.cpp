@@ -56,7 +56,7 @@ protected:
         const OsVersion& osVersion,
         const QList<QnUuid>& additionalPeers)
     {
-        UpdateFileRequestData request;
+        UpdateRequestData request;
 
         request.isClient = false;
         request.currentNxVersion = QnSoftwareVersion("3.1.0");
@@ -163,7 +163,7 @@ private:
 
     void assertDataPresence(const OsVersion& version, bool shouldBePresent)
     {
-        UpdateFileRequestData request;
+        UpdateRequestData request;
 
         request.isClient = false;
         request.currentNxVersion = QnSoftwareVersion("3.1.0");
@@ -191,12 +191,8 @@ TEST_F(CommonUpdateRegistry, manualData_remove)
     whenManualDataAdded(kManualFile1, kOsVersion1);
     whenManualDataAdded(kManualFile2, kOsVersion2);
 
-    thenAllPeersShouldBePresent(kOsVersion1, QList<QnUuid>() << kPeer1Id);
-    thenAllPeersShouldBePresent(kOsVersion2, QList<QnUuid>() << kPeer1Id);
-
     whenManualDataRemoved(kManualFile2);
     thenManualDataShouldNotBeFound(kOsVersion2);
-    thenAllPeersShouldBePresent(kOsVersion1, QList<QnUuid>() << kPeer1Id);
 
     whenManualDataRemoved(kManualFile1);
     thenManualDataShouldNotBeFound(kOsVersion1);

@@ -65,6 +65,11 @@ cp "$LAUNCHER_DIR/Contents/MacOS/droplet" "$APP_DIR/Contents/MacOS/launcher"
 
 #
 
+function hard_detach_dmg
+{
+    lsof -t "$1" | xargs kill -9
+}
+
 patch_dsstore "$SRC/DS_Store" "$SRC/.DS_Store" $RELEASE_VERSION
 rm "$SRC/DS_Store"
 
@@ -85,6 +90,9 @@ then
 fi
 
 SetFile -c icnC $SRC/.VolumeIcon.icns
+
+hard_detach_dmg "raw-$DMG_FILE"
+
 hdiutil create -srcfolder $SRC -volname "$VOLUME_NAME" -fs "HFS+" -format UDRW -ov "raw-$DMG_FILE"
 
 [ "$1" == "rwonly" ] && exit 0
@@ -112,6 +120,6 @@ done
 
 rm -rf "$TMP"
 rm -f "$DMG_FILE"
-lsof -t "raw-$DMG_FILE" | xargs kill -9
+hard_detach_dmg "raw-$DMG_FILE"
 hdiutil convert "raw-$DMG_FILE" -format UDZO -o "$DMG_FILE"
 rm -f "raw-$DMG_FILE"

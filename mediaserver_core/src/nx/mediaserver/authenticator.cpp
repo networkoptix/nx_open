@@ -58,12 +58,13 @@ static const QString TEMP_AUTH_KEY_NAME = lit("authKey");
 Authenticator::Authenticator(
     QnCommonModule* commonModule,
     TimeBasedNonceProvider* timeBasedNonceProvider,
-    nx::vms::cloud_integration::CloudManagerGroup* cloudManagerGroup)
+    nx::vms::auth::AbstractNonceProvider* cloudNonceProvider,
+    nx::vms::auth::AbstractUserDataProvider* userAuthenticator)
 :
     QnCommonModuleAware(commonModule),
     m_timeBasedNonceProvider(timeBasedNonceProvider),
-    m_nonceProvider(&cloudManagerGroup->authenticationNonceFetcher),
-    m_userDataProvider(&cloudManagerGroup->userAuthenticator),
+    m_nonceProvider(cloudNonceProvider),
+    m_userDataProvider(userAuthenticator),
     m_ldap(std::make_unique<LdapManager>(commonModule))
 {
 }

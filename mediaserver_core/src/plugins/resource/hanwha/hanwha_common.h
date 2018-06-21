@@ -175,6 +175,7 @@ static const QString kHanwhaToDateProperty = lit("ToDate");
 static const QString kHanwhaOverlappedIdProperty = lit("OverlappedID");
 static const QString kHanwhaResultsInUtcProperty = lit("ResultsInUTC");
 static const QString kHanwhaRecordingTypeProperty = lit("Type");
+static const QString kHanwhaSequenceIdProperty = lit("SunapiSeqId");
 
 static const QString kHanwhaNearFocusMove = lit("Near");
 static const QString kHanwhaFarFocusMove = lit("Far");

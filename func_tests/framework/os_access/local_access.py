@@ -4,17 +4,9 @@ import tzlocal
 
 from framework.networking.prohibited import ProhibitedNetworking
 from framework.os_access.local_path import LocalPath
+from framework.os_access.os_access_interface import OneWayPortMap, ReciprocalPortMap
 from framework.os_access.posix_access import PosixAccess
 from framework.os_access.posix_shell import local_shell
-
-
-class _LocalPorts(object):
-    def __getitem__(self, protocol_port):
-        protocol, port = protocol_port
-        return '127.0.0.1', port
-
-
-_local_ports = _LocalPorts()
 
 
 class LocalAccess(PosixAccess):
@@ -34,8 +26,8 @@ class LocalAccess(PosixAccess):
         return ProhibitedNetworking()
 
     @property
-    def forwarded_ports(self):
-        return _local_ports
+    def port_map(self):
+        return ReciprocalPortMap(OneWayPortMap.local(), OneWayPortMap.local())
 
     def get_time(self):
         local_timezone = tzlocal.get_localzone()

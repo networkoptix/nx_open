@@ -184,7 +184,6 @@
 #include <ui/delegates/resource_item_delegate.h>
 #include "ui/dialogs/adjust_video_dialog.h"
 #include "ui/graphics/items/resource/resource_widget_renderer.h"
-#include "ui/widgets/palette_widget.h"
 #include "network/authutil.h"
 #include <core/resource/fake_media_server.h>
 #include <client/client_app_info.h>
@@ -192,6 +191,7 @@
 
 #include <nx/client/desktop/ui/main_window.h>
 #include <ui/models/resource/resource_list_model.h>
+#include <QtWidgets/QTableView>
 
 using nx::client::core::Geometry;
 
@@ -1477,9 +1477,9 @@ qint64 ActionHandler::getFirstBookmarkTimeMs()
     static const qint64 kOneYearOffsetMs = kOneDayOffsetMs * 365;
     const auto nowMs = qnSyncTime->currentMSecsSinceEpoch();
     const auto bookmarksWatcher = context()->instance<QnWorkbenchBookmarksWatcher>();
-    const auto firstBookmarkUtcTimeMs = bookmarksWatcher->firstBookmarkUtcTimeMs();
-    const bool firstTimeIsNotKnown = (firstBookmarkUtcTimeMs == QnWorkbenchBookmarksWatcher::kUndefinedTime);
-    return (firstTimeIsNotKnown ? nowMs - kOneYearOffsetMs : firstBookmarkUtcTimeMs);
+    const auto firstBookmarkUtcTime = bookmarksWatcher->firstBookmarkUtcTime();
+    const bool firstTimeIsNotKnown = (firstBookmarkUtcTime == QnWorkbenchBookmarksWatcher::kUndefinedTime);
+    return (firstTimeIsNotKnown ? nowMs - kOneYearOffsetMs : firstBookmarkUtcTime.count());
 }
 
 void ActionHandler::renameLocalFile(const QnResourcePtr& resource, const QString& newName)

@@ -10,10 +10,10 @@
 #include <ui/style/helper.h>
 
 namespace {
-    const QString kIconPlus(lit("buttons/arythmetic_plus.png"));
-    const QString kIconPlusHovered(lit("buttons/arythmetic_plus_hovered.png"));
-    const QString kIconMinus(lit("buttons/arythmetic_minus.png"));
-    const QString kIconMinusHovered(lit("buttons/arythmetic_minus_hovered.png"));
+    const QString kIconPlus(lit("text_buttons/arythmetic_plus.png"));
+    const QString kIconPlusHovered(lit("text_buttons/arythmetic_plus_hovered.png"));
+    const QString kIconMinus(lit("text_buttons/arythmetic_minus.png"));
+    const QString kIconMinusHovered(lit("text_buttons/arythmetic_minus_hovered.png"));
     const QSize kButtonSize(20, 20);
     const int kSliderHeight = 120;
     const int kControlBtn = Qt::LeftButton;

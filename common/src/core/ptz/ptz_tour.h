@@ -9,7 +9,16 @@
 struct QnPtzTourSpot
 {
     QnPtzTourSpot(): stayTime(0), speed(1.0) {}
-    QnPtzTourSpot(const QString &presetId, qint64 stayTime, qreal speed): presetId(presetId), stayTime(stayTime), speed(speed) {}
+    QnPtzTourSpot(
+        const QString &presetId,
+        qint64 stayTime,
+        qreal speed)
+        :
+        presetId(presetId),
+        stayTime(stayTime),
+        speed(speed)
+    {
+    }
 
     QString presetId;
     qint64 stayTime;
@@ -21,7 +30,16 @@ struct QnPtzTour
 {
     QnPtzTour() {}
     QnPtzTour(const QnPtzTour &tour): id(tour.id), name(tour.name), spots(tour.spots) {}
-    QnPtzTour(const QString &id, const QString &name, const QnPtzTourSpotList &spots): id(id), name(name), spots(spots) {}
+    QnPtzTour(
+        const QString &id,
+        const QString &name,
+        const QnPtzTourSpotList &spots)
+        :
+        id(id),
+        name(name),
+        spots(spots)
+    {
+    }
 
     /**
      * @brief isValid                   Check validity of the tour.

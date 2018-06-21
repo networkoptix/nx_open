@@ -68,20 +68,8 @@ protected:
 
     void thenManuallyAddedDataShouldBeFoundCorrectly()
     {
-        FileData fileData;
-        auto resultCode = m_updateRegistry->findUpdateFile(
-            UpdateFileRequestData(
-                "any_cloud_host", "any_customization",
-                QnSoftwareVersion(3, 0, 0, 9872), macosx(), false),
-            &fileData);
-        assertFoundWithManualData(resultCode, fileData, m_manualData1);
-
-        resultCode = m_updateRegistry->findUpdateFile(
-            UpdateFileRequestData(
-                "any_cloud_host", "any_customization",
-                QnSoftwareVersion(3, 0, 0, 9872), ubuntuX64(), true),
-            &fileData);
-        assertFoundWithManualData(resultCode, fileData, m_manualData2);
+        thenManuallyAddedDataShouldBeFoundCorrectlyImpl(m_manualData1);
+        thenManuallyAddedDataShouldBeFoundCorrectlyImpl(m_manualData2);
     }
 
 private:
@@ -111,6 +99,7 @@ private:
     void assertUpdateRegistryContent() const
     {
         assertAlternativeServer();
+        ASSERT_EQ(42, m_updateRegistry->updateVersion());
         assertFileDataContent();
         assertUpdateDataContent();
         assertSerializability();
@@ -125,66 +114,76 @@ private:
 
     void assertUpdateDataContent() const
     {
-        QnSoftwareVersion softwareVersion;
+        QList<api::TargetVersionWithEula> softwareVersions;
         ResultCode resultCode = m_updateRegistry->latestUpdate(
-            UpdateRequestData("nxvms.com", "default", QnSoftwareVersion(2, 0, 0, 0)),
-            &softwareVersion);
+            UpdateRequestData(
+                "nxvms.com", "default", QnSoftwareVersion(2, 0, 0, 0), ubuntuX64(), nullptr, false),
+            &softwareVersions);
         assertLatestUpdateResult(
             resultCode,
             QnSoftwareVersion("3.1.0.16975"),
-            softwareVersion,
+            softwareVersions,
             false);
 
         resultCode = m_updateRegistry->latestUpdate(
-            UpdateRequestData("nxvms.com", "default", QnSoftwareVersion(4, 0, 0, 0)),
-            &softwareVersion);
+            UpdateRequestData(
+                "nxvms.com", "default", QnSoftwareVersion(4, 0, 0, 0),
+                ubuntuX64(), nullptr, false),
+            &softwareVersions);
         assertLatestUpdateResult(
             resultCode,
             QnSoftwareVersion("3.1.0.16975"),
-            softwareVersion,
+            softwareVersions,
             true);
 
         resultCode = m_updateRegistry->latestUpdate(
-            UpdateRequestData("nxvms.com", "default", QnSoftwareVersion(3, 2, 0, 0)),
-            &softwareVersion);
+            UpdateRequestData(
+                "nxvms.com", "default", QnSoftwareVersion(3, 2, 0, 0), ubuntuX64(), nullptr, false),
+            &softwareVersions);
         assertLatestUpdateResult(
             resultCode,
             QnSoftwareVersion("3.1.0.16975"),
-            softwareVersion,
+            softwareVersions,
             true);
 
         resultCode = m_updateRegistry->latestUpdate(
-            UpdateRequestData("invalid.host.com", "default", QnSoftwareVersion(2, 1, 0, 0)),
-            &softwareVersion);
+            UpdateRequestData(
+                "invalid.host.com", "default", QnSoftwareVersion(2, 1, 0, 0),
+                ubuntuX64(), nullptr, false),
+            &softwareVersions);
         assertLatestUpdateResult(
             resultCode,
             QnSoftwareVersion("3.1.0.16975"),
-            softwareVersion,
+            softwareVersions,
             true);
 
         resultCode = m_updateRegistry->latestUpdate(
-            UpdateRequestData("qcloud.vista-cctv.com", "vista", QnSoftwareVersion(2, 1, 0, 0)),
-            &softwareVersion);
+            UpdateRequestData(
+                "qcloud.vista-cctv.com", "vista", QnSoftwareVersion(2, 1, 0, 0),
+                ubuntuX64(), nullptr, false),
+            &softwareVersions);
         assertLatestUpdateResult(
             resultCode,
             QnSoftwareVersion("3.1.0.16975"),
-            softwareVersion,
+            softwareVersions,
             false);
 
         resultCode = m_updateRegistry->latestUpdate(
-            UpdateRequestData("tricom.cloud-demo.hdw.mx", "tricom", QnSoftwareVersion(2, 1, 0, 0)),
-            &softwareVersion);
+            UpdateRequestData(
+                "tricom.cloud-demo.hdw.mx", "tricom", QnSoftwareVersion(2, 1, 0, 0),
+                ubuntuX64(), nullptr, false),
+            &softwareVersions);
         assertLatestUpdateResult(
             resultCode,
             QnSoftwareVersion("3.0.0.14532"),
-            softwareVersion,
+            softwareVersions,
             false);
     }
 
     void assertLatestUpdateResult(
         const ResultCode resultCode,
         const QnSoftwareVersion& expectedVersion,
-        const QnSoftwareVersion& actualVersion,
+        const QList<api::TargetVersionWithEula>& actualVersions,
         const bool shouldFail) const
     {
         if (shouldFail)
@@ -194,49 +193,59 @@ private:
         }
 
         ASSERT_EQ(ResultCode::ok, resultCode);
-        ASSERT_EQ(expectedVersion, actualVersion);
+        ASSERT_TRUE(std::any_of(
+            actualVersions.begin(),
+            actualVersions.end(),
+            [&expectedVersion](const api::TargetVersionWithEula& v)
+            {
+                return v.targetVersion == expectedVersion;
+            }));
     }
 
     void assertFileDataContent() const
     {
         FileData fileData;
+        QnSoftwareVersion targetVersion3_1("3.1.0.16975");
         ResultCode resultCode = m_updateRegistry->findUpdateFile(
-            UpdateFileRequestData(
-                "nxvms.com", "default", QnSoftwareVersion(2, 0, 0, 0), ubuntuX64(), false),
+            UpdateRequestData(
+                "nxvms.com", "default", QnSoftwareVersion(2, 0, 0, 0),
+                ubuntuX64(), &targetVersion3_1, false),
             &fileData);
         assertFindResult(resultCode, fileData, false);
 
         resultCode = m_updateRegistry->findUpdateFile(
-            UpdateFileRequestData(
-                "nxvms.com", "default", QnSoftwareVersion(10, 0, 0, 0), ubuntuX64(), false),
+            UpdateRequestData(
+                "nxvms.com", "default", QnSoftwareVersion(10, 0, 0, 0),
+                ubuntuX64(), &targetVersion3_1, false),
             &fileData);
         assertFindResult(resultCode, fileData, true);
 
         resultCode = m_updateRegistry->findUpdateFile(
-            UpdateFileRequestData(
-                "not-existing-host", "default",
-                QnSoftwareVersion(2, 0, 0, 0), ubuntuX64(), false),
+            UpdateRequestData(
+                "not-existing-host", "default", QnSoftwareVersion(2, 0, 0, 0),
+                ubuntuX64(), &targetVersion3_1, false),
             &fileData);
         assertFindResult(resultCode, fileData, true);
 
         resultCode = m_updateRegistry->findUpdateFile(
-            UpdateFileRequestData(
-                "nxvms.com", "not-existing-customization",
-                QnSoftwareVersion(2, 0, 0, 0), ubuntuX64(), false),
+            UpdateRequestData(
+                "nxvms.com", "not-existing-customization", QnSoftwareVersion(2, 0, 0, 0),
+                ubuntuX64(), &targetVersion3_1, false),
             &fileData);
         assertFindResult(resultCode, fileData, true);
 
         resultCode = m_updateRegistry->findUpdateFile(
-            UpdateFileRequestData(
-                "qcloud.vista-cctv.com", "vista",
-                QnSoftwareVersion(3, 0, 2, 9872), windowsX64(), false),
+            UpdateRequestData(
+                "qcloud.vista-cctv.com", "vista", QnSoftwareVersion(3, 0, 2, 9872),
+                windowsX64(), &targetVersion3_1, false),
             &fileData);
         assertFindResult(resultCode, fileData, false);
 
+        QnSoftwareVersion targetVersion3_1_tricom("3.0.0.14532");
         resultCode = m_updateRegistry->findUpdateFile(
-            UpdateFileRequestData(
-                "tricom.cloud-demo.hdw.mx", "tricom",
-                QnSoftwareVersion(3, 0, 0, 9872), armRpi(), false),
+            UpdateRequestData(
+                "tricom.cloud-demo.hdw.mx", "tricom", QnSoftwareVersion(3, 0, 0, 9872),
+                armRpi(), &targetVersion3_1_tricom, false),
             &fileData);
         assertFindResult(resultCode, fileData, false);
     }
@@ -271,6 +280,19 @@ private:
         auto newUpdateRegistry = UpdateRegistryFactory::create(kCurrentPeerId);
         ASSERT_TRUE(newUpdateRegistry->fromByteArray(rawData));
         ASSERT_TRUE(m_updateRegistry->equals(newUpdateRegistry.get()));
+    }
+
+    void thenManuallyAddedDataShouldBeFoundCorrectlyImpl(const ManualFileData& referenceData)
+    {
+        FileData fileData;
+        auto resultCode = m_updateRegistry->findUpdateFile(
+            UpdateRequestData(
+                "any_cloud_host", "any_customization",
+                QnSoftwareVersion(3, 0, 0, 9872), referenceData.osVersion,
+                &referenceData.nxVersion, referenceData.isClient),
+            &fileData);
+        assertFoundWithManualData(resultCode, fileData, referenceData);
+
     }
 };
 

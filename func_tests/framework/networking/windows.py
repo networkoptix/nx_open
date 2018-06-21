@@ -2,6 +2,7 @@ import logging
 from pprint import pformat
 
 from netaddr import EUI, IPNetwork, mac_eui48
+from winrm.exceptions import WinRMError
 
 from framework.method_caching import cached_property
 from framework.networking.interface import Networking
@@ -67,19 +68,29 @@ class WindowsNetworking(Networking):
         return bool(rules)
 
     def create_firewall_rule(self):
-        self._winrm.run_powershell_script(
-            # language=PowerShell
-            '''
-                if ( -not ( Get-NetFirewallRule -Name:$Name -ErrorAction:SilentlyContinue ) ) {
-                    $newRule = New-NetFirewallRule `
-                        -Name:$Name `
-                        -DisplayName:$DisplayName `
-                        -Direction:Outbound `
-                        -RemoteAddress:@('10.0.0.0/8', '192.168.0.0/16') `
-                        -Action:Allow
-                }
-                ''',
-            {'Name': self._firewall_rule_name, 'DisplayName': self._firewall_rule_display_name})
+        # No problem if there are multiple identical rules.
+        query = self._winrm.wmi_query(u'MSFT_NetFirewallRule', {}, namespace='Root/StandardCimv2')
+        properties_dict = {
+            # See on numeric constants: https://msdn.microsoft.com/en-us/library/jj676843(v=vs.85).aspx
+            u'InstanceID': self._firewall_rule_name,
+            u'ElementName': self._firewall_rule_display_name,
+            u'Direction': 2,  # Outbound.
+            u'Action': 2,  # Allow.
+            }
+        try:
+            selector_set = query.create(properties_dict)
+        except WinRMError as e:
+            if u'already exists' not in e.message:  # TODO: Retrieve detailed error from pywinrm internals.
+                raise
+            _logger.error(e.message, exc_info=e)
+        else:
+            self._winrm.run_powershell_script(
+                # language=PowerShell
+                '''
+                    Set-NetFirewallRule -RemoteAddress @('10.0.0.0/8', '192.168.0.0/16') `
+                        -Name:$Name
+                    ''',
+                {'Name': self._firewall_rule_name})
 
     def remove_firewall_rule(self):
         self._winrm.run_powershell_script(
@@ -92,24 +103,30 @@ class WindowsNetworking(Networking):
                 ''',
             {'Name': self._firewall_rule_name})
 
+    def _network_profile_wmi_query(self, informal_profile_name):
+        query = self._winrm.wmi_query(
+            u'MSFT_NetFirewallProfile',
+            {u'InstanceID': u'MSFT|FW|FirewallProfile|{}'.format(informal_profile_name)},
+            namespace='Root/StandardCimv2')
+        return query
+
+    def _allow_outbound_by_default(self, allow):
+        value = 0 if allow else 1  # "0 -> enable, 1 or any positive -> disable.
+        for profile_name in {'Private', 'Domain', 'Public'}:
+            query = self._network_profile_wmi_query(profile_name)
+            query.put({u'DefaultOutboundAction': value})
+
     def disable_internet(self):
-        self._winrm.run_powershell_script(
-            # language=PowerShell
-            '''Set-NetFirewallProfile -DefaultOutboundAction:Block''',
-            {})
+        self._allow_outbound_by_default(False)
 
     def enable_internet(self):
-        self._winrm.run_powershell_script(
-            # language=PowerShell
-            '''Set-NetFirewallProfile -DefaultOutboundAction:Allow''',
-            {})
+        self._allow_outbound_by_default(True)
 
     def internet_is_enabled(self):
-        all_profiles = self._winrm.run_powershell_script(
-            # language=PowerShell
-            '''Get-NetFirewallProfile | select DefaultOutboundAction | ConvertTo-Json''',
-            {})
-        return not all(profile['DefaultOutboundAction'] == 'Block' for profile in all_profiles)
+        profile_name = 'Private'  # Check only this: all interfaces assigned with the private profile.
+        query = self._network_profile_wmi_query(profile_name)
+        profile = query.get()
+        return int(profile[u'DefaultOutboundAction']) == 0
 
     def setup_ip(self, mac, ip, prefix_length):
         all_configurations = self._winrm.wmi_query(u'Win32_NetworkAdapterConfiguration', {}).enumerate()
@@ -191,7 +208,7 @@ class WindowsNetworking(Networking):
 
     def can_reach(self, ip, timeout_sec=4):
         query = self._winrm.wmi_query(u'Win32_PingStatus', {u'Address': str(ip)})
-        status = query.get_one()
+        status = query.get()
         return status[u'StatusCode'] == u'0'
 
     def reset(self):

@@ -1,5 +1,7 @@
 #include "server_ptz_controller_pool.h"
 
+#include <nx/utils/std/optional.h>
+
 #include <api/app_server_connection.h>
 #include <common/common_module.h>
 #include <common/static_common_module.h>
@@ -12,11 +14,32 @@
 #include <core/ptz/tour_ptz_controller.h>
 #include <core/ptz/viewport_ptz_controller.h>
 #include <core/ptz/workaround_ptz_controller.h>
+#include <nx/core/ptz/realtive/relative_move_workaround_controller.h>
+#include <nx/core/ptz/realtive/relative_continuous_move_mapping.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource_management/resource_data_pool.h>
 #include <core/resource/param.h>
 
 #include <nx/mediaserver/resource/camera.h>
+
+using namespace nx::core;
+
+namespace {
+
+static const QString kRelativeMoveMapping("relativeMoveMapping");
+
+ptz::RelativeContinuousMoveMapping relativeMoveMapping(const QnResourcePtr& resource)
+{
+    const auto camera = resource.dynamicCast<QnSecurityCamResource>();
+    if (!camera)
+        return ptz::RelativeContinuousMoveMapping();
+
+    const auto resourceData = qnStaticCommon->dataPool()->data(camera);
+    return resourceData.value<ptz::RelativeContinuousMoveMapping>(
+        kRelativeMoveMapping, ptz::RelativeContinuousMoveMapping());
+}
+
+} // namespace
 
 QnServerPtzControllerPool::QnServerPtzControllerPool(QObject *parent):
     base_type(parent)
@@ -49,28 +72,35 @@ void QnServerPtzControllerPool::unregisterResource(const QnResourcePtr& resource
 
 QnPtzControllerPtr QnServerPtzControllerPool::createController(const QnResourcePtr& resource) const
 {
-    if(resource->flags() & Qn::foreigner)
+    if (resource->flags() & Qn::foreigner)
         return QnPtzControllerPtr(); /* That's not our resource! */
 
-    if(!resource->isInitialized())
+    if (!resource->isInitialized())
         return QnPtzControllerPtr();
 
     auto camera = resource.dynamicCast<nx::mediaserver::resource::Camera>();
-    if(!camera)
+    if (!camera)
         return QnPtzControllerPtr();
 
     QnPtzControllerPtr controller(camera->createPtzController());
-    if(controller)
+    if (controller)
     {
-        if(QnMappedPtzController::extends(controller->getCapabilities()))
-            if(QnPtzMapperPtr mapper = qnStaticCommon->dataPool()->data(camera).value<QnPtzMapperPtr>(lit("ptzMapper")))
-                controller.reset(new QnMappedPtzController(mapper, controller));
+        if (QnMappedPtzController::extends(controller->getCapabilities(ptz::Options())))
+        {
+            auto mapper = qnStaticCommon
+                ->dataPool()
+                ->data(camera)
+                .value<QnPtzMapperPtr>(lit("ptzMapper"));
 
-        if(QnViewportPtzController::extends(controller->getCapabilities()))
+            if (mapper)
+                controller.reset(new QnMappedPtzController(mapper, controller));
+        }
+
+        if (QnViewportPtzController::extends(controller->getCapabilities(ptz::Options())))
             controller.reset(new QnViewportPtzController(controller));
 
         bool disableNativePresets = false;
-        if(controller->getCapabilities().testFlag(Ptz::NativePresetsPtzCapability))
+        if (controller->getCapabilities(ptz::Options()).testFlag(Ptz::NativePresetsPtzCapability))
         {
             disableNativePresets = !resource->getProperty(
                 Qn::DISABLE_NATIVE_PTZ_PRESETS_PARAM_NAME).isEmpty();
@@ -79,32 +109,55 @@ QnPtzControllerPtr QnServerPtzControllerPool::createController(const QnResourceP
                 &QnServerPtzControllerPool::at_cameraPropertyChanged, Qt::UniqueConnection);
         }
 
-        if(QnPresetPtzController::extends(controller->getCapabilities(), disableNativePresets))
+        if (QnPresetPtzController::extends(
+            controller->getCapabilities(ptz::Options()), disableNativePresets))
+        {
             controller.reset(new QnPresetPtzController(controller));
+        }
 
-        if(QnTourPtzController::extends(controller->getCapabilities()))
+        if (QnTourPtzController::extends(controller->getCapabilities(ptz::Options())))
+        {
             controller.reset(new
                 QnTourPtzController(
                     controller,
                     qnPtzPool->commandThreadPool(),
                     qnPtzPool->executorThread()));
+        }
 
-        if(QnActivityPtzController::extends(controller->getCapabilities()))
+        if (QnActivityPtzController::extends(controller->getCapabilities(ptz::Options())))
+        {
             controller.reset(new QnActivityPtzController(
                 commonModule(),
                 QnActivityPtzController::Server,
                 controller));
+        }
 
-        if(QnHomePtzController::extends(controller->getCapabilities()))
+        if (QnHomePtzController::extends(controller->getCapabilities(ptz::Options())))
+        {
             controller.reset(new QnHomePtzController(
                 controller,
                 qnPtzPool->executorThread()));
+        }
 
-        if(QnWorkaroundPtzController::extends(controller->getCapabilities()))
+        if (QnWorkaroundPtzController::extends(controller->getCapabilities(ptz::Options())))
+        {
             controller.reset(new QnWorkaroundPtzController(controller));
+        }
+
+        if (ptz::RelativeMoveWorkaroundController::extends(
+                controller->getCapabilities(ptz::Options())))
+        {
+            controller.reset(new ptz::RelativeMoveWorkaroundController(
+                controller,
+                relativeMoveMapping(controller->resource()),
+                qnPtzPool->commandThreadPool()));
+        }
     }
 
-    Ptz::Capabilities caps = controller ? controller->getCapabilities() : Ptz::NoPtzCapabilities;
+    Ptz::Capabilities caps = controller
+        ? controller->getCapabilities(ptz::Options())
+        : Ptz::NoPtzCapabilities;
+
     if (camera->getPtzCapabilities() != caps) {
         camera->setPtzCapabilities(caps);
         camera->saveParamsAsync();
@@ -126,14 +179,19 @@ void QnServerPtzControllerPool::at_cameraPropertyChanged(
     }
 }
 
-void QnServerPtzControllerPool::at_controllerAboutToBeChanged(const QnResourcePtr& resource)
+void QnServerPtzControllerPool::at_controllerAboutToBeChanged(const QnResourcePtr &resource)
 {
     QnPtzControllerPtr oldController = controller(resource);
-    if(oldController) {
+    if (oldController)
+    {
         QnPtzObject object;
-        if(oldController->getActiveObject(&object) && object.type != Qn::InvalidPtzObject) {
+        const bool hasValidActiveObject = oldController->getActiveObject(&object)
+            && object.type != Qn::InvalidPtzObject;
+
+        if (hasValidActiveObject)
+        {
             QnMutexLocker lock(&m_mutex);
-            activeObjectByResource.insert(resource, object);
+            activeObjectByResource[resource] = object;
         }
     }
 }
@@ -149,7 +207,8 @@ void QnServerPtzControllerPool::at_controllerChanged(const QnResourcePtr& resour
         QnMutexLocker lock(&m_mutex);
         object = activeObjectByResource.take(resource);
     }
-    if(object.type != Qn::TourPtzObject)
+
+    if (object.type != Qn::TourPtzObject)
         controller->getHomeObject(&object);
 
     if(object.type == Qn::TourPtzObject)

@@ -4,12 +4,12 @@ import re
 from pprint import pformat
 from uuid import UUID
 
-from netaddr import EUI, IPAddress
+from netaddr import EUI, IPNetwork
 from netaddr.strategy.eui48 import mac_bare
 from pylru import lrudecorator
 
 from framework.os_access.exceptions import exit_status_error_cls
-from framework.os_access.os_access_interface import OSAccess
+from framework.os_access.os_access_interface import OSAccess, OneWayPortMap, ReciprocalPortMap
 from framework.vms.hypervisor import TemplateVMNotFound, VMAllAdaptersBusy, VMInfo, VMNotFound
 from framework.vms.port_forwarding import calculate_forwarded_ports
 from framework.waiting import wait_for_true
@@ -39,7 +39,7 @@ def virtual_box_error(code):
 
 
 def vm_info_from_raw_info(raw_info):
-    ports = {}
+    ports_dict = {}
     for index in range(10):  # Arbitrary.
         try:
             raw_value = raw_info['Forwarding({})'.format(index)]
@@ -50,7 +50,17 @@ def vm_info_from_raw_info(raw_info):
         # forwarded port is not part of logical interface. Other possibility is to make virtual network
         # in which host can access VMs on IP level. One more option is special Machine which is accessible by IP
         # and forwards ports to target VMs.
-        ports[protocol, int(guest_port)] = IPAddress('127.0.0.1'), int(host_port)
+        ports_dict[protocol, int(guest_port)] = int(host_port)
+    try:
+        nat_network = IPNetwork(raw_info['natnet1'])
+    except KeyError:
+        # See: https://www.virtualbox.org/manual/ch09.html#idm8375
+        nat_nic_index = 1
+        nat_network = IPNetwork('10.0.{}.0/24'.format(nat_nic_index + 2))
+    host_address_from_vm = nat_network.ip + 2
+    ports_map = ReciprocalPortMap(
+        OneWayPortMap.forwarding(ports_dict),
+        OneWayPortMap.direct(host_address_from_vm))
     macs = {}
     networks = {}
     for nic_index in _INTERNAL_NIC_INDICES:
@@ -66,7 +76,7 @@ def vm_info_from_raw_info(raw_info):
         else:
             networks[nic_index] = raw_info['intnet{}'.format(nic_index)]
             _logger.debug("NIC %d (%s): %s", nic_index, macs[nic_index], networks[nic_index])
-    parsed_info = VMInfo(raw_info['name'], ports, macs, networks, raw_info['VMState'] == 'running')
+    parsed_info = VMInfo(raw_info['name'], ports_map, macs, networks, raw_info['VMState'] == 'running')
     _logger.info("Parsed info:\n%s", pformat(parsed_info))
     return parsed_info
 

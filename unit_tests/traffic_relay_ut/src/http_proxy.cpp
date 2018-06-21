@@ -46,11 +46,16 @@ public:
     }
 
 protected:
+    virtual void SetUp() override
+    {
+        addRelayInstance();
+    }
+
     void givenListeningPeer()
     {
         using namespace std::placeholders;
 
-        auto url = basicUrl();
+        auto url = relay().basicUrl();
         if (m_listeningPeerHostName.empty())
         {
             m_listeningPeerHostName =
@@ -68,8 +73,11 @@ protected:
             nx::network::http::Method::get);
         m_peerServer->server().start();
 
-        while (!moduleInstance()->listeningPeerPool().isPeerOnline(m_listeningPeerHostName))
+        while (!relay().moduleInstance()->listeningPeerPool()
+            .isPeerOnline(m_listeningPeerHostName))
+        {
             std::this_thread::sleep_for(std::chrono::milliseconds(1));
+        }
     }
 
     void givenListeningPeerWithCompositeName()
@@ -84,12 +92,26 @@ protected:
 
     void whenSendHttpRequestToPeer()
     {
-        sendHttpRequestToPeer(m_listeningPeerHostName);
+        sendHttpRequestToPeer(m_listeningPeerHostName, relay());
     }
 
     void whenSendHttpRequestToUnknownPeer()
     {
-        sendHttpRequestToPeer(nx::utils::generateRandomName(7).toStdString());
+        sendHttpRequestToPeer(
+            nx::utils::generateRandomName(7).toStdString(),
+            relay());
+    }
+
+    void sendHttpRequestToPeer(
+        const std::string& hostName,
+        const Relay& relayInstance)
+    {
+        m_httpClient = std::make_unique<nx::network::http::AsyncClient>();
+        m_httpClient->setResponseReadTimeout(std::chrono::hours(1));
+        m_httpClient->doGet(
+            nx::network::url::Builder(proxyUrlForHost(relayInstance, hostName))
+            .setPath(kTestPath),
+            std::bind(&HttpProxy::saveResponse, this));
     }
 
     void thenResponseIsReceived()
@@ -111,6 +133,16 @@ protected:
         ASSERT_EQ(expected, m_lastResponse->statusLine.statusCode);
     }
 
+    const std::string& listeningPeerHostName() const
+    {
+        return m_listeningPeerHostName;
+    }
+
+    const nx::network::http::Response& lastResponse() const
+    {
+        return *m_lastResponse;
+    }
+
 private:
     std::string m_listeningPeerHostName;
     std::unique_ptr<nx::network::http::TestHttpServer> m_peerServer;
@@ -119,11 +151,6 @@ private:
         m_httpResponseQueue;
     std::vector<std::string> m_registeredHostNames;
     std::unique_ptr<nx::network::http::Response> m_lastResponse;
-
-    virtual void SetUp() override
-    {
-        ASSERT_TRUE(startAndWaitUntilStarted());
-    }
 
     void saveResponse()
     {
@@ -140,22 +167,15 @@ private:
         }
     }
 
-    void sendHttpRequestToPeer(const std::string& hostName)
+    nx::utils::Url proxyUrlForHost(
+        const Relay& relayInstance,
+        const std::string& hostName)
     {
-        m_httpClient = std::make_unique<nx::network::http::AsyncClient>();
-        m_httpClient->doGet(
-            nx::network::url::Builder(proxyUrlForHost(hostName))
-                .setPath(kTestPath),
-            std::bind(&HttpProxy::saveResponse, this));
-    }
+        auto url = relayInstance.basicUrl();
 
-    nx::utils::Url proxyUrlForHost(const std::string& hostName)
-    {
-        auto url = basicUrl();
-
-        auto host = lm("%1.gw.%2").args(hostName, url.host()).toStdString();
+        auto host = lm("%1.%2").args(hostName, url.host()).toStdString();
         nx::network::SocketGlobals::addressResolver().addFixedAddress(
-            host, network::SocketAddress(network::HostAddress::localhost, url.port()));
+            host, network::SocketAddress(network::HostAddress::localhost, 0));
         m_registeredHostNames.push_back(host);
         url.setHost(host.c_str());
 
@@ -183,6 +203,36 @@ TEST_F(HttpProxy, works_for_peer_with_composite_name)
 {
     givenListeningPeerWithCompositeName();
     whenSendHttpRequestToPeer();
+    thenResponseFromPeerIsReceived();
+}
+
+//-------------------------------------------------------------------------------------------------
+
+class HttpProxyRedirect:
+    public HttpProxy
+{
+    using base_type = HttpProxy;
+
+protected:
+    virtual void SetUp() override
+    {
+        base_type::SetUp();
+
+        addRelayInstance();
+    }
+
+    void whenSendHttpRequestViaBadRelay()
+    {
+        sendHttpRequestToPeer(
+            listeningPeerHostName(),
+            relay(1));
+    }
+};
+
+TEST_F(HttpProxyRedirect, request_is_redirected_to_a_proxy_relay_instance)
+{
+    givenListeningPeer();
+    whenSendHttpRequestViaBadRelay();
     thenResponseFromPeerIsReceived();
 }
 

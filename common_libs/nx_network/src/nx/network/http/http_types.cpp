@@ -303,6 +303,7 @@ bool Method::isMessageBodyAllowedInResponse(
     StatusCode::Value statusCode)
 {
     return method != connect
+        && method != head
         && StatusCode::isMessageBodyAllowed(statusCode);
 }
 
@@ -1770,6 +1771,82 @@ StringType StrictTransportSecurity::toString() const
     if (preload)
         result += ";preload";
     return result;
+}
+
+//-------------------------------------------------------------------------------------------------
+
+const StringType XForwardedFor::NAME("X-Forwarded-For");
+
+bool XForwardedFor::parse(const StringType& str)
+{
+    auto tokens = str.split(',');
+    if (tokens.empty())
+        return false;
+
+    client = tokens[0].trimmed();
+    for (int i = 1; i < tokens.size(); ++i)
+        proxies.push_back(tokens[i].trimmed());
+
+    return true;
+}
+
+//-------------------------------------------------------------------------------------------------
+
+bool ForwardedElement::parse(const StringType& str)
+{
+    const auto params = nx::utils::parseNameValuePairs(str, ';');
+    if (params.empty())
+        return false;
+
+    for (auto it = params.begin(); it != params.end(); ++it)
+    {
+        if (it.key().toLower() == "by")
+            by = it.value();
+        else if (it.key().toLower() == "for")
+            for_ = it.value();
+        else if (it.key().toLower() == "host")
+            host = it.value();
+        else if (it.key().toLower() == "proto")
+            proto = it.value();
+    }
+
+    return true;
+}
+
+bool ForwardedElement::operator==(const ForwardedElement& right) const
+{
+    return by == right.by
+        && for_ == right.for_
+        && host == right.host
+        && proto == right.proto;
+}
+
+const StringType Forwarded::NAME("Forwarded");
+
+Forwarded::Forwarded(std::vector<ForwardedElement> elements):
+    elements(std::move(elements))
+{
+}
+
+bool Forwarded::parse(const StringType& str)
+{
+    auto serializedElements = str.split(',');
+    for (const auto& serializedElement: serializedElements)
+    {
+        if (serializedElement.isEmpty())
+            continue;
+
+        ForwardedElement element;
+        if (element.parse(serializedElement.trimmed()))
+            elements.push_back(std::move(element));
+    }
+
+    return !elements.empty();
+}
+
+bool Forwarded::operator==(const Forwarded& right) const
+{
+    return elements == right.elements;
 }
 
 } // namespace header

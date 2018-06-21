@@ -61,16 +61,14 @@ QnCustomizableItemDelegate* makeRadioButtonDelegate(QObject* parent)
     return delegate;
 }
 
-// It makes everything red
+// It makes everything red.
 QnCustomizableItemDelegate* makeRedDelegate(QObject* parent)
 {
     auto delegate = new QnCustomizableItemDelegate(parent);
     delegate->setCustomInitStyleOption(
-        [](QStyleOptionViewItem* item, const QModelIndex& index)
+        [](QStyleOptionViewItem* item, const QModelIndex& /*index*/)
         {
-            NX_ASSERT(item);
-            if (item)
-                setWarningStyle(&item->palette);
+            setWarningStyle(&item->palette);
         });
     return delegate;
 }
@@ -87,12 +85,12 @@ LayoutSelectionDialog::LayoutSelectionDialog(
     ui->setupUi(this);
     ui->additionalInfoLabel->setHidden(true);
 
-    // Setup local layouts
+    // Setup local layouts.
     m_localLayoutsModel = new QnResourceListModel(this);
     m_localLayoutsModel->setHasCheckboxes(true);
     m_localLayoutsModel->setSinglePick(m_singlePick);
 
-    // Setup shared layouts
+    // Setup shared layouts.
     m_sharedLayoutsModel = new QnResourceListModel(this);
     m_sharedLayoutsModel->setHasCheckboxes(true);
     m_sharedLayoutsModel->setSinglePick(m_singlePick);
@@ -140,7 +138,7 @@ LayoutSelectionDialog::LayoutSelectionDialog(
     scrollBar->setUseMaximumSpace(true);
     ui->scrollArea->setVerticalScrollBar(scrollBar->proxyScrollBar());
 
-    // Lambda will keep the reference to filterLocalLayouts and filterSharedLayouts
+    // Lambda will keep the reference to filterLocalLayouts and filterSharedLayouts.
     const auto updateFilter =
         [this, filterLocalLayouts, filterSharedLayouts]()
         {
@@ -199,7 +197,7 @@ LayoutSelectionDialog::LayoutSelectionDialog(
             &LayoutSelectionDialog::at_sharedLayoutSelected);
     }
 
-    // Customized top margin for panel content:
+    // Customized top margin for panel content.
     static constexpr int kContentTopMargin = 8;
     QnNxStyle::setGroupBoxContentTopMargin(ui->localGroupBox, kContentTopMargin);
     QnNxStyle::setGroupBoxContentTopMargin(ui->sharedGroupBox, kContentTopMargin);
@@ -229,7 +227,7 @@ void LayoutSelectionDialog::at_sharedLayoutSelected()
     if (!selection.empty())
         m_localLayoutsModel->setCheckedResources({});
 
-    // Reset local layouts
+    // Reset local layouts.
     if (m_localSelectionMode == ModeLimited)
     {
         m_localLayoutsModel->setResources(QnResourceList());

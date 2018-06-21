@@ -128,6 +128,8 @@ Direction inversed(Direction value)
             return Direction::Left;
         case Direction::TopRight:
             return Direction::BottomLeft;
+        case Direction::NoDirection:
+            break;
     }
 
     return NoDirection;
@@ -170,6 +172,8 @@ QPointF sourceDirectionPoint(const QRectF& from, Direction direction)
             return QPointF(from.right(), center.y());
         case Direction::TopRight:
             return from.topRight();
+        case Direction::NoDirection:
+            break;
     }
 
     return center;

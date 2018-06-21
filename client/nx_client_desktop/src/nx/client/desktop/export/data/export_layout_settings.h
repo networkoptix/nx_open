@@ -22,20 +22,20 @@ struct ExportLayoutSettings
     ExportLayoutSettings() = default;
     ExportLayoutSettings(QnLayoutResourcePtr layout,
         QnTimePeriod period,
-        Filename filename,
+        Filename fileName,
         Mode mode,
         bool readOnly)
         :
         layout(layout),
         period(period),
-        filename(filename),
+        fileName(fileName),
         mode(mode),
         readOnly(readOnly)
     {}
 
     QnLayoutResourcePtr layout; //< Layout that should be exported.
     QnTimePeriod period;        //< Time period to export.
-    Filename filename;           //< Target filename.
+    Filename fileName;           //< Target filename.
     Mode mode = Mode::Export;   //< Export mode.
     bool readOnly = false;      //< Make exported layout read-only.
 };

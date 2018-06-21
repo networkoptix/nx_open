@@ -28,7 +28,6 @@
 
 struct QnLdapDigestAuthContext;
 class TimeBasedNonceProvider;
-namespace nx { namespace vms { namespace cloud_integration {  struct CloudManagerGroup; } } }
 
 namespace nx {
 namespace mediaserver {
@@ -49,7 +48,8 @@ public:
     Authenticator(
         QnCommonModule* commonModule,
         TimeBasedNonceProvider* timeBasedNonceProvider,
-        nx::vms::cloud_integration::CloudManagerGroup* cloudManagerGroup);
+        nx::vms::auth::AbstractNonceProvider* cloudNonceProvider,
+        nx::vms::auth::AbstractUserDataProvider* userAuthenticator);
 
     struct Result
     {

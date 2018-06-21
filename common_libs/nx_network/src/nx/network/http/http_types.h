@@ -685,6 +685,44 @@ public:
     StringType toString() const;
 };
 
+class NX_NETWORK_API XForwardedFor
+{
+public:
+    static const StringType NAME;
+
+    StringType client;
+    std::vector<StringType> proxies;
+
+    bool parse(const StringType& str);
+};
+
+struct NX_NETWORK_API ForwardedElement
+{
+    StringType by;
+    StringType for_;
+    StringType host;
+    StringType proto;
+
+    bool parse(const StringType& str);
+
+    bool operator==(const ForwardedElement& right) const;
+};
+
+class NX_NETWORK_API Forwarded
+{
+public:
+    static const StringType NAME;
+
+    std::vector<ForwardedElement> elements;
+
+    Forwarded() = default;
+    Forwarded(std::vector<ForwardedElement> elements);
+
+    bool parse(const StringType& str);
+
+    bool operator==(const Forwarded& right) const;
+};
+
 } // namespace header
 
 typedef std::pair<StringType, StringType> ChunkExtension;

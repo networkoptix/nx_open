@@ -17,7 +17,7 @@ class TranslatableProject():
         return self
 
     def qml(self):
-        self.extensions = "qml"
+        self.extensions = "qml,js"
         self.sources = "static-resources"
         return self
 

@@ -1,65 +1,45 @@
 import logging
 import time
-from contextlib import contextmanager
 from datetime import datetime, timedelta
 
 import pytest
 from pytz import utc
 
+from framework.timeless_mediaserver import timeless_mediaserver
 from framework.api_shortcuts import get_server_id, get_time, is_primary_time_server
-from framework.installation.make_installation import make_installation
-from framework.installation.mediaserver_factory import (
-    cleanup_mediaserver,
-    collect_artifacts_from_mediaserver,
-    make_dirty_mediaserver,
-    )
-from framework.merging import merge_systems, setup_local_system
+from framework.merging import merge_systems
 from framework.utils import RunningTime, get_internet_time
 from framework.waiting import ensure_persistence, wait_for_true
 
 _logger = logging.getLogger(__name__)
 
 BASE_TIME = RunningTime(datetime(2017, 3, 14, 15, 0, 0, tzinfo=utc))  # Tue Mar 14 15:00:00 UTC 2017
-
-
-@contextmanager
-def _timeless_mediaserver(vm, mediaserver_installers, ca, artifact_factory):
-    """Mediaserver never exposed to internet depending on machine time"""
-    installation = make_installation(mediaserver_installers, vm.type, vm.os_access)
-    mediaserver = make_dirty_mediaserver(vm.alias, installation)
-    mediaserver.stop(already_stopped_ok=True)
-    vm.os_access.networking.disable_internet()
-    cleanup_mediaserver(mediaserver, ca)
-    mediaserver.installation.update_mediaserver_conf({
-        'ecInternetSyncTimePeriodSec': 3,
-        'ecMaxInternetTimeSyncRetryPeriodSec': 3,
-        })
-    mediaserver.start()
-    setup_local_system(mediaserver, {})
-    try:
-        yield mediaserver
-    finally:
-        collect_artifacts_from_mediaserver(mediaserver, artifact_factory)
+SYNC_TIMEOUT_SEC = 180
 
 
 @pytest.fixture()
 def two_mediaservers(two_vms, mediaserver_installers, ca, artifact_factory):
     """Make sure mediaservers are installed, stopped and internet is disabled."""
     first_vm, second_vm = two_vms
-    with _timeless_mediaserver(first_vm, mediaserver_installers, ca, artifact_factory) as first:
-        with _timeless_mediaserver(second_vm, mediaserver_installers, ca, artifact_factory) as second:
-            merge_systems(first, second)
-            primary, secondary = (first, second) if is_primary_time_server(first.api) else (second, first)
-            secondary.os_access.set_time(BASE_TIME.current)
-            primary.os_access.set_time(BASE_TIME.current)
+    first_vm.os_access.set_time(BASE_TIME.current)
+    second_vm.os_access.set_time(BASE_TIME.current)
+    with timeless_mediaserver(first_vm, mediaserver_installers, ca, artifact_factory) as primary:
+        with timeless_mediaserver(second_vm, mediaserver_installers, ca, artifact_factory) as secondary:
+            merge_systems(primary, secondary)
+            primary_guid = get_server_id(primary.api)
+            primary.api.post('ec2/forcePrimaryTimeServer', dict(id=primary_guid))
+            wait_for_true(
+                lambda: get_time(secondary.api).is_close_to(primary.os_access.get_time()),
+                "time on NEW PRIMARY time server {} follows time on MACHINE WITH NEW PRIMARY time server {}".format(
+                    get_time(secondary.api), primary.os_access.get_time()))
             return primary, secondary
 
 
 @pytest.mark.quick
 def test_secondary_respects_primary(two_mediaservers):
     primary, secondary = two_mediaservers
-    secondary_response = secondary.api.get('ec2/getCurrentTime')
-    assert not secondary_response['isPrimaryTimeServer']
+    response = secondary.api.get('api/systemSettings')
+    assert response['settings']['primaryTimeServer'] == get_server_id(primary.api)
     assert not primary.installation.list_core_dumps()
     assert not secondary.installation.list_core_dumps()
 
@@ -67,10 +47,11 @@ def test_secondary_respects_primary(two_mediaservers):
 @pytest.mark.quick
 def test_primary_follows_vm_time(two_mediaservers):
     primary, secondary = two_mediaservers
+    assert primary.os_access.get_time().is_close_to(BASE_TIME)
     wait_for_true(
-        lambda: get_time(primary.api).is_close_to(BASE_TIME),
+        lambda: get_time(primary.api).is_close_to(primary.os_access.get_time()),
         "time on PRIMARY time server {} follows its machine time {}.".format(
-            get_time(primary.api), BASE_TIME))
+            get_time(primary.api), primary.os_access.get_time()))
     assert not primary.installation.list_core_dumps()
     assert not secondary.installation.list_core_dumps()
 
@@ -82,11 +63,12 @@ def test_primary_follows_vm_time(two_mediaservers):
     ids=lambda hr: '{}{}hr'.format('plus' if hr > 0 else 'minus', abs(hr)))
 def test_secondary_follows_primary(two_mediaservers, shift_hours):
     primary, secondary = two_mediaservers
+    assert primary.os_access.get_time().is_close_to(BASE_TIME)
     secondary.os_access.set_time(BASE_TIME.current + timedelta(hours=shift_hours))
     wait_for_true(
-        lambda: get_time(secondary.api).is_close_to(BASE_TIME),
+        lambda: get_time(secondary.api).is_close_to(primary.os_access.get_time()),
         "time {} on NON-PRIMARY time server aligns with time {} on MACHINE WITH PRIMARY time server.".format(
-            get_time(secondary.api), BASE_TIME))
+            get_time(secondary.api), primary.os_access.get_time()))
     assert not primary.installation.list_core_dumps()
     assert not secondary.installation.list_core_dumps()
 
@@ -96,20 +78,23 @@ def test_change_primary_server(two_mediaservers):
     """Change PRIMARY server, change time on its machine. Expect all servers align with it."""
     old_primary, old_secondary = two_mediaservers
     old_secondary_uuid = get_server_id(old_secondary.api)
-    old_secondary.api.ec2.forcePrimaryTimeServer.POST(id=old_secondary_uuid)
+    old_secondary.api.post('ec2/forcePrimaryTimeServer', dict(id=old_secondary_uuid))
     wait_for_true(
         lambda: is_primary_time_server(old_secondary.api),
         '{} becomes primary'.format(old_primary))
     new_primary, new_secondary = old_secondary, old_primary
-    new_primary_vm_time = new_primary.os_access.set_time(BASE_TIME.current + timedelta(hours=5))
+    new_time = BASE_TIME.current + timedelta(hours=5)
+    new_primary.os_access.set_time(new_time)
+    assert new_primary.os_access.get_time().is_close_to(new_time)
     wait_for_true(
-        lambda: get_time(new_primary.api).is_close_to(new_primary_vm_time),
+        lambda: get_time(new_primary.api).is_close_to(new_primary.os_access.get_time()),
         "time on NEW PRIMARY time server {} follows time on MACHINE WITH NEW PRIMARY time server {}".format(
-            get_time(new_primary.api), new_primary_vm_time))
+            get_time(new_primary.api), new_primary.os_access.get_time()))
     wait_for_true(
-        lambda: get_time(new_secondary.api).is_close_to(new_primary_vm_time),
+        lambda: get_time(new_secondary.api).is_close_to(new_primary.os_access.get_time()),
         "time on NEW NON-PRIMARY time server {} follows time on NEW PRIMARY time server {}".format(
-            get_time(new_secondary.api), new_primary_vm_time))
+            get_time(new_secondary.api), new_primary.os_access.get_time()),
+        timeout_sec=SYNC_TIMEOUT_SEC)
     assert not old_primary.installation.list_core_dumps()
     assert not old_secondary.installation.list_core_dumps()
 
@@ -117,11 +102,16 @@ def test_change_primary_server(two_mediaservers):
 def test_change_time_on_secondary_server(two_mediaservers):
     """Change time on NON-PRIMARY server's machine. Expect all servers' time doesn't change."""
     primary, secondary = two_mediaservers
-    secondary.os_access.set_time(BASE_TIME.current + timedelta(hours=10))
+    new_secondary_vm_time = BASE_TIME.current + timedelta(hours=10)
+    secondary.os_access.set_time(new_secondary_vm_time)
+    assert is_primary_time_server(primary.api)
+    assert not is_primary_time_server(secondary.api)
+    assert primary.os_access.get_time().is_close_to(BASE_TIME)
+    assert secondary.os_access.get_time().is_close_to(new_secondary_vm_time)
     ensure_persistence(
-        lambda: get_time(secondary.api).is_close_to(BASE_TIME),
+        lambda: get_time(secondary.api).is_close_to(primary.os_access.get_time()),
         "time on NON-PRIMARY time server {} follows time on PRIMARY time server {}".format(
-            get_time(secondary.api), BASE_TIME))
+            get_time(secondary.api), primary.os_access.get_time()))
     assert not primary.installation.list_core_dumps()
     assert not secondary.installation.list_core_dumps()
 
@@ -131,47 +121,56 @@ def test_primary_server_temporary_offline(two_mediaservers):
     primary.stop()
     secondary.os_access.set_time(BASE_TIME.current + timedelta(hours=4))
     ensure_persistence(
-        lambda: get_time(secondary.api).is_close_to(BASE_TIME),
+        lambda: get_time(secondary.api).is_close_to(primary.os_access.get_time()),
         "time on NON-PRIMARY time server {} follows time on PRIMARY time server {}"
-        "after PRIMARY time server was stopped".format(get_time(secondary.api), BASE_TIME))
+        "after PRIMARY time server was stopped".format(
+            get_time(secondary.api), primary.os_access.get_time()))
     assert not primary.installation.list_core_dumps()
     assert not secondary.installation.list_core_dumps()
 
 
 def test_secondary_server_temporary_inet_on(two_mediaservers):
     primary, secondary = two_mediaservers
-    primary.api.api.systemSettings.GET(synchronizeTimeWithInternet=True)
+    primary.api.post('ec2/forcePrimaryTimeServer', dict())
     secondary.os_access.networking.enable_internet()
-
+    
     wait_for_true(
         lambda: get_time(secondary.api).is_close_to(get_internet_time()),
-        "NON-PRIMARY aligns with INTERNET while internet is enabled")
+        "time on NON-PRIMARY {} aligns with INTERNET {} while internet is enabled".format(
+            get_time(secondary.api), (get_internet_time())),
+        timeout_sec=SYNC_TIMEOUT_SEC)
     wait_for_true(
         lambda: get_time(primary.api).is_close_to(get_internet_time()),
-        "PRIMARY aligns with INTERNET while internet is enabled")
+        "time on PRIMARY {} aligns with INTERNET {} while internet is enabled".format(
+            get_time(primary.api), (get_internet_time())),
+        timeout_sec=SYNC_TIMEOUT_SEC)
     primary.os_access.set_time(BASE_TIME.current - timedelta(hours=5))
     ensure_persistence(
         lambda: get_time(primary.api).is_close_to(get_internet_time()),
-        "PRIMARY aligns with INTERNET after system time is shifted but while internet is enabled")
+        "PRIMARY {} aligns with INTERNET {} after system time is shifted but while internet is enabled".format(
+            get_time(primary.api), (get_internet_time())))
     secondary.os_access.networking.disable_internet()
 
     # Turn off RFC868 (time protocol)
     ensure_persistence(
         lambda: get_time(primary.api).is_close_to(get_internet_time()),
-        "PRIMARY aligns with INTERNET after internet was disabled")
+        "PRIMARY {} aligns with INTERNET {} after internet was disabled".format(
+            get_time(primary.api), (get_internet_time())))
 
     # Stop secondary server
     secondary.stop()
     ensure_persistence(
         lambda: get_time(primary.api).is_close_to(get_internet_time()),
-        "PRIMARY aligns with INTERNET while NON-PRIMARY is stopped")
+        "PRIMARY {} aligns with INTERNET {} while NON-PRIMARY is stopped".format(
+            get_time(primary.api), (get_internet_time())))
     secondary.start()
 
     # Restart secondary server
     secondary.restart_via_api()
     ensure_persistence(
         lambda: get_time(primary.api).is_close_to(get_internet_time()),
-        "NON-PRIMARY aligns with INTERNET after restart via API")
+        "NON-PRIMARY {} aligns with INTERNET {} after restart via API".format(
+            get_time(primary.api), (get_internet_time())))
 
     # Stop and start both servers - so that servers could forget internet time
     secondary.stop()
@@ -180,14 +179,17 @@ def test_secondary_server_temporary_inet_on(two_mediaservers):
     primary.start()
     secondary.start()
 
-    # Detect new PRIMARY and change its system time
+    # Change time on both servers in the system
     primary.os_access.set_time(BASE_TIME.current - timedelta(hours=25))
-    wait_for_true(
+    secondary.os_access.set_time(BASE_TIME.current - timedelta(hours=50))
+    ensure_persistence(
         lambda: get_time(primary.api).is_close_to(get_internet_time()),
-        "PRIMARY aligns with INTERNET after both are restarted")
-    wait_for_true(
+        "PRIMARY {} aligns with INTERNET {} after both are restarted".format(
+            get_time(primary.api), (get_internet_time())))
+    ensure_persistence(
         lambda: get_time(secondary.api).is_close_to(get_internet_time()),
-        "NON-PRIMARY aligns with INTERNET after both are restarted")
+        "NON-PRIMARY {} aligns with INTERNET {} after both are restarted".format(
+            get_time(primary.api), (get_internet_time())))
 
     assert not primary.installation.list_core_dumps()
     assert not secondary.installation.list_core_dumps()

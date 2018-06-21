@@ -1,10 +1,14 @@
 
 #include "bookmark_queries_cache.h"
 
+#include <chrono>
+
 #include <camera/camera_bookmarks_query.h>
 #include <camera/camera_bookmarks_manager.h>
 
 #include <utils/common/scoped_timer.h>
+
+using std::chrono::milliseconds;
 
 QnBookmarkQueriesCache::QnBookmarkQueriesCache(qint64 timeWindowMinChange
     , QObject *parent)
@@ -65,7 +69,8 @@ bool QnBookmarkQueriesCache::updateQuery(const QnVirtualCameraResourcePtr &camer
     const auto needUpdateFunctor = [this, filter](QnCameraBookmarkSearchFilter &oldFilter)
     {
         const bool textUpdated = updateFilterText(oldFilter, filter.text);
-        const bool windowUpdated = updateFilterTimeWindow(oldFilter, filter.startTimeMs, filter.endTimeMs);
+        const bool windowUpdated = updateFilterTimeWindow(oldFilter,
+            filter.startTimeMs.count(), filter.endTimeMs.count());
         return (textUpdated || windowUpdated);
     };
 
@@ -119,13 +124,15 @@ bool QnBookmarkQueriesCache::updateFilterTimeWindow(QnCameraBookmarkSearchFilter
     , qint64 startTimeMs
     , qint64 endTimeMs)
 {
-    const bool updateStartTime = (std::abs(filter.startTimeMs - startTimeMs) > m_timeWindowMinChange);
-    const bool updateEndTime = (std::abs(filter.endTimeMs- endTimeMs) > m_timeWindowMinChange);
+    const bool updateStartTime =
+        (std::abs(filter.startTimeMs.count() - startTimeMs) > m_timeWindowMinChange);
+    const bool updateEndTime =
+        (std::abs(filter.endTimeMs.count() - endTimeMs) > m_timeWindowMinChange);
     if (!updateStartTime && !updateEndTime)
         return false;
 
-    filter.startTimeMs = startTimeMs;
-    filter.endTimeMs = endTimeMs;
+    filter.startTimeMs = milliseconds(startTimeMs);
+    filter.endTimeMs = milliseconds(endTimeMs);
 
     return true;
 }

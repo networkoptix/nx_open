@@ -12,7 +12,7 @@ _logger = logging.getLogger(__name__)
 
 SSH_PRIVATE_KEY_PATH = LocalPath.home() / '.func_tests' / 'ssh' / 'private_key'  # Get from VM's description.
 
-VM = namedtuple('VM', ['alias', 'index', 'type', 'name', 'ports', 'os_access'])
+VM = namedtuple('VM', ['alias', 'index', 'type', 'name', 'port_map', 'os_access'])
 
 
 class UnknownOsFamily(Exception):
@@ -31,16 +31,16 @@ class VMFactory(object):
             vm_type_configuration = self._vm_configuration[vm_type]
             info = obtain_running_vm(self._hypervisor, name, vm_index, vm_type_configuration['vm'])
             if vm_type_configuration['os_family'] == 'linux':
-                os_access = SSHAccess(info.ports, info.macs, 'root', SSH_PRIVATE_KEY_PATH)
+                os_access = SSHAccess(info.port_map, info.macs, 'root', SSH_PRIVATE_KEY_PATH)
             elif vm_type_configuration['os_family'] == 'windows':
-                os_access = WindowsAccess(info.ports, info.macs, u'Administrator', u'qweasd123')
+                os_access = WindowsAccess(info.port_map, info.macs, u'Administrator', u'qweasd123')
             else:
                 raise UnknownOsFamily("Expected 'linux' or 'windows', got %r", vm_type_configuration['os_family'])
             wait_for_true(os_access.is_accessible, timeout_sec=vm_type_configuration['power_on_timeout_sec'])
             # TODO: Consider unplug and reset only before network setup: that will make tests much faster.
             self._hypervisor.unplug_all(info.name)
             os_access.networking.reset()
-            vm = VM(alias, vm_index, vm_type, info.name, info.ports, os_access)
+            vm = VM(alias, vm_index, vm_type, info.name, info.port_map, os_access)
             yield vm
 
     def cleanup(self):

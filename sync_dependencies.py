@@ -45,7 +45,7 @@ def determine_package_versions(
         "gstreamer": "1.0",
         "glib": "2.0",
         "deepstream": "0.1",
-        "help": customization + "-" + short_release_version(release_version),
+        "help": customization + "-3.2",
         "server-external": release_version,
         "certificates": customization,
     }
@@ -74,7 +74,7 @@ def determine_package_versions(
         v["festival"] = "2.1"
 
     if platform == "android":
-        v["qt"] = "5.6.2-2"
+        v["qt"] = "5.6.3"
         v["openssl"] = "1.0.2g"
         v["openal"] = "1.17.2"
 
@@ -219,7 +219,7 @@ def sync_dependencies(syncher, platform, arch, box, release_version, options={})
         if not sync("any/server-external", optional=True):
             sync("any/server-external-" + release_version)
 
-        if box in ("tx1", "edge1"):
+        if box == "edge1":
             sync("openldap")
             sync("sasl2")
 

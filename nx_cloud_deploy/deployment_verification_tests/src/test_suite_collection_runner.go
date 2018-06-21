@@ -1,6 +1,7 @@
 package main
 
 import (
+	"log"
 	"time"
 )
 
@@ -36,14 +37,19 @@ func (testRunner *TestSuiteCollectionRunner) run() error {
 		}
 
 		if testRunner.report.success() {
+			log.Printf("Every test suite has completed without failures")
 			break
 		}
 
 		curTime := time.Now()
-		if curTime.Sub(startTime) > testRunner.configuration.maxTimeToWaitForTestsToPass {
+		if curTime.Sub(startTime) >= testRunner.configuration.maxTimeToWaitForTestsToPass {
 			// There are failures in the report.
+			log.Printf("Tests failed with %d failure(s)", testRunner.report.totalFailureCount())
 			break
 		}
+
+		log.Printf("Tests completed with %d failure(s). Retrying after %d seconds",
+			testRunner.report.totalFailureCount(), testRunner.configuration.retryTestPeriod/time.Second)
 
 		time.Sleep(testRunner.configuration.retryTestPeriod)
 	}
@@ -72,6 +78,8 @@ func (testRunner *TestSuiteCollectionRunner) waitForCompletion() error {
 	for i := 0; i < len(testRunner.testSuites); i++ {
 		testSuiteReport := <-testRunner.testSuiteResultPipe
 		testRunner.report.suiteReports = append(testRunner.report.suiteReports, testSuiteReport)
+		log.Printf("Test suite %s finished with %d failure(s)",
+			testSuiteReport.name, testSuiteReport.failureCount())
 		if testSuiteReport.failureCount() > 0 {
 			// TODO Interrupting other test suites that are still running
 			// break
@@ -81,6 +89,7 @@ func (testRunner *TestSuiteCollectionRunner) waitForCompletion() error {
 }
 
 func (testRunner *TestSuiteCollectionRunner) runTestSuite(testSuite TestSuite) {
-	report := testSuite.run()
+	testSuiteRunner := TestSuiteRunner{testSuite: testSuite, configuration: testRunner.configuration}
+	report := testSuiteRunner.run()
 	testRunner.testSuiteResultPipe <- report
 }

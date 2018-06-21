@@ -42,13 +42,13 @@ def db_version(request):
     return request.param
 
 
-@pytest.fixture
+@pytest.fixture()
 def one(two_stopped_mediaservers, bin_dir, db_version):
     one, _ = two_stopped_mediaservers
     yield server('one', one, bin_dir, db_version)
 
 
-@pytest.fixture
+@pytest.fixture()
 def two(two_stopped_mediaservers, bin_dir, db_version):
     _, two = two_stopped_mediaservers
     yield server('two', two, bin_dir, db_version)
@@ -67,7 +67,7 @@ def server(name, mediaserver, bin_dir, db_version):
     mediaserver.start()
     system_settings = dict(autoDiscoveryEnabled=bool_to_str(False))
     setup_local_system(mediaserver, system_settings)
-    mediaserver.api.api.systemSettings.GET(statisticsAllowed=False)
+    mediaserver.api.get('api/systemSettings', params=dict(statisticsAllowed=False))
     if db_version == '2.4':
         check_camera(mediaserver, server_config.CAMERA_GUID)
     return mediaserver
@@ -82,7 +82,7 @@ def copy_database_file(server, bin_dir, backup_db_filename):
 
 
 def check_camera(server, camera_guid):
-    cameras = [c for c in server.api.ec2.getCameras.GET() if c['id'] == camera_guid]
+    cameras = [c for c in server.api.get('ec2/getCameras') if c['id'] == camera_guid]
     assert len(cameras) == 1, "'%r': one of cameras '%s' is absent" % (server, camera_guid)
 
 
@@ -105,8 +105,8 @@ def assert_jsons_are_equal(json_one, json_two, json_name):
 def wait_until_servers_have_same_full_info(one, two):
     start_time = datetime_utc_now()
     while True:
-        full_info_one = one.api.ec2.getFullInfo.GET()
-        full_info_two = two.api.ec2.getFullInfo.GET()
+        full_info_one = one.api.get('ec2/getFullInfo')
+        full_info_two = two.api.get('ec2/getFullInfo')
         if full_info_one == full_info_two:
             return full_info_one
         if datetime_utc_now() - start_time >= MEDIASERVER_MERGE_TIMEOUT:
@@ -117,7 +117,7 @@ def wait_until_servers_have_same_full_info(one, two):
 def wait_for_camera_disappearance_after_backup(server, camera_guid):
     start_time = datetime_utc_now()
     while True:
-        cameras = [c for c in server.api.ec2.getCameras.GET()
+        cameras = [c for c in server.api.get('ec2/getCameras')
                    if c['id'] == camera_guid]
         if not cameras:
             return
@@ -131,12 +131,12 @@ def wait_for_camera_disappearance_after_backup(server, camera_guid):
 def test_backup_restore(artifact_factory, one, two, camera):
     merge_systems(two, one)
     full_info_initial = wait_until_servers_have_same_full_info(one, two)
-    backup = one.api.ec2.dumpDatabase.GET()
+    backup = one.api.get('ec2/dumpDatabase')
     camera_guid = two.add_camera(camera)
     full_info_with_new_camera = wait_until_servers_have_same_full_info(one, two)
     assert full_info_with_new_camera != full_info_initial, (
         "ec2/getFullInfo data before and after saveCamera are the same")
-    one.api.ec2.restoreDatabase.POST(data=backup['data'])
+    one.api.post('ec2/restoreDatabase', dict(data=backup['data']))
     wait_for_camera_disappearance_after_backup(one, camera_guid)
     full_info_after_backup_restore = wait_until_servers_have_same_full_info(one, two)
     try:

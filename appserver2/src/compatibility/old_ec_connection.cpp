@@ -99,12 +99,7 @@ namespace ec2
         return AbstractDiscoveryManagerPtr();
     }
 
-    AbstractTimeManagerPtr OldEcConnection::getTimeManager(const Qn::UserAccessData &)
-    {
-        return AbstractTimeManagerPtr();
-    }
-
-    AbstractLicenseNotificationManagerPtr OldEcConnection::getLicenseNotificationManager()
+        AbstractLicenseNotificationManagerPtr OldEcConnection::getLicenseNotificationManager()
     {
         return AbstractLicenseNotificationManagerPtr();
     }
@@ -236,7 +231,7 @@ int OldEcConnection::restoreDatabaseAsync(
     {
     }
 
-    QnUuid OldEcConnection::routeToPeerVia(const QnUuid& /*uuid*/, int* ) const
+    QnUuid OldEcConnection::routeToPeerVia(const QnUuid& /*uuid*/, int*, nx::network::SocketAddress*) const
     {
         return QnUuid();
     }

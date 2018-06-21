@@ -1,5 +1,4 @@
-nx_add_server_plugin(genericrtspplugin
-    NO_MOC PUBLIC_LIBS 
+nx_add_server_plugin(genericrtspplugin NO_MOC
+    PRIVATE_LIBS
         common
-        #mx_plugin_utils
 )

@@ -35,6 +35,7 @@
 
 #include <utils/common/app_info.h>
 #include <core/resource/user_resource.h>
+#include <media_server/media_server_module.h>
 
 class QnTcpListener;
 
@@ -46,17 +47,18 @@ static const int kReadBufferSize = 1024 * 128; /* ~ 1 gbit/s */
 // ----------------------------- QnProxyConnectionProcessor ----------------------------
 
 QnProxyConnectionProcessor::QnProxyConnectionProcessor(
-    ec2::TransactionMessageBusAdapter* messageBus,
+    nx::vms::network::ReverseConnectionManager* reverseConnectionManager,
     QSharedPointer<nx::network::AbstractStreamSocket> socket,
     QnHttpConnectionListener* owner)
 :
     QnTCPConnectionProcessor(new QnProxyConnectionProcessorPrivate, std::move(socket), owner)
 {
     Q_D(QnProxyConnectionProcessor);
-    d->connectTimeout = qnGlobalSettings->proxyConnectTimeout();
-    d->messageBus = messageBus;
+    d->connectTimeout = commonModule()->globalSettings()->proxyConnectTimeout();
+    d->reverseConnectionManager = reverseConnectionManager;
 }
 
+#if 0
 QnProxyConnectionProcessor::QnProxyConnectionProcessor(
     QnProxyConnectionProcessorPrivate* priv,
     QSharedPointer<nx::network::AbstractStreamSocket> socket,
@@ -65,9 +67,9 @@ QnProxyConnectionProcessor::QnProxyConnectionProcessor(
     QnTCPConnectionProcessor(priv, std::move(socket), owner)
 {
     Q_D(QnProxyConnectionProcessor);
-    d->connectTimeout = qnGlobalSettings->proxyConnectTimeout();
+    d->connectTimeout = serverModule()->globalSettings()->proxyConnectTimeout();
 }
-
+#endif
 
 QnProxyConnectionProcessor::~QnProxyConnectionProcessor()
 {
@@ -136,25 +138,16 @@ QString QnProxyConnectionProcessor::connectToRemoteHost(const QnRoute& route, co
 {
     Q_D(QnProxyConnectionProcessor);
     auto owner = static_cast<QnUniversalTcpListener*>(d->owner);
+    d->dstSocket.reset();
     if (route.reverseConnect) {
         const auto& target = route.gatewayId.isNull() ? route.id : route.gatewayId;
-        d->dstSocket = owner->getProxySocket(
-            target.toString(),
-            d->connectTimeout.count(),
-            [&](int socketCount)
-            {
-                ec2::QnTransaction<ec2::ApiReverseConnectionData> tran(
-                    ec2::ApiCommand::openReverseConnection,
-                    commonModule()->moduleGUID());
-                tran.params.targetServer = commonModule()->moduleGUID();
-                tran.params.socketCount = socketCount;
-                d->messageBus->sendTransaction(tran, target);
-            });
-    } else {
-        d->dstSocket.clear();
+        d->dstSocket = std::move(d->reverseConnectionManager->getProxySocket(
+            target,
+            d->connectTimeout));
     }
 
-    if (!d->dstSocket) {
+    if (!d->dstSocket) 
+    {
 
 #ifdef PROXY_STRICT_IP
         QnServerMessageProcessor* processor = dynamic_cast<QnServerMessageProcessor*> (QnServerMessageProcessor::instance());
@@ -169,9 +162,8 @@ QString QnProxyConnectionProcessor::connectToRemoteHost(const QnRoute& route, co
             return QString();
         }
 
-        d->dstSocket = QSharedPointer<nx::network::AbstractStreamSocket>(
-            nx::network::SocketFactory::createStreamSocket(url.scheme() == lit("https"))
-            .release());
+        d->dstSocket = 
+            nx::network::SocketFactory::createStreamSocket(url.scheme() == lit("https"));
         d->dstSocket->setRecvTimeout(d->connectTimeout.count());
         d->dstSocket->setSendTimeout(d->connectTimeout.count());
         if (!d->dstSocket->connect(
@@ -464,7 +456,7 @@ bool QnProxyConnectionProcessor::openProxyDstConnection()
 {
     Q_D(QnProxyConnectionProcessor);
 
-    d->dstSocket.clear();
+    d->dstSocket.reset();
 
     // update source request
     nx::utils::Url dstUrl;
@@ -547,10 +539,10 @@ void QnProxyConnectionProcessor::doRawProxy()
 
         bool someBytesRead1 = false;
         bool someBytesRead2 = false;
-        if (!doProxyData(d->socket.data(), d->dstSocket.data(), buffer.data(), buffer.size(), &someBytesRead1))
+        if (!doProxyData(d->socket.data(), d->dstSocket.get(), buffer.data(), buffer.size(), &someBytesRead1))
             return;
 
-        if (!doProxyData(d->dstSocket.data(), d->socket.data(), buffer.data(), buffer.size(), &someBytesRead2))
+        if (!doProxyData(d->dstSocket.get(), d->socket.data(), buffer.data(), buffer.size(), &someBytesRead2))
             return;
 
         if (!someBytesRead1 && !someBytesRead2)
@@ -608,7 +600,7 @@ void QnProxyConnectionProcessor::doSmartProxy()
                     d->dstSocket->send(d->clientRequest);
                     if (isWebSocket)
                     {
-                        if (!doProxyData(d->dstSocket.data(), d->socket.data(), buffer.data(), kReadBufferSize, nullptr))
+                        if (!doProxyData(d->dstSocket.get(), d->socket.data(), buffer.data(), kReadBufferSize, nullptr))
                             return; // send rest of data
 
                         doRawProxy(); // switch to binary mode
@@ -643,7 +635,7 @@ void QnProxyConnectionProcessor::doSmartProxy()
         }
 
         bool someBytesRead2 = false;
-        if (!doProxyData(d->dstSocket.data(), d->socket.data(), buffer.data(), kReadBufferSize, &someBytesRead2))
+        if (!doProxyData(d->dstSocket.get(), d->socket.data(), buffer.data(), kReadBufferSize, &someBytesRead2))
         {
             NX_VERBOSE(this, lm("Error during proxying data"));
             return;

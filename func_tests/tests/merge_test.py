@@ -26,7 +26,7 @@ from framework.waiting import wait_for_true
 _logger = logging.getLogger(__name__)
 
 
-@pytest.fixture
+@pytest.fixture()
 def test_system_settings():
     return {'cameraSettingsOptimization': 'false', 'autoDiscoveryEnabled': 'false', 'statisticsAllowed': 'false'}
 
@@ -51,18 +51,18 @@ def wait_for_settings_merge(one, two):
 
 
 def check_admin_disabled(server):
-    users = server.api.ec2.getUsers.GET()
+    users = server.api.get('ec2/getUsers')
     admin_users = [u for u in users if u['name'] == 'admin']
     assert len(admin_users) == 1  # One cloud user is expected
     assert not admin_users[0]['isEnabled']
     with pytest.raises(HttpError) as x_info:
-        server.api.ec2.saveUser.POST(
+        server.api.post('ec2/saveUser', dict(
             id=admin_users[0]['id'],
-            isEnabled=True)
+            isEnabled=True))
     assert x_info.value.status_code == 403
 
 
-@pytest.fixture
+@pytest.fixture()
 def one(two_stopped_mediaservers, test_system_settings, cloud_host):
     one, _ = two_stopped_mediaservers
     set_cloud_host(one.installation, cloud_host)
@@ -72,7 +72,7 @@ def one(two_stopped_mediaservers, test_system_settings, cloud_host):
     return one
 
 
-@pytest.fixture
+@pytest.fixture()
 def two(two_stopped_mediaservers, cloud_host):
     _, two = two_stopped_mediaservers
     set_cloud_host(two.installation, cloud_host)
@@ -245,11 +245,11 @@ def test_cloud_merge_after_disconnect(two_stopped_mediaservers, cloud_account, t
     assert not two.installation.list_core_dumps()
 
 
-def wait_entity_merge_done(one, two, method, api_object, api_method, expected_resources):
+def wait_entity_merge_done(one, two, endpoint, expected_resources):
     start_time = datetime_utc_now()
     while True:
-        result_1 = one.api.get_api_fn(method, api_object, api_method)()
-        result_2 = two.api.get_api_fn(method, api_object, api_method)()
+        result_1 = one.api.get(endpoint)
+        result_2 = two.api.get(endpoint)
         if result_1 == result_2:
             got_resources = [v['id'] for v in result_1 if v['id'] in expected_resources]
             assert got_resources == expected_resources
@@ -264,11 +264,11 @@ def test_merge_resources(two_separate_mediaservers):
     one, two = two_separate_mediaservers
     user_data = generator.generate_user_data(1)
     camera_data = generator.generate_camera_data(1)
-    one.api.ec2.saveUser.POST(**user_data)
-    two.api.ec2.saveCamera.POST(**camera_data)
+    one.api.post('ec2/saveUser', dict(**user_data))
+    two.api.post('ec2/saveCamera', dict(**camera_data))
     merge_systems(two, one)
-    wait_entity_merge_done(one, two, 'GET', 'ec2', 'getUsers', [user_data['id']])
-    wait_entity_merge_done(one, two, 'GET', 'ec2', 'getCamerasEx', [camera_data['id']])
+    wait_entity_merge_done(one, two, 'ec2/getUsers', [user_data['id']])
+    wait_entity_merge_done(one, two, 'ec2/getCamerasEx', [camera_data['id']])
 
     assert not one.installation.list_core_dumps()
     assert not two.installation.list_core_dumps()
@@ -285,7 +285,7 @@ def test_restart_one_server(one, two, cloud_account):
     two.start()
 
     # Remove Server2 from database on Server1
-    one.api.ec2.removeResource.POST(id=guid2)
+    one.api.post('ec2/removeResource', dict(id=guid2))
 
     # Start server 2 again and move it from initial to working state
     setup_cloud_system(two, cloud_account, {})

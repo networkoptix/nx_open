@@ -74,7 +74,7 @@ struct ExportLayoutTool::Private
     explicit Private(ExportLayoutTool* owner, const ExportLayoutSettings& settings):
         q(owner),
         settings(settings),
-        actualFilename(settings.filename.completeFileName())
+        actualFilename(settings.fileName.completeFileName())
     {
     }
 
@@ -115,7 +115,7 @@ struct ExportLayoutTool::Private
         }
         else
         {
-            const auto targetFilename = settings.filename.completeFileName();
+            const auto targetFilename = settings.fileName.completeFileName();
             if (actualFilename != targetFilename)
                 storage->renameFile(storage->getUrl(), targetFilename);
         }
@@ -155,7 +155,7 @@ ExportLayoutTool::~ExportLayoutTool()
 bool ExportLayoutTool::prepareStorage()
 {
     const auto isExeFile = utils::AppInfo::isWindows()
-        && FileExtensionUtils::isExecutable(d->settings.filename.extension);
+        && FileExtensionUtils::isExecutable(d->settings.fileName.extension);
 
     if (isExeFile || d->actualFilename == m_layout->getUrl())
     {

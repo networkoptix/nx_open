@@ -1740,7 +1740,7 @@
     <message>
       <location/>
       <source>IP addresses for cameras, and servers, groups for users, etc.</source>
-      <translation>摄像机的IP地址,服務器以及用户所属之角色等等...</translation>
+      <translation>摄像机的IP地址, 服務器以及用户所属之角色等等...</translation>
     </message>
   </context>
   <context>

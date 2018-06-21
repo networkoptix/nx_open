@@ -5,6 +5,8 @@
 #include <QtWidgets/QApplication>
 #include <QtWebKit/QWebSettings>
 #include <QtQml/QQmlEngine>
+#include <QtOpenGL/QtOpenGL>
+#include <QtGui/QSurfaceFormat>
 
 #include <api/app_server_connection.h>
 #include <api/global_settings.h>
@@ -37,8 +39,6 @@
 #include <client/client_settings_watcher.h>
 #include <client/client_show_once_settings.h>
 #include <client/client_autorun_watcher.h>
-
-#include <camera/video_decoder_factory.h>
 
 #include <cloud/cloud_connection.h>
 
@@ -103,6 +103,7 @@
 #include <nx/client/desktop/utils/upload_manager.h>
 #include <nx/client/desktop/utils/wearable_manager.h>
 #include <nx/client/desktop/analytics/object_display_settings.h>
+#include <nx/client/desktop/ui/common/color_theme.h>
 
 #include <statistics/statistics_manager.h>
 #include <statistics/storage/statistics_file_storage.h>
@@ -248,6 +249,7 @@ QnClientModule::QnClientModule(const QnStartupParameters& startupParams, QObject
     initNetwork(startupParams);
     initSkin(startupParams);
     initLocalResources(startupParams);
+    initSurfaceFormat();
 
     // WebKit initialization must occur only once per application run. Actual for ActiveX module.
     static bool isWebKitInitialized = false;
@@ -343,6 +345,21 @@ void QnClientModule::initMetaInfo()
 {
     Q_INIT_RESOURCE(nx_client_desktop);
     QnClientMetaTypes::initialize();
+}
+
+void QnClientModule::initSurfaceFormat()
+{
+    QSurfaceFormat format;
+
+    if (qnSettings->lightMode().testFlag(Qn::LightModeNoMultisampling))
+        format.setSamples(2);
+    format.setSwapBehavior(qnSettings->isGlDoubleBuffer()
+        ? QSurfaceFormat::DoubleBuffer
+        : QSurfaceFormat::SingleBuffer);
+    format.setSwapInterval(qnSettings->isVSyncEnabled() ? 1 : 0);
+
+    QSurfaceFormat::setDefaultFormat(format);
+    QGLFormat::setDefaultFormat(QGLFormat::fromSurfaceFormat(format));
 }
 
 void QnClientModule::initSingletons(const QnStartupParameters& startupParams)
@@ -653,6 +670,7 @@ void QnClientModule::initSkin(const QnStartupParameters& startupParams)
     auto commonModule = m_clientCoreModule->commonModule();
     commonModule->store(skin.take());
     commonModule->store(customizer.take());
+    commonModule->store(new ColorTheme());
 }
 
 void QnClientModule::initLocalResources(const QnStartupParameters& startupParams)
@@ -663,10 +681,7 @@ void QnClientModule::initLocalResources(const QnStartupParameters& startupParams
     QnStoragePluginFactory::instance()->registerStoragePlugin(QLatin1String("qtfile"), QnQtFileStorageResource::instance);
     QnStoragePluginFactory::instance()->registerStoragePlugin(QLatin1String("layout"), QnLayoutFileStorageResource::instance);
 
-    auto pluginManager = commonModule->store(new PluginManager(nullptr));
-
-    QnVideoDecoderFactory::setCodecManufacture(QnVideoDecoderFactory::AUTO);
-    QnVideoDecoderFactory::setPluginManager(pluginManager);
+    commonModule->store(new PluginManager());
 
     auto resourceProcessor = commonModule->store(new QnClientResourceProcessor());
 

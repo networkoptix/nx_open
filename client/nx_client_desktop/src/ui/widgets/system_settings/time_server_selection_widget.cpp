@@ -207,21 +207,19 @@ void QnTimeServerSelectionWidget::applyChanges()
     if (!connection)
         return;
 
-    qnGlobalSettings->setSynchronizingTimeWithInternet(ui->syncWithInternetCheckBox->isChecked());
-    qnGlobalSettings->synchronizeNow();
+    auto globalSettings = commonModule()->globalSettings();
+    globalSettings->setSynchronizingTimeWithInternet(ui->syncWithInternetCheckBox->isChecked());
 
     if (ui->syncWithInternetCheckBox->isChecked())
+    {
+        globalSettings->synchronizeNow();
         return;
+    }
 
     PRINT_DEBUG("forcing selected server to " + m_model->selectedServer().toByteArray());
-    auto timeManager = connection->getTimeManager(Qn::kSystemAccess);
-    timeManager->forcePrimaryTimeServer(m_model->selectedServer(), this,
-        [this](int handle, ec2::ErrorCode errCode)
-        {
-            Q_UNUSED(handle);
-            Q_UNUSED(errCode);  //suppress warning in the release code
-            PRINT_DEBUG("forcing selected server finished with result " + ec2::toString(errCode).toUtf8());
-        });
+    
+    globalSettings->setPrimaryTimeServer(m_model->selectedServer());
+    globalSettings->synchronizeNow();
 }
 
 bool QnTimeServerSelectionWidget::hasChanges() const

@@ -1,6 +1,8 @@
 
 #include "search_bookmarks_model.h"
 
+#include <chrono>
+
 #include <translation/datetime_formatter.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/camera_bookmark.h>
@@ -19,6 +21,8 @@
 #include <nx/utils/raii_guard.h>
 #include <nx/utils/algorithm/index_of.h>
 #include <nx/client/core/watchers/server_time_watcher.h>
+
+using std::chrono::milliseconds;
 
 namespace
 {
@@ -175,8 +179,8 @@ QDateTime QnSearchBookmarksModelPrivate::displayTime(qint64 millisecondsSinceEpo
 
 void QnSearchBookmarksModelPrivate::setRange(qint64 utcStartTimeMs, qint64 utcFinishTimeMs)
 {
-    m_filter.startTimeMs = utcStartTimeMs;
-    m_filter.endTimeMs = utcFinishTimeMs;
+    m_filter.startTimeMs = milliseconds(utcStartTimeMs);
+    m_filter.endTimeMs = milliseconds(utcFinishTimeMs);
 }
 
 void QnSearchBookmarksModelPrivate::setFilterText(const QString& text)
@@ -310,9 +314,9 @@ QVariant QnSearchBookmarksModelPrivate::getData(const QModelIndex& index, int ro
     if (role == Qt::DisplayRole)
     {
         if (index.column() == QnSearchBookmarksModel::kStartTime)
-            return datetime::toString(displayTime(bookmark.startTimeMs));
+            return datetime::toString(displayTime(bookmark.startTimeMs.count()));
         if (index.column() == QnSearchBookmarksModel::kCreationTime)
-            return datetime::toString(displayTime(bookmark.creationTimeMs()));
+            return datetime::toString(displayTime(bookmark.creationTime().count()));
     }
 
     switch(index.column())
@@ -320,14 +324,14 @@ QVariant QnSearchBookmarksModelPrivate::getData(const QModelIndex& index, int ro
         case QnSearchBookmarksModel::kName:
             return bookmark.name;
         case QnSearchBookmarksModel::kStartTime:
-            return displayTime(bookmark.startTimeMs);
+            return displayTime(bookmark.startTimeMs.count());
         case QnSearchBookmarksModel::kCreationTime:
-            return displayTime(bookmark.creationTimeMs());
+            return displayTime(bookmark.creationTime().count());
         case QnSearchBookmarksModel::kCreator:
             return helpers::getBookmarkCreatorName(bookmark, resourcePool());
         case QnSearchBookmarksModel::kLength:
         {
-            const auto duration = std::chrono::milliseconds(std::abs(bookmark.durationMs));
+            const auto duration = std::chrono::milliseconds(std::abs(bookmark.durationMs.count()));
             using HumanReadable = nx::client::core::HumanReadable;
             return HumanReadable::timeSpan(duration,
                 HumanReadable::DaysAndTime,

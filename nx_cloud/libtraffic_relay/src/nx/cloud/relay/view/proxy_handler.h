@@ -5,6 +5,7 @@
 #include <nx/network/http/server/proxy/proxy_handler.h>
 #include <nx/utils/async_operation_guard.h>
 #include <nx/utils/std/optional.h>
+#include <nx/utils/thread/mutex.h>
 
 #include <nx/cloud/relaying/listening_peer_pool.h>
 
@@ -46,6 +47,7 @@ private:
     nx::utils::MoveOnlyFunc<void(
         std::optional<std::string> /*relayHostName*/,
         std::string /*proxyTargetHostName*/)> m_findRelayInstanceHandler;
+    QnMutex m_mutex;
 
     std::vector<std::string> extractTargetHostNameCandidates(
         const std::string& hostHeader) const;

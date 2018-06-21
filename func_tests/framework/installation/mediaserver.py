@@ -11,6 +11,7 @@ from pathlib2 import Path
 
 from framework.api_shortcuts import get_server_id
 from framework.camera import Camera, SampleMediaFile, make_schedule_task
+from framework.installation.installation import Installation
 from framework.media_stream import open_media_stream
 from framework.method_caching import cached_property
 from framework.os_access.posix_shell import local_shell
@@ -50,13 +51,14 @@ class TimePeriod(object):
 class Mediaserver(object):
     """Mediaserver, same for physical and virtual machines"""
 
-    def __init__(self, name, installation):
+    def __init__(self, name, installation):  # type: (str, Installation) -> None
         self.name = name
         self.installation = installation
         self.service = installation.service
         self.os_access = installation.os_access
         self.port = 7001
-        forwarded_address, forwarded_port = installation.os_access.forwarded_ports['tcp', self.port]
+        forwarded_port = installation.os_access.port_map.remote.tcp(self.port)
+        forwarded_address = installation.os_access.port_map.remote.address
         self.api = RestApi(name, forwarded_address, forwarded_port)
 
     def __repr__(self):
@@ -88,15 +90,15 @@ class Mediaserver(object):
                 raise Exception("Already stopped")
 
     def restart_via_api(self, timeout=MEDIASERVER_START_TIMEOUT):
-        old_runtime_id = self.api.api.moduleInformation.GET()['runtimeId']
+        old_runtime_id = self.api.get('api/moduleInformation')['runtimeId']
         _logger.info("Runtime id before restart: %s", old_runtime_id)
         started_at = datetime.datetime.now(pytz.utc)
-        self.api.api.restart.GET()
+        self.api.get('api/restart')
         sleep_time_sec = timeout.total_seconds() / 100.
         failed_connections = 0
         while True:
             try:
-                response = self.api.api.moduleInformation.GET()
+                response = self.api.get('api/moduleInformation')
             except requests.ConnectionError as e:
                 if datetime.datetime.now(pytz.utc) - started_at > timeout:
                     assert False, "Mediaserver hasn't started, caught %r, timed out." % e
@@ -119,15 +121,15 @@ class Mediaserver(object):
     def add_camera(self, camera):
         assert not camera.id, 'Already added to a server with id %r' % camera.id
         params = camera.get_info(parent_id=get_server_id(self.api))
-        result = self.api.ec2.saveCamera.POST(**params)
+        result = self.api.post('ec2/saveCamera', dict(**params))
         camera.id = result['id']
         return camera.id
 
     def set_camera_recording(self, camera, recording):
         assert camera, 'Camera %r is not yet registered on server' % camera
         schedule_tasks = [make_schedule_task(day_of_week + 1) for day_of_week in range(7)]
-        self.api.ec2.saveCameraUserAttributes.POST(
-            cameraId=camera.id, scheduleEnabled=recording, scheduleTasks=schedule_tasks)
+        self.api.post('ec2/saveCameraUserAttributes', dict(
+            cameraId=camera.id, scheduleEnabled=recording, scheduleTasks=schedule_tasks))
 
     def start_recording_camera(self, camera):
         self.set_camera_recording(camera, recording=True)
@@ -142,9 +144,9 @@ class Mediaserver(object):
         return Storage(self.os_access, storage_path)
 
     def rebuild_archive(self):
-        self.api.api.rebuildArchive.GET(mainPool=1, action='start')
+        self.api.get('api/rebuildArchive', params=dict(mainPool=1, action='start'))
         for i in range(30):
-            response = self.api.api.rebuildArchive.GET(mainPool=1)
+            response = self.api.get('api/rebuildArchive', params=dict(mainPool=1))
             if response['state'] == 'RebuildState_None':
                 return
             time.sleep(0.3)
@@ -155,7 +157,7 @@ class Mediaserver(object):
         periods = [
             TimePeriod(datetime.datetime.utcfromtimestamp(int(d['startTimeMs']) / 1000.).replace(tzinfo=pytz.utc),
                        datetime.timedelta(seconds=int(d['durationMs']) / 1000.))
-            for d in self.api.ec2.recordedTimePeriods.GET(cameraId=camera.id, flat=True)]
+            for d in self.api.get('ec2/recordedTimePeriods', params=dict(cameraId=camera.id, flat=True))]
         _logger.info('Mediaserver %r returned %d recorded periods:', self.name, len(periods))
         for period in periods:
             _logger.info('\t%s', period)

@@ -31,6 +31,10 @@ class CIMClass(object):
 
 class _CimAction(object):
     common_namespaces = {
+        # Namespaces from pywinrm's Protocol.
+        # TODO: Use aliases from WS-Management spec.
+        # See: https://www.dmtf.org/sites/default/files/standards/documents/DSP0226_1.0.0.pdf, Table A-1.
+        # Currently aliases are coupled from those from Protocol.
         'http://www.w3.org/XML/1998/namespace': 'xml',
         'http://www.w3.org/2003/05/soap-envelope': 'env',
         'http://schemas.xmlsoap.org/ws/2004/09/enumeration': 'n',
@@ -38,6 +42,8 @@ class _CimAction(object):
         'http://www.w3.org/2001/XMLSchema': 'xs',
         'http://schemas.dmtf.org/wbem/wscim/1/common': 'cim',
         'http://schemas.dmtf.org/wbem/wsman/1/wsman.xsd': 'w',
+        'http://schemas.xmlsoap.org/ws/2004/09/transfer': 't',
+        'http://schemas.xmlsoap.org/ws/2004/08/addressing': 'a',
         CIMClass('Win32_FolderRedirectionHealth').uri: 'folder',  # Commonly encountered in responses.
         }
 
@@ -116,16 +122,16 @@ class _Enumeration(object):
             'n:Enumerate': {
                 'w:OptimizeEnumeration': None,
                 'w:MaxElements': str(self.max_elements),
+                # See: https://www.dmtf.org/sites/default/files/standards/documents/DSP0226_1.0.0.pdf, 8.7.
+                'w:EnumerationMode': 'EnumerateObjectAndEPR',
                 }
             }
         response = _CimAction(self.cim_class, action, self.selectors, body).perform(self.protocol)
         self.enumeration_context = response['n:EnumerateResponse']['n:EnumerationContext']
-        self.is_ended = any((
-            'n:EndOfSequence' in response['n:EnumerateResponse'],
-            'w:EndOfSequence' in response['n:EnumerateResponse']))
-        items = response['n:EnumerateResponse']['w:Items'][self.cim_class.name]
-        assert isinstance(items, list)
-        return items if isinstance(items, list) else [items]
+        self.is_ended = 'w:EndOfSequence' in response['n:EnumerateResponse']
+        items = response['n:EnumerateResponse']['w:Items']['w:Item']
+        objects = [item[self.cim_class.name] for item in items]
+        return objects
 
     def _pull(self):
         _logger.debug("Continue enumerating %s where %r", self.cim_class, self.selectors)
@@ -139,13 +145,11 @@ class _Enumeration(object):
                 }
             }
         response = _CimAction(self.cim_class, action, self.selectors, body).perform(self.protocol)
-        self.is_ended = any((
-            'n:EndOfSequence' in response['n:PullResponse'],
-            'w:EndOfSequence' in response['n:PullResponse']))
+        self.is_ended = 'n:EndOfSequence' in response['n:PullResponse']
         self.enumeration_context = None if self.is_ended else response['n:PullResponse']['n:EnumerationContext']
-        items = response['n:PullResponse']['n:Items'][self.cim_class.name]
-        assert isinstance(items, list)
-        return items if isinstance(items, list) else [items]
+        items = response['n:PullResponse']['n:Items']['w:Item']
+        objects = [item[self.cim_class.name] for item in items]
+        return objects
 
     def enumerate(self):
         for item in self._start():
@@ -165,13 +169,36 @@ class CIMQuery(object):
         _logger.debug("Enumerate %s where %r", self.cim_class, self.selectors)
         return _Enumeration(self.protocol, self.cim_class, self.selectors, max_elements=max_elements).enumerate()
 
-    def get_one(self):
+    def get(self):
         _logger.debug("Get %s where %r", self.cim_class, self.selectors)
         action_url = 'http://schemas.xmlsoap.org/ws/2004/09/transfer/Get'
         action = _CimAction(self.cim_class, action_url, self.selectors, {})
         outcome = action.perform(self.protocol)
         instance = outcome[self.cim_class.name]
         return instance
+
+    def put(self, new_properties_dict):
+        _logger.debug("Put %s where %r: %r", self.cim_class, self.selectors, new_properties_dict)
+        action_url = 'http://schemas.xmlsoap.org/ws/2004/09/transfer/Put'
+        body = {self.cim_class.name: new_properties_dict}
+        body[self.cim_class.name]['@xmlns'] = self.cim_class.uri
+        action = _CimAction(self.cim_class, action_url, self.selectors, body)
+        outcome = action.perform(self.protocol)
+        instance = outcome[self.cim_class.name]
+        return instance
+
+    def create(self, properties_dict):
+        assert not self.selectors
+        _logger.debug("Create %r: %r", self.cim_class, properties_dict)
+        action_url = 'http://schemas.xmlsoap.org/ws/2004/09/transfer/Create'
+        body = {self.cim_class.name: properties_dict}
+        body[self.cim_class.name]['@xmlns'] = self.cim_class.uri
+        action = _CimAction(self.cim_class, action_url, self.selectors, body)
+        outcome = action.perform(self.protocol)
+        reference_parameters = outcome[u't:ResourceCreated'][u'a:ReferenceParameters']
+        assert reference_parameters[u'w:ResourceURI'] == self.cim_class.uri
+        selector_set = reference_parameters[u'w:SelectorSet']
+        return selector_set
 
     def invoke_method(self, method_name, params, timeout_sec=None):
         _logger.debug("Invoke %s.%s(%r) where %r", self.cim_class, method_name, params, self.selectors)

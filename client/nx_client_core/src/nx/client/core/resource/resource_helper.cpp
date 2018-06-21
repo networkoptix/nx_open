@@ -100,12 +100,12 @@ bool ResourceHelper::hasCameraCapability(Qn::CameraCapability capability) const
 
 bool ResourceHelper::hasDefaultCameraPassword() const
 {
-    return hasCameraCapability(Qn::isDefaultPasswordCapability);
+    return hasCameraCapability(Qn::IsDefaultPasswordCapability);
 }
 
 bool ResourceHelper::hasOldCameraFirmware() const
 {
-    return hasCameraCapability(Qn::isOldFirmwareCapability);
+    return hasCameraCapability(Qn::IsOldFirmwareCapability);
 }
 
 bool ResourceHelper::audioSupported() const

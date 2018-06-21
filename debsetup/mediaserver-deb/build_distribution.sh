@@ -83,7 +83,6 @@ buildDistribution()
     local PLUGINS=(
         generic_multicast_plugin
         genericrtspplugin
-        image_library_plugin
         it930x_plugin
         mjpg_link
     )

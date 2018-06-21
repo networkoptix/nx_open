@@ -25,7 +25,7 @@
 #include <ui/help/help_topics.h>
 #include <common/common_module.h>
 #include <core/resource_management/resource_pool.h>
-
+#include <ui/common/read_only.h>
 using namespace nx::client::desktop;
 
 namespace {
@@ -369,6 +369,20 @@ void LegacyExpertSettingsWidget::updateFromResources(const QnVirtualCameraResour
     else
         ui->checkBoxDisableNativePtzPresets->setCheckState(Qt::Unchecked);
 
+    const bool canSetupVideoStream = std::all_of(cameras.cbegin(), cameras.cend(),
+        [](const QnVirtualCameraResourcePtr& camera)
+        {
+            return !camera->isDtsBased()
+                && !camera->hasFlags(Qn::wearable_camera)
+                && camera->hasVideo();
+        });
+
+    ui->leftWidget->setEnabled(canSetupVideoStream);
+    ui->groupBoxArchive->setEnabled(canSetupVideoStream);
+    ui->groupBoxRTP->setEnabled(canSetupVideoStream);
+    ui->groupBoxPtzControl->setEnabled(canSetupVideoStream);
+    ui->restoreDefaultsButton->setEnabled(canSetupVideoStream);
+
     m_currentCameraId = cameras.front()->getId();
     ui->logicalIdSpinBox->setValue(cameras.size() == 1
         ? cameras.front()->getLogicalId().toInt() : 0);
@@ -589,6 +603,25 @@ void LegacyExpertSettingsWidget::setSecondStreamEnabled(bool value)
     ui->secondStreamDisableCheckBox->setChecked(!value);
 }
 
+bool LegacyExpertSettingsWidget::isReadOnly() const
+{
+    return m_readOnly;
+}
+
+void LegacyExpertSettingsWidget::setReadOnly(bool readOnly)
+{
+    if (m_readOnly == readOnly)
+        return;
+
+    using ::setReadOnly;
+    setReadOnly(ui->leftWidget, readOnly);
+    setReadOnly(ui->rightWidget, readOnly);
+    setReadOnly(ui->restoreDefaultsButton, readOnly);
+
+    m_readOnly = readOnly;
+}
+
 } // namespace desktop
 } // namespace client
 } // namespace nx
+

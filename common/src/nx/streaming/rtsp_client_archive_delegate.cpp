@@ -367,7 +367,7 @@ bool QnRtspClientArchiveDelegate::openInternal()
             auto newValue = QnCustomResourceVideoLayout::fromString(vLayout);
             bool isChanged =  getVideoLayout()->toString() != newValue->toString();
             setCustomVideoLayout(newValue);
-            if(isChanged)
+            if (m_reader && isChanged)
                 emit m_reader->videoLayoutChanged();
         }
     }
@@ -828,7 +828,7 @@ void QnRtspClientArchiveDelegate::setSpeed(qint64 displayTime, double value)
     m_rtspSession->setScale(value);
 
     bool needSendRequest = !m_rtspSession->isOpened() || oldReverseMode != newReverseMode
-        || m_camera->getCameraCapabilities().testFlag(Qn::isPlaybackSpeedSupported);
+        || m_camera->getCameraCapabilities().testFlag(Qn::IsPlaybackSpeedSupported);
     if (!needSendRequest)
         return;
 

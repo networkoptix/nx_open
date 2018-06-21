@@ -4,13 +4,9 @@
 #include <QtCore/QUrl>
 
 #include <core/resource/webpage_resource.h>
-
 #include <nx/client/desktop/common/utils/aligner.h>
+#include <nx/client/desktop/common/utils/validators.h>
 #include <nx/network/http/http_types.h>
-
-#include <ui/workaround/widgets_signals_workaround.h>
-
-using namespace nx::client::desktop;
 
 namespace {
 
@@ -30,6 +26,8 @@ QnWebpageDialog::QnWebpageDialog(QWidget* parent) :
     base_type(parent),
     ui(new Ui::WebpageDialog)
 {
+    using namespace nx::client::desktop;
+
     ui->setupUi(this);
 
     ui->nameInputField->setTitle(tr("Name"));
@@ -60,29 +58,8 @@ QnWebpageDialog::QnWebpageDialog(QWidget* parent) :
     aligner->addWidgets({
         ui->nameInputField,
         ui->urlInputField,
-        ui->subTypeLabel
+        ui->c2pCheckBoxSpacerWidget
     });
-
-    ui->subtypeComboBox->addItem(tr("None"), QVariant::fromValue(WebPageSubtype::none));
-    ui->subtypeComboBox->addItem(lit("C2P"), QVariant::fromValue(WebPageSubtype::c2p));
-
-    auto advancedCheckBox = new QCheckBox(ui->buttonBox);
-    advancedCheckBox->setText(tr("Advanced"));
-    ui->buttonBox->addButton(advancedCheckBox, QDialogButtonBox::ButtonRole::HelpRole);
-
-    auto setAdvancedMode =
-        [this](bool value)
-        {
-            ui->subtypeComboBox->setVisible(value);
-            ui->subTypeLabel->setVisible(value);
-        };
-
-    connect(advancedCheckBox, &QCheckBox::stateChanged, this,
-        [setAdvancedMode](int state) { setAdvancedMode(state == Qt::Checked); });
-    setAdvancedMode(false);
-
-    connect(ui->subtypeComboBox, QnComboboxCurrentIndexChanged, this,
-        [advancedCheckBox](int index) { if (index != 0) advancedCheckBox->setChecked(true); });
 
     setResizeToContentsMode(Qt::Vertical);
 }
@@ -116,14 +93,14 @@ void QnWebpageDialog::setUrl(const QUrl& url)
 
 WebPageSubtype QnWebpageDialog::subtype() const
 {
-    return ui->subtypeComboBox->currentData().value<WebPageSubtype>();
+    return ui->c2pCheckBox->isChecked()
+        ? WebPageSubtype::c2p
+        : WebPageSubtype::none;
 }
 
 void QnWebpageDialog::setSubtype(WebPageSubtype value)
 {
-    const int index = ui->subtypeComboBox->findData(QVariant::fromValue(value));
-    NX_EXPECT(index == static_cast<int>(value));
-    ui->subtypeComboBox->setCurrentIndex(index);
+    ui->c2pCheckBox->setChecked(value == WebPageSubtype::c2p);
 }
 
 void QnWebpageDialog::accept()

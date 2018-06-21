@@ -11,6 +11,7 @@ enum class WebViewStyle
     eula
 };
 
+QPalette createWebViewPalette(WebViewStyle style = WebViewStyle::common);
 void setupWebViewStyle(QWebView* webView, WebViewStyle style = WebViewStyle::common);
 void setupWebViewStyle(QGraphicsWebView* webView, WebViewStyle style = WebViewStyle::common);
 

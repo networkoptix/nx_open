@@ -52,6 +52,11 @@ class QnCommonModule;
 struct QnModuleInformation;
 
 namespace nx {
+
+namespace time_sync { 
+class TimeSyncManager; 
+}
+
 namespace vms {
 namespace discovery {
 class Manager;
@@ -68,7 +73,6 @@ namespace ec2 {
 class ECConnectionNotificationManager;
 class TransactionMessageBusAdapter;
 class P2pMessageBus;
-class TimeSynchronizationManager;
 class QnAbstractTransactionTransport;
 
 struct QnPeerTimeInfo
@@ -736,6 +740,7 @@ public:
 signals :
     //!Emitted when synchronized time has been changed
     void timeChanged(qint64 syncTime);
+    void primaryTimeServerTimeChanged();
 };
 
 typedef std::shared_ptr<AbstractTimeNotificationManager> AbstractTimeNotificationManagerPtr;
@@ -770,31 +775,12 @@ public:
             time);
     }
 
-    /** Set peer identified by \a serverGuid to be primary time server (every other peer
-     * synchronizes time with server \a serverGuid)
-     */
-    template<class TargetType, class HandlerType>
-    int forcePrimaryTimeServer(const QnUuid& serverGuid, TargetType* target, HandlerType handler)
-    {
-        return forcePrimaryTimeServerImpl(
-            serverGuid,
-            std::static_pointer_cast<impl::SimpleHandler>(
-                std::make_shared<impl::CustomSimpleHandler<TargetType, HandlerType>>(
-                    target,
-                    handler)));
-    }
-
-    //!Returns list of peers whose local system time is known
-    virtual void forceTimeResync() = 0;
-
 protected:
     virtual int getCurrentTimeImpl(impl::CurrentTimeHandlerPtr handler) = 0;
     virtual int forcePrimaryTimeServerImpl(
         const QnUuid& serverGuid,
         impl::SimpleHandlerPtr handler) = 0;
 };
-
-typedef std::shared_ptr<AbstractTimeManager> AbstractTimeManagerPtr;
 
 class AbstractMiscNotificationManager: public QObject
 {
@@ -1036,7 +1022,6 @@ public:
     virtual AbstractMiscManagerPtr getMiscManager(const Qn::UserAccessData& userAccessData) = 0;
     virtual AbstractDiscoveryManagerPtr getDiscoveryManager(
         const Qn::UserAccessData& userAccessData) = 0;
-    virtual AbstractTimeManagerPtr getTimeManager(const Qn::UserAccessData& userAccessData) = 0;
     virtual AbstractWebPageManagerPtr getWebPageManager(
         const Qn::UserAccessData& userAccessData) = 0;
 
@@ -1058,8 +1043,12 @@ public:
 
     virtual QnCommonModule* commonModule() const = 0;
 
-    virtual QnUuid routeToPeerVia(const QnUuid& dstPeer, int* distance) const = 0;
+    virtual QnUuid routeToPeerVia(
+        const QnUuid& dstPeer, 
+        int* distance, 
+        nx::network::SocketAddress* knownPeerAddress) const = 0;
     virtual TransactionMessageBusAdapter* messageBus() const = 0;
+    virtual nx::time_sync::TimeSyncManager* timeSyncManager() const = 0;
 
     virtual ECConnectionNotificationManager* notificationManager()
     {
@@ -1226,7 +1215,7 @@ public:
 
     virtual void setConfParams(std::map<QString, QVariant> confParams) = 0;
     virtual TransactionMessageBusAdapter* messageBus() const = 0;
-    virtual TimeSynchronizationManager* timeSyncManager() const = 0;
+    virtual nx::time_sync::TimeSyncManager* timeSyncManager() const = 0;
 
     virtual void shutdown()
     {

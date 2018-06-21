@@ -121,24 +121,24 @@ JsonRestResponse createActionResponse(const QByteArray& body)
 
     if (!QJson::deserialize<api::Updates2ActionData>(body, &actionData))
     {
-        result.json.setReply(
-            api::Updates2StatusData(
-                qnServerModule->commonModule()->moduleGUID(),
-                api::Updates2StatusData::StatusCode::error,
-                "Failed to deserialize update action data"));
+        result.json.setReply(api::Updates2StatusData(qnServerModule->commonModule()->moduleGUID(),
+            api::Updates2StatusData::StatusCode::error, "Failed to deserialize update action data"));
         return result;
     }
 
     switch (actionData.action)
     {
         case api::Updates2ActionData::ActionCode::download:
-            result.json.setReply(qnServerModule->updates2Manager()->download());
+            result.json.setReply(qnServerModule->updates2Manager()->download(actionData.targetVersion));
             break;
         case api::Updates2ActionData::ActionCode::install:
             result.json.setReply(qnServerModule->updates2Manager()->install());
             break;
         case api::Updates2ActionData::ActionCode::stop:
             result.json.setReply(qnServerModule->updates2Manager()->cancel());
+            break;
+        case api::Updates2ActionData::ActionCode::check:
+            result.json.setReply(qnServerModule->updates2Manager()->check());
             break;
     }
 
