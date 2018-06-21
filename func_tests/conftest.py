@@ -8,6 +8,7 @@ from framework.artifact import ArtifactFactory
 from framework.ca import CA
 from framework.config import SingleTestConfig, TestParameter, TestsConfig
 from framework.metrics_saver import MetricsSaver
+from framework.os_access.exceptions import DoesNotExist
 
 pytest_plugins = ['fixtures.vms', 'fixtures.mediaservers', 'fixtures.cloud', 'fixtures.layouts', 'fixtures.media']
 
@@ -41,6 +42,19 @@ def work_dir(request):
     work_dir = request.config.getoption('--work-dir').expanduser()
     work_dir.mkdir(exist_ok=True, parents=True)
     return work_dir
+
+
+@pytest.fixture()
+def node_dir(request, work_dir):
+    # Don't call it "test_dir" to avoid interpretation as test.
+    # `node`, in pytest terms, is test with instantiated parameters.
+    node_dir = work_dir / request.node.name
+    try:
+        node_dir.rmtree()
+    except DoesNotExist:
+        pass
+    node_dir.mkdir(parents=True, exist_ok=True)
+    return node_dir
 
 
 @pytest.fixture(scope='session')
