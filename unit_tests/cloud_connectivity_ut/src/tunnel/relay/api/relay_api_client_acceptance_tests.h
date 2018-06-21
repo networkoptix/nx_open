@@ -1,5 +1,7 @@
 #pragma once
 
+#include <array>
+
 #include <gtest/gtest.h>
 
 #include <nx/network/cloud/tunnel/relay/api/relay_api_client_over_http_upgrade.h>
@@ -256,13 +258,15 @@ private:
         network::AbstractStreamSocket* from,
         network::AbstractStreamSocket* to)
     {
-        std::array<char, 256> sendBuf;
+        constexpr int bufSize = 256;
+
+        std::array<char, bufSize> sendBuf;
         std::generate(sendBuf.begin(), sendBuf.end(), &rand);
         ASSERT_EQ(
             (int) sendBuf.size(),
             from->send(sendBuf.data(), (unsigned int) sendBuf.size()));
 
-        std::array<char, sendBuf.size()> recvBuf;
+        std::array<char, bufSize> recvBuf;
         ASSERT_EQ(
             (int) sendBuf.size(),
             to->recv(recvBuf.data(), (unsigned int) recvBuf.size(), 0));
@@ -327,8 +331,8 @@ TYPED_TEST_P(RelayApiClientAcceptance, sending_data_through_server_tunnel)
 
 TYPED_TEST_P(RelayApiClientAcceptance, provides_feedback_about_server_tunnel)
 {
-    whenEstablishTunnelFailed();
-    thenFeedbackIsReported();
+    this->whenEstablishTunnelFailed();
+    this->thenFeedbackIsReported();
 }
 
 // TYPED_TEST_P(RelayApiClientAcceptance, establish_client_tunnel)
