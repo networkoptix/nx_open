@@ -24,6 +24,7 @@ public:
     api::Updates2StatusData download();
     api::Updates2StatusData install();
     api::Updates2StatusData cancel();
+    api::Updates2StatusData check();
     void atServerStart();
     /**
      * After this method has been called Updates2Manager is not operational and should be

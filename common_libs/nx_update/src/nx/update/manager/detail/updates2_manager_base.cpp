@@ -596,6 +596,15 @@ api::Updates2StatusData Updates2ManagerBase::cancel()
     return m_currentStatus.base();
 }
 
+api::Updates2StatusData Updates2ManagerBase::check()
+{
+    m_timerManager.addTimer(
+        [this](utils::TimerId timerId) { checkForRemoteUpdate(timerId, /*forced*/ false); },
+        std::chrono::milliseconds(1));
+    QnMutexLocker lock(&m_mutex);
+    return m_currentStatus.base();
+}
+
 } // namespace detail
 } // namespace manager
 } // namespace update

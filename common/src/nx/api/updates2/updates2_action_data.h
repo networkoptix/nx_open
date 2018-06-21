@@ -17,7 +17,8 @@ public:
     {
         download,
         stop,
-        install
+        install,
+        check
     };
     Q_ENUM(ActionCode)
 
