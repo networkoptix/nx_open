@@ -87,7 +87,9 @@ QVariant QnCameraListModel::data(const QModelIndex &index, int role) const {
         case MacColumn:
             return camera->getMAC().toString();
         case LogicalIdColumn:
-            return camera->getLogicalId();
+            if (const int logicalId = camera->logicalId(); logicalId > 0)
+                return logicalId;
+            return QVariant();
         case ServerColumn:
             return server ? QnResourceDisplayInfo(server).toString(Qn::RI_WithUrl) : QVariant();
         default:

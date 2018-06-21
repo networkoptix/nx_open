@@ -38,6 +38,8 @@ struct LayoutSettingsDialog::Private
         const auto& state = store->state();
 
         layout->setLocked(state.locked);
+        layout->setLogicalId(state.logicalId);
+        layout->setFixedSize(state.fixedSizeEnabled ? state.fixedSize : QSize());
 
         const auto& background = state.background;
         layout->setBackgroundImageFilename(background.filename);

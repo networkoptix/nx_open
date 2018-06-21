@@ -45,6 +45,9 @@ struct ApiLayoutData: ApiResourceData
     float verticalSpacing = 0;
     std::vector<ApiLayoutItemData> items;
     bool locked = false;
+    qint32 fixedWidth = 0;
+    qint32 fixedHeight = 0;
+    qint32 logicalId = 0;
     QString backgroundImageFilename;
     qint32 backgroundWidth = 0;
     qint32 backgroundHeight = 0;
@@ -52,6 +55,7 @@ struct ApiLayoutData: ApiResourceData
 };
 #define ApiLayoutData_Fields ApiResourceData_Fields \
     (cellAspectRatio)(horizontalSpacing)(verticalSpacing)(items)(locked) \
-    (backgroundImageFilename)(backgroundWidth)(backgroundHeight)(backgroundOpacity)
+    (backgroundImageFilename)(backgroundWidth)(backgroundHeight)(backgroundOpacity) \
+    (fixedWidth)(fixedHeight)(logicalId)
 
 }

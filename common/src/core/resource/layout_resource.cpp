@@ -375,6 +375,40 @@ QString QnLayoutResource::backgroundImageFilename() const
     return m_backgroundImageFilename;
 }
 
+QSize QnLayoutResource::fixedSize() const
+{
+    QnMutexLocker locker(&m_mutex);
+    return m_fixedSize;
+}
+
+void QnLayoutResource::setFixedSize(const QSize& value)
+{
+    {
+        QnMutexLocker locker(&m_mutex);
+        if (m_fixedSize == value)
+            return;
+        m_fixedSize = value;
+    }
+    emit fixedSizeChanged(::toSharedPointer(this));
+}
+
+int QnLayoutResource::logicalId() const
+{
+    QnMutexLocker locker(&m_mutex);
+    return m_logicalId;
+}
+
+void QnLayoutResource::setLogicalId(int value)
+{
+    {
+        QnMutexLocker locker(&m_mutex);
+        if (m_logicalId == value)
+            return;
+        m_logicalId = value;
+    }
+    emit logicalIdChanged(::toSharedPointer(this));
+}
+
 void QnLayoutResource::setBackgroundImageFilename(const QString &filename)
 {
     {

@@ -369,7 +369,7 @@ void QnCameraExpertSettingsWidget::updateFromResources(const QnVirtualCameraReso
 
     m_currentCameraId = cameras.front()->getId();
     ui->logicalIdSpinBox->setValue(cameras.size() == 1
-        ? cameras.front()->getLogicalId().toInt() : 0);
+        ? cameras.front()->logicalId() : 0);
     ui->logicalIdGroupBox->setEnabled(cameras.size() == 1);
 }
 
@@ -438,9 +438,9 @@ void QnCameraExpertSettingsWidget::submitToResources(const QnVirtualCameraResour
         if (ui->logicalIdGroupBox->isEnabled())
         {
             if (ui->logicalIdSpinBox->value() > 0)
-                camera->setLogicalId(ui->logicalIdSpinBox->text());
+                camera->setLogicalId(ui->logicalIdSpinBox->value());
             else
-                camera->setLogicalId(QString());
+                camera->setLogicalId(0);
         }
     }
 }
@@ -470,7 +470,7 @@ int QnCameraExpertSettingsWidget::generateFreeLogicalId() const
     {
         if (camera->getId() == m_currentCameraId)
             continue;
-        const auto id = camera->getLogicalId().toInt();
+        const auto id = camera->logicalId();
         if (id > 0)
             usedValues.insert(id);
     }
@@ -493,10 +493,11 @@ void QnCameraExpertSettingsWidget::at_generateLogicalId()
 void QnCameraExpertSettingsWidget::updateLogicalIdControls()
 {
     auto duplicateCameras = commonModule()->resourcePool()->getAllCameras().filtered(
-        [this](const QnVirtualCameraResourcePtr camera)
+        [this](const QnVirtualCameraResourcePtr& camera)
         {
-            return !camera->getLogicalId().isEmpty()
-                && camera->getLogicalId().toInt() == ui->logicalIdSpinBox->value()
+            const int logicalId = camera->logicalId();
+            return logicalId > 0
+                && logicalId == ui->logicalIdSpinBox->value()
                 && camera->getId() != m_currentCameraId;
         });
 

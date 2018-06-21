@@ -670,9 +670,7 @@ bool ManagerPool::cameraInfoFromResource(
         CameraInfo::kStringParameterMaxLength);
 
     outResourceInfo->channel = camera->getChannel();
-
-    // If getLogicalId() returns incorrect number, logicalId is set to 0.
-    outResourceInfo->logicalId = camera->getLogicalId().toInt();
+    outResourceInfo->logicalId = camera->logicalId();
 
     return true;
 }

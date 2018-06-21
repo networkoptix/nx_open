@@ -41,6 +41,7 @@ class QnResource: public QObject, public QnFromThisToShared<QnResource>
     Q_PROPERTY(QnUuid id READ getId WRITE setId)
     Q_PROPERTY(QnUuid typeId READ getTypeId WRITE setTypeId)
     Q_PROPERTY(QString uniqueId READ getUniqueId)
+    Q_PROPERTY(int logicalId READ logicalId WRITE setLogicalId NOTIFY logicalIdChanged)
     Q_PROPERTY(QString name READ getName WRITE setName NOTIFY nameChanged)
     Q_PROPERTY(QString searchString READ toSearchString)
     Q_PROPERTY(QnUuid parentId READ getParentId WRITE setParentId)
@@ -138,6 +139,9 @@ public:
     virtual QString getUrl() const;
     virtual void setUrl(const QString &url);
 
+    virtual int logicalId() const;
+    virtual void setLogicalId(int value);
+
     bool hasConsumer(QnResourceConsumer *consumer) const;
 #ifdef ENABLE_DATA_PROVIDERS
     bool hasUnprocessedCommands() const;
@@ -213,6 +217,7 @@ signals:
     void parentIdChanged(const QnResourcePtr &resource);
     void flagsChanged(const QnResourcePtr &resource);
     void urlChanged(const QnResourcePtr &resource);
+    void logicalIdChanged(const QnResourcePtr& resource);
     void resourceChanged(const QnResourcePtr &resource);
     void ptzCapabilitiesChanged(const QnResourcePtr &resource);
     void mediaDewarpingParamsChanged(const QnResourcePtr &resource);

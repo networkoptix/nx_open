@@ -1399,11 +1399,13 @@ void Ec2DirectConnectionFactory::registerRestHandlers(QnRestProcessorPool* const
      * %param locked Whether the layout is locked.
      *     %value false
      *     %value true
+     * %param fixedWidth Fixed width of the layout in cells (integer).
+     * %param fixedHeight Fixed height of the layout in cells (integer).
+     * %param logicalId Logical ID of the layout, set by user (integer).
      * %param backgroundImageFilename
-     * %param backgroundWidth Width of the background image in pixels (integer).
-     * %param backgroundHeight Height of the background image in pixels (integer).
-     * %param backgroundOpacity Level of opacity of the background image in pixels (floating-point
-     *     0..1).
+     * %param backgroundWidth Width of the background image in cells (integer).
+     * %param backgroundHeight Height of the background image in cells (integer).
+     * %param backgroundOpacity Level of opacity of the background image (floating-point, 0..1).
      * %// AbstractLayoutManager::save
      */
     regUpdate<ApiLayoutData>(p, ApiCommand::saveLayout);

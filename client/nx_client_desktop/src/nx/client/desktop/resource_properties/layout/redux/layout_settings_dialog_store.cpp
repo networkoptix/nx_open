@@ -58,6 +58,39 @@ void LayoutSettingsDialogStore::setLocked(bool value)
     d->executeAction([&](State state) { return Reducer::setLocked(std::move(state), value); });
 }
 
+void LayoutSettingsDialogStore::setLogicalId(int value)
+{
+    d->executeAction([&](State state) { return Reducer::setLogicalId(std::move(state), value); });
+}
+
+void LayoutSettingsDialogStore::resetLogicalId()
+{
+    d->executeAction([](State state) { return Reducer::resetLogicalId(std::move(state)); });
+}
+
+void LayoutSettingsDialogStore::generateLogicalId()
+{
+    d->executeAction([](State state) { return Reducer::generateLogicalId(std::move(state)); });
+}
+
+void LayoutSettingsDialogStore::setFixedSizeEnabled(bool value)
+{
+    d->executeAction(
+        [&](State state) { return Reducer::setFixedSizeEnabled(std::move(state), value); });
+}
+
+void LayoutSettingsDialogStore::setFixedSizeWidth(int value)
+{
+    d->executeAction(
+        [&](State state) { return Reducer::setFixedSizeWidth(std::move(state), value); });
+}
+
+void LayoutSettingsDialogStore::setFixedSizeHeight(int value)
+{
+    d->executeAction(
+        [&](State state) { return Reducer::setFixedSizeHeight(std::move(state), value); });
+}
+
 void LayoutSettingsDialogStore::setBackgroundImageError(const QString& errorText)
 {
     d->executeAction(
