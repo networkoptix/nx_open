@@ -50,24 +50,24 @@ namespace core {
 UserWatcher::UserWatcher(QObject* parent) :
     base_type(parent)
 {
-    connect(qnClientMessageProcessor,
-        &QnClientMessageProcessor::initialResourcesReceived, this,
-        [this]
-        {
-            setCurrentUser(findUser(m_userName, commonModule()));
-        }
-    );
+    const auto updateUserResource =
+        [this] { setUser(findUser(m_userName, commonModule())); };
+
+    connect(qnClientMessageProcessor, &QnClientMessageProcessor::initialResourcesReceived,
+        this, updateUserResource);
 
     connect(resourcePool(), &QnResourcePool::resourceRemoved,
         this, [this](const QnResourcePtr& resource)
         {
             const auto user = resource.dynamicCast<QnUserResource>();
-            if (!user || user != m_user)
-                return;
-
-            setCurrentUser(QnUserResourcePtr());
+            if (user && user == m_user)
+                setUser(QnUserResourcePtr());
         }
     );
+
+    connect(this, &UserWatcher::userNameChanged, this, updateUserResource);
+    connect(this, &UserWatcher::userChanged, this,
+        [this]() { setUserName(user()->getName()); });
 }
 
 const QnUserResourcePtr& UserWatcher::user() const
@@ -75,7 +75,7 @@ const QnUserResourcePtr& UserWatcher::user() const
     return m_user;
 }
 
-void UserWatcher::setCurrentUser(const QnUserResourcePtr& user)
+void UserWatcher::setUser(const QnUserResourcePtr& user)
 {
     if (m_user == user)
         return;

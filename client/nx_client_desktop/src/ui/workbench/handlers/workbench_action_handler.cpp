@@ -193,6 +193,8 @@
 #include <nx/client/desktop/ui/main_window.h>
 #include <ui/models/resource/resource_list_model.h>
 
+#include <nx/client/desktop/resource_views/layout/multiple_layout_selection_dialog.h>
+
 using nx::client::core::Geometry;
 
 namespace {
@@ -1082,7 +1084,8 @@ void ActionHandler::at_openCurrentLayoutInNewWindowAction_triggered()
 
 void ActionHandler::at_openNewWindowAction_triggered()
 {
-    openNewWindow(QStringList());
+    nx::client::desktop::MultipleLayoutSelectionDialog().exec();
+//    openNewWindow(QStringList());
 }
 
 void ActionHandler::at_reviewLayoutTourInNewWindowAction_triggered()
