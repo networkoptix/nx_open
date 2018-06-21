@@ -8,7 +8,7 @@ namespace nx {
 namespace vms {
 namespace api {
 
-struct DatabaseDumpToFileData: Data
+struct NX_VMS_API DatabaseDumpToFileData: Data
 {
     qint64 size = 0;
 };

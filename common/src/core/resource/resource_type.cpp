@@ -6,21 +6,7 @@
 #include <nx/vms/api/data/media_server_data.h>
 #include <nx/vms/api/data/user_data.h>
 
-const QString QnResourceTypePool::kLayoutTypeId(lit("Layout"));
-const QString QnResourceTypePool::kServerTypeId(nx::vms::api::MediaServerData::kStaticTypeName);
-const QString QnResourceTypePool::kVideoWallTypeId(lit("Videowall"));
-const QString QnResourceTypePool::kWebPageTypeId(lit("WebPage"));
 const QString QnResourceTypePool::kC2pCameraTypeId(lit("C2pCamera"));
-const QString QnResourceTypePool::kStorageTypeId(nx::vms::api::StorageData::kStaticTypeName);
-const QString QnResourceTypePool::kUserTypeId(nx::vms::api::UserData::kStaticTypeName);
-
-const QnUuid QnResourceTypePool::kUserTypeUuid(nx::vms::api::UserData::kStaticTypeId);
-const QnUuid QnResourceTypePool::kServerTypeUuid(nx::vms::api::MediaServerData::kStaticTypeId);
-const QnUuid QnResourceTypePool::kStorageTypeUuid(nx::vms::api::StorageData::kStaticTypeId);
-const QnUuid QnResourceTypePool::kLayoutTypeUuid(
-    qnResTypePool->getFixedResourceTypeId(kLayoutTypeId));
-const QnUuid QnResourceTypePool::kDesktopCameraTypeUuid("{1657647e-f6e4-bc39-d5e8-563c93cb5e1c}");
-const QnUuid QnResourceTypePool::kWearableCameraTypeUuid("{f7f5ab66-7075-4d0b-a0b2-75e2fdd079a4}");
 
 QnResourceType::QnResourceType()
     : m_isCameraSet(false)
@@ -209,19 +195,6 @@ QnUuid QnResourceTypePool::getResourceTypeId(const QString& manufacture, const Q
 
     // NX_ASSERT(false);
     return QnUuid();
-}
-
-QnUuid QnResourceTypePool::getFixedResourceTypeId(const QString& name)
-{
-    QnUuid result = nx::vms::api::ResourceData::typeIdFromName(name);
-
-#ifdef _DEBUG
-    QnUuid online = qnResTypePool->getResourceTypeId(QString(), name, false);
-    if (!online.isNull())
-        NX_ASSERT(result == online);
-#endif
-
-    return result;
 }
 
 QnUuid QnResourceTypePool::getLikeResourceTypeId(const QString& manufacture, const QString& name) const

@@ -6,9 +6,9 @@ namespace nx {
 namespace vms {
 namespace api {
 
-const QString UserData::kStaticTypeName = lit("User");
-const QnUuid UserData::kStaticTypeId =
-    ResourceData::typeIdFromName(UserData::kStaticTypeName);
+const QString UserData::kResourceTypeName = lit("User");
+const QnUuid UserData::kResourceTypeId =
+    ResourceData::getFixedTypeId(UserData::kResourceTypeName);
 
 constexpr const char* UserData::kCloudPasswordStub;
 

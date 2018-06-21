@@ -10,7 +10,7 @@ namespace nx {
 namespace vms {
 namespace api {
 
-struct EmailSettingsData: Data
+struct NX_VMS_API EmailSettingsData: Data
 {
     QString host;
     int port = 0;

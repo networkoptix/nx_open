@@ -66,7 +66,7 @@ QnMediaServerResource::QnMediaServerResource(QnCommonModule* commonModule):
         &m_mutex
     )
 {
-    setTypeId(qnResTypePool->getFixedResourceTypeId(QnResourceTypePool::kServerTypeId));
+    setTypeId(nx::vms::api::MediaServerData::kResourceTypeId);
     addFlags(Qn::server | Qn::remote);
     removeFlags(Qn::media); // TODO: #Elric is this call needed here?
 

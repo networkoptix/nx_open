@@ -1,10 +1,13 @@
 #include "wearable_camera_resource_searcher.h"
 #include "wearable_camera_resource.h"
 
+#include <nx/vms/api/data/camera_data.h>
+
 QnWearableCameraResourceSearcher::QnWearableCameraResourceSearcher(QnCommonModule* commonModule):
     QnAbstractResourceSearcher(commonModule),
     QnAbstractNetworkResourceSearcher(commonModule)
-{}
+{
+}
 
 QnWearableCameraResourceSearcher::~QnWearableCameraResourceSearcher()
 {
@@ -17,7 +20,7 @@ QString QnWearableCameraResourceSearcher::manufacture() const
 
 bool QnWearableCameraResourceSearcher::isResourceTypeSupported(QnUuid resourceTypeId) const
 {
-    return resourceTypeId == QnResourceTypePool::kWearableCameraTypeUuid;
+    return resourceTypeId == nx::vms::api::CameraData::kWearableCameraTypeId;
 }
 
 QnResourcePtr QnWearableCameraResourceSearcher::createResource(const QnUuid &resourceTypeId, const QnResourceParams& params)

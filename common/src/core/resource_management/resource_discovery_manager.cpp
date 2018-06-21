@@ -31,6 +31,7 @@
 #include <common/common_module.h>
 #include "core/resource/media_server_resource.h"
 #include <nx/utils/log/log.h>
+#include <nx/vms/api/data/media_server_data.h>
 
 #ifdef __arm__
     static const int kThreadCount = 8;
@@ -158,7 +159,7 @@ QnResourcePtr QnResourceDiscoveryManager::createResource(const QnUuid &resourceT
     if (resourceType.isNull())
         return result;
 
-    if (resourceTypeId == qnResTypePool->getFixedResourceTypeId(QnResourceTypePool::kStorageTypeId))
+    if (resourceTypeId == nx::vms::api::StorageData::kResourceTypeId)
     {
         result = QnResourcePtr(QnStoragePluginFactory::instance()->createStorage(commonModule(), params.url));
         NX_ASSERT(result); //storage can not be null

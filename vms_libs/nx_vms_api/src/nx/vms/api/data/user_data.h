@@ -13,13 +13,13 @@ namespace api {
 
 struct NX_VMS_API UserData: ResourceData
 {
-    UserData(): ResourceData(kStaticTypeId) {}
+    UserData(): ResourceData(kResourceTypeId) {}
 
     /** See fillId() in IdData. */
     void fillId();
 
-    static const QString kStaticTypeName;
-    static const QnUuid kStaticTypeId;
+    static const QString kResourceTypeName;
+    static const QnUuid kResourceTypeId;
 
     static constexpr const char* kCloudPasswordStub = "password_is_in_cloud";
 

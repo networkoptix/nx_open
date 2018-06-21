@@ -148,10 +148,10 @@ void fromApiToResource(const CameraData& src, QnVirtualCameraResourcePtr& dst)
     fromApiToResource(static_cast<const ResourceData&>(src), dst.data());
 
     // test if the camera is desktop camera
-    if (src.typeId == QnResourceTypePool::kDesktopCameraTypeUuid)
+    if (src.typeId == CameraData::kDesktopCameraTypeId)
         dst->addFlags(Qn::desktop_camera);
 
-    if (src.typeId == QnResourceTypePool::kWearableCameraTypeUuid)
+    if (src.typeId == CameraData::kWearableCameraTypeId)
         dst->addFlags(Qn::wearable_camera);
 
     dst->setPhysicalId(src.physicalId);

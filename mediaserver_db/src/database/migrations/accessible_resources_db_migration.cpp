@@ -8,6 +8,7 @@
 #include <common/common_globals.h>
 #include <core/resource/resource_type.h>
 
+#include <nx/vms/api/data/camera_data.h>
 #include <nx/vms/api/data/layout_data.h>
 
 #include <utils/db/db_helper.h>
@@ -69,7 +70,7 @@ namespace ec2
             while (query.next())
             {
                 QnUuid typeId = QnUuid::fromRfc4122(query.value("typeId").toByteArray());
-                if (typeId == QnResourceTypePool::kDesktopCameraTypeUuid)
+                if (typeId == nx::vms::api::CameraData::kDesktopCameraTypeId)
                     continue;
 
                 QnUuid resourceId = QnUuid::fromRfc4122(query.value("guid").toByteArray());

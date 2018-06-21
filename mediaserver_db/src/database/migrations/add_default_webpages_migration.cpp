@@ -29,7 +29,6 @@ bool addDefaultWebpages(ec2::database::api::QueryContext* context)
             // keeping consistency with QnWebPageResource
             nx::vms::api::WebPageData webPage;
             webPage.id = guidFromArbitraryData(url);
-            webPage.typeId = qnResTypePool->getFixedResourceTypeId(QnResourceTypePool::kWebPageTypeId);
             webPage.url = url;
             webPage.name = name;
             return api::saveWebPage(context, webPage);

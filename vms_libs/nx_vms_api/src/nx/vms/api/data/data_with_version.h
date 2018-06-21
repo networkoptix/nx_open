@@ -6,7 +6,7 @@ namespace nx {
 namespace vms {
 namespace api {
 
-struct DataWithVersion: Data
+struct NX_VMS_API DataWithVersion: Data
 {
     int version = 0;
 };

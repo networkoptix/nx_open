@@ -6,6 +6,10 @@ namespace nx {
 namespace vms {
 namespace api {
 
+const QString VideowallData::kResourceTypeName = lit("WebPage");
+const QnUuid VideowallData::kResourceTypeId =
+    ResourceData::getFixedTypeId(VideowallData::kResourceTypeName);
+
 #define VIDEOWALL_TYPES \
     (VideowallItemData) \
     (VideowallScreenData) \

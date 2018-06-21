@@ -61,7 +61,6 @@ int QnMergeLdapUsersRestHandler::executePost(
         if (dbUser.id.isNull())
         {
             dbUser.id = QnUuid::createUuid();
-            dbUser.typeId = qnResTypePool->getFixedResourceTypeId(QnResourceTypePool::kUserTypeId);
             dbUser.name = login;
             dbUser.realm = nx::network::AppInfo::realm();
 

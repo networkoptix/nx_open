@@ -13,7 +13,7 @@ namespace vms {
 namespace api {
 
 /** List of cameras that have footage on the given server. */
-struct ServerFootageData: Data
+struct NX_VMS_API ServerFootageData: Data
 {
     QnUuid serverGuid;
     std::vector<QnUuid> archivedCameras;
@@ -32,7 +32,7 @@ struct ServerFootageData: Data
  * History item of camera movement from server to server. Server and timestamp when the camera
  * moved to it.
  */
-struct CameraHistoryItemData: Data
+struct NX_VMS_API CameraHistoryItemData: Data
 {
     CameraHistoryItemData() = default;
 
@@ -48,7 +48,7 @@ struct CameraHistoryItemData: Data
 #define CameraHistoryItemData_Fields (serverGuid)(timestampMs)
 
 /** Full history of the movement for the given camera. */
-struct CameraHistoryData: Data
+struct NX_VMS_API CameraHistoryData: Data
 {
     QnUuid cameraId;
     CameraHistoryItemDataList items;

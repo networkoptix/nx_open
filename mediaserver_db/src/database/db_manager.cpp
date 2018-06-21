@@ -528,8 +528,8 @@ bool QnDbManager::init(const nx::utils::Url& dbUrl)
             return false;
         }
 
-        m_storageTypeId = getType("Storage");
-        m_serverTypeId = getType(QnResourceTypePool::kServerTypeId);
+        m_storageTypeId = getType(StorageData::kResourceTypeName);
+        m_serverTypeId = getType(MediaServerData::kResourceTypeName);
         m_cameraTypeId = getType("Camera");
 
         QSqlQuery queryAdminUser(m_sdb);
@@ -3161,17 +3161,17 @@ ApiObjectType QnDbManager::getObjectTypeNoLock(const QnUuid& objectId)
     QString objectType = query.value("name").toString();
     if (objectType == "Camera")
         return ApiObject_Camera;
-    else if (objectType == QnResourceTypePool::kStorageTypeId)
+    else if (objectType == StorageData::kResourceTypeName)
         return ApiObject_Storage;
-    else if (objectType == QnResourceTypePool::kServerTypeId)
+    else if (objectType == MediaServerData::kResourceTypeName)
         return ApiObject_Server;
-    else if (objectType == QnResourceTypePool::kUserTypeId)
+    else if (objectType == UserData::kResourceTypeName)
         return ApiObject_User;
-    else if (objectType == QnResourceTypePool::kLayoutTypeId)
+    else if (objectType == LayoutData::kResourceTypeName)
         return ApiObject_Layout;
-    else if (objectType == QnResourceTypePool::kVideoWallTypeId)
+    else if (objectType == VideowallData::kResourceTypeName)
         return ApiObject_Videowall;
-    else if (objectType == QnResourceTypePool::kWebPageTypeId)
+    else if (objectType == WebPageData::kResourceTypeName)
         return ApiObject_WebPage;
     else
     {

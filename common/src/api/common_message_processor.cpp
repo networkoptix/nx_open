@@ -986,14 +986,9 @@ void QnCommonMessageProcessor::updateResource(
 void QnCommonMessageProcessor::updateResource(
     const StorageData& storage, ec2::NotificationSource source)
 {
-    auto resTypeId = qnResTypePool->getFixedResourceTypeId(QnResourceTypePool::kStorageTypeId);
-    NX_ASSERT(!resTypeId.isNull(), Q_FUNC_INFO, "Invalid resource type pool state");
-    if (resTypeId.isNull())
-        return;
-
-    QnStorageResourcePtr qnStorage = getResourceFactory()->createResource(resTypeId,
-            QnResourceParams(storage.id, storage.url, QString()))
-        .dynamicCast<QnStorageResource>();
+    QnStorageResourcePtr qnStorage = getResourceFactory()->createResource(
+        StorageData::kResourceTypeId, QnResourceParams(storage.id, storage.url, QString()))
+            .dynamicCast<QnStorageResource>();
     qnStorage->setCommonModule(commonModule());
     NX_ASSERT(qnStorage, Q_FUNC_INFO, "Invalid resource type pool state");
     if (qnStorage)

@@ -19,6 +19,9 @@ struct NX_VMS_API CameraData: ResourceData
 
     static QnUuid physicalIdToId(const QString& physicalId);
 
+    static const QnUuid kDesktopCameraTypeId;
+    static const QnUuid kWearableCameraTypeId;
+
     QnLatin1Array mac;
     QString physicalId;
     bool manuallyAdded = false;

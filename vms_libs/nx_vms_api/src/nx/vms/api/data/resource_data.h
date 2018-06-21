@@ -20,7 +20,7 @@ struct NX_VMS_API ResourceData: IdData
     ResourceData() = default;
     ResourceData(const QnUuid& typeId): typeId(typeId) {}
 
-    static QnUuid typeIdFromName(const QString& typeName);
+    static QnUuid getFixedTypeId(const QString& typeName);
 };
 #define ResourceData_Fields IdData_Fields (parentId)(name)(url)(typeId)
 

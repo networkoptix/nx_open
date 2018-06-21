@@ -81,7 +81,7 @@ namespace ec2
 
         for (auto& cam: cameras)
         {
-            if (cam.typeId != QnResourceTypePool::kDesktopCameraTypeUuid)
+            if (cam.typeId != nx::vms::api::CameraData::kDesktopCameraTypeId)
                 outData->cameras.push_back(std::move(cam));
         }
 

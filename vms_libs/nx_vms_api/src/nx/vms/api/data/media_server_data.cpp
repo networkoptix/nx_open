@@ -14,13 +14,13 @@ static constexpr int kDefaultNotCappedBytesPerSecond = -100 * kBitsPerMegabit / 
 
 } // namespace
 
-const QString StorageData::kStaticTypeName = lit("Storage");
-const QnUuid StorageData::kStaticTypeId =
-    ResourceData::typeIdFromName(StorageData::kStaticTypeName);
+const QString StorageData::kResourceTypeName = lit("Storage");
+const QnUuid StorageData::kResourceTypeId =
+    ResourceData::getFixedTypeId(StorageData::kResourceTypeName);
 
-const QString MediaServerData::kStaticTypeName = lit("Server");
-const QnUuid MediaServerData::kStaticTypeId =
-    ResourceData::typeIdFromName(MediaServerData::kStaticTypeName);
+const QString MediaServerData::kResourceTypeName = lit("Server");
+const QnUuid MediaServerData::kResourceTypeId =
+    ResourceData::getFixedTypeId(MediaServerData::kResourceTypeName);
 
 const int MediaServerUserAttributesData::kDefaultBackupBitrate = kDefaultNotCappedBytesPerSecond;
 

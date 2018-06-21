@@ -17,10 +17,10 @@ namespace api {
 
 struct NX_VMS_API StorageData: ResourceData
 {
-    StorageData(): ResourceData(kStaticTypeId) {}
+    StorageData(): ResourceData(kResourceTypeId) {}
 
-    static const QString kStaticTypeName;
-    static const QnUuid kStaticTypeId;
+    static const QString kResourceTypeName;
+    static const QnUuid kResourceTypeId;
 
     qint64 spaceLimit = 0;
     bool usedForWriting = false;
@@ -38,10 +38,10 @@ struct NX_VMS_API StorageData: ResourceData
 
 struct NX_VMS_API MediaServerData: ResourceData
 {
-    MediaServerData(): ResourceData(kStaticTypeId) {}
+    MediaServerData(): ResourceData(kResourceTypeId) {}
 
-    static const QString kStaticTypeName;
-    static const QnUuid kStaticTypeId;
+    static const QString kResourceTypeName;
+    static const QnUuid kResourceTypeId;
 
     QString networkAddresses;
     ServerFlags flags = SF_None;

@@ -8,7 +8,7 @@ namespace nx {
 namespace vms {
 namespace api {
 
-struct IdData: Data
+struct NX_VMS_API IdData: Data
 {
     IdData() = default;
     IdData(const QnUuid& id): id(id) {}

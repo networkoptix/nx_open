@@ -3,14 +3,14 @@
 #include <list>
 
 #include <common/common_module.h>
-
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource_access/resource_access_filter.h>
-
-#include <utils/common/warnings.h>
 #include <core/storage/file_storage/layout_storage_resource.h>
 #include <core/resource/avi/avi_resource.h>
+#include <utils/common/warnings.h>
+
+#include <nx/vms/api/data/layout_data.h>
 
 QnLayoutResource::QnLayoutResource(QnCommonModule* commonModule):
     base_type(commonModule),
@@ -22,7 +22,7 @@ QnLayoutResource::QnLayoutResource(QnCommonModule* commonModule):
     m_locked(false)
 {
     addFlags(Qn::layout);
-    setTypeId(qnResTypePool->getFixedResourceTypeId(QnResourceTypePool::kLayoutTypeId));
+    setTypeId(nx::vms::api::LayoutData::kResourceTypeId);
 }
 
 QString QnLayoutResource::getUniqueId() const

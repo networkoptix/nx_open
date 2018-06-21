@@ -37,6 +37,7 @@
 
 #include <nx/utils/string.h>
 #include <nx/utils/app_info.h>
+#include <nx/vms/api/data/resource_data.h>
 
 using namespace  nx::client::desktop;
 
@@ -303,7 +304,8 @@ void QnAccessibleResourcesWidget::initControlsModel()
     if (!m_controlsVisible)
         return;
 
-    QnVirtualCameraResourcePtr dummy(new QnClientCameraResource(qnResTypePool->getFixedResourceTypeId(kDummyResourceId)));
+    QnVirtualCameraResourcePtr dummy(new QnClientCameraResource(
+        nx::vms::api::ResourceData::getFixedTypeId(kDummyResourceId)));
     dummy->setName(tr("All Cameras & Resources"));
     /* Create separate dummy resource id for each filter, but once per application run. */
     dummy->setId(QnUuid::createUuidFromPool(guidFromArbitraryData(kDummyResourceId).getQUuid(), m_filter));

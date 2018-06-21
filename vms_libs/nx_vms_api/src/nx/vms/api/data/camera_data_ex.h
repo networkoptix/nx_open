@@ -9,7 +9,7 @@ namespace nx {
 namespace vms {
 namespace api {
 
-struct CameraDataEx:
+struct NX_VMS_API CameraDataEx:
     CameraData,
     CameraAttributesData
 {

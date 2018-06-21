@@ -13,7 +13,7 @@ namespace api {
 /**
  * Parameters of connect request.
  */
-struct ConnectionData: Data
+struct NX_VMS_API ConnectionData: Data
 {
     QString login;
     QByteArray passwordHash;

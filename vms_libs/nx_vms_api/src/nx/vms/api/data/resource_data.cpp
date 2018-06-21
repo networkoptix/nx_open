@@ -6,7 +6,7 @@ namespace nx {
 namespace vms {
 namespace api {
 
-QnUuid ResourceData::typeIdFromName(const QString& typeName)
+QnUuid ResourceData::getFixedTypeId(const QString& typeName)
 {
     return QnUuid::fromArbitraryData(typeName.toUtf8() + QByteArray("-"));
 }

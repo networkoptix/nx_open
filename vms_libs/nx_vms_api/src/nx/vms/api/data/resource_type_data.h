@@ -10,7 +10,7 @@ namespace nx {
 namespace vms {
 namespace api {
 
-struct PropertyTypeData: Data
+struct NX_VMS_API PropertyTypeData: Data
 {
     QnUuid resourceTypeId;
 
@@ -19,7 +19,7 @@ struct PropertyTypeData: Data
 };
 #define PropertyTypeData_Fields (resourceTypeId)(name)(defaultValue)
 
-struct ResourceTypeData: IdData
+struct NX_VMS_API ResourceTypeData: IdData
 {
     QString name;
     QString vendor;

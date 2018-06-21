@@ -8,7 +8,7 @@ namespace nx {
 namespace vms {
 namespace api {
 
-struct DatabaseDumpData: Data
+struct NX_VMS_API DatabaseDumpData: Data
 {
     QByteArray data;
 };

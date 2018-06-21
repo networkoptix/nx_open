@@ -338,7 +338,7 @@ bool ServerTransactionMessageBus::sendInitialData(QnTransactionTransport* transp
             std::back_inserter(tranCameras.params),
             [](const nx::vms::api::CameraData& camera)
             {
-                return camera.typeId != QnResourceTypePool::kDesktopCameraTypeUuid;
+                return camera.typeId != nx::vms::api::CameraData::kDesktopCameraTypeId;
             });
 
         QnTransaction<vms::api::UserDataList> tranUsers;

@@ -9,7 +9,7 @@ namespace nx {
 namespace vms {
 namespace api {
 
-struct ClientInfoData: IdData
+struct NX_VMS_API ClientInfoData: IdData
 {
     QnUuid parentId;
 

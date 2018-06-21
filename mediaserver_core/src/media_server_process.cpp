@@ -359,10 +359,11 @@ void addFakeVideowallUser(QnCommonModule* commonModule)
     nx::vms::api::UserData fakeUserData;
     fakeUserData.realm = nx::network::AppInfo::realm();
     fakeUserData.permissions = GlobalPermission::videowallModePermissions;
-    fakeUserData.typeId = qnResTypePool->getFixedResourceTypeId(QnResourceTypePool::kUserTypeId);
+
     auto fakeUser = ec2::fromApiToResource(fakeUserData);
     fakeUser->setId(Qn::kVideowallUserAccess.userId);
     fakeUser->setName(lit("Video wall"));
+
     commonModule->resourcePool()->addResource(fakeUser);
 }
 

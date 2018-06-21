@@ -11,7 +11,7 @@ namespace nx {
 namespace vms {
 namespace api {
 
-struct LayoutItemData: IdData
+struct NX_VMS_API LayoutItemData: IdData
 {
     qint32 flags = 0;
     float left = 0;
@@ -34,8 +34,13 @@ struct LayoutItemData: IdData
     (resourceId)(resourcePath)(zoomLeft)(zoomTop)(zoomRight)(zoomBottom)(zoomTargetId) \
     (contrastParams)(dewarpingParams)(displayInfo)
 
-struct LayoutData: ResourceData
+struct NX_VMS_API LayoutData: ResourceData
 {
+    LayoutData(): ResourceData(kResourceTypeId) {}
+
+    static const QString kResourceTypeName;
+    static const QnUuid kResourceTypeId;
+
     float cellAspectRatio = 0;
     float horizontalSpacing = 0;
     float verticalSpacing = 0;

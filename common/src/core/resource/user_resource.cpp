@@ -41,7 +41,7 @@ QnUserResource::QnUserResource(QnUserType userType):
     m_passwordExpirationTimestamp(0)
 {
     addFlags(Qn::user | Qn::remote);
-    setTypeId(qnResTypePool->getFixedResourceTypeId(QnResourceTypePool::kUserTypeId));
+    setTypeId(nx::vms::api::UserData::kResourceTypeId);
 }
 
 QnUserResource::QnUserResource(const QnUserResource& right):
