@@ -6,14 +6,8 @@
 #include <client/client_settings.h>
 #include <core/resource/layout_resource.h>
 
-#include <ui/common/geometry.h>
 #include <ui/dialogs/common/custom_file_dialog.h>
 #include <ui/dialogs/common/file_dialog.h>
-#include <ui/workbench/workbench_context.h>
-
-#include <nx/client/desktop/image_providers/threaded_image_loader.h>
-#include <nx/client/desktop/utils/server_image_cache.h>
-#include <nx/client/desktop/utils/local_file_cache.h>
 
 #include "redux/layout_settings_dialog_state.h"
 #include "redux/layout_settings_dialog_store.h"

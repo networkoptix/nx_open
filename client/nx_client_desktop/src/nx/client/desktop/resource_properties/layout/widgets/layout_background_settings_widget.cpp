@@ -14,7 +14,6 @@
 
 #include <client/client_settings.h>
 
-#include <ui/common/geometry.h>
 #include <ui/dialogs/image_preview_dialog.h>
 #include <ui/dialogs/common/custom_file_dialog.h>
 #include <ui/dialogs/common/file_dialog.h>
