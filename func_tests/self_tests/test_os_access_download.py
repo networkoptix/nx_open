@@ -31,7 +31,8 @@ def served_file(node_dir):
 @pytest.fixture()
 def downloads_dir(os_access):
     downloads_dir = os_access.Path.tmp() / 'downloads_dir'
-    downloads_dir.mkdir(parents=True, exist_ok=True)
+    downloads_dir.rmtree(ignore_errors=True)
+    downloads_dir.mkdir(parents=True)
     return downloads_dir
 
 
