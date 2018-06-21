@@ -43,7 +43,7 @@ bool SequenceExecutor::executeSequenceInternal()
             executeSequenceInternal();
         };
 
-    m_threadPool->start(new nx::utils::FunctorWrapper(
+    m_threadPool->start(new nx::utils::FunctorWrapper<std::function<void()>>(
         [this, command, callback = std::move(timerExpiredCallback)]()
         {
             QnMutexLocker lock(&m_mutex);
