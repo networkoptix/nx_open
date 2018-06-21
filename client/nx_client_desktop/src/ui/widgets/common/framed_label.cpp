@@ -46,6 +46,20 @@ void QnFramedLabel::setFrameColor(const QColor& color)
     setPaletteColor(this, QPalette::Highlight, color);
 }
 
+bool QnFramedLabel::autoScale() const
+{
+    return m_autoScale;
+}
+
+void QnFramedLabel::setAutoScale(bool value)
+{
+    if (m_autoScale == value)
+        return;
+
+    m_autoScale = value;
+    update();
+}
+
 QSize QnFramedLabel::sizeHint() const
 {
     QSize sz = base_type::sizeHint();
@@ -57,6 +71,9 @@ QSize QnFramedLabel::sizeHint() const
 
 QSize QnFramedLabel::minimumSizeHint() const
 {
+    if (m_autoScale)
+        return frameSize();
+
     QSize sz = base_type::minimumSizeHint();
     if (!pixmapExists())
         return sz;
@@ -82,10 +99,20 @@ void QnFramedLabel::paintEvent(QPaintEvent* event)
     // Opacity rollback scope.
     {
         QnScopedPainterOpacityRollback opacityRollback(&painter, painter.opacity() * m_opacity);
-        QRect pix = pixmap()->rect();
+
+        QPixmap thumbnail = *pixmap();
+        if (m_autoScale)
+        {
+            thumbnail = thumbnail.scaled(
+                contentSize(),
+                Qt::KeepAspectRatio,
+                Qt::FastTransformation);
+        }
+
+        const auto pix = thumbnail.size();
         int x = fullRect.left() + (fullRect.width() - pix.width()) / 2;
         int y = fullRect.top() + (fullRect.height() - pix.height()) / 2;
-        painter.drawPixmap(x, y, *pixmap());
+        painter.drawPixmap(x, y, thumbnail);
     }
 
     if (lineWidth() == 0)

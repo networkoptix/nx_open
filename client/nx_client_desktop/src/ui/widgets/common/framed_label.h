@@ -36,6 +36,10 @@ public:
     QColor frameColor() const;
     void setFrameColor(const QColor& color);
 
+    /** When auto-scaling is set, image is resized to label and not vise-versa. */
+    bool autoScale() const;
+    void setAutoScale(bool value);
+
     virtual QSize sizeHint() const override;
     virtual QSize minimumSizeHint() const override;
 
@@ -48,4 +52,5 @@ private:
 
 private:
     qreal m_opacity = 1.0;
+    bool m_autoScale = false;
 };

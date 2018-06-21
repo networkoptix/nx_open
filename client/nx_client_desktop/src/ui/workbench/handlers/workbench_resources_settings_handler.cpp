@@ -11,7 +11,6 @@
 #include <core/resource/fake_media_server.h>
 
 #include <ui/dialogs/resource_properties/camera_settings_dialog.h>
-#include <ui/dialogs/resource_properties/layout_settings_dialog.h>
 #include <ui/dialogs/resource_properties/server_settings_dialog.h>
 #include <ui/dialogs/resource_properties/user_settings_dialog.h>
 #include <ui/dialogs/resource_properties/user_roles_dialog.h>
@@ -21,8 +20,10 @@
 #include <ui/workbench/workbench_access_controller.h>
 #include <ui/workbench/workbench_layout.h>
 
-#include <nx/utils/raii_guard.h>
+#include <nx/client/desktop/resource_properties/layout/layout_settings_dialog.h>
 #include <nx/client/desktop/utils/parameter_helper.h>
+
+#include <nx/utils/raii_guard.h>
 
 using namespace nx::client::desktop;
 using namespace nx::client::desktop::ui;
@@ -189,15 +190,17 @@ void QnWorkbenchResourcesSettingsHandler::openLayoutSettingsDialog(
     if (!accessController()->hasPermissions(layout, Qn::EditLayoutSettingsPermission))
         return;
 
-    QScopedPointer<QnLayoutSettingsDialog> dialog(new QnLayoutSettingsDialog(mainWindow()));
+    QScopedPointer<LayoutSettingsDialog> dialog(new LayoutSettingsDialog(mainWindow()));
     dialog->setWindowModality(Qt::ApplicationModal);
-    dialog->readFromResource(layout);
+    dialog->setLayout(layout);
 
-    bool backgroundWasEmpty = layout->backgroundImageFilename().isEmpty();
-    if (!dialog->exec() || !dialog->submitToResource(layout))
+    const bool backgroundWasEmpty = layout->backgroundImageFilename().isEmpty();
+    if (!dialog->exec())
         return;
 
-    /* Move layout items to grid center to best fit the background */
+    // TODO: #GDM #Common remove unused image if any
+
+    // Move layout items to grid center to best fit the background.
     if (backgroundWasEmpty && !layout->backgroundImageFilename().isEmpty())
     {
         if (auto wlayout = QnWorkbenchLayout::instance(layout))
