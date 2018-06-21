@@ -198,8 +198,6 @@ void QnWorkbenchResourcesSettingsHandler::openLayoutSettingsDialog(
     if (!dialog->exec())
         return;
 
-    // TODO: #GDM #Common remove unused image if any
-
     // Move layout items to grid center to best fit the background.
     if (backgroundWasEmpty && !layout->backgroundImageFilename().isEmpty())
     {
