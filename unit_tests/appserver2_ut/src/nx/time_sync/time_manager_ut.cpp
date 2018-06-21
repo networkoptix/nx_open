@@ -417,6 +417,10 @@ protected:
 
     void shiftMonotonicClockOnPeer(int peerIndex)
     {
+        auto commonModule = m_peers[peerIndex]->commonModule();
+        commonModule->globalSettings()->setSyncTimeExchangePeriod(
+            std::chrono::milliseconds(100));
+
         m_peers[peerIndex]->skewMonotonicClock(std::chrono::seconds(
             nx::utils::random::number<int>(
                 kMinMonotonicClockSkew.count(), kMaxMonotonicClockSkew.count())));
