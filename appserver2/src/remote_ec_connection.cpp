@@ -72,13 +72,13 @@ namespace ec2
         }
     }
 
-    Timestamp RemoteEC2Connection::getTransactionLogTime() const
+    nx::vms::api::Timestamp RemoteEC2Connection::getTransactionLogTime() const
     {
         NX_ASSERT(true); //< not implemented
-        return Timestamp();
+        return {};
     }
 
-    void RemoteEC2Connection::setTransactionLogTime(Timestamp /*value*/)
+    void RemoteEC2Connection::setTransactionLogTime(nx::vms::api::Timestamp /*value*/)
     {
         NX_ASSERT(true); //< not implemented
     }

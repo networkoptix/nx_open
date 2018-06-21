@@ -114,6 +114,7 @@ DECLARE_STRUCT(TimeData)
 
 DECLARE_STRUCT(ReverseConnectionData)
 DECLARE_STRUCT_EX(RuntimeData, (ubjson)(json)(xml))
+DECLARE_STRUCT(SystemIdData)
 
 DECLARE_STRUCT_AND_LIST(StorageData)
 DECLARE_STRUCT_AND_LIST(MediaServerData)

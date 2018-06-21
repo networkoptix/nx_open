@@ -18,7 +18,7 @@ MiscManagerStub::~MiscManagerStub()
 int MiscManagerStub::changeSystemId(
     const QnUuid& /*systemId*/,
     qint64 /*sysIdTime*/,
-    Timestamp /*tranLogTime*/,
+    nx::vms::api::Timestamp /*tranLogTime*/,
     impl::SimpleHandlerPtr /*handler*/)
 {
     // TODO

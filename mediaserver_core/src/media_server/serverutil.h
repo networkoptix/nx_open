@@ -9,7 +9,7 @@
 #include <utils/common/optional.h>
 #include <nx/vms/api/data/media_server_data.h>
 #include <nx/vms/api/data/user_data.h>
-#include <nx_ec/transaction_timestamp.h>
+#include <nx/vms/api/data/timestamp.h>
 #include <api/model/configure_system_data.h>
 
 // TODO: #Elric this belongs together with server_settings

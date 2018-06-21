@@ -28,7 +28,7 @@ QnTransactionLog::QnTransactionLog(
     m_insertTransactionQuery(db->queryCachePool()),
     m_updateSequenceQuery(db->queryCachePool())
 {
-    m_lastTimestamp = Timestamp::fromInteger(0);
+    m_lastTimestamp = vms::api::Timestamp::fromInteger(0);
     m_baseTime = 0;
 }
 
@@ -60,7 +60,7 @@ bool QnTransactionLog::clear()
     m_commitData.clear();
 
     m_baseTime = qnSyncTime->currentMSecsSinceEpoch();
-    m_lastTimestamp = Timestamp::fromInteger(m_baseTime);
+    m_lastTimestamp = vms::api::Timestamp::fromInteger(m_baseTime);
     m_relativeTimer.restart();
 
     return true;
@@ -116,7 +116,7 @@ bool QnTransactionLog::init()
         }
     }
 
-    m_lastTimestamp = Timestamp::fromInteger(qnSyncTime->currentMSecsSinceEpoch());
+    m_lastTimestamp = vms::api::Timestamp::fromInteger(qnSyncTime->currentMSecsSinceEpoch());
 
     QSqlQuery query2(m_dbManager->getDB());
     query2.setForwardOnly(true);
@@ -126,7 +126,7 @@ bool QnTransactionLog::init()
         while (query2.next())
         {
             QnUuid hash = QnUuid::fromRfc4122(query2.value("tran_guid").toByteArray());
-            Timestamp timestamp;
+            vms::api::Timestamp timestamp;
             timestamp.sequence = query2.value("timestamp_hi").toLongLong();
             timestamp.ticks = query2.value("timestamp").toLongLong();
             QnUuid peerID = QnUuid::fromRfc4122(query2.value("peer_guid").toByteArray());
@@ -147,13 +147,13 @@ bool QnTransactionLog::init()
     return true;
 }
 
-Timestamp QnTransactionLog::getTimeStamp()
+vms::api::Timestamp QnTransactionLog::getTimeStamp()
 {
     const qint64 absoluteTime = qnSyncTime->currentMSecsSinceEpoch();
 
-    Timestamp newTime = Timestamp(m_lastTimestamp.sequence, absoluteTime);
+    vms::api::Timestamp newTime = vms::api::Timestamp(m_lastTimestamp.sequence, absoluteTime);
 
-    QnMutexLocker lock( &m_timeMutex );
+    QnMutexLocker lock(&m_timeMutex);
     if (newTime > m_lastTimestamp)
     {
         m_lastTimestamp = newTime;
@@ -322,7 +322,7 @@ ErrorCode QnTransactionLog::saveToDB(
 
     m_commitData.updateHistory[hash] = UpdateHistoryData(key, tran.persistentInfo.timestamp);
 
-    QnMutexLocker lock( &m_timeMutex );
+    QnMutexLocker lock(&m_timeMutex);
     m_lastTimestamp = qMax(m_lastTimestamp, tran.persistentInfo.timestamp);
     return ErrorCode::ok;
 }
@@ -553,17 +553,25 @@ void QnTransactionLog::fillPersistentInfo(QnAbstractTransaction& tran)
     }
 }
 
-Timestamp QnTransactionLog::getTransactionLogTime() const
+vms::api::Timestamp QnTransactionLog::getTransactionLogTime() const
 {
-    QnMutexLocker lock( &m_timeMutex );
+    QnMutexLocker lock(&m_timeMutex);
     return m_lastTimestamp;
 }
 
-void QnTransactionLog::setTransactionLogTime(Timestamp value)
+void QnTransactionLog::setTransactionLogTime(vms::api::Timestamp value)
 {
-    QnMutexLocker lock( &m_timeMutex );
+    QnMutexLocker lock(&m_timeMutex);
     m_lastTimestamp = qMax(value, m_lastTimestamp);
 }
 
+QnTransactionLog::UpdateHistoryData::UpdateHistoryData(
+    const nx::vms::api::PersistentIdData& updatedBy,
+    const nx::vms::api::Timestamp& timestamp)
+    :
+    updatedBy(updatedBy),
+    timestamp(timestamp)
+{
+}
 
 } // namespace ec2

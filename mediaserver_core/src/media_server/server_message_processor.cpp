@@ -121,17 +121,19 @@ void QnServerMessageProcessor::connectToConnection(const ec2::AbstractECConnecti
     connect(connection, &ec2::AbstractECConnection::remotePeerUnauthorized,
         this, &QnServerMessageProcessor::at_remotePeerUnauthorized);
 
-    connect(connection->getMiscNotificationManager().get(), &ec2::AbstractMiscNotificationManager::systemIdChangeRequested,
-            this, [this](const QnUuid& systemId, qint64 sysIdTime, ec2::Timestamp tranLogTime)
-                  {
-                      ConfigureSystemData configSystemData;
-                      configSystemData.localSystemId = systemId;
-                      configSystemData.sysIdTime = sysIdTime;
-                      configSystemData.tranLogTime = tranLogTime;
-                      configSystemData.wholeSystem = true;
-                      if (m_connection)
-                          configureLocalSystem(configSystemData, m_connection->messageBus());
-                  });
+    connect(connection->getMiscNotificationManager().get(),
+        &ec2::AbstractMiscNotificationManager::systemIdChangeRequested,
+        this,
+        [this](const QnUuid& systemId, qint64 sysIdTime, nx::vms::api::Timestamp tranLogTime)
+        {
+            ConfigureSystemData configSystemData;
+            configSystemData.localSystemId = systemId;
+            configSystemData.sysIdTime = sysIdTime;
+            configSystemData.tranLogTime = tranLogTime;
+            configSystemData.wholeSystem = true;
+            if (m_connection)
+                configureLocalSystem(configSystemData, m_connection->messageBus());
+        });
 }
 
 void QnServerMessageProcessor::disconnectFromConnection(

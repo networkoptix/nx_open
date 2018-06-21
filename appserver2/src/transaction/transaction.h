@@ -4,12 +4,12 @@
 #include <QtCore/QString>
 
 #include <nx_ec/ec_api.h>
-#include <nx_ec/transaction_timestamp.h>
 #include <nx/fusion/serialization/binary.h>
 #include <nx/fusion/serialization/csv.h>
 #include <nx/fusion/serialization/json.h>
 #include <nx/fusion/serialization/ubjson.h>
 #include <nx/fusion/serialization/xml.h>
+#include <nx/vms/api/data/timestamp.h>
 
 /**
  * This class describes all possible transactions and defines various access righs check for them.
@@ -1171,11 +1171,11 @@ APPLY(2003, getCurrentTime, nx::vms::api::TimeData, \
                        InvalidFilterFunc(), /* Filter read func */ \
                        AllowForAllAccessOut(), /* Check remote peer rights for outgoing transaction */ \
                        RegularTransactionType()) /* regular transaction type */ \
-APPLY(2004, changeSystemId, ApiSystemIdData, \
+APPLY(2004, changeSystemId, nx::vms::api::SystemIdData, \
                        false, \
                        false, \
                        InvalidGetHashHelper(), \
-                       [] (const QnTransaction<ApiSystemIdData> &tran, const NotificationParams &notificationParams) \
+                       [] (const QnTransaction<nx::vms::api::SystemIdData>& tran, const NotificationParams& notificationParams) \
                         { return notificationParams.miscNotificationManager->triggerNotification(tran, notificationParams.source); }, \
                        AdminOnlyAccess(), /* save permission checker */ \
                        AllowForAllAccess(), /* read permission checker */ \
@@ -1429,7 +1429,7 @@ APPLY(10201, getSystemMergeHistory, nx::vms::api::SystemMergeHistoryRecordList, 
     class QnAbstractTransaction
     {
     public:
-        typedef Timestamp TimestampType;
+        using TimestampType = nx::vms::api::Timestamp;
 
         static QnUuid makeHash(const QByteArray& data1, const QByteArray& data2 = QByteArray());
         static QnUuid makeHash(const QByteArray &extraData, const ApiDiscoveryData &data);
@@ -1457,12 +1457,12 @@ APPLY(10201, getSystemMergeHistory, nx::vms::api::SystemMergeHistoryRecordList, 
 
         struct PersistentInfo
         {
-            PersistentInfo(): sequence(0), timestamp(Timestamp::fromInteger(0)) {}
+            PersistentInfo(): sequence(0), timestamp(TimestampType::fromInteger(0)) {}
             bool isNull() const { return dbID.isNull(); }
 
             QnUuid dbID;
             qint32 sequence;
-            Timestamp timestamp;
+            TimestampType timestamp;
 
             friend uint qHash(const ec2::QnAbstractTransaction::PersistentInfo &id) {
                 return ::qHash(QByteArray(id.dbID.toRfc4122()).append((const char*)&id.timestamp, sizeof(id.timestamp)), id.sequence);

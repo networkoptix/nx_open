@@ -48,15 +48,15 @@ public:
     virtual void addRemotePeer(const QnUuid& id, const nx::utils::Url& _url) override;
     virtual void deleteRemotePeer(const QnUuid& id) override;
 
-    virtual Timestamp getTransactionLogTime() const override;
-    virtual void setTransactionLogTime(Timestamp value) override;
+    virtual nx::vms::api::Timestamp getTransactionLogTime() const override;
+    virtual void setTransactionLogTime(nx::vms::api::Timestamp value) override;
 
 
     virtual void startReceivingNotifications() override;
     virtual void stopReceivingNotifications() override;
     virtual QnUuid routeToPeerVia(
-        const QnUuid& dstPeer, 
-        int* distance, 
+        const QnUuid& dstPeer,
+        int* distance,
         nx::network::SocketAddress* knownPeerAddress) const override;
     virtual TransactionMessageBusAdapter* messageBus() const override { return nullptr; }
     virtual nx::time_sync::TimeSyncManager* timeSyncManager() const override { return nullptr; }

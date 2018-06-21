@@ -22,7 +22,7 @@ protected:
     virtual int changeSystemId(
         const QnUuid& systemId,
         qint64 sysIdTime,
-        Timestamp tranLogTime,
+        nx::vms::api::Timestamp tranLogTime,
         impl::SimpleHandlerPtr handler) override;
 
     virtual int markLicenseOverflow(

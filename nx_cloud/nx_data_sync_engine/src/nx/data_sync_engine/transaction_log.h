@@ -192,7 +192,7 @@ public:
         TransactionDataType transactionData)
     {
         int transactionSequence = 0;
-        ::ec2::Timestamp transactionTimestamp;
+        vms::api::Timestamp transactionTimestamp;
         std::tie(transactionSequence, transactionTimestamp) =
             generateNewTransactionAttributes(queryContext, systemId);
 
@@ -231,7 +231,7 @@ public:
 
     void clearTransactionLogCacheForSystem(const nx::String& systemId);
 
-    ::ec2::Timestamp generateTransactionTimestamp(const nx::String& systemId);
+    vms::api::Timestamp generateTransactionTimestamp(const nx::String& systemId);
 
     void shiftLocalTransactionSequence(
         const nx::String& systemId,
@@ -327,7 +327,7 @@ private:
         nx::utils::db::QueryContext* connection,
         const nx::String& systemId);
 
-    ::ec2::Timestamp generateNewTransactionTimestamp(
+    vms::api::Timestamp generateNewTransactionTimestamp(
         const QnMutexLockerBase& lock,
         VmsTransactionLogCache::TranId cacheTranId,
         const nx::String& systemId);
@@ -346,7 +346,7 @@ private:
         const QnMutexLockerBase& lock,
         const nx::String& systemId);
 
-    std::tuple<int, ::ec2::Timestamp> generateNewTransactionAttributes(
+    std::tuple<int, vms::api::Timestamp> generateNewTransactionAttributes(
         nx::utils::db::QueryContext* queryContext,
         const nx::String& systemId);
 

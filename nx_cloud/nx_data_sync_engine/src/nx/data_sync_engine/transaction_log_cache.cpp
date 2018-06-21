@@ -63,7 +63,7 @@ void VmsTransactionLogCache::restoreTransaction(
     vms::api::PersistentIdData tranStateKey,
     int sequence,
     const nx::Buffer& tranHash,
-    const ::ec2::Timestamp& timestamp)
+    const vms::api::Timestamp& timestamp)
 {
     QnMutexLocker lock(&m_mutex);
 
@@ -170,10 +170,10 @@ const VmsDataState* VmsTransactionLogCache::state(TranId tranId) const
     return tranContext ? &tranContext->data : nullptr;
 }
 
-::ec2::Timestamp VmsTransactionLogCache::generateTransactionTimestamp(TranId tranId)
+vms::api::Timestamp VmsTransactionLogCache::generateTransactionTimestamp(TranId tranId)
 {
     QnMutexLocker lock(&m_mutex);
-    ::ec2::Timestamp timestamp;
+    vms::api::Timestamp timestamp;
     timestamp.sequence = timestampSequence(lock, tranId);
     timestamp.ticks = m_timestampCalculator.calculateNextTimeStamp().ticks;
     return timestamp;

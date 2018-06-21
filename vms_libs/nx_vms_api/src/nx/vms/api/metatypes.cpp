@@ -3,14 +3,14 @@
 #include <QtCore/QMetaType>
 
 #include "data/access_rights_data.h"
-#include "data/database_dump_data.h"
-#include "data/database_dump_to_file_data.h"
-#include "data/resource_data.h"
 #include "data/camera_data.h"
 #include "data/camera_attributes_data.h"
 #include "data/camera_history_data.h"
+#include "data/cleanup_db_data.h"
 #include "data/cloud_system_data.h"
-#include "data/webpage_data.h"
+#include "data/database_dump_data.h"
+#include "data/database_dump_to_file_data.h"
+#include "data/event_rule_data.h"
 #include "data/layout_data.h"
 #include "data/layout_tour_data.h"
 #include "data/license_data.h"
@@ -21,16 +21,18 @@
 #include "data/peer_data.h"
 #include "data/peer_alive_data.h"
 #include "data/peer_sync_time_data.h"
+#include "data/resource_data.h"
 #include "data/reverse_connection_data.h"
 #include "data/runtime_data.h"
+#include "data/system_id_data.h"
 #include "data/system_merge_history_record.h"
 #include "data/tran_state_data.h"
+#include "data/timestamp.h"
 #include "data/update_data.h"
 #include "data/user_data.h"
 #include "data/user_role_data.h"
 #include "data/videowall_data.h"
-#include "data/event_rule_data.h"
-#include "data/cleanup_db_data.h"
+#include "data/webpage_data.h"
 
 #include "types/access_rights_types.h"
 
@@ -105,7 +107,9 @@ void Metatypes::initialize()
     qRegisterMetaType<StorageData>();
     qRegisterMetaType<StorageDataList>();
     qRegisterMetaType<SyncRequestData>();
+    qRegisterMetaType<SystemIdData>();
     qRegisterMetaType<SystemMergeHistoryRecord>();
+    qRegisterMetaType<Timestamp>();
     qRegisterMetaType<TranState>();
     qRegisterMetaType<TranStateResponse>();
     qRegisterMetaType<TranSyncDoneData>();

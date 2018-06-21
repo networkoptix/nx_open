@@ -507,7 +507,7 @@ namespace detail
             return ErrorCode::notImplemented;
         }
 
-        ErrorCode executeTransactionInternal(const QnTransaction<ApiSystemIdData>&)
+        ErrorCode executeTransactionInternal(const QnTransaction<nx::vms::api::SystemIdData>&)
         {
             NX_ASSERT(false, Q_FUNC_INFO, "This is a non persistent transaction!");
             return ErrorCode::notImplemented;

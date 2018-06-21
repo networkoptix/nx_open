@@ -1,20 +1,21 @@
 #pragma once
 
 #include <nx_ec/ec_api.h>
-#include <nx_ec/data/api_system_name_data.h>
 #include <transaction/transaction.h>
 
-namespace ec2
+#include <nx/vms/api/data_fwd.h>
+
+namespace ec2 {
+
+class QnMiscNotificationManager: public AbstractMiscNotificationManager
 {
+public:
+    void triggerNotification(const QnTransaction<nx::vms::api::SystemIdData>& transaction,
+        NotificationSource source);
+    void triggerNotification(const QnTransaction<ApiMiscData>& transaction);
+};
 
-    class QnMiscNotificationManager : public AbstractMiscNotificationManager
-    {
-    public:
-        void triggerNotification(const QnTransaction<ApiSystemIdData> &transaction, NotificationSource source);
-        void triggerNotification(const QnTransaction<ApiMiscData> &transaction);
-    };
-
-    typedef std::shared_ptr<QnMiscNotificationManager> QnMiscNotificationManagerPtr;
-    typedef QnMiscNotificationManager *QnMiscNotificationManagerRawPtr;
+using QnMiscNotificationManagerPtr = std::shared_ptr<QnMiscNotificationManager>;
+using QnMiscNotificationManagerRawPtr = QnMiscNotificationManager*;
 
 } // namespace ec2

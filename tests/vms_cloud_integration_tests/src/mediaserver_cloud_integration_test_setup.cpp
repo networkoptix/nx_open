@@ -14,8 +14,9 @@
 #include <api/app_server_connection.h>
 #include <media_server/settings.h>
 
-using namespace nx;
-using namespace nx::cdb;
+using nx::cdb::api::ResultCode;
+using nx::vms::api::UserData;
+using nx::vms::api::UserDataList;
 
 MediaServerCloudIntegrationTest::MediaServerCloudIntegrationTest():
     m_defaultOwnerCredentials({ "admin", "admin" })
@@ -48,8 +49,7 @@ bool MediaServerCloudIntegrationTest::startMediaServer()
 
 bool MediaServerCloudIntegrationTest::registerRandomCloudAccount()
 {
-    if (m_cdb.addActivatedAccount(&m_ownerAccount, &m_ownerAccount.password) !=
-            api::ResultCode::ok)
+    if (m_cdb.addActivatedAccount(&m_ownerAccount, &m_ownerAccount.password) != ResultCode::ok)
     {
         return false;
     }
@@ -58,8 +58,8 @@ bool MediaServerCloudIntegrationTest::registerRandomCloudAccount()
 
 bool MediaServerCloudIntegrationTest::registerCloudSystem()
 {
-    if (m_cdb.bindRandomSystem(m_ownerAccount.email, m_ownerAccount.password, &m_cloudSystem) !=
-            api::ResultCode::ok)
+    if (m_cdb.bindRandomSystem(m_ownerAccount.email, m_ownerAccount.password, &m_cloudSystem)
+        != ResultCode::ok)
     {
         return false;
     }
@@ -69,7 +69,7 @@ bool MediaServerCloudIntegrationTest::registerCloudSystem()
             m_ownerAccount.password,
             m_cloudSystem.id,
             m_ownerAccount.email,
-            &m_systemOwnerInfo) != nx::cdb::api::ResultCode::ok)
+            &m_systemOwnerInfo) != ResultCode::ok)
     {
         return false;
     }
@@ -170,13 +170,13 @@ void MediaServerCloudIntegrationTest::changeCloudOwnerAccountPassword()
 {
     const auto newPassword = nx::utils::generateRandomName(7).toStdString();
 
-    api::AccountUpdateData update;
+    nx::cdb::api::AccountUpdateData update;
     update.passwordHa1 = nx::network::http::calcHa1(
         m_ownerAccount.email.c_str(),
         nx::network::AppInfo::realm().toStdString().c_str(),
         newPassword.c_str()).constData();
     ASSERT_EQ(
-        nx::cdb::api::ResultCode::ok,
+        ResultCode::ok,
         cdb()->updateAccount(m_ownerAccount.email, m_ownerAccount.password, update));
 
     m_ownerAccount.password = newPassword;
@@ -203,11 +203,11 @@ void MediaServerCloudIntegrationTest::waitForCloudDataSynchronizedToTheMediaServ
 
     for (;;)
     {
-        vms::api::UserDataList users;
+        UserDataList users;
         ASSERT_EQ(::ec2::ErrorCode::ok, mediaServerClient->ec2GetUsers(&users));
         const auto userIter = std::find_if(
             users.begin(), users.end(),
-            [&newAccount](const vms::api::UserData& elem)
+            [&newAccount](const UserData& elem)
             {
                 return elem.name.toStdString() == newAccount.email;
             });
@@ -217,11 +217,11 @@ void MediaServerCloudIntegrationTest::waitForCloudDataSynchronizedToTheMediaServ
     }
 }
 
-vms::api::UserData MediaServerCloudIntegrationTest::inviteRandomCloudUser()
+UserData MediaServerCloudIntegrationTest::inviteRandomCloudUser()
 {
     const auto userEmail =
         nx::cdb::test::BusinessDataGenerator::generateRandomEmailAddress();
-    vms::api::UserData userData;
+    UserData userData;
     userData.id = guidFromArbitraryData(userEmail);
     userData.typeId = QnUuid("{774e6ecd-ffc6-ae88-0165-8f4a6d0eafa7}");
     userData.isCloud = true;
@@ -230,8 +230,8 @@ vms::api::UserData MediaServerCloudIntegrationTest::inviteRandomCloudUser()
     userData.name = QString::fromStdString(userEmail);
     //userData.userRoleId = QnUuid::createUuid();
     userData.realm = nx::network::AppInfo::realm();
-    userData.hash = vms::api::UserData::kCloudPasswordStub;
-    userData.digest = vms::api::UserData::kCloudPasswordStub;
+    userData.hash = UserData::kCloudPasswordStub;
+    userData.digest = UserData::kCloudPasswordStub;
     userData.permissions = GlobalPermission::liveViewerPermissions;
 
     auto mediaServerClient = prepareMediaServerClient();

@@ -1560,7 +1560,7 @@ void LocalConnectionFactory::registerRestHandlers(QnRestProcessorPool* const p)
     // AbstractDiscoveryManager::getDiscoveryData
     regGet<QnUuid, ApiDiscoveryDataList>(p, ApiCommand::getDiscoveryData);
     // AbstractMiscManager::changeSystemId
-    regUpdate<ApiSystemIdData>(p, ApiCommand::changeSystemId);
+    regUpdate<SystemIdData>(p, ApiCommand::changeSystemId);
 
     // AbstractECConnection
     regUpdate<DatabaseDumpData>(p, ApiCommand::restoreDatabase);

@@ -19,7 +19,7 @@ TransactionLog::TransactionLog(
     const QnUuid& peerId,
     nx::utils::db::AsyncSqlQueryExecutor* const dbManager,
     AbstractOutgoingTransactionDispatcher* const outgoingTransactionDispatcher)
-:
+    :
     m_peerId(peerId),
     m_dbManager(dbManager),
     m_outgoingTransactionDispatcher(outgoingTransactionDispatcher),
@@ -129,7 +129,7 @@ void TransactionLog::clearTransactionLogCacheForSystem(
     m_systemIdToTransactionLog.erase(systemId);
 }
 
-::ec2::Timestamp TransactionLog::generateTransactionTimestamp(
+vms::api::Timestamp TransactionLog::generateTransactionTimestamp(
     const nx::String& systemId)
 {
     QnMutexLocker lock(&m_mutex);
@@ -208,7 +208,7 @@ nx::utils::db::DBResult TransactionLog::fetchTransactionState(
         const nx::String dbGuid = selectTransactionStateQuery.value("db_guid").toString().toLatin1();
         const int sequence = selectTransactionStateQuery.value("sequence").toInt();
         const nx::Buffer tranHash = selectTransactionStateQuery.value("tran_hash").toString().toLatin1();
-        ::ec2::Timestamp timestamp;
+        vms::api::Timestamp timestamp;
         timestamp.sequence = selectTransactionStateQuery.value("timestamp_hi").toLongLong();
         timestamp.ticks = selectTransactionStateQuery.value("timestamp").toLongLong();
 
@@ -331,7 +331,7 @@ int TransactionLog::generateNewTransactionSequence(
         vms::api::PersistentIdData(m_peerId, guidFromArbitraryData(systemId)));
 }
 
-::ec2::Timestamp TransactionLog::generateNewTransactionTimestamp(
+vms::api::Timestamp TransactionLog::generateNewTransactionTimestamp(
     const QnMutexLockerBase& lock,
     VmsTransactionLogCache::TranId cacheTranId,
     const nx::String& systemId)
@@ -401,7 +401,7 @@ TransactionLog::TransactionLogContext* TransactionLog::getTransactionLogContext(
     return insertionPair.first->second.get();
 }
 
-std::tuple<int, ::ec2::Timestamp> TransactionLog::generateNewTransactionAttributes(
+std::tuple<int, vms::api::Timestamp> TransactionLog::generateNewTransactionAttributes(
     nx::utils::db::QueryContext* queryContext,
     const nx::String& systemId)
 {

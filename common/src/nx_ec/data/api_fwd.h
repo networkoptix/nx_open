@@ -13,7 +13,6 @@ struct ApiFullInfoData;
 struct ApiDiscoveryData;
 struct ApiDiscoverPeerData;
 struct ApiConnectionData;
-struct ApiSystemIdData;
 struct ApiTransactionData;
 struct ApiTranLogFilter;
 struct ApiDiscoveredServerData;
@@ -41,7 +40,6 @@ struct ParentId
     (ApiDiscoveryData)\
     (ApiDiscoverPeerData)\
     (ApiConnectionData)\
-    (ApiSystemIdData)\
     (ApiMiscData)\
     (ApiDiscoveredServerData)\
 

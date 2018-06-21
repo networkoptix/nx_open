@@ -40,9 +40,9 @@
 #include "nx_ec/managers/abstract_webpage_manager.h"
 #include "nx_ec/managers/abstract_videowall_manager.h"
 #include <nx_ec/managers/abstract_event_rules_manager.h>
+#include <nx/vms/api/data/timestamp.h>
 
 #include "ec_api_fwd.h"
-#include "transaction_timestamp.h"
 
 class QnRestProcessorPool;
 class QnHttpConnectionListener;
@@ -777,8 +777,9 @@ class AbstractMiscNotificationManager: public QObject
 {
 Q_OBJECT
 public:
-signals :
-    void systemIdChangeRequested(const QnUuid& systemId, qint64 sysIdTime, Timestamp tranLogTime);
+signals:
+    void systemIdChangeRequested(
+        const QnUuid& systemId, qint64 sysIdTime, nx::vms::api::Timestamp tranLogTime);
     void miscDataChanged(const QString& name, const QString& value);
 };
 
@@ -793,7 +794,7 @@ public:
     int changeSystemId(
         const QnUuid& systemId,
         qint64 sysIdTime,
-        Timestamp tranLogTime,
+        nx::vms::api::Timestamp tranLogTime,
         TargetType* target,
         HandlerType handler)
     {
@@ -807,7 +808,8 @@ public:
                     handler)));
     }
 
-    ErrorCode changeSystemIdSync(const QnUuid& systemId, qint64 sysIdTime, Timestamp tranLogTime)
+    ErrorCode changeSystemIdSync(
+        const QnUuid& systemId, qint64 sysIdTime, nx::vms::api::Timestamp tranLogTime)
     {
         return impl::doSyncCall<impl::SimpleHandler>(
             [=](const impl::SimpleHandlerPtr& handler)
@@ -932,7 +934,7 @@ protected:
     virtual int changeSystemId(
         const QnUuid& systemId,
         qint64 sysIdTime,
-        Timestamp tranLogTime,
+        nx::vms::api::Timestamp tranLogTime,
         impl::SimpleHandlerPtr handler) = 0;
     virtual int markLicenseOverflow(bool value, qint64 time, impl::SimpleHandlerPtr handler) = 0;
     virtual int cleanupDatabase(
@@ -986,8 +988,8 @@ public:
     virtual void addRemotePeer(const QnUuid& id, const nx::utils::Url& _url) = 0;
     virtual void deleteRemotePeer(const QnUuid& id) = 0;
 
-    virtual Timestamp getTransactionLogTime() const = 0;
-    virtual void setTransactionLogTime(Timestamp value) = 0;
+    virtual nx::vms::api::Timestamp getTransactionLogTime() const = 0;
+    virtual void setTransactionLogTime(nx::vms::api::Timestamp value) = 0;
 
     virtual AbstractResourceManagerPtr getResourceManager(
         const Qn::UserAccessData& userAccessData) = 0;

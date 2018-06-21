@@ -214,11 +214,11 @@ int OldEcConnection::restoreDatabaseAsync(
     {
     }
 
-    Timestamp OldEcConnection::getTransactionLogTime() const {
-        return Timestamp();
+    nx::vms::api::Timestamp OldEcConnection::getTransactionLogTime() const {
+        return {};
     }
 
-    void OldEcConnection::setTransactionLogTime(Timestamp /* value */)
+    void OldEcConnection::setTransactionLogTime(nx::vms::api::Timestamp /*value*/)
     {
 
     }

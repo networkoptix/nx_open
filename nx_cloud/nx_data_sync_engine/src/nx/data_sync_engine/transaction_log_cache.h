@@ -18,7 +18,7 @@ namespace data_sync_engine {
 struct UpdateHistoryData
 {
     vms::api::PersistentIdData updatedBy;
-    ::ec2::Timestamp timestamp;
+    vms::api::Timestamp timestamp;
 };
 
 /**
@@ -55,7 +55,7 @@ public:
         vms::api::PersistentIdData tranStateKey,
         int sequence,
         const nx::Buffer& tranHash,
-        const ::ec2::Timestamp& timestamp);
+        const vms::api::Timestamp& timestamp);
 
     TranId beginTran();
     void commit(TranId tranId);
@@ -70,7 +70,7 @@ public:
      * @return nullptr if tranId is unknown.
      */
     const VmsDataState* state(TranId tranId) const;
-    ::ec2::Timestamp generateTransactionTimestamp(TranId tranId);
+    vms::api::Timestamp generateTransactionTimestamp(TranId tranId);
     int generateTransactionSequence(const vms::api::PersistentIdData& tranStateKey);
     void shiftTransactionSequence(const vms::api::PersistentIdData& tranStateKey, int delta);
 
@@ -83,7 +83,7 @@ private:
         VmsDataState data;
     };
 
-    ::ec2::Timestamp m_maxTimestamp;
+    vms::api::Timestamp m_maxTimestamp;
     std::map<TranId, TranContext> m_tranIdToContext;
     mutable QnMutex m_mutex;
     TranId m_tranIdSequence;

@@ -38,8 +38,8 @@ namespace ec2
         virtual void startReceivingNotifications() override;
         virtual void stopReceivingNotifications() override;
 
-        virtual Timestamp getTransactionLogTime() const override;
-        virtual void setTransactionLogTime(Timestamp value) override;
+        virtual nx::vms::api::Timestamp getTransactionLogTime() const override;
+        virtual void setTransactionLogTime(nx::vms::api::Timestamp value) override;
 
     private:
         nx::vms::api::PeerType m_peerType;

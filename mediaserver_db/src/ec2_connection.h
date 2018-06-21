@@ -3,8 +3,7 @@
 * a.kolesnikov
 ***********************************************************/
 
-#ifndef EC2_CONNECTION_H
-#define EC2_CONNECTION_H
+#pragma once
 
 #include <memory>
 
@@ -15,43 +14,44 @@
 
 #include "server_query_processor.h"
 
-namespace ec2
+#include <nx/vms/api/data/timestamp.h>
+
+namespace ec2 {
+
+class LocalConnectionFactory;
+
+// TODO: #2.4 remove Ec2 prefix to avoid ec2::Ec2DirectConnection
+class Ec2DirectConnection: public BaseEc2Connection<ServerQueryProcessorAccess>
 {
+public:
+    Ec2DirectConnection(
+        const LocalConnectionFactory* connectionFactory,
+        ServerQueryProcessorAccess* queryProcessor,
+        const QnConnectionInfo& connectionInfo,
+        const nx::utils::Url& dbUrl);
+    virtual ~Ec2DirectConnection();
 
-	class LocalConnectionFactory;
+    //!Implementation of ec2::AbstractECConnection::connectionInfo
+    virtual QnConnectionInfo connectionInfo() const override;
+    virtual void updateConnectionUrl(const nx::utils::Url& url) override;
 
-    // TODO: #2.4 remove Ec2 prefix to avoid ec2::Ec2DirectConnection
-    class Ec2DirectConnection: public BaseEc2Connection<ServerQueryProcessorAccess>
-    {
-    public:
-        Ec2DirectConnection(
-            const LocalConnectionFactory* connectionFactory,
-            ServerQueryProcessorAccess* queryProcessor,
-            const QnConnectionInfo& connectionInfo,
-            const nx::utils::Url& dbUrl);
-        virtual ~Ec2DirectConnection();
+    bool initialized() const;
 
-        //!Implementation of ec2::AbstractECConnection::connectionInfo
-        virtual QnConnectionInfo connectionInfo() const override;
-        virtual void updateConnectionUrl(const nx::utils::Url& url) override;
+    Ec2StaticticsReporter* getStaticticsReporter();
+    nx::appserver::OrphanCameraWatcher* orphanCameraWatcher();
 
-        bool initialized() const;
+    virtual nx::vms::api::Timestamp getTransactionLogTime() const override;
+    virtual void setTransactionLogTime(nx::vms::api::Timestamp value) override;
 
-        Ec2StaticticsReporter* getStaticticsReporter();
-        nx::appserver::OrphanCameraWatcher* orphanCameraWatcher();
+    ec2::detail::QnDbManager* getDb() const;
 
-        virtual Timestamp getTransactionLogTime() const override;
-        virtual void setTransactionLogTime(Timestamp value) override;
+private:
+    const QnConnectionInfo m_connectionInfo;
+    bool m_isInitialized;
+    std::unique_ptr<Ec2StaticticsReporter> m_staticticsReporter;
+    std::unique_ptr<nx::appserver::OrphanCameraWatcher> m_orphanCameraWatcher;
+};
+typedef std::shared_ptr<Ec2DirectConnection> Ec2DirectConnectionPtr;
+typedef std::shared_ptr<nx::appserver::OrphanCameraWatcher> OrphanCameraWatcherPtr;
 
-        ec2::detail::QnDbManager* getDb() const;
-    private:
-        const QnConnectionInfo m_connectionInfo;
-        bool m_isInitialized;
-        std::unique_ptr<Ec2StaticticsReporter> m_staticticsReporter;
-        std::unique_ptr<nx::appserver::OrphanCameraWatcher> m_orphanCameraWatcher;
-    };
-    typedef std::shared_ptr<Ec2DirectConnection> Ec2DirectConnectionPtr;
-    typedef std::shared_ptr<nx::appserver::OrphanCameraWatcher> OrphanCameraWatcherPtr;
-}
-
-#endif  //EC2_CONNECTION_H
+} // namespace ec2

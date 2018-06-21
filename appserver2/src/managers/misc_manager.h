@@ -1,10 +1,10 @@
 #pragma once
 
 #include <nx_ec/ec_api.h>
-#include <nx_ec/data/api_system_name_data.h>
 #include <transaction/transaction.h>
 
 #include <nx/vms/api/data/license_overflow_data.h>
+#include <nx/vms/api/data/system_id_data.h>
 
 namespace ec2 {
 
@@ -28,7 +28,8 @@ public:
         impl::SimpleHandlerPtr handler) override;
 
 protected:
-    virtual int changeSystemId(const QnUuid& systemId, qint64 sysIdTime, Timestamp tranLogTime, impl::SimpleHandlerPtr handler) override;
+    virtual int changeSystemId(const QnUuid& systemId, qint64 sysIdTime,
+        nx::vms::api::Timestamp tranLogTime, impl::SimpleHandlerPtr handler) override;
 
 private:
     QueryProcessorType* const m_queryProcessor;
@@ -50,13 +51,12 @@ template<class QueryProcessorType>
 int QnMiscManager<QueryProcessorType>::changeSystemId(
         const QnUuid& systemId,
         qint64 sysIdTime,
-        Timestamp tranLogTime,
+        nx::vms::api::Timestamp tranLogTime,
         impl::SimpleHandlerPtr handler)
 {
     const int reqId = generateRequestID();
 
-
-    ApiSystemIdData params;
+    nx::vms::api::SystemIdData params;
     params.systemId = systemId;
     params.sysIdTime = sysIdTime;
     params.tranLogTime = tranLogTime;

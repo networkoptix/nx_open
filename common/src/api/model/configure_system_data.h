@@ -4,7 +4,7 @@
 #include <nx/fusion/fusion/fusion_fwd.h>
 #include <nx/vms/api/data/media_server_data.h>
 #include <nx/vms/api/data/user_data.h>
-#include <nx_ec/transaction_timestamp.h>
+#include <nx/vms/api/data/timestamp.h>
 
 struct ConfigureSystemData: public PasswordData
 {
@@ -33,7 +33,7 @@ struct ConfigureSystemData: public PasswordData
     QnUuid localSystemId;
     bool wholeSystem;
     qint64 sysIdTime;
-    ec2::Timestamp tranLogTime;
+    nx::vms::api::Timestamp tranLogTime;
     int port;
     nx::vms::api::MediaServerData foreignServer;
     std::vector<nx::vms::api::UserData> foreignUsers;

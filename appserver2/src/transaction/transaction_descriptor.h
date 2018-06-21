@@ -23,7 +23,6 @@
 #include "nx_ec/ec_api.h"
 #include "nx_ec/data/api_full_info_data.h"
 #include "nx_ec/data/api_discovery_data.h"
-#include "nx_ec/data/api_system_name_data.h"
 #include "nx_ec/data/api_statistics.h"
 
 #include <nx/utils/type_utils.h>
@@ -42,6 +41,7 @@
 #include <nx/vms/api/data/resource_type_data.h>
 #include <nx/vms/api/data/runtime_data.h>
 #include <nx/vms/api/data/stored_file_data.h>
+#include <nx/vms/api/data/system_id_data.h>
 #include <nx/vms/api/data/tran_state_data.h>
 #include <nx/vms/api/data/update_data.h>
 #include <nx/vms/api/data/user_data.h>

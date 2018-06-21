@@ -102,7 +102,6 @@
 #include <nx/vms/api/data/layout_data.h> //< Required for the FullInfoData
 #include <nx/vms/api/data/layout_tour_data.h> //< Required for the FullInfoData
 #include <nx/vms/api/data/access_rights_data.h> //< Required for the FullInfoData
-#include <nx_ec/transaction_timestamp.h>
 
 #include "api/model/api_ioport_data.h"
 #include "api/model/recording_stats_reply.h"
@@ -301,8 +300,6 @@ void QnCommonMetaTypes::initialize()
     qRegisterMetaType<QnLdapUsers>();
 
     qRegisterMetaType<Qn::ConnectionResult>();
-
-    qRegisterMetaType<ec2::Timestamp>("Timestamp");
 
     qRegisterMetaType<ec2::ErrorCode>( "ErrorCode" );
     qRegisterMetaType<ec2::NotificationSource>();

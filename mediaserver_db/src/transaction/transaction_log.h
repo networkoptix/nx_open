@@ -91,7 +91,7 @@ namespace ec2
             return ErrorCode::ok;
         }
 
-        Timestamp getTimeStamp();
+        nx::vms::api::Timestamp getTimeStamp();
         bool init();
         bool clear();
 
@@ -105,8 +105,8 @@ namespace ec2
         void commit();
         void rollback();
 
-        Timestamp getTransactionLogTime() const;
-        void setTransactionLogTime(Timestamp value);
+        nx::vms::api::Timestamp getTransactionLogTime() const;
+        void setTransactionLogTime(nx::vms::api::Timestamp value);
         ErrorCode saveToDB(
             const QnAbstractTransaction &tranID,
             const QnUuid &hash,
@@ -117,7 +117,11 @@ namespace ec2
         ErrorCode updateSequenceNoLock(const QnUuid& peerID, const QnUuid& dbID, int sequence);
 
         template <class T>
-        ContainsReason contains(const QnTransaction<T>& tran) { return contains(tran, transactionHash(tran.command, tran.params)); }
+        ContainsReason contains(const QnTransaction<T>& tran)
+        {
+            return contains(tran, transactionHash(tran.command, tran.params));
+        }
+
         ContainsReason contains(const QnAbstractTransaction& tran, const QnUuid& hash) const;
 
         int currentSequenceNoLock() const;
@@ -125,19 +129,21 @@ namespace ec2
     private:
         struct UpdateHistoryData
         {
-            UpdateHistoryData(): timestamp(Timestamp::fromInteger(0)) {}
-            UpdateHistoryData(const nx::vms::api::PersistentIdData& updatedBy, const Timestamp& timestamp): updatedBy(updatedBy), timestamp(timestamp) {}
+            UpdateHistoryData() = default;
+            UpdateHistoryData(const nx::vms::api::PersistentIdData& updatedBy,
+                const nx::vms::api::Timestamp& timestamp);
             nx::vms::api::PersistentIdData updatedBy;
-            Timestamp timestamp;
+            nx::vms::api::Timestamp timestamp;
         };
+
         struct CommitData
         {
-            CommitData() {}
+            CommitData() = default;
             void clear() { state.values.clear(); updateHistory.clear(); }
-
             nx::vms::api::TranState state;
             QMap<QnUuid, UpdateHistoryData> updateHistory;
         };
+
     private:
         detail::QnDbManager* m_dbManager;
         nx::vms::api::TranState m_state;
@@ -146,7 +152,7 @@ namespace ec2
         mutable QnMutex m_timeMutex;
         QElapsedTimer m_relativeTimer;
         quint64 m_baseTime;
-        Timestamp m_lastTimestamp;
+        nx::vms::api::Timestamp m_lastTimestamp;
         CommitData m_commitData;
         QnUbjsonTransactionSerializer* m_tranSerializer;
         ec2::database::api::QueryCache m_insertTransactionQuery;
