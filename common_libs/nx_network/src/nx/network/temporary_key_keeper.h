@@ -23,7 +23,7 @@ public:
     using Binding = nx::String;
 
     TemporayKeyKeeper(TemporayKeyOptions options = TemporayKeyOptions());
-    ~TemporayKeyKeeper();
+    virtual ~TemporayKeyKeeper();
 
     TemporayKeyOptions getOptions() const;
     void setOptions(TemporayKeyOptions options);
@@ -204,6 +204,11 @@ template<typename Value>
 bool TemporayKeyKeeper<Value>::add(const Key& key, Value value, Binding binding, bool updateOnClash)
 {
     const auto now = std::chrono::steady_clock::now();
+    if (key.trimmed().isEmpty())
+    {
+        NX_ASSERT(false, "Attempt to add empty key");
+        return false;
+    }
 
     QnMutexLocker locker(&m_mutex);
     const auto [iterator, isInserted] = m_values.emplace(key, ValueContext{

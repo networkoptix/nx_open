@@ -5,8 +5,8 @@ namespace network {
 namespace http {
 
 const AuthMethod::Values AuthMethodRestrictionList::kDefaults =
-    AuthMethod::cookie | AuthMethod::http |
-    AuthMethod::videowall | AuthMethod::urlQueryParam;
+    AuthMethod::sessionKey | AuthMethod::cookie | AuthMethod::http |
+    AuthMethod::videowallHeader | AuthMethod::urlQueryDigest;
 
 AuthMethod::Values AuthMethodRestrictionList::getAllowedAuthMethods(
     const nx::network::http::Request& request) const

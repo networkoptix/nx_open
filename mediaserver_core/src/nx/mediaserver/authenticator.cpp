@@ -37,8 +37,7 @@ namespace http {
 // Function overlad for clean logs.
 static QString toString(const network::http::RequestLine& value)
 {
-    const auto s = QString::fromUtf8(value.toString());
-    return s.left(s.length() - 2); //< Remove "\r\n".
+    return QString::fromUtf8(value.toString()).trimmed();
 }
 
 } // namespace nx
@@ -69,6 +68,13 @@ Authenticator::Authenticator(
 {
 }
 
+QString Authenticator::Result::toString() const
+{
+    return lm("%1, used methods %2")
+        .arg(code == Qn::Auth_OK ? access.toString() : Qn::toString(code))
+        .arg((int) usedMethods, 0, 2);
+}
+
 Authenticator::Result Authenticator::tryAllMethods(
     const nx::network::HostAddress& clientIp,
     const nx::network::http::Request& request,
@@ -85,7 +91,7 @@ Authenticator::Result Authenticator::tryAllMethods(
     }
 
     Result result;
-    result.code = doAllMethods(
+    result.code = tryAllMethods(
         clientIp, request, *response, isProxy, &result.access, &result.usedMethods);
 
     if (result.code == Qn::Auth_OK && !sessionKey.isEmpty())
@@ -115,6 +121,7 @@ Authenticator::Result Authenticator::tryAllMethods(
         }
     }
 
+    NX_VERBOSE(this, lm("Result %1 for %2").args(result, request.requestLine));
     return result;
 }
 
@@ -132,10 +139,21 @@ Authenticator::Result Authenticator::tryCookie(const nx::network::http::Request&
         && nx::network::http::AuthMethod::allowWithourCsrf)
     {
         if (auto session = m_sessionKeys.get(sessionKey))
-            return {Qn::Auth_Forbidden, std::move(*session), nx::network::http::AuthMethod::cookie};
+            return {Qn::Auth_OK, std::move(*session), nx::network::http::AuthMethod::cookie};
     }
 
-    return {Qn::Auth_Forbidden, {}, nx::network::http::AuthMethod::cookie};
+    return {Qn::Auth_InvalidCsrfToken, {}, nx::network::http::AuthMethod::cookie};
+}
+
+static void removeLegacyCookie(
+    const nx::network::http::Request& request,
+    nx::network::http::Response* response)
+{
+    for (const auto& name: {"X-runtime-guid", "auth", "nx-vms-csrf-token"})
+    {
+        if (!request.getCookieValue(name).isEmpty())
+            response->removeCookie(name);
+    }
 }
 
 void Authenticator::setAccessCookie(
@@ -143,31 +161,31 @@ void Authenticator::setAccessCookie(
     nx::network::http::Response* response,
     Qn::UserAccessData access)
 {
+    removeLegacyCookie(request, response);
+
     const auto sessionKey = request.getCookieValue(kCookieRuntimeGuid);
     if (!sessionKey.isEmpty())
         return m_sessionKeys.addOrUpdate(sessionKey, access); //< Use existing if possible.
 
     const auto newSessionKey = m_sessionKeys.make(access);
-    const auto cookie = lm("%1=%2; Path=/").args(kCookieRuntimeGuid, newSessionKey);
-    nx::network::http::insertHeader(&response->headers, {"Set-Cookie", cookie.toUtf8()});
+    response->setCookie(kCookieRuntimeGuid, newSessionKey);
 }
 
 void Authenticator::removeAccessCookie(
     const nx::network::http::Request& request,
     nx::network::http::Response* response)
 {
+    removeLegacyCookie(request, response);
+
     const auto sessionKey = request.getCookieValue(kCookieRuntimeGuid);
     if (sessionKey.isEmpty())
         return;
 
-    const auto cookie = lm("%1=deleted; Path=/; expires=Thu, 01 Jan 1970 00:00 : 00 GMT")
-        .args(kCookieRuntimeGuid);
-
     m_sessionKeys.remove(sessionKey);
-    nx::network::http::insertHeader(&response->headers, {"Set-Cookie", cookie.toUtf8()});
+    response->removeCookie(kCookieRuntimeGuid);
 }
 
-Qn::AuthResult Authenticator::doAllMethods(
+Qn::AuthResult Authenticator::tryAllMethods(
     const nx::network::HostAddress& clientIp,
     const nx::network::http::Request& request,
     nx::network::http::Response& response,
@@ -202,7 +220,7 @@ Qn::AuthResult Authenticator::doAllMethods(
         if (const auto access = m_pathKeys.get(tempAuthKey, path))
         {
             if (usedAuthMethod)
-                *usedAuthMethod = nx::network::http::AuthMethod::tempUrlQueryParam;
+                *usedAuthMethod = nx::network::http::AuthMethod::temporaryUrlQueryKey;
 
             if (accessRights)
                 *accessRights = std::move(*access);
@@ -211,7 +229,7 @@ Qn::AuthResult Authenticator::doAllMethods(
         }
     }
 
-    if (allowedAuthMethods & nx::network::http::AuthMethod::videowall)
+    if (allowedAuthMethods & nx::network::http::AuthMethod::videowallHeader)
     {
         const nx::network::http::StringType& videoWall_auth = nx::network::http::getHeaderValue(request.headers, Qn::VIDEOWALL_GUID_HEADER_NAME);
         if (!videoWall_auth.isEmpty())
@@ -220,7 +238,7 @@ Qn::AuthResult Authenticator::doAllMethods(
                 .arg(request.requestLine.url).arg(videoWall_auth));
 
             if (usedAuthMethod)
-                *usedAuthMethod = nx::network::http::AuthMethod::videowall;
+                *usedAuthMethod = nx::network::http::AuthMethod::videowallHeader;
 
             if (resourcePool()->getResourceById<QnVideoWallResource>(QnUuid(videoWall_auth)).isNull())
             {
@@ -240,7 +258,7 @@ Qn::AuthResult Authenticator::doAllMethods(
         }
     }
 
-    if (allowedAuthMethods & nx::network::http::AuthMethod::urlQueryParam)
+    if (allowedAuthMethods & nx::network::http::AuthMethod::urlQueryDigest)
     {
         const QByteArray& authQueryParam = urlQuery.queryItemValue(
             isProxy ? lit("proxy_auth") : QString::fromLatin1(Qn::URL_QUERY_AUTH_KEY_NAME)).toLatin1();
@@ -261,8 +279,8 @@ Qn::AuthResult Authenticator::doAllMethods(
             if (authResult == Qn::Auth_OK)
             {
                 if (usedAuthMethod)
-                    *usedAuthMethod = nx::network::http::AuthMethod::urlQueryParam;
-                NX_DEBUG(this, lm("%1 with urlQueryParam (%2)").args(Qn::Auth_OK, request.requestLine));
+                    *usedAuthMethod = nx::network::http::AuthMethod::urlQueryDigest;
+                NX_DEBUG(this, lm("%1 with urlQueryDigest (%2)").args(Qn::Auth_OK, request.requestLine));
                 return Qn::Auth_OK;
             }
         }
@@ -288,7 +306,7 @@ Qn::AuthResult Authenticator::doAllMethods(
         NX_VERBOSE(this, lm("Authenticating %1 with HTTP authentication")
             .arg(request.requestLine));
 
-        result = doHttp(clientIp, request, response, isProxy, accessRights, usedAuthMethod);
+        result = tryHttpMethods(clientIp, request, response, isProxy, accessRights, usedAuthMethod);
         if (result == Qn::Auth_OK)
         {
             NX_VERBOSE(this, lm("Authenticated %1 with HTTP authentication").args(request.requestLine.url));
@@ -305,7 +323,7 @@ Qn::AuthResult Authenticator::doAllMethods(
     return result;
 }
 
-Qn::AuthResult Authenticator::doHttp(
+Qn::AuthResult Authenticator::tryHttpMethods(
     const nx::network::HostAddress& clientIp,
     const nx::network::http::Request& request,
     nx::network::http::Response& response,
@@ -411,7 +429,7 @@ Qn::AuthResult Authenticator::doHttp(
             authResult == Qn::Auth_WrongLogin) &&
             authorizationHeader.authScheme == nx::network::http::header::AuthScheme::digest)
         {
-            if (doDigest(request.requestLine,
+            if (tryHttpDigest(request.requestLine,
                 authorizationHeader, response, isProxy, accessRights) == Qn::Auth_OK)
             {
                 // Cached value matched user digest by not LDAP server.
@@ -438,7 +456,7 @@ Qn::AuthResult Authenticator::doHttp(
         if (usedAuthMethod)
             *usedAuthMethod = nx::network::http::AuthMethod::httpDigest;
 
-        authResult = doDigest(
+        authResult = tryHttpDigest(
             request.requestLine, authorizationHeader, response, isProxy, accessRights);
         NX_DEBUG(this, lm("%1 with digest (%2)").args(authResult, request.requestLine));
     }
@@ -446,7 +464,7 @@ Qn::AuthResult Authenticator::doHttp(
     {
         if (usedAuthMethod)
             *usedAuthMethod = nx::network::http::AuthMethod::httpBasic;
-        authResult = doBasic(request.requestLine.method, authorizationHeader, response, accessRights);
+        authResult = tryHttpBasic(request.requestLine.method, authorizationHeader, response, accessRights);
 
         if (authResult == Qn::Auth_OK && userResource &&
             (userResource->getDigest().isEmpty() || userResource->getRealm() != nx::network::AppInfo::realm()))
@@ -588,7 +606,7 @@ static bool verifyDigestUri(const nx::utils::Url& requestUrl, const QByteArray& 
         : isEqual(requestUrl.path(), digestUrl.path());
 }
 
-Qn::AuthResult Authenticator::doDigest(
+Qn::AuthResult Authenticator::tryHttpDigest(
     const nx::network::http::RequestLine& requestLine,
     const nx::network::http::header::Authorization& authorization,
     nx::network::http::Response& responseHeaders,
@@ -642,7 +660,7 @@ Qn::AuthResult Authenticator::doDigest(
     return errCode;
 }
 
-Qn::AuthResult Authenticator::doBasic(
+Qn::AuthResult Authenticator::tryHttpBasic(
     const QByteArray& method,
     const nx::network::http::header::Authorization& authorization,
     nx::network::http::Response& response,
@@ -800,6 +818,8 @@ void Authenticator::setLockoutOptions(std::optional<LockoutOptions> options)
 {
     QnMutexLocker lock(&m_mutex);
     m_lockoutOptions = std::move(options);
+    if (!m_lockoutOptions)
+        m_accessFailures.clear();
 }
 
 Authenticator::SessionKeys::SessionKeys():

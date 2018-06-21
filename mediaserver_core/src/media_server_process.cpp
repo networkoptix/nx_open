@@ -2718,8 +2718,8 @@ bool MediaServerProcess::initTcpListener(
 
     nx::network::http::AuthMethod::Values methods = (nx::network::http::AuthMethod::Values) (
         nx::network::http::AuthMethod::cookie |
-        nx::network::http::AuthMethod::urlQueryParam |
-        nx::network::http::AuthMethod::tempUrlQueryParam);
+        nx::network::http::AuthMethod::urlQueryDigest |
+        nx::network::http::AuthMethod::temporaryUrlQueryKey);
     QnUniversalRequestProcessor::setUnauthorizedPageBody(
         QnFileConnectionProcessor::readStaticFile("static/login.html"), methods);
     regTcp<QnRtspConnectionProcessor>("RTSP", "*");
@@ -4364,7 +4364,7 @@ void MediaServerProcess::configureApiRestrictions(nx::network::http::AuthMethodR
 
     // For open in new browser window.
     restrictions->allow(webPrefix + lit("/api/showLog.*"),
-        nx::network::http::AuthMethod::urlQueryParam | nx::network::http::AuthMethod::allowWithourCsrf);
+        nx::network::http::AuthMethod::urlQueryDigest | nx::network::http::AuthMethod::allowWithourCsrf);
 
     // For inserting in HTML <img src="...">.
     restrictions->allow(webPrefix + lit("/ec2/cameraThumbnail"),

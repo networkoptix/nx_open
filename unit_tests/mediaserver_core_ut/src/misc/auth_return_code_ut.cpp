@@ -31,10 +31,7 @@ namespace nx {
 namespace mediaserver {
 namespace test {
 
-static const Authenticator::LockoutOptions kLockoutOptions{
-    3, std::chrono::milliseconds(500), std::chrono::milliseconds(100)};
-
-class AuthReturnCodeTest:
+class AuthenticationTest:
     public ::testing::Test
 {
 public:
@@ -51,6 +48,8 @@ public:
 
     virtual void SetUp() override
     {
+        server->authenticator()->setLockoutOptions(std::nullopt);
+
         auto ec2Connection = server->commonModule()->ec2Connection();
         ec2::AbstractUserManagerPtr userManager = ec2Connection->getUserManager(Qn::kSystemAccess);
 
@@ -142,7 +141,8 @@ public:
     void testCookieAuth(
         const QString& login,
         const QString& password,
-        QnRestResult::Error expectedError)
+        QnRestResult::Error expectedError,
+        bool withCsrf = true)
     {
         QnCookieData cookieLogin;
         cookieLogin.auth = createHttpQueryAuthParam(
@@ -161,7 +161,7 @@ public:
         if (result.error != QnRestResult::Error::NoError)
             return;
 
-        // Set cookies manually, client does not support it.
+        // Set cookies manually, HTTP client does not support it.
         auto cookieMap = client.response()->getCookies();
         QStringList cookieList;
         for (const auto& it: cookieMap)
@@ -169,26 +169,34 @@ public:
 
         const auto cookie = cookieList.join("; ").toUtf8();
         const auto session = cookieMap["x-runtime-guid"];
-        const auto doGet =
-            [&](QString path, std::map<nx::String, nx::String> headers)
-            {
-                nx::network::http::HttpClient client;
-                for (const auto& it: headers)
-                    client.addAdditionalHeader(it.first, it.second);
+        if (withCsrf)
+        {
+            // Cookie works only with extra header.
+            expectGetResult("/ec2/getUsers", {{"Cookie", cookie}});
+            expectGetResult("/ec2/getUsers", {{"Cookie", cookie}, {"X-Runtime-Guid", session}});
 
-                if (!client.doGet(serverUrl(path)) || !client.response())
-                    return 0;
+            // Cookies does not work after logout.
+            expectGetResult("/api/cookieLogout", {{"Cookie", cookie}, {"X-Runtime-Guid", session}});
+            expectGetResult("/ec2/getUsers", {{"Cookie", cookie}, {"X-Runtime-Guid", session}}, 401);
+        }
+        else
+        {
+            expectGetResult("/api/showLog", {{"Cookie", cookie}}, 400);
+            expectGetResult("/api/cookieLogout", {{"Cookie", cookie}});
+            expectGetResult("/api/showLog", {{"Cookie", cookie}}, 401);
+        }
+    }
 
-                return client.response()->statusLine.statusCode;
-            };
+    void expectGetResult(
+        const QString& path, std::map<nx::String, nx::String> headers, int expectedStatus = 200)
+    {
+        nx::network::http::HttpClient client;
+        for (const auto& it: headers)
+            client.addAdditionalHeader(it.first, it.second);
 
-        // Cookie works only with extra header.
-        ASSERT_EQ(401, doGet("/ec2/getUsers", {{"Cookie", cookie}}));
-        ASSERT_EQ(200, doGet("/ec2/getUsers", {{"Cookie", cookie}, {"X-Runtime-Guid", session}}));
-
-        // Cookies does not work after logout.
-        ASSERT_EQ(200, doGet("api/cookieLogout", {{"Cookie", cookie}, {"X-Runtime-Guid", session}}));
-        ASSERT_EQ(401, doGet("/ec2/getUsers", {{"Cookie", cookie}, {"X-Runtime-Guid", session}}));
+        ASSERT_TRUE(client.doGet(serverUrl(path))) << path.toStdString();
+        ASSERT_TRUE(client.response()) << path.toStdString();
+        ASSERT_EQ(expectedStatus, client.response()->statusLine.statusCode) << path.toStdString();
     }
 
     ec2::ApiUserData userData;
@@ -284,20 +292,11 @@ public:
         client->addAdditionalHeader(nx::network::http::header::Authorization::NAME, digestHeader.serialized());
         return client;
     }
-
-    std::shared_ptr<SharedGuard<std::function<void()>>> setCustomLockoutOptions()
-    {
-        const auto lockoutOptons = server->authenticator()->getLockoutOptions();
-        server->authenticator()->setLockoutOptions(kLockoutOptions);
-
-        const auto restoreOptions = [=](){ server->authenticator()->setLockoutOptions(lockoutOptons); };
-        return makeSharedGuard(std::function<void()>(restoreOptions));
-    }
 };
 
-std::unique_ptr<MediaServerLauncher> AuthReturnCodeTest::server;
+std::unique_ptr<MediaServerLauncher> AuthenticationTest::server;
 
-TEST_F(AuthReturnCodeTest, authWhileRestart)
+TEST_F(AuthenticationTest, authWhileRestart)
 {
     // Cloud users is forbidden for basic auth.
     // We had bug: server return invalid code if request occurred when server is just started.
@@ -310,7 +309,7 @@ TEST_F(AuthReturnCodeTest, authWhileRestart)
         Qn::Auth_Forbidden);
 }
 
-TEST_F(AuthReturnCodeTest, noCloudConnect)
+TEST_F(AuthenticationTest, noCloudConnect)
 {
     // We have cloud user but not connected to cloud yet.
     testServerReturnCodeForWrongPassword(
@@ -321,7 +320,7 @@ TEST_F(AuthReturnCodeTest, noCloudConnect)
 
 }
 
-TEST_F(AuthReturnCodeTest, cookieNoCloudConnect)
+TEST_F(AuthenticationTest, cookieNoCloudConnect)
 {
     // We have cloud user but not connected to cloud yet.
     testCookieAuth(
@@ -329,7 +328,7 @@ TEST_F(AuthReturnCodeTest, cookieNoCloudConnect)
         QnRestResult::CantProcessRequest);
 }
 
-TEST_F(AuthReturnCodeTest, cookieWrongPassword)
+TEST_F(AuthenticationTest, cookieWrongPassword)
 {
     // Check return code for wrong password
     testCookieAuth(
@@ -337,15 +336,17 @@ TEST_F(AuthReturnCodeTest, cookieWrongPassword)
         QnRestResult::InvalidParameter);
 }
 
-TEST_F(AuthReturnCodeTest, cookieCorrectPassword)
+TEST_F(AuthenticationTest, cookieCorrectPassword)
 {
-    // Check success auth
-    testCookieAuth(
-        "admin", "admin",
-        QnRestResult::NoError);
+    testCookieAuth("admin", "admin", QnRestResult::NoError);
 }
 
-TEST_F(AuthReturnCodeTest, localUserWithCloudLikeName)
+TEST_F(AuthenticationTest, cookieWithoutScrf)
+{
+    testCookieAuth("admin", "admin", QnRestResult::NoError, /*withCsrf*/ false);
+}
+
+TEST_F(AuthenticationTest, localUserWithCloudLikeName)
 {
     const QString userCredentials[] = {"username@", "password"};
 
@@ -353,7 +354,7 @@ TEST_F(AuthReturnCodeTest, localUserWithCloudLikeName)
     assertServerAcceptsUserCredentials(userCredentials[0], userCredentials[1]);
 }
 
-TEST_F(AuthReturnCodeTest, disabledUser)
+TEST_F(AuthenticationTest, disabledUser)
 {
     const QString userCredentials[] = { "test2", "password" };
 
@@ -366,7 +367,7 @@ TEST_F(AuthReturnCodeTest, disabledUser)
         Qn::Auth_DisabledUser);
 }
 
-TEST_F(AuthReturnCodeTest, noLdapConnect)
+TEST_F(AuthenticationTest, noLdapConnect)
 {
     // We have cloud user but not connected to cloud yet.
     testServerReturnCodeForWrongPassword(
@@ -383,45 +384,48 @@ TEST_F(AuthReturnCodeTest, noLdapConnect)
         Qn::Auth_LDAPConnectError);
 }
 
-TEST_F(AuthReturnCodeTest, manualDigest)
+TEST_F(AuthenticationTest, manualDigest)
 {
     auto client = manualDigestClient("GET", "/ec2/getUsers");
     testServerReturnCode(std::move(client), 200);
 }
 
-TEST_F(AuthReturnCodeTest, manualDigestWrongUri)
+TEST_F(AuthenticationTest, manualDigestWrongUri)
 {
     auto client = manualDigestClient("GET", "/api/getCameras");
     testServerReturnCode(std::move(client), 401, Qn::AuthResult::Auth_WrongDigest);
 }
 
-TEST_F(AuthReturnCodeTest, manualDigestWrongMethod)
+TEST_F(AuthenticationTest, manualDigestWrongMethod)
 {
     auto client = manualDigestClient("POST", "/api/getUsers");
     testServerReturnCode(std::move(client), 401, Qn::AuthResult::Auth_WrongDigest);
 }
 
-TEST_F(AuthReturnCodeTest, manualDigest_onGateway)
+TEST_F(AuthenticationTest, manualDigest_onGateway)
 {
     auto client = manualDigestClient("GET", "/gateway/c6901e5b-4884-41f4-ab80-73e078341252/ec2/getUsers");
     testServerReturnCode(std::move(client), 200);
 }
 
-TEST_F(AuthReturnCodeTest, manualDigestWrongUri_onGateway)
+TEST_F(AuthenticationTest, manualDigestWrongUri_onGateway)
 {
     auto client = manualDigestClient("GET", "/gateway/c6901e5b-4884-41f4-ab80-73e078341252/api/getCameras");
     testServerReturnCode(std::move(client), 401, Qn::AuthResult::Auth_WrongDigest);
 }
 
-TEST_F(AuthReturnCodeTest, manualDigestWrongMethod_onGateway)
+TEST_F(AuthenticationTest, manualDigestWrongMethod_onGateway)
 {
     auto client = manualDigestClient("POST", "/api/getUsers");
     testServerReturnCode(std::move(client), 401, Qn::AuthResult::Auth_WrongDigest);
 }
 
-TEST_F(AuthReturnCodeTest, lockoutTest)
+static const Authenticator::LockoutOptions kLockoutOptions{
+    3, std::chrono::seconds(10), std::chrono::seconds(1)};
+
+TEST_F(AuthenticationTest, lockoutTest)
 {
-    const auto guard = setCustomLockoutOptions();
+    server->authenticator()->setLockoutOptions(kLockoutOptions);
 
     // Lockout does not happen on a random attemp.
     assertServerAcceptsUserCredentials("admin", "admin");
@@ -429,8 +433,7 @@ TEST_F(AuthReturnCodeTest, lockoutTest)
     assertServerAcceptsUserCredentials("admin", "admin");
 
     // Trigger lockout.
-    std::this_thread::sleep_for(kLockoutOptions.accountTime);
-    for (int i = 0; i < kLockoutOptions.maxLoginFailures; ++i)
+    for (int i = 0; i < kLockoutOptions.maxLoginFailures - 1; ++i)
         assertServerRejectsUserCredentials("admin", "qweasd123", Qn::Auth_WrongPassword);
     assertServerRejectsUserCredentials("admin", "admin", Qn::Auth_LockedOut);
 
@@ -439,7 +442,7 @@ TEST_F(AuthReturnCodeTest, lockoutTest)
     assertServerAcceptsUserCredentials("admin", "admin");
 }
 
-TEST_F(AuthReturnCodeTest, sessionKey)
+TEST_F(AuthenticationTest, sessionKey)
 {
     // Initial request to authorize session.
     const auto sessionKey = QnUuid::createUuid().toByteArray();
@@ -459,7 +462,7 @@ TEST_F(AuthReturnCodeTest, sessionKey)
     }
 
     // Cause user to lockout.
-    const auto guard = setCustomLockoutOptions();
+    server->authenticator()->setLockoutOptions(kLockoutOptions);
     for (int i = 0; i < kLockoutOptions.maxLoginFailures; ++i)
         assertServerRejectsUserCredentials("admin", "qweasd123", Qn::Auth_WrongPassword);
     assertServerRejectsUserCredentials("admin", "admin", Qn::Auth_LockedOut);
@@ -472,7 +475,7 @@ TEST_F(AuthReturnCodeTest, sessionKey)
     }
 }
 
-TEST_F(AuthReturnCodeTest, authKeyInUrl)
+TEST_F(AuthenticationTest, authKeyInUrl)
 {
     auto client = std::make_unique<nx::network::http::HttpClient>();
 

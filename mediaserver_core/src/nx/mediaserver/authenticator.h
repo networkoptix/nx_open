@@ -56,6 +56,8 @@ public:
           Qn::AuthResult code = Qn::Auth_Forbidden;
           Qn::UserAccessData access;
           network::http::AuthMethod::Value usedMethods = network::http::AuthMethod::NotDefined;
+
+          QString toString() const;
     };
 
     Result tryAllMethods(
@@ -122,7 +124,7 @@ private:
 
     // TODO: Refactor all these methods so they return Result instead of out paramiters.
     // It's also preferable to come to identical interfase, so they could be used as generics.
-    Qn::AuthResult doAllMethods(
+    Qn::AuthResult tryAllMethods(
         const nx::network::HostAddress& clientIp,
         const nx::network::http::Request& request,
         nx::network::http::Response& response,
@@ -130,7 +132,7 @@ private:
         Qn::UserAccessData* accessRights = 0,
         nx::network::http::AuthMethod::Value* usedAuthMethod = 0);
 
-    Qn::AuthResult doHttp(
+    Qn::AuthResult tryHttpMethods(
         const nx::network::HostAddress& clientIp,
         const nx::network::http::Request& request,
         nx::network::http::Response& response,
@@ -144,14 +146,14 @@ private:
         bool isProxy = false,
         bool isDigest = true);
 
-    Qn::AuthResult doDigest(
+    Qn::AuthResult tryHttpDigest(
         const nx::network::http::RequestLine& requestLine,
         const nx::network::http::header::Authorization& authorization,
         nx::network::http::Response& responseHeaders,
         bool isProxy,
         Qn::UserAccessData* accessRights);
 
-    Qn::AuthResult doBasic(
+    Qn::AuthResult tryHttpBasic(
         const QByteArray& method,
         const nx::network::http::header::Authorization& authorization,
         nx::network::http::Response& responseHeaders,
@@ -168,10 +170,7 @@ private:
     bool decodeBasicAuthData(const QByteArray& authData, QString* outUserName, QString* outPassword);
     bool decodeLDAPPassword(const QByteArray& hash, QString* outPassword);
 
-    /*!
-        \return \a true if password expiration timestamp has been increased
-    */
-    //!Check \a digest validity with external authentication service (LDAP currently)
+    /** Check \a digest validity with external authentication service (LDAP currently). */
     Qn::AuthResult checkDigestValidity(QnUserResourcePtr userResource, const QByteArray& digest);
 
 private:
