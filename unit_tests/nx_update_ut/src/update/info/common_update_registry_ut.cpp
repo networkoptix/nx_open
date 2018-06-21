@@ -56,7 +56,7 @@ protected:
         const OsVersion& osVersion,
         const QList<QnUuid>& additionalPeers)
     {
-        UpdateFileRequestData request;
+        UpdateRequestData request;
 
         request.isClient = false;
         request.currentNxVersion = QnSoftwareVersion("3.1.0");
@@ -163,7 +163,7 @@ private:
 
     void assertDataPresence(const OsVersion& version, bool shouldBePresent)
     {
-        UpdateFileRequestData request;
+        UpdateRequestData request;
 
         request.isClient = false;
         request.currentNxVersion = QnSoftwareVersion("3.1.0");

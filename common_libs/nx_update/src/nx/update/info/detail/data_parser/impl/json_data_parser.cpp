@@ -43,6 +43,8 @@ QN_FUSION_ADAPT_STRUCT_FUNCTIONS(
 const static QString kAlternativesServersKey = "__info";
 const static QString kManifestVersionKey = "__version";
 const static QString kVersionKey = "version";
+const static QString kEulaVersionKey = "eulaVersion";
+const static QString kEulaLinkKey = "eulaLink";
 const static QString kCloudHostKey = "cloudHost";
 const static QString kServerPackagesKey = "packages";
 const static QString kClientPackagesKey = "clientPackages";
@@ -165,6 +167,7 @@ public:
         }
 
         parseVersionAndCloudHost();
+        parseEula();
         parsePackages(kServerPackagesKey);
         parsePackages(kClientPackagesKey);
     }
@@ -252,6 +255,21 @@ private:
             return;
 
         m_updateData.cloudHost = parseString(kCloudHostKey);
+    }
+
+    void parseEula()
+    {
+        if (!m_ok)
+            return;
+
+        if (!QJson::deserialize(m_topLevelObject, kEulaVersionKey, &m_updateData.eulaVersion))
+        {
+            m_ok = false;
+            NX_ERROR(this, lm("%1 deserialization failed").args(kEulaVersionKey));
+            return;
+        }
+
+        m_updateData.eulaLink = parseString(kEulaLinkKey);
     }
 
     QString parseString(const QString& key)

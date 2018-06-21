@@ -424,6 +424,8 @@ const std::vector<UpdateTestData>& updateTestDataList()
     {
         "version": "3.1.0.16975",
         "cloudHost": "nxvms.com",
+        "eulaVersion": 2,
+        "eulaLink": "http://new.eula.com/eulaText",
         "packages": {
             "linux": {
                 "arm_rpi": {
@@ -582,7 +584,9 @@ const std::vector<UpdateTestData>& updateTestDataList()
                 }
             }
         },
-        "cloudHost": "tricom.cloud-demo.hdw.mx"
+        "cloudHost": "tricom.cloud-demo.hdw.mx",
+        "eulaVersion": 2,
+        "eulaLink": "http://new.eula.com/eulaText"
     }
     )JSON"
 },
@@ -593,6 +597,8 @@ const std::vector<UpdateTestData>& updateTestDataList()
     {
         "version": "3.1.0.16975",
         "cloudHost": "qcloud.vista-cctv.com",
+        "eulaVersion": 2,
+        "eulaLink": "http://new.eula.com/eulaText",
         "packages": {
             "linux": {
                 "arm_bpi": {

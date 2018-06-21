@@ -24,12 +24,12 @@ public:
     CommonUpdateRegistry() = delete;
 
     virtual ResultCode findUpdateFile(
-        const UpdateFileRequestData& updateFileRequestData,
+        const UpdateRequestData& updateRequestData,
         FileData* outFileData) const override;
 
     virtual ResultCode latestUpdate(
         const UpdateRequestData& updateRequestData,
-        QnSoftwareVersion* outSoftwareVersion) const override;
+        QList<api::TargetVersionWithEula>* outSoftwareVersion) const override;
 
     virtual void addFileData(const ManualFileData& manualFileData) override;
     virtual void removeFileData(const QString& fileName) override;

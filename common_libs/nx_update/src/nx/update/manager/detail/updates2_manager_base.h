@@ -21,7 +21,7 @@ class NX_UPDATE_API Updates2ManagerBase: public QObject
 public:
     Updates2ManagerBase();
     api::Updates2StatusData status();
-    api::Updates2StatusData download();
+    api::Updates2StatusData download(const QnSoftwareVersion& targetVersion);
     api::Updates2StatusData install();
     api::Updates2StatusData cancel();
     api::Updates2StatusData check();
@@ -44,6 +44,7 @@ protected:
     void setStatus(
         api::Updates2StatusData::StatusCode code,
         const QString& message,
+        const QList<api::TargetVersionWithEula> targets = QList<api::TargetVersionWithEula>(),
         double progress = 0.0f);
 
     void startPreparing(const QString& updateFilePath);
