@@ -1400,10 +1400,9 @@ void Ec2DirectConnectionFactory::registerRestHandlers(QnRestProcessorPool* const
      *     %value false
      *     %value true
      * %param backgroundImageFilename
-     * %param backgroundWidth Width of the background image in pixels (integer).
-     * %param backgroundHeight Height of the background image in pixels (integer).
-     * %param backgroundOpacity Level of opacity of the background image in pixels (floating-point
-     *     0..1).
+     * %param backgroundWidth Width of the background image in cells (integer).
+     * %param backgroundHeight Height of the background image in cells (integer).
+     * %param backgroundOpacity Level of opacity of the background image (floating-point, 0..1).
      * %// AbstractLayoutManager::save
      */
     regUpdate<ApiLayoutData>(p, ApiCommand::saveLayout);
