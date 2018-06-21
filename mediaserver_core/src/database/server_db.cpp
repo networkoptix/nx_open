@@ -1175,8 +1175,8 @@ bool QnServerDb::getBookmarks(
             ++index;
         }
 
-        checkedBind(":minStartTimeMs", filter.startTimeMs.count());
-        checkedBind(":maxEndTimeMs", filter.endTimeMs.count());
+        checkedBind(":minStartTimeMs", (qint64) filter.startTimeMs.count());
+        checkedBind(":maxEndTimeMs", (qint64) filter.endTimeMs.count());
         //checkedBind(":minDurationMs", filter.minDurationMs);
 
         const auto getFilterValue =
