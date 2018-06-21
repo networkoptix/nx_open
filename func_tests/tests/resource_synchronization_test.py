@@ -303,7 +303,6 @@ def test_api_get_methods(env):
         'ec2/listDirectory',
         'ec2/getStoredFile',
         'ec2/getSettings',
-        'ec2/getCurrentTime',
         'ec2/getFullInfo',
         'ec2/getLicenses'
         ]
