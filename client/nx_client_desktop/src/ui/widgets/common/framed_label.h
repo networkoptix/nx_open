@@ -1,5 +1,4 @@
-#ifndef FRAMED_LABEL_H
-#define FRAMED_LABEL_H
+#pragma once
 
 #include <QtWidgets/QLabel>
 
@@ -15,18 +14,19 @@
  * Width of the frame is controlled through standard property lineWidth().
  * Frame is not painted if lineWidth() is 0.
  */
-class QnFramedLabel: public QLabel {
+class QnFramedLabel: public QLabel
+{
     Q_OBJECT
     Q_PROPERTY(qreal opacity READ opacity WRITE setOpacity)
     Q_PROPERTY(QColor frameColor READ frameColor WRITE setFrameColor)
-    typedef QLabel base_type;
+    using base_type = QLabel;
 
 public:
-    explicit QnFramedLabel(QWidget *parent = NULL);
+    explicit QnFramedLabel(QWidget* parent = nullptr);
     virtual ~QnFramedLabel();
 
-    /** 
-     * \returns                         Size of label's contents (without frame).
+    /**
+     * Size of label's contents (without frame).
      */
     QSize contentSize() const;
 
@@ -34,13 +34,18 @@ public:
     void setOpacity(qreal value);
 
     QColor frameColor() const;
-    void setFrameColor(const QColor color);
+    void setFrameColor(const QColor& color);
+
+    virtual QSize sizeHint() const override;
+    virtual QSize minimumSizeHint() const override;
 
 protected:
-    virtual void paintEvent(QPaintEvent *event) override;
+    virtual void paintEvent(QPaintEvent* event) override;
 
 private:
-    qreal m_opacity;
-};
+    bool pixmapExists() const;
+    QSize frameSize() const;
 
-#endif // FRAMED_LABEL_H
+private:
+    qreal m_opacity = 1.0;
+};
