@@ -141,8 +141,8 @@ JsonRestResponse createActionResponse(const QByteArray& body)
             result.json.setReply(qnServerModule->updates2Manager()->cancel());
             break;
         case api::Updates2ActionData::ActionCode::check:
-        result.json.setReply(qnServerModule->updates2Manager()->check());
-        break;
+            result.json.setReply(qnServerModule->updates2Manager()->check());
+            break;
     }
 
     return result;
