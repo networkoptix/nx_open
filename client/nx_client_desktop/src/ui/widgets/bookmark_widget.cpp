@@ -87,7 +87,7 @@ void QnBookmarkWidget::loadData(const QnCameraBookmark &bookmark)
     ui->timeoutComboBox->addItem(tr("year"), start.addYears(1).toMSecsSinceEpoch()
         - bookmark.startTimeMs.count());
 
-    int timeoutIdx = ui->timeoutComboBox->findData(bookmark.timeout.count());
+    int timeoutIdx = ui->timeoutComboBox->findData((qint64) bookmark.timeout.count());
     ui->timeoutComboBox->setCurrentIndex(timeoutIdx < 0 ? defaultTimeoutIdx : timeoutIdx);
 
     m_selectedTags = bookmark.tags;
