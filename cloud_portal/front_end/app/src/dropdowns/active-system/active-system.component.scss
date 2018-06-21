@@ -1,3 +1,19 @@
+@import '../../../styles/custom/custom_palette';
+@import '../../../styles/native-theme/theme_palette';
+@import '../../../styles/theme_palette';
+@import '../../../styles/theme_variables';
+
+.dropdown-menu {
+    & li {
+        & > a {
+            &:hover {
+                background-color : $light5;
+                color            : $dark9;
+            }
+        }
+    }
+}
+
 .popup {
     &.arrow {
         left: 17px;

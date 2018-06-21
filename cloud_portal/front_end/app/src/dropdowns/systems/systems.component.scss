@@ -14,26 +14,60 @@
         left  : auto !important;
     }
 
-    & li > a {
-        white-space : nowrap;
-        display     : flex;
-        align-items : center;
+    @media (max-width : $collapse-second-width) {
+        right : -47px;
+        left  : auto !important;
+    }
 
-        @media (max-width : $collapse-first-width) {
-            text-align : right;
+    & li {
+        &.active {
+            display : none;
+
+            @media (max-width : $collapse-first-width) {
+                display: block;
+            }
+
+            a {
+                background-color: $light16 !important;
+
+                .system-name {
+                    color : white;
+                }
+
+                .glyphicon-home {
+                    background-position : 0px -60px !important;
+                }
+            }
         }
 
-        & .system-owner {
-            color : $blue10;
+        & + .dropdown-divider {
+            display : none;
+
+            @media (max-width : $collapse-first-width) {
+                display : block;
+            }
         }
 
-        &:hover {
+        & > a {
+            white-space : nowrap;
+            display     : flex;
+            align-items : center;
+
+            @media (max-width : $collapse-first-width) {
+                text-align : right;
+            }
+
             & .system-owner {
-                color : white;
+                color : $blue10;
+            }
+
+            &:hover {
+                background-color: $light5;
+                color: $dark9;
             }
 
             & .glyphicon-home {
-                background-position : 0px -60px !important;
+                background-position : -24px -58px !important;
             }
         }
     }
@@ -49,7 +83,7 @@
         }
 
         @media (max-width : $collapse-second-width) {
-            right : 14px;
+            right : 60px;
             left  : auto;
         }
     }
@@ -64,7 +98,7 @@
     }
 
     .glyphicon {
-        @media (max-width : $collapse-first-width ) {
+        @media (max-width : $collapse-first-width) {
             margin : 0 4px !important;
         }
     }

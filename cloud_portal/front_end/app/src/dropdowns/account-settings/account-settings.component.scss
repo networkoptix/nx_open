@@ -18,6 +18,11 @@
         @media (max-width : $collapse-first-width) {
             text-align : right;
         }
+
+        &:hover {
+            background-color : $light5;
+            color            : $dark9;
+        }
     }
 }
 
