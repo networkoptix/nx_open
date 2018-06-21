@@ -1,15 +1,14 @@
 #include "user_resource.h"
 
 #include <api/model/password_data.h>
+#include <common/common_module.h>
+#include <core/resource_management/resource_properties.h>
+#include <utils/common/synctime.h>
+#include <utils/crypt/symmetrical.h>
 
+#include <nx/network/app_info.h>
 #include <nx/network/http/auth_tools.h>
 #include <nx/utils/raii_guard.h>
-
-#include <utils/common/synctime.h>
-#include <core/resource_management/resource_properties.h>
-#include <utils/crypt/symmetrical.h>
-#include <common/common_module.h>
-#include "resource.h"
 
 namespace
 {
@@ -476,7 +475,7 @@ bool QnUserResource::passwordExpired() const
 
 void QnUserResource::fillId()
 {
-    // ATTENTION: This logic is similar to ApiUserData::fillId().
+    // ATTENTION: This logic is similar to UserData::fillId().
     NX_ASSERT(!(isCloud() && getEmail().isEmpty()));
     QnUuid id = isCloud() ? guidFromArbitraryData(getEmail()) : QnUuid::createUuid();
     setId(id);

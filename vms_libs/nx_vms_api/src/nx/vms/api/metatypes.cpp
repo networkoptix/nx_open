@@ -26,6 +26,7 @@
 #include "data/system_merge_history_record.h"
 #include "data/tran_state_data.h"
 #include "data/update_data.h"
+#include "data/user_data.h"
 #include "data/user_role_data.h"
 #include "data/videowall_data.h"
 #include "data/event_rule_data.h"
@@ -109,6 +110,7 @@ void Metatypes::initialize()
     qRegisterMetaType<TranStateResponse>();
     qRegisterMetaType<TranSyncDoneData>();
     qRegisterMetaType<UpdateInstallData>();
+    qRegisterMetaType<UserData>();
     qRegisterMetaType<UserRoleData>();
     qRegisterMetaType<UpdateUploadResponseData>();
     qRegisterMetaType<VideowallData>();

@@ -1,17 +1,15 @@
 #include "current_user_rest_handler.h"
 
-#include "nx_ec/data/api_user_data.h"
-#include "api/app_server_connection.h"
-
-#include <nx_ec/managers/abstract_user_manager.h>
-#include "rest/server/rest_connection_processor.h"
-
+#include <api/app_server_connection.h>
+#include <common/common_module.h>
+#include <network/authenticate_helper.h>
 #include <nx_ec/ec_api.h>
+#include <nx_ec/managers/abstract_user_manager.h>
+#include <rest/server/rest_connection_processor.h>
 
 #include <nx/network/http/custom_headers.h>
 #include <nx/network/http/http_types.h>
-#include <network/authenticate_helper.h>
-#include <common/common_module.h>
+#include <nx/vms/api/data/user_data.h>
 
 int QnCurrentUserRestHandler::executeGet(
     const QString&,
@@ -19,8 +17,6 @@ int QnCurrentUserRestHandler::executeGet(
     QnJsonRestResult &result,
     const QnRestConnectionProcessor* owner)
 {
-    ec2::ApiUserData user;
-
     auto accessRights = owner->accessRights();
     if (accessRights.isNull())
     {
@@ -42,7 +38,7 @@ int QnCurrentUserRestHandler::executeGet(
     }
 
     ec2::AbstractECConnectionPtr ec2Connection = owner->commonModule()->ec2Connection();
-    ec2::ApiUserDataList users;
+    nx::vms::api::UserDataList users;
     ec2::ErrorCode errCode = ec2Connection->getUserManager(accessRights)->getUsersSync(&users);
     if (errCode !=  ec2::ErrorCode::ok)
     {
@@ -62,10 +58,11 @@ int QnCurrentUserRestHandler::executeGet(
         }
     }
 
-    auto iter = std::find_if(users.cbegin(), users.cend(), [accessRights](const ec2::ApiUserData& user)
-    {
-        return user.id == accessRights.userId;
-    });
+    const auto iter = std::find_if(users.cbegin(), users.cend(),
+        [accessRights](const nx::vms::api::UserData& user)
+        {
+            return user.id == accessRights.userId;
+        });
 
     if (iter == users.cend())
     {

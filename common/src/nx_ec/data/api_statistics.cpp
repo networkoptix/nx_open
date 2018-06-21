@@ -33,126 +33,126 @@ const static QString __CAMERA_RESOURCE_PARAMS[] =
 
 namespace ec2 {
 
-    ApiCameraDataStatistics::ApiCameraDataStatistics() {}
+ApiCameraDataStatistics::ApiCameraDataStatistics() {}
 
-    ApiCameraDataStatistics::ApiCameraDataStatistics(nx::vms::api::CameraDataEx&& data)
-        : nx::vms::api::CameraDataEx(std::move(data))
+ApiCameraDataStatistics::ApiCameraDataStatistics(nx::vms::api::CameraDataEx&& data)
+    : nx::vms::api::CameraDataEx(std::move(data))
+{
+    // find out if default password worked
+    const auto& defCred = Qn::CAMERA_DEFAULT_CREDENTIALS_PARAM_NAME;
+    const auto it = std::find_if(addParams.begin(), addParams.end(),
+        [&defCred](const auto& param) { return param.name == defCred; });
+    const bool isDefCred = (it != nx::vms::api::CameraDataEx::addParams.end()) && !it->value.isEmpty();
+
+    // remove confidential information
+    auto rm = std::remove_if(addParams.begin(), addParams.end(),
+                                [](const auto& param)
+                                { return EXCEPT_PARAMS.count(param.name); });
+
+    addParams.erase(rm, addParams.end());
+    addParams.push_back(nx::vms::api::ResourceParamData(defCred, isDefCred
+        ? lit("true")
+        : lit("false")));
+
+    // update resource defaults if not in addParams
+    for (const auto& param : RESOURCE_PARAMS)
     {
-        // find out if default password worked
-        const auto& defCred = Qn::CAMERA_DEFAULT_CREDENTIALS_PARAM_NAME;
-        const auto it = std::find_if(addParams.begin(), addParams.end(),
-            [&defCred](const auto& param) { return param.name == defCred; });
-        const bool isDefCred = (it != nx::vms::api::CameraDataEx::addParams.end()) && !it->value.isEmpty();
+        if (!qnResTypePool)
+            return;
 
-        // remove confidential information
-        auto rm = std::remove_if(addParams.begin(), addParams.end(),
-                                 [](const auto& param)
-                                 { return EXCEPT_PARAMS.count(param.name); });
+        const auto it = std::find_if(
+            addParams.begin(), addParams.end(),
+            [&param](const auto& d) { return d.name == param; });
 
-        addParams.erase(rm, addParams.end());
-        addParams.push_back(nx::vms::api::ResourceParamData(defCred, isDefCred
-            ? lit("true")
-            : lit("false")));
+        if (it != addParams.end() && !it->value.isEmpty() && it->value != lit("0"))
+            continue;
 
-        // update resource defaults if not in addParams
-        for (const auto& param : RESOURCE_PARAMS)
+        if (const auto type = qnResTypePool->getResourceType(typeId))
         {
-            if (!qnResTypePool)
-                return;
-
-            const auto it = std::find_if(
-                addParams.begin(), addParams.end(),
-                [&param](const auto& d) { return d.name == param; });
-
-            if (it != addParams.end() && !it->value.isEmpty() && it->value != lit("0"))
-                continue;
-
-            if (const auto type = qnResTypePool->getResourceType(typeId))
-            {
-                const auto value = type->defaultValue(param);
-                if (!value.isEmpty())
-                    addParams.push_back(nx::vms::api::ResourceParamData(param, value));
-            }
+            const auto value = type->defaultValue(param);
+            if (!value.isEmpty())
+                addParams.push_back(nx::vms::api::ResourceParamData(param, value));
         }
     }
+}
 
-    const std::set<QString> ApiCameraDataStatistics::EXCEPT_PARAMS(
-            INIT_LIST(__CAMERA_EXCEPT_PARAMS));
+const std::set<QString> ApiCameraDataStatistics::EXCEPT_PARAMS(
+        INIT_LIST(__CAMERA_EXCEPT_PARAMS));
 
-    const std::set<QString> ApiCameraDataStatistics::RESOURCE_PARAMS(
-            INIT_LIST(__CAMERA_RESOURCE_PARAMS));
+const std::set<QString> ApiCameraDataStatistics::RESOURCE_PARAMS(
+        INIT_LIST(__CAMERA_RESOURCE_PARAMS));
 
-    ApiStorageDataStatistics::ApiStorageDataStatistics()
+ApiStorageDataStatistics::ApiStorageDataStatistics()
+{
+}
+
+ApiStorageDataStatistics::ApiStorageDataStatistics(api::StorageData&& data):
+    api::StorageData(std::move(data))
+{
+}
+
+ApiMediaServerDataStatistics::ApiMediaServerDataStatistics()
+{
+}
+
+ApiMediaServerDataStatistics::ApiMediaServerDataStatistics(api::MediaServerDataEx&& data):
+    api::MediaServerDataEx(std::move(data))
+{
+    for (auto& s: api::MediaServerDataEx::storages)
+        storages.push_back(std::move(s));
+
+    api::MediaServerDataEx::storages.clear();
+}
+
+ApiLicenseStatistics::ApiLicenseStatistics(): cameraCount(0)
+{
+}
+
+ApiLicenseStatistics::ApiLicenseStatistics(const nx::vms::api::LicenseData& data):
+    cameraCount(0)
+{
+    QMap<QString, QString> parsed;
+    for (const auto& value : data.licenseBlock.split('\n'))
     {
+        auto pair = value.split('=');
+        if (pair.size() == 2)
+            parsed.insert(QLatin1String(pair[0]), QLatin1String(pair[1]));
     }
 
-    ApiStorageDataStatistics::ApiStorageDataStatistics(api::StorageData&& data):
-        api::StorageData(std::move(data))
-    {
-    }
+    name        = parsed[lit("NAME")];
+    key         = parsed[lit("SERIAL")];
+    licenseType = parsed[lit("CLASS")];
+    cameraCount = parsed[lit("COUNT")].toLongLong();
+    version     = parsed[lit("VERSION")];
+    brand       = parsed[lit("BRAND")];
+    expiration  = parsed[lit("EXPIRATION")];
+}
 
-    ApiMediaServerDataStatistics::ApiMediaServerDataStatistics()
-    {
-    }
+ApiBusinessRuleStatistics::ApiBusinessRuleStatistics()
+{
+}
 
-    ApiMediaServerDataStatistics::ApiMediaServerDataStatistics(api::MediaServerDataEx&& data):
-        api::MediaServerDataEx(std::move(data))
-    {
-        for (auto& s: api::MediaServerDataEx::storages)
-            storages.push_back(std::move(s));
+ApiBusinessRuleStatistics::ApiBusinessRuleStatistics(nx::vms::api::EventRuleData&& data):
+    nx::vms::api::EventRuleData(std::move(data))
+{
+}
 
-        api::MediaServerDataEx::storages.clear();
-    }
+ApiUserDataStatistics::ApiUserDataStatistics()
+{
+}
 
-    ApiLicenseStatistics::ApiLicenseStatistics(): cameraCount(0)
-    {
-    }
+ApiUserDataStatistics::ApiUserDataStatistics(nx::vms::api::UserData&& data):
+    nx::vms::api::UserData(std::move(data))
+{
+}
 
-    ApiLicenseStatistics::ApiLicenseStatistics(const nx::vms::api::LicenseData& data):
-        cameraCount(0)
-    {
-        QMap<QString, QString> parsed;
-        for (const auto& value : data.licenseBlock.split('\n'))
-        {
-            auto pair = value.split('=');
-            if (pair.size() == 2)
-                parsed.insert(QLatin1String(pair[0]), QLatin1String(pair[1]));
-        }
+ApiStatisticsReportInfo::ApiStatisticsReportInfo():
+    id(QnUuid::createUuid()),
+    number(-1)
+{
+}
 
-        name        = parsed[lit("NAME")];
-        key         = parsed[lit("SERIAL")];
-        licenseType = parsed[lit("CLASS")];
-        cameraCount = parsed[lit("COUNT")].toLongLong();
-        version     = parsed[lit("VERSION")];
-        brand       = parsed[lit("BRAND")];
-        expiration  = parsed[lit("EXPIRATION")];
-    }
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(
+    API_STATISTICS_DATA_TYPES, (ubjson)(xml)(json)(csv_record), _Fields)
 
-    ApiBusinessRuleStatistics::ApiBusinessRuleStatistics()
-    {
-    }
-
-    ApiBusinessRuleStatistics::ApiBusinessRuleStatistics(nx::vms::api::EventRuleData&& data):
-        nx::vms::api::EventRuleData(std::move(data))
-    {
-    }
-
-    ApiUserDataStatistics::ApiUserDataStatistics()
-    {
-    }
-
-    ApiUserDataStatistics::ApiUserDataStatistics(ApiUserData&& data):
-        ApiUserData(std::move(data))
-    {
-    }
-
-    ApiStatisticsReportInfo::ApiStatisticsReportInfo():
-        id(QnUuid::createUuid()),
-        number(-1)
-    {
-    }
-
-    QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(
-        API_STATISTICS_DATA_TYPES, (ubjson)(xml)(json)(csv_record), _Fields)
-
-    } // namespace ec2
+} // namespace ec2

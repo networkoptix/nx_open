@@ -113,7 +113,7 @@ namespace ec2
         if (errCode != ErrorCode::ok)
             return errCode;
 
-        ApiUserDataList users;
+        nx::vms::api::UserDataList users;
         errCode = m_ec2Connection->getUserManager(Qn::kSystemAccess)->getUsersSync(&users);
         if (errCode != ErrorCode::ok)
             return errCode;

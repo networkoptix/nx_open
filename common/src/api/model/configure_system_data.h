@@ -3,8 +3,8 @@
 #include "password_data.h"
 #include <nx/fusion/fusion/fusion_fwd.h>
 #include <nx/vms/api/data/media_server_data.h>
+#include <nx/vms/api/data/user_data.h>
 #include <nx_ec/transaction_timestamp.h>
-#include <nx_ec/data/api_user_data.h>
 
 struct ConfigureSystemData: public PasswordData
 {
@@ -36,7 +36,7 @@ struct ConfigureSystemData: public PasswordData
     ec2::Timestamp tranLogTime;
     int port;
     nx::vms::api::MediaServerData foreignServer;
-    std::vector<ec2::ApiUserData> foreignUsers;
+    std::vector<nx::vms::api::UserData> foreignUsers;
     nx::vms::api::ResourceParamDataList foreignSettings;
     nx::vms::api::ResourceParamWithRefDataList additionParams;
     bool rewriteLocalSettings;

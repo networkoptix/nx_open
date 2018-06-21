@@ -126,12 +126,11 @@ void fromApiToResource(const nx::vms::api::ResourceTypeData& src, QnResourceType
 void fromApiToResourceList(const nx::vms::api::ResourceTypeDataList& src, QnResourceTypeList& dst);
 
 QnUserResourcePtr fromApiToResource(
-    const ApiUserData& src,
-    QnCommonModule* commonModule = nullptr);
-void fromApiToResource(const ApiUserData& src, QnUserResourcePtr& dst);
-void fromResourceToApi(const QnUserResourcePtr& resource, ApiUserData& data);
-void fromApiToResourceList(const ApiUserDataList& src, QnResourceList& dst);
-void fromApiToResourceList(const ApiUserDataList& src, QnUserResourceList& dst);
+    const nx::vms::api::UserData& src, QnCommonModule* commonModule = nullptr);
+void fromApiToResource(const nx::vms::api::UserData& src, QnUserResourcePtr& dst);
+void fromResourceToApi(const QnUserResourcePtr& resource, nx::vms::api::UserData& data);
+void fromApiToResourceList(const nx::vms::api::UserDataList& src, QnResourceList& dst);
+void fromApiToResourceList(const nx::vms::api::UserDataList& src, QnUserResourceList& dst);
 
 void fromApiToResource(const nx::vms::api::VideowallData& src, QnVideoWallResourcePtr& dst);
 void fromResourceToApi(const QnVideoWallResourcePtr& src, nx::vms::api::VideowallData& dst);

@@ -682,8 +682,8 @@ void QnAuthHelper::updateUserHashes(const QnUserResourcePtr& userResource, const
     userResource->setRealm(nx::network::AppInfo::realm());
     userResource->setPasswordAndGenerateHash(password);
 
-    ec2::ApiUserData userData;
-    fromResourceToApi(userResource, userData);
+    nx::vms::api::UserData userData;
+    ec2::fromResourceToApi(userResource, userData);
     commonModule()->ec2Connection()->getUserManager(Qn::kSystemAccess)->save(
         userData,
         QString(),

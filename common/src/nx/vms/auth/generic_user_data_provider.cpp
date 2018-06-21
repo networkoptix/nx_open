@@ -2,12 +2,13 @@
 
 #include <QtCore/QCryptographicHash>
 
+#include <common/common_module.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource/user_resource.h>
 #include <core/resource_management/resource_pool.h>
-
 #include <utils/common/app_info.h>
-#include <common/common_module.h>
+
+#include <nx/network/app_info.h>
 
 GenericUserDataProvider::GenericUserDataProvider(QnCommonModule* commonModule):
     QnCommonModuleAware(commonModule)

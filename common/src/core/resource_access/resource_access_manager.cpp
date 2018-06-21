@@ -21,9 +21,9 @@
 
 #include <nx/streaming/abstract_archive_resource.h>
 
-#include <nx_ec/data/api_user_data.h>
 #include <nx/vms/api/data/layout_data.h>
 #include <nx/vms/api/data/media_server_data.h>
+#include <nx/vms/api/data/user_data.h>
 #include <nx/vms/api/data/videowall_data.h>
 #include <nx/vms/api/data/webpage_data.h>
 
@@ -247,7 +247,7 @@ bool QnResourceAccessManager::canCreateResource(const QnResourceAccessSubject& s
 }
 
 bool QnResourceAccessManager::canCreateResource(const QnResourceAccessSubject& subject,
-    const ec2::ApiUserData& data) const
+    const nx::vms::api::UserData& data) const
 {
     NX_EXPECT(!isUpdating());
     if (!data.userRoleId.isNull() && !userRolesManager()->hasRole(data.userRoleId))
@@ -927,7 +927,7 @@ bool QnResourceAccessManager::canModifyResource(const QnResourceAccessSubject& s
 }
 
 bool QnResourceAccessManager::canModifyResource(const QnResourceAccessSubject& subject,
-    const QnResourcePtr& target, const ec2::ApiUserData& update) const
+    const QnResourcePtr& target, const nx::vms::api::UserData& update) const
 {
     if (!update.userRoleId.isNull() && !userRolesManager()->hasRole(update.userRoleId))
         return false;

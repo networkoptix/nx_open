@@ -21,6 +21,7 @@
 #include <nx_ec/data/api_conversion_functions.h>
 #include <nx_ec/dummy_handler.h>
 #include <rest/server/json_rest_result.h>
+#include <utils/common/app_info.h>
 
 #include "vms_utils.h"
 
@@ -371,8 +372,8 @@ bool SystemMergeProcessor::applyCurrentSettings(
     {
         if (user->isCloud() || user->isBuiltInAdmin())
         {
-            ec2::ApiUserData apiUser;
-            fromResourceToApi(user, apiUser);
+            nx::vms::api::UserData apiUser;
+            ec2::fromResourceToApi(user, apiUser);
             data.foreignUsers.push_back(apiUser);
 
             for (const auto& param : user->params())
@@ -450,10 +451,9 @@ bool SystemMergeProcessor::applyRemoteSettings(
 {
     /* Read admin user from the remote server */
 
-    ec2::ApiUserDataList users;
+    nx::vms::api::UserDataList users;
     if (!executeRequest(remoteUrl, getKey, users, lit("/ec2/getUsers")))
         return false;
-
 
     QnJsonRestResult pingRestResult;
     if (!executeRequest(remoteUrl, getKey, pingRestResult, lit("/api/ping")))
@@ -469,7 +469,6 @@ bool SystemMergeProcessor::applyRemoteSettings(
         if (!executeRequest(remoteUrl, getKey, backupDBRestResult, lit("/api/backupDatabase")))
             return false;
     }
-
 
     // 1. update settings in remove database to ensure they have priority while merge
     {
@@ -496,7 +495,7 @@ bool SystemMergeProcessor::applyRemoteSettings(
 
     for (const auto& userData : users)
     {
-        QnUserResourcePtr user = fromApiToResource(userData);
+        QnUserResourcePtr user = ec2::fromApiToResource(userData);
         if (user->isCloud() || user->isBuiltInAdmin())
         {
             data.foreignUsers.push_back(userData);

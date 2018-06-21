@@ -191,8 +191,8 @@ void loadResourcesFromEcs(
     }
 
     {
-        //loading users
-        ec2::ApiUserDataList users;
+        // Loading users.
+        nx::vms::api::UserDataList users;
         while ((rez = ec2Connection->getUserManager(Qn::kSystemAccess)->getUsersSync(&users)) != ec2::ErrorCode::ok)
         {
             qDebug() << "QnMain::run(): Can't get users. Reason: " << ec2::toString(rez);

@@ -7,7 +7,7 @@ QnUserNotificationManager::QnUserNotificationManager()
 }
 
 void QnUserNotificationManager::triggerNotification(
-    const QnTransaction<ApiUserData>& tran,
+    const QnTransaction<nx::vms::api::UserData>& tran,
     NotificationSource source)
 {
     NX_ASSERT(tran.command == ApiCommand::saveUser);
@@ -15,7 +15,7 @@ void QnUserNotificationManager::triggerNotification(
 }
 
 void QnUserNotificationManager::triggerNotification(
-    const QnTransaction<ApiUserDataList>& tran,
+    const QnTransaction<nx::vms::api::UserDataList>& tran,
     NotificationSource source)
 {
     NX_ASSERT(tran.command == ApiCommand::saveUsers);

@@ -8,6 +8,7 @@
 #include <api/http_client_pool.h>
 #include <core/resource_management/resource_data_pool.h>
 #include <network/cloud/cloud_media_server_endpoint_verificator.h>
+#include <utils/common/app_info.h>
 #include <utils/common/long_runable_cleanup.h>
 #include <utils/common/synctime.h>
 

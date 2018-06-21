@@ -55,12 +55,12 @@ public:
 
     void addAuditRecord(
         ApiCommand::Value command,
-        const ApiUserData& params,
+        const nx::vms::api::UserData& params,
         const QnAuthSession& authInfo);
 
     void addAuditRecord(
         ApiCommand::Value command,
-        const ApiUserDataList& params,
+        const nx::vms::api::UserDataList& params,
         const QnAuthSession& authInfo);
 
     void addAuditRecord(

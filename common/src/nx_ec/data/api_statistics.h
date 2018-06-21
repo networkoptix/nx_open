@@ -9,7 +9,7 @@
 #include <nx/vms/api/data/event_rule_data.h>
 #include <nx/vms/api/data/layout_data.h>
 #include <nx/vms/api/data/media_server_data.h>
-#include "api_user_data.h"
+#include <nx/vms/api/data/user_data.h>
 
 #include <nx/vms/api/data/license_data.h>
 #include <nx/vms/api/data/videowall_data.h>
@@ -94,10 +94,10 @@ struct ApiBusinessRuleStatistics:
     (actionParams)(aggregationPeriod)(disabled)(schedule)(system)
 
 struct ApiUserDataStatistics:
-    ApiUserData
+    nx::vms::api::UserData
 {
     ApiUserDataStatistics();
-    ApiUserDataStatistics(ApiUserData&& data);
+    ApiUserDataStatistics(nx::vms::api::UserData&& data);
 };
 #define ApiUserDataStatistics_Fields (id)(isAdmin)(permissions)(isLdap)(isEnabled)
 

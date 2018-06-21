@@ -38,6 +38,7 @@
 #include <nx_ec/ec_proto_version.h>
 #include <utils/common/app_info.h>
 
+#include <nx/network/app_info.h>
 #include <nx/network/socket_global.h>
 #include <nx/vms/discovery/manager.h>
 #include <nx/vms/event/rule_manager.h>

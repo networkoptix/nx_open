@@ -92,13 +92,13 @@ public:
     // /ec2/ requests
 
     void ec2GetUsers(
-        std::function<void(ec2::ErrorCode, ec2::ApiUserDataList)> completionHandler);
-    ec2::ErrorCode ec2GetUsers(ec2::ApiUserDataList* result);
+        std::function<void(ec2::ErrorCode, nx::vms::api::UserDataList)> completionHandler);
+    ec2::ErrorCode ec2GetUsers(nx::vms::api::UserDataList* result);
 
     void ec2SaveUser(
-        const ec2::ApiUserData& request,
+        const nx::vms::api::UserData& request,
         std::function<void(ec2::ErrorCode)> completionHandler);
-    ec2::ErrorCode ec2SaveUser(const ec2::ApiUserData& request);
+    ec2::ErrorCode ec2SaveUser(const nx::vms::api::UserData& request);
 
     void ec2GetSettings(
         std::function<void(

@@ -10,6 +10,7 @@
 #include <nx/network/http/auth_tools.h>
 #include <nx/network/deprecated/simple_http_client.h>
 #include <nx/network/address_resolver.h>
+#include <nx/network/app_info.h>
 
 #include <utils/common/app_info.h>
 #include <nx/utils/concurrent.h>

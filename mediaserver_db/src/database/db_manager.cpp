@@ -32,12 +32,12 @@
 #include <utils/common/util.h>
 #include <utils/crypt/symmetrical.h>
 
-#include <nx_ec/data/api_user_data.h>
 #include <nx_ec/data/api_full_info_data.h>
 #include <nx_ec/data/api_conversion_functions.h>
 #include <nx_ec/data/api_discovery_data.h>
 
 #include <nx/fusion/model_functions.h>
+#include <nx/network/app_info.h>
 #include <nx/utils/log/log.h>
 #include <nx/vms/api/data/access_rights_data.h>
 #include <nx/vms/api/data/camera_data.h>
@@ -51,6 +51,7 @@
 #include <nx/vms/api/data/stored_file_data.h>
 #include <nx/vms/api/data/time_data.h>
 #include <nx/vms/api/data/update_data.h>
+#include <nx/vms/api/data/user_data.h>
 #include <nx/vms/api/data/videowall_data.h>
 #include <nx/vms/api/data/webpage_data.h>
 #include <nx/vms/event/event_fwd.h>
@@ -675,8 +676,8 @@ bool QnDbManager::init(const nx::utils::Url& dbUrl)
             {
                 if (!fillTransactionLogInternal<
                     QnUuid,
-                    ApiUserData,
-                    ApiUserDataList>(ApiCommand::saveUser))
+                    UserData,
+                    UserDataList>(ApiCommand::saveUser))
                 {
                     return false;
                 }
@@ -755,7 +756,7 @@ bool QnDbManager::init(const nx::utils::Url& dbUrl)
         // Set admin user's password
         QnUserResourcePtr userResource;
         {
-            ApiUserDataList users;
+            UserDataList users;
             ErrorCode errCode = doQueryNoLock(QnUuid(), users);
             if (errCode != ErrorCode::ok)
                 return false;
@@ -763,10 +764,8 @@ bool QnDbManager::init(const nx::utils::Url& dbUrl)
             if (users.empty())
                 return false;
 
-            auto iter = std::find_if(users.cbegin(), users.cend(), [this](const ec2::ApiUserData& user)
-            {
-                return user.id == m_adminUserID;
-            });
+            const auto iter = std::find_if(users.cbegin(), users.cend(),
+                [this](const UserData& user) { return user.id == m_adminUserID; });
 
             NX_ASSERT(iter != users.cend(), Q_FUNC_INFO, "Admin must exist");
             if (iter == users.cend())
@@ -803,7 +802,7 @@ bool QnDbManager::init(const nx::utils::Url& dbUrl)
         if (updateUserResource)
         {
             // admin user resource has been updated
-            QnTransaction<ApiUserData> userTransaction(
+            QnTransaction<UserData> userTransaction(
                 ApiCommand::saveUser,
                 commonModule()->moduleGUID());
             m_tranLog->fillPersistentInfo(userTransaction);
@@ -988,8 +987,8 @@ bool QnDbManager::resyncTransactionLog()
 {
     if (!fillTransactionLogInternal<
         QnUuid,
-        ApiUserData,
-        ApiUserDataList>(ApiCommand::saveUser))
+        UserData,
+        UserDataList>(ApiCommand::saveUser))
     {
         return false;
     }
@@ -2108,7 +2107,7 @@ ErrorCode QnDbManager::insertOrReplaceResource(const ResourceData& data, qint32*
     return ErrorCode::ok;
 }
 
-ErrorCode QnDbManager::insertOrReplaceUser(const ApiUserData& data, qint32 internalId)
+ErrorCode QnDbManager::insertOrReplaceUser(const UserData& data, qint32 internalId)
 {
     {
         const QString authQueryStr =
@@ -3109,7 +3108,7 @@ ec2::ErrorCode QnDbManager::cleanAccessRights(const QnUuid& userOrRoleId)
     return ErrorCode::ok;
 }
 
-ErrorCode QnDbManager::executeTransactionInternal(const QnTransaction<ApiUserData>& tran)
+ErrorCode QnDbManager::executeTransactionInternal(const QnTransaction<UserData>& tran)
 {
     /*
     qint32 internalId = getResourceInternalId(tran.params.id);
@@ -4003,7 +4002,7 @@ ErrorCode QnDbManager::doQueryNoLock(const std::nullptr_t& /*dummy*/, ServerFoot
 }
 
 //getUsers
-ErrorCode QnDbManager::doQueryNoLock(const QnUuid& id, ApiUserDataList& userList)
+ErrorCode QnDbManager::doQueryNoLock(const QnUuid& id, UserDataList& userList)
 {
     QString filterStr;
     if( !id.isNull() )
@@ -4437,7 +4436,7 @@ ErrorCode QnDbManager::readApiFullInfoDataForMobileClient(
     DB_LOAD(QnUuid(), data->cameraUserAttributesList);
 
     DB_LOAD(userId, data->users);
-    const ApiUserData* user = nullptr;
+    const UserData* user = nullptr;
     if (data->users.size() == 1)
         user = &data->users[0];
 

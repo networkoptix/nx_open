@@ -2,19 +2,18 @@
 #include <vector>
 
 #include <gtest/gtest.h>
+#include <test_support/peer_wrapper.h>
+#include <test_support/merge_test_fixture.h>
 
-#include <nx/network/cloud/abstract_cloud_system_credentials_provider.h>
+#include <nx/cloud/cdb/ec2/data_conversion.h>
+#include <nx/cloud/cdb/test_support/cdb_launcher.h>
+#include <nx/network/app_info.h>
 #include <nx/network/address_resolver.h>
+#include <nx/network/cloud/abstract_cloud_system_credentials_provider.h>
 #include <nx/network/http/test_http_server.h>
 #include <nx/network/socket_global.h>
 #include <nx/network/url/url_builder.h>
 #include <nx/utils/test_support/test_options.h>
-
-#include <nx/cloud/cdb/ec2/data_conversion.h>
-#include <nx/cloud/cdb/test_support/cdb_launcher.h>
-
-#include <test_support/peer_wrapper.h>
-#include <test_support/merge_test_fixture.h>
 
 namespace test {
 
@@ -91,7 +90,7 @@ protected:
         for (int i = 0; i < m_systemMergeFixture.peerCount(); ++i)
         {
             const auto someCloudUser = m_cdb.addActivatedAccount2();
-            ::ec2::ApiUserData vmsUserData;
+            nx::vms::api::UserData vmsUserData;
 
             vmsUserData.id = guidFromArbitraryData(someCloudUser.email);
             vmsUserData.typeId = kUserResourceTypeGuid;
@@ -101,8 +100,8 @@ protected:
             vmsUserData.isCloud = true;
             vmsUserData.isEnabled = true;
             vmsUserData.realm = nx::network::AppInfo::realm();
-            vmsUserData.hash = "password_is_in_cloud";
-            vmsUserData.digest = "password_is_in_cloud";
+            vmsUserData.hash = nx::vms::api::UserData::kCloudPasswordStub;
+            vmsUserData.digest = nx::vms::api::UserData::kCloudPasswordStub;
             vmsUserData.permissions = GlobalPermission::adminPermissions;
 
             auto mediaServerClient = m_systemMergeFixture.peer(i).mediaServerClient();
@@ -233,7 +232,7 @@ protected:
         const nx::hpm::api::SystemCredentials& cloudCredentials)
     {
         auto mediaServerClient = m_systemMergeFixture.peer(0).mediaServerClient();
-        ::ec2::ApiUserDataList vmsUsers;
+        nx::vms::api::UserDataList vmsUsers;
         ASSERT_EQ(::ec2::ErrorCode::ok, mediaServerClient->ec2GetUsers(&vmsUsers));
 
         // Waiting until cloud has all that users vms has.
@@ -350,7 +349,7 @@ protected:
         mediaServerClient->setUserCredentials(Credentials(
             cloudUser.email.c_str(),
             PasswordAuthToken(cloudUser.password.c_str())));
-        ::ec2::ApiUserDataList users;
+        nx::vms::api::UserDataList users;
         return mediaServerClient->ec2GetUsers(&users) == ::ec2::ErrorCode::ok;
     }
 

@@ -160,8 +160,8 @@ bool updateUserCredentials(
         return false;
     }
 
-    ec2::ApiUserData apiOldUser;
-    fromResourceToApi(userRes, apiOldUser);
+    nx::vms::api::UserData apiOldUser;
+    ec2::fromResourceToApi(userRes, apiOldUser);
 
     //generating cryptSha512Hash
     if (data.cryptSha512Hash.isEmpty() && !data.password.isEmpty())
@@ -199,8 +199,8 @@ bool updateUserCredentials(
             updatedUser->setCryptSha512Hash(data.cryptSha512Hash);
     }
 
-    ec2::ApiUserData apiUser;
-    fromResourceToApi(updatedUser, apiUser);
+    nx::vms::api::UserData apiUser;
+    ec2::fromResourceToApi(updatedUser, apiUser);
 
     if (apiOldUser == apiUser)
         return true; //< Nothing to update.

@@ -6,6 +6,7 @@
 #include "merge_ldap_users_rest_handler.h"
 
 #include <common/common_module.h>
+#include <nx/network/app_info.h>
 #include <nx/network/http/http_types.h>
 
 #include <core/resource/user_resource.h>
@@ -14,7 +15,7 @@
 
 #include <nx_ec/ec_api.h>
 #include <nx_ec/managers/abstract_user_manager.h>
-#include <nx_ec/data/api_user_data.h>
+#include <nx/vms/api/data/user_data.h>
 
 #include <nx/utils/uuid.h>
 #include "rest/server/rest_connection_processor.h"
@@ -37,29 +38,32 @@ int QnMergeLdapUsersRestHandler::executePost(
 
     ec2::AbstractUserManagerPtr userManager = owner->commonModule()->ec2Connection()->getUserManager(owner->accessRights());
 
-    ec2::ApiUserDataList dbUsers;
+    nx::vms::api::UserDataList dbUsers;
     userManager->getUsersSync(&dbUsers);
 
-    auto findUser = [dbUsers](const QString& name)
-    {
-        auto iter = std::find_if(dbUsers.cbegin(), dbUsers.cend(), [name](const ec2::ApiUserData& user)
+    const auto findUser =
+        [dbUsers](const QString& name)
         {
-            return user.name == name;
-        });
-        if (iter != dbUsers.cend())
-            return *iter;
-        return ec2::ApiUserData();
-    };
+            const auto iter = std::find_if(dbUsers.cbegin(), dbUsers.cend(),
+                [name](const nx::vms::api::UserData& user) { return user.name == name; });
 
-    for(const QnLdapUser &ldapUser : ldapUsers)
+            if (iter != dbUsers.cend())
+                return *iter;
+
+            return nx::vms::api::UserData();
+        };
+
+    for (const auto& ldapUser: ldapUsers)
     {
         QString login = ldapUser.login.toLower();
-        ec2::ApiUserData dbUser = findUser(login);
+        nx::vms::api::UserData dbUser = findUser(login);
+
         if (dbUser.id.isNull())
         {
             dbUser.id = QnUuid::createUuid();
             dbUser.typeId = qnResTypePool->getFixedResourceTypeId(QnResourceTypePool::kUserTypeId);
             dbUser.name = login;
+            dbUser.realm = nx::network::AppInfo::realm();
 
             // Without hash DbManager wont'd do anything
             dbUser.hash = lit("-").toLatin1();

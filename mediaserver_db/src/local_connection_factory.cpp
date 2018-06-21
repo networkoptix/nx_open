@@ -1047,7 +1047,7 @@ void LocalConnectionFactory::registerRestHandlers(QnRestProcessorPool* const p)
      * %return List of user data objects in the requested format.
      * %// AbstractUserManager::getUsers
      */
-    regGet<QnUuid, ApiUserDataList>(p, ApiCommand::getUsers);
+    regGet<QnUuid, UserDataList>(p, ApiCommand::getUsers);
 
     /**%apidoc GET /ec2/getUserRoles
      * Return User roles registered in the System.
@@ -1136,7 +1136,7 @@ void LocalConnectionFactory::registerRestHandlers(QnRestProcessorPool* const p)
      * %param fullName Full name of the user.
      * %// AbstractUserManager::save
      */
-    regUpdate<ApiUserData>(p, ApiCommand::saveUser);
+    regUpdate<UserData>(p, ApiCommand::saveUser);
 
     /**%apidoc:arrayParams POST /ec2/saveUsers
     * Saves the list of users. Only local and LDAP users are supported. Cloud users won't be saved.
@@ -1195,7 +1195,7 @@ void LocalConnectionFactory::registerRestHandlers(QnRestProcessorPool* const p)
     * %param fullName Full name of the user.
     * %// AbstractUserManager::save
     */
-    regUpdate<ApiUserDataList>(p, ApiCommand::saveUsers);
+    regUpdate<UserDataList>(p, ApiCommand::saveUsers);
 
     /**%apidoc POST /ec2/removeUser
      * Delete the specified user.

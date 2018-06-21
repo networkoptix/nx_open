@@ -1152,7 +1152,8 @@ struct SetStatusTransactionType
 
 struct SaveUserTransactionType
 {
-    ec2::TransactionType::Value operator()(QnCommonModule*, const ApiUserData& params, AbstractPersistentStorage* /*db*/)
+    ec2::TransactionType::Value operator()(QnCommonModule*, const nx::vms::api::UserData& params,
+        AbstractPersistentStorage* /*db*/)
     {
         return params.isCloud ? TransactionType::Cloud : TransactionType::Regular;
     }
@@ -1186,7 +1187,7 @@ ec2::TransactionType::Value getRemoveUserTransactionTypeFromDb(
     const QnUuid& id,
     AbstractPersistentStorage* db)
 {
-    ApiUserData userData = db->getUser(id);
+    nx::vms::api::UserData userData = db->getUser(id);
     if (userData.id.isNull())
         return ec2::TransactionType::Unknown;
 

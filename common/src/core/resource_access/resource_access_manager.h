@@ -104,7 +104,7 @@ public:
         const nx::vms::api::LayoutData& data) const;
     bool canCreateResource(
         const QnResourceAccessSubject& subject,
-        const ec2::ApiUserData& data) const;
+        const nx::vms::api::UserData& data) const;
     bool canCreateResource(
         const QnResourceAccessSubject& subject,
         const nx::vms::api::VideowallData& data) const;
@@ -139,7 +139,7 @@ public:
     bool canModifyResource(const QnResourceAccessSubject& subject, const QnResourcePtr& target,
         const nx::vms::api::LayoutData& update) const;
     bool canModifyResource(const QnResourceAccessSubject& subject, const QnResourcePtr& target,
-        const ec2::ApiUserData& update) const;
+        const nx::vms::api::UserData& update) const;
     bool canModifyResource(const QnResourceAccessSubject& subject, const QnResourcePtr& target,
         const nx::vms::api::VideowallData& update) const;
 

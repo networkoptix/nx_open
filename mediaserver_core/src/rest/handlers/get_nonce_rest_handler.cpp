@@ -12,6 +12,7 @@
 #include <core/resource/user_resource.h>
 #include <core/resource_management/resource_pool.h>
 #include <api/model/getnonce_reply.h>
+#include <nx/network/app_info.h>
 #include <nx/network/http/http_client.h>
 #include <rest/server/rest_connection_processor.h>
 

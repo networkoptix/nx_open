@@ -451,13 +451,13 @@ void QnResourcesChangesManager::saveUser(const QnUserResourcePtr& user,
         return;
     }
 
-    auto replyProcessor = makeSaveResourceReplyProcessor<QnUserResource, ec2::ApiUserData>(this,
+    auto replyProcessor = makeSaveResourceReplyProcessor<QnUserResource, vms::api::UserData>(this,
         user, callback);
 
     applyChanges(user);
     NX_ASSERT(!(user->isCloud() && user->getEmail().isEmpty()));
-    ec2::ApiUserData apiUser;
-    fromResourceToApi(user, apiUser);
+    vms::api::UserData apiUser;
+    ec2::fromResourceToApi(user, apiUser);
 
     connection->getUserManager(Qn::kSystemAccess)->save(apiUser, user->getPassword(), this,
         replyProcessor);
@@ -472,11 +472,11 @@ void QnResourcesChangesManager::saveUsers(const QnUserResourceList& users)
     if (!connection)
         return;
 
-    ec2::ApiUserDataList apiUsers;
+    vms::api::UserDataList apiUsers;
     for (const auto& user: users)
     {
         apiUsers.push_back({});
-        fromResourceToApi(user, apiUsers.back());
+        ec2::fromResourceToApi(user, apiUsers.back());
     }
 
     auto handler =

@@ -1,10 +1,11 @@
 #include "data_conversion.h"
 
-#include <nx_ec/data/api_user_data.h>
-#include <nx/fusion/serialization/lexical.h>
-
 #include <nx_ec/data/api_fwd.h>
+
+#include <nx/fusion/serialization/lexical.h>
+#include <nx/network/app_info.h>
 #include <nx/vms/api/data/id_data.h>
+#include <nx/vms/api/data/user_data.h>
 
 namespace nx {
 namespace cdb {
@@ -64,7 +65,7 @@ void accessRoleToPermissions(
     }
 }
 
-void convert(const api::SystemSharing& from, ::ec2::ApiUserData* const to)
+void convert(const api::SystemSharing& from, vms::api::UserData* const to)
 {
     to->id = QnUuid::fromStringSafe(from.vmsUserId);
     to->typeId = kUserResourceTypeGuid;
@@ -76,13 +77,13 @@ void convert(const api::SystemSharing& from, ::ec2::ApiUserData* const to)
     to->userRoleId = QnUuid::fromStringSafe(from.userRoleId);
     to->isEnabled = from.isEnabled;
     to->realm = nx::network::AppInfo::realm();
-    to->hash = "password_is_in_cloud";
-    to->digest = "password_is_in_cloud";
+    to->hash = vms::api::UserData::kCloudPasswordStub;
+    to->digest = vms::api::UserData::kCloudPasswordStub;
     to->isCloud = true;
     accessRoleToPermissions(from.accessRole, &to->permissions, &to->isAdmin);
 }
 
-void convert(const ::ec2::ApiUserData& from, api::SystemSharing* const to)
+void convert(const vms::api::UserData& from, api::SystemSharing* const to)
 {
     to->accountEmail = from.email.toStdString();
     to->customPermissions = QnLexical::serialized(from.permissions).toStdString();

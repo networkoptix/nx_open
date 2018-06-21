@@ -89,7 +89,7 @@
 
 #include <nx_ec/ec_api.h>
 #include <nx_ec/ec_proto_version.h>
-#include <nx_ec/data/api_user_data.h>
+#include <nx/vms/api/data/user_data.h>
 #include <nx_ec/managers/abstract_user_manager.h>
 #include <nx_ec/managers/abstract_layout_manager.h>
 #include <nx_ec/managers/abstract_videowall_manager.h>
@@ -356,7 +356,8 @@ bool initResourceTypes(const ec2::AbstractECConnectionPtr& ec2Connection)
 
 void addFakeVideowallUser(QnCommonModule* commonModule)
 {
-    ec2::ApiUserData fakeUserData;
+    nx::vms::api::UserData fakeUserData;
+    fakeUserData.realm = nx::network::AppInfo::realm();
     fakeUserData.permissions = GlobalPermission::videowallModePermissions;
     fakeUserData.typeId = qnResTypePool->getFixedResourceTypeId(QnResourceTypePool::kUserTypeId);
     auto fakeUser = ec2::fromApiToResource(fakeUserData);
@@ -4187,7 +4188,7 @@ void MediaServerProcess::at_emptyDigestDetected(const QnUserResourcePtr& user, c
         user->setName(login);
         user->setPasswordAndGenerateHash(password);
 
-        ec2::ApiUserData userData;
+        nx::vms::api::UserData userData;
         ec2::fromResourceToApi(user, userData);
 
         QnUuid userId = user->getId();

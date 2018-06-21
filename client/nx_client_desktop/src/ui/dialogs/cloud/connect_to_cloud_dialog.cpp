@@ -32,6 +32,7 @@
 #include <nx/client/desktop/common/widgets/busy_indicator_button.h>
 #include <nx/client/desktop/common/widgets/input_field.h>
 #include <nx/client/desktop/ui/actions/action_manager.h>
+#include <nx/network/app_info.h>
 
 #include <watchers/cloud_status_watcher.h>
 

@@ -4,6 +4,7 @@
 
 #include <nx/utils/log/log.h>
 #include <nx/vms/api/data/media_server_data.h>
+#include <nx/vms/api/data/user_data.h>
 
 const QString QnResourceTypePool::kLayoutTypeId(lit("Layout"));
 const QString QnResourceTypePool::kServerTypeId(nx::vms::api::MediaServerData::kStaticTypeName);
@@ -11,10 +12,9 @@ const QString QnResourceTypePool::kVideoWallTypeId(lit("Videowall"));
 const QString QnResourceTypePool::kWebPageTypeId(lit("WebPage"));
 const QString QnResourceTypePool::kC2pCameraTypeId(lit("C2pCamera"));
 const QString QnResourceTypePool::kStorageTypeId(nx::vms::api::StorageData::kStaticTypeName);
-const QString QnResourceTypePool::kUserTypeId(lit("User"));
+const QString QnResourceTypePool::kUserTypeId(nx::vms::api::UserData::kStaticTypeName);
 
-const QnUuid QnResourceTypePool::kUserTypeUuid(
-    qnResTypePool->getFixedResourceTypeId(kUserTypeId));
+const QnUuid QnResourceTypePool::kUserTypeUuid(nx::vms::api::UserData::kStaticTypeId);
 const QnUuid QnResourceTypePool::kServerTypeUuid(nx::vms::api::MediaServerData::kStaticTypeId);
 const QnUuid QnResourceTypePool::kStorageTypeUuid(nx::vms::api::StorageData::kStaticTypeId);
 const QnUuid QnResourceTypePool::kLayoutTypeUuid(

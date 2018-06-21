@@ -7,6 +7,7 @@
 #include <nx/cloud/cdb/client/data/types.h>
 
 #include <nx/fusion/serialization/lexical.h>
+#include <nx/network/app_info.h>
 #include <nx/network/http/auth_restriction_list.h>
 #include <nx/network/http/auth_tools.h>
 #include <nx/network/http/buffer_source.h>

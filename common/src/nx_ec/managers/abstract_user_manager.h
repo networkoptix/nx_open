@@ -1,11 +1,11 @@
 #pragma once
 
 #include <nx_ec/ec_api_fwd.h>
-#include <nx_ec/data/api_user_data.h>
 #include <nx_ec/impl/ec_api_impl.h>
 #include <nx_ec/impl/sync_handler.h>
 
 #include <nx/vms/api/data/access_rights_data.h>
+#include <nx/vms/api/data/user_data.h>
 #include <nx/vms/api/data/user_role_data.h>
 
 namespace ec2 {
@@ -19,7 +19,7 @@ signals:
      * Notice: should keep ec2:: namespace for all signal declarations, or moc/qt signals
      * will fail to pick correct metadata when you try to emit queued signal
      */
-    void addedOrUpdated(const ec2::ApiUserData& user, ec2::NotificationSource source);
+    void addedOrUpdated(const nx::vms::api::UserData& user, ec2::NotificationSource source);
     void userRoleAddedOrUpdated(const nx::vms::api::UserRoleData& userRole);
     void removed(const QnUuid& id);
     void userRoleRemoved(const QnUuid& id);
@@ -47,7 +47,7 @@ public:
                 target, handler)));
     }
 
-    ErrorCode getUsersSync(ApiUserDataList* const userList)
+    ErrorCode getUsersSync(nx::vms::api::UserDataList* const userList)
     {
         return impl::doSyncCall<impl::GetUsersHandler>(
             [this](impl::GetUsersHandlerPtr handler)
@@ -61,7 +61,7 @@ public:
      * @param handler Functor with params: (ErrorCode)
      */
     template<class TargetType, class HandlerType>
-    int save(const ApiUserData& user, const QString& newPassword, TargetType* target,
+    int save(const nx::vms::api::UserData& user, const QString& newPassword, TargetType* target,
         HandlerType handler)
     {
         return save(user, newPassword, std::static_pointer_cast<impl::SimpleHandler>(
@@ -69,10 +69,10 @@ public:
                 target, handler)));
     }
 
-    ErrorCode saveSync(const ApiUserData& user, const QString& newPassword = QString())
+    ErrorCode saveSync(const nx::vms::api::UserData& user, const QString& newPassword = QString())
     {
         return impl::doSyncCall<impl::SimpleHandler>(
-            [=](const impl::SimpleHandlerPtr& handler)
+            [&](const impl::SimpleHandlerPtr& handler)
             {
                 return this->save(user, newPassword, handler);
             });
@@ -82,17 +82,17 @@ public:
     * @param handler Functor with params: (ErrorCode)
     */
     template<class TargetType, class HandlerType>
-    int save(const ApiUserDataList& users, TargetType* target, HandlerType handler)
+    int save(const nx::vms::api::UserDataList& users, TargetType* target, HandlerType handler)
     {
         return save(users, std::static_pointer_cast<impl::SimpleHandler>(
             std::make_shared<impl::CustomSimpleHandler<TargetType, HandlerType>>(
                 target, handler)));
     }
 
-    ErrorCode saveSync(const ApiUserDataList& users)
+    ErrorCode saveSync(const nx::vms::api::UserDataList& users)
     {
         return impl::doSyncCall<impl::SimpleHandler>(
-            [=](const impl::SimpleHandlerPtr& handler)
+            [&](const impl::SimpleHandlerPtr& handler)
             {
                 return this->save(users, handler);
             });
@@ -112,7 +112,7 @@ public:
     ErrorCode removeSync(const QnUuid& id)
     {
         return impl::doSyncCall<impl::SimpleHandler>(
-            [=](const impl::SimpleHandlerPtr& handler)
+            [&](const impl::SimpleHandlerPtr& handler)
             {
                 return this->remove(id, handler);
             });
@@ -153,7 +153,7 @@ public:
     ErrorCode saveUserRoleSync(const nx::vms::api::UserRoleData& data)
     {
         return impl::doSyncCall<impl::SimpleHandler>(
-            [=](const impl::SimpleHandlerPtr& handler)
+            [&](const impl::SimpleHandlerPtr& handler)
             {
                 return this->saveUserRole(data, handler);
             });
@@ -206,7 +206,7 @@ public:
     ErrorCode setAccessRightsSync(const nx::vms::api::AccessRightsData& data)
     {
         return impl::doSyncCall<impl::SimpleHandler>(
-            [=](const impl::SimpleHandlerPtr& handler)
+            [&](const impl::SimpleHandlerPtr& handler)
             {
                 return this->setAccessRights(data, handler);
             });
@@ -214,9 +214,9 @@ public:
 
 private:
     virtual int getUsers(impl::GetUsersHandlerPtr handler) = 0;
-    virtual int save(const ApiUserData& user, const QString& newPassword,
+    virtual int save(const nx::vms::api::UserData& user, const QString& newPassword,
         impl::SimpleHandlerPtr handler) = 0;
-    virtual int save(const ApiUserDataList& users, impl::SimpleHandlerPtr handler) = 0;
+    virtual int save(const nx::vms::api::UserDataList& users, impl::SimpleHandlerPtr handler) = 0;
     virtual int remove(const QnUuid& id, impl::SimpleHandlerPtr handler) = 0;
 
     virtual int getUserRoles(impl::GetUserRolesHandlerPtr handler) = 0;

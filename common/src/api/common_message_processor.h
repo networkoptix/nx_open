@@ -35,7 +35,9 @@ public:
      */
     virtual void updateResource(const QnResourcePtr& resource, ec2::NotificationSource source);
 
-    virtual void updateResource(const ec2::ApiUserData& user, ec2::NotificationSource source);
+    virtual void updateResource(
+        const nx::vms::api::UserData& user,
+        ec2::NotificationSource source);
     virtual void updateResource(
         const nx::vms::api::LayoutData& layout,
         ec2::NotificationSource source);

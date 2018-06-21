@@ -90,7 +90,7 @@ void ECConnectionAuditManager::addAuditRecord(
 
 void ECConnectionAuditManager::addAuditRecord(
     ApiCommand::Value /*command*/,
-    const ApiUserDataList& params,
+    const UserDataList& params,
     const QnAuthSession& authInfo)
 {
     QnAuditRecord auditRecord = qnAuditManager->prepareRecord(authInfo, Qn::AR_UserUpdate);
@@ -101,7 +101,7 @@ void ECConnectionAuditManager::addAuditRecord(
 
 void ECConnectionAuditManager::addAuditRecord(
     ApiCommand::Value /*command*/,
-    const ApiUserData& params,
+    const UserData& params,
     const QnAuthSession& authInfo)
 {
     QnAuditRecord auditRecord = qnAuditManager->prepareRecord(authInfo, Qn::AR_UserUpdate);

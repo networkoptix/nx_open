@@ -487,8 +487,9 @@ bool initResourceTypes(ec2::AbstractECConnection* ec2Connection)
 
 bool initUsers(ec2::AbstractECConnection* ec2Connection)
 {
-    ec2::ApiUserDataList users;
-    const ec2::ErrorCode errorCode = ec2Connection->getUserManager(Qn::kSystemAccess)->getUsersSync(&users);
+    nx::vms::api::UserDataList users;
+    const ec2::ErrorCode errorCode =
+        ec2Connection->getUserManager(Qn::kSystemAccess)->getUsersSync(&users);
     auto messageProcessor = ec2Connection->commonModule()->messageProcessor();
     if (errorCode != ec2::ErrorCode::ok)
         return false;

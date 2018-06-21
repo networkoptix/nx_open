@@ -5,24 +5,18 @@
 #include <QtCore/QUrl>
 #include <QtCore/QUrlQuery>
 #include <QtCore/QTimer>
-
 #include <QtGui/QClipboard>
-
 #include <QtWidgets/QMenu>
 
 #include <api/global_settings.h>
-
-#include <common/common_module.h>
-#include <common/static_common_module.h>
-
-#include <core/resource_management/resource_pool.h>
-#include <core/resource/media_server_resource.h>
-#include <core/resource/resource_display_info.h>
-
 #include <client/client_settings.h>
 #include <client/client_message_processor.h>
 #include <client/client_app_info.h>
-
+#include <common/common_module.h>
+#include <common/static_common_module.h>
+#include <core/resource_management/resource_pool.h>
+#include <core/resource/media_server_resource.h>
+#include <core/resource/resource_display_info.h>
 #include <ui/common/palette.h>
 #include <ui/models/sorted_server_updates_model.h>
 #include <ui/dialogs/common/message_box.h>
@@ -39,13 +33,13 @@
 #include <ui/help/help_topic_accessor.h>
 #include <ui/workbench/workbench_access_controller.h>
 #include <ui/widgets/views/resource_list_view.h>
-
 #include <update/media_server_update_tool.h>
 #include <update/low_free_space_warning.h>
-
 #include <utils/applauncher_utils.h>
 #include <utils/common/scoped_value_rollback.h>
 #include <utils/connection_diagnostics_helper.h>
+
+#include <nx/network/app_info.h>
 
 using namespace nx::client::desktop::ui;
 

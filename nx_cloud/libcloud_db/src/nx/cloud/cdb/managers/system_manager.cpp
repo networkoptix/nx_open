@@ -77,7 +77,7 @@ SystemManager::SystemManager(
 
     // Registering transaction handler.
     m_ec2SyncronizationEngine->incomingTransactionDispatcher().registerTransactionHandler
-        <::ec2::ApiCommand::saveUser, ::ec2::ApiUserData, data::SystemSharing>(
+        <::ec2::ApiCommand::saveUser, vms::api::UserData, data::SystemSharing>(
             std::bind(&SystemManager::processEc2SaveUser, this, _1, _2, _3, _4),
             std::bind(&SystemManager::onEc2SaveUserDone, this, _1, _2, _3));
 
@@ -1384,7 +1384,7 @@ nx::utils::db::DBResult SystemManager::generateSaveUserTransaction(
     const api::SystemSharing& sharing,
     const api::AccountData& account)
 {
-    ::ec2::ApiUserData userData;
+    vms::api::UserData userData;
     ec2::convert(sharing, &userData);
     userData.isCloud = true;
     userData.fullName = QString::fromStdString(account.fullName);
@@ -1902,7 +1902,7 @@ void SystemManager::expiredSystemsDeletedFromDb(
 nx::utils::db::DBResult SystemManager::processEc2SaveUser(
     nx::utils::db::QueryContext* queryContext,
     const nx::String& systemId,
-    data_sync_engine::Command<::ec2::ApiUserData> transaction,
+    data_sync_engine::Command<vms::api::UserData> transaction,
     data::SystemSharing* const systemSharingData)
 {
     const auto& vmsUser = transaction.params;

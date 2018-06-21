@@ -13,6 +13,7 @@
 #include <nx/mediaserver/fs/media_paths/media_paths.h>
 #include <nx/mediaserver/fs/media_paths/media_paths_filter_config.h>
 #include <nx/network/cloud/cloud_connect_controller.h>
+#include <nx/network/app_info.h>
 
 namespace nx {
 namespace mserver_aux {
@@ -350,14 +351,15 @@ void makeFakeData(const QString& fakeDataString,
         << camerasCount << "cameras," << propertiesPerCamera << "properties per camera,"
         << camerasPerLayout << "cameras per layout," << storageCount << "storages";
 
-    std::vector<ec2::ApiUserData> users;
+    std::vector<nx::vms::api::UserData> users;
     for (int i = 0; i < userCount; ++i)
     {
-        ec2::ApiUserData userData;
+        nx::vms::api::UserData userData;
         userData.id = QnUuid::createUuid();
         userData.name = lm("user_%1").arg(i);
         userData.isEnabled = true;
         userData.isCloud = false;
+        userData.realm = nx::network::AppInfo::realm();
         users.push_back(userData);
     }
 

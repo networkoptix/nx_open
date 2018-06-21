@@ -14,6 +14,7 @@
 #include <api/app_server_connection.h>
 #include <media_server/settings.h>
 
+using namespace nx;
 using namespace nx::cdb;
 
 MediaServerCloudIntegrationTest::MediaServerCloudIntegrationTest():
@@ -202,11 +203,11 @@ void MediaServerCloudIntegrationTest::waitForCloudDataSynchronizedToTheMediaServ
 
     for (;;)
     {
-        ::ec2::ApiUserDataList users;
+        vms::api::UserDataList users;
         ASSERT_EQ(::ec2::ErrorCode::ok, mediaServerClient->ec2GetUsers(&users));
         const auto userIter = std::find_if(
             users.begin(), users.end(),
-            [&newAccount](const ::ec2::ApiUserData& elem)
+            [&newAccount](const vms::api::UserData& elem)
             {
                 return elem.name.toStdString() == newAccount.email;
             });
@@ -216,11 +217,11 @@ void MediaServerCloudIntegrationTest::waitForCloudDataSynchronizedToTheMediaServ
     }
 }
 
-::ec2::ApiUserData MediaServerCloudIntegrationTest::inviteRandomCloudUser()
+vms::api::UserData MediaServerCloudIntegrationTest::inviteRandomCloudUser()
 {
     const auto userEmail =
         nx::cdb::test::BusinessDataGenerator::generateRandomEmailAddress();
-    ::ec2::ApiUserData userData;
+    vms::api::UserData userData;
     userData.id = guidFromArbitraryData(userEmail);
     userData.typeId = QnUuid("{774e6ecd-ffc6-ae88-0165-8f4a6d0eafa7}");
     userData.isCloud = true;
@@ -229,8 +230,8 @@ void MediaServerCloudIntegrationTest::waitForCloudDataSynchronizedToTheMediaServ
     userData.name = QString::fromStdString(userEmail);
     //userData.userRoleId = QnUuid::createUuid();
     userData.realm = nx::network::AppInfo::realm();
-    userData.hash = "password_is_in_cloud";
-    userData.digest = "password_is_in_cloud";
+    userData.hash = vms::api::UserData::kCloudPasswordStub;
+    userData.digest = vms::api::UserData::kCloudPasswordStub;
     userData.permissions = GlobalPermission::liveViewerPermissions;
 
     auto mediaServerClient = prepareMediaServerClient();

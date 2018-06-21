@@ -97,11 +97,11 @@
 #include <nx/vms/api/data/resource_type_data.h> //< Required for the FullInfoData
 #include <nx/vms/api/data/webpage_data.h> //< Required for the FullInfoData
 #include <nx/vms/api/data/videowall_data.h> //< Required for the FullInfoData
-#include <nx_ec/data/api_user_data.h>
-#include <nx/vms/api/data/license_data.h>    //< Required for the FullInfoData
-#include <nx/vms/api/data/layout_data.h>    //< Required for the FullInfoData
-#include <nx/vms/api/data/layout_tour_data.h>  //< Required for the FullInfoData
-#include <nx/vms/api/data/access_rights_data.h>  //< Required for the FullInfoData
+#include <nx/vms/api/data/user_data.h> //< Required for the FullInfoData
+#include <nx/vms/api/data/license_data.h> //< Required for the FullInfoData
+#include <nx/vms/api/data/layout_data.h> //< Required for the FullInfoData
+#include <nx/vms/api/data/layout_tour_data.h> //< Required for the FullInfoData
+#include <nx/vms/api/data/access_rights_data.h> //< Required for the FullInfoData
 #include <nx_ec/transaction_timestamp.h>
 
 #include "api/model/api_ioport_data.h"
@@ -315,7 +315,6 @@ void QnCommonMetaTypes::initialize()
     qRegisterMetaType<ec2::ApiDiscoveredServerDataList>("ApiDiscoveredServerDataList");
 
     qRegisterMetaType<ec2::ApiFullInfoData>("ec2::ApiFullInfoData");
-    qRegisterMetaType<ec2::ApiUserData>("ec2::ApiUserData");
 
     qRegisterMetaType<QnUuid>();
     qRegisterMetaTypeStreamOperators<QnUuid>();

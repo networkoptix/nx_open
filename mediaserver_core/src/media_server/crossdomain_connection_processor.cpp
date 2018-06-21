@@ -8,6 +8,7 @@
 #include <network/tcp_listener.h>
 #include <utils/common/app_info.h>
 
+#include <nx/network/app_info.h>
 #include <nx/network/http/http_types.h>
 #include <nx/network/cloud/cloud_connect_controller.h>
 

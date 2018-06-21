@@ -183,7 +183,7 @@ namespace ec2
             void onGetCameraUserAttributesDone  (int reqID, const ec2::ErrorCode, const nx::vms::api::CameraAttributesDataList&);
             void onGetCamerasExDone             (int reqID, const ec2::ErrorCode, const nx::vms::api::CameraDataExList&);
             void onGetCamerasHistoryDone        (int reqID, const ec2::ErrorCode, const nx::vms::api::ServerFootageDataList&);
-            void onGetUsersDone                 (int reqID, const ec2::ErrorCode, const ec2::ApiUserDataList&);
+            void onGetUsersDone                 (int reqID, const ec2::ErrorCode, const nx::vms::api::UserDataList&);
             void onGetUserRolesDone             (int reqID, const ec2::ErrorCode, const nx::vms::api::UserRoleDataList&);
             void onGetEventRulesDone(int, ec2::ErrorCode, const nx::vms::api::EventRuleDataList&);
             void onGetLicensesDone              (int reqID, const ec2::ErrorCode, const QnLicenseList&);
@@ -262,7 +262,7 @@ namespace ec2
         //////////////////////////////////////////////////////////
         ///////// Handlers for AbstractUserManager
         //////////////////////////////////////////////////////////
-        DEFINE_TWO_ARG_HANDLER(GetUsers,                   ec2::ErrorCode, ec2::ApiUserDataList)
+        DEFINE_TWO_ARG_HANDLER(GetUsers,                   ec2::ErrorCode, nx::vms::api::UserDataList)
         DEFINE_TWO_ARG_HANDLER(GetUserRoles,               ec2::ErrorCode, nx::vms::api::UserRoleDataList)
 
         //////////////////////////////////////////////////////////

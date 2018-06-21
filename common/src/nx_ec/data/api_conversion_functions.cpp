@@ -1,13 +1,5 @@
 #include "api_conversion_functions.h"
 
-#include <nx/fusion/serialization/json.h>
-
-#include <nx/vms/event/event_parameters.h>
-#include <nx/vms/event/action_parameters.h>
-#include <nx/vms/event/actions/abstract_action.h>
-#include <nx/vms/event/events/abstract_event.h>
-#include <nx/vms/event/action_factory.h>
-
 #include <core/misc/schedule_task.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/camera_user_attribute_pool.h>
@@ -20,15 +12,11 @@
 #include <core/resource/camera_bookmark.h>
 #include <core/resource/webpage_resource.h>
 #include <core/misc/screen_snap.h>
-
 #include <nx_ec/ec_api.h>
-
-#include <nx/vms/api/data/resource_type_data.h>
-#include "api_user_data.h"
-
 #include <utils/email/email.h>
 #include <utils/common/ldap.h>
 
+#include <nx/fusion/serialization/json.h>
 #include <nx/network/socket_common.h>
 #include <nx/utils/log/assert.h>
 #include <nx/vms/api/data/camera_data.h>
@@ -42,7 +30,14 @@
 #include <nx/vms/api/data/media_server_data.h>
 #include <nx/vms/api/data/peer_data.h>
 #include <nx/vms/api/data/resource_data.h>
+#include <nx/vms/api/data/resource_type_data.h>
+#include <nx/vms/api/data/user_data.h>
 #include <nx/vms/api/data/videowall_data.h>
+#include <nx/vms/event/event_parameters.h>
+#include <nx/vms/event/action_parameters.h>
+#include <nx/vms/event/actions/abstract_action.h>
+#include <nx/vms/event/events/abstract_event.h>
+#include <nx/vms/event/action_factory.h>
 
 using namespace nx;
 using namespace nx::vms::api;
@@ -758,7 +753,7 @@ static QnUserType userResourceType(bool isLdap, bool isCloud)
                      QnUserType::Local;
 }
 
-QnUserResourcePtr fromApiToResource(const ApiUserData& src, QnCommonModule* commonModule)
+QnUserResourcePtr fromApiToResource(const UserData& src, QnCommonModule* commonModule)
 {
     QnUserResourcePtr dst(new QnUserResource(userResourceType(src.isLdap, src.isCloud)));
     if (commonModule)
@@ -767,7 +762,7 @@ QnUserResourcePtr fromApiToResource(const ApiUserData& src, QnCommonModule* comm
     return dst;
 }
 
-void fromApiToResource(const ApiUserData& src, QnUserResourcePtr& dst)
+void fromApiToResource(const UserData& src, QnUserResourcePtr& dst)
 {
     NX_ASSERT(dst->userType() == userResourceType(src.isLdap, src.isCloud), Q_FUNC_INFO, "Unexpected user type");
 
@@ -786,7 +781,7 @@ void fromApiToResource(const ApiUserData& src, QnUserResourcePtr& dst)
     dst->setRealm(src.realm);
 }
 
-void fromResourceToApi(const QnUserResourcePtr& src, ApiUserData& dst)
+void fromResourceToApi(const QnUserResourcePtr& src, UserData& dst)
 {
     QnUserType userType = src->userType();
     fromResourceToApi(src, static_cast<ResourceData&>(dst));
@@ -805,20 +800,20 @@ void fromResourceToApi(const QnUserResourcePtr& src, ApiUserData& dst)
 }
 
 template<class List>
-void fromApiToResourceList(const ApiUserDataList& src, List& dst, const overload_tag&)
+void fromApiToResourceList(const UserDataList& src, List& dst, const overload_tag&)
 {
     dst.reserve(dst.size() + (int)src.size());
 
-    for (const ApiUserData& srcUser: src)
+    for (const UserData& srcUser: src)
         dst.push_back(fromApiToResource(srcUser));
 }
 
-void fromApiToResourceList(const ApiUserDataList& src, QnResourceList& dst)
+void fromApiToResourceList(const UserDataList& src, QnResourceList& dst)
 {
     fromApiToResourceList(src, dst, overload_tag());
 }
 
-void fromApiToResourceList(const ApiUserDataList& src, QnUserResourceList& dst)
+void fromApiToResourceList(const UserDataList& src, QnUserResourceList& dst)
 {
     fromApiToResourceList(src, dst, overload_tag());
 }

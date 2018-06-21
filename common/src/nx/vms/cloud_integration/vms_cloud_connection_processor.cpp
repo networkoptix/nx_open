@@ -355,18 +355,17 @@ bool VmsCloudConnectionProcessor::insertCloudOwner(
     const CloudCredentialsData& data,
     QnJsonRestResult* result)
 {
-    ::ec2::ApiUserData userData;
+    nx::vms::api::UserData userData;
     userData.isCloud = true;
     userData.id = guidFromArbitraryData(data.cloudAccountName);
-    userData.typeId = QnResourceTypePool::kUserTypeUuid;
     userData.email = data.cloudAccountName;
     userData.name = data.cloudAccountName;
     userData.permissions = GlobalPermission::adminPermissions;
     userData.isAdmin = true;
     userData.isEnabled = true;
     userData.realm = nx::network::AppInfo::realm();
-    userData.hash = ec2::ApiUserData::kCloudPasswordStub;
-    userData.digest = ec2::ApiUserData::kCloudPasswordStub;
+    userData.hash = nx::vms::api::UserData::kCloudPasswordStub;
+    userData.digest = nx::vms::api::UserData::kCloudPasswordStub;
 
     const auto resultCode =
         m_commonModule->ec2Connection()

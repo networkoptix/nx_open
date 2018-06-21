@@ -341,7 +341,7 @@ bool ServerTransactionMessageBus::sendInitialData(QnTransactionTransport* transp
                 return camera.typeId != QnResourceTypePool::kDesktopCameraTypeUuid;
             });
 
-        QnTransaction<ApiUserDataList> tranUsers;
+        QnTransaction<vms::api::UserDataList> tranUsers;
         tranUsers.command = ApiCommand::getUsers;
         tranUsers.peerID = commonModule()->moduleGUID();
         if (dbManager(m_db, transport->getUserAccessData()).doQuery(QnUuid(), tranUsers.params) != ErrorCode::ok)

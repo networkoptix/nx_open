@@ -284,7 +284,7 @@ namespace detail
             nx::vms::api::ServerFootageDataList& historyList);
 
         //getUserList
-        ErrorCode doQueryNoLock(const QnUuid& id, ApiUserDataList& userList);
+        ErrorCode doQueryNoLock(const QnUuid& id, nx::vms::api::UserDataList& userList);
 
         //getUserRoleList
         ErrorCode doQueryNoLock(const QnUuid& id, nx::vms::api::UserRoleDataList& userRoleList);
@@ -379,7 +379,7 @@ namespace detail
             const QnTransaction<nx::vms::api::StoredFilePath>& tran);
         ErrorCode executeTransactionInternal(
             const QnTransaction<nx::vms::api::EventRuleData>& tran);
-        ErrorCode executeTransactionInternal(const QnTransaction<ApiUserData>& tran);
+        ErrorCode executeTransactionInternal(const QnTransaction<nx::vms::api::UserData>& tran);
         ErrorCode executeTransactionInternal(const QnTransaction<nx::vms::api::UserRoleData>& tran);
         ErrorCode executeTransactionInternal(
             const QnTransaction<nx::vms::api::AccessRightsData>& tran);
@@ -626,7 +626,7 @@ namespace detail
 
         ErrorCode deleteUserProfileTable(const qint32 id);
         ErrorCode removeUser( const QnUuid& guid );
-        ErrorCode insertOrReplaceUser(const ApiUserData& data, qint32 internalId);
+        ErrorCode insertOrReplaceUser(const nx::vms::api::UserData& data, qint32 internalId);
         ErrorCode checkExistingUser(const QString &name, qint32 internalId);
         ErrorCode insertOrReplaceUserRole(const nx::vms::api::UserRoleData& data);
         ErrorCode removeUserRole( const QnUuid& guid );
@@ -833,11 +833,11 @@ namespace detail
             return result.empty() ? nx::vms::api::MediaServerData() : result[0];
         }
 
-        virtual ec2::ApiUserData getUser(const QnUuid& id) override
+        virtual nx::vms::api::UserData getUser(const QnUuid& id) override
         {
-            ApiUserDataList result;
+            nx::vms::api::UserDataList result;
             m_db->doQueryNoLock(id, result);
-            return result.empty() ? ApiUserData() : result[0];
+            return result.empty() ? nx::vms::api::UserData() : result[0];
         }
 
     private:

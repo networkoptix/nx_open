@@ -912,10 +912,10 @@ void QnCommonMessageProcessor::updateResource(
 }
 
 void QnCommonMessageProcessor::updateResource(
-    const ec2::ApiUserData& user,
+    const nx::vms::api::UserData& user,
     ec2::NotificationSource source)
 {
-    QnUserResourcePtr qnUser(fromApiToResource(user, commonModule()));
+    QnUserResourcePtr qnUser(ec2::fromApiToResource(user, commonModule()));
     updateResource(qnUser, source);
 }
 

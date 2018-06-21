@@ -5,6 +5,7 @@
 #include <api/common_message_processor.h>
 #include <api/global_settings.h>
 
+#include <nx/network/app_info.h>
 #include <nx/utils/test_support/test_options.h>
 #include <nx/utils/log/log.h>
 #include <nx/vms/api/data/peer_data.h>
@@ -36,15 +37,16 @@ void P2pMessageBusTestBase::createData(
 
     settings->synchronizeNow();
 
-    std::vector<ec2::ApiUserData> users;
+    std::vector<nx::vms::api::UserData> users;
 
     for (int i = 0; i < userCount; ++i)
     {
-        ec2::ApiUserData userData;
+        nx::vms::api::UserData userData;
         userData.id = QnUuid::createUuid();
         userData.name = lm("user_%1").arg(i);
         userData.isEnabled = true;
         userData.isCloud = false;
+        userData.realm = nx::network::AppInfo::realm();
         users.push_back(userData);
     }
 

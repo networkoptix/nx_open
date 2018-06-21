@@ -1,7 +1,7 @@
 #include "api_full_info_data.h"
 
 #include <nx/vms/api/data/stored_file_data.h>
-#include <nx_ec/data/api_user_data.h>
+#include <nx/vms/api/data/user_data.h>
 #include <nx/vms/api/data/videowall_data.h>
 #include <nx/vms/api/data/webpage_data.h>
 #include <nx_ec/data/api_discovery_data.h>

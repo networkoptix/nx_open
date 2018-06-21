@@ -606,7 +606,7 @@ APPLY(412, getStorages, nx::vms::api::StorageDataList, \
                        FilterListByAccess<ReadResourceAccess>(), /* Filter read func */ \
                        ReadListAccessOut<ReadResourceAccess>(), /* Check remote peer rights for outgoing transaction */ \
                        RegularTransactionType()) /* regular transaction type */ \
-APPLY(500, getUsers, ApiUserDataList, \
+APPLY(500, getUsers, nx::vms::api::UserDataList, \
                        false, /* persistent*/ \
                        false, /* system*/ \
                        InvalidGetHashHelper(), /* getHash*/ \
@@ -617,7 +617,7 @@ APPLY(500, getUsers, ApiUserDataList, \
                        FilterListByAccess<ReadResourceAccess>(), /* Filter read func */ \
                        ReadListAccessOut<ReadResourceAccess>(), /* Check remote peer rights for outgoing transaction */ \
                        RegularTransactionType()) /* regular transaction type */ \
-APPLY(501, saveUser, ApiUserData, \
+APPLY(501, saveUser, nx::vms::api::UserData, \
                        true, /* persistent*/ \
                        false, /* system*/ \
                        CreateHashByIdHelper(), /* getHash*/ \
@@ -716,7 +716,7 @@ APPLY(508, getPredefinedRoles, nx::vms::api::PredefinedRoleDataList, \
                        FilterListByAccess<AllowForAllAccess>(), /* Filter read func */ \
                        ReadListAccessOut<AllowForAllAccess>(), /* Check remote peer rights for outgoing transaction */ \
                        RegularTransactionType()) /* regular transaction type */ \
-APPLY(510, saveUsers,  ApiUserDataList, \
+APPLY(510, saveUsers,  nx::vms::api::UserDataList, \
                        true, /* persistent*/ \
                        false, /* system*/ \
                        InvalidGetHashHelper(), /* getHash*/ \
