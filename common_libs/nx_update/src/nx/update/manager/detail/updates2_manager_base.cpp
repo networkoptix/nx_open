@@ -149,7 +149,7 @@ void Updates2ManagerBase::refreshStatusAfterCheck()
                 return;
             }
 
-            info::ResultCode result;
+            info::ResultCode result = info::ResultCode::noData;
             nx::update::info::FileData fileData;
 
             for (int i = 0; i < targetVersions.size(); ++i)
