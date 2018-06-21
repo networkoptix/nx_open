@@ -18,6 +18,7 @@ SequenceExecutor::SequenceExecutor(
 
 SequenceExecutor::~SequenceExecutor()
 {
+    terminate();
 }
 
 bool SequenceExecutor::executeSequence(const CommandSequence& sequence)
@@ -25,11 +26,17 @@ bool SequenceExecutor::executeSequence(const CommandSequence& sequence)
     QnMutexLocker lock(&m_mutex);
     m_sequence = sequence;
 
-    return executeSequenceInternal();
+    if (!m_isCommandRunning)
+        return executeSequenceInternal();
+
+    return true;
 }
 
 bool SequenceExecutor::executeSequenceInternal()
 {
+    if (m_terminated)
+        return false;
+
     if (m_sequence.empty())
         return true;
 
@@ -43,11 +50,17 @@ bool SequenceExecutor::executeSequenceInternal()
             executeSequenceInternal();
         };
 
+    m_isCommandRunning = true;
     m_threadPool->start(new nx::utils::FunctorWrapper<std::function<void()>>(
         [this, command, callback = std::move(timerExpiredCallback)]()
         {
             QnMutexLocker lock(&m_mutex);
+            if (m_terminated)
+                return;
+
             executeTimedCommand(command, std::move(callback));
+            m_isCommandRunning = false;
+            m_wait.wakeAll();
         }));
     return true;
 }
@@ -58,6 +71,15 @@ bool SequenceExecutor::executeTimedCommand(
 {
     m_timer->start(timedCommand.duration, std::move(commandDoneCallback));
     return m_controller->continuousMove(timedCommand.command, timedCommand.options);
+}
+
+void SequenceExecutor::terminate()
+{
+    QnMutexLocker lock(&m_mutex);
+    m_terminated = true;
+
+    while (m_isCommandRunning)
+        m_wait.wait(&m_mutex);
 }
 
 } // namespace ptz
