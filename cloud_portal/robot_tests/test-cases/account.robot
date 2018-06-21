@@ -160,26 +160,26 @@ Email field is un-editable
     ${read only}    Get Element Attribute    ${ACCOUNT EMAIL}    readOnly
     Should Be True    "${read only}"
 
-Langauge is changeable on the account page
-    Go To    ${url}/account
-    Log In    ${EMAIL NOPERM}    ${password}    button=None
-    Validate Log In
-    ######## TEMPORARYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYY
-    Go To    ${url}/account
-    :FOR    ${lang}    ${account}   IN ZIP    ${LANGUAGES LIST}    ${LANGUAGES ACCOUNT TEXT LIST}
-    \  Sleep    1
-    \  Verify In Account Page
-    \  Run Keyword Unless    "${lang}"=="${LANGUAGE}"    Click Button    ${ACCOUNT LANGUAGE DROPDOWN}
-    \  Run Keyword Unless    "${lang}"=="${LANGUAGE}"    Wait Until Element Is Visible    //form[@name='accountForm']//button/span[@lang='${lang}']
-    \  Run Keyword Unless    "${lang}"=="${LANGUAGE}"    Click Element    //form[@name='accountForm']//button/span[@lang='${lang}']/..
-#    \  Run Keyword Unless    "${lang}"=="${LANGUAGE}"    Click Button    ${ACCOUNT SAVE}
-    \  Sleep    1    #to allow the system to change languages
-    \  Run Keyword Unless    "${lang}"=="${LANGUAGE}"    Wait Until Element Is Visible    //h1['${account}']
-    Wait Until Element Is Visible    ${ACCOUNT LANGUAGE DROPDOWN}
-    Click Button    ${ACCOUNT LANGUAGE DROPDOWN}
-    Wait Until Element Is Visible    //form[@name='accountForm']//button/span[@lang='${LANGUAGE}']
-    Click Element    //form[@name='accountForm']//button/span[@lang='${LANGUAGE}']
-    Click Button    ${ACCOUNT SAVE}
-    Sleep    1
-    Verify In Account Page
-    Wait Until Element Is Visible    //h1['${ACCOUNT TEXT}']
+#Langauge is changeable on the account page
+#    Go To    ${url}/account
+#    Log In    ${EMAIL NOPERM}    ${password}    button=None
+#    Validate Log In
+#    ######## TEMPORARYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYY
+#    Go To    ${url}/account
+#    :FOR    ${lang}    ${account}   IN ZIP    ${LANGUAGES LIST}    ${LANGUAGES ACCOUNT TEXT LIST}
+#    \  Sleep    1
+#    \  Verify In Account Page
+#    \  Run Keyword Unless    "${lang}"=="${LANGUAGE}"    Click Button    ${ACCOUNT LANGUAGE DROPDOWN}
+#    \  Run Keyword Unless    "${lang}"=="${LANGUAGE}"    Wait Until Element Is Visible    //form[@name='accountForm']//button/span[@lang='${lang}']
+#    \  Run Keyword Unless    "${lang}"=="${LANGUAGE}"    Click Element    //form[@name='accountForm']//button/span[@lang='${lang}']/..
+##    \  Run Keyword Unless    "${lang}"=="${LANGUAGE}"    Click Button    ${ACCOUNT SAVE}
+#    \  Sleep    1    #to allow the system to change languages
+#    \  Run Keyword Unless    "${lang}"=="${LANGUAGE}"    Wait Until Element Is Visible    //h1['${account}']
+#    Wait Until Element Is Visible    ${ACCOUNT LANGUAGE DROPDOWN}
+#    Click Button    ${ACCOUNT LANGUAGE DROPDOWN}
+#    Wait Until Element Is Visible    //form[@name='accountForm']//button/span[@lang='${LANGUAGE}']
+#    Click Element    //form[@name='accountForm']//button/span[@lang='${LANGUAGE}']
+#    Click Button    ${ACCOUNT SAVE}
+#    Sleep    1
+#    Verify In Account Page
+#    Wait Until Element Is Visible    //h1['${ACCOUNT TEXT}']

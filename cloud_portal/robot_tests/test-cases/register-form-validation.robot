@@ -23,9 +23,9 @@ ${EMAIL ALREADY REGISTERED}    //span[@ng-if='registerForm.registerEmail.$error.
 ${EMAIL INVALID}               //span[@ng-if='registerForm.registerEmail.$touched && registerForm.registerEmail.$error.email' and contains(text(),'${EMAIL INVALID TEXT}')]
 ${PASSWORD IS REQUIRED}        //span[@ng-if='passwordInput.password.$error.required' and contains(text(),'${PASSWORD IS REQUIRED TEXT}')]
 ${PASSWORD SPECIAL CHARS}      //span[@ng-if='passwordInput.password.$error.pattern' and contains(text(),'${PASSWORD SPECIAL CHARS TEXT}')]
-${PASSWORD TOO SHORT}          //span[contains(@ng-if,'passwordInput.password.$error.minlength &&') and contains(@ng-if,'!passwordInput.password.$error.pattern') and contains(text(),'${PASSWORD TOO SHORT TEXT}')]
-${PASSWORD TOO COMMON}         //span[contains(@ng-if,'passwordInput.password.$error.common &&') and contains(@ng-if,'!passwordInput.password.$error.pattern &&') and contains(@ng-if,'!passwordInput.password.$error.required') and contains(text(),'${PASSWORD TOO COMMON TEXT}')]
-${PASSWORD IS WEAK}            //span[contains(@ng-if,'passwordInput.password.$error.common &&') and contains(@ng-if,'!passwordInput.password.$error.pattern &&') and contains(@ng-if,'!passwordInput.password.$error.required') and contains(text(),'${PASSWORD IS WEAK TEXT}')]
+${PASSWORD TOO SHORT}          //span[contains(@ng-if,'form.passwordNew.$error.minlength') and contains(text(),'${PASSWORD TOO SHORT TEXT}')]
+${PASSWORD TOO COMMON}         //span[contains(@ng-if,'form.passwordNew.$error.common &&') and contains(@ng-if,'!form.passwordNew.$error.required') and contains(text(),'${PASSWORD TOO COMMON TEXT}')]
+${PASSWORD IS WEAK}            //span[contains(@ng-if,'form.passwordNew.$error.weak &&') and contains(@ng-if,'!form.passwordNew.$error.common &&') and contains(@ng-if,'!form.passwordNew.$error.pattern &&') and contains(@ng-if,'!form.passwordNew.$error.required &&') and contains(@ng-if,'!form.passwordNew.$error.minlength') and contains(text(),'${PASSWORD IS WEAK TEXT}')]
 
 *** Test Cases ***      FIRST       LAST        EMAIL                     PASS                      CHECKED
 Invalid Email 1         mark        hamill      noptixqagmail.com         ${BASE PASSWORD}            True
