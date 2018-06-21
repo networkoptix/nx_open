@@ -27,6 +27,13 @@ public:
     }
 
 protected:
+    void enableAuthentication()
+    {
+        m_authenticator = QAuthenticator();
+        m_authenticator->setUser("username");
+        m_authenticator->setPassword("password");
+    }
+
     void givenBaseUrlWithTrailingSlash()
     {
         initializeHttpServer("/test/");
@@ -41,6 +48,19 @@ protected:
     void givenBaseUrlWithRootPath()
     {
         initializeHttpServer("/");
+    }
+
+    void givenEstablishedServerTunnel()
+    {
+        whenInvokeBeginListening();
+
+        thenRequestSucceded();
+        andTunnelHasBeenCreated();
+    }
+
+    void givenBrokenBaseUrl()
+    {
+        m_baseUrl.setPath("/abra/kadabra");
     }
 
     void whenInvokedSomeRequest()
@@ -68,11 +88,22 @@ protected:
 
         initializeHttpServerIfNeeded();
         m_client = std::make_unique<typename ClientTypeSet::Client>(
-            m_baseUrl, nullptr);
+            m_baseUrl,
+            std::bind(&RelayApiClientAcceptance::saveFeedback, this, _1));
 
         m_client->beginListening(
             ::testing::UnitTest::GetInstance()->current_test_info()->name(),
-            std::bind(&RelayApiClientAcceptance::saveBeginListeningCompletionResult, this, _1, _2, _3));
+            std::bind(&RelayApiClientAcceptance::saveBeginListeningCompletionResult, this,
+                _1, _2, _3));
+    }
+
+    void whenEstablishTunnelFailed()
+    {
+        initializeHttpServerIfNeeded();
+
+        givenBrokenBaseUrl();
+        whenInvokeBeginListening();
+        thenRequestFailed();
     }
 
     void thenClientUsedRightUrl()
@@ -82,41 +113,75 @@ protected:
 
     void thenRequestSucceded()
     {
-        ASSERT_EQ(ResultCode::ok, m_requestResultQueue.pop());
+        thenRequestCompleted();
+        ASSERT_EQ(ResultCode::ok, m_prevCreateServerTunnelResult.resultCode);
+    }
+
+    void thenRequestFailed()
+    {
+        thenRequestCompleted();
+        ASSERT_NE(ResultCode::ok, m_prevCreateServerTunnelResult.resultCode);
+    }
+
+    void thenRequestCompleted()
+    {
+        m_prevCreateServerTunnelResult = m_createServerTunnelResults.pop();
     }
 
     void andBeginListeningResponseIsCorrect()
     {
         ASSERT_EQ(
             m_expectedBeginListeningResponse,
-            m_prevBeginListeningResponse);
+            m_prevCreateServerTunnelResult.response);
     }
 
-    void enableAuthentication()
+    void andTunnelHasBeenCreated()
     {
-        m_authenticator = QAuthenticator();
-        m_authenticator->setUser("username");
-        m_authenticator->setPassword("password");
+        ASSERT_NE(nullptr, m_prevCreateServerTunnelResult.connection);
+    }
+
+    void thenFeedbackIsReported()
+    {
+        ASSERT_EQ(
+            m_prevCreateServerTunnelResult.resultCode,
+            m_feedbackCodes.pop());
+    }
+
+    void assertDataExchangeGoesThroughConnection()
+    {
+        auto relaySideConnection = m_clientTypeSet.takeLastTunnelConnection();
+
+        exchangeSomeData(
+            m_prevCreateServerTunnelResult.connection.get(),
+            relaySideConnection.get());
     }
 
 private:
+    struct CreateServerTunnelResult
+    {
+        ResultCode resultCode = ResultCode::ok;
+        BeginListeningResponse response;
+        std::unique_ptr<nx::network::AbstractStreamSocket> connection;
+    };
+
     std::unique_ptr<nx::network::http::TestHttpServer> m_httpServer;
     std::unique_ptr<typename ClientTypeSet::Client> m_client;
     nx::utils::Url m_baseUrl;
     ResultCode m_lastResultCode = ResultCode::unknownError;
     boost::optional<QAuthenticator> m_authenticator;
-    nx::utils::SyncQueue<ResultCode> m_requestResultQueue;
+    nx::utils::SyncQueue<CreateServerTunnelResult> m_createServerTunnelResults;
+    CreateServerTunnelResult m_prevCreateServerTunnelResult;
     BeginListeningResponse m_expectedBeginListeningResponse;
-    BeginListeningResponse m_prevBeginListeningResponse;
     ClientTypeSet m_clientTypeSet;
+    nx::utils::SyncQueue<ResultCode> m_feedbackCodes;
 
     void saveBeginListeningCompletionResult(
         ResultCode resultCode,
         BeginListeningResponse response,
-        std::unique_ptr<nx::network::AbstractStreamSocket> /*connection*/)
+        std::unique_ptr<nx::network::AbstractStreamSocket> connection)
     {
-        m_prevBeginListeningResponse = std::move(response);
-        m_requestResultQueue.push(resultCode);
+        m_createServerTunnelResults.push(
+            {resultCode, std::move(response), std::move(connection)});
     }
 
     void initializeHttpServerIfNeeded()
@@ -170,6 +235,40 @@ private:
                 std::chrono::seconds(nx::utils::random::number<int>(1, 99));
         }
     }
+
+    void saveFeedback(ResultCode resultCode)
+    {
+        m_feedbackCodes.push(resultCode);
+    }
+
+    void exchangeSomeData(
+        network::AbstractStreamSocket* one,
+        network::AbstractStreamSocket* two)
+    {
+        ASSERT_TRUE(one->setNonBlockingMode(false));
+        ASSERT_TRUE(two->setNonBlockingMode(false));
+
+        sendData(one, two);
+        sendData(two, one);
+    }
+
+    void sendData(
+        network::AbstractStreamSocket* from,
+        network::AbstractStreamSocket* to)
+    {
+        std::array<char, 256> sendBuf;
+        std::generate(sendBuf.begin(), sendBuf.end(), &rand);
+        ASSERT_EQ(
+            (int) sendBuf.size(),
+            from->send(sendBuf.data(), (unsigned int) sendBuf.size()));
+
+        std::array<char, sendBuf.size()> recvBuf;
+        ASSERT_EQ(
+            (int) sendBuf.size(),
+            to->recv(recvBuf.data(), (unsigned int) recvBuf.size(), 0));
+
+        ASSERT_EQ(sendBuf, recvBuf);
+    }
 };
 
 TYPED_TEST_CASE_P(RelayApiClientAcceptance);
@@ -220,12 +319,32 @@ TYPED_TEST_P(RelayApiClientAcceptance, begin_listening_response_delivered_proper
     this->andBeginListeningResponseIsCorrect();
 }
 
+TYPED_TEST_P(RelayApiClientAcceptance, sending_data_through_server_tunnel)
+{
+    this->givenEstablishedServerTunnel();
+    this->assertDataExchangeGoesThroughConnection();
+}
+
+TYPED_TEST_P(RelayApiClientAcceptance, provides_feedback_about_server_tunnel)
+{
+    whenEstablishTunnelFailed();
+    thenFeedbackIsReported();
+}
+
+// TYPED_TEST_P(RelayApiClientAcceptance, establish_client_tunnel)
+
+// TYPED_TEST_P(RelayApiClientAcceptance, sending_data_through_client_tunnel)
+
+// TYPED_TEST_P(RelayApiClientAcceptance, provides_feedback_about_client_tunnel)
+
 REGISTER_TYPED_TEST_CASE_P(RelayApiClientAcceptance,
     extends_path,
     base_url_has_trailing_slash,
     base_url_has_empty_path,
     base_url_is_a_root_path,
     uses_authentication,
-    begin_listening_response_delivered_properly);
+    begin_listening_response_delivered_properly,
+    sending_data_through_server_tunnel,
+    provides_feedback_about_server_tunnel);
 
 } // namespace nx::cloud::relay::api::test

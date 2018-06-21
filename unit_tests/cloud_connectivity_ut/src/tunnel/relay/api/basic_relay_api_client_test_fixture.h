@@ -7,6 +7,7 @@
 #include <nx/network/http/rest/http_rest_client.h>
 #include <nx/network/http/test_http_server.h>
 #include <nx/network/url/url_parse_helper.h>
+#include <nx/utils/thread/sync_queue.h>
 
 namespace nx::cloud::relay::api::test {
 
@@ -41,8 +42,20 @@ public:
         return m_beginListeningResponse;
     }
 
+    std::unique_ptr<network::AbstractStreamSocket> takeLastTunnelConnection()
+    {
+        return m_tunnelConnections.pop();
+    }
+
+    void saveTunnelConnection(
+        std::unique_ptr<network::AbstractStreamSocket> connection)
+    {
+        m_tunnelConnections.push(std::move(connection));
+    }
+
 private:
     BeginListeningResponse m_beginListeningResponse;
+    nx::utils::SyncQueue<std::unique_ptr<network::AbstractStreamSocket>> m_tunnelConnections;
 };
 
 } // namespace nx::cloud::relay::api::test

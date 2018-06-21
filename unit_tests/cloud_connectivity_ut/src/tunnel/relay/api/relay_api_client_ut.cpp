@@ -27,7 +27,7 @@ public:
 
         httpServer->registerRequestProcessorFunc(
             network::url::normalizePath(
-                lm("%1/%2").args(baseUrlPath, kServerTunnelPath).toQString()),
+                lm("%1/%2").args(baseUrlPath, kServerIncomingConnectionsPath).toQString()),
             std::bind(&RelayApiClientOverHttpUpgradeTypeSet::beginListeningHandler, this,
                 _1, _2, _3, _4, _5));
     }
@@ -42,7 +42,14 @@ private:
     {
         serializeToHeaders(&response->headers, beginListeningResponse());
 
-        completionHandler(nx::network::http::StatusCode::switchingProtocols);
+        network::http::RequestResult requestResult(
+            nx::network::http::StatusCode::switchingProtocols);
+        requestResult.connectionEvents.onResponseHasBeenSent =
+            [this](network::http::HttpServerConnection* connection)
+            {
+                saveTunnelConnection(connection->takeSocket());
+            };
+        completionHandler(std::move(requestResult));
     }
 };
 
