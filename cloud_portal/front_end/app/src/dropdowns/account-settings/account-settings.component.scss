@@ -41,12 +41,12 @@
         left : 16px;
 
         @media (max-width : $collapse-first-width) {
-            right : 36px;
+            right : 38px;
             left  : auto;
         }
 
         @media (max-width : $collapse-second-width) {
-            right : 14px;
+            right : 16px;
             left  : auto;
         }
     }

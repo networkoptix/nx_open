@@ -850,16 +850,16 @@ h2.version-number{
 
 .glyphicon-home{
     @include kill-glyphicon;
-    width: 20px;
-    height: 18px;
-    background-position: -24px -34px;
+    width: 24px;
+    height: 24px;
+    background-position: -24px -32px;
 }
 
 .glyphicon-user{
     @include kill-glyphicon;
-    width: 20px;
-    height: 18px;
-    background-position: -2px -34px;
+    width: 24px;
+    height: 24px;
+    background-position: 0 -32px;
 }
 
 .glyphicon-menu-hamburger{

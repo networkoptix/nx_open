@@ -40,7 +40,7 @@
                 }
 
                 .glyphicon-home {
-                    background-position : 0px -60px !important;
+                    background-position : 0px -56px !important;
                 }
             }
         }
@@ -64,7 +64,7 @@
             }
 
             & .glyphicon-home {
-                background-position : -24px -58px !important;
+                background-position : -24px -56px !important;
             }
         }
     }
@@ -75,12 +75,12 @@
         left : 16px;
 
         @media (max-width : $collapse-first-width) {
-            right : 36px;
+            right : 38px;
             left  : auto;
         }
 
         @media (max-width : $collapse-second-width) {
-            right : 62px;
+            right : 70px;
             left  : auto;
         }
     }
