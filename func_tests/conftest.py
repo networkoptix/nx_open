@@ -18,6 +18,14 @@ JUNK_SHOP_PLUGIN_NAME = 'junk-shop-db-capture'
 _logger = logging.getLogger(__name__)
 
 
+@pytest.hookimpl(hookwrapper=True)
+def pytest_pyfunc_call(pyfuncitem):
+    outcome = yield
+    if outcome.excinfo is not None and 'skipifnotimplemented' in pyfuncitem.keywords:
+        _, e, _ = outcome.excinfo
+        pytest.skip(e.message)
+
+
 def pytest_addoption(parser):
     parser.addoption('--work-dir', type=LocalPath, default=defaults.get('work_dir'), help=(
         'working directory for tests: all generated files will be placed there'))
