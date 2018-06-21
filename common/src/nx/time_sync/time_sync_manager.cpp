@@ -93,6 +93,7 @@ void TimeSyncManager::loadTimeFromLocalClock()
     static const std::chrono::milliseconds kMaxJitterForLocalClock(250);
 
     setSyncTime(newValue, kMaxJitterForLocalClock);
+    m_isTimeTakenFromInternet = false;
     NX_DEBUG(this, lm("Set time %1 from the local clock").
         arg(QDateTime::fromMSecsSinceEpoch(newValue.count()).toString(Qt::ISODate)));
 }
@@ -157,6 +158,7 @@ bool TimeSyncManager::loadTimeFromServer(const QnRoute& route)
     bool syncWithInternel = commonModule()->globalSettings()->isSynchronizingTimeWithInternet();
     if (syncWithInternel && !timeData.isTakenFromInternet)
         return false; //< Target server is not ready yet. Time is not taken from internet yet. Repeat later.
+    m_isTimeTakenFromInternet = timeData.isTakenFromInternet;
     if (rtt > maxRtt)
         return false; //< Too big rtt. Try again.
     setSyncTime(newTime, rtt);
@@ -193,6 +195,11 @@ std::chrono::milliseconds TimeSyncManager::getSyncTime() const
 
     auto elapsed = m_steadyClock->now() - m_synchronizedOnClock;
     return m_synchronizedTime + elapsed;
+}
+
+bool TimeSyncManager::isTimeTakenFromInternet() const
+{
+    return m_isTimeTakenFromInternet;
 }
 
 void TimeSyncManager::doPeriodicTasks()

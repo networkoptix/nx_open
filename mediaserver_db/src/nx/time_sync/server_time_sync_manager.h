@@ -32,7 +32,7 @@ public:
     virtual void start() override;
     void init(const ec2::AbstractECConnectionPtr& connection);
 
-    virtual bool isTimeTakenFromInternet() const;
+    void setTimeFetcher(std::unique_ptr<AbstractAccurateTimeFetcher> timeFetcher);
 protected:
     virtual void updateTime() override;
     virtual AbstractStreamSocketPtr connectToRemoteHost(const QnRoute& route) override;
@@ -51,7 +51,6 @@ private:
     nx::vms::network::AbstractServerConnector* m_serverConnector = nullptr;
     nx::utils::ElapsedTimer m_lastNetworkSyncTime;
     QnUuid m_timeLoadFromServer;
-    std::atomic<bool> m_isTimeTakenFromInternet {false};
     ec2::AbstractECConnectionPtr m_connection;
 };
 
