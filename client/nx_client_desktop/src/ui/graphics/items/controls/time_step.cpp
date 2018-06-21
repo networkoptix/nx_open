@@ -8,7 +8,7 @@
 
 namespace
 {
-    inline qint64 timeToMSecs(const QTime& time) 
+    inline qint64 timeToMSecs(const QTime& time)
     {
         return QTime(0, 0, 0, 0).msecsTo(time);
     }
@@ -253,7 +253,8 @@ QString toShortString(qint64 msecs, const QnTimeStep& step)
         return QString::number(timeToMSecs(QDateTime::fromMSecsSinceEpoch(msecs).time()) / step.unitMSecs % step.wrapUnits) + step.format;
 
     default:
-        return QnDateTimeFormatter::dateTimeToString(step.format, QDateTime::fromMSecsSinceEpoch(msecs), QLocale());
+        return QnDateTimeFormatter::dateTimeToString(step.format,
+            QDateTime::fromMSecsSinceEpoch(msecs), QLocale::system());
     }
 }
 
