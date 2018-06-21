@@ -3,6 +3,16 @@
 @import '../../../styles/theme_palette';
 @import '../../../styles/theme_variables';
 
+.dropdown {
+    @media (max-width : $collapse-second-width) {
+        position : inherit;
+
+        .dropdown-menu {
+            right : 0 !important;
+        }
+    }
+}
+
 .dropdown-menu {
     & li {
         & > a {

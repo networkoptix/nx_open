@@ -6,16 +6,21 @@
 @import '~bootstrap/scss/functions';
 @import '~bootstrap/scss/variables';
 
+.dropdown {
+    @media (max-width : $collapse-second-width) {
+        position : inherit;
+
+        .dropdown-menu {
+            left : 0 !important;
+        }
+    }
+}
+
 .dropdown-menu {
     width : auto !important;
 
     @media (max-width : $collapse-first-width) {
         right : 0;
-        left  : auto !important;
-    }
-
-    @media (max-width : $collapse-second-width) {
-        right : -47px;
         left  : auto !important;
     }
 
@@ -75,7 +80,7 @@
         }
 
         @media (max-width : $collapse-second-width) {
-            right : 60px;
+            right : 62px;
             left  : auto;
         }
     }
