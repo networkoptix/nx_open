@@ -596,7 +596,7 @@ void QnLiveStreamProvider::extractMediaStreamParams(
     switch( videoData->compressionType )
     {
         case AV_CODEC_ID_H264:
-            extractSpsPps(
+            nx::media_utils::h264::extractSpsPps(
                 videoData,
                 (videoData->width > 0 && videoData->height > 0)
                     ? nullptr   //taking resolution from sps only if video frame does not already contain it

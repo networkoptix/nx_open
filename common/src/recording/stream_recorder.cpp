@@ -1260,4 +1260,9 @@ void QnStreamRecorder::setTranscodeFilters(const nx::core::transcoding::FilterCh
     m_transcodeFilters = filters;
 }
 
+bool QnStreamRecorder::forceDefaultContext(const QnConstAbstractMediaDataPtr& /*mediaData*/) const
+{
+    return false;
+}
+
 #endif // ENABLE_DATA_PROVIDERS

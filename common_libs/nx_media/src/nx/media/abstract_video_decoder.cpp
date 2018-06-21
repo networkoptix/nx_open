@@ -13,7 +13,7 @@ QSize AbstractVideoDecoder::mediaSizeFromRawData(const QnConstCompressedVideoDat
         case AV_CODEC_ID_H264:
         {
             QSize result;
-            extractSpsPps(frame, &result, nullptr);
+            nx::media_utils::h264::extractSpsPps(frame, &result, nullptr);
             return result;
         }
         case AV_CODEC_ID_MJPEG:

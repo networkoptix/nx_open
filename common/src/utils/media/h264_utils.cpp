@@ -3,9 +3,9 @@
 #include "core/resource/param.h"
 #include "utils/media/nalUnits.h"
 
+namespace nx {
+namespace media_utils {
 
-namespace
-{
 bool isH264SeqHeaderInExtraData(const QnConstCompressedVideoDataPtr& data)
 {
     return data->context &&
@@ -67,7 +67,7 @@ void readH264NALUsFromExtraData(
     }
 }
 
-void readH264NALUsFromAnnexBStream(
+void readNALUsFromAnnexBStream(
     const QnConstCompressedVideoDataPtr& data,
     std::vector<std::pair<const quint8*, size_t>>* const nalUnits)
 {
@@ -89,7 +89,8 @@ void readH264NALUsFromAnnexBStream(
             nalUnits->emplace_back((const quint8*)curNalu, naluEnd - curNalu);
     }
 }
-}
+
+namespace h264 {
 
 void extractSpsPps(
     const QnConstCompressedVideoDataPtr& videoData,
@@ -101,7 +102,7 @@ void extractSpsPps(
     if (isH264SeqHeaderInExtraData(videoData))
         readH264NALUsFromExtraData(videoData, &nalUnits);
     else
-        readH264NALUsFromAnnexBStream(videoData, &nalUnits);
+        readNALUsFromAnnexBStream(videoData, &nalUnits);
 
     //generating profile-level-id and sprop-parameter-sets as in rfc6184
     QByteArray profileLevelID;
@@ -173,3 +174,8 @@ void extractSpsPps(
             customStreamParams->emplace(Qn::SPROP_PARAMETER_SETS_PARAM_NAME, QLatin1String(spropParameterSets));
     }
 }
+
+} // namespace h264
+
+} // namespace media_utils
+} // namespace nx

@@ -34,11 +34,15 @@
 #include "archive_integrity_watcher.h"
 #include <nx/mediaserver/resource/camera.h>
 #include <utils/media/h264_utils.h>
+#include <utils/media/nalUnits.h>
+#include <utils/media/hevc_common.h>
 
 namespace {
+
 static const int kMotionPrebufferSize = 8;
 static const double kHighDataLimit = 0.7;
 static const double kLowDataLimit = 0.3;
+
 } // namespace
 
 std::atomic<qint64> QnServerStreamRecorder::m_totalQueueSize;
@@ -902,23 +906,46 @@ bool QnServerStreamRecorder::needConfigureProvider() const
     return !camera->isScheduleDisabled();
 }
 
-bool QnServerStreamRecorder::forceDefaultContext(const QnConstAbstractMediaDataPtr& frame)
+bool QnServerStreamRecorder::forceDefaultContext(const QnConstAbstractMediaDataPtr& frame) const
 {
     // Do not put codec context to the container level if video stream has built-in context.
     // It is CPU optimization for server recording. Ffmpeg works faster at this mode.
+    return mediaHasBuiltinContext(frame);
+}
 
+bool QnServerStreamRecorder::mediaHasBuiltinContext(const QnConstAbstractMediaDataPtr& frame) const
+{
     auto videoFrame = std::dynamic_pointer_cast<const QnCompressedVideoData>(frame);
 
-    if (!videoFrame || !videoFrame->context)
+    if (!videoFrame)
         return false;
 
-    switch (videoFrame->context->getCodecId())
+    auto codecId = videoFrame->compressionType;
+    using namespace nx::media_utils;
+    switch (codecId)
     {
         case AV_CODEC_ID_H264:
+        case AV_CODEC_ID_HEVC:
         {
-            QSize result;
-            extractSpsPps(videoFrame, &result, nullptr);
-            return result.width() > 0 && result.height() > 0;
+            std::vector<std::pair<const quint8*, size_t>> nalUnits;
+            readNALUsFromAnnexBStream(videoFrame, &nalUnits);
+
+            for (const std::pair<const quint8*, size_t>& nalu: nalUnits)
+            {
+                if (codecId == AV_CODEC_ID_H264)
+                {
+                    auto nalUnitType = *nalu.first & 0x1f;
+                    if (nalUnitType == NALUnitType::nuSPS)
+                        return true;
+                }
+                else if (codecId == AV_CODEC_ID_HEVC)
+                {
+                    hevc::NalUnitHeader header;
+                    header.decode(nalu.first, nalu.second);
+                    if (hevc::isParameterSet(header.unitType))
+                        return true;
+                }
+            }
         }
         default:
             return false;
