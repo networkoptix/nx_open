@@ -50,7 +50,7 @@ class CloudAccount(object):
         unused_realm = self.api.get('cdb/ping')
 
     def get_user_info(self):
-        return self.api.get('cdb/account')
+        return self.api.get('cdb/account/get')
 
     def register_user(self, first_name, last_name):
         response = self.api.post('api/account/register', dict(
@@ -135,6 +135,8 @@ class CloudAccountFactory(object):
         try:
             user_info = cloud_account.get_user_info()
         except HttpError as x:
+            if not x.json:
+                raise x
             result_code = x.json.get('resultCode')
             assert result_code in ['badUsername', 'accountNotActivated'], repr(result_code)
             if not self._autotest_email_password:
