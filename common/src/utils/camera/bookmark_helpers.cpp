@@ -89,7 +89,7 @@ QnCameraBookmarkList helpers::bookmarksAtPosition(
     const auto predicate =
         [posMs](const QnCameraBookmark &bookmark)
         {
-            return qBetween(bookmark.startTimeMs.count(), posMs, bookmark.endTime().count());
+            return qBetween<qint64>(bookmark.startTimeMs.count(), posMs, bookmark.endTime().count());
         };
 
     QnCameraBookmarkList result;
