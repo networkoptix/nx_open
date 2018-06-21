@@ -111,7 +111,7 @@ protected:
     void waitUntilServerIsRegisteredOnTrafficRelay();
     void waitUntilServerIsUnRegisteredOnTrafficRelay();
 
-    void setRemotePeerName(const nx::String& peerName);
+    void setRemotePeerName(const std::string& peerName);
     void setMediatorApiProtocol(MediatorApiProtocol mediatorApiProtocol);
 
     const std::unique_ptr<network::AbstractStreamSocket>& clientSocket();

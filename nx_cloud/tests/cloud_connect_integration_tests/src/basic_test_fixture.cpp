@@ -325,7 +325,7 @@ void BasicTestFixture::waitForServerStatusOnRelay(ServerRelayStatus status)
         std::this_thread::sleep_for(std::chrono::milliseconds(1));
 }
 
-void BasicTestFixture::setRemotePeerName(const nx::String& remotePeerName)
+void BasicTestFixture::setRemotePeerName(const std::string& remotePeerName)
 {
     m_remotePeerName = remotePeerName;
 }

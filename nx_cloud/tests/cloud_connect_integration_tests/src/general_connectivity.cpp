@@ -22,7 +22,7 @@ protected:
 
     void whenConnectToThePeerUsingDomainName()
     {
-        setRemotePeerName(cloudSystemCredentials().systemId);
+        setRemotePeerName(cloudSystemCredentials().systemId.toStdString());
         assertConnectionCanBeEstablished();
     }
 
