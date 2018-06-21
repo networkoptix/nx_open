@@ -73,9 +73,10 @@ void ClientOverHttpGetPostTunnel::openDownChannel(
     const nx::utils::Url& tunnelUrl,
     BeginListeningHandler completionHandler)
 {
-    m_tunnelsBeingEstablished.push_back(
-        {tunnelUrl, std::move(completionHandler)});
+    m_tunnelsBeingEstablished.push_back(TunnelContext());
     auto tunnelCtxIter = std::prev(m_tunnelsBeingEstablished.end());
+    tunnelCtxIter->tunnelUrl = tunnelUrl;
+    tunnelCtxIter->userHandler = std::move(completionHandler);
 
     tunnelCtxIter->httpClient =
         std::make_unique<nx::network::http::AsyncClient>();
@@ -142,7 +143,7 @@ nx::network::http::Request ClientOverHttpGetPostTunnel::prepareOpenUpChannelRequ
 void ClientOverHttpGetPostTunnel::handleOpenUpTunnelResult(
     std::list<TunnelContext>::iterator tunnelCtxIter,
     SystemError::ErrorCode systemErrorCode,
-    std::size_t bytesTransferreded)
+    std::size_t /*bytesTransferreded*/)
 {
     if (systemErrorCode != SystemError::noError)
         return cleanupFailedTunnel(tunnelCtxIter);

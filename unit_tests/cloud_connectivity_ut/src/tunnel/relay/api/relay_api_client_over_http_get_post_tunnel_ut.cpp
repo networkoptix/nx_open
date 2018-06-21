@@ -46,7 +46,7 @@ private:
     void openTunnelChannelDown(
         nx::network::http::HttpServerConnection* const /*connection*/,
         nx::utils::stree::ResourceContainer /*authInfo*/,
-        nx::network::http::Request request,
+        nx::network::http::Request /*request*/,
         nx::network::http::Response* const response,
         nx::network::http::RequestProcessedHandler completionHandler)
     {
@@ -75,7 +75,7 @@ private:
         m_connections.back()->startReadingConnection();
     }
 
-    void onMessage(network::http::Message httpMessage)
+    void onMessage(network::http::Message /*httpMessage*/)
     {
         // TODO
         auto connection = m_connections.back()->takeSocket();
