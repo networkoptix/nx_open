@@ -1131,7 +1131,8 @@ bool QnBusinessRuleViewModel::isValid(Column column) const
                     QUrl url(m_actionParams.url);
                     return url.isValid()
                         && !url.isEmpty()
-                        && (url.scheme().isEmpty() || url.scheme().toLower() == lit("http"))
+                        && (url.scheme().isEmpty() || url.scheme().toLower() == lit("http")
+                            || url.scheme().toLower() == lit("https"))
                         && !url.host().isEmpty();
                 }
                 default:
