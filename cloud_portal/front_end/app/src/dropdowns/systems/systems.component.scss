@@ -40,14 +40,6 @@
             }
         }
 
-        & + .dropdown-divider {
-            display : none;
-
-            @media (max-width : $collapse-first-width) {
-                display : block;
-            }
-        }
-
         & > a {
             white-space : nowrap;
             display     : flex;

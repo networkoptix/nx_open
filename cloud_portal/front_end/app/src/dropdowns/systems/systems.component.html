@@ -22,8 +22,6 @@
             </a>
         </li>
 
-        <li *ngIf="activeSystem" class="dropdown-divider" role="separator"></li>
-
         <li *ngFor="let system of systems | slice:0:config.maxSystemsForHeader; trackBy: trackByFn;">
             <a *ngIf="system !== activeSystem" [href]="getUrlFor(system.id)">
                 <span class="glyphicon glyphicon-home"></span>
