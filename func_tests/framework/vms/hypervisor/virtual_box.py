@@ -20,7 +20,6 @@ _INTERNAL_NIC_INDICES = [2, 3, 4, 5, 6, 7, 8]
 
 
 class VirtualBoxError(Exception):
-
     def __init__(self, code, message):
         Exception.__init__(self, message)
         self.code = code
@@ -88,10 +87,7 @@ class VirtualBox(object):
         self.host_os_access = os_access  # type: OSAccess
 
     def _get_info(self, vm_name):
-        try:
-            output = self._run_vbox_manage_command(['showvminfo', vm_name, '--machinereadable'])
-        except virtual_box_error('OBJECT_NOT_FOUND') as e:
-            raise VMNotFound("Cannot find Machine {}; VBoxManage says:\n{}".format(vm_name, e.message))
+        output = self._run_vbox_manage_command(['showvminfo', vm_name, '--machinereadable'])
         raw_info = dict(csv.reader(output.splitlines(), delimiter='=', escapechar='\\', doublequote=False))
         return raw_info
 
@@ -184,4 +180,6 @@ class VirtualBox(object):
             prefix = 'VBoxManage: error: '
             assert first_line.startswith(prefix)
             message = first_line[len(prefix):]
+            if code == 'OBJECT_NOT_FOUND':
+                raise VMNotFound("Cannot find VM:\n{}".format(message))
             raise virtual_box_error(code)(message)
