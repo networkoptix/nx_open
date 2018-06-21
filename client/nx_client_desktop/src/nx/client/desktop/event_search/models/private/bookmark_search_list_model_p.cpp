@@ -16,6 +16,8 @@
 #include <nx/utils/datetime.h>
 #include <nx/utils/pending_operation.h>
 
+using std::chrono::milliseconds;
+
 namespace nx {
 namespace client {
 namespace desktop {
@@ -25,10 +27,10 @@ namespace {
 static constexpr int kFetchBatchSize = 110;
 
 static const auto lowerBoundPredicate =
-    [](const QnCameraBookmark& left, qint64 right) { return left.startTimeMs > right; };
+    [](const QnCameraBookmark& left, qint64 right) { return left.startTimeMs.count() > right; };
 
 static const auto upperBoundPredicate =
-    [](qint64 left, const QnCameraBookmark& right) { return left > right.startTimeMs; };
+    [](qint64 left, const QnCameraBookmark& right) { return left > right.startTimeMs.count(); };
 
 } // namespace
 
@@ -94,11 +96,11 @@ QVariant BookmarkSearchListModel::Private::data(const QModelIndex& index, int ro
         case Qn::PreviewTimeRole:
         {
             using namespace std::chrono;
-            return QVariant::fromValue(microseconds(milliseconds(bookmark.startTimeMs)).count());
+            return QVariant::fromValue(microseconds(bookmark.startTimeMs).count());
         }
 
         case Qn::DurationRole:
-            return QVariant::fromValue(bookmark.durationMs);
+            return QVariant::fromValue(bookmark.durationMs.count());
 
         case Qn::UuidRole:
             return QVariant::fromValue(bookmark.guid);
@@ -146,8 +148,8 @@ void BookmarkSearchListModel::Private::clear()
 rest::Handle BookmarkSearchListModel::Private::requestPrefetch(qint64 fromMs, qint64 toMs)
 {
     QnCameraBookmarkSearchFilter filter;
-    filter.startTimeMs = fromMs;
-    filter.endTimeMs = toMs;
+    filter.startTimeMs = milliseconds(fromMs);
+    filter.endTimeMs = milliseconds(toMs);
     filter.text = m_filterText;
     filter.orderBy.column = Qn::BookmarkStartTime;
     filter.orderBy.order = Qt::DescendingOrder;
@@ -173,13 +175,13 @@ rest::Handle BookmarkSearchListModel::Private::requestPrefetch(qint64 fromMs, qi
             else
             {
                 qDebug() << "Pre-fetched" << m_prefetch.size() << "bookmarks from"
-                    << utils::timestampToRfc2822(m_prefetch.back().startTimeMs) << "to"
-                    << utils::timestampToRfc2822(m_prefetch.front().startTimeMs);
+                    << utils::timestampToRfc2822(m_prefetch.back().startTimeMs.count()) << "to"
+                    << utils::timestampToRfc2822(m_prefetch.front().startTimeMs.count());
             }
 
             complete(m_prefetch.size() < kFetchBatchSize
                 ? 0
-                : m_prefetch.back().startTimeMs + 1/*discard last ms*/);
+                : m_prefetch.back().startTimeMs.count() + 1/*discard last ms*/);
         });
 }
 
@@ -200,14 +202,14 @@ bool BookmarkSearchListModel::Private::commitPrefetch(qint64 earliestTimeToCommi
     if (count > 0)
     {
         qDebug() << "Committing" << count << "bookmarks from"
-            << utils::timestampToRfc2822(m_prefetch[count - 1].startTimeMs) << "to"
-            << utils::timestampToRfc2822(m_prefetch.front().startTimeMs);
+            << utils::timestampToRfc2822(m_prefetch[count - 1].startTimeMs.count()) << "to"
+            << utils::timestampToRfc2822(m_prefetch.front().startTimeMs.count());
 
         ScopedInsertRows insertRows(q, first, first + count - 1);
         m_data.insert(m_data.end(), m_prefetch.cbegin(), end);
 
         for (auto iter = m_prefetch.cbegin(); iter != end; ++iter)
-            m_guidToTimestampMs[iter->guid] = iter->startTimeMs;
+            m_guidToTimestampMs[iter->guid] = iter->startTimeMs.count();
     }
     else
     {
@@ -250,7 +252,7 @@ void BookmarkSearchListModel::Private::watchBookmarkChanges()
 void BookmarkSearchListModel::Private::addBookmark(const QnCameraBookmark& bookmark)
 {
     // Skip bookmarks outside of time range.
-    if (!fetchedTimePeriod().contains(bookmark.startTimeMs))
+    if (!fetchedTimePeriod().contains(bookmark.startTimeMs.count()))
         return;
 
     if (m_guidToTimestampMs.contains(bookmark.guid))
@@ -261,13 +263,13 @@ void BookmarkSearchListModel::Private::addBookmark(const QnCameraBookmark& bookm
     }
 
     const auto insertionPos = std::lower_bound(m_data.cbegin(), m_data.cend(),
-        bookmark.startTimeMs, lowerBoundPredicate);
+        bookmark.startTimeMs.count(), lowerBoundPredicate);
 
     const auto index = std::distance(m_data.cbegin(), insertionPos);
 
     ScopedInsertRows insertRows(q,  index, index);
     m_data.insert(m_data.begin() + index, bookmark);
-    m_guidToTimestampMs[bookmark.guid] = bookmark.startTimeMs;
+    m_guidToTimestampMs[bookmark.guid] = bookmark.startTimeMs.count();
 }
 
 void BookmarkSearchListModel::Private::updateBookmark(const QnCameraBookmark& bookmark)

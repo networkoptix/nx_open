@@ -42,7 +42,7 @@ public:
     BookmarkItem(const QnCameraBookmark &bookmark):
         bookmark(bookmark),
         startTimeMs(bookmark.startTimeMs),
-        endTimeMs(bookmark.endTimeMs())
+        endTimeMs(bookmark.endTime())
     {
     }
 
@@ -157,7 +157,7 @@ int QnBookmarkMergeHelper::indexAtPosition(const QnTimelineBookmarkItemList& boo
         [&bookmarks, time](int index)
         {
             const QnTimelineBookmarkItem& bookmarkItem = bookmarks[index];
-            return std::abs((bookmarkItem.startTimeMs() + bookmarkItem.endTimeMs()).count()
+            return std::abs((bookmarkItem.startTime() + bookmarkItem.endTime()).count()
                 / 2 - time.count());
         };
 
@@ -170,7 +170,7 @@ int QnBookmarkMergeHelper::indexAtPosition(const QnTimelineBookmarkItemList& boo
     for (int i = 0; i < bookmarks.size(); ++i)
     {
         const QnTimelineBookmarkItem& bookmarkItem = bookmarks[i];
-        if (time >= bookmarkItem.startTimeMs() && time <= bookmarkItem.endTimeMs())
+        if (time >= bookmarkItem.startTime() && time <= bookmarkItem.endTime())
         {
             foundItemIndex = i;
 
@@ -570,8 +570,8 @@ QnTimelineBookmarkItem BookmarkItem::toTimelineBookmarkItem() const
         return bookmark.get();
 
     QnBookmarkCluster cluster;
-    cluster.startTimeMs = startTimeMs;
-    cluster.durationMs = endTimeMs - startTimeMs;
+    cluster.startTime = startTimeMs;
+    cluster.duration = endTimeMs - startTimeMs;
 
     return cluster;
 }

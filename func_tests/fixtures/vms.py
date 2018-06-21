@@ -116,9 +116,21 @@ def two_vm_types(request):
 
 
 @pytest.fixture(scope='session')
-def one_vm(one_vm_type, vm_factory):
-    with vm_factory.allocated_vm('single-{}'.format(one_vm_type), vm_type=one_vm_type) as vm:
+def linux_vm(vm_factory):
+    with vm_factory.allocated_vm('single-linux', vm_type='linux') as vm:
         yield vm
+
+
+@pytest.fixture(scope='session')
+def windows_vm(vm_factory):
+    with vm_factory.allocated_vm('single-windows', vm_type='windows') as vm:
+        yield vm
+
+
+@pytest.fixture(scope='session')
+def one_vm(request, one_vm_type):
+    # TODO: If new VM type is added, create separate fixture for it or use factory here.
+    return request.getfixturevalue(one_vm_type + '_vm')
 
 
 @pytest.fixture(scope='session')

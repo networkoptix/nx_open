@@ -53,7 +53,9 @@ using GetDataExecutor = FUNC_TYPE(getData);
 
 class TestPtzController: public QnAbstractPtzController
 {
+    using base_type = QnAbstractPtzController;
 public:
+    TestPtzController();
 
     virtual Ptz::Capabilities getCapabilities(
         const nx::core::ptz::Options& options) const override;

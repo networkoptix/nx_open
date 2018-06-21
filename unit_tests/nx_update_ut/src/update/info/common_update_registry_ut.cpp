@@ -191,12 +191,8 @@ TEST_F(CommonUpdateRegistry, manualData_remove)
     whenManualDataAdded(kManualFile1, kOsVersion1);
     whenManualDataAdded(kManualFile2, kOsVersion2);
 
-    thenAllPeersShouldBePresent(kOsVersion1, QList<QnUuid>() << kPeer1Id);
-    thenAllPeersShouldBePresent(kOsVersion2, QList<QnUuid>() << kPeer1Id);
-
     whenManualDataRemoved(kManualFile2);
     thenManualDataShouldNotBeFound(kOsVersion2);
-    thenAllPeersShouldBePresent(kOsVersion1, QList<QnUuid>() << kPeer1Id);
 
     whenManualDataRemoved(kManualFile1);
     thenManualDataShouldNotBeFound(kOsVersion1);

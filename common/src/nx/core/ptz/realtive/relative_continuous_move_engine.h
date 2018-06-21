@@ -1,5 +1,7 @@
 #pragma once
 
+#include <QtCore/QThreadPool>
+
 #include <core/ptz/abstract_ptz_controller.h>
 
 #include <nx/core/ptz/sequence_executor.h>
@@ -15,7 +17,8 @@ class RelativeContinuousMoveEngine: public RelativeMoveEngine
 public:
     RelativeContinuousMoveEngine(
         QnAbstractPtzController* controller,
-        const RelativeContinuousMoveMapping& mapping);
+        const RelativeContinuousMoveMapping& mapping,
+        QThreadPool* threadPool);
 
     virtual bool relativeMove(
         const nx::core::ptz::Vector& direction,

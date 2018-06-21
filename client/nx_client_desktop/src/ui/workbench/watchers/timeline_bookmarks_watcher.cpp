@@ -38,13 +38,13 @@ void updateQueryWindowExtended(const QnCameraBookmarksQueryPtr& query, qint64 st
 {
     auto filter = query->filter();
     const bool shouldChange = helpers::isTimeWindowChanged(startTimeMs, endTimeMs,
-        filter.startTimeMs, filter.endTimeMs, kTimelineMinWindowChangeMs);
+        filter.startTimeMs.count(), filter.endTimeMs.count(), kTimelineMinWindowChangeMs);
 
     if (!shouldChange)
         return;
 
-    filter.startTimeMs = startTimeMs;
-    filter.endTimeMs = endTimeMs;
+    filter.startTimeMs = milliseconds(startTimeMs);
+    filter.endTimeMs = milliseconds(endTimeMs);
     query->setFilter(filter);
 }
 
@@ -75,8 +75,8 @@ QnTimelineBookmarksWatcher::QnTimelineBookmarksWatcher(QObject *parent)
             if (!m_timelineQuery)
                 return;
 
-            updateQueryWindowExtended(m_timelineQuery, m_timlineFilter.startTimeMs,
-                m_timlineFilter.endTimeMs);
+            updateQueryWindowExtended(m_timelineQuery, m_timlineFilter.startTimeMs.count(),
+                m_timlineFilter.endTimeMs.count());
         };
     m_updateQueryOperation = new nx::utils::PendingOperation(delayedUpdateWindow,
         kUpdateQueryPeriodMs, this);
@@ -108,8 +108,8 @@ QnTimelineBookmarksWatcher::QnTimelineBookmarksWatcher(QObject *parent)
         , this, &QnTimelineBookmarksWatcher::onTimelineWindowChanged);
     connect(navigator()->timeSlider(), &QnTimeSlider::msecsPerPixelChanged, this, [this]()
     {
-        m_timlineFilter.sparsing = QnBookmarkSparsingOptions(true
-            , navigator()->timeSlider()->msecsPerPixel());
+        m_timlineFilter.sparsing = QnBookmarkSparsingOptions(true,
+            milliseconds(qint64(navigator()->timeSlider()->msecsPerPixel())));
         if (m_timelineQuery)
             updateQuerySparing(m_timelineQuery, m_timlineFilter.sparsing);
     });
@@ -231,8 +231,8 @@ void QnTimelineBookmarksWatcher::onTimelineWindowChanged(milliseconds startTimeM
     if (startTimeMs == 0ms || endTimeMs == 0ms || (startTimeMs > endTimeMs))
         return;
 
-    m_timlineFilter.startTimeMs = startTimeMs.count();
-    m_timlineFilter.endTimeMs = endTimeMs.count();
+    m_timlineFilter.startTimeMs = startTimeMs;
+    m_timlineFilter.endTimeMs = endTimeMs;
     m_updateQueryOperation->requestOperation();
 }
 

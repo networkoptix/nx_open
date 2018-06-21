@@ -1854,7 +1854,7 @@ void QnWorkbenchNavigator::updateScrollBarFromSlider()
         m_timeScrollBar->setValue(m_timeSlider->windowStart().count());
         m_timeScrollBar->setPageStep(windowSize.count());
         m_timeScrollBar->setIndicatorVisible(m_timeSlider->positionMarkerVisible());
-        m_timeScrollBar->setIndicatorPosition(m_timeSlider->sliderTimePosition().count());
+        m_timeScrollBar->setIndicatorPosition(m_timeSlider->sliderTimePosition());
     }
 
     updateSliderFromScrollBar(); /* Bi-directional sync is needed as time scrollbar may adjust the provided values. */

@@ -1,5 +1,7 @@
 #include "workbench_bookmarks_handler.h"
 
+#include <chrono>
+
 #include <QtWidgets/QAction>
 
 #include <ini.h>
@@ -44,6 +46,9 @@
 #include <utils/common/app_info.h>
 #include <utils/common/synctime.h>
 #include <nx/client/desktop/utils/parameter_helper.h>
+
+using std::chrono::microseconds;
+using std::chrono::milliseconds;
 
 using namespace nx::client::desktop::ui;
 
@@ -126,7 +131,7 @@ QnWorkbenchBookmarksHandler::QnWorkbenchBookmarksHandler(QObject *parent /* = NU
             context()->statisticsModule()->registerClick(lit("bookmark_tooltip_play"));
 
             static const int kMicrosecondsFactor = 1000;
-            navigator()->setPosition(bookmark.startTimeMs * kMicrosecondsFactor);
+            navigator()->setPosition(microseconds(bookmark.startTimeMs).count());
             navigator()->setPlaying(true);
         });
 
@@ -201,8 +206,8 @@ void QnWorkbenchBookmarksHandler::at_addCameraBookmarkAction_triggered()
     QnCameraBookmark bookmark;
     bookmark.guid = QnUuid::createUuid();
     bookmark.name = tr("Bookmark");
-    bookmark.startTimeMs = period.startTimeMs;  //this should be assigned before loading data to the dialog
-    bookmark.durationMs = period.durationMs;
+    bookmark.startTimeMs = milliseconds(period.startTimeMs);  //this should be assigned before loading data to the dialog
+    bookmark.durationMs = milliseconds(period.durationMs);
     bookmark.cameraId = camera->getId();
 
     QScopedPointer<QnCameraBookmarkDialog> dialog(new QnCameraBookmarkDialog(false, mainWindowWidget()));
@@ -212,7 +217,7 @@ void QnWorkbenchBookmarksHandler::at_addCameraBookmarkAction_triggered()
         return;
 
     bookmark.creatorId = context()->user()->getId();
-    bookmark.creationTimeStampMs = qnSyncTime->currentMSecsSinceEpoch();
+    bookmark.creationTime() = milliseconds(qnSyncTime->currentMSecsSinceEpoch());
     dialog->submitData(bookmark);
     NX_ASSERT(bookmark.isValid(), Q_FUNC_INFO, "Dialog must not allow to create invalid bookmarks");
     if (!bookmark.isValid())
@@ -233,7 +238,8 @@ void QnWorkbenchBookmarksHandler::at_editCameraBookmarkAction_triggered()
 
     QnCameraBookmark bookmark = parameters.argument<QnCameraBookmark>(Qn::CameraBookmarkRole);
 
-    QnMediaServerResourcePtr server = cameraHistoryPool()->getMediaServerOnTime(camera, bookmark.startTimeMs);
+    QnMediaServerResourcePtr server = cameraHistoryPool()->getMediaServerOnTime(camera,
+        bookmark.startTimeMs.count());
     if (!server || server->getStatus() != Qn::Online)
     {
         QnMessageBox::warning(mainWindowWidget(),

@@ -603,7 +603,11 @@ QnThumbnail QnThumbnailsLoader::generateThumbnail(const CLVideoDecoderOutput &ou
     QSize scaleTargetSize;
     {
         QnMutexLocker locker( &m_mutex );
-        ensureScaleContextLocked(outFrame.linesize[0], QSize(outFrame.width*outFrame.sample_aspect_ratio, outFrame.height), boundingSize, (AVPixelFormat) outFrame.format);
+        ensureScaleContextLocked(
+            outFrame.linesize[0],
+            QSize(outFrame.width, outFrame.height),
+            boundingSize,
+            (AVPixelFormat)outFrame.format);
         scaleTargetSize = m_scaleTargetSize;
     }
 

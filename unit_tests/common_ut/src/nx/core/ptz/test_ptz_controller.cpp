@@ -4,6 +4,12 @@ namespace nx {
 namespace core {
 namespace ptz {
 
+TestPtzController::TestPtzController():
+    base_type(QnResourcePtr())
+{
+
+}
+
 Ptz::Capabilities TestPtzController::getCapabilities(const nx::core::ptz::Options& options) const
 {
     if (m_getCapabilitiesExecutor)

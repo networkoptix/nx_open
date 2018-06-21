@@ -1,7 +1,10 @@
 #pragma once
 
+#include <QtCore/QThreadPool>
+
 #include <core/ptz/proxy_ptz_controller.h>
 #include <nx/core/ptz/realtive/relative_move_engine.h>
+#include <nx/core/ptz/realtive/relative_continuous_move_mapping.h>
 
 namespace nx {
 namespace core {
@@ -12,7 +15,10 @@ class RelativeMoveWorkaroundController: public QnProxyPtzController
     using base_type = QnProxyPtzController;
 
 public:
-    RelativeMoveWorkaroundController(const QnPtzControllerPtr& controller);
+    RelativeMoveWorkaroundController(
+        const QnPtzControllerPtr& controller,
+        const RelativeContinuousMoveMapping& mapping,
+        QThreadPool* threadPool);
 
     static bool extends(Ptz::Capabilities capabilities);
 

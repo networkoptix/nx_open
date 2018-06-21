@@ -1477,9 +1477,9 @@ qint64 ActionHandler::getFirstBookmarkTimeMs()
     static const qint64 kOneYearOffsetMs = kOneDayOffsetMs * 365;
     const auto nowMs = qnSyncTime->currentMSecsSinceEpoch();
     const auto bookmarksWatcher = context()->instance<QnWorkbenchBookmarksWatcher>();
-    const auto firstBookmarkUtcTimeMs = bookmarksWatcher->firstBookmarkUtcTimeMs();
-    const bool firstTimeIsNotKnown = (firstBookmarkUtcTimeMs == QnWorkbenchBookmarksWatcher::kUndefinedTime);
-    return (firstTimeIsNotKnown ? nowMs - kOneYearOffsetMs : firstBookmarkUtcTimeMs);
+    const auto firstBookmarkUtcTime = bookmarksWatcher->firstBookmarkUtcTime();
+    const bool firstTimeIsNotKnown = (firstBookmarkUtcTime == QnWorkbenchBookmarksWatcher::kUndefinedTime);
+    return (firstTimeIsNotKnown ? nowMs - kOneYearOffsetMs : firstBookmarkUtcTime.count());
 }
 
 void ActionHandler::renameLocalFile(const QnResourcePtr& resource, const QString& newName)

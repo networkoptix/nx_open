@@ -795,6 +795,21 @@ ResultCode CommonUpdateRegistry::findUpdateFile(
 {
     NX_VERBOSE(this, lm("Requested update for %1").args(updateRequestData.toString()));
 
+    CustomizationData customizationData;
+    if (hasUpdateForCustomizationAndVersion(updateRequestData, &customizationData))
+    {
+        FileDataFinder fileDataFinder(m_baseUrl, updateRequestData, m_customizationVersionToUpdate,
+            customizationData);
+
+        fileDataFinder.process();
+        if (fileDataFinder.ok())
+        {
+            *outFileData = fileDataFinder.fileData();
+            NX_INFO(this, lm("Update for %1 successfully found").args(updateRequestData.toString()));
+            return ResultCode::ok;
+        }
+    }
+
     for (const auto& manualDataEntry: m_manualData)
     {
         if (manualDataEntry.isClient == updateRequestData.isClient
@@ -807,24 +822,7 @@ ResultCode CommonUpdateRegistry::findUpdateFile(
         }
     }
 
-    CustomizationData customizationData;
-    if (!hasUpdateForCustomizationAndVersion(updateRequestData, &customizationData))
-        return ResultCode::noData;
-
-    FileDataFinder fileDataFinder(
-        m_baseUrl,
-        updateRequestData,
-        m_customizationVersionToUpdate,
-        customizationData);
-
-    fileDataFinder.process();
-    if (!fileDataFinder.ok())
-        return ResultCode::noData;
-
-    *outFileData = fileDataFinder.fileData();
-    NX_INFO(this, lm("Update for %1 successfully found").args(updateRequestData.toString()));
-
-    return ResultCode::ok;
+    return ResultCode::noData;
 }
 
 QList<QString> CommonUpdateRegistry::alternativeServers() const
@@ -1087,13 +1085,21 @@ void CommonUpdateRegistry::mergeToRemovedData(const QString& fileName, const QLi
 
 QList<QnUuid> CommonUpdateRegistry::additionalPeers(const QString& fileName) const
 {
+    QList<QnUuid> result;
     for (const auto& md: m_manualData)
     {
         if (md.file == fileName)
-            return md.peers;
+        {
+            for (const auto& id: md.peers)
+            {
+                if (id != m_peerId)
+                    result.append(id);
+            }
+            return result;
+        }
     }
 
-    return QList<QnUuid>();
+    return result;
 }
 
 } // namespace impl

@@ -42,6 +42,9 @@ Ptz::Capability extendsCapabilitiesWith(
     Ptz::Capability relativeCapability,
     Ptz::Capabilities realCapabilities)
 {
+    if (realCapabilities.testFlag(relativeCapability))
+        return relativeCapability;
+
     const auto itr = kCapabilityRequirements.find(relativeCapability);
     if (itr == kCapabilityRequirements.cend())
         return Ptz::NoPtzCapabilities;
@@ -75,13 +78,13 @@ Ptz::Capabilities extendedCapabilities(Ptz::Capabilities originalCapabilities)
 } // namespace
 
 RelativeMoveWorkaroundController::RelativeMoveWorkaroundController(
-    const QnPtzControllerPtr& controller)
+    const QnPtzControllerPtr& controller,
+    const RelativeContinuousMoveMapping& mapping,
+    QThreadPool* threadPool)
     :
     base_type(controller),
     m_continuousMoveEngine(
-        std::make_unique<RelativeContinuousMoveEngine>(
-            controller.data(),
-            RelativeContinuousMoveMapping())), //< TODO: #dmishin pass mapping to controller.
+        std::make_unique<RelativeContinuousMoveEngine>(controller.data(), mapping, threadPool)),
     m_absoluteMoveEngine(std::make_unique<RelativeAbsoluteMoveEngine>(controller.data()))
 {
 }

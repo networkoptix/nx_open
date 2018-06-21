@@ -24,8 +24,12 @@ def customization(mediaserver_installers):
 
 
 @pytest.fixture()
-def cloud_host(request, customization):
-    cloud_group = request.config.getoption('--cloud-group')
+def cloud_group(request):
+    return request.config.getoption('--cloud-group')
+
+
+@pytest.fixture()
+def cloud_host(customization, cloud_group):
     return resolve_cloud_host_from_registry(cloud_group, customization.customization_name)
 
 

@@ -279,3 +279,18 @@ def test_https_verification(one_running_mediaserver, ca):
     for warning in warning_list:
         _logger.warning("Warning collected: %s.", warning)
         assert not isinstance(warning, urllib3.exceptions.InsecureRequestWarning)
+
+# https://networkoptix.atlassian.net/browse/VMS-10717
+def test_save_and_remove_layout(one_running_mediaserver):
+    layout_id = "{1a404100-0000-0000-0000-000000000001}"
+    one_running_mediaserver.api.post('ec2/saveLayout', dict(
+        backgroundHeight=0, backgroundImageFilename="", backgroundOpacity=0,
+        backgroundWidth=0, cellAspectRatio=0, horizontalSpacing=0,
+        id=layout_id, items=[], locked=False, name="Layout_1",
+        parentId="{00000000-0000-0000-0000-000000000000}",
+        typeId="{00000000-0000-0000-0000-000000000000}",
+        url="", verticalSpacing=0))
+    assert_server_has_resource(one_running_mediaserver, 'getLayouts', id=layout_id)
+    one_running_mediaserver.api.post('ec2/removeResource', dict(id=layout_id))
+    # one_running_mediaserver.api.post('ec2/removeLayout', dict(id=layout_id))
+    assert_server_does_not_have_resource(one_running_mediaserver, 'getLayouts', layout_id)

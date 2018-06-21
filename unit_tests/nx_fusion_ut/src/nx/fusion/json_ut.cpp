@@ -108,6 +108,14 @@ TEST_F(QnJsonTextFixture, integralTypes)
     ASSERT_EQ(-12, QJson::deserialized<int>("-12"));
 }
 
+TEST_F(QnJsonTextFixture, chronoTypes)
+{
+    // Chrono types are 64-bit and so serialized as strings with extra quotes
+    ASSERT_EQ("\"7\"", QJson::serialized(std::chrono::milliseconds(7)));
+    ASSERT_EQ(std::chrono::milliseconds(50), QJson::deserialized<std::chrono::milliseconds>("\"50\""));
+}
+
+
 TEST_F(QnJsonTextFixture, QtStringTypes)
 {
     //ASSERT_EQ(kHelloWorld, QJson::serialized(kHelloWorld.toUtf8())); -- not supported, returns base64
