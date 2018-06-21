@@ -97,7 +97,7 @@
     },
     "custom": {
       "label": "Özel Ayarlar",
-      "description": "Özel izinler ayarlamak için %PRODUCT_NAME% İstemci uygulamasını kullanın"
+      "description": "Özel izinler ayarlamak için %VMS_NAME% İstemci uygulamasını kullanın"
     }
   },
   "errorCodes": {
@@ -209,7 +209,7 @@
       "linux": {
         "label": "Ubuntu Linux",
         "shortLabel": "Ubuntu",
-        "supported": "Ubuntu 14.04 LTS, 16.04 LTS,  LTS"
+        "supported": "Ubuntu 14.04 LTS, 16.04 LTS, LTS"
       },
       "macos": {
         "label": "Mac OS",
@@ -226,7 +226,7 @@
       "arm": {
         "label": "ARM",
         "shortLabel": "ARM",
-        "supported": "Ubuntu 14.04 LTS, 16.04 LTS,  LTS"
+        "supported": "Ubuntu 14.04 LTS, 16.04 LTS, LTS"
       }
     },
     "platforms": {

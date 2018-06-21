@@ -53,7 +53,7 @@
 
                 <div><span class="help-block" ng-if="registerForm.registerEmail.$touched && registerForm.registerEmail.$error.email">Adj meg egy érvényes Email-t</span></div>
 
-                <div><span class="help-block" ng-if="registerForm.registerEmail.$error.alreadyExists">This Email has been already registered in %PRODUCT_NAME%</span></div>
+                <div><span class="help-block" ng-if="registerForm.registerEmail.$error.alreadyExists">Ez az e-mail már regisztrálva van %PRODUCT_NAME%</span></div>
             </div>
         </div>
         <password-input ng-model="account.password" id="'registerPassword'" label="$root.L.regActions.passwordLabel"></password-input>

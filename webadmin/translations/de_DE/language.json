@@ -87,7 +87,7 @@
         "maxRecordQueueSizeBytes": "Maximale Größe der Warteschlange für Datensätze (Bytes)",
         "maxRecordQueueSizeElements": "Maximale Größe der Warteschlange für Datensätze (Elemente)",
         "maxRemoteArchiveSynchronizationThreads": "Max Remote-Archivsynchronisation-Threads",
-        "maxRtspConnectDurationSeconds": "Max RTSP-Verbindungsdauer in Sekunden",
+        "maxRtspConnectDurationSeconds": "Max Rtsp-Verbindungsdauer in Sekunden",
         "maxSceneItems": "Max Szenenelemente (0 bedeutet Standard)",
         "proxyConnectTimeoutSec": "Proxy Verbindungstimeout (Sekunden)",
         "rtpTimeoutMs": "RTP-Zeitüberschreitung (Millisekunden)",

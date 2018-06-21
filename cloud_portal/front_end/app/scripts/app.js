@@ -18,7 +18,6 @@ window.L = {};
             'ngCookies',
             'ngResource',
             'ngSanitize',
-            'ngAnimate',
             'ngRoute',
             'ngStorage',
             'base64',

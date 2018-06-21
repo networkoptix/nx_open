@@ -97,7 +97,7 @@
     },
     "custom": {
       "label": "Personnalisé",
-      "description": "Utiliser l'application client %PRODUCT_NAME% pour configurer des autorisations personnalisées"
+      "description": "Utiliser l'application client %VMS_NAME% pour configurer des autorisations personnalisées"
     }
   },
   "errorCodes": {

@@ -3,10 +3,10 @@
         <div class="modal-body">
             <div>
                 <p class="help-block-no-height">
-                    You can merge cloud Systems, where you are owner.
+                    Sie können Cloudsysteme zusammenführen, wenn Sie Besitzer sind.
                 </p>
                 <p class="help-block-no-height">
-                    Connect System you want to merge with this one to Nx Cloud or merge locally using Nx Witness Client.
+                    Verbinden Sie das System, das Sie mit diesem zusammenführen möchten, mit %PRODUCT_NAME% oder führen Sie eine lokale Zusammenführung mit %VMS_NAME% Client durch.
                 </p>
             </div>
         </div>
@@ -17,18 +17,18 @@
     <form ng-if="showMergeForm" name="mergeForm" novalidate>
         <div class="modal-body">
             <div class="form-group">
-                <label for="system">Merge current System with</label>
+                <label for="system">Aktuelles System zusammenführen mit</label>
                 <select class="form-control" name="targetSystem" id="system" ng-model="targetSystem"
                         ng-options="system as addStatus(system) for system in systems"></select>
             </div>
             <p ng-if="systemMergeable =='offline'"
-               class="help-block-no-height warning-label">System {{targetSystem.name}} is offline. Cannot be merged with the current one.</p>
+               class="help-block-no-height warning-label">System {{targetSystem.name}} ist offline. Kann nicht mit dem aktuellen zusammengeführt werden.</p>
             <p ng-if="systemMergeable =='cannotMerge'"
-               class="help-block-no-height warning-label">System {{targetSystem.name}} is incompatable. Cannot be merged with the current one.</p>
+               class="help-block-no-height warning-label">System {{targetSystem.name}} ist inkompatibel. Kann nicht mit dem aktuellen zusammengeführt werden.</p>
             <p ng-if="systemMergeable == ''"
-               class="help-block-no-height">You can only merge Systems in which you have owner permissions.</p>
+               class="help-block-no-height">Sie können nur Systeme zusammenführen, in denen Sie Besitzerberechtigungen haben.</p>
             <div>
-                <div ng-class="{'text-muted': systemStatus != ''}">Took system name and settings from</div>
+                <div ng-class="{'text-muted': systemStatus != ''}">Übernahme des Systemnamens und der Einstellungen von</div>
                 <div ng-init="$parent.masterSystemId=system.id">
                     <div>
                         <input type="radio" id="firstSystem" ng-model="$parent.masterSystemId" ng-value="system.id"

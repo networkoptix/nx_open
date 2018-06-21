@@ -97,7 +97,7 @@
     },
     "custom": {
       "label": "Aangepast",
-      "description": "Gebruik de %PRODUCT_NAME% client-applicatie om aangepaste rechten in te stellen"
+      "description": "Gebruik de %VMS_NAME% client-applicatie om aangepaste rechten in te stellen"
     }
   },
   "errorCodes": {
@@ -136,7 +136,7 @@
     "cantOpenClient": "%VMS_NAME% applicatie is niet gedetecteerd. <a href=\"/download\">Download</a>",
     "lostConnection": "Verbinding met {{systemName}} verloren",
     "thisSystem": "het systeem",
-    "oldSafariNotSupported": "Versions of Safari older than 10 are not supported"
+    "oldSafariNotSupported": "Versies van Safari ouder dan versie 10 worden niet ondersteund"
   },
   "passwordRequirements": {
     "minLengthMessage": "Het wachtwoord moet minstens 8 karakters bevatten",

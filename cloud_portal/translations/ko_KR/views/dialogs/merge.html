@@ -3,10 +3,10 @@
         <div class="modal-body">
             <div>
                 <p class="help-block-no-height">
-                    You can merge cloud Systems, where you are owner.
+                    소유자인 당신은 클라우드 시스템을 병합 할 수 있습니다.
                 </p>
                 <p class="help-block-no-height">
-                    Connect System you want to merge with this one to Nx Cloud or merge locally using Nx Witness Client.
+                    시스템에 연결하여 당신이 원하는 %PRODUCT_NAME% 클라우드나 로컬시시스템을 %VMS_NAME%클라이언트로 병합하세요.
                 </p>
             </div>
         </div>
@@ -17,18 +17,18 @@
     <form ng-if="showMergeForm" name="mergeForm" novalidate>
         <div class="modal-body">
             <div class="form-group">
-                <label for="system">Merge current System with</label>
+                <label for="system">현재 시스템으로 병합</label>
                 <select class="form-control" name="targetSystem" id="system" ng-model="targetSystem"
                         ng-options="system as addStatus(system) for system in systems"></select>
             </div>
             <p ng-if="systemMergeable =='offline'"
-               class="help-block-no-height warning-label">System {{targetSystem.name}} is offline. Cannot be merged with the current one.</p>
+               class="help-block-no-height warning-label">{{targetSystem.name}}이 연결해제 되었습니다. 현재 시스템과 ​​병합 할 수 없습니다.</p>
             <p ng-if="systemMergeable =='cannotMerge'"
-               class="help-block-no-height warning-label">System {{targetSystem.name}} is incompatable. Cannot be merged with the current one.</p>
+               class="help-block-no-height warning-label">{{targetSystem.name}}은 호환되지 않습니다. 현재 시스템과 ​​병합 할 수 없습니다.</p>
             <p ng-if="systemMergeable == ''"
-               class="help-block-no-height">You can only merge Systems in which you have owner permissions.</p>
+               class="help-block-no-height">소유자 권한이 있는 시스템 만 병합 할 수 있습니다.</p>
             <div>
-                <div ng-class="{'text-muted': systemStatus != ''}">Took system name and settings from</div>
+                <div ng-class="{'text-muted': systemStatus != ''}">시스템명 및 설정값 취득</div>
                 <div ng-init="$parent.masterSystemId=system.id">
                     <div>
                         <input type="radio" id="firstSystem" ng-model="$parent.masterSystemId" ng-value="system.id"

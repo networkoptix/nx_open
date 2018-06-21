@@ -17,7 +17,7 @@
         <li *ngIf="activeSystem" [ngClass]="{ 'active' :active.settings}">
             <a [href]="'/systems/' + activeSystem.id" translate>Settings</a>
         </li>
-        <li ng-if="activeSystem" [ngClass]="{ 'active' :active.view }">
+        <li *ngIf="activeSystem" [ngClass]="{ 'active' :active.view }">
             <a [href]="'/systems/' + activeSystem.id + '/view'" translate>View</a>
         </li>
     </ul>
