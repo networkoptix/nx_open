@@ -2,8 +2,10 @@ from abc import ABCMeta, abstractmethod, abstractproperty
 from datetime import datetime
 
 from netaddr import IPAddress
+from pathlib2 import PureWindowsPath
 
 from framework.networking.interface import Networking
+from framework.os_access.local_path import LocalPath
 from framework.os_access.path import FileSystemPath
 from framework.utils import RunningTime
 
@@ -112,3 +114,28 @@ class OSAccess(object):
     @abstractmethod
     def make_fake_disk(self, name, size_bytes):
         return self.Path()
+
+    def download(self, source_url, destination_dir):
+        if source_url.startswith('http://') or source_url.startswith('https://'):
+            return self._download_by_http(source_url, destination_dir)
+        if source_url.startswith('smb://'):
+            hostname, path_str = source_url[len('smb://'):].split('/', 1)
+            path = PureWindowsPath(path_str)
+            return self._download_by_smb(hostname, path, destination_dir)
+        if source_url.startswith('file://'):
+            local_path = LocalPath(source_url[len('file://'):])
+            return self._take_local(local_path, destination_dir)
+        raise NotImplementedError("Unknown scheme: {}".format(source_url))
+
+    @abstractmethod
+    def _download_by_http(self, source_url, destination_dir):
+        return self.Path()
+
+    @abstractmethod
+    def _download_by_smb(self, source_hostname, source_path, destination_dir):
+        return self.Path()
+
+    @abstractmethod
+    def _take_local(self, local_source_path, dir):
+        return self.Path()
+

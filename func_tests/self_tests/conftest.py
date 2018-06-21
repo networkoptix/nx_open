@@ -2,6 +2,7 @@ from contextlib import contextmanager
 
 import pytest
 
+from defaults import defaults
 from fixtures.vms import vm_types_configuration
 from framework.networking.linux import LinuxNetworking
 from framework.networking.windows import WindowsNetworking
@@ -10,6 +11,13 @@ from framework.os_access.windows_remoting import WinRM
 from framework.vms.factory import SSH_PRIVATE_KEY_PATH
 from framework.vms.hypervisor import obtain_running_vm
 from framework.waiting import wait_for_true
+
+
+def pytest_addoption(parser):
+    parser.addoption(
+        '--dummy-smb-url',
+        default=defaults.get('dummy_smb_url'),
+        help='Dummy smb:// url pointing to existing file.')
 
 
 # Windows and Linux fixtures are made separate because they're used to get WinRM or SSH

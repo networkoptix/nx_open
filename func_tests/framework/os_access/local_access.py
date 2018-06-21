@@ -37,5 +37,8 @@ class LocalAccess(PosixAccess):
     def set_time(self, new_time):
         raise NotImplementedError("Changing local time is prohibited")
 
+    def _take_local(self, local_source_path, dir):
+        return local_source_path
+
 
 local_access = LocalAccess()

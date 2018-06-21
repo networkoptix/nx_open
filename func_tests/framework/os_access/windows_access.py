@@ -130,3 +130,23 @@ class WindowsAccess(RemoteAccess):
 
     def make_fake_disk(self, name, size_bytes):
         raise NotImplementedError()
+
+    def _download_by_http(self, source_url, destination_dir):
+        _, file_name = source_url.rsplit('/', 1)
+        destination = destination_dir / file_name
+        variables = {'out': str(destination), 'url': source_url}
+        # language=PowerShell
+        self.winrm.run_powershell_script('Invoke-WebRequest -OutFile $out $url', variables)
+        return destination
+
+    def _download_by_smb(self, source_hostname, source_path, destination_dir):
+        raise NotImplementedError(
+            "Cannot download \\\\{!s}\\{!s}. ".format(source_hostname, source_path) +
+            "Downloading from SMB share is not yet supported for Windows remote machines. "
+            "There is second hop problem: connection to another machine via WinRM is not authorized. "
+            "What has been attempted (but, probably, incorrectly, without full understanding): "
+            "enabling CredSSP, specifying literal credentials in command itself. "
+            "No classes has been found to establish connection via WMI (although it's possible to open them). "
+            "What is to be attempted: Kerberos authentication. "
+            "To debug try `Invoke-Command` from another Windows machine. "
+            )

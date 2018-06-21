@@ -32,3 +32,27 @@ class PosixAccess(OSAccess):
                 ''',
             env={'MOUNT_POINT': mount_point, 'IMAGE': image_path, 'SIZE': size_bytes})
         return mount_point
+
+    def _download_by_http(self, source_url, destination_dir):
+        _, file_name = source_url.rsplit('/', 1)
+        destination = destination_dir / file_name
+        if not destination.exists():
+            self.shell.run_command([
+                'wget',
+                '--no-clobber', source_url,  # Don't overwrite file.
+                '--output-document', destination,
+                ])
+        return destination
+
+    def _download_by_smb(self, source_hostname, source_path, destination_dir):
+        url = 'smb://{!s}/{!s}'.format(source_hostname, '/'.join(source_path.parts))
+        destination = destination_dir / source_path.name
+        if not destination.exists():
+            # TODO: Decide on authentication based on username and password from URL.
+            self.shell.run_command([
+                'smbget',
+                '--guest',  # Force guest authentication.
+                '--outputfile', destination,
+                url,
+                ])
+        return destination

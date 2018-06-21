@@ -87,8 +87,8 @@ class _Command(object):
             self._shell_id, self._command_id)
         _logger.getChild('stdout.size').debug(len(stdout_chunk))
         if len(stdout_chunk) < 8192:
-            _logger.getChild('stdout.data').debug(stdout_chunk.decode(errors='backslashreplace'))
-        _logger.getChild('stderr.data').debug(stderr_chunk.decode(errors='backslashreplace'))
+            _logger.getChild('stdout.data').debug(stdout_chunk.decode(encoding='utf8', errors='backslashreplace'))
+        _logger.getChild('stderr.data').debug(stderr_chunk.decode(encoding='utf8', errors='backslashreplace'))
         if self.is_done:
             assert isinstance(exit_code, int)
             self.exit_code = exit_code
