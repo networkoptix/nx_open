@@ -15,7 +15,7 @@ public:
         ClientFeedbackFunction feedbackFunction);
 
     virtual void beginListening(
-        const nx::String& peerName,
+        const std::string& peerName,
         BeginListeningHandler completionHandler) override;
 
 private:

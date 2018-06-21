@@ -57,7 +57,7 @@ void Connector::connect(
         {
             m_relayClient->startSession(
                 m_connectSessionId,
-                m_targetHostAddress.host.toString().toUtf8(),
+                m_targetHostAddress.host.toStdString(),
                 [this](
                     nx::cloud::relay::api::ResultCode resultCode,
                     nx::cloud::relay::api::CreateClientSessionResponse response)
@@ -103,7 +103,7 @@ void Connector::onStartRelaySessionResponse(
             nullptr);
     }
 
-    m_connectSessionId = response.sessionId.c_str();
+    m_connectSessionId = response.sessionId;
 
     auto tunnelConnection = std::make_unique<OutgoingTunnelConnection>(
         nx::utils::Url(response.actualRelayUrl.c_str()),

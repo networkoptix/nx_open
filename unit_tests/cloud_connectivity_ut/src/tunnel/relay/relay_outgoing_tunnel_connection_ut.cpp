@@ -252,7 +252,7 @@ private:
 
         m_tunnelConnection = std::make_unique<relay::OutgoingTunnelConnection>(
             relayUrl,
-            nx::String(),
+            std::string(),
             std::move(clientToRelayConnection));
         m_tunnelConnection->bindToAioThread(m_aioThreadBinder.getAioThread());
         m_tunnelConnection->setControlConnectionClosedHandler(

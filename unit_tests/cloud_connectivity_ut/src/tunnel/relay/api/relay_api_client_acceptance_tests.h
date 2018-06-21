@@ -10,11 +10,7 @@
 #include <nx/utils/random.h>
 #include <nx/utils/thread/sync_queue.h>
 
-namespace nx {
-namespace cloud {
-namespace relay {
-namespace api {
-namespace test {
+namespace nx::cloud::relay::api::test {
 
 template<typename ClientTypeSet>
 class RelayApiClientAcceptance:
@@ -50,7 +46,8 @@ protected:
     void whenInvokedSomeRequest()
     {
         initializeHttpServerIfNeeded();
-        m_client = std::make_unique<ClientOverHttpUpgrade>(m_baseUrl, nullptr);
+        m_client = std::make_unique<typename ClientTypeSet::Client>(
+            m_baseUrl, nullptr);
 
         nx::utils::promise<void> done;
         m_client->startSession(
@@ -70,7 +67,8 @@ protected:
         using namespace std::placeholders;
 
         initializeHttpServerIfNeeded();
-        m_client = std::make_unique<ClientOverHttpUpgrade>(m_baseUrl, nullptr);
+        m_client = std::make_unique<typename ClientTypeSet::Client>(
+            m_baseUrl, nullptr);
 
         m_client->beginListening(
             ::testing::UnitTest::GetInstance()->current_test_info()->name(),
@@ -90,7 +88,7 @@ protected:
     void andBeginListeningResponseIsCorrect()
     {
         ASSERT_EQ(
-            m_clientTypeSet.expectedBeginListeningResponse(),
+            m_expectedBeginListeningResponse,
             m_prevBeginListeningResponse);
     }
 
@@ -103,11 +101,12 @@ protected:
 
 private:
     std::unique_ptr<nx::network::http::TestHttpServer> m_httpServer;
-    std::unique_ptr<ClientOverHttpUpgrade> m_client;
+    std::unique_ptr<typename ClientTypeSet::Client> m_client;
     nx::utils::Url m_baseUrl;
     ResultCode m_lastResultCode = ResultCode::unknownError;
     boost::optional<QAuthenticator> m_authenticator;
     nx::utils::SyncQueue<ResultCode> m_requestResultQueue;
+    BeginListeningResponse m_expectedBeginListeningResponse;
     BeginListeningResponse m_prevBeginListeningResponse;
     ClientTypeSet m_clientTypeSet;
 
@@ -131,12 +130,15 @@ private:
         if (baseUrlPath.isEmpty())
             baseUrlPath = "/";
 
+        prepareBeginListeningResponse();
+
         m_httpServer = std::make_unique<nx::network::http::TestHttpServer>();
 
         m_clientTypeSet.initializeHttpServer(
             m_httpServer.get(),
             baseUrlPath.toStdString(),
             "some_server_name");
+        m_clientTypeSet.setBeginListeningResponse(m_expectedBeginListeningResponse);
 
         ASSERT_TRUE(m_httpServer->bindAndListen());
         m_baseUrl = nx::utils::Url(lm("http://%1/%2")
@@ -150,6 +152,22 @@ private:
                 m_authenticator->password().toUtf8());
             m_baseUrl.setUserName(m_authenticator->user());
             m_baseUrl.setPassword(m_authenticator->password());
+        }
+    }
+
+    void prepareBeginListeningResponse()
+    {
+        m_expectedBeginListeningResponse.preemptiveConnectionCount =
+            nx::utils::random::number<int>(1, 99);
+        if (nx::utils::random::number<int>(0, 1) > 0)
+        {
+            m_expectedBeginListeningResponse.keepAliveOptions = nx::network::KeepAliveOptions();
+            m_expectedBeginListeningResponse.keepAliveOptions->probeCount =
+                nx::utils::random::number<int>(1, 99);
+            m_expectedBeginListeningResponse.keepAliveOptions->inactivityPeriodBeforeFirstProbe =
+                std::chrono::seconds(nx::utils::random::number<int>(1, 99));
+            m_expectedBeginListeningResponse.keepAliveOptions->probeSendPeriod =
+                std::chrono::seconds(nx::utils::random::number<int>(1, 99));
         }
     }
 };
@@ -210,8 +228,4 @@ REGISTER_TYPED_TEST_CASE_P(RelayApiClientAcceptance,
     uses_authentication,
     begin_listening_response_delivered_properly);
 
-} // namespace test
-} // namespace api
-} // namespace relay
-} // namespace cloud
-} // namespace nx
+} // namespace nx::cloud::relay::api::test

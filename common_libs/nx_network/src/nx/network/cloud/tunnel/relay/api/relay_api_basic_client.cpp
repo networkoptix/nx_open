@@ -28,15 +28,15 @@ void BasicClient::bindToAioThread(
 }
 
 void BasicClient::startSession(
-    const nx::String& desiredSessionId,
-    const nx::String& targetPeerName,
+    const std::string& desiredSessionId,
+    const std::string& targetPeerName,
     StartClientConnectSessionHandler completionHandler)
 {
     using namespace std::placeholders;
 
     CreateClientSessionRequest request;
-    request.desiredSessionId = desiredSessionId.toStdString();
-    request.targetPeerName = targetPeerName.toStdString();
+    request.desiredSessionId = desiredSessionId;
+    request.targetPeerName = targetPeerName;
 
     const auto requestPath = nx::network::http::rest::substituteParameters(
         kServerClientSessionsPath, { targetPeerName });
