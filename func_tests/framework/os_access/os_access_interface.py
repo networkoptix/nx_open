@@ -108,3 +108,7 @@ class OSAccess(object):
     @abstractmethod
     def make_core_dump(self, pid):
         pass
+
+    @abstractmethod
+    def make_fake_disk(self, name, size_bytes):
+        return self.Path()

@@ -24,6 +24,7 @@
 #include <database/migrations/add_default_webpages_migration.h>
 #include <database/migrations/cleanup_removed_transactions.h>
 #include <database/migrations/access_rights_db_migration.h>
+#include <database/migrations/ptz_rotation_migration.h>
 #include <database/migrations/camera_user_attributes_migration.h>
 #include <network/system_helpers.h>
 #include <settings.h>
@@ -1864,6 +1865,9 @@ bool QnDbManager::afterInstallUpdate(const QString& updateName)
 
     if (updateName.endsWith(lit("/99_20180122_remove_secondary_stream_quality.sql")))
         return resyncIfNeeded(ResyncCameraAttributes);
+
+    if (updateName.endsWith(lit("/99_20180605_add_rotation_to_presets.sql")))
+        return ec2::migration::ptz::addRotationToPresets(m_sdb);
 
     if (updateName.endsWith("99_20180329_02_add_record_thresholds_camera_attributes.sql"))
     {

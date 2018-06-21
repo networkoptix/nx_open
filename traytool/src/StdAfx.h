@@ -1,5 +1,3 @@
-#define QT_NO_CAST_FROM_ASCII
-
 /* Windows headers. */
 #ifdef _WIN32
 #   include <winsock2.h>

@@ -2364,7 +2364,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Helps fix image quality issues on some cameras; for others will cause significant bitrate increase.</source>
-      <translation>有助於修正一些攝影機的圖像質量問題 ; 但對於其他攝影機會導致明顯增加的位元速率。</translation>
+      <translation>有助於修正一些攝影機的圖像質量問題; 但對於其他攝影機會導致明顯增加的位元速率。</translation>
     </message>
     <message>
       <source>Custom number that can be assigned to a camera for quick identification and access</source>
@@ -2861,7 +2861,7 @@ to %1</source>
     <message>
       <source>Please log in to %1 and follow the provided instructions.</source>
       <comment>%1 is a cloud site name like &quot;Nx Cloud&quot;</comment>
-      <translation>請登入到 %1 , 並依照提供的指示進行操作。</translation>
+      <translation>請登入到 %1, 並依照提供的指示進行操作。</translation>
     </message>
     <message>
       <source>Invalid password</source>

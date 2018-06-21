@@ -112,6 +112,9 @@ class QnMediaServerModule : public QObject,
 
     nx::mediaserver::RootTool* rootTool() const;
 
+    QnStorageManager* normalStorageManager() const;
+    QnStorageManager* backupStorageManager() const;
+
   private:
     void registerResourceDataProviders();
     QDir downloadsDirectory() const;

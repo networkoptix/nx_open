@@ -12,8 +12,10 @@ public:
 
     static bool extends(Ptz::Capabilities capabilities);
 
-    virtual Ptz::Capabilities getCapabilities() const override;
-    virtual bool continuousMove(const QVector3D &speed) override;
+    virtual Ptz::Capabilities getCapabilities(const nx::core::ptz::Options& options) const override;
+    virtual bool continuousMove(
+        const nx::core::ptz::Vector& speed,
+        const nx::core::ptz::Options& options) override;
 
 private:
     bool m_overrideContinuousMove;

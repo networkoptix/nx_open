@@ -31,6 +31,16 @@ TEST(ManualFileData, ConversionFromFileName)
         ManualFileData::fromFileName("nxwitness-client_update-3.1.0.16975-mac.zip"),
         "nxwitness-client_update-3.1.0.16975-mac.zip", macosx(), QnSoftwareVersion("3.1.0.16975"),
         true);
+
+    assertData(
+        ManualFileData::fromFileName("nxwitness-client_update-4.0.0.982-linux64-beta-test.zip"),
+        "nxwitness-client_update-4.0.0.982-linux64-beta-test.zip", ubuntuX64(), QnSoftwareVersion("4.0.0.982"),
+        true);
+
+    assertData(
+        ManualFileData::fromFileName("nxwitness-server_update-4.0.0.982-win64-beta-test.zip"),
+        "nxwitness-server_update-4.0.0.982-win64-beta-test.zip", windowsX64(), QnSoftwareVersion("4.0.0.982"),
+        false);
 }
 
 } // namespace test

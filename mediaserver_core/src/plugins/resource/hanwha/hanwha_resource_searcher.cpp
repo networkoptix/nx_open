@@ -43,7 +43,7 @@ HanwhaResult<HanwhaInformation> HanwhaResourceSearcher::cachedDeviceInfo(const Q
     const auto context = qnServerModule->sharedContextPool()
         ->sharedContext<HanwhaSharedResourceContext>(sharedId);
 
-    context->setRecourceAccess(url, auth);
+    context->setResourceAccess(url, auth);
     return context->information();
 }
 

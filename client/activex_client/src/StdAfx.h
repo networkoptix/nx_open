@@ -1,5 +1,3 @@
-#undef QT_NO_CAST_FROM_ASCII
-
 #define BLIB_EXPORT
 
 /* Windows headers. */

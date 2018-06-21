@@ -27,12 +27,12 @@ public:
 
     void setBookmarks(const QnCameraBookmarkList &bookmarks);
 
-    QnTimelineBookmarkItemList bookmarks(qint64 msecsPerDp = 0) const;
+    QnTimelineBookmarkItemList bookmarks(milliseconds msecsPerDp = milliseconds(0)) const;
 
     //** Find the topmost (or nearest) item at the given position from the provided list. */
     static int indexAtPosition(const QnTimelineBookmarkItemList& bookmarks,
         milliseconds timeMs,
-        int msecsPerDp = 0,
+        milliseconds msecsPerDp = milliseconds(0),
         BookmarkSearchOptions options = OnlyTopmost);
 
     QnCameraBookmarkList bookmarksAtPosition(milliseconds timeMs,

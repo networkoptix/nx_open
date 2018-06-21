@@ -1,7 +1,3 @@
-////////////////////////////////////////////////////////////
-// 21 dec 2012    Andrey Kolesnikov
-////////////////////////////////////////////////////////////
-
 #include "streaming_chunk_provider.h"
 
 #include <memory>
@@ -36,7 +32,8 @@ bool StreamingChunkProvider::get(
     if( !m_transcoder->transcodeAsync( key, newChunk ) )
         return false;
 
-    //NOTE at this time chunk size in bytes is unknown, since transcoding is about to be started
+    // NOTE: At this time chunk size in bytes is unknown,
+    // since transcoding is about to be started.
     *itemCost = duration_cast<seconds>(key.duration()).count();
     *chunk = newChunk;
     return true;

@@ -1,7 +1,3 @@
-////////////////////////////////////////////////////////////
-// 21 dec 2012    Andrey Kolesnikov
-////////////////////////////////////////////////////////////
-
 #include "streaming_chunk_cache_key.h"
 
 #include <QHash>
@@ -9,22 +5,13 @@
 
 #include "streaming_params.h"
 
-
-StreamingChunkCacheKey::StreamingChunkCacheKey()
-:
-    m_channel( 0 ),
-    m_startTimestamp( 0 ),
-    m_duration( 0 )
+StreamingChunkCacheKey::StreamingChunkCacheKey():
+    m_channel(0),
+    m_startTimestamp(0),
+    m_duration(0)
 {
 }
 
-/*!
-    \param channel channel number or -1 for all channels
-    \param containerFormat E.g., ts for mpeg2/ts
-    \param startTimestamp
-    \param endTimestamp
-    \param auxiliaryParams
-*/
 StreamingChunkCacheKey::StreamingChunkCacheKey(
     const QString& uniqueResourceID,
     int channel,
@@ -33,44 +20,43 @@ StreamingChunkCacheKey::StreamingChunkCacheKey(
     quint64 startTimestamp,
     std::chrono::microseconds duration,
     MediaQuality streamQuality,
-    const std::multimap<QString, QString>& auxiliaryParams )
-:
-    m_uniqueResourceID( uniqueResourceID ),
-    m_channel( channel ),
-    m_containerFormat( containerFormat ),
-    m_alias( alias ),
-    m_startTimestamp( startTimestamp ),
-    m_duration( duration ),
-    m_streamQuality( streamQuality ),
-    m_isLive( false ),
-    m_auxiliaryParams( auxiliaryParams )
+    const std::multimap<QString, QString>& auxiliaryParams)
+    :
+    m_uniqueResourceID(uniqueResourceID),
+    m_channel(channel),
+    m_containerFormat(containerFormat),
+    m_alias(alias),
+    m_startTimestamp(startTimestamp),
+    m_duration(duration),
+    m_streamQuality(streamQuality),
+    m_isLive(false),
+    m_auxiliaryParams(auxiliaryParams)
 {
-    NX_ASSERT( !containerFormat.isEmpty() );
+    NX_ASSERT(!containerFormat.isEmpty());
 
-    std::multimap<QString, QString>::const_iterator it = auxiliaryParams.find( StreamingParams::VIDEO_CODEC_PARAM_NAME );
-    if( it != auxiliaryParams.end() )
+    std::multimap<QString, QString>::const_iterator it = auxiliaryParams.find(StreamingParams::VIDEO_CODEC_PARAM_NAME);
+    if (it != auxiliaryParams.end())
         m_videoCodec = it->second;
 
-    it = auxiliaryParams.find( StreamingParams::PICTURE_SIZE_PIXELS_PARAM_NAME );
-    if( it != auxiliaryParams.end() )
+    it = auxiliaryParams.find(StreamingParams::PICTURE_SIZE_PIXELS_PARAM_NAME);
+    if (it != auxiliaryParams.end())
     {
         //1920x1080
         const QStringList& sizesStr = it->second.split(QChar('x'));
         m_pictureSizePixels = QSize(
             sizesStr.size() > 0 ? sizesStr[0].toInt() : 0,
-            sizesStr.size() > 1 ? sizesStr[1].toInt() : 0 );
+            sizesStr.size() > 1 ? sizesStr[1].toInt() : 0);
     }
 
-    it = auxiliaryParams.find( StreamingParams::LIVE_PARAM_NAME );
+    it = auxiliaryParams.find(StreamingParams::LIVE_PARAM_NAME);
     m_isLive = it != auxiliaryParams.end();
 }
 
-StreamingChunkCacheKey::StreamingChunkCacheKey( const QString& uniqueResourceID )
-:
-    m_uniqueResourceID( uniqueResourceID ),
-    m_channel( 0 ),
-    m_startTimestamp( 0 ),
-    m_duration( 0 )
+StreamingChunkCacheKey::StreamingChunkCacheKey(const QString& uniqueResourceID):
+    m_uniqueResourceID(uniqueResourceID),
+    m_channel(0),
+    m_startTimestamp(0),
+    m_duration(0)
 {
 }
 
@@ -100,7 +86,6 @@ std::chrono::microseconds StreamingChunkCacheKey::duration() const
     return m_duration;
 }
 
-//!startTimestamp() + duration
 quint64 StreamingChunkCacheKey::endTimestamp() const
 {
     return m_startTimestamp + m_duration.count();
@@ -111,13 +96,11 @@ MediaQuality StreamingChunkCacheKey::streamQuality() const
     return m_streamQuality;
 }
 
-//!Video resolution
 const QSize& StreamingChunkCacheKey::pictureSizePixels() const
 {
     return m_pictureSizePixels;
 }
 
-//media format (codec format, container format)
 const QString& StreamingChunkCacheKey::containerFormat() const
 {
     return m_containerFormat;
@@ -151,18 +134,20 @@ QString StreamingChunkCacheKey::streamingSessionId() const
     return QString();
 }
 
-bool StreamingChunkCacheKey::mediaStreamParamsEqualTo(const StreamingChunkCacheKey& right) const
+bool StreamingChunkCacheKey::mediaStreamParamsEqualTo(
+    const StreamingChunkCacheKey& right) const
 {
     return srcResourceUniqueID() == right.srcResourceUniqueID() &&
-           channel() == right.channel() &&
-           streamQuality() == right.streamQuality() &&
-           pictureSizePixels() == right.pictureSizePixels() &&
-           containerFormat() == right.containerFormat() &&
-           videoCodec() == right.videoCodec() &&
-           audioCodecId() == right.audioCodecId();
+        channel() == right.channel() &&
+        streamQuality() == right.streamQuality() &&
+        pictureSizePixels() == right.pictureSizePixels() &&
+        containerFormat() == right.containerFormat() &&
+        videoCodec() == right.videoCodec() &&
+        audioCodecId() == right.audioCodecId();
 }
 
-bool StreamingChunkCacheKey::operator<(const StreamingChunkCacheKey& right) const
+bool StreamingChunkCacheKey::operator<(
+    const StreamingChunkCacheKey& right) const
 {
     if (m_uniqueResourceID != right.m_uniqueResourceID)
         return m_uniqueResourceID < right.m_uniqueResourceID;
@@ -200,12 +185,12 @@ bool StreamingChunkCacheKey::operator<(const StreamingChunkCacheKey& right) cons
     return false;
 }
 
-bool StreamingChunkCacheKey::operator>( const StreamingChunkCacheKey& right ) const
+bool StreamingChunkCacheKey::operator>(const StreamingChunkCacheKey& right) const
 {
     return right < *this;
 }
 
-bool StreamingChunkCacheKey::operator==( const StreamingChunkCacheKey& right ) const
+bool StreamingChunkCacheKey::operator==(const StreamingChunkCacheKey& right) const
 {
     return (m_uniqueResourceID == right.m_uniqueResourceID)
         && (m_channel == right.m_channel)
@@ -214,15 +199,14 @@ bool StreamingChunkCacheKey::operator==( const StreamingChunkCacheKey& right ) c
         && (m_startTimestamp == right.m_startTimestamp)
         && (m_duration == right.m_duration)
         && (m_streamQuality == right.m_streamQuality);
-        //&& (m_auxiliaryParams == right.m_auxiliaryParams);
 }
 
-bool StreamingChunkCacheKey::operator!=( const StreamingChunkCacheKey& right ) const
+bool StreamingChunkCacheKey::operator!=(const StreamingChunkCacheKey& right) const
 {
     return !(*this == right);
 }
 
-uint qHash( const StreamingChunkCacheKey& key )
+uint qHash(const StreamingChunkCacheKey& key)
 {
     return qHash(key.srcResourceUniqueID())
         + key.channel()

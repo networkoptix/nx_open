@@ -188,6 +188,8 @@ void TimeSyncManager::setSyncTimeInternal(std::chrono::milliseconds value)
 std::chrono::milliseconds TimeSyncManager::getSyncTime() const
 {
     QnMutexLocker lock(&m_mutex);
+    if (m_synchronizedTime == std::chrono::milliseconds::zero())
+        return m_systemClock->millisSinceEpoch(); //< Network sync is not initialized yet.
 
     auto elapsed = m_steadyClock->now() - m_synchronizedOnClock;
     return m_synchronizedTime + elapsed;

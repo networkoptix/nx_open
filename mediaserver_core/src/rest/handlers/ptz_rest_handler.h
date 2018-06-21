@@ -25,32 +25,116 @@ public:
 private:
     typedef std::function<int()> AsyncFunc;
 
-    int executeContinuousMove(const QnPtzControllerPtr& controller, const QnRequestParams& params, QnJsonRestResult& result);
-    int executeContinuousFocus(const QnPtzControllerPtr& controller, const QnRequestParams& params, QnJsonRestResult& result);
-    int executeAbsoluteMove(const QnPtzControllerPtr& controller, const QnRequestParams& params, QnJsonRestResult& result);
-    int executeViewportMove(const QnPtzControllerPtr& controller, const QnRequestParams& params, QnJsonRestResult& result);
+    int executeContinuousMove(
+        const QnPtzControllerPtr& controller,
+        const QnRequestParams& params,
+        QnJsonRestResult& result);
 
-    int executeGetPosition(const QnPtzControllerPtr& controller, const QnRequestParams& params, QnJsonRestResult& result);
+    int executeContinuousFocus(
+        const QnPtzControllerPtr& controller,
+        const QnRequestParams& params,
+        QnJsonRestResult& result);
 
-    int executeCreatePreset(const QnPtzControllerPtr& controller, const QnRequestParams& params, QnJsonRestResult& result);
-    int executeUpdatePreset(const QnPtzControllerPtr& controller, const QnRequestParams& params, QnJsonRestResult& result);
-    int executeRemovePreset(const QnPtzControllerPtr& controller, const QnRequestParams& params, QnJsonRestResult& result);
-    int executeActivatePreset(const QnPtzControllerPtr& controller, const QnRequestParams& params, QnJsonRestResult& result);
-    int executeGetPresets(const QnPtzControllerPtr& controller, const QnRequestParams& params, QnJsonRestResult& result);
+    int executeAbsoluteMove(
+        const QnPtzControllerPtr& controller,
+        const QnRequestParams& params,
+        QnJsonRestResult& result);
 
-    int executeCreateTour(const QnPtzControllerPtr& controller, const QnRequestParams& params, const QByteArray& body, QnJsonRestResult& result);
-    int executeRemoveTour(const QnPtzControllerPtr& controller, const QnRequestParams& params, QnJsonRestResult& result);
-    int executeActivateTour(const QnPtzControllerPtr& controller, const QnRequestParams& params, QnJsonRestResult& result);
-    int executeGetTours(const QnPtzControllerPtr& controller, const QnRequestParams& params, QnJsonRestResult& result);
+    int executeViewportMove(
+        const QnPtzControllerPtr& controller,
+        const QnRequestParams& params,
+        QnJsonRestResult& result);
 
-    int executeGetActiveObject(const QnPtzControllerPtr& controller, const QnRequestParams& params, QnJsonRestResult& result);
-    int executeUpdateHomeObject(const QnPtzControllerPtr& controller, const QnRequestParams& params, QnJsonRestResult& result);
-    int executeGetHomeObject(const QnPtzControllerPtr& controller, const QnRequestParams& params, QnJsonRestResult& result);
+    int executeRelativeMove(
+        const QnPtzControllerPtr& controller,
+        const QnRequestParams& params,
+        QnJsonRestResult& result);
 
-    int executeGetAuxilaryTraits(const QnPtzControllerPtr& controller, const QnRequestParams& params, QnJsonRestResult& result);
-    int executeRunAuxilaryCommand(const QnPtzControllerPtr& controller, const QnRequestParams& params, QnJsonRestResult& result);
+    int executeRelativeFocus(
+        const QnPtzControllerPtr& controller,
+        const QnRequestParams& params,
+        QnJsonRestResult& result);
 
-    int executeGetData(const QnPtzControllerPtr& controller, const QnRequestParams& params, QnJsonRestResult& result);
+    int executeGetPosition(
+        const QnPtzControllerPtr& controller,
+        const QnRequestParams& params,
+        QnJsonRestResult& result);
+
+    int executeCreatePreset(
+        const QnPtzControllerPtr& controller,
+        const QnRequestParams& params,
+        QnJsonRestResult& result);
+
+    int executeUpdatePreset(
+        const QnPtzControllerPtr& controller,
+        const QnRequestParams& params,
+        QnJsonRestResult& result);
+
+    int executeRemovePreset(
+        const QnPtzControllerPtr& controller,
+        const QnRequestParams& params,
+        QnJsonRestResult& result);
+
+    int executeActivatePreset(
+        const QnPtzControllerPtr& controller,
+        const QnRequestParams& params,
+        QnJsonRestResult& result);
+
+    int executeGetPresets(
+        const QnPtzControllerPtr& controller,
+        const QnRequestParams& params,
+        QnJsonRestResult& result);
+
+    int executeCreateTour(
+        const QnPtzControllerPtr& controller,
+        const QnRequestParams& params,
+        const QByteArray& body,
+        QnJsonRestResult& result);
+
+    int executeRemoveTour(
+        const QnPtzControllerPtr& controller,
+        const QnRequestParams& params,
+        QnJsonRestResult& result);
+
+    int executeActivateTour(
+        const QnPtzControllerPtr& controller,
+        const QnRequestParams& params,
+        QnJsonRestResult& result);
+
+    int executeGetTours(
+        const QnPtzControllerPtr& controller,
+        const QnRequestParams& params,
+        QnJsonRestResult& result);
+
+    int executeGetActiveObject(
+        const QnPtzControllerPtr& controller,
+        const QnRequestParams& params,
+        QnJsonRestResult& result);
+
+    int executeUpdateHomeObject(
+        const QnPtzControllerPtr& controller,
+        const QnRequestParams& params,
+        QnJsonRestResult& result);
+
+    int executeGetHomeObject(
+        const QnPtzControllerPtr& controller,
+        const QnRequestParams& params,
+        QnJsonRestResult& result);
+
+    int executeGetAuxilaryTraits(
+        const QnPtzControllerPtr& controller,
+        const QnRequestParams& params,
+        QnJsonRestResult& result);
+
+    int executeRunAuxilaryCommand(
+        const QnPtzControllerPtr& controller,
+        const QnRequestParams& params,
+        QnJsonRestResult& result);
+
+    int executeGetData(
+        const QnPtzControllerPtr& controller,
+        const QnRequestParams& params,
+        QnJsonRestResult& result);
 
     bool checkSequence(const QString& id, int sequence);
     void cleanupOldSequence();

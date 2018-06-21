@@ -35,21 +35,27 @@ bool QnViewportPtzController::extends(Ptz::Capabilities capabilities) {
         && !capabilities.testFlag(Ptz::ViewportPtzCapability);
 }
 
-Ptz::Capabilities QnViewportPtzController::getCapabilities() const
+Ptz::Capabilities QnViewportPtzController::getCapabilities(
+    const nx::core::ptz::Options& options) const
 {
-    Ptz::Capabilities capabilities = base_type::getCapabilities();
+    Ptz::Capabilities capabilities = base_type::getCapabilities(options);
     return extends(capabilities) ? (capabilities | Ptz::ViewportPtzCapability) : capabilities;
 }
 
-bool QnViewportPtzController::viewportMove(qreal aspectRatio, const QRectF &viewport, qreal speed) {
-    QVector3D oldPosition;
-    if(!getPosition(Qn::LogicalPtzCoordinateSpace, &oldPosition))
+bool QnViewportPtzController::viewportMove(
+    qreal aspectRatio,
+    const QRectF& viewport,
+    qreal speed,
+    const nx::core::ptz::Options& options)
+{
+    nx::core::ptz::Vector oldPosition;
+    if(!getPosition(Qn::LogicalPtzCoordinateSpace, &oldPosition, options))
         return false;
 
     /* Note that we don't care about getLimits result as default-constructed
      * limits is actually 'no limits'. */
     QnPtzLimits limits;
-    getLimits(Qn::LogicalPtzCoordinateSpace, &limits);
+    getLimits(Qn::LogicalPtzCoordinateSpace, &limits, options);
 
     /* This is hacky. In theory projection should be a part of controller's interface. */
     Projection projection = Projection::Rectilinear;
@@ -58,7 +64,7 @@ bool QnViewportPtzController::viewportMove(qreal aspectRatio, const QRectF &view
 
     /* Same here, we don't care about getFlip result. */
     Qt::Orientations flip = 0;
-    getFlip(&flip);
+    getFlip(&flip, options);
 
     /* Passed viewport should be square, but who knows... */
     float zoom = 1.0 / qMax(viewport.width(), viewport.height()); /* For 2x zoom we'll get 2.0 here. */
@@ -86,11 +92,11 @@ bool QnViewportPtzController::viewportMove(qreal aspectRatio, const QRectF &view
          *      fov
          *     angle
          */
-        float unit = std::tan(qDegreesToRadians(oldPosition.z()) / 2.0) * 2.0;
+        float unit = std::tan(qDegreesToRadians(oldPosition.zoom) / 2.0) * 2.0;
 
-        QVector3D r = sphericalToCartesian<QVector3D>(1.0, qDegreesToRadians(oldPosition.x()), qDegreesToRadians(oldPosition.y()));
-        QVector3D x = sphericalToCartesian<QVector3D>(1.0, qDegreesToRadians(oldPosition.x() + 90 + (flip & Qt::Horizontal ? 180 : 0)), 0.0) * unit;
-        QVector3D y = sphericalToCartesian<QVector3D>(1.0, qDegreesToRadians(oldPosition.x()), qDegreesToRadians(oldPosition.y() - 90 + (flip & Qt::Vertical ? 180 : 0))) * unit;
+        QVector3D r = sphericalToCartesian<QVector3D>(1.0, qDegreesToRadians(oldPosition.pan), qDegreesToRadians(oldPosition.tilt));
+        QVector3D x = sphericalToCartesian<QVector3D>(1.0, qDegreesToRadians(oldPosition.pan + 90 + (flip & Qt::Horizontal ? 180 : 0)), 0.0) * unit;
+        QVector3D y = sphericalToCartesian<QVector3D>(1.0, qDegreesToRadians(oldPosition.pan), qDegreesToRadians(oldPosition.tilt - 90 + (flip & Qt::Vertical ? 180 : 0))) * unit;
 
         /* Calculate new position in spherical coordinates. */
         QVector3D r1 = r + x * delta.x() + y * delta.y();
@@ -100,18 +106,20 @@ bool QnViewportPtzController::viewportMove(qreal aspectRatio, const QRectF &view
         float newFov = qRadiansToDegrees(std::atan((unit / 2.0) / zoom)) * 2.0;
         float newPan = qRadiansToDegrees(newSpherical.phi);
         float newTilt = qRadiansToDegrees(newSpherical.psi);
-        QVector3D newPosition = qBound(QVector3D(newPan, newTilt, newFov), limits);
+        nx::core::ptz::Vector newPosition
+            = nx::core::ptz::Vector(newPan, newTilt, 0.0, newFov);
 
         /* Send it to the camera. */
-        return absoluteMove(Qn::LogicalPtzCoordinateSpace, newPosition, speed);
+        return absoluteMove(Qn::LogicalPtzCoordinateSpace, newPosition, speed, options);
     } else {
         /* Calculate new position. */
-        float newPan = oldPosition.x() + oldPosition.z() * delta.x();
-        float newTilt = oldPosition.y() - oldPosition.z() * delta.y();
-        float newFov = oldPosition.z() / zoom;
-        QVector3D newPosition = qBound(QVector3D(newPan, newTilt, newFov), limits);
+        float newPan = oldPosition.pan + oldPosition.zoom * delta.x();
+        float newTilt = oldPosition.tilt - oldPosition.zoom * delta.y();
+        float newFov = oldPosition.zoom / zoom;
+        nx::core::ptz::Vector newPosition = qBound(
+            nx::core::ptz::Vector(newPan, newTilt, 0.0, newFov), limits);
 
         /* Send it to the camera. */
-        return absoluteMove(Qn::LogicalPtzCoordinateSpace, newPosition, speed);
+        return absoluteMove(Qn::LogicalPtzCoordinateSpace, newPosition, speed, options);
     }
 }

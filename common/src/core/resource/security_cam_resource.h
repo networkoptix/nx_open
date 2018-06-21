@@ -234,7 +234,7 @@ public:
     void addStatusFlags(Qn::CameraStatusFlag value);
     void removeStatusFlags(Qn::CameraStatusFlag value);
 
-    bool needCheckIpConflicts() const;
+    virtual bool needCheckIpConflicts() const;
 
     void setMaxDays(int value);
     int maxDays() const;

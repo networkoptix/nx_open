@@ -2841,8 +2841,9 @@ void QnTimeSlider::drawBookmarks(QPainter* painter, const QRectF& rect)
     if (!m_bookmarksVisible)
         return;
 
-    QnTimelineBookmarkItemList bookmarks =
-        m_bookmarksHelper ? m_bookmarksHelper->bookmarks(m_msecsPerPixel) : QnTimelineBookmarkItemList();
+    QnTimelineBookmarkItemList bookmarks = m_bookmarksHelper
+        ? m_bookmarksHelper->bookmarks(milliseconds(qint64(m_msecsPerPixel)))
+        : QnTimelineBookmarkItemList();
     if (bookmarks.isEmpty())
         return;
 
@@ -2859,8 +2860,7 @@ void QnTimeSlider::drawBookmarks(QPainter* painter, const QRectF& rect)
     milliseconds hoverValueMs = timeFromPosition(m_hoverMousePos, false);
 
     int hoveredBookmarkItem = QnBookmarkMergeHelper::indexAtPosition(bookmarks,
-        hoverValueMs,
-        m_msecsPerPixel,
+        hoverValueMs, milliseconds(qint64(m_msecsPerPixel)),
         QnBookmarkMergeHelper::OnlyTopmost | QnBookmarkMergeHelper::ExpandArea);
 
     /* Draw bookmarks: */
@@ -2868,13 +2868,12 @@ void QnTimeSlider::drawBookmarks(QPainter* painter, const QRectF& rect)
     {
         const QnTimelineBookmarkItem& bookmarkItem = bookmarks[i];
 
-        if (bookmarkItem.startTimeMs() >= m_windowEnd.count()
-            || bookmarkItem.endTimeMs() <= m_windowStart.count())
-                continue;
+        if (bookmarkItem.startTimeMs() >= m_windowEnd || bookmarkItem.endTimeMs() <= m_windowStart)
+            continue;
 
         QRectF bookmarkRect = rect;
-        bookmarkRect.setLeft(quickPositionFromTime(qMax(milliseconds(bookmarkItem.startTimeMs()), m_windowStart)));
-        bookmarkRect.setRight(quickPositionFromTime(qMin(milliseconds(bookmarkItem.endTimeMs()), m_windowEnd)));
+        bookmarkRect.setLeft(quickPositionFromTime(qMax(bookmarkItem.startTimeMs(), m_windowStart)));
+        bookmarkRect.setRight(quickPositionFromTime(qMin(bookmarkItem.endTimeMs(), m_windowEnd)));
 
         bool hovered = i == hoveredBookmarkItem;
         const QColor& pastBg = hovered ? m_colors.pastBookmarkHover : m_colors.pastBookmark;

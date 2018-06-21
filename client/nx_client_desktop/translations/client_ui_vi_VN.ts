@@ -715,7 +715,7 @@
     <message>
       <location/>
       <source>It will increase bitrate for camera.</source>
-      <translation>Nó sẽ tăng bitrate cho camera</translation>
+      <translation>Nó sẽ tăng bitrate cho camera.</translation>
     </message>
     <message>
       <location/>
@@ -1098,7 +1098,7 @@
     <message>
       <location/>
       <source>Rotation, Dewarping, Image Enhancement etc.</source>
-      <translation>Rotation, Dewarping, Image Enhancement vv</translation>
+      <translation>Rotation, Dewarping, Image Enhancement vv.</translation>
     </message>
     <message>
       <location/>

@@ -1,6 +1,7 @@
 #ifndef NX_CAMERA_PLUGIN_H
 #define NX_CAMERA_PLUGIN_H
 
+#include <cstring>
 #include <stdint.h>
 
 #include "camera_plugin_types.h"
@@ -59,6 +60,9 @@ namespace nxcip
     // {0D06134F-16D0-41c8-9752-A33E81FE9C75}
     static const nxpl::NX_GUID IID_CameraDiscoveryManager = { { 0x0d, 0x06, 0x13, 0x4f, 0x16, 0xd0, 0x41, 0xc8, 0x97, 0x52, 0xa3, 0x3e, 0x81, 0xfe, 0x9c, 0x75 } };
 
+    // {0D06134F-16D0-41c8-9752-A33E81FE9C74}
+    static const nxpl::NX_GUID IID_CameraDiscoveryManager2 = { { 0x0d, 0x06, 0x13, 0x4f, 0x16, 0xd0, 0x41, 0xc8, 0x97, 0x52, 0xa3, 0x3e, 0x81, 0xfe, 0x9c, 0x74 } };
+
     //!Contains base camera information
     struct CameraInfo
     {
@@ -88,6 +92,43 @@ namespace nxcip
             defaultLogin[0] = 0;
             defaultPassword[0] = 0;
         }
+
+        CameraInfo(const CameraInfo& value)
+        {
+            strncpy(modelName, value.modelName, sizeof(modelName) - 1);
+            strncpy(firmware, value.firmware, sizeof(firmware) - 1);
+            strncpy(uid, value.uid, sizeof(uid) - 1);
+            strncpy(url, value.url, sizeof(url) - 1);
+            strncpy(auxiliaryData, value.auxiliaryData, sizeof(auxiliaryData) - 1);
+            strncpy(defaultLogin, value.defaultLogin, sizeof(defaultLogin) - 1);
+            strncpy(defaultPassword, value.defaultPassword, sizeof(defaultPassword) - 1);
+        }
+    };
+
+    struct CameraInfo2: public CameraInfo
+    {
+        CameraInfo2(): CameraInfo()
+        {
+            groupId[0] = 0;
+            groupName[0] = 0;
+        }
+
+        CameraInfo2(const CameraInfo& value):
+            CameraInfo(value)
+        {
+            groupId[0] = 0;
+            groupName[0] = 0;
+        }
+
+        CameraInfo2(const CameraInfo2& value):
+            CameraInfo(value)
+        {
+            strncpy(groupId, value.groupId, sizeof(groupId) - 1);
+            strncpy(groupName, value.groupName, sizeof(groupName) - 1);
+        }
+
+        char groupId[256];
+        char groupName[256];
     };
 
     static const int CAMERA_INFO_ARRAY_SIZE = 256;
@@ -107,9 +148,7 @@ namespace nxcip
 
         \note Camera search methods MUST NOT take in account result of previously done searches
     */
-    class CameraDiscoveryManager
-    :
-        public nxpl::PluginInterface
+    class CameraDiscoveryManager: public nxpl::PluginInterface
     {
     public:
         virtual ~CameraDiscoveryManager() {}
@@ -189,6 +228,15 @@ namespace nxcip
             \return \a NX_MORE_DATA if input buffer size is not sufficient
         */
         virtual int getReservedModelList( char** modelList, int* count ) = 0;
+    };
+
+    class CameraDiscoveryManager2: public CameraDiscoveryManager
+    {
+    public:
+        CameraDiscoveryManager2() = default;
+
+        virtual int checkHostAddress2(nxcip::CameraInfo2* cameras, const char* address, const char* login, const char* password) = 0;
+        virtual int findCameras2(CameraInfo2* cameras, const char* serverURL) = 0;
     };
 
 

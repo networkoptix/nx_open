@@ -22,14 +22,21 @@ namespace {
     const int kButtonSize = 20;
     // Offset from center of the circle to center of directional button.
     const int kButtonOffset = 10 + kButtonSize;
-    // Return speed of central handler. Pixels per timer's tick.
-    const int kReturnSpeed = 20;
+
+    // Return time in milliseconds. This time is needed to
+    // auto-return the handler to its initial position.
+    const int kReturnTime = 500;
 
     const qreal kSensitivity = 0.02;
     // Minimal size for joystick circle.
     const int kMinCircleSize = 176;
 
+    // Time period to read updates for ptzr control.
     const int kUpdatePeriod = 33;
+
+    // Increments to be applied when we press appropriate button
+    const float kPanTiltIncrement = 1.0;
+    const float kRotationIncrement = 90;
 
     const QString kNormalIcons[] =
     {
@@ -73,7 +80,12 @@ LensPtzControl::LensPtzControl(QWidget* parent):
     }
 
     m_rotationHandler.radius = kHandlerDiameter / 2;
+    m_rotationHandler.position.setY(kHandlerDiameter / 2);
     m_ptzHandler.radius = kHandlerDiameter / 2;
+    // We should set this limits or strange things will happen.
+    m_ptzHandler.maxDistance = 1.0;
+    m_rotationHandler.maxDistance = 1.0;
+    m_rotationHandler.minDistance = 1.0;
 
     setMouseTracking(true);
     setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
@@ -97,17 +109,25 @@ template<class T> T clamp(T value, T limit)
     return value;
 }
 
+bool changedEnough(qreal vOld, qreal vNew, qreal threshold)
+{
+    // Check if delta is large enough, or we crossed zero
+    return qAbs(vNew - vOld) >= threshold || ((vOld != 0) != (vNew != 0));
+}
+
 void LensPtzControl::updateState()
 {
-    // Auto return central handler if it is released
+    // Auto return central handler if it is released.
     if (m_state != StateHandlePtz)
     {
         auto distance = length(m_ptzHandler.position);
+        qreal returnSpeed = m_ptzHandler.maxDistance * kUpdatePeriod / kReturnTime;
+
         if (distance > 0)
         {
-            if (distance > kReturnSpeed)
+            if (distance > returnSpeed)
             {
-                float newDistance = distance - kReturnSpeed;
+                float newDistance = distance - returnSpeed;
                 m_ptzHandler.position *= newDistance / distance;
             }
             else
@@ -118,36 +138,64 @@ void LensPtzControl::updateState()
         }
     }
 
-    float newRotation = m_current.rotation;
+    Value newValue;
+
+    newValue.rotation = m_current.rotation;
     if (int len2 = QPointF::dotProduct(m_rotationHandler.position, m_rotationHandler.position))
     {
-        newRotation = qAtan2(m_rotationHandler.position.x(), m_rotationHandler.position.y());
-        newRotation = qRadiansToDegrees(newRotation);
+        newValue.rotation = qAtan2(m_rotationHandler.position.x(), m_rotationHandler.position.y());
+        newValue.rotation = qRadiansToDegrees(newValue.rotation);
+    }
+
+    // Auto-return for rotation.
+    if (m_state != StateHandleRotation && m_rotationAutoReturn)
+    {
+        qreal returnSpeed = 180.0 * kUpdatePeriod / kReturnTime;
+
+        if (qAbs(newValue.rotation) > 0)
+        {
+            if (qAbs(newValue.rotation) > returnSpeed)
+                newValue.rotation -= newValue.rotation > 0 ? returnSpeed : -returnSpeed;
+            else
+                newValue.rotation = 0;
+            m_needRedraw = true;
+        }
+
+        // Adjusting screen position of rotational handler to a new angle.
+        QPointF newPosition(qSin(qDegreesToRadians(newValue.rotation)),
+            qCos(qDegreesToRadians(newValue.rotation)));
+        m_rotationHandler.dragTo(newPosition * m_rotationHandler.maxDistance);
     }
 
     // We use 2d vector to ease calculations.
-    QVector2D newValue;
     if (m_state != StateInitial)
     {
         float limit = m_ptzHandler.maxDistance > 0 ? m_ptzHandler.maxDistance : 1.0;
-        newValue.setX(clamp(-m_ptzHandler.position.x() / limit, 1.0));
-        newValue.setY(clamp(m_ptzHandler.position.y() / limit, 1.0));
+        newValue.horizontal = -m_ptzHandler.position.x() / limit;
+        newValue.vertical = m_ptzHandler.position.y() / limit;
     }
 
-    QVector2D oldValue(m_current.horizontal, m_current.vertical);
-    bool wasZero = oldValue.lengthSquared() == 0.f;
-    bool becameZero = newValue.lengthSquared() == 0.f;
-    QVector2D delta = newValue - oldValue;
+    // Adding values from pressed buttons.
+    newValue.horizontal += m_buttonState.horizontal;
+    newValue.vertical += m_buttonState.vertical;
+    newValue.rotation += m_buttonState.rotation;
+
+    newValue.horizontal = clamp(newValue.horizontal, 1.0f);
+    newValue.vertical = clamp(newValue.vertical, 1.0f);
+    newValue.rotation = clamp(newValue.rotation, 180.0f);
+
     // Should send signal if we:
-    //  - value has changed.
-    //  - value became zero, and was not zero before.
-    //  - value became non-zero and was zero before.
-    //  - rotation has changed over the threshold
-    if (delta.length() > kSensitivity || wasZero != becameZero || qFabs(newRotation - m_current.rotation) > kSensitivity*180.0)
+    //  - pan/tilt has changed over the threshold.
+    //  - pan/tilt became zero, and was not zero before.
+    //  - pan/tilt became non-zero and was zero before.
+    //  - all the same for rotation.
+    bool changed = changedEnough(m_current.horizontal, newValue.horizontal, kSensitivity)
+        || changedEnough(m_current.vertical, newValue.vertical, kSensitivity)
+        || changedEnough(m_current.rotation, newValue.rotation, kSensitivity*180.0);
+
+    if (changed)
     {
-        m_current.horizontal = newValue.x();
-        m_current.vertical = newValue.y();
-        m_current.rotation = newRotation;
+        m_current = newValue;
         emit valueChanged(m_current);
     }
 
@@ -155,11 +203,37 @@ void LensPtzControl::updateState()
         update();
 }
 
-void LensPtzControl::onButtonClicked(ButtonType button)
+void LensPtzControl::onButtonClicked(ButtonType button, bool state)
 {
     if (m_state != StateInitial)
         return;
+
+    switch (button)
+    {
+    case ButtonLeft:
+        m_buttonState.horizontal += state ? kPanTiltIncrement : -kPanTiltIncrement;
+        break;
+    case ButtonRight:
+        m_buttonState.horizontal -= state ? kPanTiltIncrement : -kPanTiltIncrement;
+        break;
+    case ButtonUp:
+        m_buttonState.vertical += state ? kPanTiltIncrement : -kPanTiltIncrement;
+        break;
+    case ButtonDown:
+        m_buttonState.vertical -= state ? kPanTiltIncrement : -kPanTiltIncrement;
+        break;
+    }
     // TODO: Implement
+}
+
+void LensPtzControl::lockRotationAdd(bool state)
+{
+    m_buttonState.rotation += state ? kRotationIncrement : -kRotationIncrement;
+}
+
+void LensPtzControl::lockRotationDec(bool state)
+{
+    m_buttonState.rotation -= state ? kRotationIncrement : -kRotationIncrement;
 }
 
 QSize LensPtzControl::sizeHint() const
@@ -221,9 +295,14 @@ void LensPtzControl::mousePressEvent(QMouseEvent* event)
 
     if (m_panTiltEnabled)
     {
+        // Buttons use widget coordinates
+        auto pos = event->pos();
         for (int i = 0; i < ButtonMax; ++i)
-            if (m_buttons[i].picks(localPos))
-                onButtonClicked((ButtonType)i);
+            if (m_buttons[i].picks(pos))
+            {
+                m_buttons[i].isClicked = true;
+                onButtonClicked((ButtonType)i, true);
+            }
     }
 
     if (m_needRedraw)
@@ -232,6 +311,13 @@ void LensPtzControl::mousePressEvent(QMouseEvent* event)
 
 void LensPtzControl::mouseReleaseEvent(QMouseEvent* event)
 {
+    for (int i = 0; i < ButtonMax; ++i)
+        if (m_buttons[i].isClicked)
+        {
+            m_buttons[i].isClicked = false;
+            onButtonClicked((ButtonType)i, false);
+        }
+
     if (m_state == StateInitial)
     {
         return;
@@ -270,10 +356,11 @@ void LensPtzControl::mouseMoveEvent(QMouseEvent* event)
 
     if (m_panTiltEnabled)
     {
+        auto pos = event->pos();
         for (auto& button : m_buttons)
-            m_needRedraw |= button.setHover(button.picks(localPos));
+            m_needRedraw |= button.setHover(button.picks(pos));
 
-        m_needRedraw |= m_ptzHandler.setHover(m_ptzHandler.picks(localPos));
+        m_needRedraw |= m_ptzHandler.setHover(m_ptzHandler.picks(pos));
     }
 
     if (m_rotationEnabled)

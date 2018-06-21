@@ -44,7 +44,7 @@ log::Message assertLog(const char* file, int line, const char* condition, const 
 template<typename Reason>
 void assertCrash(const char* file, int line, const char* condition, const Reason& message)
 {
-    std::cerr << std::endl << ">>>" 
+    std::cerr << std::endl << ">>>"
         << assertLog(file, line, condition, message).toStdString() << std::endl;
 
     #ifdef _WIN32

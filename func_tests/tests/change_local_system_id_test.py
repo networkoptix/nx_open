@@ -11,7 +11,7 @@ _logger = logging.getLogger(__name__)
 
 
 def servers_is_online(server):
-    servers_list = server.api.ec2.getMediaServersEx.GET()
+    servers_list = server.api.get('ec2/getMediaServersEx')
     s_guid = get_server_id(server.api)
     this_servers = [v for v in servers_list if v['id'] == s_guid and v['status'] == 'Online']
     other_servers = [v for v in servers_list if v['id'] != s_guid and v['status'] == 'Online']
@@ -19,7 +19,7 @@ def servers_is_online(server):
 
 
 def neighbor_is_offline(server):
-    servers_list = server.api.ec2.getMediaServersEx.GET()
+    servers_list = server.api.get('ec2/getMediaServersEx')
     s_guid = get_server_id(server.api)
     this_servers = [v for v in servers_list if v['id'] == s_guid and v['status'] == 'Online']
     other_servers = [v for v in servers_list if v['id'] != s_guid]
@@ -38,7 +38,7 @@ def test_change_local_system_id(two_merged_mediaservers):
         "{} and {} are online".format(two, one),
         timeout_sec=10)
     new_local_system_id = generator.generate_server_guid(1, True)
-    one.api.api.configure.POST(localSystemId=new_local_system_id)
+    one.api.post('api/configure', dict(localSystemId=new_local_system_id))
     assert get_local_system_id(one.api) == uuid.UUID(new_local_system_id)
     wait_for_true(
         lambda: neighbor_is_offline(one),

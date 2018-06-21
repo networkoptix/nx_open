@@ -8,10 +8,8 @@ But for POST method keyword parameters are translated to json request body.
 """
 import base64
 import csv
-import datetime
 import hashlib
 import json
-import json as json_module
 import logging
 from pprint import pformat
 
@@ -69,38 +67,6 @@ class InappropriateRedirect(Exception):
         super(InappropriateRedirect, self).__init__(self, message)
 
 
-class _RestApiProxy(object):
-    """
-    >>> api = RestApi('HTTP Request & Response Service', 'http://httpbin.org', '', '')
-    >>> directory = _RestApiProxy(api, '/')
-    >>> directory.get.GET(wise='choice')  # doctest: +ELLIPSIS
-    {...wise...choice...}
-    >>> directory.post.POST(wise='choice')  # doctest: +ELLIPSIS
-    {...wise...choice...}
-    """
-
-    def __init__(self, api, url):
-        self._path = url
-        self._api = api
-
-    def __getattr__(self, name):
-        return _RestApiProxy(self._api, self._path + '/' + name)
-
-    # noinspection PyPep8Naming
-    def GET(self, timeout=None, headers=None, **kw):
-        params = {name: _to_get_param(value) for name, value in kw.items()}
-        _logger.debug('GET params:\n%s', pformat(params, indent=4))
-        return self._api.request('GET', self._path, timeout=timeout, headers=headers, params=params)
-
-    # noinspection PyPep8Naming
-    def POST(self, timeout=None, headers=None, json=None, **kw):
-        if kw:
-            assert not json, 'kw and json arguments are mutually exclusive - only one may be used at a time'
-            json = kw
-        _logger.debug('JSON payload:\n%s', json_module.dumps(json, indent=4))
-        return self._api.request('POST', self._path, timeout=timeout, headers=headers, json=json)
-
-
 class RestApi(object):
     """Mimic requests.Session.request.
 
@@ -125,9 +91,6 @@ class RestApi(object):
         self._auth = HTTPDigestAuth(username, password)
         self.user = username  # Only for interface.
         self.password = password  # Only for interface.
-
-    def __getattr__(self, name):
-        return _RestApiProxy(self, '/' + name)
 
     def __repr__(self):
         password_display = self._auth.password if self._auth.password in STANDARD_PASSWORDS else '***'
@@ -164,11 +127,6 @@ class RestApi(object):
         digest = hashlib.md5(':'.join([ha1, nonce, ha2]).encode()).hexdigest()
         key = base64.b64encode(':'.join([self.user.lower(), nonce, digest]))
         return key
-
-    def get_api_fn(self, method, api_object, api_method):
-        object = getattr(self, api_object)  # server.api.ec2
-        function = getattr(object, api_method)  # server.api.ec2.getUsers
-        return getattr(function, method)  # server.api.ec2.getUsers.GET
 
     def _raise_for_status(self, response):
         if 400 <= response.status_code < 600:

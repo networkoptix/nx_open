@@ -151,7 +151,6 @@ private:
     static RequestParams readRequestParams(
         const std::multimap<QString, QString>& requestParams);
 };
-
 } // namespace hls
 } // namespace mediaserver
 } // namespace nx

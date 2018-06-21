@@ -7,6 +7,8 @@
 
 #include <nx/utils/thread/mutex.h>
 
+#include <camera/camera_plugin.h>
+#include <plugins/plugin_tools.h>
 
 namespace nxcip_qt
 {
@@ -38,31 +40,70 @@ namespace nxcip_qt
     }
 
     //!See nxcip::CameraDiscoveryManager::findCameras
-    int CameraDiscoveryManager::findCameras( QVector<nxcip::CameraInfo>* const cameras, const QString& localInterfaceIPAddr )
+    int CameraDiscoveryManager::findCameras(QVector<nxcip::CameraInfo2>* const cameras, const QString& localInterfaceIPAddr )
     {
-        cameras->resize( nxcip::CAMERA_INFO_ARRAY_SIZE );
+        cameras->resize(nxcip::CAMERA_INFO_ARRAY_SIZE);
+        QVector<nxcip::CameraInfo> cameraInfo1;
+        cameraInfo1.resize(nxcip::CAMERA_INFO_ARRAY_SIZE);
+
         const QByteArray& localInterfaceIPAddrUtf8 = localInterfaceIPAddr.toUtf8();
-        int result = m_intf->findCameras( cameras->data(), localInterfaceIPAddrUtf8.data() );
-        cameras->resize( result > 0 ? result : 0 );
+
+        nxpt::ScopedRef<nxcip::CameraDiscoveryManager2> discoveryManager2(
+            (nxcip::CameraDiscoveryManager2*)m_intf->queryInterface(nxcip::IID_CameraDiscoveryManager2),
+            false);
+        int result = 0;
+        if (discoveryManager2.get())
+        {
+            result = discoveryManager2->findCameras2(cameras->data(), localInterfaceIPAddrUtf8.data());
+        }
+        else
+        {
+            result = m_intf->findCameras(cameraInfo1.data(), localInterfaceIPAddrUtf8.data());
+            for (int i = 0; i < result; ++i)
+                (*cameras)[i] = cameraInfo1[i];
+        }
+        cameras->resize(result > 0 ? result : 0);
         return result;
     }
 
     //!See nxcip::CameraDiscoveryManager::checkHostAddress
     int CameraDiscoveryManager::checkHostAddress(
-        QVector<nxcip::CameraInfo>* const cameras,
+        QVector<nxcip::CameraInfo2>* const cameras,
         const QString& url,
         const QString* login,
         const QString* password )
     {
         cameras->resize( nxcip::CAMERA_INFO_ARRAY_SIZE );
+        QVector<nxcip::CameraInfo> cameraInfo1;
+        cameraInfo1.resize(nxcip::CAMERA_INFO_ARRAY_SIZE);
+
         const QByteArray& urlUtf8 = url.toUtf8();
         const QByteArray loginUtf8 = login ? login->toUtf8() : QByteArray();
         const QByteArray passwordUtf8 = password ? password->toUtf8() : QByteArray();
-        int result = m_intf->checkHostAddress(
-            cameras->data(),
-            urlUtf8.data(),
-            login ? loginUtf8.data() : NULL,
-            password ? passwordUtf8.data() : NULL );
+
+        nxpt::ScopedRef<nxcip::CameraDiscoveryManager2> discoveryManager2(
+            (nxcip::CameraDiscoveryManager2*)m_intf->queryInterface(nxcip::IID_CameraDiscoveryManager2),
+            false);
+
+        int result = 0;
+        if (discoveryManager2.get())
+        {
+            result = discoveryManager2->checkHostAddress2(
+                cameras->data(),
+                urlUtf8.data(),
+                login ? loginUtf8.data() : NULL,
+                password ? passwordUtf8.data() : NULL);
+        }
+        else
+        {
+            result = m_intf->checkHostAddress(
+                cameraInfo1.data(),
+                urlUtf8.data(),
+                login ? loginUtf8.data() : NULL,
+                password ? passwordUtf8.data() : NULL);
+            for (int i = 0; i < result; ++i)
+                (*cameras)[i] = cameraInfo1[i];
+        }
         //TODO #ak validating cameraInfo data
         cameras->resize( result > 0 ? result : 0 );
         return result;

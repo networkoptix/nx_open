@@ -61,7 +61,7 @@
         "backupNewCamerasByDefault": "กล้องใหม่สำรองข้อมูลตามค่าเริ่มต้น",
         "backupQualities": "คุณภาพการสำรองข้อมูล",
         "cameraSettingsOptimization": "อนุญาตให้เพิ่มประสิทธิภาพการตั้งค่าอุปกรณ์",
-        "clientStatisticsSettingsUrl": "ลูกค้าสัมพัทธ์สัมพันธ์กับ URL ลูกค้า",
+        "clientStatisticsSettingsUrl": "ลูกค้าสัมพัทธ์สัมพันธ์กับ url ลูกค้า",
         "cloudAccountName": "บัญชีเจ้าของคลาวด์",
         "cloudConnectRelayingEnabled": "เปิดใช้งานการถ่ายทอดข้อมูลสำหรับการเชื่อมต่อระบบคลาวด์",
         "cloudConnectUdpHolePunchingEnabled": "เปิดใช้งาน UDP สำหรับการเชื่อมต่อระบบคลาวด์",

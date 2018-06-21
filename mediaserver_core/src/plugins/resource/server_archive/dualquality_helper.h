@@ -10,10 +10,14 @@
 
 #include <stack>
 
+class QnStorageManager;
+
 class QnDualQualityHelper
 {
 public:
-    QnDualQualityHelper();
+    QnDualQualityHelper(
+        QnStorageManager* normalStorageManager,
+        QnStorageManager* backupStorageManager);
 
     void setResource(const QnNetworkResourcePtr &netResource);
     void openCamera(const QString& cameraUniqueId);
@@ -26,7 +30,6 @@ public:
         bool                                        preciseFind,
         const DeviceFileCatalog::UniqueChunkCont    &ignoreChunks
     );
-    //void findNextChunk(const DeviceFileCatalogPtr& currentCatalog, const DeviceFileCatalog::Chunk& currentChunk, DeviceFileCatalog::Chunk& nextChunk, DeviceFileCatalogPtr& nextCatalog);
 
 private:
     typedef std::stack<DeviceFileCatalogPtr> SearchStack;
@@ -55,6 +58,8 @@ private:
     PoolToCatalogMap m_catalogLow;
     MediaQuality m_quality;
     bool m_alreadyOnAltChunk;
+    QnStorageManager* m_normalStorageManager = nullptr;
+    QnStorageManager* m_backupStorageManager = nullptr;
 };
 
 #endif // __DUAL_QUALITY_HELPER__

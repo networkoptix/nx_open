@@ -287,6 +287,7 @@ bool Method::isMessageBodyAllowedInResponse(
     StatusCode::Value statusCode)
 {
     return method != connect
+        && method != head
         && StatusCode::isMessageBodyAllowed(statusCode);
 }
 

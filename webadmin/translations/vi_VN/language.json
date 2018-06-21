@@ -218,8 +218,8 @@
         "chromeCastWarning": "Chromecast tốn nhiều tài nguyên và có thể gây ra sự cố trên máy chủ của bạn.",
         "resolution": {
             "high": "cao (H)",
-            "auto": "tự động",
-            "low": "thấp (L)"
+            "auto": "Tự động",
+            "low": "Thấp (L)"
         }
     }
 }
