@@ -33,6 +33,7 @@
 #include <nx/utils/cryptographic_hash.h>
 #include "archive_integrity_watcher.h"
 #include <nx/mediaserver/resource/camera.h>
+#include <utils/media/h264_utils.h>
 
 namespace {
 static const int kMotionPrebufferSize = 8;
@@ -899,4 +900,27 @@ bool QnServerStreamRecorder::needConfigureProvider() const
 {
     const nx::mediaserver::resource::Camera* camera = dynamic_cast<nx::mediaserver::resource::Camera*>(m_device.data());
     return !camera->isScheduleDisabled();
+}
+
+bool QnServerStreamRecorder::forceDefaultContext(const QnConstAbstractMediaDataPtr& frame)
+{
+    // Do not put codec context to the container level if video stream has built-in context.
+    // It is CPU optimization for server recording. Ffmpeg works faster at this mode.
+
+    auto videoFrame = std::dynamic_pointer_cast<const QnCompressedVideoData>(frame);
+
+    if (!videoFrame || !videoFrame->context)
+        return false;
+
+    switch (videoFrame->context->getCodecId())
+    {
+        case AV_CODEC_ID_H264:
+        {
+            QSize result;
+            extractSpsPps(videoFrame, &result, nullptr);
+            return result.width() > 0 && result.height() > 0;
+        }
+        default:
+            return false;
+    }
 }

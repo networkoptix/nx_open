@@ -94,6 +94,7 @@ protected:
     virtual void endOfRun() override;
     virtual bool saveData(const QnConstAbstractMediaDataPtr& md) override;
     virtual void writeData(const QnConstAbstractMediaDataPtr& md, int streamIndex) override;
+    virtual bool forceDefaultContext(const QnConstAbstractMediaDataPtr& frame) override;
 private:
     void updateRecordingType(const QnScheduleTask& scheduleTask);
     void updateStreamParams();
