@@ -9,7 +9,7 @@ import sys
 waitTime = 30
 
 # Path to the results folder
-loc = path.join('C:\\', 'Users', 'Kyle', 'Desktop', 'robot-outputs')
+loc = path.join('C:\\', 'Users', 'Kyle', 'Desktop', 'robot-outputs', 'combined-results')
 # Path I use on my VM for a shared file
 #loc = path.join('/media', 'sf_robot-outputs')
 
