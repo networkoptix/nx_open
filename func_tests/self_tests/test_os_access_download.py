@@ -4,6 +4,7 @@ import pytest
 from flask import Flask, send_file
 from werkzeug.exceptions import NotFound
 
+from framework.os_access.exceptions import AlreadyExists
 from framework.os_access.local_access import local_access
 from framework.serving import WsgiServer, make_base_url_for_remote_machine
 
@@ -70,6 +71,5 @@ def url(request):
 def test_download(os_access, url, downloads_dir):
     path = os_access.download(url, downloads_dir)
     assert path.exists()
-    # Check that another download of same file won't
-    another_attempt_path = os_access.download(url, downloads_dir)
-    assert another_attempt_path == path
+    with pytest.raises(AlreadyExists):
+        os_access.download(url, downloads_dir)
