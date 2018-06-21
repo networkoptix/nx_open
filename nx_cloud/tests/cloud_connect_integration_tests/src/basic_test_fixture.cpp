@@ -220,7 +220,7 @@ void BasicTestFixture::assertConnectionCanBeEstablished()
     auto clientSocketGuard = makeScopeGuard([this]() { m_clientSocket->pleaseStopSync(); });
     ASSERT_TRUE(m_clientSocket->setNonBlockingMode(true));
 
-    nx::String targetAddress =
+    std::string targetAddress =
         m_remotePeerName
         ? *m_remotePeerName
         : serverSocketCloudAddress();
@@ -273,9 +273,9 @@ nx::cloud::relay::test::Launcher& BasicTestFixture::trafficRelay()
     return *m_relays[0];
 }
 
-nx::String BasicTestFixture::serverSocketCloudAddress() const
+std::string BasicTestFixture::serverSocketCloudAddress() const
 {
-    return m_cloudSystemCredentials.systemId;
+    return m_cloudSystemCredentials.systemId.toStdString();
 }
 
 const hpm::api::SystemCredentials& BasicTestFixture::cloudSystemCredentials() const
