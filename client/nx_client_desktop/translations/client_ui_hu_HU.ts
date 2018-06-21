@@ -1098,7 +1098,7 @@
     <message>
       <location/>
       <source>Rotation, Dewarping, Image Enhancement etc.</source>
-      <translation>Forgatás, dewarping, kép javítása stb...</translation>
+      <translation>Forgatás, dewarping, kép javítása stb.</translation>
     </message>
     <message>
       <location/>

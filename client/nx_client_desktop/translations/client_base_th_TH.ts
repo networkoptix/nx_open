@@ -4477,7 +4477,7 @@ to %1</source>
     </message>
     <message>
       <source>Length of time each camera on layout will be displayed if you start a Tour.</source>
-      <translation type="unfinished">Length of time each camera on layout will be displayed if you start a Tour.</translation>
+      <translation>ระยะเวลาที่กล้องแต่ละรูปแบบจะปรากฏขึ้นหากคุณเริ่มทัวร์เค้าโครง</translation>
     </message>
   </context>
   <context>

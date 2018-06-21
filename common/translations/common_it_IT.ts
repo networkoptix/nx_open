@@ -637,15 +637,15 @@
     <message numerus="yes">
       <source>%n I/O Module(s)</source>
       <translation>
-        <numerusform>%n Moduli I / O</numerusform>
-        <numerusform>%n Moduli I / O</numerusform>
+        <numerusform>%n Moduli I/O</numerusform>
+        <numerusform>%n Moduli I/O</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n I/O module(s)</source>
       <translation>
-        <numerusform>%n Moduli I / O</numerusform>
-        <numerusform>%n Moduli I / O</numerusform>
+        <numerusform>%n Moduli I/O</numerusform>
+        <numerusform>%n Moduli I/O</numerusform>
       </translation>
     </message>
     <message>
