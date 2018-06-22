@@ -27,7 +27,8 @@ const static QString kFileName = "test.file.name";
 const static QString kUpdatesUrl = "test.url";
 const static QString kCloudHost = "test.cloud.host";
 const static QString kCustomization = "test.customization";
-const static QnSoftwareVersion kVersion = QnSoftwareVersion("1.0.0.1");
+const static QnSoftwareVersion kCurrentNxVersion = QnSoftwareVersion("1.0.0.1");
+const static QnSoftwareVersion kUpdateNxVersion = QnSoftwareVersion("5.0.0.1");
 const static QString kPlatform = "test.platform";
 const static QString kArch = "test.arch";
 const static QString kModification = "test.modification";
@@ -51,7 +52,7 @@ public:
     void setCfg(const UpdateRegistryCfg& cfg) { m_cfg = cfg; }
 
     virtual info::ResultCode findUpdateFile(
-        const info::UpdateFileRequestData& /*updateFileRequestData*/,
+        const info::UpdateRequestData& /*updateRequestData*/,
         info::FileData* outFileData) const override
     {
         if (!m_manualData.isEmpty())
@@ -75,10 +76,13 @@ public:
 
     virtual info::ResultCode latestUpdate(
         const update::info::UpdateRequestData& /*updateRequestData*/,
-        QnSoftwareVersion* /*outSoftwareVersion*/) const override
+        QList<api::TargetVersionWithEula>* outSoftwareVersions) const override
     {
         if (m_cfg.hasUpdate || !m_manualData.isEmpty())
+        {
+            outSoftwareVersions->append(api::TargetVersionWithEula(kUpdateNxVersion));
             return info::ResultCode::ok;
+        }
 
         return info::ResultCode::noData;
     }
@@ -118,8 +122,9 @@ public:
         if (!other)
             return false;
 
+        QList<api::TargetVersionWithEula> targetVersions;
         return m_cfg.hasUpdate ==
-            (other->latestUpdate(info::UpdateRequestData(), nullptr) ==
+            (other->latestUpdate(info::UpdateRequestData(), &targetVersions) ==
                 info::ResultCode::ok);
     }
 
@@ -127,7 +132,8 @@ public:
     {
         if (other)
         {
-            m_cfg.hasUpdate |= (other->latestUpdate(info::UpdateRequestData(), nullptr) ==
+            QList<api::TargetVersionWithEula> targetVersions;
+            m_cfg.hasUpdate |= (other->latestUpdate(info::UpdateRequestData(), &targetVersions) ==
                 info::ResultCode::ok);
         }
         m_manualData.append(((TestUpdateRegistry*) other)->m_manualData);
@@ -501,14 +507,15 @@ public:
 protected:
     virtual void SetUp() override
     {
-        detail::UpdateFileRequestDataFactory::setFactoryFunc(
+        detail::UpdateRequestDataFactory::setFactoryFunc(
             [this]()
             {
-                return update::info::UpdateFileRequestData(
+                return update::info::UpdateRequestData(
                     kCloudHost,
                     kCustomization,
-                    kVersion,
+                    kCurrentNxVersion,
                     update::info::OsVersion(kPlatform, kArch, kModification),
+                    nullptr,
                     false);
             });
 
@@ -603,12 +610,13 @@ protected:
 
     void whenDownloadRequestIssued(api::Updates2StatusData::StatusCode expectedResult)
     {
-        ASSERT_EQ(expectedResult, m_updatesManager->download().state);
+        while (expectedResult != m_updatesManager->download(kUpdateNxVersion).state)
+            std::this_thread::sleep_for(std::chrono::milliseconds(10));
     }
 
     void whenDownloadRequestIssuedWithFinalResult(api::Updates2StatusData::StatusCode expectedResult)
     {
-        while (m_updatesManager->download().state != expectedResult)
+        while (m_updatesManager->download(kUpdateNxVersion).state != expectedResult)
             std::this_thread::sleep_for(std::chrono::milliseconds(10));
     }
 

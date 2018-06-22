@@ -1,6 +1,7 @@
 #pragma once
 
 #include <memory>
+#include <nx/api/updates2/updates2_status_data.h>
 #include <nx/update/info/file_data.h>
 #include <nx/update/info/manual_file_data.h>
 #include <nx/update/info/result_code.h>
@@ -16,12 +17,12 @@ public:
     virtual ~AbstractUpdateRegistry() {}
 
     virtual ResultCode findUpdateFile(
-        const UpdateFileRequestData& updateFileRequestData,
+        const UpdateRequestData& updateRequestData,
         FileData* outFileData) const = 0;
 
     virtual ResultCode latestUpdate(
         const UpdateRequestData& updateRequestData,
-        QnSoftwareVersion* outSoftwareVersion) const = 0;
+        QList<api::TargetVersionWithEula>* outSoftwareVersion) const = 0;
 
     virtual void addFileData(const ManualFileData& manualFileData) = 0;
     virtual void removeFileData(const QString& fileName) = 0;

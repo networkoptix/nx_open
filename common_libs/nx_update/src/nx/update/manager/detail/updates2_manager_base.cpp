@@ -41,16 +41,11 @@ void Updates2ManagerBase::atServerStart()
             break;
         case api::Updates2StatusData::StatusCode::checking:
         case api::Updates2StatusData::StatusCode::installing:
-            setStatus(
-                api::Updates2StatusData::StatusCode::notAvailable,
-                "Update is unavailable");
-            break;
         case api::Updates2StatusData::StatusCode::downloading:
         case api::Updates2StatusData::StatusCode::preparing:
             setStatus(
-                api::Updates2StatusData::StatusCode::available,
-                "Update is available");
-            download();
+                api::Updates2StatusData::StatusCode::notAvailable,
+                "Update is unavailable");
             break;
         case api::Updates2StatusData::StatusCode::readyToInstall:
             break;
@@ -135,7 +130,7 @@ void Updates2ManagerBase::refreshStatusAfterCheck()
         case api::Updates2StatusData::StatusCode::error:
         case api::Updates2StatusData::StatusCode::checking:
         {
-            QnSoftwareVersion version;
+            QList<api::TargetVersionWithEula> targetVersions;
             if (!m_updateRegistry)
             {
                 setStatus(
@@ -145,8 +140,8 @@ void Updates2ManagerBase::refreshStatusAfterCheck()
             }
 
             if (m_updateRegistry->latestUpdate(
-                    detail::UpdateFileRequestDataFactory::create(isClient()),
-                    &version) != update::info::ResultCode::ok)
+                    detail::UpdateRequestDataFactory::create(isClient(), /* targetVersion */ nullptr),
+                    &targetVersions) != update::info::ResultCode::ok)
             {
                 setStatus(
                     api::Updates2StatusData::StatusCode::notAvailable,
@@ -154,9 +149,19 @@ void Updates2ManagerBase::refreshStatusAfterCheck()
                 return;
             }
 
+            info::ResultCode result = info::ResultCode::noData;
             nx::update::info::FileData fileData;
-            const auto result = m_updateRegistry->findUpdateFile(
-                detail::UpdateFileRequestDataFactory::create(isClient()), &fileData);
+
+            for (int i = 0; i < targetVersions.size(); ++i)
+            {
+                result = m_updateRegistry->findUpdateFile(
+                    detail::UpdateRequestDataFactory::create(
+                        isClient(),
+                        &targetVersions[i].targetVersion),
+                    &fileData);
+                if (result == info::ResultCode::ok)
+                    break;
+            }
 
             NX_ASSERT(result == update::info::ResultCode::ok);
             NX_ASSERT(!fileData.isNull());
@@ -165,15 +170,14 @@ void Updates2ManagerBase::refreshStatusAfterCheck()
             {
                 setStatus(
                     api::Updates2StatusData::StatusCode::error,
-                    lit("Failed to get update file information: %1")
-                        .arg(version.toString()));
+                    "Failed to get update file information");
                 return;
             }
 
             setStatus(
                 api::Updates2StatusData::StatusCode::available,
-                lit("Update is available: %1").arg(version.toString()));
-
+                "Update is available",
+                targetVersions);
             break;
         }
         default:
@@ -181,7 +185,7 @@ void Updates2ManagerBase::refreshStatusAfterCheck()
     }
 }
 
-api::Updates2StatusData Updates2ManagerBase::download()
+api::Updates2StatusData Updates2ManagerBase::download(const QnSoftwareVersion& targetVersion)
 {
     QnMutexLocker lock(&m_mutex);
     if (m_currentStatus.state != api::Updates2StatusData::StatusCode::available)
@@ -191,14 +195,13 @@ api::Updates2StatusData Updates2ManagerBase::download()
 
     nx::update::info::FileData fileData;
     const auto result = m_updateRegistry->findUpdateFile(
-        detail::UpdateFileRequestDataFactory::create(isClient()),
+        detail::UpdateRequestDataFactory::create(isClient(), &targetVersion),
         &fileData);
     NX_ASSERT(result == update::info::ResultCode::ok);
 
     if (result != update::info::ResultCode::ok)
     {
-        setStatus(
-            api::Updates2StatusData::StatusCode::error,
+        setStatus(api::Updates2StatusData::StatusCode::error,
             "Failed to get update file information");
         return m_currentStatus.base();
     }
@@ -315,6 +318,7 @@ api::Updates2StatusData Updates2ManagerBase::download()
 void Updates2ManagerBase::setStatus(
     api::Updates2StatusData::StatusCode code,
     const QString& message,
+    const QList<api::TargetVersionWithEula> targets,
     double progress)
 {
     detail::Updates2StatusDataEx newStatusData(
@@ -322,12 +326,14 @@ void Updates2ManagerBase::setStatus(
         moduleGuid(),
         code,
         message,
+        targets,
         progress);
 
     writeStatusToFile(newStatusData);
 
     m_currentStatus.lastRefreshTime = newStatusData.lastRefreshTime;
     m_currentStatus.message = newStatusData.message;
+    m_currentStatus.targets = targets;
     m_currentStatus.progress = newStatusData.progress;
     m_currentStatus.serverId = newStatusData.serverId;
     m_currentStatus.state = newStatusData.state;
@@ -510,7 +516,7 @@ void Updates2ManagerBase::onFileInformationChanged(const FileInformation& fileIn
     {
         setStatus(
             api::Updates2StatusData::StatusCode::downloading,
-            lit("Downloading update file: %1").arg(fileInformation.name),
+            lit("Downloading update file: %1").arg(fileInformation.name), QList<api::TargetVersionWithEula>(),
             (double) fileInformation.downloadedChunks.count(true) / fileInformation.downloadedChunks.size());
     }
 }
