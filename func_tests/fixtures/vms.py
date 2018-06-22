@@ -82,23 +82,16 @@ def hypervisor(host_os_access):
 
 
 @pytest.fixture(scope='session')
-def vm_registries(host_posix_shell, host_os_access):
-    return {
-        vm_type: Registry(
-            host_posix_shell,
-            host_os_access.Path(vm_type_configuration['registry_path']).expanduser(),
-            vm_type_configuration['name_format'].format(vm_index='{index}'),  # Registry doesn't know about VMs.
-            vm_type_configuration['limit'],
-            )
-        for vm_type, vm_type_configuration in vm_types_configuration().items()}
-
-
-@pytest.fixture(scope='session')
-def vm_types(hypervisor, vm_registries):
+def vm_types(hypervisor, host_posix_shell, host_os_access):
     return {
         vm_type_name: VMType(
             hypervisor,
-            vm_registries[vm_type_name],
+            Registry(
+                host_posix_shell,
+                host_os_access.Path(vm_type_conf['registry_path']).expanduser(),
+                vm_type_conf['name_format'].format(vm_index='{index}'),  # Registry doesn't know about VMs.
+                vm_type_conf['limit'],
+                ),
             **vm_type_conf['vm'])
         for vm_type_name, vm_type_conf in vm_types_configuration().items()
         }
