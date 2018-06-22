@@ -27,6 +27,7 @@ ServerTimeSyncManager::ServerTimeSyncManager(
     base_type(commonModule),
     m_serverConnector(serverConnector)
 {
+
     connect(this, &ServerTimeSyncManager::timeChanged, this,
         [this](qint64 syncTimeMs)
         {
@@ -37,7 +38,7 @@ ServerTimeSyncManager::ServerTimeSyncManager(
                 QByteArray::number(systemTimeDeltaMs));
 
             // Avoid passing this to async callback.
-            auto logTag = nx::utils::log::Tag(toString(typeid(this)));
+            auto logTag = nx::utils::log::Tag(this);
             connection->getMiscManager(Qn::kSystemAccess)->saveMiscParam(
                 deltaData, this,
                 [logTag](int /*reqID*/, ec2::ErrorCode errorCode)
@@ -48,7 +49,13 @@ ServerTimeSyncManager::ServerTimeSyncManager(
 
             auto primaryTimeServerId = getPrimaryTimeServerId();
             if (primaryTimeServerId == this->commonModule()->moduleGUID())
+            {
+                NX_VERBOSE(logTag,
+                    lm("Peer %1 broadcast time has changed to %2")
+                    .arg(qnStaticCommon->moduleDisplayName(this->commonModule()->moduleGUID()))
+                    .arg(QDateTime::fromMSecsSinceEpoch(syncTimeMs).toString(Qt::ISODate)));
                 broadcastSystemTime();
+            }
         });
 }
 
@@ -99,6 +106,9 @@ void ServerTimeSyncManager::stop()
 
 void ServerTimeSyncManager::initializeTimeFetcher()
 {
+    if (m_internetTimeSynchronizer)
+        return;
+
     auto meanTimerFetcher = std::make_unique<nx::network::MeanTimeFetcher>();
     for (const char* timeServer: RFC868_SERVERS)
     {
@@ -107,6 +117,13 @@ void ServerTimeSyncManager::initializeTimeFetcher()
                 QLatin1String(timeServer)));
     }
 
+    m_internetTimeSynchronizer = std::move(meanTimerFetcher);
+}
+
+void ServerTimeSyncManager::setTimeFetcher(std::unique_ptr<AbstractAccurateTimeFetcher> timeFetcher)
+{
+    auto meanTimerFetcher = std::make_unique<nx::network::MeanTimeFetcher>();
+    meanTimerFetcher->addTimeFetcher(std::move(timeFetcher));
     m_internetTimeSynchronizer = std::move(meanTimerFetcher);
 }
 
@@ -196,8 +213,6 @@ void ServerTimeSyncManager::updateTime()
             return;
         if (isTimeRecentlySync && m_timeLoadFromServer == route.id)
             return;
-        m_timeLoadFromServer = route.id;
-        m_lastNetworkSyncTime.restart();
 
         bool success = false;
         if (route.id == ownId)
@@ -228,11 +243,6 @@ void ServerTimeSyncManager::updateTime()
             }
         }
     }
-}
-
-bool ServerTimeSyncManager::isTimeTakenFromInternet() const
-{
-    return m_isTimeTakenFromInternet;
 }
 
 void ServerTimeSyncManager::init(const ec2::AbstractECConnectionPtr& connection)

@@ -30,6 +30,7 @@
 #include <nx/utils/url.h>
 
 #include <client_core/client_core_settings.h>
+#include <nx/network/http/http_types.h>
 
 namespace {
 
@@ -60,7 +61,7 @@ QnConnectionData readConnectionData(QSettings *settings)
 
     const bool useHttps = settings->value(lit("secureAppserverConnection"), true).toBool();
     connection.url = settings->value(kUrlTag).toString();
-    connection.url.setScheme(useHttps ? lit("https") : lit("http"));
+    connection.url.setScheme(nx::network::http::urlSheme(useHttps));
     connection.name = settings->value(kNameTag).toString();
     connection.localId = settings->value(kLocalId).toUuid();
     const auto password = settings->value(kPasswordTag).toString();

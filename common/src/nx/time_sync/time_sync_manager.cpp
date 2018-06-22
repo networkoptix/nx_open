@@ -16,6 +16,7 @@
 #include <nx/network/time/time_protocol_client.h>
 #include <nx/utils/elapsed_timer.h>
 #include <nx/utils/time.h>
+#include <common/static_common_module.h>
 
 namespace nx {
 namespace time_sync {
@@ -92,9 +93,12 @@ void TimeSyncManager::loadTimeFromLocalClock()
     auto newValue = m_systemClock->millisSinceEpoch();
     static const std::chrono::milliseconds kMaxJitterForLocalClock(250);
 
-    setSyncTime(newValue, kMaxJitterForLocalClock);
-    NX_DEBUG(this, lm("Set time %1 from the local clock").
-        arg(QDateTime::fromMSecsSinceEpoch(newValue.count()).toString(Qt::ISODate)));
+    if (setSyncTime(newValue, kMaxJitterForLocalClock))
+    {
+        NX_DEBUG(this, lm("Set time %1 from the local clock")
+            .arg(QDateTime::fromMSecsSinceEpoch(newValue.count()).toString(Qt::ISODate)));
+    }
+    m_isTimeTakenFromInternet = false;
 }
 
 bool TimeSyncManager::loadTimeFromServer(const QnRoute& route)
@@ -104,7 +108,8 @@ bool TimeSyncManager::loadTimeFromServer(const QnRoute& route)
     if (!socket)
     {
         NX_WARNING(this,
-            lm("Can't read time from server %1. Can't establish connection to the remote host."));
+            lm("Can't read time from server %1. Can't establish connection to the remote host.")
+                .arg(qnStaticCommon->moduleDisplayName(route.id)));
         return false;
     }
     auto maxRtt = commonModule()->globalSettings()->maxDifferenceBetweenSynchronizedAndLocalTime();
@@ -116,8 +121,8 @@ bool TimeSyncManager::loadTimeFromServer(const QnRoute& route)
     auto server = commonModule()->resourcePool()->getResourceById<QnMediaServerResource>(route.id);
     if (!server)
     {
-        NX_WARNING(this,
-            lm("Can't find server with id %1").arg(route.id));
+        NX_DEBUG(this,
+            lm("Server %1 is not known yet. Postpone time sync request").arg(qnStaticCommon->moduleDisplayName(route.id)));
         return false;
     }
     nx::utils::Url url(server->getApiUrl());
@@ -138,7 +143,7 @@ bool TimeSyncManager::loadTimeFromServer(const QnRoute& route)
         if (!success || !response)
         {
             NX_WARNING(this, lm("Can't read time from server %1. Error: %2")
-                .args(route.id.toString(), httpClient->lastSysErrorCode()));
+                .args(qnStaticCommon->moduleDisplayName(route.id), httpClient->lastSysErrorCode()));
             return false;
         }
     }
@@ -148,7 +153,7 @@ bool TimeSyncManager::loadTimeFromServer(const QnRoute& route)
     if (!QJson::deserialize(jsonResult.reply, &timeData))
     {
         NX_WARNING(this, lm("Can't deserialize time reply from server %1")
-            .arg(route.id.toString()));
+            .arg(qnStaticCommon->moduleDisplayName(route.id)));
         return false;
     }
 
@@ -157,12 +162,22 @@ bool TimeSyncManager::loadTimeFromServer(const QnRoute& route)
     bool syncWithInternel = commonModule()->globalSettings()->isSynchronizingTimeWithInternet();
     if (syncWithInternel && !timeData.isTakenFromInternet)
         return false; //< Target server is not ready yet. Time is not taken from internet yet. Repeat later.
+    m_isTimeTakenFromInternet = timeData.isTakenFromInternet;
     if (rtt > maxRtt)
         return false; //< Too big rtt. Try again.
-    setSyncTime(newTime, rtt);
-    NX_DEBUG(this, lm("Got time %1 from the neighbor server %2")
-        .args(QDateTime::fromMSecsSinceEpoch(newTime.count()).toString(Qt::ISODate),
-        route.id.toString()));
+    const auto ownGuid = commonModule()->moduleGUID();
+    NX_DEBUG(this, lm("Got time %1 (%2 <-- %3), rtt=%4")
+        .args(
+            QDateTime::fromMSecsSinceEpoch(newTime.count()).toString(Qt::ISODate),
+            qnStaticCommon->moduleDisplayName(ownGuid),
+            qnStaticCommon->moduleDisplayName(route.id),
+            rtt));
+    if (!setSyncTime(newTime, rtt))
+    {
+        NX_DEBUG(this, lm("Server %1 ignore new time %2 because of small delta.")
+            .arg(qnStaticCommon->moduleDisplayName(commonModule()->moduleGUID()))
+            .arg(QDateTime::fromMSecsSinceEpoch(newTime.count()).toString(Qt::ISODate)));
+    }
     return true;
 }
 
@@ -195,11 +210,21 @@ std::chrono::milliseconds TimeSyncManager::getSyncTime() const
     return m_synchronizedTime + elapsed;
 }
 
+bool TimeSyncManager::isTimeTakenFromInternet() const
+{
+    return m_isTimeTakenFromInternet;
+}
+
 void TimeSyncManager::doPeriodicTasks()
 {
     auto globalSettings = this->commonModule()->globalSettings();
     if (globalSettings->isTimeSynchronizationEnabled())
         updateTime();
+}
+
+QString TimeSyncManager::idForToStringFromPtr() const
+{
+    return qnStaticCommon->moduleDisplayName(this->commonModule()->moduleGUID());
 }
 
 } // namespace time_sync

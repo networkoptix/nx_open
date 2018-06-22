@@ -505,13 +505,15 @@ CameraDiagnostics::Result QnThirdPartyResource::initializeCameraDriver()
             arg(m_discoveryManager.getVendorName()).arg(QString::fromUtf8(m_camInfo.modelName)).
             arg(QString::fromUtf8(m_camInfo.url)).arg(m_camManager->getLastErrorString()), cl_logDEBUG1 );
         setStatus( result == nxcip::NX_NOT_AUTHORIZED ? Qn::Unauthorized : Qn::Offline );
+        m_encoderCount = 0;
         return CameraDiagnostics::UnknownErrorResult();
     }
 
-    if( m_encoderCount == 0 )
+    if( m_encoderCount <= 0 )
     {
         NX_LOG( lit("Third-party camera %1:%2 (url %3) returned 0 encoder count!").arg(m_discoveryManager.getVendorName()).
             arg(QString::fromUtf8(m_camInfo.modelName)).arg(QString::fromUtf8(m_camInfo.url)), cl_logDEBUG1 );
+        m_encoderCount = 0;
         return CameraDiagnostics::UnknownErrorResult();
     }
 

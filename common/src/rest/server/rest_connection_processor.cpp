@@ -91,12 +91,6 @@ QnRestConnectionProcessor::~QnRestConnectionProcessor()
     stop();
 }
 
-QnTcpListener* QnRestConnectionProcessor::owner() const
-{
-    Q_D(const QnTCPConnectionProcessor);
-    return d->owner;
-}
-
 void QnRestConnectionProcessor::run()
 {
     Q_D(QnTCPConnectionProcessor);

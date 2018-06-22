@@ -47,9 +47,20 @@ enum class PasswordStrength
     WeakAndGood,    /**< Weak, has good length. Actual for cameras. */
 };
 
+NX_UTILS_API QString toString(PasswordStrength strength);
+
 /** Function to analyze password strength. */
 NX_UTILS_API PasswordStrength passwordStrength(const QString& password);
 NX_UTILS_API PasswordStrength cameraPasswordStrength(const QString& password);
+
+enum PasswordAcceptance
+{
+    Unacceptable = -1,
+    Acceptable,
+    Good
+};
+
+NX_UTILS_API PasswordAcceptance passwordAcceptance(PasswordStrength strength);
 
 } // namespace utils
 } // namespace nx

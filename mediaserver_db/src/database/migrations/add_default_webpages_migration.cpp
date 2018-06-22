@@ -37,7 +37,7 @@ bool addDefaultWebpages(ec2::database::api::QueryContext* context)
     QFile config(":/serverProperties.json");
     if (!config.open(QIODevice::ReadOnly))
     {
-        NX_LOG(lit("Could not read serverProperties.json"), cl_logWARNING);
+        NX_LOG(lit("Could not read serverProperties.json"), cl_logDEBUG1); //< UT don't have it.
         return true; // We don't want to crash if partner did not fill any of these
     }
 

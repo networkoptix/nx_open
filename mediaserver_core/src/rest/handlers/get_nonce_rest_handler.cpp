@@ -3,18 +3,18 @@
 #include <QTimeZone>
 #include <QtCore/QJsonDocument>
 
-#include <network/authenticate_helper.h>
+#include <api/model/getnonce_reply.h>
+#include <core/resource_management/resource_pool.h>
+#include <core/resource/user_resource.h>
 #include <network/authutil.h>
 #include <network/tcp_connection_priv.h>
+#include <network/universal_tcp_listener.h>
+#include <nx/network/http/http_client.h>
+#include <rest/server/rest_connection_processor.h>
 #include <utils/common/app_info.h>
 #include <utils/common/synctime.h>
 #include <utils/common/util.h>
-#include <core/resource/user_resource.h>
-#include <core/resource_management/resource_pool.h>
-#include <api/model/getnonce_reply.h>
 #include <nx/network/app_info.h>
-#include <nx/network/http/http_client.h>
-#include <rest/server/rest_connection_processor.h>
 
 namespace {
 
@@ -71,7 +71,7 @@ int QnGetNonceRestHandler::executeGet(
     }
 
     QnGetNonceReply reply;
-    reply.nonce = QnAuthHelper::instance()->generateNonce();
+    reply.nonce = QnUniversalTcpListener::authorizer(owner->owner())->generateNonce();
     reply.realm = nx::network::AppInfo::realm();
 
     QString userName = params.value("userName");

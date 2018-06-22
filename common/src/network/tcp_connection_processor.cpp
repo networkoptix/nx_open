@@ -677,3 +677,9 @@ void QnTCPConnectionProcessor::sendUnauthorizedResponse(nx::network::http::Statu
         d->response.messageBody.isEmpty() ? QByteArray() : "text/html; charset=utf-8",
         contentEncoding );
 }
+
+QnTcpListener* QnTCPConnectionProcessor::owner() const
+{
+    Q_D(const QnTCPConnectionProcessor);
+    return d->owner;
+}

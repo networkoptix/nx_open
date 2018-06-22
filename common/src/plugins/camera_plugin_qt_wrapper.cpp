@@ -140,7 +140,7 @@ namespace nxcip_qt
         //requesting size of list
         int count = 0;
         m_intf->getReservedModelList( NULL, &count );
-        if( !count )
+        if( count <= 0 )
             return modelList;
 
         //preparing temporary buffer

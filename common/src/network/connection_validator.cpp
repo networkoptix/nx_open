@@ -87,6 +87,8 @@ Qn::ConnectionResult QnConnectionValidator::validateConnection(
         return Qn::DisabledUserConnectionResult;
     else if (networkError == ec2::ErrorCode::forbidden)
         return Qn::ForbiddenConnectionResult;
+    else if (networkError == ec2::ErrorCode::userLockedOut)
+        return Qn::UserTemporaryLockedOut;
 
     if (networkError != ec2::ErrorCode::ok)
         return Qn::NetworkErrorConnectionResult;

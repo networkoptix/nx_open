@@ -70,7 +70,8 @@ void ReverseConnectionManager::at_reverseConnectionRequested(
     auto server = resourcePool()->getResourceById<QnMediaServerResource>(data.targetServer);
     if (!server)
     {
-        NX_WARNING(this, lm("Target server %1 is not known yet").arg(data.targetServer));
+        NX_WARNING(this, lm("Target server %1 is not known yet")
+            .arg(qnStaticCommon->moduleDisplayName(data.targetServer)));
         return;
     }
 

@@ -10,8 +10,8 @@
 #include <nx/network/system_socket.h>
 #include <nx/network/udt/udt_socket.h>
 #include <nx/utils/log/log.h>
-
 #include <nx/vms/cloud_integration/cloud_connection_manager.h>
+#include <nx/vms/cloud_integration/cloud_manager_group.h>
 
 #include <common/common_module.h>
 
@@ -36,6 +36,16 @@ QnUniversalTcpListener::QnUniversalTcpListener(
     m_cloudCredentials.serverId = commonModule->moduleGUID().toByteArray();
 }
 
+void QnUniversalTcpListener::setupAuthorizer(
+    TimeBasedNonceProvider* timeBasedNonceProvider,
+    nx::vms::cloud_integration::CloudManagerGroup& cloudManagerGroup)
+{
+    m_authorizer = std::make_unique<nx::mediaserver::Authenticator>(
+        commonModule(), timeBasedNonceProvider,
+        &cloudManagerGroup.authenticationNonceFetcher,
+        &cloudManagerGroup.userAuthenticator);
+}
+
 void QnUniversalTcpListener::setCloudConnectionManager(
     const nx::vms::cloud_integration::CloudConnectionManager& cloudConnectionManager)
 {
@@ -46,6 +56,7 @@ void QnUniversalTcpListener::setCloudConnectionManager(
     {
         onCloudBindingStatusChanged(cloudConnectionManager.getSystemCredentials());
     });
+
     onCloudBindingStatusChanged(cloudConnectionManager.getSystemCredentials());
 }
 
@@ -175,6 +186,18 @@ void QnUniversalTcpListener::updateCloudConnectState(
 void QnUniversalTcpListener::applyModToRequest(nx::network::http::Request* request)
 {
     m_httpModManager->apply(request);
+}
+
+nx::mediaserver::Authenticator* QnUniversalTcpListener::authenticator() const
+{
+    return m_authorizer.get();
+}
+
+nx::mediaserver::Authenticator* QnUniversalTcpListener::authorizer(const QnTcpListener* listener)
+{
+    const auto universalListener = dynamic_cast<const QnUniversalTcpListener*>(listener);
+    NX_CRITICAL(universalListener);
+    return universalListener->authenticator();
 }
 
 bool QnUniversalTcpListener::isAuthentificationRequired(nx::network::http::Request& request)

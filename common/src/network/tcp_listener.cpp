@@ -137,7 +137,7 @@ bool QnTcpListener::bindToLocalAddress()
         d->localPort = d->localEndpoint.port;
     }
 
-    NX_LOGX(lm("Server started at %1").arg(localAddress), cl_logINFO);
+    NX_LOGX(lm("Server started at %1").arg(d->localEndpoint), cl_logINFO);
     return true;
 }
 

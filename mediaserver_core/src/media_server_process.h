@@ -36,8 +36,8 @@ class QNetworkReply;
 class QnServerMessageProcessor;
 struct QnModuleInformation;
 struct QnPeerRuntimeInfo;
-class QnLdapManager;
 struct BeforeRestoreDbData;
+class TimeBasedNonceProvider;
 
 namespace ec2 { 
 
@@ -122,6 +122,7 @@ public:
     }
 
     MSSettings* serverSettings() const { return m_settings.get(); }
+    nx::mediaserver::Authenticator* authenticator() const { return m_universalTcpListener->authenticator(); }
 
     static void configureApiRestrictions(nx::network::http::AuthMethodRestrictionList* restrictions);
 
@@ -168,6 +169,7 @@ private:
     void regTcp(const QByteArray& protocol, const QString& path, ExtraParam... extraParam);
 
     bool initTcpListener(
+        TimeBasedNonceProvider* timeBasedNonceProvider,
         nx::vms::cloud_integration::CloudManagerGroup* const cloudManagerGroup,
         ec2::LocalConnectionFactory* ec2ConnectionFactory);
     void initializeCloudConnect();
@@ -201,6 +203,7 @@ private:
         const QnMediaServerResourcePtr &server,
         bool isNewServerInstance);
     nx::utils::Url appServerConnectionUrl() const;
+
 private:
     int m_argc;
     char** m_argv;

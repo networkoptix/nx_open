@@ -46,6 +46,8 @@ namespace ec2
                 return lit( "incompatiblePeer" );
             case ErrorCode::disabled_user_unauthorized:
                 return lit("disabledUser");
+            case ErrorCode::userLockedOut:
+                return lit("userLockedOut");
             default:
                 return lit( "unknown error" );
         }

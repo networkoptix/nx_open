@@ -6,6 +6,7 @@
 #include <core/resource/webpage_resource.h>
 #include <nx/client/desktop/common/utils/aligner.h>
 #include <nx/client/desktop/common/utils/validators.h>
+#include <nx/network/http/http_types.h>
 
 namespace {
 
@@ -14,10 +15,7 @@ bool isValidUrl(const QUrl& url)
     if (!url.isValid())
         return false;
 
-    const static QString kHttp(lit("http"));
-    const static QString kHttps(lit("https"));
-
-    return url.scheme() == kHttp || url.scheme() == kHttps;
+    return nx::network::http::isUrlSheme(url.scheme());
 }
 
 } // namespace

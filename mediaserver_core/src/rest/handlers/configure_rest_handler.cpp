@@ -80,9 +80,28 @@ int QnConfigureRestHandler::execute(
     QString errStr;
     if (!nx::vms::utils::validatePasswordData(data, &errStr))
     {
-        NX_LOG(lit("QnConfigureRestHandler: invalid password provided"), cl_logWARNING);
+        NX_LOG(lit("QnConfigureRestHandler: %1").arg(errStr), cl_logWARNING);
         result.setError(QnJsonRestResult::CantProcessRequest, errStr);
         return nx::network::http::StatusCode::ok;
+    }
+
+    if (data.hasPassword())
+    {
+        if (!data.currentPassword.isEmpty())
+        {
+            result.setError(QnJsonRestResult::CantProcessRequest,
+                lit("currentPassword is required for password change"));
+            return nx::network::http::StatusCode::ok;
+        }
+
+        const auto user = owner->commonModule()->resourcePool()
+            ->getResourceById<QnUserResource>(owner->accessRights().userId);
+        if (!user->checkLocalUserPassword(data.currentPassword))
+        {
+            result.setError(QnJsonRestResult::CantProcessRequest,
+                lit("currentPassword is invalid"));
+            return nx::network::http::StatusCode::ok;
+        }
     }
 
     // Configure request must support systemName changes to maintain compatibility with NxTool

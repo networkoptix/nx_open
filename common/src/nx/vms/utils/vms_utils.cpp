@@ -15,6 +15,7 @@
 #include <network/system_helpers.h>
 #include <nx_ec/data/api_conversion_functions.h>
 #include <nx/utils/app_info.h>
+#include <nx/utils/password_analyzer.h>
 
 namespace nx {
 namespace vms {
@@ -140,6 +141,17 @@ bool validatePasswordData(const PasswordData& passwordData, QString* errStr)
         if (errStr)
             *errStr = lit("All password hashes MUST be supplied all together along with realm");
         return false;
+    }
+
+    if (!passwordData.password.isEmpty())
+    {
+        const auto passwordStrength = nx::utils::passwordStrength(passwordData.password);
+        if (nx::utils::passwordAcceptance(passwordStrength) == nx::utils::PasswordAcceptance::Unacceptable)
+        {
+            if (errStr)
+                *errStr = lit("New password is not acceptable: %1").arg(nx::utils::toString(passwordStrength));
+            return false;
+        }
     }
 
     return true;

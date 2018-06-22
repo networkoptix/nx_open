@@ -31,7 +31,6 @@
 #include "transcoding/ffmpeg_transcoder.h"
 #include "camera/video_camera.h"
 #include "camera/camera_pool.h"
-#include "network/authenticate_helper.h"
 #include "streaming/streaming_params.h"
 #include "media_server/settings.h"
 #include "cached_output_stream.h"

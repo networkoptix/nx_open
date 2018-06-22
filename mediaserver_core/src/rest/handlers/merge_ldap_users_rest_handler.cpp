@@ -1,25 +1,17 @@
-/**********************************************************
-* 16 jul 2014
-* a.kolesnikov
-***********************************************************/
-
 #include "merge_ldap_users_rest_handler.h"
 
+#include <api/app_server_connection.h>
 #include <common/common_module.h>
 #include <nx/network/app_info.h>
-#include <nx/network/http/http_types.h>
-
 #include <core/resource/user_resource.h>
-#include <ldap/ldap_manager.h>
-#include "api/app_server_connection.h"
-
+#include <network/universal_tcp_listener.h>
+#include <nx_ec/data/api_user_data.h>
 #include <nx_ec/ec_api.h>
 #include <nx_ec/managers/abstract_user_manager.h>
-#include <nx/vms/api/data/user_data.h>
-
+#include <nx_ec/data/api_user_data.h>
+#include <nx/network/http/http_types.h>
 #include <nx/utils/uuid.h>
-#include "rest/server/rest_connection_processor.h"
-#include <network/authenticate_helper.h>
+#include <rest/server/rest_connection_processor.h>
 
 int QnMergeLdapUsersRestHandler::executePost(
     const QString& /*path*/,
@@ -29,10 +21,11 @@ int QnMergeLdapUsersRestHandler::executePost(
     const QnRestConnectionProcessor* owner)
 {
     QnLdapUsers ldapUsers;
-    Qn::LdapResult ldapResult = qnAuthHelper->ldapManager()->fetchUsers(ldapUsers);
-    if (ldapResult != Qn::Ldap_NoError)
+    const auto ldapResult = QnUniversalTcpListener::authorizer(owner->owner())->ldapManager()
+        ->fetchUsers(ldapUsers);
+    if (ldapResult != nx::mediaserver::LdapResult::NoError)
 	{
-        result.setError(QnRestResult::CantProcessRequest, QnLdapManager::errorMessage(ldapResult));
+        result.setError(QnRestResult::CantProcessRequest, toString(ldapResult));
         return nx::network::http::StatusCode::ok;
     }
 
