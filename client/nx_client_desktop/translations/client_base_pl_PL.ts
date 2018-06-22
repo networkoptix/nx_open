@@ -1175,7 +1175,7 @@ to view more bookmarks</source>
     </message>
     <message numerus="yes">
       <source>Password should contain %n different combinations of either characters, symbols, or digits</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Hasło powinno zawierać znaki, symbole lub cyfry</numerusform>
         <numerusform>Hasło powinno zawierać %n znaki, symbole lub cyfry</numerusform>
         <numerusform>Hasło powinno zawierać %n znaków, symboli lub cyfr</numerusform>
@@ -4441,7 +4441,7 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>Use licenses to view these %n cameras</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Użyj licencji, aby wyświetlać tę kamerę</numerusform>
         <numerusform>Użyj licencji, aby wyświetlać te %n kamery</numerusform>
         <numerusform>Użyj licencji, aby wyświetlać te %n kamer</numerusform>
@@ -8548,7 +8548,7 @@ to %1</source>
     <name>nx::client::desktop::RapidReviewSettingsWidget</name>
     <message numerus="yes">
       <source>For exporting as Rapid Review video length should be at least %n seconds.</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Przy eksportowaniu w trybie szybkiego przeglądu długość wideo powinna wynosić co najmniej sekundę.</numerusform>
         <numerusform>Przy eksportowaniu w trybie szybkiego przeglądu długość wideo powinna wynosić co najmniej %n sekundy.</numerusform>
         <numerusform>Przy eksportowaniu w trybie szybkiego przeglądu długość wideo powinna wynosić co najmniej %n sekund.</numerusform>
