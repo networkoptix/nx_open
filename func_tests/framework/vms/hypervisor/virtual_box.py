@@ -90,13 +90,17 @@ class VirtualBox(Hypervisor):
         raw_info = dict(csv.reader(output.splitlines(), delimiter='=', escapechar='\\', doublequote=False))
         return raw_info
 
+    def import_vm(self, vm_image_path, vm_name):
+        # `import` is reserved name...
+        self._vbox_manage(['import', vm_image_path, '--vsys', 0, '--vmname', vm_name])
+        self._vbox_manage(['snapshot', vm_name, 'take', 'template'])
+
+    def export_vm(self, vm_name, vm_image_path):
+        """Export VM from its current state: it may not have snapshot at all"""
+        self._vbox_manage(['export', vm_name, '-o', vm_image_path, '--options', 'nomacs'])
+
     def create_dummy(self, vm_name):
         self._vbox_manage(['createvm', '--name', vm_name, '--register'])
-        # Without specific OS type (`Other` by default), `VBoxManage import` says:
-        # "invalid ovf:id in operating system section".
-        # Try: `strings ~/.func_tests/template_vm.ova` and
-        # search for `OperatingSystemSection` element.
-        self._vbox_manage(['modifyvm', vm_name, '--ostype', 'Ubuntu_64'])
         self._vbox_manage(['modifyvm', vm_name, '--description', 'For testing purposes. Can be deleted.'])
 
     def find(self, vm_name):
@@ -130,6 +134,9 @@ class VirtualBox(Hypervisor):
     def setup_network_access(self, vm_name, vm_index, forwarded_ports_configuration):
         modify_command = ['modifyvm', vm_name]
         forwarded_ports = calculate_forwarded_ports(vm_index, forwarded_ports_configuration)
+        if not forwarded_ports:
+            _logger.warning("No ports are forwarded to VM %s (index %d).", vm_name, vm_index)
+            return
         for tag, protocol, host_port, guest_port in forwarded_ports:
             modify_command.append('--natpf1={},{},,{},,{}'.format(tag, protocol, host_port, guest_port))
         self._vbox_manage(modify_command)

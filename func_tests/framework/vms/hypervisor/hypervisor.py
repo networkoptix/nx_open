@@ -11,6 +11,15 @@ class Hypervisor(object):
         self.host_os_access = host_os_access  # type: OSAccess
 
     @abstractmethod
+    def import_vm(self, vm_image_path, vm_name):
+        pass
+
+    @abstractmethod
+    def export_vm(self, vm_name, vm_image_path):
+        """Export VM from its current state: it may not have snapshot at all"""
+        pass
+
+    @abstractmethod
     def create_dummy(self, vm_name):
         pass
 
