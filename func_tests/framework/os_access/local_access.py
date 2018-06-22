@@ -5,7 +5,7 @@ import os
 import tzlocal
 
 from framework.networking.prohibited import ProhibitedNetworking
-from framework.os_access.exceptions import AlreadyDownloaded
+from framework.os_access.exceptions import AlreadyDownloaded, CannotDownload
 from framework.os_access.local_path import LocalPath
 from framework.os_access.os_access_interface import OneWayPortMap, ReciprocalPortMap
 from framework.os_access.posix_access import PosixAccess
@@ -42,6 +42,8 @@ class LocalAccess(PosixAccess):
 
     def _take_local(self, local_source_path, destination_dir):
         destination = destination_dir / local_source_path.name
+        if not local_source_path.exists():
+            raise CannotDownload("Local file {} doesn't exist.".format(local_source_path))
         try:
             os.symlink(str(local_source_path), str(destination))
         except OSError as e:

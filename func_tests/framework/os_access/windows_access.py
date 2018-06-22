@@ -7,10 +7,11 @@ import tzlocal.windows_tz
 
 from framework.method_caching import cached_getter, cached_property
 from framework.networking.windows import WindowsNetworking
-from framework.os_access.exceptions import AlreadyDownloaded, exit_status_error_cls
+from framework.os_access.exceptions import AlreadyDownloaded, CannotDownload, exit_status_error_cls
 from framework.os_access.remote_access import RemoteAccess
 from framework.os_access.smb_path import SMBConnectionPool, SMBPath
 from framework.os_access.windows_remoting import WinRM
+from framework.os_access.windows_remoting._powershell import PowershellError
 from framework.os_access.windows_remoting.env_vars import EnvVars
 from framework.os_access.windows_remoting.users import Users
 from framework.utils import RunningTime
@@ -140,7 +141,10 @@ class WindowsAccess(RemoteAccess):
                 destination)
         variables = {'out': str(destination), 'url': source_url}
         # language=PowerShell
-        self.winrm.run_powershell_script('Invoke-WebRequest -OutFile $out $url', variables)
+        try:
+            self.winrm.run_powershell_script('Invoke-WebRequest -OutFile $out $url', variables)
+        except PowershellError as e:
+            raise CannotDownload(str(e))
         return destination
 
     def _download_by_smb(self, source_hostname, source_path, destination_dir):

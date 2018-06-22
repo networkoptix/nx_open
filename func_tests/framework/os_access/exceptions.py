@@ -39,6 +39,10 @@ class DoesNotExist(Exception):
     pass
 
 
+class CannotDownload(DoesNotExist):
+    pass
+
+
 class AlreadyExists(Exception):
     pass
 

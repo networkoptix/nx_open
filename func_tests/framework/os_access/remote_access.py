@@ -1,6 +1,6 @@
 from abc import ABCMeta
 
-from framework.os_access.exceptions import AlreadyDownloaded
+from framework.os_access.exceptions import AlreadyDownloaded, CannotDownload
 from framework.os_access.os_access_interface import OSAccess
 from framework.os_access.path import copy_file
 
@@ -17,6 +17,8 @@ class RemoteAccess(OSAccess):
 
     def _take_local(self, local_source_path, destination_dir):
         destination = destination_dir / local_source_path.name
+        if not local_source_path.exists():
+            raise CannotDownload("Local file {} doesn't exist.".format(local_source_path))
         if destination.exists():
             raise AlreadyDownloaded(
                 "Cannot copy {!s} to {!s}".format(local_source_path, destination_dir),
