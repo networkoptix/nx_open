@@ -74,7 +74,7 @@ buildDistribution()
     done
 
     # Copy mediaserver plugins.
-    local PLUGIN_FILENAME
+
     local PLUGINS=(
         generic_multicast_plugin
         genericrtspplugin
@@ -91,6 +91,10 @@ buildDistribution()
     then
         PLUGINS+=( hanwha_metadata_plugin )
     fi
+
+    local PLUGIN_FILENAME
+    local PLUGIN
+
     for PLUGIN in "${PLUGINS[@]}"
     do
         PLUGIN_FILENAME="lib$PLUGIN.so"

@@ -276,37 +276,43 @@ copyBins()
         done
     done
 
+    if [ "$BOX" = "bpi" ]
+    then
+        echo "Creating symlink for rpath needed by mediaserver binary"
+        ln -s "../lib" "$INSTALL_DIR/mediaserver/lib"
+    fi
+}
+
+# [in] MEDIASERVER_BIN_INSTALL_DIR
+copyMediaserverPlugins()
+{
     mkdir -p "$MEDIASERVER_BIN_INSTALL_DIR/plugins"
+
     if [ "$BOX" = "edge1" ]
     then
         # NOTE: Plugins from $BIN_BUILD_DIR/plugins are not needed on edge1.
         local -r PLUGIN="libcpro_ipnc_plugin.so.1.0.0"
         echo "Copying $PLUGIN"
         cp -r "$LIB_BUILD_DIR/$PLUGIN" "$MEDIASERVER_BIN_INSTALL_DIR/plugins/"
-    else
-        if [ -d "$BIN_BUILD_DIR/plugins" ]
-        then
-            local FILE
-            for FILE in "$BIN_BUILD_DIR/plugins/"*
-            do
-                if [[ -f $FILE ]] && [[ $FILE != *.debug ]]
-                then
-                    if [ "$ENABLE_HANWHA" != "true" ] && [[ "$FILE" == *hanwha* ]]
-                    then
-                        continue
-                    fi
-
-                    echo "Copying plugins/$(basename "$FILE")"
-                    cp -r "$FILE" "$MEDIASERVER_BIN_INSTALL_DIR/plugins/"
-                fi
-            done
-        fi
+        return
     fi
 
-    if [ "$BOX" = "bpi" ]
+    if [ -d "$BIN_BUILD_DIR/plugins" ]
     then
-        echo "Creating symlink for rpath needed by mediaserver binary"
-        ln -s "../lib" "$INSTALL_DIR/mediaserver/lib"
+        local FILE
+        for FILE in "$BIN_BUILD_DIR/plugins/"*
+        do
+            if [[ -f $FILE ]] && [[ $FILE != *.debug ]]
+            then
+                if [ "$ENABLE_HANWHA" != "true" ] && [[ "$FILE" == *hanwha* ]]
+                then
+                    continue
+                fi
+
+                echo "Copying plugins/$(basename "$FILE")"
+                cp -r "$FILE" "$MEDIASERVER_BIN_INSTALL_DIR/plugins/"
+            fi
+        done
     fi
 }
 
@@ -555,7 +561,8 @@ buildDebugSymbolsArchive()
     for FILE in \
         "$LIB_BUILD_DIR"/*.debug \
         "$BIN_BUILD_DIR"/*.debug \
-        "$BIN_BUILD_DIR/plugins"/*.debug
+        "$BIN_BUILD_DIR/plugins"/*.debug \
+        "$BIN_BUILD_DIR/plugins_optional"/*.debug
     do
         if [ -f "$FILE" ]
         then
@@ -604,6 +611,7 @@ buildDistribution()
     copyBuildLibs
     copyQtLibs
     copyBins
+    copyMediaserverPlugins
     copyConf
     copyScripts
     copyDebs
