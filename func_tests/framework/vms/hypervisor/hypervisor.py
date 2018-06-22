@@ -9,7 +9,7 @@ class Hypervisor(object):
         pass
 
     @abstractmethod
-    def clone(self, original_vm_name, original_snapshot_name, clone_vm_name):
+    def clone(self, original_vm_name, clone_vm_name):
         pass
 
     @abstractmethod

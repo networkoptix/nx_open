@@ -8,7 +8,6 @@ vm_types:
       limit: 100
       mac_address_format: 0A-00-00-01-{vm_index:02X}-0{nic_index:01X}
       template_vm: trusty-template
-      template_vm_snapshot: template
       port_forwarding:
         host_ports_base: 33000
         host_ports_per_vm: 10
@@ -30,7 +29,6 @@ vm_types:
       limit: 20
       mac_address_format: 0A-00-00-02-{vm_index:02X}-0{nic_index:01X}
       template_vm: win10-template
-      template_vm_snapshot: template
       port_forwarding:
         host_ports_base: 35000
         host_ports_per_vm: 10

@@ -30,17 +30,14 @@ def template():
     """Create Machine without tested class."""
     vm = name_format.format('template')
     _create_vm(vm)
-    vm_snapshot = 'test template'
-    check_call(['VBoxManage', 'snapshot', vm, 'take', vm_snapshot])
-    return vm, vm_snapshot
+    check_call(['VBoxManage', 'snapshot', vm, 'take', 'template'])
+    return vm
 
 
 @pytest.fixture(scope='session')
 def clone_configuration(template):
-    template_vm, template_vm_snapshot = template
     return {
-        'template_vm': template_vm,
-        'template_vm_snapshot': template_vm_snapshot,
+        'template_vm': template,
         'mac_address_format': '0A-00-00-FF-{vm_index:02X}-{nic_index:02X}',
         'port_forwarding': {
             'host_ports_base': 65000,

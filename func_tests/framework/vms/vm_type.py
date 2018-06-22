@@ -10,7 +10,7 @@ class VMType(object):
             self,
             hypervisor,
             registry_path, name_format, limit,
-            template_vm, template_vm_snapshot,
+            template_vm,
             mac_address_format, port_forwarding):
         self.hypervisor = hypervisor  # type: Hypervisor
         self.registry = Registry(
@@ -20,7 +20,6 @@ class VMType(object):
             limit,
             )
         self.template_vm_name = template_vm
-        self._snapshot_name = template_vm_snapshot
         self.mac_format = mac_address_format
         self.network_access_configuration = port_forwarding
 
@@ -30,7 +29,7 @@ class VMType(object):
             try:
                 vm_info = self.hypervisor.find(vm_name)
             except VMNotFound:
-                self.hypervisor.clone(self.template_vm_name, self._snapshot_name, vm_name)
+                self.hypervisor.clone(self.template_vm_name, vm_name)
                 self.hypervisor.setup_mac_addresses(vm_name, vm_index, self.mac_format)
                 self.hypervisor.setup_network_access(vm_name, vm_index, self.network_access_configuration)
                 vm_info = self.hypervisor.find(vm_name)

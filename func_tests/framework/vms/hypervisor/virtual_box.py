@@ -97,11 +97,11 @@ class VirtualBox(Hypervisor):
         info = vm_info_from_raw_info(raw_info)
         return info
 
-    def clone(self, original_vm_name, original_snapshot_name, clone_vm_name):
+    def clone(self, original_vm_name, clone_vm_name):
         try:
             self._vbox_manage([
                 'clonevm', original_vm_name,
-                '--snapshot', original_snapshot_name,
+                '--snapshot', 'template',
                 '--name', clone_vm_name,
                 '--options', 'link',
                 '--register',
