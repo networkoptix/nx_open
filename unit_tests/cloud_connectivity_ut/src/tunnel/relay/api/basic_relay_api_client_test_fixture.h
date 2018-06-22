@@ -16,8 +16,7 @@ class BasicRelayApiClientTestFixture
 public:
     void registerClientSessionHandler(
         nx::network::http::TestHttpServer* httpServer,
-        const std::string& baseUrlPath,
-        const std::string& listeningPeerName)
+        const std::string& baseUrlPath)
     {
         httpServer->registerStaticProcessor(
             network::url::joinPath(baseUrlPath, kServerClientSessionsPath).c_str(),

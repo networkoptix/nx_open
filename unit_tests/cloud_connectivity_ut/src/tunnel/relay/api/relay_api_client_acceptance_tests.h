@@ -301,8 +301,7 @@ private:
 
         m_clientTypeSet.initializeHttpServer(
             m_httpServer.get(),
-            baseUrlPath.toStdString(),
-            "some_server_name");
+            baseUrlPath.toStdString());
         m_clientTypeSet.setBeginListeningResponse(m_expectedBeginListeningResponse);
 
         ASSERT_TRUE(m_httpServer->bindAndListen());

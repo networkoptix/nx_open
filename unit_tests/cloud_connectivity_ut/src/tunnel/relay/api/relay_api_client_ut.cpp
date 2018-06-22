@@ -15,15 +15,13 @@ public:
 
     void initializeHttpServer(
         nx::network::http::TestHttpServer* httpServer,
-        const std::string& baseUrlPath,
-        const std::string& listeningPeerName)
+        const std::string& baseUrlPath)
     {
         using namespace std::placeholders;
 
         registerClientSessionHandler(
             httpServer,
-            baseUrlPath,
-            listeningPeerName);
+            baseUrlPath);
 
         registerOpenClientTunnelViaUpgradeHandler(
             httpServer,
