@@ -83,7 +83,7 @@ def vm_types(hypervisor, host_os_access):
             hypervisor,
             Registry(
                 host_os_access,
-                host_os_access.Path(vm_type_conf['registry_path']).expanduser(),
+                vm_type_conf['registry_path'],
                 vm_type_conf['name_format'].format(vm_index='{index}'),  # Registry doesn't know about VMs.
                 vm_type_conf['limit'],
                 ),
