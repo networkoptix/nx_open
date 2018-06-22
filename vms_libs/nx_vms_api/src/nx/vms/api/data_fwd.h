@@ -123,6 +123,9 @@ DECLARE_STRUCT_AND_LIST(MediaServerUserAttributesData)
 
 DECLARE_STRUCT_AND_LIST(SystemMergeHistoryRecord)
 
+DECLARE_STRUCT(DiscoverPeerData)
+DECLARE_STRUCT_AND_LIST(DiscoveryData)
+
 #undef DECLARE_STRUCT
 #undef DECLARE_STRUCT_EX
 #undef DECLARE_STRUCT_AND_LIST

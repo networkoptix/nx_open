@@ -127,7 +127,7 @@ public slots:
 
 private slots:
     void on_gotInitialNotification(const ec2::ApiFullInfoData& fullData);
-    void on_gotDiscoveryData(const ec2::ApiDiscoveryData &discoveryData, bool addInformation);
+    void on_gotDiscoveryData(const nx::vms::api::DiscoveryData& discoveryData, bool addInformation);
 
     void on_remotePeerFound(QnUuid data, nx::vms::api::PeerType peerType);
     void on_remotePeerLost(QnUuid data, nx::vms::api::PeerType peerType);

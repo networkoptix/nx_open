@@ -1118,8 +1118,8 @@ bool QnDbManager::resyncTransactionLog()
 
     if (!fillTransactionLogInternal<
         QnUuid,
-        ApiDiscoveryData,
-        ApiDiscoveryDataList>(ApiCommand::addDiscoveryInformation))
+        DiscoveryData,
+        DiscoveryDataList>(ApiCommand::addDiscoveryInformation))
     {
         return false;
     }
@@ -2810,7 +2810,7 @@ ErrorCode QnDbManager::executeTransactionInternal(const QnTransaction<WebPageDat
     return ErrorCode::ok;
 }
 
-ErrorCode QnDbManager::executeTransactionInternal(const QnTransaction<ApiDiscoveryData> &tran)
+ErrorCode QnDbManager::executeTransactionInternal(const QnTransaction<DiscoveryData> &tran)
 {
     if (tran.command == ApiCommand::addDiscoveryInformation) {
         QSqlQuery query(m_sdb);
@@ -4481,7 +4481,8 @@ ErrorCode QnDbManager::readApiFullInfoDataForMobileClient(
 
 #undef DB_LOAD
 
-ErrorCode QnDbManager::doQueryNoLock(const QnUuid& id, ApiDiscoveryDataList &data) {
+ErrorCode QnDbManager::doQueryNoLock(const QnUuid& id, DiscoveryDataList& data)
+{
     QSqlQuery query(m_sdb);
 
     QString filterStr;

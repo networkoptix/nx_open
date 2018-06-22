@@ -16,6 +16,7 @@
 #include <network/http_connection_listener.h>
 #include <nx_ec/ec_proto_version.h>
 #include <nx/vms/api/data/access_rights_data.h>
+#include <nx/vms/api/data/discovery_data.h>
 #include <nx/vms/api/data/user_role_data.h>
 #include <nx/vms/api/data/camera_history_data.h>
 #include <nx/vms/api/data/media_server_data.h>
@@ -1552,13 +1553,13 @@ void LocalConnectionFactory::registerRestHandlers(QnRestProcessorPool* const p)
     regUpdate<ApiDiscoveredServerDataList>(p, ApiCommand::discoveredServersList);
 
     // AbstractDiscoveryManager::discoverPeer
-    regUpdate<ApiDiscoverPeerData>(p, ApiCommand::discoverPeer);
+    regUpdate<DiscoverPeerData>(p, ApiCommand::discoverPeer);
     // AbstractDiscoveryManager::addDiscoveryInformation
-    regUpdate<ApiDiscoveryData>(p, ApiCommand::addDiscoveryInformation);
+    regUpdate<DiscoveryData>(p, ApiCommand::addDiscoveryInformation);
     // AbstractDiscoveryManager::removeDiscoveryInformation
-    regUpdate<ApiDiscoveryData>(p, ApiCommand::removeDiscoveryInformation);
+    regUpdate<DiscoveryData>(p, ApiCommand::removeDiscoveryInformation);
     // AbstractDiscoveryManager::getDiscoveryData
-    regGet<QnUuid, ApiDiscoveryDataList>(p, ApiCommand::getDiscoveryData);
+    regGet<QnUuid, DiscoveryDataList>(p, ApiCommand::getDiscoveryData);
     // AbstractMiscManager::changeSystemId
     regUpdate<SystemIdData>(p, ApiCommand::changeSystemId);
 

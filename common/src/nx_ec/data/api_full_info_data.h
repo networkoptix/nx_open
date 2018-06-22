@@ -21,7 +21,7 @@ struct ApiFullInfoData: nx::vms::api::Data
     nx::vms::api::EventRuleDataList rules;
     nx::vms::api::ServerFootageDataList cameraHistory;
     nx::vms::api::LicenseDataList licenses;
-    ApiDiscoveryDataList discoveryData;
+    nx::vms::api::DiscoveryDataList discoveryData;
     nx::vms::api::ResourceParamWithRefDataList allProperties;
     nx::vms::api::StorageDataList storages;
     nx::vms::api::ResourceStatusDataList resStatusList;

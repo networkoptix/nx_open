@@ -8,12 +8,12 @@ using namespace nx::vms;
 
 namespace ec2 {
 
-ApiDiscoveryData toApiDiscoveryData(
+nx::vms::api::DiscoveryData toApiDiscoveryData(
     const QnUuid &id,
     const nx::utils::Url &url,
     bool ignore)
 {
-    ApiDiscoveryData params;
+    nx::vms::api::DiscoveryData params;
     params.id = id;
     params.url = url.toString();
     params.ignore = ignore;

@@ -324,8 +324,8 @@ namespace detail
         ErrorCode doQueryNoLock(
             const std::nullptr_t& /*dummy*/, nx::vms::api::LicenseDataList& data);
 
-        // ApiDiscoveryDataList
-        ErrorCode doQueryNoLock(const QnUuid& id, ApiDiscoveryDataList& data);
+        // DiscoveryDataList
+        ErrorCode doQueryNoLock(const QnUuid& id, nx::vms::api::DiscoveryDataList& data);
 
         //getMediaServerUserAttributesList
         ErrorCode doQueryNoLock(const QnUuid& mServerId,
@@ -400,7 +400,8 @@ namespace detail
         ErrorCode executeTransactionInternal(const QnTransaction<nx::vms::api::WebPageData>& tran);
         ErrorCode executeTransactionInternal(
             const QnTransaction<nx::vms::api::WebPageDataList>& tran);
-        ErrorCode executeTransactionInternal(const QnTransaction<ApiDiscoveryData>& tran);
+        ErrorCode executeTransactionInternal(
+            const QnTransaction<nx::vms::api::DiscoveryData>& tran);
         ErrorCode executeTransactionInternal(
             const QnTransaction<nx::vms::api::DatabaseDumpData>& tran);
         ErrorCode executeTransactionInternal(
@@ -501,7 +502,7 @@ namespace detail
             return ErrorCode::notImplemented;
         }
 
-        ErrorCode executeTransactionInternal(const QnTransaction<ApiDiscoverPeerData>&)
+        ErrorCode executeTransactionInternal(const QnTransaction<nx::vms::api::DiscoverPeerData>&)
         {
             NX_ASSERT(false, Q_FUNC_INFO, "This is a non persistent transaction!");
             return ErrorCode::notImplemented;
@@ -565,7 +566,7 @@ namespace detail
             return ErrorCode::notImplemented;
         }
 
-        ErrorCode executeTransactionInternal(const QnTransaction<ApiDiscoveryDataList>&)
+        ErrorCode executeTransactionInternal(const QnTransaction<nx::vms::api::DiscoveryDataList>&)
         {
             NX_ASSERT(false, Q_FUNC_INFO, "This is a non persistent transaction!");
             return ErrorCode::notImplemented;

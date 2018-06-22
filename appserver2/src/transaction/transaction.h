@@ -264,7 +264,7 @@ APPLY(206, getFullInfo, ApiFullInfoData, \
                        [] (const QnTransaction<ApiFullInfoData> & tran, const NotificationParams &notificationParams) \
                        { \
                            emit notificationParams.ecConnection->initNotification(tran.params); \
-                           for(const ApiDiscoveryData& data: tran.params.discoveryData) \
+                           for (const auto& data: tran.params.discoveryData) \
                                notificationParams.discoveryNotificationManager->triggerNotification(data); \
                        }, \
                        AllowForAllAccess(), /* save permission checker */ \
@@ -1083,7 +1083,7 @@ APPLY(1302, discoveredServersList, ApiDiscoveredServerDataList, \
                        FilterListByAccess<AllowForAllAccess>(), /* Filter read func */ \
                        ReadListAccessOut<AllowForAllAccess>(), /* Check remote peer rights for outgoing transaction */ \
                        RegularTransactionType()) /* regular transaction type */ \
-APPLY(1401, discoverPeer, ApiDiscoverPeerData, \
+APPLY(1401, discoverPeer, nx::vms::api::DiscoverPeerData, \
                        false, \
                        false, \
                        InvalidGetHashHelper(), \
@@ -1094,7 +1094,7 @@ APPLY(1401, discoverPeer, ApiDiscoverPeerData, \
                        InvalidFilterFunc(), /* Filter read func */ \
                        AllowForAllAccessOut(), /* Check remote peer rights for outgoing transaction */ \
                        RegularTransactionType()) /* regular transaction type */ \
-APPLY(1402, addDiscoveryInformation, ApiDiscoveryData, \
+APPLY(1402, addDiscoveryInformation, nx::vms::api::DiscoveryData, \
                        true, \
                        false, \
                        &createHashForApiDiscoveryDataHelper, \
@@ -1105,7 +1105,7 @@ APPLY(1402, addDiscoveryInformation, ApiDiscoveryData, \
                        InvalidFilterFunc(), /* Filter read func */ \
                        AllowForAllAccessOut(), /* Check remote peer rights for outgoing transaction */ \
                        RegularTransactionType()) /* regular transaction type */ \
-APPLY(1403, removeDiscoveryInformation, ApiDiscoveryData, \
+APPLY(1403, removeDiscoveryInformation, nx::vms::api::DiscoveryData, \
                        true, \
                        false, \
                        &createHashForApiDiscoveryDataHelper, \
@@ -1116,7 +1116,7 @@ APPLY(1403, removeDiscoveryInformation, ApiDiscoveryData, \
                        InvalidFilterFunc(), /* Filter read func */ \
                        AllowForAllAccessOut(), /* Check remote peer rights for outgoing transaction */ \
                        RegularTransactionType()) /* regular transaction type */ \
-APPLY(1404, getDiscoveryData, ApiDiscoveryDataList, \
+APPLY(1404, getDiscoveryData, nx::vms::api::DiscoveryDataList, \
                        true, \
                        false, \
                        InvalidGetHashHelper(), \
@@ -1432,7 +1432,7 @@ APPLY(10201, getSystemMergeHistory, nx::vms::api::SystemMergeHistoryRecordList, 
         using TimestampType = nx::vms::api::Timestamp;
 
         static QnUuid makeHash(const QByteArray& data1, const QByteArray& data2 = QByteArray());
-        static QnUuid makeHash(const QByteArray &extraData, const ApiDiscoveryData &data);
+        static QnUuid makeHash(const QByteArray &extraData, const nx::vms::api::DiscoveryData& data);
 
         /**
          * Sets \a QnAbstractTransaction::peerID to \a commonModule()->moduleGUID().

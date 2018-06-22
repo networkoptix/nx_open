@@ -9,9 +9,6 @@
 namespace ec2 {
 
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(
-    (ApiDiscoveryData)(ApiDiscoverPeerData), (ubjson)(xml)(json)(sql_record)(csv_record), _Fields)
-
-QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(
     (ApiDiscoveredServerData), (ubjson)(json), _Fields)
 
 std::vector<ApiDiscoveredServerData> getServers(nx::vms::discovery::Manager* manager)

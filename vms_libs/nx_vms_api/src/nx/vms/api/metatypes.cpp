@@ -10,6 +10,7 @@
 #include "data/cloud_system_data.h"
 #include "data/database_dump_data.h"
 #include "data/database_dump_to_file_data.h"
+#include "data/discovery_data.h"
 #include "data/event_rule_data.h"
 #include "data/layout_data.h"
 #include "data/layout_tour_data.h"
@@ -73,6 +74,9 @@ void Metatypes::initialize()
     qRegisterMetaType<DatabaseDumpData>();
     qRegisterMetaType<DatabaseDumpToFileData>();
     qRegisterMetaType<DetailedLicenseData>();
+    qRegisterMetaType<DiscoveryData>();
+    qRegisterMetaType<DiscoveryDataList>();
+    qRegisterMetaType<DiscoverPeerData>();
     qRegisterMetaType<EventRuleData>();
     qRegisterMetaType<EventRuleDataList>();
     qRegisterMetaType<LayoutData>();

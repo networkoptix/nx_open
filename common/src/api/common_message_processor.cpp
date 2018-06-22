@@ -441,7 +441,8 @@ void QnCommonMessageProcessor::on_gotInitialNotification(const ec2::ApiFullInfoD
     resetEventRules(fullData.rules);
 }
 
-void QnCommonMessageProcessor::on_gotDiscoveryData(const ec2::ApiDiscoveryData &data, bool addInformation)
+void QnCommonMessageProcessor::on_gotDiscoveryData(
+    const nx::vms::api::DiscoveryData& data, bool addInformation)
 {
     if (data.id.isNull())
         return;

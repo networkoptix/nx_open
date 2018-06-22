@@ -10,19 +10,14 @@ namespace ec2 {
 
 struct ApiFullInfoData;
 
-struct ApiDiscoveryData;
-struct ApiDiscoverPeerData;
 struct ApiConnectionData;
 struct ApiTransactionData;
 struct ApiTranLogFilter;
 struct ApiDiscoveredServerData;
-
 struct ApiMiscData;
+
 typedef std::vector<ApiMiscData> ApiMiscDataList;
-
 typedef std::vector<ApiTransactionData> ApiTransactionDataList;
-
-typedef std::vector<ApiDiscoveryData> ApiDiscoveryDataList;
 typedef std::vector<ApiDiscoveredServerData> ApiDiscoveredServerDataList;
 
 /**
@@ -37,8 +32,6 @@ struct ParentId
 
 #define QN_EC2_API_DATA_TYPES \
     (ApiFullInfoData)\
-    (ApiDiscoveryData)\
-    (ApiDiscoverPeerData)\
     (ApiConnectionData)\
     (ApiMiscData)\
     (ApiDiscoveredServerData)\

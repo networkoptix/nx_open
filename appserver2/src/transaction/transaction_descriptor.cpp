@@ -208,7 +208,7 @@ QnUuid createHashForApiStoredFileDataHelper(const nx::vms::api::StoredFileData& 
     return QnAbstractTransaction::makeHash(params.path.toUtf8());
 }
 
-QnUuid createHashForApiDiscoveryDataHelper(const ApiDiscoveryData& params)
+QnUuid createHashForApiDiscoveryDataHelper(const nx::vms::api::DiscoveryData& params)
 {
     return QnAbstractTransaction::makeHash("discovery_data", params);
 }

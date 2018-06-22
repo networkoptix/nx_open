@@ -41,7 +41,7 @@ void loadResourcesFromEcs(
                 return;
         }
 
-        ec2::ApiDiscoveryDataList discoveryDataList;
+        api::DiscoveryDataList discoveryDataList;
         while (ec2Connection->getDiscoveryManager(Qn::kSystemAccess)->getDiscoveryDataSync(&discoveryDataList) != ec2::ErrorCode::ok)
         {
             NX_LOG(lit("QnMain::run(). Can't get discovery data."), cl_logERROR);
@@ -52,7 +52,7 @@ void loadResourcesFromEcs(
 
         QMultiHash<QnUuid, nx::utils::Url> additionalAddressesById;
         QMultiHash<QnUuid, nx::utils::Url> ignoredAddressesById;
-        for (const ec2::ApiDiscoveryData &data : discoveryDataList)
+        for (const api::DiscoveryData &data : discoveryDataList)
         {
             additionalAddressesById.insert(data.id, data.url);
             if (data.ignore)

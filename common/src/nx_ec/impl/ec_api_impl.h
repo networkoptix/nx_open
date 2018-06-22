@@ -194,7 +194,7 @@ namespace ec2
             void onListDirectoryDone            (int reqID, const ec2::ErrorCode, const QStringList&);
             void onCurrentTimeDone              (int reqID, const ec2::ErrorCode, const qint64&);
             void onDumpDatabaseDone             (int reqID, const ec2::ErrorCode, const nx::vms::api::DatabaseDumpData&);
-            void onGetDiscoveryDataDone         (int reqID, const ec2::ErrorCode, const ec2::ApiDiscoveryDataList&);
+            void onGetDiscoveryDataDone         (int reqID, const ec2::ErrorCode, const nx::vms::api::DiscoveryDataList&);
             void onTestConnectionDone           (int reqID, const ec2::ErrorCode, const QnConnectionInfo&);
             void onConnectDone                  (int reqID, const ec2::ErrorCode, const AbstractECConnectionPtr &);
             void onGetVideowallsDone            (int reqID, const ec2::ErrorCode, const nx::vms::api::VideowallDataList&);
@@ -294,7 +294,7 @@ namespace ec2
         //////////////////////////////////////////////////////////
         ///////// Handlers for AbstractDiscoveryManager
         //////////////////////////////////////////////////////////
-        DEFINE_TWO_ARG_HANDLER(GetDiscoveryData, ec2::ErrorCode, ec2::ApiDiscoveryDataList)
+        DEFINE_TWO_ARG_HANDLER(GetDiscoveryData, ec2::ErrorCode, nx::vms::api::DiscoveryDataList)
 
 
         //////////////////////////////////////////////////////////

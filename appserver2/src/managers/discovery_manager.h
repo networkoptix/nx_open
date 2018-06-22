@@ -27,7 +27,8 @@ private:
     QueryProcessorType* const m_queryProcessor;
     Qn::UserAccessData m_userAccessData;
 };
-ApiDiscoveryData toApiDiscoveryData(const QnUuid &id, const nx::utils::Url &url, bool ignore);
+nx::vms::api::DiscoveryData toApiDiscoveryData(
+    const QnUuid &id, const nx::utils::Url &url, bool ignore);
 
 // TODO: Could probably be moved to mediaserver, as it is used only there.
 class QnDiscoveryMonitor: public QObject, public QnCommonModuleAware
@@ -53,7 +54,7 @@ template<class QueryProcessorType>
 QnDiscoveryManager<QueryProcessorType>::QnDiscoveryManager(
     QueryProcessorType * const queryProcessor,
     const Qn::UserAccessData &userAccessData)
-:
+    :
     m_queryProcessor(queryProcessor),
     m_userAccessData(userAccessData)
 {
@@ -69,7 +70,7 @@ int QnDiscoveryManager<QueryProcessorType>::discoverPeer(
     impl::SimpleHandlerPtr handler)
 {
     const int reqId = generateRequestID();
-    ApiDiscoverPeerData params;
+    nx::vms::api::DiscoverPeerData params;
     params.id = id;
     params.url = url.toString();
 
@@ -133,16 +134,19 @@ int QnDiscoveryManager<QueryProcessorType>::getDiscoveryData(impl::GetDiscoveryD
 {
     const int reqID = generateRequestID();
 
-    auto queryDoneHandler = [reqID, handler](ErrorCode errorCode, const ApiDiscoveryDataList &data)
-    {
-        ApiDiscoveryDataList outData;
-        if (errorCode == ErrorCode::ok)
-            outData = data;
-        handler->done(reqID, errorCode, outData);
-    };
+    const auto queryDoneHandler =
+        [reqID, handler](ErrorCode errorCode, const nx::vms::api::DiscoveryDataList &data)
+        {
+            nx::vms::api::DiscoveryDataList outData;
+            if (errorCode == ErrorCode::ok)
+                outData = data;
+            handler->done(reqID, errorCode, outData);
+        };
+
     m_queryProcessor->getAccess(m_userAccessData).template processQueryAsync<
-            QnUuid, ApiDiscoveryDataList, decltype(queryDoneHandler)>(
+            QnUuid, nx::vms::api::DiscoveryDataList, decltype(queryDoneHandler)>(
                 ApiCommand::getDiscoveryData, QnUuid(), queryDoneHandler);
+
     return reqID;
 }
 

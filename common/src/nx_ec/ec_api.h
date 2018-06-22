@@ -616,7 +616,7 @@ Q_OBJECT
 public:
 signals :
     void peerDiscoveryRequested(const nx::utils::Url& url);
-    void discoveryInformationChanged(const ApiDiscoveryData& data, bool addInformation);
+    void discoveryInformationChanged(const nx::vms::api::DiscoveryData& data, bool addInformation);
     void discoveredServerChanged(const ApiDiscoveredServerData& discoveredServer);
     void gotInitialDiscoveredServers(const ApiDiscoveredServerDataList& discoveredServers);
 };
@@ -691,7 +691,7 @@ public:
                     handler)));
     }
 
-    ErrorCode getDiscoveryDataSync(ApiDiscoveryDataList* const discoveryDataList)
+    ErrorCode getDiscoveryDataSync(nx::vms::api::DiscoveryDataList* const discoveryDataList)
     {
         int (AbstractDiscoveryManager::*fn)(impl::GetDiscoveryDataHandlerPtr) = &
             AbstractDiscoveryManager::getDiscoveryData;
