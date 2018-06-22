@@ -35,22 +35,6 @@ def template():
 
 
 @pytest.fixture(scope='session')
-def clone_configuration(template):
-    return {
-        'template_vm': template,
-        'mac_address_format': '0A-00-00-FF-{vm_index:02X}-{nic_index:02X}',
-        'port_forwarding': {
-            'host_ports_base': 65000,
-            'host_ports_per_vm': 5,
-            'forwarded_ports': {
-                'ssh': {'protocol': 'tcp', 'guest_port': 22, 'host_port_offset': 2},
-                'dns': {'protocol': 'udp', 'guest_port': 53, 'host_port_offset': 3},
-                }
-            }
-        }
-
-
-@pytest.fixture(scope='session')
 def dummy():
     name = name_format.format('dummy')
     _create_vm(name)
@@ -69,8 +53,9 @@ def test_find(hypervisor, dummy):
     assert isinstance(hypervisor.find(dummy), VMInfo)
 
 
-def test_clone(hypervisor, clone_name, clone_configuration):
-    clone = hypervisor.clone(clone_name, 1, clone_configuration)
+def test_clone(hypervisor, template, clone_name):
+    hypervisor.clone(template, clone_name)
+    clone = hypervisor.find(clone_name)
     _logger.debug("Clone:\n%s", pformat(clone))
     assert clone.name == clone_name
 
