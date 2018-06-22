@@ -139,3 +139,6 @@ class OSAccess(object):
     def _take_local(self, local_source_path, dir):
         return self.Path()
 
+    @abstractmethod
+    def lock(self, path, try_lock_timeout_sec=10):
+        pass

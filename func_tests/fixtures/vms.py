@@ -67,11 +67,6 @@ def vm_host(request):
 
 
 @pytest.fixture(scope='session')
-def host_posix_shell():
-    return local_shell
-
-
-@pytest.fixture(scope='session')
 def host_os_access():
     return local_access
 
@@ -82,12 +77,12 @@ def hypervisor(host_os_access):
 
 
 @pytest.fixture(scope='session')
-def vm_types(hypervisor, host_posix_shell, host_os_access):
+def vm_types(hypervisor, host_os_access):
     return {
         vm_type_name: VMType(
             hypervisor,
             Registry(
-                host_posix_shell,
+                host_os_access,
                 host_os_access.Path(vm_type_conf['registry_path']).expanduser(),
                 vm_type_conf['name_format'].format(vm_index='{index}'),  # Registry doesn't know about VMs.
                 vm_type_conf['limit'],

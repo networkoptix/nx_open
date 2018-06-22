@@ -20,9 +20,9 @@ class RegistryLimitReached(RegistryError):
 class Registry(object):
     """Manage names allocation. Safe for parallel usage."""
 
-    def __init__(self, ssh, path, name_format, limit):
+    def __init__(self, os_access, path, name_format, limit):
         self._path = path
-        self._lock = MoveLock(ssh, self._path.with_suffix('.lock'))
+        self._lock = os_access.lock(self._path.with_suffix('.lock'))
         self._path.parent.mkdir(parents=True, exist_ok=True)
         self._name_format = name_format
         self._limit = limit

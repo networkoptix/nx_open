@@ -152,3 +152,10 @@ class WindowsAccess(RemoteAccess):
             "What is to be attempted: Kerberos authentication. "
             "To debug try `Invoke-Command` from another Windows machine. "
             )
+
+    def lock(self, path, try_lock_timeout_sec=None):
+        raise NotImplementedError(
+            "Lock on Windows machines may be implemented in future. "
+            "One of possible solutions, which can even be a cross-platform, "
+            "is `mkdir` and `rmdir`, as long as these calls are atomic."
+            )

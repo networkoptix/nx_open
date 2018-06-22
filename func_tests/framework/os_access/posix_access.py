@@ -1,5 +1,6 @@
 from abc import ABCMeta, abstractproperty
 
+from framework.move_lock import MoveLock
 from framework.os_access.exceptions import AlreadyExists
 from framework.os_access.os_access_interface import OSAccess
 from framework.os_access.posix_shell import PosixShell
@@ -61,3 +62,6 @@ class PosixAccess(OSAccess):
             url,
             ])
         return destination
+
+    def lock(self, path, try_lock_timeout_sec=10):
+        return MoveLock(self.shell, path)
