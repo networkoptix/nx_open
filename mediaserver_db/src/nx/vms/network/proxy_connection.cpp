@@ -409,7 +409,9 @@ bool ProxyConnectionProcessor::updateClientRequest(nx::utils::Url& dstUrl, QnRou
 	}
 	else
 	{
-		dstRoute.addr = nx::network::SocketAddress(dstUrl.host(), dstUrl.port(80));
+		// TODO: Add special case for RTSP?
+		const auto defaultPort = nx::network::http::defaultPortForScheme(dstUrl.scheme().toUtf8());
+		dstRoute.addr = nx::network::SocketAddress(dstUrl.host(), dstUrl.port(defaultPort));
 
 		// No dst route Id means proxy to external resource.
 		// All proxy hops have already been passed. Remove proxy-auth header.
