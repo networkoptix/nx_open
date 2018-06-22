@@ -9,8 +9,6 @@ from pylru import lrudecorator
 
 from framework.networking import setup_flat_network
 from framework.os_access.local_access import local_access
-from framework.os_access.posix_shell import local_shell
-from framework.registry import Registry
 from framework.serialize import load
 from framework.vms.factory import VMFactory
 from framework.vms.hypervisor.virtual_box import VirtualBox
@@ -77,16 +75,13 @@ def hypervisor(host_os_access):
 
 
 @pytest.fixture(scope='session')
-def vm_types(hypervisor, host_os_access):
+def vm_types(hypervisor):
     return {
         vm_type_name: VMType(
             hypervisor,
-            Registry(
-                host_os_access,
-                vm_type_conf['registry_path'],
-                vm_type_conf['name_format'].format(vm_index='{index}'),  # Registry doesn't know about VMs.
-                vm_type_conf['limit'],
-                ),
+            vm_type_conf['registry_path'],
+            vm_type_conf['name_format'],
+            vm_type_conf['limit'],
             **vm_type_conf['vm'])
         for vm_type_name, vm_type_conf in vm_types_configuration().items()
         }

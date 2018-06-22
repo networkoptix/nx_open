@@ -9,11 +9,16 @@ class VMType(object):
     def __init__(
             self,
             hypervisor,
-            registry,
+            registry_path, name_format, limit,
             template_vm, template_vm_snapshot,
             mac_address_format, port_forwarding):
         self.hypervisor = hypervisor  # type: Hypervisor
-        self.registry = registry  # type: Registry
+        self.registry = Registry(
+            hypervisor.host_os_access,
+            registry_path,
+            name_format.format(vm_index='{index}'),  # Registry doesn't know about VMs.
+            limit,
+            )
         self.template_vm_name = template_vm
         self._snapshot_name = template_vm_snapshot
         self.mac_format = mac_address_format
