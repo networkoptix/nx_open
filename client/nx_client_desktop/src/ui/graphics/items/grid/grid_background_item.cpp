@@ -406,7 +406,7 @@ void QnGridBackgroundItem::updateGeometry()
         return;
     }
 
-    if(mapper() == NULL)
+    if (!mapper())
         return;
 
     d->sceneBoundingRect = QnLayoutResource::backgroundRect(d->imageData.size);
