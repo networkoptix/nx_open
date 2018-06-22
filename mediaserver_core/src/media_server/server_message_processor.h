@@ -21,7 +21,6 @@ public:
 
     virtual void updateResource(
         const QnResourcePtr& resource, ec2::NotificationSource source) override;
-    void registerProxySender(QnUniversalTcpListener* tcpListener);
 
     void startReceivingLocalNotifications(const ec2::AbstractECConnectionPtr& connection);
 protected:
@@ -62,7 +61,6 @@ private slots:
 
 private:
     mutable QnMutex m_mutexAddrList;
-    QnUniversalTcpListener* m_universalTcpListener;
     mutable QnMediaServerResourcePtr m_mServer;
     QSet<QnUuid> m_delayedOnlineStatus;
 };

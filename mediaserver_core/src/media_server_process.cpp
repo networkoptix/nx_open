@@ -239,7 +239,7 @@
 #include "plugins/resource/acti/acti_resource.h"
 #include "common/common_module.h"
 #include <nx/vms/network/reverse_connection_listener.h>
-#include "proxy/proxy_connection.h"
+#include <nx/vms/network/proxy_connection.h>
 #include "nx/mediaserver/hls/hls_session_pool.h"
 #include "nx/mediaserver/hls/hls_server.h"
 #include <nx/time_sync/server_time_sync_manager.h>
@@ -2766,7 +2766,7 @@ bool MediaServerProcess::initTcpListener(
 
     //regTcp<QnDefaultTcpConnectionProcessor>("HTTP", "*");
 
-    regTcp<QnProxyConnectionProcessor>("*", "proxy", ec2ConnectionFactory->serverConnector());
+    regTcp<nx::vms::network::ProxyConnectionProcessor>("*", "proxy", ec2ConnectionFactory->serverConnector());
     regTcp<QnAudioProxyReceiver>("HTTP", "proxy-2wayaudio");
 
     if( !serverModule()->settings().authenticationEnabled())
@@ -3647,12 +3647,9 @@ void MediaServerProcess::run()
 
     std::unique_ptr<QnMulticast::HttpServer> multicastHttp(new QnMulticast::HttpServer(commonModule()->moduleGUID().toQUuid(), m_universalTcpListener));
 
-    using namespace std::placeholders;
-    m_universalTcpListener->setProxyHandler<QnProxyConnectionProcessor>(
-        &QnUniversalRequestProcessor::isProxy,
+    m_universalTcpListener->setProxyHandler<nx::vms::network::ProxyConnectionProcessor>(
+        &nx::vms::network::ProxyConnectionProcessor::needProxyRequest,
         ec2ConnectionFactory->serverConnector());
-    auto processor = dynamic_cast<QnServerMessageProcessor*> (commonModule()->messageProcessor());
-    processor->registerProxySender(m_universalTcpListener);
 
     ec2ConnectionFactory->registerTransactionListener( m_universalTcpListener );
 

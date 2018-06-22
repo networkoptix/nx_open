@@ -215,11 +215,6 @@ bool QnServerMessageProcessor::isLocalAddress(const QString& addr) const
     return false;
 }
 
-void QnServerMessageProcessor::registerProxySender(QnUniversalTcpListener* tcpListener)
-{
-    m_universalTcpListener = tcpListener;
-}
-
 void QnServerMessageProcessor::execBusinessActionInternal(
     const nx::vms::event::AbstractActionPtr& action)
 {

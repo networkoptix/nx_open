@@ -59,6 +59,7 @@
 #include <api/model/time_reply.h>
 #include <nx/utils/test_support/test_options.h>
 #include <rest/handlers/sync_time_rest_handler.h>
+#include <nx/vms/network/proxy_connection.h>
 
 static int registerQtResources()
 {
@@ -429,7 +430,7 @@ void Appserver2Process::registerHttpHandlers(
                 result->setError(QnRestResult::CantProcessRequest);
             return resultCode;
         });
-    
+
     m_tcpListener->addHandler<JsonConnectionProcessor>("HTTP",
         nx::time_sync::TimeSyncManager::kTimeSyncUrlPath.mid(1), //< remove '/'
         [](const nx::network::http::Request& request, QnHttpConnectionListener* owner, QnJsonRestResult* result)
@@ -444,6 +445,10 @@ void Appserver2Process::registerHttpHandlers(
 
     m_tcpListener->addHandler<QnRestConnectionProcessor>("HTTP", "ec2");
     ec2ConnectionFactory->registerTransactionListener(m_tcpListener);
+
+    m_tcpListener->setProxyHandler<nx::vms::network::ProxyConnectionProcessor>(
+        &nx::vms::network::ProxyConnectionProcessor::needProxyRequest,
+        ec2ConnectionFactory->serverConnector());
 }
 
 void Appserver2Process::resetInstanceCounter()
@@ -523,7 +528,7 @@ bool Appserver2Process::createInitialData(const QString& systemName)
 
     //read camera list
     nx::vms::api::CameraDataList cameraList;
-    resultCode = 
+    resultCode =
         connection->getCameraManager(Qn::kSystemAccess)->getCamerasSync(&cameraList);
     if (resultCode != ec2::ErrorCode::ok)
         return false;
