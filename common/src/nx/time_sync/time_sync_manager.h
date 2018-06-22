@@ -81,6 +81,7 @@ public:
 
     std::chrono::milliseconds timeSyncInterval() const;
 
+    QString idForToStringFromPtr() const;
 signals:
     /** Emitted when synchronized time has been changed. */
     void timeChanged(qint64 syncTimeMs);

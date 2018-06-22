@@ -27,6 +27,7 @@ ServerTimeSyncManager::ServerTimeSyncManager(
     base_type(commonModule),
     m_serverConnector(serverConnector)
 {
+
     connect(this, &ServerTimeSyncManager::timeChanged, this,
         [this](qint64 syncTimeMs)
         {
@@ -37,7 +38,7 @@ ServerTimeSyncManager::ServerTimeSyncManager(
                 QByteArray::number(systemTimeDeltaMs));
 
             // Avoid passing this to async callback.
-            auto logTag = nx::utils::log::Tag(toString(typeid(this)));
+            auto logTag = nx::utils::log::Tag(this);
             connection->getMiscManager(Qn::kSystemAccess)->saveMiscParam(
                 deltaData, this,
                 [logTag](int /*reqID*/, ec2::ErrorCode errorCode)
@@ -48,7 +49,13 @@ ServerTimeSyncManager::ServerTimeSyncManager(
 
             auto primaryTimeServerId = getPrimaryTimeServerId();
             if (primaryTimeServerId == this->commonModule()->moduleGUID())
+            {
+                NX_VERBOSE(logTag,
+                    lm("Peer %1 broadcast time has changed to %2")
+                    .arg(qnStaticCommon->moduleDisplayName(this->commonModule()->moduleGUID()))
+                    .arg(QDateTime::fromMSecsSinceEpoch(syncTimeMs).toString(Qt::ISODate)));
                 broadcastSystemTime();
+            }
         });
 }
 

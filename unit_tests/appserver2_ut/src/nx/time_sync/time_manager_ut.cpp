@@ -299,6 +299,12 @@ public:
             nx::utils::test::ClockType::system,
             std::chrono::seconds::zero())
     {
+        NX_VERBOSE(this, lm("Start time test"));
+        ec2::Appserver2Process::resetInstanceCounter();
+    }
+    ~TimeSynchronization()
+    {
+        NX_VERBOSE(this, lm("End time test"));
     }
 
 protected:
