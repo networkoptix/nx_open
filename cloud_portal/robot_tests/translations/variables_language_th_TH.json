@@ -18,7 +18,7 @@
     "SYSTEM NAME SAVED": "ระบบเปลี่ยนชื่อ",
     "ACCOUNT IS CREATED": "สร้างบัญชีแล้ว",
     "CONFIRMATION MESSAGE IS SENT TO": "ข้อความยืนยันจะถูกส่งไปที่ %email%",
-    "CANNOT SAVE PASSWORD": "ไม่สามารถบันทึกรหัสผ่าน:",
+    "CANNOT SAVE PASSWORD": "ไม่สามารถบันทึกรหัสผ่านได้:",
     "PASSWORD INCORRECT": "ต้องระบุรหัสผ่านปัจจุบัน.",
     "WRONG PASSWORD": "รหัสผ่านผิด",
     "ACCOUNT DOES NOT EXIST": "ไม่มีบัญชีนี้อยู่",

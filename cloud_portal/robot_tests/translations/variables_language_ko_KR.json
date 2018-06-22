@@ -40,7 +40,7 @@
     "LIVE VIEWER TEXT": "라이브 뷰어",
     "CUSTOM TEXT": "사용자 정의",
     "YOUR SYSTEM TEXT": "귀하의 시스템",
-    "ACTIVATE YOUR ACCOUNT EMAIL SUBJECT": "귀하의 계정을 활성화 합니다",
+    "ACTIVATE YOUR ACCOUNT EMAIL SUBJECT": "귀하의 계정을 활성화합니다",
     "RESET PASSWORD EMAIL SUBJECT": "사용자 암호 초기화",
     "INVITED TO SYSTEM EMAIL SUBJECT": "비디오 시스템 {{message.system_name}} 공유 되었습니다.",
     "INVITED TO SYSTEM EMAIL SUBJECT UNREGISTERED": "{{message.sharer_name}} 께서 당신을 %PRODUCT_NAME%에 초대합니다",

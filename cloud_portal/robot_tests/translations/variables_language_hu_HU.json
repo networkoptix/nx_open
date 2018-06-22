@@ -56,7 +56,7 @@
     "PASSWORD TOO SHORT TEXT": "A jelszónak legalább 8 karakterből kell állnia",
     "PASSWORD TOO COMMON TEXT": "Ez a jelszó a leggyakoribb jelszavak egyike",
     "PASSWORD IS WEAK TEXT": "Használjon számokat, kis és nagybetűket és speciális karaktereket az erősebb jelszó érdekében",
-    "TERMS AND CONDITIONS ERROR TEXT": "Please review and agree to the Terms and Conditions and Privacy policy in order to proceed",
+    "TERMS AND CONDITIONS ERROR TEXT": "Kérem olvassa el és fogadja el az Általános Szerződési Feltételeket és az Adatvédelmi Irányelveket",
     "THIS LINK IS BROKEN TEXT": "Nincs kapcsolat,<br>\n            A rendszer és %PRODUCT_NAME% között nincs kapcsolat,<br>\n            A rendszerhez való hozzáférést visszavonták, <br>\n            vagy más fiókba van bejelentkezve",
     "PAGE NOT FOUND": "Az oldal nem található",
     "TAKE ME HOME": "Vigyen haza",
