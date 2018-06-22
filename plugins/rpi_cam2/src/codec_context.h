@@ -14,8 +14,8 @@ public:
     CodecContext(
         nxcip::CompressionType codecID, 
         const nxcip::Resolution &resolution,
-        float fps, 
-        int64_t bitrate);
+        int fps, 
+        int bitrate);
 
     void setCodecID(nxcip::CompressionType codecID);
     nxcip::CompressionType codecID() const;
@@ -24,22 +24,22 @@ public:
     const nxcip::Resolution& resolution() const;
     bool resolutionValid() const;
 
-    void setFps(float fps);
-    float fps() const;
+    void setFps(int fps);
+    int fps() const;
 
     //set the bitrate in bits per second
-    void setBitrate(int64_t bitratebps);
+    void setBitrate(int bitratebps);
 
     //the bitrate in bits per second
-    int64_t bitrate() const;
+    int bitrate() const;
 
     std::string toString() const;
 
 private:
     nxcip::CompressionType m_codecID;
     nxcip::Resolution m_resolution;
-    float m_fps;
-    int64_t m_bitrate;
+    int m_fps;
+    int m_bitrate;
 };
 
 } // namespace webcam_plugin

@@ -6,6 +6,8 @@ namespace nx {
 namespace webcam_plugin {
 namespace utils  {
 
+#define debug(...) fprintf(stderr, "[rpi_cam2] " __VA_ARGS__)
+
 /*!
 * Get the list of devices on the system, with fields filled out.
 * @param[in] getResolution - whether or not to fill each DeviceData with supported resolutions

@@ -1,33 +1,33 @@
 #include "media_encoder.h"
 
 #include <nx/utils/log/log.h>
+#include <nx/utils/url.h>
 
 #include "camera_manager.h"
 #include "stream_reader.h"
-#include "utils.h"
-#include "logging.h"
+#include "utils/utils.h"
+#include "ffmpeg/stream_reader.h"
 
 namespace nx {
 namespace webcam_plugin {
 
-MediaEncoder::MediaEncoder(CameraManager* const cameraManager,
-                           nxpl::TimeProvider *const timeProvider,
-                           int encoderNumber,
-                           const CodecContext& codecContext)
+MediaEncoder::MediaEncoder(
+    CameraManager* const cameraManager,
+    nxpl::TimeProvider *const timeProvider,
+    const CodecContext& codecContext,
+    const std::weak_ptr<ffmpeg::StreamReader>& ffmpegStreamReader)
 :
     m_refManager( cameraManager->refManager() ),
     m_cameraManager( cameraManager ),
     m_timeProvider( timeProvider ),
-    m_encoderNumber( encoderNumber ),
     m_videoCodecContext(codecContext),
+    m_ffmpegStreamReader(ffmpegStreamReader),
     m_maxBitrate(0)
 {
-    debugln(__FUNCTION__);
 }
 
 MediaEncoder::~MediaEncoder()
 {
-    debugln(__FUNCTION__);
 }
 
 void* MediaEncoder::queryInterface( const nxpl::NX_GUID& interfaceID )
@@ -83,14 +83,11 @@ int MediaEncoder::getResolutionList( nxcip::ResolutionInfo* infoList, int* infoL
         infoList[i].maxFps = resList[i].maxFps;
     }
     *infoListCount = count;
-
     return nxcip::NX_NO_ERROR;
 }
 
 int MediaEncoder::getMaxBitrate( int* maxBitrate ) const
 {
-    debugln(__FUNCTION__);
-
     if(m_maxBitrate)
     {
         *maxBitrate = m_maxBitrate / 1000;
@@ -102,17 +99,11 @@ int MediaEncoder::getMaxBitrate( int* maxBitrate ) const
     std::vector<utils::ResolutionData> resList
         = utils::getResolutionList(url.toLatin1().data(), m_videoCodecContext.codecID());
 
-    if (resList.empty())
-    {
-        *maxBitrate = 0;
-        return nxcip::NX_IO_ERROR;
-    }
-
     auto max = std::max_element(resList.begin(), resList.end(),
         [](const utils::ResolutionData& a, const utils::ResolutionData& b)
-    {
-        return a.bitrate < b.bitrate;
-    });
+        {
+            return a.bitrate < b.bitrate;
+        });
 
     m_maxBitrate = max != resList.end() ? (int) max->bitrate : 0;
     *maxBitrate = m_maxBitrate / 1000;
@@ -121,7 +112,6 @@ int MediaEncoder::getMaxBitrate( int* maxBitrate ) const
 
 int MediaEncoder::setResolution( const nxcip::Resolution& resolution )
 {
-    debugln(__FUNCTION__);
     m_videoCodecContext.setResolution(resolution);
     if (m_streamReader)
         m_streamReader->setResolution(resolution);
@@ -130,23 +120,19 @@ int MediaEncoder::setResolution( const nxcip::Resolution& resolution )
 
 int MediaEncoder::setFps( const float& fps, float* selectedFps )
 {
-    debugln(__FUNCTION__);
-
     static constexpr double MIN_FPS = 1.0 / 86400.0; //once per day
     static constexpr double MAX_FPS = 90;
 
-    auto newFps = std::min<float>( std::max<float>( fps, MIN_FPS ), MAX_FPS );
-    m_videoCodecContext.setFps(newFps);
+    float newFps = std::min<float>( std::max<float>( fps, MIN_FPS ), MAX_FPS );
+    m_videoCodecContext.setFps((int) newFps);
     if( m_streamReader)
-        m_streamReader->setFps( newFps );
+        m_streamReader->setFps((int) newFps);
     *selectedFps = newFps;
     return nxcip::NX_NO_ERROR;
 }
 
 int MediaEncoder::setBitrate( int bitrateKbps, int* selectedBitrateKbps )
 {
-    debugln(__FUNCTION__);
-
     // the plugin uses bits per second internally, so convert to that first
     int bitratebps = bitrateKbps * 1000;
     m_videoCodecContext.setBitrate(bitratebps);
@@ -154,24 +140,6 @@ int MediaEncoder::setBitrate( int bitrateKbps, int* selectedBitrateKbps )
         m_streamReader->setBitrate(bitratebps);
     *selectedBitrateKbps = bitrateKbps;
     return nxcip::NX_NO_ERROR;
-}
-
-nxcip::StreamReader* MediaEncoder::getLiveStreamReader()
-{
-    debugln(__FUNCTION__);
-
-    if (!m_streamReader)
-    {
-        m_streamReader.reset(new StreamReader(
-            &m_refManager,
-            m_timeProvider,
-            m_cameraManager->info(),
-            m_encoderNumber,
-            m_videoCodecContext));
-    }
-
-    m_streamReader->addRef();
-    return m_streamReader.get();
 }
 
 int MediaEncoder::getAudioFormat( nxcip::AudioFormat* audioFormat ) const
@@ -182,7 +150,7 @@ int MediaEncoder::getAudioFormat( nxcip::AudioFormat* audioFormat ) const
 
 void MediaEncoder::updateCameraInfo( const nxcip::CameraInfo& info )
 {
-    if( m_streamReader.get() )
+    if (m_streamReader.get())
         m_streamReader->updateCameraInfo( info );
 }
 

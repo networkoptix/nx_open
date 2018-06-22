@@ -1,5 +1,3 @@
-#ifdef __linux__
-
 #include "v4l2_utils.h"
 
 #include <errno.h>
@@ -13,7 +11,6 @@
 #include <sys/ioctl.h>
 #include <linux/videodev2.h>
 #include <stdlib.h>
-#include <map>
 
 namespace nx {
 namespace webcam_plugin {
@@ -109,7 +106,7 @@ nxcip::CompressionType toNxCompressionTypeVideo(unsigned int v4l2PixelFormat)
         case V4L2_PIX_FMT_MPEG4:      return nxcip::AV_CODEC_ID_MPEG4;
         case V4L2_PIX_FMT_H264:
         case V4L2_PIX_FMT_H264_NO_SC:
-        case V4L2_PIX_FMT_H264_MVC:   return nxcip::AV_CODEC_ID_H264;
+        /*case V4L2_PIX_FMT_H264_MVC:*/   return nxcip::AV_CODEC_ID_H264;
         default:                      return nxcip::AV_CODEC_ID_NONE;
     }
 }
@@ -327,5 +324,3 @@ std::vector<ResolutionData> getResolutionList(
 } // namespace utils
 } // namespace webcam_plugin
 } // namespace nx
-
-#endif

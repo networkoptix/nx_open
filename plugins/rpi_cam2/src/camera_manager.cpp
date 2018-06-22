@@ -1,24 +1,57 @@
+#include "camera_manager.h"
+
 #include <cstring>
 
-#include "camera_manager.h"
-#include "media_encoder.h"
-#include "utils.h"
-#include "logging.h"
+#include <nx/utils/url.h>
+
+#include "native_media_encoder.h"
+#include "transcode_media_encoder.h"
+#include "ffmpeg/stream_reader.h"
+#include "utils/utils.h"
 
 namespace nx {
 namespace webcam_plugin {
 
-CameraManager::CameraManager(const nxcip::CameraInfo& info,
-                             nxpl::TimeProvider *const timeProvider)
+namespace {
+
+static const std::vector<nxcip::CompressionType> videoCodecPriorityList =
+{
+    nxcip::AV_CODEC_ID_H264,
+    nxcip::AV_CODEC_ID_MJPEG
+};
+
+nxcip::CompressionType getPriorityCodec(const std::vector<nxcip::CompressionType>& codecList)
+{
+    for (const auto codecID : videoCodecPriorityList)
+    {
+        if (std::find(codecList.begin(), codecList.end(), codecID) != codecList.end())
+            return codecID;
+    }
+    return nxcip::AV_CODEC_ID_NONE;
+}
+
+}
+
+CameraManager::CameraManager(
+    const nxcip::CameraInfo& info,
+    nxpl::TimeProvider *const timeProvider)
 :
+    m_info( info ),
+    m_timeProvider(timeProvider),
     m_refManager( this ),
     m_pluginRef( Plugin::instance() ),
-    m_info( info ),
     m_capabilities(
         nxcip::BaseCameraManager::nativeMediaStreamCapability |
-        nxcip::BaseCameraManager::primaryStreamSoftMotionCapability),
-    m_timeProvider(timeProvider)
+        nxcip::BaseCameraManager::primaryStreamSoftMotionCapability)
 {
+    debug("%s\n", __FUNCTION__);
+
+    int encoderCount = 2;
+    m_encoders.reserve(encoderCount);
+    m_encoders.push_back(nullptr);
+    m_encoders.push_back(nullptr);
+    
+    debug("%s done\n", __FUNCTION__);
 }
 
 CameraManager::~CameraManager()
@@ -57,26 +90,63 @@ unsigned int CameraManager::releaseRef()
 
 int CameraManager::getEncoderCount( int* encoderCount ) const
 {
-    *encoderCount = 1;
+    debug("%s\n", __FUNCTION__);
+    *encoderCount = m_encoders.size();
     return nxcip::NX_NO_ERROR;
 }
 
 int CameraManager::getEncoder( int encoderIndex, nxcip::CameraMediaEncoder** encoderPtr )
 {
-    if( encoderIndex > 0 )
-        return nxcip::NX_INVALID_ENCODER_NUMBER;
+    debug("%s\n", __FUNCTION__);
 
-    if (!m_encoder.get())
+    if(!m_ffmpegStreamReader)
     {
-        m_encoder.reset(new MediaEncoder(
-            this,
-            m_timeProvider,
-            encoderIndex,
-            getEncoderDefaults()));
+        m_ffmpegStreamReader = std::make_shared<ffmpeg::StreamReader>(
+            decodeCameraInfoUrl().c_str(), 
+            getEncoderDefaults(0));
     }
-    m_encoder->addRef();
 
-    *encoderPtr = m_encoder.get();
+    switch(encoderIndex)
+    {
+        case 0:
+        {
+            if (!m_encoders[0].get())
+            {
+                m_encoders[0].reset(new NativeMediaEncoder(
+                    this,
+                    m_timeProvider,
+                    getEncoderDefaults(0),
+                    m_ffmpegStreamReader));
+            }
+            break;
+        }
+        case 1:
+        {
+            if(!m_encoders[1].get())
+            {
+                m_encoders[1].reset(new TranscodeMediaEncoder(
+                    this,
+                    m_timeProvider,
+                    getEncoderDefaults(1),
+                    m_ffmpegStreamReader));
+            }
+            break;
+        }
+        default:
+            return nxcip::NX_INVALID_ENCODER_NUMBER;
+    }
+
+    // if (!m_encoder.get())
+    // {
+    //     m_encoder.reset(new MediaEncoder(
+    //         this,
+    //         m_timeProvider,
+    //         encoderIndex,
+    //         getEncoderDefaults()));
+    // }
+    // m_encoder->addRef();
+
+    *encoderPtr = m_encoders[encoderIndex].get();
 
     return nxcip::NX_NO_ERROR;
 }
@@ -97,8 +167,8 @@ void CameraManager::setCredentials( const char* username, const char* password )
 {
     strncpy( m_info.defaultLogin, username, sizeof(m_info.defaultLogin)-1 );
     strncpy( m_info.defaultPassword, password, sizeof(m_info.defaultPassword)-1 );
-    if( m_encoder )
-        m_encoder->updateCameraInfo( m_info );
+    for(const auto & encoder : m_encoders)
+        encoder->updateCameraInfo( m_info );
 }
 
 int CameraManager::setAudioEnabled( int /*audioEnabled*/ )
@@ -152,32 +222,56 @@ nxpt::CommonRefManager* CameraManager::refManager()
     return &m_refManager;
 }
 
-CodecContext CameraManager::getEncoderDefaults()
+std::string CameraManager::decodeCameraInfoUrl() const
 {
     QString url = QString(m_info.url).mid(9);
-    url = nx::utils::Url::fromPercentEncoding(url.toLatin1());
+    return nx::utils::Url::fromPercentEncoding(url.toLatin1()).toStdString();
+}
 
-    auto codecList = utils::getSupportedCodecs(url.toLatin1().data());
-    nxcip::CompressionType codecID = m_videoCodecPriority.getPriorityCodec(codecList);
+CodecContext CameraManager::getEncoderDefaults(int encoderIndex)
+{
+    debug("%s\n", __FUNCTION__);
 
-    auto resolutionList = utils::getResolutionList(url.toLatin1().data(), codecID);
-    auto it = std::max_element(resolutionList.begin(), resolutionList.end(),
-        [](const utils::ResolutionData& a, const utils::ResolutionData& b)
+    float defaultFPS = 30;
+    int defaultBitrate = 200000; 
+    nxcip::Resolution resolution;
+
+    std::string url = decodeCameraInfoUrl();
+    auto codecList = utils::getSupportedCodecs(url.c_str());
+    nxcip::CompressionType codecID = getPriorityCodec(codecList);
+
+    switch (encoderIndex)
+    {
+        case 0: // native stream
         {
-            return
-                a.resolution.width
-                 * a.resolution.height <
-                b.resolution.width
-                 * b.resolution.height;
-        });
+            auto resolutionList = utils::getResolutionList(url.c_str(), codecID);
+            auto it = std::max_element(resolutionList.begin(), resolutionList.end(),
+                [](const utils::ResolutionData& a, const utils::ResolutionData& b)
+                {
+                    return
+                        a.resolution.width
+                        * a.resolution.height <
+                        b.resolution.width
+                        * b.resolution.height;
+                });
 
-    bool valid = it != resolutionList.end();
+            bool valid = it != resolutionList.end();
 
-    float defaultFPS = valid ? it->maxFps : 30;
-    int64_t defaultBitrate = valid ? it->bitrate : 200000;
-    auto res = valid ? it->resolution : nxcip::Resolution();
+            defaultFPS = valid ? it->maxFps : 30;
+            defaultBitrate = valid ? (int) it->bitrate : 200000;
+            resolution = valid ? it->resolution : nxcip::Resolution();
+            break;
+        }
+        case 1: // motion stream
+            defaultFPS = 30;
+            defaultBitrate = 200000;
+            resolution = {480, 270};
+            break;
+        default:
+        return CodecContext();
+    }
 
-    return CodecContext(codecID, res, defaultFPS, defaultBitrate);
+    return CodecContext(codecID, resolution, defaultFPS, defaultBitrate);
 }
 
 } // namespace nx

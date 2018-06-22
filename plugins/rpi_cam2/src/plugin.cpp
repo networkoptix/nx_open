@@ -4,12 +4,8 @@ extern "C" {
 } // extern "C"
 
 #include "discovery_manager.h"
-#include "logging.h"
 
 extern "C" {
-#ifdef _WIN32
-__declspec(dllexport)
-#endif
 nxpl::PluginInterface* createNXPluginInstance()
 {
     return new nx::webcam_plugin::Plugin();
@@ -27,12 +23,6 @@ Plugin::Plugin()
     m_timeProvider(nullptr)
 {
     avdevice_register_all();
-#ifndef _DEBUG
-    av_log_set_level(AV_LOG_QUIET);
-#endif
-
-    debug("%s\n", __FUNCTION__);
-
     webCameraPluginInstance = this;
 }
 

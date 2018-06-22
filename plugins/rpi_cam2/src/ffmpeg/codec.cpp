@@ -1,23 +1,26 @@
-#include "avcodec_container.h"
+#include "codec.h"
 
 #include <nx/utils/log/log.h>
 
-#include "av_utils.h"
-#include "logging.h"
+#include "ffmpeg/utils.h"
 
 namespace nx {
 namespace webcam_plugin {
+namespace ffmpeg {
 
-AVCodecContainer::~AVCodecContainer()
+Codec::Codec():
+    Options()
+{
+    
+}
+
+Codec::~Codec()
 {
     close();
 }
 
-int AVCodecContainer::open()
+int Codec::open()
 {
-    if (m_open)
-        return 0;
-
     int codecOpenCode = avcodec_open2(m_codecContext, m_codec, &m_options);
     if (codecOpenCode < 0)
     {
@@ -25,31 +28,27 @@ int AVCodecContainer::open()
         return codecOpenCode;
     }
 
-    m_open = true;
     return codecOpenCode;
 }
 
-int AVCodecContainer::close()
+void Codec::close()
 {
     if (m_codecContext)
         avcodec_free_context(&m_codecContext);
-
-    m_open = false;
-    return 0;
 }
 
-int AVCodecContainer::readFrame(AVFormatContext * formatContext, AVPacket * outPacket)
+int Codec::readFrame(AVFormatContext * formatContext, AVPacket * outPacket)
 {
     return av_read_frame(formatContext, outPacket);
 }
 
-int AVCodecContainer::encodeVideo(AVPacket * outPacket, const AVFrame * frame, int * outGotPacket) const
+int Codec::encodeVideo(AVPacket * outPacket, const AVFrame * frame, int * outGotPacket) const
 {
     return avcodec_encode_video2(m_codecContext, outPacket, frame, outGotPacket);
 }
 
 
-int AVCodecContainer::decodeVideo(AVFormatContext* formatContext, AVFrame * outFrame, int * outGotPicture, AVPacket * packet) const
+int Codec::decodeVideo(AVFormatContext* formatContext, AVFrame * outFrame, int * outGotPicture, AVPacket * packet) const
 {
     int readCode;
     while ((readCode = av_read_frame(formatContext, packet) >= 0))
@@ -61,17 +60,24 @@ int AVCodecContainer::decodeVideo(AVFormatContext* formatContext, AVFrame * outF
     return readCode;
 }
 
-int AVCodecContainer::encodeAudio(AVPacket * outPacket, const AVFrame * frame, int * outGotPacket) const
+int Codec::encodeAudio(AVPacket * outPacket, const AVFrame * frame, int * outGotPacket) const
 {
     return avcodec_encode_audio2(m_codecContext, outPacket, frame, outGotPacket);
 }
 
-int AVCodecContainer::decodeAudio(AVFrame * frame, int* outGotFrame, const AVPacket *packet) const
+int Codec::decodeAudio(AVFormatContext* formatContext, AVFrame * outFrame, int* outGotFrame, AVPacket *packet) const
 {
-    return avcodec_decode_audio4(m_codecContext, frame, outGotFrame, packet);
+    int readCode;
+    while ((readCode = av_read_frame(formatContext, packet) >= 0))
+    {
+        int decodeCode = avcodec_decode_audio4(m_codecContext, outFrame, outGotFrame, packet);
+        if (decodeCode < 0 || outGotFrame)
+            return decodeCode;
+    }
+    return readCode;
 }
 
-int AVCodecContainer::initializeEncoder(AVCodecID codecID)
+int Codec::initializeEncoder(AVCodecID codecID)
 {
     m_codec = avcodec_find_encoder(codecID);
     if (!m_codec)
@@ -84,7 +90,7 @@ int AVCodecContainer::initializeEncoder(AVCodecID codecID)
     return 0;
 }
 
-int AVCodecContainer::initializeEncoder(const char * codecName)
+int Codec::initializeEncoder(const char * codecName)
 {
     m_codec = avcodec_find_encoder_by_name(codecName);
     if (!m_codec)
@@ -97,7 +103,7 @@ int AVCodecContainer::initializeEncoder(const char * codecName)
     return 0;
 }
 
-int AVCodecContainer::initializeDecoder(AVCodecParameters * codecParameters)
+int Codec::initializeDecoder(AVCodecParameters * codecParameters)
 {
     m_codec = avcodec_find_decoder(codecParameters->codec_id);
     if (!m_codec)
@@ -111,7 +117,7 @@ int AVCodecContainer::initializeDecoder(AVCodecParameters * codecParameters)
     return paramToContextCode;
 }
 
-int AVCodecContainer::initializeDecoder(const char * codecName)
+int Codec::initializeDecoder(const char * codecName)
 {
     m_codec = avcodec_find_decoder_by_name(codecName);
     if(!m_codec)
@@ -124,30 +130,43 @@ int AVCodecContainer::initializeDecoder(const char * codecName)
     return 0;
 }
 
-int AVCodecContainer::addOption(const char * key, const char * value, int flags)
+void Codec::setFps(int fps)
 {
-    return av_dict_set(&m_options, key, value, flags);
+    m_codecContext->time_base = {1, fps};
+    m_codecContext->framerate = {fps, 1};
 }
 
-AVCodecContext * AVCodecContainer::codecContext() const
+void Codec::setResolution(int width, int height)
+{
+    m_codecContext->width = width;
+    m_codecContext->height = height;
+}
+
+void Codec::setBitrate(int bitrate)
+{
+    m_codecContext->bit_rate = bitrate;
+}
+
+void Codec::setPixelFormat(AVPixelFormat pixelFormat)
+{
+    m_codecContext->pix_fmt = pixelFormat;
+}
+
+AVCodecContext * Codec::codecContext() const
 {
     return m_codecContext;
 }
 
-AVCodec * AVCodecContainer::codec() const
+AVCodec * Codec::codec() const
 {
     return m_codec;
 }
 
-AVDictionary * AVCodecContainer::options() const
-{
-    return m_options;
-}
-
-AVCodecID AVCodecContainer::codecID() const
+AVCodecID Codec::codecID() const
 {
     return m_codecContext->codec_id;
 }
 
+} // namespace ffmpeg
 } // namespace webcam_plugin
 } // namespace nx

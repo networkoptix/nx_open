@@ -1,5 +1,7 @@
 #pragma once
 
+#include "options.h"
+
 extern "C" {
 #include <libavcodec/avcodec.h>
 #include <libavformat/avformat.h>
@@ -7,14 +9,16 @@ extern "C" {
 
 namespace nx {
 namespace webcam_plugin {
+namespace ffmpeg {
 
-class AVCodecContainer
+class Codec : Options
 {
 public:
-    ~AVCodecContainer();
+    Codec();
+    ~Codec();
 
     int open();
-    int close();
+    void close();
 
     static int readFrame(AVFormatContext * formatContext, AVPacket * outPacket);
 
@@ -22,26 +26,27 @@ public:
     int decodeVideo(AVFormatContext* formatContext, AVFrame *outFrame, int *outGotPicture, AVPacket *packet) const;
 
     int encodeAudio(AVPacket *outPacket, const AVFrame *frame, int *outGotPacket) const;
-    int decodeAudio(AVFrame * frame, int* outGotFrame, const AVPacket *packet) const;
+    int decodeAudio(AVFormatContext* formatContext, AVFrame * frame, int* outGotFrame, AVPacket *packet) const;
 
     int initializeEncoder(AVCodecID codecID);
     int initializeEncoder(const char * codecName);
     int initializeDecoder(AVCodecParameters * codecParameters);
     int initializeDecoder(const char * codecName);
 
-    int addOption(const char * key, const char * value, int flags = 0);
+    void setFps(int fps);
+    void setResolution(int width, int height);
+    void setBitrate(int bitrate);
+    void setPixelFormat(AVPixelFormat pixelFormat);
 
     AVCodecContext* codecContext() const;
     AVCodec* codec() const;
-    AVDictionary * options() const;
     AVCodecID codecID() const;
 
 private:
     AVCodecContext * m_codecContext = nullptr;
     AVCodec * m_codec = nullptr;
-    AVDictionary * m_options = nullptr;
-    bool m_open = false;
 };
 
+} //namespace ffmpeg
 } // namespace webcam_plugin
 } // namespace nx

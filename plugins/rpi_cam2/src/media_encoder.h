@@ -5,13 +5,15 @@
 #include <camera/camera_plugin.h>
 #include <plugins/plugin_tools.h>
 
-#include "stream_reader.h"
+#include "native_stream_reader.h"
+#include "transcode_stream_reader.h"
 #include "device_data.h"
 #include "codec_context.h"
 
 namespace nx {
 namespace webcam_plugin {
 
+namespace ffmpeg { class StreamReader; }
 class CameraManager;
 
 class MediaEncoder
@@ -19,10 +21,12 @@ class MediaEncoder
     public nxcip::CameraMediaEncoder2
 {
 public:
-    MediaEncoder(CameraManager* const cameraManager, 
-                 nxpl::TimeProvider *const timeProvider,
-                 int encoderNumber,
-                 const CodecContext& codecContext);
+    MediaEncoder(
+        CameraManager* const cameraManager,
+        nxpl::TimeProvider *const timeProvider,
+        const CodecContext& codecContext,
+        const std::weak_ptr<ffmpeg::StreamReader>& ffmpegStreamReader);
+
     virtual ~MediaEncoder();
 
     virtual void* queryInterface( const nxpl::NX_GUID& interfaceID ) override;
@@ -36,21 +40,23 @@ public:
     virtual int setFps( const float& fps, float* selectedFps ) override;
     virtual int setBitrate( int bitrateKbps, int* selectedBitrateKbps ) override;
 
-    virtual nxcip::StreamReader* getLiveStreamReader() override;
+    virtual nxcip::StreamReader* getLiveStreamReader() = 0;
     virtual int getAudioFormat( nxcip::AudioFormat* audioFormat ) const override;
 
     void updateCameraInfo( const nxcip::CameraInfo& info );
     void setVideoCodecID(nxcip::CompressionType codecID);
 
-private:
+protected:
     nxpt::CommonRefManager m_refManager;
     CameraManager* m_cameraManager;
     nxpl::TimeProvider *const m_timeProvider;
-    std::unique_ptr<StreamReader> m_streamReader;
-    int m_encoderNumber;
     CodecContext m_videoCodecContext;
+    std::weak_ptr<ffmpeg::StreamReader> m_ffmpegStreamReader;
     mutable int m_maxBitrate;
-private:
+
+    std::unique_ptr<StreamReader> m_streamReader;
+    
+protected:
     QString decodeCameraInfoUrl() const;
 };
 

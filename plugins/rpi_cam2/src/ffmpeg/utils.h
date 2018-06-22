@@ -4,19 +4,17 @@
 
 extern "C" {
 #include <libavdevice/avdevice.h>
-#include <libavutil/error.h>
 } // extern "C"
 
 #include <camera/camera_plugin_types.h>
 
 namespace nx {
 namespace webcam_plugin {
+namespace ffmpeg {
 namespace utils {
-namespace av {
 
 std::string avCodecIDStr(AVCodecID codecID);
 AVCodecID avCodecID(const char * codecName);
-std::string avStrError(int errorCode);
 AVStream* getAVStream(AVFormatContext * context, AVMediaType mediaType, int * streamIndex = nullptr);
 AVPixelFormat suggestPixelFormat(AVCodecID codecID);
 AVPixelFormat unDeprecatePixelFormat(AVPixelFormat pixelFormat);

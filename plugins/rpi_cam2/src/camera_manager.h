@@ -2,14 +2,16 @@
 
 #include <camera/camera_plugin.h>
 #include <plugins/plugin_tools.h>
-#include <plugins/plugin_tools.h>
 
-#include "video_codec_priority.h"
+#include <vector>
+
 #include "codec_context.h"
 #include "plugin.h"
 
 namespace nx {
 namespace webcam_plugin {
+
+namespace ffmpeg { class StreamReader; }
 
 class MediaEncoder;
 
@@ -43,18 +45,19 @@ public:
     const nxcip::CameraInfo& info() const;
     nxpt::CommonRefManager* refManager();
 
+    std::string decodeCameraInfoUrl() const;
 protected:
+    nxcip::CameraInfo m_info;
+    nxpl::TimeProvider *const m_timeProvider;
     nxpt::CommonRefManager m_refManager;
     nxpt::ScopedRef<Plugin> m_pluginRef;
-    nxcip::CameraInfo m_info;
     unsigned int m_capabilities;
-    nxpl::TimeProvider *const m_timeProvider;
-    std::unique_ptr<MediaEncoder> m_encoder;
+    std::vector<std::unique_ptr<MediaEncoder>> m_encoders;
 
-    VideoCodecPriority m_videoCodecPriority;
+    std::shared_ptr<ffmpeg::StreamReader> m_ffmpegStreamReader;
 
 private:
-    CodecContext getEncoderDefaults();
+    CodecContext getEncoderDefaults(int encoderIndex);
 };
 
 } // namespace nx 

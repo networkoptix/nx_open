@@ -1,11 +1,11 @@
-#include "av_utils.h"
+#include "utils.h"
 
 #include <camera/camera_plugin.h>
 
 namespace nx {
 namespace webcam_plugin {
+namespace ffmpeg{
 namespace utils{
-namespace av{
 
 std::string avCodecIDStr(AVCodecID codecID)
 {
@@ -21,14 +21,6 @@ AVCodecID avCodecID(const char * codecName)
     if(codec)
         return codec->id;
     return AV_CODEC_ID_NONE;
-}
-
-std::string avStrError(int errorCode)
-{
-    static constexpr int length = AV_ERROR_MAX_STRING_SIZE;
-    char errorBuffer[length];
-    av_strerror(errorCode, errorBuffer, length);
-    return std::string(errorBuffer);
 }
 
 AVStream* getAVStream(AVFormatContext * context, AVMediaType mediaType, int * streamIndex)
@@ -167,7 +159,6 @@ nxcip::CompressionType toNxCompressionType(AVCodecID codecID)
                 return AV_CODEC_ID_NONE;
         }
     }
-
 
 } // namespace av
 } // namespace utils

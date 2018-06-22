@@ -1,6 +1,5 @@
 #include "codec_context.h"
-
-#include "av_utils.h"
+#include "ffmpeg/utils.h"
 
 namespace nx {
 namespace webcam_plugin {
@@ -15,8 +14,8 @@ CodecContext::CodecContext():
 CodecContext::CodecContext (
     nxcip::CompressionType codecID, 
     const nxcip::Resolution &resolution,
-    float fps,
-    int64_t bitrate)
+    int fps,
+    int bitrate)
     :
     m_codecID(codecID),
     m_resolution(resolution),
@@ -51,22 +50,22 @@ bool CodecContext::resolutionValid() const
         && m_resolution.height > 0;
 }
 
-void CodecContext::setFps (float fps)
+void CodecContext::setFps (int fps)
 {
     m_fps = fps;
 }
 
-float CodecContext::fps () const
+int CodecContext::fps () const
 {
     return m_fps;
 }
 
-void CodecContext::setBitrate(int64_t bitrate)
+void CodecContext::setBitrate(int bitrate)
 {
     m_bitrate = bitrate;
 }
 
-int64_t CodecContext::bitrate () const
+int CodecContext::bitrate () const
 {
     return m_bitrate;
 }
@@ -77,7 +76,7 @@ std::string CodecContext::toString() const
         std::string("width: ") + std::to_string(m_resolution.width) +
         ", height: " + std::to_string(m_resolution.height);
 
-    return std::string("codecID: ") + utils::av::avCodecIDStr(utils::av::toAVCodecID(m_codecID)) + 
+    return std::string("codecID: ") + ffmpeg::utils::avCodecIDStr(ffmpeg::utils::toAVCodecID(m_codecID)) + 
         ", " + resolutionStr + 
         ", fps: " + std::to_string(m_fps) +
         ", bitrate: " + std::to_string(m_bitrate);
