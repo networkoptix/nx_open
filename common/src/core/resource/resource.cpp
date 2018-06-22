@@ -331,7 +331,6 @@ void QnResource::setTypeByName(const QString& resTypeName)
 
 Qn::ResourceStatus QnResource::getStatus() const
 {
-    NX_EXPECT(commonModule());
     return commonModule()
         ? commonModule()->statusDictionary()->value(getId())
         : Qn::NotDefined;
