@@ -147,12 +147,14 @@ void Appserver2MessageProcessor::updateResource(
     }
 }
 
-void Appserver2MessageProcessor::handleRemotePeerFound(QnUuid peer, Qn::PeerType /*peerType*/)
+void Appserver2MessageProcessor::handleRemotePeerFound(
+    QnUuid peer, nx::vms::api::PeerType /*peerType*/)
 {
     commonModule()->statusDictionary()->setValue(peer, Qn::Online);
 }
 
-void Appserver2MessageProcessor::handleRemotePeerLost(QnUuid peer, Qn::PeerType /*peerType*/)
+void Appserver2MessageProcessor::handleRemotePeerLost(
+    QnUuid peer, nx::vms::api::PeerType /*peerType*/)
 {
     commonModule()->statusDictionary()->setValue(peer, Qn::Offline);
 }

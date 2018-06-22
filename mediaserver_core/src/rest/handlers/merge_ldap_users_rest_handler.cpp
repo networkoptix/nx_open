@@ -2,16 +2,16 @@
 
 #include <api/app_server_connection.h>
 #include <common/common_module.h>
-#include <nx/network/app_info.h>
 #include <core/resource/user_resource.h>
 #include <network/universal_tcp_listener.h>
-#include <nx_ec/data/api_user_data.h>
 #include <nx_ec/ec_api.h>
 #include <nx_ec/managers/abstract_user_manager.h>
-#include <nx_ec/data/api_user_data.h>
+#include <rest/server/rest_connection_processor.h>
+
+#include <nx/network/app_info.h>
 #include <nx/network/http/http_types.h>
 #include <nx/utils/uuid.h>
-#include <rest/server/rest_connection_processor.h>
+#include <nx/vms/api/data/user_data.h>
 
 int QnMergeLdapUsersRestHandler::executePost(
     const QString& /*path*/,

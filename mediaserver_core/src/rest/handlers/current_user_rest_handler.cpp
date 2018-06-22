@@ -1,15 +1,15 @@
 #include "current_user_rest_handler.h"
 
-#include "nx_ec/data/api_user_data.h"
+#include <api/abstract_connection.h>
+#include <api/app_server_connection.h>
 #include <common/common_module.h>
-#include "api/app_server_connection.h"
-
-#include "rest/server/rest_connection_processor.h"
-#include <nx_ec/data/api_user_data.h>
+#include <network/universal_tcp_listener.h>
 #include <nx_ec/managers/abstract_user_manager.h>
+#include <rest/server/rest_connection_processor.h>
+
 #include <nx/network/http/custom_headers.h>
 #include <nx/network/http/http_types.h>
-#include <network/authenticate_helper.h>
+#include <nx/vms/api/data/user_data.h>
 
 int QnCurrentUserRestHandler::executeGet(
     const QString&,

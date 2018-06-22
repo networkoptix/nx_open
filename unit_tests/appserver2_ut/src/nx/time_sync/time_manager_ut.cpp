@@ -204,10 +204,10 @@ public:
             auto id = commonModule->moduleGUID();
             auto resourcePool = m_appserver->moduleInstance()->commonModule()->resourcePool();
             auto server = resourcePool->getResourceById<QnMediaServerResource>(id);
-            auto flags = server->getServerFlags() | Qn::SF_HasPublicIP;
+            auto flags = server->getServerFlags() | nx::vms::api::SF_HasPublicIP;
             server->setServerFlags(flags);
 
-            ec2::ApiMediaServerData apiServer;
+            nx::vms::api::MediaServerData apiServer;
             ec2::fromResourceToApi(server, apiServer);
             ec2Connection->getMediaServerManager(Qn::kSystemAccess)->save(apiServer, this, [] {});
         }
