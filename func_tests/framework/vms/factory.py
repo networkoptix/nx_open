@@ -21,20 +21,15 @@ class UnknownOsFamily(Exception):
 
 
 class VMFactory(object):
-    def __init__(self, vm_configuration, hypervisor, registries):
+    def __init__(self, vm_configuration, hypervisor, vm_types):
         self._vm_configuration = vm_configuration
         self._hypervisor = hypervisor
-        self._registries = registries
-        self._vm_types = {
-            vm_type_name: VMType(hypervisor, **vm_type_conf['vm'])
-            for vm_type_name, vm_type_conf in vm_configuration.items()
-            }
+        self._vm_types = vm_types
 
     @contextmanager
     def allocated_vm(self, alias, vm_type='linux'):
-        with self._registries[vm_type].taken(alias) as (vm_index, name):
+        with self._vm_types[vm_type].obtained(alias) as (info, vm_index):
             vm_type_configuration = self._vm_configuration[vm_type]
-            info = self._vm_types[vm_type].obtain(name, vm_index)
             if vm_type_configuration['os_family'] == 'linux':
                 os_access = SSHAccess(info.port_map, info.macs, 'root', SSH_PRIVATE_KEY_PATH)
             elif vm_type_configuration['os_family'] == 'windows':

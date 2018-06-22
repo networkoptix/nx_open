@@ -1,15 +1,11 @@
-from contextlib import contextmanager
-
 import pytest
 
 from defaults import defaults
-from fixtures.vms import vm_types_configuration
 from framework.networking.linux import LinuxNetworking
 from framework.networking.windows import WindowsNetworking
 from framework.os_access.posix_shell import SSH
 from framework.os_access.windows_remoting import WinRM
 from framework.vms.factory import SSH_PRIVATE_KEY_PATH
-from framework.vms.vm_type import VMType
 from framework.waiting import wait_for_true
 
 
@@ -24,27 +20,16 @@ def pytest_addoption(parser):
 # and then to use these as fixtures directly or create Networking objects.
 # There is no simple way to do that with overriding.
 
-@contextmanager
-def _vm_info(vm_alias, hypervisor, vm_registry, vm_configuration):
-    vm_type = VMType(hypervisor, **vm_configuration)
-    with vm_registry.taken(vm_alias) as (vm_index, vm_name):
-        yield vm_type.obtain(vm_name, vm_index)
+@pytest.fixture(scope='session')
+def linux_vm_info(vm_types):
+    with vm_types['linux'].obtained('raw-linux') as (info, index):
+        return info
 
 
 @pytest.fixture(scope='session')
-def linux_vm_info(hypervisor, vm_registries):
-    vm_registry = vm_registries['linux']
-    vm_configuration = vm_types_configuration()['linux']['vm']
-    with _vm_info('raw-linux', hypervisor, vm_registry, vm_configuration) as vm_info:
-        yield vm_info
-
-
-@pytest.fixture(scope='session')
-def windows_vm_info(hypervisor, vm_registries):
-    vm_registry = vm_registries['windows']
-    vm_configuration = vm_types_configuration()['windows']['vm']
-    with _vm_info('raw-windows', hypervisor, vm_registry, vm_configuration) as vm_info:
-        yield vm_info
+def windows_vm_info(vm_types):
+    with vm_types['linux'].obtained('raw-linux') as (info, index):
+        return info
 
 
 @pytest.fixture(scope='session')

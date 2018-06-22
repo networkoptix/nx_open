@@ -14,6 +14,7 @@ from framework.registry import Registry
 from framework.serialize import load
 from framework.vms.factory import VMFactory
 from framework.vms.hypervisor.virtual_box import VirtualBox
+from framework.vms.vm_type import VMType
 
 DEFAULT_VM_HOST_USER = 'root'
 DEFAULT_VM_HOST_DIR = '/tmp/jenkins-test'
@@ -93,8 +94,19 @@ def vm_registries(host_posix_shell, host_os_access):
 
 
 @pytest.fixture(scope='session')
-def vm_factory(request, hypervisor, vm_registries):
-    factory = VMFactory(vm_types_configuration(), hypervisor, vm_registries)
+def vm_types(hypervisor, vm_registries):
+    return {
+        vm_type_name: VMType(
+            hypervisor,
+            vm_registries[vm_type_name],
+            **vm_type_conf['vm'])
+        for vm_type_name, vm_type_conf in vm_types_configuration().items()
+        }
+
+
+@pytest.fixture(scope='session')
+def vm_factory(request, hypervisor, vm_types):
+    factory = VMFactory(vm_types_configuration(), hypervisor, vm_types)
     if request.config.getoption('--clean'):
         factory.cleanup()
     return factory
