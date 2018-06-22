@@ -136,16 +136,7 @@ int CameraManager::getEncoder( int encoderIndex, nxcip::CameraMediaEncoder** enc
             return nxcip::NX_INVALID_ENCODER_NUMBER;
     }
 
-    // if (!m_encoder.get())
-    // {
-    //     m_encoder.reset(new MediaEncoder(
-    //         this,
-    //         m_timeProvider,
-    //         encoderIndex,
-    //         getEncoderDefaults()));
-    // }
-    // m_encoder->addRef();
-
+    m_encoders[encoderIndex]->addRef();
     *encoderPtr = m_encoders[encoderIndex].get();
 
     return nxcip::NX_NO_ERROR;
@@ -168,7 +159,8 @@ void CameraManager::setCredentials( const char* username, const char* password )
     strncpy( m_info.defaultLogin, username, sizeof(m_info.defaultLogin)-1 );
     strncpy( m_info.defaultPassword, password, sizeof(m_info.defaultPassword)-1 );
     for(const auto & encoder : m_encoders)
-        encoder->updateCameraInfo( m_info );
+        if(encoder)
+            encoder->updateCameraInfo( m_info );
 }
 
 int CameraManager::setAudioEnabled( int /*audioEnabled*/ )
