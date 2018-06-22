@@ -26,7 +26,6 @@
 #include <ui/common/palette.h>
 #include <ui/models/sorted_server_updates_model.h>
 #include <ui/dialogs/common/message_box.h>
-#include <ui/dialogs/common/file_dialog.h>
 #include <ui/dialogs/common/custom_file_dialog.h>
 #include <ui/dialogs/build_number_dialog.h>
 #include <ui/delegates/update_status_item_delegate.h>
@@ -293,7 +292,7 @@ void QnServerUpdatesWidget::initDropdownActions()
     selectUpdateTypeMenu->addAction(tr("Browse for Update File..."),
         [this]()
         {
-            m_localFileName = QnFileDialog::getOpenFileName(this,
+            m_localFileName = QFileDialog::getOpenFileName(this,
                 tr("Select Update File..."),
                 QString(),
                 tr("Update Files") + lit(" (*.zip)"),

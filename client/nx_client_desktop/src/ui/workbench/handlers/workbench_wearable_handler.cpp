@@ -16,7 +16,6 @@
 #include <core/resource_management/resource_pool.h>
 
 #include <ui/dialogs/new_wearable_camera_dialog.h>
-#include <ui/dialogs/common/file_dialog.h>
 #include <ui/dialogs/common/message_box.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_state_manager.h>
@@ -158,7 +157,7 @@ void QnWorkbenchWearableHandler::at_uploadWearableCameraFileAction_triggered()
     filters << tr("Video (%1)").arg(kVideoExtensions.join(L' '));
     filters << tr("All files (*.*)");
 
-    QStringList paths = QnFileDialog::getOpenFileNames(mainWindow(),
+    QStringList paths = QFileDialog::getOpenFileNames(mainWindow(),
         tr("Open Wearable Camera Recordings..."),
         QString(),
         filters.join(lit(";;")),
@@ -169,7 +168,7 @@ void QnWorkbenchWearableHandler::at_uploadWearableCameraFileAction_triggered()
         return;
 
     // TODO: #wearable requested by rvasilenko as copypaste from totalcmd doesn't work without
-    // this line. Maybe move directly to QnFileDialog?
+    // this line. Maybe move directly to QFileDialog?
     for(QString& path: paths)
         path = path.trimmed();
 
@@ -188,7 +187,7 @@ void QnWorkbenchWearableHandler::at_uploadWearableCameraFolderAction_triggered()
     if (!camera || !camera->getParentServer())
         return;
 
-    QString path = QnFileDialog::getExistingDirectory(mainWindow(),
+    QString path = QFileDialog::getExistingDirectory(mainWindow(),
         tr("Open Wearable Camera Recordings..."),
         QString(),
         QnCustomFileDialog::directoryDialogOptions()
