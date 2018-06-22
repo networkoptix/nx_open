@@ -2,12 +2,6 @@
 
 #include <rest/server/json_rest_handler.h>
 
-class QnCookieHelper
-{
-public:
-    static void addLogoutHeaders(nx::network::http::HttpHeaders* outHeaders);
-};
-
 class QnCookieLogoutRestHandler : public QnJsonRestHandler
 {
     Q_OBJECT

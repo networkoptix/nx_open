@@ -779,11 +779,20 @@ CameraDiagnostics::Result QnRtspClient::open(const QString& url, qint64 startTim
             nx::network::http::header::WWWAuthenticate(m_defaultAuthScheme));
     }
 
+    bool isSslRequired = false;
+    const auto urlScheme = m_url.scheme().toLower().toUtf8();
+    if (urlScheme == nx_rtsp::kUrlSchemeName)
+        isSslRequired = false;
+    else if (urlScheme == nx_rtsp::kSecureUrlSchemeName)
+        isSslRequired = true;
+    else
+        return CameraDiagnostics::UnsupportedProtocolResult(m_url.toString(), m_url.scheme());
+
     std::unique_ptr<nx::network::AbstractStreamSocket> previousSocketHolder;
     {
         QnMutexLocker lock(&m_socketMutex);
         previousSocketHolder = std::move(m_tcpSock);
-        m_tcpSock = nx::network::SocketFactory::createStreamSocket();
+        m_tcpSock = nx::network::SocketFactory::createStreamSocket(isSslRequired);
         m_additionalReadBufferSize = 0;
     }
 

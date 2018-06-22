@@ -3,7 +3,6 @@
 
 #include "network/tcp_connection_processor.h"
 #include "universal_tcp_listener.h"
-#include "authenticate_helper.h"
 
 class QnUniversalRequestProcessorPrivate;
 
@@ -29,6 +28,8 @@ public:
 protected:
     virtual void run() override;
     virtual void pleaseStop() override;
+    bool hasSecurityIssue();
+    bool redicrectToScheme(const char* scheme);
     bool processRequest(bool noAuth);
     bool authenticate(Qn::UserAccessData* accessRights, bool *noAuth);
 

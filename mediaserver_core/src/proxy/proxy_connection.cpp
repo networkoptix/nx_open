@@ -31,6 +31,7 @@
 #include "api/global_settings.h"
 #include <nx/network/http/auth_tools.h>
 #include <nx/network/aio/unified_pollset.h>
+#include <nx/network/rtsp/rtsp_types.h>
 
 #include <utils/common/app_info.h>
 #include <core/resource/user_resource.h>
@@ -78,7 +79,8 @@ QnProxyConnectionProcessor::~QnProxyConnectionProcessor()
 
 bool QnProxyConnectionProcessor::isProtocol(const QString& protocol) const
 {
-    return protocol == "http" || protocol == "https" || protocol == "rtsp";
+    return nx::network::http::isUrlSheme(protocol)
+        || nx_rtsp::isUrlSheme(protocol);
 }
 
 int QnProxyConnectionProcessor::getDefaultPortByProtocol(const QString& protocol)
@@ -227,8 +229,9 @@ bool QnProxyConnectionProcessor::replaceAuthHeader()
         nx::network::http::header::WWWAuthenticate wwwAuthenticateHeader;
         nx::network::http::header::DigestAuthorization digestAuthorizationHeader;
         wwwAuthenticateHeader.authScheme = nx::network::http::header::AuthScheme::digest;
-        wwwAuthenticateHeader.params["nonce"] = QnAuthHelper::instance()->generateNonce(QnAuthHelper::NonceProvider::local);
         wwwAuthenticateHeader.params["realm"] = nx::network::AppInfo::realm().toUtf8();
+        wwwAuthenticateHeader.params["nonce"] = QnUniversalTcpListener::authorizer(owner())
+            ->generateNonce(nx::mediaserver::Authenticator::NonceProvider::local);
 
         if (!nx::network::http::calcDigestResponse(
             d->request.requestLine.method,
@@ -502,7 +505,7 @@ void QnProxyConnectionProcessor::run()
         return;
 
     bool isWebSocket = nx::network::http::getHeaderValue( d->request.headers, "Upgrade").toLower() == lit("websocket");
-    if (!isWebSocket && (d->protocol.toLower() == "http" || d->protocol.toLower() == "https"))
+    if (!isWebSocket && nx::network::http::isUrlSheme(d->protocol.toLower()))
     {
         NX_VERBOSE(this, lm("Smart proxy for %1").arg(d->request.requestLine));
         doSmartProxy();

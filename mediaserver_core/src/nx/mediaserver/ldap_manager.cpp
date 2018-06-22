@@ -40,22 +40,23 @@
 #include <common/common_module.h>
 #include <nx/utils/string.h>
 
-namespace {
-    static const int kPageSize = 1000;
+namespace nx {
+namespace mediaserver {
 
-    Qn::LdapResult translateErrorCode(LDAP_RESULT ldapCode)
+static const int kPageSize = 1000;
+
+static LdapResult translateErrorCode(LDAP_RESULT ldapCode)
+{
+    switch(ldapCode)
     {
-        switch(ldapCode)
-        {
         case LDAP_SUCCESS:
-            return Qn::Ldap_NoError;
+            return LdapResult::NoError;
         case LDAP_SIZELIMIT_EXCEEDED:
-            return Qn::Ldap_SizeLimit;
+            return LdapResult::SizeLimit;
         case LDAP_INVALID_CREDENTIALS:
-            return Qn::Ldap_InvalidCredentials;
+            return LdapResult::InvalidCredentials;
         default:
-            return Qn::Ldap_Other;
-        }
+            return LdapResult::Other;
     }
 }
 
@@ -211,13 +212,28 @@ namespace
     }
 }
 
-QnLdapManager::QnLdapManager(QnCommonModule* commonModule):
-    QnCommonModuleAware(commonModule)
+QString toString(LdapResult result)
 {
-    connect(commonModule->globalSettings(), &QnGlobalSettings::ldapSettingsChanged, this, &QnLdapManager::clearCache);
+    switch(result)
+    {
+        case LdapResult::NoError:
+            return lit("OK");
+        case LdapResult::SizeLimit:
+            return lit("User limit exceeded. Narrow your filter or fix server configuration");
+        case LdapResult::InvalidCredentials:
+            return lit("Invalid credentials");
+        default:
+            return lit("Invalid ldap settings");
+    }
 }
 
-QnLdapManager::~QnLdapManager()
+LdapManager::LdapManager(QnCommonModule* commonModule):
+    QnCommonModuleAware(commonModule)
+{
+    connect(commonModule->globalSettings(), &QnGlobalSettings::ldapSettingsChanged, this, &LdapManager::clearCache);
+}
+
+LdapManager::~LdapManager()
 {
 }
 
@@ -525,7 +541,7 @@ bool LdapSession::detectLdapVendor(LdapVendor& vendor)
     return true;
 }
 
-Qn::LdapResult QnLdapManager::fetchUsers(QnLdapUsers& users, const QnLdapSettings& settings)
+LdapResult LdapManager::fetchUsers(QnLdapUsers& users, const QnLdapSettings& settings)
 {
     LdapSession session(settings);
     if (!session.connect())
@@ -540,16 +556,16 @@ Qn::LdapResult QnLdapManager::fetchUsers(QnLdapUsers& users, const QnLdapSetting
         return translateErrorCode(session.lastErrorCode());
     }
 
-    return Qn::Ldap_NoError;
+    return LdapResult::NoError;
 }
 
-Qn::LdapResult QnLdapManager::fetchUsers(QnLdapUsers& users)
+LdapResult LdapManager::fetchUsers(QnLdapUsers& users)
 {
     QnLdapSettings settings = commonModule()->globalSettings()->ldapSettings();
     return fetchUsers(users, settings);
 }
 
-Qn::AuthResult QnLdapManager::authenticate(const QString& login, const QString& password)
+Qn::AuthResult LdapManager::authenticate(const QString& login, const QString& password)
 {
     QnLdapSettings settings = commonModule()->globalSettings()->ldapSettings();
     LdapSession session(settings);
@@ -582,21 +598,12 @@ Qn::AuthResult QnLdapManager::authenticate(const QString& login, const QString& 
     return authResult;
 }
 
-QString QnLdapManager::errorMessage(Qn::LdapResult ldapResult)
-{
-    switch(ldapResult)
-    {
-    case Qn::Ldap_SizeLimit:
-        return lit("User limit exceeded. Narrow your filter or fix server configuration.");
-    case Qn::Ldap_InvalidCredentials:
-        return lit("Invalid credentials");
-    default:
-        return lit("Invalid ldap settings");
-    }
-}
-
-void QnLdapManager::clearCache()
+void LdapManager::clearCache()
 {
     QnMutexLocker lock(&m_cacheMutex);
     m_dnCache.clear();
 }
+
+} // namespace mediaserver
+} // namespace nx
+

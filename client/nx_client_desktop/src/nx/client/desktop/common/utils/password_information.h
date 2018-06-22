@@ -14,15 +14,8 @@ namespace desktop {
 class PasswordInformation
 {
 public:
-    enum Acceptance
-    {
-        Inacceptable = -1,
-        Acceptable,
-        Good
-    };
-
     PasswordInformation() = default;
-    PasswordInformation(const QString& text, const QString& hint, Acceptance acceptance);
+    PasswordInformation(const QString& text, const QString& hint, utils::PasswordAcceptance acceptance);
 
     explicit PasswordInformation(nx::utils::PasswordStrength strength);
 
@@ -34,12 +27,12 @@ public:
 
     QString text() const;
     QString hint() const;
-    Acceptance acceptance() const;
+    utils::PasswordAcceptance acceptance() const;
 
 private:
     QString m_text;
     QString m_hint;
-    Acceptance m_acceptance = Inacceptable;
+    utils::PasswordAcceptance m_acceptance = utils::PasswordAcceptance::Unacceptable;
 
     Q_DECLARE_TR_FUNCTIONS(PasswordInformation)
 };

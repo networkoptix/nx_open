@@ -38,6 +38,7 @@
 
 #include <nx/client/core/utils/human_readable.h>
 #include <utils/media/audio_player.h>
+#include <nx/network/http/http_types.h>
 
 using namespace nx;
 
@@ -1134,7 +1135,7 @@ bool QnBusinessRuleViewModel::isValid(Column column) const
                     QUrl url(m_actionParams.url);
                     return url.isValid()
                         && !url.isEmpty()
-                        && (url.scheme().isEmpty() || url.scheme().toLower() == lit("http"))
+                        && (url.scheme().isEmpty() || nx::network::http::isUrlSheme(url.scheme()))
                         && !url.host().isEmpty();
                 }
                 default:
