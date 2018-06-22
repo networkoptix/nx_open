@@ -1794,7 +1794,7 @@
     <message>
       <location filename="../src/ui/dialogs/new_wearable_camera_dialog.ui"/>
       <source>New Wearable Camera...</source>
-      <translation type="unfinished">New Wearable Camera...</translation>
+      <translation>Új hordozható kamera...</translation>
     </message>
     <message>
       <location/>
@@ -3080,7 +3080,7 @@
     <message>
       <location/>
       <source>Detect motion in uploaded video</source>
-      <translation type="unfinished">Detect motion in uploaded video</translation>
+      <translation>Mozgásérzékelés a feltöltött videón</translation>
     </message>
     <message>
       <location/>
