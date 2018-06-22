@@ -92,6 +92,10 @@ class VirtualBox(Hypervisor):
         raw_info = dict(csv.reader(output.splitlines(), delimiter='=', escapechar='\\', doublequote=False))
         return raw_info
 
+    def create_dummy(self, vm_name):
+        self._vbox_manage(['createvm', '--name', vm_name, '--register'])
+        self._vbox_manage(['modifyvm', vm_name, '--description', 'For testing purposes. Can be deleted.'])
+
     def find(self, vm_name):
         raw_info = self._get_info(vm_name)
         info = vm_info_from_raw_info(raw_info)

@@ -11,6 +11,10 @@ class Hypervisor(object):
         self.host_os_access = host_os_access  # type: OSAccess
 
     @abstractmethod
+    def create_dummy(self, vm_name):
+        pass
+
+    @abstractmethod
     def find(self, vm_name):
         pass
 
