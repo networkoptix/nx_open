@@ -1,8 +1,11 @@
+import logging
 from contextlib import contextmanager
 
 from framework.registry import Registry
 from framework.vms.hypervisor import VMNotFound
 from framework.vms.hypervisor.hypervisor import Hypervisor
+
+_logger = logging.getLogger(__name__)
 
 
 class VMType(object):
@@ -37,3 +40,17 @@ class VMType(object):
             if not vm_info.is_running:
                 self.hypervisor.power_on(vm_info.name)
             yield vm_info, vm_index
+
+    def cleanup(self):
+        def destroy(name, vm_alias):
+            if vm_alias is None:
+                try:
+                    self.hypervisor.destroy(name)
+                except VMNotFound:
+                    _logger.info("Machine %s not found.", name)
+                else:
+                    _logger.info("Machine %s destroyed.", name)
+            else:
+                _logger.warning("Machine %s reserved now.", name)
+
+        self.registry.for_each(destroy)

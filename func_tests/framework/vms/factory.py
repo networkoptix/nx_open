@@ -5,7 +5,6 @@ from contextlib import contextmanager
 from framework.os_access.local_path import LocalPath
 from framework.os_access.ssh_access import SSHAccess
 from framework.os_access.windows_access import WindowsAccess
-from framework.vms.hypervisor import VMNotFound
 from framework.vms.vm_type import VMType
 from framework.waiting import wait_for_true
 
@@ -44,16 +43,5 @@ class VMFactory(object):
             yield vm
 
     def cleanup(self):
-        def destroy(name, vm_alias):
-            if vm_alias is None:
-                try:
-                    self._hypervisor.destroy(name)
-                except VMNotFound:
-                    _logger.info("Machine %s not found.", name)
-                else:
-                    _logger.info("Machine %s destroyed.", name)
-            else:
-                _logger.warning("Machine %s reserved now.", name)
-
         for vm_type in self._vm_types.values():
-            vm_type.registry.for_each(destroy)
+            vm_type.cleanup()
