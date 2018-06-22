@@ -40,7 +40,7 @@ def runTest(key, langList):
             map(remove, (path.join(loc, file) for file in listdir(loc)
                          if file.endswith('.png') and file.find(key) > -1))
             system('robot -N {}_{} -v SCREENSHOTDIRECTORY:{} -v BROWSER:headlesschrome -d {} -e not-ready -V getvars.py:{} test-cases'.format(
-                langList[key], key, path.join(loc, 'combined-results'), path.join(loc, key), key))
+                langList[key], key, loc, path.join(loc, key), key))
             # ping the server at the end to make sure it didn't go down
             if ping().ok:
                 break
