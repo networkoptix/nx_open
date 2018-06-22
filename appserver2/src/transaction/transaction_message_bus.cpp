@@ -17,7 +17,6 @@
 #include <utils/common/synctime.h>
 #include <utils/common/warnings.h>
 
-#include <nx_ec/data/api_resource_data.h>
 #include <nx_ec/data/api_discovery_data.h>
 
 #include <nx/cloud/cdb/api/ec2_request_paths.h>
@@ -28,6 +27,7 @@
 #include <nx/vms/api/data/camera_data.h>
 #include <nx/vms/api/data/camera_data_ex.h>
 #include <nx/vms/api/data/peer_alive_data.h>
+#include <nx/vms/api/data/resource_data.h>
 #include <nx/vms/api/data/resource_type_data.h>
 #include <nx/vms/api/data/reverse_connection_data.h>
 #include <nx/vms/discovery/manager.h>

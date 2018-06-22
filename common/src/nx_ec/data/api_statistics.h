@@ -3,18 +3,17 @@
 #include <set>
 
 #include "api_globals.h"
-#include "api_resource_data.h"
+
+#include <nx/fusion/model_functions_fwd.h>
 #include <nx/vms/api/data/camera_data_ex.h>
 #include <nx/vms/api/data/client_info_data.h>
 #include <nx/vms/api/data/event_rule_data.h>
 #include <nx/vms/api/data/layout_data.h>
-#include <nx/vms/api/data/media_server_data.h>
-#include <nx/vms/api/data/user_data.h>
-
 #include <nx/vms/api/data/license_data.h>
+#include <nx/vms/api/data/media_server_data.h>
+#include <nx/vms/api/data/resource_data.h>
+#include <nx/vms/api/data/user_data.h>
 #include <nx/vms/api/data/videowall_data.h>
-
-#include <nx/fusion/model_functions_fwd.h>
 
 // NOTE: structs with suffix 'Statistics' are only used to tell fusion which
 //       fields should be serialized for statistics (to cut out private data

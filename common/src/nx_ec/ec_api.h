@@ -18,7 +18,7 @@
 
 #include <nx_ec/impl/ec_api_impl.h>
 #include <nx_ec/impl/sync_handler.h>
-#include <nx_ec/data/api_resource_data.h>
+#include <nx/vms/api/data/resource_data.h>
 #include <nx/vms/api/data/email_settings_data.h>
 #include <nx/vms/api/data/peer_alive_data.h>
 #include <nx_ec/data/api_discovery_data.h>

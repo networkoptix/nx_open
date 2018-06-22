@@ -20,10 +20,10 @@
 #include <nx/utils/std/cpp14.h>
 #include <nx/utils/thread/mutex.h>
 #include <nx/utils/type_utils.h>
+#include <nx/vms/api/data/resource_data.h>
 
 #include <analytics/detected_objects_storage/analytics_events_storage.h>
 #include <network/module_information.h>
-#include <nx_ec/data/api_resource_data.h>
 #include <nx_ec/ec_api.h>
 #include <rest/server/json_rest_result.h>
 

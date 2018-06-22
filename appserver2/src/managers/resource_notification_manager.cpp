@@ -1,7 +1,6 @@
 #include "resource_notification_manager.h"
 
 #include <core/resource_management/resource_pool.h>
-
 #include <nx_ec/data/api_conversion_functions.h>
 
 #include <nx/utils/log/log.h>

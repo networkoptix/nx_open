@@ -91,7 +91,6 @@
 
 #include <nx_ec/ec_api.h>
 #include <nx_ec/data/api_discovery_data.h>
-#include <nx_ec/data/api_resource_data.h>
 #include <nx_ec/data/api_full_info_data.h>
 #include <nx/vms/api/data/event_rule_data.h> //< Required for the FullInfoData
 #include <nx/vms/api/data/resource_type_data.h> //< Required for the FullInfoData

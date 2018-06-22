@@ -2,7 +2,7 @@
 
 #include <limits>
 
-#include <nx_ec/data/api_resource_data.h>
+#include <nx/vms/api/data/resource_data.h>
 #include <nx/fusion/serialization/lexical.h>
 #include <nx/fusion/serialization/sql.h>
 #include <nx/fusion/serialization/sql_functions.h>
