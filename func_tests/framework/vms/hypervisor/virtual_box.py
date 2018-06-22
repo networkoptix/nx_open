@@ -21,10 +21,7 @@ _INTERNAL_NIC_INDICES = [2, 3, 4, 5, 6, 7, 8]
 
 
 class VirtualBoxError(Exception):
-    def __init__(self, code, message):
-        Exception.__init__(self, message)
-        self.code = code
-        self.message = message
+    pass
 
 
 @lrudecorator(100)
@@ -33,7 +30,8 @@ def virtual_box_error(code):
 
     class SpecificVirtualBoxError(VirtualBoxError):
         def __init__(self, message):
-            VirtualBoxError.__init__(self, code, message)
+            super(SpecificVirtualBoxError, self).__init__(message)
+            self.code = code
 
     return type('VirtualBoxError_{}'.format(code), (SpecificVirtualBoxError,), {})
 
@@ -185,7 +183,8 @@ class VirtualBox(Hypervisor):
             code = mo.group(1)
             first_line = x.stderr.splitlines()[0]
             prefix = 'VBoxManage: error: '
-            assert first_line.startswith(prefix)
+            if not first_line.startswith(prefix):
+                raise VirtualBoxError(x.stderr)
             message = first_line[len(prefix):]
             if code == 'OBJECT_NOT_FOUND':
                 raise VMNotFound("Cannot find VM:\n{}".format(message))
