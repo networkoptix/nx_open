@@ -77,12 +77,7 @@ def hypervisor(host_os_access):
 @pytest.fixture(scope='session')
 def vm_types(hypervisor):
     return {
-        vm_type_name: VMType(
-            hypervisor,
-            vm_type_conf['registry_path'],
-            vm_type_conf['name_format'],
-            vm_type_conf['limit'],
-            **vm_type_conf['vm'])
+        vm_type_name: VMType(hypervisor, **vm_type_conf['vm'])
         for vm_type_name, vm_type_conf in vm_types_configuration().items()
         }
 
