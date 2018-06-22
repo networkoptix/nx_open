@@ -9,7 +9,7 @@ from framework.networking.windows import WindowsNetworking
 from framework.os_access.posix_shell import SSH
 from framework.os_access.windows_remoting import WinRM
 from framework.vms.factory import SSH_PRIVATE_KEY_PATH
-from framework.vms.hypervisor import obtain_running_vm
+from framework.vms.vm_type import VMType
 from framework.waiting import wait_for_true
 
 
@@ -26,8 +26,9 @@ def pytest_addoption(parser):
 
 @contextmanager
 def _vm_info(vm_alias, hypervisor, vm_registry, vm_configuration):
+    vm_type = VMType(hypervisor, **vm_configuration)
     with vm_registry.taken(vm_alias) as (vm_index, vm_name):
-        yield obtain_running_vm(hypervisor, vm_name, vm_index, vm_configuration)
+        yield vm_type.obtain(vm_name, vm_index)
 
 
 @pytest.fixture(scope='session')

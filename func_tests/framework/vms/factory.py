@@ -5,7 +5,8 @@ from contextlib import contextmanager
 from framework.os_access.local_path import LocalPath
 from framework.os_access.ssh_access import SSHAccess
 from framework.os_access.windows_access import WindowsAccess
-from framework.vms.hypervisor import VMNotFound, obtain_running_vm
+from framework.vms.hypervisor import VMNotFound
+from framework.vms.vm_type import VMType
 from framework.waiting import wait_for_true
 
 _logger = logging.getLogger(__name__)
@@ -24,12 +25,16 @@ class VMFactory(object):
         self._vm_configuration = vm_configuration
         self._hypervisor = hypervisor
         self._registries = registries
+        self._vm_types = {
+            vm_type_name: VMType(hypervisor, **vm_type_conf['vm'])
+            for vm_type_name, vm_type_conf in vm_configuration.items()
+            }
 
     @contextmanager
     def allocated_vm(self, alias, vm_type='linux'):
         with self._registries[vm_type].taken(alias) as (vm_index, name):
             vm_type_configuration = self._vm_configuration[vm_type]
-            info = obtain_running_vm(self._hypervisor, name, vm_index, vm_type_configuration['vm'])
+            info = self._vm_types[vm_type].obtain(name, vm_index)
             if vm_type_configuration['os_family'] == 'linux':
                 os_access = SSHAccess(info.port_map, info.macs, 'root', SSH_PRIVATE_KEY_PATH)
             elif vm_type_configuration['os_family'] == 'windows':

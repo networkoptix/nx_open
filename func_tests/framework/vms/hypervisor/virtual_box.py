@@ -96,33 +96,35 @@ class VirtualBox(object):
         info = vm_info_from_raw_info(raw_info)
         return info
 
-    def clone(self, vm_name, vm_index, vm_configuration):
-        """Clone and setup Machine with simple and generic parameters. Template can be any specific type."""
+    def clone(self, original_vm_name, original_snapshot_name, clone_vm_name):
         try:
             self._run_vbox_manage_command([
-                'clonevm', vm_configuration['template_vm'],
-                '--snapshot', vm_configuration['template_vm_snapshot'],
-                '--name', vm_name,
+                'clonevm', original_vm_name,
+                '--snapshot', original_snapshot_name,
+                '--name', clone_vm_name,
                 '--options', 'link',
                 '--register',
                 ])
         except virtual_box_error('OBJECT_NOT_FOUND') as x:
-            _logger.error('Failed to clone %r: %s', vm_name, x.message)
+            _logger.error('Failed to clone %r: %s', original_vm_name, x.message)
             mo = re.search(r"Could not find a registered machine named '(.+)'", x.message)
             if not mo:
                 raise
             raise TemplateVMNotFound('Template VM is missing: %r' % mo.group(1))
+
+    def setup_mac_addresses(self, vm_name, vm_index, mac_format):
         modify_command = ['modifyvm', vm_name]
-        forwarded_ports = calculate_forwarded_ports(vm_index, vm_configuration['port_forwarding'])
-        for tag, protocol, host_port, guest_port in forwarded_ports:
-            modify_command.append('--natpf1={},{},,{},,{}'.format(tag, protocol, host_port, guest_port))
         for nic_index in [1] + _INTERNAL_NIC_INDICES:
-            raw_mac = vm_configuration['mac_address_format'].format(vm_index=vm_index, nic_index=nic_index)
+            raw_mac = mac_format.format(vm_index=vm_index, nic_index=nic_index)
             modify_command.append('--macaddress{}={}'.format(nic_index, EUI(raw_mac, dialect=mac_bare)))
         self._run_vbox_manage_command(modify_command)
-        raw_info = self._get_info(vm_name)
-        info = vm_info_from_raw_info(raw_info)
-        return info
+
+    def setup_network_access(self, vm_name, vm_index, forwarded_ports_configuration):
+        modify_command = ['modifyvm', vm_name]
+        forwarded_ports = calculate_forwarded_ports(vm_index, forwarded_ports_configuration)
+        for tag, protocol, host_port, guest_port in forwarded_ports:
+            modify_command.append('--natpf1={},{},,{},,{}'.format(tag, protocol, host_port, guest_port))
+        self._run_vbox_manage_command(modify_command)
 
     def destroy(self, vm_name):
         if self.find(vm_name).is_running:
