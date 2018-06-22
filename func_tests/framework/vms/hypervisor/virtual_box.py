@@ -9,7 +9,7 @@ from netaddr.strategy.eui48 import mac_bare
 from pylru import lrudecorator
 
 from framework.os_access.exceptions import exit_status_error_cls
-from framework.os_access.os_access_interface import OSAccess, OneWayPortMap, ReciprocalPortMap
+from framework.os_access.os_access_interface import OneWayPortMap, ReciprocalPortMap
 from framework.vms.hypervisor import TemplateVMNotFound, VMAllAdaptersBusy, VMInfo, VMNotFound
 from framework.vms.hypervisor.hypervisor import Hypervisor
 from framework.vms.port_forwarding import calculate_forwarded_ports
@@ -84,8 +84,8 @@ def vm_info_from_raw_info(raw_info):
 class VirtualBox(Hypervisor):
     """Interface for VirtualBox as hypervisor."""
 
-    def __init__(self, os_access):
-        self.host_os_access = os_access  # type: OSAccess
+    def __init__(self, host_os_access):
+        super(VirtualBox, self).__init__(host_os_access)
 
     def _get_info(self, vm_name):
         output = self._vbox_manage(['showvminfo', vm_name, '--machinereadable'])

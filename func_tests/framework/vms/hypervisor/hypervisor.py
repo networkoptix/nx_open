@@ -1,8 +1,14 @@
 from abc import ABCMeta, abstractmethod
 
+from framework.os_access.os_access_interface import OSAccess
+
 
 class Hypervisor(object):
     __metaclass__ = ABCMeta
+
+    def __init__(self, host_os_access):
+        super(Hypervisor, self).__init__()
+        self.host_os_access = host_os_access  # type: OSAccess
 
     @abstractmethod
     def find(self, vm_name):
