@@ -55,5 +55,5 @@ class VMFactory(object):
             else:
                 _logger.warning("Machine %s reserved now.", name)
 
-        for registry in self._registries.values():
-            registry.for_each(destroy)
+        for vm_type in self._vm_types.values():
+            vm_type.registry.for_each(destroy)
