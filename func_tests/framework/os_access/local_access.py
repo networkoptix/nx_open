@@ -5,7 +5,7 @@ import os
 import tzlocal
 
 from framework.networking.prohibited import ProhibitedNetworking
-from framework.os_access.exceptions import AlreadyExists
+from framework.os_access.exceptions import AlreadyDownloaded
 from framework.os_access.local_path import LocalPath
 from framework.os_access.os_access_interface import OneWayPortMap, ReciprocalPortMap
 from framework.os_access.posix_access import PosixAccess
@@ -47,7 +47,9 @@ class LocalAccess(PosixAccess):
         except OSError as e:
             if e.errno != errno.EEXIST:
                 raise
-            raise AlreadyExists("Creating symlink {!s} pointing to {!s}".format(destination, local_source_path))
+            raise AlreadyDownloaded(
+                "Creating symlink {!s} pointing to {!s}".format(destination, local_source_path),
+                destination)
         return destination
 
 

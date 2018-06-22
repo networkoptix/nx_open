@@ -7,7 +7,7 @@ import tzlocal.windows_tz
 
 from framework.method_caching import cached_getter, cached_property
 from framework.networking.windows import WindowsNetworking
-from framework.os_access.exceptions import AlreadyExists, exit_status_error_cls
+from framework.os_access.exceptions import AlreadyDownloaded, exit_status_error_cls
 from framework.os_access.remote_access import RemoteAccess
 from framework.os_access.smb_path import SMBConnectionPool, SMBPath
 from framework.os_access.windows_remoting import WinRM
@@ -135,7 +135,9 @@ class WindowsAccess(RemoteAccess):
         _, file_name = source_url.rsplit('/', 1)
         destination = destination_dir / file_name
         if destination.exists():
-            raise AlreadyExists("Cannot download {!s} to {!s}".format(source_url, destination_dir))
+            raise AlreadyDownloaded(
+                "Cannot download {!s} to {!s}".format(source_url, destination_dir),
+                destination)
         variables = {'out': str(destination), 'url': source_url}
         # language=PowerShell
         self.winrm.run_powershell_script('Invoke-WebRequest -OutFile $out $url', variables)
