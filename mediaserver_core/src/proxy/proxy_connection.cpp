@@ -579,7 +579,9 @@ void QnProxyConnectionProcessor::doSmartProxy()
                 QnRoute dstRoute;
                 updateClientRequest(dstUrl, dstRoute);
                 bool isWebSocket = nx_http::getHeaderValue( d->request.headers, "Upgrade").toLower() == lit("websocket");
-                bool isSameAddr = d->lastConnectedUrl == dstRoute.addr.toString() || d->lastConnectedUrl == dstUrl;
+                bool isSameAddr = d->lastConnectedUrl == dstRoute.addr.toString()
+                    || d->lastConnectedUrl == dstUrl
+                    || (dstRoute.reverseConnect && d->lastConnectedUrl.toString() == dstRoute.id.toByteArray());
                 if (isSameAddr)
                 {
                     d->dstSocket->send(d->clientRequest);
@@ -609,9 +611,6 @@ void QnProxyConnectionProcessor::doSmartProxy()
                         doRawProxy(); // switch to binary mode
                         return;
                     }
-
-                    d->clientRequest.clear();
-                    break;
                 }
                 d->clientRequest.clear();
             }
