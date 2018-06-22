@@ -790,49 +790,49 @@ void QnTimeSlider::createSteps(QVector<QnTimeStep>* absoluteSteps, QVector<QnTim
     QString ySuffix = QnTimeStrings::suffix(QnTimeStrings::Suffix::Years);
 
     *absoluteSteps <<
-        QnTimeStep(QnTimeStep::Milliseconds,    1ll,                                10,     1000,   msSuffix,       QString(),          false) <<
-        QnTimeStep(QnTimeStep::Milliseconds,    1ll,                                50,     1000,   msSuffix,       QString(),          false) <<
-        QnTimeStep(QnTimeStep::Milliseconds,    1ll,                                100,    1000,   msSuffix,       QString(),          false) <<
-        QnTimeStep(QnTimeStep::Milliseconds,    1ll,                                500,    1000,   msSuffix,       QString(),          false) <<
-        QnTimeStep(QnTimeStep::Seconds,         1000ll,                             1,      60,     sSuffix,        QString(),          false) <<
-        QnTimeStep(QnTimeStep::Seconds,         1000ll,                             5,      60,     sSuffix,        QString(),          false) <<
-        QnTimeStep(QnTimeStep::Seconds,         1000ll,                             10,     60,     sSuffix,        QString(),          false) <<
-        QnTimeStep(QnTimeStep::Seconds,         1000ll,                             30,     60,     sSuffix,        QString(),          false) <<
-        QnTimeStep(QnTimeStep::Minutes,         1000ll * 60,                        1,      24*60,  mFormat,        dateMinsFormat,     false) <<
-        QnTimeStep(QnTimeStep::Minutes,         1000ll * 60,                        5,      24*60,  mFormat,        QString(),          false) <<
-        QnTimeStep(QnTimeStep::Minutes,         1000ll * 60,                        10,     24*60,  mFormat,        QString(),          false) <<
-        QnTimeStep(QnTimeStep::Minutes,         1000ll * 60,                        30,     24*60,  mFormat,        QString(),          false) <<
-        QnTimeStep(QnTimeStep::Hours,           1000ll * 60 * 60,                   1,      24,     hFormat,        dateHoursFormat,    false) <<
-        QnTimeStep(QnTimeStep::Hours,           1000ll * 60 * 60,                   3,      24,     hFormat,        QString(),          false) <<
-        QnTimeStep(QnTimeStep::Hours,           1000ll * 60 * 60,                   12,     24,     hFormat,        QString(),          false) <<
-        QnTimeStep(QnTimeStep::Days,            1000ll * 60 * 60 * 24,              1,      31,     dFormat,        dateDaysFormat,     false) <<
-        QnTimeStep(QnTimeStep::Months,          1000ll * 60 * 60 * 24 * 31,         1,      12,     moFormat,       dateMonthsFormat,   false) <<
-        QnTimeStep(QnTimeStep::Years,           1000ll * 60 * 60 * 24 * 365,        1,      50000,  yFormat,        dateYearsFormat,    false) <<
-        QnTimeStep(QnTimeStep::Years,           1000ll * 60 * 60 * 24 * 365,        5,      50000,  yFormat,        QString(),          false) <<
-        QnTimeStep(QnTimeStep::Years,           1000ll * 60 * 60 * 24 * 365,        10,     50000,  yFormat,        dateYearsFormat,    false);
+        QnTimeStep(QnTimeStep::Milliseconds,  1ms,        10,     1000,   msSuffix,     QString(),          false) <<
+        QnTimeStep(QnTimeStep::Milliseconds,  1ms,        50,     1000,   msSuffix,     QString(),          false) <<
+        QnTimeStep(QnTimeStep::Milliseconds,  1ms,        100,    1000,   msSuffix,     QString(),          false) <<
+        QnTimeStep(QnTimeStep::Milliseconds,  1ms,        500,    1000,   msSuffix,     QString(),          false) <<
+        QnTimeStep(QnTimeStep::Seconds,       1s,         1,      60,     sSuffix,      QString(),          false) <<
+        QnTimeStep(QnTimeStep::Seconds,       1s,         5,      60,     sSuffix,      QString(),          false) <<
+        QnTimeStep(QnTimeStep::Seconds,       1s,         10,     60,     sSuffix,      QString(),          false) <<
+        QnTimeStep(QnTimeStep::Seconds,       1s,         30,     60,     sSuffix,      QString(),          false) <<
+        QnTimeStep(QnTimeStep::Minutes,       1min,       1,      24*60,  mFormat,      dateMinsFormat,     false) <<
+        QnTimeStep(QnTimeStep::Minutes,       1min,       5,      24*60,  mFormat,      QString(),          false) <<
+        QnTimeStep(QnTimeStep::Minutes,       1min,       10,     24*60,  mFormat,      QString(),          false) <<
+        QnTimeStep(QnTimeStep::Minutes,       1min,       30,     24*60,  mFormat,      QString(),          false) <<
+        QnTimeStep(QnTimeStep::Hours,         1h,         1,      24,     hFormat,      dateHoursFormat,    false) <<
+        QnTimeStep(QnTimeStep::Hours,         1h,         3,      24,     hFormat,      QString(),          false) <<
+        QnTimeStep(QnTimeStep::Hours,         1h,         12,     24,     hFormat,      QString(),          false) <<
+        QnTimeStep(QnTimeStep::Days,          24h,        1,      31,     dFormat,      dateDaysFormat,     false) <<
+        QnTimeStep(QnTimeStep::Months,        30 * 24h,   1,      12,     moFormat,     dateMonthsFormat,   false) <<
+        QnTimeStep(QnTimeStep::Years,         365 * 24h,  1,      50000,  yFormat,      dateYearsFormat,    false) <<
+        QnTimeStep(QnTimeStep::Years,         365 * 24h,  5,      50000,  yFormat,      QString(),          false) <<
+        QnTimeStep(QnTimeStep::Years,         365 * 24h,  10,     50000,  yFormat,      dateYearsFormat,    false);
     enumerateSteps(*absoluteSteps);
 
     *relativeSteps <<
-        QnTimeStep(QnTimeStep::Milliseconds,    1ll,                                10,     1000,   msSuffix,       QString(),          true) <<
-        QnTimeStep(QnTimeStep::Milliseconds,    1ll,                                50,     1000,   msSuffix,       QString(),          true) <<
-        QnTimeStep(QnTimeStep::Milliseconds,    1ll,                                100,    1000,   msSuffix,       QString(),          true) <<
-        QnTimeStep(QnTimeStep::Milliseconds,    1ll,                                500,    1000,   msSuffix,       QString(),          true) <<
-        QnTimeStep(QnTimeStep::Milliseconds,    1000ll,                             1,      60,     sSuffix,        QString(),          true) <<
-        QnTimeStep(QnTimeStep::Milliseconds,    1000ll,                             5,      60,     sSuffix,        QString(),          true) <<
-        QnTimeStep(QnTimeStep::Milliseconds,    1000ll,                             10,     60,     sSuffix,        QString(),          true) <<
-        QnTimeStep(QnTimeStep::Milliseconds,    1000ll,                             30,     60,     sSuffix,        QString(),          true) <<
-        QnTimeStep(QnTimeStep::Milliseconds,    1000ll * 60,                        1,      60,     mSuffix,        QString(),          true) <<
-        QnTimeStep(QnTimeStep::Milliseconds,    1000ll * 60,                        5,      60,     mSuffix,        QString(),          true) <<
-        QnTimeStep(QnTimeStep::Milliseconds,    1000ll * 60,                        10,     60,     mSuffix,        QString(),          true) <<
-        QnTimeStep(QnTimeStep::Milliseconds,    1000ll * 60,                        30,     60,     mSuffix,        QString(),          true) <<
-        QnTimeStep(QnTimeStep::Milliseconds,    1000ll * 60 * 60,                   1,      24,     hSuffix,        QString(),          true) <<
-        QnTimeStep(QnTimeStep::Milliseconds,    1000ll * 60 * 60,                   3,      24,     hSuffix,        QString(),          true) <<
-        QnTimeStep(QnTimeStep::Milliseconds,    1000ll * 60 * 60,                   12,     24,     hSuffix,        QString(),          true) <<
-        QnTimeStep(QnTimeStep::Milliseconds,    1000ll * 60 * 60 * 24,              1,      31,     dSuffix,        QString(),          true) <<
-        QnTimeStep(QnTimeStep::Milliseconds,    1000ll * 60 * 60 * 24 * 30,         1,      12,     moSuffix,       QString(),          true) <<
-        QnTimeStep(QnTimeStep::Milliseconds,    1000ll * 60 * 60 * 24 * 30 * 12,    1,      50000,  ySuffix,        QString(),          true) <<
-        QnTimeStep(QnTimeStep::Milliseconds,    1000ll * 60 * 60 * 24 * 30 * 12,    5,      50000,  ySuffix,        QString(),          true) <<
-        QnTimeStep(QnTimeStep::Milliseconds,    1000ll * 60 * 60 * 24 * 30 * 12,    10,     50000,  ySuffix,        QString(),          true);
+        QnTimeStep(QnTimeStep::Milliseconds,    1ms,            50,     1000,   msSuffix,   QString(),  true) <<
+        QnTimeStep(QnTimeStep::Milliseconds,    1ms,            10,     1000,   msSuffix,   QString(),  true) <<
+        QnTimeStep(QnTimeStep::Milliseconds,    1ms,            100,    1000,   msSuffix,   QString(),  true) <<
+        QnTimeStep(QnTimeStep::Milliseconds,    1ms,            500,    1000,   msSuffix,   QString(),  true) <<
+        QnTimeStep(QnTimeStep::Milliseconds,    1s,             1,      60,     sSuffix,    QString(),  true) <<
+        QnTimeStep(QnTimeStep::Milliseconds,    1s,             5,      60,     sSuffix,    QString(),  true) <<
+        QnTimeStep(QnTimeStep::Milliseconds,    1s,             10,     60,     sSuffix,    QString(),  true) <<
+        QnTimeStep(QnTimeStep::Milliseconds,    1s,             30,     60,     sSuffix,    QString(),  true) <<
+        QnTimeStep(QnTimeStep::Milliseconds,    1min,           1,      60,     mSuffix,    QString(),  true) <<
+        QnTimeStep(QnTimeStep::Milliseconds,    1min,           5,      60,     mSuffix,    QString(),  true) <<
+        QnTimeStep(QnTimeStep::Milliseconds,    1min,           10,     60,     mSuffix,    QString(),  true) <<
+        QnTimeStep(QnTimeStep::Milliseconds,    1min,           30,     60,     mSuffix,    QString(),  true) <<
+        QnTimeStep(QnTimeStep::Milliseconds,    1h,             1,      24,     hSuffix,    QString(),  true) <<
+        QnTimeStep(QnTimeStep::Milliseconds,    1h,             3,      24,     hSuffix,    QString(),  true) <<
+        QnTimeStep(QnTimeStep::Milliseconds,    1h,             12,     24,     hSuffix,    QString(),  true) <<
+        QnTimeStep(QnTimeStep::Milliseconds,    24h,            1,      31,     dSuffix,    QString(),  true) <<
+        QnTimeStep(QnTimeStep::Milliseconds,    30 * 24h,       1,      12,     moSuffix,   QString(),  true) <<
+        QnTimeStep(QnTimeStep::Milliseconds,    12 * 30 * 24h,  1,      50000,  ySuffix,    QString(),  true) <<
+        QnTimeStep(QnTimeStep::Milliseconds,    12 * 30 * 24h,  5,      50000,  ySuffix,    QString(),  true) <<
+        QnTimeStep(QnTimeStep::Milliseconds,    12 * 30 * 24h,  10,     50000,  ySuffix,    QString(),  true);
     enumerateSteps(*relativeSteps);
 }
 
@@ -1919,7 +1919,7 @@ int QnTimeSlider::findTopLevelStepIndex() const
     for (; minStepIndex >= 0; --minStepIndex)
     {
         /* Pixel distance between tickmarks of this level: */
-        qreal separationPixels = m_steps[minStepIndex].stepMSecs / m_msecsPerPixel;
+        qreal separationPixels = m_steps[minStepIndex].stepMSecs.count() / m_msecsPerPixel;
 
         /* Correct maxStepIndexLimit if needed: */
         if (separationPixels >= width)
@@ -1987,7 +1987,7 @@ void QnTimeSlider::updateStepAnimationTargets()
     for (int i = m_steps.size() - 1; i >= minLevelStepIndexMinusOne; --i)
     {
         TimeStepData& data = m_stepData[i];
-        qreal separationPixels = m_steps[i].stepMSecs / m_msecsPerPixel;
+        qreal separationPixels = m_steps[i].stepMSecs.count() / m_msecsPerPixel;
 
         int level = tickmarkLevel(i);
         data.targetHeight = separationPixels >= kMinTickmarkLineStepPixels ? kTickmarkLengthPixels[level] : 0.0;
@@ -2602,7 +2602,7 @@ void QnTimeSlider::drawTickmarks(QPainter* painter, const QRectF& rect)
 
     /* Initialize next positions for tickmark steps. */
     for (int i = minStepIndex; i < stepCount; i++)
-        m_nextTickmarkPos[i] = milliseconds(roundUp(startPos.count(), m_steps[i]));
+        m_nextTickmarkPos[i] = milliseconds(roundUp(startPos, m_steps[i]));
 
     /* Draw tickmarks. */
     for (int i = 0; i < m_tickmarkLines.size(); i++)
@@ -2619,7 +2619,7 @@ void QnTimeSlider::drawTickmarks(QPainter* painter, const QRectF& rect)
         for (; index < stepCount; index++)
         {
             if (m_nextTickmarkPos[index] == pos)
-                m_nextTickmarkPos[index] = milliseconds(add(pos.count(), m_steps[index]));
+                m_nextTickmarkPos[index] = milliseconds(add(pos, m_steps[index]));
             else
                 break;
         }
@@ -2633,7 +2633,8 @@ void QnTimeSlider::drawTickmarks(QPainter* painter, const QRectF& rect)
         qreal lineHeight = m_stepData[index].currentHeight;
         if (!qFuzzyIsNull(m_stepData[index].currentTextOpacity) && kTickmarkFontHeights[level])
         {
-            QPixmap pixmap = m_pixmapCache->tickmarkTextPixmap(level, pos.count(), kTickmarkFontHeights[level], m_steps[index]);
+            QPixmap pixmap = m_pixmapCache->tickmarkTextPixmap(level, pos,
+                kTickmarkFontHeights[level], m_steps[index]);
             const auto pixmapSize = pixmap.size() / pixmap.devicePixelRatio();
             qreal topMargin = qFloor((kTickmarkTextHeightPixels[level] - pixmapSize.height()) * 0.5);
             QRectF textRect(x - pixmapSize.width() / 2.0, rect.top() + lineHeight + topMargin, pixmapSize.width(), pixmapSize.height());
@@ -2680,8 +2681,9 @@ void QnTimeSlider::drawDates(QPainter* painter, const QRectF& rect)
     int highlightIndex = 0;
     qreal highlightSpanPixels = qMax(size().width() * kMinDateSpanFraction, kMinDateSpanPixels);
     for (; highlightIndex < stepCount; highlightIndex++)
-        if (!m_steps[highlightIndex].longFormat.isEmpty() && m_steps[highlightIndex].stepMSecs / m_msecsPerPixel >= highlightSpanPixels)
-            break;
+        if (!m_steps[highlightIndex].longFormat.isEmpty()
+            && m_steps[highlightIndex].stepMSecs.count() / m_msecsPerPixel >= highlightSpanPixels)
+                break;
 
     highlightIndex = qMin(highlightIndex, stepCount - 1); // TODO: #Elric remove this line.
     const QnTimeStep& highlightStep = m_steps[highlightIndex];
@@ -2692,10 +2694,10 @@ void QnTimeSlider::drawDates(QPainter* painter, const QRectF& rect)
     QnScopedPainterBrushRollback brushRollback(painter);
 
     /* Draw highlight. */
-    qint64 pos1 = roundUp((m_windowStart + m_localOffset).count(), highlightStep);
-    qint64 pos0 = sub(pos1, highlightStep);
+    qint64 pos1 = roundUp(m_windowStart + m_localOffset, highlightStep);
+    qint64 pos0 = sub(milliseconds(pos1), highlightStep);
     qreal x0 = quickPositionFromTime(m_windowStart);
-    qint64 number = absoluteNumber(pos1, highlightStep);
+    qint64 number = absoluteNumber(milliseconds(pos1), highlightStep);
     while(true)
     {
         qreal x1 = quickPositionFromTime(milliseconds(pos1) - m_localOffset);
@@ -2704,7 +2706,8 @@ void QnTimeSlider::drawDates(QPainter* painter, const QRectF& rect)
         painter->setBrush(backgroundColor(number));
         painter->drawRect(QRectF(x0, rect.top(), x1 - x0, rect.height()));
 
-        QPixmap pixmap = m_pixmapCache->dateTextPixmap(pos0, kDateTextFontHeight, highlightStep);
+        QPixmap pixmap = m_pixmapCache->
+            dateTextPixmap(milliseconds(pos0), kDateTextFontHeight, highlightStep);
         const auto pixmapSize = pixmap.size() / pixmap.devicePixelRatio();
         QRectF textRect((x0 + x1) / 2.0 - pixmapSize.width() / 2.0,
             rect.top() + topMargin, pixmapSize.width(), pixmapSize.height());
@@ -2719,7 +2722,7 @@ void QnTimeSlider::drawDates(QPainter* painter, const QRectF& rect)
             break;
 
         pos0 = pos1;
-        pos1 = add(pos1, highlightStep);
+        pos1 = add(milliseconds(pos1), highlightStep);
         number++;
         x0 = x1;
     }

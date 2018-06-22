@@ -28,6 +28,11 @@
 #include <test_support/appserver2_process.h>
 #include <nx/utils/test_support/test_options.h>
 #include <transaction/message_bus_adapter.h>
+#include <nx/utils/elapsed_timer.h>
+#include <nx/network/aio/aio_thread.h>
+#include <core/resource_management/resource_pool.h>
+#include <core/resource/media_server_resource.h>
+#include <nx_ec/data/api_conversion_functions.h>
 
 using namespace nx::utils::test;
 
@@ -38,6 +43,46 @@ namespace test {
 namespace {
 
 static const QString kSystemName("timeSyncTestSystem");
+static const std::chrono::seconds kBaseInternetTime(qint64(8e9)); //< End of 21-th century.
+
+class TestTimeFetcher: public AbstractAccurateTimeFetcher
+{
+public:
+    TestTimeFetcher() {}
+
+    void setTime(std::chrono::milliseconds timestamp, std::chrono::milliseconds rtt)
+    {
+        m_timestamp = timestamp;
+        m_rtt = rtt;
+        m_timeDelta.restart();
+    }
+
+    virtual void stopWhileInAioThread() override
+    {
+        m_timer.cancelSync();
+    }
+
+    virtual void bindToAioThread(nx::network::aio::AbstractAioThread* aioThread) override
+    {
+        m_timer.bindToAioThread(aioThread);
+    }
+
+    virtual void getTimeAsync(CompletionHandler completionHandler) override
+    {
+        m_timer.post(
+            [this, completionHandler = std::move(completionHandler)]()
+            {
+                std::chrono::milliseconds result(m_timestamp + m_timeDelta.elapsed());
+                completionHandler(result.count(), SystemError::noError, m_rtt);
+            });
+    }
+private:
+    nx::network::aio::Timer m_timer;
+    std::chrono::milliseconds m_timestamp{0};
+    nx::utils::ElapsedTimer m_timeDelta;
+    std::chrono::milliseconds m_rtt{0};
+};
+
 
 class TestSystemClock:
     public AbstractSystemClock
@@ -103,6 +148,10 @@ public:
     {
         m_syncWithInternetEnabled = value;
     }
+    void setHasInternetAccess(bool value)
+    {
+        m_hasInternetAccess = value;
+    }
 
     bool start(bool keepDatabase = false)
     {
@@ -124,18 +173,46 @@ public:
                     auto timeSyncManager = m_appserver->moduleInstance()->ecConnection()->timeSyncManager();
                     timeSyncManager->setClock(m_testSystemClock, m_testSteadyClock);
 
+                    auto internetTimeFetcher = std::make_unique<TestTimeFetcher>();
+                    internetTimeFetcher->setTime(
+                        kBaseInternetTime,
+                        /*rtt */std::chrono::milliseconds(0));
+                    auto serverTimeFetcher = dynamic_cast<ServerTimeSyncManager*>(timeSyncManager);
+                    serverTimeFetcher->setTimeFetcher(std::move(internetTimeFetcher));
+
                     commonModule->globalSettings()->setOsTimeChangeCheckPeriod(
                         std::chrono::milliseconds(100));
+                    // TODO: need to comment this setter as soon as we fix proxy for timeSync tests.
+                    // It doesn't work because appServerLauncher don't have proxy handler.
                     commonModule->globalSettings()->setSyncTimeExchangePeriod(
                         std::chrono::milliseconds(100));
 
                 }, Qt::DirectConnection);
             }, Qt::DirectConnection);
 
-
         m_appserver->start();
-        return m_appserver->waitUntilStarted()
+        auto result = m_appserver->waitUntilStarted()
             && m_appserver->moduleInstance()->createInitialData(kSystemName);
+
+        auto commonModule = m_appserver->moduleInstance()->commonModule();
+        auto globalSettings = commonModule->globalSettings();
+        globalSettings->synchronizeNow();
+
+        if (result && m_hasInternetAccess)
+        {
+            auto ec2Connection = commonModule->ec2Connection();
+            auto id = commonModule->moduleGUID();
+            auto resourcePool = m_appserver->moduleInstance()->commonModule()->resourcePool();
+            auto server = resourcePool->getResourceById<QnMediaServerResource>(id);
+            auto flags = server->getServerFlags() | Qn::SF_HasPublicIP;
+            server->setServerFlags(flags);
+
+            ec2::ApiMediaServerData apiServer;
+            ec2::fromResourceToApi(server, apiServer);
+            ec2Connection->getMediaServerManager(Qn::kSystemAccess)->save(apiServer, this, [] {});
+        }
+
+        return result;
     }
 
     std::chrono::milliseconds getSyncTime() const
@@ -199,6 +276,7 @@ public:
 private:
     ec2::Appserver2Ptr m_appserver;
     bool m_syncWithInternetEnabled = false;
+    bool m_hasInternetAccess = false;
     std::shared_ptr<TestSystemClock> m_testSystemClock;
     std::shared_ptr<TestSteadyClock> m_testSteadyClock;
 };
@@ -215,8 +293,7 @@ constexpr auto kMaxAllowedSyncTimeDeviation = std::chrono::seconds(21);
 constexpr auto kMinMonotonicClockSkew = kMaxAllowedSyncTimeDeviation + std::chrono::seconds(10);
 constexpr auto kMaxMonotonicClockSkew = kMinMonotonicClockSkew + std::chrono::minutes(2);
 
-class TimeSynchronization:
-    public ::testing::Test
+class TimeSynchronization: public ::testing::Test
 {
 public:
     TimeSynchronization():
@@ -224,6 +301,12 @@ public:
             nx::utils::test::ClockType::system,
             std::chrono::seconds::zero())
     {
+        NX_VERBOSE(this, lm("Start time test"));
+        ec2::Appserver2Process::resetInstanceCounter();
+    }
+    ~TimeSynchronization()
+    {
+        NX_VERBOSE(this, lm("End time test"));
     }
 
 protected:
@@ -235,11 +318,33 @@ protected:
         m_peers.push_back(std::move(peer));
     }
 
+    void givenSingleOfflinePeerWithInternetSync()
+    {
+        auto peer = std::make_unique<TimeSynchronizationPeer>();
+        peer->setSynchronizeWithInternetEnabled(true);
+        ASSERT_TRUE(peer->start());
+        m_peers.push_back(std::move(peer));
+    }
+
+    void givenSingleOnlinePeer()
+    {
+        auto peer = std::make_unique<TimeSynchronizationPeer>();
+        peer->setSynchronizeWithInternetEnabled(true);
+        peer->setHasInternetAccess(true);
+        ASSERT_TRUE(peer->start());
+        m_peers.push_back(std::move(peer));
+    }
+
     template<int peerCount>
     void launchCluster(const int connectTable[peerCount][peerCount])
     {
         startPeers(peerCount);
+        connectPeers<peerCount>(connectTable);
+    }
 
+    template<int peerCount>
+    void connectPeers(const int connectTable[peerCount][peerCount])
+    {
         m_connectTable.resize(peerCount);
         for (int i = 0; i < peerCount; ++i)
         {
@@ -320,6 +425,10 @@ protected:
 
     void shiftMonotonicClockOnPeer(int peerIndex)
     {
+        auto commonModule = m_peers[peerIndex]->commonModule();
+        commonModule->globalSettings()->setSyncTimeExchangePeriod(
+            std::chrono::milliseconds(100));
+
         m_peers[peerIndex]->skewMonotonicClock(std::chrono::seconds(
             nx::utils::random::number<int>(
                 kMinMonotonicClockSkew.count(), kMaxMonotonicClockSkew.count())));
@@ -348,6 +457,26 @@ protected:
             std::chrono::milliseconds syncTimeDeviation;
             std::tie(syncTime, syncTimeDeviation) = getClusterSyncTime();
             if (syncTimeDeviation <= kMaxAllowedSyncTimeDeviation)
+            {
+                std::cout << "Time synchronized with " << syncTimeDeviation.count()
+                    << "ms deviation" << std::endl;
+                break;
+            }
+
+            std::this_thread::sleep_for(std::chrono::milliseconds(1));
+        }
+    }
+
+    void waitForInternetlTimeToBeSynchronizedAcrossAllPeers()
+    {
+        using namespace std::chrono;
+
+        for (;;)
+        {
+            std::chrono::milliseconds syncTime;
+            std::chrono::milliseconds syncTimeDeviation;
+            std::tie(syncTime, syncTimeDeviation) = getClusterSyncTime();
+            if (syncTimeDeviation <= kMaxAllowedSyncTimeDeviation && syncTime >= kBaseInternetTime)
             {
                 std::cout << "Time synchronized with " << syncTimeDeviation.count()
                     << "ms deviation" << std::endl;
@@ -411,7 +540,7 @@ private:
 
     void startPeers(int peerCount)
     {
-        for (int i = 0; i < peerCount; ++i)
+        while(m_peers.size() < peerCount)
         {
             auto peer = std::make_unique<TimeSynchronizationPeer>();
             peer->setSynchronizeWithInternetEnabled(false);
@@ -541,6 +670,24 @@ TEST_F(TimeSynchronization, synctime_follows_selected_peer_after_clock_skew_fix)
 
     shiftLocalTimeOnPrimaryPeer();
     waitForTimeToBeSynchronizedWithPrimaryPeerSystemClock();
+}
+
+TEST_F(TimeSynchronization, multiple_peers_synchronize_time_with_internet)
+{
+    const int connectionTable[3][3] =
+    {
+        { 0, 1, 0 },
+        { 0, 0, 1 },
+        { 0, 0, 0 }
+    };
+
+    givenSingleOnlinePeer();
+    givenSingleOfflinePeerWithInternetSync();
+    givenSingleOfflinePeerWithInternetSync();
+
+    connectPeers<3>(connectionTable);
+
+    waitForInternetlTimeToBeSynchronizedAcrossAllPeers();
 }
 
 } // namespace test

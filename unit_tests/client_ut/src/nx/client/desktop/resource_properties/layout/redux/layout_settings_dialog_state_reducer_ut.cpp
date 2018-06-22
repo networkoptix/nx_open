@@ -1,10 +1,10 @@
 #include <gtest/gtest.h>
 
+#include <nx/client/core/utils/geometry.h>
 #include <nx/client/desktop/resource_properties/layout/redux/layout_settings_dialog_state.h>
 #include <nx/client/desktop/resource_properties/layout/redux/layout_settings_dialog_state_reducer.h>
 
 #include <ui/style/globals.h>
-#include <ui/common/geometry.h>
 
 namespace nx {
 namespace client {
@@ -111,11 +111,11 @@ TEST_F(LayoutSettingsDialogStateReducerTest, checkLimitsOnKeepArChange)
     ASSERT_EQ(s.background.height.max, kMaxHeight / kSampleAspectRatio);
 
     // Validate old logic consistency.
-    const QSize minSize = QnGeometry::expanded(
+    const QSize minSize = core::Geometry::expanded(
         kSampleAspectRatio,
         qnGlobals->layoutBackgroundMinSize(),
         Qt::KeepAspectRatioByExpanding).toSize();
-    const QSize maxSize = QnGeometry::expanded(
+    const QSize maxSize = core::Geometry::expanded(
         kSampleAspectRatio,
         qnGlobals->layoutBackgroundMaxSize(),
         Qt::KeepAspectRatio).toSize();

@@ -71,17 +71,17 @@ public:
 
     /** @return synchronized time (milliseconds from epoch, UTC). */
     std::chrono::milliseconds getSyncTime() const;
-    
+
     /** @return True if current server has load time from internet at least once after start. */
-    virtual bool isTimeTakenFromInternet() const { return false; }
+    bool isTimeTakenFromInternet() const;
 
     void setClock(
         const std::shared_ptr<AbstractSystemClock>& systemClock,
         const std::shared_ptr<AbstractSteadyClock>& steadyClock);
 
-    void setTimeSyncInterval(std::chrono::milliseconds value);
     std::chrono::milliseconds timeSyncInterval() const;
 
+    QString idForToStringFromPtr() const;
 signals:
     /** Emitted when synchronized time has been changed. */
     void timeChanged(qint64 syncTimeMs);
@@ -103,7 +103,7 @@ private:
 protected:
     std::shared_ptr<AbstractSystemClock> m_systemClock;
     std::shared_ptr<AbstractSteadyClock> m_steadyClock;
-
+    std::atomic<bool> m_isTimeTakenFromInternet{false};
 private:
     std::chrono::milliseconds m_synchronizedTime{0};
     std::chrono::milliseconds m_synchronizedOnClock{0};
