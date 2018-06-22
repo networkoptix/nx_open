@@ -1,4 +1,5 @@
 from framework.vms.hypervisor import VMNotFound
+from framework.vms.hypervisor.hypervisor import Hypervisor
 
 
 class VMType(object):
@@ -7,7 +8,7 @@ class VMType(object):
             hypervisor,
             template_vm, template_vm_snapshot,
             mac_address_format, port_forwarding):
-        self.hypervisor = hypervisor
+        self.hypervisor = hypervisor  # type: Hypervisor
         self.template_vm_name = template_vm
         self._snapshot_name = template_vm_snapshot
         self.mac_format = mac_address_format

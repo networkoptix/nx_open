@@ -11,6 +11,7 @@ from pylru import lrudecorator
 from framework.os_access.exceptions import exit_status_error_cls
 from framework.os_access.os_access_interface import OSAccess, OneWayPortMap, ReciprocalPortMap
 from framework.vms.hypervisor import TemplateVMNotFound, VMAllAdaptersBusy, VMInfo, VMNotFound
+from framework.vms.hypervisor.hypervisor import Hypervisor
 from framework.vms.port_forwarding import calculate_forwarded_ports
 from framework.waiting import wait_for_true
 
@@ -80,7 +81,7 @@ def vm_info_from_raw_info(raw_info):
     return parsed_info
 
 
-class VirtualBox(object):
+class VirtualBox(Hypervisor):
     """Interface for VirtualBox as hypervisor."""
 
     def __init__(self, os_access):
