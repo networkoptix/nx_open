@@ -225,16 +225,14 @@ void QnWorkbenchResourcesSettingsHandler::at_updateLocalFilesAction_triggered()
 
     // We should update local media directories
     // Is there a better place for it?
-    auto localFilesSearcher = commonModule()->instance<QnResourceDirectoryBrowser>();
-    if (localFilesSearcher)
+    if (auto localFilesSearcher = commonModule()->instance<QnResourceDirectoryBrowser>())
     {
         QStringList dirs;
         dirs << qnSettings->mediaFolder();
         dirs << qnSettings->extraMediaFolders();
         localFilesSearcher->setPathCheckList(dirs);
+        emit localFilesSearcher->startLocalDiscovery();
     }
-
-    emit localFilesSearcher->startLocalDiscovery();
 }
 
 void QnWorkbenchResourcesSettingsHandler::openLayoutSettingsDialog(
