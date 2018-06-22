@@ -999,7 +999,7 @@ nx::network::http::StatusCode::Value HttpLiveStreamingProcessor::createSession(
         }
     }
 
-    const auto authenticator = QnUniversalTcpListener::authorizer(owner());
+    const auto authenticator = QnUniversalTcpListener::authenticator(owner());
     newHlsSession->setChunkAuthenticationQueryItem( authenticator->makeQueryItemForPath(
         accessRights, HLS_PREFIX + camResource->getUniqueId() + ".ts") );
 

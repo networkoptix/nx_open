@@ -70,7 +70,7 @@ int QnGetNonceRestHandler::executeGet(
     }
 
     QnGetNonceReply reply;
-    reply.nonce = QnUniversalTcpListener::authorizer(owner->owner())->generateNonce();
+    reply.nonce = QnUniversalTcpListener::authenticator(owner->owner())->generateNonce();
     reply.realm = nx::network::AppInfo::realm();
 
     QString userName = params.value("userName");

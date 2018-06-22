@@ -18,7 +18,7 @@ int QnCurrentUserRestHandler::executeGet(
 {
     ec2::ApiUserData user;
 
-    const auto authenticator = QnUniversalTcpListener::authorizer(owner->owner());
+    const auto authenticator = QnUniversalTcpListener::authenticator(owner->owner());
     const auto clientIp = owner->socket()->getForeignAddress().address;
     auto accessRights = owner->accessRights();
 

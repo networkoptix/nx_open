@@ -17,7 +17,7 @@ int QnTestLdapSettingsHandler::executePost(
     QnLdapSettings settings = QJson::deserialized(body, QnLdapSettings());
 
     QnLdapUsers ldapUsers;
-    const auto ldapResult = QnUniversalTcpListener::authorizer(owner->owner())->ldapManager()
+    const auto ldapResult = QnUniversalTcpListener::authenticator(owner->owner())->ldapManager()
         ->fetchUsers(ldapUsers, settings);
     if (ldapResult != nx::mediaserver::LdapResult::NoError)
     {
