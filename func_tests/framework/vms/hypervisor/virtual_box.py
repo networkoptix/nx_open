@@ -88,7 +88,7 @@ class VirtualBox(Hypervisor):
         self.host_os_access = os_access  # type: OSAccess
 
     def _get_info(self, vm_name):
-        output = self._run_vbox_manage_command(['showvminfo', vm_name, '--machinereadable'])
+        output = self._vbox_manage(['showvminfo', vm_name, '--machinereadable'])
         raw_info = dict(csv.reader(output.splitlines(), delimiter='=', escapechar='\\', doublequote=False))
         return raw_info
 
@@ -99,7 +99,7 @@ class VirtualBox(Hypervisor):
 
     def clone(self, original_vm_name, original_snapshot_name, clone_vm_name):
         try:
-            self._run_vbox_manage_command([
+            self._vbox_manage([
                 'clonevm', original_vm_name,
                 '--snapshot', original_snapshot_name,
                 '--name', clone_vm_name,
@@ -118,27 +118,27 @@ class VirtualBox(Hypervisor):
         for nic_index in [1] + _INTERNAL_NIC_INDICES:
             raw_mac = mac_format.format(vm_index=vm_index, nic_index=nic_index)
             modify_command.append('--macaddress{}={}'.format(nic_index, EUI(raw_mac, dialect=mac_bare)))
-        self._run_vbox_manage_command(modify_command)
+        self._vbox_manage(modify_command)
 
     def setup_network_access(self, vm_name, vm_index, forwarded_ports_configuration):
         modify_command = ['modifyvm', vm_name]
         forwarded_ports = calculate_forwarded_ports(vm_index, forwarded_ports_configuration)
         for tag, protocol, host_port, guest_port in forwarded_ports:
             modify_command.append('--natpf1={},{},,{},,{}'.format(tag, protocol, host_port, guest_port))
-        self._run_vbox_manage_command(modify_command)
+        self._vbox_manage(modify_command)
 
     def destroy(self, vm_name):
         if self.find(vm_name).is_running:
-            self._run_vbox_manage_command(['controlvm', vm_name, 'poweroff'])
+            self._vbox_manage(['controlvm', vm_name, 'poweroff'])
             wait_for_true(lambda: not self.find(vm_name).is_running, 'Machine {} is off'.format(vm_name))
-        self._run_vbox_manage_command(['unregistervm', vm_name, '--delete'])
+        self._vbox_manage(['unregistervm', vm_name, '--delete'])
         _logger.info("Machine %r destroyed.", vm_name)
 
     def power_on(self, vm_name):
-        self._run_vbox_manage_command(['startvm', vm_name, '--type', 'headless'])
+        self._vbox_manage(['startvm', vm_name, '--type', 'headless'])
 
     def power_off(self, vm_name):
-        self._run_vbox_manage_command(['controlvm', vm_name, 'poweroff'])
+        self._vbox_manage(['controlvm', vm_name, 'poweroff'])
 
     def plug(self, vm_name, network_name):
         info = self.find(vm_name)
@@ -146,7 +146,7 @@ class VirtualBox(Hypervisor):
             slot = next(slot for slot in info.networks if info.networks[slot] is None)
         except StopIteration:
             raise VMAllAdaptersBusy(vm_name, info.networks)
-        self._run_vbox_manage_command([
+        self._vbox_manage([
             'controlvm', vm_name,
             'nic{}'.format(slot), 'intnet', network_name])
         return info.macs[slot]
@@ -155,11 +155,11 @@ class VirtualBox(Hypervisor):
         info = self.find(vm_name)
         for nic_index in info.networks:
             if info.networks[nic_index] is not None:
-                self._run_vbox_manage_command(
+                self._vbox_manage(
                     ['controlvm', vm_name, 'nic{}'.format(nic_index), 'null'])
 
     def list_vm_names(self):
-        output = self._run_vbox_manage_command(['list', 'vms'])
+        output = self._vbox_manage(['list', 'vms'])
         lines = output.strip().splitlines()
         vm_names = []
         for line in lines:
@@ -171,7 +171,7 @@ class VirtualBox(Hypervisor):
             vm_names.append(name)
         return vm_names
 
-    def _run_vbox_manage_command(self, args):
+    def _vbox_manage(self, args):
         try:
             return self.host_os_access.run_command(['VBoxManage'] + args)
         except exit_status_error_cls(1) as x:
