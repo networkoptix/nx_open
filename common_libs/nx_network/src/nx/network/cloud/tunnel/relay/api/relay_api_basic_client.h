@@ -96,6 +96,10 @@ private:
     ResultCode toUpgradeResultCode(
         SystemError::ErrorCode sysErrorCode,
         const nx::network::http::Response* httpResponse);
+
+    std::string prepareActualRelayUrl(
+        const std::string& contentLocationUrl,
+        const std::string& requestPath);
 };
 
 //-------------------------------------------------------------------------------------------------
@@ -233,6 +237,7 @@ void BasicClient::executeRequest(
                 httpClientPtr->httpClient().contentLocationUrl().toString().toStdString();
             m_prevSysErrorCode = sysErrorCode;
             const auto resultCode = toResultCode(sysErrorCode, httpResponse);
+            auto requestContext = std::move(*httpClientIter);
             m_activeRequests.erase(httpClientIter);
             completionHandler(contentLocationUrl, resultCode, std::move(response));
         });

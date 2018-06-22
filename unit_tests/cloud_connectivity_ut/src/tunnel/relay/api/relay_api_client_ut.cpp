@@ -25,6 +25,10 @@ public:
             baseUrlPath,
             listeningPeerName);
 
+        registerOpenClientTunnelViaUpgradeHandler(
+            httpServer,
+            baseUrlPath);
+
         httpServer->registerRequestProcessorFunc(
             network::url::normalizePath(
                 lm("%1/%2").args(baseUrlPath, kServerIncomingConnectionsPath).toQString()),

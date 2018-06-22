@@ -19,17 +19,22 @@ public:
         const std::string& baseUrlPath,
         const std::string& listeningPeerName)
     {
-        const auto realPath = nx::network::http::rest::substituteParameters(
-            kServerClientSessionsPath,
-            { listeningPeerName.c_str() });
-
-        const auto handlerPath = network::url::normalizePath(lm("%1%2")
-            .args(baseUrlPath, realPath).toQString());
-
         httpServer->registerStaticProcessor(
-            handlerPath,
-            "{\"result\": \"ok\"}",
+            network::url::joinPath(baseUrlPath, kServerClientSessionsPath).c_str(),
+            "{\"result\": \"ok\", \"sessionId\": \"testSession\"}",
             "application/json");
+    }
+
+    void registerOpenClientTunnelViaUpgradeHandler(
+        nx::network::http::TestHttpServer* httpServer,
+        const std::string& baseUrlPath)
+    {
+        using namespace std::placeholders;
+
+        httpServer->registerRequestProcessorFunc(
+            network::url::joinPath(baseUrlPath, kClientSessionConnectionsPath).c_str(),
+            std::bind(&BasicRelayApiClientTestFixture::openClientTunnel, this,
+                _1, _2, _3, _4, _5));
     }
 
     void setBeginListeningResponse(const BeginListeningResponse& response)
@@ -56,6 +61,16 @@ public:
 private:
     BeginListeningResponse m_beginListeningResponse;
     nx::utils::SyncQueue<std::unique_ptr<network::AbstractStreamSocket>> m_tunnelConnections;
+
+    void openClientTunnel(
+        nx::network::http::HttpServerConnection* const /*connection*/,
+        nx::utils::stree::ResourceContainer /*authInfo*/,
+        nx::network::http::Request /*request*/,
+        nx::network::http::Response* const /*response*/,
+        nx::network::http::RequestProcessedHandler completionHandler)
+    {
+        completionHandler(network::http::StatusCode::switchingProtocols);
+    }
 };
 
 } // namespace nx::cloud::relay::api::test
