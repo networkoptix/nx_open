@@ -101,6 +101,11 @@ class VirtualBox(Hypervisor):
 
     def create_dummy(self, vm_name):
         self._vbox_manage(['createvm', '--name', vm_name, '--register'])
+        # Without specific OS type (`Other` by default), `VBoxManage import` says:
+        # "invalid ovf:id in operating system section".
+        # Try: `strings ~/.func_tests/template_vm.ova` and
+        # search for `OperatingSystemSection` element.
+        self._vbox_manage(['modifyvm', vm_name, '--ostype', 'Ubuntu_64'])
         self._vbox_manage(['modifyvm', vm_name, '--description', 'For testing purposes. Can be deleted.'])
 
     def find(self, vm_name):
