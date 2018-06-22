@@ -402,15 +402,10 @@ ExportLayoutSettings ExportSettingsDialog::exportLayoutSettings() const
 void ExportSettingsDialog::updateSettingsWidgets()
 {
     const auto& mediaPersistentSettings = d->exportMediaPersistentSettings();
-
     if (mediaPersistentSettings.canExportOverlays())
     {
         ui->exportLayoutSettingsPage->setLayoutReadOnly(d->exportLayoutPersistentSettings().readOnly);
         ui->exportMediaSettingsPage->setApplyFilters(mediaPersistentSettings.applyFilters);
-        ui->timestampSettingsPage->setData(mediaPersistentSettings.timestampOverlay);
-        ui->bookmarkSettingsPage->setData(mediaPersistentSettings.bookmarkOverlay);
-        ui->imageSettingsPage->setData(mediaPersistentSettings.imageOverlay);
-        ui->textSettingsPage->setData(mediaPersistentSettings.textOverlay);
 
         if(mediaPersistentSettings.rapidReview.enabled)
         {
@@ -418,6 +413,11 @@ void ExportSettingsDialog::updateSettingsWidgets()
             ui->rapidReviewSettingsPage->setSpeed(speed);
         }
     }
+
+    ui->timestampSettingsPage->setData(mediaPersistentSettings.timestampOverlay);
+    ui->bookmarkSettingsPage->setData(mediaPersistentSettings.bookmarkOverlay);
+    ui->imageSettingsPage->setData(mediaPersistentSettings.imageOverlay);
+    ui->textSettingsPage->setData(mediaPersistentSettings.textOverlay);
 
     ui->mediaFilenamePanel->setFilename(d->selectedFileName(Mode::Media));
     ui->layoutFilenamePanel->setFilename(d->selectedFileName(Mode::Layout));
