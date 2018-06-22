@@ -20,7 +20,6 @@
 #include <ui/common/image_processing.h>
 #include <ui/dialogs/image_preview_dialog.h>
 #include <ui/dialogs/common/custom_file_dialog.h>
-#include <ui/dialogs/common/file_dialog.h>
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
 #include <ui/style/globals.h>
