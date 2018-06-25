@@ -301,8 +301,13 @@ int runInHttpClientMode(const nx::utils::ArgumentParser& args)
     }
     else
     {
-        if (nx::network::http::getHeaderValue(client.response()->headers, "Content-Type") == "application/json")
+        const auto contentType =
+            nx::network::http::getHeaderValue(client.response()->headers, "Content-Type");
+        if (contentType == "application/json" ||
+            contentType == "text/xml")
+        {
             outputStream = &std::cout;
+        }
     }
 
     if (outputStream)

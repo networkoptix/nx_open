@@ -68,8 +68,7 @@ public:
 
     void assertFirstRelayHasBeenAddedToThePool()
     {
-        auto serverId = nx::String::fromStdString(m_addedPeer);
-        ASSERT_TRUE(serverId.contains(serverSocketCloudAddress()));
+        ASSERT_TRUE(m_addedPeer.find(serverSocketCloudAddress()) != std::string::npos);
     }
 
     virtual void peerAdded(const std::string& domainName) override
@@ -91,10 +90,7 @@ public:
 
     void thenItsRecordShouldBeRemovedFromRemoteRelayPool()
     {
-        nx::String removedPeer = nx::String::fromStdString(m_removedPeer);
-        nx::String firstRelayServerId = this->serverSocketCloudAddress();
-
-        ASSERT_TRUE(removedPeer.contains(firstRelayServerId));
+        ASSERT_TRUE(m_removedPeer.find(this->serverSocketCloudAddress()) != std::string::npos);
     }
 
     void waitForRemovePeerSignal()

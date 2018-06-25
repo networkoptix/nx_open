@@ -23,8 +23,8 @@ public:
     virtual void bindToAioThread(network::aio::AbstractAioThread* aioThread) override;
 
     virtual void startSession(
-        const nx::String& desiredSessionId,
-        const nx::String& targetPeerName,
+        const std::string& desiredSessionId,
+        const std::string& targetPeerName,
         StartClientConnectSessionHandler handler) override;
 
     virtual nx::utils::Url url() const override;
@@ -50,7 +50,7 @@ protected:
     >
         void issueUpgradeRequest(
             nx::network::http::Method::ValueType httpMethod,
-            const nx::network::http::StringType& protocolToUpgradeTo,
+            const std::string& protocolToUpgradeTo,
             Request request,
             const char* requestPathTemplate,
             std::initializer_list<RequestPathArgument> requestPathArguments,
@@ -84,7 +84,7 @@ private:
     template<typename HttpClient, typename CompletionHandler, typename ... Response>
     void executeUpgradeRequest(
         nx::network::http::Method::ValueType httpMethod,
-        const nx::network::http::StringType& protocolToUpgradeTo,
+        const std::string& protocolToUpgradeTo,
         HttpClient httpClient,
         CompletionHandler completionHandler);
 
@@ -96,6 +96,10 @@ private:
     ResultCode toUpgradeResultCode(
         SystemError::ErrorCode sysErrorCode,
         const nx::network::http::Response* httpResponse);
+
+    std::string prepareActualRelayUrl(
+        const std::string& contentLocationUrl,
+        const std::string& requestPath);
 };
 
 //-------------------------------------------------------------------------------------------------
@@ -108,7 +112,7 @@ template<
 >
 void BasicClient::issueUpgradeRequest(
     nx::network::http::Method::ValueType httpMethod,
-    const nx::network::http::StringType& protocolToUpgradeTo,
+    const std::string& protocolToUpgradeTo,
     Request request,
     const char* requestPathTemplate,
     std::initializer_list<RequestPathArgument> requestPathArguments,
@@ -186,7 +190,7 @@ BasicClient::prepareHttpRequest(
 template<typename HttpClient, typename CompletionHandler, typename ... Response>
 void BasicClient::executeUpgradeRequest(
     nx::network::http::Method::ValueType httpMethod,
-    const nx::network::http::StringType& protocolToUpgradeTo,
+    const std::string& protocolToUpgradeTo,
     HttpClient httpClient,
     CompletionHandler completionHandler)
 {
@@ -194,7 +198,7 @@ void BasicClient::executeUpgradeRequest(
     m_activeRequests.push_back(std::move(httpClient));
     httpClientPtr->executeUpgrade(
         httpMethod,
-        protocolToUpgradeTo,
+        protocolToUpgradeTo.c_str(),
         [this, httpClientPtr,
         httpClientIter = std::prev(m_activeRequests.end()),
         completionHandler = std::move(completionHandler)](
@@ -233,6 +237,7 @@ void BasicClient::executeRequest(
                 httpClientPtr->httpClient().contentLocationUrl().toString().toStdString();
             m_prevSysErrorCode = sysErrorCode;
             const auto resultCode = toResultCode(sysErrorCode, httpResponse);
+            auto requestContext = std::move(*httpClientIter);
             m_activeRequests.erase(httpClientIter);
             completionHandler(contentLocationUrl, resultCode, std::move(response));
         });

@@ -1,6 +1,7 @@
 #pragma once
 
 #include <list>
+#include <string>
 
 #include <nx/network/aio/basic_pollable.h>
 #include <nx/utils/move_only_func.h>
@@ -32,21 +33,21 @@ class NX_NETWORK_API Client:
 {
 public:
     virtual void beginListening(
-        const nx::String& peerName,
+        const std::string& peerName,
         BeginListeningHandler completionHandler) = 0;
     /**
      * @param desiredSessionId Can be empty.
      *   In this case server will generate unique session id itself.
      */
     virtual void startSession(
-        const nx::String& desiredSessionId,
-        const nx::String& targetPeerName,
+        const std::string& desiredSessionId,
+        const std::string& targetPeerName,
         StartClientConnectSessionHandler handler) = 0;
     /**
      * After successful call socket provided represents connection to the requested peer.
      */
     virtual void openConnectionToTheTargetHost(
-        const nx::String& sessionId,
+        const std::string& sessionId,
         OpenRelayConnectionHandler handler) = 0;
 
     virtual nx::utils::Url url() const = 0;

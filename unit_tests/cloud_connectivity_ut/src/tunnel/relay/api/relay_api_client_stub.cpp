@@ -29,7 +29,7 @@ ClientStub::~ClientStub()
 }
 
 void ClientStub::beginListening(
-    const nx::String& /*peerName*/,
+    const std::string& /*peerName*/,
     nx::cloud::relay::api::BeginListeningHandler handler)
 {
     ++m_scheduledRequestCount;
@@ -49,8 +49,8 @@ void ClientStub::beginListening(
 }
 
 void ClientStub::startSession(
-    const nx::String& desiredSessionId,
-    const nx::String& /*targetPeerName*/,
+    const std::string& desiredSessionId,
+    const std::string& /*targetPeerName*/,
     nx::cloud::relay::api::StartClientConnectSessionHandler handler)
 {
     ++m_scheduledRequestCount;
@@ -61,7 +61,7 @@ void ClientStub::startSession(
         [this, handler = std::move(handler), desiredSessionId]()
         {
             nx::cloud::relay::api::CreateClientSessionResponse response;
-            response.sessionId = desiredSessionId.toStdString();
+            response.sessionId = desiredSessionId;
             if (m_behavior == RequestProcessingBehavior::succeed)
                 handler(nx::cloud::relay::api::ResultCode::ok, std::move(response));
             else
@@ -70,7 +70,7 @@ void ClientStub::startSession(
 }
 
 void ClientStub::openConnectionToTheTargetHost(
-    const nx::String& /*sessionId*/,
+    const std::string& /*sessionId*/,
     nx::cloud::relay::api::OpenRelayConnectionHandler handler)
 {
     ++m_scheduledRequestCount;

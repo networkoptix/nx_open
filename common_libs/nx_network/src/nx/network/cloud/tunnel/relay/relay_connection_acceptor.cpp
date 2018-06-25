@@ -47,7 +47,7 @@ private:
 
 ReverseConnection::ReverseConnection(const nx::utils::Url& relayUrl):
     m_relayClient(api::ClientFactory::instance().create(relayUrl)),
-    m_peerName(relayUrl.userName().toUtf8())
+    m_peerName(relayUrl.userName().toStdString())
 {
     bindToAioThread(getAioThread());
 }

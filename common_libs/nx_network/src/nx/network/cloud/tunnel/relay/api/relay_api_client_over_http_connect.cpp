@@ -13,7 +13,7 @@ ClientOverHttpConnect::ClientOverHttpConnect(
 }
 
 void ClientOverHttpConnect::beginListening(
-    const nx::String& peerName,
+    const std::string& peerName,
     BeginListeningHandler completionHandler)
 {
     completionHandler =
@@ -38,7 +38,7 @@ void ClientOverHttpConnect::beginListening(
             m_activeRequests.push_back(std::move(httpClient));
             httpClientPtr->doConnect(
                 url(),
-                peerName,
+                peerName.c_str(),
                 [this, httpClientIter = std::prev(m_activeRequests.end()),
                     completionHandler = std::move(completionHandler)]() mutable
                 {

@@ -108,7 +108,7 @@ TYPED_TEST_P(Relaying, connection_can_be_established)
 
 TYPED_TEST_P(Relaying, connecting_using_full_server_name)
 {
-    this->setRemotePeerName(this->cloudSystemCredentials().hostName());
+    this->setRemotePeerName(this->cloudSystemCredentials().hostName().toStdString());
     this->assertConnectionCanBeEstablished();
 }
 

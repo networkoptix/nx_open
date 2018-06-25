@@ -28,15 +28,15 @@ void BasicClient::bindToAioThread(
 }
 
 void BasicClient::startSession(
-    const nx::String& desiredSessionId,
-    const nx::String& targetPeerName,
+    const std::string& desiredSessionId,
+    const std::string& targetPeerName,
     StartClientConnectSessionHandler completionHandler)
 {
     using namespace std::placeholders;
 
     CreateClientSessionRequest request;
-    request.desiredSessionId = desiredSessionId.toStdString();
-    request.targetPeerName = targetPeerName.toStdString();
+    request.desiredSessionId = desiredSessionId;
+    request.targetPeerName = targetPeerName;
 
     const auto requestPath = nx::network::http::rest::substituteParameters(
         kServerClientSessionsPath, { targetPeerName });
@@ -45,24 +45,18 @@ void BasicClient::startSession(
         std::move(request),
         kServerClientSessionsPath,
         { targetPeerName },
-        [completionHandler = std::move(completionHandler), requestPath](
+        [this, completionHandler = std::move(completionHandler), requestPath](
             const std::string contentLocationUrl,
             ResultCode resultCode,
             CreateClientSessionResponse response)
-    {
-        response.actualRelayUrl = contentLocationUrl;
-        // Removing request path from the end of response.actualRelayUrl
-        // so that we have basic relay url.
-        NX_ASSERT(
-            response.actualRelayUrl.find(requestPath) != std::string::npos);
-        NX_ASSERT(
-            response.actualRelayUrl.find(requestPath) + requestPath.size() ==
-            response.actualRelayUrl.size());
+        {
+            giveFeedback(resultCode);
 
-        response.actualRelayUrl.erase(
-            response.actualRelayUrl.size() - requestPath.size());
-        completionHandler(resultCode, std::move(response));
-    });
+            response.actualRelayUrl =
+                prepareActualRelayUrl(contentLocationUrl, requestPath);
+
+            completionHandler(resultCode, std::move(response));
+        });
 }
 
 nx::utils::Url BasicClient::url() const
@@ -118,6 +112,24 @@ ResultCode BasicClient::toResultCode(
     return fromHttpStatusCode(
         static_cast<nx::network::http::StatusCode::Value>(
             httpResponse->statusLine.statusCode));
+}
+
+std::string BasicClient::prepareActualRelayUrl(
+    const std::string& contentLocationUrl,
+    const std::string& requestPath)
+{
+    auto actualRelayUrl = contentLocationUrl;
+    // Removing request path from the end of response.actualRelayUrl
+    // so that we have basic relay url.
+    NX_ASSERT(
+        actualRelayUrl.find(requestPath) != std::string::npos);
+    NX_ASSERT(
+        actualRelayUrl.find(requestPath) + requestPath.size() ==
+        actualRelayUrl.size());
+
+    actualRelayUrl.erase(actualRelayUrl.size() - requestPath.size());
+
+    return actualRelayUrl;
 }
 
 void BasicClient::giveFeedback(ResultCode resultCode)

@@ -18,16 +18,16 @@ ClientOverHttpUpgrade::ClientOverHttpUpgrade(
 }
 
 void ClientOverHttpUpgrade::beginListening(
-    const nx::String& peerName,
+    const std::string& peerName,
     BeginListeningHandler completionHandler)
 {
     using namespace std::placeholders;
 
     BeginListeningRequest request;
-    request.peerName = peerName.toStdString();
+    request.peerName = peerName;
 
     issueUpgradeRequest<
-        BeginListeningRequest, nx::String, BeginListeningHandler, BeginListeningResponse>(
+        BeginListeningRequest, std::string, BeginListeningHandler, BeginListeningResponse>(
             nx::network::http::Method::post,
             kRelayProtocolName,
             std::move(request),
@@ -47,16 +47,16 @@ void ClientOverHttpUpgrade::beginListening(
 }
 
 void ClientOverHttpUpgrade::openConnectionToTheTargetHost(
-    const nx::String& sessionId,
+    const std::string& sessionId,
     OpenRelayConnectionHandler completionHandler)
 {
     using namespace std::placeholders;
 
     ConnectToPeerRequest request;
-    request.sessionId = sessionId.toStdString();
+    request.sessionId = sessionId;
 
     issueUpgradeRequest<
-        ConnectToPeerRequest, nx::String, OpenRelayConnectionHandler>(
+        ConnectToPeerRequest, std::string, OpenRelayConnectionHandler>(
             nx::network::http::Method::post,
             kRelayProtocolName,
             std::move(request),

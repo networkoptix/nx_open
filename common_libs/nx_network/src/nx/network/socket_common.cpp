@@ -407,6 +407,11 @@ SocketAddress::SocketAddress(const QByteArray& utf8Str):
 {
 }
 
+SocketAddress::SocketAddress(const std::string& str):
+    SocketAddress(QString::fromStdString(str))
+{
+}
+
 SocketAddress::SocketAddress(const char* utf8Str):
     SocketAddress(QByteArray(utf8Str))
 {

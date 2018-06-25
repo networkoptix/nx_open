@@ -12,7 +12,7 @@ namespace relay {
 
 OutgoingTunnelConnection::OutgoingTunnelConnection(
     nx::utils::Url relayUrl,
-    nx::String relaySessionId,
+    std::string relaySessionId,
     std::unique_ptr<nx::cloud::relay::api::Client> relayApiClient)
     :
     m_relayUrl(std::move(relayUrl)),
