@@ -121,7 +121,7 @@ int StreamReader::loadNextData()
     return decodeCode;
 }
 
-int StreamReader::ensureInitialized()
+bool StreamReader::ensureInitialized()
 {
      auto printError =
         [this]()
@@ -136,10 +136,9 @@ int StreamReader::ensureInitialized()
             NX_DEBUG(this) << "ensureInitialized(): ffmpeg::error::lastError" << error::lastError();
         };
 
-    int error = 0;
     if(m_cameraState != kInitialized)
     {
-        error = initialize();
+        initialize();
         NX_DEBUG(this) << "ensureInitialized(): first initialization";
         printError();
     }
@@ -147,11 +146,11 @@ int StreamReader::ensureInitialized()
     {
         NX_DEBUG(this) << "ensureInitialized(): codec parameters modified, reinitializing";
         uninitialize();
-        error = initialize();
+        initialize();
         printError();
     }
 
-    return error;
+    return m_cameraState == kInitialized;
 }
 
 int StreamReader::initialize()

@@ -55,7 +55,7 @@ private:
 
     int m_refCount = 0;
 private:
-    int ensureInitialized();
+    bool ensureInitialized();
     int initialize();
     void uninitialize();
     int allocateCurrentPacket();
