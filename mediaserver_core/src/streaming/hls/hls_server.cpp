@@ -1072,7 +1072,8 @@ void QnHttpLiveStreamingProcessor::ensureChunkCacheFilledEnoughForPlayback(
 AVCodecID QnHttpLiveStreamingProcessor::detectAudioCodecId(
     const StreamingChunkCacheKey& chunkParams)
 {
-    const auto resource = commonModule()->resourcePool()->getResourceByUniqueId(
+    const auto resource = nx::camera_id_helper::findCameraByFlexibleId(
+        commonModule()->resourcePool(),
         chunkParams.srcResourceUniqueID());
     if (!resource)
         return AV_CODEC_ID_NONE;
