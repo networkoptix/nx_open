@@ -1260,11 +1260,10 @@ TYPED_TEST_P(
     this->thenEveryConnectionIsAccepted();
 }
 
-#if 0
 // TODO: #ak Following test is not relevant for Macosx since server socket there
 // has a queue of connect requests, not connections with fulfilled handshake.
 // Adapt for Mac or erase.
-TYPED_TEST_P(StreamSocketAcceptance, server_socket_listen_queue_size_is_used)
+TYPED_TEST_P(StreamSocketAcceptance, DISABLED_server_socket_listen_queue_size_is_used)
 {
     constexpr int listenQueueSize =
         AbstractStreamServerSocket::kDefaultBacklogSize + 11;
@@ -1273,7 +1272,6 @@ TYPED_TEST_P(StreamSocketAcceptance, server_socket_listen_queue_size_is_used)
     this->whenEstablishMultipleConnectionsAsync(listenQueueSize);
     this->thenEveryConnectionEstablishedSuccessfully();
 }
-#endif
 
 TYPED_TEST_P(StreamSocketAcceptance, socket_is_reusable_after_recv_timeout)
 {
@@ -1333,6 +1331,7 @@ REGISTER_TYPED_TEST_CASE_P(StreamSocketAcceptance,
     accepted_socket_is_in_blocking_mode_when_server_socket_is_nonblocking,
     accepted_socket_is_in_blocking_mode_when_server_socket_is_blocking,
     server_socket_accepts_many_connections_in_a_row,
+    DISABLED_server_socket_listen_queue_size_is_used,
     socket_is_reusable_after_recv_timeout,
     socket_reports_send_timeout,
     cancel_io);

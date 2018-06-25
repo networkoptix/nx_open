@@ -47,9 +47,9 @@ std::unique_ptr<nx::network::http::HttpClient> IqInvisionRequestHelper::makeHttp
     auto httpClient = std::make_unique<nx::network::http::HttpClient>();
     auto auth = m_resource->getAuth();
 
-    httpClient->setSendTimeoutMs(duration_cast<milliseconds>(kSendTimeout).count());
-    httpClient->setMessageBodyReadTimeoutMs(duration_cast<milliseconds>(kReceiveTimeout).count());
-    httpClient->setResponseReadTimeoutMs(duration_cast<milliseconds>(kReceiveTimeout).count());
+    httpClient->setSendTimeout(kSendTimeout);
+    httpClient->setMessageBodyReadTimeout(kReceiveTimeout);
+    httpClient->setResponseReadTimeout(kReceiveTimeout);
     httpClient->setUserName(auth.user());
     httpClient->setUserPassword(auth.password());
 
@@ -94,7 +94,7 @@ IqInvisionResponse IqInvisionRequestHelper::doRequest(const nx::utils::Url& url)
         return result;
 
     result.statusCode = httpResponse->statusLine.statusCode;
-    result.data = parseResponseData(responseData.get(), httpClient->contentType());
+    result.data = parseResponseData(*responseData, httpClient->contentType());
 
     return result;
 }

@@ -161,12 +161,18 @@ public:
      * Start POST request to url.
      * @return true, if socket is created and async connect is started. false otherwise
      */
-    void doPost(const nx::utils::Url &url);
+    void doPost(const nx::utils::Url& url);
+    void doPost(
+        const nx::utils::Url& url,
+        std::unique_ptr<AbstractMsgBodySource> body);
     void doPost(
         const nx::utils::Url& url,
         nx::utils::MoveOnlyFunc<void()> completionHandler);
 
     void doPut(const nx::utils::Url& url);
+    void doPut(
+        const nx::utils::Url& url,
+        std::unique_ptr<AbstractMsgBodySource> body);
     void doPut(
         const nx::utils::Url& url,
         nx::utils::MoveOnlyFunc<void()> completionHandler);
@@ -175,6 +181,14 @@ public:
     void doDelete(
         const nx::utils::Url& url,
         nx::utils::MoveOnlyFunc<void()> completionHandler);
+
+    void doUpgrade(
+        const nx::utils::Url& url,
+        const StringType& protocolToUpgradeTo);
+    void doUpgrade(
+        const nx::utils::Url& url,
+        nx::network::http::Method::ValueType method,
+        const StringType& protocolToUpgradeTo);
 
     void doUpgrade(
         const nx::utils::Url& url,

@@ -4,14 +4,13 @@
 #include <memory>
 #include <vector>
 
-#include <boost/optional.hpp>
-
 #include <gtest/gtest.h>
 
 #include <nx/network/cloud/cloud_server_socket.h>
 #include <nx/network/http/http_types.h>
 #include <nx/network/http/test_http_server.h>
 #include <nx/network/stun/async_client.h>
+#include <nx/utils/std/optional.h>
 #include <nx/utils/thread/sync_queue.h>
 
 #include <nx/cloud/relay/model/abstract_remote_relay_peer_pool.h>
@@ -105,14 +104,14 @@ protected:
 
     nx::hpm::MediatorFunctionalTest& mediator();
     nx::cloud::relay::test::Launcher& trafficRelay();
-    nx::String serverSocketCloudAddress() const;
+    std::string serverSocketCloudAddress() const;
     const hpm::api::SystemCredentials& cloudSystemCredentials() const;
 
     void waitUntilServerIsRegisteredOnMediator();
     void waitUntilServerIsRegisteredOnTrafficRelay();
     void waitUntilServerIsUnRegisteredOnTrafficRelay();
 
-    void setRemotePeerName(const nx::String& peerName);
+    void setRemotePeerName(const std::string& peerName);
     void setMediatorApiProtocol(MediatorApiProtocol mediatorApiProtocol);
 
     const std::unique_ptr<network::AbstractStreamSocket>& clientSocket();
@@ -141,7 +140,7 @@ private:
     nx::utils::Url m_staticUrl;
     std::list<std::unique_ptr<nx::network::http::AsyncClient>> m_httpClients;
     std::atomic<int> m_unfinishedRequestsLeft;
-    boost::optional<nx::String> m_remotePeerName;
+    std::optional<std::string> m_remotePeerName;
     MediatorApiProtocol m_mediatorApiProtocol = MediatorApiProtocol::http;
     int m_initFlags = 0;
 

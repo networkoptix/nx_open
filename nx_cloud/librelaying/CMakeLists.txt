@@ -6,7 +6,7 @@ if(WINDOWS)
     set(library_type LIBRARY_TYPE SHARED)
 endif()
 
-nx_add_target(nx_relaying LIBRARY ${library_type}
+nx_add_target(nx_relaying LIBRARY ${library_type} NO_MOC
     PUBLIC_LIBS
         nx_network nx_fusion nx_utils)
 

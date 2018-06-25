@@ -12,6 +12,7 @@
 
 #include <nx/cloud/relaying/http_view/begin_listening_http_handler.h>
 
+#include "create_get_post_tunnel_handler.h"
 #include "http_handlers.h"
 #include "proxy_handler.h"
 #include "../controller/connect_session_manager.h"
@@ -59,7 +60,10 @@ View::View(
     m_settings(settings),
     m_model(model),
     m_controller(controller),
-    m_authenticationManager(m_authRestrictionList)
+    m_authenticationManager(m_authRestrictionList),
+    m_getPostTunnelProcessor(
+        m_settings,
+        &model->listeningPeerPool())
 {
     registerApiHandlers();
     loadSslCertificate();
@@ -122,12 +126,18 @@ void View::registerApiHandlers()
     registerApiHandler<relaying::BeginListeningHandler>(
         nx::network::http::Method::post,
         &m_controller->listeningPeerManager());
+
     registerApiHandler<view::CreateClientSessionHandler>(
         nx::network::http::Method::post,
         &m_controller->connectSessionManager());
+
     registerApiHandler<view::ConnectToPeerHandler>(
         nx::network::http::Method::post,
         &m_controller->connectSessionManager());
+
+    registerApiHandler<view::CreatePostGetTunnelHandler>(
+        nx::network::http::Method::get,
+        &m_getPostTunnelProcessor);
 
     registerApiHandler<relaying::BeginListeningUsingConnectMethodHandler>(
         nx::network::http::Method::connect,

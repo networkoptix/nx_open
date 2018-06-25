@@ -287,14 +287,14 @@ void StreamTransformingAsyncChannel::onRawDataWritten(
     std::size_t /*bytesTransferred*/)
 {
     auto completedIoRange =
-        std::make_tuple(m_rawWriteQueue.begin(), std::next(m_rawWriteQueue.begin()));
+        std::make_pair(m_rawWriteQueue.begin(), std::next(m_rawWriteQueue.begin()));
     if (sysErrorCode != SystemError::noError)
     {
         // Marking socket unusable since we cannot throw away bytes out of SSL stream.
         m_sendShutdown = true;
 
         // Considering every queue raw write failed since send has been shut down.
-        std::get<1>(completedIoRange) = m_rawWriteQueue.end();
+        completedIoRange.second = m_rawWriteQueue.end();
     }
 
     if (completeRawSendTasks(completedIoRange, sysErrorCode) == UserHandlerResult::thisDeleted)
@@ -319,7 +319,7 @@ StreamTransformingAsyncChannel::UserHandlerResult
         Range completedIoRange,
         SystemError::ErrorCode sysErrorCode)
 {
-    for (auto it = std::get<0>(completedIoRange); it != std::get<1>(completedIoRange); ++it)
+    for (auto it = completedIoRange.first; it != completedIoRange.second; ++it)
     {
         if (!it->userHandler)
             continue;
@@ -333,8 +333,8 @@ StreamTransformingAsyncChannel::UserHandlerResult
             return UserHandlerResult::thisDeleted;
     }
 
-    m_rawWriteQueue.erase(std::get<0>(completedIoRange), std::get<1>(completedIoRange));
-    return UserHandlerResult::proceed;
+    m_rawWriteQueue.erase(completedIoRange.first, completedIoRange.second);
+    return UserHandlerResult::thisLeftRunning;
 }
 
 void StreamTransformingAsyncChannel::scheduleNextRawSendTaskIfAny()

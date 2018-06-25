@@ -55,6 +55,8 @@ public:
     void updateLockoutState(const Key& key, UserLocker::AuthResult authResult);
     bool isLocked(const Key& key) const;
 
+    std::map<Key, UserLocker> userLockers() const;
+
 private:
     const UserLockerSettings m_settings;
     mutable QnMutex m_mutex;
