@@ -23,11 +23,6 @@ Q_DECLARE_OPERATORS_FOR_FLAGS(RuntimeFlags)
  */
 struct ApiRuntimeData: nx::vms::api::DataWithVersion
 {
-    static const quint64 tpfPeerTimeSynchronizedWithInternetServer = 0x0008LL << 32;
-    static const quint64 tpfPeerTimeSetByUser = 0x0004LL << 32;
-    static const quint64 tpfPeerHasMonotonicClock = 0x0002LL << 32;
-    static const quint64 tpfPeerIsNotEdgeServer = 0x0001LL << 32;
-
     /**
      * This operator must not be replaced with fusion implementation as it skips brand and
      * customization checking.
