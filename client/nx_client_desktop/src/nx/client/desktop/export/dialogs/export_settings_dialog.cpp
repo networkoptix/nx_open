@@ -473,9 +473,9 @@ void ExportSettingsDialog::updateAlertsInternal(QLayout* layout,
         [layout](int index, const QString& text)
         {
             auto item = layout->itemAt(index);
-            auto bar = item ? qobject_cast<AlertBar*>(item->widget()) : nullptr;
-            //NX_EXPECT(bar);
-            if (bar)
+            // Notice: notifications are added at the runtime. It is possible to have no
+            // widget so far, especially when dialog is only initialized.
+            if (auto bar = item ? qobject_cast<AlertBar*>(item->widget()) : nullptr)
                 bar->setText(text);
         };
 

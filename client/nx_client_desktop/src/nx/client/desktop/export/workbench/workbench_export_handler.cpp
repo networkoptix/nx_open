@@ -441,7 +441,7 @@ void WorkbenchExportHandler::handleExportBookmarkAction(const ui::action::Parame
     runExport(std::move(context));
 }
 
-void WorkbenchExportHandler::runExport(std::tuple<QnUuid, std::unique_ptr<AbstractExportTool>>&& context)
+void WorkbenchExportHandler::runExport(ExportInstance&& context)
 {
     QnUuid exportProcessId;
     std::unique_ptr<AbstractExportTool> exportTool;
@@ -478,7 +478,7 @@ void WorkbenchExportHandler::runExport(std::tuple<QnUuid, std::unique_ptr<Abstra
     }
 }
 
-std::tuple<QnUuid, std::unique_ptr<AbstractExportTool>>
+WorkbenchExportHandler::ExportInstance
 WorkbenchExportHandler::prepareExportTool(const ExportSettingsDialog& dialog)
 {
     QnUuid exportId;
@@ -532,7 +532,7 @@ WorkbenchExportHandler::prepareExportTool(const ExportSettingsDialog& dialog)
         NX_ASSERT(false, "Unhandled export mode");
     }
 
-    return std::make_tuple(exportId, std::move(tool));
+    return std::make_pair(exportId, std::move(tool));
 }
 
 void WorkbenchExportHandler::at_exportStandaloneClientAction_triggered()
@@ -641,7 +641,7 @@ void WorkbenchExportHandler::at_saveLocalLayoutAction_triggered()
 
     QnUuid exportId = d->initExport(layoutSettings.fileName);
 
-    runExport(std::make_tuple(exportId, std::move(exportTool)));
+    runExport(std::make_pair(exportId, std::move(exportTool)));
 }
 
 } // namespace desktop
