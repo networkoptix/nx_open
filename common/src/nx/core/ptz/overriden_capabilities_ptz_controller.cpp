@@ -23,7 +23,7 @@ bool OverridenCapabilitiesPtzController::continuousMove(
     const Vector& speed,
     const Options& options)
 {
-    if (m_overridenCapabilities & Ptz::ContinuousPtrzCapabilities == Ptz::NoPtzCapabilities)
+    if ((m_overridenCapabilities & Ptz::ContinuousPtrzCapabilities) == Ptz::NoPtzCapabilities)
         return false;
 
     return base_type::continuousMove(speed, options);
@@ -43,7 +43,7 @@ bool OverridenCapabilitiesPtzController::absoluteMove(
     qreal speed,
     const Options& options)
 {
-    if (m_overridenCapabilities & Ptz::AbsolutePtrzCapabilities == Ptz::NoPtzCapabilities)
+    if ((m_overridenCapabilities & Ptz::AbsolutePtrzCapabilities) == Ptz::NoPtzCapabilities)
         return false;
 
     return base_type::absoluteMove(space, position, speed, options);
@@ -65,7 +65,7 @@ bool OverridenCapabilitiesPtzController::relativeMove(
     const Vector& direction,
     const Options& options)
 {
-    if (m_overridenCapabilities & Ptz::RelativePtrzCapabilities == Ptz::NoPtzCapabilities)
+    if ((m_overridenCapabilities & Ptz::RelativePtrzCapabilities) == Ptz::NoPtzCapabilities)
         return false;
 
     return base_type::relativeMove(direction, options);
@@ -84,7 +84,7 @@ bool OverridenCapabilitiesPtzController::getPosition(
     Vector* position,
     const Options& options) const
 {
-    if (m_overridenCapabilities & Ptz::AbsolutePtrzCapabilities == Ptz::NoPtzCapabilities)
+    if ((m_overridenCapabilities & Ptz::AbsolutePtrzCapabilities) == Ptz::NoPtzCapabilities)
         return false;
 
     return base_type::getPosition(space, position, options);
