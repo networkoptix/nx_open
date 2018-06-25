@@ -88,7 +88,7 @@ CameraExtraStatus QnResourceTreeModelRecorderNode::calculateCameraExtraStatus() 
 
 void QnResourceTreeModelRecorderNode::updateName(const QnVirtualCameraResourcePtr& camera)
 {
-    auto name = camera->getGroupName();
+    auto name = camera->getUserDefinedGroupName();
     if (name.isEmpty())
         name = camera->getGroupId();
     NX_ASSERT(!name.isEmpty());
