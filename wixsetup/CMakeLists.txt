@@ -6,7 +6,7 @@ option(addQtPdb
 set(project.build.directory "${CMAKE_CURRENT_BINARY_DIR}")
 set(bin_resources "${CMAKE_CURRENT_SOURCE_DIR}/maven/bin-resources")
 set(filter_resources "${CMAKE_CURRENT_SOURCE_DIR}/maven/filter-resources")
-set(ClientHelpSourceDir "${bin_source_dir}/help")
+set(ClientHelpSourceDir "${help_directory}/bin/help")
 set(VoxSourceDir "${bin_source_dir}/vox")
 set(client_qml_dir "${CMAKE_CURRENT_BINARY_DIR}/client_qml")
 set(nxtool_qml_dir "${CMAKE_CURRENT_BINARY_DIR}/nxtool_qml")
