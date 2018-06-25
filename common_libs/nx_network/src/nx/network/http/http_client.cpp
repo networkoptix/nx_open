@@ -24,6 +24,12 @@ HttpClient::HttpClient():
 {
 }
 
+HttpClient::HttpClient(std::unique_ptr<nx::network::AbstractStreamSocket> socket):
+    HttpClient()
+{
+    m_socket = std::move(socket);
+}
+
 HttpClient::~HttpClient()
 {
     pleaseStop();
@@ -293,7 +299,7 @@ bool HttpClient::fetchResource(
 
 void HttpClient::instantiateHttpClient()
 {
-    m_asyncHttpClient = std::make_unique<nx::network::http::AsyncClient>();
+    m_asyncHttpClient = std::make_unique<nx::network::http::AsyncClient>(std::move(m_socket));
 
     m_asyncHttpClient->setOnResponseReceived(
         std::bind(&HttpClient::onResponseReceived, this));
@@ -301,14 +307,6 @@ void HttpClient::instantiateHttpClient()
         std::bind(&HttpClient::onSomeMessageBodyAvailable, this));
     m_asyncHttpClient->setOnDone(
         std::bind(&HttpClient::onDone, this));
-}
-
-void HttpClient::setSocket(std::unique_ptr<nx::network::AbstractStreamSocket> socket)
-{
-    if (m_asyncHttpClient)
-        m_asyncHttpClient->setSocket(std::move(socket));
-    else
-        m_socket = std::move(socket);
 }
 
 template<typename AsyncClientFunc>
@@ -351,8 +349,6 @@ bool HttpClient::doRequest(AsyncClientFunc func)
             m_asyncHttpClient->setAuthType(*m_authType);
         if (m_proxyEndpoint)
             m_asyncHttpClient->setProxyVia(*m_proxyEndpoint);
-        if (m_socket)
-            m_asyncHttpClient->setSocket(std::move(m_socket));
 
         m_asyncHttpClient->setDisablePrecalculatedAuthorization(m_precalculatedAuthorizationDisabled);
         m_asyncHttpClient->setExpectOnlyMessageBodyWithoutHeaders(m_expectOnlyBody);

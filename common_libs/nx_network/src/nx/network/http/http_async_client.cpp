@@ -85,6 +85,12 @@ AsyncClient::AsyncClient():
     m_responseBuffer.reserve(RESPONSE_BUFFER_SIZE);
 }
 
+AsyncClient::AsyncClient(std::unique_ptr<AbstractStreamSocket> socket):
+    AsyncClient()
+{
+    m_userDefinedSocket = std::move(socket);
+}
+
 AsyncClient::~AsyncClient()
 {
 }
@@ -92,11 +98,6 @@ AsyncClient::~AsyncClient()
 const std::unique_ptr<AbstractStreamSocket>& AsyncClient::socket()
 {
     return m_socket;
-}
-
-void AsyncClient::setSocket(std::unique_ptr<AbstractStreamSocket> socket)
-{
-    m_userDefinedSocket = std::move(socket);
 }
 
 std::unique_ptr<AbstractStreamSocket> AsyncClient::takeSocket()

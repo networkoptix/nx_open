@@ -114,8 +114,7 @@ bool TimeSyncManager::loadTimeFromServer(const QnRoute& route)
     }
     auto maxRtt = commonModule()->globalSettings()->maxDifferenceBetweenSynchronizedAndLocalTime();
 
-    auto httpClient = std::make_unique<nx::network::http::HttpClient>();
-    httpClient->setSocket(std::move(socket));
+    auto httpClient = std::make_unique<nx::network::http::HttpClient>(std::move(socket));
     httpClient->setResponseReadTimeout(std::chrono::milliseconds(maxRtt));
     httpClient->addAdditionalHeader(Qn::SERVER_GUID_HEADER_NAME, route.id.toByteArray());
     auto server = commonModule()->resourcePool()->getResourceById<QnMediaServerResource>(route.id);
@@ -139,7 +138,8 @@ bool TimeSyncManager::loadTimeFromServer(const QnRoute& route)
     {
         rttTimer.restart();
         bool success = httpClient->doGet(url);
-        response = httpClient->fetchEntireMessageBody();
+        if (success)
+            response = httpClient->fetchEntireMessageBody();
         if (!success || !response)
         {
             NX_WARNING(this, lm("Can't read time from server %1. Error: %2")

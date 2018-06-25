@@ -49,6 +49,7 @@ public:
     static const int UNLIMITED_RECONNECT_TRIES = -1;
 
     AsyncHttpClient();
+    AsyncHttpClient(std::unique_ptr<AbstractStreamSocket> socket);
     virtual ~AsyncHttpClient();
 
     virtual void pleaseStop(nx::utils::MoveOnlyFunc<void()> completionHandler) override;
@@ -178,7 +179,6 @@ public:
     void setProxyUserAuthToken(const AuthToken& proxyUserToken);
     void setProxyUserCredentials(const Credentials& userCredentials);
     void setAuth(const AuthInfo& auth);
-    void setSocket(std::unique_ptr<AbstractStreamSocket> socket);
 
     void setProxyVia(const SocketAddress& proxyEndpoint);
 
@@ -234,6 +234,7 @@ public:
      * @return smart pointer to newly created instance.
      */
     static AsyncHttpClientPtr create();
+    static AsyncHttpClientPtr create(std::unique_ptr<AbstractStreamSocket> socket);
 
     static QString endpointWithProtocol(const nx::utils::Url &url);
 
@@ -264,7 +265,8 @@ signals:
      *   To read it, call AsyncHttpClient::fetchMessageBodyBuffer.
      */
     void done(nx::network::http::AsyncHttpClientPtr);
-
+private:
+    void initDelegate();
 private:
     AsyncClient m_delegate;
     nx::utils::MoveOnlyFunc<void(AsyncHttpClientPtr)> m_onDoneHandler;

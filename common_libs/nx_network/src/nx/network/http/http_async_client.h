@@ -90,6 +90,12 @@ public:
     static const int UNLIMITED_RECONNECT_TRIES = -1;
 
     AsyncClient();
+
+    /**
+     * Set already connected socket to force it for the very first request.
+     */
+    AsyncClient(std::unique_ptr<AbstractStreamSocket> socket);
+
     virtual ~AsyncClient();
 
     AsyncClient(const AsyncClient&) = delete;
@@ -258,11 +264,6 @@ public:
     void setProxyUserAuthToken(const AuthToken& proxyUserToken);
     void setProxyUserCredentials(const Credentials& userCredentials);
     void setAuth(const AuthInfo& auth);
-
-    /**
-     * Set already connected socket to force it for the very first request.
-     */
-    void setSocket(std::unique_ptr<AbstractStreamSocket> socket);
 
     void setProxyVia(const SocketAddress& proxyEndpoint);
 
