@@ -1,10 +1,11 @@
 #include "filename_panel.h"
 #include "ui_filename_panel.h"
 
+#include <QtWidgets/QFileDialog>
+
 #include <client/client_settings.h>
 
 #include <nx/client/desktop/common/utils/aligner.h>
-#include <ui/dialogs/common/file_dialog.h>
 #include <ui/workaround/widgets_signals_workaround.h>
 #include <nx/utils/app_info.h>
 #include <nx/utils/log/log.h>
@@ -60,7 +61,7 @@ FilenamePanel::FilenamePanel(QWidget* parent):
     connect(ui->browsePushButton, &QPushButton::clicked, this,
         [this]
         {
-            const auto folder = QnFileDialog::getExistingDirectory(this,
+            const auto folder = QFileDialog::getExistingDirectory(this,
                 tr("Select folder..."),
                 d->filename.path,
                 QFileDialog::ShowDirsOnly);

@@ -16,6 +16,12 @@ public:
     static State loadLayout(State state, const QnLayoutResourcePtr& layout);
 
     static State setLocked(State state, bool value);
+    static State setLogicalId(State state, int value);
+    static State resetLogicalId(State state);
+    static State generateLogicalId(State state);
+    static State setFixedSizeEnabled(State state, bool value);
+    static State setFixedSizeWidth(State state, int value);
+    static State setFixedSizeHeight(State state, int value);
 
     static State setBackgroundImageError(State state, const QString& errorText);
     static State clearBackgroundImage(State state);

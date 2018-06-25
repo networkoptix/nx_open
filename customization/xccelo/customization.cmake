@@ -64,6 +64,7 @@ set(additionalTranslations
     fr_FR
     ru_RU
     es_ES
+    it_IT
     ja_JP
     ko_KR
     tr_TR

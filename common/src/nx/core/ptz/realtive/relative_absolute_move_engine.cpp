@@ -25,10 +25,17 @@ bool RelativeAbsoluteMoveEngine::relativeMove(
     if (position == std::nullopt)
         return false;
 
-    const auto delta = direction * ptz::Vector::rangeVector(*limits, LimitsType::position);
-    const auto positionToMove = (*position + delta)
-        .restricted(*limits, LimitsType::position);
+    const auto range = ptz::Vector::rangeVector(*limits, LimitsType::position);
+    const auto delta = direction * range;
 
+    ptz::Vector positionToMove = *position + delta;
+    while (positionToMove.pan < limits->minPan)
+        positionToMove.pan += range.pan;
+
+    while (positionToMove.pan > limits->maxPan)
+        positionToMove.pan -= range.pan;
+
+    positionToMove = positionToMove.restricted(*limits, LimitsType::position);
     return m_controller->absoluteMove(space, positionToMove, 1.0, options);
 }
 

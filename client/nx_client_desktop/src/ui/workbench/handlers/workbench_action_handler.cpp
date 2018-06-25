@@ -98,7 +98,6 @@
 #include <ui/dialogs/failover_priority_dialog.h>
 #include <ui/dialogs/backup_cameras_dialog.h>
 #include <ui/dialogs/common/custom_file_dialog.h>
-#include <ui/dialogs/common/file_dialog.h>
 #include <ui/dialogs/camera_diagnostics_dialog.h>
 #include <ui/dialogs/common/message_box.h>
 #include <ui/dialogs/notification_sound_manager_dialog.h>
@@ -1358,7 +1357,7 @@ void ActionHandler::at_openFileAction_triggered() {
     filters << tr("Pictures (*.jpg *.png *.gif *.bmp *.tiff)");
     filters << tr("All files (*.*)");
 
-    QStringList files = QnFileDialog::getOpenFileNames(mainWindowWidget(),
+    QStringList files = QFileDialog::getOpenFileNames(mainWindowWidget(),
         tr("Open File"),
         QString(),
         filters.join(lit(";;")),
@@ -1370,7 +1369,7 @@ void ActionHandler::at_openFileAction_triggered() {
 }
 
 void ActionHandler::at_openFolderAction_triggered() {
-    QString dirName = QnFileDialog::getExistingDirectory(mainWindowWidget(),
+    QString dirName = QFileDialog::getExistingDirectory(mainWindowWidget(),
         tr("Select folder..."),
         QString(),
         QnCustomFileDialog::directoryDialogOptions());

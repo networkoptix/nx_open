@@ -7,7 +7,6 @@
 #include <core/resource/layout_resource.h>
 
 #include <ui/dialogs/common/custom_file_dialog.h>
-#include <ui/dialogs/common/file_dialog.h>
 
 #include "redux/layout_settings_dialog_state.h"
 #include "redux/layout_settings_dialog_store.h"
@@ -38,6 +37,8 @@ struct LayoutSettingsDialog::Private
         const auto& state = store->state();
 
         layout->setLocked(state.locked);
+        layout->setLogicalId(state.logicalId);
+        layout->setFixedSize(state.fixedSizeEnabled ? state.fixedSize : QSize());
 
         const auto& background = state.background;
         layout->setBackgroundImageFilename(background.filename);

@@ -5,6 +5,7 @@
 #include <QtWidgets/QApplication>
 #include <QtWidgets/QDesktopWidget>
 
+#include <core/resource_management/resource_pool.h>
 #include <core/resource/layout_resource.h>
 
 #include <ui/common/image_processing.h>
@@ -15,6 +16,7 @@
 #include <nx/utils/log/assert.h>
 #include <nx/utils/std/optional.h>
 #include <client/client_settings.h>
+#include <set>
 
 namespace nx {
 namespace client {
@@ -138,6 +140,32 @@ QnAspectRatio screenAspectRatio()
     return QnAspectRatio(screen.size());
 }
 
+int findFreeLogicalId(const QnLayoutResourcePtr& layout)
+{
+    if (!layout->resourcePool())
+        return 1;
+
+    auto layouts = layout->resourcePool()->getResources<QnLayoutResource>();
+    std::set<int> usedValues;
+    for (const auto& other: layouts)
+    {
+        if (other == layout)
+            continue;
+        const auto id = other->logicalId();
+        if (id > 0)
+            usedValues.insert(id);
+    }
+
+    int previousValue = 0;
+    for (auto value: usedValues)
+    {
+        if (value > previousValue + 1)
+            break;
+        previousValue = value;
+    }
+    return previousValue + 1;
+}
+
 } // namespace
 
 //using Camera = QnVirtualCameraResourcePtr;
@@ -146,7 +174,12 @@ QnAspectRatio screenAspectRatio()
 State LayoutSettingsDialogStateReducer::loadLayout(State state, const QnLayoutResourcePtr& layout)
 {
     state.locked = layout->locked();
+    state.logicalId = layout->logicalId();
+    state.reservedLogicalId = findFreeLogicalId(layout);
     state.isLocalFile = layout->isFile();
+
+    state.fixedSize = layout->fixedSize();
+    state.fixedSizeEnabled = !state.fixedSize.isEmpty();
 
     if (layout->hasCellAspectRatio())
     {
@@ -172,6 +205,42 @@ State LayoutSettingsDialogStateReducer::loadLayout(State state, const QnLayoutRe
 State LayoutSettingsDialogStateReducer::setLocked(State state, bool value)
 {
     state.locked = value;
+    return state;
+}
+
+State LayoutSettingsDialogStateReducer::setLogicalId(State state, int value)
+{
+    state.logicalId = value;
+    return state;
+}
+
+State LayoutSettingsDialogStateReducer::resetLogicalId(State state)
+{
+    state.logicalId = 0;
+    return state;
+}
+
+State LayoutSettingsDialogStateReducer::generateLogicalId(State state)
+{
+    state.logicalId = state.reservedLogicalId;
+    return state;
+}
+
+State LayoutSettingsDialogStateReducer::setFixedSizeEnabled(State state, bool value)
+{
+    state.fixedSizeEnabled = value;
+    return state;
+}
+
+State LayoutSettingsDialogStateReducer::setFixedSizeWidth(State state, int value)
+{
+    state.fixedSize.setWidth(value);
+    return state;
+}
+
+State LayoutSettingsDialogStateReducer::setFixedSizeHeight(State state, int value)
+{
+    state.fixedSize.setHeight(value);
     return state;
 }
 
