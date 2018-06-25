@@ -325,7 +325,7 @@ QnThirdPartyResourcePtr ThirdPartyResourceSearcher::createResourceFromCameraInfo
     resource->setVendor( vendor );
 
     resource->setGroupId(QString::fromUtf8(cameraInfo.groupId));
-    resource->setGroupName(QString::fromUtf8(cameraInfo.groupName));
+    resource->setDefaultGroupName(QString::fromUtf8(cameraInfo.groupName));
 
     if( strlen(cameraInfo.auxiliaryData) > 0 )
         resource->setProperty( QnThirdPartyResource::AUX_DATA_PARAM_NAME, QString::fromLatin1(cameraInfo.auxiliaryData) );

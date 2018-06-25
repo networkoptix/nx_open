@@ -173,7 +173,7 @@ public:
     //!Set group name (the one is show to the user in client)
     /*!
         This name is set by user.
-        \a setGroupName name is generally set automatically (e.g., by server)
+        \a setDefaultGroupName name is generally set automatically (e.g., by server)
     */
     void setUserDefinedGroupName( const QString& value );
     virtual QString getGroupId() const;
