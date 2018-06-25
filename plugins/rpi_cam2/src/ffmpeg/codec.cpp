@@ -1,8 +1,6 @@
 #include "codec.h"
 
-#include <nx/utils/log/log.h>
-
-#include "ffmpeg/utils.h"
+#include "utils.h"
 
 namespace nx {
 namespace webcam_plugin {
