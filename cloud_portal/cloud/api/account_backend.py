@@ -37,7 +37,7 @@ class AccountBackend(ModelBackend):
             user = Account.get(username, password)  # first - check cloud_db
         except APINotAuthorisedException as exception:
             if exception.error_code == ErrorCodes.account_blocked:
-                request.session['exception'] = exception
+                request.session['account_blocked'] = True
             return None  # not authorised - return None which tells django that auth failed and it will log it
 
         if user and 'email' in user:

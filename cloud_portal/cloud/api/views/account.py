@@ -54,10 +54,10 @@ def login(request):
         user = django.contrib.auth.authenticate(request=request, username=email, password=password)
 
     if user is None:
-        exception = request.session['exception'] if 'exception' in request.session else None
-        if exception:
-            request.session.pop('exception', None)
-            raise exception
+        account_blocked = request.session['account_blocked'] if 'account_blocked' in request.session else None
+        if account_blocked:
+            request.session.pop('account_blocked', None)
+            raise APINotAuthorisedException("Account is blocked", ErrorCodes.account_blocked)
         # try to find user in the DB
         if not AccountBackend.is_email_in_portal(email):
             raise APINotFoundException("User not in cloud portal", )  # user not found here
