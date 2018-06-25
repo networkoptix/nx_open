@@ -118,7 +118,7 @@ void QnPlVmax480ResourceSearcher::processPacket(const QHostAddress& discoveryAdd
         resource->setUrl(QString(QLatin1String("http://%1:%2?channel=%3&http_port=%4")).arg(deviceEndpoint.address.toString()).arg(apiPort).arg(i+1).arg(httpPort));
         resource->setPhysicalId(QString(QLatin1String("%1_%2")).arg(resource->getMAC().toString()).arg(i+1));
         resource->setDefaultAuth(auth);
-        resource->setGroupName(groupName);
+        resource->setDefaultGroupName(groupName);
         QString groupId = QString(QLatin1String("VMAX480_uuid_%1:%2")).arg(deviceEndpoint.address.toString()).arg(apiPort);
         resource->setGroupId(groupId);
 
@@ -383,7 +383,7 @@ QList<QnResourcePtr> QnPlVmax480ResourceSearcher::checkHostAddr(const QUrl& url,
         resource->setPhysicalId(QString(QLatin1String("VMAX_DVR_%1_%2")).arg(url.host()).arg(i+1));
         resource->setDefaultAuth(auth);
         resource->setGroupId(groupId);
-        resource->setGroupName(groupName);
+        resource->setDefaultGroupName(groupName);
 
         result << resource;
 

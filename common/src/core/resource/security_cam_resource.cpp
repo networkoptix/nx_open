@@ -844,7 +844,7 @@ QString QnSecurityCamResource::getUserDefinedName() const
     return QnSecurityCamResource::getName();
 }
 
-QString QnSecurityCamResource::getGroupName() const
+QString QnSecurityCamResource::getUserDefinedGroupName() const
 {
     if (!getId().isNull() && commonModule())
     {
@@ -863,7 +863,7 @@ QString QnSecurityCamResource::getDefaultGroupName() const
     SAFE(return m_groupName);
 }
 
-void QnSecurityCamResource::setGroupName(const QString& value)
+void QnSecurityCamResource::setDefaultGroupName(const QString& value)
 {
     {
         QnMutexLocker locker( &m_mutex );
@@ -1334,8 +1334,8 @@ bool QnSecurityCamResource::mergeResourcesIfNeeded(const QnNetworkResourcePtr &s
         &QnSecurityCamResource::setGroupId,
         isStringEmpty);
     mergeValue(
-        &QnSecurityCamResource::getGroupName,
-        &QnSecurityCamResource::setGroupName,
+        &QnSecurityCamResource::getDefaultGroupName,
+        &QnSecurityCamResource::setDefaultGroupName,
         isStringEmpty);
     mergeValue(
         &QnSecurityCamResource::getModel,

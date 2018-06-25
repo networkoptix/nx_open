@@ -165,11 +165,11 @@ public:
     //!Returns user-defined camera name (if not empty), default name otherwise
     QString getUserDefinedName() const;
 
-    //!Returns user-defined group name (if not empty) or server-defined group name
-    virtual QString getGroupName() const;
-    //!Returns server-defined group name
+    //!Returns user-defined group name (if not empty) or default group name
+    virtual QString getUserDefinedGroupName() const;
+    //!Returns default group name
     QString getDefaultGroupName() const;
-    virtual void setGroupName(const QString& value);
+    virtual void setDefaultGroupName(const QString& value);
     //!Set group name (the one is show to the user in client)
     /*!
         This name is set by user.

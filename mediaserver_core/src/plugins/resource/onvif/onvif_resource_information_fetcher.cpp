@@ -312,11 +312,11 @@ void OnvifResourceInformationFetcher::findResources(
         }
         else {
             groupId = onvifRes->getGroupId();
-            groupName = onvifRes->getGroupName();
+            groupName = onvifRes->getUserDefinedGroupName();
         }
 
         res->setGroupId(groupId);
-        res->setGroupName(groupName);
+        res->setDefaultGroupName(groupName);
 
         for (int i = 1; i < onvifRes->getMaxChannels(); ++i)
         {
@@ -328,7 +328,7 @@ void OnvifResourceInformationFetcher::findResources(
                 subres->setPhysicalId(info.uniqId + suffix.replace(QLatin1String("?"), QLatin1String("_")));
                 subres->setName(res->getName() + QString(QLatin1String("-channel %1")).arg(i+1));
                 subres->setGroupId(groupId);
-                subres->setGroupName(groupName);
+                subres->setDefaultGroupName(groupName);
                 result << subres;
             }
         }

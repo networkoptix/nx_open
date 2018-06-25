@@ -165,7 +165,7 @@ void fromApiToResource(const ApiCameraData& src, QnVirtualCameraResourcePtr& dst
     dst->setManuallyAdded(src.manuallyAdded);
     dst->setModel(src.model);
     dst->setGroupId(src.groupId);
-    dst->setGroupName(src.groupName);
+    dst->setDefaultGroupName(src.groupName);
     dst->setStatusFlags(src.statusFlags);
 
     dst->setVendor(src.vendor);
