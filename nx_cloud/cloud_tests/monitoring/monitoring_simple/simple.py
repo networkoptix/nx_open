@@ -14,6 +14,7 @@ import docker
 from requests.auth import HTTPDigestAuth
 
 CLOUD_CONNECT_TEST_UTIL_VERSION = '18.1.0.20026'
+RETRY_TIMEOUT = 5                                   # seconds
 
 log = logging.getLogger('simple_cloud_test')
 
@@ -64,7 +65,7 @@ def testmethod(delay=0, host=None, continue_if_fails=False, metric=None, tries=1
                         traceback.print_exc(file=io)
                         log.error(io.getvalue())
 
-                        time.sleep(1)
+                        time.sleep(RETRY_TIMEOUT)
                         continue
 
                 n_try += 1
@@ -381,7 +382,7 @@ class CloudSession(object):
         data = r.json()
         assert 'id' in data, 'No ID'
 
-    @testmethod(delay=20, metric='view_and_settings_failure', tries=3)
+    @testmethod(delay=30, metric='view_and_settings_failure', tries=3)
     def check_system_users(self):
         headers = {
             'referer': '{}/systems/{}'.format(self.base_url, self.system_id),
