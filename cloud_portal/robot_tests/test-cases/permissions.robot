@@ -208,6 +208,7 @@ Delete user works
 Share with registered user - sends him notification
     [tags]    email
     Log In    ${EMAIL NOPERM}    ${password}
+    Validate Log In
     Log Out
     Validate Log Out
     Log in to Auto Tests System    ${email}
