@@ -3282,7 +3282,7 @@ ApiObjectInfoList QnDbManager::getObjectsNoLock(const ApiObjectType& objectType)
     return result;
 }
 
-ErrorCode QnDbManager::saveMiscParam(const ApiMiscData &params)
+ErrorCode QnDbManager::saveMiscParam(const MiscData& params)
 {
     QSqlQuery insQuery(m_sdb);
     insQuery.prepare("INSERT OR REPLACE INTO misc_data (key, data) values (?,?)");
@@ -3436,7 +3436,7 @@ void QnDbManager::addResourceTypesFromXML(ResourceTypeDataList& data)
         loadResourceTypeXML(fileInfo.absoluteFilePath(), data);
 }
 
-ErrorCode QnDbManager::doQueryNoLock(const QByteArray &name, ApiMiscData& miscData)
+ErrorCode QnDbManager::doQueryNoLock(const QByteArray& name, MiscData& miscData)
 {
     QSqlQuery query(m_sdb);
     query.setForwardOnly(true);
@@ -4560,7 +4560,7 @@ ErrorCode QnDbManager::removeLicense(const LicenseData& license, QSqlDatabase& d
     }
 }
 
-ErrorCode QnDbManager::executeTransactionInternal(const QnTransaction<ApiMiscData>& tran)
+ErrorCode QnDbManager::executeTransactionInternal(const QnTransaction<MiscData>& tran)
 {
     return saveMiscParam(tran.params);
 }
@@ -5129,7 +5129,7 @@ bool QnDbManager::rebuildUserAccessRightsTransactions()
 bool QnDbManager::migrateTimeManagerData()
 {
     const QByteArray kLegacyUsedTimePriorityKey = "used_time_priority_key";
-    ApiMiscData syncTimeKeyData;
+    MiscData syncTimeKeyData;
     if (doQueryNoLock(kLegacyUsedTimePriorityKey, syncTimeKeyData) != ErrorCode::ok)
         return false;
 

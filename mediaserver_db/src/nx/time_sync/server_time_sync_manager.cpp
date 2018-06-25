@@ -14,6 +14,7 @@
 #include <nx/network/time/time_protocol_client.h>
 #include <nx/utils/elapsed_timer.h>
 #include <nx/utils/time.h>
+#include <nx/vms/api/data/misc_data.h>
 
 namespace nx {
 namespace time_sync {
@@ -33,7 +34,7 @@ ServerTimeSyncManager::ServerTimeSyncManager(
         {
             const auto systemTimeDeltaMs = syncTimeMs - m_systemClock->millisSinceEpoch().count();
             auto connection = this->commonModule()->ec2Connection();
-            ec2::ApiMiscData deltaData(
+            vms::api::MiscData deltaData(
                 kTimeDeltaParamName,
                 QByteArray::number(systemTimeDeltaMs));
 
@@ -247,7 +248,7 @@ void ServerTimeSyncManager::updateTime()
 
 void ServerTimeSyncManager::init(const ec2::AbstractECConnectionPtr& connection)
 {
-    ec2::ApiMiscData deltaData;
+    vms::api::MiscData deltaData;
     auto miscManager = connection->getMiscManager(Qn::kSystemAccess);
     auto dbResult = miscManager->getMiscParamSync(kTimeDeltaParamName, &deltaData);
     if (dbResult != ec2::ErrorCode::ok)

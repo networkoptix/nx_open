@@ -19,6 +19,7 @@
 #include "data/license_overflow_data.h"
 #include "data/lock_data.h"
 #include "data/media_server_data.h"
+#include "data/misc_data.h"
 #include "data/p2p_statistics_data.h"
 #include "data/peer_data.h"
 #include "data/peer_alive_data.h"
@@ -94,6 +95,8 @@ void Metatypes::initialize()
     qRegisterMetaType<MediaServerDataExList>();
     qRegisterMetaType<MediaServerUserAttributesData>();
     qRegisterMetaType<MediaServerUserAttributesDataList>();
+    qRegisterMetaType<MiscData>();
+    qRegisterMetaType<MiscDataList>();
     qRegisterMetaType<P2pStatisticsData>();
     qRegisterMetaType<PeerData>();
     qRegisterMetaType<PeerDataEx>();

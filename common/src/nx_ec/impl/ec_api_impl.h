@@ -174,7 +174,7 @@ namespace ec2
             void onGetKvPairsDone               (int reqID, const ec2::ErrorCode, const nx::vms::api::ResourceParamWithRefDataList&);
             void onGetStatusListDone            (int reqID, const ec2::ErrorCode, const nx::vms::api::ResourceStatusDataList&);
             void onSaveKvPairsDone              (int reqID, const ec2::ErrorCode, const nx::vms::api::ResourceParamWithRefDataList&);
-            void onGetMiscParamDone             (int reqID, const ec2::ErrorCode, const ec2::ApiMiscData&);
+            void onGetMiscParamDone             (int reqID, const ec2::ErrorCode, const nx::vms::api::MiscData&);
             void onSaveBusinessRuleDone         (int reqID, const ec2::ErrorCode, const nx::vms::event::RulePtr&);
             void onGetServersDone               (int reqID, const ec2::ErrorCode, const nx::vms::api::MediaServerDataList&);
             void onGetServerUserAttributesDone  (int reqID, const ec2::ErrorCode, const nx::vms::api::MediaServerUserAttributesDataList&);
@@ -223,7 +223,7 @@ namespace ec2
         DEFINE_TWO_ARG_HANDLER(GetKvPairs,                  ec2::ErrorCode, nx::vms::api::ResourceParamWithRefDataList)
         DEFINE_TWO_ARG_HANDLER(GetStatusList,               ec2::ErrorCode, nx::vms::api::ResourceStatusDataList)
         DEFINE_TWO_ARG_HANDLER(SaveKvPairs,                 ec2::ErrorCode, nx::vms::api::ResourceParamWithRefDataList)
-        DEFINE_TWO_ARG_HANDLER(GetMiscParam,                ec2::ErrorCode, ec2::ApiMiscData)
+        DEFINE_TWO_ARG_HANDLER(GetMiscParam,                ec2::ErrorCode, nx::vms::api::MiscData)
         DEFINE_TWO_ARG_HANDLER(GetSystemMergeHistory,       ec2::ErrorCode, nx::vms::api::SystemMergeHistoryRecordList)
 
         //////////////////////////////////////////////////////////

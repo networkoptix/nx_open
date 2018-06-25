@@ -11,7 +11,8 @@ void QnMiscNotificationManager::triggerNotification(
         transaction.params.systemId, transaction.params.sysIdTime, transaction.params.tranLogTime);
 }
 
-void QnMiscNotificationManager::triggerNotification(const QnTransaction<ApiMiscData>& transaction)
+void QnMiscNotificationManager::triggerNotification(
+    const QnTransaction<nx::vms::api::MiscData>& transaction)
 {
     emit miscDataChanged(transaction.params.name, transaction.params.value);
 }

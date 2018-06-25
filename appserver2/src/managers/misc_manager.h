@@ -12,16 +12,22 @@ template<class QueryProcessorType>
 class QnMiscManager: public AbstractMiscManager
 {
 public:
-    QnMiscManager(QueryProcessorType * const queryProcessor, const Qn::UserAccessData &userAccessData);
-
+    QnMiscManager(QueryProcessorType* const queryProcessor,
+        const Qn::UserAccessData& userAccessData);
     virtual ~QnMiscManager();
-    virtual int markLicenseOverflow(bool value, qint64 time, impl::SimpleHandlerPtr handler) override;
-    virtual int cleanupDatabase(bool cleanupDbObjects, bool cleanupTransactionLog, impl::SimpleHandlerPtr handler) override;
 
-    virtual int saveMiscParam(const ec2::ApiMiscData& params, impl::SimpleHandlerPtr handler) override;
-    virtual int getMiscParam(const QByteArray& paramName, impl::GetMiscParamHandlerPtr handler) override;
+    virtual int markLicenseOverflow(
+        bool value, qint64 time, impl::SimpleHandlerPtr handler) override;
+    virtual int cleanupDatabase(bool cleanupDbObjects, bool cleanupTransactionLog,
+        impl::SimpleHandlerPtr handler) override;
 
-    virtual int saveSystemMergeHistoryRecord(const nx::vms::api::SystemMergeHistoryRecord& param, impl::SimpleHandlerPtr handler) override;
+    virtual int saveMiscParam(
+        const nx::vms::api::MiscData& params, impl::SimpleHandlerPtr handler) override;
+    virtual int getMiscParam(
+        const QByteArray& paramName, impl::GetMiscParamHandlerPtr handler) override;
+
+    virtual int saveSystemMergeHistoryRecord(const nx::vms::api::SystemMergeHistoryRecord& param,
+        impl::SimpleHandlerPtr handler) override;
     virtual int getSystemMergeHistory(impl::GetSystemMergeHistoryHandlerPtr handler) override;
 
     virtual int saveRuntimeInfo(const nx::vms::api::RuntimeData& data,
@@ -120,7 +126,8 @@ int QnMiscManager<QueryProcessorType>::cleanupDatabase(
 }
 
 template<class T>
-int QnMiscManager<T>::saveMiscParam(const ec2::ApiMiscData& param, impl::SimpleHandlerPtr handler)
+int QnMiscManager<T>::saveMiscParam(
+    const nx::vms::api::MiscData& param, impl::SimpleHandlerPtr handler)
 {
     const int reqID = generateRequestID();
     m_queryProcessor->getAccess(m_userAccessData).processUpdateAsync(
@@ -147,19 +154,23 @@ int QnMiscManager<T>::saveRuntimeInfo(const nx::vms::api::RuntimeData& data,
 }
 
 template<class T>
-int QnMiscManager<T>::getMiscParam(const QByteArray& paramName, impl::GetMiscParamHandlerPtr handler)
+int QnMiscManager<T>::getMiscParam(
+    const QByteArray& paramName, impl::GetMiscParamHandlerPtr handler)
 {
     const int reqID = generateRequestID();
+    const auto queryDoneHandler =
+        [reqID, handler, paramName](ErrorCode errorCode, const nx::vms::api::MiscData& param)
+        {
+            nx::vms::api::MiscData outData;
+            if (errorCode == ErrorCode::ok)
+                outData = param;
+            handler->done(reqID, errorCode, outData);
+        };
 
-    auto queryDoneHandler = [reqID, handler, paramName](ErrorCode errorCode, const ApiMiscData& param)
-    {
-        ApiMiscData outData;
-        if (errorCode == ErrorCode::ok)
-            outData = param;
-        handler->done(reqID, errorCode, outData);
-    };
-    m_queryProcessor->getAccess(m_userAccessData).template processQueryAsync<QByteArray, ApiMiscData, decltype(queryDoneHandler)>
+    m_queryProcessor->getAccess(m_userAccessData).template processQueryAsync<
+            QByteArray, nx::vms::api::MiscData, decltype(queryDoneHandler)>
         (ApiCommand::getMiscParam, paramName, queryDoneHandler);
+
     return reqID;
 }
 

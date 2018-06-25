@@ -8,13 +8,10 @@ class QString;
 
 namespace ec2 {
 
-struct ApiConnectionData;
 struct ApiTransactionData;
 struct ApiTranLogFilter;
 struct ApiDiscoveredServerData;
-struct ApiMiscData;
 
-typedef std::vector<ApiMiscData> ApiMiscDataList;
 typedef std::vector<ApiTransactionData> ApiTransactionDataList;
 typedef std::vector<ApiDiscoveredServerData> ApiDiscoveredServerDataList;
 
@@ -29,9 +26,7 @@ struct ParentId
 };
 
 #define QN_EC2_API_DATA_TYPES \
-    (ApiConnectionData)\
-    (ApiMiscData)\
-    (ApiDiscoveredServerData)\
+    (ApiDiscoveredServerData)
 
 QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
     QN_EC2_API_DATA_TYPES,

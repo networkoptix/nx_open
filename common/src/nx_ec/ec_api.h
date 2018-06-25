@@ -25,12 +25,12 @@
 #include <nx/vms/api/data/camera_history_data.h>
 #include <nx/vms/api/data/reverse_connection_data.h>
 #include <nx/vms/api/data/client_info_data.h>
+#include <nx/vms/api/data/misc_data.h>
 #include <nx/vms/api/data/camera_attributes_data.h>
 #include <nx/vms/api/data/access_rights_data.h>
 #include <nx/vms/api/data/time_data.h>
 #include <nx/vms/api/data/media_server_data.h>
 #include <nx/vms/api/data/user_role_data.h>
-#include <nx_ec/data/api_misc_data.h>
 #include <nx/vms/api/data/system_merge_history_record.h>
 #include "nx_ec/managers/abstract_server_manager.h"
 #include "nx_ec/managers/abstract_camera_manager.h"
@@ -775,7 +775,7 @@ protected:
 
 class AbstractMiscNotificationManager: public QObject
 {
-Q_OBJECT
+    Q_OBJECT
 public:
 signals:
     void systemIdChangeRequested(
@@ -841,22 +841,25 @@ public:
 
     ErrorCode markLicenseOverflowSync(bool value, qint64 time)
     {
-        int (AbstractMiscManager::*fn)(bool, qint64, impl::SimpleHandlerPtr) = &AbstractMiscManager
-            ::markLicenseOverflow;
+        int (AbstractMiscManager::*fn)(bool, qint64, impl::SimpleHandlerPtr) =
+            &AbstractMiscManager::markLicenseOverflow;
+
         return impl::doSyncCall<impl::SimpleHandler>(
             std::bind(fn, this, value, time, std::placeholders::_1));
     }
 
-    ErrorCode saveMiscParamSync(const ec2::ApiMiscData& param)
+    ErrorCode saveMiscParamSync(const nx::vms::api::MiscData& param)
     {
-        int (AbstractMiscManager::*fn)(const ec2::ApiMiscData&, impl::SimpleHandlerPtr) = &
-            AbstractMiscManager::saveMiscParam;
+        int (AbstractMiscManager::*fn)(const nx::vms::api::MiscData&, impl::SimpleHandlerPtr) =
+            &AbstractMiscManager::saveMiscParam;
+
         return impl::doSyncCall<impl::SimpleHandler>(
             std::bind(fn, this, param, std::placeholders::_1));
     }
 
     template<class TargetType, class HandlerType>
-    int saveMiscParam(const ApiMiscData& data, TargetType* target, HandlerType handler)
+    int saveMiscParam(
+        const nx::vms::api::MiscData& data, TargetType* target, HandlerType handler)
     {
         return saveMiscParam(
             data,
@@ -891,7 +894,8 @@ public:
                     handler)));
     }
 
-    ErrorCode getMiscParamSync(const QByteArray& paramName, ApiMiscData* const outData)
+    ErrorCode getMiscParamSync(
+        const QByteArray& paramName, nx::vms::api::MiscData* const outData)
     {
         return impl::doSyncCall<impl::GetMiscParamHandler>(
             [=](const impl::GetMiscParamHandlerPtr& handler)
@@ -941,7 +945,8 @@ protected:
         bool cleanupDbObjects,
         bool cleanupTransactionLog,
         impl::SimpleHandlerPtr handler) = 0;
-    virtual int saveMiscParam(const ec2::ApiMiscData& param, impl::SimpleHandlerPtr handler) = 0;
+    virtual int saveMiscParam(
+        const nx::vms::api::MiscData& param, impl::SimpleHandlerPtr handler) = 0;
     virtual int saveRuntimeInfo(
         const nx::vms::api::RuntimeData& data,
         impl::SimpleHandlerPtr handler) = 0;

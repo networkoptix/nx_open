@@ -1327,11 +1327,11 @@ APPLY(10000, getTransactionLog, ApiTransactionDataList, \
                        FilterListByAccess<AllowForAllAccess>(), /* Filter read func */ \
                        ReadListAccessOut<AllowForAllAccess>(), /* Check remote peer rights for outgoing transaction */ \
                        RegularTransactionType()) /* regular transaction type */ \
-APPLY(10100, saveMiscParam, ApiMiscData, \
+APPLY(10100, saveMiscParam, nx::vms::api::MiscData, \
                        true, /* persistent*/ \
                        false,  /* system*/ \
                        InvalidGetHashHelper(), \
-                       [] (const QnTransaction<ApiMiscData> &tran, const NotificationParams &notificationParams) \
+                       [] (const QnTransaction<nx::vms::api::MiscData>& tran, const NotificationParams& notificationParams) \
                         { return notificationParams.miscNotificationManager->triggerNotification(tran); }, \
                        AdminOnlyAccess(), /* save permission checker */ \
                        InvalidAccess(), /* read permission checker */ \
@@ -1339,7 +1339,7 @@ APPLY(10100, saveMiscParam, ApiMiscData, \
                        InvalidFilterFunc(), /* Filter read func */ \
                        AllowForAllAccessOut(), /* Check remote peer rights for outgoing transaction */ \
                        LocalTransactionType()) /* local transaction type */ \
-APPLY(10101, getMiscParam, ApiMiscData, \
+APPLY(10101, getMiscParam, nx::vms::api::MiscData, \
                        true, /* persistent*/ \
                        false,  /* system*/ \
                        InvalidGetHashHelper(), \

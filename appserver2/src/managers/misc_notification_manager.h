@@ -12,7 +12,7 @@ class QnMiscNotificationManager: public AbstractMiscNotificationManager
 public:
     void triggerNotification(const QnTransaction<nx::vms::api::SystemIdData>& transaction,
         NotificationSource source);
-    void triggerNotification(const QnTransaction<ApiMiscData>& transaction);
+    void triggerNotification(const QnTransaction<nx::vms::api::MiscData>& transaction);
 };
 
 using QnMiscNotificationManagerPtr = std::shared_ptr<QnMiscNotificationManager>;

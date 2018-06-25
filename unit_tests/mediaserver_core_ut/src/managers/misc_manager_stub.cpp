@@ -58,7 +58,7 @@ int MiscManagerStub::getSystemMergeHistory(impl::GetSystemMergeHistoryHandlerPtr
 }
 
 int MiscManagerStub::saveMiscParam(
-    const ec2::ApiMiscData& param,
+    const nx::vms::api::MiscData& param,
     impl::SimpleHandlerPtr handler)
 {
     const int reqId = ++m_reqIdSequence;
@@ -93,9 +93,9 @@ int MiscManagerStub::getMiscParam(
             QByteArray value;
             auto it = m_miscParams.find(paramName);
             if (it != m_miscParams.end())
-                handler->done(reqId, ErrorCode::ok, ApiMiscData(paramName, it->second));
+                handler->done(reqId, ErrorCode::ok, {paramName, it->second});
             else
-                handler->done(reqId, ErrorCode::ioError, ApiMiscData());
+                handler->done(reqId, ErrorCode::ioError, {});
         });
 
     return reqId;
@@ -110,7 +110,7 @@ WorkAroundMiscDataSaverStub::WorkAroundMiscDataSaverStub(
 {
 }
 
-ErrorCode WorkAroundMiscDataSaverStub::saveSync(const ApiMiscData& data)
+ErrorCode WorkAroundMiscDataSaverStub::saveSync(const nx::vms::api::MiscData& data)
 {
     nx::utils::promise<ErrorCode> done;
     m_miscManager->AbstractMiscManager::saveMiscParam(

@@ -11,7 +11,6 @@
 #include <database/api/db_resource_api.h>
 #include <nx_ec/ec_api.h>
 #include <nx_ec/data/api_fwd.h>
-#include <nx_ec/data/api_misc_data.h>
 #include <transaction/transaction.h>
 #include <transaction/transaction_log.h>
 #include <utils/db/db_helper.h>
@@ -19,6 +18,7 @@
 #include <nx/fusion/serialization/sql.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/singleton.h>
+#include <nx/vms/api/data_fwd.h>
 #include <nx/vms/api/data/runtime_data.h>
 #include <nx/vms/api/data/lock_data.h>
 #include <nx/vms/event/event_fwd.h>
@@ -242,7 +242,7 @@ namespace detail
             return doQueryNoLock(nx::vms::api::StoredFilePath(), data);
         }
 
-        ErrorCode doQueryNoLock(const QByteArray &paramName, ApiMiscData& miscData);
+        ErrorCode doQueryNoLock(const QByteArray &paramName, nx::vms::api::MiscData& miscData);
         ErrorCode doQueryNoLock(const QByteArray& /*dummy*/,
             nx::vms::api::SystemMergeHistoryRecordList& systemMergeHistory);
         //getResourceTypes
@@ -407,7 +407,7 @@ namespace detail
             const QnTransaction<nx::vms::api::DatabaseDumpData>& tran);
         ErrorCode executeTransactionInternal(
             const QnTransaction<nx::vms::api::ClientInfoData>& tran);
-        ErrorCode executeTransactionInternal(const QnTransaction<ApiMiscData>& tran);
+        ErrorCode executeTransactionInternal(const QnTransaction<nx::vms::api::MiscData>& tran);
         ErrorCode executeTransactionInternal(
             const QnTransaction<nx::vms::api::SystemMergeHistoryRecord>& tran);
 
@@ -583,7 +583,7 @@ namespace detail
         ErrorCode deleteTableRecord(const QnUuid& id, const QString& tableName, const QString& fieldName);
         ErrorCode deleteTableRecord(const qint32& internalId, const QString& tableName, const QString& fieldName);
 
-        ErrorCode saveMiscParam(const ApiMiscData &params);
+        ErrorCode saveMiscParam(const nx::vms::api::MiscData& params);
         ErrorCode readSettings(nx::vms::api::ResourceParamDataList& settings);
 
         ErrorCode insertOrReplaceResource(const nx::vms::api::ResourceData& data,

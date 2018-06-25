@@ -36,7 +36,7 @@ protected:
         impl::SimpleHandlerPtr handler) override;
 
     virtual int saveMiscParam(
-        const ec2::ApiMiscData& param,
+        const nx::vms::api::MiscData& param,
         impl::SimpleHandlerPtr handler) override;
 
     virtual int getMiscParam(
@@ -66,8 +66,7 @@ class AbstractWorkAroundMiscDataSaver
 {
 public:
     virtual ~AbstractWorkAroundMiscDataSaver() = default;
-
-    virtual ErrorCode saveSync(const ApiMiscData& data) = 0;
+    virtual ErrorCode saveSync(const nx::vms::api::MiscData& data) = 0;
 };
 
 class WorkAroundMiscDataSaverStub:
@@ -76,8 +75,7 @@ class WorkAroundMiscDataSaverStub:
 {
 public:
     WorkAroundMiscDataSaverStub(MiscManagerStub* miscManager);
-
-    virtual ErrorCode saveSync(const ApiMiscData& /*data*/) override;
+    virtual ErrorCode saveSync(const nx::vms::api::MiscData& /*data*/) override;
 
 private:
     MiscManagerStub* m_miscManager;
